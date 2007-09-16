@@ -235,7 +235,7 @@ movie_root::getStageObject()
 	if ( ! VM::isInitialized() ) return NULL;
 	as_object* global = VM::get().getGlobal();
 	if ( ! global ) return NULL;
-	if ( ! global->get_member(PROPNAME("Stage"), &v) ) return NULL;
+	if (!global->get_member(string_table::find(PROPNAME("Stage")), &v) ) return NULL;
 	return boost::dynamic_pointer_cast<Stage>(v.to_object());
 }
 		
@@ -292,7 +292,7 @@ movie_root::getKeyObject()
 	// TODO: test what happens with the global "Key" object
 	//       is removed or overridden by the user
 
-	if ( ! _keyobject )
+	if (!_keyobject)
 	{
 		// This isn't very performant... 
 		// it will keep trying to find it even if impossible
@@ -306,7 +306,7 @@ movie_root::getKeyObject()
 		{
 			boost::to_lower(objName, vm.getLocale());
 		}
-		if ( global->get_member(objName, &kval) )
+		if ( global->get_member(string_table::find(objName), &kval) )
 		{
 			//log_msg("Found member 'Key' in _global: %s", kval.to_string());
 			boost::intrusive_ptr<as_object> obj = kval.to_object();

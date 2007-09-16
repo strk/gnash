@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.53 2007/09/04 21:50:21 strk Exp $ */
+/* $Id: character.cpp,v 1.54 2007/09/16 16:48:13 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -725,7 +725,7 @@ character::getUserDefinedEventHandler(const std::string& name) const
 
 	// const cast is needed due to getter/setter members possibly
 	// modifying this object even when only get !
-	if ( const_cast<character*>(this)->get_member(method_name, &tmp) )
+	if ( const_cast<character*>(this)->get_member(string_table::find(method_name), &tmp) )
 	{
 		func = tmp.to_as_function();
 	}

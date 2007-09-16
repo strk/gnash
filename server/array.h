@@ -290,10 +290,10 @@ public:
 	/// Overridden to provide 'length' member
 	//
 	/// TODO: use a property for handling 'length'
-	virtual bool get_member(const std::string& name, as_value* val);
+	virtual bool get_member(string_table::key name, as_value* val);
 
 	/// Overridden to provide array[#]=x semantic
-	virtual void set_member(const std::string& name,
+	virtual void set_member(string_table::key name,
 		const as_value& val );
 
 protected:
@@ -315,7 +315,7 @@ private:
 	// this function is used internally by set_member and get_member
 	// it takes a string that is the member name of the array and returns -1
 	// if the string does not refer to an index, or an appropriate int if the string does refer to an index
-	int index_requested(const std::string& name);
+	int index_requested(string_table::key name);
 
 };
 

@@ -124,7 +124,7 @@ bool	s_inited = false;
 void register_component(const std::string& name, as_c_function_ptr handler)
 {
 	as_object* global = VM::get().getGlobal();
-	global->set_member(name, handler);
+	global->set_member(string_table::find(name), handler);
 }
 
 //
@@ -426,12 +426,12 @@ event_id::is_button_event() const
 // TODO: move to character.h ?
 // TODO: case-insensitive search ?
 as_standard_member
-get_standard_member(const std::string& name)
+get_standard_member(string_table::key name)
 {
-	typedef std::map< std::string, as_standard_member, StringNoCaseLessThen>  maptype; 
+	typedef std::map<string_table::key, as_standard_member>  maptype; 
 
 	static bool s_inited = false;
-	static std::map< std::string, as_standard_member, StringNoCaseLessThen> membersMap;
+	static maptype membersMap;
 
 	if (!s_inited)
 	{
@@ -440,35 +440,47 @@ get_standard_member(const std::string& name)
 		// worth reserving ?
 		//membersMap.resize(int(AS_STANDARD_MEMBER_COUNT));
 
-		membersMap["_x"] = M_X;
-		membersMap["_y"] = M_Y;
-		membersMap["_xscale"] = M_XSCALE;
-		membersMap["_yscale"] = M_YSCALE;
-		membersMap["_currentframe"] = M_CURRENTFRAME;
-		membersMap["_totalframes"] = M_TOTALFRAMES;
-		membersMap["_alpha"] = M_ALPHA;
-		membersMap["_visible"] = M_VISIBLE;
-		membersMap["_width"] = M_WIDTH;
-		membersMap["_height"] = M_HEIGHT;
-		membersMap["_rotation"] = M_ROTATION;
-		membersMap["_target"] = M_TARGET;
-		membersMap["_framesloaded"] = M_FRAMESLOADED;
-		membersMap["_name"] = M_NAME;
-		membersMap["_droptarget"] = M_DROPTARGET;
-		membersMap["_url"] = M_URL;
-		membersMap["_highquality"] = M_HIGHQUALITY;
-		membersMap["_focusrect"] = M_FOCUSRECT;
-		membersMap["_soundbuftime"] = M_SOUNDBUFTIME;
-		membersMap["_xmouse"] = M_XMOUSE;
-		membersMap["_ymouse"] = M_YMOUSE;
-		membersMap["_parent"] = M_PARENT;
-		membersMap["text"] = M_TEXT;
-		membersMap["htmlText"] = M_HTMLTEXT;
-		membersMap["textWidth"] = M_TEXTWIDTH;
-		membersMap["textColor"] = M_TEXTCOLOR;
-		membersMap["onLoad"] = M_ONLOAD;
-		membersMap["onRollOver"] = M_ONROLLOVER;
-		membersMap["onRollOut"] = M_ONROLLOUT;
+		membersMap[string_table::find("_x")] = M_X;
+		membersMap[string_table::find("_y")] = M_Y;
+		membersMap[string_table::find("_xscale")] = M_XSCALE;
+		membersMap[string_table::find("_yscale")] = M_YSCALE;
+		membersMap[string_table::find("_currentframe")] = M_CURRENTFRAME;
+		membersMap[string_table::find("_totalframes")] = M_TOTALFRAMES;
+		membersMap[string_table::find("_alpha")] = M_ALPHA;
+		membersMap[string_table::find("_visible")] = M_VISIBLE;
+		membersMap[string_table::find("_width")] = M_WIDTH;
+		membersMap[string_table::find("_height")] = M_HEIGHT;
+		membersMap[string_table::find("_rotation")] = M_ROTATION;
+		membersMap[string_table::find("_target")] = M_TARGET;
+		membersMap[string_table::find("_framesloaded")] = M_FRAMESLOADED;
+		membersMap[string_table::find("_name")] = M_NAME;
+		membersMap[string_table::find("_droptarget")] = M_DROPTARGET;
+		membersMap[string_table::find("_url")] = M_URL;
+		membersMap[string_table::find("_highquality")] = M_HIGHQUALITY;
+		membersMap[string_table::find("_focusrect")] = M_FOCUSRECT;
+		membersMap[string_table::find("_soundbuftime")] = M_SOUNDBUFTIME;
+		membersMap[string_table::find("_xmouse")] = M_XMOUSE;
+		membersMap[string_table::find("_ymouse")] = M_YMOUSE;
+		membersMap[string_table::find("_parent")] = M_PARENT;
+		membersMap[string_table::find("text")] = M_TEXT;
+		if (VM::get().getSWFVersion() >= 7)
+		{
+			membersMap[string_table::find("htmlText")] = M_HTMLTEXT;
+			membersMap[string_table::find("textWidth")] = M_TEXTWIDTH;
+			membersMap[string_table::find("textColor")] = M_TEXTCOLOR;
+			membersMap[string_table::find("onLoad")] = M_ONLOAD;
+			membersMap[string_table::find("onRollOver")] = M_ONROLLOVER;
+			membersMap[string_table::find("onRollOut")] = M_ONROLLOUT;
+		}
+		else
+		{
+			membersMap[string_table::find("htmltext")] = M_HTMLTEXT;
+			membersMap[string_table::find("textwidth")] = M_TEXTWIDTH;
+			membersMap[string_table::find("textcolor")] = M_TEXTCOLOR;
+			membersMap[string_table::find("onload")] = M_ONLOAD;
+			membersMap[string_table::find("onrollover")] = M_ONROLLOVER;
+			membersMap[string_table::find("onrollout")] = M_ONROLLOUT;
+		}
 	}
 
 	as_standard_member result;

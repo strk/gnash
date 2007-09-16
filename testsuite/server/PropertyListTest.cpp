@@ -65,48 +65,48 @@ main(int /*argc*/, char** /*argv*/)
 	as_value ret;
 
 	check_equals(props.size(), 0);
-	check ( props.setValue("Var0", val, obj) );
+	check ( props.setValue(string_table::find("Var0"), val, obj) );
 	check_equals(props.size(), 1);
 
-	check ( props.getValue("Var0", ret, obj) );
+	check ( props.getValue(string_table::find("Var0"), ret, obj) );
 	check_equals ( ret, val );
 
 	// search should be case-sensitive
-	check ( ! props.getValue("var0", ret, obj) );
+	check ( ! props.getValue(string_table::find("var0"), ret, obj) );
 
 	// new value overrides existing value
-	check ( props.setValue("Var0", val2, obj) );
+	check ( props.setValue(string_table::find("Var0"), val2, obj) );
 	check_equals(props.size(), 1);
-	check ( props.getValue("Var0", ret, obj) );
+	check ( props.getValue(string_table::find("Var0"), ret, obj) );
 	check_equals ( ret, val2 );
 
 	// case-sensitive setting value doesn't overrides existing value
-	check ( props.setValue("var0", val3, obj) );
+	check ( props.setValue(string_table::find("var0"), val3, obj) );
 	check_equals(props.size(), 2);
-	check ( ! props.getValue("vAr0", ret, obj) );
+	check ( ! props.getValue(string_table::find("vAr0"), ret, obj) );
 
 	// Now add some new labels
-	check ( props.setValue("var1", val, obj) );
+	check ( props.setValue(string_table::find("var1"), val, obj) );
 	check_equals(props.size(), 3);
-	check ( props.setValue("var2", val, obj) );
+	check ( props.setValue(string_table::find("var2"), val, obj) );
 	check_equals(props.size(), 4);
-	check ( props.setValue("var3", val, obj) );
+	check ( props.setValue(string_table::find("var3"), val, obj) );
 	check_equals(props.size(), 5);
 
 	// Test deletion of properties
 
 	// this succeeds
-	check(props.delProperty("var3").second);
+	check(props.delProperty(string_table::find("var3")).second);
 	check_equals(props.size(), 4);
 
 	// this fails (non existent property)
-	check(!props.delProperty("non-existent").first);
+	check(!props.delProperty(string_table::find("non-existent")).first);
 	check_equals(props.size(), 4);
 
 	// Set property var2 as protected from deletion!
-	check(props.setFlags("var2", as_prop_flags::dontDelete, 0));
+	check(props.setFlags(string_table::find("var2"), as_prop_flags::dontDelete, 0));
 	// this fails (protected from deletion)
-	std::pair<bool, bool> delpair = props.delProperty("var2");
+	std::pair<bool, bool> delpair = props.delProperty(string_table::find("var2"));
 	check_equals(delpair.first, true); // property was found
 	check_equals(delpair.second, false); // property was NOT deleted
 	check_equals(props.size(), 4);

@@ -61,7 +61,7 @@ PropertyList::operator=(const PropertyList& pl)
 
 
 bool
-PropertyList::getValue(const std::string& key, as_value& val,
+PropertyList::getValue(const string_table::key key, as_value& val,
 		as_object& this_ptr) 
 {
 	const_iterator found = _props.find( key );
@@ -78,7 +78,7 @@ PropertyList::getValue(const std::string& key, as_value& val,
 }
 
 bool
-PropertyList::setValue(const std::string& key, const as_value& val,
+PropertyList::setValue(string_table::key key, const as_value& val,
 		as_object& this_ptr)
 {
 	iterator found = _props.find( key );
@@ -87,7 +87,7 @@ PropertyList::setValue(const std::string& key, const as_value& val,
 		// create a new member
 		SimpleProperty* prop = new SimpleProperty(val);
 #ifdef DEBUG_PROPERTY_ALLOC
-		log_debug("SimpleProperty %s = %p", key.c_str(), (void*)prop);
+		log_debug("SimpleProperty %s = %p", string_table::value(key).c_str(), (void*)prop);
 #endif // DEBUG_PROPERTY_ALLOC
 		_props[key] = prop;
 		return true;
@@ -97,7 +97,8 @@ PropertyList::setValue(const std::string& key, const as_value& val,
 
 	if ( prop->isReadOnly() )
 	{
-		log_error(_("Property %s is read-only, not setting it to %s"), key.c_str(), val.to_string().c_str());
+		log_error(_("Property %s is read-only, not setting it to %s"), 
+			string_table::value(key).c_str(), val.to_string().c_str());
 		return false;
 	}
 
@@ -107,7 +108,7 @@ PropertyList::setValue(const std::string& key, const as_value& val,
 }
 
 bool
-PropertyList::setFlags(const std::string& key,
+PropertyList::setFlags(string_table::key key,
 		int setFlags, int clearFlags)
 {
 	iterator found = _props.find( key );
@@ -137,7 +138,7 @@ PropertyList::setFlagsAll(int setFlags, int clearFlags)
 }
 
 Property*
-PropertyList::getProperty(const std::string& key)
+PropertyList::getProperty(string_table::key key)
 {
 	iterator it=find(key);
 	if ( it == end() ) return NULL;
@@ -145,7 +146,7 @@ PropertyList::getProperty(const std::string& key)
 }
 
 std::pair<bool,bool>
-PropertyList::delProperty(const std::string& key)
+PropertyList::delProperty(string_table::key key)
 {
 	//GNASH_REPORT_FUNCTION;
 	iterator it=find(key);
@@ -173,9 +174,9 @@ PropertyList::setFlagsAll(const PropertyList& props,
 
 	for (const_iterator it = props.begin(), itEnd = props.end(); it != itEnd; ++it )
 	{
-		const std::string& name = it->first;
+		string_table::key key = it->first;
 
-		if ( setFlags(name, flagsSet, flagsClear) ) ++success;
+		if ( setFlags(key, flagsSet, flagsClear) ) ++success;
 		else ++failure;
 	}
 
@@ -192,7 +193,7 @@ PropertyList::enumerateKeys(as_environment& env) const
 
 		if ( prop->getFlags().get_dont_enum() ) continue;
 
-		env.push(as_value(i->first.c_str()));
+		env.push(as_value(string_table::value(i->first).c_str()));
 	}
 }
 
@@ -205,7 +206,7 @@ PropertyList::enumerateKeyValue(as_object& this_ptr, std::map<std::string, std::
 
 		if ( prop->getFlags().get_dont_enum() ) continue;
 
-		to.insert(make_pair(i->first,
+		to.insert(make_pair(string_table::value(i->first),
 				prop->getValue(this_ptr).to_string()));
 	}
 }
@@ -215,7 +216,7 @@ PropertyList::dump(as_object& this_ptr)
 {
 	for ( const_iterator it=begin(), itEnd=end(); it != itEnd; ++it )
 	{
-		log_msg("  %s: %s", it->first.c_str(),
+		log_msg("  %s: %s", string_table::value(it->first).c_str(),
 			it->second->getValue(this_ptr).to_string().c_str());
 	}
 }
@@ -225,11 +226,11 @@ PropertyList::import(const PropertyList& o)
 {
 	for (const_iterator it = o.begin(), itEnd = o.end(); it != itEnd; ++it)
 	{
-		const std::string& name = it->first;
+		string_table::key key = it->first;
 		const Property* prop = it->second;
 
 		// Delete any previous property with this name
-		iterator found = _props.find( name );
+		iterator found = _props.find(key);
 		if ( found != _props.end() )
 		{
 			delete found->second;
@@ -237,13 +238,13 @@ PropertyList::import(const PropertyList& o)
 		}
 		else
 		{
-			_props[name] = prop->clone();
+			_props[key] = prop->clone();
 		}
 	}
 }
 
 bool
-PropertyList::addGetterSetter(const std::string& key, as_function& getter,
+PropertyList::addGetterSetter(string_table::key key, as_function& getter,
 	as_function& setter)
 {
 	iterator found = _props.find( key );
@@ -251,7 +252,7 @@ PropertyList::addGetterSetter(const std::string& key, as_function& getter,
 
 	GetterSetterProperty* prop = new GetterSetterProperty(GetterSetter(getter, setter));
 #ifdef DEBUG_PROPERTY_ALLOC
-	log_debug("GetterSetterProperty %s = %p", key.c_str(), (void*)prop);
+	log_debug("GetterSetterProperty %s = %p", string_table::value(key).c_str(), (void*)prop);
 #endif // DEBUG_PROPERTY_ALLOC
 	_props[key] = prop;
 	return true;

@@ -71,7 +71,7 @@ void
 Stage::onResize(as_environment* env)
 {
 	as_value v;
-	if ( get_member(PROPNAME("scaleMode"), &v) && v.to_string(env) == "noScale" )
+	if (get_member(string_table::find(PROPNAME("scaleMode")), &v) && v.to_string(env) == "noScale" )
 	{
 		notifyResize(env);
 	}
@@ -92,7 +92,7 @@ Stage::notifyResize(as_environment* env)
 void
 Stage::notifyResize(boost::intrusive_ptr<as_object> obj, as_environment* env)
 {
-	std::string eventname = PROPNAME("onResize");
+	string_table::key eventname = string_table::find(PROPNAME("onResize"));
 
 	as_value method;
 	if ( ! obj->get_member(eventname, &method) ) {

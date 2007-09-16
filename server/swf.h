@@ -526,6 +526,7 @@ typedef enum
     /// Stack Out:
     ///  .
     /// Do: Throw obj as an exception
+    /// Equivalent: ACTIONTHROW
     ABC_ACTION_THROW               = 0X03,
 
     /// Stream:
@@ -565,6 +566,7 @@ typedef enum
     /// Stream: UV32 frame pointer offset 'offset'
     /// Frame: 
     ///  Kill at offset
+    /// Equivalent: ACTION_DELETE
     ABC_ACTION_KILL                = 0X08,
 
     /// Do: Unknown purpose, Tamarin does nothing.
@@ -611,6 +613,7 @@ typedef enum
 
     /// Stream: S24 jump offset 'jump'
     /// Do: If jump is negative, check for interrupts. Move by jump in stream.
+    /// Equivalent: ACTION_BRANCHALWAYS
     ABC_ACTION_JUMP                = 0X10,
 
     /// Stream: S24 jump offset 'jump'
@@ -619,6 +622,7 @@ typedef enum
     /// Stack Out:
     ///  .
     /// Do: If a is 'true', move by jump in stream, as ABC_ACTION_JUMP does.
+    /// Equivalent: ACTION_BRANCHIFTRUE
     ABC_ACTION_IFTRUE              = 0X11,
 
     /// Stream: S24 jump offset 'jump'

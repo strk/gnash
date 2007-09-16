@@ -62,9 +62,9 @@ public:
 	/// Use the set_member function to properly set *inherited* properties
 	/// of the given target object
 	///
-	void operator() (const std::string& name, const as_value& val)
+	void operator() (string_table::key name, const as_value& val)
 	{
-		if ( name == "__proto__" ) return;
+		if (name == string_table::find("__proto__")) return;
 		//log_msg(_("Setting member '%s' to value '%s'"), name.c_str(), val.to_debug_string().c_str());
 		_tgt.set_member(name, val);
 	}
@@ -83,17 +83,17 @@ as_object::add_property(const std::string& key, as_function& getter,
 	{
 		std::string name = key;
 		boost::to_lower(name, _vm.getLocale());
-		return _members.addGetterSetter(name, getter, setter);
+		return _members.addGetterSetter(string_table::find(name), getter, setter);
 	}
 	else
 	{
-		return _members.addGetterSetter(key, getter, setter);
+		return _members.addGetterSetter(string_table::find(key), getter, setter);
 	}
 }
 
 /*protected*/
 bool
-as_object::get_member_default(const std::string& name, as_value* val)
+as_object::get_member_default(string_table::key name, as_value* val)
 {
 	assert(val);
 
@@ -116,10 +116,10 @@ as_object::get_member_default(const std::string& name, as_value* val)
 
 /*private*/
 Property*
-as_object::findProperty(const std::string& key)
+as_object::findProperty(string_table::key key)
 {
 	// don't enter an infinite loop looking for __proto__ ...
-	if ( key == "__proto__" )
+	if (key == string_table::find("__proto__"))
 	{
 		return _members.getProperty(key);
 	}
@@ -143,10 +143,10 @@ as_object::findProperty(const std::string& key)
 
 /*private*/
 Property*
-as_object::findGetterSetter(const std::string& key)
+as_object::findGetterSetter(string_table::key key)
 {
 	// don't enter an infinite loop looking for __proto__ ...
-	if ( key == "__proto__" )
+	if (key == string_table::find("__proto__"))
 	{
 		Property* prop = _members.getProperty(key);
 		if ( ! prop ) return NULL;
@@ -180,10 +180,10 @@ as_object::findGetterSetter(const std::string& key)
 void
 as_object::set_prototype(boost::intrusive_ptr<as_object> proto, int flags)
 {
-	static std::string key ( "__proto__" );
+	static string_table::key key = string_table::find("__proto__");
 
 	// TODO: check what happens if __proto__ is set as a user-defined getter/setter
-	if ( _members.setValue(key, as_value(proto.get()), *this) )
+	if (_members.setValue(key, as_value(proto.get()), *this) )
 	{
 		// TODO: optimize this, don't scan again !
 		_members.setFlags(key, flags, 0);
@@ -191,7 +191,7 @@ as_object::set_prototype(boost::intrusive_ptr<as_object> proto, int flags)
 }
 
 void
-as_object::set_member_default(const std::string& key, const as_value& val )
+as_object::set_member_default(string_table::key key, const as_value& val )
 {
 	//log_msg(_("set_member_default(%s)"), key.c_str());
 
@@ -207,7 +207,7 @@ as_object::set_member_default(const std::string& key, const as_value& val )
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
                 			log_aserror(_("Attempt to set read-only property '%s'"),
-						    key.c_str());
+						    string_table::value(key).c_str());
 	                	);
 			} else
 			{
@@ -217,7 +217,7 @@ as_object::set_member_default(const std::string& key, const as_value& val )
 		}
 		catch (ActionException& exc)
 		{
-			log_msg(_("%s: Exception %s.  Will create a new member"), key.c_str(), exc.what());
+			log_msg(_("%s: Exception %s.  Will create a new member"), string_table::value(key).c_str(), exc.what());
 		}
 	}
 
@@ -225,19 +225,19 @@ as_object::set_member_default(const std::string& key, const as_value& val )
 
 	// No getter/setter property found, so set (or create) a
 	// SimpleProperty (if possible)
-	if ( ! _members.setValue(key, val, *this) )
+	if (!_members.setValue(key, val, *this) )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Attempt to set read-only property ``%s''"
 			" on object ``%p''"),
-			key.c_str(), (void*)this);
+			string_table::value(key).c_str(), (void*)this);
 		);
 	}
 
 }
 
 void
-as_object::init_member(const std::string& key, const as_value& val, int flags)
+as_object::init_member(const std::string& key1, const as_value& val, int flags)
 {
 
 	//log_msg(_("Setting member %s (SWF version:%d)"), key.c_str(), vm.getSWFVersion());
@@ -246,39 +246,35 @@ as_object::init_member(const std::string& key, const as_value& val, int flags)
 
 	if ( vm.getSWFVersion() < 7 )
 	{
-		std::string keylower = key;
+		std::string keylower = key1;
 		boost::to_lower(keylower, vm.getLocale());
 
 		// Set (or create) a SimpleProperty 
-		if ( ! _members.setValue(keylower, val, *this) )
+		if (! _members.setValue(string_table::find(keylower), val, *this) )
 		{
 			log_error(_("Attempt to initialize read-only property ``%s''"
 				" (%s) on object ``%p'' twice"),
-				keylower.c_str(), key.c_str(), (void*)this);
+				keylower.c_str(), key1.c_str(), (void*)this);
 			// We shouldn't attempt to initialize a member twice, should we ?
 			assert(0);
 		}
 		// TODO: optimize this, don't scan again !
-		_members.setFlags(keylower, flags, 0);
+		_members.setFlags(string_table::find(keylower), flags, 0);
 	}
 	else
 	{
 		// Set (or create) a SimpleProperty 
-		if ( ! _members.setValue(key, val, *this) )
+		if ( ! _members.setValue(string_table::find(key1), val, *this) )
 		{
 			log_error(_("Attempt to initialize read-only property ``%s''"
 				" on object ``%p'' twice"),
-				key.c_str(), (void*)this);
+				key1.c_str(), (void*)this);
 			// We shouldn't attempt to initialize a member twice, should we ?
 			assert(0);
 		}
 		// TODO: optimize this, don't scan again !
-		_members.setFlags(key, flags, 0);
+		_members.setFlags(string_table::find(key1), flags, 0);
 	}
-
-
-
-
 }
 
 void
@@ -290,17 +286,17 @@ as_object::init_property(const std::string& key, as_function& getter,
 	{
 		std::string name = key;
 		boost::to_lower(name, _vm.getLocale());
-		success = _members.addGetterSetter(name, getter, setter);
+		success = _members.addGetterSetter(string_table::find(name), getter, setter);
 		//log_msg(_("Initialized property '%s'"), name.c_str());
 		// TODO: optimize this, don't scan again !
-		_members.setFlags(name, flags, 0);
+		_members.setFlags(string_table::find(name), flags, 0);
 	}
 	else
 	{
-		success = _members.addGetterSetter(key, getter, setter);
+		success = _members.addGetterSetter(string_table::find(key), getter, setter);
 		//log_msg(_("Initialized property '%s'"), key.c_str());
 		// TODO: optimize this, don't scan again !
-		_members.setFlags(key, flags, 0);
+		_members.setFlags(string_table::find(key), flags, 0);
 	}
 
 	// We shouldn't attempt to initialize a property twice, should we ?
@@ -312,7 +308,7 @@ as_object::init_readonly_property(const std::string& key, as_function& getter, i
 {
 	init_property(key, getter, getter, initflags);
 
-	as_prop_flags& flags = getOwnProperty(key)->getFlags();
+	as_prop_flags& flags = getOwnProperty(string_table::find(key))->getFlags();
 
 	// ActionScript must not change the flags of this builtin property.
 	flags.set_is_protected(true);
@@ -323,9 +319,9 @@ as_object::init_readonly_property(const std::string& key, as_function& getter, i
 }
 
 std::string
-as_object::asPropName(std::string name)
+as_object::asPropName(string_table::key name)
 {
-	std::string orig = name;
+	std::string orig = string_table::value(name);
 	if ( _vm.getSWFVersion() < 7 )
 	{
 		boost::to_lower(orig, _vm.getLocale());
@@ -336,7 +332,7 @@ as_object::asPropName(std::string name)
 
 
 bool
-as_object::set_member_flags(const std::string& name,
+as_object::set_member_flags(string_table::key name,
 		int setTrue, int setFalse)
 {
 	// TODO: accept a std::string directly
@@ -396,7 +392,7 @@ as_object::dump_members()
 void
 as_object::setPropFlags(as_value& props_val, int set_false, int set_true)
 {
-	if ( props_val.is_string() )
+	if (props_val.is_string())
 	{
 		std::string propstr = props_val.to_string();
 		for(;;)
@@ -414,7 +410,7 @@ as_object::setPropFlags(as_value& props_val, int set_false, int set_true)
 			}
 
 			// set_member_flags will take care of case conversion
-			if ( ! set_member_flags(prop.c_str(), set_true, set_false) )
+			if (!set_member_flags(string_table::find(prop), set_true, set_false) )
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
 				log_aserror(_("Can't set propflags on object "
@@ -560,13 +556,13 @@ as_object::as_object(const as_object& other)
 }
 
 std::pair<bool,bool>
-as_object::delProperty(const std::string& name)
+as_object::delProperty(string_table::key name)
 {
 	if ( _vm.getSWFVersion() < 7 )
 	{
-        	std::string key = name;
+       	std::string key = string_table::value(name);
 		boost::to_lower(key, _vm.getLocale());
-		return _members.delProperty(key);
+		return _members.delProperty(string_table::find(key));
 	}
 	else
 	{
@@ -575,13 +571,13 @@ as_object::delProperty(const std::string& name)
 }
 
 Property*
-as_object::getOwnProperty(const std::string& name)
+as_object::getOwnProperty(string_table::key name)
 {
 	if ( _vm.getSWFVersion() < 7 )
 	{
-        	std::string key = name;
+       	std::string key = string_table::value(name);
 		boost::to_lower(key, _vm.getLocale());
-		return _members.getProperty(key);
+		return _members.getProperty(string_table::find(key));
 	}
 	else
 	{
@@ -616,11 +612,11 @@ as_object::valueof_method(const fn_call& fn)
 boost::intrusive_ptr<as_object>
 as_object::get_prototype()
 {
-	static std::string key ( "__proto__" );
+	static string_table::key key = string_table::find("__proto__");
 	as_value tmp;
 	// I don't think any subclass should override getting __proto__ anyway...
 	//if ( ! get_member(key, &tmp) ) return NULL;
-	if ( ! _members.getValue(key, tmp, *this) ) return NULL;
+	if (!_members.getValue(key, tmp, *this) ) return NULL;
 	return tmp.to_object();
 
 #if 0 // the inheritance chain MUST end somewhere, handle the SWF4 thing in some other way
@@ -650,7 +646,7 @@ as_object::on_event(const event_id& id )
 		boost::to_lower(handler_name, _vm.getLocale());
 	}
 
-	if (get_member(handler_name, &event_handler) )
+	if (get_member(string_table::find(handler_name), &event_handler) )
 	{
 		call_method(event_handler, NULL, this, 0, 0);
 		return true;
@@ -661,20 +657,21 @@ as_object::on_event(const event_id& id )
 #endif 
 
 as_value
-as_object::getMember(const std::string& name)
+as_object::getMember(string_table::key name)
 {
 	as_value ret;
-	get_member(PROPNAME(name), &ret);
+	get_member(name, &ret);
+	//get_member(PROPNAME(name), &ret);
 	return ret;
 }
 
 as_value
-as_object::callMethod(const std::string& methodName, as_environment& env)
+as_object::callMethod(string_table::key methodName, as_environment& env)
 {
 	as_value ret;
 	as_value method;
 
-	if ( ! get_member(methodName, &method) )
+	if (! get_member(methodName, &method))
 	{
 		return ret;
 	}
@@ -683,12 +680,12 @@ as_object::callMethod(const std::string& methodName, as_environment& env)
 }
 
 as_value
-as_object::callMethod(const std::string& methodName, as_environment& env, const as_value& arg0)
+as_object::callMethod(string_table::key methodName, as_environment& env, const as_value& arg0)
 {
 	as_value ret;
 	as_value method;
 
-	if ( ! get_member(methodName, &method) )
+	if (!get_member(methodName, &method))
 	{
 		return ret;
 	}
@@ -703,12 +700,13 @@ as_object::callMethod(const std::string& methodName, as_environment& env, const 
 }
 
 as_value
-as_object::callMethod(const std::string& methodName, as_environment& env, const as_value& arg0, const as_value& arg1)
+as_object::callMethod(string_table::key methodName, as_environment& env,
+	const as_value& arg0, const as_value& arg1)
 {
 	as_value ret;
 	as_value method;
 
-	if ( ! get_member(methodName, &method) )
+	if (! get_member(methodName, &method))
 	{
 		return ret;
 	}

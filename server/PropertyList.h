@@ -24,6 +24,7 @@
 
 #include "Property.h" // for templated functions
 #include "as_value.h" // for templated functions
+#include "string_table.h"
 
 #include <map> 
 #include <string> // for use within map 
@@ -64,7 +65,7 @@ private:
 	///	  overhead and with manager ownerhips. See:
 	/// http://www.boost.org/libs/ptr_container/doc/ptr_container.html
 	///
-	typedef std::map<std::string, Property*> container;
+	typedef std::map<string_table::key, Property*> container;
 	typedef container::iterator iterator;
 	typedef container::const_iterator const_iterator;
 	typedef container::reverse_iterator reverse_iterator;
@@ -72,10 +73,10 @@ private:
 
 	container _props;
 
-	iterator find(const std::string& key) {
+	iterator find(string_table::key key) {
 		return _props.find(key);
 	}
-	const_iterator find(const std::string& key) const {
+	const_iterator find(string_table::key key) const {
 		return _props.find(key);
 	}
 	iterator end() {
@@ -125,11 +126,11 @@ public:
 		for (const_iterator it = begin(), itEnd = end();
 				it != itEnd; ++it)
 		{
-			const std::string& name = it->first;
+			string_table::key key = it->first;
 			const Property* prop = it->second;
 			as_value val = prop->getValue(this_ptr);
 
-			visitor(name, val);
+			visitor(key, val);
 		}
 	}
 
@@ -161,7 +162,7 @@ public:
 	/// @return true if the value was successfully retrived, false
 	///         otherwise (and value will be untouched)
 	///
-	bool getValue(const std::string& key, as_value& value,
+	bool getValue(string_table::key key, as_value& value,
 			as_object& this_ptr);
 
 	/// Set the value of a property, creating a new one if unexistent.
@@ -189,7 +190,7 @@ public:
 	/// @return true if the value was successfully set, false
 	///         otherwise (found a read-only property, most likely).
 	///
-	bool setValue(const std::string& key, const as_value& value,
+	bool setValue(string_table::key key, const as_value& value,
 			as_object& this_ptr);
 
 	/// Get a property, if existing
@@ -201,7 +202,7 @@ public:
 	///	ownership of returned Propery is kept by the PropertyList,
 	///	so plase *don't* delete it !
 	///
-	Property* getProperty(const std::string& key);
+	Property* getProperty(string_table::key key);
 
 	/// Delete a propery, if exising and not protected from deletion.
 	//
@@ -217,7 +218,7 @@ public:
 	///	- (true, false) : property protected from deletion
 	///	- (true, true) : property successfully deleted
 	///
-	std::pair<bool,bool> delProperty(const std::string& key);
+	std::pair<bool,bool> delProperty(string_table::key key);
 
 	/// \brief
 	/// Add a getter/setter property, if not already existing
@@ -237,7 +238,7 @@ public:
 	/// @return true if the property was successfully added, false
 	///         otherwise (property already existent?)
 	///
-	bool addGetterSetter(const std::string& key, as_function& getter,
+	bool addGetterSetter(string_table::key key, as_function& getter,
 		as_function& setter);
 
 	/// Set the flags of a property.
@@ -254,7 +255,7 @@ public:
 	/// @return true if the value was successfully set, false
 	///         otherwise (either not found or protected)
 	///
-	bool setFlags(const std::string& key, int setTrue, int setFalse);
+	bool setFlags(string_table::key key, int setTrue, int setFalse);
 
 	/// Set the flags of all properties.
 	//

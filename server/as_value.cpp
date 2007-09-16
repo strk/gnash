@@ -135,7 +135,7 @@ as_value::to_string(as_environment* env) const
 			bool gotValidToStringResult = false;
 			if ( env )
 			{
-				std::string methodname = PROPNAME("toString"); 
+				string_table::key methodname = string_table::find(PROPNAME("toString")); 
 				as_value method;
 				if ( obj->get_member(methodname, &method) )
 				{
@@ -148,13 +148,13 @@ as_value::to_string(as_environment* env) const
 					else
 					{
 						log_msg(_("[object %p].%s() did not return a string: %s"),
-								(void*)obj, methodname.c_str(),
+								(void*)obj, string_table::value(methodname).c_str(),
 								ret.to_debug_string().c_str());
 					}
 				}
 				else
 				{
-					log_msg(_("get_member(%s) returned false"), methodname.c_str());
+					log_msg(_("get_member(%s) returned false"), string_table::value(methodname).c_str());
 				}
 			}
 			if ( ! gotValidToStringResult )
@@ -211,7 +211,7 @@ as_value::to_primitive(as_environment& env) const
 	if ( m_type == OBJECT || m_type == AS_FUNCTION )
 	{
 		as_object* obj = m_object_value;
-		std::string methodname = PROPNAME("valueOf"); 
+		string_table::key methodname = string_table::find(PROPNAME("valueOf")); 
 		as_value method;
 		if ( obj->get_member(methodname, &method) )
 		{
@@ -219,7 +219,7 @@ as_value::to_primitive(as_environment& env) const
 		}
 		else
 		{
-			log_msg(_("get_member(%s) returned false"), methodname.c_str());
+			log_msg(_("get_member(%s) returned false"), string_table::value(methodname).c_str());
 		}
 	}
 
@@ -290,9 +290,9 @@ as_value::to_number(as_environment* env) const
 			as_object* obj = m_object_value; 
 			if ( env )
 			{
-				std::string methodname = PROPNAME("valueOf"); 
+				string_table::key methodname = string_table::find(PROPNAME("valueOf")); 
 				as_value method;
-				if ( obj->get_member(methodname, &method) )
+				if (obj->get_member(methodname, &method) )
 				{
 					as_value ret = call_method0(method, env, obj);
 					if ( ret.is_number() )
@@ -306,7 +306,7 @@ as_value::to_number(as_environment* env) const
 					else
 					{
 						log_msg(_("[object %p].%s() did not return a number: %s"),
-								(void*)obj, methodname.c_str(),
+								(void*)obj, string_table::value(methodname).c_str(),
 								ret.to_debug_string().c_str());
 						if ( m_type == AS_FUNCTION && swfversion < 6 )
 						{
@@ -320,7 +320,7 @@ as_value::to_number(as_environment* env) const
 				}
 				else
 				{
-					log_msg(_("get_member(%s) returned false"), methodname.c_str());
+					log_msg(_("get_member(%s) returned false"), string_table::value(methodname).c_str());
 				}
 			}
 			return obj->get_numeric_value(); 

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.132 2007/09/14 06:34:08 nihilus Exp $ */
+/* $Id: ASHandlers.cpp,v 1.133 2007/09/16 16:48:15 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -413,8 +413,6 @@ SWFHandlers::SWFHandlers()
              string("ActionDefineFunction"), SWFHandlers::ActionDefineFunction, ARG_HEX);
     handlers[ACTION_SETREGISTER] = ActionHandler(ACTION_SETREGISTER,
              string("ActionSetRegister"), SWFHandlers::ActionSetRegister, ARG_U8);
-
-
 }
 
 SWFHandlers::~SWFHandlers()
@@ -2434,7 +2432,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
         // Calling super ? 
         boost::intrusive_ptr<as_object> obj = function.to_object();
             this_ptr = thread.getThisPointer();
-        if ( ! obj->get_member("constructor", &function) )
+        if (!obj->get_member(string_table::find("constructor"), &function) )
         {
             IF_VERBOSE_ASCODING_ERRORS (
             log_aserror(_("Object doensn't have a constructor"));
@@ -3067,7 +3065,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 
 			// TODO: all this crap should go into an as_object::getConstructor instead
 			as_value ctor;
-			if ( ! obj->get_member("constructor", &ctor) )
+			if (!obj->get_member(string_table::find("constructor"), &ctor) )
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
 				log_aserror(_("ActionCallMethod: object has no constructor"));

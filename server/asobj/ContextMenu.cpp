@@ -73,7 +73,7 @@ private:
 	as_function* getCallback() 
 	{
 		as_value tmp;
-		if (  get_member("onSelect", &tmp) )
+		if (get_member(string_table::find("onSelect"), &tmp))
 			return tmp.to_as_function();
 		else return NULL;
 	}
@@ -86,7 +86,7 @@ private:
 	///
 	void setCallback(const as_value& callback)
 	{
-		set_member("onSelect", callback);
+		set_member(string_table::find("onSelect"), callback);
 	}
 
 	/// Attach the exported interface of this ActionScript class

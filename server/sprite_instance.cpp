@@ -953,7 +953,7 @@ sprite_globalToLocal(const fn_call& fn)
 	float x = 0;
 	float y = 0;
 
-	if ( ! obj->get_member("x", &tmp) )
+	if ( ! obj->get_member(string_table::find("x"), &tmp) )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("MovieClip.globalToLocal(%s): "
@@ -964,7 +964,7 @@ sprite_globalToLocal(const fn_call& fn)
 	}
 	x = PIXELS_TO_TWIPS(tmp.to_number(&fn.env()));
 
-	if ( ! obj->get_member("y", &tmp) )
+	if ( ! obj->get_member(string_table::find("y"), &tmp) )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("MovieClip.globalToLocal(%s): "
@@ -979,8 +979,8 @@ sprite_globalToLocal(const fn_call& fn)
 	matrix world_mat = sprite->get_world_matrix();
 	world_mat.transform_by_inverse(pt);
 
-	obj->set_member("x", TWIPS_TO_PIXELS(round(pt.m_x)));
-	obj->set_member("y", TWIPS_TO_PIXELS(round(pt.m_y)));
+	obj->set_member(string_table::find("x"), TWIPS_TO_PIXELS(round(pt.m_x)));
+	obj->set_member(string_table::find("y"), TWIPS_TO_PIXELS(round(pt.m_y)));
 
 	return ret;
 }
@@ -1015,7 +1015,7 @@ sprite_localToGlobal(const fn_call& fn)
 	float x = 0;
 	float y = 0;
 
-	if ( ! obj->get_member("x", &tmp) )
+	if ( ! obj->get_member(string_table::find("x"), &tmp) )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("MovieClip.localToGlobal(%s): "
@@ -1026,7 +1026,7 @@ sprite_localToGlobal(const fn_call& fn)
 	}
 	x = PIXELS_TO_TWIPS(tmp.to_number(&fn.env()));
 
-	if ( ! obj->get_member("y", &tmp) )
+	if ( ! obj->get_member(string_table::find("y"), &tmp) )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("MovieClip.localToGlobal(%s): "
@@ -1041,8 +1041,8 @@ sprite_localToGlobal(const fn_call& fn)
 	matrix world_mat = sprite->get_world_matrix();
 	world_mat.transform(pt);
 
-	obj->set_member("x", TWIPS_TO_PIXELS(round(pt.m_x)));
-	obj->set_member("y", TWIPS_TO_PIXELS(round(pt.m_y)));
+	obj->set_member(string_table::find("x"), TWIPS_TO_PIXELS(round(pt.m_x)));
+	obj->set_member(string_table::find("y"), TWIPS_TO_PIXELS(round(pt.m_y)));
 
 	return ret;
 
@@ -1765,14 +1765,16 @@ character* sprite_instance::get_character_at_depth(int depth)
 // Set *val to the value of the named member and
 // return true, if we have the named member.
 // Otherwise leave *val alone and return false.
-bool sprite_instance::get_member(const std::string& name, as_value* val)
+bool sprite_instance::get_member(string_table::key name_key, as_value* val)
 {
+	const std::string& name = string_table::value(name_key);
+
 	// FIXME: use addProperty interface for these !!
 	// TODO: or at least have a character:: protected method take
 	//       care of these ?
 	//       Duplicates code in character::get_relative_target_common too..
 	//
-	if ( name == "_root" )
+	if (name == "_root" )
 	{
 		// TODO: handle lockroot
 		val->set_as_object( VM::get().getRoot().get_root_movie() );
@@ -1811,7 +1813,7 @@ bool sprite_instance::get_member(const std::string& name, as_value* val)
 	//
 	// TODO: simplify the next line when get_member_default takes
 	//       a std::string
-	if ( get_member_default(name.c_str(), val) )
+	if ( get_member_default(name_key, val) )
 	{
 
 // ... trying to be useful to Flash coders ...
@@ -2200,16 +2202,16 @@ sprite_instance::get_relative_target(const std::string& name)
 	return NULL;
 }
 
-void sprite_instance::set_member(const std::string& name,
+void sprite_instance::set_member(string_table::key name,
 		const as_value& val)
 {
 #ifdef DEBUG_DYNTEXT_VARIABLES
-	log_debug(_("sprite[%p]::set_member(%s, %s)"), (void*)this, name.c_str(), val.to_debug_string().c_str());
+	log_debug(_("sprite[%p]::set_member(%s, %s)"), (void*)this, string_table::value(name), val.to_debug_string().c_str());
 #endif
 
 	if ( val.is_function() )
 	{
-		checkForKeyOrMouseEvent(name);
+		checkForKeyOrMouseEvent(string_table::value(name));
 	}
 
 	// Try textfield variables
@@ -2221,7 +2223,7 @@ void sprite_instance::set_member(const std::string& name,
 	//        property (ie: have a textfield use _x as variable name and
 	//        be scared)
 	//
-	edit_text_character* etc = get_textfield_variable(name.c_str());
+	edit_text_character* etc = get_textfield_variable(string_table::value(name).c_str());
 	if ( etc )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
@@ -3328,10 +3330,10 @@ sprite_instance::construct()
 		//
 		if ( swfversion > 5 )
 		{
-			set_member("__constructor__", ctor);
+			set_member(string_table::find("__constructor__"), ctor);
 			if ( swfversion == 6 )
 			{
-				set_member("constructor", ctor);
+				set_member(string_table::find("constructor"), ctor);
 			}
 		}
 	}
@@ -3472,7 +3474,7 @@ sprite_instance::processCompletedLoadVariableRequest(LoadVariablesThread& reques
 		const string& name = it->first;
 		const string& val = it->second;
 		//log_msg(_("Setting variable '%s' to value '%s'"), name.c_str(), val.c_str());
-		set_member(name.c_str(), val.c_str());
+		set_member(string_table::find(name), val.c_str());
 	}
 }
 
@@ -3507,7 +3509,7 @@ sprite_instance::setVariables(VariableMap& vars)
 	{
 		const string& name = it->first;
 		const string& val = it->second;
-		set_member(PROPNAME(name), val.c_str());
+		set_member(string_table::find(PROPNAME(name)), val.c_str());
 	}
 }
 
@@ -3588,7 +3590,7 @@ sprite_instance::isEnabled() const
 	as_value enabled;
 	// const_cast needed due to get_member being non-const due to the 
 	// possibility that a getter-setter would actually modify us ...
-	const_cast<sprite_instance*>(this)->get_member("enabled", &enabled);
+	const_cast<sprite_instance*>(this)->get_member(string_table::find("enabled"), &enabled);
 	return enabled.to_bool();
 }
 

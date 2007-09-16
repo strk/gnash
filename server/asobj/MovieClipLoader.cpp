@@ -281,7 +281,7 @@ MovieClipLoader::dispatchEvent(const std::string& event, fn_call& fn)
 	{
 		boost::intrusive_ptr<as_object> listener = *it;
 		as_value method;
-		if ( ! listener->get_member(event.c_str(), &method) )
+		if (!listener->get_member(string_table::find(event), &method) )
 		{
 #if GNASH_DEBUG
 log_msg(_("Listener %p doesn't have an %s event to listen for, skipped"),

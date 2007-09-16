@@ -121,7 +121,40 @@ public:
 		return (const char*)(&m_buffer[pc]);
 	}
 
-        /// Get a pointer to the current instruction within the code
+	/// Get a variable length 32-bit integer from the stream.
+	/// Store its length in the passed uint8_t.
+	uint32_t read_V32(size_t pc, uint8_t& length) const
+	{
+		uint32_t res = m_buffer[pc];
+		if (!(res & 0x00000080))
+		{
+			length = 1;
+			return res;
+		}
+		res = res & 0x0000007F | m_buffer[pc + 1] << 7;
+		if (!(res & 0x00004000))
+		{
+			length = 2;
+			return res;
+		}
+		res = res & 0x00003FFF | m_buffer[pc + 2] << 14;
+		if (!(res & 0x00200000))
+		{
+			length = 3;
+			return res;
+		}
+		res = res & 0x001FFFFF | m_buffer[pc + 3] << 21;
+		if (!(res & 0x10000000))
+		{
+			length = 4;
+			return res;
+		}
+		res = res & 0x0FFFFFFF | m_buffer[pc + 4] << 28;
+		length = 5;
+		return res;
+	}
+
+    /// Get a pointer to the current instruction within the code
 	const unsigned char* getFramePointer(size_t pc) const
 	{
 		return reinterpret_cast<const unsigned char*>(&m_buffer[pc]);

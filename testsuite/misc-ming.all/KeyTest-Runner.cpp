@@ -58,33 +58,33 @@ main(int /*argc*/, char** /*argv*/)
 
 	as_value tmp;
 
-	check(mc1->get_member("_x", &tmp));
+	check(mc1->get_member(string_table::find("_x"), &tmp));
 	check_equals(tmp.to_number(), 0);
 
 	tester.advance();
 	check_equals(root->get_current_frame(), 2);
 
-	check(mc1->get_member("_x", &tmp));
+	check(mc1->get_member(string_table::find("_x"), &tmp));
 	check_equals(tmp.to_number(), 200);
 
 	tester.pressKey(key::J);
 
-	check(mc1->get_member("_x", &tmp));
+	check(mc1->get_member(string_table::find("_x"), &tmp));
 	check_equals(tmp.to_number(), 250);
 
 	tester.pressKey(key::K);
 
-	check(mc1->get_member("_x", &tmp));
+	check(mc1->get_member(string_table::find("_x"), &tmp));
 	check_equals(tmp.to_number(), 300);
 
 	tester.releaseKey(key::A);
 
-	check(mc1->get_member("_x", &tmp));
+	check(mc1->get_member(string_table::find("_x"), &tmp));
 	check_equals(tmp.to_number(), 250);
 
 	tester.releaseKey(key::B);
 
-	check(mc1->get_member("_x", &tmp));
+	check(mc1->get_member(string_table::find("_x"), &tmp));
 	check_equals(tmp.to_number(), 200);
 
 	// TODO: test pressing and releases keys

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.71 2007/09/10 16:53:30 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.72 2007/09/16 16:48:14 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -456,7 +456,7 @@ NetStream::processStatusNotifications()
 {
 	// TODO: check for System.onStatus too ! use a private getStatusHandler() method for this.
 	as_value status;
-	if ( ! get_member("onStatus", &status) || ! status.is_function())
+	if (!get_member(string_table::find("onStatus"), &status) || ! status.is_function())
 	{
 		clearStatusQueue();
 		return;

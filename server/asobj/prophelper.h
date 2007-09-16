@@ -186,7 +186,7 @@ phelp_helper::attachInterface(as_object& /* o */) \
     o.init_member(#sp_name , new builtin_function(sp_code_name))
 
 #define phelp_i_replace(sp_name, sp_code_name) \
-    o.set_member(#sp_name , new builtin_function(sp_code_name))
+    o.set_member(string_table::find(#sp_name), new builtin_function(sp_code_name))
 
 #else /* phelp_helper */
 #error phelp_helper must be defined.

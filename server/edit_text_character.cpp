@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.112 2007/09/12 10:57:05 bwy Exp $ */
+/* $Id: edit_text_character.cpp,v 1.113 2007/09/16 16:48:13 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -726,7 +726,7 @@ edit_text_character::get_text_value() const
 }
 
 void
-edit_text_character::set_member(const std::string& name,
+edit_text_character::set_member(string_table::key name,
 		const as_value& val)
 {
 	//log_msg("edit_text_character.set_member(%s, %s)", name.c_str(), val.to_string());
@@ -884,7 +884,7 @@ edit_text_character::set_member(const std::string& name,
 }
 
 bool
-edit_text_character::get_member(const std::string& name, as_value* val)
+edit_text_character::get_member(string_table::key name, as_value* val)
 {
 	//log_msg("edit_text_character.get_member(%s)", name.c_str());
 
@@ -897,7 +897,7 @@ edit_text_character::get_member(const std::string& name, as_value* val)
 	default:
 		break;
 	case M_INVALID_MEMBER:
-		if (name == PROPNAME("htmlText")) {
+		if (string_table::value(name) == PROPNAME("htmlText")) {
 			val->set_string(get_text_value());
 			return true;
 		}
@@ -1487,7 +1487,7 @@ edit_text_character::registerTextVariable()
 	// check if the VariableName already has a value,
 	// in that case update text value
 	as_value val;
-	if ( sprite->get_member(varname, &val) )
+	if (sprite->get_member(string_table::find(varname), &val) )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
 		log_msg(_("target sprite (%p) does have a member named %s"), (void*)sprite, varname);

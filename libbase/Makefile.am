@@ -90,6 +90,7 @@ libgnashbase_la_SOURCES = \
 	postscript.cpp \
 	rc.cpp \
 	sharedlib.cpp \
+	string_table.cpp \
 	triangulate_float.cpp \
 	triangulate_sint32.cpp \
 	tu_file.cpp \
@@ -131,6 +132,7 @@ noinst_HEADERS = \
 	ref_counted.h \
 	smart_ptr.h \
 	sharedlib.h \
+	string_table.h \
 	tree.hh \
 	triangulate.h \
 	triangulate_impl.h \

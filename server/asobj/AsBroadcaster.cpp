@@ -77,7 +77,7 @@ public:
 		if ( ! o ) return;
 
 		as_value method;
-		o->get_member(_eventName, &method);
+		o->get_member(string_table::find(_eventName), &method);
 
 		if ( method.is_function() )
 		{
@@ -106,20 +106,20 @@ AsBroadcaster::initialize(as_object& o)
 {
 	log_debug("Initializing object %p as an AsBroadcaster", (void*)&o);
 	// TODO: reserch on protection flags for these methods
-	o.set_member(PROPNAME("addListener"), new builtin_function(AsBroadcaster::addListener_method));
-	o.set_member(PROPNAME("removeListener"), new builtin_function(AsBroadcaster::removeListener_method));
-	o.set_member(PROPNAME("broadcastMessage"), new builtin_function(AsBroadcaster::broadcastMessage_method));
-	o.set_member("_listeners", new as_array_object());
+	o.set_member(string_table::find(PROPNAME("addListener")), new builtin_function(AsBroadcaster::addListener_method));
+	o.set_member(string_table::find(PROPNAME("removeListener")), new builtin_function(AsBroadcaster::removeListener_method));
+	o.set_member(string_table::find(PROPNAME("broadcastMessage")), new builtin_function(AsBroadcaster::broadcastMessage_method));
+	o.set_member(string_table::find("_listeners"), new as_array_object());
 
 #ifndef NDEBUG
 	as_value tmp;
-	assert(o.get_member("_listeners", &tmp));
+	assert(o.get_member(string_table::find("_listeners"), &tmp));
 	assert(tmp.is_object());
-	assert(o.get_member(PROPNAME("addListener"), &tmp));
+	assert(o.get_member(string_table::find(PROPNAME("addListener")), &tmp));
 	assert(tmp.is_function());
-	assert(o.get_member(PROPNAME("removeListener"), &tmp));
+	assert(o.get_member(string_table::find(PROPNAME("removeListener")), &tmp));
 	assert(tmp.is_function());
-	assert(o.get_member(PROPNAME("broadcastMessage"), &tmp));
+	assert(o.get_member(string_table::find(PROPNAME("broadcastMessage")), &tmp));
 	assert(tmp.is_function());
 #endif
 }
@@ -164,7 +164,7 @@ AsBroadcaster::addListener_method(const fn_call& fn)
 	as_value newListener; assert(newListener.is_undefined());
 	if ( fn.nargs ) newListener = fn.arg(0);
 
-	obj->callMethod(PROPNAME("removeListener"), fn.env(), newListener);
+	obj->callMethod(string_table::find(PROPNAME("removeListener")), fn.env(), newListener);
 
 	as_value listenersValue;
 
@@ -172,7 +172,7 @@ AsBroadcaster::addListener_method(const fn_call& fn)
 	//       inheritance chain in case it's own property _listeners 
 	//       has been deleted while another one is found in any base
 	//       class.
-	if ( ! obj->get_member("_listeners", &listenersValue) )
+	if ( ! obj->get_member(string_table::find("_listeners"), &listenersValue) )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("%p.addListener(%s): this object has no _listeners member"),
@@ -205,7 +205,7 @@ AsBroadcaster::addListener_method(const fn_call& fn)
 			fn.dump_args().c_str(), listenersValue.to_debug_string().c_str());
 		);
 
-		listenersObj->callMethod(PROPNAME("push"), fn.env(), newListener);
+		listenersObj->callMethod(string_table::find(PROPNAME("push")), fn.env(), newListener);
 
 	}
 	else
@@ -229,7 +229,7 @@ AsBroadcaster::removeListener_method(const fn_call& fn)
 	//       inheritance chain in case it's own property _listeners 
 	//       has been deleted while another one is found in any base
 	//       class.
-	if ( ! obj->get_member("_listeners", &listenersValue) )
+	if (!obj->get_member(string_table::find("_listeners"), &listenersValue) )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("%p.addListener(%s): this object has no _listeners member"),
@@ -266,15 +266,15 @@ AsBroadcaster::removeListener_method(const fn_call& fn)
 		);
 
 		// TODO: implement brute force scan of pseudo-array
-		unsigned int length = listenersObj->getMember("length").to_int(fn.env());
+		unsigned int length = listenersObj->getMember(string_table::find("length")).to_int(fn.env());
 		for (unsigned int i=0; i<length; ++i)
 		{
 			as_value iVal(i);
 			std::string n = iVal.to_string(&(fn.env()));
-			as_value v = listenersObj->getMember(n);
+			as_value v = listenersObj->getMember(string_table::find(n));
 			if ( v.equals(listenerToRemove, fn.env()) )
 			{
-				listenersObj->callMethod("splice", fn.env(), iVal, as_value(1));
+				listenersObj->callMethod(string_table::find("splice"), fn.env(), iVal, as_value(1));
 				return as_value(true); 
 			}
 		}
@@ -303,7 +303,7 @@ AsBroadcaster::broadcastMessage_method(const fn_call& fn)
 	//       inheritance chain in case it's own property _listeners 
 	//       has been deleted while another one is found in any base
 	//       class.
-	if ( ! obj->get_member("_listeners", &listenersValue) )
+	if ( ! obj->get_member(string_table::find("_listeners"), &listenersValue) )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("%p.addListener(%s): this object has no _listeners member"),

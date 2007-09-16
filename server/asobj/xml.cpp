@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.44 2007/07/01 10:54:32 bjacques Exp $ */
+/* $Id: xml.cpp,v 1.45 2007/09/16 16:48:14 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -133,14 +133,14 @@ XML::XML(struct node * /* childNode */)
 }
 
 bool
-XML::get_member(const std::string& name, as_value *val)
+XML::get_member(string_table::key name, as_value *val)
 {
-        if ( name == "status" ) 
+        if ( string_table::value(name) == "status" ) 
         {
                 val->set_int(_status);
                 return true;
         }
-        else if ( name == "loaded" )
+        else if ( string_table::value(name) == "loaded" )
         {
                 if ( _loaded < 0 ) val->set_undefined();
                 else val->set_bool(_loaded);
@@ -151,14 +151,14 @@ XML::get_member(const std::string& name, as_value *val)
 }
 
 void
-XML::set_member(const std::string& name, const as_value& val)
+XML::set_member(string_table::key name, const as_value& val)
 {
-        if ( name == "status" )
+        if (string_table::value(name) == "status" )
 	{
 		_status = XML::Status(val.to_number());
 		return;
 	}
-        else if ( name == "loaded" )
+        else if (string_table::value(name) == "loaded" )
         {
                 bool b = val.to_bool();
 		log_msg(_("set_member 'loaded' (%s) became boolean %d"), val.to_debug_string().c_str(), b);
@@ -191,14 +191,15 @@ XML::onLoadEvent(bool success)
     // In ActionScript 2.0, event method names are CASE SENSITIVE.
     // In ActionScript 1.0, event method names are CASE INSENSITIVE.
     // TODO: move to get_function_name directly ?
-    std::string method_name = "onLoad";
+    std::string method_name1 = "onLoad";
     if ( _vm.getSWFVersion() < 7 )
-        boost::to_lower(method_name, _vm.getLocale());
+        boost::to_lower(method_name1, _vm.getLocale());
 
-    if ( method_name.empty() ) return;
+    if ( method_name1.empty() ) return;
 
+	string_table::key method_name = string_table::find(method_name1);
     as_value	method;
-    if ( ! get_member(method_name, &method) ) return;
+    if (!get_member(method_name, &method) ) return;
     if ( method.is_undefined() ) return;
     if ( ! method.is_function() ) return;
 
@@ -218,14 +219,15 @@ XML::onCloseEvent()
     // In ActionScript 2.0, event method names are CASE SENSITIVE.
     // In ActionScript 1.0, event method names are CASE INSENSITIVE.
     // TODO: move to get_function_name directly ?
-    std::string method_name = "onClose";
+    std::string method_name1 = "onClose";
     if ( _vm.getSWFVersion() < 7 )
-        boost::to_lower(method_name, _vm.getLocale());
+        boost::to_lower(method_name1, _vm.getLocale());
 
-    if ( method_name.empty() ) return;
+    if ( method_name1.empty() ) return;
 
+	string_table::key method_name = string_table::find(method_name1);
     as_value	method;
-    if ( ! get_member(method_name, &method) ) return;
+    if (! get_member(method_name, &method) ) return;
     if ( method.is_undefined() ) return;
     if ( ! method.is_function() ) return;
 
@@ -847,8 +849,9 @@ XML::ignoreWhite() const
     if ( VM::get().getSWFVersion() < 7 ) propname = "ignorewhite";
     else propname = "ignoreWhite";
 
+	string_table::key propnamekey = string_table::find(propname);
     as_value val;
-    if ( ! const_cast<XML*>(this)->get_member(propname, &val) ) return false;
+    if (!const_cast<XML*>(this)->get_member(propnamekey, &val) ) return false;
     return val.to_bool();
 }
 

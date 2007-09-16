@@ -52,7 +52,7 @@ main(int /*argc*/, char** /*argv*/)
   as_value tmp;
   // Gnash fails because it forget to do the case conversion.
   // A big old bug!
-  xcheck(root->get_member("hasKeyPressed", &tmp));
+  xcheck(root->get_member(string_table::find("hasKeyPressed"), &tmp));
   check_equals(tmp.to_number(), 0.0);
   
   // Provide a key event and that's all.
@@ -69,7 +69,7 @@ main(int /*argc*/, char** /*argv*/)
   
   // Gnash fails because it forget to do the case conversion.
   // A big old bug!
-  xcheck(root->get_member("hasKeyPressed", &tmp));
+  xcheck(root->get_member(string_table::find("hasKeyPressed"), &tmp));
   xcheck_equals(tmp.to_number(), 1.0);
   
   // Provide a key event. 

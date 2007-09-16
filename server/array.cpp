@@ -392,8 +392,8 @@ public:
 		boost::intrusive_ptr<as_object> ao = a.to_object();
 		boost::intrusive_ptr<as_object> bo = b.to_object();
 		
-		ao->get_member(_prop, &av);
-		bo->get_member(_prop, &bv);
+		ao->get_member(string_table::find(_prop), &av);
+		bo->get_member(string_table::find(_prop), &bv);
 		return _comp(av, bv);
 	}
 };
@@ -424,8 +424,8 @@ public:
 			as_value av, bv;
 			boost::intrusive_ptr<as_object> ao = a.to_object();
 			boost::intrusive_ptr<as_object> bo = b.to_object();
-			ao->get_member(*pit, &av);
-			bo->get_member(*pit, &bv);
+			ao->get_member(string_table::find(*pit), &av);
+			bo->get_member(string_table::find(*pit), &bv);
 
 			if ( (*cmp)(av, bv) ) return true;
 			if ( (*cmp)(bv, av) ) return false;
@@ -457,8 +457,8 @@ public:
 			as_value av, bv;
 			boost::intrusive_ptr<as_object> ao = a.to_object();
 			boost::intrusive_ptr<as_object> bo = b.to_object();
-			ao->get_member(*pit, &av);
-			bo->get_member(*pit, &bv);
+			ao->get_member(string_table::find(*pit), &av);
+			bo->get_member(string_table::find(*pit), &bv);
 
 			if ( !(*cmp)(av, bv) ) return false;
 		}
@@ -560,10 +560,12 @@ as_array_object::end()
 }
 
 int
-as_array_object::index_requested(const std::string& name)
+as_array_object::index_requested(string_table::key name)
 {
+	string name_str = string_table::value(name);
+
 	as_value temp;
-	temp.set_string(name);
+	temp.set_string(name_str);
 	double value = temp.to_number();
 
 	// if we were sent a string that can't convert like "asdf", it returns as NaN. -1 means invalid index
@@ -781,7 +783,7 @@ as_array_object::removeFirst(const as_value& v, as_environment& env)
 
 /* virtual public, overriding as_object::get_member */
 bool
-as_array_object::get_member(const std::string& name, as_value *val)
+as_array_object::get_member(string_table::key name, as_value *val)
 {
 	// an index has been requested
 	int index = index_requested(name);
@@ -802,7 +804,7 @@ as_array_object::resize(unsigned int newsize)
 
 /* virtual public, overriding as_object::set_member */
 void
-as_array_object::set_member(const std::string& name,
+as_array_object::set_member(string_table::key name,
 		const as_value& val )
 {
 	int index = index_requested(name);
@@ -1378,7 +1380,7 @@ array_new(const fn_call& fn)
 		for (int i = 0; i < int(fn.arg(0).to_number()); i++)
 		{
 			index_number.set_int(i);
-			ao->set_member(index_number.to_string_versioned(sv, env).c_str(), undef_value);
+			ao->set_member(string_table::find(index_number.to_string_versioned(sv, env)), undef_value);
 		}
 	}
 	else

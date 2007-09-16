@@ -58,7 +58,7 @@ main(int /*argc*/, char** /*argv*/)
   check(mc);
 
   as_value tmp;
-  check(root->get_member("x1", &tmp));
+  check(root->get_member(string_table::find("x1"), &tmp));
   check_equals(tmp.to_number(), 0);
   
   // press key 'A' and checks
@@ -66,7 +66,7 @@ main(int /*argc*/, char** /*argv*/)
   tester.releaseKey(key::A);
 
   // check that KeyDown have been triggered
-  check(root->get_member("x1", &tmp));
+  check(root->get_member(string_table::find("x1"), &tmp));
   check_equals(tmp.to_number(), 1);
 
   
@@ -75,7 +75,7 @@ main(int /*argc*/, char** /*argv*/)
    tester.pressKey(key::A);
    tester.releaseKey(key::A);
   // check that no KeyDown was triggered(no key event handler at frame1);
-  check(root->get_member("x1", &tmp));
+  check(root->get_member(string_table::find("x1"), &tmp));
   check_equals(tmp.to_number(), 0);
 
   tester.advance(); // advance to frame2
@@ -87,7 +87,7 @@ main(int /*argc*/, char** /*argv*/)
   tester.releaseKey(key::A);
 
   // check that KeyDown have been triggered
-  check(root->get_member("x1", &tmp));
+  check(root->get_member(string_table::find("x1"), &tmp));
   check_equals(tmp.to_number(), 1); 
 
   tester.advance(); // loop back to frame1 again
@@ -95,7 +95,7 @@ main(int /*argc*/, char** /*argv*/)
   tester.pressKey(key::A);
   tester.releaseKey(key::A);
   // check that no KeyDown was triggered(no key event handler at frame1);
-  check(root->get_member("x1", &tmp));
+  check(root->get_member(string_table::find("x1"), &tmp));
   check_equals(tmp.to_number(), 0);
 
   tester.advance(); // advance to frame2
@@ -107,7 +107,7 @@ main(int /*argc*/, char** /*argv*/)
   tester.releaseKey(key::A);
 
   // check that KeyDown have been triggered
-  check(root->get_member("x1", &tmp));
+  check(root->get_member(string_table::find("x1"), &tmp));
   check_equals(tmp.to_number(), 1);
   
   return 0; 

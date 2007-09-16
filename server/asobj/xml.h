@@ -99,13 +99,13 @@ public:
     /// which are NOT proper properties !
     /// See actionscript.all/XML.as
     ///
-    bool get_member(const std::string& name, as_value *val);
+    bool get_member(string_table::key name, as_value *val);
 
     /// This is overridden to provide the 'status' and 'loaded' members,
     /// which are NOT proper properties !
     /// See actionscript.all/XML.as
     ///
-	void set_member(const std::string& name, const as_value& val );
+	void set_member(string_table::key name, const as_value& val );
 
     // Methods
 

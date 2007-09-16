@@ -24,6 +24,7 @@
 
 #include "tu_config.h"
 
+#include "string_table.h"
 #include "container.h"
 #include "ref_counted.h" // for inheritance  (to drop)
 #include "GC.h" // for inheritance from GcResource (to complete)
@@ -83,13 +84,13 @@ class DSOEXPORT as_object
 	//
 	/// @returns a Getter/Setter propery if found, NULL if not found
 	///
-	Property* findGetterSetter(const std::string& name);
+	Property* findGetterSetter(string_table::key name);
 
 	/// Find a property scanning the inheritance chain
 	//
 	/// @returns a Propery if found, NULL if not found
 	///
-	Property* findProperty(const std::string& name);
+	Property* findProperty(string_table::key name);
 
 public:
 
@@ -174,7 +175,7 @@ public:
 	/// @param val
 	///	Value to assign to the named property.
 	///
-	virtual void set_member(const std::string& name, const as_value& val)
+	virtual void set_member(string_table::key name, const as_value& val)
 	{
 		return set_member_default(name, val);
 	}
@@ -269,7 +270,7 @@ public:
 	///
 	/// @return true of the named property was found, false otherwise.
 	///
-	virtual bool get_member(const std::string& name, as_value* val)
+	virtual bool get_member(string_table::key name, as_value* val)
 	{
 		return get_member_default(name, val);
 	}
@@ -290,7 +291,7 @@ public:
 	///	or undefined if not found. Use get_member if you
 	///	need to know wheter it was found or not.
 	///
-	as_value getMember(const std::string& name);
+	as_value getMember(string_table::key name);
 
 	/// Call a method of this object in an AS-compatible way
 	//
@@ -312,10 +313,10 @@ public:
 	///	or undefined if not found. Use get_member if you
 	///	need to know wheter it was found or not.
 	///
-	as_value callMethod(const std::string& name, as_environment& env);
-	as_value callMethod(const std::string& name, as_environment& env, const as_value& arg0);
-	as_value callMethod(const std::string& name, as_environment& env, const as_value& arg0, const as_value& arg1);
-	as_value callMethod(const std::string& name, as_environment& env, const as_value& arg0, const as_value& arg1, const as_value& arg2);
+	as_value callMethod(string_table::key name, as_environment& env);
+	as_value callMethod(string_table::key name, as_environment& env, const as_value& arg0);
+	as_value callMethod(string_table::key name, as_environment& env, const as_value& arg0, const as_value& arg1);
+	as_value callMethod(string_table::key name, as_environment& env, const as_value& arg0, const as_value& arg1, const as_value& arg2);
 
 	/// Delete a property of this object, unless protected from deletion.
 	//
@@ -334,7 +335,7 @@ public:
 	///	- (true, false) : property protected from deletion
 	///	- (true, true) : property successfully deleted
 	///
-	std::pair<bool,bool> delProperty(const std::string& name);
+	std::pair<bool,bool> delProperty(string_table::key name);
 
 	/// Get this object's own named property, if existing.
 	//
@@ -349,7 +350,7 @@ public:
 	///	a Property pointer, or NULL if this object doesn't
 	///	contain the named property.
 	///
-	Property* getOwnProperty(const std::string& name);
+	Property* getOwnProperty(string_table::key name);
 
 	/// Set member flags (probably used by ASSetPropFlags)
 	//
@@ -367,7 +368,7 @@ public:
 	/// @return true on success, false on failure
 	///	(non-existent or protected member)
 	///
-	bool set_member_flags(const std::string& name,
+	bool set_member_flags(string_table::key name,
 			int setTrue, int setFalse=0);
 
 	/// Cast to a sprite, or return NULL
@@ -503,7 +504,7 @@ public:
 	///
 	void set_prototype(boost::intrusive_ptr<as_object> proto, int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum);
 
-	std::string asPropName(std::string name);
+	std::string asPropName(string_table::key name);
 	
 	/// @{ Common ActionScript methods for characters
 	/// TODO: make protected
@@ -537,7 +538,7 @@ protected:
 	/// @param val
 	///     The as_value to store a found variable's value in.
 	///
-	bool get_member_default(const std::string& name, as_value* val);
+	bool get_member_default(string_table::key name, as_value* val);
 
 	/// Set a member value
 	//
@@ -555,7 +556,7 @@ protected:
 	/// @param val
 	///	Value to assign to the named property.
 	///
-	void set_member_default(const std::string& name, const as_value& val);
+	void set_member_default(string_table::key name, const as_value& val);
 
 #ifdef GNASH_USE_GC
 	/// Mark all reachable resources, override from GcResource.

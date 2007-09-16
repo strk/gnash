@@ -1,3 +1,34 @@
+2007-09-16 Chad Musick <chadmusick@msbx.net>
+
+	* libbase/string_table.cpp,.h: A string table to cut down on memory
+	  usage and lookup time for properties, particularly in inheritance.
+	  Preparation for AS3.
+	* libbase/Makefile.am: Add string_table to list of files which the
+	  Makefile knows about.
+	* server directory:
+	*  PropertyList.cpp,.h array.cpp,.h as_environment.cpp as_function.cpp
+	   as_object.cpp,.h as_value.cpp character.cpp edit_text_character.cpp,.h
+	   movie_root.cpp sprite_instance.cpp,.h swf_function.cpp textformat.cpp
+	   timers.cpp: Update to use string table.
+	* server/asobj directory:
+	   AsBroadcaster.cpp ContextMenu.cpp LoadVars.cpp MovieClipLoader.cpp
+	   NetStream.cpp Object.cpp Stage.cpp prophelper.h xml.cpp xml.h
+	   xmlsocket.cpp: Update to use string table.
+	* server/parser/action_buffer.h: Update to use string table.
+	* server/vm directory:
+	   ASHandlers.cpp ActionExec.cpp action.cpp action.h: Update to use string
+	   table.
+	* testsuite/misc-ming.all directory:
+	   KeyTest-Runner.cpp attachMovieTestRunner.cpp intervalTestRunner.cpp
+	   key_event_test2runner.cpp key_event_test3runner.cpp
+	   key_event_test5runner.cpp key_event_testrunner.cpp: Update to use
+	   string table
+	* testsuite/movies.all/gravity_embedded-TestRunner.cpp: Update to use
+	  string table
+	* testsuite/server/GetterSetterTest.cpp PropertyListTest.cpp: Update to
+	  use string table
+	* server/swf.h: More notes about AS3 operations.
+
 2007-09-16 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/gnash.h: add gnashCharacter code for proper key handling.

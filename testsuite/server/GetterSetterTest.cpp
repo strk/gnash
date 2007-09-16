@@ -53,7 +53,7 @@ static as_value setter(const fn_call& fn)
 	boost::intrusive_ptr<as_object> o = fn.this_ptr;
 	assert(fn.nargs == 1);
 	as_value& val = fn.arg(0);
-	o->set_member(val.to_string(&fn.env()), val);
+	o->set_member(string_table::find(val.to_string(&fn.env())), val);
 	return as_value();
 }
 
@@ -70,7 +70,7 @@ struct test_object: public as_object {
 
 	std::string get_text_value() const { return textval; }
 
-	void set_member(const std::string& , const as_value& val )
+	void set_member(string_table::key, const as_value& val )
 	{
 		textval = val.to_string();
 	}
