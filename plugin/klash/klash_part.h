@@ -147,6 +147,7 @@ protected slots:
 protected:
     virtual bool openFile();
 private:
+    QStringList m_args;
     KlashBrowserExtension * m_browserextension;
     KlashLiveConnectExtension * m_liveconnectextension;
     KProcess * m_process;

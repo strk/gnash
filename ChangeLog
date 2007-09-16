@@ -1,3 +1,8 @@
+2007-09-16 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* plugin/klash/klash_part.{cpp,h}: Properly add URL arguments to
+	the Klash commandline. This enables Youtube playback in Konqueror.
+
 2007-09-16 Chad Musick <chadmusick@msbx.net>
 
 	* libbase/string_table.cpp,.h: A string table to cut down on memory

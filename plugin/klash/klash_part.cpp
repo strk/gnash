@@ -134,7 +134,8 @@ KDE_NO_CDTOR_EXPORT KlashPart::KlashPart (QWidget * wparent, const char *wname,
                 m_autostart = value.toInt (&ok);
                 if (!ok)
                     m_autostart = (value.lower () == "false");
-	    }
+            }
+            m_args.push_back(name + QChar('=') + value);
         }
     }
     KParts::Part::setWidget (new KlashView (wparent));
@@ -173,21 +174,29 @@ KDE_NO_EXPORT void KlashPart::play ()
     m_process = new KProcess;
     m_process->setUseShell (true);
     m_process->setEnvironment (QString::fromLatin1 ("SESSION_MANAGER"), QString::fromLatin1 (""));
-    QString dim;
+
+    QString cmd = procname + QString(" -x ") +
+                             QString::number(static_cast<KlashView*>(widget())->embedId());
+
     if (m_width > 0 && m_height > 0)
-        dim = QString ("-j ") + QString::number (m_width) +
-            QString (" -k ") + QString::number (m_height);
+        cmd += QString(" -j ") + QString::number(m_width) +
+               QString(" -k ") + QString::number(m_height);
+
     QString url = m_url.url();
-    QString url_param;
     if (!url.isEmpty())
-        url_param = QString ("-u ") + KProcess::quote (url);
-    QString cmd = procname + QString (" -x ") +
-        QString::number (static_cast <KlashView *> (widget ())->embedId()) +
-        QChar (' ') + dim +
-        QChar (' ') + url_param +
-        QChar (' ') + KProcess::quote (m_src_url);
+        cmd += QString(" -u ") + KProcess::quote(url);
+    url = m_docbase.url();
+    if (!url.isEmpty())
+        cmd += QString(" -U ") + KProcess::quote(url);
+
+    for (QStringList::const_iterator it=m_args.begin(), end=m_args.end();it != end; ++it)
+        cmd += QString(" -P ") + KProcess::quote(*it);
+
+    cmd += QString (" ") + KProcess::quote(m_src_url);
+
     kdDebug () << cmd << endl;
     *m_process << cmd;
+
     connect (m_process, SIGNAL (processExited (KProcess *)),
             this, SLOT (processStopped (KProcess *)));
     m_process->start (KProcess::NotifyOnExit, KProcess::NoCommunication);

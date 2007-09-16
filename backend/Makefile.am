@@ -120,6 +120,8 @@ noinst_LTLIBRARIES += libgnashogl.la
 #plugins_LTLIBRARIES += libgnashogl.la
 libgnashogl_la_SOURCES = render_handler_tri.cpp render_handler_ogl.cpp 
 #libgnashogl_la_LDFLAGS = -module -avoid-version -no-undefined
+libgnashogl_la_LDFLAGS =
+libgnashogl_la_LIBADD = $(OPENGL_LIBS)
 endif
 endif
 
