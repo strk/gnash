@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.138 2007/09/17 12:41:22 tgc Exp $ */
+/* $Id: tag_loaders.cpp,v 1.139 2007/09/17 14:38:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -766,7 +766,7 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 	//  ea8bbad50ccbc52dd734dfc93a7f06a7  6964trev3c.swf
 	//
 	uint8_t* data = im->data();
-	for (int i = 0; i < buffer_bytes; i++)
+	for (size_t i = 0; i < buffer_bytes; ++i)
 	{
 	    data[4*i+3] = buffer[i];
 	}

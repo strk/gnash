@@ -1,3 +1,8 @@
+2007-09-17 Sandro Santilli <strk@keybit.net>
+
+	* server/swf/tag_loaders.cpp (define_bits_jpeg3_loader): fix compiler
+	  warning (signed vs. unsigned comparison).
+
 2007-09-17 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* libbase/string_table.h: Fixed compilation for non-32 bit platforms.
