@@ -101,6 +101,7 @@
   .end
   
   .initaction mc2: // Add initactions for mc2(mc2 is not placed)
+    _root.initActionExecuted = "mc2";
     // mc1 is still alive here, _root.gotoAndPlay(6) hasn't been executed yet.
     // Note mc1 has 2 frames.
     check_equals(typeof(mc1), 'movieclip');
@@ -116,6 +117,7 @@
   .end
   
   .initaction mc3: // Add initactions for mc3(mc3 is not placed)
+    _root.initActionExecuted += ", mc3";
     _root.xcheck_equals(mc1, null);
     _root.xcheck_equals(typeof(mc1), 'undefined');
     _root.check_equals(typeof(_root.getInstanceAtDepth(-16386)), 'undefined');
@@ -200,16 +202,23 @@
   .end
   
   .sprite mc6
-    .frame 1  .put mc61
+    .frame 1 
+      .put mc61
+      .initaction mc61: // Add initactions for mc6
+        _root.initActionExecuted += ", mc61";
+        _root.check_equals(this, _root); // target is the root !
+      .end
   .end
   
   .put mc6    // Place the movieclip
   
   .initaction mc6: // Add initactions for mc6
     // Gnash fails by not respecting actions order for initactions
+    _root.initActionExecuted += ", mc6";
     _root.xcheck_equals(typeof(mc6), 'movieclip');
     _root.xcheck_equals(typeof(mc6.mc61), 'movieclip');
     _root.xcheck_equals(typeof(mc7), 'movieclip');
+    _root.check_equals(this, _root); // target is the root !
   .end
   
   .sprite mc7  // Define a movieclip
@@ -222,6 +231,7 @@
 .frame 15
   .initaction mc6: //Add initactions for mc6 again.
     x = 0;
+    _root.initActionExecuted += ", mc6";
     // This check should not be executed.
     // We should ignore the second init actions for the same sprite.
     // It is here just for detecting some bogus implementation
@@ -240,9 +250,11 @@
   // test initactions for child sprite.
   .initaction mc8:
     _root.check_equals(this, _root);
+    _root.initActionExecuted += ", mc8";
   .end
    
   .action:
+    _root.xcheck_equals(initActionExecuted, "mc2, mc3, mc61, mc6, mc8");
     stop();
     totals();
   .end
