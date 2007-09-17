@@ -27,11 +27,17 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.29 2007/09/11 05:46:32 zoulunkai Exp $";
+rcsid="$Id: Number.as,v 1.30 2007/09/17 05:55:38 strk Exp $";
 
 #include "check.as"
 
 var n1=new Number(268);
+check_equals(typeof(n1), 'object');
+var n1prim = Number(268);
+xcheck_equals(typeof(n1prim), 'number');
+// gnash fails below because it compares 2 objects
+// rather then an object and a primitive
+xcheck_equals(n1, n1prim);
 
 // strict-equality operator was introduced in SWF6
 #if OUTPUT_VERSION > 5

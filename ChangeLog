@@ -1,5 +1,9 @@
 2007-09-16 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Number.as: more tests for Number()
+	  returning a primitive number rather then an object. I suspect
+	  most builtin functions will need to support both invocation as
+	  constructor *and* simple invocation.
 	* testsuite/actionscript.all/ops.as: more tests for comparison between
 	  "different" nan values... :/
 
