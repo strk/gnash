@@ -209,11 +209,13 @@ private:
 	typedef std::map<int, boost::intrusive_ptr<sound_sample> > SoundSampleMap;
 	SoundSampleMap m_sound_samples;
 
-	/// A list of movie control events for each frame.
-	std::vector<PlayList> m_playlist;
+	typedef std::map<size_t, PlayList> PlayListMap;
+
+	/// Movie control events for each frame.
+	PlayListMap m_playlist;
 
 	/// Init actions for each frame.
-	std::vector<PlayList> m_init_action_list;
+	PlayListMap m_init_action_list;
 
 	/// 0-based frame #'s
 	typedef std::map<std::string, size_t> NamedFrameMap;
@@ -477,9 +479,7 @@ public:
 	void	add_execute_tag(execute_tag* tag)
 	{
 	    assert(tag);
-	    if (_frames_loaded < m_playlist.size()) {
-	      m_playlist[_frames_loaded].push_back(tag);
-	    }
+	    m_playlist[_frames_loaded].push_back(tag);
 	}
 
 	/// Need to execute the given tag before entering the
@@ -487,7 +487,6 @@ public:
 	void	add_init_action(execute_tag* e)
 	{
 	    assert(e);
-	    assert(_frames_loaded < m_init_action_list.size());
 	    m_init_action_list[_frames_loaded].push_back(e);
 	}
 
@@ -508,17 +507,22 @@ public:
 	    return m_jpeg_in.get();
 	}
 
-	virtual const PlayList& get_playlist(size_t frame_number) const
+	virtual const PlayList* getPlaylist(size_t frame_number) const
 	{
 		assert(frame_number <= _frames_loaded);
-		return m_playlist[frame_number];
+
+		PlayListMap::const_iterator it = m_playlist.find(frame_number);
+		if ( it == m_playlist.end() ) return NULL;
+		else return &(it->second);
 	}
 
 	virtual const PlayList* get_init_actions(size_t frame_number)
 	{
 		assert(frame_number <= _frames_loaded);
-		//ensure_frame_loaded(frame_number);
-		return &m_init_action_list[frame_number];
+
+		PlayListMap::iterator it = m_init_action_list.find(frame_number);
+		if ( it == m_init_action_list.end() ) return NULL;
+		else return &(it->second);
 	}
 
 	/// Calls readHeader() and completeLoad() in sequence.

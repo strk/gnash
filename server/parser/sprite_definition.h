@@ -122,8 +122,10 @@ private:
 	/// (the definition read from SWF stream)
 	movie_definition* m_movie_def;
 
+	typedef std::map<size_t, PlayList> PlayListMap;
+
 	/// movie control events for each frame.
-	std::vector<PlayList> m_playlist;
+	PlayListMap m_playlist;
 
 	// stores 0-based frame #'s
 	typedef std::map<std::string, size_t> NamedFrameMap;
@@ -131,6 +133,7 @@ private:
 
 	size_t m_frame_count;
 
+	// Number of frames completely parsed 
 	size_t m_loading_frame;
 
 	// overloads from movie_definition
@@ -314,9 +317,15 @@ private:
 	bool get_labeled_frame(const std::string& label, size_t& frame_number);
 
 	/// frame_number is 0-based
-	const PlayList& get_playlist(size_t frame_number) const
+	const PlayList* getPlaylist(size_t frame_number) const
 	{
-		return m_playlist[frame_number];
+		// Don't access playlist of a frame which has not been
+		// completely parsed yet.
+		assert(frame_number < m_loading_frame);
+
+		PlayListMap::const_iterator it = m_playlist.find(frame_number);
+		if ( it == m_playlist.end() ) return NULL;
+		else return &(it->second);
 	}
 
 	// Sprites do not have init actions in their

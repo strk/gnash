@@ -48,13 +48,15 @@ sprite_definition::create_character_instance(character* parent,
 sprite_definition::~sprite_definition()
 {
 	// Release our playlist data.
-	for (int i = 0, n = m_playlist.size(); i < n; i++)
+	for (PlayListMap::iterator i=m_playlist.begin(), e=m_playlist.end(); i!=e; ++i)
 	{
-		for (int j = 0, m = m_playlist[i].size(); j < m; j++)
+		PlayList& pl = i->second;
+
+		for (PlayList::iterator j=pl.begin(), je=pl.end(); j!=je; ++j)
 		{
-		    delete m_playlist[i][j];
-		}
-	}
+                    delete *j;
+                }
+        }
 }
 
 /*private*/
@@ -72,9 +74,6 @@ sprite_definition::read(stream* in)
 	{
 		m_frame_count = 1;
 	}
-
-	// need a playlist for each frame
-	m_playlist.resize(m_frame_count);
 
 		IF_VERBOSE_PARSE (
 	log_parse(_("  frames = " SIZET_FMT), m_frame_count);
@@ -187,9 +186,6 @@ sprite_definition::sprite_definition(movie_definition* m, stream* in)
 	{
 		m_frame_count = 1;
 		m_loading_frame = 1;
-
-		m_playlist.resize(1);
-		m_playlist[0].push_back(new execute_tag());
 	}
 	else
 	{

@@ -84,7 +84,6 @@ BitmapMovieDefinition::BitmapMovieDefinition(
 	// image::rgb size is in pixels
 	_framesize(0, 0, image->width()*20, image->height()*20),
 	_framecount(1),
-	_playlist(_framecount),
 	_framerate(12),
 	_url(url),
 	_image(image)

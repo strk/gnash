@@ -226,23 +226,33 @@ movie_def_impl::~movie_def_impl()
 	// Request cancelation of the loading thread
 	_loadingCanceled = true;
 
-    // Release our playlist data.
-    {for (size_t i = m_playlist.size() - 1; i != static_cast<size_t>(-1); i--) // Optimized
-        {
-            for (size_t j = m_playlist[i].size()-1; j != static_cast<size_t>(-1); j--)
-                {
-                    delete m_playlist[i][j];
-                }
-        }}
+	// Release frame tags
+	for (PlayListMap::iterator i=m_playlist.begin(), e=m_playlist.end(); i!=e; ++i)
+	{
+		PlayList& pl = i->second;
 
-    // Release init action data.
-    {for (size_t i = m_init_action_list.size() - 1; i != static_cast<size_t>(-1); i--) //Optimized
-        {
-            for (size_t j = m_init_action_list[i].size()-1; j != static_cast<size_t>(-1); j--)
-                {
-                    delete m_init_action_list[i][j];
+		for (PlayList::iterator j=pl.begin(), je=pl.end(); j!=je; ++j)
+		{
+                    delete *j;
                 }
-        }}
+
+		//pl.clear(); // useless, as we're going to clean the whole map
+        }
+	//m_playlist.clear(); // useless, as we're going to call it's destructor next 
+
+	// Release init action data.
+	for (PlayListMap::iterator i=m_init_action_list.begin(), e=m_init_action_list.end(); i!=e; ++i)
+	{
+		PlayList& pl = i->second;
+
+		for (PlayList::iterator j=pl.begin(), je=pl.end(); j!=je; ++j)
+		{
+                    delete *j;
+                }
+
+		//pl.clear(); // useless, as we're going to clean the whole map
+        }
+	//m_init_action_list.clear(); // useless, as we're going to call it's destructor next 
 
 	// It's supposed to be cleaned up in read()
 	// TODO: join with loader thread instead ?
@@ -499,8 +509,8 @@ movie_def_impl::readHeader(std::auto_ptr<tu_file> in, const std::string& url)
 
 	// Allocate 1 more then the expected slots
 	// for actions, to make handling malformed SWF easier.
-	m_playlist.resize(m_frame_count+1);
-	m_init_action_list.resize(m_frame_count+1);
+	//m_playlist.resize(m_frame_count+1);
+	//m_init_action_list.resize(m_frame_count+1);
 
 	IF_VERBOSE_PARSE(
 		m_frame_size.print();
@@ -991,8 +1001,8 @@ movie_def_impl::incrementLoadedFrames()
 				get_url().c_str(), _frames_loaded,
 				m_frame_count);
 		);
-		m_playlist.resize(_frames_loaded+1);
-		m_init_action_list.resize(_frames_loaded+1);
+		//m_playlist.resize(_frames_loaded+1);
+		//m_init_action_list.resize(_frames_loaded+1);
 	}
 
 #ifdef DEBUG_FRAMES_LOAD
@@ -1116,8 +1126,9 @@ void
 movie_def_impl::add_frame_name(const std::string& n)
 {
 	//log_msg(_("labelframe: frame %d, name %s"), _frames_loaded, name);
-	assert(_frames_loaded < m_frame_count);
-    m_named_frames[n] = _frames_loaded;
+	//why do we care about m_frame_count here ?
+	//assert(_frames_loaded < m_frame_count);
+	m_named_frames[n] = _frames_loaded;
 }
 
 bool

@@ -232,7 +232,13 @@ public:
 	/// @param frame_number
 	///	 Frame number, 0-based (ie: first frame is 0)
 	///
-	virtual const PlayList& get_playlist(size_t frame_number) const = 0;
+	/// @return NULL if no execute tags are defined for the given frame number
+	///	    (the default implementation) or a pointer to the vector of them (PlayList)
+	///
+	virtual const PlayList* getPlaylist(size_t /*frame_number*/) const
+	{
+		return 0;
+	}
 
 	/// Return the list of init actions for given frame number
 	//

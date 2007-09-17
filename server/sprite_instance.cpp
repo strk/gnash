@@ -1930,9 +1930,12 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
 	//       to properly queue actions back on the global queue.
 	//
 	_callingFrameActions=true;
-	const PlayList& playlist = m_def->get_playlist(frame_number);
-	std::for_each(playlist.begin(), playlist.end(),
-		boost::bind(&execute_tag::execute_action, _1, this)); 
+	const PlayList* playlist = m_def->getPlaylist(frame_number);
+	if ( playlist )
+	{
+		std::for_each(playlist->begin(), playlist->end(),
+			boost::bind(&execute_tag::execute_action, _1, this)); 
+	}
 	_callingFrameActions=false;
 
 }
@@ -2438,22 +2441,24 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 		}
 	}
 
-	const PlayList& playlist = m_def->get_playlist(frame);
-
-	IF_VERBOSE_ACTION(
-		// Use 1-based frame numbers
-		log_action(_("Executing " SIZET_FMT " tags in frame "
-			SIZET_FMT "/" SIZET_FMT " of sprite %s"),
-			playlist.size(), frame+1, get_frame_count(),
-			getTargetPath().c_str());
-	);
-
-	for (PlayList::const_iterator it=playlist.begin(), itEnd=playlist.end();
-			it != itEnd; ++it)
+	const PlayList* playlist = m_def->getPlaylist(frame);
+	if ( playlist )
 	{
-		execute_tag* tag = *it;
-		if ( typeflags & TAG_DLIST ) tag->execute_state(this);
-		if ( typeflags & TAG_ACTION ) tag->execute_action(this);
+		IF_VERBOSE_ACTION(
+			// Use 1-based frame numbers
+			log_action(_("Executing " SIZET_FMT " tags in frame "
+				SIZET_FMT "/" SIZET_FMT " of sprite %s"),
+				playlist->size(), frame+1, get_frame_count(),
+				getTargetPath().c_str());
+		);
+
+		for (PlayList::const_iterator it=playlist->begin(), itEnd=playlist->end();
+				it != itEnd; ++it)
+		{
+			execute_tag* tag = *it;
+			if ( typeflags & TAG_DLIST ) tag->execute_state(this);
+			if ( typeflags & TAG_ACTION ) tag->execute_action(this);
+		}
 	}
 
 	testInvariant();

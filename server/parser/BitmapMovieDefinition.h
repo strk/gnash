@@ -48,7 +48,6 @@ class BitmapMovieDefinition : public movie_definition
 	int _version;
 	rect _framesize;
 	size_t _framecount;
-	std::vector<PlayList> _playlist;
 	float _framerate;
 	std::string _url;
 
@@ -144,12 +143,6 @@ public:
 	virtual movie_instance* create_movie_instance()
 	{
 		return new BitmapMovieInstance(this);
-	}
-
-	virtual const PlayList& get_playlist(size_t frame_number) const
-	{
-		assert ( frame_number < _playlist.size() );
-		return _playlist[frame_number];
 	}
 
 	virtual const std::string& get_url() const {

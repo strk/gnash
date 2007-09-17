@@ -1,3 +1,24 @@
+2007-09-17 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/movie_definition.h: changed signature of get_playlist:
+	  rename to getPlaylist, return by pointer, have the default
+	  implementation return 0.
+	* server/parser/BitmapMovieDefinition.{cpp,h}: don't build a dummy
+	  PlayList just for implementing the get_playlist abstract method, 
+	  it's not needed anymore (the default implementation does fine).
+	* server/parser/movie_def_impl.{cpp,h}: use a std::map instead of a
+	  std::vector to contain PlayList of each frame. This reduced memory
+	  use for movies that don't have actions in *each* frame and removes
+	  race conditions due to unexpected growth of frames while parsing
+	  (when number of frames advertised in header doesn't match number
+	  of SHOWFRAME found in the stream); (add_frame_name): don't insist
+	  in _frames_loaded being less then advertised frame count.
+	* server/parser/sprite_definition.{cpp,h}: use a std::map instead
+	  of a std::vector for PlayList of frames. Cleanup construction
+	  of dynamic sprite definitions now that we don't need to create
+	  a fake PlayList only to store a dummy execute tag.
+	* server/sprite_instance.cpp: update calls to getPlaylist.
+
 2007-09-17 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/gnash.h: another code map for proper key handling.
