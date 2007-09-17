@@ -1,3 +1,7 @@
+2007-09-17 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/gnash.h: another code map for proper key handling.
+	
 2007-09-16 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Number.as: more tests for Number()
