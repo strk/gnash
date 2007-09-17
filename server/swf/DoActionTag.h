@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: DoActionTag.h,v 1.4 2007/09/04 20:50:00 strk Exp $ */
+/* $Id: DoActionTag.h,v 1.5 2007/09/17 23:33:18 strk Exp $ */
 
 #ifndef GNASH_SWF_DOACTIONTAG_H
 #define GNASH_SWF_DOACTIONTAG_H
@@ -99,7 +99,6 @@ public:
 	{
 		DoActionTag* da = new DoActionTag(true);
 		int cid = in->read_u16();
-    		UNUSED(cid);
 		da->read(in);
 
 		IF_VERBOSE_PARSE (
@@ -107,7 +106,7 @@ public:
 		log_parse(_("  -- init actions for sprite %d"), cid);
 		);
 
-		m->add_init_action(da); // ownership transferred
+		m->add_init_action(da, cid); // ownership transferred
 	}
 
 private:

@@ -235,7 +235,7 @@
     // This check should not be executed.
     // We should ignore the second init actions for the same sprite.
     // It is here just for detecting some bogus implementation
-    _root.xcheck_equals(x, 1);
+    _root.check_equals(x, 1);
   .end
 
 
@@ -254,7 +254,7 @@
   .end
    
   .action:
-    _root.xcheck_equals(initActionExecuted, "mc2, mc3, mc61, mc6, mc8");
+    _root.check_equals(initActionExecuted, "mc2, mc3, mc61, mc6, mc8");
     stop();
     totals();
   .end

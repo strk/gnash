@@ -1,5 +1,19 @@
 2007-09-18 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/DoActionTag.h (doInitActionLoader): pass 'cid' value
+	  to add_init_action().
+	* server/parser/movie_definition.h (add_init_action): add support for
+	  a 'cir' parameter, to ignore duplicated init actions for the same
+	  character id.
+	* server/parser/sprite_definition.h: update add_init_action signature
+	* server/parser/movie_def_impl.{cpp,h}: update add_init_action
+	  signature, use a std::set to keep note of character id for which
+	  init actions have been added already, discarding the rest.
+	* testsuite/misc-swfc.all/movieclip_destruction_test1.sc: more
+	  successes.
+
+2007-09-18 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-swfc.all/movieclip_destruction_test1.sc:
 	  Add test to verify init actions have been executed
 	  in the correct order.

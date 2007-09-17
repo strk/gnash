@@ -303,7 +303,7 @@ private:
 	/// Overridden just for complaining  about malformed SWF
 	//
 	/// Sprite def's should not have do_init_action tags in them!  (@@ correct?)
-	virtual void	add_init_action(execute_tag* /*c*/)
+	virtual void	add_init_action(execute_tag* /*c*/, int /*cid*/)
 	{
 		IF_VERBOSE_MALFORMED_SWF (
 		log_swferror(_("sprite_definition::add_init_action called!  Ignored"));

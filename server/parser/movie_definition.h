@@ -353,11 +353,13 @@ public:
 	{
 	}
 
+	/// \brief
 	/// Add an init action to the frame currently being loaded
+	/// and the specified character id
 	//
 	/// The default implementation is a no-op.
 	///
-	virtual void	add_init_action(execute_tag* /*c*/)
+	virtual void	add_init_action(execute_tag* /*c*/, int /*cid*/)
 	{
 	}
 

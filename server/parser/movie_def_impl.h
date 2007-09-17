@@ -216,6 +216,7 @@ private:
 
 	/// Init actions for each frame.
 	PlayListMap m_init_action_list;
+	std::set<int> m_init_action_defined;
 
 	/// 0-based frame #'s
 	typedef std::map<std::string, size_t> NamedFrameMap;
@@ -484,11 +485,7 @@ public:
 
 	/// Need to execute the given tag before entering the
 	/// currently-loading frame for the first time.
-	void	add_init_action(execute_tag* e)
-	{
-	    assert(e);
-	    m_init_action_list[_frames_loaded].push_back(e);
-	}
+	void	add_init_action(execute_tag* e, int cid);
 
 	// See dox in movie_definition.h
 	void add_frame_name(const std::string& name);
