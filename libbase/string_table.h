@@ -53,7 +53,7 @@ public:
 			boost::multi_index::hashed_non_unique<
 				boost::multi_index::member<svt, std::string, &svt::mValue> >,
 			boost::multi_index::hashed_non_unique<
-				boost::multi_index::member<svt, uint32_t, &svt::mId> > 
+				boost::multi_index::member<svt, std::size_t, &svt::mId> > 
 	> > table;
 
 	typedef std::size_t key;

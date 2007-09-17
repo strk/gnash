@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.h,v 1.10 2007/09/13 20:54:42 tgc Exp $
+// $Id: video_stream_def.h,v 1.11 2007/09/17 12:41:22 tgc Exp $
 
 #ifndef GNASH_VIDEO_STREAM_DEF_H
 #define GNASH_VIDEO_STREAM_DEF_H
@@ -162,9 +162,9 @@ private:
 	/// Elements of this map are owned by this instance, and will be deleted 
 	/// at instance destruction time.
 	///
-	typedef std::pair< boost::shared_array<uint8_t>, uint32_t> embedFrame;
-	typedef std::map<uint32_t, embedFrame > embedFrameMap;
-	embedFrameMap m_video_frames;
+	typedef std::pair< boost::shared_array<uint8_t>, uint32_t> EmbedFrame;
+	typedef std::map<uint32_t, EmbedFrame > EmbedFrameMap;
+	EmbedFrameMap m_video_frames;
 
 };
 

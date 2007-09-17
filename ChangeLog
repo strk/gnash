@@ -1,3 +1,13 @@
+2007-09-17 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libbase/string_table.h: Fixed compilation for non-32 bit platforms.
+	* server/parser/video_stream_def.{cpp,h}: Use CapitalCase for types.
+
+2007-09-17 Lauri Mylläri <rez>
+
+	* server/swf/tag_loaders.cpp: Also parse DelaySeek field for MP3 
+	  in DEFINESOUND, fixes bug #21094.
+
 2007-09-17 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/movie_definition.h: changed signature of get_playlist:

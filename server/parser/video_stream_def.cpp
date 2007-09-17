@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.16 2007/09/13 20:54:42 tgc Exp $
+// $Id: video_stream_def.cpp,v 1.17 2007/09/17 12:41:22 tgc Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -94,7 +94,7 @@ video_stream_definition::read(stream* in, SWF::tag_type tag, movie_definition* m
 			data[i] = in->read_u8();
 		}
 
-		m_video_frames[m->get_loading_frame()] = embedFrame(boost::shared_array<uint8_t>(data), size);
+		m_video_frames[m->get_loading_frame()] = EmbedFrame(boost::shared_array<uint8_t>(data), size);
 	}
 
 }
@@ -138,7 +138,7 @@ video_stream_definition::get_decoder()
 void 
 video_stream_definition::get_frame_data(int frameNum, uint8_t** data, int* size)
 {
-	embedFrameMap::iterator it = m_video_frames.find(frameNum);
+	EmbedFrameMap::iterator it = m_video_frames.find(frameNum);
 	if( it != m_video_frames.end() )
 	{
 		*data = it->second.first.get();

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.137 2007/09/10 16:53:30 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.138 2007/09/17 12:41:22 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1463,6 +1463,25 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 	bool	stereo = in->read_bit(); 
 
 	unsigned int	sample_count = in->read_u32();
+
+	if (format == sound_handler::FORMAT_MP3) {
+		in->ensureBytes(2);
+		int16_t	delay_seek = in->read_s16();	// FIXME - not implemented/used
+		// The DelaySeek field has the following meaning:
+		// * If this value is positive, the player seeks this number of
+		//   samples into the sound block before the sound is played.
+		//   However, the seek is only performed if the player reached
+		//   the current frame via a GotoFrame action, otherwise no
+		//   seek is performed.
+		//
+		// * If this value is negative the player plays this number of
+		//   silent samples before playing the sound block. The player
+		//   behaves this way, regardless of how the current frame was
+		//   reached.
+		//
+		// quoted from
+		// http://www-lehre.informatik.uni-osnabrueck.de/~fbstark/diplom/docs/swf/Sounds.htm
+	}
 
 	IF_VERBOSE_PARSE
 	(
