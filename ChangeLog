@@ -1,5 +1,8 @@
 2007-09-17 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.{cpp,h} (format_text): get text alignment
+	  using a new private function, which checks for _autoSize settings too.
+	  Fixes bug #20760.
 	* server/swf/tag_loaders.cpp (define_bits_jpeg3_loader): fix compiler
 	  warning (signed vs. unsigned comparison).
 

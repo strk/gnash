@@ -29,6 +29,7 @@
 #include "text.h" // for text_glyph_record
 #include "Range2d.h"
 #include "rect.h" // for inlines
+#include "edit_text_character_def.h" // for ::alignment typedef
 
 
 // Forward declarations
@@ -184,6 +185,9 @@ public:
 	{
 		return _autoSize;
 	}
+
+	/// Return text alignment
+	edit_text_character_def::alignment getTextAlignment();
 
 	/// Set autoSize value 
 	//

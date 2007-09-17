@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.113 2007/09/16 16:48:13 cmusick Exp $ */
+/* $Id: edit_text_character.cpp,v 1.114 2007/09/17 14:39:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1044,6 +1044,9 @@ edit_text_character::format_text()
 {
 	m_text_glyph_records.resize(0);
 
+	// Should get info from autoSize too maybe ?
+	edit_text_character_def::alignment textAlignment = getTextAlignment();
+
 	// nothing more to do if text is empty
 	if ( _text.empty() ) return;
 
@@ -1119,7 +1122,7 @@ edit_text_character::format_text()
 
 			// Close out this stretch of glyphs.
 			m_text_glyph_records.push_back(rec);
-			align_line(m_def->get_alignment(), last_line_start_record, x);
+			align_line(textAlignment, last_line_start_record, x);
 
 			// new paragraphs get the indent.
 			x = std::max(0, leftMargin + indent) + PADDING_TWIPS;
@@ -1379,7 +1382,7 @@ after_x_advance:
 					last_line.m_glyphs.resize(last_space_glyph);
 				}
 
-				align_line(m_def->get_alignment(), last_line_start_record, previous_x);
+				align_line(textAlignment, last_line_start_record, previous_x);
 
 				last_space_glyph = -1;
 				last_line_start_record = m_text_glyph_records.size();
@@ -1409,7 +1412,7 @@ after_x_advance:
 	// Add this line to our output.
 	m_text_glyph_records.push_back(rec);
 
-	float extra_space = align_line(m_def->get_alignment(), last_line_start_record, x);
+	float extra_space = align_line(textAlignment, last_line_start_record, x);
 
 	m_xcursor += static_cast<int>(extra_space);
 	m_ycursor -= fontHeight + (fontLeading - fontDescent);
@@ -1901,6 +1904,19 @@ edit_text_character::setAutoSize(AutoSizeValue val)
 
 	_autoSize = val; 
 	format_text();
+}
+
+edit_text_character_def::alignment
+edit_text_character::getTextAlignment()
+{
+	// TODO: use a _textAlignment private member to reduce lookups ?
+	// The member would be initialized to m_def->get_alignment and then update
+	// when _autoSize is updated.
+	edit_text_character_def::alignment textAlignment = m_def->get_alignment();
+	if ( _autoSize == autoSizeCenter ) textAlignment = edit_text_character_def::ALIGN_CENTER;
+	else if ( _autoSize == autoSizeLeft ) textAlignment = edit_text_character_def::ALIGN_LEFT;
+	else if ( _autoSize == autoSizeRight ) textAlignment = edit_text_character_def::ALIGN_RIGHT;
+	return textAlignment;
 }
 
 } // namespace gnash
