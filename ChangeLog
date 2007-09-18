@@ -1,5 +1,15 @@
 2007-09-18 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (execute_frame_tags): execute
+	  init actions *after* DLIST tags. 
+	* testsuite/misc-swfc.all/movieclip_destruction_test1.sc:
+	  No more failures in this case.
+	* testsuite/misc-ming.all/init_action_test.c: a single
+	  failure was introduced by this comit, for known reason.
+	  We decided to accept the failure and take care of it later.
+
+2007-09-18 Sandro Santilli <strk@keybit.net>
+
 	* server/array.{cpp,h}: Implement enumerateNonProperties().
 	  Still not 100% correct but fixes youtube controls positioning
 	  (bug #20469).

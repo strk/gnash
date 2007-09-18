@@ -2409,6 +2409,26 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 
 	assert(frame < m_def->get_frame_count());
 
+	const PlayList* playlist = m_def->getPlaylist(frame);
+	if ( playlist )
+	{
+		IF_VERBOSE_ACTION(
+			// Use 1-based frame numbers
+			log_action(_("Executing " SIZET_FMT " tags in frame "
+				SIZET_FMT "/" SIZET_FMT " of sprite %s"),
+				playlist->size(), frame+1, get_frame_count(),
+				getTargetPath().c_str());
+		);
+
+		for (PlayList::const_iterator it=playlist->begin(), itEnd=playlist->end();
+				it != itEnd; ++it)
+		{
+			execute_tag* tag = *it;
+			if ( typeflags & TAG_DLIST ) tag->execute_state(this);
+			if ( typeflags & TAG_ACTION ) tag->execute_action(this);
+		}
+	}
+
 	// Execute this frame's init actions, if necessary.
 	if (m_init_actions_executed[frame] == false)
 	{
@@ -2441,25 +2461,6 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 		}
 	}
 
-	const PlayList* playlist = m_def->getPlaylist(frame);
-	if ( playlist )
-	{
-		IF_VERBOSE_ACTION(
-			// Use 1-based frame numbers
-			log_action(_("Executing " SIZET_FMT " tags in frame "
-				SIZET_FMT "/" SIZET_FMT " of sprite %s"),
-				playlist->size(), frame+1, get_frame_count(),
-				getTargetPath().c_str());
-		);
-
-		for (PlayList::const_iterator it=playlist->begin(), itEnd=playlist->end();
-				it != itEnd; ++it)
-		{
-			execute_tag* tag = *it;
-			if ( typeflags & TAG_DLIST ) tag->execute_state(this);
-			if ( typeflags & TAG_ACTION ) tag->execute_action(this);
-		}
-	}
 
 	testInvariant();
 }

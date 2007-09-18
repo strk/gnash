@@ -135,8 +135,8 @@
   
   .initaction mc3: // Add initactions for mc3(mc3 is not placed)
     _root.initActionExecuted += ", mc3";
-    _root.xcheck_equals(mc1, null);
-    _root.xcheck_equals(typeof(mc1), 'undefined');
+    _root.check_equals(mc1, null);
+    _root.check_equals(typeof(mc1), 'undefined');
     _root.check_equals(typeof(_root.getInstanceAtDepth(-16386)), 'undefined');
   .end
 
@@ -242,9 +242,9 @@
   .initaction mc6: // Add initactions for mc6
     // Gnash fails by not respecting actions order for initactions
     _root.initActionExecuted += ", mc6";
-    _root.xcheck_equals(typeof(mc6), 'movieclip');
-    _root.xcheck_equals(typeof(mc6.mc61), 'movieclip');
-    _root.xcheck_equals(typeof(mc7), 'movieclip');
+    _root.check_equals(typeof(mc6), 'movieclip');
+    _root.check_equals(typeof(mc6.mc61), 'movieclip');
+    _root.check_equals(typeof(mc7), 'movieclip');
     _root.check_equals(this, _root); // target is the root !
   .end
   
