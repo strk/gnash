@@ -28,6 +28,7 @@ SCTESTS = \
 	movieclip_destruction_test3.sc \
 	movieclip_destruction_test4.sc \
 	action_execution_order_test10.sc \
+	action_execution_order_test12.sc \
 	$(NULL)
 
 # These will get compiled to SWFs just as above, but will not be executed as a test

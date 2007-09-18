@@ -1,3 +1,9 @@
+2007-09-18 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-swfc.all/action _execution_order_test12.sc, Makefile.am:
+	  add new testcase, caught an assertion here. Disable it if it blocks your
+	  work.
+	
 2007-09-18 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (execute_frame_tags): execute
