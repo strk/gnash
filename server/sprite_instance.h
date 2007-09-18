@@ -913,16 +913,19 @@ private:
 
 	bool m_has_mouse_event;
 
+	typedef boost::intrusive_ptr< edit_text_character > TextFieldPtr;
+	typedef std::vector< TextFieldPtr > TextFieldPtrVect;
+
 	/// A container for textfields, indexed by their variable name
-	typedef std::map< std::string, boost::intrusive_ptr<edit_text_character> > TextfieldMap;
+	typedef std::map< std::string, TextFieldPtrVect > TextFieldMap;
 
 	/// We'll only allocate Textfield variables map if
 	/// we need them (ie: anyone calls set_textfield_variable)
 	///
-	std::auto_ptr<TextfieldMap> _text_variables;
+	std::auto_ptr<TextFieldMap> _text_variables;
 
 	/// \brief
-	/// Returns a TextField given it's variable name,
+	/// Returns a vector of TextField associated with the given variable name,
 	/// or NULL if no such variable name is known.
 	//
 	/// A TextField variable is a variable that acts
@@ -932,7 +935,10 @@ private:
 	///
 	/// @todo find out wheter we should be case sensitive or not
 	///
-	edit_text_character* get_textfield_variable(const std::string& name);
+	/// @return a pointer inside a vector, will be invalidated by modifications
+	///         of the vector (set_textfield_variable)
+	///
+	TextFieldPtrVect* get_textfield_variable(const std::string& name);
 
 	/// soundid for current playing stream. If no stream set to -1
 	int m_sound_stream_id;

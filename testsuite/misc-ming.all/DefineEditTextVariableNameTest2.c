@@ -149,15 +149,15 @@ main(int argc, char** argv)
   add_actions(mo, "edit_text_var = 'Hahaha'; ");
   check_equals(mo, "edit_text_var", "'Hahaha'");
   check_equals(mo, "dtext1.text", "'Hahaha'");
-  xcheck_equals(mo, "dtext2.text", "'Hahaha'");
-  xcheck_equals(mo, "dtext3.text", "'Hahaha'");
+  check_equals(mo, "dtext2.text", "'Hahaha'");
+  check_equals(mo, "dtext3.text", "'Hahaha'");
   
   add_actions(mo, "dtext1.variable = 'newName'; ");
   // Maybe 'variable' is the connection point?
   xcheck_equals(mo, "dtext1.text", "'Hello'");
   // Change 'variable' back to its orignal string.
   add_actions(mo, "dtext1.variable = 'edit_text_var'; ");
-  xcheck_equals(mo, "dtext1.text", "'Hahaha'");
+  check_equals(mo, "dtext1.text", "'Hahaha'");
   SWFMovie_nextFrame(mo); 
   
   // Frame6: remove dtext1
@@ -195,7 +195,7 @@ main(int argc, char** argv)
   add_actions(mo, "edit_text_var = new Object();");
   check_equals(mo, "typeof(edit_text_var)", "'object'");
   check_equals(mo, "typeof(dtext4.text)", "'string'");
-  xcheck_equals(mo, "dtext4.text", "'[object Object]'");
+  check_equals(mo, "dtext4.text", "'[object Object]'");
   SWFMovie_nextFrame(mo);
   
   // Frame 11: provide a user defined toString for edit_text_var
@@ -203,23 +203,23 @@ main(int argc, char** argv)
   add_actions(mo, "Object.prototype.toString = function() {return 'TO_STRING';}; ");
   check_equals(mo, "typeof(dtext4.text)", "'string'");
   // Object.prototype.toString not invoked for dtext4.text!
-  xcheck_equals(mo, "dtext4.text", "'[object Object]'");
+  check_equals(mo, "dtext4.text", "'[object Object]'");
   check_equals(mo, "typeof(dtext4.text.toString)", "'function'");
-  xcheck_equals(mo, "dtext4.text.toString()", "'[object Object]'");
-  xcheck_equals(mo, "dtext4.text.valueOf()", "'[object Object]'");
+  check_equals(mo, "dtext4.text.toString()", "'[object Object]'");
+  check_equals(mo, "dtext4.text.valueOf()", "'[object Object]'");
   SWFMovie_nextFrame(mo);
   
   // Frame 12: dtext4.text still not updated
   // Deduction: dtext4.text won't update if edit_text_var is untouched.
   check_equals(mo, "edit_text_var.toString()", "'TO_STRING'");
-  xcheck_equals(mo, "dtext4.text", "'[object Object]'");
+  check_equals(mo, "dtext4.text", "'[object Object]'");
   SWFMovie_nextFrame(mo);
   
   // Frame 13: dtext4.text updated. 
   // Deduction: setting edit_text_var triggered updating dtext4.text.
   add_actions(mo, "edit_text_var = new Object();");
   check_equals(mo, "edit_text_var.toString()", "'TO_STRING'");
-  xcheck_equals(mo, "dtext4.text", "'TO_STRING'");
+  check_equals(mo, "dtext4.text", "'TO_STRING'");
   SWFMovie_nextFrame(mo);
   
   // Frame 14: end

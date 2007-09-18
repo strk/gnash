@@ -73,6 +73,7 @@ namespace gnash {
 //#define GNASH_DEBUG 1
 //#define GNASH_DEBUG_TIMELINE 1
 //#define GNASH_DEBUG_REPLACE 1
+//#define  DEBUG_DYNTEXT_VARIABLES 1
 
 // Forward declarations
 static as_object* getMovieClipInterface();
@@ -1863,10 +1864,14 @@ bool sprite_instance::get_member(string_table::key name_key, as_value* val)
 	}
 
 	// Try textfield variables
-	edit_text_character* etc = get_textfield_variable(name);
+	TextFieldPtrVect* etc = get_textfield_variable(name);
 	if ( etc )
 	{
-	    	val->set_string(etc->get_text_value());
+		for (TextFieldPtrVect::iterator i=etc->begin(), e=etc->end(); i!=e; ++i)
+		{
+			TextFieldPtr tf = *i;
+	    		val->set_string(tf->get_text_value());
+		}
 		return true;
 	}
 
@@ -2209,7 +2214,7 @@ void sprite_instance::set_member(string_table::key name,
 		const as_value& val)
 {
 #ifdef DEBUG_DYNTEXT_VARIABLES
-	log_debug(_("sprite[%p]::set_member(%s, %s)"), (void*)this, string_table::value(name), val.to_debug_string().c_str());
+	//log_debug(_("sprite[%p]::set_member(%s, %s)"), (void*)this, string_table::value(name).c_str(), val.to_debug_string().c_str());
 #endif
 
 	if ( val.is_function() )
@@ -2226,14 +2231,18 @@ void sprite_instance::set_member(string_table::key name,
 	//        property (ie: have a textfield use _x as variable name and
 	//        be scared)
 	//
-	edit_text_character* etc = get_textfield_variable(string_table::value(name).c_str());
+	TextFieldPtrVect* etc = get_textfield_variable(string_table::value(name).c_str());
 	if ( etc )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
-		log_debug(_("it's a Text Variable"));
+		log_debug(_("it's a Text Variable, associated with " SIZET_FMT " TextFields"), etc->size());
 #endif
 		as_environment* env = const_cast<as_environment*>(&m_as_environment);
-		etc->set_text_value(val.to_string(env).c_str());
+		for (TextFieldPtrVect::iterator i=etc->begin(), e=etc->end(); i!=e; ++i)
+		{
+			TextFieldPtr tf = *i;
+			tf->set_text_value(val.to_string(env).c_str());
+		}
 	}
 #ifdef DEBUG_DYNTEXT_VARIABLES
 	else
@@ -3121,35 +3130,28 @@ sprite_instance::set_textfield_variable(const std::string& name,
 	// lazy allocation
 	if ( ! _text_variables.get() )
 	{
-		_text_variables.reset(new TextfieldMap);
+		_text_variables.reset(new TextFieldMap);
 	}
 	
-	// TODO: should variable name be considered case-insensitive ?
-	TextfieldMap::iterator it = _text_variables->find(name);
-	// Don't replace the original textfiled character
-	// TODO: more tests for TextField variables.
-	if ( it == _text_variables->end() )
-	{
-		_text_variables->operator[] (name) = ch;
-	}
+	(*_text_variables)[name].push_back(ch);
 }
 
 /* private */
-edit_text_character*
+sprite_instance::TextFieldPtrVect*
 sprite_instance::get_textfield_variable(const std::string& name)
 {
 	// nothing allocated yet...
 	if ( ! _text_variables.get() ) return NULL;
 
 	// TODO: should variable name be considered case-insensitive ?
-	TextfieldMap::iterator it = _text_variables->find(name);
+	TextFieldMap::iterator it = _text_variables->find(name);
 	if ( it == _text_variables->end() )
 	{
-		return NULL;
+		return 0;
 	}
 	else
 	{
-		return it->second.get();
+		return &(it->second);
 	}
 } 
 
@@ -3656,14 +3658,18 @@ sprite_instance::markReachableResources() const
 	// Mark our own definition
 	if ( m_def.get() ) m_def->setReachable();
 
-	// Mark textfields in the TextfieldMap
+	// Mark textfields in the TextFieldMap
 	if ( _text_variables.get() )
 	{
-		for(TextfieldMap::const_iterator i=_text_variables->begin(),
+		for(TextFieldMap::const_iterator i=_text_variables->begin(),
 					e=_text_variables->end();
 				i!=e; ++i)
 		{
-			i->second->setReachable();
+			const TextFieldPtrVect& tfs=i->second;
+			for (TextFieldPtrVect::const_iterator j=tfs.begin(), je=tfs.end(); j!=je; ++j)
+			{
+				(*j)->setReachable();
+		 	}
 		}
 	}
 

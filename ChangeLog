@@ -1,5 +1,12 @@
 2007-09-18 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.{cpp,h}: allow multiple edit_text_character
+	  to be registered with a single variable name.
+	* testsuite/misc-ming.all/DefineEditTextVariableNameTest2.c:
+	  success in most tests (one still fails).
+
+2007-09-18 Sandro Santilli <strk@keybit.net>
+
 	* server/dlist.cpp (unload): don't unload again already-unloaded
 	  characters. Fixes the assertion failure in
 	  action_execution_order_test12.sc.
