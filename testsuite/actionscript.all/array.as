@@ -18,7 +18,7 @@
 
 // Initial test written by Mike Carlson
 
-rcsid="$Id: array.as,v 1.33 2007/09/01 01:59:33 strk Exp $";
+rcsid="$Id: array.as,v 1.34 2007/09/18 07:35:02 strk Exp $";
 
 #include "check.as"
 
@@ -922,3 +922,33 @@ check_equals( r.toString(), "0,3,1,2,4");
 #endif // OUTPUT_VERSION > 6
 
 
+//-------------------------------------------------------
+// Test array enumeration
+//------------------------------------------------------
+
+b = ["a","b","c"];
+out = {len:0}; for (var i in b) { out[i] = 1; out['len']++; }
+check_equals(out['len'], 3);
+check_equals(out[0], 1);
+check_equals(out[1], 1);
+check_equals(out[2], 1);
+
+b = [];
+out = {len:0}; for (var i in b) { out[i] = 1; out['len']++; }
+check_equals(out['len'], 0);
+
+// Changing length doesn't trigger enumeration of undefined values
+b.length = 100;
+out = {len:0}; for (var i in b) { out[i] = 1; out['len']++; }
+xcheck_equals(out['len'], 0);
+
+b[1] = undefined;
+out = {len:0}; for (var i in b) { out[i] = 1; out['len']++; }
+xcheck_equals(out['len'], 1);
+check_equals(out[1], 1);
+
+b[0] = undefined;
+out = {len:0}; for (var i in b) { out[i] = 1; out['len']++; }
+xcheck_equals(out['len'], 2);
+check_equals(out[1], 1);
+check_equals(out[0], 1);

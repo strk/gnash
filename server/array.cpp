@@ -1473,6 +1473,19 @@ array_class_init(as_object& glob)
 	glob.init_member("Array", ar.get());
 }
 
+void
+as_array_object::enumerateNonProperties(as_environment& env) const
+{
+	// TODO: only actually defined elements should be pushed on the env
+	//       but we currently have no way to distinguish between defined
+	//       and non-defined elements
+	for (unsigned int i=0; i<size(); ++i)
+	{
+		// here should be something like, if ( isDefined(i) ) ...
+		env.push(as_value(i));
+	}
+}
+
 #ifdef GNASH_USE_GC
 void
 as_array_object::markReachableResources() const

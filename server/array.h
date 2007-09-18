@@ -296,6 +296,12 @@ public:
 	virtual void set_member(string_table::key name,
 		const as_value& val );
 
+	/// Enumerate elements
+	//
+	/// See as_object::enumerateNonProperties(as_environment&) for more info.
+	///
+	virtual void enumerateNonProperties(as_environment&) const;
+
 protected:
 
 #ifdef GNASH_USE_GC

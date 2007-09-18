@@ -1,5 +1,13 @@
 2007-09-18 Sandro Santilli <strk@keybit.net>
 
+	* server/array.{cpp,h}: Implement enumerateNonProperties().
+	  Still not 100% correct but fixes youtube controls positioning
+	  (bug #20469).
+	* testsuite/actionscript.all/array.as: tests for enumeration
+	  of array properties.
+
+2007-09-18 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-swfc.all/movieclip_destruction_test1.sc:
 	  Add visual traces of actions while being executed; add
 	  comment about other finding.
