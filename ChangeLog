@@ -1,5 +1,11 @@
 2007-09-18 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfc.all/movieclip_destruction_test1.sc:
+	  Add visual traces of actions while being executed; add
+	  comment about other finding.
+
+2007-09-18 Sandro Santilli <strk@keybit.net>
+
 	* server/swf/DoActionTag.h (doInitActionLoader): pass 'cid' value
 	  to add_init_action().
 	* server/parser/movie_definition.h (add_init_action): add support for

@@ -35,7 +35,7 @@
  * Description:
  * 
  *  frame2: character mc1 placed at depth -16381.
- *          mc1 has two frams, _root.gotoAndPlay(6) get executed in it's 2nd frame.
+ *          mc1 has two frames, _root.gotoAndPlay(6) get executed in it's 2nd frame.
  *  frame3: 
  *  frame4: remove character -16381 
  *  frame6: 
@@ -44,6 +44,7 @@
  *    (1) only part of the AS in a single action_buffer(in the 2nd frame of mc1) 
  *        get executed;
  *    (2) character mc1 get destroied at frame 4.
+ *    (3) init actions defined in a passing-by frame get executed (while normal actions don't)
  * 
  */
 
@@ -66,8 +67,12 @@
   .sprite mc1 // Define a sprite named as mc1
     .frame 1
       .put b1 x = 300 y = 300
+	.action:
+		note("mc1.frame1");
+	.end
     .frame 2    
       .action:
+	note("mc1.frame2");
         check_equals(mc1.getDepth(), -16383);
         _root.x = 0;
         _root.gotoAndPlay(6);
@@ -81,6 +86,7 @@
   .put mc1 // Place mc1
   
   .action:
+	note("root.frame2 (after put mc1)");
     check_equals(typeof(mc1), 'movieclip');
     check_equals(mc1.getDepth(), -16383);
   .end
@@ -95,12 +101,16 @@
 #endif
 
 .frame 3 
+	.action: note("root.frame3 (before definesprite)");
+	.end
+
   .sprite mc2 // Define mc2 and add init_actions for it
     .frame 1
       .put b2 x = 300 y = 300
   .end
   
   .initaction mc2: // Add initactions for mc2(mc2 is not placed)
+	note("initaction mc2");
     _root.initActionExecuted = "mc2";
     // mc1 is still alive here, _root.gotoAndPlay(6) hasn't been executed yet.
     // Note mc1 has 2 frames.
@@ -108,6 +118,8 @@
     check_equals(mc1.getDepth(), -16383);
   .end
 
+	.action: note("root.frame3 (after initaction)");
+	.end
 
 .frame 4
 
@@ -115,6 +127,11 @@
     .frame 1
       .put b3 x = 300 y = 300
   .end
+
+	.action:
+		note("root.frame4 (before initaction)");
+		_root.check(false); // should not be executed
+	.end
   
   .initaction mc3: // Add initactions for mc3(mc3 is not placed)
     _root.initActionExecuted += ", mc3";
@@ -123,7 +140,17 @@
     _root.check_equals(typeof(_root.getInstanceAtDepth(-16386)), 'undefined');
   .end
 
+	.action:
+		note("root.frame4 (after initaction)");
+		_root.check(false); // should not be executed
+	.end
+
   .del mc1  // Remove sprite mc1  
+
+	.action:
+		note("root.frame4 (after del mc1)");
+		_root.check(false); // should not be executed
+	.end
 
 
 .frame 6 // target frame
