@@ -807,10 +807,19 @@ DisplayList::unload()
 
 	testInvariant();
 
-	for (iterator it = _charsByDepth.begin(),	itEnd = _charsByDepth.end(); it != itEnd; )
+	// Should we start looking from beginNonRemoved ?
+	// If I try, I get a failure in swfdec/gotoframe.swf
+	for (iterator it = _charsByDepth.begin(), itEnd = _charsByDepth.end(); it != itEnd; )
 	{
 		// make a copy
 		DisplayItem di = *it;
+
+		// skip if already unloaded
+		if ( di->isUnloaded() )
+		{
+			++it;
+			continue;
+		}
 
 		if ( ! di->unload() ) // no event handler queued, we remove
 		{
