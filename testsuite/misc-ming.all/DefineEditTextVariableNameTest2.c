@@ -151,6 +151,13 @@ main(int argc, char** argv)
   check_equals(mo, "dtext1.text", "'Hahaha'");
   xcheck_equals(mo, "dtext2.text", "'Hahaha'");
   xcheck_equals(mo, "dtext3.text", "'Hahaha'");
+  
+  add_actions(mo, "dtext1.variable = 'newName'; ");
+  // Maybe 'variable' is the connection point?
+  xcheck_equals(mo, "dtext1.text", "'Hello'");
+  // Change 'variable' back to its orignal string.
+  add_actions(mo, "dtext1.variable = 'edit_text_var'; ");
+  xcheck_equals(mo, "dtext1.text", "'Hahaha'");
   SWFMovie_nextFrame(mo); 
   
   // Frame6: remove dtext1
