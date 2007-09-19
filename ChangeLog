@@ -1,5 +1,6 @@
 2007-09-19 Sandro Santilli <strk@keybit.net>
 
+	* gui/kde_glue_agg.cpp: fix initialization order warning.
 	* gui/gui.{cpp,h}: draft an attempt at skipping rendering
 	  when late of fps timer. It's experimental, and disabled
 	  by default. Define SKIP_RENDERING_IF_LATE in gui.h to

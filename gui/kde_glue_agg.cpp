@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: kde_glue_agg.cpp,v 1.5 2007/07/26 19:41:37 strk Exp $ */
+/* $Id: kde_glue_agg.cpp,v 1.6 2007/09/19 06:38:04 strk Exp $ */
 
 #include "kde_glue_agg.h"
 #include "render_handler.h"
@@ -27,9 +27,10 @@ namespace gnash
 {
 
 KdeAggGlue::KdeAggGlue()
-: _renderer(NULL),
+:
   _width(0),
-  _height(0)
+  _height(0),
+  _renderer(0)
 {
 }
 
