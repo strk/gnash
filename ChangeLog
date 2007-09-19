@@ -1,3 +1,8 @@
+2007-09-19 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/TextField.as: add tests
+	  for effects of changing _name.
+
 2007-09-19 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/gnash.h: more enums for extended ascii characters.

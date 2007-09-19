@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.24 2007/09/12 16:47:34 strk Exp $";
+rcsid="$Id: TextField.as,v 1.25 2007/09/19 09:28:01 strk Exp $";
 
 #include "check.as"
 
@@ -351,7 +351,16 @@ xcheck_equals(typeof(tf._name), 'string');
 check(!tf.hasOwnProperty('_name'));
 check(!tf.__proto__.hasOwnProperty('_name'));
 xcheck_equals(tf._name, 'tf');
-// TODO: see effects of changing _name
+tfref = tf;
+tf._name = 'changed';
+xcheck_equals(typeof(tf), 'undefined');
+check_equals(typeof(tfref), 'object');
+check_equals(tfref._name, 'changed');
+xcheck_equals(tfref._target, '/changed');
+tfref._name = 'tf';
+check_equals(typeof(tf), 'object');
+check_equals(typeof(tfref), 'object');
+// TODO: see effects of unloading the textfield ?
 
 // Check TextField._parent
 
