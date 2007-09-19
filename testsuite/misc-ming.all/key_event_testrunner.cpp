@@ -26,6 +26,7 @@
 #include "dlist.h"
 #include "container.h"
 #include "log.h"
+#include "VM.h"
 
 #include "check.h"
 #include <string>
@@ -56,8 +57,10 @@ main(int /*argc*/, char** /*argv*/)
   check(mc);
 
   as_value tmp;
+  string_table& st = VM::get().getStringTable();
+  string_table::key x1key = st.find("x1");
 
-  check(root->get_member(string_table::find("x1"), &tmp));
+  check(root->get_member(x1key, &tmp));
   check_equals(tmp.to_number(), 0);
   
   // press key 'A' and checks
@@ -65,15 +68,15 @@ main(int /*argc*/, char** /*argv*/)
   tester.releaseKey(key::A);
 
   // check that onClipKeyUp/KeyDown have been triggered
-  check(root->get_member(string_table::find("x1"), &tmp));
+  check(root->get_member(x1key, &tmp));
   check_equals(tmp.to_string(), "A");
-  check(root->get_member(string_table::find("x2"), &tmp));
+  check(root->get_member(st.find("x2"), &tmp));
   check_equals(tmp.to_number(), key::A);
 
   // check that user defined onKeyUp/KeyDown were not triggered
-  check(root->get_member(string_table::find("x4"), &tmp));
+  check(root->get_member(st.find("x4"), &tmp));
   check_equals(tmp.to_number(), 0);
-  check(root->get_member(string_table::find("x5"), &tmp));
+  check(root->get_member(st.find("x5"), &tmp));
   check_equals(tmp.to_number(), 0);
 
   for(int i=1; i<30; i++)
@@ -89,24 +92,24 @@ main(int /*argc*/, char** /*argv*/)
   tester.releaseKey(key::C);
 
   // check that onClipKeyUp/KeyDown have been triggered
-  check(root->get_member(string_table::find("x1"), &tmp));
+  check(root->get_member(x1key, &tmp));
   check_equals(tmp.to_string(), "C");
-  check(root->get_member(string_table::find("x2"), &tmp));
+  check(root->get_member(st.find("x2"), &tmp));
   check_equals(tmp.to_number(), key::C);
   
   // check that user defined onKeyUp/KeyDown have been triggered
-  check(root->get_member(string_table::find("x4"), &tmp));
+  check(root->get_member(st.find("x4"), &tmp));
   check_equals(tmp.to_string(), "C");
-  check(root->get_member(string_table::find("x5"), &tmp));
+  check(root->get_member(st.find("x5"), &tmp));
   check_equals(tmp.to_number(), key::C);
   	
   // check that user onClipKeyPress and user defined onKeyPress were not triggered
   // onClipKeyPress was not triggered because the event handler binds a invalid key code
-  check(root->get_member(string_table::find("x3"), &tmp));
+  check(root->get_member(st.find("x3"), &tmp));
   check_equals(tmp.to_number(), 0);
   // onKeyPress was not triggered because I think there is no user defined
   // KeyPress event handler at all( the defined onKeyPress is just a normal function).
-  check(root->get_member(string_table::find("x6"), &tmp));
+  check(root->get_member(st.find("x6"), &tmp));
   check_equals(tmp.to_number(), 0);
   
 }

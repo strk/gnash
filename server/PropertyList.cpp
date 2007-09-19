@@ -30,6 +30,7 @@
 #include "as_function.h"
 #include "as_environment.h" // for enumerateKeys
 #include "as_value.h" // for enumerateValues
+#include "VM.h" // For string_table
 
 #include <utility> // for std::make_pair
 
@@ -87,7 +88,7 @@ PropertyList::setValue(string_table::key key, const as_value& val,
 		// create a new member
 		SimpleProperty* prop = new SimpleProperty(val);
 #ifdef DEBUG_PROPERTY_ALLOC
-		log_debug("SimpleProperty %s = %p", string_table::value(key).c_str(), (void*)prop);
+		log_debug("SimpleProperty %s = %p", VM::get().getStringTable().value(key).c_str(), (void*)prop);
 #endif // DEBUG_PROPERTY_ALLOC
 		_props[key] = prop;
 		return true;
@@ -98,7 +99,7 @@ PropertyList::setValue(string_table::key key, const as_value& val,
 	if ( prop->isReadOnly() )
 	{
 		log_error(_("Property %s is read-only, not setting it to %s"), 
-			string_table::value(key).c_str(), val.to_string().c_str());
+			VM::get().getStringTable().value(key).c_str(), val.to_string().c_str());
 		return false;
 	}
 
@@ -187,26 +188,28 @@ PropertyList::setFlagsAll(const PropertyList& props,
 void
 PropertyList::enumerateKeys(as_environment& env) const
 {
+	string_table& st = VM::get().getStringTable();
 	for ( const_iterator i=begin(), ie=end(); i != ie; ++i)
 	{
 		const Property* prop = i->second;
 
 		if ( prop->getFlags().get_dont_enum() ) continue;
 
-		env.push(as_value(string_table::value(i->first).c_str()));
+		env.push(as_value(st.value(i->first).c_str()));
 	}
 }
 
 void
 PropertyList::enumerateKeyValue(as_object& this_ptr, std::map<std::string, std::string>& to) 
 {
+	string_table& st = VM::get().getStringTable();
 	for ( const_iterator i=begin(), ie=end(); i != ie; ++i)
 	{
 		const Property* prop = i->second;
 
 		if ( prop->getFlags().get_dont_enum() ) continue;
 
-		to.insert(make_pair(string_table::value(i->first),
+		to.insert(make_pair(st.value(i->first),
 				prop->getValue(this_ptr).to_string()));
 	}
 }
@@ -214,9 +217,10 @@ PropertyList::enumerateKeyValue(as_object& this_ptr, std::map<std::string, std::
 void
 PropertyList::dump(as_object& this_ptr)
 {
+	string_table& st = VM::get().getStringTable();
 	for ( const_iterator it=begin(), itEnd=end(); it != itEnd; ++it )
 	{
-		log_msg("  %s: %s", string_table::value(it->first).c_str(),
+		log_msg("  %s: %s", st.value(it->first).c_str(),
 			it->second->getValue(this_ptr).to_string().c_str());
 	}
 }
@@ -252,7 +256,7 @@ PropertyList::addGetterSetter(string_table::key key, as_function& getter,
 
 	GetterSetterProperty* prop = new GetterSetterProperty(GetterSetter(getter, setter));
 #ifdef DEBUG_PROPERTY_ALLOC
-	log_debug("GetterSetterProperty %s = %p", string_table::value(key).c_str(), (void*)prop);
+	log_debug("GetterSetterProperty %s = %p", V::get().getStringTable().value(key).c_str(), (void*)prop);
 #endif // DEBUG_PROPERTY_ALLOC
 	_props[key] = prop;
 	return true;

@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.37 2007/09/16 16:48:14 cmusick Exp $ */
+/* $Id: timers.cpp,v 1.38 2007/09/19 14:20:49 cmusick Exp $ */
 
 #include "timers.h"
 #include "as_function.h" // for class as_function
@@ -188,7 +188,7 @@ timer_setinterval(const fn_call& fn)
 	{
 		as_value method;
 		const std::string& method_name = fn.arg(1).to_string(&fn.env());
-		if (!obj->get_member(string_table::find(method_name), &method) )
+		if (!obj->get_member(VM::get().getStringTable().find(method_name), &method) )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 				std::stringstream ss; fn.dump_args(ss);

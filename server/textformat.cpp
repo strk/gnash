@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-// $Id: textformat.cpp,v 1.28 2007/09/16 16:48:14 cmusick Exp $
+// $Id: textformat.cpp,v 1.29 2007/09/19 14:20:49 cmusick Exp $
 
 #include "log.h"
 #include "textformat.h"
@@ -165,63 +165,63 @@ as_value textformat_setformat(const fn_call& fn)
   //log_msg(_("Change from %f for %f characters for object at %p"), start, end, obj);
 
   // Check for the flags that could be set
-  if (obj->get_member(string_table::find("underline"), &method)) {
+  if (obj->get_member(as_object::PROP_UNDERLINE, &method)) {
     //log_msg(_("Underline exists and is set to %d"), method.to_bool());
     obj->obj.underlinedSet(method.to_bool());
   }
   
-  if (obj->get_member(string_table::find("italic"), &method)) {
+  if (obj->get_member(as_object::PROP_ITALIC, &method)) {
     //log_msg(_("Italic exists and is set to %d"), method.to_bool());
     obj->obj.italicedSet(method.to_bool());
   }
   
-  if (obj->get_member(string_table::find("bold"), &method)) {
+  if (obj->get_member(as_object::PROP_BOLD, &method)) {
     //log_msg(_("Bold exists and is set to %d"), method.to_bool());
     obj->obj.boldSet(method.to_bool());
   }
   
-  if (obj->get_member(string_table::find("bullet"), &method)) {
+  if (obj->get_member(as_object::PROP_BULLET, &method)) {
     //log_msg(_("Bullet exists and is set to %d"), method.to_bool());
     obj->obj.bulletSet(method.to_bool());
   }
 
-  if (obj->get_member(string_table::find("color"), &method)) {
+  if (obj->get_member(as_object::PROP_COLOR, &method)) {
     //log_msg(_("Color exists and is set to %f", method.to_number());
     obj->obj.colorSet((uint32_t)method.to_number());
   }
 
-  if (obj->get_member(string_table::find("indent"), &method)) {
+  if (obj->get_member(as_object::PROP_INDENT, &method)) {
     //log_msg(_("Indent exists and is set to %f"), method.to_number());
     obj->obj.indentSet(float(method.to_number()));
   }
 
-  if (obj->get_member(string_table::find("align"), &method)) {
+  if (obj->get_member(as_object::PROP_ALIGN, &method)) {
     //log_msg(_("Align exists and is set to %s"), method.to_string());
     const char* align = method.to_string().c_str();
     if ( align ) obj->obj.alignSet(align);
   }
 
-  if (obj->get_member(string_table::find("blockIndent"), &method)) {
+  if (obj->get_member(as_object::PROP_BLOCK_INDENT, &method)) {
     //log_msg(_("BlockIndent exists and is set to %f"), method.to_number());
     obj->obj.blockIndentSet(float(method.to_number()));
   }
   
-  if (obj->get_member(string_table::find("leading"), &method)) {
+  if (obj->get_member(as_object::PROP_LEADING, &method)) {
     //log_msg(_("Leading exists and is set to %f"), method.to_number());
     obj->obj.leadingSet(float(method.to_number()));
   }
   
-  if (obj->get_member(string_table::find("leftMargin"), &method)) {
+  if (obj->get_member(as_object::PROP_LEFT_MARGIN, &method)) {
     //log_msg(_("LeftMargin exists and is set to %f"), method.to_number());
     obj->obj.leftMarginSet(float(method.to_number()));
   }
   
-  if (obj->get_member(string_table::find("RightMargin"), &method)) {
+  if (obj->get_member(as_object::PROP_RIGHT_MARGIN, &method)) {
     //log_msg(_("RightMargin exists and is set to %f"), method.to_number());
     obj->obj.rightMarginSet(float(method.to_number()));
   }
   
-  if (obj->get_member(string_table::find("size"), &method)) {
+  if (obj->get_member(as_object::PROP_SIZE, &method)) {
     //log_msg(_("Size exists and is set to %f"), method.to_number());
     obj->obj.sizeSet(float(method.to_number()));
   }

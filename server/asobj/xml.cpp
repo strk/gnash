@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.45 2007/09/16 16:48:14 cmusick Exp $ */
+/* $Id: xml.cpp,v 1.46 2007/09/19 14:20:50 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -135,12 +135,12 @@ XML::XML(struct node * /* childNode */)
 bool
 XML::get_member(string_table::key name, as_value *val)
 {
-        if ( string_table::value(name) == "status" ) 
+        if (name == as_object::PROP_STATUS) 
         {
                 val->set_int(_status);
                 return true;
         }
-        else if ( string_table::value(name) == "loaded" )
+        else if (name == as_object::PROP_LOADED)
         {
                 if ( _loaded < 0 ) val->set_undefined();
                 else val->set_bool(_loaded);
@@ -153,12 +153,12 @@ XML::get_member(string_table::key name, as_value *val)
 void
 XML::set_member(string_table::key name, const as_value& val)
 {
-        if (string_table::value(name) == "status" )
+        if (name == as_object::PROP_STATUS)
 	{
 		_status = XML::Status(val.to_number());
 		return;
 	}
-        else if (string_table::value(name) == "loaded" )
+        else if (name == as_object::PROP_LOADED)
         {
                 bool b = val.to_bool();
 		log_msg(_("set_member 'loaded' (%s) became boolean %d"), val.to_debug_string().c_str(), b);
@@ -197,7 +197,7 @@ XML::onLoadEvent(bool success)
 
     if ( method_name1.empty() ) return;
 
-	string_table::key method_name = string_table::find(method_name1);
+	string_table::key method_name = _vm.getStringTable().find(method_name1);
     as_value	method;
     if (!get_member(method_name, &method) ) return;
     if ( method.is_undefined() ) return;
@@ -225,7 +225,7 @@ XML::onCloseEvent()
 
     if ( method_name1.empty() ) return;
 
-	string_table::key method_name = string_table::find(method_name1);
+	string_table::key method_name = _vm.getStringTable().find(method_name1);
     as_value	method;
     if (! get_member(method_name, &method) ) return;
     if ( method.is_undefined() ) return;
@@ -849,7 +849,7 @@ XML::ignoreWhite() const
     if ( VM::get().getSWFVersion() < 7 ) propname = "ignorewhite";
     else propname = "ignoreWhite";
 
-	string_table::key propnamekey = string_table::find(propname);
+	string_table::key propnamekey = VM::get().getStringTable().find(propname);
     as_value val;
     if (!const_cast<XML*>(this)->get_member(propnamekey, &val) ) return false;
     return val.to_bool();

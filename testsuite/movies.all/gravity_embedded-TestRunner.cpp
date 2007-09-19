@@ -26,6 +26,7 @@
 #include "dlist.h"
 #include "container.h"
 #include "log.h"
+#include "VM.h"
 
 #include "check.h"
 #include <string>
@@ -65,8 +66,9 @@ main(int /*argc*/, char** /*argv*/)
 	check(loaded);
 	check_equals(loaded->get_parent(), root);
 
-	string_table::key xscale = string_table::find("_xscale");
-	string_table::key yscale = string_table::find("_yscale");
+	string_table& st = VM::get().getStringTable();
+	string_table::key xscale = st.find("_xscale");
+	string_table::key yscale = st.find("_yscale");
 	// we need a const_cast as get_member *might* eventually
 	// change the character (fetching _x shouldn't change it though)
 	check(const_cast<character*>(loaded)->get_member(xscale, &tmp));

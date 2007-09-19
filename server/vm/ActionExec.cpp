@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.45 2007/09/16 16:48:15 cmusick Exp $ */
+/* $Id: ActionExec.cpp,v 1.46 2007/09/19 14:20:51 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -539,7 +539,7 @@ ActionExec::delObjectMember(as_object& obj, const std::string& name)
 	    boost::to_lower(namei, vm.getLocale());
 	} 
 
-	std::pair<bool,bool> ret = obj.delProperty(string_table::find(namei));
+	std::pair<bool,bool> ret = obj.delProperty(vm.getStringTable().find(namei));
 	return ret.second;
 }
 
@@ -609,9 +609,9 @@ ActionExec::setObjectMember(as_object& obj, const std::string& var, const as_val
 	if ( vm.getSWFVersion() < 7 ) {
 	    std::string vari = var;
 	    boost::to_lower(vari, vm.getLocale());
-	    obj.set_member(string_table::find(vari), val);
+	    obj.set_member(vm.getStringTable().find(vari), val);
 	} else {
-	    obj.set_member(string_table::find(var), val);
+	    obj.set_member(vm.getStringTable().find(var), val);
 	}
 	
 }
@@ -624,9 +624,9 @@ ActionExec::getObjectMember(as_object& obj, const std::string& var, as_value& va
 	if ( vm.getSWFVersion() < 7 ) {
 	    std::string vari = var;
 	    boost::to_lower(vari, vm.getLocale());
-	    return obj.get_member(string_table::find(vari), &val);
+	    return obj.get_member(vm.getStringTable().find(vari), &val);
 	} else {
-	    return obj.get_member(string_table::find(var), &val);
+	    return obj.get_member(vm.getStringTable().find(var), &val);
 	}
 
 }

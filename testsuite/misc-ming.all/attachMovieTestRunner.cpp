@@ -26,6 +26,7 @@
 #include "dlist.h"
 #include "container.h"
 #include "log.h"
+#include "VM.h"
 
 #include "check.h"
 #include <string>
@@ -79,23 +80,25 @@ main(int /*argc*/, char** /*argv*/)
 	// check that the pixel under the mouse is white
 	check_pixel(100, 30, 2, rgba(255,255,255,255), 2);
 
-	root->get_member(string_table::find("mousedown"), &tmp);
+	string_table& st = VM::get().getStringTable();
+
+	root->get_member(st.find("mousedown"), &tmp);
 	check(tmp.is_undefined());
-	root->get_member(string_table::find("mouseup"), &tmp);
+	root->get_member(st.find("mouseup"), &tmp);
 	check(tmp.is_undefined());
 
 	// Note that we are *not* on an active entity !
 	tester.pressMouseButton();
 
-	root->get_member(string_table::find("mousedown"), &tmp);
+	root->get_member(st.find("mousedown"), &tmp);
 	check_equals(tmp.to_number(), 1);
-	check ( ! root->get_member(string_table::find("mouseup"), &tmp) );
+	check ( ! root->get_member(st.find("mouseup"), &tmp) );
 
 	tester.depressMouseButton();
 
-	root->get_member(string_table::find("mousedown"), &tmp);
+	root->get_member(st.find("mousedown"), &tmp);
 	check_equals(tmp.to_number(), 1);
-	root->get_member(string_table::find("mouseup"), &tmp);
+	root->get_member(st.find("mouseup"), &tmp);
 	check_equals(tmp.to_number(), 1);
 
 	tester.advance();
@@ -152,7 +155,7 @@ main(int /*argc*/, char** /*argv*/)
 	// Note that we are *not* on an active entity !
 	tester.pressMouseButton();
 
-	root->get_member(string_table::find("mousedown"), &tmp);
+	root->get_member(st.find("mousedown"), &tmp);
 	check_equals(tmp.to_number(), 5);
 
 }

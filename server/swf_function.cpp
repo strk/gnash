@@ -87,7 +87,7 @@ swf_function::getSuper(as_object& obj)
 	//       returning an as_function ?
 	//
 	as_value ctor;
-	bool ret = proto->get_member(string_table::find("__constructor__"), &ctor);
+	bool ret = proto->get_member(as_object::PROP_uuCONSTRUCTORuu, &ctor);
 	if ( ! ret )
 	{
 #ifdef GNASH_DEBUG_GETSUPER
@@ -114,7 +114,7 @@ swf_function::getSuper(as_object& obj)
 #endif
 
 	as_value ctor_proto;
-	ret = ctor_obj->get_member(string_table::find("prototype"), &ctor_proto);
+	ret = ctor_obj->get_member(as_object::PROP_PROTOTYPE, &ctor_proto);
 	if ( ! ret )
 
 	{
@@ -154,7 +154,7 @@ swf_function::getArguments(swf_function& callee, const fn_call& fn)
 	{
 		arguments->push(fn.arg(i));
 	}
-	arguments->set_member(string_table::find("callee"), &callee);
+	arguments->set_member(as_object::PROP_CALLEE, &callee);
 
 	return arguments;
 

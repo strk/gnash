@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.119 2007/09/04 11:27:42 cmusick Exp $ */
+/* $Id: impl.cpp,v 1.120 2007/09/19 14:20:49 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -929,9 +929,6 @@ void gnashInit()
 	GC::init(gcRoot);
 #endif
 }
-
-
-
 
 } // namespace gnash
 

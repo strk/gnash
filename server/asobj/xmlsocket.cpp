@@ -642,7 +642,7 @@ xmlsocket_as_object::getEventHandler(const std::string& name)
 		if ( vm.getSWFVersion() < 7 ) boost::to_lower(key, vm.getLocale());
 
 		as_value tmp;
-		if (!get_member(string_table::find(key), &tmp) ) return ret;
+		if (!get_member(vm.getStringTable().find(key), &tmp) ) return ret;
 		ret = tmp.to_as_function();
 		return ret;
 }

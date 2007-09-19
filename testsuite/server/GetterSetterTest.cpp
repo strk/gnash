@@ -53,7 +53,7 @@ static as_value setter(const fn_call& fn)
 	boost::intrusive_ptr<as_object> o = fn.this_ptr;
 	assert(fn.nargs == 1);
 	as_value& val = fn.arg(0);
-	o->set_member(string_table::find(val.to_string(&fn.env())), val);
+	o->set_member(VM::get().getStringTable().find(val.to_string(&fn.env())), val);
 	return as_value();
 }
 

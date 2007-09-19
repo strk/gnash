@@ -26,6 +26,7 @@
 #include "dlist.h"
 #include "container.h"
 #include "log.h"
+#include "VM.h"
 
 #include "check.h"
 #include <string>
@@ -60,65 +61,66 @@ main(int /*argc*/, char** /*argv*/)
 
 	// Now timers are set and counters initialized
 
-	root->get_member(string_table::find("this_counter"), &tmp);
+	string_table& st = VM::get().getStringTable();
+	root->get_member(st.find("this_counter"), &tmp);
 	check_equals(tmp.to_number(), 0);
-	root->get_member(string_table::find("that_counter"), &tmp);
+	root->get_member(st.find("that_counter"), &tmp);
 	check_equals(tmp.to_number(), 0);
 
 	usleep(500000); tester.advance(); // run expired timers
 
-	root->get_member(string_table::find("this_counter"), &tmp);
+	root->get_member(st.find("this_counter"), &tmp);
 	check_equals(tmp.to_number(), 1);
-	root->get_member(string_table::find("that_counter"), &tmp);
+	root->get_member(st.find("that_counter"), &tmp);
 	check_equals(tmp.to_number(), 0);
 
 	usleep(500000); tester.advance(); // run expired timers
 
-	root->get_member(string_table::find("this_counter"), &tmp);
+	root->get_member(st.find("this_counter"), &tmp);
 	check_equals(tmp.to_number(), 2);
-	root->get_member(string_table::find("that_counter"), &tmp);
+	root->get_member(st.find("that_counter"), &tmp);
 	check_equals(tmp.to_number(), 1);
 
 	usleep(500000); tester.advance(); // run expired timers
 
-	root->get_member(string_table::find("this_counter"), &tmp);
+	root->get_member(st.find("this_counter"), &tmp);
 	check_equals(tmp.to_number(), 3);
-	root->get_member(string_table::find("that_counter"), &tmp);
+	root->get_member(st.find("that_counter"), &tmp);
 	check_equals(tmp.to_number(), 1);
 
 	usleep(500000); tester.advance(); // run expired timers
 
-	root->get_member(string_table::find("this_counter"), &tmp);
+	root->get_member(st.find("this_counter"), &tmp);
 	check_equals(tmp.to_number(), 4);
-	root->get_member(string_table::find("that_counter"), &tmp);
+	root->get_member(st.find("that_counter"), &tmp);
 	check_equals(tmp.to_number(), 2);
 
 	usleep(1000000); tester.advance(); // run expired timers
 
-	root->get_member(string_table::find("this_counter"), &tmp);
+	root->get_member(st.find("this_counter"), &tmp);
 	check_equals(tmp.to_number(), 4);
-	root->get_member(string_table::find("that_counter"), &tmp);
+	root->get_member(st.find("that_counter"), &tmp);
 	check_equals(tmp.to_number(), 3);
 
 	usleep(1000000); tester.advance(); // run expired timers
 
-	root->get_member(string_table::find("this_counter"), &tmp);
+	root->get_member(st.find("this_counter"), &tmp);
 	check_equals(tmp.to_number(), 4);
-	root->get_member(string_table::find("that_counter"), &tmp);
+	root->get_member(st.find("that_counter"), &tmp);
 	check_equals(tmp.to_number(), 4);
 
 	usleep(500000); tester.advance(); // run expired timers
 
-	root->get_member(string_table::find("this_counter"), &tmp);
+	root->get_member(st.find("this_counter"), &tmp);
 	check_equals(tmp.to_number(), 5);
-	root->get_member(string_table::find("that_counter"), &tmp);
+	root->get_member(st.find("that_counter"), &tmp);
 	check_equals(tmp.to_number(), 4);
 
-	root->get_member(string_table::find("pushed_args"), &tmp);
+	root->get_member(st.find("pushed_args"), &tmp);
 	as_environment env; // needed for proper to_string()
 	check_equals(tmp.to_string(&env), std::string("8,9,10"));
 
-	root->get_member(string_table::find("test_completed"), &tmp);
+	root->get_member(st.find("test_completed"), &tmp);
 	check_equals(tmp.to_number(), 1);
 
 

@@ -19,7 +19,9 @@
 #ifndef GNASH_STRING_TABLE_H
 #define GNASH_STRING_TABLE_H
 
-// Thread Status: SAFE
+// Thread Status: SAFE, except for group functions.
+// The group functions may have strange behavior when trying to automatically
+// lowercase the additions.
 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/hashed_index.hpp>
@@ -38,14 +40,13 @@ class string_table;
 // that a string table could give significant memory savings.
 class string_table
 {
-private:
+public:
 	// A little helper for indexing.
 	struct svt
 	{
 		std::string mValue;
 		std::size_t mId;
-		svt(const std::string& a, std::size_t b) : mValue(a), mId(b) {/**/}
-	 };
+	};
 
 public:
 	typedef boost::multi_index_container<svt,
@@ -60,28 +61,47 @@ public:
 
 	// Find a string. If insert_unfound is true, the string will
 	// be inserted if the value is not found in the table already.
-	static key find(const std::string& to_find, bool insert_unfound = true);
+	key find(const std::string& to_find, bool insert_unfound = true);
 
 	// Find a string by its key.
-	static const std::string& value(key to_find)
-	{ table::nth_index<1>::type::iterator r = mTable.get<1>().find(to_find);
-		return (r == mTable.get<1>().end()) ? mEmpty : r->mValue; }
+	const std::string& value(key to_find)
+	{ 
+		if (mTable.empty())
+			return mEmpty;
+		table::nth_index<1>::type::iterator r = mTable.get<1>().find(to_find);
+		return (r == mTable.get<1>().end()) ? mEmpty : r->mValue;
+	}
 
 	// Insert a string known to not be in the table. Return the new
 	// index.
-	static key insert(const std::string& to_insert);
+	key insert(const std::string& to_insert);
+
+	// Insert a group of strings with their ids preset. This allows
+	// for switches and enums and such, but be careful you don't set two
+	// strings with the same id, as this does not check for such occurrences.
+	void insert_group(svt* pList, std::size_t size);
+
+	void lower_next_group() { mSetToLower = true; }
 
 	// Insert a string when you will handle the locking yourself.
 	// Use 'lock_mutex' to obtain the correct mutex to use for this.
-	static key already_locked_insert(const std::string& to_insert, boost::mutex& lock);
+	key already_locked_insert(const std::string& to_insert, boost::mutex& lock);
 
-	static boost::mutex& lock_mutex() { return mLock; }
+	boost::mutex& lock_mutex() { return mLock; }
+
+	string_table() :
+		mTable(),
+		mLock(),
+		mHighestKey(0),
+		mSetToLower(false)
+	{/**/}
 
 private:
-	static table mTable;
-	static std::string mEmpty;
-	static boost::mutex mLock;
-	static key mHighestKey;
+	table mTable;
+	static std::string mEmpty; // The empty string, universally.
+	boost::mutex mLock;
+	key mHighestKey;
+	bool mSetToLower; // If true, affects the next group addition.
 };
 
 }; /* namespace gnash */

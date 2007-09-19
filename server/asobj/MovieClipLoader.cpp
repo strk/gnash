@@ -33,6 +33,7 @@
 #include "character.h" // for loadClip (get_parent)
 #include "log.h"
 #include "URL.h" // for url parsing
+#include "VM.h" // for the string table.
 #include "builtin_function.h"
 #include "Object.h" // for getObjectInterface
 
@@ -275,13 +276,14 @@ MovieClipLoader::dispatchEvent(const std::string& event, fn_call& fn)
 		event.c_str(), _listeners.size());
 #endif
 
+	string_table& st = VM::get().getStringTable();
 	for (iterator it=_listeners.begin(), itEnd=_listeners.end();
 			it != itEnd;
 			++it)
 	{
 		boost::intrusive_ptr<as_object> listener = *it;
 		as_value method;
-		if (!listener->get_member(string_table::find(event), &method) )
+		if (!listener->get_member(st.find(event), &method) )
 		{
 #if GNASH_DEBUG
 log_msg(_("Listener %p doesn't have an %s event to listen for, skipped"),

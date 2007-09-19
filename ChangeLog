@@ -1,3 +1,32 @@
+2007-09-19 Chad Musick <chadmusick@msbx.net>
+
+	* libbase/string_table.cpp,.h: Make member functions non-static and
+	  add a facility to pre-load some strings.
+	* server/PropertyList.cpp array.cpp as_environment.cpp as_function.cpp
+	  as_object.cpp as_object.h as_value.cpp character.cpp
+	  edit_text_character.cpp impl.cpp movie_root.cpp sprite_instance.cpp
+	  swf_function.cpp textformat.cpp timers.cpp: Convert string table usage
+	  to enum + instance use.
+	* server/asobj/AsBroadcaster.cpp ContextMenu.cpp LoadVars.cpp
+	  MovieClipLoader.cpp NetStream.cpp Object.cpp Stage.cpp prophelper.h
+	  xml.cpp xmlsocket.cpp: Convert string table usage to enum + instance
+	* server/vm/ASHandlers.cpp ActionExec.cpp: Convert string table usage
+	* server/vm/VM.cpp VM.h: Add pre-load of common property names, convert
+	  string table usage, add string table member.
+	* server/vm/action.cpp action.h: Remove enumeration of standard properties
+	  with the special handler, use string table enumeration instead. Unifies
+	  handling.
+	* testsuite/misc-ming.all/DefineEditTextVariableNameTest2.c: Success
+	* testsuite/misc-ming.all/KeyTest-Runner.cpp Makefile.am
+	  attachMovieTestRunner.cpp intervalTestRunner.cpp
+	  key_event_test2runner.cpp key_event_test3runner.cpp
+	  key_event_test5runner.cpp key_event_testrunner.cpp: Convert string table
+	  usage
+	* testsuite/movies.all/Makefile.am gravity_embedded-TestRunner.cpp:
+	  Convert string table usage
+	* testsuite/server/GetterSetterTest.cpp PropertyListTest.cpp: Convert
+	  string table usage
+
 2007-09-19 Sandro Santilli <strk@keybit.net>
 
 	* server/edit_text_character.cpp (set_variable_name): reinitialize

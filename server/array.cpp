@@ -389,11 +389,12 @@ public:
 	bool operator() (const as_value& a, const as_value& b)
 	{
 		as_value av, bv;
+		string_table& st = VM::get().getStringTable();
 		boost::intrusive_ptr<as_object> ao = a.to_object();
 		boost::intrusive_ptr<as_object> bo = b.to_object();
 		
-		ao->get_member(string_table::find(_prop), &av);
-		bo->get_member(string_table::find(_prop), &bv);
+		ao->get_member(st.find(_prop), &av);
+		bo->get_member(st.find(_prop), &bv);
 		return _comp(av, bv);
 	}
 };
@@ -418,14 +419,15 @@ public:
 	{
 		std::deque<as_cmp_fn>::iterator cmp = _cmps.begin();
 		std::deque<std::string>::iterator pit;
+		string_table& st = VM::get().getStringTable();
 		
 		for (pit = _prps.begin(); pit != _prps.end(); ++pit, ++cmp)
 		{
 			as_value av, bv;
 			boost::intrusive_ptr<as_object> ao = a.to_object();
 			boost::intrusive_ptr<as_object> bo = b.to_object();
-			ao->get_member(string_table::find(*pit), &av);
-			bo->get_member(string_table::find(*pit), &bv);
+			ao->get_member(st.find(*pit), &av);
+			bo->get_member(st.find(*pit), &bv);
 
 			if ( (*cmp)(av, bv) ) return true;
 			if ( (*cmp)(bv, av) ) return false;
@@ -451,14 +453,15 @@ public:
 	{
 		std::deque<as_cmp_fn>::iterator cmp = _cmps.begin();
 		std::deque<std::string>::iterator pit;
-		
+		string_table& st = VM::get().getStringTable();
+
 		for (pit = _prps.begin(); pit != _prps.end(); ++pit, ++cmp)
 		{
 			as_value av, bv;
 			boost::intrusive_ptr<as_object> ao = a.to_object();
 			boost::intrusive_ptr<as_object> bo = b.to_object();
-			ao->get_member(string_table::find(*pit), &av);
-			bo->get_member(string_table::find(*pit), &bv);
+			ao->get_member(st.find(*pit), &av);
+			bo->get_member(st.find(*pit), &bv);
 
 			if ( !(*cmp)(av, bv) ) return false;
 		}
@@ -562,7 +565,7 @@ as_array_object::end()
 int
 as_array_object::index_requested(string_table::key name)
 {
-	string name_str = string_table::value(name);
+	string name_str = VM::get().getStringTable().value(name);
 
 	as_value temp;
 	temp.set_string(name_str);
@@ -1375,12 +1378,13 @@ array_new(const fn_call& fn)
 		as_value index_number, undef_value;
 		int sv = VM::get().getSWFVersion();
 		as_environment* env = &(fn.env());
+		string_table& st = VM::get().getStringTable();
 
 		undef_value.set_undefined();
 		for (int i = 0; i < int(fn.arg(0).to_number()); i++)
 		{
 			index_number.set_int(i);
-			ao->set_member(string_table::find(index_number.to_string_versioned(sv, env)), undef_value);
+			ao->set_member(st.find(index_number.to_string_versioned(sv, env)), undef_value);
 		}
 	}
 	else

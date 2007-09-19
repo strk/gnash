@@ -27,6 +27,7 @@
 #include "movie_root.h" // for composition
 #include "tu_types.h"  // for uint64_t
 #include "GC.h" // for ineritance of VmGcRoot
+#include "string_table.h" // for the string table
 
 #include <memory> // for auto_ptr
 #include <locale>
@@ -127,6 +128,8 @@ class DSOEXPORT VM {
 	ResVect _statics;
 #endif
 
+	mutable string_table mStringTable;
+
 public:
 
 	/// \brief
@@ -165,6 +168,8 @@ public:
 
 	/// Get the number of milliseconds since VM was started
 	uint64_t getTime();
+
+	string_table& getStringTable() const { return mStringTable; }
 
 	/// Get version of the player, in a compatible representation
 	//

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Object.cpp,v 1.30 2007/09/16 16:48:14 cmusick Exp $ */
+/* $Id: Object.cpp,v 1.31 2007/09/19 14:20:50 cmusick Exp $ */
 
 #include "tu_config.h"
 #include "Object.h"
@@ -325,7 +325,7 @@ object_hasOwnProperty(const fn_call& fn)
 		);
 		return as_value();
 	}
-	return as_value(fn.this_ptr->getOwnProperty(string_table::find(propname)) != NULL);
+	return as_value(fn.this_ptr->getOwnProperty(VM::get().getStringTable().find(propname)) != NULL);
 }
 
 as_value
@@ -349,7 +349,7 @@ object_isPropertyEnumerable(const fn_call& fn)
 		return as_value();
 	}
 
-	Property* prop = fn.this_ptr->getOwnProperty(string_table::find(propname));
+	Property* prop = fn.this_ptr->getOwnProperty(VM::get().getStringTable().find(propname));
 	if ( ! prop )
 	{
 		return as_value(false);

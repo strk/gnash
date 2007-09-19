@@ -382,7 +382,7 @@ LoadVars::processLoaded(LoadVariablesThread& lr)
 	for  (ValuesMap::iterator it=vals.begin(), itEnd=vals.end();
 			it != itEnd; ++it)
 	{
-		set_member(string_table::find(it->first), as_value(it->second.c_str()));
+		set_member(VM::get().getStringTable().find(it->first), as_value(it->second.c_str()));
 		//log_msg("Setting %s == %s", it->first.c_str(), it->second.c_str());
 	}
 

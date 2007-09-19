@@ -140,7 +140,7 @@ as_function::getPrototype()
 	//               this function should likely return the *new*
 	//               prototype, not the old !!
 	as_value proto;
-	get_member(string_table::find("prototype"), &proto);
+	get_member(as_object::PROP_PROTOTYPE, &proto);
 	return proto.to_object();
 }
 
@@ -354,7 +354,7 @@ as_function::constructInstance( as_environment& env,
 		// a literal string in lowercase. (we should likely avoid calling
 		// get_member as a whole actually, and use a getProto() or similar
 		// method directly instead) TODO
-		bool func_has_prototype = get_member(string_table::find("prototype"), &proto);
+		bool func_has_prototype = get_member(as_object::PROP_PROTOTYPE, &proto);
 		assert(func_has_prototype);
 
 		IF_VERBOSE_ACTION (

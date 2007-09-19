@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.116 2007/09/19 10:54:09 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.117 2007/09/19 14:20:49 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -744,22 +744,18 @@ edit_text_character::set_member(string_table::key name,
 	//        of the TextField class. See attachTextFieldInterface()
 	// @@ TODO need to inherit basic stuff like _x, _y, _xscale, _yscale etc ?
 
-
-	as_standard_member	std_member = get_standard_member(name);
-	switch (std_member)
+	switch (name)
 	{
 	default:
 		break;
-	case M_INVALID_MEMBER:
-		break;
-	case M_TEXT:
+	case as_object::PROP_TEXT:
 		//if (name == "text")
 	{
 		int version = get_parent()->get_movie_definition()->get_version();
 		set_text_value(val.to_string_versioned(version).c_str());
 		return;
 	}
-	case M_HTMLTEXT:
+	case as_object::PROP_HTML_TEXT:
 		//if (name == "htmlText")
 	{
 		int version = get_parent()->get_movie_definition()->get_version();
@@ -767,7 +763,7 @@ edit_text_character::set_member(string_table::key name,
 		format_text();
 		return;
 	}
-	case M_X:
+	case as_object::PROP_uX:
 		//else if (name == "_x")
 	{
 		matrix	m = get_matrix();
@@ -778,7 +774,7 @@ edit_text_character::set_member(string_table::key name,
 		
 		return;
 	}
-	case M_Y:
+	case as_object::PROP_uY:
 		//else if (name == "_y")
 	{
 		matrix	m = get_matrix();
@@ -789,7 +785,7 @@ edit_text_character::set_member(string_table::key name,
 		
 		return;
 	}
-	case M_WIDTH: // _width
+	case as_object::PROP_uWIDTH:
 	{
 		float nw = PIXELS_TO_TWIPS(val.to_number()); // TODO: pass an as_environment !
 		if ( _bounds.width() == nw )
@@ -829,7 +825,7 @@ edit_text_character::set_member(string_table::key name,
 
 		return;
 	}
-	case M_HEIGHT: // _height
+	case as_object::PROP_uHEIGHT:
 	{
 		float nh = PIXELS_TO_TWIPS(val.to_number()); // TODO: pass an as_environment !
 		if ( _bounds.height() == nh )
@@ -869,13 +865,13 @@ edit_text_character::set_member(string_table::key name,
 
 		return;
 	}
-	case M_VISIBLE:
+	case as_object::PROP_uVISIBLE:
 		//else if (name == "_visible")
 	{
 		set_visible(val.to_bool());
 		return;
 	}
-	case M_ALPHA:
+	case as_object::PROP_uALPHA:
 		//else if (name == "_alpha")
 	{
 		// @@ TODO this should be generic to class character!
@@ -900,36 +896,29 @@ edit_text_character::get_member(string_table::key name, as_value* val)
 	// FIXME: Turn all standard members into getter/setter properties
 	//        of the TextField class. See attachTextFieldInterface()
 	
-	as_standard_member std_member = get_standard_member(name);
-	switch (std_member)
+	switch (name)
 	{
 	default:
 		break;
-	case M_INVALID_MEMBER:
-		if (string_table::value(name) == PROPNAME("htmlText")) {
-			val->set_string(get_text_value());
-			return true;
-		}
-		break;
-	case M_TEXT:
+	case as_object::PROP_TEXT:
 		//if (name == "text")
 	{
 		val->set_string(get_text_value());
 		return true;
 	}
-	case M_HTMLTEXT:
+	case as_object::PROP_HTML_TEXT:
 		//if (name == "htmlText")
 	{
 		val->set_string(get_text_value());
 		return true;
 	}
-	case M_VISIBLE:
+	case as_object::PROP_uVISIBLE:
 		//else if (name == "_visible")
 	{
 		val->set_bool(get_visible());
 		return true;
 	}
-	case M_ALPHA:
+	case as_object::PROP_uALPHA:
 		//else if (name == "_alpha")
 	{
 		// @@ TODO this should be generic to class character!
@@ -937,21 +926,21 @@ edit_text_character::get_member(string_table::key name, as_value* val)
 		val->set_double(cx.m_[3][0] * 100.f);
 		return true;
 	}
-	case M_X:
+	case as_object::PROP_uX:
 		//else if (name == "_x")
 	{
 		matrix	m = get_matrix();	// @@ get_world_matrix()???
 		val->set_double(TWIPS_TO_PIXELS(m.m_[0][2]));
 		return true;
 	}
-	case M_Y:
+	case as_object::PROP_uY:
 		//else if (name == "_y")
 	{
 		matrix	m = get_matrix();	// @@ get_world_matrix()???
 		val->set_double(TWIPS_TO_PIXELS(m.m_[1][2]));
 		return true;
 	}
-	case M_WIDTH: // _width
+	case as_object::PROP_uWIDTH:
 	{
 		val->set_double(TWIPS_TO_PIXELS(get_width()));
 #ifdef GNASH_DEBUG_TEXTFIELDS
@@ -959,7 +948,7 @@ edit_text_character::get_member(string_table::key name, as_value* val)
 #endif // GNASH_DEBUG_TEXTFIELDS
 		return true;
 	}
-	case M_HEIGHT: // _height
+	case as_object::PROP_uHEIGHT:
 	{
 		val->set_double(TWIPS_TO_PIXELS(get_height()));
 #ifdef GNASH_DEBUG_TEXTFIELDS
@@ -967,7 +956,7 @@ edit_text_character::get_member(string_table::key name, as_value* val)
 #endif // GNASH_DEBUG_TEXTFIELDS
 		return true;
 	}
-	case M_TEXTWIDTH:
+	case as_object::PROP_TEXT_WIDTH:
 		//else if (name == "textWidth")
 	{
 		// Return the width, in pixels, of the text as laid out.
@@ -1499,7 +1488,7 @@ edit_text_character::registerTextVariable()
 	// check if the VariableName already has a value,
 	// in that case update text value
 	as_value val;
-	if (sprite->get_member(string_table::find(varname), &val) )
+	if (sprite->get_member(VM::get().getStringTable().find(varname), &val) )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
 		log_msg(_("target sprite (%p) does have a member named %s"), (void*)sprite, varname);

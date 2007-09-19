@@ -17,13 +17,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "string_table.h"
+#include <boost/algorithm/string/case_conv.hpp>
 
 using namespace gnash;
 
-string_table::table string_table::mTable;
-// By starting at 0, this can be the 'unknown' value.
-string_table::key string_table::mHighestKey = 0;
-boost::mutex string_table::mLock;
 std::string string_table::mEmpty = "";
 
 string_table::key
@@ -35,15 +32,19 @@ string_table::find(const std::string& to_find, bool insert_unfound)
 	{
 		if (insert_unfound)
 		{
+			svt theSvt;
+
 			// First we lock.
-			//boost::mutex::scoped_lock aLock(mLock);
+			boost::mutex::scoped_lock aLock(mLock);
 			// Then we see if someone else managed to sneak past us.
 			i = mTable.get<0>().find(to_find);
 			// If they did, use that value.
 			if (i != mTable.end())
 				return i->mId;
 			// Otherwise, insert it.
-			return mTable.insert(svt(to_find, ++mHighestKey)).first->mId;
+			theSvt.mValue = to_find;
+			theSvt.mId = ++mHighestKey;
+			return mTable.insert(theSvt).first->mId;
 		}
 		else
 			return 0;
@@ -56,13 +57,37 @@ string_table::key
 string_table::insert(const std::string& to_insert)
 {
 	boost::mutex::scoped_lock aLock(mLock);
+	svt theSvt;
+	theSvt.mValue = to_insert;
+	theSvt.mId = ++mHighestKey;
 
-	return mTable.insert(svt(to_insert, ++mHighestKey)).first->mId;
+	return mTable.insert(theSvt).first->mId;
+}
+
+void
+string_table::insert_group(svt* pList, std::size_t size)
+{
+	boost::mutex::scoped_lock aLock(mLock);
+
+	for (std::size_t i = 0; i < size; ++i)
+	{
+		if (mSetToLower)
+			boost::to_lower(pList[i].mValue);
+		// The keys don't have to be consecutive, so any time we find a key
+		// that is too big, jump a few keys to avoid rewriting this on every item.
+		if (pList[i].mId > mHighestKey)
+			mHighestKey = pList[i].mId + 256;
+		mTable.insert(pList[i]);
+	}
+	mSetToLower = false;
 }
 
 string_table::key
 string_table::already_locked_insert(const std::string& to_insert, boost::mutex&)
 {
-	return mTable.insert(svt(to_insert, ++mHighestKey)).first->mId;
+	svt theSvt;
+	theSvt.mValue = to_insert;
+	theSvt.mId = ++mHighestKey;
+	return mTable.insert(theSvt).first->mId;
 }
 

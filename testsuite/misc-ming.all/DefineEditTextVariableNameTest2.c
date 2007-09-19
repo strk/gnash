@@ -154,7 +154,7 @@ main(int argc, char** argv)
   
   add_actions(mo, "dtext1.variable = 'newName'; ");
   // Maybe 'variable' is the connection point?
-  xcheck_equals(mo, "dtext1.text", "'Hello'");
+  check_equals(mo, "dtext1.text", "'Hello'");
   // Change 'variable' back to its orignal string.
   add_actions(mo, "dtext1.variable = 'edit_text_var'; ");
   check_equals(mo, "dtext1.text", "'Hahaha'");

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.88 2007/09/16 16:48:13 cmusick Exp $ */
+/* $Id: as_environment.cpp,v 1.89 2007/09/19 14:20:48 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -62,7 +62,7 @@ as_environment::get_variable(const std::string& varname,
 
 	if (target) {
 	    as_value	val;
-	    target->get_member(string_table::find(var), &val);
+	    target->get_member(VM::get().getStringTable().find(var), &val);
 	    if ( retTarget ) *retTarget = target;
 	    return val;
 	} else {
@@ -111,7 +111,7 @@ as_environment::get_variable_raw(
     for (size_t i = scopeStack.size(); i > 0; --i) {
         // const_cast needed due to non-const as_object::get_member 
 	as_object* obj = const_cast<as_object*>(scopeStack[i-1].get());
-	if (obj && obj->get_member(string_table::find(varname), &val)) {
+	if (obj && obj->get_member(VM::get().getStringTable().find(varname), &val)) {
 	    // Found the var in this context.
 	    if ( retTarget ) *retTarget = obj;
 	    return val;
@@ -127,7 +127,7 @@ as_environment::get_variable_raw(
 
 
     // Check target members.
-    if (m_target->get_member(string_table::find(varname), &val)) {
+    if (m_target->get_member(VM::get().getStringTable().find(varname), &val)) {
 	if ( retTarget ) *retTarget = m_target;
 	return val;
     }
@@ -162,7 +162,7 @@ as_environment::get_variable_raw(
 	return as_value(global);
     }
 
-    if (global->get_member(string_table::find(varname), &val))
+    if (global->get_member(vm.getStringTable().find(varname), &val))
     {
 	if ( retTarget ) *retTarget = global;
 	return val;
@@ -188,6 +188,7 @@ as_environment::del_variable_raw(
 	assert(strchr(varname.c_str(), '/') == NULL);
 	assert(strchr(varname.c_str(), '.') == NULL);
 
+	string_table::key varkey = VM::get().getStringTable().find(varname);
 	as_value	val;
 
 	// Check the with-stack.
@@ -197,7 +198,7 @@ as_environment::del_variable_raw(
 		as_object* obj = const_cast<as_object*>(scopeStack[i-1].get());
 		if (obj)
 		{
-			std::pair<bool,bool> ret = obj->delProperty(string_table::find(varname));
+			std::pair<bool,bool> ret = obj->delProperty(varkey);
 			if (ret.first)
 			{
 			    return ret.second;
@@ -213,7 +214,7 @@ as_environment::del_variable_raw(
 
 
 	// Try target
-	std::pair<bool,bool> ret = m_target->delProperty(string_table::find(varname));
+	std::pair<bool,bool> ret = m_target->delProperty(varkey);
 	if ( ret.first )
 	{
 		return ret.second;
@@ -222,7 +223,7 @@ as_environment::del_variable_raw(
 	// TODO: try 'this' ? Add a testcase for it !
 
 	// Try _global 
-	return VM::get().getGlobal()->delProperty(string_table::find(varname)).second;
+	return VM::get().getGlobal()->delProperty(varkey).second;
 }
 
 // varname must be a plain variable name; no path parsing.
@@ -257,7 +258,7 @@ as_environment::set_variable(
         target = is_slash_based ? find_object_slashsyntax(path) : find_object_dotsyntax(path); 
 	if (target)
 	{
-	    target->set_member(string_table::find(var), val);
+	    target->set_member(VM::get().getStringTable().find(var), val);
 	}
 	else
 	{
@@ -288,6 +289,8 @@ as_environment::set_variable_raw(
     const ScopeStack& scopeStack)
 {
 
+	string_table::key varkey = VM::get().getStringTable().find(varname);
+
 	// Check locals for setting them
 	// TODO: check if local variable takes precedence over 'with' scope when setting
 	if ( setLocal(varname, val) )
@@ -301,15 +304,15 @@ as_environment::set_variable_raw(
 		// const_cast needed due to non-const as_object::get_member 
 		as_object* obj = const_cast<as_object*>(scopeStack[i-1].get());
 		as_value	dummy;
-		if (obj && obj->get_member(string_table::find(varname), &dummy)) {
+		if (obj && obj->get_member(varkey, &dummy)) {
 		    // This object has the member; so set it here.
-		    obj->set_member(string_table::find(varname), val);
+		    obj->set_member(varkey, val);
 		    return;
 		}
 	}
     
 	assert(m_target);
-	m_target->set_member(string_table::find(varname), val);
+	m_target->set_member(varkey, val);
 }
 
 void
@@ -329,6 +332,7 @@ as_environment::set_local(const std::string& varname, const as_value& val)
 	// stack ?
 	assert(_localFrames.size());
 
+	string_table::key varkey = VM::get().getStringTable().find(varname);
 	// Is it in the current frame already?
 	if ( setLocal(varname, val) )
 	{
@@ -341,7 +345,7 @@ as_environment::set_local(const std::string& varname, const as_value& val)
 		assert(varname.length() > 0);	// null varnames are invalid!
 		LocalVars& locals = _localFrames.back().locals;
 		//locals.push_back(as_environment::frame_slot(varname, val));
-		locals->set_member(string_table::find(varname), val);
+		locals->set_member(varkey, val);
 	}
 }
 	
@@ -357,7 +361,7 @@ as_environment::declare_local(const std::string& varname)
 		assert(varname.length() > 0);	// null varnames are invalid!
 		LocalVars& locals = _localFrames.back().locals;
 		//locals.push_back(as_environment::frame_slot(varname, as_value()));
-		locals->set_member(string_table::find(varname), as_value());
+		locals->set_member(VM::get().getStringTable().find(varname), as_value());
 	}
 }
 	
@@ -436,7 +440,7 @@ as_environment::parse_path(const std::string& var_path,
         as_object* target_ptr = is_slash_based ? find_object_slashsyntax(path) : find_object_dotsyntax(path); 
 	if ( ! target_ptr ) return false;
 
-	target_ptr->get_member(string_table::find(var), &val);
+	target_ptr->get_member(VM::get().getStringTable().find(var), &val);
 	*target = target_ptr;
 	return true;
 }
@@ -662,8 +666,10 @@ as_environment::find_object_dotsyntax(const std::string& path) const
 	log_msg(_("Invoking get_member(%s) on object %p"), subpart.c_str(), (void *)env);
 #endif
 	as_value tmp;
+	string_table::key subpartkey = VM::get().getStringTable().find(subpart);
+
 	// TODO: make sure sprite_instances know about ".."
-	if (!env->get_member(string_table::find(subpart), &tmp) )
+	if (!env->get_member(subpartkey, &tmp) )
 	{
 		// Try this and _global, but only at first iteration...
 
@@ -680,7 +686,7 @@ as_environment::find_object_dotsyntax(const std::string& path) const
 		{
 			tmp.set_as_object(m_target);
 		}
-		else if ( ! VM::get().getGlobal()->get_member(string_table::find(subpart), &tmp) )
+		else if ( ! VM::get().getGlobal()->get_member(subpartkey, &tmp) )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Element '%s' of variable '%s' not found in object %p nor in _global (dotsyntax)"),
@@ -814,8 +820,9 @@ as_environment::find_object_slashsyntax(const std::string& path) const
 		log_msg(_("Invoking get_member(%s) on object %p"), subpart.c_str(), (void *)env);
 #endif
 		as_value tmp;
+		string_table::key subpartkey = VM::get().getStringTable().find(subpart);
 		// TODO: make sure sprite_instances know about ".."
-		if (!env->get_member(string_table::find(subpart), &tmp) )
+		if (!env->get_member(subpartkey, &tmp) )
 		{
 			// Try this and _global, but only at first iteration...
 
@@ -833,7 +840,7 @@ as_environment::find_object_slashsyntax(const std::string& path) const
 				tmp.set_as_object(m_target);
 			}
 
-			else if (!VM::get().getGlobal()->get_member(string_table::find(subpart), &tmp) )
+			else if (!VM::get().getGlobal()->get_member(subpartkey, &tmp) )
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
 				log_aserror(_("Element '%s' of variable '%s' not found in object %p nor in _global (slashsyntax)"),
@@ -966,14 +973,14 @@ as_environment::findLocal(const std::string& varname, as_value& ret, as_object**
 bool
 as_environment::findLocal(LocalVars& locals, const std::string& name, as_value& ret)
 {
-	return locals->get_member(string_table::find(name), &ret);
+	return locals->get_member(VM::get().getStringTable().find(name), &ret);
 }
 
 /* static private */
 bool
 as_environment::delLocal(LocalVars& locals, const std::string& varname)
 {
-	return locals->delProperty(string_table::find(varname)).second;
+	return locals->delProperty(VM::get().getStringTable().find(varname)).second;
 }
 
 /* private */
@@ -997,7 +1004,7 @@ bool
 as_environment::setLocal(LocalVars& locals,
 		const std::string& varname, const as_value& val)
 {
-	Property* prop = locals->getOwnProperty(string_table::find(varname));
+	Property* prop = locals->getOwnProperty(VM::get().getStringTable().find(varname));
 	if ( ! prop ) return false;
 	prop->setValue(*locals, val);
 	return true;
@@ -1043,7 +1050,7 @@ as_environment::add_local(const std::string& varname, const as_value& val)
 	assert(_localFrames.size());
 	LocalVars& locals = _localFrames.back().locals;
 	//locals.push_back(frame_slot(varname, val));
-	locals->set_member(string_table::find(varname), val);
+	locals->set_member(VM::get().getStringTable().find(varname), val);
 }
 
 as_environment::CallFrame::CallFrame(as_function* funcPtr)

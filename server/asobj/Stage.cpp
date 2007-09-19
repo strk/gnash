@@ -31,7 +31,6 @@
 #include "Object.h" // for getObjectInterface()
 
 #include <string>
-#include <boost/algorithm/string/case_conv.hpp> // for using PROPNAME
 
 namespace gnash {
 
@@ -71,7 +70,7 @@ void
 Stage::onResize(as_environment* env)
 {
 	as_value v;
-	if (get_member(string_table::find(PROPNAME("scaleMode")), &v) && v.to_string(env) == "noScale" )
+	if (get_member(as_object::PROP_SCALE_MODE, &v) && v.to_string(env) == "noScale" )
 	{
 		notifyResize(env);
 	}
@@ -92,10 +91,8 @@ Stage::notifyResize(as_environment* env)
 void
 Stage::notifyResize(boost::intrusive_ptr<as_object> obj, as_environment* env)
 {
-	string_table::key eventname = string_table::find(PROPNAME("onResize"));
-
 	as_value method;
-	if ( ! obj->get_member(eventname, &method) ) {
+	if ( ! obj->get_member(as_object::PROP_ON_RESIZE, &method) ) {
 		// nothing to do
 		return;
 	}
