@@ -1,5 +1,11 @@
 2007-09-19 Sandro Santilli <strk@keybit.net>
 
+	* gui/gtk.cpp (setInterval): add a note about the fact that the 
+	  current way of setting up the FPS timer is bogus. Note that the
+	  problem is related to A/V syncing...
+
+2007-09-19 Sandro Santilli <strk@keybit.net>
+
 	* server/character.{cpp,h}: provide a generic
 	  _name getter-setter.
 	* server/sprite_instance.cpp: use character's version

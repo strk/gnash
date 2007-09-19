@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.109 2007/09/12 10:57:05 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.110 2007/09/19 10:32:52 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -368,8 +368,20 @@ GtkGui::quit()
 void
 GtkGui::setInterval(unsigned int interval)
 {
-    _interval = interval;
-    g_timeout_add_full (G_PRIORITY_LOW, interval, (GSourceFunc)advance_movie,
+	_interval = interval;
+
+	// From http://www.idt.mdh.se/kurser/cd5040/ht02/gtk/glib/glib-the-main-event-loop.html#G-TIMEOUT-ADD-FULL
+	//
+	// Note that timeout functions may be delayed, due to the
+	// processing of other event sources. Thus they should not be
+	// relied on for precise timing. After each call to the timeout
+	// function, the time of the next timeout is recalculated based
+	// on the current time and the given interval (it does not try to
+	// 'catch up' time lost in delays).
+	//
+	// TODO: this is not what we need here, we want instead to 'catch up' !!
+	//
+	g_timeout_add_full (G_PRIORITY_LOW, interval, (GSourceFunc)advance_movie,
                         this, NULL);
 }
 
