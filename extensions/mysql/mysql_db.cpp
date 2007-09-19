@@ -63,14 +63,14 @@ attachInterface(as_object *obj)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    obj->set_member("connect", &mysql_connect);
-    obj->set_member("qetData", &mysql_qetData);
-    obj->set_member("disconnect", &mysql_disconnect);
-    obj->set_member("query", &mysql_query);
-    obj->set_member("fetch_row", &mysql_fetch);
-    obj->set_member("num_fields", &mysql_fields);
-    obj->set_member("free_result", &mysql_free);
-    obj->set_member("store_results", &mysql_store);
+    obj->init_member("connect", &mysql_connect);
+    obj->init_member("qetData", &mysql_qetData);
+    obj->init_member("disconnect", &mysql_disconnect);
+    obj->init_member("query", &mysql_query);
+    obj->init_member("fetch_row", &mysql_fetch);
+    obj->init_member("num_fields", &mysql_fields);
+    obj->init_member("free_result", &mysql_free);
+    obj->init_member("store_results", &mysql_store);
 }
 
 static as_object*
@@ -420,7 +420,7 @@ extern "C" {
 // 	    // all methods as static functions
  	    attachInterface(cl.get());
 	}	
-	obj.set_member("MySQL", cl.get());
+	obj.init_member("MySQL", cl.get());
     }
     
 } // end of extern C

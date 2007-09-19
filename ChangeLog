@@ -1,3 +1,9 @@
+2007-09-19 Sandro Santilli <strk@keybit.net>
+
+	* extensions/mysql/mysql_db.cpp: use init_member, not set_member, when
+	  initializing symbols (should fix use in SWF6 or lower versions -
+	  untested but pretty sure).
+
 2007-09-19 Chad Musick <chadmusick@msbx.net>
 
 	* libbase/string_table.cpp,.h: Make member functions non-static and
