@@ -72,8 +72,8 @@
     check_equals(edtext1.variable, 'textVar2');
     // textVar2 automatically initialized to 'Hello'
     // (the InitialText in DefineTextField tag, make sense!)
-    xcheck_equals(_root.textVar2, 'Hello');
-    xcheck_equals(edtext1.text, 'Hello');
+    check_equals(_root.textVar2, 'Hello');
+    check_equals(edtext1.text, 'Hello');
     xcheck_equals(_root.textVar1, 'new-string-frame3');
   .end
 
@@ -99,7 +99,7 @@
     edtext1.variable = 'textVar3'; 
     // textVar3 automatically initialized to 'Hello'
     // (the InitialText in DefineTextField tag, make sense!)
-    xcheck_equals(_root.textVar3, 'Hello');
+    check_equals(_root.textVar3, 'Hello');
     xcheck_equals(_root.textVar1, 'new-string-frame6');
   .end
   

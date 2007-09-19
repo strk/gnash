@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.115 2007/09/19 10:17:03 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.116 2007/09/19 10:54:09 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1526,6 +1526,9 @@ edit_text_character::set_variable_name(const std::string& newname)
 	{
 		_variable_name = newname;
 		_text_variable_registered = false;
+		set_text_value(m_def->get_default_text().c_str());
+		registerTextVariable();
+		//reset_bounding_box(0, 0); // does this make sense ? it's called in the constructor...
 	}
 }
 
