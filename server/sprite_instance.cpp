@@ -1300,43 +1300,6 @@ sprite_framesloaded_get(const fn_call& fn)
 }
 
 static as_value
-sprite_target_get(const fn_call& fn)
-{
-	boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
-
-	return as_value(ptr->getTargetPath().c_str());
-}
-
-static as_value
-sprite_name_getset(const fn_call& fn)
-{
-	boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		VM& vm = VM::get();
-		const std::string& name = ptr->get_name();
-		if ( vm.getSWFVersion() < 6 && name.empty() )
-		{
-			return as_value();
-		} 
-		else
-		{
-			return as_value(name.c_str());
-		}
-	}
-	else // setter
-	{
-		ptr->set_name(fn.arg(0).to_string(&fn.env()).c_str());
-		//IF_VERBOSE_ASCODING_ERRORS(
-		//log_aserror(_("Attempt to set read-only property '_name'"));
-		//);
-	}
-
-	return as_value();
-}
-
-static as_value
 sprite_droptarget_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
@@ -1552,10 +1515,10 @@ attachMovieClipProperties(as_object& o)
 	gettersetter = new builtin_function(&sprite_framesloaded_get, NULL);
 	o.init_property("_framesloaded", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&sprite_target_get, NULL);
+	gettersetter = new builtin_function(&character::target_getset, NULL);
 	o.init_property("_target", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&sprite_name_getset, NULL);
+	gettersetter = new builtin_function(&character::name_getset, NULL);
 	o.init_property("_name", *gettersetter, *gettersetter);
 
 	gettersetter = new builtin_function(&sprite_droptarget_getset, NULL);

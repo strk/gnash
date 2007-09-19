@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.94 2007/09/04 21:50:21 strk Exp $ */
+/* $Id: character.h,v 1.95 2007/09/19 10:17:03 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -327,6 +327,9 @@ public:  // TODO: make protected
 
 	/// Getter-setter for _target 
 	static as_value target_getset(const fn_call& fn);
+
+	/// Getter-setter for _name
+	static as_value name_getset(const fn_call& fn);
 
 	/// @} Common ActionScript getter-setters for characters
 

@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.25 2007/09/19 09:28:01 strk Exp $";
+rcsid="$Id: TextField.as,v 1.26 2007/09/19 10:17:03 strk Exp $";
 
 #include "check.as"
 
@@ -347,16 +347,16 @@ tf.multiline = false;
 
 // Check TextField._name
 
-xcheck_equals(typeof(tf._name), 'string');
+check_equals(typeof(tf._name), 'string');
 check(!tf.hasOwnProperty('_name'));
-check(!tf.__proto__.hasOwnProperty('_name'));
-xcheck_equals(tf._name, 'tf');
+xcheck(!tf.__proto__.hasOwnProperty('_name'));
+check_equals(tf._name, 'tf');
 tfref = tf;
 tf._name = 'changed';
-xcheck_equals(typeof(tf), 'undefined');
+check_equals(typeof(tf), 'undefined');
 check_equals(typeof(tfref), 'object');
 check_equals(tfref._name, 'changed');
-xcheck_equals(tfref._target, '/changed');
+check_equals(tfref._target, '/changed');
 tfref._name = 'tf';
 check_equals(typeof(tf), 'object');
 check_equals(typeof(tfref), 'object');
@@ -461,13 +461,13 @@ delete(tf.tabIndex);
 
 // Check TextField._target
 
-xcheck_equals(typeof(tf._target), 'string');
+check_equals(typeof(tf._target), 'string');
 check( ! tf.hasOwnProperty('_target') ); 
-check( ! tf.__proto__.hasOwnProperty('_target') ); 
-xcheck_equals(tf._target, '/tf');
+xcheck( ! tf.__proto__.hasOwnProperty('_target') ); 
+check_equals(tf._target, '/tf');
 // TODO: check the effect of changing _name on the _target value
 tf._target = "fake_target"; // read-only
-xcheck_equals(tf._target, '/tf');
+check_equals(tf._target, '/tf');
 
 // Check TextField.text
 

@@ -39,8 +39,8 @@
   .action:
     // check the initial values
     check_equals(typeof(edtext1), 'object');
-    xcheck_equals(edtext1._name, 'edtext1');
-    xcheck_equals(edtext1._target, '/edtext1');
+    check_equals(edtext1._name, 'edtext1');
+    check_equals(edtext1._target, '/edtext1');
     check_equals(edtext1.text, 'Hello');
     check_equals(edtext1.variable, 'textVar1');
     check_equals(_root.textVar1, 'Hello');

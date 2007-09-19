@@ -1,5 +1,18 @@
 2007-09-19 Sandro Santilli <strk@keybit.net>
 
+	* server/character.{cpp,h}: provide a generic
+	  _name getter-setter.
+	* server/sprite_instance.cpp: use character's version
+	  for _name and _target getter/setter.
+	* server/edit_text_character.cpp: use character's
+	  _name and _target getter/setter.
+	* testsuite/actionscript.all/TextField.as: successes
+	  on _name and _target accesses, minor failures.
+	* testsuite/misc-swfc.all/edittext_test1.sc: successes
+	  on _name and _target access.
+
+2007-09-19 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/TextField.as: add tests
 	  for effects of changing _name.
 

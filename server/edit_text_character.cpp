@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.114 2007/09/17 14:39:35 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.115 2007/09/19 10:17:03 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -336,6 +336,15 @@ attachTextFieldInterface(as_object& o)
 	o.init_property("wordWrap", *getset, *getset);
 	getset = new builtin_function(textfield_html_getset);
 	o.init_property("html", *getset, *getset);
+
+	// Target seems to not be a normal property
+	getset = new builtin_function(&character::target_getset, NULL);
+	o.init_property("_target", *getset, *getset);
+
+	// _name should be a property of the instance, not the prototype
+	getset = new builtin_function(&character::name_getset, NULL);
+	o.init_property("_name", *getset, *getset);
+
 
 	if ( target_version  < 7 ) return;
 

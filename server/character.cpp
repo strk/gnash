@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.54 2007/09/16 16:48:13 cmusick Exp $ */
+/* $Id: character.cpp,v 1.55 2007/09/19 10:17:03 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -602,6 +602,32 @@ character::target_getset(const fn_call& fn)
 	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	return as_value(ptr->getTargetPath());
+}
+
+as_value
+character::name_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		VM& vm = VM::get(); // TODO: fetch VM from ptr 
+		const std::string& name = ptr->get_name();
+		if ( vm.getSWFVersion() < 6 && name.empty() )
+		{
+			return as_value();
+		} 
+		else
+		{
+			return as_value(name.c_str());
+		}
+	}
+	else // setter
+	{
+		ptr->set_name(fn.arg(0).to_string(&fn.env()).c_str());
+	}
+
+	return as_value();
 }
 
 void
