@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.133 2007/09/16 16:48:15 cmusick Exp $ */
+/* $Id: ASHandlers.cpp,v 1.134 2007/09/19 06:27:46 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2225,7 +2225,7 @@ SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
 void
 SWFHandlers::ActionCallFrame(ActionExec& thread)
 {
-    GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
 
 	thread.ensureStack(1); // frame spec
