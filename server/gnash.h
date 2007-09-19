@@ -738,6 +738,16 @@ enum gnashKey
   CH_KP_ENTER = 167,
   
   CH_NUMLOCK = 168,
+
+// Extended ASCII
+  CH_NOBREAKSPACE = 169,
+  CH_AGRAVE = 170, 
+  CH_NTILDE = 171,
+  CH_UGRAVE = 172,
+  CH_SSHARPSMALL = 173,
+  CH_UGRAVESMALL = 174,
+  CH_YACUTESMALL = 175, 
+
   // TODO: add other function keys and extend the codeMap
   CH_COUNT
 };
@@ -913,6 +923,13 @@ const unsigned char codeMap[CH_COUNT][3] = {
   {0, 110,  46}, // CH_KP_DECIMAL = 166
   {13, 13,  13}, // CH_KP_ENTER = 167
   {0, 144,   0}, // CH_NUMLOCK = 168
+  {0, 160,   0}, // CH_ NOBREAKSPACE = 169,
+  {0, 192,   0}, // CH_AGRAVE = 170 
+  {0, 209,   0}, // CH_NTILDE = 171
+  {0, 217,   0}, // CH_UGRAVE = 172
+  {0, 223,   0}, // CH_SSHARPSMALL = 173
+  {0, 249,   0}, // CH_UGRAVESMALL = 174
+  {0, 255,   0}, // CH_YACUTESMALL = 175 
 };
 
 }   // end namespace key

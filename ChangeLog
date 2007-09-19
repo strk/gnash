@@ -1,5 +1,9 @@
 2007-09-19 Zou Lunkai <zoulunkai@gmail.com>
 
+	* server/gnash.h: more enums for extended ascii characters.
+
+2007-09-19 Zou Lunkai <zoulunkai@gmail.com>
+
 	* testsuite/misc-swfc.all/edittext_test1.sc, Makefile.am: new testcase for 
 	  TextField using swfc. Clearer then Ming based tests. TextField variable
 	  still need some work.
