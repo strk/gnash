@@ -220,7 +220,10 @@ private:
 
 	/// 0-based frame #'s
 	typedef std::map<std::string, size_t> NamedFrameMap;
-	NamedFrameMap m_named_frames;
+	NamedFrameMap _namedFrames;
+
+	// Mutex protecting access to _namedFrames
+	mutable boost::mutex _namedFramesMutex;
 
 	typedef std::map<std::string, boost::intrusive_ptr<resource> > ExportMap;
 	ExportMap m_exports;
@@ -452,6 +455,8 @@ public:
 
 	// See dox in movie_definition
 	//
+	// locks _namedFramesMutex
+	//
 	bool get_labeled_frame(const std::string& label, size_t& frame_number);
 
 	void	add_font(int font_id, font* f);
@@ -488,6 +493,9 @@ public:
 	void	add_init_action(execute_tag* e, int cid);
 
 	// See dox in movie_definition.h
+	//
+	// locks _namedFramesMutex
+	//
 	void add_frame_name(const std::string& name);
 
 	/// Set an input object for later loading DefineBits

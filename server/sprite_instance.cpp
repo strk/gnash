@@ -1848,14 +1848,19 @@ sprite_instance::get_frame_number(const as_value& frame_spec, size_t& frameno) c
 	//GNASH_REPORT_FUNCTION;
 
 	as_environment* env = const_cast<as_environment*>(&m_as_environment);
+	std::string fspecStr = frame_spec.to_string(env);
 
-	as_value str(frame_spec.to_string(env));
+	as_value str(fspecStr);
 
 	double num =  str.to_number(env);
 
+	//log_debug("get_frame_number(%s), num: %g", frame_spec.to_debug_string().c_str(), num);
+
 	if ( ! isfinite(num) || int(num) != num )
 	{
-		return m_def->get_labeled_frame(frame_spec.to_string(env), frameno);
+		bool ret = m_def->get_labeled_frame(fspecStr, frameno);
+		//log_debug("get_labeled_frame(%s) returned %d, frameno is %d", fspecStr.c_str(), ret, frameno);
+		return ret;
 	}
 
 	// TODO: are we sure we shouldn't check for frames labeled with negative numbers ?
@@ -2459,14 +2464,14 @@ sprite_instance::goto_frame(size_t target_frame_number)
     // and stop at that frame. 
     set_play_state(STOP);
 
-    if(target_frame_number == m_current_frame)
-    {
-        // don't push actions
-        return;
-    }
     if(target_frame_number > m_def->get_frame_count() - 1)
     {
-        m_current_frame = m_def->get_frame_count() - 1;
+	// TODO: should we assert this is never the case ?
+        target_frame_number = m_def->get_frame_count() - 1;
+    }
+
+    if(target_frame_number == m_current_frame)
+    {
         // don't push actions
         return;
     }
@@ -2496,7 +2501,12 @@ sprite_instance::goto_frame(size_t target_frame_number)
                 loaded_frames);
 
         );
-        m_def->ensure_frame_loaded(target_frame_number+1);
+        if ( ! m_def->ensure_frame_loaded(target_frame_number+1) )
+	{
+		log_error("Target frame of a gotoFrame(%d) was never loaded, altought frame count in header (%d) said we would have found it",
+			target_frame_number+1, m_def->get_frame_count()+1);
+		return; // ... I guess, or not ?
+	}
     }
 
 

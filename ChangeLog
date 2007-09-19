@@ -1,5 +1,13 @@
 2007-09-19 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (goto_frame): fix blind jump to target
+	  frame when > frame count. We still want to ensure_frame_loaded
+	  instead. 
+	* server/parser/movie_def_impl.{cpp,h}: mutex-protect access to named
+	  frames map.
+
+2007-09-19 Sandro Santilli <strk@keybit.net>
+
 	* extensions/mysql/mysql_db.cpp: use init_member, not set_member, when
 	  initializing symbols (should fix use in SWF6 or lower versions -
 	  untested but pretty sure).

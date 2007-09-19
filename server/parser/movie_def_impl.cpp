@@ -1125,17 +1125,17 @@ movie_def_impl::get_exported_resource(const std::string& symbol)
 void
 movie_def_impl::add_frame_name(const std::string& n)
 {
-	//log_msg(_("labelframe: frame %d, name %s"), _frames_loaded, name);
-	//why do we care about m_frame_count here ?
-	//assert(_frames_loaded < m_frame_count);
-	m_named_frames[n] = _frames_loaded;
+	boost::mutex::scoped_lock lock(_namedFramesMutex);
+	//log_debug(_("labelframe: frame %d, name %s"), _frames_loaded, n.c_str());
+	_namedFrames[n] = _frames_loaded;
 }
 
 bool
 movie_def_impl::get_labeled_frame(const std::string& label, size_t& frame_number)
 {
-    NamedFrameMap::iterator it = m_named_frames.find(label);
-    if ( it == m_named_frames.end() ) return false;
+    boost::mutex::scoped_lock lock(_namedFramesMutex);
+    NamedFrameMap::iterator it = _namedFrames.find(label);
+    if ( it == _namedFrames.end() ) return false;
     frame_number = it->second;
     return true;
 }
