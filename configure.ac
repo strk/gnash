@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.420 2007/09/14 07:38:34 nihilus Exp $
+dnl $Id: configure.ac,v 1.421 2007/09/19 02:17:37 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -428,7 +428,7 @@ dnl  Toggle support for MIT-SHM extension to the X server
 dnl --------------------------------------------------------
 
 AC_ARG_ENABLE(mit-shm,
-  AC_HELP_STRING([--disablee-mit-shm], [Disable support for the MIT-SHM X extension]),
+  AC_HELP_STRING([--disable-mit-shm], [Disable support for the MIT-SHM X extension]),
 [case "${enableval}" in
   yes) xmitshm=yes ;;
   no)  xmitshm=no ;;

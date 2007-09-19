@@ -1,3 +1,7 @@
+2007-09-19 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* configure.ac: Fixed typo.
+
 2007-09-18 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.{cpp,h}: allow multiple edit_text_character
