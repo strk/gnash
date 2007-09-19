@@ -37,6 +37,10 @@
 #include <cstdio>
 #include <cstring>
 
+#ifdef SKIP_RENDERING_IF_LATE
+#include <boost/timer.hpp>
+#endif
+
 /// Define this to make sure each frame is fully rendered from ground up
 /// even if no motion has been detected in the movie.
 //#define FORCE_REDRAW 1
@@ -71,10 +75,6 @@
 // as the mouse moves
 //#define DEBUG_MOUSE_COORDINATES 1
 
-
-// Define this to N for only rendering 1/N frames
-//#define RENDER_ONE_FRAME_EVERY 50
-
 namespace gnash {
 
 Gui::Gui() :
@@ -95,6 +95,9 @@ Gui::Gui() :
     ,fps_timer(0)
     ,fps_timer_interval(0.0)
 #endif
+#ifdef SKIP_RENDERING_IF_LATE
+    ,estimatedDisplayTime(0.001) // will grow later..
+#endif // SKIP_RENDERING_IF_LATE
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -118,6 +121,9 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
     ,fps_timer(0)
     ,fps_timer_interval(0.0)
 #endif        
+#ifdef SKIP_RENDERING_IF_LATE
+    ,estimatedDisplayTime(0.001) // will grow later..
+#endif // SKIP_RENDERING_IF_LATE
 {
 }
 
@@ -426,9 +432,10 @@ Gui::display(movie_root* m)
 		setInvalidatedRegions(changed_ranges);
 #endif
 
-    beforeRendering();
+		// TODO: should this be called even if we're late ?
+		beforeRendering();
 
-		// render the frame.
+		// Render the frame, if not late.
 		// It's up to the GUI/renderer combination
 		// to do any clipping, if desired.     
 		m->display();
@@ -483,6 +490,10 @@ Gui::advance_movie(Gui* gui)
   
 //	GNASH_REPORT_FUNCTION;
 
+#ifdef SKIP_RENDERING_IF_LATE
+	boost::timer advanceTimer;
+#endif // SKIP_RENDERING_IF_LATE
+
 	gnash::movie_root* m = gnash::get_current_root();
 	
 #ifdef GNASH_FPS_DEBUG
@@ -507,16 +518,42 @@ Gui::advance_movie(Gui* gui)
 #endif
 
 
-#if RENDER_ONE_FRAME_EVERY 
-	static unsigned call=0;
-	if ( ++call % RENDER_ONE_FRAME_EVERY == 0 )
+#ifdef SKIP_RENDERING_IF_LATE
+
+	double advanceTime = advanceTimer.elapsed(); // in seconds !
+
+	double timeSlot = gui->_interval/1000.0; // seconds between advance calls (TODO: compute once)
+
+	if ( advanceTime+gui->estimatedDisplayTime < timeSlot )
 	{
-		call=0;
+		advanceTimer.restart();
 		gui->display(m);
-	} 
-#else
+		double displayTime = advanceTimer.elapsed();
+
+		if ( displayTime > gui->estimatedDisplayTime)
+		{
+			//log_debug("Display took %6.6g seconds over %6.6g available for each frame", displayTime, timeSlot);
+
+			// Don't update estimatedDisplayTime if it's bigger then timeSlot*0.8
+			if (  displayTime < timeSlot*0.8 )
+			{
+				// TODO: check for absurdly high values, like we can't set
+				//       estimatedDisplayTime to a value higher then FPS, or
+				//       we'll simply never display...
+				gui->estimatedDisplayTime = displayTime;
+			}
+		}
+	}
+	else
+	{
+		//log_debug("We're unable to keep up with FPS speed: advanceTime was %g + estimatedDisplayTime (%g) == %g, over a timeSlot of %g", advanceTime, gui->estimatedDisplayTime, advanceTime+gui->estimatedDisplayTime, timeSlot);
+		// TODO: increment a counter, we don't want to skip too many frames
+	}
+#else // ndef SKIP_RENDERING_IF_LATE
+
 	gui->display(m);
-#endif
+
+#endif // ndef SKIP_RENDERING_IF_LATE
 	
 	if ( ! gui->loops() )
 	{

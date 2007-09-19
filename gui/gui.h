@@ -33,6 +33,11 @@
 
 #include <string>
 
+// Define the following macro if you want to skip rendering
+// when late on FPS time.
+// This is an experimental feature, so it's off by default
+//#define SKIP_RENDERING_IF_LATE
+
 // Forward declarations
 namespace gnash
 {
@@ -338,6 +343,12 @@ private:
     void fpsCounterTick();
 
 #endif // def GNASH_FPS_DEBUG
+
+#ifdef SKIP_RENDERING_IF_LATE
+    /// Estimated max number of seconds required for a call to ::display
+    /// This should be incremented everytime we take more
+    double estimatedDisplayTime;
+#endif // SKIP_RENDERING_IF_LATE
 
 };
 
