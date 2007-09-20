@@ -2464,12 +2464,22 @@ sprite_instance::goto_frame(size_t target_frame_number)
     // and stop at that frame. 
     set_play_state(STOP);
 
-    if(target_frame_number > m_def->get_frame_count() - 1)
+    if ( target_frame_number > m_def->get_frame_count() - 1)
     {
-		    // Just set _currentframe and return.
-        m_current_frame = m_def->get_frame_count() - 1;
-		    // don't push actions, already tested.
-		    return;
+	target_frame_number = m_def->get_frame_count() - 1;
+
+        if ( ! m_def->ensure_frame_loaded(target_frame_number+1) )
+	{
+		log_error("Target frame of a gotoFrame(%d) was never loaded, altought frame count in header (%d) said we would have found it",
+			target_frame_number+1, m_def->get_frame_count());
+		return; // ... I guess, or not ?
+	}
+
+	// Just set _currentframe and return.
+        m_current_frame = target_frame_number;
+
+	// don't push actions, already tested.
+	return;
     }
 
     if(target_frame_number == m_current_frame)
@@ -2506,7 +2516,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
         if ( ! m_def->ensure_frame_loaded(target_frame_number+1) )
 	{
 		log_error("Target frame of a gotoFrame(%d) was never loaded, altought frame count in header (%d) said we would have found it",
-			target_frame_number+1, m_def->get_frame_count()+1);
+			target_frame_number+1, m_def->get_frame_count());
 		return; // ... I guess, or not ?
 	}
     }

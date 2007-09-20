@@ -1,3 +1,8 @@
+2007-09-21 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (goto_frame): wait for target frame
+	  even if we won't push any action. Fixes bug #21126.
+
 2007-09-21 Chad Musick <chadmusick@msbx.net>
 
 	* server/parser/abc_block.cpp,.h: Read AS3 blocks. (unfinished)
