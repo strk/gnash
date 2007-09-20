@@ -317,6 +317,14 @@ private:
 	/// display)
 	///
 	void registerTextVariable();
+
+	typedef std::pair<sprite_instance*, string_table::key> VariableRef;
+
+	/// \brief
+	/// Parse the given variable name
+	/// into sprite and a string_table::key components
+	///
+	VariableRef parseTextVariableRef(const std::string& variableName) const;
 	
 	// Text fields need to handle cxform specially 
 	cxform	get_world_cxform() const;

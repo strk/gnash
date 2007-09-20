@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.117 2007/09/19 14:20:49 cmusick Exp $ */
+/* $Id: edit_text_character.cpp,v 1.118 2007/09/20 11:29:13 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1416,33 +1416,16 @@ after_x_advance:
 	m_ycursor -= fontHeight + (fontLeading - fontDescent);
 }
 
-void
-edit_text_character::registerTextVariable() 
+edit_text_character::VariableRef
+edit_text_character::parseTextVariableRef(const std::string& variableName) const
 {
-//#define DEBUG_DYNTEXT_VARIABLES 1
+	VariableRef ret;
+	ret.first = 0;
 
-	if ( _text_variable_registered )
+	std::string var_str = variableName;
+	if ( _vm.getSWFVersion() < 7 )
 	{
-#ifdef DEBUG_DYNTEXT_VARIABLES
-		log_msg(_("registerTextVariable() no-op call (already registered)"));
-#endif
-		return;
-	}
-
-	if ( _variable_name.empty() )
-	{
-#ifdef DEBUG_DYNTEXT_VARIABLES
-		log_msg(_("string is empty, consider as registered"));
-#endif
-		_text_variable_registered=true;
-		return;
-	}
-
-	std::string var_str = _variable_name;
-	VM& vm = VM::get();
-	if ( vm.getSWFVersion() < 7 )
-	{
-		boost::to_lower( var_str, vm.getLocale() );
+		boost::to_lower( var_str, _vm.getLocale() );
 	}
 
 	const char* varname = var_str.c_str();
@@ -1451,7 +1434,8 @@ edit_text_character::registerTextVariable()
 	log_msg(_("VariableName: %s"), var_str.c_str());
 #endif
 
-	as_environment& env = get_environment();
+	/// Why isn't get_environment const again ?
+	as_environment& env = const_cast<edit_text_character*>(this)->get_environment();
 
 	character* target = env.get_target();
 	assert(target); // is this correct ?
@@ -1478,32 +1462,76 @@ edit_text_character::registerTextVariable()
 		IF_VERBOSE_MALFORMED_SWF(
 			log_swferror(_("VariableName associated to text field refer to an unknown target (%s). It is possible that the character will be instantiated later in the SWF stream. Gnash will try to register again on next access."), path.c_str());
 		);
-		return;
+		return ret;
 	}
 
 	assert(dynamic_cast<sprite_instance*>(target));
 	sprite_instance* sprite = static_cast<sprite_instance*>(target);
 
+	ret.first = sprite;
+	ret.second = _vm.getStringTable().find(varname);
+
+	return ret;
+}
+
+void
+edit_text_character::registerTextVariable() 
+{
+//#define DEBUG_DYNTEXT_VARIABLES 1
+
+	if ( _text_variable_registered )
+	{
+#ifdef DEBUG_DYNTEXT_VARIABLES
+		log_msg(_("registerTextVariable() no-op call (already registered)"));
+#endif
+		return;
+	}
+
+	if ( _variable_name.empty() )
+	{
+#ifdef DEBUG_DYNTEXT_VARIABLES
+		log_msg(_("string is empty, consider as registered"));
+#endif
+		_text_variable_registered=true;
+		return;
+	}
+
+	VariableRef varRef = parseTextVariableRef(_variable_name);
+	sprite_instance* sprite = varRef.first;
+	if ( ! sprite )
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+			log_swferror(_("VariableName associated to text field (%s) refer to an unknown target. "
+				"It is possible that the character will be instantiated later in the SWF stream. "
+				"Gnash will try to register again on next access."), _variable_name.c_str());
+		);
+		return;
+	}
+
+	string_table::key& key = varRef.second;
 
 	// check if the VariableName already has a value,
 	// in that case update text value
 	as_value val;
-	if (sprite->get_member(VM::get().getStringTable().find(varname), &val) )
+	if (sprite->get_member(key, &val) )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
-		log_msg(_("target sprite (%p) does have a member named %s"), (void*)sprite, varname);
+		log_msg(_("target sprite (%p) does have a member named %s"), (void*)sprite, _vm.getStringTable().value(key).c_str());
 #endif
+		// TODO: pass environment to to_string ?
+		// as_environment& env = get_environment();
 		set_text_value(val.to_string().c_str());
 	}
 #ifdef DEBUG_DYNTEXT_VARIABLES
 	else
 	{
-		log_msg(_("target sprite (%p) does NOT have a member named %s (no problem, we'll add it)"), (void*)sprite, varname);
+		log_msg(_("target sprite (%p) does NOT have a member named %s (no problem, we'll add it)"), (void*)sprite, _vm.getStringTable().value(key).c_str());
 	}
 #endif
 
 	// add the textfield variable to the target sprite
-	sprite->set_textfield_variable(varname, this);
+	// TODO: have set_textfield_variable take a string_table::key instead ?
+	sprite->set_textfield_variable(_vm.getStringTable().value(key), this);
 
 	_text_variable_registered=true;
 }

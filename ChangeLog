@@ -1,3 +1,11 @@
+2007-09-20 Sandro Santilli <strk@keybit.net>
+
+	* server/edit_text_character.{cpp,h}: define a private method
+	  to parse the text variable into a sprite_instance and property name
+	  components, to be used later to update the state of a registered
+	  variable when text is updated otherwise and to unregister the
+	  variable name when unloaded or when variable name changes.
+
 2007-09-20 Chad Musick <chadmusick@msbx.net>
 
 	* libbase/string_table.h: Doxygen documentation.
