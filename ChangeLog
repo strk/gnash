@@ -1,5 +1,8 @@
 2007-09-21 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/action.cpp (call_method): add more info to the exception
+	  derived from attempts to call a value which is neither a C nor an AS
+	  function.
 	* server/sprite_instance.cpp (goto_frame): wait for target frame
 	  even if we won't push any action. Fixes bug #21126.
 

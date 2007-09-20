@@ -156,7 +156,12 @@ call_method(
 		}
 		else
 		{
-			throw ActionException(_("Attempt to call a value which is neither a C nor an ActionScript function"));
+			char buf[256];
+			snprintf(buf, 256, _("Attempt to call a value which is neither a C nor an ActionScript function (%s)"),
+				method.to_debug_string().c_str());
+			buf[255] = '\0';
+		
+			throw ActionException(buf);
 		}
 	}
 	catch (ActionException& ex)
