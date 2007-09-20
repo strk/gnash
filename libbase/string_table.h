@@ -38,10 +38,11 @@ class string_table;
 
 // So many strings are duplicated (such as standard property names)
 // that a string table could give significant memory savings.
+/// A general use string table.
 class string_table
 {
 public:
-	// A little helper for indexing.
+	/// A little helper for indexing.
 	struct svt
 	{
 		std::string mValue;
@@ -59,11 +60,25 @@ public:
 
 	typedef std::size_t key;
 
-	// Find a string. If insert_unfound is true, the string will
-	// be inserted if the value is not found in the table already.
+	/// \brief
+	/// Find a string. If insert_unfound is true, the string will
+	/// be inserted if the value is not found in the table already.
+	/// @param to_find
+	/// The string to be found. Case-sensitive comparison using < operator
+	///
+	/// @param insert_unfound
+	/// If this is set to false, a search is performed, but no update.
+	/// By update, any unfound string is added to the table.
+	///
+	/// @return
+	/// A key which can be used in value or 0 if the string is
+	/// not yet in the table and insert_unfound was false.
 	key find(const std::string& to_find, bool insert_unfound = true);
 
-	// Find a string by its key.
+	/// Find a string by its key.
+	///
+	/// @return
+	/// The string which matches key or "" if an invalid key is given.
 	const std::string& value(key to_find)
 	{ 
 		if (mTable.empty())
@@ -72,23 +87,43 @@ public:
 		return (r == mTable.get<1>().end()) ? mEmpty : r->mValue;
 	}
 
-	// Insert a string known to not be in the table. Return the new
-	// index.
+	/// \brief
+	/// Force insert a string with auto-assigned id. Does not prevent
+	/// duplicate insertions.
+	///
+	/// @return The assigned key
 	key insert(const std::string& to_insert);
 
-	// Insert a group of strings with their ids preset. This allows
-	// for switches and enums and such, but be careful you don't set two
-	// strings with the same id, as this does not check for such occurrences.
+	/// \brief
+	/// Insert a group of strings with their ids preset. This allows
+	/// for switches and enums and such, but be careful you don't set two
+	/// strings with the same id, as this does not check for such occurrences.
+	/// Converts the strings to lower case if mSetToLower is true.
+	/// In any case, sets mSetToLower to false at the end.
+	///
+	/// @param pList
+	/// An array of svt objects, these should be fully constructed, including
+	/// their ids.
 	void insert_group(svt* pList, std::size_t size);
 
+	/// \brief
+	/// Call this just before calling insert_group if the next group should
+	/// be set to lower_case before addition.
 	void lower_next_group() { mSetToLower = true; }
 
-	// Insert a string when you will handle the locking yourself.
-	// Use 'lock_mutex' to obtain the correct mutex to use for this.
+	/// \brief
+	/// Insert a string when you will handle the locking yourself.
+	/// @param lock
+	/// Use lock_mutex to obtain the correct mutex to use for this -- using
+	/// a different mutex will not be thread safe.
+	///
+	/// @return The assigned key
 	key already_locked_insert(const std::string& to_insert, boost::mutex& lock);
 
+	/// @return A mutex which can be used to lock the string table to inserts.
 	boost::mutex& lock_mutex() { return mLock; }
 
+	/// Construct the empty string_table
 	string_table() :
 		mTable(),
 		mLock(),

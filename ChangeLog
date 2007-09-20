@@ -1,3 +1,7 @@
+2007-09-20 Chad Musick <chadmusick@msbx.net>
+
+	* libbase/string_table.h: Doxygen documentation.
+
 2007-09-20 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* server/sprite_instance.cpp: goto_frame(), revert a few changes, 
