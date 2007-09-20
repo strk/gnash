@@ -1,4 +1,8 @@
 2007-09-20 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* server/asobj/Key.cpp: use key::codeMap instead of key::code.
+		
+2007-09-20 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/gnash.h: drop key::gnashKey, reorganize key::code.
 	* server/event_id.h: make the constructor	to take an unsigned char type.

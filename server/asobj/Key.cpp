@@ -332,7 +332,7 @@ void key_class_init(as_object& global)
     as_object*  key_obj = new key_as_object;
 
     // constants
-#define KEY_CONST(k) key_obj->init_member(#k, key::k)
+#define KEY_CONST(k) key_obj->init_member(#k, key::codeMap[key::k][1])
     KEY_CONST(BACKSPACE);
     KEY_CONST(CAPSLOCK);
     KEY_CONST(CONTROL);
