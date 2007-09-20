@@ -103,8 +103,53 @@
     xcheck_equals(_root.textVar1, 'new-string-frame6');
   .end
   
+.frame 7
+  .action:
+    check_equals(_root.hasOwnProperty('textVar1'), true); 
+    xcheck_equals(_root.hasOwnProperty('textVar2'), true); 
+    xcheck_equals(_root.hasOwnProperty('textVar3'), true); 
+  .end
+  
+  
+.frame 8
+  .del edtext1  // Remove edtext1
+  .action:
+    // after removing the TextField instance, all registered variables still keep alive
+    check_equals(_root.hasOwnProperty('textVar1'), true); 
+    xcheck_equals(_root.hasOwnProperty('textVar2'), true); 
+    xcheck_equals(_root.hasOwnProperty('textVar3'), true); 
+    check_equals(typeof(edtext1), 'undefined');
+  .end
+
+
+// new tests, seperate from the above
+.frame 9
+  .action:
+    textVar4 = 'new_tests_begin';
+  .end
   
 .frame 10
+  .edittext edtext2 size=200% 
+            width=100 height=100 
+            color=blue border multiline wordwrap
+            text="Hello"
+            variable="textVar4" // give a name already exists in main timeline.
+  .put edtext2 x=10 y=300
+  .action:
+  	// returns the value of the registered variable in main timeline
+    check_equals(edtext2.text, 'new_tests_begin');
+  .end
+
+
+.frame 11
+  .action:
+      edtext2.text = 'value_changed';
+      check_equals(edtext2.text, 'value_changed');
+      xcheck_equals(textVar4, 'value_changed');
+  .end
+    
+    
+.frame 15
   .action:
     totals();
     stop();
