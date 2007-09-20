@@ -1,3 +1,8 @@
+2007-09-21 Chad Musick <chadmusick@msbx.net>
+
+	* server/parser/abc_block.cpp,.h: Read AS3 blocks. (unfinished)
+	* server/parser/Namespace.h: AS3 namespaces (unfinished)
+
 2007-09-20 Sandro Santilli <strk@keybit.net>
 
 	* server/edit_text_character.cpp (set_variable_name): create
