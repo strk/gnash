@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.119 2007/09/20 14:07:31 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.120 2007/09/20 15:44:41 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -740,7 +740,7 @@ edit_text_character::set_text_value(const char* new_text_cstr)
 		else	
 		{
 			// nothing to do (too early ?)
-			log_debug("set_text_value: variable name %s points to an unexisting sprite", _variable_name.c_str());
+			log_debug("set_text_value: variable name %s points to an unexisting sprite, I guess we would not be registered in this was true, or the sprite we've registered our variable name has been unloaded", _variable_name.c_str());
 		}
 	}
 }
@@ -1504,6 +1504,10 @@ edit_text_character::registerTextVariable()
 {
 //#define DEBUG_DYNTEXT_VARIABLES 1
 
+#ifdef DEBUG_DYNTEXT_VARIABLES
+	log_debug(_("registerTextVariable() called"));
+#endif
+
 	if ( _text_variable_registered )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
@@ -1525,11 +1529,11 @@ edit_text_character::registerTextVariable()
 	sprite_instance* sprite = varRef.first;
 	if ( ! sprite )
 	{
-		IF_VERBOSE_MALFORMED_SWF(
+		//IF_VERBOSE_MALFORMED_SWF(
 			log_swferror(_("VariableName associated to text field (%s) refer to an unknown target. "
 				"It is possible that the character will be instantiated later in the SWF stream. "
 				"Gnash will try to register again on next access."), _variable_name.c_str());
-		);
+		//);
 		return;
 	}
 
@@ -1547,15 +1551,19 @@ edit_text_character::registerTextVariable()
 		// as_environment& env = get_environment();
 		set_text_value(val.to_string().c_str());
 	}
-#ifdef DEBUG_DYNTEXT_VARIABLES
 	else
 	{
+#ifdef DEBUG_DYNTEXT_VARIABLES
 		log_msg(_("target sprite (%p) does NOT have a member named %s (no problem, we'll add it)"), (void*)sprite, _vm.getStringTable().value(key).c_str());
-	}
 #endif
+		sprite->set_member(key, as_value(_text));
+	}
 
 	// add the textfield variable to the target sprite
 	// TODO: have set_textfield_variable take a string_table::key instead ?
+#ifdef DEBUG_DYNTEXT_VARIABLES
+	log_debug("Calling set_textfield_variable(%s) against sprite %s", _vm.getStringTable().value(key).c_str(), sprite->getTarget().c_str());
+#endif
 	sprite->set_textfield_variable(_vm.getStringTable().value(key), this);
 
 	_text_variable_registered=true;
@@ -1568,7 +1576,14 @@ edit_text_character::set_variable_name(const std::string& newname)
 	{
 		_variable_name = newname;
 		_text_variable_registered = false;
-		set_text_value(m_def->get_default_text().c_str());
+		//set_text_value(m_def->get_default_text().c_str());
+#ifdef DEBUG_DYNTEXT_VARIABLES
+		log_debug("Calling updateText after change of variable name");
+#endif
+		updateText(m_def->get_default_text());
+#ifdef DEBUG_DYNTEXT_VARIABLES
+		log_debug("Calling registerTextVariable after change of variable name and updateText call");
+#endif
 		registerTextVariable();
 		//reset_bounding_box(0, 0); // does this make sense ? it's called in the constructor...
 	}

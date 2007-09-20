@@ -69,6 +69,7 @@
   .action:
     // rename the EditText variable to 'textVar2'
     edtext1.variable = 'textVar2'; 
+    check_equals(_root.hasOwnProperty('textVar2'), true); 
     check_equals(edtext1.variable, 'textVar2');
     // textVar2 automatically initialized to 'Hello'
     // (the InitialText in DefineTextField tag, make sense!)
@@ -106,8 +107,8 @@
 .frame 7
   .action:
     check_equals(_root.hasOwnProperty('textVar1'), true); 
-    xcheck_equals(_root.hasOwnProperty('textVar2'), true); 
-    xcheck_equals(_root.hasOwnProperty('textVar3'), true); 
+    check_equals(_root.hasOwnProperty('textVar2'), true); 
+    check_equals(_root.hasOwnProperty('textVar3'), true); 
   .end
   
   
@@ -116,8 +117,8 @@
   .action:
     // after removing the TextField instance, all registered variables still keep alive
     check_equals(_root.hasOwnProperty('textVar1'), true); 
-    xcheck_equals(_root.hasOwnProperty('textVar2'), true); 
-    xcheck_equals(_root.hasOwnProperty('textVar3'), true); 
+    check_equals(_root.hasOwnProperty('textVar2'), true); 
+    check_equals(_root.hasOwnProperty('textVar3'), true); 
     check_equals(typeof(edtext1), 'undefined');
   .end
 

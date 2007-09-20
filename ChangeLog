@@ -1,5 +1,13 @@
 2007-09-20 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.cpp (set_variable_name): create
+	  the new variable if it doesn't exist in registering sprite.
+	* testsuite/misc-swfc.all/edittext_test1.sc: no more failures
+	  here, but I'm sure it would be easy to break gnash more.
+	  Zou, good luck :)
+
+2007-09-20 Sandro Santilli <strk@keybit.net>
+
 	* server/edit_text_character.{cpp,h}: add an updateText method
 	  intended to be called by sprite_instance when a registered
 	  text variable is updated; have set_text_value forward the 
