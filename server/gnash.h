@@ -405,148 +405,8 @@ public:
 //
 
 /// Keyboard handling
-// TODO: deprecate this table.
-// It's wrongly used for
-// (1)onClipKeypress, which should use swf-key-code instead, another table.
-// (2)characters received from GUI. Different characters might have same codes.
 namespace key {
-enum code
-{
-    INVALID = 0,
-    A = 65,
-    B,
-    C,
-    D,
-    E,
-    F,
-    G,
-    H,
-    I,
-    J,
-    K,
-    L,
-    M,
-    N,
-    O,
-    P,
-    Q,
-    R,
-    S,
-    T,
-    U,
-    V,
-    W,
-    X,
-    Y,
-    Z,
-    _0 = 48,
-    _1,
-    _2,
-    _3,
-    _4,
-    _5,
-    _6,
-    _7,
-    _8,
-    _9,
-    KP_0 = 96,
-    KP_1,
-    KP_2,
-    KP_3,
-    KP_4,
-    KP_5,
-    KP_6,
-    KP_7,
-    KP_8,
-    KP_9,
-    KP_MULTIPLY,
-    KP_ADD,
-    KP_ENTER,
-    KP_SUBTRACT,
-    KP_DECIMAL,
-    KP_DIVIDE,
-    F1 = 112,
-    F2,
-    F3,
-    F4,
-    F5,
-    F6,
-    F7,
-    F8,
-    F9,
-    F10,
-    F11,
-    F12,
-    F13,
-    F14,
-    F15,
-    BACKSPACE = 8,
-    TAB,
-    CLEAR = 12,
-    ENTER,
-    SHIFT = 16,
-    CONTROL = 17,
-    ALT = 18,
-    CAPSLOCK = 20,
-    ESCAPE = 27,
-    SPACE = 32,
-    PGUP = 33,
-    PGDN = 34,
-    END = 35,
-    HOME,
-    LEFT,
-    UP,
-    RIGHT,
-    DOWN,
-    INSERT = 45,
-    DELETEKEY,
-    HELP,
-    NUM_LOCK = 144,
-    SEMICOLON = 186,
-    EQUALS = 187,
-    COMMA = 188,
-    MINUS = 189,
-    PERIOD = 190,
-    SLASH = 191,
-    BACKTICK = 192,
-    LEFT_BRACKET = 219,
-    BACKSLASH = 220,
-    RIGHT_BRACKET = 221,
-    APOSTROPHE = 222,
 
-    PAREN_RIGHT = 48,
-    EXCLAM = 49,
-    AT = 50,
-    HASH = 51,
-    DOLLAR = 52,
-    PERCENT = 53,
-    ASCIICIRCUM = 54,
-    AMPERSAND = 55,
-    ASTERISK = 56,
-    PAREN_LEFT = 57,
-    COLON = 186,
-    PLUS = 187,
-    LESSTHAN = 188,
-    UNDERSCORE = 189,
-    MORETHAN = 190,
-    QUESTION = 191,
-    ASCIITILDE = 192,
-    CURLYLEFT = 219,
-    PIPE = 220,
-    CURLYRIGHT = 221,
-    QUOTE = 222,
-
-    // Extended ASCII
-    NOBREAKSPACE = 160,
-    AGRAVE = 192, 
-    NTILDE = 209,
-    UGRAVE = 217,
-    SSHARPSMALL = 223,
-    UGRAVESMALL = 249,
-    YACUTESMALL = 255, //Last
-
-    KEYCOUNT
-};
 enum modifier
 {
     MOD_NONE = 0,
@@ -557,379 +417,385 @@ enum modifier
 
 // Gnash character codes. Each code represents a single character on the keyboard.
 // The first 128 code are ordered by their correspond ASCII value.
-enum gnashKey
+enum code
 {
-  CH_INVALID = 0,
-  CH_UNKOWN1,
-  CH_UNKOWN2,
-  CH_UNKOWN3,
-  CH_UNKOWN4,
-  CH_UNKOWN5,
-  CH_UNKOWN6,
-  CH_UNKOWN7,
-  CH_BACkSPACE = 8,
-  CH_TAB = 9,
-  CH_UNKOWN10,
-  CH_UNKOWN11,
-  CH_CLEAR = 12,
-  CH_ENTER = 13,
-  CH_UNKOWN14,
-  CH_UNKOWN15,
-  CH_SHIFT = 16,
-  CH_CONTROL = 17,
-  CH_ALT = 18,
-  CH_PAUSE = 19,
-  CH_CAPSLOCK = 20,
-  CH_UNKOWN21,
-  CH_UNKOWN22,
-  CH_UNKOWN23,
-  CH_UNKOWN24,
-  CH_UNKOWN25,  
-  CH_UNKOWN26,
-  CH_ESC = 27,
-  CH_UNKOWN28,
-  CH_UNKOWN29,
-  CH_UNKOWN30,
-  CH_UNKOWN31,
-  CH_SPACE = 32,
-  CH_EXCLAM = 33,
-  CH_DOUBLE_QUOTE = 34,
-  CH_HASH = 35,
-  CH_DOLLAR = 36,
-  CH_PERCENT = 37,
-  CH_AMPERSAND = 38 ,
-  CH_SINGLE_QUOTE  = 39,
-  CH_PAREN_LEFT = 40,
-  CH_PAREN_RIGHT = 41,
-  CH_ASTERISK = 42,
-  CH_PLUS = 43,
-  CH_COMMA = 44,
-  CH_MINUS = 45,
-  CH_PERIOD = 46,
-  CH_SLASH =47,
+  INVALID = 0,
+  UNKOWN1,
+  UNKOWN2,
+  UNKOWN3,
+  UNKOWN4,
+  UNKOWN5,
+  UNKOWN6,
+  UNKOWN7,
+  BACKSPACE = 8,
+  TAB = 9,
+  UNKOWN10,
+  UNKOWN11,
+  CLEAR = 12,
+  ENTER = 13,
+  UNKOWN14,
+  UNKOWN15,
+  SHIFT = 16,
+  CONTROL = 17,
+  ALT = 18,
+  PAUSE = 19,
+  CAPSLOCK = 20,
+  UNKOWN21,
+  UNKOWN22,
+  UNKOWN23,
+  UNKOWN24,
+  UNKOWN25,  
+  UNKOWN26,
+  ESCAPE = 27,
+  UNKOWN28,
+  UNKOWN29,
+  UNKOWN30,
+  UNKOWN31,
+  SPACE = 32,
+  EXCLAM = 33,
+  DOUBLE_QUOTE = 34,
+  HASH = 35,
+  DOLLAR = 36,
+  PERCENT = 37,
+  AMPERSAND = 38 ,
+  SINGLE_QUOTE  = 39,
+  PAREN_LEFT = 40,
+  PAREN_RIGHT = 41,
+  ASTERISK = 42,
+  PLUS = 43,
+  COMMA = 44,
+  MINUS = 45,
+  PERIOD = 46,
+  SLASH =47,
 
-  CH_0 = 48,
-  CH_1,
-  CH_2,
-  CH_3,
-  CH_4,
-  CH_5,
-  CH_6,
-  CH_7,
-  CH_8,
-  CH_9 = 57,
+  _0 = 48,
+  _1,
+  _2,
+  _3,
+  _4,
+  _5,
+  _6,
+  _7,
+  _8,
+  _9 = 57,
   
-  CH_COLON = 58,
-  CH_SEMICOLON = 59,
-  CH_LESS = 60,
-  CH_EQUAL = 61,
-  CH_MORE = 62,
-  CH_QUESTION = 63,
-  CH_AT = 64,
+  COLON = 58,
+  SEMICOLON = 59,
+  LESS = 60,
+  EQUALS = 61,
+  MORE = 62,
+  QUESTION = 63,
+  AT = 64,
   
-  CH_A = 65,
-  CH_B,
-  CH_C,
-  CH_D,
-  CH_E,
-  CH_F,
-  CH_G,
-  CH_H,
-  CH_I,
-  CH_J,
-  CH_K,
-  CH_L,
-  CH_M,
-  CH_N,
-  CH_O,
-  CH_P,
-  CH_Q,
-  CH_R,
-  CH_S,
-  CH_T,
-  CH_U,
-  CH_V,
-  CH_W,
-  CH_X,
-  CH_Y,
-  CH_Z = 90,
+  A = 65,
+  B,
+  C,
+  D,
+  E,
+  F,
+  G,
+  H,
+  I,
+  J,
+  K,
+  L,
+  M,
+  N,
+  O,
+  P,
+  Q,
+  R,
+  S,
+  T,
+  U,
+  V,
+  W,
+  X,
+  Y,
+  Z = 90,
   
-  CH_LEFTBRACKET =  91,
-  CH_BACKSLASH =92,
-  CH_RIGHTBRACKET = 93,
-  CH_CARET = 94,
-  CH_UNDERSCORE = 95,
-  CH_BACKQUOTE = 96,
+  LEFT_BRACKET =  91,
+  BACKSLASH =92,
+  RIGHT_BRACKET = 93,
+  CARET = 94,
+  UNDERSCORE = 95,
+  BACKQUOTE = 96,
   
-  CH_a = 97,
-  CH_b,
-  CH_c,
-  CH_d,
-  CH_e,
-  CH_f,
-  CH_g,
-  CH_h,
-  CH_i,
-  CH_j,
-  CH_k,
-  CH_l,
-  CH_m,
-  CH_n,
-  CH_o,
-  CH_p,
-  CH_q,
-  CH_r,
-  CH_s,
-  CH_t,
-  CH_u,
-  CH_v,
-  CH_w,
-  CH_x,
-  CH_y,
-  CH_z = 122,
-  CH_LEFTBRACE = 123,
-  CH_PIPE = 124,
-  CH_RIGHTBRACE = 125,
-  CH_ASCIITILDE = 126,
-  CH_DELETE = 127,
+  a = 97,
+  b,
+  c,
+  d,
+  e,
+  f,
+  g,
+  h,
+  i,
+  j,
+  k,
+  l,
+  m,
+  n,
+  o,
+  p,
+  q,
+  r,
+  s,
+  t,
+  u,
+  v,
+  w,
+  x,
+  y,
+  z = 122,
+  LEFT_BRACE = 123,
+  PIPE = 124,
+  RIGHT_BRACE = 125,
+  ASCIITILDE = 126,
+  DELETEKEY = 127,
   
-  CH_KP_0 = 128,
-  CH_KP_1,
-  CH_KP_2,
-  CH_KP_3,
-  CH_KP_4,
-  CH_KP_5,
-  CH_KP_6,
-  CH_KP_7,
-  CH_KP_8,
-  CH_KP_9 = 137,
+  KP_0 = 128,
+  KP_1,
+  KP_2,
+  KP_3,
+  KP_4,
+  KP_5,
+  KP_6,
+  KP_7,
+  KP_8,
+  KP_9 = 137,
       
-  CH_F1 = 138,
-  CH_F2,
-  CH_F3,
-  CH_F4,
-  CH_F5,
-  CH_F6,
-  CH_F7,
-  CH_F8,
-  CH_F9,
-  CH_F10,
-  CH_F11,
-  CH_F12,
-  CH_F13,
-  CH_F14,
-  CH_F15 = 152,
+  F1 = 138,
+  F2,
+  F3,
+  F4,
+  F5,
+  F6,
+  F7,
+  F8,
+  F9,
+  F10,
+  F11,
+  F12,
+  F13,
+  F14,
+  F15 = 152,
   
-  CH_UP = 153,
-  CH_DOWN = 154,
-  CH_RIGHT = 155,
-  CH_LEFT = 156,
-  CH_INSERT = 157,
-  CH_HOME = 158,
-  CH_END  = 159,
-  CH_PAGEUP = 160,
-  CH_PAGEDOWN = 161,
+  UP = 153,
+  DOWN = 154,
+  RIGHT = 155,
+  LEFT = 156,
+  INSERT = 157,
+  HOME = 158,
+  END  = 159,
+  PGUP = 160,
+  PGDN = 161,
 
-  CH_KP_ADD = 162,
-  CH_KP_SUBTRACT = 163,
-  CH_KP_MULITPLY = 164,
-  CH_KP_DEVIDE = 165,
-  CH_KP_DECIMAL = 166,
-  CH_KP_ENTER = 167,
+  KP_ADD = 162,
+  KP_SUBTRACT = 163,
+  KP_MULITPLY = 164,
+  KP_DEVIDE = 165,
+  KP_DECIMAL = 166,
+  KP_ENTER = 167,
   
-  CH_NUMLOCK = 168,
+  NUM_LOCK = 168,
 
 // Extended ASCII
-  CH_NOBREAKSPACE = 169,
-  CH_AGRAVE = 170, 
-  CH_NTILDE = 171,
-  CH_UGRAVE = 172,
-  CH_SSHARPSMALL = 173,
-  CH_UGRAVESMALL = 174,
-  CH_YACUTESMALL = 175, 
+  NOBREAKSPACE = 169,
+  AGRAVE = 170, 
+  NTILDE = 171,
+  UGRAVE = 172,
+  SSHARPSMALL = 173,
+  UGRAVESMALL = 174,
+  YACUTESMALL = 175, 
 
   // TODO: add other function keys and extend the codeMap
-  CH_COUNT
+  HELP = 176,
+  APOSTROPHE = 177,
+  ASCIICIRCUM = 178,
+  KEYCOUNT
 };
 
-const unsigned char codeMap[CH_COUNT][3] = {
+const unsigned char codeMap[KEYCOUNT][3] = {
 //{swfKeyCode, keycode, asciiKeyCode}
-  {0,   0,   0}, // CH_INVALID = 0
-  {0,   0,   0}, // CH_UNKOWN1
-  {0,   0,   0}, // CH_UNKOWN2
-  {0,   0,   0}, // CH_UNKOWN3
-  {0,   0,   0}, // CH_UNKOWN4
-  {0,   0,   0}, // CH_UNKOWN5
-  {0,   0,   0}, // CH_UNKOWN6
-  {0,   0,   0}, // CH_UNKOWN7
-  {8,   8,   8}, // CH_BACkSPACE = 8
-  {18,  9,   9}, // CH_TAB = 9
-  {0,   0,   0}, // CH_UNKOWN10
-  {0,   0,   0}, // CH_UNKOWN11
-  {0,  12,   0}, // CH_CLEAR = 12
-  {13, 13,  13}, // CH_ENTER = 13
-  {0,   0,   0}, // CH_UNKOWN14
-  {0,   0,   0}, // CH_UNKOWN15
-  {0,  16,   0}, // CH_SHIFT = 16
-  {0,  17,   0}, // CH_CONTROL = 17
-  {0,  18,   0}, // CH_ALT = 18
-  {0,  19,   0}, // CH_PAUSE = 19
-  {0,  20,   0}, // CH_CAPSLOCK = 20
-  {0,   0,   0}, // CH_UNKOWN21
-  {0,   0,   0}, // CH_UNKOWN22
-  {0,   0,   0}, // CH_UNKOWN23
-  {0,   0,   0}, // CH_UNKOWN24
-  {0,   0,   0}, // CH_UNKOWN25 
-  {0,   0,   0}, // CH_UNKOWN26
-  {19, 27,  27}, // CH_ESC = 27
-  {0,   0,   0}, // CH_UNKOWN28
-  {0,   0,   0}, // CH_UNKOWN29
-  {0,   0,   0}, // CH_UNKOWN30
-  {0,   0,   0}, // CH_UNKOWN31
-  {32, 32,  32}, // CH_SPACE = 32
-  {33, 33,  33}, // CH_EXCLAM = 33
-  {34, 34,  34}, // CH_DOUBLE_QUOTE = 34
-  {35, 35,  35}, // CH_HASH = 35
-  {36, 36,  36}, // CH_DOLLAR = 36
-  {37, 37,  37}, // CH_PERCENT = 37
-  {38, 38,  38}, // CH_AMPERSAND = 38 
-  {39, 39,  39}, // CH_SINGLE_QUOTE  = 39
-  {40, 40,  40}, // CH_PAREN_LEFT = 40
-  {41, 41,  41}, // CH_PAREN_RIGHT = 41
-  {42, 42,  42}, // CH_ASTERISK = 42
-  {43, 43,  43}, // CH_PLUS = 43
-  {44, 44,  44}, // CH_COMMA = 44
-  {45, 45,  45}, // CH_MINUS = 45
-  {46, 46,  46}, // CH_PERIOD = 46
-  {47, 47,  47}, // CH_SLASH = 47
-  {48, 48,  48}, // CH_0 = 48
-  {49, 49,  49}, // CH_1
-  {50, 50,  50}, // CH_2
-  {51, 51,  51}, // CH_3
-  {52, 52,  52}, // CH_4
-  {53, 53,  53}, // CH_5
-  {54, 54,  54}, // CH_6
-  {55, 55,  55}, // CH_7
-  {56, 56,  56}, // CH_8
-  {57, 57,  57}, // CH_9 = 57
-  {58, 58,  58}, // CH_COLON = 58
-  {59, 59,  59}, // CH_SEMICOLON = 59
-  {60, 60,  60}, // CH_LESS = 60
-  {61, 61,  61}, // CH_EQUAL = 61
-  {62, 62,  62}, // CH_MORE = 62
-  {63, 63,  63}, // CH_QUESTION = 63
-  {64, 64,  64}, // CH_AT = 64
-  {65, 65,  65}, // CH_A = 65
-  {66, 66,  66}, // CH_B
-  {67, 67,  67}, // CH_C
-  {68, 68,  68}, // CH_D
-  {69, 69,  69}, // CH_E
-  {70, 70,  70}, // CH_F
-  {71, 71,  71}, // CH_G
-  {72, 72,  72}, // CH_H
-  {73, 73,  73}, // CH_I
-  {74, 74,  74}, // CH_J
-  {75, 75,  75}, // CH_K
-  {76, 76,  76}, // CH_L
-  {77, 77,  77}, // CH_M
-  {78, 78,  78}, // CH_N
-  {79, 79,  79}, // CH_O
-  {80, 80,  80}, // CH_P
-  {81, 81,  81}, // CH_Q
-  {82, 82,  82}, // CH_R
-  {83, 83,  83}, // CH_S
-  {84, 84,  84}, // CH_T
-  {85, 85,  85}, // CH_U
-  {86, 86,  86}, // CH_V
-  {87, 87,  87}, // CH_W
-  {88, 88,  88}, // CH_X
-  {89, 89,  89}, // CH_Y
-  {90, 90,  90}, // CH_Z = 90
-  {91, 91,  91}, // CH_LEFTBRACKET = 91
-  {92, 92,  92}, // CH_BACKSLASH = 92
-  {93, 93,  93}, // CH_RIGHTBRACKET = 93
-  {94, 94,  94}, // CH_CARET = 94
-  {95, 95,  95}, // CH_UNDERSCORE = 95
-  {96, 96,  96}, // CH_BACKQUOTE = 96
-  {97, 65,  97}, // CH_a = 97
-  {98, 66,  98}, // CH_b
-  {99, 67,  99}, // CH_c
-  {100,68, 100}, // CH_d
-  {101,69, 101}, // CH_e
-  {102,70, 102}, // CH_f
-  {103,71, 103}, // CH_g
-  {104,72, 104}, // CH_h
-  {105,73, 105}, // CH_i
-  {106,74, 106}, // CH_j
-  {107,75, 107}, // CH_k
-  {108,76, 108}, // CH_l
-  {109,77, 109}, // CH_m
-  {110,78, 110}, // CH_n
-  {111,79, 111}, // CH_o
-  {112,80, 112}, // CH_p
-  {113,81, 113}, // CH_q
-  {114,82, 114}, // CH_r
-  {115,83, 115}, // CH_s
-  {116,84, 116}, // CH_t
-  {117,85, 117}, // CH_u
-  {118,86, 118}, // CH_v
-  {119,87, 119}, // CH_w
-  {120,88, 120}, // CH_x
-  {121,89, 121}, // CH_y
-  {122,90, 122}, // CH_z = 122
-  {123,219,123}, // CH_LEFTBRACE = 123
-  {124,220,124}, // CH_PIPE = 124
-  {125,221,125}, // CH_RIGHTBRACE = 125
-  {126,192,126}, // CH_ASCIITILDE = 126
-  {6,  46, 127}, // CH_DELETE = 127
-  {48, 96,  48}, // CH_KP_0 = 128
-  {49, 97,  49}, // CH_KP_1
-  {50, 98,  50}, // CH_KP_2
-  {51, 99,  51}, // CH_KP_3
-  {52, 100, 52}, // CH_KP_4
-  {53, 101, 53}, // CH_KP_5
-  {54, 102, 54}, // CH_KP_6
-  {55, 103, 55}, // CH_KP_7
-  {56, 104, 56}, // CH_KP_8
-  {57, 105, 57}, // CH_KP_9
-  {0,  112,  0}, // CH_F1 = 138
-  {0,  113,  0}, // CH_F2
-  {0,  114,  0}, // CH_F3
-  {0,  115,  0}, // CH_F4
-  {0,  116,  0}, // CH_F5
-  {0,  117,  0}, // CH_F6
-  {0,  118,  0}, // CH_F7
-  {0,  119,  0}, // CH_F8
-  {0,  120,  0}, // CH_F9
-  {0,  121,  0}, // CH_F10
-  {0,  122,  0}, // CH_F11
-  {0,  123,  0}, // CH_F12
-  {0,  124,  0}, // CH_F13
-  {0,  125,  0}, // CH_F14
-  {0,  126,  0}, // CH_F15 = 152
-  {14, 38,   0}, // CH_UP = 153
-  {15, 40,   0}, // CH_DOWN = 154
-  {2,  39,   0}, // CH_RIGHT = 155
-  {1,  37,   0}, // CH_LEFT = 156
-  {5,  45,   0}, // CH_INSERT = 157
-  {3,  36,   0}, // CH_HOME = 158
-  {4,  35,   0}, // CH_END = 159
-  {16, 33,   0}, // CH_PAGEUP = 160
-  {17, 34,   0}, // CH_PAGEDOWN = 161
-  {0, 107,  43}, // CH_KP_ADD = 162
-  {0, 109,  45}, // CH_KP_SUBTRACT = 163
-  {0, 106,  42}, // CH_KP_MULITPLY = 164
-  {0, 111,  47}, // CH_KP_DEVIDE = 165
-  {0, 110,  46}, // CH_KP_DECIMAL = 166
-  {13, 13,  13}, // CH_KP_ENTER = 167
-  {0, 144,   0}, // CH_NUMLOCK = 168
-  {0, 160,   0}, // CH_ NOBREAKSPACE = 169,
-  {0, 192,   0}, // CH_AGRAVE = 170 
-  {0, 209,   0}, // CH_NTILDE = 171
-  {0, 217,   0}, // CH_UGRAVE = 172
-  {0, 223,   0}, // CH_SSHARPSMALL = 173
-  {0, 249,   0}, // CH_UGRAVESMALL = 174
-  {0, 255,   0}, // CH_YACUTESMALL = 175 
+  {0,   0,   0}, // INVALID = 0
+  {0,   0,   0}, // UNKOWN1
+  {0,   0,   0}, // UNKOWN2
+  {0,   0,   0}, // UNKOWN3
+  {0,   0,   0}, // UNKOWN4
+  {0,   0,   0}, // UNKOWN5
+  {0,   0,   0}, // UNKOWN6
+  {0,   0,   0}, // UNKOWN7
+  {8,   8,   8}, // BACkSPACE = 8
+  {18,  9,   9}, // TAB = 9
+  {0,   0,   0}, // UNKOWN10
+  {0,   0,   0}, // UNKOWN11
+  {0,  12,   0}, // CLEAR = 12
+  {13, 13,  13}, // ENTER = 13
+  {0,   0,   0}, // UNKOWN14
+  {0,   0,   0}, // UNKOWN15
+  {0,  16,   0}, // SHIFT = 16
+  {0,  17,   0}, // CONTROL = 17
+  {0,  18,   0}, // ALT = 18
+  {0,  19,   0}, // PAUSE = 19
+  {0,  20,   0}, // CAPSLOCK = 20
+  {0,   0,   0}, // UNKOWN21
+  {0,   0,   0}, // UNKOWN22
+  {0,   0,   0}, // UNKOWN23
+  {0,   0,   0}, // UNKOWN24
+  {0,   0,   0}, // UNKOWN25 
+  {0,   0,   0}, // UNKOWN26
+  {19, 27,  27}, // ESCAPE = 27
+  {0,   0,   0}, // UNKOWN28
+  {0,   0,   0}, // UNKOWN29
+  {0,   0,   0}, // UNKOWN30
+  {0,   0,   0}, // UNKOWN31
+  {32, 32,  32}, // SPACE = 32
+  {33, 33,  33}, // EXCLAM = 33
+  {34, 34,  34}, // DOUBLE_QUOTE = 34
+  {35, 35,  35}, // HASH = 35
+  {36, 36,  36}, // DOLLAR = 36
+  {37, 37,  37}, // PERCENT = 37
+  {38, 38,  38}, // AMPERSAND = 38 
+  {39, 39,  39}, // SINGLE_QUOTE  = 39
+  {40, 40,  40}, // PAREN_LEFT = 40
+  {41, 41,  41}, // PAREN_RIGHT = 41
+  {42, 42,  42}, // ASTERISK = 42
+  {43, 43,  43}, // PLUS = 43
+  {44, 44,  44}, // COMMA = 44
+  {45, 45,  45}, // MINUS = 45
+  {46, 46,  46}, // PERIOD = 46
+  {47, 47,  47}, // SLASH = 47
+  {48, 48,  48}, // 0 = 48
+  {49, 49,  49}, // 1
+  {50, 50,  50}, // 2
+  {51, 51,  51}, // 3
+  {52, 52,  52}, // 4
+  {53, 53,  53}, // 5
+  {54, 54,  54}, // 6
+  {55, 55,  55}, // 7
+  {56, 56,  56}, // 8
+  {57, 57,  57}, // 9 = 57
+  {58, 58,  58}, // COLON = 58
+  {59, 59,  59}, // SEMICOLON = 59
+  {60, 60,  60}, // LESS = 60
+  {61, 61,  61}, // EQUALS = 61
+  {62, 62,  62}, // MORE = 62
+  {63, 63,  63}, // QUESTION = 63
+  {64, 64,  64}, // AT = 64
+  {65, 65,  65}, // A = 65
+  {66, 66,  66}, // B
+  {67, 67,  67}, // C
+  {68, 68,  68}, // D
+  {69, 69,  69}, // E
+  {70, 70,  70}, // F
+  {71, 71,  71}, // G
+  {72, 72,  72}, // H
+  {73, 73,  73}, // I
+  {74, 74,  74}, // J
+  {75, 75,  75}, // K
+  {76, 76,  76}, // L
+  {77, 77,  77}, // M
+  {78, 78,  78}, // N
+  {79, 79,  79}, // O
+  {80, 80,  80}, // P
+  {81, 81,  81}, // Q
+  {82, 82,  82}, // R
+  {83, 83,  83}, // S
+  {84, 84,  84}, // T
+  {85, 85,  85}, // U
+  {86, 86,  86}, // V
+  {87, 87,  87}, // W
+  {88, 88,  88}, // X
+  {89, 89,  89}, // Y
+  {90, 90,  90}, // Z = 90
+  {91, 91,  91}, // LEFT_BRACKET = 91
+  {92, 92,  92}, // BACKSLASH = 92
+  {93, 93,  93}, // RIGHT_BRACKET = 93
+  {94, 94,  94}, // CARET = 94
+  {95, 95,  95}, // UNDERSCORE = 95
+  {96, 96,  96}, // BACKQUOTE = 96
+  {97, 65,  97}, // a = 97
+  {98, 66,  98}, // b
+  {99, 67,  99}, // c
+  {100,68, 100}, // d
+  {101,69, 101}, // e
+  {102,70, 102}, // f
+  {103,71, 103}, // g
+  {104,72, 104}, // h
+  {105,73, 105}, // i
+  {106,74, 106}, // j
+  {107,75, 107}, // k
+  {108,76, 108}, // l
+  {109,77, 109}, // m
+  {110,78, 110}, // n
+  {111,79, 111}, // o
+  {112,80, 112}, // p
+  {113,81, 113}, // q
+  {114,82, 114}, // r
+  {115,83, 115}, // s
+  {116,84, 116}, // t
+  {117,85, 117}, // u
+  {118,86, 118}, // v
+  {119,87, 119}, // w
+  {120,88, 120}, // x
+  {121,89, 121}, // y
+  {122,90, 122}, // z = 122
+  {123,219,123}, // LEFT_BRACE = 123
+  {124,220,124}, // PIPE = 124
+  {125,221,125}, // RIGHT_BRACE = 125
+  {126,192,126}, // ASCIITILDE = 126
+  {6,  46, 127}, // DELETE = 127
+  {48, 96,  48}, // KP_0 = 128
+  {49, 97,  49}, // KP_1
+  {50, 98,  50}, // KP_2
+  {51, 99,  51}, // KP_3
+  {52, 100, 52}, // KP_4
+  {53, 101, 53}, // KP_5
+  {54, 102, 54}, // KP_6
+  {55, 103, 55}, // KP_7
+  {56, 104, 56}, // KP_8
+  {57, 105, 57}, // KP_9
+  {0,  112,  0}, // F1 = 138
+  {0,  113,  0}, // F2
+  {0,  114,  0}, // F3
+  {0,  115,  0}, // F4
+  {0,  116,  0}, // F5
+  {0,  117,  0}, // F6
+  {0,  118,  0}, // F7
+  {0,  119,  0}, // F8
+  {0,  120,  0}, // F9
+  {0,  121,  0}, // F10
+  {0,  122,  0}, // F11
+  {0,  123,  0}, // F12
+  {0,  124,  0}, // F13
+  {0,  125,  0}, // F14
+  {0,  126,  0}, // F15 = 152
+  {14, 38,   0}, // UP = 153
+  {15, 40,   0}, // DOWN = 154
+  {2,  39,   0}, // RIGHT = 155
+  {1,  37,   0}, // LEFT = 156
+  {5,  45,   0}, // INSERT = 157
+  {3,  36,   0}, // HOME = 158
+  {4,  35,   0}, // END = 159
+  {16, 33,   0}, // PAGEUP = 160
+  {17, 34,   0}, // PAGEDOWN = 161
+  {0, 107,  43}, // KP_ADD = 162
+  {0, 109,  45}, // KP_SUBTRACT = 163
+  {0, 106,  42}, // KP_MULITPLY = 164
+  {0, 111,  47}, // KP_DEVIDE = 165
+  {0, 110,  46}, // KP_DECIMAL = 166
+  {13, 13,  13}, // KP_ENTER = 167
+  {0, 144,   0}, // NUMLOCK = 168
+  {0, 160,   0}, // NOBREAKSPACE = 169,
+  {0, 192,   0}, // AGRAVE = 170 
+  {0, 209,   0}, // NTILDE = 171
+  {0, 217,   0}, // UGRAVE = 172
+  {0, 223,   0}, // SSHARPSMALL = 173
+  {0, 249,   0}, // UGRAVESMALL = 174
+  {0, 255,   0}, // YACUTESMALL = 175 
+  {0,  47,   0}, // HELP = 176(untested)
+  {0, 222,   0}, // APOSTROPHE(untested)
+  {0,  54,   0}, // ASCIICIRCUM(untested)
 };
 
 }   // end namespace key

@@ -55,20 +55,21 @@ key_as_object::is_key_down(int code)
 {
     if (code < 0 || code >= key::KEYCOUNT) return false;
 
-    int byte_index = code >> 3;
-    int bit_index = code - (byte_index << 3);
-    int mask = 1 << bit_index;
-
-    assert(byte_index >= 0 && byte_index < int(sizeof(m_unreleased_keys)/sizeof(m_unreleased_keys[0])));
-
-    if (m_unreleased_keys[byte_index] & mask)
+    for(int i = 0; i < sizeof(m_unreleased_keys)/sizeof(m_unreleased_keys[0]); i++)
     {
-        return true;
+        if( m_unreleased_keys[i] != 0) 
+        {
+            for(int j=0; j<8; j++) 
+            {
+                if( m_unreleased_keys[i] & (1 << j) ) 
+                {
+                    if(key::codeMap[i*8+j][1] == code)  return true;
+                }
+            }
+        }
     }
-    else
-    {
-        return false;
-    }
+    
+    return false;
 }
 
 void
@@ -244,18 +245,8 @@ key_get_ascii(const fn_call& fn)
     boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr);
 
     int code = ko->get_last_key_pressed();
-    if (code < 0)
-        return as_value();
-
-    // @@ Crude for now; just jamming the key code in a string, as a character.
-    // Need to apply shift/capslock/numlock, etc...
-    char    buf[2];
-    buf[0] = (char) code;
-    buf[1] = 0;
-
-    log_unimpl("Key.getAscii partially implemented");
-
-    return as_value(buf);
+    
+		return as_value(gnash::key::codeMap[code][2]);
 }
 
 // Returns the keycode of the last key pressed.
@@ -263,8 +254,10 @@ static as_value
 key_get_code(const fn_call& fn)
 {
     boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr);
-
-    return as_value(ko->get_last_key_pressed());
+		
+		int code = ko->get_last_key_pressed();
+		
+    return as_value(key::codeMap[code][1]);
 }
 
 /// Return true if the specified (first arg keycode) key is pressed.

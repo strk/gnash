@@ -1,3 +1,13 @@
+2007-09-20 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/gnash.h: drop key::gnashKey, reorganize key::code.
+	* server/event_id.h: make the constructor	to take an unsigned char type.
+	* server/movie_root.cpp, server/button_character_instance.cpp,
+	  server/asobj/Key.cpp: use key::codeMap instead of key::code, fix getAscii().
+	* gui/gtk.cpp, gui/kde.cpp: update a few key names.
+	* testsuite/misc-ming.all/key_event_testrunner.cpp: fix bogus tests about
+	  Key.getAscii().	   
+	
 2007-09-19 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (goto_frame): fix blind jump to target

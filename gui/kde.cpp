@@ -208,7 +208,7 @@ KdeGui::qtToGnashKey(QKeyEvent *event)
             { Qt::Key_BracketLeft, gnash::key::LEFT_BRACKET },
             { Qt::Key_Backslash, gnash::key::BACKSLASH },
             { Qt::Key_BracketRight, gnash::key::RIGHT_BRACKET },
-            { Qt::Key_QuoteDbl, gnash::key::QUOTE },
+            { Qt::Key_QuoteDbl, gnash::key::DOUBLE_QUOTE },
             { 0, gnash::key::INVALID }
         };
         

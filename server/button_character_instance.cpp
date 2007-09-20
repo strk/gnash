@@ -327,30 +327,6 @@ bool
 button_character_instance::on_event(const event_id& id)
 {
 
-	static const event_id s_key[32] =
-	{
-		event_id(),
-		event_id(event_id::KEY_PRESS, key::LEFT),
-		event_id(event_id::KEY_PRESS, key::RIGHT),
-		event_id(event_id::KEY_PRESS, key::HOME),
-		event_id(event_id::KEY_PRESS, key::END),
-		event_id(event_id::KEY_PRESS, key::INSERT),
-		event_id(event_id::KEY_PRESS, key::DELETEKEY),
-		event_id(),
-		event_id(event_id::KEY_PRESS, key::BACKSPACE),	//8
-		event_id(),
-		event_id(),
-		event_id(),
-		event_id(),
-		event_id(event_id::KEY_PRESS, key::ENTER),	//13
-		event_id(event_id::KEY_PRESS, key::UP),
-		event_id(event_id::KEY_PRESS, key::DOWN),
-		event_id(event_id::KEY_PRESS, key::PGUP),
-		event_id(event_id::KEY_PRESS, key::PGDN),
-		event_id(event_id::KEY_PRESS, key::TAB),
-		// 32-126 folows ASCII
-	};
-
 	bool called = false;
 
 	// Add appropriate actions to the global action list ...
@@ -360,7 +336,7 @@ button_character_instance::on_event(const event_id& id)
 		button_action& ba = m_def->m_button_actions[i];
 
 		int keycode = (ba.m_conditions & 0xFE00) >> 9;
-		event_id key_event = keycode < 32 ? s_key[keycode] : event_id(event_id::KEY_PRESS, (key::code) keycode);
+		event_id key_event(event_id::KEY_PRESS, (key::code) keycode);
 		if (key_event == id)
 		{
 			// Matching action.

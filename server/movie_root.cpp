@@ -856,7 +856,7 @@ void movie_root::notify_key_listeners(key::code k, bool down)
                     }
                 }
                 // invoke onClipKeyPress handler
-                ch->on_event(event_id(event_id::KEY_PRESS, k));
+                ch->on_event(event_id(event_id::KEY_PRESS, key::codeMap[k][0]));
             }
             else
             {
@@ -971,7 +971,7 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 			{
 				// KEY_UP and KEY_DOWN events are unrelated to any key!
 				ch->on_event(event_id(event_id::KEY_DOWN, key::INVALID)); 
-				ch->on_event(event_id(event_id::KEY_PRESS, k));
+        ch->on_event(event_id(event_id::KEY_PRESS, key::codeMap[k][0]));
 			}
 			else
 				ch->on_event(event_id(event_id::KEY_UP, key::INVALID));   

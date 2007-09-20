@@ -98,10 +98,10 @@ public:
 
 	event_id() : m_id(INVALID), m_key_code(key::INVALID) {}
 
-	event_id(id_code id, key::code c = key::INVALID)
+	event_id(id_code id, unsigned char c = key::INVALID)
 		:
 		m_id(id),
-		m_key_code((unsigned char) c)
+		m_key_code(c)
 	{
 		// you must supply a key code for KEY_PRESS event
 		// 

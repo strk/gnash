@@ -69,7 +69,7 @@ main(int /*argc*/, char** /*argv*/)
 
   // check that onClipKeyUp/KeyDown have been triggered
   check(root->get_member(x1key, &tmp));
-  check_equals(tmp.to_string(), "A");
+  check_equals(tmp.to_string(), "65");
   check(root->get_member(st.find("x2"), &tmp));
   check_equals(tmp.to_number(), key::A);
 
@@ -93,13 +93,13 @@ main(int /*argc*/, char** /*argv*/)
 
   // check that onClipKeyUp/KeyDown have been triggered
   check(root->get_member(x1key, &tmp));
-  check_equals(tmp.to_string(), "C");
+  check_equals(tmp.to_string(), "67");
   check(root->get_member(st.find("x2"), &tmp));
   check_equals(tmp.to_number(), key::C);
   
   // check that user defined onKeyUp/KeyDown have been triggered
   check(root->get_member(st.find("x4"), &tmp));
-  check_equals(tmp.to_string(), "C");
+  check_equals(tmp.to_string(), "67");
   check(root->get_member(st.find("x5"), &tmp));
   check_equals(tmp.to_number(), key::C);
   	

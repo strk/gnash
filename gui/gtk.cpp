@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.110 2007/09/19 10:32:52 strk Exp $ */
+/* $Id: gtk.cpp,v 1.111 2007/09/20 06:57:01 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1463,7 +1463,7 @@ GtkGui::gdk_to_gnash_key(guint key)
             { GDK_bracketleft, gnash::key::LEFT_BRACKET },
             { GDK_backslash, gnash::key::SLASH },
             { GDK_bracketright, gnash::key::RIGHT_BRACKET },
-            { GDK_quotedbl, gnash::key::QUOTE },
+            { GDK_quotedbl, gnash::key::DOUBLE_QUOTE },
 	    { GDK_colon, gnash::key::COLON },
 	    { GDK_parenright, gnash::key::PAREN_RIGHT },
 	    { GDK_exclam, gnash::key::EXCLAM },
@@ -1476,13 +1476,13 @@ GtkGui::gdk_to_gnash_key(guint key)
 	    { GDK_asterisk, gnash::key::ASTERISK }, 
 	    { GDK_parenleft, gnash::key::PAREN_LEFT }, 
 	    { GDK_plus, gnash::key::PLUS }, 
-	    { GDK_less, gnash::key::LESSTHAN },
+	    { GDK_less, gnash::key::LESS },
 	    { GDK_underscore, gnash::key::UNDERSCORE },
-	    { GDK_greater, gnash::key::MORETHAN },
+	    { GDK_greater, gnash::key::MORE },
 	    { GDK_asciitilde, gnash::key::ASCIITILDE },
-	    { GDK_leftmiddlecurlybrace, gnash::key::CURLYLEFT },
+	    { GDK_leftmiddlecurlybrace, gnash::key::LEFT_BRACE },
 	    { GDK_bar, gnash::key::PIPE },
-	    { GDK_rightmiddlecurlybrace, gnash::key::CURLYRIGHT },
+	    { GDK_rightmiddlecurlybrace, gnash::key::RIGHT_BRACE },
 
             { GDK_VoidSymbol, gnash::key::INVALID }
         };
