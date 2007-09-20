@@ -2466,8 +2466,10 @@ sprite_instance::goto_frame(size_t target_frame_number)
 
     if(target_frame_number > m_def->get_frame_count() - 1)
     {
-	// TODO: should we assert this is never the case ?
-        target_frame_number = m_def->get_frame_count() - 1;
+		    // Just set _currentframe and return.
+        m_current_frame = m_def->get_frame_count() - 1;
+		    // don't push actions, already tested.
+		    return;
     }
 
     if(target_frame_number == m_current_frame)

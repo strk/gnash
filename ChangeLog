@@ -1,5 +1,10 @@
 2007-09-20 Zou Lunkai <zoulunkai@gmail.com>
 	
+	* server/sprite_instance.cpp: goto_frame(), revert a few changes, 
+	  which I believe caused the infinite loop when executing get_frame_number_test.swf
+	
+2007-09-20 Zou Lunkai <zoulunkai@gmail.com>
+	
 	* server/asobj/Key.cpp: use key::codeMap instead of key::code.
 		
 2007-09-20 Zou Lunkai <zoulunkai@gmail.com>
