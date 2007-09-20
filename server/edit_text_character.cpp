@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.118 2007/09/20 11:29:13 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.119 2007/09/20 14:07:31 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -695,29 +695,54 @@ edit_text_character::get_topmost_mouse_entity(float x, float y)
 }
 
 void
-edit_text_character::set_text_value(const char* new_text_cstr)
+edit_text_character::updateText(const std::string& new_text)
 {
-	std::string new_text;
-	if ( new_text_cstr ) new_text = new_text_cstr;
+	unsigned int maxLen = m_def->get_max_length();
 
-	if (_text == new_text)
+	std::string newText = new_text; // copy needed for eventual resize
+	if (maxLen && newText.length() > maxLen )
+	{
+		newText.resize(maxLen);
+	}
+
+	if (_text == newText)
 	{
 		return;
 	}
 
 	set_invalidated();
 
-	_text = new_text;
-	if (m_def->get_max_length() > 0
-	    && _text.length() > m_def->get_max_length() )
-	{
-		_text.resize(m_def->get_max_length());
-	}
+	_text = newText;
 
 	format_text();
 
 	//log_msg(_("Text set to %s"), new_text.c_str());
 
+}
+
+void
+edit_text_character::set_text_value(const char* new_text_cstr)
+{
+	std::string newText;
+	if ( new_text_cstr ) newText = new_text_cstr;
+
+	updateText(newText);
+
+	if ( ! _variable_name.empty() && _text_variable_registered )
+	{
+		// TODO: notify sprite_instance if we have a variable name !
+		VariableRef ref = parseTextVariableRef(_variable_name);
+		sprite_instance* sp = ref.first;
+		if ( sp )
+		{
+			sp->set_member(ref.second, newText); // we shouldn't truncate, right ?
+		}
+		else	
+		{
+			// nothing to do (too early ?)
+			log_debug("set_text_value: variable name %s points to an unexisting sprite", _variable_name.c_str());
+		}
+	}
 }
 
 std::string

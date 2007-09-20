@@ -74,7 +74,7 @@
     // (the InitialText in DefineTextField tag, make sense!)
     check_equals(_root.textVar2, 'Hello');
     check_equals(edtext1.text, 'Hello');
-    xcheck_equals(_root.textVar1, 'new-string-frame3');
+    check_equals(_root.textVar1, 'new-string-frame3');
   .end
 
 
@@ -85,7 +85,7 @@
     check_equals(edtext1.variable, 'textVar1');
     // edtext1.text also restore to the value of 
     //  _root.textVar1(the registered variable)
-    xcheck_equals(edtext1.text, 'new-string-frame3');
+    check_equals(edtext1.text, 'new-string-frame3');
   .end
 
 
@@ -93,14 +93,14 @@
   .action:
     edtext1.text = 'new-string-frame6';
     check_equals(edtext1.text, 'new-string-frame6');
-    xcheck_equals(_root.textVar1, 'new-string-frame6');
+    check_equals(_root.textVar1, 'new-string-frame6');
     
     // Rename the EditText variable to 'textVar3'
     edtext1.variable = 'textVar3'; 
     // textVar3 automatically initialized to 'Hello'
     // (the InitialText in DefineTextField tag, make sense!)
     check_equals(_root.textVar3, 'Hello');
-    xcheck_equals(_root.textVar1, 'new-string-frame6');
+    check_equals(_root.textVar1, 'new-string-frame6');
   .end
   
 .frame 7
@@ -145,7 +145,7 @@
   .action:
       edtext2.text = 'value_changed';
       check_equals(edtext2.text, 'value_changed');
-      xcheck_equals(textVar4, 'value_changed');
+      check_equals(textVar4, 'value_changed');
   .end
     
     

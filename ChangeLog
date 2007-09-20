@@ -1,5 +1,19 @@
 2007-09-20 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.{cpp,h}: add an updateText method
+	  intended to be called by sprite_instance when a registered
+	  text variable is updated; have set_text_value forward the 
+	  text change back to the sprite_instance where any 
+	  variable name is registered, for proper distribution of
+	  the new text to any other TextField registered with the
+	  same variable.
+	* server/sprite_instance.cpp (set_text_value): use the new
+	  updateText to update TextField text when variable name is
+	  updated.
+	* testsuite/misc-swfc.all/edittext_test1.sc: more successes.
+
+2007-09-20 Sandro Santilli <strk@keybit.net>
+
 	* server/edit_text_character.{cpp,h}: define a private method
 	  to parse the text variable into a sprite_instance and property name
 	  components, to be used later to update the state of a registered

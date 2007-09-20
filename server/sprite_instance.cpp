@@ -2209,7 +2209,7 @@ void sprite_instance::set_member(string_table::key name,
 		for (TextFieldPtrVect::iterator i=etc->begin(), e=etc->end(); i!=e; ++i)
 		{
 			TextFieldPtr tf = *i;
-			tf->set_text_value(val.to_string(env).c_str());
+			tf->updateText(val.to_string(env));
 		}
 	}
 #ifdef DEBUG_DYNTEXT_VARIABLES

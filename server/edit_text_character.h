@@ -96,7 +96,17 @@ public:
 	void set_variable_name(const std::string& newname);
 
 	/// Set our text to the given string.
+	//
+	/// This function will also update any registered variable
+	///
 	void	set_text_value(const char* new_text);
+
+	/// Set our text to the given string by effect of an update of a registered variable name
+	//
+	/// This cal only updates the text and is only meant to be called by ourselves
+	/// or by sprite_instance when a registered TextVariable is updated.
+	///
+	void updateText(const std::string& s);
 
  	/// Return value of our text.
 	std::string get_text_value() const;
