@@ -65,7 +65,7 @@ public:
 			int depth = ch->get_depth();
 			if ( ! depths.insert(depth).second )
 			{
-				log_debug("Depth %d is duplicated in DisplayList %p", depth, (void*)this);
+				log_debug("Depth %d is duplicated in DisplayList %p", depth, (const void*)this);
 				abort();
 			}
 		}

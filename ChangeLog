@@ -1,5 +1,7 @@
 2007-09-21 Sandro Santilli <strk@keybit.net>
 
+	* server/dlist.h (testInvariant): fix a cast discarding const
+	  qualifier.
 	* server/sprite_instance.cpp (execute_frame_tags): optimized
 	  execution loop and avoid calling both execute_state and 
 	  execute_action (this is propedeutic for DoInitAction possibly
