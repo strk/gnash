@@ -18,7 +18,7 @@
  */ 
 
 /*
- *	zou lunkai,  zoulunkai@gmail.com
+ *  zou lunkai,  zoulunkai@gmail.com
  *  
  *  Testcase for Object.registerClass().
  *
@@ -46,9 +46,9 @@ int
 main(int argc, char** argv)
 {
   SWFMovie mo;
-  SWFMovieClip  mc1, mc2, dejagnuclip;
-  SWFShape  sh1, sh2;
-  SWFDisplayItem it1, it2;
+  SWFMovieClip  mc1, mc2, mc3, dejagnuclip;
+  SWFShape  sh1, sh2, sh3;
+  SWFDisplayItem it1, it2, it3;
   const char *srcdir=".";
 
   if ( argc>1 ) srcdir=argv[1];
@@ -120,9 +120,44 @@ main(int argc, char** argv)
   // clip2 does not inherit MovieClip
   check_equals(mo, "clip2.getDepth()", "undefined");
 
-  add_actions(mo, "totals(); stop();");
   SWFMovie_nextFrame(mo); /* end of frame2 */
 
+
+ 
+  // Define movieclip mc2
+  mc3 = newSWFMovieClip();
+  sh3 = make_fill_square (0, 300, 100, 100, 255, 255, 0, 255, 255, 0);
+  SWFMovieClip_add(mc3, (SWFBlock)sh3);
+  
+  addExport(mo, mc2, "libItem3");  
+  
+  it3 = SWFMovie_add(mo, mc3);
+  SWFDisplayItem_addAction(it3,
+    newSWFAction(" _root.note('mc3.onClipInitialize'); " 
+                 " _root.xcheck_equals(typeof(_root.clip3), 'movieclip');" 
+                 " _root.xcheck_equals(_root.clip3.__proto__, _root.theClass3.prototype);" 
+                 ),
+    SWFACTION_INIT);
+    
+  SWFDisplayItem_addAction(it3,
+    newSWFAction(" _root.note('mc3.onClipConstruct'); "
+                 " _root.xcheck_equals(typeof(_root.clip3), 'movieclip'); "
+                 // this one is passed by luck at the moment, both are undefined for Gnash
+                 " _root.check_equals(_root.clip3.__proto__, _root.theClass3.prototype);"
+                ),
+    SWFACTION_CONSTRUCT);
+
+  // add init actions for mc3
+  add_clip_init_actions(mc3, " _root.note('initactions for mc3'); "
+                             " theClass3 = function () {}; "
+                             " theClass3.prototype = new MovieClip(); "
+                             " Object.registerClass('libItem3', theClass3); "
+                             " _root.attachMovie('libItem3', 'clip3', 30); ");
+  SWFMovieClip_nextFrame(mc3);
+  
+  add_actions(mo, "totals(); stop();");
+  SWFMovie_nextFrame(mo); /* end of frame4 */
+     
  /*****************************************************
   *
   * Output movie
