@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler_tri.cpp,v 1.21 2007/09/04 02:12:55 cmusick Exp $ */
+/* $Id: render_handler_tri.cpp,v 1.22 2007/09/21 20:18:40 bjacques Exp $ */
 
 #include "render_handler_tri.h"
 
@@ -32,24 +32,33 @@
 
 #include "log.h"
 
+#include <boost/scoped_array.hpp>
+
 namespace gnash {
 
-// helper function for tri_cache_manager
-static int	sort_by_decreasing_error(const void* A, const void* B)
+bool SortByDecreasingError(const mesh_set& lhs, const mesh_set& rhs)
 {
-  const mesh_set*	a = *(const mesh_set* const *) A;
-  const mesh_set*	b = *(const mesh_set* const *) B;
-  float atol = a->get_error_tolerance(); 
-  float btol = b->get_error_tolerance(); 
+  float ltol = lhs.get_error_tolerance(); 
+  float rtol = rhs.get_error_tolerance(); 
   
-  if (atol < btol) {
-    return 1;
-  } else if (atol > btol) {
-    return -1;
-  } else {
-    return 0;
-  }
+  return ltol < rtol;
 }
+
+/// Takes a vector and copies all the values into an array. The array's memory
+/// is guaranteed to be contiguous, unlike the vector's.
+template <typename T>
+void vector_to_array(const std::vector<T>& vec, boost::scoped_array<T>& array)
+{
+  using namespace boost;
+  size_t vec_size = vec.size();
+  
+  array.reset(new T[vec_size]);
+  
+  for (size_t i = 0; i < vec_size; i++) {
+    array[i] = vec[i];
+  }  
+}
+
 
 //------------------------------------------------------------------------------
 
@@ -57,8 +66,8 @@ mesh_set* tri_cache_manager::search_candidate(float max_error)  {
 
   for (unsigned int i=0,n=m_cached_meshes.size(); i<n; i++) {
   
-    mesh_set* candidate = m_cached_meshes[i];
-    float candidate_etol = candidate->get_error_tolerance();
+    mesh_set& candidate = m_cached_meshes[i];
+    float candidate_etol = candidate.get_error_tolerance();
   
     if (max_error > candidate_etol * 3.0f) {
       // Mesh is too high-res; the remaining meshes are higher res,
@@ -68,7 +77,7 @@ mesh_set* tri_cache_manager::search_candidate(float max_error)  {
     
     if (max_error > candidate_etol) {
       // found it!
-      return candidate;
+      return &candidate;
     }
   
   } // for
@@ -81,7 +90,7 @@ mesh_set* tri_cache_manager::search_candidate(float max_error)  {
   
 /// Adds a mesh set to the cache. 
 void tri_cache_manager::add(mesh_set* m) {
-  m_cached_meshes.push_back(m);
+  m_cached_meshes.push_back(*m);
   sort_and_clean_meshes();
 } // add
 
@@ -91,20 +100,16 @@ void tri_cache_manager::add(mesh_set* m) {
 void tri_cache_manager::sort_and_clean_meshes() {
 
   // Re-sort.
-  if (m_cached_meshes.size() > 0) {
-  
-    qsort(
-      &m_cached_meshes[0],
-      m_cached_meshes.size(),
-      sizeof(m_cached_meshes[0]),
-      sort_by_decreasing_error
-    );
-  
-    // TODO: The cache will grow forever, without any limit. Add code that
-    // limits the vector to a certain size. The older Gnash implementation
-    // appears to never have removed unused cache objects!
-  
+  if (!m_cached_meshes.size()) {
+    return;
   }
+  
+  std::sort(m_cached_meshes.begin(), m_cached_meshes.end(),
+            SortByDecreasingError);
+
+  // TODO: The cache will grow forever, without any limit. Add code that
+  // limits the vector to a certain size. The older Gnash implementation
+  // appears to never have removed unused cache objects!
   
   // Sort check omitted!
 
@@ -194,8 +199,11 @@ void triangulating_render_handler::draw_mesh_set(const mesh_set& m,
     if (!the_mesh.m_triangle_strip.size()) continue; // nothing to draw
     
     apply_fill_style(the_style, 0, ratio);
-    draw_mesh_strip(&the_mesh.m_triangle_strip[0], 
-      the_mesh.m_triangle_strip.size() / 2);   
+    
+    boost::scoped_array<int16_t> coords;
+    vector_to_array(the_mesh.m_triangle_strip, coords);
+    
+    draw_mesh_strip(coords.get(), the_mesh.m_triangle_strip.size() / 2);
   }
   
   // draw outlines
@@ -208,7 +216,10 @@ void triangulating_render_handler::draw_mesh_set(const mesh_set& m,
     assert((strip.m_coords.size() & 1) == 0);
     apply_line_style(line_styles[style], ratio);
     
-    draw_line_strip(&strip.m_coords[0], strip.m_coords.size() >> 1);
+    boost::scoped_array<int16_t> coords;
+    vector_to_array(strip.m_coords, coords);
+    
+    draw_line_strip(coords.get(), strip.m_coords.size() / 2);
   }
     
   
@@ -341,7 +352,7 @@ tri_cache_manager* triangulating_render_handler::get_cache_of(character_def* def
     def->m_render_cache = new tri_cache_manager;
   }
   
-  return (tri_cache_manager*) def->m_render_cache;
+  return static_cast<tri_cache_manager*> (def->m_render_cache);
 
 } // get_cache_of
  
@@ -364,11 +375,6 @@ triangulating_render_handler::pixel_to_world(int x, int y)
 
 tri_cache_manager::~tri_cache_manager()
 {
-	for (MeshSetList::iterator i=m_cached_meshes.begin(), e=m_cached_meshes.end();
-			i != e; ++i)
-	{
-		delete *i;
-	}
 }
 
 

@@ -1,3 +1,12 @@
+2007-09-21 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler_tri.{cpp,h}: Don't assume the
+	elements in a std::vector are stored in contiguous memory.
+	Whenver that must be true, copy the elements into a new
+	block of memory. Store mesh_sets in the cache as non-
+	pointer types, so we get automatic memory management. Use
+	std::sort rather than qsort on the cache vector.
+
 2007-09-21 Chad Musick <chadmusick@msbx.net>
 
 	* libbase/tu_file.h: Add support for reading 64-bit doubles.

@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler_tri.h,v 1.15 2007/08/23 09:53:03 udog Exp $ */
+/* $Id: render_handler_tri.h,v 1.16 2007/09/21 20:18:41 bjacques Exp $ */
 
 #ifndef GNASH_RENDER_HANDLER_TRI_H
 #define GNASH_RENDER_HANDLER_TRI_H
@@ -57,7 +57,7 @@ private:
   ///
   /// This instance owns the mesh_sets
   ///
-  typedef std::vector <mesh_set*> MeshSetList;
+  typedef std::vector <mesh_set> MeshSetList;
   MeshSetList m_cached_meshes;
   
 public:  
