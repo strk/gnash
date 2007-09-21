@@ -225,7 +225,7 @@
 //
 .frame 12
   .sprite mc61  // Define a movieclip
-    .frame 1  b3
+    .frame 1  .put b3
   .end
   
   .sprite mc6
@@ -245,11 +245,16 @@
     _root.check_equals(typeof(mc6), 'movieclip');
     _root.check_equals(typeof(mc6.mc61), 'movieclip');
     _root.check_equals(typeof(mc7), 'movieclip');
+    _root.check_equals(typeof(mc7.mc71), 'movieclip');
     _root.check_equals(this, _root); // target is the root !
   .end
   
+  .sprite mc71
+  	.frame 1  .put b3
+  .end
+  
   .sprite mc7  // Define a movieclip
-    .frame 1  b3
+    .frame 1  .put mc71
   .end
   
   .put mc7    // Place the movieclip
