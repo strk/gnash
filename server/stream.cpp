@@ -254,6 +254,13 @@ namespace gnash {
 		return static_cast<float> (m_input->read_le32());
 	}
 
+	// Read a 64-bit double value
+	long double stream::read_d64()
+	{
+		align();
+		return m_input->read_le_double64();
+	}
+
 	uint8_t	stream::read_u8() { align(); return m_input->read_byte(); }
 	int8_t	stream::read_s8() { align(); return m_input->read_byte(); }
 	uint16_t	stream::read_u16()

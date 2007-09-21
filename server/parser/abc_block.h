@@ -23,11 +23,11 @@
 
 #include <vector>
 #include <string>
+#include <boost/scoped_array.hpp>
 
 #include "gnash.h"
 #include "stream.h"
 #include "string_table.h"
-
 #include "Namespace.h"
 
 namespace gnash {
@@ -89,7 +89,6 @@ public:
 	std::vector<abc_Multiname*> mParameters; // The types, not the names.
 	uint8_t mFlags;
 	std::vector<optional_parameter> mOptionalParameters;
-
 };
 
 class abc_Instance
@@ -141,6 +140,39 @@ public:
 	bool read(stream* in);
 };
 
+class abc_Class
+{
+public:
+	abc_Method *mMethod;
+	std::vector<abc_Trait> mTraits;
+};
+
+class abc_Script
+{
+public:
+	abc_Method *mMethod;
+	std::vector<abc_Trait> mTraits;
+};
+
+class abc_Exception
+{
+public:
+	uint32_t mStart;
+	uint32_t mEnd;
+	uint32_t mCatch;
+	abc_Multiname* mType;
+	abc_Multiname* mName;
+};
+
+class abc_MethodBody
+{
+public:
+	abc_Method *mMethod;
+	std::vector<abc_Exception> mExceptions;
+	std::vector<abc_Trait> mTraits;
+	std::vector<char> mCode;
+};
+
 }; // namespace abc_parsing
 
 typedef std::vector<Namespace*> NamespaceSet;
@@ -158,17 +190,16 @@ private:
 	std::vector<abc_parsing::abc_Method> mMethods;
 	std::vector<abc_parsing::abc_Multiname> mMultinamePool;
 	std::vector<abc_parsing::abc_Instance> mInstances;
-	std::vector<uint32_t> mClasses; // TODO: Fix this.
-	std::vector<uint32_t> mScripts; // TODO: Fix this.
-	std::vector<uint32_t> mBodies; // TODO: Fix this.
+	std::vector<abc_parsing::abc_Class> mClasses; 
+	std::vector<abc_parsing::abc_Script> mScripts;
+	std::vector<abc_parsing::abc_MethodBody> mBodies;
 
 	string_table* mStringTable;
 
 public:
-	int32_t poolInteger(uint32_t index) const;
-	uint32_t poolUInteger(uint32_t index) const;
-	
 	bool read(stream* in);
+
+	abc_block();
 };
 
 }; /* namespace gnash */

@@ -72,6 +72,10 @@ namespace gnash {
 		float	read_float();
 
 		/// \brief
+		/// Read 64-bit double values.
+		long double read_d64();
+
+		/// \brief
 		/// Discard any left-over bits from previous bit reads
 		void	align()
 		{
@@ -107,6 +111,44 @@ namespace gnash {
 		/// \brief
 		/// Read a aligned signed 32-bit value from the stream.		
 		int32_t  read_s32();
+
+		/// \brief
+		/// Read a variable length unsigned 32-bit value from the stream.
+		/// These values continue until either the high bit is not set or
+		/// until 5 bytes have been read.
+		uint32_t read_V32()
+		{
+			uint32_t res = read_u8();
+			if (!(res & 0x00000080))
+				return res;
+			res = (res & 0x0000007F) | read_u8() << 7;
+			if (!(res & 0x00004000))
+				return res;
+			res = (res & 0x00003FFF) | read_u8() << 14;
+			if (!(res & 0x00200000))
+				return res;
+			res = (res & 0x001FFFFF) | read_u8() << 21;
+			if (!(res & 0x10000000))
+				return res;
+			res = (res & 0x0FFFFFFF) | read_u8() << 28;
+			return res;
+		}
+
+		/// \brief
+		/// Skip a variable length unsigned 32-bit value in the stream.
+		/// This is faster than doing the bitwise arithmetic of full reading.
+		void skip_V32()
+		{
+			if (!(read_u8() & 0x80))
+				return;
+			if (!(read_u8() & 0x80))
+				return;
+			if (!(read_u8() & 0x80))
+				return;
+			if (!(read_u8() & 0x80))
+				return;
+			static_cast<void> (read_u8());
+		}
 
 		/// \brief
 		/// Read a length in a byte or three.

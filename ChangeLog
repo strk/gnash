@@ -1,3 +1,12 @@
+2007-09-21 Chad Musick <chadmusick@msbx.net>
+
+	* libbase/tu_file.h: Add support for reading 64-bit doubles.
+	* server/impl.cpp: Add abc_loader to list of loaders.
+	* server/stream.cpp,.h: Support necessary read types for AS3.
+	* server/parser/Makefile.am: Add new files
+	* server/parser/abc_block.cpp,.h: Changes to parse AS3.
+	* server/swf/tag_loaders.cpp,.h: Loader for action block (AS3)
+
 2007-09-21 Sandro Santilli <strk@keybit.net>
 
 	* server/dlist.h (testInvariant): fix a cast discarding const

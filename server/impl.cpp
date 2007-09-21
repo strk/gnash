@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.120 2007/09/19 14:20:49 cmusick Exp $ */
+/* $Id: impl.cpp,v 1.121 2007/09/21 13:40:31 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -251,7 +251,7 @@ static void	ensure_loaders_registered()
 	register_tag_loader(SWF::PLACEOBJECT3, PlaceObject2Tag::loader); // 70
 	register_tag_loader(SWF::IMPORTASSETS2, import_loader); // 71
 
-        register_tag_loader(SWF::DOABC, fixme_loader); // 72 -- AS3 codeblock.
+        register_tag_loader(SWF::DOABC, abc_loader); // 72 -- AS3 codeblock.
 	register_tag_loader(SWF::DEFINEALIGNZONES, DefineFontAlignZonesTag::loader); // 73
 
 	register_tag_loader(SWF::CSMTEXTSETTINGS, fixme_loader); // 74
@@ -259,7 +259,7 @@ static void	ensure_loaders_registered()
         register_tag_loader(SWF::SYMBOLCLASS, fixme_loader); // 76 
 	register_tag_loader(SWF::METADATA, metadata_loader); // 77
 	register_tag_loader(SWF::DEFINESCALINGGRID, fixme_loader); // 78
-        register_tag_loader(SWF::DOABCDEFINE, fixme_loader); // 79 -- AS3 codeblock.
+        register_tag_loader(SWF::DOABCDEFINE, abc_loader); // 82 -- AS3 codeblock.
 	register_tag_loader(SWF::DEFINESHAPE4, define_shape_loader); // 83
 	register_tag_loader(SWF::DEFINEMORPHSHAPE2, define_shape_morph_loader); // 84
 

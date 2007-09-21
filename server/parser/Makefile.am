@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.37 2007/07/01 10:54:33 bjacques Exp $
+# $Id: Makefile.am,v 1.38 2007/09/21 13:40:32 cmusick Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -45,6 +45,7 @@ AM_CPPFLAGS = \
 	$(NULL)
 
 libgnashparser_la_SOURCES = \
+	abc_block.cpp \
 	action_buffer.cpp \
 	bitmap_character_def.cpp \
 	BitmapMovieDefinition.cpp \
@@ -61,6 +62,7 @@ libgnashparser_la_SOURCES = \
 
 noinst_HEADERS = \
 	Timeline.h	\
+	abc_block.h \
 	action_buffer.h \
 	button_character_def.h \
 	character_def.h	\
@@ -71,6 +73,7 @@ noinst_HEADERS = \
 	morph2_character_def.h \
 	movie_definition.h \
 	movie_def_impl.h \
+	Namespace.h \
 	shape_character_def.h \
 	sound_definition.h \
 	sprite_definition.h \
