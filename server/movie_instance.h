@@ -65,14 +65,14 @@ public:
 		return const_cast<movie_instance*>(this);
 	}
 
-	/// Construct a top-level movie
+	/// Handle a top-level movie on stage placement.
 	//
 	/// This method will just ensure first frame is loaded
-	/// and then call sprite_instance::construct.
+	/// and then call sprite_instance::stagePlacementCallback.
 	///
 	/// It's intended to be called by movie_root::setLevel().
 	///
-	void construct();
+	void stagePlacementCallback();
 
 private:
 

@@ -796,10 +796,10 @@ button_character_instance::get_relative_target(const std::string& name)
 }
 
 void
-button_character_instance::construct()
+button_character_instance::stagePlacementCallback()
 {
-    // Register this button instance as a live character
-    _vm.getRoot().addLiveChar(this);
+	// Register this button instance as a live character
+	_vm.getRoot().addLiveChar(this);
 
 	size_t r, r_num =  m_def->m_button_records.size();
 	m_record_character.resize(r_num);
@@ -813,7 +813,7 @@ button_character_instance::construct()
 
 		// we don't need an id here, do we ?
 		boost::intrusive_ptr<character> ch = bdef.m_character_def->create_character_instance(this, 0);
-		ch->construct(); // give this character life
+		ch->stagePlacementCallback(); // give this character life (TODO: they aren't on stage, are them ?)
 		m_record_character[r] = ch;
 		ch->set_matrix(mat);
 		ch->set_cxform(cx);

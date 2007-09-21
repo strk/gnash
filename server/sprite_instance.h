@@ -377,21 +377,24 @@ public:
 	///
 	bool attachCharacter(character& newch, int depth);
 
-	/// Construct this instance as an ActionScript object.
+	/// Handle placement event
 	//
-	/// This function must be called when the sprite is placed on
-	/// stage for the first time. It will take care of invoking
-	/// the constructor of its associated class, either MovieClip
-	/// or any user-specified one (see sprite_definition::registerClass).
+	/// This callback will (not known to be a problem):
 	///
-	/// Make sure this sprite got an instance name before calling
-	/// this method (it's needed for properly setting the "this" pointer
-	/// when calling user-defined constructors).
+	/// (1) Register ourselves with the global instance list
+	/// (2) Take note of our original target path
+	/// (3) Register as listener of core broadcasters
+	/// (4) Execute tags of frame 0
 	///
-	/// TODO: check if we only need to construct "named" instances
-	/// TODO: possibly have this function call the onConstruct() event handler
+	/// The callback will also (known to be bogus):
+	//
+	/// (1) Invoke the onClipConstruct and onConstruct handlers
+	///     [ too early for handlers to refer to childs, should be queued eventually ]
+	/// (2) Invoke constructor of its associated class, either MovieClip
+	///     or any user-specified one (see sprite_definition::registerClass).
+	///	[ too early, init actions might not have had a chance to call registerClass ]
 	///
-	virtual void construct();
+	virtual void stagePlacementCallback();
 
 	/// Unload all contents in the displaylist and this instance
 	/// See character::unload for more info

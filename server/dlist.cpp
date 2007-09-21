@@ -235,7 +235,7 @@ DisplayList::place_character(
 	}
 
 	// Give life to this instance
-	ch->construct();
+	ch->stagePlacementCallback();
 
 	testInvariant();
 }
@@ -360,7 +360,7 @@ DisplayList::replace_character(
 		// WARNING: when a new Button character is added,
 		//          the invalidated bounds computation will likely
 		//          be bogus, as the actual character shown is not instantiated
-		//          until ::construct for buttons (I'd say this is a bug in button_character_instance)
+		//          until ::stagePlacementCallback for buttons (I'd say this is a bug in button_character_instance)
 		//          UdoG, following ? 
 		//
 		ch->extend_invalidated_bounds(old_ranges);				
@@ -368,7 +368,7 @@ DisplayList::replace_character(
 	}
 
 	// Give life to this instance
-	ch->construct();
+	ch->stagePlacementCallback();
 
 	testInvariant();
 }

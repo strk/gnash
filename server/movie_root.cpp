@@ -130,8 +130,8 @@ movie_root::setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movi
 		(int) movie->get_movie_definition()->get_width_pixels(),
 		(int) movie->get_movie_definition()->get_height_pixels());
 
-	/// Give life to this instance
-	movie->construct();
+	/// Notify placement 
+	movie->stagePlacementCallback();
 
 	assert(testInvariant());
 }
@@ -200,13 +200,13 @@ movie_root::restart()
 	// TODO: instead, take it's definition and re-instantiate
 	// a new movie here ! The only problem would be re-setting
 	// externally set variables
-	level0->restart(); // NOTE: restart() will call construct
+	level0->restart(); 
 
 	// Add level0 back in place
-	// NOTE: we don't call setLevel to avoid calling ::construct again
+	// NOTE: we don't call setLevel to avoid calling ::stagePlacementCallback again
 	_movies[0] = level0; 
 
-	// Process actions queued by restart/construct
+	// Process actions queued by restart/stagePlacementCallback
 	processActionQueue();
 
 	// Delete characters removed from the stage

@@ -3216,8 +3216,9 @@ sprite_instance::registerAsListener()
 // WARNING: THIS SNIPPET NEEDS THE CHARACTER TO BE "INSTANTIATED", which is
 //          it's target path needs to exist, or any as_value for it will be
 //          a dangling reference to an unexistent sprite !
+//          NOTE: this is just due to the wrong steps, see comment in header
 void
-sprite_instance::construct()
+sprite_instance::stagePlacementCallback()
 {
 	assert(!isUnloaded());
 
@@ -3225,8 +3226,8 @@ sprite_instance::construct()
 	log_debug(_("Constructing sprite '%s'"), _origTarget.c_str());
 #endif
 
-    // Register this sprite as a live one
-    _vm.getRoot().addLiveChar(this);
+	// Register this sprite as a live one
+	_vm.getRoot().addLiveChar(this);
 
 	// Take note of our original target (for soft references)
 	_origTarget = getTarget();

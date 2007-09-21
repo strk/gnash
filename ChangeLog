@@ -1,5 +1,15 @@
 2007-09-21 Sandro Santilli <strk@keybit.net>
 
+	* server/character.h, server/dlist.cpp,
+	  server/button_character_instance.{cpp,h},
+	  server/movie_instance.{cpp,h}, server/movie_root.cpp,
+	  server/sprite_instance.{cpp,h},
+	  server/video_stream_instance.{cpp,h}:
+	  Rename character::construct to character::stagePlacementCallback
+	  and update documentation to help clarity.
+
+2007-09-21 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (goto_frame): make
 	  sure m_current_frame always reflect the frame number
 	  in which the control tags being executed were defined.

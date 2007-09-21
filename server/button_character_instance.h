@@ -21,7 +21,7 @@
 
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
-/* $Id: button_character_instance.h,v 1.25 2007/09/13 16:26:13 strk Exp $ */
+/* $Id: button_character_instance.h,v 1.26 2007/09/21 08:29:02 strk Exp $ */
 
 #ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
 #define GNASH_BUTTON_CHARACTER_INSTANCE_H
@@ -146,8 +146,14 @@ public:
 	bool get_enabled();
 	void set_enabled(bool value);
 	
-	/// Properly initialize instance names for contained sprites
-	virtual void construct();
+	/// Receive a stage placement notification
+	//
+	/// This callback will:
+	///
+	/// (1) Register this button instance as a live character
+	/// (2) Setup the state characters calling stagePlacementCallback on all [WRONG]
+	///
+	virtual void stagePlacementCallback();
 
 	/// Properly unload contained characters
 	bool unload();

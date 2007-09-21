@@ -45,7 +45,7 @@ movie_instance::movie_instance(movie_definition* def, character* parent)
 }
 
 void
-movie_instance::construct()
+movie_instance::stagePlacementCallback()
 {
 	//GNASH_REPORT_FUNCTION;
 
@@ -79,8 +79,8 @@ movie_instance::construct()
 		return;
 	}
 
-	// Invoke proper constructor
-	sprite_instance::construct();  
+	// Invoke parent placement event handler
+	sprite_instance::stagePlacementCallback();  
 }
 
 // Advance of an SWF-defined movie instance
