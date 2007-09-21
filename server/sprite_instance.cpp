@@ -2386,6 +2386,8 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 
 	assert(frame < m_def->get_frame_count());
 
+	assert(typeflags);
+
 	const PlayList* playlist = m_def->getPlaylist(frame);
 	if ( playlist )
 	{
@@ -2397,12 +2399,19 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 				getTargetPath().c_str());
 		);
 
-		for (PlayList::const_iterator it=playlist->begin(), itEnd=playlist->end();
-				it != itEnd; ++it)
+		if ( (typeflags&TAG_DLIST) && (typeflags&TAG_ACTION) )
 		{
-			execute_tag* tag = *it;
-			if ( typeflags & TAG_DLIST ) tag->execute_state(this);
-			if ( typeflags & TAG_ACTION ) tag->execute_action(this);
+			std::for_each( playlist->begin(), playlist->end(), boost::bind(&execute_tag::execute, _1, this) );
+		}
+		else if ( typeflags & TAG_DLIST )
+		{
+			assert( ! (typeflags & TAG_ACTION) );
+			std::for_each( playlist->begin(), playlist->end(), boost::bind(&execute_tag::execute_state, _1, this) );
+		}
+		else
+		{
+			assert(typeflags & TAG_ACTION);
+			std::for_each(playlist->begin(), playlist->end(), boost::bind(&execute_tag::execute_action, _1, this));
 		}
 	}
 

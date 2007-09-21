@@ -1,5 +1,12 @@
 2007-09-21 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (execute_frame_tags): optimized
+	  execution loop and avoid calling both execute_state and 
+	  execute_action (this is propedeutic for DoInitAction possibly
+	  needing to execute in both cases).
+
+2007-09-21 Sandro Santilli <strk@keybit.net>
+
 	* server/character.h, server/dlist.cpp,
 	  server/button_character_instance.{cpp,h},
 	  server/movie_instance.{cpp,h}, server/movie_root.cpp,
