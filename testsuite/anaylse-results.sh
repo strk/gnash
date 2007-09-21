@@ -107,7 +107,7 @@ if test ${total_fail} -gt 0 || test ${total_xpass} -gt 0; then
 	if test ${total_fail} -gt 0; then
 		echo "Unexpected failures follow:"
 		for s in ${suitefail}; do
-			echo -n "	${s}: "
+			echo " --=[ ${s} ]=-- "
 			grep -w FAIL ${s}/testrun.sum;
 		done
 		echo
@@ -116,7 +116,7 @@ if test ${total_fail} -gt 0 || test ${total_xpass} -gt 0; then
 	if test ${total_xpass} -gt 0; then
 		echo "Unexpected successes follow:"
 		for s in ${suitexpass}; do
-			echo -n "	${s}: "
+			echo "--=[ ${s} ]=--- "
 			grep -w XPASS ${s}/testrun.sum; done
 		echo
 	fi
