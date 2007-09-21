@@ -21,9 +21,19 @@
  *
  * Test for DoInitAction tag.
  *
+ * Tags order(compiled with Ming0.4.beta4):
+ *   DefineMovieClip(mc1)
+ *   DoInitAction(mc1)
+ *   PlaceObject2(mc1)
+ *   DefineMovieClip(mc2)
+ *   DoInitAction(mc2);
+ *   PlaceObject2(mc2);
+ *
  * Tests show that the actions order is like this:
  *     mc1.init_actions
+ *     mc1.onClipInitialize
  *     mc2.init_actions
+ *     mc2.onClipInitialize
  *     mc1.onClipConstruct
  *     mc2.onClipConstruct
  *     _root.actions
@@ -67,7 +77,7 @@ main(int argc, char** argv)
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
 
-  add_actions(mo, " _root.x = ''; ");
+  add_actions(mo, " _root.x = '0+'; ");
   SWFMovie_nextFrame(mo); /* 1st frame */
 
 
@@ -80,16 +90,16 @@ main(int argc, char** argv)
                              " y = 'var_of_root'; " );
 
   /* add actions */
-  add_clip_actions(mc1, " _root.note('mc1.actions');  _root.x += '7+'; ");
+  add_clip_actions(mc1, " _root.note('mc1.actions');  _root.x += '9+'; ");
   SWFMovieClip_nextFrame(mc1);//1st frame
 
   mc2 = newSWFMovieClip();
   sh2 = make_fill_square (600, 600, 60, 60, 255, 0, 0, 255, 0, 0);
   SWFMovieClip_add(mc2, (SWFBlock)sh2);
   /* add init actions */
-  add_clip_init_actions(mc2, " _root.note('mc2.init_actions'); _root.x += '2+'; ");
+  add_clip_init_actions(mc2, " _root.note('mc2.init_actions'); _root.x += '3+'; ");
   /* add actions */
-  add_clip_actions(mc2, " _root.note('mc2.actions');  _root.x += '9+'; ");
+  add_clip_actions(mc2, " _root.note('mc2.actions');  _root.x += '11+'; ");
   SWFMovieClip_nextFrame(mc2);//1st frame
   
 
@@ -100,11 +110,15 @@ main(int argc, char** argv)
   SWFDisplayItem_setName(it1, "mc1");
 
   SWFDisplayItem_addAction(it1,
-    newSWFAction(" _root.note('mc1.onClipConstruct');  _root.x += '3+'; "),
+    newSWFAction(" _root.note('mc1.onClipInitialize'); _root.x += '2+'; "),
+    SWFACTION_INIT);
+    
+  SWFDisplayItem_addAction(it1,
+    newSWFAction(" _root.note('mc1.onClipConstruct');  _root.x += '5+'; "),
     SWFACTION_CONSTRUCT);
     
   SWFDisplayItem_addAction(it1,
-    newSWFAction(" _root.note('mc1.onClipLoad');  _root.x += '6+'; "),
+    newSWFAction(" _root.note('mc1.onClipLoad');  _root.x += '8+'; "),
     SWFACTION_ONLOAD);
 
 
@@ -114,17 +128,21 @@ main(int argc, char** argv)
   SWFDisplayItem_setDepth(it2, 11);
   SWFDisplayItem_setName(it2, "mc2");
  
+   SWFDisplayItem_addAction(it2,
+    newSWFAction(" _root.note('mc2.onClipInitialize'); _root.x += '4+'; "),
+    SWFACTION_INIT);
+    
   SWFDisplayItem_addAction(it2,
-    newSWFAction(" _root.note('mc2.onClipConstruct');  _root.x += '4+'; "),
+    newSWFAction(" _root.note('mc2.onClipConstruct');  _root.x += '6+'; "),
     SWFACTION_CONSTRUCT);
     
   SWFDisplayItem_addAction(it2,
-    newSWFAction(" _root.note('mc2.onClipLoad');  _root.x += '8+'; "),
+    newSWFAction(" _root.note('mc2.onClipLoad');  _root.x += '10+'; "),
     SWFACTION_ONLOAD);
     
     
   /* add main timeline actions */
-  add_actions(mo, "_root.note('_root.actions');  _root.x += '5+'; ");
+  add_actions(mo, "_root.note('_root.actions');  _root.x += '7+'; ");
   SWFMovie_nextFrame(mo); /* 2nd frame */
 
   /* The check below used to succeeds, and started failing when
@@ -133,7 +151,7 @@ main(int argc, char** argv)
    * to "after" init actions are executed, which would require
    * some book keeping in sprite_instance class
    */
-  xcheck_equals(mo, "_root.x", "'1+2+3+4+5+6+7+8+9+'");
+  xcheck_equals(mo, "_root.x", "'0+1+2+3+4+5+6+7+8+9+10+11+'");
 
   check_equals(mo, "_root.y", "'var_of_root'");
   add_actions(mo, " _root.totals(); stop(); ");
@@ -146,9 +164,3 @@ main(int argc, char** argv)
 
   return 0;
 }
-
-
-
-
-
-
