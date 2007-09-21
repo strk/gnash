@@ -1,5 +1,11 @@
 2007-09-21 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (goto_frame): make
+	  sure m_current_frame always reflect the frame number
+	  in which the control tags being executed were defined.
+
+2007-09-21 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/action.cpp (call_method): add more info to the exception
 	  derived from attempts to call a value which is neither a C nor an AS
 	  function.

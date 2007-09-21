@@ -2548,14 +2548,15 @@ sprite_instance::goto_frame(size_t target_frame_number)
     {
         // We'd immediately return if target_frame_number == m_current_frame
         assert(target_frame_number > m_current_frame);
-        for (size_t f = m_current_frame+1; f<target_frame_number; ++f)
-        {
+	while (++m_current_frame < target_frame_number)
+	{
+            //for (size_t f = m_current_frame+1; f<target_frame_number; ++f) 
             // Second argument requests that only "DisplayList" tags
             // are executed. This means NO actions will be
             // pushed on m_action_list.
-            execute_frame_tags(f, TAG_DLIST);
+            execute_frame_tags(m_current_frame, TAG_DLIST);
         }
-        m_current_frame = target_frame_number;
+        assert(m_current_frame == target_frame_number);
 
 #if defined(GNASH_DEBUG_TIMELINE)
     cout << "At end of DisplayList reconstruction, m_current_frame is " << m_current_frame << endl;
