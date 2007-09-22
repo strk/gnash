@@ -1,5 +1,8 @@
 2007-09-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/init_action_test.c:
+	  Test that prototype of sprites have been set up to MovieClip one
+	  at time of onClipInitialize call.
 	* testsuite/misc-swfc.all/movieclip_destruction_test1.swf:
 	  Test that just-placed sprites (at time of init actions execution)
 	  are instances of Object, not MovieClip !!

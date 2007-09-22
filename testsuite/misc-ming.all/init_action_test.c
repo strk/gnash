@@ -110,7 +110,9 @@ main(int argc, char** argv)
   SWFDisplayItem_setName(it1, "mc1");
 
   SWFDisplayItem_addAction(it1,
-    newSWFAction(" _root.note('mc1.onClipInitialize'); _root.x += '2+'; "),
+    newSWFAction(" _root.note('mc1.onClipInitialize'); _root.x += '2+'; "
+	"_root.check_equals(this.__proto__, MovieClip.prototype);"
+	),
     SWFACTION_INIT);
     
   SWFDisplayItem_addAction(it1,
