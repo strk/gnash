@@ -141,7 +141,7 @@ main(int argc, char** argv)
     
   SWFDisplayItem_addAction(it3,
     newSWFAction(" _root.note('mc3.onClipConstruct'); "
-                 " _root.xcheck_equals(typeof(_root.clip3), 'movieclip'); "
+                 " _root.check_equals(typeof(_root.clip3), 'movieclip'); "
                  // this one is passed by luck at the moment, both are undefined for Gnash
                  " _root.check_equals(_root.clip3.__proto__, _root.theClass3.prototype);"
                 ),

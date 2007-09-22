@@ -1,3 +1,10 @@
+2007-09-22 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/registerClassTest2.c,
+	  testsuite/misc-swfc.all/movieclip_destruction_test1.sc:
+	  Expect the failures and the success introduced by reverting
+	  the change which broke youtube.
+
 2007-09-22 Chad Musick <chadmusick@msbx.net>
 
 	* server/parser/abc_block.cpp: Change data() to &...front() since
