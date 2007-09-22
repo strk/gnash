@@ -1,5 +1,7 @@
 2007-09-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfc.all/movieclip_destruction_test1.sc: remove
+	  redundant test.
 	* server/sprite_instance.cpp (execute_frame_tags): revert the 
 	  change in init action execution which blew up youtube.
 	  We get more unexpected failures then unexpected succeses with

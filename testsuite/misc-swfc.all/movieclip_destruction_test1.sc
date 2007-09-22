@@ -135,7 +135,6 @@
   
   .initaction mc3: // Add initactions for mc3(mc3 is not placed)
     _root.initActionExecuted += ", mc3";
-    _root.check_equals(mc1, null);
     _root.check_equals(typeof(mc1), 'undefined');
     _root.check_equals(typeof(_root.getInstanceAtDepth(-16386)), 'undefined');
   .end
