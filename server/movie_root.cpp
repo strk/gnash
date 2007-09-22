@@ -1090,9 +1090,10 @@ movie_root::processActionQueue()
 	// and a final call to .clear() 
 	while ( ! _actionQueue.empty() )
 	{
-		ExecutableCode& code = *(_actionQueue.front());
-		code.execute();
+		ExecutableCode* code = _actionQueue.front();
+		code->execute();
 		_actionQueue.pop_front(); 
+		delete code;
 	}
 
 	assert(_actionQueue.empty());

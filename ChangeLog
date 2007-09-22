@@ -1,3 +1,8 @@
+2007-09-22 Sandro Santilli <strk@keybit.net>
+
+	* server/movie_root.cpp (processQueuedActions): fix a memory leak.
+	  Thanks dli on #gnash for finding out.
+
 2007-09-21 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/render_handler_tri.{cpp,h}: Don't assume the
