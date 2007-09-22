@@ -9,7 +9,7 @@
     trace("Hello World!");
     var abc = 123;
     check_equals(abc, 123);  // check something is equal
-    xcheck_equals(abc, 456); // check something is equal, but expect it to fail
+    //xcheck_equals(abc, 456); // check something is equal, but expect gnash it to fail
     var qux = true;
     check(qux); // check a boolean is true
     Dejagnu.done(); // don't forget to call this, or the test will not complete
