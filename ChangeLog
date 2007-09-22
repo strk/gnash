@@ -1,3 +1,8 @@
+2007-09-22 Chad Musick <chadmusick@msbx.net>
+
+	* server/parser/abc_block.cpp: Change data() to &...front() since
+	  data() is not standard.
+
 2007-09-22 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-swfc.all/Dejagnu.sc: add 2 args to the totals()

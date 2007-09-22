@@ -556,7 +556,7 @@ abc_block::read(stream* in)
 		// And the code:
 		method.mCode.resize(code_length);
 		unsigned int got_length;
-		if ((got_length = in->read(method.mCode.data(), code_length)) != code_length)
+		if ((got_length = in->read(&method.mCode.front(), code_length)) != code_length)
 		{
 			ERR((_("Action Block: Not enough body. Wanted %d but got %d.\n"),
 				code_length, got_length));
