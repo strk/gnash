@@ -53,7 +53,23 @@
                 trace (msg);
             },
 
-            totals: function () {
+            totals: function (expectedTestsRun, msg) {
+		if ( arguments.length > 1 )
+		{
+			ttr = 0;
+			if ( this.passed ) ttr += this.passed;
+			if ( this.failed ) ttr += this.failed;
+			if ( this.xpassed ) ttr += this.xpassed;
+			if ( this.xfailed ) ttr += this.xfailed;
+			if ( this.untest ) ttr += this.untest;
+			if ( this.unresolv ) ttr += this.unresolv;
+			this.note("Total tests run: "+ttr+" typeof expected: "+typeof(expectedTestsRun));
+
+			if ( expectedTestsRun != ttr )
+			{
+				this.fail("TOTAL tests run: "+ttr+", expected: "+expectedTestsRun+" ["+msg+"]");
+			}
+		}
                 this.xtrace('#passed: '+ this.passed);
                 this.xtrace('#failed: '+ this.failed);
                 if ( this.xpassed ) {

@@ -1,5 +1,16 @@
 2007-09-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfc.all/Dejagnu.sc: add 2 args to the totals()
+	  call, one if which is expected of tests to be run, if it doesn't
+	  match actual number of tests run will print and record a FAIL
+	  message.
+	* testsuite/misc-swfc.all/check.sc: accept an arg in the totals()
+	  macro to tell how many tests in total are expected to be run.
+	* testsuite/misc-swfc.all/movieclip_destruction_test1.sc: expect
+	  33 tests to be run.
+
+2007-09-22 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-swfc.all/movieclip_destruction_test1.sc: remove
 	  redundant test.
 	* server/sprite_instance.cpp (execute_frame_tags): revert the 

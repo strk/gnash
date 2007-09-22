@@ -287,7 +287,7 @@
   .action:
     _root.check_equals(initActionExecuted, "mc2, mc3, mc61, mc6, mc8");
     stop();
-    totals();
+    totals(33);
   .end
   
 .end  // file end
