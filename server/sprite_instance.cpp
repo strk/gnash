@@ -2388,33 +2388,6 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 
 	assert(typeflags);
 
-	const PlayList* playlist = m_def->getPlaylist(frame);
-	if ( playlist )
-	{
-		IF_VERBOSE_ACTION(
-			// Use 1-based frame numbers
-			log_action(_("Executing " SIZET_FMT " tags in frame "
-				SIZET_FMT "/" SIZET_FMT " of sprite %s"),
-				playlist->size(), frame+1, get_frame_count(),
-				getTargetPath().c_str());
-		);
-
-		if ( (typeflags&TAG_DLIST) && (typeflags&TAG_ACTION) )
-		{
-			std::for_each( playlist->begin(), playlist->end(), boost::bind(&execute_tag::execute, _1, this) );
-		}
-		else if ( typeflags & TAG_DLIST )
-		{
-			assert( ! (typeflags & TAG_ACTION) );
-			std::for_each( playlist->begin(), playlist->end(), boost::bind(&execute_tag::execute_state, _1, this) );
-		}
-		else
-		{
-			assert(typeflags & TAG_ACTION);
-			std::for_each(playlist->begin(), playlist->end(), boost::bind(&execute_tag::execute_action, _1, this));
-		}
-	}
-
 	// Execute this frame's init actions, if necessary.
 	if (m_init_actions_executed[frame] == false)
 	{
@@ -2447,6 +2420,34 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 		}
 	}
 
+
+
+	const PlayList* playlist = m_def->getPlaylist(frame);
+	if ( playlist )
+	{
+		IF_VERBOSE_ACTION(
+			// Use 1-based frame numbers
+			log_action(_("Executing " SIZET_FMT " tags in frame "
+				SIZET_FMT "/" SIZET_FMT " of sprite %s"),
+				playlist->size(), frame+1, get_frame_count(),
+				getTargetPath().c_str());
+		);
+
+		if ( (typeflags&TAG_DLIST) && (typeflags&TAG_ACTION) )
+		{
+			std::for_each( playlist->begin(), playlist->end(), boost::bind(&execute_tag::execute, _1, this) );
+		}
+		else if ( typeflags & TAG_DLIST )
+		{
+			assert( ! (typeflags & TAG_ACTION) );
+			std::for_each( playlist->begin(), playlist->end(), boost::bind(&execute_tag::execute_state, _1, this) );
+		}
+		else
+		{
+			assert(typeflags & TAG_ACTION);
+			std::for_each(playlist->begin(), playlist->end(), boost::bind(&execute_tag::execute_action, _1, this));
+		}
+	}
 
 	testInvariant();
 }

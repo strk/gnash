@@ -1,5 +1,14 @@
 2007-09-22 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (execute_frame_tags): revert the 
+	  change in init action execution which blew up youtube.
+	  We get more unexpected failures then unexpected succeses with
+	  this, and I won't change them to *expected* for now.
+	  I just felt this patch will limit annoyance to actual users while
+	  we seek a better solution.
+
+2007-09-22 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.cpp (processQueuedActions): fix a memory leak.
 	  Thanks dli on #gnash for finding out.
 
