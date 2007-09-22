@@ -244,11 +244,15 @@
     _root.xcheck_equals(typeof(mc6), 'movieclip'); // Gnash fails because executes init actions before DLIST tags
     _root.xcheck_equals(typeof(mc6.mc61), 'movieclip'); // Gnash fails because executes init actions before DLIST tags
     _root.xcheck_equals(typeof(mc7), 'movieclip'); // Gnash fails because executes init actions before DLIST tags
+    _root.xcheck_equals(mc7.__proto__, Object.prototype); // this is interesting, isn't it ?
     _root.xcheck_equals(typeof(mc7.mc71), 'movieclip'); // Gnash fails because executes init actions before DLIST tags
     _root.check_equals(this, _root); // target is the root !
   .end
   
   .sprite mc71
+	.action:
+          _root.check_equals(this.__proto__, MovieClip.prototype); 
+	.end
   	.frame 1  .put b3
   .end
   
@@ -287,7 +291,7 @@
   .action:
     _root.check_equals(initActionExecuted, "mc2, mc3, mc61, mc6, mc8");
     stop();
-    totals(33);
+    totals(35);
   .end
   
 .end  // file end

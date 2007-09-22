@@ -1,5 +1,11 @@
 2007-09-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfc.all/movieclip_destruction_test1.swf:
+	  Test that just-placed sprites (at time of init actions execution)
+	  are instances of Object, not MovieClip !!
+
+2007-09-22 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (stagePlacementCallback): notify
 	  INITIALIZE event.
 	* testsuite/misc-ming.all/registerClassTest2.c: 2 more successes.
