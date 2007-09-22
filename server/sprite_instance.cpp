@@ -3248,6 +3248,8 @@ sprite_instance::stagePlacementCallback()
 	// We *might* avoid this, but better safe then sorry
 	m_def->ensure_frame_loaded(0);
 
+	on_event(event_id::INITIALIZE);
+
 	// Execute CONSTRUCT event immediately
 	on_event(event_id::CONSTRUCT);
 	if (isUnloaded())

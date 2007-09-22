@@ -134,8 +134,8 @@ main(int argc, char** argv)
   it3 = SWFMovie_add(mo, mc3);
   SWFDisplayItem_addAction(it3,
     newSWFAction(" _root.note('mc3.onClipInitialize'); " 
-                 " _root.xcheck_equals(typeof(_root.clip3), 'movieclip');" 
-                 " _root.xcheck_equals(_root.clip3.__proto__, _root.theClass3.prototype);" 
+                 " _root.check_equals(typeof(_root.clip3), 'movieclip');" 
+                 " _root.check_equals(_root.clip3.__proto__, _root.theClass3.prototype);" 
                  ),
     SWFACTION_INIT);
     

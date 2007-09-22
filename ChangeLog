@@ -1,5 +1,12 @@
 2007-09-22 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (stagePlacementCallback): notify
+	  INITIALIZE event.
+	* testsuite/misc-ming.all/registerClassTest2.c: 2 more successes.
+	* testsuite/swfdec/PASSING: 44 more successes !!
+
+2007-09-22 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/registerClassTest2.c,
 	  testsuite/misc-swfc.all/movieclip_destruction_test1.sc:
 	  Expect the failures and the success introduced by reverting
