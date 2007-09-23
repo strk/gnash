@@ -26,7 +26,21 @@ class string_table; // Forward
 
 /// Named String Values
 //
-/// Long description here...
+/// These are enumerations of the strings which should have known string
+/// table values.  They are the first strings added to the string table,
+/// and the key will be equal to the enumeration.
+///
+/// Lowercase letters in the enum value signal the format of the string
+/// literals associated with these enums.
+/// i: Initial capital for groups which are normally initial lower case.
+/// For example: PROP_iSTAGE is "Stage";
+/// u: An underscore
+/// For example: PROP_uuPROTOuu is "__proto__"
+/// _: The next letter is capitalized
+/// For example: PROP_ON_LOAD is "onLoad"
+///
+/// Names beginning with PROP_ have a lowercase initial letter
+/// Names beginning with CLASS_ have an uppercase initial letter
 ///
 namespace NSV {
 
@@ -97,7 +111,7 @@ typedef enum {
 		PROP_uYMOUSE,
 		PROP_uYSCALE,
 		CLASS_SYSTEM,
-		CLASS_STAGE,
+		CLASS_STAGE = PROP_iSTAGE,
 		CLASS_MOVIE_CLIP,
 		CLASS_TEXT_FIELD,
 		CLASS_MATH,

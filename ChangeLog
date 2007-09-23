@@ -1,5 +1,11 @@
 2007-09-24 Chad Musick <chadmusick@msbx.net>
 
+	* server/namedStrings.h: More documentation,
+	  remove duplicate enumeration
+	* server/namedStrings.cpp: Don't duplicate string "Stage".
+
+2007-09-24 Chad Musick <chadmusick@msbx.net>
+
 	* configure.ac: Add requirement of boost serialization library
 	* macros/boost.m4: Add requirement of boost serialization library
 

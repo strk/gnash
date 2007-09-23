@@ -93,7 +93,7 @@ static string_table::svt preload_names[] =
 	{ "_ymouse", NSV::PROP_uYMOUSE },
 	{ "_yscale", NSV::PROP_uYSCALE },
 	{ "System", NSV::CLASS_SYSTEM },
-	{ "Stage", NSV::CLASS_STAGE },
+//	{ "Stage", NSV::CLASS_STAGE }, // Identical to PROP_iSTAGE
 	{ "MovieClip", NSV::CLASS_MOVIE_CLIP },
 	{ "TextField", NSV::CLASS_TEXT_FIELD },
 	{ "Math", NSV::CLASS_MATH },
