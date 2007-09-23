@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.68 2007/09/11 17:01:23 strk Exp $ */
+/* $Id: Global.cpp,v 1.69 2007/09/23 08:48:18 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -65,6 +65,7 @@
 #include "builtin_function.h"
 #include "edit_text_character.h"
 #include "rc.h"
+#include "ClassHierarchy.h"
 
 #include "fn_call.h"
 #include "sprite_instance.h"
@@ -378,22 +379,28 @@ Global::Global(VM& vm)
 	init_member("setInterval", new builtin_function(timer_setinterval));
 	init_member("clearInterval", new builtin_function(timer_clearinterval));
 
-	// System was added in Player Version 6, but
-	// seem to be available even if SWF target version is
-	// inferior
-	system_class_init(*this); // System and System.capabilities
+// If extensions aren't used, then no extensions will be loaded.
+#ifdef USE_EXTENSIONS
+	ClassHierarchy CH(this, &et);
+#else
+	ClassHierarchy CH(this, NULL);
+#endif
+	CH.massDeclare(vm.getSWFVersion());
 
-	// I find Stage object used in SWF5 movies, don't
-	// see a good reason not to enable this always
-	stage_class_init(*this);
-
+	if (vm.getSWFVersion() >= 5)
+	{
+		object_class_init(*this);
+		array_class_init(*this);
+	}
+	if (vm.getSWFVersion() >= 6)
+	{
+		function_class_init(*this);
+	}
+	
 	if ( vm.getSWFVersion() < 3 ) goto extscan;
 	//-----------------------
 	// SWF3
 	//-----------------------
-
-	movieclip_class_init(*this);
-	textfield_class_init(*this);
 
 	if ( vm.getSWFVersion() < 4 ) goto extscan;
 	//-----------------------
@@ -401,30 +408,12 @@ Global::Global(VM& vm)
 	//-----------------------
 
 	init_member("trace", new builtin_function(as_global_trace));
-	// The methods of the Math class are available
-	// as global methods in SWF4 and as members of
-	// the Math class from SWF5 up
-	math_class_init(*this);
 
 	if ( vm.getSWFVersion() < 5 ) goto extscan;
 	//-----------------------
 	// SWF5
 	//-----------------------
 
-	boolean_class_init(*this);
-	color_class_init(*this);
-	selection_class_init(*this); // Selection
-	sound_class_init(*this);
-    xmlsocket_class_init(*this);
-	date_class_init(*this);
-	xml_class_init(*this);
-	xmlnode_class_init(*this);
-	mouse_class_init(*this);
-	object_class_init(*this);
-	number_class_init(*this); 
-	string_class_init(*this); 
-	array_class_init(*this);
-	key_class_init(*this); // Key
 	init_member("escape", new builtin_function(as_global_escape));
 	init_member("unescape", new builtin_function(as_global_unescape));
 	init_member("parseFloat", new builtin_function(as_global_parsefloat));
@@ -438,39 +427,17 @@ Global::Global(VM& vm)
 	init_member("NaN", as_value(NAN));
 	init_member("Infinity", as_value(INFINITY));
 
-	// TODO: check if this is available in SWF4
-	// (for SWF5 it just exists as a useless function, it seems)
-	AsBroadcaster_init(*this);
-
 	if ( vm.getSWFVersion() < 6 ) goto extscan;
 	//-----------------------
 	// SWF6
 	//-----------------------
-	function_class_init(*this);
-	// See: http://sephiroth.it/reference.php?id=717&cat=1
-	textsnapshot_class_init(*this);
 	init_member("LocalConnection", new builtin_function(localconnection_new));
 	init_member("TextFormat", new builtin_function(textformat_new));
-	video_class_init(*this); // Video
-	camera_class_init(*this); // Camera
-	microphone_class_init(*this); // Microphone
-	sharedobject_class_init(*this);
-	loadvars_class_init(*this);
-	customactions_class_init(*this);
 
 	if ( vm.getSWFVersion() < 7 ) goto extscan;
 	//-----------------------
 	// SWF7
 	//-----------------------
-
-	netconnection_class_init(*this);
-	netstream_class_init(*this);
-	contextmenu_class_init(*this);
-	moviecliploader_class_init(*this);
-	// sephiroth.it refers this to be introduced in SWF7
-	// but empirical checks seem to confirm it's also avaiable in SWF6
-	// if player is >= 7
-	error_class_init(*this);
 
 	if ( vm.getSWFVersion() < 8 ) goto extscan;
 	//-----------------------

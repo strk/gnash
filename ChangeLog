@@ -1,3 +1,33 @@
+2007-09-23 Chad Musick <chadmusick@msbx.net>
+
+	* server/namedStrings.cpp,.h: New files. Move pre-load string
+	  enumeration from as_object and add new enumerations for the
+	  known ActionScript classes.
+	* server/asobj/ClassHierarchy.cpp,.h: New files. Delay loading
+	  ActionScript classes until they are needed.  At the moment,
+	  does not support loading them as extensions, though this is
+	  planned.
+	* server/Makefile.am: Add new files
+	* server/Property.h: Define a new type DestructiveGetterSetterProperty
+	  which servers as a place-holder to allow transparent loading
+	  of resources when the value is fetched.
+	* server/PropertyList.h,.cpp: New functions to allow use of the
+	  (self)Destructive getters.
+	* server/as_function.cpp as_object.cpp,.h as_value.cpp
+	  edit_text_character.cpp movie_root.cpp sprite_instance.cpp
+	  swf_function.cpp textformat.cpp: Change to new string enums.
+	* server/asobj/AsBroadcaster.cpp ContextMenu.cpp NetStream.cpp
+	  Stage.cpp xml.cpp: Change to new string enums.
+	* server/asobj/Global.cpp: Use new ClassHierarchy object to
+	  delay-load actionscript classes, except for Object, Function, Array.
+	* server/asobj/Makefile.am: Add new files
+	* server/parser/abc_block.cpp,.h: More work (still incomplete) on
+	  parsing ActionScript 3.
+	* server/vm/ASHandlers.cpp VM.cpp: Change to new string enums.
+	* testsuite/misc-ming.all/KeyTest-Runner.cpp: Change to new string enums.
+	* libbase/extension.cpp,.h: Add a function to load a library by
+	  naming both the library and the function to be called.
+
 2007-09-22 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/init_action_test.c:

@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: extension.cpp,v 1.13 2007/09/15 17:53:09 rsavoye Exp $ */
+/* $Id: extension.cpp,v 1.14 2007/09/23 08:48:17 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -159,6 +159,34 @@ Extension::initModule(const char *module, as_object &obj)
     }
     
     return true;
+}
+
+bool
+Extension::initModuleWithFunc(const char *module, const char *func,
+	as_object &obj)
+{
+	SharedLib::initentry *symptr;
+	SharedLib *sl;
+
+	log_msg(_("Initializing module: \"%s\""), module);
+
+	if (_plugins[module] == 0) {
+		sl = new SharedLib(module);
+		sl->openLib();
+		_plugins[module] = sl;
+	} else {
+		sl = _plugins[module];
+	}
+
+	symptr = sl->getInitEntry(func);
+
+	if (symptr) {
+		symptr(obj);
+	} else {
+		log_error(_("Couldn't get class_init symbol: \"%s\""), func);
+	}
+
+	return true;
 }
 
 bool

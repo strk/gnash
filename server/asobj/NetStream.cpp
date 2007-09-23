@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.73 2007/09/19 14:20:50 cmusick Exp $ */
+/* $Id: NetStream.cpp,v 1.74 2007/09/23 08:48:18 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -38,7 +38,7 @@
 #include "action.h" // for call_method
 #include "render.h"	// for gnash::render::videoFrameFormat()
 #include "Object.h" // for getObjectInterface
-
+#include "namedStrings.h"
 #include "movie_root.h"
 
 // Define the following macro to have status notification handling debugged
@@ -456,7 +456,7 @@ NetStream::processStatusNotifications()
 {
 	// TODO: check for System.onStatus too ! use a private getStatusHandler() method for this.
 	as_value status;
-	if (!get_member(as_object::PROP_ON_STATUS, &status) || ! status.is_function())
+	if (!get_member(NSV::PROP_ON_STATUS, &status) || ! status.is_function())
 	{
 		clearStatusQueue();
 		return;

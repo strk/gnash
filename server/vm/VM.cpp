@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: VM.cpp,v 1.19 2007/09/19 14:20:51 cmusick Exp $ */
+/* $Id: VM.cpp,v 1.20 2007/09/23 08:48:19 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -29,6 +29,7 @@
 #include "Global.h"
 #include "tu_timer.h" // for tu_timer::get_ticks()
 #include "rc.h" //for overriding default version string with rcfile
+#include "namedStrings.h"
 
 #include <memory>
 
@@ -50,82 +51,7 @@ VM::init(movie_definition& movie)
 	_singleton.reset(new VM(movie));
 
 	assert(_singleton.get());
-
-// Load up our pre-known properties.
-string_table::svt preload_properties[] =
-{
-	{ "addListener", as_object::PROP_ADD_LISTENER },
-	{ "align", as_object::PROP_ALIGN },
-	{ "_alpha", as_object::PROP_uALPHA },
-	{ "blockIndent", as_object::PROP_BLOCK_INDENT },
-	{ "bold", as_object::PROP_BOLD },
-	{ "broadcastMessage", as_object::PROP_BROADCAST_MESSAGE },
-	{ "bullet", as_object::PROP_BULLET },
-	{ "callee", as_object::PROP_CALLEE },
-	{ "color", as_object::PROP_COLOR },
-	{ "constructor", as_object::PROP_CONSTRUCTOR },
-	{ "__constructor__", as_object::PROP_uuCONSTRUCTORuu },
-	{ "_currentframe", as_object::PROP_uCURRENTFRAME },
-	{ "_droptarget", as_object::PROP_uDROPTARGET },
-	{ "enabled", as_object::PROP_ENABLED },
-	{ "_focusrect", as_object::PROP_uFOCUSRECT },
-	{ "_framesloaded", as_object::PROP_uFRAMESLOADED },
-	{ "_height", as_object::PROP_uHEIGHT },
-	{ "_highquality", as_object::PROP_uHIGHQUALITY },
-	{ "htmlText", as_object::PROP_HTML_TEXT },
-	{ "indent", as_object::PROP_INDENT },
-	{ "italic", as_object::PROP_ITALIC },
-	{ "leading", as_object::PROP_LEADING },
-	{ "left_margin", as_object::PROP_LEFT_MARGIN },
-	{ "length", as_object::PROP_LENGTH },
-	{ "_listeners", as_object::PROP_uLISTENERS },
-	{ "loaded", as_object::PROP_LOADED },
-	{ "_name", as_object::PROP_uNAME },
-	{ "onLoad", as_object::PROP_ON_LOAD },
-	{ "onResize", as_object::PROP_ON_RESIZE },
-	{ "onRollOut", as_object::PROP_ON_ROLL_OUT },
-	{ "onRollOver", as_object::PROP_ON_ROLL_OVER },
-	{ "onSelect", as_object::PROP_ON_SELECT },
-	{ "onStatus", as_object::PROP_ON_STATUS },
-	{ "_parent", as_object::PROP_uPARENT },
-	{ "__proto__", as_object::PROP_uuPROTOuu },
-	{ "prototype", as_object::PROP_PROTOTYPE },
-	{ "push", as_object::PROP_PUSH },
-	{ "removeListener", as_object::PROP_REMOVE_LISTENER },
-	{ "rightMargin", as_object::PROP_RIGHT_MARGIN },
-	{ "_rotation", as_object::PROP_uROTATION },
-	{ "scaleMode", as_object::PROP_SCALE_MODE },
-	{ "size", as_object::PROP_SIZE },
-	{ "_soundbuftime", as_object::PROP_uSOUNDBUFTIME },
-	{ "splice", as_object::PROP_SPLICE },
-	{ "Stage", as_object::PROP_iSTAGE },
-	{ "status", as_object::PROP_STATUS },
-	{ "_target", as_object::PROP_uTARGET },
-	{ "text", as_object::PROP_TEXT },
-	{ "textColor", as_object::PROP_TEXT_COLOR },
-	{ "textWidth", as_object::PROP_TEXT_WIDTH },
-	{ "toString", as_object::PROP_TO_STRING },
-	{ "_totalframes", as_object::PROP_uTOTALFRAMES },
-	{ "underline", as_object::PROP_UNDERLINE },
-	{ "_url", as_object::PROP_uURL },
-	{ "valueOf", as_object::PROP_VALUE_OF },
-	{ "_visible", as_object::PROP_uVISIBLE },
-	{ "_width", as_object::PROP_uWIDTH },
-	{ "x", as_object::PROP_X },
-	{ "_x", as_object::PROP_uX },
-	{ "_xmouse", as_object::PROP_uXMOUSE },
-	{ "_xscale", as_object::PROP_uXSCALE },
-	{ "y", as_object::PROP_Y },
-	{ "_y", as_object::PROP_uY },
-	{ "_ymouse", as_object::PROP_uYMOUSE },
-	{ "_yscale", as_object::PROP_uYSCALE }
-};
-	if (_singleton->getSWFVersion() < 7)
-	{
-		_singleton->mStringTable.lower_next_group();
-	}
-	_singleton->mStringTable.insert_group(preload_properties,
-		sizeof (preload_properties) / sizeof (string_table::svt));
+	NSV::load_strings(&_singleton->mStringTable, _singleton->getSWFVersion());
 
 	_singleton->setGlobal(new Global(*_singleton));
 	assert(_singleton->getGlobal());

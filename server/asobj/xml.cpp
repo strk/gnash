@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.46 2007/09/19 14:20:50 cmusick Exp $ */
+/* $Id: xml.cpp,v 1.47 2007/09/23 08:48:18 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -39,6 +39,7 @@
 #include "tu_file.h"
 #include "URL.h"
 #include "VM.h"
+#include "namedStrings.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -135,12 +136,12 @@ XML::XML(struct node * /* childNode */)
 bool
 XML::get_member(string_table::key name, as_value *val)
 {
-        if (name == as_object::PROP_STATUS) 
+        if (name == NSV::PROP_STATUS) 
         {
                 val->set_int(_status);
                 return true;
         }
-        else if (name == as_object::PROP_LOADED)
+        else if (name == NSV::PROP_LOADED)
         {
                 if ( _loaded < 0 ) val->set_undefined();
                 else val->set_bool(_loaded);
@@ -153,12 +154,12 @@ XML::get_member(string_table::key name, as_value *val)
 void
 XML::set_member(string_table::key name, const as_value& val)
 {
-        if (name == as_object::PROP_STATUS)
+        if (name == NSV::PROP_STATUS)
 	{
 		_status = XML::Status(val.to_number());
 		return;
 	}
-        else if (name == as_object::PROP_LOADED)
+        else if (name == NSV::PROP_LOADED)
         {
                 bool b = val.to_bool();
 		log_msg(_("set_member 'loaded' (%s) became boolean %d"), val.to_debug_string().c_str(), b);

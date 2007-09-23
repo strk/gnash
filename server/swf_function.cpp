@@ -30,6 +30,7 @@
 #include "VM.h" // for storing _global in a local register
 #include "builtin_function.h" // for Function constructor
 #include "Object.h" // for getObjectInterface
+#include "namedStrings.h"
 
 #include <typeinfo>
 #include <iostream>
@@ -87,7 +88,7 @@ swf_function::getSuper(as_object& obj)
 	//       returning an as_function ?
 	//
 	as_value ctor;
-	bool ret = proto->get_member(as_object::PROP_uuCONSTRUCTORuu, &ctor);
+	bool ret = proto->get_member(NSV::PROP_uuCONSTRUCTORuu, &ctor);
 	if ( ! ret )
 	{
 #ifdef GNASH_DEBUG_GETSUPER
@@ -114,7 +115,7 @@ swf_function::getSuper(as_object& obj)
 #endif
 
 	as_value ctor_proto;
-	ret = ctor_obj->get_member(as_object::PROP_PROTOTYPE, &ctor_proto);
+	ret = ctor_obj->get_member(NSV::PROP_PROTOTYPE, &ctor_proto);
 	if ( ! ret )
 
 	{
@@ -154,7 +155,7 @@ swf_function::getArguments(swf_function& callee, const fn_call& fn)
 	{
 		arguments->push(fn.arg(i));
 	}
-	arguments->set_member(as_object::PROP_CALLEE, &callee);
+	arguments->set_member(NSV::PROP_CALLEE, &callee);
 
 	return arguments;
 

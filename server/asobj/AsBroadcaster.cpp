@@ -29,6 +29,7 @@
 #include "VM.h" // for getPlayerVersion() 
 #include "Object.h" // for getObjectInterface
 #include "action.h" // for call_method
+#include "namedStrings.h"
 
 #include <boost/algorithm/string/case_conv.hpp> // for PROPNAME
 
@@ -106,20 +107,20 @@ AsBroadcaster::initialize(as_object& o)
 {
 	log_debug("Initializing object %p as an AsBroadcaster", (void*)&o);
 	// TODO: reserch on protection flags for these methods
-	o.set_member(as_object::PROP_ADD_LISTENER, new builtin_function(AsBroadcaster::addListener_method));
-	o.set_member(as_object::PROP_REMOVE_LISTENER, new builtin_function(AsBroadcaster::removeListener_method));
-	o.set_member(as_object::PROP_BROADCAST_MESSAGE, new builtin_function(AsBroadcaster::broadcastMessage_method));
-	o.set_member(as_object::PROP_uLISTENERS, new as_array_object());
+	o.set_member(NSV::PROP_ADD_LISTENER, new builtin_function(AsBroadcaster::addListener_method));
+	o.set_member(NSV::PROP_REMOVE_LISTENER, new builtin_function(AsBroadcaster::removeListener_method));
+	o.set_member(NSV::PROP_BROADCAST_MESSAGE, new builtin_function(AsBroadcaster::broadcastMessage_method));
+	o.set_member(NSV::PROP_uLISTENERS, new as_array_object());
 
 #ifndef NDEBUG
 	as_value tmp;
-	assert(o.get_member(as_object::PROP_uLISTENERS, &tmp));
+	assert(o.get_member(NSV::PROP_uLISTENERS, &tmp));
 	assert(tmp.is_object());
-	assert(o.get_member(as_object::PROP_ADD_LISTENER, &tmp));
+	assert(o.get_member(NSV::PROP_ADD_LISTENER, &tmp));
 	assert(tmp.is_function());
-	assert(o.get_member(as_object::PROP_REMOVE_LISTENER, &tmp));
+	assert(o.get_member(NSV::PROP_REMOVE_LISTENER, &tmp));
 	assert(tmp.is_function());
-	assert(o.get_member(as_object::PROP_BROADCAST_MESSAGE, &tmp));
+	assert(o.get_member(NSV::PROP_BROADCAST_MESSAGE, &tmp));
 	assert(tmp.is_function());
 #endif
 }
@@ -164,7 +165,7 @@ AsBroadcaster::addListener_method(const fn_call& fn)
 	as_value newListener; assert(newListener.is_undefined());
 	if ( fn.nargs ) newListener = fn.arg(0);
 
-	obj->callMethod(as_object::PROP_REMOVE_LISTENER, fn.env(), newListener);
+	obj->callMethod(NSV::PROP_REMOVE_LISTENER, fn.env(), newListener);
 
 	as_value listenersValue;
 
@@ -172,7 +173,7 @@ AsBroadcaster::addListener_method(const fn_call& fn)
 	//       inheritance chain in case it's own property _listeners 
 	//       has been deleted while another one is found in any base
 	//       class.
-	if ( ! obj->get_member(as_object::PROP_uLISTENERS, &listenersValue) )
+	if ( ! obj->get_member(NSV::PROP_uLISTENERS, &listenersValue) )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("%p.addListener(%s): this object has no _listeners member"),
@@ -205,7 +206,7 @@ AsBroadcaster::addListener_method(const fn_call& fn)
 			fn.dump_args().c_str(), listenersValue.to_debug_string().c_str());
 		);
 
-		listenersObj->callMethod(as_object::PROP_PUSH, fn.env(), newListener);
+		listenersObj->callMethod(NSV::PROP_PUSH, fn.env(), newListener);
 
 	}
 	else
@@ -229,7 +230,7 @@ AsBroadcaster::removeListener_method(const fn_call& fn)
 	//       inheritance chain in case it's own property _listeners 
 	//       has been deleted while another one is found in any base
 	//       class.
-	if (!obj->get_member(as_object::PROP_uLISTENERS, &listenersValue) )
+	if (!obj->get_member(NSV::PROP_uLISTENERS, &listenersValue) )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("%p.addListener(%s): this object has no _listeners member"),
@@ -266,7 +267,7 @@ AsBroadcaster::removeListener_method(const fn_call& fn)
 		);
 
 		// TODO: implement brute force scan of pseudo-array
-		unsigned int length = listenersObj->getMember(as_object::PROP_LENGTH).to_int(fn.env());
+		unsigned int length = listenersObj->getMember(NSV::PROP_LENGTH).to_int(fn.env());
 		for (unsigned int i=0; i<length; ++i)
 		{
 			as_value iVal(i);
@@ -274,7 +275,7 @@ AsBroadcaster::removeListener_method(const fn_call& fn)
 			as_value v = listenersObj->getMember(VM::get().getStringTable().find(n));
 			if ( v.equals(listenerToRemove, fn.env()) )
 			{
-				listenersObj->callMethod(as_object::PROP_SPLICE, fn.env(), iVal, as_value(1));
+				listenersObj->callMethod(NSV::PROP_SPLICE, fn.env(), iVal, as_value(1));
 				return as_value(true); 
 			}
 		}
@@ -303,7 +304,7 @@ AsBroadcaster::broadcastMessage_method(const fn_call& fn)
 	//       inheritance chain in case it's own property _listeners 
 	//       has been deleted while another one is found in any base
 	//       class.
-	if ( ! obj->get_member(as_object::PROP_uLISTENERS, &listenersValue) )
+	if ( ! obj->get_member(NSV::PROP_uLISTENERS, &listenersValue) )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("%p.addListener(%s): this object has no _listeners member"),

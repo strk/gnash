@@ -45,6 +45,8 @@ class DSOEXPORT Extension
     // open a module
     // initialize the module within Gnash
     bool initModule(const char *module, as_object &obj);
+	// open a module, initialize the module within Gnash. Known function name.
+	bool initModuleWithFunc(const char *module, const char *func, as_object &obj);
     bool initNewObject(as_object &obj);
     void dumpModules();
 private:

@@ -38,6 +38,7 @@ namespace gnash {
 ///
 class Property
 {
+protected: // For DestructiveGetterSetterProperty
 	/// Properties flags
 	as_prop_flags _flags;
 
@@ -178,6 +179,7 @@ public:
 ///
 class GetterSetterProperty: public Property
 {
+protected: // For use in DestructiveGetterSetterProperty
 	/// Actual Getter / Setter  (the workhorse)
 	GetterSetter _getset;
 
@@ -232,6 +234,77 @@ public:
 	}
 };
 
+/// A destructive Getter/Setter property.
+///
+/// Just like a regular Getter/Setter property, but you only get one chance
+/// to call its getValue -- it then becomes a simple property whose value is
+/// the value returned by getValue.
+///
+class DestructiveGetterSetterProperty : public GetterSetterProperty
+{
+private:
+	mutable bool mDestroyed;
+	mutable as_value mValue;
+
+public:
+	/// Construct a DestructiveGetterSetterProperty
+	DestructiveGetterSetterProperty(const GetterSetter& getset)
+		:
+		GetterSetterProperty(getset),
+		mDestroyed(false),
+		mValue()
+	{/**/}
+
+	/// Allow specific flags.
+	DestructiveGetterSetterProperty(const GetterSetter& getset,
+			const as_prop_flags& flags)
+		:
+		GetterSetterProperty(getset, flags),
+		mDestroyed(false),
+		mValue()
+	{/**/}
+
+	/// Copy constructor
+	DestructiveGetterSetterProperty(const DestructiveGetterSetterProperty& o)
+		:
+		GetterSetterProperty(o),
+		mDestroyed(o.mDestroyed),
+		mValue(o.mValue)
+	{/**/}
+
+	Property* clone() const
+	{
+		if (mDestroyed) 
+			return new SimpleProperty(mValue, _flags);
+		return new DestructiveGetterSetterProperty(*this);
+	}
+
+	/// The point of the destructive type: Only call getter once.
+	as_value getValue(as_object& this_ptr) const
+	{
+		if (!mDestroyed)
+		{
+			mDestroyed = true; // Be sure we can set in get if we like.
+			mValue = _getset.getValue(&this_ptr);
+		}
+		return mValue;
+	}
+
+	/// Set the value (destroys)
+	void setValue(as_object& /*this_ptr*/, const as_value &value) 
+	{
+		// Destroy, if not already.
+		mValue = value;
+		mDestroyed = true;
+	}
+
+	/// Set GetterSetter, mValue as reachable (for GC)
+	void setReachable() const
+	{
+		_getset.setReachable();
+		mValue.setReachable();
+	}
+};
 
 } // namespace gnash
 

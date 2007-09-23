@@ -29,6 +29,7 @@
 #include "builtin_function.h" // need builtin_function
 #include "VM.h"
 #include "Object.h" // for getObjectInterface()
+#include "namedStrings.h"
 
 #include <string>
 
@@ -70,7 +71,7 @@ void
 Stage::onResize(as_environment* env)
 {
 	as_value v;
-	if (get_member(as_object::PROP_SCALE_MODE, &v) && v.to_string(env) == "noScale" )
+	if (get_member(NSV::PROP_SCALE_MODE, &v) && v.to_string(env) == "noScale" )
 	{
 		notifyResize(env);
 	}
@@ -92,7 +93,7 @@ void
 Stage::notifyResize(boost::intrusive_ptr<as_object> obj, as_environment* env)
 {
 	as_value method;
-	if ( ! obj->get_member(as_object::PROP_ON_RESIZE, &method) ) {
+	if ( ! obj->get_member(NSV::PROP_ON_RESIZE, &method) ) {
 		// nothing to do
 		return;
 	}

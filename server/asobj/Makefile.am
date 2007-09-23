@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.44 2007/09/11 17:01:23 strk Exp $
+# $Id: Makefile.am,v 1.45 2007/09/23 08:48:18 cmusick Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -49,6 +49,7 @@ libgnashasobjs_la_SOURCES = \
 	Boolean.cpp	\
         BlurFilter_as.cpp \
 	Camera.cpp	\
+	ClassHierarchy.cpp \
 	Color.cpp	\
 	ColorMatrixFilter_as.cpp \
 	ContextMenu.cpp	\
@@ -92,6 +93,7 @@ noinst_HEADERS = \
 	Boolean.h	\
 	BlurFilter_as.h \
 	Camera.h	\
+	ClassHierarchy.h \
 	Color.h		\
 	ColorMatrixFilter_as.h \
 	ContextMenu.h	\

@@ -52,6 +52,7 @@
 #include "gnash.h" // for point class !
 #include "Timeline.h" // for restoreDisplayList
 #include "Object.h" // for getObjectInterface
+#include "namedStrings.h"
 
 #include <vector>
 #include <string>
@@ -954,7 +955,7 @@ sprite_globalToLocal(const fn_call& fn)
 	float x = 0;
 	float y = 0;
 
-	if ( ! obj->get_member(as_object::PROP_X, &tmp) )
+	if ( ! obj->get_member(NSV::PROP_X, &tmp) )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("MovieClip.globalToLocal(%s): "
@@ -965,7 +966,7 @@ sprite_globalToLocal(const fn_call& fn)
 	}
 	x = PIXELS_TO_TWIPS(tmp.to_number(&fn.env()));
 
-	if ( ! obj->get_member(as_object::PROP_Y, &tmp) )
+	if ( ! obj->get_member(NSV::PROP_Y, &tmp) )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("MovieClip.globalToLocal(%s): "
@@ -980,8 +981,8 @@ sprite_globalToLocal(const fn_call& fn)
 	matrix world_mat = sprite->get_world_matrix();
 	world_mat.transform_by_inverse(pt);
 
-	obj->set_member(as_object::PROP_X, TWIPS_TO_PIXELS(round(pt.m_x)));
-	obj->set_member(as_object::PROP_Y, TWIPS_TO_PIXELS(round(pt.m_y)));
+	obj->set_member(NSV::PROP_X, TWIPS_TO_PIXELS(round(pt.m_x)));
+	obj->set_member(NSV::PROP_Y, TWIPS_TO_PIXELS(round(pt.m_y)));
 
 	return ret;
 }
@@ -1016,7 +1017,7 @@ sprite_localToGlobal(const fn_call& fn)
 	float x = 0;
 	float y = 0;
 
-	if ( ! obj->get_member(as_object::PROP_X, &tmp) )
+	if ( ! obj->get_member(NSV::PROP_X, &tmp) )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("MovieClip.localToGlobal(%s): "
@@ -1027,7 +1028,7 @@ sprite_localToGlobal(const fn_call& fn)
 	}
 	x = PIXELS_TO_TWIPS(tmp.to_number(&fn.env()));
 
-	if ( ! obj->get_member(as_object::PROP_Y, &tmp) )
+	if ( ! obj->get_member(NSV::PROP_Y, &tmp) )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("MovieClip.localToGlobal(%s): "
@@ -1042,8 +1043,8 @@ sprite_localToGlobal(const fn_call& fn)
 	matrix world_mat = sprite->get_world_matrix();
 	world_mat.transform(pt);
 
-	obj->set_member(as_object::PROP_X, TWIPS_TO_PIXELS(round(pt.m_x)));
-	obj->set_member(as_object::PROP_Y, TWIPS_TO_PIXELS(round(pt.m_y)));
+	obj->set_member(NSV::PROP_X, TWIPS_TO_PIXELS(round(pt.m_x)));
+	obj->set_member(NSV::PROP_Y, TWIPS_TO_PIXELS(round(pt.m_y)));
 
 	return ret;
 
@@ -3337,10 +3338,10 @@ sprite_instance::stagePlacementCallback()
 		//
 		if ( swfversion > 5 )
 		{
-			set_member(as_object::PROP_uuCONSTRUCTORuu, ctor);
+			set_member(NSV::PROP_uuCONSTRUCTORuu, ctor);
 			if ( swfversion == 6 )
 			{
-				set_member(as_object::PROP_CONSTRUCTOR, ctor);
+				set_member(NSV::PROP_CONSTRUCTOR, ctor);
 			}
 		}
 	}
@@ -3599,7 +3600,7 @@ sprite_instance::isEnabled() const
 	as_value enabled;
 	// const_cast needed due to get_member being non-const due to the 
 	// possibility that a getter-setter would actually modify us ...
-	const_cast<sprite_instance*>(this)->get_member(as_object::PROP_ENABLED, &enabled);
+	const_cast<sprite_instance*>(this)->get_member(NSV::PROP_ENABLED, &enabled);
 	return enabled.to_bool();
 }
 

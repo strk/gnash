@@ -32,6 +32,7 @@
 #include "Stage.h"
 #include "utility.h"
 #include "URL.h"
+#include "namedStrings.h"
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
   #include "action.h"
 #endif
@@ -235,7 +236,7 @@ movie_root::getStageObject()
 	if ( ! VM::isInitialized() ) return NULL;
 	as_object* global = VM::get().getGlobal();
 	if ( ! global ) return NULL;
-	if (!global->get_member(as_object::PROP_iSTAGE, &v) ) return NULL;
+	if (!global->get_member(NSV::PROP_iSTAGE, &v) ) return NULL;
 	return boost::dynamic_pointer_cast<Stage>(v.to_object());
 }
 		

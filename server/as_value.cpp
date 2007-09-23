@@ -33,6 +33,7 @@
 #include "Boolean.h" // for automatic as_value::BOOLEAN => Boolean as object
 #include "action.h" // for call_method0
 #include "utility.h" // for typeName()
+#include "namedStrings.h"
 
 #include <boost/algorithm/string/case_conv.hpp>
 
@@ -135,7 +136,7 @@ as_value::to_string(as_environment* env) const
 			bool gotValidToStringResult = false;
 			if ( env )
 			{
-				string_table::key methodname = as_object::PROP_TO_STRING;
+				string_table::key methodname = NSV::PROP_TO_STRING;
 				as_value method;
 				if ( obj->get_member(methodname, &method) )
 				{
@@ -211,7 +212,7 @@ as_value::to_primitive(as_environment& env) const
 	if ( m_type == OBJECT || m_type == AS_FUNCTION )
 	{
 		as_object* obj = m_object_value;
-		string_table::key methodname = as_object::PROP_VALUE_OF;
+		string_table::key methodname = NSV::PROP_VALUE_OF;
 		as_value method;
 		if ( obj->get_member(methodname, &method) )
 		{
@@ -290,7 +291,7 @@ as_value::to_number(as_environment* env) const
 			as_object* obj = m_object_value; 
 			if ( env )
 			{
-				string_table::key methodname = as_object::PROP_VALUE_OF;
+				string_table::key methodname = NSV::PROP_VALUE_OF;
 				as_value method;
 				if (obj->get_member(methodname, &method) )
 				{

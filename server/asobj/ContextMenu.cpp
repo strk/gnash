@@ -29,6 +29,7 @@
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h"
 #include "Object.h" // for getObjectInterface
+#include "namedStrings.h"
 
 namespace gnash {
 
@@ -73,7 +74,7 @@ private:
 	as_function* getCallback() 
 	{
 		as_value tmp;
-		if (get_member(as_object::PROP_ON_SELECT, &tmp))
+		if (get_member(NSV::PROP_ON_SELECT, &tmp))
 			return tmp.to_as_function();
 		else return NULL;
 	}
@@ -86,7 +87,7 @@ private:
 	///
 	void setCallback(const as_value& callback)
 	{
-		set_member(as_object::PROP_ON_SELECT, callback);
+		set_member(NSV::PROP_ON_SELECT, callback);
 	}
 
 	/// Attach the exported interface of this ActionScript class

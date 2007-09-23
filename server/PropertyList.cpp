@@ -262,6 +262,20 @@ PropertyList::addGetterSetter(string_table::key key, as_function& getter,
 	return true;
 }
 
+bool
+PropertyList::addDestructiveGetterSetter(string_table::key key,
+	as_function& getter, as_function& setter)
+{
+	iterator found = _props.find(key);
+	if (found != _props.end())
+		return false; // Already exists.
+
+	DestructiveGetterSetterProperty* prop =
+		new DestructiveGetterSetterProperty(GetterSetter(getter, setter));
+	_props[key] = prop;
+	return true;
+}
+
 void
 PropertyList::clear()
 {

@@ -31,6 +31,7 @@
 #include "GnashException.h"
 #include "VM.h"
 #include "Object.h" // for getObjectInterface
+#include "namedStrings.h"
 
 #include <typeinfo>
 #include <iostream>
@@ -72,7 +73,6 @@ static as_object* getFunctionPrototype()
 	static boost::intrusive_ptr<as_object> proto;
 
 	if ( proto.get() == NULL ) {
-
 		// Initialize Function prototype
 		proto = new as_object(getObjectInterface());
 		VM::get().addStatic(proto.get());
@@ -140,7 +140,7 @@ as_function::getPrototype()
 	//               this function should likely return the *new*
 	//               prototype, not the old !!
 	as_value proto;
-	get_member(as_object::PROP_PROTOTYPE, &proto);
+	get_member(NSV::PROP_PROTOTYPE, &proto);
 	return proto.to_object();
 }
 
@@ -354,7 +354,7 @@ as_function::constructInstance( as_environment& env,
 		// a literal string in lowercase. (we should likely avoid calling
 		// get_member as a whole actually, and use a getProto() or similar
 		// method directly instead) TODO
-		bool func_has_prototype = get_member(as_object::PROP_PROTOTYPE, &proto);
+		bool func_has_prototype = get_member(NSV::PROP_PROTOTYPE, &proto);
 		assert(func_has_prototype);
 
 		IF_VERBOSE_ACTION (

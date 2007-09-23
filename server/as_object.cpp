@@ -35,7 +35,7 @@
 #include <string>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <utility> // for std::pair
-
+#include "namedStrings.h"
 
 // Anonymous namespace used for module-static defs
 namespace {
@@ -64,7 +64,7 @@ public:
 	///
 	void operator() (string_table::key name, const as_value& val)
 	{
-		if (name == as_object::PROP_uuPROTOuu) return;
+		if (name == NSV::PROP_uuPROTOuu) return;
 		//log_msg(_("Setting member '%s' to value '%s'"), name.c_str(), val.to_debug_string().c_str());
 		_tgt.set_member(name, val);
 	}
@@ -120,7 +120,7 @@ Property*
 as_object::findProperty(string_table::key key)
 {
 	// don't enter an infinite loop looking for __proto__ ...
-	if (key == as_object::PROP_uuPROTOuu)
+	if (key == NSV::PROP_uuPROTOuu)
 	{
 		return _members.getProperty(key);
 	}
@@ -147,7 +147,7 @@ Property*
 as_object::findGetterSetter(string_table::key key)
 {
 	// don't enter an infinite loop looking for __proto__ ...
-	if (key == as_object::PROP_uuPROTOuu)
+	if (key == NSV::PROP_uuPROTOuu)
 	{
 		Property* prop = _members.getProperty(key);
 		if ( ! prop ) return NULL;
@@ -181,7 +181,7 @@ as_object::findGetterSetter(string_table::key key)
 void
 as_object::set_prototype(boost::intrusive_ptr<as_object> proto, int flags)
 {
-	static string_table::key key = as_object::PROP_uuPROTOuu;
+	static string_table::key key = NSV::PROP_uuPROTOuu;
 
 	// TODO: check what happens if __proto__ is set as a user-defined getter/setter
 	if (_members.setValue(key, as_value(proto.get()), *this) )
@@ -302,6 +302,18 @@ as_object::init_property(const std::string& key, as_function& getter,
 
 	// We shouldn't attempt to initialize a property twice, should we ?
 	assert(success);
+}
+
+bool
+as_object::init_destructive_property(string_table::key key, as_function& getter,
+	as_function& setter, int flags)
+{
+	bool success;
+
+	// No case check, since we've already got the key.
+	success = _members.addDestructiveGetterSetter(key, getter, setter);
+	_members.setFlags(key, flags, 0);
+	return success;
 }
 
 void
@@ -613,7 +625,7 @@ as_object::valueof_method(const fn_call& fn)
 boost::intrusive_ptr<as_object>
 as_object::get_prototype()
 {
-	static string_table::key key = as_object::PROP_uuPROTOuu;
+	static string_table::key key = NSV::PROP_uuPROTOuu;
 	as_value tmp;
 	// I don't think any subclass should override getting __proto__ anyway...
 	//if ( ! get_member(key, &tmp) ) return NULL;

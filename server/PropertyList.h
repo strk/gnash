@@ -241,6 +241,24 @@ public:
 	bool addGetterSetter(string_table::key key, as_function& getter,
 		as_function& setter);
 
+	/// \brief
+	/// Add a destructive getter/setter property, if not already extant.
+	///
+	/// @param key
+	/// Name of the property. Case-sensitive search.
+	///
+	/// @param getter
+	/// A function to invoke when this property value is requested.
+	///
+	/// @param setter
+	/// A function to invoke when setting this property's value.
+	///
+	/// @return true if the property was successfully added, false
+	/// otherwise.
+	///
+	bool addDestructiveGetterSetter(string_table::key key,
+		as_function& getter, as_function& setter);
+
 	/// Set the flags of a property.
 	//
 	/// @param key

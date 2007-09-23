@@ -56,8 +56,16 @@ public:
 		KIND_MultinameL = 0x1B,
 		KIND_MultinameLA = 0x1C
 	} kinds;
+	typedef enum
+	{
+		FLAG_ATTR = 0x01,
+		FLAG_QNAME = 0x02,
+		FLAG_RTNS = 0x04,
+		FLAG_RTNAME = 0x08,
+		FLAG_NSSET = 0x10
+	} flags;
 
-	kinds mKind;
+	uint8_t mFlags;
 	string_table::key mName;
 	Namespace* mNamespace;
 	std::vector<Namespace*> *mNamespaceSet;

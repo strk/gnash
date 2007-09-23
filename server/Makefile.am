@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.124 2007/08/28 08:45:11 strk Exp $
+# $Id: Makefile.am,v 1.125 2007/09/23 08:48:17 cmusick Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -79,6 +79,7 @@ libgnashserver_la_SOURCES = \
 	matrix.cpp \
 	movie_instance.cpp \
 	movie_root.cpp \
+	namedStrings.cpp \
 	rect.cpp \
 	shm.cpp	\
 	sprite_instance.cpp \
@@ -159,6 +160,7 @@ noinst_HEADERS = \
 	mouse_button_state.h \
 	movie_instance.h \
 	movie_root.h \
+	namedStrings.h \
 	rect.h \
 	render.h \
 	resource.h \

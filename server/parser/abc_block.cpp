@@ -228,14 +228,18 @@ abc_block::read(stream* in)
 	// 0th is used as a no-op.
 	uint32_t multinamePoolCount = in->read_V32();
 
+	// Any two namespaces with the same uri here are the same namespace,
+	// excepting private nameSpaces.  This will be handled at verify time.
+	// TODO: Handle this.
 	mMultinamePool.resize(multinamePoolCount);
 	for (unsigned int i = 1; i < multinamePoolCount; ++i)
 	{
 		uint8_t kind = in->read_u8();
-		mMultinamePool[i].mKind = static_cast<abc_Multiname::kinds>(kind);
 		uint32_t ns = 0;
 		uint32_t name = 0;
 		uint32_t nsset = 0;
+
+		mMultinamePool[i].mFlags = 0;
 
 		// Read, but don't upper validate until after the switch
 		switch (kind)
@@ -245,17 +249,29 @@ abc_block::read(stream* in)
 		{
 			ns = in->read_V32();
 			name = in->read_V32();
+			mMultinamePool[i].mFlags |= abc_Multiname::FLAG_QNAME;
+			if (kind == abc_Multiname::KIND_QnameA)
+				mMultinamePool[i].mFlags |= abc_Multiname::FLAG_ATTR;
 			break;
 		}
 		case abc_Multiname::KIND_RTQname:
 		case abc_Multiname::KIND_RTQnameA:
 		{
 			name = in->read_V32();
+			mMultinamePool[i].mFlags |= abc_Multiname::FLAG_QNAME
+				| abc_Multiname::FLAG_RTNS;
+			if (kind == abc_Multiname::KIND_RTQnameA)
+				mMultinamePool[i].mFlags |= abc_Multiname::FLAG_ATTR;
 			break;
 		}
 		case abc_Multiname::KIND_RTQnameL:
 		case abc_Multiname::KIND_RTQnameLA:
 		{
+			mMultinamePool[i].mFlags |= abc_Multiname::FLAG_QNAME
+				| abc_Multiname::FLAG_RTNAME
+				| abc_Multiname::FLAG_RTNS;
+			if (kind == abc_Multiname::KIND_RTQnameLA)
+				mMultinamePool[i].mFlags |= abc_Multiname::FLAG_ATTR;
 			break;
 		}
 		case abc_Multiname::KIND_Multiname:
@@ -269,6 +285,9 @@ abc_block::read(stream* in)
 				ERR((_("Action Block: 0 selection for namespace set is invalid.\n")));
 				return false;
 			}
+			mMultinamePool[i].mFlags |= abc_Multiname::FLAG_NSSET;
+			if (kind == abc_Multiname::KIND_MultinameA)
+				mMultinamePool[i].mFlags |= abc_Multiname::FLAG_ATTR;
 			break;
 		}
 		case abc_Multiname::KIND_MultinameL:
@@ -281,6 +300,10 @@ abc_block::read(stream* in)
 				ERR((_("Action Block: 0 selection for namespace set is invalid.\n")));
 				return false;
 			}
+			mMultinamePool[i].mFlags |= abc_Multiname::FLAG_RTNAME
+				| abc_Multiname::FLAG_NSSET;
+			if (kind == abc_Multiname::KIND_MultinameLA)
+				mMultinamePool[i].mFlags |= abc_Multiname::FLAG_ATTR;
 			break;
 		}
 		default:
@@ -415,17 +438,42 @@ abc_block::read(stream* in)
 			return false; // Name out of bounds.
 		}
 		instance.mName = &mMultinamePool[index];
-
+		// This must be a QName, not some other type.
+		if (!(instance.mName->mFlags & abc_Multiname::FLAG_QNAME))
+		{
+			ERR((_("Action Block: Qname required for instance.\n")));
+			return false; // Name not Qname
+		}
+		
 		uint32_t super_index = in->read_V32();
 		if (!super_index)
 			instance.mSuperType = NULL;
 		else if (super_index >= mMultinamePool.size())
 		{
-			ERR((_("Action Block: Out of Bound super type (%d).\n"), index));
+			ERR((_("Action Block: Out of Bound super type (%d).\n"), super_index));
 			return false; // Bad index.
 		}
 		else
 			instance.mSuperType = &mMultinamePool[super_index];
+
+		as_object *global = VM::get().getGlobal();
+		as_value vstore;
+		if (super_index && !global->get_member(instance.mSuperType->mName, &vstore))
+		{
+			ERR((_("Action Block: Non-existent super type (%d).\n"),
+				super_index));
+			fprintf(stderr, "Super type doesn't exist, but continuing (%s).\n",
+				mStringTable->value(instance.mSuperType->mName).c_str());
+			//return false;
+		}
+
+		// vstore now contains the object (we hope) which is the class that
+		// we want to be the super of this instance.
+		if (!vstore.is_object())
+		{
+			ERR((_("Action Block: Super prospect is not an object.\n")));
+			//return false;
+		}
 
 		uint8_t flags = in->read_u8();
 		instance.mFlags = static_cast<abc_Instance::flags> (flags);
@@ -479,6 +527,16 @@ abc_block::read(stream* in)
 			if (!instance.mTraits[j].read(in))
 				return false;
 		}
+
+		// And now we add this instance to the type names of the VM...
+		// TODO: Quit faking!
+		as_value fake;
+		if (global->get_member(instance.mName->mName, &fake))
+		{
+			fprintf(stderr, "Already registered, but doing it again?"
+				"Type is %s\n", mStringTable->value(instance.mName->mName).c_str());
+		}
+		global->set_member(instance.mName->mName, as_value(2));
 	} // end of instances list
 
 	// Now the classes are read. TODO: Discover what these do.
@@ -556,7 +614,7 @@ abc_block::read(stream* in)
 		// And the code:
 		method.mCode.resize(code_length);
 		unsigned int got_length;
-		if ((got_length = in->read(&method.mCode.front(), code_length)) != code_length)
+		if ((got_length = in->read(method.mCode.data(), code_length)) != code_length)
 		{
 			ERR((_("Action Block: Not enough body. Wanted %d but got %d.\n"),
 				code_length, got_length));
@@ -612,6 +670,9 @@ abc_block::read(stream* in)
 		}
 	} // End of method bodies
 
+	// Everything has been read. It needs to be verified, with symbol tables
+	// built to make it all run.
+	
 	// If flow reaches here, everything went fine.
 	return true;
 }

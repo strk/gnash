@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.135 2007/09/19 14:20:50 cmusick Exp $ */
+/* $Id: ASHandlers.cpp,v 1.136 2007/09/23 08:48:19 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -49,6 +49,7 @@
 #include "movie_root.h" // for set_drag_state (ActionStartDragMovie)
 #include "debugger.h"
 #include "sound_handler.h"
+#include "namedStrings.h"
 
 #include <string>
 #include <map>
@@ -2432,7 +2433,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
         // Calling super ? 
         boost::intrusive_ptr<as_object> obj = function.to_object();
             this_ptr = thread.getThisPointer();
-        if (!obj->get_member(as_object::PROP_CONSTRUCTOR, &function) )
+        if (!obj->get_member(NSV::PROP_CONSTRUCTOR, &function) )
         {
             IF_VERBOSE_ASCODING_ERRORS (
             log_aserror(_("Object doensn't have a constructor"));
@@ -3065,7 +3066,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 
 			// TODO: all this crap should go into an as_object::getConstructor instead
 			as_value ctor;
-			if (!obj->get_member(as_object::PROP_CONSTRUCTOR, &ctor) )
+			if (!obj->get_member(NSV::PROP_CONSTRUCTOR, &ctor) )
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
 				log_aserror(_("ActionCallMethod: object has no constructor"));

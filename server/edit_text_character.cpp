@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.120 2007/09/20 15:44:41 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.121 2007/09/23 08:48:17 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -37,6 +37,7 @@
 #include "builtin_function.h" // for getter/setter properties
 #include "font.h" // for using the _font member
 #include "Object.h" // for getObjectInterface
+#include "namedStrings.h"
 
 #include <algorithm>
 #include <string>
@@ -773,14 +774,14 @@ edit_text_character::set_member(string_table::key name,
 	{
 	default:
 		break;
-	case as_object::PROP_TEXT:
+	case NSV::PROP_TEXT:
 		//if (name == "text")
 	{
 		int version = get_parent()->get_movie_definition()->get_version();
 		set_text_value(val.to_string_versioned(version).c_str());
 		return;
 	}
-	case as_object::PROP_HTML_TEXT:
+	case NSV::PROP_HTML_TEXT:
 		//if (name == "htmlText")
 	{
 		int version = get_parent()->get_movie_definition()->get_version();
@@ -788,7 +789,7 @@ edit_text_character::set_member(string_table::key name,
 		format_text();
 		return;
 	}
-	case as_object::PROP_uX:
+	case NSV::PROP_uX:
 		//else if (name == "_x")
 	{
 		matrix	m = get_matrix();
@@ -799,7 +800,7 @@ edit_text_character::set_member(string_table::key name,
 		
 		return;
 	}
-	case as_object::PROP_uY:
+	case NSV::PROP_uY:
 		//else if (name == "_y")
 	{
 		matrix	m = get_matrix();
@@ -810,7 +811,7 @@ edit_text_character::set_member(string_table::key name,
 		
 		return;
 	}
-	case as_object::PROP_uWIDTH:
+	case NSV::PROP_uWIDTH:
 	{
 		float nw = PIXELS_TO_TWIPS(val.to_number()); // TODO: pass an as_environment !
 		if ( _bounds.width() == nw )
@@ -850,7 +851,7 @@ edit_text_character::set_member(string_table::key name,
 
 		return;
 	}
-	case as_object::PROP_uHEIGHT:
+	case NSV::PROP_uHEIGHT:
 	{
 		float nh = PIXELS_TO_TWIPS(val.to_number()); // TODO: pass an as_environment !
 		if ( _bounds.height() == nh )
@@ -890,13 +891,13 @@ edit_text_character::set_member(string_table::key name,
 
 		return;
 	}
-	case as_object::PROP_uVISIBLE:
+	case NSV::PROP_uVISIBLE:
 		//else if (name == "_visible")
 	{
 		set_visible(val.to_bool());
 		return;
 	}
-	case as_object::PROP_uALPHA:
+	case NSV::PROP_uALPHA:
 		//else if (name == "_alpha")
 	{
 		// @@ TODO this should be generic to class character!
@@ -925,25 +926,25 @@ edit_text_character::get_member(string_table::key name, as_value* val)
 	{
 	default:
 		break;
-	case as_object::PROP_TEXT:
+	case NSV::PROP_TEXT:
 		//if (name == "text")
 	{
 		val->set_string(get_text_value());
 		return true;
 	}
-	case as_object::PROP_HTML_TEXT:
+	case NSV::PROP_HTML_TEXT:
 		//if (name == "htmlText")
 	{
 		val->set_string(get_text_value());
 		return true;
 	}
-	case as_object::PROP_uVISIBLE:
+	case NSV::PROP_uVISIBLE:
 		//else if (name == "_visible")
 	{
 		val->set_bool(get_visible());
 		return true;
 	}
-	case as_object::PROP_uALPHA:
+	case NSV::PROP_uALPHA:
 		//else if (name == "_alpha")
 	{
 		// @@ TODO this should be generic to class character!
@@ -951,21 +952,21 @@ edit_text_character::get_member(string_table::key name, as_value* val)
 		val->set_double(cx.m_[3][0] * 100.f);
 		return true;
 	}
-	case as_object::PROP_uX:
+	case NSV::PROP_uX:
 		//else if (name == "_x")
 	{
 		matrix	m = get_matrix();	// @@ get_world_matrix()???
 		val->set_double(TWIPS_TO_PIXELS(m.m_[0][2]));
 		return true;
 	}
-	case as_object::PROP_uY:
+	case NSV::PROP_uY:
 		//else if (name == "_y")
 	{
 		matrix	m = get_matrix();	// @@ get_world_matrix()???
 		val->set_double(TWIPS_TO_PIXELS(m.m_[1][2]));
 		return true;
 	}
-	case as_object::PROP_uWIDTH:
+	case NSV::PROP_uWIDTH:
 	{
 		val->set_double(TWIPS_TO_PIXELS(get_width()));
 #ifdef GNASH_DEBUG_TEXTFIELDS
@@ -973,7 +974,7 @@ edit_text_character::get_member(string_table::key name, as_value* val)
 #endif // GNASH_DEBUG_TEXTFIELDS
 		return true;
 	}
-	case as_object::PROP_uHEIGHT:
+	case NSV::PROP_uHEIGHT:
 	{
 		val->set_double(TWIPS_TO_PIXELS(get_height()));
 #ifdef GNASH_DEBUG_TEXTFIELDS
@@ -981,7 +982,7 @@ edit_text_character::get_member(string_table::key name, as_value* val)
 #endif // GNASH_DEBUG_TEXTFIELDS
 		return true;
 	}
-	case as_object::PROP_TEXT_WIDTH:
+	case NSV::PROP_TEXT_WIDTH:
 		//else if (name == "textWidth")
 	{
 		// Return the width, in pixels, of the text as laid out.
