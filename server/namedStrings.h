@@ -24,7 +24,11 @@ namespace gnash {
 
 class string_table; // Forward
 
-namespace NSV { // Named String Values
+/// Named String Values
+//
+/// Long description here...
+///
+namespace NSV {
 
 typedef enum {
 		PROP_ADD_LISTENER = 1,
