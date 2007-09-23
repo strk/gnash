@@ -1,3 +1,8 @@
+2007-09-24 Chad Musick <chadmusick@msbx.net>
+
+	* configure.ac: Add requirement of boost serialization library
+	* macros/boost.m4: Add requirement of boost serialization library
+
 2007-09-23 Chad Musick <chadmusick@msbx.net>
 
 	* server/namedStrings.cpp,.h: New files. Move pre-load string

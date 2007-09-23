@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.54 2007/09/11 00:17:43 rsavoye Exp $
+dnl $Id: boost.m4,v 1.55 2007/09/23 22:09:14 cmusick Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -95,9 +95,10 @@ AC_DEFUN([GNASH_PATH_BOOST],
   dnl attributes.
   boost_date_time="no"
   boost_thread="no"
+  boost_serialization="no"
   AC_MSG_CHECKING([for Boost libraries])
   for i in $libslist; do
-    if test x${boost_date_time} = xyes -a x${boost_thread} = xyes; then
+    if test x${boost_date_time} = xyes -a x${boost_thread} = xyes -a x${boost_serialization} = xyes; then
       break;
     fi
     dirs=`ls -dr $i/libboost_date_time*.${shlibext} $i/libboost_date_time*.${shlibext}.* $i/libboost_date_time*.a 2>/dev/null`
@@ -136,6 +137,23 @@ AC_DEFUN([GNASH_PATH_BOOST],
         break
       fi
     done
+
+    dnl now look for the Boost Serialization library
+    dirs=`ls -dr $i/libboost_serialization*.${shlibext} $i/libboost_serialization*.${shlibext}.* $i/libboost_serialization*.a 2>/dev/null`
+    for libname in $dirs; do
+      if test x"${boost_serialization}" = xno; then
+        lfile=`basename ${libname} | eval sed -e 's:^lib::'  -e 's:.a$::' -e 's:\.${shlibext}.*::'`
+        ldir=`dirname ${libname}`
+        if test -f ${ldir}/lib${lfile}-mt.${shlibext}; then
+          lfile="${lfile}-mt"
+        fi
+        boost_serialization=yes
+        ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${lfile}"
+        break
+      else
+        break
+      fi
+    done
   done
   AC_MSG_RESULT(${ac_cv_path_boost_lib})
 
@@ -152,7 +170,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   # This isn't right: you don't need boot date-time installed unless u build
   # cygnal, and it is sometimes a separate package from Boost core and thread.
   # TODO: why is this needed, lack of boost being a fatal error?
-  AM_CONDITIONAL(HAVE_BOOST, [test x${boost_date_time} = xyes && test x${boost_thread} = xyes])
+  AM_CONDITIONAL(HAVE_BOOST, [test x${boost_date_time} = xyes && test x${boost_thread} = xyes && test x${boost_serialization} = xyes])
 ])
 
 # Local Variables:

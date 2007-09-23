@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.421 2007/09/19 02:17:37 nihilus Exp $
+dnl $Id: configure.ac,v 1.422 2007/09/23 22:09:14 cmusick Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -2045,12 +2045,19 @@ fi # }
 
 if test x"$BOOST_LIBS" != x; then
 
-    if test x"$boost_thread" != xyes; then
+	if test x"$boost_thread" != xyes; then
 	echo "        ERROR: The BOOST thread package is needed to compile cygnal!"
 	echo "               Install it from http://boost.org"
 	echo "               or .deb users: apt-get install libboost-thread-dev"
 	nogo=true
-    fi
+	fi
+
+	if test x"$boost_serialization" != xyes; then
+	echo "        ERROR: The BOOST serialization package is needed to compile gnash."
+	echo "               Install it from http://boost.org"
+    echo "               or .deb users: apt-get install libboost-serialization-dev"
+	nogo=true
+	fi
 
     # Only cygnal requires date_time at present, so it's OK if either
     # you don't want cygnal or do have date_time installed.
