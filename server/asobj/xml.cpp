@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.47 2007/09/23 08:48:18 cmusick Exp $ */
+/* $Id: xml.cpp,v 1.48 2007/09/24 12:34:50 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -156,7 +156,15 @@ XML::set_member(string_table::key name, const as_value& val)
 {
         if (name == NSV::PROP_STATUS)
 	{
-		_status = XML::Status(val.to_number());
+		if ( ! val.is_number() )
+		{
+			_status = static_cast<XML::Status>(std::numeric_limits<int32_t>::min());
+		}
+		else
+		{
+			unsigned int statusNumber = static_cast<int>(val.to_number());
+			_status = XML::Status( static_cast<XML::Status>(statusNumber) );
+		}
 		return;
 	}
         else if (name == NSV::PROP_LOADED)
@@ -173,7 +181,7 @@ XML::set_member(string_table::key name, const as_value& val)
 
 XML::~XML()
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
     
 #ifdef DEBUG_MEMORY_ALLOCATION
     log_msg(_("\tDeleting XML top level node at %p"), this);

@@ -1,5 +1,11 @@
 2007-09-24 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xml.cpp: set _status to min 32bit signed int
+	  if value is not a number, cast to_number() to an int otherwise.
+	* testsuite/actionscript.all/XML.as: two more successes.
+
+2007-09-24 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/action_execution_order_test5.c:
 	  replicate tests run from SWFACTION_INIT into SWFACTION_CONSTRUCT.
 	* testsuite/actionscript.all/XML.as: more test for .status.
