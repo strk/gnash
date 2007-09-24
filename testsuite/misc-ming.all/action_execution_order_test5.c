@@ -181,12 +181,13 @@ main(int argc, char** argv)
   SWFDisplayItem_setName(it12, "mc12"); 
   
   /* add onClipEvents */
-  SWFDisplayItem_addAction(it12, // the inner most child
+  SWFDisplayItem_addAction(it12, 
     compileSWFActionCode(" _root.note('mc12 onInitialize called'); "
                          " _root.check_equals(this, _root.mc1.mc12);"
                          " _root.check_equals(this.__proto__, MovieClip.prototype);"
                          " _root.check_equals(this._parent.__proto__, MovieClip.prototype);"
                          " _root.check_equals(this._parent.mc11.__proto__, MovieClip.prototype);"
+                         // test child __proto__
                          " _root.xcheck_equals(this.mc121.__proto__, MovieClip.prototype);"),
     SWFACTION_INIT);
     
