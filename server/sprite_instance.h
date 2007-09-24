@@ -388,11 +388,8 @@ public:
 	///
 	/// The callback will also (known to be bogus):
 	//
-	/// (1) Invoke the onClipConstruct and onConstruct handlers
-	///     [ too early for handlers to refer to childs, should be queued eventually ]
-	/// (2) Invoke constructor of its associated class, either MovieClip
-	///     or any user-specified one (see sprite_definition::registerClass).
-	///	[ too early, init actions might not have had a chance to call registerClass ]
+	/// (1) Construct this instance as an ActionScript object.
+	///     See constructAsScriptObject() method.
 	///
 	virtual void stagePlacementCallback();
 
@@ -762,6 +759,15 @@ public:
         void queueAction(const action_buffer& buf);
 
 private:
+
+	/// Construct this instance as an ActionScript object
+	//
+	/// This method invokes the constructor associated with our
+	/// definition, either MovieClip or any user-speficied one
+	/// (see sprite_definition::registerClass). 
+	/// It will also invoke the onClipConstruct and onConstruct handlers.
+	///
+	void constructAsScriptObject();
 
 	/// Register this sprite as a listener of core broadcasters
 	//

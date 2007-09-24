@@ -3251,15 +3251,6 @@ sprite_instance::stagePlacementCallback()
 
 	on_event(event_id::INITIALIZE);
 
-	// Execute CONSTRUCT event immediately
-	on_event(event_id::CONSTRUCT);
-	if (isUnloaded())
-	{
-		log_debug("%s construct event handler unloaded self", getTarget().c_str());
-		// TODO: check if we should still execute frame tags (dlist ones in particular)
-		return;
-	}
-
 	// Now execute frame tags and take care of queuing the LOAD event.
 	//
 	// DLIST tags are executed immediately while ACTION tags are queued.
@@ -3296,55 +3287,78 @@ sprite_instance::stagePlacementCallback()
 		execute_frame_tags(0, TAG_DLIST|TAG_ACTION);
 	}
 
-	if ( _name.empty() )
-	{
-		// instance name will be needed for properly setting up
-		// a reference to 'this' object for ActionScript actions.
-		// If the instance doesn't have a name, it will NOT be
-		// an ActionScript referenciable object so we don't have
-		// anything more to do.
 
+	// Construct as ActionScript object.
+	constructAsScriptObject();
+}
+
+/*private*/
+void
+sprite_instance::constructAsScriptObject()
+{
+	do {
+		if ( _name.empty() )
+		{
+			// instance name will be needed for properly setting up
+			// a reference to 'this' object for ActionScript actions.
+			// If the instance doesn't have a name, it will NOT be
+			// an ActionScript referenciable object so we don't have
+			// anything more to do.
+			break;
+		}
+
+		sprite_definition* def = dynamic_cast<sprite_definition*>(m_def.get());
+
+		// We won't "construct" top-level movies
+		if ( ! def )
+		{
+			break;
+		}
+
+		as_function* ctor = def->getRegisteredClass();
+		//log_msg(_("Attached sprite's registered class is %p"), (void*)ctor); 
+
+		// TODO: builtin constructors are different from user-defined ones
+		// we should likely change that. See also vm/ASHandlers.cpp (construct_object)
+		if ( ctor && ! ctor->isBuiltin() )
+		{
+			// Set the new prototype *after* the constructor was called
+			boost::intrusive_ptr<as_object> proto = ctor->getPrototype();
+			set_prototype(proto);
+
+			//log_msg(_("Calling the user-defined constructor against this sprite_instance"));
+			fn_call call(this, &(get_environment()), 0, 0);
+
+			// we don't use the constructor return (should we?)
+			(*ctor)(call);
+
+			int swfversion = _vm.getSWFVersion();
+
+			// Set the '__constructor__' and 'constructor' members
+			// TODO: this would be best done by an as_function::constructInstance()
+			//       method. We have one but it returns a new object rather then
+			//       initializing a given object, we just need to add another one...
+			//
+			if ( swfversion > 5 )
+			{
+				set_member(NSV::PROP_uuCONSTRUCTORuu, ctor);
+				if ( swfversion == 6 )
+				{
+					set_member(NSV::PROP_CONSTRUCTOR, ctor);
+				}
+			}
+		}
+	} while (0);
+
+	// Execute CONSTRUCT event 
+	on_event(event_id::CONSTRUCT);
+	if (isUnloaded())
+	{
+		log_debug("%s construct event handler unloaded self", getTarget().c_str());
+		// TODO: check if we should still execute frame tags (dlist ones in particular)
 		return;
 	}
 
-	sprite_definition* def = dynamic_cast<sprite_definition*>(m_def.get());
-
-	// We won't "construct" top-level movies
-	if ( ! def ) return;
-
-	as_function* ctor = def->getRegisteredClass();
-	//log_msg(_("Attached sprite's registered class is %p"), (void*)ctor); 
-
-	// TODO: builtin constructors are different from user-defined ones
-	// we should likely change that. See also vm/ASHandlers.cpp (construct_object)
-	if ( ctor && ! ctor->isBuiltin() )
-	{
-		// Set the new prototype *after* the constructor was called
-		boost::intrusive_ptr<as_object> proto = ctor->getPrototype();
-		set_prototype(proto);
-
-		//log_msg(_("Calling the user-defined constructor against this sprite_instance"));
-		fn_call call(this, &(get_environment()), 0, 0);
-
-		// we don't use the constructor return (should we?)
-		(*ctor)(call);
-
-		int swfversion = _vm.getSWFVersion();
-
-		// Set the '__constructor__' and 'constructor' members
-		// TODO: this would be best done by an as_function::constructInstance()
-		//       method. We have one but it returns a new object rather then
-		//       initializing a given object, we just need to add another one...
-		//
-		if ( swfversion > 5 )
-		{
-			set_member(NSV::PROP_uuCONSTRUCTORuu, ctor);
-			if ( swfversion == 6 )
-			{
-				set_member(NSV::PROP_CONSTRUCTOR, ctor);
-			}
-		}
-	}
 }
 
 bool
