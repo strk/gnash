@@ -1,3 +1,8 @@
+2007-09-24 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/misc-swfc.all/action_execution_order_test10.sc: found a way to
+	  trigger user defined onConstruct with swfc.
+	  
 2007-09-24 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/loop_test6.c: Add test for onClipInitialize

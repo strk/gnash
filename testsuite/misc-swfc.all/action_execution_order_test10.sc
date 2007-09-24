@@ -153,15 +153,72 @@
     _root.as_order1 += "10+";
   .end
   
+  .del mc3 // delete mc3 by RemoveObject2
+  
 .frame 7
   .action:
     check_equals(_root.as_order1, '0+1+2+3+4+5+6+7+8+9+10+');
     check_equals(_root.as_order2, '0+1+2+3+');
-    _root.note(_root.as_order1);
+  .end
+
+
+//
+// seperate tests for user defined onInitialize, onConstruct, onLoad
+//
+.frame 8
+  .sprite mc4
+    .put b4  x=100 y=300
+  .end
+  .sprite mc5
+    .put b4  x=100 y=400
+  .end
+  .put mc4 // PlaceObject2(mc4)
+  .initaction mc4:
+    _root.mc4_onConstruct_executed = false;
+    
+    mc4.onInitialize = function () { 
+      _root.note("mc4 user defined onInitialize"); 
+      _root.check(false); // should not be executed
+    };
+    mc4.onConstruct = function() { 
+      _root.note("mc4 user defined onConstruct"); 
+      _root.mc4_onConstruct_executed = true;
+    };
+    mc4.onLoad = function() { 
+      _root.note("mc4 user defined onLoad"); 
+      _root.check(false); // should not be executed
+    };
+  .end
+  .initaction mc5:
+    _root.mc5_onConstruct_executed = false;
+    
+    mc5.onInitialize = function () { 
+      _root.note("mc5 user defined onInitialize"); 
+      _root.check(false); // should not be executed
+    };
+    mc5.onConstruct = function() { 
+      _root.note("mc5 user defined onConstruct"); 
+      _root.mc5_onConstruct_executed = true;
+    };
+    mc5.onLoad = function() { 
+      _root.note("mc5 user defined onLoad"); 
+      _root.check(false); // should not be executed
+    };
+  .end
+  .put mc5 // PlaceObject2(mc5)
+  
+.frame 9
+  .action:
+    xcheck_equals(mc4_onConstruct_executed, true);
+    xcheck_equals(mc5_onConstruct_executed, true);
+  .end
+
+.frame 15
+  .action:
     totals();
     stop();
   .end
-
+  
   
 .end // end of the file
 
