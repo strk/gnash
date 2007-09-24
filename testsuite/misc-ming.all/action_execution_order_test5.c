@@ -101,6 +101,13 @@ main(int argc, char** argv)
   SWFDisplayItem_setName(it1211, "mc1211"); 
   
   /* add onClipEvents */
+  SWFDisplayItem_addAction(it1211, // the inner most child
+    compileSWFActionCode(" _root.note('mc1211 onInitialize called'); "
+                         " _root.check_equals(this.__proto__, MovieClip.prototype);"
+                         " _root.check_equals(this._parent.__proto__, MovieClip.prototype);"
+                         " _root.check_equals(this._parent._parent.__proto__, MovieClip.prototype);"),
+    SWFACTION_INIT);
+
   SWFDisplayItem_addAction(it1211,
     compileSWFActionCode(" _root.note('mc1211 onLoad called'); "
                          " _root.x1 += '5+'; "),
@@ -174,6 +181,15 @@ main(int argc, char** argv)
   SWFDisplayItem_setName(it12, "mc12"); 
   
   /* add onClipEvents */
+  SWFDisplayItem_addAction(it12, // the inner most child
+    compileSWFActionCode(" _root.note('mc12 onInitialize called'); "
+                         " _root.check_equals(this, _root.mc1.mc12);"
+                         " _root.check_equals(this.__proto__, MovieClip.prototype);"
+                         " _root.check_equals(this._parent.__proto__, MovieClip.prototype);"
+                         " _root.check_equals(this._parent.mc11.__proto__, MovieClip.prototype);"
+                         " _root.xcheck_equals(this.mc121.__proto__, MovieClip.prototype);"),
+    SWFACTION_INIT);
+    
   SWFDisplayItem_addAction(it12,
     compileSWFActionCode(" _root.note('mc12 onLoad called'); "
                          " _root.x1 += '3+'; "),
@@ -235,6 +251,3 @@ main(int argc, char** argv)
 
   return 0;
 }
-
-
-
