@@ -19,8 +19,11 @@
 /*
  * Zou Lunkai, zoulunkai@gmail.com
  *
- * Within the same frame, if PlaceObject(mc1) is before PlaceObject(mc2), 
- * then actions in mc1 should be executed before actions in mc2. Otherwise, after mc2.
+ *
+ * expected behaviour:
+ * (1) Within the same frame, if PlaceObject(mc1) is before PlaceObject(mc2), 
+ *     then frame0 actions of mc1 should be executed before frame0 actions of mc2.
+ * (2) Within the same timeline, frame actions(frameNum>0) of fisrt placed sprites executed last.
  *
  * The actual order of tags are dependent on compiler, so you need to 
  * verify first if the order of tags is what you expect.

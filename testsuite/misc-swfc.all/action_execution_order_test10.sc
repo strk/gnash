@@ -41,6 +41,7 @@
  *    (2) user defined onLoad should not be triggered in this case(when allEventFlags == zero).
  *    (3) If DoAction is before RemoveObject2, then actions in DoAction should be executed before
  *        onUnload, otherwise after onUnload.
+ *    (4) Frame actions(frameNum>0): first placed last executed.
  * 
  */
 
@@ -51,7 +52,8 @@
   .action:
    #include "Dejagnu.sc"
    
-   _root.as_order = '0+';
+   _root.as_order1 = '0+';
+   _root.as_order2 = '0+';
     check_equals(_root._currentframe, 1);
   .end
   
@@ -64,72 +66,98 @@
 .frame 2
   
   .sprite mc1 // Define a sprite mc1
+  .frame 1
       .put b1
       .action:
-        _root.as_order += '2+';
+        _root.as_order1 += '2+';
       .end
+  .frame 3
+      .action:
+        _root.as_order2 += '3+';
+      .end
+  .frame 10
   .end 
   
   .sprite mc2 // Define a sprite mc2
+  .frame 1
       .put b2
       .action:
-        _root.as_order += '4+';
+        _root.as_order1 += '4+';
       .end
+  .frame 3
+      .action:
+        _root.as_order2 += '2+';
+      .end
+  .frame 10
   .end
   
+  .sprite mc3 // Define a sprite mc3
+  .frame 2
+      .action:
+        _root.as_order2 += '1+';
+      .end
+  .frame 10
+  .end
 
 .frame 3
 
   .action:
     // user defined onConstruct has no chance to be executed
-    mc1.onConstruct = function () {_root.as_order += 'xx+';};
-    mc2.onConstruct = function () {_root.as_order += 'xx+';};
+    mc1.onConstruct = function () {_root.as_order1 += 'xx+';};
+    mc2.onConstruct = function () {_root.as_order1 += 'xx+';};
     
     // user defined onLoad won't be triggered if allEventFlags is zero(this case),
     // otherwise, it will be triggered. A PP bug???
-    mc1.onLoad = function () {_root.as_order += 'YY+';};
-    mc2.onLoad = function () {_root.as_order += 'YY+';};
+    mc1.onLoad = function () {_root.as_order1 += 'YY+';};
+    mc2.onLoad = function () {_root.as_order1 += 'YY+';};
     
-    mc1.onUnload = function () {_root.as_order += '7+';};
-    mc2.onUnload = function () {_root.as_order += '9+';};
+    mc1.onUnload = function () {_root.as_order1 += '7+';};
+    mc2.onUnload = function () {_root.as_order1 += '9+';};
     
-    _root.as_order += "1+";
+    _root.as_order1 += "1+";
   .end
   
   .put mc1 x = 0   y = 300  // Place mc1  
     
   .action:
-    _root.as_order += "3+";
+    _root.as_order1 += "3+";
   .end
   
   .put mc2 x = 100 y = 300  // Place mc2
 
   .action:
-    _root.as_order += "5+";
+    _root.as_order1 += "5+";
   .end
-  
+
+
+ 
 .frame 4
+  .put mc3 // Place mc3
+
+
+.frame 6
   
   .action:
-    _root.as_order += "6+";
+    _root.as_order1 += "6+";
   .end
   
   .del mc1 // delete mc1 by RemoveObject2
 
   .action:
-    _root.as_order += "8+";
+    _root.as_order1 += "8+";
   .end
   
   .del mc2 // delete mc2 by RemoveObject2
   
   .action:
-    _root.as_order += "10+";
+    _root.as_order1 += "10+";
   .end
   
-.frame 6
+.frame 7
   .action:
-    check_equals(_root.as_order, '0+1+2+3+4+5+6+7+8+9+10+');
-    _root.note(_root.as_order);
+    check_equals(_root.as_order1, '0+1+2+3+4+5+6+7+8+9+10+');
+    check_equals(_root.as_order2, '0+1+2+3+');
+    _root.note(_root.as_order1);
     totals();
     stop();
   .end
