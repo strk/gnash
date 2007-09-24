@@ -1,3 +1,9 @@
+2007-09-24 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/gnash.h: correct some keycodes, extend support to
+ 	  extended ascii.
+	* gui/gtk.cpp: clean up and extend keyboard mapping.
+
 2007-09-24 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-swfc.all/movieclip_destruction_test1.sc: clarify

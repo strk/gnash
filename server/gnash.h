@@ -420,37 +420,37 @@ enum modifier
 enum code
 {
   INVALID = 0,
-  UNKOWN1,
-  UNKOWN2,
-  UNKOWN3,
-  UNKOWN4,
-  UNKOWN5,
-  UNKOWN6,
-  UNKOWN7,
+  UNKNOWN1,
+  UNKNOWN2,
+  UNKNOWN3,
+  UNKNOWN4,
+  UNKNOWN5,
+  UNKNOWN6,
+  UNKNOWN7,
   BACKSPACE = 8,
   TAB = 9,
-  UNKOWN10,
-  UNKOWN11,
+  UNKNOWN10,
+  UNKNOWN11,
   CLEAR = 12,
   ENTER = 13,
-  UNKOWN14,
-  UNKOWN15,
+  UNKNOWN14,
+  UNKNOWN15,
   SHIFT = 16,
   CONTROL = 17,
   ALT = 18,
   PAUSE = 19,
   CAPSLOCK = 20,
-  UNKOWN21,
-  UNKOWN22,
-  UNKOWN23,
-  UNKOWN24,
-  UNKOWN25,  
-  UNKOWN26,
+  UNKNOWN21,
+  UNKNOWN22,
+  UNKNOWN23,
+  UNKNOWN24,
+  UNKNOWN25,  
+  UNKNOWN26,
   ESCAPE = 27,
-  UNKOWN28,
-  UNKOWN29,
-  UNKOWN30,
-  UNKOWN31,
+  UNKNOWN28,
+  UNKNOWN29,
+  UNKNOWN30,
+  UNKNOWN31,
   SPACE = 32,
   EXCLAM = 33,
   DOUBLE_QUOTE = 34,
@@ -593,78 +593,166 @@ enum code
   KP_ADD = 162,
   KP_SUBTRACT = 163,
   KP_MULITPLY = 164,
-  KP_DEVIDE = 165,
+  KP_DIVIDE = 165,
   KP_DECIMAL = 166,
   KP_ENTER = 167,
   
   NUM_LOCK = 168,
 
 // Extended ASCII
-  NOBREAKSPACE = 169,
-  AGRAVE = 170, 
-  NTILDE = 171,
-  UGRAVE = 172,
-  SSHARPSMALL = 173,
-  UGRAVESMALL = 174,
-  YACUTESMALL = 175, 
 
-  // TODO: add other function keys and extend the codeMap
-  HELP = 176,
-  APOSTROPHE = 177,
-  ASCIICIRCUM = 178,
+  NOBREAKSPACE = 169,
+  EXCLAM_DOWN = 170,
+  CENT = 171,
+  STERLING = 172,
+  CURRENCY = 173,
+  YEN = 174,
+  BROKENBAR = 175,
+  SECTION = 176,
+  DIAERESIS = 177,
+  COPYRIGHT = 178,
+  ORDFEMININE = 179,
+  GUILLEMOTLEFT = 180,
+  NOTSIGN = 181,
+  HYPHEN = 182,
+  REGISTERED = 183,
+  MACRON = 184,
+  DEGREE = 185,
+  PLUSMINUS = 186,
+  TWOSUPERIOR = 187,
+  THREESUPERIOR = 188,
+  ACUTE = 189,
+  MU = 190,
+  PARAGRAPH = 191,
+  PERIODCENTRED = 192,
+  CEDILLA = 193,
+  ONESUPERIOR = 194,
+  MASCULINE = 195,
+  GUILLEMOTRIGHT = 196,
+  ONEQUARTER = 197,
+  ONEHALF = 198,
+  THREEQUARTERS = 199,
+  QUESTIONDOWN = 200,
+  AGRAVE = 201,
+  AACUTE = 202, 
+  ACIRCUMFLEX = 203,
+  ATILDE = 204,
+  ADIAERESIS = 205,
+  ARING = 206,
+  AE = 207,
+  CCEDILLA = 208,
+  EGRAVE = 209,
+  EACUTE = 210,
+  ECIRCUMFLEX = 211,
+  EDIAERESIS = 212,
+  IGRAVE = 213,
+  IACUTE = 214,
+  ICIRCUMFLEX = 215,
+  IDIAERESIS = 216,
+  ETH = 217,
+  NTILDE = 218,
+  OGRAVE = 219,
+  OACUTE = 220,
+  OCIRCUMFLEX = 221,
+  OTILDE = 222,
+  ODIAERESIS = 223,
+  MULTIPLY = 224,
+  OSLASH = 225,
+  UGRAVE = 226,
+  UACUTE = 227,
+  UCIRCUMFLEX = 228,
+  UDIAERESIS = 229,
+  YACUTE = 230,
+  THORN = 231,
+  sSHARP = 232,
+  aGRAVE = 233,
+  aACUTE = 234,
+  aCIRCUMFLEX = 235,
+  aTILDE = 236,
+  aDIAERESIS = 237,
+  aRING = 238,
+  ae = 239,
+  cCEDILLA = 240,
+  eGRAVE = 241,
+  eACUTE = 242,
+  eCIRCUMFLEX = 243,
+  eDIAERESIS = 244,
+  iGRAVE = 245,
+  iACUTE = 246,
+  iCIRCUMFLEX = 247,
+  iDIAERESIS = 248,
+  eth = 249,
+  nTILDE = 250,
+  oGRAVE = 251,
+  oACUTE = 252,
+  oCIRCUMFLEX = 253,
+  oTILDE = 254,
+  oDIAERESIS = 255,
+  DIVISION = 256,
+  oSLASH = 257,
+  uGRAVE = 258,
+  uACUTE = 259,
+  uCIRCUMFLEX = 260,
+  uDIAERESIS = 261,
+  yACUTE = 262,
+  thorn = 263,
+  yDIAERESIS = 264,
+  
+  // TODO: add other function keys and characters not yet known.
+  HELP = 265,
   KEYCOUNT
 };
 
 const unsigned char codeMap[KEYCOUNT][3] = {
 //{swfKeyCode, keycode, asciiKeyCode}
   {0,   0,   0}, // INVALID = 0
-  {0,   0,   0}, // UNKOWN1
-  {0,   0,   0}, // UNKOWN2
-  {0,   0,   0}, // UNKOWN3
-  {0,   0,   0}, // UNKOWN4
-  {0,   0,   0}, // UNKOWN5
-  {0,   0,   0}, // UNKOWN6
-  {0,   0,   0}, // UNKOWN7
-  {8,   8,   8}, // BACkSPACE = 8
+  {0,   0,   0}, // UNKNOWN1
+  {0,   0,   0}, // UNKNOWN2
+  {0,   0,   0}, // UNKNOWN3
+  {0,   0,   0}, // UNKNOWN4
+  {0,   0,   0}, // UNKNOWN5
+  {0,   0,   0}, // UNKNOWN6
+  {0,   0,   0}, // UNKNOWN7
+  {8,   8,   8}, // BACKSPACE = 8
   {18,  9,   9}, // TAB = 9
-  {0,   0,   0}, // UNKOWN10
-  {0,   0,   0}, // UNKOWN11
+  {0,   0,   0}, // UNKNOWN10
+  {0,   0,   0}, // UNKNOWN11
   {0,  12,   0}, // CLEAR = 12
   {13, 13,  13}, // ENTER = 13
-  {0,   0,   0}, // UNKOWN14
-  {0,   0,   0}, // UNKOWN15
+  {0,   0,   0}, // UNKNOWN14
+  {0,   0,   0}, // UNKNOWN15
   {0,  16,   0}, // SHIFT = 16
   {0,  17,   0}, // CONTROL = 17
   {0,  18,   0}, // ALT = 18
   {0,  19,   0}, // PAUSE = 19
   {0,  20,   0}, // CAPSLOCK = 20
-  {0,   0,   0}, // UNKOWN21
-  {0,   0,   0}, // UNKOWN22
-  {0,   0,   0}, // UNKOWN23
-  {0,   0,   0}, // UNKOWN24
-  {0,   0,   0}, // UNKOWN25 
-  {0,   0,   0}, // UNKOWN26
+  {0,   0,   0}, // UNKNOWN21
+  {0,   0,   0}, // UNKNOWN22
+  {0,   0,   0}, // UNKNOWN23
+  {0,   0,   0}, // UNKNOWN24
+  {0,   0,   0}, // UNKNOWN25 
+  {0,   0,   0}, // UNKNOWN26
   {19, 27,  27}, // ESCAPE = 27
-  {0,   0,   0}, // UNKOWN28
-  {0,   0,   0}, // UNKOWN29
-  {0,   0,   0}, // UNKOWN30
-  {0,   0,   0}, // UNKOWN31
+  {0,   0,   0}, // UNKNOWN28
+  {0,   0,   0}, // UNKNOWN29
+  {0,   0,   0}, // UNKNOWN30
+  {0,   0,   0}, // UNKNOWN31
   {32, 32,  32}, // SPACE = 32
-  {33, 33,  33}, // EXCLAM = 33
-  {34, 34,  34}, // DOUBLE_QUOTE = 34
-  {35, 35,  35}, // HASH = 35
-  {36, 36,  36}, // DOLLAR = 36
-  {37, 37,  37}, // PERCENT = 37
-  {38, 38,  38}, // AMPERSAND = 38 
-  {39, 39,  39}, // SINGLE_QUOTE  = 39
-  {40, 40,  40}, // PAREN_LEFT = 40
-  {41, 41,  41}, // PAREN_RIGHT = 41
-  {42, 42,  42}, // ASTERISK = 42
-  {43, 43,  43}, // PLUS = 43
-  {44, 44,  44}, // COMMA = 44
-  {45, 45,  45}, // MINUS = 45
-  {46, 46,  46}, // PERIOD = 46
-  {47, 47,  47}, // SLASH = 47
+  {33, 49,  33}, // EXCLAM = 33
+  {34, 222,  34}, // DOUBLE_QUOTE = 34
+  {35, 51,  35}, // HASH = 35
+  {36, 52,  36}, // DOLLAR = 36
+  {37, 53,  37}, // PERCENT = 37
+  {38, 55,  38}, // AMPERSAND = 38 
+  {39, 222,  39}, // SINGLE_QUOTE  = 39
+  {40, 57,  40}, // PAREN_LEFT = 40
+  {41, 48,  41}, // PAREN_RIGHT = 41
+  {42, 56,  42}, // ASTERISK = 42
+  {43, 187,  43}, // PLUS = 43
+  {44, 188,  44}, // COMMA = 44
+  {45, 189,  45}, // MINUS = 45
+  {46, 190,  46}, // PERIOD = 46
+  {47, 191,  47}, // SLASH = 47
   {48, 48,  48}, // 0 = 48
   {49, 49,  49}, // 1
   {50, 50,  50}, // 2
@@ -675,13 +763,13 @@ const unsigned char codeMap[KEYCOUNT][3] = {
   {55, 55,  55}, // 7
   {56, 56,  56}, // 8
   {57, 57,  57}, // 9 = 57
-  {58, 58,  58}, // COLON = 58
-  {59, 59,  59}, // SEMICOLON = 59
-  {60, 60,  60}, // LESS = 60
-  {61, 61,  61}, // EQUALS = 61
-  {62, 62,  62}, // MORE = 62
-  {63, 63,  63}, // QUESTION = 63
-  {64, 64,  64}, // AT = 64
+  {58, 186,  58}, // COLON = 58
+  {59, 186,  59}, // SEMICOLON = 59
+  {60, 188,  60}, // LESS = 60
+  {61, 187,  61}, // EQUALS = 61
+  {62, 190,  62}, // MORE = 62
+  {63, 191,  63}, // QUESTION = 63
+  {64, 50,  64}, // AT = 64
   {65, 65,  65}, // A = 65
   {66, 66,  66}, // B
   {67, 67,  67}, // C
@@ -708,12 +796,12 @@ const unsigned char codeMap[KEYCOUNT][3] = {
   {88, 88,  88}, // X
   {89, 89,  89}, // Y
   {90, 90,  90}, // Z = 90
-  {91, 91,  91}, // LEFT_BRACKET = 91
-  {92, 92,  92}, // BACKSLASH = 92
-  {93, 93,  93}, // RIGHT_BRACKET = 93
-  {94, 94,  94}, // CARET = 94
-  {95, 95,  95}, // UNDERSCORE = 95
-  {96, 96,  96}, // BACKQUOTE = 96
+  {91, 219,  91}, // LEFT_BRACKET = 91
+  {92, 220,  92}, // BACKSLASH = 92
+  {93, 221,  93}, // RIGHT_BRACKET = 93
+  {94, 54,  94}, // CARET = 94
+  {95, 189,  95}, // UNDERSCORE = 95
+  {96, 192,  96}, // BACKQUOTE = 96
   {97, 65,  97}, // a = 97
   {98, 66,  98}, // b
   {99, 67,  99}, // c
@@ -782,20 +870,107 @@ const unsigned char codeMap[KEYCOUNT][3] = {
   {0, 107,  43}, // KP_ADD = 162
   {0, 109,  45}, // KP_SUBTRACT = 163
   {0, 106,  42}, // KP_MULITPLY = 164
-  {0, 111,  47}, // KP_DEVIDE = 165
+  {0, 111,  47}, // KP_DIVIDE = 165
   {0, 110,  46}, // KP_DECIMAL = 166
   {13, 13,  13}, // KP_ENTER = 167
   {0, 144,   0}, // NUMLOCK = 168
-  {0, 160,   0}, // NOBREAKSPACE = 169,
-  {0, 192,   0}, // AGRAVE = 170 
-  {0, 209,   0}, // NTILDE = 171
-  {0, 217,   0}, // UGRAVE = 172
-  {0, 223,   0}, // SSHARPSMALL = 173
-  {0, 249,   0}, // UGRAVESMALL = 174
-  {0, 255,   0}, // YACUTESMALL = 175 
-  {0,  47,   0}, // HELP = 176(untested)
-  {0, 222,   0}, // APOSTROPHE(untested)
-  {0,  54,   0}, // ASCIICIRCUM(untested)
+  {0, 160,   160}, // NOBREAKSPACE = 169
+  {0, 161,   161}, //   EXCLAM_DOWN = 170
+  {0, 162,   162}, //   CENT = 171
+  {0, 163,   163}, //   STERLING = 172
+  {0, 164,   164}, //   CURRENCY = 173
+  {0, 165,   165}, //   YEN = 174
+  {0, 166,   166}, //   BROKENBAR = 175
+  {0, 167,   167}, //   SECTION = 176
+  {0, 168,   168}, //   DIAERESIS = 177
+  {0, 169,   169}, //   COPYRIGHT = 178
+  {0, 170,   170}, //   ORDFEMININE = 179
+  {0, 171,   171}, //   GUILLEMOTLEFT = 180
+  {0, 172,   172}, //   NOTSIGN = 181
+  {0, 173,   173}, //   HYPHEN = 182
+  {0, 174,   174}, //   REGISTERED = 183
+  {0, 175,   175}, //   MACRON = 184
+  {0, 176,   176}, //   DEGREE = 185
+  {0, 177,   177}, //   PLUSMINUS = 186
+  {0, 178,   178}, //   TWOSUPERIOR = 187
+  {0, 179,   179}, //   THREESUPERIOR = 188
+  {0, 180,   180}, //   ACUTE = 189
+  {0, 181,   181}, //   MU = 190
+  {0, 182,   182}, //   PARAGRAPH = 191
+  {0, 183,   183}, //   PERIODCENTRED = 192
+  {0, 184,   184}, //   CEDILLA = 193
+  {0, 185,   185}, //   ONESUPERIOR = 194
+  {0, 186,   186}, //   MASCULINE = 195
+  {0, 187,   187}, //   GUILLEMOTRIGHT = 196
+  {0, 188,   188}, //   ONEQUARTER = 197
+  {0, 189,   189}, //   ONEHALF = 198
+  {0, 190,   190}, //   THREEQUARTERS = 199
+  {0, 191,   191}, //   QUESTIONDOWN = 200
+  {0, 192,   192}, //   AGRAVE = 201
+  {0, 193,   193}, //   AACUTE = 202
+  {0, 194,   194}, //   ACIRCUMFLEX = 203
+  {0, 195,   195}, //   ATILDE = 204
+  {0, 196,   196}, //   ADIAERISIS = 205
+  {0, 197,   197}, //   ARING = 206
+  {0, 198,   198}, //   AE = 207
+  {0, 199,   199}, //   CCEDILLA = 208
+  {0, 200,   200}, //   EGRAVE = 209
+  {0, 201,   201}, //   EACUTE = 210
+  {0, 202,   202}, //   ECIRCUMFLEX = 211
+  {0, 203,   203}, //   EDIAERESIS = 212
+  {0, 204,   204}, //   IGRAVE = 213
+  {0, 205,   205}, //   IACUTE = 214
+  {0, 206,   206}, //   ICIRCUMFLEX = 215
+  {0, 207,   207}, //   IDIAERESIS = 216
+  {0, 208,   208}, //   ETH = 217
+  {0, 209,   209}, //   NTILDE = 218
+  {0, 210,   210}, //   OGRAVE = 219
+  {0, 211,   211}, //   OACUTE = 220
+  {0, 212,   212}, //   OCIRCUMFLEX = 221
+  {0, 213,   213}, //   OTILDE = 222
+  {0, 214,   214}, //   ODIAERESIS = 223
+  {0, 215,   215}, //   MULTIPLY = 224
+  {0, 216,   116}, //   OSLASH = 225
+  {0, 217,   217}, //   UGRAVE = 226
+  {0, 218,   218}, //   UACTUE = 227
+  {0, 219,   219}, //   UCIRCUMFLEX = 228
+  {0, 220,   220}, //   UDIAERESIS = 229
+  {0, 221,   221}, //   ZACUTE = 230
+  {0, 222,   222}, //   THORN = 231
+  {0, 223,   223}, //   sSHARP = 232
+  {0, 224,   224}, //   aTILDE = 233
+  {0, 225,   225}, //   aACUTE = 234
+  {0, 226,   226}, //   aCIRCUMFLEX = 235
+  {0, 227,   227}, //   aTILDE = 236
+  {0, 228,   228}, //   aDIAERESIS = 237
+  {0, 229,   229}, //   aRING = 238
+  {0, 230,   230}, //   ae = 239
+  {0, 231,   231}, //   cCEDILLA = 240
+  {0, 232,   232}, //   eGRAVE = 241
+  {0, 233,   233}, //   eACUTE = 242
+  {0, 234,   234}, //   eCIRCUMFLEX = 243
+  {0, 235,   235}, //   eDIAERESIS = 244
+  {0, 236,   236}, //   iGRAVE = 245
+  {0, 237,   237}, //   iACUTE = 246
+  {0, 238,   238}, //   iCIRCUMFLEX = 247
+  {0, 239,   239}, //   iDIAERESIS = 248
+  {0, 240,   240}, //   eth = 249
+  {0, 241,   241}, //   nTILDE = 250
+  {0, 242,   242}, //   oTILDE = 251
+  {0, 243,   243}, //   oACUTE = 252
+  {0, 244,   244}, //   oCIRCUMFLEX = 253
+  {0, 245,   245}, //   oTILDE = 254
+  {0, 246,   246}, //   oDIAERESIS = 255
+  {0, 247,   247}, //   DIVISION = 256
+  {0, 248,   248}, //   oSLASH = 257
+  {0, 249,   249}, //   uGRAVE = 258
+  {0, 250,   250}, //   uACUTE = 259
+  {0, 251,   251}, //   uCIRCUMFLEX = 260 
+  {0, 252,   252}, //   uDIAERESIS = 261
+  {0, 253,   253}, //   yACUTE = 262
+  {0, 253,   253}, //   thorn = 263
+  {0, 254,   254}, //   yDIAERESIS = 264
+  {0, 0,     0},   //   HELP (untested)
 };
 
 }   // end namespace key
