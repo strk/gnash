@@ -85,7 +85,7 @@ main(int argc, char** argv)
 
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
-  add_actions(mo, "mc1Constructed=0; mc2Constructed=0; mc3Constructed=0; mc4Constructed=0;");
+  add_actions(mo, "mc1Initialized=0; mc1Constructed=0; mc2Constructed=0; mc3Constructed=0; mc4Constructed=0;");
   SWFMovie_nextFrame(mo); 
   
   //
@@ -104,6 +104,10 @@ main(int argc, char** argv)
     "_root.note(this+' constructed');"
     "_root.mc1Constructed++;"
     ), SWFACTION_CONSTRUCT);
+  SWFDisplayItem_addAction(it1, newSWFAction(
+    "_root.note(this+' initialized');"
+    "_root.mc1Initialized++;"
+    ), SWFACTION_INIT);
 
   check_equals(mo, "typeof(movieClip1)", "'movieclip'");
   check_equals(mo, "_root.mc1Constructed", "1");
@@ -128,6 +132,12 @@ main(int argc, char** argv)
   // on whether the onClipUnload has been defined.
   // Gnash fails by calling onClipConstruct again without considering onClipUnload!!
   xcheck_equals(mo, "_root.mc1Constructed", "1");
+
+  // I'm not sure the above is correct, rather I'd think mc1 is not constructed
+  // agains simply because we're jumping back to a frame that's *after* mc1
+  // was destructed again. We can place an mc2 with an onUnload event to see
+  // what does it change, for now we know onClipInitialize is also invoked once...
+  xcheck_equals(mo, "_root.mc1Initialized", "1");
 
   SWFMovie_add(mo, (SWFBlock)newSWFAction( "totals(); stop();" ));
   SWFMovie_nextFrame(mo);

@@ -1,3 +1,8 @@
+2007-09-24 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/loop_test6.c: Add test for onClipInitialize
+	  also NOT called when jumping-back to after the character lifetime.
+
 2007-09-24 Chad Musick <chadmusick@msbx.net>
 
 	* server/namedStrings.h: More documentation,
