@@ -1,3 +1,8 @@
+2007-09-24 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/gui.cpp: change shortcut keys to lower case restore old
+	  behaviour.
+
 2007-09-25 Chad Musick <chadmusick@msbx.net>
 
 	* server/VM.cpp,.h: Add ClassHierarchy object to VM. Doesn't yet

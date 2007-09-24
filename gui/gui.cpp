@@ -333,14 +333,14 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 	if (!pressed) return;
 	if (modifier & gnash::key::MOD_CONTROL) {
 		switch(k) {
-		case gnash::key::R:
+		case gnash::key::r:
 			menu_restart();
 			break;
-		case gnash::key::P:
+		case gnash::key::p:
 			menu_pause();
 			break;
-		case gnash::key::Q:
-		case gnash::key::W:
+		case gnash::key::q:
+		case gnash::key::w:
 			menu_quit();
 			break;
 		default:
