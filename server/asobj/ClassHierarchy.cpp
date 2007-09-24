@@ -189,6 +189,8 @@ ClassHierarchy::declareClass(extensionClass& c)
 	if (mExtension == NULL)
 		return false; // Extensions can't be loaded.
 
+	mGlobalNamespace.stubPrototype(c.name);
+
 	boost::intrusive_ptr<as_function> getter =
 		new declare_extension_function(c, mGlobal, mExtension);
 	boost::intrusive_ptr<as_function> setter =
@@ -201,6 +203,8 @@ ClassHierarchy::declareClass(extensionClass& c)
 bool
 ClassHierarchy::declareClass(nativeClass& c)
 {
+	mGlobalNamespace.stubPrototype(c.name);
+
 	boost::intrusive_ptr<as_function> getter =
 		new declare_native_function(c, mGlobal, mExtension);
 	boost::intrusive_ptr<as_function> setter =

@@ -20,6 +20,7 @@
 #define GNASH_CLASS_HIERARCHY_H
 
 #include "as_object.h"
+#include "Namespace.h"
 
 namespace gnash {
 
@@ -109,16 +110,56 @@ public:
 	///
 	void massDeclare(int version);
 
+	/// The global namespace
+	///
+	/// Get the global namespace.  This is not the Global object -- it only
+	/// contains the classes, not any globally available functions or anything
+	/// else.
+	Namespace *getGlobalNs() { return &mGlobalNamespace; }
+
+	/// Find a namespace with the given uri.
+	///
+	/// @return 
+	/// The namespace with the given uri or NULL if it doesn't exist.
+	Namespace *findNamespace(string_table::key uri)
+	{
+		if (uri == 0)
+			return getGlobalNs();
+
+		std::map<string_table::key, Namespace>::iterator i;
+		i = mNamespaces.find(uri);
+		if (i == mNamespaces.end())
+			return NULL;
+		return &(i->second);
+	}
+
 	/// \brief
-	/// Construct the declaration object with the given global object
-	/// and extension object.
-	ClassHierarchy(as_object *global, Extension *e) :
-		mGlobal(global), mExtension(e)
+	/// Add a namespace to the set. Don't use to add unnamed namespaces.
+	/// Will overwrite existing namespaces 'kind' and 'prefix' values. 
+	/// Returns the added space.
+	Namespace* addNamespace(string_table::key uri, Namespace::kinds kind)
+	{ Namespace &n = mNamespaces[uri]; n.initialize(uri, 0, kind);
+	  return &mNamespaces[uri];}
+
+	/// Set the extension object, since it wasn't set on construction.
+	void setExtension(Extension *e) { mExtension = e; }
+
+	/// Set the global object, for registrations.
+	void setGlobal(as_object *g) { mGlobal = g; }
+
+	/// \brief
+	/// Construct the declaration object. Later set the global and
+	/// extension objects using setGlobal and setExtension
+	ClassHierarchy() :
+		mGlobal(NULL), mGlobalNamespace(), mExtension(NULL)
 	{/**/}
 
 private:
 	as_object *mGlobal;
+	Namespace mGlobalNamespace;
 	Extension *mExtension;
+
+	std::map<string_table::key, Namespace> mNamespaces;
 };
 
 } /* namespace gnash */

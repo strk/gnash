@@ -31,6 +31,7 @@
 namespace gnash {
 	class VM;
 	class fn_call;
+	class ClassHierarchy;
 }
 
 namespace gnash {
@@ -38,7 +39,7 @@ namespace gnash {
 class Global: public as_object
 {
 public:
-	Global(VM& vm);
+	Global(VM& vm, ClassHierarchy *ch);
 	~Global() {}
 private:
 

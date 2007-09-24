@@ -1,3 +1,20 @@
+2007-09-25 Chad Musick <chadmusick@msbx.net>
+
+	* server/VM.cpp,.h: Add ClassHierarchy object to VM. Doesn't yet
+	  mark objects, though it will very soon.
+	* server/asobj/ClassHierarchy.cpp,.h: Extend to use as a namespace
+	  object for ActionScript independent of the "Global" object.
+	* server/asobj/Global.cpp,.h: Accept a passed ClassHierarchy,
+	  rather than stack constructing one.
+	* server/parser/Makefile.am: Add asobj directory for use of
+	  ClassHierarchy by abc_block.
+	* server/parser/Namespace.h: Namespaces contain names, and this
+	  enables that.
+	* server/abc_block.h: Change Namespaces to be stored by pointer,
+	  since the ClassHiearchy object does the creation now.
+	* server/abc_block.cpp: More parsing. Validate super class
+	  of all declared classes, declare stubs in the correct namespaces.
+	
 2007-09-24 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/gnash.h: correct some keycodes, extend support to

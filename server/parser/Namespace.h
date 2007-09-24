@@ -25,12 +25,20 @@
 #include "config.h"
 #endif
 
+#include <map>
 #include "string_table.h"
 
 namespace gnash {
 
 class abc_block;
+class as_object;
 
+/// A namespace for ActionScript. Not really functional in AS2.
+///
+/// A namespace contains the prototypes of the objects in its
+/// namespace and nothing else.  In AS3 and up, namespaces are
+/// not semantically nested. (Though they may look nested by their
+/// names, this is not a true nesting as done by the bytecode.)
 class Namespace
 {
 public:
@@ -47,22 +55,123 @@ public:
 		KIND_STATIC_PROTECTED = 0x1A
 	} kinds;
 
+	/// the Uri is the name of the nameSpace.
 	string_table::key getUri() const { return mUri; }
+
+	/// the Prefix is used for XML, but not otherwise.
 	string_table::key getPrefix() const { return mPrefix; }
 
+	/// \brief
+	/// Create a namespace with the given characteristics. Such a namespace
+	/// will be empty upon creation.
 	Namespace(string_table::key uri, string_table::key prefix, kinds kind) :
-		mUri(uri), mPrefix(prefix), mKind(kind)
+		mUri(uri), mPrefix(prefix), mKind(kind), mMembers()
 	{/**/}
 
-	Namespace() : mUri(0), mPrefix(0), mKind(KIND_NORMAL) {/**/}
+	/// \brief
+	/// Default constructor so that Namespaces can appear in containers.
+	Namespace() : mUri(0), mPrefix(0), mKind(KIND_NORMAL), mMembers()
+	 {/**/}
 
-	void Initialize(string_table::key uri, string_table::key prefix, kinds kind)
+	/// \brief
+	/// Initialize the namespace with the given values.  Does not clear
+	/// the list of members of the namespace.
+	void initialize(string_table::key uri, string_table::key prefix, kinds kind)
 	{ mUri = uri; mPrefix = prefix; mKind = kind; }
+
+	/// \brief
+	/// Add a prototype
+	///
+	/// It is intentional that there is no facility for deleting a prototype.
+	/// It doesn't make any sense, and this would cause multiple problems.
+	/// If this functionality is needed, the whole namespace is probably
+	/// invalidated, and the namespace can be discarded.
+	///
+	/// @param name
+	/// The string table key corresponding to the unqualified name of the
+	/// class.
+	///
+	/// @param obj
+	/// The object which is the prototype of the named class.
+	///
+	/// @return
+	/// true if the object is added, false if a different prototype object
+	/// already existed.
+	bool addPrototype(string_table::key name, as_object* obj)
+	{
+		std::map<string_table::key, as_object*>::iterator i =
+			mMembers.find(name);
+
+		if (i != mMembers.end())
+			return false;
+
+		mMembers[name] = obj;
+		return true;
+	}
+
+	/// \brief
+	/// Declare a class stub.
+	bool stubPrototype(string_table::key name)
+	{ return addPrototype(name, NULL); }
+
+	/// \brief
+	/// Has a prototype been either stubbed or entered?
+	bool prototypeExists(string_table::key name)
+	{ return mMembers.find(name) != mMembers.end(); }
+
+	/// \brief
+	/// Set a prototype for an existing stub.
+	///
+	/// The difference between this and addPrototype is that addPrototype
+	/// will not allow the addition of the object if there is already an
+	/// entry, and this will.
+	///
+	/// @param name
+	/// The string table key of the unqualified name of the class.
+	///
+	/// @param obj
+	/// The object which is the prototype of the named class.
+	///
+	/// @return
+	/// true if the stub existed, otherwise false.
+	/// The prototype is added either way.
+	bool setPrototype(string_table::key name, as_object *obj)
+	{
+		std::map<string_table::key, as_object*>::iterator i =
+			mMembers.find(name);
+		if (i == mMembers.end())
+		{
+			mMembers[name] = obj;
+			return false;
+		}
+		i->second = obj;
+		return true;
+	}
+
+	/// \brief
+	/// Get a prototype
+	///
+	/// Find a prototype object given its string table key. Returns an empty
+	/// pointer if there is no such object. Because prototypes are unique,
+	/// returns the actual prototype, not a copy. Might return NULL if the
+	/// prototype is stubbed but not set.
+	as_object* getPrototype(string_table::key name)
+	{
+		std::map<string_table::key, as_object*>::iterator i = 
+			mMembers.find(name);
+
+		if (i == mMembers.end())
+			return NULL;
+
+		return i->second;
+	}
 
 private:
 	string_table::key mUri;
 	string_table::key mPrefix;
 	kinds mKind;
+
+	std::map<string_table::key, as_object*> mMembers;
 };
 
 }; /* namespace gnash */

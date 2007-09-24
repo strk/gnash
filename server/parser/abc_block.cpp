@@ -22,8 +22,10 @@
 #include "stream.h"
 #include "VM.h"
 #include "log.h"
+#include "ClassHierarchy.h"
 
 #define ERR(x) IF_VERBOSE_MALFORMED_SWF(log_swferror x;);
+//#define ERR(x) printf x
 
 namespace gnash {
 
@@ -100,8 +102,7 @@ bool
 abc_block::read(stream* in)
 {
 	using namespace abc_parsing;
-
-	std::vector<abc_Trait> traitVec;
+	ClassHierarchy *ch = VM::get().getClassHierarchy();
 
 	// Minor version, major version.
 	uint32_t version = (in->read_u16()) | (in->read_u16() << 16);
@@ -163,16 +164,13 @@ abc_block::read(stream* in)
 	mNamespacePool.resize(namespacePoolCount);
 	if (namespacePoolCount)
 	{
-		mNamespacePool[0].mUri = mNamespacePool[0].mPrefix = 0;
-		mNamespacePool[0].mKind = Namespace::KIND_NORMAL;
+		mNamespacePool[0] = ch->getGlobalNs();
 	}
 	for (unsigned int i = 1; i < namespacePoolCount; ++i)
 	{
 		uint8_t kind = in->read_u8();
 		if (kind == Namespace::KIND_PACKAGE)
 			kind = Namespace::KIND_NORMAL;
-		else
-			kind = static_cast<Namespace::kinds> (kind);
 		// All namespaces have the same structure, though the usage differs.
 
 		uint32_t nameIndex = in->read_V32();
@@ -192,10 +190,21 @@ abc_block::read(stream* in)
 			return false;
 		}
 
-		// And set the name in the Namespace itself.
-		mNamespacePool[i].mUri = nameIndex;
-		// The prefix is unknown right now.
-		mNamespacePool[i].mPrefix = 0;
+		// If this is a private namespace, it is special.
+		if (kind == Namespace::KIND_PRIVATE)
+		{
+			// TODO: This is a leak. Plug it.
+			mNamespacePool[i] = new Namespace(nameIndex, 0, static_cast<Namespace::kinds>(kind));
+		}
+		else
+		{
+			// And do the Namespace itself.
+			Namespace *n = ch->findNamespace(nameIndex);
+			if (n == NULL)
+				n = ch->addNamespace(nameIndex, 
+					static_cast<Namespace::kinds>(kind));
+			mNamespacePool[i] = n;
+		}
 	}
 
 	// These are sets of namespaces, which use the individual ones above.
@@ -220,7 +229,7 @@ abc_block::read(stream* in)
 				ERR((_("Action Block: Out of Bound namespace in namespace set.\n")));
 				return false;
 			}
-			mNamespaceSetPool[i][j] = &mNamespacePool[selection];
+			mNamespaceSetPool[i][j] = mNamespacePool[selection];
 		}
 	}
 
@@ -229,8 +238,7 @@ abc_block::read(stream* in)
 	uint32_t multinamePoolCount = in->read_V32();
 
 	// Any two namespaces with the same uri here are the same namespace,
-	// excepting private nameSpaces.  This will be handled at verify time.
-	// TODO: Handle this.
+	// excepting private nameSpaces.
 	mMultinamePool.resize(multinamePoolCount);
 	for (unsigned int i = 1; i < multinamePoolCount; ++i)
 	{
@@ -338,7 +346,7 @@ abc_block::read(stream* in)
 		mMultinamePool[i].mName = mStringPoolTableIds[name];
 
 		if (ns)
-			mMultinamePool[i].mNamespace = &mNamespacePool[ns];
+			mMultinamePool[i].mNamespace = mNamespacePool[ns];
 		if (nsset)
 			mMultinamePool[i].mNamespaceSet = &mNamespaceSetPool[nsset];
 
@@ -456,23 +464,48 @@ abc_block::read(stream* in)
 		else
 			instance.mSuperType = &mMultinamePool[super_index];
 
-		as_object *global = VM::get().getGlobal();
-		as_value vstore;
-		if (super_index && !global->get_member(instance.mSuperType->mName, &vstore))
+		int found = 0;
+		// If there is a super_index, we ought to be able to find this thing.
+		if (super_index)
 		{
-			ERR((_("Action Block: Non-existent super type (%d).\n"),
-				super_index));
-			fprintf(stderr, "Super type doesn't exist, but continuing (%s).\n",
-				mStringTable->value(instance.mSuperType->mName).c_str());
-			//return false;
-		}
+			if (!instance.mSuperType->mNamespace)
+			{
+				if (instance.mSuperType->mNamespaceSet)
+				{
+					int found = 0;
+					for (std::vector<Namespace*>::iterator i = 
+						instance.mSuperType->mNamespaceSet->begin();
+						i != instance.mSuperType->mNamespaceSet->end();
+						++i)
+					{
+						if ((*i)->prototypeExists(super_index))
+							++found;
+					}
+				}
+			}
+			else if (instance.mSuperType->mNamespace->prototypeExists(
+				instance.mSuperType->mName))
+			{
+				++found;
+			}
 
-		// vstore now contains the object (we hope) which is the class that
-		// we want to be the super of this instance.
-		if (!vstore.is_object())
-		{
-			ERR((_("Action Block: Super prospect is not an object.\n")));
-			//return false;
+			if (found == 0)
+			{
+				if (!ch->getGlobalNs()->prototypeExists(instance.mSuperType->mName))
+				{
+					ERR((_("Action Block: Super type not found (%s), faking.\n"),
+						mStringTable->value(instance.mSuperType->mName).c_str()));
+					// While testing, we will add the super to the global object to fake.
+					ch->getGlobalNs()->stubPrototype(instance.mSuperType->mName);
+					//return false;
+				}
+			}
+			else if (found > 1)
+			{
+				ERR((_("Action Block: Ambiguous declaration (%s)\n"),
+					mStringTable->value(instance.mSuperType->mName).c_str()));
+				return false;
+			}
 		}
 
 		uint8_t flags = in->read_u8();
@@ -489,7 +522,7 @@ abc_block::read(stream* in)
 				return false;
 			}
 			if (ns_index)
-				instance.mProtectedNamespace = &mNamespacePool[ns_index];
+				instance.mProtectedNamespace = mNamespacePool[ns_index];
 		}
 
 		// Get the interfaces.
@@ -528,15 +561,17 @@ abc_block::read(stream* in)
 				return false;
 		}
 
-		// And now we add this instance to the type names of the VM...
-		// TODO: Quit faking!
-		as_value fake;
-		if (global->get_member(instance.mName->mName, &fake))
+		if (instance.mName->mNamespace == NULL)
 		{
-			fprintf(stderr, "Already registered, but doing it again?"
-				"Type is %s\n", mStringTable->value(instance.mName->mName).c_str());
+			ERR((_("Action Block: No namespace to use for storing class.\n")));
+			return false;
 		}
-		global->set_member(instance.mName->mName, as_value(2));
+		if (!instance.mName->mNamespace->stubPrototype(instance.mName->mName))
+		{
+			ERR((_("Duplicate class registration for type %s.\n"),
+				mStringTable->value(instance.mName->mName).c_str()));
+			return false;
+		}
 	} // end of instances list
 
 	// Now the classes are read. TODO: Discover what these do.

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.69 2007/09/23 08:48:18 cmusick Exp $ */
+/* $Id: Global.cpp,v 1.70 2007/09/24 15:39:31 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -66,6 +66,7 @@
 #include "edit_text_character.h"
 #include "rc.h"
 #include "ClassHierarchy.h"
+#include "namedStrings.h"
 
 #include "fn_call.h"
 #include "sprite_instance.h"
@@ -354,7 +355,7 @@ as_global_assetpropflags(const fn_call& fn)
     return as_value();
 }
 
-Global::Global(VM& vm)
+Global::Global(VM& vm, ClassHierarchy *ch)
 	:
 	as_object()
 {
@@ -379,22 +380,26 @@ Global::Global(VM& vm)
 	init_member("setInterval", new builtin_function(timer_setinterval));
 	init_member("clearInterval", new builtin_function(timer_clearinterval));
 
+	ch->setGlobal(this);
+
 // If extensions aren't used, then no extensions will be loaded.
 #ifdef USE_EXTENSIONS
-	ClassHierarchy CH(this, &et);
-#else
-	ClassHierarchy CH(this, NULL);
+	ch->setExtension(&et);
 #endif
-	CH.massDeclare(vm.getSWFVersion());
+
+	ch->massDeclare(vm.getSWFVersion());
 
 	if (vm.getSWFVersion() >= 5)
 	{
 		object_class_init(*this);
+		ch->getGlobalNs()->stubPrototype(NSV::CLASS_OBJECT);
 		array_class_init(*this);
+		ch->getGlobalNs()->stubPrototype(NSV::CLASS_ARRAY);
 	}
 	if (vm.getSWFVersion() >= 6)
 	{
 		function_class_init(*this);
+		ch->getGlobalNs()->stubPrototype(NSV::CLASS_FUNCTION);
 	}
 	
 	if ( vm.getSWFVersion() < 3 ) goto extscan;

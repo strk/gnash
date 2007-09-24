@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.38 2007/09/21 13:40:32 cmusick Exp $
+# $Id: Makefile.am,v 1.39 2007/09/24 15:39:31 cmusick Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -32,6 +32,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/server/swf \
 	-I$(top_srcdir)/server/parser \
 	-I$(top_srcdir)/server/vm \
+	-I$(top_srcdir)/server/asobj \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libgeometry \
         -I$(top_srcdir)/libamf \

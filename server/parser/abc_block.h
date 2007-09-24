@@ -193,7 +193,7 @@ private:
 	std::vector<long double> mDoublePool;
 	std::vector<std::string> mStringPool;
 	std::vector<string_table::key> mStringPoolTableIds;
-	std::vector<Namespace> mNamespacePool;
+	std::vector<Namespace*> mNamespacePool;
 	std::vector<NamespaceSet> mNamespaceSetPool;
 	std::vector<abc_parsing::abc_Method> mMethods;
 	std::vector<abc_parsing::abc_Multiname> mMultinamePool;

@@ -40,6 +40,8 @@ namespace gnash {
 
 namespace gnash {
 
+class ClassHierarchy;
+
 /// A GC root used to mark all reachable collectable pointers
 class VmGcRoot : public GcRoot 
 {
@@ -128,7 +130,10 @@ class DSOEXPORT VM {
 	ResVect _statics;
 #endif
 
+	/// Mutable since it should not affect how the VM runs.
 	mutable string_table mStringTable;
+	/// Not mutable since changing this changes behavior of the VM.
+	ClassHierarchy *mClassHierarchy;
 
 public:
 
@@ -169,6 +174,7 @@ public:
 	/// Get the number of milliseconds since VM was started
 	uint64_t getTime();
 
+	/// Get a reference to the string table used by the VM.
 	string_table& getStringTable() const { return mStringTable; }
 
 	/// Get version of the player, in a compatible representation
@@ -184,6 +190,9 @@ public:
 	/// Get a pointer to this VM's _global Object
 	as_object* getGlobal() const;
 
+	/// Get a pointer to this VM's global ClassHierarchy object.
+	ClassHierarchy* getClassHierarchy() const { return mClassHierarchy; }
+	
 	/// Get the SWF locale to use 
 	std::locale& getLocale() const;
 
@@ -192,6 +201,7 @@ public:
 	/// - root movie / stage (_root_movie)
 	/// - Global object (_global)
 	/// - registered static GcResources (_statics)
+	/// - Class Hierarchy object
 	///
 	///
 	void markReachableResources() const;

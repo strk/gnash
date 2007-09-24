@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: VM.cpp,v 1.20 2007/09/23 08:48:19 cmusick Exp $ */
+/* $Id: VM.cpp,v 1.21 2007/09/24 15:39:31 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -30,6 +30,7 @@
 #include "tu_timer.h" // for tu_timer::get_ticks()
 #include "rc.h" //for overriding default version string with rcfile
 #include "namedStrings.h"
+#include "ClassHierarchy.h"
 
 #include <memory>
 
@@ -53,7 +54,8 @@ VM::init(movie_definition& movie)
 	assert(_singleton.get());
 	NSV::load_strings(&_singleton->mStringTable, _singleton->getSWFVersion());
 
-	_singleton->setGlobal(new Global(*_singleton));
+	_singleton->mClassHierarchy = new ClassHierarchy;
+	_singleton->setGlobal(new Global(*_singleton, _singleton->mClassHierarchy));
 	assert(_singleton->getGlobal());
 
 	return *_singleton;
