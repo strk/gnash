@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.35 2007/07/26 03:41:20 strk Exp $";
+rcsid="$Id: XML.as,v 1.36 2007/09/24 10:57:34 strk Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
@@ -105,6 +105,26 @@ check(! tmp.hasOwnProperty("length"));
 
 check_equals(typeof(tmp.status), 'number');
 check(! tmp.hasOwnProperty("status"));
+#if OUTPUT_VERSION < 6
+ check(! tmp.__proto__.hasOwnProperty('status') );
+#else
+ xcheck(tmp.__proto__.hasOwnProperty('status') );
+#endif
+
+check_equals(tmp.status, 0);
+tmp.status = -1;
+check_equals(tmp.status, -1);
+tmp.status = 1000;
+check_equals(tmp.status, 1000);
+o = new Object;
+tmp.status = o; 
+check_equals(typeof(tmp.status), 'number');
+xcheck_equals(tmp.status, -2147483648); // 0xFFFFFFFF
+returnFour = function() { return 4; };
+o.toString = returnFour;
+tmp.status = o;
+check_equals(typeof(tmp.status), 'number');
+xcheck_equals(tmp.status, -2147483648); // 0xFFFFFFFF
 
 check_equals(typeof(tmp.loaded), 'undefined');
 check(! tmp.hasOwnProperty("loaded"));
