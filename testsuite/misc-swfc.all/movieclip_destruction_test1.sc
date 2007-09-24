@@ -241,7 +241,11 @@
   .initaction mc6: // Add initactions for mc6
     // Gnash fails by not respecting actions order for initactions
     _root.initActionExecuted += ", mc6";
+    // This is the secret to make __proto__ interesting:)
+    trace(mc6.__proto__);
+    // trace(mc7.__proto__);
     _root.xcheck_equals(typeof(mc6), 'movieclip'); // Gnash fails because executes init actions before DLIST tags
+    _root.xcheck_equals(mc6.__proto__, MovieClip.prototype); 
     _root.xcheck_equals(typeof(mc6.mc61), 'movieclip'); // Gnash fails because executes init actions before DLIST tags
     _root.xcheck_equals(typeof(mc7), 'movieclip'); // Gnash fails because executes init actions before DLIST tags
     _root.xcheck_equals(mc7.__proto__, Object.prototype); // this is interesting, isn't it ?
@@ -291,7 +295,7 @@
   .action:
     _root.check_equals(initActionExecuted, "mc2, mc3, mc61, mc6, mc8");
     stop();
-    totals(35);
+    totals(36);
   .end
   
 .end  // file end
