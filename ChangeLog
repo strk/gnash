@@ -1,5 +1,7 @@
 2007-09-24 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/action_execution_order_test5.c:
+	  replicate tests run from SWFACTION_INIT into SWFACTION_CONSTRUCT.
 	* testsuite/actionscript.all/XML.as: more test for .status.
 	  See patch #6178 for the why.
 
