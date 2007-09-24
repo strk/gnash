@@ -1,5 +1,8 @@
 2007-09-24 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfc.all/movieclip_destruction_test1.sc: clarify
+	  test for bogus __proto__ delayed construction. We still need
+	  to find a way to verify registerClass effects handling time.
 	* server/asobj/xml.cpp: set _status to min 32bit signed int
 	  if value is not a number, cast to_number() to an int otherwise.
 	* testsuite/actionscript.all/XML.as: two more successes.
