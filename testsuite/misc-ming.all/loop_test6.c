@@ -23,7 +23,7 @@
  * 
  *   Frame  | 1 | 2 | 3 | 4 | 5 | 6 |
  *  --------+---+---+---+---+---+---+
- *   Event  |   | P | R | * | J |   |
+ *   Event  |   | PP| RR| * | J |   |
  * 
  *  P = place (by PlaceObject2)
  *  R = remove (by RemoveObject* tag)
@@ -32,14 +32,21 @@
  *
  * Description:
  *
- *  frame2: a static characters is placed at depth 3 (-16381) [ a red square ]
- *          onConstruct event handler defined, onUnload event handlers NOT defined
- *  frame3: character at depth 3 (-16381) removed
+ *  frame2: (1)a static character(movieclip1) is placed at depth 3 (-16381) [ a red square ]
+ *             onInitialize and onConstruct event handlers defined, onUnload event handler NOT defined.
+ *          (2)a static character(movieclip2) is placed at depth 4 [a green square]
+ *             onInitialize and onConstruct event handlers defined, onUnload event handler also defined.
+ *  frame3: (1)character at depth 3 (-16381) removed.
+ *          (2)character at depth 4 removed.
  *  frame5: jump back to frame 4 and stop
  *
  * Expected behaviour:
  *
- *   After jump back, the onConstruct event handler for the red square has been invoked only once.
+ *   After jump back, 
+ *   (1)the onInitialize and onConstruct event handler for the red square has been 
+ *      invoked only once.
+ *   (2)the onInitialize and onConstruct event handlers for the green square has been 
+ *      invoked twice!
  *
  * run as ./loop_test6
  */
@@ -85,18 +92,24 @@ main(int argc, char** argv)
 
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
-  add_actions(mo, "mc1Initialized=0; mc1Constructed=0; mc2Constructed=0; mc3Constructed=0; mc4Constructed=0;");
+  add_actions(mo, "mc1Initialized=0; mc1Constructed=0; mc2Initialized=0; mc2Constructed=0; ");
   SWFMovie_nextFrame(mo); 
   
   //
   // Frame 2: 
   //   Place red static movieClip1 character at depth 3 (-16381)
+  //   Place green static movieClip2 character at depth 4 (-16380)
   //
-  sh1 = make_fill_square (300, 300, 60, 60, 255, 0, 0, 255, 0, 0);
+  sh1 = make_fill_square (100, 300, 60, 60, 255, 0, 0, 255, 0, 0);
   mc1 = newSWFMovieClip();
   SWFMovieClip_add(mc1, (SWFBlock)sh1); 
   SWFMovieClip_nextFrame(mc1);
   
+  sh2 = make_fill_square (300, 400, 60, 60, 255, 0, 0, 0, 255, 0);
+  mc2 = newSWFMovieClip();
+  SWFMovieClip_add(mc2, (SWFBlock)sh2); 
+  SWFMovieClip_nextFrame(mc2);
+
   it1 = SWFMovie_add(mo, (SWFBlock)mc1);  //add movieClip1 to the _root
   SWFDisplayItem_setDepth(it1, 3);
   SWFDisplayItem_setName(it1, "movieClip1"); //name movieClip1
@@ -108,14 +121,31 @@ main(int argc, char** argv)
     "_root.note(this+' initialized');"
     "_root.mc1Initialized++;"
     ), SWFACTION_INIT);
-
+  
+  it2 = SWFMovie_add(mo, (SWFBlock)mc2);  //add movieClip2 to the _root
+  SWFDisplayItem_setDepth(it2, 4);
+  SWFDisplayItem_setName(it2, "movieClip2"); //name movieClip1
+  SWFDisplayItem_addAction(it2, newSWFAction(
+    "_root.note(this+' constructed');"
+    "_root.mc2Constructed++;"
+    ), SWFACTION_CONSTRUCT);
+  SWFDisplayItem_addAction(it2, newSWFAction(
+    "_root.note(this+' initialized');"
+    "_root.mc2Initialized++;"
+    ), SWFACTION_INIT);
+  SWFDisplayItem_addAction(it2, newSWFAction(
+    "_root.note(this+' unloaded');"
+    ), SWFACTION_UNLOAD);
+    
   check_equals(mo, "typeof(movieClip1)", "'movieclip'");
   check_equals(mo, "_root.mc1Constructed", "1");
-
+  check_equals(mo, "typeof(movieClip2)", "'movieclip'");
+  check_equals(mo, "_root.mc1Constructed", "1");
   SWFMovie_nextFrame(mo);  
 
-  // Frame3: Remove red square
+  // Frame3: Remove movieclip1 and movieclip2
   SWFDisplayItem_remove(it1);
+  SWFDisplayItem_remove(it2);
   check_equals(mo, "typeof(movieClip1)", "'undefined'");
   check_equals(mo, "_root.mc1Constructed", "1");
   SWFMovie_nextFrame(mo);  
@@ -127,18 +157,16 @@ main(int argc, char** argv)
 
   SWFMovie_add(mo, (SWFBlock)newSWFAction( "gotoAndStop(4);"));
   check_equals(mo, "typeof(movieClip1)", "'undefined'");
+  check_equals(mo, "typeof(movieClip2)", "'movieclip'");
 
   // onClipConstruct invoked or not during jumping back is dependent 
   // on whether the onClipUnload has been defined.
   // Gnash fails by calling onClipConstruct again without considering onClipUnload!!
   xcheck_equals(mo, "_root.mc1Constructed", "1");
-
-  // I'm not sure the above is correct, rather I'd think mc1 is not constructed
-  // agains simply because we're jumping back to a frame that's *after* mc1
-  // was destructed again. We can place an mc2 with an onUnload event to see
-  // what does it change, for now we know onClipInitialize is also invoked once...
   xcheck_equals(mo, "_root.mc1Initialized", "1");
 
+  check_equals(mo, "_root.mc2Constructed", "2");
+  check_equals(mo, "_root.mc2Initialized", "2");
   SWFMovie_add(mo, (SWFBlock)newSWFAction( "totals(); stop();" ));
   SWFMovie_nextFrame(mo);
 

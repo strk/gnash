@@ -2,6 +2,8 @@
 	
 	* testsuite/misc-swfc.all/action_execution_order_test10.sc: found a way to
 	  trigger user defined onConstruct with swfc.
+	* testsuite/misc-ming.all/loop_test6.c: add test for onClipInitialize called
+	  when jumping-back with onClipUnload defined.
 	  
 2007-09-24 Sandro Santilli <strk@keybit.net>
 
