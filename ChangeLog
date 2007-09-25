@@ -1,3 +1,8 @@
+2007-09-26 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/gtk.cpp: change Oslash to Ooblique - GDK_Oslash is evidently
+	  not defined in all gtk-2.0 versions.
+
 2007-09-26 Chad Musick <chadmusick@msbx.net>
 
 	* server/vm/ActionExec.cpp: If the stack is empty, there was not
