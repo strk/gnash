@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.59 2007/07/01 10:54:04 bjacques Exp $ */
+/* $Id: sdl.cpp,v 1.60 2007/09/25 08:53:54 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -35,7 +35,7 @@ extern "C"{
 #  include <getopt.h>
 # endif
 # ifndef __GNUC__
-	extern int getopt(int, char *const *, const char *);
+  extern int getopt(int, char *const *, const char *);
 # endif
 }
 #endif // Win32
@@ -113,13 +113,12 @@ SDLGui::run()
                 {
                     return true;
                 }
-                key_event(event.key.keysym.sym, true);
+                key_event(&event.key, true);
                 break;
             }
             case SDL_KEYUP:
             {
-                SDLKey  key = event.key.keysym.sym;
-                key_event(key, false);       
+                key_event(&event.key, false);       
                 break;
             }
             case SDL_VIDEORESIZE:
@@ -256,51 +255,68 @@ SDLGui::setupEvents()
     return false;
 }
 
-void SDLGui::key_event(SDLKey key, bool down)
+key::code
+SDLGui::sdl_to_gnash_key(SDL_KeyboardEvent * key)
+{
+  gnash::key::code c(gnash::key::INVALID);
+  
+  // TODO: take care of CAPS_LOCK and NUM_LOCK and SHIFT
+  // int mod = key->keysym.mod;
+  int code = key->keysym.sym;
+
+  if(code>= 32 && code <= 127) {
+    c = (gnash::key::code)(code);
+  }else if(code >= SDLK_KP0 && code <= SDLK_KP9) {
+    c = (gnash::key::code)(code - SDLK_KP0 + gnash::key::KP_0);
+  }else if(code >= SDLK_F1 && code <= SDLK_F15) {
+    c = (gnash::key::code)(code - SDLK_F1 + gnash::key::F1);
+  }else 
+  {
+    switch(code) {
+      case SDLK_UP:       c = gnash::key::UP;       break;
+      case SDLK_DOWN:     c = gnash::key::DOWN;     break;
+      case SDLK_RIGHT:    c = gnash::key::RIGHT;    break;
+      case SDLK_LEFT:     c = gnash::key::LEFT;     break;
+      case SDLK_INSERT:   c = gnash::key::INSERT;   break;
+      case SDLK_HOME:     c = gnash::key::HOME;     break;
+      case SDLK_END:      c = gnash::key::END;      break;
+      case SDLK_PAGEUP:   c = gnash::key::PGUP;     break;
+      case SDLK_PAGEDOWN: c = gnash::key::PGDN;     break;
+      case SDLK_RSHIFT:
+      case SDLK_LSHIFT:   c = gnash::key::SHIFT;    break;
+      case SDLK_RCTRL:
+      case SDLK_LCTRL:    c = gnash::key::CONTROL;  break;
+      case SDLK_RALT:
+      case SDLK_LALT:     c = gnash::key::ALT;      break;
+      default: c = gnash::key::INVALID; break;
+    }
+  }
+
+  return c;
+}
+
+int 
+SDLGui::sdl_to_gnash_modifier(int state)
+{
+  int modifier = gnash::key::MOD_NONE;
+  
+  if (state & KMOD_SHIFT) {
+      modifier = modifier | gnash::key::MOD_SHIFT;
+    }
+    if (state & KMOD_CTRL) {
+      modifier = modifier | gnash::key::MOD_CONTROL;
+    }
+    if (state & KMOD_ALT) {
+      modifier = modifier | gnash::key::MOD_ALT;
+    }
+
+    return modifier;
+}
+
+void SDLGui::key_event(SDL_KeyboardEvent* key, bool down)
 // For forwarding SDL key events.
 {
-    gnash::key::code c(gnash::key::INVALID);
-    
-    if (key >= SDLK_0 && key <= SDLK_9) {
-        c = (gnash::key::code) ((key - SDLK_0) + gnash::key::_0);
-    } else if (key >= SDLK_a && key <= SDLK_z) {
-        c = (gnash::key::code) ((key - SDLK_a) + gnash::key::A);
-    } else if (key >= SDLK_F1 && key <= SDLK_F15) {
-        c = (gnash::key::code) ((key - SDLK_F1) + gnash::key::F1);
-    } else if (key >= SDLK_KP0 && key <= SDLK_KP9) {
-        c = (gnash::key::code) ((key - SDLK_KP0) + gnash::key::KP_0);
-    } else {
-        // many keys don't correlate, so just use a look-up table.
-        struct {
-            SDLKey sdlk;
-            gnash::key::code gs;
-        } table[] = {
-            { SDLK_SPACE, gnash::key::SPACE },
-            { SDLK_PAGEDOWN, gnash::key::PGDN },
-            { SDLK_PAGEUP, gnash::key::PGUP },
-            { SDLK_HOME, gnash::key::HOME },
-            { SDLK_END, gnash::key::END },
-            { SDLK_INSERT, gnash::key::INSERT },
-            { SDLK_DELETE, gnash::key::DELETEKEY },
-            { SDLK_BACKSPACE, gnash::key::BACKSPACE },
-            { SDLK_TAB, gnash::key::TAB },
-            { SDLK_RETURN, gnash::key::ENTER },
-            { SDLK_ESCAPE, gnash::key::ESCAPE },
-            { SDLK_LEFT, gnash::key::LEFT },
-            { SDLK_UP, gnash::key::UP },
-            { SDLK_RIGHT, gnash::key::RIGHT },
-            { SDLK_DOWN, gnash::key::DOWN },
-            // @@ TODO fill this out some more
-            { SDLK_UNKNOWN, gnash::key::INVALID }
-        };
-        
-        for (int i = 0; table[i].sdlk != SDLK_UNKNOWN; i++) {
-            if (key == table[i].sdlk) {
-                c = table[i].gs;
-                break;
-            }
-        }
-    }
+    gnash::key::code c = sdl_to_gnash_key(key);  
 
     if (c != gnash::key::INVALID) {
         // 0 should be any modifier instead..

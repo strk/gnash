@@ -8,6 +8,13 @@
 
 2007-09-25 Zou Lunkai <zoulunkai@gmail.com>
 	
+	* gui/sdl.cpp, gui/sdlsup.h: add sdl_to_gnash_key() and sdl_to_gnash_modifier(),
+	  cleanups.
+	* server/button_character_instance.cpp: on_event() don't respond to keypress event
+	  when keycode is 0(INVALID).
+	  
+2007-09-25 Zou Lunkai <zoulunkai@gmail.com>
+	
 	* testsuite/misc-ming.all/registerClassTest2.c: one more test.
 	* testsuite/misc-swfc.all/register_class_test3.sc, Makefile.am: one more testcase.
 	  all passed.

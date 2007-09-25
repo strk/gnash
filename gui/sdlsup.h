@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sdlsup.h,v 1.22 2007/07/01 10:54:05 bjacques Exp $ */
+/* $Id: sdlsup.h,v 1.23 2007/09/25 08:53:54 zoulunkai Exp $ */
 
 #ifndef __SDLSUP_H__
 #define __SDLSUP_H__
@@ -64,11 +64,11 @@ public:
     virtual void disableCoreTrap();
     virtual void setTimeout(unsigned int timeout);
 
-		void key_event(SDLKey key, bool down);
+    void key_event(SDL_KeyboardEvent * key, bool down);
 
 private:
-    unsigned int	_timeout;
-    bool 		_core_trap;
+    unsigned int _timeout;
+    bool         _core_trap;
 
     /// Handle VIDEORESIZE event
     void resize_event();
@@ -76,21 +76,24 @@ private:
     /// Handle VIDEOEXPOSE event
     void expose_event();
 
+    static key::code sdl_to_gnash_key(SDL_KeyboardEvent* key);
+    static int sdl_to_gnash_modifier(int state);
+
 #ifdef RENDERER_AGG
     SdlAggGlue          _glue;
 #elif defined(RENDERER_CAIRO)
-    SdlCairoGlue	_glue;
+    SdlCairoGlue    _glue;
 #elif defined(RENDERER_OPENGL)
-    SdlOglGlue		_glue;
+    SdlOglGlue      _glue;
 # ifdef FIX_I810_LOD_BIAS
-    float 		_tex_lod_bias;
+    float       _tex_lod_bias;
 # endif
 #endif
 
 };
  
 // void xt_event_handler(Widget xtwidget, gpointer instance,
-// 		 XEvent *xevent, Boolean *b);
+//       XEvent *xevent, Boolean *b);
 
 // end of namespace gnash 
 }

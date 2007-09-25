@@ -327,6 +327,12 @@ bool
 button_character_instance::on_event(const event_id& id)
 {
 
+    if( (id.m_id==event_id::KEY_PRESS) && (id.m_key_code == key::INVALID) )
+	{
+		// onKeypress only responds to valid key code
+		return false;
+	}
+
 	bool called = false;
 
 	// Add appropriate actions to the global action list ...
