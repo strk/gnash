@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.56 2007/09/25 09:39:49 cmusick Exp $
+dnl $Id: boost.m4,v 1.57 2007/09/25 11:11:36 nihilus Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -53,11 +53,11 @@ AC_DEFUN([GNASH_PATH_BOOST],
 	dnl Fix for packaging systems not adding extra fluff to the path-name.
 	i=`dirname ${j}`
         
-	if test -f ${j}/boost/detail/lightweight_mutex.hpp -a -f ${j}/boost/thread.hpp -a -f ${j}/boost/multi_index.hpp -a -f ${j}/boost/multi_index/key_extractors.hpp ;then
+	if test -f ${j}/boost/detail/lightweight_mutex.hpp -a -f ${j}/boost/thread.hpp -a -f ${j}/boost/multi_index.hpp -a -f ${j}/boost/multi_index/key_extractors.hpp ; then
 	  gnash_boost_topdir=`basename $j`
 	  ac_cv_path_boost_incl="-I${j}"
 	  break;
-	elif test -f ${i}/boost/detail/lightweight_mutex.hpp -a -f ${i}/boost/thread.hpp ; then
+	elif test -f ${i}/boost/detail/lightweight_mutex.hpp -a -f ${i}/boost/thread.hpp -a -f ${j}/boost/multi_index.hpp -a -f ${j}/boost/multi_index/key_extractors.hpp ; then
           ac_cv_path_boost_incl="-I${i}"
           break
         fi
