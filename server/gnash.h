@@ -968,8 +968,8 @@ const unsigned char codeMap[KEYCOUNT][3] = {
   {0, 251,   251}, //   uCIRCUMFLEX = 260 
   {0, 252,   252}, //   uDIAERESIS = 261
   {0, 253,   253}, //   yACUTE = 262
-  {0, 253,   253}, //   thorn = 263
-  {0, 254,   254}, //   yDIAERESIS = 264
+  {0, 254,   254}, //   thorn = 263
+  {0, 255,   255}, //   yDIAERESIS = 264
   {0, 0,     0},   //   HELP (untested)
 };
 
