@@ -1,3 +1,10 @@
+2007-09-25 Sandro Santilli <strk@keybit.net>
+
+	* server/edit_text_character.cpp (set_member): handle attempts
+	  to set _width and _height to non-finite or negative values.
+	  Fixes assertion failures in playing
+	  flvplayer-debug-lulutv-beta4.swf.
+
 2007-09-25 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gtk.cpp: clean up properties dialogue.

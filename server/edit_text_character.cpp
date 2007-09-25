@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.121 2007/09/23 08:48:17 cmusick Exp $ */
+/* $Id: edit_text_character.cpp,v 1.122 2007/09/25 11:10:00 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -814,6 +814,23 @@ edit_text_character::set_member(string_table::key name,
 	case NSV::PROP_uWIDTH:
 	{
 		float nw = PIXELS_TO_TWIPS(val.to_number()); // TODO: pass an as_environment !
+		if ( ! finite(nw) )
+		{
+			// might be our fault, see the TODO above (missing to pass as_environment out..)
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Attempt to set TextField._width to %g"), nw);
+			);
+			return;
+		}
+
+		if ( nw < 0.0f )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Attempt to set TextField._width to a negative number: %g, toggling sign"), nw);
+			);
+			nw = -nw;
+		}
+
 		if ( _bounds.width() == nw )
 		{
 #ifdef GNASH_DEBUG_TEXTFIELDS
@@ -841,7 +858,9 @@ edit_text_character::set_member(string_table::key name,
 		float xmin = _bounds.getMinX();
 		float ymin = _bounds.getMinY();
 		float ymax = _bounds.getMaxY();
-		_bounds.setTo(xmin, ymin, xmin+nw, ymax);
+		float xmax = xmin+nw;
+		assert(xmin <= xmax);
+		_bounds.setTo(xmin, ymin, xmax, ymax);
 		assert(_bounds.width() == nw);
 
 		// previously truncated text might get visible now
@@ -854,6 +873,23 @@ edit_text_character::set_member(string_table::key name,
 	case NSV::PROP_uHEIGHT:
 	{
 		float nh = PIXELS_TO_TWIPS(val.to_number()); // TODO: pass an as_environment !
+		if ( ! finite(nh) )
+		{
+			// might be our fault, see the TODO above (missing to pass as_environment out..)
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Attempt to set TextField._height to %g"), nh);
+			);
+			return;
+		}
+
+		if ( nh < 0.0f )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Attempt to set TextField._height to a negative number: %g, toggling sign"), nh);
+			);
+			nh = -nh;
+		}
+
 		if ( _bounds.height() == nh )
 		{
 #ifdef GNASH_DEBUG_TEXTFIELDS
