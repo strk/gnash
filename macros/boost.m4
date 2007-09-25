@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.58 2007/09/25 18:48:06 nihilus Exp $
+dnl $Id: boost.m4,v 1.59 2007/09/25 19:05:49 nihilus Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -53,11 +53,11 @@ AC_DEFUN([GNASH_PATH_BOOST],
 	dnl Fix for packaging systems not adding extra fluff to the path-name.
 	i=`dirname ${j}`
         
-	if test -f ${j}/boost/detail/lightweight_mutex.hpp -a -f ${j}/boost/thread.hpp -a -f ${j}/boost/multi_index.hpp -a -f ${j}/boost/multi_index/key_extractors.hpp ; then
+	if test -f ${j}/boost/detail/lightweight_mutex.hpp -a -f ${j}/boost/thread.hpp -a -f ${j}/boost/multi_index_container.hpp -a -f ${j}/boost/multi_index/key_extractors.hpp ; then
 	  gnash_boost_topdir=`basename $j`
 	  ac_cv_path_boost_incl="-I${j}"
 	  break;
-	elif test -f ${i}/boost/detail/lightweight_mutex.hpp -a -f ${i}/boost/thread.hpp -a -f ${i}/boost/multi_index.hpp -a -f ${i}/boost/multi_index/key_extractors.hpp ; then
+	elif test -f ${i}/boost/detail/lightweight_mutex.hpp -a -f ${i}/boost/thread.hpp -a -f ${i}/boost/multi_index_container.hpp -a -f ${i}/boost/multi_index/key_extractors.hpp ; then
           ac_cv_path_boost_incl="-I${i}"
           break
         fi
@@ -75,8 +75,8 @@ AC_DEFUN([GNASH_PATH_BOOST],
    AC_MSG_RESULT(${gnash_boost_version})
   fi
 
-  dnl AC_MSG_CHECKING([for boost header])
-  dnl AC_MSG_RESULT(${ac_cv_path_boost_incl})
+  AC_MSG_CHECKING([for boost header])
+  AC_MSG_RESULT(${ac_cv_path_boost_incl})
 
   dnl Look for the library
   AC_ARG_WITH(boost_lib, AC_HELP_STRING([--with-boost-lib], [directory where boost libraries are]), with_boost_lib=${withval})
