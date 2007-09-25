@@ -35,8 +35,11 @@
 
 
 .frame 2
-  .sprite libItem1 // Define a sprite mc1
+  .sprite libItem1 // Define a sprite libItem1
       .put b1  x=100 y=100
+  .end 
+  .sprite libItem2 // Define a sprite libItem2
+      .put b1  x=100 y=200
   .end 
   
 
@@ -58,11 +61,22 @@
      // sprite libItem1 never placed.
      check_equals(typeof(libItem1), 'undefined');
   .end
-    
+  .initaction  libItem2:
+     theClass2 = function() { this.testvar = 60;};
+     theClass2.prototype = new MovieClip();
+     Object.registerClass('libItem2', theClass2);
+     
+     // Gnash failed by executing init actions before DLIST tags.
+     xcheck_equals(typeof(libItem2), 'movieclip');
+     xcheck_equals(libItem2.__proto__, MovieClip.prototype);
+  .end
+  
+  .put libItem2
+  
     
 .frame 4
   .action:
-    totals(7);
+    totals(8);
     stop();
   .end
 
