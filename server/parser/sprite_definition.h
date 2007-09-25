@@ -352,8 +352,8 @@ private:
 				"loading of frame " SIZET_FMT " requested "
 				"(we are at " SIZET_FMT "/" SIZET_FMT ")"),
 				framenum, m_loading_frame, m_frame_count);
-			// Could this ever happen ?
-			assert(0);
+			// Could this ever happen ? YES ! See tuner_7_6_0_0_pandora.swf
+			return false;
 		}
 		return true;
 	}

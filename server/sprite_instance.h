@@ -636,7 +636,11 @@ public:
 
 	void testInvariant() const {
 		assert(m_play_state == PLAY || m_play_state == STOP);
-		assert(m_current_frame < m_def->get_frame_count());
+
+		// m_current_frame may be 0, since this is our initial
+		// condition. Still, frame count might be 0 as well, and
+		// loaded frames too !
+		//assert(m_current_frame < m_def->get_frame_count());
 #ifndef GNASH_USE_GC 
 		assert(get_ref_count() > 0); // or we're constructed but
 		                             // not stored in a boost::intrusive_ptr
@@ -909,7 +913,7 @@ private:
 	bool _callingFrameActions;
 
 	// a bit-array class would be ideal for this
-	std::vector<bool>	m_init_actions_executed;
+	std::set<size_t>	m_init_actions_executed;
 
 	/// This timeline's variable scope
 	as_environment	m_as_environment;

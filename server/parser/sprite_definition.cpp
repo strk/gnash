@@ -68,16 +68,9 @@ sprite_definition::read(stream* in)
 
 	m_frame_count = in->read_u16();
 
-	// ALEX: some SWF files have been seen that have 0-frame sprites.
-	// The Macromedia player behaves as if they have 1 frame.
-	if (m_frame_count < 1)
-	{
-		m_frame_count = 1;
-	}
-
-		IF_VERBOSE_PARSE (
+	IF_VERBOSE_PARSE (
 	log_parse(_("  frames = " SIZET_FMT), m_frame_count);
-		);
+	);
 
 	m_loading_frame = 0;
 

@@ -1,5 +1,21 @@
 2007-09-25 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/sprite_definition.h (ensure_frame_loaded): don't
+	  assume the target frame has always been loaded, as we might
+	  have loaded less frames then advertised in header.
+	* server/parser/sprite_definition.cpp (read): don't change 
+	  total frame count if zero. We wan't to respect it for _totalframes
+	  to return the correct value.
+	* server/sprite_instance.{cpp,h}: don't assume m_current_frame is less
+	  then frame count or even loaded frames, as we might have loaded NO
+	  frames too; use a std::set rather then a vector of boolean to tell
+	  wheter init actions for a given frame have been executed; check
+	  frames loaded count when needed.
+	* server/movie_instance.cpp (advance, stagePlacementCallback): drop
+	  the frames loaded count check, it's now in sprite_instance.
+
+2007-09-25 Sandro Santilli <strk@keybit.net>
+
 	* doc/C/usermanual/usage/gnashrc.xml: document StreamsTimeout
 	  directive, remove duplicated line for StartStopped.
 	* libbase/: Makefile.am, WallClockTimer.{h,cpp}:

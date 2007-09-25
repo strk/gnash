@@ -63,22 +63,6 @@ movie_instance::stagePlacementCallback()
 		);
 	}
 
-	// The parser might have reset the total frame count
-	// due to SWF malformation, so we check this *after*
-	// the ensure_frame_loaded call above.
-	//
-	if ( get_frame_count() == 0 )
-	{
-		IF_VERBOSE_MALFORMED_SWF(
-		static bool warned=false;
-		if ( ! warned ) {
-			log_swferror(_("The movie with url %s has NO frames!"), m_def->get_url().c_str());
-			warned=true;
-		}
-		);
-		return;
-	}
-
 	// Invoke parent placement event handler
 	sprite_instance::stagePlacementCallback();  
 }
@@ -105,22 +89,6 @@ movie_instance::advance(float delta_time)
 		log_swferror("Frame " SIZET_FMT " never loaded. Total frames: "
 				SIZET_FMT ".", nextframe, get_frame_count());
 		);
-	}
-
-	// The parser might have reset the total frame count
-	// due to SWF malformation, so we check this *after*
-	// the ensure_frame_loaded call above.
-	//
-	if ( get_frame_count() == 0 )
-	{
-		IF_VERBOSE_MALFORMED_SWF(
-		static bool warned=false;
-		if ( ! warned ) {
-			log_swferror(_("The movie with url %s has NO frames!"), m_def->get_url().c_str());
-			warned=true;
-		}
-		);
-		return;
 	}
 
 	advance_sprite(delta_time); 

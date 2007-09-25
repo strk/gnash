@@ -1693,7 +1693,7 @@ sprite_instance::sprite_instance(
 	m_as_environment.set_target(this);
 
 	// Initialize the flags for init action executed.
-	m_init_actions_executed.assign(m_def->get_frame_count(), false);
+	//m_init_actions_executed.assign(m_def->get_frame_count(), false);
 
 	// TODO: have the 'MovieClip' constructor take care of this !
 	attachMovieClipProperties(*this);
@@ -2232,6 +2232,20 @@ void sprite_instance::advance_sprite(float /*delta_time*/)
 	assert(!isUnloaded());
 	assert(!_callingFrameActions); // call_frame shoudl never trigger advance_sprite
 
+	// We might have loaded NO frames !
+	if ( get_loaded_frames() == 0 )
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+		static bool warned=false;
+		if ( ! warned ) {
+			log_swferror(_("advance_sprite: no frames loaded for sprite/movie %s"), getTarget().c_str());
+			warned=true;
+		}
+		);
+		return;
+	}
+
+
 	// Process any pending loadVariables request
 	processCompletedLoadVariableRequests();
 
@@ -2385,12 +2399,12 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 {
 	testInvariant();
 
-	assert(frame < m_def->get_frame_count());
+	assert(frame < get_loaded_frames());
 
 	assert(typeflags);
 
 	// Execute this frame's init actions, if necessary.
-	if (m_init_actions_executed[frame] == false)
+	if ( m_init_actions_executed.insert(frame).second )
 	{
 
 		const PlayList* init_actions = m_def->get_init_actions(frame);
@@ -2415,7 +2429,7 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 
 			// Mark this frame done, so we never execute these
 			// init actions again.
-			m_init_actions_executed[frame] = true;
+			//m_init_actions_executed[frame] = true;
 
 			//do_actions();
 		}
@@ -2838,7 +2852,8 @@ void sprite_instance::increment_frame_and_check_for_loop()
 {
 	//GNASH_REPORT_FUNCTION;
 
-	size_t frame_count = m_def->get_frame_count();
+	//size_t frame_count = m_def->get_frame_count();
+	size_t frame_count = get_loaded_frames(); 
 	if ( ++m_current_frame >= frame_count )
 	{
 		// Loop.
@@ -3232,6 +3247,19 @@ void
 sprite_instance::stagePlacementCallback()
 {
 	assert(!isUnloaded());
+
+	// We might have loaded NO frames !
+	if ( get_loaded_frames() == 0 )
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+		static bool warned=false;
+		if ( ! warned ) {
+			log_swferror(_("stagePlacementCallback: no frames loaded for sprite/movie %s"), getTarget().c_str());
+			warned=true;
+		}
+		);
+		return;
+	}
 
 #ifdef GNASH_DEBUG
 	log_debug(_("Constructing sprite '%s'"), _origTarget.c_str());
