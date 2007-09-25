@@ -70,14 +70,14 @@ public:
 
 	/// Returns the data pointer in the undecoded datastream
 	/// for the given position. Boundaries are checked.
-	uint8_t* get_data_ptr(unsigned long int pos);
+	const uint8_t* get_data_ptr(unsigned long int pos);
 
 	/// Set the undecoded data pointer
-	void set_data(uint8_t*);
+	void set_data(const uint8_t*);
 
 private:
 	// The (un)compressed data
-	guint8* data;
+	const guint8* data;
 
 };
 
@@ -85,12 +85,39 @@ private:
 // Used to hold the sounddata when doing on-demand-decoding
 class sound_data
 {
-public:
 	// The (un)compressed data
-	guint8* data;
+	guint8* _data;
 
 	// data size
-	long data_size;
+	unsigned long _dataSize;
+
+	/// Allocated memory for _data
+	unsigned long _capacity;
+
+public:
+
+	sound_data()
+		:
+		_data(0),
+		_dataSize(0),
+		_capacity(0)
+	{}
+
+	/// Append size bytes to this sound
+	//
+	/// @param data
+	///	Data bytes, allocated with new[]. Ownership transferred.
+	///
+	/// @param size
+	///	Size of the 'data' buffer.
+	///
+	void append(unsigned char* data, unsigned int size);
+
+	/// Return data size
+	unsigned long dataSize() const { return _dataSize; }
+
+	/// Return data buffer
+	const unsigned char* data() { return _data; }
 
 	// Object holding information about the sound
 	std::auto_ptr<SoundInfo> soundinfo;
@@ -104,8 +131,8 @@ public:
 
 	~sound_data()
 	{
-		// TODO: use boost::scoped_array
-		delete [] data;
+		// TODO: use boost::scoped_array ?
+		delete [] _data;
 	}
 };
 

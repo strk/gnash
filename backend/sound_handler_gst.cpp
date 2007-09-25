@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.62 2007/09/25 18:58:43 strk Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.63 2007/09/25 20:24:08 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -51,6 +51,39 @@ using namespace boost;
 
 namespace gnash {
 
+void
+sound_data::append(unsigned char* newData, unsigned int size)
+{
+	if ( ! _capacity )
+	{
+		_data = newData;
+		_dataSize = size;
+		_capacity = _dataSize;
+		return;
+	}
+
+	if ( _capacity < _dataSize+size )
+	{
+		// TODO: find the smallest bigger power of 2 ?
+		unsigned long newCapacity = std::max(_capacity*2, _dataSize+size);
+
+		//log_debug("sound_data %p reallocating from %lu to %lu bytes", (void*)this, _capacity, newCapacity);
+
+		_capacity = newCapacity;
+
+		guint8* tmp = _data;
+		_data = new guint8[_capacity];
+		memcpy(_data, tmp, _dataSize);
+		delete [] tmp;
+	}
+
+	assert(_capacity >= _dataSize+size);
+	memcpy(_data+_dataSize, newData, size);
+	_dataSize += size;
+	delete [] newData;
+}
+
+
 GST_sound_handler::GST_sound_handler()
 	: looping(false),
 	  muted(false)
@@ -70,7 +103,7 @@ GST_sound_handler::~GST_sound_handler()
 
 
 int	GST_sound_handler::create_sound(
-	void* data,
+	void* data_,
 	unsigned int data_bytes,
 	std::auto_ptr<SoundInfo> sinfo)
 // Called to create a sample.  We'll return a sample ID that
@@ -79,6 +112,8 @@ int	GST_sound_handler::create_sound(
 
 	try_mutex::scoped_lock lock(_mutex);
 
+	unsigned char* data = static_cast<unsigned char*>(data_);
+
 	assert(sinfo.get());
 	sound_data *sounddata = new sound_data;
 	if (!sounddata) {
@@ -86,30 +121,18 @@ int	GST_sound_handler::create_sound(
 		return -1;
 	}
 
-	sounddata->data_size = data_bytes;
 	sounddata->volume = 100;
 	sounddata->soundinfo = sinfo;
 
 	switch (sounddata->soundinfo->getFormat())
 	{
 	case FORMAT_NATIVE16:
-		sounddata->data = new guint8[data_bytes];
-		if (!sounddata->data) { 
-			log_error(_("Could not allocate space for data in sound handler"));
-			return -1;
-		}
-		memcpy(sounddata->data, data, data_bytes);
+		sounddata->append(data, data_bytes);
 		break;
 
 	case FORMAT_MP3:
 	//case FORMAT_VORBIS:
-		sounddata->data = new guint8[data_bytes];
-		if (!sounddata->data) { 
-			log_error(_("Could not allocate space for data in sound handler"));
-			return -1;
-		}
-		memcpy(sounddata->data, data, data_bytes);
-
+		sounddata->append(data, data_bytes);
 		break;
 
 	case FORMAT_RAW:
@@ -147,28 +170,24 @@ long	GST_sound_handler::fill_stream_data(unsigned char* data, unsigned int data_
 	{
 		sound_data* sounddata = m_sound_data[handle_id];
 
-		// Reallocate the required memory.
-		guint8* tmp_data = new guint8[data_bytes + sounddata->data_size];
-		memcpy(tmp_data, sounddata->data, sounddata->data_size);
-		memcpy(tmp_data + sounddata->data_size, data, data_bytes);
-		if (sounddata->data_size > 0) delete [] sounddata->data;
-		sounddata->data = tmp_data;
+		long startSize = sounddata->dataSize();
 
-		sounddata->data_size += data_bytes;
+		sounddata->append(data, data_bytes);
 
 		// If playback has already started, we also update the active sounds
 		for (size_t i=0, e=sounddata->m_gst_elements.size(); i < e; ++i) {
 			gst_elements* sound = sounddata->m_gst_elements[i];
-			sound->data_size = sounddata->data_size;
-			sound->set_data(tmp_data);
+			sound->data_size = sounddata->dataSize();
+			sound->set_data(sounddata->data());
 		}
 
-		delete [] data;
-		return sounddata->data_size - data_bytes;
+		return startSize;
 	}
-
-	delete [] data;
-	return 0;
+	else
+	{
+		delete [] data;
+		return 0;
+	}
 }
 
 // This stops sounds when they are done playing
@@ -222,7 +241,7 @@ void GST_sound_handler::callback_handoff (GstElement * /*c*/, GstBuffer *buffer,
 		return;
 	}
 
-	guint8* data_pos = gstelements->get_data_ptr(gstelements->position);
+	const guint8* data_pos = gstelements->get_data_ptr(gstelements->position);
 
 	// Last callback - the last re-fill
 	if (gstelements->position+BUFFER_SIZE > gstelements->data_size) {
@@ -278,7 +297,7 @@ void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offse
 		return;
 	}
 	// Make sure sound actually got some data
-	if (sounddata->data_size < 1) {
+	if (sounddata->dataSize() < 1) {
 		IF_VERBOSE_MALFORMED_SWF(
 			log_swferror(_("Trying to play sound with size 0"));
 		);
@@ -296,8 +315,8 @@ void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offse
 	gst_element->handler = this;
 
 	// Copy data-info to the "gst_elements"
-	gst_element->data_size = sounddata->data_size;
-	gst_element->set_data(sounddata->data);
+	gst_element->data_size = sounddata->dataSize();
+	gst_element->set_data(sounddata->data());
 	gst_element->position = start_position;
 
 	// Set number of loop we should do. -1 is infinte loop, 0 plays it once, 1 twice etc.
@@ -684,12 +703,13 @@ unsigned int GST_sound_handler::get_position(int sound_handle)
 }
 
 // Pointer handling and checking functions
-uint8_t* gst_elements::get_data_ptr(unsigned long int pos) {
+const uint8_t* gst_elements::get_data_ptr(unsigned long int pos)
+{
 	assert(data_size > pos);
 	return data + pos;
 }
 
-void gst_elements::set_data(uint8_t* idata) {
+void gst_elements::set_data(const uint8_t* idata) {
 	data = idata;
 }
 

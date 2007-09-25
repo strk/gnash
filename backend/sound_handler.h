@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.25 2007/09/25 18:58:43 strk Exp $ */
+/* $Id: sound_handler.h,v 1.26 2007/09/25 20:24:08 strk Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -119,10 +119,12 @@ public:
 	///     Size of the data in bytes
 	///
 	/// @param sample_count
-	/// Number of samples in the data
+	/// 	Number of samples in the data
 	///
 	/// @param handle_id
-	/// The soundhandlers id of the sound we want some info about.
+	/// 	The soundhandlers id of the sound we want some info about.
+	///
+	/// @return size of the data buffer before the new data is appended
 	///
 	virtual long	fill_stream_data(unsigned char* data, unsigned int data_bytes, unsigned int sample_count, int handle_id) = 0;
 

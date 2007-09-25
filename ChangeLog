@@ -1,5 +1,13 @@
 2007-09-26 Sandro Santilli <strk@keybit.net>
 
+	* backend/sound_handler.h: document fill_stream_data return value.
+	* backend/sound_handler_gst.{cpp,h}: Make buffer member of sound_data
+	  private, provide an ::append() function with optimized reallocs.
+	  Makes ninja parsing much faster. Same should be done for ffmpeg...
+	  See http://wiki.gnashdev.org/wiki/index.php/NinjaProfile.
+
+2007-09-26 Sandro Santilli <strk@keybit.net>
+
 	* backend/: sound_handler.h, sound_handler_gst.{cpp,h},
 	  sound_handler_sdl.{cpp,h}: changed fill_stream_data
 	  interface to take ownership of the data array.
