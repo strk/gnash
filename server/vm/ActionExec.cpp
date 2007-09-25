@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.46 2007/09/19 14:20:51 cmusick Exp $ */
+/* $Id: ActionExec.cpp,v 1.47 2007/09/25 16:03:25 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -187,7 +187,7 @@ ActionExec::operator() ()
 			tryBlock& t = mTryList.back();
 			if (t.mState == tryBlock::TRY_TRY)
 			{
-				if (env.top(0).is_exception()) // We have an exception. Catch.
+				if (env.stack_size() && env.top(0).is_exception()) // We have an exception. Catch.
 				{
 					as_value exc = env.pop();
 					pc = t.mCatchOffset;
@@ -223,7 +223,7 @@ ActionExec::operator() ()
 				// Here's a fine mess. We've thrown, but we still need to
 				// go to finally.
 
-				if (env.top(0).is_exception())
+				if (env.stack_size() && env.top(0).is_exception())
 				{
 					// If we set a variable, erase it.
 					if (t.mNamed)
@@ -248,7 +248,7 @@ ActionExec::operator() ()
 				mTryList.pop_back();
 
 				// If there is an exception, we're throwing from finally.
-				if (env.top(0).is_exception())
+				if (env.stack_size() && env.top(0).is_exception())
 				{
 					continue; // Leaving it does right.
 				}

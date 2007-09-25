@@ -1,3 +1,9 @@
+2007-09-26 Chad Musick <chadmusick@msbx.net>
+
+	* server/vm/ActionExec.cpp: If the stack is empty, there was not
+	  an exception. Check for an empty stack first to avoid reading a
+	  non-existent value.
+
 2007-09-25 Sandro Santilli <strk@keybit.net>
 
 	* gui/gui.{cpp,h}: port SKIP_RENDERING_IF_LATE to use WallClockTimer.
