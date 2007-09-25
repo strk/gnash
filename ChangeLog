@@ -1,5 +1,7 @@
 2007-09-25 Sandro Santilli <strk@keybit.net>
 
+	* doc/C/usermanual/usage/gnashrc.xml: document StreamsTimeout
+	  directive, remove duplicated line for StartStopped.
 	* libbase/: Makefile.am, WallClockTimer.{h,cpp}:
 	  New class for wall-clock timing. Interface borrowed
 	  by boost::timer, but this one uses wall-clock and

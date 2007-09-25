@@ -150,11 +150,12 @@ The variables in the <filename>.gnashrc</filename> file support three types of a
        the latter (which doesn't affect $version and System.capabilities.version).</entry>
 </row>
 <row>
-<entry>StartStopped</entry>
-<entry>on/off</entry>
-<entry>Set to <emphasis>on</emphasis> to have the GUI start in "stop" mode. This is useful in particular
-	    for the plugin, so you have to explicitly start any movie on a webpage. This option is <emphasis>off</emphasis> by default.
-	  </entry>
+<entry>StreamsTimeout</entry>
+<entry>double</entry>
+<entry>
+Set the number of seconds after which streams download time out. Note that timeouts only occurs after the given number of seconds
+passed w/out anything was received.
+</entry>
 </row>
 </tbody>
 </tgroup>
