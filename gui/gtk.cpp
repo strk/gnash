@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.112 2007/09/24 13:43:08 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.113 2007/09/25 09:44:45 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1072,7 +1072,7 @@ GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
             renderer = gtk_cell_renderer_text_new ();
             g_object_set (renderer, "xalign", 0.0, NULL);
             col_offset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
-	       						       -1, "Node",
+	       						       -1, "Depth",
 							       renderer, "text",
 							       NODENAME_COLUMN,
 							       NULL);
@@ -1097,17 +1097,6 @@ GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 							       -1, "Value",
 							       renderer, "text",
 							       STRING2_COLUMN,
-							       NULL);
-            column = gtk_tree_view_get_column (GTK_TREE_VIEW (treeview), col_offset - 1);
-
-            //Third column:
-
-            renderer = gtk_cell_renderer_text_new ();
-            g_object_set (renderer, "xalign", 0.0, NULL);
-            col_offset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
-							       -1, "Comment",
-							       renderer, "text",
-							       COMMENT_COLUMN,
 							       NULL);
             column = gtk_tree_view_get_column (GTK_TREE_VIEW (treeview), col_offset - 1);
 
@@ -1143,12 +1132,10 @@ GtkGui::makeTreeModel (std::auto_ptr<InfoTree> treepointer)
        NODENAME_COLUMN = 0,
        STRING1_COLUMN,
        STRING2_COLUMN,
-       COMMENT_COLUMN,
        NUM_COLUMNS
      };
     
      GtkTreeStore *model = gtk_tree_store_new (NUM_COLUMNS,
-                          G_TYPE_STRING,
                           G_TYPE_STRING,
                           G_TYPE_STRING,
                           G_TYPE_STRING);
@@ -1174,7 +1161,7 @@ GtkGui::makeTreeModel (std::auto_ptr<InfoTree> treepointer)
           }
 
           if (info.depth(i) < depth) {        // Align Gtk tree depth.
-               depth -= (depth - info.depth(i));
+               depth = info.depth(i);
                gtk_tree_model_iter_parent (GTK_TREE_MODEL(model), &parent_iter, &iter);  // Get parent iter.
                iter = parent_iter;
           }
@@ -1187,7 +1174,6 @@ GtkGui::makeTreeModel (std::auto_ptr<InfoTree> treepointer)
                             NODENAME_COLUMN, buf,   //infotree
                             STRING1_COLUMN, p.first.c_str(),     //infotree
     		            STRING2_COLUMN, p.second.c_str(),     //infotree
-                            COMMENT_COLUMN, "Comment",     //infotree
 			    -1);
 
      }

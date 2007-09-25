@@ -201,6 +201,11 @@ public:
     /// interval specified in the call to setInterval().
     static bool advance_movie(Gui* gui);
 
+    /// Force redraw of next frame manually
+    ///
+    /// TODO: force immediate redraw
+    void refresh_view() { _redraw_flag=true; }
+
     /// Put the application in "stop" mode
     //
     /// When in stop mode the application won't be advanced.
@@ -230,6 +235,7 @@ public:
     void menu_quit();
     void menu_about();
     void menu_play();
+    void menu_refresh_view();
     void menu_pause();
     void menu_stop();
     void menu_step_forward();

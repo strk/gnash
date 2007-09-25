@@ -137,6 +137,12 @@ Gui::~Gui()
 }
 
 void
+Gui::menu_refresh_view()
+{
+	refresh_view();
+}
+
+void
 Gui::menu_restart()
 {
 //    GNASH_REPORT_FUNCTION;
@@ -338,6 +344,9 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 			break;
 		case gnash::key::p:
 			menu_pause();
+			break;
+		case gnash::key::l:
+			menu_refresh_view();
 			break;
 		case gnash::key::q:
 		case gnash::key::w:

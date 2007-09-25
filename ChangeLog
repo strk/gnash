@@ -1,3 +1,11 @@
+2007-09-25 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/gtk.cpp: clean up properties dialogue.
+	* gui/gui.{h,cpp}: add menu_refresh_view() and refresh_view() to gui
+	  with shortcut Ctrl-L. Now forces full redraw of next frame, but
+	  should in future force immediate redraw.
+	* gui/gnash.cpp: add Ctrl-L to gnash -h.
+
 2007-09-25 Chad Musick <chadmusick@msbx.net>
 
 	* macros/boost.m4: Look for multi_index directory in boost include
