@@ -44,6 +44,12 @@
   
 
 .frame 3
+
+  .action:
+     // registerClass effects are visible here
+     check_equals(libItem2.__proto__, theClass2.prototype);
+  .end
+    
   .initaction libItem1:
      theClass1 = function() { this.testvar = 60;};
      theClass1.prototype = new MovieClip();
@@ -69,14 +75,17 @@
      // Gnash failed by executing init actions before DLIST tags.
      xcheck_equals(typeof(libItem2), 'movieclip');
      xcheck_equals(libItem2.__proto__, MovieClip.prototype);
+
+     // Childs of libItem2 have also been placed already
+     // Gnash fails by executing init actions before frame0 tags
+     xcheck_equals(typeof(libItem2.b1), 'movieclip');
   .end
   
   .put libItem2
   
-    
 .frame 4
   .action:
-    totals(8);
+    totals(10);
     stop();
   .end
 

@@ -1,3 +1,11 @@
+2007-09-25 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-swfc.all/registerclass_test3.sc:
+	  Test that registerClass effects are visible from withing actions
+	  contained in the same frame as the target clip is placed, even if
+	  DoAction comes before DoInitAction, which itself can't see those
+	  effects.
+
 2007-09-25 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* testsuite/misc-ming.all/registerClassTest2.c: one more test.
