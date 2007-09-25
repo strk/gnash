@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: curl_adapter.cpp,v 1.38 2007/07/09 07:31:05 martinwguy Exp $ */
+/* $Id: curl_adapter.cpp,v 1.39 2007/09/25 14:17:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -28,6 +28,9 @@
 #include "utility.h"
 #include "GnashException.h"
 #include "log.h"
+#include "rc.h"
+//#include "tu_timer.h"
+#include "WallClockTimer.h"
 
 #include <map>
 #include <iostream>
@@ -299,8 +302,14 @@ void
 CurlStreamFile::fill_cache(long unsigned size)
 {
 #ifdef GNASH_CURL_VERBOSE
-	fprintf(stderr, "fill_cache(%d) called\n", size);
+	fprintf(stderr, "fill_cache(%lu) called\n", size);
 #endif
+
+	// I don't think we can rely on this, unless we
+	// can trust the result (the interface isn't documented
+	// about trust of it)
+	//
+	// if ( size > get_stream_size() ) return;
 
 // Disable this when you're convinced the sleeping mechanism is satisfactory
 //#define VERBOSE_POLLING_LOOP 1
@@ -314,13 +323,19 @@ CurlStreamFile::fill_cache(long unsigned size)
 	// of data requested haven't arrived yet.
 	// 
 	const long unsigned minSleep =  10000; // 1/100 second
-	const long unsigned maxSleep =  100000; // 1/10 second
+	const long unsigned maxSleep =  1000000; // 1/10 second
 
 	CURLMcode mcode;
-#if VERBOSE_POLLING_LOOP
 	long unsigned lastCached = _cached;
-#endif
 	long unsigned sleepTime = minSleep;
+
+	// Timeout in milliseconds (TODO: have getStreamsTimeout return milliseconds)
+	static const unsigned int timeout = int(gnash::RcInitFile::getDefaultInstance().getStreamsTimeout()*1000.0);
+#if VERBOSE_POLLING_LOOP
+	printf("Timeout is %u\n", timeout);
+#endif
+
+	gnash::WallClockTimer lastProgress; // timer since last progress
 	while (_cached < size && _running)
 	{
 		do
@@ -339,13 +354,35 @@ CurlStreamFile::fill_cache(long unsigned size)
 		// In order to avoid overusing the CPU we take a nap if we didn't
 		// reach the requested position.
 
-#if VERBOSE_POLLING_LOOP
 		long unsigned fetched = _cached - lastCached;
-
-		fprintf(stderr, "CurlStreamFile %p: Fetched: %lu (%lu/%lu total) - requested %lu (%lu total) - sleeping %lu milliseconds\n",
-				this, fetched, _cached, get_stream_size(), fetchRequested, size, sleepTime/1000);
-		lastCached = _cached;
+		if ( fetched )
+		{
+#if VERBOSE_POLLING_LOOP
+			fprintf(stderr, "Fetched %lu bytes, resetting progress timer\n", fetched);
 #endif
+			lastProgress.restart();
+		}
+		else
+		{
+#if VERBOSE_POLLING_LOOP
+			fprintf(stderr, "Nothing fetched, elapsed is %u\n", lastProgress.elapsed() );
+#endif
+			if ( timeout && lastProgress.elapsed() > timeout )
+			{
+				gnash::log_error(_("Timeout (%u milliseconds) while loading from url %s"), timeout, _url.c_str());
+				return;
+			}
+		}
+
+#if VERBOSE_POLLING_LOOP
+		fprintf(stderr, "CurlStreamFile %p: Fetched: %lu (%lu/%lu total) from url %s"
+				" - requested %lu (%lu total) - sleeping %lu milliseconds "
+				" - %u millisecond since last progress (timeout is %u)\n",
+				this, fetched, _cached, get_stream_size(), _url.c_str(),
+				fetchRequested, size, sleepTime/1000, lastProgress.elapsed(),
+				timeout);
+#endif
+		lastCached = _cached;
 
 		usleep(sleepTime);
 

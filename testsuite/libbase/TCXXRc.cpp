@@ -176,6 +176,12 @@ main (int /*argc*/, char** /*argv*/) {
         runtest.fail ("startStopped");
     }
 
+    if (rc.getStreamsTimeout() == 1.5) {
+        runtest.pass ("streamsTimeout");
+    } else {
+        runtest.fail ("streamsTimeout");
+    }
+
     std::vector<std::string> whitelist = rc.getWhiteList();
     if (whitelist.size()) {
         if ((whitelist[0] == "www.doonesbury.com")

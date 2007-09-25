@@ -41,6 +41,11 @@
 #include "log.h"
 #include "rc.h"
 
+#ifndef DEFAULT_STREAMS_TIMEOUT
+// TODO: add a ./configure switch to set this
+# define DEFAULT_STREAMS_TIMEOUT 10
+#endif
+
 using namespace std;
 namespace gnash {
 
@@ -74,7 +79,9 @@ RcInitFile::RcInitFile() : _delay(0),
                            _sound(true),
                            _plugin_sound(true),
 			   _extensionsEnabled(false),
-			   _startStopped(false)
+			   _startStopped(false),
+			   _streamsTimeout(DEFAULT_STREAMS_TIMEOUT)
+
 {
 //    GNASH_REPORT_FUNCTION;
     loadFiles();
@@ -145,11 +152,30 @@ RcInitFile::extractNumber(int *num, const char *pattern, string &variable,
                            string &value)
 {      
 //    GNASH_REPORT_FUNCTION;
+
+    StringNoCaseEqual noCaseCompare;
+
 //        log_msg ("%s: %s", variable.c_str(), value.c_str());
-    if (variable == pattern) {
+    if ( noCaseCompare(variable, pattern) ) {
         *num = strtol(value.c_str(), NULL, 0);
     }
     return *num;
+}
+
+void
+RcInitFile::extractDouble(double& out, const char *pattern, string &variable,
+                           string &value)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    StringNoCaseEqual noCaseCompare;
+
+    // printf("%s: %s\n", variable.c_str(), value.c_str());
+
+    if ( noCaseCompare(variable, pattern) ) {
+        out = strtod(value.c_str(), 0);
+	//printf("strtod returned %g\n", out);
+    }
 }
 
 string
@@ -282,6 +308,8 @@ RcInitFile::parseFile(const std::string& filespec)
                 extractSetting(&_extensionsEnabled, "EnableExtensions",
                                variable, value);
                 extractSetting(&_startStopped, "StartStopped", variable, value);
+
+                extractDouble(_streamsTimeout, "StreamsTimeout", variable, value);
                 
                 extractNumber(&_delay, "delay", variable, value);
                 extractNumber(&_verbosity, "verbosity", variable, value);

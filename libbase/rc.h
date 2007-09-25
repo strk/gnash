@@ -104,6 +104,12 @@ public:
     int getRetries() const { return _retries; }
     void setRetries(int x) { _retries = x; }
 
+    /// Return the number of seconds of inactivity before timing out streams downloads
+    double getStreamsTimeout() const { return _streamsTimeout; }
+
+    /// Set the number of seconds of inactivity before timing out streams downloads
+    void setStreamsTimeout(double x) { _streamsTimeout = x; }
+
     void dump();
     
 private:
@@ -149,12 +155,18 @@ private:
 
     bool _startStopped;		// whether to start the gui in "stop" mode
 
+    /// The number of seconds of inactivity triggering download timeout
+    double _streamsTimeout;
+
     static std::string expandPath(std::string _path); //path string operations
 
     static bool extractSetting(bool *var, const char *pattern,
                         std::string &variable, std::string &value);
     
     static int extractNumber(int *num, const char *pattern,
+                        std::string &variable, std::string &value);
+
+    static void extractDouble(double& out, const char *pattern,
                         std::string &variable, std::string &value);
 
 };

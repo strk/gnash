@@ -1,3 +1,16 @@
+2007-09-25 Sandro Santilli <strk@keybit.net>
+
+	* libbase/: Makefile.am, WallClockTimer.{h,cpp}:
+	  New class for wall-clock timing. Interface borrowed
+	  by boost::timer, but this one uses wall-clock and
+	  talks milliseconds instead of seconds.
+	* libbase/rc.{cpp,h}: add support for streamsTimeout
+	  setting.
+	* testsuite/libbase/: TCXXRc.cpp, gnashrc.in: test
+	  streamsTimeout setting.
+	* libbase/curl_adapter.cpp (fill_cache): implement
+	  stream timeout.
+
 2007-09-25 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/gnash.h: fix typo in key::codeMap.
