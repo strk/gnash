@@ -29,6 +29,7 @@ SCTESTS = \
 	movieclip_destruction_test4.sc \
 	action_execution_order_test10.sc \
 	action_execution_order_test12.sc \
+	registerclass_test3.sc \
 	edittext_test1.sc \
 	$(NULL)
 

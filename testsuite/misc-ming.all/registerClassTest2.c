@@ -142,17 +142,19 @@ main(int argc, char** argv)
   SWFDisplayItem_addAction(it3,
     newSWFAction(" _root.note('mc3.onClipConstruct'); "
                  " _root.check_equals(typeof(_root.clip3), 'movieclip'); "
-                 // this one is passed by luck at the moment, both are undefined for Gnash
+                 " _root.check(_root.clip3.__proto__ != undefined); "
                  " _root.check_equals(_root.clip3.__proto__, _root.theClass3.prototype);"
                 ),
     SWFACTION_CONSTRUCT);
 
   // add init actions for mc3
-  add_clip_init_actions(mc3, " _root.note('initactions for mc3'); "
+  add_clip_init_actions(mc3, " _root.note('mc3.initactions'); "
                              " theClass3 = function () {}; "
                              " theClass3.prototype = new MovieClip(); "
                              " Object.registerClass('libItem3', theClass3); "
-                             " _root.attachMovie('libItem3', 'clip3', 30); ");
+                             " _root.attachMovie('libItem3', 'clip3', 30); "
+                             // clip3.__proto__ is initialized before executing onClipConstruct
+                             "_root.check_equals(clip3.__proto__, _root.theClass3.prototype); ");
   SWFMovieClip_nextFrame(mc3);
   
   add_actions(mo, "totals(); stop();");

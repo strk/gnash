@@ -1,4 +1,10 @@
-2007-09-24 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+2007-09-25 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/misc-ming.all/registerClassTest2.c: one more test.
+	* testsuite/misc-swfc.all/register_class_test3.sc, Makefile.am: one more testcase.
+	  all passed.
+	  
+2007-09-25 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gui.cpp: change shortcut keys to lower case restore old
 	  behaviour.
