@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.24 2007/08/10 10:24:11 tgc Exp $ */
+/* $Id: sound_handler.h,v 1.25 2007/09/25 18:58:43 strk Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -112,11 +112,11 @@ public:
 	/// gnash's parser calls this to fill up soundstreams data
 	//
 	/// @param data
-	/// 	The sound data to be saved. Will be copied.
-	/// 	TODO: avoid the copy, if possible, getting ownership transferred instead
+	/// 	The sound data to be saved, allocated by new[]. Ownership is transferred.
+	///	TODO: define a class for containing both data and data_bytes ? or use vector ?
 	///
 	/// @param data_bytes
-	/// Size of the data in bytes
+	///     Size of the data in bytes
 	///
 	/// @param sample_count
 	/// Number of samples in the data
@@ -124,7 +124,7 @@ public:
 	/// @param handle_id
 	/// The soundhandlers id of the sound we want some info about.
 	///
-	virtual long	fill_stream_data(void* data, unsigned int data_bytes, unsigned int sample_count, int handle_id) = 0;
+	virtual long	fill_stream_data(unsigned char* data, unsigned int data_bytes, unsigned int sample_count, int handle_id) = 0;
 
 	/// Returns a pointer to the SoundInfo object for the sound with the given id.
 	/// The SoundInfo object is still owned by the soundhandler.

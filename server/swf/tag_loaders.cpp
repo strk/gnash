@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.141 2007/09/24 15:39:31 cmusick Exp $ */
+/* $Id: tag_loaders.cpp,v 1.142 2007/09/25 18:58:43 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1697,9 +1697,10 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 
     // Fill the data on the apropiate sound, and receives the starting point
     // for later "start playing from this frame" events.
+    //
+    // ownership of 'data' is transferred here
+    //
     long start = handler->fill_stream_data(data, data_bytes, sample_count, handle_id);
-
-    delete [] data;
 
     start_stream_sound_tag*	ssst = new start_stream_sound_tag();
     ssst->read(m, handle_id, start);

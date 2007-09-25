@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_sdl.h,v 1.32 2007/08/10 10:24:11 tgc Exp $
+// $Id: sound_handler_sdl.h,v 1.33 2007/09/25 18:58:43 strk Exp $
 
 #ifndef SOUND_HANDLER_SDL_H
 #define SOUND_HANDLER_SDL_H
@@ -181,7 +181,7 @@ public:
 	virtual int	create_sound(void* data, unsigned int data_bytes, std::auto_ptr<SoundInfo> sinfo);
 
 	/// this gets called when a stream gets more data
-	virtual long	fill_stream_data(void* data, unsigned int data_bytes,
+	virtual long	fill_stream_data(unsigned char* data, unsigned int data_bytes,
 					 unsigned int sample_count, int handle_id);
 
 	/// Play the index'd sample.

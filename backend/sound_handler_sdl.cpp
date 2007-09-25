@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.84 2007/09/05 13:05:15 tgc Exp $
+// $Id: sound_handler_sdl.cpp,v 1.85 2007/09/25 18:58:43 strk Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -143,13 +143,15 @@ int	SDL_sound_handler::create_sound(
 }
 
 // this gets called when a stream gets more data
-long	SDL_sound_handler::fill_stream_data(void* data, unsigned int data_bytes, unsigned int sample_count, int handle_id)
+long	SDL_sound_handler::fill_stream_data(unsigned char* data, unsigned int data_bytes, unsigned int sample_count, int handle_id)
 {
 
 	boost::mutex::scoped_lock lock(_mutex);
 	// @@ does a negative handle_id have any meaning ?
 	//    should we change it to unsigned instead ?
-	if (handle_id < 0 || (unsigned int) handle_id+1 > m_sound_data.size()) {
+	if (handle_id < 0 || (unsigned int) handle_id+1 > m_sound_data.size())
+	{
+		delete [] data;
 		return -1;
 	}
 	int start_size = 0;
@@ -166,8 +168,10 @@ long	SDL_sound_handler::fill_stream_data(void* data, unsigned int data_bytes, un
 				 data, sample_count, 2 /*sample size*/,
 				 sounddata->soundinfo->getSampleRate(), sounddata->soundinfo->isStereo(),
 				 audioSpec.freq, (audioSpec.channels == 2));
-		if (!adjusted_data || adjusted_size < 1) {
+		if (!adjusted_data || adjusted_size < 1)
+		{
 			log_error(_("Some kind of error with resampling sound data"));
+			delete [] data;
 			return -1;
 		}
 
@@ -219,6 +223,7 @@ long	SDL_sound_handler::fill_stream_data(void* data, unsigned int data_bytes, un
 		log_error(_("Behavior for this audio codec %d is unknown.  Please send this SWF to the developers"), (int)(sounddata->soundinfo->getFormat()));
 	}
 
+	delete [] data;
 	return start_size;
 }
 

@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.61 2007/09/05 13:05:15 tgc Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.62 2007/09/25 18:58:43 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -137,7 +137,7 @@ int	GST_sound_handler::create_sound(
 
 
 // this gets called when a stream gets more data
-long	GST_sound_handler::fill_stream_data(void* data, unsigned int data_bytes, unsigned int /*sample_count*/, int handle_id)
+long	GST_sound_handler::fill_stream_data(unsigned char* data, unsigned int data_bytes, unsigned int /*sample_count*/, int handle_id)
 {
 	try_mutex::scoped_lock lock(_mutex);
 
@@ -163,8 +163,11 @@ long	GST_sound_handler::fill_stream_data(void* data, unsigned int data_bytes, un
 			sound->set_data(tmp_data);
 		}
 
+		delete [] data;
 		return sounddata->data_size - data_bytes;
 	}
+
+	delete [] data;
 	return 0;
 }
 

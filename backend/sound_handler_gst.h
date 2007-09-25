@@ -138,7 +138,7 @@ public:
 				     std::auto_ptr<SoundInfo> sinfo);
 
 	/// this gets called when a stream gets more data
-	virtual long	fill_stream_data(void* data, unsigned int data_bytes,
+	virtual long	fill_stream_data(unsigned char* data, unsigned int data_bytes,
 					 unsigned int sample_count, int handle_id);
 
 	/// Play the index'd sample.

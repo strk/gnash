@@ -1,3 +1,13 @@
+2007-09-26 Sandro Santilli <strk@keybit.net>
+
+	* backend/: sound_handler.h, sound_handler_gst.{cpp,h},
+	  sound_handler_sdl.{cpp,h}: changed fill_stream_data
+	  interface to take ownership of the data array.
+	  Data is still copied, but can now be optimized locally
+	  in each sound hanlder.
+	* server/swf/tag_loaders.cpp (sound_stream_block_loader):
+	  update use of fill_stream_data.
+
 2007-09-26 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gtk.cpp: change Oslash to Ooblique - GDK_Oslash is evidently
