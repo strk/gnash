@@ -1,3 +1,8 @@
+2007-09-25 Chad Musick <chadmusick@msbx.net>
+
+	* macros/boost.m4: Look for multi_index directory in boost include
+	  directory. No library is needed, headers only.
+
 2007-09-25 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-swfc.all/registerclass_test3.sc:
