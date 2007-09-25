@@ -1,5 +1,9 @@
 2007-09-25 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui.{cpp,h}: port SKIP_RENDERING_IF_LATE to use WallClockTimer.
+
+2007-09-25 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/sprite_definition.h (ensure_frame_loaded): don't
 	  assume the target frame has always been loaded, as we might
 	  have loaded less frames then advertised in header.

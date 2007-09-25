@@ -38,7 +38,7 @@
 #include <cstring>
 
 #ifdef SKIP_RENDERING_IF_LATE
-#include <boost/timer.hpp>
+#include "WallClockTimer.h"
 #endif
 
 /// Define this to make sure each frame is fully rendered from ground up
@@ -75,6 +75,7 @@
 // as the mouse moves
 //#define DEBUG_MOUSE_COORDINATES 1
 
+
 namespace gnash {
 
 Gui::Gui() :
@@ -96,7 +97,7 @@ Gui::Gui() :
     ,fps_timer_interval(0.0)
 #endif
 #ifdef SKIP_RENDERING_IF_LATE
-    ,estimatedDisplayTime(0.001) // will grow later..
+    ,estimatedDisplayTime(0) // milliseconds (will grow later..)
 #endif // SKIP_RENDERING_IF_LATE
 {
 //    GNASH_REPORT_FUNCTION;
@@ -122,7 +123,7 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
     ,fps_timer_interval(0.0)
 #endif        
 #ifdef SKIP_RENDERING_IF_LATE
-    ,estimatedDisplayTime(0.001) // will grow later..
+    ,estimatedDisplayTime(0) // milliseconds (will grow later..)
 #endif // SKIP_RENDERING_IF_LATE
 {
 }
@@ -500,7 +501,7 @@ Gui::advance_movie(Gui* gui)
 //	GNASH_REPORT_FUNCTION;
 
 #ifdef SKIP_RENDERING_IF_LATE
-	boost::timer advanceTimer;
+	WallClockTimer advanceTimer;
 #endif // SKIP_RENDERING_IF_LATE
 
 	gnash::movie_root* m = gnash::get_current_root();
@@ -529,15 +530,15 @@ Gui::advance_movie(Gui* gui)
 
 #ifdef SKIP_RENDERING_IF_LATE
 
-	double advanceTime = advanceTimer.elapsed(); // in seconds !
+	uint32_t advanceTime = advanceTimer.elapsed(); // in milliseconds !
 
-	double timeSlot = gui->_interval/1000.0; // seconds between advance calls (TODO: compute once)
+	uint32_t timeSlot = gui->_interval; // milliseconds between advance calls 
 
 	if ( advanceTime+gui->estimatedDisplayTime < timeSlot )
 	{
 		advanceTimer.restart();
 		gui->display(m);
-		double displayTime = advanceTimer.elapsed();
+		uint32_t displayTime = advanceTimer.elapsed();
 
 		if ( displayTime > gui->estimatedDisplayTime)
 		{
@@ -555,7 +556,11 @@ Gui::advance_movie(Gui* gui)
 	}
 	else
 	{
-		//log_debug("We're unable to keep up with FPS speed: advanceTime was %g + estimatedDisplayTime (%g) == %g, over a timeSlot of %g", advanceTime, gui->estimatedDisplayTime, advanceTime+gui->estimatedDisplayTime, timeSlot);
+		log_debug("We're unable to keep up with FPS speed: "
+			"advanceTime was %u + estimatedDisplayTime (%u) "
+			"== %u, over a timeSlot of %u",
+			advanceTime, gui->estimatedDisplayTime,
+			advanceTime+gui->estimatedDisplayTime, timeSlot);
 		// TODO: increment a counter, we don't want to skip too many frames
 	}
 #else // ndef SKIP_RENDERING_IF_LATE

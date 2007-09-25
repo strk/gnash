@@ -351,9 +351,9 @@ private:
 #endif // def GNASH_FPS_DEBUG
 
 #ifdef SKIP_RENDERING_IF_LATE
-    /// Estimated max number of seconds required for a call to ::display
+    /// Estimated max number of milliseconds required for a call to ::display
     /// This should be incremented everytime we take more
-    double estimatedDisplayTime;
+    uint32_t estimatedDisplayTime;
 #endif // SKIP_RENDERING_IF_LATE
 
 };
