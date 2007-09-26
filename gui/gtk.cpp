@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.116 2007/09/26 10:53:48 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.117 2007/09/26 19:14:07 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1407,7 +1407,7 @@ GtkGui::gdk_to_gnash_key(guint key)
         c = (gnash::key::code) ((key - GDK_Ntilde) + gnash::key::NTILDE);
     } else if (key >= GDK_Ugrave && key <= GDK_THORN) {
         c = (gnash::key::code) ((key - GDK_Ugrave) + gnash::key::UGRAVE);
-    } else if (key >= GDK_ssharp && key <= GDK_ooblique) {
+    } else if (key >= GDK_ssharp && key <= GDK_oslash) {
         c = (gnash::key::code) ((key - GDK_ssharp) + gnash::key::sSHARP);
     } else if (key >= GDK_ugrave && key <= GDK_ydiaeresis) {
         c = (gnash::key::code) ((key - GDK_ugrave) + gnash::key::uGRAVE);

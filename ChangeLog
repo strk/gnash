@@ -1,5 +1,7 @@
 2007-09-26 Sandro Santilli <strk@keybit.net>
 
+	* gui/gtk.cpp (gdk_to_gnash_key): GDK_ooblique => GDK_oslash
+	  (gtk-2.0 in debian stable doesn't define the former).
 	* server/: BevelFilter.h, BlurFilter.h, ConvolutionFilter.h,
 	  DropShadowFilter.h, GlowFilter.h, GradientBevelFilter.h,
 	  GradientGlowFilter.h: include <boost/cstdint.hpp> for XintXX_t.
