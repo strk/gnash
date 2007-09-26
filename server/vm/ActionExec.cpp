@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.47 2007/09/25 16:03:25 cmusick Exp $ */
+/* $Id: ActionExec.cpp,v 1.48 2007/09/26 11:09:47 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -173,6 +173,9 @@ ActionExec::operator() ()
 		log_action("%s", ss.str().c_str());
 	);
 #endif
+
+	// TODO: specify in the .gnashrc !!
+	static const size_t maxBranchCount = 65536; // what's enough ?
 
 	size_t branchCount = 0;
 	try {
@@ -368,8 +371,6 @@ ActionExec::operator() ()
 	// 
 	if ( pc <= oldPc )
 	{
-		// TODO: specify in the .gnashrc ?
-		size_t maxBranchCount = 65536; // what's enough ?
 		if ( ++branchCount > maxBranchCount )
 		{
 			char buf[256];

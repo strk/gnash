@@ -1,3 +1,8 @@
+2007-09-26 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ActionExec.cpp (call operator): initialize maxBranchCount
+	  once at start of function.
+
 2007-09-26 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gtk.cpp: More moving menu items about.
