@@ -1,5 +1,17 @@
 2007-09-26 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.cpp (get_variable_raw): don't handle _root and
+	  _levelX in any special way, they are just sprite members !
+	* server/sprite_instance.cpp (get_member): _root doesn't exist if
+	  we're unloaded.
+	* server/vm/ActionExec.cpp (call operator): drop opcode-level
+	  unloaded guard. Fixes bugs #21069 (feed.swf) and #20996
+	  (curveball.swf) w/out reopening #20974 (sonic.swf). 
+	  Changes in as_environment.cpp and sprite_instance.cpp above
+	  do the rest for misc-ming and misc-swfc tests..
+
+2007-09-26 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/morph2_character_def.cpp (read):
 	  Don't print malformed swf errors if number of paths in defining
 	  shapes don't match: only edges matter.

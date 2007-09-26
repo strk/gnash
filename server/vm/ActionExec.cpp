@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.49 2007/09/26 11:30:43 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.50 2007/09/26 20:52:02 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -284,11 +284,13 @@ ActionExec::operator() ()
 			continue; // Walk up the try chain if necessary.
 		} // end of try checking.
 
+#if 0 // See bugs: #20974, #21069, #20996.
 		if ( _abortOnUnload && _original_target->isUnloaded() )
 		{
 			log_debug("Target of action_buffer unloaded during execution, discarding %d remaining opcodes", stop_pc-pc);
 			break;
 		}
+#endif
 
 	    // Cleanup any expired "with" blocks.
 	    while ( ! with_stack.empty() && pc >= with_stack.back().end_pc() ) {

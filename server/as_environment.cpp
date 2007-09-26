@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.91 2007/09/26 12:54:18 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.92 2007/09/26 20:52:02 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -139,6 +139,8 @@ as_environment::get_variable_raw(
 	return val;
     }
 
+#if 0 // NO special support for _root and _levelX, all should be done by target !
+      // see movieclip_destruction_test3, where _root becomes undefined if target is unloaded
     // Check built-in constants.
     if (varname == "_root") 
     { 
@@ -151,6 +153,7 @@ as_environment::get_variable_raw(
        unsigned int levelno = atoi(varname.c_str()+6);
        return VM::get().getRoot().getLevel(levelno).get();
     }
+#endif
 
     VM& vm = VM::get();
     as_object* global = vm.getGlobal();
