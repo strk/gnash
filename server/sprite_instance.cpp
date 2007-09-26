@@ -1741,7 +1741,7 @@ bool sprite_instance::get_member(string_table::key name_key, as_value* val)
 	//
 	if (name == "_root" )
 	{
-		if ( isUnloaded() ) return false; // see movieclip_destruction_test3.sc
+		//if ( isUnloaded() ) return false; // see movieclip_destruction_test3.sc
 
 		// TODO: handle lockroot
 		val->set_as_object( VM::get().getRoot().get_root_movie() );

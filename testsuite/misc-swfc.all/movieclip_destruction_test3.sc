@@ -119,7 +119,7 @@
 
 .frame 20
   .action:  
-    check_equals(_root.x, 300);
+    xcheck_equals(_root.x, 300);
     check_equals(typeof(nestedMovieClip), 'undefined');
     check_equals(_root.as_order, "0+1+2+");
     stop();

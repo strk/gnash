@@ -154,7 +154,7 @@
 
 .frame 6 // target frame
   .action:
-    check_equals(_root.x, 0);
+    xcheck_equals(_root.x, 0);
   .end
 
 

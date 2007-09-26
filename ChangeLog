@@ -1,5 +1,18 @@
 2007-09-26 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (get_member): forget that
+	  _root as undefined when unloaded thing. Broke other
+	  tests in the testsuite.
+	* testsuite/misc-ming.all/action_execution_order_test8.c,
+	  testsuite/misc-swfc.all/movieclip_destruction_test1.sc,
+	  testsuite/misc-swfc.all/movieclip_destruction_test3.sc:
+	  Expect the 3 failures introduced by removal of opcode-level
+	  unloaded guard. We know that 2 real-world movies are fixed
+	  by removing that opcode-level guard, so we likely need 
+	  more testing of this thing. 
+
+2007-09-26 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-swfc.all/: action_execution_order_test10.sc,
 	  action_execution_order_test12.sc, edittext_test1.sc,
 	  movieclip_destruction_test2.sc, movieclip_destruction_test3.sc,
