@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ConvolutionFilter.h,v 1.3 2007/08/29 03:32:58 cmusick Exp $ */
+/* $Id: ConvolutionFilter.h,v 1.4 2007/09/26 19:00:46 strk Exp $ */
 
 #ifndef GNASH_CONVOLUTIONFILTER_H
 #define GNASH_CONVOLUTIONFILTER_H
@@ -25,7 +25,9 @@
 #endif
 
 #include "BitmapFilter.h"
+
 #include <vector>
+#include <boost/cstdint.hpp> // for XintXX_t
 
 namespace gnash {
 

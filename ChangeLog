@@ -1,5 +1,11 @@
 2007-09-26 Sandro Santilli <strk@keybit.net>
 
+	* server/: BevelFilter.h, BlurFilter.h, ConvolutionFilter.h,
+	  DropShadowFilter.h, GlowFilter.h, GradientBevelFilter.h,
+	  GradientGlowFilter.h: include <boost/cstdint.hpp> for XintXX_t.
+
+2007-09-26 Sandro Santilli <strk@keybit.net>
+
 	* server/swf/tag_loaders.cpp (define_sound_loader): don't delete
 	  the sound data, ownership was transferred to the sound hanlder.
 
