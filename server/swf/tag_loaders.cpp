@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.143 2007/09/26 10:15:52 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.144 2007/09/26 15:22:12 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1519,7 +1519,8 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 	    sinfo.reset(new SoundInfo(format, orgFormat, stereo, s_sample_rate_table[sample_rate], sample_count, sample_16bit));
 
 	    // Stores the sounddata in the soundhandler, and the ID returned
-		// can be used to starting, stopping and deleting that sound
+	    // can be used to starting, stopping and deleting that sound
+	    // NOTE: ownership of 'data' is transferred to the sound hanlder 
 	    int	handler_id = handler->create_sound(data, data_bytes, sinfo);
 
 	    if (handler_id >= 0)
@@ -1527,8 +1528,6 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 		sound_sample* sam = new sound_sample(handler_id);
 		m->add_sound_sample(character_id, sam);
 	    }
-
-	    delete [] data;
 	}
 	else
 	{

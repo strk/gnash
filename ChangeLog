@@ -1,5 +1,10 @@
 2007-09-26 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp (define_sound_loader): don't delete
+	  the sound data, ownership was transferred to the sound hanlder.
+
+2007-09-26 Sandro Santilli <strk@keybit.net>
+
 	* server/as_value.cpp (equals): in SWF5, functions are
 	  considered null types for what concerns equality.
 	* testsuite/actionscript.all/: Function.as,
