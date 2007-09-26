@@ -1,3 +1,8 @@
+2007-09-26 Sandro Santilli <strk@keybit.net>
+
+	* backend/sound_handler.h (Buffer::reserve): don't try to copy
+	  from the NULL pointer.
+
 2007-09-26 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gtk.cpp,gtksup.h: add Refresh menu item, add gtk version checks

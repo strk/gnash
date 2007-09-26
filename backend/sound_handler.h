@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.28 2007/09/26 07:25:00 strk Exp $ */
+/* $Id: sound_handler.h,v 1.29 2007/09/26 08:49:47 strk Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -118,8 +118,11 @@ public:
 
 		uint8_t* tmp = _data;
 		_data = new uint8_t[_capacity];
-		memcpy(_data, tmp, _size);
-		delete [] tmp;
+		if ( tmp )
+		{
+			memcpy(_data, tmp, _size);
+			delete [] tmp;
+		}
 	}
 
 	size_t size() const
