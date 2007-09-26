@@ -3,6 +3,8 @@
 	* gui/gtk.cpp,gtksup.h: add Refresh menu item, add gtk version checks
 	  for some stock menu items, reorder and add stock images to Movie
 	  Control menu.
+	* gui/gui{cpp,h}: Force immediate redraw instead of waiting for next
+	  frame.
 
 2007-09-26 Sandro Santilli <strk@keybit.net>
 

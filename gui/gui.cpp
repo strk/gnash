@@ -325,6 +325,16 @@ Gui::notify_mouse_clicked(bool mouse_pressed, int mask)
 }
 
 void
+Gui::refresh_view()
+{
+	movie_root* m = get_current_root();
+	assert(m);
+	_redraw_flag=true;
+	display(m);
+}
+
+
+void
 Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed) 
 {
 	movie_root* m = get_current_root();
