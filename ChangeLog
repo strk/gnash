@@ -1,5 +1,10 @@
 2007-09-26 Sandro Santilli <strk@keybit.net>
 
+	* backend/sound_handler.h: add assign() and constructor taking
+	  a memory buffer to the Buffer class.
+
+2007-09-26 Sandro Santilli <strk@keybit.net>
+
 	* backend/sound_handler.h (Buffer::reserve): don't try to copy
 	  from the NULL pointer.
 

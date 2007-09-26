@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.29 2007/09/26 08:49:47 strk Exp $ */
+/* $Id: sound_handler.h,v 1.30 2007/09/26 09:28:27 strk Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -56,11 +56,26 @@ public:
 		_size(0)
 	{}
 
+	/// Create a Buffer with the given initial content
+	//
+	/// @param newData data to assign to this buffer.
+	///	Allocated with new[]. Ownership transferred.
+	///
+	/// @param size number of bytes in the new data
+	///
+	Buffer(uint8_t* newData, size_t size)
+		:
+		_capacity(size),
+		_data(newData),
+		_size(size)
+	{}
+
 	/// Append data to this buffer
 	//
 	/// @param newData data to append to this buffer.
+	///	Allocated with new[]. Ownership transferred.
 	///
-	/// @param size number of elements
+	/// @param size number of bytes in the new data
 	///
 	void append(uint8_t* newData, size_t size)
 	{
@@ -77,6 +92,34 @@ public:
 		assert(_capacity >= _size+size);
 		memcpy(_data+_size, newData, size);
 		_size += size;
+		delete [] newData;
+	}
+
+	/// Assign data to this buffer
+	//
+	/// @param newData data to assign to this buffer.
+	///	Allocated with new[]. Ownership transferred.
+	///
+	/// @param size number of bytes in the new data
+	///
+	void assign(uint8_t* newData, size_t size)
+	{
+		if ( ! _capacity )
+		{
+			_data = newData;
+			_size = size;
+			_capacity = _size;
+			return;
+		}
+
+		_size=0; // so reserve won't memcpy...
+		reserve(size);
+
+		assert(_capacity >= size);
+
+		memcpy(_data, newData, size);
+		_size = size;
+
 		delete [] newData;
 	}
 
@@ -120,7 +163,7 @@ public:
 		_data = new uint8_t[_capacity];
 		if ( tmp )
 		{
-			memcpy(_data, tmp, _size);
+			if ( _size ) memcpy(_data, tmp, _size);
 			delete [] tmp;
 		}
 	}
