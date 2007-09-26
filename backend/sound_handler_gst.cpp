@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.64 2007/09/26 07:09:02 strk Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.65 2007/09/26 10:15:52 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -94,12 +94,12 @@ int	GST_sound_handler::create_sound(
 	switch (sounddata->soundinfo->getFormat())
 	{
 	case FORMAT_NATIVE16:
-		sounddata->append(data, data_bytes);
+		if ( data ) sounddata->append(data, data_bytes);
 		break;
 
 	case FORMAT_MP3:
 	//case FORMAT_VORBIS:
-		sounddata->append(data, data_bytes);
+		if ( data ) sounddata->append(data, data_bytes);
 		break;
 
 	case FORMAT_RAW:

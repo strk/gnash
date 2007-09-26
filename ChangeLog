@@ -1,5 +1,14 @@
 2007-09-26 Sandro Santilli <strk@keybit.net>
 
+	* backend/sound_handler.h (create_sound): document meaning of a NULL
+	  data.
+	* backend/sound_handler_gst.cpp (create_sound): don't choke on NULL
+	  data.
+	* server/swf/tag_loaders.cpp (sound_stream_head_loader): mek the call
+	  to create_sound() with NO data easier to read.
+
+2007-09-26 Sandro Santilli <strk@keybit.net>
+
 	* backend/sound_handler.h: add assign() and constructor taking
 	  a memory buffer to the Buffer class.
 

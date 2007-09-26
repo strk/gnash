@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.142 2007/09/25 18:58:43 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.143 2007/09/26 10:15:52 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1619,9 +1619,6 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 
    // Wot about reading the sample_count samples?
 
-    // Ask sound_handler it to init this sound.
-    int	data_bytes = 0;
-
     if (! (sample_rate >= 0 && sample_rate <= 3))
     {
 	IF_VERBOSE_MALFORMED_SWF(
@@ -1653,7 +1650,7 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 
 	// Stores the sounddata in the soundhandler, and the ID returned
 	// can be used to starting, stopping and deleting that sound
-	int	handler_id = handler->create_sound(NULL, data_bytes, sinfo);
+	int	handler_id = handler->create_sound(NULL, 0, sinfo);
 
     m->set_loading_sound_stream_id(handler_id);
 }

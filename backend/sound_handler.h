@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.30 2007/09/26 09:28:27 strk Exp $ */
+/* $Id: sound_handler.h,v 1.31 2007/09/26 10:15:52 strk Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -235,15 +235,15 @@ public:
 	//
 	/// @param data
 	/// 	The data to be stored. For soundstream this is NULL.
-	/// 	If not NULL, the data is currently *copied*
-	/// 	TODO: avoid the copy, if possible, getting ownership transferred instead
+	/// 	If not NULL, ownership of the data is transferred.
+	///	The data is assumed to have been allocated using new[].
 	///
 	/// @param data_bytes
-	/// The size of the data to be stored. For soundstream this is 0.
+	///	The size of the data to be stored. For soundstream this is 0.
 	///
 	/// @param sinfo
-	/// A SoundInfo object contained in an auto_ptr, which contains info about samplerate,
-	/// samplecount, stereo and more. The SoundObject must be not-NULL!
+	/// 	A SoundInfo object contained in an auto_ptr, which contains info about samplerate,
+	/// 	samplecount, stereo and more. The SoundObject must be not-NULL!
 	///
 	/// @return the id given by the soundhandler for later identification.
 	///
