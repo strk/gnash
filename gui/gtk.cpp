@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.115 2007/09/26 08:11:19 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.116 2007/09/26 10:53:48 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1573,39 +1573,54 @@ GtkGui::createFileMenu(GtkWidget *obj)
     
     GtkWidget *menu = gtk_menu_new ();
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), menu);
-    
-    GtkWidget *obre1 =
- 	gtk_image_menu_item_new_from_stock ("gtk-open", NULL);
-    gtk_widget_show (obre1);
-    gtk_container_add (GTK_CONTAINER (menu), obre1);
-    
-    GtkWidget *desa1 =
- 	gtk_image_menu_item_new_from_stock ("gtk-save", NULL);
-    gtk_widget_show (desa1);
-    gtk_container_add (GTK_CONTAINER (menu), desa1);
-    // Disabled until save functionality is implemented:
-    gtk_widget_set_sensitive(desa1,FALSE); 
 
-    GtkWidget *anomena_i_desa1 =
+// Open    
+    GtkWidget *open =
+ 	gtk_image_menu_item_new_from_stock ("gtk-open", NULL);
+    gtk_widget_show (open);
+    gtk_container_add (GTK_CONTAINER (menu), open);
+    g_signal_connect ((gpointer) open, "activate",
+                      G_CALLBACK (&menuitem_openfile_callback),
+                      this);
+
+// Save    
+    GtkWidget *save =
+ 	gtk_image_menu_item_new_from_stock ("gtk-save", NULL);
+    gtk_widget_show (save);
+    gtk_container_add (GTK_CONTAINER (menu), save);
+    // Disabled until save functionality is implemented:
+    gtk_widget_set_sensitive(save,FALSE); 
+
+// Save as
+    GtkWidget *save_as =
  	gtk_image_menu_item_new_from_stock ("gtk-save-as", NULL);
-    gtk_widget_show (anomena_i_desa1);
-    gtk_container_add (GTK_CONTAINER (menu), anomena_i_desa1);
+    gtk_widget_show (save_as);
+    gtk_container_add (GTK_CONTAINER (menu), save_as);
     // Disabled until save-as functionality is implemented:
-    gtk_widget_set_sensitive(anomena_i_desa1,FALSE);
+    gtk_widget_set_sensitive(save_as,FALSE);
     
     GtkWidget *separatormenuitem1 = gtk_separator_menu_item_new ();
     gtk_widget_show (separatormenuitem1);
     gtk_container_add (GTK_CONTAINER (menu), separatormenuitem1);
-    gtk_widget_set_sensitive (separatormenuitem1, FALSE);
 
-    GtkWidget *surt1 = gtk_image_menu_item_new_from_stock ("gtk-quit", NULL);
-    gtk_widget_show (surt1);
-    gtk_container_add (GTK_CONTAINER (menu), surt1);
-
-    g_signal_connect ((gpointer) obre1, "activate",
-                      G_CALLBACK (&menuitem_openfile_callback),
+// Properties
+    GtkWidget *properties =
+ 	gtk_image_menu_item_new_from_stock ("gtk-properties", NULL);
+    gtk_widget_show (properties);
+    gtk_container_add (GTK_CONTAINER (menu), properties);
+    g_signal_connect ((gpointer) properties, "activate",
+                      G_CALLBACK (&menuitem_movieinfo_callback),
                       this);
-    g_signal_connect ((gpointer) surt1, "activate",
+
+    GtkWidget *separator2 = gtk_separator_menu_item_new ();
+    gtk_widget_show (separator2);
+    gtk_container_add (GTK_CONTAINER (menu), separator2);
+
+    GtkWidget *quit = gtk_image_menu_item_new_from_stock ("gtk-quit", NULL);
+    gtk_widget_show (quit);
+    gtk_container_add (GTK_CONTAINER (menu), quit);
+
+    g_signal_connect ((gpointer) quit, "activate",
                       G_CALLBACK (&menuitem_quit_callback),
                       this);
 }
@@ -1666,15 +1681,17 @@ GtkGui::createViewMenu(GtkWidget *obj)
     GtkWidget *menu = gtk_menu_new ();
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), menu);
 
-    GtkWidget *properties1 =
- 	gtk_image_menu_item_new_from_stock ("gtk-properties", NULL);
-    gtk_widget_show (properties1);
-    gtk_container_add (GTK_CONTAINER (menu), properties1);
-    // Disabled until properties functionality is implemented:
-    g_signal_connect ((gpointer) properties1, "activate",
-                      G_CALLBACK (&menuitem_movieinfo_callback),
-                      this);
-
+// Refresh
+    GtkImageMenuItem *menuitem_refresh =
+ 	GTK_IMAGE_MENU_ITEM(
+	    gtk_image_menu_item_new_with_label(_("Redraw")));
+    gtk_image_menu_item_set_image (menuitem_refresh,
+				   gtk_image_new_from_stock("gtk-refresh",
+						 	     GTK_ICON_SIZE_MENU));
+    gtk_menu_append(menu, GTK_WIDGET(menuitem_refresh));
+    gtk_widget_show(GTK_WIDGET(menuitem_refresh));
+    g_signal_connect ((gpointer) menuitem_refresh, "activate",
+        G_CALLBACK (&menuitem_refresh_view_callback), this);
 }
 
 // Create a Control menu that can be used from the menu bar or the popup.
@@ -1790,23 +1807,6 @@ GtkGui::createControlMenu(GtkWidget *obj)
 						 	     GTK_ICON_SIZE_MENU));
     gtk_menu_append(menu, GTK_WIDGET(menuitem_jump_backward));
     gtk_widget_show(GTK_WIDGET(menuitem_jump_backward));
-
-
-    GtkWidget *separator2 = gtk_separator_menu_item_new ();
-    gtk_widget_show (separator2);
-    gtk_container_add (GTK_CONTAINER (menu), separator2);
-
-// Refresh
-// This should probably be under 'View', but then Properties should
-// be under 'File'
-    GtkMenuItem *menuitem_refresh = GTK_MENU_ITEM(
- 	gtk_image_menu_item_new_from_stock ("gtk-refresh", NULL));
-    gtk_menu_append(menu, GTK_WIDGET(menuitem_refresh));
-    gtk_widget_show(GTK_WIDGET(menuitem_refresh));
-    g_signal_connect ((gpointer) menuitem_refresh, "activate",
-        G_CALLBACK (&menuitem_refresh_view_callback), this);
-
-
 
 }
 
