@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.90 2007/09/26 12:09:07 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.91 2007/09/26 12:54:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -946,16 +946,21 @@ void
 as_environment::dump_global_registers(std::ostream& out) const
 {
 	std::string registers;
+
+	std::stringstream ss;
+
+	ss << "Global registers: ";
 	int defined=0;
 	for (unsigned int i=0; i<numGlobalRegisters; ++i)
 	{
-		if (i) registers += std::string(" | ");
-		registers += std::string("\"") +
-			m_global_register[i].to_debug_string() +
-			std::string("\"");
-		if ( ! m_global_register[i].is_undefined() ) defined++;
+		if ( m_global_register[i].is_undefined() ) continue;
+
+		if ( defined++ ) ss <<  ", ";
+
+		ss << i << ":" << m_global_register[i].to_debug_string();
+
 	}
-	if ( defined ) out << "Global registers (" << defined << "): " << registers << std::endl;
+	if ( defined ) out << ss.str() << std::endl;
 }
 
 /*private*/
