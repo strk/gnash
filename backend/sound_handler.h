@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.27 2007/09/26 07:09:02 strk Exp $ */
+/* $Id: sound_handler.h,v 1.28 2007/09/26 07:25:00 strk Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -72,20 +72,7 @@ public:
 			return;
 		}
 
-		if ( _capacity < _size+size )
-		{
-			// TODO: find the smallest bigger power of 2 ?
-			unsigned long newCapacity = std::max(_capacity*2, _size+size);
-
-			//log_debug("Buffer %p reallocating from %lu to %lu bytes", (void*)this, _capacity, newCapacity);
-
-			_capacity = newCapacity;
-
-			uint8_t* tmp = _data;
-			_data = new uint8_t[_capacity];
-			memcpy(_data, tmp, _size);
-			delete [] tmp;
-		}
+		reserve(_size+size);
 
 		assert(_capacity >= _size+size);
 		memcpy(_data+_size, newData, size);
@@ -96,6 +83,43 @@ public:
 	const uint8_t* data() const
 	{
 		return _data;
+	}
+
+	uint8_t* data() 
+	{
+		return _data;
+	}
+
+	const uint8_t* data(size_t pos) const
+	{
+		assert(pos < _capacity);
+		return _data+pos;
+	}
+
+	uint8_t* data(size_t pos) 
+	{
+		assert(pos < _capacity);
+		return _data+pos;
+	}
+
+	void resize(size_t newSize)
+	{
+		// we won't change capacity here
+		// (should we?)
+		_size = newSize;
+	}
+
+	void reserve(size_t newCapacity)
+	{
+		if ( _capacity > newCapacity ) return;
+
+		// TODO: use smalles power of 2 bigger then newCapacity
+		_capacity = std::max(newCapacity, _capacity*2);
+
+		uint8_t* tmp = _data;
+		_data = new uint8_t[_capacity];
+		memcpy(_data, tmp, _size);
+		delete [] tmp;
 	}
 
 	size_t size() const

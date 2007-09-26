@@ -1,5 +1,11 @@
 2007-09-26 Sandro Santilli <strk@keybit.net>
 
+	* backend/sound_handler.h: add more services to the
+	  Buffer class (sounds like reinventing the std::vector class
+	  actually).
+
+2007-09-26 Sandro Santilli <strk@keybit.net>
+
 	* backend/sound_handler.h: define a Buffer class
 	  to avoid duplicating code within the different
 	  versions of sound_data and active_sound.
