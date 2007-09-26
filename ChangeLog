@@ -1,5 +1,10 @@
 2007-09-26 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/ops.as: add test for bitwise and between
+	  negative and positive number.
+
+2007-09-26 Sandro Santilli <strk@keybit.net>
+
 	* backend/sound_handler.h (create_sound): document meaning of a NULL
 	  data.
 	* backend/sound_handler_gst.cpp (create_sound): don't choke on NULL

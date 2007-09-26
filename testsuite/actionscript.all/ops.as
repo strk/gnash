@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.22 2007/09/16 19:24:38 strk Exp $";
+rcsid="$Id: ops.as,v 1.23 2007/09/26 10:41:02 strk Exp $";
 
 #include "check.as"
 
@@ -359,6 +359,12 @@ check_equals( (null&1), 0 );
 check_equals( (null&null), 0 );
 check_equals( (3&2), 2 );
 // TODO ... 
+
+check_equals ((-1 & 1), 1);
+check_equals ((1 & -1), 1);
+
+check_equals ((-2 & 1), 0);
+check_equals ((1 & -2), 0);
 
 //------------------------------------------------
 // Bitwise OR operator (ACTION_BITWISEOR : 0x61)
