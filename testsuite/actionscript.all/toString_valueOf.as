@@ -69,8 +69,8 @@
   // Object object still supports toString and valueOf in swf5
   check_equals(typeof(Object.prototype['toString']), 'function');
   check_equals(typeof(Object.prototype['valueOf']), 'function');
-  // this is true because Function object in swf5 does not 
-  // support toString and valueOf.
+  // this is true because a function is considered like an undefined
+  // value in equality context.
   check_equals(Object.prototype.toString, undefined);
   check_equals(Object.prototype.valueOf,  undefined);
 #endif
@@ -273,8 +273,8 @@ _root.createEmptyMovieClip("mc2", 2);
   check(typeof(TextField.prototype.valueOf) == 'function' );
 #else
   // TextField in swf5 does not have toString and valueOf methods(to be checked).
-  xcheck(typeof(TextField.prototype.toString) == 'undefined' );
-  xcheck(typeof(TextField.prototype.valueOf) == 'undefined' );
+  xcheck_equals(typeof(TextField.prototype.toString), 'undefined' );
+  xcheck_equals(typeof(TextField.prototype.valueOf), 'undefined' );
 #endif
 
 // For TextFields, this true from swf5~swf8!
