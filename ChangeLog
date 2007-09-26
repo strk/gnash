@@ -1,5 +1,13 @@
 2007-09-26 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.cpp (equals): in SWF5, functions are
+	  considered null types for what concerns equality.
+	* testsuite/actionscript.all/: Function.as,
+	  Inheritance.as, Object.as, toString_valueOf.as: 
+	  new successes.
+
+2007-09-26 Sandro Santilli <strk@keybit.net>
+
 	* server/as_environment.cpp (dump_global_registers): better
 	  presentation for global registers.
 

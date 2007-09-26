@@ -680,10 +680,25 @@ as_value::equals(const as_value& v, as_environment& env) const
     log_debug("equals(%s, %s) called [%d]", to_debug_string().c_str(), v.to_debug_string().c_str(), count++);
 #endif
 
+    int SWFVersion = env.get_version();
+
     bool this_nulltype = (m_type == UNDEFINED || m_type == NULLTYPE);
     bool v_nulltype = (v.get_type() == UNDEFINED || v.get_type() == NULLTYPE);
+
+    // It seems like functions are considered the same as a NULL type
+    // in SWF5 (and I hope below, didn't check)
+    //
+    if ( SWFVersion < 6 )
+    {
+        if ( m_type == AS_FUNCTION ) this_nulltype = true;
+        if ( v.m_type == AS_FUNCTION ) v_nulltype = true;
+    }
+
     if (this_nulltype || v_nulltype)
     {
+#ifdef GNASH_DEBUG_EQUALITY
+       log_debug(" on of the two things is undefined or null");
+#endif
         return this_nulltype == v_nulltype;
     }
 
@@ -696,7 +711,7 @@ as_value::equals(const as_value& v, as_environment& env) const
 
     // 16. If Type(x) is Number and Type(y) is String,
     //    return the result of the comparison x == ToNumber(y).
-    else if (m_type == NUMBER && v.m_type == STRING)
+    if (m_type == NUMBER && v.m_type == STRING)
     {
 	double n = v.to_number(&env); // no need for the env actually
 	if ( ! isfinite(n) ) return false;
@@ -705,7 +720,7 @@ as_value::equals(const as_value& v, as_environment& env) const
 
     // 17. If Type(x) is String and Type(y) is Number,
     //     return the result of the comparison ToNumber(x) == y.
-    else if (v.m_type == NUMBER && m_type == STRING)
+    if (v.m_type == NUMBER && m_type == STRING)
     {
 	double n = to_number(&env); // no need for the env actually
 	if ( ! isfinite(n) ) return false;
@@ -713,20 +728,20 @@ as_value::equals(const as_value& v, as_environment& env) const
     }
 
     // 18. If Type(x) is Boolean, return the result of the comparison ToNumber(x) == y.
-    else if (m_type == BOOLEAN)
+    if (m_type == BOOLEAN)
     {
         return as_value(to_number(&env)).equals(v, env); // m_boolean_value == v.to_bool();
     }
 
     // 19. If Type(y) is Boolean, return the result of the comparison x == ToNumber(y).
-    else if (v.m_type == BOOLEAN)
+    if (v.m_type == BOOLEAN)
     {
         return as_value(v.to_number(&env)).equals(*this, env); 
     }
 
     // 20. If Type(x) is either String or Number and Type(y) is Object,
     //     return the result of the comparison x == ToPrimitive(y).
-    else if ( (m_type == STRING || m_type == NUMBER ) && ( v.is_object() ) ) // v.m_type == OBJECT || v.m_type == AS_FUNCTION ) )
+    if ( (m_type == STRING || m_type == NUMBER ) && ( v.is_object() ) ) // v.m_type == OBJECT || v.m_type == AS_FUNCTION ) )
     {
         // convert this value to a primitive and recurse
         as_value v2 = v.to_primitive(env); 
@@ -742,7 +757,7 @@ as_value::equals(const as_value& v, as_environment& env) const
 
     // 21. If Type(x) is Object and Type(y) is either String or Number,
     //    return the result of the comparison ToPrimitive(x) == y.
-    else if ( (v.m_type == STRING || v.m_type == NUMBER ) && ( is_object() ) ) // m_type == OBJECT || m_type == AS_FUNCTION ) )
+    if ( (v.m_type == STRING || v.m_type == NUMBER ) && ( is_object() ) ) // m_type == OBJECT || m_type == AS_FUNCTION ) )
     {
         // convert this value to a primitive and recurse
         as_value v2 = to_primitive(env); 

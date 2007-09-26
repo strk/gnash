@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.41 2007/09/12 17:15:11 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.42 2007/09/26 14:44:16 strk Exp $";
 
 #include "check.as"
 
@@ -133,7 +133,7 @@ check_equals(o1.__proto__, TypeChanger.prototype);
 #if OUTPUT_VERSION > 5
 check_equals(o1.__constructor__, TypeChanger);
 #else
-xcheck_equals(o1.__constructor__, TypeChanger);
+check_equals(o1.__constructor__, TypeChanger);
 #endif
 check(o1 instanceof TypeChanger);
 check(o1 instanceof Object);

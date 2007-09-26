@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.55 2007/09/11 05:46:31 zoulunkai Exp $";
+rcsid="$Id: Function.as,v 1.56 2007/09/26 14:44:16 strk Exp $";
 
 #include "check.as"
 
@@ -38,8 +38,14 @@ check_equals(getThisName.prototype.__proto__, Object.prototype);
 #if OUTPUT_VERSION >=6 
  check (getThisName != undefined);
 #else
- // this might be due to forced numerical comparison
- xcheck_equals (getThisName, undefined);
+ // this might be due to forced string comparison ?
+ check_equals (getThisName, undefined);
+ check_equals (getThisName, null);
+ check (getThisName != 0);
+ check (getThisName != 1);
+ check (! isNaN(getThisName) );
+ check (getThisName != "");
+ check (getThisName != "[type Function]");
 #endif
 check_equals ( typeof(getThisName), "function" );
 
