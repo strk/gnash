@@ -1,7 +1,8 @@
 2007-09-26 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ActionExec.cpp (call operator): initialize maxBranchCount
-	  once at start of function.
+	  once at start of function; include PC of last jump in maxBranchCount
+	  exception.
 
 2007-09-26 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
