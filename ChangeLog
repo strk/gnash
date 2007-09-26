@@ -1,5 +1,13 @@
 2007-09-26 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfc.all/: action_execution_order_test10.sc,
+	  action_execution_order_test12.sc, edittext_test1.sc,
+	  movieclip_destruction_test2.sc, movieclip_destruction_test3.sc,
+	  movieclip_destruction_test4.sc, soft_reference_test1.sc:
+	  Add expected number of tests run in the totals() call.
+
+2007-09-26 Sandro Santilli <strk@keybit.net>
+
 	* server/as_environment.cpp (get_variable_raw): don't handle _root and
 	  _levelX in any special way, they are just sprite members !
 	* server/sprite_instance.cpp (get_member): _root doesn't exist if

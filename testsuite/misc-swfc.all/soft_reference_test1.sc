@@ -163,7 +163,7 @@
     //   as of creation time.
     check(mcRef == _level0.mc1);
     
-    _root.totals();
+    _root.totals(38);
     stop(); 
   .end
   

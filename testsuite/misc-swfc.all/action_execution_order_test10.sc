@@ -215,7 +215,7 @@
 
 .frame 15
   .action:
-    totals();
+    totals(5);
     stop();
   .end
   

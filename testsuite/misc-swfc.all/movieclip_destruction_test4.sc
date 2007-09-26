@@ -173,7 +173,7 @@
     check_equals(typeof(brother2), 'movieclip');
     check_equals(typeof(brother3), 'undefined');
     stop();
-    totals();
+    totals(19);
   .end
 
 .end

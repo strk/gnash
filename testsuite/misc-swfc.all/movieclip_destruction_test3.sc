@@ -123,7 +123,7 @@
     check_equals(typeof(nestedMovieClip), 'undefined');
     check_equals(_root.as_order, "0+1+2+");
     stop();
-    totals();
+    totals(9);
   .end
 
 

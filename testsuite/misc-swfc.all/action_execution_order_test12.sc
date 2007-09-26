@@ -175,7 +175,7 @@
       // mc2.mc21, mc1.mc11 and mc1.mc12 were unloaded when loop back.
       // mc1 and mc2 were unloaded by RemoveObject2 tags.
       check_equals(_root.unloadOrder, '0+1+2+3+4+5+');
-    totals();
+    totals(13);
     stop();
   .end
 
