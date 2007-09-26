@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.422 2007/09/23 22:09:14 cmusick Exp $
+dnl $Id: configure.ac,v 1.423 2007/09/27 00:29:30 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -560,11 +560,8 @@ AM_CONDITIONAL(BUILD_MYSQL_EXT, [ test x$ext_mysql = xyes ])
 AM_CONDITIONAL(BUILD_GTK_EXT, [ test x$ext_gtk = xyes ])
 AM_CONDITIONAL(BUILD_LIRC_EXT, [ test x$ext_lirc = xyes ])
 AM_CONDITIONAL(BUILD_DBUS_EXT, [ test x$ext_dbus = xyes ])
-if test x$ext_mysql = xyes; then
-  GNASH_PATH_MYSQL
-fi
 
-dnl force lirc to be enabled
+dnl force lirc to be enabled when building the extension.
 if test x"${ext_lirc}" = x"yes"; then
   lirc=yes
 fi
@@ -660,6 +657,14 @@ dnl !!  This is to ensure that PKG_CONFIG, cross_compiling and incllist are
 dnl !!  properly set at the time of call.
 dnl !! 
 dnl !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+if test x$ext_dbus = xyes; then
+  GNASH_PATH_DBUS
+fi
+
+if test x$ext_mysql = xyes; then
+  GNASH_PATH_MYSQL
+fi
 
 dnl -----------------------------------------------------------
 dnl   Verify dependencies for requested GUIs are met, and
@@ -796,9 +801,7 @@ case $host in
   ;;
 esac
 
-dnl Look for LIRC, which i sused if there is a remote control
-GNASH_PATH_LIRC
-AM_CONDITIONAL(LIRC, [test -n "$LIRC_LIBS"])
+AM_CONDITIONAL(LIRC, [test x$lirc_ext = xyes])
 
 AC_CHECK_HEADERS(malloc.h)
 AC_CHECK_HEADERS(getopt.h)
@@ -1478,6 +1481,7 @@ extensions/mysql/Makefile
 extensions/fileio/Makefile
 extensions/gtk2/Makefile
 extensions/lirc/Makefile
+extensions/dbus/Makefile
 plugin/Makefile
 plugin/klash/Makefile
 cygnal/Makefile
@@ -2001,20 +2005,21 @@ else
   echo "                 or .rpm users: yum install curl-devel"
 fi
 
-
-if test x"$LIRC_LIBS" != x; then
-  if test x"$LIRC_CFLAGS" != x; then
-    echo "        LIRC flags are: $LIRC_CFLAGS"
+if test x"$ext_dbus" = xyes; then
+  if test x"$DBUS_LIBS" != x; then
+    if test x"$DBUS_CFLAGS" != x; then
+      echo "        DBUS flags are: $DBUS_CFLAGS"
+    else
+      echo "        DBUS flags are: default include path"
+    fi
+      echo "        DBUS libs are: $DBUS_LIBS"
   else
-    echo "        LIRC flags are: default include path"
+    echo "        WARNING: DBUS library not found."
+    echo "                 Gnash will be built without support for remote controls."
+    echo "                 Why not install libdbus from http://www.dbus.org"
+    echo "                 or .deb users: apt-get install dbus-dev"
+    echo "                 or .rpm users: yum install dbus-devel"
   fi
-    echo "        LIRC libs are: $LIRC_LIBS"
-else
-  echo "        WARNING: LIRC library not found."
-  echo "                 Gnash will be built without support for remote controls."
-  echo "                 Why not install liblirc from http://www.lirc.org"
-  echo "                 or .deb users: apt-get install lirc-dev"
-  echo "                 or .rpm users: yum install lirc-devel"
 fi
 
 if test x$build_agg = xyes; then # {

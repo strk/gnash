@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: extension.cpp,v 1.14 2007/09/23 08:48:17 cmusick Exp $ */
+/* $Id: extension.cpp,v 1.15 2007/09/27 00:29:30 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -218,6 +218,7 @@ Extension::scanDir(const char *dirlist)
         dir = dirlistcopy;
     }
 
+            
     while (dir) {
         log_msg(_("Scanning directory \"%s\" for plugins"), dir);
         DIR *library_dir = opendir(dir);
@@ -227,6 +228,7 @@ Extension::scanDir(const char *dirlist)
             return false;
         }
         
+        entry = readdir(library_dir);
         for (i=0; entry>0; i++) {
             // We only want shared libraries than end with the suffix, otherwise
             // we get all the duplicates.
@@ -244,6 +246,8 @@ Extension::scanDir(const char *dirlist)
             if (suffix == 0) {
                 continue;
             }
+
+            log_msg(_("Gnash Plugin name: %s"), entry->d_name);
             
             if (strcmp(suffix, ".so") == 0) {
                 *suffix = 0;
