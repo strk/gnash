@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.89 2007/09/19 14:20:48 cmusick Exp $ */
+/* $Id: as_environment.cpp,v 1.90 2007/09/26 12:09:07 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -910,19 +910,21 @@ as_environment::dump_local_registers(std::ostream& out) const
 }
 
 static void
-dump(const as_environment::LocalVars& /*locals*/, std::ostream&/* out*/)
+dump(const as_environment::LocalVars& locals, std::ostream& out)
 {
-	log_msg("FIXME: implement dumper for local variables now that they are simple objects");
-#if 0
-	for (size_t i=0; i<locals.size(); ++i)
+	typedef std::map<std::string, as_value> PropMap;
+	PropMap props;
+	const_cast<as_object*>(locals.get())->dump_members(props);
+	
+	//log_msg("FIXME: implement dumper for local variables now that they are simple objects");
+	int count = 0;
+	for (PropMap::iterator i=props.begin(), e=props.end(); i!=e; ++i)
 	{
-		const as_environment::frame_slot& slot = locals[i];
-		if (i) out << ", ";
+		if (count++) out << ", ";
 		// TODO: define output operator for as_value !
-		out << slot.m_name << "==" << slot.m_value;
+		out << i->first << "==" << i->second.to_debug_string();
 	}
 	out << std::endl;
-#endif
 }
 
 void

@@ -112,6 +112,15 @@ public:
 	///
 	void dump_members();
 
+	/// Dump all properties into the given map
+	//
+	/// Note that this method is non-const
+	/// as some properties might be getter/setter
+	/// ones, thus simple read of them might execute
+	/// user code actually changing the object itsef.
+	///
+	void dump_members(std::map<std::string, as_value>& to);
+
 	/// Construct an ActionScript object with no prototype associated.
 	as_object();
 

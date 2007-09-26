@@ -215,6 +215,17 @@ PropertyList::enumerateKeyValue(as_object& this_ptr, std::map<std::string, std::
 }
 
 void
+PropertyList::dump(as_object& this_ptr, std::map<std::string, as_value>& to) 
+{
+	string_table& st = VM::get().getStringTable();
+	for ( const_iterator i=begin(), ie=end(); i != ie; ++i)
+	{
+		const Property* prop = i->second;
+		to.insert(make_pair(st.value(i->first), prop->getValue(this_ptr)));
+	}
+}
+
+void
 PropertyList::dump(as_object& this_ptr)
 {
 	string_table& st = VM::get().getStringTable();

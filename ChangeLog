@@ -1,5 +1,12 @@
 2007-09-26 Sandro Santilli <strk@keybit.net>
 
+	* server/PropertyList.{cpp,h}: add dump to map.
+	* server/as_object.{cpp,h}: add dump_members to map.
+	* server/as_environment.cpp: implement dumper for local
+	  variables.
+
+2007-09-26 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ActionExec.cpp (call operator): initialize maxBranchCount
 	  once at start of function; include PC of last jump in maxBranchCount
 	  exception.

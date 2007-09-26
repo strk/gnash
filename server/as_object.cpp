@@ -403,6 +403,12 @@ as_object::dump_members()
 }
 
 void
+as_object::dump_members(std::map<std::string, as_value>& to)
+{
+	_members.dump(*this, to);
+}
+
+void
 as_object::setPropFlags(as_value& props_val, int set_false, int set_true)
 {
 	if (props_val.is_string())

@@ -372,6 +372,22 @@ public:
 	///
 	void dump(as_object& this_ptr);
 
+	/// Dump all members into the given map
+	//
+	/// @param this_ptr
+	/// 	The as_object used to set the 'this' pointer
+	/// 	for calling getter/setter function (GetterSetterProperty);
+	/// 	it will be unused when getting or setting SimpleProperty
+	/// 	properties.
+	///	This parameter is non-const as nothing prevents an
+	///	eventual "Getter" function from actually modifying it,
+	///	so we can't promise constness.
+	///	Note that the PropertyList itself might be changed
+	///	from this call, accessed trough the 'this' pointer,
+	///	so this method too is non-const.
+	///
+	void dump(as_object& this_ptr, std::map<std::string, as_value>& to);
+
 	/// Mark all simple properties, getters and setters
 	/// as being reachable (for the GC)
 	void setReachable() const;
