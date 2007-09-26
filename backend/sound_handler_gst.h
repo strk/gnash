@@ -86,21 +86,11 @@ private:
 class sound_data
 {
 	// The (un)compressed data
-	guint8* _data;
-
-	// data size
-	unsigned long _dataSize;
-
-	/// Allocated memory for _data
-	unsigned long _capacity;
+	Buffer _data;
 
 public:
 
 	sound_data()
-		:
-		_data(0),
-		_dataSize(0),
-		_capacity(0)
 	{}
 
 	/// Append size bytes to this sound
@@ -111,13 +101,16 @@ public:
 	/// @param size
 	///	Size of the 'data' buffer.
 	///
-	void append(unsigned char* data, unsigned int size);
+	void append(unsigned char* data, unsigned int size)
+	{
+		_data.append(data, size);
+	}
 
 	/// Return data size
-	unsigned long dataSize() const { return _dataSize; }
+	size_t dataSize() const { return _data.size(); }
 
 	/// Return data buffer
-	const unsigned char* data() { return _data; }
+	const uint8_t* data() { return _data.data(); }
 
 	// Object holding information about the sound
 	std::auto_ptr<SoundInfo> soundinfo;
@@ -129,11 +122,6 @@ public:
 	// gstreamer objects
 	std::vector<gst_elements*>	m_gst_elements;
 
-	~sound_data()
-	{
-		// TODO: use boost::scoped_array ?
-		delete [] _data;
-	}
 };
 
 // Use gstreamer to handle sounds.

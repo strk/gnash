@@ -1,5 +1,13 @@
 2007-09-26 Sandro Santilli <strk@keybit.net>
 
+	* backend/sound_handler.h: define a Buffer class
+	  to avoid duplicating code within the different
+	  versions of sound_data and active_sound.
+	* backend/sound_handler_gst.{cpp,h}: Use a Buffer
+	  member in the sound_data.
+
+2007-09-26 Sandro Santilli <strk@keybit.net>
+
 	* backend/sound_handler.h: document fill_stream_data return value.
 	* backend/sound_handler_gst.{cpp,h}: Make buffer member of sound_data
 	  private, provide an ::append() function with optimized reallocs.

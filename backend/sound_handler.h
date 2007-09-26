@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.26 2007/09/25 20:24:08 strk Exp $ */
+/* $Id: sound_handler.h,v 1.27 2007/09/26 07:09:02 strk Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -37,6 +37,7 @@
 
 #include <vector>
 #include <memory>
+#include <cassert>
 
 namespace gnash {
 	class stream;
@@ -44,6 +45,79 @@ namespace gnash {
 }
 
 namespace gnash {
+
+/// A buffer of bytes
+class Buffer {
+public:
+	Buffer()
+		:
+		_capacity(0),
+		_data(0),
+		_size(0)
+	{}
+
+	/// Append data to this buffer
+	//
+	/// @param newData data to append to this buffer.
+	///
+	/// @param size number of elements
+	///
+	void append(uint8_t* newData, size_t size)
+	{
+		if ( ! _capacity )
+		{
+			_data = newData;
+			_size = size;
+			_capacity = _size;
+			return;
+		}
+
+		if ( _capacity < _size+size )
+		{
+			// TODO: find the smallest bigger power of 2 ?
+			unsigned long newCapacity = std::max(_capacity*2, _size+size);
+
+			//log_debug("Buffer %p reallocating from %lu to %lu bytes", (void*)this, _capacity, newCapacity);
+
+			_capacity = newCapacity;
+
+			uint8_t* tmp = _data;
+			_data = new uint8_t[_capacity];
+			memcpy(_data, tmp, _size);
+			delete [] tmp;
+		}
+
+		assert(_capacity >= _size+size);
+		memcpy(_data+_size, newData, size);
+		_size += size;
+		delete [] newData;
+	}
+
+	const uint8_t* data() const
+	{
+		return _data;
+	}
+
+	size_t size() const
+	{
+		return _size;
+	}
+
+	~Buffer()
+	{
+		delete [] _data;
+	}
+
+private:
+
+	size_t _capacity;
+
+	uint8_t* _data;
+
+	size_t _size;
+
+};
+
 
 /// Sound handler.
 //

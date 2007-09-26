@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.63 2007/09/25 20:24:08 strk Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.64 2007/09/26 07:09:02 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -50,39 +50,6 @@
 using namespace boost;
 
 namespace gnash {
-
-void
-sound_data::append(unsigned char* newData, unsigned int size)
-{
-	if ( ! _capacity )
-	{
-		_data = newData;
-		_dataSize = size;
-		_capacity = _dataSize;
-		return;
-	}
-
-	if ( _capacity < _dataSize+size )
-	{
-		// TODO: find the smallest bigger power of 2 ?
-		unsigned long newCapacity = std::max(_capacity*2, _dataSize+size);
-
-		//log_debug("sound_data %p reallocating from %lu to %lu bytes", (void*)this, _capacity, newCapacity);
-
-		_capacity = newCapacity;
-
-		guint8* tmp = _data;
-		_data = new guint8[_capacity];
-		memcpy(_data, tmp, _dataSize);
-		delete [] tmp;
-	}
-
-	assert(_capacity >= _dataSize+size);
-	memcpy(_data+_dataSize, newData, size);
-	_dataSize += size;
-	delete [] newData;
-}
-
 
 GST_sound_handler::GST_sound_handler()
 	: looping(false),
