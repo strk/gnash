@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: morph2_character_def.cpp,v 1.16 2007/09/10 17:15:01 strk Exp $ */
+/* $Id: morph2_character_def.cpp,v 1.17 2007/09/26 19:46:29 strk Exp $ */
 
 // Based on the public domain morph2.cpp of:
 // Thatcher Ulrich <tu@tulrich.com>, Mike Shaver <shaver@off.net> 2003,
@@ -292,17 +292,9 @@ private:
 		);
 
 		IF_VERBOSE_MALFORMED_SWF(
-
-
-		if ( m_shape1->m_paths.size() != m_shape2->m_paths.size() )
-		{
-			log_swferror(_("Different number of paths "
-				"in start (" SIZET_FMT ") and end (" SIZET_FMT
-				") shapes of a morph"),
-				m_shape1->m_paths.size(),
-				m_shape2->m_paths.size());
-		}
-		else if ( edges_count1 != edges_count2 )
+		// It is perfectly legal to have a different number of patsh,
+		// edges count should be the same instead
+		if ( edges_count1 != edges_count2 )
 		{
 			log_swferror(_("Different number of edges "
 				"in start (%u) and end (%u) shapes "

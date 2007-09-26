@@ -1,5 +1,8 @@
 2007-09-26 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/morph2_character_def.cpp (read):
+	  Don't print malformed swf errors if number of paths in defining
+	  shapes don't match: only edges matter.
 	* gui/gtk.cpp (gdk_to_gnash_key): GDK_ooblique => GDK_oslash
 	  (gtk-2.0 in debian stable doesn't define the former).
 	* server/: BevelFilter.h, BlurFilter.h, ConvolutionFilter.h,
