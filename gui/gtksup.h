@@ -99,6 +99,10 @@ class DSOEXPORT GtkGui : public Gui
     /// Show info about the movie currently being played
     static void menuitem_movieinfo_callback(GtkMenuItem *menuitem,
                                               gpointer instance);
+
+    /// Force redraw (Ctrl-L)
+    static void menuitem_refresh_view_callback(GtkMenuItem *menuitem,
+                                   gpointer instance);
  
     // GTK Event handlers
     static gboolean unrealize_event(GtkWidget *widget, GdkEvent *event,

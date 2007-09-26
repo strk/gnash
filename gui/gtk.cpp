@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.114 2007/09/25 18:08:28 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.115 2007/09/26 08:11:19 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1296,10 +1296,19 @@ GtkGui::menuitem_jump_backward_callback(GtkMenuItem* /*menuitem*/,
     gui->menu_jump_backward();
 }
 
+/// \brief Force redraw
+void
+GtkGui::menuitem_refresh_view_callback(GtkMenuItem* /*menuitem*/,
+                                gpointer data)
+{
+//    GNASH_REPORT_FUNCTION;
+    Gui* gui = static_cast<Gui*>(data);
+    gui->menu_refresh_view();
+}
+
 //
 // Event handlers
 //
-
 
 gboolean
 GtkGui::expose_event(GtkWidget *const /*widget*/,
@@ -1558,7 +1567,7 @@ void
 GtkGui::createFileMenu(GtkWidget *obj)
 {
 //    GNASH_REPORT_FUNCTION;
-    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic (_("File"));
+    GtkWidget *menuitem = gtk_menu_item_new_with_label (_("File"));
     gtk_widget_show (menuitem);
     gtk_container_add (GTK_CONTAINER (obj), menuitem);
     
@@ -1668,11 +1677,13 @@ GtkGui::createViewMenu(GtkWidget *obj)
 
 }
 
-// Create a Help menu that can be used from the menu bar or the popup.
+// Create a Control menu that can be used from the menu bar or the popup.
 void
 GtkGui::createControlMenu(GtkWidget *obj)
 {
 //    GNASH_REPORT_FUNCTION;
+
+// Movie Control Menu
     GtkWidget *menuitem_control =
 	gtk_menu_item_new_with_label (_("Movie Control"));
     gtk_widget_show (menuitem_control);
@@ -1681,54 +1692,122 @@ GtkGui::createControlMenu(GtkWidget *obj)
     GtkWidget *menu = gtk_menu_new ();
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem_control), menu);
 
+// Play
+#if GTK_CHECK_VERSION(2,6,0)
     GtkMenuItem *menuitem_play = GTK_MENU_ITEM(
  	gtk_image_menu_item_new_from_stock ("gtk-media-play", NULL));
+#else
+    GtkMenuItem *menuitem_play =
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Play")));
+#endif
     gtk_menu_append(menu, GTK_WIDGET(menuitem_play));
     gtk_widget_show(GTK_WIDGET(menuitem_play));    
     g_signal_connect ((gpointer) menuitem_play, "activate",
         G_CALLBACK (&menuitem_play_callback), this);
 
+// Pause
+#if GTK_CHECK_VERSION(2,6,0)
     GtkMenuItem *menuitem_pause = GTK_MENU_ITEM(
  	gtk_image_menu_item_new_from_stock ("gtk-media-pause", NULL));
+#else
+    GtkMenuItem *menuitem_pause =
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Pause")));
+#endif
     gtk_menu_append(menu, GTK_WIDGET(menuitem_pause));
     gtk_widget_show(GTK_WIDGET(menuitem_pause));
     g_signal_connect ((gpointer) menuitem_pause, "activate",
         G_CALLBACK (&menuitem_pause_callback), this);
 
+// Stop
+#if GTK_CHECK_VERSION(2,6,0)
     GtkMenuItem *menuitem_stop = GTK_MENU_ITEM(
  	gtk_image_menu_item_new_from_stock ("gtk-media-stop", NULL));
+#else
+    GtkMenuItem *menuitem_stop =
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Stop")));
+#endif
     gtk_menu_append(menu, GTK_WIDGET(menuitem_stop));
     gtk_widget_show(GTK_WIDGET(menuitem_stop));
     g_signal_connect ((gpointer) menuitem_stop, "activate",
         G_CALLBACK (&menuitem_stop_callback), this);
 
-    GtkMenuItem *menuitem_restart =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Restart Movie")));
+// Restart
+// 
+    GtkImageMenuItem *menuitem_restart =
+ 	GTK_IMAGE_MENU_ITEM(
+	     gtk_image_menu_item_new_with_label(_("Restart Movie")));
+// Suitable image?
     gtk_menu_append(menu, GTK_WIDGET(menuitem_restart));
     gtk_widget_show(GTK_WIDGET(menuitem_restart));
     g_signal_connect ((gpointer) menuitem_restart, "activate",
         G_CALLBACK (&menuitem_restart_callback), this);
 
-    GtkMenuItem *menuitem_step_forward =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Step Forward Frame")));
+    GtkWidget *separator1 = gtk_separator_menu_item_new ();
+    gtk_widget_show (separator1);
+    gtk_container_add (GTK_CONTAINER (menu), separator1);
+
+// Step Forward
+    GtkImageMenuItem *menuitem_step_forward =
+ 	GTK_IMAGE_MENU_ITEM(
+	    gtk_image_menu_item_new_with_label(_("Step Forward Frame")));
+    gtk_image_menu_item_set_image (menuitem_step_forward,
+				   gtk_image_new_from_stock("gtk-go-forward",
+						 	     GTK_ICON_SIZE_MENU));
     gtk_menu_append(menu, GTK_WIDGET(menuitem_step_forward));
     gtk_widget_show(GTK_WIDGET(menuitem_step_forward));
 //     gtk_widget_add_accelerator (GTK_WIDGET(menuitem_step_forward), "activate", accel_group,
 //                                 GDK_bracketleft, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-    GtkMenuItem *menuitem_step_backward =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Step Backward Frame")));
+
+// Step Backward
+    GtkImageMenuItem *menuitem_step_backward =
+ 	GTK_IMAGE_MENU_ITEM(
+	    gtk_image_menu_item_new_with_label(_("Step Backward Frame")));
+    gtk_image_menu_item_set_image (menuitem_step_backward,
+				   gtk_image_new_from_stock("gtk-go-back",
+						 	     GTK_ICON_SIZE_MENU));
     gtk_menu_append(menu, GTK_WIDGET(menuitem_step_backward));
     gtk_widget_show(GTK_WIDGET(menuitem_step_backward));
 //     gtk_widget_add_accelerator (GTK_WIDGET(menuitem_step_forward), "activate", accel_group,
 //                                 GDK_bracketright, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-    GtkMenuItem *menuitem_jump_forward =
-        GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Jump Forward 10 Frames")));
+
+// Jump Forward
+// Stock image from Gtk-2.6 should be ignored in earlier versions.
+    GtkImageMenuItem *menuitem_jump_forward =
+        GTK_IMAGE_MENU_ITEM(
+	    gtk_image_menu_item_new_with_label(_("Jump Forward 10 Frames")));
+    gtk_image_menu_item_set_image (menuitem_jump_forward,
+				   gtk_image_new_from_stock("gtk-media-forward",
+						 	     GTK_ICON_SIZE_MENU));
     gtk_menu_append(menu, GTK_WIDGET(menuitem_jump_forward));
     gtk_widget_show(GTK_WIDGET(menuitem_jump_forward));
-    GtkMenuItem *menuitem_jump_backward =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Jump Backward 10 Frames")));
+
+// Jump Backward
+// Stock image from Gtk-2.6 should be ignored in earlier versions.
+    GtkImageMenuItem *menuitem_jump_backward =
+ 	GTK_IMAGE_MENU_ITEM(gtk_image_menu_item_new_with_label(_("Jump Backward 10 Frames")));
+    gtk_image_menu_item_set_image (menuitem_jump_backward,
+				   gtk_image_new_from_stock("gtk-media-rewind",
+						 	     GTK_ICON_SIZE_MENU));
     gtk_menu_append(menu, GTK_WIDGET(menuitem_jump_backward));
     gtk_widget_show(GTK_WIDGET(menuitem_jump_backward));
+
+
+    GtkWidget *separator2 = gtk_separator_menu_item_new ();
+    gtk_widget_show (separator2);
+    gtk_container_add (GTK_CONTAINER (menu), separator2);
+
+// Refresh
+// This should probably be under 'View', but then Properties should
+// be under 'File'
+    GtkMenuItem *menuitem_refresh = GTK_MENU_ITEM(
+ 	gtk_image_menu_item_new_from_stock ("gtk-refresh", NULL));
+    gtk_menu_append(menu, GTK_WIDGET(menuitem_refresh));
+    gtk_widget_show(GTK_WIDGET(menuitem_refresh));
+    g_signal_connect ((gpointer) menuitem_refresh, "activate",
+        G_CALLBACK (&menuitem_refresh_view_callback), this);
+
+
+
 }
 
 } // end of namespace gnash
