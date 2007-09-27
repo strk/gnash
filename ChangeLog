@@ -1,3 +1,8 @@
+2007-09-27 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/actionscript.all/Movieclip.as, XML.as: fix a few unstable checks.
+	  and a few more tests.
+
 2007-09-27 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/action_buffer.cpp (disasm_instruction): neater output.

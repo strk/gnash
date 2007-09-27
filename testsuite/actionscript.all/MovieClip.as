@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.89 2007/09/12 05:43:44 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.90 2007/09/27 07:18:15 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -43,6 +43,17 @@ check_equals(_root, this);
 check_equals(typeof(this['_root']), 'movieclip');
 check_equals(typeof(this['_level0']), 'movieclip');
 check_equals(typeof(this['this']), 'undefined');
+check_equals(_root['_root'], _root);
+check_equals(_level0['_root'], _root);
+check_equals(_root['_level0'], _root);
+#if OUTPUT_VERSION >= 6
+check_equals(typeof(_root['_global']), 'object');
+check_equals(_root.hasOwnProperty('_root'), false);
+#endif
+check_equals(typeof(_global['_root']), 'undefined');
+x = new Object();
+check_equals(x['_root'], undefined);
+
 
 // Check inheritance
 check(MovieClip);
@@ -188,7 +199,7 @@ check_equals(mc.onUnload, undefined);
 check(! mc.hasOwnProperty('onData'));
 check(! mc.hasOwnProperty('onDragOut'));
 check(! mc.hasOwnProperty('onDragOver'));
-check(! mc.hasOwnProperty('onEnterFrame')); 
+check_equals(mc.hasOwnProperty('onEnterFrame'), false); 
 check(! mc.hasOwnProperty('onKeyDown'));
 check(! mc.hasOwnProperty('onKeyUp'));
 check(! mc.hasOwnProperty('onKillFocus'));

@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.37 2007/09/24 12:34:50 strk Exp $";
+rcsid="$Id: XML.as,v 1.38 2007/09/27 07:18:15 zoulunkai Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
@@ -119,13 +119,13 @@ check_equals(tmp.status, 1000);
 o = new Object;
 tmp.status = o; 
 check_equals(typeof(tmp.status), 'number');
-check_equals(tmp.status, -2147483648); // 0xFFFFFFFF
+check_equals(tmp.status, -2147483648.0); // 0xFFFFFFFF
 tmp.status = 7;
 returnFour = function() { return 4; };
 o.toString = returnFour;
 tmp.status = o;
 check_equals(typeof(tmp.status), 'number');
-check_equals(tmp.status, -2147483648); // 0xFFFFFFFF
+check_equals(tmp.status, -2147483648.0); // 0xFFFFFFFF
 
 check_equals(typeof(tmp.loaded), 'undefined');
 check(! tmp.hasOwnProperty("loaded"));
