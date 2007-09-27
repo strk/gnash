@@ -140,7 +140,7 @@ check_PROGRAMS = \
 	DrawingApiTestRunner \
 	frame_label_test \
 	path_format_test \
-        callFunction_test \
+	callFunction_test \
 	duplicate_movie_clip_test \
 	duplicate_movie_clip_test2 \
 	event_handler_scope_test \
@@ -165,6 +165,7 @@ check_PROGRAMS = \
 	shape_test \
 	morph_test1 \
 	morph_test1runner \
+	opcode_guard_test \
 	$(NULL)
 
 if MING_VERSION_0_4
@@ -248,6 +249,7 @@ check_SCRIPTS = \
 	registerClassTest2runner \
 	DefineEditTextVariableNameTest-Runner \
 	DefineEditTextVariableNameTest2-Runner \
+	opcode_guard_testrunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -330,6 +332,18 @@ DefineEditTextTest_Runner_DEPENDENCIES = \
 spritehier_SOURCES =  spritehier.c
 spritehier_LDADD = $(MING_LIBS)
 
+opcode_guard_test_SOURCES =	\
+	opcode_guard_test.c	\
+	$(NULL)
+opcode_guard_test_LDADD = libgnashmingutils.la
+
+opcode_guard_test.swf: opcode_guard_test
+	./opcode_guard_test $(top_srcdir)/testsuite/media
+
+opcode_guard_testrunner: $(srcdir)/../generic-testrunner.sh opcode_guard_test.swf
+	sh $< $(top_builddir) opcode_guard_test.swf > $@
+	chmod 755 $@
+	
 PlaceObject2Test_SOURCES =	\
 	PlaceObject2Test.c	\
 	$(NULL)
@@ -1750,6 +1764,7 @@ TEST_CASES = \
 	shape_testrunner \
 	morph_test1runner \
 	registerClassTest2runner \
+	opcode_guard_testrunner \
 	$(NULL)
 
 if MING_VERSION_0_4

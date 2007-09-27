@@ -122,8 +122,9 @@
     check_equals(typeof(edtext1), 'undefined');
   .end
 
-
+//
 // new tests, seperate from the above
+//
 .frame 9
   .action:
     textVar4 = 'new_tests_begin';
@@ -137,7 +138,7 @@
             variable="textVar4" // give a name already exists in main timeline.
   .put edtext2 x=10 y=300
   .action:
-  	// returns the value of the registered variable in main timeline
+    // returns the value of the registered variable in main timeline
     check_equals(edtext2.text, 'new_tests_begin');
   .end
 
@@ -148,11 +149,61 @@
       check_equals(edtext2.text, 'value_changed');
       check_equals(textVar4, 'value_changed');
   .end
-    
-    
+
+//
+// new tests, seperate from the above
+//
+.frame 12
+  .edittext edtext10 size=200% 
+            width=100 height=100 
+            color=blue border multiline wordwrap
+            text="AAA"
+            variable="textVar10" 
+  .edittext edtext11 size=200% 
+            width=100 height=100 
+            color=blue border multiline wordwrap
+            text="BBB"
+            variable="textVar11" 
+  .edittext edtext12 size=200% 
+            width=100 height=100 
+            color=blue border multiline wordwrap
+            text="CCC"
+            variable="textVar12" 
+            
+  .put edtext10 x=100 y=300
+  .put edtext11 x=100 y=400
+  .put edtext12 x=100 y=500
+  
+  
+  .action:
+    check_equals(edtext10.text, 'AAA');
+    check_equals(edtext11.text, 'BBB');
+    check_equals(edtext12.text, 'CCC');
+    edtext10.variable = "textVar11";
+    edtext11.variable = "textVar12";
+    edtext12.variable = "textVar10";
+    check_equals(edtext10.text, 'BBB');
+    check_equals(edtext11.text, 'CCC');
+    check_equals(edtext12.text, 'AAA');
+    check_equals(textVar10, 'AAA');
+    check_equals(textVar11, 'BBB');
+    check_equals(textVar12, 'CCC');
+  .end
+ 
+
+.frame 13
+  .action:
+    edtext10.text = 'CCC';
+    edtext11.text = 'BBB';
+    edtext12.text = 'AAA';
+    check_equals(textVar10, 'AAA');
+    check_equals(textVar11, 'CCC');
+    check_equals(textVar12, 'BBB');
+  .end
+  
 .frame 15
   .action:
-    totals(31);
+    totals(43);
     stop();
   .end
 

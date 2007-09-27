@@ -1,3 +1,9 @@
+2007-09-27 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/misc-ming.all/opcode_guard_test.c, Makefile.am: new testcase
+	  for opcode guard.
+	* testsuite/misc-swfc.all/edittext_test1.sc: more tests, passed.
+	  
 2007-09-26 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (get_member): forget that
