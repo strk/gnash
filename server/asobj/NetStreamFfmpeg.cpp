@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.92 2007/09/13 09:47:32 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.93 2007/09/28 00:33:30 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -33,7 +33,7 @@
 #include "movie_root.h"
 #include "NetConnection.h"
 #include "sound_handler.h"
-#include "embedVideoDecoderFfmpeg.h"
+#include "VideoDecoderFfmpeg.h"
 
 #include <boost/scoped_array.hpp>
 
@@ -855,7 +855,7 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 			// Don't use depreceted img_convert, use sws_scale
 
 		} else if (m_videoFrameFormat == render::RGB && m_VCodecCtx->pix_fmt != PIX_FMT_RGB24) {
-			buffer.reset(embedVideoDecoderFfmpeg::convertRGB24(m_VCodecCtx, m_Frame));
+			buffer.reset(VideoDecoderFfmpeg::convertRGB24(m_VCodecCtx, m_Frame));
 		}
 
 		raw_mediadata_t* video = new raw_mediadata_t;

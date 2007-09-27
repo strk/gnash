@@ -1,4 +1,10 @@
-2007-09-27 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+2007-09-28 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libbase/Makefile.am, libmedia/sdl/VideoDecoderFfmpeg.h,
+	  server/asobj/NetStreamFfmpeg.cpp: Fix building with libmedia.
+	* libmedia/gst/VideoDecoderGst.{cpp,h}: Small comment update.
+
+2007-09-28 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* libmedia/, libmedia/sdl/, libmedia/gst/,
 	  (in libmedia:) AudioDecoder.h, AudioDecoderSimple.{h,cpp}, Makefile.am,

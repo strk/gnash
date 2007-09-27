@@ -1,3 +1,4 @@
+// VideoDecoderGst.cpp: Video decoding using Gstreamer.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -15,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderGst.cpp,v 1.1 2007/09/27 23:59:54 tgc Exp $
+// $Id: VideoDecoderGst.cpp,v 1.2 2007/09/28 00:33:30 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

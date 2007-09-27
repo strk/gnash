@@ -116,7 +116,6 @@ noinst_HEADERS = \
 	demo.h \
 	dlmalloc.h \
 	extension.h \
-	embedVideoDecoder.h \
 	GnashException.h \
 	gettext.h \
 	grid_index.h \
@@ -156,22 +155,6 @@ noinst_HEADERS = \
 	FLVParser.h \
 	GC.h \
 	$(NULL)
-
-
-
-if USE_SOUND_GST
-libgnashbase_la_SOURCES += gstgnashsrc.c embedVideoDecoderGst.cpp
-noinst_HEADERS += gstgnashsrc.h embedVideoDecoderGst.h
-libgnashbase_la_CPPFLAGS += $(GSTREAMER_CFLAGS)
-libgnashbase_la_LIBADD += $(GSTREAMER_LIBS) -lgstbase-0.10
-endif
-
-if USE_FFMPEG_ENGINE
-libgnashbase_la_SOURCES += embedVideoDecoderFfmpeg.cpp
-noinst_HEADERS += embedVideoDecoderFfmpeg.h
-libgnashbase_la_LIBADD += $(FFMPEG_LIBS)
-libgnashbase_la_CPPFLAGS += $(FFMPEG_CFLAGS)
-endif
 
 libgnashbase_la_LDFLAGS = -release $(VERSION)
 

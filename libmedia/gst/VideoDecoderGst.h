@@ -1,4 +1,4 @@
-// VideoDecoderGst.h: Video decoding using the FFMPEG library.
+// VideoDecoderGst.h: Video decoding using Gstreamer.
 // 
 //   Copyright (C) 2007 Free Software Foundation, Inc.
 // 
@@ -48,7 +48,7 @@ public:
 		int /*height*/,
 		int /*deblocking*/,
 		bool /*smoothing*/,
-		videoCodecType /*format*/, // should this argument be of codecType type ?
+		videoCodecType /*format*/,
 		int /*outputFormat*/);
 
 //	uint8_t* decode(uint8_t* input, uint32_t inputSize, uint32_t& outputSize);

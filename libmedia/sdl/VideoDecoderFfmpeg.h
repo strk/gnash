@@ -49,15 +49,16 @@ public:
 		int /*height*/,
 		int /*deblocking*/,
 		bool /*smoothing*/,
-		videoCodecType /*format*/, // should this argument be of codecType type ?
+		videoCodecType /*format*/,
 		int /*outputFormat*/);
 
 	uint8_t* decode(uint8_t* input, uint32_t inputSize, uint32_t& outputSize);
 
 	std::auto_ptr<image::image_base> decodeToImage(uint8_t* /*input*/, uint32_t /*inputSize*/);
-private:
 
-	uint8_t* convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame);
+	static uint8_t* convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame);
+
+private:
 
 	AVCodec* _videoCodec;
 	AVCodecContext* _videoCodecCtx;
