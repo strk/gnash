@@ -191,24 +191,18 @@ movie_root::restart()
 	// wipe out queued actions
 	_actionQueue.clear();
 
-	// take a copy of _level0 
-	boost::intrusive_ptr<movie_instance> level0 = getLevel(0);
+	// Get an handle to definition of _level0 
+	//
+	// TODO: this is bogus, in case _level0 was loaded into
+	//
+	boost::intrusive_ptr<movie_definition> level0Def = getLevel(0)->get_movie_definition();
 
 	// wipe out all levels
 	_movies.clear();
 
-	// Add level0 back in place
-	// NOTE: we don't call setLevel to avoid calling ::stagePlacementCallback again
-	_movies[0] = level0; 
+	boost::intrusive_ptr<movie_instance> level0 = level0Def->create_movie_instance();
 
-	// Restart the level0 movie
-	// TODO: instead, take it's definition and re-instantiate
-	// a new movie here ! The only problem would be re-setting
-	// externally set variables
-	level0->restart(); 
-
-	// Process actions queued by restart/stagePlacementCallback
-	processActionQueue();
+	setRootMovie(level0.get());
 
 	// Delete characters removed from the stage
 	// from the display lists

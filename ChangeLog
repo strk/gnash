@@ -1,3 +1,8 @@
+2007-09-27 Sandro Santilli <strk@keybit.net>
+
+	* server/movie_root.cpp (restart): rework restart mechanism
+	  by actually re-instantiating the root from it's definition.
+
 2007-09-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/movie_root.cpp: move level0->restart()
