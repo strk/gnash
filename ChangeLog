@@ -1,3 +1,12 @@
+2007-09-27 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ActionExec.{cpp,h}: add dumpActions() debugging function
+	  useful to tell which opcode are discarded due to opcode-guard.
+	  (change #if 0 to #if 1 in the opcode-guard code to see).
+	  For the curveball.swf case, the unloading opcode is a
+	  GotoLabel("Serve"), followed by a Play and a SetTarget which are
+	  discarded when opcode-guard is in effect.
+
 2007-09-27 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* testsuite/misc-ming.all/opcode_guard_test.c, Makefile.am: new testcase

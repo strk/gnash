@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.50 2007/09/26 20:52:02 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.51 2007/09/27 06:25:07 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -284,14 +284,6 @@ ActionExec::operator() ()
 			continue; // Walk up the try chain if necessary.
 		} // end of try checking.
 
-#if 0 // See bugs: #20974, #21069, #20996.
-		if ( _abortOnUnload && _original_target->isUnloaded() )
-		{
-			log_debug("Target of action_buffer unloaded during execution, discarding %d remaining opcodes", stop_pc-pc);
-			break;
-		}
-#endif
-
 	    // Cleanup any expired "with" blocks.
 	    while ( ! with_stack.empty() && pc >= with_stack.back().end_pc() ) {
 		// Drop last stack element
@@ -343,6 +335,22 @@ ActionExec::operator() ()
 	}
 
 	ash.execute((action_type)action_id, *this);
+
+#if 0 // See bugs: #20974, #21069, #20996.
+	if ( _abortOnUnload && _original_target->isUnloaded() )
+	{
+		std::stringstream ss;
+		ss << "Target of action_buffer (" << _original_target->getTarget() 
+			<< ") unloaded by execution of opcode: " << std::endl;
+		dumpActions(pc, next_pc, ss);
+		ss << "Discarding " << stop_pc-next_pc
+			<< " bytes of remaining opcodes: " << std::endl;
+		dumpActions(next_pc, stop_pc, ss);
+		log_debug("%s", ss.str().c_str());
+		break;
+	}
+#endif
+
 
 #ifdef USE_DEBUGGER
  	debugger.setFramePointer(code.getFramePointer(pc));
@@ -686,6 +694,32 @@ ActionExec::pushReturn(const as_value& t)
     	*retval = t;
 	}
     mReturning = true;
+}
+
+void
+ActionExec::dumpActions(size_t from, size_t to, ostream& os)
+{
+	size_t lpc = from;
+	while (lpc < to)
+	{
+	    // Get the opcode.
+	    uint8_t action_id = code[lpc];
+
+	    os << " PC:" << lpc << " - EX: " <<  code.disasm(lpc) << std::endl;
+
+	    // Set default next_pc offset, control flow action handlers
+	    // will be able to reset it.
+	    if ((action_id & 0x80) == 0) {
+		// action with no extra data
+		lpc++;
+	    } else {
+		// action with extra data
+		int16_t length = code.read_int16(lpc+1);
+		assert( length >= 0 );
+		lpc += length + 3;
+	    }
+
+	}
 }
 
 } // end of namespace gnash

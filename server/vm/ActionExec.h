@@ -89,6 +89,21 @@ class ActionExec {
 
 private: 
 
+	/// \brief
+	/// Debugging function:
+	/// print opcodes from start (included) to end (not-included) PCs.
+	//
+	/// @param start
+	///	First opcode to dump
+	///
+	/// @param end
+	///	One-past last opcode to dump
+	///
+	/// @param os
+	///	Output stream to dump to
+	///
+	void dumpActions(size_t start, size_t end, std::ostream& os);
+
 	/// Returns 'with' stack associated with this execution thread
 	// 
 	/// If you need to modify it, use the pushWithEntry() function.
