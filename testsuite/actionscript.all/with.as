@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.13 2007/07/26 03:41:20 strk Exp $";
+rcsid="$Id: with.as,v 1.14 2007/09/27 09:09:43 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -182,8 +182,10 @@ with(mc1)
 
 with(mc2)
 {
+	check_equals(this, _root);
 	with(mc1)
 	{
+	  check_equals(this, _level0);
 		check_equals(a, 1);
 		check_equals(b, 1);
 		check_equals(x, 3);
@@ -221,3 +223,17 @@ with(mc1)
 		check_equals(typeof(f_y()), 'undefined'); 
 	}
 }
+
+
+//
+// tests of setTarget
+//
+tellTarget("mc1");
+// setTarget and With won't change this context.
+// but the deduction might be incorrect!!!
+check_equals(this, _root);
+tellTarget("");
+// Ming thinks tellTarget is a Function, but it is not.
+// So all related tests are probably bogus.
+check_equals(typeof(tellTarget), 'undefined');
+check_equals(this, _root);
