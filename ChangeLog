@@ -1,5 +1,10 @@
 2007-09-27 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/action_buffer.cpp (disasm_instruction): neater output.
+	* server/vm/ActionExec.cpp: tweak action verbosity output.
+
+2007-09-27 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ActionExec.{cpp,h}: add dumpActions() debugging function
 	  useful to tell which opcode are discarded due to opcode-guard.
 	  (change #if 0 to #if 1 in the opcode-guard code to see).

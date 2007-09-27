@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.51 2007/09/27 06:25:07 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.52 2007/09/27 06:46:33 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -362,7 +362,7 @@ ActionExec::operator() ()
 	
 #if DEBUG_STACK
 	IF_VERBOSE_ACTION (
-		log_action(_(" After execution, PC is " SIZET_FMT "."), pc);
+		log_action(_("After execution: PC " SIZET_FMT ", next PC " SIZET_FMT ", stack follows"), pc, next_pc);
 		stringstream ss;
 		env.dump_stack(ss);
 		env.dump_global_registers(ss);

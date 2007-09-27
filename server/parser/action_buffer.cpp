@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: action_buffer.cpp,v 1.22 2007/08/07 20:53:10 strk Exp $ */
+/* $Id: action_buffer.cpp,v 1.23 2007/09/27 06:46:32 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -211,117 +211,159 @@ disasm_instruction(const unsigned char* instruction_data)
     if (action_id > ash.lastType()) {
 	ss << "<unknown>[0x]" <<  action_id << endl;
     } else {
-	ss << ash[action_id].getName() << endl;
-	fmt = ash[action_id].getArgFormat();
+	ss << ash[action_id].getName();
     }
 
     // Show instruction argument(s).
-    if (action_id & 0x80) {
+    if (action_id & 0x80)
+    {
+	ss << " (";
+	fmt = ash[action_id].getArgFormat();
 	assert(fmt != ARG_NONE);
 	int length = instruction_data[1] | (instruction_data[2] << 8);
-	if (fmt == ARG_HEX) {
+	if (fmt == ARG_HEX)
+	{
 	    for (int i = 0; i < length; i++) {
 		hexify(num, (const unsigned char *)&instruction_data[3 + i], 1, false);
 		ss << "0x" << num << " ";
 	    }
-	    ss << endl;
-	} else if (fmt == ARG_STR) {
+	}
+	else if (fmt == ARG_STR)
+	{
 	    string str;
 	    for (int i = 0; i < length; i++) {
 		str += instruction_data[3 + i];
 	    }
-	    ss << "\"" << str.c_str() << "\"" << endl;
-	} else if (fmt == ARG_U8) {
+	    ss << "\"" << str.c_str() << "\"";
+	}
+	else if (fmt == ARG_U8)
+	{
 	    int	val = instruction_data[3];
-	    ss << " " << val << endl;
-	} else if (fmt == ARG_U16) {
+	    ss << " " << val;
+	}
+	else if (fmt == ARG_U16)
+	{
 	    int	val = instruction_data[3] | (instruction_data[4] << 8);
-	    ss << " " << val << endl;
-	} else if (fmt == ARG_S16) {
+	    ss << " " << val;
+	}
+	else if (fmt == ARG_S16)
+	{
 	    int	val = instruction_data[3] | (instruction_data[4] << 8);
 	    if (val & 0x8000) val |= ~0x7FFF;	// sign-extend
-	    ss << " " << val << endl;
-	} else if (fmt == ARG_PUSH_DATA) {
-	    ss << endl;
+	    ss << " " << val;
+	}
+	else if (fmt == ARG_PUSH_DATA)
+	{
 	    int i = 0;
-	    while (i < length) {
-		int	type = instruction_data[3 + i];
-		i++;
-		if (type == 0) {
+	    while (i < length)
+	    {
+		int type = instruction_data[3 + i];
+		if ( i++ ) ss << ", ";
+
+		if (type == 0)
+		{
 		    // string
 		    string str;
-		    while (instruction_data[3 + i]) {
+		    while (instruction_data[3 + i])
+		    {
 			str += instruction_data[3 + i];
 			i++;
 		    }
 		    i++;
-		    ss << "\t\"" << str.c_str() << "\"" << endl;
-		} else if (type == 1) {
+		    ss << "\"" << str.c_str() << "\"";
+		}
+		else if (type == 1)
+		{
 		    // float (little-endian)
 		    float f = convert_float_little(instruction_data + 3 + i);
 		    i += 4;
-		    ss << "(float) " << f << endl;
-		} else if (type == 2) {
-		    ss << "NULL" << endl;
-		} else if (type == 3) {
-		    ss << "undef" << endl;
-		} else if (type == 4) {
+		    ss << "(float) " << f;
+		}
+		else if (type == 2)
+		{
+		    ss << "NULL";
+		}
+		else if (type == 3)
+		{
+		    ss << "undef";
+		}
+		else if (type == 4)
+		{
 		    // contents of register
 		    int	reg = instruction_data[3 + i];
 		    i++;
-		    ss << "reg[" << reg << "]" << endl;
-		} else if (type == 5) {
+		    ss << "reg[" << reg << "]";
+		}
+		else if (type == 5)
+		{
 		    int	bool_val = instruction_data[3 + i];
 		    i++;
-		    ss << "bool(" << bool_val << ")" << endl;
-		} else if (type == 6) {
+		    ss << "bool(" << bool_val << ")";
+		}
+		else if (type == 6)
+		{
 		    // double in wacky format: 45670123
 		    double d = convert_double_wacky(instruction_data + 3 + i);
 		    i += 8;
-		    ss << "(double) " << d << endl;
-		} else if (type == 7) {
+		    ss << "(double) " << d;
+		}
+		else if (type == 7)
+		{
 		    // int32_t
 		    int32_t	val = instruction_data[3 + i]
 			| (instruction_data[3 + i + 1] << 8)
 			| (instruction_data[3 + i + 2] << 16)
 			| (instruction_data[3 + i + 3] << 24);
 		    i += 4;
-		    ss << "(int) " << val << endl;
-		} else if (type == 8) {
+		    ss << "(int) " << val;
+		}
+		else if (type == 8)
+		{
 		    int	id = instruction_data[3 + i];
 		    i++;
-		    ss << "dict_lookup[" << id << "]" << endl;
-		} else if (type == 9) {
+		    ss << "dict_lookup[" << id << "]";
+		}
+		else if (type == 9)
+		{
 		    int	id = instruction_data[3 + i] | (instruction_data[3 + i + 1] << 8);
 		    i += 2;
-		    ss << "dict_lookup_lg[" << id << "]" << endl;
+		    ss << "dict_lookup_lg[" << id << "]";
 		}
 	    }
-	} else if (fmt == ARG_DECL_DICT) {
+	}
+	else if (fmt == ARG_DECL_DICT)
+	{
 	    int	i = 0;
 	    int	count = instruction_data[3 + i] | (instruction_data[3 + i + 1] << 8);
 	    i += 2;
 	    
-	    ss << " [" << count << "]" << endl;
+	    ss << " [" << count << "] ";
 	    
 	    // Print strings.
-	    for (int ct = 0; ct < count; ct++) {
-		ss << "\t" << ct << ") "; 
+	    for (int ct = 0; ct < count; ct++)
+	    {
+		if ( ct ) ss << ", ";
+
+		ss << ct << ":"; 
 		
 		string str;
-		while (instruction_data[3 + i]) {
+		while (instruction_data[3 + i])
+		{
 			// safety check.
-		    if (i >= length) {
+		    if (i >= length)
+		    {
 			log_debug("<disasm error -- length exceeded>");
 			break;
 		    }
 		    str += instruction_data[3 + i];
 		    i++;
 		}
-		ss << "\"" << str.c_str() << "\"" << endl;
+		ss << "\"" << str.c_str() << "\"";
 		i++;
 	    }
-	} else if (fmt == ARG_FUNCTION2) {
+	}
+	else if (fmt == ARG_FUNCTION2)
+	{
 	    // Signature info for a function2 opcode.
 	    int	i = 0;
 	    const char*	function_name = (const char*) &instruction_data[3 + i];
@@ -333,9 +375,9 @@ disasm_instruction(const unsigned char* instruction_data)
 	    int	reg_count = instruction_data[3 + i];
 	    i++;
 
-	    ss << "\t\tname = '" << function_name << "'"
+	    ss << "\tname = '" << function_name << "'"
 		       << " arg_count = " << arg_count
-		       << " reg_count = " << reg_count << endl;
+		       << " reg_count = " << reg_count;
 	    
 	    uint16_t	flags = (instruction_data[3 + i]) | (instruction_data[3 + i + 1] << 8);
 	    i += 2;
@@ -352,45 +394,36 @@ disasm_instruction(const unsigned char* instruction_data)
 	    bool	suppress_this  = (flags & 0x02) != 0;
 	    bool	preload_this   = (flags & 0x01) != 0;
 	    
-	    log_msg("\t\t        pg = %d\n"
-		    "\t\t        pp = %d\n"
-		    "\t\t        pr = %d\n"
-		    "\t\tss = %d, ps = %d\n"
-		    "\t\tsa = %d, pa = %d\n"
-		    "\t\tst = %d, pt = %d\n",
-		    int(preload_global),
-		    int(preload_parent),
-		    int(preload_root),
-		    int(suppress_super),
-		    int(preload_super),
-		    int(suppress_args),
-		    int(preload_args),
-		    int(suppress_this),
-		    int(preload_this));
-	    
-	    for (int argi = 0; argi < arg_count; argi++) {
+	    ss << " pg=" << preload_global
+		<< " pp=" << preload_parent
+		<< " pr=" << preload_root
+		<< " ss=" << suppress_super
+		<< " ps=" << preload_super
+		<< " sa=" << suppress_args
+		<< " pa=" << preload_args
+		<< " st=" << suppress_this
+		<< " pt=" << preload_this;
+
+	    for (int argi = 0; argi < arg_count; argi++)
+	    {
 		int	arg_register = instruction_data[3 + i];
 		i++;
 		const char*	arg_name = (const char*) &instruction_data[3 + i];
 		i += strlen(arg_name) + 1;
 		
-		ss << "\t\targ[" << argi << "]"
+		ss << "\targ[" << argi << "]"
 			   << " - reg[" << arg_register << "]"
-			   << " - '" << arg_name << "'" << endl;
+			   << " - '" << arg_name << "'";
 	    }
 	    
 	    int	function_length = instruction_data[3 + i] | (instruction_data[3 + i + 1] << 8);
 	    i += 2;
 	    
-	    ss << "\t\tfunction length = " << function_length << endl;
+	    ss << "\t\tfunction length = " << function_length;
 	}
-    } else {
-	ss << endl;
+	ss << ")";
     }
 
-    //dbglogfile.setStamp(false); // why ?
-    //log_msg("%s", ss.str().c_str());
-    //dbglogfile.setStamp(true);
     return ss.str();
 }
 
