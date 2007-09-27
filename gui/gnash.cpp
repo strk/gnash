@@ -144,8 +144,9 @@ usage()
         "  CTRL-[ or kp-   Step back one frame\n"
         "  CTRL-] or kp+   Step forward one frame\n"
 	"  CTRL-L          Force immediate redraw\n"
-        "  CTRL-B          Toggle background color\n"
 /*
+        "  CTRL-B          Toggle background color\n"  // No code to make this work or indication
+						       // what it's supposed to do.
         "  CTRL-A          Toggle antialiasing (doesn't work)\n"
         "  CTRL-T          Debug.  Test the set_variable() function\n"
         "  CTRL-G          Debug.  Test the get_variable() function\n"

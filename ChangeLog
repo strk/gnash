@@ -1,7 +1,8 @@
 2007-09-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gnash.cpp: remove ESC = Quit from gnash --help output. It's not true
-	  and would potentially interfere with movie key events if it were.
+	  and would potentially interfere with movie key events if it were. Ctrl-B
+	  commented out, because it also doesn't do anything.
 
 2007-09-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
