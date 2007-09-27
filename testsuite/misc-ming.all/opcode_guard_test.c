@@ -34,8 +34,8 @@ int
 main(int argc, char** argv)
 {
   SWFMovie mo;
-  SWFMovieClip  mc1, mc2, mc3, dejagnuclip;
-  SWFDisplayItem it1, it2, it3;
+  SWFMovieClip  mc1, mc11, mc2, mc3, dejagnuclip;
+  SWFDisplayItem it1, it11, it2, it3;
 
   const char *srcdir=".";
   if ( argc>1 ) 
@@ -55,10 +55,16 @@ main(int argc, char** argv)
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   SWFMovie_nextFrame(mo); // 1st frame 
   
+  mc11 = newSWFMovieClip();
+  SWFMovieClip_nextFrame(mc11); 
   
   mc1 = newSWFMovieClip();
-  // should be executed.
-  add_clip_actions(mc1, "_root.xcheck(false);");
+    // should not be executed.
+    add_clip_actions(mc1, "_root.xcheck(false);");
+    // add child movieclip
+    it11 = SWFMovieClip_add(mc1, (SWFBlock)mc11);  
+    SWFDisplayItem_setDepth(it11, 1); 
+    SWFDisplayItem_setName(it11, "mc11"); 
   SWFMovieClip_nextFrame(mc1); 
   
 
@@ -68,8 +74,12 @@ main(int argc, char** argv)
   /* Define Construct ClipEvent */
   SWFDisplayItem_addAction(it1,
     compileSWFActionCode(" _root.note('mc1 Construct called');"
+                         // test child movieclip has been constructed(no unload handler defined).
+                         " _root.check_equals(typeof(_root.mc1.mc11), 'movieclip');"
                          " _root.gotoAndPlay(3); "
-                         " _root.testvar1 = 'executed'; "),
+                         " _root.testvar1 = 'executed'; "
+                         // test child movieclip has been destroyed.
+                         " _root.check_equals(typeof(_root.mc1.mc11), 'undefined');"),
     SWFACTION_CONSTRUCT);
   /* Define Load ClipEvent */
   SWFDisplayItem_addAction(it1,
@@ -81,7 +91,9 @@ main(int argc, char** argv)
   SWFDisplayItem_addAction(it1,
     compileSWFActionCode(" _root.note('mc1 Unload called'); "
                          " _root.gotoAndPlay(3); "
-                         " _root.testvar3 = 'executed'; "),
+                         " _root.testvar3 = 'executed'; "
+                         // test child movieclip has been destroyed(no unload handler defined)
+                         " _root.check_equals(typeof(_root.mc1.mc11), 'undefined');"),
     SWFACTION_UNLOAD);
    /* Define EnterFrame ClipEvent */
   SWFDisplayItem_addAction(it1,
