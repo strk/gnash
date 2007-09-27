@@ -1,5 +1,10 @@
 2007-09-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* gui/gnash.cpp: remove ESC = Quit from gnash --help output. It's not true
+	  and would potentially interfere with movie key events if it were.
+
+2007-09-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* docs/C/usage.xml, gui/gnash.cpp: add/update Ctrl-L
 	* gui/gui.cpp: make keyboard shortcuts work for both upper and lower
 	  case. Correct step back ('[') and forward (']'), which are documented to

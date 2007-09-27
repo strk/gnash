@@ -138,7 +138,7 @@ usage()
         "\n"
         "keys:\n"
 	"\n"
-        "  CTRL-Q, CTRL-W, ESC   Quit/Exit\n"
+        "  CTRL-Q, CTRL-W  Quit/Exit\n"
         "  CTRL-P          Toggle Pause\n"
         "  CTRL-R          Restart the movie\n"
         "  CTRL-[ or kp-   Step back one frame\n"
