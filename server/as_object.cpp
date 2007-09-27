@@ -413,7 +413,12 @@ as_object::setPropFlags(as_value& props_val, int set_false, int set_true)
 {
 	if (props_val.is_string())
 	{
-		std::string propstr = props_val.to_string();
+		std::string propstr = props_val.to_string(); // no need for calling toString here..
+		if ( _vm.getSWFVersion() < 7 ) // convert to lower case if required
+		{
+			boost::to_lower(propstr);
+		}
+
 		for(;;)
 		{
 			std::string prop;

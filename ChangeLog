@@ -1,5 +1,12 @@
 2007-09-27 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.cpp (setPropFlags): properly convert the properties
+	  to lowercase for SWF < 7.
+	* testsuite/actionscript.all/String.as: successes in unprotecting
+	  {String,Object}.prototype.toString from deletion.
+
+2007-09-27 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/String.as: tests for toString and it's
 	  deletion/unprotection from deletion (succeeds from SWF7 and higher,
 	  fails up to SWF6)

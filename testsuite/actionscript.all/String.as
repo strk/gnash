@@ -16,7 +16,7 @@
 
 // Original author: Mike Carlson - June 19th, 2006
 
-rcsid="$Id: String.as,v 1.21 2007/09/27 16:54:49 strk Exp $";
+rcsid="$Id: String.as,v 1.22 2007/09/27 17:23:18 strk Exp $";
 
 #include "check.as"
 
@@ -330,22 +330,13 @@ check_equals(typeof(s.toString), 'function');
 check(! delete String.prototype.toString);
 ASSetPropFlags(String.prototype, "toString", 0, 7); // unprotect from deletion
 StringProtoToStringBackup = String.prototype.toString;
-#if OUTPUT_VERSION < 7
- xcheck(delete String.prototype.toString);
-#else
- check(delete String.prototype.toString);
-#endif
+check(delete String.prototype.toString);
 check_equals(typeof(s.toString), 'function');
 check(!delete Object.prototype.toString);
 ASSetPropFlags(Object.prototype, "toString", 0, 7); // unprotect from deletion
 ObjectProtoToStringBackup = Object.prototype.toString;
-#if OUTPUT_VERSION < 7
- xcheck(delete Object.prototype.toString);
- xcheck_equals(typeof(s.toString), 'undefined');
-#else
- check(delete Object.prototype.toString);
- check_equals(typeof(s.toString), 'undefined');
-#endif
+check(delete Object.prototype.toString);
+check_equals(typeof(s.toString), 'undefined');
 Object.prototype.toString = ObjectProtoToStringBackup;
 String.prototype.toString = StringProtoToStringBackup;
 
