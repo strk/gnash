@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.56 2007/09/19 14:20:49 cmusick Exp $ */
+/* $Id: character.cpp,v 1.57 2007/09/27 23:06:56 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -887,12 +887,14 @@ character::getTarget() const
 	return target;
 }
 
+#if 0
 /*public*/
 std::string
 character::get_text_value() const
 {
 	return getTarget();
 }
+#endif
 
 
 } // namespace gnash

@@ -224,7 +224,7 @@ y = mc1.valueOf();
 #if OUTPUT_VERSION > 5
   check_equals(typeof(x), 'string'); 
   check_equals(typeof(y), 'movieclip');  
-  xcheck_equals(x, '[object Object]'); 
+  check_equals(x, '[object Object]'); 
   check_equals(y, _level0.mc1); 
 #else
   // createEmptyMovieClip is not a function in SWF5...
@@ -233,12 +233,16 @@ y = mc1.valueOf();
   check_equals(x, undefined); 
   check_equals(y, undefined); 
 #endif
-check(y == _level0.mc1);  
+check_equals(y, _level0.mc1);  
+
 //trace a movieclip doesn't invoke the toString method, either.
 //trace(mc1); //output _level0.mc
 
 MovieClip.prototype.toString = function () {return "TO_STRING";};
 MovieClip.prototype.valueOf = function () {return "TO_VALUE";};
+
+check( mc1 != '_level0.mc1'); // won't invoke toString for comparison
+check_equals( mc1, _level0.mc1 ); 
 
 x = mc1.toString();
 y = mc1.valueOf();

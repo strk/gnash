@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.96 2007/09/21 08:29:02 strk Exp $ */
+/* $Id: character.h,v 1.97 2007/09/27 23:06:56 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -1081,8 +1081,8 @@ public: // istn't this 'public' reduntant ?
 	///
 	TimelineInfo* getTimelineInfo() { return _timelineInfo.get(); }
 	
-  // override from as_object
-	virtual std::string get_text_value() const;	
+	// override from as_object
+	//virtual std::string get_text_value() const;	
 
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
 	boost::intrusive_ptr<as_function> getUserDefinedEventHandler(const std::string& name) const;

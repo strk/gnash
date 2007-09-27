@@ -1,5 +1,11 @@
 2007-09-28 Sandro Santilli <strk@keybit.net>
 
+	* server/character.{cpp,h}: drop the get_text_value override here.
+	* testsuite/actionscript.all/: toString_valueOf.as, MovieClip.as:
+	  more successes.
+
+2007-09-28 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/toString_valueOf.as: more
 	  xcheck => xcheck_equals (easier to tell what's going on).
 	

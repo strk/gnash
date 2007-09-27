@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.90 2007/09/27 07:18:15 zoulunkai Exp $";
+rcsid="$Id: MovieClip.as,v 1.91 2007/09/27 23:06:56 strk Exp $";
 
 #include "check.as"
 
@@ -413,12 +413,12 @@ check_equals(mc4._target, "/changed");
 check_equals(mc5._target, "/changed/mc5_mc");
 check_equals(targetPath(mc4), "_level0.changed");
 check_equals(targetPath(mc5), "_level0.changed.mc5_mc");
-xcheck_equals(mc4.toString(), "[object Object]");
-xcheck_equals(mc5.toString(), "[object Object]");
+check_equals(mc4.toString(), "[object Object]");
+check_equals(mc5.toString(), "[object Object]");
 check_equals(changed._target, "/changed");
 check_equals(changed.mc5_mc._target, "/changed/mc5_mc");
-xcheck_equals(changed.toString(), "[object Object]");
-xcheck_equals(changed.mc5_mc.toString(), "[object Object]");
+check_equals(changed.toString(), "[object Object]");
+check_equals(changed.mc5_mc.toString(), "[object Object]");
 #endif // OUTPUT_VERSION >= 6
 
 //--------------------------------------------------------------------------
