@@ -16,7 +16,7 @@
 
 // Original author: Mike Carlson - June 19th, 2006
 
-rcsid="$Id: String.as,v 1.20 2007/08/25 23:11:00 strk Exp $";
+rcsid="$Id: String.as,v 1.21 2007/09/27 16:54:49 strk Exp $";
 
 #include "check.as"
 
@@ -288,9 +288,11 @@ check(c.toString != prevToStringFunc);
 #endif
 check_equals(b+c, "two[type Object]");
 
+ObjectProtoToStringBackup = Object.prototype.toString;
 Object.prototype.toString = undefined;
 check_equals(typeof(c.toString), 'function');
 check_equals(b+c, "two[type Object]");
+Object.prototype.toString = ObjectProtoToStringBackup;
 
 c.toString = undefined;
 check_equals(typeof(c.toString), 'undefined');
@@ -317,3 +319,33 @@ xcheck_equals(stringObject, numberObject); // SWF5 always converts to string !!
 #endif
 check_equals(numberObject.toString(), stringObject);
 check_equals(numberObject.toString(), stringObject.toString());
+
+//----------------------------------------------------------------------
+// Drop the toString method of a string (also a test for ASSetPropFlags)
+//----------------------------------------------------------------------
+
+s = new String("a");
+check_equals(typeof(Object.prototype.toString), 'function');
+check_equals(typeof(s.toString), 'function');
+check(! delete String.prototype.toString);
+ASSetPropFlags(String.prototype, "toString", 0, 7); // unprotect from deletion
+StringProtoToStringBackup = String.prototype.toString;
+#if OUTPUT_VERSION < 7
+ xcheck(delete String.prototype.toString);
+#else
+ check(delete String.prototype.toString);
+#endif
+check_equals(typeof(s.toString), 'function');
+check(!delete Object.prototype.toString);
+ASSetPropFlags(Object.prototype, "toString", 0, 7); // unprotect from deletion
+ObjectProtoToStringBackup = Object.prototype.toString;
+#if OUTPUT_VERSION < 7
+ xcheck(delete Object.prototype.toString);
+ xcheck_equals(typeof(s.toString), 'undefined');
+#else
+ check(delete Object.prototype.toString);
+ check_equals(typeof(s.toString), 'undefined');
+#endif
+Object.prototype.toString = ObjectProtoToStringBackup;
+String.prototype.toString = StringProtoToStringBackup;
+

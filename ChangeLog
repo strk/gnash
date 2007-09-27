@@ -1,5 +1,11 @@
 2007-09-27 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/String.as: tests for toString and it's
+	  deletion/unprotection from deletion (succeeds from SWF7 and higher,
+	  fails up to SWF6)
+
+2007-09-27 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Global.as: add test for
 	  parseInt(<stringObject>).
 	* server/asobj/Global.cpp (as_global_parseint): fix
