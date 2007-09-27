@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.118 2007/09/27 13:56:28 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.119 2007/09/27 19:26:04 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -357,6 +357,29 @@ void
 GtkGui::setTimeout(unsigned int timeout)
 {
     g_timeout_add(timeout, (GSourceFunc)gtk_main_quit, NULL);
+}
+
+bool
+GtkGui::addFDListener(int fd, callback_t callback, void* data)
+{
+    // NOTE: "The default encoding for GIOChannel is UTF-8. If your application
+    // is reading output from a command using via pipe, you may need to set the
+    // encoding to the encoding of the current locale (see g_get_charset())
+    // with the g_io_channel_set_encoding() function."
+
+    GIOChannel* gio_read = g_io_channel_unix_new(fd);
+    
+    if (!gio_read) {
+      return false;
+    }
+    
+    if (!g_io_add_watch (gio_read, GIOCondition(G_IO_IN | G_IO_HUP),
+                         GIOFunc (callback), data)) {
+      g_io_channel_unref(gio_read);
+      return false;    
+    }
+    
+    return true;    
 }
 
 void

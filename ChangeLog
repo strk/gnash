@@ -1,3 +1,9 @@
+2007-09-27 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* gui/gtk{.cpp,sup.h}: Introduce addFDListener, which will make the
+	GDK event loop poll the specified file descriptor and execute the
+	specified callback if data is to be read from the file desciptor.
+
 2007-09-27 Sandro Santilli <strk@keybit.net>
 
 	* server/as_object.cpp (setPropFlags): properly convert the properties

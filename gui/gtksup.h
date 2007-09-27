@@ -36,7 +36,7 @@
 namespace gnash
 {
 
-//typedef void (*callback_t)(int x);
+typedef bool (*callback_t)(void*, int, void *data);
 
 class DSOEXPORT GtkGui : public Gui
 {
@@ -57,6 +57,20 @@ class DSOEXPORT GtkGui : public Gui
     virtual void renderBuffer();
     virtual void setInterval(unsigned int interval);
     virtual void setTimeout(unsigned int timeout);
+    
+    /// Add a listener with default priority that listens for IN and HUP
+    /// events on a file descriptor.
+    //
+    /// @param fd The file descriptor to poll.
+    /// @param callback A pointer to a callback function with the following
+    ///                 signature:
+    ///        bool func(void*, int, void* data)
+    ///        The first and second arguments should be ignored.
+    ///        The last argument is a user-specified pointer. The
+    ///        callback should return false if the listener is to be removed.
+    /// @param data A pointer to a user-defined data structure.
+    /// @return true on success, false on failure.
+    bool addFDListener(int fd, callback_t callback, void* data);
 
     /// Create a menu bar for the application, attach to our window. 
     //  This should only appear in the standalone player.
