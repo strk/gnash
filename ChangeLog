@@ -1,3 +1,9 @@
+2007-09-27 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (get_member): make "_global"
+	  a property (althought non-proper) of MovieClip. Fixes failures
+	  in MovieClip.as.
+
 2007-09-27 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* testsuite/actionscript.all/Movieclip.as, XML.as: fix a few unstable checks.

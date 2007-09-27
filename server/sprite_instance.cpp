@@ -1761,6 +1761,13 @@ bool sprite_instance::get_member(string_table::key name_key, as_value* val)
 			return false;
 		}
 	}
+	if ( _vm.getSWFVersion() > 5 && name == "_global" ) // see MovieClip.as
+	{
+		// The "_global" ref was added in SWF6
+		val->set_as_object( _vm.getGlobal() );
+		return true;
+	}
+
 #if 0 // see MovieClip.as
 	if ( name == "this" )
 	{
