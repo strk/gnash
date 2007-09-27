@@ -197,15 +197,15 @@ movie_root::restart()
 	// wipe out all levels
 	_movies.clear();
 
+	// Add level0 back in place
+	// NOTE: we don't call setLevel to avoid calling ::stagePlacementCallback again
+	_movies[0] = level0; 
+
 	// Restart the level0 movie
 	// TODO: instead, take it's definition and re-instantiate
 	// a new movie here ! The only problem would be re-setting
 	// externally set variables
 	level0->restart(); 
-
-	// Add level0 back in place
-	// NOTE: we don't call setLevel to avoid calling ::stagePlacementCallback again
-	_movies[0] = level0; 
 
 	// Process actions queued by restart/stagePlacementCallback
 	processActionQueue();

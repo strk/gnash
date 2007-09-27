@@ -1,3 +1,8 @@
+2007-09-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/movie_root.cpp: move level0->restart()
+	  to avoid assertion failure.
+
 2007-09-27 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ActionExec.cpp (call operator): re-enable
