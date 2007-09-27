@@ -1,5 +1,10 @@
 2007-09-28 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/toString_valueOf.as: more
+	  xcheck => xcheck_equals (easier to tell what's going on).
+	
+2007-09-28 Sandro Santilli <strk@keybit.net>
+
 	* server/as_object.h: add useCustomToString method to handle corner
 	  cases for which an ActionScript class doesn't want to use toString
 	  methods, when available, for converting to a string.

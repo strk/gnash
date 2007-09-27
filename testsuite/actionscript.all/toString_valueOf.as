@@ -210,27 +210,28 @@ check(y == "TO_VALUE");
 #if OUTPUT_VERSION > 5
   check(!MovieClip.prototype.hasOwnProperty('toString'));
   check(!MovieClip.prototype.hasOwnProperty('valueOf'));
-  check(typeof(MovieClip.prototype.toString) == 'function');
-  check(typeof(MovieClip.prototype.valueOf) == 'function');
+  check_equals(typeof(MovieClip.prototype.toString), 'function');
+  check_equals(typeof(MovieClip.prototype.valueOf), 'function');
 #endif
 
 // For movieclips, this true from swf5~swf8!
-check(MovieClip.prototype.toString == Object.prototype.toString);
-check(MovieClip.prototype.valueOf == Object.prototype.valueOf);
+check_equals(MovieClip.prototype.toString, Object.prototype.toString);
+check_equals(MovieClip.prototype.valueOf, Object.prototype.valueOf);
 
 _root.createEmptyMovieClip("mc1", 1);
 x = mc1.toString();
 y = mc1.valueOf();
 #if OUTPUT_VERSION > 5
-  check(typeof(x) == 'string'); 
-  check(typeof(y) == 'movieclip');  
-  xcheck(x == '[object Object]'); 
-  check(y == _level0.mc1); 
+  check_equals(typeof(x), 'string'); 
+  check_equals(typeof(y), 'movieclip');  
+  xcheck_equals(x, '[object Object]'); 
+  check_equals(y, _level0.mc1); 
 #else
-  check(typeof(x) == 'undefined'); 
-  check(typeof(y) == 'undefined');  
-  check(x == undefined); 
-  check(y == undefined); 
+  // createEmptyMovieClip is not a function in SWF5...
+  check_equals(typeof(x), 'undefined'); 
+  check_equals(typeof(y), 'undefined');  
+  check_equals(x, undefined); 
+  check_equals(y, undefined); 
 #endif
 check(y == _level0.mc1);  
 //trace a movieclip doesn't invoke the toString method, either.
@@ -292,11 +293,11 @@ y = text1.valueOf();
   check(y.toString() == "[object Object]"); 
   check(typeof(y.valueOf()) == "object"); 
 #else
-  xcheck(typeof(x) == "undefined");   
-  xcheck(typeof(y) == "undefined");  
-  xcheck(x == undefined); 
-  xcheck(y.toString() == undefined); 
-  xcheck(typeof(y.valueOf()) ==  "undefined"); 
+  xcheck_equals(typeof(x), "undefined");   
+  xcheck_equals(typeof(y), "undefined");  
+  xcheck_equals(x, undefined); 
+  xcheck_equals(y.toString(), undefined); 
+  xcheck_equals(typeof(y.valueOf()),  "undefined"); 
 #endif 
 check(y == text1);
 
@@ -310,8 +311,8 @@ check(!Button.prototype.hasOwnProperty('toString'));
 check(!Button.prototype.hasOwnProperty('valueOf'));
 #endif
 
-xcheck(typeof(Button.prototype.toString) == 'function' );
-xcheck(typeof(Button.prototype.valueOf) == 'function' );
+xcheck_equals(typeof(Button.prototype.toString), 'function' );
+xcheck_equals(typeof(Button.prototype.valueOf), 'function' );
 
 // For Buttons, this true from swf5~swf8!
 #if OUTPUT_VERSION < 6
@@ -320,20 +321,20 @@ xcheck(typeof(Button.prototype.valueOf) == 'function' );
  check_equals(Button.prototype.toString, undefined);
  check_equals(Button.prototype.valueOf, undefined);
 #else
- xcheck(Button.prototype.toString == Object.prototype.toString);
- xcheck(Button.prototype.valueOf == Object.prototype.valueOf);
+ xcheck_equals(Button.prototype.toString, Object.prototype.toString);
+ xcheck_equals(Button.prototype.valueOf, Object.prototype.valueOf);
 #endif
 
 btn1 = new Button();
-xcheck(typeof(btn1) == "object");
+xcheck_equals(typeof(btn1), "object");
 x = btn1.toString();
 y = btn1.valueOf();
-xcheck(typeof(x) == "string");  
-xcheck(typeof(y) == "object");   
-xcheck(x == "[object Object]");  
-xcheck(y.toString() == "[object Object]"); 
-xcheck(typeof(y.valueOf()) == "object");  
-xcheck(typeof(btn1) == "object");
+xcheck_equals(typeof(x), "string");  
+xcheck_equals(typeof(y), "object");   
+xcheck_equals(x, "[object Object]");  
+xcheck_equals(y.toString(), "[object Object]"); 
+xcheck_equals(typeof(y.valueOf()), "object");  
+xcheck_equals(typeof(btn1), "object");
 check(y == btn1);
 //trace(btn1); // invoke btn1.toString(), output [object Object]
 
