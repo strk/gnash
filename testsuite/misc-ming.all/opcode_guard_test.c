@@ -57,7 +57,7 @@ main(int argc, char** argv)
   
   
   mc1 = newSWFMovieClip();
-  // should not be executed.
+  // should be executed.
   add_clip_actions(mc1, "_root.xcheck(false);");
   SWFMovieClip_nextFrame(mc1); 
   
