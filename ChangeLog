@@ -1,5 +1,12 @@
 2007-09-27 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/MovieTester.{cpp,h}: add restart() method.
+	* testsuite/misc-ming.all/simple_loop_testrunner.cpp: fix expected
+	  invalidated bounds: we expect it to be the WORLD range on start
+	  and restart. Test ::restart itself.
+
+2007-09-27 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.{cpp,h}: add the concept of an 'invalidated'
 	  stage/movie_root. The Stage is only invalidated when the background
 	  color changes, dunno if it should also be invalidated by changes

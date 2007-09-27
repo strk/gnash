@@ -239,6 +239,14 @@ public:
 	/// Return true if this build of gnash supports video
 	bool canTestVideo() const;
 
+	/// Restart the movie
+	//
+	/// NOTE: the movie returned by getRootMovie() will likely be
+	///       NOT the real root movie anymore, so call getRootMovie
+	///	  again after this call.
+	///
+	void restart();
+
 private:
 
 	/// Initialize testing renderers

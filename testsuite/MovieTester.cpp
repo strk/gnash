@@ -492,4 +492,12 @@ MovieTester::initTestingSoundHandlers()
 	gnash::set_sound_handler(_sound_handler.get());
 }
 
+void
+MovieTester::restart() 
+{
+	_movie_root->restart();
+	_movie = _movie_root->getLevel(0).get();
+	render();
+}
+
 } // namespace gnash

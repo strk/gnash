@@ -36,17 +36,28 @@
 using namespace gnash;
 using namespace std;
 
+void testAll(MovieTester& tester);
+
 int
 main(int /*argc*/, char** /*argv*/)
 {
-	typedef gnash::geometry::SnappingRanges2d<int> Ranges;
-	typedef gnash::geometry::Range2d<int> Bounds;
-
 	string filename = string(TGTDIR) + string("/") + string(INPUT_FILENAME);
 	MovieTester tester(filename);
 
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity(1);
+
+	testAll(tester);
+	tester.restart();
+	testAll(tester);
+
+}
+
+
+void testAll(MovieTester& tester)
+{
+	typedef gnash::geometry::SnappingRanges2d<int> Ranges;
+	typedef gnash::geometry::Range2d<int> Bounds;
 
 	Ranges invalidated;
 	sprite_instance* root = tester.getRootMovie();
@@ -59,7 +70,9 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_current_frame(), 0);
 	check_equals(root->getDisplayList().size(), 0); // no chars
 	invalidated = tester.getInvalidatedRanges();
-	check( invalidated.isNull() );
+	// I think it makes sense for the first frame to have world 
+	// inv bounds.
+	check( invalidated.isWorld() );
 
 	tester.advance(); // FRAME 2/4
 	
@@ -128,6 +141,4 @@ main(int /*argc*/, char** /*argv*/)
 	check( tester.findDisplayItemByDepth(*root, 4+character::staticDepthOffset) );
 	invalidated = tester.getInvalidatedRanges();
 	check( invalidated.contains(Bounds(120, 0, 180, 60)) );
-
 }
-
