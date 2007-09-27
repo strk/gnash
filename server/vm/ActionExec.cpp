@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.52 2007/09/27 06:46:33 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.53 2007/09/27 08:10:17 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -336,8 +336,14 @@ ActionExec::operator() ()
 
 	ash.execute((action_type)action_id, *this);
 
-#if 0 // See bugs: #20974, #21069, #20996.
-	if ( _abortOnUnload && _original_target->isUnloaded() )
+#if 1 // See bugs: #20974, #21069, #20996.
+
+#if 0 // action_execution_order_test8.c shows that the opcode guard is not SWF version based (TODO: automate it!)
+	if ( _abortOnUnload && _original_target->isUnloaded()
+		&& VM::get().getSWFVersion() > 5 /* TODO: cache SWF version */ )
+#else // curveball.swf clearly shows that it is the *current* target, not the *original* one that matters.
+	if ( _abortOnUnload && env.get_target()->isUnloaded() )
+#endif
 	{
 		std::stringstream ss;
 		ss << "Target of action_buffer (" << _original_target->getTarget() 

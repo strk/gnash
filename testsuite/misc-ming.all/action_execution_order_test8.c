@@ -136,7 +136,7 @@ main(int argc, char** argv)
   /* Remove mc2 in frame 5 (from depth 3) */
   SWFDisplayItem_remove(it2);
 
-  xcheck_equals(mo, "_root.x", "200");
+  check_equals(mo, "_root.x", "200");
   add_actions(mo, " _root.note('root frame '+_root._currentframe);");
   add_actions(mo, " _root.totals(); stop(); ");
 

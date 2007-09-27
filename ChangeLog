@@ -1,5 +1,17 @@
 2007-09-27 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ActionExec.cpp (call operator): re-enable
+	  opcode-guard but guard current target, not original
+	  one. Keeps feed.swf and curveball.swf fixed and also
+	  fixes the tests in our testsuite that where expected
+	  to fail since disabling the opcode guard.
+	* testsuite/misc-ming.all/action_execution_order_test8.c,
+	  testsuite/misc-swfc.all/movieclip_destruction_test1.sc,
+	  testsuite/misc-swfc.all/movieclip_destruction_test3.sc:
+	  success in the opcode-guard tests.
+
+2007-09-27 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (get_member): make "_global"
 	  a property (althought non-proper) of MovieClip. Fixes failures
 	  in MovieClip.as.
