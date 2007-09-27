@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.76 2007/09/13 16:26:13 strk Exp $ */
+/* $Id: movie_root.h,v 1.77 2007/09/27 10:44:45 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -422,15 +422,9 @@ public:
         return getLevel(0)->get_character(character_id);
     }
 
-    void set_background_color(const rgba& color)
-    {
-        m_background_color = color;
-    }
+    void set_background_color(const rgba& color);
 
-    void set_background_alpha(float alpha)
-    {
-        m_background_color.m_a = iclamp(frnd(alpha * 255.0f), 0, 255);
-    }
+    void set_background_alpha(float alpha);
 
     float get_background_alpha() const
     {
@@ -536,9 +530,6 @@ public:
     bool isMouseOverActiveEntity() const;
 
     bool testInvariant() const;
-
-    // Clear invalidated flag for all levels 
-    void clear_invalidated();
 
     /// Push an executable code to the ActionQueue
     void pushAction(std::auto_ptr<ExecutableCode> code);
@@ -752,6 +743,30 @@ private:
     /// @@ might be worth making public
     ///
     boost::intrusive_ptr<key_as_object> getKeyObject();
+
+    /// Boundaries of the Stage are always world boundaries
+    /// and are only invalidated by changes in the background
+    /// color.
+    void setInvalidated() { _invalidated=true; }
+
+    /// Every ::display call clears the invalidated flag
+    //
+    /// See setInvalidated();
+    ///
+    void clearInvalidated() { _invalidated=false; }
+
+    /// An invalidated stage will trigger complete redraw
+    //
+    /// So, this method should return true everytime a complete
+    /// redraw is needed. This is tipically only needed when
+    /// the background changes.
+    ///
+    /// See setInvalidated() and clearInvalidated().
+    ///
+    bool isInvalidated() { return _invalidated; }
+
+    /// See setInvalidated
+    bool _invalidated;
 
 };
 

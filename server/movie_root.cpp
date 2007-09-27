@@ -79,7 +79,8 @@ movie_root::movie_root()
 	m_active_input_text(NULL),
 	m_time_remainder(0.0f),
 	m_drag_state(),
-	_allowRescale(true)
+	_allowRescale(true),
+	_invalidated(true)
 {
 }
 
@@ -212,15 +213,8 @@ movie_root::restart()
 	// Run the garbage collector again
 	GC::get().collect();
 #endif
-}
 
-void
-movie_root::clear_invalidated()
-{
-	for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
-	{
-		i->second->clear_invalidated();
-	}
+	setInvalidated();
 }
 
 boost::intrusive_ptr<Stage>
@@ -727,6 +721,8 @@ movie_root::display()
 	// should we cache this ? it's immutable after all !
 	const rect& frame_size = getLevel(0)->get_frame_size();
 
+	clearInvalidated();
+
 	render::begin_display(
 		m_background_color,
 		m_viewport_x0, m_viewport_y0,
@@ -1063,6 +1059,12 @@ movie_root::isMouseOverActiveEntity() const
 void
 movie_root::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 {
+	if ( isInvalidated() )
+	{
+		ranges.setWorld();
+		return;
+	}
+
 	for (Levels::reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
 	{
 		i->second->add_invalidated_bounds(ranges, force);
@@ -1308,6 +1310,32 @@ movie_root::advanceLiveChars(float delta_time)
 #endif
 
 	std::for_each(_liveChars.begin(), _liveChars.end(), boost::bind(advanceLiveChar, _1, delta_time));
+}
+
+void
+movie_root::set_background_color(const rgba& color)
+{
+	//GNASH_REPORT_FUNCTION;
+
+        if ( m_background_color != color )
+	{
+		setInvalidated();
+        	m_background_color = color;
+	}
+}
+
+void
+movie_root::set_background_alpha(float alpha)
+{
+	//GNASH_REPORT_FUNCTION;
+
+	uint8_t newAlpha = iclamp(frnd(alpha * 255.0f), 0, 255);
+
+        if ( m_background_color.m_a != newAlpha )
+	{
+		setInvalidated();
+        	m_background_color.m_a = newAlpha;
+	}
 }
 
 } // namespace gnash

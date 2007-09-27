@@ -1,5 +1,16 @@
 2007-09-27 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.{cpp,h}: add the concept of an 'invalidated'
+	  stage/movie_root. The Stage is only invalidated when the background
+	  color changes, dunno if it should also be invalidated by changes
+	  in the _levels.. maybe I'm using a confusing terminology here...
+	  Anyway this fixes bug #21169 and probably allow for cleanups 
+	  in the gui code, where some paranoia is used to tell the first
+	  ::display call apart from subsequent, exactly for the invalidated
+	  bounds on startup problem.
+
+2007-09-27 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.cpp (restart): rework restart mechanism
 	  by actually re-instantiating the root from it's definition.
 
