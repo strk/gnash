@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: embedVideoDecoderGst.cpp,v 1.11 2007/09/10 16:53:29 strk Exp $
+// $Id: VideoDecoderGst.cpp,v 1.1 2007/09/27 23:59:54 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -23,11 +23,11 @@
 
 #ifdef SOUND_GST
 
-#include "embedVideoDecoderGst.h"
+#include "VideoDecoderGst.h"
 
 namespace gnash {
 
-embedVideoDecoderGst::embedVideoDecoderGst() :
+VideoDecoderGst::VideoDecoderGst() :
 	pipeline(NULL),
 	input(NULL),
 	inputcaps(NULL),
@@ -41,7 +41,7 @@ embedVideoDecoderGst::embedVideoDecoderGst() :
 {
 }
 
-embedVideoDecoderGst::~embedVideoDecoderGst()
+VideoDecoderGst::~VideoDecoderGst()
 {
 
 	if (pipeline) {
@@ -52,8 +52,8 @@ embedVideoDecoderGst::~embedVideoDecoderGst()
 	}
 }
 
-void
-embedVideoDecoderGst::createDecoder(int widthi, int heighti, int deblockingi, bool smoothingi, int formati, int outputFormati)
+bool
+VideoDecoderGst::setup(int widthi, int heighti, int deblockingi, bool smoothingi, videoCodecType formati, int outputFormati)
 {
 	// Save video attributes
 	width = widthi;
@@ -64,7 +64,7 @@ embedVideoDecoderGst::createDecoder(int widthi, int heighti, int deblockingi, bo
 	outputFormat = outputFormati;
 
 	// For now only H263/SVQ3, VP6 and screenvideo1 is supported
-	if (format != CODEC_H263 && format != CODEC_VP6 && format != CODEC_SCREENVIDEO) return;
+	if (format != VIDEO_CODEC_H263 && format != VIDEO_CODEC_VP6 && format != VIDEO_CODEC_SCREENVIDEO) return false;
 
 	// init GStreamer
 	gst_init (NULL, NULL);
@@ -78,25 +78,25 @@ embedVideoDecoderGst::createDecoder(int widthi, int heighti, int deblockingi, bo
 	input = gst_element_factory_make ("fakesrc", NULL);
 	g_object_set (G_OBJECT (input),	"sizetype", 3, /*"can-activate-pull", FALSE,*/ "signal-handoffs", TRUE, NULL);
 	// Setup the callback
-	g_signal_connect (input, "handoff", G_CALLBACK (embedVideoDecoderGst::callback_handoff), this);
+	g_signal_connect (input, "handoff", G_CALLBACK (VideoDecoderGst::callback_handoff), this);
 
 	// Setup the input capsfilter
 	inputcaps = gst_element_factory_make ("capsfilter", NULL);
 	GstCaps* caps = NULL;
-	if (format == CODEC_H263) {
+	if (format == VIDEO_CODEC_H263) {
 		caps = gst_caps_new_simple ("video/x-flash-video",
 			"width", G_TYPE_INT, width,
 			"height", G_TYPE_INT, height,
 			"framerate", GST_TYPE_FRACTION, 25, 1,
 			"flvversion", G_TYPE_INT, 1,
 			NULL);
-	} else if (format == CODEC_VP6) {
+	} else if (format == VIDEO_CODEC_VP6) {
 		caps = gst_caps_new_simple ("video/x-vp6-flash",
 			"width", G_TYPE_INT, width,
 			"height", G_TYPE_INT, height,
 			"framerate", GST_TYPE_FRACTION, 25, 1,
 			NULL);
-	} else if (format == CODEC_SCREENVIDEO) {
+	} else if (format == VIDEO_CODEC_SCREENVIDEO) {
 		caps = gst_caps_new_simple ("video/x-flash-screen",
 			"width", G_TYPE_INT, width,
 			"height", G_TYPE_INT, height,
@@ -119,16 +119,7 @@ embedVideoDecoderGst::createDecoder(int widthi, int heighti, int deblockingi, bo
 
 	// Setup the capsfilter which demands either YUV or RGB videoframe format
 	videocaps = gst_element_factory_make ("capsfilter", NULL);
-	if (outputFormat == YUV) {
-		caps = gst_caps_new_simple ("video/x-raw-yuv", NULL);
-	} else if ( outputFormat == RGB ) {
-		caps = gst_caps_new_simple ("video/x-raw-rgb", NULL);
-	}
-	else
-	{
-		assert(outputFormat == NONE);
-		return; // nothing to do, right ? TODO: some cleanup ?
-	}
+	caps = gst_caps_new_simple ("video/x-raw-rgb", NULL);
 
 	assert(caps); // ok, this is a silly assertion *now*, but as long as 
 	              // the code is implemented with such long function bodies
@@ -143,31 +134,31 @@ embedVideoDecoderGst::createDecoder(int widthi, int heighti, int deblockingi, bo
 	// setup the videosink with callback
 	output = gst_element_factory_make ("fakesink", NULL);
 	g_object_set (G_OBJECT (output), "signal-handoffs", TRUE, NULL);
-	g_signal_connect (output, "handoff", G_CALLBACK (embedVideoDecoderGst::callback_output), this);
+	g_signal_connect (output, "handoff", G_CALLBACK (VideoDecoderGst::callback_output), this);
 
 	// setup the video colorspaceconverter converter
 	colorspace = gst_element_factory_make ("ffmpegcolorspace", NULL);
 
-	// Find the decoder
-	if (format == CODEC_H263) {
+	// Find the decoder, use auto plugin loader? use plugin-downloader?
+	if (format == VIDEO_CODEC_H263) {
 		decoder = gst_element_factory_make ("ffdec_flv", NULL);
-	} else if (format == CODEC_VP6) {
+	} else if (format == VIDEO_CODEC_VP6) {
 		decoder = gst_element_factory_make ("ffdec_vp6f", NULL);
-	} else if (format == CODEC_SCREENVIDEO) {
+	} else if (format == VIDEO_CODEC_SCREENVIDEO) {
 		decoder = gst_element_factory_make ("ffdec_flashsv", NULL);
 	} else {
 		gnash::log_error("Unsupported embedded video format");
-		return;
+		return false;
 	}
 
 	if (!pipeline || !input || !inputcaps || !videocaps || !output || !colorspace) {
 		gnash::log_error("Creation of Gstreamer baisc elements failed, is your Gstreamer installation complete?");
-		return;
+		return false;
 	}
 
 	if (!decoder) {
 		gnash::log_error("Creation of decoder element failed, do you have gstreamer-0.10-ffmpeg installed?");
-		return;
+		return false;
 	}
 
 	// Put the elemets in the pipeline and link them
@@ -183,32 +174,23 @@ embedVideoDecoderGst::createDecoder(int widthi, int heighti, int deblockingi, bo
 	output_lock = new boost::mutex::scoped_lock(output_mutex);
 
 	// Determine required buffer size and allocate buffer
-	if (outputFormat == YUV) {
-		decodedFrame.reset(new image::yuv(width, height));
-	} else if (outputFormat == RGB) {
-		decodedFrame.reset(new image::rgb(width, height));
-	}
+	decodedFrame.reset(new image::rgb(width, height));
 
 	// Start "playing"
 	gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PLAYING);
+
+	return true;
 }
 
 
 // gnash calls this when it wants you to decode the given videoframe
 std::auto_ptr<image::image_base>
-embedVideoDecoderGst::decodeFrame(uint8_t* data, int size)
+VideoDecoderGst::decodeToImage(uint8_t* data, uint32_t size)
 {
 
 	std::auto_ptr<image::image_base> ret_image;
 
-	if (outputFormat == YUV) {
-		ret_image.reset(new image::yuv(width, height));
-	} else if (outputFormat == RGB) {
-		ret_image.reset(new image::rgb(width, height));
-	} else {
-		ret_image.reset(NULL);
-		return ret_image;
-	}
+	ret_image.reset(new image::rgb(width, height));
 
 	// If there is nothing to decode in the new frame
 	// we just return the lastest.
@@ -249,9 +231,9 @@ embedVideoDecoderGst::decodeFrame(uint8_t* data, int size)
 
 // The callback function which refills the buffer with data
 void
-embedVideoDecoderGst::callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data)
+VideoDecoderGst::callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data)
 {
-	embedVideoDecoderGst* decoder = static_cast<embedVideoDecoderGst*>(user_data);
+	VideoDecoderGst* decoder = static_cast<VideoDecoderGst*>(user_data);
 
 	if (decoder->stop) return;
 
@@ -264,40 +246,15 @@ embedVideoDecoderGst::callback_handoff (GstElement * /*c*/, GstBuffer *buffer, G
 
 // The callback function which passes the decoded video frame
 void
-embedVideoDecoderGst::callback_output (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data)
+VideoDecoderGst::callback_output (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data)
 {
-	embedVideoDecoderGst* decoder = static_cast<embedVideoDecoderGst*>(user_data);
+	VideoDecoderGst* decoder = static_cast<VideoDecoderGst*>(user_data);
 
 	if (decoder->stop) return;
 
 	if (decoder->decodedFrame.get())
 	{
-
-		if (decoder->outputFormat == YUV) {
-			assert(0);
-
-		/*	image::yuv* yuvframe = static_cast<image::yuv*>(decoder->decodedFrame);
-			int copied = 0;
-			uint8_t* ptr = GST_BUFFER_DATA(buffer);
-			for (int i = 0; i < 3 ; i++)
-			{
-				int shift = (i == 0 ? 0 : 1);
-				uint8_t* yuv_factor = m_Frame->data[i];
-				int h = ns->videoheight >> shift;
-				int w = ns->videowidth >> shift;
-				for (int j = 0; j < h; j++)
-				{
-					copied += w;
-					assert(copied <= yuvframe->size());
-					memcpy(ptr, yuv_factor, w);
-					yuv_factor += m_Frame->linesize[i];
-					ptr += w;
-				}
-			}
-			video->m_size = copied;*/
-		} else {
-			decoder->decodedFrame->update(GST_BUFFER_DATA(buffer));
-		}
+		decoder->decodedFrame->update(GST_BUFFER_DATA(buffer));
 	}
 
 	delete decoder->output_lock;

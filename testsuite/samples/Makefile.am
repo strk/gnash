@@ -27,6 +27,7 @@ CLEANFILES =  \
 AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)		\
         -I$(top_srcdir)/libbase \
+        -I$(top_srcdir)/libmedia \
         -I$(top_srcdir)/backend \
         -I$(top_srcdir)/server  \
         -I$(top_srcdir)/server/parser  \

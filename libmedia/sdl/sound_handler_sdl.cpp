@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.85 2007/09/25 18:58:43 strk Exp $
+// $Id: sound_handler_sdl.cpp,v 1.1 2007/09/27 23:59:55 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -26,6 +26,16 @@
 
 #include "sound_handler_sdl.h"
 #include "utility.h" // for convert_raw_data
+#include "AudioDecoderSimple.h"
+#include "AudioDecoderNellymoser.h"
+
+#ifdef USE_FFMPEG
+#include "AudioDecoderFfmpeg.h"
+#endif
+
+#ifdef USE_MAD
+#include "AudioDecoderMad.h"
+#endif
 
 #include "log.h"
 #include <cmath>
@@ -68,66 +78,35 @@ int	SDL_sound_handler::create_sound(
 {
 
 	assert(sinfo.get());
-	sound_data *sounddata = new sound_data;
-	if (!sounddata) {
-		log_error(_("could not allocate memory for sound data"));
-		return -1;
-	}
+	std::auto_ptr<sound_data> sounddata ( new sound_data );
 
-	sounddata->data_size = data_bytes;
+	//sounddata->data_size = data_bytes;
 	sounddata->volume = 100;
 	sounddata->soundinfo = sinfo;
 
 	int16_t*	adjusted_data = 0;
 	int	adjusted_size = 0;
 
-        boost::mutex::scoped_lock lock(_mutex);
+	boost::mutex::scoped_lock lock(_mutex);
 
 	switch (sounddata->soundinfo->getFormat())
 	{
-	case FORMAT_NATIVE16:
-
-		if (sounddata->data_size > 0) {
-			convert_raw_data(&adjusted_data, &adjusted_size, data, sounddata->soundinfo->getSampleCount(), 
-					2, sounddata->soundinfo->getSampleRate(), sounddata->soundinfo->isStereo(),
-					 audioSpec.freq, (audioSpec.channels == 2 ? true : false));
-			if (!adjusted_data) {
-				log_error(_("Some kind of error occurred with sound data"));
-				return -1;
-			}
-			sounddata->data_size = adjusted_size;
-			sounddata->data = reinterpret_cast<uint8_t*>(adjusted_data);
-		}
-		break;
-
-	case FORMAT_MP3:
+	case AUDIO_CODEC_MP3:
 #ifndef USE_FFMPEG
 #ifndef USE_MAD
 		log_error(_("gnash has not been compiled to handle mp3 audio"));
 		return -1;
 #endif
 #endif
-		sounddata->data = new Uint8[data_bytes];
-		if (!sounddata->data) {
-			log_error(_("could not allocate space for data in sound handler"));
-			return -1;
-		}
-		memcpy(sounddata->data, data, data_bytes);
+		sounddata->append(reinterpret_cast<uint8_t*>(data), data_bytes);
 		break;
 
-	//case FORMAT_VORBIS:
-
-	case FORMAT_RAW:
-	case FORMAT_ADPCM:
-	case FORMAT_UNCOMPRESSED:
-		// These should have been converted to FORMAT_NATIVE16
-		log_error(_("Sound data format not properly converted"));
-		return -1;
+	case AUDIO_CODEC_RAW:
+	case AUDIO_CODEC_ADPCM:
+	case AUDIO_CODEC_UNCOMPRESSED:
+	case AUDIO_CODEC_NELLYMOSER:
+		sounddata->append(reinterpret_cast<uint8_t*>(data), data_bytes);
 		break;
-
-	case FORMAT_NELLYMOSER:
-		log_unimpl("Nellymoser sound format requested, gnash does not handle it.");
-		return -1;
 
 	default:
 		// Unhandled format.
@@ -135,7 +114,7 @@ int	SDL_sound_handler::create_sound(
 		return -1; // Unhandled format, set to NULL.
 	}
 
-	m_sound_data.push_back(sounddata);
+	m_sound_data.push_back(sounddata.release()); // the vector takes ownership
 	int sound_id = m_sound_data.size()-1;
 
 	return sound_id;
@@ -143,7 +122,8 @@ int	SDL_sound_handler::create_sound(
 }
 
 // this gets called when a stream gets more data
-long	SDL_sound_handler::fill_stream_data(unsigned char* data, unsigned int data_bytes, unsigned int sample_count, int handle_id)
+long	SDL_sound_handler::fill_stream_data(unsigned char* data, unsigned int data_bytes, unsigned int /*sample_count*/, int handle_id)
+
 {
 
 	boost::mutex::scoped_lock lock(_mutex);
@@ -154,76 +134,17 @@ long	SDL_sound_handler::fill_stream_data(unsigned char* data, unsigned int data_
 		delete [] data;
 		return -1;
 	}
-	int start_size = 0;
 	sound_data* sounddata = m_sound_data[handle_id];
 
-	// Handling of the sound data
-	switch (sounddata->soundinfo->getFormat()) {
-	case FORMAT_NATIVE16:
-	    {
-		int16_t*	adjusted_data = 0;
-		int	adjusted_size = 0;
-
-		convert_raw_data(&adjusted_data, &adjusted_size,
-				 data, sample_count, 2 /*sample size*/,
-				 sounddata->soundinfo->getSampleRate(), sounddata->soundinfo->isStereo(),
-				 audioSpec.freq, (audioSpec.channels == 2));
-		if (!adjusted_data || adjusted_size < 1)
-		{
-			log_error(_("Some kind of error with resampling sound data"));
-			delete [] data;
-			return -1;
-		}
-
-		// Reallocate the required memory.
-		Uint8* tmp_data = new Uint8[adjusted_size + sounddata->data_size];
-		memcpy(tmp_data, sounddata->data, sounddata->data_size);
-		memcpy(tmp_data + sounddata->data_size, adjusted_data, adjusted_size);
-		if (sounddata->data_size > 0) delete [] sounddata->data;
-		sounddata->data = tmp_data;
-
-		start_size = sounddata->data_size;
-		sounddata->data_size += adjusted_size;
-		std::vector<active_sound*> asounds = sounddata->m_active_sounds;
-
-		// If playback has already started, we also update the active sounds
-		for(uint32_t i=0; i < asounds.size(); i++) {
-			active_sound* sound = asounds[i];
-			sound->raw_data_size = sounddata->data_size;
-			sound->set_raw_data(sounddata->data);
-		}
-	    }
-	    break;
-
-	case FORMAT_MP3:
-	    {
-
-		// Reallocate the required memory.
-		Uint8* tmp_data = new Uint8[data_bytes + sounddata->data_size];
-		memcpy(tmp_data, sounddata->data, sounddata->data_size);
-		memcpy(tmp_data + sounddata->data_size, data, data_bytes);
-		if (sounddata->data_size > 0) delete [] sounddata->data;
-		sounddata->data = tmp_data;
-
-		start_size = sounddata->data_size;
-		sounddata->data_size += data_bytes;
-		std::vector<active_sound*> asounds = sounddata->m_active_sounds;
-		
-		// If playback has already started, we also update the active sounds
-		for(uint32_t i=0; i < asounds.size(); i++) {
-			active_sound* sound = asounds[i];
-			sound->set_data(sounddata->data);
-			sound->data_size = sounddata->data_size;
-		}
-
-	    }
-	    break;
-
-	default:
-		log_error(_("Behavior for this audio codec %d is unknown.  Please send this SWF to the developers"), (int)(sounddata->soundinfo->getFormat()));
+	// If doing ADPCM, knowing the framesize is needed to decode!
+	if (sounddata->soundinfo->getFormat() == AUDIO_CODEC_ADPCM) {
+		sounddata->m_frames_size[sounddata->size()] = data_bytes;
 	}
 
-	delete [] data;
+	// Handling of the sound data
+	size_t start_size = sounddata->size();
+	sounddata->append(reinterpret_cast<uint8_t*>(data), data_bytes);
+
 	return start_size;
 }
 
@@ -249,7 +170,7 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 	}
 
 	// Make sure sound actually got some data
-	if (sounddata->data_size < 1) {
+	if (sounddata->size() < 1) {
 		IF_VERBOSE_MALFORMED_SWF(
 			log_swferror(_("Trying to play sound with size 0"));
 		);
@@ -257,11 +178,10 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 	}
 
 	// Make a "active_sound" for this sound which is later placed on the vector of instances of this sound being played
-	active_sound* sound = new active_sound;
+	std::auto_ptr<active_sound> sound ( new active_sound );
 
-	// Copy data-info to the active_sound
-	sound->data_size = sounddata->data_size;
-	sound->set_data(sounddata->data);
+	// Set source data to the active_sound
+	sound->set_data(sounddata);
 
 	// Set the given options of the sound
 	if (start_position < 0) sound->position = 0;
@@ -271,51 +191,60 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 	else sound->offset = (sounddata->soundinfo->isStereo() ? offset : offset*2); // offset is stored as stereo
 
 	sound->envelopes = envelopes;
-	sound->current_env = 0;
-	sound->samples_played = 0;
 
 	// Set number of loop we should do. -1 is infinte loop, 0 plays it once, 1 twice etc.
 	sound->loop_count = loop_count;
 
-	if (sounddata->soundinfo->getFormat() == FORMAT_MP3) {
+	sound->decoder = NULL;
 
-#ifdef USE_FFMPEG
-		// Init the avdecoder-decoder
-		avcodec_init();
-		avcodec_register_all();// change this to only register mp3?
-		sound->codec = avcodec_find_decoder(CODEC_ID_MP3);
+	switch (sounddata->soundinfo->getFormat()) {
+	case AUDIO_CODEC_NELLYMOSER:
+	case AUDIO_CODEC_NELLYMOSER_8HZ_MONO:
+		sound->decoder = new AudioDecoderNellymoser();
 
-		// Init the parser
-		sound->parser = av_parser_init(CODEC_ID_MP3);
-
-		if (!sound->codec) {
-			log_error(_("Your FFMPEG can't decode MP3?!"));
-			return;
+		if (!sound->decoder->setup(sounddata->soundinfo.get())) {
+			log_error("The audio decoder can't decode the audio");
+			delete sound->decoder;
+			sound->decoder = NULL;
 		}
 
-		sound->cc = avcodec_alloc_context();
-		avcodec_open(sound->cc, sound->codec);
+		break;
+	case AUDIO_CODEC_MP3:
+#ifdef USE_MAD
+		sound->decoder = new AudioDecoderMad();
 
-#elif defined(USE_MAD)
-		// Init the mad decoder
-		mad_stream_init(&sound->stream);
-		mad_frame_init(&sound->frame);
-		mad_synth_init(&sound->synth);
+		if (!sound->decoder->setup(sounddata->soundinfo.get())) {
+			log_error("The audio decoder can't decode the audio");
+			delete sound->decoder;
+			sound->decoder = NULL;
+		}
+
+		break;
 #endif
+	case AUDIO_CODEC_ADPCM:
+#ifdef USE_FFMPEG
+		sound->decoder = new AudioDecoderFfmpeg();
 
-		sound->set_raw_data(NULL);
-		sound->raw_position = 0;
-		sound->raw_data_size = 0;
+		if (!sound->decoder->setup(sounddata->soundinfo.get())) {
+			log_error("The audio decoder can't decode the audio");
+			delete sound->decoder;
+			sound->decoder = NULL;
+		}
 
-	} else {
-		sound->raw_data_size = sounddata->data_size;
-		sound->set_raw_data(sounddata->data);
-		sound->raw_position = 0;
-		sound->position = 0;
-		sound->data_size = 0;
+		break;
+#endif
+	default:
+
+		sound->decoder = new AudioDecoderSimple();
+
+		if (!sound->decoder->setup(sounddata->soundinfo.get())) {
+			log_error("The audio decoder can't decode the audio");
+			delete sound->decoder;
+			sound->decoder = NULL;
+		}
 
 	}
-
+		
 	if (!soundOpened) {
 		if (SDL_OpenAudio(&audioSpec, NULL) < 0 ) {
 			log_error(_("Unable to start SDL sound: %s"), SDL_GetError());
@@ -327,7 +256,7 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 
 	++soundsPlaying;
 	++_soundsStarted;
-	sounddata->m_active_sounds.push_back(sound);
+	sounddata->m_active_sounds.push_back(sound.release());
 
 	if (soundsPlaying == 1) {
 		SDL_PauseAudio(0);
@@ -350,25 +279,13 @@ void	SDL_sound_handler::stop_sound(int sound_handle)
 	
 		for (int32_t i = (int32_t) sounddata->m_active_sounds.size()-1; i >-1; i--) {
 
-			active_sound* sound = sounddata->m_active_sounds[i];
+			//active_sound* sound = sounddata->m_active_sounds[i];
 
-			// Stop sound, remove it from the active list (mp3)
-			if (sounddata->soundinfo->getFormat() == FORMAT_MP3) {
-#ifdef USE_FFMPEG
-				avcodec_close(sound->cc);
-				av_parser_close(sound->parser);
-#elif defined(USE_MAD)
-				mad_synth_finish(&sound->synth);
-				mad_frame_finish(&sound->frame);
-				mad_stream_finish(&sound->stream);
-#endif
-				sound->delete_raw_data();
-				sounddata->m_active_sounds.erase(sounddata->m_active_sounds.begin() + i);
-
-			// Stop sound, remove it from the active list (adpcm/native16)
-			} else {
-				sounddata->m_active_sounds.erase(sounddata->m_active_sounds.begin() + i);
-			}
+			// Stop sound, remove it from the active list
+			//sound->delete_raw_data();
+			//delete sound->decoder;
+			sounddata->m_active_sounds.erase(sounddata->m_active_sounds.begin() + i);
+			
 			--soundsPlaying;
 			++_soundsStopped;
 		}
@@ -403,27 +320,14 @@ void	SDL_sound_handler::stop_all_sounds()
 		int32_t num_active_sounds = (int32_t) sounddata->m_active_sounds.size()-1;
 		for (int32_t i = num_active_sounds; i > -1; i--) {
 
-			active_sound* sound = sounddata->m_active_sounds[i];
+			//active_sound* sound = sounddata->m_active_sounds[i];
 
-			// Stop sound, remove it from the active list (mp3)
-			if (sounddata->soundinfo->getFormat() == FORMAT_MP3) {
-#ifdef USE_FFMPEG
-				avcodec_close(sound->cc);
-				av_parser_close(sound->parser);
-#elif defined(USE_MAD)
-				mad_synth_finish(&sound->synth);
-				mad_frame_finish(&sound->frame);
-				mad_stream_finish(&sound->stream);
-#endif
-				sound->delete_raw_data();
-				sounddata->m_active_sounds.erase(sounddata->m_active_sounds.begin() + i);
-				soundsPlaying--;
-
-			// Stop sound, remove it from the active list (adpcm/native16)
-			} else {
-				sounddata->m_active_sounds.erase(sounddata->m_active_sounds.begin() + i);
-				soundsPlaying--;
-			}
+			// Stop sound, remove it from the active list
+			//delete sound->decoder;
+			sounddata->m_active_sounds.erase(sounddata->m_active_sounds.begin() + i);
+			
+			--soundsPlaying;
+			++_soundsStopped;
 		}
 	}
 }
@@ -595,28 +499,32 @@ create_sound_handler_sdl()
 	return new SDL_sound_handler;
 }
 
-
 // Pointer handling and checking functions
-uint8_t* active_sound::get_raw_data_ptr(unsigned long int pos) {
-	assert(raw_data_size > pos);
-	return raw_data + pos;
+uint8_t*
+active_sound::get_raw_data_ptr(unsigned long int pos)
+{
+	if ( _decodedData.get() )
+	{
+		return _decodedData->data(pos);
+	}
+	else return 0;
 }
 
-uint8_t* active_sound::get_data_ptr(unsigned long int pos) {
-	assert(data_size > pos);
-	return data + pos;
+uint8_t*
+active_sound::get_data_ptr(unsigned long int pos)
+{
+	assert(_undecodedData);
+	return _undecodedData->data(pos);
 }
 
-void active_sound::set_raw_data(uint8_t* iraw_data) {
-	raw_data = iraw_data;
+void active_sound::set_data(sound_data* idata)
+{
+	_undecodedData = idata;
 }
 
-void active_sound::set_data(uint8_t* idata) {
-	data = idata;
-}
-
-void active_sound::delete_raw_data() {
-	delete [] raw_data;
+void active_sound::deleteDecodedData()
+{
+	_decodedData.reset();
 }
 
 // AS-volume adjustment
@@ -775,213 +683,77 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 
 			// Temp variables to make the code simpler and easier to read
 			active_sound* sound = sounddata->m_active_sounds[j];
-			format_type soundFormat = sounddata->soundinfo->getFormat();
-			bool soundStereo = sounddata->soundinfo->isStereo();
-			uint32_t soundSampleRate = sounddata->soundinfo->getSampleRate();
+
+			// If there exist no decoder, then we can't decode!
+			if (sound->decoder == NULL) continue;
 
 			// When the current sound dont have enough decoded data to fill the buffer, 
 			// we first mix what is already decoded, then decode some more data, and
 			// mix some more until the buffer is full. If a sound loops the magic
 			// happens here ;)
-			if (sound->raw_data_size - sound->raw_position < buffer_length 
-				&& (sound->position < sound->data_size || sound->loop_count != 0)) {
-
+			if (sound->rawDataSize() - sound->raw_position < buffer_length 
+				&& (sound->position < sound->dataSize() || sound->loop_count != 0)) {
 				// First we mix what is decoded
 				unsigned int index = 0;
-				if (sound->raw_data_size - sound->raw_position > 0) {
-					index = sound->raw_data_size - sound->raw_position;
+				if (sound->rawDataSize() - sound->raw_position > 0)
+				{
+					index = sound->rawDataSize() - sound->raw_position;
 
 					do_mixing(stream, sound, sound->get_raw_data_ptr(sound->raw_position),
 						index, sounddata->volume);
 
 				}
 
-				// If this isn't MP3 (which means its NATIVE16) there is nothing to decode,
-				// reusing the available data is the only option.
-				if (soundFormat != FORMAT_MP3) {
-					if (index < buffer_length) {
-						sound->loop_count--;
-						sound->raw_position = 0;
-						sound->samples_played = 0;
-						unsigned int mix_length = ((buffer_length - index) > sound->raw_data_size ? sound->raw_data_size : (buffer_length - index));
-						do_mixing(stream+index, sound, sound->get_raw_data_ptr(sound->raw_position), 
-							mix_length, sounddata->volume);
-					}
-					continue;
-				}
-				
 				// Then we decode some data
 				// We loop until the size of the decoded sound is greater than the buffer size,
 				// or there is no more to decode.
 				unsigned int decoded_size = 0;
-				sound->raw_data_size = 0;
-				while(decoded_size < buffer_length) {
+				// TODO: should we delete any previous raw_data ?
+				while(decoded_size < buffer_length)
+				{
 
 					// If we need to loop, we reset the data pointer
-					if (sound->data_size == sound->position && sound->loop_count != 0) {
+					if (sound->dataSize() == sound->position && sound->loop_count != 0) {
 						sound->loop_count--;
 						sound->position = 0;
 						sound->samples_played = 0;
 					}
 
 					// Test if we will get problems... Should not happen...
-					assert(sound->data_size > sound->position);
+					assert(sound->dataSize() > sound->position);
 					
 					// temp raw buffer
 					Uint8* tmp_raw_buffer;
-					unsigned int tmp_raw_buffer_size;
-					int outsize = 0;
+					uint32_t tmp_raw_buffer_size = 0;
+					uint32_t decodedBytes = 0;
 
-#ifdef USE_FFMPEG
-					tmp_raw_buffer = new Uint8[AVCODEC_MAX_AUDIO_FRAME_SIZE];
-					tmp_raw_buffer_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-
-					long bytes_decoded = 0;
-
-					while (outsize == 0 && sound->position < sound->data_size) {
-						uint8_t* frame;
-						int framesize;
-
-						bytes_decoded = av_parser_parse(sound->parser, sound->cc, &frame, &framesize,
-									static_cast<uint8_t *>(sound->get_data_ptr(sound->position)), sound->data_size - sound->position,
-									0 ,0);	//pts, dts
-
-						int tmp = 0;
-#ifdef FFMPEG_AUDIO2
-						outsize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-						tmp = avcodec_decode_audio2(sound->cc, (int16_t*)(tmp_raw_buffer), &outsize, frame, framesize);
-#else
-						tmp = avcodec_decode_audio(sound->cc, (int16_t*)(tmp_raw_buffer), &outsize, frame, framesize);
-#endif
-
-						if (bytes_decoded < 0 || tmp < 0 || outsize < 0) {
-							log_error(_("Error while decoding MP3-stream.  Upgrading ffmpeg/libavcodec might fix this issue."));
-							// Setting data position to data size will get the sound removed
-							// from the active sound list later on.
-							sound->position = sound->data_size;
-							break;
-						}
-
-						sound->position += bytes_decoded;
-					}
-
-#elif defined(USE_MAD)
-
-					// Setup the mad decoder
-					mad_stream_buffer(&sound->stream, sound->get_data_ptr(sound->position), sound->data_size-sound->position);
-
-					int ret;
-					const unsigned char* old_next_frame = sound->stream.next_frame;
-					int loops = 0;
-					while(true) {
-
-						ret = mad_frame_decode(&sound->frame, &sound->stream);
-						loops++;
-						
-						// There is always some junk in front of the data, 
-						// so we continue until we get past it.
-						if (ret && sound->stream.error == MAD_ERROR_LOSTSYNC) continue;
-						
-						// Error handling is done by relooping (max. 8 times) and just hooping that it will work...
-						if (loops > 8) break;
-						if (ret == -1 && sound->stream.error != MAD_ERROR_BUFLEN && MAD_RECOVERABLE(sound->stream.error)) {
-							log_error(_("Recoverable error while decoding MP3-stream, MAD error: %s"), mad_stream_errorstr (&sound->stream));
-							continue;
-						}
-						
-						break;
-					}
-
-					if (ret == -1 && sound->stream.error != MAD_ERROR_BUFLEN) {
-						log_error(_("Unrecoverable error while decoding MP3-stream, MAD error: %s"), mad_stream_errorstr (&sound->stream));
-						sound->position = sound->data_size;
-						continue;
-					} else if (ret == -1 && sound->stream.error == MAD_ERROR_BUFLEN) {
-						// the buffer is empty, no more to decode!
-						sound->position = sound->data_size;
+					uint32_t inputSize = 0;
+					bool parse = true;
+					if (sounddata->soundinfo->getFormat() == AUDIO_CODEC_ADPCM) {
+						parse = false;
+						if (sounddata->m_frames_size.size() > 0) inputSize = sounddata->m_frames_size[sound->position];
+						else inputSize = sound->dataSize() - sound->position;
 					} else {
-						sound->position += sound->stream.next_frame - old_next_frame;
+						inputSize = sound->dataSize() - sound->position;
 					}
 
-					mad_synth_frame (&sound->synth, &sound->frame);
-					
-					outsize = sound->synth.pcm.length * ((soundStereo == true) ? 4 : 2);
+					tmp_raw_buffer = sound->decoder->decode(sound->get_data_ptr(sound->position), 
+													inputSize, tmp_raw_buffer_size, decodedBytes, parse);
 
-					tmp_raw_buffer = new Uint8[outsize];
-					int sample;
-					
-					int16_t* dst = reinterpret_cast<int16_t*>(tmp_raw_buffer);
+					sound->position += decodedBytes;
 
-					// transfer the decoded samples into the sound-struct, and do some
-					// scaling while we're at it.
-					for(int f = 0; f < sound->synth.pcm.length; f++)
-					{
-						for (int e = 0; e < ((soundStereo == true) ? 2 : 1); e++){ // channels (stereo/mono)
+					sound->deleteDecodedData();
+					sound->appendDecodedData(tmp_raw_buffer, tmp_raw_buffer_size);
 
-							mad_fixed_t mad_sample = sound->synth.pcm.samples[e][f];
-
-							// round
-							mad_sample += (1L << (MAD_F_FRACBITS - 16));
-
-							// clip
-							if (mad_sample >= MAD_F_ONE) mad_sample = MAD_F_ONE - 1;
-							else if (mad_sample < -MAD_F_ONE) mad_sample = -MAD_F_ONE;
-
-							// quantize
-							sample = mad_sample >> (MAD_F_FRACBITS + 1 - 16);
-
-							if ( sample != static_cast<int16_t>(sample) ) sample = sample < 0 ? -32768 : 32767;
-
-							*dst++ = sample;
-						}
-					}
-#endif // defined(USE_MAD)
-
-					// If we need to convert samplerate or/and from mono to stereo...
-					if (outsize > 0 && (static_cast<int>(soundSampleRate) != handler->audioSpec.freq || !soundStereo)) {
-
-						int16_t* adjusted_data = 0;
-						int	adjusted_size = 0;
-						int sample_count = outsize / ((soundStereo == true) ? 4 : 2);
-
-						// Convert to needed samplerate
-						convert_raw_data(&adjusted_data, &adjusted_size, tmp_raw_buffer, sample_count, 0, 
-								soundSampleRate, soundStereo,
-								handler->audioSpec.freq, (handler->audioSpec.channels == 2 ? true : false));
-
-						// Hopefully this wont happen
-						if (!adjusted_data) {
-							log_error(_("Error in sound sample conversion"));
-							continue;
-						}
-
-						// Move the new data to the sound-struct
-						delete[] tmp_raw_buffer;
-						tmp_raw_buffer = reinterpret_cast<Uint8*>(adjusted_data);
-						tmp_raw_buffer_size = adjusted_size;
-
-					} else {
-						tmp_raw_buffer_size = outsize;
-					}
-
-					Uint8* tmp_buf = new Uint8[decoded_size + tmp_raw_buffer_size];
-					sound->raw_data_size = 1;
-					memcpy(tmp_buf, sound->get_raw_data_ptr(0), decoded_size);
-					memcpy(tmp_buf+decoded_size, tmp_raw_buffer, tmp_raw_buffer_size);
 					decoded_size += tmp_raw_buffer_size;
-					sound->delete_raw_data();
-					sound->set_raw_data(tmp_buf);
-					delete[] tmp_raw_buffer;
 
 					// no more to decode from this sound, so we break the loop
-					if (sound->data_size <= sound->position && sound->loop_count == 0) {
+					if (sound->dataSize() <= sound->position && sound->loop_count == 0) {
 						break;
 					}
 
 				} // end of "decode min. bufferlength data" while loop
 
-				sound->raw_data_size = decoded_size;
-								
 				sound->raw_position = 0;
 
 				// Determine how much should be mixed
@@ -991,55 +763,37 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 				} else { 
 					mix_length = decoded_size;
 				}
-				if (sound->raw_data_size < 2) continue; // something went terrible wrong
+				if (sound->rawDataSize() < 2) continue; // something went terrible wrong
 				do_mixing(stream+index, sound, sound->get_raw_data_ptr(0), mix_length, sounddata->volume);
 
 			// When the current sound has enough decoded data to fill 
 			// the buffer, we do just that.
-			} else if (sound->raw_data_size - sound->raw_position > buffer_length ) {
-			
+			} else if (sound->rawDataSize() > sound->raw_position && sound->rawDataSize() - sound->raw_position > buffer_length ) {
+
 				do_mixing(stream, sound, sound->get_raw_data_ptr(sound->raw_position), 
 					buffer_length, sounddata->volume);
 
 			// When the current sound doesn't have anymore data to decode,
 			// and doesn't loop (anymore), but still got unplayed data,
 			// we put the last data on the stream
-			} else if (sound->raw_data_size - sound->raw_position <= buffer_length && sound->raw_data_size > sound->raw_position+1) {
+			} else if (sound->rawDataSize() - sound->raw_position <= buffer_length && sound->rawDataSize() > sound->raw_position+1) {
 			
 
 				do_mixing(stream, sound, sound->get_raw_data_ptr(sound->raw_position), 
-					sound->raw_data_size - sound->raw_position, sounddata->volume);
+					sound->rawDataSize() - sound->raw_position, sounddata->volume);
 
-				sound->raw_position = sound->raw_data_size;
+				sound->raw_position = sound->rawDataSize();
 			} 
 
-			// Sound is done, remove it from the active list (mp3)
-			if (sound->position == sound->data_size && sound->loop_count == 0 && soundFormat == FORMAT_MP3) {
-#ifdef USE_FFMPEG
-				avcodec_close(sound->cc);
-				av_parser_close(sound->parser);
-#elif defined(USE_MAD)
-				mad_synth_finish(&sound->synth);
-				mad_frame_finish(&sound->frame);
-				mad_stream_finish(&sound->stream);
-#endif
-				sound->delete_raw_data();
+			// Sound is done, remove it from the active list
+			if (sound->position == sound->dataSize() && sound->loop_count == 0) {
+				/*delete sound->decoder;
+				sound->deleteDecodedData();*/
 				sounddata->m_active_sounds.erase(sounddata->m_active_sounds.begin() + j);
 				handler->soundsPlaying--;
 				handler->_soundsStopped++;
 
-
-			// Sound is done, remove it from the active list (adpcm/native16)
-			} else if (sound->loop_count == 0 && soundFormat == FORMAT_NATIVE16 && sound->raw_position >= sound->raw_data_size && sound->raw_data_size != 0) {
-				sounddata->m_active_sounds.erase(sounddata->m_active_sounds.begin() + j);
-				handler->soundsPlaying--;
-				handler->_soundsStopped++;
-			} else if (sound->raw_position == 0 && sound->raw_data_size == 0) {
-				sounddata->m_active_sounds.erase(sounddata->m_active_sounds.begin() + j);
-				handler->soundsPlaying--;
-				handler->_soundsStopped++;
-			}
-
+			} 
 		} // active sounds loop
 	} // existing sounds loop
 

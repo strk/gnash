@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.125 2007/09/23 08:48:17 cmusick Exp $
+# $Id: Makefile.am,v 1.126 2007/09/27 23:59:55 tgc Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -41,6 +41,9 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/server/vm \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libgeometry \
+	-I$(top_srcdir)/libmedia \
+	-I$(top_srcdir)/libmedia/sdl \
+	-I$(top_srcdir)/libmedia/gst \
 	-I$(top_srcdir)	\
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
@@ -189,6 +192,7 @@ noinst_HEADERS = \
 
 libgnashserver_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
+	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/server/asobj/libgnashasobjs.la \
 	$(top_builddir)/server/parser/libgnashparser.la \
 	$(top_builddir)/server/vm/libgnashvm.la \

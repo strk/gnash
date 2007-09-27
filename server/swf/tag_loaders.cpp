@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.144 2007/09/26 15:22:12 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.145 2007/09/27 23:59:56 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -55,6 +55,7 @@
 #include "video_stream_def.h"
 #include "sound_definition.h"
 #include "abc_block.h"
+#include "SoundInfo.h"
 
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>
@@ -69,14 +70,6 @@ namespace gnash {
 }
 
 namespace gnash {
-
-// Forward declaration for functions at end of file
-//
-// Both modify "data" parameter, allocating memory for it.
-
-static void u8_expand(unsigned char* &data, stream* in,
-	int sample_count,  // in stereo, this is number of *pairs* of samples
-	bool stereo);
 
 namespace SWF {
 namespace tag_loaders {
@@ -136,291 +129,6 @@ public:
 };
 
 } // anonymous namespace
-
-// ----------------------------------------------------------------------------
-// ADPCMDecoder class
-// ----------------------------------------------------------------------------
-
-/// ADPCM decoder utilities
-//
-/// Algo from http://www.circuitcellar.com/pastissues/articles/richey110/text.htm
-/// And also Jansen.
-/// Here's another reference: http://www.geocities.com/SiliconValley/8682/aud3.txt
-/// Original IMA spec doesn't seem to be on the web :(
-///
-/// TODO: move in it's own file
-///
-class ADPCMDecoder {
-
-private:
-
-	// Data from Alexis' SWF reference
-	static int _index_update_table_2bits[2];
-	static int _index_update_table_3bits[4];
-	static int _index_update_table_4bits[8];
-	static int _index_update_table_5bits[16];
-
-	static int* s_index_update_tables[4];
-
-	// Data from Jansen.  http://homepages.cwi.nl/~jack/
-	// Check out his Dutch retro punk songs, heh heh :)
-	static const int STEPSIZE_CT = 89;
-	static int s_stepsize[STEPSIZE_CT];
-
-
-	static void doSample(int n_bits, int& sample, int& stepsize_index, int raw_code)
-	{
-		assert(raw_code >= 0 && raw_code < (1 << n_bits));								
-																
-		static const int	HI_BIT = (1 << (n_bits - 1));								
-		int*	index_update_table = s_index_update_tables[n_bits - 2];							
-																
-		/* Core of ADPCM. */												
-																
-		int	code_mag = raw_code & (HI_BIT - 1);									
-		bool	code_sign_bit = (raw_code & HI_BIT) ? 1 : 0;								
-		int	mag = (code_mag << 1) + 1;	/* shift in LSB (they do this so that pos & neg zero are different)*/	
-																
-		int	stepsize = s_stepsize[stepsize_index];									
-																
-		/* Compute the new sample.  It's the predicted value			*/					
-		/* (i.e. the previous value), plus a delta.  The delta			*/					
-		/* comes from the code times the stepsize.  going for			*/					
-		/* something like: delta = stepsize * (code * 2 + 1) >> code_bits	*/					
-		int	delta = (stepsize * mag) >> (n_bits - 1);								
-		if (code_sign_bit) delta = -delta;										
-																
-		sample += delta;												
-		sample = iclamp(sample, -32768, 32767);										
-																
-		/* Update our stepsize index.  Use a lookup table. */								
-		stepsize_index += index_update_table[code_mag];									
-		stepsize_index = iclamp(stepsize_index, 0, STEPSIZE_CT - 1);							
-	}
-
-	/* Uncompress 4096 mono samples of ADPCM. */									
-	static void doMonoBlock(int16_t** out_data, int n_bits, int sample_count, stream* in, int sample, int stepsize_index)
-	{
-		/* First sample doesn't need to be decompressed. */								
-		sample_count--;													
-		*(*out_data)++ = (int16_t) sample;										
-																
-		while (sample_count--)												
-		{														
-			int	raw_code = in->read_uint(n_bits);								
-			doSample(n_bits, sample, stepsize_index, raw_code);	/* sample & stepsize_index are in/out params */	
-			*(*out_data)++ = (int16_t) sample;									
-		}														
-	}
-
-
-	/* Uncompress 4096 stereo sample pairs of ADPCM. */									
-	static void doStereoBlock(
-			int16_t** out_data,	// in/out param
-			int n_bits,
-			int sample_count,
-			stream* in,
-			int left_sample,
-			int left_stepsize_index,
-			int right_sample,
-			int right_stepsize_index
-			)
-	{
-		/* First samples don't need to be decompressed. */								
-		sample_count--;													
-		*(*out_data)++ = (int16_t) left_sample;										
-		*(*out_data)++ = (int16_t) right_sample;										
-																
-		while (sample_count--)												
-		{														
-			int	left_raw_code = in->read_uint(n_bits);								
-			doSample(n_bits, left_sample, left_stepsize_index, left_raw_code);					
-			*(*out_data)++ = (int16_t) left_sample;									
-																
-			int	right_raw_code = in->read_uint(n_bits);								
-			doSample(n_bits, right_sample, right_stepsize_index, right_raw_code);					
-			*(*out_data)++ = (int16_t) right_sample;									
-		}														
-	}
-
-public:
-
-	// Utility function: uncompress ADPCM data from in stream to
-	// out_data[].	The output buffer must have (sample_count*2)
-	// bytes for mono, or (sample_count*4) bytes for stereo.
-	static void adpcm_expand(
-		unsigned char* &data,
-		stream* in,
-		int sample_count,	// in stereo, this is number of *pairs* of samples (TODO: why is this signed at all ??)
-		bool stereo)
-	{
-		int16_t* out_data = new int16_t[stereo ? sample_count*2 : sample_count];
-		data = reinterpret_cast<unsigned char *>(out_data);
-
-		// Read header.
-		in->ensureBytes(1); // nbits
-		unsigned int n_bits = in->read_uint(2) + 2;	// 2 to 5 bits (TODO: use unsigned...)
-
-
-#ifndef GNASH_TRUST_SWF_INPUT
-
-		// bitsPerCompSample is the number of bits for each comp sample
-		unsigned int bitsPerCompSample = n_bits;
-		if (stereo) bitsPerCompSample *= 2;
-
-		// There's going to be one block every 4096 samples ...
-		unsigned int blocksCount = sample_count/4096;
-
-		// ... or fraction
-		if ( sample_count%4096 ) ++blocksCount;
-
-		// Of the total samples, all but the first sample in a block are comp
-		unsigned int compSamples = sample_count - blocksCount;
-
-		// From every block, a fixed 22 bits will be read (16 of which are the uncomp sample)
-		unsigned int fixedBitsPerBlock = 22;
-
-		// Total bits needed from stream
-		unsigned long bitsNeeded = (compSamples*bitsPerCompSample) + (fixedBitsPerBlock*blocksCount);
-
-		// Now, we convert this number to bytes...
-		unsigned long bytesNeeded = bitsNeeded/8;
-		// ... requiring one more if the bits in excess are more then
-		//     the ones still available in last byte read 
-		unsigned int excessBits = bitsNeeded%8;
-		if ( excessBits > 6 ) ++bytesNeeded;
-
-		// Take note of the current position to later verify if we got the 
-		// number of required bytes right
-		unsigned long prevPosition = in->get_position();
-
-		// We substract 1 byte as the 6 excessive of a byte are already in the stream,
-		// and we won't require another one unless more then 6 excessive bits are needed
-		// WARNING: this is currently disabled due to a bug in this function often resulting
-		//          in reads past the end of the stream
-		//in->ensureBytes(bytesNeeded-1);
-
-#endif // GNASH_TRUST_SWF_INPUT
-
-		while (sample_count)
-		{
-			// Read initial sample & index values.
-
-			int	sample = in->read_sint(16);
-
-			int	stepsize_index = in->read_uint(6);
-			assert(STEPSIZE_CT >= (1 << 6));	// ensure we don't need to clamp.
-
-			int	samples_this_block = imin(sample_count, 4096);
-			sample_count -= samples_this_block;
-
-			if (stereo == false)
-			{
-#define DO_MONO(n) doMonoBlock(&out_data, n, samples_this_block, in, sample, stepsize_index)
-
-				switch (n_bits)
-				{
-				default: assert(0); break;
-				case 2: DO_MONO(2); break;
-				case 3: DO_MONO(3); break;
-				case 4: DO_MONO(4); break;
-				case 5: DO_MONO(5); break;
-				}
-			}
-			else
-			{
-				// Stereo.
-
-				// Got values for left channel; now get initial sample
-				// & index for right channel.
-				int	right_sample = in->read_sint(16);
-
-				int	right_stepsize_index = in->read_uint(6);
-				assert(STEPSIZE_CT >= (1 << 6));	// ensure we don't need to clamp.
-
-#define DO_STEREO(n)					\
-		doStereoBlock(				\
-			&out_data, n, samples_this_block,	\
-			in, sample, stepsize_index,		\
-			right_sample, right_stepsize_index)
-				
-				switch (n_bits)
-				{
-				default: assert(0); break;
-				case 2: DO_STEREO(2); break;
-				case 3: DO_STEREO(3); break;
-				case 4: DO_STEREO(4); break;
-				case 5: DO_STEREO(5); break;
-				}
-			}
-		}
-
-#ifndef GNASH_TRUST_SWF_INPUT
-		unsigned long curPos = in->get_position();
-		unsigned long bytesRead = curPos - prevPosition;
-		if ( bytesRead != bytesNeeded )
-		{
-			// This would happen if the computation of bytesNeeded doesn't match the current
-			// implementation.
-			// NOTE That the current implementation seems pretty much bogus as we *often* end
-			// up reading past the end of the tag. Once we fix the decoding we shoudl also fix
-			// the computation of bytes needed
-			log_error("admcp_expand: we expected to read %lu bytes, but we read %lu instead (%ld error)",
-				bytesNeeded, bytesRead, bytesNeeded-bytesRead);
-			// abort();
-		}
-
-		unsigned long endTagPos = in->get_tag_end_position();
-		if ( curPos > endTagPos )
-		{
-			// This happens when our decoder reads past the end of the tag.
-			// In general, we should aborth parsing of the current tag when this happens,
-			// anyway, it seems that *some* sound can be heard nonetheless so we keep going.
-			log_error("admcp_expand: read past tag boundary: current position: %lu, end of tag position: %lu (overflow: %lu bytes)",
-				curPos, endTagPos, curPos-endTagPos);
-
-#if 0
-			log_debug("      stereo:%d, sample_count:%u, compressedSamples:%d, bitsPerCompSample:%u, "
-				"blocksCount:%u, bitsPerBlock:%u, bitsNeeded:%lu, excessBits:%u, bytesNeeded:%lu, bytesLeft:%lu",
-				stereo, sample_count, compSamples, bitsPerCompSample, blocksCount, fixedBitsPerBlock,
-				bitsNeeded, excessBits, bytesNeeded, in->get_tag_end_position()-in->get_position());
-#endif
-		}
-#endif // GNASH_TRUST_SWF_INPUT
-
-	}
-
-
-};
-
-int ADPCMDecoder::_index_update_table_2bits[2] = { -1,  2 };
-int ADPCMDecoder::_index_update_table_3bits[4] = { -1, -1,  2,  4 };
-int ADPCMDecoder::_index_update_table_4bits[8] = { -1, -1, -1, -1,  2,  4,  6,  8 };
-int ADPCMDecoder::_index_update_table_5bits[16] = { -1, -1, -1, -1, -1, -1, -1, -1, 1,  2,  4,  6,  8, 10, 13, 16 };
-
-int* ADPCMDecoder::s_index_update_tables[4] = {
-	ADPCMDecoder::_index_update_table_2bits,
-	ADPCMDecoder::_index_update_table_3bits,
-	ADPCMDecoder::_index_update_table_4bits,
-	ADPCMDecoder::_index_update_table_5bits
-};
-
-int ADPCMDecoder::s_stepsize[STEPSIZE_CT] = {
-	7, 8, 9, 10, 11, 12, 13, 14, 16, 17,
-	19, 21, 23, 25, 28, 31, 34, 37, 41, 45,
-	50, 55, 60, 66, 73, 80, 88, 97, 107, 118,
-	130, 143, 157, 173, 190, 209, 230, 253, 279, 307,
-	337, 371, 408, 449, 494, 544, 598, 658, 724, 796,
-	876, 963, 1060, 1166, 1282, 1411, 1552, 1707, 1878, 2066,
-	2272, 2499, 2749, 3024, 3327, 3660, 4026, 4428, 4871, 5358,
-	5894, 6484, 7132, 7845, 8630, 9493, 10442, 11487, 12635, 13899,
-	15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767
-};
-
-// ----------------------------------------------------------------------------
-// END OF ADPCMDecoder class
-// ----------------------------------------------------------------------------
-
 
 //
 // Some tag implementations
@@ -1435,10 +1143,10 @@ define_text_loader(stream* in, tag_type tag, movie_definition* m)
 //
 
 // Forward declaration
-static void sound_expand(stream *in, sound_handler::format_type &format,
+/*static void sound_expand(stream *in, sound_handler::format_type &format,
 	bool sample_16bit, bool stereo, unsigned int &sample_count,
 	unsigned char* &data, unsigned &data_bytes);
-
+*/
 // Common data
 static int	s_sample_rate_table[] = { 5512, 11025, 22050, 44100 };
 
@@ -1457,15 +1165,14 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 
 	uint16_t	character_id = in->read_u16();
 
-	sound_handler::format_type	format = static_cast<sound_handler::format_type>(in->read_uint(4));
-	sound_handler::format_type	orgFormat = format;
+	audioCodecType	format = static_cast<audioCodecType>(in->read_uint(4));
 	int	sample_rate = in->read_uint(2);	// multiples of 5512.5
 	bool	sample_16bit = in->read_bit(); 
 	bool	stereo = in->read_bit(); 
 
 	unsigned int	sample_count = in->read_u32();
 
-	if (format == sound_handler::FORMAT_MP3) {
+	if (format == AUDIO_CODEC_MP3) {
 		in->ensureBytes(2);
 		int16_t	delay_seek = in->read_s16();	// FIXME - not implemented/used
 		// The DelaySeek field has the following meaning:
@@ -1504,19 +1211,16 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 		return;
 	    }
 
-	    unsigned char *data; // Expanded audio data ready for playing
-
 	    // First it is the amount of data from file,
 	    // then the amount allocated at *data (it may grow)
-            unsigned data_bytes = in->get_tag_end_position() - in->get_position();
+	    unsigned data_bytes = in->get_tag_end_position() - in->get_position();
+	    unsigned char *data = new unsigned char[data_bytes];
 
-	    // sound_expand allocates storage for data[].
-	    // and modifies 3 parameters: format, data and data_bytes.
-	    sound_expand(in, format, sample_16bit, stereo, sample_count, data, data_bytes);
+	    in->read((char*)data, data_bytes);
 
 	    // Store all the data in a SoundInfo object
 	    std::auto_ptr<SoundInfo> sinfo;
-	    sinfo.reset(new SoundInfo(format, orgFormat, stereo, s_sample_rate_table[sample_rate], sample_count, sample_16bit));
+	    sinfo.reset(new SoundInfo(format, stereo, s_sample_rate_table[sample_rate], sample_count, sample_16bit));
 
 	    // Stores the sounddata in the soundhandler, and the ID returned
 	    // can be used to starting, stopping and deleting that sound
@@ -1528,6 +1232,7 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 		sound_sample* sam = new sound_sample(handler_id);
 		m->add_sound_sample(character_id, sam);
 	    }
+
 	}
 	else
 	{
@@ -1594,8 +1299,7 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
     // extract garbage data
     int	garbage = in->read_uint(8);
 
-    sound_handler::format_type format = static_cast<sound_handler::format_type>(in->read_uint(4));
-	sound_handler::format_type orgFormat = format;
+    audioCodecType format = static_cast<audioCodecType>(in->read_uint(4));
     int sample_rate = in->read_uint(2);	// multiples of 5512.5
     bool sample_16bit = in->read_bit(); 
     bool stereo = in->read_bit(); 
@@ -1605,7 +1309,7 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 
     unsigned int sample_count = in->read_u16();
 	int latency = 0;
-    if (format == sound_handler::FORMAT_MP3) {
+    if (format == AUDIO_CODEC_MP3) {
 		latency = in->read_s16();
 		garbage = in->read_uint(16);
 	}
@@ -1627,25 +1331,9 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 	return;
     }
 
-    // Tell create_sound what format it will be receiving, in case it cares
-    // at this stage.
-    switch (format) {
-    case sound_handler::FORMAT_ADPCM:
-    case sound_handler::FORMAT_RAW:
-    case sound_handler::FORMAT_UNCOMPRESSED:
-	format = sound_handler::FORMAT_NATIVE16;
-	break;
-    // Shut fussy compilers up...
-    case sound_handler::FORMAT_MP3:
-    case sound_handler::FORMAT_NELLYMOSER:
-    case sound_handler::FORMAT_NATIVE16:
-    case sound_handler::FORMAT_NELLYMOSER_8HZ_MONO:
-	break;
-    }
-
 	// Store all the data in a SoundInfo object
 	std::auto_ptr<SoundInfo> sinfo;
-	sinfo.reset(new SoundInfo(format, orgFormat, stereo, s_sample_rate_table[sample_rate], sample_count, sample_16bit));
+	sinfo.reset(new SoundInfo(format, stereo, s_sample_rate_table[sample_rate], sample_count, sample_16bit));
 
 	// Stores the sounddata in the soundhandler, and the ID returned
 	// can be used to starting, stopping and deleting that sound
@@ -1676,20 +1364,15 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
     // If there is no SoundInfo something is wrong...
     if (!sinfo) return;
 
-    sound_handler::format_type format = sinfo->getOrgFormat();
+    audioCodecType format = sinfo->getFormat();
     unsigned int sample_count = sinfo->getSampleCount();
 
 	// discard garbage data if format is MP3
-    if (format == sound_handler::FORMAT_MP3) in->skip_bytes(4);
+    if (format == AUDIO_CODEC_MP3) in->skip_bytes(4);
 
-    unsigned char *data;	// Storage is allocated by sound_expand()
     unsigned int data_bytes = in->get_tag_end_position() - in->get_position();
-
-    sound_expand(in, format,
-		 sinfo->is16bit(), sinfo->isStereo(), sample_count,
-		 data, data_bytes);
-    // "format" now reflects what we hand(ed) to the sound drivers.
-    // "data_bytes" now reflects the size of the uncompressed data.
+    unsigned char *data = new unsigned char[data_bytes];
+    in->read((char*)data, data_bytes);
 
     // Fill the data on the apropiate sound, and receives the starting point
     // for later "start playing from this frame" events.
@@ -1700,132 +1383,6 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 
     start_stream_sound_tag*	ssst = new start_stream_sound_tag();
     ssst->read(m, handle_id, start);
-}
-
-// sound_expand: Expand audio data to 16-bit host endian.
-//
-// This modifies three of its parameters:
-// On entry, "format" is the format of the original data. If this routine
-// expands that to 16-bit native-endian, it will also modify "format" to
-// FORMAT_NATIVE16. Otherwise it leaves it alone (MP3 and NELLYMOSER).
-//
-// Storage for "data" is allocated here, and the the "data" pointer is modified.
-//
-// On entry, data_bytes is the amount of sound data to be read from "in";
-// on exit it reflects the number of bytes that "data" now points to.
-static void
-sound_expand(stream *in, sound_handler::format_type &format,
-	bool sample_16bit, bool stereo, unsigned int &sample_count,
-	unsigned char* &data, unsigned int &data_bytes)
-{
-
-    // Make sure that an unassigned pointer cannot get through
-    data = NULL;
-
-    switch (format) {
-
-    case sound_handler::FORMAT_ADPCM:
-      {
-	//log_debug("ADPCM format");
-	// Uncompress the ADPCM before handing data to host.
-	if (sample_count == 0) sample_count = data_bytes / ( stereo ? 4 : 2 );
-	ADPCMDecoder::adpcm_expand(data, in, sample_count, stereo);
-	data_bytes = sample_count * (stereo ? 4 : 2);
-	format = sound_handler::FORMAT_NATIVE16;
-	break;
-      }
-    case sound_handler::FORMAT_RAW:
-	//log_debug("RAW format");
-	// 8- or 16-bit mono or stereo host-endian audio
-	// Convert to 16-bit host-endian
-	if (sample_16bit) {
-	    // FORMAT_RAW 16-bit is exactly what we want!
-	    in->ensureBytes(data_bytes); 
-	    data = new unsigned char[data_bytes];
-	    in->read((char *)data, data_bytes);
-	} else {
-	    // Convert 8-bit signed to 16-bit range
-	    // Allocate as many shorts as there are samples
-	    if (sample_count == 0) sample_count = data_bytes / (stereo ? 2 : 1);
-	    u8_expand(data, in, sample_count, stereo);
-		data_bytes = sample_count * (stereo ? 4 : 2);
-	}
-	format = sound_handler::FORMAT_NATIVE16;
-	break;
-
-    case sound_handler::FORMAT_UNCOMPRESSED:
-	//log_debug("UNCOMPRESSED format");
-	// 8- or 16-bit mono or stereo little-endian audio
-	// Convert to 16-bit host-endian.
-	if (!sample_16bit)
-	{
-	    // Convert 8-bit signed to 16-bit range
-	    // Allocate as many shorts as there are 8-bit samples
-	    if (sample_count == 0) sample_count = data_bytes / (stereo ? 2 : 1);
-	    u8_expand(data, in, sample_count, stereo);
-		data_bytes = sample_count * (stereo ? 4 : 2);
-
-	} else {
-	    // Read 16-bit data into buffer
-	    in->ensureBytes(data_bytes); 
-	    data = new unsigned char[data_bytes];
-	    in->read((char *)data, data_bytes);
-
-	    // Convert 16-bit little-endian data to host-endian.
-
-	    // Runtime detection of host endianness costs almost
-	    // nothing and is less of a continual maintenance headache
-	    // than compile-time detection.
-	    union u {
-	    	uint16_t s;
-		struct {
-		    uint8_t c0;
-		    uint8_t c1;
-		} c;
-	    } u = { 0x0001 };
-
-	    switch (u.c.c0) {
-	    case 0x01:	// Little-endian host: sample is already native.
-		break;
-	    case 0x00:  // Big-endian host
-	        // Swap sample bytes to get big-endian format.
-		assert(data_bytes & 1 == 0);
-	        for (unsigned i = 0; i < data_bytes; i+=2)
-	        {
-		    swap(&data[i], &data[i+1]);
-	        }
-		break;
-	    default:	// Impossible
-		log_error(_("Host endianness not detected in define_sound_loader"));
-		// Just carry on anyway...
-	    }
-	}
-	format = sound_handler::FORMAT_NATIVE16;
-	break;
-
-    case sound_handler::FORMAT_MP3:
-	//log_debug("MP3 format");
-	// Decompressed elsewhere
-	in->ensureBytes(data_bytes); 
-	data = new unsigned char[data_bytes];
-	in->read((char *)data, data_bytes);
-	break;
-
-    case sound_handler::FORMAT_NELLYMOSER_8HZ_MONO:
-    case sound_handler::FORMAT_NELLYMOSER:
-	//log_debug("NELLYMOSER format");
-	// One day...
-	in->ensureBytes(data_bytes); 
-	in->skip_bytes(data_bytes);
-	data = NULL;
-	break;
-
-    // This is impossible as an input but stops fussy compilers
-    // complaining about unhandled enum values.
-    case sound_handler::FORMAT_NATIVE16:
-	//log_debug("NATIVE16 format");
-	break;
-    }
 }
 
 void
@@ -1987,52 +1544,6 @@ abc_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 // indent-tabs-mode: t
 // End:
 
-// Expand ADPCM, 8-bit and non-host-endian 16-bit audio to 16-bit host-endian
-//
-// Provides:
-//
-// void	adpcm_expand(unsigned char* &data, stream* in,
-//	int sample_count, // in stereo, this is number of *pairs* of samples
-//	bool stereo)
-//
-//	Uncompress ADPCM data from in stream to out_data[].
-//	The output buffer must have (sample_count*2) bytes for mono,
-//	or (sample_count*4) bytes for stereo.
-//
-// This code has wandered round the Gnash source tree and has still not found
-// its proper home yet.
-
-
-//
-// Unsigned 8-bit expansion (128 is silence)
-//
-// u8_expand allocates the memory for its "data" pointer.
-//
-
-static void u8_expand(
-	unsigned char * &data,
-	stream* in,
-	int sample_count,	// in stereo, this is number of *pairs* of samples
-	bool stereo)
-{
-	unsigned total_samples = stereo ? sample_count*2 : sample_count;
-
-	in->ensureBytes(total_samples); 
-
-	boost::scoped_array<uint8_t> in_data ( new uint8_t[total_samples] );
-	int16_t	*out_data = new int16_t[total_samples];
-
-	in->read((char *)in_data.get(), total_samples); // Read 8-bit samples
-
-	// Convert 8-bit to 16
-	uint8_t *inp = in_data.get();
-	int16_t *outp = out_data;
-	for (unsigned i=total_samples; i>0; i--) {
-		*outp++ = ((int16_t)(*inp++) - 128) * 256;
-	}
-	
-	data = (unsigned char *)out_data;
-}
 
 
 // @@ lots of macros here!  It seems that VC6 can't correctly

@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.45 2007/09/23 08:48:18 cmusick Exp $
+# $Id: Makefile.am,v 1.46 2007/09/27 23:59:56 tgc Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -31,6 +31,9 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libgeometry \
 	-I$(top_srcdir)/libamf \
 	-I$(top_srcdir)/libltdl \
+	-I$(top_srcdir)/libmedia \
+	-I$(top_srcdir)/libmedia/gst \
+	-I$(top_srcdir)/libmedia/sdl \
 	-I$(top_srcdir)	\
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \

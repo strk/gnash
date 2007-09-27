@@ -16,16 +16,16 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.17 2007/09/17 12:41:22 tgc Exp $
+// $Id: video_stream_def.cpp,v 1.18 2007/09/27 23:59:56 tgc Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
 #include "render.h"
 
 #ifdef USE_FFMPEG
-#include "embedVideoDecoderFfmpeg.h"
+#include "VideoDecoderFfmpeg.h"
 #elif defined(SOUND_GST)
-#include "embedVideoDecoderGst.h"
+#include "VideoDecoderGst.h"
 #endif
 
 namespace gnash {
@@ -66,7 +66,7 @@ video_stream_definition::read(stream* in, SWF::tag_type tag, movie_definition* m
 		m_deblocking_flags = in->read_uint(2);
 		m_smoothing_flags = in->read_bit(); 
 
-		m_codec_id = in->read_u8();
+		m_codec_id = static_cast<videoCodecType>(in->read_u8());
 
 	}
 	else if (tag == SWF::VIDEOFRAME)
@@ -107,30 +107,31 @@ video_stream_definition::create_character_instance(character* parent, int id)
 	return ch;
 }
 
-std::auto_ptr<embedVideoDecoder>
+std::auto_ptr<VideoDecoder>
 video_stream_definition::get_decoder()
 {
 
-	std::auto_ptr<embedVideoDecoder> decoder;
+	std::auto_ptr<VideoDecoder> decoder;
 
 	if (m_num_frames == 0) return decoder;
 
 
 #ifdef USE_FFMPEG
-	decoder.reset( new embedVideoDecoderFfmpeg() );
+	decoder.reset( new VideoDecoderFfmpeg() );
 #elif defined(SOUND_GST)
-	decoder.reset( new embedVideoDecoderGst() );
+	decoder.reset( new VideoDecoderGst() );
 #else
-	decoder.reset( new embedVideoDecoder() );
+	decoder.reset( new VideoDecoder() );
 #endif
 
-	decoder->createDecoder(
+	bool ret = decoder->setup(
 				static_cast<int>(TWIPS_TO_PIXELS(m_bound.width())),// m_width,
 				static_cast<int>(TWIPS_TO_PIXELS(m_bound.height())), // m_height,
 				m_deblocking_flags,
 				m_smoothing_flags,
 				m_codec_id,
 				gnash::render::videoFrameFormat());
+	if (!ret) log_error("The videodecoder cannot decode this video");
 	return decoder;
 
 }

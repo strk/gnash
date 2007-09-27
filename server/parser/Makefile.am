@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.39 2007/09/24 15:39:31 cmusick Exp $
+# $Id: Makefile.am,v 1.40 2007/09/27 23:59:56 tgc Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -35,6 +35,9 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/server/asobj \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libgeometry \
+        -I$(top_srcdir)/libmedia \
+        -I$(top_srcdir)/libmedia/sdl \
+        -I$(top_srcdir)/libmedia/gst \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)	\
 	$(LIBXML_CFLAGS) \
@@ -83,7 +86,8 @@ noinst_HEADERS = \
 libgnashparser_la_LIBADD = \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libgeometry/libgnashgeo.la \
-	$(top_builddir)/libbase/libgnashbase.la
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(top_builddir)/libmedia/libgnashmedia.la
 
 libgnashparser_la_LDFLAGS = $(BOOST_LIBS) -export-dynamic # -release $(VERSION) -no-undefined 
 

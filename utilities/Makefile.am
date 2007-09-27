@@ -26,6 +26,7 @@ AUTOMAKE_OPTIONS = # dejagnu
 GNASH_LIBS = \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/libbase/libgnashbase.la \
+	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/libamf/libgnashamf.la
 
@@ -52,6 +53,9 @@ AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)/server \
         -I$(top_srcdir)/server/parser \
         -I$(top_srcdir)/server/vm \
+        -I$(top_srcdir)/libmedia \
+        -I$(top_srcdir)/libmedia/sdl \
+        -I$(top_srcdir)/libmedia/gst \
         -DLOCALEDIR=\"$(localedir)\" \
 	$(BOOST_CFLAGS) \
         $(LIBXML_CFLAGS) \

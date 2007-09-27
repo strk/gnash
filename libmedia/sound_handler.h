@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.31 2007/09/26 10:15:52 strk Exp $ */
+/* $Id: sound_handler.h,v 1.1 2007/09/27 23:59:53 tgc Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -34,6 +34,7 @@
 
 #include "tu_config.h" // for DSOEXPORT
 #include "tu_types.h"
+#include "SoundInfo.h"
 
 #include <vector>
 #include <memory>
@@ -41,7 +42,7 @@
 
 namespace gnash {
 	class stream;
-	class SoundInfo;
+//	class SoundInfo;
 }
 
 namespace gnash {
@@ -216,19 +217,6 @@ public:
 		uint16_t m_level1;
 	};
 
-	/// Format type that the sound can be.
-	enum format_type
-	{
-		FORMAT_RAW = 0,		// Host-endian 8- or 16-bit
-		FORMAT_ADPCM = 1,	// decoded in the tag loader and passed through as NATIVE16
-		FORMAT_MP3 = 2,
-		FORMAT_UNCOMPRESSED = 3,// Little-endian 8- or 16-bit, should be passed through as FORMAT_NATIVE16
-		FORMAT_NELLYMOSER_8HZ_MONO = 5,	// According to ffmpeg
-		FORMAT_NELLYMOSER = 6,	// Mystery proprietary format; see nellymoser.com
-				
-		// gnash tries to convert data to this format when possible:
-		FORMAT_NATIVE16 = 7	// gnash extension: 16 bits/sample, native-endian
-	};
 	// If stereo is true, samples are interleaved w/ left sample first.
 	
 	/// gnash's parser calls this to create sounds to be played later.
@@ -434,6 +422,7 @@ protected:
 	size_t _soundsStopped;
 };
 
+/*
 ///
 /// Class containing information about a sound. Is created by the parser while
 /// parsing, and ownership is then transfered to sound_data. When the parser is
@@ -523,7 +512,7 @@ private:
 	/// Is the audio in 16bit format (samplesize == 2)? else it 
 	/// is 8bit (samplesize == 1). Used for streams when decoding adpcm.
 	bool _is16bit;
-};
+};*/
 
 // TODO: move to appropriate specific sound handlers
 DSOEXPORT sound_handler*	create_sound_handler_sdl();

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-// $Id: video_stream_instance.cpp,v 1.39 2007/09/21 08:29:03 strk Exp $
+// $Id: video_stream_instance.cpp,v 1.40 2007/09/27 23:59:56 tgc Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -213,7 +213,7 @@ video_stream_instance::display()
 
 		if (size > 0 && data) {
 
-			std::auto_ptr<image::image_base> i ( m_decoder->decodeFrame(data, size) );
+			std::auto_ptr<image::image_base> i(m_decoder->decodeToImage(data, size));
 			if (i.get())
 			{
 				gnash::render::drawVideoFrame(i.get(), &m, &bounds);
@@ -221,7 +221,7 @@ video_stream_instance::display()
 				log_error(_("An error occured while decoding video frame"));
 			}
 		} else {
-			log_error(_("An error occured while decoding video frame"));
+			log_error(_("Video frame data is missing - skipping decoding"));
 		}
 	}
 

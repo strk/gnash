@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.h,v 1.11 2007/09/17 12:41:22 tgc Exp $
+// $Id: video_stream_def.h,v 1.12 2007/09/27 23:59:56 tgc Exp $
 
 #ifndef GNASH_VIDEO_STREAM_DEF_H
 #define GNASH_VIDEO_STREAM_DEF_H
@@ -31,7 +31,7 @@
 #include "swf.h"
 #include "rect.h" // for composition
 #include "execute_tag.h"
-#include "embedVideoDecoder.h"
+#include "VideoDecoder.h"
 #include "image.h"
 #include <map>
 #include <boost/shared_array.hpp>
@@ -94,7 +94,7 @@ public:
 	///
 	/// This function *never* returns a NULL pointer.
 	///
-	std::auto_ptr<embedVideoDecoder> get_decoder();
+	std::auto_ptr<VideoDecoder> get_decoder();
 
 	/// Get the Video frame associated with the given SWF frame number
 	//
@@ -152,7 +152,7 @@ private:
 	///
 	/// TODO: define an enumeration for the above values
 	///
-	uint8_t m_codec_id;
+	videoCodecType m_codec_id;
 
 	/// Bounds of the video, as read from the DEFINEVIDEOSTREAM tag.
 	rect m_bound;

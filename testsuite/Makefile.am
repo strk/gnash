@@ -33,11 +33,13 @@ libtestsuite_la_SOURCES = \
 libtestsuite_la_LIBADD = \
 	$(RENDERER_LIBS) \
 	$(top_builddir)/backend/libgnashbackend.la \
+	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(NULL)
 libtestsuite_la_CXXFLAGS = \
 	-I$(top_srcdir)/libbase \
+	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/backend \
 	-I$(top_srcdir)/libgeometry \
 	-I$(top_srcdir)/server  \

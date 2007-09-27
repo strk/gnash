@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.90 2007/09/15 03:06:37 rsavoye Exp $
+# $Id: Makefile.am,v 1.91 2007/09/27 23:59:50 tgc Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -26,6 +26,7 @@ STD_DIRS = \
 	libbase \
 	libgeometry \
 	libamf \
+	libmedia \
 	server \
 	backend \
 	utilities \

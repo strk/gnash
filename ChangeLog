@@ -1,3 +1,30 @@
+2007-09-27 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libmedia/, libmedia/sdl/, libmedia/gst/,
+	  (in libmedia:) AudioDecoder.h, AudioDecoderSimple.{h,cpp}, Makefile.am,
+	  AudioDecoderNellymoser.{h,cpp}, FLVParser.{h,cpp}, MediaDecoder.h, 
+	  MediaParser.h, SoundInfo.h, MediaBuffer.h, VideoDecoder.h, sound_handler.h,
+	  (in libmedia/sdl:) AudioDecoderFfmpeg.{h,cpp}, AudioDecoderMad.{h,cpp},
+	  MediaDecoderSdl.{h,cpp}, MediaParserFfmpeg.{cpp,h}, VideoDecoderFfmpeg.{h,cpp},
+	  sound_handler_sdl.{h,cpp},
+	  (in libmedia/gst:) VideoDecoderGst.{h,cpp}, sound_handler_gst.{h,cpp},
+	  gstgnashsrc.{h.c}, gstappbuffer.{c,h}, gstappsink.{c,h}, gstappsrc.{c,h}:
+	  Files added for the new libmedia (finally!!). Some og theese files are moved
+	  from the backend/ and libbase/ folders (see below). Not all files are yet in use.
+	* backend/sound_handler*, libbase/embedVideoDecoder*: Moved to libmedia.
+	* Makefile.am, configure.ac, backend/Makefile.am, gui/Makefile.am, 
+	  server/Makefile.am, server/asobj/Makefile.am, server/parser/Makefile.am,
+	  server/vm/Makefile.am, testsuite/Makefile.am, testsuite/misc-ming.all/Makefile.am,
+	  testsuite/movies.all/Makefile.am, testsuite/samples/Makefile.am,
+	  utilities/Makefile.am: Added the new libmedia to the build system.
+	* libbase/FLVParser.h: Moved some declerations inside the class to avoid
+	  conflicts with MediaParser.h.
+	* server/video_stream_instance.{cpp,h}, server/parser/video_stream_def.{cpp,h}:
+	  Use VideoDecoder instead of embedVideoDecoder.
+	* server/swf/tag_loaders.cpp: Don't decode and resample the ADPCM and raw audio
+	  before passing to the soundhandler.
+	  Read more about libmedia here: http://wiki.gnashdev.org/wiki/index.php/Main_Page
+
 2007-09-28 Sandro Santilli <strk@keybit.net>
 
 	* server/character.{cpp,h}: drop the get_text_value override here.

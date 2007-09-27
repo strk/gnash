@@ -16,14 +16,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_instance.h,v 1.21 2007/09/21 08:29:03 strk Exp $
+// $Id: video_stream_instance.h,v 1.22 2007/09/27 23:59:56 tgc Exp $
 
 #ifndef GNASH_VIDEO_STREAM_INSTANCE_H
 #define GNASH_VIDEO_STREAM_INSTANCE_H
 
 #include "character.h" // for inheritance
 #include "video_stream_def.h"
-#include "embedVideoDecoder.h"
+#include "VideoDecoder.h"
 #include "snappingrange.h"
 
 // Forward declarations
@@ -100,7 +100,7 @@ private:
 	boost::intrusive_ptr<NetStream> _ns;
 
 	/// Decoder for embedded video
-	std::auto_ptr<embedVideoDecoder> m_decoder;
+	std::auto_ptr<VideoDecoder> m_decoder;
 };
 
 void video_class_init(as_object& global);

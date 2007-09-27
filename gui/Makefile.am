@@ -41,7 +41,10 @@ AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/backend \
         -I$(top_srcdir)/libgeometry \
-        -DLOCALEDIR=\"$(localedir)\" \
+	 	-I$(top_srcdir)/libmedia \
+	 	-I$(top_srcdir)/libmedia/sdl \
+	 	-I$(top_srcdir)/libmedia/gst \
+       -DLOCALEDIR=\"$(localedir)\" \
 	-DPLUGINSDIR=\"$(pluginsdir)\" \
         $(LIBXML_CFLAGS) \
         $(DMALLOC_CFLAGS) \
@@ -88,6 +91,7 @@ AM_LDFLAGS =  \
 GNASH_LIBS = \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/backend/libgnashbackend.la \
+	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/libgeometry/libgnashgeo.la \
 	$(top_builddir)/libbase/libgnashbase.la

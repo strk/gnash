@@ -17,81 +17,33 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.h,v 1.19 2007/09/27 23:59:52 tgc Exp $
+// $Id: FLVParser.h,v 1.1 2007/09/27 23:59:53 tgc Exp $
 
 // Information about the FLV format can be found at http://osflash.org/flv
 
 #ifndef __FLVPARSER_H__
 #define __FLVPARSER_H__
 
-#include "LoadThread.h"
+#include <tu_file.h>
 #include <vector>
 #include <boost/thread/mutex.hpp>
+#include "MediaParser.h"
+
+#define HEADER_SKIP 15
 
 namespace gnash {
 
-
-
-/// \brief
-/// The FLVFrame class contains a video or audio frame, its size, its
-/// timestamp,
-class FLVFrame
+enum videoFrameType
 {
-public:
-	uint32_t dataSize;
-	uint8_t* data;
-	uint64_t timestamp;
-	uint8_t tag;
+	KEY_FRAME = 1,
+	INTER_FRAME = 2,
+	DIS_INTER_FRAME = 3
 };
 
-/// \brief
-/// The FLVAudioInfo class contains information about the audiostream
-/// in the FLV being parsed. The information stored is codec-type,
-/// samplerate, samplesize, stereo and duration.
-/// timestamp,
-class FLVAudioInfo
-{
-public:
-	FLVAudioInfo(uint16_t codeci, uint16_t sampleRatei, uint16_t sampleSizei, bool stereoi, uint64_t durationi)
-		: codec(codeci),
-		sampleRate(sampleRatei),
-		sampleSize(sampleSizei),
-		stereo(stereoi),
-		duration(durationi)
-		{
-		}
-
-	uint16_t codec;
-	uint16_t sampleRate;
-	uint16_t sampleSize;
-	bool stereo;
-	uint64_t duration;
+enum {
+	CONTAINS_VIDEO = 1,
+	CONTAINS_AUDIO = 4,
 };
-
-/// \brief
-/// The FLVVideoInfo class contains information about the videostream
-/// in the FLV being parsed. The information stored is codec-type,
-/// width, height, framerate and duration.
-/// timestamp,
-class FLVVideoInfo
-{
-public:
-	FLVVideoInfo(uint16_t codeci, uint16_t widthi, uint16_t heighti, uint16_t frameRatei, uint64_t durationi)
-		: codec(codeci),
-		width(widthi),
-		height(heighti),
-		frameRate(frameRatei),
-		duration(durationi)
-		{
-		}
-
-	uint16_t codec;
-	uint16_t width;
-	uint16_t height;
-	uint16_t frameRate;
-	uint64_t duration;
-};
-
 
 class FLVVideoFrame
 {
@@ -106,7 +58,7 @@ public:
 	/// Return true if this video frame is a key frame
 	bool isKeyFrame() const
 	{
-		return frameType == 1 /*KEY_FRAME*/;
+		return frameType == KEY_FRAME;
 	}
 
 };
@@ -123,65 +75,29 @@ public:
 };
 
 /// \brief
-/// The FLVParser class parses an FLV stream, buffers audio/video frames
-/// and provides cursor-based access to them.
+/// The FLVParser class parses an FLV stream, buffers information about 
+/// audio/video frames and provides cursor-based access to them.
 //
 /// Cursor-based access allow seeking as close as possible to a specified time
 /// and fetching frames from there on, sequentially.
 /// See seek(), nextVideoFrame(), nextAudioFrame() and nextMediaFrame().
 ///
-/// Input is received from a LoadThread object.
+/// Input is received from a tu_file object.
 ///
-/// TODO: have the LoadThread passed at construction time
-///
-class DSOEXPORT FLVParser
+class DSOEXPORT FLVParser : public MediaParser
 {
 
 public:
 
-	enum videoCodecType
-	{
-		VIDEO_CODEC_H263 = 2,	// H263/SVQ3 video codec
-		VIDEO_CODEC_SCREENVIDEO = 3,	// Screenvideo codec
-		VIDEO_CODEC_VP6 = 4,		// On2 VP6 video codec
-		VIDEO_CODEC_VP6A = 5,		// On2 VP6 Alpha video codec
-		VIDEO_CODEC_SCREENVIDEO2 = 6	// Screenvideo2 codec
-	};
-
-	enum audioCodecType
-	{
-		AUDIO_CODEC_RAW = 0,		// unspecified format.  Useful for 8-bit sounds???
-		AUDIO_CODEC_ADPCM = 1,	// gnash doesn't pass this through; it uncompresses and sends FORMAT_NATIVE16
-		AUDIO_CODEC_MP3 = 2,
-		AUDIO_CODEC_UNCOMPRESSED = 3,	// 16 bits/sample, little-endian
-		AUDIO_CODEC_NELLYMOSER_8HZ_MONO = 5,	// According to ffmpeg
-		AUDIO_CODEC_NELLYMOSER = 6	// Mystery proprietary format; see nellymoser.com
-	};
-
-	enum tagType
-	{
-		AUDIO_TAG = 0x08,
-		VIDEO_TAG = 0x09,
-		META_TAG = 0x12
-	};
-
-	enum videoFrameType
-	{
-		KEY_FRAME = 1,
-		INTER_FRAME = 2,
-		DIS_INTER_FRAME = 3
-	};
-
-
 	/// \brief
 	/// Create an FLV parser reading input from
-	/// the given LoadThread
+	/// the given tu_file
 	//
-	/// @param lt
-	/// 	LoadThread to use for input.
+	/// @param stream
+	/// 	tu_file to use for input.
 	/// 	Ownership left to the caller.
 	///
-	FLVParser(LoadThread& lt);
+	FLVParser(tu_file* stream);
 
 	/// Kills the parser...
 	~FLVParser();
@@ -190,7 +106,7 @@ public:
 	//
 	/// Locks the _mutex
 	///
-	FLVFrame* nextMediaFrame();
+	MediaFrame* parseMediaFrame();
 
 	/// \brief
 	/// Returns the next audio frame in the parsed buffer.
@@ -202,7 +118,7 @@ public:
 	///
 	/// Locks the _mutex
 	///
-	FLVFrame* nextAudioFrame();
+	MediaFrame* nextAudioFrame();
 
 	/// \brief
 	/// Returns the next video frame in the parsed buffer.
@@ -214,7 +130,7 @@ public:
 	///
 	/// Locks the _mutex
 	///
-	FLVFrame* nextVideoFrame();
+	MediaFrame* nextVideoFrame();
 
 	/// Return true of parsing is completed
 	//
@@ -223,17 +139,17 @@ public:
 	///
 	bool parsingCompleted() const { return _parsingComplete; }
 
-	/// Returns a FLVVideoInfo class about the videostream
+	/// Returns a VideoInfo class about the videostream
 	//
 	/// Locks the _mutex
 	///
-	FLVVideoInfo* getVideoInfo();
+	std::auto_ptr<VideoInfo> getVideoInfo();
 
-	/// Returns a FLVAudioInfo class about the audiostream
+	/// Returns a AudioInfo class about the audiostream
 	//
 	/// Locks the _mutex
 	///
-	FLVAudioInfo* getAudioInfo();
+	std::auto_ptr<AudioInfo> getAudioInfo();
 
 	/// \brief
 	/// Asks if a frame with with a timestamp larger than
@@ -287,6 +203,13 @@ public:
 	///
 	uint32_t getBufferLength();
 
+	/// Setup the parser
+	//
+	/// @return whether we'll be able to parse the file.
+	bool setupParser() { return true; }
+
+	uint32_t getLastParsedPos() { return _lastParsedPosition; }
+
 private:
 
 	/// seeks to the closest possible position the given position,
@@ -298,7 +221,7 @@ private:
 	uint32_t seekVideo(uint32_t time);
 
 
-	/// Parses next frame from the file, returns true is a frame
+	/// Parses next frame from the file, returns true if a frame
 	/// was succesfully parsed, or false if not enough data was present.
 	bool parseNextFrame();
 
@@ -309,7 +232,7 @@ private:
 	inline uint32_t getUInt24(uint8_t* in);
 
 	/// The interface to the file, externally owned
-	LoadThread& _lt;
+//	tu_file* _stream;
 
 	typedef std::vector<FLVVideoFrame*> VideoFrames;
 
@@ -322,16 +245,16 @@ private:
 	AudioFrames _audioFrames;
 
 	/// The position where the parsing should continue from.
-	uint64_t _lastParsedPosition;
+	uint32_t _lastParsedPosition;
 
 	/// Whether the parsing is complete or not
 	bool _parsingComplete;
 
 	/// Info about the video stream
-	FLVVideoInfo* _videoInfo;
+	std::auto_ptr<VideoInfo> _videoInfo;
 
 	/// Info about the audio stream
-	FLVAudioInfo* _audioInfo;
+	std::auto_ptr<AudioInfo> _audioInfo;
 
 	/// Last audio frame returned
 	size_t _nextAudioFrame;

@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.65 2007/09/26 10:15:52 strk Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.1 2007/09/27 23:59:54 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -93,26 +93,15 @@ int	GST_sound_handler::create_sound(
 
 	switch (sounddata->soundinfo->getFormat())
 	{
-	case FORMAT_NATIVE16:
+	case AUDIO_CODEC_MP3:
+	case AUDIO_CODEC_RAW:
+	case AUDIO_CODEC_ADPCM:
+	case AUDIO_CODEC_UNCOMPRESSED:
+	case AUDIO_CODEC_NELLYMOSER:
+	case AUDIO_CODEC_NELLYMOSER_8HZ_MONO:
 		if ( data ) sounddata->append(data, data_bytes);
 		break;
 
-	case FORMAT_MP3:
-	//case FORMAT_VORBIS:
-		if ( data ) sounddata->append(data, data_bytes);
-		break;
-
-	case FORMAT_RAW:
-	case FORMAT_ADPCM:
-	case FORMAT_UNCOMPRESSED:
-		// These should have been converted to FORMAT_NATIVE16
-		log_error(_("Sound data format not properly converted"));
-		assert(0);
-		break;
-
-	case FORMAT_NELLYMOSER:
-		log_unimpl(_("Nellymoser sound format requested; gnash does not handle it"));
-		return -1;
 
 	default:
 		// Unhandled format.
@@ -339,11 +328,11 @@ void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offse
 	// Create a gstreamer decoder for the chosen sound.
 
 	// Temp variables to make the code simpler and easier to read
-	format_type soundFormat = sounddata->soundinfo->getFormat();
+	audioCodecType soundFormat = sounddata->soundinfo->getFormat();
 	bool soundStereo = sounddata->soundinfo->isStereo();
 	uint32_t soundSampleRate = sounddata->soundinfo->getSampleRate();
 
-	if (soundFormat == FORMAT_MP3) {
+	if (soundFormat == AUDIO_CODEC_MP3) {
 
 		gst_element->decoder = gst_element_factory_make ("mad", NULL);
 		if (gst_element->decoder == NULL) {
@@ -390,16 +379,20 @@ void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offse
 						gst_element->audioresample, 
 						gst_element->volume, NULL);
 
-	} else if (soundFormat == FORMAT_NATIVE16) {
+	} else if (soundFormat == AUDIO_CODEC_ADPCM) {
+		gst_element->decoder = gst_element_factory_make ("ffdec_adpcm_swf", NULL);
+
+		// Check if the element was correctly created
+		if (!gst_element->decoder) {
+			log_error(_("A gstreamer adpcm-decoder element could not be created.  You probably need to install gst-ffmpeg."));
+			return;
+		}
+		gst_bin_add (GST_BIN (gst_element->bin), gst_element->decoder);
 
 		// Set the info about the stream so that gstreamer knows what it is.
-		GstCaps *caps = gst_caps_new_simple ("audio/x-raw-int",
+		GstCaps *caps = gst_caps_new_simple ("audio/x-adpcm",
 			"rate", G_TYPE_INT, soundSampleRate,
-			"channels", G_TYPE_INT, soundStereo ? 2 : 1,
-			"endianness", G_TYPE_INT, G_BIG_ENDIAN,
-			"width", G_TYPE_INT, 16,
-			"depth", G_TYPE_INT, 16,
-			/*"signed", G_TYPE_INT, 1,*/ NULL);
+			"channels", G_TYPE_INT, soundStereo ? 2 : 1, NULL);
 		g_object_set (G_OBJECT (gst_element->capsfilter), "caps", caps, NULL);
 		gst_caps_unref (caps);
 
@@ -410,14 +403,37 @@ void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offse
 		// Setup the callback
 		gst_element->handoff_signal_id = g_signal_connect (gst_element->input, "handoff", G_CALLBACK (callback_handoff), gst_element);
 
-/*	caps info:
-    audio/x-raw-int
-                rate: [ 1, 2147483647 ]
-            channels: [ 1, 8 ]
-            endianness: { 1234, 4321 }
-                width: 16
-                depth: [ 1, 16 ]
-                signed: { true, false }*/
+		// link data, decoder, audio* and adder
+		gst_element_link_many (gst_element->input,
+						gst_element->capsfilter,
+						gst_element->decoder,
+						gst_element->audioconvert,
+						gst_element->audioresample, 
+						gst_element->volume, NULL);
+
+	} else if (soundFormat == AUDIO_CODEC_NELLYMOSER_8HZ_MONO || soundFormat == AUDIO_CODEC_NELLYMOSER) {
+		return;
+	} else {
+
+		// Set the info about the stream so that gstreamer knows what it is.
+		GstCaps *caps = gst_caps_new_simple ("audio/x-raw-int",
+			"rate", G_TYPE_INT, soundSampleRate,
+			"channels", G_TYPE_INT, soundStereo ? 2 : 1,
+			"endianness", G_TYPE_INT, G_BIG_ENDIAN,
+			"width", G_TYPE_INT, (sounddata->soundinfo->is16bit() ? 16 : 8),
+			"depth", G_TYPE_INT, 16,
+			//"signed", G_TYPE_INT, 1,
+			 NULL);
+		g_object_set (G_OBJECT (gst_element->capsfilter), "caps", caps, NULL);
+		gst_caps_unref (caps);
+
+		// setup fake source
+		g_object_set (G_OBJECT (gst_element->input),
+					"sizetype", 2, "can-activate-pull", FALSE, "signal-handoffs", TRUE,
+					"sizemax", BUFFER_SIZE, NULL);
+		// Setup the callback
+		gst_element->handoff_signal_id = g_signal_connect (gst_element->input, "handoff", G_CALLBACK (callback_handoff), gst_element);
+
 		// Raw native sound-data, output directly
 		gst_element_link_many (gst_element->input, 
 					gst_element->capsfilter, 

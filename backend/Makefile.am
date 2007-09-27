@@ -71,44 +71,21 @@ noinst_HEADERS = \
 	render_handler_agg_compat.h \
 	render_handler_agg_style.h \
 	render_handler_cairo.h \
-	render_handler_tri.h \
-	sound_handler.h \
-	sound_handler_gst.h \
-	sound_handler_sdl.h
+	render_handler_tri.h
 
 # bin_PROGRAMS = gnash
 
 pkglib_LTLIBRARIES = libgnashbackend.la
 
 # RENDER_SOURCES = render_handler_tri.cpp
-SOUND_SOURCES = 
-
-if USE_SOUND_GST
-SOUND_SOURCES += sound_handler_gst.cpp sound_handler_gst.h 
-libgnashbackend_LIBS += $(GSTREAMER_LIBS) 
-libgnashbackend_LIBS += $(LIBXML_LIBS) 
-AM_CPPFLAGS += $(GSTREAMER_CFLAGS)
-AM_CPPFLAGS += $(LIBXML_CFLAGS)
-endif
-
-if USE_SOUND_SDL
-SOUND_SOURCES += sound_handler_sdl.cpp sound_handler_sdl.h
-if USE_FFMPEG_ENGINE
-libgnashbackend_LIBS += $(FFMPEG_LIBS)
-AM_CPPFLAGS += $(FFMPEG_CFLAGS)
-endif
-if USE_MAD_ENGINE
-libgnashbackend_LIBS += $(MAD_LIBS)
-AM_CPPFLAGS += $(MAD_CFLAGS)
-endif
-endif
 
 libgnashbackend_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/server/libgnashserver.la  \
 	$(libgnashbackend_LIBS)
 
-libgnashbackend_la_SOURCES = $(SOUND_SOURCES)
+libgnashbackend_la_SOURCES = 
+#$(SOUND_SOURCES)
 
 libgnashbackend_la_LDFLAGS = -release $(VERSION)
 
