@@ -385,6 +385,15 @@ Note that this will not work with every website; some embedded Flash files are d
 	    </entry>
 	  </row>
 	<row>
+	<row>
+	<entry>
+	  <option>CTRL-L</option>
+	  </entry>
+	    <entry>
+	      Force immediate redraw.
+	    </entry>
+	  </row>
+
 <!--
 	<entry>
 	  <option>CTRL-A</option>

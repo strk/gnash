@@ -1,3 +1,11 @@
+2007-09-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* docs/C/usage.xml, gui/gnash.cpp: add/update Ctrl-L
+	* gui/gui.cpp: make keyboard shortcuts work for both upper and lower
+	  case. Correct step back ('[') and forward (']'), which are documented to
+	  need Ctrl and were the wrong way round. Function menu_step_forward
+	  is correctly called, but apparently doesn't work.
+
 2007-09-27 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/MovieTester.{cpp,h}: add restart() method.

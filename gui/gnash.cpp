@@ -143,7 +143,7 @@ usage()
         "  CTRL-R          Restart the movie\n"
         "  CTRL-[ or kp-   Step back one frame\n"
         "  CTRL-] or kp+   Step forward one frame\n"
-	"  CTRL-L          Force full redraw of next frame\n"
+	"  CTRL-L          Force immediate redraw\n"
         "  CTRL-B          Toggle background color\n"
 /*
         "  CTRL-A          Toggle antialiasing (doesn't work)\n"
