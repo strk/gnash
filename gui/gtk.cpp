@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.117 2007/09/26 19:14:07 strk Exp $ */
+/* $Id: gtk.cpp,v 1.118 2007/09/27 13:56:28 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -514,76 +514,37 @@ GtkGui::menuitem_preferences_callback(GtkMenuItem* /*menuitem*/, gpointer /*data
 {
 //    GNASH_REPORT_FUNCTION;
     
-    GtkWidget *window1;
-    GtkWidget *notebook1;
-    GtkWidget *frame1;
-    GtkWidget *alignment1;
-    GtkWidget *table1;
-    GtkWidget *label5;
-    GtkWidget *hscale1;
-    GtkWidget *label6;
-    GtkWidget *checkbutton1;
-    GtkWidget *label7;
-    GtkWidget *logfilenameentry;
-    GtkWidget *label8;
-    GtkWidget *parseroutputcheckbutton2;
-    GtkWidget *label9;
-    GtkWidget *debugActionScriptcheckbutton3;
-    GtkWidget *label10;
-    GtkWidget *debuggercheckbutton4;
-    GtkWidget *label4;
-    GtkWidget *label1;
-    GtkWidget *frame2;
-    GtkWidget *alignment2;
-    GtkWidget *table4;
-    GtkWidget *label13;
-    GtkWidget *label15;
-    GtkWidget *label16;
-    GtkWidget *whitelistcomboboxentry1;
-    GtkWidget *blacklistcomboboxentry2;
-    GtkWidget *localhostcheckbutton8;
-    GtkWidget *localdomaincheckbutton9;
-    GtkWidget *label11;
-    GtkWidget *label2;
-    GtkWidget *frame3;
-    GtkWidget *alignment3;
-    GtkWidget *table5;
-    GtkWidget *label17;
-    GtkWidget *checkbutton7;
-    GtkWidget *label12;
-    GtkWidget *label3;
-    
     RcInitFile& rcfile = RcInitFile::getDefaultInstance();
-    
-    window1 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title (GTK_WINDOW (window1), "Gnash preferences");
-    
-    notebook1 = gtk_notebook_new ();
+
+    GtkWidget *window1 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title (GTK_WINDOW (window1), _("Gnash preferences"));
+
+    GtkWidget *notebook1 = gtk_notebook_new ();
     gtk_widget_show (notebook1);
     gtk_container_add (GTK_CONTAINER (window1), notebook1);
-    
-    frame1 = gtk_frame_new (NULL);
+
+    GtkWidget *frame1 = gtk_frame_new (NULL);
     gtk_widget_show (frame1);
     gtk_container_add (GTK_CONTAINER (notebook1), frame1);
     gtk_frame_set_shadow_type (GTK_FRAME (frame1), GTK_SHADOW_NONE);
     
-    alignment1 = gtk_alignment_new (0.5, 0.5, 1, 1);
+    GtkWidget *alignment1 = gtk_alignment_new (0.5, 0.5, 1, 1);
     gtk_widget_show (alignment1);
     gtk_container_add (GTK_CONTAINER (frame1), alignment1);
     gtk_alignment_set_padding (GTK_ALIGNMENT (alignment1), 0, 0, 12, 0);
     
-    table1 = gtk_table_new (6, 2, FALSE);
+    GtkWidget *table1 = gtk_table_new (6, 2, FALSE);
     gtk_widget_show (table1);
     gtk_container_add (GTK_CONTAINER (alignment1), table1);
     
-    label5 = gtk_label_new ("Verbosity");
+    GtkWidget *label5 = gtk_label_new (_("Verbosity"));
     gtk_widget_show (label5);
     gtk_table_attach (GTK_TABLE (table1), label5, 0, 1, 0, 1,
                       (GtkAttachOptions) (GTK_FILL),
                       (GtkAttachOptions) (0), 0, 0);
     gtk_misc_set_alignment (GTK_MISC (label5), 0, 0.5);
-    
-    hscale1 = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (rcfile.verbosityLevel(), 0, 10, 1, 0, 0)));
+
+    GtkWidget *hscale1 = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (rcfile.verbosityLevel(), 0, 10, 1, 0, 0)));
     gtk_widget_show (hscale1);
     gtk_table_attach (GTK_TABLE (table1), hscale1, 1, 2, 0, 1,
                       (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
@@ -591,14 +552,14 @@ GtkGui::menuitem_preferences_callback(GtkMenuItem* /*menuitem*/, gpointer /*data
     gtk_scale_set_digits (GTK_SCALE (hscale1), 0);
     gtk_range_set_update_policy (GTK_RANGE (hscale1), GTK_UPDATE_DISCONTINUOUS);
     
-    label6 = gtk_label_new ("Log to file");
+    GtkWidget *label6 = gtk_label_new (_("Log to file"));
     gtk_widget_show (label6);
     gtk_table_attach (GTK_TABLE (table1), label6, 0, 1, 1, 2,
                       (GtkAttachOptions) (GTK_FILL),
                       (GtkAttachOptions) (0), 0, 0);
     gtk_misc_set_alignment (GTK_MISC (label6), 0, 0.5);
     
-    checkbutton1 = gtk_check_button_new_with_mnemonic ("");
+    GtkWidget *checkbutton1 = gtk_check_button_new_with_mnemonic ("");
     gtk_widget_show (checkbutton1);
     gtk_table_attach (GTK_TABLE (table1), checkbutton1, 1, 2, 1, 2,
                       (GtkAttachOptions) (GTK_FILL),
@@ -609,14 +570,14 @@ GtkGui::menuitem_preferences_callback(GtkMenuItem* /*menuitem*/, gpointer /*data
     else 
   	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (checkbutton1), FALSE);
     
-    label7 = gtk_label_new ("Log File name");
+    GtkWidget *label7 = gtk_label_new (_("Log File name"));
     gtk_widget_show (label7);
     gtk_table_attach (GTK_TABLE (table1), label7, 0, 1, 2, 3,
                       (GtkAttachOptions) (GTK_FILL),
                       (GtkAttachOptions) (0), 0, 0);
     gtk_misc_set_alignment (GTK_MISC (label7), 0, 0.5);
     
-    logfilenameentry = gtk_entry_new ();
+    GtkWidget *logfilenameentry = gtk_entry_new ();
     gtk_widget_show (logfilenameentry);
     gtk_table_attach (GTK_TABLE (table1), logfilenameentry, 1, 2, 2, 3,
                       (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
@@ -630,14 +591,14 @@ GtkGui::menuitem_preferences_callback(GtkMenuItem* /*menuitem*/, gpointer /*data
         gtk_widget_set_sensitive(logfilenameentry,FALSE);
     }
     
-    label8 = gtk_label_new ("Parser output");
+    GtkWidget *label8 = gtk_label_new (_("Parser output"));
     gtk_widget_show (label8);
     gtk_table_attach (GTK_TABLE (table1), label8, 0, 1, 3, 4,
                       (GtkAttachOptions) (GTK_FILL),
                       (GtkAttachOptions) (0), 0, 0);
     gtk_misc_set_alignment (GTK_MISC (label8), 0, 0.5);
     
-    parseroutputcheckbutton2 = gtk_check_button_new_with_mnemonic ("");
+    GtkWidget *parseroutputcheckbutton2 = gtk_check_button_new_with_mnemonic ("");
     gtk_widget_show (parseroutputcheckbutton2);
     gtk_table_attach (GTK_TABLE (table1), parseroutputcheckbutton2, 1, 2, 3, 4,
                       (GtkAttachOptions) (GTK_FILL),
@@ -648,14 +609,14 @@ GtkGui::menuitem_preferences_callback(GtkMenuItem* /*menuitem*/, gpointer /*data
     else 
   	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (parseroutputcheckbutton2), FALSE);
     
-    label9 = gtk_label_new ("Debug ActionScript");
+    GtkWidget *label9 = gtk_label_new (_("Debug ActionScript"));
     gtk_widget_show (label9);
     gtk_table_attach (GTK_TABLE (table1), label9, 0, 1, 4, 5,
                       (GtkAttachOptions) (GTK_FILL),
                       (GtkAttachOptions) (0), 0, 0);
     gtk_misc_set_alignment (GTK_MISC (label9), 0, 0.5);
     
-    debugActionScriptcheckbutton3 = gtk_check_button_new_with_mnemonic ("");
+    GtkWidget *debugActionScriptcheckbutton3 = gtk_check_button_new_with_mnemonic ("");
     gtk_widget_show (debugActionScriptcheckbutton3);
     gtk_table_attach (GTK_TABLE (table1), debugActionScriptcheckbutton3, 1, 2, 4, 5,
                       (GtkAttachOptions) (GTK_FILL),
@@ -667,14 +628,14 @@ GtkGui::menuitem_preferences_callback(GtkMenuItem* /*menuitem*/, gpointer /*data
   	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (debugActionScriptcheckbutton3), FALSE);
     }
 
-    label10 = gtk_label_new ("Debugger");
+    GtkWidget *label10 = gtk_label_new (_("Debugger"));
     gtk_widget_show (label10);
     gtk_table_attach (GTK_TABLE (table1), label10, 0, 1, 5, 6,
                       (GtkAttachOptions) (GTK_FILL),
                       (GtkAttachOptions) (0), 0, 0);
     gtk_misc_set_alignment (GTK_MISC (label10), 0, 0.5);
-    
-    debuggercheckbutton4 = gtk_check_button_new_with_mnemonic ("");
+
+    GtkWidget *debuggercheckbutton4 = gtk_check_button_new_with_mnemonic ("");
     gtk_widget_show (debuggercheckbutton4);
     gtk_table_attach (GTK_TABLE (table1), debuggercheckbutton4, 1, 2, 5, 6,
                       (GtkAttachOptions) (GTK_FILL),
@@ -686,63 +647,63 @@ GtkGui::menuitem_preferences_callback(GtkMenuItem* /*menuitem*/, gpointer /*data
   	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (debuggercheckbutton4), FALSE);
     }
     
-    label4 = gtk_label_new ("<b>Logging preferences</b>");
+    GtkWidget *label4 = gtk_label_new (_("<b>Logging preferences</b>"));
     gtk_widget_show (label4);
     gtk_frame_set_label_widget (GTK_FRAME (frame1), label4);
     gtk_label_set_use_markup (GTK_LABEL (label4), TRUE);
     
-    label1 = gtk_label_new ("Logging");
+    GtkWidget *label1 = gtk_label_new (_("Logging"));
     gtk_widget_show (label1);
     gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 0), label1);
     
-    frame2 = gtk_frame_new (NULL);
+    GtkWidget *frame2 = gtk_frame_new (NULL);
     gtk_widget_show (frame2);
     gtk_container_add (GTK_CONTAINER (notebook1), frame2);
     gtk_frame_set_shadow_type (GTK_FRAME (frame2), GTK_SHADOW_NONE);
     
-    alignment2 = gtk_alignment_new (0.5, 0.5, 1, 1);
+    GtkWidget *alignment2 = gtk_alignment_new (0.5, 0.5, 1, 1);
     gtk_widget_show (alignment2);
     gtk_container_add (GTK_CONTAINER (frame2), alignment2);
     gtk_alignment_set_padding (GTK_ALIGNMENT (alignment2), 0, 0, 12, 0);
     
-    table4 = gtk_table_new (4, 2, FALSE);
+    GtkWidget *table4 = gtk_table_new (4, 2, FALSE);
     gtk_widget_show (table4);
     gtk_container_add (GTK_CONTAINER (alignment2), table4);
     
-    label13 = gtk_label_new ("Allow remote access from: ");
+    GtkWidget *label13 = gtk_label_new (_("Allow remote access from: "));
     gtk_widget_show (label13);
     gtk_table_attach (GTK_TABLE (table4), label13, 0, 1, 0, 1,
                       (GtkAttachOptions) (GTK_FILL),
                       (GtkAttachOptions) (0), 0, 0);
     gtk_misc_set_alignment (GTK_MISC (label13), 0, 0.5);
     
-    label15 = gtk_label_new ("Whitelist");
+    GtkWidget *label15 = gtk_label_new (_("Whitelist"));
     gtk_widget_show (label15);
     gtk_table_attach (GTK_TABLE (table4), label15, 0, 1, 2, 3,
                       (GtkAttachOptions) (GTK_FILL),
                       (GtkAttachOptions) (0), 0, 0);
     gtk_misc_set_alignment (GTK_MISC (label15), 0, 0.5);
     
-    label16 = gtk_label_new ("Blacklist");
+    GtkWidget *label16 = gtk_label_new (_("Blacklist"));
     gtk_widget_show (label16);
     gtk_table_attach (GTK_TABLE (table4), label16, 0, 1, 3, 4,
                       (GtkAttachOptions) (GTK_FILL),
                       (GtkAttachOptions) (0), 0, 0);
     gtk_misc_set_alignment (GTK_MISC (label16), 0, 0.5);
     
-    whitelistcomboboxentry1 = gtk_combo_box_entry_new_text ();
+    GtkWidget *whitelistcomboboxentry1 = gtk_combo_box_entry_new_text ();
     gtk_widget_show (whitelistcomboboxentry1);
     gtk_table_attach (GTK_TABLE (table4), whitelistcomboboxentry1, 1, 2, 2, 3,
                       (GtkAttachOptions) (GTK_FILL),
                       (GtkAttachOptions) (GTK_FILL), 0, 0);
     
-    blacklistcomboboxentry2 = gtk_combo_box_entry_new_text ();
+    GtkWidget *blacklistcomboboxentry2 = gtk_combo_box_entry_new_text ();
     gtk_widget_show (blacklistcomboboxentry2);
     gtk_table_attach (GTK_TABLE (table4), blacklistcomboboxentry2, 1, 2, 3, 4,
                       (GtkAttachOptions) (GTK_FILL),
                       (GtkAttachOptions) (GTK_FILL), 0, 0);
     
-    localhostcheckbutton8 = gtk_check_button_new_with_mnemonic ("local host only");
+    GtkWidget *localhostcheckbutton8 = gtk_check_button_new_with_mnemonic (_("local host only"));
     gtk_widget_show (localhostcheckbutton8);
     gtk_table_attach (GTK_TABLE (table4), localhostcheckbutton8, 1, 2, 0, 1,
                       (GtkAttachOptions) (GTK_FILL),
@@ -754,7 +715,7 @@ GtkGui::menuitem_preferences_callback(GtkMenuItem* /*menuitem*/, gpointer /*data
   	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (localhostcheckbutton8), FALSE);
     }
     
-    localdomaincheckbutton9 = gtk_check_button_new_with_mnemonic ("local domain only");
+    GtkWidget *localdomaincheckbutton9 = gtk_check_button_new_with_mnemonic (_("local domain only"));
     gtk_widget_show (localdomaincheckbutton9);
     gtk_table_attach (GTK_TABLE (table4), localdomaincheckbutton9, 1, 2, 1, 2,
                       (GtkAttachOptions) (GTK_FILL),
@@ -766,37 +727,37 @@ GtkGui::menuitem_preferences_callback(GtkMenuItem* /*menuitem*/, gpointer /*data
   	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (localdomaincheckbutton9), FALSE);
     }
     
-    label11 = gtk_label_new ("<b>Security preferences</b>");
+    GtkWidget *label11 = gtk_label_new (_("<b>Security preferences</b>"));
     gtk_widget_show (label11);
     gtk_frame_set_label_widget (GTK_FRAME (frame2), label11);
     gtk_label_set_use_markup (GTK_LABEL (label11), TRUE);
     
-    label2 = gtk_label_new ("Security");
+    GtkWidget *label2 = gtk_label_new (_("Security"));
     gtk_widget_show (label2);
     gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 1), label2);
     
-    frame3 = gtk_frame_new (NULL);
+    GtkWidget *frame3 = gtk_frame_new (NULL);
     gtk_widget_show (frame3);
     gtk_container_add (GTK_CONTAINER (notebook1), frame3);
     gtk_frame_set_shadow_type (GTK_FRAME (frame3), GTK_SHADOW_NONE);
     
-    alignment3 = gtk_alignment_new (0.5, 0.5, 1, 1);
+    GtkWidget *alignment3 = gtk_alignment_new (0.5, 0.5, 1, 1);
     gtk_widget_show (alignment3);
     gtk_container_add (GTK_CONTAINER (frame3), alignment3);
     gtk_alignment_set_padding (GTK_ALIGNMENT (alignment3), 0, 0, 12, 0);
     
-    table5 = gtk_table_new (3, 2, FALSE);
+    GtkWidget *table5 = gtk_table_new (3, 2, FALSE);
     gtk_widget_show (table5);
     gtk_container_add (GTK_CONTAINER (alignment3), table5);
-    
-    label17 = gtk_label_new ("Enable sound");
+
+    GtkWidget *label17 = gtk_label_new (_("Enable sound"));
     gtk_widget_show (label17);
     gtk_table_attach (GTK_TABLE (table5), label17, 0, 1, 0, 1,
                       (GtkAttachOptions) (GTK_FILL),
                       (GtkAttachOptions) (0), 0, 0);
     gtk_misc_set_alignment (GTK_MISC (label17), 0, 0.5);
     
-    checkbutton7 = gtk_check_button_new_with_mnemonic ("");
+    GtkWidget *checkbutton7 = gtk_check_button_new_with_mnemonic ("");
     gtk_widget_show (checkbutton7);
     gtk_table_attach (GTK_TABLE (table5), checkbutton7, 1, 2, 0, 1,
                       (GtkAttachOptions) (GTK_FILL),
@@ -807,12 +768,12 @@ GtkGui::menuitem_preferences_callback(GtkMenuItem* /*menuitem*/, gpointer /*data
   	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (checkbutton7), FALSE);
     }
     
-    label12 = gtk_label_new ("<b>Sound preferences</b>");
+    GtkWidget *label12 = gtk_label_new (_("<b>Sound preferences</b>"));
     gtk_widget_show (label12);
     gtk_frame_set_label_widget (GTK_FRAME (frame3), label12);
     gtk_label_set_use_markup (GTK_LABEL (label12), TRUE);
     
-    label3 = gtk_label_new ("Sound");
+    GtkWidget *label3 = gtk_label_new (_("Sound"));
     gtk_widget_show (label3);
     gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 2), label3);
 
@@ -971,7 +932,7 @@ GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
     GtkWidget *main_vbox = gtk_vbox_new(FALSE, 2);
     gtk_container_add (GTK_CONTAINER (window1), main_vbox);
 
-    GtkWidget *frame1 = gtk_frame_new("Movie Properties");
+    GtkWidget *frame1 = gtk_frame_new(_("Movie Properties"));
     gtk_box_pack_start (GTK_BOX (main_vbox), frame1, TRUE, TRUE, 0);
 
     GtkWidget *vbox1 = gtk_vbox_new (FALSE, 3);
@@ -980,7 +941,7 @@ GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
     GtkWidget *vbox2 = gtk_vbox_new (FALSE, 2);
     gtk_box_pack_start (GTK_BOX (vbox1), vbox2, FALSE, FALSE, 0);
 
-    GtkWidget *label_vbox2 = gtk_label_new("VM Properties");
+    GtkWidget *label_vbox2 = gtk_label_new(_("VM Properties"));
     gtk_box_pack_start (GTK_BOX (vbox2), label_vbox2, FALSE, FALSE, 0);
 
     GtkWidget *table1 = gtk_table_new(4, 2, FALSE);
@@ -1072,7 +1033,7 @@ GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
             renderer = gtk_cell_renderer_text_new ();
             g_object_set (renderer, "xalign", 0.0, NULL);
             col_offset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
-	       						       -1, "Depth",
+	       						       -1, _("Depth"),
 							       renderer, "text",
 							       NODENAME_COLUMN,
 							       NULL);
@@ -1083,7 +1044,7 @@ GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
             renderer = gtk_cell_renderer_text_new ();
             g_object_set (renderer, "xalign", 0.0, NULL);
             col_offset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
-							       -1, "Variable",
+							       -1, _("Variable"),
 							       renderer, "text",
 							       STRING1_COLUMN,
 							       NULL);
@@ -1094,7 +1055,7 @@ GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
             renderer = gtk_cell_renderer_text_new ();
             g_object_set (renderer, "xalign", 0.0, NULL);
             col_offset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
-							       -1, "Value",
+							       -1, _("Value"),
 							       renderer, "text",
 							       STRING2_COLUMN,
 							       NULL);
@@ -1398,19 +1359,9 @@ GtkGui::gdk_to_gnash_key(guint key)
         c = (gnash::key::code) ((key - GDK_KP_0) + gnash::key::KP_0);
     }
 
-    // Extended ascii, missing out non-ascii gdk characters:
-    else if (key >= GDK_nobreakspace && key <= GDK_ETH) {
-        c = (gnash::key::code) ((key - GDK_nobreakspace) + gnash::key::NOBREAKSPACE); 
-    }
-
-    else if (key >= GDK_Ntilde && key <= GDK_Ooblique ) {
-        c = (gnash::key::code) ((key - GDK_Ntilde) + gnash::key::NTILDE);
-    } else if (key >= GDK_Ugrave && key <= GDK_THORN) {
-        c = (gnash::key::code) ((key - GDK_Ugrave) + gnash::key::UGRAVE);
-    } else if (key >= GDK_ssharp && key <= GDK_oslash) {
-        c = (gnash::key::code) ((key - GDK_ssharp) + gnash::key::sSHARP);
-    } else if (key >= GDK_ugrave && key <= GDK_ydiaeresis) {
-        c = (gnash::key::code) ((key - GDK_ugrave) + gnash::key::uGRAVE);
+    // Extended ascii:
+    else if (key >= GDK_nobreakspace && key <= GDK_ydiaeresis) {
+        c = (gnash::key::code) ((key - GDK_nobreakspace) + gnash::key::NOBREAKSPACE);
     }
 
     // non-character keys don't correlate, so use a look-up table.
