@@ -159,7 +159,7 @@ main(int argc, char** argv)
   check_equals(mo, "_root.x6.toString()", "4");
   add_actions(mo, " gotoAndStop(x6); ");  // ActionGotoExpression
   /* toString() not invoked for String Object ??? */
-  xcheck_equals(mo, "_currentframe", "3");
+  check_equals(mo, "_currentframe", "3");
   
   /* This ensure the movie stop at the last frame,
    * and the actions in last frame will not be pushed again 

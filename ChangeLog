@@ -1,3 +1,17 @@
+2007-09-28 Sandro Santilli <strk@keybit.net>
+
+	* server/as_object.h: add useCustomToString method to handle corner
+	  cases for which an ActionScript class doesn't want to use toString
+	  methods, when available, for converting to a string.
+	* server/as_value.cpp (to_string): check with useCustomToString if
+	  for an object value we should or not call the ActionScript toString
+	  method.
+	* server/asobj/string.cpp: override useCustomToString to return false
+	  and act as dumb and complex as the proprietary player (urgh)
+	* testsuite/actionscript.all/toString_valueOf.as: two tests fixed.
+	* testsuite/misc-ming.all/get_frame_number_test.c: one test fixed.
+	* testsuite/swfdec/PASSING: three tests fixed.
+
 2007-09-27 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Global.as: test that parseInt() would

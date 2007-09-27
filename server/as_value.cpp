@@ -133,6 +133,12 @@ as_value::to_string(as_environment* env) const
 			// instead.
 			//
 			as_object* obj = m_object_value; 
+			if ( ! obj->useCustomToString() )
+			{
+				m_string_value = obj->get_text_value();
+				return m_string_value;
+			}
+
 			bool gotValidToStringResult = false;
 			if ( env )
 			{

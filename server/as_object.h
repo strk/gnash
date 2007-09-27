@@ -141,6 +141,11 @@ public:
 	/// Return a text representation for this object
 	virtual std::string get_text_value() const { return "[object Object]"; }
 
+	/// Return true if instances of this ActionScript class should use 
+	/// a custom toString method, when available, for converting the object
+	/// to a string.
+	virtual bool useCustomToString() const { return true; }
+
 	/// Return the numeric value of this object
 	//
 	/// The default implementation converts the text value

@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.36 2007/08/31 21:53:32 strk Exp $ */
+/* $Id: string.cpp,v 1.37 2007/09/27 22:20:07 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -119,6 +119,8 @@ public:
             :
             as_object(getStringInterface())
     {}
+
+    bool useCustomToString() const { return false; }
 
     std::string get_text_value() const
     {
