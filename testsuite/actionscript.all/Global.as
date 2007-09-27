@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Global.as,v 1.27 2007/08/31 21:53:33 strk Exp $";
+rcsid="$Id: Global.as,v 1.28 2007/09/27 15:42:11 strk Exp $";
 
 #include "check.as"
 
@@ -72,6 +72,7 @@ check ( isNaN(parseInt('zero')) );
 check ( ! isFinite(parseInt('none')) );
 check ( ! isFinite(1/0) );
 check ( ! isNaN(1/0) );
+check_equals (parseInt(new String("10")), 10);
 
 // It's not reliable to compare a double type with ==, so we'll give it a
 // small range using >= and <=

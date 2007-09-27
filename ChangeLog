@@ -1,3 +1,12 @@
+2007-09-27 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Global.as: add test for
+	  parseInt(<stringObject>).
+	* server/asobj/Global.cpp (as_global_parseint): fix
+	  the parseInt(<stringObject>) case
+	* testsuite/actionscript.all/toString_valueOf.as: xcheck =>
+	  xcheck_equals
+
 2007-09-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gnash.cpp: remove ESC = Quit from gnash --help output. It's not true

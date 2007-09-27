@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.70 2007/09/24 15:39:31 cmusick Exp $ */
+/* $Id: Global.cpp,v 1.71 2007/09/27 15:42:11 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -189,7 +189,8 @@ as_global_parsefloat(const fn_call& fn)
 static as_value
 as_global_parseint(const fn_call& fn)
 {
-    as_environment* env = &fn.env();
+    as_environment& env = fn.env();
+
     // assert(fn.nargs == 2 || fn.nargs == 1);
     if (fn.nargs < 1) {
 	IF_VERBOSE_ASCODING_ERRORS(
@@ -202,16 +203,26 @@ as_global_parseint(const fn_call& fn)
             log_aserror(_("%s has more than two arguments"), __FUNCTION__);
     )
 
+#if 0 // seems useless, will be done later
     // Make sure our argument is the correct type
     if (fn.nargs > 1)
+    {
 	fn.arg(1).convert_to_number(env);
+    }
+#endif
 
+    const std::string& expr = fn.arg(0).to_string(&env);
+
+    int base = 10; // the default base
+    
     // Set up some variables
     const string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    boost::scoped_array<char> input_buffer ( new char[fn.arg(0).to_string().size()+1] );
+
+    // TODO: does all this copying make any sense ?
+    //       Use a std::string::iterator instead ?
+    boost::scoped_array<char> input_buffer ( new char[expr.size()+1] );
     char *input = input_buffer.get();
-    strcpy(input,fn.arg(0).to_string().c_str());
-    int base;
+    strcpy(input, expr.c_str());
     bool bNegative;
 
     // Skip leading whitespace
@@ -234,7 +245,7 @@ as_global_parseint(const fn_call& fn)
     if (fn.nargs > 1)
 	{
 	    // to_number returns a double. atoi() would be better
-	    base = (int)(fn.arg(1).to_number(env));
+	    base = (int)(fn.arg(1).to_number(&env));
 	}
     // if the string starts with "0x" then a hex digit
     else if (strlen(input) > 2 && input[0] == '0' && input[1] == 'X'
@@ -252,7 +263,7 @@ as_global_parseint(const fn_call& fn)
 	}
     else
 	// default base is 10
-	base = 10;
+	assert(base == 10);
 
     if (base < 2 || base > 36)
 	{

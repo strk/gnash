@@ -186,8 +186,8 @@ check(str3 == 102);
 String.prototype.toString = function () {return "TO_STRING";};
 String.prototype.valueOf = function () {return "TO_VALUE";};
 
-xcheck(parseInt(str1) == 10); 
-xcheck(parseInt(str2) == 2);  
+xcheck_equals(parseInt(str1), 10); 
+xcheck_equals(parseInt(str2), 2);  
 str3 =  str1 + str2;
 check(typeof(str3) == "string");
 //valueOf called
