@@ -1,5 +1,11 @@
 2007-09-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* configure.ac, testsuite/libbase/TCXXRc.cpp, gnashrc-local.in: add
+	  second rc file and test for append blacklist.
+	* docs: update user manual with black- and whitelist information.
+
+2007-09-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* libbase/rc.cpp: for whitelists and blacklists, 'set' overrides
 	  lists from previous files, 'append' adds to previous files.
 	* testsuite/libbase/gnashrc.in: update tests, replace colons (old

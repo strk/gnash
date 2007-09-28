@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.424 2007/09/27 23:59:50 tgc Exp $
+dnl $Id: configure.ac,v 1.425 2007/09/28 09:28:59 bwy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1444,6 +1444,7 @@ AC_SUBST(MEDIA_CONFIG)
 
 dnl AC_CONFIG_LINKS(doc/C/images)
 AC_CONFIG_LINKS(testsuite/libbase/gnashrc:testsuite/libbase/gnashrc.in)
+AC_CONFIG_LINKS(testsuite/libbase/gnashrc-local:testsuite/libbase/gnashrc-local.in)
 
 AC_OUTPUT(Makefile
 libmedia/Makefile

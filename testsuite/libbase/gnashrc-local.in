@@ -1,0 +1,3 @@
+# Don't access content from these sites
+# Test for append to list
+append blacklist www.gnashdev.org www.wikipedia.de

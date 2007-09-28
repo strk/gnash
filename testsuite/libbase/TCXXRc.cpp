@@ -208,5 +208,25 @@ main (int /*argc*/, char** /*argv*/) {
     } else {
         runtest.fail ("rc.getBlackList() doesn't have elements");        
     }
+
+    // Parse a second file
+    if (rc.parseFile("gnashrc-local")) {
+
+	// Test whether blacklist in gnashrc-local is appended
+        std::vector<std::string> blacklist = rc.getBlackList();
+        if (blacklist.size()) {
+            if ((blacklist[2] == "www.gnashdev.org")
+                && (blacklist[3] == "www.wikipedia.de")) {
+                runtest.pass ("rc.getBlackList() - append");
+            } else {
+                runtest.fail ("rc.getBlackList() - append");
+            }
+            runtest.pass ("rc.getBlackList() has elements after append");
+        } else {
+            runtest.fail ("rc.getBlackList() doesn't have elements after append");        
+        }
+
+    }
+
 }
 
