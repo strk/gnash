@@ -1,3 +1,11 @@
+2007-09-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/rc.cpp: for whitelists and blacklists, 'set' overrides
+	  lists from previous files, 'append' adds to previous files.
+	* testsuite/libbase/gnashrc.in: update tests, replace colons (old
+	  behaviour) with spaces (new behaviour) in lists. Please update
+	  your own lists, as old behaviour must eventually disappear.
+
 2007-09-28 Sandro Santilli <strk@keybit.net>
 
  	* testsuite/actionscript.all/toString_valueOf.as: few more tests

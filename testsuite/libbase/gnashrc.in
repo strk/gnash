@@ -8,10 +8,7 @@ set localdomain on
 set localhost on
 
 # These sites are OK
-set whitelist www.doonesbury.com:www.cnn.com:www.9news.com
-
-# Don't access content from these sites
-set blacklist www.doubleclick.com:www.ebay.com
+set whitelist www.doonesbury.com www.cnn.com www.9news.com
 
 # The delay between timer interupts
 set delay 50
@@ -54,3 +51,9 @@ set startStopped on
 # of inactivity. Every activity resets the timer
 #
 set streamsTimeout 1.5
+
+# Don't access content from these sites
+# A blacklist or whitelist should be the last line in the file,
+# since these are the only values that can cause problems due to
+# the parser looping too many times.
+set blacklist www.doubleclick.com www.ebay.com

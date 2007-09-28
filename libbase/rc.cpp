@@ -270,53 +270,39 @@ RcInitFile::parseFile(const std::string& filespec)
         
         // Read in each line and parse it
         while (!in.eof()) {
+
+	    // Make sure action is empty, otherwise the last loop (with no new
+	    // data) keeps action, variable and value from the previous loop. This
+	    // causes problems if set blacklist or set whitelist are last, because
+	    // value is erased while parsing and the lists are thus deleted.
+	    action.clear();
+
             // Get the first token
             in >> action;
+
             // Ignore comment lines
             if (action[0] == '#') {
-//        log_msg ("Ignoring comment line");
                 // suck up the rest of the line
                 char name[128];
                 in.getline(name, 128);
                 continue;
-            }
+            } 
             
+	    // Get second token
             in >> variable;
+
+	    // Read in rest of line for parsing.
             getline(in, value);
+
+	    // Erase leading spaces.
             string::size_type position = value.find_first_not_of(' ');
             if(position != string::npos) value.erase(0, position);
 
-            //      log_msg ("%s %s %s", action, variable, value);
-            
-            if (action == "set") {
-                extractSetting(&_splash_screen, "splash_screen", variable,
-                               value);
-                extractSetting(&_localhost_only, "localhost", variable,
-                               value);
-                extractSetting(&_localdomain_only, "localdomain", variable,
-                               value);
-                extractSetting(&_debugger, "debugger", variable, value);
-                extractSetting(&_actiondump, "actionDump", variable, value);
-                extractSetting(&_parserdump, "parserDump", variable, value);
-                extractSetting(&_writelog, "writelog", variable, value);
-                extractSetting(&_sound, "sound", variable, value);
-                extractSetting(&_plugin_sound, "pluginsound", variable, value);
-                extractSetting(&_verboseASCodingErrors,
-                               "ASCodingErrorsVerbosity", variable, value);
-                extractSetting(&_verboseMalformedSWF, "MalformedSWFVerbosity",
-                               variable, value);
-                extractSetting(&_extensionsEnabled, "EnableExtensions",
-                               variable, value);
-                extractSetting(&_startStopped, "StartStopped", variable, value);
-
-                extractDouble(_streamsTimeout, "StreamsTimeout", variable, value);
-                
-                extractNumber(&_delay, "delay", variable, value);
-                extractNumber(&_verbosity, "verbosity", variable, value);
+            if (action == "set" || action == "append") {
 
                 if (variable == "flashVersionString") {
                     _flashVersionString = value;
-                    continue;
+		                    continue;
                 }
 
                 if (variable == "debuglog") {
@@ -330,6 +316,10 @@ RcInitFile::parseFile(const std::string& filespec)
                 }
                 
                 if (variable == "blacklist") {
+		    // 'set' should override all previous blacklists
+		    // else 'append' should add to the end.
+		    if (action == "set") _blacklist.clear();
+
                     string::size_type pos;
                     //This is an ugly way to avoid breaking lists
                     //Lists will work if they worked before, but
@@ -349,6 +339,8 @@ RcInitFile::parseFile(const std::string& filespec)
                 }
 
                 if (variable == "whitelist") {
+		    if (action == "set") _whitelist.clear();
+		    
                     string::size_type pos;
                     //This is an ugly way to avoid breaking lists
                     //Lists will work if they worked before, but
@@ -366,8 +358,36 @@ RcInitFile::parseFile(const std::string& filespec)
                     }
                     continue;
                 }
+
+		if (action == "set") {
+                     extractSetting(&_splash_screen, "splash_screen", variable,
+                               value);
+                     extractSetting(&_localhost_only, "localhost", variable,
+                               value);
+                     extractSetting(&_localdomain_only, "localdomain", variable,
+                               value);
+                     extractSetting(&_debugger, "debugger", variable, value);
+                     extractSetting(&_actiondump, "actionDump", variable, value);
+                     extractSetting(&_parserdump, "parserDump", variable, value);
+                     extractSetting(&_writelog, "writelog", variable, value);
+                     extractSetting(&_sound, "sound", variable, value);
+                     extractSetting(&_plugin_sound, "pluginsound", variable, value);
+                     extractSetting(&_verboseASCodingErrors,
+                               "ASCodingErrorsVerbosity", variable, value);
+                     extractSetting(&_verboseMalformedSWF, "MalformedSWFVerbosity",
+                               variable, value);
+                     extractSetting(&_extensionsEnabled, "EnableExtensions",
+                               variable, value);
+                     extractSetting(&_startStopped, "StartStopped", variable, value);
+
+                     extractDouble(_streamsTimeout, "StreamsTimeout", variable, value);
+                
+                     extractNumber(&_delay, "delay", variable, value);
+                     extractNumber(&_verbosity, "verbosity", variable, value);
+		}
             }
         }
+
     } else {
         if (in) {
             in.close();
@@ -378,8 +398,7 @@ RcInitFile::parseFile(const std::string& filespec)
     if (in) {
         in.close();
     }
-    
-    
+
     return true;
 }
 
