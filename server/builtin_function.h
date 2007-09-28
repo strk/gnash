@@ -37,9 +37,24 @@ class builtin_function : public as_function
 
 public:
 
-	/// Construct a builtin function/class
+	/// Construct a builtin function/class with a default interface
 	//
+	/// The default interface will have a constructor member set as 'this'
 	///
+	/// @param func
+	///	The C function to call when this as_function is invoked.
+	/// 	For classes, the function pointer is the constructor.
+	///
+	builtin_function(as_c_function_ptr func)
+		:
+		as_function(),
+		_func(func)
+	{
+		init_member("constructor", this);
+	}
+
+	/// Construct a builtin function/class with the given interface (possibly none)
+	//
 	/// @param func
 	///	The C function to call when this as_function is invoked.
 	/// 	For classes, the function pointer is the constructor.
@@ -47,10 +62,11 @@ public:
 	/// @param iface
 	///	The interface of this class (will be inherited by
 	///	instances of this class)
-	/// 	If the given interface is NULL a default one
-	/// 	will be provided, with constructor set as 'this'.
+	/// 	If the given interface is NULL no interface will be
+	/// 	provided. Use the constructor taking a single argument
+	///	to get a default interface instead.
 	///
-	builtin_function(as_c_function_ptr func, as_object* iface=NULL)
+	builtin_function(as_c_function_ptr func, as_object* iface)
 		:
 		as_function(iface),
 		_func(func)

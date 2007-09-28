@@ -96,6 +96,15 @@ function_ctor(const fn_call& /* fn */)
 	return as_value(func.get());
 }
 
+as_function::as_function()
+	:
+	// all functions inherit from global Function class
+	as_object(getFunctionPrototype())
+{
+	as_object* iface = new as_object(getObjectInterface());
+	iface->init_member("constructor", this); 
+	init_member("prototype", as_value(iface));
+}
 
 
 // What if we want a function to inherit from Object instead ?
@@ -104,13 +113,11 @@ as_function::as_function(as_object* iface)
 	// all functions inherit from global Function class
 	as_object(getFunctionPrototype())
 {
-	/// TODO: create properties lazily, on getPrototype() call
-	if ( ! iface )
+	if ( iface )
 	{
-		iface = new as_object(getObjectInterface());
+		iface->init_member("constructor", this); 
+		init_member("prototype", as_value(iface));
 	}
-	iface->init_member("constructor", this); 
-	init_member("prototype", as_value(iface));
 }
 
 void

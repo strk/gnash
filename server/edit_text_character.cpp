@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.122 2007/09/25 11:10:00 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.123 2007/09/28 10:10:36 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -283,7 +283,9 @@ textfield_removeTextField(const fn_call& fn)
 static as_value
 textfield_ctor(const fn_call& /* fn */)
 {
-	boost::intrusive_ptr<as_object> obj = new as_object(getTextFieldInterface());
+	as_object* proto = getTextFieldInterface();
+	if ( ! proto ) proto = getObjectInterface(); // for SWF5 and below I guess...
+	boost::intrusive_ptr<as_object> obj = new as_object(proto);
 	return as_value(obj);
 }
 
@@ -376,6 +378,9 @@ static as_object*
 getTextFieldInterface()
 {
 	static boost::intrusive_ptr<as_object> proto;
+
+	if ( VM::get().getSWFVersion() < 6 ) return NULL;
+
 	if ( proto == NULL )
 	{
 		proto = new as_object(getObjectInterface());
@@ -1634,8 +1639,25 @@ textfield_class_init(as_object& global)
 
 	if ( cl == NULL )
 	{
-		cl=new builtin_function(&textfield_ctor, getTextFieldInterface());
-		VM::get().addStatic(cl.get());
+		VM& vm = VM::get();
+
+		as_object* iface = getTextFieldInterface();
+		cl=new builtin_function(&textfield_ctor, iface);
+#ifndef NDEBUG
+		int swfVer = vm.getSWFVersion();
+		if ( swfVer > 5 )
+		{
+			assert(iface);
+			assert(cl->getOwnProperty(vm.getStringTable().find("prototype")));
+		}
+		else
+		{
+			assert(!iface);
+			assert(!cl->getOwnProperty(vm.getStringTable().find("prototype")));
+		}
+#endif
+
+		vm.addStatic(cl.get());
 
 		// replicate all interface to class, to be able to access
 		// all methods as static functions

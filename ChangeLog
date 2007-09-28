@@ -1,3 +1,21 @@
+2007-09-28 Sandro Santilli <strk@keybit.net>
+
+	* server/as_function.{cpp,h}: Add a constructor
+	  taking no args to use when a default prototype (iface)
+	  is wanted. The other constructor, taking an interface
+	  will be used when willing to control wheter or not a
+	  prototype should be used (TextField don't have one in SWF5
+	  and lower).
+	* server/builtin_function.h: Same as with as_function, have
+	  a constructor taking on interface for a default one, use
+	  a NULL interface as meaning we don't want to expose a
+	  prototype.
+	* server/edit_text_character.cpp: don't set a prototype for TextField
+	  class in SWF5, make TextField instances of object when TextField
+	  has no prototype.
+	* testsuite/actionscript.all/toString_valueOf.as: one more success.
+
+
 2007-09-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* configure.ac, testsuite/libbase/TCXXRc.cpp, gnashrc-local.in: add

@@ -155,17 +155,21 @@ protected:
 	}
 #endif // GNASH_USE_GC
 
-	/// Construct a function with given interface
+	/// Construct a function with a default interface
 	//
-	/// If the given interface is NULL a default one
-	/// will be provided, with constructor set as 'this'.
+	/// The default interface will have derive from Object and 
+	/// have 'this' set as it's 'constructor' member. 
 	///
+	as_function();
+
+	/// Construct a function with given interface (possibly none)
+	//
 	/// @param iface
-	///	The interface exported by this class (ie.
-	///	it's 'prototype' member). If NULL a default
-	///	prototype will be used, using 'this' as
-	///	it's 'constructor' member. 
-	///	Refcount on the interface will be incremented.
+	///	The interface exported by this class (its 'prototype' member).
+	///	If NULL, no prototype will be set (this is used for some
+	///	corner cases like TextField in SWF5 or below).
+	///	If not NULL, a 'constructor' member will be added to the
+	///	prototype, pointing to 'this'.
 	///
 	as_function(as_object* iface);
 
