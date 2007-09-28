@@ -203,7 +203,7 @@ RcInitFile::parseList(std::vector<std::string> &list, string &action,
     if (items.find(':') != string::npos) {
 	// Deprecated behaviour
 	separator = ':';
-	log_error(_("The list '%s' in an rcfile contains a colon. This is deprecated and may result in "
+	fprintf(stderr, _("The list '%s' in an rcfile contains a colon. This is deprecated and may result in "
 		"unexpected behaviour. Please only use spaces as a separator."), listname.c_str());
     } else {
 	// New behaviour

@@ -1,5 +1,6 @@
 2007-09-28 Sandro Santilli <strk@keybit.net>
 
+	* libbase/rc.cpp: use fprintf rather then log_XXX during parsing.
 	* testsuite/actionscript.all/toString_valueOf.as: more tests,
 	  check->check_equals.
 
