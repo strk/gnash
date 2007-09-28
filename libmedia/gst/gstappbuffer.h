@@ -17,6 +17,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
+/* Id: */
+
 #ifndef _GST_APP_BUFFER_H_
 #define _GST_APP_BUFFER_H_
 

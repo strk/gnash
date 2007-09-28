@@ -1,3 +1,4 @@
+// AudioDecoder.h: Audio decoding base class.
 // 
 //   Copyright (C) 2007 Free Software Foundation, Inc.
 // 
@@ -15,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//  $Id:
+// $Id:
 
 #ifndef __AUDIODECODER_H__
 #define __AUDIODECODER_H__
@@ -25,14 +26,54 @@
 
 namespace gnash {
 
+/// Audio decoding base class.
 class AudioDecoder {
 	
 public:
 	AudioDecoder() {}
 	~AudioDecoder() {}
 
+	/// Sets up the decoder.
+	//
+	/// @param info
+	/// 	AudioInfo class with all the info needed to decode
+	///     the sound correctly.
+	///
+	/// @return true if succesfull else false
+	///
 	virtual bool setup(AudioInfo* /*info*/) { return false; }
+
+	/// Sets up the decoder.
+	//
+	/// @param info
+	/// 	SoundInfo class with all the info needed to decode
+	///     the audio correctly.
+	///
+	/// @return true if succesfull else false
+	///
 	virtual bool setup(SoundInfo* /*info*/) { return false; }
+
+	/// Decodes a frame and returns a pointer to the data
+	//
+	/// @param input
+	/// 	The audio data
+	///
+	/// @param inputSize
+	/// 	The size of the video data
+	///
+	/// @param outputSize
+	/// 	The output size of the video data, is passed by reference.
+	///
+	/// @param decodedData
+	/// 	The amount of bytes that has been decoded when decoding is done,
+	///		is passed by reference.
+	///
+	/// @param parse
+	/// 	Should we parse the audio? Needed for embedded MP3 sounds.
+	///
+	/// @return a pointer to the decoded data, or NULL if decoding fails.
+	///     The caller owns the decoded data.
+	///
 	virtual uint8_t* decode(uint8_t* /*input*/, uint32_t /*inputSize*/, uint32_t& /*outputSize*/, uint32_t& /*decodedData*/, bool /*parse*/) { return NULL; }
 
 };

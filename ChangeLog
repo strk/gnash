@@ -1,3 +1,17 @@
+2007-09-28 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libmedia/AudioDecoder.h, libmedia/AudioDecoderNellymoser.{cpp,h},
+	  libmedia/AudioDecoderSimple.h, libmedia/MediaBuffer.h, 
+	  libmedia/MediaDecoder.h, libmedia/MediaParser.h libmedia/VideoDecoder.h,
+	  libmedia/gst/VideoDecoderGst.h, libmedia/gst/gstappbuffer.{c,h},
+	  libmedia/gst/gstappsink.{c,h}, libmedia/gst/gstappsrc.{c,h},
+	  libmedia/gst/sound_handler_gst.h, libmedia/sdl/AudioDecoderFfmpeg.{cpp,h},
+	  libmedia/sdl/AudioDecoderMad.{h,cpp}, libmedia/sdl/MediaDecoderSdl.{h,cpp},
+	  libmedia/sdl/MediaParserFfmpeg.{h,cpp}, libmedia/sdl/sound_handler_sdl.h,
+	  libmedia/sdl/VideoDecoderFfmpeg.h: Update docs.
+	* libmedia/sdl/VideoDecoderFfmpeg.cpp: Fix memleak. Fixes bug #21180.
+	* libmedia/sdl/sound_handler_sdl.cpp: Use the internal ADPCM decoder.
+
 2007-09-28 Sandro Santilli <strk@keybit.net>
 
 	* server/as_function.{cpp,h}: Add a constructor

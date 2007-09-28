@@ -30,6 +30,7 @@ namespace gnash {
 
 namespace gnash {
 
+/// Audio decoding using "simple" internal decoders.
 class AudioDecoderSimple : public AudioDecoder {
 
 public:

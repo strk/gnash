@@ -17,6 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+// $Id:
+
 #include "VideoDecoderFfmpeg.h"
 
 #ifdef HAVE_SWSCALE_H
@@ -323,6 +325,7 @@ VideoDecoderFfmpeg::decodeToImage(uint8_t* input, uint32_t inputSize)
 	std::auto_ptr<image::image_base> ret;
 	ret.reset(new image::rgb(_videoCodecCtx->width, _videoCodecCtx->height));
 	ret->update(decodedData);
+	delete [] decodedData;
 	return ret;
 	
 }

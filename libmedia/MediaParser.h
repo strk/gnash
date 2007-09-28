@@ -1,3 +1,4 @@
+// MediaParser.h: Base class for media parsers
 // 
 //   Copyright (C) 2007 Free Software Foundation, Inc.
 // 
@@ -15,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//  $Id:
+// $Id:
 
 #ifndef __MEDIAPARSER_H__
 #define __MEDIAPARSER_H__
@@ -31,35 +32,67 @@
 #endif
 namespace gnash {
 
+/// The type of the codec id passed in the AudioInfo or VideoInfo class
 enum codecType
 {
+	/// The internal flash codec ids
 	FLASH,
+
+	/// Ffmpegs codecs ids
 	FFMPEG
 };
 
+/// Video codec ids as defined in flash
 enum videoCodecType
 {
-	VIDEO_CODEC_H263 = 2,	// H263/SVQ3 video codec
-	VIDEO_CODEC_SCREENVIDEO = 3,	// Screenvideo codec
-	VIDEO_CODEC_VP6 = 4,		// On2 VP6 video codec
-	VIDEO_CODEC_VP6A = 5,		// On2 VP6 Alpha video codec
-	VIDEO_CODEC_SCREENVIDEO2 = 6	// Screenvideo2 codec
+	/// H263/SVQ3 video codec
+	VIDEO_CODEC_H263 = 2,
+
+	/// Screenvideo codec
+	VIDEO_CODEC_SCREENVIDEO = 3,
+
+	/// On2 VP6 video codec
+	VIDEO_CODEC_VP6 = 4,
+
+	/// On2 VP6 Alpha video codec
+	VIDEO_CODEC_VP6A = 5,
+
+	/// Screenvideo2 codec
+	VIDEO_CODEC_SCREENVIDEO2 = 6
 };
 
+/// Audio codec ids as defined in flash
 enum audioCodecType
 {
-	AUDIO_CODEC_RAW = 0,		// unspecified format.  Useful for 8-bit sounds???
-	AUDIO_CODEC_ADPCM = 1,	// gnash doesn't pass this through; it uncompresses and sends FORMAT_NATIVE16
+	/// Raw format.  Useful for 8-bit sounds???
+	AUDIO_CODEC_RAW = 0,	
+
+	/// ADPCM format, flash's ADPCM is a bit different for normal ADPCM
+	AUDIO_CODEC_ADPCM = 1,
+
+	/// Mp3 format
 	AUDIO_CODEC_MP3 = 2,
-	AUDIO_CODEC_UNCOMPRESSED = 3,	// 16 bits/sample, little-endian
-	AUDIO_CODEC_NELLYMOSER_8HZ_MONO = 5,	// According to ffmpeg
-	AUDIO_CODEC_NELLYMOSER = 6	// Mystery proprietary format; see nellymoser.com
+
+	/// 16 bits/sample, little-endian
+	AUDIO_CODEC_UNCOMPRESSED = 3,
+
+	/// Proprietary simple format
+	AUDIO_CODEC_NELLYMOSER_8HZ_MONO = 5,
+
+	/// Proprietary simple format
+	AUDIO_CODEC_NELLYMOSER = 6
 };
 
+/// Type of frame in FLVs. Also type of the frame contained in the MediaFrame class.
 enum tagType
 {
+	/// Audio frame
 	AUDIO_TAG = 0x08,
+
+	/// Video frame
 	VIDEO_TAG = 0x09,
+
+	/// Meta frame
 	META_TAG = 0x12
 };
 

@@ -17,7 +17,11 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// Original copyright notice:
+// Id: 
+
+// This file incorporates work covered by the following copyright and permission
+// notice:
+
 
 /*
  * Copyright (c) 2007 a840bda5870ba11f19698ff6eb9581dfb0f95fa5,

@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//  $Id:
+// $Id:
 
 #ifndef __VIDEODECODERGST_H__
 #define __VIDEODECODERGST_H__
@@ -36,7 +36,7 @@
 
 namespace gnash {
 
-
+/// Video decoding using Gstreamer.
 class VideoDecoderGst : public VideoDecoder {
 	
 public:

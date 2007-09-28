@@ -17,6 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+// $Id:
+
 #include "AudioDecoderMad.h"
 #include "utility.h"
 #ifdef USE_FFMPEG

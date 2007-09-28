@@ -16,9 +16,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//  $Id:
+// $Id:
 
-// Original copyright notice:
+// This file incorporates work covered by the following copyright and permission
+// notice:
 
 /*
  * Copyright (c) 2007 a840bda5870ba11f19698ff6eb9581dfb0f95fa5,
@@ -67,6 +68,7 @@ typedef struct nelly_handle_struct {
 
 namespace gnash {
 
+/// Audio decoding using internal Nellymoser decoder.
 class AudioDecoderNellymoser : public AudioDecoder {
 
 public:

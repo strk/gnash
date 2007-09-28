@@ -1,3 +1,4 @@
+// MediaBuffer.h: Buffer where decoded audio and video data is stored.
 // 
 //   Copyright (C) 2007 Free Software Foundation, Inc.
 // 
@@ -15,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//  $Id:
+// $Id:
 
 #ifndef __MEDIABUFFER_H__
 #define __MEDIABUFFER_H__
@@ -24,7 +25,10 @@
 #include <queue>
 
 namespace gnash {
-  
+
+
+/// This class is used to store decoded video or audio data
+/// while it is in the MediaBuffer.
 class raw_mediadata_t
 {
 public:
@@ -42,11 +46,20 @@ public:
 		if (m_data) delete [] m_data;
 	}
 
-	int m_stream_index;
+//	int m_stream_index;
+
+	/// Size of the data stored
 	uint32_t m_size;
+
+	/// Pointer to the data. The data is owned by this class.
 	uint8_t* m_data;
+
+	/// Pointer to where the data should be used from. Used with audio, since we
+	/// don't always use all the data.
 	uint8_t* m_ptr;
-	uint32_t m_pts;	// presentation timestamp in millisec
+
+	/// Timestamp in millisec
+	uint32_t m_pts;
 };
 
 /// Threadsafe elements-owning queue

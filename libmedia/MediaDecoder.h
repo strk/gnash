@@ -1,3 +1,4 @@
+// MediaDecoder.h: Media decoding base class.
 // 
 //   Copyright (C) 2007 Free Software Foundation, Inc.
 // 
@@ -15,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//  $Id:
+// $Id:
 
 #ifndef __MEDIADECODER_H__
 #define __MEDIADECODER_H__

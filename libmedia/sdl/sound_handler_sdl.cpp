@@ -1,3 +1,5 @@
+// sound_handler_sdl.cpp: Sound handling using standard SDL
+//
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
@@ -18,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.1 2007/09/27 23:59:55 tgc Exp $
+// $Id: sound_handler_sdl.cpp,v 1.2 2007/09/28 10:49:11 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -221,7 +223,6 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 
 		break;
 #endif
-	case AUDIO_CODEC_ADPCM:
 #ifdef USE_FFMPEG
 		sound->decoder = new AudioDecoderFfmpeg();
 
@@ -233,6 +234,7 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 
 		break;
 #endif
+	case AUDIO_CODEC_ADPCM:
 	default:
 
 		sound->decoder = new AudioDecoderSimple();

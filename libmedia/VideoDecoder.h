@@ -1,3 +1,4 @@
+// VideoDecoder.h: Video decoding base class.
 // 
 //   Copyright (C) 2007 Free Software Foundation, Inc.
 // 
@@ -15,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//  $Id:
+// $Id:
 
 #ifndef __VIDEODECODER_H__
 #define __VIDEODECODER_H__
@@ -25,6 +26,7 @@
 
 namespace gnash {
 
+/// Video decoding base class.
 class VideoDecoder {
 	
 public:

@@ -17,6 +17,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
+/* Id: */
+
 #ifndef _GST_APP_SINK_H_
 #define _GST_APP_SINK_H_
 
