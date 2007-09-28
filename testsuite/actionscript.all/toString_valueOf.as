@@ -278,7 +278,7 @@ _root.createEmptyMovieClip("mc2", 2);
   check(typeof(TextField.prototype.valueOf) == 'function' );
 #else
   // TextField in swf5 does not have a prototype at all !
-  xcheck_equals(typeof(TextField.prototype), 'undefined'); 
+  check_equals(typeof(TextField.prototype), 'undefined'); 
 #endif
 
 // For TextFields, this true from swf5~swf8!
