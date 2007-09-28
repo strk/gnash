@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.425 2007/09/28 09:28:59 bwy Exp $
+dnl $Id: configure.ac,v 1.426 2007/09/28 15:10:29 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -95,26 +95,26 @@ AC_TRY_COMPILE([#include <sys/types.h>
   #include <stdio.h>], [
   size_t num = 0;
   printf("%d", num); ],
-  AC_DEFINE(SIZET_FMT, ["%d"], [size_t printf modifier is d])
-)
+  AC_DEFINE(SIZET_FMT, ["%d"], [size_t printf modifier is d]), [
+
 AC_TRY_COMPILE([#include <sys/types.h>
   #include <stdio.h>], [
   size_t num = 0;
   printf("%u", num); ],
-   AC_DEFINE(SIZET_FMT, ["%u"], [size_t printf modifier is u])
-)
+   AC_DEFINE(SIZET_FMT, ["%u"], [size_t printf modifier is u]), [
+
 AC_TRY_COMPILE([#include <sys/types.h>
   #include <stdio.h>], [
   size_t num = 0;
   printf("%lu", num); ],
-  AC_DEFINE(SIZET_FMT, ["%lu"], [size_t printf modifier is lu])
-)
+  AC_DEFINE(SIZET_FMT, ["%lu"], [size_t printf modifier is lu]), [
+
 AC_TRY_COMPILE([#include <sys/types.h> 
   #include <stdio.h>], [
   size_t num = 0;
   printf("%ld", num); ],
   AC_DEFINE(SIZET_FMT, ["%ld"], [size_t printf modifier is ld])
-)
+)])])])
 
 CXXFLAGS="$save_CXXFLAGS"
 AC_LANG_POP(C++)

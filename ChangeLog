@@ -1,3 +1,8 @@
+2007-09-28 Bernhard Rosenkraenzer <bero@arklinux.org>
+
+	* configure.ac: rework SIZET_FMT detection to stop at first
+	  success. See bug #21182.
+
 2007-09-28 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* libmedia/Makefile.am: Compile gstgnashsrc.{c,h} when gstreamer
