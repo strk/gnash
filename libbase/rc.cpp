@@ -162,6 +162,63 @@ RcInitFile::extractNumber(int *num, const char *pattern, string &variable,
     return *num;
 }
 
+/// Takes references to action ('set' or 'append'), items
+/// (list of items separated by spaces), listname (name of list)
+/// and the item array (list).
+//
+/// Returns either empty array ('set <list> off'), array with only
+/// passed items ('set <list> <items>') or array passed with items
+/// appended ('append <list> <items>').
+
+void
+RcInitFile::parseList(std::vector<std::string> &list, string &action,
+			    std::string &listname, string &items)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    if (action == "set") {
+
+	// Clear array of hosts in previously parsed
+	// rc files.
+ 	list.clear();
+
+	StringNoCaseEqual noCaseCompare;
+
+        if (noCaseCompare(items, "off") || noCaseCompare(items, "no") ||
+            noCaseCompare(items, "false")) {
+	    // Return empty array (allows disabling of global
+	    // whitelists in favour of a blacklist)
+	    return;
+	}
+    }		
+
+    string::size_type pos;
+
+    // This is an ugly way to avoid breaking lists
+    // Lists will work if they worked before, but
+    // combining the two separators will not.
+    // The colon way must be removed before protocols
+    // (http://, https:// can be included in lists).
+    char separator;
+    if (items.find(':') != string::npos) {
+	// Deprecated behaviour
+	separator = ':';
+	log_error(_("The list '%s' in an rcfile contains a colon. This is deprecated and may result in "
+		"unexpected behaviour. Please only use spaces as a separator."), listname.c_str());
+    } else {
+	// New behaviour
+	separator = ' ';
+    }
+
+    while (items.size()) {
+	pos = items.find(separator, 0);
+    	list.push_back(items.substr(0, pos));
+    	items.erase(0, pos);
+    	if (items.size()) items.erase(0, items.find_first_not_of(separator)); 
+    }
+
+}
+
 void
 RcInitFile::extractDouble(double& out, const char *pattern, string &variable,
                            string &value)
@@ -316,46 +373,12 @@ RcInitFile::parseFile(const std::string& filespec)
                 }
                 
                 if (variable == "blacklist") {
-		    // 'set' should override all previous blacklists
-		    // else 'append' should add to the end.
-		    if (action == "set") _blacklist.clear();
-
-                    string::size_type pos;
-                    //This is an ugly way to avoid breaking lists
-                    //Lists will work if they worked before, but
-                    //combining the two separators will not.
-                    //The colon way must be removed before protocols
-                    //(http://, https:// can be included in lists).
-                    char separator;
-                    if (value.find(':') != string::npos) separator = ':';
-                    else separator = ' ';
-                    while (value.size()) {
-                        pos = value.find(separator, 0);
-                        _blacklist.push_back(value.substr(0, pos));
-                        value.erase(0, pos);
-                        if (value.size()) value.erase(0, value.find_first_not_of(separator)); 
-                    }
+		    parseList(_blacklist, action, variable, value);
                     continue;
                 }
 
                 if (variable == "whitelist") {
-		    if (action == "set") _whitelist.clear();
-		    
-                    string::size_type pos;
-                    //This is an ugly way to avoid breaking lists
-                    //Lists will work if they worked before, but
-                    //combining the two separators will not.
-                    //The colon way must be removed before protocols
-                    //(http://, https:// can be included in lists).
-                    char separator;
-                    if (value.find(':') != string::npos) separator = ':';
-                    else separator = ' ';
-                    while (value.size()) {
-                        pos = value.find(separator, 0);
-                        _whitelist.push_back(value.substr(0, pos));
-                        value.erase(0, pos);
-                        if (value.size()) value.erase(0, value.find_first_not_of(separator)); 
-                    }
+		    parseList(_whitelist, action, variable, value);
                     continue;
                 }
 

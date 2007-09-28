@@ -169,6 +169,9 @@ private:
     static void extractDouble(double& out, const char *pattern,
                         std::string &variable, std::string &value);
 
+    static void parseList(std::vector<std::string>& list, std::string &action,
+			std::string &listname, std::string &items);
+
 };
 
 //extern DSOEXPORT RcInitFile rcfile;

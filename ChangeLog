@@ -1,3 +1,12 @@
+2007-09-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/rc.{h,cpp}: move list parsing into a function; enable
+	  'set <list> off' for disabling previously parsed lists. Add
+	  error message when colons found in a list.
+	* testsuite/libbase/TCXXRc.cpp, gnashrc-local.in: add test for
+	  whitelist override.
+	* docs: update user manual.
+
 2007-09-28 Bernhard Rosenkraenzer <bero@arklinux.org>
 
 	* configure.ac: rework SIZET_FMT detection to stop at first

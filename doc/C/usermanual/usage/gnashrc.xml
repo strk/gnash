@@ -59,7 +59,8 @@ The variables in the <filename>.gnashrc</filename> file support three types of a
 <row>
 <entry>whitelist</entry>
 <entry>hostnames</entry>
-<entry>This is a list of hostnames, separated by spaces. The hostname must be given
+<entry>This is a list of hostnames separated by spaces, or <emphasis>off</emphasis>
+	    to disable the whitelist. The hostname must be given
             without a protocol (http://, https://). If this list is populated,
 	    &app; will only load external Flash movies from the specified hosts.  The
 	    whitelist takes precedence over the blacklist. Because several files can
@@ -71,7 +72,8 @@ The variables in the <filename>.gnashrc</filename> file support three types of a
 <row>
 <entry>blacklist</entry>
 <entry>hostnames</entry>
-<entry>This is a list of hostnames, separated by spaces. The hostname must be given
+<entry>This is a list of hostnames separated by spaces, or <emphasis>off</emphasis>
+	    to disable the blacklist. The hostname must be given
             without a protocol (http://, https://).
 	    External flash movies from these
             domains are never allowed to load. If whitelist is present

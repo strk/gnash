@@ -217,16 +217,22 @@ main (int /*argc*/, char** /*argv*/) {
         if (blacklist.size()) {
             if ((blacklist[2] == "www.gnashdev.org")
                 && (blacklist[3] == "www.wikipedia.de")) {
-                runtest.pass ("rc.getBlackList() - append");
+                runtest.pass ("rc.getBlackList(): append");
             } else {
-                runtest.fail ("rc.getBlackList() - append");
+                runtest.fail ("rc.getBlackList(): append");
             }
-            runtest.pass ("rc.getBlackList() has elements after append");
+            runtest.pass ("rc.getBlackList(): has appended elements");
         } else {
-            runtest.fail ("rc.getBlackList() doesn't have elements after append");        
+            runtest.fail ("rc.getBlackList(): doesn't appended elements");        
         }
 
+	// Test local override of previous whitelist 
+        std::vector<std::string> whitelist = rc.getWhiteList();
+	if (whitelist.size()) {
+	    runtest.fail ("rc.getWhiteList(): local override failed");
+	} else {
+	    runtest.pass ("rc.getWhiteList(): local override succeeded");
+	}
     }
-
 }
 
