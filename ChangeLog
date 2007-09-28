@@ -1,3 +1,22 @@
+2007-09-27  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* gui/gtk.cpp: Add support for LIRC, if it's running. Add event
+	handler for LIRC messages.
+
+2007-09-26  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* extensions/Makefile.am: Add dbus to DIST_SUBDIRS.
+	
+	* libbase/extension.cpp: Initialize the entry first so the loop
+	actually works.
+	* extensions/dbus_ext.h, dbus_ext.cpp: Minimal code stubs for a
+	soon to be Dbus extension.
+	* configure.ac: Add extensions/dbus. Drop calling
+	GNASH_PATH_LIRC, as Gnash has it's own LIRC client code, and
+	doesn't use the lirc_client API anymore.
+	* macros/dbus.m4: New macro for Dbus support.
+	* extensions/Makefile.am: Build dbus extension if requested.
+	
 2007-09-28 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* libbase/Makefile.am, libmedia/sdl/VideoDecoderFfmpeg.h,
@@ -220,6 +239,7 @@
 	  DropShadowFilter.h, GlowFilter.h, GradientBevelFilter.h,
 	  GradientGlowFilter.h: include <boost/cstdint.hpp> for XintXX_t.
 
+>>>>>>> 1.4447
 2007-09-26 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/tag_loaders.cpp (define_sound_loader): don't delete
@@ -946,10 +966,9 @@
 	* libbase/network.cpp: Don't just see if fd is set, make sure it's
 	greater than zero to avoid problems!
 
-	* extensions/lirc/test.as: Test case for Lirc extension.
-
 2007-09-14  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* extensions/lirc/test.as: Test case for Lirc extension.
 	* extensions/lirc/Makefile.am: Chnage from lirc.* to lirc_ext.* to
 	avoid name collisions. 
 	* libbase/lirc.h, lirc.cpp: New files for lirc interface for

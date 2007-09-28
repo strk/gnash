@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.119 2007/09/27 19:26:04 bjacques Exp $ */
+/* $Id: gtk.cpp,v 1.120 2007/09/28 03:03:53 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -32,6 +32,7 @@
 #include "gnash.h" // for get_sound_handler
 #include "render_handler.h"
 #include "VM.h"
+#include "lirc.h"
 
 #include <iostream>
 #include <X11/keysym.h>
@@ -63,6 +64,11 @@ bool createEditMenu(GtkWidget *obj);
 bool createHelpMenu(GtkWidget *obj);
 bool createControlMenu(GtkWidget *obj);
 
+// This is global so it can be accessed by the evnt handler, which
+// isn't part of this class. 
+Lirc *lirc;
+bool lirc_handler(void*, int, void* data);
+
 GtkGui::~GtkGui()
 {
 }
@@ -78,7 +84,6 @@ bool
 GtkGui::init(int argc, char **argv[])
 {
     //GNASH_REPORT_FUNCTION;
-
 
     gtk_init (&argc, argv);
 
@@ -146,6 +151,14 @@ GtkGui::init(int argc, char **argv[])
     _glue->prepDrawingArea(_drawing_area);
 #endif
 
+    lirc = new Lirc();
+    if (lirc->init("/dev/lircd")) {
+        int fd = lirc->getFileFd();
+        addFDListener(fd, lirc_handler, &fd);
+    } else {
+        log_msg("LIRC daemon not running");
+    }
+    
     _renderer = _glue->createRenderHandler();
     if ( ! _renderer ) return false;
     set_render_handler(_renderer);
@@ -385,7 +398,7 @@ GtkGui::addFDListener(int fd, callback_t callback, void* data)
 void
 GtkGui::quit()
 {
-	gtk_main_quit();
+    gtk_main_quit();
 }
 
 void
@@ -913,7 +926,7 @@ GtkGui::menuitem_about_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
     comments += "\nRenderer: ";
     comments += RENDERER_CONFIG;
     comments += "   GUI: ";
-    comments += GUI_CONFIG; // gtk of course!
+    comments += "GTK2"; // gtk of course!
     comments += "   Media: ";
     comments += MEDIA_CONFIG;
     comments += ".";
@@ -1089,8 +1102,8 @@ GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 
             }
 
-     GtkWidget *bbox1 = gtk_hbutton_box_new ();
-     gtk_box_pack_start (
+    GtkWidget *bbox1 = gtk_hbutton_box_new ();
+    gtk_box_pack_start (
 	GTK_BOX (main_vbox), bbox1, FALSE, FALSE, 0);
 
 
@@ -1360,7 +1373,6 @@ GtkGui::delete_event(GtkWidget* /*widget*/, GdkEvent* /*event*/,
     gtk_main_quit();
     return TRUE;
 }
-
 
 gnash::key::code
 GtkGui::gdk_to_gnash_key(guint key)
@@ -1782,6 +1794,19 @@ GtkGui::createControlMenu(GtkWidget *obj)
     gtk_menu_append(menu, GTK_WIDGET(menuitem_jump_backward));
     gtk_widget_show(GTK_WIDGET(menuitem_jump_backward));
 
+}
+
+bool
+lirc_handler(void*, int, void* data)
+{ 
+    GNASH_REPORT_FUNCTION;
+    int* fd = static_cast<int*>(data);
+    
+    // want to remove this handler. You may want to close fd.
+    log_msg("%s\n", lirc->getButton());
+  
+    // Want to keep this handler
+    return true;
 }
 
 } // end of namespace gnash
