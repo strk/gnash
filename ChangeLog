@@ -1,9 +1,14 @@
-2007-09-27  Rob Savoye  <rob@ripple.welcomehome.org>
+2007-09-28 Sandro Santilli <strk@keybit.net>
+
+ 	* testsuite/actionscript.all/toString_valueOf.as: few more tests
+	  for TextField.toString.
+
+2007-09-28  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* gui/gtk.cpp: Add support for LIRC, if it's running. Add event
 	handler for LIRC messages.
 
-2007-09-26  Rob Savoye  <rob@ripple.welcomehome.org>
+2007-09-28  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* extensions/Makefile.am: Add dbus to DIST_SUBDIRS.
 	
@@ -239,7 +244,6 @@
 	  DropShadowFilter.h, GlowFilter.h, GradientBevelFilter.h,
 	  GradientGlowFilter.h: include <boost/cstdint.hpp> for XintXX_t.
 
->>>>>>> 1.4447
 2007-09-26 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/tag_loaders.cpp (define_sound_loader): don't delete

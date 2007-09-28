@@ -277,9 +277,8 @@ _root.createEmptyMovieClip("mc2", 2);
   check(typeof(TextField.prototype.toString) == 'function' );
   check(typeof(TextField.prototype.valueOf) == 'function' );
 #else
-  // TextField in swf5 does not have toString and valueOf methods(to be checked).
-  xcheck_equals(typeof(TextField.prototype.toString), 'undefined' );
-  xcheck_equals(typeof(TextField.prototype.valueOf), 'undefined' );
+  // TextField in swf5 does not have a prototype at all !
+  xcheck_equals(typeof(TextField.prototype), 'undefined'); 
 #endif
 
 // For TextFields, this true from swf5~swf8!
@@ -288,6 +287,15 @@ check(TextField.prototype.valueOf == Object.prototype.valueOf);
 
 text1 = new TextField();
 check(typeof(text1) == "object");
+#if OUTPUT_VERSION > 5
+  check_equals(typeof(text1.toString), "function");
+  check_equals(typeof(text1.__proto__.toString), "function");
+#else
+  xcheck_equals(typeof(text1.toString), "undefined");
+  check_equals(typeof(text1.__proto__), 'object');
+  xcheck_equals(typeof(text1.__proto__.toString), "undefined"); 
+#endif
+
 x = text1.toString();
 y = text1.valueOf();
 #if OUTPUT_VERSION > 5 
