@@ -292,8 +292,10 @@ check(typeof(text1) == "object");
   check_equals(typeof(text1.__proto__.toString), "function");
 #else
   xcheck_equals(typeof(text1.toString), "undefined");
+  xcheck_equals(typeof(text1.valueOf), "undefined");
   check_equals(typeof(text1.__proto__), 'object');
   xcheck_equals(typeof(text1.__proto__.toString), "undefined"); 
+  xcheck_equals(typeof(text1.__proto__.valueOf), "undefined"); 
 #endif
 
 x = text1.toString();
@@ -311,7 +313,7 @@ y = text1.valueOf();
   xcheck_equals(y.toString(), undefined); 
   xcheck_equals(typeof(y.valueOf()),  "undefined"); 
 #endif 
-check(y == text1);
+check_equals(y, text1);
 
 //
 //Testing toString and valueOf of Buttons
