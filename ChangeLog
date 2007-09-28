@@ -1,5 +1,10 @@
 2007-09-28 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
+	* libmedia/Makefile.am: Compile gstgnashsrc.{c,h} when gstreamer
+	  is the mediahandler.
+
+2007-09-28 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
 	* libmedia/AudioDecoder.h, libmedia/AudioDecoderNellymoser.{cpp,h},
 	  libmedia/AudioDecoderSimple.h, libmedia/MediaBuffer.h, 
 	  libmedia/MediaDecoder.h, libmedia/MediaParser.h libmedia/VideoDecoder.h,
