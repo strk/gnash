@@ -16,6 +16,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#ifdef __sgi
+        __SGI_LIBC_USING_FROM_STD(va_list)
+#endif
+
 //
 // tu_file functions using FILE
 //

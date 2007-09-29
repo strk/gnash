@@ -1,3 +1,7 @@
+2007-09-30 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* libbase/tu_file.cpp: __SGI_LIBC_USING_FROM_STD(va_list).
+
 2007-09-29 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/: check.as, with.as: use totals_check
