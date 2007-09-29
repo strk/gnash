@@ -1,3 +1,8 @@
+2007-09-29 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* docs: update Mozilla plugin install information to reflect current
+	  state. Task #7340 contains ideas for improving installation.
+
 2007-09-29 Chad Musick <chadmusick@msbx.net>
 
 	* New: server/asClass.h,.cpp: Several different classes which work

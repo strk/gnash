@@ -66,12 +66,18 @@ The above command installs the standalone player.  If the correct files were fou
   <title>Executables</title>
 
   <para>
-   The Mozilla plugin is installed in the <filename>plugins/</filename> subdirectory of the Mozilla or Firefox application location if development packages are installed for either browser.  For example, if Firefox is installed in the <filename>/usr/lib/firefox-<replaceable>&lt;version&gt;</replaceable></filename> directory, the plugin will be installed in <filename>/usr/lib/firefox-<replaceable>&lt;version&gt;</replaceable>/plugins/</filename> directory.  If development packages are not installed for either, the default location is <filename>~/.firefox/plugins</filename>. 
-    You may also specify the plugin installation directory by using the 
-    <option>--with-plugindir</option> <link linkend="custompath">option 
-    at configuration time</link>.
-  </para>
-
+   The Mozilla plugin is built from headers (the Mozilla SDK) provided with Gnash and
+	does not need extra development packages to be installed. By default, the
+	plugin is installed to <filename>~/.mozilla/plugins/</filename>. To enable
+	the plugin for other users, copy the file <filename>libgnashplugin.so</filename>
+	to <filename>.mozilla/plugins/</filename> in their home directory.
+	You may also specify the plugin installation directory by using the 
+	<option>--with-plugindir</option> <link linkend="custompath">option 
+	at configuration time</link>.
+   </para>
+   <para>
+   These defaults are likely to change in future versions of Gnash.
+   </para> 
   <para>
     The remaining executables are installed in the <filename>bin</filename>
     subdirectory of the directory specified by during configuration.
