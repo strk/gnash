@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.15 2007/09/29 03:27:57 zoulunkai Exp $";
+rcsid="$Id: with.as,v 1.16 2007/09/29 09:34:03 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -223,6 +223,20 @@ with(mc1)
 		check_equals(typeof(f_y()), 'undefined'); 
 	}
 }
+
+//
+//  test 'this' in 'with' context
+//
+objA = new Object();
+objB = new Object();
+objA.func = function () {
+   check_equals(this, objA);
+   with(_root.objB){
+    // 'with' won't change this context
+   	check_equals(this, objA);
+   }
+};
+objA.func();
 
 
 // 
