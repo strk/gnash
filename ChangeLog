@@ -1,3 +1,9 @@
+2007-09-29 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/actionscript.all/with.as: more tests for setTarget and found
+	  the Dejagnu clip functions might be out of scope chain, and explicitly
+	  targeting also not work.
+	  
 2007-09-28 Sandro Santilli <strk@keybit.net>
 
 	* libbase/rc.cpp: use fprintf rather then log_XXX during parsing.

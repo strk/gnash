@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.14 2007/09/27 09:09:43 zoulunkai Exp $";
+rcsid="$Id: with.as,v 1.15 2007/09/29 03:27:57 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -225,15 +225,85 @@ with(mc1)
 }
 
 
+// 
+// test ActionSetTarget and ActionSetTarget2 
 //
-// tests of setTarget
+#if OUTPUT_VERSION > 5
+
+// create _root.clip1.clip2 
+_root.createEmptyMovieClip("clip1", 101);
+clip1.createEmptyMovieClip("clip2", 102);  
+check_equals(typeof(clip1.clip2),'movieclip');
+
+clip1.testvar = 'clip1_var'; 
+clip1.clip2.testvar = 'clip2_var';  
+testvar = '_root_timeline_var'; 
+_global.testvar = 'global_var';
+
+testvar2 = '_root_timeline_var'; 
+_global.testvar2  = 'global_var';
+
+testvar3 = '_root_timeline_var';
+
+
+// Quick Dejagnu hack for setTarget
+// After setTarget, those function are hidden.
+// Calling _root.check is also not appropriate at the moment.
+// TODO: find a better way to fix Dejagnu
+_global.pass_check = pass_check;
+_global.fail_check = fail_check;
+_global.xpass_check = xpass_check;
+_global.xfail_check = xfail_check;
+
+setTarget('/clip1'); //tag 0x8B 
+    xcheck_equals(this, _level0);
+    check_equals(testvar, 'clip1_var');     
+    // won't search timeline properties, different with ActionWith     
+    check_equals(testvar2, 'global_var');
+    check_equals(testvar3, undefined);  
+setTarget("");
+
+setTarget('/clip1/clip2'); //tag 0x8B 
+    xcheck_equals(this, _level0);
+    check_equals(testvar, 'clip2_var');     
+    check_equals(testvar2, 'global_var');  
+setTarget("");
+
+// first understand getproperty 
+asm{   
+    push  'checkpoint'   
+    push  ''   
+    push  11 //_target   
+    getproperty  
+    setvariable        
+};  
+check_equals(checkpoint, '/');
+
+// then see how _target is affected. 
+setTarget("/clip1"); 
+  asm{
+    push 'checkpoint'         
+    push ''         
+    push 11 //_target        
+    getproperty  
+    setvariable             
+  };      
+  check_equals(checkpoint, '/clip1'); 
+setTarget("");
+
+setTarget("/clip1/clip2");  
+  asm{
+    push 'checkpoint'         
+    push ''
+    push 11         
+    getproperty  //_target         
+    setvariable             
+  };
+  check_equals(checkpoint, '/clip1/clip2'); 
+setTarget("");
+
+// 
+// TODO: add tests for setTargetExpression 
 //
-tellTarget("mc1");
-// setTarget and With won't change this context.
-// but the deduction might be incorrect!!!
-check_equals(this, _root);
-tellTarget("");
-// Ming thinks tellTarget is a Function, but it is not.
-// So all related tests are probably bogus.
-check_equals(typeof(tellTarget), 'undefined');
-check_equals(this, _root);
+#endif  //OUTPUT_VERSION > 5
+
