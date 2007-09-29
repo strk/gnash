@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.17 2007/09/29 16:23:00 strk Exp $";
+rcsid="$Id: with.as,v 1.18 2007/09/29 16:40:38 strk Exp $";
 
 #include "check.as"
 
@@ -322,7 +322,7 @@ setTarget("");
 #endif  //OUTPUT_VERSION > 5
 
 #if OUTPUT_VERSION < 6
- totals(26);
+ totals_check(26);
 #else
- xtotals(55); // a-ah!
+ xtotals_check(55); // a-ah!
 #endif

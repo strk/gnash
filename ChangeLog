@@ -1,5 +1,11 @@
 2007-09-29 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/: check.as, with.as: use totals_check
+	  and xtotals_check for macros, to avoid confusions.
+	  Will come back on this on monday...
+
+2007-09-29 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/: AsBroadcaster.as, Boolean.as,
 	  Camera.as, Color.as, ContextMenu.as, CustomActions.as, Date.as,
 	  Error.as, Function.as, Global.as, Inheritance.as, Key.as,

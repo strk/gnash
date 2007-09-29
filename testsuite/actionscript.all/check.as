@@ -69,8 +69,8 @@
 
 #define INFO " [" + __FILE__ + ":" + __LINE__ + "]" 
 
-#define totals(x) totals(x, INFO)
-#define xtotals(x) xtotals(x, INFO)
+#define totals_check(x) totals(x, INFO)
+#define xtotals_check(x) xtotals(x, INFO)
 
 //
 // Use check(<expression>)
