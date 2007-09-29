@@ -1,3 +1,9 @@
+2007-09-29 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/ming_utils.c (Dejagnu class): 
+	  add totals(n, msg)  and xtotals(n, msg) to check number
+	  of tests being run.
+
 2007-09-29 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* docs: update Mozilla plugin install information to reflect current
