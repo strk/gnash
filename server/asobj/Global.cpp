@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.71 2007/09/27 15:42:11 strk Exp $ */
+/* $Id: Global.cpp,v 1.72 2007/09/29 08:24:21 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -404,13 +404,16 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 	{
 		object_class_init(*this);
 		ch->getGlobalNs()->stubPrototype(NSV::CLASS_OBJECT);
+		ch->getGlobalNs()->getClass(NSV::CLASS_OBJECT)->setDeclared();
 		array_class_init(*this);
 		ch->getGlobalNs()->stubPrototype(NSV::CLASS_ARRAY);
+		ch->getGlobalNs()->getClass(NSV::CLASS_ARRAY)->setDeclared();
 	}
 	if (vm.getSWFVersion() >= 6)
 	{
 		function_class_init(*this);
 		ch->getGlobalNs()->stubPrototype(NSV::CLASS_FUNCTION);
+		ch->getGlobalNs()->getClass(NSV::CLASS_FUNCTION)->setDeclared();
 	}
 	
 	if ( vm.getSWFVersion() < 3 ) goto extscan;

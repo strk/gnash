@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.126 2007/09/27 23:59:55 tgc Exp $
+# $Id: Makefile.am,v 1.127 2007/09/29 08:24:21 cmusick Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -65,6 +65,7 @@ libgnashserver_la_SOURCES = \
 	as_function.cpp	\
 	as_object.cpp \
 	as_value.cpp \
+	asClass.cpp \
 	character.cpp \
 	cxform.cpp \
 	DynamicShape.cpp	\
@@ -129,6 +130,7 @@ noinst_HEADERS = \
 	as_object.h \
 	as_prop_flags.h	\
 	as_value.h \
+	asClass.h \
 	bitmap_info.h \
 	BitmapMovieInstance.h \
 	builtin_function.h \

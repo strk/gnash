@@ -28,13 +28,14 @@
 #include "gnash.h"
 #include "stream.h"
 #include "string_table.h"
-#include "Namespace.h"
+#include "asClass.h"
 
 namespace gnash {
 
-typedef std::vector<Namespace *> abcNamespaceSet;
+typedef std::vector<asNamespace *> abcNamespaceSet;
 
 class abc_block;
+class ClassHierarchy;
 
 namespace abc_parsing {
 
@@ -67,57 +68,11 @@ public:
 
 	uint8_t mFlags;
 	string_table::key mName;
-	Namespace* mNamespace;
-	std::vector<Namespace*> *mNamespaceSet;
-};
+	asNamespace* mNamespace;
+	std::vector<asNamespace*> *mNamespaceSet;
 
-class abc_Method
-{
-public:
-	typedef enum
-	{
-		FLAG_ARGS = 0x01,
-		FLAG_ACTIVATION = 0x02,
-		FLAG_MORE = 0x04,
-		FLAG_OPTIONAL = 0x08,
-		FLAG_IGNORE = 0x10,
-		FLAG_NATIVE = 0x20,
-		FLAG_DEFAULT_NS = 0x40,
-		FLAG_PARAM_NAMES = 0x80
-	} flags;
-
-	class optional_parameter
-	{
-	public:
-		uint32_t mIndex;
-		uint8_t mKind;
-	};
-
-	abc_Multiname *mReturnType;
-	std::vector<abc_Multiname*> mParameters; // The types, not the names.
-	uint8_t mFlags;
-	std::vector<optional_parameter> mOptionalParameters;
-};
-
-class abc_Instance
-{
-public:
-	typedef enum
-	{
-		FLAG_SEALED = 0x01,
-		FLAG_FINAL = 0x02,
-		FLAG_INTERFACE = 0x04,
-		FLAG_PROTECTED_NS = 0x08,
-		FLAG_DYNAMIC = 0x00 // No other flags set
-	} flags;
-
-	abc_Multiname *mName;
-	abc_Multiname *mSuperType;
-	flags mFlags;
-	Namespace *mProtectedNamespace;
-	std::vector<abc_Multiname*> mInterfaces;
-	abc_Method *mMethod;
-	std::vector<abc_Trait> mTraits;
+	abc_Multiname() : mFlags(0), mName(0), mNamespace(NULL), mNamespaceSet(NULL)
+	{/**/}
 };
 
 class abc_Trait
@@ -134,78 +89,127 @@ public:
 		KIND_FUNCTION = 5
 	} kinds;
 
+	bool mHasValue;
 	kinds mKind;
-	uint32_t mNameIndex;
-	uint32_t mNamespaceIndex;
-	uint32_t mNamespaceSetIndex;
 	uint32_t mSlotId;
 	uint32_t mTypeIndex;
-	uint32_t mValueIndex;
-	uint8_t mValueIndexTypeIndex;
 	uint32_t mClassInfoIndex;
-	uint32_t mMethodInfoIndex;
+	as_value mValue;
+	string_table::key mName;
+	asNamespace *mNamespace;
+	asMethod *mMethod;
+	bool mValueSet;
 
-	bool read(stream* in);
-};
+	asClass *mCTarget;
+	asMethod *mMTarget;
+	bool mStatic;
 
-class abc_Class
-{
-public:
-	abc_Method *mMethod;
-	std::vector<abc_Trait> mTraits;
-};
+	abc_Trait() : mHasValue(false), mKind(KIND_SLOT), mSlotId(0),
+		mTypeIndex(0), mClassInfoIndex(0), mValue(), mName(0),
+		mNamespace(NULL), mMethod(NULL), mValueSet(false)
+	{/**/}
 
-class abc_Script
-{
-public:
-	abc_Method *mMethod;
-	std::vector<abc_Trait> mTraits;
-};
+	bool read(stream* in, abc_block *pBlock);
+	bool finalize(abc_block *pBlock, asClass *pClass, bool do_static);
+	bool finalize_mbody(abc_block *pBlock, asMethod *pMethod);
 
-class abc_Exception
-{
-public:
-	uint32_t mStart;
-	uint32_t mEnd;
-	uint32_t mCatch;
-	abc_Multiname* mType;
-	abc_Multiname* mName;
-};
+	void set_target(asClass *pClass, bool do_static)
+	{ mCTarget = pClass; mStatic = do_static; }
+	void set_target(asMethod *pMethod)
+	{ mCTarget = NULL; mMTarget = pMethod; }
 
-class abc_MethodBody
-{
-public:
-	abc_Method *mMethod;
-	std::vector<abc_Exception> mExceptions;
-	std::vector<abc_Trait> mTraits;
-	std::vector<char> mCode;
+	bool finalize(abc_block *pBlock)
+	{
+		if (mCTarget)
+			return finalize(pBlock, mCTarget, mStatic);
+		return finalize_mbody(pBlock, mMTarget);
+	}
 };
 
 }; // namespace abc_parsing
 
-typedef std::vector<Namespace*> NamespaceSet;
+typedef std::vector<asNamespace*> NamespaceSet;
 			
 class abc_block
 {
 private:
+	friend class abc_parsing::abc_Trait;
+	typedef enum
+	{
+		PRIVATE_NS = 0x05,
+		PROTECTED_NS = 0x18,
+		METHOD_ARGS = 0x01,
+		METHOD_ACTIVATION = 0x02,
+		METHOD_MORE = 0x04,
+		METHOD_OPTIONAL_ARGS = 0x08,
+		METHOD_IGNORE = 0x10,
+		METHOD_NATIVE = 0x20,
+		METHOD_DEFAULT_NS = 0x40,
+		METHOD_ARG_NAMES = 0x80,
+		INSTANCE_SEALED = 0x01,
+		INSTANCE_FINAL = 0x02,
+		INSTANCE_INTERFACE = 0x04,
+		INSTANCE_DYNAMIC = 0x00,
+		INSTANCE_PROTECTED_NS = 0x08,
+		POOL_STRING = 0x01,
+		POOL_INTEGER = 0x03,
+		POOL_UINTEGER = 0x04,
+		POOL_DOUBLE = 0x06,
+		POOL_NAMESPACE = 0x08,
+		POOL_FALSE = 0x0A,
+		POOL_TRUE = 0x0B,
+		POOL_NULL = 0x0C
+	} constants;
+
 	std::vector<int32_t> mIntegerPool;
 	std::vector<uint32_t> mUIntegerPool;
 	std::vector<long double> mDoublePool;
 	std::vector<std::string> mStringPool;
 	std::vector<string_table::key> mStringPoolTableIds;
-	std::vector<Namespace*> mNamespacePool;
+	std::vector<asNamespace*> mNamespacePool;
 	std::vector<NamespaceSet> mNamespaceSetPool;
-	std::vector<abc_parsing::abc_Method> mMethods;
+	std::vector<asMethod*> mMethods;
 	std::vector<abc_parsing::abc_Multiname> mMultinamePool;
-	std::vector<abc_parsing::abc_Instance> mInstances;
-	std::vector<abc_parsing::abc_Class> mClasses; 
-	std::vector<abc_parsing::abc_Script> mScripts;
-	std::vector<abc_parsing::abc_MethodBody> mBodies;
+	std::vector<asClass*> mClasses; 
+	std::vector<asClass*> mScripts;
+	std::vector<abc_parsing::abc_Trait*> mTraits;
 
 	string_table* mStringTable;
+	stream *mS; // Not stored beyond one read.
+
+	asClass *mTheObject;
+	ClassHierarchy *mCH;
+
+	uint32_t mVersion;
+
+	asClass *locateClass(abc_parsing::abc_Multiname &m);
+
+	abc_parsing::abc_Trait &newTrait()
+	{
+		abc_parsing::abc_Trait *p = new abc_parsing::abc_Trait;
+		mTraits.push_back(p);
+		return *p;
+	}
 
 public:
+	bool read_version();
+	bool read_integer_constants();
+	bool read_unsigned_integer_constants();
+	bool read_double_constants();
+	bool read_string_constants();
+	bool read_namespaces();
+	bool read_namespace_sets();
+	bool read_multinames();
+	bool read_method_infos();
+	bool skip_metadata();
+	bool read_instances();
+	bool read_classes();
+	bool read_scripts();
+	bool read_method_bodies();
+
 	bool read(stream* in);
+
+	bool pool_value(uint32_t index, uint8_t type, as_value &v);
 
 	abc_block();
 };

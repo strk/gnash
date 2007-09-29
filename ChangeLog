@@ -1,3 +1,22 @@
+2007-09-29 Chad Musick <chadmusick@msbx.net>
+
+	* New: server/asClass.h,.cpp: Several different classes which work
+	  together to construct a type library for ActionScript 3.  Work is
+	  in progress to make this glean the same information from the current
+	  ActionScript 2 information (through the Global object, as well
+	  as hand coding) so that the 'implements' op can be written and so
+	  that various AS2 things will work better.  This is not yet complete.
+	  Because this code is in flux (though currently not broken), it is
+	  not yet extensively commented.
+	* server/Makefile.am: Add new files
+	* server/namedStrings.h,.cpp: New strings for the AS3 namespaces.
+	* server/parser/Namespace.h: Add resource marking -- this file is
+	  going to be obsolete as soon as dependencies are verified.
+	* server/parser/abc_block.h,.cpp: Update to be more modular, and to
+	  build a type library from AS3 tag.
+	* server/vm/VM.cpp: Change to registration method for new types.
+	* New: Various .cvsignore files
+
 2007-09-29 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-swfc.all/: Dejagnu.sc, check.sc,

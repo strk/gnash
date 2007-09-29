@@ -125,6 +125,18 @@ static string_table::svt preload_names[] =
 	{ "ContextMenu", NSV::CLASS_CONTEXT_MENU },
 	{ "MovieClipLoader", NSV::CLASS_MOVIE_CLIP_LOADER },
 	{ "Error", NSV::CLASS_ERROR },
+	{ "flash.display", NSV::NS_FLASH_DISPLAY },
+	{ "flash.text", NSV::NS_FLASH_TEXT },
+	{ "flash.geom", NSV::NS_FLASH_GEOM },
+	{ "flash.net", NSV::NS_FLASH_NET },
+	{ "flash.system", NSV::NS_FLASH_SYSTEM },
+	{ "flash.utils", NSV::NS_FLASH_UTILS },
+	{ "flash.events", NSV::NS_FLASH_EVENTS },
+	{ "flash.accessibility", NSV::NS_FLASH_ACCESSIBILITY },
+	{ "flash.media", NSV::NS_FLASH_MEDIA },
+	{ "flash.xml", NSV::NS_FLASH_XML },
+	{ "flash.ui", NSV::NS_FLASH_UI },
+	{ "adobe.utils", NSV::NS_ADOBE_UTILS },
 };
 
 void load_strings(string_table *table, int version)

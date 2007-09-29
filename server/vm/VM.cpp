@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: VM.cpp,v 1.21 2007/09/24 15:39:31 cmusick Exp $ */
+/* $Id: VM.cpp,v 1.22 2007/09/29 08:24:22 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -155,6 +155,8 @@ VM::markReachableResources() const
 	{
 		(*i)->setReachable();
 	}
+
+	mClassHierarchy->markReachableResources();
 #endif
 
 }

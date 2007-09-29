@@ -27,11 +27,11 @@
 
 #include <map>
 #include "string_table.h"
+#include "as_object.h"
 
 namespace gnash {
 
 class abc_block;
-class as_object;
 
 /// A namespace for ActionScript. Not really functional in AS2.
 ///
@@ -166,6 +166,10 @@ public:
 		return i->second;
 	}
 
+	/// \brief
+	/// Mark reachable resources for GC.
+	void markReachableResources() const;
+
 private:
 	string_table::key mUri;
 	string_table::key mPrefix;
@@ -173,6 +177,19 @@ private:
 
 	std::map<string_table::key, as_object*> mMembers;
 };
+
+inline void
+Namespace::markReachableResources() const
+{
+	std::map<string_table::key, as_object*>::const_iterator i =
+		mMembers.begin();
+
+	for ( ; i != mMembers.end(); ++i)
+	{
+		if (i->second != NULL)
+			i->second->setReachable();
+	}
+}
 
 }; /* namespace gnash */
 #endif /* GNASH_NAMESPACE_H */

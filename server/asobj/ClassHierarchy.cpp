@@ -63,6 +63,7 @@
 #include "xmlsocket.h"
 #include "xml.h"
 #include "xmlnode.h"
+#include "asClass.h"
 
 namespace gnash {
 
@@ -189,7 +190,9 @@ ClassHierarchy::declareClass(extensionClass& c)
 	if (mExtension == NULL)
 		return false; // Extensions can't be loaded.
 
-	mGlobalNamespace.stubPrototype(c.name);
+	mGlobalNamespace->stubPrototype(c.name);
+	mGlobalNamespace->getClass(c.name)->setDeclared();
+	mGlobalNamespace->getClass(c.name)->setSystem();
 
 	boost::intrusive_ptr<as_function> getter =
 		new declare_extension_function(c, mGlobal, mExtension);
@@ -203,7 +206,14 @@ ClassHierarchy::declareClass(extensionClass& c)
 bool
 ClassHierarchy::declareClass(nativeClass& c)
 {
-	mGlobalNamespace.stubPrototype(c.name);
+	// For AS2 and below, registering with mGlobal _should_ make it equivalent
+	// to being in the global namespace, since everything is global there.
+	asNamespace *nso = findNamespace(c.namespace_name);
+	if (!nso)
+		nso = addNamespace(c.namespace_name);
+	nso->stubPrototype(c.name);
+	nso->getClass(c.name)->setDeclared();
+	nso->getClass(c.name)->setSystem();
 
 	boost::intrusive_ptr<as_function> getter =
 		new declare_native_function(c, mGlobal, mExtension);
@@ -216,40 +226,45 @@ ClassHierarchy::declareClass(nativeClass& c)
 
 static ClassHierarchy::nativeClass knownClasses[] =
 {
+// This makes it clear the difference between "We don't know where the
+// class belongs" and "it belongs in the global namespace", even though
+// the result is the same.
+#define NS_GLOBAL 0
+#define NS_UNKNOWN 0
 	/* { function_name, name key, super name key, lowest version }, */
-//	{ object_class_init, NSV::CLASS_OBJECT, 0, 5 }, // Object is special
-//	{ function_class_init, NSV::CLASS_FUNCTION, NSV::CLASS_OBJECT, 6 }, // Function is special
-//	{ array_class_init, NSV::CLASS_ARRAY, NSV::CLASS_OBJECT, 5 }, // Array is special
-	{ system_class_init, NSV::CLASS_SYSTEM, 0, 1 },
-	{ stage_class_init, NSV::CLASS_STAGE, 0, 1 },
-	{ movieclip_class_init, NSV::CLASS_MOVIE_CLIP, 0, 3 },
-	{ textfield_class_init, NSV::CLASS_TEXT_FIELD, 0, 3 },
-	{ math_class_init, NSV::CLASS_MATH, 0, 4 },
-	{ boolean_class_init, NSV::CLASS_BOOLEAN, NSV::CLASS_OBJECT, 5 },
-	{ color_class_init, NSV::CLASS_COLOR, NSV::CLASS_OBJECT, 5 },
-	{ selection_class_init, NSV::CLASS_SELECTION, NSV::CLASS_OBJECT, 5 },
-	{ sound_class_init, NSV::CLASS_SOUND, NSV::CLASS_OBJECT, 5 },
-	{ xmlsocket_class_init, NSV::CLASS_X_M_L_SOCKET, NSV::CLASS_OBJECT, 5 },
-	{ date_class_init, NSV::CLASS_DATE, NSV::CLASS_OBJECT, 5 },
-	{ xml_class_init, NSV::CLASS_X_M_L, NSV::CLASS_OBJECT, 5 },
-	{ xmlnode_class_init, NSV::CLASS_X_M_L_NODE, NSV::CLASS_OBJECT, 5 },
-	{ mouse_class_init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT, 5 },
-	{ number_class_init, NSV::CLASS_NUMBER, NSV::CLASS_OBJECT, 5 },
-	{ string_class_init, NSV::CLASS_STRING, NSV::CLASS_OBJECT, 5 },
-	{ key_class_init, NSV::CLASS_KEY, NSV::CLASS_OBJECT, 5 },
-	{ AsBroadcaster_init, NSV::CLASS_AS_BROADCASTER, NSV::CLASS_OBJECT, 5 },
-	{ textsnapshot_class_init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT, 6 },
-	{ video_class_init, NSV::CLASS_VIDEO, NSV::CLASS_OBJECT, 6 },
-	{ camera_class_init, NSV::CLASS_CAMERA, NSV::CLASS_OBJECT, 6 },
-	{ microphone_class_init, NSV::CLASS_MICROPHONE, NSV::CLASS_OBJECT, 6 },
-	{ sharedobject_class_init, NSV::CLASS_SHARED_OBJECT, NSV::CLASS_OBJECT, 6 },
-	{ loadvars_class_init, NSV::CLASS_LOAD_VARS, NSV::CLASS_OBJECT, 6 },
-	{ customactions_class_init, NSV::CLASS_CUSTOM_ACTIONS, NSV::CLASS_OBJECT, 6 },
-	{ netconnection_class_init, NSV::CLASS_NET_CONNECTION, NSV::CLASS_OBJECT, 7 },
-	{ netstream_class_init, NSV::CLASS_NET_STREAM, NSV::CLASS_OBJECT, 7 },
-	{ contextmenu_class_init, NSV::CLASS_CONTEXT_MENU, NSV::CLASS_OBJECT, 7 },
-	{ moviecliploader_class_init, NSV::CLASS_MOVIE_CLIP_LOADER, NSV::CLASS_OBJECT, 7 },
-	{ error_class_init, NSV::CLASS_ERROR, NSV::CLASS_OBJECT, 7 },
+//	{ object_class_init, NSV::CLASS_OBJECT, 0, NS_GLOBAL, 5 }, // Object is special
+//	{ function_class_init, NSV::CLASS_FUNCTION, NSV::CLASS_OBJECT, NS_GLOBAL, 6 }, // Function is special
+//	{ array_class_init, NSV::CLASS_ARRAY, NSV::CLASS_OBJECT, NS_GLOBAL, 5 }, // Array is special
+	{ system_class_init, NSV::CLASS_SYSTEM, 0, NSV::NS_FLASH_SYSTEM, 1 },
+	{ stage_class_init, NSV::CLASS_STAGE, 0, NSV::NS_FLASH_DISPLAY, 1 },
+	{ movieclip_class_init, NSV::CLASS_MOVIE_CLIP, 0, NSV::NS_FLASH_DISPLAY, 3 },
+	{ textfield_class_init, NSV::CLASS_TEXT_FIELD, 0, NSV::NS_FLASH_TEXT, 3 },
+	{ math_class_init, NSV::CLASS_MATH, 0, NS_GLOBAL, 4 },
+	{ boolean_class_init, NSV::CLASS_BOOLEAN, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
+	{ color_class_init, NSV::CLASS_COLOR, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
+	{ selection_class_init, NSV::CLASS_SELECTION, NSV::CLASS_OBJECT, NS_UNKNOWN, 5 },
+	{ sound_class_init, NSV::CLASS_SOUND, NSV::CLASS_OBJECT, NSV::NS_FLASH_MEDIA, 5 },
+	{ xmlsocket_class_init, NSV::CLASS_X_M_L_SOCKET, NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 5 },
+	{ date_class_init, NSV::CLASS_DATE, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
+	{ xml_class_init, NSV::CLASS_X_M_L, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
+	{ xmlnode_class_init, NSV::CLASS_X_M_L_NODE, NSV::CLASS_OBJECT, NSV::NS_FLASH_XML, 5 },
+	{ mouse_class_init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 5 },
+	{ number_class_init, NSV::CLASS_NUMBER, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
+	{ string_class_init, NSV::CLASS_STRING, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
+	{ key_class_init, NSV::CLASS_KEY, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
+	{ AsBroadcaster_init, NSV::CLASS_AS_BROADCASTER, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
+	{ textsnapshot_class_init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 6 },
+	{ video_class_init, NSV::CLASS_VIDEO, NSV::CLASS_OBJECT, NSV::NS_FLASH_MEDIA, 6 },
+	{ camera_class_init, NSV::CLASS_CAMERA, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 6 },
+	{ microphone_class_init, NSV::CLASS_MICROPHONE, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 6 },
+	{ sharedobject_class_init, NSV::CLASS_SHARED_OBJECT, NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 6 },
+	{ loadvars_class_init, NSV::CLASS_LOAD_VARS, NSV::CLASS_OBJECT, NS_GLOBAL, 6 },
+	{ customactions_class_init, NSV::CLASS_CUSTOM_ACTIONS, NSV::CLASS_OBJECT, NSV::NS_ADOBE_UTILS, 6 },
+	{ netconnection_class_init, NSV::CLASS_NET_CONNECTION, NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 7 },
+	{ netstream_class_init, NSV::CLASS_NET_STREAM, NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 7 },
+	{ contextmenu_class_init, NSV::CLASS_CONTEXT_MENU, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 7 },
+	{ moviecliploader_class_init, NSV::CLASS_MOVIE_CLIP_LOADER, NSV::CLASS_OBJECT, NS_GLOBAL, 7 },
+	{ error_class_init, NSV::CLASS_ERROR, NSV::CLASS_OBJECT, NS_GLOBAL, 7 },
 };
 
 void
@@ -271,6 +286,24 @@ ClassHierarchy::massDeclare(int version)
 	{
 		/* Load extensions here */
 	}
+}
+
+void
+ClassHierarchy::markReachableResources() const
+{
+	// TODO
+}
+
+void
+ClassHierarchy::dump()
+{
+	namespacesContainer::iterator i;
+
+	for (i = mNamespaces.begin(); i != mNamespaces.end(); ++i)
+	{
+		(i->second).dump();
+	}
+	getGlobalNs()->dump();
 }
 
 } /* namespace gnash */

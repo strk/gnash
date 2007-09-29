@@ -13,3 +13,6 @@ site.exp
 GotoAndPlayTestRunner
 gotoFrameOnKeyEvent-TestRunner
 gmon.out
+subshapes-TestRunner
+BitsReaderTest
+StreamTest
