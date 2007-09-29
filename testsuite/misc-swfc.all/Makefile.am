@@ -31,6 +31,7 @@ SCTESTS = \
 	action_execution_order_test12.sc \
 	registerclass_test3.sc \
 	edittext_test1.sc \
+	opcode_guard_test2.sc \
 	$(NULL)
 
 # These will get compiled to SWFs just as above, but will not be executed as a test

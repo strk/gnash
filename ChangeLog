@@ -3,6 +3,8 @@
 	* testsuite/actionscript.all/with.as: more tests for setTarget and found
 	  the Dejagnu clip functions might be out of scope chain, and explicitly
 	  targeting also not work.
+	* testsuite/misc-swfc.all/opcode_guard_test2.sc, Makefile.am : test opcode 
+	  guard with setTarget. seems too much actions get discarded than expected.
 	  
 2007-09-28 Sandro Santilli <strk@keybit.net>
 
