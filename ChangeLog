@@ -1,5 +1,7 @@
 2007-09-29 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfc.all/: Dejagnu.sc, check.sc,
+	  opcode_guard_test2.sc: add and use xtotals.
 	* testsuite/actionscript.all/toString_valueOf.as: more tests for
 	  TextField, toString and comparison..
 

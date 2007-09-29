@@ -105,7 +105,7 @@
     stop();
     // Gnash failed on totals() by discarding some checks.
     // should we have a xtotals()?
-    totals(6);
+    xtotals(6);
   .end
   
 .end  // file end

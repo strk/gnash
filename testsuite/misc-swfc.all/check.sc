@@ -46,6 +46,8 @@
 
 #define totals(x) Dejagnu.totals(x, _INFO_)
 
+#define xtotals(x) Dejagnu.xtotals(x, _INFO_)
+
 #define MEDIA(x) MEDIADIR/x
 
 #endif
