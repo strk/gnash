@@ -22,7 +22,7 @@
  *  Test case sensitivity 
  */
 
-rcsid="$Id: case.as,v 1.11 2007/09/07 12:56:31 strk Exp $";
+rcsid="$Id: case.as,v 1.12 2007/09/29 16:22:58 strk Exp $";
 
 #include "check.as"
 
@@ -198,3 +198,4 @@ func(100);
   check_equals(typeof(mcRef['gotoAndStop']), 'function');
 #endif 
 
+totals();

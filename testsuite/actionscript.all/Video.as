@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Video.as,v 1.12 2007/08/31 21:53:33 strk Exp $";
+rcsid="$Id: Video.as,v 1.13 2007/09/29 16:22:58 strk Exp $";
 
 #include "check.as"
 
@@ -47,3 +47,4 @@ check_equals (typeof(videoObj.clear), 'function');
 // TODO: test other properties !
 
 #endif
+totals();

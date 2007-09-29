@@ -16,7 +16,7 @@
 
 // Original author: Mike Carlson - June 19th, 2006
 
-rcsid="$Id: String.as,v 1.22 2007/09/27 17:23:18 strk Exp $";
+rcsid="$Id: String.as,v 1.23 2007/09/29 16:22:58 strk Exp $";
 
 #include "check.as"
 
@@ -340,3 +340,4 @@ check_equals(typeof(s.toString), 'undefined');
 Object.prototype.toString = ObjectProtoToStringBackup;
 String.prototype.toString = StringProtoToStringBackup;
 
+totals();

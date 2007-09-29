@@ -18,7 +18,7 @@
 
 // Initial test written by Mike Carlson
 
-rcsid="$Id: array.as,v 1.34 2007/09/18 07:35:02 strk Exp $";
+rcsid="$Id: array.as,v 1.35 2007/09/29 16:22:58 strk Exp $";
 
 #include "check.as"
 
@@ -952,3 +952,4 @@ out = {len:0}; for (var i in b) { out[i] = 1; out['len']++; }
 xcheck_equals(out['len'], 2);
 check_equals(out[1], 1);
 check_equals(out[0], 1);
+totals();

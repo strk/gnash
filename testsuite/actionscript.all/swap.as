@@ -21,7 +21,7 @@
  *  Test stack status after action "Swap"
  */
 
-rcsid="$Id: swap.as,v 1.2 2007/07/01 10:54:43 bjacques Exp $";
+rcsid="$Id: swap.as,v 1.3 2007/09/29 16:23:00 strk Exp $";
 
 #include "check.as"
 
@@ -43,3 +43,4 @@ check_equals(var_x, "hello");
 
 #endif
 
+totals();

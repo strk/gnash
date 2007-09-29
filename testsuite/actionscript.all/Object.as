@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.34 2007/09/26 14:44:16 strk Exp $";
+rcsid="$Id: Object.as,v 1.35 2007/09/29 16:22:58 strk Exp $";
 
 #include "check.as"
 
@@ -432,3 +432,4 @@ check( obj8.prototype.isPrototypeOf(obj9) );
 // TODO: add tests here !
 
 #endif // OUTPUT_VERSION > 5
+totals();

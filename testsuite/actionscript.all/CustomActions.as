@@ -25,7 +25,7 @@
 // CustomActions is only intended foro use in the Flash authoring tool,
 // See http://sephiroth.it/reference.php?id=156&cat=1
 
-rcsid="$Id: CustomActions.as,v 1.10 2007/07/26 03:41:18 strk Exp $";
+rcsid="$Id: CustomActions.as,v 1.11 2007/09/29 16:22:57 strk Exp $";
 
 #include "check.as"
 
@@ -51,3 +51,4 @@ check (customactionsObj.list != undefined);
 check (customactionsObj.uninstall != undefined);
 
 #endif
+totals();

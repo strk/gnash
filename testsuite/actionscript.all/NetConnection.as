@@ -56,3 +56,4 @@ else
 
 
 #endif // OUTPUT_VERSION >= 7
+totals();

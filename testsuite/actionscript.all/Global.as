@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Global.as,v 1.29 2007/09/27 20:01:16 strk Exp $";
+rcsid="$Id: Global.as,v 1.30 2007/09/29 16:22:57 strk Exp $";
 
 #include "check.as"
 
@@ -117,3 +117,4 @@ check_equals (escape('abcdefghijklmnopqrstuvwxyz'), 'abcdefghijklmnopqrstuvwxyz'
 // We don't want to test onEnterFrame here, do we ?
 check_equals(typeof(setInterval), 'function');
 check_equals(typeof(clearInterval), 'function');
+totals();

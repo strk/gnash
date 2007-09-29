@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: System.as,v 1.12 2007/07/26 03:41:19 strk Exp $";
+rcsid="$Id: System.as,v 1.13 2007/09/29 16:22:58 strk Exp $";
 
 #include "check.as"
 
@@ -66,3 +66,4 @@ check(this.hasOwnProperty("$version"));
 check(! MovieClip.prototype.hasOwnProperty("$version") );
 #endif
 
+totals();

@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: getvariable.as,v 1.14 2007/08/24 10:05:58 strk Exp $";
+rcsid="$Id: getvariable.as,v 1.15 2007/09/29 16:22:59 strk Exp $";
 
 #include "check.as"
 
@@ -407,3 +407,4 @@ check_equals(checkpoint, 4);
 //-----------------------------------------------------------------------
 
 #endif // MING_SUPPORT_ASM
+totals();

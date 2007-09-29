@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.56 2007/09/26 14:44:16 strk Exp $";
+rcsid="$Id: Function.as,v 1.57 2007/09/29 16:22:57 strk Exp $";
 
 #include "check.as"
 
@@ -707,3 +707,4 @@ check_equals(f(), 42);
 check_equals(typeof(f()), 'undefined');
 #endif
 
+totals();

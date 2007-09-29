@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextSnapshot.as,v 1.9 2007/07/26 03:41:20 strk Exp $";
+rcsid="$Id: TextSnapshot.as,v 1.10 2007/09/29 16:22:58 strk Exp $";
 
 #include "check.as"
 
@@ -58,3 +58,4 @@ check_equals (typeof(textsnapshotObj.setSelectColor), 'function');
 check_equals (typeof(textsnapshotObj.setSelected), 'function');
 
 #endif // OUTPUT_VERSION > 5
+totals();

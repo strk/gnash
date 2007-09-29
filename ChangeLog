@@ -1,5 +1,24 @@
 2007-09-29 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/: AsBroadcaster.as, Boolean.as,
+	  Camera.as, Color.as, ContextMenu.as, CustomActions.as, Date.as,
+	  Error.as, Function.as, Global.as, Inheritance.as, Key.as,
+	  LoadVars.as, LocalConnection.as, Math.as, Microphone.as, Mouse.as,
+	  MovieClip.as, MovieClipLoader.as, NetConnection.as, NetStream.as,
+	  Number.as, Object.as, Selection.as, SharedObject.as, Stage.as,
+	  String.as, System.as, TextField.as, TextSnapshot.as, Video.as,
+	  XML.as, XMLNode.as, XMLSocket.as, array.as, case.as,
+	  delete.as, enumerate.as, getvariable.as, ops.as, rtmp.as,
+	  swap.as, targetPath.as, toString_valueOf.as:
+	  Add a totals() call.
+	* testsuite/actionscript.all/check.as: add totals and xtotals macros.
+	* testsuite/actionscript.all/with.as: add totals(x) and xtotal(x)
+	  calls
+	* testsuite/actionscript.all/dejagnu_so_fini.as: remove the totals()
+	  call.
+
+2007-09-29 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/ming_utils.c (Dejagnu class): 
 	  add totals(n, msg)  and xtotals(n, msg) to check number
 	  of tests being run.

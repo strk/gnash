@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.38 2007/09/27 07:18:15 zoulunkai Exp $";
+rcsid="$Id: XML.as,v 1.39 2007/09/29 16:22:58 strk Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
@@ -754,3 +754,4 @@ check_equals(myxml2.toString(), "<X1> t </X1>");
 
 // We're done
 //totals();
+totals();

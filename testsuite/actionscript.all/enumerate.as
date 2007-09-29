@@ -22,7 +22,7 @@
  *  Test ActionEnumerate/2
  */
 
-rcsid="$Id: enumerate.as,v 1.7 2007/07/24 13:13:27 strk Exp $";
+rcsid="$Id: enumerate.as,v 1.8 2007/09/29 16:22:59 strk Exp $";
 
 #include "check.as"
 
@@ -99,3 +99,4 @@ rcsid="$Id: enumerate.as,v 1.7 2007/07/24 13:13:27 strk Exp $";
 }
 
 #endif  // OUTPUT_VERSION > 5
+totals();

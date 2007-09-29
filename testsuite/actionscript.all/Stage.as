@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Stage.as,v 1.15 2007/08/29 18:50:20 strk Exp $";
+rcsid="$Id: Stage.as,v 1.16 2007/09/29 16:22:58 strk Exp $";
 
 #include "check.as"
 
@@ -73,3 +73,4 @@ check_equals (typeof(Stage.removeListener), 'undefined');
 
 #endif // OUTPUT_VERSION <= 5
 
+totals();

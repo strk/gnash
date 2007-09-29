@@ -456,3 +456,4 @@ a3 = a1 + a2;
 check(typeof(a3) == 'number');
 check(isNaN(a3));
 
+totals();

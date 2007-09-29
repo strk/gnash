@@ -67,6 +67,11 @@
 //
 #define MEDIA(x) MEDIADIR + "/" + #x
 
+#define INFO " [" + __FILE__ + ":" + __LINE__ + "]" 
+
+#define totals(x) totals(x, INFO)
+#define xtotals(x) xtotals(x, INFO)
+
 //
 // Use check(<expression>)
 //

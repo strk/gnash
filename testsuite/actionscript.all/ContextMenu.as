@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: ContextMenu.as,v 1.11 2007/07/26 03:41:18 strk Exp $";
+rcsid="$Id: ContextMenu.as,v 1.12 2007/09/29 16:22:57 strk Exp $";
 
 #include "check.as"
 
@@ -78,3 +78,4 @@ contextMenuObj2.onSelect = 4;
 check_equals(typeof(contextMenuObj2.onSelect), 'number');
 
 #endif
+totals();

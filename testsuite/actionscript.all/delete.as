@@ -1,4 +1,4 @@
-rcsid="$Id: delete.as,v 1.11 2007/08/24 10:05:58 strk Exp $";
+rcsid="$Id: delete.as,v 1.12 2007/09/29 16:22:59 strk Exp $";
 
 #include "check.as"
 
@@ -74,3 +74,4 @@ check(!delete unexistent.a);
 
 // TODO: test deletion of variables referenced by path (slash-based or dot-based)
 //       make sure to test use of 'this' here too !
+totals();

@@ -20,7 +20,7 @@
  *  Test targetPath tags (0x45)
  */
 
-rcsid="$Id: targetPath.as,v 1.3 2007/07/01 10:54:43 bjacques Exp $";
+rcsid="$Id: targetPath.as,v 1.4 2007/09/29 16:23:00 strk Exp $";
 
 #include "check.as"
 
@@ -75,3 +75,4 @@ setvariable
 check_equals(typeof(a), 'undefined');
 
 #endif // MING_SUPPORTS_ASM_TARGETPATH
+totals();

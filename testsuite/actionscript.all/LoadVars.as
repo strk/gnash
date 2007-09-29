@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: LoadVars.as,v 1.14 2007/08/08 19:53:03 strk Exp $";
+rcsid="$Id: LoadVars.as,v 1.15 2007/09/29 16:22:57 strk Exp $";
 
 #include "check.as"
 
@@ -138,3 +138,4 @@ check_equals(loadvarsObj['var2'], undefined);
 stop();
 
 #endif //  OUTPUT_VERSION >= 6
+totals();

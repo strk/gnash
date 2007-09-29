@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.42 2007/09/26 14:44:16 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.43 2007/09/29 16:22:57 strk Exp $";
 
 #include "check.as"
 
@@ -452,3 +452,4 @@ check(t5 instanceOf Test5);
 check(! t5 instanceOf Test4);
 check(t4 instanceOf Test4);
 check(! t4 instanceOf Test5);
+totals();

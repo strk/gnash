@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.26 2007/09/19 10:17:03 strk Exp $";
+rcsid="$Id: TextField.as,v 1.27 2007/09/29 16:22:58 strk Exp $";
 
 #include "check.as"
 
@@ -670,3 +670,4 @@ check_equals(tf2._y, 6);
 
 
 #endif // OUTPUT_VERSION > 5
+totals();

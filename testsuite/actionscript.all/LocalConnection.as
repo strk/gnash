@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: LocalConnection.as,v 1.16 2007/07/26 03:41:18 strk Exp $";
+rcsid="$Id: LocalConnection.as,v 1.17 2007/09/29 16:22:57 strk Exp $";
 
 #include "dejagnu.as"
 
@@ -115,4 +115,5 @@ check_equals(typeof(tmp.exists), 'undefined');
 
 #endif // OUTPUT_VERSION >= 6
 
+totals();
 totals();

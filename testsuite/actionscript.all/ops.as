@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.23 2007/09/26 10:41:02 strk Exp $";
+rcsid="$Id: ops.as,v 1.24 2007/09/29 16:22:59 strk Exp $";
 
 #include "check.as"
 
@@ -611,3 +611,4 @@ y = ++x;
 xcheck(y!=NaN);
 check(isNaN(y));
 
+totals();

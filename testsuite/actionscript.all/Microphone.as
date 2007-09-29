@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Microphone.as,v 1.11 2007/07/26 03:41:19 strk Exp $";
+rcsid="$Id: Microphone.as,v 1.12 2007/09/29 16:22:57 strk Exp $";
 
 #include "check.as"
 
@@ -58,3 +58,4 @@ xcheck_equals ( typeof(microphoneObj.setSilenceLevel), 'function' );
 xcheck_equals ( typeof(microphoneObj.setUseEchoSuppression), 'function' );
 
 #endif // OUTPUT_VERSION > 5
+totals();

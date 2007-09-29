@@ -17,7 +17,7 @@
 //
 
 
-rcsid="$Id: Math.as,v 1.5 2007/07/26 03:41:19 strk Exp $";
+rcsid="$Id: Math.as,v 1.6 2007/09/29 16:22:57 strk Exp $";
 
 // Test case for Math ActionScript class
 //
@@ -463,3 +463,4 @@ check_equals (Math.pow(-2, -2), 0.25);
 //check_equals (Math.pow(-2, -.5).toString(), "NaN");
 
 // End of Math testsuite
+totals();

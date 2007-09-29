@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.91 2007/09/27 23:06:56 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.92 2007/09/29 16:22:57 strk Exp $";
 
 #include "check.as"
 
@@ -1106,3 +1106,4 @@ check_equals(getInstanceAtDepth(-6.2), tt2);
 
 #endif // OUTPUT_VERSION >= 7
 
+totals();

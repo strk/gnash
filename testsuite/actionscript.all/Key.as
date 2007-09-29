@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Key.as,v 1.3 2007/08/29 18:50:19 strk Exp $";
+rcsid="$Id: Key.as,v 1.4 2007/09/29 16:22:57 strk Exp $";
 
 #include "check.as"
 
@@ -96,3 +96,4 @@ check_equals(Key.SPACE, 32);
 // Event handlers are:
 // onKeyUp
 // onKeyDown
+totals();

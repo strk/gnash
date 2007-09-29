@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Date.as,v 1.26 2007/07/26 03:41:18 strk Exp $";
+rcsid="$Id: Date.as,v 1.27 2007/09/29 16:22:57 strk Exp $";
 
 #include "check.as"
 
@@ -503,3 +503,4 @@ check (Date.UTC(2000,0,1,0,0,0,0) == d.valueOf());
 d.setUTCFullYear(2000, 6, 1);
 d.setUTCHours(0, 0, 0, 0);
 check (Date.UTC(2000,6,1,0,0,0,0) == d.valueOf());
+totals();

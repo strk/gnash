@@ -17,7 +17,7 @@
 //
 
 
-rcsid='$Id: rtmp.as,v 1.7 2007/07/26 03:41:20 strk Exp $';
+rcsid='$Id: rtmp.as,v 1.8 2007/09/29 16:23:00 strk Exp $';
 
 #include "dejagnu.as"
 #include "utils.as"
@@ -38,3 +38,4 @@ MyVideo.attachVideo(NewStream);
 //client_nc.write("invite");     
 
 note("Done...");
+totals();

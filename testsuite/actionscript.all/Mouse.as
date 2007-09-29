@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Mouse.as,v 1.13 2007/08/29 18:50:20 strk Exp $";
+rcsid="$Id: Mouse.as,v 1.14 2007/09/29 16:22:57 strk Exp $";
 
 #include "check.as"
 
@@ -49,3 +49,4 @@ check_equals ( typeof(Mouse.hide), 'function' );
 
 // test the Mouse::show method
 check_equals ( typeof(Mouse.show), 'function' );
+totals();

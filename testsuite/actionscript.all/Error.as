@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Error.as,v 1.10 2007/07/26 03:41:18 strk Exp $";
+rcsid="$Id: Error.as,v 1.11 2007/09/29 16:22:57 strk Exp $";
 
 #include "check.as"
 
@@ -44,3 +44,4 @@ check_equals (typeof(errorObj), 'object');
 check_equals (typeof(errorObj.toString), 'function');
 
 #endif
+totals();

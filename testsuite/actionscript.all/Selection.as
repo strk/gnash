@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Selection.as,v 1.12 2007/08/29 18:50:20 strk Exp $";
+rcsid="$Id: Selection.as,v 1.13 2007/09/29 16:22:58 strk Exp $";
 
 #include "check.as"
 
@@ -66,3 +66,4 @@ check_equals (typeof(Selection.setSelection), 'function');
 
 #endif // OUTPUT_VERSION >= 6
 
+totals();

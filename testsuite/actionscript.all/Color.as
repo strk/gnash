@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Color.as,v 1.9 2007/07/26 03:41:18 strk Exp $";
+rcsid="$Id: Color.as,v 1.10 2007/09/29 16:22:57 strk Exp $";
 
 #include "check.as"
 
@@ -46,3 +46,4 @@ check_equals ( typeof(colorObj.setRGB), 'function');
 
 // test the Color::settransform method
 check_equals ( typeof(colorObj.setTransform), 'function');
+totals();

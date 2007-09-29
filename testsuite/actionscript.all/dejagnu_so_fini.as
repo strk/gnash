@@ -4,8 +4,8 @@
 //       actions in it will *NOT* be executed)
 
 // Print totals
-info();
-totals();
+//info();
+//totals();
 
 // Since we movies importing Dejagnu.swf need
 // to be multiframed (actions in first frame will

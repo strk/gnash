@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClipLoader.as,v 1.3 2007/07/26 03:41:19 strk Exp $";
+rcsid="$Id: MovieClipLoader.as,v 1.4 2007/09/29 16:22:58 strk Exp $";
 
 #include "check.as"
 
@@ -59,3 +59,4 @@ check(mcl instanceOf MovieClipLoader);
 //
 
 #endif // OUTPUT_VERSION >= 7
+totals();
