@@ -14,3 +14,5 @@ as_prop_flagsTest
 DisplayListTest
 EdgeTest
 PointTest
+BitsReaderTest
+StreamTest
