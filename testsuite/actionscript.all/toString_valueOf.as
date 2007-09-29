@@ -315,6 +315,15 @@ y = text1.valueOf();
 #endif 
 check_equals(y, text1);
 
+text1.toString = function() { return "A STRING"; };
+check(text1 != "A STRING");
+a = "prefix_"+text1;
+#if OUTPUT_VERSION > 5
+ check_equals(a, "prefix_A STRING");
+#else
+ xcheck_equals(a, "prefix_");
+#endif
+
 //
 //Testing toString and valueOf of Buttons
 //

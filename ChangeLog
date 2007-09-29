@@ -1,3 +1,8 @@
+2007-09-29 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/toString_valueOf.as: more tests for
+	  TextField, toString and comparison..
+
 2007-09-29 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* testsuite/actionscript.all/with.as: more tests for setTarget and found
