@@ -62,7 +62,12 @@
     dup1.testVar = 'dup1_var';
     setTarget('dup1');
       removeMovieClip(_root.dup1);
-      // seems Gnash discarded the follow 2 tests
+      // seems Gnash discarded the following 2 tests, caused by opcode guard with
+      // current target.  I think we should use the original target.
+      // Note, there's no soft reference for dup1, but I bet sprite 'dup1' 
+      // still leaks in Gnash due to hard reference as_environment::m_target.
+      // I guess sprites(and maybe all referencable characters) should be referenced by 
+      // _target(string) value, otherwise too much leaks to afford.
       _root.check_equals(typeof(_root.dup1), 'undefined');
       _root.check_equals(testVar, undefined);
     setTarget('');
@@ -70,7 +75,7 @@
     dup2.testVar = 'dup2_var';
     with('dup2'){
       removeMovieClip(_root.dup2);
-      // seems Gnash discarded the follow 2 tests
+      // seems Gnash discarded the following 2 tests
       _root.check_equals(typeof(_root.dup2), 'undefined');
       _root.check_equals(testVar, undefined);
     }
