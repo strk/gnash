@@ -67,6 +67,7 @@ libgnashmedia_la_LIBADD = \
 	$(OPENGL_LIBS) \
 	$(LIBINTL) \
 	$(LIBLTDL) \
+	$(LIBLTDLHEAD) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(SDL_LIBS) \
@@ -119,6 +120,16 @@ endif
 
 libgnashmedia_la_LDFLAGS = -release $(VERSION)
 
+libltdlc_la_CPPFLAGS = $(LTDLINCL)
+if CONVENIENCE_LTDL
+noinst_LTLIBRARIES = libltdlc.la
+libltdlc_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
+endif
+CLEANFILES = libltdl.la libltdlc.la
+
+libltdl_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
+libltdl_la_LDFLAGS = -no-undefined -version-info 4:4:1
+libltdl_la_LIBADD = $(LIBADD_DL)
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

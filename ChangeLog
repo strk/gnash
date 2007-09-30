@@ -3,6 +3,7 @@
 	* libbase/tu_file.cpp: __SGI_LIBC_USING_FROM_STD(va_list).
 	* libbase/Makefile.am: Don't include OPENGL_INCL, it might direct you
 	  /usr/include on some systems and it doesn't seem necessary...
+	* libmedia/Makefile.am: Added libltdl-stuff from libbase/Makefile.am.
 
 2007-09-29 Sandro Santilli <strk@keybit.net>
 
