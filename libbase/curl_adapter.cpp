@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: curl_adapter.cpp,v 1.39 2007/09/25 14:17:20 strk Exp $ */
+/* $Id: curl_adapter.cpp,v 1.40 2007/09/30 18:51:27 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -402,7 +402,6 @@ CurlStreamFile::fill_cache(long unsigned size)
 		_running = false;
         }
 
-
 }
 
 /*private*/
@@ -437,6 +436,25 @@ CurlStreamFile::init(const std::string& url)
 	_cachefd = fileno(_cache);
 
 	CURLcode ccode;
+
+	// Override cURL's default verification of SSL certificates
+	// This is insecure, so log security warning.
+	// Equivalent to curl -k or curl --insecure.
+	if (gnash::RcInitFile::getDefaultInstance().SSLInsecure())
+	{
+                gnash::log_security(_("Allowing connections to SSL sites with invalid"
+				 " or absent certificates"));		
+
+		ccode = curl_easy_setopt(_handle, CURLOPT_SSL_VERIFYPEER, 0);
+		if ( ccode != CURLE_OK ) {
+			throw gnash::GnashException(curl_easy_strerror(ccode));
+		}
+
+		ccode = curl_easy_setopt(_handle, CURLOPT_SSL_VERIFYHOST, 0);
+		if ( ccode != CURLE_OK ) {
+			throw gnash::GnashException(curl_easy_strerror(ccode));
+		}
+	}
 
 	ccode = curl_easy_setopt(_handle, CURLOPT_USERAGENT, "Gnash-" VERSION);
 	if ( ccode != CURLE_OK ) {
@@ -646,6 +664,7 @@ CurlStreamFile::seek_to_end()
 			_running = false;
                         return false;
                 }
+
 	}
 
 	if ( fseek(_cache, 0, SEEK_END) == -1 ) {

@@ -1,3 +1,12 @@
+2007-09-30 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/curl_adapter.cpp: allow, with security warning, override
+	  of curl's SSL certificate verification when requested in gnashrc.
+	  Equivalent to curl --insecure.
+	* libbase/rc.{cpp,h}: 'set insecureSSL on' disables SSL certificate
+	  verification, thus allowing connections from the standalone player
+	  to https:// sites when the certificate is invalid or untrusted.
+
 2007-09-30 Sandro Santilli <strk@keybit.net>
 	
 	* server/environment.{h, cpp}: get_variable_raw() set 'this' to the orignial target

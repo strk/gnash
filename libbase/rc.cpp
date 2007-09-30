@@ -80,6 +80,7 @@ RcInitFile::RcInitFile() : _delay(0),
                            _plugin_sound(true),
 			   _extensionsEnabled(false),
 			   _startStopped(false),
+			   _SSLInsecure(false),
 			   _streamsTimeout(DEFAULT_STREAMS_TIMEOUT)
 
 {
@@ -326,7 +327,7 @@ RcInitFile::parseFile(const std::string& filespec)
         }
         
         // Read in each line and parse it
-        while (!in.eof()) {
+        do {
 
 	    // Make sure action is empty, otherwise the last loop (with no new
 	    // data) keeps action, variable and value from the previous loop. This
@@ -389,6 +390,8 @@ RcInitFile::parseFile(const std::string& filespec)
                                value);
                      extractSetting(&_localdomain_only, "localdomain", variable,
                                value);
+                     extractSetting(&_SSLInsecure, "InsecureSSL", variable,
+                               value);
                      extractSetting(&_debugger, "debugger", variable, value);
                      extractSetting(&_actiondump, "actionDump", variable, value);
                      extractSetting(&_parserdump, "parserDump", variable, value);
@@ -409,7 +412,7 @@ RcInitFile::parseFile(const std::string& filespec)
                      extractNumber(&_verbosity, "verbosity", variable, value);
 		}
             }
-        }
+        } while (!in.eof());
 
     } else {
         if (in) {
@@ -515,6 +518,8 @@ RcInitFile::dump()
          << ((_localhost_only)?"enabled":"disabled") << endl;
     cerr << "\tWrite Debug Log To Disk: "
          << ((_writelog)?"enabled":"disabled") << endl;
+    cerr << "\tAllow insecure SSL connections: "
+         << ((_SSLInsecure)?"yes":"no") << endl;
     cerr << "\tEnable sound: "
          << ((_sound)?"enabled":"disabled") << endl;
     cerr << "\tEnable Plugin sound: "

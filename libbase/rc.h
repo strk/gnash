@@ -72,6 +72,8 @@ public:
     /// defaults to false.
     ///
     bool startStopped() const { return _startStopped; }
+
+    bool SSLInsecure() const { return _SSLInsecure; }
     
     int verbosityLevel() const { return _verbosity; }
     void verbosityLevel(int value) { _verbosity = value; }
@@ -154,6 +156,9 @@ private:
     bool _extensionsEnabled;	// whether to scan plugin path for extensions
 
     bool _startStopped;		// whether to start the gui in "stop" mode
+
+    bool _SSLInsecure;		// When TRUE, does not verify SSL certificates
+				// so is INSECURE.
 
     /// The number of seconds of inactivity triggering download timeout
     double _streamsTimeout;
