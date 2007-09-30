@@ -1,3 +1,8 @@
+2007-09-30 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/misc-swfc.all/movieclip_destruction_test3.sc: '_root' is always
+	  defined as tests shows.
+	  
 2007-09-30 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libbase/tu_file.cpp: __SGI_LIBC_USING_FROM_STD(va_list).

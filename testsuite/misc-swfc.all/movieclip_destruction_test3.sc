@@ -111,21 +111,38 @@
   .end
 
 .frame 10
-	.action:
-		// Check 'nestedMovieClip' has unloaded but not destroyed
-		 check_equals(nestedMovieClip.getDepth(), -32779);
-	.end
+  .action:
+    // Check 'nestedMovieClip' has unloaded but not destroyed
+     check_equals(nestedMovieClip.getDepth(), -32779);
+  .end
 #endif 
 
-.frame 20
+
+.frame 12
   .action:  
     check_equals(_root.x, 300);
     check_equals(typeof(nestedMovieClip), 'undefined');
     check_equals(_root.as_order, "0+1+2+");
-    stop();
-    totals(9);
   .end
 
+
+.frame 15
+  .action:
+    _root.createEmptyMovieClip("mcA", 10);
+    mcARef = mcA;
+    mcA.onUnload = function () {
+      _root.check_equals(mcA['_root'], _level0);
+    };
+    mcA['removeMovieClip']();
+    _root.check_equals(mcARef.getDepth(), -32779);
+    _root.check_equals(mcARef['_root'], _level0);
+  .end
+
+.frame 16
+  .action:  
+    stop();
+    totals(12);
+  .end
 
 .end
 
