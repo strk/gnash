@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.53 2007/09/27 08:10:17 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.54 2007/09/30 05:24:36 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -726,6 +726,12 @@ ActionExec::dumpActions(size_t from, size_t to, ostream& os)
 	    }
 
 	}
+}
+
+as_object*
+ActionExec::getThisPointer()
+{
+	return _function_var ? _this_ptr.get() : env.get_original_target(); 
 }
 
 } // end of namespace gnash

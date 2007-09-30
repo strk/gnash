@@ -58,6 +58,8 @@ public:
 	character* get_target() { return m_target; }
 	void set_target(character* target);
 
+    character* get_original_target() { return _original_target; }
+
 	// Reset target to its original value
 	void reset_target() { m_target = _original_target; }
 

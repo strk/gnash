@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.18 2007/09/29 16:40:38 strk Exp $";
+rcsid="$Id: with.as,v 1.19 2007/09/30 05:24:36 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -270,7 +270,7 @@ _global.xpass_check = xpass_check;
 _global.xfail_check = xfail_check;
 
 setTarget('/clip1'); //tag 0x8B 
-    xcheck_equals(this, _level0);
+    check_equals(this, _level0);
     check_equals(testvar, 'clip1_var');     
     // won't search timeline properties, different with ActionWith     
     check_equals(testvar2, 'global_var');
@@ -278,7 +278,7 @@ setTarget('/clip1'); //tag 0x8B
 setTarget("");
 
 setTarget('/clip1/clip2'); //tag 0x8B 
-    xcheck_equals(this, _level0);
+    check_equals(this, _level0);
     check_equals(testvar, 'clip2_var');     
     check_equals(testvar2, 'global_var');  
 setTarget("");

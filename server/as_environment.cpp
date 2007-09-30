@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.92 2007/09/26 20:52:02 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.93 2007/09/30 05:24:36 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -105,38 +105,38 @@ as_environment::get_variable_raw(
 {
     assert(strchr(varname.c_str(), ':') == NULL);
 
-    as_value	val;
+    as_value    val;
 
     // Check the with-stack.
     for (size_t i = scopeStack.size(); i > 0; --i) {
         // const_cast needed due to non-const as_object::get_member 
-	as_object* obj = const_cast<as_object*>(scopeStack[i-1].get());
-	if (obj && obj->get_member(VM::get().getStringTable().find(varname), &val)) {
-	    // Found the var in this context.
-	    if ( retTarget ) *retTarget = obj;
-	    return val;
-	}
+        as_object* obj = const_cast<as_object*>(scopeStack[i-1].get());
+        if (obj && obj->get_member(VM::get().getStringTable().find(varname), &val)) {
+            // Found the var in with context.
+            if ( retTarget ) *retTarget = obj;
+            return val;
+        }
     }
 
     // Check locals for getting them
     //as_environment::frame_slot slot;
     if ( findLocal(varname, val, retTarget) ) 
     {
-	return val;
+        return val;
     }
 
 
-    // Check target members.
+    // Check current target members.
     if (m_target->get_member(VM::get().getStringTable().find(varname), &val)) {
-	if ( retTarget ) *retTarget = m_target;
-	return val;
+        if ( retTarget ) *retTarget = m_target;
+        return val;
     }
 
-    // Looking for "this"?
+    // Looking for "this" 
     if (varname == "this") {
-	val.set_as_object(m_target);
-	if ( retTarget ) *retTarget = NULL; // correct ??
-	return val;
+        val.set_as_object(_original_target);
+        if ( retTarget ) *retTarget = NULL; // correct ??
+        return val;
     }
 
 #if 0 // NO special support for _root and _levelX, all should be done by target !
@@ -144,8 +144,8 @@ as_environment::get_variable_raw(
     // Check built-in constants.
     if (varname == "_root") 
     { 
-	if ( retTarget ) *retTarget = NULL; // correct ??
-	return as_value(m_target->get_root_movie());
+        if ( retTarget ) *retTarget = NULL; // correct ??
+        return as_value(m_target->get_root_movie());
     }
     else if (varname.compare(0, 6, "_level") == 0 && varname.find_first_not_of("0123456789", 7) == string::npos )
     {
@@ -160,23 +160,23 @@ as_environment::get_variable_raw(
 
     if ( vm.getSWFVersion() > 5 && varname == "_global" )
     {
-	// The "_global" ref was added in SWF6
-	if ( retTarget ) *retTarget = NULL; // correct ??
-	return as_value(global);
+        // The "_global" ref was added in SWF6
+        if ( retTarget ) *retTarget = NULL; // correct ??
+        return as_value(global);
     }
 
     if (global->get_member(vm.getStringTable().find(varname), &val))
     {
-	if ( retTarget ) *retTarget = global;
-	return val;
+        if ( retTarget ) *retTarget = global;
+        return val;
     }
     
     // Fallback.
     // FIXME, should this be log_error?  or log_swferror?
-	IF_VERBOSE_ACTION (
+    IF_VERBOSE_ACTION (
     log_action(_("get_variable_raw(\"%s\") failed, returning UNDEFINED"),
-	       varname.c_str());
-	);
+           varname.c_str());
+    );
 
     return as_value();
 }

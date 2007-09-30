@@ -277,7 +277,7 @@ public:
 	bool isFunction() { return _function_var!=0; }
 
 	/// Get the current 'this' pointer, for use in function calls
-	as_object* getThisPointer() { return _function_var ? _this_ptr.get() : getTarget(); }
+	as_object* getThisPointer();
 
 	/// Returns the scope stack associated with this execution thread
 	//
