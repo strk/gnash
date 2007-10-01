@@ -1,5 +1,8 @@
 2007-09-30 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfc.all/opcode_guard_test2.sc: test that unloaded
+	  but still not removed current target is still used for finding
+	  variables.
 	* testsuite/misc-swfc.all/Dejagnu.sc (xtotals): call xpass on
 	  unexpected success.
 

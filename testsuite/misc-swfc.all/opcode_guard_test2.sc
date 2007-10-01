@@ -56,10 +56,12 @@
     mc2.duplicateMovieClip('dup2', 20);
     mc2.duplicateMovieClip('dup3', 30); 
     
+    _root.dup3.onUnload = function() {};
+
     _root.check_equals(typeof(_root.dup1), 'movieclip');
     _root.check_equals(typeof(_root.dup2), 'movieclip');
     
-    dup1.testVar = 'dup1_var';
+    dup1.testVar = 'dup1_var'; // <<-----------------------------
     setTarget('dup1');
       removeMovieClip(_root.dup1);
       // seems Gnash discarded the following 2 tests, caused by opcode guard with
@@ -79,6 +81,14 @@
       _root.check_equals(typeof(_root.dup2), 'undefined');
       _root.check_equals(testVar, undefined);
     }
+
+    dup3.testVar = 'dup3_var'; // <<-----------------------------
+    setTarget('dup3');
+      removeMovieClip(_root.dup3);
+      _root.check_equals(typeof(_root.dup3), 'movieclip');
+      _root.check_equals(testVar, 'dup3_var');
+    setTarget('');
+
   .end
 
 
@@ -109,8 +119,7 @@
   .action:
     stop();
     // Gnash failed on totals() by discarding some checks.
-    // should we have a xtotals()?
-    xtotals(6);
+    xtotals(8);
   .end
   
 .end  // file end
