@@ -97,6 +97,10 @@
 			{
 				this.xfail("TOTAL tests run: "+ttr+", expected: "+expectedTestsRun+" ["+msg+"]");
 			}
+			else
+			{
+				this.xpass("TOTAL tests run: "+ttr+" ["+msg+"]");
+			}
 		}
                 this.xtrace('#passed: '+ this.passed);
                 this.xtrace('#failed: '+ this.failed);

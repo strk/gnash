@@ -1,5 +1,10 @@
 2007-09-30 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfc.all/Dejagnu.sc (xtotals): call xpass on
+	  unexpected success.
+
+2007-09-30 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/: MediaParser.h, VideoDecoder.h, AudoDecoder.h:
 	  virtual classes need virtual destructors, or destructors of
 	  subclasses will not be invoked be deleting instances by
