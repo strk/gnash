@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.54 2007/09/30 05:24:36 zoulunkai Exp $ */
+/* $Id: ActionExec.cpp,v 1.55 2007/10/01 16:51:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -338,16 +338,22 @@ ActionExec::operator() ()
 
 #if 1 // See bugs: #20974, #21069, #20996.
 
-#if 0 // action_execution_order_test8.c shows that the opcode guard is not SWF version based (TODO: automate it!)
-	if ( _abortOnUnload && _original_target->isUnloaded()
-		&& VM::get().getSWFVersion() > 5 /* TODO: cache SWF version */ )
-#else // curveball.swf clearly shows that it is the *current* target, not the *original* one that matters.
-	if ( _abortOnUnload && env.get_target()->isUnloaded() )
+#if 0
+	// curveball.swf and feed.swf break with this
+	character* guardedChar = env.get_original_target(); // watch out : _original_target is not necessarely the same
+#else
+	// curveball.swf and feed.swf suggest that it is the *current* target,
+	// not the *original* one that matters.
+	character* guardedChar = env.get_target();
 #endif
+
+	if ( _abortOnUnload && guardedChar->isUnloaded() )
+		// action_execution_order_test8.c shows that the opcode guard is not SWF version based (TODO: automate it!)
+		// && VM::get().getSWFVersion() > 5 
 	{
 		std::stringstream ss;
-		ss << "Target of action_buffer (" << _original_target->getTarget() 
-			<< ") unloaded by execution of opcode: " << std::endl;
+		ss << "Target of action_buffer (" << guardedChar->getTarget() 
+			<< " of type " << typeName(*guardedChar) << ") unloaded by execution of opcode: " << std::endl;
 		dumpActions(pc, next_pc, ss);
 		ss << "Discarding " << stop_pc-next_pc
 			<< " bytes of remaining opcodes: " << std::endl;
