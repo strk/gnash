@@ -1283,11 +1283,14 @@ action_execution_order_test8_SOURCES =	\
 	$(NULL)
 action_execution_order_test8_LDADD = libgnashmingutils.la
 
-action_execution_order_test8.swf: action_execution_order_test8
-	./action_execution_order_test8 $(top_srcdir)/testsuite/media
+action_execution_order_test8-v6.swf: action_execution_order_test8
+	./action_execution_order_test8 $(top_srcdir)/testsuite/media 6
 
-action_execution_order_test8runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test8.swf
-	sh $< -f8 $(top_builddir) action_execution_order_test8.swf > $@
+action_execution_order_test8-v5.swf: action_execution_order_test8
+	./action_execution_order_test8 $(top_srcdir)/testsuite/media 5
+
+action_execution_order_test8runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test8-v5.swf action_execution_order_test8-v6.swf
+	sh $< -f8 $(top_builddir) action_execution_order_test8-v5.swf action_execution_order_test8-v6.swf > $@
 	chmod 755 $@
 
 action_execution_order_test9_SOURCES =	\

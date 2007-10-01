@@ -50,8 +50,8 @@
 
 #include "ming_utils.h"
 
-#define OUTPUT_VERSION 6
-#define OUTPUT_FILENAME "action_execution_order_test8.swf"
+#define DEF_OUTPUT_VERSION 6
+#define OUTPUT_FILENAME_FMT "action_execution_order_test8-v%d.swf"
 
 
 int
@@ -60,10 +60,14 @@ main(int argc, char** argv)
   SWFMovie mo;
   SWFMovieClip  mc1, mc2, dejagnuclip;
   SWFDisplayItem it1, it2;
+  int outputVersion = DEF_OUTPUT_VERSION;
   
   const char *srcdir=".";
   if ( argc>1 ) 
+  {
     srcdir=argv[1];
+    if ( argc>2 ) outputVersion = atoi(argv[2]);
+  }
   else
   {
       fprintf(stderr, "Usage: %s <mediadir>\n", argv[0]);
@@ -71,7 +75,7 @@ main(int argc, char** argv)
   }
 
   Ming_init();
-  mo = newSWFMovieWithVersion(OUTPUT_VERSION);
+  mo = newSWFMovieWithVersion(outputVersion);
   SWFMovie_setDimension(mo, 800, 600);
   SWFMovie_setRate (mo, 12.0);
 
@@ -142,8 +146,10 @@ main(int argc, char** argv)
 
   SWFMovie_nextFrame(mo); /* 6th frame */
   //Output movie
-  puts("Saving " OUTPUT_FILENAME );
-  SWFMovie_save(mo, OUTPUT_FILENAME);
+  char outputFilename[256];
+  snprintf(outputFilename, 255, OUTPUT_FILENAME_FMT, outputVersion);
+  printf("Saving %s\n", outputFilename );
+  SWFMovie_save(mo, outputFilename);
 
   return 0;
 }
