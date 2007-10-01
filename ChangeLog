@@ -1,5 +1,13 @@
 2007-09-30 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/dejagnu_so_init.as: set and invoke
+	  utility functions from/to _root. Fixes some scope chain problems
+	  we have in Gnash, better tested in a more focused testcase.
+	* testsuite/actionscript.all/with.as: total runs check succeed
+	  with the change above.
+
+2007-09-30 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/check.as: rename totals_check,
 	  xtotals_check to check_totals() and xcheck_totals (easier
 	  to grep for 'xcheck').

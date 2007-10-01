@@ -49,17 +49,17 @@ checkIt = function() {
 			xtrace(msg);
 			trace(msg);
 		};
-		pass_check = function (msg) {
-			pass(msg);
+		_root.pass_check = function (msg) {
+			_root.pass(msg);
 		};
-		xpass_check = function (msg) {
-			xpass(msg);
+		_root.xpass_check = function (msg) {
+			_root.xpass(msg);
 		};
-		fail_check = function (msg) {
-			fail(msg);
+		_root.fail_check = function (msg) {
+			_root.fail(msg);
 		};
-		xfail_check = function (msg) {
-			xfail(msg);
+		_root.xfail_check = function (msg) {
+			_root.xfail(msg);
 		};
 
 		// make __shared_assets visible (in case it didnt' work before)
