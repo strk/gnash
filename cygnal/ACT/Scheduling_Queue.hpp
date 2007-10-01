@@ -98,6 +98,10 @@ namespace ACT {
 	} ;
 
 	//-------------------------
+	// forward declaration for Scheduled_Item_Pointer
+	template< class T, class Aux > class Scheduling_Queue ;
+	
+	//-------------------------
 	/** \class Scheduled_Item_Pointer
 	 *	\brief A pointer into an item within a scheduling queue.
 	 *	Since items within the underlying container of a queue move around,
@@ -106,7 +110,7 @@ namespace ACT {
 	template< class T, class Aux >
 	class Scheduled_Item_Pointer
 	{
-		template< class T, class Aux > friend class Scheduling_Queue ;
+		template< class, class > friend class Scheduling_Queue ;
 
 		size_t index ;
 
@@ -151,7 +155,7 @@ namespace ACT {
 	class Scheduling_Queue
 	{
 		// friends
-		template< class T, class Aux > friend class Scheduled_Item_Pointer ;
+		template< class T1, class Aux1 > friend class Scheduled_Item_Pointer ;
 		template< class S > friend class Basic_Wakeup_Listener ;
 
 		/// The main queue for scheduled items.

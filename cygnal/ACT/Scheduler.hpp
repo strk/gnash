@@ -254,7 +254,7 @@ namespace ACT {
 		: public Scheduler
 	{
 		///
-		friend Basic_Wakeup_Listener< Basic_Scheduler > ;
+		friend class Basic_Wakeup_Listener< Basic_Scheduler > ;
 
 		/// The type of our internal queue.
 		typedef Scheduling_Queue< Basic_Scheduled_Item, wakeup_listener_allocated< Basic_Scheduler > > queue_type ;

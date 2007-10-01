@@ -46,7 +46,7 @@ namespace ACT {
 	 *		- Ready. 
 	 *			The action spontaneously yielded control.
 	 *			An immediate call to this action would immediately continue.
-	 *		- Waiting.
+	 *		- Would_Block.
 	 *			The action returned because it would block otherwise.
 	 *			An immediate call to this action is unlikely to do anything else.
 	 *	- Action has finished.

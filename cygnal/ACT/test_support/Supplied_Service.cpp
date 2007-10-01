@@ -22,6 +22,7 @@
 /// \brief A service that takes an outside supply of actions and supplies them as a service.
 
 #include "Supplied_Service.hpp"
+#include <stdexcept>
 
 namespace ACT {
 	shared_ptr< basic_act >
@@ -45,7 +46,7 @@ namespace ACT {
 	Supplied_Generator::
 	add_task( shared_ptr< basic_act > x )
 	{
-		if ( ! active ) throw std::exception( "Not accepting new actions after shutdown" ) ;
+		if ( ! active ) throw std::runtime_error( "Not accepting new actions after shutdown" ) ;
 		the_tasks.push_back( x ) ;
 	}
 

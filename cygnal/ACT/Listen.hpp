@@ -98,7 +98,7 @@ namespace ACT {
 		typedef Scheduler::handle_type handle_type ;
 
 		/// Type of the class registry of monitors
-		typedef typename Handle_Registry_Follower< boost::weak_ptr< Monitor >, Scheduler > follower_registry_type ;
+		typedef Handle_Registry_Follower< boost::weak_ptr< Monitor >, Scheduler > follower_registry_type ;
 
 		/**	A vector of monitors, indexed by Scheduler handles.
 		 *

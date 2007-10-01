@@ -128,10 +128,16 @@ namespace ACT {
 		typedef Aspect< T, Handle_Registry_Leader > aspect_type ;
 
 		/// The aspect class is a friend
-		friend class aspect_type ;
+		friend class Aspect< T, Handle_Registry_Leader > ;
+		// * Note that the following declaration does not work:
+		// *	friend class aspect_type ;
+		// * A friend declaration must be an elaborated-type-specifier, and that doesn't include the use of typedefs.
 
 		/// The cooperative Handled aspect is also a friend.
-		friend typename Handled< T, Aspect >::aspect_type ;
+		friend class Aspect< T, Handled< T, Aspect > > ;
+		// * Here's the intended declaration.
+		// *	friend typename Handled< T, Aspect >::aspect_type ;
+		// * We've had to unpack the clean definition to satisfy the anti-typedef restriction.
 
 		/// Type declaration of the class registry
 		typedef Vector_with_Handle_Index< T *, Handle_Registry_Leader > vector_type ;
@@ -196,7 +202,9 @@ namespace ACT {
 		typedef Aspect< T, Leader, Handle_Registry_Follower > aspect_type ;
 
 		/// The aspect class is a friend
-		friend class aspect_type ;
+		friend class Aspect< T, Leader, Handle_Registry_Follower > ;
+		// Was:
+		//		friend class aspect_type ;
 
 		/// Marker class derived from Leader
 		typedef typename Leader::handle_type::marker_type marker_type ;
@@ -258,7 +266,9 @@ namespace ACT {
 		typedef Aspect< T, Handled > aspect_type ;
 
 		/// The aspect class is a friend
-		friend class aspect_type ;
+		friend class Aspect< T, Handled > ;
+		// Was:
+		//		friend class aspect_type ;
 
 	private:
 		/// Type declaration of the class registry

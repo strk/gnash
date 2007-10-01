@@ -1,6 +1,14 @@
 Change Log for GNU Cygnal, Module ACT
 =====================================
 
+2007-01-10 Eric Hughes <eh@narthex.us>
+	* Cygnal_Instances.cpp:  Added class keyword for explicit template instantiation.  Replaced typedef in explicit instantiation with its referent.
+	* Handle.hpp: Replaced typedefs in friend declarations with their referents.
+	* Listen.hpp: Removed extraneous typename declaration.
+	* Scheduler.hpp: Added class keyword in a friend declaration.
+	* Scheduler.T.cpp: Added typename declaration in an auto variable declaration.
+	* Scheduling_Queue.hpp: Removed dummy template parameters in a friend declaration.  Added a forward declaration.
+	
 2007-07-21 Eric Hughes <eh@narthex.us>
 	* Handle.hpp: Changed operator declarations in Handled from references to values.
 	* test_support/Supplied_Service.hpp: Changed auto_ptr to shared_ptr to enable implicit copy constructor.

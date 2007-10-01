@@ -34,7 +34,9 @@
 
 namespace ACT {
 	// Explicit template instantiations.
-	template Basic_Scheduler< aspect::Null_Aspect_0 >::queue_type ;
-	template Basic_Scheduler< aspect::Null_Aspect_0 > ;
+	template class Scheduling_Queue< Basic_Scheduled_Item, wakeup_listener_allocated< Basic_Scheduler< aspect::Null_Aspect_0 > > > ;
+	// Was:
+	//		template class Basic_Scheduler< aspect::Null_Aspect_0 >::queue_type ;
+	template class Basic_Scheduler< aspect::Null_Aspect_0 > ;
 
 } // end namespace ACT

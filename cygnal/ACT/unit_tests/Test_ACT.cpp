@@ -27,6 +27,8 @@
 #include "ACT/test_support/Simple_Actions.hpp"
 #include "ACT/test_support/Listening_Actions.hpp"
 
+#include <stdexcept>
+
 using namespace ACT ;
 
 //--------------------------------------------------
@@ -59,7 +61,7 @@ public:
 			// Note:
 			// case 2 should never be called, since the guard for calling run requires that the action still be working
 		}
-		throw std::exception( "Not Reached" ) ;
+		throw std::logic_error( "Not Reached" ) ;
 	}
 } ;
 

@@ -127,7 +127,7 @@ namespace ACT {
 		}
 		// Assert the_queue is not empty
 
-		queue_type::pointer item = the_queue.top_ptr() ;
+		typename queue_type::pointer item = the_queue.top_ptr() ;
 		ACT_State result = item -> the_action( the_queue.auxiliary_top() -> get() ) ;
 		if ( result.working() ) {
 			switch ( item -> action_type ) 
