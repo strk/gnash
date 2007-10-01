@@ -1,5 +1,10 @@
 2007-10-01 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.{cpp,h}: remove the error-prone ::restart method.
+	* testsuite/MovieTester.{cpp,h}: implement proper restart method.
+
+2007-10-01 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.{cpp,h}: add a clear() method for clearing
 	  everything managed by the movie_root/stage. Intended to be called
 	  right before a brand new setRootMovie call (for restart).

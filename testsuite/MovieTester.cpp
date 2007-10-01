@@ -495,8 +495,11 @@ MovieTester::initTestingSoundHandlers()
 void
 MovieTester::restart() 
 {
-	_movie_root->restart();
-	_movie = _movie_root->getLevel(0).get();
+	_movie_root->clear(); // restart();
+	_movie = _movie_def->create_movie_instance();
+	_movie_root->setRootMovie(_movie);
+
+	// Set _movie before calling ::render
 	render();
 }
 

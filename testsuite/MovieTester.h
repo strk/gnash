@@ -26,6 +26,7 @@
 #include "sound_handler.h" // for creating the "test" sound handlers
 #include "types.h" // for rgba class
 #include "render_handler.h" // for dtor visibility by auto_ptr
+#include "movie_instance.h" 
 
 #include <memory> // for auto_ptr
 #include <string> 
@@ -284,7 +285,7 @@ private:
 
 	gnash::movie_definition* _movie_def;
 
-	gnash::sprite_instance* _movie;
+	gnash::movie_instance* _movie;
 
 	std::auto_ptr<sound_handler> _sound_handler;
 

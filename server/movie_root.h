@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.78 2007/10/01 22:04:41 strk Exp $ */
+/* $Id: movie_root.h,v 1.79 2007/10/01 22:41:59 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -430,15 +430,6 @@ public:
     {
         return m_background_color.m_a / 255.0f;
     }
-
-    /// Restart this application as if it was just loaded
-    //
-    /// NOTE: this doesn't work correctly in that rather then
-    ///       re-instantiating the original root movie it only
-    ///	      picks *current* _level0, restarts it and place it
-    ///	      back on stage.
-    ///
-    void restart();
 
     /// Entry point for movie advancement
     //

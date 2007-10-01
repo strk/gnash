@@ -203,40 +203,6 @@ movie_root::clear()
 	setInvalidated();
 }
 
-void
-movie_root::restart()
-{
-	// wipe out live chars
-	_liveChars.clear();
-
-	// wipe out queued actions
-	_actionQueue.clear();
-
-	// Get an handle to definition of _level0 
-	//
-	// TODO: this is bogus, in case _level0 was loaded into
-	//
-	boost::intrusive_ptr<movie_definition> level0Def = getLevel(0)->get_movie_definition();
-
-	// wipe out all levels
-	_movies.clear();
-
-	boost::intrusive_ptr<movie_instance> level0 = level0Def->create_movie_instance();
-
-	setRootMovie(level0.get());
-
-	// Delete characters removed from the stage
-	// from the display lists
-	cleanupDisplayList();
-
-#ifdef GNASH_USE_GC
-	// Run the garbage collector again
-	GC::get().collect();
-#endif
-
-	setInvalidated();
-}
-
 boost::intrusive_ptr<Stage>
 movie_root::getStageObject()
 {
