@@ -153,9 +153,13 @@ void
 Gui::menu_restart()
 {
 //    GNASH_REPORT_FUNCTION;
-	_stage->restart();
 
-    // TODO: see ::start() for a clean way to restart (including setting flash vars)
+	_stage->clear();
+	_started = false;
+	start();
+
+	//_stage->restart();
+
 }
 
 void

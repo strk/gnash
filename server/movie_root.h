@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.77 2007/09/27 10:44:45 strk Exp $ */
+/* $Id: movie_root.h,v 1.78 2007/10/01 22:04:41 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -569,6 +569,13 @@ public:
 	assert(std::find(_liveChars.begin(), _liveChars.end(), ch) == _liveChars.end());
         _liveChars.push_front(ch);
     }
+
+    /// Cleanup all resources and run the GC collector
+    //
+    /// This method should be invoked before calling setRootMovie again
+    /// for a clean restart.
+    ///
+    void clear();
 
 private:
 

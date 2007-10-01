@@ -184,6 +184,26 @@ movie_root::getLevel(unsigned int num) const
 }
 
 void
+movie_root::clear()
+{
+	// wipe out live chars
+	_liveChars.clear();
+
+	// wipe out queued actions
+	_actionQueue.clear();
+
+	// wipe out all levels
+	_movies.clear();
+
+#ifdef GNASH_USE_GC
+	// Run the garbage collector again
+	GC::get().collect();
+#endif
+
+	setInvalidated();
+}
+
+void
 movie_root::restart()
 {
 	// wipe out live chars

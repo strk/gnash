@@ -1,5 +1,14 @@
 2007-10-01 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.{cpp,h}: add a clear() method for clearing
+	  everything managed by the movie_root/stage. Intended to be called
+	  right before a brand new setRootMovie call (for restart).
+	* gui/gui.cpp (menu_restart): get a real restart, including flash
+	  variables settings and sure about the real initial movie_definition
+	  that started everything.
+
+2007-10-01 Sandro Santilli <strk@keybit.net>
+
 	* gui/gui.{cpp,h}: add movie_definition and movie_root members,
 	  add _started member to postpone kick-start (movie_root::setRootMovie
 	  call) in case we started in "stop" mode [ fixed bug #21212 ].
