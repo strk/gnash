@@ -1,5 +1,11 @@
 2007-09-30 Sandro Santilli <strk@keybit.net>
 
+	* libbase/Makefile.am, libmedia/Makefile.am: remove no-dependencies
+	  option. The option is still in libltdl/Makefile.am, dunno if it
+	  makes sense there either.
+
+2007-09-30 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: Makefile.am,
 	  action_execution_order_test8.c: build the test in SWF5 and SWF6 
 	  version, to verify opcode guard being is not dependent on version
