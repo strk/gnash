@@ -133,7 +133,7 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); // 7th frame
   SWFMovie_nextFrame(mo); // 8th frame
   
-  add_actions(mo, "totals(); stop();");
+  add_actions(mo, "xtotals(6); stop();");
   SWFMovie_nextFrame(mo); // 9th frame
   
   //Output movie

@@ -1,5 +1,6 @@
 2007-09-30 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/opcode_guard_test.c: add xtotals() call.
 	* testsuite/actionscript.all/dejagnu_so_init.as: set and invoke
 	  utility functions from/to _root. Fixes some scope chain problems
 	  we have in Gnash, better tested in a more focused testcase.
