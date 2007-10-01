@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: curl_adapter.cpp,v 1.40 2007/09/30 18:51:27 bwy Exp $ */
+/* $Id: curl_adapter.cpp,v 1.41 2007/10/01 14:20:19 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -392,15 +392,49 @@ CurlStreamFile::fill_cache(long unsigned size)
 
 	}
 
-	// TODO: check for 404 only once !
-        long code;
-        curl_easy_getinfo(_handle, CURLINFO_RESPONSE_CODE, &code);
-        if ( code == 404 ) // file not found!
-        {
-		gnash::log_error(_("404 response from url %s"), _url.c_str());
-		_error = TU_FILE_OPEN_ERROR;
-		_running = false;
-        }
+	CURLMsg *curl_msg;
+	int _active = _running; // Is _running a suitable var for the number
+				// of active easy_handles? (Which seems 
+				// to be a maximum of 1 anyway).
+
+	while ((curl_msg = curl_multi_info_read(_mhandle, &_active))) {
+
+		// Only for completed transactions
+		if (curl_msg->msg == CURLMSG_DONE) {
+
+			// HTTP transaction succeeded
+			if (curl_msg->data.result == CURLE_OK) {
+
+				long code;
+
+				// Check HTTP response
+				curl_easy_getinfo(curl_msg->easy_handle,
+						  CURLINFO_RESPONSE_CODE, &code);
+
+				if ( code >= 400 ) {
+					gnash::log_error ("HTTP response %d from url %s",
+							code, _url.c_str());
+					_error = TU_FILE_OPEN_ERROR;
+					_running = false;
+				} else {
+					gnash::log_msg ("HTTP response %d from url %s",
+							code, _url.c_str());
+				}
+
+			} else {
+
+				// Transaction failed, pass on curl error.
+				gnash::log_error("CURL: %s",
+					         curl_easy_strerror(
+						 curl_msg->data.result));
+				_error = TU_FILE_OPEN_ERROR;
+				_running = false;
+
+			}
+
+		}
+
+	}
 
 }
 

@@ -1,3 +1,10 @@
+2007-10-01 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/curl_adapter.cpp: use curl_multi_info_read to get
+	  better information about stream connections. Pass on CURL errors
+	  if transaction fails (e.g. for self-certified SSL sites like Savannah).
+	  Log HTTP code of all transactions. 400 and above logged as error.
+
 2007-09-30 Sandro Santilli <strk@keybit.net>
 
 	* libbase/Makefile.am, libmedia/Makefile.am: remove no-dependencies
