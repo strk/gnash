@@ -55,17 +55,15 @@ gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 
 /*static private*/
 void
-Player::setFlashVars(gnash::sprite_instance& m, const std::string& varstr)
+Player::setFlashVars(const std::string& varstr)
 {
-	gnash::sprite_instance* si = m.get_root_movie();
-	assert(si);
-
-	typedef sprite_instance::VariableMap maptype;
+	typedef Gui::VariableMap maptype;
 
 	maptype vars;
 	URL::parse_querystring(varstr, vars);
 
-	si->setVariables(vars);
+	_gui->addFlashVars(vars);
+	//si->setVariables(vars);
 }
 
 Player::Player()
@@ -239,8 +237,6 @@ int
 Player::run(int argc, char* argv[], const char* infile, const char* url)
 {
     
-	bool background = true;
-
 	assert(tu_types_validate());
 
 	// Call this at run() time, so the caller has
@@ -313,8 +309,7 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 
     movie_root& root = VM::init(*_movie_def).getRoot();
 
-    std::auto_ptr<movie_instance> mr ( _movie_def->create_movie_instance() );
-    sprite_instance* m = mr.get();
+    _gui->setStage(&root);
 
     // Start loader thread
     _movie_def->completeLoad();
@@ -326,7 +321,7 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 	// todo: use a case-insensitive string type
     	if ( it->first == "flashvars" || it->first == "FlashVars" )
 	{
-		setFlashVars(*m, it->second);
+		setFlashVars(it->second);
 		continue;
 	}
 
@@ -336,11 +331,10 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
     }
 
     // Parse querystring
-    setFlashVars(*m, URL(_url).querystring());
+    setFlashVars(URL(_url).querystring());
 
-    root.setRootMovie( mr.release() ); // will construct the instance
-    root.set_display_viewport(0, 0, width, height);
-    root.set_background_alpha(background ? 1.0f : 0.05f);
+    _gui->setMovieDefinition(_movie_def);
+
 
     if (!delay) {
       delay = (unsigned int) (1000 / movie_fps) ; // milliseconds per frame

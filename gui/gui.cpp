@@ -88,8 +88,7 @@ Gui::Gui() :
     _depth(16),
     _interval(0),
     _renderer(NULL),
-    _redraw_flag(true),
-    _stopped(false)
+    _redraw_flag(true)
 #ifdef GNASH_FPS_DEBUG
     ,fps_counter(0)
     ,fps_counter_total(0)
@@ -99,6 +98,10 @@ Gui::Gui() :
 #ifdef SKIP_RENDERING_IF_LATE
     ,estimatedDisplayTime(0) // milliseconds (will grow later..)
 #endif // SKIP_RENDERING_IF_LATE
+    ,_movieDef(0)
+    ,_stage(0)
+    ,_stopped(false)
+    ,_started(false)
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -114,8 +117,7 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
     _depth(depth),
     _interval(0),
     _renderer(NULL),
-    _redraw_flag(true),
-    _stopped(false)
+    _redraw_flag(true)
 #ifdef GNASH_FPS_DEBUG
     ,fps_counter(0)    
     ,fps_counter_total(0)    
@@ -125,6 +127,10 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
 #ifdef SKIP_RENDERING_IF_LATE
     ,estimatedDisplayTime(0) // milliseconds (will grow later..)
 #endif // SKIP_RENDERING_IF_LATE
+    ,_movieDef(0)
+    ,_stage(0)
+    ,_stopped(false)
+    ,_started(false)
 {
 }
 
@@ -147,7 +153,9 @@ void
 Gui::menu_restart()
 {
 //    GNASH_REPORT_FUNCTION;
-	get_current_root()->restart();
+	_stage->restart();
+
+    // TODO: see ::start() for a clean way to restart (including setting flash vars)
 }
 
 void
@@ -161,14 +169,13 @@ Gui::resize_view(int width, int height)
 	if ( VM::isInitialized() )
 	{
 
-		movie_root& m = VM::get().getRoot();
+		float swfwidth = _movieDef->get_width_pixels();
+		float swfheight = _movieDef->get_height_pixels();
 
-		movie_definition* md = m.get_movie_definition();
-
-		float swfwidth = md->get_width_pixels();
-		float swfheight = md->get_height_pixels();
-
-		m.set_display_viewport(0, 0, width, height);
+		if ( _stage && _started )
+		{
+			_stage->set_display_viewport(0, 0, width, height);
+		}
 
 		// set new scale value
 		_xscale = width / swfwidth;
@@ -290,7 +297,11 @@ Gui::menu_toggle_sound()
 void
 Gui::notify_mouse_moved(int x, int y) 
 {
-	movie_root* m = get_current_root();
+	movie_root* m = _stage;
+
+    if ( ! _started ) return;
+
+    if ( _stopped ) return;
 
 #ifdef DEBUG_MOUSE_COORDINATES
 	log_msg(_("mouse @ %d,%d"), x, y);
@@ -313,8 +324,12 @@ Gui::notify_mouse_moved(int x, int y)
 void
 Gui::notify_mouse_clicked(bool mouse_pressed, int mask) 
 {
-	movie_root* m = get_current_root();
+	movie_root* m = _stage;
 	assert(m);
+
+    if ( ! _started ) return;
+
+    if ( _stopped ) return;
 
 	if ( m->notify_mouse_clicked(mouse_pressed, mask) )
 	{
@@ -327,7 +342,10 @@ Gui::notify_mouse_clicked(bool mouse_pressed, int mask)
 void
 Gui::refresh_view()
 {
-	movie_root* m = get_current_root();
+	movie_root* m = _stage;
+
+    if ( ! _started ) return;
+
 	assert(m);
 	_redraw_flag=true;
 	display(m);
@@ -337,14 +355,7 @@ Gui::refresh_view()
 void
 Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed) 
 {
-	movie_root* m = get_current_root();
-
-	if ( m->notify_key_event(k, pressed) )
-	{
-		// any action triggered by the
-		// event required screen refresh
-		display(m);
-	}
+	movie_root* m = _stage;
 
 	/* Handle GUI shortcuts */
 	if (!pressed) return;
@@ -378,11 +389,26 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 			break;
 		}
 	}
+
+    if ( ! _started ) return;
+
+    if ( _stopped ) return;
+
+	if ( m->notify_key_event(k, pressed) )
+	{
+		// any action triggered by the
+		// event required screen refresh
+		display(m);
+	}
+
 }
 
 bool
 Gui::display(movie_root* m)
 {
+    assert(m == _stage); // why taking this arg ??
+
+    assert(_started);
 
 	InvalidatedRanges changed_ranges;
 	bool redraw_flag;
@@ -501,12 +527,62 @@ Gui::display(movie_root* m)
 	return true;
 }
 
-bool
-Gui::advance_movie(Gui* gui)
+void
+Gui::play()
 {
-	assert(gui);
+    if ( ! _stopped ) return;
 
-	if ( gui->isStopped() ) return true;
+    _stopped = false;
+    if ( ! _started ) start();
+}
+
+void
+Gui::stop()
+{
+    if ( _stopped ) return;
+
+    _stopped = true;
+}
+
+void
+Gui::pause()
+{
+    if ( _stopped )
+    {
+        play();
+    }
+    else _stopped = true;
+}
+
+void
+Gui::start()
+{
+    assert ( ! _started );
+    if ( _stopped )
+    {
+        log_debug("Gui is in stop mode, won't start application");
+        return;
+    }
+
+    std::auto_ptr<movie_instance> mr ( _movieDef->create_movie_instance() );
+    mr->setVariables(_flashVars);
+
+    _stage->setRootMovie( mr.release() ); // will construct the instance
+    _stage->set_display_viewport(0, 0, _width, _height);
+
+    bool background = true; // ??
+    _stage->set_background_alpha(background ? 1.0f : 0.05f);
+
+
+    _started = true;
+}
+
+bool
+Gui::advanceMovie()
+{
+	if ( isStopped() ) return true;
+
+    if ( ! _started ) start();
   
 //	GNASH_REPORT_FUNCTION;
 
@@ -514,10 +590,10 @@ Gui::advance_movie(Gui* gui)
 	WallClockTimer advanceTimer;
 #endif // SKIP_RENDERING_IF_LATE
 
-	gnash::movie_root* m = gnash::get_current_root();
+	gnash::movie_root* m = _stage;
 	
 #ifdef GNASH_FPS_DEBUG
-	gui->fpsCounterTick(); // will be a no-op if fps_timer_interval is zero
+	fpsCounterTick(); // will be a no-op if fps_timer_interval is zero
 #endif
 
 // Define REVIEW_ALL_FRAMES to have *all* frames
@@ -542,15 +618,15 @@ Gui::advance_movie(Gui* gui)
 
 	uint32_t advanceTime = advanceTimer.elapsed(); // in milliseconds !
 
-	uint32_t timeSlot = gui->_interval; // milliseconds between advance calls 
+	uint32_t timeSlot = _interval; // milliseconds between advance calls 
 
 	if ( advanceTime+gui->estimatedDisplayTime < timeSlot )
 	{
 		advanceTimer.restart();
-		gui->display(m);
+		display(m);
 		uint32_t displayTime = advanceTimer.elapsed();
 
-		if ( displayTime > gui->estimatedDisplayTime)
+		if ( displayTime > estimatedDisplayTime)
 		{
 			//log_debug("Display took %6.6g seconds over %6.6g available for each frame", displayTime, timeSlot);
 
@@ -560,7 +636,7 @@ Gui::advance_movie(Gui* gui)
 				// TODO: check for absurdly high values, like we can't set
 				//       estimatedDisplayTime to a value higher then FPS, or
 				//       we'll simply never display...
-				gui->estimatedDisplayTime = displayTime;
+				estimatedDisplayTime = displayTime;
 			}
 		}
 	}
@@ -569,23 +645,23 @@ Gui::advance_movie(Gui* gui)
 		log_debug("We're unable to keep up with FPS speed: "
 			"advanceTime was %u + estimatedDisplayTime (%u) "
 			"== %u, over a timeSlot of %u",
-			advanceTime, gui->estimatedDisplayTime,
-			advanceTime+gui->estimatedDisplayTime, timeSlot);
+			advanceTime, estimatedDisplayTime,
+			advanceTime+estimatedDisplayTime, timeSlot);
 		// TODO: increment a counter, we don't want to skip too many frames
 	}
 #else // ndef SKIP_RENDERING_IF_LATE
 
-	gui->display(m);
+	display(m);
 
 #endif // ndef SKIP_RENDERING_IF_LATE
 	
-	if ( ! gui->loops() )
+	if ( ! loops() )
 	{
 		size_t curframe = m->get_current_frame(); // can be 0 on malformed SWF
 		gnash::sprite_instance* si = m->get_root_movie();
 		if (curframe + 1 >= si->get_frame_count())
 		{
-			gui->quit(); 
+			quit(); 
 		}
 	}
 
@@ -746,6 +822,30 @@ Gui::fpsCounterTick()
    
 }
 #endif
+
+void
+Gui::addFlashVars(Gui::VariableMap& from)
+{
+    for (VariableMap::iterator i=from.begin(), ie=from.end(); i!=ie; ++i)
+    {
+        _flashVars[i->first] = i->second;
+    }
+}
+
+void
+Gui::setMovieDefinition(movie_definition* md)
+{
+    assert(!_movieDef);
+    _movieDef = md;
+}
+
+void
+Gui::setStage(movie_root* stage)
+{
+    assert(stage);
+    assert(!_stage);
+    _stage = stage;
+}
 
 // end of namespace
 }

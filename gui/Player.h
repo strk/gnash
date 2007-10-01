@@ -151,7 +151,7 @@ private:
 	///
 	std::auto_ptr<Gui> getGui();
 
-	static void setFlashVars(sprite_instance& m, const std::string& varstr);
+	void setFlashVars(const std::string& varstr);
 
 	static void fs_callback(sprite_instance* movie,
 			const char* command, const char* args);

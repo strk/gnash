@@ -30,8 +30,10 @@
 #include "snappingrange.h"  // for InvalidatedRanges
 #include "gnash.h" // for gnash::key::code type
 #include "tree.hh" // for tree
+#include "smart_ptr.h"
 
 #include <string>
+#include <map>
 
 // Define the following macro if you want to skip rendering
 // when late on FPS time.
@@ -195,11 +197,16 @@ public:
     /// @param height The desired height in pixels.
     void resize_view(int width, int height);
 
-
     /// \brief
     /// Advances the movie to the next frame. This is to take place after the
     /// interval specified in the call to setInterval().
-    static bool advance_movie(Gui* gui);
+    bool advanceMovie();
+
+    /// Convenience static wrapper around advanceMovie for callbacks happiness.
+    static bool advance_movie(Gui* gui)
+    {
+        return gui->advanceMovie();
+    }
 
     /// Force immediate redraw
     ///
@@ -209,19 +216,26 @@ public:
     //
     /// When in stop mode the application won't be advanced.
     ///
-    void stop() { _stopped=true; }
+    void stop();
 
     /// Put the application in "play" mode
     //
-    /// When in stop mode the application will be advanced as usual.
+    /// When in play mode the application will be advanced as usual.
     ///
-    void play() { _stopped=false; }
+    void play();
 
     /// Toggle between "stop" and "play" mode
     //
     /// See stop() and play()
     ///
-    void pause() { _stopped = !_stopped; }
+    void pause();
+
+    /// Start the movie
+    //
+    /// This function will create an instance of the registered top-level 
+    /// movie definition, set variables into it and place it to the stage.
+    ///
+    void start();
 
     /// See stop(), play() and pause()
     bool isStopped() const { return _stopped; }
@@ -265,6 +279,17 @@ public:
     /// currently being played (or NULL, if the VM isn't initialized yet)
     ///
     std::auto_ptr<InfoTree> getMovieInfo() const;
+
+    typedef std::map<std::string, std::string> VariableMap;
+
+    /// Add variables to set into instances of the top-level movie definition
+    void addFlashVars(VariableMap& vars);
+
+    /// Set the definition of top-level movie
+    void setMovieDefinition(movie_definition* md);
+
+    /// Set the stage to advance/display
+    void setStage(movie_root* stage);
 
 protected:
 
@@ -317,8 +342,6 @@ protected:
     /// window size did change.
     bool            _redraw_flag;
 
-    bool            _stopped;
-
 private:
 
     bool display(movie_root* m);
@@ -354,6 +377,18 @@ private:
     /// This should be incremented everytime we take more
     uint32_t estimatedDisplayTime;
 #endif // SKIP_RENDERING_IF_LATE
+
+    VariableMap _flashVars;
+
+    boost::intrusive_ptr<movie_definition> _movieDef;
+
+    movie_root* _stage;
+
+    /// True if the application has been put into "stop" mode
+    bool            _stopped;
+
+    /// True if the application didn't start yet
+    bool            _started;
 
 };
 
