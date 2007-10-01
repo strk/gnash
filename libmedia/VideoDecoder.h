@@ -31,7 +31,9 @@ class VideoDecoder {
 	
 public:
 	VideoDecoder() {}
-	~VideoDecoder() {}
+
+	// virtual classes need a virtual destructor !
+	virtual ~VideoDecoder() {}
 
 	/// Sets up the decoder.
 	//

@@ -179,6 +179,13 @@ public:
 	_stream(stream)
 	{}
 
+	// Classes with virtual methods (virtual classes)
+	// must have a virtual destructor, or the destructors
+	// of subclasses will never be invoked, tipically resulting
+	// in memory leaks..
+	//
+	virtual ~MediaParser() {};
+
 	/// Used to parse the next media frame in the stream and return it
 	//
 	/// @return a pointer to a MediaFrame in which the undecoded frame data is.

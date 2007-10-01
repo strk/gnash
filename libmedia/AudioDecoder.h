@@ -31,7 +31,9 @@ class AudioDecoder {
 	
 public:
 	AudioDecoder() {}
-	~AudioDecoder() {}
+
+	// virtual classes need a virtual destructor !
+	virtual ~AudioDecoder() {}
 
 	/// Sets up the decoder.
 	//
