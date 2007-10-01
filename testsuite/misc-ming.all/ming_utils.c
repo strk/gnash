@@ -230,6 +230,8 @@ get_dejagnu_actions()
 		" var obt = this.testcount(); "
 		" if ( exp != undefined && obt != exp ) { "
 		"   this.xfail('Tests run '+obt+' (expected '+exp+') ['+msg+']'); "
+		" } else {"
+		"   this.xpass('Tests run: '+obt+' ['+msg+']'); "
 		" }"
 		" this.printtotals();"
 		"};\n"

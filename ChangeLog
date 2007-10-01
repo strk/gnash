@@ -1,3 +1,13 @@
+2007-09-30 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/check.as: rename totals_check,
+	  xtotals_check to check_totals() and xcheck_totals (easier
+	  to grep for 'xcheck').
+	* testsuite/actionscript.all/with.as: update calls to check_totals()
+	  and xcheck_totals()
+	* testsuite/misc-ming.all/ming_utils.c (Dejagnu.xtotals): call xpass
+	  un unexpectedd success.
+
 2007-09-30 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/curl_adapter.cpp: allow, with security warning, override
