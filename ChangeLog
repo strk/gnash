@@ -1,5 +1,10 @@
 2007-10-02 Sandro Santilli <strk@keybit.net>
 
+	* server/array.cpp (as_value_custom call operator): use the
+	  environment passed to us, not a newly created one.
+
+2007-10-02 Sandro Santilli <strk@keybit.net>
+
 	* server/as_object.cpp (callMethod): fix order in which
 	  args are pushed on the stack [the version taking 2 args].
 	* server/asobj/MovieClipLoader.cpp: initialize MovieClipLoader

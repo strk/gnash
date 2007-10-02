@@ -360,12 +360,21 @@ public:
 	bool operator() (const as_value& a, const as_value& b)
 	{
 		as_value cmp_method(&_comp);
-		as_environment env;
 		as_value ret(0);
 
-		env.push(a);
-		env.push(b);
-		ret = call_method(cmp_method, &env, _object, 2, 1);
+#ifndef NDEBUG
+		size_t prevStackSize = _env.stack_size();
+#endif
+
+		_env.push(a);
+		_env.push(b);
+		ret = call_method(cmp_method, &_env, _object, 2, _env.stack_size()-1);
+		_env.drop(2);
+
+#ifndef NDEBUG
+		assert(prevStackSize == _env.stack_size());
+#endif
+
 		return (*_zeroCmp)((int)ret.to_number(&_env));
 	}
 };
@@ -915,6 +924,7 @@ array_sort(const fn_call& fn)
 {
 	boost::intrusive_ptr<as_array_object> array = 
 		ensureType<as_array_object>(fn.this_ptr);
+
 	as_environment& env = fn.env();
 	uint8_t flags = 0;
 
