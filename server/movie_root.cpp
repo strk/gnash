@@ -33,6 +33,7 @@
 #include "utility.h"
 #include "URL.h"
 #include "namedStrings.h"
+#include "GnashException.h"
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
   #include "action.h"
 #endif
@@ -83,12 +84,40 @@ movie_root::movie_root()
 	m_time_remainder(0.0f),
 	m_drag_state(),
 	_allowRescale(true),
-	_invalidated(true)
+	_invalidated(true),
+	_disableScripts(false)
 {
+}
+
+void
+movie_root::disableScripts()
+{
+	_disableScripts=true;
+
+	// NOTE: we won't clear the action queue now
+	//       to avoid invalidating iterators as we've
+	//       been probably called during processing
+	//       of the queue.
+	//
+	//clearActionQueue();
+}
+
+void
+movie_root::clearActionQueue()
+{
+	for (ActionQueue::iterator it=_actionQueue.begin(),
+			itE=_actionQueue.end();
+			it != itE; ++it)
+	{
+		delete *it;
+	}
+	_actionQueue.clear();
 }
 
 movie_root::~movie_root()
 {
+	clearActionQueue();
+
 	for (ActionQueue::iterator it=_actionQueue.begin(),
 			itE=_actionQueue.end();
 			it != itE; ++it)
@@ -184,6 +213,13 @@ movie_root::getLevel(unsigned int num) const
 
 	assert(boost::dynamic_pointer_cast<movie_instance>(i->second));
 	return boost::static_pointer_cast<movie_instance>(i->second);
+}
+
+void
+movie_root::reset()
+{
+	clear();
+	_disableScripts = false;
 }
 
 void
@@ -1071,13 +1107,31 @@ movie_root::processActionQueue()
 	if ( actionsToProcess ) log_msg(" Processing action queue (call %u)", calls);
 #endif
 
+	if ( _disableScripts )
+	{
+		//log_debug(_("Scripts are disabled, global instance list has %d elements"), _liveChars.size());
+		/// cleanup anything pushed later..
+		clearActionQueue();
+		return;
+	}
+
 	// _actionQueue may be changed due to actions (appended-to)
 	// this loop might be optimized by using an iterator
 	// and a final call to .clear() 
 	while ( ! _actionQueue.empty() )
 	{
 		ExecutableCode* code = _actionQueue.front();
-		code->execute();
+		try
+		{
+			code->execute();
+		}
+		catch (ActionLimitException& al)
+		{
+			log_error(_("ActionLimits hit: %s"), al.what());
+			disableScripts();
+			clearActionQueue();
+			break;
+		}
 		_actionQueue.pop_front(); 
 		delete code;
 	}

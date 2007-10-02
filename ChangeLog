@@ -1,5 +1,17 @@
 2007-10-02 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui.cpp (restart): call movie_root::reset so scripts are enabled
+	  again; (getMovieInfo): add info about wheter scripts are disabled.
+	* server/movie_root.{cpp,h}: add disableScripts and scriptsDisabled
+	  methods; don't process queued actions if scripts are disabled,
+	  disable scripts if ActionLimitException is thrown by execution of
+	  an executable code.
+	* server/vm/ActionExec.{cpp,h}: re-throw ActionLimitException so all
+	  elements of the call stack have a chance to cleanup and the exception
+	  is eventually cought by the movie_root.
+	* testsuite/swfdec/PASSING: success with script abortion tests.
+
+2007-10-02 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/xml.{cpp,h}: get environment passed for events
 	  invocation purposes.

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.55 2007/10/01 16:51:18 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.56 2007/10/02 15:44:51 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -34,6 +34,7 @@
 #include "ASHandlers.h"
 #include "as_environment.h"
 #include "debugger.h"
+#include "WallClockTimer.h"
 
 #include <typeinfo>
 #include <boost/algorithm/string/case_conv.hpp>
@@ -176,6 +177,9 @@ ActionExec::operator() ()
 
 	// TODO: specify in the .gnashrc !!
 	static const size_t maxBranchCount = 65536; // what's enough ?
+
+	uint32_t timeLimit = getScriptTimeout();
+	WallClockTimer timer;
 
 	size_t branchCount = 0;
 	try {
@@ -387,10 +391,19 @@ ActionExec::operator() ()
 	// Control flow actions will change the PC (next_pc)
 	pc = next_pc;
 
-	// Check for loop backs. Actually this should be implemented
-	// as a timeout in seconds.
+	// Check for script limits hit. 
 	// See: http://www.gnashdev.org/wiki/index.php/ScriptLimits
 	// 
+#if 0
+	// TODO: only check on branch-back ? (would be less aggressive..)
+	// WARNING: if the movie is stopped, the wall clock continues to run !
+	if ( timeLimit && timer.elapsed() > timeLimit )
+	{
+		char buf[256];
+		snprintf(buf, 255, _("Script exceeded time limit of %u milliseconds."), timeLimit);
+		throw ActionLimitException(buf);
+	}
+#else
 	if ( pc <= oldPc )
 	{
 		if ( ++branchCount > maxBranchCount )
@@ -402,20 +415,20 @@ ActionExec::operator() ()
 		}
 		//log_debug("Branch count: %u", branchCount);
 	}
+#endif
 
     }
 
     }
     catch (ActionLimitException& ex)
     {
-	    // We want to always show these messages, as in the future
-	    // we'll eventually need to pop up a window asking user about
-	    // what to do instead..
-	    //
-	    //IF_VERBOSE_ASCODING_ERRORS (
-	    log_aserror("Script aborted due to exceeded limit: %s", ex.what());
-	    //)
+	    // Here's were we should pop-up a window to prompt user about
+	    // what to do next (abort or not ?)
+	    //log_error("Script aborted due to exceeded limit: %s - cleaning up after run", ex.what());
+            cleanupAfterRun(true); // we expect inconsistencies here
+	    throw;
     }
+    // TODO: catch other exceptions ?
 
     cleanupAfterRun();
 
@@ -423,7 +436,7 @@ ActionExec::operator() ()
 
 /*private*/
 void
-ActionExec::cleanupAfterRun()
+ActionExec::cleanupAfterRun(bool expectInconsistencies)
 {
     assert(_original_target);
     env.set_target(_original_target);
@@ -436,16 +449,18 @@ ActionExec::cleanupAfterRun()
     {
 	if ( currCallStackDepth > _initialCallStackDepth )
 	{
-		// TODO: try to produce this error hitting script limits
-		log_error(_("Call stack at end of ActionScript execution "
-			"(" SIZET_FMT ") exceeds call stack depth at start "
-			"of it (" SIZET_FMT ") - limits hit ?"),
-			 currCallStackDepth, _initialCallStackDepth);
-		size_t diff = currCallStackDepth-_initialCallStackDepth;
-		while (diff--)
+		if ( ! expectInconsistencies )
 		{
-			env.popCallFrame();
+			// TODO: try to produce this error hitting script limits
+			log_error(_("Call stack at end of ActionScript execution "
+				"(" SIZET_FMT ") exceeds call stack depth at start "
+				"of it (" SIZET_FMT ") - limits hit ?"),
+				 currCallStackDepth, _initialCallStackDepth);
 		}
+		size_t diff = currCallStackDepth-_initialCallStackDepth;
+		// TODO: implement dropCallFrames(diff) ?
+		while (diff--) env.popCallFrame();
+		assert(env.callStackDepth() == _initialCallStackDepth);
 	}
 	else
 	{
@@ -467,13 +482,18 @@ ActionExec::cleanupAfterRun()
 	    env.push(as_value());
 	}
     } else if ( _initial_stack_size < env.stack_size() ) {
+		if ( ! expectInconsistencies )
+		{
 	// We can argue this would be an "size-optimized" SWF instead...
 	IF_VERBOSE_MALFORMED_SWF(
 	    log_swferror(_(SIZET_FMT " elements left on the stack after block execution.  "
 		    "Cleaning up"), env.stack_size()-_initial_stack_size);
 	    );
+		}
 	env.drop(env.stack_size()-_initial_stack_size);
     }
+
+    //log_debug("After cleanup of ActionExec %p, env %p has stack size of %d and callStackDepth of %d", (void*)this, (void*)&env, env.stack_size(), env.callStackDepth());
 }
 
 void
@@ -738,6 +758,15 @@ as_object*
 ActionExec::getThisPointer()
 {
 	return _function_var ? _this_ptr.get() : env.get_original_target(); 
+}
+
+uint32_t
+ActionExec::getScriptTimeout()
+{
+	// TODO1: allow specifying this in the .gnashrc file
+	// TODO2: possibly use the SWF tag for this
+	return 15000;
+	//return 2000;
 }
 
 } // end of namespace gnash

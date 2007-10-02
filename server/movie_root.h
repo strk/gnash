@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.79 2007/10/01 22:41:59 strk Exp $ */
+/* $Id: movie_root.h,v 1.80 2007/10/02 15:44:51 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -568,7 +568,30 @@ public:
     ///
     void clear();
 
+    /// Reset stage to it's initial state
+    //
+    void reset();
+
+    /// Call this method for disabling run of actions
+    //
+    /// NOTE: this will only work for queued actions, not
+    ///       for *every* action. Supposedly all actions should
+    ///       be queued, but this is not really always the case.
+    ///       Notable exceptions are:
+    ///         - Actions in callFrame target frame
+    ///           but only executed by execution of the callFrame opcode
+    ///         - on{,Clip}{Initialize,Construct} event handlers
+    ///         - User event handlers (mouse,keyboard)
+    ///
+    void disableScripts();
+
+    /// Return true if scripts execution is disabled
+    bool scriptsDisabled() const { return _disableScripts; };
+
 private:
+
+    /// Delete all elements on the action queue and empty it.
+    void clearActionQueue();
 
     /// An element of the advanceable characters
     typedef boost::intrusive_ptr<character> AdvanceableCharacter;
@@ -766,6 +789,9 @@ private:
     /// See setInvalidated
     bool _invalidated;
 
+    /// This is set to true if execution of scripts
+    /// aborted due to action limit set or whatever else
+    bool _disableScripts;
 };
 
 

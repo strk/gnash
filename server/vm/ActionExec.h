@@ -118,7 +118,7 @@ private:
 
 	/// Run after a complete run, or after an run interrupted by 
 	/// a bail-out exception (ActionLimitException, for example)
-	void cleanupAfterRun();
+	void cleanupAfterRun(bool expectInconsistencies=false);
 
 	/// the 'with' stack associated with this execution thread
 	std::vector<with_stack_entry> with_stack;
@@ -183,6 +183,10 @@ private:
 	void fixStackUnderrun(size_t required);
 
 	bool _abortOnUnload;
+
+	/// Return the number of milliseconds after which
+	/// execution of a script block should abort.
+	uint32_t getScriptTimeout();
 
 public:
 

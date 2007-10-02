@@ -154,7 +154,7 @@ Gui::menu_restart()
 {
 //    GNASH_REPORT_FUNCTION;
 
-	_stage->clear();
+	_stage->reset();
 	_started = false;
 	start();
 
@@ -751,6 +751,7 @@ Gui::getMovieInfo() const
     snprintf(buf, 16, "SWF%d", def0->get_version()); buf[15] = '\0';
     ret->insert(ret->begin(), StringPair("_level0 SWFVersion", string(buf)));
     ret->insert(ret->begin(), StringPair("_level0 URL", def0->get_url()));
+    ret->insert(ret->begin(), StringPair("Stage scripts", stage.scriptsDisabled() ? " disabled" : "enabled"));
 
     return ret;
 }
