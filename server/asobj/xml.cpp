@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.48 2007/09/24 12:34:50 strk Exp $ */
+/* $Id: xml.cpp,v 1.49 2007/10/02 13:17:29 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -190,7 +190,7 @@ XML::~XML()
 }
 
 void
-XML::onLoadEvent(bool success)
+XML::onLoadEvent(bool success, as_environment& env)
 {
     // Do the events that (appear to) happen as the movie
     // loads.  frame1 tags and actions are executed (even
@@ -212,13 +212,19 @@ XML::onLoadEvent(bool success)
     if ( method.is_undefined() ) return;
     if ( ! method.is_function() ) return;
 
-    as_environment env; // how to set target here ??
+#ifndef NDEBUG
+    size_t prevStackSize = env.stack_size();
+#endif
     env.push(as_value(success));
     call_method(method, &env, this, 1, env.stack_size()-1);
+    env.drop(1);
+#ifndef NDEBUG
+    assert( prevStackSize == env.stack_size());
+#endif
 }
 
 void
-XML::onCloseEvent()
+XML::onCloseEvent(as_environment& env)
 {
     // Do the events that (appear to) happen as the movie
     // loads.  frame1 tags and actions are executed (even
@@ -240,7 +246,6 @@ XML::onCloseEvent()
     if ( method.is_undefined() ) return;
     if ( ! method.is_function() ) return;
 
-    as_environment env; // how to set target here ??
     call_method(method, &env, this, 0, 0);
 }
 
@@ -393,7 +398,7 @@ XML::parseXML(const std::string& xml_in)
 // This reads in an XML file from disk and parses into into a memory resident
 // tree which can be walked through later.
 bool
-XML::load(const URL& url)
+XML::load(const URL& url, as_environment& env)
 {
     GNASH_REPORT_FUNCTION;
   
@@ -406,7 +411,7 @@ XML::load(const URL& url)
     if ( ! str.get() ) 
     {
         log_error(_("Can't load XML file: %s (security?)"), url.str().c_str());
-        onLoadEvent(false);
+        onLoadEvent(false, env);
         return false;
     }
 
@@ -423,7 +428,7 @@ XML::load(const URL& url)
         _doc = 0;
         log_error(_("Can't read XML file %s (stream error %d)"), url.str().c_str(), str->get_error());
         _loaded = 0;
-        onLoadEvent(false);
+        onLoadEvent(false, env);
         return false;
     }
 
@@ -434,7 +439,7 @@ XML::load(const URL& url)
         xmlErrorPtr err = xmlGetLastError();
         log_error(_("Can't read XML file %s (%s)"), url.str().c_str(), err->message);
         _loaded = 0;
-        onLoadEvent(false);
+        onLoadEvent(false, env);
         return false;
     }
 
@@ -447,7 +452,7 @@ XML::load(const URL& url)
     xmlMemoryDump();
     _loaded = ret ? 1 : 0;
 
-    onLoadEvent(ret);
+    onLoadEvent(ret, env);
 
     return ret;
 }
@@ -531,7 +536,7 @@ xml_load(const fn_call& fn)
 
     // Set the argument to the function event handler based on whether the load
     // was successful or failed.
-    ret = xml_obj->load(url);
+    ret = xml_obj->load(url, fn.env());
     rv = ret;
 
     if (ret == false) {

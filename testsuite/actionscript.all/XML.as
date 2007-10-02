@@ -20,9 +20,10 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.39 2007/09/29 16:22:58 strk Exp $";
+rcsid="$Id: XML.as,v 1.40 2007/10/02 13:17:30 strk Exp $";
 
-#include "dejagnu.as"
+#include "check.as"
+//#include "dejagnu.as"
 #include "utils.as"
 
 var existtests = true;
@@ -753,5 +754,14 @@ myxml2.parseXML("<X1> t </X1>");
 check_equals(myxml2.toString(), "<X1> t </X1>"); 
 
 // We're done
-//totals();
-totals();
+#if OUTPUT_VERSION < 6
+ // NOTE: tests inside onLoad are not counted here as onLoad handler
+ //       should execute later !
+ //       Gnash fails executing onLoad immediately
+ xcheck_totals(228);
+#else
+ // NOTE: tests inside onLoad are not counted here as onLoad handler
+ //       should execute later !
+ //       Gnash fails executing onLoad immediately
+ xcheck_totals(291);
+#endif

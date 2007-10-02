@@ -1,5 +1,10 @@
 2007-10-02 Sandro Santilli <strk@keybit.net>
 
+
+	* server/asobj/xml.{cpp,h}: get environment passed for events
+	  invocation purposes.
+	* testsuite/actionscript.all/: XML.as, XMLNode.as: use check.as
+	  instead of dejagnu.as, add check_totals.
 	* server/array.cpp (as_value_custom call operator): use the
 	  environment passed to us, not a newly created one.
 

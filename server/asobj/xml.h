@@ -120,7 +120,14 @@ public:
 
     // Loads a document (specified by
     // the XML object) from a URL.
-    bool load(const URL& url);
+    //
+    // @param url
+    // 
+    // @param env
+    // 	The environment to use for calling event hadlers
+    //	TODO: what about 'this' pointer?
+    //
+    bool load(const URL& url, as_environment& env);
 
     // An event handler that returns a
     bool onLoad();
@@ -197,10 +204,10 @@ private:
     Status      _status;	
 
     /// Trigger the onLoad event, if any
-    void onLoadEvent(bool success);
+    void onLoadEvent(bool success, as_environment& env);
 
     /// Trigger the onClose event, if any
-    void onCloseEvent();
+    void onCloseEvent(as_environment& env);
   
     /// Initialize an XMLNode from an xmlNodePtr
     //

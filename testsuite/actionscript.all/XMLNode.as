@@ -20,9 +20,10 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XMLNode.as,v 1.14 2007/09/29 16:22:58 strk Exp $";
+rcsid="$Id: XMLNode.as,v 1.15 2007/10/02 13:17:30 strk Exp $";
 
-#include "dejagnu.as"
+#include "check.as"
+//#include "dejagnu.as"
 
 var doc = new XML();
 
@@ -109,5 +110,4 @@ check_equals(node2.previousSibling.nodeValue, "first text node");
 // }
 
 
-totals();
-totals();
+check_totals(27);
