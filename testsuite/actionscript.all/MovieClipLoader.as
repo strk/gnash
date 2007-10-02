@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClipLoader.as,v 1.4 2007/09/29 16:22:58 strk Exp $";
+rcsid="$Id: MovieClipLoader.as,v 1.5 2007/10/02 12:17:47 strk Exp $";
 
 #include "check.as"
 
@@ -36,6 +36,7 @@ check_equals(typeOf(mcl.addListener), 'function');
 check_equals(typeOf(mcl.getProgress), 'function');
 check_equals(typeOf(mcl.loadClip), 'function');
 check_equals(typeOf(mcl.removeListener), 'function');
+check_equals(typeOf(mcl.broadcastMessage), 'function');
 check_equals(typeOf(mcl.unloadClip), 'function');
 check(mcl instanceOf MovieClipLoader);
 

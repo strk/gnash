@@ -36,6 +36,7 @@
 #include "VM.h" // for the string table.
 #include "builtin_function.h"
 #include "Object.h" // for getObjectInterface
+#include "AsBroadcaster.h" // for initializing self as a broadcaster
 
 #include <typeinfo> 
 #include <string>
@@ -58,8 +59,10 @@ attachMovieClipLoaderInterface(as_object& o)
 	o.init_member("unloadClip", new builtin_function(moviecliploader_unloadclip));
 	o.init_member("getProgress", new builtin_function(moviecliploader_getprogress));
 
+#if 0 // done by AsBroadcaster
 	o.init_member("addListener", new builtin_function(moviecliploader_addlistener));
 	o.init_member("removeListener", new builtin_function(moviecliploader_removelistener));
+#endif
 
 #if 0
 	// Load the default event handlers. These should really never
@@ -112,7 +115,7 @@ public:
 	struct mcl *getProgress(as_object *ao);
 
 	/// MovieClip
-	bool loadClip(const std::string& url, sprite_instance& target);
+	bool loadClip(const std::string& url, sprite_instance& target, as_environment& env);
 
 	void unloadClip(void *);
 
@@ -120,6 +123,7 @@ public:
 	/// @ {
 	///
 
+#if 0
 	/// Add an object to the list of event listeners
 	//
 	/// This function will call add_ref() on the
@@ -128,14 +132,16 @@ public:
 	void addListener(boost::intrusive_ptr<as_object> listener);
 
 	void removeListener(boost::intrusive_ptr<as_object> listener);
+#endif
 
 	/// Invoke any listener for the specified event
-	void dispatchEvent(const std::string& eventName, fn_call& fn);
+	void dispatchEvent(const std::string& eventName, as_environment& env, const as_value& arg);
 
 	/// @ }
 
 protected:
 
+#if 0
 #ifdef GNASH_USE_GC
 	/// Mark MovieClipLoader-specific reachable resources and invoke
 	/// the parent's class version (markAsObjectReachable)
@@ -145,12 +151,13 @@ protected:
 	///
 	virtual void markReachableResources() const;
 #endif // GNASH_USE_GC
+#endif
 
 private:
 
-	typedef std::set< boost::intrusive_ptr<as_object> > Listeners;
+	//typedef std::set< boost::intrusive_ptr<as_object> > Listeners;
+	//Listeners _listeners;
 
-	Listeners _listeners;
 	bool          _started;
 	bool          _completed;
 	std::string     _filespec;
@@ -165,6 +172,8 @@ MovieClipLoader::MovieClipLoader()
 {
 	_mcl.bytes_loaded = 0;
 	_mcl.bytes_total = 0;  
+
+	AsBroadcaster::initialize(*this);
 }
 
 MovieClipLoader::~MovieClipLoader()
@@ -183,12 +192,11 @@ MovieClipLoader::getProgress(as_object* /*ao*/)
 
 
 bool
-MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
+MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target, as_environment& env)
 {
 	// Prepare function call for events...
-	as_environment env;
-	env.push(as_value(&target));
-	fn_call events_call(this, &env, 1, 0);
+	//env.push(as_value(&target));
+	//fn_call events_call(this, &env, 1, 0);
 
 	URL url(url_str.c_str(), get_base_url());
 	
@@ -199,7 +207,7 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	// Call the callback since we've started loading the file
 	// TODO: probably we should move this below, after 
 	//       the loading thread actually started
-	dispatchEvent("onLoadStart", events_call);
+	dispatchEvent("onLoadStart", env, as_value(&target));
 
 	bool ret = target.loadMovie(url);
 	if ( ! ret ) 
@@ -219,7 +227,8 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	/// TODO: check if we need to place it before calling
 	///       this function though...
 	///
-	dispatchEvent("onLoadInit", events_call);
+	//dispatchEvent("onLoadInit", events_call);
+	dispatchEvent("onLoadInit", env, as_value(&target));
 
 	struct mcl *mcl_data = getProgress(&target);
 
@@ -233,7 +242,8 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	// TODO: dispatchEvent("onLoadProgress", ...)
 
 	log_unimpl (_("FIXME: MovieClipLoader calling onLoadComplete *before* movie has actually been fully loaded (cheating)"));
-	dispatchEvent("onLoadComplete", events_call);
+	//dispatchEvent("onLoadComplete", events_call);
+	dispatchEvent("onLoadComplete", env, as_value(&target));
 
 	return true;
 }
@@ -244,80 +254,17 @@ MovieClipLoader::unloadClip(void *)
   GNASH_REPORT_FUNCTION;
 }
 
-
-void
-MovieClipLoader::addListener(boost::intrusive_ptr<as_object> listener)
-{
-	assert(listener); // caller should check
-	_listeners.insert(listener);
-}
-
-
-void
-MovieClipLoader::removeListener(boost::intrusive_ptr<as_object> listener)
-{
-	assert(listener); // caller should check
-	Listeners::iterator it = _listeners.find(listener);
-	if ( it != _listeners.end() )
-	{
-		_listeners.erase(it);
-	}
-}
-
-  
 // Callbacks
 void
-MovieClipLoader::dispatchEvent(const std::string& event, fn_call& fn)
+MovieClipLoader::dispatchEvent(const std::string& event, as_environment& env, const as_value& arg)
 {
-	typedef Listeners::iterator iterator;
+	string_table& st = _vm.getStringTable();
 
-#if GNASH_DEBUG
-	log_msg(_("Dispatching %s event to " SIZET_FMT " listeners"),
-		event.c_str(), _listeners.size());
-#endif
+	as_value ev(event);
 
-	string_table& st = VM::get().getStringTable();
-	for (iterator it=_listeners.begin(), itEnd=_listeners.end();
-			it != itEnd;
-			++it)
-	{
-		boost::intrusive_ptr<as_object> listener = *it;
-		as_value method;
-		if (!listener->get_member(st.find(event), &method) )
-		{
-#if GNASH_DEBUG
-log_msg(_("Listener %p doesn't have an %s event to listen for, skipped"),
-	(void*)listener, event.c_str());
-#endif
-			// this listener doesn't care about this event
-			// event
-			continue;
-		}
-
-#if GNASH_DEBUG
-		log_msg(_("Testing call to listener's "
-			" %s function"), event.c_str());
-#endif
-
-		call_method(method, &fn.env(), fn.this_ptr.get(), fn.nargs, fn.offset());
-	}
-
+	log_debug("dispatchEvent calling broadcastMessage with args %s and %s", ev.to_debug_string().c_str(), arg.to_debug_string().c_str());
+	callMethod(st.find("broadcastMessage"), env, ev, arg);
 }
-
-#ifdef GNASH_USE_GC
-void
-MovieClipLoader::markReachableResources() const
-{
-	assert(isReachable());
-
-	// mark listeners
-	for(Listeners::const_iterator i=_listeners.begin(), e=_listeners.end(); i!=e; ++i)
-	{
-		(*i)->setReachable();
-	}
-	markAsObjectReachable();
-}
-#endif // GNASH_USE_GC
 
 static as_value
 moviecliploader_loadclip(const fn_call& fn)
@@ -361,7 +308,7 @@ moviecliploader_loadclip(const fn_call& fn)
 		str_url.c_str(), (void*)sprite);
 #endif
 
-	bool ret = ptr->loadClip(str_url, *sprite);
+	bool ret = ptr->loadClip(str_url, *sprite, fn.env());
 
 	return as_value(ret);
 
@@ -405,43 +352,6 @@ moviecliploader_getprogress(const fn_call& fn)
   
   return as_value(mcl_obj.get()); // will store in a boost::intrusive_ptr
 }
-
-static as_value
-moviecliploader_addlistener(const fn_call& fn)
-{
-	boost::intrusive_ptr<MovieClipLoader> mcl = ensureType<MovieClipLoader>(fn.this_ptr);
-  
-	boost::intrusive_ptr<as_object> listener = fn.arg(0).to_object();
-	if ( ! listener )
-	{
-		IF_VERBOSE_ASCODING_ERRORS (
-		log_aserror(_("Listener given to MovieClipLoader.addListener() is not an object"));
-		)
-		return as_value();
-	}
-
-	mcl->addListener(listener);
-	return as_value();
-}
-
-static as_value
-moviecliploader_removelistener(const fn_call& fn)
-{
-	boost::intrusive_ptr<MovieClipLoader> mcl = ensureType<MovieClipLoader>(fn.this_ptr);
-  
-	boost::intrusive_ptr<as_object> listener = fn.arg(0).to_object();
-	if ( ! listener )
-	{
-		IF_VERBOSE_ASCODING_ERRORS (
-		log_aserror(_("Listener given to MovieClipLoader.removeListener() is not an object"));
-		)
-		return as_value();
-	}
-
-	mcl->removeListener(listener);
-	return as_value();
-}
-
 
 void
 moviecliploader_class_init(as_object& global)

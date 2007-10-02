@@ -1,5 +1,15 @@
 2007-10-02 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.cpp (callMethod): fix order in which
+	  args are pushed on the stack [the version taking 2 args].
+	* server/asobj/MovieClipLoader.cpp: initialize MovieClipLoader
+	  instances as AsBroadcasters, call broadcastMessage for broadcasting,
+	  use the environment used in the loadClip call.
+	* testsuite/actionscript.all/MovieClipLoader.as: add test for
+	  existence of the broadcastMessage function.
+
+2007-10-02 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.cpp (testInvariant): non-emptiness of _movies
 	  container is NOT an invariant...
 

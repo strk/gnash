@@ -735,12 +735,20 @@ as_object::callMethod(string_table::key methodName, as_environment& env,
 		return ret;
 	}
 
-	env.push(arg0);
-	env.push(arg1);
+#ifndef NDEBUG
+	size_t origStackSize = env.stack_size();
+#endif
 
-	ret = call_method(method, &env, this, 2, env.stack_size()-2);
+	env.push(arg1);
+	env.push(arg0);
+
+	ret = call_method(method, &env, this, 2, env.stack_size()-1);
 
 	env.drop(2);
+
+#ifndef NDEBUG
+	assert(origStackSize == env.stack_size());
+#endif
 
 	return ret;
 }
