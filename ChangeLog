@@ -1,3 +1,8 @@
+2007-10-02 Sandro Santilli <strk@keybit.net>
+
+	* server/movie_root.cpp (testInvariant): non-emptiness of _movies
+	  container is NOT an invariant...
+
 2007-10-01 Sandro Santilli <strk@keybit.net>
 
 	* server/movie_root.{cpp,h}: remove the error-prone ::restart method.

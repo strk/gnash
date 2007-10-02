@@ -53,7 +53,10 @@ inline bool
 movie_root::testInvariant() const
 {
 	// TODO: fill this function !
-	assert( ! _movies.empty() );
+	// The _movies map can not invariantably
+	// be non-empty as the stage is autonomous
+	// itself
+	//assert( ! _movies.empty() );
 
 	return true;
 }
