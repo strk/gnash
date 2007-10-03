@@ -1,3 +1,8 @@
+2007-10-03 Sandro Santilli <strk@keybit.net>
+
+	* cygnal/ACT/Makefile.am: don't list subdirs for which no
+	  Makefile.am is present. TODO: add a Makefile.am there !
+
 2007-10-04 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/rc.{cpp,h}: make expandPath void and other small cleanups.

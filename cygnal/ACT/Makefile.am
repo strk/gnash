@@ -15,12 +15,14 @@
 #   along with this program; if not, write to the Free Software
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
-# $Id: Makefile.am,v 1.2 2007/10/03 15:29:16 eh9 Exp $
+# $Id: Makefile.am,v 1.3 2007/10/03 18:11:59 strk Exp $
 
 #----------------------------------------
 # Makefile.am for Cygnal/ACT 
 #----------------------------------------
-SUBDIRS = . test_support unit_tests
+
+# provide subdirs with a Makefile.am to list here
+SUBDIRS = 
 
 AM_CPPFLAGS = # -Wall
 
