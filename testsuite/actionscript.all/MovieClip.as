@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.93 2007/10/03 10:36:01 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.94 2007/10/03 13:01:22 strk Exp $";
 
 #include "check.as"
 
@@ -1069,6 +1069,24 @@ check_equals(b.xMin, 10);
 check_equals(b.xMax, 180);
 check_equals(b.yMin, 10);
 check_equals(b.yMax, 40);
+
+// Check effects of unload on bounds
+// TODO: test this with bounds defined by SWF tags !
+container.onUnload = function() {};
+container_ref = container;
+container.removeMovieClip();
+check_equals(typeof(container), 'movieclip');
+check_equals(typeof(container_ref.getBounds), 'function');
+b = container.getBounds(); 
+check_equals(b.xMin, 6710886.35);
+check_equals(b.xMax, 6710886.35);
+check_equals(b.yMin, 6710886.35);
+check_equals(b.yMax, 6710886.35);
+b = container_ref.getBounds(); 
+check_equals(b.xMin, 6710886.35);
+check_equals(b.xMax, 6710886.35);
+check_equals(b.yMin, 6710886.35);
+check_equals(b.yMax, 6710886.35);
 
 #endif // OUTPUT_VERSION >= 6
 

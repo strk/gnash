@@ -1,5 +1,10 @@
 2007-10-03 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/MovieClip.as: Test effects of unload
+	  on clip bounds (confirms we should clean the drawable on unload).
+
+2007-10-03 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/MovieClip.as:
 	  more extensive tests for soft references, confirming current
 	  gnash behaviour being unbreaked.
