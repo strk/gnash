@@ -54,16 +54,17 @@ namespace gnash {
 
 as_value::as_value(as_function* func)
     :
-    m_type(AS_FUNCTION),
-    m_object_value(func)
+    m_type(AS_FUNCTION)
 {
-    if (m_object_value) {
-#ifndef GNASH_USE_GC
-	m_object_value->add_ref();
-#endif // GNASH_USE_GC
-    } else {
-        m_type = NULLTYPE;
-    }
+	if ( func )
+	{
+		_value = boost::intrusive_ptr<as_object>(func);
+	}
+	else
+	{
+		m_type = NULLTYPE;
+		_value = boost::blank();
+	}
 }
 
 // Conversion to const std::string&.
@@ -74,23 +75,23 @@ as_value::to_string(as_environment* env) const
 	{
 
 		case STRING:
-			return m_string_value;
+			return getStr();
 
 		case MOVIECLIP:
 		{
-			assert(m_string_value.empty());
-			sprite_instance* sp = m_object_value->to_movie();
-			assert(sp); // or return as in to_sprite() ?
-			return sp->getTarget();
+                        sprite_instance* sp = getSprite();
+                        assert(sp); // or return as in to_sprite() ?
+                        return sp->getTarget();
 		}
 
 		case NUMBER:
-			assert(m_string_value.empty());
-			return doubleToString(m_number_value);
+		{
+			double d = getNum();
+			return doubleToString(d);
+		}
 
 		case UNDEFINED: 
 
-			assert(m_string_value.empty());
 			// Behavior depends on file version.  In
 			// version 7+, it's "undefined", in versions
 			// 6-, it's "".
@@ -102,17 +103,19 @@ as_value::to_string(as_environment* env) const
 			return "undefined";
 
 		case NULLTYPE:
-			assert(m_string_value.empty());
 			return "null";
 
 		case BOOLEAN:
-			assert(m_string_value.empty());
-			return m_boolean_value ? "true" : "false";
+		{
+			bool b = getBool();
+			return b ? "true" : "false";
+		}
 
 		case OBJECT:
 		case AS_FUNCTION:
 		{
-			assert(m_string_value.empty());
+			as_object* obj = m_type == OBJECT ? getObj().get() : getFun().get();
+
 			//printf("as_value to string conversion, env=%p\n", env);
 			// @@ Moock says, "the value that results from
 			// calling toString() on the object".
@@ -122,7 +125,6 @@ as_value::to_string(as_environment* env) const
 			// text representation for that object is used
 			// instead.
 			//
-			as_object* obj = m_object_value; 
 			if ( ! obj->useCustomToString() )
 			{
 				return obj->get_text_value();
@@ -139,7 +141,7 @@ as_value::to_string(as_environment* env) const
 					if ( ret.is_string() )
 					{
 						gotValidToStringResult=true;
-						return ret.m_string_value;
+						return ret.to_string(); // no need to env, it's a string already
 					}
 					log_msg(_("[object %p].%s() did not return a string: %s"),
 							(void*)obj, VM::get().getStringTable().value(methodname).c_str(),
@@ -185,9 +187,10 @@ as_value::to_string_versioned(int version, as_environment* env) const
 as_value
 as_value::to_primitive(as_environment& env) const
 {
+
 	if ( m_type == OBJECT || m_type == AS_FUNCTION )
 	{
-		as_object* obj = m_object_value;
+		as_object* obj = m_type == OBJECT ? getObj().get() : getFun().get();
 		string_table::key methodname = NSV::PROP_VALUE_OF;
 		as_value method;
 		if ( obj->get_member(methodname, &method) )
@@ -204,7 +207,6 @@ as_value::to_primitive(as_environment& env) const
 
 }
 
-// Conversion to double.
 double
 as_value::to_number(as_environment* env) const
 {
@@ -220,23 +222,25 @@ as_value::to_number(as_environment* env) const
 			// string is a valid float literal, then it
 			// gets converted; otherwise it is set to NaN.
 			char* tail=0;
-			m_number_value = strtod(m_string_value.c_str(), &tail);
+			const char* s = getStr().c_str();
+
+			double d = strtod(s, &tail);
 			// Detect failure by "tail" still being at the start of
 			// the string or there being extra junk after the
 			// converted characters.
-			if ( tail == m_string_value.c_str() || *tail != 0 )
+			if ( tail == s || *tail != 0 )
 			{
 				// Failed conversion to Number.
-				m_number_value = NAN;
+				return (double)NAN;
 			}
 
 			// "Infinity" and "-Infinity" are recognized by strtod()
 			// but Flash Player returns NaN for them.
-			if ( isinf(m_number_value) ) {
-				m_number_value = NAN;
+			if ( isinf(d) ) {
+				return (double)NAN;
 			}
 
-			return m_number_value;
+			return d;
 		}
 
 		case NULLTYPE:
@@ -248,10 +252,10 @@ as_value::to_number(as_environment* env) const
 		case BOOLEAN:
 			// Evan: from my tests
 			// Martin: confirmed
-			return (this->m_boolean_value) ? 1 : 0;
+			return getBool() ? 1 : 0;
 
 		case NUMBER:
-			return m_number_value;
+			return getNum();
 
 		case OBJECT:
 		case AS_FUNCTION:
@@ -264,7 +268,7 @@ as_value::to_number(as_environment* env) const
 
 			//log_msg(_("OBJECT to number conversion, env is %p"), env);
 
-			as_object* obj = m_object_value; 
+			as_object* obj = m_type == OBJECT ? getObj().get() : getFun().get();
 			if ( env )
 			{
 				string_table::key methodname = NSV::PROP_VALUE_OF;
@@ -274,7 +278,7 @@ as_value::to_number(as_environment* env) const
 					as_value ret = call_method0(method, env, obj);
 					if ( ret.is_number() )
 					{
-						return ret.m_number_value;
+						return ret.getNum();
 					}
 					else if ( ret.is_string() )
 					{
@@ -343,15 +347,18 @@ as_value::to_bool_v7() const
 	    switch (m_type)
 	    {
 		case  STRING:
-			return m_string_value != "";
+			return getStr() != "";
 		case NUMBER:
-			return m_number_value && ! isnan(m_number_value);
+		{
+			double d = getNum();
+			return d && ! isnan(d);
+		}
 		case BOOLEAN:
-			return this->m_boolean_value;
+			return getBool();
 		case OBJECT:
 		case AS_FUNCTION:
-			assert(m_object_value != NULL);
 			return true;
+
 		case MOVIECLIP:
 			return true;
 		default:
@@ -369,24 +376,26 @@ as_value::to_bool_v5() const
 	    {
 		case  STRING:
 		{
-			if (m_string_value == "false") return false;
-			else if (m_string_value == "true") return true;
+			if (getStr() == "false") return false;
+			else if (getStr() == "true") return true;
 			else
 			{
 				double num = to_number();
 				bool ret = num && ! isnan(num);
-				//log_msg(_("m_string_value: %s, to_number: %g, to_bool: %d"), m_string_value.c_str(), num, ret);
 				return ret;
 			}
 		}
 		case NUMBER:
-			return ! isnan(m_number_value) && m_number_value; 
+		{
+			double d = getNum();
+			return ! isnan(d) && d; 
+		}
 		case BOOLEAN:
-			return this->m_boolean_value;
+			return getBool();
 		case OBJECT:
 		case AS_FUNCTION:
-			assert(m_object_value != NULL);
 			return true;
+
 		case MOVIECLIP:
 			return true;
 		default:
@@ -404,24 +413,26 @@ as_value::to_bool_v6() const
 	    {
 		case  STRING:
 		{
-			if (m_string_value == "false") return false;
-			else if (m_string_value == "true") return true;
+			if (getStr() == "false") return false;
+			else if (getStr() == "true") return true;
 			else
 			{
 				double num = to_number();
 				bool ret = num && ! isnan(num);
-				//log_msg(_("m_string_value: %s, to_number: %g, to_bool: %d"), m_string_value.c_str(), num, ret);
 				return ret;
 			}
 		}
 		case NUMBER:
-			return isfinite(m_number_value) && m_number_value; 
+		{
+			double d = getNum();
+			return isfinite(d) && d;
+		}
 		case BOOLEAN:
-			return this->m_boolean_value;
+			return getBool();
 		case OBJECT:
 		case AS_FUNCTION:
-			assert(m_object_value != NULL);
 			return true;
+
 		case MOVIECLIP:
 			return true;
 		default:
@@ -450,8 +461,10 @@ as_value::to_object() const
 	switch (m_type)
 	{
 		case OBJECT:
+			return getObj();
+
 		case AS_FUNCTION:
-			return ptr(m_object_value);
+			return getFun().get();
 
 		case MOVIECLIP:
 			// FIXME: update when to_sprite will return
@@ -459,13 +472,13 @@ as_value::to_object() const
 			return ptr(to_sprite());
 
 		case STRING:
-			return init_string_instance(m_string_value.c_str());
+			return init_string_instance(getStr().c_str());
 
 		case NUMBER:
-			return init_number_instance(m_number_value);
+			return init_number_instance(getNum());
 
 		case BOOLEAN:
-			return init_boolean_instance(m_boolean_value);
+			return init_boolean_instance(getBool());
 
 		default:
 			// Invalid to convert exceptions.
@@ -491,7 +504,7 @@ as_value::to_sprite() const
 {
 	if ( m_type != MOVIECLIP ) return NULL;
 
-	sprite_instance* sp = m_object_value->to_movie();
+	sprite_instance* sp = getSprite();
 	if ( ! sp ) return NULL; // shoudl we assert(sp) instead ?
 
 	if ( sp->isUnloaded() )
@@ -512,7 +525,7 @@ as_value::set_sprite(const sprite_instance& sprite)
 {
 	drop_refs();
 	m_type = MOVIECLIP;
-	m_object_value = const_cast<sprite_instance*>(&sprite);
+	_value = boost::intrusive_ptr<as_object>(const_cast<sprite_instance*>(&sprite));
 }
 
 void
@@ -532,7 +545,7 @@ as_value::to_as_function() const
 {
     if (m_type == AS_FUNCTION) {
 	// OK.
-	return m_object_value->to_function();
+	return getFun().get();
     } else {
 	return NULL;
     }
@@ -552,7 +565,7 @@ as_value::convert_to_string()
     std::string ns = to_string();
     drop_refs();
     m_type = STRING;	// force type.
-    m_string_value = ns;
+    _value = ns;
 }
 
 
@@ -563,9 +576,25 @@ as_value::convert_to_string_versioned(int version, as_environment* env)
     std::string ns = to_string_versioned(version, env);
     drop_refs();
     m_type = STRING;	// force type.
-    m_string_value = ns;
+    _value = ns;
 }
 
+
+void
+as_value::set_undefined()
+{
+	drop_refs();
+	m_type = UNDEFINED;
+	_value = boost::blank();
+}
+
+void
+as_value::set_null()
+{
+	drop_refs();
+	m_type = NULLTYPE;
+	_value = boost::blank();
+}
 
 void
 as_value::set_as_object(as_object* obj)
@@ -587,17 +616,11 @@ as_value::set_as_object(as_object* obj)
 		set_as_function(func);
 		return;
 	}
-	if (m_type != OBJECT || m_object_value != obj)
+	if (m_type != OBJECT || getObj() != obj)
 	{
 		drop_refs();
 		m_type = OBJECT;
-		m_object_value = obj;
-#ifndef GNASH_USE_GC
-		if (m_object_value)
-		{
-			m_object_value->add_ref();
-		}
-#endif // GNASH_USE_GC
+		_value = boost::intrusive_ptr<as_object>(obj);
 	}
 }
 
@@ -610,16 +633,18 @@ as_value::set_as_object(boost::intrusive_ptr<as_object> obj)
 void
 as_value::set_as_function(as_function* func)
 {
-    if (m_type != AS_FUNCTION || m_object_value != func) {
+    if (m_type != AS_FUNCTION || getFun().get() != func)
+    {
 	drop_refs();
 	m_type = AS_FUNCTION;
-	m_object_value = func;
-	if (m_object_value) {
-#ifndef GNASH_USE_GC
-	    m_object_value->add_ref();
-#endif // GNASH_USE_GC
-	} else {
-	    m_type = NULLTYPE;
+	if (func)
+	{
+		_value = boost::intrusive_ptr<as_object>(func);
+	}
+	else
+	{
+		m_type = NULLTYPE;
+		_value = boost::blank(); // to properly destroy anything else might be stuffed into it
 	}
     }
 }
@@ -651,7 +676,7 @@ as_value::equals(const as_value& v, as_environment& env) const
     if (this_nulltype || v_nulltype)
     {
 #ifdef GNASH_DEBUG_EQUALITY
-       log_debug(" on of the two things is undefined or null");
+       log_debug(" one of the two things is undefined or null");
 #endif
         return this_nulltype == v_nulltype;
     }
@@ -660,7 +685,11 @@ as_value::equals(const as_value& v, as_environment& env) const
     bool v_obj_or_func = (v.m_type == OBJECT || v.m_type == AS_FUNCTION);
 
     /// Compare to same type
-    if ( obj_or_func && v_obj_or_func ) return m_object_value == v.m_object_value;
+    if ( obj_or_func && v_obj_or_func )
+    {
+        return boost::get<AsObjPtr>(_value) == boost::get<AsObjPtr>(v._value); 
+    }
+
     if ( m_type == v.m_type ) return equalsSameType(v);
 
     // 16. If Type(x) is Number and Type(y) is String,
@@ -684,7 +713,7 @@ as_value::equals(const as_value& v, as_environment& env) const
     // 18. If Type(x) is Boolean, return the result of the comparison ToNumber(x) == y.
     if (m_type == BOOLEAN)
     {
-        return as_value(to_number(&env)).equals(v, env); // m_boolean_value == v.to_bool();
+        return as_value(to_number(&env)).equals(v, env); 
     }
 
     // 19. If Type(y) is Boolean, return the result of the comparison x == ToNumber(y).
@@ -751,23 +780,13 @@ as_value::string_concat(const std::string& str)
 {
     std::string currVal = to_string();
     m_type = STRING;
-    m_string_value = currVal + str;
+    _value = currVal + str;
 }
 
 // Drop any ref counts we have; this happens prior to changing our value.
 void
 as_value::drop_refs()
 {
-    m_string_value.clear();
-#ifndef GNASH_USE_GC
-    if (m_type == AS_FUNCTION || m_type == OBJECT )
-    {
-	if (m_object_value) // should assert here ?
-	{
-	    m_object_value->drop_ref();
-	}
-    } 
-#endif // GNASH_USE_GC
 }
 
 const char*
@@ -824,21 +843,17 @@ as_value::equalsSameType(const as_value& v) const
 
 		case OBJECT:
 		case AS_FUNCTION:
-			return m_object_value == v.m_object_value;
-
 		case BOOLEAN:
-			return m_boolean_value == v.m_boolean_value;
-
 		case STRING:
-			return m_string_value == v.m_string_value;
+			return _value == v._value;
 
 		case MOVIECLIP:
-			return to_sprite() == v.to_sprite(); // m_object_value == v.m_object_value;
+			return to_sprite() == v.to_sprite(); 
 
 		case NUMBER:
 		{
-			double a = m_number_value;
-			double b = v.m_number_value;
+			double a = getNum();
+			double b = v.getNum();
 
 			// Nan != NaN
 			//if ( isnan(a) || isnan(b) ) return false;
@@ -878,25 +893,31 @@ as_value::to_debug_string() const
 		case NULLTYPE:
 			return "[null]";
 		case BOOLEAN:
-			sprintf(buf, "[bool:%s]", m_boolean_value ? "true" : "false");
+			sprintf(buf, "[bool:%s]", getBool() ? "true" : "false");
 			return buf;
 		case OBJECT:
-			sprintf(buf, "[object(%s):%p]", typeName(*m_object_value).c_str(), (void *)m_object_value);
+		{
+			as_object* obj = getObj().get();
+			sprintf(buf, "[object(%s):%p]", typeName(*obj).c_str(), (void *)obj);
 			return buf;
+		}
 		case AS_FUNCTION:
-			sprintf(buf, "[function:%p]", (void *)m_object_value);
+		{
+			as_function* obj = getFun().get();
+			sprintf(buf, "[function:%p]", (void *)obj);
 			return buf;
+		}
 		case STRING:
-			return "[string:" + m_string_value + "]";
+			return "[string:" + getStr() + "]";
 		case NUMBER:
 		{
 			std::stringstream stream;
-			stream << m_number_value;
+			stream << getNum();
 			return "[number:" + stream.str() + "]";
 		}
 		case MOVIECLIP:
 		{
-			sprite_instance* sp = m_object_value->to_movie();
+			sprite_instance* sp = getSprite();
 			assert(sp); // will change in case we'll have better management :)
 			snprintf(buf, 511, "[%smovieclip(%s):%p]", sp->isUnloaded() ? "dangling " : "", sp->getOrigTarget().c_str(), (void *)sp);
 			buf[511] = '\0';
@@ -913,30 +934,19 @@ as_value::to_debug_string() const
 void
 as_value::operator=(const as_value& v)
 {
+#if 0
 	type the_type = v.m_type;
 	if (v.is_exception())
 		the_type = (type) ((int) the_type - 1);
+#endif
 
-	if (the_type == UNDEFINED) set_undefined();
-	else if (the_type == NULLTYPE) set_null();
-	else if (the_type == BOOLEAN) set_bool(v.m_boolean_value);
-	else if (the_type == STRING) set_string(v.m_string_value);
-	else if (the_type == NUMBER) set_double(v.m_number_value);
-	else if (the_type == OBJECT) set_as_object(v.m_object_value);
+	m_type = v.m_type;
+	_value = v._value;
 
-	else if (the_type == MOVIECLIP)
-	{
-		sprite_instance* sp = dynamic_cast<sprite_instance*>(v.m_object_value);
-		assert(sp);
-		set_sprite(*sp);
-	}
-
-	else if (the_type == AS_FUNCTION) set_as_function(v.m_object_value->to_function());
-	else 
-		assert(0);
-
+#if 0
 	if (v.is_exception())
 		flag_exception();
+#endif
 }
 
 as_value::as_value(boost::intrusive_ptr<as_object> obj)
@@ -1111,13 +1121,156 @@ void
 as_value::setReachable() const
 {
 #ifdef GNASH_USE_GC
-	if ( m_type == OBJECT || m_type == AS_FUNCTION || m_type == MOVIECLIP
-		|| m_type == OBJECT_EXCEPT)
+	switch (m_type)
 	{
-		assert(m_object_value); // will need to change for MOVIECLIP...
-		m_object_value->setReachable();
+		case OBJECT:
+			getObj()->setReachable();
+			break;
+
+		case AS_FUNCTION:
+			getFun()->setReachable();
+			break;
+
+		case MOVIECLIP:
+			getSprite()->setReachable();
+			break;
+
+		default: break;
 	}
 #endif // GNASH_USE_GC
+}
+
+as_value::AsFunPtr
+as_value::getFun() const
+{
+	assert(m_type == AS_FUNCTION);
+	return boost::get<AsObjPtr>(_value)->to_function();
+}
+
+as_value::AsObjPtr
+as_value::getObj() const
+{
+	assert(m_type == OBJECT);
+	return boost::get<AsObjPtr>(_value);
+}
+
+as_value::SpritePtr
+as_value::getSprite() const
+{
+	assert(m_type == MOVIECLIP);
+	//return boost::get<SpritePtr>(_value);
+	return boost::get<AsObjPtr>(_value)->to_movie();
+}
+
+void
+as_value::set_string(const std::string& str)
+{
+	drop_refs();
+	m_type = STRING;
+	_value = str;
+}
+
+void
+as_value::set_double(double val)
+{
+	drop_refs();
+	m_type = NUMBER;
+	_value = val;
+}
+
+void
+as_value::set_bool(bool val)
+{
+	drop_refs();
+	m_type = BOOLEAN;
+	_value = val;
+}
+
+as_value::as_value()
+	:
+	m_type(UNDEFINED),
+	_value(boost::blank())
+{
+}
+
+as_value::as_value(const as_value& v)
+	:
+	m_type(v.m_type),
+	_value(v._value)
+{
+}
+
+as_value::as_value(const char* str)
+	:
+	m_type(STRING),
+	_value(std::string(str))
+{
+}
+
+as_value::as_value(const std::string& str)
+	:
+	m_type(STRING),
+	_value(str)
+{
+}
+
+as_value::as_value(bool val)
+	:
+	m_type(BOOLEAN),
+	_value(val)
+{
+}
+
+as_value::as_value(int val)
+	:
+	m_type(NUMBER),
+	_value(double(val))
+{
+}
+
+as_value::as_value(unsigned int val)
+	:
+	m_type(NUMBER),
+	_value(double(val))
+{
+}
+
+as_value::as_value(float val)
+	:
+	m_type(NUMBER),
+	_value(double(val))
+{
+}
+
+as_value::as_value(double val)
+	:
+	m_type(NUMBER),
+	_value(val)
+{
+}
+
+as_value::as_value(long val)
+	:
+	m_type(NUMBER),
+	_value(double(val))
+{
+}
+
+as_value::as_value(unsigned long val)
+	:
+	m_type(NUMBER),
+	_value(double(val))
+{
+}
+
+as_value::as_value(as_object* obj)
+	:
+	// Initialize to non-object type here,
+	// or set_as_object will call
+	// drop_ref on undefined memory !!
+	m_type(UNDEFINED)
+{
+	set_as_object(obj);
 }
 
 } // namespace gnash

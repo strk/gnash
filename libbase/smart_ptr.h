@@ -21,7 +21,7 @@
 // although the nice thing about templates is that no particular
 // ref-counted class is mandated.
 
-/* $Id: smart_ptr.h,v 1.23 2007/09/15 17:53:09 rsavoye Exp $ */
+/* $Id: smart_ptr.h,v 1.24 2007/10/03 21:20:06 strk Exp $ */
 
 #ifndef SMART_PTR_H
 #define SMART_PTR_H
@@ -72,6 +72,12 @@ intrusive_ptr_release(ref_counted* o)
 
 inline void intrusive_ptr_add_ref(GcResource* ) { }
 inline void intrusive_ptr_release(GcResource* ) { }
+
+#ifdef GNASH_USE_GC
+class as_object;
+inline void intrusive_ptr_add_ref(as_object* ) { }
+inline void intrusive_ptr_release(as_object* ) { }
+#endif
 
 // The below thing won't work. We'll need a real templated class..
 //template <typename C> typedef C* gc_ptr;

@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.67 2007/10/03 14:58:31 strk Exp $ */
+/* $Id: as_value.h,v 1.68 2007/10/03 21:20:07 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -31,6 +31,7 @@
 #include <cmath>
 #include <limits>
 #include <string>
+#include <boost/variant.hpp>
 #include <ostream> // for inlined output operator
 
 namespace gnash {
@@ -81,7 +82,6 @@ static inline int isnan_ld (long double x) { return x != x; }
 /// is SWF6 or lower
 ///
 #define PROPNAME(x) ( VM::get().getSWFVersion() < 7 ? boost::to_lower_copy(std::string(x)) : (x) )
- 
 
 /// ActionScript value type.
 //
@@ -130,92 +130,37 @@ public:
 	};
 
 	/// Construct an UNDEFINED value
-	as_value()
-		:
-		m_type(UNDEFINED),
-		m_number_value(0.0)
-	{
-	}
+	as_value();
 
-	as_value(const as_value& v)
-		:
-		m_type(UNDEFINED),
-		m_number_value(0.0)
-	{
-		*this = v;
-	}
+	/// Copy-construct a STRING value 
+	as_value(const as_value& v);
 
 	/// Construct a STRING value 
-	as_value(const char* str)
-		:
-		m_type(STRING),
-		m_string_value(str)
-	{
-	}
+	as_value(const char* str);
 
 	/// Construct a STRING value 
-	as_value(const std::string& str)
-		:
-		m_type(STRING),
-		m_string_value(str)
-	{
-	}
+	as_value(const std::string& str);
 
 	/// Construct a BOOLEAN value
-	as_value(bool val)
-		:
-		m_type(BOOLEAN),
-		m_boolean_value(val)
-	{
-	}
+	as_value(bool val);
 
 	/// Construct a NUMBER value
-	as_value(int val)
-		:
-		m_type(NUMBER),
-		m_number_value(double(val))
-	{
-	}
+	as_value(int val);
 
 	/// Construct a NUMBER value
-	as_value(unsigned int val)
-		:
-		m_type(NUMBER),
-		m_number_value(double(val))
-	{
-	}
+	as_value(unsigned int val);
 
 	/// Construct a NUMBER value
-	as_value(float val)
-		:
-		m_type(NUMBER),
-		m_number_value(double(val))
-	{
-	}
+	as_value(float val);
 
 	/// Construct a NUMBER value
-	as_value(double val)
-		:
-		m_type(NUMBER),
-		m_number_value(val)
-	{
-	}
+	as_value(double val);
 
 	/// Construct a NUMBER value
-	as_value(long val)
-		:
-		m_type(NUMBER),
-		m_number_value(val)
-	{
-	}
+	as_value(long val);
 	
 	/// Construct a NUMBER value
-	as_value(unsigned long val)
-		:
-		m_type(NUMBER),
-		m_number_value(val)
-	{
-	}
+	as_value(unsigned long val);
 
 	/// Construct a NULL, OBJECT, MOVIECLIP or AS_FUNCTION value
 	//
@@ -224,15 +169,7 @@ public:
 	/// Internally adds a reference to the ref-counted as_object, 
 	/// if not-null
 	///
-	as_value(as_object* obj)
-		:
-		// Initialize to non-object type here,
-		// or set_as_object will call
-		// drop_ref on undefined memory !!
-		m_type(UNDEFINED)
-	{
-		set_as_object(obj);
-	}
+	as_value(as_object* obj);
 
 	/// Construct an NULL, MOVIECLIP, AS_FUNCTION or OBJECT value
 	as_value(boost::intrusive_ptr<as_object> obj);
@@ -327,7 +264,7 @@ public:
 	///
 	std::string to_string_versioned(int version, as_environment* env=NULL) const;
 
-	/// Conversion to number (double)
+	/// Get a number representation for this value
 	//
 	/// @param env
 	///	The environment to use for running the valueOf() method
@@ -458,12 +395,7 @@ public:
 	// in preference to generic overloaded set().  You are
 	// more likely to get a warning/error if misused.
 
-	void	set_string(const std::string& str)
-	{
-		drop_refs();
-		m_type = STRING;
-		m_string_value = str;
-	}
+	void	set_string(const std::string& str);
 
 	void	set_std_string(const std::string& str)
 	{
@@ -472,24 +404,12 @@ public:
 
 	void	set_string(const char* str)
 	{
-		drop_refs();
-		m_type = STRING;
-		m_string_value = str;
+		set_string(std::string(str));
 	}
 
-	void	set_double(double val)
-	{
-		drop_refs();
-		m_type = NUMBER;
-		m_number_value = val;
-	}
+	void	set_double(double val);
 
-	void	set_bool(bool val)
-	{
-		drop_refs();
-		m_type = BOOLEAN;
-		m_boolean_value = val;
-	}
+	void	set_bool(bool val);
 
 	void	set_sprite(const sprite_instance& sp);
 
@@ -511,13 +431,10 @@ public:
 	/// Make this a NULL or AS_FUNCTION value
 	void	set_as_function(as_function* func);
 
-	void	set_undefined() { drop_refs(); m_type = UNDEFINED; }
+	void	set_undefined();
 
 	/// Set this value to the NULL value
-	//
-	/// @return a reference to this instance
-	///
-	as_value& set_null() { drop_refs(); m_type = NULLTYPE; return *this; }
+	void set_null();
 
 	/// Equality operator, follows strict equality semantic
 	//
@@ -610,18 +527,52 @@ private:
 	//
 	type	get_type() const { return m_type; }
 
-
 	type	m_type;
 
-	mutable std::string m_string_value;
+	typedef sprite_instance* SpritePtr;
+	typedef boost::intrusive_ptr<as_function> AsFunPtr;
+	typedef boost::intrusive_ptr<as_object> AsObjPtr;
 
-	union
+        boost::variant<  
+			 boost::blank,  // UNDEFINED or NULL
+                         double,	// NUMBER
+                         bool,		// BOOLEAN
+                         AsObjPtr,	// OBJECT,
+//                        AsFuncPtr,	// AS_FUNCTION
+//                        SpritePtr,	// MOVIECLIP
+			 std::string	// STRING 
+                      > _value;
+
+
+	/// Get the function pointer variant member (we assume m_type == FUNCTION)
+	AsFunPtr getFun() const;
+
+	/// Get the object pointer variant member (we assume m_type == OBJECT)
+	AsObjPtr getObj() const;
+
+	/// Get the sprite pointer variant member (we assume m_type == MOVIECLIP)
+	SpritePtr getSprite() const;
+
+	/// Get the number variant member (we assume m_type == NUMBER)
+	double getNum() const
 	{
-		bool m_boolean_value;
-		// @@ hm, what about PS2, where double is bad?  should maybe have int&float types.
-		mutable	double	m_number_value;
-		as_object*	m_object_value;
-	};
+		assert(m_type == NUMBER);
+		return boost::get<double>(_value);
+	}
+
+	/// Get the boolean variant member (we assume m_type == BOOLEAN)
+	bool getBool() const
+	{
+		assert(m_type == BOOLEAN);
+		return boost::get<bool>(_value);
+	}
+
+	/// Get the boolean variant member (we assume m_type == STRING)
+	const std::string& getStr() const
+	{
+		assert(m_type == STRING);
+		return boost::get<std::string>(_value);
+	}
 
 };
 

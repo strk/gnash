@@ -1,5 +1,16 @@
 2007-10-03 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.{cpp,h}: use boost::variant instead of the union.
+	  Idea taken from patch #6067. No clever templates used, this is just
+	  the basic thing, can be improved in the future. Main reason to have
+	  done so is for being able to drop the reference to the original
+	  sprite for soft references (still not implemented but now possible).
+	* libbase/smart_ptr.h: define intrusive_ptr_{add,drop}_ref for
+	  as_object needed for the "clever" boost::get visitor of
+	  boost::variant ...
+
+2007-10-03 Sandro Santilli <strk@keybit.net>
+
 	* cygnal/ACT/Makefile.am: don't list subdirs for which no
 	  Makefile.am is present. TODO: add a Makefile.am there !
 
