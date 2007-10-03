@@ -21,131 +21,9 @@
 
 #include "AudioDecoderSimple.h"
 #include "utility.h"
+#include "BitsReader.h"
 
 namespace gnash {
-
-class BitReader 
-{
-public:
-	typedef unsigned char byte;
-
-	/// Ownership of buffer left to caller
-	BitReader(byte* input, size_t len)
-		:
-		start(input),
-		ptr(input),
-		end(ptr+len),
-		usedBits(0)
-	{
-	}
-
-	~BitReader() {}
-
-	/// Set a new buffer to work with
-	void setBuffer(byte* input, size_t len)
-	{
-		start = ptr = input;
-		end = start+len;
-		usedBits = 0;
-	}
-
-	bool read_bit()
-	{
-		bool ret = (*ptr&(128>>usedBits));
-		if ( ++usedBits == 8 ) advanceToNextByte();
-		return ret;
-	}
-
-	unsigned int read_uint(unsigned short bitcount)
-	{
-		assert(bitcount <= 32);
-
-		uint32_t value = 0;
-
-		unsigned short bits_needed = bitcount;
-		do
-		{
-			int unusedMask = 0xFF >> usedBits;
-			int unusedBits = 8-usedBits;
-
-			if (bits_needed == unusedBits)
-			{
-				// Consume all the unused bits.
-				value |= (*ptr&unusedMask);
-				advanceToNextByte();
-				break;
-
-			}
-			else if (bits_needed > unusedBits)
-			{
-				// Consume all the unused bits.
-
-				bits_needed -= unusedBits; // assert(bits_needed>0)
-
-				value |= ((*ptr&unusedMask) << bits_needed);
-				advanceToNextByte();
-			}
-			else
-			{
-				assert(bits_needed <= unusedBits);
-
-				// Consume some of the unused bits.
-
-				unusedBits -= bits_needed;
-
-				value |= ((*ptr&unusedMask) >> unusedBits);
-
-				usedBits += bits_needed;
-				if ( usedBits >= 8 ) advanceToNextByte();
-
-				// We're done.
-				break;
-			}
-		}
-		while (bits_needed > 0);
-
-		return value;
-
-	}
-
-
-	int32_t read_sint(unsigned short bitcount)
-	{
-		int32_t	value = int32_t(read_uint(bitcount));
-
-		// Sign extend...
-		if (value & (1 << (bitcount - 1))) 
-			value |= -1 << bitcount;
-
-		return value;
-	}
-
-
-private:
-
-	void advanceToNextByte()
-	{
-		if ( ++ptr == end )
-		{
-			log_debug("Going round");
-			ptr=start;
-		}
-		usedBits=0;
-	}
-
-	/// Pointer to first byte
-	byte* start;
-
-	/// Pointer to current byte
-	byte* ptr;
-
-	/// Pointer to one past last byte
-	byte* end;
-
-	/// Number of used bits in current byte
-	unsigned usedBits;
-
-};
 
 // ----------------------------------------------------------------------------
 // ADPCMDecoder class
@@ -209,27 +87,27 @@ private:
 	}
 
 	/* Uncompress 4096 mono samples of ADPCM. */									
-	static void doMonoBlock(int16_t** out_data, int n_bits, int sample_count, BitReader* in, int sample, int stepsize_index)
+	static uint32_t doMonoBlock(int16_t** out_data, int n_bits, BitsReader* in, int sample, int stepsize_index)
 	{
 		/* First sample doesn't need to be decompressed. */								
-		sample_count--;													
+		uint32_t sample_count = 1;
 		*(*out_data)++ = (int16_t) sample;										
 																
-		while (sample_count--)												
+		while (sample_count++ <= 4096 && in->got_bits(n_bits))												
 		{														
 			int	raw_code = in->read_uint(n_bits);								
 			doSample(n_bits, sample, stepsize_index, raw_code);	/* sample & stepsize_index are in/out params */	
 			*(*out_data)++ = (int16_t) sample;									
-		}														
+		}	
+		return sample_count;													
 	}
 
 
 	/* Uncompress 4096 stereo sample pairs of ADPCM. */									
-	static void doStereoBlock(
+	static int doStereoBlock(
 			int16_t** out_data,	// in/out param
 			int n_bits,
-			int sample_count,
-			BitReader* in,
+			BitsReader* in,
 			int left_sample,
 			int left_stepsize_index,
 			int right_sample,
@@ -237,11 +115,11 @@ private:
 			)
 	{
 		/* First samples don't need to be decompressed. */								
-		sample_count--;													
+		uint32_t sample_count = 2;
 		*(*out_data)++ = (int16_t) left_sample;										
 		*(*out_data)++ = (int16_t) right_sample;										
 																
-		while (sample_count--)												
+		while (in->got_bits(n_bits*2) && sample_count++ <= 4096)
 		{														
 			int	left_raw_code = in->read_uint(n_bits);								
 			doSample(n_bits, left_sample, left_stepsize_index, left_raw_code);					
@@ -250,28 +128,31 @@ private:
 			int	right_raw_code = in->read_uint(n_bits);								
 			doSample(n_bits, right_sample, right_stepsize_index, right_raw_code);					
 			*(*out_data)++ = (int16_t) right_sample;									
-		}														
+		}
+		return sample_count;
 	}
 
 public:
 
 	// Utility function: uncompress ADPCM data from in BitReader to
-	// out_data[].	The output buffer must have (sample_count*2)
-	// bytes for mono, or (sample_count*4) bytes for stereo.
-	static void adpcm_expand(
+	// out_data[]. Returns the output samplecount.
+	static uint32_t adpcm_expand(
 		unsigned char* &data,
-		BitReader* in,
-		unsigned int sample_count,	// in stereo, this is number of *pairs* of samples
+		BitsReader* in,
+		unsigned int insize,
 		bool stereo)
 	{
-		int16_t* out_data = new int16_t[stereo ? sample_count*2 : sample_count];
+		// The compression ratio is 4:1, so this should be enough...
+		int16_t* out_data = new int16_t[insize * 5];
 		data = reinterpret_cast<unsigned char *>(out_data);
 
 		// Read header.
 		//in->ensureBytes(1); // nbits
 		unsigned int n_bits = in->read_uint(2) + 2;	// 2 to 5 bits (TODO: use unsigned...)
 
-		while (sample_count)
+		uint32_t sample_count = 0;
+
+		while (/*sample_count && !in->overread()*/in->got_bits(22))
 		{
 			// Read initial sample & index values.
 
@@ -280,20 +161,19 @@ public:
 			int	stepsize_index = in->read_uint(6);
 			assert(STEPSIZE_CT >= (1 << 6));	// ensure we don't need to clamp.
 
-			int	samples_this_block = imin(sample_count, 4096);
-			sample_count -= samples_this_block;
-
 			if (stereo == false)
 			{
-#define DO_MONO(n) doMonoBlock(&out_data, n, samples_this_block, in, sample, stepsize_index)
 
-				switch (n_bits)
-				{
-				default: assert(0); break;
-				case 2: DO_MONO(2); break;
-				case 3: DO_MONO(3); break;
-				case 4: DO_MONO(4); break;
-				case 5: DO_MONO(5); break;
+				if (n_bits == 0) {
+					assert(0);
+				} else if (n_bits == 2) {
+					sample_count += doMonoBlock(&out_data, 2, in, sample, stepsize_index);
+				} else if (n_bits == 3) {
+					sample_count += doMonoBlock(&out_data, 3, in, sample, stepsize_index);
+				} else if (n_bits == 4) {
+					sample_count += doMonoBlock(&out_data, 4, in, sample, stepsize_index);
+				} else if (n_bits == 5) {
+					sample_count += doMonoBlock(&out_data, 5, in, sample, stepsize_index);
 				}
 			}
 			else
@@ -307,22 +187,21 @@ public:
 				int	right_stepsize_index = in->read_uint(6);
 				assert(STEPSIZE_CT >= (1 << 6));	// ensure we don't need to clamp.
 
-#define DO_STEREO(n)					\
-		doStereoBlock(				\
-			&out_data, n, samples_this_block,	\
-			in, sample, stepsize_index,		\
-			right_sample, right_stepsize_index)
-				
-				switch (n_bits)
-				{
-				default: assert(0); break;
-				case 2: DO_STEREO(2); break;
-				case 3: DO_STEREO(3); break;
-				case 4: DO_STEREO(4); break;
-				case 5: DO_STEREO(5); break;
+				if (n_bits == 0) {
+					assert(0);
+				} else if (n_bits == 2) {
+					sample_count += doStereoBlock(&out_data, 2, in, sample, stepsize_index, right_sample, right_stepsize_index);
+				} else if (n_bits == 3) {
+					sample_count += doStereoBlock(&out_data, 3, in, sample, stepsize_index, right_sample, right_stepsize_index);
+				} else if (n_bits == 4) {
+					sample_count += doStereoBlock(&out_data, 4, in, sample, stepsize_index, right_sample, right_stepsize_index);
+				} else if (n_bits == 5) {
+					sample_count += doStereoBlock(&out_data, 5, in, sample, stepsize_index, right_sample, right_stepsize_index);
 				}
+
 			}
 		}
+		return sample_count;
 
 	}
 
@@ -399,6 +278,7 @@ AudioDecoderSimple::~AudioDecoderSimple()
 
 bool AudioDecoderSimple::setup(SoundInfo* info)
 {
+
 	if (info->getFormat() == AUDIO_CODEC_ADPCM || info->getFormat() == AUDIO_CODEC_RAW || info->getFormat() == AUDIO_CODEC_UNCOMPRESSED) {
 		_codec = info->getFormat();
 		_sampleRate = info->getSampleRate();
@@ -432,8 +312,8 @@ uint8_t* AudioDecoderSimple::decode(uint8_t* input, uint32_t inputSize, uint32_t
     switch (_codec) {
 	case AUDIO_CODEC_ADPCM:
 		{
-		uint32_t sample_count = inputSize * ( _stereo ? 1 : 2 ); //(_sampleCount == 0 ? inputSize / ( _stereo ? 4 : 2 ) : _sampleCount);
-		ADPCMDecoder::adpcm_expand(decodedData, new BitReader(input,inputSize), sample_count, _stereo);
+		//uint32_t sample_count = inputSize * ( _stereo ? 1 : 2 ); //(_sampleCount == 0 ? inputSize / ( _stereo ? 4 : 2 ) : _sampleCount);
+		uint32_t sample_count = ADPCMDecoder::adpcm_expand(decodedData, new BitsReader(input,inputSize), inputSize, _stereo);
 		outsize = sample_count * (_stereo ? 4 : 2);
 		}
 		break;
@@ -534,6 +414,7 @@ uint8_t* AudioDecoderSimple::decode(uint8_t* input, uint32_t inputSize, uint32_t
 	}
 
 	outputSize = tmp_raw_buffer_size;
+
 	decodedBytes = inputSize;
 	return tmp_raw_buffer;
 }

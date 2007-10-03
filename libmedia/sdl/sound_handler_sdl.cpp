@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.2 2007/09/28 10:49:11 tgc Exp $
+// $Id: sound_handler_sdl.cpp,v 1.3 2007/10/03 21:43:05 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -85,9 +85,6 @@ int	SDL_sound_handler::create_sound(
 	//sounddata->data_size = data_bytes;
 	sounddata->volume = 100;
 	sounddata->soundinfo = sinfo;
-
-	int16_t*	adjusted_data = 0;
-	int	adjusted_size = 0;
 
 	boost::mutex::scoped_lock lock(_mutex);
 
@@ -750,7 +747,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 					decoded_size += tmp_raw_buffer_size;
 
 					// no more to decode from this sound, so we break the loop
-					if (sound->dataSize() <= sound->position && sound->loop_count == 0) {
+					if (sound->dataSize() <= sound->position && sound->loop_count == 0 || tmp_raw_buffer_size == 0 && decodedBytes == 0) {
 						break;
 					}
 
@@ -788,9 +785,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 			} 
 
 			// Sound is done, remove it from the active list
-			if (sound->position == sound->dataSize() && sound->loop_count == 0) {
-				/*delete sound->decoder;
-				sound->deleteDecodedData();*/
+			if (sound->position == sound->dataSize() && sound->raw_position == sound->rawDataSize() && sound->loop_count == 0) {
 				sounddata->m_active_sounds.erase(sounddata->m_active_sounds.begin() + j);
 				handler->soundsPlaying--;
 				handler->_soundsStopped++;

@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.127 2007/09/29 08:24:21 cmusick Exp $
+# $Id: Makefile.am,v 1.128 2007/10/03 21:43:05 tgc Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -57,7 +57,6 @@ AM_CPPFLAGS = \
 
 libgnashserver_la_SOURCES = \
 	BitmapMovieInstance.cpp \
-	BitsReader.cpp \
 	GetterSetter.cpp \
 	PropertyList.cpp \
 	URLAccessManager.cpp \
@@ -116,7 +115,6 @@ libgnashserver_la_SOURCES = \
 	$(NULL)
 
 noinst_HEADERS = \
-	BitsReader.h \
 	GetterSetter.h \
 	Property.h \
 	PropertyList.h \

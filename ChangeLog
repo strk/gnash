@@ -1,3 +1,16 @@
+2007-10-03 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libbase/Makefile.am: Added BitsReader.{h,cpp}
+	* server/Makefile.am: Removed BitsReader.{h,cpp}
+	* server/BitsReader.{h,cpp}: moved to libbase, and added got_bits().
+	* libmedia/AudioDecoderSimple.cpp: Use BitsReader in libbase.
+	  Fixed (at least some) adpcm decoding bugs (bug #21177).
+	* libmedia/sdl/AudioDecoderFfmpeg.cpp: fix cvs id tag.
+	* libmedia/sdl/sound_handler_sdl.cpp: Only stop playback of sound if
+	  completely done. If nothing has been decoded assume nothing can be
+	  decoded, fixes bug #21219.
+	* libmedia/sdl/sound_handler_sdl.h: Only delete decoder if it exists.
+
 2007-10-03 Sandro Santilli <strk@keybit.net>
 
 	* server/as_value.{cpp,h}: use boost::variant instead of the union.

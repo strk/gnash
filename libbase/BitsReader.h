@@ -139,6 +139,14 @@ public:
 		if ( usedBits ) advanceToNextByte();
 	}
 
+	bool got_bits(uint32_t nbits)
+	{
+
+		uint32_t gotbits = 8-usedBits +8*(end-ptr-1);
+		if (gotbits > nbits) return true;
+		else return false;
+	}
+
 private:
 
 	void advanceToNextByte()
