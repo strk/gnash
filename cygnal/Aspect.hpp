@@ -65,7 +65,7 @@ namespace aspect {
 		typedef Owner owner_type ;
 
 		/// For the null aspect set_owner does nothing.
-		inline void set_owner( Owner * x ) {}
+		inline void set_owner( Owner * ) {}
 	} ;
 
 	//--------------------------------------------------

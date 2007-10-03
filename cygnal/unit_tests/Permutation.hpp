@@ -30,6 +30,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <stdexcept>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 
@@ -104,7 +105,7 @@ public:
 		if ( x.at_end ) {
 			return at_end ;
 		}
-		throw std::exception( "Can only compare against end-iterators in the present implementation." ) ;
+		throw std::logic_error( "Can only compare against end-iterators in the present implementation." ) ;
 	}
 
 	/**	\class test_function

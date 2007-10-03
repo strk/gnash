@@ -22,6 +22,7 @@
 #include <boost/test/auto_unit_test.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/thread/thread.hpp>
+#include <stdexcept>
 
 #include "../socket_device.hpp"
 
@@ -57,7 +58,7 @@ local_server()
 		return Net::socket_receptor( server_socket ) ;
 	} catch (...) {
 		BOOST_FAIL( "Unexpected exception while creating server socket" ) ;
-		throw std::exception( "Huh?" ) ;	// present to avoid warning "not all paths return a value"
+		throw std::logic_error( "Reached a not-reachable statement." ) ;	// present to avoid warning "not all paths return a value"
 	}
 }
 

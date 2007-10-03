@@ -1,4 +1,3 @@
-// 
 //   Copyright (C) 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
@@ -19,6 +18,7 @@
 
 #include "socket_device.hpp"
 #include "errno.h"
+#include <stdexcept>
 
 namespace Net {
 	//--------------------------------------------------
@@ -148,7 +148,7 @@ namespace Net {
 	socket_device_nonblocking::
 	consume_up_to( char * )
 	{
-		throw std::exception( "socket_device_nonblocking::consume_up_to() not implemented" ) ;
+		throw std::logic_error( "socket_device_nonblocking::consume_up_to() not implemented" ) ;
 	}
 
 	bool
@@ -162,7 +162,7 @@ namespace Net {
 	socket_device_nonblocking::
 	characters_available( size_t n )
 	{
-		throw std::exception( "socket_device_nonblocking::characters_available() not implemented" ) ;
+		throw std::logic_error( "socket_device_nonblocking::characters_available() not implemented" ) ;
 	}
 
 	IO::contiguous_buffer<>

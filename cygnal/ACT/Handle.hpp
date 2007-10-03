@@ -265,10 +265,16 @@ namespace ACT {
 		/// The aspect type as actually used.
 		typedef Aspect< T, Handled > aspect_type ;
 
-		/// The aspect class is a friend
-		friend class Aspect< T, Handled > ;
-		// Was:
+		//	This declaration had been the following:
 		//		friend class aspect_type ;
+		//	This syntax isn't normative C++, so it had to go.
+		//	The problem is, though, that there's some compiler defect in MSVC8 that actually accepts the friend declaration
+		//		with the non-normative syntax, but not the normative one.
+
+		/// The aspect class is a friend.
+		/// The aspect is a template parameter, so we know nothing of aspect structure.
+		///	Hence we use a class friend here.
+		friend class Aspect< T, Handled > ;
 
 	private:
 		/// Type declaration of the class registry
@@ -305,6 +311,11 @@ namespace ACT {
 		///		change the access control of this item to private
 		///		and add a \c const accessor function returning a reference.
 		aspect_type aspect ;
+
+		/// The aspect class is a friend.
+		/// The aspect is a template parameter, so we know nothing of aspect structure.
+		///	Hence we use a class friend here.
+		friend class Aspect< T, Handled > ;
 
 	public:
 		/// Default constructor takes as parameter the \c this pointer of a derived object.

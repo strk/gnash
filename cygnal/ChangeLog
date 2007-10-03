@@ -1,6 +1,13 @@
 2009-09-05 Markus Gothe
-
 	* cygnal.cpp: Added a #ifdef ENABLE_NLS.
+
+2007-08-24 Eric Hughes <eh@narthex.us>
+	* ACT/test_support/Supplied_Service.cpp, ACT/unit_tests/Test_ACT.cpp, IO/Stream_Consumer.cpp, 
+	IO/test_support/String_Device.cpp, IO/unit_tests/Test_Buffer.cpp, Net/Net.cpp, Net/Old_Device.hpp, 
+	Net/socket_device.cpp, Net/unit_tests/Test_socket_device.cpp, HTTP/HTTP_Parse.cpp, HTTP/URI.cpp, 
+	unit_tests/Permutation.hpp: 
+		Eliminated std::exception constructors with string arguments, 
+		replacing with std::runtime_error or std::logic error as appropriate.
 
 2007-07-14  Rob Savoye  <rob@bertha.welcomehome.org>
 	* ACT/Makefile.am: New Makefile.

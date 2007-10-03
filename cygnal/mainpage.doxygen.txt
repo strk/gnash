@@ -12,7 +12,7 @@
 	- \ref ACT.  
 		Asynchronous Computation Task.  
 		The multitasking foundation of the system.
-	- IO. 
+	- \ref IO. 
 		Input/Output.
 		ACT-enabled I/O infrastructure.
 		Provides scattered buffering and the conversion of asynchronous block I/O into an asynchronous stream abstraction.

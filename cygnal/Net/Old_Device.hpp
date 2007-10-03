@@ -72,6 +72,7 @@
 
 #include "ACT/ACT.hpp"
 #include "IO/Buffer.hpp"
+#include <stdexcept>
 
 namespace IO {
 
@@ -165,7 +166,7 @@ namespace IO {
 
 		/// The NEW reset
 		/// To be made pure-virtual later.
-		virtual void reset() { throw std::exception( "new reset() not implemented in child class" ) ; }
+		virtual void reset() { throw std::logic_error( "new reset() not implemented in child class" ) ; }
 
 	} ;
 

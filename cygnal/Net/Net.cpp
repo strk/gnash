@@ -22,6 +22,7 @@
 #include "../libbase/log.h"
 
 #include <errno.h>
+#include <stdexcept>
 
 #ifndef HAVE_WINSOCK_H
 #	define close_socket close
@@ -83,7 +84,7 @@ namespace Net {
 			WSADATA wsaData ;
 			wVersionRequested = MAKEWORD( 1, 1 ) ;		// Require Windows Sockets 1.1
 			if ( WSAStartup( wVersionRequested, & wsaData ) != 0 ) {
-				throw exception( "Could not initialize winsock" ) ;
+				throw std::runtime_error( "Could not initialize winsock" ) ;
 			}
 		}
 		++ call_count ;
@@ -464,12 +465,12 @@ namespace Net {
 		int x = connect( the_handle, remote.struct_ptr(), remote.struct_size() ) ;
 		if ( x < 0 ) {
 			if ( last_error() == EINTR ) {
-				throw exception( "EINTR not handled yet" ) ;
+				throw std::runtime_error( "EINTR not handled yet" ) ;
 			}
 			// Assert connect failed.
 			/// \todo Distinguish between implementation/system failures, e.g. not-a-socket,
 			/// and operational failures, e.g. host-not-available
-			throw exception( "Did not connect" ) ;
+			throw std::runtime_error( "Did not connect" ) ;
 		}
 	}
 

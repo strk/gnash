@@ -20,6 +20,7 @@
  */
 
 #include "URI.hpp"
+#include <stdexcept>
 
 namespace cygnal {
 	URI_Scanner::
@@ -461,7 +462,7 @@ namespace cygnal {
 				return set_completed() ;
 		}
 		label_percent_encoding_not_implemented:
-		throw std::exception( "% encoding not yet implemented" ) ;
+		throw std::logic_error( "% encoding not yet implemented" ) ;
 
 	}
 } // end namespace cygnal

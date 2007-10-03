@@ -20,6 +20,7 @@
  */
 
 #include "HTTP_Parse.hpp"
+#include <stdexcept>
 using namespace ACT ;
 
 namespace cygnal { namespace HTTP {
@@ -239,7 +240,7 @@ namespace cygnal { namespace HTTP {
 							// Assert there's lookahead for us.
 							
 							// But we cannot handle it yet.
-							throw std::exception( "Implementation Defect: Cannot handle lookahead not in current segment." ) ;
+							throw std::logic_error( "Implementation Defect: Cannot handle lookahead not in current segment." ) ;
 						} else {
 							// Assert next segment is empty.
 

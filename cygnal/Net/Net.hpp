@@ -33,6 +33,16 @@
 #	include <arpa/inet.h>
 	typedef int socket_t ;
 #else
+	/*	Note:
+	 *		It is impossible under VC8 to compile this module with language extensions turned off.
+	 *		This is a known defect in the Microsoft environment.
+	 *		The system headers, which winsock.h includes, use MS-specific language extensions.
+	 *		The compiler has no way of turning them temporarily on.
+	 *		The only work-around is to turn extensions on as a whole.
+	 *	Warning:
+	 *		If you are developing with this module primarily under Visual C++, you will want a second compilation environment available.
+	 *		MS-specific extensions can creep into code easily, particularly because some of them are anticipations of future standards.
+	 */
 #	include <winsock2.h>
 #	include <fcntl.h>
 #	include <sys/stat.h>

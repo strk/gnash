@@ -1,5 +1,8 @@
 Change Log for GNU Cygnal, Module Net
 =====================================
 
+2007-08-28 Eric Hughes <eh@narthex.us>
+	* Net.hpp: Added portability documentation.
+
 2007-07-06 Eric Hughes <eh@narthex.us>
 	* socket_device.cpp: Stubbed out obsolete reaction to EINTR.
