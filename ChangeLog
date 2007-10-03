@@ -1,5 +1,11 @@
 2007-10-03 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.{cpp,h}: changed to_string and to_string_versioned
+	  methods to return by value rather then by const ref. Next step will
+	  be only using a string member when needed.
+
+2007-10-03 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/MovieClip.as: Test effects of unload
 	  on clip bounds (confirms we should clean the drawable on unload).
 

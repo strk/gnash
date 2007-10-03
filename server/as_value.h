@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.65 2007/09/11 22:03:05 cmusick Exp $ */
+/* $Id: as_value.h,v 1.66 2007/10/03 13:10:18 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -312,20 +312,9 @@ public:
 	///	The environment to use for running the toString() method
 	///	for object values. If NULL, toString() won't be run.
 	///
-	const std::string& to_string(as_environment* env=NULL) const;
+	std::string to_string(as_environment* env=NULL) const;
 
 	std::string to_debug_string() const;
-
-	/// Get a version-dependent std::string representation for this value.
-	//
-	/// @param version
-	///	The SWF version to be compatible with.
-	///
-	/// @param env
-	///	The environment to use for running the toString() method
-	///	for object values. If NULL, toString() won't be run.
-	///
-	std::string to_std_string_versioned(int version, as_environment* env=NULL) const;
 
 	/// Get a string representation for this value.
 	//
@@ -338,7 +327,7 @@ public:
 	///	The environment to use for running the toString() method
 	///	for object values. If NULL, toString() won't be run.
 	///
-	const std::string&	to_string_versioned(int version, as_environment* env=NULL) const;
+	std::string to_string_versioned(int version, as_environment* env=NULL) const;
 
 	/// Conversion to number (double)
 	//

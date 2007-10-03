@@ -71,7 +71,7 @@ as_value::as_value(as_function* func)
 }
 
 // Conversion to const std::string&.
-const std::string&
+std::string
 as_value::to_string(as_environment* env) const
 {
 	switch (m_type)
@@ -188,7 +188,7 @@ as_value::to_string(as_environment* env) const
 }
 
 // Conversion to const std::string&.
-const std::string&
+std::string
 as_value::to_string_versioned(int version, as_environment* env) const
 {
     if (m_type == UNDEFINED) {
@@ -202,13 +202,6 @@ as_value::to_string_versioned(int version, as_environment* env) const
     }
 		
     return to_string(env);
-}
-
-// Version-based Conversion to std::string
-std::string
-as_value::to_std_string_versioned(int version, as_environment* env) const
-{
-	return to_string_versioned(version, env);
 }
 
 // Conversion to primitive value.
