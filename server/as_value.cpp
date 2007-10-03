@@ -350,8 +350,8 @@ as_value::to_bool_v7() const
 			return this->m_boolean_value;
 		case OBJECT:
 		case AS_FUNCTION:
-			// it is possible we'll need to convert to number anyway first
-			return m_object_value != NULL;
+			assert(m_object_value != NULL);
+			return true;
 		case MOVIECLIP:
 			return true;
 		default:
@@ -385,8 +385,8 @@ as_value::to_bool_v5() const
 			return this->m_boolean_value;
 		case OBJECT:
 		case AS_FUNCTION:
-			// it is possible we'll need to convert to number anyway first
-			return m_object_value != NULL;
+			assert(m_object_value != NULL);
+			return true;
 		case MOVIECLIP:
 			return true;
 		default:
@@ -420,8 +420,8 @@ as_value::to_bool_v6() const
 			return this->m_boolean_value;
 		case OBJECT:
 		case AS_FUNCTION:
-			// it is possible we'll need to convert to number anyway first
-			return m_object_value != NULL;
+			assert(m_object_value != NULL);
+			return true;
 		case MOVIECLIP:
 			return true;
 		default:

@@ -1,5 +1,10 @@
 2007-10-03 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.cpp (to_bool*): assert that OBJECT and FUNCTION
+	  values are never null.
+
+2007-10-03 Sandro Santilli <strk@keybit.net>
+
 	* server/as_value.{cpp,h}: stop using m_string_value as a cache
 	  for convertion to string (propedeutic for storing the string
 	  into the union). clean m_string_value inside drop_refs
