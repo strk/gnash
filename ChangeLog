@@ -1,3 +1,9 @@
+2007-10-03 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/ops.as: more tests for ActionShiftRight
+	* server/vm/ASHandlers.cpp (ActionShiftRight): fix new testcases
+	  (and the current 3dtris.swf problem with it - see bug #21074).
+
 2007-10-03 Chad Musick <chadmusick@msbx.net>
 
 	* server/vm/ASHandlers.cpp: Drop top of stack in ActionStringCompare,

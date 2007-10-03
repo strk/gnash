@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.137 2007/10/03 08:06:53 cmusick Exp $ */
+/* $Id: ASHandlers.cpp,v 1.138 2007/10/03 09:26:31 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -3367,17 +3367,18 @@ SWFHandlers::ActionShiftLeft(ActionExec& thread)
 void
 SWFHandlers::ActionShiftRight(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-//
-	//env.top(1).lsr(env.top(0));
 
 	as_environment& env = thread.env;
 	thread.ensureStack(2);
 
-	int16_t operand1 = env.top(1).to_int(env);
-	int operand2 = env.top(0).to_int(env);
+	int32_t operand1 = env.top(1).to_int(env);
+	int32_t operand2 = env.top(0).to_int(env);
 
-	env.top(1) = operand1 >> operand2;
+	int32_t res = operand1 >> operand2;
+
+	//log_debug("%d >> %d == %d", operand1, operand2, res);
+
+	env.top(1) = res;
 	env.drop(1);
 }
 
@@ -3391,9 +3392,9 @@ SWFHandlers::ActionShiftRight2(ActionExec& thread)
 	thread.ensureStack(2);
 
 	uint32_t operand1 = env.top(1).to_int(env);
-	int operand2 = env.top(0).to_int(env);
+	int32_t operand2 = env.top(0).to_int(env); // TODO: check this !
 
-	env.top(1) = operand1 >> operand2;
+	env.top(1) = uint32_t( operand1 >> operand2 );
 	env.drop(1);
 }
 

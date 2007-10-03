@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.24 2007/09/29 16:22:59 strk Exp $";
+rcsid="$Id: ops.as,v 1.25 2007/10/03 09:26:31 strk Exp $";
 
 #include "check.as"
 
@@ -442,6 +442,9 @@ x = 1.999;
 y = new String("2.999");
 check_equals(x^y, 3);
 
+x = 1082401;
+y = x^32800;
+check_equals(y, 1049601);
 
 //------------------------------------------------
 // Shift left operator (ACTION_SHIFTLEFT : 0x63)
@@ -541,6 +544,36 @@ check_equals(y, 3);
 x = new String("7");
 y = x >> 1;
 check_equals(y, 3);
+
+x = 32800;
+y = x >> 5;
+check_equals(y, 1025);
+
+x = -32;
+y = x >> 5;
+check_equals(y, -1);
+
+x = -1023;
+y = x >> 5;
+check_equals(y, -32);
+
+x = -32736;
+y = x >> 5;
+check_equals(y, -1023);
+
+x = 32800;
+y = x >> 1082400;
+check_equals(y, 32800);
+
+x = 32800;
+y = x >> 1082401;
+check_equals(y, 16400);
+
+x = 32800;
+y = x >> -2;
+check_equals(y, 0);
+
+
 
 //-------------------------------------------------
 // Shift right2 operator (ACTION_SHIFTRIGHT2 : 0x65)
