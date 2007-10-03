@@ -236,14 +236,13 @@ RcInitFile::extractDouble(double& out, const char *pattern, string &variable,
     }
 }
 
-string
+void
 RcInitFile::expandPath (std::string& path)
 
 {
 
-//Returns what's passed to it on systems without
-//POSIX tilde expansion, but is still called to prepare
-//for other operations on the path string
+// Leaves path unchanged on systems without
+// POSIX tilde expansion.
 
 #ifdef HAVE_PWD_H
 //Don't build tilde expansion on systems without pwd.h
@@ -299,7 +298,6 @@ RcInitFile::expandPath (std::string& path)
                  }
 #endif
 
-     return path;
 }
 
 // Parse the config file and set the variables.
@@ -364,7 +362,8 @@ RcInitFile::parseFile(const std::string& filespec)
                 }
 
                 if (variable == "debuglog") {
-                    _log = expandPath (value);
+                    expandPath (value);
+		    _log = value;
                     continue;
                 }
 

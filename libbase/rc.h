@@ -163,7 +163,7 @@ private:
     /// The number of seconds of inactivity triggering download timeout
     double _streamsTimeout;
 
-    static std::string expandPath(std::string& path); //path string operations
+    void expandPath(std::string& path); //path string operations
 
     static bool extractSetting(bool *var, const char *pattern,
                         std::string &variable, std::string &value);
@@ -174,7 +174,7 @@ private:
     static void extractDouble(double& out, const char *pattern,
                         std::string &variable, std::string &value);
 
-    static void parseList(std::vector<std::string>& list, std::string &action,
+    void parseList(std::vector<std::string>& list, std::string &action,
 			std::string &listname, std::string &items);
 
 };

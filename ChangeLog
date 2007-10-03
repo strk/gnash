@@ -1,3 +1,7 @@
+2007-10-04 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/rc.{cpp,h}: make expandPath void and other small cleanups.
+
 2007-10-04 Chad Musick <chadmusick@msbx.net>
 
 	* server/vm/AbcHandlers.cpp: New file. This will become the
