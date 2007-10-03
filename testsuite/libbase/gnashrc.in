@@ -46,6 +46,9 @@ set enableExtensions on
 # Start the gui in STOP mode
 set startStopped on
 
+# Allow unverified SSL connections
+set insecureSSL on
+
 # Timeout in seconds for stream download
 # The download will timeout after the given seconds
 # of inactivity. Every activity resets the timer

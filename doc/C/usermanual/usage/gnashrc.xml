@@ -125,14 +125,14 @@ The variables in the <filename>.gnashrc</filename> file support three types of a
 <entry>on/off</entry>
 <entry>This value can be set to either <emphasis>on</emphasis> or
 	    <emphasis>off</emphasis>, and controls whether a debug log
-	    is always written by Gnash, or not at all.</entry>
+	    is always written by &app;, or not at all.</entry>
 </row>
 <row>
 <entry>sound</entry>
 <entry>on/off</entry>
 <entry>This value can be set to either <emphasis>on</emphasis> or
 	    <emphasis>off</emphasis>, and controls the sound of the
-	    standalone player. By default Gnash enables playing the
+	    standalone player. By default &app; enables playing the
 	    sound in any Flash movie.</entry>
 </row>
 <row>
@@ -141,7 +141,7 @@ The variables in the <filename>.gnashrc</filename> file support three types of a
 <entry>This value can be set to either <emphasis>on</emphasis> or
 	    <emphasis>off</emphasis>, and controls the sound of the
 	    player when running as a browser plugin. By default, sound
-	    is enabled when using Gnash as a browser plugin.</entry>
+	    is enabled when using &app; as a browser plugin.</entry>
 </row>
 <row>
 <entry>EnableExtensions</entry>
@@ -172,6 +172,15 @@ Set the number of seconds after which streams download time out. Note that timeo
 passed w/out anything was received.
 </entry>
 </row>
+<row>
+<entry>insecureSSL</entry>
+<entry>on/off</entry>
+<entry>If set to <emphasis>on</emphasis>, no verification of SSL connections
+is performed. This means that, although the connection is encrypted, the server
+certificate could be invalid, may not belong to the host, or both. Equivalent
+to curl --insecure. By default, this option is <emphasis>off</emphasis> and
+connections will fail when a host cannot be verified.</entry>
+</row>
 </tbody>
 </tgroup>
 </table>
@@ -197,6 +206,10 @@ The following example <filename>.gnashrc</filename> file allows a user to only p
     # uncommenting the following line will allow load of external
     # movies *only* from the specified hosts.
     #set whitelist www.doonesbury.com www.cnn.com www.9news.com
+
+    # Disable whitelists set in any other gnashrc files, because
+    # these could override our blacklist.
+    set whitelist off
 
     # Don't access content from these sites
     set blacklist www.doubleclick.com mochibot.com
@@ -224,6 +237,9 @@ The following example <filename>.gnashrc</filename> file allows a user to only p
 
     # Enable or Disable sound for the standalone player
     set pluginsound on
+
+    # Make sure SSL connections are always verified
+    set insecureSSL off
 
   </programlisting>
 

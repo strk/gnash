@@ -237,7 +237,7 @@ RcInitFile::extractDouble(double& out, const char *pattern, string &variable,
 }
 
 string
-RcInitFile::expandPath (std::string _path)
+RcInitFile::expandPath (std::string& path)
 
 {
 
@@ -249,13 +249,13 @@ RcInitFile::expandPath (std::string _path)
 //Don't build tilde expansion on systems without pwd.h
 
               //Only if path starts with "~"
-             if (_path.substr(0,1) == "~") {
+             if (path.substr(0,1) == "~") {
              const char *home = getenv("HOME");
-                     if (_path.substr(1,1) == "/") {
+                     if (path.substr(1,1) == "/") {
                           // Initial "~" followed by "/"
                           if (home) {
                                // if HOME set in env, replace ~ with HOME
-                               _path = _path.replace(0,1,home);
+                               path = path.replace(0,1,home);
                           }
 
 # ifdef HAVE_GETPWNAM
@@ -267,7 +267,7 @@ RcInitFile::expandPath (std::string _path)
                                struct passwd *password = getpwuid(getuid());
                                const char *pwdhome = password->pw_dir;
                                if (home) {
-                                   _path = _path.replace(0,1,pwdhome);
+                                   path = path.replace(0,1,pwdhome);
                                }
                                //If all that fails, leave path alone
                           }
@@ -277,12 +277,12 @@ RcInitFile::expandPath (std::string _path)
                      else {
                           const char *userhome = NULL;
                           string::size_type first_slash =
-                              _path.find_first_of("/");
+                              path.find_first_of("/");
                           string user;
                           if (first_slash != string::npos) {
                               // everything between initial ~ and / 
-                              user = _path.substr(1, first_slash - 1 );
-                          } else user = _path.substr(1);
+                              user = path.substr(1, first_slash - 1 );
+                          } else user = path.substr(1);
 
                           //find user using pwd    
                           struct passwd *password = getpwnam(user.c_str());
@@ -292,14 +292,14 @@ RcInitFile::expandPath (std::string _path)
                           }
                           if (userhome) {
                                string foundhome(userhome);
-                               _path = _path.replace(0,first_slash,foundhome);
+                               path = path.replace(0,first_slash,foundhome);
                           }
 # endif
                       }
                  }
 #endif
 
-     return _path;
+     return path;
 }
 
 // Parse the config file and set the variables.

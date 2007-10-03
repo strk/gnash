@@ -1,3 +1,11 @@
+2007-10-03 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/rc.{cpp,h}: reference instead of copy for expandpath
+	* testsuite/libbase/TCXXRc.cpp, gnashrc.in: tests for insecureSSL
+	* docs: add insecureSSL and minor cleanups to gnashrc.xml
+	* gui/gnash.cpp, gui/gtk.cpp: comment out broken / disabled movie
+	  controls until they work.
+
 2007-10-03 Sandro Santilli <strk@keybit.net>
 
 	* server/as_value.{cpp,h}: changed to_string and to_string_versioned

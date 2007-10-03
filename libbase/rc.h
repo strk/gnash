@@ -163,7 +163,7 @@ private:
     /// The number of seconds of inactivity triggering download timeout
     double _streamsTimeout;
 
-    static std::string expandPath(std::string _path); //path string operations
+    static std::string expandPath(std::string& path); //path string operations
 
     static bool extractSetting(bool *var, const char *pattern,
                         std::string &variable, std::string &value);

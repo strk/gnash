@@ -182,6 +182,12 @@ main (int /*argc*/, char** /*argv*/) {
         runtest.fail ("streamsTimeout");
     }
 
+    if (rc.SSLInsecure()) {
+        runtest.pass ("insecureSSL");
+    } else {
+        runtest.fail ("insecureSSL");
+    }
+
     std::vector<std::string> whitelist = rc.getWhiteList();
     if (whitelist.size()) {
         if ((whitelist[0] == "www.doonesbury.com")

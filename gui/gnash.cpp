@@ -141,8 +141,12 @@ usage()
         "  CTRL-Q, CTRL-W  Quit/Exit\n"
         "  CTRL-P          Toggle Pause\n"
         "  CTRL-R          Restart the movie\n"
+
+#if 0 // Currently disabled
         "  CTRL-[ or kp-   Step back one frame\n"
         "  CTRL-] or kp+   Step forward one frame\n"
+#endif
+
 	"  CTRL-L          Force immediate redraw\n"
 /*
         "  CTRL-B          Toggle background color\n"  // No code to make this work or indication

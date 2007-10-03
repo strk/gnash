@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.120 2007/09/28 03:03:53 rsavoye Exp $ */
+/* $Id: gtk.cpp,v 1.121 2007/10/03 14:15:22 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1745,6 +1745,8 @@ GtkGui::createControlMenu(GtkWidget *obj)
     g_signal_connect ((gpointer) menuitem_restart, "activate",
         G_CALLBACK (&menuitem_restart_callback), this);
 
+#if 0 // Presently disabled
+
     GtkWidget *separator1 = gtk_separator_menu_item_new ();
     gtk_widget_show (separator1);
     gtk_container_add (GTK_CONTAINER (menu), separator1);
@@ -1793,6 +1795,8 @@ GtkGui::createControlMenu(GtkWidget *obj)
 						 	     GTK_ICON_SIZE_MENU));
     gtk_menu_append(menu, GTK_WIDGET(menuitem_jump_backward));
     gtk_widget_show(GTK_WIDGET(menuitem_jump_backward));
+
+#endif
 
 }
 
