@@ -1,3 +1,9 @@
+2007-10-03 Chad Musick <chadmusick@msbx.net>
+
+	* server/vm/ASHandlers.cpp: Drop top of stack in ActionStringCompare,
+	  since there are two stack elements on entry and (should be) one
+	  on exit.
+
 2007-10-03 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (unload): clear the drawable when unload

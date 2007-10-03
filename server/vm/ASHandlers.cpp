@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.136 2007/09/23 08:48:19 cmusick Exp $ */
+/* $Id: ASHandlers.cpp,v 1.137 2007/10/03 08:06:53 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1309,6 +1309,7 @@ SWFHandlers::ActionStringCompare(ActionExec& thread)
     as_environment& env = thread.env;
     thread.ensureStack(2);
     env.top(1).set_bool(env.top(1).to_string(&env) < env.top(0).to_string(&env));
+	env.drop(1);
 }
 
 void
