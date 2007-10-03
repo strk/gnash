@@ -1,3 +1,11 @@
+2007-10-04 Chad Musick <chadmusick@msbx.net>
+
+	* server/vm/AbcHandlers.cpp: New file. This will become the
+	  interpreter for AS3, and I hope to convert the ASHandlers class
+	  to this style as well, as it offers some significant clarity
+	  and performance gainst.  At the moment, this code won't
+	  compile, isn't complete, and isn't even consistent.
+
 2007-10-03 Sandro Santilli <strk@keybit.net>
 
 	* server/as_value.cpp (to_bool*): assert that OBJECT and FUNCTION
