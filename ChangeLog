@@ -1,5 +1,10 @@
 2007-10-03 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp: add support for debugging the drawing
+	  API.
+
+2007-10-03 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/shape_character_def.{cpp,h}: add numEdges and numPaths
 	  methods.
 

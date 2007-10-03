@@ -52,6 +52,7 @@
 #include "gnash.h" // for point class !
 #include "Timeline.h" // for restoreDisplayList
 #include "Object.h" // for getObjectInterface
+#include "DynamicShape.h" // for composition
 #include "namedStrings.h"
 
 #include <vector>
@@ -75,6 +76,11 @@ namespace gnash {
 //#define GNASH_DEBUG_TIMELINE 1
 //#define GNASH_DEBUG_REPLACE 1
 //#define  DEBUG_DYNTEXT_VARIABLES 1
+
+// Defining the following macro you'll get a DEBUG lien
+// for each call to the drawing API, in a format which is
+// easily re-compilable to obtain a smaller testcase
+//#define DEBUG_DRAWING_API 1
 
 // Forward declarations
 static as_object* getMovieClipInterface();
@@ -1069,6 +1075,9 @@ static as_value
 sprite_endFill(const fn_call& fn)
 {
 	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
+#ifdef DEBUG_DRAWING_API
+	log_debug("%s.endFill();", sprite->getTarget().c_str());
+#endif
 	sprite->endFill();
 	return as_value();
 }
@@ -1089,6 +1098,9 @@ sprite_lineTo(const fn_call& fn)
 	float x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
 	float y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
 
+#ifdef DEBUG_DRAWING_API
+	log_debug("%s.lineTo(%g,%g);", sprite->getTarget().c_str(), x, y);
+#endif
 	sprite->lineTo(x, y);
 
 	return as_value();
@@ -1110,6 +1122,9 @@ sprite_moveTo(const fn_call& fn)
 	float x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
 	float y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
 
+#ifdef DEBUG_DRAWING_API
+	log_debug("%s.moveTo(%g,%g);", sprite->getTarget().c_str(), x, y);
+#endif
 	sprite->moveTo(x, y);
 
 	return as_value();
@@ -1154,6 +1169,9 @@ sprite_lineStyle(const fn_call& fn)
 	rgba color(r, g, b, a);
 	//log_msg("Color: %s", color.toString().c_str());
 
+#ifdef DEBUG_DRAWING_API
+	log_debug("%s.lineStyle(%d,%d,%d,%d);", sprite->getTarget().c_str(), thickness, r, g, b);
+#endif
 	sprite->lineStyle(thickness, color);
 
 	return as_value();
@@ -1177,6 +1195,9 @@ sprite_curveTo(const fn_call& fn)
 	float ax = PIXELS_TO_TWIPS(fn.arg(2).to_number());
 	float ay = PIXELS_TO_TWIPS(fn.arg(3).to_number());
 
+#ifdef DEBUG_DRAWING_API
+	log_debug("%s.curveTo(%g,%g,%g,%g);", sprite->getTarget().c_str(), cx, cy, ax, ay);
+#endif
 	sprite->curveTo(cx, cy, ax, ay);
 
 	return as_value();
@@ -1187,6 +1208,9 @@ sprite_clear(const fn_call& fn)
 {
 	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
+#ifdef DEBUG_DRAWING_API
+	log_debug("%s.clear();", sprite->getTarget().c_str());
+#endif
 	sprite->clear();
 
 	return as_value();
@@ -1214,6 +1238,9 @@ sprite_beginFill(const fn_call& fn)
 
 	rgba color(r, g, b, a);
 
+#ifdef DEBUG_DRAWING_API
+	log_debug("%s.beginFill(%d,%d,%d);", sprite->getTarget().c_str(), r, g, b);
+#endif
 	sprite->beginFill(color);
 
 	return as_value();
@@ -3407,6 +3434,12 @@ sprite_instance::unload()
 #endif
 
 	bool childHaveUnloadHandler = m_display_list.unload();
+
+	// We won't be displayed again, so worth releasing
+	// some memory. The drawable might take a lot of memory
+	// on itself.
+	//_drawable.clear();
+	// TODO: drop the _drawable_inst too ?
 
 	return character::unload() || childHaveUnloadHandler;
 
