@@ -43,10 +43,6 @@ using namespace std;
 #	define snprintf _snprintf
 #endif
 
-// Undefine this to keep MOVIECLIP values by pointer
-// rather then by "target" ref.
-//#define MOVIECLIP_AS_SOFTREF
-
 // Define the macro below to make abstract equality operator verbose
 //#define GNASH_DEBUG_EQUALITY
 
@@ -78,29 +74,23 @@ as_value::to_string(as_environment* env) const
 	{
 
 		case STRING:
-			/* don't need to do anything */
-			break;
+			return m_string_value;
 
 		case MOVIECLIP:
 		{
-#ifdef MOVIECLIP_AS_SOFTREF
-			/* don't need to do anything */
-#else
+			assert(m_string_value.empty());
 			sprite_instance* sp = m_object_value->to_movie();
 			assert(sp); // or return as in to_sprite() ?
-			if ( sp ) {
-				m_string_value = sp->getTarget();
-			}
-#endif
-			break;
+			return sp->getTarget();
 		}
 
 		case NUMBER:
-			m_string_value = doubleToString(m_number_value);
-			break;
+			assert(m_string_value.empty());
+			return doubleToString(m_number_value);
 
 		case UNDEFINED: 
 
+			assert(m_string_value.empty());
 			// Behavior depends on file version.  In
 			// version 7+, it's "undefined", in versions
 			// 6-, it's "".
@@ -108,21 +98,21 @@ as_value::to_string(as_environment* env) const
 			// We'll go with the v7 behavior by default,
 			// and conditionalize via _versioned()
 			// functions.
-			m_string_value = "undefined";
-
-			break;
+			// 
+			return "undefined";
 
 		case NULLTYPE:
-			m_string_value = "null";
-			break;
+			assert(m_string_value.empty());
+			return "null";
 
 		case BOOLEAN:
-			m_string_value = this->m_boolean_value ? "true" : "false";
-			break;
+			assert(m_string_value.empty());
+			return m_boolean_value ? "true" : "false";
 
 		case OBJECT:
 		case AS_FUNCTION:
 		{
+			assert(m_string_value.empty());
 			//printf("as_value to string conversion, env=%p\n", env);
 			// @@ Moock says, "the value that results from
 			// calling toString() on the object".
@@ -135,8 +125,7 @@ as_value::to_string(as_environment* env) const
 			as_object* obj = m_object_value; 
 			if ( ! obj->useCustomToString() )
 			{
-				m_string_value = obj->get_text_value();
-				return m_string_value;
+				return obj->get_text_value();
 			}
 
 			bool gotValidToStringResult = false;
@@ -150,58 +139,46 @@ as_value::to_string(as_environment* env) const
 					if ( ret.is_string() )
 					{
 						gotValidToStringResult=true;
-						m_string_value = ret.m_string_value;
+						return ret.m_string_value;
 					}
-					else
-					{
-						log_msg(_("[object %p].%s() did not return a string: %s"),
-								(void*)obj, VM::get().getStringTable().value(methodname).c_str(),
-								ret.to_debug_string().c_str());
-					}
+					log_msg(_("[object %p].%s() did not return a string: %s"),
+							(void*)obj, VM::get().getStringTable().value(methodname).c_str(),
+							ret.to_debug_string().c_str());
 				}
 				else
 				{
 					log_msg(_("get_member(%s) returned false"), VM::get().getStringTable().value(methodname).c_str());
 				}
 			}
-			if ( ! gotValidToStringResult )
+			if ( m_type == OBJECT )
 			{
-				if ( m_type == OBJECT )
-				{
-					m_string_value = "[type Object]";
-				}
-				else
-				{
-					assert(m_type == AS_FUNCTION);
-					m_string_value = "[type Function]";
-				}
+				return "[type Object]";
 			}
-			break;
+			assert(m_type == AS_FUNCTION);
+			return "[type Function]";
 		}
 
 		default:
-			m_string_value = "[exception]";
-			break;
+			return "[exception]";
     }
     
-    return m_string_value;
 }
 
 // Conversion to const std::string&.
 std::string
 as_value::to_string_versioned(int version, as_environment* env) const
 {
-    if (m_type == UNDEFINED) {
-	// Version-dependent behavior.
-	if (version <= 6) {
-	    m_string_value = "";
-	} else {
-	    m_string_value = "undefined";
+	if (m_type == UNDEFINED)
+	{
+		// Version-dependent behavior.
+		if (version <= 6)
+		{
+		    return "";
+		}
+		return "undefined";
 	}
-	return m_string_value;
-    }
 		
-    return to_string(env);
+	return to_string(env);
 }
 
 // Conversion to primitive value.
@@ -514,7 +491,6 @@ as_value::to_sprite() const
 {
 	if ( m_type != MOVIECLIP ) return NULL;
 
-#ifndef MOVIECLIP_AS_SOFTREF
 	sprite_instance* sp = m_object_value->to_movie();
 	if ( ! sp ) return NULL; // shoudl we assert(sp) instead ?
 
@@ -529,22 +505,6 @@ as_value::to_sprite() const
 		//return NULL;
 	}
 	return sp;
-#else
-	// Evaluate target everytime an attempt is made 
-	// to fetch a movieclip value.
-	sprite_instance* sp = find_sprite_by_target(m_string_value);
-	if ( ! sp )
-	{
-		log_debug(_("MovieClip value is a dangling reference: "
-				"target '%s' not found (should set to NULL?)"),
-				m_string_value.c_str());
-		return NULL;
-	}
-	else
-	{
-		return sp;
-	}
-#endif
 }
 
 void
@@ -552,11 +512,7 @@ as_value::set_sprite(const sprite_instance& sprite)
 {
 	drop_refs();
 	m_type = MOVIECLIP;
-#ifndef MOVIECLIP_AS_SOFTREF
 	m_object_value = const_cast<sprite_instance*>(&sprite);
-#else
-	m_string_value = sprite.get_text_value();
-#endif
 }
 
 void
@@ -564,14 +520,9 @@ as_value::set_sprite(const std::string& path)
 {
 	drop_refs();
 	m_type = MOVIECLIP;
-#ifndef MOVIECLIP_AS_SOFTREF
 	sprite_instance* sp = find_sprite_by_target(path);
 	if ( ! sp ) set_null();
 	else set_sprite(*sp);
-#else
-	// TODO: simplify next statement when m_string_value will become a std::string
-	m_string_value = path.c_str();
-#endif
 }
 
 // Return value as an ActionScript function.  Returns NULL if value is
@@ -598,8 +549,10 @@ as_value::convert_to_number(as_environment* env)
 void
 as_value::convert_to_string()
 {
-    to_string();	// init our string data.
+    std::string ns = to_string();
+    drop_refs();
     m_type = STRING;	// force type.
+    m_string_value = ns;
 }
 
 
@@ -607,8 +560,10 @@ void
 as_value::convert_to_string_versioned(int version, as_environment* env)
     // Force type to string.
 {
-    to_string_versioned(version, env); // init our string data.
+    std::string ns = to_string_versioned(version, env);
+    drop_refs();
     m_type = STRING;	// force type.
+    m_string_value = ns;
 }
 
 
@@ -794,15 +749,16 @@ as_value::equals(const as_value& v, as_environment& env) const
 void
 as_value::string_concat(const std::string& str)
 {
-    to_string();	// make sure our m_string_value is initialized
+    std::string currVal = to_string();
     m_type = STRING;
-    m_string_value += str;
+    m_string_value = currVal + str;
 }
 
 // Drop any ref counts we have; this happens prior to changing our value.
 void
 as_value::drop_refs()
 {
+    m_string_value.clear();
 #ifndef GNASH_USE_GC
     if (m_type == AS_FUNCTION || m_type == OBJECT )
     {
@@ -877,11 +833,7 @@ as_value::equalsSameType(const as_value& v) const
 			return m_string_value == v.m_string_value;
 
 		case MOVIECLIP:
-#ifdef MOVIECLIP_AS_SOFTREF
-			return m_string_value == v.m_string_value;
-#else
 			return to_sprite() == v.to_sprite(); // m_object_value == v.m_object_value;
-#endif
 
 		case NUMBER:
 		{
@@ -974,13 +926,9 @@ as_value::operator=(const as_value& v)
 
 	else if (the_type == MOVIECLIP)
 	{
-#ifndef MOVIECLIP_AS_SOFTREF
 		sprite_instance* sp = dynamic_cast<sprite_instance*>(v.m_object_value);
 		assert(sp);
 		set_sprite(*sp);
-#else
-		set_sprite(v.m_string_value);
-#endif
 	}
 
 	else if (the_type == AS_FUNCTION) set_as_function(v.m_object_value->to_function());
@@ -1163,14 +1111,10 @@ void
 as_value::setReachable() const
 {
 #ifdef GNASH_USE_GC
-#ifdef MOVIECLIP_AS_SOFTREF
-	if ( m_type == OBJECT || m_type == AS_FUNCTION ||
-		m_type == OBJECT_EXCEPT)
-#else
 	if ( m_type == OBJECT || m_type == AS_FUNCTION || m_type == MOVIECLIP
 		|| m_type == OBJECT_EXCEPT)
-#endif
 	{
+		assert(m_object_value); // will need to change for MOVIECLIP...
 		m_object_value->setReachable();
 	}
 #endif // GNASH_USE_GC

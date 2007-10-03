@@ -1,3 +1,10 @@
+2007-10-03 Sandro Santilli <strk@keybit.net>
+
+	* server/as_value.{cpp,h}: stop using m_string_value as a cache
+	  for convertion to string (propedeutic for storing the string
+	  into the union). clean m_string_value inside drop_refs
+	  (should reduce memory use).
+
 2007-10-03 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/rc.{cpp,h}: reference instead of copy for expandpath

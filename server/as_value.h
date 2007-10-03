@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.66 2007/10/03 13:10:18 strk Exp $ */
+/* $Id: as_value.h,v 1.67 2007/10/03 14:58:31 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -149,8 +149,7 @@ public:
 	as_value(const char* str)
 		:
 		m_type(STRING),
-		m_string_value(str),
-		m_number_value(0.0)
+		m_string_value(str)
 	{
 	}
 
@@ -158,8 +157,7 @@ public:
 	as_value(const std::string& str)
 		:
 		m_type(STRING),
-		m_string_value(str.c_str()),
-		m_number_value(0.0)
+		m_string_value(str)
 	{
 	}
 
@@ -460,35 +458,38 @@ public:
 	// in preference to generic overloaded set().  You are
 	// more likely to get a warning/error if misused.
 
-	void	set_string(const std::string& str) {
-          drop_refs();
-          m_type = STRING;
-          m_string_value = str;
-        }
+	void	set_string(const std::string& str)
+	{
+		drop_refs();
+		m_type = STRING;
+		m_string_value = str;
+	}
 
-	void	set_std_string(const std::string& str) {
-          drop_refs();
-          m_type = STRING;
-          m_string_value = str.c_str();
-        }
+	void	set_std_string(const std::string& str)
+	{
+		set_string(str);
+	}
 
-	void	set_string(const char* str) {
-          drop_refs();
-          m_type = STRING;
-          m_string_value = str;
-        }
+	void	set_string(const char* str)
+	{
+		drop_refs();
+		m_type = STRING;
+		m_string_value = str;
+	}
 
-	void	set_double(double val) {
-          drop_refs();
-          m_type = NUMBER;
-          m_number_value = val;
-        }
+	void	set_double(double val)
+	{
+		drop_refs();
+		m_type = NUMBER;
+		m_number_value = val;
+	}
 
-	void	set_bool(bool val) {
-          drop_refs();
-          m_type = BOOLEAN;
-          m_boolean_value = val;
-        }
+	void	set_bool(bool val)
+	{
+		drop_refs();
+		m_type = BOOLEAN;
+		m_boolean_value = val;
+	}
 
 	void	set_sprite(const sprite_instance& sp);
 
@@ -612,7 +613,7 @@ private:
 
 	type	m_type;
 
-	mutable std::string	m_string_value;
+	mutable std::string m_string_value;
 
 	union
 	{
