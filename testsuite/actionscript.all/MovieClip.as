@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.92 2007/09/29 16:22:57 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.93 2007/10/03 10:36:01 strk Exp $";
 
 #include "check.as"
 
@@ -408,7 +408,6 @@ check_equals(typeof(mc4_mc), 'undefined');
 check_equals(typeof(mc4_mc.mc5_mc), 'undefined');
 check_equals(typeof(mc4), 'movieclip');
 check_equals(typeof(mc5), 'movieclip');
-// gah.. our "soft references" are bogus :(
 check_equals(mc4._target, "/changed");
 check_equals(mc5._target, "/changed/mc5_mc");
 check_equals(targetPath(mc4), "_level0.changed");
@@ -536,6 +535,105 @@ check_equals(hardref.member, 6); // depth 61 < 62
 sr60 = _root.createEmptyMovieClip("hardref", 60);
 sr60.member = 60;
 check_equals(hardref.member, 60); // depth 60 < 61 < 62
+
+// Here we verify that the "soft-reference" always refers to
+// the original target of the sprite it was bound to even
+// if it's re-bound to a new sprite. In particular we check that:
+//
+//  1. Original target of a re-bound target isn't used for further
+//     rebounding.
+//  2. No rebind is attempted till the original sprite is unloaded.
+//  3. After original bounded sprite is unloaded, rebinding is *always*
+//     attempted.
+//
+
+// _level0.hardref4 created, soft ref sr62 set
+sr62 = _root.createEmptyMovieClip("hardref4", 62);
+sr62.member = 'hardref4_original';
+check_equals(sr62.member, "hardref4_original");
+
+// _level0.hardref4_n created and renamed to _level0.hardref
+// this does NOT trigger rebinding of sr62, still bound to
+// it's original sprite
+//
+sr60 = _root.createEmptyMovieClip("hardref4_n", 60);
+sr60._name = "hardref4";
+check_equals(sr62.member, "hardref4_original");
+sr60.removeMovieClip();
+check_equals(sr62.member, "hardref4_original");
+
+// _level0.hardref4 unloaded.
+// From now on, sr62 is a dangling soft refefence
+// and will try to rebind to something else
+//
+hardref4.removeMovieClip();
+check_equals(typeof(hardref4), 'undefined'); 
+check_equals(typeof(sr62.member), 'undefined');
+
+// _level0.hardref4_with_another_name created
+sr63 = _root.createEmptyMovieClip("hardref4_with_another_name", 63);
+sr63.member = "hardref4_63";
+
+// sr62 is still unbound
+check_equals(typeof(sr62.member), "undefined");
+
+// renamed _level0.hardref4_with_another_name to _level0.hardref4
+// sr62 will now rebind to the new sprite.
+// sr63 and sr63_bis refs created.
+//
+sr63._name = "hardref4";
+sr63_bis = hardref4;
+check_equals(sr62.member, "hardref4_63");
+
+// A new sprite is created at depth 60 and named 
+// _level0.hardref4 again
+//
+// The sr62 soft-ref is rebound again, even if the
+// currently bound sprite wasn't unloaded !
+// The sr63 soft-ref, originally bound to the character
+// at depth 63, isn't rebound instead.
+//
+sr60 = _root.createEmptyMovieClip("hardref4_60", 60);
+sr60.member = "hardref4_60";
+sr60._name = "hardref4";
+check_equals(hardref4.member, 'hardref4_60'); 
+check_equals(sr62.member, "hardref4_60");
+check_equals(sr63.member, "hardref4_63");
+
+// Removing the at depth 60 (currently bound to sr62)
+// exposes depth63 again for next binding attempt of sr62
+sr62.removeMovieClip();
+check_equals(sr62.member, "hardref4_63");
+
+// depth 63 unloaded, sr62 is orphaned again
+check_equals(hardref4, sr63);
+hardref4.removeMovieClip();
+check_equals(typeof(sr63.member), 'undefined');
+check_equals(typeof(sr62.member), "undefined");
+
+// Finally, we create a sprite at depth 64 and see how changing
+// it's name triggers rebinding
+sr64 = _root.createEmptyMovieClip("hardref4_with_yet_another_name", 64);
+sr64.member = "hardref4_64";
+
+// Naming it "hardref4" rebinds sr62 (dangling)
+// but leaves sr63 orphaned (dangling, but pointing to
+// _level0.hardref4_with_another_name)
+// 
+sr64._name = "hardref4";
+check_equals(sr62.member, "hardref4_64");
+check_equals(typeof(sr63.member), 'undefined');
+
+// Naming it "hardref4_with_another_name"
+// makes sr62 orphaned (dangling and pointing to _level0.hardref4),
+// rebinds sr63 and sr63_bis to it
+// (previously dangling and pointing to _level0.hardref4_with_another_name)
+// 
+sr64._name = "hardref4_with_another_name";
+check_equals(typeof(sr62.member), "undefined");
+check_equals(sr63.member, 'hardref4_64');
+check_equals(sr63_bis.member, 'hardref4_64');
+check_equals(sr64.member, 'hardref4_64');
 
 #endif // OUTPUT_VERSION >= 6
 

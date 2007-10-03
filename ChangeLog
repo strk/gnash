@@ -1,5 +1,11 @@
 2007-10-03 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/MovieClip.as:
+	  more extensive tests for soft references, confirming current
+	  gnash behaviour being unbreaked.
+
+2007-10-03 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/ops.as: more tests for ActionShiftRight
 	* server/vm/ASHandlers.cpp (ActionShiftRight): fix new testcases
 	  (and the current 3dtris.swf problem with it - see bug #21074).
