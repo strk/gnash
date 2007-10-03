@@ -2188,6 +2188,11 @@ sprite_instance::on_event(const event_id& id)
 		}
 	}
 
+	// TODO: if this was UNLOAD release as much memory as possible ?
+	//       Verify if this is possible, in particular check order in
+	//       which unload handlers of parent and childs is performed
+	//       and wheter unload of child can access members of parent.
+
 	testInvariant();
 
 	return called;
@@ -3438,8 +3443,10 @@ sprite_instance::unload()
 	// We won't be displayed again, so worth releasing
 	// some memory. The drawable might take a lot of memory
 	// on itself.
-	//_drawable.clear();
+	_drawable->clear();
 	// TODO: drop the _drawable_inst too ?
+	//       it would require _drawable_inst to possibly be NULL,
+	//       which wouldn't be bad at all actually...
 
 	return character::unload() || childHaveUnloadHandler;
 

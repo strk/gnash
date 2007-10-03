@@ -1,5 +1,7 @@
 2007-10-03 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (unload): clear the drawable when unload
+	  (won't be needed anymore).
 	* server/sprite_instance.cpp: add support for debugging the drawing
 	  API.
 
