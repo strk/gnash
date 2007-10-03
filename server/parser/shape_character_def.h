@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape_character_def.h,v 1.15 2007/08/23 15:10:51 strk Exp $ */
+/* $Id: shape_character_def.h,v 1.16 2007/10/03 06:52:42 strk Exp $ */
 
 #ifndef GNASH_SHAPE_CHARACTER_DEF_H
 #define GNASH_SHAPE_CHARACTER_DEF_H
@@ -98,6 +98,10 @@ namespace gnash {
 
 		// morph uses this
 		void	set_bound(const rect& r) { m_bound = r; /* should do some verifying */ }
+
+		size_t numEdges() const;
+
+		size_t numPaths() const;
 
 	protected:
 		friend class morph2_character_def;

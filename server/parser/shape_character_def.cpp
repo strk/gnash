@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.40 2007/09/14 16:02:51 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.41 2007/10/03 06:52:42 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -518,7 +518,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 void	shape_character_def::display(character* inst)
     // Draw the shape using our own inherent styles.
 {
-//    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
 
 
   gnash::render::draw_shape_character(this, inst);
@@ -846,6 +846,25 @@ shape_character_def::markReachableResources() const
 	}
 }
 #endif // GNASH_USE_GC
+
+size_t
+shape_character_def::numPaths() const
+{
+	return m_paths.size();
+}
+
+size_t
+shape_character_def::numEdges() const
+{
+	typedef std::vector<path> PathList;
+
+	size_t count = 0;
+	for  (PathList::const_iterator i=m_paths.begin(), ie=m_paths.end(); i!=ie; ++i)
+	{
+		count += i->size();
+	}
+	return count;
+}
 
 }	// end namespace gnash
 
