@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.94 2007/10/03 13:01:22 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.95 2007/10/04 08:18:12 strk Exp $";
 
 #include "check.as"
 
@@ -542,7 +542,7 @@ check_equals(hardref.member, 60); // depth 60 < 61 < 62
 //
 //  1. Original target of a re-bound target isn't used for further
 //     rebounding.
-//  2. No rebind is attempted till the original sprite is unloaded.
+//  2. No rebind is attempted till the original sprite is destroyed (not simply unloaded!)
 //  3. After original bounded sprite is unloaded, rebinding is *always*
 //     attempted.
 //
@@ -634,6 +634,40 @@ check_equals(typeof(sr62.member), "undefined");
 check_equals(sr63.member, 'hardref4_64');
 check_equals(sr63_bis.member, 'hardref4_64');
 check_equals(sr64.member, 'hardref4_64');
+
+// Now check that unloaded-but-not-destroyed sprite
+// do NOT trigger rebinding
+sr59 = createEmptyMovieClip("hardref5", 59);
+sr59.member = "hardref5@59";
+sr59.onUnload = function() {};
+sr60 = createEmptyMovieClip("hardref5", 60);
+sr60.member = "hardref5@60";
+sr60.onUnload = function() {};
+check_equals(sr59.getDepth(), 59);
+check_equals(sr60.getDepth(), 60);
+check_equals(sr59._target, "/hardref5");
+check_equals(sr60._target, "/hardref5");
+sr60.removeMovieClip();
+check_equals(sr59.getDepth(), 59);
+check_equals(sr60.getDepth(), -32829);
+check_equals(sr59._target, "/hardref5");
+check_equals(sr60._target, "/hardref5");
+sr59.removeMovieClip();
+// sr59, despite the fact hardref5@59 was unloaded, still
+// points to the original sprite. This means no rebind is
+// attempted, otherwise hardref5@60 will be found first
+// being at a lower depth
+check_equals(hardref5.getDepth(), -32829);
+check_equals(hardref5._target, "/hardref5");
+check_equals(hardref5.member, "hardref5@60");
+// Gnash fails because it's "unload" event triggering rebinding
+// rather then "destroy" event (unsupported in Gnash).
+xcheck_equals(sr59.getDepth(), -32828);
+xcheck_equals(sr59.member, "hardref5@59");
+check_equals(sr59._target, "/hardref5");
+check_equals(sr60.getDepth(), -32829);
+check_equals(sr60._target, "/hardref5");
+check_equals(sr60.member, "hardref5@60");
 
 #endif // OUTPUT_VERSION >= 6
 
