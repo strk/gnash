@@ -1743,7 +1743,7 @@ sprite_instance::~sprite_instance()
 		_vm.getRoot().remove_mouse_listener(this);
 	}
 
-	m_display_list.clear();
+	//m_display_list.clear();
 
 	for (LoadVariablesThreads::iterator it=_loadVariableRequests.begin();
 			it != _loadVariableRequests.end(); ++it)

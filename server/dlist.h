@@ -208,12 +208,6 @@ public:
 	///
 	void removeUnloaded();
 
-	/// Clear the display list.
-	void clear()
-	{
-		_charsByDepth.clear();
-	}
-
 	/// Unload the characters in this DisplayList removing
 	/// all but the ones with on onUnload event defined
 	/// (checked by calling ::unload on them) and keeping
@@ -222,35 +216,6 @@ public:
 	/// Return true if any child was kept (as they had onUnload defined)
 	///
 	bool unload();
-
-	/// \brief
-	/// Clear all characters in this DisplayList that are also found
-	/// in the given DisplayList
-	//
-	/// @param from
-	///	A DisplayList containing character instances to clear.
-	///	Any instance found in in will be removed from this DisplayList.
-	///
-	/// @param call_unload
-	///	If true, UNLOAD event will be invoked on the characters being
-	///	removed. False by default.
-	///
-	void clear(const DisplayList& from, bool call_unload=false);
-
-	/// \brief
-	/// Clear all characters in this DisplayList except the ones
-	/// contained in the given DisplayList and not unloaded
-	//
-	/// @param exclude
-	///	A DisplayList containing character instances to keep.
-	///	Any instance not found in in will be removed
-	///	from this DisplayList.
-	///
-	/// @param call_unload
-	///	If true, UNLOAD event will be invoked on the characters being
-	///	removed. False by default.
-	///
-	void clear_except(const DisplayList& exclude, bool call_unload=false);
 
 	/// Add all characters in the list, maintaining depth-order
 	//
@@ -300,11 +265,6 @@ public:
 	///	making any modification to the list.
 	///
 	void reset(movie_definition& movieDef, size_t targetFrame, sprite_instance& owner);
-
-	/// Just an alias for clear()
-	void reset() {
-		clear();
-	}
 
 	/// \brief
 	/// Display the referenced characters.

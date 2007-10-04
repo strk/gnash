@@ -1,3 +1,10 @@
+2007-10-04 Sandro Santilli <strk@keybit.net>
+
+	* server/dlist.{cpp,h}: remove unused functions, call destroy()
+	  on characters whos unload() returned false.
+	* server/sprite_instance.cpp (dtor): remove useless call to
+	  DisplayList::clear()
+
 2007-10-04 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* libbase/BitsReader.h: Added doc.

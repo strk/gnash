@@ -229,6 +229,10 @@ DisplayList::place_character(
 			// reinsert removed character if needed
 			reinsertRemovedCharacter(oldCh);
 		}
+		else
+		{
+			oldCh->destroy();
+		}
 		
 		// extend invalidated bounds
 		ch->extend_invalidated_bounds(old_ranges); 				
@@ -355,6 +359,10 @@ DisplayList::replace_character(
 			// reinsert removed character if needed
 			reinsertRemovedCharacter(oldch);
 		}
+		else
+		{
+			oldch->destroy();
+		}
 		
 		// extend invalidated bounds
 		// WARNING: when a new Button character is added,
@@ -471,6 +479,10 @@ DisplayList::remove_display_object(int depth)
 			//       (after the shift) is occupied already
 			//
 			reinsertRemovedCharacter(oldCh);
+		}
+		else
+		{
+			oldCh->destroy();
 		}
 	}
 
@@ -628,6 +640,10 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, sprite_inst
 			{
 				toReinsert.push_back(di);
 			}
+			else
+			{
+				di->destroy();
+			}
 
 			continue;
 		}
@@ -640,7 +656,7 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, sprite_inst
 			// Call set_invalidated before changing the DisplayList
 			owner.set_invalidated();
 
-			// TODO: no unload() call needed here ? would help GC ?
+			// TODO: no unload() or destroy() call needed here ? would help GC ?
 			// (I guess there can't be any as_value pointing at this
 			// if it's not ActionScriptReferenceable after all...)
 			//
@@ -664,6 +680,10 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, sprite_inst
 			{
 				toReinsert.push_back(di);
 			}
+			else
+			{
+				di->destroy();
+			}
 
 			continue;
 		}
@@ -678,121 +698,6 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, sprite_inst
 
 		++it;
 	}
-
-	std::for_each(toReinsert.begin(), toReinsert.end(),
-		boost::bind(&DisplayList::reinsertRemovedCharacter, this, _1));
-
-	testInvariant();
-}
-
-void
-DisplayList::clear_except(const DisplayList& exclude, bool call_unload)
-{
-	//log_debug("clear_except(DislpayList, %d) called", call_unload);
-	//GNASH_REPORT_FUNCTION;
-
-	testInvariant();
-	//log_debug("First invariant test worked");
-
-
-	assert(&exclude != this);
-	const container_type& keepchars = exclude._charsByDepth;
-
-	std::vector<DisplayItem> toReinsert;
-
-	const_iterator keepStart = beginNonRemoved(keepchars);
-	const_iterator keepEnd = keepchars.end();
-
-	//int called=0;
-	for (iterator it = _charsByDepth.begin(),	itEnd = _charsByDepth.end(); it != itEnd; )
-	{
-		
-		testInvariant(); // TODO: expensive
-		//log_debug("Invariant test in iteration %d worked", called++);
-
-		// make a copy of the pointer here, don't take a reference
-		DisplayItem di = *it;
-
-		bool is_affected = false;
-		for (const_iterator kit = keepStart; kit != keepEnd; ++kit)
-		{
-			if ( *kit == di )
-			{
-				is_affected = true;
-				break;
-			}
-		}
-
-		if (is_affected == false)
-		{
-			it = _charsByDepth.erase(it);
-
-			if ( call_unload )
-			{
-				if ( di->unload() )
-				{
-					toReinsert.push_back(di);
-				}
-			}
-
-			continue;
-		}
-		it++;
-	}
-
-	testInvariant();
-	//log_debug("Invariant test after cleanup worked");
-
-	std::for_each(toReinsert.begin(), toReinsert.end(),
-		boost::bind(&DisplayList::reinsertRemovedCharacter, this, _1));
-
-	testInvariant();
-	//log_debug("Invariant test after reinsertion worked");
-}
-
-void
-DisplayList::clear(const DisplayList& from, bool call_unload)
-{
-	//GNASH_REPORT_FUNCTION;
-
-	testInvariant();
-
-	const container_type dropchars = from._charsByDepth;
-
-	std::vector<DisplayItem> toReinsert;
-
-	for (iterator it = _charsByDepth.begin(), itEnd = _charsByDepth.end(); it != itEnd; )
-	{
-		// make a copy
-		DisplayItem di = *it;
-
-		bool is_affected = false;
-		for (const_iterator kit = dropchars.begin(), kitEnd = dropchars.end(); kit != kitEnd; ++kit)
-		{
-			if ( *kit == di )
-			{
-				is_affected = true;
-				break;
-			}
-		}
-
-		if (is_affected)
-		{
-			it = _charsByDepth.erase(it);
-
-			if ( call_unload )
-			{
-				if ( di->unload() )
-				{
-					toReinsert.push_back(di);
-				}
-			}
-			continue;
-		}
-		it++;
-	}
-
-	testInvariant();
 
 	std::for_each(toReinsert.begin(), toReinsert.end(),
 		boost::bind(&DisplayList::reinsertRemovedCharacter, this, _1));
@@ -817,12 +722,14 @@ DisplayList::unload()
 		// skip if already unloaded
 		if ( di->isUnloaded() )
 		{
+			// TODO: call di->destroy(); ?
 			++it;
 			continue;
 		}
 
 		if ( ! di->unload() ) // no event handler queued, we remove
 		{
+			di->destroy();
 			it = _charsByDepth.erase(it);
 		}
 		else
