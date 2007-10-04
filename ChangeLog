@@ -1,5 +1,13 @@
 2007-10-04 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.{cpp,h}: use a new SpriteProxy class for 
+	  doing all the soft-reference things. This will now be a flavor
+	  of the boost::variant. Advantage of this is we won't keep alive
+	  destroyed sprites only because we need their original path for
+	  rebinding.
+
+2007-10-04 Sandro Santilli <strk@keybit.net>
+
 	* autogen.sh: reccommend installing libltdl3-dev when libtoolize
 	  fails.
 

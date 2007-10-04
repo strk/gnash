@@ -79,9 +79,7 @@ as_value::to_string(as_environment* env) const
 
 		case MOVIECLIP:
 		{
-                        sprite_instance* sp = getSprite();
-                        assert(sp); // or return as in to_sprite() ?
-                        return sp->getTarget();
+			return getSpriteProxy().getTarget();
 		}
 
 		case NUMBER:
@@ -486,56 +484,20 @@ as_value::to_object() const
 	}
 }
 
-/* static private */
-sprite_instance*
-as_value::find_sprite_by_target(const std::string& tgtstr)
-{
-	// Evaluate target everytime an attempt is made 
-	// to fetch a movieclip value.
-	sprite_instance* root = VM::get().getRoot().get_root_movie();
-	as_environment& env = root->get_environment();
-	character* target = env.find_target(tgtstr);
-	if ( ! target ) return NULL;
-	return target->to_movie();
-}
-
 sprite_instance*
 as_value::to_sprite() const
 {
 	if ( m_type != MOVIECLIP ) return NULL;
 
-	sprite_instance* sp = getSprite();
-	if ( ! sp ) return NULL; // shoudl we assert(sp) instead ?
-
-	if ( sp->isDestroyed() )
-	// TODO: we should also check if the unload event handlers have been invoked or not, or references to 'this' in unload handlers will be bogus !
-	{
-		log_debug(_("MovieClip value is a dangling reference: "
-				"target %s was unloaded (looking for a substitute on the same target))"),
-				sp->getTarget().c_str());
-		sp = find_sprite_by_target(sp->getOrigTarget());
-		return sp;
-		//return NULL;
-	}
-	return sp;
+	return getSprite();
 }
 
 void
-as_value::set_sprite(const sprite_instance& sprite)
+as_value::set_sprite(sprite_instance& sprite)
 {
 	drop_refs();
 	m_type = MOVIECLIP;
-	_value = boost::intrusive_ptr<as_object>(const_cast<sprite_instance*>(&sprite));
-}
-
-void
-as_value::set_sprite(const std::string& path)
-{
-	drop_refs();
-	m_type = MOVIECLIP;
-	sprite_instance* sp = find_sprite_by_target(path);
-	if ( ! sp ) set_null();
-	else set_sprite(*sp);
+	_value = SpriteProxy(&sprite);
 }
 
 // Return value as an ActionScript function.  Returns NULL if value is
@@ -917,10 +879,15 @@ as_value::to_debug_string() const
 		}
 		case MOVIECLIP:
 		{
-			sprite_instance* sp = getSprite();
-			assert(sp); // will change in case we'll have better management :)
-			//snprintf(buf, 511, "[%smovieclip(%s):%p]", sp->isUnloaded() ? "dangling " : "", sp->getOrigTarget().c_str(), (void *)sp);
-			snprintf(buf, 511, "[%smovieclip(%s):%p]", sp->isDestroyed() ? "dangling " : "", sp->getOrigTarget().c_str(), (void *)sp);
+			const SpriteProxy& sp = getSpriteProxy();
+			if ( sp.isDangling() )
+			{
+				snprintf(buf, 511, "[dangling movieclip:%s]", sp.getTarget().c_str());
+			}
+			else
+			{
+				snprintf(buf, 511, "[movieclip(%s):%p]", sp.getTarget().c_str(), (void *)sp.get());
+			}
 			buf[511] = '\0';
 			return buf;
 		}
@@ -1133,7 +1100,7 @@ as_value::setReachable() const
 			break;
 
 		case MOVIECLIP:
-			getSprite()->setReachable();
+			getSpriteProxy().setReachable();
 			break;
 
 		default: break;
@@ -1155,12 +1122,18 @@ as_value::getObj() const
 	return boost::get<AsObjPtr>(_value);
 }
 
+as_value::SpriteProxy
+as_value::getSpriteProxy() const
+{
+	assert(m_type == MOVIECLIP);
+	return boost::get<SpriteProxy>(_value);
+}
+
 as_value::SpritePtr
 as_value::getSprite() const
 {
 	assert(m_type == MOVIECLIP);
-	//return boost::get<SpritePtr>(_value);
-	return boost::get<AsObjPtr>(_value)->to_movie();
+	return boost::get<SpriteProxy>(_value).get();
 }
 
 void
@@ -1272,6 +1245,48 @@ as_value::as_value(as_object* obj)
 	m_type(UNDEFINED)
 {
 	set_as_object(obj);
+}
+
+//-------------------------------------
+// as_value::SpriteProxy
+//-------------------------------------
+
+/* static private */
+sprite_instance*
+as_value::SpriteProxy::find_sprite_by_target(const std::string& tgtstr)
+{
+	if ( tgtstr.empty() ) return NULL;
+
+	sprite_instance* root = VM::get().getRoot().get_root_movie();
+	as_environment& env = root->get_environment();
+	character* target = env.find_target(tgtstr);
+	if ( ! target ) return NULL;
+	return target->to_movie();
+}
+
+void
+as_value::SpriteProxy::checkDangling() const
+{
+	if ( _ptr && _ptr->isDestroyed() ) 
+	{
+		_tgt = _ptr->getOrigTarget();
+		_ptr = 0;
+	}
+}
+
+std::string
+as_value::SpriteProxy::getTarget() const
+{
+	checkDangling(); // set _ptr to NULL and _tgt to original target if destroyed
+	if ( _ptr ) return _ptr->getTarget();
+	else return _tgt;
+}
+
+void
+as_value::SpriteProxy::setReachable() const
+{
+	checkDangling();
+	if ( _ptr ) _ptr->setReachable();
 }
 
 } // namespace gnash

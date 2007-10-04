@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.68 2007/10/03 21:20:07 strk Exp $ */
+/* $Id: as_value.h,v 1.69 2007/10/04 15:32:11 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -411,7 +411,7 @@ public:
 
 	void	set_bool(bool val);
 
-	void	set_sprite(const sprite_instance& sp);
+	void	set_sprite(sprite_instance& sp);
 
 	void	set_int(int val) { set_double(val); }
 
@@ -509,10 +509,112 @@ public:
 
 private:
 
-	static sprite_instance* find_sprite_by_target(const std::string& target);
+	/// A proxy for sprite pointers.
+	//
+	/// The proxy will store a pointer to a sprite_instance until the 
+	/// sprite is destroyed, in which case it will only store the original
+	/// target path of it and always use that for rebinding when needed.
+	///
+	class SpriteProxy {
 
-	void	set_sprite(const std::string& path);
+		mutable sprite_instance* _ptr;
 
+		mutable std::string _tgt;
+
+		static sprite_instance* find_sprite_by_target(const std::string& target);
+
+		/// If we still have a sprite pointer check if it was destroyed
+		/// in which case we drop the pointer and only keep the target.
+		void checkDangling() const;
+
+	public:
+
+		/// Construct a SpriteProxy pointing to the given sprite
+		SpriteProxy(sprite_instance* sp)
+			:
+			_ptr(sp)
+		{
+			checkDangling();
+		}
+
+		/// Construct a copy of the given SpriteProxy 
+		//
+		/// @param sp
+		///	The SpriteProxy to make a copy of.
+		///	NOTE: if the given proxy is dangling, this proxy
+		///	      will also be dangling. If you want to 
+		///	      create a non-dangling proxy you can
+		///           use the constructor taking a sprite_instance
+		///	      as in SpriteProxy newProxy(oldProxy.get())
+		///
+		SpriteProxy(const SpriteProxy& sp)
+		{
+			sp.checkDangling();
+			_ptr=sp._ptr;
+			if ( ! _ptr ) _tgt=sp._tgt;
+		}
+
+		/// Make this proxy a copy of the given one
+		//
+		/// @param sp
+		///	The SpriteProxy to make a copy of.
+		///	NOTE: if the given proxy is dangling, this proxy
+		///	      will also be dangling. If you want to 
+		///	      create a non-dangling proxy you can
+		///           use the constructor taking a sprite_instance
+		///	      as in SpriteProxy newProxy(oldProxy.get())
+		///
+		SpriteProxy& operator=(const SpriteProxy& sp)
+		{
+			sp.checkDangling();
+			_ptr=sp._ptr;
+			if ( ! _ptr ) _tgt=sp._tgt;
+			return *this;
+		}
+
+		/// Get the pointed sprite, either original or rebound
+		//
+		/// @return the currently bound sprite, NULL if none
+		///
+		sprite_instance* get() const
+		{
+			checkDangling(); // set _ptr to NULL and _tgt to original target if destroyed
+			if ( _ptr ) return _ptr;
+			else return find_sprite_by_target(_tgt);
+		}
+
+		/// Get the sprite target, either current (if not dangling) or bounded-to one.
+		std::string getTarget() const;
+
+		/// Return true if this sprite is dangling
+		//
+		/// Dangling means that it doesn't have a pointer to the original
+		/// sprite anymore, not that it doesn't point to anything.
+		/// To know if it points to something or not use get(), which will
+		/// return NULL if it doesn't point to anyhing.
+		///
+		bool isDangling() const
+		{
+			checkDangling();
+			return !_ptr;
+		}
+
+		/// \brief
+		/// Two sprite_proxies are equal if they point to the
+		/// same sprite
+		///
+		bool operator==(const SpriteProxy& sp) const
+		{
+			return get() == sp.get();
+		}
+
+		/// Set the original sprite (if any) as reachable
+		//
+		/// NOTE: if this value is dangling, we won't keep anything
+		///       alive.
+		///
+		void setReachable() const;
+	};
 
 	/// Compare values of the same type
 	//
@@ -539,7 +641,7 @@ private:
                          bool,		// BOOLEAN
                          AsObjPtr,	// OBJECT,
 //                        AsFuncPtr,	// AS_FUNCTION
-//                        SpritePtr,	// MOVIECLIP
+                         SpriteProxy,	// MOVIECLIP
 			 std::string	// STRING 
                       > _value;
 
@@ -551,7 +653,14 @@ private:
 	AsObjPtr getObj() const;
 
 	/// Get the sprite pointer variant member (we assume m_type == MOVIECLIP)
+	//
+	/// NOTE: this is possibly NULL !
+	///
 	SpritePtr getSprite() const;
+
+	/// Get the sprite proxy variant member (we assume m_type == MOVIECLIP)
+	//
+	SpriteProxy getSpriteProxy() const;
 
 	/// Get the number variant member (we assume m_type == NUMBER)
 	double getNum() const
