@@ -21,15 +21,17 @@ ActionMachine::execute_as3()
 {
 	for ( ; ; )
 	{
-	switch (mStream.read_as3op())
+	switch ((opcode = mStream.read_as3op())) // Assignment intentional
 	{
 /// 0x01 ABC_ACTION_BKPT
 /// Do: Enter the debugger if one has been invoked.
 /// This is a no-op. Enable it if desired.
-	case SWF::ABC_ACTION_BKPT:
 /// 0x02 ABC_ACTION_NOP
 /// Do: Nothing.
+/// 0xF3 ABC_ACTION_TIMESTAMP
 	case SWF::ABC_ACTION_NOP:
+	case SWF::ABC_ACTION_BKPT:
+	case SWF::ABC_ACTION_TIMESTAMP:
 	{
 		break;
 	}
@@ -931,63 +933,112 @@ ActionMachine::execute_as3()
 		// TODO: Decide or discover what to do with this.
 		break;
 	}
+/// 0x5A ABC_ACTION_NEWCATCH
 /// Stream: V32 'catch_id'
 /// Stack Out:
 ///  vtable -- vtable suitable to catch an exception of type in catch_id.
 /// NB: Need more information on how exceptions are set up.
-ABC_ACTION_NEWCATCH = 0x5A,
-
+	case SWF::ABC_ACTION_NEWCATCH:
+	{
+		// TODO: Decide if we need this. (Might be a no-op.)
+		break;
+	}
+/// 0x5D ABC_ACTION_FINDPROPSTRICT
+/// 0x5E ABC_ACTION_FINDPROPERTY
 /// Stream: V32 'name_id'
 /// Stack In:
 ///  [ns [n]] -- Namespace stuff
 /// Stack Out:
-///  owner -- object which owns property given by looking up the name_id,
-///   or throw a ReferenceError if none exists.
-ABC_ACTION_FINDPROPSTRICT   = 0x5D,
-
-/// Stream: V32 'name_id'
-/// Stack In:
-///  [ns [n]] -- Namespace stuff
-/// Stack Out:
-///  owner -- object which owns property given by looking up the name_id,
-///   or an Undefined object if none exists.
-ABC_ACTION_FINDPROPERTY = 0x5E,
-
+///  owner -- object which owns property given by looking up the name_id.
+///  0x5D is the undefined object if not found
+///  0x5E throws a ReferenceError if not found
+	case SWF::ABC_ACTION_FINDPROPSTRICT:
+	case SWF::ABC_ACTION_FINDPROPERTY:
+	{
+		asName a = read_V32();
+		completeName(a);
+		as_value v = findProperty(a);
+		if ((opcode == SWF::ABC_ACTION_FINDPROPSTRICT) && v.is_undefined())
+			throw ASReferenceException();
+		break;
+	}
+/// 0x5F ABC_ACTION_FINDDEF
 /// Stream: V32 'name_id' (no ns expansion)
 /// Stack Out:
 ///  def -- The definition of the name at name_id.
-ABC_ACTION_FINDDEF  = 0x5F,
-
+	case SWF::ABC_ACTION_FINDDEF:
+	{
+		asName a = read_V32();
+		// TODO
+		break;
+	}
+/// 0x60 ABC_ACTION_GETLEX
 /// Stream: V32 'name_id' (no ns expansion)
 /// Stack Out:
 ///  property -- The result of 0x5D (ABC_ACTION_FINDPROPSTRICT)
 ///   + 0x66 (ABC_ACTION_GETPROPERTY)
-ABC_ACTION_GETLEX   = 0x60,
-
+	case SWF::ABC_ACTION_GETLEX
+	{
+		asName a = read_V32();
+		as_value v = findProperty(a);
+		if (v.is_undefined())
+			throw ASReferenceException();
+		mStack.grow(1);
+		mStack.top(0) = v.getProperty(a);
+		break;
+	}
+/// 0x61 ABC_ACTION_SETPROPERTY
 /// Stream: V32 'name_id'
 /// Stack In:
-///  obj -- The object whose property is to be set
-///  [ns [n]] -- Namespace stuff
-///  [key] -- Key name for property. Will not have both Namespace and key.
 ///  value -- The value to be used
+///  [ns [n]] -- Namespace stuff
+///      OR
+///  [key] -- Key name for property. Will not have both Namespace and key.
+///  obj -- The object whose property is to be set
 /// Stack Out:
 ///  .
-/// Do: Set obj::(resolve)'name_id' to value, or set obj::key to value.
-/// NB: I'm not yet clear which should be used when. (Chad)
-ABC_ACTION_SETPROPERTY  = 0x61,
-
+/// NB: If the name at name_id is completely qualified, neither a namespace
+/// nor a key is needed.  If the name_id refers to a name with a runtime
+/// namespace, then this will be used.  If neither of those is true and
+/// obj is a dictionary and key is a name, then the name_id is discarded and
+/// key/value is set in the dictionary obj instead.
+	case SWF::ABC_ACTION_SETPROPERTY:
+	{
+		asName a = read_V32();
+		as_value &v = mStack.pop();
+		if (!a.isRuntime())
+		{
+			mStack.top(0).setProperty(a, v);
+			mStack.drop(1);
+		}
+		else
+		{
+			if (a.isRtns() || !(mStack.top(0).is_object()
+				&& mStack.top(1).is_dictionary()))
+			{
+				completeName(a);
+				mStack.top(0).setProperty(a, v);
+				mStack.drop(1);
+			}
+			else
+			{
+				mStack.top(1).setDictProperty(mStack.top(0), v);
+				mStack.drop(2);
+			}
+		}
+		break;
+	}
 /// 0x62 ABC_ACTION_GETLOCAL
 /// Stream: V32 'frame_index'
 /// Frame: value at frame_index is needed
 /// Stack Out:
 ///  value
-void
-AbcHandlers::AbcGetLocal()
-{
-	mStack.grow(1);
-	mStack.top(0) = mFrame.value(read_V32());
-}
-
+	case SWF::ABC_ACTION_GETLOCAL:
+	{
+		mStack.grow(1);
+		mStack.top(0) = mFrame.value(read_V32());
+		break;
+	}
 /// 0x63 ABC_ACTION_SETLOCAL
 /// Stream: V32 'frame_index'
 /// Frame: obj at frame_index is set to value
@@ -995,76 +1046,148 @@ AbcHandlers::AbcGetLocal()
 ///  value
 /// Stack Out:
 ///  .
-void
-AbcHandlers::AbcSetLocal()
-{
-	mFrame.value(read_V32()) = mStack.top(0);
-	mStack.drop(1);
-}
-
+	case SWF::ABC_ACTION_SETLOCAL:
+	{
+		mFrame.value(read_V32()) = mStack.top(0);
+		mStack.drop(1);
+		break;
+	}
+/// 0x64 ABC_ACTION_GETGLOBALSCOPE
 /// Stack Out:
 ///  global -- The global scope object
-ABC_ACTION_GETGLOBALSCOPE   = 0x64,
-
+	case SWF::ABC_ACTION_GETGLOBALSCOPE:
+	{
+		mStack.grow(1);
+		mStack.top(0) = mGlobalScope;
+		break;
+	}
+/// 0x65 ABC_ACTION_GETSCOPEOBJECT
 /// Stream: S8 'depth'
 /// Stack Out:
 ///  scope -- The scope object at depth
-ABC_ACTION_GETSCOPEOBJECT   = 0x65,
-
+	case SWF::ABC_ACTION_GETSCOPEOBJECT
+	{
+		uint8_t depth = read_u8();
+		mStack.grow(1);
+		mStack.top(0) = mScopeStack(depth);
+		break;
+	}
+/// 0x66 ABC_ACTION_GETPROPERTY
 /// Stream: V32 'name_id'
 /// Stack In:
-///  obj -- The object whose property is to be retrieved
 ///  [ns [n]] -- Namespace stuff
+///      OR
 ///  [key] -- Key name for property. Will not have both Namespace and key.
+///  obj -- The object whose property is to be retrieved
 /// Stack Out:
 ///  prop -- The requested property.
-/// NB: As with 0x61 (ABC_ACTION_SETPROPERTY) it's unclear to me when
-/// key gets used and when the namespace (or nothing) is used.
-ABC_ACTION_GETPROPERTY  = 0x66,
-
+/// NB: See 0x61 (ABC_ACTION_SETPROPETY) for the decision of ns/key.
+	case SWF::ABC_ACTION_GETPROPERTY:
+	{
+		asName a = read_V32();
+		if (!a.isRuntime())
+		{
+			mStack.top(0) = mStack.top(0).getProperty(a, v);
+		}
+		else
+		{
+			if (a.isRtns() || !(mStack.top(0).is_object()
+				&& mStack.top(1).is_dictionary()))
+			{
+				completeName(a);
+				mStack.top(0) = mStack.top(0).getProperty(a);
+			}
+			else
+			{
+				mStack.top(1) = mStack.top(1).getDictProperty(mStack.top(0));
+				mStack.drop(1);
+			}
+		}
+		break;
+	}
+/// 0x68 ABC_ACTION_INITPROPERTY
 /// Stream V32 'name_id'
 /// Stack In:
+///  value -- The value to be put into the property.
 ///  [ns [n]] -- Namespace stuff
 ///  obj -- The object whose property is to be initialized
-///  value -- The value to be put into the property.
 /// Stack Out:
 ///  .
 /// Do:
 ///  Set obj::(resolve)'name_id' to value, set bindings from the context.
-ABC_ACTION_INITPROPERTY = 0x68,
-
+	case SWF::ABC_ACTION_INITPROPERTY:
+	{
+		asName a = read_V32();
+		as_value& v = mStack.pop();
+		completeName(a);
+		mStack.pop().to_object().setProperty(a, v, true); // true for init
+		break;
+	}
+/// 0x6A ABC_ACTION_DELETEPROPERTY
 /// Stream: V32 'name_id'
 /// Stack In:
-///  obj -- The object whose property should be deleted.
 ///  [ns [n]] -- Namespace stuff
+///  obj -- The object whose property should be deleted.
 /// Stack Out:
 ///  truth -- True if property was deleted or did not exist, else False.
-ABC_ACTION_DELETEPROPERTY   = 0x6A,
-
+	case SWF::ABC_ACTION_DELETEPROPERTY:
+	{
+		asName a = read_V32();
+		completeName(a);
+		mStack.top(0) = mStack.top(0).deleteProperty(a);
+		break;
+	}
+/// 0x6C ABC_ACTION_GETSLOT
 /// Stream: V32 'slot_index + 1'
 /// Stack In:
 ///  obj -- The object which owns the desired slot.
 /// Stack Out:
 ///  slot -- obj.slots[slot_index]
-ABC_ACTION_GETSLOT  = 0x6C,
-
+	case SWF::ABC_ACTION_GETSLOT
+	{
+		uint32_t sindex = read_V32();
+		if (!sindex)
+			throw ASException();
+		--sindex;
+		mStack.top(0) = mStack.top(0).getSlot(sindex);
+		break;
+	}
+/// 0x6D ABC_ACTION_SETSLOT
 /// Stream: V32 'slot_index + 1'
 /// Stack In:
-///  obj -- The object whose slot should be set.
 ///  value -- The value intended for the slot.
+///  obj -- The object whose slot should be set.
 /// Stack Out:
 ///  .
 /// Do: obj.slots[slot_index] = value
-ABC_ACTION_SETSLOT  = 0x6D,
-
+	case SWF::ABC_ACTION_SETSLOT:
+	{
+		uint32_t sindex = read_V32();
+		if (!sindex)
+			throw ASException();
+		--sindex;
+		mStack.top(0).setSlot(sindex, mStack.top(1));
+		mStack.drop(2);
+		break;
+	}
+/// 0x6E ABC_ACTION_GETGLOBALSLOT
 /// Stream: V32 'slot_index + 1'
 /// Stack In:
 ///  .
 /// Stack Out:
 ///  slot -- globals.slots[slot_index]
 /// NB: Deprecated
-ABC_ACTION_GETGLOBALSLOT= 0x6E,
-
+	case SWF::ABC_ACTION_GETGLOBALSLOT:
+	{
+		uint32_t sindex = read_V32();
+		if (!sindex)
+			throw ASException();
+		--sindex;
+		mStack.grow(1);
+		mStack.top(0) = mGlobal.getSlot(sindex);
+		break;
+	}
+/// 0x6F ABC_ACTION_SETGLOBALSLOT
 /// Stream: V32 'slot_index + 1'
 /// Stack In:
 ///  value -- The value to be placed into the slot.
@@ -1072,416 +1195,421 @@ ABC_ACTION_GETGLOBALSLOT= 0x6E,
 ///  .
 /// Do: globals[slot_index] = value
 /// NB: Deprecated
-ABC_ACTION_SETGLOBALSLOT= 0x6F,
-
+	case SWF::ABC_ACTION_SETGLOBALSLOT:
+	{
+		uint32_t sindex = read_V32();
+		if (!sindex)
+			throw ASException();
+		--sindex;
+		mGlobal.setSlot(sindex, mStack.pop());
+		break;
+	}
+/// 0x70 ABC_ACTION_CONVERT_S
 /// Stack In:
 ///  value -- An object
 /// Stack Out:
 ///  str_value -- value as a string
-ABC_ACTION_CONVERT_S   = 0x70,
-
+	case SWF::ABC_ACTION_CONVERT_S:
+	{
+		mStack.top(0) = mStack.top(0).to_string();
+		break;
+	}
+/// 0x71 ABC_ACTION_ESC_XELEM
 /// Stack In:
 ///  value -- An object to be escaped
 /// Stack Out:
 ///  str_value -- value as a string, escaped suitably for an XML element.
-ABC_ACTION_ESC_XELEM   = 0x71,
-
+	case SWF::ABC_ACTION_ESC_XELEM:
+	{
+		mStack.top(0) = mStack.top(0).to_escaped_xml_element();
+		break;
+	}
+/// 0x72 ABC_ACTION_ESC_XATTR
 /// Stack In:
 ///  value -- An object to be escaped
 /// Stack Out:
 ///  str_value -- value as a string, escaped suitably for an XML attribute.
-ABC_ACTION_ESC_XATTR   = 0x72,
-
+	case SWF::ABC_ACTION_ESC_XATTR:
+	{
+		mStack.top(0) = mStack.top(0).to_escaped_xml_attribute();
+		break;
+	}
+/// 0x73 ABC_ACTION_CONVERT_I
+/// 0x83 ABC_ACTION_COERCE_I (deprecated)
 /// Stack In:
 ///  value -- An object to be converted to Integer
 /// Stack Out:
 ///  int_value -- value as an integer object
-ABC_ACTION_CONVERT_I   = 0x73,
-
+	case SWF::ABC_ACTION_CONVERT_I:
+	case SWF::ABC_ACTION_COERCE_I:
+	{
+		mStack.top(0) = mStack.top(0).to_number<int>();
+		break;
+	}
+/// 0x74 ABC_ACTION_CONVERT_U
+/// 0x88 ABC_ACTION_COERCE_U (deprecated)
 /// Stack In:
 ///  value -- An object to be converted to unsigned integer
 /// Stack Out:
 ///  int_value -- value as an unsigned integer object
-ABC_ACTION_CONVERT_U   = 0X74,
-
+	case SWF::ABC_ACTION_CONVERT_U:
+	case SWF::ABC_ACTION_COERCE_U:
+	{
+		mStack.top(0) = mStack.top(0).to_number<unsigned int>();
+		break;
+	}
+/// 0x75 ABC_ACTION_CONVERT_D
+/// 0x84 ABC_ACTION_COERCE_D (deprecated)
 /// Stack In:
 ///  value -- An object to be converted to a double
 /// Stack Out:
 ///  double_value -- value as a double object
-ABC_ACTION_CONVERT_D   = 0X75,
-
+	case SWF::ABC_ACTION_CONVERT_D:
+	case SWF::ABC_ACTION_COERCE_D:
+	{
+		mStack.top(0) = mStack.top(0).to_double();
+		break;
+	}
+/// 0x76 ABC_ACTION_CONVERT_B
+/// 0x81 ABC_ACTION_COERCE_B (deprecated)
 /// Stack In:
 ///  value -- An object to be converted to a boolean
 /// Stack Out:
 ///  bool_value -- value as a boolean object
-ABC_ACTION_CONVERT_B   = 0X76,
-
+	case SWF::ABC_ACTION_CONVERT_B:
+	case SWF::ABC_ACTION_COERCE_B:
+	{
+		mStack.top(0) = mStack.top(0).to_bool();
+		break;
+	}
+/// 0x77 ABC_ACTION_CONVERT_O
 /// Stack In:
 ///  obj -- An object
 /// Stack Out:
 ///  obj -- An object
 /// Do: If obj is Undefined or Null, throw TypeError
-ABC_ACTION_CONVERT_O   = 0X77,
-
+	case SWF::ABC_ACTION_CONVERT_O:
+	{
+		mStack.top(0) = mStack.top(0).to_object();
+		if (mStack.top(0).is_undefined() || mStack.top(0).is_null())
+			throw ASTypeException();
+		break;
+	}
+/// 0x78 ABC_ACTION_CHECKFILTER
 /// Stack In:
 ///  obj -- An object
 /// Stack Out:
 ///  obj -- An object
 /// Do: If obj is not XML based, throw TypeError
-ABC_ACTION_CHECKFILTER = 0x78,
-
+	case SWF::ABC_ACTION_CHECKFILTER:
+	{
+		if (!mStack.top(0).is_xml())
+			throw ASTypeException();
+		break;
+	}
 /// 0x80 ABC_ACTION_COERCE
 /// Stream: V32 'name_index'
 /// Stack In:
+///  [ns [n]] -- Possibly name/namespace stuff
 ///  obj -- An object to be converted
 /// Stack Out:
 ///  coerced_obj -- The object as the desired (resolve)'name_index' type.
-void
-AbcHandlers::AbcCoerce()
-{
-	uint32_t mindex = read_V32();
-	as_value &v = mStack.top(0);
-	// TODO: Finish
-}
-
-/// 0x81 ABC_ACTION_COERCE_B
-/// See: 0x76 (ABC_ACTION_CONVERT_B)
-/// NB: Deprecated
-/// Aliased in interpreter as 0x81
-
+	case SWF::ABC_ACTION_COERCE:
+	{
+		asName a = read_V32();
+		completeName(a);
+		mStack.top(0) = mStack.top(0).coerce(a);
+		break;
+	}
 /// 0x82 ABC_ACTION_COERCE_A
 /// Stack In:
 ///  obj -- An object to be converted
 /// Stack Out:
 ///  obj
 /// Do: Nothing. (The 'a' is for atom, and it's unclear if anything is needed.)
-void
-AbcHandlers::AbcCoerceA()
-{
-	return;
-}
-
-/// 0x83 ABC_ACTION_COERCE_I
-/// See: 0x73 ABC_ACTION_CONVERT_I
-/// NB: Deprecated
-/// NOMING 20 Aug 2007
-/// Aliased in interpreter as 0x73
-
-/// 0x84 ABC_ACTION_COERCE_D
-/// See: 0x75 ABC_ACTION_CONVERT_D
-/// NB: Deprecated
-/// NOMING 20 Aug 2007
-/// Aliased in interpreter as 0x75
-
+	case SWF::ABC_ACTION_COERCE_A:
+	{
+		break;
+	}
 /// 0x85 ABC_ACTION_COERCE_S
 /// Stack In:
 ///  obj -- An object to be converted
 /// Stack Out:
 ///  str_obj -- obj as string. nullString object if obj is Null or Undefined
-void
-AbcHandlers::AbcCoerceS()
-{
-	if (mStack.top(0).is_undefined() || mStack.top(0).is_null())
-		mStack.top(0) = "";
-	else
-		mStack.top(0) = mStack.top(0).to_string();
-}
-
+	case SWF::ABC_ACTION_COERCE_S:
+	{
+		if (mStack.top(0).is_undefined() || mStack.top(0).is_null())
+			mStack.top(0) = "";
+		else
+			mStack.top(0) = mStack.top(0).to_string();
+		break;
+	}
 /// 0x86 ABC_ACTION_ASTYPE
-/// Stream: V32 'name_index' (no namespace)
+/// Stream: V32 'name_index'
 /// Stack In:
+///  [ns [n]] -- Possible namespace stuff
 ///  obj -- An object to be checked
 /// Stack Out:
 ///  cobj -- obj if obj is of type (resolve)'name_index', otherwise Null
-void
-AbcHandlers::AbcAsType()
-{
-	uint32_t mindex = read_V32();
-	if (!mStack.top(0).conforms_to(pool_name(mindex)))
-		mStack.top(0).set_null();
-}
-
+	case SWF::ABC_ACTION_ASTYPE:
+	{
+		asName a = read_V32();
+		completeName(a);
+		if (!mStack.top(0).conforms_to(a)
+			mStack.top(0).set_null();
+		break;
+	}
 /// 0x87 ABC_ACTION_ASTYPELATE
 /// Stack In:
 ///  valid -- The object whose type is to be matched
 ///  obj -- An object to be checked
 /// Stack Out:
 ///  cobj -- obj if type of obj conforms to valid, otherwise Null
-void
-AbcHandlers::AbcAsTypeLate()
-{
-	if (!mStack.top(1).conforms_to(mStack.top(0).to_object()))
-		mStack.top(1).set_null();
-	mStack.drop(1);
-}
-
-/// 0x88 ABC_ACTION_COERCE_U
-/// See: 0x74 (ABC_ACTION_CONVERT_U)
-/// NB: Deprecated
-/// Placed in interpreter as 0x74 duplicate.
-
+	case SWF::ABC_ACTION_ASTYPELATE:
+	{
+		if (!mStack.top(1).conforms_to(mStack.top(0).to_object()))
+			mStack.top(1).set_null();
+		mStack.drop(1);
+		break;
+	}
 /// 0x89 ABC_ACTION_COERCE_O
 /// Stack In:
 ///  obj -- An object
 /// Stack Out:
 ///  cobj -- obj if obj is not Undefined, otherwise Null
-void
-AbcHandlers::AbcCoerceO()
-{
-	if (mStack.top(0).is_undefined())
-		mStack.top(0) = mStack.top(0).to_object();
-	else
-		mStack.top(0).set_undefined();
-}
-
+	case SWF::ABC_ACTION_COERCE_O:
+	{
+		if (mStack.top(0).is_undefined())
+			mStack.top(0) = mStack.top(0).to_object();
+		else
+			mStack.top(0).set_undefined();
+		break;
+	}
 /// 0x90 ABC_ACTION_NEGATE
 /// Stack In:
 ///  obj -- An object
 /// Stack Out:
 ///  negdouble -- -1.0 * (double) obj
-void
-AbcHandlers::AbcNegate()
-{
-	mStack.top(0) = -mStack.top(0).to_number();
-}
-
+	case SWF::ABC_ACTION_NEGATE:
+	{
+		mStack.top(0) = -mStack.top(0).to_number();
+		break;
+	}
 /// 0x91 ABC_ACTION_INCREMENT
 /// Stack In:
 ///  num -- A number, integer or double
 /// Stack Out:
-///  num2 -- The same value, but new object.
-/// Do:
-///  num = num + 1 (post-increment)
-void
-AbcHandlers::AbcIncrement()
-{
-	mStack.top(0) = mStack.top(0).to_number() + 1;
-}
-
-/// 0x92 ABC_ACTION_INCLOCAL = 0x92,
+///  num + 1
+	case SWF::ABC_ACTION_INCREMENT:
+	{
+		mStack.top(0) = mStack.top(0).to_number() + 1;
+		break;
+	}
+/// 0x92 ABC_ACTION_INCLOCAL
 /// Stream: V32 'frame_addr'
 /// Frame: Load i from frame_addr and increment it.
-void
-AbcHandlers::AbcIncLocal()
-{
-	uint32_t foff = read_V32();
-	mFrame.value(foff) = mFrame.value(foff).to_number() + 1;
-}
-
-/// ABC_ACTION_DECREMENT= 0x93,
+	case SWF::ABC_ACTION_INCLOCAL:
+	{
+		uint32_t foff = read_V32();
+		mFrame.value(foff) = mFrame.value(foff).to_number() + 1;
+		break;
+	}
+/// 0x93 ABC_ACTION_DECREMENT
 /// Stack In:
 ///  num -- A number, integer or double
 /// Stack Out:
-///  num2 -- The same value, but new object.
-/// Do:
-///  num = num - 1 (post-decrement)
-void
-AbcHandlers::AbcDecrement()
-{
-	mStack.top(0) = mStack.top(0).to_number() - 1;
-}
-
-/// ABC_ACTION_DECLOCAL = 0x94
+///  num - 1
+	case SWF::ABC_ACTION_DECREMENT:
+	{
+		mStack.top(0) = mStack.top(0).to_number() - 1;
+		break;
+	}
+/// 0x94 ABC_ACTION_DECLOCAL
 /// Stream: V32 'frame_addr'
 /// Frame: Load i from frame_addr and decrement it.
-void
-AbcHandlers::AbcDecLocal()
-{
-	uint32_t foff = read_V32();
-	mFrame.value(foff) = mFrame.value(foff).to_number() - 1;
-}
-
+	case SWF::ABC_ACTION_DECLOCAL:
+	{
+		uint32_t foff = read_V32();
+		mFrame.value(foff) = mFrame.value(foff).to_number() - 1;
+		break;
+	}
 /// 0x95 ABC_ACTION_ABC_TYPEOF
 /// Stack In:
 ///  obj -- An object
 /// Stack Out:
 ///  type -- typeof(obj) as a string
-void
-AbcHandlers::AbcTypeof()
-{
-	mStack.top(0) = mStack.top(0).typeOf();
-}
-
+	case SWF::ABC_ACTION_ABC_TYPEOF:
+	{
+		mStack.top(0) = mStack.top(0).typeOf();
+		break;
+	}
 /// 0x96 ABC_ACTION_NOT
 /// Stack In:
 ///  obj -- An object
 /// Stack Out:
 ///  nobj -- A truth object with value !((Boolean) obj)
-void
-AbcHandlers::AbcNot()
-{
-	mStack.top(0) = !mStack.top(0).to_bool();
-}
-
+	case SWF::ABC_ACTION_NOT:
+	{
+		mStack.top(0).set_bool(!mStack.top(0).to_bool();)
+		break;
+	}
 /// 0x97 ABC_ACTION_BITNOT
 /// Stack In:
 ///  obj -- An object
 /// Stack Out:
 ///  nint -- ~((Int) obj)
-void
-AbcHandlers::AbcBitNot()
-{
-	mStack.top(0) = ~mStack.top(0).to_number<int>();
-}
-
+	case SWF::ABC_ACTION_BITNOT:
+	{
+		mStack.top(0) = ~mStack.top(0).to_number<int>();
+		break;
+	}
 /// 0xA0 ABC_ACTION_ADD	
 /// Stack In:
 /// a
 /// b
 /// Stack Out:
 /// a + b (double if numeric)
-void
-AbcHandlers::AbcAdd()
-{
-	mStack.top(1) = mStack.top(1).add(mStack.top(0));
-	mStack.drop(1);
-}
-
+	case SWF::ABC_ACTION_ADD:
+	{
+		mStack.top(1) = mStack.top(1).add(mStack.top(0));
+		mStack.drop(1);
+		break;
+	}
 /// 0xA1 ABC_ACTION_SUBTRACT
-/// Stack In:/// Stack In:
+/// Stack In:
 ///  a
 ///  b
 /// Stack Out:
 ///  a - b (double)
-void
-AbcHandlers::AbcSubtract()
-{
-	mStack.top(1) = mStack.top(1).to_number<double>() - mStack.top(1).to_number<double>();
-	mStack.drop(1);
-}
-
+	case SWF::ABC_ACTION_SUBTRACT:
+	{
+		mStack.top(1) = mStack.top(1).to_number() - mStack.top(1).to_number();
+		mStack.drop(1);
+		break;
+	}
 /// 0xA2 ABC_ACTION_MULTIPLY
 /// Stack In:
 ///  a
 ///  b
 /// Stack Out:
 ///  a * b (double)
-void
-AbcHandlers::AbcMultiply()
-{
-	mStack.top(1) = mStack.top(1).to_number<double>() * mStack.top(0).to_number<double>();
-	mStack.drop(1);
-}
-
+	case SWF::ABC_ACTION_MULTIPLY:
+	{
+		mStack.top(1) = mStack.top(1).to_number() * mStack.top(0).to_number();
+		mStack.drop(1);
+		break;
+	}
 /// 0xA3 ABC_ACTION_DIVIDE
 /// Stack In:
 ///  b
 ///  a
 /// Stack Out:
 ///  a / b (double)
-void
-AbcHandlers::AbcDivide()
-{
-	mStack.top(1) = mStack.top(1).to_number<double>() / mStack.top(0).to_number<double>();
-	mStack.drop(1);
-}
-
+	case SWF::ABC_ACTION_DIVIDE:
+	{
+		mStack.top(1) = mStack.top(1).to_number() / mStack.top(0).to_number();
+		mStack.drop(1);
+		break;
+	}
 /// 0xA4 ABC_ACTION_MODULO
 /// Stack In:
 ///  b
 ///  a
 /// Stack Out:
 ///  a % b (not integer mod, but remainder)
-void
-AbcHandlers::AbcModulo()
-{
-	double result = mStack.top(1).to_number<double>() / mStack.top(0).to_number<double>();
-	int trunc_result = static_cast<int> (result);
-	mStack.top(1) = mStack.top(1).to_number<double>() - 
-		(trunc_result * mStack.top(0).to_number<double>());
-	mStack.drop(1);
-}
-
+	case SWF::ABC_ACTION_MODULO:
+	{
+		double result = mStack.top(1).to_number() / mStack.top(0).to_number();
+		int trunc_result = static_cast<int> (result);
+		mStack.top(1) = mStack.top(1).to_number<double>() - 
+			(trunc_result * mStack.top(0).to_number<double>());
+		mStack.drop(1);
+		break;
+	}
 /// 0xA5 ABC_ACTION_LSHIFT
 /// Stack In:
 ///  b
 ///  a
 /// Stack Out:
 ///  a << b
-void
-AbcHandlers::AbcLShift()
-{
-	mStack.top(1) = mStack.top(1).to_number<int>() << mStack.top(0).to_number<int>();
-	mStack.drop(1);
-}
-
+	case SWF::ABC_ACTION_LSHIFT:
+	{
+		mStack.top(1) = mStack.top(1).to_int() << mStack.top(0).to_int();
+		mStack.drop(1);
+		break;
+	}
 /// 0xA6 ABC_ACTION_RSHIFT
 /// Stack In:
 ///  a
 ///  b
 /// Stack Out:
 ///  a >> b
-void
-AbcHandlers::AbcRShift()
-{
-	mStack.top(1) = mStack.top(1).to_number<int>() >> mStack.top(0).to_number<int>();
-	mStack.drop(1);
-}
-
+	case SWF::ABC_ACTION_RSHIFT:
+	{
+		mStack.top(1) = mStack.top(1).to_int() >> mStack.top(0).to_int();
+		mStack.drop(1);
+		break;
+	}
 /// 0xA7 ABC_ACTION_URSHIFT
 /// Stack In:
 ///  b
 ///  a
 /// Stack Out:
 ///  ((unsigned) a) >> b
-void
-AbcHandlers::AbcURShift()
-{
-	mStack.top(1) = mStack.top(1).to_number<unsigned int>() >> mStack.top(0).to_number<int>();
-	mStack.drop(1);
-}
-
+	case SWF::ABC_ACTION_URSHIFT:
+	{
+		mStack.top(1) = mStack.top(1).to_number<unsigned int>()
+			>> mStack.top(0).to_number<int>();
+		mStack.drop(1);
+		break;
+	}
 /// 0xA8 ABC_ACTION_BITAND
 ///  a
 ///  b
 /// Stack Out:
 ///  a & b
-void
-AbcHandlers::AbcBitAnd()
-{
-	mStack.top(1) = mStack.top(1).to_number<int>() & mStack.top(0).to_number<int>();
-	mStack.drop(1);
-}
-
+	case SWF::ABC_ACTION_BITAND:
+	{
+		mStack.top(1) = mStack.top(1).to_int() & mStack.top(0).to_int();
+		mStack.drop(1);
+		break;
+	}
 /// 0xA9 ABC_ACTION_BITOR
 /// Stack In:
 ///  b
 ///  a
 /// Stack Out:
 ///  a | b
-void
-AbcHandlers::AbcBitOr()
-{
-	mStack.top(1) = mStack.top(1).to_number<int>() | mStack.top(0).to_number<int>();
-	mStack.drop(1);
-}
-
+	case SWF::ABC_ACTION_BITOR:
+	{
+		mStack.top(1) = mStack.top(1).to_int() | mStack.top(0).to_int();
+		mStack.drop(1);
+		break;
+	}
 /// 0xAA ABC_ACTION_BITXOR
 /// Stack In:
 ///  b
 ///  a
 /// Stack Out:
 ///  a ^ b
-void
-AbcHandlers::AbcBitXor()
-{
-	mStack.top(1) = mStack.top(1).to_number<int>() ^ mStack.top(0).to_number<int>();
-	mStack.drop(1);
-}
-
+	case SWF::ABC_ACTION_BITXOR:
+	{
+		mStack.top(1) = mStack.top(1).to_int() ^ mStack.top(0).to_int();
+		mStack.drop(1);
+		break;
+	}
 /// 0xAB ABC_ACTION_EQUALS
 /// Stack In:
 ///  b
 ///  a
 /// Stack Out:
 ///  truth -- Truth of (a == b) (weakly)
-void
-AbcHandlers::AbcEquals()
-{
-	mStack.top(1) = mStack.top(1).weak_equals(mStack.top(0));
-	mStack.drop(1);
-}
-
+	case SWF::ABC_ACTION_EQUALS:
+	{
+		mStack.top(1) = mStack.top(1).weak_equals(mStack.top(0));
+		mStack.drop(1);
+		break;
+	}
 /// 0xAC ABC_ACTION_STRICTEQUALS
 /// Stack In:
 ///  b
@@ -1489,107 +1617,100 @@ AbcHandlers::AbcEquals()
 /// Stack Out:
 ///  truth -- Truth of (a == b) (strongly, as in 
 ///   0x19 (ABC_ACTION_IFSTRICTEQ))
-void
-AbcHandlers::AbcStrictEquals()
-{
-	mStack.top(1) = mStack.top(1).strict_equals(mStack.top(0));
-	mStack.drop(1);
-}
-
+	case SWF::ABC_ACTION_STRICTEQUALS:
+	{
+		mStack.top(1) = mStack.top(1).strict_equals(mStack.top(0));
+		mStack.drop(1);
+		break;
+	}
 /// 0xAD ABC_ACTION_LESSTHAN
 /// Stack In:
 ///  b
 ///  a
 /// Stack Out:
 ///  truth -- Truth of (a < b)
-void
-AbcHandlers::AbcLessThan()
-{
-	mStack.top(1) = mStack.top(1).less_than(mStack.top(0));
-	mStack.drop(1);
-}
-
+	case SWF::ABC_ACTION_LESSTHAN:
+	{
+		mStack.top(1) = mStack.top(1).less_than(mStack.top(0));
+		mStack.drop(1);
+		break;
+	}
 /// 0xAE ABC_ACTION_LESSEQUALS
 /// Stack In:
 ///  b
 ///  a
 /// Stack Out:
 ///  truth -- Truth of (a <= b)
-void
-AbcHandlers::AbcLessEquals()
-{
-	mStack.top(1) = mStack.top(1).less_equal(mStack.top(0));
-	mStack.drop(1);
-}
-
+	case SWF::ABC_ACTION_LESSEQUALS:
+	{
+		mStack.top(1) = mStack.top(1).less_equal(mStack.top(0));
+		mStack.drop(1);
+		break;
+	}
 /// 0xAF ABC_ACTION_GREATERTHAN
 /// Stack In:
 ///  b
 ///  a
 /// Stack Out:
 ///  truth -- Truth of (a > b)
-void
-AbcHandlers::AbcGreaterThan()
-{
-	mStack.top(1) = mStack.top(1).greater_than(mStack.top(0));
-	mStack.drop(1);
-}
-
+	case SWF::ABC_ACTION_GREATERTHAN:
+	{
+		mStack.top(1) = mStack.top(1).greater_than(mStack.top(0));
+		mStack.drop(1);
+		break;
+	}
 /// 0xB0 ABC_ACTION_GREATEREQUALS
 /// Stack In:
 ///  b
 ///  a
 /// Stack Out:
 ///  truth -- Truth of (a >= b)
-void
-AbcHandlers::AbcGreaterEquals()
-{
-	mStack.top(1) = mStack.top(1).greater_equal(mStack.top(0));
-	mStack.drop(1);
-}
-
+	case SWF::ABC_ACTION_GREATEREQUALS:
+	{
+		mStack.top(1) = mStack.top(1).greater_equal(mStack.top(0));
+		mStack.drop(1);
+		break;
+	}
 /// 0xB1 ABC_ACTION_INSTANCEOF
 /// Stack In:
 ///  super -- An object
 ///  val -- An object
 /// Stack Out:
 ///  truth -- Truth of "val is an instance of super"
-void
-AbcHandlers::AbcInstanceOf()
-{
-	if (mStack.top(1).is_null())
-		mStack.top(1) = false;
-	else // Calling to_object intentionally causes an exception if super is not an object.
-		mStack.top(1) = mStack.top(1).conforms_to(mStack.top(0).to_object());
-	mStack.drop(1);
-}
-
+	case SWF::ABC_ACTION_INSTANCEOF:
+	{
+		if (mStack.top(1).is_null())
+			mStack.top(1) = false;
+		else // Calling to_object intentionally causes an exception if super is not an object.
+			mStack.top(1) = mStack.top(1).conforms_to(mStack.top(0).to_object());
+		mStack.drop(1);
+		break;
+	}
 /// 0xB2 ABC_ACTION_ISTYPE
 /// Stream: V32 'name_id'
 /// Stack In:
+///  [ns] -- Namespace stuff
 ///  obj -- An object
 /// Stack Out:
 ///  truth -- Truth of "obj is of the type given in (resolve)'name_id'"
-void
-AbcHandlers::AbcIsType()
-{
-	uint32_t mindex = read_V32();
-	mStack.top(0).to_bool(mStack.top(0).conforms_to(pool_name(mindex)));
-}
-
+	case SWF::ABC_ACTION_ISTYPE:
+	{
+		asName a = read_V32();
+		completeName(a);
+		mStack.top(0).set_bool(mStack.top(0).conforms_to(a));
+	}
 /// 0xB3 ABC_ACTION_ISTYPELATE
 /// Stack In:
 ///  type -- A type to match
 ///  obj -- An object
 /// Stack Out:
 ///  truth -- Truth of "obj is of type"
-void
-AbcHandlers::AbcIsTypeLate()
-{
-	mStack.top(1).to_bool(mStack.top(1).conforms_to(mStack.top(0)));
-	mStack.drop(1);
-}
-
+	case SWF::ABC_ACTION_ISTYPELATE:
+	{
+		mStack.top(1).set_bool(mStack.top(1).conforms_to(mStack.top(0)));
+		mStack.drop(1);
+		break;
+	}
 /// 0xB4 ABC_ACTION_IN
 /// Stack In:
 ///  obj -- The object to search for it
@@ -1599,222 +1720,142 @@ AbcHandlers::AbcIsTypeLate()
 ///   Don't look in the namespace if obj is a dictionary.
 /// NB: Since there doesn't seem to be a way to make a dictionary, this
 /// is not done. If there is, fix this lack.
-void
-AbcHandlers::AbcIn()
-{
-	mStack.top(1).to_bool(mStack.top(1).to_object().contains(mStack.top(0)));
-	mStack.drop(1);
-}
-
+	case SWF::ABC_ACTION_IN:
+	{
+		mStack.top(1).set_bool(mStack.top(1).to_object().contains(mStack.top(0)));
+		mStack.drop(1);
+		break;
+	}
 /// 0xC0 ABC_ACTION_INCREMENT_I
 /// See: 0x91 (ABC_ACTION_INCREMENT), but forces types to int, not double
-void
-AbcHandlers::AbcIncrementI()
-{
-	mStack.top(0) = mStack.top(0).to_number<int>() + 1;
-}
-
+	case SWF::ABC_ACTION_INCREMENT_I:
+	{
+		mStack.top(0) = mStack.top(0).to_int() + 1;
+		break;
+	}
 /// 0xC1 ABC_ACTION_DECREMENT_I
 /// See: 0x93 (ABC_ACTION_DECREMENT), but forces types to int, not double
-void
-AbcHandlers::AbcDecrementI()
-{
-	mStack.top(0) = mStack.top(0).to_number<int>() - 1;
-}
-
+	case SWF::ABC_ACTION_DECREMENT_I:
+	{
+		mStack.top(0) = mStack.top(0).to_number<int>() - 1;
+		break;
+	}
 /// 0xC2 ABC_ACTION_INCLOCAL_I
 /// See: 0x92 (ABC_ACTION_INCLOCAL), but forces types to int, not double
-void
-AbcHandlers::AbcIncLocalI()
-{
-	uint32_t foff = read_V32();
-	mFrame.value(foff) = mFrame.value(foff).to_number<int>() + 1;
-}
-
+	case SWF::ABC_ACTION_INCLOCAL_I:
+	{
+		uint32_t foff = read_V32();
+		mFrame.value(foff) = mFrame.value(foff).to_number<int>() + 1;
+		break;
+	}
 /// 0xC3 ABC_ACTION_DECLOCAL_I
 /// See: 0x94 (ABC_ACTION_DECLOCAL), but forces types to int, not double
-void
-AbcHandlers::AbcDecLocalI()
-{
-	uint32_t foff = read_V32();
-	mFrame.value(foff) = mFrame.value(foff).to_number<int>() - 1;
-}
-
+	case SWF::ABC_ACTION_DECLOCAL_I:
+	{
+		uint32_t foff = read_V32();
+		mFrame.value(foff) = mFrame.value(foff).to_number<int>() - 1;
+		break;
+	}
 /// 0xC4 ABC_ACTION_NEGATE_I
 /// See: 0x90 (ABC_ACTION_NEGATE), but forces type to int, not double
-void
-AbcHandlers::AbcNegateI()
-{
-	mStack.top(0) = - mStack.top(0).to_number<int>();
-}
-
+	case SWF::ABC_ACTION_NEGATE_I:
+	{
+		mStack.top(0) = - mStack.top(0).to_number<int>();
+		break;
+	}
 /// 0xC5 ABC_ACTION_ADD_I
 /// See: 0xA0 (ABC_ACTION_ADD), but forces type to int
-void
-AbcHandlers::AbcAddI()
-{
-	mStack.top(1) = mStack.top(1).to_number<int>() + mStack.top(0).to_number<int>();
-	mStack.drop(1);
-}
-
+	case SWF::ABC_ACTION_ADD_I:
+	{
+		mStack.top(1) = mStack.top(1).to_number<int>() + mStack.top(0).to_number<int>();
+		mStack.drop(1);
+		break;
+	}
 /// 0xC6 ABC_ACTION_SUBTRACT_I
 /// See: 0xA1 (ABC_ACTION_SUBTRACT), but forces type to int
-void
-AbcHandlers::AbcSubtractI()
-{
-	mStack.top(1) = mStack.top(1).to_number<int>() - mStack.top(0).to_number<int>();
-	mStack.drop(1);
-}
-
+	case SWF::ABC_ACTION_SUBTRACT_I:
+	{
+		mStack.top(1) = mStack.top(1).to_number<int>() - mStack.top(0).to_number<int>();
+		mStack.drop(1);
+		break;
+	}
 /// 0xC7 ABC_ACTION_MULTIPLY_I
 /// See: 0xA2 (ABC_ACTION_MULTIPLY), but forces type to int
-void
-AbcHandlers::AbcMultiplyI()
-{
-	mStack.top(1) = mStack.top(0).to_number<int>() * mStack.top(1).to_number<int>();
-	mStack.drop(1);
-}
-
+	case SWF::ABC_ACTION_MULTIPLY_I:
+	{
+		mStack.top(1) = mStack.top(0).to_number<int>() * mStack.top(1).to_number<int>();
+		mStack.drop(1);
+		break;
+	}
 /// 0xD0 ABC_ACTION_GETLOCAL0
-/// Frame: Load frame[0] as val
-/// Stack Out:
-///  val
-void
-AbcHandlers::AbcGetLocal0()
-{
-	mStack.grow(1);
-	mStack.top(0) = mFrame.value(0);
-}
-
 /// 0xD1 ABC_ACTION_GETLOCAL1
-/// Frame: Load frame[1] as val
-/// Stack Out:
-///  val
-void
-AbcHandlers::AbcGetLocal1()
-{
-	mStack.grow(1);
-	mStack.top(0) = mFrame.value(1);
-}
-
 /// 0xD2 ABC_ACTION_GETLOCAL2
-/// Frame: Load frame[2] as val
-/// Stack Out:
-///  val
-void
-AbcHandlers::AbcGetLocal2()
-{
-	mStack.grow(1);
-	mStack.top(0) = mFrame.value(2);
-}
-
 /// 0xD3 ABC_ACTION_GETLOCAL3
-/// Frame: Load frame[3] as val
+/// Frame: Load frame[#] as val
 /// Stack Out:
 ///  val
-void
-AbcHandlers::AbcGetLocal3()
-{
-	mStack.grow(1);
-	mStack.top(0) = mFrame.value(3);
-}
-
+	case SWF::ABC_ACTION_GETLOCAL0:
+	case SWF::ABC_ACTION_GETLOCAL1:
+	case SWF::ABC_ACTION_GETLOCAL2:
+	case SWF::ABC_ACTION_GETLOCAL3:
+	{
+		mStack.grow(1);
+		mStack.top(0) = mFrame.value(opcode - SWF::ABC_ACTION_GETLOCAL0);
+		break;
+	}
 /// 0xD4 ABC_ACTION_SETLOCAL0
-/// Frame: Store val as frame[0]
-/// Stack In:
-///  val
-/// Stack Out:
-///  .
-void
-AbcHandlers::AbcSetLocal0()
-{
-	mFrame.value(0) = mStack.top(0);
-	mStack.drop(1);
-}
-
 /// 0xD5 ABC_ACTION_SETLOCAL1
-/// Frame: Store val as frame[1]
-/// Stack In:
-///  val
-/// Stack Out:
-///  .
-void
-AbcHandlers::AbcSetLocal1()
-{
-	mFrame.value(1) = mStack.top(0);
-	mStack.drop(1);
-}
-
 /// 0xD6 ABC_ACTION_SETLOCAL2
-/// Frame: Store val as frame[2]
-/// Stack In:
-///  val
-/// Stack Out:
-///  .
-void
-AbcHandlers::AbcSetLocal2()
-{
-	mFrame.value(2) = mStack.top(0);
-	mStack.drop(1);
-}
-
-/// Frame: Store val as frame[3]
-/// Stack In:
-///  val
-/// Stack Out:
-///  .
 /// 0xD7 ABC_ACTION_SETLOCAL3
-void
-AbcHandlers::AbcSetLocal3()
-{
-	mFrame.value(3) = mStack.top(0);
-	mStack.drop(1);
-}
+/// Frame: Store val as frame[#]
+/// Stack In:
+///  val
+/// Stack Out:
+///  .
+	case SWF::ABC_ACTION_SETLOCAL0:
+	case SWF::ABC_ACTION_SETLOCAL1:
+	case SWF::ABC_ACTION_SETLOCAL2:
+	case SWF::ABC_ACTION_SETLOCAL3:
+	{
+		mFrame.value(opcode - SWF::ABC_ACTION_SETLOCAL0) = mStack.top(0);
+		mStack.drop(1);
+		break;
+	}
 
 /// 0xEF ABC_ACTION_DEBUG
 /// Stream: 7 bytes of unknown stuff to be skipped
 /// Do: skip ahead 7 bytes in stream
-void
-AbcHandlers::AbcDebug()
-{
-	seekSkip(7);
-}
-
+	case SWF::ABC_ACTION_DEBUG:
+	{
+		seekSkip(7);
+		break;
+	}
 /// 0xF0 ABC_ACTION_DEBUGLINE
 /// Stream: V32 'line_number'
 /// Do: Nothing, but line_number is for the debugger if wanted.
-void
-AbcHandlers::AbcDebugline()
-{
-	skip_V32();
-	return;
-}
-
+	case SWF::ABC_ACTION_DEBUGLINE:
+	{
+		skip_V32();
+		break;
+	}
 /// 0xF1 ABC_ACTION_DEBUGFILE
 /// Stream: V32 'name_offset'
 /// Do: Nothing. 'name_offset' into string pool is the file name if wanted.
-void
-AbcHandlers::AbcDebugfile()
-{
-	skip_V32();
-	return;
-}
-
+	case SWF::ABC_ACTION_DEBUGFILE:
+	{
+		skip_V32();
+		break;
+	}
 /// 0xF2 ABC_ACTION_BKPTLINE
 /// Stream: V32 'line_number'
 /// Do: Enter debugger if present, line_number is the line number in source.
-void
-AbcHandlers::AbcBkptline()
-{
-	skip_V32();
-	return;
-}
-
-/// Do: Nothing.
-/// 0xF3 ABC_ACTION_TIMESTAMP
-void
-AbcHandlers::AbcTimestamp()
-{
-	return;
-}
+	case SWF::ABC_ACTION_BKPTLINE:
+	{
+		skip_V32();
+		break;
+	}
+	} // end of switch statement
+	
+	} // end of main loop
+} // end of execute function
 

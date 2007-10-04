@@ -1,3 +1,7 @@
+2007-10-04 Chad Musick <chadmusick@msbx.net>
+
+	* server/vm/AbcHandlers.cpp: More work on the main interpreter for AS3.
+
 2007-10-04 Sandro Santilli <strk@keybit.net>
 
 	* server/character.{cpp,h}: add destroy() and isDestroyed()
