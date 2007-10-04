@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.138 2007/10/03 09:26:31 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.139 2007/10/04 23:02:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1974,7 +1974,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 
 	// If the url starts with "FSCommand:", then this is
 	// a message for the host app.
-	if (strncmp(url_c, "FSCommand:", 10) == 0)
+	if (strncasecmp(url_c, "FSCommand:", 10) == 0)
 	{
 		if (s_fscommand_handler)
 		{

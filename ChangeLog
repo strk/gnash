@@ -1,5 +1,10 @@
 2007-10-05 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (CommonGetUrl): case-insensitive
+	  'fscommand' matching. 
+
+2007-10-05 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/action_buffer.{h,cpp}: add readFullTag method not
 	  bothering to check for an END opcode thus making read faster.
 	* server/swf/DoActionTag.h (read): use action_buffer::readFullTag.
