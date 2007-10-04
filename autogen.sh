@@ -113,7 +113,7 @@ if grep "^AC_PROG_LIBTOOL" configure.ac >/dev/null; then
 	    chmod a+w libltdl/config-h.in # Darwin needs this
           else
             echo
-            echo "**Error**: libtoolize failed, do you have libtool package installed?"
+            echo "**Error**: libtoolize failed, do you have libtool and libltdl3-dev packages installed?"
             exit 1
           fi
 	fi
