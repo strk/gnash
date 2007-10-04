@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderSimple.cpp,v 1.3 2007/10/04 09:37:50 tgc Exp $
+// $Id: AudioDecoderSimple.cpp,v 1.4 2007/10/04 11:25:31 tgc Exp $
 
 #include <boost/scoped_array.hpp>
 
@@ -60,52 +60,54 @@ private:
 
 	static void doSample(int n_bits, int& sample, int& stepsize_index, int raw_code)
 	{
-		assert(raw_code >= 0 && raw_code < (1 << n_bits));								
-																
-		static const int	HI_BIT = (1 << (n_bits - 1));								
-		int*	index_update_table = s_index_update_tables[n_bits - 2];							
-																
-		/* Core of ADPCM. */												
-																
-		int	code_mag = raw_code & (HI_BIT - 1);									
-		bool	code_sign_bit = (raw_code & HI_BIT) ? 1 : 0;								
-		int	mag = (code_mag << 1) + 1;	/* shift in LSB (they do this so that pos & neg zero are different)*/	
-																
-		int	stepsize = s_stepsize[stepsize_index];									
-																
-		/* Compute the new sample.  It's the predicted value			*/					
-		/* (i.e. the previous value), plus a delta.  The delta			*/					
-		/* comes from the code times the stepsize.  going for			*/					
-		/* something like: delta = stepsize * (code * 2 + 1) >> code_bits	*/					
-		int	delta = (stepsize * mag) >> (n_bits - 1);								
-		if (code_sign_bit) delta = -delta;										
-																
-		sample += delta;												
-		sample = iclamp(sample, -32768, 32767);										
-																
-		/* Update our stepsize index.  Use a lookup table. */								
-		stepsize_index += index_update_table[code_mag];									
-		stepsize_index = iclamp(stepsize_index, 0, STEPSIZE_CT - 1);							
+		assert(raw_code >= 0 && raw_code < (1 << n_bits));
+
+		static const int	HI_BIT = (1 << (n_bits - 1));
+		int*	index_update_table = s_index_update_tables[n_bits - 2];
+
+		/* Core of ADPCM. */
+
+		int	code_mag = raw_code & (HI_BIT - 1);
+		bool	code_sign_bit = (raw_code & HI_BIT) ? 1 : 0;
+		int	mag = (code_mag << 1) + 1;	/* shift in LSB (they do this so that pos & neg zero are different)*/
+
+		int	stepsize = s_stepsize[stepsize_index];
+
+		/* Compute the new sample.  It's the predicted value			*/
+		/* (i.e. the previous value), plus a delta.  The delta			*/
+		/* comes from the code times the stepsize.  going for			*/
+		/* something like: delta = stepsize * (code * 2 + 1) >> code_bits	*/
+		int	delta = (stepsize * mag) >> (n_bits - 1);
+		if (code_sign_bit) delta = -delta;
+
+		sample += delta;
+		sample = iclamp(sample, -32768, 32767);
+
+		/* Update our stepsize index.  Use a lookup table. */
+		stepsize_index += index_update_table[code_mag];
+		stepsize_index = iclamp(stepsize_index, 0, STEPSIZE_CT - 1);
 	}
 
-	/* Uncompress 4096 mono samples of ADPCM. */									
+	/* Uncompress 4096 mono samples of ADPCM. */
 	static uint32_t doMonoBlock(int16_t** out_data, int n_bits, BitsReader* in, int sample, int stepsize_index)
 	{
-		/* First sample doesn't need to be decompressed. */								
+		/* First sample doesn't need to be decompressed. */
 		uint32_t sample_count = 1;
-		*(*out_data)++ = (int16_t) sample;										
-																
-		while (sample_count++ <= 4096 && in->got_bits(n_bits))												
-		{														
-			int	raw_code = in->read_uint(n_bits);								
-			doSample(n_bits, sample, stepsize_index, raw_code);	/* sample & stepsize_index are in/out params */	
-			*(*out_data)++ = (int16_t) sample;									
+		*(*out_data)++ = (int16_t) sample;
+
+		while (sample_count < 4096 && in->got_bits(n_bits))
+		{
+			int	raw_code = in->read_uint(n_bits);
+			doSample(n_bits, sample, stepsize_index, raw_code);	/* sample & stepsize_index are in/out params */
+			*(*out_data)++ = (int16_t) sample;
+
+			sample_count++;
 		}	
-		return sample_count;													
+		return sample_count;
 	}
 
 
-	/* Uncompress 4096 stereo sample pairs of ADPCM. */									
+	/* Uncompress 4096 stereo sample pairs of ADPCM. */
 	static int doStereoBlock(
 			int16_t** out_data,	// in/out param
 			int n_bits,
@@ -116,20 +118,22 @@ private:
 			int right_stepsize_index
 			)
 	{
-		/* First samples don't need to be decompressed. */								
+		/* First samples don't need to be decompressed. */
 		uint32_t sample_count = 2;
-		*(*out_data)++ = (int16_t) left_sample;										
-		*(*out_data)++ = (int16_t) right_sample;										
-																
-		while (in->got_bits(n_bits*2) && sample_count++ <= 4096)
+		*(*out_data)++ = (int16_t) left_sample;
+		*(*out_data)++ = (int16_t) right_sample;
+
+		while (sample_count < 4096 && in->got_bits(n_bits*2))
 		{														
-			int	left_raw_code = in->read_uint(n_bits);								
-			doSample(n_bits, left_sample, left_stepsize_index, left_raw_code);					
-			*(*out_data)++ = (int16_t) left_sample;									
-																
-			int	right_raw_code = in->read_uint(n_bits);								
-			doSample(n_bits, right_sample, right_stepsize_index, right_raw_code);					
-			*(*out_data)++ = (int16_t) right_sample;									
+			int	left_raw_code = in->read_uint(n_bits);
+			doSample(n_bits, left_sample, left_stepsize_index, left_raw_code);
+			*(*out_data)++ = (int16_t) left_sample;
+
+			int	right_raw_code = in->read_uint(n_bits);
+			doSample(n_bits, right_sample, right_stepsize_index, right_raw_code);
+			*(*out_data)++ = (int16_t) right_sample;
+
+			sample_count++;
 		}
 		return sample_count;
 	}

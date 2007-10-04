@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: BitsReader.h,v 1.2 2007/10/04 09:37:49 tgc Exp $
+// $Id: BitsReader.h,v 1.3 2007/10/04 11:25:31 tgc Exp $
 
 #ifndef BITSREADER_H
 #define BITSREADER_H
@@ -139,9 +139,9 @@ public:
 		if ( usedBits ) advanceToNextByte();
 	}
 
+	/// Checks if the stream contains X bits
 	bool got_bits(uint32_t nbits)
 	{
-
 		uint32_t gotbits = 8-usedBits +8*(end-ptr-1);
 		if (gotbits > nbits) return true;
 		else return false;
