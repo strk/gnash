@@ -165,7 +165,16 @@ movie_root::setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movi
 		(int) movie->get_movie_definition()->get_height_pixels());
 
 	/// Notify placement 
-	movie->stagePlacementCallback();
+	try
+	{
+		movie->stagePlacementCallback();
+	}
+	catch (ActionLimitException& al)
+	{
+		log_error(_("ActionLimits hit: %s"), al.what());
+		disableScripts();
+		clearActionQueue();
+	}
 
 	assert(testInvariant());
 }
@@ -700,7 +709,11 @@ movie_root::advance(float delta_time)
 {
 	// GNASH_REPORT_FUNCTION;
 
+	try
+	{
+
 	// Execute expired timers
+	// NOTE: can throw ActionLimitException
 	executeTimers();
 
 #ifndef NEW_KEY_LISTENER_LIST_DESIGN
@@ -716,12 +729,24 @@ movie_root::advance(float delta_time)
 			
 	// Advance all non-unloaded characters in the LiveChars list
 	// in reverse order (last added, first advanced)
-	advanceLiveChars(delta_time);
+	// NOTE: can throw ActionLimitException
+	advanceLiveChars(delta_time); 
 
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
 	cleanup_key_listeners();
 #endif
+
+	// Process queued actions
+	// NOTE: can throw ActionLimitException
 	processActionQueue();
+
+	}
+	catch (ActionLimitException& al)
+	{
+		log_error(_("ActionLimits hit: %s"), al.what());
+		disableScripts();
+		clearActionQueue();
+	}
 
 	// Delete characters removed from the stage
 	// from the display lists
