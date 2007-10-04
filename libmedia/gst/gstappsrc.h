@@ -17,7 +17,7 @@
  * Boston, MA 02111-1307, USA.
  */
 
-// Id:
+/* $Id: gstappsrc.h,v 1.3 2007/10/04 09:37:50 tgc Exp $ */
 
 #ifndef _GST_APP_SRC_H_
 #define _GST_APP_SRC_H_

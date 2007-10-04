@@ -17,6 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+// $Id: AudioDecoderSimple.cpp,v 1.3 2007/10/04 09:37:50 tgc Exp $
+
 #include <boost/scoped_array.hpp>
 
 #include "AudioDecoderSimple.h"

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// Id:
+// $Id: sound_handler_gst.h,v 1.3 2007/10/04 09:37:50 tgc Exp $
 
 #ifndef SOUND_HANDLER_GST_H
 #define SOUND_HANDLER_GST_H

@@ -18,7 +18,7 @@
 // 
 //
 
-// $Id:
+// $Id: SoundInfo.h,v 1.2 2007/10/04 09:37:50 tgc Exp $
 
 #ifndef __SOUNDINFO_H__
 #define __SOUNDINFO_H__

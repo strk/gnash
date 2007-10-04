@@ -17,6 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+// $Id: BitsReader.cpp,v 1.2 2007/10/04 09:37:49 tgc Exp $
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

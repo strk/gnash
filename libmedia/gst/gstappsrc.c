@@ -17,7 +17,7 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* Id: */
+/* $Id: gstappsrc.c,v 1.3 2007/10/04 09:37:50 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

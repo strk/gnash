@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-
+// $Id: BitsReader.h,v 1.2 2007/10/04 09:37:49 tgc Exp $
 
 #ifndef BITSREADER_H
 #define BITSREADER_H
