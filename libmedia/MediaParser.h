@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaParser.h,v 1.4 2007/10/04 09:37:50 tgc Exp $
+// $Id: MediaParser.h,v 1.5 2007/10/04 16:12:42 strk Exp $
 
 #ifndef __MEDIAPARSER_H__
 #define __MEDIAPARSER_H__
@@ -28,8 +28,12 @@
 #include "tu_file.h"
 
 #ifdef USE_FFMPEG
-#include <ffmpeg/avcodec.h>
-#endif
+extern "C" 
+{
+	#include <ffmpeg/avcodec.h>
+}
+#endif // USE_FFMPEG
+
 namespace gnash {
 
 /// The type of the codec id passed in the AudioInfo or VideoInfo class

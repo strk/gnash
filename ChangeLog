@@ -1,3 +1,8 @@
+2007-10-04 Aleksey Lim <alsroot@member.fsf.org>
+
+	* libmedia/MediaParser.h: wrap avcodec.h include in extern "C"
+	  namespace.
+
 2007-10-04 Sandro Santilli <strk@keybit.net>
 
 	* server/as_value.{cpp,h}: use a new SpriteProxy class for 
