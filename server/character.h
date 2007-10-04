@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.97 2007/09/27 23:06:56 strk Exp $ */
+/* $Id: character.h,v 1.98 2007/10/04 09:47:36 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -142,6 +142,9 @@ private:
 
 	/// Set to yes when this instance has been unloaded
 	bool _unloaded;
+
+	/// This flag should be set to true by a call to destroy()
+	bool _destroyed;
 
 	/// Build the _target member recursive on parent
 	std::string computeTargetPath() const;
@@ -393,6 +396,7 @@ public:
 	m_display_callback(NULL),
 	m_display_callback_user_ptr(NULL),
 	_unloaded(false),
+	_destroyed(false),
 	m_visible(true),
 	m_parent(parent),
 	m_invalidated(true),
@@ -1028,6 +1032,26 @@ public:
 	virtual bool unload();
 
 	bool isUnloaded() { return _unloaded; }
+
+	/// Mark this character as destroyed
+	//
+	/// A character should be destroyed when is removed from the display
+	/// list and is not more needed for names (target) resolutions.
+	/// Sprites are needed for names resolution whenever themselves
+	/// or a contained object has an onUnload event handler defined, 
+	/// in which case we want the event handler to find the 'this'
+	/// variable w/out attempting to rebind it.
+	///
+	/// Note: this function can safely release most memory associated
+	///       with the character as it will not be needed anymore.
+	///
+	virtual void destroy();
+
+	/// Return true if this character was destroyed.
+	//
+	/// See destroy() for more info.
+	///
+	bool isDestroyed() const { return _destroyed; }
 	
 public: // istn't this 'public' reduntant ?
 

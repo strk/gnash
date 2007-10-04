@@ -397,6 +397,22 @@ public:
 	/// See character::unload for more info
 	bool unload();
 
+	/// Mark this sprite as destroyed
+	//
+	/// This is an override of character::destroy()
+	///
+	/// A sprite should be destroyed when is removed from the display
+	/// list and is not more needed for names (target) resolutions.
+	/// Sprites are needed for names resolution whenever themselves
+	/// or a contained object has an onUnload event handler defined, 
+	/// in which case we want the event handler to find the 'this'
+	/// variable w/out attempting to rebind it.
+	///
+	/// Note: this function will release most memory associated with
+	/// the sprite as no members or drawable should be needed anymore.
+	///
+	void destroy();
+
 	/// See DisplayList::move_display_object, this method is just a proxy to that...
 	//
 	/// @param color_xform

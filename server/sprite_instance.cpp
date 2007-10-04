@@ -1709,6 +1709,7 @@ sprite_instance::sprite_instance(
 	m_has_mouse_event(false),
 	_text_variables(),
 	m_sound_stream_id(-1),
+	_origTarget(),
 	m_def(def)
 {
 	assert(m_def != NULL);
@@ -1729,6 +1730,8 @@ sprite_instance::sprite_instance(
 
 sprite_instance::~sprite_instance()
 {
+	// We might have been deleted by Quit... 
+	//assert(isDestroyed());
 
 	if (m_has_key_event)
 	{
@@ -3448,8 +3451,11 @@ sprite_instance::unload()
 	//       it would require _drawable_inst to possibly be NULL,
 	//       which wouldn't be bad at all actually...
 
-	return character::unload() || childHaveUnloadHandler;
+	bool selfHaveUnloadHandler = character::unload();
 
+	bool shouldKeepAlive =  ( selfHaveUnloadHandler || childHaveUnloadHandler );
+
+	return shouldKeepAlive;
 }
 
 void
@@ -3774,5 +3780,14 @@ sprite_instance::markReachableResources() const
 
 }
 #endif // GNASH_USE_GC
+
+void
+sprite_instance::destroy()
+{
+	/// We don't need these anymore
+	clearProperties();
+
+	character::destroy();
+}
 
 } // namespace gnash

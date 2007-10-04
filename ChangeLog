@@ -1,3 +1,13 @@
+2007-10-04 Sandro Santilli <strk@keybit.net>
+
+	* server/character.{cpp,h}: add destroy() and isDestroyed()
+	  members. Will surely help with soft references and hopefully
+	  with opcode guarding too.
+	* server/movie_root.cpp (cleanupDisplayList): call destroy()
+	  on unloaded but still not destroyed characters.
+	* server/sprite_instance.{cpp,h}: override destroy() to remove
+	  properties.
+
 2007-10-04 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* libmedia/gst/gstappsink.{c,h}: Updated to match latest gstreamer cvs.

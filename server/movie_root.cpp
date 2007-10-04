@@ -1296,7 +1296,23 @@ movie_root::cleanupDisplayList()
 #endif
 
 	// Remove unloaded characters from the _liveChars list
-	_liveChars.remove_if(boost::bind(&character::isUnloaded, _1));
+	for (LiveChars::iterator i=_liveChars.begin(), e=_liveChars.end(); i!=e;)
+	{
+		AdvanceableCharacter ch = *i;
+		if ( ch->isUnloaded() )
+		{
+			// the sprite might have been destroyed already
+			// by effect of an unload() call with no onUnload
+			// handlers available either in self or child
+			// characters
+			if ( ! ch->isDestroyed() ) ch->destroy();
+			i = _liveChars.erase(i);
+		}
+		else
+		{
+			++i;
+		}
+	}
 
 #ifdef GNASH_DEBUG_INSTANCE_LIST
 	if ( _liveChars.size() > maxLiveChars )

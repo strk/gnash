@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.57 2007/09/27 23:06:56 strk Exp $ */
+/* $Id: character.cpp,v 1.58 2007/10/04 09:47:36 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -895,6 +895,19 @@ character::get_text_value() const
 	return getTarget();
 }
 #endif
+
+void
+character::destroy()
+{
+	/// We can't be destroyed w/out being unloaded first, right ?
+	/// we may change this in the future...
+	assert(isUnloaded());
+
+	/// We don't destroy ourself twice, right ?
+	assert(!_destroyed);
+
+	_destroyed = true;
+}
 
 
 } // namespace gnash
