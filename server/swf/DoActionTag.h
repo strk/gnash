@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: DoActionTag.h,v 1.5 2007/09/17 23:33:18 strk Exp $ */
+/* $Id: DoActionTag.h,v 1.6 2007/10/04 22:55:53 strk Exp $ */
 
 #ifndef GNASH_SWF_DOACTIONTAG_H
 #define GNASH_SWF_DOACTIONTAG_H
@@ -60,7 +60,7 @@ public:
 	//
 	void read(stream* in)
 	{
-	    m_buf.read(in);
+	    m_buf.readFullTag(in);
 	}
 
 	virtual void execute(sprite_instance* m) const

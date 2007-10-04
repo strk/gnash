@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: action_buffer.cpp,v 1.24 2007/10/04 22:05:00 strk Exp $ */
+/* $Id: action_buffer.cpp,v 1.25 2007/10/04 22:55:53 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -55,18 +55,56 @@ action_buffer::action_buffer()
 //	printf("Action buffer %d created\n", ++count);
 }
 
+void
+action_buffer::readFullTag(stream* in)
+{
+	unsigned long endPos = in->get_tag_end_position();
+	unsigned long startPos = in->get_position();
+	unsigned size = endPos-startPos;
+
+	// Allocate the buffer
+	// 
+	// NOTE: a .reserve would be fine here, except GLIBCPP_DEBUG will complain...
+	//
+	m_buffer.resize(size);
+	unsigned char* buf = &m_buffer.front();
+
+	// Read all the bytes in the buffer
+	//
+	// NOTE:
+	// we might be reading more data then we'll actually
+	// use here if the SWF contains Action blocks padded
+	// with data after the terminating END.
+	// This has a cost in memory use, but for the normal
+	// case (non-malformed SWF) not looking for an END
+	// tag should give significant speedup in parsing
+	// large action-based movies.
+	//
+	in->read(reinterpret_cast<char*>(buf), size);
+
+	// Consistency checks here
+	//
+	// NOTE: it is common to find such movies, swfmill is known to write
+	//       DoAction w/out the terminating END tag
+	//
+	IF_VERBOSE_MALFORMED_SWF(
+	if ( m_buffer.back() != SWF::ACTION_END )
+	{
+		log_swferror(_("Action buffer starting at offset %lu doesn't end witn an END tag"),
+			startPos);
+	}
+	);
+}
 
 void
 action_buffer::read(stream* in)
 {
     // NOTE:
-    // This method is called for different tags, not only DOACTION.
-    // For DoAction we have to read all the tag, in which case we 
-    // can optimize the read to a single memcpy.
-    // For other tags (like button actions) we have to seek for an END
-    // tag.
-    // TODO: implement two different 'read' flavors to make parsing more
-    // performant and SWF consistency checking more effective
+    // This method is called for tags like button actions, 
+    // where we don't know the size of the action block in advance
+    // and are thus forced to seek for an END opcode.
+    // For DoAction and DoInitAction you can use the readFullTag method
+    // instead, which is faster.
 
     // Read action bytes.
     unsigned long endPos = in->get_tag_end_position();

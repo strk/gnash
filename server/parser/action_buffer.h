@@ -59,8 +59,11 @@ public:
 
 	action_buffer();
 
-	/// Read action bytes from input stream
+	/// Read action bytes from input stream up to an SWF::ACTION_END or end of tag
 	void	read(stream* in);
+
+	/// Read action bytes from input stream up to end of tag
+	void	readFullTag(stream* in);
 
 #if 0
 	/// \brief
