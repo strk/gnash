@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: action_buffer.cpp,v 1.23 2007/09/27 06:46:32 strk Exp $ */
+/* $Id: action_buffer.cpp,v 1.24 2007/10/04 22:05:00 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -59,24 +59,32 @@ action_buffer::action_buffer()
 void
 action_buffer::read(stream* in)
 {
+    // NOTE:
+    // This method is called for different tags, not only DOACTION.
+    // For DoAction we have to read all the tag, in which case we 
+    // can optimize the read to a single memcpy.
+    // For other tags (like button actions) we have to seek for an END
+    // tag.
+    // TODO: implement two different 'read' flavors to make parsing more
+    // performant and SWF consistency checking more effective
+
     // Read action bytes.
-    for (;;) {
+    unsigned long endPos = in->get_tag_end_position();
+    while ( in->get_position() < endPos )
+    {
 #if 0
 	size_t instruction_start = m_buffer.size();
 	size_t pc = m_buffer.size();
 #endif
 
-	in->ensureBytes(1); // action_id
 	uint8_t action_id = in->read_u8();
 	m_buffer.push_back(action_id);
 	
 	if (action_id & 0x80) {
 	    // Action contains extra data.  Read it.
-	    in->ensureBytes(2); // action length
 	    uint16_t length = in->read_u16();
 	    m_buffer.push_back(length & 0x0FF);
 	    m_buffer.push_back((length >> 8) & 0x0FF);
-	    in->ensureBytes(length); // action actions 
 	    for (uint16_t i = 0; i < length; i++) {
 		uint8_t b = in->read_u8(); // bytes ensured outside loop
 		m_buffer.push_back(b);
