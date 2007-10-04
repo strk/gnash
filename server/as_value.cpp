@@ -507,7 +507,7 @@ as_value::to_sprite() const
 	sprite_instance* sp = getSprite();
 	if ( ! sp ) return NULL; // shoudl we assert(sp) instead ?
 
-	if ( sp->isUnloaded() )
+	if ( sp->isDestroyed() )
 	// TODO: we should also check if the unload event handlers have been invoked or not, or references to 'this' in unload handlers will be bogus !
 	{
 		log_debug(_("MovieClip value is a dangling reference: "
@@ -919,7 +919,8 @@ as_value::to_debug_string() const
 		{
 			sprite_instance* sp = getSprite();
 			assert(sp); // will change in case we'll have better management :)
-			snprintf(buf, 511, "[%smovieclip(%s):%p]", sp->isUnloaded() ? "dangling " : "", sp->getOrigTarget().c_str(), (void *)sp);
+			//snprintf(buf, 511, "[%smovieclip(%s):%p]", sp->isUnloaded() ? "dangling " : "", sp->getOrigTarget().c_str(), (void *)sp);
+			snprintf(buf, 511, "[%smovieclip(%s):%p]", sp->isDestroyed() ? "dangling " : "", sp->getOrigTarget().c_str(), (void *)sp);
 			buf[511] = '\0';
 			return buf;
 		}

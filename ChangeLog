@@ -1,5 +1,12 @@
 2007-10-04 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.cpp (to_sprite, to_debug_string): use isDestroyed()
+	  instead of isUnloaded() to trigger "dangliness" of a soft reference.
+	* testsuite/actionscript.all/MovieClip.as: the two new tests about
+	  soft references succeed now.
+
+2007-10-04 Sandro Santilli <strk@keybit.net>
+
 	* server/dlist.{cpp,h}: remove unused functions, call destroy()
 	  on characters whos unload() returned false.
 	* server/sprite_instance.cpp (dtor): remove useless call to

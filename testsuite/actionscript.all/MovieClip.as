@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.95 2007/10/04 08:18:12 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.96 2007/10/04 12:16:50 strk Exp $";
 
 #include "check.as"
 
@@ -662,8 +662,8 @@ check_equals(hardref5._target, "/hardref5");
 check_equals(hardref5.member, "hardref5@60");
 // Gnash fails because it's "unload" event triggering rebinding
 // rather then "destroy" event (unsupported in Gnash).
-xcheck_equals(sr59.getDepth(), -32828);
-xcheck_equals(sr59.member, "hardref5@59");
+check_equals(sr59.getDepth(), -32828);
+check_equals(sr59.member, "hardref5@59");
 check_equals(sr59._target, "/hardref5");
 check_equals(sr60.getDepth(), -32829);
 check_equals(sr60._target, "/hardref5");
