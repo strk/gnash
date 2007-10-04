@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id:
+// $Id: AudioDecoderMad.cpp,v 1.3 2007/10/04 09:41:46 tgc Exp $
 
 #include "AudioDecoderMad.h"
 #include "utility.h"

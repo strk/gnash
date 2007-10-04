@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id:
+// $Id: MediaParserFfmpeg.cpp,v 1.3 2007/10/04 09:41:46 tgc Exp $
 
 #include "MediaParserFfmpeg.h"
 #include "log.h"
