@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.139 2007/10/04 23:02:35 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.140 2007/10/05 00:01:38 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1803,16 +1803,27 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 			{
 				uint8_t reg = code[3 + i];
 				++i;
-				if ( thread.isFunction2() && reg < env.num_local_registers() )
+				if ( thread.isFunction2() && env.num_local_registers() )
 				{
-					env.push(env.local_register(reg));
+					if ( reg < env.num_local_registers() )
+					{
+						env.push(env.local_register(reg));
+					}
+					else
+					{
+						env.push(as_value());
+						IF_VERBOSE_MALFORMED_SWF(
+						log_swferror(_("register %d "
+							"out of local registers bounds (0.."SIZET_FMT")!"), reg, env.num_local_registers());
+						);
+					}
 				}
 				else if (reg >= 4)
 				{
 					env.push(as_value());
 					IF_VERBOSE_MALFORMED_SWF(
 					log_swferror(_("register %d "
-						"out of bounds"), reg);
+						"out of global registers bounds"), reg);
 					);
 				}
 				else
@@ -3834,14 +3845,23 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
 	uint8_t reg = code[thread.pc + 3];
 
 	// Save top of stack in specified register.
-	if ( thread.isFunction2() && reg < env.num_local_registers() )
+	if ( thread.isFunction2() && env.num_local_registers() )
 	{
-		env.local_register(reg) = env.top(0);
+		if ( reg < env.num_local_registers() )
+		{
+			env.local_register(reg) = env.top(0);
 
-		IF_VERBOSE_ACTION (
-		log_action(_("-------------- local register[%d] = '%s'"),
-			reg, env.top(0).to_debug_string().c_str());
-		);
+			IF_VERBOSE_ACTION (
+			log_action(_("-------------- local register[%d] = '%s'"),
+				reg, env.top(0).to_debug_string().c_str());
+			);
+		}
+		else
+		{
+			IF_VERBOSE_MALFORMED_SWF(
+			log_swferror(_("store_register[%d] -- register out of local registers bounds (0.." SIZET_FMT ")!"), reg, env.num_local_registers());
+			);
+		}
 	}
 	else if (reg < 4)
 	{
@@ -3856,7 +3876,7 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
 	else
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_("store_register[%d] -- register out of bounds!"), reg);
+		log_swferror(_("store_register[%d] -- register out of global registers bounds!"), reg);
 		);
 	}
 

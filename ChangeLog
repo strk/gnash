@@ -1,5 +1,13 @@
 2007-10-05 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionSetRegister, ActionPushData):
+	  Don't use global registers in a function2 context with local
+	  registers.
+	* testsuite/swfdec/PASSING: success for register-count.swf and
+	  definefunction2-registers-#.swf
+
+2007-10-05 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ASHandlers.cpp (CommonGetUrl): case-insensitive
 	  'fscommand' matching. 
 
