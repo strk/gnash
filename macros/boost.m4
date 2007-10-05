@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.59 2007/09/25 19:05:49 nihilus Exp $
+dnl $Id: boost.m4,v 1.60 2007/10/05 18:34:57 rsavoye Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -22,69 +22,81 @@ dnl regex, serialization, signals, unit test, thead, and wave.
 
 AC_DEFUN([GNASH_PATH_BOOST],
 [
+  dnl start variables with a known value
+  gnash_boost_version=""
+  gnash_boost_topdir=""
+  gnash_boost_libdir=""
+  missing_headers=""
+  missing_libs=""
+  gcc_version=""
+  dirname=""
+  libname=""
+  dnl this is a list of *required* headers. If any of these are missing, this
+  dnl test will return a failure, and Gnash won't build.
+  boost_headers="detail/lightweight_mutex.hpp thread/thread.hpp multi_index_container.hpp multi_index/key_extractors.hpp thread/mutex.hpp"
+  dnl this is a list of *required* libraries. If any of these are missing, this
+  dnl test will return a failure, and Gnash won't build.
+  boost_libs="thread date_time serialization foobar"
+
+  dnl this is the default list for paths to search. This gets
+  dnl redefined if --with-boost-incl= is specified.
+  newlist=$incllist
+
   dnl Lool for the header
   AC_ARG_WITH(boost_incl, AC_HELP_STRING([--with-boost-incl], [directory where boost headers are]), with_boost_incl=${withval})
-  AC_CACHE_VAL(ac_cv_path_boost_incl, [
-    if test x"${with_boost_incl}" != x ; then
-      if test -f ${with_boost_incl}/boost/thread.hpp ; then
-        ac_cv_path_boost_incl=-I`(cd ${with_boost_incl}; pwd)`
-      else
-        AC_MSG_ERROR([${with_boost_incl} directory doesn't contain boost/thread.hpp])
-      fi
-    fi
-  ])
-
-  dnl Attempt to find the top level directory, which unfortunately has a
-  dnl version number attached. At least on Debian based systems, this
-  dnl doesn't seem to get a directory that is unversioned.
-  AC_MSG_CHECKING([for the Boost Version])
-  if test x$cross_compiling = xno; then
-    if test x"$PKG_CONFIG" != x; then
-      $PKG_CONFIG --exists boost && gnash_boost_version=`$PKG_CONFIG --modversion boost | cut -d "." -f 1 | awk '{print $'0'".0"}'`
-    fi
-  fi
-
-  if test x"${gnash_boost_version}" = x; then
-    gnash_boost_topdir=""
-    gnash_boost_version=""
-    for i in $incllist; do
-      for j in `ls -dr $i/boost* 2>/dev/null`; do
-	
-	dnl Fix for packaging systems not adding extra fluff to the path-name.
-	i=`dirname ${j}`
-        
-	if test -f ${j}/boost/detail/lightweight_mutex.hpp -a -f ${j}/boost/thread.hpp -a -f ${j}/boost/multi_index_container.hpp -a -f ${j}/boost/multi_index/key_extractors.hpp ; then
-	  gnash_boost_topdir=`basename $j`
-	  ac_cv_path_boost_incl="-I${j}"
-	  break;
-	elif test -f ${i}/boost/detail/lightweight_mutex.hpp -a -f ${i}/boost/thread.hpp -a -f ${i}/boost/multi_index_container.hpp -a -f ${i}/boost/multi_index/key_extractors.hpp ; then
-          ac_cv_path_boost_incl="-I${i}"
-          break
-        fi
-      done
-      if test x$gnash_boost_topdir != x; then
-        gnash_boost_version=`echo ${gnash_boost_topdir} | sed -e 's:boost-::'`
-        break;
-      fi
-    done
-  fi
-
-  if test x"${gnash_boost_version}" = x; then
-    AC_MSG_RESULT([no version found/needed])
-  else
-   AC_MSG_RESULT(${gnash_boost_version})
+  if test x"${with_boost_incl}" != x ; then
+    gnash_boost_topdir=`(cd ${with_boost_incl}; pwd)`
+    gnash_boost_version=`echo ${gnash_boost_topdir} | sed -e 's:.*boost-::'`
+    newlist=${gnash_boost_topdir}
   fi
 
   AC_MSG_CHECKING([for boost header])
-  AC_MSG_RESULT(${ac_cv_path_boost_incl})
+  dnl munge the GCC version number, which Boost uses to label it's libraries.
+  gcc_version=`${CXX} --version | head -1 | cut -d ' ' -f 3 | cut -d '.' -f 1-2 | tr -d '.'`
+
+  if test x"${gnash_boost_topdir}" = x; then
+    dnl Attempt to find the top level directory, which unfortunately has a
+    dnl version number attached. At least on Debian based systems, this
+    dnl doesn't seem to get a directory that is unversioned.
+    AC_MSG_CHECKING([for the Boost Version])
+    if test x$cross_compiling = xno; then
+      if test x"$PKG_CONFIG" != x; then
+        $PKG_CONFIG --exists boost && gnash_boost_version=`$PKG_CONFIG --modversion boost | cut -d "." -f 1 | awk '{print $'0'".0"}'`
+      fi
+    fi
+  fi
+
+  for i in $newlist; do
+    dirs=`ls -dr $i/boost* 2>/dev/null`
+    if test -n "${dirs}"; then
+      gnash_boost_topdir=`(cd ${dirs}; pwd)`
+      gnash_boost_version=`echo ${gnash_boost_topdir} | sed -e 's:boost-::'`
+      dnl Fix for packaging systems not adding extra fluff to the path-name.
+      for k in ${boost_headers}; do
+       if test ! -f ${gnash_boost_topdir}/boost/$k ; then
+          missing_headers="${missing_headers} $k"
+        fi
+      done
+      if test x"${missing_headers}" = x ; then          
+        ac_cv_path_boost_incl="-I${gnash_boost_topdir}"
+        AC_MSG_RESULT(${ac_cv_path_boost_incl})
+        break
+      else
+        AC_MSG_RESULT([You need to install ${missing_headers}])
+      fi
+    fi
+  done
+
+  dnl this is the default list for paths to search. This gets
+  dnl redefined if --with-boost-lib= is specified.
+  newlist=$libslist
 
   dnl Look for the library
   AC_ARG_WITH(boost_lib, AC_HELP_STRING([--with-boost-lib], [directory where boost libraries are]), with_boost_lib=${withval})
-  AC_CACHE_VAL(ac_cv_path_boost_lib, [
-    if test x"${with_boost_lib}" != x ; then
-      ac_cv_path_boost_lib="-L`(cd ${with_boost_lib}; pwd)`"
-    fi
-  ])
+  if test x"${with_boost_lib}" != x ; then
+    gnash_boost_libdir=`(cd ${with_boost_lib}; pwd)`
+    newlist="${gnash_boost_libdir}"
+  fi
 
   dnl Specify the list of probable names. Boost creates 8 identical
   dnl libraries with different names. The prefered order is to always
@@ -93,72 +105,44 @@ AC_DEFUN([GNASH_PATH_BOOST],
   dnl version compiled with GCC instead of the native
   dnl compiler. Finally look for the library without any qualitfying
   dnl attributes.
-  boost_date_time="no"
-  boost_thread="no"
-  boost_serialization="no"
-  AC_MSG_CHECKING([for Boost libraries])
-  for i in $libslist; do
-    if test x${boost_date_time} = xyes -a x${boost_thread} = xyes -a x${boost_serialization} = xyes; then
-      break;
-    fi
-    dirs=`ls -dr $i/libboost_date_time*.${shlibext} $i/libboost_date_time*.${shlibext}.* $i/libboost_date_time*.a 2>/dev/null`
-    for libname in $dirs; do
-      if test x"${boost_date_time}" = xno; then
-        lfile=`basename ${libname} | eval sed -e 's:^lib::' -e 's:.a$::' -e 's:\.${shlibext}.*::'`
-        ldir=`dirname ${libname}`
-        if test -f ${ldir}/lib${lfile}-mt.${shlibext}; then
-          lfile="${lfile}-mt"
-        fi
-        boost_date_time=yes
-	      if test x"${ldir}" != "x/usr/lib"; then
-        	ac_cv_path_boost_lib="-L${ldir} -l${lfile}"
-	      else
-        	ac_cv_path_boost_lib="-l${lfile}"
-	      fi
+  if test x${ac_cv_path_boost_lib} = x; then
+    AC_MSG_CHECKING([for Boost libraries])
+    for i in $newlist; do
+      if test x"${ac_cv_path_boost_lib}" != x; then
         break
       else
-        break
+        missing_libs=""
       fi
+      for j in ${boost_libs}; do
+        dirs=`ls -dr $i/libboost_${j}*.${shlibext} $i/libboost_${j}*.a 2>/dev/null`
+        if test -n "${dirs}"; then
+          libname=`echo ${dirs} | sed -e 's:\..*$::' -e 's:^.*/lib::'`
+          if test x$dirname = x; then
+            dirname=`echo ${dirs} | sed -e 's:/libboost.*$::'`
+           if test x"${dirname}" != "x/usr/lib"; then
+      	      ac_cv_path_boost_lib="-L${dirname}"
+            fi
+          fi
+          ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${libname}"
+        else
+          missing_libs="${missing_libs} $j"
+        fi
+      done
     done
+  fi
 
-    dnl now look for the Boost Thread library
-    dirs=`ls -dr $i/libboost_thread*.${shlibext} $i/libboost_thread*.${shlibext}.* $i/libboost_thread*.a 2>/dev/null`
-    for libname in $dirs; do
-      if test x"${boost_thread}" = xno; then
-        lfile=`basename ${libname} | eval sed -e 's:^lib::'  -e 's:.a$::' -e 's:\.${shlibext}.*::'`
-        ldir=`dirname ${libname}`
-        if test -f ${ldir}/lib${lfile}-mt.${shlibext}; then
-          lfile="${lfile}-mt"
-        fi
-        boost_thread=yes
-        ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${lfile}"
-        break
-      else
-        break
-      fi
-    done
-
-    dnl now look for the Boost Serialization library
-    dirs=`ls -dr $i/libboost_serialization*.${shlibext} $i/libboost_serialization*.${shlibext}.* $i/libboost_serialization*.a 2>/dev/null`
-    for libname in $dirs; do
-      if test x"${boost_serialization}" = xno; then
-        lfile=`basename ${libname} | eval sed -e 's:^lib::'  -e 's:.a$::' -e 's:\.${shlibext}.*::'`
-        ldir=`dirname ${libname}`
-        if test -f ${ldir}/lib${lfile}-mt.${shlibext}; then
-          lfile="${lfile}-mt"
-        fi
-        boost_serialization=yes
-        ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${lfile}"
-        break
-      else
-        break
-      fi
-    done
-  done
+  if test x"${missing_libs}" != x ; then
+    AC_MSG_ERROR([Libraries ${missing_libs} aren't installed ])
+  fi
   AC_MSG_RESULT(${ac_cv_path_boost_lib})
 
-  BOOST_CFLAGS="$ac_cv_path_boost_incl"
-  BOOST_LIBS="$ac_cv_path_boost_lib" 
+  if test x"${missing_headers}" != x; then
+    BOOST_CFLAGS="$ac_cv_path_boost_incl"
+  fi
+
+  if test x"${missing_libs}" != x; then
+    BOOST_LIBS="$ac_cv_path_boost_lib" 
+  fi
 
   dnl ------------------------------------------------------------------
   dnl Set HAVE_BOOST conditional, BOOST_CFLAGS and BOOST_LIBS variables
@@ -170,7 +154,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   # This isn't right: you don't need boot date-time installed unless u build
   # cygnal, and it is sometimes a separate package from Boost core and thread.
   # TODO: why is this needed, lack of boost being a fatal error?
-  AM_CONDITIONAL(HAVE_BOOST, [test x${boost_date_time} = xyes && test x${boost_thread} = xyes && test x${boost_serialization} = xyes])
+  AM_CONDITIONAL(HAVE_BOOST, [test -n "${BOOST_LIBS}"])
 ])
 
 # Local Variables:

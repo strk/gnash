@@ -1,3 +1,9 @@
+2007-10-05  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* macros/boost.m4: Makwe the --with-options work correctly. Recode
+	how all the directories, headers, and libraries get found, or
+	configure fails to find any dependant file.
+
 2007-10-06 Chad Musick <chadmusick@msbx.net>
 	* server/vm/Machine.h: More comments about functions, some
 	  signature corrections.
@@ -3056,7 +3062,7 @@
 2007-08-23 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libamf/amf.cpp: memcpy -> strncpy, since it does a memory 
-	access violation on Darwin (and porbably other OSes).
+	access violation on Darwin (and probably other OSes).
 
 2007-08-23 Sandro Santilli <strk@keybit.net>
 
