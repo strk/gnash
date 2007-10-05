@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.427 2007/10/05 20:59:38 rsavoye Exp $
+dnl $Id: configure.ac,v 1.428 2007/10/06 00:49:51 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -2066,16 +2066,16 @@ if test x"$BOOST_LIBS" != x; then
     if test x"${missing_headers}" != x; then
       for i in ${missing_headers}; do
 	# They have some boost libs but no date_time and want to compile cygnal.
-	echo "        ERROR: The BOOST $i package is needed!"
+	echo "        ERROR: The BOOST $i header file is needed!"
 	echo "               Install it from http://boost.org"
-	echo "               or .deb users: apt-get install libboost-$i-dev"
+	echo "               or from a Boost development package"
 	nogo=true
       done
     fi
     if test x"${missing_libs}" != x; then
       for i in ${missing_libs}; do
 	# They have some boost libs but no date_time and want to compile cygnal.
-	echo "        ERROR: The BOOST $i package is needed!"
+	echo "        ERROR: The BOOST $i library is needed!"
 	echo "               Install it from http://boost.org"
 	echo "               or .deb users: apt-get install libboost-$i-dev"
 	nogo=true

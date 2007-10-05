@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.63 2007/10/05 20:19:34 rsavoye Exp $
+dnl $Id: boost.m4,v 1.64 2007/10/06 00:49:52 rsavoye Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -50,7 +50,6 @@ AC_DEFUN([GNASH_PATH_BOOST],
     newlist=${gnash_boost_topdir}
   fi
 
-  AC_MSG_CHECKING([for boost header])
   dnl munge the GCC version number, which Boost uses to label it's libraries.
   gcc_version=`${CXX} --version | head -1 | cut -d ' ' -f 3 | cut -d '.' -f 1-2 | tr -d '.'`
 
@@ -58,14 +57,16 @@ AC_DEFUN([GNASH_PATH_BOOST],
     dnl Attempt to find the top level directory, which unfortunately has a
     dnl version number attached. At least on Debian based systems, this
     dnl doesn't seem to get a directory that is unversioned.
-    AC_MSG_CHECKING([for the Boost Version])
     if test x$cross_compiling = xno; then
       if test x"$PKG_CONFIG" != x; then
+        AC_MSG_CHECKING([for the Boost Version])
         $PKG_CONFIG --exists boost && gnash_boost_version=`$PKG_CONFIG --modversion boost | cut -d "." -f 1 | awk '{print $'0'".0"}'`
+        AC_MSG_RESULT(${gnash_boost_version})
       fi
     fi
   fi
 
+  AC_MSG_CHECKING([for boost header])
   for i in $newlist; do
     dirs=`ls -dr $i/boost* 2>/dev/null`
     if test -n "${dirs}"; then
@@ -82,7 +83,8 @@ AC_DEFUN([GNASH_PATH_BOOST],
         AC_MSG_RESULT(${ac_cv_path_boost_incl})
         break
       else
-        AC_MSG_RESULT([You need to install ${missing_headers}])
+        AC_MSG_RESULT([headers missing])
+        AC_MSG_WARN([You need to install ${missing_headers}])
       fi
     fi
   done
@@ -132,7 +134,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   fi
 
   if test x"${missing_libs}" != x ; then
-    AC_MSG_ERROR([Libraries ${missing_libs} aren't installed ])
+    AC_MSG_WARN([Libraries ${missing_libs} aren't installed ])
   fi
   AC_MSG_RESULT(${ac_cv_path_boost_lib})
 
