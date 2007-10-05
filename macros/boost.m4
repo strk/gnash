@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.61 2007/10/05 18:35:51 rsavoye Exp $
+dnl $Id: boost.m4,v 1.62 2007/10/05 20:00:54 rsavoye Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -136,11 +136,11 @@ AC_DEFUN([GNASH_PATH_BOOST],
   fi
   AC_MSG_RESULT(${ac_cv_path_boost_lib})
 
-  if test x"${missing_headers}" != x; then
+  if test x"${ac_cv_path_boost_incl}" != x; then
     BOOST_CFLAGS="$ac_cv_path_boost_incl"
   fi
 
-  if test x"${missing_libs}" != x; then
+  if test x"${ac_cv_path_boost_lib}" != x; then
     BOOST_LIBS="$ac_cv_path_boost_lib" 
   fi
 
