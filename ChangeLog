@@ -1,6 +1,9 @@
 2007-10-05  Rob Savoye  <rob@ripple.welcomehome.org>
 
-	* macros/boost.m4: Makwe the --with-options work correctly. Recode
+	* macros/boost.m4: Check for a directory without "boost" as an
+	additional sub directory.
+
+	* macros/boost.m4: Make the --with-options work correctly. Recode
 	how all the directories, headers, and libraries get found, or
 	configure fails to find any dependant file.
 
