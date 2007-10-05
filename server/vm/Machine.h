@@ -131,6 +131,22 @@ private:
 	Stack<as_value> *mStack;
 };
 
+/// This machine is intended to work without relying on the C++ call stack,
+/// by resetting its Stream and Stack members (actually, by limiting the stack)
+/// to make function calls, rather than calling them directly in C++.
+/// As a result, many of the internal calls are void functions even though they
+/// will be returning some value.
+/// The exception to this is that C++ native functions defined in ActionScript
+/// objects will be called in the typical way.
+///
+/// The C++ exceptions mechanism is used for exception handling, since this
+/// allows both ActionScript code and C++ code to use the exception handling
+/// with a minimum of hassle, and it helps with correctness.
+///
+/// The intent is that the machine will run both AS2 and AS3 code. Despite the
+/// difference in presentation between the two, they should be compatible (or
+/// able to become so), so that extensions written for AS2 will work in AS3
+/// (and vice versa).
 class Machine
 {
 public:
@@ -142,21 +158,78 @@ public:
 	/// Not null.
 	void setTarget(character* target);
 
-	void completeName(asBindingName&);
+	/// This will complete a name in AS3, where a part of the name
+	/// is stored in the stream and another part may be stored on
+	/// the stack.
+	///
+	/// @param name
+	/// A partially filled asBoundName, this should be the id
+	/// from the stream.
+	///
+	/// @param initial
+	/// The depth in the stack where the stack objects may be found.
+	///
+	/// @return
+	/// The number of stack elements used by the name.
+	/// At present, always 0, 1, or 2. These are not dropped.
+	int completeName(asBoundName& name, int initial = 0);
 
-	asClass* findSuper(as_value&, bool);
+	/// Given a value v, find the class object of the superclass of v.
+	///
+	/// @param obj
+	/// The object whose superclass is desired.
+	///
+	/// @param find_primitive
+	/// If true, the ActionScript prototype will be find for primitive values.
+	///
+	/// @return
+	/// Null if the superclass was not found, or the superclass.
+	asClass* findSuper(as_value& obj, bool find_primitive);
 
-	as_value getMember(asClass*, asBindingName&, as_value&);
-	bool setMember(asClass*, asBindingName&, as_value& target, as_value& val);
+	/// Get a member from an object.
+	///
+	/// @param pDefinition
+	/// The definition of the class which is to be used. This should be the
+	/// one which has the property.
+	///
+	/// @param name
+	/// The bound name of the member
+	///
+	/// @param source
+	/// The source object -- the specific instance of the pDefinition class.
+	///
+	/// @return
+	/// This returns the value, but on the stack.
+	/// (Since the return value is not known until after control has left
+	/// the caller of this, it's impossible to return a meaningful value.
+	void getMember(asClass* pDefinition, asBoundName& name, as_value& source);
 
-	std::string pool_string(uint32_t);
+	/// Set a member in an object.
+	///
+	/// @param pDefinition
+	/// The definition of the class which is to be used.
+	///
+	/// @param name
+	/// The bound name of the member
+	///
+	/// @param source
+	/// The source object -- where the instance should be set
+	///
+	/// @param newvalue
+	/// The new value
+	///
+	/// @return
+	/// Nothing.
+	void setMember(asClass*, asBoundName&, as_value& target, as_value& val);
+
+	std::string& pool_string(uint32_t);
 	int pool_int(uint32_t);
 	unsigned int pool_uint(uint32_t);
 	double pool_double(uint32_t);
 	asNamespace* pool_namespace(uint32_t);
 	asMethod* pool_method(uint32_t);
 
-	as_value(v) findProperty(asBindingName&);
+	as_value findProperty(asBoundName&);
 
 	void pushScope(asScope*);
 	asScope* popScope();
@@ -164,6 +237,8 @@ public:
 	void execute_as3();
 
 	void execute_as2();
+
+	void pushCall(int param_count, int return_count, asMethod *pMethod);
 
 private:
 	Stack<as_value> mStack;

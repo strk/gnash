@@ -1,4 +1,10 @@
 2007-10-06 Chad Musick <chadmusick@msbx.net>
+	* server/vm/Machine.h: More comments about functions, some
+	  signature corrections.
+	* server/vm/AbcHandlers.cpp: Definition of some of the necessary
+	  support functions.
+
+2007-10-06 Chad Musick <chadmusick@msbx.net>
 
 	* server/vm/Machine.h: New File. First iteration (not documented,
 	  not compilable) of class definition for VM for ActionScript3

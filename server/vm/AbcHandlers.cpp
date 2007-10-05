@@ -61,15 +61,15 @@ ActionMachine::execute_as3()
 		// Get the name.
 		asName a = mStream.read_V32();
 		// Finish it, if necessary.
-		completeName(a);
+		mStack.drop(completeName(a));
 		// Get the target object.
 		as_value vobj& = mStack.top(0);
 		asClass *pClass = findSuper(vobj, true);
 		// If we don't have a class yet, throw.
 		if (!pClass)
 			throw ASReferenceError();
-		// getMember will throw any necessary exceptions.
-		mStack.top(0) = getMember(pClass, a, vobj);
+		// getMember will throw any necessary exceptions and do the push.
+		getMember(pClass, a, vobj);
 		break;
 	}
 /// 0x05 ABC_ACTION_SETSUPER
@@ -87,7 +87,7 @@ ActionMachine::execute_as3()
 		asName a = mStream.read_V32();
 		as_value vobj = mStack.pop(); // The value
 
-		completeName(a);
+		mStack.drop(completeName(a));
 
 		as_value target = mStack.pop();
 		asClass *pClass = findSuper(target, true);
@@ -760,7 +760,7 @@ ActionMachine::execute_as3()
 	case SWF::ABC_ACTION_CALLSUPERVOID:
 	{
 		asName a = mStream.read_V32();
-		completeName(a);
+		mStack.drop(completeName(a));
 	
 		mStack.top(argc) = mStack.top(argc).get_named_super(a)
 			.call_function(mStack.top(argc - 1));
@@ -956,7 +956,7 @@ ActionMachine::execute_as3()
 	case SWF::ABC_ACTION_FINDPROPERTY:
 	{
 		asName a = mStream.read_V32();
-		completeName(a);
+		mStack.drop(completeName(a));
 		as_value v = findProperty(a);
 		if ((opcode == SWF::ABC_ACTION_FINDPROPSTRICT) && v.is_undefined())
 			throw ASReferenceException();
@@ -1016,7 +1016,7 @@ ActionMachine::execute_as3()
 			if (a.isRtns() || !(mStack.top(0).is_object()
 				&& mStack.top(1).is_dictionary()))
 			{
-				completeName(a);
+				mStack.drop(completeName(a));
 				mStack.top(0).setProperty(a, v);
 				mStack.drop(1);
 			}
@@ -1094,7 +1094,7 @@ ActionMachine::execute_as3()
 			if (a.isRtns() || !(mStack.top(0).is_object()
 				&& mStack.top(1).is_dictionary()))
 			{
-				completeName(a);
+				mStack.drop(completeName(a));
 				mStack.top(0) = mStack.top(0).getProperty(a);
 			}
 			else
@@ -1119,7 +1119,7 @@ ActionMachine::execute_as3()
 	{
 		asName a = mStream.read_V32();
 		as_value& v = mStack.pop();
-		completeName(a);
+		mStack.drop(completeName(a));
 		mStack.pop().to_object().setProperty(a, v, true); // true for init
 		break;
 	}
@@ -1133,7 +1133,7 @@ ActionMachine::execute_as3()
 	case SWF::ABC_ACTION_DELETEPROPERTY:
 	{
 		asName a = mStream.read_V32();
-		completeName(a);
+		mStack.drop(completeName(a));
 		mStack.top(0) = mStack.top(0).deleteProperty(a);
 		break;
 	}
@@ -1317,7 +1317,7 @@ ActionMachine::execute_as3()
 	case SWF::ABC_ACTION_COERCE:
 	{
 		asName a = mStream.read_V32();
-		completeName(a);
+		mStack.drop(completeName(a));
 		mStack.top(0) = mStack.top(0).coerce(a);
 		break;
 	}
@@ -1354,7 +1354,7 @@ ActionMachine::execute_as3()
 	case SWF::ABC_ACTION_ASTYPE:
 	{
 		asName a = mStream.read_V32();
-		completeName(a);
+		mStack.drop(completeName(a));
 		if (!mStack.top(0).conforms_to(a)
 			mStack.top(0).set_null();
 		break;
@@ -1696,7 +1696,7 @@ ActionMachine::execute_as3()
 	case SWF::ABC_ACTION_ISTYPE:
 	{
 		asName a = mStream.read_V32();
-		completeName(a);
+		mStack.drop(completeName(a));
 		mStack.top(0).set_bool(mStack.top(0).conforms_to(a));
 	}
 /// 0xB3 ABC_ACTION_ISTYPELATE
@@ -1859,9 +1859,77 @@ ActionMachine::execute_as3()
 	} // end of main loop
 } // end of execute function
 
-/// Given a value v, find the class object of the superclass of v.
-/// If find_for_primitive is true, then, for example, The value
-/// 1 (a number) will return the Number class object.
+void
+ActionMachine::getMember(asClass* pDefinition, asBoundName& name,
+	as_value& instance)
+{
+	if (!instance.is_object())
+		throw ASTypeError();
+
+	asBinding *pBinding = pDefinition->findMember(name);
+	if (pBinding->isWriteOnly())
+		throw ASReferenceError();
+
+	if (!pBinding->isGetSet())
+	{
+		mStack.push(pBinding->getFromInstance(instance));
+		return;
+	}
+
+	// This is a getter, so we need to execute it. Even those
+	// written in C++ get called like this, with pushCall handling.
+	// 1 parameter (the source), 1 value expected back.
+	mStack.push(instance);
+	pushCall(1, 1, pBinding->getGetter());
+}
+
+void
+ActionMachine::setMember(asClass *pDefinition, asBoundName& name,
+	as_value& instance, as_value& newvalue)
+{
+	if (!instance.is_object())
+		throw ReferenceError();
+
+	asBinding *pBinding = pDefinition->findMember(name);
+	if (pBinding->isReadOnly())
+		throw ASReferenceError();
+
+	if (!pBinding->isGetSet())
+	{
+		pBinding->setInInstance(instance, newvalue);
+		return;
+	}
+
+	// Two parameters -- the target object, the value to set.
+	mStack.push(instance);
+	mStack.push(newvalue);
+	pushCall(2, 0, pBinding->getSetter());
+}
+
+int
+ActionMachine::completeName(asBoundName &name, int offset)
+{
+	int size = 0;
+
+	asUnboundName* uname = mNamePool.at(name.id);
+	if (uname->isRuntime())
+	{
+		as_value obj = mStack.top(offset);
+		if (obj.is_object() && obj.to_object()->isQName())
+			name.fill(obj.to_object());
+		++size;
+
+		if (uname->isRuntimeNamespace())
+			++size; // Ignore the Namespace.
+	}
+	else if (uname->isRuntimeNamespace())
+	{
+		uname->setNamespace(mStack.top(offset);
+		++size;
+	}
+	return size;
+}
+
 asClass *
 ActionMachine::findSuper(as_value &v, bool find_for_primitive)
 {
@@ -1880,6 +1948,7 @@ ActionMachine::findSuper(as_value &v, bool find_for_primitive)
 	}
 
 	// And so on...
+	// TODO: Other primitives
 	return NULL;
 }
 
