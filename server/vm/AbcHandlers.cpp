@@ -44,7 +44,7 @@ ActionMachine::execute_as3()
 /// Equivalent: ACTIONTHROW
 	case SWF::ABC_ACTION_THROW:
 	{
-		throw ASException(mStack.top(0));
+		throw ASException(mStack.pop());
 		break;
 	}
 /// 0x04 ABC_ACTION_GETSUPER
@@ -59,44 +59,42 @@ ActionMachine::execute_as3()
 	case SWF::ABC_ACTION_GETSUPER:
 	{
 		// Get the name.
-		asName a = read_V32();
+		asName a = mStream.read_V32();
 		// Finish it, if necessary.
 		completeName(a);
 		// Get the target object.
-		stackValueType vobj = mStack.top(0);
-		if (!vobj.is_object())
-		{
-			// Leave the object, let the exception decide what to do.
-			throw ASReferenceException();
-		}
-		as_object *obj = vobj.to_object();
-		// get_named_super will throw any necessary exceptions.
-		mStack.top(0) = obj.get_named_super(a);
+		as_value vobj& = mStack.top(0);
+		asClass *pClass = findSuper(vobj, true);
+		// If we don't have a class yet, throw.
+		if (!pClass)
+			throw ASReferenceError();
+		// getMember will throw any necessary exceptions.
+		mStack.top(0) = getMember(pClass, a, vobj);
 		break;
 	}
 /// 0x05 ABC_ACTION_SETSUPER
 /// Stream: UV32 index to multiname 'name'
 /// Stack In:
+///  val -- an object
 ///  [ns [n]] -- Namespace stuff.
 ///  obj -- an object
-///  val -- an object
 /// Stack Out:
 ///  .
 /// Do: Set obj.super.name to val, if allowable.
 	case SWF::ABC_ACTION_SETSUPER:
 	{
 		// Get and finish the name.
-		asName a = read_V32();
+		asName a = mStream.read_V32();
+		as_value vobj = mStack.pop(); // The value
+
 		completeName(a);
-		// Get the target object.
-		as_value vobj = mStack.top(0);
-		if (!vobj.is_object())
-		{
-			asThrow(AS_EXCEPT_REFERENCE_ERROR);
-		}
-		boost::intrusive_ptr<as_object> obj = vobj.to_object();
-		obj.set_named_super(a, mStack.top(1));
-		mStack.drop(2);
+
+		as_value target = mStack.pop();
+		asClass *pClass = findSuper(target, true);
+		if (!pClass)
+			throw ASReferenceError();
+
+		setMember(pClass, a, target, vobj);
 		break;
 	}
 /// 0x06 ABC_ACTION_DXNS
@@ -106,7 +104,7 @@ ActionMachine::execute_as3()
 ///  default XML namespace. 
 	case SWF::ABC_ACTION_DXNS:
 	{
-		uint32_t soffset = read_V32();
+		uint32_t soffset = mStream.read_V32();
 		std::string& uri = pool_string(soffset);
 		mDefaultXMLNamespace = mCH->anonNamespace(mST.find(uri));
 		break;
@@ -131,8 +129,8 @@ ActionMachine::execute_as3()
 /// Equivalent: ACTION_DELETE
 	case SWF::ABC_ACTION_KILL:
 	{
-		uint32_t regNum = read_V32();
-		mFrame.kill(regnum);
+		uint32_t regNum = mStream.read_V32();
+		mFrame.value(regnum).set_undefined();
 		break;
 	}
 /// 0x09 ABC_ACTION_LABEL
@@ -370,18 +368,18 @@ ActionMachine::execute_as3()
 ///  Otherwise, move by cases[index] - 1 from stream position on op entry.
 	case SWF::ABC_ACTION_LOOKUPSWITCH:
 	{
-		AbcHandlers::stream_position npos = mStream.seekTell();
+		AbcHandlers::stream_position npos = mStream.tell();
 		uint32_t index = mStack.top(0).to_number<uint32_t>();
 		mStack.drop(1);
 
-		mStream.seekSkip(3); // Skip the intial offset.
+		mStream.seekBy(3); // Skip the intial offset.
 		uint32_t cases = mStream.read_V32();
 		// Read from our original position and use it to skip if the case
 		// is out of range.
 		if (index > cases)
 		{
 			mStream.seekTo(npos);
-			mStream.seekTo(npos + read_S24());
+			mStream.seekTo(npos + mStream.read_S24());
 		}
 		else
 		{
@@ -413,6 +411,8 @@ ActionMachine::execute_as3()
 ///  shallower than the base's depth.
 	case SWF::ABC_ACTION_POPSCOPE:
 	{
+		if (mCurrentScope == mBaseScope)
+			mBaseScope = NULL;
 		popScope();
 		break;
 	}
@@ -496,7 +496,7 @@ ActionMachine::execute_as3()
 ///  byte -- as a raw byte
 	case SWF::ABC_ACTION_PUSHBYTE:
 	{
-		int8_t *b = read_s8();
+		int8_t *b = mStream.read_s8();
 		mStack.grow(1);
 		mStack.top(0) = b;
 		break;
@@ -507,7 +507,7 @@ ActionMachine::execute_as3()
 ///  value -- as a raw integer
 	case SWF::ABC_ACTION_PUSHSHORT:
 	{
-		signed short s = static_cast<signed short>(read_V32());
+		signed short s = static_cast<signed short>(mStream.read_V32());
 		mStack.grow(1);
 		mStack.top(0) = s;
 		break;
@@ -582,7 +582,7 @@ ActionMachine::execute_as3()
 	case SWF::ABC_ACTION_PUSHSTRING:
 	{
 		mStack.grow(1);
-		mStack.top(0) = pool_string(read_V32());
+		mStack.top(0) = pool_string(mStream.read_V32());
 		break;
 	}
 /// 0x2D ABC_ACTION_PUSHINT
@@ -592,7 +592,7 @@ ActionMachine::execute_as3()
 	case SWF::ABC_ACTION_PUSHINT:
 	{
 		mStack.grow(1);
-		mStack.top(0) = pool_int(read_V32());
+		mStack.top(0) = pool_int(mStream.read_V32());
 		break;
 	}
 /// 0x2E ABC_ACTION_PUSHUINT
@@ -602,7 +602,7 @@ ActionMachine::execute_as3()
 	case SWF::ABC_ACTION_PUSHUINT:
 	{
 		mStack.grow(1);
-		mStack.top(0) = pool_uint(read_V32());
+		mStack.top(0) = pool_uint(mStream.read_V32());
 		break;
 	}
 /// 0x2F ABC_ACTION_PUSHDOUBLE
@@ -612,7 +612,7 @@ ActionMachine::execute_as3()
 	case SWF::ABC_ACTION_PUSHDOUBLE:
 	{
 		mStack.grow(1);
-		mStack.top(0) = pool_double(read_V32());
+		mStack.top(0) = pool_double(mStream.read_V32());
 		break;
 	}
 /// 0x30 ABC_ACTION_PUSHSCOPE
@@ -634,7 +634,7 @@ ActionMachine::execute_as3()
 ///  ns -- Namespace object from namespace_pool[index]
 	case SWF::ABC_ACTION_PUSHNAMESPACE:
 	{
-		asNamespace *ns = pool_namespace(read_V32());
+		asNamespace *ns = pool_namespace(mStream.read_V32());
 		mStack.grow(1);
 		mStack.top(0) = *ns;
 		break;
@@ -649,8 +649,8 @@ ActionMachine::execute_as3()
 ///  Change at indexloc to index (as object) of the next value.
 	case ABC_ACTION_HASNEXT2:
 	{
-		int32_t oindex = read_V32();
-		int32_t iindex = read_V32();
+		int32_t oindex = mStream.read_V32();
+		int32_t iindex = mStream.read_V32();
 		as_object *obj = mFrame.value(oindex).to_object();
 		int32_t index = mFrame.value(iindex).to_number<int32_t>();
 		asBinding *next = obj->next_after_index(index);
@@ -678,7 +678,7 @@ ActionMachine::execute_as3()
 	case SWF::ABC_ACTION_NEWFUNCTION:
 	{
 		mStack.grow(1);
-		asMethod *m = pool_method(read_V32());
+		asMethod *m = pool_method(mStream.read_V32());
 		mStack.top(0) = m->construct(mCurrentScope, mBaseScope);
 		break;
 	}
@@ -692,7 +692,7 @@ ActionMachine::execute_as3()
 ///  value -- the value returned by obj->func(arg1, ...., argN)
 	case SWF::ABC_ACTION_CALL:
 	{
-		uint32_t argc = read_V32();
+		uint32_t argc = mStream.read_V32();
 		as_function *f = mStack.top(argc + 1).to_function();
 		as_object *obj = mStack.top(argc).to_object();
 		mStack.top(argc + 1) = f.call(obj, mStack);
@@ -708,7 +708,7 @@ ActionMachine::execute_as3()
 ///  value -- obj after it has been constructed as obj(arg1, ..., argN)
 	case SWF::ABC_ACTION_CONSTRUCT:
 	{
-		uint32_t argc = read_V32();
+		uint32_t argc = mStream.read_V32();
 		as_function *f = mStack.top(argc).to_function();
 		mStack.top(argc) = f.construct(mStack);
 		mStack.drop(argc);
@@ -723,8 +723,8 @@ ActionMachine::execute_as3()
 ///  value -- the value returned by obj::'method_id'(arg1, ..., argN)
 	case SWF::ABC_ACTION_CALLMETHOD:
 	{
-		uint32_t dispatch_id = read_V32() - 1;
-		uint32_t argc = read_V32();
+		uint32_t dispatch_id = mStream.read_V32() - 1;
+		uint32_t argc = mStream.read_V32();
 		as_object *obj = mStack.top(argc).to_object();
 		mStack.top(argc) = obj.call_dispatch(dispatch_id);
 		mStack.drop(argc);
@@ -739,8 +739,8 @@ ActionMachine::execute_as3()
 ///  value -- the value returned by obj->ABC::'method_id'(arg1, ..., argN)
 	case SWF::ABC_ACTION_CALLSTATIC:
 	{
-		asMethod *m = pool_method(read_V32());
-		uint32_t argc = read_V32();
+		asMethod *m = pool_method(mStream.read_V32());
+		uint32_t argc = mStream.read_V32();
 		mStack.top(argc) = m->call_static(mStack.top(argc), mStack.top(argc - 1));
 		mStack.drop(argc);
 		break;
@@ -759,7 +759,7 @@ ActionMachine::execute_as3()
 	case SWF::ABC_ACTION_CALLSUPER:
 	case SWF::ABC_ACTION_CALLSUPERVOID:
 	{
-		asName a = read_V32();
+		asName a = mStream.read_V32();
 		completeName(a);
 	
 		mStack.top(argc) = mStack.top(argc).get_named_super(a)
@@ -785,8 +785,8 @@ ActionMachine::execute_as3()
 	case SWF::ABC_ACTION_CALLPROPVOID:
 	{
 		bool lex_only = (opcode == SWF::ABC_ACTION_CALLPROPLEX);
-		asName a = read_V32();
-		uint32_t argc = read_V32();
+		asName a = mStream.read_V32();
+		uint32_t argc = mStream.read_V32();
 		int shift = completeName(a, argc);
 		// Ugly setup. Any name stuff is between the args and the object.
 		as_object *obj = mStack.top(argc + shift).to_object();
@@ -825,7 +825,7 @@ ActionMachine::execute_as3()
 ///
 	case SWF::ABC_ACTION_CONSTRUCTSUPER:
 	{
-		uint32_t argc = read_V32();
+		uint32_t argc = mStream.read_V32();
 		as_object *obj = mStack.top(argc).to_object();
 		obj->super_construct(mStack.top(argc - 1));
 		mStack.drop(argc + 1);
@@ -842,8 +842,8 @@ ActionMachine::execute_as3()
 ///   'name_offset'(arg1, ..., argN)
 	case SWF::ABC_ACTION_CONSTRUCTPROP:
 	{
-		asName a = read_V32();
-		uint32_t argc = read_V32();
+		asName a = mStream.read_V32();
+		uint32_t argc = mStream.read_V32();
 		int shift = completeName(a, argc);
 		as_object *obj = mStack.top(argc + shift).to_object();
 		mStack.top(argc + shift) = obj->construct_property(a, mStack.top(argc));
@@ -866,7 +866,7 @@ ActionMachine::execute_as3()
 	case SWF::ABC_ACTION_NEWOBJECT:
 	{
 		as_object *obj = mCH->newOfType(NSV::CLASS_OBJECT);
-		uint32_t argc = read_V32();
+		uint32_t argc = mStream.read_V32();
 		int i = argc;
 		while (i--)
 		{
@@ -888,7 +888,7 @@ ActionMachine::execute_as3()
 ///  array -- an array { value_1, value_2, ..., value_n }
 	case SWF::ABC_ACTION_NEWARRAY:
 	{
-		uint32_t asize = read_V32();
+		uint32_t asize = mStream.read_V32();
 		as_object *obj = mCH->newOfType(NSV::CLASS_ARRAY);
 		as_array *array = dynamic_cast<as_array*> (obj);
 		array->load(mStack.top(asize - 1));
@@ -914,7 +914,7 @@ ActionMachine::execute_as3()
 /// NB: This depends on scope and scope base (to determine lifetime(?))
 	case SWF::ABC_ACTION_NEWCLASS:
 	{
-		uint32_t cid = read_V32();
+		uint32_t cid = mStream.read_V32();
 		mStack.top(0) = mCH->newOfId(cid, mStack.top(0));
 		break;
 	}
@@ -955,7 +955,7 @@ ActionMachine::execute_as3()
 	case SWF::ABC_ACTION_FINDPROPSTRICT:
 	case SWF::ABC_ACTION_FINDPROPERTY:
 	{
-		asName a = read_V32();
+		asName a = mStream.read_V32();
 		completeName(a);
 		as_value v = findProperty(a);
 		if ((opcode == SWF::ABC_ACTION_FINDPROPSTRICT) && v.is_undefined())
@@ -968,7 +968,7 @@ ActionMachine::execute_as3()
 ///  def -- The definition of the name at name_id.
 	case SWF::ABC_ACTION_FINDDEF:
 	{
-		asName a = read_V32();
+		asName a = mStream.read_V32();
 		// TODO
 		break;
 	}
@@ -979,7 +979,7 @@ ActionMachine::execute_as3()
 ///   + 0x66 (ABC_ACTION_GETPROPERTY)
 	case SWF::ABC_ACTION_GETLEX
 	{
-		asName a = read_V32();
+		asName a = mStream.read_V32();
 		as_value v = findProperty(a);
 		if (v.is_undefined())
 			throw ASReferenceException();
@@ -1004,7 +1004,7 @@ ActionMachine::execute_as3()
 /// key/value is set in the dictionary obj instead.
 	case SWF::ABC_ACTION_SETPROPERTY:
 	{
-		asName a = read_V32();
+		asName a = mStream.read_V32();
 		as_value &v = mStack.pop();
 		if (!a.isRuntime())
 		{
@@ -1036,7 +1036,7 @@ ActionMachine::execute_as3()
 	case SWF::ABC_ACTION_GETLOCAL:
 	{
 		mStack.grow(1);
-		mStack.top(0) = mFrame.value(read_V32());
+		mStack.top(0) = mFrame.value(mStream.read_V32());
 		break;
 	}
 /// 0x63 ABC_ACTION_SETLOCAL
@@ -1048,7 +1048,7 @@ ActionMachine::execute_as3()
 ///  .
 	case SWF::ABC_ACTION_SETLOCAL:
 	{
-		mFrame.value(read_V32()) = mStack.top(0);
+		mFrame.value(mStream.read_V32()) = mStack.top(0);
 		mStack.drop(1);
 		break;
 	}
@@ -1067,7 +1067,7 @@ ActionMachine::execute_as3()
 ///  scope -- The scope object at depth
 	case SWF::ABC_ACTION_GETSCOPEOBJECT
 	{
-		uint8_t depth = read_u8();
+		uint8_t depth = mStream.read_u8();
 		mStack.grow(1);
 		mStack.top(0) = mScopeStack(depth);
 		break;
@@ -1084,7 +1084,7 @@ ActionMachine::execute_as3()
 /// NB: See 0x61 (ABC_ACTION_SETPROPETY) for the decision of ns/key.
 	case SWF::ABC_ACTION_GETPROPERTY:
 	{
-		asName a = read_V32();
+		asName a = mStream.read_V32();
 		if (!a.isRuntime())
 		{
 			mStack.top(0) = mStack.top(0).getProperty(a, v);
@@ -1117,7 +1117,7 @@ ActionMachine::execute_as3()
 ///  Set obj::(resolve)'name_id' to value, set bindings from the context.
 	case SWF::ABC_ACTION_INITPROPERTY:
 	{
-		asName a = read_V32();
+		asName a = mStream.read_V32();
 		as_value& v = mStack.pop();
 		completeName(a);
 		mStack.pop().to_object().setProperty(a, v, true); // true for init
@@ -1132,7 +1132,7 @@ ActionMachine::execute_as3()
 ///  truth -- True if property was deleted or did not exist, else False.
 	case SWF::ABC_ACTION_DELETEPROPERTY:
 	{
-		asName a = read_V32();
+		asName a = mStream.read_V32();
 		completeName(a);
 		mStack.top(0) = mStack.top(0).deleteProperty(a);
 		break;
@@ -1145,7 +1145,7 @@ ActionMachine::execute_as3()
 ///  slot -- obj.slots[slot_index]
 	case SWF::ABC_ACTION_GETSLOT
 	{
-		uint32_t sindex = read_V32();
+		uint32_t sindex = mStream.read_V32();
 		if (!sindex)
 			throw ASException();
 		--sindex;
@@ -1162,7 +1162,7 @@ ActionMachine::execute_as3()
 /// Do: obj.slots[slot_index] = value
 	case SWF::ABC_ACTION_SETSLOT:
 	{
-		uint32_t sindex = read_V32();
+		uint32_t sindex = mStream.read_V32();
 		if (!sindex)
 			throw ASException();
 		--sindex;
@@ -1179,7 +1179,7 @@ ActionMachine::execute_as3()
 /// NB: Deprecated
 	case SWF::ABC_ACTION_GETGLOBALSLOT:
 	{
-		uint32_t sindex = read_V32();
+		uint32_t sindex = mStream.read_V32();
 		if (!sindex)
 			throw ASException();
 		--sindex;
@@ -1197,7 +1197,7 @@ ActionMachine::execute_as3()
 /// NB: Deprecated
 	case SWF::ABC_ACTION_SETGLOBALSLOT:
 	{
-		uint32_t sindex = read_V32();
+		uint32_t sindex = mStream.read_V32();
 		if (!sindex)
 			throw ASException();
 		--sindex;
@@ -1316,7 +1316,7 @@ ActionMachine::execute_as3()
 ///  coerced_obj -- The object as the desired (resolve)'name_index' type.
 	case SWF::ABC_ACTION_COERCE:
 	{
-		asName a = read_V32();
+		asName a = mStream.read_V32();
 		completeName(a);
 		mStack.top(0) = mStack.top(0).coerce(a);
 		break;
@@ -1353,7 +1353,7 @@ ActionMachine::execute_as3()
 ///  cobj -- obj if obj is of type (resolve)'name_index', otherwise Null
 	case SWF::ABC_ACTION_ASTYPE:
 	{
-		asName a = read_V32();
+		asName a = mStream.read_V32();
 		completeName(a);
 		if (!mStack.top(0).conforms_to(a)
 			mStack.top(0).set_null();
@@ -1410,7 +1410,7 @@ ActionMachine::execute_as3()
 /// Frame: Load i from frame_addr and increment it.
 	case SWF::ABC_ACTION_INCLOCAL:
 	{
-		uint32_t foff = read_V32();
+		uint32_t foff = mStream.read_V32();
 		mFrame.value(foff) = mFrame.value(foff).to_number() + 1;
 		break;
 	}
@@ -1429,7 +1429,7 @@ ActionMachine::execute_as3()
 /// Frame: Load i from frame_addr and decrement it.
 	case SWF::ABC_ACTION_DECLOCAL:
 	{
-		uint32_t foff = read_V32();
+		uint32_t foff = mStream.read_V32();
 		mFrame.value(foff) = mFrame.value(foff).to_number() - 1;
 		break;
 	}
@@ -1695,7 +1695,7 @@ ActionMachine::execute_as3()
 ///  truth -- Truth of "obj is of the type given in (resolve)'name_id'"
 	case SWF::ABC_ACTION_ISTYPE:
 	{
-		asName a = read_V32();
+		asName a = mStream.read_V32();
 		completeName(a);
 		mStack.top(0).set_bool(mStack.top(0).conforms_to(a));
 	}
@@ -1744,7 +1744,7 @@ ActionMachine::execute_as3()
 /// See: 0x92 (ABC_ACTION_INCLOCAL), but forces types to int, not double
 	case SWF::ABC_ACTION_INCLOCAL_I:
 	{
-		uint32_t foff = read_V32();
+		uint32_t foff = mStream.read_V32();
 		mFrame.value(foff) = mFrame.value(foff).to_number<int>() + 1;
 		break;
 	}
@@ -1752,7 +1752,7 @@ ActionMachine::execute_as3()
 /// See: 0x94 (ABC_ACTION_DECLOCAL), but forces types to int, not double
 	case SWF::ABC_ACTION_DECLOCAL_I:
 	{
-		uint32_t foff = read_V32();
+		uint32_t foff = mStream.read_V32();
 		mFrame.value(foff) = mFrame.value(foff).to_number<int>() - 1;
 		break;
 	}
@@ -1827,7 +1827,7 @@ ActionMachine::execute_as3()
 /// Do: skip ahead 7 bytes in stream
 	case SWF::ABC_ACTION_DEBUG:
 	{
-		seekSkip(7);
+		seekBy(7);
 		break;
 	}
 /// 0xF0 ABC_ACTION_DEBUGLINE
@@ -1835,7 +1835,7 @@ ActionMachine::execute_as3()
 /// Do: Nothing, but line_number is for the debugger if wanted.
 	case SWF::ABC_ACTION_DEBUGLINE:
 	{
-		skip_V32();
+		mStream.skip_V32();
 		break;
 	}
 /// 0xF1 ABC_ACTION_DEBUGFILE
@@ -1843,7 +1843,7 @@ ActionMachine::execute_as3()
 /// Do: Nothing. 'name_offset' into string pool is the file name if wanted.
 	case SWF::ABC_ACTION_DEBUGFILE:
 	{
-		skip_V32();
+		mStream.skip_V32();
 		break;
 	}
 /// 0xF2 ABC_ACTION_BKPTLINE
@@ -1851,11 +1851,35 @@ ActionMachine::execute_as3()
 /// Do: Enter debugger if present, line_number is the line number in source.
 	case SWF::ABC_ACTION_BKPTLINE:
 	{
-		skip_V32();
+		mStream.skip_V32();
 		break;
 	}
 	} // end of switch statement
 	
 	} // end of main loop
 } // end of execute function
+
+/// Given a value v, find the class object of the superclass of v.
+/// If find_for_primitive is true, then, for example, The value
+/// 1 (a number) will return the Number class object.
+asClass *
+ActionMachine::findSuper(as_value &v, bool find_for_primitive)
+{
+	if (v.is_undefined() || v.is_null())
+		return NULL;
+
+	if (v.is_object())
+	{
+		asClass *pProto = v.to_object()->getClass();
+		return pProto ? pProto->getSuper() : NULL;
+	}
+
+	if (v.is_number())
+	{
+		return mCH->getClass(NSV::CLASS_NUMBER);
+	}
+
+	// And so on...
+	return NULL;
+}
 

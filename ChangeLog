@@ -1,3 +1,10 @@
+2007-10-06 Chad Musick <chadmusick@msbx.net>
+
+	* server/vm/Machine.h: New File. First iteration (not documented,
+	  not compilable) of class definition for VM for ActionScript3
+	  blocks.
+	* server/vm/AbcHandlers.cpp: More regularity, some small changes.
+
 2007-10-05 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/sprite_instance.cpp: Allow attachMovie() to accept also
