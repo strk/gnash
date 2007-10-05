@@ -16,7 +16,7 @@
 
 // Original author: Mike Carlson - June 19th, 2006
 
-rcsid="$Id: String.as,v 1.23 2007/09/29 16:22:58 strk Exp $";
+rcsid="$Id: String.as,v 1.24 2007/10/05 22:27:57 strk Exp $";
 
 #include "check.as"
 
@@ -36,9 +36,17 @@ isNaN ( a.charAt(-1) );
 isNaN (a.charAt(21) );
 check_equals ( a.indexOf("lawa"), 3 );
 check_equals ( a.lastIndexOf("lawa"), 8);
+
+//----------------------------------------
+// Check String.indexOf
+//-----------------------------------------
+
 check_equals ( a.indexOf("lawas"), 8 );
 check_equals ( a.indexOf("hinG"), 13 );
 check_equals ( a.indexOf("hing"), -1 );
+check_equals ( a.indexOf("lawas", -1), 8 );
+check_equals ( a.indexOf("a", 2), 4 );
+//TODO: add many more tests with a second argument to indexOf !
 
 //----------------------------------------
 // Check String.split

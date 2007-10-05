@@ -1,5 +1,7 @@
 2007-10-05 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/String.as: couple more tests for
+	  String.indexOf (lots more needed!).
 	* server/asobj/AsBroadcaster.{cpp,h} (initialize): query
 	  addListener and removeListener methods from the global
 	  AsBroadcaster, using any overridden member (shown
