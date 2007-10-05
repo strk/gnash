@@ -1,3 +1,8 @@
+2007-10-05 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/sprite_instance.cpp: Allow attachMovie() to accept also
+	  button definitions, not just movie clips
+
 2007-10-05 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-swfmill.all/: Makefile.am, jump_after_end.xml:

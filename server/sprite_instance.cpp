@@ -175,12 +175,13 @@ static as_value sprite_attach_movie(const fn_call& fn)
 		);
 		return rv; 
 	}
-	movie_definition* exported_movie = dynamic_cast<movie_definition*>(exported.get());
+	
+	character_def* exported_movie = dynamic_cast<character_def*>(exported.get());
 	if ( ! exported_movie )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("attachMovie: exported resource '%s' "
-			"is not a movie definition (%s) -- "
+			"is not a character definition (%s) -- "
 			"returning undefined"),
 			id_name.c_str(),
 			typeid(*(exported.get())).name());
@@ -194,7 +195,6 @@ static as_value sprite_attach_movie(const fn_call& fn)
 	int depth_val = uint16_t(fn.arg(2).to_number());
 
 	boost::intrusive_ptr<character> newch = exported_movie->create_character_instance(sprite.get(), depth_val);
-	assert( dynamic_cast<sprite_instance*>(newch.get()) );
 	assert( newch.get() > (void*)0xFFFF );
 #ifndef GNASH_USE_GC
 	assert(newch->get_ref_count() > 0);
