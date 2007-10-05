@@ -1,5 +1,14 @@
 2007-10-05 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfmill.all/jump_after_end.xml: Made the
+	  self-contained (almost completely). The problem now is that
+	  if it fails it will NOT print nor FAILED nor PASSED so
+	  we'll need the test *runner* to implement some sort of
+	  consistency check to verify the end of test is reached.
+	  We should do this always, btw...
+
+2007-10-05 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-swfmill.all/jump_after_end.xml:
 	  Fixed the XML to *really* do what I intended it to
 	  do. Still not self-contained though.

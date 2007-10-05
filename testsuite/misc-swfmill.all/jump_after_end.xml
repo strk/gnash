@@ -2,16 +2,24 @@
 <swf version="6" compressed="1">
 
 <!--
-This test checks if you can jump after the end opcode in a doaction block
 
-EXPECTED OUTPUT:
-   - TRACE: jump target
+ This file wants to test if branch after END opcode is allowed.
 
-TODO:
-  - Find out how to embed the Dejagnu.swf lib
-  - Find out how to call the Dejagnu.swf interfaces
+ It is hard to make it self-contained as if the branch fails
+ we'll loose control over the execution so nothing will be 
+ traced.  Tracing successes is fined.
+
+ The only solution I can think of is making the test *runner* 
+ aware of what signals end of test, and verify the end of test
+ is reached. This should be easy to implement, except producing
+ these XML files takes a bit of time due to hard-to-compute offsets
+ to branch to.
+
+ The best way I found to modify this file is to use flasm, edit
+ the code there, then change back to XML and add the END tag when
+ needed (flasm is unable to add END tags in the middle of an action)
+
 -->
-
 
   <Header framerate="12" frames="1">
     <size>
@@ -27,23 +35,43 @@ TODO:
         <actions>
           <PushData>
             <items>
-              <StackInteger value="1"/>
-            </items>
-          </PushData>
-	  <Trace/>
-
-	  <!-- Now jump to after the END action -->
-          <BranchAlways byteOffset="1"/>
-
-          <EndAction/>
-
-          <PushData>
-            <items>
-              <StackString value="jump after end"/>
+              <StackString value="Check if branch after end is allowed"/>
             </items>
           </PushData>
           <Trace/>
+          <PushData>
+            <items>
+              <StackString value="jumpval"/>
+              <!-- NOTE: we'll never get to trace this in a real failure.. -->
+              <StackString value="FAILED: jump after NOT allowed"/>
+            </items>
+          </PushData>
+          <SetVariable/>
 
+          <!-- NOTE:
+               If the branch fails here (not allowed to jump after END opcode)
+               we'll never get to a FAILED trace. To handle such cases we should
+               trace a final 'end-of-test' message to be seeked-for by the test
+               runner.
+            -->
+          <BranchAlways byteOffset="15"/>
+
+          <PushData>
+            <items>
+              <StackString value="jumpval"/>
+            </items>
+          </PushData>
+          <GetVariable/>
+          <Trace/>
+	  <EndAction/>
+          <PushData>
+            <items>
+              <StackString value="jumpval"/>
+              <StackString value="PASSED: jump after end ALLOWED"/>
+            </items>
+          </PushData>
+          <SetVariable/>
+          <BranchAlways byteOffset="-65"/>
           <EndAction/>
         </actions>
       </DoAction>
