@@ -9,6 +9,8 @@
 
 2007-10-05  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* configure.ac: Fix error messages for mising boost files.
+
 	* macros/boost.m4: Check for a directory without "boost" as an
 	additional sub directory.
 

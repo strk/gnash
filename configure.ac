@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.426 2007/09/28 15:10:29 strk Exp $
+dnl $Id: configure.ac,v 1.427 2007/10/05 20:59:38 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -467,6 +467,18 @@ AC_ARG_ENABLE(media,
  [media_handler=ffmpeg]
 )
 
+AC_ARG_ENABLE(lirc, AC_HELP_STRING([--disable-lirc], [Disable support for Lirc]),
+[case "${enableval}" in
+  yes) lirc=yes ;;
+  no)  lirc=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for disble-lirc option]) ;;
+esac], lirc=yes)
+
+if test x"$lirc" = x"yes"; then
+  AC_DEFINE([USE_LIRC], [], [LIRC daemon support])
+fi
+AM_CONDITIONAL(USE_LIRC, test x$lirc = xyes)
+
 dnl --------------------------------------------------------
 dnl Figure out which extensions to build.
 dnl --------------------------------------------------------
@@ -560,11 +572,6 @@ AM_CONDITIONAL(BUILD_MYSQL_EXT, [ test x$ext_mysql = xyes ])
 AM_CONDITIONAL(BUILD_GTK_EXT, [ test x$ext_gtk = xyes ])
 AM_CONDITIONAL(BUILD_LIRC_EXT, [ test x$ext_lirc = xyes ])
 AM_CONDITIONAL(BUILD_DBUS_EXT, [ test x$ext_dbus = xyes ])
-
-dnl force lirc to be enabled when building the extension.
-if test x"${ext_lirc}" = x"yes"; then
-  lirc=yes
-fi
 
 AC_LIBLTDL_INSTALLABLE
 AC_LIBTOOL_DLOPEN
@@ -1307,7 +1314,6 @@ if test x"$pthreads" = x"yes"; then
 fi
 
 GNASH_PATH_BOOST
-
 AX_GCC_ARCHFLAG(no)
 
 AC_ARG_ENABLE([strict],
@@ -2051,33 +2057,29 @@ if test x$build_agg = xyes; then # {
 fi # }
 
 if test x"$BOOST_LIBS" != x; then
-
-	if test x"$boost_thread" != xyes; then
-	echo "        ERROR: The BOOST thread package is needed to compile cygnal!"
-	echo "               Install it from http://boost.org"
-	echo "               or .deb users: apt-get install libboost-thread-dev"
-	nogo=true
-	fi
-
-	if test x"$boost_serialization" != xyes; then
-	echo "        ERROR: The BOOST serialization package is needed to compile gnash."
-	echo "               Install it from http://boost.org"
-    echo "               or .deb users: apt-get install libboost-serialization-dev"
-	nogo=true
-	fi
-
-    # Only cygnal requires date_time at present, so it's OK if either
-    # you don't want cygnal or do have date_time installed.
-    if test x"$cygnal" = xno -o x"$boost_date_time" = xyes; then
+    dnl Only cygnal requires date_time at present, so it's OK if either
+    dnl you don't want cygnal or do have date_time installed.
+    if test x"$cygnal" = xno; then
 	echo "        BOOST flags are: $BOOST_CFLAGS"
 	echo "        BOOST libs are: $BOOST_LIBS"
-    else
+    fi
+    if test x"${missing_headers}" != x; then
+      for i in ${missing_headers}; do
 	# They have some boost libs but no date_time and want to compile cygnal.
-	echo "        ERROR: The BOOST date_time package is needed to compile cygnal!"
+	echo "        ERROR: The BOOST $i package is needed!"
 	echo "               Install it from http://boost.org"
-	echo "               or .deb users: apt-get install libboost-date-time-dev"
-	echo "               or configure --disable-cygnal"
+	echo "               or .deb users: apt-get install libboost-$i-dev"
 	nogo=true
+      done
+    fi
+    if test x"${missing_libs}" != x; then
+      for i in ${missing_libs}; do
+	# They have some boost libs but no date_time and want to compile cygnal.
+	echo "        ERROR: The BOOST $i package is needed!"
+	echo "               Install it from http://boost.org"
+	echo "               or .deb users: apt-get install libboost-$i-dev"
+	nogo=true
+      done
     fi
 else
     echo "        ERROR: No BOOST development package installed!"
