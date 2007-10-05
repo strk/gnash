@@ -1,5 +1,13 @@
 2007-10-05 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/generic-testrunner.sh: add support for consistency
+	  checking (-c and -C switches)
+	* testsuite/misc-swfmill.all/Makefile.am: expect jump_after_end.swf
+	  to end with a PASSED trace (for now this will catch errors in
+	  jump after end bugs).
+
+2007-10-05 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-swfmill.all/jump_after_end.xml: Made the
 	  self-contained (almost completely). The problem now is that
 	  if it fails it will NOT print nor FAILED nor PASSED so

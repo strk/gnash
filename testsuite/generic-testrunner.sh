@@ -19,12 +19,23 @@
 
 runs=1
 advances=0
+endtagpat=
+endtagexp=""
 
-while getopts r:f: name; do
+while getopts r:f:c:C: name; do
 	case $name in
 		r) runs="$OPTARG" ;;
 		f) advances="$OPTARG" ;;
-		?) echo "Usage: $0 [-r <runs>] [-f <advances>] <swf> ..." >&2;
+		c) endtagpat="$OPTARG" ;;
+		C) endtagpat="$OPTARG"; endtagexp=X ;;
+		?)
+		   {
+		   echo "Usage: $0 [-r <runs>] [-f <advances>] [-c <string>]  <swf> ..." 
+		   echo "   -r <runs>       : allow for <runs> jump-backs" 
+		   echo "   -f <advances>   : only advance <advances> times" 
+		   echo "   -c <pattern>    : verify that the test ends with a trace matching <pattern>, or print a failure" 
+		   echo "   -C <pattern>    : same as -c <pattern> but a failure is expected" 
+		   } >&2
 		   exit 1;;
 	esac
 done
@@ -45,7 +56,21 @@ done
 cat << EOF
 
 for t in ${testfiles}; do
+	outlog=\${t}.output.\$$
 	echo "NOTE: Running test \${t}"
-	${top_builddir}/utilities/gprocessor -r${runs} -f${advances} -v \${t} || echo "FAILED: gprocessor returned an error while playing '\${t}'"
+	( 
+		exec > \${outlog}
+		${top_builddir}/utilities/gprocessor -r${runs} -f${advances} -v \${t} || echo "FAILED: gprocessor returned an error while playing '\${t}'"
+	)
+	cat \${outlog}
+	if test "x${endtagpat}" != x; then
+		lasttrace=\`grep TRACE \${outlog} | tail -1 | sed 's/.*TRACE: //'\`
+		if ! expr "\${lasttrace}" : '${endtagpat}' > /dev/null; then
+			echo "${endtagexp}FAILED: consistency check: last trace (\${lasttrace}) doesn't match pattern (${endtagpat})"
+		else
+			echo "${endtagexp}PASSED: consistency check: last trace (\${lasttrace}) matches pattern (${endtagpat})"
+		fi
+	fi
+	rm \${outlog}
 done
 EOF

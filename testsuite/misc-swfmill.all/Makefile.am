@@ -40,11 +40,11 @@ Dejagnu.swf: $(DEJAGNU_SO_PATH)
 	cp ../misc-ming.all/Dejagnu.swf .
 
 check_SCRIPTS = \
-	alltests-runner \
+	jump_after_end-runner \
 	$(NULL)
 
-alltests-runner: $(srcdir)/../generic-testrunner.sh $(SC_XMLTESTS_OUT) 
-	sh $< -r 50 $(top_builddir) $(SC_XMLTESTS_OUT) > $@
+jump_after_end-runner: $(srcdir)/../generic-testrunner.sh jump_after_end.swf 
+	sh $< -r 50 -c PASSED $(top_builddir) jump_after_end.swf > $@
 	chmod 755 $@
 
 .xml.swf: 
