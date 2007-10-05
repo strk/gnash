@@ -362,7 +362,6 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 	movie_root* m = _stage;
 
 	/* Handle GUI shortcuts */
-	if (!pressed) return;
 	if (modifier & gnash::key::MOD_CONTROL) {
 		switch(k) {
 		case gnash::key::r:
