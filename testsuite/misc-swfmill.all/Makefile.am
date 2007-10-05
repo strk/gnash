@@ -43,8 +43,8 @@ check_SCRIPTS = \
 	jump_after_end-runner \
 	$(NULL)
 
-jump_after_end-runner: $(srcdir)/../generic-testrunner.sh jump_after_end.swf 
-	sh $< -r 50 -c PASSED $(top_builddir) jump_after_end.swf > $@
+jump_after_end-runner: $(srcdir)/../generic-testrunner.sh jump_after_end.swf Makefile
+	sh $< -r 50 -c "END OF TEST" $(top_builddir) jump_after_end.swf > $@
 	chmod 755 $@
 
 .xml.swf: 

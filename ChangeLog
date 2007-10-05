@@ -1,5 +1,10 @@
 2007-10-05 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfmill.all/: Makefile.am, jump_after_end.xml:
+	  Have the test end with an "END OF TEST" trace, and expect that.
+
+2007-10-05 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/generic-testrunner.sh: add support for consistency
 	  checking (-c and -C switches)
 	* testsuite/misc-swfmill.all/Makefile.am: expect jump_after_end.swf
