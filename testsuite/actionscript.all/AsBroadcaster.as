@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: AsBroadcaster.as,v 1.6 2007/10/05 20:50:44 strk Exp $";
+rcsid="$Id: AsBroadcaster.as,v 1.7 2007/10/05 22:17:54 strk Exp $";
 
 #include "check.as"
 
@@ -45,12 +45,12 @@ check(!AsBroadcaster.prototype.hasOwnProperty('initialize'));
 // and a lookup should be issued by 'initalize' so that overridden
 // functions are attached to the initialized object rather then
 // the original one (from swfdec/test/trace/asbroadcaster-override.as)
-xcheck_equals(typeof(AsBroadcaster.addListener), 'function');
-xcheck(AsBroadcaster.hasOwnProperty('addListener'));
-xcheck_equals(typeof(AsBroadcaster.removeListener), 'function');
-xcheck(AsBroadcaster.hasOwnProperty('removeListener'));
-xcheck_equals(typeof(AsBroadcaster.broadcastMessage), 'function');
-xcheck(AsBroadcaster.hasOwnProperty('broadcastMessage'));
+check_equals(typeof(AsBroadcaster.addListener), 'function');
+check(AsBroadcaster.hasOwnProperty('addListener'));
+check_equals(typeof(AsBroadcaster.removeListener), 'function');
+check(AsBroadcaster.hasOwnProperty('removeListener'));
+check_equals(typeof(AsBroadcaster.broadcastMessage), 'function');
+check(AsBroadcaster.hasOwnProperty('broadcastMessage'));
 
 bc = new AsBroadcaster;
 check_equals(typeof(bc), 'object');
@@ -242,7 +242,7 @@ ret = bcast.broadcastMessage('onUnexistent');
 check_equals(typeof(ret), 'undefined');
 
 //--------------------------------
-// broadcaseMessage with args
+// broadcastMessage with args
 //--------------------------------
 
 _root.total = 0;
@@ -272,6 +272,14 @@ bcast.broadcastMessage('setSum', 1, 2, 3, 4, 5, 6, 7, 8);
 check_equals(_root.total, 36);
 bcast.broadcastMessage('setSum', 'one', 'two', 'three');
 check_equals(_root.total, '0onetwothree');
+
+//-----------------------------------------------------------------------------------
+// TODO: test override of AsBroadcaster.{addListener,removeListener,broadcastMessage}
+// swfdec contains tests for this, which should now be pretty succeeding except for
+// not-directly related checks which trigger failure due to all-or-nothing nature of
+// the swfdec testsuite.
+// See swfdec/test/trace/asbroadcaster-override.as for more info
+//-----------------------------------------------------------------------------------
 
 #endif // OUTPUT_VERSION >= 6
 

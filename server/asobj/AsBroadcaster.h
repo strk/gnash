@@ -57,6 +57,11 @@ public:
 	/// AsBroadcaster.initialize() AS method
 	static as_value initialize_method(const fn_call& fn);
 
+	/// Return the global AsBroadcaster
+	/// (the native one, immune to any override)
+	///
+	static as_object* getAsBroadcaster();
+
 private:
 
 	static as_value addListener_method(const fn_call& fn);

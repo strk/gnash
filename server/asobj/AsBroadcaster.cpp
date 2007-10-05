@@ -105,23 +105,40 @@ public:
 void 
 AsBroadcaster::initialize(as_object& o)
 {
+	as_object* asb = getAsBroadcaster();
+
 	log_debug("Initializing object %p as an AsBroadcaster", (void*)&o);
-	// TODO: reserch on protection flags for these methods
-	o.set_member(NSV::PROP_ADD_LISTENER, new builtin_function(AsBroadcaster::addListener_method));
-	o.set_member(NSV::PROP_REMOVE_LISTENER, new builtin_function(AsBroadcaster::removeListener_method));
+
+	as_value tmp;
+
+	if ( asb->get_member(NSV::PROP_ADD_LISTENER, &tmp) )
+	{
+		o.set_member(NSV::PROP_ADD_LISTENER, tmp);
+	}
+
+	if ( asb->get_member(NSV::PROP_REMOVE_LISTENER, &tmp) )
+	{
+		o.set_member(NSV::PROP_REMOVE_LISTENER, tmp);
+	}
+	
 	o.set_member(NSV::PROP_BROADCAST_MESSAGE, new builtin_function(AsBroadcaster::broadcastMessage_method));
 	o.set_member(NSV::PROP_uLISTENERS, new as_array_object());
 
 #ifndef NDEBUG
-	as_value tmp;
 	assert(o.get_member(NSV::PROP_uLISTENERS, &tmp));
 	assert(tmp.is_object());
+	assert(o.get_member(NSV::PROP_BROADCAST_MESSAGE, &tmp));
+	assert(tmp.is_function());
+
+#if 0 // we can't rely on the following, due to possible override 
+      // of the AsBroadcaster properties used to intialize this
+      // object
 	assert(o.get_member(NSV::PROP_ADD_LISTENER, &tmp));
 	assert(tmp.is_function());
 	assert(o.get_member(NSV::PROP_REMOVE_LISTENER, &tmp));
 	assert(tmp.is_function());
-	assert(o.get_member(NSV::PROP_BROADCAST_MESSAGE, &tmp));
-	assert(tmp.is_function());
+#endif // 0
+
 #endif
 }
 
@@ -375,11 +392,9 @@ AsBroadcaster_ctor(const fn_call& /*fn*/)
 	return as_value(obj); // will keep alive
 }
 
-void
-AsBroadcaster_init(as_object& global)
+as_object*
+AsBroadcaster::getAsBroadcaster()
 {
-	// _global.AsBroadcaster is NOT a class, but a simple object
-
 	VM& vm = VM::get();
 	int swfVersion = vm.getSWFVersion();
 
@@ -391,9 +406,20 @@ AsBroadcaster_init(as_object& global)
 		if ( swfVersion >= 6 )
 		{
 			obj->init_member("initialize", new builtin_function(AsBroadcaster::initialize_method));
+			obj->init_member("addListener", new builtin_function(AsBroadcaster::addListener_method));
+			obj->init_member("removeListener", new builtin_function(AsBroadcaster::removeListener_method));
+			obj->init_member("broadcastMessage", new builtin_function(AsBroadcaster::broadcastMessage_method));
 		}
 	}
-	global.init_member("AsBroadcaster", obj.get());
+
+	return obj.get();
+}
+
+void
+AsBroadcaster_init(as_object& global)
+{
+	// _global.AsBroadcaster is NOT a class, but a simple object
+	global.init_member("AsBroadcaster", AsBroadcaster::getAsBroadcaster());
 }
 
 } // end of gnash namespace

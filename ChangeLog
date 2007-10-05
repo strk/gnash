@@ -1,3 +1,12 @@
+2007-10-05 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/AsBroadcaster.{cpp,h} (initialize): query
+	  addListener and removeListener methods from the global
+	  AsBroadcaster, using any overridden member (shown
+	  to be needed by swfdec testsuite).
+	* testsuite/actionscript.all/AsBroadcaster.as: the new tests
+	  are fixed, added a TODO for adding more.
+
 2007-10-05 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gui.cpp: Handle key releases again.
