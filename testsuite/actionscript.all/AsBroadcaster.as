@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: AsBroadcaster.as,v 1.5 2007/09/29 16:22:57 strk Exp $";
+rcsid="$Id: AsBroadcaster.as,v 1.6 2007/10/05 20:50:44 strk Exp $";
 
 #include "check.as"
 
@@ -40,6 +40,17 @@ check_equals(AsBroadcaster.__proto__, Function.prototype);
 check_equals(typeof(AsBroadcaster.initialize), 'function');
 check(AsBroadcaster.hasOwnProperty('initialize'));
 check(!AsBroadcaster.prototype.hasOwnProperty('initialize'));
+
+// These functions are available as AsBroadcaster "statics"
+// and a lookup should be issued by 'initalize' so that overridden
+// functions are attached to the initialized object rather then
+// the original one (from swfdec/test/trace/asbroadcaster-override.as)
+xcheck_equals(typeof(AsBroadcaster.addListener), 'function');
+xcheck(AsBroadcaster.hasOwnProperty('addListener'));
+xcheck_equals(typeof(AsBroadcaster.removeListener), 'function');
+xcheck(AsBroadcaster.hasOwnProperty('removeListener'));
+xcheck_equals(typeof(AsBroadcaster.broadcastMessage), 'function');
+xcheck(AsBroadcaster.hasOwnProperty('broadcastMessage'));
 
 bc = new AsBroadcaster;
 check_equals(typeof(bc), 'object');
