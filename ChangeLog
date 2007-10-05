@@ -1,5 +1,12 @@
 2007-10-05 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.cpp: catch less ActionLimitException: in
+	  setMovieRoot and in advance (both can trigger immediate execution
+	  of actions). Basically I removed from setLevel as it can be called
+	  by a child of processAction thus resulting in a missing cleanup.
+
+2007-10-05 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.cpp: catch more ActionLimitException: in
 	  setLevel and in advance (both can trigger immediate execution
 	  of actions).

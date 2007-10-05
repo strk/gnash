@@ -137,11 +137,20 @@ movie_root::~movie_root()
 void
 movie_root::setRootMovie(movie_instance* movie)
 {
-	setLevel(0, movie);
+	try
+	{
+		setLevel(0, movie);
 
-	// actions in first frame of _level0 must execute now, before next advance,
-	// or they'll be executed with _currentframe being set to 2
-	processActionQueue();
+		// actions in first frame of _level0 must execute now, before next advance,
+		// or they'll be executed with _currentframe being set to 2
+		processActionQueue();
+	}
+	catch (ActionLimitException& al)
+	{
+		log_error(_("ActionLimits hit: %s"), al.what());
+		disableScripts();
+		clearActionQueue();
+	}
 }
 
 /* private */
@@ -165,16 +174,7 @@ movie_root::setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movi
 		(int) movie->get_movie_definition()->get_height_pixels());
 
 	/// Notify placement 
-	try
-	{
-		movie->stagePlacementCallback();
-	}
-	catch (ActionLimitException& al)
-	{
-		log_error(_("ActionLimits hit: %s"), al.what());
-		disableScripts();
-		clearActionQueue();
-	}
+	movie->stagePlacementCallback();
 
 	assert(testInvariant());
 }
@@ -1146,17 +1146,7 @@ movie_root::processActionQueue()
 	while ( ! _actionQueue.empty() )
 	{
 		ExecutableCode* code = _actionQueue.front();
-		try
-		{
-			code->execute();
-		}
-		catch (ActionLimitException& al)
-		{
-			log_error(_("ActionLimits hit: %s"), al.what());
-			disableScripts();
-			clearActionQueue();
-			break;
-		}
+		code->execute();
 		_actionQueue.pop_front(); 
 		delete code;
 	}
