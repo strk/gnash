@@ -1,5 +1,13 @@
 2007-10-05 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfmill.all/: Makefile.am, jump_after_end.xml:
+	  Test that it is completely fine to jump past the END opcode
+	  in an action buffer (thanks Chad). Note that the tests in
+	  misc-swfmill.all are not automated yet (need to find out how
+	  to make use of the Dejagnu.swf lib)
+
+2007-10-05 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.cpp: catch less ActionLimitException: in
 	  setMovieRoot and in advance (both can trigger immediate execution
 	  of actions). Basically I removed from setLevel as it can be called

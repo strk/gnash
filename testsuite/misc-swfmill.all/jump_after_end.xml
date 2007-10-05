@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<swf version="6" compressed="1">
+
+<!--
+This test checks if you can jump after the end opcode in a doaction block
+
+EXPECTED OUTPUT:
+   - TRACE: jump target
+
+TODO:
+  - Find out how to embed the Dejagnu.swf lib
+  - Find out how to call the Dejagnu.swf interfaces
+-->
+
+
+  <Header framerate="12" frames="1">
+    <size>
+      <Rectangle left="0" right="12800" top="0" bottom="9600"/>
+    </size>
+    <tags>
+      <SetBackgroundColor>
+        <color>
+          <Color red="255" green="255" blue="255"/>
+        </color>
+      </SetBackgroundColor>
+      <DoAction>
+        <actions>
+          <Dictionary>
+            <strings>
+              <String value="jump target"/>
+            </strings>
+          </Dictionary>
+          <PushData>
+            <items>
+              <StackInteger value="1"/>
+            </items>
+          </PushData>
+          <LogicalNOT/>
+          <BranchIfTrue byteOffset="7"/>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+          <Trace/>
+          <EndAction/>
+          <PushData>
+            <items>
+              <StackInteger value="2"/>
+            </items>
+          </PushData>
+          <Trace/>
+          <EndAction/>
+        </actions>
+      </DoAction>
+      <ShowFrame/>
+      <End/>
+    </tags>
+  </Header>
+</swf>

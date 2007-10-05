@@ -23,8 +23,9 @@ abs_topbuilddir=$(shell cd $(top_builddir); pwd)
 if ENABLE_SWFMILL
 
 ## Self-contained XML tests
-SC_XMLTESTS =		\
-	hello.xml	\
+SC_XMLTESTS =			\
+	hello.xml		\
+	jump_after_end.xml	\
 	$(NULL)
 
 ## Path to Dejagnu.swf file
@@ -39,7 +40,12 @@ Dejagnu.swf: $(DEJAGNU_SO_PATH)
 	cp ../misc-ming.all/Dejagnu.swf .
 
 check_SCRIPTS = \
+	alltests-runner \
 	$(NULL)
+
+alltests-runner: $(srcdir)/../generic-testrunner.sh $(SC_XMLTESTS_OUT) 
+	sh $< -r 50 $(top_builddir) $(SC_XMLTESTS_OUT) > $@
+	chmod 755 $@
 
 .xml.swf: 
 	$(SWFMILL) -v simple $(@:%.swf=$(srcdir)/%.xml) $@
