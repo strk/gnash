@@ -25,31 +25,25 @@ TODO:
       </SetBackgroundColor>
       <DoAction>
         <actions>
-          <Dictionary>
-            <strings>
-              <String value="jump target"/>
-            </strings>
-          </Dictionary>
           <PushData>
             <items>
               <StackInteger value="1"/>
             </items>
           </PushData>
-          <LogicalNOT/>
-          <BranchIfTrue byteOffset="7"/>
-          <PushData>
-            <items>
-              <StackDictionaryLookup index="0"/>
-            </items>
-          </PushData>
-          <Trace/>
+	  <Trace/>
+
+	  <!-- Now jump to after the END action -->
+          <BranchAlways byteOffset="1"/>
+
           <EndAction/>
+
           <PushData>
             <items>
-              <StackInteger value="2"/>
+              <StackString value="jump after end"/>
             </items>
           </PushData>
           <Trace/>
+
           <EndAction/>
         </actions>
       </DoAction>

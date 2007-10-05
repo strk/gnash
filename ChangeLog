@@ -1,5 +1,11 @@
 2007-10-05 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfmill.all/jump_after_end.xml:
+	  Fixed the XML to *really* do what I intended it to
+	  do. Still not self-contained though.
+
+2007-10-05 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-swfmill.all/: Makefile.am, jump_after_end.xml:
 	  Test that it is completely fine to jump past the END opcode
 	  in an action buffer (thanks Chad). Note that the tests in
