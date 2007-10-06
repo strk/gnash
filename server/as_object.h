@@ -194,19 +194,16 @@ public:
 	{
 		return set_member_default(name, val);
 	}
+
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
 	virtual bool on_event(const event_id& id );
 #endif
-	/// Initialize a member value
+
+	/// Initialize a member value by string
 	//
-	/// This method has to be used by built-in classes initialization
-	/// (VM initialization in general) as will avoid to scan the
-	/// inheritance chain and perform lowercase conversion when
-	/// VM version is initialized at versions < 7.
-	///
-	/// By dedfault, members initialized by calling this function will
-	/// be protected from deletion and not shown in enumeration.
-	/// These flags can be explicitly set using the third argument.
+	/// This is just a wrapper around the other init_member method
+	/// used as a trampoline to avoid changing all classes to 
+	/// use string_table::key directly.
 	///
 	/// @param name
 	///     Name of the member.
@@ -221,13 +218,34 @@ public:
 	///
 	void init_member(const std::string& name, const as_value& val, int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum);
 
-	/// \brief
-	/// Initialize a getter/setter property
+	/// Initialize a member value by key
 	//
 	/// This method has to be used by built-in classes initialization
 	/// (VM initialization in general) as will avoid to scan the
-	/// inheritance chain and perform lowercase conversion when
-	/// VM version is initialized at versions < 7.
+	/// inheritance chain.
+	///
+	/// By default, members initialized by calling this function will
+	/// be protected from deletion and not shown in enumeration.
+	/// These flags can be explicitly set using the third argument.
+	///
+	/// @param key
+	///     Member key.
+	///
+	/// @param val
+	///     Value to assign to the member.
+	///
+	/// @param flags
+	///     Flags for the new member. By default dontDelete and dontEnum.
+	///	See as_prop_flags::Flags.
+	///
+	void init_member(string_table::key key, const as_value& val, int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum);
+
+	/// \brief
+	/// Initialize a getter/setter property by name
+	//
+	/// This is just a wrapper around the other init_property method
+	/// used as a trampoline to avoid changing all classes to 
+	/// use string_table::key directly.
 	///
 	/// @param key
 	///     Name of the property.
@@ -247,6 +265,32 @@ public:
 	///
 	void init_property(const std::string& key, as_function& getter,
 		as_function& setter, int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum);
+
+	/// \brief
+	/// Initialize a getter/setter property by key
+	//
+	/// This method has to be used by built-in classes initialization
+	/// (VM initialization in general) as will avoid to scan the
+	/// inheritance chain.
+	///
+	/// @param key
+	///     Key of the property.
+	///
+	/// @param getter
+	///	A function to invoke when this property value is requested.
+	///	add_ref will be called on the function.
+	///
+	/// @param setter
+	///	A function to invoke when setting this property's value.
+	///	add_ref will be called on the function.
+	///
+	/// @param flags
+	///     Flags for the new member. By default dontDelete and dontEnum.
+	///	See as_prop_flags::Flags.
+	///
+	void init_property(string_table::key key, as_function& getter,
+		as_function& setter, int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum);
+
 
 	/// \brief
 	/// Initialize a destructive getter/setter property

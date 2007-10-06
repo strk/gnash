@@ -405,10 +405,15 @@ AsBroadcaster::getAsBroadcaster()
 		VM::get().addStatic(obj.get()); // correct ?
 		if ( swfVersion >= 6 )
 		{
+			// NOTE: we may add NSV::PROP_INITIALIZE, unavailable at time of writing.
+			//       anyway, since AsBroadcaster is the only class we know using an 'initialize'
+			//       method we might as well save the string_table size in case we'll not load
+			//       the class.
 			obj->init_member("initialize", new builtin_function(AsBroadcaster::initialize_method));
-			obj->init_member("addListener", new builtin_function(AsBroadcaster::addListener_method));
-			obj->init_member("removeListener", new builtin_function(AsBroadcaster::removeListener_method));
-			obj->init_member("broadcastMessage", new builtin_function(AsBroadcaster::broadcastMessage_method));
+
+			obj->init_member(NSV::PROP_ADD_LISTENER, new builtin_function(AsBroadcaster::addListener_method));
+			obj->init_member(NSV::PROP_REMOVE_LISTENER, new builtin_function(AsBroadcaster::removeListener_method));
+			obj->init_member(NSV::PROP_BROADCAST_MESSAGE, new builtin_function(AsBroadcaster::broadcastMessage_method));
 		}
 	}
 

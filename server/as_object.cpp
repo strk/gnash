@@ -240,68 +240,72 @@ as_object::set_member_default(string_table::key key, const as_value& val )
 void
 as_object::init_member(const std::string& key1, const as_value& val, int flags)
 {
-
-	//log_msg(_("Setting member %s (SWF version:%d)"), key.c_str(), vm.getSWFVersion());
-
-	VM& vm = _vm;
-
-	if ( vm.getSWFVersion() < 7 )
+	if ( _vm.getSWFVersion() < 7 )
 	{
 		std::string keylower = key1;
-		boost::to_lower(keylower, vm.getLocale());
+		boost::to_lower(keylower, _vm.getLocale());
 
-		// Set (or create) a SimpleProperty 
-		if (! _members.setValue(_vm.getStringTable().find(keylower), val, *this) )
-		{
-			log_error(_("Attempt to initialize read-only property ``%s''"
-				" (%s) on object ``%p'' twice"),
-				keylower.c_str(), key1.c_str(), (void*)this);
-			// We shouldn't attempt to initialize a member twice, should we ?
-			assert(0);
-		}
-		// TODO: optimize this, don't scan again !
-		_members.setFlags(_vm.getStringTable().find(keylower), flags, 0);
+		init_member(_vm.getStringTable().find(keylower), val, flags);
+
 	}
 	else
 	{
-		// Set (or create) a SimpleProperty 
-		if ( ! _members.setValue(_vm.getStringTable().find(key1), val, *this) )
-		{
-			log_error(_("Attempt to initialize read-only property ``%s''"
-				" on object ``%p'' twice"),
-				key1.c_str(), (void*)this);
-			// We shouldn't attempt to initialize a member twice, should we ?
-			assert(0);
-		}
-		// TODO: optimize this, don't scan again !
-		_members.setFlags(_vm.getStringTable().find(key1), flags, 0);
+		init_member(_vm.getStringTable().find(key1), val, flags);
 	}
+}
+
+void
+as_object::init_member(string_table::key key, const as_value& val, int flags)
+{
+	//log_debug(_("Initializing member %s for object %p"), _vm.getStringTable().value(key).c_str(), (void*) this);
+
+	// Set (or create) a SimpleProperty 
+	if (! _members.setValue(key, val, *this) )
+	{
+		log_error(_("Attempt to initialize read-only property ``%s''"
+			" on object ``%p'' twice"),
+			_vm.getStringTable().value(key).c_str(), (void*)this);
+		// We shouldn't attempt to initialize a member twice, should we ?
+		assert(0);
+	}
+	// TODO: optimize this, don't scan again !
+	_members.setFlags(key, flags, 0);
 }
 
 void
 as_object::init_property(const std::string& key, as_function& getter,
 		as_function& setter, int flags)
 {
-	bool success;
 	if ( _vm.getSWFVersion() < 7 )
 	{
 		std::string name = key;
 		boost::to_lower(name, _vm.getLocale());
-		success = _members.addGetterSetter(_vm.getStringTable().find(name), getter, setter);
-		//log_msg(_("Initialized property '%s'"), name.c_str());
-		// TODO: optimize this, don't scan again !
-		_members.setFlags(_vm.getStringTable().find(name), flags, 0);
+		string_table::key k = _vm.getStringTable().find(name);
+		init_property(k, getter, setter, flags);
 	}
 	else
 	{
-		success = _members.addGetterSetter(_vm.getStringTable().find(key), getter, setter);
-		//log_msg(_("Initialized property '%s'"), key.c_str());
-		// TODO: optimize this, don't scan again !
-		_members.setFlags(_vm.getStringTable().find(key), flags, 0);
+		string_table::key k = _vm.getStringTable().find(key);
+		init_property(k, getter, setter, flags);
 	}
+
+}
+
+void
+as_object::init_property(string_table::key key, as_function& getter,
+		as_function& setter, int flags)
+{
+	bool success;
+	success = _members.addGetterSetter(key, getter, setter);
 
 	// We shouldn't attempt to initialize a property twice, should we ?
 	assert(success);
+
+	//log_msg(_("Initialized property '%s'"), name.c_str());
+
+	// TODO: optimize this, don't scan again !
+	_members.setFlags(key, flags, 0);
+
 }
 
 bool

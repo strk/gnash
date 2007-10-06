@@ -1,3 +1,10 @@
+2007-10-06 Sandro Santilli <strk@keybit.net>
+
+	* server/as_object.{cpp,h}: add init_member and init_property
+	  based on string_table::key
+	* server/asobj/AsBroadcaster.cpp (initialize): use string_table 
+	  keys when already available.
+
 2007-10-06 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* libmedia/sdl/AudioDecoderFfmpeg.cpp: Release allocate data on errors.
