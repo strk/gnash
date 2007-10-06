@@ -36,6 +36,8 @@
 #include "namedStrings.h"
 
 #include <boost/algorithm/string/case_conv.hpp>
+#include <boost/lexical_cast.hpp>
+
 
 using namespace std;
 
@@ -219,26 +221,23 @@ as_value::to_number(as_environment* env) const
 			// @@ Moock says the rule here is: if the
 			// string is a valid float literal, then it
 			// gets converted; otherwise it is set to NaN.
-			char* tail=0;
-			const char* s = getStr().c_str();
 
-			double d = strtod(s, &tail);
-			// Detect failure by "tail" still being at the start of
-			// the string or there being extra junk after the
-			// converted characters.
-			if ( tail == s || *tail != 0 )
-			{
-				// Failed conversion to Number.
+			try { 
+
+				double d = boost::lexical_cast<double>(getStr());
+
+				if ( isinf(d) ) {
+					return (double)NAN;
+				}
+
+				return d;
+
+			} catch (boost::bad_lexical_cast &) {
+
 				return (double)NAN;
+
 			}
 
-			// "Infinity" and "-Infinity" are recognized by strtod()
-			// but Flash Player returns NaN for them.
-			if ( isinf(d) ) {
-				return (double)NAN;
-			}
-
-			return d;
 		}
 
 		case NULLTYPE:
