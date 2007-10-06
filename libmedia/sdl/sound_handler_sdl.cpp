@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.3 2007/10/03 21:43:05 tgc Exp $
+// $Id: sound_handler_sdl.cpp,v 1.4 2007/10/06 09:53:45 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -177,7 +177,7 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 	}
 
 	// Make a "active_sound" for this sound which is later placed on the vector of instances of this sound being played
-	std::auto_ptr<active_sound> sound ( new active_sound );
+	std::auto_ptr<active_sound> sound ( new active_sound() );
 
 	// Set source data to the active_sound
 	sound->set_data(sounddata);
