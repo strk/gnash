@@ -1,5 +1,11 @@
 2007-10-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Number.as: test conversion of a string
+	  with a decimal point to a number (fails when locales have comma
+	  instead of dot as the decimal point). See bug #21168.
+
+2007-10-06 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/string.{h,cpp} (init_string_instance): when in SWF6 fetch
 	  constructor from the global object, to use any overrided one
 	  (swfdec testsuite contains a test for this).
