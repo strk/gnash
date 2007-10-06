@@ -1,5 +1,10 @@
 2007-10-06 Sandro Santilli <strk@keybit.net>
 
+	* libbase/curl_adapter.cpp (fill_cache): fix compiler warning
+	  (printf formats)
+
+2007-10-06 Sandro Santilli <strk@keybit.net>
+
 	* server/as_object.{cpp,h}: add init_member and init_property
 	  based on string_table::key
 	* server/asobj/AsBroadcaster.cpp (initialize): use string_table 

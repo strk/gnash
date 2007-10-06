@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: curl_adapter.cpp,v 1.41 2007/10/01 14:20:19 bwy Exp $ */
+/* $Id: curl_adapter.cpp,v 1.42 2007/10/06 10:31:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -412,12 +412,12 @@ CurlStreamFile::fill_cache(long unsigned size)
 						  CURLINFO_RESPONSE_CODE, &code);
 
 				if ( code >= 400 ) {
-					gnash::log_error ("HTTP response %d from url %s",
+					gnash::log_error ("HTTP response %ld from url %s",
 							code, _url.c_str());
 					_error = TU_FILE_OPEN_ERROR;
 					_running = false;
 				} else {
-					gnash::log_msg ("HTTP response %d from url %s",
+					gnash::log_msg ("HTTP response %ld from url %s",
 							code, _url.c_str());
 				}
 
