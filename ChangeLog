@@ -1,5 +1,14 @@
 2007-10-06 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/string.{h,cpp} (init_string_instance): when in SWF6 fetch
+	  constructor from the global object, to use any overrided one
+	  (swfdec testsuite contains a test for this).
+	* server/vm/ASHandlers.cpp (ActionGetMember): drop special handling
+	  for 'length' (it's incorrect and was marked with a FIXME).
+	* testsuite/swfdec/PASSING: string-convert-{6,7} succeed now.
+
+2007-10-06 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/string.cpp (string_index_of): only use second argument
 	  if it casts to positive integer.
 	* testsuite/actionscript.all/String.as: more tests.

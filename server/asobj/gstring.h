@@ -39,7 +39,13 @@ class as_object;
 // Initialize the global String class
 void string_class_init(as_object& global);
 
-/// Return a String instance
+/// Return a String instance (possibibly NULL!)
+//
+/// This function will use the native String constructor in SWF5, but
+/// any function registered by user as the _global.String for SWF6 and higher.
+/// In the second case, not finding a proper constructor might result in
+/// returning the NULL object.
+///
 boost::intrusive_ptr<as_object> init_string_instance(const char* val);
 
 }

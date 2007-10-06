@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.38 2007/10/06 07:08:52 strk Exp $ */
+/* $Id: string.cpp,v 1.39 2007/10/06 08:17:48 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -33,6 +33,7 @@
 #include "GnashException.h"
 #include "VM.h" // for registering static GcResources (constructor and prototype)
 #include "Object.h" // for getObjectInterface
+#include "namedStrings.h"
 
 #include <boost/algorithm/string/case_conv.hpp>
 
@@ -597,10 +598,54 @@ void string_class_init(as_object& global)
 boost::intrusive_ptr<as_object>
 init_string_instance(const char* val)
 {
-    boost::intrusive_ptr<builtin_function> cl = getStringConstructor();
-    as_environment env;
-    env.push(val);
-    return cl->constructInstance(env, 1, 0);
+	// TODO: get the environment passed in !!
+	as_environment env;
+
+	// TODO: get VM from the environment ?
+	VM& vm = VM::get();
+	int swfVersion = vm.getSWFVersion();
+
+	boost::intrusive_ptr<as_function> cl;
+
+	if ( swfVersion < 6 )
+	{
+		cl = getStringConstructor();
+	}
+	else
+	{
+		as_object* global = vm.getGlobal();
+		as_value clval;
+		if ( ! global->get_member(NSV::CLASS_STRING, &clval) )
+		{
+			log_debug("UNTESTED: String instantiation requested but _global doesn't contain a 'String' symbol. Returning the NULL object.");
+			return cl;
+			//cl = getStringConstructor();
+		}
+		else if ( ! clval.is_function() )
+		{
+			log_debug("UNTESTED: String instantiation requested but _global.String is not a function (%s). Returning the NULL object.",
+				clval.to_debug_string().c_str());
+			return cl;
+			//cl = getStringConstructor();
+		}
+		else
+		{
+			cl = clval.to_as_function();
+			assert(cl);
+		}
+	}
+
+#ifndef NDEBUG
+	size_t prevStackSize = env.stack_size();
+#endif
+	env.push(val);
+	boost::intrusive_ptr<as_object> ret = cl->constructInstance(env, 1, 0);
+	env.drop(1);
+#ifndef NDEBUG
+	assert( prevStackSize == env.stack_size());
+#endif
+
+	return ret;
 }
 
 } // namespace gnash

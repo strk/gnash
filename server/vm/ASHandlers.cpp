@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.140 2007/10/05 00:01:38 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.141 2007/10/06 08:17:48 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2931,12 +2931,6 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
                target.to_debug_string().c_str(), (void*)obj.get());
 	);
 
-    // Special case: String has a member "length"
-    // @@ FIXME: we shouldn't have all this "special" cases --strk;
-    if (target.is_string() && member_name.to_string_versioned(version) == "length") {
-        int len = target.to_string_versioned(version).size();
-        env.top(1).set_int(len);
-    } else {
         if ( ! thread.getObjectMember(*obj, member_name.to_string(&env), env.top(1)) )
 	{
             env.top(1).set_undefined();
@@ -2948,8 +2942,8 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
                    member_name.to_debug_string().c_str(),
                    env.top(1).to_debug_string().c_str());
 	);
-    }
-    env.drop(1);
+
+	env.drop(1);
 
 }
 
