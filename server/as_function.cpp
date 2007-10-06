@@ -298,8 +298,29 @@ function_call(const fn_call& fn)
 	else
 	{
 		// Get the object to use as 'this' reference
-		boost::intrusive_ptr<as_object> this_ptr = fn.arg(0).to_object();
-		new_fn_call.this_ptr = this_ptr;
+		as_value this_val = fn.arg(0);
+		boost::intrusive_ptr<as_object> this_ptr = this_val.to_object();
+
+		if ( ! this_ptr )
+		{
+			// If the first argument is not an object, we should
+			// not pass an object to the function, which I belive
+			// should be allowed (but gnash code is not ready).
+			// Anyway, the 'this' label inside the function should 
+			// then be a strange object in that typeof() would return
+			// 'object' but when compared to undefined matches !!
+			// See actionscript.all/Function.as
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("First argument to Function.call(%s) doesn't cast to object. "
+				"Gnash will keep the current 'this' pointer as it is, "
+				"but this is known to not be the correct way to handle "
+				"such a malformed call."), this_val.to_debug_string().c_str());
+			);
+		}
+		else
+		{
+			new_fn_call.this_ptr = this_ptr;
+		}
 		new_fn_call.nargs--;
 		new_fn_call.set_offset(new_fn_call.offset()-1);
 	}

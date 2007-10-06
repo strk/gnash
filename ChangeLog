@@ -1,3 +1,12 @@
+2007-10-06 Sandro Santilli <strk@keybit.net>
+
+	* server/as_function.cpp (function_call): handle the case in which
+	  first argument given to Function.call does not cast to an object.
+	  The handling is not correct, but at least prevents assertion
+	  failures and prints an ascoding error. Fixes bug #21236.
+	* testsuite/actionscript.all/Function.as: add few more tests for
+	  Function.call(<not-an-object>).
+
 2007-10-05  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* macros/boost.m4: Adjust error messages when boost files aren't

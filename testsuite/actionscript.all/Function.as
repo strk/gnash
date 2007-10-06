@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.57 2007/09/29 16:22:57 strk Exp $";
+rcsid="$Id: Function.as,v 1.58 2007/10/06 06:28:29 strk Exp $";
 
 #include "check.as"
 
@@ -133,8 +133,30 @@ check_equals(typeOf(getThisName.apply), 'undefined');
 
 #if OUTPUT_VERSION >= 6
 
-// Test Function.call(arg1, arg2, arg3)
+// Test Function.call(this, arg1, arg2, arg3)
 check_equals ( getThisName.call(this_ref, 1, 2, 3), "extname123" );
+
+// Test Function.call(null, arg1, arg2, arg3)
+nullcall = getThisName.call(null, 1, 2, 3);
+#if OUTPUT_VERSION > 6
+ check_equals ( typeof(nullcall), 'number' );
+ check ( isNaN(nullcall) );
+#else
+ check_equals ( nullcall, 6 );
+#endif
+
+function getThis () { ++c; return this; }
+o={};
+c=0;
+ret = getThis.call(o);
+check_equals(ret, o);
+check_equals(c, 1);
+ret = getThis.call(null);
+check_equals(c, 2);
+xcheck_equals(typeof(ret), 'object');
+xcheck_equals(ret, undefined); // an object type which returns 'undefined' as primitive value ?
+check( ! (ret === undefined) ); // an object type which returns 'undefined' as primitive value ?
+check( ! (ret === null) ); // an object type which returns 'undefined' as primitive value ?
 
 #else // OUTPUT_VERSION < 6
 
