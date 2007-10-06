@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: VideoDecoderFfmpeg.cpp,v 1.3 2007/10/04 09:41:46 tgc Exp $
+// $Id: VideoDecoderFfmpeg.cpp,v 1.4 2007/10/06 10:32:28 strk Exp $
 
 #include "VideoDecoderFfmpeg.h"
 
@@ -215,6 +215,11 @@ uint8_t* VideoDecoderFfmpeg::decode(uint8_t* input, uint32_t inputSize, uint32_t
 {
 	// Allocate a frame to store the decoded frame in
 	AVFrame* frame = avcodec_alloc_frame();
+	if ( ! frame )
+	{
+		log_error(_("Out of memory while allocating avcodec frame"));
+		return NULL;
+	}
 
 	int got = 0;
 	avcodec_decode_video(_videoCodecCtx, frame, &got, input, inputSize);

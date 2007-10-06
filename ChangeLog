@@ -1,5 +1,8 @@
+
 2007-10-06 Sandro Santilli <strk@keybit.net>
 
+	* libmedia/sdl/VideoDecoderFfmpeg.cpp (decode): check return from
+	  avcodec_alloc_frame.
 	* libbase/curl_adapter.cpp (fill_cache): fix compiler warning
 	  (printf formats)
 
