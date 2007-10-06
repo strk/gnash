@@ -16,7 +16,7 @@
 
 // Original author: Mike Carlson - June 19th, 2006
 
-rcsid="$Id: String.as,v 1.24 2007/10/05 22:27:57 strk Exp $";
+rcsid="$Id: String.as,v 1.25 2007/10/06 07:08:52 strk Exp $";
 
 #include "check.as"
 
@@ -34,19 +34,34 @@ check_equals ( a.charAt(3), "l" );
 check_equals ( a.charAt(4), "a" );
 isNaN ( a.charAt(-1) );
 isNaN (a.charAt(21) );
-check_equals ( a.indexOf("lawa"), 3 );
 check_equals ( a.lastIndexOf("lawa"), 8);
 
 //----------------------------------------
 // Check String.indexOf
 //-----------------------------------------
 
+// wallawallawashinGTON
+check_equals ( a.indexOf("lawa"), 3 );
 check_equals ( a.indexOf("lawas"), 8 );
 check_equals ( a.indexOf("hinG"), 13 );
 check_equals ( a.indexOf("hing"), -1 );
 check_equals ( a.indexOf("lawas", -1), 8 );
 check_equals ( a.indexOf("a", 2), 4 );
-//TODO: add many more tests with a second argument to indexOf !
+check_equals ( a.indexOf("a", -1), 1 ); 
+check_equals ( a.indexOf("a", -2), 1 ); 
+check_equals ( a.indexOf("l"), 2 ); 
+check_equals ( a.indexOf("l", 2.1), 2 ); 
+check_equals ( a.indexOf("l", 2.8), 2 ); 
+check_equals ( a.indexOf("l", 3), 3 ); 
+check_equals ( a.indexOf("l", 3.5), 3 ); 
+check_equals ( a.indexOf("l", 3.8), 3 ); 
+check_equals ( a.indexOf("l", -3.8), 2 ); 
+check_equals ( a.indexOf("l", -4.8), 2 ); 
+check_equals ( a.indexOf("l", -4), 2 ); 
+o = {}; o.valueOf = function() { return 2; };
+check_equals ( a.indexOf("a", o), 4 ); 
+o2 = {}; o2.toString = function() { return "a"; };
+check_equals ( a.indexOf(o2, o), 4 ); 
 
 //----------------------------------------
 // Check String.split

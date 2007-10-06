@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.37 2007/09/27 22:20:07 strk Exp $ */
+/* $Id: string.cpp,v 1.38 2007/10/06 07:08:52 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -409,12 +409,27 @@ string_index_of(const fn_call& fn)
 
     ENSURE_FN_ARGS(1, 2, -1);
 
-    const std::string& toFind = fn.arg(0).to_string(&(fn.env()));
+    as_value& tfarg = fn.arg(0); // to find arg
+    const std::string& toFind = tfarg.to_string(&(fn.env()));
 
     size_t start = 0;
 
-    if (fn.nargs >= 2) {
-        start = fn.arg(1).to_number<size_t>();
+    if (fn.nargs >= 2)
+    {
+        as_value& saval = fn.arg(1); // start arg val
+        int start_arg = saval.to_int(fn.env());
+        if ( start_arg > 0 ) start = (size_t) start_arg;
+	else
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		if ( start_arg < 0 )
+		{
+			log_aserror("String.indexOf(%s, %s): second argument casts to invalid offset (%d)",
+				tfarg.to_debug_string().c_str(),
+				saval.to_debug_string().c_str(), start_arg);
+		}
+		);
+	}
     }
 
     size_t pos = str.find(toFind, start);
