@@ -255,6 +255,9 @@ public:
 
 	/// Get the named exported resource, if we expose it.
 	//
+	/// @param symbol
+	///	The symbol name. Matching should be case-insensitive for all SWF versions.
+	///
 	/// @return NULL if the label doesn't correspond to an exported
 	///         resource. This is the default behaviour.
 	///

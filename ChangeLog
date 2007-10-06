@@ -1,5 +1,15 @@
 2007-10-06 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (sprite_attach_movie): remove useless
+	  std::string construction.
+	* server/parser/movie_def_impl.h: change ExportMap to use
+	  case-insensitive string comparison.
+	* server/parser/movie_definition.h: update get_exported_resource
+	  documentation to mention string matching is always case-insensitive.
+	* testsuite/swfdec/PASSING: export-case-# success.
+
+2007-10-06 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Number.as: test conversion of a string
 	  with a decimal point to a number (fails when locales have comma
 	  instead of dot as the decimal point). See bug #21168.

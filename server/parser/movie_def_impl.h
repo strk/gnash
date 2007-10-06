@@ -33,6 +33,7 @@
 #include "resource.h" // for boost::intrusive_ptr visibility of dtor
 #include "stream.h" // for get_bytes_loaded
 #include "Timeline.h" // for composition 
+#include "StringPredicates.h" // for case-insensitive string comparision (ExportMap)
 
 #include <map> // for CharacterDictionary
 #include <string>
@@ -225,7 +226,7 @@ private:
 	// Mutex protecting access to _namedFrames
 	mutable boost::mutex _namedFramesMutex;
 
-	typedef std::map<std::string, boost::intrusive_ptr<resource> > ExportMap;
+	typedef std::map<std::string, boost::intrusive_ptr<resource>, StringNoCaseLessThen > ExportMap;
 	ExportMap m_exports;
 
 	/// Items we import.

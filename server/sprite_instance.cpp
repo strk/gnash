@@ -165,7 +165,7 @@ static as_value sprite_attach_movie(const fn_call& fn)
 	// Get exported resource 
 	const std::string& id_name = fn.arg(0).to_string(&fn.env());
 
-	boost::intrusive_ptr<resource> exported = sprite->get_movie_definition()->get_exported_resource(id_name.c_str());
+	boost::intrusive_ptr<resource> exported = sprite->get_movie_definition()->get_exported_resource(id_name);
 	if ( exported == NULL )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
