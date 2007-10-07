@@ -1,5 +1,12 @@
 2007-10-07 Chad Musick <chadmusick@msbx.net>
 
+	* server/vm/SafeStack.h: New file. Complete definition of a stack
+	  which can be used for obtaining references valid for the life of
+	  the stack and has facilities for simulating multiple stacks
+	  in one stack.  See the class for documentation.
+
+2007-10-07 Chad Musick <chadmusick@msbx.net>
+
 	* server/vm/CodeStream.h: New file. Complete definition of a stream
 	  for safely reading code, with necessary reader functions for AS3.
 
