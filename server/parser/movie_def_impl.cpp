@@ -42,6 +42,7 @@
 #include "sound_definition.h" // for sound_sample
 #include <boost/bind.hpp>
 
+#include <iomanip>
 #include <memory>
 #include <string>
 #include <unistd.h>
@@ -139,46 +140,38 @@ MovieLoader::start()
 //
 // some utility stuff
 //
-// FIXME, this needs work now that log_msg always ends with a newline.
 
-void	dump_tag_bytes(stream* in)
-    // Log the contents of the current tag, in hex.
+/// Log the contents of the current tag, in hex to the output strream
+static void	dump_tag_bytes(stream* in, ostream& os)
 {
     static const int	ROW_BYTES = 16;
     char	row_buf[ROW_BYTES];
     int	row_count = 0;
 
-    while(in->get_position() < in->get_tag_end_position())
-        {
-            int	c = in->read_u8();
-            log_msg("%02X", c);
+    row_buf[ROW_BYTES-1] = '\0';
 
-            if (c < 32) c = '.';
-            if (c > 127) c = '.';
+    os << endl;
+    while(in->get_position() < in->get_tag_end_position())
+    {
+            int	c = in->read_u8();
+            os << std::hex << std::setw(2) << std::setfill('0') << c << " ";
+
+            if (c < 32 || c > 127 ) c = '.';
             row_buf[row_count] = c;
 
             row_count++;
             if (row_count >= ROW_BYTES)
-                {
-                    log_msg("    ");
-                    for (int i = 0; i < ROW_BYTES; i++)
-                        {
-                            log_msg("%c", row_buf[i]);
-                        }
-
-                    log_msg("\n");
+            {
+                    os << row_buf << endl;
                     row_count = 0;
-                }
-            else
-                {
-                    log_msg(" ");
-                }
-        }
-
-    if (row_count > 0)
-        {
-            log_msg("\n");
-        }
+            }
+   }
+   if ( row_count )
+   {
+            row_buf[row_count] = '\0';
+            while (row_count++ < ROW_BYTES ) os << "   ";
+            os << row_buf << endl;
+   }
 }
 
 
@@ -931,7 +924,9 @@ parse_tag:
 			log_error(_("*** no tag loader for type %d (movie)"),
 				tag_type);
 			IF_VERBOSE_PARSE(
-				dump_tag_bytes(&str);
+				stringstream ss;
+				dump_tag_bytes(&str, ss);
+				log_error("tag dump follows: %s", ss.str().c_str());
 			);
 		}
 
