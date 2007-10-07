@@ -1,3 +1,8 @@
+2007-10-07 Chad Musick <chadmusick@msbx.net>
+
+	* server/vm/CodeStream.h: New file. Complete definition of a stream
+	  for safely reading code, with necessary reader functions for AS3.
+
 2007-10-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/as_value.cpp (to_number): use boost::lexical_cast instead
