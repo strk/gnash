@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: button_character_def.cpp,v 1.18 2007/08/27 12:44:28 strk Exp $ */
+/* $Id: button_character_def.cpp,v 1.19 2007/10/07 21:15:59 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -70,7 +70,7 @@ void	button_action::read(stream* in, int tag_type)
 	}
 
 	IF_VERBOSE_PARSE (
-	log_parse(_("-- actions in button\n")); // @@ need more info about which actions
+	log_parse(_("-- actions in button")); // @@ need more info about which actions
 	);
 
 	// Read actions.

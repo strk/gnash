@@ -891,7 +891,7 @@ parse_tag:
 			// show frame tag -- advance to the next frame.
 
 			IF_VERBOSE_PARSE(
-				log_parse("  show_frame\n");
+				log_parse("  show_frame");
 			);
 
 			incrementLoadedFrames();
