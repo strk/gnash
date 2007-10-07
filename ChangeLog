@@ -1,5 +1,9 @@
 2007-10-06 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/RemoveObjectTag.cpp (loader): don't attempt to unregister
+	  a timeline depth if depth is out of the static zone. PlaceObject2
+	  does the same avoiding to register the depth in this case. Fixes bug
+	  #21281.
 	* server/parser/movie_def_impl.cpp (dump_tag_bytes): output cleanup.
 
 2007-10-07 Chad Musick <chadmusick@msbx.net>

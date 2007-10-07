@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: RemoveObjectTag.cpp,v 1.4 2007/07/01 10:54:35 bjacques Exp $ */
+/* $Id: RemoveObjectTag.cpp,v 1.5 2007/10/07 21:37:15 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -63,12 +63,21 @@ RemoveObjectTag::loader(stream* in, tag_type tag, movie_definition* m)
     std::auto_ptr<RemoveObjectTag> t ( new RemoveObjectTag );
     t->read(in, tag);
 
+    int depth = t->getDepth();
+
     IF_VERBOSE_PARSE
     (
-	log_parse(_("  remove_object_2(%d)"), t->getDepth());
+	log_parse(_("  remove_object_2(%d)"), depth);
     );
 
-    m->removeTimelineDepth(t->getDepth());
+    if ( depth < 0 && depth >= character::staticDepthOffset )
+    {
+        m->removeTimelineDepth(depth);
+    }
+    else
+    {
+	log_debug("RemoveObjectTag depth %d is out of static depth zone. Won't unregister its TimelineDepth.", depth);
+    }
 
     // Ownership transferred to movie_definition
     m->add_execute_tag(t.release());
