@@ -81,7 +81,7 @@ uint64_t	tu_timer::get_profile_ticks()
 	
 	gettimeofday(&tv, 0);
 
-	uint64_t result = tv.tv_sec * 1000000;
+	uint64_t result = (uint64_t)tv.tv_sec * 1000000L;
 
 	result += tv.tv_usec;
 	// Time Unit: microsecond

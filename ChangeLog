@@ -1,3 +1,7 @@
+2007-10-08 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* libbase/tu_timer.cpp: Avoid range problems. Fixes bug #21289 
+
 2007-10-08 Sandro Santilli <strk@keybit.net>
 
 	* server/as_value.{cpp,h}: fully inlined destructor, since it has
