@@ -182,7 +182,7 @@ main (int /*argc*/, char** /*argv*/) {
         runtest.fail ("streamsTimeout");
     }
 
-    if (rc.SSLInsecure()) {
+    if (rc.insecureSSL()) {
         runtest.pass ("insecureSSL");
     } else {
         runtest.fail ("insecureSSL");

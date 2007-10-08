@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: curl_adapter.cpp,v 1.42 2007/10/06 10:31:18 strk Exp $ */
+/* $Id: curl_adapter.cpp,v 1.43 2007/10/08 12:56:27 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -474,7 +474,7 @@ CurlStreamFile::init(const std::string& url)
 	// Override cURL's default verification of SSL certificates
 	// This is insecure, so log security warning.
 	// Equivalent to curl -k or curl --insecure.
-	if (gnash::RcInitFile::getDefaultInstance().SSLInsecure())
+	if (gnash::RcInitFile::getDefaultInstance().insecureSSL())
 	{
                 gnash::log_security(_("Allowing connections to SSL sites with invalid"
 				 " or absent certificates"));		

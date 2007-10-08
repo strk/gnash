@@ -156,19 +156,51 @@ KdeGui::setupEvents()
 gnash::key::code
 KdeGui::qtToGnashKey(QKeyEvent *event)
 {
+
+    // Gnash uses its own keycodes to map key events
+    // to the three sometimes weird and confusing values that flash movies
+    // can refer to. See gnash.h for the keycodes and map.
+    //
+    // Gnash's keycodes are gnash::key::code. They are mainly in ascii order.
+    // Standard ascii characters (32-127) have the same value. Extended ascii
+    // characters (160-254) are in ascii order but correspond to gnash::key::code
+    // 169-263. Non-character values must normally be mapped separately.
+
     gnash::key::code c = gnash::key::INVALID;
     int key = event->key();
-    
+
+    // Qt seems to treat numbers on the keypad and main keyboard
+    // as the same key event, so needs this check:
     if (key >= Qt::Key_0 && key <= Qt::Key_9) {
       if (event->state() & Qt::Keypad)
           c = (gnash::key::code) ((key - Qt::Key_0) + gnash::key::KP_0);
       else
           c = (gnash::key::code) ((key - Qt::Key_0) + gnash::key::_0);
-    } else if (key >= Qt::Key_A && key <= Qt::Key_Z) {
-        c = (gnash::key::code) ((key - Qt::Key_A) + gnash::key::A);
-    } else if (key >= Qt::Key_F1 && key <= Qt::Key_F15) {
+    }
+
+    // All other characters between ascii 32 and 126 are simple.
+    // From space (32) to slash (47):
+    else if (key >= Qt::Key_Space && key <= Qt::Key_Slash) {
+        c = (gnash::key::code) ((key - Qt::Key_Space) + gnash::key::SPACE);
+    }
+
+    // From colon (58) to tilde (126):
+    else if (key >= Qt::Key_Colon && key <= Qt::Key_AsciiTilde) {
+        c = (gnash::key::code) ((key - Qt::Key_Colon) + gnash::key::COLON);
+    }
+
+    // Function keys:
+    else if (key >= Qt::Key_F1 && key <= Qt::Key_F15) {
         c = (gnash::key::code) ((key - Qt::Key_F1) + gnash::key::F1);
-    } else {
+    }
+
+    // Extended ascii from non-breaking (160) space to ÿ (264) is in the same
+    // order.
+    else if (key >= Qt::Key_nobreakspace && key <= Qt::Key_ydiaeresis) {
+        c = (gnash::key::code) ((key - Qt::Key_nobreakspace) + gnash::key::NOBREAKSPACE);
+    }
+
+    else {
         // many keys don't correlate, so just use a look-up table.
         struct {
             int               qt;
@@ -186,7 +218,7 @@ KdeGui::qtToGnashKey(QKeyEvent *event)
             { Qt::Key_CapsLock, gnash::key::CAPSLOCK },
 
             { Qt::Key_Escape, gnash::key::ESCAPE },
-            { Qt::Key_Space, gnash::key::SPACE },
+            //{ Qt::Key_Space, gnash::key::SPACE },
 
             { Qt::Key_Next, gnash::key::PGDN },
             { Qt::Key_Prior, gnash::key::PGUP },
@@ -201,14 +233,14 @@ KdeGui::qtToGnashKey(QKeyEvent *event)
 
             { Qt::Key_Help, gnash::key::HELP },
             { Qt::Key_NumLock, gnash::key::NUM_LOCK },
-            { Qt::Key_Semicolon, gnash::key::SEMICOLON },
-            { Qt::Key_Equal, gnash::key::EQUALS },
-            { Qt::Key_Minus, gnash::key::MINUS },
-            { Qt::Key_Slash, gnash::key::SLASH },
-            { Qt::Key_BracketLeft, gnash::key::LEFT_BRACKET },
-            { Qt::Key_Backslash, gnash::key::BACKSLASH },
-            { Qt::Key_BracketRight, gnash::key::RIGHT_BRACKET },
-            { Qt::Key_QuoteDbl, gnash::key::DOUBLE_QUOTE },
+            //{ Qt::Key_Semicolon, gnash::key::SEMICOLON },
+            //{ Qt::Key_Equal, gnash::key::EQUALS },
+            //{ Qt::Key_Minus, gnash::key::MINUS },
+            //{ Qt::Key_Slash, gnash::key::SLASH },
+            //{ Qt::Key_BracketLeft, gnash::key::LEFT_BRACKET },
+            //{ Qt::Key_Backslash, gnash::key::BACKSLASH },
+            //{ Qt::Key_BracketRight, gnash::key::RIGHT_BRACKET },
+            //{ Qt::Key_QuoteDbl, gnash::key::DOUBLE_QUOTE },
             { 0, gnash::key::INVALID }
         };
         

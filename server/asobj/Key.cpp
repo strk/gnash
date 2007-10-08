@@ -93,6 +93,8 @@ key_as_object::set_key_up(int code)
 {
     if (code < 0 || code >= key::KEYCOUNT) return;
 
+    m_last_key_pressed = code;
+
     int byte_index = code >> 3;
     int bit_index = code - (byte_index << 3);
     int mask = 1 << bit_index;

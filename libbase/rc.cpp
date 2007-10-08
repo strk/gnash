@@ -80,7 +80,7 @@ RcInitFile::RcInitFile() : _delay(0),
                            _plugin_sound(true),
 			   _extensionsEnabled(false),
 			   _startStopped(false),
-			   _SSLInsecure(false),
+			   _insecureSSL(false),
 			   _streamsTimeout(DEFAULT_STREAMS_TIMEOUT)
 
 {
@@ -389,7 +389,7 @@ RcInitFile::parseFile(const std::string& filespec)
                                value);
                      extractSetting(&_localdomain_only, "localdomain", variable,
                                value);
-                     extractSetting(&_SSLInsecure, "InsecureSSL", variable,
+                     extractSetting(&_insecureSSL, "InsecureSSL", variable,
                                value);
                      extractSetting(&_debugger, "debugger", variable, value);
                      extractSetting(&_actiondump, "actionDump", variable, value);
@@ -518,7 +518,7 @@ RcInitFile::dump()
     cerr << "\tWrite Debug Log To Disk: "
          << ((_writelog)?"enabled":"disabled") << endl;
     cerr << "\tAllow insecure SSL connections: "
-         << ((_SSLInsecure)?"yes":"no") << endl;
+         << ((_insecureSSL)?"yes":"no") << endl;
     cerr << "\tEnable sound: "
          << ((_sound)?"enabled":"disabled") << endl;
     cerr << "\tEnable Plugin sound: "

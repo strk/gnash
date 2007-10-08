@@ -1,3 +1,13 @@
+2007-10-08 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/rc.{h,cpp}, testsuite/libbase/TCCXXRc.cpp
+	  libbase/curl_adapter.cpp: rename variable and function to _insecureSSL
+	  / insecureSSL().
+	* gui/kde.cpp: complete keyboard handling from the GUI.
+	* server/asobj/Key.cpp (set_key_up): key releases also update
+	  m_last_key_pressed, so that the last key released is not necessarily
+	  the same as the last key pressed.
+
 2007-10-08 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* libmedia/AudioDecoderSimple.cpp: Fix stereo/mono resampling.

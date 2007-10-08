@@ -73,7 +73,7 @@ public:
     ///
     bool startStopped() const { return _startStopped; }
 
-    bool SSLInsecure() const { return _SSLInsecure; }
+    bool insecureSSL() const { return _insecureSSL; }
     
     int verbosityLevel() const { return _verbosity; }
     void verbosityLevel(int value) { _verbosity = value; }
@@ -157,7 +157,7 @@ private:
 
     bool _startStopped;		// whether to start the gui in "stop" mode
 
-    bool _SSLInsecure;		// When TRUE, does not verify SSL certificates
+    bool _insecureSSL;		// When TRUE, does not verify SSL certificates
 				// so is INSECURE.
 
     /// The number of seconds of inactivity triggering download timeout
