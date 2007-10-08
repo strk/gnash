@@ -59,8 +59,9 @@ int
 main(int argc, char** argv)
 {
   SWFMovie mo;
-  SWFMovieClip mc1, mc2, dejagnuclip;
-  SWFShape  sh1,sh2;
+  SWFMovieClip mc1, mc2, mc3, dejagnuclip;
+  SWFShape  sh1, sh2, sh3;
+  SWFDisplayItem it1, it2, it3;
   SWFAction ac;
   int i;
 
@@ -98,7 +99,11 @@ main(int argc, char** argv)
   SWFMovieClip_add(mc2, (SWFBlock)sh2);  
   SWFMovieClip_nextFrame(mc2); 
 
-  SWFDisplayItem it1, it2;
+  sh3 = make_fill_square (330, 270, 120, 180, 0, 255, 0, 0, 255, 0);
+  mc3 = newSWFMovieClip();
+  SWFMovieClip_add(mc3, (SWFBlock)sh3);
+  SWFMovieClip_nextFrame(mc3); 
+
   it1 = SWFMovie_add(mo, (SWFBlock)mc1);  //add movieClip1 to the _root
   SWFDisplayItem_setName(it1, "movieClip1"); //name movieClip1
   SWFDisplayItem_addAction(it1, newSWFAction(
@@ -114,10 +119,26 @@ main(int argc, char** argv)
 		"_root.mc2Constructed++;"),
 		  SWFACTION_CONSTRUCT);
   SWFDisplayItem_setDepth(it2, 30000); // depth of movieClip2 is 30000 (13616)
+
+  it3 = SWFMovie_add(mo, (SWFBlock)mc3);  //add movieClip3 to the _root
+  SWFDisplayItem_setName(it3, "movieClip3"); //name movieClip2
+  SWFDisplayItem_addAction(it3, newSWFAction(
+		"_root.note(this+' constructed');"
+		"_root.mc3Constructed++;"),
+		  SWFACTION_CONSTRUCT);
+  SWFDisplayItem_setDepth(it3, 30001); // depth of movieClip2 is 30001 (13617)
+
+  SWFMovie_add(mo, (SWFBlock)newSWFAction(
+      "check_equals(movieClip3.getDepth(), 13617);"
+  ));
   
   SWFMovie_nextFrame(mo);
   
-  // Frame3: gotoAndStop(2), check..
+  // Frame4: RemoveObject(mc3) - one of those out of static depth zone
+
+  SWFDisplayItem_remove(it3);
+
+  // Frame4: gotoAndStop(2), check..
 
   SWFMovie_add(mo, (SWFBlock)newSWFAction(
 
@@ -128,6 +149,8 @@ main(int argc, char** argv)
 
       "check_equals(movieClip1.getDepth(), -16381);" 
       "check_equals(movieClip2.getDepth(), 13616);"
+      // movieClip3 was removed, despite it's depth is out of the static zone
+      "check_equals(typeof(movieClip3), 'undefined');"
 
       "gotoAndStop(1);"
 
@@ -143,7 +166,7 @@ main(int argc, char** argv)
       "check_equals(mc1Constructed, 1);"
       "check_equals(mc2Constructed, 1);"
 
-      "totals(7);"
+      "totals(9);"
 
 	));
   SWFMovie_nextFrame(mo);

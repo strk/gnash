@@ -1,3 +1,10 @@
+2007-10-08 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/loop_test9.c: add a test for RemoveObject
+	  having effect for out-of-static-zone depths (now the test would
+	  segfault with a gnash version prior the fix for bug #21281 - 0.8.1
+	  for instance). Head is fine.
+
 2007-10-08 Chad Musick <chadmusick@msbx.net>
 
 	* server/vm/AbcHandlers.cpp: More work on the AS3 interpreter --
