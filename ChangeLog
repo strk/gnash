@@ -1,3 +1,14 @@
+2007-10-08 Chad Musick <chadmusick@msbx.net>
+
+	* server/vm/AbcHandlers.cpp: More work on the AS3 interpreter --
+	  function calls and such.
+	* server/vm/Machine.h: Remove Stack (moved to SafeStack.h), remove
+	  CodeStream (moved to CodeStream.h), remove FunctionEntry (becomes
+	  State internal class).
+	* server/vm/CodeStream.h: Add reInitialize method to allow empty
+	  construction.
+	* server/vm/SafeStack.h: Add method to reset stack to a certains state.
+
 2007-10-08 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/ming_utils.c: have totals() and friend also

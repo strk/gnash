@@ -19,117 +19,10 @@
 
 #include <vector>
 
+#include "SafeStack.h"
 #include "as_value.h"
 
 namespace gnash {
-
-class ASException
-{
-};
-
-class StackException : public ASException
-{
-};
-
-template <class T>
-class Stack
-{
-public:
-	T& top(unsigned int i)
-	{
-		if (i >= mDownstop) 
-			throw StackException();
-		unsigned int offset = mEnd - i;
-		return mData[offset >> mChunkShift][offset & mChunkMod];
-	}
-
-	T& value(unsigned int i)
-	{
-		if (i >= mDownstop)
-			throw StackException();
-		unsigned int offset = mEnd - mDownstop + i;
-		return mData[offset >> mChunkShift][offset & mChunkMod];
-	}
-
-	void drop(unsigned int i)
-	{ if (i >= mDownstop) throw StackException(); mDownstop -= i; mEnd -= i; }
-
-	void push(const T& t)
-	{ grow(1); top(0) = t; }
-
-	void grow(unsigned int i)
-	{
-		if (((mEnd + i) >> mChunkShift) > mData.size()) 
-		{
-			if (i > (1 << mChunkShift))
-				throw StackException();
-			mData.push_back(new data_vector(1 << mChunkShift));
-			mData.back()->resize(1 << mChunkShift);
-		}
-		mDownstop += i;
-		mEnd += i;
-	}
-
-	unsigned int getDownstop() const 
-	{ return mDownstop; }
-
-	unsigned int fixDownstop() 
-	{ unsigned int ret = mDownstop; mDownstop = 0; return ret; }
-
-	void setDownstop(unsigned int i)
-	{ if (mDownstop > mEnd) throw StackException(); mDownstop = i; }
-
-	Stack() : mData(), mDownstop(1), mEnd(1)
-	{ /**/ }
-
-	~Stack()
-	{
-		stack_type::iterator i = mData.begin();
-		for ( ; i != mData.end(); ++i)
-		{
-			delete (*i);
-		}
-	}
-
-private:
-	typedef std::vector<T> data_vector;
-	typedef std::vector<data_vector *> stack_type;
-	stack_type mData;
-	unsigned int mDownstop;
-	unsigned int mEnd;
-
-	// If mChunkMod is not a power of 2 less 1, it will not work properly.
-	static const unsigned int mChunkShift = 6;
-	static const unsigned int mChunkMod = (1 << mChunkShift) - 1;
-};
-
-class CodeStream
-{
-public:
-	uint32_t read_V32();
-	uint8_t read_as3op();
-	std::size_t tell();
-	void seekBy(int change);
-	void seekTo(std::size_t set);
-	int32_t read_S24();
-	int8_t read_s8();
-	uint8_t read_u8();
-	void skip_V32();
-};
-
-class FunctionEntry
-{
-public:
-	FunctionEntry(Stack<as_value> *s) : mStack(s)
-	{ mStackReset = s->fixDownstop(); }
-
-	~FunctionEntry()
-	{ if (mStack) mStack->setDownstop(mStackReset); }
-
-private:
-	unsigned int mStackReset;
-	Stack<as_value> *mStack;
-};
 
 /// This machine is intended to work without relying on the C++ call stack,
 /// by resetting its Stream and Stack members (actually, by limiting the stack)
@@ -238,21 +131,63 @@ public:
 
 	void execute_as2();
 
-	void pushCall(int param_count, int return_count, asMethod *pMethod);
+	/// push a function call to be executed next.
+	///
+	/// Any asBinding can be pushed, and it will appropriate value
+	/// into return_slot.  This ensures that getter/setter properties
+	/// can be accessed in the same way as other properties, and hides
+	/// the difference between ActionScript methods and native C++ methods.
+	///
+	/// @param stack_in
+	/// The initial stack size when the function is entered. This can be used
+	/// to pass 'this' and other parameters to the call.
+	///
+	/// @param stack_out
+	/// The maximum number of values to leave on the stack when the function
+	/// returns.
+	///
+	/// @param return_slot
+	/// A space for the return value. An assignment will always be made here,
+	/// but mVoidSlot can be used for values that will be discarded.
+	///
+	/// @param pBind
+	/// The non-null binding.  If this is only a partial binding, then
+	/// the 'this' value will be used to complete it, when possible.
+	void pushCall(unsigned int stack_in, unsigned int stack_out,
+		as_value &return_slot, asBinding *pBind);
 
 private:
+	/// The state of the machine.
+	class State
+	{
+	public:
+		unsigned int mStackDepth;
+		unsigned int mStackTotalSize;
+		unsigned int mScopeStackDepth;
+		unsigned int mScopeTotalSize;
+		CodeStream *mStream;
+		asNamespace *mDefaultXMLNamespace;
+		asScope *mCurrentScope;
+		asValue *mGlobalReturn;
+	};
+
+	void saveState();
+	void restoreState();
+
 	Stack<as_value> mStack;
-	Stack<FunctionEntry> mCallStack;
-	Stack<as_value> mFrame;
-	Stack<asScope*> mScopeStack;
-	CodeStream mStream;
+	Stack<State> mStateStack;
+	Stack<asScope> mScopeStack;
+	CodeStream *mStream;
 
 	ClassHierarchy *mCH;
+	string_table& mST;
 
 	asNamespace* mDefaultXMLNamespace;
 	asScope *mGlobalScope;
 	asScope *mCurrentScope;
-	asScope *mBaseScope;
+
+	asValue *mGlobalReturn;
+	asValue mIgnoreReturn; // Throw away returns go here.
 };
 
 } // namespace gnash

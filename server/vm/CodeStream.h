@@ -60,11 +60,47 @@ public:
 		}
 	}
 
+	/// Construct an empty CodeStream. Call reInitialize to fill it.
+	CodeStream() : mRaw(NULL), mRawEnd(NULL), mEnd(NULL), mOwn(false)
+	{/**/}
+
 	/// Destruct a CodeStream
 	///
 	/// If the stream owns the memory, it will destroy it.
 	~CodeStream()
 	{ if (mOwn) delete [] mRaw; }
+
+	/// Pseudo-construct a CodeStream
+	///
+	/// This has the same parameters as the non-default constructor,
+	/// but it can be used to re-initialize the CodeStream object.
+	void reInitialize(const char *pStart, std::size_t length,
+		bool own = false)
+	{
+		if (own)
+		{
+			// Delete mRaw if it's not large enough and it's ours.
+			if (mOwn && length > static_cast<unsigned int> (mRawEnd - mRaw))
+			{
+				mOwn = false;
+				delete [] mRaw;
+			}
+			if (!mOwn)
+				mRaw = new char [length];
+			memcpy(const_cast<char *>(mRaw), pStart, length);
+			mEnd = mRawEnd = pStart + length;
+			mCurrent = mRaw;
+			return;
+		}
+
+		if (mOwn)
+		{
+			// We own now, but don't want to.
+			delete [] mRaw;
+		}
+		mCurrent = mRaw = pStart;
+		mEnd = mRawEnd = pStart + length;
+	}
 
 	/// Read a variable length encoded 32 bit unsigned integer
 	uint32_t read_V32()
@@ -172,6 +208,11 @@ public:
 	/// Unset any stop placed on the stream.
 	void unset_end()
 	{ mEnd = mRawEnd; }
+
+	/// Take ownership of mRaw.  mRaw should be a block which can be
+	/// de-allocated by calling delete [] mRaw
+	void takeMemoryOwnership()
+	{ mOwn = true; }
 
 	/// Same as read_V32(), but doesn't bother with the arithmetic for
 	/// calculating the value.

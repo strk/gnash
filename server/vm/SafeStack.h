@@ -105,6 +105,11 @@ public:
 	/// getDownstop()
 	unsigned int totalSize() const { return mEnd - 1; }
 
+	/// Set the total size and local size of the stack, for restoring a
+	/// stack through unknown changes.
+	void setAllSizes(unsigned int total, unsigned int downstop)
+	{ mEnd = total + 1; mDownstop = downstop; }
+
 	/// Default constructor.
 	SafeStack() : mData(), mDownstop(1), mEnd(1)
 	{ /**/ }
