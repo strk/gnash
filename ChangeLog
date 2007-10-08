@@ -1,3 +1,8 @@
+2007-10-08 Sandro Santilli <strk@keybit.net>
+
+	* server/as_value.{cpp,h}: fully inlined destructor, since it has
+	  nothing to do.
+
 2007-10-08 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/rc.{h,cpp}, testsuite/libbase/TCCXXRc.cpp

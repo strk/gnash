@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.69 2007/10/04 15:32:11 strk Exp $ */
+/* $Id: as_value.h,v 1.70 2007/10/08 15:03:00 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -190,7 +190,7 @@ public:
 	/// This happens prior to changing our value.
 	/// Useful when changing types/values.
 	///
-	void	drop_refs();
+	void	drop_refs() {}
 
 	/// Return the primitive type of this value, as a string.
 	const char* typeOf() const;

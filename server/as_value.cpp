@@ -744,12 +744,6 @@ as_value::string_concat(const std::string& str)
     _value = currVal + str;
 }
 
-// Drop any ref counts we have; this happens prior to changing our value.
-void
-as_value::drop_refs()
-{
-}
-
 const char*
 as_value::typeOf() const
 {
