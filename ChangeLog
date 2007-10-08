@@ -1,4 +1,11 @@
-2007-10-06 Sandro Santilli <strk@keybit.net>
+2007-10-08 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/: Makefile.am, loop_test9.c: test that
+	  a PlaceObject-placed instance in a depth higher then 0 (after
+	  depth-shift) doesn't get removed on jump-back. Verifies behaviour
+	  of bug #21281.
+
+2007-10-07 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/RemoveObjectTag.cpp (loader): don't attempt to unregister
 	  a timeline depth if depth is out of the static zone. PlaceObject2
