@@ -516,7 +516,7 @@ Gui::display(movie_root* m)
 				matrix dummy;    	
 				gnash::render::set_matrix(dummy); // reset matrix
 				gnash::render::draw_poly(&corners[0], 4,
-					rgba(0,0,0,0), rgba(255,0,0,255));
+					rgba(0,0,0,0), rgba(255,0,0,255), false);
 					
 			}
 		}

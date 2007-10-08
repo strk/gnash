@@ -1,6 +1,7 @@
 2007-10-08 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
-	* libbase/tu_timer.cpp: Avoid range problems. Fixes bug #21289 
+	* libbase/tu_timer.cpp: Avoid range problems. Fixes bug #21289
+	* gui/gui.cpp: fixed draw_poly() call when region debugging is active   
 
 2007-10-08 Sandro Santilli <strk@keybit.net>
 
