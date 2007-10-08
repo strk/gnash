@@ -1,5 +1,8 @@
 2007-10-08 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/ming_utils.c: have totals() and friend also
+	  print a final line containing grand totals. This will be easier
+	  to use for consistency checking from the generic-testrunner.sh.
 	* testsuite/misc-ming.all/: Makefile.am, loop_test9.c: test that
 	  a PlaceObject-placed instance in a depth higher then 0 (after
 	  depth-shift) doesn't get removed on jump-back. Verifies behaviour

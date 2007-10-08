@@ -545,7 +545,7 @@ loop_test9.swf: loop_test9
 	./loop_test9 $(top_srcdir)/testsuite/media
 
 loop_test9runner: $(srcdir)/../generic-testrunner.sh loop_test9.swf Makefile
-	sh $< -r10 -f20 -c "END OF TEST" $(top_builddir) loop_test9.swf > $@
+	sh $< -r10 -f20 -c "#total tests" $(top_builddir) loop_test9.swf > $@
 	chmod 755 $@
 	
 shape_test_SOURCES = shape_test.c

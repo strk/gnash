@@ -145,8 +145,6 @@ main(int argc, char** argv)
 
       "totals(7);"
 
-      "trace('END OF TEST');"
-
 	));
   SWFMovie_nextFrame(mo);
 
