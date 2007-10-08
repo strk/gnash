@@ -1,3 +1,13 @@
+2007-10-08 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libmedia/AudioDecoderSimple.cpp: Fix stereo/mono resampling.
+	* libmedia/sdl/AudioDecoderMad.cpp: Fix compilation and stereo/mono
+	  resampling.
+	* libmedia/sdl/VideoDecoderFfmpeg.cpp: Free frame after use. Throw
+	  bad_alloc, if out of memory.
+	* libmedia/sdl/sound_handler_sdl.cpp: Fix decoding multiple times until
+	  the required buffer is full.
+
 2007-10-08 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/loop_test9.c: add a test for RemoveObject

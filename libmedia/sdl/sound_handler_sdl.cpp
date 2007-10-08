@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.4 2007/10/06 09:53:45 tgc Exp $
+// $Id: sound_handler_sdl.cpp,v 1.5 2007/10/08 11:00:06 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -707,7 +707,10 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 				// We loop until the size of the decoded sound is greater than the buffer size,
 				// or there is no more to decode.
 				unsigned int decoded_size = 0;
-				// TODO: should we delete any previous raw_data ?
+
+				// Delete any previous raw_data
+				sound->deleteDecodedData();
+
 				while(decoded_size < buffer_length)
 				{
 
@@ -741,13 +744,13 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 
 					sound->position += decodedBytes;
 
-					sound->deleteDecodedData();
 					sound->appendDecodedData(tmp_raw_buffer, tmp_raw_buffer_size);
 
 					decoded_size += tmp_raw_buffer_size;
 
 					// no more to decode from this sound, so we break the loop
 					if (sound->dataSize() <= sound->position && sound->loop_count == 0 || tmp_raw_buffer_size == 0 && decodedBytes == 0) {
+						sound->position = sound->dataSize();
 						break;
 					}
 

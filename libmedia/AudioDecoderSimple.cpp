@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderSimple.cpp,v 1.4 2007/10/04 11:25:31 tgc Exp $
+// $Id: AudioDecoderSimple.cpp,v 1.5 2007/10/08 11:00:05 tgc Exp $
 
 #include <boost/scoped_array.hpp>
 
@@ -394,7 +394,7 @@ uint8_t* AudioDecoderSimple::decode(uint8_t* input, uint32_t inputSize, uint32_t
 
 		int16_t* adjusted_data = 0;
 		int	adjusted_size = 0;
-		int sample_count = outsize / 2;// samples are of size 2
+		int sample_count = outsize / (_stereo ? 4 : 2); // samples are of size 2
 
 		// Convert to needed samplerate - this converter only support standard flash samplerates
 		convert_raw_data(&adjusted_data, &adjusted_size, tmp_raw_buffer, sample_count, 0, 

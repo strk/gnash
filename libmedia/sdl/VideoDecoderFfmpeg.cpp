@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: VideoDecoderFfmpeg.cpp,v 1.4 2007/10/06 10:32:28 strk Exp $
+// $Id: VideoDecoderFfmpeg.cpp,v 1.5 2007/10/08 11:00:06 tgc Exp $
 
 #include "VideoDecoderFfmpeg.h"
 
@@ -218,7 +218,7 @@ uint8_t* VideoDecoderFfmpeg::decode(uint8_t* input, uint32_t inputSize, uint32_t
 	if ( ! frame )
 	{
 		log_error(_("Out of memory while allocating avcodec frame"));
-		return NULL;
+		throw std::bad_alloc();
 	}
 
 	int got = 0;
@@ -228,7 +228,6 @@ uint8_t* VideoDecoderFfmpeg::decode(uint8_t* input, uint32_t inputSize, uint32_t
 
 		uint8_t* decodedData = new uint8_t[_videoCodecCtx->width * _videoCodecCtx->height * 3];
 		buffer.reset(convertRGB24(_videoCodecCtx, frame));
-
 
 		// Copy the data to the buffer in the correct RGB format
 		uint8_t* srcptr = frame->data[0];
@@ -245,6 +244,7 @@ uint8_t* VideoDecoderFfmpeg::decode(uint8_t* input, uint32_t inputSize, uint32_t
 			outputSize += srcwidth;
 		}
 
+		av_free(frame);
 		return decodedData;
 
 /*		if (_videoFrameFormat == NONE) { // NullGui?
@@ -313,6 +313,7 @@ uint8_t* VideoDecoderFfmpeg::decode(uint8_t* input, uint32_t inputSize, uint32_t
 		}*/
 	} else {
 		log_error("Decoding of a video frame failed");
+		av_free(frame);
 		return NULL;
 	}
 }
