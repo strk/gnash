@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.98 2007/10/04 09:47:36 strk Exp $ */
+/* $Id: character.h,v 1.99 2007/10/09 01:34:41 zoulunkai Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -761,6 +761,7 @@ public:
 	///	  NOT set as dynamic (should check if they should)
 	///	- Characters created by attachMovie ARE dynamic
 	///	- Characters created by duplicateMovieClip ARE dynamic
+	/// - Characters created by createEmptyMovieClip ARE dynamic
 	///	- Characters created by new Video ARE dynamic
 	///	- Characters created by createTextField ARE dynamic
 	///

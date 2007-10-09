@@ -121,12 +121,12 @@ main(int argc, char** argv)
   SWFDisplayItem_setDepth(it2, 30000); // depth of movieClip2 is 30000 (13616)
 
   it3 = SWFMovie_add(mo, (SWFBlock)mc3);  //add movieClip3 to the _root
-  SWFDisplayItem_setName(it3, "movieClip3"); //name movieClip2
+  SWFDisplayItem_setName(it3, "movieClip3"); //name movieClip3
   SWFDisplayItem_addAction(it3, newSWFAction(
 		"_root.note(this+' constructed');"
 		"_root.mc3Constructed++;"),
 		  SWFACTION_CONSTRUCT);
-  SWFDisplayItem_setDepth(it3, 30001); // depth of movieClip2 is 30001 (13617)
+  SWFDisplayItem_setDepth(it3, 30001); // depth of movieClip3 is 30001 (13617)
 
   SWFMovie_add(mo, (SWFBlock)newSWFAction(
       "check_equals(movieClip3.getDepth(), 13617);"
@@ -138,7 +138,7 @@ main(int argc, char** argv)
 
   SWFDisplayItem_remove(it3);
 
-  // Frame4: gotoAndStop(2), check..
+  // Frame4: gotoAndStop(1), check..
 
   SWFMovie_add(mo, (SWFBlock)newSWFAction(
 
