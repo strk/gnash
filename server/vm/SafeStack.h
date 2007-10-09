@@ -66,17 +66,19 @@ public:
 	void push(const T t)
 	{ grow(1); top(0) = t; }
 
+	/// Pop the top of the stack.
+	T& pop()
+	{	T& ret = top(0); drop(1); return ret; }
+
 	/// Grow by i entries. Normally this is 1, but there might be sometime
-	/// when you need more than that.  Cannot grow by more than the size
-	/// of block allocations, which is (1 << mChunkShift)
-	/// For mChunkShift == 6, this is 64.
+	/// when you need more than that.
 	void grow(unsigned int i)
 	{
-		if (((mEnd + i) >> mChunkShift) > mData.size()) 
+		unsigned int available = (1 << mChunkShift) * mData.size() - mEnd - 1;
+		while (available < i)
 		{
-			if (i > (1 << mChunkShift))
-				throw StackException();
 			mData.push_back(new T[1 << mChunkShift]);
+			available += 1 << mChunkShift;
 		}
 		mDownstop += i;
 		mEnd += i;
