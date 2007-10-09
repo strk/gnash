@@ -147,7 +147,7 @@ movie_root::setRootMovie(movie_instance* movie)
 	}
 	catch (ActionLimitException& al)
 	{
-		log_error(_("ActionLimits hit: %s"), al.what());
+		log_error(_("ActionLimits hit during setRootMovie: %s. Disabling scripts"), al.what());
 		disableScripts();
 		clearActionQueue();
 	}
@@ -743,7 +743,7 @@ movie_root::advance(float delta_time)
 	}
 	catch (ActionLimitException& al)
 	{
-		log_error(_("ActionLimits hit: %s"), al.what());
+		log_error(_("ActionLimits hit during advance: %s. Disabling scripts"), al.what());
 		disableScripts();
 		clearActionQueue();
 	}
@@ -1362,6 +1362,7 @@ movie_root::cleanupDisplayList()
 void
 movie_root::advanceLiveChar(boost::intrusive_ptr<character> ch, float delta_time)
 {
+
 	if ( ! ch->isUnloaded() )
 	{
 #ifdef GNASH_DEBUG
@@ -1379,6 +1380,7 @@ movie_root::advanceLiveChar(boost::intrusive_ptr<character> ch, float delta_time
 void
 movie_root::advanceLiveChars(float delta_time)
 {
+
 #ifdef GNASH_DEBUG
 	log_debug("---- movie_root::advance: %d live characters in the global list", _liveChars.size());
 #endif
