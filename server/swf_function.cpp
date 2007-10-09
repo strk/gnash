@@ -172,6 +172,7 @@ swf_function::operator()(const fn_call& fn)
 	{
 		our_env = &fn.env();
 	}
+	//our_env = &fn.env(); // I think this should be it...
 	assert(our_env);
 
 #if 0
@@ -179,11 +180,11 @@ swf_function::operator()(const fn_call& fn)
 	log_msg("  first_arg_bottom_index: %d\n", fn.first_arg_bottom_index);
 #endif
 
-	// Set up local stack frame, for parameters and locals.
-	our_env->pushCallFrame(this);
-
 	// Some features are version-dependant
 	unsigned swfversion = VM::get().getSWFVersion();
+
+	// Set up local stack frame, for parameters and locals.
+	our_env->pushCallFrame(this);
 
 	if (m_is_function2 == false)
 	{
@@ -322,11 +323,36 @@ swf_function::operator()(const fn_call& fn)
 		}
 	}
 
+
+	as_value result;
+
 	// Execute the actions.
-	//ActionExec exec(*m_action_buffer, *our_env, m_start_pc, m_length, fn.result, m_with_stack, m_is_function2);
-        as_value result;
-	ActionExec exec(*this, *our_env, &result, fn.this_ptr.get());
-	exec();
+	// Do this in a try block to proper drop the pushed call frame 
+	// in case of problems (most interesting action limits)
+	try 
+	{
+		//ActionExec exec(*m_action_buffer, *our_env, m_start_pc, m_length, fn.result, m_with_stack, m_is_function2);
+		ActionExec exec(*this, *our_env, &result, fn.this_ptr.get());
+		exec();
+	}
+	catch (ActionLimitException& ale) // expected and sane 
+	{
+		//log_debug("ActionLimitException got from swf_function execution: %s", ale.what());
+		our_env->popCallFrame();
+		throw;
+	}
+	catch (std::exception& ex) // unexpected but we can tell what it is
+	{
+		log_debug("Unexpected exception from swf_function execution: %s", ex.what());
+		our_env->popCallFrame();
+		throw;
+	}
+	catch (...) // unexpected, unknown, but why not cleaning up...
+	{
+		log_debug("Unknown exception got from swf_function execution");
+		our_env->popCallFrame();
+		throw;
+	}
 
 	our_env->popCallFrame();
         return result;

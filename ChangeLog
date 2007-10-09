@@ -1,5 +1,8 @@
 2007-10-10 Sandro Santilli <strk@keybit.net>
 
+	* server/swf_function.cpp (call operator): pop call stack frame on
+	  exception. Fixes assertion failure on restart reported by bwy in
+	  in bug #21295
 	* server/as_environment.h: don't use size() or length()
 	  when empty() is really meant (in some cases empty() is much
 	  faster).
