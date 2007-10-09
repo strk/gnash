@@ -1,3 +1,7 @@
+2007-10-09 Chad Musick <chadmusick@msbx.net>
+
+	* server/AS3_OPCODES: Remove file (information up-to-date elsewhere).
+
 2007-10-09 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* testsuite/misc-ming.all/PlaceObject2Test.swf, Makefile.am: enable an old
