@@ -45,7 +45,7 @@ namespace gnash {
 key_as_object::key_as_object()
     :
     as_object(getObjectInterface()),
-    m_last_key_pressed(0)
+    m_last_key_event(0)
 {
     memset(m_unreleased_keys, 0, sizeof(m_unreleased_keys));
 }
@@ -77,10 +77,15 @@ key_as_object::set_key_down(int code)
 {
     if (code < 0 || code >= key::KEYCOUNT) return;
 
-    m_last_key_pressed = code;
+    // This is used for getAscii() of the last key event, so we use gnash's
+    // internal code.
+    m_last_key_event = code;
 
-    int byte_index = code >> 3;
-    int bit_index = code - (byte_index << 3);
+    // Key.isDown() only cares about flash keycode, not character, so
+    // we lookup keycode to add to m_unreleased_keys.   
+    
+    int byte_index = key::codeMap[code][1] >> 3;
+    int bit_index = key::codeMap[code][1] - (byte_index << 3);
     int mask = 1 << bit_index;
 
     assert(byte_index >= 0 && byte_index < int(sizeof(m_unreleased_keys)/sizeof(m_unreleased_keys[0])));
@@ -93,10 +98,14 @@ key_as_object::set_key_up(int code)
 {
     if (code < 0 || code >= key::KEYCOUNT) return;
 
-    m_last_key_pressed = code;
+    // This is used for getAscii() of the last key event, so we use gnash's
+    // internal code.
+    m_last_key_event = code;
 
-    int byte_index = code >> 3;
-    int bit_index = code - (byte_index << 3);
+    // Key.isDown() only cares about flash keycode, not character, so
+    // we lookup keycode to add to m_unreleased_keys.
+    int byte_index = key::codeMap[code][1] >> 3;
+    int bit_index = key::codeMap[code][1] - (byte_index << 3);
     int mask = 1 << bit_index;
 
     assert(byte_index >= 0 && byte_index < int(sizeof(m_unreleased_keys)/sizeof(m_unreleased_keys[0])));
@@ -198,7 +207,7 @@ key_as_object::remove_listener(boost::intrusive_ptr<as_object> listener)
 int
 key_as_object::get_last_key_pressed() const
 {
-    return m_last_key_pressed;
+    return m_last_key_event;
 }
 
 

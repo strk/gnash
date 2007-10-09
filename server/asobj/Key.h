@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: Key.h,v 1.26 2007/09/12 10:57:06 bwy Exp $ */
+/* $Id: Key.h,v 1.27 2007/10/09 12:48:44 bwy Exp $ */
 
 #ifndef __KEY_H__
 #define __KEY_H__
@@ -62,7 +62,7 @@ private:
 	Listeners m_listeners;
 #endif
 
-	int	m_last_key_pressed;
+	int	m_last_key_event;
 
 protected:
 

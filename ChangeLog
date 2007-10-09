@@ -1,3 +1,10 @@
+2007-10-09 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/asobj/Key.{cpp,h}: rename m_last_key_pressed to 
+	  m_last_key_event. Add SWF keycode, not gnash keycode to
+	  index of keys down. Fixes problems when releasing shift
+	  before a character key.
+
 2007-10-09 Chad Musick <chadmusick@msbx.net>
 
 	* server/AS3_OPCODES: Remove file (information up-to-date elsewhere).
