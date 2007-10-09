@@ -1,3 +1,9 @@
+2007-10-10 Sandro Santilli <strk@keybit.net>
+
+	* server/as_environment.h: don't use size() or length()
+	  when empty() is really meant (in some cases empty() is much
+	  faster).
+
 2007-10-10 Chad Musick <chadmusick@msbx.net>
 
 	* server/vm/SafeStack.h: Remove limit on size of grow()

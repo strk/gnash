@@ -75,7 +75,7 @@ public:
 	/// Pops an as_value off the stack top and return it.
 	as_value pop()
 	{
-		assert( m_stack.size() > 0 );
+		assert( ! m_stack.empty() );
 		as_value result = m_stack.back();
 		m_stack.pop_back();
 		return result;
@@ -87,8 +87,9 @@ public:
 	///
 	as_value& top(size_t dist)
 	{
-		assert ( m_stack.size() > dist );
-		return m_stack[m_stack.size() - 1 - dist];
+		size_t ssize = m_stack.size();
+		assert ( ssize > dist );
+		return m_stack[ssize - 1 - dist];
 	}
 
 	/// Get stack value at the given distance from bottom.
@@ -104,8 +105,9 @@ public:
 	/// Drop 'count' values off the top of the stack.
 	void drop(size_t count)
 	{
-		assert ( m_stack.size() >= count );
-		m_stack.resize(m_stack.size() - count);
+		size_t ssize = m_stack.size();
+		assert ( ssize >= count );
+		m_stack.resize(ssize - count);
 	}
 
 	/// Insert 'count' undefined values before 'offset'.
@@ -280,7 +282,7 @@ public:
 	///
 	void add_local_registers(unsigned int register_count)
 	{
-		assert(_localFrames.size());
+		assert(!_localFrames.empty());
 		return _localFrames.back().registers.resize(register_count);
 	}
 
@@ -290,7 +292,7 @@ public:
 	///
 	size_t num_local_registers() const
 	{
-		assert(_localFrames.size());
+		assert(!_localFrames.empty());
 		return _localFrames.back().registers.size();
 	}
 
@@ -300,14 +302,14 @@ public:
 	///
 	as_value& local_register(uint8_t n)
 	{
-		assert(_localFrames.size());
+		assert(!_localFrames.empty());
 		return _localFrames.back().registers[n];
 	}
 
         /// Set the Nth local register to something
         void set_local_register(uint8_t n, as_value &val)
 	{
-		if (_localFrames.size() )
+		if ( ! _localFrames.empty() )
 		{
 			Registers& registers = _localFrames.back().registers;
 			if ( n < registers.size() )
@@ -488,7 +490,7 @@ public:
 	///
 	void popCallFrame()
 	{
-		assert(_localFrames.size());
+		assert(!_localFrames.empty());
 		_localFrames.pop_back();
 	}
 
@@ -496,7 +498,7 @@ public:
 	//
 	CallFrame& topCallFrame()
 	{
-		assert(_localFrames.size());
+		assert(!_localFrames.empty());
 		return _localFrames.back();
 	}
 
