@@ -1,3 +1,11 @@
+2007-10-09 Sandro Santilli <strk@keybit.net>
+
+	* server/as_environment.cpp: don't use size() or length()
+	  when empty() is really meant (in some cases empty() is much
+	  faster).
+	* testsuite/misc-ming.all/Makefile.am: remove duplicate rule
+	  for PlaceObject2Test.swf (fixes make check).
+
 2007-10-09 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/asobj/Key.{cpp,h}: rename m_last_key_pressed to 

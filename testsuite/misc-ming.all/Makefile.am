@@ -1411,9 +1411,6 @@ registerClassTest2runner: $(srcdir)/../generic-testrunner.sh registerClassTest2.
 spritehier.swf: spritehier
 	./spritehier
 
-PlaceObject2Test.swf: PlaceObject2Test 
-	./PlaceObject2Test
-
 RemoveObject2Test.swf: RemoveObject2Test 
 	./RemoveObject2Test
 

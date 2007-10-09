@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.93 2007/09/30 05:24:36 zoulunkai Exp $ */
+/* $Id: as_environment.cpp,v 1.94 2007/10/09 15:36:57 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -187,9 +187,7 @@ as_environment::del_variable_raw(
     const ScopeStack& scopeStack) 
     // varname must be a plain variable name; no path parsing.
 {
-	assert(strchr(varname.c_str(), ':') == NULL);
-	assert(strchr(varname.c_str(), '/') == NULL);
-	assert(strchr(varname.c_str(), '.') == NULL);
+	assert( ! strpbrk(varname.c_str(), ":/.") );
 
 	string_table::key varkey = VM::get().getStringTable().find(varname);
 	as_value	val;
@@ -333,7 +331,7 @@ as_environment::set_local(const std::string& varname, const as_value& val)
 {
 	// why would you want to set a local if there's no call frame on the
 	// stack ?
-	assert(_localFrames.size());
+	assert( ! _localFrames.empty() );
 
 	string_table::key varkey = VM::get().getStringTable().find(varname);
 	// Is it in the current frame already?
@@ -344,8 +342,7 @@ as_environment::set_local(const std::string& varname, const as_value& val)
 	else
 	{
 		// Not in frame; create a new local var.
-		assert(_localFrames.size());
-		assert(varname.length() > 0);	// null varnames are invalid!
+		assert( ! varname.empty() ); // null varnames are invalid!
 		LocalVars& locals = _localFrames.back().locals;
 		//locals.push_back(as_environment::frame_slot(varname, val));
 		locals->set_member(varkey, val);
@@ -360,8 +357,8 @@ as_environment::declare_local(const std::string& varname)
 	if ( ! findLocal(varname, tmp) )
 	{
 		// Not in frame; create a new local var.
-		assert(_localFrames.size());
-		assert(varname.length() > 0);	// null varnames are invalid!
+		assert( ! _localFrames.empty() );
+		assert( ! varname.empty() );	// null varnames are invalid!
 		LocalVars& locals = _localFrames.back().locals;
 		//locals.push_back(as_environment::frame_slot(varname, as_value()));
 		locals->set_member(VM::get().getStringTable().find(varname), as_value());
@@ -1056,8 +1053,8 @@ as_environment::set_target(character* target)
 void
 as_environment::add_local(const std::string& varname, const as_value& val)
 {
-	assert(varname.length() > 0);	// null varnames are invalid!
-	assert(_localFrames.size());
+	assert( ! varname.empty() );	// null varnames are invalid!
+	assert( ! _localFrames.empty() );
 	LocalVars& locals = _localFrames.back().locals;
 	//locals.push_back(frame_slot(varname, val));
 	locals->set_member(VM::get().getStringTable().find(varname), val);
