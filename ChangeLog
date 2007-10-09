@@ -1,6 +1,9 @@
 2007-10-10 Chad Musick <chadmusick@msbx.net>
 
 	* server/vm/SafeStack.h: Remove limit on size of grow()
+	* server/vm/Machine.cpp: Name changed from server/vm/AbcHandlers.cpp,
+	  more work on making it work.
+	* server/vm/Machine.h: More work on making it work.
 
 2007-10-09 Sandro Santilli <strk@keybit.net>
 

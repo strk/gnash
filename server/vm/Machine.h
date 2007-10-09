@@ -21,8 +21,35 @@
 
 #include "SafeStack.h"
 #include "as_value.h"
+#include "asClass.h"
+#include "swf.h"
 
 namespace gnash {
+
+class character;
+class as_object;
+
+class asScope
+{
+public:
+	void setBase(asScope *);
+};
+
+class asName
+{
+public:
+	asName(uint32_t);
+	asName();
+	void makeComplete();
+
+	bool isRuntime();
+	bool isRtns();
+
+	void fill(as_object*);
+	void setNamespace(as_value&);
+
+	uint32_t id;
+};
 
 /// This machine is intended to work without relying on the C++ call stack,
 /// by resetting its Stream and Stack members (actually, by limiting the stack)
@@ -65,7 +92,7 @@ public:
 	/// @return
 	/// The number of stack elements used by the name.
 	/// At present, always 0, 1, or 2. These are not dropped.
-	int completeName(asBoundName& name, int initial = 0);
+	int completeName(asName& name, int initial = 0);
 
 	/// Given a value v, find the class object of the superclass of v.
 	///
@@ -73,7 +100,7 @@ public:
 	/// The object whose superclass is desired.
 	///
 	/// @param find_primitive
-	/// If true, the ActionScript prototype will be find for primitive values.
+	/// If true, the ActionScript prototype will be found for primitive values.
 	///
 	/// @return
 	/// Null if the superclass was not found, or the superclass.
@@ -95,7 +122,7 @@ public:
 	/// This returns the value, but on the stack.
 	/// (Since the return value is not known until after control has left
 	/// the caller of this, it's impossible to return a meaningful value.
-	void getMember(asClass* pDefinition, asBoundName& name, as_value& source);
+	void getMember(asClass* pDefinition, asName& name, as_value& source);
 
 	/// Set a member in an object.
 	///
@@ -113,7 +140,7 @@ public:
 	///
 	/// @return
 	/// Nothing.
-	void setMember(asClass*, asBoundName&, as_value& target, as_value& val);
+	void setMember(asClass*, asName&, as_value& target, as_value& val);
 
 	std::string& pool_string(uint32_t);
 	int pool_int(uint32_t);
@@ -121,15 +148,15 @@ public:
 	double pool_double(uint32_t);
 	asNamespace* pool_namespace(uint32_t);
 	asMethod* pool_method(uint32_t);
+	asClass* pool_class(uint32_t);
+	asName* pool_name(uint32_t);
 
-	as_value findProperty(asBoundName&);
+	asBinding* findProperty(asName&);
 
 	void pushScope(asScope*);
 	asScope* popScope();
 
-	void execute_as3();
-
-	void execute_as2();
+	void execute();
 
 	/// push a function call to be executed next.
 	///
@@ -153,8 +180,10 @@ public:
 	/// @param pBind
 	/// The non-null binding.  If this is only a partial binding, then
 	/// the 'this' value will be used to complete it, when possible.
-	void pushCall(unsigned int stack_in, unsigned int stack_out,
-		as_value &return_slot, asBinding *pBind);
+	void pushCall(unsigned int stack_in, as_value *return_slot,
+		asBinding *pBind);
+
+	Machine(string_table &ST, ClassHierarchy *CH);
 
 private:
 	/// The state of the machine.
@@ -168,15 +197,16 @@ private:
 		CodeStream *mStream;
 		asNamespace *mDefaultXMLNamespace;
 		asScope *mCurrentScope;
-		asValue *mGlobalReturn;
+		as_value *mGlobalReturn;
 	};
 
 	void saveState();
 	void restoreState();
 
-	Stack<as_value> mStack;
-	Stack<State> mStateStack;
-	Stack<asScope> mScopeStack;
+	SafeStack<as_value> mStack;
+	SafeStack<State> mStateStack;
+	SafeStack<asScope> mScopeStack;
+	SafeStack<as_value> mFrame;
 	CodeStream *mStream;
 
 	ClassHierarchy *mCH;
@@ -186,8 +216,10 @@ private:
 	asScope *mGlobalScope;
 	asScope *mCurrentScope;
 
-	asValue *mGlobalReturn;
-	asValue mIgnoreReturn; // Throw away returns go here.
+	as_value *mGlobalReturn;
+	as_value mIgnoreReturn; // Throw away returns go here.
+
+	bool mIsAS3; // Is the stream an AS3 stream.
 };
 
 } // namespace gnash

@@ -16,46 +16,66 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include <boost/logic/tribool.hpp>
+#include "Machine.h"
+#include "as_object.h"
+#include "ClassHierarchy.h"
+#include "namedStrings.h"
+#include "array.h"
 
-#define ENSURE_NUMBER(vte)										\
+namespace gnash {
+
+/// ENSURE_NUMBER makes sure that the given argument is a number,
+/// calling the valueOf method if necessary -- it's a macro so that
+/// the valueOf method may be pushed if needed, and then whatever
+/// opcode asked for this will be re-entered.
+#define ENSURE_NUMBER(vte)												\
 {																		\
-	as_value &a = vte; /* Don't call vte multiple times */				\
-	if (vte.is_object())												\
+	as_value *e = &vte;													\
+	if (e->is_object())													\
 	{																	\
-		asBinding *b = a.to_object()->getBinding(NSV::PROP_VALUE_OF);	\
+		asBinding *b = e->to_object()->getBinding(NSV::PROP_VALUE_OF);	\
 		if (b)															\
 		{																\
-			mStream->seekTo(mOpStart);									\
-			mStack.push(vte);											\
-			pushCall(1, &vte, b);										\
+			mStream->seekTo(opStart);									\
+			mStack.push(*e);											\
+			pushCall(1, e, b);											\
 			break;														\
 		}																\
 	}																	\
 }											   /* end of ENSURE_NUMBER */
 
-#define ENSURE_OBJECT(vte, backup)										\
+/// ENSURE_OBJECT will throw an exception if the argument isn't an
+/// object. It's a macro to match with the other ENSURE_ macros.
+#define ENSURE_OBJECT(vte)												\
 {																		\
 	if (!vte.is_object())												\
-		throw ASMalformedError();										\
+		throw ASException();											\
 }											   /* end of ENSURE_OBJECT */
 
-#define ENSURE_STRING(vte, backup)										\
+/// ENSURE_STRING makes sure that the given argument is a string,
+/// calling the toString method if necessary -- it's a macro so that
+/// the toString may be pushed if needed, and then whatever opcode
+/// asked for this will be re-entered.
+#define ENSURE_STRING(vte)												\
 {																		\
-	as_value &a = vte; /* Don't call vte multiple times */				\
-	if (a.is_object())													\
+	as_value *c = &vte; /* Don't call vte multiple times */				\
+	if (c->is_object())													\
 	{																	\
-		asBinding *b = a.to_object()->getBinding(NSV::PROP_TO_STRING);	\
-		if (b)															\
+		asBinding *d = c->to_object()->getBinding(NSV::PROP_TO_STRING);	\
+		if (d)															\
 		{																\
-			mStream->seekTo(mOpStart);									\
-			mStack.push(vte);											\
-			pushCall(1, &vte, b);										\
+			mStream->seekTo(opStart);									\
+			mStack.push(*c);											\
+			pushCall(1, c, d);											\
 			break;														\
 		}																\
 	}																	\
 }											   /* end of ENSURE_STRING */
 
+/// ABSTRACT_COMPARE is the abstract comparison as described in the ECMA
+/// standard.  The 'truth_of_undefined' is used to specify which value
+/// should be set for NaN values. It's a macro so that calls may be
+/// pushed in the ENSURE_STRING and ENSURE_NUMBER macros.
 #define ABSTRACT_COMPARE(store, rv1, rv2, truth_of_undefined) 			\
 { 																		\
 	as_value &a = rv1; /* Don't call rv1 multiple times */				\
@@ -64,75 +84,105 @@
 	{ 																	\
 		ENSURE_STRING(a); 												\
 		ENSURE_STRING(b); 												\
-		std::string &str_a = a.to_string(); 							\
-		std::string &str_b = b.to_string(); 							\
-		store = a < b; 													\
+		store = a.to_string() < b.to_string(); 							\
 	} 																	\
 	else 																\
 	{ 																	\
 		ENSURE_NUMBER(a); 												\
 		ENSURE_NUMBER(b); 												\
-		if (a.is_nan() || b.is_nan()) 									\
+		double ad = a.to_number(); double bd = b.to_number();			\
+		if (isnan(ad) || isnan(bd))										\
 			store = truth_of_undefined; 								\
-		else if (a.is_positive_infinity()) 								\
+		else if (isinf(ad) && ad > 0)	 								\
 			store = false; 												\
-		else if (b.is_positive_infinity()) 								\
+		else if (isinf(bd) && bd > 0)	 								\
 			store = true; 												\
-		else if (b.is_negative_infinity()) 								\
+		else if (isinf(bd) && bd < 0)	 								\
 			store = false; 												\
-		else if (a.is_negative_infinity())								\
+		else if (isinf(ad) && ad < 0)									\
 			store = true;												\
 		else 															\
-			store = a.to_number() < b.to_number(); 						\
+			store = ad < bd; 											\
 	} 																	\
 }											/* end of ABSTRACT_COMPARE */
 
-#define ABSTRACT_EQUALITY(store, ev1, ev2, strictness_on)				\
+#define ABSTRACT_EQUALITY(st, ev1, ev2, strictness_on)					\
 {																		\
+	bool *store = &st;													\
 	as_value &a = ev1; /* Don't call ev1 multiple times */				\
 	as_value &b = ev2; /* Don't call ev2 multiple times */				\
 	if (a.is_object() && b.is_object())									\
-		store = a.to_object() == b.to_object();							\
+		*store = a.to_object() == b.to_object();						\
 	else if (a.is_object() || b.is_object())							\
-		store = false;													\
+		*store = false;													\
 	else if (a.ptype() != b.ptype())									\
 	{																	\
 		if (!strictness_on && (a.is_undefined() || b.is_undefined()) && \
-			(a.is_null() || b.is_null())								\
-			store = true;												\
+			(a.is_null() || b.is_null()))								\
+			*store = true;												\
 		else															\
-			store = false;												\
+			*store = false;												\
 	}																	\
 	else if (a.is_number())												\
 	{																	\
-		if (a.is_nan() || b.is_nan())									\
-			store = false;												\
-		else if (a.is_positive_infinity() && b.is_positive_infinity())	\
-			store = true;												\
-		else if (a.is_negative_infinity() && b.is_negative_infinity())	\
-			store = true;												\
+		double ad = a.to_number(); double bd = b.to_number();			\
+		if (isnan(ad) || isnan(bd))										\
+			*store = false;												\
+		else if (isinf(ad) && ad > 0)									\
+			*store = (isinf(bd) && bd > 0);								\
+		else if (isinf(ad) && ad < 0)									\
+			*store = (isinf(bd) && bd < 0);								\
 		else															\
-			store = a.to_number() == b.to_number();						\
+			*store = (ad == bd);										\
 	}																	\
 	else if (a.is_bool() && b.is_bool())								\
-		store = a.to_bool() == b.to_bool();								\
+		*store = a.to_bool() == b.to_bool();							\
+	else																\
+		*store = false;													\
 }										   /* end of ABSTRACT_EQUALITY */
 
 #define JUMPIF(jtruth)													\
 {																		\
-	int32t jumpOffset = mStream->read_S24();							\
+	int32_t jumpOffset = mStream->read_S24();							\
 	if (jtruth)															\
 		mStream->seekBy(jumpOffset);									\
 	break;																\
 }													  /* end of JUMPIF */
 
-void
-ActionMachine::execute()
+/// The type of exceptions thrown by ActionScript.
+class ASException
 {
+public:
+	as_value mValue;
+
+	ASException(as_value &v) { mValue = v; }
+	ASException() { mValue.set_undefined(); }
+};
+
+class ASReferenceError : public ASException
+{
+public:
+	ASReferenceError() : ASException()
+	{/**/}
+};
+
+class ASTypeError : public ASException
+{
+public:
+	ASTypeError() : ASException()
+	{/**/}
+};
+
+void
+Machine::execute()
+{
+	uint8_t opcode;
+
 	for ( ; ; )
 	{
+		std::size_t opStart = mStream->tell();
 
-	if (mStream->isAS3())
+	if (mIsAS3)
 	{
 	switch ((opcode = mStream->read_as3op())) // Assignment intentional
 	{
@@ -184,13 +234,14 @@ ActionMachine::execute()
 		// Finish it, if necessary.
 		mStack.drop(completeName(a));
 		// Get the target object.
-		as_value vobj& = mStack.top(0);
+		as_value& vobj = mStack.top(0);
 		asClass *pClass = findSuper(vobj, true);
 		// If we don't have a class yet, throw.
 		if (!pClass)
 			throw ASReferenceError();
-		// getMember will throw any necessary exceptions and do the push.
-		getMember(pClass, a, vobj);
+		asBinding *b = pClass->getGetBinding(vobj, a);
+		// The object is on the top already.
+		pushCall(1, &mStack.top(0), b);
 		break;
 	}
 /// 0x05 ABC_ACTION_SETSUPER
@@ -214,8 +265,9 @@ ActionMachine::execute()
 		asClass *pClass = findSuper(target, true);
 		if (!pClass)
 			throw ASReferenceError();
-
-		setMember(pClass, a, target, vobj);
+		asBinding* b = pClass->getSetBinding(vobj, a);
+		// The object is on the top already.
+		pushCall(1, &mStack.top(0), b);
 		break;
 	}
 /// 0x06 ABC_ACTION_DXNS
@@ -252,7 +304,7 @@ ActionMachine::execute()
 	case SWF::ABC_ACTION_KILL:
 	{
 		uint32_t regNum = mStream->read_V32();
-		mFrame.value(regnum).set_undefined();
+		mFrame.value(regNum).set_undefined();
 		break;
 	}
 /// 0x09 ABC_ACTION_LABEL
@@ -503,11 +555,11 @@ ActionMachine::execute()
 ///  Otherwise, move by cases[index] - 1 from stream position on op entry.
 	case SWF::ABC_ACTION_LOOKUPSWITCH:
 	{
-		AbcHandlers::stream_position npos = mStream->tell();
+		std::size_t npos = mStream->tell();
 		if (!mStack.top(0).is_number())
-			throw ASMalformedError();
+			throw ASException();
 
-		uint32_t index = mStack.top(0).to_int();
+		uint32_t index = mStack.top(0).to_number<uint32_t>();
 		mStack.drop(1);
 
 		mStream->seekBy(3); // Skip the intial offset.
@@ -522,7 +574,7 @@ ActionMachine::execute()
 		else
 		{
 			mStream->seekTo(npos + 3 * (index + 1));
-			uint_32t newpos = mStream->read_S24();
+			uint32_t newpos = mStream->read_S24();
 			mStream->seekTo(npos - 1 + newpos);
 		}
 		break;
@@ -540,8 +592,7 @@ ActionMachine::execute()
 		mStack.drop(1);
 		mScopeStack.push(a);
 		// If there wasn't a base scope, then this becomes it.
-		if (!mBaseScope)
-			mBaseScope = mCurrentScope;
+		a.setBase(mCurrentScope);
 		break;
 	}
 /// 0x1D ABC_ACTION_POPSCOPE
@@ -549,8 +600,6 @@ ActionMachine::execute()
 ///  shallower than the base's depth.
 	case SWF::ABC_ACTION_POPSCOPE:
 	{
-		if (mCurrentScope == mBaseScope)
-			mBaseScope = NULL;
 		mScopeStack.pop();
 		break;
 	}
@@ -564,11 +613,11 @@ ActionMachine::execute()
 	{
 		ENSURE_NUMBER(mStack.top(0));
 		ENSURE_OBJECT(mStack.top(1));
-		as_object *obj = mStack.top(1).to_object();
-		uint32_t index = mStack.top(0).to_uint();
+		as_object *obj = mStack.top(1).to_object().get();
+		uint32_t index = mStack.top(0).to_number<uint32_t>();
 		mStack.drop(1);
-		asBinding *b = obj->binding_at_index(index);
-		if (next)
+		asBinding *b = obj->bindingAtIndex(index);
+		if (b)
 			mStack.top(0) = b->getNameString();
 		else
 			mStack.top(0) = "";
@@ -586,10 +635,10 @@ ActionMachine::execute()
 	{
 		ENSURE_NUMBER(mStack.top(0));
 		ENSURE_OBJECT(mStack.top(1));
-		as_object *obj = mStack.top(1).to_object();
-		uint32_t index = mStack.top(0).to_uint();
+		as_object *obj = mStack.top(1).to_object().get();
+		uint32_t index = mStack.top(0).to_number<uint32_t>();
 		mStack.drop(1);
-		asBinding *next = obj->binding_after_index(index);
+		asBinding *next = obj->bindingAfterIndex(index);
 		if (next)
 			mStack.top(0) = next->getDispatch();
 		else
@@ -624,11 +673,11 @@ ActionMachine::execute()
 	{
 		ENSURE_NUMBER(mStack.top(0));
 		ENSURE_OBJECT(mStack.top(1));
-		as_object *obj = mStack.top(1).to_object();
-		uint32_t index = mStack.top(0).to_uint();
-		asBinding *b = obj->binding_at_index(index);
+		as_object *obj = mStack.top(1).to_object().get();
+		uint32_t index = mStack.top(0).to_number<uint32_t>();
+		asBinding *b = obj->bindingAtIndex(index);
 		mStack.drop(1);
-		if (!next)
+		if (!b)
 			mStack.top(0).set_undefined();
 		else // The top of the stack is obj, as it should be.
 			pushCall(1, &mStack.top(0), b);
@@ -640,7 +689,7 @@ ActionMachine::execute()
 ///  byte -- as a raw byte
 	case SWF::ABC_ACTION_PUSHBYTE:
 	{
-		int8_t *b = mStream->read_s8();
+		int8_t b = mStream->read_s8();
 		mStack.grow(1);
 		mStack.top(0) = b;
 		break;
@@ -767,9 +816,10 @@ ActionMachine::execute()
 /// Do: Enter scope without altering base.
 	case SWF::ABC_ACTION_PUSHSCOPE:
 	{
-		asScope = mStack.top(0).to_scope();
+		asScope a = mStack.top(0).to_scope();
 		mStack.drop(1);
-		pushScope(asScope);
+		a.setBase(mCurrentScope);
+		mScopeStack.push(a);
 		break;
 	}
 /// 0x31 ABC_ACTION_PUSHNAMESPACE
@@ -791,7 +841,7 @@ ActionMachine::execute()
 /// Frame:
 ///  Change at objloc to object which possessed next value.
 ///  Change at indexloc to index (as object) of the next value.
-	case ABC_ACTION_HASNEXT2:
+	case SWF::ABC_ACTION_HASNEXT2:
 	{
 		int32_t oindex = mStream->read_V32();
 		int32_t iindex = mStream->read_V32();
@@ -799,15 +849,15 @@ ActionMachine::execute()
 		as_value &indexv = mFrame.value(iindex);
 		ENSURE_OBJECT(objv);
 		ENSURE_NUMBER(indexv);
-		as_object *obj = objv.to_object();
-		int32_t index = indexv.to_int();
-		asBinding *next = obj->next_after_index(index);
+		as_object *obj = objv.to_object().get();
+		uint32_t index = indexv.to_number<uint32_t>();
+		asBinding *next = obj->bindingAfterIndex(index);
 		mStack.grow(1);
 		if (next)
 		{
 			mStack.top(0).set_bool(true);
 			mFrame.value(oindex) = next->getOwner();
-			mFrame.value(iindex) = next->getName();
+			mFrame.value(iindex) = next->getDispatch();
 		}
 		else
 		{
@@ -841,11 +891,13 @@ ActionMachine::execute()
 	case SWF::ABC_ACTION_CALL:
 	{
 		uint32_t argc = mStream->read_V32();
-		as_function *f = mStack.top(argc + 1).to_function();
+		ENSURE_OBJECT(mStack.top(argc + 1));
+		as_function *f = mStack.top(argc + 1).to_as_function();
 		// argc + 1 will be dropped, and mStack.top(argc + 1)
 		// will be the top of the stack, so that is where the
 		// return value should go. (Currently it is the func)
-		pushCall(argc + 1, &mStack.top(argc + 1), asBinding(f));
+		asBinding b(f);
+		pushCall(argc + 1, &mStack.top(argc + 1), &b);
 		break;
 	}
 /// 0x42 ABC_ACTION_CONSTRUCT
@@ -858,8 +910,9 @@ ActionMachine::execute()
 	case SWF::ABC_ACTION_CONSTRUCT:
 	{
 		uint32_t argc = mStream->read_V32();
-		as_function *f = mStack.top(argc).to_function();
-		pushCall(argc, &mStack.top(argc), asBinding(f));
+		as_function *f = mStack.top(argc).to_as_function();
+		asBinding b(f);
+		pushCall(argc, &mStack.top(argc), &b);
 		break;
 	}
 /// 0x43 ABC_ACTION_CALLMETHOD
@@ -874,8 +927,8 @@ ActionMachine::execute()
 		uint32_t dispatch_id = mStream->read_V32() - 1;
 		uint32_t argc = mStream->read_V32();
 		ENSURE_OBJECT(mStack.top(argc));
-		as_object *obj = mStack.top(argc).to_object();
-		asBinding *b = obj.find_at_index(dispatch_id);
+		as_object *obj = mStack.top(argc).to_object().get();
+		asBinding *b = obj->bindingAtIndex(dispatch_id);
 		if (!b)
 		{
 			mStack.drop(argc);
@@ -896,7 +949,8 @@ ActionMachine::execute()
 	{
 		asMethod *m = pool_method(mStream->read_V32());
 		uint32_t argc = mStream->read_V32();
-		pushCall(argc + 1, &mStack.top(argc), asBinding(m));
+		asBinding b(m);
+		pushCall(argc + 1, &mStack.top(argc), &b);
 		break;
 	}
 /// 0x45 ABC_ACTION_CALLSUPER
@@ -918,7 +972,8 @@ ActionMachine::execute()
 		int dropsize = completeName(a);
 		ENSURE_OBJECT(mStack.top(argc + dropsize));
 		mStack.drop(dropsize);
-		asBinding *b = mStack.top(argc).to_object().get_named_super(a);
+		asBinding *b = findSuper(mStack.top(argc), 
+			true)->getBinding(mStack.top(argc), a);
 		if (opcode == SWF::ABC_ACTION_CALLSUPER)
 			pushCall(argc + 1, &mStack.top(argc), b);
 		else
@@ -955,7 +1010,7 @@ ActionMachine::execute()
 				mStack.top(i + shift) = mStack.top(i);
 			mStack.drop(shift);
 		}
-		asBinding *b = mStack.top(argc).to_object()->getPropertyBinding(a);
+		asBinding *b = mStack.top(argc).to_object()->getBinding(a);
 		b->setLexOnly(lex_only);
 		if (opcode == SWF::ABC_ACTION_CALLPROPVOID)
 			pushCall(argc + 1, &mIgnoreReturn, b);
@@ -998,9 +1053,9 @@ ActionMachine::execute()
 	{
 		uint32_t argc = mStream->read_V32();
 		ENSURE_OBJECT(mStack.top(argc));
-		as_object *obj = mStack.top(argc).to_object();
-		asBinding *b = obj->getSuperConstructor();
-		pushCall(argc + 1, &mIgnoreReturn, b);
+		asMethod *m = findSuper(mStack.top(argc), true)->getConstructor();
+		asBinding b(m);
+		pushCall(argc + 1, &mIgnoreReturn, &b);
 		break;
 	}
 /// 0x4A ABC_ACTION_CONSTRUCTPROP
@@ -1026,9 +1081,7 @@ ActionMachine::execute()
 				mStack.top(i + shift) = mStack.top(i);
 			mStack.drop(shift);
 		}
-		as_object *obj = mStack.top(argc).to_object();
-		asBinding *b = obj->getPropertyConstructor(a);
-		pushCall(argc + 1, &mStack.top(0), b);
+		// TODO: Finish this (See ECMA spec)
 		break;
 	}
 /// 0x55 ABC_ACTION_NEWOBJECT
@@ -1051,7 +1104,8 @@ ActionMachine::execute()
 		int i = argc;
 		while (i--)
 		{
-			obj->add_property(mStack.top(i * 2 + 1), mStack.top(i * 2));
+			obj->set_member(mST.find(mStack.top(i * 2 + 1).to_string()),
+				mStack.top(i * 2));
 		}
 		mStack.drop(argc * 2 - 1);
 		mStack.top(0) = obj;
@@ -1071,7 +1125,7 @@ ActionMachine::execute()
 	{
 		uint32_t asize = mStream->read_V32();
 		as_object *obj = mCH->newOfType(NSV::CLASS_ARRAY);
-		as_array *array = dynamic_cast<as_array*> (obj);
+		as_array_object *array = dynamic_cast<as_array_object*> (obj);
 		array->resize(asize);
 		uint32_t i = asize;
 		while (i--)
@@ -1099,7 +1153,10 @@ ActionMachine::execute()
 	case SWF::ABC_ACTION_NEWCLASS:
 	{
 		uint32_t cid = mStream->read_V32();
-		mStack.top(0) = mCH->newOfId(cid, mStack.top(0));
+		asClass *c = pool_class(cid);
+		asMethod *m = c->getConstructor();
+		asBinding b(m);
+		pushCall(1, &mStack.top(0), &b);
 		break;
 	}
 /// 0x59 ABC_ACTION_GETDESCENDANTS
@@ -1114,6 +1171,11 @@ ActionMachine::execute()
 /// descendants of a class.
 	case SWF::ABC_ACTION_GETDESCENDANTS:
 	{
+		asName a = mStream->read_V32();
+		as_value &v = mStack.top(0);
+		ENSURE_OBJECT(v);
+		mStack.drop(1);
+		mStack.drop(completeName(a));
 		// TODO: Decide or discover what to do with this.
 		break;
 	}
@@ -1141,9 +1203,17 @@ ActionMachine::execute()
 	{
 		asName a = mStream->read_V32();
 		mStack.drop(completeName(a));
-		as_value v = findProperty(a);
-		if ((opcode == SWF::ABC_ACTION_FINDPROPSTRICT) && v.is_undefined())
-			throw ASReferenceException();
+		asBinding *b = findProperty(a);
+		if (!b)
+			if (opcode == SWF::ABC_ACTION_FINDPROPSTRICT)
+				throw ASReferenceError();
+			else
+				mStack.push(as_value());
+		else
+		{
+			mStack.push(as_value());
+			pushCall(0, &mStack.top(0), b);
+		}
 		break;
 	}
 /// 0x5F ABC_ACTION_FINDDEF
@@ -1153,6 +1223,7 @@ ActionMachine::execute()
 	case SWF::ABC_ACTION_FINDDEF:
 	{
 		asName a = mStream->read_V32();
+		a.makeComplete();
 		// TODO
 		break;
 	}
@@ -1161,14 +1232,16 @@ ActionMachine::execute()
 /// Stack Out:
 ///  property -- The result of 0x5D (ABC_ACTION_FINDPROPSTRICT)
 ///   + 0x66 (ABC_ACTION_GETPROPERTY)
-	case SWF::ABC_ACTION_GETLEX
+	case SWF::ABC_ACTION_GETLEX:
 	{
 		asName a = mStream->read_V32();
-		as_value v = findProperty(a);
-		if (v.is_undefined())
-			throw ASReferenceException();
+		a.makeComplete();
+		asBinding *b = findProperty(a);
+		if (!b)
+			throw ASReferenceError();
+		b->setLexOnly(b);
 		mStack.grow(1);
-		mStack.top(0) = v.getProperty(a);
+		pushCall(0, &mStack.top(0), b);
 		break;
 	}
 /// 0x61 ABC_ACTION_SETPROPERTY
@@ -1189,11 +1262,10 @@ ActionMachine::execute()
 	case SWF::ABC_ACTION_SETPROPERTY:
 	{
 		asName a = mStream->read_V32();
-		as_value &v = mStack.pop();
+		//as_value &v = mStack.pop();
 		if (!a.isRuntime())
 		{
-			mStack.top(0).setProperty(a, v);
-			mStack.drop(1);
+			//TODO: Set the property of mStack.top(0) v,a
 		}
 		else
 		{
@@ -1201,12 +1273,12 @@ ActionMachine::execute()
 				&& mStack.top(1).is_dictionary()))
 			{
 				mStack.drop(completeName(a));
-				mStack.top(0).setProperty(a, v);
+				//TODO: mStack.top(0).setProperty(a, v);
 				mStack.drop(1);
 			}
 			else
 			{
-				mStack.top(1).setDictProperty(mStack.top(0), v);
+				//TODO: mStack.top(1).setDictProperty(mStack.top(0), v);
 				mStack.drop(2);
 			}
 		}
@@ -1249,11 +1321,11 @@ ActionMachine::execute()
 /// Stream: S8 'depth'
 /// Stack Out:
 ///  scope -- The scope object at depth
-	case SWF::ABC_ACTION_GETSCOPEOBJECT
+	case SWF::ABC_ACTION_GETSCOPEOBJECT:
 	{
 		uint8_t depth = mStream->read_u8();
 		mStack.grow(1);
-		mStack.top(0) = mScopeStack(depth);
+		mStack.top(0) = &mScopeStack.top(depth);
 		break;
 	}
 /// 0x66 ABC_ACTION_GETPROPERTY
@@ -1271,7 +1343,7 @@ ActionMachine::execute()
 		asName a = mStream->read_V32();
 		if (!a.isRuntime())
 		{
-			mStack.top(0) = mStack.top(0).getProperty(a, v);
+			//TODO: mStack.top(0) = mStack.top(0).getProperty(a, v);
 		}
 		else
 		{
@@ -1279,11 +1351,11 @@ ActionMachine::execute()
 				&& mStack.top(1).is_dictionary()))
 			{
 				mStack.drop(completeName(a));
-				mStack.top(0) = mStack.top(0).getProperty(a);
+				//TODO: mStack.top(0) = mStack.top(0).getProperty(a);
 			}
 			else
 			{
-				mStack.top(1) = mStack.top(1).getDictProperty(mStack.top(0));
+				//TODO: mStack.top(1) = mStack.top(1).getDictProperty(mStack.top(0));
 				mStack.drop(1);
 			}
 		}
@@ -1302,9 +1374,9 @@ ActionMachine::execute()
 	case SWF::ABC_ACTION_INITPROPERTY:
 	{
 		asName a = mStream->read_V32();
-		as_value& v = mStack.pop();
+		//as_value& v = mStack.pop();
 		mStack.drop(completeName(a));
-		mStack.pop().to_object().setProperty(a, v, true); // true for init
+		//TODO: mStack.pop().to_object().setProperty(a, v, true); // true for init
 		break;
 	}
 /// 0x6A ABC_ACTION_DELETEPROPERTY
@@ -1318,7 +1390,7 @@ ActionMachine::execute()
 	{
 		asName a = mStream->read_V32();
 		mStack.drop(completeName(a));
-		mStack.top(0) = mStack.top(0).deleteProperty(a);
+		//mStack.top(0) = mStack.top(0).deleteProperty(a);
 		break;
 	}
 /// 0x6C ABC_ACTION_GETSLOT
@@ -1327,13 +1399,13 @@ ActionMachine::execute()
 ///  obj -- The object which owns the desired slot.
 /// Stack Out:
 ///  slot -- obj.slots[slot_index]
-	case SWF::ABC_ACTION_GETSLOT
+	case SWF::ABC_ACTION_GETSLOT:
 	{
 		uint32_t sindex = mStream->read_V32();
 		if (!sindex)
 			throw ASException();
 		--sindex;
-		mStack.top(0) = mStack.top(0).getSlot(sindex);
+		//TODO: mStack.top(0) = mStack.top(0).getSlot(sindex);
 		break;
 	}
 /// 0x6D ABC_ACTION_SETSLOT
@@ -1350,7 +1422,7 @@ ActionMachine::execute()
 		if (!sindex)
 			throw ASException();
 		--sindex;
-		mStack.top(0).setSlot(sindex, mStack.top(1));
+		//TODO: mStack.top(0).setSlot(sindex, mStack.top(1));
 		mStack.drop(2);
 		break;
 	}
@@ -1368,7 +1440,7 @@ ActionMachine::execute()
 			throw ASException();
 		--sindex;
 		mStack.grow(1);
-		mStack.top(0) = mGlobal.getSlot(sindex);
+		//TODO: mStack.top(0) = mGlobal.getSlot(sindex);
 		break;
 	}
 /// 0x6F ABC_ACTION_SETGLOBALSLOT
@@ -1385,7 +1457,7 @@ ActionMachine::execute()
 		if (!sindex)
 			throw ASException();
 		--sindex;
-		mGlobal.setSlot(sindex, mStack.pop());
+		//TODO: mGlobal.setSlot(sindex, mStack.pop());
 		break;
 	}
 /// 0x70 ABC_ACTION_CONVERT_S
@@ -1405,7 +1477,7 @@ ActionMachine::execute()
 ///  str_value -- value as a string, escaped suitably for an XML element.
 	case SWF::ABC_ACTION_ESC_XELEM:
 	{
-		mStack.top(0) = mStack.top(0).to_escaped_xml_element();
+		//TODO: mStack.top(0) = mStack.top(0).to_escaped_xml_element();
 		break;
 	}
 /// 0x72 ABC_ACTION_ESC_XATTR
@@ -1415,7 +1487,7 @@ ActionMachine::execute()
 ///  str_value -- value as a string, escaped suitably for an XML attribute.
 	case SWF::ABC_ACTION_ESC_XATTR:
 	{
-		mStack.top(0) = mStack.top(0).to_escaped_xml_attribute();
+		//TODO: mStack.top(0) = mStack.top(0).to_escaped_xml_attribute();
 		break;
 	}
 /// 0x73 ABC_ACTION_CONVERT_I
@@ -1451,7 +1523,7 @@ ActionMachine::execute()
 	case SWF::ABC_ACTION_CONVERT_D:
 	case SWF::ABC_ACTION_COERCE_D:
 	{
-		mStack.top(0) = mStack.top(0).to_double();
+		mStack.top(0) = mStack.top(0).to_number();
 		break;
 	}
 /// 0x76 ABC_ACTION_CONVERT_B
@@ -1463,7 +1535,7 @@ ActionMachine::execute()
 	case SWF::ABC_ACTION_CONVERT_B:
 	case SWF::ABC_ACTION_COERCE_B:
 	{
-		mStack.top(0) = mStack.top(0).to_bool();
+		mStack.top(0).set_bool(mStack.top(0).to_bool());
 		break;
 	}
 /// 0x77 ABC_ACTION_CONVERT_O
@@ -1474,9 +1546,9 @@ ActionMachine::execute()
 /// Do: If obj is Undefined or Null, throw TypeError
 	case SWF::ABC_ACTION_CONVERT_O:
 	{
-		mStack.top(0) = mStack.top(0).to_object();
+		mStack.top(0) = mStack.top(0).to_object().get();
 		if (mStack.top(0).is_undefined() || mStack.top(0).is_null())
-			throw ASTypeException();
+			throw ASTypeError();
 		break;
 	}
 /// 0x78 ABC_ACTION_CHECKFILTER
@@ -1488,7 +1560,7 @@ ActionMachine::execute()
 	case SWF::ABC_ACTION_CHECKFILTER:
 	{
 		if (!mStack.top(0).is_xml())
-			throw ASTypeException();
+			throw ASTypeError();
 		break;
 	}
 /// 0x80 ABC_ACTION_COERCE
@@ -1502,7 +1574,7 @@ ActionMachine::execute()
 	{
 		asName a = mStream->read_V32();
 		mStack.drop(completeName(a));
-		mStack.top(0) = mStack.top(0).coerce(a);
+		//TODO: mStack.top(0) = mStack.top(0).coerce(a);
 		break;
 	}
 /// 0x82 ABC_ACTION_COERCE_A
@@ -1539,7 +1611,7 @@ ActionMachine::execute()
 	{
 		asName a = mStream->read_V32();
 		mStack.drop(completeName(a));
-		if (!mStack.top(0).conforms_to(a)
+		if (!mStack.top(0).conforms_to(a))
 			mStack.top(0).set_null();
 		break;
 	}
@@ -1551,7 +1623,7 @@ ActionMachine::execute()
 ///  cobj -- obj if type of obj conforms to valid, otherwise Null
 	case SWF::ABC_ACTION_ASTYPELATE:
 	{
-		if (!mStack.top(1).conforms_to(mStack.top(0).to_object()))
+		if (!mStack.top(1).conforms_to(mStack.top(0)))
 			mStack.top(1).set_null();
 		mStack.drop(1);
 		break;
@@ -1564,7 +1636,7 @@ ActionMachine::execute()
 	case SWF::ABC_ACTION_COERCE_O:
 	{
 		if (mStack.top(0).is_undefined())
-			mStack.top(0) = mStack.top(0).to_object();
+			mStack.top(0) = mStack.top(0).to_object().get();
 		else
 			mStack.top(0).set_undefined();
 		break;
@@ -1634,7 +1706,7 @@ ActionMachine::execute()
 ///  nobj -- A truth object with value !((Boolean) obj)
 	case SWF::ABC_ACTION_NOT:
 	{
-		mStack.top(0).set_bool(!mStack.top(0).to_bool();)
+		mStack.top(0).set_bool(!mStack.top(0).to_bool());
 		break;
 	}
 /// 0x97 ABC_ACTION_BITNOT
@@ -1655,7 +1727,7 @@ ActionMachine::execute()
 /// a + b (double if numeric)
 	case SWF::ABC_ACTION_ADD:
 	{
-		mStack.top(1) = mStack.top(1).add(mStack.top(0));
+		//TODO: mStack.top(1) = mStack.top(1).add(mStack.top(0));
 		mStack.drop(1);
 		break;
 	}
@@ -1718,7 +1790,7 @@ ActionMachine::execute()
 ///  a << b
 	case SWF::ABC_ACTION_LSHIFT:
 	{
-		mStack.top(1) = mStack.top(1).to_int() << mStack.top(0).to_int();
+		mStack.top(1) = mStack.top(1).to_number<int>() << mStack.top(0).to_number<int>();
 		mStack.drop(1);
 		break;
 	}
@@ -1730,7 +1802,7 @@ ActionMachine::execute()
 ///  a >> b
 	case SWF::ABC_ACTION_RSHIFT:
 	{
-		mStack.top(1) = mStack.top(1).to_int() >> mStack.top(0).to_int();
+		mStack.top(1) = mStack.top(1).to_number<int>() >> mStack.top(0).to_number<int>();
 		mStack.drop(1);
 		break;
 	}
@@ -1754,7 +1826,7 @@ ActionMachine::execute()
 ///  a & b
 	case SWF::ABC_ACTION_BITAND:
 	{
-		mStack.top(1) = mStack.top(1).to_int() & mStack.top(0).to_int();
+		mStack.top(1) = mStack.top(1).to_number<int>() & mStack.top(0).to_number<int>();
 		mStack.drop(1);
 		break;
 	}
@@ -1766,7 +1838,7 @@ ActionMachine::execute()
 ///  a | b
 	case SWF::ABC_ACTION_BITOR:
 	{
-		mStack.top(1) = mStack.top(1).to_int() | mStack.top(0).to_int();
+		mStack.top(1) = mStack.top(1).to_number<int>() | mStack.top(0).to_number<int>();
 		mStack.drop(1);
 		break;
 	}
@@ -1778,7 +1850,7 @@ ActionMachine::execute()
 ///  a ^ b
 	case SWF::ABC_ACTION_BITXOR:
 	{
-		mStack.top(1) = mStack.top(1).to_int() ^ mStack.top(0).to_int();
+		mStack.top(1) = mStack.top(1).to_number<int>() ^ mStack.top(0).to_number<int>();
 		mStack.drop(1);
 		break;
 	}
@@ -1790,8 +1862,10 @@ ActionMachine::execute()
 ///  truth -- Truth of (a == b) (weakly)
 	case SWF::ABC_ACTION_EQUALS:
 	{
-		mStack.top(1) = mStack.top(1).weak_equals(mStack.top(0));
+		bool truth;
+		ABSTRACT_EQUALITY(truth, mStack.top(1), mStack.top(0), false);
 		mStack.drop(1);
+		mStack.top(0).set_bool(truth);
 		break;
 	}
 /// 0xAC ABC_ACTION_STRICTEQUALS
@@ -1803,8 +1877,10 @@ ActionMachine::execute()
 ///   0x19 (ABC_ACTION_IFSTRICTEQ))
 	case SWF::ABC_ACTION_STRICTEQUALS:
 	{
-		mStack.top(1) = mStack.top(1).strict_equals(mStack.top(0));
+		bool truth;
+		ABSTRACT_EQUALITY(truth, mStack.top(1), mStack.top(0), true);
 		mStack.drop(1);
+		mStack.top(0).set_bool(truth);
 		break;
 	}
 /// 0xAD ABC_ACTION_LESSTHAN
@@ -1815,8 +1891,10 @@ ActionMachine::execute()
 ///  truth -- Truth of (a < b)
 	case SWF::ABC_ACTION_LESSTHAN:
 	{
-		mStack.top(1) = mStack.top(1).less_than(mStack.top(0));
+		bool truth;
+		ABSTRACT_COMPARE(truth, mStack.top(1), mStack.top(0), false);
 		mStack.drop(1);
+		mStack.top(0).set_bool(truth); // truth is a < b
 		break;
 	}
 /// 0xAE ABC_ACTION_LESSEQUALS
@@ -1827,8 +1905,10 @@ ActionMachine::execute()
 ///  truth -- Truth of (a <= b)
 	case SWF::ABC_ACTION_LESSEQUALS:
 	{
-		mStack.top(1) = mStack.top(1).less_equal(mStack.top(0));
+		bool truth;
+		ABSTRACT_COMPARE(truth, mStack.top(0), mStack.top(1), true);
 		mStack.drop(1);
+		mStack.top(0).set_bool(!truth); // truth is b < a
 		break;
 	}
 /// 0xAF ABC_ACTION_GREATERTHAN
@@ -1839,8 +1919,10 @@ ActionMachine::execute()
 ///  truth -- Truth of (a > b)
 	case SWF::ABC_ACTION_GREATERTHAN:
 	{
-		mStack.top(1) = mStack.top(1).greater_than(mStack.top(0));
+		bool truth;
+		ABSTRACT_COMPARE(truth, mStack.top(0), mStack.top(1), false);
 		mStack.drop(1);
+		mStack.top(0).set_bool(truth); // truth is b < a
 		break;
 	}
 /// 0xB0 ABC_ACTION_GREATEREQUALS
@@ -1851,8 +1933,10 @@ ActionMachine::execute()
 ///  truth -- Truth of (a >= b)
 	case SWF::ABC_ACTION_GREATEREQUALS:
 	{
-		mStack.top(1) = mStack.top(1).greater_equal(mStack.top(0));
+		bool truth;
+		ABSTRACT_COMPARE(truth, mStack.top(1), mStack.top(0), true);
 		mStack.drop(1);
+		mStack.top(0).set_bool(!truth); // truth is a < b
 		break;
 	}
 /// 0xB1 ABC_ACTION_INSTANCEOF
@@ -1866,7 +1950,7 @@ ActionMachine::execute()
 		if (mStack.top(1).is_null())
 			mStack.top(1) = false;
 		else // Calling to_object intentionally causes an exception if super is not an object.
-			mStack.top(1) = mStack.top(1).conforms_to(mStack.top(0).to_object());
+			mStack.top(1) = mStack.top(1).conforms_to(mStack.top(0));
 		mStack.drop(1);
 		break;
 	}
@@ -1906,7 +1990,7 @@ ActionMachine::execute()
 /// is not done. If there is, fix this lack.
 	case SWF::ABC_ACTION_IN:
 	{
-		mStack.top(1).set_bool(mStack.top(1).to_object().contains(mStack.top(0)));
+		//TODO: mStack.top(1).set_bool(mStack.top(1).to_object().contains(mStack.top(0)));
 		mStack.drop(1);
 		break;
 	}
@@ -1914,7 +1998,7 @@ ActionMachine::execute()
 /// See: 0x91 (ABC_ACTION_INCREMENT), but forces types to int, not double
 	case SWF::ABC_ACTION_INCREMENT_I:
 	{
-		mStack.top(0) = mStack.top(0).to_int() + 1;
+		mStack.top(0) = mStack.top(0).to_number<int>() + 1;
 		break;
 	}
 /// 0xC1 ABC_ACTION_DECREMENT_I
@@ -2050,19 +2134,19 @@ ActionMachine::execute()
 } // end of execute function
 
 void
-ActionMachine::getMember(asClass* pDefinition, asBoundName& name,
+Machine::getMember(asClass* pDefinition, asName& name,
 	as_value& instance)
 {
 	if (!instance.is_object())
 		throw ASTypeError();
 
-	asBinding *pBinding = pDefinition->findMember(name, instance);
+	asBinding *pBinding = pDefinition->getBinding(instance, name);
 	if (pBinding->isWriteOnly())
 		throw ASReferenceError();
 
 	if (!pBinding->isGetSet())
 	{
-		mStack.push(pBinding->getFromInstance(instance));
+		//TODO: mStack.push(pBinding->getFromInstance(instance));
 		return;
 	}
 
@@ -2070,72 +2154,75 @@ ActionMachine::getMember(asClass* pDefinition, asBoundName& name,
 	// written in C++ get called like this, with pushCall handling.
 	// And push the instance ('this')
 	mStack.push(instance);
-	pushCall(1, &mStack.top(0), pBinding->getGetter());
+	pushCall(1, &mStack.top(0), pBinding); //TODO: pBinding->getGetter());
 }
 
 void
-ActionMachine::setMember(asClass *pDefinition, asBoundName& name,
-	as_value& instance, as_value& newvalue)
+Machine::setMember(asClass *pDefinition, asName& name, as_value& instance,
+	as_value& newvalue)
 {
 	if (!instance.is_object())
-		throw ReferenceError();
+		throw ASReferenceError();
 
-	asBinding *pBinding = pDefinition->findMember(name, instance);
+	asBinding *pBinding = pDefinition->getBinding(instance, name);
 
 	if (pBinding->isReadOnly())
 		throw ASReferenceError();
 
 	if (!pBinding->isGetSet())
 	{
-		pBinding->setInInstance(instance, newvalue);
+		//TODO: pBinding->setInInstance(instance, newvalue);
 		return;
 	}
 
 	// Two parameters -- the target object, the value to set.
 	mStack.push(instance);
 	mStack.push(newvalue);
-	pushCall(2, &mStack.top(1), pBinding->getSetter());
+	pushCall(2, &mStack.top(1), pBinding); //TODO: pBinding->getSetter());
 }
 
 int
-ActionMachine::completeName(asBoundName &name, int offset)
+Machine::completeName(asName &name, int offset)
 {
 	int size = 0;
 
-	asUnboundName* uname = mNamePool.at(name.id);
+	asName* uname = pool_name(name.id);
 	if (uname->isRuntime())
 	{
 		as_value obj = mStack.top(offset);
 		if (obj.is_object() && obj.to_object()->isQName())
-			name.fill(obj.to_object());
+			name.fill(obj.to_object().get());
 		++size;
 
-		if (uname->isRuntimeNamespace())
+		if (uname->isRtns())
 			++size; // Ignore the Namespace.
 	}
-	else if (uname->isRuntimeNamespace())
+	else if (uname->isRtns())
 	{
-		uname->setNamespace(mStack.top(offset);
+		uname->setNamespace(mStack.top(offset));
 		++size;
 	}
 	return size;
 }
 
 asClass *
-ActionMachine::findSuper(as_value &v, bool find_for_primitive)
+Machine::findSuper(as_value &v, bool find_for_primitive)
 {
 	if (v.is_undefined() || v.is_null())
 		return NULL;
 
 	if (v.is_object())
 	{
-		asClass *pProto = v.to_object()->getClass();
+		asClass *pProto = NULL; // TODO: v.to_object()->getClass();
 		return pProto ? pProto->getSuper() : NULL;
 	}
 
+	if (!find_for_primitive)
+		return NULL;
+
 	if (v.is_number())
 	{
-		return mCH->getClass(NSV::CLASS_NUMBER);
+		return NULL; // TODO: mCH->getClass(NSV::CLASS_NUMBER);
 	}
 
 	// And so on...
@@ -2144,7 +2231,7 @@ ActionMachine::findSuper(as_value &v, bool find_for_primitive)
 }
 
 void
-ActionMachine::pushCall(unsigned int stack_in, as_value *return_slot,
+Machine::pushCall(unsigned int stack_in, as_value *return_slot,
 	asBinding *pBind)
 {
 	switch (pBind->mType)
@@ -2155,7 +2242,7 @@ ActionMachine::pushCall(unsigned int stack_in, as_value *return_slot,
 		throw ASException();
 		return;
 	case asBinding::T_VALUE:
-		return_slot = pBind->getValue()->getCurrentValue();
+		*return_slot = pBind->getValue()->getCurrentValue();
 		return;
 	case asBinding::T_METHOD:
 		break;
@@ -2163,7 +2250,7 @@ ActionMachine::pushCall(unsigned int stack_in, as_value *return_slot,
 
 	asMethod *m = pBind->getMethod();
 
-	if (!(m->isNative() || m->hasBody())
+	if (!(m->isNative() || m->hasBody()))
 		throw ASException();
 
 	// Here is where the SafeStack shines:
@@ -2184,18 +2271,18 @@ ActionMachine::pushCall(unsigned int stack_in, as_value *return_slot,
 	// Native functions have to be called now.
 	if (m->isNative())
 	{
-		return_slot = m->CallNative(mStack, mGlobalScope);
+		//TODO: return_slot = m->CallNative(mStack, mGlobalScope);
 		restoreState();
 		return;
 	}
 
 	// The scope stack should be fixed for non-native calls.
 	mScopeStack.fixDownstop();
-	mScopeStack.push(m->getActivation());
-	mCurrentScope = mScopeStack.top(0);
+	//TODO: mScopeStack.push(m->getActivation());
+	mCurrentScope = &mScopeStack.top(0);
 
 	// We set the stream and return as given in the method and call.
-	mStream = m->getCode();
+	//TODO: mStream = m->getBody();
 	mGlobalReturn = return_slot;
 
 	// When control goes to the main loop of the interpreter, it will
@@ -2203,7 +2290,7 @@ ActionMachine::pushCall(unsigned int stack_in, as_value *return_slot,
 }
 
 void
-ActionMachine::restoreState()
+Machine::restoreState()
 {
 	State &s = mStateStack.top(0);
 	mStack.setAllSizes(s.mStackTotalSize, s.mStackDepth);
@@ -2216,17 +2303,18 @@ ActionMachine::restoreState()
 }
 
 void
-ActionMachine::saveState()
+Machine::saveState()
 {
 	mStateStack.grow(1);
 	State &s = mStateStack.top(0);
 	s.mStackDepth = mStack.getDownstop();
-	s.mStackTotalSize = mStack.getTotalSize();
+	s.mStackTotalSize = mStack.totalSize();
 	s.mScopeStackDepth = mScopeStack.getDownstop();
-	s.mScopeTotalSize = mScopeStack.getTotalSize();
+	s.mScopeTotalSize = mScopeStack.totalSize();
 	s.mStream = mStream;
 	s.mDefaultXMLNamespace = mDefaultXMLNamespace;
 	s.mCurrentScope = mCurrentScope;
 	s.mGlobalReturn = mGlobalReturn;
 }
 
+} // end of namespace gnash
