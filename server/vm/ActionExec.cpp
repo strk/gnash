@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.56 2007/10/02 15:44:51 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.57 2007/10/09 08:12:26 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -151,6 +151,9 @@ ActionExec::operator() ()
 	periodic_events.poll_event_handlers(&env);
     }
 #endif
+
+    // Do not execute if scripts are disabled
+    if ( VM::get().getRoot().scriptsDisabled() ) return;
 
     static const SWFHandlers& ash = SWFHandlers::instance();
 		
