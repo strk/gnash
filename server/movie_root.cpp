@@ -871,8 +871,6 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 {
     //log_msg("Notifying " SIZET_FMT " keypress listeners", _keyListeners.size());
 
-    as_environment env;
-
     for (KeyListeners::iterator iter = _keyListeners.begin();
         iter != _keyListeners.end(); ++iter)
     {
@@ -889,12 +887,9 @@ void movie_root::notify_key_listeners(key::code k, bool down)
                 if(iter->hasUserRegistered())
                 // invoke onKeyDown handler
                 {
-                    boost::intrusive_ptr<as_function> 
-                        method = ch->getUserDefinedEventHandler("onKeyDown");
-                    if ( method )
-                    {
-                        call_method0(as_value(method.get()), &env, ch);
-                    }
+			VM& vm = VM::get();
+			string_table& st =vm.getStringTable();
+			ch->callMethod(st.find(PROPNAME("onKeyDown")), ch->get_environment());
                 }
                 // invoke onClipKeyPress handler
                 ch->on_event(event_id(event_id::KEY_PRESS, key::codeMap[k][0]));
@@ -907,12 +902,9 @@ void movie_root::notify_key_listeners(key::code k, bool down)
                 if(iter->hasUserRegistered())
                 // invoke onKeyUp handler
                 {
-                    boost::intrusive_ptr<as_function> 
-                        method = ch->getUserDefinedEventHandler("onKeyUp");
-                    if ( method )
-                    {
-                        call_method0(as_value(method.get()), &env, ch);
-                    }
+			VM& vm = VM::get();
+			string_table& st =vm.getStringTable();
+			ch->callMethod(st.find(PROPNAME("onKeyUp")), ch->get_environment());
                 }
             }
         }

@@ -1,3 +1,9 @@
+2007-10-10 Sandro Santilli <strk@keybit.net>
+
+	* server/movie_root.cpp (notify_key_listeners): don't use a
+	  stack-allocated and non-configured as_environment for user-defined
+	  event handlers invocation.
+
 2007-10-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gui.cpp: only handle GUI shortcuts on key down.
