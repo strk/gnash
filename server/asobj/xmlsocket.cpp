@@ -443,6 +443,9 @@ xmlsocket_connect(const fn_call& fn)
     int port = int(fn.arg(1).to_number(&fn.env()));
     
     bool success = ptr->obj.connect(host.c_str(), port);
+
+    VM& vm = VM::get();
+    string_table& st = vm.getStringTable();
     
     // Actually, if first-stage connection was successful, we
     // should NOT invoke onConnect(true) here, but postpone
@@ -451,14 +454,9 @@ xmlsocket_connect(const fn_call& fn)
     // confirm this is that onConnect is invoked *after* 
     // XMLSocket.connect() returned in these cases.
     //
-	boost::intrusive_ptr<as_function> handler = ptr->getEventHandler("onConnect");
-    if ( handler )
-    {
-        log_msg(_("XMLSocket.connect(): calling onConnect"));
-        as_environment env;
-        env.push(success);
-        val = call_method(handler.get(), &env, ptr.get(), 1, env.stack_size()-1); 
-    }
+    log_debug(_("XMLSocket.connect(): tring to call onConnect"));
+    as_environment& env = fn.env();
+    ptr->callMethod(st.find(PROPNAME("onConnect")), env, success);
 	    
     if ( success )
     {
@@ -468,7 +466,7 @@ xmlsocket_connect(const fn_call& fn)
         boost::intrusive_ptr<builtin_function> ondata_handler = new builtin_function(&xmlsocket_inputChecker, NULL);
         unsigned interval = 50; // just make sure it's expired at every frame iteration (20 FPS used here)
         timer->setInterval(*ondata_handler, interval, boost::dynamic_pointer_cast<as_object>(ptr));
-        VM::get().getRoot().add_interval_timer(timer, true);
+        vm.getRoot().add_interval_timer(timer, true);
 
         log_msg(_("Timer set"));
     }
@@ -550,15 +548,6 @@ xmlsocket_onData(const fn_call& fn)
     
     boost::intrusive_ptr<xmlsocket_as_object> ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
 
-    boost::intrusive_ptr<as_function> onXMLEvent = ptr->getEventHandler("onXML");
-    if ( ! onXMLEvent )
-    {
-            log_msg(_("Builtin XMLSocket.onData doing nothing as no "
-                            "onXML event is defined on XMLSocket %p"),
-                            (void*)ptr.get());
-            return as_value();
-    }
-
     if ( fn.nargs < 1 )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -579,9 +568,13 @@ xmlsocket_onData(const fn_call& fn)
     }
 
     boost::intrusive_ptr<as_object> xml = new XML(xmlin);
+    as_value arg(xml.get());
 
-    env.push(xml);
-    call_method(as_value(onXMLEvent.get()), &env, ptr.get(), 1, env.stack_size()-1);
+    VM& vm = VM::get();
+    string_table& st = vm.getStringTable();
+    
+    ptr->callMethod(st.find(PROPNAME("onXML")), env, arg);
+
     return as_value();
 
 

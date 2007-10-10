@@ -1,3 +1,8 @@
+2007-10-10 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/xmlsocket.cpp: don't use non-configured as_environment
+	  for user-defined event handlers invocation.
+
 2007-10-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/asobj/Key.{h,cpp}: change is_key_down() to take SWF keycode
