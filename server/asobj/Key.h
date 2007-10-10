@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: Key.h,v 1.28 2007/10/10 07:45:28 bwy Exp $ */
+/* $Id: Key.h,v 1.29 2007/10/10 14:07:58 bwy Exp $ */
 
 #ifndef __KEY_H__
 #define __KEY_H__
@@ -79,10 +79,17 @@ public:
 
 	key_as_object();
 
-	bool is_key_down(int code);
+	// Pass SWF keycode, returns true if currently pressed.
+	bool is_key_down(int keycode);
 
+	// Pass gnash::key::code. Changes m_last_key_event
+	// and adds appropriate SWF keycode to bit array of keys
+	// pressed (m_unreleased_keys)
 	void set_key_down(int code);
 
+	// Pass gnash::key::code. Changes m_last_key_event
+	// and removes appropriate SWF keycode from bit array of keys
+	// pressed (m_unreleased_keys)
 	void set_key_up(int code);
 	
 #ifndef NEW_KEY_LISTENER_LIST_DESIGN

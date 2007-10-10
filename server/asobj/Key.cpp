@@ -51,24 +51,19 @@ key_as_object::key_as_object()
 }
 
 bool
-key_as_object::is_key_down(int code)
+key_as_object::is_key_down(int keycode)
 {
-    if (code < 0 || code >= key::KEYCOUNT) return false;
+    if (keycode < 0 || keycode >= key::KEYCOUNT) return false;
 
-    for(int i = 0; i < sizeof(m_unreleased_keys)/sizeof(m_unreleased_keys[0]); i++)
-    {
-        if( m_unreleased_keys[i] != 0) 
-        {
-            for(int j=0; j<8; j++) 
-            {
-                if( m_unreleased_keys[i] & (1 << j) ) 
-                {
-                    if(key::codeMap[i*8+j][1] == code)  return true;
-                }
-            }
-        }
-    }
+    // Select the relevant byte of the bit array:
+    int byte_index = keycode >> 3;
+    // Find bit within the byte:
+    int bit_index = keycode - (byte_index << 3);
     
+    uint8_t mask = ~(1 << bit_index);
+    
+    if ((m_unreleased_keys[byte_index] & mask) != m_unreleased_keys[byte_index] ) return true;
+
     return false;
 }
 
@@ -98,11 +93,10 @@ key_as_object::set_key_up(int code)
 {
     if (code < 0 || code >= key::KEYCOUNT) return;
 
-    // Key.isDown() only cares about flash keycode, not character, so
-    // we lookup keycode to add to m_unreleased_keys.  
-    
+    // This is used for getAscii() of the last key event, so we use gnash's
+    // internal code.    
     m_last_key_event = code;
-    
+        
     // Key.isDown() only cares about flash keycode, not character, so
     // we lookup keycode to add to m_unreleased_keys.
     int byte_index = key::codeMap[code][1] >> 3;
@@ -286,9 +280,9 @@ key_is_down(const fn_call& fn)
         return as_value();
     }
 
-    int code = fn.arg(0).to_number<int>();
+    int keycode = fn.arg(0).to_number<int>();
 
-    return as_value(ko->is_key_down(code));
+    return as_value(ko->is_key_down(keycode));
 }
 
 /// \brief
