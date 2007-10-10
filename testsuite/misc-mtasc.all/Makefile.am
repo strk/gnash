@@ -22,7 +22,7 @@ AUTOMAKE_OPTIONS = dejagnu
 ASTESTS = \
 	hello.as \
 	inheritance.as \
-	function.as \
+	function_test.as \
 	enum.as \
 	exception.as \
 	levels.as \
