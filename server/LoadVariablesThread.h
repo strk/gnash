@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: LoadVariablesThread.h,v 1.2 2007/07/01 10:54:18 bjacques Exp $ */
+/* $Id: LoadVariablesThread.h,v 1.3 2007/10/10 17:49:45 strk Exp $ */
 
 #ifndef GNASH_LOADVARIABLESTHREAD_H
 #define GNASH_LOADVARIABLESTHREAD_H
@@ -43,6 +43,10 @@ namespace gnash {
 
 namespace gnash {
 
+// Exception thrown by LoadVariablesThread constructor if unable to connect
+// to the stream input.
+class NetworkException {};
+
 /// A manager for loadVariable requests
 //
 /// Provides services for starting a "load and parse" thread, checking
@@ -54,26 +58,27 @@ public:
 	typedef std::map<std::string, std::string> ValuesMap;
 
 	/// Construct a LoadVariablesThread opening a stream for the given URL
-	LoadVariablesThread(const URL& url)
-		:
-		_stream(StreamProvider::getDefaultInstance().getStream(url)),
-		_completed(false)
-	{
-	}
+	//
+	/// Throws a NetworkException if unable.
+	///
+	/// @param url
+	///	URL to post to and fetch from
+	///
+	LoadVariablesThread(const URL& url);
 
 	/// \brief
 	/// Construct a LoadVariablesThread opening a stream for the given URL,
 	/// posting the given url-encoded data if using HTTP.
 	//
+	/// Throws a NetworkException if unable.
+	///
+	/// @param url
+	///	URL to post to and fetch from
+	///
 	/// @param postdata
 	///	Url-encoded post data.
 	///
-	LoadVariablesThread(const URL& url, const std::string& postdata)
-		:
-		_stream(StreamProvider::getDefaultInstance().getStream(url, postdata)),
-		_completed(false)
-	{
-	}
+	LoadVariablesThread(const URL& url, const std::string& postdata);
 
 	/// Return the name,value map parsed out of the loaded stream
 	ValuesMap& getValues()

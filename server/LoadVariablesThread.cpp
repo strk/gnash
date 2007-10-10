@@ -23,6 +23,7 @@
 #include "LoadVariablesThread.h"
 #include "tu_file.h"
 #include "log.h"
+#include "GnashException.h"
 
 #include <string>
 
@@ -106,6 +107,28 @@ LoadVariablesThread::completeLoad()
 	//dispatchLoadEvent();
 	delete[] buf;
 	setCompleted();
+}
+
+LoadVariablesThread::LoadVariablesThread(const URL& url, const std::string& postdata)
+	:
+	_stream(StreamProvider::getDefaultInstance().getStream(url, postdata)),
+	_completed(false)
+{
+	if ( ! _stream.get() )
+	{
+		throw NetworkException();
+	}
+}
+
+LoadVariablesThread::LoadVariablesThread(const URL& url)
+	:
+	_stream(StreamProvider::getDefaultInstance().getStream(url)),
+	_completed(false)
+{
+	if ( ! _stream.get() )
+	{
+		throw NetworkException();
+	}
 }
 
 } // namespace gnash 

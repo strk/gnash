@@ -411,10 +411,19 @@ LoadVars::addLoadVariablesThread(const std::string& urlstr, const char* postdata
 	}
 
 	URL url(urlstr, get_base_url());
-	if ( postdata ) {
-		_loadRequests.insert( _loadRequests.end(), new LoadVariablesThread(url, postdata) );
-	} else {
-		_loadRequests.insert( _loadRequests.end(), new LoadVariablesThread(url) );
+
+	std::auto_ptr<LoadVariablesThread> newThread;
+
+	try
+	{
+		if ( postdata ) newThread.reset( new LoadVariablesThread(url, postdata) );
+		else newThread.reset( new LoadVariablesThread(url) );
+
+		_loadRequests.insert( _loadRequests.end(), newThread.release() );
+	}
+	catch (NetworkException&)
+	{
+		log_error(_("Could not load variables from %s"), url.str().c_str());
 	}
 }
 

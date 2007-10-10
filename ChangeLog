@@ -1,5 +1,13 @@
 2007-10-10 Sandro Santilli <strk@keybit.net>
 
+	* server/LoadVariablesThread.{cpp,h}: throw an exception
+	  if stream can't be fetched (NetworkException).
+	* server/asobj/LoadVars.cpp: catch NetworkException while
+	  constructing LoadVariablesThread. Fixes assertion failure
+	  of bug #19901.
+
+2007-10-10 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/xmlsocket.cpp: don't use non-configured as_environment
 	  for user-defined event handlers invocation.
 
