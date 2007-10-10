@@ -1,3 +1,9 @@
+2007-10-00 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/misc-mtasc.all/function.as, Makefile.am: rename function.as to 
+	  function_test.as, fix a name conflict in a case insensitive file system. There
+	  is a Function.as in mtasc/std.
+	  
 2007-10-10 Sandro Santilli <strk@keybit.net>
 
 	* server/swf_function.cpp (call operator): pop call stack frame on
