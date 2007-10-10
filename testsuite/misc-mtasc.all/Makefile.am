@@ -26,6 +26,7 @@ ASTESTS = \
 	enum.as \
 	exception.as \
 	levels.as \
+	super_test1.as \
 	$(NULL)
 
 # These will get compiled to SWFs just as above, but will not be executed as a test
