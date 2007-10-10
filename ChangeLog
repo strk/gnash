@@ -1,11 +1,14 @@
-2007-10-00 Zou Lunkai <zoulunkai@gmail.com>
+2007-10-10 Sandro Santilli <strk@keybit.net>
 
-	* testsuite/misc-mtasc.all/Base1.as,
-	* testsuite/misc-mtasc.all/Derived1.as,
-	* testsuite/misc-mtasc.all/super_test1.as, Makefile.am: test for super,
-	  detected an unexpected 'ActionLimit hit'. 
+	* testsuite/misc-swfmill.all/: Makefile.am, dict_override.xml:
+	  New test for constant pool override (gnash fails, will fix next).
+
+2007-10-10 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-mtasc.all/: Base1.as, Derived1.as, super_test1.as,
+	  Makefile.am: test for super, detected an unexpected 'ActionLimit hit'
 	  
-2007-10-00 Zou Lunkai <zoulunkai@gmail.com>
+2007-10-10 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* testsuite/misc-mtasc.all/function.as, Makefile.am: rename function.as to 
 	  function_test.as, fix a name conflict in a case insensitive file system. There

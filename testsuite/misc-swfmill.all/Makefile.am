@@ -26,6 +26,7 @@ if ENABLE_SWFMILL
 SC_XMLTESTS =			\
 	hello.xml		\
 	jump_after_end.xml	\
+	dict_override.xml	\
 	$(NULL)
 
 ## Path to Dejagnu.swf file
@@ -40,11 +41,16 @@ Dejagnu.swf: $(DEJAGNU_SO_PATH)
 	cp ../misc-ming.all/Dejagnu.swf .
 
 check_SCRIPTS = \
-	jump_after_end-runner \
+	jump_after_end-runner	\
+	dict_override-runner	\
 	$(NULL)
 
 jump_after_end-runner: $(srcdir)/../generic-testrunner.sh jump_after_end.swf Makefile
 	sh $< -r 50 -c "END OF TEST" $(top_builddir) jump_after_end.swf > $@
+	chmod 755 $@
+
+dict_override-runner: $(srcdir)/../generic-testrunner.sh dict_override.swf Makefile
+	sh $< -r 50 -c "END OF TEST" $(top_builddir) dict_override.swf > $@
 	chmod 755 $@
 
 .xml.swf: 

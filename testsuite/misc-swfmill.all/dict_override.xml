@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<swf version="6" compressed="1">
+
+<!--
+
+ This file test that constants can be overridden by later ActionConstantPool
+
+-->
+
+  <Header framerate="12" frames="1">
+    <size>
+      <Rectangle left="0" right="12800" top="0" bottom="9600"/>
+    </size>
+    <tags>
+      <SetBackgroundColor>
+        <color>
+          <Color red="255" green="255" blue="255"/>
+        </color>
+      </SetBackgroundColor>
+      <DoAction>
+        <actions>
+
+	  // Declare dict 0:a 1:b
+          <Dictionary>
+            <strings>
+              <String value="a"/>
+              <String value="b"/>
+            </strings>
+          </Dictionary>
+
+	  // Push 'result' to stack, will be assigned
+	  // concatenation of dict[0],dict[1],dict[0],dict[1]
+          <PushData>
+            <items>
+              <StackString value="result"/>
+            </items>
+          </PushData>
+
+	  // Set 'a' to 'A_value'
+          <PushData>
+            <items>
+              <StackString value="a"/>
+              <StackString value="A"/>
+            </items>
+          </PushData>
+          <SetVariable/>
+
+	  // Set 'b' to 'A_value'
+          <PushData>
+            <items>
+              <StackString value="b"/>
+              <StackString value="B"/>
+            </items>
+          </PushData>
+          <SetVariable/>
+
+	  // Get dict[0], expect A
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+          <GetVariable/> // EXPECT A_value
+
+	  // Get dict[1] and add, expect AB 
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="1"/>
+            </items>
+          </PushData>
+          <GetVariable/>
+	  <AddTyped/> // EXPECT AB
+
+	  // Declare dict 0:b 1:a (OVERRIDE!)
+          <Dictionary>
+            <strings>
+              <String value="b"/>
+              <String value="a"/>
+            </strings>
+          </Dictionary>
+
+	  // Get dict[0] and add
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+          <GetVariable/>
+	  <AddTyped/> // EXPECT ABB
+
+	  // Get dict[1] and add
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="1"/>
+            </items>
+          </PushData>
+          <GetVariable/>
+	  <AddTyped/> // EXPECT ABBA
+
+	  // Assign all to result
+	  <SetVariable/>
+
+	  // Verify (here we should print FAILED/PASSED)
+          <PushData>
+            <items>
+              <StackString value="ABBA"/>
+              <StackString value="result"/>
+            </items>
+          </PushData>
+          <GetVariable/>
+	  <EqualTyped/>
+
+	  // If true, jump to PASSED tracing
+	  <BranchIfTrue byteOffset="49"/>
+
+	  // Else, trace FAILED
+          <PushData>
+            <items>
+              <StackString value="FAILED: overridden dictionary not used"/>
+            </items>
+          </PushData>
+          <Trace/>
+          <BranchAlways byteOffset="40"/> // get to end 
+
+	  // PASSED tracing
+          <PushData>
+            <items>
+              <StackString value="PASSED: overridden dictionary used"/>
+            </items>
+          </PushData>
+          <Trace/>
+
+	  // END OF TEST tag
+          <PushData>
+            <items>
+              <StackString value="END OF TEST"/>
+            </items>
+          </PushData>
+          <Trace/>
+
+          <EndAction/>
+        </actions>
+      </DoAction>
+      <ShowFrame/>
+      <End/>
+    </tags>
+  </Header>
+</swf>
