@@ -1,3 +1,7 @@
+2007-10-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/gui.cpp: only handle GUI shortcuts on key down.
+
 2007-10-10 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/action_buffer.cpp (process_decl_dict): allow

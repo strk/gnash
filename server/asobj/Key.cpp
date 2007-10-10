@@ -98,9 +98,14 @@ key_as_object::set_key_up(int code)
 {
     if (code < 0 || code >= key::KEYCOUNT) return;
 
-    // This is used for getAscii() of the last key event, so we use gnash's
-    // internal code.
-    m_last_key_event = code;
+    // This is used for getAscii() of the last key event up to
+    // SWF7, so we use gnash's internal code. 
+    
+    VM& vm = VM::get();
+    if ( vm.getSWFVersion() < 8 )
+    {
+    	m_last_key_event = code;
+    }
 
     // Key.isDown() only cares about flash keycode, not character, so
     // we lookup keycode to add to m_unreleased_keys.
@@ -205,7 +210,7 @@ key_as_object::remove_listener(boost::intrusive_ptr<as_object> listener)
 #endif // ndef NEW_KEY_LISTENER_LIST_DESIGN
 
 int
-key_as_object::get_last_key_pressed() const
+key_as_object::get_last_key() const
 {
     return m_last_key_event;
 }
@@ -255,7 +260,7 @@ key_get_ascii(const fn_call& fn)
 {
     boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr);
 
-    int code = ko->get_last_key_pressed();
+    int code = ko->get_last_key();
     
 		return as_value(gnash::key::codeMap[code][2]);
 }
@@ -266,7 +271,7 @@ key_get_code(const fn_call& fn)
 {
     boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr);
 		
-		int code = ko->get_last_key_pressed();
+		int code = ko->get_last_key();
 		
     return as_value(key::codeMap[code][1]);
 }

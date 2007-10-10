@@ -362,34 +362,36 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 	movie_root* m = _stage;
 
 	/* Handle GUI shortcuts */
-	if (modifier & gnash::key::MOD_CONTROL) {
-		switch(k) {
-		case gnash::key::r:
-		case gnash::key::R:
-			menu_restart();
-			break;
-		case gnash::key::p:
-		case gnash::key::P:
-			menu_pause();
-			break;
-		case gnash::key::l:
-		case gnash::key::L:
-			menu_refresh_view();
-			break;
-		case gnash::key::q:
-		case gnash::key::Q:
-		case gnash::key::w:
-		case gnash::key::W:
-			menu_quit();
-			break;
-		case gnash::key::RIGHT_BRACKET:
-			menu_step_forward();
-			break;
-		case gnash::key::LEFT_BRACKET:
-			menu_step_backward();
-			break;
-		default:
-			break;
+	if (pressed) {
+		if (modifier & gnash::key::MOD_CONTROL) {
+			switch(k) {
+			case gnash::key::r:
+			case gnash::key::R:
+				menu_restart();
+				break;
+			case gnash::key::p:
+			case gnash::key::P:
+				menu_pause();
+				break;
+			case gnash::key::l:
+			case gnash::key::L:
+				menu_refresh_view();
+				break;
+			case gnash::key::q:
+			case gnash::key::Q:
+			case gnash::key::w:
+			case gnash::key::W:
+				menu_quit();
+				break;
+			case gnash::key::RIGHT_BRACKET:
+				menu_step_forward();
+				break;
+			case gnash::key::LEFT_BRACKET:
+				menu_step_backward();
+				break;
+			default:
+				break;
+			}
 		}
 	}
 
