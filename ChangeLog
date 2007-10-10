@@ -1,5 +1,7 @@
 2007-10-10 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/action_buffer.cpp (process_decl_dict): allow
+	  overriding the constant pool. Fixes dict_override.swf
 	* testsuite/misc-swfmill.all/: Makefile.am, dict_override.xml:
 	  New test for constant pool override (gnash fails, will fix next).
 

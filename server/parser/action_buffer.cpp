@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: action_buffer.cpp,v 1.25 2007/10/04 22:55:53 strk Exp $ */
+/* $Id: action_buffer.cpp,v 1.26 2007/10/10 07:15:09 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -145,7 +145,7 @@ action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
     assert(stop_pc <= m_buffer.size());
     
     if (static_cast<size_t>(m_decl_dict_processed_at) == start_pc) {
-	// We've already processed this decl_dict.
+	// We've already processed this decl_dict. 
 #ifndef NDEBUG
 	int count = read_int16(start_pc+3);
 	assert((int) m_dictionary.size() == count);
@@ -154,10 +154,10 @@ action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
     }
     
     if (m_decl_dict_processed_at != -1)	{
-	log_msg(_("process_decl_dict(" SIZET_FMT ", " SIZET_FMT "): decl_dict was already processed at %d. "
-		"Skipping (or maybe we should append, or replace?)."),
+	log_debug(_("process_decl_dict(" SIZET_FMT ", " SIZET_FMT "): decl_dict was already processed at %d. "
+		"Overriding."),
 		  start_pc, stop_pc, m_decl_dict_processed_at);
-	return;
+	//return;
     }
     
     m_decl_dict_processed_at = start_pc;
