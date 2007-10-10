@@ -98,15 +98,11 @@ key_as_object::set_key_up(int code)
 {
     if (code < 0 || code >= key::KEYCOUNT) return;
 
-    // This is used for getAscii() of the last key event up to
-    // SWF7, so we use gnash's internal code. 
+    // Key.isDown() only cares about flash keycode, not character, so
+    // we lookup keycode to add to m_unreleased_keys.  
     
-    VM& vm = VM::get();
-    if ( vm.getSWFVersion() < 8 )
-    {
-    	m_last_key_event = code;
-    }
-
+    m_last_key_event = code;
+    
     // Key.isDown() only cares about flash keycode, not character, so
     // we lookup keycode to add to m_unreleased_keys.
     int byte_index = key::codeMap[code][1] >> 3;
