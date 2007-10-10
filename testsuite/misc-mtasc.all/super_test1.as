@@ -28,12 +28,14 @@ import Derived1;
 class Derived11 extends Derived1
 {
   var derived11CtorCalled;
+  var thisPtr;
   
   // constructor
   function Derived11()
   {
     super();
     this.derived11CtorCalled = true;
+    thisPtr = this;
   }
 
   static function main()
@@ -41,10 +43,15 @@ class Derived11 extends Derived1
      // Gnash got an unexpected 'ActionLimit hit' here.
      var derivedObj = new Derived11();
      
-     // check that all constructors in the inheritance chain are called.
-     check_equals(derivedObj.derived11CtorCalled, true);
-     check_equals(derivedObj.derived1CtorCalled, true);
+     // check that all constructors in the inheritance chain are called.    
      check_equals(derivedObj.baseCtorCalled, true);
+     check_equals(derivedObj.derived1CtorCalled, true);
+     check_equals(derivedObj.derived11CtorCalled, true);
+     
+     // check this pointers. 
+     check_equals(derivedObj.thisPtr, derivedObj);
+     check_equals(derivedObj.derivedThisPtr, derivedObj);
+     check_equals(derivedObj.baseThisPtr, derivedObj);
      Dejagnu.done();
   }
 }
