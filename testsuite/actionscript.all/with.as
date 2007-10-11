@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.22 2007/10/11 21:55:08 strk Exp $";
+rcsid="$Id: with.as,v 1.23 2007/10/11 22:07:33 strk Exp $";
 
 #include "check.as"
 
@@ -328,22 +328,49 @@ setTarget("");
 function testWith()
 {
 	var a = 1;
+	var b = 6;
 	with (o)
 	{
+		// with stack takes precedence over locals
 		check_equals(a, 4);
+
+		// locals take precedence over scope stack
+		check_equals(b, 6);
 	}
+
+	_root.newFunc = function()
+	{
+		var b = 7;
+
+#if OUTPUT_VERSION >= 6
+		// scope stack includes activation object
+		// which is locals of testWith
+		check_equals(a, 1); 
+#else
+		// scope stack doesn't include activation object
+		// of testWith
+		check_equals(a, 120); 
+#endif
+
+		// locals take precedence over scope stack
+		check_equals(b, 7);
+
+	};
 }
 
 o = new Object();
 o.a = 4;
+a = 120;
+b = 5;
 testWith();
+newFunc();
 
 //---------------------------------------------------------
 // END OF TESTS
 //---------------------------------------------------------
 
 #if OUTPUT_VERSION < 6
- check_totals(27);
+ check_totals(30);
 #else
- check_totals(56); // a-ah!
+ check_totals(59); 
 #endif
