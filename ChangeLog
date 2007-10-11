@@ -1,6 +1,6 @@
 2007-10-11 Sandro Santilli <strk@keybit.net>
 
-	* testsuite/actionscript.all/with.as: test that locals take
+	* testsuite/actionscript.all/with.as: test that locals do NOT take
 	  precedence over 'with' stack.
 
 2007-10-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
