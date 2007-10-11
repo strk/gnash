@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.23 2007/10/11 22:07:33 strk Exp $";
+rcsid="$Id: with.as,v 1.24 2007/10/11 22:47:45 strk Exp $";
 
 #include "check.as"
 
@@ -329,14 +329,35 @@ function testWith()
 {
 	var a = 1;
 	var b = 6;
+	var c = "empty";
+	var f = "empty";
+
 	with (o)
 	{
+		//// GETTING VARIABLES
+
 		// with stack takes precedence over locals
+		// (this is o.a)
 		check_equals(a, 4);
 
 		// locals take precedence over scope stack
+		// (o.b does not exist)
 		check_equals(b, 6);
+
+		//// SETTING VARIABLES
+
+		// with stack takes precedence over locals:
+		// locals are only set if with stack don't contain the variable being set
+		c = "with o"; // c exists in  locals:YES  with:NO 
+		d = "with o"; // d exists in  locals:NO   with:NO 
+		e = "with o"; // e exists in  locals:NO   with:YES
+		f = "with o"; // f exists in  locals:YES  with:YES
 	}
+
+	check_equals(c, "with o");
+	check_equals(d, "with o");
+	check_equals(typeof(e), "undefined");
+	xcheck_equals(f, "empty"); // gnash fails by giving precedence to locals when setting the variable in 'with' context
 
 	_root.newFunc = function()
 	{
@@ -360,9 +381,15 @@ function testWith()
 
 o = new Object();
 o.a = 4;
+o.e = "o.e";
+o.f = "o.f";
 a = 120;
 b = 5;
 testWith();
+check_equals(typeof(o.c), 'undefined');
+check_equals(typeof(o.d), 'undefined');
+check_equals(o.e, 'with o');
+xcheck_equals(o.f, 'with o'); // gnash fails by giving precedence to locals when setting the variable in 'with' context
 newFunc();
 
 //---------------------------------------------------------
@@ -370,7 +397,7 @@ newFunc();
 //---------------------------------------------------------
 
 #if OUTPUT_VERSION < 6
- check_totals(30);
+ check_totals(38);
 #else
- check_totals(59); 
+ check_totals(67);
 #endif
