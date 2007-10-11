@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.24 2007/10/11 22:47:45 strk Exp $";
+rcsid="$Id: with.as,v 1.25 2007/10/11 23:00:27 strk Exp $";
 
 #include "check.as"
 
@@ -344,6 +344,24 @@ function testWith()
 		// (o.b does not exist)
 		check_equals(b, 6);
 
+		// Members named 'x.y' won't be seeked for in with stack elements 
+		asm {
+			push  'checkpoint'   
+			push  'g.h'   
+			getvariable  
+			setvariable
+		};
+		check_equals(typeof(checkpoint), "undefined");
+
+		// Path like 'x.y' will be looked for in with stack elements 
+		asm {
+			push  'checkpoint'   
+			push  'i.j'   
+			getvariable  
+			setvariable
+		};
+		check_equals(checkpoint, "o.i.j");
+
 		//// SETTING VARIABLES
 
 		// with stack takes precedence over locals:
@@ -383,6 +401,9 @@ o = new Object();
 o.a = 4;
 o.e = "o.e";
 o.f = "o.f";
+o['g.h'] = "o.g.h";
+o.i = new Object;
+o.i.j = "o.i.j";
 a = 120;
 b = 5;
 testWith();
@@ -390,6 +411,14 @@ check_equals(typeof(o.c), 'undefined');
 check_equals(typeof(o.d), 'undefined');
 check_equals(o.e, 'with o');
 xcheck_equals(o.f, 'with o'); // gnash fails by giving precedence to locals when setting the variable in 'with' context
+asm {
+	push  'checkpoint'   
+	push  'o.g.h'   
+	getvariable  
+	setvariable
+};
+check_equals(typeof(checkpoint), "undefined");
+
 newFunc();
 
 //---------------------------------------------------------
@@ -397,7 +426,7 @@ newFunc();
 //---------------------------------------------------------
 
 #if OUTPUT_VERSION < 6
- check_totals(38);
+ check_totals(41);
 #else
- check_totals(67);
+ check_totals(70);
 #endif
