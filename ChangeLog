@@ -1,6 +1,7 @@
 2007-10-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/asobj/Key.cpp: clean up.
+	* testsuite/misc-ming.all/Keycodes_test.c: add test for Key.isDown().
 
 2007-10-10 Sandro Santilli <strk@keybit.net>
 
