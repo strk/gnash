@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.21 2007/10/01 07:22:12 strk Exp $";
+rcsid="$Id: with.as,v 1.22 2007/10/11 21:55:08 strk Exp $";
 
 #include "check.as"
 
@@ -321,8 +321,29 @@ setTarget("");
 //
 #endif  //OUTPUT_VERSION > 5
 
+//---------------------------------------------------------
+// Test with() inside user-defined function context
+//---------------------------------------------------------
+
+function testWith()
+{
+	var a = 1;
+	with (o)
+	{
+		check_equals(a, 4);
+	}
+}
+
+o = new Object();
+o.a = 4;
+testWith();
+
+//---------------------------------------------------------
+// END OF TESTS
+//---------------------------------------------------------
+
 #if OUTPUT_VERSION < 6
- check_totals(26);
+ check_totals(27);
 #else
- check_totals(55); // a-ah!
+ check_totals(56); // a-ah!
 #endif
