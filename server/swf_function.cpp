@@ -168,8 +168,10 @@ swf_function::operator()(const fn_call& fn)
 
 	as_environment*	our_env = m_env;
 	assert(our_env);
-	if (our_env == NULL)
+	if(our_env->get_original_target()->isDestroyed())
 	{
+		// if the original target is destroyed, we use the caller's environment.
+		// TODO: fix leaks here.
 		our_env = &fn.env();
 	}
 	//our_env = &fn.env(); // I think this should be it...
