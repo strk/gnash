@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.26 2007/10/11 23:10:46 strk Exp $";
+rcsid="$Id: with.as,v 1.27 2007/10/12 01:59:53 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -316,6 +316,28 @@ setTarget("/clip1/clip2");
   check_equals(checkpoint, '/clip1/clip2'); 
 setTarget("");
 
+setTarget("/clip1"); 
+  setTarget("/clip1/clip2");  
+    asm{
+      push 'checkpoint'         
+      push ''
+      push 11         
+      getproperty  //_target         
+      setvariable             
+    };
+    check_equals(checkpoint, '/clip1/clip2'); 
+  setTarget("");
+  asm{
+    push 'checkpoint'         
+    push ''
+    push 11         
+    getproperty  //_target         
+    setvariable             
+  };
+  // _target don't need to be stacked.
+  check_equals(checkpoint, '/'); 
+setTarget("");
+
 // 
 // TODO: add tests for setTargetExpression 
 //
@@ -428,5 +450,5 @@ newFunc();
 #if OUTPUT_VERSION < 6
  check_totals(41);
 #else
- check_totals(70);
+ check_totals(72);
 #endif

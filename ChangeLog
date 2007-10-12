@@ -3,6 +3,8 @@
 	* testsuite/misc-swfc.all/opcode_guard_test2.sc: test that both setTarget
 	  and setTargetExpression use the target string instead of pointer for
 	  searching the target.
+	* testsuite/actionscript.all/with.as: test that target don't need to be
+	  stacked in nesting setTarget context.
 	  
 2007-10-11 Sandro Santilli <strk@keybit.net>
 
