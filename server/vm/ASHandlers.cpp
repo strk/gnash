@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.141 2007/10/06 08:17:48 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.142 2007/10/12 01:21:49 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1016,13 +1016,16 @@ SWFHandlers::ActionSetTargetExpression(ActionExec& thread)
 
 	as_environment& env = thread.env;
 
-	thread.ensureStack(1);  // target name
+	thread.ensureStack(1);  // target sprite
 
+	// we don't ues the target sprite directly, instead we fetch the _target(string type)
+	// of that sprite first and then search the final target(might be a different one).
+	// see tests in opcode_guard_test2.sc
 	const string& target_name = env.top(0).to_string(&env);
 
 	CommonSetTarget(env, target_name);
 
-	env.drop(1); // pop the target name off the stack
+	env.drop(1); // pop the target sprite off the stack
 }
 
 void
