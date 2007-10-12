@@ -114,12 +114,33 @@
   .del mc3
 
 
+//
+// separate tests for setTargetExpression
+//
+.frame 8
+  .action:
+     mc100Ref = _root.createEmptyMovieClip("mcA", 100);
+     mc100Ref.testvar = 100;
+     mc101Ref = _root.createEmptyMovieClip("mcA", 101);
+     mc101Ref.testvar = 101;
+     _root.check_equals(mc100Ref.testvar, 100);
+     _root.check_equals(mc101Ref.testvar, 101);
+     
+     setTarget(mc100Ref);
+      _root.check_equals(testvar, 100);
+     setTarget('');
+     
+     setTarget(mc101Ref);
+      _root.check_equals(testvar, 100);
+     setTarget('');
+  .end
+
 .frame 10
  
   .action:
     stop();
     // Gnash failed on totals() by discarding some checks.
-    xtotals(8);
+    xtotals(12);
   .end
   
 .end  // file end

@@ -1,3 +1,9 @@
+2007-10-12 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-swfc.all/opcode_guard_test2.sc: test that both setTarget
+	  and setTargetExpression use the target string instead of pointer for
+	  searching the target.
+	  
 2007-10-11 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/with.as: test that locals do NOT take
