@@ -111,7 +111,7 @@ AC_DEFUN([AC_PATH_MING], [
     if test x"${ac_cv_path_ming_incl}" != x; then
       for i in $libslist; do
       	if test -f $i/libming.a -o -f $i/libming.${shlibext}; then
-      	  if test x"$i" != x"/usr/lib"; then
+      	  if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
       	    ac_cv_path_ming_lib="-L$i -lming"
       	    break
           else

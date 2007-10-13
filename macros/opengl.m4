@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: opengl.m4,v 1.35 2007/07/17 23:07:30 nihilus Exp $
+dnl $Id: opengl.m4,v 1.36 2007/10/13 23:24:08 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_OPENGL],
 [
@@ -95,7 +95,7 @@ AC_DEFUN([GNASH_PATH_OPENGL],
         newlist="/System/Library/Frameworks/OpenGL.framework/Libraries ${libslist}"
         for i in $newlist; do
           if test -f $i/libGL.${shlibext} -o -f $i/libGL.a; then
-            if test x"$i" != x"/usr/lib"; then
+            if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
               ac_cv_path_opengl_lib="-L$i -lGL"
               break
 	          else

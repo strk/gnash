@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 dnl Copyright (C) 2006 Steven G. Johnson <stevenj@alum.mit.edu>.
-dnl $Id: pthreads.m4,v 1.31 2007/08/23 09:26:50 strk Exp $
+dnl $Id: pthreads.m4,v 1.32 2007/10/13 23:24:08 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_PTHREADS],
 [
@@ -180,7 +180,7 @@ if test x"${PTHREAD_LIBS}" = "x"; then
   for i in $libslist; do
    if test -f $i/libpthread.a -o -f $i/libpthread.${shlibext} -o -f $i/libpthread.dylib; then
       pthreads=yes
-     if test x"$i" != x"/usr/lib"; then
+     if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
        PTHREAD_LIBS="-L$i -lpthread"
        break
       else

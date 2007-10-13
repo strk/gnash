@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: libXML.m4,v 1.31 2007/07/01 10:54:12 bjacques Exp $
+dnl $Id: libXML.m4,v 1.32 2007/10/13 23:24:08 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_LIBXML], [
   has_xml=no
@@ -79,7 +79,7 @@ AC_DEFUN([GNASH_PATH_LIBXML], [
   if test x"${ac_cv_path_libxml_lib}" = x ; then
     for i in $libslist; do
       if test -f $i/libxml2.a -o -f $i/libxml2.${shlibext}; then
-        if test x"$i" != x"/usr/lib"; then
+        if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
           ac_cv_path_libxml_lib="-L$i -lxml2"
           break
         else

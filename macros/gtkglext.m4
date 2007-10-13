@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl: $Id: gtkglext.m4,v 1.36 2007/09/11 00:17:44 rsavoye Exp $
+dnl: $Id: gtkglext.m4,v 1.37 2007/10/13 23:24:07 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_GLEXT],
 [
@@ -117,7 +117,7 @@ if test x"${ac_cv_path_glext_lib}" = x; then
 	for i in $libslist; do
 		if test -f $i/libgtkglext-x11-${gnash_glext_version}.a -o -f $i/libgtkglext-x11-${gnash_glext_version}.${shlibext}; then
 		ac_cv_path_glext_incl_config="-I$i/gtkglext-${gnash_glext_version}/include"
-			if test x"$i" != x"/usr/lib"; then
+			if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
 				ac_cv_path_glext_lib="-L$i -lgtkglext-x11-${gnash_glext_version} -lgdkglext-x11-${gnash_glext_version}"
 				break
 			fi

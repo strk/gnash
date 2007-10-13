@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: glib.m4,v 1.27 2007/07/01 10:54:12 bjacques Exp $
+dnl $Id: glib.m4,v 1.28 2007/10/13 23:24:07 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_GLIB],
 [
@@ -89,7 +89,7 @@ AC_DEFUN([GNASH_PATH_GLIB],
   if test x"${ac_cv_path_glib_lib}" = x; then
     for i in $libslist; do
       if test -f $i/libglib-${gnash_glib_version}.a -o -f $i/libglib-${gnash_glib_version}.${shlibext}; then
-        if test x"$i" != x"/usr/lib"; then
+        if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
           ac_cv_path_glib_lib="-L$i -lglib-${gnash_glib_version}"
           break
         else

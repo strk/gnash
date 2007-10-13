@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: ffmpeg.m4,v 1.51 2007/09/11 00:17:44 rsavoye Exp $
+dnl $Id: ffmpeg.m4,v 1.52 2007/10/13 23:24:07 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -234,7 +234,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
       if test -f $i/libavcodec.a -o -f $i/libavcodec.${shlibext}; then
         topdir=$i
         AC_MSG_RESULT(${topdir}/libavcodec)
-	      if test x"$i" != x"/usr/lib"; then
+	      if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
 	        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -L$i -lavcodec"
        	  break
         else

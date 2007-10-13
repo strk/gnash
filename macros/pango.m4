@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: pango.m4,v 1.26 2007/09/11 00:17:44 rsavoye Exp $
+dnl $Id: pango.m4,v 1.27 2007/10/13 23:24:08 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_PANGO],
 [
@@ -97,7 +97,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
   if test x"${ac_cv_path_pango_lib}" = x; then
     for i in $libslist; do
       if test -f $i/libpango-${gnash_pango_version}.a -o -f $i/libpango-${gnash_pango_version}.${shlibext}; then
-        if test x"$i" != x"/usr/lib"; then
+        if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
 	  ac_cv_path_pango_lib="-L$i -lpango-${gnash_pango_version}"
 	  break
         else

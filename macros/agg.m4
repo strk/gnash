@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: agg.m4,v 1.29 2007/07/01 10:54:11 bjacques Exp $
+dnl $Id: agg.m4,v 1.30 2007/10/13 23:24:07 rsavoye Exp $
 
 dnl agg_rasterizer_compound_aa.h is a new file included in AGG 2.4,
 dnl but not in AGG 2.3. As we need AGG 2.4, we use this as 
@@ -96,7 +96,7 @@ AC_DEFUN([GNASH_PATH_AGG],
   if test x"${ac_cv_path_agg_lib}" = x; then
     for i in $libslist; do
       if test -f $i/libagg.a -o -f $i/libagg.${shlibext}; then
-      	if test x"$i" != x"/usr/lib"; then
+      	if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
       	  ac_cv_path_agg_lib="-L$i"
       	  break
         else

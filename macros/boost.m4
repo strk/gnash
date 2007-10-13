@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.64 2007/10/06 00:49:52 rsavoye Exp $
+dnl $Id: boost.m4,v 1.65 2007/10/13 23:24:07 rsavoye Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -153,9 +153,9 @@ AC_DEFUN([GNASH_PATH_BOOST],
   AC_SUBST(BOOST_CFLAGS)
   AC_SUBST(BOOST_LIBS)
 
-  # This isn't right: you don't need boot date-time installed unless u build
-  # cygnal, and it is sometimes a separate package from Boost core and thread.
-  # TODO: why is this needed, lack of boost being a fatal error?
+  dnl This isn't right: you don't need boot date-time installed unless u build
+  dnl cygnal, and it is sometimes a separate package from Boost core and thread.
+  dnl TODO: why is this needed, lack of boost being a fatal error?
   AM_CONDITIONAL(HAVE_BOOST, [test -n "${BOOST_LIBS}"])
 ])
 

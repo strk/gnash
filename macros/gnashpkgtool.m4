@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: gnashpkgtool.m4,v 1.43 2007/09/11 00:17:44 rsavoye Exp $
+dnl $Id: gnashpkgtool.m4,v 1.44 2007/10/13 23:24:07 rsavoye Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS().
@@ -193,7 +193,7 @@ if test x"${$1}" = x"yes"; then
 		for i in $libslist; do
 			if test -f $i/lib$1.a -o -f $i/lib$1.${shlibext}; then
 				if test -f "$i/lib$1.a" -o -f "$i/lib$1.${shlibext}"; then
-					if test x"$i" != x"/usr/lib"; then
+					if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
 						ac_cv_path_$1_lib="-L$i -l$1 $5"
 						break
 					else
@@ -203,7 +203,7 @@ if test x"${$1}" = x"yes"; then
 				fi
 			else
 				if test -f "$i/lib$name.a" -o -f "$i/lib$name.${shlibext}"; then
-					if test x"$i" != x"/usr/lib"; then
+					if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
 						ac_cv_path_$1_lib="-L$i -l$name $5"
 						break
 					else

@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: kde.m4,v 1.40 2007/09/11 04:17:17 rsavoye Exp $
+dnl $Id: kde.m4,v 1.41 2007/10/13 23:24:08 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_KDE],
 [
@@ -100,7 +100,7 @@ dnl   # KDE_LIBS =  -lkdeui -lkdecore -lkdeprint -L/usr/lib/qt-3.3/lib -lqt-mt
       if test -f $i/libkdeui.a -o -f $i/libkdeui.${shlibext} ; then
         topdir=$i
         AC_MSG_RESULT(${topdir}/libkdeui)
-	      if test x"$i" != x"/usr/lib"; then
+	      if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
 	        ac_cv_path_kde_lib="-L$i -lkdeui"
        	  break
         else

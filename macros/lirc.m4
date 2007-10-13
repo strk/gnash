@@ -39,14 +39,7 @@ AC_DEFUN([GNASH_PATH_LIRC],
     fi
   ])
 
-  AC_ARG_ENABLE(lirc, AC_HELP_STRING([--enable-lirc], [Enable support for Lirc]),
-  [case "${enableval}" in
-    yes) lirc=yes ;;
-    no)  lirc=no ;;
-    *)   AC_MSG_ERROR([bad value ${enableval} for enable-lirc option]) ;;
-  esac], lirc=no)
-
-  if test x"${lirc}" = x"yes"; then
+  if test x"${ext_lirc}" = x"yes"; then
     dnl If the path hasn't been specified, go look for it.
     if test x"${ac_cv_path_lirc_incl}" = x; then
       for i in $incllist; do
@@ -76,7 +69,7 @@ AC_DEFUN([GNASH_PATH_LIRC],
       AC_MSG_CHECKING([for lirc_client library])
       for i in $libslist; do
         if test -f $i/liblirc_client.a -o -f $i/liblirc_client.${shlibext}; then
-          if test x"$i" != x"/usr/lib"; then
+          if test x"$i" != x"/usr/lib" -o x"$i" != x"/usr/lib64"; then
             ac_cv_path_lirc_lib="-L$i -llirc_client"
             AC_MSG_RESULT(${ac_cv_path_lirc_lib})
             break
@@ -98,8 +91,9 @@ AC_DEFUN([GNASH_PATH_LIRC],
     fi
 
     if test x"${ac_cv_path_lirc_lib}" != x ; then
-      if test x"${ac_cv_path_lirc_lib}" != x"/usr/lib"; then
+      if test ! x"${ac_cv_path_lirc_lib}" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
         LIRC_LIBS="${ac_cv_path_lirc_lib}"
+        AC_DEFINE(HAVE_LIRC, [1], [Has Lirc])
       fi
     else
       LIRC_LIBS=""

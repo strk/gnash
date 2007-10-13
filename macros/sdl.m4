@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: sdl.m4,v 1.41 2007/07/01 10:54:14 bjacques Exp $
+dnl $Id: sdl.m4,v 1.42 2007/10/13 23:24:08 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_SDL], [
   has_sdl=no
@@ -118,7 +118,7 @@ dnl  AC_MSG_CHECKING([for sdl library])
   if test x"${ac_cv_path_sdl_lib}" = x ; then
     for i in $libslist; do
       if test -f $i/libSDL.a -o -f $i/libSDL.${shlibext}; then
-        if test x"$i" != x"/usr/lib"; then
+        if test ! x"$i" = x"/usr/lib" -o x"$i" = x"/usr/lib64"; then
           ac_cv_path_sdl_lib="-L$i -lSDL"
           dnl AC_MSG_RESULT(${ac_cv_path_sdl_lib})
           break
@@ -130,7 +130,7 @@ dnl  AC_MSG_CHECKING([for sdl library])
         fi
       else
         if test -f $i/libSDL-1.1.a -o -f $i/libSDL-1.1.${shlibext}; then
-          if test x"$i" != x"/usr/lib"; then
+          if test ! x"$i" = x"/usr/lib" -o x"$i" = x"/usr/lib64"; then
             ac_cv_path_sdl_lib="-L$i -lSDL-1.1"
             dnl AC_MSG_RESULT(${ac_cv_path_sdl_lib})
             break

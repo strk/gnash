@@ -83,7 +83,7 @@ dnl   fi
   dnl Look for the library
   if test x$cross_compiling = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_freetype_lib}" = x; then
-      $PKG_CONFIG --exists freetype2 && ac_cv_path_freetype_lib=`$PKG_CONFIG --libs freetype2`
+      $PKG_CONFIG --exists freetype2 && ac_cv_path_freetype_lib=`$PKG_CONFIG --libs-only-l freetype2`
     fi
   fi
 
@@ -95,7 +95,7 @@ dnl   fi
     AC_MSG_CHECKING([for ${libname} library])
     for i in $libslist; do
       if test -f $i/lib${libname}.a -o -f $i/lib${libname}.${shlibext}; then
-        if test x"$i" != x"/usr/lib"; then
+        if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
           ac_cv_path_freetype_lib="-L$i -l${libname}"
           AC_MSG_RESULT(${ac_cv_path_freetype_lib})
           break

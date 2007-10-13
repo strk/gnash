@@ -1,3 +1,11 @@
+2007-10-13  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* macros/agg.m4, curl.m4, ffmpeg.m4, freetype.m4, glib.m4,
+	gnashpkgtool.m4, gtk2.m4, gtkglext.m4, jpeg.m4, kde.m4, libXML.m4,
+	lirc.m4, ming.m4, mysql.m4, opengl.m4, pango.m4, pthreads.m4,
+	sdl.m4, x11.m4: Also test for /usr/lib64, so it doesn't sneak into
+	our LDFLAGS. This will cause make distcheck to fail on a 64 bit machine.
+	
 2007-10-13 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* gui/fbsup.h: Make PS/2 mouse the default (instead of ETurboTouch)
@@ -104,9 +112,9 @@
 
 2007-10-09 Zou Lunkai <zoulunkai@gmail.com>
 	
-	* testsuite/misc-ming.all/PlaceObject2Test.swf, Makefile.am: enable an old
-	  testcase, it wasn't used actually. Test DLIST tags with dynamic depth manipulation.
-	  All passed with cvs-head.
+	* testsuite/misc-ming.all/PlaceObject2Test.swf, Makefile.am:
+	enable an old testcase, it wasn't used actually. Test DLIST tags
+	with dynamic depth manipulation. All passed with cvs-head.
 	  
 2007-10-09 Sandro Santilli <strk@keybit.net>
 
