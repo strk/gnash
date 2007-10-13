@@ -45,11 +45,11 @@
 
 // Define this to read from /dev/input/mice (any PS/2 compatbile mouse or
 // emulated by the Kernel) 
-//#define USE_MOUSE_PS2
+#define USE_MOUSE_PS2
 
 // Define this to support eTurboTouch / eGalax touchscreens. When reading from
 // a serial device, it must be initialized (stty) externally. 
-#define USE_MOUSE_ETT
+//#define USE_MOUSE_ETT
 
 #ifdef USE_MOUSE_PS2
 #define MOUSE_DEVICE "/dev/input/mice"
