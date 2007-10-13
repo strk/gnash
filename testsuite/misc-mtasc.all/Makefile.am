@@ -29,6 +29,7 @@ ASTESTS = \
 	super_test1.as \
 	$(NULL)
 
+
 # These will get compiled to SWFs just as above, but will not be executed as a test
 # They are for secondary movies to be loaded by the above tests.
 AUXMOVIES = \
@@ -36,8 +37,7 @@ AUXMOVIES = \
 	    level99.as \
 	    $(NULL)
 
-
-EXTRA_DIST = $(ASTESTS) $(AUXMOVIES) TestClass.as check.as Dejagnu.as
+EXTRA_DIST = $(ASTESTS) $(AUXMOVIES) TestClass.as ../check.h Dejagnu.as check.as
 
 if ENABLE_MTASC
 
