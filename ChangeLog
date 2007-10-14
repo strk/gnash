@@ -1,7 +1,8 @@
 2007-10-14 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/Makefile.am: don't build and run PlaceObject2Test
-	  if MING_SUPPORTS_REPLACE_TAG is not defined.
+	  if MING_SUPPORTS_REPLACE_TAG is not defined, don't try to run
+	  get_frame_number_testrunner when not building it.
 	* testsuite/misc-ming.all/PlaceObject2Test.c: remove /* in comment warning.
 
 2007-10-13  Rob Savoye  <rob@ripple.welcomehome.org>

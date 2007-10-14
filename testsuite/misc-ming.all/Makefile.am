@@ -1756,7 +1756,6 @@ TEST_CASES = \
 	displaylist_depths_test10runner \
 	displaylist_depths_test11runner \
 	matrix_testrunner \
-	get_frame_number_testrunner \
 	frame_label_testrunner \
 	path_format_testrunner \
 	callFunction_testrunner \
