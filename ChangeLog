@@ -1,3 +1,9 @@
+2007-10-14 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/Makefile.am: don't build and run PlaceObject2Test
+	  if MING_SUPPORTS_REPLACE_TAG is not defined.
+	* testsuite/misc-ming.all/PlaceObject2Test.c: remove /* in comment warning.
+
 2007-10-13  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* macros/agg.m4, curl.m4, ffmpeg.m4, freetype.m4, glib.m4,

@@ -67,7 +67,6 @@ check_PROGRAMS = \
 	DefineEditTextVariableNameTest2 \
 	Dejagnu \
 	Dejagnu.swf \
-	PlaceObject2Test \
 	RemoveObject2Test \
 	RollOverOutTest \
 	RollOverOutTest-Runner \
@@ -198,7 +197,6 @@ check_SCRIPTS = \
 	timeline_var_test-Runner \
 	place_object_testrunner \
 	place_object_test2runner \
-	PlaceObject2TestRunner \
 	move_object_testrunner \
 	place_and_remove_object_testrunner \
 	place_and_remove_object_insane_testrunner \
@@ -276,8 +274,10 @@ endif
 
 if MING_SUPPORTS_REPLACE_TAG
 check_SCRIPTS += \
+	PlaceObject2TestRunner \
 	$(NULL)
 check_PROGRAMS += \
+	PlaceObject2Test \
 	replace_shapes1test_runner \
 	replace_sprites1test_runner \
 	replace_buttons1test_runner \
@@ -1716,7 +1716,6 @@ TEST_CASES = \
 	loop_test-Runner \
 	place_object_testrunner \
 	place_object_test2runner \
-	PlaceObject2TestRunner \
 	move_object_testrunner \
 	place_and_remove_object_testrunner \
 	place_and_remove_object_insane_testrunner \
@@ -1811,6 +1810,7 @@ endif
 
 if MING_SUPPORTS_REPLACE_TAG
 TEST_CASES += \
+	PlaceObject2TestRunner \
 	replace_shapes1test_runner \
 	replace_sprites1test_runner \
 	replace_buttons1test_runner \
