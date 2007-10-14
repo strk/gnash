@@ -133,6 +133,18 @@ secondsSinceLastAdvance()
 	return ( now - lastAdvanceTimer);
 }
 
+// A flag which will be used to interrupt playback
+// by effect of a "quit" fscommand
+//
+static int quitrequested = false;
+
+void execFsCommand(sprite_instance* movie, const char* command, const char* args)
+{
+    log_msg(_("fs_callback(%p): %s %s"), (void*)movie, command, args);
+
+    if ( ! strcasecmp(command, "quit") ) quitrequested=true;
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -262,6 +274,8 @@ main(int argc, char *argv[])
 	exit(1);
     }
 
+    register_fscommand_callback(execFsCommand);
+
     // Play through all the movies.
     for (int i = 0, n = infiles.size(); i < n; i++) {
 
@@ -358,6 +372,13 @@ play_movie(const char* filename)
 	
 	size_t	last_frame = m.get_current_frame();
 	m.advance(0.010f);
+
+    if ( quitrequested ) 
+    {
+        quitrequested = false;
+        return md;
+    }
+
 	m.display();
 	++nadvances;
 	if ( limit_advances && nadvances >= limit_advances)

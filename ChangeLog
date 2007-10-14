@@ -1,5 +1,11 @@
 2007-10-14 Sandro Santilli <strk@keybit.net>
 
+	* utilities/processor.cpp: support fscommand:quit command.
+	* testsuite/swfdec/PASSING: 39 successes found (used to fail just
+	  because we didn't support the fscommand:quit command.
+
+2007-10-14 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/check.h: force literal string to std::string conversion in
 	  check_equals and xcheck_equals (fixes compiler warnings from gcc >=
 	  4.1.x)
