@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.27 2007/10/12 01:59:53 zoulunkai Exp $";
+rcsid="$Id: with.as,v 1.28 2007/10/14 21:38:11 strk Exp $";
 
 #include "check.as"
 
@@ -397,7 +397,7 @@ function testWith()
 	check_equals(c, "with o");
 	check_equals(d, "with o");
 	check_equals(typeof(e), "undefined");
-	xcheck_equals(f, "empty"); // gnash fails by giving precedence to locals when setting the variable in 'with' context
+	check_equals(f, "empty"); 
 
 	_root.newFunc = function()
 	{
@@ -432,7 +432,8 @@ testWith();
 check_equals(typeof(o.c), 'undefined');
 check_equals(typeof(o.d), 'undefined');
 check_equals(o.e, 'with o');
-xcheck_equals(o.f, 'with o'); // gnash fails by giving precedence to locals when setting the variable in 'with' context
+check_equals(o.f, 'with o'); 
+
 asm {
 	push  'checkpoint'   
 	push  'o.g.h'   

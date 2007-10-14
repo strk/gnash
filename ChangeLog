@@ -1,5 +1,14 @@
 2007-10-14 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.cpp (get_variable_raw, set_variable_raw): don't
+	  explicitly look in locals for SWF6 and higher, as locals should already
+	  be in the scope chain; look in scope chain *before* locals in the
+	  SWF5- case (only 'with stack' in that case).
+	* testsuite/actionscript.all/with.as: fixed a couple of tests about locals
+	  and 'with' stack seek order.
+
+2007-10-14 Sandro Santilli <strk@keybit.net>
+
 	* server/as_environment.cpp (get_variable_raw): reduce calls to
 	  string_table::find.
 	* testsuite/misc-ming.all/Makefile.am: don't build and run PlaceObject2Test

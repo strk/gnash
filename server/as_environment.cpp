@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.95 2007/10/14 20:36:43 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.96 2007/10/14 21:38:11 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -112,7 +112,7 @@ as_environment::get_variable_raw(
     string_table& st = vm.getStringTable();
     string_table::key key = st.find(varname);
 
-    // Check the with-stack.
+    // Check the scope stack.
     for (size_t i = scopeStack.size(); i > 0; --i)
     {
         // const_cast needed due to non-const as_object::get_member 
@@ -126,14 +126,16 @@ as_environment::get_variable_raw(
     }
 
     // Check locals for getting them
-    //as_environment::frame_slot slot;
-    if ( findLocal(varname, val, retTarget) ) 
+    if ( swfVersion < 6 ) // for SWF6 and up locals should be in the scope stack
     {
-        return val;
+        if ( findLocal(varname, val, retTarget) ) 
+        {
+            return val;
+        }
     }
 
 
-    // Check current target members.
+    // Check current target members. TODO: shouldn't target be in scope stack ?
     if (m_target->get_member(key, &val)) {
         if ( retTarget ) *retTarget = m_target;
         return val;
@@ -280,28 +282,54 @@ as_environment::set_variable_raw(
     const ScopeStack& scopeStack)
 {
 
-	string_table::key varkey = VM::get().getStringTable().find(varname);
+    VM& vm = VM::get();
+    int swfVersion = vm.getSWFVersion();
+    string_table& st = vm.getStringTable();
+    string_table::key varkey = st.find(varname);
 
-	// Check locals for setting them
-	// TODO: check if local variable takes precedence over 'with' scope when setting
-	if ( setLocal(varname, val) )
-	{
-		return;
-	}
+    if ( swfVersion < 6 ) 
+    {
+        // in SWF5 and lower, scope stack should just contain 'with' elements 
 
-	// Check the with-stack.
-	for (size_t i = scopeStack.size(); i > 0; --i)
-	{
-		// const_cast needed due to non-const as_object::get_member 
-		as_object* obj = const_cast<as_object*>(scopeStack[i-1].get());
-		as_value	dummy;
-		if (obj && obj->get_member(varkey, &dummy)) {
-		    // This object has the member; so set it here.
-		    obj->set_member(varkey, val);
-		    return;
-		}
-	}
+        // Check the with-stack.
+        for (size_t i = scopeStack.size(); i > 0; --i)
+        {
+            // const_cast needed due to non-const as_object::get_member 
+            as_object* obj = const_cast<as_object*>(scopeStack[i-1].get());
+            as_value	dummy;
+            if (obj && obj->get_member(varkey, &dummy))
+            {
+                // This object has the member; so set it here.
+                obj->set_member(varkey, val);
+                return;
+            }
+        }
+
+        // Check locals for setting them
+        if ( setLocal(varname, val) ) return;
+
+    }
+    else // SWF >= 6
+    {
+
+        // Check the scope-stack (would include locals)
+        //
+        for (size_t i = scopeStack.size(); i > 0; --i)
+        {
+            // const_cast needed due to non-const as_object::get_member 
+            as_object* obj = const_cast<as_object*>(scopeStack[i-1].get());
+            as_value	dummy;
+            if (obj && obj->get_member(varkey, &dummy))
+            {
+                // This object has the member; so set it here.
+                obj->set_member(varkey, val);
+                return;
+            }
+        }
+
+    }
     
+    // TODO: shouldn't m_target be in the scope chain ?
 	assert(m_target);
 	m_target->set_member(varkey, val);
 }
