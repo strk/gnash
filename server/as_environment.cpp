@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.94 2007/10/09 15:36:57 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.95 2007/10/14 20:36:43 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -107,11 +107,18 @@ as_environment::get_variable_raw(
 
     as_value    val;
 
+    VM& vm = VM::get();
+    int swfVersion = vm.getSWFVersion();
+    string_table& st = vm.getStringTable();
+    string_table::key key = st.find(varname);
+
     // Check the with-stack.
-    for (size_t i = scopeStack.size(); i > 0; --i) {
+    for (size_t i = scopeStack.size(); i > 0; --i)
+    {
         // const_cast needed due to non-const as_object::get_member 
         as_object* obj = const_cast<as_object*>(scopeStack[i-1].get());
-        if (obj && obj->get_member(VM::get().getStringTable().find(varname), &val)) {
+        if (obj && obj->get_member(key, &val))
+        {
             // Found the var in with context.
             if ( retTarget ) *retTarget = obj;
             return val;
@@ -127,7 +134,7 @@ as_environment::get_variable_raw(
 
 
     // Check current target members.
-    if (m_target->get_member(VM::get().getStringTable().find(varname), &val)) {
+    if (m_target->get_member(key, &val)) {
         if ( retTarget ) *retTarget = m_target;
         return val;
     }
@@ -139,33 +146,16 @@ as_environment::get_variable_raw(
         return val;
     }
 
-#if 0 // NO special support for _root and _levelX, all should be done by target !
-      // see movieclip_destruction_test3, where _root becomes undefined if target is unloaded
-    // Check built-in constants.
-    if (varname == "_root") 
-    { 
-        if ( retTarget ) *retTarget = NULL; // correct ??
-        return as_value(m_target->get_root_movie());
-    }
-    else if (varname.compare(0, 6, "_level") == 0 && varname.find_first_not_of("0123456789", 7) == string::npos )
-    {
-       if ( retTarget ) *retTarget = NULL; // correct ??
-       unsigned int levelno = atoi(varname.c_str()+6);
-       return VM::get().getRoot().getLevel(levelno).get();
-    }
-#endif
-
-    VM& vm = VM::get();
     as_object* global = vm.getGlobal();
 
-    if ( vm.getSWFVersion() > 5 && varname == "_global" )
+    if ( swfVersion > 5 && varname == "_global" )
     {
         // The "_global" ref was added in SWF6
         if ( retTarget ) *retTarget = NULL; // correct ??
         return as_value(global);
     }
 
-    if (global->get_member(vm.getStringTable().find(varname), &val))
+    if (global->get_member(key, &val))
     {
         if ( retTarget ) *retTarget = global;
         return val;

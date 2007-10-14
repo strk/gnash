@@ -1,5 +1,7 @@
 2007-10-14 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.cpp (get_variable_raw): reduce calls to
+	  string_table::find.
 	* testsuite/misc-ming.all/Makefile.am: don't build and run PlaceObject2Test
 	  if MING_SUPPORTS_REPLACE_TAG is not defined, don't try to run
 	  get_frame_number_testrunner when not building it.
