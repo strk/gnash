@@ -36,7 +36,7 @@ TestState _runtest;
 #define check_equals_label(label, expr, expected) \
 	{ \
 		std::stringstream ss; \
-		if ( label != "" ) ss << label << ": "; \
+		if ( ! label.empty() ) ss << label << ": "; \
 		if ( expr == expected ) \
 		{ \
 			ss << #expr << " == " << expected; \
@@ -71,9 +71,9 @@ TestState _runtest;
 		} \
 	}
 
-#define check_equals(expr, expected) check_equals_label("", expr, expected)
+#define check_equals(expr, expected) check_equals_label(std::string(), expr, expected)
 
-#define xcheck_equals(expr, expected) xcheck_equals_label("", expr, expected)
+#define xcheck_equals(expr, expected) xcheck_equals_label(std::string(), expr, expected)
 
 #define check(expr) \
 	{ \
