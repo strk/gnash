@@ -1,12 +1,20 @@
+2007-10-15 Sandro Santilli <strk@keybit.net>
+
+	* server/as_environment.{cpp,h}: have find_object_{dot,slash}syntax
+	  support a scope stack.
+	* testsuite/actionscript.all/with.as: fix last failing test. Should be
+	  easy to add more failing (hint: get variable in one-before-last member
+	  of with stack scope).
+
 2007-10-15 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp, backend/render_handler_agg.h, gui/fb.cpp,
 	  gui/fltk_glue_agg.cpp, gui/gtk_glue_agg.cpp, gui/kde_glue_agg.cpp,
 	  gui/riscos_glue_agg.cpp, gui/sdl_agg_glue.cpp: Don't let the renderer
 	  choose the rowstride (bytes per line) as this depends on the GUI
-    and use the rowstride reported by the MIT-SHM extension instead of
-    calculating it.
-  * backend/render_handler_agg.cpp: Code cleanup
+	  and use the rowstride reported by the MIT-SHM extension instead of
+	  calculating it.
+	* backend/render_handler_agg.cpp: Code cleanup
 
 2007-10-14 Sandro Santilli <strk@keybit.net>
 

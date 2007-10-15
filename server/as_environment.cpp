@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.97 2007/10/15 09:40:07 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.98 2007/10/15 21:42:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -66,7 +66,7 @@ as_environment::get_variable(const std::string& varname,
         // TODO: let find_target return generic as_objects, or use 'with' stack,
         //       see player2.swf or bug #18758 (strip.swf)
         // @@ TODO: should we use scopeStack here too ?
-        as_object* target = is_slash_based ? find_object_slashsyntax(path) : find_object_dotsyntax(path); 
+        as_object* target = is_slash_based ? find_object_slashsyntax(path, &scopeStack) : find_object_dotsyntax(path, &scopeStack);
 
         if (target)
         {
@@ -94,7 +94,7 @@ as_environment::get_variable(const std::string& varname,
                     path.c_str(), tmp.to_debug_string().c_str());
                 )
             }
-            return as_value();
+			return as_value();
         }
     }
     else
@@ -262,7 +262,7 @@ as_environment::set_variable(
     if (parse_path(varname, path, var, &is_slash_based)) {
     	//log_msg(_("Variable '%s' parsed into path='%s', var='%s'"), varname.c_str(), path.c_str(), var.c_str());
 	//target = find_target(path);
-        target = is_slash_based ? find_object_slashsyntax(path) : find_object_dotsyntax(path); 
+        target = is_slash_based ? find_object_slashsyntax(path, &scopeStack) : find_object_dotsyntax(path, &scopeStack); 
 	if (target)
 	{
 	    target->set_member(VM::get().getStringTable().find(var), val);
@@ -638,7 +638,7 @@ as_environment::find_target(const std::string& path) const
 }
 
 as_object*
-as_environment::find_object_dotsyntax(const std::string& path) const
+as_environment::find_object_dotsyntax(const std::string& path, const ScopeStack* scopeStack) const
 {
 #ifdef DEBUG_TARGET_FINDING 
 	log_msg(_("find_object_dotsyntax(%s) called"), path.c_str());
@@ -658,6 +658,7 @@ as_environment::find_object_dotsyntax(const std::string& path) const
     //assert(path.length() > 0);
     
     as_object* env = m_target;
+    if ( scopeStack && ! scopeStack->empty() ) env = scopeStack->back().get();
     assert(env);
     
     const char*	p = path.c_str();
@@ -760,7 +761,7 @@ as_environment::find_object_dotsyntax(const std::string& path) const
 }
 
 as_object*
-as_environment::find_object_slashsyntax(const std::string& path) const
+as_environment::find_object_slashsyntax(const std::string& path, const ScopeStack* scopeStack) const
 {
 #ifdef DEBUG_TARGET_FINDING 
 	log_msg(_("find_object_slashsyntax(%s) called"), path.c_str());
@@ -775,6 +776,7 @@ as_environment::find_object_slashsyntax(const std::string& path) const
     }
     
     as_object* env = m_target;
+    if ( scopeStack && ! scopeStack->empty() ) env = scopeStack->back().get();
     assert(env);
     
     const char*	p = path.c_str();

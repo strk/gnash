@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.28 2007/10/14 21:38:11 strk Exp $";
+rcsid="$Id: with.as,v 1.29 2007/10/15 21:42:20 strk Exp $";
 
 #include "check.as"
 
@@ -382,7 +382,7 @@ function testWith()
 			getvariable  
 			setvariable
 		};
-		xcheck_equals(checkpoint, "o.i.j");
+		check_equals(checkpoint, "o.i.j");
 
 		//// SETTING VARIABLES
 
