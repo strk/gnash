@@ -6,6 +6,7 @@
 	  choose the rowstride (bytes per line) as this depends on the GUI
     and use the rowstride reported by the MIT-SHM extension instead of
     calculating it.
+  * backend/render_handler_agg.cpp: Code cleanup
 
 2007-10-14 Sandro Santilli <strk@keybit.net>
 

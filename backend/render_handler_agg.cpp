@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.110 2007/10/15 12:31:33 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.111 2007/10/15 12:59:00 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -364,8 +364,6 @@ private:
 
 
 public:
-  //int              m_view_width;      // TODO: remove these??
-  //int              m_view_height;
 
   // Enable/disable antialiasing.
   bool  m_enable_antialias;
@@ -620,11 +618,7 @@ public:
   // Destructor
   ~render_handler_agg()
   {
-    // don't need to check m_pixf != NULL
-    // as that check is already implemented
-    // in the 'delete' statement
-    // if (m_pixf != NULL)
-      delete m_pixf;    // TODO: is this correct??
+      delete m_pixf;   
   }
 
   /// Initializes the rendering buffer. The memory pointed by "mem" is not
