@@ -1,5 +1,9 @@
 2007-10-14 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.cpp: minor cleanups.
+
+2007-10-14 Sandro Santilli <strk@keybit.net>
+
 	* backend/render_handler_agg.{cpp,h} (agg_detect_pixel_format):
 	  return by const char*, fixing a warning raised by gcc 4.2.1
 	* gui/gtk_glue_agg.cpp: update use of agg_detect_pixel_format.
