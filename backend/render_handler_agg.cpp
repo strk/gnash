@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.108 2007/09/10 16:53:29 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.109 2007/10/15 09:06:59 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -2258,7 +2258,7 @@ DSOEXPORT render_handler_agg_base*  create_render_handler_agg(const char *pixelf
 }
 
 
-DSOEXPORT char *agg_detect_pixel_format(unsigned int rofs, unsigned int rsize,
+DSOEXPORT const char *agg_detect_pixel_format(unsigned int rofs, unsigned int rsize,
   unsigned int gofs, unsigned int gsize,
   unsigned int bofs, unsigned int bsize,
   unsigned int bpp) {

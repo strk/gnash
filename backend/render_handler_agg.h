@@ -72,7 +72,7 @@ DSOEXPORT render_handler_agg_base*
 /// NULL is returned. Note that a successfully detected pixel format does
 /// not necessarily mean that the pixel format is available (compiled in).
 /// The bit offsets are assumed to be in host byte order!
-DSOEXPORT char* agg_detect_pixel_format(unsigned int rofs, unsigned int rsize,
+DSOEXPORT const char* agg_detect_pixel_format(unsigned int rofs, unsigned int rsize,
   unsigned int gofs, unsigned int gsize,
   unsigned int bofs, unsigned int bsize,
   unsigned int bpp);

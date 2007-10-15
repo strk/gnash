@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: gtk_glue_agg.cpp,v 1.28 2007/08/26 10:23:48 strk Exp $ */
+/* $Id: gtk_glue_agg.cpp,v 1.29 2007/10/15 09:07:00 strk Exp $ */
 
 
 /// \page gtk_shm_support GTK shared memory extension support
@@ -307,7 +307,7 @@ GtkAggGlue::create_shm_handler()
     _shm_image->bits_per_pixel);
   
   
-  char *pixelformat = agg_detect_pixel_format(
+  const char *pixelformat = agg_detect_pixel_format(
     red_shift, red_prec,
     green_shift, green_prec,
     blue_shift, blue_prec,
