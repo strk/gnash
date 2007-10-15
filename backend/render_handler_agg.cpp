@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.109 2007/10/15 09:06:59 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.110 2007/10/15 12:31:33 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -631,8 +631,9 @@ public:
   /// owned by the renderer and init_buffer() may be called multiple times
   /// when the buffer size changes, for example. However, bits_per_pixel must
   /// remain the same. 
+  /// rowstride is the size, in bytes, of one row.
   /// This method *must* be called prior to any other method of the class!
-  void init_buffer(unsigned char *mem, int size, int x, int y)
+  void init_buffer(unsigned char *mem, int size, int x, int y, int rowstride)
   {
         assert(x > 0);
         assert(y > 0);
@@ -642,14 +643,9 @@ public:
     xres    = x;
     yres    = y;
     
-        // don't need to check m_pixf != NULL
-        // as that check is already implemented
-        // in the 'delete' statement
-    //if (m_pixf != NULL)
-      delete m_pixf;    // TODO: is this correct??
-
-    int row_size = xres*((bpp+7)/8);
-    m_rbuf.attach(memaddr, xres, yres, row_size);
+    delete m_pixf;   
+    
+    m_rbuf.attach(memaddr, xres, yres, rowstride);
 
     // allocate pixel format accessor   
     m_pixf = new PixelFormat(m_rbuf);
@@ -659,7 +655,7 @@ public:
     set_invalidated_region_world();
     
     log_msg("initialized AGG buffer <%p>, %d bytes, %dx%d, rowsize is %d bytes", 
-      mem, size, x, y, row_size);
+      mem, size, x, y, rowstride);
   }
   
 
@@ -1216,7 +1212,7 @@ public:
     
     size_t pcount = paths.size();
 
-    dest.resize(pcount);    
+    dest.resize(pcount);
     
     for (size_t pno=0; pno<pcount; pno++) {
       

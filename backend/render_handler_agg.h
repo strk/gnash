@@ -40,7 +40,7 @@ public:
   virtual ~render_handler_agg_base() {}
   
   // these methods need to be accessed from outside:
-  virtual void init_buffer(unsigned char *mem, int size, int x, int y)=0;
+  virtual void init_buffer(unsigned char *mem, int size, int x, int y, int rowstride)=0;
 
   virtual unsigned int getBytesPerPixel() const=0;
 
@@ -51,7 +51,7 @@ public:
     
     _testBuffer	= static_cast<unsigned char *>( realloc(_testBuffer, size) );
     
-    init_buffer(_testBuffer, size, width, height);
+    init_buffer(_testBuffer, size, width, height, width * getBytesPerPixel());
     
     return true;
   }

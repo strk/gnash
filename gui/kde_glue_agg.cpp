@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: kde_glue_agg.cpp,v 1.6 2007/09/19 06:38:04 strk Exp $ */
+/* $Id: kde_glue_agg.cpp,v 1.7 2007/10/15 12:31:33 udog Exp $ */
 
 #include "kde_glue_agg.h"
 #include "render_handler.h"
@@ -61,7 +61,7 @@ KdeAggGlue::initBuffer(int width, int height)
     if (!_renderer) return;
 
     int _bpp = 32;
-    int depth_bytes = _bpp / 8;
+    int depth_bytes = _bpp / 8;  // TODO: <Udo> is this correct? Gives 1 for 15 bit modes!
 
     assert(_bpp % 8 == 0);
 
@@ -76,7 +76,8 @@ KdeAggGlue::initBuffer(int width, int height)
     // address) during run-time.
     render_handler_agg_base * renderer =
       static_cast<render_handler_agg_base *>(_renderer);
-    renderer->init_buffer(_offscreenbuf.get(), bufsize, width, height);
+    renderer->init_buffer(_offscreenbuf.get(), bufsize, width, height,
+      width*((_bpp+7)/8));
 
     _width = width;
     _height = height;

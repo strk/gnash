@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: gtk_glue_agg.cpp,v 1.29 2007/10/15 09:07:00 strk Exp $ */
+/* $Id: gtk_glue_agg.cpp,v 1.30 2007/10/15 12:31:33 udog Exp $ */
 
 
 /// \page gtk_shm_support GTK shared memory extension support
@@ -395,7 +395,8 @@ GtkAggGlue::setRenderHandlerSize(int width, int height)
   	  (unsigned char*) _shm_info->shmaddr,
   		_shm_image->bytes_per_line * _shm_image->height,
   		_width,
-  		_height
+  		_height,
+  		_shm_image->bytes_per_line
   	);
 	
   } else {
@@ -403,7 +404,7 @@ GtkAggGlue::setRenderHandlerSize(int width, int height)
   
     // ==> use standard pixmaps (slower, but should work in any case)
 
-  	int new_bufsize = width*height*(_bpp/8);
+  	int new_bufsize = width*height*((_bpp+7)/8);
   	
   	// TODO: At the moment we only increase the buffer and never decrease it. Should be
   	// changed sometime.
@@ -432,7 +433,8 @@ GtkAggGlue::setRenderHandlerSize(int width, int height)
   	  _offscreenbuf,
   		_offscreenbuf_size,
   		_width,
-  		_height
+  		_height,
+  		_width*((_bpp+7)/8)
   	);
   	
   	

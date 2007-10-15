@@ -84,7 +84,7 @@ SdlAggGlue::createRenderHandler(int bpp)
 bool
 SdlAggGlue::prepDrawingArea(int width, int height, uint32_t sdl_flags)
 {
-    int depth_bytes = _bpp / 8;
+    int depth_bytes = _bpp / 8;  // TODO: <Udo> is this correct? Gives 1 for 15 bit modes!
 
     assert(_bpp % 8 == 0);
 
@@ -136,7 +136,8 @@ SdlAggGlue::prepDrawingArea(int width, int height, uint32_t sdl_flags)
     // address) during run-time.
     render_handler_agg_base * renderer =
       static_cast<render_handler_agg_base *>(_agg_renderer);
-    renderer->init_buffer(_offscreenbuf, bufsize, width, height);
+    renderer->init_buffer(_offscreenbuf, bufsize, width, height,
+      width*((_bpp+7)/8));
 
 
     _sdl_surface = SDL_CreateRGBSurfaceFrom((void *) _offscreenbuf, width, height,

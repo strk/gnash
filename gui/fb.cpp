@@ -295,7 +295,7 @@ bool FBGui::initialize_renderer() {
 
   set_render_handler(agg_handler);
   
-  agg_handler->init_buffer(_mem, _size, _width, _height);
+  agg_handler->init_buffer(_mem, _size, _width, _height, _width*((_bpp+7)/8));
   
   disable_terminal();
 
