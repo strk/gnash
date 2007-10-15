@@ -1,5 +1,6 @@
 2007-10-14 Sandro Santilli <strk@keybit.net>
 
+	* gui/fb.cpp: update use of agg_detect_pixel_format
 	* server/as_environment.cpp: minor cleanups.
 
 2007-10-14 Sandro Santilli <strk@keybit.net>

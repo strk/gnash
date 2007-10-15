@@ -276,7 +276,7 @@ bool FBGui::initialize_renderer() {
   you know what to do when colors look wrong (or pixel format can't be detected)
   on big-endian machines! - Udo */   
   
-  char* pixelformat = agg_detect_pixel_format(
+  const char* pixelformat = agg_detect_pixel_format(
     var_screeninfo.red.offset, var_screeninfo.red.length,
     var_screeninfo.green.offset, var_screeninfo.green.length,
     var_screeninfo.blue.offset, var_screeninfo.blue.length,
