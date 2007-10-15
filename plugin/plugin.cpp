@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.84 2007/08/18 16:48:43 strk Exp $ */
+/* $Id: plugin.cpp,v 1.85 2007/10/15 22:27:12 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -490,6 +490,14 @@ nsPluginInstance::startProc(Window win)
       procname = gnash_env;
     }
 
+    const char* pageurl = getCurrentPageURL();
+    if ( ! pageurl )
+    {
+	cout << "Could not get current page URL!" << endl;
+	//log_msg("UNIMPLEMENTED: current page url: %s", pageurl);
+	// invoke gnash with -U <current_page_url>
+    }
+
     struct stat procstats;
 
     // See if the file actually exists, otherwise we can't spawn it
@@ -557,14 +565,6 @@ nsPluginInstance::startProc(Window win)
     cout << "Closed " << closed << "files." <<endl;
 
     // setup the command line
-
-    const char* pageurl = getCurrentPageURL();
-    if ( ! pageurl )
-    {
-	cout << "Could not get current page URL!" << endl;
-	//log_msg("UNIMPLEMENTED: current page url: %s", pageurl);
-	// invoke gnash with -U <current_page_url>
-    }
 
     const size_t buf_size = 30;
     char xid[buf_size], width[buf_size], height[buf_size];

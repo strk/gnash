@@ -1,3 +1,8 @@
+2007-10-15 Martin Stransky 
+
+	* plugin/plugin.cpp: don't call NSAPI code after the fork.
+	  Patch from https://bugzilla.redhat.com/show_bug.cgi?id=281061.
+
 2007-10-15 Sandro Santilli <strk@keybit.net>
 
 	* server/as_environment.{cpp,h}: have find_object_{dot,slash}syntax
