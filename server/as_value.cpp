@@ -875,7 +875,15 @@ as_value::to_debug_string() const
 			const SpriteProxy& sp = getSpriteProxy();
 			if ( sp.isDangling() )
 			{
-				snprintf(buf, 511, "[dangling movieclip:%s]", sp.getTarget().c_str());
+				sprite_instance* rebound = sp.get();
+				if ( rebound )
+				{
+					snprintf(buf, 511, "[rebound movieclip(%s):%p]", sp.getTarget().c_str(), rebound);
+				}
+				else
+				{
+					snprintf(buf, 511, "[dangling movieclip:%s]", sp.getTarget().c_str());
+				}
 			}
 			else
 			{
