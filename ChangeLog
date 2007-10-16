@@ -3,7 +3,7 @@
 	* server/as_value.cpp (to_debug_string): tell apart dangling from
 	  rebound soft refs.
 
-2007-10-15 Martin Stransky 
+2007-10-15 Martin Stransky  <stransky at redhat dot com>
 
 	* plugin/plugin.cpp: don't call NSAPI code after the fork.
 	  Patch from https://bugzilla.redhat.com/show_bug.cgi?id=281061.
