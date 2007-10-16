@@ -30,7 +30,7 @@
 
 #include "ming_utils.h"
 
-#define OUTPUT_VERSION 6
+#define OUTPUT_VERSION 7
 #define OUTPUT_FILENAME "registerClassTest2.swf"
 
 void addExport(SWFMovie mo, SWFMovieClip mc, const char * name);
@@ -124,12 +124,14 @@ main(int argc, char** argv)
 
 
  
-  // Define movieclip mc2
+  // Define movieclip mc3
   mc3 = newSWFMovieClip();
   sh3 = make_fill_square (0, 300, 100, 100, 255, 255, 0, 255, 255, 0);
   SWFMovieClip_add(mc3, (SWFBlock)sh3);
+  SWFMovieClip_nextFrame(mc3);
   
-  addExport(mo, mc2, "libItem3");  
+  // Exprot mc3
+  addExport(mo, mc3, "libItem3");  
   
   it3 = SWFMovie_add(mo, mc3);
   SWFDisplayItem_addAction(it3,
@@ -155,9 +157,9 @@ main(int argc, char** argv)
                              " _root.attachMovie('libItem3', 'clip3', 30); "
                              // clip3.__proto__ is initialized before executing onClipConstruct
                              "_root.check_equals(clip3.__proto__, _root.theClass3.prototype); ");
-  SWFMovieClip_nextFrame(mc3);
+ 
   
-  add_actions(mo, "totals(); stop();");
+  add_actions(mo, "totals(21); stop();");
   SWFMovie_nextFrame(mo); /* end of frame4 */
      
  /*****************************************************
