@@ -1,5 +1,7 @@
 2007-10-16 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/edit_text_character_def.cpp (get_font): reduce
+	  debugging output for a common case.
 	* server/character.h: indentation cleanups and get_visible/set_visible
 	  made non-virtual.
 

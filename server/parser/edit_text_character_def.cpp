@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character_def.cpp,v 1.13 2007/08/27 12:44:28 strk Exp $ */
+/* $Id: edit_text_character_def.cpp,v 1.14 2007/10/16 22:00:27 strk Exp $ */
 
 // Based on the public domain text.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -119,7 +119,7 @@ edit_text_character_def::get_font()
 		if (m_font == NULL)
 		{
 			// this is fine, the textfield would use a default device font
-			log_debug(_("text style with undefined font; font_id = %d; using a default font"), m_font_id);
+			//log_debug(_("text style with undefined font; font_id = %d; using a default font"), m_font_id);
 			m_font = fontlib::get_default_font().get();
 		}
 	}
