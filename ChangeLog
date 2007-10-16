@@ -1,3 +1,8 @@
+2007-10-16 Sandro Santilli <strk@keybit.net>
+
+	* server/character.h: indentation cleanups and get_visible/set_visible
+	  made non-virtual.
+
 2007-10-15 Sandro Santilli <strk@keybit.net>
 
 	* server/as_value.cpp (to_debug_string): tell apart dangling from

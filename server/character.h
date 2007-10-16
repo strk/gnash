@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.99 2007/10/09 01:34:41 zoulunkai Exp $ */
+/* $Id: character.h,v 1.100 2007/10/16 09:24:49 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -230,13 +230,11 @@ protected:
 	/// so it starts in invalidated mode.
 	///
 	bool m_invalidated;
-	
-	
-	/// Just like m_invalidated but set when a child is invalidated instead
-  /// of this character instance. m_invalidated and m_child_invalidated
-  /// can be set at the same time. 
-	bool m_child_invalidated;
 
+	/// Just like m_invalidated but set when a child is invalidated instead
+	/// of this character instance. m_invalidated and m_child_invalidated
+	/// can be set at the same time. 
+	bool m_child_invalidated;
 
 	/// \brief
 	/// Bounds of this character instance before first invalidation
@@ -254,7 +252,7 @@ protected:
 	/// get_invalidated_bounds().
 	///
 	InvalidatedRanges m_old_invalidated_ranges;
-  	
+
 	/// Wheter this character has been transformed by ActionScript code
 	//
 	/// Once we've been moved by ActionScript,
@@ -354,7 +352,8 @@ public:
     ///
     /// Example: a character at depth 60 gets moved to
     ///          depth -32829 (-32769-60) when unloaded and
-    ///          an onUnload event handler is defined for it.
+    ///          an onUnload event handler is defined for it
+    ///	         or any of its childs.
     ///
     /// So, to recap:
     ///		1:  -32769 to -16385 are removed
@@ -363,7 +362,7 @@ public:
     ///	(all of the above correct?)
     ///
     ///
-    static const int removedDepthOffset = -32769; // -32769;
+    static const int removedDepthOffset = -32769; 
 
     /// Return true if the given depth is in the removed zone
     static bool depthInRemovedZone(int depth)
@@ -404,11 +403,11 @@ public:
 	m_old_invalidated_ranges(),
 	_scriptTransformed(false),
 	_dynamicallyCreated(false)
-	{
+    {
 	    assert((parent == NULL && m_id == -1)
 		   || (parent != NULL && m_id >= 0));
 	    assert(m_old_invalidated_ranges.isNull());
-	}
+    }
 
 	/// Return a reference to the variable scope of this character.
 	//
@@ -435,9 +434,13 @@ public:
 
     // for extern movie
     void set_parent(character* parent) { m_parent = parent; }
+
     int	get_depth() const { return m_depth; }
+
     void	set_depth(int d) { m_depth = d; }
+
     const matrix&	get_matrix() const { return m_matrix; }
+
     void	set_matrix(const matrix& m)
 	{
 	    assert(m.is_valid());
@@ -463,6 +466,7 @@ public:
     void set_y_scale(float factor);
 
     const cxform&	get_cxform() const { return m_color_transform; }
+
     void	set_cxform(const cxform& cx) 
     {       
       if (!(cx == m_color_transform)) {
@@ -470,10 +474,15 @@ public:
       	m_color_transform = cx;
       }
     }
+
     void	concatenate_cxform(const cxform& cx) { m_color_transform.concatenate(cx); }
+
     void	concatenate_matrix(const matrix& m) { m_matrix.concatenate(m); }
+
     int		get_ratio() const { return m_ratio; }
-    void	set_ratio(int r) {
+
+    void	set_ratio(int r)
+    {
       if (r!=m_ratio) set_invalidated(__FILE__, __LINE__); 
       m_ratio = r;       
     }
@@ -486,6 +495,8 @@ public:
     /// returns true!
     ///  
     int get_clip_depth() const { return m_clip_depth; }
+
+    /// See get_clip_depth()
     void set_clip_depth(int d) { m_clip_depth = d; }
     
     /// Returns true when the character (and it's childs) are used as a mask
@@ -812,27 +823,27 @@ public:
 		_scriptTransformed = true;
 	}
 
+	// Set whether this character should be rendered
+	void set_visible(bool visible)
+	{
+		if (m_visible!=visible) set_invalidated(__FILE__, __LINE__);  
+		m_visible = visible;      
+	}
 
-    // TODO: why is this virtual ??
-    virtual void	set_visible(bool visible) {
-      if (m_visible!=visible) set_invalidated(__FILE__, __LINE__);  
-      m_visible = visible;      
-    }
+	// Return true if this character should be rendered
+	bool get_visible() const { return m_visible; }
 
-    // TODO: why is this virtual ??
-    virtual bool	get_visible() const { return m_visible; }
-
-    virtual void	set_display_callback(void (*callback)(void*), void* user_ptr)
+	virtual void	set_display_callback(void (*callback)(void*), void* user_ptr)
 	{
 	    m_display_callback = callback;
 	    m_display_callback_user_ptr = user_ptr;
 	}
 
-    virtual void	do_display_callback()
+	virtual void	do_display_callback()
 	{
-//			GNASH_REPORT_FUNCTION;
+//		GNASH_REPORT_FUNCTION;
 			
-	    if (m_display_callback)
+		if (m_display_callback)
 		{
 		    (*m_display_callback)(m_display_callback_user_ptr);
 		}
@@ -924,7 +935,7 @@ public:
 	{
 		return NULL;
 	}
-	
+
 	/// Returns true when the object (type) should get a instance name even 
 	/// if none is provided manually.
 	virtual bool wantsInstanceName()
@@ -1008,7 +1019,7 @@ public:
 	/// force is set.
 	///
 	virtual void add_invalidated_bounds(InvalidatedRanges& ranges, bool force) = 0;
-	
+
 	/// Callback invoked whenever a character is placed on stage
 	//
 	/// This function must be called when the character is placed on
@@ -1032,6 +1043,7 @@ public:
 	///
 	virtual bool unload();
 
+	/// Return true if this character was unloaded from the stage
 	bool isUnloaded() { return _unloaded; }
 
 	/// Mark this character as destroyed
@@ -1053,7 +1065,7 @@ public:
 	/// See destroy() for more info.
 	///
 	bool isDestroyed() const { return _destroyed; }
-	
+
 public: // istn't this 'public' reduntant ?
 
 	/// Return full path to this object, in slash notation
@@ -1105,9 +1117,6 @@ public: // istn't this 'public' reduntant ?
 	/// Ownership of the returned object belong to this character.
 	///
 	TimelineInfo* getTimelineInfo() { return _timelineInfo.get(); }
-	
-	// override from as_object
-	//virtual std::string get_text_value() const;	
 
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
 	boost::intrusive_ptr<as_function> getUserDefinedEventHandler(const std::string& name) const;
