@@ -45,8 +45,8 @@ public:
 // Explicit instantiation
 #include "ACT/Scheduling_Queue.cpp"
 #include "ACT/Scheduler.T.cpp"
-template ACT::wakeup_listener_allocated< ACT::Basic_Scheduler<> > ;
-template ACT::Scheduling_Queue< test_item, ACT::wakeup_listener_allocated< ACT::Basic_Scheduler<> > > ;
+template class ACT::wakeup_listener_allocated< ACT::Basic_Scheduler<> > ;
+template class ACT::Scheduling_Queue< test_item, ACT::wakeup_listener_allocated< ACT::Basic_Scheduler<> > > ;
 
 typedef ACT::Scheduling_Queue< test_item, ACT::wakeup_listener_allocated< ACT::Basic_Scheduler<> > > queue_type ;
 typedef queue_type::pointer pointer ;
@@ -54,7 +54,7 @@ typedef queue_type::pointer pointer ;
 using namespace ACT ;
 
 //--------------------------------------------------
-BOOST_AUTO_UNIT_TEST( simple_queue_exercise )
+BOOST_AUTO_TEST_CASE( simple_queue_exercise )
 {
 	queue_type q ;
 
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_GENERATOR( ordering_random1_, random_permutation( add_then_test_
 //BOOST_AUTO_TEST_GENERATOR( ordering_random2_, random_permutation( add_then_test_order, 20000, 1 ) )
 
 //--------------------------------------------------
-BOOST_AUTO_UNIT_TEST( another_simple_queue_exercise )
+BOOST_AUTO_TEST_CASE( another_simple_queue_exercise )
 {
 	queue_type q ;
 
@@ -209,7 +209,7 @@ add_then_reorder( const iterator begin, iterator middle, iterator end )
 /*	This test exercises the use pattern that an ACT at the top of the queue is executed then rescheduled
  *	at lower priority, generally while waiting for I/O to complete.
  */
-BOOST_AUTO_UNIT_TEST( parametric_add_permuted_reorder_all )
+BOOST_AUTO_TEST_CASE( parametric_add_permuted_reorder_all )
 {
 	vector_type v ;
 	const size_t upper = 100 ;
@@ -242,7 +242,7 @@ add_then_wakeup( const iterator begin, const iterator middle, const iterator end
 	while ( i != middle ) {
 		pp.push_back( q.push( test_item( * i ++ ), 0 ) ) ;
 	}
-	BOOST_REQUIRE( i - begin == number_of_elements ) ;
+	BOOST_REQUIRE( i == begin + number_of_elements ) ;
 
 	const size_t number_of_wakeups = end - middle ;
 	for ( j = number_of_elements ; j < number_of_wakeups + number_of_elements ; ++ j ) {
@@ -256,7 +256,7 @@ add_then_wakeup( const iterator begin, const iterator middle, const iterator end
 
 /*	This test exercises the use pattern that an ACT somewhere in the queue wakes up and becomes ready for execution.
  */
-BOOST_AUTO_UNIT_TEST( add_permuted_wakeup_all )
+BOOST_AUTO_TEST_CASE( add_permuted_wakeup_all )
 {
 	vector_type v ;
 	const size_t n = 100 ;

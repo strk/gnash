@@ -54,6 +54,9 @@ namespace ACT {
 		Supplied_Generator()
 			: active( true ), complete( false ) {}
 
+		/// Trivial virtual destructor
+		virtual ~Supplied_Generator() {}
+		
 		/// This \c shutdown routine pushes out all pending actions, accepting no new ones.
 		void shutdown() { active = false ; }
 
@@ -96,6 +99,8 @@ namespace ACT {
 	class Supplied_Service
 		: public Service< Supplied_Service_Aspect >
 	{
+		typedef Service< Supplied_Service_Aspect > Service_Base ;
+		
 		/// Aspect type for \c Service base class
 		typedef Supplied_Service_Aspect< Service< Supplied_Service_Aspect > > service_base_aspect_type ;
 
@@ -105,9 +110,12 @@ namespace ACT {
 	public:
 		/// Default constructor
 		Supplied_Service( Scheduler & z, tracking_function * t = 0 )
-			: Service( the_generator, z, service_base_aspect_type( t ) )
+			: Service_Base( the_generator, z, service_base_aspect_type( t ) )
 		{}
 
+		/// Trivial virtual destructor
+		virtual ~Supplied_Service() {}
+		
 		///
 		inline void shutdown() { the_generator.shutdown() ; }
 

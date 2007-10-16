@@ -15,46 +15,28 @@
 #   along with this program; if not, write to the Free Software
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
-# $Id: Makefile.am,v 1.3 2007/10/03 18:11:59 strk Exp $
+# $Id: Makefile.am,v 1.4 2007/10/16 20:20:29 eh9 Exp $
 
 #----------------------------------------
 # Makefile.am for Cygnal/ACT 
 #----------------------------------------
-
-# provide subdirs with a Makefile.am to list here
-SUBDIRS = 
-
 AM_CPPFLAGS = # -Wall
 
 ## WARNING: make sure GLIB_LIBS appears first
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_LDFLAGS = \
-	../../libbase/libgnashbase.la \
-	../../libamf/libgnashamf.la \
-	$(LIBLTDL) \
 	$(GLIB_LIBS) \
-	$(LIBXML_LIBS) \
-	$(CURL_LIBS) \
-	$(BOOST_LIBS) \
-	$(PTHREAD_LIBS)
+	$(BOOST_LIBS)
 
 localedir = $(datadir)/locale
 
 INCLUDES = -I.. \
-        -I$(top_srcdir)	\
         -I$(top_srcdir)/cygnal	\
-        -I$(top_srcdir)/libamf \
-        -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/server \
         -DLOCALEDIR=\"$(localedir)\" \
-        $(LIBXML_CFLAGS) \
-	$(DMALLOC_CFLAGS) \
-	$(CURL_CFLAGS) \
-	$(BOOST_CFLAGS) \
-	$(PTHREAD_CFLAGS)
+	$(BOOST_CFLAGS)
 
-lib_LTLIBRARIES = libcygnalact.la
-libcygnalact_la_SOURCES= \
+lib_LTLIBRARIES = libcygnal_act.la
+libcygnal_act_la_SOURCES= \
 	ACT.cpp \
 	Cygnal_Instances.cpp \
 	Handle.cpp \

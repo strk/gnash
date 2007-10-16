@@ -48,8 +48,11 @@ namespace ACT {
 		ACT_State run() ;
 
 	public:
-		/// Default constructor.
-		N_to_completion_Monitor() {} ;
+		/// Trivial default constructor.
+		N_to_completion_Monitor() {}
+		
+		/// Trivial virtual destructor
+		~N_to_completion_Monitor() {}
 
 		/// Implementation of specific wake-up preparation
 		void add_wakeup_item( N_to_completion *, wakeup_listener * ) ;
@@ -62,14 +65,14 @@ namespace ACT {
 	class N_to_completion
 		: public Basic_Listening_Task< N_to_completion, N_to_completion_Monitor >
 	{
-		/// Tracking
-		std::auto_ptr< tracking_function > tracker ;
+		///
+		unsigned int total_number_of_activations ;
 
 		///
 		unsigned int number_of_activations_left ;
 
-		///
-		unsigned int total_number_of_activations ;
+		/// Tracking
+		std::auto_ptr< tracking_function > tracker ;
 
 		/// Action body, proxied by operator()
 		ACT_State run( wakeup_listener * ) ;
@@ -78,6 +81,9 @@ namespace ACT {
 		///
 		N_to_completion( unsigned int n, tracking_function * = 0 ) ;
 
+		/// Trivial virtual destructor
+		virtual ~N_to_completion() {}
+		
 		void reset() ;
 	} ;
 

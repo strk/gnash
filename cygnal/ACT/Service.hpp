@@ -93,7 +93,7 @@ namespace ACT {
 	 *	It only completes when it needs to shut down, either from an internal failure or by external command.
 	 *
 	 *	WARNING: A service must not both schedule a new action and return \c Completed in the same activation.
-	 *	This restriction simplifies implementation of the scheduler, which then doesn't need to removed
+	 *	This restriction simplifies implementation of the scheduler, which then doesn't need to remove
 	 *		a completed service action from within the middle of the scheduling queue.
 	 *	When a service schedules no new actions, it remains at the top of the priority queue,
 	 *		from where it can be removed like any other task.
@@ -106,15 +106,21 @@ namespace ACT {
 		typedef Aspect< Service > aspect_type ;
 
 	private:
+		///
+		Generator & the_generator ;
+
+		///
+		Scheduler & our_scheduler ;
+
 		/// Aspect instance.
 		aspect_type aspect ;
 
-		Scheduler & our_scheduler ;
-
-		Generator & the_generator ;
 	public:
 		/// 
 		Service( Generator & x, Scheduler & z, aspect_type aspect = aspect_type() ) ;
+
+		/// Trivial virtual destructor
+		virtual ~Service() {}
 
 		///
 		ACT_State run( wakeup_listener * ) ;

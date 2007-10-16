@@ -67,7 +67,7 @@ public:
 
 //--------------------------------------------------
 
-BOOST_AUTO_UNIT_TEST( act_twice_works )
+BOOST_AUTO_TEST_CASE( act_twice_works )
 {
 	 act x( new act_twice() ) ;
 
@@ -80,7 +80,7 @@ BOOST_AUTO_UNIT_TEST( act_twice_works )
 	 BOOST_CHECK_MESSAGE( x.completed(), "state after three calls should still be 'Completed'" ) ;
 }
 
-BOOST_AUTO_UNIT_TEST( no_action_works )
+BOOST_AUTO_TEST_CASE( no_action_works )
 {
 	execution_trace trace ;
 	act x( new no_action( new simple_tracker( trace, "N" ) ) ) ;
@@ -91,7 +91,7 @@ BOOST_AUTO_UNIT_TEST( no_action_works )
 	BOOST_CHECK_MESSAGE( trace.result() == "", "Tracking should not have recorded an activation, since action was already completed" ) ;
 }
 
-BOOST_AUTO_UNIT_TEST( act_n_equals_two_works )
+BOOST_AUTO_TEST_CASE( act_n_equals_two_works )
 {
 	execution_trace trace ;
 	act x( new N_to_completion( 2, new simple_tracker( trace, "C" ) ) ) ;

@@ -54,5 +54,5 @@ namespace ACT {
 
 #include "ACT/Service.cpp"
 namespace ACT {
-	template Service< Supplied_Service_Aspect > ;
+	template class Service< Supplied_Service_Aspect > ;
 }

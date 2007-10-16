@@ -1,7 +1,28 @@
 Change Log for GNU Cygnal, Module ACT
 =====================================
 
-2007-01-10 Eric Hughes <eh@narthex.us>
+2007-10-16 Eric Hughes <eh@narthex.us>
+	* Scheduler.hpp: Rearranged member declarations to eliminate gcc warning.
+	* Makefile.am: Changed name of boost test library to match my setup.  Your mileage will certainly vary.
+	* unit_tests/Test_{ACT,Scheduler,Scheduling_Queue}.cpp: Changed BOOST_AUTO_UNIT_TEST to BOOST_AUTO_TEST_CASE (removal of deprecated syntax).
+
+2007-10-14 Eric Hughes <eh@narthex.us>
+	* {.,test_support,unit_tests}/Makefile.am: Changed file names of libraries to use underscore separators.
+	* unit_tests/Makefile.am: Added library dependencies and build a unit test executable.
+	* Scheduler.T.cpp: Added logic_error for a Critical_Demon switch case because that task type isn't implemented.  This eliminates a gcc warning.
+	* Scheduling_Queue.cpp: Removed an unused variable to remove a gcc warning.
+	* unit_tests/Test_Scheduler.cpp: Removed a 'using namespace' declaration, which may or may not have gotten rid of a possible defect involving template parameter instantiation.
+	* unit_tests/Test_Scheduling_Queue.cpp: Normalized syntax of template class declarations.
+
+2007-10-04 Eric Hughes <eh@narthex.us>
+	* {Listen,Scheduler,Service}.hpp,test_support/{Action_Tracing,Listening_Actions,Simple_Actions,Supplied_Service}.hpp:
+		Added virtual destructors to eliminate gcc warning.  Rearranged class data members to eliminate gcc warning about order of initialization.
+	* test_support/Supplied_Service.hpp: Added template arguments (by means of a typedef) to parent class initializer of Supplied_Service.
+	* test_support/{Listening_Actions,Supplied_Service}.cpp: Added class declarator to explicit template instantiation.
+	* Makefile.am: Cut out definitions not needed for Cygnal.
+	* {test_support,unit_tests}/Makefile.am: new file
+
+2007-10-01 Eric Hughes <eh@narthex.us>
 	* Cygnal_Instances.cpp:  Added class keyword for explicit template instantiation.  Replaced typedef in explicit instantiation with its referent.
 	* Handle.hpp: Replaced typedefs in friend declarations with their referents.
 	* Listen.hpp: Removed extraneous typename declaration.

@@ -73,11 +73,11 @@ namespace ACT {
 	class simple_tracker
 		: public tracking_function
 	{
-		/// Prefix for tracking item
-		const std::string prefix ;
-
 		/// Trace to which to added tracking event
 		execution_trace & trace ;
+
+		/// Prefix for tracking item
+		const std::string prefix ;
 
 	public:
 		///
@@ -85,6 +85,9 @@ namespace ACT {
 			: trace( trace ), prefix( prefix )
 		{}
 
+		/// Trivial virtual destructor
+		virtual ~simple_tracker() {}
+		
 		///
 		void operator()( const std::string x )
 		{

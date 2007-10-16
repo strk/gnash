@@ -59,7 +59,7 @@ namespace ACT {
 			permutation[ permutation_index ].the_auxiliary.reconstruct( auxiliary ) ;
 		}
 		++ n_queue_items ;
-		size_t n = up_heap( n_queue_items - 1 ) ;
+		(void) up_heap( n_queue_items - 1 ) ;
 		return pointer( permutation_index, this ) ;
 	}
 

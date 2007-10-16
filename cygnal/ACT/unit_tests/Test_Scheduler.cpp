@@ -38,7 +38,6 @@ namespace ACT_Test {
 	//--------------------------------------------------
 	// White box test of Handle using aspects.
 	//--------------------------------------------------
-	using namespace ACT ;
 
 	//---------------
 	// This is the template definition of the base aspect class.
@@ -52,15 +51,15 @@ namespace ACT_Test {
 	//---------------
 	/// \brief Test aspect for Handle_Registry_Leader
 	template< class T >
-	class test_aspect< T, Handle_Registry_Leader< T, test_aspect > >
-		: public aspect::Null_Aspect_1< T, Handle_Registry_Leader< T, aspect::Null_Aspect_1 > >
+	class test_aspect< T, ACT::Handle_Registry_Leader< T, test_aspect > >
+		: public aspect::Null_Aspect_1< T, ACT::Handle_Registry_Leader< T, aspect::Null_Aspect_1 > >
 	{
 		// We need the execution trace in this class because it's constructed statically.
 		// If we had two static classes that required a common trace, we'd have to use a third class, a singleton, to put this in.
-		execution_trace tr ;
+		ACT::execution_trace tr ;
 
 	public:
-		execution_trace & trace() { return tr ; }
+		ACT::execution_trace & trace() { return tr ; }
 		std::string result() const { return tr.result() ; }
 
 		void add_in_new_place() { tr.add( "N" ) ; }
@@ -70,13 +69,13 @@ namespace ACT_Test {
 	//---------------
 	/// \brief Test aspect for Handle_Registry_Follower.
 	template< class T, class Leader >
-	class test_aspect_2< T, Leader, Handle_Registry_Follower< T, Leader, test_aspect_2 > >
-		: public aspect::Null_Aspect_2< T, Leader, Handle_Registry_Follower< T, Leader, aspect::Null_Aspect_2 > >
+	class test_aspect_2< T, Leader, ACT::Handle_Registry_Follower< T, Leader, test_aspect_2 > >
+		: public aspect::Null_Aspect_2< T, Leader, ACT::Handle_Registry_Follower< T, Leader, aspect::Null_Aspect_2 > >
 	{
 		// See reason above for why the execution trace is here
-		execution_trace tr ;
+		ACT::execution_trace tr ;
 	public:
-		execution_trace & trace() { return tr ; }
+		ACT::execution_trace & trace() { return tr ; }
 		std::string result() const { return tr.result() ; }
 
 		void access_from_existing_slot() { tr.add( "A" ) ; }
@@ -84,20 +83,19 @@ namespace ACT_Test {
 	} ;
 
 	//---------------
-	// Forward
-	class test ;
-	//---------------
 	/// \brief Test aspect for Handled.
+	///	This is a specialization of the 
 	template< class T >
-	class test_aspect< T, Handled< T, test_aspect > >
-		: public Null_Aspect_Handled< T >,
-		public aspect::Aspect_Has_Access_To_Owner< Handled< T, test_aspect > >
+	class test_aspect< T, ACT::Handled< T, ACT_Test::test_aspect > >
+		: public ACT::Null_Aspect_Handled< T >,
+		public aspect::Aspect_Has_Access_To_Owner< ACT::Handled< T, test_aspect > >
 	{
-		/// The explicit namespace qualification distinguishes the generic declaration from this specialization.
-		typedef Handled< test, ACT_Test::test_aspect > owner_type ;
+		/// An explicit namespace qualification (ACT_Test::test_aspect instead of merely test_aspect)
+		///		discriminates between the template as such and the present class, which is a template specialization.
+		typedef ACT::Handled< T, ACT_Test::test_aspect > owner_type ;
 
 		///
-		typedef aspect::Aspect_Has_Access_To_Owner< Handled< T, ACT_Test::test_aspect > > access_base_type ;
+		typedef aspect::Aspect_Has_Access_To_Owner< ACT::Handled< T, ACT_Test::test_aspect > > access_base_type ;
 
 	public:
 		std::string result() const {
@@ -106,19 +104,31 @@ namespace ACT_Test {
 	} ;
 
 	//---------------
+	// Forward
+	class test ;
+}
+namespace ACT {
+	//template<> class Handled< ACT_Test::test, ACT_Test::test_aspect > ;
+}
+namespace ACT_Test {
+	//---------------
 	/// \brief A test class for \c Handled, deriving from it in order to exercise it.
 	class test
-		: public Handled< test, test_aspect >
+		: public ACT::Handled< ACT_Test::test, ACT_Test::test_aspect >
 	{
-		typedef Handled< test, test_aspect > Handled_Base ;
+		typedef ACT::Handled< test, test_aspect > Handled_Base ;
 	public:
 		test() : Handled_Base( this ) {}
 
 		std::string result() const { return aspect.result() ; }
 	} ;
 
+	//------------------------------
+	using ACT::simple_tracker ;
+	//------------------------------
+
 	//---------------
-	BOOST_AUTO_UNIT_TEST( handle_one )
+	BOOST_AUTO_TEST_CASE( handle_one )
 	{
 		// We declare variables within blocks to invoke their destructors.
 		{
@@ -146,10 +156,10 @@ namespace ACT_Test {
 	}
 
 	//---------------
-	BOOST_AUTO_UNIT_TEST( handle_two )
+	BOOST_AUTO_TEST_CASE( handle_two )
 	{
 		test x ;
-		Handle_Registry_Follower< int, test, test_aspect_2 > follower ;
+		ACT::Handle_Registry_Follower< int, test, test_aspect_2 > follower ;
 		std::string found( follower.aspect.result() ) ;
 		std::string expected( "" ) ;
 		BOOST_CHECK( found == "" ) ;
@@ -210,9 +220,9 @@ namespace ACT_Test {
 
 	/// \brief test aspect for \c Basic_Scheduler
 	template<>
-	class scheduler_aspect< Basic_Scheduler< scheduler_aspect > >
-		: public Basic_Scheduler_Null_Aspect,
-		public aspect::Aspect_Has_Access_To_Owner< Basic_Scheduler< scheduler_aspect > >
+	class scheduler_aspect< ACT::Basic_Scheduler< scheduler_aspect > >
+		: public ACT::Basic_Scheduler_Null_Aspect,
+		public aspect::Aspect_Has_Access_To_Owner< ACT::Basic_Scheduler< scheduler_aspect > >
 	{
 		scheduler_aspect_body * body ;
 
@@ -235,15 +245,15 @@ namespace ACT_Test {
 
 	} ;
 
-	typedef scheduler_aspect< Basic_Scheduler< scheduler_aspect > > Test_Scheduler_Aspect ;
-	typedef Basic_Scheduler< scheduler_aspect > Test_Scheduler ;
+	typedef scheduler_aspect< ACT::Basic_Scheduler< scheduler_aspect > > Test_Scheduler_Aspect ;
+	typedef ACT::Basic_Scheduler< scheduler_aspect > Test_Scheduler ;
 
 	// Explicit instantiation of our Test_Scheduler
-	template Test_Scheduler ;
+	template class ACT::Basic_Scheduler< scheduler_aspect > ;
 
 	//--------------------------------------------------
 	// This test checks that the execution guard functions correctly to limit the total number of execution passes.
-	BOOST_AUTO_UNIT_TEST( guard_functions )
+	BOOST_AUTO_TEST_CASE( guard_functions )
 	{
 		scheduler_aspect_body a ;
 		Test_Scheduler b = Test_Scheduler( Test_Scheduler_Aspect( & a ) ) ;
@@ -255,7 +265,7 @@ namespace ACT_Test {
 		 * We run them 4 at a time.
 		 * After the last one, the queue should be empty.
 		 */
-		b.add_task( act( new N_to_completion( 6, 0 ) ) ) ;
+		b.add_task( ACT::act( new ACT::N_to_completion( 6, 0 ) ) ) ;
 		a.set_execution_bound( 4 ) ;
 		b() ;
 		BOOST_CHECK( a.finished_within_bound() ) ;
@@ -268,16 +278,16 @@ namespace ACT_Test {
 		BOOST_CHECK( b.empty() ) ;
 	}
 
-	BOOST_AUTO_UNIT_TEST( some_single_actions )
+	BOOST_AUTO_TEST_CASE( some_single_actions )
 	{
 		scheduler_aspect_body a ;
 		Test_Scheduler b = Test_Scheduler( Test_Scheduler_Aspect( & a ) ) ;
 
-		execution_trace tr ;
-		b.add_task( act( new no_action( new simple_tracker( tr, "N" ) ) ) ) ;
-		b.add_task( act( new single_action( new simple_tracker( tr, "A" ) ) ) ) ;
-		b.add_task( act( new single_action( new simple_tracker( tr, "B" ) ) ) ) ;
-		b.add_task( act( new single_action( new simple_tracker( tr, "C" ) ) ) ) ;
+		ACT::execution_trace tr ;
+		b.add_task( ACT::act( new ACT::no_action( new simple_tracker( tr, "N" ) ) ) ) ;
+		b.add_task( ACT::act( new ACT::single_action( new simple_tracker( tr, "A" ) ) ) ) ;
+		b.add_task( ACT::act( new ACT::single_action( new simple_tracker( tr, "B" ) ) ) ) ;
+		b.add_task( ACT::act( new ACT::single_action( new simple_tracker( tr, "C" ) ) ) ) ;
 
 		a.set_execution_bound( 100 ) ;
 		b() ;
@@ -288,15 +298,15 @@ namespace ACT_Test {
 		BOOST_CHECK( b.empty() ) ;
 	}
 
-	BOOST_AUTO_UNIT_TEST( act_n_interleaved )
+	BOOST_AUTO_TEST_CASE( act_n_interleaved )
 	{
 		scheduler_aspect_body a ;
 		Test_Scheduler b = Test_Scheduler( Test_Scheduler_Aspect( & a ) ) ;
 
-		execution_trace tr ;
-		b.add_task( act( new N_to_completion( 2, new simple_tracker( tr, "A" ) ) ) ) ;
-		b.add_task( act( new N_to_completion( 3, new simple_tracker( tr, "B" ) ) ) ) ;
-		b.add_task( act( new N_to_completion( 5, new simple_tracker( tr, "C" ) ) ) ) ;
+		ACT::execution_trace tr ;
+		b.add_task( ACT::act( new ACT::N_to_completion( 2, new simple_tracker( tr, "A" ) ) ) ) ;
+		b.add_task( ACT::act( new ACT::N_to_completion( 3, new simple_tracker( tr, "B" ) ) ) ) ;
+		b.add_task( ACT::act( new ACT::N_to_completion( 5, new simple_tracker( tr, "C" ) ) ) ) ;
 		
 		a.set_execution_bound( 100 ) ;
 		b() ;
@@ -309,18 +319,18 @@ namespace ACT_Test {
 	//--------------------------------------------------
 	// Same as act_n_interleaved, but using a Supplied_Service
 
-	BOOST_AUTO_UNIT_TEST( act_n_service )
+	BOOST_AUTO_TEST_CASE( act_n_service )
 	{
 		scheduler_aspect_body a ;
 		Test_Scheduler b = Test_Scheduler( Test_Scheduler_Aspect( & a ) ) ;
 
-		execution_trace tr ;
-		Supplied_Service * ss = new Supplied_Service( b, new simple_tracker( tr, "S" ) ) ;
-		ss -> add_task( shared_ptr< basic_act >( new N_to_completion( 2, new simple_tracker( tr, "A" ) ) ) ) ;
-		ss -> add_task( shared_ptr< basic_act >( new N_to_completion( 3, new simple_tracker( tr, "B" ) ) ) ) ;
-		ss -> add_task( shared_ptr< basic_act >( new N_to_completion( 5, new simple_tracker( tr, "C" ) ) ) ) ;
+		ACT::execution_trace tr ;
+		ACT::Supplied_Service * ss = new ACT::Supplied_Service( b, new simple_tracker( tr, "S" ) ) ;
+		ss -> add_task( shared_ptr< ACT::basic_act >( new ACT::N_to_completion( 2, new simple_tracker( tr, "A" ) ) ) ) ;
+		ss -> add_task( shared_ptr< ACT::basic_act >( new ACT::N_to_completion( 3, new simple_tracker( tr, "B" ) ) ) ) ;
+		ss -> add_task( shared_ptr< ACT::basic_act >( new ACT::N_to_completion( 5, new simple_tracker( tr, "C" ) ) ) ) ;
 
-		b.add_service( act( ss ) ) ;
+		b.add_service( ACT::act( ss ) ) ;
 		ss -> shutdown() ;
 		a.set_execution_bound( 100 ) ;
 		b() ;
@@ -332,19 +342,19 @@ namespace ACT_Test {
 	}
 
 	//--------------------------------------------------
-	BOOST_AUTO_UNIT_TEST( pause_action )
+	BOOST_AUTO_TEST_CASE( pause_action )
 	{
 		scheduler_aspect_body a ;
 		Test_Scheduler b = Test_Scheduler( Test_Scheduler_Aspect( & a ) ) ;
 		BOOST_REQUIRE( b.empty() ) ;
 
-		Pause_Demon * pause( new Pause_Demon( & b ) ) ;
-		b.add_task( act( new no_action( 0 ) ) ) ;
+		ACT::Pause_Demon * pause( new ACT::Pause_Demon( & b ) ) ;
+		b.add_task( ACT::act( new ACT::no_action( 0 ) ) ) ;
 		// This pause action should immediately return, because there's a pending action in the scheduler.
 		( * pause )() ;
 
 		a.set_execution_bound( 2 ) ;
-		b.add_service( act( pause ) ) ;
+		b.add_service( ACT::act( pause ) ) ;
 		b() ;
 		BOOST_CHECK( a.finished_at_bound() ) ;	// Pause demon should execute once, no_action once.
 		BOOST_CHECK( ! b.empty() ) ;			// demon should still be in queue.

@@ -46,7 +46,10 @@ namespace ACT {
 		single_action( tracking_function * x = 0 )
 			: tracker( x )
 		{}
-	} ;
+
+		/// Trivial virtual destructor
+		virtual ~single_action() {}
+} ;
 
 	//-------------------------
 	/**	\class no_action
@@ -72,6 +75,9 @@ namespace ACT {
 		{
 			set_completed() ;
 		}
+		
+		/// Trivial virtual destructor
+		virtual ~no_action() {}
 	} ;
 
 } // end namespace ACT

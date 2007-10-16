@@ -312,11 +312,6 @@ namespace ACT {
 		///		and add a \c const accessor function returning a reference.
 		aspect_type aspect ;
 
-		/// The aspect class is a friend.
-		/// The aspect is a template parameter, so we know nothing of aspect structure.
-		///	Hence we use a class friend here.
-		friend class Aspect< T, Handled > ;
-
 	public:
 		/// Default constructor takes as parameter the \c this pointer of a derived object.
 		Handled( T * that, aspect_type aspect = aspect_type() )

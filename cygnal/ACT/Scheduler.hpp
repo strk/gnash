@@ -54,6 +54,9 @@ namespace ACT {
 		Scheduler( Scheduler * that )
 			: Handled< Scheduler >( that )
 		{} ;
+		
+		/// Trivial destructor
+		virtual ~Scheduler() {}
 	} ;
 
 	/** \class wakeup_listener
@@ -220,16 +223,16 @@ namespace ACT {
 	struct Basic_Scheduled_Item
 	{
 		///
-		Action_Category action_type ;
-
-		/// 
-		Basic_Priority priority_category ;
+		act the_action ;
 
 		///
 		unsigned int sequence_number ;
 
 		///
-		act the_action ;
+		Action_Category action_type ;
+
+		/// 
+		Basic_Priority priority_category ;
 
 		///
 		Basic_Scheduled_Item( act x, unsigned int n, Action_Category action_type = Task ) ;

@@ -75,6 +75,9 @@ namespace ACT {
 
 		/// Add an item to the waiting list
 		void add_waiting_listener_task( Listener *, wakeup_listener * ) ;
+		
+		/// Trivial virtual destructor
+		virtual ~Basic_Listen_Monitor() {}
 	} ;
 
 	//-------------------------

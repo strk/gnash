@@ -88,5 +88,5 @@ namespace ACT {
 // Instantiate an instance of Handle_Registry_Follower as needed for N_to_Completion
 #include "ACT/Handle.cpp"
 namespace ACT {
-	template Handle_Registry_Follower< shared_ptr< N_to_completion_Monitor >, Scheduler > ;
+	template class Handle_Registry_Follower< shared_ptr< N_to_completion_Monitor >, Scheduler > ;
 }

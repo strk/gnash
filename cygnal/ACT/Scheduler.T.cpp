@@ -20,6 +20,7 @@
 
 /// \file Scheduler.T.cpp
 
+#include <stdexcept>
 #include "Scheduler.hpp"
 
 namespace ACT {
@@ -143,6 +144,8 @@ namespace ACT {
 					item -> sequence_number = next_service_sequence_number ++ ;
 					the_queue.reorder( item ) ;
 					break ;
+				case Critical_Demon:
+					throw std::logic_error( "Scheduled item type 'Critical_Demon' found but not yet supported." ) ;
 			}
 		} else {
 			the_queue.pop() ;
