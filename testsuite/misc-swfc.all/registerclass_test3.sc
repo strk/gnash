@@ -35,11 +35,19 @@
 
 
 .frame 2
+  .sprite child1
+    .put b1  x=100 y=100
+  .end
+  
+  .sprite child2
+    .put b1  x=100 y=200
+  .end
+  
   .sprite libItem1 // Define a sprite libItem1
-      .put b1  x=100 y=100
+      .put child1
   .end 
   .sprite libItem2 // Define a sprite libItem2
-      .put b1  x=100 y=200
+      .put child2
   .end 
   
 
@@ -78,7 +86,7 @@
 
      // Childs of libItem2 have also been placed already
      // Gnash fails by executing init actions before frame0 tags
-     xcheck_equals(typeof(libItem2.b1), 'movieclip');
+     xcheck_equals(typeof(libItem2.child2), 'movieclip');
   .end
   
   .put libItem2
