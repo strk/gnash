@@ -69,8 +69,7 @@ public:
 				abort();
 			}
 		}
-		sorted.sort();
-		assert(*this == sorted); // check we didn't screw up ordering
+		assert(isSorted()); // check we didn't screw up ordering
 #endif
 	}
 
@@ -416,6 +415,8 @@ private:
 
 	container_type _charsByDepth;
 
+	/// Check that the list is sorted by depth
+	bool isSorted() const;
 };
 
 template <class V>

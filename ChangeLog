@@ -1,5 +1,7 @@
 2007-10-17 Sandro Santilli <strk@keybit.net>
 
+	* server/dlist.{cpp,h}: add isSorted private method
+	  to slighly speed up invariant testing.
 	* server/edit_text_character.{cpp,h}: Add support for
 	  the TextField.onChanged event.
 

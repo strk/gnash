@@ -955,6 +955,24 @@ DisplayList::removeUnloaded()
 	testInvariant();
 }
 
+bool
+DisplayList::isSorted() const
+{
+	if ( _charsByDepth.empty() ) return true;
+
+	const_iterator i=_charsByDepth.begin();
+	int minDepth = (*i)->get_depth();
+	++i;
+	for (const_iterator e=_charsByDepth.end(); i!=e; ++i)
+	{
+		int nextDepth = (*i)->get_depth();
+
+		if ( nextDepth < minDepth ) return false;
+		minDepth = nextDepth;
+	}
+	return true;
+}
+
 } // namespace gnash
 
 
