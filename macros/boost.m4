@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.65 2007/10/13 23:24:07 rsavoye Exp $
+dnl $Id: boost.m4,v 1.66 2007/10/17 21:30:26 nihilus Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -42,7 +42,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   dnl redefined if --with-boost-incl= is specified.
   newlist=$incllist
 
-  dnl Lool for the header
+  dnl Look for the header
   AC_ARG_WITH(boost_incl, AC_HELP_STRING([--with-boost-incl], [directory where boost headers are]), with_boost_incl=${withval})
   if test x"${with_boost_incl}" != x ; then
     gnash_boost_topdir=`(cd ${with_boost_incl}; pwd)`
@@ -51,7 +51,9 @@ AC_DEFUN([GNASH_PATH_BOOST],
   fi
 
   dnl munge the GCC version number, which Boost uses to label it's libraries.
-  gcc_version=`${CXX} --version | head -1 | cut -d ' ' -f 3 | cut -d '.' -f 1-2 | tr -d '.'`
+  if test x"${GXX}" = xyes; then
+  	gcc_version=`${CXX} --version | head -1 | cut -d ' ' -f 3 | cut -d '.' -f 1-2 | tr -d '.'`
+  fi
 
   if test x"${gnash_boost_topdir}" = x; then
     dnl Attempt to find the top level directory, which unfortunately has a
@@ -71,11 +73,16 @@ AC_DEFUN([GNASH_PATH_BOOST],
     dirs=`ls -dr $i/boost* 2>/dev/null`
     if test -n "${dirs}"; then
       gnash_boost_topdir=`(cd ${dirs}; pwd)`
+      gnash_boost_subdir=`dirname ${gnash_boost_topdir}`
       gnash_boost_version=`echo ${gnash_boost_topdir} | sed -e 's:boost-::'`
       dnl Fix for packaging systems not adding extra fluff to the path-name.
       for k in ${boost_headers}; do
-       if test ! -f ${gnash_boost_topdir}/boost/$k -a ! -f ${gnash_boost_topdir}/$k; then
-          missing_headers="${missing_headers} $k"
+       if test ! -f ${gnash_boost_topdir}/boost/$k; then
+          if test ! -f ${gnash_boost_subdir}/boost/$k; then
+		missing_headers="${missing_headers} $k"
+	  else
+	  	gnash_boost_topdir=${gnash_boost_subdir}
+	  fi
         fi
       done
       if test x"${missing_headers}" = x ; then

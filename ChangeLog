@@ -15,6 +15,8 @@
 2007-10-17 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/asobj/NetStream.h: MIPSPro work-around.
+	* configure: Always print BOOST_{CFLAGS, LIBS}
+	* macros/boost.m4: Detect boost correctly by two steps. Added GXX.
 
 2007-10-16 Sandro Santilli <strk@keybit.net>
 
