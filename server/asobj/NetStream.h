@@ -19,7 +19,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.51 2007/10/17 04:53:13 nihilus Exp $ */
+/*  $Id: NetStream.h,v 1.52 2007/10/17 04:58:59 nihilus Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -188,7 +188,7 @@ public:
 
 	NetStream();
 
-#ifndef sgi
+#if !defined(sgi) || defined(__GNUC__)
 	virtual ~NetStream(){}
 #endif
 	/// Closes the video session and frees all ressources used for decoding
