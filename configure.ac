@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.428 2007/10/06 00:49:51 rsavoye Exp $
+dnl $Id: configure.ac,v 1.429 2007/10/17 17:05:55 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1364,6 +1364,25 @@ if test x"$GCC" = x"yes"; then
       -Wno-long-long \
       "
   fi
+fi
+
+AC_ARG_ENABLE([cassert],
+  AC_HELP_STRING([--enable-cassert],[Enable assertion checking]),
+  [case "${enableval}" in
+    yes) cassert=yes ;;
+    no) cassert=no ;;
+    *) AC_MSG_ERROR([bad value ${enableval} for --enable-cassert option]) ;;
+  esac],
+  [cassert=no]
+)
+
+if test x"$cassert" = x"no"; then
+    CXXFLAGS="$CXXFLAGS \
+      -DNDEBUG \
+      "
+    CFLAGS="$CFLAGS \
+      -DNDEBUG \
+      "
 fi
 
 dnl /* http://gcc.gnu.org/bugzilla/show_bug.cgi?id=19664 */
