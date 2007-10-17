@@ -260,6 +260,9 @@ public:
 
 private:
 
+	/// Call this function when willing to invoke the onChanged event handler
+	void onChanged();
+
 	/// The actual text
 	std::string _text;
 

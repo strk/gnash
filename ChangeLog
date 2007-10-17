@@ -1,3 +1,8 @@
+2007-10-17 Sandro Santilli <strk@keybit.net>
+
+	* server/edit_text_character.{cpp,h}: Add support for
+	  the TextField.onChanged event.
+
 2007-10-17 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/asobj/NetStream.h: MIPSPro work-around.

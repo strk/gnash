@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.123 2007/09/28 10:10:36 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.124 2007/10/17 05:41:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -661,6 +661,7 @@ edit_text_character::on_event(const event_id& id)
 					break;
 				}
 			}
+			onChanged();
 		}
 
 		default:
@@ -2045,6 +2046,15 @@ edit_text_character::getTextAlignment()
 	else if ( _autoSize == autoSizeLeft ) textAlignment = edit_text_character_def::ALIGN_LEFT;
 	else if ( _autoSize == autoSizeRight ) textAlignment = edit_text_character_def::ALIGN_RIGHT;
 	return textAlignment;
+}
+
+void
+edit_text_character::onChanged()
+{
+	string_table& st = _vm.getStringTable();
+	string_table::key key = st.find(PROPNAME("onChanged"));
+	as_environment& env = const_cast<edit_text_character*>(this)->get_environment();
+	callMethod(key, env);
 }
 
 } // namespace gnash
