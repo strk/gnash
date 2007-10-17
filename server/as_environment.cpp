@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.98 2007/10/15 21:42:20 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.99 2007/10/17 21:09:55 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -395,23 +395,6 @@ as_environment::declare_local(const std::string& varname)
 		//locals.push_back(as_environment::frame_slot(varname, as_value()));
 		locals->set_member(VM::get().getStringTable().find(varname), as_value());
 	}
-}
-	
-bool
-as_environment::get_member(const std::string& varname, as_value* val) const
-{
-    Variables::const_iterator it = _variables.find(varname);
-    if ( it == _variables.end() ) return false;
-    
-    *val = it->second;
-    return true;
-}
-
-
-void
-as_environment::set_member(const std::string& varname, const as_value& val)
-{
-    _variables[varname] = val;
 }
 
 /* public static */

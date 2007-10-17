@@ -261,21 +261,6 @@ public:
 	/// Create the specified local var if it doesn't exist already.
 	void	declare_local(const std::string& varname);
 
-	/// Retrieve the named member (variable).
-	//
-	/// If no member is found under the given name
-	/// 'val' is untouched and 'false' is returned.
-	/// 
-	/// TODO: rename to get_variable
-	///
-	bool	get_member(const std::string& varname, as_value* val) const;
-
-	/// Set the named variable 
-	//
-	/// TODO: rename to set_variable, take a std::string
-	///
-	void	set_member(const std::string& varname, const as_value& val);
-
 	/// Add 'count' local registers (add space to end)
 	//
 	/// Local registers are only meaningful within a function2 context.
@@ -521,9 +506,6 @@ private:
 	typedef std::vector<CallFrame> CallStack;
 		
 	CallStack _localFrames;
-
-	/// Variables available in this environment
-	Variables _variables;
 
 	as_value m_global_register[numGlobalRegisters];
 

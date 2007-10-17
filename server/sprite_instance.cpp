@@ -1798,20 +1798,6 @@ bool sprite_instance::get_member(string_table::key name_key, as_value* val)
 		return true;
 	}
 
-#if 0 // see MovieClip.as
-	if ( name == "this" )
-	{
-		val->set_as_object( this );
-		return true;
-	}
-#endif
-
-	// Try variables.
-	if ( m_as_environment.get_member(name, val) )
-	{
-	    return true;
-	}
-
 	// Try object members, BEFORE display list items!
 	// (see testcase VarAndCharClash.swf in testsuite/misc-ming.all)
 	//

@@ -1,5 +1,10 @@
 2007-10-17 Sandro Santilli <strk@keybit.net>
 
+	* server/: as_environment.{cpp,h}, sprite_instance.cpp:
+	  Drop useless as_environment::{get,set}_member.
+
+2007-10-17 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: add --enable-cassert (build with NDEBUG defined by
 	  default)
 	* server/dlist.{cpp,h}: add isSorted private method
