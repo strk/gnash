@@ -59,7 +59,9 @@ GtkCairoGlue::prepDrawingArea(GtkWidget *drawing_area)
 render_handler*
 GtkCairoGlue::createRenderHandler()
 {
-    return renderer::cairo::create_handler();
+    _renderer = renderer::cairo::create_handler();
+
+    return _renderer;
 }
 
 void
@@ -80,18 +82,25 @@ GtkCairoGlue::configure(GtkWidget *const /*widget*/,
     if (!_drawing_area)  return;
 
     // Create cairo handle for output window
-    if (_cairo_handle)  cairo_destroy(_cairo_handle);
+    if (_cairo_handle) {
+      assert(cairo_get_reference_count(_cairo_handle));
+      cairo_destroy(_cairo_handle);
+    }
     _cairo_handle = gdk_cairo_create(_drawing_area->window);
     assert(_cairo_handle);
 
     // Create offscreen image for rendering
-    if (_cairo_offscreen)  cairo_destroy(_cairo_offscreen);
+    if (_cairo_offscreen) {
+      assert(cairo_get_reference_count(_cairo_offscreen));
+      cairo_destroy(_cairo_offscreen);
+    }
+    
     cairo_surface_t* surface = cairo_image_surface_create(
-	CAIRO_FORMAT_RGB24, event->width, event->height);
+      CAIRO_FORMAT_RGB24, event->width, event->height);
     _cairo_offscreen = cairo_create(surface);
-    assert(_cairo_offscreen);
     cairo_surface_destroy(surface);
-    renderer::cairo::set_handle(_cairo_offscreen);
+
+    renderer::cairo::set_context(_renderer, _cairo_offscreen);
 }
 
 

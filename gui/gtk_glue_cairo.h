@@ -45,6 +45,7 @@ class GtkCairoGlue : public GtkGlue
   private:
     cairo_t     *_cairo_handle;
     cairo_t     *_cairo_offscreen;
+    render_handler* _renderer;
 };
 
 } // namespace gnash

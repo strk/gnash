@@ -18,12 +18,14 @@
 // 
 //
 
-/* $Id: render_handler_cairo.h,v 1.6 2007/07/01 10:53:48 bjacques Exp $ */
+/* $Id: render_handler_cairo.h,v 1.7 2007/10/18 09:05:40 bjacques Exp $ */
 
 #ifndef BACKEND_RENDER_HANDLER_CAIRO_H
 #define BACKEND_RENDER_HANDLER_CAIRO_H
 
 #include "tu_config.h"
+#include <cairo/cairo.h>
+#include "render_handler.h"
 
 namespace gnash {
 namespace renderer {
@@ -35,7 +37,7 @@ namespace cairo {
 gnash::render_handler* create_handler();
 
 /// Make sure to call this before starting display
-void set_handle(cairo_t* handle);
+void set_context(render_handler* handler, cairo_t* context);
 
 } // namespace gnash::renderer::cairo
 } // namespace gnash::renderer
