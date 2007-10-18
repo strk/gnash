@@ -129,7 +129,7 @@
 
 .frame 10
   .action:
-    _root.check_equals(testvar, true);
+    _root.xcheck_equals(testvar, true);
   .end
   
 //
