@@ -289,6 +289,12 @@ private:
 	/// Call this function when willing to invoke the onChanged event handler
 	void onChanged();
 
+	/// Call this function when willing to invoke the onSetFocus event handler
+	void onSetFocus();
+
+	/// Call this function when willing to invoke the onKillFocus event handler
+	void onKillFocus();
+
 	/// The actual text
 	std::string _text;
 

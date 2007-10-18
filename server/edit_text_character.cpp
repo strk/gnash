@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.128 2007/10/18 16:28:45 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.129 2007/10/18 18:54:33 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2063,6 +2063,24 @@ edit_text_character::onChanged()
 }
 
 void
+edit_text_character::onSetFocus()
+{
+	string_table& st = _vm.getStringTable();
+	string_table::key key = st.find(PROPNAME("onSetFocus"));
+	as_environment& env = const_cast<edit_text_character*>(this)->get_environment();
+	callMethod(key, env);
+}
+
+void
+edit_text_character::onKillFocus()
+{
+	string_table& st = _vm.getStringTable();
+	string_table::key key = st.find(PROPNAME("onKillFocus"));
+	as_environment& env = const_cast<edit_text_character*>(this)->get_environment();
+	callMethod(key, env);
+}
+
+void
 edit_text_character::setFocus()
 {
 	if ( m_has_focus ) return; // nothing to do
@@ -2079,6 +2097,8 @@ edit_text_character::setFocus()
 
 	m_cursor = _text.size();
 	format_text();
+
+	onSetFocus();
 }
 
 void
@@ -2094,6 +2114,8 @@ edit_text_character::killFocus()
 	root.setFocus(NULL);
 	root.remove_key_listener(this);
 	format_text(); // is this needed ?
+
+	onKillFocus();
 }
 
 } // namespace gnash
