@@ -25,7 +25,6 @@
 #include "as_object.h"
 #include "asClass.h"
 #include "SafeStack.h"
-#include "asNamespace.h"
 
 namespace gnash {
 
