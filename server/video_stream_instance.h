@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_instance.h,v 1.22 2007/09/27 23:59:56 tgc Exp $
+// $Id: video_stream_instance.h,v 1.23 2007/10/18 15:56:55 tgc Exp $
 
 #ifndef GNASH_VIDEO_STREAM_INSTANCE_H
 #define GNASH_VIDEO_STREAM_INSTANCE_H
@@ -99,8 +99,8 @@ private:
 	// Who owns this ? Should it be an intrusive ptr ?
 	boost::intrusive_ptr<NetStream> _ns;
 
-	/// Decoder for embedded video
-	std::auto_ptr<VideoDecoder> m_decoder;
+	/// Playing an embbeded video stream ?
+	bool _embeddedStream;
 };
 
 void video_class_init(as_object& global);

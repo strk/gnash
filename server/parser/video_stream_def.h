@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.h,v 1.12 2007/09/27 23:59:56 tgc Exp $
+// $Id: video_stream_def.h,v 1.13 2007/10/18 15:56:55 tgc Exp $
 
 #ifndef GNASH_VIDEO_STREAM_DEF_H
 #define GNASH_VIDEO_STREAM_DEF_H
@@ -81,41 +81,14 @@ public:
 		return m_bound;
 	}
 
-	/// Return a newly created embedded-video decoder
-	//
-	/// The type of decoder returned currently depends
-	/// on compile-time defines (FFMPG/GST/none)
-	///
-	/// The returned decoder will be initialized with
-	/// data kept as member of this class
-	/// (width/height/codec_id/videoFrameFormat)
-	/// Note that videoFrameFormat is fetched from the
-	/// current renderer.
-	///
-	/// This function *never* returns a NULL pointer.
-	///
-	std::auto_ptr<VideoDecoder> get_decoder();
-
 	/// Get the Video frame associated with the given SWF frame number
 	//
 	/// @param frameNum
 	///	0-based SWF frame number of which we want to fetch associated Video frame.
 	///
-	/// @param data
-	///	Output parameter. If a video frame is available for the specified SWF frame,
-	///	then the given pointer (*data) will be set to point to a memory buffer owned
-	///	by this instance; otherwise (no video frame available) the given pointer will
-	///	be set to zero.
+	/// @return pointer (possibly NULL) to an image. The ownership is with the callee
 	///
-	/// @param size
-	///	Output parameter. If a video frame is available for the specified SWF frame,
-	///	then the given integer (*size) will be set to the size of the memory buffer
-	///	returned in the data parameter; otherwise (no video frame available) the given
-	///	integer will be set to zero.
-	///
-	/// TODO: return pointer (possibly NULL) to a structure with data&size ? (simpler)
-	///
-	void get_frame_data(int frameNum, uint8_t** data, int* size);
+	image::image_base* get_frame_data(int frameNum);
 
 private:
 
@@ -150,8 +123,6 @@ private:
 	/// 3: screen video (Flash 7+ only)
 	/// 4: VP6
 	///
-	/// TODO: define an enumeration for the above values
-	///
 	videoCodecType m_codec_id;
 
 	/// Bounds of the video, as read from the DEFINEVIDEOSTREAM tag.
@@ -162,10 +133,17 @@ private:
 	/// Elements of this map are owned by this instance, and will be deleted 
 	/// at instance destruction time.
 	///
-	typedef std::pair< boost::shared_array<uint8_t>, uint32_t> EmbedFrame;
-	typedef std::map<uint32_t, EmbedFrame > EmbedFrameMap;
+	typedef std::map<uint32_t, image::image_base*> EmbedFrameMap;
 	EmbedFrameMap m_video_frames;
 
+	/// Width of the video
+	uint32_t _width;
+
+	/// Height of the video
+	uint32_t _height;
+
+	/// The decoder used to decode the video frames
+	VideoDecoder* _decoder;
 };
 
 }	// end namespace gnash

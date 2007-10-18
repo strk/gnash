@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: VideoDecoderFfmpeg.cpp,v 1.5 2007/10/08 11:00:06 tgc Exp $
+// $Id: VideoDecoderFfmpeg.cpp,v 1.6 2007/10/18 15:56:55 tgc Exp $
 
 #include "VideoDecoderFfmpeg.h"
 
@@ -69,7 +69,7 @@ bool VideoDecoderFfmpeg::setup(
 			codec_id = CODEC_ID_FLASHSV;
 			break;
 		default:
-			log_error(_("Unsupported audio codec %d"), static_cast<int>(format));
+			log_error(_("Unsupported video codec %d"), static_cast<int>(format));
 			return false;
 	}
 
@@ -123,7 +123,7 @@ bool VideoDecoderFfmpeg::setup(VideoInfo* info)
 				codec_id = CODEC_ID_FLASHSV;
 				break;
 			default:
-				log_error(_("Unsupported audio codec %d"), static_cast<int>(info->codec));
+				log_error(_("Unsupported video codec %d"), static_cast<int>(info->codec));
 				return false;
 		}
 		_videoCodec = avcodec_find_decoder(static_cast<CodecID>(codec_id));
@@ -141,7 +141,7 @@ bool VideoDecoderFfmpeg::setup(VideoInfo* info)
 
 	// Reuse the videoCodecCtx from the ffmpeg parser if exists/possible
 	if (info->videoCodecCtx) {
-	printf("re-using the parsers videoCodecCtx\n");
+		log_debug("re-using the parsers videoCodecCtx");
 		_videoCodecCtx = info->videoCodecCtx;
 	} else {
 		_videoCodecCtx = avcodec_alloc_context();
@@ -318,18 +318,17 @@ uint8_t* VideoDecoderFfmpeg::decode(uint8_t* input, uint32_t inputSize, uint32_t
 	}
 }
 
-std::auto_ptr<image::image_base> 
+image::image_base*
 VideoDecoderFfmpeg::decodeToImage(uint8_t* input, uint32_t inputSize)
 {
 	uint32_t outputSize = 0;
 	uint8_t* decodedData = decode(input, inputSize, outputSize);
 
 	if (!decodedData || outputSize == 0) {
-		return std::auto_ptr<image::image_base>(NULL);
+		return NULL;
 	}
 
-	std::auto_ptr<image::image_base> ret;
-	ret.reset(new image::rgb(_videoCodecCtx->width, _videoCodecCtx->height));
+	image::image_base* ret = new image::rgb(_videoCodecCtx->width, _videoCodecCtx->height);
 	ret->update(decodedData);
 	delete [] decodedData;
 	return ret;

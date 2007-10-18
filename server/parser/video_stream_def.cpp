@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.18 2007/09/27 23:59:56 tgc Exp $
+// $Id: video_stream_def.cpp,v 1.19 2007/10/18 15:56:55 tgc Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -32,7 +32,10 @@ namespace gnash {
 
 video_stream_definition::video_stream_definition(uint16_t char_id)
 	:
-	m_char_id(char_id)
+	m_char_id(char_id),
+	_width(0),
+	_height(0),
+	_decoder(NULL)
 {
 }
 
@@ -40,6 +43,7 @@ video_stream_definition::video_stream_definition(uint16_t char_id)
 video_stream_definition::~video_stream_definition()
 {
 	m_video_frames.clear();
+	delete _decoder;
 }
 
 
@@ -57,19 +61,28 @@ video_stream_definition::read(stream* in, SWF::tag_type tag, movie_definition* m
 
 		m_num_frames = in->read_u16();
 
-		uint16_t width = in->read_u16();
-		uint16_t height = in->read_u16();
+		_width = in->read_u16();
+		_height = in->read_u16();
 		m_bound.enclose_point(0, 0);
-		m_bound.expand_to_point(PIXELS_TO_TWIPS(width), PIXELS_TO_TWIPS(height));
+		m_bound.expand_to_point(PIXELS_TO_TWIPS(_width), PIXELS_TO_TWIPS(_height));
 
 		m_reserved_flags = in->read_uint(5);
 		m_deblocking_flags = in->read_uint(2);
 		m_smoothing_flags = in->read_bit(); 
 
 		m_codec_id = static_cast<videoCodecType>(in->read_u8());
+#ifdef USE_FFMPEG
+		_decoder = new VideoDecoderFfmpeg();
+#elif defined(SOUND_GST)
+		_decoder = new VideoDecoderGst();
+#else
+		_decoder = new VideoDecoder();
+#endif
+		bool ret = _decoder->setup(_width, _height, m_deblocking_flags, m_smoothing_flags, m_codec_id, gnash::render::videoFrameFormat());
+		if (!ret) delete _decoder;
 
 	}
-	else if (tag == SWF::VIDEOFRAME)
+	else if (tag == SWF::VIDEOFRAME && _decoder)
 	{
 		// We don't use the videoframe number, but instead
 		// each video frame is tied to the swf-frame where
@@ -94,7 +107,14 @@ video_stream_definition::read(stream* in, SWF::tag_type tag, movie_definition* m
 			data[i] = in->read_u8();
 		}
 
-		m_video_frames[m->get_loading_frame()] = EmbedFrame(boost::shared_array<uint8_t>(data), size);
+		image::image_base* img = _decoder->decodeToImage(data, size);
+
+		if (img) {
+			m_video_frames[m->get_loading_frame()] = img;
+		} else {
+			log_error(_("An error occured while decoding video frame in frame %d"), m->get_loading_frame());
+		}
+		delete [] data;
 	}
 
 }
@@ -107,48 +127,16 @@ video_stream_definition::create_character_instance(character* parent, int id)
 	return ch;
 }
 
-std::auto_ptr<VideoDecoder>
-video_stream_definition::get_decoder()
-{
-
-	std::auto_ptr<VideoDecoder> decoder;
-
-	if (m_num_frames == 0) return decoder;
-
-
-#ifdef USE_FFMPEG
-	decoder.reset( new VideoDecoderFfmpeg() );
-#elif defined(SOUND_GST)
-	decoder.reset( new VideoDecoderGst() );
-#else
-	decoder.reset( new VideoDecoder() );
-#endif
-
-	bool ret = decoder->setup(
-				static_cast<int>(TWIPS_TO_PIXELS(m_bound.width())),// m_width,
-				static_cast<int>(TWIPS_TO_PIXELS(m_bound.height())), // m_height,
-				m_deblocking_flags,
-				m_smoothing_flags,
-				m_codec_id,
-				gnash::render::videoFrameFormat());
-	if (!ret) log_error("The videodecoder cannot decode this video");
-	return decoder;
-
-}
-
-void 
-video_stream_definition::get_frame_data(int frameNum, uint8_t** data, int* size)
+image::image_base*
+video_stream_definition::get_frame_data(int frameNum)
 {
 	EmbedFrameMap::iterator it = m_video_frames.find(frameNum);
 	if( it != m_video_frames.end() )
 	{
-		*data = it->second.first.get();
-		*size = it->second.second;
+		return it->second;
 	} else {
-		log_error(_("No video data available for frame %d."), frameNum);
-		*data = 0;
-		*size = 0;
-		return;
+		log_debug(_("No video data available for frame %d."), frameNum);
+		return NULL;
 	}
 }
 

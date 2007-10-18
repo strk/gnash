@@ -1,3 +1,10 @@
+2007-10-18 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libmedia/VideoDecoder.h,libmedia/gst/VideoDecoder{Ffmpeg.Gst}.{h,cpp}: 
+	  Changed decodeToImage to return a raw image::image_base pointer.
+	* server/video_stream_instance.{cpp,h},server/parser/video_stream_def.{h,cpp}:
+	  Changed to do decoding of video stream on parsing, and not on demand.
+
 2007-10-18 Chad Musick <chadmusick@msbx.net>
 
 	* testsuite/swfdec/PASSING: More than 20 newly passing tests.

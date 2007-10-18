@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-// $Id: video_stream_instance.cpp,v 1.40 2007/09/27 23:59:56 tgc Exp $
+// $Id: video_stream_instance.cpp,v 1.41 2007/10/18 15:56:55 tgc Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -160,12 +160,12 @@ video_stream_instance::video_stream_instance(video_stream_definition* def,
 	m_def(def),
 	//m_video_source(NULL),
 	_ns(NULL),
-	m_decoder(NULL) // don't abort if m_def is null
+	_embeddedStream(false)
 {
 	log_debug("video_stream_instance %p ctor", (void*)this);
 	if ( m_def )
 	{
-		m_decoder = m_def->get_decoder();
+		_embeddedStream = true;
 	}
 
 	set_prototype(getVideoInterface());
@@ -199,9 +199,7 @@ video_stream_instance::display()
 		}
 
 	// If this is a video from a VideoFrame tag, retrieve a video frame from there.
-	} else if (m_decoder.get()) {
-		uint8_t* data = 0;
-		int size = 0;
+	} else if (_embeddedStream) {
 		character* parent = get_parent();
 		assert(parent);
 		sprite_instance* sprite = parent->to_movie();
@@ -209,19 +207,14 @@ video_stream_instance::display()
 
 		int current_frame = sprite->get_current_frame();
 		assert(m_def);
-		m_def->get_frame_data(current_frame, &data, &size);
 
-		if (size > 0 && data) {
-
-			std::auto_ptr<image::image_base> i(m_decoder->decodeToImage(data, size));
-			if (i.get())
-			{
-				gnash::render::drawVideoFrame(i.get(), &m, &bounds);
-			} else {
-				log_error(_("An error occured while decoding video frame"));
-			}
+		// The returned image is owned by "m_def"
+		image::image_base* img = m_def->get_frame_data(current_frame);
+		if (img)
+		{
+			gnash::render::drawVideoFrame(img, &m, &bounds);
 		} else {
-			log_error(_("Video frame data is missing - skipping decoding"));
+			log_debug(_("Video frame data is missing in frame %d"),current_frame);
 		}
 	}
 

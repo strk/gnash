@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderGst.cpp,v 1.2 2007/09/28 00:33:30 tgc Exp $
+// $Id: VideoDecoderGst.cpp,v 1.3 2007/10/18 15:56:54 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -185,13 +185,11 @@ VideoDecoderGst::setup(int widthi, int heighti, int deblockingi, bool smoothingi
 
 
 // gnash calls this when it wants you to decode the given videoframe
-std::auto_ptr<image::image_base>
+image::image_base*
 VideoDecoderGst::decodeToImage(uint8_t* data, uint32_t size)
 {
 
-	std::auto_ptr<image::image_base> ret_image;
-
-	ret_image.reset(new image::rgb(width, height));
+	image::rgb* ret_image = new image::rgb(width, height);
 
 	// If there is nothing to decode in the new frame
 	// we just return the lastest.
@@ -201,11 +199,9 @@ VideoDecoderGst::decodeToImage(uint8_t* data, uint32_t size)
 		// auto pointer ..
 		if ( ! decodedFrame.get() )
 		{
-			ret_image.reset(NULL);
-			return ret_image;
+			return NULL;
 		}
 
-		// return decodedFrame->clone() ?
 		ret_image->update(*decodedFrame);
 		return ret_image;
 	}
@@ -221,14 +217,44 @@ VideoDecoderGst::decodeToImage(uint8_t* data, uint32_t size)
 	// auto pointer ..
 	if ( ! decodedFrame.get() )
 	{
-		ret_image.reset(NULL);
-		return ret_image;
+		return NULL;
 	}
 
 	// return decodedFrame->clone() ?
 	ret_image->update(*decodedFrame);
 	return ret_image;
 }
+
+// gnash calls this when it wants you to decode the given videoframe
+/*uint8_t*
+VideoDecoderGst::decode(uint8_t* data, uint32_t size, uint32_t& outputSize)
+{
+	// If there is nothing to decode in the new frame
+	// we just return the lastest.
+	if (data == NULL || size == 0 || !decoder)
+	{
+		outputSize = 0;
+		return NULL;
+	}
+
+	frame = data;
+	frameSize = size;
+
+	delete input_lock;
+
+	output_lock = new boost::mutex::scoped_lock(output_mutex);
+
+	// If we never decoded any frame return a NULL
+	// auto pointer ..
+	if ( ! decodedFrame.get() )
+	{
+		outputSize = 0;
+		return NULL;
+	}
+
+	outputSize = width * height * 3;
+	return decodedFrame->data();
+}*/
 
 // The callback function which refills the buffer with data
 void

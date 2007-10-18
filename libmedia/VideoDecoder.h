@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoder.h,v 1.4 2007/10/04 09:37:50 tgc Exp $
+// $Id: VideoDecoder.h,v 1.5 2007/10/18 15:56:54 tgc Exp $
 
 #ifndef __VIDEODECODER_H__
 #define __VIDEODECODER_H__
@@ -102,7 +102,7 @@ public:
 	/// @return a pointer to the image with the decoded data, or NULL if decoding fails.
 	///     The caller owns the decoded data.
 	///
-	virtual std::auto_ptr<image::image_base> decodeToImage(uint8_t* /*input*/, uint32_t /*inputSize*/) { return std::auto_ptr<image::image_base>(NULL); }
+	virtual image::image_base* decodeToImage(uint8_t* /*input*/, uint32_t /*inputSize*/) { return NULL; }
 
 };
 	
