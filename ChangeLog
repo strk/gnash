@@ -1,3 +1,8 @@
+2007-10-18 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/swfdec/PASSING: we now pass
+	  addProperty-get-prototypes-{6,7,8}.swf
+
 2007-10-18 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* testsuite/MovieTester.cpp: Conditionally include cairo header.
