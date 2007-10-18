@@ -1,5 +1,15 @@
 2007-10-18 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.{cpp,h}: add getActiveEntityUnderPointer method.
+	* server/character.h: add virtual isSelectableTextField() method.
+	* server/edit_text_character.h: implement isSelectableTextField()
+	* gui/gui.cpp: use getActiveENtityUnderPointer and
+	  isSelectableTextField to provide an INPUT cursor rather then
+	  an HAND when the active entity under pointer is a selectable
+	  text field.
+
+2007-10-18 Sandro Santilli <strk@keybit.net>
+
 	* server/: movie_root.{cpp,h}, edit_text_character.cpp:
 	  Renamed movie_root::{get,set}_active_entity to
 	  movie_root::{get,set}Focus for clarity, and documented it.

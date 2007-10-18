@@ -317,9 +317,20 @@ Gui::notify_mouse_moved(int x, int y)
 		display(m);
 	}
     
-	if ( m->isMouseOverActiveEntity() ) {
-		setCursor(CURSOR_HAND);
-	} else {
+	character* activeEntity = m->getActiveEntityUnderPointer();
+	if ( activeEntity )
+	{
+		if ( activeEntity->isSelectableTextField() )
+		{
+			setCursor(CURSOR_INPUT);
+		}
+		else
+		{
+			setCursor(CURSOR_HAND);
+		}
+	}
+	else
+	{
 		setCursor(CURSOR_NORMAL);
 	}
 

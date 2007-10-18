@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.100 2007/10/16 09:24:49 strk Exp $ */
+/* $Id: character.h,v 1.101 2007/10/18 14:13:03 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -593,8 +593,8 @@ public:
 	///
 	virtual void has_mouse_event() {}
 
-    // Movie interfaces.  By default do nothing.  sprite_instance and some others override these.
-    virtual void	display() {}
+	// Movie interfaces.  By default do nothing.  sprite_instance and some others override these.
+	virtual void	display() {}
 
     	/// Returns local, untransformed height of this character in TWIPS
 	//
@@ -720,9 +720,6 @@ public:
 		return get_relative_target_common(name);
 	}
 
-    //virtual size_t	get_current_frame() const { assert(0); return 0; }
-    //virtual bool	has_looped() const { assert(0); return false; }
-
 	/// Restart the character
 	//
 	/// This is only meaningful for sprite instances, but default
@@ -746,7 +743,8 @@ public:
 		// GNASH_REPORT_FUNCTION 
 	}
 
-    virtual void	goto_frame(size_t /*target_frame*/) {}
+	// TODO: verify if this is really needed (I guess not)
+	virtual void	goto_frame(size_t /*target_frame*/) {}
 
 	/// \brief
 	/// Return true if PlaceObjects tag are allowed to move
@@ -1121,6 +1119,13 @@ public: // istn't this 'public' reduntant ?
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
 	boost::intrusive_ptr<as_function> getUserDefinedEventHandler(const std::string& name) const;
 #endif
+
+	/// Return true if this character is a selectable TextField
+	//
+	/// This method is used by Gui to set up an appropriate cursor
+	/// for input textfields.
+	///
+	bool virtual isSelectableTextField() const { return false; }
 };
 
 

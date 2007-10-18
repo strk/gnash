@@ -1081,6 +1081,12 @@ movie_root::setFocus(character* ch)
 	assert(testInvariant());
 }
 
+character*
+movie_root::getActiveEntityUnderPointer() const
+{
+	return m_mouse_button_state.m_active_entity.get();
+}
+
 bool
 movie_root::isMouseOverActiveEntity() const
 {

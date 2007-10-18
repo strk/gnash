@@ -272,6 +272,11 @@ public:
 		_selectable = v;
 	}
 
+	// See character::isActiveTextField
+	bool virtual isSelectableTextField() const
+	{
+		return isSelectable();
+	}
 
 private:
 

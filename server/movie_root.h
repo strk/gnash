@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.81 2007/10/18 13:51:33 strk Exp $ */
+/* $Id: movie_root.h,v 1.82 2007/10/18 14:13:04 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -519,6 +519,17 @@ public:
     void setFocus(character* ch);
     
     DSOEXPORT void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
+
+    /// Return the topmost active entity under the pointer
+    //
+    /// This method returns cached info, with cache updated
+    /// by notify_mouse_moved (and should be updated also
+    /// by movie advancement or actions execution maybe, not
+    /// currently implmented).
+    ///
+    /// @return the topmost active entity under pointer or NULL if none.
+    ///
+    character* getActiveEntityUnderPointer() const;
 
     /// Return true if the mouse pointer is over an active entity
     bool isMouseOverActiveEntity() const;
