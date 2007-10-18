@@ -28,7 +28,6 @@
 // - Implement unimplemented methods.
 // - Would be nice to have a header/implementation separation.
 // - Document workings of Cairo and this renderer.
-// - Implement getPixel and friends.
 // - Test bitmap implementation correctness.
 // - Figure out what extend types should be used and when.
 // - Figure out what the deal with subpixel offsets is.
@@ -849,9 +848,9 @@ public:
     if (context == _cr) {
       return;    
     }
-    if (cairo_get_reference_count(_cr)) {
-      cairo_destroy(_cr);
-    }
+
+    cairo_destroy(_cr);
+
     _cr = context;
   }
   
@@ -863,6 +862,77 @@ public:
 	    gnash_matrix.m_[0][1], gnash_matrix.m_[1][1],
 	    gnash_matrix.m_[0][2], gnash_matrix.m_[1][2]);
   }
+  
+  bool initTestBuffer(unsigned width, unsigned height)
+  {    
+    cairo_surface_t* test_surface =
+      cairo_image_surface_create (CAIRO_FORMAT_ARGB32, width, height);
+    
+    if (cairo_surface_status(test_surface) != CAIRO_STATUS_SUCCESS) {
+      return false;
+    }
+    
+    cairo_t* context = cairo_create(test_surface);
+    
+    if (cairo_status(context) != CAIRO_STATUS_NO_MEMORY) {    
+      return false;    
+    }
+    
+    cairo_surface_destroy(test_surface);
+    
+    set_context(context);    
+  
+    return true;
+  }
+  
+  unsigned int getBitsPerPixel() const
+  {
+    cairo_surface_t* surface = cairo_get_target (_cr);
+    
+    cairo_format_t format = cairo_image_surface_get_format (surface);
+    
+    switch(format) {
+      case CAIRO_FORMAT_ARGB32:
+        return 32;
+      case CAIRO_FORMAT_RGB24:
+        // In practice this is 32 with 8 bits unused...
+        return 24;
+      case CAIRO_FORMAT_A8:
+        return 8;
+      case CAIRO_FORMAT_A1:
+        return 1;    
+    }   
+  }
+  
+  bool getPixel(rgba& color_return, int x, int y)
+  {
+    if (x < 0 || y < 0) {
+      return false;
+    }
+
+    cairo_surface_t* surface = cairo_get_target (_cr);
+    
+    assert(cairo_image_surface_get_format (surface) == CAIRO_FORMAT_ARGB32);
+    
+    unsigned char* data = cairo_image_surface_get_data (surface);
+    int width = cairo_image_surface_get_width(surface);
+    int height = cairo_image_surface_get_height(surface);
+    int stride = cairo_image_surface_get_stride(surface);
+    
+    if (x >= width || y >= height) {    
+      return false;
+    }
+    
+    unsigned char* ptr = data + x * stride + y * 4;
+    
+    color_return.m_a = ptr[0];
+    color_return.m_r = ptr[1];
+    color_return.m_g = ptr[2];
+    color_return.m_b = ptr[3];
+
+    return true;
+  }
+  
     
 private:
   /// The cairo context.

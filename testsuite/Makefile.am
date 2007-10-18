@@ -46,6 +46,7 @@ libtestsuite_la_CXXFLAGS = \
 	-I$(top_srcdir)/server/parser  \
 	-I$(top_srcdir)/server/vm  \
 	$(BOOST_CFLAGS) \
+	$(CAIRO_CFLAGS) \
 	$(NULL)
 
 if ENABLE_MING

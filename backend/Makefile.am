@@ -118,6 +118,7 @@ noinst_LTLIBRARIES += libgnashcairo.la
 # plugins_LTLIBRARIES += libgnashcairo.la
 libgnashcairo_la_SOURCES = render_handler_tri.cpp  render_handler_cairo.cpp
 #libgnashcairo_la_LDFLAGS = -module -avoid-version -no-undefined
+libgnashcairo_la_LIBADD = $(CAIRO_LIBS)
 endif
 endif
 

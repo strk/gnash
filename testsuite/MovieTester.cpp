@@ -36,6 +36,7 @@
 #include "render.h"
 #include "render_handler.h"
 #include "render_handler_agg.h"
+#include "render_handler_cairo.h"
 
 #include <cstdio>
 #include <string>
@@ -423,6 +424,9 @@ MovieTester::initTestingRenderers()
 
 #ifdef RENDERER_CAIRO
 	// Initialize Cairo
+	handler.reset(renderer::cairo::create_handler());
+
+        addTestingRenderer(handler, "Cairo");
 #endif
 
 #ifdef RENDERER_OPENGL

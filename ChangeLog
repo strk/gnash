@@ -1,3 +1,14 @@
+2007-10-17 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler_cairo.cpp: Implement getPixel and
+	related methods to enable automated renderer testing.
+	* backend/Makefile.am: Add CAIRO_LIBS.
+	* gui/gtk_glue_cairo.cpp: Let the renderer deal with
+	cairo_t destruction.
+	* testsuite/Makefile.am: Add CAIRO_CFLAGS so we can include
+	render_handler_cairo.h.
+	* testsuite/MovieTester.cpp: Enable Cairo renderer testing.
+
 2007-10-17 Sandro Santilli <strk@keybit.net>
 
 	* server/edit_text_character.{cpp,h}: add initial support for
