@@ -864,7 +864,7 @@ public:
   }
   
   bool initTestBuffer(unsigned width, unsigned height)
-  {    
+  {
     cairo_surface_t* test_surface =
       cairo_image_surface_create (CAIRO_FORMAT_ARGB32, width, height);
     
@@ -874,7 +874,7 @@ public:
     
     cairo_t* context = cairo_create(test_surface);
     
-    if (cairo_status(context) != CAIRO_STATUS_NO_MEMORY) {    
+    if (cairo_status(context) == CAIRO_STATUS_NO_MEMORY) {    
       return false;    
     }
     
@@ -917,18 +917,18 @@ public:
     unsigned char* data = cairo_image_surface_get_data (surface);
     int width = cairo_image_surface_get_width(surface);
     int height = cairo_image_surface_get_height(surface);
-    int stride = cairo_image_surface_get_stride(surface);
+    int stride = cairo_image_surface_get_stride(surface); // in bytes
     
     if (x >= width || y >= height) {    
       return false;
     }
     
-    unsigned char* ptr = data + x * stride + y * 4;
+    unsigned char* ptr = data + y * stride + x * 4;
     
-    color_return.m_a = ptr[0];
-    color_return.m_r = ptr[1];
-    color_return.m_g = ptr[2];
-    color_return.m_b = ptr[3];
+    color_return.m_a = ptr[3];
+    color_return.m_r = ptr[2];
+    color_return.m_g = ptr[1];
+    color_return.m_b = ptr[0];
 
     return true;
   }

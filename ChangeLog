@@ -1,3 +1,9 @@
+2007-10-18 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler_cairo.cpp: initTestBuffer: fix a set of
+	typos to allow the testsuite to actually test the renderer. No
+	XFAILs so far; one XPASS (masks_test2runner.cpp:58).
+
 2007-10-18 Sandro Santilli <strk@keybit.net>
 
 	* server/edit_text_character.{cpp,h}: send onSetFocus and onKillFocus
