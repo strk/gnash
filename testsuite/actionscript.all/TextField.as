@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.27 2007/09/29 16:22:58 strk Exp $";
+rcsid="$Id: TextField.as,v 1.28 2007/10/18 09:07:18 strk Exp $";
 
 #include "check.as"
 
@@ -65,7 +65,7 @@ check( !TextField.prototype.hasOwnProperty('multiline') );
 check( !TextField.prototype.hasOwnProperty('password') );
 check( !TextField.prototype.hasOwnProperty('restrict') );
 check( !TextField.prototype.hasOwnProperty('scroll') );
-check( !TextField.prototype.hasOwnProperty('selectable') );
+xcheck( !TextField.prototype.hasOwnProperty('selectable') );
 check( !TextField.prototype.hasOwnProperty('text') );
 xcheck( !TextField.prototype.hasOwnProperty('textColor') );
 check( !TextField.prototype.hasOwnProperty('textHeight') );
@@ -134,7 +134,7 @@ xcheck( TextField.prototype.hasOwnProperty('multiline') );
 xcheck( TextField.prototype.hasOwnProperty('password') );
 xcheck( TextField.prototype.hasOwnProperty('restrict') );
 xcheck( TextField.prototype.hasOwnProperty('scroll') );
-xcheck( TextField.prototype.hasOwnProperty('selectable') );
+check( TextField.prototype.hasOwnProperty('selectable') );
 xcheck( TextField.prototype.hasOwnProperty('text') );
 check( TextField.prototype.hasOwnProperty('textColor') );
 xcheck( TextField.prototype.hasOwnProperty('textHeight') );
@@ -427,11 +427,13 @@ xcheck_equals(tf.scroll, 1); // read-only
 
 // Check TextField.selectable
 
-xcheck_equals(typeof(tf.selectable), 'boolean');
+check_equals(typeof(tf.selectable), 'boolean');
 check( ! tf.hasOwnProperty('selectable') ); 
-xcheck_equals(tf.selectable, true);
+check_equals(tf.selectable, true);
 tf.selectable = false;
 check_equals(tf.selectable, false);
+tf.selectable = "Hello";
+check_equals(typeof(tf.selectable), 'boolean');
 tf.selectable = true;
 
 // Check TextField._soundbuftime

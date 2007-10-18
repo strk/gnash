@@ -70,7 +70,7 @@ public:
 
 	~edit_text_character();
 
-	// TODO: should this return !m_def->get_no_select() ?
+	// TODO: should this return isSelectable() ?
 	bool can_handle_mouse_event() const { return true; }
 
 	character* get_topmost_mouse_entity(float x, float y);
@@ -258,6 +258,19 @@ public:
 		_html = on;
 	}
 
+	/// Return true if the TextField text is selectable
+	bool isSelectable() const
+	{
+		return _selectable;
+	}
+
+	/// Set 'selectable' parameter
+	void setSelectable(bool v) 
+	{
+		_selectable = v;
+	}
+
+
 private:
 
 	/// Call this function when willing to invoke the onChanged event handler
@@ -371,6 +384,8 @@ private:
 	bool _wordWrap;
 
 	bool _html;
+
+	bool _selectable;
 
 	AutoSizeValue _autoSize;
 

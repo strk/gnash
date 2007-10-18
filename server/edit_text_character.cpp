@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.124 2007/10/17 05:41:35 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.125 2007/10/18 09:07:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -86,6 +86,7 @@ static as_value textfield_embedFonts_getset(const fn_call& fn);
 static as_value textfield_autoSize_getset(const fn_call& fn);
 static as_value textfield_wordWrap_getset(const fn_call& fn);
 static as_value textfield_html_getset(const fn_call& fn);
+static as_value textfield_selectable_getset(const fn_call& fn);
 
 
 //
@@ -339,6 +340,8 @@ attachTextFieldInterface(as_object& o)
 	o.init_property("wordWrap", *getset, *getset);
 	getset = new builtin_function(textfield_html_getset);
 	o.init_property("html", *getset, *getset);
+	getset = new builtin_function(textfield_selectable_getset);
+	o.init_property("selectable", *getset, *getset);
 
 	// Target seems to not be a normal property
 	getset = new builtin_function(&character::target_getset, NULL);
@@ -416,6 +419,7 @@ edit_text_character::edit_text_character(character* parent,
 	_embedFonts(m_def->getUseEmbeddedGlyphs()),
 	_wordWrap(m_def->do_word_wrap()),
 	_html(m_def->htmlAllowed()),
+	_selectable(!m_def->get_no_select()),
 	_autoSize(autoSizeNone),
 	_bounds(m_def->get_bounds().getRange())
 {
@@ -1945,6 +1949,23 @@ textfield_html_getset(const fn_call& fn)
 	else // setter
 	{
 		ptr->setHtml( fn.arg(0).to_bool() );
+	}
+
+	return as_value();
+}
+
+static as_value
+textfield_selectable_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<edit_text_character> ptr = ensureType<edit_text_character>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		return as_value(ptr->isSelectable());
+	}
+	else // setter
+	{
+		ptr->setSelectable( fn.arg(0).to_bool() );
 	}
 
 	return as_value();
