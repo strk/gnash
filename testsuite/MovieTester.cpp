@@ -36,7 +36,9 @@
 #include "render.h"
 #include "render_handler.h"
 #include "render_handler_agg.h"
+#ifdef RENDERER_CAIRO
 #include "render_handler_cairo.h"
+#endif
 
 #include <cstdio>
 #include <string>

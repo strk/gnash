@@ -1,3 +1,7 @@
+2007-10-18 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* testsuite/MovieTester.cpp: Conditionally include cairo header.
+
 2007-10-18 Chad Musick <chadmusick@msbx.net>
 
 	* server/Property.cpp: New file -- Definition of properties now requires
