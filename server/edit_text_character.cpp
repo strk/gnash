@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.125 2007/10/18 09:07:18 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.126 2007/10/18 11:47:54 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -772,7 +772,7 @@ edit_text_character::get_text_value() const
 
 void
 edit_text_character::set_member(string_table::key name,
-		const as_value& val)
+		const as_value& val, string_table::key nsname)
 {
 	//log_msg("edit_text_character.set_member(%s, %s)", name.c_str(), val.to_string());
 
@@ -957,11 +957,12 @@ edit_text_character::set_member(string_table::key name,
 	}	// end switch
 
 
-	set_member_default(name, val);
+	set_member_default(name, val, nsname);
 }
 
 bool
-edit_text_character::get_member(string_table::key name, as_value* val)
+edit_text_character::get_member(string_table::key name, as_value* val,
+	string_table::key nsname)
 {
 	//log_msg("edit_text_character.get_member(%s)", name.c_str());
 
@@ -1042,7 +1043,7 @@ edit_text_character::get_member(string_table::key name, as_value* val)
 	}
 	}	// end switch
 
-	return get_member_default(name, val);
+	return get_member_default(name, val, nsname);
 }
 	
 

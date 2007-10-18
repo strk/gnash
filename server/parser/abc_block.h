@@ -29,6 +29,7 @@
 #include "stream.h"
 #include "string_table.h"
 #include "asClass.h"
+#include "asName.h"
 
 namespace gnash {
 
@@ -40,40 +41,6 @@ class ClassHierarchy;
 namespace abc_parsing {
 
 class abc_Trait;
-
-class abc_Multiname
-{
-public:
-    typedef enum
-    {
-		KIND_Qname = 0x07,
-		KIND_QnameA = 0x0D,
-		KIND_RTQname = 0x0F,
-		KIND_RTQnameA = 0x10,
-		KIND_RTQnameL = 0x11,
-		KIND_RTQnameLA = 0x12,
-		KIND_Multiname = 0x09,
-		KIND_MultinameA = 0x0E,
-		KIND_MultinameL = 0x1B,
-		KIND_MultinameLA = 0x1C
-	} kinds;
-	typedef enum
-	{
-		FLAG_ATTR = 0x01,
-		FLAG_QNAME = 0x02,
-		FLAG_RTNS = 0x04,
-		FLAG_RTNAME = 0x08,
-		FLAG_NSSET = 0x10
-	} flags;
-
-	uint8_t mFlags;
-	string_table::key mName;
-	asNamespace* mNamespace;
-	std::vector<asNamespace*> *mNamespaceSet;
-
-	abc_Multiname() : mFlags(0), mName(0), mNamespace(NULL), mNamespaceSet(NULL)
-	{/**/}
-};
 
 class abc_Trait
 {
@@ -132,8 +99,7 @@ typedef std::vector<asNamespace*> NamespaceSet;
 			
 class abc_block
 {
-private:
-	friend class abc_parsing::abc_Trait;
+public:
 	typedef enum
 	{
 		PRIVATE_NS = 0x05,
@@ -163,13 +129,13 @@ private:
 
 	std::vector<int32_t> mIntegerPool;
 	std::vector<uint32_t> mUIntegerPool;
-	std::vector<long double> mDoublePool;
+	std::vector<double> mDoublePool;
 	std::vector<std::string> mStringPool;
 	std::vector<string_table::key> mStringPoolTableIds;
 	std::vector<asNamespace*> mNamespacePool;
 	std::vector<NamespaceSet> mNamespaceSetPool;
 	std::vector<asMethod*> mMethods;
-	std::vector<abc_parsing::abc_Multiname> mMultinamePool;
+	std::vector<asName> mMultinamePool;
 	std::vector<asClass*> mClasses; 
 	std::vector<asClass*> mScripts;
 	std::vector<abc_parsing::abc_Trait*> mTraits;
@@ -182,7 +148,7 @@ private:
 
 	uint32_t mVersion;
 
-	asClass *locateClass(abc_parsing::abc_Multiname &m);
+	asClass *locateClass(asName &m);
 
 	abc_parsing::abc_Trait &newTrait()
 	{

@@ -49,7 +49,13 @@ public:
 		dontDelete	= 1 << 1,
 
 		/// Protect from assigning a value
-		readOnly	= 1 << 2
+		readOnly	= 1 << 2,
+
+		/// Property is static -- assignments change, not override.
+		staticProp	= 1 << 3,
+
+		/// Flags are protected from changes
+		isProtected	= 1 << 4
 	};
 
 	/// mask for flags
@@ -61,7 +67,7 @@ public:
 
 
 	/// Default constructor
-	as_prop_flags() : _flags(0), _protected(false)
+	as_prop_flags() : _flags(0)
 	{
 	}
 
@@ -70,26 +76,34 @@ public:
 		:
 		_flags(((read_only) ? readOnly : 0) |
 				((dont_delete) ? dontDelete : 0) |
-				((dont_enum) ? dontEnum : 0)),
-		_protected(false)
+				((dont_enum) ? dontEnum : 0))
 	{
 	}
 
 	/// Constructor, from numerical value
 	as_prop_flags(const int flags)
-		: _flags(flags), _protected(false)
+		: _flags(flags)
 	{
 	}
 
 	bool operator== (const as_prop_flags& o) const
 	{
-		return ( _flags == o._flags ) && ( _protected == o._protected );
+		return ( _flags == o._flags );
 	}
 
 	bool operator!= (const as_prop_flags& o) const
 	{
-		return ( _flags != o._flags ) || ( _protected != o._protected );
+		return ( _flags != o._flags );
 	}
+
+	/// Get "static" flag
+	bool get_static() const { return (_flags & staticProp) ? true : false; }
+
+	/// Set "static" flag
+	void set_static() { _flags |= staticProp; }
+
+	/// Clear "static" flag
+	void clear_static() { _flags &= ~staticProp; }
 
 	/// Get "read-only" flag 
 	bool get_read_only() const { return (((_flags & readOnly)!=0)?true:false); }
@@ -122,13 +136,17 @@ public:
 	int get_flags() const { return _flags; }
 
 	/// Get "protected" flag
-	bool get_is_protected() const { return _protected; }
+	bool get_is_protected() const { return (_flags & isProtected) ? true : false; }
 
 	/// Set "protected" flag
 	//
-	/// @@ why isn't this a bitflag like the others ?
-	///
-	void set_is_protected(const bool is_protected) { _protected = is_protected; }
+	void set_is_protected(const bool is_protected)
+	{
+		if (is_protected)
+			_flags |= isProtected;
+		else
+			_flags &= ~isProtected;
+	}
 
 	/// set the numerical flags value (return the new value )
 	/// If unlocked is false, you cannot un-protect from over-write,

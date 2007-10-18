@@ -127,6 +127,8 @@ public:
 
 	void reverse();
 
+	void set_indexed(unsigned int index, const as_value &v);
+
 	/// @param env
 	///	If not-null will be used to properl invoke the toString()
 	///	method against member values.
@@ -290,11 +292,12 @@ public:
 	/// Overridden to provide 'length' member
 	//
 	/// TODO: use a property for handling 'length'
-	virtual bool get_member(string_table::key name, as_value* val);
+	virtual bool get_member(string_table::key name, as_value* val,
+		string_table::key nsname = 0);
 
 	/// Overridden to provide array[#]=x semantic
 	virtual void set_member(string_table::key name,
-		const as_value& val );
+		const as_value& val, string_table::key nsname = 0);
 
 	/// Enumerate elements
 	//

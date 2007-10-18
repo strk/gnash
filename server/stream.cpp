@@ -15,6 +15,7 @@
 #include "swf.h"
 #include <cstring>
 //#include <iostream> // debugging only
+#include "Property.h"
 
 namespace gnash {
 	

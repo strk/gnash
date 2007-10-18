@@ -378,7 +378,6 @@ movie_root::notify_key_event(key::code k, bool down)
 
 	// Notify character key listeners.
 	notify_key_listeners(k, down);
-
 #ifndef NEW_KEY_LISTENER_LIST_DESIGN
 	// Notify both character and non-character Key listeners
 	//	for user defined handerlers.

@@ -137,6 +137,8 @@ static string_table::svt preload_names[] =
 	{ "flash.xml", NSV::NS_FLASH_XML },
 	{ "flash.ui", NSV::NS_FLASH_UI },
 	{ "adobe.utils", NSV::NS_ADOBE_UTILS },
+	{ "", NSV::INTERNAL_TYPE },
+	{ "", NSV::INTERNAL_STACK_PARENT }
 };
 
 void load_strings(string_table *table, int version)

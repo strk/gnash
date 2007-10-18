@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Object.cpp,v 1.31 2007/09/19 14:20:50 cmusick Exp $ */
+/* $Id: Object.cpp,v 1.32 2007/10/18 11:47:55 cmusick Exp $ */
 
 #include "tu_config.h"
 #include "Object.h"
@@ -148,6 +148,7 @@ void object_class_init(as_object& global)
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
 		attachObjectInterface(*cl);
+		cl->init_member("prototype", as_value(getObjectInterface()));
 		     
 	}
 

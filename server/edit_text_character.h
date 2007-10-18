@@ -112,9 +112,11 @@ public:
 	std::string get_text_value() const;
 
 	/// We have a "text" member.
-	void set_member(string_table::key name, const as_value& val);
+	void set_member(string_table::key name, const as_value& val, 
+		string_table::key nsname = 0);
 
-	bool get_member(string_table::key name, as_value* val);
+	bool get_member(string_table::key name, as_value* val, 
+		string_table::key nsname = 0);
 
 	/// Draw the dynamic string.
 	void	display();

@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.128 2007/10/03 21:43:05 tgc Exp $
+# $Id: Makefile.am,v 1.129 2007/10/18 11:47:53 cmusick Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -57,7 +57,7 @@ AM_CPPFLAGS = \
 
 libgnashserver_la_SOURCES = \
 	BitmapMovieInstance.cpp \
-	GetterSetter.cpp \
+	Property.cpp \
 	PropertyList.cpp \
 	URLAccessManager.cpp \
 	as_environment.cpp \
@@ -115,7 +115,6 @@ libgnashserver_la_SOURCES = \
 	$(NULL)
 
 noinst_HEADERS = \
-	GetterSetter.h \
 	Property.h \
 	PropertyList.h \
 	Sprite.h \

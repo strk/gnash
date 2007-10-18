@@ -74,7 +74,7 @@ public:
 	/// when you need more than that.
 	void grow(unsigned int i)
 	{
-		unsigned int available = (1 << mChunkShift) * mData.size() - mEnd - 1;
+		unsigned int available = (1 << mChunkShift) * mData.size() - mEnd + 1;
 		while (available < i)
 		{
 			mData.push_back(new T[1 << mChunkShift]);
@@ -87,6 +87,12 @@ public:
 	/// Gives the size of the stack which is currently accessible.
 	unsigned int getDownstop() const 
 	{ return mDownstop; }
+
+	/// Alias for getDownstop()
+	unsigned int size() const { return getDownstop(); }
+
+	/// Is the stack empty to us? (Check totalSize() != for actually empty)
+	bool empty() const { return mDownstop == 0; }
 
 	/// Makes the stack appear empty to subsequent callers.  This can be used
 	/// to simulate multiple stacks with a single stack, as in function

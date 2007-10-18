@@ -16,12 +16,230 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "asClass.h"
+#include "as_object.h"
 #include "ClassHierarchy.h"
 #include "VM.h"
+#include "namedStrings.h"
+#include "as_value.h"
 
 namespace gnash {
-
 #define STV(x) VM::get().getStringTable().value(x).c_str()
+
+asMethod::asMethod()
+{
+//TODO
+}
+
+void
+asMethod::setOwner(asClass *pOwner)
+{
+	mPrototype->set_member(NSV::PROP_PROTOTYPE, pOwner->getPrototype());
+}
+
+void
+asMethod::setReturnType(asClass */*type*/)
+{
+	/* No-op */
+}
+
+bool
+asMethod::addValue(string_table::key name, asNamespace *ns, uint32_t slotId,
+	asClass *type, as_value& val, bool isconst)
+{
+	if (val.is_object())
+		val.to_object()->set_member(NSV::INTERNAL_TYPE, type->getName());
+
+	string_table::key nsname = ns ? ns->getURI() : 0;
+
+	int flags = as_prop_flags::dontDelete;
+
+	if (isconst)
+		flags |= as_prop_flags::readOnly;
+
+	mPrototype->init_member(name, val, flags, nsname, slotId);
+	return true;
+}
+
+bool
+asClass::addValue(string_table::key name, asNamespace *ns, uint32_t slotId,
+	asClass *type, as_value& val, bool isconst, bool isstatic)
+{
+	if (val.is_object())
+		val.to_object()->set_member(NSV::INTERNAL_TYPE, type->getName());
+
+	string_table::key nsname = ns ? ns->getURI() : 0;
+
+	int flags = as_prop_flags::dontDelete;
+	if (isconst)
+		flags |= as_prop_flags::readOnly;
+	if (isstatic)
+		flags |= as_prop_flags::staticProp;
+
+	mPrototype->init_member(name, val, flags, nsname, slotId);
+	return true;
+}
+
+bool
+asMethod::addMemberClass(string_table::key name, asNamespace *ns,
+	uint32_t slotId, asClass *type)
+{
+	return addSlot(name, ns, slotId, type);
+}
+
+bool
+asClass::addMemberClass(string_table::key name, asNamespace *ns,
+	uint32_t slotId, asClass *type, bool isstatic)
+{
+	return addSlot(name, ns, slotId, type, isstatic);
+}
+
+bool
+asMethod::addSlot(string_table::key name, asNamespace* ns, uint32_t slotId,
+	asClass */*type*/)
+{
+	string_table::key nsname = ns ? ns->getURI() : 0;
+	int flags = as_prop_flags::dontDelete;
+
+	mPrototype->init_member(name, as_value(), flags, nsname, slotId);
+	return true;
+}
+
+bool
+asMethod::addSlotFunction(string_table::key name, asNamespace *ns,
+	uint32_t slotId, asMethod *method)
+{
+	asClass a;
+	a.setName(NSV::CLASS_FUNCTION);
+	as_value b(method->getPrototype());
+	return addValue(name, ns, slotId, &a, b, false);
+}
+
+bool
+asClass::addSlotFunction(string_table::key name, asNamespace *ns,
+	uint32_t slotId, asMethod *method, bool isstatic)
+{
+	asClass a;
+	a.setName(NSV::CLASS_FUNCTION);
+	as_value b(method->getPrototype());
+	return addValue(name, ns, slotId, &a, b, false, isstatic);
+}
+
+bool
+asClass::addSlot(string_table::key name, asNamespace* ns, uint32_t slotId,
+	asClass */*type*/, bool isstatic)
+{
+	string_table::key nsname = ns ? ns->getURI() : 0;
+	int flags = as_prop_flags::dontDelete;
+	if (isstatic)
+		flags |= as_prop_flags::staticProp;
+
+	mPrototype->init_member(name, as_value(), flags, nsname, slotId);
+	return true;
+}
+
+bool
+asMethod::addMethod(string_table::key name, asNamespace* ns, asMethod* method)
+{
+	string_table::key nsname = ns ? ns->getURI() : 0;
+	as_value val(method->getPrototype());
+
+	mPrototype->init_member(name, val, as_prop_flags::readOnly |
+		as_prop_flags::dontDelete | as_prop_flags::dontEnum, nsname);
+	return true;
+}
+
+bool
+asClass::addMethod(string_table::key name, asNamespace* ns, asMethod* method,
+	bool isstatic)
+{
+	string_table::key nsname = ns ? ns->getURI() : 0;
+	as_value val(method->getPrototype());
+	int flags = as_prop_flags::readOnly | as_prop_flags::dontDelete
+		| as_prop_flags::dontEnum;
+	if (isstatic)
+		flags |= as_prop_flags::staticProp;
+
+	mPrototype->init_member(name, val, flags, nsname);
+	return true;
+}
+
+bool
+asClass::addGetter(string_table::key name, asNamespace *ns, asMethod *method,
+	bool isstatic)
+{
+	string_table::key nsname = ns ? ns->getURI() : 0;
+
+	Property *getset = mPrototype->getOwnProperty(name, nsname);
+
+	if (getset)
+		getset->setGetter(method->getPrototype());
+	else
+	{
+		int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum;
+		if (isstatic)
+			flags |= as_prop_flags::staticProp;
+		mPrototype->init_property(name, *method->getPrototype(), 
+			*method->getPrototype(), flags, nsname);
+	}
+	return true;
+}
+
+bool
+asClass::addSetter(string_table::key name, asNamespace *ns, asMethod *method,
+	bool isstatic)
+{
+	string_table::key nsname = ns ? ns->getURI() : 0;
+
+	Property *getset = mPrototype->getOwnProperty(name, nsname);
+
+	if (getset)
+		getset->setSetter(method->getPrototype());
+	else
+	{
+		int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum;
+		if (isstatic)
+			flags |= as_prop_flags::staticProp;
+		mPrototype->init_property(name, *method->getPrototype(), 
+			*method->getPrototype(), flags, nsname);
+	}
+	return true;
+}
+
+bool
+asMethod::addGetter(string_table::key name, asNamespace *ns, asMethod *method)
+{
+	string_table::key nsname = ns ? ns->getURI() : 0;
+
+	Property *getset = mPrototype->getOwnProperty(name, nsname);
+
+	if (getset)
+		getset->setGetter(method->getPrototype());
+	else
+	{
+		int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum;
+		mPrototype->init_property(name, *method->getPrototype(), 
+			*method->getPrototype(), flags, nsname);
+	}
+	return true;
+}
+
+bool
+asMethod::addSetter(string_table::key name, asNamespace *ns, asMethod *method)
+{
+	string_table::key nsname = ns ? ns->getURI() : 0;
+
+	Property *getset = mPrototype->getOwnProperty(name, nsname);
+
+	if (getset)
+		getset->setSetter(method->getPrototype());
+	else
+	{
+		int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum;
+		mPrototype->init_property(name, *method->getPrototype(), 
+			*method->getPrototype(), flags, nsname);
+	}
+	return true;
+}
 
 void
 asNamespace::stubPrototype(string_table::key name)
@@ -31,99 +249,32 @@ asNamespace::stubPrototype(string_table::key name)
 	addClass(name, pClass);
 }
 
-bool
-asMethod::addValue(string_table::key name, asNamespace *ns, uint32_t slotId,
-	asClass *type, as_value& val, bool isconst, ClassHierarchy *CH)
+#if 0 // TODO
+void
+asClass::buildFromPrototype(as_object *o, string_table::key name,
+	ClassHierarchy *pCH)
 {
-	asBoundValue *bv = CH->newBoundValue();
-	bv->setType(type);
-	bv->setValue(val);
-	return addBinding(name, asBinding(ns, bv, slotId, isconst, false));
-}
+	setName(name);
+	PropertyList *pList = &o->_members;
+	PropertyList::iterator i = pList->begin();
 
-bool
-asMethod::addSlot(string_table::key name, asNamespace *ns, uint32_t slotId,
-	asClass *type, ClassHierarchy *CH)
-{
-	asBoundValue *bv = CH->newBoundValue();
-	bv->setType(type);
-	return addBinding(name, asBinding(ns, bv, slotId, false));
-}
-
-bool
-asMethod::addMethod(string_table::key name, asNamespace *ns, asMethod *method)
-{
-	return addBinding(name, asBinding(ns, method, false));
-}
-
-bool
-asMethod::addGetter(string_table::key name, asNamespace *ns, asMethod *method,
-	ClassHierarchy *CH)
-{
-	asBinding *bv = getBinding(name);
-	if (bv)
+	for ( ; i != pList->end(); ++i)
 	{
-		asBoundAccessor *a = bv->getAccessor();
-		if (!a)
+		Property *pProp = i->second;
+		fprintf(stderr, "Evaluating property %s.\n", STV(i->first));
+		if (pProp->isDestructive())
 		{
-			// Okay if this is already bound to a value.
-			asBoundValue *v = bv->getValue();
-			if (!v)
-			{
-				// Let caller do the logging.
-				return false;
-			}
-			a = CH->newBoundAccessor();
-			a->setValue(v);
-			bv->reset(a, bv->isStatic());
+			fprintf(stderr, "%s is destructive.\n", STV(i->first));
 		}
-		return a->setGetter(method);
-	}
-	asBoundAccessor *a = CH->newBoundAccessor();
-	a->setGetter(method);
-	return addBinding(name, asBinding(ns, a, false));
-}
-
-bool
-asMethod::addSetter(string_table::key name, asNamespace *ns, asMethod *method,
-	ClassHierarchy *CH)
-{
-	asBinding *bv = getBinding(name);
-	if (bv)
-	{
-		asBoundAccessor *a = bv->getAccessor();
-		if (!a)
+		if (pProp->isGetterSetter())
 		{
-			asBoundValue *v = bv->getValue();
-			if (!v)
-			{
-				// Let caller do the logging.
-				return false;
-			}
-			a = CH->newBoundAccessor();
-			a->setValue(v);
-			bv->reset(a, bv->isStatic());
+			fprintf(stderr, "%s is a getset.\n", STV(i->first));
 		}
-		return a->setSetter(method);
+		if (pProp->isReadOnly())
+		{
+			fprintf(stderr, "%s is read only.\n", STV(i->first));
+		}
 	}
-	asBoundAccessor *a = CH->newBoundAccessor();
-	addBinding(name, asBinding(ns, a, false));
-	return a->setSetter(method);
-}
-
-bool
-asMethod::addMemberClass(string_table::key name, asNamespace *ns,
-	uint32_t slotId, asClass *type)
-{
-	return addBinding(name, asBinding(ns, type, slotId, false));
-}
-
-// TODO: Figure out how this differs from addMethod
-bool
-asMethod::addSlotFunction(string_table::key name, asNamespace *ns,
-	uint32_t slotId, asMethod *method)
-{
-	return addBinding(name, asBinding(ns, method, slotId, false));
 }
 
 bool
@@ -161,75 +312,6 @@ asClass::addMethod(string_table::key name, asNamespace *ns, asMethod *method,
 }
 
 bool
-asClass::addGetter(string_table::key name, asNamespace *ns, asMethod *method,
-	bool isstatic, ClassHierarchy *CH)
-{
-	asBinding *bv;
-	if (!isstatic)
-		bv = getBinding(name);
-	else
-		bv = getStaticBinding(name);
-	if (bv)
-	{
-		asBoundAccessor *a = bv->getAccessor();
-		if (!a)
-		{
-			// Okay if this is already bound to a value.
-			asBoundValue *v = bv->getValue();
-			if (!v)
-			{
-				// Let caller do the logging.
-				return false;
-			}
-			a = CH->newBoundAccessor();
-			a->setValue(v);
-			bv->reset(a, bv->isStatic());
-		}
-		return a->setGetter(method);
-	}
-	asBoundAccessor *a = CH->newBoundAccessor();
-	a->setGetter(method);
-	if (!isstatic)
-		return addBinding(name, asBinding(ns, a, isstatic));
-	return addStaticBinding(name, asBinding(ns, a, isstatic));
-}
-
-bool
-asClass::addSetter(string_table::key name, asNamespace *ns, asMethod *method,
-	bool isstatic, ClassHierarchy *CH)
-{
-	asBinding *bv;
-	if (!isstatic)
-		bv = getBinding(name);
-	else
-		bv = getStaticBinding(name);
-
-	if (bv)
-	{
-		asBoundAccessor *a = bv->getAccessor();
-		if (!a)
-		{
-			asBoundValue *v = bv->getValue();
-			if (!v)
-			{
-				// Let caller do the logging.
-				return false;
-			}
-			a = CH->newBoundAccessor();
-			a->setValue(v);
-			bv->reset(a, bv->isStatic());
-		}
-		return a->setSetter(method);
-	}
-	asBoundAccessor *a = CH->newBoundAccessor();
-	a->setSetter(method);
-	if (!isstatic)
-		return addBinding(name, asBinding(ns, a, isstatic));
-	else
-		return addStaticBinding(name, asBinding(ns, a, isstatic));
-}
-
-bool
 asClass::addMemberClass(string_table::key name, asNamespace *ns,
 	uint32_t slotId, asClass *type, bool isstatic)
 {
@@ -247,93 +329,5 @@ asClass::addSlotFunction(string_table::key name, asNamespace *ns,
 		return addBinding(name, asBinding(ns, method, slotId, isstatic));
 	return addStaticBinding(name, asBinding(ns, method, slotId, isstatic));
 }
-
-void
-asNamespace::dump()
-{
-	container::iterator i;
-	for (i = mClasses.begin(); i != mClasses.end(); ++i)
-	{
-		if (!((*i->second).isDeclared()))
-		{
-			if (i->second->isSystem())
-				fprintf(stderr, "(Known to internals) ");
-			fprintf(stderr, "%s.%s\n", STV(getURI()),
-				STV(i->second->getName()));
-//		else
-//			(*i->second).dump();
-		}
-	}
-}
-
-void
-asClass::dump()
-{
-	binding_container::iterator i;
-	fprintf(stderr, "Class: %s\n", STV(getName()));
-	for (i = mBindings.begin(); i != mBindings.end(); ++i)
-	{
-		fprintf(stderr, "    ");
-		i->second.dump(i->first);
-	}
-}
-
-void
-asBinding::dump(string_table::key name)
-{
-	if (mNamespace->isProtected())
-		fprintf(stderr, "+");
-	if (mNamespace->isPrivate())
-		fprintf(stderr, "#");
-	if (mConst)
-		fprintf(stderr, "@");
-	fprintf(stderr, "%s: ", STV(name));
-	switch (mType)
-	{
-	case T_CLASS:
-	{
-		fprintf(stderr, "Class %s", STV(mClass->getName()));
-		break;
-	}
-	case T_METHOD:
-	{
-//		if (mConst)
-			fprintf(stderr, "Member Function: %s", STV(mMethod->getReturnType()->getName()));
-//		else
-//			fprintf(stderr, "Function Slot");
-		break;
-	}
-	case T_VALUE:
-	{
-		if (mValue->getType())
-			fprintf(stderr, "Value of type %s", STV(mValue->getType()->getName()));
-		else
-			fprintf(stderr, "Value of unknown type.");
-		break;
-	}
-	case T_ACCESS:
-	{
-		fprintf(stderr, "GetSet: ");
-		if (mAccess->getGetter())
-		{
-			fprintf(stderr, "g:%s ", STV(mAccess->getGetter()->getReturnType()->getName()));
-		}
-		if (mAccess->getSetter())
-		{
-			fprintf(stderr, "s ");
-		}
-		if (mAccess->getValue())
-		{
-			fprintf(stderr, "dv: ");
-			if (mAccess->getValue()->getType())
-				fprintf(stderr, "%s ", STV(mAccess->getValue()->getType()->getName()));
-			else
-				fprintf(stderr, "(unknown type)");
-		}
-		break;
-	}
-	}
-	fprintf(stderr, "\n");
-}
-
+#endif /* 0 */
 } /* namespace gnash */

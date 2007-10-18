@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.49 2007/10/02 13:17:29 strk Exp $ */
+/* $Id: xml.cpp,v 1.50 2007/10/18 11:47:55 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -134,7 +134,7 @@ XML::XML(struct node * /* childNode */)
 }
 
 bool
-XML::get_member(string_table::key name, as_value *val)
+XML::get_member(string_table::key name, as_value *val, string_table::key nsname)
 {
         if (name == NSV::PROP_STATUS) 
         {
@@ -148,11 +148,12 @@ XML::get_member(string_table::key name, as_value *val)
                 return true;
         }
 
-        return get_member_default(name, val);
+        return get_member_default(name, val, nsname);
 }
 
 void
-XML::set_member(string_table::key name, const as_value& val)
+XML::set_member(string_table::key name, const as_value& val, 
+	string_table::key nsname)
 {
         if (name == NSV::PROP_STATUS)
 	{
@@ -176,7 +177,7 @@ XML::set_member(string_table::key name, const as_value& val)
                 return;
         }
 
-        set_member_default(name, val);
+        set_member_default(name, val, nsname);
 }
 
 XML::~XML()

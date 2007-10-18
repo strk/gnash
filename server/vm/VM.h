@@ -36,6 +36,7 @@
 namespace gnash {
 	class movie_definition;
 	class as_object;
+	class Machine;
 }
 
 namespace gnash {
@@ -134,6 +135,8 @@ class DSOEXPORT VM {
 	mutable string_table mStringTable;
 	/// Not mutable since changing this changes behavior of the VM.
 	ClassHierarchy *mClassHierarchy;
+	/// A running execution thread.
+	Machine *mMachine;
 
 public:
 
@@ -176,6 +179,9 @@ public:
 
 	/// Get a reference to the string table used by the VM.
 	string_table& getStringTable() const { return mStringTable; }
+
+	/// Get a pointer to the machine, if it exists.
+	Machine* getMachine() const { return mMachine; }
 
 	/// Get version of the player, in a compatible representation
 	//

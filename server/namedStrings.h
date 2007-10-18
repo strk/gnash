@@ -41,7 +41,11 @@ class string_table; // Forward
 ///
 /// Names beginning with PROP_ have a lowercase initial letter
 /// Names beginning with CLASS_ have an uppercase initial letter
+/// Names beginning with NS_ have a lowercase initial letter and _ are
+///  . instead of uppercase.
 ///
+/// Names beginning with INTERNAL_ have no named string -- they can only
+/// be used if you know their key value already.
 namespace NSV {
 
 typedef enum {
@@ -154,7 +158,9 @@ typedef enum {
 		NS_FLASH_MEDIA,
 		NS_FLASH_XML,
 		NS_FLASH_UI,
-		NS_ADOBE_UTILS
+		NS_ADOBE_UTILS,
+		INTERNAL_TYPE, // The type name
+		INTERNAL_STACK_PARENT // Any public property is unsafe
 	} named_strings;
 
 /// Load the prenamed strings.

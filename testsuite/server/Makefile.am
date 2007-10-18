@@ -40,7 +40,6 @@ check_PROGRAMS = \
 	PointTest \
 	EdgeTest \
 	PropertyListTest \
-	GetterSetterTest \
 	as_prop_flagsTest \
 	DisplayListTest \
 	$(NULL)
@@ -90,11 +89,6 @@ EdgeTest_LDADD = \
 
 PropertyListTest_SOURCES = PropertyListTest.cpp
 PropertyListTest_LDADD = \
-	$(GNASH_LIBS) \
-	$(NULL)
-
-GetterSetterTest_SOURCES = GetterSetterTest.cpp
-GetterSetterTest_LDADD = \
 	$(GNASH_LIBS) \
 	$(NULL)
 

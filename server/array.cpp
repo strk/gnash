@@ -795,7 +795,8 @@ as_array_object::removeFirst(const as_value& v, as_environment& env)
 
 /* virtual public, overriding as_object::get_member */
 bool
-as_array_object::get_member(string_table::key name, as_value *val)
+as_array_object::get_member(string_table::key name, as_value *val,
+	string_table::key nsname)
 {
 	// an index has been requested
 	int index = index_requested(name);
@@ -805,7 +806,7 @@ as_array_object::get_member(string_table::key name, as_value *val)
 		return true;
 	}
 
-	return get_member_default(name, val);
+	return get_member_default(name, val, nsname);
 }
 
 void
@@ -814,10 +815,24 @@ as_array_object::resize(unsigned int newsize)
 	elements.resize(newsize);
 }
 
+void
+as_array_object::set_indexed(unsigned int index,
+	const as_value& val)
+{
+	if (index >= elements.size())
+	{
+		// make sure the vector is large enough.
+		elements.resize(index + 1);
+	}
+
+	elements[index] = val;
+	return;
+}
+
 /* virtual public, overriding as_object::set_member */
 void
 as_array_object::set_member(string_table::key name,
-		const as_value& val )
+		const as_value& val, string_table::key nsname)
 {
 	int index = index_requested(name);
 
@@ -836,7 +851,7 @@ as_array_object::set_member(string_table::key name,
 		return;
 	}
 
-	as_object::set_member_default(name,val);
+	as_object::set_member_default(name,val, nsname);
 }
 
 as_array_object*

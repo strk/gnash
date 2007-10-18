@@ -347,6 +347,14 @@ as_function::constructInstance( as_environment& env,
 
 	boost::intrusive_ptr<as_object> newobj;
 
+	as_value us;
+	bool has_proto = false;
+	get_member(NSV::PROP_PROTOTYPE, &us);
+	if (!us.is_undefined())
+	{
+		has_proto = true;
+	}
+
         // a built-in class takes care of assigning a prototype
 	// TODO: change this
         if ( isBuiltin() )
@@ -408,6 +416,9 @@ as_function::constructInstance( as_environment& env,
 		// We don't need the function result.
 		call(fn_call(newobj.get(), &env, nargs, first_arg_index));
 	}
+
+	if (!has_proto)
+		set_member(NSV::PROP_PROTOTYPE, as_value(newobj));
     
 	return newobj;
 }

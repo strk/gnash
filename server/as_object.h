@@ -45,6 +45,7 @@
 
 #include <cmath>
 #include <utility> // for std::pair
+#include <set>
 
 // Forward declarations
 namespace gnash {
@@ -52,9 +53,13 @@ namespace gnash {
 	class sprite_instance;
 	class as_environment;
 	class VM;
+	class Machine;
 }
 
 namespace gnash {
+
+class asClass;
+class asName;
 
 /// \brief
 /// A generic bag of attributes. Base class for all ActionScript-able objects.
@@ -70,6 +75,10 @@ class DSOEXPORT as_object
 	public ref_counted
 #endif
 {
+	friend class asClass;
+	friend class Machine;
+
+	typedef std::set<std::pair<string_table::key, string_table::key> > propNameSet;
 private:
 	/// Properties of this objects 
 	PropertyList _members;
@@ -85,13 +94,21 @@ private:
 	//
 	/// @returns a Getter/Setter propery if found, NULL if not found
 	///
-	Property* findGetterSetter(string_table::key name);
+	Property* findGetterSetter(string_table::key name, 
+		string_table::key nsname = 0);
 
 	/// Find a property scanning the inheritance chain
-	//
+	///
+	/// @param name
+	/// The string id to look for
+	///
+	/// @param owner
+	/// If not null, this is set to the object which contained the property.
+	///
 	/// @returns a Propery if found, NULL if not found
 	///
-	Property* findProperty(string_table::key name);
+	Property* findProperty(string_table::key name, string_table::key nsname,
+		as_object **owner = NULL);
 
 public:
 
@@ -190,14 +207,21 @@ public:
 	/// @param val
 	///	Value to assign to the named property.
 	///
-	virtual void set_member(string_table::key name, const as_value& val)
+	virtual void set_member(string_table::key name, const as_value& val,
+		string_table::key nsname = 0)
 	{
-		return set_member_default(name, val);
+		return set_member_default(name, val, nsname);
 	}
 
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
 	virtual bool on_event(const event_id& id );
 #endif
+
+	/// Reserve a slot
+	///
+	/// Reserves a slot for a property to follow.
+	void reserveSlot(string_table::key name, string_table::key nsId,
+		unsigned short slotId);
 
 	/// Initialize a member value by string
 	//
@@ -216,7 +240,12 @@ public:
 	///     Flags for the new member. By default dontDelete and dontEnum.
 	///	See as_prop_flags::Flags.
 	///
-	void init_member(const std::string& name, const as_value& val, int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum);
+	/// @param nsname
+	/// The id of the namespace to which this member belongs. 0 is a wildcard
+	/// and will be matched by anything not asking for a specific namespace.
+	void init_member(const std::string& name, const as_value& val, 
+		int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum, 
+		string_table::key nsname = 0);
 
 	/// Initialize a member value by key
 	//
@@ -238,7 +267,18 @@ public:
 	///     Flags for the new member. By default dontDelete and dontEnum.
 	///	See as_prop_flags::Flags.
 	///
-	void init_member(string_table::key key, const as_value& val, int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum);
+	/// @param nsname
+	/// The id of the namespace to which this member belongs. 0 is a wildcard
+	/// and will be matched by anything not asking for a specific namespace.
+	///
+	/// @param slotId
+	/// If this is a non-negative value which will fit in an unsigned short,
+	/// this is used as the slotId and can be subsequently found with
+	/// get_slot
+	///
+	void init_member(string_table::key key, const as_value& val, 
+		int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
+		string_table::key nsname = 0, int slotId = -1);
 
 	/// \brief
 	/// Initialize a getter/setter property by name
@@ -263,8 +303,12 @@ public:
 	///     Flags for the new member. By default dontDelete and dontEnum.
 	///	See as_prop_flags::Flags.
 	///
+	/// @param nsname
+	/// The id of the namespace to which this member belongs. 0 is a wildcard
+	/// and will be matched by anything not asking for a specific namespace.
 	void init_property(const std::string& key, as_function& getter,
-		as_function& setter, int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum);
+		as_function& setter, int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
+		string_table::key nsname = 0);
 
 	/// \brief
 	/// Initialize a getter/setter property by key
@@ -288,8 +332,12 @@ public:
 	///     Flags for the new member. By default dontDelete and dontEnum.
 	///	See as_prop_flags::Flags.
 	///
+	/// @param nsname
+	/// The id of the namespace to which this member belongs. 0 is a wildcard
+	/// and will be matched by anything not asking for a specific namespace.
 	void init_property(string_table::key key, as_function& getter,
-		as_function& setter, int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum);
+		as_function& setter, int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
+		string_table::key nsname = 0);
 
 
 	/// \brief
@@ -316,9 +364,13 @@ public:
 	///     Flags for the new member. By default dontDelete and dontEnum.
 	///	See as_prop_flags::Flags.
 	///
+	/// @param nsname
+	/// The id of the namespace to which this member belongs. 0 is a wildcard
+	/// and will be matched by anything not asking for a specific namespace.
 	///
 	bool init_destructive_property(string_table::key key, as_function& getter,
-		as_function& setter, int flags=as_prop_flags::dontEnum);
+		as_function& setter, int flags=as_prop_flags::dontEnum,
+		string_table::key nsname = 0);
 
 	/// \brief
 	/// Use this method for read-only properties.
@@ -331,8 +383,12 @@ public:
 	/// The arguments are the same as the above init_property arguments,
 	/// although the setter argument is omitted.
 	///
+	/// @param nsname
+	/// The id of the namespace to which this member belongs. 0 is a wildcard
+	/// and will be matched by anything not asking for a specific namespace.
 	void init_readonly_property(const std::string& key, as_function& getter,
-			int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum);
+			int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
+			string_table::key nsname = 0);
 
 	/// Get a member as_value by name
 	//
@@ -355,12 +411,22 @@ public:
 	///	Will be untouched if no property with the given name
 	///	was found.
 	///
+	/// @param nsname
+	/// The id of the namespace to which this member belongs. 0 is a wildcard
+	/// and will be matched by anything not asking for a specific namespace.
+	///
 	/// @return true of the named property was found, false otherwise.
 	///
-	virtual bool get_member(string_table::key name, as_value* val)
+	virtual bool get_member(string_table::key name, as_value* val,
+		string_table::key nsname = 0)
 	{
-		return get_member_default(name, val);
+		return get_member_default(name, val, nsname);
 	}
+
+	/// Chad: Document
+	bool isQName() const { return false; /* TODO: Implement */ }
+	bool isXML() const { return false; /* TODO */ }
+	bool isDictionary() const { return false; /* TODO */ }
 
 	/// Get a member as_value by name in an AS-compatible way
 	//
@@ -374,11 +440,15 @@ public:
 	///	if the current VM is initialized for a  target
 	///	up to SWF6.
 	///
+	/// @param nsname
+	/// The id of the namespace to which this member belongs. 0 is a wildcard
+	/// and will be matched by anything not asking for a specific namespace.
+	///
 	/// @return value of the member (possibly undefined),
 	///	or undefined if not found. Use get_member if you
 	///	need to know wheter it was found or not.
 	///
-	as_value getMember(string_table::key name);
+	as_value getMember(string_table::key name, string_table::key nsname = 0);
 
 	/// Call a method of this object in an AS-compatible way
 	//
@@ -414,6 +484,10 @@ public:
 	///	Case insensitive up to SWF6,
 	///	case *sensitive* from SWF7 up.
 	///
+	/// @param nsname
+	/// The id of the namespace to which this member belongs. 0 is a wildcard
+	/// and will be matched by anything not asking for a specific namespace.
+	///
 	/// @return a pair of boolean values expressing whether the property
 	///	was found (first) and whether it was deleted (second).
 	///	Of course a pair(false, true) would be invalid (deleted
@@ -422,7 +496,7 @@ public:
 	///	- (true, false) : property protected from deletion
 	///	- (true, true) : property successfully deleted
 	///
-	std::pair<bool,bool> delProperty(string_table::key name);
+	std::pair<bool,bool> delProperty(string_table::key name, string_table::key nsname = 0);
 
 	/// Get this object's own named property, if existing.
 	//
@@ -433,11 +507,40 @@ public:
 	///	Case insensitive up to SWF6,
 	///	case *sensitive* from SWF7 up.
 	///
+	/// @param nsname
+	/// The id of the namespace to which this member belongs. 0 is a wildcard
+	/// and will be matched by anything not asking for a specific namespace.
+	///
 	/// @return
 	///	a Property pointer, or NULL if this object doesn't
 	///	contain the named property.
 	///
-	Property* getOwnProperty(string_table::key name);
+	Property* getOwnProperty(string_table::key name, string_table::key nsname = 0);
+
+	/// Get a property from this object (or a prototype) by ordering index.
+	///
+	/// @param index
+	/// An index returned by nextIndex
+	///
+	/// @return
+	/// The property associated with the order index.
+	Property *getByIndex(int index);
+
+	/// Get the next index after the one whose index was used as a parameter.
+	///
+	/// @param index
+	/// 0 is a starter index -- use it to get the first index. Using the
+	/// return value in subsequent calls will walk through all enumerable
+	/// properties in the list.
+	///
+	/// @param owner
+	/// If owner is not NULL, it will be set to the exact object to which
+	/// the property used for the value of index belongs, if such a property
+	/// exists, and left untouched otherwise.
+	///
+	/// @return
+	/// A value which can be fed to getByIndex, or 0 if there are no more.
+	int nextIndex(int index, as_object **owner = NULL);
 
 	/// Set member flags (probably used by ASSetPropFlags)
 	//
@@ -452,17 +555,25 @@ public:
 	/// @param setFalse
 	///	the set of flags to clear
 	///
+	/// @param nsname
+	/// The id of the namespace to which this member belongs. 0 is a wildcard
+	/// and will be matched by anything not asking for a specific namespace.
+	///
 	/// @return true on success, false on failure
 	///	(non-existent or protected member)
 	///
 	bool set_member_flags(string_table::key name,
-			int setTrue, int setFalse=0);
+			int setTrue, int setFalse=0, string_table::key nsname = 0);
 
 	/// Cast to a sprite, or return NULL
 	virtual sprite_instance* to_movie() { return NULL; }
 
 	/// Cast to a as_function, or return NULL
 	virtual as_function* to_function() { return NULL; }
+
+	/// Add an interface to the list of interfaces.
+	/// Used by instanceOf
+	void add_interface(as_object* ctor);
 
 	/// \brief
 	/// Check whether this object is an instance of the given
@@ -625,7 +736,8 @@ protected:
 	/// @param val
 	///     The as_value to store a found variable's value in.
 	///
-	bool get_member_default(string_table::key name, as_value* val);
+	bool get_member_default(string_table::key name, as_value* val, 
+		string_table::key nsname);
 
 	/// Set a member value
 	//
@@ -643,7 +755,8 @@ protected:
 	/// @param val
 	///	Value to assign to the named property.
 	///
-	void set_member_default(string_table::key name, const as_value& val);
+	void set_member_default(string_table::key name, const as_value& val, 
+		string_table::key nsname);
 
 #ifdef GNASH_USE_GC
 	/// Mark all reachable resources, override from GcResource.
@@ -672,6 +785,10 @@ protected:
 	VM& _vm;
 
 private:
+
+	/// The constructors of the objects which are the interfaces
+	/// implemented by this one.
+	std::list<as_object*> mInterfaces;
 
 	/// Reference to this object's '__proto__'
 	//boost::intrusive_ptr<as_object> m_prototype;

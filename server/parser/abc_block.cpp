@@ -25,6 +25,7 @@
 #include "ClassHierarchy.h"
 #include "asClass.h"
 #include "namedStrings.h"
+#include "CodeStream.h"
 
 //#define ERR(x) IF_VERBOSE_MALFORMED_SWF(log_swferror x;);
 #define ERR(x) printf x; fflush(stdout);
@@ -55,10 +56,10 @@ abc_Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 		// The name has been validated in read.
 		if (mHasValue)
 			pClass->addValue(mName, mNamespace, mSlotId, pType, 
-				mValue, mKind == KIND_CONST, do_static, pBlock->mCH);
+				mValue, mKind == KIND_CONST, do_static);
 		else
 			pClass->addSlot(mName, mNamespace, mSlotId, pType,
-				do_static, pBlock->mCH);
+				do_static);
 		break;
 	}
 	case KIND_METHOD:
@@ -68,12 +69,12 @@ abc_Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 	}
 	case KIND_GETTER:
 	{
-		pClass->addGetter(mName, mNamespace, mMethod, do_static, pBlock->mCH);
+		pClass->addGetter(mName, mNamespace, mMethod, do_static);
 		break;
 	}
 	case KIND_SETTER:
 	{
-		pClass->addSetter(mName, mNamespace, mMethod, do_static, pBlock->mCH);
+		pClass->addSetter(mName, mNamespace, mMethod, do_static);
 		break;
 	}
 	case KIND_CLASS:
@@ -117,9 +118,9 @@ abc_Trait::finalize_mbody(abc_block *pBlock, asMethod *pMethod)
 		// The name has been validated in read.
 		if (mHasValue)
 			pMethod->addValue(mName, mNamespace, mSlotId, pType, 
-				mValue, mKind == KIND_CONST, pBlock->mCH);
+				mValue, mKind == KIND_CONST);
 		else
-			pMethod->addSlot(mName, mNamespace, mSlotId, pType,	pBlock->mCH);
+			pMethod->addSlot(mName, mNamespace, mSlotId, pType);
 		break;
 	}
 	case KIND_METHOD:
@@ -129,12 +130,12 @@ abc_Trait::finalize_mbody(abc_block *pBlock, asMethod *pMethod)
 	}
 	case KIND_GETTER:
 	{
-		pMethod->addGetter(mName, mNamespace, mMethod, pBlock->mCH);
+		pMethod->addGetter(mName, mNamespace, mMethod);
 		break;
 	}
 	case KIND_SETTER:
 	{
-		pMethod->addSetter(mName, mNamespace, mMethod, pBlock->mCH);
+		pMethod->addSetter(mName, mNamespace, mMethod);
 		break;
 	}
 	case KIND_CLASS:
@@ -166,13 +167,13 @@ abc_Trait::read(stream* in, abc_block *pBlock)
 		ERR((_("ABC: Bad name for trait.\n")));
 		return false;
 	}
-	if (!(pBlock->mMultinamePool[name].mFlags & abc_Multiname::FLAG_QNAME))
+	if (!pBlock->mMultinamePool[name].isQName())
 	{
 		ERR((_("ABC: Trait name must be fully qualified.\n")));
 		return false;
 	}
-	mName = pBlock->mMultinamePool[name].mName;
-	mNamespace = pBlock->mMultinamePool[name].mNamespace;
+	mName = pBlock->mMultinamePool[name].getName();
+	mNamespace = pBlock->mMultinamePool[name].getNamespace();
 
 	uint8_t kind = in->read_u8();
 	mKind = static_cast<kinds> (kind & 0x0F);
@@ -258,13 +259,13 @@ abc_Trait::read(stream* in, abc_block *pBlock)
 using namespace abc_parsing;
 
 asClass *
-abc_block::locateClass(abc_Multiname &m)
+abc_block::locateClass(asName &m)
 {
 	asClass *found = NULL;
 
-	if (m.mNamespace)
+	if (m.getNamespace())
 	{
-		found = m.mNamespace->getClass(m.mName);
+		found = m.getNamespace()->getClass(m.getName());
 		if (found)
 			return found;
 	}
@@ -273,28 +274,28 @@ abc_block::locateClass(abc_Multiname &m)
 		std::vector<asNamespace*>::iterator i;
 		for (i = m.mNamespaceSet->begin(); i != m.mNamespaceSet->end(); ++i)
 		{
-			found = (*i)->getClass(m.mName);
+			found = (*i)->getClass(m.getName());
 			if (found)
 				return found;
 		}
 	}
 	// One last chance: Look globally.
-	found = mCH->getGlobalNs()->getClass(m.mName);
+	found = mCH->getGlobalNs()->getClass(m.getName());
 	if (found)
 		return found;
 
 	// Fake it here for a while.
-	if (m.mNamespace)
+	if (m.getNamespace())
 	{
-		m.mNamespace->stubPrototype(m.mName);
-		found = m.mNamespace->getClass(m.mName);
+		m.getNamespace()->stubPrototype(m.getName());
+		found = m.getNamespace()->getClass(m.getName());
 		return found;
 	}
 	else
 	{
 		// Fake in global.
-		mCH->getGlobalNs()->stubPrototype(m.mName);
-		found = mCH->getGlobalNs()->getClass(m.mName);
+		mCH->getGlobalNs()->stubPrototype(m.getName());
+		found = mCH->getGlobalNs()->getClass(m.getName());
 		return found;
 	}
 	return NULL;
@@ -465,8 +466,8 @@ abc_block::read_multinames()
 	mMultinamePool.resize(count);
 	if (count)
 	{
-		mMultinamePool[0].mName = 0;
-		mMultinamePool[0].mNamespace = mCH->getGlobalNs();
+		mMultinamePool[0].setName(0);
+		mMultinamePool[0].setNamespace(mCH->getGlobalNs());
 	}
 	for (unsigned int i = 1; i < count; ++i)
 	{
@@ -480,38 +481,38 @@ abc_block::read_multinames()
 		// Read, but don't upper validate until after the switch.
 		switch (kind)
 		{
-        case abc_Multiname::KIND_Qname:
-        case abc_Multiname::KIND_QnameA:
+        case asName::KIND_Qname:
+        case asName::KIND_QnameA:
         {
             ns = mS->read_V32();
             name = mS->read_V32();
-            mMultinamePool[i].mFlags |= abc_Multiname::FLAG_QNAME;
-            if (kind == abc_Multiname::KIND_QnameA)
-                mMultinamePool[i].mFlags |= abc_Multiname::FLAG_ATTR;
+			mMultinamePool[i].setQName();
+            if (kind == asName::KIND_QnameA)
+				mMultinamePool[i].setAttr();
             break;
         }
-        case abc_Multiname::KIND_RTQname:
-        case abc_Multiname::KIND_RTQnameA:
+        case asName::KIND_RTQname:
+        case asName::KIND_RTQnameA:
         {
             name = mS->read_V32();
-            mMultinamePool[i].mFlags |= abc_Multiname::FLAG_QNAME
-                | abc_Multiname::FLAG_RTNS;
-            if (kind == abc_Multiname::KIND_RTQnameA)
-                mMultinamePool[i].mFlags |= abc_Multiname::FLAG_ATTR;
+            mMultinamePool[i].mFlags |= asName::FLAG_QNAME
+                | asName::FLAG_RTNS;
+            if (kind == asName::KIND_RTQnameA)
+				mMultinamePool[i].setAttr();
             break;
         }
-        case abc_Multiname::KIND_RTQnameL:
-        case abc_Multiname::KIND_RTQnameLA:
+        case asName::KIND_RTQnameL:
+        case asName::KIND_RTQnameLA:
         {
-            mMultinamePool[i].mFlags |= abc_Multiname::FLAG_QNAME
-                | abc_Multiname::FLAG_RTNAME
-                | abc_Multiname::FLAG_RTNS;
-            if (kind == abc_Multiname::KIND_RTQnameLA)
-                mMultinamePool[i].mFlags |= abc_Multiname::FLAG_ATTR;
+            mMultinamePool[i].mFlags |= asName::FLAG_QNAME
+                | asName::FLAG_RTNAME
+                | asName::FLAG_RTNS;
+            if (kind == asName::KIND_RTQnameLA)
+				mMultinamePool[i].setAttr();
             break;
         }
-        case abc_Multiname::KIND_Multiname:
-        case abc_Multiname::KIND_MultinameA:
+        case asName::KIND_Multiname:
+        case asName::KIND_MultinameA:
         {
             name = mS->read_V32();
             nsset = mS->read_V32();
@@ -521,13 +522,13 @@ abc_block::read_multinames()
                 ERR((_("ABC: 0 selection for namespace set is invalid.\n")));
                 return false;
             }
-            mMultinamePool[i].mFlags |= abc_Multiname::FLAG_NSSET;
-            if (kind == abc_Multiname::KIND_MultinameA)
-                mMultinamePool[i].mFlags |= abc_Multiname::FLAG_ATTR;
+            mMultinamePool[i].mFlags |= asName::FLAG_NSSET;
+            if (kind == asName::KIND_MultinameA)
+                mMultinamePool[i].mFlags |= asName::FLAG_ATTR;
             break;
         }
-        case abc_Multiname::KIND_MultinameL:
-        case abc_Multiname::KIND_MultinameLA:
+        case asName::KIND_MultinameL:
+        case asName::KIND_MultinameLA:
         {
             nsset = mS->read_V32();
             // 0 is not a valid nsset.
@@ -536,10 +537,10 @@ abc_block::read_multinames()
                 ERR((_("ABC: 0 selection for namespace set is invalid.\n")));
                 return false;
             }
-            mMultinamePool[i].mFlags |= abc_Multiname::FLAG_RTNAME
-                | abc_Multiname::FLAG_NSSET;
-            if (kind == abc_Multiname::KIND_MultinameLA)
-                mMultinamePool[i].mFlags |= abc_Multiname::FLAG_ATTR;
+            mMultinamePool[i].mFlags |= asName::FLAG_RTNAME
+                | asName::FLAG_NSSET;
+            if (kind == asName::KIND_MultinameLA)
+				mMultinamePool[i].setAttr();
             break;
         }
         default:
@@ -571,10 +572,10 @@ abc_block::read_multinames()
 		{
 			mStringPoolTableIds[name] = mStringTable->find(mStringPool[name]);
 		}
-		mMultinamePool[i].mName = mStringPoolTableIds[name];
+		mMultinamePool[i].setName(mStringPoolTableIds[name]);
 
 		if (ns)
-			mMultinamePool[i].mNamespace = mNamespacePool[ns];
+			mMultinamePool[i].setNamespace(mNamespacePool[ns]);
 		if (nsset)
 			mMultinamePool[i].mNamespaceSet = &mNamespaceSetPool[nsset];
 	} // End of main loop.
@@ -785,12 +786,12 @@ abc_block::read_instances()
 			return false;
 		}
 		// This must be a QName.
-		if (!(mMultinamePool[index].mFlags & abc_Multiname::FLAG_QNAME))
+		if (!mMultinamePool[index].isQName())
 		{
 			ERR((_("ABC: QName required for instance.\n")));
 			return false;
 		}
-		if (mMultinamePool[index].mNamespace == NULL)
+		if (mMultinamePool[index].getNamespace() == NULL)
 		{
 			ERR((_("ABC: No namespace to use for storing class.\n")));
 			return false;
@@ -800,8 +801,8 @@ abc_block::read_instances()
 		if (!pClass)
 		{
 			pClass = mCH->newClass();
-			if (!mMultinamePool[index].mNamespace->addClass(
-				mMultinamePool[index].mName, pClass))
+			if (!mMultinamePool[index].getNamespace()->addClass(
+				mMultinamePool[index].getName(), pClass))
 			{
 				ERR((_("Duplicate class registration.\n")));
 				return false;
@@ -826,11 +827,11 @@ abc_block::read_instances()
 			if (!pSuper)
 			{
 				ERR((_("ABC: Super type not found (%s), faking.\n"),
-					mStringTable->value(mMultinamePool[super_index].mName).c_str()));
+					mStringTable->value(mMultinamePool[super_index].getName()).c_str()));
 				// While testing, we will add a fake type, rather than abort.
 				pSuper = mCH->newClass();
-				pSuper->setName(mMultinamePool[super_index].mName);
-				mCH->getGlobalNs()->addClass(mMultinamePool[super_index].mName, pSuper);
+				pSuper->setName(mMultinamePool[super_index].getName());
+				mCH->getGlobalNs()->addClass(mMultinamePool[super_index].getName(), pSuper);
 				// return false;
 			}
 
@@ -912,11 +913,7 @@ abc_block::read_instances()
 			ERR((_("ABC: Out of bounds method for initializer.\n")));
 			return false;
 		}
-		if (mMethods[moffset]->getOwner())
-		{
-			ERR((_("ABC: Initializer method already bound.\n")));
-			return false;
-		}
+		// Don't validate for previous owner.
 		pClass->setConstructor(mMethods[moffset]);
 		mMethods[moffset]->setOwner(pClass);
 
@@ -949,11 +946,7 @@ abc_block::read_classes()
 			ERR((_("ABC: Out of bound static constructor for class.\n")));
 			return false;
 		}
-		if (mMethods[moffset]->getOwner())
-		{
-			ERR((_("ABC: Static constructor method already bound.\n")));
-			return false;
-		}
+		// Don't validate for previous owner.
 		pClass->setStaticConstructor(mMethods[moffset]);
 		mMethods[moffset]->setOwner(pClass);
 		
@@ -988,11 +981,7 @@ abc_block::read_scripts()
 			ERR((_("ABC: Out of bounds method for script.\n")));
 			return false;
 		}
-		if (mMethods[moffset]->getOwner())
-		{
-			ERR((_("ABC: Global script initializer is already bound.\n")));
-			return false;
-		}
+		// Don't validate for previous owner.
 		mMethods[moffset]->setOwner(pScript);
 		pScript->setConstructor(mMethods[moffset]);
 		pScript->setSuper(mTheObject);
@@ -1017,8 +1006,6 @@ abc_block::read_method_bodies()
 
 	for (unsigned int i = 0; i < count; ++i)
 	{
-		asMethodBody *pBody = mCH->newMethodBody();
-
 		uint32_t moffset = mS->read_V32();
 		if (moffset >= mMethods.size())
 		{
@@ -1030,7 +1017,7 @@ abc_block::read_method_bodies()
 			ERR((_("ABC: Only one body per method.\n")));
 			return false;
 		}
-		mMethods[moffset]->setBody(pBody);
+		mMethods[moffset]->setBody(new CodeStream);
 
 		// Maximum stack size.
 		mS->skip_V32();
@@ -1043,14 +1030,17 @@ abc_block::read_method_bodies()
 		// Code length
 		uint32_t clength = mS->read_V32();
 		// The code.
-		pBody->setSize(clength);
+		std::vector<char> body(clength);
+		body.resize(clength);
 		unsigned int got_length;
-		if ((got_length = mS->read(pBody->getRaw(), clength)) != clength)
+		if ((got_length = mS->read(&body.front(), clength)) != clength)
 		{
 			ERR((_("ABC: Not enough method body. Wanted %d but got %d.\n"),
-				pBody->getSize(), got_length));
+				clength, got_length));
 			return false;
 		}
+		else
+			mMethods[moffset]->getBody()->reInitialize(&body.front(), clength, true);
 
 		uint32_t ecount = mS->read_V32();
 		for (unsigned int j = 0; j < ecount; ++j)
@@ -1081,7 +1071,7 @@ abc_block::read_method_bodies()
 				if (!pType)
 				{
 					ERR((_("ABC: Unknown type of object to catch. (%s)\n"),
-						mStringTable->value(mMultinamePool[catch_type].mName).c_str()));
+						mStringTable->value(mMultinamePool[catch_type].getName()).c_str()));
 					// return false;
 					// Fake it, for now:
 					pExcept->catchAny();
@@ -1102,8 +1092,8 @@ abc_block::read_method_bodies()
 					ERR((_("ABC: Out of bound name for caught exception.\n")));
 					return false;
 				}
-				pExcept->setName(mMultinamePool[cvn].mName);
-				pExcept->setNamespace(mMultinamePool[cvn].mNamespace);
+				pExcept->setName(mMultinamePool[cvn].getName());
+				pExcept->setNamespace(mMultinamePool[cvn].getNamespace());
 			}
 		} // end of exceptions
 

@@ -36,6 +36,8 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <utility> // for std::pair
 #include "namedStrings.h"
+#include "asName.h"
+#include "asClass.h"
 
 // Anonymous namespace used for module-static defs
 namespace {
@@ -94,11 +96,12 @@ as_object::add_property(const std::string& key, as_function& getter,
 
 /*protected*/
 bool
-as_object::get_member_default(string_table::key name, as_value* val)
+as_object::get_member_default(string_table::key name, as_value* val,
+	string_table::key nsname)
 {
 	assert(val);
 
-	Property* prop = findProperty(name);
+	Property* prop = findProperty(name, nsname);
 	if ( ! prop ) return false;
 
 	try 
@@ -115,41 +118,103 @@ as_object::get_member_default(string_table::key name, as_value* val)
 	
 }
 
-/*private*/
 Property*
-as_object::findProperty(string_table::key key)
+as_object::getByIndex(int index)
 {
-	// don't enter an infinite loop looking for __proto__ ...
-	if (key == NSV::PROP_uuPROTOuu)
+	// The low byte is used to contain the depth of the property.
+	unsigned char depth = index & 0xFF;
+	index /= 256; // Signed
+	as_object *obj = this;
+	while (depth--)
 	{
-		return _members.getProperty(key);
+		obj = obj->get_prototype().get();
+		if (!obj)
+			return NULL;
 	}
 
-	// this set will keep track of visited objects,
-	// to avoid infinite loops
-	std::set< as_object* > visited;
+	return const_cast<Property *>(obj->_members.getPropertyByOrder(index));
+}
 
-	boost::intrusive_ptr<as_object> obj = this;
-	while ( obj && visited.insert(obj.get()).second )
+int
+as_object::nextIndex(int index, as_object **owner)
+{
+skip_duplicates:
+	unsigned char depth = index & 0xFF;
+	unsigned char i = depth;
+	index /= 256; // Signed
+	as_object *obj = this;
+	while (i--)
 	{
-		Property* prop = obj->_members.getProperty(key);
-		if ( prop ) return prop;
-		else obj = obj->get_prototype();
+		obj = obj->get_prototype().get();
+		if (!obj)
+			return 0;
 	}
-
-	// No Property found
-	return NULL;
-
+	
+	const Property *p = obj->_members.getOrderAfter(index);
+	if (!p)
+	{
+		obj = obj->get_prototype().get();
+		if (!obj)
+			return 0;
+		p = obj->_members.getOrderAfter(0);
+		++depth;
+	}
+	if (p)
+	{
+		if (findProperty(p->getName(), p->getNamespace()) != p)
+		{
+			index = p->getOrder() * 256 | depth;
+			goto skip_duplicates; // Faster than recursion.
+		}
+		if (owner)
+			*owner = obj;
+		return p->getOrder() * 256 | depth;
+	}
+	return 0;
 }
 
 /*private*/
 Property*
-as_object::findGetterSetter(string_table::key key)
+as_object::findProperty(string_table::key key, string_table::key nsname, 
+	as_object **owner)
 {
 	// don't enter an infinite loop looking for __proto__ ...
 	if (key == NSV::PROP_uuPROTOuu)
 	{
-		Property* prop = _members.getProperty(key);
+		if (owner != NULL)
+			*owner = this;
+		return _members.getProperty(key, nsname);
+	}
+
+	// keep track of visited objects, avoid infinite loops.
+	std::set<as_object*> visited;
+
+	boost::intrusive_ptr<as_object> obj = this;
+	while (obj && visited.insert(obj.get()).second)
+	{
+		Property* prop = obj->_members.getProperty(key);
+		if (prop)
+		{
+			if (owner != NULL)
+				*owner = obj.get();
+			return prop;
+		}
+		else
+			obj = obj->get_prototype();
+	}
+
+	// No Property found
+	return NULL;
+}
+
+/*private*/
+Property*
+as_object::findGetterSetter(string_table::key key, string_table::key nsname)
+{
+	// don't enter an infinite loop looking for __proto__ ...
+	if (key == NSV::PROP_uuPROTOuu)
+	{
+		Property* prop = _members.getProperty(key, nsname);
 		if ( ! prop ) return NULL;
 		if ( ! prop->isGetterSetter() ) return NULL;
 		return prop;
@@ -162,7 +227,7 @@ as_object::findGetterSetter(string_table::key key)
 	boost::intrusive_ptr<as_object> obj = this;
 	while ( obj && visited.insert(obj.get()).second )
 	{
-		Property* prop = obj->_members.getProperty(key);
+		Property* prop = obj->_members.getProperty(key, nsname);
 		if ( prop && prop->isGetterSetter() )
 		{
 			// what if a property is found which is
@@ -174,7 +239,6 @@ as_object::findGetterSetter(string_table::key key)
 
 	// No Getter/Setter property found
 	return NULL;
-
 }
 
 /*protected*/
@@ -184,7 +248,7 @@ as_object::set_prototype(boost::intrusive_ptr<as_object> proto, int flags)
 	static string_table::key key = NSV::PROP_uuPROTOuu;
 
 	// TODO: check what happens if __proto__ is set as a user-defined getter/setter
-	if (_members.setValue(key, as_value(proto.get()), *this) )
+	if (_members.setValue(key, as_value(proto.get()), *this, 0) )
 	{
 		// TODO: optimize this, don't scan again !
 		_members.setFlags(key, flags, 0);
@@ -192,75 +256,88 @@ as_object::set_prototype(boost::intrusive_ptr<as_object> proto, int flags)
 }
 
 void
-as_object::set_member_default(string_table::key key, const as_value& val )
+as_object::reserveSlot(string_table::key name, string_table::key nsId,
+	unsigned short slotId)
+{
+	_members.reserveSlot(name, nsId, slotId);
+}
+
+// Handles read_only and static properties properly.
+void
+as_object::set_member_default(string_table::key key, const as_value& val,
+	string_table::key nsname)
 {
 	//log_msg(_("set_member_default(%s)"), key.c_str());
-
-	// found a getter/setter property in the inheritance chain
-	// so set that and return
-	Property* prop = findGetterSetter(key);
-	if ( prop )
+	Property* prop = findProperty(key, nsname);
+	if (prop)
 	{
-		try 
+		if (prop->isReadOnly())
 		{
-			//log_msg(_("Found a getter/setter property for key %s"), key.c_str());
-			if (prop->isReadOnly())
-			{
-				IF_VERBOSE_ASCODING_ERRORS(
-                			log_aserror(_("Attempt to set read-only property '%s'"),
-						    _vm.getStringTable().value(key).c_str());
-	                	);
-			} else
-			{
-				prop->setValue(*this, val);
-			}
+			IF_VERBOSE_ASCODING_ERRORS(log_aserror(_(""
+				"Attempt to set read-only property '%s'"),
+				_vm.getStringTable().value(key).c_str()););
 			return;
 		}
-		catch (ActionException& exc)
+
+		if (prop->isGetterSetter() || prop->isStatic())
 		{
-			log_msg(_("%s: Exception %s.  Will create a new member"), _vm.getStringTable().value(key).c_str(), exc.what());
+			try
+			{
+				prop->setValue(*this, val);
+				return;
+			}
+			catch (ActionException& exc)
+			{
+				log_msg(_("%s: Exception %s. Will create a new member"),
+					_vm.getStringTable().value(key).c_str(), exc.what());
+			}
 		}
 	}
 
-	//log_msg(_("Found no getter/setter property for key %s"), key.c_str());
-
-	// No getter/setter property found, so set (or create) a
-	// SimpleProperty (if possible)
-	if (!_members.setValue(key, val, *this) )
+	// Property does not exist, so it won't be read-only. Set it.
+	if (!_members.setValue(key, const_cast<as_value&>(val), *this, nsname))
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Attempt to set read-only property ``%s''"
-			" on object ``%p''"),
-			_vm.getStringTable().value(key).c_str(), (void*)this);
-		);
+			log_aserror(_("Unknown failure in setting property '%s' on "
+			"object '%p'"), _vm.getStringTable().value(key).c_str(),
+			(void*) this););
 	}
-
 }
 
 void
-as_object::init_member(const std::string& key1, const as_value& val, int flags)
+as_object::init_member(const std::string& key1, const as_value& val, int flags,
+	string_table::key nsname)
 {
 	if ( _vm.getSWFVersion() < 7 )
 	{
 		std::string keylower = key1;
 		boost::to_lower(keylower, _vm.getLocale());
 
-		init_member(_vm.getStringTable().find(keylower), val, flags);
+		init_member(_vm.getStringTable().find(keylower), val, flags, nsname);
 
 	}
 	else
 	{
-		init_member(_vm.getStringTable().find(key1), val, flags);
+		init_member(_vm.getStringTable().find(key1), val, flags, nsname);
 	}
 }
 
 void
-as_object::init_member(string_table::key key, const as_value& val, int flags)
+as_object::init_member(string_table::key key, const as_value& val, int flags,
+	string_table::key nsname, int order)
 {
 	//log_debug(_("Initializing member %s for object %p"), _vm.getStringTable().value(key).c_str(), (void*) this);
 
+	if (order >= 0 && !_members.
+		reserveSlot(static_cast<unsigned short>(order), key, nsname))
+	{
+		log_error(_("Attempt to set a slot for either a slot or a property "
+			"which already exists."));
+		return;
+	}
+		
 	// Set (or create) a SimpleProperty 
-	if (! _members.setValue(key, val, *this) )
+	if (! _members.setValue(key, const_cast<as_value&>(val), *this, nsname) )
 	{
 		log_error(_("Attempt to initialize read-only property ``%s''"
 			" on object ``%p'' twice"),
@@ -269,34 +346,34 @@ as_object::init_member(string_table::key key, const as_value& val, int flags)
 		assert(0);
 	}
 	// TODO: optimize this, don't scan again !
-	_members.setFlags(key, flags, 0);
+	_members.setFlags(key, flags, nsname);
 }
 
 void
 as_object::init_property(const std::string& key, as_function& getter,
-		as_function& setter, int flags)
+		as_function& setter, int flags, string_table::key nsname)
 {
 	if ( _vm.getSWFVersion() < 7 )
 	{
 		std::string name = key;
 		boost::to_lower(name, _vm.getLocale());
 		string_table::key k = _vm.getStringTable().find(name);
-		init_property(k, getter, setter, flags);
+		init_property(k, getter, setter, flags, nsname);
 	}
 	else
 	{
 		string_table::key k = _vm.getStringTable().find(key);
-		init_property(k, getter, setter, flags);
+		init_property(k, getter, setter, flags, nsname);
 	}
 
 }
 
 void
 as_object::init_property(string_table::key key, as_function& getter,
-		as_function& setter, int flags)
+		as_function& setter, int flags, string_table::key nsname)
 {
 	bool success;
-	success = _members.addGetterSetter(key, getter, setter);
+	success = _members.addGetterSetter(key, getter, setter, nsname);
 
 	// We shouldn't attempt to initialize a property twice, should we ?
 	assert(success);
@@ -304,35 +381,40 @@ as_object::init_property(string_table::key key, as_function& getter,
 	//log_msg(_("Initialized property '%s'"), name.c_str());
 
 	// TODO: optimize this, don't scan again !
-	_members.setFlags(key, flags, 0);
+	_members.setFlags(key, flags, nsname);
 
 }
 
 bool
 as_object::init_destructive_property(string_table::key key, as_function& getter,
-	as_function& setter, int flags)
+	as_function& setter, int flags, string_table::key nsname)
 {
 	bool success;
 
 	// No case check, since we've already got the key.
-	success = _members.addDestructiveGetterSetter(key, getter, setter);
-	_members.setFlags(key, flags, 0);
+	success = _members.addDestructiveGetterSetter(key, getter, setter, nsname);
+	_members.setFlags(key, flags, nsname);
 	return success;
 }
 
 void
-as_object::init_readonly_property(const std::string& key, as_function& getter, int initflags)
+as_object::init_readonly_property(const std::string& key, as_function& getter,
+	int initflags, string_table::key nsname)
 {
-	init_property(key, getter, getter, initflags);
-
-	as_prop_flags& flags = getOwnProperty(_vm.getStringTable().find(key))->getFlags();
-
-	// ActionScript must not change the flags of this builtin property.
-	flags.set_is_protected(true);
-
-	// Make the property read-only; that is, the default no-op handler will
-	// be triggered when ActionScript tries to set it.
-	flags.set_read_only();
+	string_table::key k;
+	if ( _vm.getSWFVersion() < 7 )
+	{
+		std::string name = key;
+		boost::to_lower(name, _vm.getLocale());
+		k = _vm.getStringTable().find(name);
+	}
+	else
+	{
+		k = _vm.getStringTable().find(key);
+	}
+	init_property(k, getter, getter, initflags | as_prop_flags::readOnly
+		| as_prop_flags::isProtected, nsname);
+	assert(_members.getProperty(k, nsname));
 }
 
 std::string
@@ -350,10 +432,19 @@ as_object::asPropName(string_table::key name)
 
 bool
 as_object::set_member_flags(string_table::key name,
-		int setTrue, int setFalse)
+		int setTrue, int setFalse, string_table::key nsname)
 {
 	// TODO: accept a std::string directly
-	return _members.setFlags(name, setTrue, setFalse);
+	return _members.setFlags(name, setTrue, setFalse, nsname);
+}
+
+void
+as_object::add_interface(as_object* obj)
+{
+	if (std::find(mInterfaces.begin(), mInterfaces.end(), obj) == mInterfaces.end())
+		mInterfaces.push_back(obj);
+	else
+		fprintf(stderr, "Not adding duplicate interface.\n");
 }
 
 bool
@@ -363,8 +454,13 @@ as_object::instanceOf(as_function* ctor)
 
 	std::set< as_object* > visited;
 
+	if (this == ctor)
+	{ assert(0); }
 	while (obj && visited.insert(obj.get()).second )
 	{
+		if (!mInterfaces.empty() &&
+			std::find(mInterfaces.begin(), mInterfaces.end(), obj) != mInterfaces.end())
+			return true;
 		if ( obj->get_prototype() == ctor->getPrototype() ) return true;
 		obj = obj->get_prototype(); 
 	}
@@ -513,11 +609,12 @@ as_object::enumerateProperties(as_environment& env) const
 	// this set will keep track of visited objects,
 	// to avoid infinite loops
 	std::set< as_object* > visited;
+	PropertyList::propNameSet named;
 
 	boost::intrusive_ptr<as_object> obj = const_cast<as_object*>(this);
 	while ( obj && visited.insert(obj.get()).second )
 	{
-		obj->_members.enumerateKeys(env);
+		obj->_members.enumerateKeys(env, named);
 		obj = obj->get_prototype();
 	}
 
@@ -584,32 +681,32 @@ as_object::as_object(const as_object& other)
 }
 
 std::pair<bool,bool>
-as_object::delProperty(string_table::key name)
+as_object::delProperty(string_table::key name, string_table::key nsname)
 {
 	if ( _vm.getSWFVersion() < 7 )
 	{
        	std::string key = _vm.getStringTable().value(name);
 		boost::to_lower(key, _vm.getLocale());
-		return _members.delProperty(_vm.getStringTable().find(key));
+		return _members.delProperty(_vm.getStringTable().find(key), nsname);
 	}
 	else
 	{
-		return _members.delProperty(name);
+		return _members.delProperty(name, nsname);
 	}
 }
 
 Property*
-as_object::getOwnProperty(string_table::key name)
+as_object::getOwnProperty(string_table::key name, string_table::key nsname)
 {
 	if ( _vm.getSWFVersion() < 7 )
 	{
        	std::string key = _vm.getStringTable().value(name);
 		boost::to_lower(key, _vm.getLocale());
-		return _members.getProperty(_vm.getStringTable().find(key));
+		return _members.getProperty(_vm.getStringTable().find(key), nsname);
 	}
 	else
 	{
-		return _members.getProperty(name);
+		return _members.getProperty(name, nsname);
 	}
 }
 
@@ -685,10 +782,10 @@ as_object::on_event(const event_id& id )
 #endif 
 
 as_value
-as_object::getMember(string_table::key name)
+as_object::getMember(string_table::key name, string_table::key nsname)
 {
 	as_value ret;
-	get_member(name, &ret);
+	get_member(name, &ret, nsname);
 	//get_member(PROPNAME(name), &ret);
 	return ret;
 }

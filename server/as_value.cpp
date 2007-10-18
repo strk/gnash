@@ -611,6 +611,13 @@ as_value::set_as_function(as_function* func)
 }
 
 bool
+as_value::conforms_to(string_table::key name)
+{
+	// TODO: Implement
+	return false;
+}
+
+bool
 as_value::equals(const as_value& v, as_environment& env) const
 {
     // Comments starting with numbers refer to the ECMA-262 document

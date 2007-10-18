@@ -1,3 +1,56 @@
+2007-10-18 Chad Musick <chadmusick@msbx.net>
+
+	* server/Property.cpp: New file -- Definition of properties now requires
+	  some support functions.
+	* server/GetterSetter.cpp,.h -- Obsolete file removal, functionality moved
+	  to Property
+	* server/vm/asName.h -- New file, split and combined from abc_block.h and
+	  asClass.h
+	* libbase/string_table.cpp,.h -- Make all empty strings return 0, make a
+	  new function for combining two values with a dot.
+	* server/Makefile.am -- Remove GetterSetter files, add Property.cpp
+	* server/Property.h -- Combine all 3 types (ordinary, getter/setter,
+	  destructive getter/setter) into a single class, Property, using boost::
+	  variant. Remove all virtual functions. Add key and namespace.
+	* server/PropertyList.h,.cpp -- Change container to a multi-index storing
+	  properties by value rather than by pointer, add functions for retrieval
+	  by order number (for AS3). Remove all virtual functions.
+	* server/array.cpp,.h -- Change get_member signature to match the one in
+	  as_object which now includes a namespace.
+	* server/asClass.cpp -- Change asMethod and asClass to use an as_object
+	  backend
+	* server/asClass.h -- Move asName out. Change asMethod and asClass to new
+	  signatures.
+	* server/as_function.cpp -- Add checks for prototype.
+	* server/as_object.cpp -- Chnage to new PropertyList style, some early
+	  code for interfaces (ImplementsOp) which should be working soon.
+	* server/as_object.h -- Support for new PropertyList. Unfinished support
+	  for AS3.
+	* server/as_prop_flags.h -- Added flag for static members, changed
+	  protected variable to a flag.
+	* server/as_value.cpp,.h -- Stubs for implements and namespace support.
+	* server/edit_text_character.cpp,.h -- Change to namespace get_member
+	* server/namedStrings.cpp,.h -- Add some anonymous strings. These can
+	  only be used if you already know their number and are invisible to
+	  clients of the object.
+	* server/sprite_instance.cpp,.h -- Change to namespace get_member
+	* server/stream.cpp -- Depends on Property
+	* server/asobj/ClassHierarchy.cpp,.h -- Use SafeStack instead of
+	  memoryDispenser, change to conform to new definitions of some classes.
+	* server/asobj/Object.cpp -- Make sure construct has Object prototype
+	  set as "prototype" members.
+	* server/asobj/xml.cpp,.h -- Use namespace get_member.
+	* server/parser/abc_block.cpp,.h -- Change to conform to new asClass and
+	  asMethod. No longer safe to call read() in non-AS thread. abc_Multiname
+	  became asName (merged with asName from asClass.h) and was moved to its
+	  own file. Double pool changed from 'long double' to 'double'.
+	* server/swf/tag_loaders.cpp -- Remove read() call from loading abc_block,
+	  since this is no longer safe to do in loader thread.
+	* server/vm/Machine.cpp,.h -- Numerous steps towards completion.
+	* server/vm/VM.h -- Add Machine member to VM object.
+	* testsuite/server/Makefile.am -- Remove obsolete GetterSetterTest
+	* testsuite/server/GetterSetterTest.cpp -- Removed as obsolete.
+
 2007-10-17 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/render_handler_cairo.cpp: Implement getPixel and

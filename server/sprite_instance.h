@@ -538,13 +538,15 @@ public:
 	//
 
 	// See dox in as_object.h
-	bool get_member(string_table::key name, as_value* val);
+	bool get_member(string_table::key name, as_value* val, 
+		string_table::key nsname = 0);
 		
 	/// Set the named member to the value. 
 	//
 	/// Return true if we have that member; false otherwise.
 	///
-	virtual void set_member(string_table::key name, const as_value& val);
+	virtual void set_member(string_table::key name, const as_value& val,
+		string_table::key nsname = 0);
 
 	/// Overridden to look in DisplayList for a match
 	virtual character* get_relative_target(const std::string& name);

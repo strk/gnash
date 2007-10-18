@@ -25,51 +25,102 @@
 #include "config.h"
 #endif
 
+#include <boost/variant.hpp>
+
 #include "as_prop_flags.h"
 #include "as_value.h"
-#include "GetterSetter.h" // for GetterSetterProperty
+#include "string_table.h"
 
 namespace gnash {
 
+class as_function;
+class PropertyList;
+
+/// Simple Holder for getter/setter functions
+class as_accessors
+{
+public:
+	as_function* mGetter;
+	as_function* mSetter;
+
+	as_accessors(as_function* getter, as_function* setter) : mGetter(getter),
+		mSetter(setter)
+	{/**/}
+};
 
 /// An abstract property
-//
-/// This is intended for use only by PropertyList class
-///
 class Property
 {
-protected: // For DestructiveGetterSetterProperty
+private:
+	friend class PropertyList; // For index access
+
 	/// Properties flags
 	as_prop_flags _flags;
 
+	// Store the various types of things that can be held.
+	typedef boost::variant<boost::blank, as_value, as_accessors> boundType;
+	// Changing this doesn't change the identity of the property, so it is
+	// mutable.
+	mutable boundType mBound;
+
+	// If true, as soon as getValue has been invoked once, the
+	// returned value becomes a fixed return (though it can be
+	// overwritten if not readOnly)
+	mutable bool mDestructive;
+	
+	string_table::key mName;
+	string_table::key mNamespace;
+	// An ordering number, for access by order
+	// (AS3 enumeration and slots, AS2 arrays)
+	int mOrderId;
+
+	/// Get a value from a getter function.
+	as_value getDelayedValue(const as_object& this_ptr) const;
+
+	/// Set a value using a setter function.
+	void setDelayedValue(as_object& this_ptr, const as_value& value);
+
 public:
 	/// Default constructor
-	Property()
-	{
-	}
+	Property(string_table::key name = 0, string_table::key nsId = 0) : 
+		mName(name), mNamespace(nsId)
+	{/**/}
 
-	Property(const Property& p)
-		:
-		_flags(p._flags)
-	{
-	}
+	/// Copy constructor
+	Property(const Property& p) :
+		_flags(p._flags), mBound(p.mBound), mDestructive(p.mDestructive),
+		mName(p.mName), mNamespace(p.mNamespace)
+	{/**/}
 
 	/// Constructor taking initial flags
-	Property(const as_prop_flags& flags)
-		:
-		_flags(flags)
-	{
-	}
+	Property(string_table::key name, string_table::key nsId,
+		const as_prop_flags& flags) : _flags(flags),
+		mBound(as_value()), mDestructive(false), mName(name), mNamespace(nsId)
+	{/**/}
 
-	/// \brief
-	/// Virtual destructor, to make sure the appropriate
-	/// destructor is called for derivated classes
-	//
-	/// We've nothing to do here, as our only member is
-	/// the as_prop_flags which should take care of it's
-	/// destruction.
-	///
-	virtual ~Property() {}
+	Property(string_table::key name, string_table::key nsId, 
+		const as_value& value) : mBound(value), mDestructive(false),
+		mName(name), mNamespace(nsId)
+	{/**/}
+
+	Property(string_table::key name, string_table::key nsId,
+		const as_value& value, const as_prop_flags& flags) :
+		_flags(flags), mBound(value), mDestructive(false),
+		mName(name), mNamespace(nsId)
+	{/**/}
+
+	Property(string_table::key name, string_table::key nsId,
+		as_function *getter, as_function *setter, 
+		const as_prop_flags& flags, bool destroy = false) :
+		_flags(flags), mBound(as_accessors(getter, setter)),
+		mDestructive(destroy), mName(name), mNamespace(nsId)
+	{/**/}
+
+	Property(string_table::key name, string_table::key nsId,
+		as_function *getter, as_function *setter, bool destroy = false) :
+		_flags(), mBound(as_accessors(getter, setter)), mDestructive(destroy),
+		mName(name), mNamespace(nsId)
+	{/**/}
 
 	/// accessor to the properties flags
 	const as_prop_flags& getFlags() const { return _flags; }
@@ -88,7 +139,19 @@ public:
 	///
 	/// @return the value of this property
 	///
-	virtual as_value getValue(as_object& this_ptr) const=0;
+	as_value getValue(const as_object& this_ptr) const
+	{
+		switch (mBound.which())
+		{
+		case 0: // blank, nothing to do.
+			return as_value();
+		case 1: // Bound value
+			return boost::get<as_value>(mBound);
+		case 2: // Getter/setter
+			return getDelayedValue(this_ptr);
+		} // end of switch
+		return as_value(); // Not reached.
+	}
 
 	/// Set value of this property
 	//
@@ -106,204 +169,59 @@ public:
 	///	argument of the 'setter' function if this is a Getter/Setter
 	///	property. @see isGetterSetter().
 	///
-	/// TODO: have this function check for readOnly property...
-	///
-	virtual void setValue(as_object& this_ptr, const as_value &value)=0;
+	void setValue(as_object& this_ptr, const as_value &value)
+	{
+		switch (mBound.which())
+		{
+		case 0: // As yet unbound, so make it a simple
+		case 1: // Bound value, set. Trust our callers to check read-only.
+			mBound = value;
+			return;
+		case 2: // Getter/setter
+			// Destructive are always overwritten.
+			if (mDestructive)
+			{
+				mDestructive = false;
+				mBound = value;
+			}
+			else
+				setDelayedValue(this_ptr, value);
+			return;
+		}
+	}
 
-	// clone this property
-	virtual Property* clone() const=0;
-	
+	/// Set the order id
+	void setOrder(int order) { mOrderId = order; }
+
+	/// Get the order id
+	int getOrder() const { return mOrderId; }
+
+	/// Set the setter
+	void setSetter(as_function*);
+
+	/// Set the getter
+	void setGetter(as_function*);
+
 	/// is this a read-only member ?
 	bool isReadOnly() const { return _flags.get_read_only(); }
 
-	/// is this a Getter/Setter property ?
-	virtual bool isGetterSetter() const { return false; }
+	/// Is this a getter/setter property?
+	bool isGetterSetter() const { return mBound.which() == 2; }
+
+	/// is this a destructive property ?
+	bool isDestructive() const { return mDestructive; }
+
+	/// Is this a static property?
+	bool isStatic() const { return _flags.get_static(); }
+
+	/// What is the name of this property?
+	string_table::key getName() const { return mName; }
+
+	/// What is the namespace of this property?
+	string_table::key getNamespace() const { return mNamespace; }
 
 	/// Mark this property as being reachable (for the GC)
-	virtual void setReachable() const=0;
-};
-
-/// A simple property, consisting only of an as_value
-//
-/// This is intended for use only by PropertyList class
-///
-class SimpleProperty: public Property
-{
-	/// value
-	as_value _value;
-
-public:
-
-	SimpleProperty()
-		:
-		Property(),
-		_value()
-	{
-	}
-
-	SimpleProperty(const SimpleProperty& p)
-		:
-		Property(p),
-		_value(p._value)
-	{
-	}
-
-	SimpleProperty(const as_value& value)
-		:
-		Property(),
-		_value(value)
-	{
-	}
-
-	SimpleProperty(const as_value &value, const as_prop_flags& flags)
-		:
-		Property(flags),
-		_value(value)
-	{
-	}
-
-	Property* clone() const { return new SimpleProperty(*this); }
-
-	as_value getValue(as_object&) const { return _value; }
-
-	void setValue(as_object&, const as_value &value)  { _value = value; }
-
-	void setReachable() const { _value.setReachable(); }
-
-};
-
-/// A Getter/Setter property
-//
-/// Basically a small wrapper around GetterSetter.
-/// This is intended for use only by PropertyList.
-///
-class GetterSetterProperty: public Property
-{
-protected: // For use in DestructiveGetterSetterProperty
-	/// Actual Getter / Setter  (the workhorse)
-	GetterSetter _getset;
-
-public:
-
-	/// Construct a GetterSetterProperty given a GetterSetter
-	GetterSetterProperty(const GetterSetter& getset)
-		:
-		Property(),
-		_getset(getset)
-	{
-	}
-
-	/// Overridden constructor to allow flags specification
-	GetterSetterProperty(const GetterSetter& getset,
-			const as_prop_flags& flags)
-		:
-		Property(flags),
-		_getset(getset)
-	{
-	}
-
-	// Copy constructor
-	GetterSetterProperty(const GetterSetterProperty& o)
-		:
-		Property(o),
-		_getset(o._getset)
-	{
-	}
-
-	Property* clone() const { return new GetterSetterProperty(*this); }
-
-	/// Get the value (invokes the getter)
-	as_value getValue(as_object& this_ptr) const
-	{
-		return _getset.getValue(&this_ptr);
-	}
-
-	/// Set the value (invokes the setter)
-	void setValue(as_object& this_ptr, const as_value &value) 
-	{
-		_getset.setValue(&this_ptr, value);
-	}
-
-	/// This *is* a Getter/Setter property !
-	virtual bool isGetterSetter() const { return true; }
-
-	/// Set GetterSetter as reachable (for GC)
-	void setReachable() const
-	{
-		_getset.setReachable();
-	}
-};
-
-/// A destructive Getter/Setter property.
-///
-/// Just like a regular Getter/Setter property, but you only get one chance
-/// to call its getValue -- it then becomes a simple property whose value is
-/// the value returned by getValue.
-///
-class DestructiveGetterSetterProperty : public GetterSetterProperty
-{
-private:
-	mutable bool mDestroyed;
-	mutable as_value mValue;
-
-public:
-	/// Construct a DestructiveGetterSetterProperty
-	DestructiveGetterSetterProperty(const GetterSetter& getset)
-		:
-		GetterSetterProperty(getset),
-		mDestroyed(false),
-		mValue()
-	{/**/}
-
-	/// Allow specific flags.
-	DestructiveGetterSetterProperty(const GetterSetter& getset,
-			const as_prop_flags& flags)
-		:
-		GetterSetterProperty(getset, flags),
-		mDestroyed(false),
-		mValue()
-	{/**/}
-
-	/// Copy constructor
-	DestructiveGetterSetterProperty(const DestructiveGetterSetterProperty& o)
-		:
-		GetterSetterProperty(o),
-		mDestroyed(o.mDestroyed),
-		mValue(o.mValue)
-	{/**/}
-
-	Property* clone() const
-	{
-		if (mDestroyed) 
-			return new SimpleProperty(mValue, _flags);
-		return new DestructiveGetterSetterProperty(*this);
-	}
-
-	/// The point of the destructive type: Only call getter once.
-	as_value getValue(as_object& this_ptr) const
-	{
-		if (!mDestroyed)
-		{
-			mDestroyed = true; // Be sure we can set in get if we like.
-			mValue = _getset.getValue(&this_ptr);
-		}
-		return mValue;
-	}
-
-	/// Set the value (destroys)
-	void setValue(as_object& /*this_ptr*/, const as_value &value) 
-	{
-		// Destroy, if not already.
-		mValue = value;
-		mDestroyed = true;
-	}
-
-	/// Set GetterSetter, mValue as reachable (for GC)
-	void setReachable() const
-	{
-		_getset.setReachable();
-		mValue.setReachable();
-	}
+	void setReachable() const;
 };
 
 } // namespace gnash

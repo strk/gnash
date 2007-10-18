@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.145 2007/09/27 23:59:56 tgc Exp $ */
+/* $Id: tag_loaders.cpp,v 1.146 2007/10/18 11:47:56 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1524,14 +1524,7 @@ abc_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 		name.c_str();
 	}
 
-	bool success = a.read(in);
-	if (success)
-	{
-		/* TODO: Run the script if needed. */
-		fprintf(stderr, "Block read was successful.\n");
-	}
-	else
-		fprintf(stderr, "Block read failed.\n");
+	//TODO: Move this to execution time so that as_object can be used. bool success = a.read(in);
 
 	log_unimpl(_("Action Block tags are parsed but not yet used"));
 }

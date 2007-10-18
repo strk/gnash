@@ -297,13 +297,6 @@ ClassHierarchy::markReachableResources() const
 void
 ClassHierarchy::dump()
 {
-	namespacesContainer::iterator i;
-
-	for (i = mNamespaces.begin(); i != mNamespaces.end(); ++i)
-	{
-		(i->second).dump();
-	}
-	getGlobalNs()->dump();
 }
 
 } /* namespace gnash */

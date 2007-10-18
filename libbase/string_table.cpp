@@ -26,6 +26,10 @@ std::string string_table::mEmpty = "";
 string_table::key
 string_table::find(const std::string& to_find, bool insert_unfound)
 {
+	// Empty strings all map to 0
+	if (to_find.empty())
+		return 0;
+
 	table::nth_index<0>::type::iterator i = mTable.get<0>().find(to_find);
 
 	if (i == mTable.end() && insert_unfound)
@@ -51,6 +55,17 @@ string_table::find(const std::string& to_find, bool insert_unfound)
 	}
 
 	return i->mId;
+}
+
+string_table::key
+string_table::find_dot_pair(string_table::key left, string_table::key right, 
+	bool insert_unfound)
+{
+	if (!right)
+		return left;
+
+	std::string isit = value(left) + "." + value(right);
+	return find(isit, insert_unfound);
 }
 
 string_table::key

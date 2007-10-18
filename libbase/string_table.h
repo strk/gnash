@@ -75,13 +75,19 @@ public:
 	/// not yet in the table and insert_unfound was false.
 	key find(const std::string& to_find, bool insert_unfound = true);
 
+	/// \brief
+	/// Find a string which is the concatentation of two known strings
+	/// with a dot between them. (Used for namespaces.)
+	/// Otherwise, just like find.
+	key find_dot_pair(key left, key right, bool insert_unfound = true);
+
 	/// Find a string by its key.
 	///
 	/// @return
 	/// The string which matches key or "" if an invalid key is given.
 	const std::string& value(key to_find)
 	{ 
-		if (mTable.empty())
+		if (mTable.empty() || !to_find)
 			return mEmpty;
 		table::nth_index<1>::type::iterator r = mTable.get<1>().find(to_find);
 		return (r == mTable.get<1>().end()) ? mEmpty : r->mValue;

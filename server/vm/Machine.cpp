@@ -21,133 +21,9 @@
 #include "ClassHierarchy.h"
 #include "namedStrings.h"
 #include "array.h"
+#include "abc_block.h"
 
 namespace gnash {
-
-/// ENSURE_NUMBER makes sure that the given argument is a number,
-/// calling the valueOf method if necessary -- it's a macro so that
-/// the valueOf method may be pushed if needed, and then whatever
-/// opcode asked for this will be re-entered.
-#define ENSURE_NUMBER(vte)												\
-{																		\
-	as_value *e = &vte;													\
-	if (e->is_object())													\
-	{																	\
-		asBinding *b = e->to_object()->getBinding(NSV::PROP_VALUE_OF);	\
-		if (b)															\
-		{																\
-			mStream->seekTo(opStart);									\
-			mStack.push(*e);											\
-			pushCall(1, e, b);											\
-			break;														\
-		}																\
-	}																	\
-}											   /* end of ENSURE_NUMBER */
-
-/// ENSURE_OBJECT will throw an exception if the argument isn't an
-/// object. It's a macro to match with the other ENSURE_ macros.
-#define ENSURE_OBJECT(vte)												\
-{																		\
-	if (!vte.is_object())												\
-		throw ASException();											\
-}											   /* end of ENSURE_OBJECT */
-
-/// ENSURE_STRING makes sure that the given argument is a string,
-/// calling the toString method if necessary -- it's a macro so that
-/// the toString may be pushed if needed, and then whatever opcode
-/// asked for this will be re-entered.
-#define ENSURE_STRING(vte)												\
-{																		\
-	as_value *c = &vte; /* Don't call vte multiple times */				\
-	if (c->is_object())													\
-	{																	\
-		asBinding *d = c->to_object()->getBinding(NSV::PROP_TO_STRING);	\
-		if (d)															\
-		{																\
-			mStream->seekTo(opStart);									\
-			mStack.push(*c);											\
-			pushCall(1, c, d);											\
-			break;														\
-		}																\
-	}																	\
-}											   /* end of ENSURE_STRING */
-
-/// ABSTRACT_COMPARE is the abstract comparison as described in the ECMA
-/// standard.  The 'truth_of_undefined' is used to specify which value
-/// should be set for NaN values. It's a macro so that calls may be
-/// pushed in the ENSURE_STRING and ENSURE_NUMBER macros.
-#define ABSTRACT_COMPARE(store, rv1, rv2, truth_of_undefined) 			\
-{ 																		\
-	as_value &a = rv1; /* Don't call rv1 multiple times */				\
-	as_value &b = rv2; /* Don't call rv2 multiple times */				\
-	if (a.ptype() == PTYPE_STRING && b.ptype() == PTYPE_STRING) 		\
-	{ 																	\
-		ENSURE_STRING(a); 												\
-		ENSURE_STRING(b); 												\
-		store = a.to_string() < b.to_string(); 							\
-	} 																	\
-	else 																\
-	{ 																	\
-		ENSURE_NUMBER(a); 												\
-		ENSURE_NUMBER(b); 												\
-		double ad = a.to_number(); double bd = b.to_number();			\
-		if (isnan(ad) || isnan(bd))										\
-			store = truth_of_undefined; 								\
-		else if (isinf(ad) && ad > 0)	 								\
-			store = false; 												\
-		else if (isinf(bd) && bd > 0)	 								\
-			store = true; 												\
-		else if (isinf(bd) && bd < 0)	 								\
-			store = false; 												\
-		else if (isinf(ad) && ad < 0)									\
-			store = true;												\
-		else 															\
-			store = ad < bd; 											\
-	} 																	\
-}											/* end of ABSTRACT_COMPARE */
-
-#define ABSTRACT_EQUALITY(st, ev1, ev2, strictness_on)					\
-{																		\
-	bool *store = &st;													\
-	as_value &a = ev1; /* Don't call ev1 multiple times */				\
-	as_value &b = ev2; /* Don't call ev2 multiple times */				\
-	if (a.is_object() && b.is_object())									\
-		*store = a.to_object() == b.to_object();						\
-	else if (a.is_object() || b.is_object())							\
-		*store = false;													\
-	else if (a.ptype() != b.ptype())									\
-	{																	\
-		if (!strictness_on && (a.is_undefined() || b.is_undefined()) && \
-			(a.is_null() || b.is_null()))								\
-			*store = true;												\
-		else															\
-			*store = false;												\
-	}																	\
-	else if (a.is_number())												\
-	{																	\
-		double ad = a.to_number(); double bd = b.to_number();			\
-		if (isnan(ad) || isnan(bd))										\
-			*store = false;												\
-		else if (isinf(ad) && ad > 0)									\
-			*store = (isinf(bd) && bd > 0);								\
-		else if (isinf(ad) && ad < 0)									\
-			*store = (isinf(bd) && bd < 0);								\
-		else															\
-			*store = (ad == bd);										\
-	}																	\
-	else if (a.is_bool() && b.is_bool())								\
-		*store = a.to_bool() == b.to_bool();							\
-	else																\
-		*store = false;													\
-}										   /* end of ABSTRACT_EQUALITY */
-
-#define JUMPIF(jtruth)													\
-{																		\
-	int32_t jumpOffset = mStream->read_S24();							\
-	if (jtruth)															\
-		mStream->seekBy(jumpOffset);									\
-	break;																\
-}													  /* end of JUMPIF */
 
 /// The type of exceptions thrown by ActionScript.
 class ASException
@@ -172,6 +48,211 @@ public:
 	ASTypeError() : ASException()
 	{/**/}
 };
+
+// Functions for getting pool constants.
+static inline std::string& pool_string(uint32_t index, abc_block *pool)
+{
+	if (!pool)
+		throw ASException();
+	return pool->mStringPool.at(index);
+}
+
+static inline int pool_int(uint32_t index, abc_block *pool)
+{
+	if (!pool)
+		throw ASException();
+	return pool->mIntegerPool.at(index);
+}
+
+static inline unsigned int pool_uint(uint32_t index, abc_block *pool)
+{
+	if (!pool)
+		throw ASException();
+	return pool->mUIntegerPool.at(index);
+}
+
+static inline double pool_double(uint32_t index, abc_block *pool)
+{
+	if (!pool)
+		throw ASException();
+	return pool->mDoublePool.at(index);
+}
+
+static inline asNamespace* pool_namespace(uint32_t index, abc_block *pool)
+{
+	if (!pool)
+		throw ASException();
+	return pool->mNamespacePool.at(index);
+}
+
+static inline asMethod* pool_method(uint32_t index, abc_block* pool)
+{
+	if (!pool)
+		throw ASException();
+	return pool->mMethods.at(index);
+}
+
+static inline asClass* pool_class(uint32_t index, abc_block* pool)
+{
+	if (!pool)
+		throw ASException();
+	return pool->mClasses.at(index);
+}
+
+// Don't make this a reference or you'll taint the pool.
+static inline asName pool_name(uint32_t index, abc_block* pool)
+{
+	if (!pool)
+		throw ASException();
+	return pool->mMultinamePool.at(index);
+}
+
+/// ENSURE_NUMBER makes sure that the given argument is a number,
+/// calling the valueOf method if necessary -- it's a macro so that
+/// the valueOf method may be pushed if needed, and then whatever
+/// opcode asked for this will be re-entered.
+#define ENSURE_NUMBER(vte)													\
+{																			\
+	as_value *e = &vte;														\
+	if (e->is_object())														\
+	{																		\
+		Property *b = e->to_object()->findProperty(NSV::PROP_VALUE_OF, 0);	\
+		if (b)																\
+		{																	\
+			mStream->seekTo(opStart);										\
+			mStack.push(*e);												\
+			pushCall(1, e, b);												\
+			break;															\
+		}																	\
+	}																		\
+}												   /* end of ENSURE_NUMBER */
+
+/// ENSURE_OBJECT will throw an exception if the argument isn't an
+/// object. It's a macro to match with the other ENSURE_ macros.
+#define ENSURE_OBJECT(vte)													\
+{																			\
+	if (!vte.is_object())													\
+		throw ASException();												\
+}												   /* end of ENSURE_OBJECT */
+
+/// ENSURE_STRING makes sure that the given argument is a string,
+/// calling the toString method if necessary -- it's a macro so that
+/// the toString may be pushed if needed, and then whatever opcode
+/// asked for this will be re-entered.
+#define ENSURE_STRING(vte)													\
+{																			\
+	as_value *c = &vte; /* Don't call vte multiple times */					\
+	if (c->is_object())														\
+	{																		\
+		Property *d = c->to_object()->findProperty(NSV::PROP_TO_STRING, 0);	\
+		if (d)																\
+		{																	\
+			mStream->seekTo(opStart);										\
+			mStack.push(*c);												\
+			pushCall(1, c, d);												\
+			break;															\
+		}																	\
+	}																		\
+}												   /* end of ENSURE_STRING */
+
+/// ABSTRACT_COMPARE is the abstract comparison as described in the ECMA
+/// standard.  The 'truth_of_undefined' is used to specify which value
+/// should be set for NaN values. It's a macro so that calls may be
+/// pushed in the ENSURE_STRING and ENSURE_NUMBER macros.
+#define ABSTRACT_COMPARE(store, rv1, rv2, truth_of_undefined) 				\
+{ 																			\
+	as_value &a = rv1; /* Don't call rv1 multiple times */					\
+	as_value &b = rv2; /* Don't call rv2 multiple times */					\
+	if (a.ptype() == PTYPE_STRING && b.ptype() == PTYPE_STRING) 			\
+	{ 																		\
+		ENSURE_STRING(a); 													\
+		ENSURE_STRING(b); 													\
+		store = a.to_string() < b.to_string(); 								\
+	} 																		\
+	else 																	\
+	{ 																		\
+		ENSURE_NUMBER(a); 													\
+		ENSURE_NUMBER(b); 													\
+		double ad = a.to_number(); double bd = b.to_number();				\
+		if (isnan(ad) || isnan(bd))											\
+			store = truth_of_undefined; 									\
+		else if (isinf(ad) && ad > 0)	 									\
+			store = false; 													\
+		else if (isinf(bd) && bd > 0)	 									\
+			store = true; 													\
+		else if (isinf(bd) && bd < 0)	 									\
+			store = false; 													\
+		else if (isinf(ad) && ad < 0)										\
+			store = true;													\
+		else 																\
+			store = ad < bd; 												\
+	} 																		\
+}												/* end of ABSTRACT_COMPARE */
+
+#define ABSTRACT_EQUALITY(st, ev1, ev2, strictness_on)						\
+{																			\
+	bool *store = &st;														\
+	as_value &a = ev1; /* Don't call ev1 multiple times */					\
+	as_value &b = ev2; /* Don't call ev2 multiple times */					\
+	if (a.is_object() && b.is_object())										\
+		*store = a.to_object() == b.to_object();							\
+	else if (a.is_object() || b.is_object())								\
+		*store = false;														\
+	else if (a.ptype() != b.ptype())										\
+	{																		\
+		if (!strictness_on && (a.is_undefined() || b.is_undefined()) && 	\
+			(a.is_null() || b.is_null()))									\
+			*store = true;													\
+		else																\
+			*store = false;													\
+	}																		\
+	else if (a.is_number())													\
+	{																		\
+		double ad = a.to_number(); double bd = b.to_number();				\
+		if (isnan(ad) || isnan(bd))											\
+			*store = false;													\
+		else if (isinf(ad) && ad > 0)										\
+			*store = (isinf(bd) && bd > 0);									\
+		else if (isinf(ad) && ad < 0)										\
+			*store = (isinf(bd) && bd < 0);									\
+		else																\
+			*store = (ad == bd);											\
+	}																		\
+	else if (a.is_bool() && b.is_bool())									\
+		*store = a.to_bool() == b.to_bool();								\
+	else																	\
+		*store = false;														\
+}											   /* end of ABSTRACT_EQUALITY */
+
+#define ABSTRACT_TYPELATE(st, checkval, matchval)							\
+{																			\
+	bool *store = &st;														\
+	as_value &a = checkval; /* Don't call checkval multiple times */		\
+	as_value &b = matchval; /* Don't call matchval multiple times */		\
+	*store = true;															\
+	if (b.is_object())														\
+	{																		\
+		as_value v;															\
+		b.to_object()->get_member(NSV::INTERNAL_TYPE, &v);					\
+		if (!a.conforms_to(mST.find(v.to_string())))						\
+			*store = false;													\
+	}																		\
+	else if (b.is_string())													\
+	{																		\
+		if (!a.conforms_to(mST.find(b.to_string())))						\
+			*store = false;													\
+	}																		\
+	else																	\
+		*store = false;														\
+}											   /* end of ABSTRACT_TYPELATE */
+
+#define JUMPIF(jtruth)														\
+{																			\
+	int32_t jumpOffset = mStream->read_S24();								\
+	if (jtruth)																\
+		mStream->seekBy(jumpOffset);										\
+	break;																	\
+}														  /* end of JUMPIF */
 
 void
 Machine::execute()
@@ -230,16 +311,17 @@ Machine::execute()
 	case SWF::ABC_ACTION_GETSUPER:
 	{
 		// Get the name.
-		asName a = mStream->read_V32();
+		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		// Finish it, if necessary.
 		mStack.drop(completeName(a));
 		// Get the target object.
-		as_value& vobj = mStack.top(0);
-		asClass *pClass = findSuper(vobj, true);
-		// If we don't have a class yet, throw.
-		if (!pClass)
+		ENSURE_OBJECT(mStack.top(0));
+		as_object *super = mStack.top(0).to_object()->get_prototype().get();
+		// If we don't have a super, throw.
+		if (!super)
 			throw ASReferenceError();
-		asBinding *b = pClass->getGetBinding(vobj, a);
+		Property *b = super->findProperty(a.getName(), 
+			a.getNamespace()->getURI());
 		// The object is on the top already.
 		pushCall(1, &mStack.top(0), b);
 		break;
@@ -256,16 +338,17 @@ Machine::execute()
 	case SWF::ABC_ACTION_SETSUPER:
 	{
 		// Get and finish the name.
-		asName a = mStream->read_V32();
+		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		as_value vobj = mStack.pop(); // The value
 
 		mStack.drop(completeName(a));
 
-		as_value target = mStack.pop();
-		asClass *pClass = findSuper(target, true);
-		if (!pClass)
+		ENSURE_OBJECT(mStack.top(0));
+		as_object* super = mStack.pop().to_object()->get_prototype().get();
+		if (!super)
 			throw ASReferenceError();
-		asBinding* b = pClass->getSetBinding(vobj, a);
+		Property* b = super->findProperty(a.getName(), 
+			a.getNamespace()->getURI());
 		// The object is on the top already.
 		pushCall(1, &mStack.top(0), b);
 		break;
@@ -278,7 +361,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_DXNS:
 	{
 		uint32_t soffset = mStream->read_V32();
-		std::string& uri = pool_string(soffset);
+		std::string& uri = pool_string(soffset, mPoolObject);
 		mDefaultXMLNamespace = mCH->anonNamespace(mST.find(uri));
 		break;
 	}
@@ -580,19 +663,35 @@ Machine::execute()
 		break;
 	}
 /// 0x1C ABC_ACTION_PUSHWITH
+/// 0x30 ABC_ACTION_PUSHSCOPE
 /// Stack In:
 ///  scope -- a scope
 /// Stack Out:
 ///  .
-/// Do: Enter scope with previous scope as its base, unless it already had
-///  a base, in which case leave that alone.
+/// Do: Enter scope with previous scope as its base.
+/// If 0x1C, start a new base if the previous one was global.
 	case SWF::ABC_ACTION_PUSHWITH:
 	{
-		asScope a = mStack.top(0).to_scope();
+		// A scope object is just a regular object.
+		ENSURE_OBJECT(mStack.top(0));
+		as_object *a = mStack.top(0).to_object().get();
+
+		if (!mScopeStack.empty())
+			a->set_prototype(mScopeStack.top(0).mScope);
+		else
+			a->set_prototype(NULL);
+
+		if (opcode == SWF::ABC_ACTION_PUSHWITH &&
+				mScopeStack.totalSize() == mScopeStack.size())
+		{
+			mScopeStack.push(Scope(0, a));
+		}
+		else
+		{
+			mScopeStack.push(Scope(mScopeStack.size(), a));
+		}
+		mCurrentScope = a;
 		mStack.drop(1);
-		mScopeStack.push(a);
-		// If there wasn't a base scope, then this becomes it.
-		a.setBase(mCurrentScope);
 		break;
 	}
 /// 0x1D ABC_ACTION_POPSCOPE
@@ -600,7 +699,12 @@ Machine::execute()
 ///  shallower than the base's depth.
 	case SWF::ABC_ACTION_POPSCOPE:
 	{
-		mScopeStack.pop();
+		Scope &s = mScopeStack.pop();
+		mScopeStack.setDownstop(s.mHeightAfterPop);
+		if (mScopeStack.empty())
+			mCurrentScope = NULL;
+		else
+			mCurrentScope = mScopeStack.top(0).mScope;
 		break;
 	}
 /// 0x1E ABC_ACTION_NEXTNAME
@@ -616,9 +720,9 @@ Machine::execute()
 		as_object *obj = mStack.top(1).to_object().get();
 		uint32_t index = mStack.top(0).to_number<uint32_t>();
 		mStack.drop(1);
-		asBinding *b = obj->bindingAtIndex(index);
+		Property *b = obj->getByIndex(index);
 		if (b)
-			mStack.top(0) = b->getNameString();
+			mStack.top(0) = mST.value(b->getName());
 		else
 			mStack.top(0) = "";
 		break;
@@ -629,8 +733,9 @@ Machine::execute()
 ///  obj -- an object
 /// Stack Out:
 ///  next_index -- next index after index in obj, or 0 if none.
-/// Do: If there is a key/val pair after index, make next_index as it.
-///  Otherwise, make next_index 0.
+/// Do: If the index is 0, return the first logical property.
+/// We'll do this by name, since the name id can be used for this
+/// directly.
 	case SWF::ABC_ACTION_HASNEXT:
 	{
 		ENSURE_NUMBER(mStack.top(0));
@@ -638,11 +743,7 @@ Machine::execute()
 		as_object *obj = mStack.top(1).to_object().get();
 		uint32_t index = mStack.top(0).to_number<uint32_t>();
 		mStack.drop(1);
-		asBinding *next = obj->bindingAfterIndex(index);
-		if (next)
-			mStack.top(0) = next->getDispatch();
-		else
-			mStack.top(0) = 0;
+		mStack.top(0) = obj->nextIndex(index);
 		break;
 	}
 /// 0x20 ABC_ACTION_PUSHNULL
@@ -675,12 +776,12 @@ Machine::execute()
 		ENSURE_OBJECT(mStack.top(1));
 		as_object *obj = mStack.top(1).to_object().get();
 		uint32_t index = mStack.top(0).to_number<uint32_t>();
-		asBinding *b = obj->bindingAtIndex(index);
+		const Property *b = obj->getByIndex(index);
 		mStack.drop(1);
 		if (!b)
 			mStack.top(0).set_undefined();
 		else // The top of the stack is obj, as it should be.
-			pushCall(1, &mStack.top(0), b);
+			pushCall(1, &mStack.top(0), const_cast<Property*>(b));
 		break;
 	}
 /// 0x24 ABC_ACTION_PUSHBYTE
@@ -775,7 +876,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_PUSHSTRING:
 	{
 		mStack.grow(1);
-		mStack.top(0) = pool_string(mStream->read_V32());
+		mStack.top(0) = pool_string(mStream->read_V32(), mPoolObject);
 		break;
 	}
 /// 0x2D ABC_ACTION_PUSHINT
@@ -785,7 +886,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_PUSHINT:
 	{
 		mStack.grow(1);
-		mStack.top(0) = pool_int(mStream->read_V32());
+		mStack.top(0) = pool_int(mStream->read_V32(), mPoolObject);
 		break;
 	}
 /// 0x2E ABC_ACTION_PUSHUINT
@@ -795,7 +896,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_PUSHUINT:
 	{
 		mStack.grow(1);
-		mStack.top(0) = pool_uint(mStream->read_V32());
+		mStack.top(0) = pool_uint(mStream->read_V32(), mPoolObject);
 		break;
 	}
 /// 0x2F ABC_ACTION_PUSHDOUBLE
@@ -805,21 +906,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_PUSHDOUBLE:
 	{
 		mStack.grow(1);
-		mStack.top(0) = pool_double(mStream->read_V32());
-		break;
-	}
-/// 0x30 ABC_ACTION_PUSHSCOPE
-/// Stack In:
-///  scope -- a scope
-/// Stack Out:
-///  .
-/// Do: Enter scope without altering base.
-	case SWF::ABC_ACTION_PUSHSCOPE:
-	{
-		asScope a = mStack.top(0).to_scope();
-		mStack.drop(1);
-		a.setBase(mCurrentScope);
-		mScopeStack.push(a);
+		mStack.top(0) = pool_double(mStream->read_V32(), mPoolObject);
 		break;
 	}
 /// 0x31 ABC_ACTION_PUSHNAMESPACE
@@ -828,7 +915,7 @@ Machine::execute()
 ///  ns -- Namespace object from namespace_pool[index]
 	case SWF::ABC_ACTION_PUSHNAMESPACE:
 	{
-		asNamespace *ns = pool_namespace(mStream->read_V32());
+		asNamespace *ns = pool_namespace(mStream->read_V32(), mPoolObject);
 		mStack.grow(1);
 		mStack.top(0) = *ns;
 		break;
@@ -841,6 +928,8 @@ Machine::execute()
 /// Frame:
 ///  Change at objloc to object which possessed next value.
 ///  Change at indexloc to index (as object) of the next value.
+/// N.B.: A value of '0' for indexloc initializes to the first logical
+/// property.
 	case SWF::ABC_ACTION_HASNEXT2:
 	{
 		int32_t oindex = mStream->read_V32();
@@ -851,13 +940,17 @@ Machine::execute()
 		ENSURE_NUMBER(indexv);
 		as_object *obj = objv.to_object().get();
 		uint32_t index = indexv.to_number<uint32_t>();
-		asBinding *next = obj->bindingAfterIndex(index);
+		as_object *owner = NULL;
+		int next = obj->nextIndex(index, &owner);
 		mStack.grow(1);
 		if (next)
 		{
 			mStack.top(0).set_bool(true);
-			mFrame.value(oindex) = next->getOwner();
-			mFrame.value(iindex) = next->getDispatch();
+			if (owner)
+				mFrame.value(oindex) = owner;
+			else
+				mFrame.value(oindex).set_null();
+			mFrame.value(iindex) = next;
 		}
 		else
 		{
@@ -876,7 +969,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_NEWFUNCTION:
 	{
 		mStack.grow(1);
-		asMethod *m = pool_method(mStream->read_V32());
+		asMethod *m = pool_method(mStream->read_V32(), mPoolObject);
 		mStack.top(0) = m->construct(mCurrentScope);
 		break;
 	}
@@ -896,7 +989,7 @@ Machine::execute()
 		// argc + 1 will be dropped, and mStack.top(argc + 1)
 		// will be the top of the stack, so that is where the
 		// return value should go. (Currently it is the func)
-		asBinding b(f);
+		Property b(0, 0, f, NULL);
 		pushCall(argc + 1, &mStack.top(argc + 1), &b);
 		break;
 	}
@@ -911,7 +1004,7 @@ Machine::execute()
 	{
 		uint32_t argc = mStream->read_V32();
 		as_function *f = mStack.top(argc).to_as_function();
-		asBinding b(f);
+		Property b(0, 0, f, NULL);
 		pushCall(argc, &mStack.top(argc), &b);
 		break;
 	}
@@ -928,7 +1021,7 @@ Machine::execute()
 		uint32_t argc = mStream->read_V32();
 		ENSURE_OBJECT(mStack.top(argc));
 		as_object *obj = mStack.top(argc).to_object().get();
-		asBinding *b = obj->bindingAtIndex(dispatch_id);
+		Property *b = NULL; // TODO: obj->findProperty(dispatch_id);
 		if (!b)
 		{
 			mStack.drop(argc);
@@ -947,9 +1040,9 @@ Machine::execute()
 ///  value -- the value returned by obj->ABC::'method_id'(arg1, ..., argN)
 	case SWF::ABC_ACTION_CALLSTATIC:
 	{
-		asMethod *m = pool_method(mStream->read_V32());
+		asMethod *m = pool_method(mStream->read_V32(), mPoolObject);
 		uint32_t argc = mStream->read_V32();
-		asBinding b(m);
+		Property b; //TODO: asBinding b(m);
 		pushCall(argc + 1, &mStack.top(argc), &b);
 		break;
 	}
@@ -967,13 +1060,17 @@ Machine::execute()
 	case SWF::ABC_ACTION_CALLSUPER:
 	case SWF::ABC_ACTION_CALLSUPERVOID:
 	{
-		asName a = mStream->read_V32();
+		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		uint32_t argc = mStream->read_V32();
 		int dropsize = completeName(a);
 		ENSURE_OBJECT(mStack.top(argc + dropsize));
 		mStack.drop(dropsize);
-		asBinding *b = findSuper(mStack.top(argc), 
-			true)->getBinding(mStack.top(argc), a);
+		ENSURE_OBJECT(mStack.top(argc));
+		as_object *super = mStack.top(argc).to_object()->get_prototype().get();
+		if (!super)
+			throw ASReferenceError();
+		Property *b = super->findProperty(a.getName(), 
+			a.getNamespace()->getURI());
 		if (opcode == SWF::ABC_ACTION_CALLSUPER)
 			pushCall(argc + 1, &mStack.top(argc), b);
 		else
@@ -998,7 +1095,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_CALLPROPVOID:
 	{
 		bool lex_only = (opcode == SWF::ABC_ACTION_CALLPROPLEX);
-		asName a = mStream->read_V32();
+		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		uint32_t argc = mStream->read_V32();
 		int shift = completeName(a, argc);
 		ENSURE_OBJECT(mStack.top(shift + argc));
@@ -1010,8 +1107,9 @@ Machine::execute()
 				mStack.top(i + shift) = mStack.top(i);
 			mStack.drop(shift);
 		}
-		asBinding *b = mStack.top(argc).to_object()->getBinding(a);
-		b->setLexOnly(lex_only);
+		Property *b = mStack.top(argc).to_object()->
+			findProperty(a.getName(), a.getNamespace()->getURI());
+		//TODO: b->setLexOnly(lex_only);
 		if (opcode == SWF::ABC_ACTION_CALLPROPVOID)
 			pushCall(argc + 1, &mIgnoreReturn, b);
 		else
@@ -1054,7 +1152,7 @@ Machine::execute()
 		uint32_t argc = mStream->read_V32();
 		ENSURE_OBJECT(mStack.top(argc));
 		asMethod *m = findSuper(mStack.top(argc), true)->getConstructor();
-		asBinding b(m);
+		Property b; //TODO: asBinding b(m);
 		pushCall(argc + 1, &mIgnoreReturn, &b);
 		break;
 	}
@@ -1069,7 +1167,7 @@ Machine::execute()
 ///   'name_offset'(arg1, ..., argN)
 	case SWF::ABC_ACTION_CONSTRUCTPROP:
 	{
-		asName a = mStream->read_V32();
+		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		uint32_t argc = mStream->read_V32();
 		int shift = completeName(a, argc);
 		ENSURE_OBJECT(mStack.top(argc + shift));
@@ -1153,9 +1251,9 @@ Machine::execute()
 	case SWF::ABC_ACTION_NEWCLASS:
 	{
 		uint32_t cid = mStream->read_V32();
-		asClass *c = pool_class(cid);
+		asClass *c = pool_class(cid, mPoolObject);
 		asMethod *m = c->getConstructor();
-		asBinding b(m);
+		Property b; //TODO: asBinding b(m);
 		pushCall(1, &mStack.top(0), &b);
 		break;
 	}
@@ -1171,7 +1269,7 @@ Machine::execute()
 /// descendants of a class.
 	case SWF::ABC_ACTION_GETDESCENDANTS:
 	{
-		asName a = mStream->read_V32();
+		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		as_value &v = mStack.top(0);
 		ENSURE_OBJECT(v);
 		mStack.drop(1);
@@ -1201,10 +1299,10 @@ Machine::execute()
 	case SWF::ABC_ACTION_FINDPROPSTRICT:
 	case SWF::ABC_ACTION_FINDPROPERTY:
 	{
-		asName a = mStream->read_V32();
+		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		mStack.drop(completeName(a));
-		asBinding *b = findProperty(a);
-		if (!b)
+		Property *b = NULL; //TODO: asBinding *b = findProperty(a);
+		if (0)//!b)
 			if (opcode == SWF::ABC_ACTION_FINDPROPSTRICT)
 				throw ASReferenceError();
 			else
@@ -1222,8 +1320,8 @@ Machine::execute()
 ///  def -- The definition of the name at name_id.
 	case SWF::ABC_ACTION_FINDDEF:
 	{
-		asName a = mStream->read_V32();
-		a.makeComplete();
+		asName a = pool_name(mStream->read_V32(), mPoolObject);
+		// The name is expected to be complete.
 		// TODO
 		break;
 	}
@@ -1234,12 +1332,12 @@ Machine::execute()
 ///   + 0x66 (ABC_ACTION_GETPROPERTY)
 	case SWF::ABC_ACTION_GETLEX:
 	{
-		asName a = mStream->read_V32();
-		a.makeComplete();
-		asBinding *b = findProperty(a);
-		if (!b)
+		asName a = pool_name(mStream->read_V32(), mPoolObject);
+		// The name is expected to be complete.
+		Property *b = NULL; //TODO: asBinding *b = findProperty(a);
+		if (0)//!b)
 			throw ASReferenceError();
-		b->setLexOnly(b);
+		//TODO: b->setLexOnly(b);
 		mStack.grow(1);
 		pushCall(0, &mStack.top(0), b);
 		break;
@@ -1261,7 +1359,7 @@ Machine::execute()
 /// key/value is set in the dictionary obj instead.
 	case SWF::ABC_ACTION_SETPROPERTY:
 	{
-		asName a = mStream->read_V32();
+		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		//as_value &v = mStack.pop();
 		if (!a.isRuntime())
 		{
@@ -1270,7 +1368,7 @@ Machine::execute()
 		else
 		{
 			if (a.isRtns() || !(mStack.top(0).is_object()
-				&& mStack.top(1).is_dictionary()))
+				&& mStack.top(1).to_object()->isDictionary()))
 			{
 				mStack.drop(completeName(a));
 				//TODO: mStack.top(0).setProperty(a, v);
@@ -1325,7 +1423,7 @@ Machine::execute()
 	{
 		uint8_t depth = mStream->read_u8();
 		mStack.grow(1);
-		mStack.top(0) = &mScopeStack.top(depth);
+		mStack.top(0) = mScopeStack.top(depth).mScope;
 		break;
 	}
 /// 0x66 ABC_ACTION_GETPROPERTY
@@ -1340,7 +1438,7 @@ Machine::execute()
 /// NB: See 0x61 (ABC_ACTION_SETPROPETY) for the decision of ns/key.
 	case SWF::ABC_ACTION_GETPROPERTY:
 	{
-		asName a = mStream->read_V32();
+		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		if (!a.isRuntime())
 		{
 			//TODO: mStack.top(0) = mStack.top(0).getProperty(a, v);
@@ -1348,7 +1446,7 @@ Machine::execute()
 		else
 		{
 			if (a.isRtns() || !(mStack.top(0).is_object()
-				&& mStack.top(1).is_dictionary()))
+				&& mStack.top(1).to_object()->isDictionary()))
 			{
 				mStack.drop(completeName(a));
 				//TODO: mStack.top(0) = mStack.top(0).getProperty(a);
@@ -1373,7 +1471,7 @@ Machine::execute()
 ///  Set obj::(resolve)'name_id' to value, set bindings from the context.
 	case SWF::ABC_ACTION_INITPROPERTY:
 	{
-		asName a = mStream->read_V32();
+		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		//as_value& v = mStack.pop();
 		mStack.drop(completeName(a));
 		//TODO: mStack.pop().to_object().setProperty(a, v, true); // true for init
@@ -1388,7 +1486,7 @@ Machine::execute()
 ///  truth -- True if property was deleted or did not exist, else False.
 	case SWF::ABC_ACTION_DELETEPROPERTY:
 	{
-		asName a = mStream->read_V32();
+		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		mStack.drop(completeName(a));
 		//mStack.top(0) = mStack.top(0).deleteProperty(a);
 		break;
@@ -1559,7 +1657,7 @@ Machine::execute()
 /// Do: If obj is not XML based, throw TypeError
 	case SWF::ABC_ACTION_CHECKFILTER:
 	{
-		if (!mStack.top(0).is_xml())
+		if (!mStack.top(0).is_object() || !mStack.top(0).to_object()->isXML())
 			throw ASTypeError();
 		break;
 	}
@@ -1572,7 +1670,7 @@ Machine::execute()
 ///  coerced_obj -- The object as the desired (resolve)'name_index' type.
 	case SWF::ABC_ACTION_COERCE:
 	{
-		asName a = mStream->read_V32();
+		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		mStack.drop(completeName(a));
 		//TODO: mStack.top(0) = mStack.top(0).coerce(a);
 		break;
@@ -1609,9 +1707,10 @@ Machine::execute()
 ///  cobj -- obj if obj is of type (resolve)'name_index', otherwise Null
 	case SWF::ABC_ACTION_ASTYPE:
 	{
-		asName a = mStream->read_V32();
+		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		mStack.drop(completeName(a));
-		if (!mStack.top(0).conforms_to(a))
+		// TODO: Might need some namespace stuff.
+		if (!mStack.top(0).conforms_to(a.getName()))
 			mStack.top(0).set_null();
 		break;
 	}
@@ -1623,7 +1722,9 @@ Machine::execute()
 ///  cobj -- obj if type of obj conforms to valid, otherwise Null
 	case SWF::ABC_ACTION_ASTYPELATE:
 	{
-		if (!mStack.top(1).conforms_to(mStack.top(0)))
+		bool truth;
+		ABSTRACT_TYPELATE(truth, mStack.top(1), mStack.top(0));
+		if (!truth)
 			mStack.top(1).set_null();
 		mStack.drop(1);
 		break;
@@ -1947,10 +2048,9 @@ Machine::execute()
 ///  truth -- Truth of "val is an instance of super"
 	case SWF::ABC_ACTION_INSTANCEOF:
 	{
-		if (mStack.top(1).is_null())
-			mStack.top(1) = false;
-		else // Calling to_object intentionally causes an exception if super is not an object.
-			mStack.top(1) = mStack.top(1).conforms_to(mStack.top(0));
+		bool truth;
+		ABSTRACT_TYPELATE(truth, mStack.top(1), mStack.top(0));
+		mStack.top(1).set_bool(truth);
 		mStack.drop(1);
 		break;
 	}
@@ -1963,9 +2063,10 @@ Machine::execute()
 ///  truth -- Truth of "obj is of the type given in (resolve)'name_id'"
 	case SWF::ABC_ACTION_ISTYPE:
 	{
-		asName a = mStream->read_V32();
+		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		mStack.drop(completeName(a));
-		mStack.top(0).set_bool(mStack.top(0).conforms_to(a));
+		// TODO: Namespace stuff?
+		mStack.top(0).set_bool(mStack.top(0).conforms_to(a.getName()));
 	}
 /// 0xB3 ABC_ACTION_ISTYPELATE
 /// Stack In:
@@ -1975,7 +2076,9 @@ Machine::execute()
 ///  truth -- Truth of "obj is of type"
 	case SWF::ABC_ACTION_ISTYPELATE:
 	{
-		mStack.top(1).set_bool(mStack.top(1).conforms_to(mStack.top(0)));
+		bool truth;
+		ABSTRACT_TYPELATE(truth, mStack.top(1), mStack.top(0));
+		mStack.top(1).set_bool(truth);
 		mStack.drop(1);
 		break;
 	}
@@ -2140,7 +2243,9 @@ Machine::getMember(asClass* pDefinition, asName& name,
 	if (!instance.is_object())
 		throw ASTypeError();
 
-	asBinding *pBinding = pDefinition->getBinding(instance, name);
+	return; // TODO:
+#if 0
+	asBinding *pBinding = pDefinition->getBinding(name.getName());
 	if (pBinding->isWriteOnly())
 		throw ASReferenceError();
 
@@ -2155,6 +2260,7 @@ Machine::getMember(asClass* pDefinition, asName& name,
 	// And push the instance ('this')
 	mStack.push(instance);
 	pushCall(1, &mStack.top(0), pBinding); //TODO: pBinding->getGetter());
+#endif
 }
 
 void
@@ -2164,7 +2270,10 @@ Machine::setMember(asClass *pDefinition, asName& name, as_value& instance,
 	if (!instance.is_object())
 		throw ASReferenceError();
 
-	asBinding *pBinding = pDefinition->getBinding(instance, name);
+	return;
+	// TODO:
+#if 0
+	asBinding *pBinding = pDefinition->getBinding(name.getName());
 
 	if (pBinding->isReadOnly())
 		throw ASReferenceError();
@@ -2179,6 +2288,7 @@ Machine::setMember(asClass *pDefinition, asName& name, as_value& instance,
 	mStack.push(instance);
 	mStack.push(newvalue);
 	pushCall(2, &mStack.top(1), pBinding); //TODO: pBinding->getSetter());
+#endif
 }
 
 int
@@ -2186,20 +2296,19 @@ Machine::completeName(asName &name, int offset)
 {
 	int size = 0;
 
-	asName* uname = pool_name(name.id);
-	if (uname->isRuntime())
+	if (name.isRuntime())
 	{
 		as_value obj = mStack.top(offset);
 		if (obj.is_object() && obj.to_object()->isQName())
 			name.fill(obj.to_object().get());
 		++size;
 
-		if (uname->isRtns())
+		if (name.isRtns())
 			++size; // Ignore the Namespace.
 	}
-	else if (uname->isRtns())
+	else if (name.isRtns())
 	{
-		uname->setNamespace(mStack.top(offset));
+		//TODO: This should be a namespace //name.setNamespace(mStack.top(offset));
 		++size;
 	}
 	return size;
@@ -2231,9 +2340,27 @@ Machine::findSuper(as_value &v, bool find_for_primitive)
 }
 
 void
-Machine::pushCall(unsigned int stack_in, as_value *return_slot,
-	asBinding *pBind)
+Machine::immediateFunction(as_function *to_call, as_value& storage,
+	as_object *pThis)
 {
+	// TODO: Implement
+}
+
+void
+Machine::immediateProcedure(as_function *to_call, as_object *pthis,
+	const as_value *stackAdditions, unsigned int stackAdditionsCount)
+{
+	// TODO: Implement
+}
+
+void
+Machine::pushCall(unsigned int stack_in, as_value *return_slot,
+	Property *pBind)
+{
+	if (!pBind)
+		return;
+	//TODO
+#if 0
 	switch (pBind->mType)
 	{
 	default:
@@ -2262,6 +2389,11 @@ Machine::pushCall(unsigned int stack_in, as_value *return_slot,
 		mStack.drop(stack_in);
 	// We save that state.
 	saveState();
+	// Set the 'this' object for the new call.
+	if (stack_in == 0)
+		mThis = mDefaultThis;
+	else
+		mThis = mStack.value(0).to_object().get(); // Checked in caller.
 	// We make the stack appear empty.
 	mStack.fixDownstop();
 	// We grow to reclaim the parameters. Since this is a SafeStack, they
@@ -2279,7 +2411,10 @@ Machine::pushCall(unsigned int stack_in, as_value *return_slot,
 	// The scope stack should be fixed for non-native calls.
 	mScopeStack.fixDownstop();
 	//TODO: mScopeStack.push(m->getActivation());
-	mCurrentScope = &mScopeStack.top(0);
+	if (!mScopeStack.empty())
+		mCurrentScope = mScopeStack.top(0).mScope;
+	else
+		mCurrentScope = NULL;
 
 	// We set the stream and return as given in the method and call.
 	//TODO: mStream = m->getBody();
@@ -2287,6 +2422,7 @@ Machine::pushCall(unsigned int stack_in, as_value *return_slot,
 
 	// When control goes to the main loop of the interpreter, it will
 	// automatically start executing the method.
+#endif
 }
 
 void
@@ -2299,6 +2435,7 @@ Machine::restoreState()
 	mDefaultXMLNamespace = s.mDefaultXMLNamespace;
 	mCurrentScope = s.mCurrentScope;
 	mGlobalReturn = s.mGlobalReturn;
+	mThis = s.mThis;
 	mStateStack.drop(1);
 }
 
@@ -2315,6 +2452,6 @@ Machine::saveState()
 	s.mDefaultXMLNamespace = mDefaultXMLNamespace;
 	s.mCurrentScope = mCurrentScope;
 	s.mGlobalReturn = mGlobalReturn;
+	s.mThis = mThis;
 }
-
 } // end of namespace gnash

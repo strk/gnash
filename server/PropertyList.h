@@ -31,6 +31,10 @@
 #include <cassert> // for inlines
 #include <cctype> // for toupper
 #include <utility> // for std::pair
+#include <set> // for propNameSet
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/key_extractors.hpp>
 
 // Forward declaration
 namespace gnash {
@@ -41,7 +45,6 @@ namespace gnash {
 
 namespace gnash {
 
-
 /// Set of properties associated to an ActionScript object.
 //
 /// The PropertyList container is the sole owner of the Property
@@ -50,61 +53,45 @@ namespace gnash {
 ///
 class PropertyList
 {
-
-private:
+public:
+	/// A tag type for multi-index
+	struct oType {/**/};
 
 	/// The actual container
-	//
-	/// We store Property objects by pointer to allow polymorphism
-	/// so that we can store either SimpleProperty or GetterSetterProperty
-	/// the destructor will take care of deleting all elements.
+	/// index 0 is the fully indexed name/namespace pairs, which are unique
+	/// Because of the way searching works, this index can also be used to search
+	/// for the names alone (composite keys are sorted lexographically, beginning
+	/// with the first element specified)
 	///
-	/// TODO: change this to a <boost/ptr_container/ptr_map.hpp>
-	///       so we can store as_member by pointer allowing polymorphism
-	///	  of it (planning to add a getset_as_member) w/out much
-	///	  overhead and with manager ownerhips. See:
-	/// http://www.boost.org/libs/ptr_container/doc/ptr_container.html
-	///
-	typedef std::map<string_table::key, Property*> container;
-	typedef container::iterator iterator;
-	typedef container::const_iterator const_iterator;
-	typedef container::reverse_iterator reverse_iterator;
-	typedef container::const_reverse_iterator const_reverse_iterator;
-
-	container _props;
-
-	iterator find(string_table::key key) {
-		return _props.find(key);
-	}
-	const_iterator find(string_table::key key) const {
-		return _props.find(key);
-	}
-	iterator end() {
-		return _props.end();
-	}
-	const_iterator end() const {
-		return _props.end();
-	}
-	iterator begin() {
-		return _props.begin();
-	}
-	const_iterator begin() const {
-		return _props.begin();
-	}
-
-public:
+	/// index 1 is an ordered sequence, and it is used for the AS3 style
+	/// enumeration (which requires an order number for each property),
+	/// for slot access, and for array access.
+	typedef boost::multi_index_container<
+		Property,
+		boost::multi_index::indexed_by<
+			boost::multi_index::ordered_unique<
+				boost::multi_index::composite_key<
+					Property,
+					boost::multi_index::member<Property,string_table::key,&Property::mName>,
+					boost::multi_index::member<Property,string_table::key,&Property::mNamespace>
+				>
+			>,
+			boost::multi_index::ordered_unique<
+				boost::multi_index::tag<PropertyList::oType>,
+				boost::multi_index::member<Property,int,&Property::mOrderId>
+			>
+		>
+	> container;
 
 	/// Construct the PropertyList 
-	PropertyList();
+	PropertyList() : _props()
+	{/**/}
 
 	/// Copy constructor
 	PropertyList(const PropertyList& pl);
 
 	/// Assignment operator
 	PropertyList& operator=(const PropertyList&);
-
-	/// Delete all Property objects in the container
-	~PropertyList();
 
 	/// Visit the list of properties 
 	//
@@ -123,14 +110,11 @@ public:
 	template <class V>
 	void visitValues(V& visitor, as_object& this_ptr) const
 	{
-		for (const_iterator it = begin(), itEnd = end();
-				it != itEnd; ++it)
+		for (container::const_iterator it = _props.begin(),
+			itEnd = _props.end(); it != itEnd; ++it)
 		{
-			string_table::key key = it->first;
-			const Property* prop = it->second;
-			as_value val = prop->getValue(this_ptr);
-
-			visitor(key, val);
+			as_value val = it->getValue(this_ptr);
+			visitor(it->mName, val);
 		}
 	}
 
@@ -163,7 +147,28 @@ public:
 	///         otherwise (and value will be untouched)
 	///
 	bool getValue(string_table::key key, as_value& value,
-			as_object& this_ptr);
+			as_object& this_ptr, string_table::key nsId = 0);
+
+	/// Get the as_value value of an ordered property
+	///
+	/// getter/setter will be invoked, just as for getValue
+	///
+	/// @param order
+	/// The order number: negative for default values,  non-negative for
+	/// properties which were specifically positioned.
+	///
+	bool getValueByOrder(int order, as_value& val, as_object& this_ptr);
+	
+	/// Get the order number just after the passed order number.
+	///
+	/// @param order
+	/// 0 is a special value indicating the first order should be returned,
+	/// otherwise, this should be the result of a previous call to
+	/// getOrderAfter
+	///
+	/// @return
+	/// A value which can be used for ordered access. 
+	const Property* getOrderAfter(int order);
 
 	/// Set the value of a property, creating a new one if unexistent.
 	//
@@ -187,28 +192,61 @@ public:
 	///	eventual "Setter" function from actually modifying it,
 	///	so we can't promise constness.
 	///
+	/// @param namespaceId
+	/// The namespace in which this should be entered. If 0 is given,
+	/// this will use the first value found, if it exists.
+	///
 	/// @return true if the value was successfully set, false
 	///         otherwise (found a read-only property, most likely).
 	///
-	bool setValue(string_table::key key, const as_value& value,
-			as_object& this_ptr);
+	bool setValue(string_table::key key, as_value value,
+			as_object& this_ptr, string_table::key namespaceId = 0);
+
+	/// Reserves a slot number for a property
+	///
+	/// @param slotId
+	/// The slot id to use. (Note that getOrder() on this property will return
+	/// this slot number + 1 if the assignment was successful.)
+	///
+	/// @param key
+	/// Name of the property.
+	///
+	/// @param nsId
+	/// The namespace in which the property should be found.
+	///
+	/// @return true if the slot did not previously exist.
+	bool reserveSlot(unsigned short slotId, string_table::key key,
+		string_table::key nsId = 0);
 
 	/// Get a property, if existing
 	//
 	/// @param key
 	///	Name of the property. Search is case-*sensitive*
 	///
+	/// @param nsId
+	/// The id of the namespace to search
+	///
 	/// @return a Property or NULL, if no such property exists
 	///	ownership of returned Propery is kept by the PropertyList,
 	///	so plase *don't* delete it !
 	///
-	Property* getProperty(string_table::key key);
+	Property* getProperty(string_table::key key, string_table::key nsId = 0);
 
+	/// Get a property, if existing, by order
+	///
+	/// @param order
+	/// The ordering id
+	///
+	const Property* getPropertyByOrder(int order);
+	
 	/// Delete a propery, if exising and not protected from deletion.
 	//
 	///
 	/// @param key
 	///	Name of the property. Search is case-*sensitive*
+	///
+	/// @param nsId
+	/// Name of the namespace
 	///
 	/// @return a pair of boolean values expressing whether the property
 	///	was found (first) and whether it was deleted (second).
@@ -218,7 +256,8 @@ public:
 	///	- (true, false) : property protected from deletion
 	///	- (true, true) : property successfully deleted
 	///
-	std::pair<bool,bool> delProperty(string_table::key key);
+	std::pair<bool,bool> delProperty(string_table::key key,
+		string_table::key nsId = 0);
 
 	/// \brief
 	/// Add a getter/setter property, if not already existing
@@ -239,7 +278,7 @@ public:
 	///         otherwise (property already existent?)
 	///
 	bool addGetterSetter(string_table::key key, as_function& getter,
-		as_function& setter);
+		as_function& setter, string_table::key ns = 0);
 
 	/// \brief
 	/// Add a destructive getter/setter property, if not already extant.
@@ -257,7 +296,7 @@ public:
 	/// otherwise.
 	///
 	bool addDestructiveGetterSetter(string_table::key key,
-		as_function& getter, as_function& setter);
+		as_function& getter, as_function& setter, string_table::key ns = 0);
 
 	/// Set the flags of a property.
 	//
@@ -273,7 +312,8 @@ public:
 	/// @return true if the value was successfully set, false
 	///         otherwise (either not found or protected)
 	///
-	bool setFlags(string_table::key key, int setTrue, int setFalse);
+	bool setFlags(string_table::key key, int setTrue, int setFalse,
+		string_table::key ns = 0);
 
 	/// Set the flags of all properties.
 	//
@@ -324,10 +364,17 @@ public:
 	///
 	void import(const PropertyList& props);
 
+	// Used to keep track of which properties have been enumerated.
+	typedef std::set<std::pair<string_table::key, string_table::key> > propNameSet;
+
 	/// \brief
 	/// Enumerate all non-hidden properties pushing
 	/// their keys to the given as_environment.
-	void enumerateKeys(as_environment& env) const;
+	///
+	/// @param donelist
+	/// Don't enumerate those in donelist. Add those done to donelist.
+	///
+	void enumerateKeys(as_environment& env, propNameSet& donelist) const;
 
 	/// \brief
 	/// Enumerate all non-hidden properties inserting
@@ -391,6 +438,10 @@ public:
 	/// Mark all simple properties, getters and setters
 	/// as being reachable (for the GC)
 	void setReachable() const;
+
+private:
+	container _props;
+	unsigned short mDefaultOrder;
 };
 
 

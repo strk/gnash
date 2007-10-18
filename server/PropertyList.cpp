@@ -24,7 +24,6 @@
 #include "PropertyList.h"
 #include "Property.h" 
 
-
 #include "log.h"
 
 #include "as_function.h"
@@ -38,10 +37,6 @@
 //#define DEBUG_PROPERTY_ALLOC
 
 namespace gnash {
-
-PropertyList::PropertyList()
-{
-}
 
 PropertyList::PropertyList(const PropertyList& pl)
 {
@@ -59,65 +54,135 @@ PropertyList::operator=(const PropertyList& pl)
 	return *this;
 }
 
-
-
-bool
-PropertyList::getValue(const string_table::key key, as_value& val,
-		as_object& this_ptr) 
+// Should find in any namespace if nsId is 0, and any namespace should find
+// something in namespace 0.
+static inline
+PropertyList::container::iterator
+iterator_find(PropertyList::container &p, string_table::key name,
+	string_table::key nsId)
 {
-	const_iterator found = _props.find( key );
-	if ( found == _props.end() )
+	if (nsId)
 	{
-		return false;
+		PropertyList::container::iterator i =
+			p.find(boost::make_tuple(name, nsId));
+		if (i != p.end())
+			return i;
+		return p.find(boost::make_tuple(name, 0));
 	}
 
-	val=found->second->getValue(this_ptr);
+	return p.find(boost::make_tuple(name));
+}
 
-	//log_msg(_("Property %s found, value is (%s)"), key.c_str(), val.to_string());
+typedef PropertyList::container::index<PropertyList::oType>::type::iterator
+	orderIterator;
 
+static inline
+orderIterator
+iterator_find(PropertyList::container &p, int order)
+{
+	return p.get<1>().find(order);
+}
+
+bool
+PropertyList::getValueByOrder(int order, as_value& val,
+	as_object& this_ptr)
+{
+	orderIterator i = iterator_find(_props, order);
+	if (i == _props.get<1>().end())
+		return false;
+
+	val = i->getValue(this_ptr);
+	return true;
+}
+
+const Property*
+PropertyList::getPropertyByOrder(int order)
+{
+	orderIterator i = iterator_find(_props, order);
+	if (i == _props.get<1>().end())
+		return NULL;
+
+	return &(*i);
+}
+
+const Property*
+PropertyList::getOrderAfter(int order)
+{
+	orderIterator i = iterator_find(_props, order);
+
+	if (i == _props.get<1>().end())
+		return NULL; // Not found at all.
+
+	do
+	{
+		++i;
+		if (i == _props.get<1>().end())
+			return NULL;
+	} while (i->getFlags().get_dont_enum());
+
+	return &(*i);
+}
+
+bool
+PropertyList::reserveSlot(unsigned short slotId, string_table::key name,
+	string_table::key nsId)
+{
+	orderIterator found = iterator_find(_props, slotId + 1);
+	if (found != _props.get<1>().end())
+		return false;
+
+	Property a(name, nsId, as_value());
+	a.setOrder(slotId + 1);
+	_props.insert(a);
 	return true;
 }
 
 bool
-PropertyList::setValue(string_table::key key, const as_value& val,
-		as_object& this_ptr)
+PropertyList::getValue(const string_table::key key, as_value& val,
+		as_object& this_ptr, const string_table::key nsId) 
 {
-	iterator found = _props.find( key );
-	if ( found == _props.end() )
+	container::iterator found = iterator_find(_props, key, nsId);
+	if (found == _props.end())
+		return false;
+
+	val = found->getValue(this_ptr);
+	return true;
+}
+
+bool
+PropertyList::setValue(string_table::key key, as_value val,
+		as_object& this_ptr, string_table::key nsId)
+{
+	container::iterator found = iterator_find(_props, key, nsId);
+	
+	if (found == _props.end())
 	{
 		// create a new member
-		SimpleProperty* prop = new SimpleProperty(val);
-#ifdef DEBUG_PROPERTY_ALLOC
-		log_debug("SimpleProperty %s = %p", VM::get().getStringTable().value(key).c_str(), (void*)prop);
-#endif // DEBUG_PROPERTY_ALLOC
-		_props[key] = prop;
+		Property a(key, nsId, val);
+		// Non slot properties are negative ordering in insertion order
+		a.setOrder(- ++mDefaultOrder - 1);
+		_props.insert(a);
 		return true;
 	}
-
-	Property* prop = found->second;
-
-	if ( prop->isReadOnly() )
+	if (found->isReadOnly())
 	{
 		log_error(_("Property %s is read-only, not setting it to %s"), 
 			VM::get().getStringTable().value(key).c_str(), val.to_string().c_str());
 		return false;
 	}
 
-	//log_msg(_("Property %s set to value %s"), key.c_str(), val.to_string());
-	prop->setValue(this_ptr, val);
+	const_cast<Property*>(&(*found))->setValue(this_ptr, val);
 	return true;
 }
 
 bool
 PropertyList::setFlags(string_table::key key,
-		int setFlags, int clearFlags)
+		int setFlags, int clearFlags, string_table::key nsId)
 {
-	iterator found = _props.find( key );
+	container::iterator found = iterator_find(_props, key, nsId);
 	if ( found == _props.end() ) return false;
 
-	Property* prop = found->second;
-
-	as_prop_flags& f = prop->getFlags();
+	as_prop_flags& f = const_cast<as_prop_flags&>(found->getFlags());
 	return f.set_flags(setFlags, clearFlags);
 }
 
@@ -127,42 +192,43 @@ PropertyList::setFlagsAll(int setFlags, int clearFlags)
 	size_t success=0;
 	size_t failure=0;
 
-	for ( iterator it=_props.begin(), far=_props.end(); it != far; ++it)
+	for (container::iterator it=_props.begin(), far=_props.end(); it != far; ++it)
 	{
-		Property* prop = it->second;
-		as_prop_flags& f = prop->getFlags();
-		if ( f.set_flags(setFlags, clearFlags) ) ++success;
-		else ++failure;
+		as_prop_flags& f = const_cast<as_prop_flags&>(it->getFlags());
+		if (f.set_flags(setFlags, clearFlags))
+			++success;
+		else
+			++failure;
 	}
 
 	return std::make_pair(success,failure);
 }
 
 Property*
-PropertyList::getProperty(string_table::key key)
+PropertyList::getProperty(string_table::key key, string_table::key nsId)
 {
-	iterator it=find(key);
-	if ( it == end() ) return NULL;
-	return it->second;
+	container::iterator found = iterator_find(_props, key, nsId);
+	if (found == _props.end()) return NULL;
+	return const_cast<Property*>(&(*found));
 }
 
 std::pair<bool,bool>
-PropertyList::delProperty(string_table::key key)
+PropertyList::delProperty(string_table::key key, string_table::key nsId)
 {
 	//GNASH_REPORT_FUNCTION;
-	iterator it=find(key);
-	if ( it == end() ){
+	container::iterator found = iterator_find(_props, key, nsId);
+	if (found == _props.end())
+	{
 		return std::make_pair(false,false);
 	}
 
 	// check if member is protected from deletion
-	if ( it->second->getFlags().get_dont_delete() )
+	if (found->getFlags().get_dont_delete())
 	{
 		return std::make_pair(true,false);
 	}
 
-	delete it->second;
-	_props.erase(it);
+	_props.erase(found);
 	return std::make_pair(true,true);
 }
 
@@ -173,11 +239,12 @@ PropertyList::setFlagsAll(const PropertyList& props,
 	size_t success=0;
 	size_t failure=0;
 
-	for (const_iterator it = props.begin(), itEnd = props.end(); it != itEnd; ++it )
+	for (container::const_iterator it = props._props.begin(),
+		itEnd = props._props.end(); it != itEnd; ++it )
 	{
-		string_table::key key = it->first;
+		string_table::key key = it->mName;
 
-		if ( setFlags(key, flagsSet, flagsClear) ) ++success;
+		if (setFlags(key, flagsSet, flagsClear, it->mNamespace)) ++success;
 		else ++failure;
 	}
 
@@ -186,16 +253,21 @@ PropertyList::setFlagsAll(const PropertyList& props,
 }
 
 void
-PropertyList::enumerateKeys(as_environment& env) const
+PropertyList::enumerateKeys(as_environment& env, propNameSet& donelist) const
 {
 	string_table& st = VM::get().getStringTable();
-	for ( const_iterator i=begin(), ie=end(); i != ie; ++i)
+	for (container::const_iterator i=_props.begin(), ie=_props.end(); i != ie; ++i)
 	{
-		const Property* prop = i->second;
+		if (i->getFlags().get_dont_enum())
+			continue;
 
-		if ( prop->getFlags().get_dont_enum() ) continue;
-
-		env.push(as_value(st.value(i->first).c_str()));
+		if (donelist.insert(std::make_pair(i->mName, i->mNamespace)).second)
+		{
+			if (i->mNamespace)
+				env.push(as_value(st.value(i->mName) + "." + st.value(i->mNamespace)));
+			else
+				env.push(as_value(st.value(i->mName)));
+		}
 	}
 }
 
@@ -203,14 +275,13 @@ void
 PropertyList::enumerateKeyValue(as_object& this_ptr, std::map<std::string, std::string>& to) 
 {
 	string_table& st = VM::get().getStringTable();
-	for ( const_iterator i=begin(), ie=end(); i != ie; ++i)
+	for (container::const_iterator i=_props.begin(), ie=_props.end(); i != ie; ++i)
 	{
-		const Property* prop = i->second;
+		if (i->getFlags().get_dont_enum())
+			continue;
 
-		if ( prop->getFlags().get_dont_enum() ) continue;
-
-		to.insert(make_pair(st.value(i->first),
-				prop->getValue(this_ptr).to_string()));
+		to.insert(make_pair(st.value(i->mName),
+				i->getValue(this_ptr).to_string()));
 	}
 }
 
@@ -218,10 +289,9 @@ void
 PropertyList::dump(as_object& this_ptr, std::map<std::string, as_value>& to) 
 {
 	string_table& st = VM::get().getStringTable();
-	for ( const_iterator i=begin(), ie=end(); i != ie; ++i)
+	for (container::const_iterator i=_props.begin(), ie=_props.end(); i != ie; ++i)
 	{
-		const Property* prop = i->second;
-		to.insert(make_pair(st.value(i->first), prop->getValue(this_ptr)));
+		to.insert(make_pair(st.value(i->mName), i->getValue(this_ptr)));
 	}
 }
 
@@ -229,84 +299,80 @@ void
 PropertyList::dump(as_object& this_ptr)
 {
 	string_table& st = VM::get().getStringTable();
-	for ( const_iterator it=begin(), itEnd=end(); it != itEnd; ++it )
+	for (container::const_iterator it=_props.begin(), itEnd=_props.end(); it != itEnd; ++it )
 	{
-		log_msg("  %s: %s", st.value(it->first).c_str(),
-			it->second->getValue(this_ptr).to_string().c_str());
+		log_msg("  %s: %s", st.value(it->mName).c_str(),
+			it->getValue(this_ptr).to_string().c_str());
 	}
 }
 
 void
 PropertyList::import(const PropertyList& o) 
 {
-	for (const_iterator it = o.begin(), itEnd = o.end(); it != itEnd; ++it)
+	for (container::const_iterator it = o._props.begin(),
+		itEnd = o._props.end(); it != itEnd; ++it)
 	{
-		string_table::key key = it->first;
-		const Property* prop = it->second;
-
-		// Delete any previous property with this name
-		iterator found = _props.find(key);
-		if ( found != _props.end() )
+		// overwrite any previous property with this name
+		container::iterator found = iterator_find(_props, it->mName, it->mNamespace);
+		if (found != _props.end())
 		{
-			delete found->second;
-			found->second = prop->clone();
+			Property a = *it;
+			a.setOrder(found->getOrder());
+			_props.replace(found, a);
 		}
 		else
 		{
-			_props[key] = prop->clone();
+			Property a = *it;
+			a.setOrder(- ++mDefaultOrder - 1);
+			_props.insert(a);
 		}
 	}
 }
 
 bool
 PropertyList::addGetterSetter(string_table::key key, as_function& getter,
-	as_function& setter)
+	as_function& setter, string_table::key nsId)
 {
-	iterator found = _props.find( key );
-	if ( found != _props.end() ) return false; // already exists !!
+	container::iterator found = iterator_find(_props, key, nsId);
+	if (found != _props.end())
+	{
+		assert(0);
+		return false; // already exists !!
+	}
 
-	GetterSetterProperty* prop = new GetterSetterProperty(GetterSetter(getter, setter));
-#ifdef DEBUG_PROPERTY_ALLOC
-	log_debug("GetterSetterProperty %s = %p", V::get().getStringTable().value(key).c_str(), (void*)prop);
-#endif // DEBUG_PROPERTY_ALLOC
-	_props[key] = prop;
+	Property a(key, nsId, &getter, &setter);
+	a.setOrder(- ++mDefaultOrder - 1);
+	_props.insert(a);
 	return true;
 }
 
 bool
 PropertyList::addDestructiveGetterSetter(string_table::key key,
-	as_function& getter, as_function& setter)
+	as_function& getter, as_function& setter, string_table::key nsId)
 {
-	iterator found = _props.find(key);
+	container::iterator found = iterator_find(_props, key, nsId);
 	if (found != _props.end())
 		return false; // Already exists.
 
-	DestructiveGetterSetterProperty* prop =
-		new DestructiveGetterSetterProperty(GetterSetter(getter, setter));
-	_props[key] = prop;
+	Property a(key, nsId, &getter, &setter, 1);
+	a.setOrder(- ++mDefaultOrder - 1);
+	_props.insert(a);
 	return true;
 }
 
 void
 PropertyList::clear()
 {
-	for (iterator it = begin(), itEnd = end(); it != itEnd; ++it)
-		delete it->second;
 	_props.clear();
-}
-
-PropertyList::~PropertyList()
-{
-	for (iterator it = begin(), itEnd = end(); it != itEnd; ++it)
-		delete it->second;
 }
 
 void
 PropertyList::setReachable() const
 {
-	for (const_iterator it = begin(), itEnd = end(); it != itEnd; ++it)
+	for (container::const_iterator it = _props.begin();
+			it != _props.end(); ++it)
 	{
-		it->second->setReachable();
+		it->setReachable();
 	}
 }
 

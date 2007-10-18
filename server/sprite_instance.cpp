@@ -1760,7 +1760,8 @@ character* sprite_instance::get_character_at_depth(int depth)
 // Set *val to the value of the named member and
 // return true, if we have the named member.
 // Otherwise leave *val alone and return false.
-bool sprite_instance::get_member(string_table::key name_key, as_value* val)
+bool sprite_instance::get_member(string_table::key name_key, as_value* val,
+	string_table::key nsname)
 {
 	const std::string& name = VM::get().getStringTable().value(name_key);
 
@@ -1803,7 +1804,7 @@ bool sprite_instance::get_member(string_table::key name_key, as_value* val)
 	//
 	// TODO: simplify the next line when get_member_default takes
 	//       a std::string
-	if ( get_member_default(name_key, val) )
+	if (get_member_default(name_key, val, nsname))
 	{
 
 // ... trying to be useful to Flash coders ...
@@ -2210,7 +2211,7 @@ sprite_instance::get_relative_target(const std::string& name)
 }
 
 void sprite_instance::set_member(string_table::key name,
-		const as_value& val)
+		const as_value& val, string_table::key nsname)
 {
 #ifdef DEBUG_DYNTEXT_VARIABLES
 	//log_debug(_("sprite[%p]::set_member(%s, %s)"), (void*)this, VM::get().getStringTable().value(name), val.to_debug_string().c_str());
@@ -2251,7 +2252,7 @@ void sprite_instance::set_member(string_table::key name,
 #endif
 
 	// If that didn't work call the default set_member
-	set_member_default(name, val);
+	set_member_default(name, val, nsname);
 
 }
 

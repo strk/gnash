@@ -23,6 +23,9 @@
 #include <vector>
 #include "string_table.h"
 #include "as_value.h"
+#include "CodeStream.h"
+#include "Property.h"
+#include "as_function.h"
 
 namespace gnash {
 
@@ -31,10 +34,14 @@ class asNamespace;
 class asMethod;
 class asClass;
 class asException;
-class asBinding;
+typedef Property asBinding;
+//class asBinding;
 class asBoundValue;
 class asBoundAccessor;
 class ClassHierarchy;
+class Property;
+
+class asName;
 
 class asException
 {
@@ -56,7 +63,7 @@ private:
 	asNamespace *mNamespace;
 	string_table::key mName;
 };
-
+#if 0
 /// An abstract binding for ActionScript.
 class asBinding
 {
@@ -73,6 +80,22 @@ public:
 
 	uint32_t getSlotId() { return mSlotId; }
 	void setSlotId(uint32_t s) { mSlotId = s; }
+
+	// Chad: Document
+	string_table::key getName() { return mName; }
+	void setLexOnly(bool) { /* TODO */ }
+
+	/// If true, the attribute has a setter, but no getter.
+	bool isWriteOnly();
+
+	/// If true, the attribute can be read, but not written. Might be
+	/// constant or might have a getter but no setter.
+	bool isReadOnly(); 
+
+	bool isGetSet() { return getAccessor() != NULL; }
+
+	// Conversion from Property
+	asBinding(Property *, string_table::key name);
 
 	// As a member method.
 	asBinding(asNamespace *ns, asMethod *pMethod, bool isstatic = false) :
@@ -110,6 +133,9 @@ public:
 		mClass(NULL)
 	{/**/}
 
+	asBinding(asMethod *);
+	asBinding(as_function *);
+
 	void reset(asBoundAccessor *pAccess, bool isstatic)
 	{
 		mType = T_ACCESS;
@@ -130,13 +156,15 @@ public:
 	asClass* getClass()
 	{ return mType == T_CLASS ? mClass : NULL; }
 
-private:
+	as_function* getASFunction();
+
 	asNamespace *mNamespace;
 
 	typedef enum
 	{
 		T_CLASS,
 		T_METHOD,
+		T_AS_FUNCTION,
 		T_VALUE,
 		T_ACCESS
 	} types;
@@ -145,6 +173,8 @@ private:
 	uint32_t mSlotId;
 	bool mConst;
 	bool mStatic;
+	string_table::key mName;
+	as_object* mOwner;
 
 	union
 	{
@@ -154,16 +184,7 @@ private:
 		asBoundAccessor *mAccess;
 	};
 };
-
-class asMethodBody
-{
-public:
-	void setSize(std::size_t s) { mData.resize(s); }
-	std::size_t getSize() { return mData.size(); }
-	char *getRaw() { return &mData.front(); }
-private:
-	std::vector<char> mData;
-};
+#endif // comment out of asBinding
 
 /// Represent an ActionScript namespace
 class asNamespace
@@ -219,8 +240,6 @@ public:
 		return found;
 	}
 
-	void dump();
-
 	void setPrivate() { mPrivate = true; }
 	void unsetPrivate() { mPrivate = false; }
 	bool isPrivate() { return mPrivate; }
@@ -255,7 +274,6 @@ private:
 };
 
 class asBoundValue;
-class asBoundAccessor;
 
 class asBoundAccessor
 {
@@ -280,7 +298,7 @@ public:
 	asBoundValue() : mConst(false), mValue()
 	{ mValue.set_undefined(); }
 	void setValue(as_value &v) { mValue = v; }
-	as_value& getCurrentValue() { return mValue; }
+	as_value getCurrentValue() { return mValue; }
 
 	void setType(asClass *t) { mType = t; }
 	asClass *getType() { return mType; }
@@ -297,6 +315,8 @@ private:
 class asMethod
 {
 private:
+	as_function* mPrototype;
+
 	typedef enum
 	{
 		FLAGS_FINAL = 0x01,
@@ -308,57 +328,45 @@ private:
 	typedef std::list<asClass*> argumentList;
 	typedef std::map<string_table::key, asBinding> binding_container;
 
-	binding_container mBindings;
-	asClass *mReturnType;
-	asClass* mOwner;
-	asMethod* mSuper;
 	int mMinArguments;
 	int mMaxArguments;
+	bool mIsNative;
 	argumentList mArguments;
 	std::list<as_value> mOptionalArguments;
 	as_function *mImplementation;
 	unsigned char mFlags;
-	asMethodBody *mBody;
+	CodeStream *mBody;
 
-	bool addBinding(string_table::key name, asBinding b)
-	{ mBindings[name] = b; return true; }
-
-	asBinding *getBinding(string_table::key name)
-	{
-		binding_container::iterator i;
-		if (mBindings.empty())
-			return NULL;
-		i = mBindings.find(name);
-		if (i == mBindings.end())
-			return NULL;
-		return &i->second;
-	}
+	bool addBinding(string_table::key name, asBinding b);
 
 public:
-	asMethod() : mBindings(), mReturnType(NULL),
-		mOwner(NULL), mSuper(NULL), mMinArguments(-1), mMaxArguments(-1),
-		mArguments(), mOptionalArguments(), mImplementation(NULL), mFlags(0),
-		mBody(NULL)
-	{/**/}
+	as_function* getPrototype() { return mPrototype; }
 
-	bool hasActivation() { return !mBindings.empty(); }
+	asBinding* getBinding(string_table::key name);
 
-	asMethodBody *getBody() { return mBody; }
-	void setBody(asMethodBody* b) { mBody = b; }
+	asMethod();
+
+	bool isNative() { return mIsNative; }
+	bool hasBody() const { return mBody != NULL; }
+
+	as_object* construct(as_object *base_scope) { /* TODO */ return NULL; }
+
+	bool hasActivation();
+
+	CodeStream *getBody() { return mBody; }
+	void setBody(CodeStream *b) { mBody = b; }
 
 	bool addValue(string_table::key name, asNamespace *ns, uint32_t slotId,
-		asClass *type, as_value& val, bool isconst, ClassHierarchy *CH);
+		asClass *type, as_value& val, bool isconst);
 
 	bool addSlot(string_table::key name, asNamespace *ns, uint32_t slotId,
-		asClass *type, ClassHierarchy *CH);
+		asClass *type);
 
 	bool addMethod(string_table::key name, asNamespace *ns, asMethod *method);
 
-	bool addGetter(string_table::key name, asNamespace *ns, asMethod *method,
-		ClassHierarchy *CH);
+	bool addGetter(string_table::key name, asNamespace *ns, asMethod *method);
 
-	bool addSetter(string_table::key name, asNamespace *ns, asMethod *method,
-		ClassHierarchy *CH);
+	bool addSetter(string_table::key name, asNamespace *ns, asMethod *method);
 
 	bool addMemberClass(string_table::key name, asNamespace *ns,
 		uint32_t slotId, asClass *type);
@@ -367,26 +375,21 @@ public:
 		uint32_t slotId, asMethod *method);
 
 	/// \brief
-	/// Get the unique identifier of the owning class.
-	/// 0 indicates that no class owns this.
-	asClass* getOwner() const { return mOwner; }
-
-	/// \brief
 	/// Set the owner of this method.
-	void setOwner(asClass* s) { mOwner = s; }
+	void setOwner(asClass* s);
 
 	/// \brief
 	/// Get the unique identifier for the return type. 0 is 'anything'.
 	/// (This is the value of any dynamic property.)
 	/// Id reference: Type
-	asClass* getReturnType() const { return mReturnType; }
+	asClass* getReturnType() const;
 
 	/// Set the return type
-	void setReturnType(asClass* t) { mReturnType = t; }
+	void setReturnType(asClass* t);
 
-	asMethod *getSuper() { return mSuper; }
+	asMethod *getSuper();
 
-	void setSuper(asMethod* s) { mSuper = s; }
+	void setSuper(asMethod* s);
 
 	/// \brief
 	/// Is the method final? If so, it may not be overridden.
@@ -464,35 +467,6 @@ public:
 	/// Note: This may be NULL, because we might have information about this
 	/// function but not actually have it yet.
 	as_function* getImplementation() { return mImplementation; }
-
-	/// \brief
-	/// Check to see whether m could override this.
-	///
-	/// Check to see whether m could override this. This means:
-	/// Same return type. Same parameter types. Same access. At least as many
-	/// default arguments. this is not final or private. Should check, but
-	/// does not for information storing reasons: they are not in the same
-	/// override chain. (Can be checked in management object.)
-	/// have a super.
-	bool isOkayAsSuper(const asMethod &m) const
-	{
-		if (mMinArguments < m.mMinArguments
-			|| m.mMaxArguments < mMaxArguments
-			|| isFinal()
-			|| mFlags != m.mFlags
-			|| isPrivate())
-			return false;
-		for (argumentList::const_iterator i, j; /**/; ++i, ++j)
-		{
-			if (i == mArguments.end())
-				return (j == mArguments.end());
-			if (j == mArguments.end())
-				return false;
-			if (*i != *j)
-				return false;
-		}
-		return true;
-	}
 };
 
 /// A class to represent, abstractly, ActionScript prototypes.
@@ -504,23 +478,24 @@ public:
 class asClass
 {
 public:
+	as_object* getPrototype() { return mPrototype; }
+
 	void dump();
 
 	bool addValue(string_table::key name, asNamespace *ns, uint32_t slotId,
-		asClass *type, as_value& val, bool isconst, bool isstatic,
-		ClassHierarchy *CH);
+		asClass *type, as_value& val, bool isconst, bool isstatic);
 
 	bool addSlot(string_table::key name, asNamespace *ns, uint32_t slotId,
-		asClass *type, bool isstatic, ClassHierarchy *CH);
+		asClass *type, bool isstatic);
 
 	bool addMethod(string_table::key name, asNamespace *ns, asMethod *method,
 		bool isstatic);
 
 	bool addGetter(string_table::key name, asNamespace *ns, asMethod *method,
-		bool isstatic, ClassHierarchy *CH);
+		bool isstatic);
 
 	bool addSetter(string_table::key name, asNamespace *ns, asMethod *method,
-		bool isstatic, ClassHierarchy *CH);
+		bool isstatic);
 
 	bool addMemberClass(string_table::key name, asNamespace *ns,
 		uint32_t slotId, asClass *type, bool isstatic);
@@ -587,10 +562,15 @@ public:
 
 	/// This is our constructor.
 	void setConstructor(asMethod *m) { mConstructor = m; }
+	asMethod *getConstructor() { return mConstructor; }
 
 	void setStaticConstructor(asMethod *m) { mStaticConstructor = m; }
 
 	void setSuper(asClass *p) { mSuper = p; }
+
+	/// Try to build an asClass object from just a prototype.
+	void buildFromPrototype(as_object *o, string_table::key name,
+		ClassHierarchy *);
 
 	void setDeclared() { mDeclared = true; }
 	bool isDeclared() { return mDeclared; }
@@ -608,7 +588,24 @@ public:
 		mSystem(false)
 	{/**/}
 
+
+	asBinding *getBinding(string_table::key name)
+	{
+		binding_container::iterator i;
+		if (mBindings.empty())
+			return NULL;
+		i = mBindings.find(name);
+		if (i == mBindings.end())
+			return NULL;
+		return &i->second;
+	}
+
+	asBinding* getGetBinding(as_value& v, asName& n);
+	asBinding* getSetBinding(as_value& v, asName& n);
+
 private:
+	as_object *mPrototype;
+
 	bool addBinding(string_table::key name, asBinding b)
 	{ mBindings[name] = b; return true; }
 	bool addStaticBinding(string_table::key name, asBinding b)
@@ -621,17 +618,6 @@ private:
 			return NULL;
 		i = mStaticBindings.find(name);
 		if (i == mStaticBindings.end())
-			return NULL;
-		return &i->second;
-	}
-
-	asBinding *getBinding(string_table::key name)
-	{
-		binding_container::iterator i;
-		if (mBindings.empty())
-			return NULL;
-		i = mBindings.find(name);
-		if (i == mBindings.end())
 			return NULL;
 		return &i->second;
 	}

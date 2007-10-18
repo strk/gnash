@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.70 2007/10/08 15:03:00 strk Exp $ */
+/* $Id: as_value.h,v 1.71 2007/10/18 11:47:54 cmusick Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -34,6 +34,8 @@
 #include <boost/variant.hpp>
 #include <ostream> // for inlined output operator
 
+#include "string_table.h"
+
 namespace gnash {
 
 class as_object;
@@ -41,6 +43,8 @@ class fn_call;
 class as_function;
 class sprite_instance;
 class as_environment;
+class asNamespace;
+class asName;
 
 #ifndef HAVE_ISFINITE
 # ifndef isfinite 
@@ -82,6 +86,14 @@ static inline int isnan_ld (long double x) { return x != x; }
 /// is SWF6 or lower
 ///
 #define PROPNAME(x) ( VM::get().getSWFVersion() < 7 ? boost::to_lower_copy(std::string(x)) : (x) )
+
+/// These are the primitive types, see the ECMAScript reference.
+enum primitive_types
+{
+	PTYPE_STRING,
+	PTYPE_NUMBER,
+	PTYPE_BOOLEAN
+};
 
 /// ActionScript value type.
 //
@@ -162,6 +174,9 @@ public:
 	/// Construct a NUMBER value
 	as_value(unsigned long val);
 
+	/// Chad: Document this
+	as_value(asNamespace &) {/**/}
+
 	/// Construct a NULL, OBJECT, MOVIECLIP or AS_FUNCTION value
 	//
 	/// See as_object::to_movie and as_object::to_function
@@ -194,6 +209,32 @@ public:
 
 	/// Return the primitive type of this value, as a string.
 	const char* typeOf() const;
+
+	/// Get the primitive type of this value
+	primitive_types ptype() const
+	{
+		switch (m_type)
+		{
+		case STRING: return PTYPE_STRING;
+		case NUMBER: return PTYPE_NUMBER;
+		case AS_FUNCTION:
+		case UNDEFINED:
+		case NULLTYPE:
+		case MOVIECLIP:
+			return PTYPE_NUMBER;
+		case OBJECT:
+			// TODO: Date objects should return TYPE_STRING
+			return PTYPE_NUMBER;
+		case BOOLEAN:
+			return PTYPE_BOOLEAN;
+		default:
+			break; // Should be only exceptions here.
+		}
+		return PTYPE_NUMBER;
+	}
+
+	// Chad: Document
+	bool conforms_to(string_table::key name);
 
 	/// \brief
 	/// Return true if this value is callable

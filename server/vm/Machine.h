@@ -28,28 +28,9 @@ namespace gnash {
 
 class character;
 class as_object;
-
-class asScope
-{
-public:
-	void setBase(asScope *);
-};
-
-class asName
-{
-public:
-	asName(uint32_t);
-	asName();
-	void makeComplete();
-
-	bool isRuntime();
-	bool isRtns();
-
-	void fill(as_object*);
-	void setNamespace(as_value&);
-
-	uint32_t id;
-};
+class abc_block;
+class asName;
+class Property;
 
 /// This machine is intended to work without relying on the C++ call stack,
 /// by resetting its Stream and Stack members (actually, by limiting the stack)
@@ -142,19 +123,7 @@ public:
 	/// Nothing.
 	void setMember(asClass*, asName&, as_value& target, as_value& val);
 
-	std::string& pool_string(uint32_t);
-	int pool_int(uint32_t);
-	unsigned int pool_uint(uint32_t);
-	double pool_double(uint32_t);
-	asNamespace* pool_namespace(uint32_t);
-	asMethod* pool_method(uint32_t);
-	asClass* pool_class(uint32_t);
-	asName* pool_name(uint32_t);
-
-	asBinding* findProperty(asName&);
-
-	void pushScope(asScope*);
-	asScope* popScope();
+	asBinding* findProperty(asName&) { return NULL; }
 
 	void execute();
 
@@ -178,10 +147,16 @@ public:
 	/// but mVoidSlot can be used for values that will be discarded.
 	///
 	/// @param pBind
-	/// The non-null binding.  If this is only a partial binding, then
+	/// The binding.  If this is only a partial binding, then
 	/// the 'this' value will be used to complete it, when possible.
+	/// Sending a null binding will result in a no-op, not an error.
 	void pushCall(unsigned int stack_in, as_value *return_slot,
-		asBinding *pBind);
+		Property *pBind);
+
+	void immediateFunction(as_function *to_call, as_value& storage,
+		as_object *pThis);
+	void immediateProcedure(as_function *to_call, as_object *pthis,
+		const as_value *stackAdditions, unsigned int stackAdditionsCount);
 
 	Machine(string_table &ST, ClassHierarchy *CH);
 
@@ -196,8 +171,21 @@ private:
 		unsigned int mScopeTotalSize;
 		CodeStream *mStream;
 		asNamespace *mDefaultXMLNamespace;
-		asScope *mCurrentScope;
+		as_object *mCurrentScope;
 		as_value *mGlobalReturn;
+		as_object *mThis;
+	};
+
+	class Scope
+	{
+	public:
+		unsigned int mHeightAfterPop;
+		as_object *mScope;
+
+		Scope() : mHeightAfterPop(0), mScope(NULL) {/**/}
+		Scope(unsigned int i, as_object *o) : mHeightAfterPop(i),
+			mScope(o)
+		{/**/}
 	};
 
 	void saveState();
@@ -205,7 +193,7 @@ private:
 
 	SafeStack<as_value> mStack;
 	SafeStack<State> mStateStack;
-	SafeStack<asScope> mScopeStack;
+	SafeStack<Scope> mScopeStack;
 	SafeStack<as_value> mFrame;
 	CodeStream *mStream;
 
@@ -213,13 +201,16 @@ private:
 	string_table& mST;
 
 	asNamespace* mDefaultXMLNamespace;
-	asScope *mGlobalScope;
-	asScope *mCurrentScope;
+	as_object* mCurrentScope;
+	as_object* mGlobalScope;
+	as_object* mDefaultThis;
+	as_object* mThis;
 
 	as_value *mGlobalReturn;
 	as_value mIgnoreReturn; // Throw away returns go here.
 
 	bool mIsAS3; // Is the stream an AS3 stream.
+	abc_block* mPoolObject; // Where all of the pools are stored.
 };
 
 } // namespace gnash
