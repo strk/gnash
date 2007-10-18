@@ -146,7 +146,7 @@
   .action:
     stop();
     // Gnash failed on totals() by discarding some checks.
-    xtotals(12);
+    xtotals(14);
   .end
   
 .end  // file end
