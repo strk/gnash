@@ -1,3 +1,14 @@
+2007-10-17 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler_cairo.cpp: New Cairo implementation.
+	Fixes all Cairo bugs currently in Savannah, but adds a set of
+	new bugs. The new renderer offers significantly better
+	performance and better rendering quality. This implementation
+	does not rely on Gnash's own triangulation.
+	* backend/render_handler_cairo.h: Renamed set_handle to
+	set_context, which is more descriptive.
+	* gui/gtk_glue_cairo.{cpp,h}: Updated for set_context.
+
 2007-10-17 Sandro Santilli <strk@keybit.net>
 
 	* server/: as_environment.{cpp,h}, sprite_instance.cpp:
