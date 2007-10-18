@@ -560,7 +560,7 @@ generate_mouse_button_events(mouse_button_state* ms)
 
 			// set/kill focus for current root
 			movie_root& mroot = VM::get().getRoot();
-			character* current_active_entity = mroot.get_active_entity();
+			character* current_active_entity = mroot.getFocus();
 
 			// It's another entity ?
 			if (current_active_entity != active_entity.get())
@@ -573,7 +573,7 @@ generate_mouse_button_events(mouse_button_state* ms)
 					//       wheter the action must trigger
 					//       a redraw.
 					need_redisplay=true;
-					mroot.set_active_entity(NULL);
+					mroot.setFocus(NULL);
 				}
 
 				// Then to set focus
@@ -581,7 +581,7 @@ generate_mouse_button_events(mouse_button_state* ms)
 				{
 					if (active_entity->on_event(event_id::SETFOCUS))
 					{
-						mroot.set_active_entity(active_entity.get());
+						mroot.setFocus(active_entity.get());
 					}
 				}
 			}
@@ -1068,14 +1068,14 @@ void movie_root::notify_mouse_listeners(const event_id& event)
 }
 
 character*
-movie_root::get_active_entity()
+movie_root::getFocus()
 {
 	assert(testInvariant());
 	return m_active_input_text;
 }
 
 void
-movie_root::set_active_entity(character* ch)
+movie_root::setFocus(character* ch)
 {
 	m_active_input_text = ch;
 	assert(testInvariant());

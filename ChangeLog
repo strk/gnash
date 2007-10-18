@@ -1,5 +1,8 @@
 2007-10-18 Sandro Santilli <strk@keybit.net>
 
+	* server/: movie_root.{cpp,h}, edit_text_character.cpp:
+	  Renamed movie_root::{get,set}_active_entity to
+	  movie_root::{get,set}Focus for clarity, and documented it.
 	* testsuite/swfdec/PASSING: we now pass
 	  addProperty-get-prototypes-{6,7,8}.swf
 

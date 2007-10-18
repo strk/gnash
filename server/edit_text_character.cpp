@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.126 2007/10/18 11:47:54 cmusick Exp $ */
+/* $Id: edit_text_character.cpp,v 1.127 2007/10/18 13:51:33 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -594,7 +594,7 @@ edit_text_character::on_event(const event_id& id)
 			if (m_has_focus == true)
 			{
 				movie_root& root = _vm.getRoot();
-				root.set_active_entity(NULL);
+				root.setFocus(NULL);
 				root.remove_key_listener(this);
 				m_has_focus = false;
 				format_text();

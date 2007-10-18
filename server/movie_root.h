@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.80 2007/10/02 15:44:51 strk Exp $ */
+/* $Id: movie_root.h,v 1.81 2007/10/18 13:51:33 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -504,16 +504,19 @@ public:
 
     /// Get the character having focus
     //
+    /// The character having focus will receive mouse button
+    /// and key presses/releases.
+    ///
     /// @return the character having focus or NULL of none.
     ///
-    character* get_active_entity();
+    character* getFocus();
 
     /// Set the character having focus
     //
     /// @param ch
     /// The character having focus. NULL to kill focus.
     ///
-    void set_active_entity(character* ch);
+    void setFocus(character* ch);
     
     DSOEXPORT void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 
