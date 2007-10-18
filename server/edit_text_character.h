@@ -280,6 +280,12 @@ public:
 
 private:
 
+	/// Set focus 
+	void setFocus();
+
+	/// Kill focus 
+	void killFocus();
+
 	/// Call this function when willing to invoke the onChanged event handler
 	void onChanged();
 

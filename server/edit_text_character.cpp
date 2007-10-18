@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.127 2007/10/18 13:51:33 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.128 2007/10/18 16:28:45 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -575,30 +575,13 @@ edit_text_character::on_event(const event_id& id)
 	{
 		case event_id::SETFOCUS:
 		{
-			if (m_has_focus == false)
-			{
-#ifdef NEW_KEY_LISTENER_LIST_DESIGN
-				_vm.getRoot().add_key_listener(KeyListener(this, KeyListener::ON_CLIP_DEF));
-#else
-				_vm.getRoot().add_key_listener(this);
-#endif
-				m_has_focus = true;
-				m_cursor = _text.size();
-				format_text();
-			}
+			setFocus();
 			break;
 		}
 
 		case event_id::KILLFOCUS:
 		{
-			if (m_has_focus == true)
-			{
-				movie_root& root = _vm.getRoot();
-				root.setFocus(NULL);
-				root.remove_key_listener(this);
-				m_has_focus = false;
-				format_text();
-			}
+			killFocus();
 			break;
 		}
 
@@ -2077,6 +2060,40 @@ edit_text_character::onChanged()
 	string_table::key key = st.find(PROPNAME("onChanged"));
 	as_environment& env = const_cast<edit_text_character*>(this)->get_environment();
 	callMethod(key, env);
+}
+
+void
+edit_text_character::setFocus()
+{
+	if ( m_has_focus ) return; // nothing to do
+
+	set_invalidated();
+
+	m_has_focus = true;
+
+#ifdef NEW_KEY_LISTENER_LIST_DESIGN
+	_vm.getRoot().add_key_listener(KeyListener(this, KeyListener::ON_CLIP_DEF));
+#else
+	_vm.getRoot().add_key_listener(this);
+#endif
+
+	m_cursor = _text.size();
+	format_text();
+}
+
+void
+edit_text_character::killFocus()
+{
+	if ( ! m_has_focus ) return; // nothing to do
+
+	set_invalidated();
+
+	m_has_focus = false;
+
+	movie_root& root = _vm.getRoot();
+	root.setFocus(NULL);
+	root.remove_key_listener(this);
+	format_text(); // is this needed ?
 }
 
 } // namespace gnash
