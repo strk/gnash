@@ -1,3 +1,7 @@
+2007-10-18 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* macros/mtasc.m4: Don't prepend a path to test with "x".
+
 2007-10-19 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* plugin/plugin.cpp, macros/boost.m4: Added year 2007.

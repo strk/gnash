@@ -54,7 +54,7 @@ AC_DEFUN([AC_PATH_MTASC], [
 
   if test x"$MTASC" != "x" -a x"$MTASC_CLASSPATH" = "x"; then
     # cross your fingers !
-    if test -d x"`dirname ${MTASC}`/std"; then
+    if test -d "`dirname ${MTASC}`/std"; then
     dir="`dirname ${MTASC}`/std"
     else
     dnl FIXME
