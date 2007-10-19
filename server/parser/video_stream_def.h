@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.h,v 1.14 2007/10/19 09:30:24 strk Exp $
+// $Id: video_stream_def.h,v 1.15 2007/10/19 12:17:28 strk Exp $
 
 #ifndef GNASH_VIDEO_STREAM_DEF_H
 #define GNASH_VIDEO_STREAM_DEF_H
@@ -57,25 +57,24 @@ public:
 
 	character* create_character_instance(character* parent, int id);
 
-	/// Read tag SWF::DEFINEVIDEOSTREAM or SWF::VIDEOFRAME
+	/// Read tag SWF::DEFINEVIDEOSTREAM 
 	//
-	/// For DEFINEVIDEOSTREAM tag, the character_id is assumed to have been
-	/// already read by caller.
+	/// The character_id is assumed to have been already read by caller.
 	///
-	/// For VIDEOFRAME, again, the character_id (which contains association
-	/// between the VIDEOFRAME tag and the VIDEOSTREAM defined before) is
-	/// assumed to have been already read.
+	/// This function is allowed to be called only *once* for each
+	/// instance of this class.
 	///
-	/// For clarity, a *single* instance of this class should theoretically
-	/// read a DEFINEVIDEOSTREAM on first call and zero or more VIDEOFRAME
-	/// tags.
+	void readDefineVideoStream(stream* in, SWF::tag_type tag, movie_definition* m);
+
+	/// Read tag SWF::VIDEOFRAME
+	//
+	/// The character_id (used to find this instance in the character's dictionary)
+	/// is assumed to have been already read.
 	///
-	/// TODO: separate the two reader functions, provide a constructor
-	///       reading the DEFINEVIDEOSTREAM and only expose the parser
-	///	      for VIDEOFRAME (to ensure, at C++ level, that we won't
-	///       parse DEFINEVIDEOSTREAM twice).
+	/// This function is allowed to be called zero or more times, as long
+	/// as readDefineVideoStream was read before.
 	///
-	void	read(stream* in, SWF::tag_type tag, movie_definition* m);
+	void readDefineVideoFrame(stream* in, SWF::tag_type tag, movie_definition* m);
 
 	/// Return local video bounds in twips
 	const rect&	get_bound() const
@@ -137,6 +136,22 @@ private:
 	///
 	typedef std::map<uint32_t, image::image_base*> EmbedFrameMap;
 	EmbedFrameMap m_video_frames;
+
+	/// Set data for the given frame
+	//
+	/// If a frame image is already known for the given frame number
+	/// it will NOT be replaced, and an SWF error will be printed.
+	/// The 'img' parameter will be deleted.
+	///
+	/// See get_frame_data to extract it.
+	///
+	/// @param frameNum
+	///	Frame number.
+	///
+	/// @param img
+	///	Frame data. Ownership is transferred. 
+	///
+	void setFrameData(uint32_t frameNum, std::auto_ptr<image::image_base> img);
 
 	/// Width of the video
 	uint32_t _width;

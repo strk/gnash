@@ -1,5 +1,16 @@
 2007-10-19 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/video_stream_def.{cpp,h}: split read into
+	  readDefineVideoStream and readDefineVideoFrame, make
+	  presence of a non-null _decoder member a sign of a
+	  completed call to readDefineVideoStream (thus a sign
+	  of a statically-defined videostream vs. a dynamically
+	  created one [ using new Video ] ).
+	* server/swf/tag_loaders.cpp: update calls to video_stream_def
+	  ::read*
+
+2007-10-19 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/video_stream_def.cpp (read): rework the input
 	  buffer padding to be cleaner, safer and a bit faster (only
 	  memset the pad); (destructor): get rid of the embedded video

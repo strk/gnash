@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.147 2007/10/19 09:20:55 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.148 2007/10/19 12:17:28 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1391,10 +1391,10 @@ define_video_loader(stream* in, tag_type tag, movie_definition* m)
     assert(tag == SWF::DEFINEVIDEOSTREAM); // 60
     uint16_t character_id = in->read_u16();
 
-    video_stream_definition* ch = new video_stream_definition(character_id);
-    ch->read(in, tag, m);
+    std::auto_ptr<video_stream_definition> chdef ( new video_stream_definition(character_id) );
+    chdef->readDefineVideoStream(in, tag, m);
 
-    m->add_character(character_id, ch);
+    m->add_character(character_id, chdef.release());
 
 }
 
@@ -1424,7 +1424,7 @@ video_loader(stream* in, tag_type tag, movie_definition* m)
         return;
     }
 
-    vdef->read(in, tag, m);
+    vdef->readDefineVideoFrame(in, tag, m);
 }
 
 void
