@@ -1,3 +1,10 @@
+2007-10-19 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/fb.cpp, gui/fbsup.h: Preliminary support for keyboard input;
+	  implemented mouse handler using Linux Input Subsytem (made new 
+	  default); simple built-in touchscreen calibration/conversion;
+	  preliminary input device configuration via environment variables
+
 2007-10-19 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/video_stream_def.{cpp,h}: split read into

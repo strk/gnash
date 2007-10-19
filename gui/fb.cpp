@@ -17,6 +17,52 @@
 
 // -----------------------------------------------------------------------------
    
+/// \page fb_input FB GUI input devices
+///
+/// The framebuffer GUI supports various input devices through the modern
+/// Linux Input Subsystem (/dev/input/event*). Both standard mice and 
+/// touchscreen devices are supported.
+///
+/// Make sure the USE_INPUT_EVENTS macro is defined in fbsup.h so that
+/// the events system is enabled for the FB GUI (this may be configurable
+/// at runtime sometime).
+///
+/// Since there can be multiple input devices in /dev/input/ you have to
+/// specify which device to use using the 
+///  POINTING_DEVICE environment variable for the mouse and
+///  KEYBOARD_DEVICE environment variable for the keyboard
+   
+
+/// \page fb_calibration FB GUI Touchscreen Calibration
+///
+/// The touchscreen drivers (like "usbtouchscreen") provide raw data from the
+/// devices. It is up to the user space program to translate this data to
+/// screen coordinates. Normally this is done by the X server so this 
+/// conversion needs to be done internally by Gnash itself.
+///
+/// The current implementation uses a very simple 2-point calibration where
+/// the first point is at one fifth of the screen width and height and the
+/// second point is at the exact opposite part of the screen (at it's lower
+/// right). The SWF file calibrate.swf provides a simple graphical reference
+/// for 4:3 sized screens (don't use it for other formats!).
+/// 
+/// With the current preliminary implementation it's a bit uncomfortable to do 
+/// the calibration:
+/// 
+/// 1) starting gnash with DUMP_RAW environment variable will show raw 
+///    coordinates on STDOUT:
+///      DUMP_RAW=1 gnash calibrate.swf
+/// 
+/// 2) Keep touching the upper left reference point for a while. You'll get
+///    lots of (similar) coordinates printed. Choose a X/Y coordinate pair you 
+///    think is the best one (ie. the average) and write it down.
+///
+/// 3) Do the same for the lower right reference point.
+///
+/// From now on, start gnash with the TSCALIB enivronment variable set to
+/// the coordinates you just found out. Write the coordinates separated by
+/// commas (X,Y,X,Y), like this: 
+///   TSCALIB=491,1635,1581,639 gnash yourmovie.swf    
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -33,6 +79,7 @@
 #include <unistd.h>
 #include <signal.h>
 
+
 #include "gnash.h"
 #include "gui.h"
 #include "fbsup.h"
@@ -41,6 +88,8 @@
 
 #include "render_handler.h"
 #include "render_handler_agg.h"
+
+#include <linux/input.h>    // for /dev/input/event*
 
 //#define DEBUG_SHOW_FPS  // prints number of frames per second to STDOUT
 
@@ -126,7 +175,7 @@ FBGui::FBGui(unsigned long xid, float scale, bool loop, unsigned int depth)
 	#endif
 
   input_fd=-1;
-	
+  
 	signal(SIGINT, terminate_signal);
 	signal(SIGTERM, terminate_signal);
 }
@@ -196,7 +245,12 @@ bool FBGui::init(int /*argc*/, char *** /*argv*/)
   // Initialize mouse (don't abort if no mouse found)
   if (!init_mouse()) {
     // just report to the user, keep on going...
-    log_msg("You won't have any input device, sorry.");
+    log_msg("You won't have any pointing input device, sorry.");
+  }
+  
+  // Initialize keyboard (still not critical)
+  if (!init_keyboard()) {   
+    log_msg("You won't have any keyboard input device, sorry.");
   }
 
   // Open the framebuffer device
@@ -327,6 +381,7 @@ bool FBGui::run()
 		  usleep(1); // task switch
 		  
 		  check_mouse(); // TODO: Exit delay loop on mouse events! 
+		  check_keyboard(); // TODO: Exit delay loop on keyboard events!
 		        
       if (!gettimeofday(&tv, NULL))
         timer = (double)tv.tv_sec + (double)tv.tv_usec / 1000000.0;
@@ -492,8 +547,18 @@ void FBGui::read_mouse_data()
 bool FBGui::mouse_command(unsigned char cmd, unsigned char *buf, int count) {
   int n;
   
+  // flush input buffer
+  char trash[16];
+  do {
+    n = read(input_fd, trash, sizeof trash);
+    if (n>0) 
+      log_msg("mouse_command: discarded %d bytes from input buffer", n);
+  } while (n>0);
+  
+  // send command
   write(input_fd, &cmd, 1);
   
+  // read response (if any)
   while (count>0) {
     usleep(250*1000); // 250 ms inter-char timeout (simple method)
     // TODO: use select() instead
@@ -503,6 +568,7 @@ bool FBGui::mouse_command(unsigned char cmd, unsigned char *buf, int count) {
     count-=n;
     buf+=n;
   }
+  
   return true;
   
 } //command()
@@ -541,6 +607,15 @@ bool FBGui::init_mouse()
     close(input_fd);
     input_fd=-1;
     return false; 
+  }
+  
+  // Get Device ID (not crucial, debug only)
+  if ((!mouse_command(0xF2, buf, 2)) || (buf[0]!=0xFA)) {
+    log_msg("WARNING: Could not detect mouse device ID");
+  } else {
+    unsigned char devid = buf[1];
+    if (devid!=0)
+      log_msg("WARNING: Non-standard mouse device ID %d", devid);
   }
   
   // Enable mouse data reporting
@@ -736,6 +811,402 @@ void FBGui::check_mouse()
   
 }
 #endif
+
+#ifdef USE_INPUT_EVENTS  	
+bool FBGui::init_mouse()
+{
+
+  char* devname = getenv("POINTING_DEVICE");
+  if (!devname) devname="/dev/input/event0";
+
+  // Try to open mouse device, be error tolerant (FD is kept open all the time)
+  input_fd = open(devname, O_RDONLY);
+  
+  if (input_fd<0) {
+    log_msg("Could not open %s: %s", devname, strerror(errno));    
+    return false;
+  }
+  
+  log_msg("Pointing device %s open", devname);
+  
+  if (fcntl(input_fd, F_SETFL, fcntl(input_fd, F_GETFL) | O_NONBLOCK)<0) {
+    log_error("Could not set non-blocking mode for pointing device: %s", strerror(errno));
+    close(input_fd);
+    input_fd=-1;
+    return false; 
+  }
+  
+  return true;
+
+} //init_mouse
+
+void FBGui::apply_ts_calibration(float* cx, float* cy, int rawx, int rawy) {
+
+  /*
+  <UdoG>:
+  This is a *very* simple method to translate raw touchscreen coordinates to
+  the screen coordinates. We simply to linear interpolation between two points.
+  Note this won't work well when the touchscreen is not perfectly aligned to
+  the screen (ie. slightly rotated). Standard touchscreen calibration uses
+  5 calibration points (or even 25). If someone can give me the formula, tell
+  me! I'm too lazy right now to do the math myself... ;)  
+  
+  And sorry for the quick-and-dirty implementation! I'm in a hurry...
+  */
+
+  float ref1x = m_stage_width  / 5 * 1;
+  float ref1y = m_stage_height / 5 * 1;
+  float ref2x = m_stage_width  / 5 * 4;
+  float ref2y = m_stage_height / 5 * 4;
+  
+  static float cal1x = 2048/5*1;   // very approximative default values
+  static float cal1y = 2048/5*4;
+  static float cal2x = 2048/5*4;
+  static float cal2y = 2048/5*1;
+  
+  static bool initialized=false; // woohooo.. better don't look at this code...
+  if (!initialized) {
+    initialized=true;
+    
+    char* settings = getenv("TSCALIB");
+    
+    if (settings) {
+    
+      // expected format: 
+      // 491,1635,1581,646      (cal1x,cal1y,cal2x,cal2y; all integers)
+
+      char buffer[1024];      
+      char* p1;
+      char* p2;
+      bool ok = false;
+      
+      snprintf(buffer, sizeof buffer, "%s", settings);
+      p1 = buffer;
+      
+      do {
+        // cal1x        
+        p2 = strchr(p1, ',');
+        if (!p2) continue; // stop here
+        *p2 = 0;
+        cal1x = atoi(p1);        
+        p1=p2+1;
+        
+        // cal1y        
+        p2 = strchr(p1, ',');
+        if (!p2) continue; // stop here
+        *p2 = 0;
+        cal1y = atoi(p1);        
+        p1=p2+1;
+        
+        // cal2x        
+        p2 = strchr(p1, ',');
+        if (!p2) continue; // stop here
+        *p2 = 0;
+        cal2x = atoi(p1);        
+        p1=p2+1;
+        
+        // cal2y        
+        cal2y = atoi(p1);
+        
+        ok = true;        
+        
+      } while (0);
+      
+      if (!ok)
+        log_msg("WARNING: Error parsing calibration data!");
+      
+      log_msg("Using touchscreen calibration data: %.0f / %.0f / %.0f / %.0f",
+        cal1x, cal1y, cal2x, cal2y);
+    
+    } else {
+      log_msg("WARNING: No touchscreen calibration settings found. "
+        "The mouse pointer most probably won't work precisely. Set "
+        "TSCALIB environment variable with correct values for better results");
+    }
+    
+  } //!initialized
+
+
+  // real duty: 
+  *cx = (rawx-cal1x) / (cal2x-cal1x) * (ref2x-ref1x) + ref1x;
+  *cy = (rawy-cal1y) / (cal2y-cal1y) * (ref2y-ref1y) + ref1y;
+}
+
+void FBGui::check_mouse()
+{
+
+  struct input_event ev;  // time,type,code,value
+  
+  static int new_mouse_x = 0; // all uncalibrated!
+  static int new_mouse_y = 0;
+  static int new_mouse_btn = 0;
+  
+  // this is necessary for our quick'n'dirty touchscreen calibration: 
+  static int coordinatedebug = getenv("DUMP_RAW")!=NULL;
+  
+  
+  // Assuming we will never read less than one full struct...
+  
+  while (read(input_fd, &ev, sizeof ev) == (sizeof ev)) {
+  
+    if (ev.type == EV_SYN) {    // synchronize (apply information)
+    
+      if ((new_mouse_x != mouse_x) || (new_mouse_y != mouse_y)) {
+      
+        mouse_x = new_mouse_x;
+        mouse_y = new_mouse_y;
+        
+        float xscale = getXScale();
+        float yscale = getYScale();
+            
+        float cx, cy;
+        
+        if (getenv("TSCALIB"))  // ONLY convert when requested
+          apply_ts_calibration(&cx, &cy, mouse_x, mouse_y);
+        else
+          { cx=mouse_x; cy=mouse_y; }
+              
+        notify_mouse_moved(int(cx / xscale), int(cy / yscale));
+      }
+      
+      if (new_mouse_btn != mouse_btn) {
+        mouse_btn = new_mouse_btn;
+        notify_mouse_clicked(mouse_btn, 1);  // mark=??
+      }
+
+      if (coordinatedebug)
+        printf("% 5d / % 5d / % 5d\n", mouse_x, mouse_y, mouse_btn);
+      
+    }
+  
+    if (ev.type == EV_KEY) {    // button down/up
+    
+      // don't care which button, we support only one...
+      new_mouse_btn = ev.value;      
+      
+    }
+      
+    if (ev.type == EV_ABS) {    // absolute coordinate
+      if (ev.code == ABS_X) new_mouse_x = ev.value;
+      if (ev.code == ABS_Y) new_mouse_y = ev.value;
+    }
+    
+    if (ev.type == EV_REL) {    // relative movement
+      if (ev.code == REL_X) new_mouse_x += ev.value;
+      if (ev.code == REL_Y) new_mouse_y += ev.value;
+      
+      if (new_mouse_x < 0) new_mouse_x=0;
+      if (new_mouse_y < 0) new_mouse_y=0;
+      
+      if (new_mouse_x > m_stage_width ) new_mouse_x = m_stage_width;
+      if (new_mouse_y > m_stage_height) new_mouse_y = m_stage_height;
+    }      
+  
+  } 
+ 
+} //check_mouse
+#endif
+
+
+bool FBGui::init_keyboard() 
+{
+  char* devname = getenv("KEYBOARD_DEVICE");
+  if (!devname) devname="/dev/input/event0";
+
+  // Try to open keyboard device, be error tolerant (FD is kept open all the time)
+  keyb_fd = open(devname, O_RDONLY);
+  
+  if (keyb_fd<0) {
+    log_msg("Could not open %s: %s", devname, strerror(errno));    
+    return false;
+  }
+  
+  log_msg("Keyboard device %s open", devname);
+  
+  if (fcntl(keyb_fd, F_SETFL, fcntl(keyb_fd, F_GETFL) | O_NONBLOCK)<0) {
+    log_error("Could not set non-blocking mode for keyboard device: %s", strerror(errno));
+    close(keyb_fd);
+    keyb_fd=-1;
+    return false; 
+  }
+  
+  return true;
+}
+
+gnash::key::code FBGui::scancode_to_gnash_key(int code, bool shift) {
+ 
+  // NOTE: Scancodes are mostly keyboard oriented (ie. Q, W, E, R, T, ...)
+  // while Gnash codes are mostly ASCII-oriented (A, B, C, D, ...) so no
+  // direct conversion is possible.
+  
+  // TODO: This is a very *incomplete* list and I also dislike this method
+  // very much because it depends on the keyboard layout (ie. pressing "Z"
+  // on a german keyboard will print "Y" instead). So we need some 
+  // alternative...
+  
+  switch (code) {
+  
+    case KEY_1      : return !shift ? gnash::key::_1 : gnash::key::EXCLAM;
+    case KEY_2      : return !shift ? gnash::key::_2 : gnash::key::DOUBLE_QUOTE; 
+    case KEY_3      : return !shift ? gnash::key::_3 : gnash::key::HASH; 
+    case KEY_4      : return !shift ? gnash::key::_4 : gnash::key::DOLLAR; 
+    case KEY_5      : return !shift ? gnash::key::_5 : gnash::key::PERCENT; 
+    case KEY_6      : return !shift ? gnash::key::_6 : gnash::key::AMPERSAND; 
+    case KEY_7      : return !shift ? gnash::key::_7 : gnash::key::SINGLE_QUOTE; 
+    case KEY_8      : return !shift ? gnash::key::_8 : gnash::key::PAREN_LEFT; 
+    case KEY_9      : return !shift ? gnash::key::_9 : gnash::key::PAREN_RIGHT; 
+    case KEY_0      : return !shift ? gnash::key::_0 : gnash::key::ASTERISK;
+                            
+    case KEY_A      : return shift ? gnash::key::A : gnash::key::a;
+    case KEY_B      : return shift ? gnash::key::B : gnash::key::b;
+    case KEY_C      : return shift ? gnash::key::C : gnash::key::c;
+    case KEY_D      : return shift ? gnash::key::D : gnash::key::d;
+    case KEY_E      : return shift ? gnash::key::E : gnash::key::e;
+    case KEY_F      : return shift ? gnash::key::F : gnash::key::f;
+    case KEY_G      : return shift ? gnash::key::G : gnash::key::g;
+    case KEY_H      : return shift ? gnash::key::H : gnash::key::h;
+    case KEY_I      : return shift ? gnash::key::I : gnash::key::i;
+    case KEY_J      : return shift ? gnash::key::J : gnash::key::j;
+    case KEY_K      : return shift ? gnash::key::K : gnash::key::k;
+    case KEY_L      : return shift ? gnash::key::L : gnash::key::l;
+    case KEY_M      : return shift ? gnash::key::M : gnash::key::m;
+    case KEY_N      : return shift ? gnash::key::N : gnash::key::n;
+    case KEY_O      : return shift ? gnash::key::O : gnash::key::o;
+    case KEY_P      : return shift ? gnash::key::P : gnash::key::p;
+    case KEY_Q      : return shift ? gnash::key::Q : gnash::key::q;
+    case KEY_R      : return shift ? gnash::key::R : gnash::key::r;
+    case KEY_S      : return shift ? gnash::key::S : gnash::key::s;
+    case KEY_T      : return shift ? gnash::key::T : gnash::key::t;
+    case KEY_U      : return shift ? gnash::key::U : gnash::key::u;
+    case KEY_V      : return shift ? gnash::key::V : gnash::key::v;
+    case KEY_W      : return shift ? gnash::key::W : gnash::key::w;
+    case KEY_X      : return shift ? gnash::key::X : gnash::key::x;
+    case KEY_Y      : return shift ? gnash::key::Y : gnash::key::y;
+    case KEY_Z      : return shift ? gnash::key::Z : gnash::key::z;
+
+    case KEY_F1     : return gnash::key::F1; 
+    case KEY_F2     : return gnash::key::F2; 
+    case KEY_F3     : return gnash::key::F3; 
+    case KEY_F4     : return gnash::key::F4; 
+    case KEY_F5     : return gnash::key::F5; 
+    case KEY_F6     : return gnash::key::F6; 
+    case KEY_F7     : return gnash::key::F7; 
+    case KEY_F8     : return gnash::key::F8; 
+    case KEY_F9     : return gnash::key::F9;
+    case KEY_F10    : return gnash::key::F10;
+    case KEY_F11    : return gnash::key::F11;
+    case KEY_F12    : return gnash::key::F12;
+    
+    case KEY_KP0    : return gnash::key::KP_0; 
+    case KEY_KP1    : return gnash::key::KP_1; 
+    case KEY_KP2    : return gnash::key::KP_2; 
+    case KEY_KP3    : return gnash::key::KP_3; 
+    case KEY_KP4    : return gnash::key::KP_4; 
+    case KEY_KP5    : return gnash::key::KP_5; 
+    case KEY_KP6    : return gnash::key::KP_6; 
+    case KEY_KP7    : return gnash::key::KP_7; 
+    case KEY_KP8    : return gnash::key::KP_8; 
+    case KEY_KP9    : return gnash::key::KP_9;
+
+    /*    
+    case KEY_KPMINUS       : return gnash::key::;
+    case KEY_KPPLUS        : return gnash::key::;
+    case KEY_KPDOT         : return gnash::key::;
+    case KEY_KPASTERISK    : return gnash::key::;
+    case KEY_KPENTER       : return gnash::key::;
+    */
+    
+    case KEY_ESC           : return gnash::key::ESCAPE;
+    case KEY_MINUS         : return gnash::key::MINUS;
+    case KEY_EQUAL         : return gnash::key::EQUALS;
+    case KEY_BACKSPACE     : return gnash::key::BACKSPACE;
+    case KEY_TAB           : return gnash::key::TAB;
+    case KEY_LEFTBRACE     : return gnash::key::LEFT_BRACE;
+    case KEY_RIGHTBRACE    : return gnash::key::RIGHT_BRACE;
+    case KEY_ENTER         : return gnash::key::ENTER;
+    case KEY_LEFTCTRL      : return gnash::key::CONTROL;
+    case KEY_SEMICOLON     : return gnash::key::SEMICOLON;
+    //case KEY_APOSTROPHE    : return gnash::key::APOSTROPHE;  
+    //case KEY_GRAVE         : return gnash::key::GRAVE;
+    case KEY_LEFTSHIFT     : return gnash::key::SHIFT;
+    case KEY_BACKSLASH     : return gnash::key::BACKSLASH;
+    case KEY_COMMA         : return gnash::key::COMMA;
+    //case KEY_DOT           : return gnash::key::DOT;
+    case KEY_SLASH         : return gnash::key::SLASH;
+    case KEY_RIGHTSHIFT    : return gnash::key::SHIFT;
+    case KEY_LEFTALT       : return gnash::key::ALT;
+    case KEY_SPACE         : return gnash::key::SPACE;
+    case KEY_CAPSLOCK      : return gnash::key::CAPSLOCK;
+    //case KEY_NUMLOCK       : return gnash::key::NUMLOCK;
+    //case KEY_SCROLLLOCK    : return gnash::key::SCROLLLOCK;
+    
+  }
+  
+  return gnash::key::INVALID;  
+}
+
+void FBGui::check_keyboard()
+{
+
+  struct input_event ev;  // time,type,code,value
+  
+  while (read(keyb_fd, &ev, sizeof ev) == (sizeof ev)) {
+  
+    if (ev.type == EV_KEY) {
+    
+      // code == scan code of the key (KEY_xxxx defines in input.h)
+      
+      // value == 0  key has been released
+      // value == 1  key has been pressed
+      // value == 2  repeated key reporting (while holding the key) 
+
+      if (ev.code==KEY_LEFTSHIFT) 
+        keyb_lshift = ev.value;
+      else
+      if (ev.code==KEY_RIGHTSHIFT) 
+        keyb_rshift = ev.value;
+      else
+      if (ev.code==KEY_LEFTCTRL) 
+        keyb_lctrl = ev.value;
+      else
+      if (ev.code==KEY_RIGHTCTRL) 
+        keyb_rctrl = ev.value;
+      else
+      if (ev.code==KEY_LEFTALT) 
+        keyb_lalt = ev.value;
+      else
+      if (ev.code==KEY_RIGHTALT) 
+        keyb_ralt = ev.value;
+      else {
+      
+        gnash::key::code	c = scancode_to_gnash_key(ev.code, 
+          keyb_lshift || keyb_rshift);
+      
+        // build modifier
+      
+        int modifier = gnash::key::MOD_NONE;
+        
+        if (keyb_lshift || keyb_rshift)
+          modifier = modifier | gnash::key::MOD_SHIFT;
+
+        if (keyb_lctrl || keyb_rctrl)
+          modifier = modifier | gnash::key::MOD_CONTROL;
+
+        if (keyb_lalt || keyb_ralt)
+          modifier = modifier | gnash::key::MOD_ALT;
+          
+          
+        // send event
+        if (c != gnash::key::INVALID) 
+            Gui::notify_key_event(c, modifier, ev.value);
+              
+      } //if normal key
+
+    } //if EV_KEY      
+  
+  } //while
+
+}
 
 // end of namespace gnash
 }

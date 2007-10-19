@@ -45,7 +45,10 @@
 
 // Define this to read from /dev/input/mice (any PS/2 compatbile mouse or
 // emulated by the Kernel) 
-#define USE_MOUSE_PS2
+//#define USE_MOUSE_PS2
+
+// Define this to read from /dev/input/event0 (new generic input subsystem)
+#define USE_INPUT_EVENTS
 
 // Define this to support eTurboTouch / eGalax touchscreens. When reading from
 // a serial device, it must be initialized (stty) externally. 
@@ -119,9 +122,13 @@ class FBGui : public Gui
     int m_stage_height;
 
   	int input_fd; /// file descriptor for /dev/input/mice
+  	int keyb_fd; /// file descriptor for /dev/input/event* (keyboard)
   	int mouse_x, mouse_y, mouse_btn;
   	unsigned char mouse_buf[256];
   	int mouse_buf_size;
+  	
+  	// Keyboard SHIFT/CTRL/ALT states (left + right)
+  	bool keyb_lshift, keyb_rshift, keyb_lctrl, keyb_rctrl, keyb_lalt, keyb_ralt;
 
     struct fb_var_screeninfo var_screeninfo;
   	struct fb_fix_screeninfo fix_screeninfo;
@@ -153,6 +160,20 @@ class FBGui : public Gui
   	
   	/// Checks for any mouse activity
   	void check_mouse();
+  	
+  	/// Initializes keyboard routines 
+  	bool init_keyboard();
+  	  	
+  	/// Translates a scancode from the Linux Input Subsystem to a Gnash key code 
+    gnash::key::code scancode_to_gnash_key(int code, bool shift);
+  	
+  	/// Checks for any keyboard activity
+  	void check_keyboard();
+  	
+#ifdef USE_INPUT_EVENTS  	
+    /// Applies builtin touchscreen calibration
+  	void apply_ts_calibration(float* cx, float* cy, int rawx, int rawy);
+#endif
   	
   	int valid_x(int x);
   	int valid_y(int y);
