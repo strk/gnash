@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.146 2007/10/18 11:47:56 cmusick Exp $ */
+/* $Id: tag_loaders.cpp,v 1.147 2007/10/19 09:20:55 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1406,11 +1406,25 @@ video_loader(stream* in, tag_type tag, movie_definition* m)
     uint16_t character_id = in->read_u16();
     character_def* chdef = m->get_character_def(character_id);
 
-    assert ( dynamic_cast<video_stream_definition*> (chdef) );
-    video_stream_definition* ch = static_cast<video_stream_definition*> (chdef);
-    assert(ch != NULL);
+    if ( ! chdef )
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+        log_swferror(_("VideoFrame tag refers to unknown video stream id %d"), character_id);
+        );
+        return;
+    }
 
-    ch->read(in, tag, m);
+    // TODO: add a character_def::cast_to_video_def ?
+    video_stream_definition* vdef = dynamic_cast<video_stream_definition*> (chdef);
+    if ( ! vdef )
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+        log_swferror(_("VideoFrame tag refers to a non-video character %d (%s)"), character_id, typeName(*chdef).c_str());
+        );
+        return;
+    }
+
+    vdef->read(in, tag, m);
 }
 
 void

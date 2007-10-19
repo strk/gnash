@@ -1,3 +1,8 @@
+2007-10-19 Sandro Santilli <strk@keybit.net>
+
+	* server/swf/tag_loaders.cpp (video_loader): don't abort on malformed
+	  SWFs.
+
 2007-10-19 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/Makefile.am: Only compile render_handler_tri.cpp if
