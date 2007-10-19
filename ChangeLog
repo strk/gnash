@@ -1,5 +1,11 @@
 2007-10-19 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp (file_attributes_loader):
+	  Update message and add TODO list based on a talk with
+	  Benjamin Otte on #gnash.
+
+2007-10-19 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/VideoDecoder.h: add getPaddingBytes.
 	* libmedia/sdl/VideoDecoderFfmpeg.h: implement getPaddingBytes
 	  using the ffmpeg define.

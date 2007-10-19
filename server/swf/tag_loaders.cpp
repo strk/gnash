@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.148 2007/10/19 12:17:28 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.149 2007/10/19 14:02:13 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1459,11 +1459,16 @@ file_attributes_loader(stream* in, tag_type tag, movie_definition* /*m*/)
     {
 	log_unimpl(_("FileAttributes tag in the SWF requests that "
 		    "network access is not granted to this movie "
-		    "(or application?). Anyway Gnash won't care; "
+		    "(or application?) when loaded from the filesystem. "
+	            "Anyway Gnash won't care; "
 		    "use white/black listing in your .gnashrc instead"));
     }
 
-    // TODO: attach info to movie_definition
+    // TODO:
+    // 	- attach info to movie_definition.
+    // 	- don't allow later FileAttributes tags in the same movie
+    // 	  to override the first one used.
+    // 	- only use if it is the *first* tag in the stream.
 }
 
 void
