@@ -1,5 +1,5 @@
 dnl  
-dnl    Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+dnl    Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.66 2007/10/17 21:30:26 nihilus Exp $
+dnl $Id: boost.m4,v 1.67 2007/10/19 01:51:28 nihilus Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
