@@ -1,3 +1,11 @@
+2007-10-19 Sandro Santilli <strk@keybit.net>
+
+	* libmedia/VideoDecoder.h: add getPaddingBytes.
+	* libmedia/sdl/VideoDecoderFfmpeg.h: implement getPaddingBytes
+	  using the ffmpeg define.
+	* server/parser/video_stream_def.cpp: use getPaddingBytes
+	  to find out how much to pad.
+
 2007-10-19 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* gui/fb.cpp, gui/fbsup.h: Preliminary support for keyboard input;

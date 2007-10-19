@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoder.h,v 1.5 2007/10/18 15:56:54 tgc Exp $
+// $Id: VideoDecoder.h,v 1.6 2007/10/19 13:50:25 strk Exp $
 
 #ifndef __VIDEODECODER_H__
 #define __VIDEODECODER_H__
@@ -34,6 +34,12 @@ public:
 
 	// virtual classes need a virtual destructor !
 	virtual ~VideoDecoder() {}
+
+	/// Return the number of bytes input frame data is expected
+	/// to be padded with zeroes. Make sure to provide such
+	/// padding to avoid illegal reads.
+	///
+	virtual unsigned getPaddingBytes() const { return 8; }
 
 	/// Sets up the decoder.
 	//

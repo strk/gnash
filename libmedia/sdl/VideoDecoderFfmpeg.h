@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderFfmpeg.h,v 1.5 2007/10/18 15:56:55 tgc Exp $
+// $Id: VideoDecoderFfmpeg.h,v 1.6 2007/10/19 13:50:25 strk Exp $
 
 #ifndef __VIDEODECODERFFMPEG_H__
 #define __VIDEODECODERFFMPEG_H__
@@ -41,6 +41,8 @@ class VideoDecoderFfmpeg : public VideoDecoder {
 public:
 	VideoDecoderFfmpeg();
 	~VideoDecoderFfmpeg();
+
+	virtual unsigned getPaddingBytes() const { return FF_INPUT_BUFFER_PADDING_SIZE; }
 
 	bool setup(VideoInfo* info);
 

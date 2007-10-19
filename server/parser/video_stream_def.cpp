@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.22 2007/10/19 12:17:28 strk Exp $
+// $Id: video_stream_def.cpp,v 1.23 2007/10/19 13:50:25 strk Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -102,7 +102,7 @@ video_stream_definition::readDefineVideoFrame(stream* in, SWF::tag_type tag, mov
 	// bigger than the data to avoid libavcodec (ffmpeg) making
 	// illegal reads. Also, we must ensure first 23 bits to be 
 	// zeroed out. We'll zero out all padding.
-	unsigned int padding =  FF_INPUT_BUFFER_PADDING_SIZE;
+	unsigned int padding =  _decoder->getPaddingBytes();
 	unsigned int dataSize = in->get_tag_end_position() - in->get_position();
 	unsigned int totSize = dataSize+padding;
 
@@ -111,7 +111,7 @@ video_stream_definition::readDefineVideoFrame(stream* in, SWF::tag_type tag, mov
 	{
 		data[i] = in->read_u8();
 	}
-	memset(&data[dataSize], 0, padding);  // padd with zeroes
+	if ( padding ) memset(&data[dataSize], 0, padding);  // pad with zeroes if needed
 
 	// TODO: should we pass dataSize instead of totSize to decodeToImage ?
 	std::auto_ptr<image::image_base> img ( _decoder->decodeToImage(data.get(), totSize) );
