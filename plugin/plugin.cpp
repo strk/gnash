@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.85 2007/10/15 22:27:12 strk Exp $ */
+/* $Id: plugin.cpp,v 1.86 2007/10/19 01:47:54 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -36,7 +36,7 @@
 
 #define PLUGIN_DESCRIPTION \
   "Shockwave Flash "FLASH_VERSION" Gnash "VERSION", the GNU Flash Player. \
-  Copyright &copy; 2006 <a href=\"http://www.fsf.org\">Free Software \
+  Copyright &copy; 2006, 2007 <a href=\"http://www.fsf.org\">Free Software \
   Foundation</a>, Inc. <br> \
   Gnash comes with NO WARRANTY, to the extent permitted by law. \
   You may redistribute copies of Gnash under the terms of the \
