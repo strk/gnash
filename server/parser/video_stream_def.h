@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.h,v 1.13 2007/10/18 15:56:55 tgc Exp $
+// $Id: video_stream_def.h,v 1.14 2007/10/19 09:30:24 strk Exp $
 
 #ifndef GNASH_VIDEO_STREAM_DEF_H
 #define GNASH_VIDEO_STREAM_DEF_H
@@ -33,8 +33,10 @@
 #include "execute_tag.h"
 #include "VideoDecoder.h"
 #include "image.h"
+
 #include <map>
 #include <boost/shared_array.hpp>
+#include <boost/scoped_ptr.hpp> 
 
 namespace gnash {
 
@@ -70,7 +72,7 @@ public:
 	///
 	/// TODO: separate the two reader functions, provide a constructor
 	///       reading the DEFINEVIDEOSTREAM and only expose the parser
-	///	  for VIDEOFRAME (to ensure, at C++ level, that we won't
+	///	      for VIDEOFRAME (to ensure, at C++ level, that we won't
 	///       parse DEFINEVIDEOSTREAM twice).
 	///
 	void	read(stream* in, SWF::tag_type tag, movie_definition* m);
@@ -143,7 +145,7 @@ private:
 	uint32_t _height;
 
 	/// The decoder used to decode the video frames
-	VideoDecoder* _decoder;
+	boost::scoped_ptr<VideoDecoder> _decoder;
 };
 
 }	// end namespace gnash

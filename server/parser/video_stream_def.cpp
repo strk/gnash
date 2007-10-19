@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.19 2007/10/18 15:56:55 tgc Exp $
+// $Id: video_stream_def.cpp,v 1.20 2007/10/19 09:30:24 strk Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -42,8 +42,7 @@ video_stream_definition::video_stream_definition(uint16_t char_id)
 
 video_stream_definition::~video_stream_definition()
 {
-	m_video_frames.clear();
-	delete _decoder;
+	m_video_frames.clear(); // TODO: isn't this useless ?
 }
 
 
@@ -72,14 +71,14 @@ video_stream_definition::read(stream* in, SWF::tag_type tag, movie_definition* m
 
 		m_codec_id = static_cast<videoCodecType>(in->read_u8());
 #ifdef USE_FFMPEG
-		_decoder = new VideoDecoderFfmpeg();
+		_decoder.reset( new VideoDecoderFfmpeg() );
 #elif defined(SOUND_GST)
-		_decoder = new VideoDecoderGst();
+		_decoder.reset( new VideoDecoderGst() );
 #else
-		_decoder = new VideoDecoder();
+		_decoder.reset( new VideoDecoder() );
 #endif
 		bool ret = _decoder->setup(_width, _height, m_deblocking_flags, m_smoothing_flags, m_codec_id, gnash::render::videoFrameFormat());
-		if (!ret) delete _decoder;
+		if (!ret) _decoder.reset();
 
 	}
 	else if (tag == SWF::VIDEOFRAME && _decoder)
