@@ -1140,6 +1140,17 @@ gnash::key::code FBGui::scancode_to_gnash_key(int code, bool shift) {
     //case KEY_NUMLOCK       : return gnash::key::NUMLOCK;
     //case KEY_SCROLLLOCK    : return gnash::key::SCROLLLOCK;
     
+    case KEY_UP            : return gnash::key::UP;
+    case KEY_DOWN          : return gnash::key::DOWN;
+    case KEY_LEFT          : return gnash::key::LEFT;
+    case KEY_RIGHT         : return gnash::key::RIGHT;
+    case KEY_PAGEUP        : return gnash::key::PGUP;
+    case KEY_PAGEDOWN      : return gnash::key::PGDN;
+    case KEY_INSERT        : return gnash::key::INSERT;
+    case KEY_DELETE        : return gnash::key::DELETEKEY;
+    case KEY_HOME          : return gnash::key::HOME;
+    case KEY_END           : return gnash::key::END;
+    
   }
   
   return gnash::key::INVALID;  
@@ -1149,6 +1160,7 @@ void FBGui::check_keyboard()
 {
 
   struct input_event ev;  // time,type,code,value
+
   
   while (read(keyb_fd, &ev, sizeof ev) == (sizeof ev)) {
   
