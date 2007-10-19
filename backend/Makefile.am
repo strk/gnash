@@ -106,7 +106,7 @@ if  BUILD_AGG_RENDERER
 if HAVE_AGG
 noinst_LTLIBRARIES += libgnashagg.la
 #plugins_LTLIBRARIES += libgnashagg.la
-libgnashagg_la_SOURCES = render_handler_tri.cpp render_handler_agg.cpp 
+libgnashagg_la_SOURCES = render_handler_agg.cpp 
 #libgnashagg_la_LDFLAGS = -module -avoid-version -no-undefined
 libgnashagg_la_LIBADD = $(AGG_LIBS)
 endif
@@ -116,7 +116,7 @@ if  BUILD_CAIRO_RENDERER
 if HAVE_CAIRO
 noinst_LTLIBRARIES += libgnashcairo.la
 # plugins_LTLIBRARIES += libgnashcairo.la
-libgnashcairo_la_SOURCES = render_handler_tri.cpp  render_handler_cairo.cpp
+libgnashcairo_la_SOURCES = render_handler_cairo.cpp
 #libgnashcairo_la_LDFLAGS = -module -avoid-version -no-undefined
 libgnashcairo_la_LIBADD = $(CAIRO_LIBS)
 endif

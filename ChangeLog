@@ -1,3 +1,8 @@
+2007-10-19 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/Makefile.am: Only compile render_handler_tri.cpp if
+	  using the OpenGL backend.
+
 2007-10-18 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* macros/mtasc.m4: Don't prepend a path to test with "x".
