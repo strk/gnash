@@ -112,7 +112,7 @@
 // which is a syntax error.
 
 #define fatal_error(args ...) \
-	do { fprintf(stderr, args); putc('\n', stderr); } while(0)
+  do { fprintf(stderr, args); putc('\n', stderr); } while(0)
 
 //--
 
@@ -166,37 +166,37 @@ FBGui::FBGui() : Gui()
 }
 
 FBGui::FBGui(unsigned long xid, float scale, bool loop, unsigned int depth)
-	: Gui(xid, scale, loop, depth)
+  : Gui(xid, scale, loop, depth)
 {
-	fd 			= -1;
-	fbmem 	= NULL;
-	#ifdef DOUBLE_BUFFER
-	buffer  = NULL;
-	#endif
+  fd      = -1;
+  fbmem   = NULL;
+  #ifdef DOUBLE_BUFFER
+  buffer  = NULL;
+  #endif
 
   input_fd=-1;
   
-	signal(SIGINT, terminate_signal);
-	signal(SIGTERM, terminate_signal);
+  signal(SIGINT, terminate_signal);
+  signal(SIGTERM, terminate_signal);
 }
 
 FBGui::~FBGui()
 {
   
-	if (fd>0) {
-	  enable_terminal();
-		log_msg("Closing framebuffer device\n");
-		close(fd);
-	}
-	
-	close(input_fd);
+  if (fd>0) {
+    enable_terminal();
+    log_msg("Closing framebuffer device\n");
+    close(fd);
+  }
+  
+  close(input_fd);
 
   #ifdef DOUBLE_BUFFER
-	if (buffer) {
-		log_msg("Free'ing offscreen buffer\n");
-		free(buffer);
-	}
-	#endif
+  if (buffer) {
+    log_msg("Free'ing offscreen buffer\n");
+    free(buffer);
+  }
+  #endif
 }
 
 
@@ -264,7 +264,7 @@ bool FBGui::init(int /*argc*/, char *** /*argv*/)
   ioctl(fd, FBIOGET_VSCREENINFO, &var_screeninfo);
   ioctl(fd, FBIOGET_FSCREENINFO, &fix_screeninfo);
   log_msg("Framebuffer device uses %d bytes of memory.\n",
-  	fix_screeninfo.smem_len);
+    fix_screeninfo.smem_len);
   log_msg("Video mode: %dx%d with %d bits per pixel.\n",
     var_screeninfo.xres, var_screeninfo.yres, var_screeninfo.bits_per_pixel);
 
@@ -281,8 +281,8 @@ bool FBGui::init(int /*argc*/, char *** /*argv*/)
 #ifdef PIXELFORMAT_LUT8
   // Set grayscale for 8 bit modes
   if (var_screeninfo.bits_per_pixel==8) {
-  	if (!set_grayscale_lut8())
-  		return false;
+    if (!set_grayscale_lut8())
+      return false;
   }
 #endif
 
@@ -291,8 +291,8 @@ bool FBGui::init(int /*argc*/, char *** /*argv*/)
 }
 
 bool FBGui::initialize_renderer() {
-  int _width 		= var_screeninfo.xres;
-  int _height 	= var_screeninfo.yres;
+  int _width    = var_screeninfo.xres;
+  int _height   = var_screeninfo.yres;
   int _bpp = var_screeninfo.bits_per_pixel;
   int _size = fix_screeninfo.smem_len;   // TODO: should recalculate!  
   unsigned char *_mem;
@@ -372,30 +372,30 @@ bool FBGui::run()
   // let the GUI recompute the x/y scale factors to best fit the whole screen
   resize_view(_validbounds.width(), _validbounds.height());
 
-	while (!terminate_request) {
-	
-	  double prevtimer = timer; 
-		
-		while ((timer-prevtimer)*1000 < _interval) {
-		
-		  usleep(1); // task switch
-		  
-		  check_mouse(); // TODO: Exit delay loop on mouse events! 
-		  check_keyboard(); // TODO: Exit delay loop on keyboard events!
-		        
+  while (!terminate_request) {
+  
+    double prevtimer = timer; 
+    
+    while ((timer-prevtimer)*1000 < _interval) {
+    
+      usleep(1); // task switch
+      
+      check_mouse(); // TODO: Exit delay loop on mouse events! 
+      check_keyboard(); // TODO: Exit delay loop on keyboard events!
+            
       if (!gettimeofday(&tv, NULL))
         timer = (double)tv.tv_sec + (double)tv.tv_usec / 1000000.0;
     }
   
-	// advance movie	
-	Gui::advance_movie(this);
-	}
-	return true;
+  // advance movie  
+  Gui::advance_movie(this);
+  }
+  return true;
 }
 
 void FBGui::renderBuffer()
 {
-	if ( _drawbounds.size() == 0 ) return; // nothing to do..
+  if ( _drawbounds.size() == 0 ) return; // nothing to do..
 
 #ifdef DOUBLE_BUFFER
 
@@ -409,31 +409,31 @@ void FBGui::renderBuffer()
     
     
   for (unsigned int bno=0; bno < _drawbounds.size(); bno++) {
-	
-		geometry::Range2d<int>& bounds = _drawbounds[bno];
-		
-		assert ( ! bounds.isWorld() );  
+  
+    geometry::Range2d<int>& bounds = _drawbounds[bno];
     
-	  // Size, in bytes, of a row that has to be copied
-	  const unsigned int row_size = (bounds.width()+1) * pixel_size;
-	    
-	  // copy each row
-	  const int minx = bounds.getMinX();
-	  const int maxy = bounds.getMaxY();
-	  
-	  for (int y=bounds.getMinY(); y<=maxy; ++y) {
-	  
-	    const unsigned int pixel_index = y * scanline_size + minx*pixel_size;
-	    
-	    memcpy(&fbmem[pixel_index], &buffer[pixel_index], row_size);
-	    
-	  }
-	}  
-	     
+    assert ( ! bounds.isWorld() );  
+    
+    // Size, in bytes, of a row that has to be copied
+    const unsigned int row_size = (bounds.width()+1) * pixel_size;
+      
+    // copy each row
+    const int minx = bounds.getMinX();
+    const int maxy = bounds.getMaxY();
+    
+    for (int y=bounds.getMinY(); y<=maxy; ++y) {
+    
+      const unsigned int pixel_index = y * scanline_size + minx*pixel_size;
+      
+      memcpy(&fbmem[pixel_index], &buffer[pixel_index], row_size);
+      
+    }
+  }  
+       
 #endif
-	
+  
 #ifdef DEBUG_SHOW_FPS
-	profile();
+  profile();
 #endif
 }
 
@@ -441,24 +441,24 @@ bool FBGui::createWindow(const char* /*title*/, int /*width*/, int /*height*/)
 {
   // Framebuffer has no windows... :-)
 
-	return true;
+  return true;
 }
 
 bool FBGui::createMenu()
 {
   // no menu support! 
-	return true;
+  return true;
 }
 
 bool FBGui::setupEvents()
 {
   // events currently not supported!
-	return true;
+  return true;
 }
 
 void FBGui::setInterval(unsigned int interval)
 {
-	_interval = interval;
+  _interval = interval;
 }
 
 void FBGui::setTimeout(unsigned int /*timeout*/)
@@ -481,24 +481,24 @@ int FBGui::valid_y(int y) {
 
 void FBGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 {
-	_renderer->set_invalidated_regions(ranges);
+  _renderer->set_invalidated_regions(ranges);
 
-	_drawbounds.clear();
-		
-	for (unsigned int rno=0; rno<ranges.size(); rno++) {
-	
-		geometry::Range2d<int> bounds = Intersection(
-	    _renderer->world_to_pixel(ranges.getRange(rno)),
-	    _validbounds);
-			
-		// it may happen that a particular range is out of the screen, which 
-		// will lead to bounds==null. 
-		if (bounds.isNull()) continue; 
-		
-		_drawbounds.push_back(bounds);
-	    
-	}
-	
+  _drawbounds.clear();
+    
+  for (unsigned int rno=0; rno<ranges.size(); rno++) {
+  
+    geometry::Range2d<int> bounds = Intersection(
+      _renderer->world_to_pixel(ranges.getRange(rno)),
+      _validbounds);
+      
+    // it may happen that a particular range is out of the screen, which 
+    // will lead to bounds==null. 
+    if (bounds.isNull()) continue; 
+    
+    _drawbounds.push_back(bounds);
+      
+  }
+  
 }
 
 void FBGui::disable_terminal() 
@@ -543,7 +543,7 @@ void FBGui::read_mouse_data()
   
 }
 
-#ifdef USE_MOUSE_PS2  	
+#ifdef USE_MOUSE_PS2    
 bool FBGui::mouse_command(unsigned char cmd, unsigned char *buf, int count) {
   int n;
   
@@ -574,7 +574,7 @@ bool FBGui::mouse_command(unsigned char cmd, unsigned char *buf, int count) {
 } //command()
 #endif
 
-#ifdef USE_MOUSE_PS2  	
+#ifdef USE_MOUSE_PS2    
 bool FBGui::init_mouse() 
 {
 
@@ -637,7 +637,7 @@ bool FBGui::init_mouse()
 }
 #endif
 
-#ifdef USE_MOUSE_PS2  	
+#ifdef USE_MOUSE_PS2    
 void FBGui::check_mouse() 
 {
   if (input_fd<0) return;   // no mouse available
@@ -710,7 +710,7 @@ void FBGui::check_mouse()
 }
 #endif
 
-#ifdef USE_MOUSE_ETT  	
+#ifdef USE_MOUSE_ETT    
 bool FBGui::init_mouse()
 {
   // Try to open mouse device, be error tolerant (FD is kept open all the time)
@@ -740,7 +740,7 @@ bool FBGui::init_mouse()
 } 
 #endif
 
-#ifdef USE_MOUSE_ETT  	
+#ifdef USE_MOUSE_ETT    
 void FBGui::check_mouse() 
 {
   if (input_fd<0) return;   // no mouse available
@@ -812,7 +812,7 @@ void FBGui::check_mouse()
 }
 #endif
 
-#ifdef USE_INPUT_EVENTS  	
+#ifdef USE_INPUT_EVENTS   
 bool FBGui::init_mouse()
 {
 
@@ -1179,7 +1179,7 @@ void FBGui::check_keyboard()
         keyb_ralt = ev.value;
       else {
       
-        gnash::key::code	c = scancode_to_gnash_key(ev.code, 
+        gnash::key::code  c = scancode_to_gnash_key(ev.code, 
           keyb_lshift || keyb_rshift);
       
         // build modifier
