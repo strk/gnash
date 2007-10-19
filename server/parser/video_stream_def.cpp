@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.20 2007/10/19 09:30:24 strk Exp $
+// $Id: video_stream_def.cpp,v 1.21 2007/10/19 10:29:17 strk Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -42,7 +42,11 @@ video_stream_definition::video_stream_definition(uint16_t char_id)
 
 video_stream_definition::~video_stream_definition()
 {
-	m_video_frames.clear(); // TODO: isn't this useless ?
+	for (EmbedFrameMap::iterator i=m_video_frames.begin(), e=m_video_frames.end();
+			i!=e; ++i)
+	{
+		delete i->second;
+	}
 }
 
 
@@ -88,32 +92,39 @@ video_stream_definition::read(stream* in, SWF::tag_type tag, movie_definition* m
 		// it belongs.
 		in->skip_bytes(2); //int frameNum = in->read_u16();
 
-		// We need to make the buffer a bit bigger than the data
-		// to avoid libavcodec (ffmpeg) making illegal reads.
-		// The reason is a bit sketchy, but it seems that the h263
-		// decoder (perhaps other decoders as well) assumes that the
-		// buffer with the data is bigger than the data it contains.
-		// We make the buffer 4 bytes bigger than the data, and set
-		// them to 0.
+		// We need to make the buffer a FF_INPUT_BUFFER_PADDING_SIZE
+		// bigger than the data to avoid libavcodec (ffmpeg) making
+		// illegal reads. Also, we must ensure first 23 bits to be 
+		// zeroed out. We'll zero out all padding.
+		unsigned int padding =  FF_INPUT_BUFFER_PADDING_SIZE;
+		unsigned int dataSize = in->get_tag_end_position() - in->get_position();
+		unsigned int totSize = dataSize+padding;
 
-		// The data size is 4 bytes smaller than this, but because of 
-		// what is mentioned above we don't subtract the 4 bytes.
-		int size = in->get_tag_length();
-		uint8_t* data = new uint8_t[size];
-		memset(data, 0, size);
-		for (int i = 0; i < size-4; i++) // The size-variable 4 bytes bigger than the data
+		boost::scoped_array<uint8_t> data ( new uint8_t[totSize] );
+		for (unsigned int i = 0; i < dataSize; ++i) 
 		{
 			data[i] = in->read_u8();
 		}
+		memset(&data[dataSize], 0, padding);  // padd with zeroes
 
-		image::image_base* img = _decoder->decodeToImage(data, size);
+		// TODO: should we pass dataSize instead of totSize to decodeToImage ?
+		std::auto_ptr<image::image_base> img ( _decoder->decodeToImage(data.get(), totSize) );
 
-		if (img) {
-			m_video_frames[m->get_loading_frame()] = img;
-		} else {
+		if ( img.get() )
+		{
+			// TODO: why don't we use  the frame number specified
+			//       in the tag instead of skipping it ?
+			size_t frameNum = m->get_loading_frame();
+
+			// TODO: use a private function for this as we
+			//       should eventually delete any previously
+			//       existing element for key frameNum
+			m_video_frames[frameNum] = img.release();
+		}
+		else
+		{
 			log_error(_("An error occured while decoding video frame in frame %d"), m->get_loading_frame());
 		}
-		delete [] data;
 	}
 
 }

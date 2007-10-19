@@ -1,5 +1,12 @@
 2007-10-19 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/video_stream_def.cpp (read): rework the input
+	  buffer padding to be cleaner, safer and a bit faster (only
+	  memset the pad); (destructor): get rid of the embedded video
+	  frames. Add TODO items.
+
+2007-10-19 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/video_stream_def.{cpp,h}: keep _decoder by
 	  boost::scoped_ptr. Fixes bug #21284.
 	* server/swf/tag_loaders.cpp (video_loader): don't abort on malformed
