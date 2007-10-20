@@ -112,6 +112,27 @@ public:
     /// Set the number of seconds of inactivity before timing out streams downloads
     void setStreamsTimeout(double x) { _streamsTimeout = x; }
 
+    typedef std::vector<std::string> PathList;
+
+    /// Return the list of directories to be used as the 'local' sandbox
+    //
+    /// Local sendbox is the set of resources on the filesystem we want to
+    /// give the current movie access to.
+    ///
+    const PathList& getLocalSandboxPath() const { return _localSandboxPath; }
+
+    /// Add a directory to the local sandbox list
+    void addLocalSandboxPath(const std::string& dir)
+    {
+        _localSandboxPath.push_back(dir);
+    }
+
+    /// Set the local sandbox list
+    void setLocalSandboxPath(const PathList& path)
+    {
+        _localSandboxPath = path;
+    }
+
     void dump();
     
 private:
@@ -162,6 +183,10 @@ private:
 
     /// The number of seconds of inactivity triggering download timeout
     double _streamsTimeout;
+
+    /// Local sendbox: the set of resources on the filesystem we want to
+    /// give the current movie access to.
+    PathList _localSandboxPath;
 
     void expandPath(std::string& path); //path string operations
 

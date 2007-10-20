@@ -65,11 +65,20 @@ StreamProvider::getStream(const URL& url)
 		std::string path = url.path();
 		if ( path == "-" )
 		{
+            // TODO: only allow this as the *very first* call ?
+            //       Rationale is a movie might request load of
+            //       standar input, being a security issue.
+            //       Note also that the FB gui will use stdin
+            //       for key events.
+            //
 			FILE *newin = fdopen(dup(0), "rb");
 			return new tu_file(newin, true); // close by dtor
 		}
 		else
 		{
+            // check security here !!
+		    if ( ! URLAccessManager::allow(url) ) return NULL;
+
 			FILE *newin = fopen(path.c_str(), "rb");
 			if (!newin)  { 
 				return NULL;

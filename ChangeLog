@@ -1,5 +1,19 @@
 2007-10-20 Sandro Santilli <strk@keybit.net>
 
+	* libbase/rc.h: add a "local sandboxes" configuration.
+	  This is not yet allowed to be set in .gnashrc, but
+	  can be set by internal calls.
+	* server/StreamProvider.cpp: check security also in
+	  the local resource case.
+	* server/URLAccessManager.{cpp,h}: check local resources
+	  against the sandboxes list of RcInitFile.
+	* server/impl.cpp (set_base_url): push base url to 
+	  the local sandboxes.
+	* testsuite/actionscript.all/XML.as: add (failing) test for
+	  XML.onData.
+
+2007-10-20 Sandro Santilli <strk@keybit.net>
+
 	* server/URLAccessManager.{cpp,h}, server/asobj/xmlsocket.cpp
 	  Don't expose allowHost w/out port, rename allowHost (with port)
 	  to allowXMLSocket.

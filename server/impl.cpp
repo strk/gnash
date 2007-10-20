@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.121 2007/09/21 13:40:31 cmusick Exp $ */
+/* $Id: impl.cpp,v 1.122 2007/10/20 07:06:17 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -93,7 +93,20 @@ set_base_url(const URL& url)
 	// can call this only once during a single run
 	assert(!globals::baseurl.get());
 	globals::baseurl.reset(new URL(url));
-	log_msg(_("Base url set to: %s"), globals::baseurl->str().c_str());
+	log_debug(_("Base url set to: %s"), globals::baseurl->str().c_str());
+
+	// If base url is a local file, we push the local file's directory
+	// to the list of local sandboxes
+	if ( url.protocol() == "file" )
+	{
+		RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+
+		const std::string& path = url.path();
+
+		size_t lastSlash = path.find_last_of('/');
+		rcfile.addLocalSandboxPath(path.substr(0, lastSlash+1));
+		log_debug(_("Dir %s appended to local sandboxes"), url.path().c_str());
+	}
 }
 
 const URL&

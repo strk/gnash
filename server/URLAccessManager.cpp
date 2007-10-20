@@ -23,6 +23,7 @@
 #include "URL.h"
 #include "log.h"
 #include "StringPredicates.h" // for case-insensitive host match
+#include "gnash.h" // for get_base_url
 
 #include "rc.h" // for rcfile
 #include <cerrno> // for errno :)
@@ -193,6 +194,67 @@ host_check_blackwhite_lists(const std::string& host)
 	return true;
 }
 
+static bool
+pathIsUnderDir(const std::string& path, const std::string& dir)
+{
+    size_t dirLen = dir.length();
+    if ( dirLen > path.length() ) return false; // can't contain it, right ?
+
+    // Path must be equal to dir for the whole dir length
+    //
+    // TODO: this is pretty lame, can do better with some normalization
+    //       we'd need a generic splitPathInComponents.. maybe as a static
+    //       public method of gnash::URL ?
+    //
+    if ( path.compare(0, dirLen, dir) ) return false;
+
+    return true;
+}
+
+/// Return true if we allow load of the local resource, false otherwise.
+//
+static bool
+local_check(const std::string& path)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    assert( ! path.empty() );
+
+    // Don't allow local access if base url is a network resource
+    // TODO: let user override this behaviour using the .gnashrc file
+    const URL& baseUrl = get_base_url();
+    if ( baseUrl.protocol() != "file" )
+    {
+        log_security("Load of file %s forbidden (base url %s is not a local resource).",
+           path.c_str(), baseUrl.str().c_str());
+        return false;
+    }
+
+    RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+    
+    typedef RcInitFile::PathList PathList;
+    const PathList& sandbox = rcfile.getLocalSandboxPath();
+
+    for (PathList::const_iterator i=sandbox.begin(), e=sandbox.end();
+            i!=e; ++i)
+    {
+        const std::string& dir = *i;
+        if ( pathIsUnderDir(path, dir) ) 
+        {
+            log_security("Load of file %s granted (under local sandbox %s).",
+                path.c_str(), dir.c_str());
+            return true;
+        }
+    }
+
+    // TODO: dump local sandboxes here ? (or maybe send the info to the GUI properties
+    //       view
+    log_security("Load of file %s forbidden (not under local sandboxes).",
+        path.c_str());
+    return false;
+
+}
+
 /// Return true if we allow load from host, false otherwise.
 //
 /// This function will check for localhost/localdomain (if requested)
@@ -287,9 +349,12 @@ allow(const URL& url)
 
 	std::string host = url.hostname();
 
-	// always allow from local host
-	if (host.size() == 0) {
-		return true;
+	// Local resources can be accessed only if they are
+	// in a directory listed as local sandbox
+	if (host.size() == 0)
+    {
+        assert(host.protocol() == "file");
+		return local_check(url.path());
 	}
 	return host_check(host);
 }

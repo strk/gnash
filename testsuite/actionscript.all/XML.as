@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.40 2007/10/02 13:17:30 strk Exp $";
+rcsid="$Id: XML.as,v 1.41 2007/10/20 07:06:17 strk Exp $";
 
 #include "check.as"
 //#include "dejagnu.as"
@@ -30,7 +30,8 @@ var existtests = true;
 
 check(XML);
 
-#if OUTPUT_VERSION >= 6
+#if OUTPUT_VERSION >= 6 // {
+
 check(! XML.prototype.hasOwnProperty("appendChild") );
 check(! XML.prototype.hasOwnProperty("cloneNode") );
 check(! XML.prototype.hasOwnProperty("hasChildNodes") );
@@ -93,7 +94,8 @@ check(! XMLNode.hasOwnProperty("insertBefore") );
 check(! XMLNode.hasOwnProperty("removeNode") );
 check(! XMLNode.hasOwnProperty("toString") );
 check(! XMLNode.hasOwnProperty("cloneNode") );
-#endif
+
+#endif // OUTPUT_VERSION >= 6 }
 
 check(XML.prototype instanceof XMLNode);
 
@@ -614,6 +616,12 @@ trace(doc.toString());
 //--------------------------------------------------------------------
 
 myxml = new XML;
+
+xcheck_equals(typeof(myxml.onData), 'function');
+#if OUTPUT_VERSION > 5
+check(myxml.onData != XML.prototype.parseXML);
+#endif
+
 myxml.onLoad = function(success)
 {
 	note("myxml.onLoad("+success+") called");
@@ -758,10 +766,10 @@ check_equals(myxml2.toString(), "<X1> t </X1>");
  // NOTE: tests inside onLoad are not counted here as onLoad handler
  //       should execute later !
  //       Gnash fails executing onLoad immediately
- xcheck_totals(228);
+ xcheck_totals(229);
 #else
  // NOTE: tests inside onLoad are not counted here as onLoad handler
  //       should execute later !
  //       Gnash fails executing onLoad immediately
- xcheck_totals(291);
+ xcheck_totals(293);
 #endif
