@@ -1,5 +1,11 @@
 2007-10-20 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/Makefile.am: fix MEDIADIR path (for gnashrc)
+	* testsuite/actionscript.all/Makefile.am: use testsuite/gnashrc
+	  for running tests (so loads from MEDIADIR are allowed).
+
+2007-10-20 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/loadMovieTestRunner.cpp: allow loads from
 	  MEDIADIR
 	* testsuite/actionscript.all/XML.as: test where onData is defined.

@@ -49,10 +49,10 @@ libtestsuite_la_CXXFLAGS = \
 	$(CAIRO_CFLAGS) \
 	$(NULL)
 
-abs_mediadir = $(shell cd $(srcdir)/../media; pwd)
+abs_mediadir = $(shell cd $(srcdir)/media; pwd)
 
 gnashrc: gnashrc.in
-	sed -e 's#@@MEDIADIR@@#$(srcdir)/testsuite/media#g' $< > $@
+	sed -e 's#@@MEDIADIR@@#$(abs_mediadir)/#g' $< > $@
 
 if ENABLE_MING
 

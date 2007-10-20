@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.79 2007/09/07 12:25:40 strk Exp $
+# $Id: Makefile.am,v 1.80 2007/10/20 10:19:52 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -26,7 +26,8 @@ AUTOMAKE_OPTIONS = dejagnu
 # so I take responsibility of dropping that for the moment...
 if ENABLE_MING
 
-DEF_MAKESWF_FLAGS=-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR='\"$(srcdir)/../media\"'
+abs_mediadir = $(shell cd $(srcdir)/../media; pwd)
+DEF_MAKESWF_FLAGS=-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR='\"$(abs_mediadir)\"'
 
 quickcheck_RUNNERS = \
 	alltests-v5-Runner \
@@ -269,39 +270,39 @@ alltests-v8.swf: $(ASTESTS)
 	@mv alltests.swf alltests-v8.swf
 
 astests-v5-Runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_V5_OUT)
-	sh $< $(top_builddir) $(ASTESTS_V5_OUT) > $@
+	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $< $(top_builddir) $(ASTESTS_V5_OUT) > $@
 	chmod 755 $@
 
 astests-v6-Runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_V6_OUT)
-	sh $< $(top_builddir) $(ASTESTS_V6_OUT) > $@
+	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $< $(top_builddir) $(ASTESTS_V6_OUT) > $@
 	chmod 755 $@
 
 astests-v7-Runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_V7_OUT)
-	sh $< $(top_builddir) $(ASTESTS_V7_OUT) > $@
+	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $< $(top_builddir) $(ASTESTS_V7_OUT) > $@
 	chmod 755 $@
 
 astests-v8-Runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_V8_OUT)
-	sh $< $(top_builddir) $(ASTESTS_V8_OUT) > $@
+	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $< $(top_builddir) $(ASTESTS_V8_OUT) > $@
 	chmod 755 $@
 
 # This version runs all testcases in a single SWF targetted at player 5
 alltests-v5-Runner: $(srcdir)/../generic-testrunner.sh alltests-v5.swf
-	sh $< $(top_builddir) alltests-v5.swf > $@
+	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $< $(top_builddir) alltests-v5.swf > $@
 	chmod 755 $@
 
 # This version runs all testcases in a single SWF targetted at player 6
 alltests-v6-Runner: $(srcdir)/../generic-testrunner.sh alltests-v6.swf
-	sh $< $(top_builddir) alltests-v6.swf > $@
+	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $< $(top_builddir) alltests-v6.swf > $@
 	chmod 755 $@
 
 # This version runs all testcases in a single SWF targetted at player 7
 alltests-v7-Runner: $(srcdir)/../generic-testrunner.sh alltests-v7.swf
-	sh $< $(top_builddir) alltests-v7.swf > $@
+	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $< $(top_builddir) alltests-v7.swf > $@
 	chmod 755 $@
 
 # This version runs all testcases in a single SWF targetted at player 8
 alltests-v8-Runner: $(srcdir)/../generic-testrunner.sh alltests-v8.swf
-	sh $< $(top_builddir) alltests-v8.swf > $@
+	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $< $(top_builddir) alltests-v8.swf > $@
 	chmod 755 $@
 
 $(ASTESTS_V5_OUT) : $(ASTESTS) Dejagnu.swf
