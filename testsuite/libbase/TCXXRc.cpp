@@ -215,6 +215,20 @@ main (int /*argc*/, char** /*argv*/) {
         runtest.fail ("rc.getBlackList() doesn't have elements");        
     }
 
+    const std::vector<std::string>& localSandbox = rc.getLocalSandboxPath();
+    if (localSandbox.size() != 1) {
+        runtest.fail ("rc.getLocalSandboxPath() doesn't have 1 element after set");
+    } else {
+        if ( localSandbox[0] == "/tmp/p1" )
+        {
+            runtest.pass ("set localSandbox");
+        }
+        else
+        {
+            runtest.fail ("rc.getLocalSandboxPath() doesn't have the correct first element after set");
+        }
+    }
+
     // Parse a second file
     if (rc.parseFile("gnashrc-local")) {
 
@@ -232,13 +246,28 @@ main (int /*argc*/, char** /*argv*/) {
             runtest.fail ("rc.getBlackList(): doesn't appended elements");        
         }
 
-	// Test local override of previous whitelist 
+        // Test local override of previous whitelist 
         std::vector<std::string> whitelist = rc.getWhiteList();
-	if (whitelist.size()) {
-	    runtest.fail ("rc.getWhiteList(): local override failed");
-	} else {
-	    runtest.pass ("rc.getWhiteList(): local override succeeded");
-	}
+        if (whitelist.size()) {
+            runtest.fail ("rc.getWhiteList(): local override failed");
+        } else {
+            runtest.pass ("rc.getWhiteList(): local override succeeded");
+        }
+
+        // Test local override of previous local sandbox
+        const std::vector<std::string>& localSandbox = rc.getLocalSandboxPath();
+        if (localSandbox.empty()) {
+            runtest.fail ("rc.getLocalSandboxPath() doesn't have elements after append");        
+        } else {
+            if ( localSandbox.back() == "/tmp/gnash" )
+            {
+                runtest.pass ("append localSandbox");
+            }
+            else
+            {
+                runtest.fail ("rc.getLocalSandboxPath() doesn't have the correct last element after append");
+            }
+        }
     }
 }
 

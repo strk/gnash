@@ -60,3 +60,6 @@ set streamsTimeout 1.5
 # since these are the only values that can cause problems due to
 # the parser looping too many times.
 set blacklist www.doubleclick.com www.ebay.com
+
+# Allow access to the /tmp/p1 directory
+set localSandboxPath /tmp/p1

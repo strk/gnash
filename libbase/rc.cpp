@@ -310,6 +310,8 @@ RcInitFile::parseFile(const std::string& filespec)
     string variable;
     string value;
     ifstream in;
+
+	StringNoCaseEqual noCaseCompare;
     
 //  log_msg ("Seeing if %s exists", filespec);
     if (filespec.size() == 0) {
@@ -347,6 +349,8 @@ RcInitFile::parseFile(const std::string& filespec)
 	    // Get second token
             in >> variable;
 
+            // cout << "Parsing " << variable << endl;
+
 	    // Read in rest of line for parsing.
             getline(in, value);
 
@@ -354,35 +358,40 @@ RcInitFile::parseFile(const std::string& filespec)
             string::size_type position = value.find_first_not_of(' ');
             if(position != string::npos) value.erase(0, position);
 
-            if (action == "set" || action == "append") {
+            if (noCaseCompare(action, "set") || noCaseCompare(action, "append") ) {
 
-                if (variable == "flashVersionString") {
+                if (noCaseCompare(variable, "flashVersionString")) {
                     _flashVersionString = value;
-		                    continue;
-                }
-
-                if (variable == "debuglog") {
-                    expandPath (value);
-		    _log = value;
                     continue;
                 }
 
-                if (variable == "documentroot") {
+                if (noCaseCompare(variable, "debuglog")) {
+                    expandPath (value);
+                    _log = value;
+                    continue;
+                }
+
+                if (noCaseCompare(variable, "documentroot") ) {
                     _wwwroot = value;
                     continue;
                 }
                 
-                if (variable == "blacklist") {
-		    parseList(_blacklist, action, variable, value);
+                if (noCaseCompare(variable, "blacklist") ) {
+                    parseList(_blacklist, action, variable, value);
                     continue;
                 }
 
-                if (variable == "whitelist") {
-		    parseList(_whitelist, action, variable, value);
+                if (noCaseCompare(variable, "whitelist")) {
+                    parseList(_whitelist, action, variable, value);
                     continue;
                 }
 
-		if (action == "set") {
+                if (noCaseCompare(variable, "localSandboxPath")) {
+                    parseList(_localSandboxPath, action, variable, value);
+                    continue;
+                }
+
+		if (noCaseCompare(action , "set") ) {
                      extractSetting(&_splash_screen, "splash_screen", variable,
                                value);
                      extractSetting(&_localhost_only, "localhost", variable,

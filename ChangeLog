@@ -1,5 +1,13 @@
 2007-10-20 Sandro Santilli <strk@keybit.net>
 
+	* doc/C/usermanual/usage/gnashrc.xml: document new localSandboxPath
+	  directive.
+	* libbase/rc.cpp: support localSandboxPath (set, append) directive.
+	* testsuite/libbase/: TCXXRc.cpp, gnashrc-local.in, gnashrc.in: 
+	  test localSandboxPath append and set.
+
+2007-10-20 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/MovieTester.cpp: call set_base_url *before*
 	  create_movie*
 	* libbase/rc.h: add a "local sandboxes" configuration.
