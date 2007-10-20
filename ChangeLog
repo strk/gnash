@@ -1,5 +1,14 @@
 2007-10-20 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xml.{cpp,h}: rework the way XML is loaded:
+	  read all input and call onData, providing a default one.
+	  Still misses a background thread, but is a bit more correct
+	  now, in that allows overriding onData.
+	* testsuite/actionscript.all/XML.as: succeeds in finding
+	  onData in XML.prototype.
+
+2007-10-20 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/Makefile.am: fix MEDIADIR path (for gnashrc)
 	* testsuite/actionscript.all/Makefile.am: use testsuite/gnashrc
 	  for running tests (so loads from MEDIADIR are allowed).

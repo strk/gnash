@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.42 2007/10/20 09:34:45 strk Exp $";
+rcsid="$Id: XML.as,v 1.43 2007/10/20 10:47:14 strk Exp $";
 
 #include "check.as"
 //#include "dejagnu.as"
@@ -619,7 +619,7 @@ trace(doc.toString());
 
 myxml = new XML;
 
-xcheck_equals(typeof(myxml.onData), 'function');
+check_equals(typeof(myxml.onData), 'function');
 #if OUTPUT_VERSION > 5
 check(myxml.onData != XML.prototype.parseXML);
 #endif

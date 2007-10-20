@@ -223,10 +223,11 @@ private:
 
     void setupFrame(gnash::as_object *xml, XMLNode *data, bool src);
   
-private:
-
     /// Initialize the libxml2 parser
     void initParser();
+
+    /// Queue a load request from the given stream
+    void queueLoad(std::auto_ptr<tu_file> str,  as_environment& env);
 
     //static void _xmlErrorHandler(void *ctx, const char* fmt, ...);
 };

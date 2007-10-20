@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.50 2007/10/18 11:47:55 cmusick Exp $ */
+/* $Id: xml.cpp,v 1.51 2007/10/20 10:47:14 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -79,6 +79,7 @@ static as_value xml_getbytestotal(const fn_call& fn);
 static as_value xml_parsexml(const fn_call& fn);
 static as_value xml_send(const fn_call& fn);
 static as_value xml_sendandload(const fn_call& fn);
+static as_value xml_ondata(const fn_call& fn);
 
 static LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 #ifdef USE_DEBUGGER
@@ -395,6 +396,40 @@ XML::parseXML(const std::string& xml_in)
   
 }
 
+void
+XML::queueLoad(std::auto_ptr<tu_file> str,  as_environment& env)
+{
+	GNASH_REPORT_FUNCTION;
+
+    // Set the "loaded" parameter to false
+    VM& vm = _vm;
+    string_table& st = vm.getStringTable();
+    string_table::key loadedKey = st.find("loaded");
+    string_table::key onDataKey = st.find(PROPNAME("onData"));
+    set_member(loadedKey, as_value(false));
+
+    // TODO:
+    // 1. interrupt any pre-existing loading thread (send onLoad event in that case?)
+    // 2. start new loading thread
+    //
+    // Using LoadThread should do. Most likely we should do something
+    // similar for LoadVars or ::loadVariables, so might consider generalizing
+    // a load-in-a-separate-thread-calling-onLoad-when-done class
+    //
+    // The class would use a separate thread, provide cancelling and
+    // will call a specified function (or functor) when all data arrived,
+    // passing it the full data buffer.
+    //
+    std::string src;
+    char buf[256];
+    while ( 1 )
+    {
+        size_t bytes = str->read_bytes(buf, 255);
+        src.append(buf, bytes);
+        if ( bytes < 255 ) break; // end of buffer
+    }
+    callMethod(onDataKey, env, as_value(src));
+}
 
 // This reads in an XML file from disk and parses into into a memory resident
 // tree which can be walked through later.
@@ -405,57 +440,19 @@ XML::load(const URL& url, as_environment& env)
   
     //log_msg(_("%s: mem is %d"), __FUNCTION__, mem);
 
-    // Clear current data
-    clear(); 
-
     std::auto_ptr<tu_file> str ( StreamProvider::getDefaultInstance().getStream(url) );
     if ( ! str.get() ) 
     {
         log_error(_("Can't load XML file: %s (security?)"), url.str().c_str());
-        onLoadEvent(false, env);
+        as_value nullValue; nullValue.set_null();
+        callMethod(VM::get().getStringTable().find("onData"), env, nullValue);
         return false;
     }
 
     log_msg(_("Loading XML file from url: '%s'"), url.str().c_str());
+    queueLoad(str, env);
 
-    initParser();
-
-    int options = getXMLOptions();
-
-    _doc = xmlReadIO(readFromTuFile, closeTuFile, str.get(), url.str().c_str(), NULL, options);
-    if ( str->get_error() )
-    {
-	xmlFreeDoc(_doc);
-        _doc = 0;
-        log_error(_("Can't read XML file %s (stream error %d)"), url.str().c_str(), str->get_error());
-        _loaded = 0;
-        onLoadEvent(false, env);
-        return false;
-    }
-
-    _bytes_total = str->get_size();
-
-    if (_doc == 0)
-    {
-        xmlErrorPtr err = xmlGetLastError();
-        log_error(_("Can't read XML file %s (%s)"), url.str().c_str(), err->message);
-        _loaded = 0;
-        onLoadEvent(false, env);
-        return false;
-    }
-
-    _bytes_loaded = _bytes_total;
-
-    bool ret = parseDoc(_doc, false);
-
-    xmlCleanupParser();
-    xmlFreeDoc(_doc);
-    xmlMemoryDump();
-    _loaded = ret ? 1 : 0;
-
-    onLoadEvent(ret, env);
-
-    return ret;
+    return true;
 }
 
 
@@ -568,6 +565,7 @@ attachXMLInterface(as_object& o)
     o.init_member("parseXML", new builtin_function(xml_parsexml));
     o.init_member("send", new builtin_function(xml_send));
     o.init_member("sendAndLoad", new builtin_function(xml_sendandload));
+    o.init_member("onData", new builtin_function(xml_ondata));
 
 }
 
@@ -659,10 +657,8 @@ xml_createelement(const fn_call& fn)
     if (fn.nargs > 0) {
         const std::string& text = fn.arg(0).to_string(&(fn.env()));
 	XMLNode *xml_obj = new XMLNode();
-//	cerr << "create new child XMLNode is at " << (void *)xml_obj << endl;
 	xml_obj->nodeNameSet(text);
 	xml_obj->nodeTypeSet(XMLNode::tText);
-//	ptr->set_member(text, xml_obj); // FIXME: use a getter/setter !
 	// no return code from this method
 	return as_value(xml_obj);
 	
@@ -769,6 +765,43 @@ xml_sendandload(const fn_call& fn)
     
 //    return as_value(ptr->getAllocated());
     ptr->sendAndLoad();
+    return as_value();
+}
+
+static as_value
+xml_ondata(const fn_call& fn)
+{
+    GNASH_REPORT_FUNCTION;
+
+    VM& vm = VM::get();
+    string_table& st = vm.getStringTable();
+    string_table::key onLoadKey = st.find(PROPNAME("onLoad"));
+    string_table::key loadedKey = st.find("loaded");
+    as_environment& env = fn.env();
+
+    as_object* thisPtr = fn.this_ptr.get();
+    assert(thisPtr);
+
+    // See http://gitweb.freedesktop.org/?p=swfdec/swfdec.git;a=blob;f=libswfdec/swfdec_initialize.as
+
+    as_value src; src.set_null();
+    if ( fn.nargs ) src = fn.arg(0);
+
+    if ( ! src.is_null() )
+    {
+        string_table::key parseXMLKey = st.find(PROPNAME("parseXML"));
+        as_value tmp(true);
+        thisPtr->set_member(loadedKey, tmp);
+        thisPtr->callMethod(parseXMLKey, env, src);
+        thisPtr->callMethod(onLoadKey, env, tmp);
+    }
+    else
+    {
+        as_value tmp(true);
+        thisPtr->set_member(loadedKey, tmp);
+        thisPtr->callMethod(onLoadKey, env, tmp);
+    }
+
     return as_value();
 }
 
