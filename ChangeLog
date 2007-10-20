@@ -1,5 +1,6 @@
 2007-10-20 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/Makefile.am: distribute gnashrc.in
 	* testsuite/misc-ming.all/Makefile.am: provide MEDIADIR
 	  macro as absolute path.
 	* testsuite/misc-ming.all/NetStream-SquareTestRunner.cpp: 
