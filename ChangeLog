@@ -1,5 +1,11 @@
 2007-10-20 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/: .cvsignore, Makefile.am, gnashrc.in:
+	  Add a testsuite-local gnashrc to enable loading local
+	  resources from the MEDIADIR.
+
+2007-10-20 Sandro Santilli <strk@keybit.net>
+
 	* doc/C/usermanual/usage/gnashrc.xml: document new localSandboxPath
 	  directive.
 	* libbase/rc.cpp: support localSandboxPath (set, append) directive.

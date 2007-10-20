@@ -49,6 +49,11 @@ libtestsuite_la_CXXFLAGS = \
 	$(CAIRO_CFLAGS) \
 	$(NULL)
 
+abs_mediadir = $(shell cd $(srcdir)/../media; pwd)
+
+gnashrc: gnashrc.in
+	sed -e 's#@@MEDIADIR@@#$(srcdir)/testsuite/media#g' $< > $@
+
 if ENABLE_MING
 
 .PHONY: Dejagnu.swf
@@ -56,9 +61,10 @@ Dejagnu.swf:
 	$(MAKE) -C misc-ming.all $@
 	cp misc-ming.all/Dejagnu.swf $@
 
-check-local: Dejagnu.swf
-
-clean-local:
-	rm -f Dejagnu.swf
+check-local: Dejagnu.swf gnashrc
 
 endif
+
+clean-local:
+	rm -f Dejagnu.swf gnashrc
+

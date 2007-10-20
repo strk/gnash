@@ -1,0 +1,4 @@
+# Allow load of resources in the MEDIA dir
+append localSandboxPath @@MEDIADIR@@
+
+# TODO: enable extensions ?
