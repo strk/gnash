@@ -37,7 +37,7 @@ AUXMOVIES = \
 	    level99.as \
 	    $(NULL)
 
-EXTRA_DIST = $(ASTESTS) $(AUXMOVIES) TestClass.as ../check.h Dejagnu.as check.as
+EXTRA_DIST = $(ASTESTS) $(AUXMOVIES) TestClass.as ../check.h Dejagnu.as check.as Derived1.as Base1.as
 
 if ENABLE_MTASC
 
