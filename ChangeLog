@@ -1,3 +1,9 @@
+2007-10-20 Sandro Santilli <strk@keybit.net>
+
+	* server/URLAccessManager.{cpp,h}, server/asobj/xmlsocket.cpp
+	  Don't expose allowHost w/out port, rename allowHost (with port)
+	  to allowXMLSocket.
+
 2007-10-19 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* gui/fb.cpp: Added a few more key scan codes

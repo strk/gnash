@@ -138,7 +138,7 @@ XMLSocket::connect(const char *host, short port)
 {
     GNASH_REPORT_FUNCTION;
 
-    if ( ! URLAccessManager::allowHost(host, port) )
+    if ( ! URLAccessManager::allowXMLSocket(host, port) )
     {
 	    return false;
     }

@@ -265,12 +265,6 @@ host_check(const std::string& host)
 }
 
 bool
-allowHost(const std::string& host, short /* port */)
-{
-	return allowHost(host);
-}
-
-bool
 allowHost(const std::string& host)
 {
 	if (host.size() == 0) {
@@ -278,6 +272,13 @@ allowHost(const std::string& host)
 	}
 	return host_check(host);
 }
+
+bool
+allowXMLSocket(const std::string& host, short /* port */)
+{
+	return allowHost(host);
+}
+
 
 bool
 allow(const URL& url)

@@ -40,9 +40,10 @@ namespace URLAccessManager {
 ///
 bool allow(const URL& url);
 
-bool allowHost(const std::string& str);
+//bool allowHost(const std::string& str);
 
-bool allowHost(const std::string& str, short port);
+// Used by XMLSocket::connect (and others?)
+bool allowXMLSocket(const std::string& str, short port);
 
 } // AccessManager
 
