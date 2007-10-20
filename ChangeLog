@@ -1,5 +1,7 @@
 2007-10-20 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/loadMovieTestRunner.cpp: allow loads from
+	  MEDIADIR
 	* testsuite/actionscript.all/XML.as: test where onData is defined.
 	* libbase/LoadThread.{cpp,h}: add support for cancelling load
 	  (untested).

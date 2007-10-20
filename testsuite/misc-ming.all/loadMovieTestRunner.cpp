@@ -87,6 +87,10 @@ main(int /*argc*/, char** /*argv*/)
 	URL offspringURL("offspring.swf", mediaURL);
 	std::string url;
 
+	gnash::RcInitFile& rc = gnash::RcInitFile::getDefaultInstance();
+	rc.addLocalSandboxPath(MEDIADIR);
+
+
 
 	root = tester->getRootMovie();
 	assert(root.get());
