@@ -1,5 +1,6 @@
 2007-10-20 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/XML.as: test where onData is defined.
 	* libbase/LoadThread.{cpp,h}: add support for cancelling load
 	  (untested).
 

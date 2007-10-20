@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.41 2007/10/20 07:06:17 strk Exp $";
+rcsid="$Id: XML.as,v 1.42 2007/10/20 09:34:45 strk Exp $";
 
 #include "check.as"
 //#include "dejagnu.as"
@@ -43,6 +43,7 @@ check(! XML.prototype.hasOwnProperty("length") );
 check(! XML.prototype.hasOwnProperty("status"));
 check(! XML.prototype.hasOwnProperty("loaded"));
 check(! XML.prototype.hasOwnProperty("attributes"));
+check(XML.prototype.hasOwnProperty("onData"));
 check(XML.prototype.hasOwnProperty("createElement") );
 check(XML.prototype.hasOwnProperty("addRequestHeader") );
 check(XML.prototype.hasOwnProperty("createTextNode") );
@@ -74,6 +75,7 @@ check(XMLNode.prototype.hasOwnProperty("toString") );
 check(XMLNode.prototype.hasOwnProperty("cloneNode") );
 check(XMLNode.prototype.hasOwnProperty("attributes") );
 check(XMLNode.prototype.hasOwnProperty("parentNode") );
+check(! XMLNode.prototype.hasOwnProperty("onData") );
 check(! XMLNode.prototype.hasOwnProperty("length") );
 check(! XMLNode.prototype.hasOwnProperty("createElement") );
 check(! XMLNode.prototype.hasOwnProperty("addRequestHeader") );
@@ -771,5 +773,5 @@ check_equals(myxml2.toString(), "<X1> t </X1>");
  // NOTE: tests inside onLoad are not counted here as onLoad handler
  //       should execute later !
  //       Gnash fails executing onLoad immediately
- xcheck_totals(293);
+ xcheck_totals(295);
 #endif
