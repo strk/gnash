@@ -19,6 +19,7 @@
 AUTOMAKE_OPTIONS = dejagnu -Wno-portability
 
 abs_builddir=$(shell cd $(top_builddir)/testsuite/misc-ming.all; pwd)
+abs_mediadir = $(shell cd $(srcdir)/../media; pwd)
 
 if ENABLE_MING
 
@@ -1645,7 +1646,7 @@ NetStream_SquareTest_SOURCES = \
 NetStream_SquareTest_LDADD = libgnashmingutils.la
 
 NetStream-SquareTest.swf: NetStream-SquareTest
-	./NetStream-SquareTest $(srcdir)/../media
+	./NetStream-SquareTest $(abs_mediadir)
 
 NetStream_SquareTestRunner_SOURCES = \
 	NetStream-SquareTestRunner.cpp \
@@ -1654,6 +1655,7 @@ NetStream_SquareTestRunner_SOURCES = \
 NetStream_SquareTestRunner_CXXFLAGS = \
 	-DSRCDIR='"$(srcdir)"' \
 	-DTGTDIR='"$(abs_builddir)"' \
+	-DMEDIADIR='"$(abs_mediadir)"' \
 	$(NULL)
 
 NetStream_SquareTestRunner_LDADD = \

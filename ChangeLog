@@ -1,5 +1,12 @@
 2007-10-20 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/Makefile.am: provide MEDIADIR
+	  macro as absolute path.
+	* testsuite/misc-ming.all/NetStream-SquareTestRunner.cpp: 
+	  allow load of data from MEDIADIR.
+
+2007-10-20 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/xml.{cpp,h}: rework the way XML is loaded:
 	  read all input and call onData, providing a default one.
 	  Still misses a background thread, but is a bit more correct

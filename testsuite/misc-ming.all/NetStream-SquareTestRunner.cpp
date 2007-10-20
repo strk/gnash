@@ -41,6 +41,9 @@ main(int /*argc*/, char** /*argv*/)
 	string filename = string(TGTDIR) + string("/") + string(INPUT_FILENAME);
 	MovieTester tester(filename);
 
+	gnash::RcInitFile& rc = gnash::RcInitFile::getDefaultInstance();
+	rc.addLocalSandboxPath(MEDIADIR);
+
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity(1);
 
