@@ -62,6 +62,10 @@ MovieTester::MovieTester(const std::string& url)
 	// Initialize gnash code lib
 	gnashInit();
 
+	// Set base url *before* calling create_movie
+	// TODO: use PWD if url == '-'
+	set_base_url(url);
+
 	if ( url == "-" )
 	{
 		std::auto_ptr<tu_file> in (
@@ -74,9 +78,6 @@ MovieTester::MovieTester(const std::string& url)
 		// _url should be always set at this point...
 		_movie_def = gnash::create_library_movie(URL(url), NULL, false);
 	}
-
-	// TODO: use PWD if url == '-'
-	set_base_url(url);
 
 	if ( ! _movie_def )
 	{
