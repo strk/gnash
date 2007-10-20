@@ -1,5 +1,10 @@
 2007-10-20 Sandro Santilli <strk@keybit.net>
 
+	* libbase/LoadThread.{cpp,h}: add support for cancelling load
+	  (untested).
+
+2007-10-20 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/: .cvsignore, Makefile.am, gnashrc.in:
 	  Add a testsuite-local gnashrc to enable loading local
 	  resources from the MEDIADIR.

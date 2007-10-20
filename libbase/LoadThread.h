@@ -100,7 +100,13 @@ public:
 		return (static_cast<int32_t>(pos) <= _loadPosition);
 	}
 
+    /// Request download cancel
+    void requestCancel();
+
 private:
+
+    /// Return true if cancel was requested
+    bool cancelRequested() const;
 
 	/// The thread function used to download from the stream
 	static void downloadThread(LoadThread* lt);
@@ -120,7 +126,7 @@ private:
 	volatile bool _completed;
 
 #ifdef THREADED_LOADS
-	boost::mutex _mutex;
+	mutable boost::mutex _mutex;
 
 	std::auto_ptr<boost::thread> _thread;
 #endif
@@ -128,6 +134,8 @@ private:
 	volatile long _loadPosition;
 	volatile long _userPosition;
 	volatile long _actualPosition;
+
+    bool _cancelRequested;
 
 	// Cache...
 	boost::scoped_array<uint8_t> _cache;
@@ -153,6 +161,9 @@ private:
 	// get a lock because fillCache() and download() just "keeps" it, which can
 	// makes read() wait for for a really long time.
 	volatile bool _needAccess;
+
+    /// Reset all values to original state
+    void reset();
 };
 
 #endif // __LOADTHREAD_H__

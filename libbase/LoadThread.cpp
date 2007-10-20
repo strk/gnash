@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: LoadThread.cpp,v 1.15 2007/07/01 10:54:06 bjacques Exp $
+// $Id: LoadThread.cpp,v 1.16 2007/10/20 09:33:28 strk Exp $
 
 #include "LoadThread.h"
 
@@ -33,6 +33,7 @@ LoadThread::LoadThread()
 	_loadPosition(0),
 	_userPosition(0),
 	_actualPosition(0),
+	_cancelRequested(false),
 	_cache(),
 	_cacheStart(0),
 	_cachedData(0),
@@ -41,6 +42,25 @@ LoadThread::LoadThread()
 	_streamSize(0),
 	_needAccess(false)
 {
+}
+
+void
+LoadThread::reset()
+{
+	_completed=false;
+	_loadPosition=0;
+	_userPosition=0;
+	_actualPosition=0;
+	_cache.reset();
+	_cancelRequested=false;
+	_cacheStart=0;
+	_cachedData=0;
+	_cacheSize=0;
+	_chunkSize=56;
+	_streamSize=0;
+	_needAccess=false;
+	_stream.reset();
+	_thread.reset();
 }
 
 LoadThread::~LoadThread()
@@ -57,12 +77,29 @@ LoadThread::~LoadThread()
 #endif
 }
 
+void
+LoadThread::requestCancel()
+{
+    boost::mutex::scoped_lock lock(_mutex);
+    _cancelRequested=true;
+    _thread->join();
+    reset();
+}
+
+bool
+LoadThread::cancelRequested() const
+{
+    boost::mutex::scoped_lock lock(_mutex);
+    return _cancelRequested;
+}
+
 bool LoadThread::setStream(std::auto_ptr<tu_file> stream)
 {
 	_stream = stream;
 	if (_stream.get() != NULL) {
 		// Start the downloading.
 		setupCache();
+		_cancelRequested = false;
 #ifdef THREADED_LOADS
 		_thread.reset( new boost::thread(boost::bind(LoadThread::downloadThread, this)) );
 #else
@@ -253,7 +290,8 @@ void LoadThread::setupCache()
 void LoadThread::downloadThread(LoadThread* lt)
 {
 	// Until the download is completed keep downloading
-	while (!lt->_completed) {
+	while ( (!lt->_completed) && (!lt->cancelRequested()) )
+    {
 		// If the cache is full just "warm up" the data using download(),
 		// else put data directly into the cache using fillCache().
 		if (lt->_chunkSize + lt->_loadPosition > lt->_cacheStart + lt->_cacheSize) lt->download();
@@ -264,7 +302,6 @@ void LoadThread::downloadThread(LoadThread* lt)
 			usleep(100000); // 1/10 second
 		}
 	}
-
 }
 
 void LoadThread::fillCache()
