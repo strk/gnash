@@ -1,3 +1,7 @@
+2007-10-21  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* macros/boost.m4: Add unit_test_framework for Cygnal tests.
+
 2007-10-20 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-mtasc.all/Makefile.am: distribute Derived1.as
