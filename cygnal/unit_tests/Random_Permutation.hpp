@@ -107,11 +107,11 @@ public:
 	typedef const random_permutation_iterator const_iterator ;
 	typedef random_permutation_iterator::test_function_type test_function_type ;
 private:
+	test_function_type f ;
+
 	unsigned int n ;
 
 	unsigned int number_of_iterations ;
-
-	test_function_type f ;
 
 public:
 	random_permutation( test_function_type f, unsigned int n, unsigned int number_of_iterations )

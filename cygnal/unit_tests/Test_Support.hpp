@@ -101,6 +101,9 @@ public:
 	concrete_generator( Iter begin, Iter end )
 		: begin( begin ), end( end )
 	{}
+	
+	/// Trivial virtual destructor
+	virtual ~concrete_generator() {}
 } ;
 
 //--------------------------------------------------
@@ -139,8 +142,8 @@ public:
 template< class Gen >
 auto_generator make_generator( Gen generator_instance, std::string name )
 {
-	shared_ptr< concrete_generator< Gen::iterator > > 
-		g( new concrete_generator< Gen::iterator >( generator_instance.begin(), generator_instance.end() ) ) ;
+	shared_ptr< concrete_generator< typename Gen::iterator > > 
+		g( new concrete_generator< typename Gen::iterator >( generator_instance.begin(), generator_instance.end() ) ) ;
 	return auto_generator( g, name ) ;
 }
 

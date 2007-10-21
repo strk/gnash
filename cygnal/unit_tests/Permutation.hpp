@@ -42,9 +42,9 @@ public:
 	typedef boost::function< void( const_iterator, const_iterator ) > test_function_type ;
 private:
 	vector_type the_vector ;
+	test_function_type f ;
 	bool at_end ;
 	bool at_begin ;
-	test_function_type f ;
 
 	const_iterator begin() { return at_end ? the_vector.end() : the_vector.begin() ; }
 	const_iterator end() { return the_vector.end() ; }

@@ -15,8 +15,11 @@
 #   along with this program; if not, write to the Free Software
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
+# $Id: Makefile.am,v 1.2 2007/10/21 20:24:00 eh9 Exp $
 
-## Process this file with automake to generate Makefile.in
+#----------------------------------------
+# Makefile.am for Cygnal/unit_tests 
+#----------------------------------------
 
 AUTOMAKE_OPTIONS = #dejagnu
 
@@ -25,32 +28,17 @@ AM_CPPFLAGS = # -Wall
 ## WARNING: make sure GLIB_LIBS appears first
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_LDFLAGS = \
-	../../libbase/libgnashbase.la \
-	../../libamf/libgnashamf.la \
-	$(LIBLTDL) \
 	$(GLIB_LIBS) \
-	$(LIBXML_LIBS) \
-	$(CURL_LIBS) \
-	$(BOOST_LIBS) \
-	$(PTHREAD_LIBS)
+	$(BOOST_LIBS)
 
 localedir = $(datadir)/locale
 
-INCLUDES = -I.. \
-        -I$(top_srcdir)	\
-        -I$(top_srcdir)/cygnal	\
-        -I$(top_srcdir)/libamf \
-        -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/server \
-        -DLOCALEDIR=\"$(localedir)\" \
-        $(LIBXML_CFLAGS) \
-	$(DMALLOC_CFLAGS) \
-	$(CURL_CFLAGS) \
-	$(BOOST_CFLAGS) \
-	$(PTHREAD_CFLAGS)
+INCLUDES = -I$(top_srcdir)/cygnal	\
+	-DLOCALEDIR=\"$(localedir)\" \
+	$(BOOST_CFLAGS)
 
-lib_LTLIBRARIES = libcygnaltest.la
-libcygnaltest_la_SOURCES= \
+lib_LTLIBRARIES = libcygnal_test.la
+libcygnal_test_la_SOURCES= \
 	Random_Permutation.cpp \
 	Test_Support.cpp \
 	main.cpp
