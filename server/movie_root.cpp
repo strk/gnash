@@ -137,6 +137,10 @@ movie_root::~movie_root()
 void
 movie_root::setRootMovie(movie_instance* movie)
 {
+	set_display_viewport(0, 0,
+		(int) movie->get_movie_definition()->get_width_pixels(),
+		(int) movie->get_movie_definition()->get_height_pixels());
+
 	try
 	{
 		setLevel(0, movie);
@@ -169,10 +173,6 @@ movie_root::setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movi
 
 	movie->set_invalidated();
 	
-	set_display_viewport(0, 0,
-		(int) movie->get_movie_definition()->get_width_pixels(),
-		(int) movie->get_movie_definition()->get_height_pixels());
-
 	/// Notify placement 
 	movie->stagePlacementCallback();
 

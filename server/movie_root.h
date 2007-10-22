@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.82 2007/10/18 14:13:04 strk Exp $ */
+/* $Id: movie_root.h,v 1.83 2007/10/22 19:53:35 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -762,9 +762,6 @@ private:
 
     /// Put the given movie at the given level 
     //
-    /// Note that the display viewport will be updated to reflect
-    /// the new layout.
-    ///
     /// @param movie
     /// The movie_instance to store at the given level.
     /// Will be stored in an intrusive_ptr.
