@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.68 2007/10/21 20:17:18 rsavoye Exp $
+dnl $Id: boost.m4,v 1.69 2007/10/22 14:50:32 rsavoye Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -28,6 +28,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   gnash_boost_libdir=""
   missing_headers=""
   missing_libs=""
+  extra_missing_libs=""
   gcc_version=""
   dirname=""
   libname=""
@@ -36,7 +37,10 @@ AC_DEFUN([GNASH_PATH_BOOST],
   boost_headers="detail/lightweight_mutex.hpp thread/thread.hpp multi_index_container.hpp multi_index/key_extractors.hpp thread/mutex.hpp"
   dnl this is a list of *required* libraries. If any of these are missing, this
   dnl test will return a failure, and Gnash won't build.
-  boost_libs="thread date_time serialization unit_test_framework"
+  boost_libs="thread date_time serialization"
+  dnl this is a list of *recommended* libraries. If any of these are missing, this
+  dnl test will return a warning, and Gnash will build, but testing won't work.
+  extra_boost_libs="unit_test_framework"
 
   dnl this is the default list for paths to search. This gets
   dnl redefined if --with-boost-incl= is specified.
@@ -79,10 +83,10 @@ AC_DEFUN([GNASH_PATH_BOOST],
       for k in ${boost_headers}; do
        if test ! -f ${gnash_boost_topdir}/boost/$k; then
           if test ! -f ${gnash_boost_subdir}/boost/$k; then
-		missing_headers="${missing_headers} $k"
-	  else
-	  	gnash_boost_topdir=${gnash_boost_subdir}
-	  fi
+		        missing_headers="${missing_headers} $k"
+	        else
+	  	      gnash_boost_topdir=${gnash_boost_subdir}
+	        fi
         fi
       done
       if test x"${missing_headers}" = x ; then
@@ -138,10 +142,19 @@ AC_DEFUN([GNASH_PATH_BOOST],
         fi
       done
     done
+    for j in ${extra_boost_libs}; do
+      dirs=`ls -dr ${dirname}/libboost_${j}*.${shlibext} ${dirname}/libboost_${j}*.a 2>/dev/null`
+      if test -n "${dirs}"; then
+        libname=`echo ${dirs} | sed -e 's:\..*$::' -e 's:^.*/lib::'`
+        ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${libname}"
+      else
+        extra_missing_libs="${extra_missing_libs} $j"
+      fi
+    done
   fi
 
   if test x"${missing_libs}" != x ; then
-    AC_MSG_WARN([Libraries ${missing_libs} aren't installed ])
+    AC_MSG_WARN([Libraries ${missing_libs} ${extra_missing_libs} aren't installed ])
   fi
   AC_MSG_RESULT(${ac_cv_path_boost_lib})
 

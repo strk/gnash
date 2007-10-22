@@ -1,3 +1,10 @@
+2007-10-22  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* configure.ac: Print out a warning for missing boost libraries
+	that are only recommended, and not required.
+	* macros/boost.m4: Look for some libraries that are only needed
+	for testing, but still flag the user if they aren't found.
+
 2007-10-22 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/asobj/Stage.cpp: corrected Stage.width and Stage.height, 
@@ -40,7 +47,7 @@
 2007-10-20 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/loadMovieTestRunner.cpp: allow loads from
-	  MEDIADIR
+	  MEDIADIR.
 	* testsuite/actionscript.all/XML.as: test where onData is defined.
 	* libbase/LoadThread.{cpp,h}: add support for cancelling load
 	  (untested).
