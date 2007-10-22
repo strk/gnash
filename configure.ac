@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.430 2007/10/17 21:30:25 nihilus Exp $
+dnl $Id: configure.ac,v 1.431 2007/10/22 10:28:27 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -200,13 +200,13 @@ if test x"$write" = x"yes"; then
   AC_DEFINE([WRITE_FILE], [], [Write files while streaming])
 fi
 
-dnl Don't build the cygnal server if specified.
+dnl Build the cygnal server if specified.
 AC_ARG_ENABLE(cygnal,
-  AC_HELP_STRING([--disable-cygnal], [Disable support for the Cygnal server]),
+  AC_HELP_STRING([--enable-cygnal], [Enable building of the Cygnal server]),
 [case "${enableval}" in
   yes) cygnal=yes ;;
   no)  cygnal=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for disable-cygnal option]) ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for enable-cygnal option]) ;;
 esac],cygnal=no)
 
 AM_CONDITIONAL(CYGNAL, test x$cygnal = xyes)

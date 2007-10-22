@@ -1,3 +1,8 @@
+2007-10-22 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: fix docmentation for --enable-cygnal
+	  (is not more --disable-cygnal, as it's off by default).
+
 2007-10-21  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* macros/boost.m4: Add unit_test_framework for Cygnal tests.
