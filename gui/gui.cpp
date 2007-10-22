@@ -181,15 +181,18 @@ Gui::resize_view(int width, int height)
 			_stage->set_display_viewport(0, 0, width, height);
 		}
 
-		// set new scale value
-		_xscale = width / swfwidth;
-		_yscale = height / swfheight;
-		
-		// always scale proportionally
-		if (_xscale < _yscale) _yscale = _xscale;
-		if (_yscale < _xscale) _xscale = _yscale;
-		
-		_renderer->set_scale(_xscale, _yscale);
+		if ( _stage && _stage->isRescalingAllowed() )
+		{
+			// set new scale value
+			_xscale = width / swfwidth;
+			_yscale = height / swfheight;
+			
+			// always scale proportionally
+			if (_xscale < _yscale) _yscale = _xscale;
+			if (_yscale < _xscale) _xscale = _yscale;
+			
+			_renderer->set_scale(_xscale, _yscale);
+		}
 
 	}
 	else

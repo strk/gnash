@@ -155,13 +155,20 @@ Stage::getScaleModeString()
 void
 Stage::setScaleMode(ScaleMode mode)
 {
-	_scaleMode = mode;
+	if ( _scaleMode == mode ) return; // nothing to do
 
+	_scaleMode = mode;
 	//log_msg("Scale mode set to %s", getScaleModeString());
+
 	if ( _scaleMode == noScale )
 	{
 		//log_msg("Setting rescaling allowance to false");
 		VM::get().getRoot().allowRescaling(false);
+	}
+	else
+	{
+		//log_msg("Setting rescaling allowance to true");
+		VM::get().getRoot().allowRescaling(true);
 	}
 }
 
