@@ -1,3 +1,8 @@
+2007-10-22 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/asobj/Stage.cpp: corrected Stage.width and Stage.height, 
+	  fixes bug #21364  
+
 2007-10-22 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac: fix docmentation for --enable-cygnal

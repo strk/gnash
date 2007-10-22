@@ -107,13 +107,23 @@ Stage::notifyResize(boost::intrusive_ptr<as_object> obj, as_environment* env)
 unsigned
 Stage::getWidth() const
 {
+  //if (_scaleMode==showAll)      <-- the only mode implemented in Gnash 
+	return VM::get().getRoot().get_movie_definition()->get_width_pixels();
+	/*
+	else
 	return VM::get().getRoot().getWidth();
+	*/	
 }
 
 unsigned
 Stage::getHeight() const
 {
+  //if (_scaleMode==showAll)      <-- the only mode implemented in Gnash 
+	return VM::get().getRoot().get_movie_definition()->get_height_pixels();
+	/*
+	else
 	return VM::get().getRoot().getHeight();
+	*/	
 }
 
 void
