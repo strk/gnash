@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.91 2007/09/27 23:59:50 tgc Exp $
+# $Id: Makefile.am,v 1.92 2007/10/22 15:58:40 rsavoye Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -31,7 +31,6 @@ STD_DIRS = \
 	backend \
 	utilities \
 	gui \
-	extensions \
 	plugin \
 	testsuite \
 	po \
@@ -47,9 +46,13 @@ endif
 
 SUBDIRS      = $(STD_DIRS) $(CYGNAL_DIRS) $(DOC_DIRS)
 
+if BUILD_EXTENSIONS
+SUBDIRS += extensions
+endif
+
 man_MANS = doc/gnash.1
 
-DIST_SUBDIRS = $(STD_DIRS) cygnal doc
+DIST_SUBDIRS = $(STD_DIRS) cygnal doc extensions
 
 EXTRA_DIST = config.rpath $(man_MANS) macros/incllist macros/libslist ChangeLog-0.8.0 ChangeLog-0.8.1
 
@@ -91,7 +94,6 @@ mudflap-check:
 
 # Set a few variables to what features we selected so we can dump it with the
 # test of the config
-
 dumpconfig:
 	@echo ""
 	@echo "Building in directories: $(SUBDIRS)"
@@ -164,10 +166,6 @@ if BUILD_MYSQL_EXT
 	@echo "MYSQL_CFLAGS is $(MYSQL_CFLAGS)"
 	@echo "MYSQL_LIBS is $(MYSQL_LIBS)"
 endif
-if BUILD_LIRC_EXT
-	@echo "	LIRC_CFLAGS is $(LIRC_CFLAGS)"
-	@echo "	LIRC_LIBS is $(LIRC_LIBS)"
-endif
 if USE_MAD_ENGINE
 	@echo "	MAD_CFLAGS is $(MAD_CFLAGS)"
 	@echo "	MAD_LIBS is $(MAD_LIBS)"
@@ -178,6 +176,9 @@ endif
 	@echo "	CURL_LIBS is $(CURL_LIBS)"
 	@echo "	BOOST_CFLAGS is $(BOOST_CFLAGS)"
 	@echo "	BOOST_LIBS is $(BOOST_LIBS)"
+	@if test -n $(BOOST_EXTRA_LIBS); then \
+	  echo "	BOOST_EXTRA_LIBS is $(BOOST_EXTRA_LIBS)"; \
+	fi
 if ENABLE_MING
 	@echo "	MING_VERSION_CODE $(MING_VERSION_CODE) "
 	@echo "	MING_LIBS $(MING_LIBS) "
@@ -221,6 +222,7 @@ endif
 	@echo "	Media handler: $(MEDIA_CONFIG)"
 	@echo "	Renderer engine: $(RENDERER_CONFIG)"
 
+
 if BUILD_GTK_GUI
 	@echo "	Supported GUI: GTK"
 endif
@@ -251,6 +253,9 @@ if NSAPI
 else
 	@echo "	Firefox (NSAPI) plugin disabled"
 endif
+	@if test -n "$(EXTENSIONS_LIST)" ; then \
+	  echo "	Extensions added are: $(EXTENSIONS_LIST)"; \
+	fi
 
 check: check-recursive anal
 

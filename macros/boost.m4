@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.69 2007/10/22 14:50:32 rsavoye Exp $
+dnl $Id: boost.m4,v 1.70 2007/10/22 15:58:40 rsavoye Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -146,7 +146,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
       dirs=`ls -dr ${dirname}/libboost_${j}*.${shlibext} ${dirname}/libboost_${j}*.a 2>/dev/null`
       if test -n "${dirs}"; then
         libname=`echo ${dirs} | sed -e 's:\..*$::' -e 's:^.*/lib::'`
-        ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${libname}"
+        ac_cv_path_boost_extra_lib="${ac_cv_path_boost_extra_lib} -l${libname}"
       else
         extra_missing_libs="${extra_missing_libs} $j"
       fi
@@ -166,12 +166,17 @@ AC_DEFUN([GNASH_PATH_BOOST],
     BOOST_LIBS="$ac_cv_path_boost_lib" 
   fi
 
+  if test x"${ac_cv_path_boost_extra_lib}" != x; then
+    BOOST_EXTRA_LIBS="$ac_cv_path_boost_extra_lib" 
+  fi
+
   dnl ------------------------------------------------------------------
   dnl Set HAVE_BOOST conditional, BOOST_CFLAGS and BOOST_LIBS variables
   dnl ------------------------------------------------------------------
 
   AC_SUBST(BOOST_CFLAGS)
   AC_SUBST(BOOST_LIBS)
+  AC_SUBST(BOOST_EXTRA_LIBS)
 
   dnl This isn't right: you don't need boot date-time installed unless u build
   dnl cygnal, and it is sometimes a separate package from Boost core and thread.

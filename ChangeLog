@@ -1,5 +1,16 @@
 2007-10-22  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* configure.ac: Build Makefiles in cygnal/ACT sub dirs, add metome
+	extension. Also display proper values for Boost libs.
+	* Makefile.am: Dispplay boost values correctly for missing
+	libraries, both required and optional.
+	* macros/boost.m4: Make extra libraries used for testing it's own
+	BOOST_EXTRA_LIBS variable to avoid linking problems.
+	* extensions/metome: New directory for the soon-to-be-available
+	metome SDK.
+	* extensions/metome/Makefile.am, metome_ext.{h,cpp}: New support
+	for Metome SDK.
+	
 	* configure.ac: Print out a warning for missing boost libraries
 	that are only recommended, and not required.
 	* macros/boost.m4: Look for some libraries that are only needed

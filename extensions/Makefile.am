@@ -39,9 +39,9 @@ if BUILD_DBUS_EXT
 OTHER_DIRS += dbus
 endif
 
-# if BUILD_DBUS_EXT
-# OTHER_DIRS += dbus
-# endif
+if BUILD_METOME_EXT
+OTHER_DIRS += metome
+endif
 
 if BUILD_GTK_EXT
 if BUILD_GTK_GUI

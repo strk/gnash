@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.431 2007/10/22 10:28:27 strk Exp $
+dnl $Id: configure.ac,v 1.432 2007/10/22 15:58:40 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -490,6 +490,7 @@ ext_fileio=no
 ext_gtk=no
 ext_lirc=no
 ext_dbus=no
+ext_metome=no
 ext_all=no
 AC_ARG_WITH(extensions,
   AC_HELP_STRING([--with-extensions=], [Specify which extensions to build]),
@@ -540,18 +541,24 @@ AC_ARG_WITH(extensions,
         ext_dbus=yes
         nextensions=$((nextensions+1))
         ;;
+      metome|METOME)
+        AC_DEFINE(USE_METOME_EXT, [1], [Build the METOME extension])
+        ext_metome=yes
+        nextensions=$((nextensions+1))
+        ;;
       all|ALL)
         AC_DEFINE(USE_GTK_EXT, [1], [Build all the extensions])
         ext_dejagnu=yes
         ext_mysql=yes
         ext_fileio=yes
         ext_gtk=yes
-        ext_lirc=no
-        ext_dbus=no
+        ext_lirc=yes
+        ext_dbus=yes
+        ext_metome=yes
         ext_all=yes
-        nextensions=5
+        nextensions=8
         ;;
-      *) AC_MSG_ERROR([invalid extension specified: ${withval} given (accept: MYSQL|DEJAGNU|FILEIO|GTK|LIRC|DBUS|ALL)])
+      *) AC_MSG_ERROR([invalid extension specified: ${withval} given (accept: MYSQL|DEJAGNU|FILEIO|GTK|LIRC|DBUS|METOME|ALL)])
          ;;
       esac]
     withval=`echo ${withval} | cut -d ' ' -f 2-6`
@@ -572,6 +579,8 @@ AM_CONDITIONAL(BUILD_MYSQL_EXT, [ test x$ext_mysql = xyes ])
 AM_CONDITIONAL(BUILD_GTK_EXT, [ test x$ext_gtk = xyes ])
 AM_CONDITIONAL(BUILD_LIRC_EXT, [ test x$ext_lirc = xyes ])
 AM_CONDITIONAL(BUILD_DBUS_EXT, [ test x$ext_dbus = xyes ])
+AM_CONDITIONAL(BUILD_METOME_EXT, [ test x$ext_metome = xyes ])
+AM_CONDITIONAL(BUILD_EXTENSIONS, [ test -n $extensions_list])
 
 AC_LIBLTDL_INSTALLABLE
 AC_LIBTOOL_DLOPEN
@@ -1509,10 +1518,13 @@ extensions/fileio/Makefile
 extensions/gtk2/Makefile
 extensions/lirc/Makefile
 extensions/dbus/Makefile
+extensions/metome/Makefile
 plugin/Makefile
 plugin/klash/Makefile
 cygnal/Makefile
 cygnal/ACT/Makefile
+cygnal/ACT/test_support/Makefile
+cygnal/ACT/unit_tests/Makefile
 cygnal/IO/Makefile
 cygnal/HTTP/Makefile
 cygnal/Net/Makefile
@@ -2081,6 +2093,7 @@ if test x"$BOOST_LIBS" != x; then
     dnl if test x"$cygnal" = xno; then
 	echo "        BOOST flags are: $BOOST_CFLAGS"
 	echo "        BOOST libs are: $BOOST_LIBS"
+	echo "        BOOST Extra libs are: $BOOST_EXTRA_LIBS"
     dnl fi
     if test x"${missing_headers}" != x; then
       for i in ${missing_headers}; do
@@ -2089,6 +2102,14 @@ if test x"$BOOST_LIBS" != x; then
 	echo "               Install it from http://boost.org"
 	echo "               or from a Boost development package"
 	nogo=true
+      done
+    fi
+    if test x"${extra_missing_libs}" != x; then
+      for i in ${extra_missing_libs}; do
+	      echo "        WARNING: The BOOST $i library is recommended!"
+        echo "               Install it from http://www.boost.org"
+        echo "               or .deb users: apt-get install libboost-${i}-dev"
+        echo "               Gnash will compile anyway, but not all tests will work."
       done
     fi
     if test x"${missing_libs}" != x; then
