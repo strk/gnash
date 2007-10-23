@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.1 2007/09/27 23:59:53 tgc Exp $ */
+/* $Id: sound_handler.h,v 1.2 2007/10/23 18:13:59 strk Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -39,6 +39,7 @@
 #include <vector>
 #include <memory>
 #include <cassert>
+#include <cstring>
 
 namespace gnash {
 	class stream;

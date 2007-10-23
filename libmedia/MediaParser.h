@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaParser.h,v 1.5 2007/10/04 16:12:42 strk Exp $
+// $Id: MediaParser.h,v 1.6 2007/10/23 18:13:59 strk Exp $
 
 #ifndef __MEDIAPARSER_H__
 #define __MEDIAPARSER_H__
@@ -33,6 +33,8 @@ extern "C"
 	#include <ffmpeg/avcodec.h>
 }
 #endif // USE_FFMPEG
+
+#include <memory>
 
 namespace gnash {
 

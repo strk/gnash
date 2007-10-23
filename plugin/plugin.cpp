@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.86 2007/10/19 01:47:54 nihilus Exp $ */
+/* $Id: plugin.cpp,v 1.87 2007/10/23 18:13:59 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -52,6 +52,7 @@
 #include <unistd.h>
 #include <cstdio>
 #include <cstddef>
+#include <cstring>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
