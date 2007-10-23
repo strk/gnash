@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.35 2007/09/29 16:22:58 strk Exp $";
+rcsid="$Id: Object.as,v 1.36 2007/10/23 17:33:42 strk Exp $";
 
 #include "check.as"
 
@@ -279,6 +279,31 @@ check_equals (inh1.len, 5);
 check_equals (inh2.len, 7);
 check_equals (proto.len, undefined);
 
+inh2.ogs = 5; // overridden getter-setter
+var inh2d = new Object;
+check(proto.addProperty("ogs", getLen, setLen));
+inh2d.__proto__ = inh2;
+inh2d._len = 8;
+proto._len = 14;
+
+//
+// Inheritance is: inh2d : inh2 : proto
+//	inh2d.ogs doesn't exist at this time
+//	inh2.ogs is a normal member (value: 5)
+//	proto.ogs is a getter-setter (changes: this._len)
+//
+check( ! inh2d.hasOwnProperty("ogs") );
+check( inh2d.__proto__.hasOwnProperty("ogs") );
+check( inh2d.__proto__.__proto__.hasOwnProperty("ogs") );
+check_equals(inh2d.ogs, 5); // find inh2.ogs
+check_equals(inh2.ogs, 5); // find inh2.ogs
+check_equals(inh2.__proto__.ogs, 14); // find proto.ogs
+inh2d.ogs = 54; // sets what ?
+xcheck_equals(inh2d._len, 54); // this._len ! So the getter-setter takes precedence
+xcheck_equals(inh2d.ogs, 5); // does NOT override inh2.ogs normal member
+check_equals(inh2.ogs, 5); // find inh2.ogs
+check_equals(inh2.__proto__.ogs, 14); // find proto.ogs
+
 // Override addProperty member
 var o = new Object();
 o.addProperty = function(a, b) { return a+b; };
@@ -432,4 +457,10 @@ check( obj8.prototype.isPrototypeOf(obj9) );
 // TODO: add tests here !
 
 #endif // OUTPUT_VERSION > 5
-totals();
+
+
+#if OUTPUT_VERSION > 5
+totals(156);
+#else
+totals(63);
+#endif
