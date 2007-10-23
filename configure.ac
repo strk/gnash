@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.432 2007/10/22 15:58:40 rsavoye Exp $
+dnl $Id: configure.ac,v 1.433 2007/10/23 13:34:25 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1979,9 +1979,9 @@ if $need_sdl; then
     echo "               Install it from http://www.libsdl.org/download-1.2.php"
     echo "               or .deb users: apt-get install libsdl1.2-dev"
     echo "               or .rpm users: yum install SDL-devel"
-    [ x$build_sdl = xyes ] &&
+    test x$build_sdl = xyes &&
 	echo "               or select a different GUI with --enable-gui= "
-    [ x"$media_handler" = x"ffmpeg" -o x"$media_handler" = x"mad" ] &&
+    test x"$media_handler" = x"ffmpeg" -o x"$media_handler" = x"mad" &&
 	echo "               or use --enable-media=gst"
     nogo=true
   fi
