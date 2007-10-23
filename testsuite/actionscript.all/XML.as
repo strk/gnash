@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.43 2007/10/20 10:47:14 strk Exp $";
+rcsid="$Id: XML.as,v 1.44 2007/10/23 17:01:32 strk Exp $";
 
 #include "check.as"
 //#include "dejagnu.as"
@@ -43,6 +43,7 @@ check(! XML.prototype.hasOwnProperty("length") );
 check(! XML.prototype.hasOwnProperty("status"));
 check(! XML.prototype.hasOwnProperty("loaded"));
 check(! XML.prototype.hasOwnProperty("attributes"));
+check(! XML.prototype.hasOwnProperty("nodeValue"));
 check(XML.prototype.hasOwnProperty("onData"));
 check(XML.prototype.hasOwnProperty("createElement") );
 check(XML.prototype.hasOwnProperty("addRequestHeader") );
@@ -63,6 +64,7 @@ check(!XML.hasOwnProperty("load") );
 check(!XML.hasOwnProperty("parseXML") );
 check(!XML.hasOwnProperty("send") );
 check(!XML.hasOwnProperty("sendAndLoad") );
+check(!XML.hasOwnProperty("nodeValue"));
 // ignoreWhite is undefined by default, but is used when set to true
 check(!XML.prototype.hasOwnProperty("ignoreWhite") );
 
@@ -75,6 +77,7 @@ check(XMLNode.prototype.hasOwnProperty("toString") );
 check(XMLNode.prototype.hasOwnProperty("cloneNode") );
 check(XMLNode.prototype.hasOwnProperty("attributes") );
 check(XMLNode.prototype.hasOwnProperty("parentNode") );
+check(XMLNode.prototype.hasOwnProperty("nodeValue"));
 check(! XMLNode.prototype.hasOwnProperty("onData") );
 check(! XMLNode.prototype.hasOwnProperty("length") );
 check(! XMLNode.prototype.hasOwnProperty("createElement") );
@@ -96,12 +99,18 @@ check(! XMLNode.hasOwnProperty("insertBefore") );
 check(! XMLNode.hasOwnProperty("removeNode") );
 check(! XMLNode.hasOwnProperty("toString") );
 check(! XMLNode.hasOwnProperty("cloneNode") );
+check(! XMLNode.hasOwnProperty("nodeValue"));
 
 #endif // OUTPUT_VERSION >= 6 }
 
 check(XML.prototype instanceof XMLNode);
 
 var tmp = new XML();
+
+#if OUTPUT_VERSION >= 6
+ check( ! tmp.hasOwnProperty("nodeValue") );
+#endif
+
 check(tmp instanceof XML);
 check(tmp instanceof XMLNode);
 
@@ -415,6 +424,7 @@ tmp.checkParsed = function ()
 			}
 		}
         }
+	check_equals(this.firstChild.nodeValue, '4');
 };
 
 check_equals( typeof(tmp.parseXML), 'function');
@@ -768,10 +778,10 @@ check_equals(myxml2.toString(), "<X1> t </X1>");
  // NOTE: tests inside onLoad are not counted here as onLoad handler
  //       should execute later !
  //       Gnash fails executing onLoad immediately
- xcheck_totals(229);
+ xcheck_totals(230);
 #else
  // NOTE: tests inside onLoad are not counted here as onLoad handler
  //       should execute later !
  //       Gnash fails executing onLoad immediately
- xcheck_totals(295);
+ xcheck_totals(301);
 #endif
