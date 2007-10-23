@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.31 2007/10/23 16:43:06 strk Exp $";
+rcsid="$Id: with.as,v 1.32 2007/10/23 16:58:16 strk Exp $";
 
 #include "check.as"
 
@@ -462,6 +462,12 @@ with (mc)
 	hidden = "hiddenUpdated"; // protected from override in mc, but existing. Will NOT be set in _root
 	nonexistent = "nonExistent"; // non-existing in mc, will be set in root
 	inheritedMem = "McProtoOverridden"; // non own-property of mc, will be set in root
+
+	check_equals(inheritedMem, "McProto");
+	check_equals(nonexistent, "nonExistent");
+	check_equals(hidden, "hidden");
+	check_equals(mem, "mcMemberUpdated");
+	check_equals(child._target, "/mc/child");
 }
 xcheck_equals(inheritedMem, "McProtoOverridden");
 xcheck_equals(mc.inheritedMem, "McProto");
@@ -481,5 +487,5 @@ xcheck_equals(child, "rootChild");
 #if OUTPUT_VERSION < 6
  check_totals(41);
 #else
- check_totals(81);
+ check_totals(86);
 #endif
