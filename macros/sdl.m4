@@ -1,5 +1,5 @@
 dnl  
-dnl    Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+dnl    Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: sdl.m4,v 1.43 2007/10/23 13:50:27 strk Exp $
+dnl $Id: sdl.m4,v 1.44 2007/10/23 21:53:10 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_SDL], [
   has_sdl=no
@@ -53,9 +53,15 @@ AC_DEFUN([GNASH_PATH_SDL], [
   if test "x$SDL_CONFIG" != "x" ; then
     if test "x$SDL_CFLAGS" = "x" ; then
       SDL_CFLAGS=`$SDL_CONFIG --cflags`
+	if test x${cross_compiling} = xno; then
+      		ac_cv_path_sdl_incl=$SDL_CFLAGS
+	fi
     fi
     if test "x$SDL_LIBS" = "x" ; then
       SDL_LIBS=`$SDL_CONFIG --libs | sed -e 's:-L/usr/lib::'`
+	if test x${cross_compiling} = xno; then
+		ac_cv_path_sdl_lib=$SDL_LIBS
+	fi
     fi
   fi
 
@@ -68,7 +74,7 @@ AC_DEFUN([GNASH_PATH_SDL], [
         if test -f $j/SDL.h; then
       	  gnash_sdl_topdir=`basename $j`
       	  gnash_sdl_version=`echo ${gnash_sdl_topdir} | sed -e 's:SDL::' -e 's:-::'`
-      	  ac_cv_path_sdl_incl="$j"
+      	  ac_cv_path_sdl_incl="-I$j"
           break
         fi
       done
@@ -83,12 +89,13 @@ AC_DEFUN([GNASH_PATH_SDL], [
     fi
   fi
  
+  dnl This is sorta bogus atm.
   SDL_CFLAGS=""
   if test x"${ac_cv_path_sdl_incl}" = x ; then
     AC_CHECK_HEADERS(SDL.h, [ac_cv_path_sdl_incl=""])
   else
     if test x"${ac_cv_path_sdl_incl}" != x"/usr/include"; then
-      ac_cv_path_sdl_incl="-I${ac_cv_path_sdl_incl}"
+      ac_cv_path_sdl_incl="${ac_cv_path_sdl_incl}"
     else
       ac_cv_path_sdl_incl=""
     fi

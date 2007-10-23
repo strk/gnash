@@ -5,6 +5,7 @@
 2007-10-23 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* macros/glib.m4; Fixed out put.
+	* macros/sdl.m4: Fixed bogus -I.
 
 2007-10-23 Takashi Iwai <tiwai@suse.de>
 
