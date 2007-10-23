@@ -1,5 +1,6 @@
 2007-10-23 Sandro Santilli <strk@keybit.net>
 
+	* server/URLAccessManager.cpp (allow): fix assertion checking.
 	* testsuite/misc-ming.all/ming_utils.h: provide a CALLFRAME
 	  macro to use the syntax recognized by the detected Ming
 	  version.

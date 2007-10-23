@@ -352,8 +352,8 @@ allow(const URL& url)
 	// Local resources can be accessed only if they are
 	// in a directory listed as local sandbox
 	if (host.size() == 0)
-    {
-        assert(host.protocol() == "file");
+	{
+		assert(url.protocol() == "file");
 		return local_check(url.path());
 	}
 	return host_check(host);
