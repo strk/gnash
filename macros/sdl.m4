@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: sdl.m4,v 1.42 2007/10/13 23:24:08 rsavoye Exp $
+dnl $Id: sdl.m4,v 1.43 2007/10/23 13:50:27 strk Exp $
 
 AC_DEFUN([GNASH_PATH_SDL], [
   has_sdl=no
@@ -39,14 +39,15 @@ AC_DEFUN([GNASH_PATH_SDL], [
   dnl version number attached. At least on Debain based systems, this
   dnl doesn't seem to get a directory that is unversioned.
 
-  AC_MSG_CHECKING([for the SDL Version])  
   if test x${cross_compiling} = xno; then
     if test x"$PKG_CONFIG" != x; then
-      $PKG_CONFIG --exists sdl && gnash_sdl_version=`$PKG_CONFIG --modversion sdl`
+      dnl What's the point of checking for SDL version here if we wipe out that info below ?? .. dropping the check
+      dnl AC_MSG_CHECKING([for the SDL Version])  
+      dnl $PKG_CONFIG --exists sdl && gnash_sdl_version=`$PKG_CONFIG --modversion sdl`
       $PKG_CONFIG --exists sdl && ac_cv_path_sdl_incl=`$PKG_CONFIG --cflags sdl`
+      dnl AC_MSG_RESULT(${gnash_sdl_version})
     fi
   fi
-  AC_MSG_RESULT(${gnash_sdl_version})
 
   AC_PATH_PROG(SDL_CONFIG, sdl-config, , ,[${pathlist}])
   if test "x$SDL_CONFIG" != "x" ; then
@@ -56,24 +57,30 @@ AC_DEFUN([GNASH_PATH_SDL], [
     if test "x$SDL_LIBS" = "x" ; then
       SDL_LIBS=`$SDL_CONFIG --libs | sed -e 's:-L/usr/lib::'`
     fi
-  else
-    AC_MSG_RESULT(no)
   fi
 
   gnash_sdl_topdir=""
   gnash_sdl_version=""
-  AC_MSG_CHECKING([for SDL header])  
   if test x"${ac_cv_path_sdl_incl}" = x; then
+    AC_MSG_CHECKING([for SDL header])  
     for i in ${incllist}; do
       for j in `ls -dr $i/SDL* 2>/dev/null`; do
- 	      if test -f $j/SDL.h; then
+        if test -f $j/SDL.h; then
       	  gnash_sdl_topdir=`basename $j`
       	  gnash_sdl_version=`echo ${gnash_sdl_topdir} | sed -e 's:SDL::' -e 's:-::'`
-      	  ac_cv_path_sdl_incl="-I$j"
+      	  ac_cv_path_sdl_incl="$j"
           break
         fi
       done
+      if test x"${ac_cv_path_sdl_incl}" != x; then
+        break
+      fi
     done
+    if test x"${ac_cv_path_sdl_incl}" != x; then
+        AC_MSG_RESULT(${ac_cv_path_sdl_incl})
+    else
+        AC_MSG_RESULT([not found in incllist])
+    fi
   fi
  
   SDL_CFLAGS=""
@@ -81,12 +88,11 @@ AC_DEFUN([GNASH_PATH_SDL], [
     AC_CHECK_HEADERS(SDL.h, [ac_cv_path_sdl_incl=""])
   else
     if test x"${ac_cv_path_sdl_incl}" != x"/usr/include"; then
-      ac_cv_path_sdl_incl="${ac_cv_path_sdl_incl}"
+      ac_cv_path_sdl_incl="-I${ac_cv_path_sdl_incl}"
     else
       ac_cv_path_sdl_incl=""
     fi
   fi
-  AC_MSG_RESULT(${ac_cv_path_sdl_incl})
   
   dnl Look for the library
   AC_ARG_WITH(sdl_lib, AC_HELP_STRING([--with-sdl-lib], [directory where sdl library is]), with_sdl_lib=${withval})
@@ -147,8 +153,8 @@ dnl  AC_MSG_CHECKING([for sdl library])
   if test x"${ac_cv_path_sdl_lib}" = x ; then
     AC_CHECK_LIB(SDL, SDL_Init, [ac_cv_path_sdl_lib="-lSDL"])
   fi  
-  AC_MSG_CHECKING([for SDL library])
-  AC_MSG_RESULT(${ac_cv_path_sdl_lib}) 
+  dnl AC_MSG_CHECKING([for SDL library])
+  dnl AC_MSG_RESULT(${ac_cv_path_sdl_lib}) 
   if test x"${ac_cv_path_sdl_incl}" != x ; then
     SDL_CFLAGS="${ac_cv_path_sdl_incl}"
   fi
