@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.30 2007/10/23 15:32:54 strk Exp $";
+rcsid="$Id: with.as,v 1.31 2007/10/23 16:43:06 strk Exp $";
 
 #include "check.as"
 
@@ -452,11 +452,22 @@ newFunc();
 createEmptyMovieClip("mc", 1);
 mc.createEmptyMovieClip("child", 1);
 mc.mem = "mcMember";
+mc.hidden = "hidden";
+ASSetPropFlags(mc, "hidden", 4, 1); 
+MovieClip.prototype.inheritedMem = "McProto";
 with (mc)
 {
-	child = "rootChild";
-	mem = "mcMemberUpdated";
+	child = "rootChild"; // non-proper in mc, will be set in root
+	mem = "mcMemberUpdated"; // overridable in mc, will be updated
+	hidden = "hiddenUpdated"; // protected from override in mc, but existing. Will NOT be set in _root
+	nonexistent = "nonExistent"; // non-existing in mc, will be set in root
+	inheritedMem = "McProtoOverridden"; // non own-property of mc, will be set in root
 }
+xcheck_equals(inheritedMem, "McProtoOverridden");
+xcheck_equals(mc.inheritedMem, "McProto");
+check_equals(nonexistent, 'nonExistent');
+check_equals(typeof(hidden), 'undefined');
+check_equals(mc.hidden, 'hidden');
 check_equals(typeof(mem), 'undefined');
 check_equals(mc.mem, "mcMemberUpdated");
 xcheck_equals(typeof(mc.child), 'movieclip');
@@ -470,5 +481,5 @@ xcheck_equals(child, "rootChild");
 #if OUTPUT_VERSION < 6
  check_totals(41);
 #else
- check_totals(76);
+ check_totals(81);
 #endif
