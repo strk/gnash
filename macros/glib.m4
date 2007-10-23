@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: glib.m4,v 1.30 2007/10/23 21:21:42 nihilus Exp $
+dnl $Id: glib.m4,v 1.31 2007/10/23 21:34:36 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_GLIB],
 [
@@ -60,7 +60,7 @@ AC_DEFUN([GNASH_PATH_GLIB],
       done
     done
   fi
-      if test x"${ac_cv_path_glib_incl}" == x; then
+      if test x"${ac_cv_path_glib_incl}" = x; then
         AC_MSG_RESULT(no)
 	else
         AC_MSG_RESULT(${ac_cv_path_glib_incl})	
