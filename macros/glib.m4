@@ -1,5 +1,5 @@
 dnl  
-dnl    Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+dnl    Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: glib.m4,v 1.28 2007/10/13 23:24:07 rsavoye Exp $
+dnl $Id: glib.m4,v 1.29 2007/10/23 20:55:21 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_GLIB],
 [
@@ -51,7 +51,6 @@ AC_DEFUN([GNASH_PATH_GLIB],
           gnash_glib_topdir=`basename $j`
           gnash_glib_version=`echo ${gnash_glib_topdir} | sed -e 's:glib-::'`
           ac_cv_path_glib_incl="-I$j"
-          AC_MSG_RESULT(${ac_cv_path_glib_incl})
           gnash_glib_config=`echo $j | sed -e 's:include:lib:'`
           if test -f ${gnash_glib_config}/include/glibconfig.h; then
             ac_cv_path_glib_incl="${ac_cv_path_glib_incl} -I${gnash_glib_config}/include"
@@ -59,12 +58,13 @@ AC_DEFUN([GNASH_PATH_GLIB],
           break
         fi
       done
-      if test x$gnash_glib_version != x; then
-        AC_MSG_RESULT(no)
- 	      break;
-      fi
     done
   fi
+      if test x"$ac_cv_path_glib_incl" != x; then
+        AC_MSG_RESULT(no)
+	else
+        AC_MSG_RESULT(${ac_cv_path_glib_incl})	
+      fi
  
 
   dnl Look for the library
