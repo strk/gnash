@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.29 2007/10/15 21:42:20 strk Exp $";
+rcsid="$Id: with.as,v 1.30 2007/10/23 15:32:54 strk Exp $";
 
 #include "check.as"
 
@@ -445,11 +445,30 @@ check_equals(typeof(checkpoint), "undefined");
 newFunc();
 
 //---------------------------------------------------------
+// Test with(movieclip) 
+//---------------------------------------------------------
+
+#if OUTPUT_VERSION > 5
+createEmptyMovieClip("mc", 1);
+mc.createEmptyMovieClip("child", 1);
+mc.mem = "mcMember";
+with (mc)
+{
+	child = "rootChild";
+	mem = "mcMemberUpdated";
+}
+check_equals(typeof(mem), 'undefined');
+check_equals(mc.mem, "mcMemberUpdated");
+xcheck_equals(typeof(mc.child), 'movieclip');
+xcheck_equals(child, "rootChild");
+#endif // OUTPUT_VERSION > 5
+
+//---------------------------------------------------------
 // END OF TESTS
 //---------------------------------------------------------
 
 #if OUTPUT_VERSION < 6
  check_totals(41);
 #else
- check_totals(72);
+ check_totals(76);
 #endif

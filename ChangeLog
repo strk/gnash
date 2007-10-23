@@ -1,5 +1,6 @@
 2007-10-23 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/with.as: more failures !
 	* macros/sdl.m4: cleanups
 	* configure.ac: use test, not the ``['' command, in m4 macros.
 	* server/URLAccessManager.cpp (allow): fix assertion checking.
