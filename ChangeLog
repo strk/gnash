@@ -1,3 +1,11 @@
+2007-10-23 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/ming_utils.h: provide a CALLFRAME
+	  macro to use the syntax recognized by the detected Ming
+	  version.
+	* testsuite/misc-ming.all/: frame_label_test.c, path_format_test.c:
+	  use CALLFRAME instead of callFrame.
+
 2007-10-22 Sandro Santilli <strk@keybit.net>
 
 	* server/movie_root.{cpp,h}: don't update viewport size on setLevel,

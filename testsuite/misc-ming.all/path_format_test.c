@@ -237,31 +237,30 @@ main(int argc, char** argv)
   /* Notice that _root.3.1 is not even displayed on screen 
      with all versions. accessing _root.3.1 failed! */
   check_equals(mo, "_root.x10", "'undefined'" ); 
-  
-  add_actions(mo, "callFrame('/mc1/mc11/:4');");
+  add_actions(mo, CALLFRAME"('/mc1/mc11/:4');");
   /* the above path format is supported */
   check_equals(mo, "_root.x1", "'mc11_frame4'" ); 
   
   /* reset _root.x1 to 0*/
   add_actions(mo, "_root.x1 = 0;");
-  add_actions(mo, "callFrame('_root.mc1.mc11.4');");
+  add_actions(mo, CALLFRAME"('_root.mc1.mc11.4');");
   /* the above path format is supported */
   check_equals(mo, "_root.x1", "'mc11_frame4'" ); 
 
   /* reset _root.x1 to 0*/
   add_actions(mo, "_root.x1 = 0;");
-  add_actions(mo, "callFrame('_root.mc1.mc11:4');");
+  add_actions(mo, CALLFRAME"('_root.mc1.mc11:4');");
   /* the above path format is supported */
   check_equals(mo, "_root.x1", "'mc11_frame4'" ); 
   
   /* reset _root.x1 to 0*/
   add_actions(mo, "_root.x1 = 0;");
-  add_actions(mo, "callFrame('/mc1/mc11/4');");
+  add_actions(mo, CALLFRAME"('/mc1/mc11/4');");
   /* the above path format is not supported */
   check_equals(mo, "_root.x1", "0" ); 
 
   /* reset _root.x1~10 to 0 */
-  add_actions(mo, "callFrame('/:1');");
+  add_actions(mo, CALLFRAME"('/:1');");
  
   /* test valid path format for ActionGotoExpression */
   add_actions(mo, " path = '/mc1/mc11/4'; "        // not supported

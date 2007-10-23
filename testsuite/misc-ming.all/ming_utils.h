@@ -48,6 +48,18 @@ void SWFMovie_writeExports(SWFMovie movie);
 # define newSWFAction compileSWFActionCode
 #endif
 
+/*
+ * 'callFrame' was drop as a keyword since Ming-0.4.0.beta5
+ * and replaced by 'call'. Before that version 'call' would
+ * never be recognized as a "callframe" action
+ */
+#if MING_VERSION_CODE >= 00040006
+# define CALLFRAME "call"
+#else
+# define CALLFRAME "callFrame"
+#endif
+
+
 /* Missing define to allow using older Ming releases */
 
 #ifndef SWFACTION_INIT

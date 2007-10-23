@@ -121,9 +121,9 @@ main(int argc, char** argv)
                   " gotoAndPlay(lable); "           //GotoExpression
                   " lable = '/mc1/mc11/:5'; "
                   " gotoAndPlay(lable); "           //GotoExpression
-                  " callFrame('/mc1/mc11/:frame6'); "
-                  " callFrame('mc1:7'); "
-                  " callFrame('mc1/:frame8'); ");      
+                  " "CALLFRAME"('/mc1/mc11/:frame6'); "
+                  " "CALLFRAME"('mc1:7'); "
+                  " "CALLFRAME"('mc1/:frame8'); ");      
                   
   SWFMovie_nextFrame(mo); /* 3rd frame of _root */
    
@@ -139,7 +139,7 @@ main(int argc, char** argv)
   check_equals(mo, "_root.x4", "0");
   check_equals(mo, "_root.x5", "0");
   check_equals(mo, "_root.x6", "0");
-  add_actions(mo, " callFrame('/:1'); ");
+  add_actions(mo, " "CALLFRAME"('/:1'); ");
   check_equals(mo, "_root.x1", "0");
   check_equals(mo, "_root.x2", "0");
   check_equals(mo, "_root.x3", "0");
