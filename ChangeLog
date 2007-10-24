@@ -1,5 +1,7 @@
 2007-10-24 Sandro Santilli <strk@keybit.net>
 
+	* cygnal/ACT/Makefile.am: distribute test_support and unit_tests
+	  subdirs.
 	* extensions/Makefile.am: distribute metome subdir
 
 2007-10-24 Sandro Santilli <strk@keybit.net>

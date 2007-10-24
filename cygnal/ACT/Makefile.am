@@ -15,11 +15,14 @@
 #   along with this program; if not, write to the Free Software
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
-# $Id: Makefile.am,v 1.4 2007/10/16 20:20:29 eh9 Exp $
+# $Id: Makefile.am,v 1.5 2007/10/24 15:55:03 strk Exp $
 
 #----------------------------------------
 # Makefile.am for Cygnal/ACT 
 #----------------------------------------
+
+DIST_SUBDIRS = test_support unit_tests
+
 AM_CPPFLAGS = # -Wall
 
 ## WARNING: make sure GLIB_LIBS appears first
