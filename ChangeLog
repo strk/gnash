@@ -1,5 +1,11 @@
 2007-10-24 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/string.cpp (string_sub_str): fix corner cases
+	  exposed by swfdec's substr tests.
+	* testsuite/swfdec/PASSING: succeed in substr tests.
+
+2007-10-24 Sandro Santilli <strk@keybit.net>
+
 	* server/PropertyList.cpp: addProperty can always override
 	  pre-existing properties, and inherits flags in that case.
 	* testsuite/swfdec/PASSING: addProperty-flags succeeds.

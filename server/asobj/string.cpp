@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.39 2007/10/06 08:17:48 strk Exp $ */
+/* $Id: string.cpp,v 1.40 2007/10/24 23:26:24 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -342,12 +342,24 @@ string_sub_str(const fn_call& fn)
 
     ENSURE_FN_ARGS(1, 2, str);
 
-    int start = valid_index(str, fn.arg(0).to_number<int>());
+    as_environment& env = fn.env();
+
+    int start = valid_index(str, fn.arg(0).to_int(env));
 
     int num = str.size();
 
-    if (fn.nargs >= 2) {
-        num = fn.arg(1).to_number<int>();
+    if (fn.nargs >= 2)
+    {
+        num = fn.arg(1).to_int(env);
+	if ( num < 0 )
+	{
+		if ( -num <= start ) num = 0;
+		else
+		{
+			num = str.size()+num;
+			if ( num < 0 ) return as_value("");
+		}
+	}
     }
 
     return as_value(str.substr(start, num));
