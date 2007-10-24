@@ -944,10 +944,15 @@ void FBGui::check_mouse()
   // this is necessary for our quick'n'dirty touchscreen calibration: 
   static int coordinatedebug = getenv("DUMP_RAW")!=NULL;
   
+  // The while loop is limited because the kernel tends to send us hundreds
+  // of events while the touchscreen is touched. We don't loose any 
+  // information if we stop reading because the kernel will stop
+  // sending redundant information.
+  int loops=0;  
   
-  // Assuming we will never read less than one full struct...
+  // Assuming we will never read less than one full struct...  
   
-  while (read(input_fd, &ev, sizeof ev) == (sizeof ev)) {
+  while ((loops++ < 8) && (read(input_fd, &ev, sizeof ev) == (sizeof ev))) {
   
     if (ev.type == EV_SYN) {    // synchronize (apply information)
     

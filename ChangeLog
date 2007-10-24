@@ -6,6 +6,7 @@
 	  masks (don't invalidate outside of masks)	
 	* backend/render_handler_agg.cpp: never use even-odd filling
 	  rules when drawing a mask (unlike normal shapes); some cleanup
+	* gui/fb.cpp: Limit pointing device events reading loop
 
 2007-10-24 Sandro Santilli <strk@keybit.net>
 
