@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.142 2007/10/12 01:21:49 zoulunkai Exp $ */
+/* $Id: ASHandlers.cpp,v 1.143 2007/10/24 23:40:37 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2166,9 +2166,10 @@ SWFHandlers::CommonSetTarget(as_environment& env, const string& target_name)
 		IF_VERBOSE_ASCODING_ERRORS (
 		log_aserror(
 			_("Couldn't find movie \"%s\" to set target to!"
-			" Not setting target at all..."),
+			" Resetting to original target..."),
 			target_name.c_str());
 		);
+		env.reset_target();
 	}
 	else
 	{
