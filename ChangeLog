@@ -1,7 +1,9 @@
 2007-10-24 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* extensions/fileio/fileio.cpp: Fixed a bug in fgets() which
-	  caused a segfault on empty files	
+	  caused a segfault on empty files
+	* extensions/fileio/Makefile.am: fixed GNASH_PLUGINS env.
+	  variable   
 
 2007-10-24 Sandro Santilli <strk@keybit.net>
 
