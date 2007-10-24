@@ -49,7 +49,7 @@ for test in \`ls ${SWFDECTRACEDIR}/*.swf\`; do
 	if grep -q "^\${testname}:\${md5}\$" \${EXPECTPASS}; then
 		expectpass="yes"
 	fi
-	echo "NOTE: running \${testname} (expect pass: \${expectpass})"
+	echo "NOTE: running \${testname}:\${md5} (expect pass: \${expectpass})"
 	if ${SWFDEC_GNASH_TESTER} \${test} > \${testname}.log; then
 		if [ "\${expectpass}" = "yes" ]; then
 			echo "PASSED: \${test}"
