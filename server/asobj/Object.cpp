@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Object.cpp,v 1.33 2007/10/24 21:32:00 strk Exp $ */
+/* $Id: Object.cpp,v 1.34 2007/10/24 21:55:33 strk Exp $ */
 
 #include "tu_config.h"
 #include "Object.h"
@@ -53,12 +53,6 @@ attachObjectInterface(as_object& o)
 {
 	VM& vm = o.getVM();
 	int target_version = vm.getSWFVersion();
-
-	as_function* native;
-
-	// Object.registerClass() -- TODO: should this only be in SWF6 or higher ?
-	vm.registerNative(object_registerClass, 101, 8);
-	o.init_member("registerClass", vm.getNative(101, 8));
 
 	// Object.valueOf()
 	vm.registerNative(as_object::valueof_method, 101, 3);
@@ -165,13 +159,19 @@ void object_class_init(as_object& global)
 	// This is going to be the global Object "class"/"function"
 	static boost::intrusive_ptr<builtin_function> cl=NULL;
 
+	VM& vm = VM::get();
+
 	if ( cl == NULL )
 	{
 		cl=new builtin_function(&object_ctor, getObjectInterface());
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		attachObjectInterface(*cl);
-		cl->init_member("prototype", as_value(getObjectInterface()));
+
+		// TODO: is this needed ?
+		//cl->init_member("prototype", as_value(getObjectInterface()));
+
+		// Object.registerClass() -- TODO: should this only be in SWF6 or higher ?
+		vm.registerNative(object_registerClass, 101, 8);
+		cl->init_member("registerClass", vm.getNative(101, 8));
+
 		     
 	}
 
@@ -338,7 +338,7 @@ object_hasOwnProperty(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Object.hasOwnProperty() requires one arg"));
 		);
-		return as_value();
+		return as_value(false);
 	}
 	as_value& arg = fn.arg(0);
 	const std::string& propname = arg.to_string(&(fn.env()));
@@ -347,7 +347,7 @@ object_hasOwnProperty(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Invalid call to Object.hasOwnProperty('%s')"), arg.to_debug_string().c_str());
 		);
-		return as_value();
+		return as_value(false);
 	}
 	return as_value(fn.this_ptr->getOwnProperty(VM::get().getStringTable().find(propname)) != NULL);
 }

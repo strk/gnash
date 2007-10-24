@@ -1,5 +1,13 @@
 2007-10-24 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Object.cpp: don't replicate all exported interfaces
+	  to the Object class; move registerClass from prototype to class;
+	  have hasOwnProperty return false on invalid calls.
+	* testsuite/actionscript.all/Object.as: one more success, more
+	  tests needed for hasOwnProperty calls.
+
+2007-10-24 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/VM.{cpp,h}: initial support for a native functions table.
 	* server/asobj/Global.cpp: ASnative global.
 	* server/asobj/Object.cpp: register Objects' natives (101 series).

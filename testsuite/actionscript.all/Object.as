@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.37 2007/10/24 07:58:14 strk Exp $";
+rcsid="$Id: Object.as,v 1.38 2007/10/24 21:55:33 strk Exp $";
 
 #include "check.as"
 
@@ -51,11 +51,7 @@ check_equals(Object.prototype.__proto__, undefined);
  check(!Object.prototype.hasOwnProperty("__proto__"));
 #endif 
 
-#if OUTPUT_VERSION < 6
- check_equals(Object.prototype.registerClass, undefined);
-#else
- xcheck_equals(Object.prototype.registerClass, undefined);
-#endif
+check_equals(Object.prototype.registerClass, undefined);
 
 #if OUTPUT_VERSION > 5
 
