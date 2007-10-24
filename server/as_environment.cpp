@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.100 2007/10/24 07:58:14 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.101 2007/10/24 23:54:22 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -559,17 +559,16 @@ as_environment::find_target(const std::string& path) const
 	log_msg(_("find_target(%s) called"), path.c_str());
 #endif
 
-    if (path.length() <= 0) {
+    if (path.empty())
+    {
 #ifdef DEBUG_TARGET_FINDING 
 	log_msg(_("Returning m_target (empty path)"));
 #endif
-	return m_target;
+	return m_target; // or should we return the *original* path ?
     }
     
-    // we'd have returned m_target in this case
-    //assert(path.length() > 0);
-    
-    character* env = m_target;
+    // see swfdec's settarget-relative-*.swf
+    character* env = _original_target; // m_target;
     assert(env);
     
     const char*	p = path.c_str();

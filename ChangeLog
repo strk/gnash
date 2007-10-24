@@ -1,5 +1,11 @@
 2007-10-24 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.cpp (find_target): use original target
+	  for relative paths.
+	* testsuite/swfdec/PASSING: succeed in settarget-relative-*.swf
+
+2007-10-24 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ASHandlers.cpp (CommonSetTarget):
 	  Reset to original target if argument doesn't correspond
 	  to a character.
