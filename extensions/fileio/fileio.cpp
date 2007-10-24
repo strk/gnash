@@ -237,7 +237,11 @@ Fileio::fgets(std::string &str)
     if (_stream) {
         char buf[BUFSIZE];
         memset(buf, 0, BUFSIZE);
-        str = ::fgets(buf, BUFSIZE, _stream);
+        char* res = ::fgets(buf, BUFSIZE, _stream);
+        if (res) 
+          str = res;
+        else
+          str = "";  // we might want to return NULL to the VM ?
         return str;
     }
     return str;

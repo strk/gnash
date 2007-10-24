@@ -61,7 +61,7 @@ install-pluginsLTLIBRARIES: $(plugins_LTLIBRARIES)
 	$(RM) $(DESTDIR)$(pluginsdir)/*.a 
 
 test: $(srcdir)/../../testsuite/generic-testrunner.sh test.swf
-	GNASH_PLUGINS=$(PWD) GNASHRC=$(srcdir)/../gnashrc sh $< $(top_builddir) test.swf > $@
+	GNASH_PLUGINS=$(PWD)/.libs GNASHRC=$(srcdir)/../gnashrc sh $< $(top_builddir) test.swf > $@
 	chmod +x $@
 
 test.swf: test.as
