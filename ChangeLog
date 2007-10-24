@@ -1,3 +1,8 @@
+2007-10-24 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (get_topmost_mouse_entity): don't
+	  segfault if the root movie can handle mouse events :/
+
 2007-10-24 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* libgeometry/snappingrange.h: add routines for calculating

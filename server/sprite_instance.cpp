@@ -3037,7 +3037,14 @@ sprite_instance::get_topmost_mouse_entity(float x, float y)
 	{
 		// point is in parent's space,
 		// we need to convert it in world space
-		matrix parent_world_matrix = get_parent()->get_world_matrix();
+		character* parent = get_parent();
+		// WARNING: if we have NO parent, our parent it the Stage (movie_root)
+		//          so, in case we'll add a "stage" matrix, we'll need to take
+		//          it into account here.
+		// TODO: actually, why are we insisting in using parent's coordinates for
+		//       this method at all ?
+		//
+		matrix parent_world_matrix = parent ? parent->get_world_matrix() : matrix::identity;
 		point wp(x,y);
 		parent_world_matrix.transform(wp);
 		if ( pointInVisibleShape(wp.m_x, wp.m_y) ) return this;
