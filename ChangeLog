@@ -3,7 +3,9 @@
 	* libgeometry/snappingrange.h: add routines for calculating
 	  intersections between SnappingRanges
 	* server/dlist.cpp: optimize add_invalidated_bounds() for
-    masks (don't invalidate outside of masks)	
+	  masks (don't invalidate outside of masks)	
+	* backend/render_handler_agg.cpp: never use even-odd filling
+	  rules when drawing a mask (unlike normal shapes); some cleanup
 
 2007-10-24 Sandro Santilli <strk@keybit.net>
 

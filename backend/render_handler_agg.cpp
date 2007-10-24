@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.111 2007/10/15 12:59:00 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.112 2007/10/24 12:55:37 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1048,7 +1048,7 @@ public:
     if (m_drawing_mask) {
       
       // Shape is drawn inside a mask, skip sub-shapes handling and outlines
-      draw_mask_shape(paths, true);      
+      draw_mask_shape(paths, false);   // never use even-odd for masks
     
     } else {
     
@@ -1077,13 +1077,13 @@ public:
       for (unsigned int subshape=0; subshape<subshape_count; subshape++)
       {
         if (have_shape)
-  {
+        {
           draw_shape(subshape, paths, agg_paths, sh, true);    
-  }
+        }
         if (have_outline)      
-  {
+        {
           draw_outlines(subshape, paths, agg_paths_rounded, line_styles, cx, mat);
-  }
+        }
       }
       
     } // if not drawing mask
@@ -1682,10 +1682,6 @@ public:
     typedef agg_mask_style_handler sh_type;
     sh_type sh;                   
        
-    // anti-aliased scanline rasterizer
-    typedef agg::rasterizer_scanline_aa<> ras_type;
-    ras_type ras;
-    
     // compound rasterizer used for flash shapes
     typedef agg::rasterizer_compound_aa<agg::rasterizer_sl_clip_dbl> rasc_type;  
     rasc_type rasc;
