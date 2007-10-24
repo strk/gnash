@@ -16,13 +16,14 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: VM.cpp,v 1.22 2007/09/29 08:24:22 cmusick Exp $ */
+/* $Id: VM.cpp,v 1.23 2007/10/24 21:32:00 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include "VM.h"
+#include "builtin_function.h"
 #include "movie_definition.h"
 #include "movie_instance.h"
 #include "movie_root.h"
@@ -165,6 +166,14 @@ void
 VmGcRoot::markReachableResources() const
 {
 	_vm.markReachableResources();
+}
+
+builtin_function*
+VM::getNative(unsigned int x, unsigned int y)
+{
+	as_c_function_ptr fun = _asNativeTable[x][y];
+	if ( fun ) return new builtin_function(fun);
+	else return 0;
 }
 
 } // end of namespace gnash

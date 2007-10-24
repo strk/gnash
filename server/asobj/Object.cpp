@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Object.cpp,v 1.32 2007/10/18 11:47:55 cmusick Exp $ */
+/* $Id: Object.cpp,v 1.33 2007/10/24 21:32:00 strk Exp $ */
 
 #include "tu_config.h"
 #include "Object.h"
@@ -51,25 +51,48 @@ static as_value object_unwatch(const fn_call&);
 static void
 attachObjectInterface(as_object& o)
 {
-	int target_version = o.getVM().getSWFVersion();
+	VM& vm = o.getVM();
+	int target_version = vm.getSWFVersion();
 
-	// FIXME: add Object interface here:
-	o.init_member("registerClass", new builtin_function(object_registerClass));
+	as_function* native;
+
+	// Object.registerClass() -- TODO: should this only be in SWF6 or higher ?
+	vm.registerNative(object_registerClass, 101, 8);
+	o.init_member("registerClass", vm.getNative(101, 8));
 
 	// Object.valueOf()
-	o.init_member("valueOf", new builtin_function(as_object::valueof_method));
+	vm.registerNative(as_object::valueof_method, 101, 3);
+	o.init_member("valueOf", vm.getNative(101, 3));
 
 	// Object.toString()
-	o.init_member("toString", new builtin_function(as_object::tostring_method));
+	vm.registerNative(as_object::tostring_method, 101, 4);
+	o.init_member("toString", vm.getNative(101, 4));
 
 	if ( target_version  < 6 ) return;
 
-	o.init_member("addProperty", new builtin_function(object_addproperty));
-	o.init_member("hasOwnProperty", new builtin_function(object_hasOwnProperty));
-	o.init_member("isPropertyEnumerable", new builtin_function(object_isPropertyEnumerable));
-	o.init_member("isPrototypeOf", new builtin_function(object_isPrototypeOf));
-	o.init_member("watch", new builtin_function(object_watch));
-	o.init_member("unwatch", new builtin_function(object_unwatch));
+	// Object.addProperty()
+	vm.registerNative(object_addproperty, 101, 2);
+	o.init_member("addProperty", vm.getNative(101, 2));
+
+	// Object.hasOwnProperty()
+	vm.registerNative(object_hasOwnProperty, 101, 5);
+	o.init_member("hasOwnProperty", vm.getNative(101, 5));
+
+	// Object.isPropertyEnumerable()
+	vm.registerNative(object_isPropertyEnumerable, 101, 7);
+	o.init_member("isPropertyEnumerable", vm.getNative(101, 7));
+
+	// Object.isPrototypeOf()
+	vm.registerNative(object_isPrototypeOf, 101, 6);
+	o.init_member("isPrototypeOf", vm.getNative(101, 6));
+
+	// Object.watch()
+	vm.registerNative(object_watch, 101, 0);
+	o.init_member("watch", vm.getNative(101, 0));
+
+	// Object.unwatch()
+	vm.registerNative(object_unwatch, 101, 1);
+	o.init_member("unwatch", vm.getNative(101, 1));
 }
 
 as_object*

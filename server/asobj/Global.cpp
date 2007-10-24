@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.72 2007/09/29 08:24:21 cmusick Exp $ */
+/* $Id: Global.cpp,v 1.73 2007/10/24 21:32:00 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -366,6 +366,52 @@ as_global_assetpropflags(const fn_call& fn)
     return as_value();
 }
 
+// ASNative function
+// See: http://osflash.org/flashcoders/undocumented/asnative?s=asnative
+static as_value
+as_global_asnative(const fn_call& fn)
+{
+	as_value ret;
+
+	if (fn.nargs < 2)
+	{
+		IF_VERBOSE_ASCODING_ERRORS(	
+		log_aserror(_("ASNative(%s): needs at least two arguments"), fn.dump_args().c_str());
+		)
+		return ret;
+	}
+
+	as_environment& env = fn.env();
+
+	int sx = fn.arg(0).to_int(env);
+	int sy = fn.arg(1).to_int(env);
+
+	if ( sx < 0 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(	
+		log_aserror(_("ASNative(%s): first arg must be >= 0"), fn.dump_args().c_str());
+		)
+		return ret;
+	}
+	if ( sy < 0 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(	
+		log_aserror(_("ASNative(%s): second arg must be >= 0"), fn.dump_args().c_str());
+		)
+		return ret;
+	}
+
+	unsigned x = (unsigned)sx;
+	unsigned y = (unsigned)sy;
+
+	VM& vm = VM::get();
+	as_function* fun = vm.getNative(x, y);
+	if ( ! fun ) return ret;
+	ret.set_as_function(fun);
+	return ret;
+		
+}
+
 Global::Global(VM& vm, ClassHierarchy *ch)
 	:
 	as_object()
@@ -386,6 +432,7 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 
 	// ASSetPropFlags
 	init_member("ASSetPropFlags", new builtin_function(as_global_assetpropflags));
+	init_member("ASNative", new builtin_function(as_global_asnative));
 
 	// Defined in timers.h
 	init_member("setInterval", new builtin_function(timer_setinterval));

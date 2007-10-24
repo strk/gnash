@@ -1,5 +1,11 @@
 2007-10-24 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/VM.{cpp,h}: initial support for a native functions table.
+	* server/asobj/Global.cpp: ASnative global.
+	* server/asobj/Object.cpp: register Objects' natives (101 series).
+
+2007-10-24 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/swfdec/: PASSING, gen_run_swfdec_testsuite.sh, README:
 	  Include md5sum of known-to-pass tests so updates in swfdec
 	  testsuite don't introduce unexpected failures.

@@ -35,6 +35,7 @@
 // Forward declarations
 namespace gnash {
 	class movie_definition;
+	class builtin_function;
 	class as_object;
 	class Machine;
 }
@@ -80,6 +81,13 @@ public:
 /// initialization.
 ///
 class DSOEXPORT VM {
+
+public:
+
+	typedef as_value (*as_c_function_ptr)(const fn_call& fn);
+
+private:
+
 
 	friend class VmGcRoot;
 
@@ -130,6 +138,10 @@ class DSOEXPORT VM {
 	typedef std::vector< boost::intrusive_ptr<GcResource> > ResVect;
 	ResVect _statics;
 #endif
+
+	typedef std::map<unsigned int, as_c_function_ptr> FuncMap;
+	typedef std::map<unsigned int, FuncMap> AsNativeTable;
+	AsNativeTable _asNativeTable;
 
 	/// Mutable since it should not affect how the VM runs.
 	mutable string_table mStringTable;
@@ -211,6 +223,16 @@ public:
 	///
 	///
 	void markReachableResources() const;
+
+	void registerNative(as_c_function_ptr fun, unsigned int x, unsigned int y)
+	{
+		assert(fun);
+		assert(!_asNativeTable[x][y]);
+		_asNativeTable[x][y]=fun;
+	}
+
+	/// Return a newly created builtin_function or null
+	builtin_function* getNative(unsigned int x, unsigned int y);
 
 #ifdef GNASH_USE_GC
 	void addStatic(GcResource* res)
