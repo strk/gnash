@@ -1,3 +1,11 @@
+2007-10-24 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/swfdec/PASSING: new succeeding tests from swfdec
+	  testsuite. Not completed as one test keeps gnash busy forever
+	  due to the fact we don't pass an as_environment (a call stack, 
+	  in particular) to getter/setter calls.
+	  See: prototype-recursion-addProperty.as.
+
 2007-10-24 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* extensions/fileio/fileio.cpp: Fixed a bug in fgets() which
