@@ -1,5 +1,13 @@
 2007-10-24 Sandro Santilli <strk@keybit.net>
 
+	* server/PropertyList.cpp: addProperty can always override
+	  pre-existing properties, and inherits flags in that case.
+	* testsuite/swfdec/PASSING: addProperty-flags succeeds.
+	* testsuite/swfdec/gen_run_swfdec_testsuite.sh: include md5 
+	  in PASS/FAIL lines (for easier copy&paste into PASSING)
+
+2007-10-24 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/Object.cpp: don't replicate all exported interfaces
 	  to the Object class; move registerClass from prototype to class;
 	  have hasOwnProperty return false on invalid calls.

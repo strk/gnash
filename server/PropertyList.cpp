@@ -333,16 +333,22 @@ bool
 PropertyList::addGetterSetter(string_table::key key, as_function& getter,
 	as_function& setter, string_table::key nsId)
 {
+	Property a(key, nsId, &getter, &setter);
+	a.setOrder(- ++mDefaultOrder - 1);
+
 	container::iterator found = iterator_find(_props, key, nsId);
 	if (found != _props.end())
 	{
-		assert(0);
-		return false; // already exists !!
+		// copy flags from previous member (even if it's a normal member ?)
+		as_prop_flags& f = a.getFlags();
+		f = found->getFlags();
+		_props.replace(found, a);
+	}
+	else
+	{
+		_props.insert(a);
 	}
 
-	Property a(key, nsId, &getter, &setter);
-	a.setOrder(- ++mDefaultOrder - 1);
-	_props.insert(a);
 	return true;
 }
 

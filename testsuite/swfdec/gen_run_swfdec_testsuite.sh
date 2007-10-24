@@ -45,22 +45,23 @@ EXPECTPASS=${SRCDIR}/PASSING
 for test in \`ls ${SWFDECTRACEDIR}/*.swf\`; do
 	testname=\`basename \${test}\`
 	md5=\`md5sum \${test} | cut -d' ' -f1\`
+	testid="\${test}:\${md5}"
 	expectpass=no
-	if grep -q "^\${testname}:\${md5}\$" \${EXPECTPASS}; then
+	if grep -q "^\${testid}\$" \${EXPECTPASS}; then
 		expectpass="yes"
 	fi
-	echo "NOTE: running \${testname}:\${md5} (expect pass: \${expectpass})"
+	echo "NOTE: running \${testname} (expect pass: \${expectpass})"
 	if ${SWFDEC_GNASH_TESTER} \${test} > \${testname}.log; then
 		if [ "\${expectpass}" = "yes" ]; then
-			echo "PASSED: \${test}"
+			echo "PASSED: \${testid}"
 		else
-			echo "XPASSED: \${test}"
+			echo "XPASSED: \${testid}"
 		fi	
 	else
 		if [ "\${expectpass}" = "yes" ]; then
-			echo "FAILED: \${testname} (traces in \${testname}.trace-gnash, log in \${testname}.log)"
+			echo "FAILED: \${testid} (traces in \${testname}.trace-gnash, log in \${testname}.log)"
 		else
-			echo "XFAILED: \${testname} (traces in \${testname}.trace-gnash, log in \${testname}.log)"
+			echo "XFAILED: \${testid} (traces in \${testname}.trace-gnash, log in \${testname}.log)"
 		fi
 	fi
 done
