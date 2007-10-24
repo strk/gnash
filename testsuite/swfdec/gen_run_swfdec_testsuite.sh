@@ -44,8 +44,9 @@ EXPECTPASS=${SRCDIR}/PASSING
 
 for test in \`ls ${SWFDECTRACEDIR}/*.swf\`; do
 	testname=\`basename \${test}\`
+	md5=\`md5sum \${test} | cut -d' ' -f1\`
 	expectpass=no
-	if grep -q "^\${testname}\$" \${EXPECTPASS}; then
+	if grep -q "^\${testname}:\${md5}\$" \${EXPECTPASS}; then
 		expectpass="yes"
 	fi
 	echo "NOTE: running \${testname} (expect pass: \${expectpass})"

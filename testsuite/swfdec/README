@@ -1,10 +1,12 @@
-2007-03-07
+2007-10-24
 
 This directory is contain scripts to run swfdec trace-based testsuite.
 
 The PASSING file is a list of SWF files in the testsuite which is expected to pass,
-when new tests are added they'll be expected to fail by default.
-If you see an unexpected success you can add the name of the file to PASSING.
+associated with their md5sum.
+When new tests are, or existing tests are updated, they'll be expected to fail by default.
+If you see an unexpected success you can add the name and md5 of the file to PASSING.
+Please keep the file sorted by name.
 
 You'll need to pass the --with-swfdec-testsuite switch to configure in order
 for swfdec tests to be run as part of the 'make check' rule.
