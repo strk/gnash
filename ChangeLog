@@ -1,3 +1,8 @@
+2007-10-24 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+  * backend/render_handler_agg_style.h: don't force premultiply()
+	  for RGBA bitmaps, fixes bug #20972 (hopefully...)  
+
 2007-10-24 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/swfdec/PASSING: new succeeding tests from swfdec

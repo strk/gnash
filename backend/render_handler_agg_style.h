@@ -502,8 +502,6 @@ public:
       st_type* st = new st_type(bi->get_width(), bi->get_height(),
           bi->get_rowlen(), bi->get_data(), mat, cx);
           
-      st->m_force_premultiply = true; // important for alpha channel       
-        
       m_styles.push_back(st);
     }
         
@@ -526,8 +524,6 @@ public:
       st_type* st = new st_type(bi->get_width(), bi->get_height(),
           bi->get_rowlen(), bi->get_data(), mat, cx);
           
-      st->m_force_premultiply = true; // important for alpha channel       
-        
       m_styles.push_back(st);
     }
     
@@ -550,8 +546,6 @@ public:
       st_type* st = new st_type(bi->get_width(), bi->get_height(),
           bi->get_rowlen(), bi->get_data(), mat, cx);       
         
-      st->m_force_premultiply = true; // important for alpha channel       
-
       m_styles.push_back(st);
     }
         
@@ -572,8 +566,6 @@ public:
       st_type* st = new st_type(bi->get_width(), bi->get_height(),
           bi->get_rowlen(), bi->get_data(), mat, cx);       
         
-      st->m_force_premultiply = true; // important for alpha channel       
-
       m_styles.push_back(st);
     }
     
