@@ -1,15 +1,16 @@
 2007-10-24 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
-  * backend/render_handler_agg_style.h: don't force premultiply()
+	* backend/render_handler_agg_style.h: don't force premultiply()
 	  for RGBA bitmaps, fixes bug #20972 (hopefully...)  
 
 2007-10-24 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/swfdec/PASSING: new succeeding tests from swfdec
-	  testsuite. Not completed as one test keeps gnash busy forever
-	  due to the fact we don't pass an as_environment (a call stack, 
-	  in particular) to getter/setter calls.
-	  See: prototype-recursion-addProperty.as.
+	  testsuite. Note that prototype-recursion-* tests prevent
+	  the full testsuite from being run as gnash goes into an infinite
+	  recursion failling to detect max call stack limit (our
+	  getter/setters use a brand new as_environment, and thus stack
+	  everytime they are invoked).
 
 2007-10-24 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
