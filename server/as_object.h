@@ -90,11 +90,26 @@ private:
 		return *this;
 	}
 
+#if 0
 	/// Look for a Getter/setter property scanning the inheritance chain
 	//
 	/// @returns a Getter/Setter propery if found, NULL if not found
 	///
+	/// TODO: drop this function, is unused
 	Property* findGetterSetter(string_table::key name, 
+		string_table::key nsname = 0);
+#endif
+
+	/// Find an existing property for update, only scaning the inheritance chain for getter/setters
+	/// or statics.
+	//
+	/// NOTE: updatable here doesn't mean the property isn't protected from update
+	///       but only that a set_member will NOT create a new property (either
+	///	  completely new or as an override).
+	///
+	/// @returns a propery if found, NULL if not found
+	///
+	Property* findUpdatableProperty(string_table::key name, 
 		string_table::key nsname = 0);
 
 	/// Find a property scanning the inheritance chain
@@ -199,19 +214,44 @@ public:
 	/// NOTE: This might change in the near future trough use of
 	///       getter/setter properties instead..
 	///
-	/// @param name
-	///	Name of the property. Must be all lowercase
-	///	if the current VM is initialized for a  target
-	///	up to SWF6.
+	/// @param key
+	///	Id of the property. 
 	///
 	/// @param val
 	///	Value to assign to the named property.
 	///
-	virtual void set_member(string_table::key name, const as_value& val,
+	/// @param nsname
+	///	Id of the namespace.
+	///
+	virtual void set_member(string_table::key key, const as_value& val,
 		string_table::key nsname = 0)
 	{
-		return set_member_default(name, val, nsname);
+		return set_member_default(key, val, nsname);
 	}
+
+	/// Update an existing member value
+	//
+	/// NOTE that getter-setter in the inheritance chaing are
+	/// considered as existing members. See with.as and Object.as
+	/// testcases under actionscript.all.
+	/// Also be aware that 'special' (non-proper) properties
+	/// are considered non-existing, this is surely true for
+	/// childs of MovieClips, also tested in with.as.
+	///
+	/// @param key
+	///	Id of the property. 
+	///
+	/// @param val
+	///	Value to assign to the named property.
+	///
+	/// @param nsname
+	///	Id of the namespace.
+	///
+	/// @return a pair in which first element express wheter the property01apl0mb
+	///         was found and the second wheter it was set (won't set if read-only).
+	///
+	std::pair<bool,bool> update_member(string_table::key key, const as_value& val,
+		string_table::key nsname = 0);
 
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
 	virtual bool on_event(const event_id& id );

@@ -1,3 +1,14 @@
+2007-10-24 Sandro Santilli <strk@keybit.net>
+
+	* server/as_object.{cpp,h}: add update_member to only 
+	  update pre-existing members (including getter-setter
+	  in the inheritance chain).
+	* server/as_environment.cpp (set_variable_raw): only
+	  set members of elements in the scope stack if
+	  pre-existing.
+	* testsuite/actionscript.all/: Object.as, with.as:
+	  success for the new failing tests.
+
 2007-10-23 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac: abort if no supported GUI are selected.

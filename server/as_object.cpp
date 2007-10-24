@@ -207,6 +207,7 @@ as_object::findProperty(string_table::key key, string_table::key nsname,
 	return NULL;
 }
 
+#if 0
 /*private*/
 Property*
 as_object::findGetterSetter(string_table::key key, string_table::key nsname)
@@ -240,6 +241,42 @@ as_object::findGetterSetter(string_table::key key, string_table::key nsname)
 	// No Getter/Setter property found
 	return NULL;
 }
+#endif
+
+Property*
+as_object::findUpdatableProperty(string_table::key key, string_table::key nsname)
+{
+	Property* prop = _members.getProperty(key, nsname);
+	if ( prop ) return prop;
+
+	// don't enter an infinite loop looking for __proto__ ...
+	if (key == NSV::PROP_uuPROTOuu)
+	{
+		Property* prop = _members.getProperty(key, nsname);
+		if ( prop ) return prop;
+	}
+
+	// this set will keep track of visited objects,
+	// to avoid infinite loops
+	std::set< as_object* > visited;
+	visited.insert(this);
+
+	boost::intrusive_ptr<as_object> obj = get_prototype();
+	while ( obj && visited.insert(obj.get()).second )
+	{
+		Property* prop = obj->_members.getProperty(key, nsname);
+		if ( prop && prop->isGetterSetter() )
+		{
+			// what if a property is found which is
+			// NOT a getter/setter ?
+			return prop;
+		}
+		obj = obj->get_prototype();
+	}
+
+	// No Getter/Setter property found in inheritance chain
+	return NULL;
+}
 
 /*protected*/
 void
@@ -268,7 +305,7 @@ as_object::set_member_default(string_table::key key, const as_value& val,
 	string_table::key nsname)
 {
 	//log_msg(_("set_member_default(%s)"), key.c_str());
-	Property* prop = findProperty(key, nsname);
+	Property* prop = findUpdatableProperty(key, nsname);
 	if (prop)
 	{
 		if (prop->isReadOnly())
@@ -279,8 +316,8 @@ as_object::set_member_default(string_table::key key, const as_value& val,
 			return;
 		}
 
-		if (prop->isGetterSetter() || prop->isStatic())
-		{
+		// TODO: add isStatic() check in findUpdatableProperty ?
+		//if (prop->isGetterSetter() || prop->isStatic()) {
 			try
 			{
 				prop->setValue(*this, val);
@@ -291,8 +328,12 @@ as_object::set_member_default(string_table::key key, const as_value& val,
 				log_msg(_("%s: Exception %s. Will create a new member"),
 					_vm.getStringTable().value(key).c_str(), exc.what());
 			}
-		}
+		//}
+
+		return;
 	}
+
+	// Else, add new property...
 
 	// Property does not exist, so it won't be read-only. Set it.
 	if (!_members.setValue(key, const_cast<as_value&>(val), *this, nsname))
@@ -302,6 +343,42 @@ as_object::set_member_default(string_table::key key, const as_value& val,
 			"object '%p'"), _vm.getStringTable().value(key).c_str(),
 			(void*) this););
 	}
+}
+
+std::pair<bool,bool>
+as_object::update_member(string_table::key key, const as_value& val,
+	string_table::key nsname)
+{
+	std::pair<bool,bool> ret; // first is found, second is updated
+
+	//log_msg(_("set_member_default(%s)"), key.c_str());
+	Property* prop = findUpdatableProperty(key, nsname);
+	if (prop)
+	{
+		if (prop->isReadOnly())
+		{
+			IF_VERBOSE_ASCODING_ERRORS(log_aserror(_(""
+				"Attempt to set read-only property '%s'"),
+				_vm.getStringTable().value(key).c_str()););
+			return make_pair(true, false);
+		}
+
+		try
+		{
+			prop->setValue(*this, val);
+			return make_pair(true, true);
+		}
+		catch (ActionException& exc)
+		{
+			log_msg(_("%s: Exception %s. Will create a new member"),
+				_vm.getStringTable().value(key).c_str(), exc.what());
+		}
+
+		return make_pair(true, false);
+	}
+
+	return make_pair(false, false);
+
 }
 
 void
@@ -434,7 +511,6 @@ bool
 as_object::set_member_flags(string_table::key name,
 		int setTrue, int setFalse, string_table::key nsname)
 {
-	// TODO: accept a std::string directly
 	return _members.setFlags(name, setTrue, setFalse, nsname);
 }
 

@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.32 2007/10/23 16:58:16 strk Exp $";
+rcsid="$Id: with.as,v 1.33 2007/10/24 07:58:14 strk Exp $";
 
 #include "check.as"
 
@@ -452,32 +452,32 @@ newFunc();
 createEmptyMovieClip("mc", 1);
 mc.createEmptyMovieClip("child", 1);
 mc.mem = "mcMember";
-mc.hidden = "hidden";
-ASSetPropFlags(mc, "hidden", 4, 1); 
+mc.nooverride = "nooverride";
+ASSetPropFlags(mc, "nooverride", 4, 1); 
 MovieClip.prototype.inheritedMem = "McProto";
 with (mc)
 {
 	child = "rootChild"; // non-proper in mc, will be set in root
 	mem = "mcMemberUpdated"; // overridable in mc, will be updated
-	hidden = "hiddenUpdated"; // protected from override in mc, but existing. Will NOT be set in _root
+	nooverride = "nooverrideUpdated"; // protected from override in mc, but existing. Will NOT be set in _root
 	nonexistent = "nonExistent"; // non-existing in mc, will be set in root
 	inheritedMem = "McProtoOverridden"; // non own-property of mc, will be set in root
 
 	check_equals(inheritedMem, "McProto");
 	check_equals(nonexistent, "nonExistent");
-	check_equals(hidden, "hidden");
+	check_equals(nooverride, "nooverride");
 	check_equals(mem, "mcMemberUpdated");
 	check_equals(child._target, "/mc/child");
 }
-xcheck_equals(inheritedMem, "McProtoOverridden");
-xcheck_equals(mc.inheritedMem, "McProto");
+check_equals(inheritedMem, "McProtoOverridden");
+check_equals(mc.inheritedMem, "McProto");
 check_equals(nonexistent, 'nonExistent');
-check_equals(typeof(hidden), 'undefined');
-check_equals(mc.hidden, 'hidden');
+check_equals(typeof(nooverride), 'undefined');
+check_equals(mc.nooverride, 'nooverride');
 check_equals(typeof(mem), 'undefined');
 check_equals(mc.mem, "mcMemberUpdated");
-xcheck_equals(typeof(mc.child), 'movieclip');
-xcheck_equals(child, "rootChild");
+check_equals(typeof(mc.child), 'movieclip');
+check_equals(child, "rootChild");
 #endif // OUTPUT_VERSION > 5
 
 //---------------------------------------------------------

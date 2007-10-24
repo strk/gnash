@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.99 2007/10/17 21:09:55 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.100 2007/10/24 07:58:14 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -310,12 +310,18 @@ as_environment::set_variable_raw(
         {
             // const_cast needed due to non-const as_object::get_member 
             as_object* obj = const_cast<as_object*>(scopeStack[i-1].get());
-            as_value	dummy;
-            if (obj && obj->get_member(varkey, &dummy))
+            if (obj && obj->update_member(varkey, val).first )
             {
-                // This object has the member; so set it here.
-                obj->set_member(varkey, val);
-                return;
+		return;
+#if 0
+		Property* prop = obj->findUpdatableProperty(varkey);
+		if ( prop )
+		{
+			//prop->setValue(*obj, val);
+			obj->set_member(varkey, val);
+			return;
+		}
+#endif
             }
         }
 
@@ -332,12 +338,18 @@ as_environment::set_variable_raw(
         {
             // const_cast needed due to non-const as_object::get_member 
             as_object* obj = const_cast<as_object*>(scopeStack[i-1].get());
-            as_value	dummy;
-            if (obj && obj->get_member(varkey, &dummy))
+            if (obj && obj->update_member(varkey, val).first )
             {
-                // This object has the member; so set it here.
-                obj->set_member(varkey, val);
-                return;
+		return;
+#if 0
+		Property* prop = obj->findUpdatableProperty(varkey);
+		if ( prop )
+		{
+			//prop->setValue(*obj, val);
+			obj->set_member(varkey, val);
+			return;
+		}
+#endif
             }
         }
 

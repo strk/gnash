@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.36 2007/10/23 17:33:42 strk Exp $";
+rcsid="$Id: Object.as,v 1.37 2007/10/24 07:58:14 strk Exp $";
 
 #include "check.as"
 
@@ -299,8 +299,8 @@ check_equals(inh2d.ogs, 5); // find inh2.ogs
 check_equals(inh2.ogs, 5); // find inh2.ogs
 check_equals(inh2.__proto__.ogs, 14); // find proto.ogs
 inh2d.ogs = 54; // sets what ?
-xcheck_equals(inh2d._len, 54); // this._len ! So the getter-setter takes precedence
-xcheck_equals(inh2d.ogs, 5); // does NOT override inh2.ogs normal member
+check_equals(inh2d._len, 54); // this._len ! So the getter-setter takes precedence
+check_equals(inh2d.ogs, 5); // does NOT override inh2.ogs normal member
 check_equals(inh2.ogs, 5); // find inh2.ogs
 check_equals(inh2.__proto__.ogs, 14); // find proto.ogs
 
