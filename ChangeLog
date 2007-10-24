@@ -1,7 +1,9 @@
 2007-10-24 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* libgeometry/snappingrange.h: add routines for calculating
-	  intersections between SnappingRanges    
+	  intersections between SnappingRanges
+	* server/dlist.cpp: optimize add_invalidated_bounds() for
+    masks (don't invalidate outside of masks)	
 
 2007-10-24 Sandro Santilli <strk@keybit.net>
 
