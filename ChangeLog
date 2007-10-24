@@ -1,3 +1,8 @@
+2007-10-24 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* libgeometry/snappingrange.h: add routines for calculating
+	  intersections between SnappingRanges    
+
 2007-10-24 Sandro Santilli <strk@keybit.net>
 
 	* server/as_object.{cpp,h}: add update_member to only 
