@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.103 2007/10/25 09:37:34 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.104 2007/10/25 10:47:49 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -471,44 +471,6 @@ as_environment::parse_path(const std::string& var_path,
 	*target = target_ptr;
 	return true;
 }
-
-#if 0
-character*
-as_environment::find_target(const as_value& val) const
-{
-	// TODO: should we reduce this whole function to
-	//       find_target(val.to_std_string()) ?
-	//       a quick test shows it would work, I'm just not sure about
-	//       edit_text_chars, that might return the text value rather
-	//       then their target ...
-
-	if ( val.is_object() )
-	{
-		boost::intrusive_ptr<as_object> obj = val.to_object();
-		assert (obj);
-		character* s=dynamic_cast<character*>(obj.get());
-#ifndef GNASH_USE_GC
-		assert(s->get_ref_count() > 1); // or the intrusive_ptr above going out-of-scope will kill it
-#endif // ndef GNASH_USE_GC
-		//log_msg(_("find_target is a character, returning it"));
-		return s; // might be NULL
-	}
-	else if ( val.is_string() )
-	{
-		return find_target(val.to_string());
-	}
-	else
-	{
-		// TODO: should we *force* string conversion above instead ?
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("as_environment::find_target: '%s': "
-			"invalid path; neither string nor object"),
-			val.to_debug_string().c_str() );
-		);
-		return NULL;
-	}
-}
-#endif
 
 // Search for next '.' or '/' character in this word.  Return
 // a pointer to it, or to NULL if it wasn't found.

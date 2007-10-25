@@ -335,16 +335,6 @@ public:
 	///
 	character* find_target(const std::string& path) const;
 
-	/// \brief
-	/// Find the sprite/movie represented by the given value.
-	//
-	/// The value might be a reference to the object itself, or a
-	/// string giving a relative path name to the object.
-	///
-	/// @@ make private ? --strk;
-	///
-	//character* find_target(const as_value& val) const;
-
 	/// Dump content of the stack to a std::ostream
 	void dump_stack(std::ostream& out=std::cerr)
 	{
