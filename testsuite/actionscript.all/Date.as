@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Date.as,v 1.27 2007/09/29 16:22:57 strk Exp $";
+rcsid="$Id: Date.as,v 1.28 2007/10/25 09:33:51 udog Exp $";
 
 #include "check.as"
 
@@ -503,4 +503,13 @@ check (Date.UTC(2000,0,1,0,0,0,0) == d.valueOf());
 d.setUTCFullYear(2000, 6, 1);
 d.setUTCHours(0, 0, 0, 0);
 check (Date.UTC(2000,6,1,0,0,0,0) == d.valueOf());
+
+
+// Check if Date, concatenated to a string, is in human readable form
+d = new Date(2000, 1, 15, 0, 0, 0); 
+var foo = "foo "+d;   
+// correct: "foo Tue Feb 15 00:00:00 GMT+0100 2000"
+// but this probably depends on time zone, so just check for some fixed part..
+xcheck_equals(foo.indexOf("Feb"), 8);
+
 totals();
