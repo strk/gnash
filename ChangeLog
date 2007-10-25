@@ -1,5 +1,6 @@
 2007-10-25 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Date.as: couple more tests.
 	* testsuite/actionscript.all/targetPath.as: add a failing test
 	  as borrowed from swfdec
 	* testsuite/actionscript.all/MovieClip.as: test _parent is not

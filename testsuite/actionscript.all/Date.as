@@ -21,11 +21,20 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Date.as,v 1.30 2007/10/25 15:48:17 udog Exp $";
+rcsid="$Id: Date.as,v 1.31 2007/10/25 22:27:06 strk Exp $";
 
 #include "check.as"
 
-check (Date);
+check_equals(typeof(Date), 'function');
+check_equals(typeof(Date.prototype), 'object');
+check_equals(typeof(Date.prototype.__proto__), 'object');
+check_equals(Date.prototype.__proto__, Object.prototype);
+#if OUTPUT_VERSION > 5
+ check_equals(typeof(Date.__proto__), 'object');
+ check_equals(Date.__proto__, Function.prototype);
+#else
+ xcheck_equals(typeof(Date.__proto__), 'undefined');
+#endif
 
 // Static method should be available even if you haven't asked for a Date object.
 //
@@ -184,6 +193,7 @@ check (Date.utc);
 // One numeric argument sets milliseconds since 1970 UTC
     delete d; var d = new Date(0);
 	// Check UTC "get" methods too
+	check_equals(typeof(d.valueOf()), 'number');
 	check_equals(d.valueOf(), 0);
 	check_equals(typeof(d.getTime()), 'number'); 
 	check_equals(d.getTime(), 0);
@@ -509,8 +519,14 @@ check (Date.UTC(2000,6,1,0,0,0,0) == d.valueOf());
 // Check if Date, concatenated to a string, is in human readable form
 d = new Date(2000, 1, 15, 0, 0, 0); 
 var foo = "foo "+d;   
+check_equals(typeof(foo), 'string');
 // correct: "foo Tue Feb 15 00:00:00 GMT+0100 2000"
 // but this probably depends on time zone, so just check for some fixed part..
-check_equals(foo.indexOf("Feb"), 8);
+#if OUTPUT_VERSION > 5
+ check_equals(foo.indexOf("Feb"), 8);
+#else
+ // correct: "foo 950569200000"
+ check_equals(foo.substring(0, 10), 'foo 950569');
+#endif
 
 totals();
