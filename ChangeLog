@@ -1,9 +1,16 @@
+2007-10-25 Sandro Santilli <strk@keybit.net>
+
+	* server/as_environment.{cpp,h}: drop find_target taking as_value.
+	* server/sprite_instance.cpp, server/asobj/MovieClipLoader.cpp,
+	  server/vm/ASHandlers.cpp: update calls to find_target (always
+	  takes a string now).
+
 2007-10-25 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* testsuite/actionscript.all/Date.as: Added testcase for bug #21414
 	  (currently failing)	
 
-2007-10-24 Sandro Santilli <strk@keybit.net>
+2007-10-25 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-swfc.all/opcode_guard_test2.sc: add more consistency
 	  checks for zou new tests.

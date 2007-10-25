@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.102 2007/10/25 07:52:10 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.103 2007/10/25 09:37:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -472,6 +472,7 @@ as_environment::parse_path(const std::string& var_path,
 	return true;
 }
 
+#if 0
 character*
 as_environment::find_target(const as_value& val) const
 {
@@ -507,6 +508,7 @@ as_environment::find_target(const as_value& val) const
 		return NULL;
 	}
 }
+#endif
 
 // Search for next '.' or '/' character in this word.  Return
 // a pointer to it, or to NULL if it wasn't found.

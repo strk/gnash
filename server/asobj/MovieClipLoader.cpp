@@ -271,6 +271,8 @@ moviecliploader_loadclip(const fn_call& fn)
 {
 	as_value	val, method;
 
+	as_environment& env = fn.env();
+
 	//log_msg(_("%s: nargs = %d"), __FUNCTION__, fn.nargs);
 
 	boost::intrusive_ptr<MovieClipLoader> ptr = ensureType<MovieClipLoader>(fn.this_ptr);
@@ -287,9 +289,9 @@ moviecliploader_loadclip(const fn_call& fn)
 		return;
 	}
 #endif
-	std::string str_url = url_arg.to_string(); 
+	std::string str_url = url_arg.to_string(&env); 
 
-	character* target = fn.env().find_target(fn.arg(1));
+	character* target = fn.env().find_target(fn.arg(1).to_string(&env));
 	if ( ! target )
 	{
 		log_error(_("Could not find target %s"), fn.arg(1).to_string().c_str());

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.144 2007/10/25 07:52:10 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.145 2007/10/25 09:37:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1067,7 +1067,7 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
 	}
 	else
 	{
-		target = env.find_target(tgt_val);
+		target = env.find_target(tgt_str);
 	}
 	unsigned int prop_number = (unsigned int)env.top(0).to_number(&env);
 	if (target)
@@ -1110,7 +1110,7 @@ SWFHandlers::ActionSetProperty(ActionExec& thread)
 
     thread.ensureStack(3); // prop val, prop num, target
 
-    character *target = env.find_target(env.top(2));
+    character *target = env.find_target(env.top(2).to_string(&env));
     unsigned int prop_number = (unsigned int)env.top(1).to_number(&env);
     as_value prop_val = env.top(0);
 
@@ -1239,7 +1239,7 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
 
 	drag_state st;
 
-	character* tgt = env.find_target(env.top(0));
+	character* tgt = env.find_target(env.top(0).to_string(&env));
 	if ( tgt ) {
 		st.setCharacter( tgt );
 	} else {
@@ -2036,7 +2036,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		return;
 	}
 
-	character* target_ch = env.find_target(target);
+	character* target_ch = env.find_target(target.to_string(&env));
 	sprite_instance* target_movie = target_ch ? target_ch->to_movie() : 0;
 
 	if ( loadVariableFlag )

@@ -343,7 +343,7 @@ public:
 	///
 	/// @@ make private ? --strk;
 	///
-	character* find_target(const as_value& val) const;
+	//character* find_target(const as_value& val) const;
 
 	/// Dump content of the stack to a std::ostream
 	void dump_stack(std::ostream& out=std::cerr)

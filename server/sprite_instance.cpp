@@ -652,7 +652,7 @@ static as_value sprite_hit_test(const fn_call& fn)
 		case 1: // target
 		{
 			as_value& tgt_val = fn.arg(0);
-			character* target = fn.env().find_target(tgt_val);
+			character* target = fn.env().find_target(tgt_val.to_string(&env));
 			if ( ! target )
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
