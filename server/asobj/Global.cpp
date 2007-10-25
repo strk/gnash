@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.73 2007/10/24 21:32:00 strk Exp $ */
+/* $Id: Global.cpp,v 1.74 2007/10/25 10:10:53 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -106,7 +106,7 @@ as_global_trace(const fn_call& fn)
     //
     // @@ Nothing needs special treatment,
     //    as_value::to_string() will take care of everything
-    const char* arg0 = fn.arg(0).to_string().c_str();
+    const char* arg0 = fn.arg(0).to_string(&fn.env()).c_str();
     log_trace("%s", arg0);
     return as_value();
 }
