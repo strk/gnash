@@ -2,7 +2,7 @@
 
 	* server/as_environment.cpp (find_target): always use current, not
 	  original target.
-	* server/vm/ASHandlers.cpp (CommonSetTarget): reset target as first
+	* server/vm/ASHandlers.{cpp,h} (CommonSetTarget): reset target as first
 	  thing, so that find_target won't use previously current target
 	  to resolve relative paths.
 

@@ -154,10 +154,10 @@ private:
 	/// @param target_name
 	///	The target name. If empty new target will be the main movie.
 	///
-	/// @param env
-	///	The current execution environment.
+	/// @param thread
+	///	The current execution thread.
 	///
-	static void CommonSetTarget(as_environment& env, 
+	static void CommonSetTarget(ActionExec& thread, 
 			const std::string& target_name);
 
         /// Common code for guessing at the encoding of random text, between
