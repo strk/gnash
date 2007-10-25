@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.97 2007/10/25 17:05:40 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.98 2007/10/25 17:07:57 strk Exp $";
 
 #include "check.as"
 
@@ -41,6 +41,7 @@ check_equals(typeof(this), 'movieclip');
 check_equals(typeof(_parent), 'undefined');
 #if OUTPUT_VERSION > 5
  xcheck(!mc.hasOwnProperty('_parent'));
+ check(!MovieClip.prototype.hasOwnProperty('_parent'));
 #endif
 check_equals(_root, this);
 check_equals(typeof(this['_root']), 'movieclip');
@@ -1265,12 +1266,12 @@ check_equals(getInstanceAtDepth(-6.2), tt2);
  check_totals(158); // SWF5
 #else
 #if OUTPUT_VERSION < 7
- check_totals(502); // SWF6
+ check_totals(503); // SWF6
 #else
 #if OUTPUT_VERSION < 8
- check_totals(519); // SWF7
+ check_totals(520); // SWF7
 #else
- check_totals(520); // SWF8+
+ check_totals(521); // SWF8+
 #endif
 #endif
 #endif
