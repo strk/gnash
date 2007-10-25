@@ -1,3 +1,10 @@
+2007-10-25 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/asobj/Date.cpp: date_valueof() returns human readable date
+	  for SWF > 5 (fixes bug #21414)	
+	* testsuite/actionscript.all/Date.as: 1 PASS
+	* testsuite/actionscript.all/toString_valueOf.as: 2 PASSes
+
 2007-10-25 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/swfdec/PASSING: new swfdec tests passing

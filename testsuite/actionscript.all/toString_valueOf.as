@@ -417,8 +417,8 @@ d2 = new Date(1);
 d3 = d1 + d2; // in SWF5 this should result in a number, in SWF6 or higher, in a string
 exp = d1.toString() + d2.toString();
 #if OUTPUT_VERSION > 5 
-  xcheck_equals(typeof(d3), 'string');
-  xcheck_equals(d3, exp);
+  check_equals(typeof(d3), 'string');
+  check_equals(d3, exp);
 #else
   check_equals(typeof(d3), 'number');
   check_equals(d3, 1);

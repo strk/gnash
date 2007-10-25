@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Date.as,v 1.28 2007/10/25 09:33:51 udog Exp $";
+rcsid="$Id: Date.as,v 1.29 2007/10/25 15:25:51 udog Exp $";
 
 #include "check.as"
 
@@ -510,6 +510,6 @@ d = new Date(2000, 1, 15, 0, 0, 0);
 var foo = "foo "+d;   
 // correct: "foo Tue Feb 15 00:00:00 GMT+0100 2000"
 // but this probably depends on time zone, so just check for some fixed part..
-xcheck_equals(foo.indexOf("Feb"), 8);
+check_equals(foo.indexOf("Feb"), 8);
 
 totals();
