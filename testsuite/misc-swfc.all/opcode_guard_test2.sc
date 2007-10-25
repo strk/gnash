@@ -159,6 +159,21 @@
      setTarget('');
      
      _root.check_equals(mc99Ref.testvar, 99);
+     
+     
+     ref200=createEmptyMovieClip('name', 200); 
+     ref200.testvar = 200; 
+     ref200.onUnload = function() {}; 
+     ref201=createEmptyMovieClip('name', 201);
+     ref201.testvar = 201; 
+     ref200.removeMovieClip(); 
+     setTarget(ref200);
+        _root.check_equals(testvar, 200);
+     setTarget('');
+     
+     setTarget(ref201);
+        _root.check_equals(testvar, 200);
+     setTarget('');
   .end
   
   
@@ -167,7 +182,7 @@
   .action:
     stop();
     // Gnash failed on totals() by discarding some checks.
-    xtotals(15);
+    xtotals(17);
   .end
   
 .end  // file end
