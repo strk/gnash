@@ -1,3 +1,8 @@
+2007-10-25 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/getvariable.as: more tests for
+	  getvariable/setvariable.
+
 2007-10-25 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/asobj/Date.cpp: date_valueof() returns human readable date

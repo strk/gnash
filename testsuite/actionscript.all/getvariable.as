@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: getvariable.as,v 1.15 2007/09/29 16:22:59 strk Exp $";
+rcsid="$Id: getvariable.as,v 1.16 2007/10/25 16:48:07 strk Exp $";
 
 #include "check.as"
 
@@ -28,6 +28,11 @@ rcsid="$Id: getvariable.as,v 1.15 2007/09/29 16:22:59 strk Exp $";
 
 _global.globalvar = "gv1";
 _global.globalobj = { m1: 1 };
+
+mc1 = createEmptyMovieClip('mc', 1);
+mc1.mem = 'mc1';
+mc2 = mc1.createEmptyMovieClip('mc', 1);
+mc2.mem = 'mc2';
 
 //---------------------------------------------------------------------
 // Check access to root variable (simplest case)
@@ -128,6 +133,33 @@ asm {
 check_equals(checkpoint, undefined);
 
 //---------------------------------------------------------------------
+// Check '...:variable_in_root' access 
+//---------------------------------------------------------------------
+
+checkpoint = 1;
+var variable_in_root = 6;
+asm {
+        push 'checkpoint'
+	push '...:variable_in_root'
+	getvariable
+        setvariable
+};
+check_equals(typeof(checkpoint), 'undefined');
+
+//---------------------------------------------------------------------
+// Check '...:mc1' access 
+//---------------------------------------------------------------------
+
+checkpoint = 1;
+asm {
+        push 'checkpoint'
+	push '...:mc1'
+	getvariable
+        setvariable
+};
+check_equals(typeof(checkpoint), 'undefined');
+
+//---------------------------------------------------------------------
 // Check 'obj:variable_in_object' access 
 //---------------------------------------------------------------------
 
@@ -146,6 +178,74 @@ asm {
         setvariable
 };
 check_equals(obj.variable_in_object, 'yes2');
+
+//---------------------------------------------------------------------
+// Check 'obj::::variable_in_object' access 
+//---------------------------------------------------------------------
+
+var obj = { variable_in_object: 'yes' };
+check_equals(obj.variable_in_object, 'yes');
+asm {
+        push 'checkpoint'
+	push 'obj::::variable_in_object'
+	getvariable
+        setvariable
+};
+check_equals(checkpoint, undefined);
+asm {
+	push 'obj::::variable_in_object'
+        push 'yes2'
+        setvariable
+};
+check_equals(obj.variable_in_object, 'yes');
+check_equals(typeof(_root['obj::::variable_in_object']), 'undefined');
+
+//---------------------------------------------------------------------
+// Check 'mc1:variable_in_object' access 
+//---------------------------------------------------------------------
+
+#if OUTPUT_VERSION > 5
+
+mc1.variable_in_object = 'yes';
+asm {
+        push 'checkpoint'
+	push 'mc1:variable_in_object'
+	getvariable
+        setvariable
+};
+check_equals(checkpoint, 'yes');
+asm {
+	push 'mc1:variable_in_object'
+        push 'yes2'
+        setvariable
+};
+check_equals(mc1.variable_in_object, 'yes2');
+
+#endif // OUTPUT_VERSION > 5
+
+//---------------------------------------------------------------------
+// Check 'mc1::::variable_in_object' access 
+//---------------------------------------------------------------------
+
+#if OUTPUT_VERSION > 5
+
+mc1.variable_in_object = 'yes';
+asm {
+        push 'checkpoint'
+	push 'mc1::::variable_in_object'
+	getvariable
+        setvariable
+};
+check_equals(checkpoint, undefined);
+asm {
+	push 'mc1::::variable_in_object'
+        push 'yes2'
+        setvariable
+};
+check_equals(mc1.variable_in_object, 'yes');
+check_equals(typeof(_root['mc1::::variable_in_object']), 'undefined');
+
+#endif // OUTPUT_VERSION > 5
 
 //---------------------------------------------------------------------
 // Check '../invalidname' access 
