@@ -1,5 +1,9 @@
 2007-10-25 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/PASSING: new swfdec tests passing
+
+2007-10-25 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/Global.cpp (global_trace): pass environment to
 	  as_value::to_string.
 	* server/as_environment.{cpp,h}: drop find_target taking as_value.

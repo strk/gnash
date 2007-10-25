@@ -364,6 +364,10 @@ settarget-relative-5.swf:221055729979efd8dea86a64474ed731
 settarget-relative-6.swf:18dfc8f881ef9b0f7d52ffd4b4999f6d
 settarget-relative-7.swf:63c614bc2a052ca9f1fb9d87999de285
 settarget-relative-8.swf:f49b0132cd0c545321eb9a8d32b9ea99
+settarget-tostring-5.swf:f08ae059e37ed95aa18ca77778531ef6
+settarget-tostring-6.swf:31dbe71a86643100339d6b918abdbead
+settarget-tostring-7.swf:aaae1953f0a974bf91587bebc658c370
+settarget-tostring-8.swf:44126b78c91c4e5d32a924b741bb4971
 settarget2-tostring-5.swf:66b7402854ca261fc8102c916a3efe6d
 settarget2-tostring-7.swf:cfa9318ea413cc8ebf950902c952a3fd
 settarget2-tostring-8.swf:ca6f5fe29c73ef074a6ad39c0ecfa1d8
@@ -421,6 +425,10 @@ super-this-5.swf:0e68ec038aea019ba6434698eb61e31a
 targetpath-5.swf:5af443c52767f4709305003a8d081ffc
 targetpath-6.swf:100f7f5ac0740ce49f0a2dac8ee10ab8
 targetpath-7.swf:b280daedd3a8f4e3d0defd38ff2c2b2a
+text-field-get-text-format-5.swf:1e3a1b39de01a627e3d9cf327b6fcefa
+text-field-init-5.swf:f9c095838e41c5b00de362cef6c20167
+text-field-set-text-format-5.swf:f576da900f9e9b8d911f6791d4114983
+textformat-init-5.swf:52dec30885359d5bdda450588076eb10
 this-localfunction-5.swf:f19b0894fdb355070a7358904536a4f4
 this-localfunction-6.swf:02e2d34657330766997697cc52f3f2cf
 this-localfunction-7.swf:9f25bfae3408892742d94ca208e035ac
@@ -446,3 +454,5 @@ with-outobject-8.swf:914a0e922ae9d4b1b933b33d7abc2502
 with-prototypes-5.swf:4fbad4d181fef388e50d993d61c16917
 with-prototypes-6.swf:6b9dcb482fe520cbc9dc4a8456688905
 with-prototypes-7.swf:20f1f3b8905c8a3f3a61cb18e7e59e76
+xml-init-5.swf:bb54cac64e38396084a147266f7d9711
+xml-node-init-5.swf:12fd3762a2bfa787b01fc0b8abfaa492
