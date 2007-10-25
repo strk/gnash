@@ -1,5 +1,9 @@
 2007-10-24 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/with.as: more setTarget tests (failing)
+
+2007-10-24 Sandro Santilli <strk@keybit.net>
+
 	* server/as_environment.cpp (find_target): use original target
 	  for relative paths.
 	* testsuite/swfdec/PASSING: succeed in settarget-relative-*.swf

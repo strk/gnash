@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.33 2007/10/24 07:58:14 strk Exp $";
+rcsid="$Id: with.as,v 1.34 2007/10/25 07:22:03 strk Exp $";
 
 #include "check.as"
 
@@ -338,9 +338,31 @@ setTarget("/clip1");
   check_equals(checkpoint, '/'); 
 setTarget("");
 
+var o = {}; o.t = _root.clip1;
+var o2 = {}; o2.o = o;
+setTarget('o.t');
+xcheck_equals(_target, "/clip1");
+setTarget("");
+
+setTarget('o:t');
+xcheck_equals(_target, "/clip1");
+setTarget("");
+
+setTarget('../o:t'); // invalid ?
+check_equals(_target, "/");
+setTarget("");
+
+with (o2)
+{
+	setTarget('o:t'); 
+	xcheck_equals(_target, "/clip1");
+	setTarget("");
+}
+
 // 
 // TODO: add tests for setTargetExpression 
 //
+
 #endif  //OUTPUT_VERSION > 5
 
 //---------------------------------------------------------
@@ -487,5 +509,5 @@ check_equals(child, "rootChild");
 #if OUTPUT_VERSION < 6
  check_totals(41);
 #else
- check_totals(86);
+ check_totals(90);
 #endif
