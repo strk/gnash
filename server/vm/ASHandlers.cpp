@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.143 2007/10/24 23:40:37 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.144 2007/10/25 07:52:10 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -679,7 +679,7 @@ SWFHandlers::ActionSetTarget(ActionExec& thread)
 	// Change the movie we're working on.
 	string target_name ( code.read_string(pc+3) );
 
-	CommonSetTarget(env, target_name);
+	CommonSetTarget(thread, target_name);
 }
 
 void
@@ -1023,7 +1023,7 @@ SWFHandlers::ActionSetTargetExpression(ActionExec& thread)
 	// see tests in opcode_guard_test2.sc
 	const string& target_name = env.top(0).to_string(&env);
 
-	CommonSetTarget(env, target_name);
+	CommonSetTarget(thread, target_name);
 
 	env.drop(1); // pop the target sprite off the stack
 }
@@ -2149,18 +2149,19 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 // http://sswf.sourceforge.net/SWFalexref.html#action_set_target
 // http://sswf.sourceforge.net/SWFalexref.html#action_get_dynamic
 void
-SWFHandlers::CommonSetTarget(as_environment& env, const string& target_name)
+SWFHandlers::CommonSetTarget(ActionExec& thread, const string& target_name)
 {
+	as_environment& env = thread.env;
+
+	// see swfdec's settarget-relative-*.swf
+	env.reset_target();
+
 	character *new_target;
 
 	// if the string is blank, we reset the target to its original value
-	if ( target_name.empty() )
-	{
-		env.reset_target();
-		return;
-	}
+	if ( target_name.empty() ) return;
 
-	new_target = env.find_target(target_name);
+	new_target = env.find_target(target_name); // TODO: pass thread.getScopeStack()
 	if (new_target == NULL)
 	{
 		IF_VERBOSE_ASCODING_ERRORS (
@@ -2169,7 +2170,7 @@ SWFHandlers::CommonSetTarget(as_environment& env, const string& target_name)
 			" Resetting to original target..."),
 			target_name.c_str());
 		);
-		env.reset_target();
+		return;
 	}
 	else
 	{

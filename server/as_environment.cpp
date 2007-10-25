@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.101 2007/10/24 23:54:22 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.102 2007/10/25 07:52:10 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -567,8 +567,7 @@ as_environment::find_target(const std::string& path) const
 	return m_target; // or should we return the *original* path ?
     }
     
-    // see swfdec's settarget-relative-*.swf
-    character* env = _original_target; // m_target;
+    character* env = m_target; 
     assert(env);
     
     const char*	p = path.c_str();

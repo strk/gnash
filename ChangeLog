@@ -1,5 +1,13 @@
 2007-10-24 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.cpp (find_target): always use current, not
+	  original target.
+	* server/vm/ASHandlers.cpp (CommonSetTarget): reset target as first
+	  thing, so that find_target won't use previously current target
+	  to resolve relative paths.
+
+2007-10-24 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/with.as: more setTarget tests (failing)
 
 2007-10-24 Sandro Santilli <strk@keybit.net>
