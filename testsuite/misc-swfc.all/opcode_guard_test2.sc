@@ -167,6 +167,8 @@
      ref201=createEmptyMovieClip('name', 201);
      ref201.testvar = 201; 
      ref200.removeMovieClip(); 
+     _root.check_equals(ref200.getDepth(), -32969);
+     _root.check_equals(ref201.getDepth(), 201);
      setTarget(ref200);
         _root.check_equals(testvar, 200);
      setTarget('');
@@ -182,7 +184,7 @@
   .action:
     stop();
     // Gnash failed on totals() by discarding some checks.
-    xtotals(17);
+    xtotals(19);
   .end
   
 .end  // file end
