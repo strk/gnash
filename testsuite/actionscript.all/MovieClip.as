@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.96 2007/10/04 12:16:50 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.97 2007/10/25 17:05:40 strk Exp $";
 
 #include "check.as"
 
@@ -39,6 +39,9 @@ check_equals(typeof(mc), "movieclip");
 // Check some references
 check_equals(typeof(this), 'movieclip');
 check_equals(typeof(_parent), 'undefined');
+#if OUTPUT_VERSION > 5
+ xcheck(!mc.hasOwnProperty('_parent'));
+#endif
 check_equals(_root, this);
 check_equals(typeof(this['_root']), 'movieclip');
 check_equals(typeof(this['_level0']), 'movieclip');
@@ -352,8 +355,10 @@ check_equals(mc2_mc.getBytesTotal(), 0);
 check_equals(mc2.getBytesLoaded(), 0);
 check_equals(mc2.getBytesTotal(), 0);
 
+xcheck(!mc2.hasOwnProperty('_parent'));
+
 #if OUTPUT_VERSION > 6
-check_equals(getInstanceAtDepth(50), mc2);
+ check_equals(getInstanceAtDepth(50), mc2);
 #endif
 
 var mc3 = createEmptyMovieClip("mc3_mc", 50);
@@ -1256,4 +1261,16 @@ check_equals(getInstanceAtDepth(-6.2), tt2);
 
 #endif // OUTPUT_VERSION >= 7
 
-totals();
+#if OUTPUT_VERSION < 6
+ check_totals(158); // SWF5
+#else
+#if OUTPUT_VERSION < 7
+ check_totals(502); // SWF6
+#else
+#if OUTPUT_VERSION < 8
+ check_totals(519); // SWF7
+#else
+ check_totals(520); // SWF8+
+#endif
+#endif
+#endif
