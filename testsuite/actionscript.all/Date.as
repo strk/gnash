@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Date.as,v 1.29 2007/10/25 15:25:51 udog Exp $";
+rcsid="$Id: Date.as,v 1.30 2007/10/25 15:48:17 udog Exp $";
 
 #include "check.as"
 
@@ -185,6 +185,7 @@ check (Date.utc);
     delete d; var d = new Date(0);
 	// Check UTC "get" methods too
 	check_equals(d.valueOf(), 0);
+	check_equals(typeof(d.getTime()), 'number'); 
 	check_equals(d.getTime(), 0);
 	check_equals(d.getUTCFullYear(), 1970);
 	check_equals(d.getUTCMonth(), 0);

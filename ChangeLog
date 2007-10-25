@@ -5,6 +5,7 @@
 	* testsuite/actionscript.all/Date.as: 1 PASS
 	* testsuite/actionscript.all/toString_valueOf.as: 2 PASSes
 	* server/asobj/Date.cpp: getTime() still has to return a numeric value 
+	* testsuite/actionscript.all/Date.as: add a check for getTime()
 
 2007-10-25 Sandro Santilli <strk@keybit.net>
 
