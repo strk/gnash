@@ -20,7 +20,7 @@
  *  Test targetPath tags (0x45)
  */
 
-rcsid="$Id: targetPath.as,v 1.4 2007/09/29 16:23:00 strk Exp $";
+rcsid="$Id: targetPath.as,v 1.5 2007/10/25 17:53:56 strk Exp $";
 
 #include "check.as"
 
@@ -75,4 +75,30 @@ setvariable
 check_equals(typeof(a), 'undefined');
 
 #endif // MING_SUPPORTS_ASM_TARGETPATH
+
+#if OUTPUT_VERSION > 5
+
+mc1 = createEmptyMovieClip('mc', 1);
+mc2 = mc1.createEmptyMovieClip('mc', 1);
+
+// hack to make check_equals work even with modified target
+_global.fail_check = fail_check;
+_global.xfail_check = xfail_check;
+_global.pass_check = pass_check;
+_global.xpass_check = xpass_check;
+
+setTarget(null);
+check_equals(_target, '/');
+setTarget("");
+
+setTarget('...:mc1');
+check_equals(_target, '/');
+setTarget("");
+
+setTarget('...:mc');
+xcheck_equals(_target, '/');
+setTarget("");
+
+#endif
+
 totals();
