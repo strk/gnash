@@ -229,7 +229,7 @@ static as_value date_getmilliseconds(const fn_call& fn);
 static as_value date_getminutes(const fn_call& fn);
 static as_value date_getmonth(const fn_call& fn);
 static as_value date_getseconds(const fn_call& fn);
-// static as_value date_gettime(const fn_call& fn); == date_valueof()
+static as_value date_gettime(const fn_call& fn); 
 static as_value date_gettimezoneoffset(const fn_call& fn);
 static as_value date_getutcdate(const fn_call& fn);
 static as_value date_getutcday(const fn_call& fn);
@@ -277,7 +277,7 @@ attachDateInterface(as_object& o)
   o.init_member("getMinutes", new builtin_function(date_getminutes));
   o.init_member("getMonth", new builtin_function(date_getmonth));
   o.init_member("getSeconds", new builtin_function(date_getseconds));
-  o.init_member("getTime", new builtin_function(date_valueof));
+  o.init_member("getTime", new builtin_function(date_gettime));
   o.init_member("getTimezoneOffset", new builtin_function(date_gettimezoneoffset));
   o.init_member("getUTCDate", new builtin_function(date_getutcdate));
   o.init_member("getUTCDay", new builtin_function(date_getutcday));
@@ -1346,7 +1346,6 @@ rogue_date_args(const fn_call& fn, unsigned maxargs) {
 /// \brief Date.valueOf() returns the number of milliseconds since midnight
 /// January 1, 1970 00:00 UTC, for a Date. The return value can be a fractional
 /// number of milliseconds.
-// Also used to implement Date.getTime()
 
 static as_value date_valueof(const fn_call& fn) {
   boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
@@ -1355,6 +1354,13 @@ static as_value date_valueof(const fn_call& fn) {
     return as_value(date->tostring());
   else
     return as_value(date->value);
+}
+
+
+static as_value date_gettime(const fn_call& fn) {
+  boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
+  
+  return as_value(date->value);
 }
 
 // extern (used by Global.cpp)

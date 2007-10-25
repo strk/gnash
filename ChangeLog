@@ -4,6 +4,7 @@
 	  for SWF > 5 (fixes bug #21414)	
 	* testsuite/actionscript.all/Date.as: 1 PASS
 	* testsuite/actionscript.all/toString_valueOf.as: 2 PASSes
+	* server/asobj/Date.cpp: getTime() still has to return a numeric value 
 
 2007-10-25 Sandro Santilli <strk@keybit.net>
 
