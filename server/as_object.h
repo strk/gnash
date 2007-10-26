@@ -463,6 +463,17 @@ public:
 		return get_member_default(name, val, nsname);
 	}
 
+	/// Resolve the given relative path component
+	//
+	/// Path components are only objects, if the given string
+	/// points to a non-object member, NULL is returned.
+	///
+	/// Main use if for getvariable and settarget resolution,
+	/// currently implemented in as_environment.
+	///
+	///
+	virtual as_object* get_path_element(string_table::key key);
+
 	/// Chad: Document
 	bool isQName() const { return false; /* TODO: Implement */ }
 	bool isXML() const { return false; /* TODO */ }

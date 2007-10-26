@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.104 2007/10/25 10:47:49 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.105 2007/10/26 13:03:56 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -36,6 +36,7 @@
 
 #include <string>
 #include <utility> // for std::pair
+#include <boost/algorithm/string/case_conv.hpp>
 
 // Define this to have find_target() calls trigger debugging output
 //#define DEBUG_TARGET_FINDING 1
@@ -517,13 +518,13 @@ find_next_dot(const char* word)
 // Supports both /slash/syntax and dot.syntax
 //
 character*
-as_environment::find_target(const std::string& path) const
+as_environment::find_target(const std::string& path_in) const
 {
 #ifdef DEBUG_TARGET_FINDING 
-	log_msg(_("find_target(%s) called"), path.c_str());
+	log_msg(_("find_target(%s) called"), path_in.c_str());
 #endif
 
-    if (path.empty())
+    if (path_in.empty())
     {
 #ifdef DEBUG_TARGET_FINDING 
 	log_msg(_("Returning m_target (empty path)"));
@@ -531,38 +532,55 @@ as_environment::find_target(const std::string& path) const
 	return m_target; // or should we return the *original* path ?
     }
     
-    character* env = m_target; 
-    assert(env);
-    
-    const char*	p = path.c_str();
+    string path = path_in;
+    VM& vm = VM::get();
+    string_table& st = vm.getStringTable();
+    int swfVersion = vm.getSWFVersion(); 
 
+    // Convert to lower case if needed
+    if ( swfVersion < 7 ) boost::to_lower(path);
+
+    as_object* env = m_target; 
+    assert(env);
+
+    const char*	p = path.c_str();
     if (*p == '/') {
 	// Absolute path.  Start at the root.
-	env = env->get_root_movie();
+	env = m_target->get_root_movie();
 #ifdef DEBUG_TARGET_FINDING 
 	log_msg(_("Absolute path, start at the root (%p)"), (void*)env);
 #endif
 	p++;
     }
+#ifdef DEBUG_TARGET_FINDING 
+    else
+    {
+	log_msg(_("Relative path, start at (%s)"), m_target->getTarget().c_str());
+    }
+#endif
     
     if (*p == '\0') {
 #ifdef DEBUG_TARGET_FINDING 
 	log_msg(_("Null path, returning m_target"));
 #endif
-	return env;
+	return m_target;
     }
 
     std::string	subpart;
-    while (env) {
+    while (env)
+    {
 	const char*	next_slash = next_slash_or_dot(p);
 	subpart = p;
-	if (next_slash == p) {
+	if (next_slash == p)
+	{
             IF_VERBOSE_ASCODING_ERRORS(
 	    log_aserror(_("invalid path '%s'"), path.c_str());
 	    );
 	    return NULL;
 	    //break;
-	} else if (next_slash) {
+	}
+	else if (next_slash)
+	{
 	    // Cut off the slash and everything after it.
 	    subpart.resize(next_slash - p);
 	    // Remove any column in the subpart
@@ -574,24 +592,35 @@ as_environment::find_target(const std::string& path) const
 	if ( subpart.empty() )
 	{
 #ifdef DEBUG_TARGET_FINDING 
-	log_msg(_("No more subparts, env is %p"), (void*)env);
+		log_msg(_("No more subparts, env is %p"), (void*)env);
 #endif
 		break;
 	}
 
 #ifdef DEBUG_TARGET_FINDING 
-	log_msg(_("Invoking get_relative_target(%s) on object %p (%s)"), subpart.c_str(), (void *)env, env->get_name().c_str());
+	log_msg(_("Invoking get_path_element(%s) on object %p (%s)"), subpart.c_str(), (void *)env, env->get_text_value().c_str());
 #endif
-	env = env->get_relative_target(subpart);
+
+	as_object* element = env->get_path_element(st.find(subpart));
+        if ( ! element )
+	{
+#ifdef DEBUG_TARGET_FINDING 
+		log_msg(_("Path element %s not found in object %p"), subpart.c_str(), (void *)env);
+#endif
+		return NULL;
+	}
+	env = element;
+
 	//@@   _level0 --> root, .. --> parent, . --> this, other == character
 	
-	if (env == NULL || next_slash == NULL) {
+	if (next_slash == NULL)
+	{
 	    break;
 	}
 	
 	p = next_slash + 1;
     }
-    return env;
+    return env->to_movie(); // can be NULL (not a movie)...
 }
 
 as_object*

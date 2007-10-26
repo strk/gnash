@@ -1,5 +1,17 @@
 2007-10-26 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.{cpp,h}: expose a get_path_element method
+	  being the semantically equivalent to the replaced
+	  character::find_relative_target
+	* server/character.{cpp,h}, server/button_character_instance.{cpp,h},
+	  server/sprite_instance.{cpp,h}:
+	  Adapt find_relative_target to the new get_path_element.
+	* server/as_environment.cpp (find_target): use the new
+	  get_path_element for paths resolution.
+	* testsuite/actionscript.all/: targetPath.as, with.as: some successes.
+
+2007-10-26 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/with.as: test that '..' is
 	  a legal path component in a setTarget call.
 

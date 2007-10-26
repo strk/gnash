@@ -549,7 +549,7 @@ public:
 		string_table::key nsname = 0);
 
 	/// Overridden to look in DisplayList for a match
-	virtual character* get_relative_target(const std::string& name);
+	as_object* get_path_element(string_table::key key);
 
 	/// Execute the actions for the specified frame. 
 	//

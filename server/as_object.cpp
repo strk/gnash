@@ -930,4 +930,32 @@ as_object::callMethod(string_table::key methodName, as_environment& env,
 	return ret;
 }
 
+as_object*
+as_object::get_path_element(string_table::key key)
+{
+//#define DEBUG_TARGET_FINDING 1
+
+	as_value tmp;
+	if ( ! get_member(key, &tmp ) )
+	{
+#ifdef DEBUG_TARGET_FINDING 
+		log_debug("Member %s not found in object %p",
+			_vm.getStringTable().value(key).c_str(),
+			(void*)this);
+#endif
+		return NULL;
+	}
+	if ( ! tmp.is_object() )
+	{
+#ifdef DEBUG_TARGET_FINDING 
+		log_debug("Member %s of object %p is not an object (%s)",
+			_vm.getStringTable().value(key).c_str(), (void*)this,
+			tmp.to_debug_string().c_str());
+#endif
+		return NULL;
+	}
+
+	return tmp.to_object().get();
+}
+
 } // end of gnash namespace

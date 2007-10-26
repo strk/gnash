@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.36 2007/10/26 08:47:39 strk Exp $";
+rcsid="$Id: with.as,v 1.37 2007/10/26 13:03:56 strk Exp $";
 
 #include "check.as"
 
@@ -350,7 +350,7 @@ setTarget("");
 
 var o = {}; o.t = _root.clip1;
 setTarget('o.t');
-xcheck_equals(_target, "/clip1");
+check_equals(_target, "/clip1");
 setTarget("");
 
 setTarget('o:t');
@@ -368,12 +368,17 @@ check_equals(_target, "/");
 setTarget("");
 
 setTarget('o2.o.t'); 
-xcheck_equals(_target, "/clip1");
+check_equals(_target, "/clip1");
 setTarget("");
 
 o2['o.p'] = o;
 setTarget('o2.o.p.t');  // member p of object o2.o doesn't exist
 check_equals(_target, "/");
+setTarget("");
+
+o2.__proto__.inh = o;
+setTarget('o2.inh.t');  // inherited members are scanned 
+check_equals(_target, "/clip1");
 setTarget("");
 
 with (o2)
@@ -533,5 +538,5 @@ check_equals(child, "rootChild");
 #if OUTPUT_VERSION < 6
  check_totals(41);
 #else
- check_totals(98);
+ check_totals(99);
 #endif

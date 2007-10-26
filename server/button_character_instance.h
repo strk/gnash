@@ -21,7 +21,7 @@
 
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
-/* $Id: button_character_instance.h,v 1.26 2007/09/21 08:29:02 strk Exp $ */
+/* $Id: button_character_instance.h,v 1.27 2007/10/26 13:03:56 strk Exp $ */
 
 #ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
 #define GNASH_BUTTON_CHARACTER_INSTANCE_H
@@ -126,7 +126,7 @@ public:
 	}
 	
 	/// Overridden to look in button records for a match
-	virtual character* get_relative_target(const std::string& name);
+	virtual as_object* get_path_element(string_table::key key);
 
 	virtual void	on_button_event(const event_id& event);
 

@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.101 2007/10/18 14:13:03 strk Exp $ */
+/* $Id: character.h,v 1.102 2007/10/26 13:03:56 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -219,7 +219,7 @@ protected:
 	//
 	/// NOTE: case insensitive up to SWF6, sensitive from SWF7 up
 	///
-	character* get_relative_target_common(const std::string& name);
+	as_object* get_path_element_character(string_table::key key);
 
 	/// \brief
 	/// Set when the visual aspect of this particular character or movie
@@ -696,7 +696,7 @@ public:
 		return get_parent()->get_root();
 	}
 
-	/// Find the character which is one degree removed from us,
+	/// Find the object which is one degree removed from us,
 	/// given the relative pathname.
 	///
 	/// If the pathname is "..", then return our parent.
@@ -715,9 +715,9 @@ public:
 	/// In ActionScript 1.0, everything seems to be CASE
 	/// INSENSITIVE.
 	///
-	virtual character* get_relative_target(const std::string& name)
+	virtual as_object* get_path_element(string_table::key key)
 	{
-		return get_relative_target_common(name);
+		return get_path_element_character(key);
 	}
 
 	/// Restart the character

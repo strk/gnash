@@ -1768,7 +1768,7 @@ bool sprite_instance::get_member(string_table::key name_key, as_value* val,
 	// FIXME: use addProperty interface for these !!
 	// TODO: or at least have a character:: protected method take
 	//       care of these ?
-	//       Duplicates code in character::get_relative_target_common too..
+	//       Duplicates code in character::get_path_element_character too..
 	//
 	if (name == "_root" )
 	{
@@ -2188,13 +2188,20 @@ sprite_instance::on_event(const event_id& id)
 	return called;
 }
 
-character*
-sprite_instance::get_relative_target(const std::string& name)
+as_object*
+sprite_instance::get_path_element(string_table::key key)
 {
-	character* ch = get_relative_target_common(name);
-	if ( ch ) return ch;
+	//log_debug("%s.get_path_element(%s) called", getTarget().c_str(), _vm.getStringTable().value(key).c_str());
+	as_object* obj = get_path_element_character(key);
+	if ( obj )
+	{
+		return obj;
+	}
+
+	string name = _vm.getStringTable().value(key);
 
 	// See if we have a match on the display list.
+	character* ch;
 	if ( _vm.getSWFVersion() >= 7 ) ch =  m_display_list.get_character_by_name(name);
 	else ch = m_display_list.get_character_by_name_i(name);
 
@@ -2207,7 +2214,24 @@ sprite_instance::get_relative_target(const std::string& name)
 		else return this;
 	}
 
-	return NULL;
+	// See if it's a member
+
+	// NOTE: direct use of get_member_default avoids
+	//       triggering a call to sprite_instance::get_member
+	//       which would scan the child characters again
+	//       w/out a need for it
+	//return as_object::get_path_element(key);
+
+	as_value tmp;
+	if ( ! get_member_default(key, &tmp, 0) )
+	{
+		return NULL;
+	}
+	if ( ! tmp.is_object() )
+	{
+		return NULL;
+	}
+	return tmp.to_object().get();
 }
 
 void sprite_instance::set_member(string_table::key name,

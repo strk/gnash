@@ -20,7 +20,7 @@
  *  Test targetPath tags (0x45)
  */
 
-rcsid="$Id: targetPath.as,v 1.5 2007/10/25 17:53:56 strk Exp $";
+rcsid="$Id: targetPath.as,v 1.6 2007/10/26 13:03:56 strk Exp $";
 
 #include "check.as"
 
@@ -96,7 +96,7 @@ check_equals(_target, '/');
 setTarget("");
 
 setTarget('...:mc');
-xcheck_equals(_target, '/');
+check_equals(_target, '/');
 setTarget("");
 
 #endif

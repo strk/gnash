@@ -779,19 +779,21 @@ button_character_instance::pointInShape(float x, float y) const
 	return false; // no shape
 }
 
-character*
-button_character_instance::get_relative_target(const std::string& name)
+as_object*
+button_character_instance::get_path_element(string_table::key key)
 {
-	character* ch = get_relative_target_common(name);
+	as_object* ch = get_path_element_character(key);
 
 	if ( ! ch )
 	{
+		string name = _vm.getStringTable().value(key);
 		size_t size = m_record_character.size();
 		
 		// See if we have a match on the button records list
 		// TODO: Should we scan only currently visible characters 
 		// (get_active_characters) ?? 
-		for (size_t i=0; i<size; i++) {
+		for (size_t i=0; i<size; i++)
+		{
 			character* child = m_record_character[i].get();
 			if (child->get_name() == name)
 				return child;

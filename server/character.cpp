@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.58 2007/10/04 09:47:36 strk Exp $ */
+/* $Id: character.cpp,v 1.59 2007/10/26 13:03:56 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -151,10 +151,10 @@ character::get_mouse_state(int& x, int& y, int& buttons)
 	get_parent()->get_mouse_state(x, y, buttons);
 }
 
-character*
-character::get_relative_target_common(const std::string& name_orig)
+as_object*
+character::get_path_element_character(string_table::key key)
 {
-	string name = PROPNAME(name_orig); // convert name to lowercase in SWF<6
+	std::string name = _vm.getStringTable().value(key);
 	if (name == "." || name == "this")
 	{
 	    return this;
@@ -171,12 +171,9 @@ character::get_relative_target_common(const std::string& name_orig)
 				" a nonexistent parent with '..' "
 				" (a nonexistent parent probably only "
 				"occurs in the root MovieClip)."
-				" Returning a reference to top parent "
-				"(probably the root clip)."));
+				" Returning NULL. "));
 			);
-			//parent = this;
-			assert(this == get_root_movie());
-			return this;
+			return NULL;
 		}
 		return parent;
 	}
@@ -187,7 +184,7 @@ character::get_relative_target_common(const std::string& name_orig)
 	else if (name.compare(0, 6, "_level") == 0 && name.find_first_not_of("0123456789", 7) == string::npos )
 	{
 		unsigned int levelno = atoi(name.c_str()+6);
-		return VM::get().getRoot().getLevel(levelno).get();
+		return _vm.getRoot().getLevel(levelno).get();
 	}
 
 	return NULL;
