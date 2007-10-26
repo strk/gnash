@@ -1,3 +1,8 @@
+2007-10-26 Sandro Santilli <strk@keybit.net>
+
+	* extensions/gtk2/gtkext.cpp: use init_member to initialize interface
+	  (fixes build)
+
 2007-10-26 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* libmedia/FLVParser.h, libmedia/MediaParser.h: Move the videoFrameType

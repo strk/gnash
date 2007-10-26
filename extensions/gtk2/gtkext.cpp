@@ -120,14 +120,14 @@ attachInterface(as_object *obj)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    obj->set_member("window_new", &gtkext_window_new);
-    obj->set_member("signal_connect", &gtkext_signal_connect);
-    obj->set_member("container_set_border_width", &gtkext_container_set_border_width);
-    obj->set_member("button_new_with_label", &gtkext_button_new_with_label);
-    obj->set_member("signal_connect_swapped", &gtkext_signal_connect_swapped);
-    obj->set_member("container_add", &gtkext_container_add);
-    obj->set_member("widget_show", &gtkext_widget_show);
-    obj->set_member("main", &gtkext_main);
+    obj->init_member("window_new", &gtkext_window_new);
+    obj->init_member("signal_connect", &gtkext_signal_connect);
+    obj->init_member("container_set_border_width", &gtkext_container_set_border_width);
+    obj->init_member("button_new_with_label", &gtkext_button_new_with_label);
+    obj->init_member("signal_connect_swapped", &gtkext_signal_connect_swapped);
+    obj->init_member("container_add", &gtkext_container_add);
+    obj->init_member("widget_show", &gtkext_widget_show);
+    obj->init_member("main", &gtkext_main);
 }
 
 static as_object*
