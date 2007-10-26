@@ -611,6 +611,15 @@ public:
 	/// Cast to a as_function, or return NULL
 	virtual as_function* to_function() { return NULL; }
 
+	/// Return true if this is a Date object.
+	//
+	/// This is needed for special handling of Date objects
+	/// by the as_value::to_primitive method, also described
+	/// in ECMA-262 "8.6.2.6 [[DefaultValue]] (hint)"
+	/// 
+	///
+	virtual bool isDateObject() { return false; }
+
 	/// Add an interface to the list of interfaces.
 	/// Used by instanceOf
 	void add_interface(as_object* ctor);

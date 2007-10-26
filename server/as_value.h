@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.71 2007/10/18 11:47:54 cmusick Exp $ */
+/* $Id: as_value.h,v 1.72 2007/10/26 07:39:47 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -211,27 +211,7 @@ public:
 	const char* typeOf() const;
 
 	/// Get the primitive type of this value
-	primitive_types ptype() const
-	{
-		switch (m_type)
-		{
-		case STRING: return PTYPE_STRING;
-		case NUMBER: return PTYPE_NUMBER;
-		case AS_FUNCTION:
-		case UNDEFINED:
-		case NULLTYPE:
-		case MOVIECLIP:
-			return PTYPE_NUMBER;
-		case OBJECT:
-			// TODO: Date objects should return TYPE_STRING
-			return PTYPE_NUMBER;
-		case BOOLEAN:
-			return PTYPE_BOOLEAN;
-		default:
-			break; // Should be only exceptions here.
-		}
-		return PTYPE_NUMBER;
-	}
+	primitive_types ptype() const;
 
 	// Chad: Document
 	bool conforms_to(string_table::key name);
@@ -402,12 +382,25 @@ public:
 	/// Return value as a primitive type
 	//
 	/// Primitive types are: undefined, null, boolean, string, number.
-	/// See ECMA-2.6.2 (section 4.3.2).
+	/// See ECMA-2.6.2 (sections 4.3.2 and 8.6.2.6).
 	///
 	/// @param env
 	/// 	The environment to use for calling the valueOf method.
 	///
 	as_value to_primitive(as_environment& env) const;
+
+	/// Return value as a primitive type, with a preference
+	//
+	/// Primitive types are: undefined, null, boolean, string, number.
+	/// See ECMA-2.6.2 (sections 4.3.2 and 8.6.2.6).
+	///
+	/// @param env
+	/// 	The environment to use for calling the valueOf method.
+	///
+	/// @param hint
+	/// 	NUMBER or STRING, the preferred representation we're asking for.
+	///
+	as_value to_primitive(as_environment& env, type hint) const;
 
 	/// Force type to number.
 	//

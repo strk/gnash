@@ -183,24 +183,78 @@ as_value::to_string_versioned(int version, as_environment* env) const
 	return to_string(env);
 }
 
+primitive_types
+as_value::ptype() const
+{
+	VM& vm = VM::get();
+	int swfVersion = vm.getSWFVersion();
+
+	switch (m_type)
+	{
+	case STRING: return PTYPE_STRING;
+	case NUMBER: return PTYPE_NUMBER;
+	case AS_FUNCTION:
+	case UNDEFINED:
+	case NULLTYPE:
+	case MOVIECLIP:
+		return PTYPE_NUMBER;
+	case OBJECT:
+	{
+		as_object* obj = getObj().get();
+		// Date objects should return TYPE_STRING (but only from SWF6 up)
+		// See ECMA-262 8.6.2.6
+		if ( swfVersion > 5 && obj->isDateObject() ) return PTYPE_STRING;
+		return PTYPE_NUMBER;
+	}
+	case BOOLEAN:
+		return PTYPE_BOOLEAN;
+	default:
+		break; // Should be only exceptions here.
+	}
+	return PTYPE_NUMBER;
+}
+
 // Conversion to primitive value.
 as_value
 as_value::to_primitive(as_environment& env) const
 {
+	VM& vm = VM::get();
+	int swfVersion = vm.getSWFVersion();
 
-	if ( m_type == OBJECT || m_type == AS_FUNCTION )
+	type hint = NUMBER;
+
+	if ( m_type == OBJECT && swfVersion > 5 && getObj()->isDateObject() )
 	{
-		as_object* obj = m_type == OBJECT ? getObj().get() : getFun().get();
-		string_table::key methodname = NSV::PROP_VALUE_OF;
-		as_value method;
-		if ( obj->get_member(methodname, &method) )
-		{
-			return call_method0(method, &env, obj);
-		}
-		else
-		{
-			log_msg(_("get_member(%s) returned false"), VM::get().getStringTable().value(methodname).c_str());
-		}
+		hint = STRING;
+	}
+
+	return to_primitive(env, hint);
+}
+
+// Conversion to primitive value.
+as_value
+as_value::to_primitive(as_environment& env, type hint) const
+{
+	if ( m_type != OBJECT && m_type != AS_FUNCTION ) return *this;
+
+	as_object* obj;
+	if ( m_type == OBJECT ) obj = getObj().get();
+	else obj = getFun().get();
+
+	// TODO: implement DefaultValue (ECMA-262 - 8.6.2.6)
+
+	string_table::key methodname;
+	if (hint == NUMBER) { methodname=NSV::PROP_VALUE_OF; }
+	else { assert(hint==STRING); methodname=NSV::PROP_TO_STRING; }
+
+	as_value method;
+	if ( obj->get_member(methodname, &method) )
+	{
+		return call_method0(method, &env, obj);
+	}
+	else
+	{
+		log_msg(_("get_member(%s) returned false"), VM::get().getStringTable().value(methodname).c_str());
 	}
 
 	return *this;

@@ -341,6 +341,8 @@ public:
     as_object(getDateInterface())
   {
   }
+
+  bool isDateObject() { return true; }
   
   as_value tostring()
   {
@@ -1350,9 +1352,11 @@ rogue_date_args(const fn_call& fn, unsigned maxargs) {
 static as_value date_valueof(const fn_call& fn) {
   boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
   
+#if 0
   if (fn.env().get_version() > 5)
     return as_value(date->tostring());
   else
+#endif
     return as_value(date->value);
 }
 

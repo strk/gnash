@@ -1,3 +1,11 @@
+2007-10-26 Sandro Santilli <strk@keybit.net>
+
+	* server/as_object.h: add virtual isDateObject() method.
+	* server/asobj/Date.cpp: implement isDateObject, have valueOf
+	  always return a number.
+	* server/as_value.{cpp,h}: to_primitive for date objects returns
+	  a string rather then a number.
+
 2007-10-25 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Date.as: couple more tests.
