@@ -16,7 +16,7 @@
 
 // Original author: Mike Carlson - June 19th, 2006
 
-rcsid="$Id: String.as,v 1.25 2007/10/06 07:08:52 strk Exp $";
+rcsid="$Id: String.as,v 1.26 2007/10/26 08:26:54 strk Exp $";
 
 #include "check.as"
 
@@ -273,6 +273,7 @@ check_equals(typeof(a_string), "string");
 check_equals (a_string.substring(0, 4), "a_st");
 check_equals (a_string.substring(-3, 4), "a_st");
 check_equals (a_string.substring(0, -1), "");
+check_equals (a_string.substring(0, 1), "a");
 check_equals (a_string.substring(4), "ring");
 check_equals (a_string.substring(16), "");
 check_equals (a_string.substring(-16), "a_string");
@@ -280,6 +281,8 @@ check_equals (a_string.toUpperCase(), "A_STRING");
 check_equals (a_string.indexOf("hing"), -1 );
 check_equals (a_string.indexOf("string"), 2 );
 check_equals (a_string.charCodeAt(0), 97 );
+a_string = ""; // empty
+check_equals (a_string.substring(0, 1), "");
 
 // Test String.length not being overridable
 a_string = "1234567890";

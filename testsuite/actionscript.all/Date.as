@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Date.as,v 1.31 2007/10/25 22:27:06 strk Exp $";
+rcsid="$Id: Date.as,v 1.32 2007/10/26 08:26:54 strk Exp $";
 
 #include "check.as"
 
@@ -519,12 +519,19 @@ check (Date.UTC(2000,6,1,0,0,0,0) == d.valueOf());
 // Check if Date, concatenated to a string, is in human readable form
 d = new Date(2000, 1, 15, 0, 0, 0); 
 var foo = "foo "+d;   
+var bar = 0+d;   
 check_equals(typeof(foo), 'string');
-// correct: "foo Tue Feb 15 00:00:00 GMT+0100 2000"
-// but this probably depends on time zone, so just check for some fixed part..
 #if OUTPUT_VERSION > 5
+ // correct: "0Tue Feb 15 00:00:00 GMT+0100 2000"
+ // but this probably depends on time zone, so just check for some fixed part..
+ check_equals(typeof(bar), 'string');
+ check_equals(bar.substring(0, 1), '0');
+ check_equals(bar.indexOf("Feb"), 5);
+ // correct: "foo Tue Feb 15 00:00:00 GMT+0100 2000"
+ // but this probably depends on time zone, so just check for some fixed part..
  check_equals(foo.indexOf("Feb"), 8);
 #else
+ check_equals(typeof(bar), 'number');
  // correct: "foo 950569200000"
  check_equals(foo.substring(0, 10), 'foo 950569');
 #endif

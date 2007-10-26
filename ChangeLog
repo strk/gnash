@@ -1,5 +1,12 @@
 2007-10-26 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/string.cpp: fix substring(0,1).
+	* testsuite/actionscript.all/String.as: test substring(0,1)
+	* testsuite/actionscript.all/Date.as: add test for adding Date
+	  instance to a number.
+
+2007-10-26 Sandro Santilli <strk@keybit.net>
+
 	* server/as_object.h: add virtual isDateObject() method.
 	* server/asobj/Date.cpp: implement isDateObject, have valueOf
 	  always return a number.

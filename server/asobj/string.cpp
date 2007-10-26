@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.40 2007/10/24 23:26:24 strk Exp $ */
+/* $Id: string.cpp,v 1.41 2007/10/26 08:26:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -395,7 +395,7 @@ string_sub_string(const fn_call& fn)
             return as_value("");
         }
 
-        if (num > 1 && static_cast<unsigned>(num) < str.size()) {
+        if (num >= 1 && static_cast<unsigned>(num) < str.size()) {
             end = num;
 
             if (end < start) {
@@ -409,6 +409,8 @@ string_sub_string(const fn_call& fn)
         }
 
     }
+
+    //log_debug("Start: %d, End: %d", start, end);
 
     return as_value(str.substr(start, end));
 }
