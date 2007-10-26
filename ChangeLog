@@ -1,3 +1,7 @@
+2007-10-26 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* configure.ac: Added quotation-marks around $extensions_list.
+
 2007-10-26 Sandro Santilli <strk@keybit.net>
 
 	* server/as_object.{cpp,h}: expose a get_path_element method

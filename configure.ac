@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.434 2007/10/23 21:17:24 strk Exp $
+dnl $Id: configure.ac,v 1.435 2007/10/26 15:43:02 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -580,7 +580,7 @@ AM_CONDITIONAL(BUILD_GTK_EXT, [ test x$ext_gtk = xyes ])
 AM_CONDITIONAL(BUILD_LIRC_EXT, [ test x$ext_lirc = xyes ])
 AM_CONDITIONAL(BUILD_DBUS_EXT, [ test x$ext_dbus = xyes ])
 AM_CONDITIONAL(BUILD_METOME_EXT, [ test x$ext_metome = xyes ])
-AM_CONDITIONAL(BUILD_EXTENSIONS, [ test -n $extensions_list])
+AM_CONDITIONAL(BUILD_EXTENSIONS, [ test -n "$extensions_list"])
 
 AC_LIBLTDL_INSTALLABLE
 AC_LIBTOOL_DLOPEN
