@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.35 2007/10/26 08:36:21 strk Exp $";
+rcsid="$Id: with.as,v 1.36 2007/10/26 08:47:39 strk Exp $";
 
 #include "check.as"
 
@@ -349,7 +349,6 @@ setTarget("/clip1");
 setTarget("");
 
 var o = {}; o.t = _root.clip1;
-var o2 = {}; o2.o = o;
 setTarget('o.t');
 xcheck_equals(_target, "/clip1");
 setTarget("");
@@ -359,6 +358,21 @@ xcheck_equals(_target, "/clip1");
 setTarget("");
 
 setTarget('../o:t'); // invalid ?
+check_equals(_target, "/");
+setTarget("");
+
+var o2 = {};
+o2.o = o;
+setTarget('o2.o'); // not a movie
+check_equals(_target, "/");
+setTarget("");
+
+setTarget('o2.o.t'); 
+xcheck_equals(_target, "/clip1");
+setTarget("");
+
+o2['o.p'] = o;
+setTarget('o2.o.p.t');  // member p of object o2.o doesn't exist
 check_equals(_target, "/");
 setTarget("");
 
@@ -519,5 +533,5 @@ check_equals(child, "rootChild");
 #if OUTPUT_VERSION < 6
  check_totals(41);
 #else
- check_totals(95);
+ check_totals(98);
 #endif
