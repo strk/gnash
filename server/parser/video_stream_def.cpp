@@ -16,11 +16,12 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.23 2007/10/19 13:50:25 strk Exp $
+// $Id: video_stream_def.cpp,v 1.24 2007/10/26 18:43:36 tgc Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
 #include "render.h"
+#include "BitsReader.h"
 
 #ifdef USE_FFMPEG
 #include "VideoDecoderFfmpeg.h"
@@ -33,6 +34,7 @@ namespace gnash {
 video_stream_definition::video_stream_definition(uint16_t char_id)
 	:
 	m_char_id(char_id),
+	m_last_decoded_frame(-1),
 	_width(0),
 	_height(0),
 	_decoder(NULL)
@@ -42,11 +44,6 @@ video_stream_definition::video_stream_definition(uint16_t char_id)
 
 video_stream_definition::~video_stream_definition()
 {
-	for (EmbedFrameMap::iterator i=m_video_frames.begin(), e=m_video_frames.end();
-			i!=e; ++i)
-	{
-		delete i->second;
-	}
 }
 
 
@@ -65,6 +62,7 @@ video_stream_definition::readDefineVideoStream(stream* in, SWF::tag_type tag, mo
 
 	_width = in->read_u16();
 	_height = in->read_u16();
+
 	m_bound.enclose_point(0, 0);
 	m_bound.expand_to_point(PIXELS_TO_TWIPS(_width), PIXELS_TO_TWIPS(_height));
 
@@ -106,28 +104,43 @@ video_stream_definition::readDefineVideoFrame(stream* in, SWF::tag_type tag, mov
 	unsigned int dataSize = in->get_tag_end_position() - in->get_position();
 	unsigned int totSize = dataSize+padding;
 
-	boost::scoped_array<uint8_t> data ( new uint8_t[totSize] );
+	boost::shared_array<uint8_t> data ( new uint8_t[totSize] );
 	for (unsigned int i = 0; i < dataSize; ++i) 
 	{
 		data[i] = in->read_u8();
 	}
 	if ( padding ) memset(&data[dataSize], 0, padding);  // pad with zeroes if needed
 
-	// TODO: should we pass dataSize instead of totSize to decodeToImage ?
-	std::auto_ptr<image::image_base> img ( _decoder->decodeToImage(data.get(), totSize) );
 
-	if ( img.get() )
-	{
-		// TODO: why don't we use  the frame number specified
-		//       in the tag instead of skipping it ?
-		size_t frameNum = m->get_loading_frame();
+	// Check what kind of frame this is
+	videoFrameType ft;
+	if (m_codec_id == VIDEO_CODEC_H263) {
+		// Parse the h263 header to determine the frame type. The position of the
+		// info varies if the frame size is custom.
+		std::auto_ptr<BitsReader> br (new BitsReader(data.get(), totSize));
+		uint32_t tmp = br->read_uint(30);
+		tmp = br->read_uint(3);
+		if (tmp == 0) tmp = br->read_uint(32);
+		else if (tmp == 1) tmp = br->read_uint(16);
+		
+		// Finally we're at the info, read and use
+		videoFrameType ft;
+		tmp = br->read_uint(3);
+		if (tmp == 0) ft = KEY_FRAME;
+		else if (tmp == 1) ft = INTER_FRAME;
+		else ft = DIS_INTER_FRAME;
 
-		setFrameData(frameNum, img);
+	} else if (m_codec_id == VIDEO_CODEC_VP6 || m_codec_id == VIDEO_CODEC_VP6A) {
+		// Get the info from the VP6 header
+		if (!(data.get()[0] & 0x80)) ft = KEY_FRAME;
+		else ft = INTER_FRAME;
+
+	} else {
+		ft = KEY_FRAME;
 	}
-	else
-	{
-		log_error(_("An error occured while decoding video frame in frame %d"), m->get_loading_frame());
-	}
+
+	setFrameData(m->get_loading_frame(), data, totSize, ft);
+
 }
 
 
@@ -138,31 +151,55 @@ video_stream_definition::create_character_instance(character* parent, int id)
 	return ch;
 }
 
-image::image_base*
-video_stream_definition::get_frame_data(int frameNum)
+std::auto_ptr<image::image_base>
+video_stream_definition::get_frame_data(uint32_t frameNum)
 {
+
+	// Check if the requested frame hold any video data.
 	EmbedFrameMap::iterator it = m_video_frames.find(frameNum);
-	if( it != m_video_frames.end() )
+	if( it == m_video_frames.end() )
 	{
-		return it->second;
-	} else {
 		log_debug(_("No video data available for frame %d."), frameNum);
-		return NULL;
+		return std::auto_ptr<image::image_base>(NULL);
 	}
+
+	// rewind to the nearest keyframe, or the last frame we decoded
+	while (static_cast<uint32_t>(m_last_decoded_frame+1) != it->first && it->second->frameType != KEY_FRAME && it != m_video_frames.begin()) it--;
+
+	std::auto_ptr<image::image_base> ret;
+
+	// Decode all the frames needed to produce the requested one
+	while (it->first <= frameNum && it != m_video_frames.end()) {
+		// If this is a disposable interlaced frame, and it is not the
+		// last one to be decoded, we skip the decoding.
+		if (!(it->second->frameType == DIS_INTER_FRAME && it->first != frameNum)) {
+			ret.reset(NULL);
+			ret = _decoder->decodeToImage(it->second->videoData.get(), it->second->dataSize);
+		}
+		it++;
+	}
+
+	m_last_decoded_frame = frameNum;
+
+	return ret;
+
 }
 
 void
-video_stream_definition::setFrameData(uint32_t frameNum, std::auto_ptr<image::image_base> image)
+video_stream_definition::setFrameData(uint32_t frameNum, boost::shared_array<uint8_t> data, uint32_t size, videoFrameType ft)
 {
-	image::image_base*& ptr = m_video_frames[frameNum];
-	if ( ptr )
+	EmbedFrameMap::iterator it = m_video_frames.find(frameNum);
+	if( it != m_video_frames.end() )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
 		log_swferror(_("Mulitple video frames defined for frame %u"), frameNum);
 		);
 		return;
 	}
-	ptr = image.release();
+	
+	boost::shared_ptr<VideoData> vd (new VideoData(data, size,ft));
+	m_video_frames[frameNum] = vd;
+
 }
 
 } // namespace gnash

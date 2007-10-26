@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderFfmpeg.h,v 1.6 2007/10/19 13:50:25 strk Exp $
+// $Id: VideoDecoderFfmpeg.h,v 1.7 2007/10/26 18:43:36 tgc Exp $
 
 #ifndef __VIDEODECODERFFMPEG_H__
 #define __VIDEODECODERFFMPEG_H__
@@ -56,7 +56,7 @@ public:
 
 	uint8_t* decode(uint8_t* input, uint32_t inputSize, uint32_t& outputSize);
 
-	image::image_base* decodeToImage(uint8_t* /*input*/, uint32_t /*inputSize*/);
+	std::auto_ptr<image::image_base> decodeToImage(uint8_t* /*input*/, uint32_t /*inputSize*/);
 
 	static uint8_t* convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame);
 

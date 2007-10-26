@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.h,v 1.15 2007/10/19 12:17:28 strk Exp $
+// $Id: video_stream_def.h,v 1.16 2007/10/26 18:43:36 tgc Exp $
 
 #ifndef GNASH_VIDEO_STREAM_DEF_H
 #define GNASH_VIDEO_STREAM_DEF_H
@@ -36,9 +36,32 @@
 
 #include <map>
 #include <boost/shared_array.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp> 
 
 namespace gnash {
+
+
+/// Class used to store data for the undecoded embedded video frames.
+/// Contains the data, the data size and the type of the frame
+class VideoData {
+public:
+	VideoData(boost::shared_array<uint8_t> data, uint32_t size, videoFrameType ft)
+	:
+	videoData(data),
+	dataSize(size),
+	frameType(ft)
+	{
+	}
+
+	~VideoData()
+	{
+	}
+
+	boost::shared_array<uint8_t> videoData;
+	uint32_t dataSize;
+	videoFrameType frameType;
+};
 
 class video_stream_definition : public character_def
 {
@@ -89,7 +112,7 @@ public:
 	///
 	/// @return pointer (possibly NULL) to an image. The ownership is with the callee
 	///
-	image::image_base* get_frame_data(int frameNum);
+	std::auto_ptr<image::image_base> get_frame_data(uint32_t frameNum);
 
 private:
 
@@ -134,8 +157,11 @@ private:
 	/// Elements of this map are owned by this instance, and will be deleted 
 	/// at instance destruction time.
 	///
-	typedef std::map<uint32_t, image::image_base*> EmbedFrameMap;
+	typedef std::map<uint32_t, boost::shared_ptr<VideoData> > EmbedFrameMap;
 	EmbedFrameMap m_video_frames;
+
+	/// Last decoded frame number
+	int32_t m_last_decoded_frame;
 
 	/// Set data for the given frame
 	//
@@ -151,7 +177,7 @@ private:
 	/// @param img
 	///	Frame data. Ownership is transferred. 
 	///
-	void setFrameData(uint32_t frameNum, std::auto_ptr<image::image_base> img);
+	void setFrameData(uint32_t frameNum, boost::shared_array<uint8_t> data, uint32_t size, videoFrameType ft);
 
 	/// Width of the video
 	uint32_t _width;

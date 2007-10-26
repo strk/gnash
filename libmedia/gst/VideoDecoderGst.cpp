@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderGst.cpp,v 1.3 2007/10/18 15:56:54 tgc Exp $
+// $Id: VideoDecoderGst.cpp,v 1.4 2007/10/26 18:43:36 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -185,11 +185,11 @@ VideoDecoderGst::setup(int widthi, int heighti, int deblockingi, bool smoothingi
 
 
 // gnash calls this when it wants you to decode the given videoframe
-image::image_base*
+std::auto_ptr<image::image_base>
 VideoDecoderGst::decodeToImage(uint8_t* data, uint32_t size)
 {
 
-	image::rgb* ret_image = new image::rgb(width, height);
+	std::auto_ptr<image::image_base> ret_image(new image::rgb(width, height));
 
 	// If there is nothing to decode in the new frame
 	// we just return the lastest.
@@ -199,7 +199,7 @@ VideoDecoderGst::decodeToImage(uint8_t* data, uint32_t size)
 		// auto pointer ..
 		if ( ! decodedFrame.get() )
 		{
-			return NULL;
+			return std::auto_ptr<image::image_base>(NULL);
 		}
 
 		ret_image->update(*decodedFrame);
@@ -217,7 +217,7 @@ VideoDecoderGst::decodeToImage(uint8_t* data, uint32_t size)
 	// auto pointer ..
 	if ( ! decodedFrame.get() )
 	{
-		return NULL;
+		return std::auto_ptr<image::image_base>(NULL);
 	}
 
 	// return decodedFrame->clone() ?

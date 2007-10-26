@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-// $Id: video_stream_instance.cpp,v 1.41 2007/10/18 15:56:55 tgc Exp $
+// $Id: video_stream_instance.cpp,v 1.42 2007/10/26 18:43:36 tgc Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -209,10 +209,10 @@ video_stream_instance::display()
 		assert(m_def);
 
 		// The returned image is owned by "m_def"
-		image::image_base* img = m_def->get_frame_data(current_frame);
-		if (img)
+		std::auto_ptr<image::image_base> img = m_def->get_frame_data(current_frame);
+		if (img.get())
 		{
-			gnash::render::drawVideoFrame(img, &m, &bounds);
+			gnash::render::drawVideoFrame(img.get(), &m, &bounds);
 		} else {
 			log_debug(_("Video frame data is missing in frame %d"),current_frame);
 		}

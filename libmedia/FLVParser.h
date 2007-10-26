@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.h,v 1.1 2007/09/27 23:59:53 tgc Exp $
+// $Id: FLVParser.h,v 1.2 2007/10/26 18:43:35 tgc Exp $
 
 // Information about the FLV format can be found at http://osflash.org/flv
 
@@ -32,13 +32,6 @@
 #define HEADER_SKIP 15
 
 namespace gnash {
-
-enum videoFrameType
-{
-	KEY_FRAME = 1,
-	INTER_FRAME = 2,
-	DIS_INTER_FRAME = 3
-};
 
 enum {
 	CONTAINS_VIDEO = 1,

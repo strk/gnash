@@ -1,3 +1,16 @@
+2007-10-26 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libmedia/FLVParser.h, libmedia/MediaParser.h: Move the videoFrameType
+	  definition from FLVParser.h to MediaParser.h.
+	* libmedia/VideoDecoder.h, libmedia/gst/VideoDecoder{Gst,ffmpeg}.{h,cpp}:
+	  Make decodeToImage return a auto_ptr (again).
+	* server/video_stream_instance.cpp: We now receive the decoded image in a
+	  auto_ptr.
+	* server/parser/video_stream_def.{h,cpp}: Changed decoding of embedded video
+	  to be on-demand, instead of at-parse. If asked to decode a random frame, we
+	  rewind to the lastest keyframe (or the last decoded frame) and decode all
+	  the frames needed to produce the requested frame.
+
 2007-10-26 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* configure.ac: Added quotation-marks around $extensions_list.

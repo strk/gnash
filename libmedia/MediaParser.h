@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaParser.h,v 1.6 2007/10/23 18:13:59 strk Exp $
+// $Id: MediaParser.h,v 1.7 2007/10/26 18:43:36 tgc Exp $
 
 #ifndef __MEDIAPARSER_H__
 #define __MEDIAPARSER_H__
@@ -37,6 +37,19 @@ extern "C"
 #include <memory>
 
 namespace gnash {
+
+/// Video frame types
+enum videoFrameType
+{
+	/// Key frames
+	KEY_FRAME = 1,
+
+	/// Interlaced frames
+	INTER_FRAME = 2,
+
+	/// Disposable interlaced frames
+	DIS_INTER_FRAME = 3
+};
 
 /// The type of the codec id passed in the AudioInfo or VideoInfo class
 enum codecType

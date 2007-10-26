@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: VideoDecoderFfmpeg.cpp,v 1.6 2007/10/18 15:56:55 tgc Exp $
+// $Id: VideoDecoderFfmpeg.cpp,v 1.7 2007/10/26 18:43:36 tgc Exp $
 
 #include "VideoDecoderFfmpeg.h"
 
@@ -318,17 +318,17 @@ uint8_t* VideoDecoderFfmpeg::decode(uint8_t* input, uint32_t inputSize, uint32_t
 	}
 }
 
-image::image_base*
+std::auto_ptr<image::image_base>
 VideoDecoderFfmpeg::decodeToImage(uint8_t* input, uint32_t inputSize)
 {
 	uint32_t outputSize = 0;
 	uint8_t* decodedData = decode(input, inputSize, outputSize);
 
 	if (!decodedData || outputSize == 0) {
-		return NULL;
+		return std::auto_ptr<image::image_base>(NULL);
 	}
 
-	image::image_base* ret = new image::rgb(_videoCodecCtx->width, _videoCodecCtx->height);
+	std::auto_ptr<image::image_base> ret(new image::rgb(_videoCodecCtx->width, _videoCodecCtx->height));
 	ret->update(decodedData);
 	delete [] decodedData;
 	return ret;
