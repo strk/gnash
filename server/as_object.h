@@ -90,16 +90,6 @@ private:
 		return *this;
 	}
 
-#if 0
-	/// Look for a Getter/setter property scanning the inheritance chain
-	//
-	/// @returns a Getter/Setter propery if found, NULL if not found
-	///
-	/// TODO: drop this function, is unused
-	Property* findGetterSetter(string_table::key name, 
-		string_table::key nsname = 0);
-#endif
-
 	/// Find an existing property for update, only scaning the inheritance chain for getter/setters
 	/// or statics.
 	//
@@ -108,6 +98,7 @@ private:
 	///	  completely new or as an override).
 	///
 	/// @returns a propery if found, NULL if not found
+	///          or not visible in current VM version
 	///
 	Property* findUpdatableProperty(string_table::key name, 
 		string_table::key nsname = 0);
@@ -121,6 +112,7 @@ private:
 	/// If not null, this is set to the object which contained the property.
 	///
 	/// @returns a Propery if found, NULL if not found
+	///          or not visible in current VM version
 	///
 	Property* findProperty(string_table::key name, string_table::key nsname,
 		as_object **owner = NULL);

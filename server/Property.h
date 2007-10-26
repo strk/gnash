@@ -214,6 +214,9 @@ public:
 	/// Is this a static property?
 	bool isStatic() const { return _flags.get_static(); }
 
+	/// Is this member supposed to be visible by a VM of given version ?
+	bool isVisible(int swfVersion) const { return _flags.get_visible(swfVersion); }
+
 	/// What is the name of this property?
 	string_table::key getName() const { return mName; }
 

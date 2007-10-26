@@ -1,5 +1,14 @@
 2007-10-26 Sandro Santilli <strk@keybit.net>
 
+	* server/as_prop_flags.h: add version-based ignore flags.
+	* server/Property.h: expose an isVisible(int ver) method.
+	* server/as_object.{cpp,h} (findProperty): ignore invisible
+	  properties.
+	* testsuite/swfdec/PASSING: success for all versions from
+	  ASSetPropFlags-ignore.as
+
+2007-10-26 Sandro Santilli <strk@keybit.net>
+
 	* extensions/gtk2/gtkext.cpp: use init_member to initialize interface
 	  (fixes build)
 

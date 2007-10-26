@@ -55,15 +55,28 @@ public:
 		staticProp	= 1 << 3,
 
 		/// Flags are protected from changes
-		isProtected	= 1 << 4
+		isProtected	= 1 << 4,
+
+		/// Only visible by VM initialized for version 6 or higher 
+		onlySWF6Up 	= 1 << 7, // 128
+
+		/// Ignore in SWF6-initialized VM
+		ignoreSWF6	= 1 << 8, // 256
+
+		/// Only visible by VM initialized for version 7 or higher 
+		onlySWF7Up 	= 1 << 10, // 1024
+
+		/// Only visible by VM initialized for version 8 or higher 
+		onlySWF8Up	= 1 << 12 // 4096
+
 	};
 
-	/// mask for flags
+	/// mask for flags (bits that can be set by user)
 	//
 	/// TODO: make private.
 	///       Currently used by as_global_assetpropflags in Global.cpp
 	///
-	static const int as_prop_flags_mask = dontEnum|dontDelete|readOnly;
+	static const int as_prop_flags_mask = dontEnum|dontDelete|readOnly|onlySWF6Up|ignoreSWF6|onlySWF7Up|onlySWF8Up;
 
 
 	/// Default constructor
@@ -131,6 +144,16 @@ public:
 
 	/// Clear "don't enum" flag 
 	void clear_dont_enum() { _flags &= ~dontEnum; }
+
+	/// Get version-based visibility 
+	bool get_visible(int swfVersion) const
+	{
+		if ( _flags & onlySWF6Up && swfVersion  < 6 ) return false;
+		if ( _flags & ignoreSWF6 && swfVersion == 6 ) return false;
+		if ( _flags & onlySWF7Up && swfVersion  < 7 ) return false;
+		if ( _flags & onlySWF8Up && swfVersion < 8 ) return false;
+		return true;
+	}
 
 	/// accesor to the numerical flags value
 	int get_flags() const { return _flags; }

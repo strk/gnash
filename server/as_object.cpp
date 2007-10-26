@@ -189,11 +189,13 @@ as_object::findProperty(string_table::key key, string_table::key nsname,
 	// keep track of visited objects, avoid infinite loops.
 	std::set<as_object*> visited;
 
+	int swfVersion = _vm.getSWFVersion();
+
 	boost::intrusive_ptr<as_object> obj = this;
 	while (obj && visited.insert(obj.get()).second)
 	{
 		Property* prop = obj->_members.getProperty(key);
-		if (prop)
+		if (prop && prop->isVisible(swfVersion) )
 		{
 			if (owner != NULL)
 				*owner = obj.get();
@@ -206,42 +208,6 @@ as_object::findProperty(string_table::key key, string_table::key nsname,
 	// No Property found
 	return NULL;
 }
-
-#if 0
-/*private*/
-Property*
-as_object::findGetterSetter(string_table::key key, string_table::key nsname)
-{
-	// don't enter an infinite loop looking for __proto__ ...
-	if (key == NSV::PROP_uuPROTOuu)
-	{
-		Property* prop = _members.getProperty(key, nsname);
-		if ( ! prop ) return NULL;
-		if ( ! prop->isGetterSetter() ) return NULL;
-		return prop;
-	}
-
-	// this set will keep track of visited objects,
-	// to avoid infinite loops
-	std::set< as_object* > visited;
-
-	boost::intrusive_ptr<as_object> obj = this;
-	while ( obj && visited.insert(obj.get()).second )
-	{
-		Property* prop = obj->_members.getProperty(key, nsname);
-		if ( prop && prop->isGetterSetter() )
-		{
-			// what if a property is found which is
-			// NOT a getter/setter ?
-			return prop;
-		}
-		obj = obj->get_prototype();
-	}
-
-	// No Getter/Setter property found
-	return NULL;
-}
-#endif
 
 Property*
 as_object::findUpdatableProperty(string_table::key key, string_table::key nsname)
