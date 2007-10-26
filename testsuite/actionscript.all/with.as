@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.34 2007/10/25 07:22:03 strk Exp $";
+rcsid="$Id: with.as,v 1.35 2007/10/26 08:36:21 strk Exp $";
 
 #include "check.as"
 
@@ -247,10 +247,12 @@ objA.func();
 // create _root.clip1.clip2 
 _root.createEmptyMovieClip("clip1", 101);
 clip1.createEmptyMovieClip("clip2", 102);  
+_root.createEmptyMovieClip("clip3", 103);
 check_equals(typeof(clip1.clip2),'movieclip');
 
 clip1.testvar = 'clip1_var'; 
 clip1.clip2.testvar = 'clip2_var';  
+clip3.testvar = 'clip3_var';  
 testvar = '_root_timeline_var'; 
 _global.testvar = 'global_var';
 
@@ -281,6 +283,14 @@ setTarget('/clip1/clip2'); //tag 0x8B
     check_equals(this, _level0);
     check_equals(testvar, 'clip2_var');     
     check_equals(testvar2, 'global_var');  
+    check_equals(testvar3, undefined);  
+setTarget("");
+
+setTarget('/clip1/../clip3'); //tag 0x8B 
+    check_equals(this, _level0);
+    check_equals(testvar, 'clip3_var');     
+    check_equals(testvar2, 'global_var');  
+    check_equals(testvar3, undefined);  
 setTarget("");
 
 // first understand getproperty 
@@ -509,5 +519,5 @@ check_equals(child, "rootChild");
 #if OUTPUT_VERSION < 6
  check_totals(41);
 #else
- check_totals(90);
+ check_totals(95);
 #endif
