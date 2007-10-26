@@ -1,3 +1,8 @@
+2007-10-26 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/parser/video_stream_def.cpp: Check if iterator is valid, before
+	  using it. Fixes bug #21442.
+
 2007-10-26 Sandro Santilli <strk@keybit.net>
 
 	* server/as_prop_flags.h: add version-based ignore flags.

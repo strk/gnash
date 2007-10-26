@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.24 2007/10/26 18:43:36 tgc Exp $
+// $Id: video_stream_def.cpp,v 1.25 2007/10/26 23:30:25 tgc Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -166,10 +166,10 @@ video_stream_definition::get_frame_data(uint32_t frameNum)
 	// rewind to the nearest keyframe, or the last frame we decoded
 	while (static_cast<uint32_t>(m_last_decoded_frame+1) != it->first && it->second->frameType != KEY_FRAME && it != m_video_frames.begin()) it--;
 
-	std::auto_ptr<image::image_base> ret;
+	std::auto_ptr<image::image_base> ret(NULL);
 
 	// Decode all the frames needed to produce the requested one
-	while (it->first <= frameNum && it != m_video_frames.end()) {
+	while (it != m_video_frames.end() && it->first <= frameNum) {
 		// If this is a disposable interlaced frame, and it is not the
 		// last one to be decoded, we skip the decoding.
 		if (!(it->second->frameType == DIS_INTER_FRAME && it->first != frameNum)) {
