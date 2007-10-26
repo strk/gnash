@@ -1,3 +1,11 @@
+2007-10-26 Sandro Santilli <strk@keybit.net>
+
+	* server/as_object.cpp: have __proto__ respect the same
+	  visibility rules of other properties, check visibility
+	  rules in findUpdatableProperty.
+	* testsuite/swfdec/PASSING: one more test passing (more failing
+	  from the same set).
+
 2007-10-26 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/parser/video_stream_def.cpp: Check if iterator is valid, before

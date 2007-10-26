@@ -212,15 +212,13 @@ as_object::findProperty(string_table::key key, string_table::key nsname,
 Property*
 as_object::findUpdatableProperty(string_table::key key, string_table::key nsname)
 {
+	int swfVersion = _vm.getSWFVersion();
+
 	Property* prop = _members.getProperty(key, nsname);
-	if ( prop ) return prop;
+	if ( prop && prop->isVisible(swfVersion) ) return prop;
 
 	// don't enter an infinite loop looking for __proto__ ...
-	if (key == NSV::PROP_uuPROTOuu)
-	{
-		Property* prop = _members.getProperty(key, nsname);
-		if ( prop ) return prop;
-	}
+	if (key == NSV::PROP_uuPROTOuu) return NULL;
 
 	// this set will keep track of visited objects,
 	// to avoid infinite loops
@@ -231,7 +229,7 @@ as_object::findUpdatableProperty(string_table::key key, string_table::key nsname
 	while ( obj && visited.insert(obj.get()).second )
 	{
 		Property* prop = obj->_members.getProperty(key, nsname);
-		if ( prop && prop->isGetterSetter() )
+		if ( prop && prop->isGetterSetter() && prop->isVisible(swfVersion) )
 		{
 			// what if a property is found which is
 			// NOT a getter/setter ?
@@ -636,6 +634,8 @@ void
 as_object::copyProperties(const as_object& o)
 {
 	PropsCopier copier(*this);
+
+	// TODO: check if non-visible properties should be also copied !
 	o._members.visitValues(copier,
 			// Need const_cast due to getValue getting non-const ...
 			const_cast<as_object&>(o));
@@ -780,24 +780,18 @@ boost::intrusive_ptr<as_object>
 as_object::get_prototype()
 {
 	static string_table::key key = NSV::PROP_uuPROTOuu;
-	as_value tmp;
-	// I don't think any subclass should override getting __proto__ anyway...
-	//if ( ! get_member(key, &tmp) ) return NULL;
-	if (!_members.getValue(key, tmp, *this) ) return NULL;
+
+	int swfVersion = _vm.getSWFVersion();
+
+	boost::intrusive_ptr<as_object> nullRet;
+
+	Property* prop = _members.getProperty(key);
+	if ( ! prop ) return nullRet;
+	if ( ! prop->isVisible(swfVersion) ) return nullRet;
+
+	as_value tmp = prop->getValue(*this);
+
 	return tmp.to_object();
-
-#if 0 // the inheritance chain MUST end somewhere, handle the SWF4 thing in some other way
-	if ( m_prototype ) return m_prototype.get();
-	//log_msg(_("as_object::get_prototype(): Hit top of inheritance chain"));
-
-	// if SWF version < 5 the Object interface won't keep alive !
-	if ( _vm.getSWFVersion() > 4 )
-	{
-		return getObjectInterface();
-	}
-
-	return NULL;
-#endif
 }
 
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
