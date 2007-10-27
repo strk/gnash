@@ -219,7 +219,7 @@ as_object::findUpdatableProperty(string_table::key key, string_table::key nsname
 	// We won't scan the inheritance chain if we find a member,
 	// even if invisible.
 	// 
-	if ( prop ) return prop; // && prop->isVisible(swfVersion) ) return prop;
+	if ( prop ) return prop; 
 
 	// don't enter an infinite loop looking for __proto__ ...
 	if (key == NSV::PROP_uuPROTOuu) return NULL;

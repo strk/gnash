@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Global.as,v 1.32 2007/10/27 09:41:07 strk Exp $";
+rcsid="$Id: Global.as,v 1.33 2007/10/27 10:53:44 strk Exp $";
 
 #include "check.as"
 
@@ -125,6 +125,8 @@ check_equals(typeof(clearInterval), 'function');
 
 function get() { return this.s; }
 function set() { this.s++; }
+function get2() { return this.s2; }
+function set2() { this.s2++; }
 
 #if OUTPUT_VERSION == 5
 
@@ -156,8 +158,9 @@ function set() { this.s++; }
 
 #if OUTPUT_VERSION == 6
 
-	b = {}; b.addProperty("m", get, set);
-	a = { m:1 }; a.__proto__ = b; a.s = 9;
+	c = {}; c.addProperty("m", get2, set2);
+	b = {}; b.addProperty("m", get, set); b.__proto__ = c;
+	a = { m:1 }; a.__proto__ = b; a.s = 9; a.s2 = 99;
 	check_equals(a.m, 1);
 	ASsetPropFlags(a, "m", 256);
 	check_equals(a.m, 9);
@@ -166,9 +169,18 @@ function set() { this.s++; }
 	xcheck_equals(a.m, 2); // ignore flag was cleared
 	ASsetPropFlags(a, "m", 256);
 	check_equals(a.m, 9); // a own property was set instead
+	check(delete(a.m)); // delete a.m
+	ASsetPropFlags(b, "m", 256); // make b.m invisible
+	check_equals(a.m, 99); // b.m invisible, a.m non-existent
+	a.m=3; // will call b.m setter, even if invisible 
+	xcheck_equals(a.s, 10); // b.m setter was called
+	xcheck_equals(a.m, 99); // ignore flag on inherited property was NOT cleared
+	ASsetPropFlags(b, "m", 0, 256); // make b.m visible again
+	xcheck_equals(a.m, 10); // ignore flag was cleared
 
-	b = {}; b.addProperty("m", get, set);
-	a = { m:1 }; a.__proto__ = b; a.s = 9;
+	c = {}; c.addProperty("m", get2, set2);
+	b = {}; b.addProperty("m", get, set); b.__proto__ = c;
+	a = { m:1 }; a.__proto__ = b; a.s = 9; a.s2 = 99;
 	check_equals(a.m, 1);
 	ASsetPropFlags(a, "m", 1024);
 	check_equals(a.m, 9);
@@ -177,9 +189,18 @@ function set() { this.s++; }
 	check_equals(a.m, 9); // ignore flag wasn't cleared
 	ASsetPropFlags(a, "m", 0, 1024);
 	check_equals(a.m, 2); // a own property was set instead
+	check(delete(a.m)); // delete a.m
+	ASsetPropFlags(b, "m", 1024); // make b.m invisible
+	check_equals(a.m, 99); // b.m invisible, a.m non-existent
+	a.m=3; // will call b.m setter, even if invisible 
+	xcheck_equals(a.s, 10); // b.m setter was called
+	xcheck_equals(a.m, 99); // ignore flag on inherited property was NOT cleared
+	ASsetPropFlags(b, "m", 0, 1024); // make b.m visible again
+	xcheck_equals(a.m, 10); // ignore flag was cleared
 
-	b = {}; b.addProperty("m", get, set);
-	a = { m:1 }; a.__proto__ = b; a.s = 9;
+	c = {}; c.addProperty("m", get2, set2);
+	b = {}; b.addProperty("m", get, set); b.__proto__ = c;
+	a = { m:1 }; a.__proto__ = b; a.s = 9; a.s2 = 99;
 	check_equals(a.m, 1);
 	ASsetPropFlags(a, "m", 4096);
 	check_equals(a.m, 9);
@@ -188,13 +209,23 @@ function set() { this.s++; }
 	xcheck_equals(a.m, 2); // ignore flag was cleared
 	ASsetPropFlags(a, "m", 0, 4096);
 	check_equals(a.m, 2); // a own property was set instead
+	check(delete(a.m)); // delete a.m
+	ASsetPropFlags(b, "m", 4096); // make b.m invisible
+	check_equals(a.m, 99); // b.m invisible, a.m non-existent
+	a.m=3; // will call c.m setter, skipping invisible b.m one
+	check_equals(a.s, 9); // b.m setter was NOT called
+	check_equals(a.s2, 100); // c.m setter was called
+	check_equals(a.m, 100); // ignore flag on b.m getter-setter was NOT cleared
+	ASsetPropFlags(b, "m", 0, 4096); // make b.m visible again
+	check_equals(a.m, 9); // ignore flag on b.m was NOT cleared
 
 #endif // OUTPUT_VERSION == 6
 
 #if OUTPUT_VERSION == 7
 
-	b = {}; b.addProperty("m", get, set);
-	a = { m:1 }; a.__proto__ = b; a.s = 9;
+	c = {}; c.addProperty("m", get2, set2);
+	b = {}; b.addProperty("m", get, set); b.__proto__ = c; b.s = 8; b.s2 = 88;
+	a = { m:1 }; a.__proto__ = b; a.s = 9; a.s2 = 99;
 	check_equals(a.m, 1);
 	ASSetPropFlags(a, "m", 4096);
 	check_equals(a.m, 9); 
@@ -203,6 +234,17 @@ function set() { this.s++; }
 	xcheck_equals(a.m, 2); // ignore flag was cleared
 	ASSetPropFlags(a, "m", 0, 4096);
 	check_equals(a.m, 2); // a own property was set instead
+	check(delete(a.m)); // delete a.m
+	check_equals(b.m, 8); // ???
+	ASsetPropFlags(b, "m", 4096); // make b.m invisible (no-op in SWF7 ?)
+	check_equals(b.m, 8); // b.m getter, altought invisible, is still invoked as a getter
+	check_equals(a.m, 9); // b.m, altought invisible, is still invoked as a getter
+	a.m=3; // ??
+	check_equals(a.s, 10); // b.m, altought invisible, is still invoked as a setter
+	check_equals(a.s2, 99); // c.m is never reached (b.m was called)
+	check_equals(a.m, 10); // b.m getter, altoguth invisible, is used 
+	ASsetPropFlags(b, "m", 0, 4096); // make b.m visible again (looks like it wasn't really invisible before)
+	check_equals(a.m, 10); // ??
 
 #endif // OUTPUT_VERSION == 7
 
@@ -215,10 +257,10 @@ function set() { this.s++; }
 	check_totals(43); // SWF5
 #else
 # if OUTPUT_VERSION == 6
-	check_totals(59); // SWF6
+	check_totals(75); // SWF6
 # else
 #  if OUTPUT_VERSION == 7
-	check_totals(49); // SWF7
+	check_totals(57); // SWF7
 #  else
 	check_totals(44); // SWF8+
 #  endif

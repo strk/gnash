@@ -1,5 +1,11 @@
 2007-10-27 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Global.as: more tests about invisible
+	  flags over inherited getter-setters (most failures are for SWF6
+	  only)
+
+2007-10-27 Sandro Santilli <strk@keybit.net>
+
 	* server/as_object.cpp (findUpdatableProperty): don't overlook
 	  invisible properties in *this* object, it'll be eventually
 	  overridden.
