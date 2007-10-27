@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Global.as,v 1.30 2007/09/29 16:22:57 strk Exp $";
+rcsid="$Id: Global.as,v 1.31 2007/10/27 09:17:03 strk Exp $";
 
 #include "check.as"
 
@@ -117,4 +117,110 @@ check_equals (escape('abcdefghijklmnopqrstuvwxyz'), 'abcdefghijklmnopqrstuvwxyz'
 // We don't want to test onEnterFrame here, do we ?
 check_equals(typeof(setInterval), 'function');
 check_equals(typeof(clearInterval), 'function');
-totals();
+
+
+//------------------------------------------------------------
+// Test ASSetPropFlags
+//------------------------------------------------------------
+
+function get() { return this.s; }
+function set() { this.s++; }
+
+#if OUTPUT_VERSION == 5
+
+	a = { m:1 }; 
+	ASsetPropFlags(a, "m", 128);
+	check_equals(a.m, undefined);
+	a.m=2; // will set a own property m
+	xcheck_equals(a.m, 2); // ignore flag was cleared
+
+	a = { m:1 }; 
+	ASsetPropFlags(a, "m", 256);
+	check_equals(a.m, 1);
+	a.m=2; // will set a own property m
+	check_equals(a.m, 2); // ignore flag was cleared
+
+	a = { m:1 }; 
+	ASsetPropFlags(a, "m", 1024);
+	check_equals(a.m, undefined);
+	a.m=2; // will set a own property m
+	xcheck_equals(a.m, 2); // ignore flag was cleared
+
+	a = { m:1 }; 
+	ASsetPropFlags(a, "m", 4096);
+	check_equals(a.m, undefined);
+	a.m=2; // will set a own property m
+	xcheck_equals(a.m, 2); // ignore flag was cleared
+
+#endif // OUTPUT_VERSION == 5
+
+#if OUTPUT_VERSION == 6
+
+	b = {}; b.addProperty("m", get, set);
+	a = { m:1 }; a.__proto__ = b; a.s = 9;
+	check_equals(a.m, 1);
+	ASsetPropFlags(a, "m", 256);
+	check_equals(a.m, 9);
+	a.m=2; // won't call setter, but set a own property m and clear ignore flag
+	xcheck_equals(a.s, 9); // setter wasn't called
+	xcheck_equals(a.m, 2); // ignore flag was cleared
+	ASsetPropFlags(a, "m", 256);
+	xcheck_equals(a.m, 9); // a own property was set instead
+
+	b = {}; b.addProperty("m", get, set);
+	a = { m:1 }; a.__proto__ = b; a.s = 9;
+	check_equals(a.m, 1);
+	ASsetPropFlags(a, "m", 1024);
+	check_equals(a.m, 9);
+	a.m=2; // won't call setter, but set a own property m
+	xcheck_equals(a.s, 9); // setter wasn't called
+	xcheck_equals(a.m, 9); // ignore flag wasn't cleared
+	ASsetPropFlags(a, "m", 0, 1024);
+	xcheck_equals(a.m, 2); // a own property was set instead
+
+	b = {}; b.addProperty("m", get, set);
+	a = { m:1 }; a.__proto__ = b; a.s = 9;
+	check_equals(a.m, 1);
+	ASsetPropFlags(a, "m", 4096);
+	check_equals(a.m, 9);
+	a.m=2; // won't call setter, but set a own property m
+	xcheck_equals(a.s, 9); // setter wasn't called
+	xcheck_equals(a.m, 2); // ignore flag was cleared
+	ASsetPropFlags(a, "m", 0, 4096);
+	xcheck_equals(a.m, 2); // a own property was set instead
+
+#endif // OUTPUT_VERSION == 6
+
+#if OUTPUT_VERSION == 7
+
+	b = {}; b.addProperty("m", get, set);
+	a = { m:1 }; a.__proto__ = b; a.s = 9;
+	check_equals(a.m, 1);
+	ASSetPropFlags(a, "m", 4096);
+	check_equals(a.m, 9); 
+	a.m=2; // won't call setter, but set a own property m
+	xcheck_equals(a.s, 9); // setter wasn't called
+	xcheck_equals(a.m, 2); // ignore flag was cleared
+	ASSetPropFlags(a, "m", 0, 4096);
+	xcheck_equals(a.m, 2); // a own property was set instead
+
+#endif // OUTPUT_VERSION == 7
+
+
+//------------------------------------------------------------
+// END OF TEST
+//------------------------------------------------------------
+
+#if OUTPUT_VERSION == 5
+	check_totals(43); // SWF5
+#else
+# if OUTPUT_VERSION == 6
+	check_totals(59); // SWF6
+# else
+#  if OUTPUT_VERSION == 7
+	check_totals(49); // SWF7
+#  else
+	check_totals(44); // SWF8+
+#  endif
+# endif
+#endif
