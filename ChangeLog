@@ -1,5 +1,15 @@
 2007-10-27 Sandro Santilli <strk@keybit.net>
 
+	* server/as_prop_flags.h: add clear_visible method.
+	* server/Property.h: add clearVisible method
+	* server/as_object.cpp: clear visibility flags after
+	  overriding.
+	* testsuite/simple.exp: double timeout.
+	* testsuite/actionscript.all/Global.as: more successes
+	  (still not completed).
+
+2007-10-27 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Global.as: use 'delete a.b'
 	  instead of 'delete(a.b)' -- the latter wasn't supported
 	  by erlier Ming versions.

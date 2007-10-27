@@ -12,7 +12,7 @@ if $tracelevel {
 # This is to handle deadlocks. We don't reset the timeout when a match is
 # found to avoid hanging in case of a testcase sending matches in an infinite loops.
 # (not unlikely as it seems, think about flash movies...)
-set timeout 300
+set timeout 600
 set file all
 set params ""
 

@@ -155,6 +155,20 @@ public:
 		return true;
 	}
 
+	void clear_visible(int swfVersion) 
+	{
+		if ( swfVersion == 6)
+		{
+			// version 6, so let's forget SWFDEC_AS_VARIABLE_VERSION_7_UP flag, oops!
+			// we will still set the value though, even if that flag is set
+			_flags &= ~(onlySWF6Up|ignoreSWF6|onlySWF8Up);
+		}
+		else
+		{
+			_flags &= ~(onlySWF6Up|ignoreSWF6|onlySWF7Up|onlySWF8Up);
+		}
+	}
+
 	/// accesor to the numerical flags value
 	int get_flags() const { return _flags; }
 

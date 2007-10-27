@@ -289,6 +289,7 @@ as_object::set_member_default(string_table::key key, const as_value& val,
 			try
 			{
 				prop->setValue(*this, val);
+				prop->clearVisible(_vm.getSWFVersion());
 				return;
 			}
 			catch (ActionException& exc)

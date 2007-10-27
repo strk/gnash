@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Global.as,v 1.34 2007/10/27 13:02:27 strk Exp $";
+rcsid="$Id: Global.as,v 1.35 2007/10/27 16:43:45 strk Exp $";
 
 #include "check.as"
 
@@ -134,7 +134,7 @@ function set2() { this.s2++; }
 	ASsetPropFlags(a, "m", 128);
 	check_equals(a.m, undefined);
 	a.m=2; // will set a own property m
-	xcheck_equals(a.m, 2); // ignore flag was cleared
+	check_equals(a.m, 2); // ignore flag was cleared
 
 	a = { m:1 }; 
 	ASsetPropFlags(a, "m", 256);
@@ -146,13 +146,13 @@ function set2() { this.s2++; }
 	ASsetPropFlags(a, "m", 1024);
 	check_equals(a.m, undefined);
 	a.m=2; // will set a own property m
-	xcheck_equals(a.m, 2); // ignore flag was cleared
+	check_equals(a.m, 2); // ignore flag was cleared
 
 	a = { m:1 }; 
 	ASsetPropFlags(a, "m", 4096);
 	check_equals(a.m, undefined);
 	a.m=2; // will set a own property m
-	xcheck_equals(a.m, 2); // ignore flag was cleared
+	check_equals(a.m, 2); // ignore flag was cleared
 
 #endif // OUTPUT_VERSION == 5
 
@@ -166,7 +166,7 @@ function set2() { this.s2++; }
 	check_equals(a.m, 9);
 	a.m=2; // won't call setter, but set a own property m and clear ignore flag
 	check_equals(a.s, 9); // setter wasn't called
-	xcheck_equals(a.m, 2); // ignore flag was cleared
+	check_equals(a.m, 2); // ignore flag was cleared
 	ASsetPropFlags(a, "m", 256);
 	check_equals(a.m, 9); // a own property was set instead
 	check(delete a.m); // delete a.m
@@ -206,7 +206,7 @@ function set2() { this.s2++; }
 	check_equals(a.m, 9);
 	a.m=2; // won't call setter, but set a own property m
 	check_equals(a.s, 9); // setter wasn't called
-	xcheck_equals(a.m, 2); // ignore flag was cleared
+	check_equals(a.m, 2); // ignore flag was cleared
 	ASsetPropFlags(a, "m", 0, 4096);
 	check_equals(a.m, 2); // a own property was set instead
 	check(delete a.m); // delete a.m
@@ -231,7 +231,7 @@ function set2() { this.s2++; }
 	check_equals(a.m, 9); 
 	a.m=2; // won't call setter, but set a own property m
 	check_equals(a.s, 9); // setter wasn't called
-	xcheck_equals(a.m, 2); // ignore flag was cleared
+	check_equals(a.m, 2); // ignore flag was cleared
 	ASSetPropFlags(a, "m", 0, 4096);
 	check_equals(a.m, 2); // a own property was set instead
 	check(delete a.m); // delete a.m
