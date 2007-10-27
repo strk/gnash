@@ -1,5 +1,12 @@
 2007-10-27 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.cpp (findUpdatableProperty): don't overlook
+	  invisible properties in *this* object, it'll be eventually
+	  overridden.
+	* testsuite/actionscript.all/Global.as: more successes.
+
+2007-10-27 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Global.as: test ignore property flags
 	  effect on inherited gettersetter.
 

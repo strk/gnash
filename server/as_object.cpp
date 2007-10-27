@@ -215,7 +215,11 @@ as_object::findUpdatableProperty(string_table::key key, string_table::key nsname
 	int swfVersion = _vm.getSWFVersion();
 
 	Property* prop = _members.getProperty(key, nsname);
-	if ( prop && prop->isVisible(swfVersion) ) return prop;
+	// 
+	// We won't scan the inheritance chain if we find a member,
+	// even if invisible.
+	// 
+	if ( prop ) return prop; // && prop->isVisible(swfVersion) ) return prop;
 
 	// don't enter an infinite loop looking for __proto__ ...
 	if (key == NSV::PROP_uuPROTOuu) return NULL;
