@@ -1,5 +1,11 @@
 2007-10-27 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Global.as: use 'delete a.b'
+	  instead of 'delete(a.b)' -- the latter wasn't supported
+	  by erlier Ming versions.
+
+2007-10-27 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Global.as: more tests about invisible
 	  flags over inherited getter-setters (most failures are for SWF6
 	  only)

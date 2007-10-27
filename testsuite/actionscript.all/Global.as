@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Global.as,v 1.33 2007/10/27 10:53:44 strk Exp $";
+rcsid="$Id: Global.as,v 1.34 2007/10/27 13:02:27 strk Exp $";
 
 #include "check.as"
 
@@ -169,7 +169,7 @@ function set2() { this.s2++; }
 	xcheck_equals(a.m, 2); // ignore flag was cleared
 	ASsetPropFlags(a, "m", 256);
 	check_equals(a.m, 9); // a own property was set instead
-	check(delete(a.m)); // delete a.m
+	check(delete a.m); // delete a.m
 	ASsetPropFlags(b, "m", 256); // make b.m invisible
 	check_equals(a.m, 99); // b.m invisible, a.m non-existent
 	a.m=3; // will call b.m setter, even if invisible 
@@ -189,7 +189,7 @@ function set2() { this.s2++; }
 	check_equals(a.m, 9); // ignore flag wasn't cleared
 	ASsetPropFlags(a, "m", 0, 1024);
 	check_equals(a.m, 2); // a own property was set instead
-	check(delete(a.m)); // delete a.m
+	check(delete a.m); // delete a.m
 	ASsetPropFlags(b, "m", 1024); // make b.m invisible
 	check_equals(a.m, 99); // b.m invisible, a.m non-existent
 	a.m=3; // will call b.m setter, even if invisible 
@@ -209,7 +209,7 @@ function set2() { this.s2++; }
 	xcheck_equals(a.m, 2); // ignore flag was cleared
 	ASsetPropFlags(a, "m", 0, 4096);
 	check_equals(a.m, 2); // a own property was set instead
-	check(delete(a.m)); // delete a.m
+	check(delete a.m); // delete a.m
 	ASsetPropFlags(b, "m", 4096); // make b.m invisible
 	check_equals(a.m, 99); // b.m invisible, a.m non-existent
 	a.m=3; // will call c.m setter, skipping invisible b.m one
@@ -234,7 +234,7 @@ function set2() { this.s2++; }
 	xcheck_equals(a.m, 2); // ignore flag was cleared
 	ASSetPropFlags(a, "m", 0, 4096);
 	check_equals(a.m, 2); // a own property was set instead
-	check(delete(a.m)); // delete a.m
+	check(delete a.m); // delete a.m
 	check_equals(b.m, 8); // ???
 	ASsetPropFlags(b, "m", 4096); // make b.m invisible (no-op in SWF7 ?)
 	check_equals(b.m, 8); // b.m getter, altought invisible, is still invoked as a getter
