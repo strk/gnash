@@ -27,7 +27,6 @@ GNASH_LIBS = \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
-	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/libamf/libgnashamf.la
 
 ## WARNING: make sure GLIB_LIBS appears first

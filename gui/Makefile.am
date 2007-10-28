@@ -90,7 +90,6 @@ AM_LDFLAGS =  \
 
 GNASH_LIBS = \
 	$(top_builddir)/libamf/libgnashamf.la \
-	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/libgeometry/libgnashgeo.la \
@@ -114,16 +113,6 @@ GUI_CPPFLAGS += -DGUI_AQUA
 
 bundle_name = gnash.app
 
-bundle: Info.plist
-	@echo " Building: $(bundle_name)" 
-	-rm -rf $(bundle_name)/Contents
-	mkdir -p $(bundle_name)/Contents/MacOS
-	mkdir -p $(bundle_name)/Contents/Resources
-	echo "APPL????" > $(bundle_name)/Contents/PkgInfo
-	cp Info.plist $(bundle_name)/Contents/Info.plist
-	strip -S gnash
-	cp -f gnash $(bundle_name)/Contents/MacOS
-	cp -f images/GnashG.icns $(bundle_name)/Contents/Resources/
 
 if  HAVE_OPENGL
 noinst_LTLIBRARIES += libgnashaqua_ogl.la
@@ -184,8 +173,8 @@ GUI_SRCS = gnash.cpp \
 	NullGui.cpp NullGui.h
 
 if BUILD_AQUA_GUI
-bin_PROGRAMS += bundle
-bundle_SOURCES = $(NULL)
+BUILT_SOURCES += bundle
+EXTRA_DIST += gnash.app
 endif
 
 #
@@ -393,6 +382,17 @@ endif				# BUILD_AGG_RENDERER
 endif				# BUILD_FB_GUI
 
 CLEANFILES = klash.moc .configline gnash
+
+bundle: Info.plist
+	@echo " Building: $(bundle_name)" 
+	rm -rf $(bundle_name)/Contents
+	mkdir -p $(bundle_name)/Contents/MacOS
+	mkdir -p $(bundle_name)/Contents/Resources
+	echo "APPL????" > $(bundle_name)/Contents/PkgInfo
+	cp Info.plist $(bundle_name)/Contents/Info.plist
+	cp -f $(bin_PROGRAMS) $(bundle_name)/Contents/MacOS
+	cp -f images/GnashG.icns $(bundle_name)/Contents/Resources/
+
 
 klash.moc: $(srcdir)/kdesup.h
 	@if test x"$(MOC)" != x; then \

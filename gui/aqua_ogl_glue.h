@@ -18,12 +18,13 @@
 // 
 //
 
-/* $Id: aqua_ogl_glue.h,v 1.8 2007/07/23 01:04:18 nihilus Exp $ */
+/* $Id: aqua_ogl_glue.h,v 1.9 2007/10/28 22:01:32 bjacques Exp $ */
 
 #ifndef AQUA_OGL_GLUE_H
 #define AQUA_OGL_GLUE_H
 
 #include "aqua_glue.h"
+#include <AGL/agl.h>
 
 using namespace std;
 
@@ -38,13 +39,14 @@ class AquaOglGlue : public AquaGlue
 
     bool init(int argc, char ***argv);
     render_handler* createRenderHandler();
-    bool prepDrawingArea(int width, int height);
+    bool prepDrawingArea(int width, int height, AGLDrawable drawable);
     void setInvalidatedRegions(const InvalidatedRanges& /* ranges */);
     void render();
    private:
 #ifdef FIX_I810_LOD_BIAS
     float _tex_lod_bias;
 #endif
+    AGLContext _context;
 };
 }
 

@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aquasup.h,v 1.10 2007/07/23 01:01:31 nihilus Exp $ */
+/* $Id: aquasup.h,v 1.11 2007/10/28 22:01:32 bjacques Exp $ */
 
 #ifndef __AQUASUP_H__
 #define __AQUASUP_H__
@@ -51,6 +51,8 @@ class DSOEXPORT AquaGui : public Gui
   	void key_event(int key, bool down);
   	unsigned int	_timeout;
 
+    EventLoopTimerRef* _advance_timer;
+
 #if defined(RENDERER_OPENGL)
     AquaOglGlue		_glue;
 #ifdef FIX_I810_LOD_BIAS
@@ -68,8 +70,6 @@ class DSOEXPORT AquaGui : public Gui
     virtual bool createMenu();
     virtual bool setupEvents();
     virtual void renderBuffer();
-    virtual void setInvalidatedRegions(const InvalidatedRanges& ranges);
-    virtual void setInterval(unsigned int interval);
     virtual void setTimeout(unsigned int timeout);
 };
 

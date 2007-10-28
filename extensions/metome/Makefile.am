@@ -33,7 +33,6 @@ metome_ext_la_SOURCES = metome_ext.cpp metome_ext.h
 metome_ext_la_LDFLAGS = -module -avoid-version -no-undefined
 metome_ext_la_LIBDADD = $(LIBADD_DL) $(LIBLTDL) \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/libgnashserver.la \
 	$(PTHREAD_LIBS) \
 	$(NULL)

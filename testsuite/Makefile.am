@@ -32,7 +32,6 @@ libtestsuite_la_SOURCES = \
 	$(NULL)
 libtestsuite_la_LIBADD = \
 	$(RENDERER_LIBS) \
-	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/libbase/libgnashbase.la \

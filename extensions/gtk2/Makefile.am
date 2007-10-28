@@ -46,7 +46,6 @@ INCLUDES = -I$(srcdir)  \
 
 AM_LDFLAGS =  \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/libgnashserver.la \
 	$(GTK2_LIBS) \
 	$(GLEXT_LIBS) \

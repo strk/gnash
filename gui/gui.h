@@ -75,7 +75,9 @@ public:
     virtual bool init(int argc, char **argv[]) = 0;
 
     /// Set main loop delay in milliseconds. 
-    virtual void setInterval(unsigned int interval) = 0;
+    virtual void setInterval(unsigned int interval) {
+      _interval = interval;
+    }
 
     /// Set the time in milliseconds after which the programme should exit.
     virtual void setTimeout(unsigned int timeout) = 0;

@@ -16,6 +16,7 @@
 	<string>6.0</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+<!-- four-character Mac OS 9-style creator code -->
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleTypeExtensions</key>

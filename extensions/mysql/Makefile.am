@@ -31,7 +31,6 @@ AM_CPPFLAGS = -I$(srcdir)  \
 
 AM_LDFLAGS =  \
         $(MYSQL_LIBS) \
-	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/libgnashserver.la \
 	$(PTHREAD_LIBS) \
 	$(NULL)

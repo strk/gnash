@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua.cpp,v 1.26 2007/07/30 17:22:01 nihilus Exp $ */
+/* $Id: aqua.cpp,v 1.27 2007/10/28 22:01:32 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -42,57 +42,65 @@ extern "C"{
 
 #include <Carbon/Carbon.h>
 
+namespace gnash {
+
 WindowRef	myWindow;
 
 pascal OSStatus DoWindowClose (EventHandlerCallRef  nextHandler,
                                EventRef             theEvent,
-                               void*                userData){
+                               void*                userData)
+{
 	QuitApplicationEventLoop();
+        return noErr;
+}
+
+void DoAdvanceMovie ( EventLoopTimerRef inTimer, void * data)
+{
+   Gui::advance_movie(static_cast<Gui*>(data));
 }
   
-namespace gnash {
 	
 AquaGui::AquaGui(unsigned long xid, float scale, bool loop, unsigned int depth)
-	: Gui(xid, scale, loop, depth)
+	: Gui(xid, scale, loop, depth),
+          _advance_timer(NULL)
 {
 }
 
 AquaGui::~AquaGui()
 {
-	
+    if (_advance_timer) {
+      RemoveEventLoopTimer(*_advance_timer);
+    }
 }
 
-void AquaGui::setInterval(unsigned int interval)
-{
-    _interval = interval;
-}
 
 bool AquaGui::run()
 {
-  	GNASH_REPORT_FUNCTION;
+//  GNASH_REPORT_FUNCTION;
+    double interval = _interval / 1000.0;
 
-	RepositionWindow(myWindow, NULL, kWindowCenterOnMainScreen);
+
+    OSStatus ret = InstallEventLoopTimer (GetMainEventLoop(), 0, interval, 
+      DoAdvanceMovie, this, _advance_timer);
+    if (!ret) {
+      return ret;
+    }
+
+    RepositionWindow(myWindow, NULL, kWindowCascadeOnMainScreen);
+    SelectWindow(myWindow);
     ShowWindow(myWindow);
+    
     RunApplicationEventLoop();
     return true;
 }
 
 void AquaGui::renderBuffer()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     _glue.render();
 }
 
-void
-AquaGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
-{
-	GNASH_REPORT_FUNCTION;
-#if 0	
-    _glue.setInvalidatedRegions(ranges);
-#endif
-}
-
-bool AquaGui::init(int argc, char ***argv) /* Self-explainatory */
+bool AquaGui::init(int argc, char ***argv)
 {
 
 	OSErr err;
@@ -111,15 +119,12 @@ bool AquaGui::init(int argc, char ***argv) /* Self-explainatory */
       ExitToShell();
       }
       	
-	/* Initialize the cursor */
-	InitCursor();
-		
-#if 0                    
   	_glue.init(argc, argv);
 
     _renderer = _glue.createRenderHandler();
     if(!_renderer)return false;
-#endif    
+
+    set_render_handler(_renderer);
     return true;
 
 }
@@ -161,12 +166,9 @@ bool AquaGui::createWindow(const char* title, int width, int height)
 	GNASH_REPORT_FUNCTION;
 
 	SetRect(&theBounds, 0, 0, width, height);
-	CreateNewWindow (kDocumentWindowClass,
+	OSStatus status = CreateNewWindow ( kDocumentWindowClass,
                     	 kWindowStandardDocumentAttributes 
-                       | kWindowStandardHandlerAttribute
-                       | kWindowMetalAttribute
-                       | kWindowCompositingAttribute
-                       | kWindowInWindowMenuAttribute,
+                       | kWindowStandardHandlerAttribute,
                     	&theBounds,
                     	&myWindow);
                     	
@@ -182,8 +184,8 @@ bool AquaGui::createWindow(const char* title, int width, int height)
 	InstallWindowEventHandler (myWindow, handlerUPP,  // Install handler
                                  1, &eventType,
                                  NULL, NULL);
-	_glue.prepDrawingArea(_width, _height);
-    set_render_handler(_renderer);
+	_glue.prepDrawingArea(_width, _height, GetWindowPort(myWindow));
+
     return true;
 }
 
@@ -213,4 +215,5 @@ bool AquaGui::setupEvents()
 	return true;
 }
 
-}
+} // namespace gnash
+

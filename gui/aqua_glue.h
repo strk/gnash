@@ -18,13 +18,14 @@
 // 
 //
 
-/* $Id: aqua_glue.h,v 1.8 2007/07/24 00:04:39 nihilus Exp $ */
+/* $Id: aqua_glue.h,v 1.9 2007/10/28 22:01:32 bjacques Exp $ */
 
 #ifndef AQUA_GLUE_H
 #define AQUA_GLUE_H
 
 #include "gnash.h"
 #include "snappingrange.h"
+#include <AGL/agl.h>
 
 namespace gnash
 {
@@ -34,7 +35,7 @@ class AquaGlue
   public:
     virtual ~AquaGlue() { }
     virtual bool init(int argc, char **argv[]) = 0;
-    virtual bool prepDrawingArea(int width, int height) = 0;
+    virtual bool prepDrawingArea(int width, int height, AGLDrawable drawable) = 0;
     virtual render_handler* createRenderHandler() = 0;
     virtual void render() = 0;
   protected:

@@ -33,7 +33,6 @@ lirc_la_SOURCES = lirc_ext.cpp lirc_ext.h
 lirc_la_LDFLAGS = -module -avoid-version -no-undefined
 lirc_la_LIBDADD = $(LIBADD_DL) $(LIBLTDL) \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/libgnashserver.la \
 	$(PTHREAD_LIBS) \
 	$(NULL)

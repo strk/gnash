@@ -16,7 +16,7 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-# $Id: Makefile.am,v 1.65 2007/10/22 03:54:08 nihilus Exp $
+# $Id: Makefile.am,v 1.66 2007/10/28 22:01:31 bjacques Exp $
 
 ## Process this file with automake to generate Makefile.in
 
@@ -29,19 +29,6 @@ pluginsdir = $(libdir)/gnash/plugins
 
 ## WARNING: make sure GLIB_LIBS appears first
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
-libgnashbackend_LIBS =  \
-	$(GLIB_LIBS) \
-	$(JPEG_LIBS) \
-	$(PNG_LIBS) \
-        $(OGG_LIBS) \
-	$(Z_LIBS) \
-        $(SDL_LIBS) \
-	$(PANGO_LIBS) \
-	$(ATK_LIBS) \
-	$(X_LIBS) \
-	$(DMALLOC_LIBS)	\
-	$(PTHREAD_LIBS)	\
-	$(NULL)
 
 AM_CPPFLAGS = -I.. \
         -I$(srcdir) \
@@ -77,19 +64,7 @@ noinst_HEADERS = \
 
 # bin_PROGRAMS = gnash
 
-pkglib_LTLIBRARIES = libgnashbackend.la
-
 # RENDER_SOURCES = render_handler_tri.cpp
-
-libgnashbackend_la_LIBADD = \
-	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/server/libgnashserver.la  \
-	$(libgnashbackend_LIBS)
-
-libgnashbackend_la_SOURCES = 
-#$(SOUND_SOURCES)
-
-libgnashbackend_la_LDFLAGS = -release $(VERSION)
 
 noinst_LTLIBRARIES =		# set later on by conditionals
 

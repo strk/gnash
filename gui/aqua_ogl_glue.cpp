@@ -18,11 +18,10 @@
 // 
 //
 
-/* $Id: aqua_ogl_glue.cpp,v 1.15 2007/07/24 00:04:39 nihilus Exp $ */
+/* $Id: aqua_ogl_glue.cpp,v 1.16 2007/10/28 22:01:32 bjacques Exp $ */
 
 
 #include "aqua_ogl_glue.h"
-#include <AGL/agl.h>
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #include <OpenGL/glext.h>
@@ -36,9 +35,11 @@ namespace gnash
 {
 
 AquaOglGlue::AquaOglGlue()
+: _context(NULL)
 #ifdef FIX_I810_LOD_BIAS
-  : _tex_lod_bias(-1.2f)
+  ,_tex_lod_bias(-1.2f)
 #endif
+   
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -46,7 +47,7 @@ AquaOglGlue::AquaOglGlue()
 AquaOglGlue::~AquaOglGlue()
 {
 //    GNASH_REPORT_FUNCTION;
-
+  aglDestroyContext (_context);
 }
 
 
@@ -64,12 +65,29 @@ AquaOglGlue::init(int, char***)
       _tex_lod_bias = (float) atof(optarg);
     }
 #endif
-    return true;
+
+    const GLint glattribs[] = { AGL_RGBA, AGL_ACCELERATED,
+                                AGL_DEPTH_SIZE, 24,
+                                AGL_DOUBLEBUFFER, AGL_NONE };
+                              
+    AGLPixelFormat pixfmt = aglChoosePixelFormat ( NULL, 0, glattribs);
+        
+
+    _context = aglCreateContext (pixfmt, NULL);
+    if (!_context) {
+      aglDestroyPixelFormat(pixfmt);
+      return false;
+    }
+
+    bool ret = aglSetCurrentContext(_context);
+    aglDestroyPixelFormat(pixfmt);
+
+    return ret; 
 }
 
 render_handler* AquaOglGlue::createRenderHandler()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     render_handler* renderer = create_render_handler_ogl();
 #ifdef FIX_I810_LOD_BIAS
     glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, _tex_lod_bias);
@@ -77,7 +95,7 @@ render_handler* AquaOglGlue::createRenderHandler()
     return renderer;
 }
 
-bool AquaOglGlue::prepDrawingArea(int width, int height)
+bool AquaOglGlue::prepDrawingArea(int width, int height, AGLDrawable drawable)
 {
 	GNASH_REPORT_FUNCTION;
     //SDL_SetVideoMode(width, height, _bpp, sdl_flags | SDL_OPENGL);
@@ -104,14 +122,15 @@ bool AquaOglGlue::prepDrawingArea(int width, int height)
 #ifdef FIX_I810_LOD_BIAS
     glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, _tex_lod_bias);
 #endif
-    return true;
+    bool ret = aglSetDrawable(_context, drawable);
+    
+    return ret;
 }
 
 void AquaOglGlue::render()
 {
-    GNASH_REPORT_FUNCTION;
-    //SDL_GL_SwapBuffers();
-    aglUpdateContext(aglGetCurrentContext());
+//    GNASH_REPORT_FUNCTION;
+    aglSwapBuffers(_context);
 }
 
 } // namespace gnash

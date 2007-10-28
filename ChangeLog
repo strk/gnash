@@ -1,3 +1,19 @@
+2007-10-27 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* various Makefile.am: Remove libgnashbackend, since it is
+	unused and OS X's `ar' chokes on the empty archive we
+	currently create.
+	* gui/Makefile.am: Don't put the gnash script in the Carbon
+	bundle; instead, put bin_PROGRAMS in it.
+	* gui/aqua.cpp: Implement the event loop necessary to draw
+	the renderer.
+	* gui/aqua_glue.h: Pass a window pointer to the rendering glue
+	so the glue can attach the renderer to the window.
+	* gui/aqua_ogl_glue.{cpp,h}: Implement the aqua GUI by setting
+	up an OpenGL context.
+	* gui/gui.h: Add a default implementation for setInterval since
+	it is the same for most renderers.
+
 2007-10-27 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/swfdec/PASSING: add new successes

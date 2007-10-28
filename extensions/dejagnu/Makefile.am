@@ -31,7 +31,6 @@ INCLUDES = -I$(srcdir)  \
 
 AM_LDFLAGS =  \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/libgnashserver.la \
 	$(PTHREAD_LIBS) \
 	$(NULL)
