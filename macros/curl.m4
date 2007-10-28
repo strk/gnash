@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: curl.m4,v 1.19 2007/10/13 23:24:07 rsavoye Exp $
+dnl $Id: curl.m4,v 1.20 2007/10/28 21:06:51 eh9 Exp $
 
 AC_DEFUN([GNASH_PATH_CURL],
 [
@@ -110,6 +110,9 @@ AC_DEFUN([GNASH_PATH_CURL],
           fi # }
         fi # }
       done # }
+      if test x"${ac_cv_path_curl_lib}" = x; then # {
+        AC_MSG_RESULT(no)
+      fi # }
     fi # }
 
   fi # }
