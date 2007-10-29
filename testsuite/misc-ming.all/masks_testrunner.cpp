@@ -77,12 +77,12 @@ main(int /*argc*/, char** /*argv*/)
 
 	rgba red(255,0,0,255);
 	rgba green(0,255,0,255);
-	rgba blue(0,255,0,255);
+	rgba blue(0,0,255,255);
 	rgba yellow(255,255,0,255);
 	rgba cyan(0,255,255,255);
 	rgba violet(255,0,255,255);
 	rgba dark_green(0,128,0,255);
-	rgba light_blue(0,0,128,255);
+	rgba light_blue(0,128,255,255);
 
 	// 14,232 = red
 	check( invalidated.contains(14, 232) );
@@ -106,7 +106,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	// 14,331 = blue
 	check( invalidated.contains(14, 331) );
-	xcheck_pixel(14,331, 2, blue, 2);
+	check_pixel(14,331, 2, blue, 2);
 	// 48,331 = violet (blue behind)
 	check( invalidated.contains(48, 331) );
 	check_pixel(48,331, 2, violet, 2);
@@ -119,10 +119,10 @@ main(int /*argc*/, char** /*argv*/)
 	check_pixel(214,331, 2, dark_green, 2);
 	// 248,331 = light_blue (dark_green behind)
 	check( invalidated.contains(248, 331) );
-	xcheck_pixel(248,331, 2, light_blue, 2);
+	check_pixel(248,331, 2, light_blue, 2);
 	// 276,331 = light_blue
 	check( invalidated.contains(276, 331) );
-	xcheck_pixel(276,331, 2, light_blue, 2);
+	check_pixel(276,331, 2, light_blue, 2);
 
 
 }
