@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Date.as,v 1.32 2007/10/26 08:26:54 strk Exp $";
+rcsid="$Id: Date.as,v 1.33 2007/10/29 21:07:34 cmusick Exp $";
 
 #include "check.as"
 
@@ -532,8 +532,9 @@ check_equals(typeof(foo), 'string');
  check_equals(foo.indexOf("Feb"), 8);
 #else
  check_equals(typeof(bar), 'number');
- // correct: "foo 950569200000"
- check_equals(foo.substring(0, 10), 'foo 950569');
+ // correct: "foo 950569200000", but only for the timezone
+ // of the original author
+ check_equals(foo.substring(0, 7), 'foo 950');
 #endif
 
 totals();

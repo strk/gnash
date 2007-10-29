@@ -135,6 +135,20 @@ as_object::getByIndex(int index)
 	return const_cast<Property *>(obj->_members.getPropertyByOrder(index));
 }
 
+as_object*
+as_object::get_super()
+{
+	// TODO: Implement
+	return NULL;
+}
+
+as_function*
+as_object::get_constructor()
+{
+	// TODO: Implement
+	return NULL;
+}
+
 int
 as_object::nextIndex(int index, as_object **owner)
 {
@@ -483,6 +497,8 @@ as_object::set_member_flags(string_table::key name,
 void
 as_object::add_interface(as_object* obj)
 {
+	assert(obj);
+
 	if (std::find(mInterfaces.begin(), mInterfaces.end(), obj) == mInterfaces.end())
 		mInterfaces.push_back(obj);
 	else
@@ -492,27 +508,23 @@ as_object::add_interface(as_object* obj)
 bool
 as_object::instanceOf(as_function* ctor)
 {
-	boost::intrusive_ptr<as_object> obj = this;
+	if (this == ctor->getPrototype())
+		return true;
 
-	std::set< as_object* > visited;
-
-	if (this == ctor)
-	{ assert(0); }
-	while (obj && visited.insert(obj.get()).second )
+	if (!mInterfaces.empty())
 	{
-		if (!mInterfaces.empty() &&
-			std::find(mInterfaces.begin(), mInterfaces.end(), obj) != mInterfaces.end())
+		// TODO: Make this work.
+		if (std::find(mInterfaces.begin(), mInterfaces.end(), ctor->getPrototype()) != mInterfaces.end())
+		{
 			return true;
-		if ( obj->get_prototype() == ctor->getPrototype() ) return true;
-		obj = obj->get_prototype(); 
+		}
 	}
 
-	// See actionscript.all/Inheritance.as for a way to trigger this
-	IF_VERBOSE_ASCODING_ERRORS(
-	if ( obj ) log_aserror(_("Circular inheritance chain detected during instanceOf call"));
-	);
-
-	return false;
+	as_object *proto = this->get_prototype().get();
+	if (proto)
+		return proto->instanceOf(ctor);
+	else
+		return false;
 }
 
 bool

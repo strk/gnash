@@ -1,3 +1,20 @@
+2007-10-30 Chad Musick <chadmusick@msbx.net>
+
+	* server/StreamProvider.cpp: Even if LIBCURL is not being used,
+	  URLAccessManager.h must be included.
+	* server/as_object.h,.cpp: Make instanceOf a recursive function
+	  so that non-proper properties, like interfaces, will be correctly
+	  searched. Add get_super() and get_constructor() functions, not yet
+	  implemented.
+	* server/namedStrings.h,.cpp: Add another anonymous string.
+	* server/asobj/ClassHierarchy.cpp: Add prototypes to loaded objects if
+	  they don't do so themselves.
+	* server/vm/ASHandlers.cpp: ImplementsOp -- not quite working, yet.
+	* server/vm/Machine.h,.cpp: More work toward AS3 ability.
+	* testsuite/actionscript.all/Date.as: Fix bogus test -- the time
+	  returned depends on local timezone, so you can't check to the second.
+	* server/vm/SafeStack.h, server/vm/CodeStream.h -- Comment updates.
+
 2007-10-27 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/MovieTester.cpp (checkPixel): multiply tolerance by

@@ -472,6 +472,20 @@ public:
 	bool isXML() const { return false; /* TODO */ }
 	bool isDictionary() const { return false; /* TODO */ }
 
+	/// Get the super object of this object.
+	///
+	/// The super should be __proto__ if this is a prototype object
+	/// itself, or __proto__.__proto__ if this is not a prototype
+	/// object. This is only conceptual however, and may be more
+	/// convoluted to obtain the actual super.
+	as_object* get_super(); 
+
+	/// Get the constructor for this object.
+	///
+	/// This is the AS constructor for this object. When invoked, it
+	/// should initialize the object passed as 'this'
+	as_function* get_constructor();
+
 	/// Get a member as_value by name in an AS-compatible way
 	//
 	/// NOTE that this method is non-const becase a property

@@ -1,3 +1,5 @@
+// Machine.h A VM to run AS3 code, and AS2 code in the future.
+//
 //   Copyright (C) 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
@@ -127,36 +129,77 @@ public:
 
 	void execute();
 
-	/// push a function call to be executed next.
+	/// push a get call to be executed next.
 	///
-	/// Any asBinding can be pushed, and it will appropriate value
-	/// into return_slot.  This ensures that getter/setter properties
+	/// Any Property can be pushed, and it will put an appropriate value
+	/// into return_slot.  This ensures that getter properties
 	/// can be accessed in the same way as other properties, and hides
 	/// the difference between ActionScript methods and native C++ methods.
 	///
-	/// @param stack_in
-	/// The initial stack size when the function is entered. This can be used
-	/// to pass 'this' and other parameters to the call.
-	///
-	/// @param stack_out
-	/// The maximum number of values to leave on the stack when the function
-	/// returns.
+	/// @param this_obj
+	/// The 'this' to use for a getter/setter if it exists.
 	///
 	/// @param return_slot
 	/// A space for the return value. An assignment will always be made here,
 	/// but mVoidSlot can be used for values that will be discarded.
 	///
-	/// @param pBind
-	/// The binding.  If this is only a partial binding, then
-	/// the 'this' value will be used to complete it, when possible.
-	/// Sending a null binding will result in a no-op, not an error.
-	void pushCall(unsigned int stack_in, as_value *return_slot,
-		Property *pBind);
+	/// @param prop
+	/// The property. If this is a value, it simply returns that value in
+	/// the return_slot immediately. Otherwise, it may immediately call
+	/// the gettter or it may push that onto the call stack and transfer
+	/// control. Callers can be agnostic as to which happens.
+	void pushGet(as_object *this_obj, as_value& return_slot, Property *prop);
 
-	void immediateFunction(as_function *to_call, as_value& storage,
-		as_object *pThis);
-	void immediateProcedure(as_function *to_call, as_object *pthis,
-		const as_value *stackAdditions, unsigned int stackAdditionsCount);
+	/// push a set call to be executed next.
+	///
+	/// Any Property can be pushed, and it will set the property, if possible.
+	/// setter properties and simple properties alike will be handled by this.
+	///
+	/// @param this_obj
+	/// The 'this' to use for a getter/setter if it exists.
+	///
+	/// @param value
+	/// The value which should be set
+	///
+	/// @param prop
+	/// The property desired to be set.
+	///
+	void pushSet(as_object *this_obj, as_value& value, Property *prop);
+
+	/// push a call to be executed next
+	///
+	/// Push a call to be executed as soon as execution of the current opcode
+	/// finishes. At the end, transfer will return to the previous context.
+	///
+	/// @param func
+	/// The function to call
+	///
+	/// @param pThis
+	/// The object to act as the 'this' pointer.
+	///
+	/// @param return_slot
+	/// The slot to use for returns. Use mIgnoreReturn if you don't care
+	/// what happens here.
+	///
+	/// @param stack_in
+	/// How many of the values on the stack are for the new context
+	///
+	/// @param stack_out
+	/// How much of the stack should be left behind when the function exits.
+	/// For example: 0 will leave a stack which is stack_in shorter than it
+	/// was on call. 1 will leave a stack which is 1 taller than it was on
+	/// call.
+	///
+	/// RESTRICTION: stack_in - stack_out must not be negative
+	void pushCall(as_function *func, as_object *pThis, as_value& return_slot,
+		unsigned char stack_in, short stack_out);
+
+	void immediateFunction(const as_function *to_call, as_object* pThis,
+		as_value& storage, unsigned char stack_in, short stack_out);
+
+	void immediateProcedure(const as_function *to_call, as_object *pthis,
+		unsigned char stack_in, short stack_out)
+	{ immediateFunction(to_call, pthis, mIgnoreReturn, stack_in, stack_out); }
 
 	Machine(string_table &ST, ClassHierarchy *CH);
 

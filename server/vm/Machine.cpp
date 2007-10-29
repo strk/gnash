@@ -1,3 +1,4 @@
+// Machine.cpp A machine to run AS3 code, with AS2 code in the future
 //
 //   Copyright (C) 2007 Free Software Foundation, Inc.
 //
@@ -22,6 +23,7 @@
 #include "namedStrings.h"
 #include "array.h"
 #include "abc_block.h"
+#include "fn_call.h"
 
 namespace gnash {
 
@@ -120,8 +122,7 @@ static inline asName pool_name(uint32_t index, abc_block* pool)
 		if (b)																\
 		{																	\
 			mStream->seekTo(opStart);										\
-			mStack.push(*e);												\
-			pushCall(1, e, b);												\
+			pushGet(e->to_object().get(), *e, b);							\
 			break;															\
 		}																	\
 	}																		\
@@ -148,8 +149,7 @@ static inline asName pool_name(uint32_t index, abc_block* pool)
 		if (d)																\
 		{																	\
 			mStream->seekTo(opStart);										\
-			mStack.push(*c);												\
-			pushCall(1, c, d);												\
+			pushGet(c->to_object().get(), *c, d);							\
 			break;															\
 		}																	\
 	}																		\
@@ -323,7 +323,7 @@ Machine::execute()
 		Property *b = super->findProperty(a.getName(), 
 			a.getNamespace()->getURI());
 		// The object is on the top already.
-		pushCall(1, &mStack.top(0), b);
+		pushGet(super, mStack.top(0), b);
 		break;
 	}
 /// 0x05 ABC_ACTION_SETSUPER
@@ -349,8 +349,8 @@ Machine::execute()
 			throw ASReferenceError();
 		Property* b = super->findProperty(a.getName(), 
 			a.getNamespace()->getURI());
-		// The object is on the top already.
-		pushCall(1, &mStack.top(0), b);
+		mStack.push(vobj);
+		pushSet(super, vobj, b);
 		break;
 	}
 /// 0x06 ABC_ACTION_DXNS
@@ -780,8 +780,11 @@ Machine::execute()
 		mStack.drop(1);
 		if (!b)
 			mStack.top(0).set_undefined();
-		else // The top of the stack is obj, as it should be.
-			pushCall(1, &mStack.top(0), const_cast<Property*>(b));
+		else
+		{
+			mStack.drop(1);
+			pushGet(obj, mStack.top(0), const_cast<Property*>(b));
+		}
 		break;
 	}
 /// 0x24 ABC_ACTION_PUSHBYTE
@@ -984,13 +987,19 @@ Machine::execute()
 	case SWF::ABC_ACTION_CALL:
 	{
 		uint32_t argc = mStream->read_V32();
-		ENSURE_OBJECT(mStack.top(argc + 1));
+		ENSURE_OBJECT(mStack.top(argc + 1)); // The func
+		ENSURE_OBJECT(mStack.top(argc)); // The 'this'
 		as_function *f = mStack.top(argc + 1).to_as_function();
-		// argc + 1 will be dropped, and mStack.top(argc + 1)
-		// will be the top of the stack, so that is where the
-		// return value should go. (Currently it is the func)
-		Property b(0, 0, f, NULL);
-		pushCall(argc + 1, &mStack.top(argc + 1), &b);
+		as_object *obj = mStack.top(argc).to_object().get();
+		// We start with argc + 2 values related to this call
+		// on the stack. We want to end with 1 value. We pass
+		// argc values (the parameters), so we need to drop
+		// one more than we pass and store the return just
+		// below that one. Thus:
+		// return is mStack.top(argc + 1)
+		// bottom of arguments is argc deep
+		// drop 1 more value than is passed, on return
+		pushCall(f, obj, mStack.top(argc + 1), argc, -1);
 		break;
 	}
 /// 0x42 ABC_ACTION_CONSTRUCT
@@ -1005,7 +1014,7 @@ Machine::execute()
 		uint32_t argc = mStream->read_V32();
 		as_function *f = mStack.top(argc).to_as_function();
 		Property b(0, 0, f, NULL);
-		pushCall(argc, &mStack.top(argc), &b);
+		pushCall(f, NULL, mStack.top(argc), argc, 0);
 		break;
 	}
 /// 0x43 ABC_ACTION_CALLMETHOD
@@ -1021,14 +1030,21 @@ Machine::execute()
 		uint32_t argc = mStream->read_V32();
 		ENSURE_OBJECT(mStack.top(argc));
 		as_object *obj = mStack.top(argc).to_object().get();
-		Property *b = NULL; // TODO: obj->findProperty(dispatch_id);
-		if (!b)
+		Property *f = obj->getByIndex(dispatch_id);
+		as_function* func;
+		if (f->isGetterSetter())
 		{
-			mStack.drop(argc);
-			mStack.top(0).set_undefined();
-			break;
+			// Likely an error, but try to handle it.
+			func = f->getGetter();
 		}
-		pushCall(argc + 1, &mStack.top(argc), b);
+		else if (f->getValue(*obj).is_function())
+			func = f->getValue(*obj).to_as_function();
+		else
+		{
+			// Definitely an error, and not the kind we can handle.
+			throw ASException();
+		}
+		pushCall(func, obj, mStack.top(argc), argc, 0);
 		break;
 	}
 /// 0x44 ABC_ACTION_CALLSTATIC
@@ -1042,8 +1058,10 @@ Machine::execute()
 	{
 		asMethod *m = pool_method(mStream->read_V32(), mPoolObject);
 		uint32_t argc = mStream->read_V32();
-		Property b; //TODO: asBinding b(m);
-		pushCall(argc + 1, &mStack.top(argc), &b);
+		as_function *func = m->getPrototype();
+		ENSURE_OBJECT(mStack.top(argc));
+		as_object *obj = mStack.top(argc).to_object().get();
+		pushCall(func, obj, mStack.top(argc), argc, 0);
 		break;
 	}
 /// 0x45 ABC_ACTION_CALLSUPER
@@ -1065,16 +1083,20 @@ Machine::execute()
 		int dropsize = completeName(a);
 		ENSURE_OBJECT(mStack.top(argc + dropsize));
 		mStack.drop(dropsize);
-		ENSURE_OBJECT(mStack.top(argc));
-		as_object *super = mStack.top(argc).to_object()->get_prototype().get();
+		as_object *super = mStack.top(argc).to_object()->get_super();
 		if (!super)
 			throw ASReferenceError();
 		Property *b = super->findProperty(a.getName(), 
 			a.getNamespace()->getURI());
+		if (!b)
+			throw ASReferenceError();
+		as_function *f = b->isGetterSetter() ? b->getGetter() :
+			b->getValue(super).to_as_function();
+
 		if (opcode == SWF::ABC_ACTION_CALLSUPER)
-			pushCall(argc + 1, &mStack.top(argc), b);
-		else
-			pushCall(argc + 1, &mIgnoreReturn, b);
+			pushCall(f, super, mStack.top(argc), argc, 0);
+		else // Void call
+			pushCall(f, super, mIgnoreReturn, argc, -1); // drop obj too.
 		break;
 	}
 /// 0x46 ABC_ACTION_CALLPROPERTY
@@ -1099,21 +1121,33 @@ Machine::execute()
 		uint32_t argc = mStream->read_V32();
 		int shift = completeName(a, argc);
 		ENSURE_OBJECT(mStack.top(shift + argc));
-		// Ugly setup. Any name stuff is between the args and the object.
-		if (shift)
+		as_object *obj = mStack.top(argc + shift).to_object().get();
+		Property *b = obj->findProperty(a.getName(), 
+			a.getNamespace()->getURI());
+		if (!b)
+			throw ASReferenceError();
+
+		as_function *func;
+		if (b->isGetterSetter())
 		{
-			uint32_t i = argc;
-			while (i--)
-				mStack.top(i + shift) = mStack.top(i);
-			mStack.drop(shift);
+			if (lex_only)
+			{
+				mStack.top(argc + shift).set_undefined();
+				mStack.drop(argc + shift);
+				break;
+			}
+			else
+			{
+				func = b->getGetter();
+			}
 		}
-		Property *b = mStack.top(argc).to_object()->
-			findProperty(a.getName(), a.getNamespace()->getURI());
-		//TODO: b->setLexOnly(lex_only);
-		if (opcode == SWF::ABC_ACTION_CALLPROPVOID)
-			pushCall(argc + 1, &mIgnoreReturn, b);
 		else
-		pushCall(argc + 1, &mStack.top(argc), b);
+			func = b->getValue(obj).to_as_function();
+
+		if (opcode == SWF::ABC_ACTION_CALLPROPVOID)
+			pushCall(func, obj, mIgnoreReturn, argc, -shift - 1);
+		else
+			pushCall(func, obj, mStack.top(argc + shift), argc, -shift);
 		break;
 	}
 /// 0x47 ABC_ACTION_RETURNVOID
@@ -1135,6 +1169,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_RETURNVALUE:
 	{
 		// Slot the return.
+		if (mGlobalReturn != &mStack.top(0));
 		*mGlobalReturn = mStack.top(0);
 		// And restore the previous state.
 		restoreState();
@@ -1143,17 +1178,27 @@ Machine::execute()
 /// 0x49 ABC_ACTION_CONSTRUCTSUPER
 /// Stream: V32 'arg_count'
 /// Stack In:
+///  argN ... arg1 -- the arg_count arguments
 ///  obj -- the object whose super's constructor should be invoked
-///  arg1 ... argN -- the arg_count arguments
 /// Stack Out:
 ///  .
 	case SWF::ABC_ACTION_CONSTRUCTSUPER:
 	{
+		// TODO
 		uint32_t argc = mStream->read_V32();
 		ENSURE_OBJECT(mStack.top(argc));
-		asMethod *m = findSuper(mStack.top(argc), true)->getConstructor();
-		Property b; //TODO: asBinding b(m);
-		pushCall(argc + 1, &mIgnoreReturn, &b);
+		as_object *obj = mStack.top(argc).to_object().get();
+		as_object *super = mStack.top(argc).to_object()->get_super();
+		if (!super)
+		{
+			throw ASException();
+			break;
+		}
+		as_function *func = super->get_constructor();
+		// 'obj' is the 'this' for the call, we ignore the return, there are
+		// argc arguments, and we drop all of the arguments plus 'obj' from
+		// the stack.
+		pushCall(func, obj, mIgnoreReturn, argc, -1);
 		break;
 	}
 /// 0x4A ABC_ACTION_CONSTRUCTPROP
@@ -1167,6 +1212,7 @@ Machine::execute()
 ///   'name_offset'(arg1, ..., argN)
 	case SWF::ABC_ACTION_CONSTRUCTPROP:
 	{
+		// TODO
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		uint32_t argc = mStream->read_V32();
 		int shift = completeName(a, argc);
@@ -1197,7 +1243,7 @@ Machine::execute()
 /// NB: This builds an object from its properties, it's not a constructor.
 	case SWF::ABC_ACTION_NEWOBJECT:
 	{
-		as_object *obj = mCH->newOfType(NSV::CLASS_OBJECT);
+		as_object *obj = new as_object;
 		uint32_t argc = mStream->read_V32();
 		int i = argc;
 		while (i--)
@@ -1222,14 +1268,13 @@ Machine::execute()
 	case SWF::ABC_ACTION_NEWARRAY:
 	{
 		uint32_t asize = mStream->read_V32();
-		as_object *obj = mCH->newOfType(NSV::CLASS_ARRAY);
-		as_array_object *array = dynamic_cast<as_array_object*> (obj);
-		array->resize(asize);
+		as_array_object *arr = new as_array_object;
+		arr->resize(asize);
 		uint32_t i = asize;
 		while (i--)
-			array->set_indexed(i, mStack.value(i));
+			arr->set_indexed(i, mStack.value(i));
 		mStack.drop(asize - 1);
-		mStack.top(0) = array;
+		mStack.top(0) = arr;
 		break;
 	}
 /// 0x57 ABC_ACTION_NEWACTIVATION
@@ -1252,9 +1297,12 @@ Machine::execute()
 	{
 		uint32_t cid = mStream->read_V32();
 		asClass *c = pool_class(cid, mPoolObject);
-		asMethod *m = c->getConstructor();
-		Property b; //TODO: asBinding b(m);
-		pushCall(1, &mStack.top(0), &b);
+		ENSURE_OBJECT(mStack.top(0));
+		as_object *obj = mStack.top(0).to_object().get();
+		as_function *func = c->getConstructor()->getPrototype();
+		// func is the constructor, obj is 'this' and also the return
+		// value, no arguments, no change in stack.
+		pushCall(func, obj, mStack.top(0), 0, 0);
 		break;
 	}
 /// 0x59 ABC_ACTION_GETDESCENDANTS
@@ -1301,16 +1349,19 @@ Machine::execute()
 	{
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		mStack.drop(completeName(a));
-		Property *b = NULL; //TODO: asBinding *b = findProperty(a);
-		if (0)//!b)
+		as_object *owner;
+		Property *b = mCurrentScope->findProperty(a.getName(), 
+			a.getNamespace()->getURI(), &owner);
+		if (!b)
+		{
 			if (opcode == SWF::ABC_ACTION_FINDPROPSTRICT)
 				throw ASReferenceError();
 			else
 				mStack.push(as_value());
+		}
 		else
 		{
-			mStack.push(as_value());
-			pushCall(0, &mStack.top(0), b);
+			mStack.push(owner);
 		}
 		break;
 	}
@@ -1333,13 +1384,14 @@ Machine::execute()
 	case SWF::ABC_ACTION_GETLEX:
 	{
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
-		// The name is expected to be complete.
-		Property *b = NULL; //TODO: asBinding *b = findProperty(a);
-		if (0)//!b)
-			throw ASReferenceError();
-		//TODO: b->setLexOnly(b);
+		as_object *owner;
+		Property *b = mCurrentScope->findProperty(a.getName(),
+			a.getNamespace()->getURI(), &owner);
+		if (!b)
+			throw ASException();
+
 		mStack.grow(1);
-		pushCall(0, &mStack.top(0), b);
+		pushGet(owner, mStack.top(0), b);
 		break;
 	}
 /// 0x61 ABC_ACTION_SETPROPERTY
@@ -2242,13 +2294,7 @@ Machine::getMember(asClass* pDefinition, asName& name,
 {
 	if (!instance.is_object())
 		throw ASTypeError();
-
-	return; // TODO:
 #if 0
-	asBinding *pBinding = pDefinition->getBinding(name.getName());
-	if (pBinding->isWriteOnly())
-		throw ASReferenceError();
-
 	if (!pBinding->isGetSet())
 	{
 		//TODO: mStack.push(pBinding->getFromInstance(instance));
@@ -2340,89 +2386,76 @@ Machine::findSuper(as_value &v, bool find_for_primitive)
 }
 
 void
-Machine::immediateFunction(as_function *to_call, as_value& storage,
-	as_object *pThis)
+Machine::immediateFunction(const as_function *to_call, as_object *pThis,
+	as_value& storage, unsigned char stack_in, short stack_out)
 {
-	// TODO: Implement
+	// TODO: Set up the fn, or remove the need.
+	fn_call fn(NULL, NULL, 0, 0);
+	mStack.drop(stack_in - stack_out);
+	saveState();
+	mThis = pThis;
+	mStack.grow(stack_in - stack_out);
+	mStack.setDownstop(stack_in);
+	storage = const_cast<as_function*>(to_call)->call(fn);
+	restoreState();
 }
 
 void
-Machine::immediateProcedure(as_function *to_call, as_object *pthis,
-	const as_value *stackAdditions, unsigned int stackAdditionsCount)
+Machine::pushGet(as_object *this_obj, as_value &return_slot, Property *prop)
 {
-	// TODO: Implement
-}
-
-void
-Machine::pushCall(unsigned int stack_in, as_value *return_slot,
-	Property *pBind)
-{
-	if (!pBind)
+	if (!prop)
 		return;
-	//TODO
-#if 0
-	switch (pBind->mType)
+
+	if (prop->isGetterSetter())
 	{
-	default:
-	case asBinding::T_ACCESS:
-	case asBinding::T_CLASS:
-		throw ASException();
+		//TODO pushCall(prop->getGetter(), this_obj, return_slot, 0);
 		return;
-	case asBinding::T_VALUE:
-		*return_slot = pBind->getValue()->getCurrentValue();
-		return;
-	case asBinding::T_METHOD:
-		break;
 	}
 
-	asMethod *m = pBind->getMethod();
+	return_slot = prop->getValue(*this_obj);
+}
 
-	if (!(m->isNative() || m->hasBody()))
-		throw ASException();
+void
+Machine::pushSet(as_object *this_obj, as_value &value, Property *prop)
+{
+	if (!prop)
+		return;
+
+	if (prop->isGetterSetter())
+	{
+		mStack.push(value);
+		//TODO pushCall(prop->getSetter(), this_obj, mIgnoreReturn, 1);
+		return;
+	}
+
+	prop->setValue(*this_obj, value);
+}
+
+void
+Machine::pushCall(as_function *func, as_object *pthis, as_value& return_slot,
+	unsigned char stack_in, short stack_out)
+{
+	if (1 || func->isBuiltin())
+	{
+		immediateFunction(func, pthis, return_slot, stack_in, stack_out);
+		return;
+	}
+	// TODO: Make this work for stackless.
 
 	// Here is where the SafeStack shines:
 	// We set the stack the way it should be on return.
-	// If the return slot is the deepest parameter, leave room for it.
-	if (stack_in && (return_slot == &mStack.top(stack_in - 1)))
-		mStack.drop(stack_in - 1);
-	else // The return slot is somewhere else.
-		mStack.drop(stack_in);
+	mStack.drop(stack_in - stack_out);
 	// We save that state.
 	saveState();
-	// Set the 'this' object for the new call.
-	if (stack_in == 0)
-		mThis = mDefaultThis;
-	else
-		mThis = mStack.value(0).to_object().get(); // Checked in caller.
-	// We make the stack appear empty.
-	mStack.fixDownstop();
-	// We grow to reclaim the parameters. Since this is a SafeStack, they
-	// were not lost.
-	mStack.grow(stack_in);
-
-	// Native functions have to be called now.
-	if (m->isNative())
-	{
-		//TODO: return_slot = m->CallNative(mStack, mGlobalScope);
-		restoreState();
-		return;
-	}
-
-	// The scope stack should be fixed for non-native calls.
-	mScopeStack.fixDownstop();
-	//TODO: mScopeStack.push(m->getActivation());
-	if (!mScopeStack.empty())
-		mCurrentScope = mScopeStack.top(0).mScope;
-	else
-		mCurrentScope = NULL;
-
-	// We set the stream and return as given in the method and call.
-	//TODO: mStream = m->getBody();
-	mGlobalReturn = return_slot;
+	// Set the 'this' for the new call
+	mThis = pthis;
+	// Retrieve the stack. (It wasn't lost)
+	mStack.grow(stack_in - stack_out);
+	// And then we set the downstop
+	mStack.setDownstop(stack_in);
 
 	// When control goes to the main loop of the interpreter, it will
 	// automatically start executing the method.
-#endif
 }
 
 void

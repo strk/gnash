@@ -27,8 +27,8 @@
 #ifdef USE_CURL
 //# include <curl/curl.h>
 # include "curl_adapter.h"
-#include "URLAccessManager.h"
 #endif
+#include "URLAccessManager.h"
 #include "log.h"
 #include "rc.h" // for rcfile
 

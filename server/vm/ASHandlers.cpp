@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.145 2007/10/25 09:37:35 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.146 2007/10/29 21:07:34 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1358,27 +1358,51 @@ SWFHandlers::ActionCastOp(ActionExec& thread)
 	}
 
 	env.drop(1);
-	if ( instance->instanceOf(super) )
+	if (instance->instanceOf(super))
 	{
+		fprintf(stderr, "Cast succeeded.\n");
 		env.top(0) = as_value(instance);
 	}
 	else
 	{
-		env.top(0) = as_value();
+		fprintf(stderr, "Cast failed.\n");
+		env.top(0).set_null(); // null, not undefined.
 	}
 
 	log_msg(_("ActionCastOp TESTING"));
 }
 
 void
-SWFHandlers::ActionImplementsOp(ActionExec& /*thread*/)
+SWFHandlers::ActionImplementsOp(ActionExec& thread)
 {
 //	GNASH_REPORT_FUNCTION;
+//	TODO: This doesn't work quite right, yet.
+	as_environment& env = thread.env;
 
-    // assert(thread.code[thread.pc] == SWF::ACTION_IMPLEMENTSOP);
+	thread.ensureStack(2);
 
-    //as_environment& env = thread.env;
-    log_unimpl (__PRETTY_FUNCTION__);
+	as_object *obj = env.pop().to_object().get();
+	int count = static_cast<int>(env.pop().to_number(&env));
+	as_value a(1);
+
+	if (!obj)
+	{
+		log_msg(_("In ImplementsOp, not an object.\n"));
+		return;
+	}
+	obj = obj->get_prototype().get();
+	if (!obj)
+	{
+		log_msg(_("In ImplementsOp, object had no prototype.\n"));
+		return;
+	}
+
+	thread.ensureStack(count);
+	while (count--)
+	{
+		as_object *inter = env.pop().to_as_function()->getPrototype().get();
+		obj->add_interface(inter);
+	}
 }
 
 void
@@ -3492,6 +3516,7 @@ SWFHandlers::ActionExtends(ActionExec& thread)
 	}
 	env.drop(2);
 
+	fprintf(stderr, "Extending.\n");
 	sub->extends(*super);
 
 	//log_msg(_("%s: testing"), __PRETTY_FUNCTION__);

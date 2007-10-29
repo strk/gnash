@@ -101,7 +101,7 @@ public:
 				super.set_undefined();
 				return super;
 			}
-			if (!super.is_object())
+			if (!super.is_as_function())
 			{
 				// Error here -- not an object.
 				// TODO: Log the error.
@@ -115,8 +115,8 @@ public:
 			// Successfully loaded it, now find it, set its proto, and return.
 			as_value us;
 			mTarget->get_member(mDeclaration.name, &us);
-			if (0 && mDeclaration.super_name)
-				us.to_object()->set_prototype(boost::intrusive_ptr<as_object>(super.to_object()));
+			if (mDeclaration.super_name && !us.to_object()->get_prototype())
+				us.to_object()->set_prototype(super.to_as_function()->getPrototype());
 			fprintf(stderr, "Loaded ourselves.\n");
 			return us;
 		}
@@ -158,7 +158,7 @@ public:
 				super.set_undefined();
 				return super;
 			}
-			if (!super.is_object())
+			if (!super.is_as_function())
 			{
 				// Error here -- not an object.
 				// TODO: Log the error.
@@ -170,8 +170,8 @@ public:
 		// Successfully loaded it, now find it, set its proto, and return.
 		as_value us;
 		mTarget->get_member(mDeclaration.name, &us);
-		if (0 && mDeclaration.super_name)
-			us.to_object()->set_prototype(boost::intrusive_ptr<as_object>(super.to_object()));
+		if (mDeclaration.super_name && !us.to_object()->get_prototype())
+			us.to_object()->set_prototype(super.to_as_function()->getPrototype());
 		return us;
 	}
 };

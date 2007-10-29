@@ -160,7 +160,8 @@ typedef enum {
 		NS_FLASH_UI,
 		NS_ADOBE_UTILS,
 		INTERNAL_TYPE, // The type name
-		INTERNAL_STACK_PARENT // Any public property is unsafe
+		INTERNAL_STACK_PARENT, // Any public property is unsafe
+		INTERNAL_INTERFACES
 	} named_strings;
 
 /// Load the prenamed strings.

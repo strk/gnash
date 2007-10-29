@@ -1,3 +1,7 @@
+// SafeStack.h A stack which doesn't drop or free references until explicitly
+// asked to do so, so that values outside of the stack are guaranteed good
+// in an appropriate scope.
+//
 //   Copyright (C) 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify

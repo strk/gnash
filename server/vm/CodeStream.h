@@ -1,3 +1,5 @@
+// CodeStream.h A class which allows bounds-checked reading from a char array
+//
 //   Copyright (C) 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
