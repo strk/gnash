@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 dnl Copyright (C) 2006 Steven G. Johnson <stevenj@alum.mit.edu>.
-dnl $Id: pthreads.m4,v 1.32 2007/10/13 23:24:08 rsavoye Exp $
+dnl $Id: pthreads.m4,v 1.33 2007/10/29 16:38:08 eh9 Exp $
 
 AC_DEFUN([GNASH_PATH_PTHREADS],
 [
@@ -88,7 +88,7 @@ case "${host_cpu}-${host_os}" in
   *darwin*)
     pthread_flags="none"
     ;;
-  *mingw*)
+  *mingw* | *cygwin*)
     pthread_flags="-mthreads"
     ;;
   *solaris*)
@@ -115,7 +115,7 @@ if test x"$pthreads" = xno; then
       -*)
         AC_MSG_CHECKING([whether pthreads work with $flag])
         PTHREAD_CFLAGS="$flag"
-	      PTHREAD_LIBS=""
+	PTHREAD_LIBS=""
         ;;
 
       pth-config)
@@ -178,16 +178,17 @@ dnl Try a manual search, useful for cross-compiling
 if test x"${PTHREAD_LIBS}" = "x"; then
   AC_MSG_CHECKING([searching for pthread library])
   for i in $libslist; do
-   if test -f $i/libpthread.a -o -f $i/libpthread.${shlibext} -o -f $i/libpthread.dylib; then
+    if test -f $i/libpthread.a -o -f $i/libpthread.${shlibext} -o -f $i/libpthread.dylib; then
       pthreads=yes
-     if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
-       PTHREAD_LIBS="-L$i -lpthread"
-       break
+      if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
+        PTHREAD_LIBS="-L$i -lpthread"
+        AC_MSG_RESULT([using $PTHREAD_LIBS])
+        break
       else
-       PTHREAD_LIBS="-lpthread"
-       break
-     fi
-      AC_MSG_RESULT(yes)
+        PTHREAD_LIBS="-lpthread"
+        AC_MSG_RESULT([using $PTHREAD_LIBS])
+        break
+      fi
     fi
   done
   if test x"${PTHREAD_LIBS}" = "x"; then
