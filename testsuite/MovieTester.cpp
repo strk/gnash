@@ -275,7 +275,7 @@ MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 
 		// Find minimum tolerance as a function of BPP
 
-		unsigned short minRendererTolerance = tolerance;
+		unsigned short minRendererTolerance = 1;
 		unsigned int bpp = handler.getBitsPerPixel();
 		if ( bpp ) 
 		{
@@ -284,7 +284,7 @@ MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 		}
 
 		//unsigned short tol = std::max(tolerance, minRendererTolerance);
-		unsigned short tol = tolerance*minRendererTolerance; //std::max(tolerance, minRendererTolerance);
+		unsigned short tol = tolerance*minRendererTolerance; 
 
 	        ss << "exp:" << color.toShortString() << " ";
 	        ss << "obt:" << obt_col.toShortString() << " ";
