@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.103 2007/10/29 16:38:55 strk Exp $ */
+/* $Id: character.h,v 1.104 2007/10/29 21:23:16 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -556,6 +556,9 @@ public:
 	void setMask(character* mask)
 	{
 		if ( _mask == mask ) return;
+
+		set_invalidated();
+
 		if ( _mask )
 		{
 			// TODO: should we reset any original clip depth

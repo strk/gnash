@@ -1,3 +1,25 @@
+2007-10-30 Sandro Santilli <strk@keybit.net>
+
+	* server/character.h (setMask): set character as invalidated
+	  when it's mask change. Needs more care: when the mask itself
+	  changes, we should find a way to invalidate the maskee as well,
+	  but we currently have no refefence from the mask to the maskee.
+	* server/dlist.cpp (display): add support for dynamic masks.
+	  Needs more care: test what happens with nested masks, check if
+	  it is possible to trigger infinite recursions.
+	* server/sprite_instance.cpp (sprite_setMask); draft support for
+	  setMask. Needs more care: forbid a character to mask itself,
+	  see care needed in dlist to avoid infinite recursion (A masks B
+	  contining B2 maksing A)
+	* testsuite/misc-ming.all/DrawingApiTest.as: turn user-defined cursor
+	  into a mask or disable the mask on click (toggle). Needs testing
+	  in the runner.
+	* testsuite/misc-ming.all/masks_test.c: add comments.
+	* testsuite/misc-ming.all/masks_testrunner.cpp: add section testing
+	  for setMask effects on rendering. Needs more care: add test for
+	  effect of swapDepth on next advance.
+
+
 2007-10-30 Chad Musick <chadmusick@msbx.net>
 
 	* server/StreamProvider.cpp: Even if LIBCURL is not being used,
@@ -15,7 +37,7 @@
 	  returned depends on local timezone, so you can't check to the second.
 	* server/vm/SafeStack.h, server/vm/CodeStream.h -- Comment updates.
 
-2007-10-27 Sandro Santilli <strk@keybit.net>
+2007-10-29 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/MovieTester.cpp (checkPixel): multiply tolerance by
 	  minimum renderer tolerance.

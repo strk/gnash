@@ -761,6 +761,17 @@ DisplayList::display()
 		character* ch = it->get();
 		assert(ch);
 
+		character* mask = ch->getMask();
+		if ( mask && ! mask->isUnloaded() )
+		{
+			render::begin_submit_mask();
+			mask->display();
+			render::end_submit_mask();
+			ch->display();
+			render::disable_mask();
+			continue;
+		}
+
 		assert(! ch->isUnloaded() ); // we don't advance unloaded chars
 
 		// Check if this charater or any of its parents is a mask.

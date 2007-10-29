@@ -127,21 +127,21 @@ main(int argc, char** argv)
 	dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
 	it = SWFMovie_add(mo, (SWFBlock)dejagnuclip);
 	SWFDisplayItem_setDepth(it, 1000);
-	SWFMovie_nextFrame(mo); 
+	SWFMovie_nextFrame(mo);  // FRAME 2 starts here
 
 	add_actions(mo, "note('Test masks and dynamic masks at different depth ranges.');");
 
 	// this one seems to confuse the MM player
 	//add_static_mask(mo, "mask1", 1, 0, 150, 200, 100, 20);
 
-	add_static_mc(mo, "staticmc2", 2, 0, 200, 60, 60, 255, 0, 0);
-	add_static_mc(mo, "staticmc3", 3, 30, 200, 60, 60, 255, 255, 0);
-	add_static_mc(mo, "staticmc4", 4, 200, 200, 60, 60, 0, 255, 0);
-	add_static_mc(mo, "staticmc5", 5, 230, 200, 60, 60, 0, 255, 255);
-	add_dynamic_mc(mo, "dynamicmc2", 12, 0, 300, 60, 60, 0, 0, 255);
-	add_dynamic_mc(mo, "dynamicmc3", 13, 30, 300, 60, 60, 255, 0, 255);
-	add_dynamic_mc(mo, "dynamicmc4", 14, 200, 300, 60, 60, 0, 128, 0);
-	add_dynamic_mc(mo, "dynamicmc5", 15, 230, 300, 60, 60, 0, 128, 255);
+	add_static_mc(mo, "staticmc2", 2, 0, 200, 60, 60, 255, 0, 0); // red
+	add_static_mc(mo, "staticmc3", 3, 30, 200, 60, 60, 255, 255, 0); // yellow
+	add_static_mc(mo, "staticmc4", 4, 200, 200, 60, 60, 0, 255, 0); // green
+	add_static_mc(mo, "staticmc5", 5, 230, 200, 60, 60, 0, 255, 255); // cyan
+	add_dynamic_mc(mo, "dynamicmc2", 12, 0, 300, 60, 60, 0, 0, 255); // blue
+	add_dynamic_mc(mo, "dynamicmc3", 13, 30, 300, 60, 60, 255, 0, 255); // violet
+	add_dynamic_mc(mo, "dynamicmc4", 14, 200, 300, 60, 60, 0, 128, 0); // dark green
+	add_dynamic_mc(mo, "dynamicmc5", 15, 230, 300, 60, 60, 0, 128, 255); // light blue
 
 
 	check_equals(mo, "staticmc2.getDepth()", "-16382");
@@ -153,18 +153,18 @@ main(int argc, char** argv)
 	check_equals(mo, "dynamicmc4.getDepth()", "14"); 
 	check_equals(mo, "dynamicmc5.getDepth()", "15"); 
 
-	SWFMovie_nextFrame(mo);        
+	SWFMovie_nextFrame(mo);  // FRAME 3 starts here
 
 	add_actions(mo, "note('Using setMask on chars in the static depth range 2.mask(3) and 5.mask(5)');");
 
 	add_actions(mo, 
-		"staticmc2.setMask(staticmc3);"
-		"staticmc5.setMask(staticmc4);"
-		"dynamicmc2.setMask(dynamicmc3);"
-		"dynamicmc5.setMask(dynamicmc4);"
+		"staticmc2.setMask(staticmc3);" // red masked by yellow
+		"staticmc5.setMask(staticmc4);" // cyan masked by green
+		"dynamicmc2.setMask(dynamicmc3);" // blue masked by violet
+		"dynamicmc5.setMask(dynamicmc4);" // light blue masked by dark green 
 		);
 
-	SWFMovie_nextFrame(mo);        
+	SWFMovie_nextFrame(mo);  // FRAME 4 starts here
 
 	add_actions(mo, "note('Swapping chars 2/3 and 4/5 to see if masks are still in effect');");
 
@@ -183,7 +183,6 @@ main(int argc, char** argv)
 	check_equals(mo, "dynamicmc3.getDepth()", "12");
 	check_equals(mo, "dynamicmc4.getDepth()", "15"); 
 	check_equals(mo, "dynamicmc5.getDepth()", "14"); 
-
 
 	add_actions(mo, "_root.totals(); stop();");
 

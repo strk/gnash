@@ -1060,14 +1060,41 @@ static as_value
 sprite_setMask(const fn_call& fn)
 {
 	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
-	UNUSED(sprite);
 
-	static bool warned = false;
-	if ( ! warned )
+	if ( ! fn.nargs )
 	{
-		log_unimpl("MovieClip.setMask()");
-		warned=true;
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("%s.setMask() : needs an argument"), sprite->getTarget().c_str());
+		);
+		return as_value();
 	}
+
+	as_value& arg = fn.arg(0);
+	if ( arg.is_null() || arg.is_undefined() )
+	{
+		// disable mask
+		sprite->setMask(NULL);
+	}
+	else
+	{
+
+		boost::intrusive_ptr<as_object> obj ( arg.to_object() );
+		character* ch = dynamic_cast<character*>(obj.get());
+		if ( ! ch )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("%s.setMask(%s) : first argument is not a character"),
+				sprite->getTarget().c_str(), arg.to_debug_string().c_str());
+			);
+			return as_value();
+		}
+
+		// ch is possibly NULL, which is intended
+		sprite->setMask(ch); 
+	}
+
+	log_debug("MovieClip.setMask() TESTING");
+
 	return as_value();
 }
 

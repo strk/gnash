@@ -59,10 +59,11 @@ main(int /*argc*/, char** /*argv*/)
 	invalidated = tester.getInvalidatedRanges();
 	check( invalidated.contains(76, 4) ); // the "-xtrace enabled-" label...
 
-	tester.advance(); // FRAME 2
+	// FRAME 2 -- masks at different depth ranges
+	tester.advance();
 	
 	check_equals(root->get_play_state(), sprite_instance::PLAY);
-	check_equals(root->get_current_frame(), 1);
+	check_equals(root->get_current_frame(), 1); // 0-based
 	check_equals(root->getDisplayList().size(), 9);
 	root->getDisplayList().dump();
 	check( tester.findDisplayItemByName(*root, "staticmc2") );
@@ -75,6 +76,7 @@ main(int /*argc*/, char** /*argv*/)
 	check( tester.findDisplayItemByName(*root, "dynamicmc5") );
 	invalidated = tester.getInvalidatedRanges();
 
+	rgba white(255,255,255,255);
 	rgba red(255,0,0,255);
 	rgba green(0,255,0,255);
 	rgba blue(0,0,255,255);
@@ -124,6 +126,55 @@ main(int /*argc*/, char** /*argv*/)
 	check( invalidated.contains(276, 331) );
 	check_pixel(276,331, 2, light_blue, 2);
 
+	// FRAME 3
+	tester.advance();
+
+	// test effects of setMask here
+
+	// 14,232 = white (red not covered by its yellow mask)
+	check( invalidated.contains(14, 232) );
+	check_pixel(14,232, 2, white, 2);
+	// 48,232 = red (visible in the yellow mask)
+	check( invalidated.contains(48, 232) );
+	check_pixel(48,232, 2, red, 2);
+	// 80,232 = white (red not covered by its yellow mask)
+	check( invalidated.contains(80, 232) );
+	check_pixel(80,232, 2, white, 2);
+
+	// 214,232 = white (cyan not covered by its green mask)
+	check( invalidated.contains(214, 232) );
+	check_pixel(214,232, 2, white, 2);
+	// 248,232 = cyan (visible in its green mask)
+	check( invalidated.contains(248, 232) );
+	check_pixel(248,232, 2, cyan, 2);
+	// 276,232 = white (cyan not covered by its green mask)
+	check( invalidated.contains(276, 232) );
+	check_pixel(276,232, 2, white, 2);
+
+	// 14,331 = white (blue not covered by its violet mask)
+	check( invalidated.contains(14, 331) );
+	check_pixel(14,331, 2, white, 2);
+	// 48,331 = blue (visible in its violet mask)
+	check( invalidated.contains(48, 331) );
+	check_pixel(48,331, 2, blue, 2);
+	// 80,331 = white (blue not covered by its violet mask)
+	check( invalidated.contains(80, 331) );
+	check_pixel(80,331, 2, white, 2);
+
+	// 214,331 = white (light_blue not covered by its dark_green mask)
+	check( invalidated.contains(214, 331) );
+	check_pixel(214,331, 2, white, 2);
+	// 248,331 = light_blue (visible in its dark_green mask)
+	check( invalidated.contains(248, 331) );
+	check_pixel(248,331, 2, light_blue, 2);
+	// 276,331 = white (light_blue not covered by its dark_green mask)
+	check( invalidated.contains(276, 331) );
+	check_pixel(276,331, 2, white, 2);
+
+	// FRAME 3
+	tester.advance();
+
+	// test effects of swapDepth (should be none)
 
 }
 

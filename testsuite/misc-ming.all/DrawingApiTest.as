@@ -8,7 +8,7 @@
 //	gnash DrawingApi.swf
 //
 
-rcsid="$Id: DrawingApiTest.as,v 1.14 2007/09/14 16:32:38 strk Exp $";
+rcsid="$Id: DrawingApiTest.as,v 1.15 2007/10/29 21:23:16 strk Exp $";
 
 #include "../actionscript.all/check.as"
 
@@ -313,3 +313,23 @@ with(cursor)
 		}
 	};
 }
+
+
+isMask = false;
+onMouseDown = function()
+{
+	if ( isMask )
+	{
+		a.setMask(); // no effect !
+		a.setMask(true); // no effect !
+		trace("Disabling cursor mask");
+		a.setMask(undefined); // works
+		//a.setMask(null); // also work
+	}
+	else
+	{
+		trace("Enabling cursor mask");
+		a.setMask(cursor);
+	}
+	isMask = !isMask;
+};
