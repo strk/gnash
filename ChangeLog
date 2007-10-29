@@ -1,3 +1,10 @@
+2007-10-27 Sandro Santilli <strk@keybit.net>
+
+	* server/as_object.{cpp,h} (findUpdatableProperty): return
+	  static properties in inheritance chain if found, as correctly
+	  documented in the header file (need an ABC compiler for real 
+	  testing).
+
 2007-10-27 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* various Makefile.am: Remove libgnashbackend, since it is

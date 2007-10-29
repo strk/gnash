@@ -90,8 +90,9 @@ private:
 		return *this;
 	}
 
-	/// Find an existing property for update, only scaning the inheritance chain for getter/setters
-	/// or statics.
+	/// \brief
+	/// Find an existing property for update, only scaning the inheritance chain for
+	/// getter/setters or statics.
 	//
 	/// NOTE: updatable here doesn't mean the property isn't protected from update
 	///       but only that a set_member will NOT create a new property (either

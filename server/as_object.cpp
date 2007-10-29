@@ -233,7 +233,7 @@ as_object::findUpdatableProperty(string_table::key key, string_table::key nsname
 	while ( obj && visited.insert(obj.get()).second )
 	{
 		Property* prop = obj->_members.getProperty(key, nsname);
-		if ( prop && prop->isGetterSetter() && prop->isVisible(swfVersion) )
+		if ( prop && ( prop->isGetterSetter() || prop->isStatic() ) && prop->isVisible(swfVersion) )
 		{
 			// what if a property is found which is
 			// NOT a getter/setter ?
@@ -242,7 +242,7 @@ as_object::findUpdatableProperty(string_table::key key, string_table::key nsname
 		obj = obj->get_prototype();
 	}
 
-	// No Getter/Setter property found in inheritance chain
+	// No Getter/Setter or Static property found in inheritance chain
 	return NULL;
 }
 
@@ -284,20 +284,17 @@ as_object::set_member_default(string_table::key key, const as_value& val,
 			return;
 		}
 
-		// TODO: add isStatic() check in findUpdatableProperty ?
-		//if (prop->isGetterSetter() || prop->isStatic()) {
-			try
-			{
-				prop->setValue(*this, val);
-				prop->clearVisible(_vm.getSWFVersion());
-				return;
-			}
-			catch (ActionException& exc)
-			{
-				log_msg(_("%s: Exception %s. Will create a new member"),
-					_vm.getStringTable().value(key).c_str(), exc.what());
-			}
-		//}
+		try
+		{
+			prop->setValue(*this, val);
+			prop->clearVisible(_vm.getSWFVersion());
+			return;
+		}
+		catch (ActionException& exc)
+		{
+			log_msg(_("%s: Exception %s. Will create a new member"),
+				_vm.getStringTable().value(key).c_str(), exc.what());
+		}
 
 		return;
 	}
