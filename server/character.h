@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.102 2007/10/26 13:03:56 strk Exp $ */
+/* $Id: character.h,v 1.103 2007/10/29 16:38:55 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -97,7 +97,6 @@ public:
 	/// Return true if this instance replaced an other one at same depth
 	bool placedByReplaceTag() const { return _replace; }
 
-
 private:
 
 	/// Original depth
@@ -154,6 +153,9 @@ private:
 	/// For dynamically-created instances this is always NULL
 	///
 	std::auto_ptr<TimelineInfo> _timelineInfo;
+
+	/// The character masking this instance (if any)
+	character* _mask;
 
 protected:
 
@@ -376,11 +378,22 @@ public:
         return depthInRemovedZone(get_depth());
     }
     
-    /// This value is used for m_clip_depth when the value has no meaning, ie.
-    /// the character is not a mask. Depths below -16384 are illegal, so this
+    /// This value is used for m_clip_depth when 
+    /// the character is not a layer mask.
+    //
+    /// Depths below -16384 are illegal, so this
     /// value should not collide with real depths.  
+    ///
     static const int noClipDepthValue = -1000000;
-	
+
+    /// This value is used for m_clip_depth when 
+    /// the character is a dynamic mask.
+    //
+    /// Depths below -16384 are illegal, so this
+    /// value should not collide with real depths.  
+    ///
+    static const int dynClipDepthValue = -2000000;
+
 	// Maybe it's better to move all these constants to DisplayListTag
 	static const int noRatioValue = -1;
 
@@ -396,6 +409,7 @@ public:
 	m_display_callback_user_ptr(NULL),
 	_unloaded(false),
 	_destroyed(false),
+	_mask(0),
 	m_visible(true),
 	m_parent(parent),
 	m_invalidated(true),
@@ -491,19 +505,77 @@ public:
     /// tells us to use the character as a mask for all the objects contained 
     /// in the display list from m_depth to m_clipping_depth inclusive.
     /// 
-    /// The value returned by get_clip_depth() is only valid when isMask()
+    /// The value returned by get_clip_depth() is only valid when isMaskLayer()
     /// returns true!
     ///  
     int get_clip_depth() const { return m_clip_depth; }
 
-    /// See get_clip_depth()
-    void set_clip_depth(int d) { m_clip_depth = d; }
+	/// See get_clip_depth()
+	void set_clip_depth(int d)
+	{
+		m_clip_depth = d;
+		_mask = 0; // in case we're masked by some other char
+	}
     
-    /// Returns true when the character (and it's childs) are used as a mask
-    /// for other characters. isMask() does *not* return true when one of it's
-    /// parents is a mask and the character itself is not.
-    ///   
-    bool isMask() const { return m_clip_depth!=noClipDepthValue; }
+	/// Returns true when the character (and it's childs) is used as a mask
+	/// for other characters at higher depth (up to get_clip_depth).
+	/// isMaskLayer() does *not* return true when one of it's
+	/// parents is a mask and the character itself is not.
+	///
+	/// See also isDynamicMask() and isMask()
+	///   
+	bool isMaskLayer() const
+	{
+		return (m_clip_depth!=noClipDepthValue);
+	}
+
+	/// Returns true when the character (and it's childs) is used as a mask
+	/// for another character.
+	/// isDynamicMask() does *not* return true when one of it's
+	/// parents is a mask and the character itself is not.
+	///
+	/// NOTE: there's no way to obtain the maskee from a dynamic mask
+	///
+	/// See also isMaskLeyer() and isMask()
+	///   
+	bool isDynamicMask() const
+	{
+		return (m_clip_depth==dynClipDepthValue);
+	}
+
+	/// Return the character masked by this instance (if any)
+	character* getMask() const
+	{
+		return _mask;
+	}
+
+	/// Register a character as a mask for this instance.
+	///
+	/// @param mask The character to use as a mask, possibly NULL.
+	///
+	void setMask(character* mask)
+	{
+		if ( _mask == mask ) return;
+		if ( _mask )
+		{
+			// TODO: should we reset any original clip depth
+			//       specified by PlaceObject tag ?
+			_mask->set_clip_depth(noClipDepthValue);
+		}
+		_mask = mask;
+		if ( mask )
+		{
+			/// Mark the mask as a dynamic one
+			mask->set_clip_depth(dynClipDepthValue); 
+		}
+	}
+
+
+	/// Returns true if this character is a mask (either layer or dynamic mask)
+	bool isMask() const
+	{
+		return isDynamicMask() || isMaskLayer();
+	}
 
     virtual void set_name(const char* name) { _name = name; }
 
@@ -593,7 +665,7 @@ public:
 	///
 	virtual void has_mouse_event() {}
 
-	// Movie interfaces.  By default do nothing.  sprite_instance and some others override these.
+	/// Render this character
 	virtual void	display() {}
 
     	/// Returns local, untransformed height of this character in TWIPS

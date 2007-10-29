@@ -749,78 +749,72 @@ DisplayList::unload()
 void
 DisplayList::display()
 {
-  testInvariant();
+	testInvariant();
 
-    //GNASH_REPORT_FUNCTION;
-    std::stack<int> clipDepthStack;
+	//GNASH_REPORT_FUNCTION;
+	std::stack<int> clipDepthStack;
     
-    // We only advance characters which are out of the "removed" zone (or should we check isUnloaded?)
-    iterator it = beginNonRemoved(_charsByDepth);
-    //iterator it = _charsByDepth.begin();
-    for(iterator endIt = _charsByDepth.end(); it != endIt; ++it)
-    {
-        character* ch = it->get();
-        assert(ch);
+	// We only advance characters which are out of the "removed" zone (or should we check isUnloaded?)
+	iterator it = beginNonRemoved(_charsByDepth);
+	for(iterator endIt = _charsByDepth.end(); it != endIt; ++it)
+	{
+		character* ch = it->get();
+		assert(ch);
 
-  if ( ch->isUnloaded() ) // debugging
-  {
-    log_error("character at depth %d is unloaded", ch->get_depth());
-    abort();
-  }
-  assert(! ch->isUnloaded() ); // we don't advance unloaded chars
+		assert(! ch->isUnloaded() ); // we don't advance unloaded chars
 
-
-        // Check if this charater or any of its parents is a mask.
-        // Characters act as masks should always be rendered to the
-        // mask buffer despite their visibility.
-        character * parent = ch->get_parent();
-        bool renderAsMask = ch->isMask();
-        while(!renderAsMask && parent)
-        {
-            renderAsMask = parent->isMask();
-            parent = parent->get_parent();
-        }
+		// Check if this charater or any of its parents is a mask.
+		// Characters acting as masks should always be rendered to the
+		// mask buffer despite their visibility.
+		//
+		character * parent = ch->get_parent();
+		bool renderAsMask = ch->isMaskLayer();
+		while(!renderAsMask && parent)
+		{
+		    renderAsMask = parent->isMaskLayer();
+		    parent = parent->get_parent();
+		}
         
-        // check for non-mask hiden characters
-        if( !renderAsMask && (ch->get_visible() == false))
-        {
-            // Avoid stale old_invalidated_rect
-            ch->clear_invalidated(); 
-            // Don't display non-mask hiden characters
-            continue;
-        }
+		// check for non-mask hiden characters
+		if( !renderAsMask && (ch->get_visible() == false))
+		{
+			// Avoid stale old_invalidated_rect
+			ch->clear_invalidated(); 
+			// Don't display non-mask hidden characters
+			continue;
+		}
     
-        int depth = ch->get_depth();
-        // Discard useless masks
-        while(!clipDepthStack.empty() && (depth > clipDepthStack.top()))
-        {
-            clipDepthStack.pop();
-            render::disable_mask();
-        }
+		int depth = ch->get_depth();
+		// Discard useless masks
+		while(!clipDepthStack.empty() && (depth > clipDepthStack.top()))
+		{
+			clipDepthStack.pop();
+			render::disable_mask();
+		}
 
-        int clipDepth = ch->get_clip_depth();
-        // Push a new mask to the masks stack
-        if(clipDepth != character::noClipDepthValue)
-        {
-            clipDepthStack.push(clipDepth);
-            render::begin_submit_mask();
-        }
+		int clipDepth = ch->get_clip_depth();
+		// Push a new mask to the masks stack
+		if(clipDepth != character::noClipDepthValue)
+		{
+			clipDepthStack.push(clipDepth);
+			render::begin_submit_mask();
+		}
         
-        ch->display();
+		ch->display();
         
-        // Notify the renderer that mask drawing has finished.
-        if (ch->isMask())
-        {
-            render::end_submit_mask();
-        }
-    } //end of for
+		// Notify the renderer that mask drawing has finished.
+		if (ch->isMaskLayer())
+		{
+			render::end_submit_mask();
+		}
+	} //end of for
 
-    // Discard any remaining masks
-    while(!clipDepthStack.empty())
-    {
-        clipDepthStack.pop();
-        render::disable_mask();
-    }
+	// Discard any remaining masks
+	while(!clipDepthStack.empty())
+	{
+		clipDepthStack.pop();
+		render::disable_mask();
+	}
 }
 
 /*public*/
@@ -964,7 +958,7 @@ DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
     
     
     // Mask "drawing" has finished
-    if (dobj->isMask())
+    if (dobj->isMaskLayer())
     {
       drawing_mask = false; // end_submit_mask equivalent
     }

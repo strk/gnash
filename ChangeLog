@@ -1,5 +1,12 @@
 2007-10-27 Sandro Santilli <strk@keybit.net>
 
+	* server/character.h: add setMask, getMask, isDynamiMask,
+	  rename isMask to isMaskLayer, add change isMask to check both
+	  dynamic and static masks.
+	* server/dlist.cpp: replace isMask with isMaskLayer
+
+2007-10-27 Sandro Santilli <strk@keybit.net>
+
 	* server/as_object.{cpp,h} (findUpdatableProperty): return
 	  static properties in inheritance chain if found, as correctly
 	  documented in the header file (need an ABC compiler for real 
