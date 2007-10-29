@@ -1,5 +1,7 @@
 2007-10-27 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/MovieTester.cpp (checkPixel): multiply tolerance by
+	  minimum renderer tolerance.
 	* testsuite/misc-ming.all/masks_testrunner.cpp: fix color values,
 	  which reveals all tests pass (need to add tests for setMask next).
 	* server/character.h: add setMask, getMask, isDynamiMask,

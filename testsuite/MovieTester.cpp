@@ -283,7 +283,8 @@ MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 			minRendererTolerance = int(ceil(exp2(8 - bpp/3)));
 		}
 
-		unsigned short tol = std::max(tolerance, minRendererTolerance);
+		//unsigned short tol = std::max(tolerance, minRendererTolerance);
+		unsigned short tol = tolerance*minRendererTolerance; //std::max(tolerance, minRendererTolerance);
 
 	        ss << "exp:" << color.toShortString() << " ";
 	        ss << "obt:" << obt_col.toShortString() << " ";
