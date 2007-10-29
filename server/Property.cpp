@@ -43,8 +43,8 @@ Property::getDelayedValue(const as_object& this_ptr) const
 	return (*a->mGetter)(fn);
 
 	as_value v;	
-	VM::get().getMachine()->immediateFunction(a->mGetter, v,
-		const_cast<as_object*>(&this_ptr));
+	VM::get().getMachine()->immediateFunction(a->mGetter, 
+		const_cast<as_object*>(&this_ptr),	v, 0, 0);
 	if (mDestructive)
 	{
 		((boundType) mBound) = v;
@@ -63,8 +63,9 @@ Property::setDelayedValue(as_object& this_ptr, const as_value& value)
 	(*a->mSetter)(fn);
 	return;
 
-	VM::get().getMachine()->immediateProcedure(a->mSetter, &this_ptr,
-		&value, 1);
+	// TODO: Push value
+	VM::get().getMachine()->immediateProcedure(a->mSetter,
+		const_cast<as_object*>(&this_ptr), 1, 0);
 }
 
 void

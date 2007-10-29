@@ -198,9 +198,15 @@ public:
 
 	/// Set the setter
 	void setSetter(as_function*);
+	/// Get the setter, throws if not a getter/setter
+	as_function *getSetter()
+	{ return boost::get<as_accessors>(mBound).mSetter; }
 
 	/// Set the getter
 	void setGetter(as_function*);
+	/// Get the getter, throws if not a getter/setter
+	as_function *getGetter()
+	{ return boost::get<as_accessors>(mBound).mGetter; }
 
 	/// is this a read-only member ?
 	bool isReadOnly() const { return _flags.get_read_only(); }
