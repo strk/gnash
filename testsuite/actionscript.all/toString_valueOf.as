@@ -21,6 +21,8 @@
  */
 
 
+rcsid="$Id: toString_valueOf.as,v 1.27 2007/10/30 17:53:53 strk Exp $";
+
 #include "check.as"
 
 //
@@ -456,4 +458,32 @@ a3 = a1 + a2;
 check(typeof(a3) == 'number');
 check(isNaN(a3));
 
-totals();
+
+var v = function () {
+        this.valueOfCalls++;
+        return this.v;
+};
+var s = function () {
+        this.toStringCalls++;
+        return this.v;
+};
+
+
+var o = new Object ();
+o.valueOfCalls = 0;
+o.toStringCalls = 0;
+o.valueOf = v;
+o.toString = s;
+o.v = new Object();
+a = "" + o;
+check_equals(o.valueOfCalls, 1);
+check_equals(o.toStringCalls, 1);
+check_equals(typeof(a), "string");
+check_equals(a, "[type Object]");
+
+
+#if OUTPUT_VERSION < 6
+ check_totals(128);
+#else
+ check_totals(144);
+#endif

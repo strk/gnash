@@ -1,5 +1,10 @@
 2007-10-30 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/toString_valueOf.as: add a test which
+	  seems to be killing gnash (segfault).
+
+2007-10-30 Sandro Santilli <strk@keybit.net>
+
 	* server/as_value.cpp (to_debug_string): assert(0) => abort()
 	  [ to abort when NDEBUG is defined ]
 	* server/character.h (markCharacterReachable): mark mask as
