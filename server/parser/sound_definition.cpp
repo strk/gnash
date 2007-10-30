@@ -75,7 +75,7 @@ start_sound_tag::read(stream* in, int /* tag_type */, movie_definition* m,
 
 
 void
-start_sound_tag::execute_state(sprite_instance* /* m */) const
+start_sound_tag::execute(sprite_instance* /* m */) const
 {
 	// Make static ?
 	sound_handler* handler = get_sound_handler();
@@ -111,7 +111,7 @@ start_stream_sound_tag::read(movie_definition* m, int handler_id, long start)
 
 
 void
-start_stream_sound_tag::execute_state(sprite_instance* m) const
+start_stream_sound_tag::execute(sprite_instance* m) const
 {
 	// Make static ?
 	sound_handler* handler = get_sound_handler();

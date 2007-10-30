@@ -80,15 +80,10 @@ public:
 	void read(stream* in, int tag_type,
 		movie_definition* m, const sound_sample* sam);
 
-	/// StartSound is a "state" tag.
-	void	execute_state(sprite_instance* m) const;
+	void	execute(sprite_instance* m) const;
 
-	/// This implementation of 'execute' should likely
-	/// be the default one.
-	void execute(sprite_instance* m) const
-	{
-		execute_state(m);
-	}
+	/// StartStreamSound is not a "state" tag?
+	void execute_state(sprite_instance* m) const { /*no-op*/ }
 
 	/// TODO: provide execute_reverse ?
 	/// (for StartSound would StopSound and vice-versa)
@@ -121,13 +116,10 @@ public:
 	/// Insert ourself into the movie.
 	void	read(movie_definition* m, int handler_id, long start);
 
-	/// StartStreamSound is a "state" tag.
-	void	execute_state(sprite_instance* m) const;
+	void	execute(sprite_instance* m) const;
 
-	void execute(sprite_instance* m) const
-	{
-		execute_state(m);
-	}
+	/// StartStreamSound is not a "state" tag?
+	void execute_state(sprite_instance* m) const { /*no-op*/ }
 };
 
 } // namespace gnash
