@@ -1,5 +1,10 @@
 2007-10-30 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: 
+	  Check rendering effects of the setMask call.
+
+2007-10-30 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp:
 	  Check hitdetector bounds and reactions on mouse movement
 	* gui/gui.{cpp,h}: Add support for mouse pointer movements using the

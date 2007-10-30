@@ -441,8 +441,29 @@ main(int /*argc*/, char** /*argv*/)
 	check_pixel(c3b.x, c3b.y, 1, yellow, 2); 
 
 	//--------------------------------------------------------------
-	// TODO: Check setMask effect (triggered onMouseDown)
+	// Check setMask effect (triggered onMouseDown)
 	//--------------------------------------------------------------
+
+	tester.click(); // this should enable cursor shape masking drawing
+
+	tester.movePointerTo(50, 50); // out of any drawing
+	tester.advance();
+
+        // Inside bottom-left blue fill
+	check_pixel(60, 215, 2, white, 2); 
+	tester.movePointerTo(60, 215); tester.advance(); // move the mask over it...
+	check_pixel(60, 215, 2, blue, 2); 
+
+	// Inside violet fill
+	check_pixel(250, 112, 2, white, 2);
+	tester.movePointerTo(250, 112); tester.advance(); // move the mask over it
+	check_pixel(250, 112, 2, violet, 2);
+
+	// Inside red "thick" line
+	check_pixel(146, 146, 2, white, 2);
+	tester.movePointerTo(146, 146); tester.advance(); // move the mask over it
+	check_pixel(146, 146, 2, red, 2);
+
 
 }
 
