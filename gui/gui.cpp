@@ -72,7 +72,9 @@
 #endif
 
 // Define this to have gnash print the mouse pointer coordinates
-// as the mouse moves
+// as the mouse moves. See also ENABLE_KEYBOARD_MOUSE_MOVEMENTS
+// to have more control over mouse pointer.
+//
 //#define DEBUG_MOUSE_COORDINATES 1
 
 
@@ -102,6 +104,12 @@ Gui::Gui() :
     ,_stage(0)
     ,_stopped(false)
     ,_started(false)
+#ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS 
+    ,_xpointer(0)
+    ,_ypointer(0)
+    ,_keyboardMouseMovements(true) // TODO: base default on gnashrc or always false and provide menu item to toggle
+    ,_keyboardMouseMovementsStep(1)
+#endif
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -131,6 +139,12 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
     ,_stage(0)
     ,_stopped(false)
     ,_started(false)
+#ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS 
+    ,_xpointer(0)
+    ,_ypointer(0)
+    ,_keyboardMouseMovements(true) // TODO: base default on gnashrc or always false and provide menu item to toggle
+    ,_keyboardMouseMovementsStep(1)
+#endif
 {
 }
 
@@ -337,6 +351,12 @@ Gui::notify_mouse_moved(int x, int y)
 		setCursor(CURSOR_NORMAL);
 	}
 
+#ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS
+	_xpointer = x;
+	_ypointer = y;
+#endif
+
+
 }
 
 void
@@ -376,36 +396,92 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 	movie_root* m = _stage;
 
 	/* Handle GUI shortcuts */
-	if (pressed) {
-		if (modifier & gnash::key::MOD_CONTROL) {
-			switch(k) {
-			case gnash::key::r:
-			case gnash::key::R:
-				menu_restart();
-				break;
-			case gnash::key::p:
-			case gnash::key::P:
-				menu_pause();
-				break;
-			case gnash::key::l:
-			case gnash::key::L:
-				menu_refresh_view();
-				break;
-			case gnash::key::q:
-			case gnash::key::Q:
-			case gnash::key::w:
-			case gnash::key::W:
-				menu_quit();
-				break;
-			case gnash::key::RIGHT_BRACKET:
-				menu_step_forward();
-				break;
-			case gnash::key::LEFT_BRACKET:
-				menu_step_backward();
-				break;
-			default:
-				break;
+	if (pressed)
+	{
+		if (modifier & gnash::key::MOD_CONTROL)
+		{
+			switch(k)
+			{
+				case gnash::key::r:
+				case gnash::key::R:
+					menu_restart();
+					break;
+				case gnash::key::p:
+				case gnash::key::P:
+					menu_pause();
+					break;
+				case gnash::key::l:
+				case gnash::key::L:
+					menu_refresh_view();
+					break;
+				case gnash::key::q:
+				case gnash::key::Q:
+				case gnash::key::w:
+				case gnash::key::W:
+					menu_quit();
+					break;
+				case gnash::key::RIGHT_BRACKET:
+					menu_step_forward();
+					break;
+				case gnash::key::LEFT_BRACKET:
+					menu_step_backward();
+					break;
+				default:
+					break;
 			}
+
+#ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS
+			if ( _keyboardMouseMovements )
+			{
+				int step = _keyboardMouseMovementsStep; 
+				if (modifier & gnash::key::MOD_SHIFT) step*=5; // x5 if SHIFT is pressed
+				switch(k)
+				{
+					case gnash::key::UP:
+					{
+						int newx = _xpointer;
+						int newy = _ypointer-step;
+						log_debug("(theoretically) From %d,%d to %d,%d (step %d)", _xpointer, _ypointer, newx, newy, step);
+						if ( newy < 0 ) newy=0;
+						log_debug("From %d,%d to %d,%d", _xpointer, _ypointer, newx, newy);
+						notify_mouse_moved(newx, newy);
+						break;
+					}
+					case gnash::key::DOWN:
+					{
+						int newx = _xpointer;
+						int newy = _ypointer+step;
+						log_debug("(theoretically) From %d,%d to %d,%d (step %d)", _xpointer, _ypointer, newx, newy, step);
+						if ( newy >= _height ) newy = _height-1;
+						log_debug("From %d,%d to %d,%d", _xpointer, _ypointer, newx, newy);
+						notify_mouse_moved(newx, newy);
+						break;
+					}
+					case gnash::key::LEFT:
+					{
+						int newx = _xpointer-step;
+						int newy = _ypointer;
+						log_debug("(theoretically) From %d,%d to %d,%d (step %d)", _xpointer, _ypointer, newx, newy, step);
+						if ( newx < 0 ) newx = 0;
+						log_debug("From %d,%d to %d,%d", _xpointer, _ypointer, newx, newy);
+						notify_mouse_moved(newx, newy);
+						break;
+					}
+					case gnash::key::RIGHT:
+					{
+						int newy = _ypointer;
+						int newx = _xpointer+step;
+						log_debug("(theoretically) From %d,%d to %d,%d (step %d)", _xpointer, _ypointer, newx, newy, step);
+						if ( newx >= _width ) newx = _width-1;
+						log_debug("From %d,%d to %d,%d", _xpointer, _ypointer, newx, newy);
+						notify_mouse_moved(newx, newy);
+						break;
+					}
+					default:
+						break;
+				}
+			}
+#endif // ENABLE_KEYBOARD_MOUSE_MOVEMENTS
 		}
 	}
 

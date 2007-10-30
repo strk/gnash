@@ -1,5 +1,13 @@
 2007-10-30 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui.{cpp,h}: Add support for mouse pointer movements using the
+	  keyboard arrow keys. Support is currently enabled but can be
+	  switched off at compile time. If compile-time enabled support can
+	  still be toggled at runtime, currently defaults to enabled and 
+	  menu items to toggle it are missing.
+
+2007-10-30 Sandro Santilli <strk@keybit.net>
+
 	* server/dlist.cpp (display): don't render dynamic masks.
 	* testsuite/misc-ming.all/masks_testrunner.cpp: no more failures here.
 

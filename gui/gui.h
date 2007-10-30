@@ -40,6 +40,9 @@
 // This is an experimental feature, so it's off by default
 //#define SKIP_RENDERING_IF_LATE
 
+/// Define this to support keyboard-based pointer movements
+#define ENABLE_KEYBOARD_MOUSE_MOVEMENTS 1
+
 // Forward declarations
 namespace gnash
 {
@@ -391,6 +394,13 @@ private:
 
     /// True if the application didn't start yet
     bool            _started;
+
+#ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS 
+	int _xpointer;
+	int _ypointer;
+	bool _keyboardMouseMovements;
+	int _keyboardMouseMovementsStep;
+#endif // ENABLE_KEYBOARD_MOUSE_MOVEMENTS
 
 };
 
