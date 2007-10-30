@@ -300,8 +300,9 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 
     if ( ! width || ! height )
     {
-        log_error(_("Input movie has collapsed dimensions " SIZET_FMT "/" SIZET_FMT ". Giving up."), width, height);
-	return EXIT_FAILURE;
+        //log_error(_("Input movie has collapsed dimensions " SIZET_FMT "/" SIZET_FMT ". Giving up."), width, height);
+        log_debug(_("Input movie has collapsed dimensions " SIZET_FMT "/" SIZET_FMT ". Continuing anyway."), width, height);
+	//return EXIT_FAILURE;
     }
 
     // Now that we know about movie size, create gui window.
