@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.104 2007/10/29 21:23:16 strk Exp $ */
+/* $Id: character.h,v 1.105 2007/10/30 17:29:23 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -175,11 +175,17 @@ protected:
 
 	/// Mark character-specific reachable resources
 	//
-	/// These are: the character's parent and the defualt
-	/// as_object reachable stuff.
+	/// These are: the character's parent, mask and the default
+	///             as_object reachable stuff.
+	///
 	void markCharacterReachable() const
 	{
 		if ( m_parent ) m_parent->setReachable();
+		if ( _mask )
+		{
+			// TODO: check if we should drop when isUnloaded() or isDestroyed()
+			_mask->setReachable();
+		}
 		markAsObjectReachable();
 	}
 #endif // GNASH_USE_GC

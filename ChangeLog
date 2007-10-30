@@ -1,5 +1,10 @@
 2007-10-30 Sandro Santilli <strk@keybit.net>
 
+	* server/character.h (markCharacterReachable): mark mask as
+	  reachable.
+
+2007-10-30 Sandro Santilli <strk@keybit.net>
+
 	* gui/Player.cpp (run): don't give up if the movie has collapsed size.
 	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: 
 	  Check rendering effects of the setMask call.
