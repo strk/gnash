@@ -1,3 +1,8 @@
+2007-10-30 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/masks_testrunner.cpp: add tests for effects
+	  of swapDepth on dynamic masks (gnash fails).
+
 2007-10-30 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/parser/sound_definition.{cpp,h}: move execute_state actions

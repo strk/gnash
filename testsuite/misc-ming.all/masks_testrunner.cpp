@@ -176,5 +176,45 @@ main(int /*argc*/, char** /*argv*/)
 
 	// test effects of swapDepth (should be none)
 
+	// 14,232 = white (red not covered by its yellow mask)
+	check( invalidated.contains(14, 232) );
+	check_pixel(14,232, 2, white, 2);
+	// 48,232 = red (visible in the yellow mask)
+	check( invalidated.contains(48, 232) );
+	check_pixel(48,232, 2, red, 2);
+	// 80,232 = white (red not covered by its yellow mask)
+	check( invalidated.contains(80, 232) );
+	check_pixel(80,232, 2, white, 2);
+
+	// 214,232 = white (cyan not covered by its green mask)
+	check( invalidated.contains(214, 232) );
+	check_pixel(214,232, 2, white, 2);
+	// 248,232 = cyan (visible in its green mask)
+	check( invalidated.contains(248, 232) );
+	xcheck_pixel(248,232, 2, cyan, 2);
+	// 276,232 = white (cyan not covered by its green mask)
+	check( invalidated.contains(276, 232) );
+	check_pixel(276,232, 2, white, 2);
+
+	// 14,331 = white (blue not covered by its violet mask)
+	check( invalidated.contains(14, 331) );
+	check_pixel(14,331, 2, white, 2);
+	// 48,331 = blue (visible in its violet mask)
+	check( invalidated.contains(48, 331) );
+	xcheck_pixel(48,331, 2, blue, 2);
+	// 80,331 = white (blue not covered by its violet mask)
+	check( invalidated.contains(80, 331) );
+	check_pixel(80,331, 2, white, 2);
+
+	// 214,331 = white (light_blue not covered by its dark_green mask)
+	check( invalidated.contains(214, 331) );
+	check_pixel(214,331, 2, white, 2);
+	// 248,331 = light_blue (visible in its dark_green mask)
+	check( invalidated.contains(248, 331) );
+	check_pixel(248,331, 2, light_blue, 2);
+	// 276,331 = white (light_blue not covered by its dark_green mask)
+	check( invalidated.contains(276, 331) );
+	check_pixel(276,331, 2, white, 2);
+
 }
 
