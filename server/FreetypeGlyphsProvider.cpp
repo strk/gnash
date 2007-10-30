@@ -386,7 +386,7 @@ FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string& name, bool bol
 #else // ndef(USE_FREETYPE)
 FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string&, bool, bool)
 {
-	assert(0); // should never be called
+	abort(); // should never be called
 }
 #endif // ndef USE_FREETYPE 
 
@@ -457,7 +457,7 @@ FreetypeGlyphsProvider::getGlyph(uint16_t code, float& advance)
 boost::intrusive_ptr<shape_character_def>
 FreetypeGlyphsProvider::getGlyph(uint16_t, float& advance)
 {
-	assert(0); // should never be called... 
+	abort(); // should never be called... 
 }
 #endif // ndef(USE_FREETYPE)
 

@@ -215,7 +215,7 @@ public
 
         if (m_bitmap_info == NULL)
         {
-          assert(0);
+          abort();
           m_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG2);
           m_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG2);
         }
@@ -504,7 +504,7 @@ public
     // Munges *data (in order to make mipmaps)!!
   {
     assert(bi);
-    assert(0);  // not tested
+    abort();  // not tested
 
     //pk    bi->set_alpha_image(w, h, data);
   }
@@ -614,7 +614,7 @@ public
 
     if( NULL == m_pd3dDevice )
     {
-      assert(0);
+      abort();
       return;
     }
 
@@ -645,7 +645,7 @@ public
 
       // End the scene
       m_pd3dDevice->EndScene();
-      assert(0);
+      abort();
     }
 
 
@@ -898,7 +898,7 @@ public
 
     if( FAILED( m_pVB->Lock( 0, 0, (tLock**)&pVertices, D3DLOCK_DISCARD ) ) )
     {
-      assert(0);
+      abort();
     }
 
     pVertices[0].x = a.m_x ;

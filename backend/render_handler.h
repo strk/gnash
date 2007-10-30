@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.46 2007/08/23 09:53:02 udog Exp $ */
+/* $Id: render_handler.h,v 1.47 2007/10/30 18:55:40 strk Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -526,7 +526,7 @@ public:
   {
 
     log_msg("getPixel() not implemented for this renderer");
-    assert(0);    
+    abort();    
     return false; // avoid compiler warning    
   }
   

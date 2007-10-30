@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.112 2007/10/24 12:55:37 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.113 2007/10/30 18:55:40 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -397,7 +397,7 @@ public:
   {    
     return new agg_bitmap_info<agg::pixfmt_rgb24_pre> (im->width(), im->height(),
       im->pitch(), im->data(), 24);
-    assert(0); 
+    abort(); 
   }
 
 
@@ -1375,7 +1375,7 @@ public:
     const std::vector<line_style> &line_styles,
     const matrix& linestyle_matrix) {
     
-    assert(0); // should not be used currently
+    abort(); // should not be used currently
     
     size_t pcount=paths.size(); 
     dest.resize(pcount);
@@ -2237,7 +2237,7 @@ DSOEXPORT render_handler_agg_base*  create_render_handler_agg(const char *pixelf
   {
     log_error("Unknown pixelformat: %s\n", pixelformat);
     return NULL;
-    //assert(0);
+    //abort();
   }
   
   return NULL; // avoid compiler warning

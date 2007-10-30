@@ -24,7 +24,7 @@ bool	tu_types_validate()
 		|| sizeof(int64_t) != 8)
 	{
 		// No good.
-		assert(0);
+		abort();
 		return false;
 	}
 

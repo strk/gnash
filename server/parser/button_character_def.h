@@ -199,14 +199,14 @@ public:
     // is used only shape character definitions. See character_def.h to learn
     // why it is virtual anyway.
     // get_button_bound() is used for buttons.
-    assert(0); // should not be called  
+    abort(); // should not be called  
 		static rect unused;
 		return unused;
   }
   
   const rect&	get_button_bound(int id) const {
     UNUSED(id);
-    assert(0); // not implemented
+    abort(); // not implemented
   }
 	
 protected:

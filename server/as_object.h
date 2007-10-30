@@ -86,7 +86,7 @@ private:
 	/// Don't allow implicit copy, must think about behaviour
 	as_object& operator=(const as_object&)
 	{
-		assert(0);
+		abort();
 		return *this;
 	}
 

@@ -426,7 +426,7 @@ err(void* appdata)
 static int
 write(const void* /*src*/, int /*bytes*/, void* /*appdata*/)
 {
-	assert(0); // not supported
+	abort(); // not supported
 	return 0;
 }
 
@@ -441,7 +441,7 @@ seek(int pos, void* appdata)
 static int
 seek_to_end(void* /*appdata*/)
 {
-	assert(0); // not supported
+	abort(); // not supported
 	return 0;
 }
 

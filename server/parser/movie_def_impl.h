@@ -620,7 +620,7 @@ public:
     // get_bound() is currently only used by generic_character which normally
     // is used only shape character definitions. See character_def.h to learn
     // why it is virtual anyway.
-    assert(0); // should not be called  
+    abort(); // should not be called  
 		static rect unused;
 		return unused;
 	}

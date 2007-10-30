@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderSimple.cpp,v 1.5 2007/10/08 11:00:05 tgc Exp $
+// $Id: AudioDecoderSimple.cpp,v 1.6 2007/10/30 18:55:41 strk Exp $
 
 #include <boost/scoped_array.hpp>
 
@@ -171,7 +171,7 @@ public:
 			{
 
 				if (n_bits == 0) {
-					assert(0);
+					abort();
 				} else if (n_bits == 2) {
 					sample_count += doMonoBlock(&out_data, 2, in, sample, stepsize_index);
 				} else if (n_bits == 3) {
@@ -194,7 +194,7 @@ public:
 				assert(STEPSIZE_CT >= (1 << 6));	// ensure we don't need to clamp.
 
 				if (n_bits == 0) {
-					assert(0);
+					abort();
 				} else if (n_bits == 2) {
 					sample_count += doStereoBlock(&out_data, 2, in, sample, stepsize_index, right_sample, right_stepsize_index);
 				} else if (n_bits == 3) {

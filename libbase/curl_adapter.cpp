@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: curl_adapter.cpp,v 1.43 2007/10/08 12:56:27 bwy Exp $ */
+/* $Id: curl_adapter.cpp,v 1.44 2007/10/30 18:55:41 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -58,7 +58,7 @@ namespace curl_adapter
 tu_file* make_stream(const char * /*url */)
 	{
 		fprintf(stderr, "libcurl is not available, but curl_adapter has been attempted to use\n");
-		return NULL; // should assert(0) instead ?
+		return NULL; // should abort() instead ?
 	}
 }
 
@@ -761,7 +761,7 @@ eof(void* appdata)
 static int
 write(const void* /*src*/, int /*bytes*/, void* /*appdata*/)
 {
-	assert(0); // not supported
+	abort(); // not supported
 	return 0;
 }
 

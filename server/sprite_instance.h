@@ -816,11 +816,11 @@ private:
 		:
 		character(NULL, 0)
 	{
-		assert(0);
+		abort();
 	}
 
 	/// Forbid assignment
-	sprite_instance& operator=(const sprite_instance&) { assert(0); return *this; }
+	sprite_instance& operator=(const sprite_instance&) { abort(); return *this; }
 
 	/// \brief
 	/// Call has_key_event() or has_mouse_event()

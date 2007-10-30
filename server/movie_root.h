@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.83 2007/10/22 19:53:35 strk Exp $ */
+/* $Id: movie_root.h,v 1.84 2007/10/30 18:55:42 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -623,10 +623,10 @@ private:
     LiveChars _liveChars;
 
     /// Forbid copy 
-    movie_root(const movie_root& ) { assert(0); }
+    movie_root(const movie_root& ) { abort(); }
 
     /// Forbid assignment
-    movie_root& operator=(const movie_root& ) { assert(0); return *this; }
+    movie_root& operator=(const movie_root& ) { abort(); return *this; }
 
     /// Execute expired timers
     void executeTimers();

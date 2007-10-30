@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.93 2007/09/28 00:33:30 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.94 2007/10/30 18:55:43 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -850,7 +850,7 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 			return false;
 
 		} else if (m_videoFrameFormat == render::YUV && m_VCodecCtx->pix_fmt != PIX_FMT_YUV420P) {
-			assert(0);	// TODO
+			abort();	// TODO
 			//img_convert((AVPicture*) pFrameYUV, PIX_FMT_YUV420P, (AVPicture*) pFrame, pCodecCtx->pix_fmt, pCodecCtx->width, pCodecCtx->height);
 			// Don't use depreceted img_convert, use sws_scale
 

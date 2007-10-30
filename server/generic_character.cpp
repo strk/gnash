@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: generic_character.cpp,v 1.8 2007/07/01 10:54:22 bjacques Exp $ */
+/* $Id: generic_character.cpp,v 1.9 2007/10/30 18:55:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -46,7 +46,7 @@ void
 generic_character::enclose_own_bounds(rect *) const
 {
 	log_unimpl("generic_character::enclose_own_bounds");
-	assert(0); // TO BE IMPLEMENTED!!!!!
+	abort(); // TO BE IMPLEMENTED!!!!!
 }
 
 bool

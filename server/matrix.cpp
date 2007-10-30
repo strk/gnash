@@ -19,7 +19,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.cpp,v 1.18 2007/08/27 12:44:28 strk Exp $ 
+// $Id: matrix.cpp,v 1.19 2007/10/30 18:55:42 strk Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -353,7 +353,7 @@ matrix::set_inverse(const matrix& m)
 	if (det == 0.0f)
 	{
 		// Not invertible.
-		//assert(0);	// castano: this happens sometimes! (ie. sample6.swf)
+		//abort();	// castano: this happens sometimes! (ie. sample6.swf)
 
 		// Arbitrary fallback.
 		set_identity();

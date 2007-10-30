@@ -1,5 +1,9 @@
 2007-10-30 Sandro Santilli <strk@keybit.net>
 
+	* lots of files: assert(0) -> abort()
+
+2007-10-30 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/toString_valueOf.as: add a test which
 	  seems to be killing gnash (segfault).
 

@@ -152,10 +152,10 @@ private:
 	LoadVars(const LoadVars&)
 		:
 		as_object()
-	{ assert(0); }
+	{ abort(); }
 
 	/// Forbid assignment
-	LoadVars& operator=(const LoadVars&) { assert(0); return *this; }
+	LoadVars& operator=(const LoadVars&) { abort(); return *this; }
 
 	/// Return enumerable property pairs in url-encoded form
 	//

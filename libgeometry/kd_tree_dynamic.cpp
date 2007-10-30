@@ -209,7 +209,7 @@ static void	remap_vertex_order(kd_tree_dynamic::node* node, hash_wrapper<int, in
 		{
 			// Trouble: couldn't reduce vert count by
 			// splitting.
-			assert(0);
+			abort();
 			// log error
 			return;
 		}

@@ -122,7 +122,7 @@ void	bsp_node::add_partition( const plane_info& p )
 // faces.  Otherwise volume queries will be wrong.
 {
 	if ( m_partitioning_plane != true ) {
-		assert(0);
+		abort();
 		// Trying to add a partitioning plane to a tree that already
 		// contains faces.  Refuse to add the plane.
 		return;

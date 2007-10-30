@@ -5,7 +5,7 @@
 
 // A module to take care of all of gnash's loaded fonts.
 
-/* $Id: fontlib.cpp,v 1.34 2007/09/10 16:53:29 strk Exp $ */
+/* $Id: fontlib.cpp,v 1.35 2007/10/30 18:55:42 strk Exp $ */
 
 #include "container.h"
 #include "tu_file.h"
@@ -531,7 +531,7 @@ namespace {
 				const point* /*coords*/, int /*coord_count*/)
 		{
 			// Shape glyphs should not contain lines.
-			assert(0);
+			abort();
 		}
 	};
 
@@ -705,7 +705,7 @@ namespace {
 					if (found_it == false)
 					{
 						// Should not happen -- glyph should either be in the font, or in s_pending_glyphs.
-						assert(0);
+						abort();
 						return false;
 					}
 				}

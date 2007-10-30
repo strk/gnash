@@ -400,7 +400,7 @@ as_object::init_member(string_table::key key, const as_value& val, int flags,
 			" on object ``%p'' twice"),
 			_vm.getStringTable().value(key).c_str(), (void*)this);
 		// We shouldn't attempt to initialize a member twice, should we ?
-		assert(0);
+		abort();
 	}
 	// TODO: optimize this, don't scan again !
 	_members.setFlags(key, flags, nsname);

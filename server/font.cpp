@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.48 2007/09/03 16:50:09 cmusick Exp $ */
+/* $Id: font.cpp,v 1.49 2007/10/30 18:55:42 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -570,7 +570,7 @@ GlyphInfo::markReachableResources() const
 		else
 		{
 			// Bad glyph index.  Due to bad data file?
-			assert(0);
+			abort();
 			return 0;
 		}
 	}

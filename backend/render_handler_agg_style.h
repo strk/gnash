@@ -75,7 +75,7 @@ public:
 
   void generate_span(agg::rgba8* /*span*/, int /*x*/, int /*y*/, unsigned /*len*/)
   {
-    assert(0); // never call generate_span for solid fill styles
+    abort(); // never call generate_span for solid fill styles
   }
 };
 
@@ -354,7 +354,7 @@ public:
           if (bi->get_bpp()==32)
             add_bitmap_repeat_aa_rgba32 (bi, mat, cx);      
           else
-            assert(0);
+            abort();
             
         } else {
         
@@ -364,7 +364,7 @@ public:
           if (bi->get_bpp()==32)
             add_bitmap_repeat_nn_rgba32 (bi, mat, cx);      
           else
-            assert(0);
+            abort();
             
         } // if smooth
       } else {
@@ -376,7 +376,7 @@ public:
           if (bi->get_bpp()==32)
             add_bitmap_clip_aa_rgba32 (bi, mat, cx);      
           else
-            assert(0);
+            abort();
             
         } else {
         
@@ -386,7 +386,7 @@ public:
           if (bi->get_bpp()==32)
             add_bitmap_clip_nn_rgba32 (bi, mat, cx);      
           else
-            assert(0);
+            abort();
             
         } // if smooth
       } // if repeat
@@ -703,7 +703,7 @@ public:
   
   void generate_span(agg::gray8* /*span*/, int /*x*/, int /*y*/, int /*len*/, unsigned /*style*/)
   {
-    assert(0); // never call generate_span for solid fill styles
+    abort(); // never call generate_span for solid fill styles
   }
 
 private:

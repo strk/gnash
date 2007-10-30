@@ -71,7 +71,7 @@
 // rationally deals with self-intersection by just overlapping parts
 // of the tesselated poly.
 
-/* $Id: tesselate.cpp,v 1.13 2007/05/19 22:24:48 nihilus Exp $ */
+/* $Id: tesselate.cpp,v 1.14 2007/10/30 18:55:43 strk Exp $ */
 
 #include "tesselate.h"
 #include "types.h"
@@ -486,7 +486,7 @@ namespace tesselate {
 		recursion_count++;
 		if (recursion_count > 500)
 		{
-			assert(0);	// probably a bug!
+			abort();	// probably a bug!
 		}
 #endif // not NDEBUG
 

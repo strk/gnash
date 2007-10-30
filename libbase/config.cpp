@@ -147,7 +147,7 @@ void	cvar::init( const char* name )
 			if (varname == p) {
 				// null string for a key.
 				// warning("something or other");
-				assert(0);	// TODO: recover somehow.
+				abort();	// TODO: recover somehow.
 			}
 
 			// Reference the name of the table.

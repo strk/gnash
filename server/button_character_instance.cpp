@@ -506,7 +506,7 @@ button_character_instance::on_button_event(const event_id& event)
 		break;
 
 	default:
-		//assert(0);	// missed a case?
+		//abort();	// missed a case?
 		log_error(_("Unhandled button event %s"), event.get_function_name().c_str());
 		break;
 	};

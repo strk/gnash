@@ -124,7 +124,7 @@ MovieLoader::start()
 {
 #ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
 	// don't start MovieLoader thread !
-	assert(0);
+	abort();
 #endif
 	// We have two sanity checks, started() and isSelfThread() which rely
 	// on boost::thread() returning before they are executed. Therefore,
@@ -820,7 +820,7 @@ movie_def_impl::load_next_frame_chunk()
 			log_error(_("Could not advance to frame " SIZET_FMT),
 				nextframe);
 			// these kind of errors should be handled by callers
-			assert(0);
+			abort();
 		}
 	}
 #ifdef DEBUG_FRAMES_LOAD

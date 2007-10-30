@@ -325,7 +325,7 @@ public:
 		}
 
 		// Didn't find entry!  Something is wrong.
-		assert(0);
+		abort();
 	}
 
 	iterator	find(const point_t& location, payload p)

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.60 2007/09/10 14:27:45 strk Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.61 2007/10/30 18:55:43 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -299,7 +299,7 @@ NetStreamGst::callback_output (GstElement* /*c*/, GstBuffer *buffer, GstPad* /*p
 	if (ns->m_imageframe) {
 //		ns->m_imageframe->update(GST_BUFFER_DATA(buffer));
 		if (ns->m_videoFrameFormat == render::YUV) {
-			assert(0);
+			abort();
 
 		/*	image::yuv* yuvframe = static_cast<image::yuv*>(m_imageframe);
 			int copied = 0;

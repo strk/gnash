@@ -25,12 +25,12 @@ namespace zlib_adapter
 {
 	std::auto_ptr<tu_file> make_inflater(std::auto_ptr<tu_file> /*in*/)
 	{
-		assert(0); // callers should check this themselves
+		abort(); // callers should check this themselves
 		return std::auto_ptr<tu_file>(NULL);
 	}
 	tu_file* make_deflater(tu_file* /*out*/)
 	{
-		assert(0); // callers should check this themselves
+		abort(); // callers should check this themselves
 		return NULL;
 	}
 }
@@ -237,7 +237,7 @@ namespace zlib_adapter
 	// Return number of bytes actually written.
 	{
 		// *In*flaters can't write!!!
-		assert(0);
+		abort();
 		return 0;
 	}
 

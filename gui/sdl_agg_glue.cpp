@@ -75,7 +75,7 @@ SdlAggGlue::createRenderHandler(int bpp)
         break;
       default:
         log_error (_("AGG's bit depth must be 16, 24 or 32 bits, not %d."), _bpp);
-        assert(0);
+        abort();
     }
     return _agg_renderer;
 }
@@ -119,7 +119,7 @@ SdlAggGlue::prepDrawingArea(int width, int height, uint32_t sdl_flags)
         amask = 0;
         break;
       default:
-        assert(0);
+        abort();
     }
 
 #define CHUNK_SIZE (100 * 100 * depth_bytes)

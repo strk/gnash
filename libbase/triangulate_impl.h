@@ -24,7 +24,7 @@
 // code, see the FIST web page at:
 // http://www.cosy.sbg.ac.at/~held/projects/triang/triang.html
 
-/* $Id: triangulate_impl.h,v 1.26 2007/09/13 09:47:31 strk Exp $ */
+/* $Id: triangulate_impl.h,v 1.27 2007/10/30 18:55:41 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1021,7 +1021,7 @@ void	poly<coord_t>::emit_and_remove_ear(
 	if (vertex_left_test(pv0->m_v, pv1->m_v, pv2->m_v) == 0)
 	{
 		// Degenerate triangle!  Don't emit it.
-		assert(0);	// This should have already been removed by remove_degenerate_chain().
+		abort();	// This should have already been removed by remove_degenerate_chain().
 	}
 	else
 	{
@@ -1066,7 +1066,7 @@ void	poly<coord_t>::emit_and_remove_ear(
 	{
 		// remove_degenerate_chain() should have taken care of
 		// this before we got here.
-		assert(0);
+		abort();
 	}
 
 	// ear status of v0 and v2 could have changed now.
@@ -1877,7 +1877,7 @@ void	poly_env<coord_t>::init(int path_count, const std::vector<coord_t> paths[])
 		if (path.size() & 1)
 		{
 			// Bad input, odd number of coords.
-			assert(0);			
+			abort();			
 			fprintf(stderr, "path[%d] has odd number of coords (" SIZET_FMT 
 			        "), dropping last value\n", i, path.size());//xxxx
 			path_size--;

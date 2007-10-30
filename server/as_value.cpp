@@ -837,7 +837,7 @@ as_value::typeOf() const
 		default:
 			if (is_exception())
 				return "exception";
-			assert(0);
+			abort();
 			return NULL;
 	}
 }
@@ -886,7 +886,7 @@ as_value::equalsSameType(const as_value& v) const
 				return false; // Exceptions equal nothing.
 
 	}
-	assert(0);
+	abort();
 	return false;
 }
 

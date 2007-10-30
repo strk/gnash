@@ -61,7 +61,7 @@ namespace gnash {
 		{
 #ifdef DEBUG_RENDER_CALLS
 			GNASH_REPORT_FUNCTION;
-			//assert(0);
+			//abort();
 #endif
 			if (s_render_handler) return s_render_handler->create_bitmap_info_rgb(im);
 			else return new bogus_bi;
@@ -71,7 +71,7 @@ namespace gnash {
 		{
 #ifdef DEBUG_RENDER_CALLS
 			GNASH_REPORT_FUNCTION;
-			//assert(0);
+			//abort();
 #endif
     
 			if (s_render_handler) return s_render_handler->create_bitmap_info_rgba(im);

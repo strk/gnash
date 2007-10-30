@@ -308,7 +308,7 @@ fill_style::get_bitmap_info() const
    
   } else {
     log_error(_("Unknown fill style %d"), m_type);
-    assert(0);
+    abort();
   }  
 }
 

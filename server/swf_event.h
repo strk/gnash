@@ -73,8 +73,8 @@ private:
     event_id	m_event;
     std::auto_ptr<action_buffer> m_action_buffer;
     // DON'T USE THESE
-    swf_event(const swf_event& /*s*/) { assert(0); }
-    void	operator=(const swf_event& /*s*/) { assert(0); }
+    swf_event(const swf_event& /*s*/) { abort(); }
+    void	operator=(const swf_event& /*s*/) { abort(); }
 };
 
 

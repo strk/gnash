@@ -246,7 +246,7 @@ static void	write_packed_data(tu_file* out, const kd_tree_dynamic::node* source)
 		if (sl->m_faces.size() > 255)
 		{
 			// problem.
-			assert(0);
+			abort();
 			l.m_face_count = 255;
 		}
 		else
@@ -308,7 +308,7 @@ static void	write_packed_data(tu_file* out, const kd_tree_dynamic::node* source)
 			if (pos_child_delta >= (1 << 24))
 			{
 				// Problem.
-				assert(0);
+				abort();
 			}
 			else
 			{

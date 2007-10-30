@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: VideoDecoderFfmpeg.cpp,v 1.7 2007/10/26 18:43:36 tgc Exp $
+// $Id: VideoDecoderFfmpeg.cpp,v 1.8 2007/10/30 18:55:42 strk Exp $
 
 #include "VideoDecoderFfmpeg.h"
 
@@ -251,7 +251,7 @@ uint8_t* VideoDecoderFfmpeg::decode(uint8_t* input, uint32_t inputSize, uint32_t
 			return;
 
 		} else if (_videoFrameFormat == YUV && _videoCodecCtx->pix_fmt != PIX_FMT_YUV420P) {
-			assert(0);	// TODO
+			abort();	// TODO
 			//img_convert((AVPicture*) pFrameYUV, PIX_FMT_YUV420P, (AVPicture*) pFrame, pCodecCtx->pix_fmt, pCodecCtx->width, pCodecCtx->height);
 			// Don't use depreceted img_convert, use sws_scale
 
@@ -261,7 +261,7 @@ uint8_t* VideoDecoderFfmpeg::decode(uint8_t* input, uint32_t inputSize, uint32_t
 
 		raw_mediadata_t* video = new raw_mediadata_t;
 		if (_videoFrameFormat == YUV) {
-			assert(0); // See image.cpp to see what yuv size is
+			abort(); // See image.cpp to see what yuv size is
 			//video->m_data = new uint8_t[static_cast<image::yuv*>(m_imageframe)->size()];
 		} else if (_videoFrameFormat == RGB) {
 			video->m_data = new uint8_t[_videoCodecCtx->width * _videoCodecCtx->height * 3];

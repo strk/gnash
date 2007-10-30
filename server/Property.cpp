@@ -108,7 +108,7 @@ Property::setReachable() const
 		break;
 	}
 	default:
-		assert(0); // Not here.
+		abort(); // Not here.
 		break;
 	}
 };

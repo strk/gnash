@@ -49,7 +49,7 @@ namespace tools {
 		{
 			if (m_done_copy)
 			{
-				assert(0);
+				abort();
 				log_error("gnash::tools::copy_helper() already done copy\n");
 				return false;
 			}

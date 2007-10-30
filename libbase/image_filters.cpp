@@ -11,7 +11,7 @@
 // converted from K&R C to C-like C++, changed the interfaces a bit,
 // etc.
 
-/* $Id: image_filters.cpp,v 1.16 2007/09/10 16:53:29 strk Exp $ */
+/* $Id: image_filters.cpp,v 1.17 2007/10/30 18:55:41 strk Exp $ */
 
 #include "image.h"
 #include "utility.h"
@@ -104,7 +104,7 @@ void	get_column(uint8_t* column, image::rgb* image, int x)
 {
 
     if ((x < 0) || (x >= image->width())) {
-	assert(0);
+	abort();
 	x = iclamp(x, 0, image->width() - 1);
     }
 
@@ -122,7 +122,7 @@ void	get_column(uint8_t* column, image::rgba* image, int x)
 // Copy RGBA data from the specified column into the given buffer.
 {
     if ((x < 0) || (x >= image->width())) {
-	assert(0);
+	abort();
 	x = iclamp(x, 0, image->width() - 1);
     }
 
@@ -146,7 +146,7 @@ void	put_pixel(image::rgb* image, int x, int y, float r, float g, float b)
     static uint8_t*	p = NULL;
 
     if ((x < 0) || (x >= image->width()) || (y < 0) || (y >= image->height())) {
-	assert(0);
+	abort();
 	return;
     }
     if ((im != image) || (yy != y)) {
@@ -169,7 +169,7 @@ void	put_pixel(image::rgba* image, int x, int y, float r, float g, float b, floa
     static uint8_t*	p = NULL;
 
     if ((x < 0) || (x >= image->width()) || (y < 0) || (y >= image->height())) {
-	assert(0);
+	abort();
 	return;
     }
     if ((im != image) || (yy != y)) {

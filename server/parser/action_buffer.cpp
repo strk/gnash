@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: action_buffer.cpp,v 1.26 2007/10/10 07:15:09 strk Exp $ */
+/* $Id: action_buffer.cpp,v 1.27 2007/10/30 18:55:43 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -531,7 +531,7 @@ convert_float_little(const void *p)
 	    break;
 	default:
 	    log_error(_("Native floating point format not recognised"));
-	    assert(0);
+	    abort();
 	}
 	
 	return u.f;
@@ -607,7 +607,7 @@ convert_double_wacky(const void *p)
 		break;
 	default:
 		log_error(_("Native double floating point format not recognised"));
-		assert(0);
+		abort();
 	}
 
 	return u.d;
