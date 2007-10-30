@@ -956,8 +956,8 @@ as_value::to_debug_string() const
 		default:
 			if (is_exception())
 				return "[exception]";
-			assert(0);
-			return NULL;
+			abort();
+			return "[invalid type]";
 	}
 }
 
