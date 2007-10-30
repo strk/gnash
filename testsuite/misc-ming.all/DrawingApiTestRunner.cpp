@@ -353,7 +353,96 @@ main(int /*argc*/, char** /*argv*/)
 	check_pixel(351, 280, 10, white, 2); 
 	check_pixel(400, 280, 3, yellow, 2); 
 
-	// TODO: check hitdetector bounds and reactions on mouse
-	//       movement !
+	//--------------------------------------------------------------
+	// Check hitdetector bounds and reactions on mouse movement 
+	//--------------------------------------------------------------
+
+	typedef struct IntPoint { int x; int y; IntPoint(int nx, int ny) : x(nx), y(ny) {} };
+
+	IntPoint c1s(6, 346); // top-right of first yellow circle (in when small)
+	IntPoint c1b(16, 329); // top-right of first yellow circle (in when big, out when small)
+	IntPoint c2s(66, 340); // top-right of second yellow circle (in when small)
+	IntPoint c2b(75, 332); // top-right of second yellow circle (in when big, out when small)
+	IntPoint c3s(129, 340); // top-right of third yellow circle (in when small)
+	IntPoint c3b(133, 330); // top-right of third yellow circle (in when big, out when small)
+
+	// Disjoint cursor's and drawing's bounding boxes 
+	tester.movePointerTo(50, 50);
+	tester.advance(); // hitTest runs onEnterFrame
+
+	check_pixel(c1s.x, c1s.y, 1, yellow, 2); 
+	check_pixel(c1b.x, c1b.y, 1, white, 2); 
+
+	check_pixel(c2s.x, c2s.y, 1, yellow, 2); 
+	check_pixel(c2b.x, c2b.y, 1, white, 2); 
+
+	check_pixel(c3s.x, c3s.y, 1, yellow, 2); 
+	check_pixel(c3b.x, c3b.y, 1, white, 2); 
+
+	// Cursor's and drawing's bounding box intersection
+	//
+	// NOTE: shapes don't intersect, the cursor is a circle,
+	//       and only the top-left corner of it's bounding box
+	//       intersects the drawing's bounding box
+	// NOTE: one pixel down or one pixel right and they would not intersect anymore
+	//
+	tester.movePointerTo(424, 304);
+	tester.advance(); // hitTest runs onEnterFrame
+
+	check_pixel(c1s.x, c1s.y, 1, yellow, 2); 
+	check(tester.getInvalidatedRanges().contains(c1b.x, c1b.y));
+	check_pixel(c1b.x, c1b.y, 1, yellow, 2); 
+
+	check(!tester.getInvalidatedRanges().contains(c2s.x, c2s.y)); // failure won't impact correctness, only performance
+	check(!tester.getInvalidatedRanges().contains(c2b.x, c2b.y)); // failure won't impact correctness, only performance
+	check_pixel(c2s.x, c2s.y, 1, yellow, 2); 
+	check_pixel(c2b.x, c2b.y, 1, white, 2); 
+
+	check(!tester.getInvalidatedRanges().contains(c3s.x, c3s.y)); // failure won't impact correctness, only performance
+	check(!tester.getInvalidatedRanges().contains(c3b.x, c3b.y)); // failure won't impact correctness, only performance
+	check_pixel(c3s.x, c3s.y, 1, yellow, 2); 
+	check_pixel(c3b.x, c3b.y, 1, white, 2); 
+
+	// Pointer inside drawing's bounding box 
+	// (pointer itself, not the cursor)
+	tester.movePointerTo(221, 84);
+	tester.advance(); // hitTest runs onEnterFrame
+
+	check(!tester.getInvalidatedRanges().contains(c1s.x, c1s.y)); // failure won't impact correctness, only performance
+	check(!tester.getInvalidatedRanges().contains(c1b.x, c1b.y)); // failure won't impact correctness, only performance
+	check_pixel(c1s.x, c1s.y, 1, yellow, 2); 
+	check_pixel(c1b.x, c1b.y, 1, yellow, 2); 
+
+	check_pixel(c2s.x, c2s.y, 1, yellow, 2); 
+	check(tester.getInvalidatedRanges().contains(c2b.x, c2b.y));
+	check_pixel(c2b.x, c2b.y, 1, yellow, 2); 
+
+	check(!tester.getInvalidatedRanges().contains(c3s.x, c3s.y)); // failure won't impact correctness, only performance
+	check(!tester.getInvalidatedRanges().contains(c3b.x, c3b.y)); // failure won't impact correctness, only performance
+	check_pixel(c3s.x, c3s.y, 1, yellow, 2); 
+	check_pixel(c3b.x, c3b.y, 1, white, 2); 
+
+	// Pointer inside drawing's shape
+	tester.movePointerTo(167, 170); // the thik red line
+	tester.advance(); // hitTest runs onEnterFrame
+
+	check(!tester.getInvalidatedRanges().contains(c1s.x, c1s.y)); // failure won't impact correctness, only performance
+	check(!tester.getInvalidatedRanges().contains(c1b.x, c1b.y)); // failure won't impact correctness, only performance
+	check_pixel(c1s.x, c1s.y, 1, yellow, 2); 
+	check_pixel(c1b.x, c1b.y, 1, yellow, 2); 
+
+	check(!tester.getInvalidatedRanges().contains(c2s.x, c2s.y)); // failure won't impact correctness, only performance
+	check(!tester.getInvalidatedRanges().contains(c2b.x, c2b.y)); // failure won't impact correctness, only performance
+	check_pixel(c2s.x, c2s.y, 1, yellow, 2); 
+	check_pixel(c2b.x, c2b.y, 1, yellow, 2); 
+
+	check_pixel(c3s.x, c3s.y, 1, yellow, 2); 
+	check(tester.getInvalidatedRanges().contains(c3b.x, c3b.y));
+	check_pixel(c3b.x, c3b.y, 1, yellow, 2); 
+
+	//--------------------------------------------------------------
+	// TODO: Check setMask effect (triggered onMouseDown)
+	//--------------------------------------------------------------
+
 }
 

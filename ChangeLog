@@ -1,5 +1,7 @@
 2007-10-30 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp:
+	  Check hitdetector bounds and reactions on mouse movement
 	* gui/gui.{cpp,h}: Add support for mouse pointer movements using the
 	  keyboard arrow keys. Support is currently enabled but can be
 	  switched off at compile time. If compile-time enabled support can
