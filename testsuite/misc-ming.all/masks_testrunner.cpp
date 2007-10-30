@@ -191,7 +191,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_pixel(214,232, 2, white, 2);
 	// 248,232 = cyan (visible in its green mask)
 	check( invalidated.contains(248, 232) );
-	xcheck_pixel(248,232, 2, cyan, 2);
+	check_pixel(248,232, 2, cyan, 2);
 	// 276,232 = white (cyan not covered by its green mask)
 	check( invalidated.contains(276, 232) );
 	check_pixel(276,232, 2, white, 2);
@@ -201,7 +201,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_pixel(14,331, 2, white, 2);
 	// 48,331 = blue (visible in its violet mask)
 	check( invalidated.contains(48, 331) );
-	xcheck_pixel(48,331, 2, blue, 2);
+	check_pixel(48,331, 2, blue, 2);
 	// 80,331 = white (blue not covered by its violet mask)
 	check( invalidated.contains(80, 331) );
 	check_pixel(80,331, 2, white, 2);

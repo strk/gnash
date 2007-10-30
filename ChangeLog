@@ -1,5 +1,10 @@
 2007-10-30 Sandro Santilli <strk@keybit.net>
 
+	* server/dlist.cpp (display): don't render dynamic masks.
+	* testsuite/misc-ming.all/masks_testrunner.cpp: no more failures here.
+
+2007-10-30 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/masks_testrunner.cpp: add tests for effects
 	  of swapDepth on dynamic masks (gnash fails).
 

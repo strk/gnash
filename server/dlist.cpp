@@ -772,6 +772,12 @@ DisplayList::display()
 			continue;
 		}
 
+		// Don't display dynamic masks
+		if ( ch->isDynamicMask() )
+		{
+			continue;
+		}
+
 		assert(! ch->isUnloaded() ); // we don't advance unloaded chars
 
 		// Check if this charater or any of its parents is a mask.
