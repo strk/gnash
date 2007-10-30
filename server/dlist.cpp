@@ -880,6 +880,8 @@ DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
   
   For a simpler implementation (that doesn't care about masks, but 
   still produces correct results) see CVS revision 1.96    
+
+  TODO: review this function to take "dynamic" mask and maskees into account
   */
   
   std::stack<int> clipDepthStack; // same method used in display()
