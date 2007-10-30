@@ -441,9 +441,9 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 					{
 						int newx = _xpointer;
 						int newy = _ypointer-step;
-						log_debug("(theoretically) From %d,%d to %d,%d (step %d)", _xpointer, _ypointer, newx, newy, step);
+						//log_debug("(theoretically) From %d,%d to %d,%d (step %d)", _xpointer, _ypointer, newx, newy, step);
 						if ( newy < 0 ) newy=0;
-						log_debug("From %d,%d to %d,%d", _xpointer, _ypointer, newx, newy);
+						//log_debug("From %d,%d to %d,%d", _xpointer, _ypointer, newx, newy);
 						notify_mouse_moved(newx, newy);
 						break;
 					}
@@ -451,9 +451,9 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 					{
 						int newx = _xpointer;
 						int newy = _ypointer+step;
-						log_debug("(theoretically) From %d,%d to %d,%d (step %d)", _xpointer, _ypointer, newx, newy, step);
+						//log_debug("(theoretically) From %d,%d to %d,%d (step %d)", _xpointer, _ypointer, newx, newy, step);
 						if ( newy >= _height ) newy = _height-1;
-						log_debug("From %d,%d to %d,%d", _xpointer, _ypointer, newx, newy);
+						//log_debug("From %d,%d to %d,%d", _xpointer, _ypointer, newx, newy);
 						notify_mouse_moved(newx, newy);
 						break;
 					}
@@ -461,9 +461,9 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 					{
 						int newx = _xpointer-step;
 						int newy = _ypointer;
-						log_debug("(theoretically) From %d,%d to %d,%d (step %d)", _xpointer, _ypointer, newx, newy, step);
+						//log_debug("(theoretically) From %d,%d to %d,%d (step %d)", _xpointer, _ypointer, newx, newy, step);
 						if ( newx < 0 ) newx = 0;
-						log_debug("From %d,%d to %d,%d", _xpointer, _ypointer, newx, newy);
+						//log_debug("From %d,%d to %d,%d", _xpointer, _ypointer, newx, newy);
 						notify_mouse_moved(newx, newy);
 						break;
 					}
@@ -471,9 +471,9 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 					{
 						int newy = _ypointer;
 						int newx = _xpointer+step;
-						log_debug("(theoretically) From %d,%d to %d,%d (step %d)", _xpointer, _ypointer, newx, newy, step);
+						//log_debug("(theoretically) From %d,%d to %d,%d (step %d)", _xpointer, _ypointer, newx, newy, step);
 						if ( newx >= _width ) newx = _width-1;
-						log_debug("From %d,%d to %d,%d", _xpointer, _ypointer, newx, newy);
+						//log_debug("From %d,%d to %d,%d", _xpointer, _ypointer, newx, newy);
 						notify_mouse_moved(newx, newy);
 						break;
 					}
