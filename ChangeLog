@@ -1,5 +1,7 @@
 2007-10-31 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/TextField.as: add test for
+	  toString/valueOf properties (un)availability.
 	* server/vm/ASHandlers.cpp (ActionNewAdd): don't assume
 	  stack element references are valid after calls to to_primitive.
 	  Fixes bug #21482.

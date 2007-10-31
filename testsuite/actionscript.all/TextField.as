@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.28 2007/10/18 09:07:18 strk Exp $";
+rcsid="$Id: TextField.as,v 1.29 2007/10/31 11:17:48 strk Exp $";
 
 #include "check.as"
 
@@ -142,6 +142,11 @@ xcheck( TextField.prototype.hasOwnProperty('textWidth') );
 xcheck( TextField.prototype.hasOwnProperty('type') );
 check( TextField.prototype.hasOwnProperty('variable') );
 check( TextField.prototype.hasOwnProperty('wordWrap') );
+
+check( ! TextField.prototype.hasOwnProperty('valueOf') );
+check( ! TextField.prototype.hasOwnProperty('toString') );
+check( TextField.prototype.__proto__.hasOwnProperty('valueOf') );
+check( TextField.prototype.__proto__.hasOwnProperty('toString') );
 
 // Check TextField._alpha
 
