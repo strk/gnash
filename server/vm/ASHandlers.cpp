@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.146 2007/10/29 21:07:34 cmusick Exp $ */
+/* $Id: ASHandlers.cpp,v 1.147 2007/10/31 08:28:41 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2810,13 +2810,20 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
 
     thread.ensureStack(2);
 
-    as_value& v1_in = env.top(0);
-    as_value& v2_in = env.top(1);
+#ifndef NDEBUG
+    size_t stackSize = env.stack_size();
+#endif
 
-    as_value v1 = v1_in.to_primitive(env);
-    as_value v2 = v2_in.to_primitive(env);
+    as_value v1 = env.top(0).to_primitive(env);
+    as_value v2 = env.top(1).to_primitive(env);
 
-    //log_msg(_("ActionNewAdd(%s, %s) [prim %s, %s] called"), v1_in.to_debug_string().c_str(), v2_in.to_debug_string().c_str(), v1.to_debug_string().c_str(), v2.to_debug_string().c_str());
+    assert( stackSize == env.stack_size() );
+
+    //log_debug(_("ActionNewAdd(%s, %s) [prim %s, %s] called"),
+    //		env.top(0).to_debug_string().c_str(),
+    //		v2_in.to_debug_string().c_str(),
+    //		env.top(1).to_debug_string().c_str(),
+    //		v2.to_debug_string().c_str());
 
 
     if (v1.is_string() || v2.is_string() )
@@ -2824,7 +2831,7 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
     	int version = env.get_version();
         v2.convert_to_string_versioned(version, &env);
         v2.string_concat(v1.to_string_versioned(version, &env));
-	v2_in = v2; // modify env.top(1)
+	env.top(1) = v2;
     }
     else
     {
@@ -2836,7 +2843,7 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
 
         v2.set_double(v2num + v1num); 
 
-	v2_in = v2; // modify env.top(1)
+	env.top(1) = v2;
     }
     env.drop(1);
 }
