@@ -21,7 +21,7 @@
  */
 
 
-rcsid="$Id: toString_valueOf.as,v 1.27 2007/10/30 17:53:53 strk Exp $";
+rcsid="$Id: toString_valueOf.as,v 1.28 2007/10/31 10:22:23 strk Exp $";
 
 #include "check.as"
 
@@ -477,9 +477,9 @@ o.toString = s;
 o.v = new Object();
 a = "" + o;
 check_equals(o.valueOfCalls, 1);
-check_equals(o.toStringCalls, 1);
+xcheck_equals(o.toStringCalls, 1);
 check_equals(typeof(a), "string");
-check_equals(a, "[type Object]");
+xcheck_equals(a, "[type Object]");
 
 
 #if OUTPUT_VERSION < 6
