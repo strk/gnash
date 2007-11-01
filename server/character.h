@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.105 2007/10/30 17:29:23 strk Exp $ */
+/* $Id: character.h,v 1.106 2007/11/01 21:54:45 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -219,9 +219,6 @@ protected:
 	bool m_visible;
 
 	boost::intrusive_ptr<character> m_parent;
-
-	/// Implement mouse-dragging for this movie.
-	void do_mouse_drag();
 
 	/// look for '.', 'this',  '..', '_parent', '_level0' and '_root'
 	//

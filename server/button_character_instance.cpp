@@ -375,8 +375,6 @@ void
 button_character_instance::advance(float delta_time)
 {
 //			printf("%s:\n", __PRETTY_FUNCTION__); // FIXME:
-	// Implement mouse-drag.
-	character::do_mouse_drag();
 
 	matrix	mat = get_world_matrix();
 

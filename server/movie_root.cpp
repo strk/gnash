@@ -666,6 +666,56 @@ movie_root::set_drag_state(const drag_state& st)
 	assert(testInvariant());
 }
 
+void
+movie_root::doMouseDrag()
+{
+	character* dragChar = m_drag_state.getCharacter();
+	if ( ! dragChar || dragChar->isUnloaded() ) return; // nothing to do
+
+	int	x, y, buttons;
+	get_mouse_state(x, y, buttons);
+
+	point world_mouse(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+	if ( m_drag_state.hasBounds() )
+	{
+		// Clamp mouse coords within a defined rect.
+		m_drag_state.getBounds().clamp(world_mouse);
+	}
+
+	if (! m_drag_state.isLockCentered())
+	{
+		// FIXME: Implement relative drag...
+		static bool warned_relative_drag = false;
+		if ( ! warned_relative_drag )
+		{
+			log_unimpl(_("Relative drag"));
+			warned_relative_drag = true;
+		}
+	}
+
+#if 0
+	matrix	world_mat = dragChar->get_world_matrix();
+	point	local_mouse;
+	world_mat.transform_by_inverse(&local_mouse, world_mouse);
+#endif
+
+	matrix	parent_world_mat;
+	character* parent = dragChar->get_parent();
+	if (parent != NULL)
+	{
+	    parent_world_mat = parent->get_world_matrix();
+	}
+
+	point	parent_mouse;
+	parent_world_mat.transform_by_inverse(&parent_mouse, world_mouse);
+			
+	// Place our origin so that it coincides with the mouse coords
+	// in our parent frame.
+	matrix	local = dragChar->get_matrix();
+	local.set_translation( parent_mouse.m_x, parent_mouse.m_y );
+	dragChar->set_matrix(local);
+}
+
 unsigned int
 movie_root::add_interval_timer(std::auto_ptr<Timer> timer, bool internal)
 {
@@ -709,6 +759,9 @@ void
 movie_root::advance(float delta_time)
 {
 	// GNASH_REPORT_FUNCTION;
+
+	// Do mouse drag, if needed
+	doMouseDrag();
 
 	try
 	{

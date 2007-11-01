@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.59 2007/10/26 13:03:56 strk Exp $ */
+/* $Id: character.cpp,v 1.60 2007/11/01 21:54:45 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -50,60 +50,6 @@ character::getNextUnnamedInstanceName()
 	return ss.str();
 }
 
-
-// TODO: this should likely go in movie_root instead !
-void
-character::do_mouse_drag()
-{
-	drag_state st;
-	_vm.getRoot().get_drag_state(st);
-	if ( this == st.getCharacter() )
-	{
-		// We're being dragged!
-		int	x, y, buttons;
-		get_root_movie()->get_mouse_state(x, y, buttons);
-
-		point world_mouse(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
-		if ( st.hasBounds() )
-		{
-			// Clamp mouse coords within a defined rect.
-			// (it is assumed that drag_state keeps
-			st.getBounds().clamp(world_mouse);
-		}
-
-		if (st.isLockCentered())
-		{
-		    matrix	world_mat = get_world_matrix();
-		    point	local_mouse;
-		    world_mat.transform_by_inverse(&local_mouse, world_mouse);
-
-		    matrix	parent_world_mat;
-		    if (m_parent != NULL)
-			{
-			    parent_world_mat = m_parent->get_world_matrix();
-			}
-
-		    point	parent_mouse;
-		    parent_world_mat.transform_by_inverse(&parent_mouse, world_mouse);
-					
-		    // Place our origin so that it coincides with the mouse coords
-		    // in our parent frame.
-		    matrix	local = get_matrix();
-		    local.set_translation( parent_mouse.m_x, parent_mouse.m_y );
-		    set_matrix(local);
-		}
-		else
-		{
-			// FIXME: Implement relative drag...
-			static bool warned_relative_drag = false;
-			if ( ! warned_relative_drag )
-			{
-				log_unimpl(_("Relative drag"));
-		    		warned_relative_drag = true;
-		    	}
-		}
-	}
-}
 
 matrix
 character::get_world_matrix() const

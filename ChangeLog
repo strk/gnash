@@ -1,3 +1,16 @@
+2007-11-01 Sandro Santilli <strk@keybit.net>
+
+	* server/character.{cpp,h}: remove the do_mouse_drag
+	  method. It's silly to call it for each sprite or button
+	  when at the end only a single character (if any) would
+	  do something useful with that.
+	* server/: button_character_instance.cpp, sprite_instance.cpp:
+	  remove the do_mouse_drag call from the (advance) function.
+	* server/movie_root.{cpp,h}: Move the doMouseDrag method
+	  here, as a private one, called from advance. Also, drag
+	  anyway, even if not correctly, when the drag is not
+	  lock-centered (to be fixed later).
+
 2007-11-01 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/render_handler.h: Document that draw_poly draws a

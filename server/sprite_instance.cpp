@@ -2331,9 +2331,6 @@ void sprite_instance::advance_sprite(float /*delta_time*/)
 	// Process any pending loadVariables request
 	processCompletedLoadVariableRequests();
 
-	// mouse drag.
-	character::do_mouse_drag();
-
 #ifdef GNASH_DEBUG
 	size_t frame_count = m_def->get_frame_count();
 

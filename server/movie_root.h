@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.84 2007/10/30 18:55:42 strk Exp $ */
+/* $Id: movie_root.h,v 1.85 2007/11/01 21:54:45 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -603,6 +603,9 @@ public:
     bool scriptsDisabled() const { return _disableScripts; };
 
 private:
+
+    /// Take care of dragging, if needed
+    void doMouseDrag();
 
     /// Delete all elements on the action queue and empty it.
     void clearActionQueue();
