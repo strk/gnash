@@ -258,12 +258,13 @@ Tesselator::feed(std::vector<oglVertex>& vertices)
   }
 }
 
-void Tesselator::endContour()
+void
+Tesselator::endContour()
 {
   gluTessEndContour(_tessobj);  
 }
   
-void 
+void
 Tesselator::tesselate()
 {
   gluTessEndPolygon(_tessobj);
@@ -1414,7 +1415,13 @@ public:
     glyph_fs.push_back(coloring);
     
     std::vector<line_style> dummy_ls;
-    draw_shape_character(def, mat, dummy_cx, pixel_scale, glyph_fs, dummy_ls); 
+    
+    glPushMatrix();
+    apply_matrix(mat);
+    
+    draw_subshape(def->get_paths(), mat, dummy_cx, pixel_scale, glyph_fs, dummy_ls);
+    
+    glPopMatrix();
   }
 
   virtual bool allow_glyph_textures()

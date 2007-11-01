@@ -1,3 +1,12 @@
+2007-11-01 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler.h: Document that renderers should
+	ignore subshapes in glyphs, as demonstrated by Agg and
+	evidenced in text-test.swf.
+	* backend/render_handler_{cairo,ogl}.cpp: draw_glyph: call
+	draw_subshape directly with all paths, since subshapes should
+	be ignored.
+
 2007-10-31 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/render_handler_ogl.h: New header file; the beginnings

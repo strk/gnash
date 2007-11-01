@@ -17,9 +17,6 @@
 
 // Known bugs:
 // - Shape filling problems: renderer skips certain fills. See car_smash.swf.
-// - Fonts: The "a" is not filled in text-test.swf. If subshapes are ignored
-//          then it works as expected. The Agg renderer would suggest this has
-//          something to do with the fill rule.
 // - Rotation problem in gradient-tests.swf.
 //
 // TODOs:
@@ -627,7 +624,7 @@ public:
 
 	
 	void
-	draw_subshape(PathVec& path_vec,
+	draw_subshape(const PathVec& path_vec,
 	  const matrix& mat,
     const cxform& cx,
     float pixel_scale,
@@ -834,7 +831,21 @@ public:
     const PathVec& path_vec = def->get_paths();
     
     std::vector<line_style> dummy_ls;
-    draw_shape_character(def, mat, dummy_cx, pixel_scale, glyph_fs, dummy_ls); 
+    
+    cairo_matrix_t old_matrix;
+    cairo_get_matrix(_cr, &old_matrix);
+
+    apply_matrix(_cr, mat);
+    
+    std::vector<cairo_pattern_t*> fill_styles_cairo
+      = build_cairo_styles(glyph_fs, dummy_cx, mat);
+      
+    
+    draw_subshape(path_vec, mat, dummy_cx, pixel_scale, fill_styles_cairo, dummy_ls);
+    
+    destroy_cairo_patterns(fill_styles_cairo);
+    
+    cairo_set_matrix(_cr, &old_matrix);    
   }
 
   virtual bool allow_glyph_textures()
@@ -900,7 +911,9 @@ public:
       case CAIRO_FORMAT_A8:
         return 8;
       case CAIRO_FORMAT_A1:
-        return 1;    
+        return 1;
+      default:
+        return 0;
     }   
   }
   

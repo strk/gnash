@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.47 2007/10/30 18:55:40 strk Exp $ */
+/* $Id: render_handler.h,v 1.48 2007/11/01 09:35:46 bjacques Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -496,7 +496,9 @@ public:
   //
   /// Glyphs are defined just like shape characters with the difference that
   /// they do not have any fill or line styles.
-  /// Instead, the shape must be drawn using the given color (solid fill). 
+  /// Instead, the shape must be drawn using the given color (solid fill).
+  /// Please note that although the glyph paths may indicate subshapes,
+  /// the renderer is to ignore that information.
   /// 
   /// @param def
   ///
