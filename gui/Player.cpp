@@ -301,7 +301,9 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
     if ( ! width || ! height )
     {
         //log_error(_("Input movie has collapsed dimensions " SIZET_FMT "/" SIZET_FMT ". Giving up."), width, height);
-        log_debug(_("Input movie has collapsed dimensions " SIZET_FMT "/" SIZET_FMT ". Continuing anyway."), width, height);
+        log_debug(_("Input movie has collapsed dimensions " SIZET_FMT "/" SIZET_FMT ". Setting to 1/1 and going on."), width, height);
+	if ( ! width ) width = 1;
+	if ( ! height ) height = 1;
 	//return EXIT_FAILURE;
     }
 

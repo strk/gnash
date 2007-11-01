@@ -1,5 +1,10 @@
 2007-11-01 Sandro Santilli <strk@keybit.net>
 
+	* gui/Player.cpp (run): make the window at least 1x1 pixels sized
+	  in a collapsed SWF header situation.
+
+2007-11-01 Sandro Santilli <strk@keybit.net>
+
 	* server/character.{cpp,h}: remove the do_mouse_drag
 	  method. It's silly to call it for each sprite or button
 	  when at the end only a single character (if any) would
