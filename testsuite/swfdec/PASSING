@@ -42,6 +42,7 @@ attachmovie-object-7.swf:9a18445affc4ae1dc0e0fe085b13f1e1
 bitwise-5.swf:98475055aae4796a066e7728d5a7a944
 bitwise-6.swf:ef818f643cc14a4cc57248473e05a48c
 bitwise-7.swf:c18505cd0d075c512d15b6d96ab221d0
+call-arguments-5.swf:422c391a2abd3e864eb8ed8a1e05ad31
 callfunction-stack.swf:21d0c957f4caf0eb0ccd0dcadaf17500
 case1-6.swf:ba805f628a3a2d1bbd292ec1e56d1708
 case1-7.swf:ad4cfa4c3df86421237239167414fb40
@@ -439,6 +440,9 @@ this-localfunction-5.swf:f19b0894fdb355070a7358904536a4f4
 this-localfunction-6.swf:02e2d34657330766997697cc52f3f2cf
 this-localfunction-7.swf:9f25bfae3408892742d94ca208e035ac
 this-localfunction-8.swf:f917712fb915df27699b0f2615f5f9fa
+tointeger-various-5.swf:25fab4b9f2e8739ac63863933a4c7ead
+tointeger-various-6.swf:71257f69e5f3feb6ae18ebf26ad2eb22
+tointeger-various-7.swf:6251bc39b6449a82c89b6c821f9af0ff
 transform.swf:5c8533f9168ca3e92d000ce1693ed5ef
 try-throw-in-finally-6.swf:1c12d4b0f949704bd0794d73f0385007
 try-throw-in-finally-7.swf:0342b214948d6bec886863f6f66cab33

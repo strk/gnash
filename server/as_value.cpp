@@ -46,7 +46,10 @@ using namespace std;
 #endif
 
 // Define the macro below to make abstract equality operator verbose
-//#define GNASH_DEBUG_EQUALITY
+//#define GNASH_DEBUG_EQUALITY 1
+
+// Define the macro below to make to_primitive verbose
+//#define GNASH_DEBUG_CONVERSION_TO_PRIMITIVE 1
 
 namespace gnash {
 
@@ -115,49 +118,31 @@ as_value::to_string(as_environment* env) const
 		case AS_FUNCTION:
 		{
 			as_object* obj = m_type == OBJECT ? getObj().get() : getFun().get();
-
-			//printf("as_value to string conversion, env=%p\n", env);
-			// @@ Moock says, "the value that results from
-			// calling toString() on the object".
-			//
-			// When the toString() method doesn't exist, or
-			// doesn't return a valid number, the default
-			// text representation for that object is used
-			// instead.
-			//
-			if ( ! obj->useCustomToString() )
-			{
-				return obj->get_text_value();
-			}
-
-			bool gotValidToStringResult = false;
 			if ( env )
 			{
-				string_table::key methodname = NSV::PROP_TO_STRING;
-				as_value method;
-				if ( obj->get_member(methodname, &method) )
+				try
 				{
-					as_value ret = call_method0(method, env, obj);
-					if ( ret.is_string() )
-					{
-						gotValidToStringResult=true;
-						return ret.to_string(); // no need to env, it's a string already
-					}
-					log_msg(_("[object %p].%s() did not return a string: %s"),
-							(void*)obj, VM::get().getStringTable().value(methodname).c_str(),
-							ret.to_debug_string().c_str());
+					as_value ret = to_primitive(*env, STRING);
+					// This additional is_string test is NOT compliant with ECMA-262
+					// specification, but seems required for compatibility with the
+					// reference player.
+#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
+					log_debug(" %s.to_primitive(STRING) returned %s", to_debug_string().c_str(), ret.to_debug_string().c_str());
+#endif
+					if ( ret.is_string() ) return ret.to_string();
 				}
-				else
+				catch (ActionTypeError& e)
 				{
-					log_msg(_("get_member(%s) returned false"), VM::get().getStringTable().value(methodname).c_str());
+					log_debug(_("to_primitive(%s, STRING) threw an ActionTypeError %s"),
+							to_debug_string().c_str(), e.what());
 				}
 			}
-			if ( m_type == OBJECT )
-			{
-				return "[type Object]";
-			}
+			else log_debug("%s.to_number() called w/out env", to_debug_string().c_str());
+
+			if ( m_type == OBJECT ) return "[type Object]";
 			assert(m_type == AS_FUNCTION);
 			return "[type Function]";
+
 		}
 
 		default:
@@ -228,6 +213,13 @@ as_value::to_primitive(as_environment& env) const
 		hint = STRING;
 	}
 
+#if 0
+	else if ( m_type == MOVIECLIP && swfVersion > 5 )
+	{
+		throw ActionTypeError();
+	}
+#endif
+
 	return to_primitive(env, hint);
 }
 
@@ -235,29 +227,103 @@ as_value::to_primitive(as_environment& env) const
 as_value
 as_value::to_primitive(as_environment& env, type hint) const
 {
-	if ( m_type != OBJECT && m_type != AS_FUNCTION ) return *this;
+	if ( m_type != OBJECT && m_type != AS_FUNCTION ) return *this; 
+	//if ( ! is_object() ) return *this; // include MOVIECLIP !!
 
-	as_object* obj;
-	if ( m_type == OBJECT ) obj = getObj().get();
-	else obj = getFun().get();
+#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
+	log_debug("to_primitive(%s)", hint==NUMBER ? "NUMBER" : "STRING");
+#endif 
 
-	// TODO: implement DefaultValue (ECMA-262 - 8.6.2.6)
-
-	string_table::key methodname;
-	if (hint == NUMBER) { methodname=NSV::PROP_VALUE_OF; }
-	else { assert(hint==STRING); methodname=NSV::PROP_TO_STRING; }
+	// TODO: implement as_object::DefaultValue (ECMA-262 - 8.6.2.6)
 
 	as_value method;
-	if ( obj->get_member(methodname, &method) )
+	as_object* obj = NULL;
+
+	if (hint == NUMBER)
 	{
-		return call_method0(method, &env, obj);
+#if 1
+		if ( m_type == MOVIECLIP )
+		{
+			return as_value(NAN);
+		}
+#endif
+		if ( m_type == OBJECT ) obj = getObj().get();
+		else obj = getFun().get();
+
+		if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) || (!method.is_function()) ) // ECMA says ! is_object()
+		{
+#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
+			log_debug(" valueOf not found");
+#endif
+			if ( (!obj->get_member(NSV::PROP_TO_STRING, &method)) || (!method.is_function()) ) // ECMA says ! is_object()
+			{
+#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
+				log_debug(" toString not found");
+#endif
+				throw ActionTypeError();
+			}
+		}
 	}
 	else
 	{
-		log_msg(_("get_member(%s) returned false"), VM::get().getStringTable().value(methodname).c_str());
+		assert(hint==STRING);
+
+#if 1
+		if ( m_type == MOVIECLIP )
+		{
+			return as_value(getSpriteProxy().getTarget());
+		}
+#endif
+
+		if ( m_type == OBJECT ) obj = getObj().get();
+		else obj = getFun().get();
+
+		//printf("as_value to string conversion, env=%p\n", env);
+		// @@ Moock says, "the value that results from
+		// calling toString() on the object".
+		//
+		// When the toString() method doesn't exist, or
+		// doesn't return a valid number, the default
+		// text representation for that object is used
+		// instead.
+		//
+		if ( ! obj->useCustomToString() )
+		{
+#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
+			log_debug(" not using custom toString");
+#endif
+			return as_value(obj->get_text_value());
+		}
+
+		if ( (!obj->get_member(NSV::PROP_TO_STRING, &method)) || (!method.is_function()) ) // ECMA says ! is_object()
+		{
+#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
+			log_debug(" toString not found");
+#endif
+			if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) || (!method.is_function()) ) // ECMA says ! is_object()
+			{
+#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
+				log_debug(" valueOf not found");
+#endif
+				//return as_value(obj->get_text_value());
+				throw ActionTypeError();
+			}
+		}
 	}
 
-	return *this;
+	assert(obj);
+
+	as_value ret = call_method0(method, &env, obj);
+#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
+	log_debug("to_primitive: method call returned %s", ret.to_debug_string().c_str());
+#endif
+	if ( ret.m_type == OBJECT || ret.m_type == AS_FUNCTION ) // not a primitive 
+	{
+		throw ActionTypeError();
+	}
+
+
+	return ret;
 
 }
 
@@ -322,40 +388,31 @@ as_value::to_number(as_environment* env) const
 			as_object* obj = m_type == OBJECT ? getObj().get() : getFun().get();
 			if ( env )
 			{
-				string_table::key methodname = NSV::PROP_VALUE_OF;
-				as_value method;
-				if (obj->get_member(methodname, &method) )
+				try
 				{
-					as_value ret = call_method0(method, env, obj);
-					if ( ret.is_number() )
+					as_value ret = to_primitive(*env, NUMBER);
+					// env shouldn't be needed as to_primitive ensure a primitive type is returned
+					return ret.to_number();
+				}
+				catch (ActionTypeError& e)
+				{
+					log_debug(_("to_primitive(%s, NUMBER) threw an ActionTypeError %s"),
+							to_debug_string().c_str(), e.what());
+					if ( m_type == AS_FUNCTION && swfversion < 6 )
 					{
-						return ret.getNum();
-					}
-					else if ( ret.is_string() )
-					{
-						return ret.to_number();
+						return 0;
 					}
 					else
 					{
-						log_msg(_("[object %p].%s() did not return a number: %s"),
-								(void*)obj, VM::get().getStringTable().value(methodname).c_str(),
-								ret.to_debug_string().c_str());
-						if ( m_type == AS_FUNCTION && swfversion < 6 )
-						{
-							return 0;
-						}
-						else
-						{
-							return NAN;
-						}
+						return NAN;
 					}
 				}
-				else
-				{
-					log_msg(_("get_member(%s) returned false"), VM::get().getStringTable().value(methodname).c_str());
-				}
 			}
-			return obj->get_numeric_value(); 
+			else
+			{
+				log_debug("%s.to_number() called w/out env", to_debug_string().c_str());
+				return obj->get_numeric_value(); 
+			}
 		    }
 
 		case MOVIECLIP:
@@ -746,53 +803,117 @@ as_value::equals(const as_value& v, as_environment& env) const
 
     // 20. If Type(x) is either String or Number and Type(y) is Object,
     //     return the result of the comparison x == ToPrimitive(y).
-    if ( (m_type == STRING || m_type == NUMBER ) && ( v.is_object() ) ) // v.m_type == OBJECT || v.m_type == AS_FUNCTION ) )
+    if ( (m_type == STRING || m_type == NUMBER ) && ( v.m_type == OBJECT || v.m_type == AS_FUNCTION ) )
     {
         // convert this value to a primitive and recurse
-        as_value v2 = v.to_primitive(env); 
+	try
+	{
+		as_value v2 = v.to_primitive(env); 
+		if ( v.strictly_equals(v2) ) return false;
+
 #ifdef GNASH_DEBUG_EQUALITY
-       log_debug(" convertion to primitive : %s -> %s", v.to_debug_string().c_str(), v2.to_debug_string().c_str());
+		log_debug(" 20: convertion to primitive : %s -> %s", v.to_debug_string().c_str(), v2.to_debug_string().c_str());
 #endif
-        if ( v.strictly_equals(v2) ) // returned self ?
-        {
-            return false; // no valid conversion  
-        }
-        else return equals(v2, env);
+
+		return equals(v2, env);
+	}
+	catch (ActionTypeError& e)
+	{
+//#ifdef GNASH_DEBUG_EQUALITY
+		log_debug(" %s.to_primitive() threw an ActionTypeError %s", v.to_debug_string().c_str(), e.what());
+//#endif
+		return false; // no valid conversion
+	}
+
     }
 
     // 21. If Type(x) is Object and Type(y) is either String or Number,
     //    return the result of the comparison ToPrimitive(x) == y.
-    if ( (v.m_type == STRING || v.m_type == NUMBER ) && ( is_object() ) ) // m_type == OBJECT || m_type == AS_FUNCTION ) )
+    if ( (v.m_type == STRING || v.m_type == NUMBER ) && ( m_type == OBJECT || m_type == AS_FUNCTION ) )
     {
         // convert this value to a primitive and recurse
-        as_value v2 = to_primitive(env); 
+        try
+	{
+        	as_value v2 = to_primitive(env); 
+		if ( strictly_equals(v2) ) return false;
+
 #ifdef GNASH_DEBUG_EQUALITY
-       log_debug(" convertion to primitive : %s -> %s", to_debug_string().c_str(), v2.to_debug_string().c_str());
+		log_debug(" 21: convertion to primitive : %s -> %s", to_debug_string().c_str(), v2.to_debug_string().c_str());
 #endif
-        if ( strictly_equals(v2) ) // returned self ?
-        {
-            return false; // no valid conversion 
-        }
-        else return v2.equals(v, env);
+
+		return v2.equals(v, env);
+	}
+	catch (ActionTypeError& e)
+	{
+
+//#ifdef GNASH_DEBUG_EQUALITY
+		log_debug(" %s.to_primitive() threw an ActionTypeError %s", to_debug_string().c_str(), e.what());
+//#endif
+
+		return false; // no valid conversion
+	}
+
     }
 
-    // Both operands are objects (OBJECT,AS_FUNCTION,MOVIECLIP)
-    assert(is_object() && v.is_object());
+	// Both operands are objects (OBJECT,AS_FUNCTION,MOVIECLIP)
+	if ( ! is_object() || ! v.is_object() )
+	{
+		log_error("Equals(%s,%s)", to_debug_string().c_str(), v.to_debug_string().c_str());
+	}
 
     // If any of the two converts to a primitive, we recurse
 
-    as_value p = to_primitive(env); 
-    as_value vp = v.to_primitive(env); 
-#ifdef GNASH_DEBUG_EQUALITY
-    log_debug(" convertion to primitive (this): %s -> %s", to_debug_string().c_str(), p.to_debug_string().c_str());
-    log_debug(" convertion to primitive (that): %s -> %s", v.to_debug_string().c_str(), vp.to_debug_string().c_str());
-#endif
-    if ( strictly_equals(p) && v.strictly_equals(vp) ) // both returned self ?
-    {
-            return false; // no valid conversion 
-    }
+	as_value p = *this;
+	as_value vp = v;
 
-    return p.equals(vp, env);
+	int converted = 0;
+	try
+	{
+		p = to_primitive(env); 
+		if ( ! strictly_equals(p) ) ++converted;
+#ifdef GNASH_DEBUG_EQUALITY
+		log_debug(" convertion to primitive (this): %s -> %s", to_debug_string().c_str(), p.to_debug_string().c_str());
+#endif
+	}
+	catch (ActionTypeError& e)
+	{
+#ifdef GNASH_DEBUG_CONVERSION_TO_PRIMITIVE 
+		log_debug(" %s.to_primitive() threw an ActionTypeError %s",
+			to_debug_string().c_str(), e.what());
+#endif
+	}
+
+	try
+	{
+		vp = v.to_primitive(env); 
+		if ( ! v.strictly_equals(vp) ) ++converted;
+#ifdef GNASH_DEBUG_EQUALITY
+		log_debug(" convertion to primitive (that): %s -> %s", v.to_debug_string().c_str(), vp.to_debug_string().c_str());
+#endif
+	}
+	catch (ActionTypeError& e)
+	{
+#ifdef GNASH_DEBUG_CONVERSION_TO_PRIMITIVE 
+		log_debug(" %s.to_primitive() threw an ActionTypeError %s",
+			v.to_debug_string().c_str(), e.what());
+#endif
+	}
+
+	if ( converted )
+	{
+#ifdef GNASH_DEBUG_EQUALITY
+		log_debug(" some conversion took place, recurring");
+#endif
+		return p.equals(vp, env);
+	}
+	else
+	{
+#ifdef GNASH_DEBUG_EQUALITY
+		log_debug(" no conversion took place, returning false");
+#endif
+		return false;
+	}
+
 
 }
 	

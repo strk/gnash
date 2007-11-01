@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.147 2007/10/31 08:28:41 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.148 2007/11/01 16:14:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2814,38 +2814,51 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
     size_t stackSize = env.stack_size();
 #endif
 
-    as_value v1 = env.top(0).to_primitive(env);
-    as_value v2 = env.top(1).to_primitive(env);
+	as_value v1 = env.top(0);
+	as_value v2 = env.top(1);
 
-    assert( stackSize == env.stack_size() );
+	try { v1 = v1.to_primitive(env); }
+	catch (ActionTypeError& e)
+	{
+		log_debug("%s.to_primitive() threw an error during ActionNewAdd",
+			env.top(0).to_debug_string().c_str());
+	}
 
-    //log_debug(_("ActionNewAdd(%s, %s) [prim %s, %s] called"),
-    //		env.top(0).to_debug_string().c_str(),
-    //		v2_in.to_debug_string().c_str(),
-    //		env.top(1).to_debug_string().c_str(),
-    //		v2.to_debug_string().c_str());
+	try { v2 = v2.to_primitive(env); }
+	catch (ActionTypeError& e)
+	{
+		log_debug("%s.to_primitive() threw an error during ActionNewAdd",
+			env.top(1).to_debug_string().c_str());
+	}
 
+	assert( stackSize == env.stack_size() );
 
-    if (v1.is_string() || v2.is_string() )
-    {
-    	int version = env.get_version();
-        v2.convert_to_string_versioned(version, &env);
-        v2.string_concat(v1.to_string_versioned(version, &env));
-	env.top(1) = v2;
-    }
-    else
-    {
-	// use numeric semantic
-	double v2num = v2.to_number(&env);
-	//log_msg(_("v2 num = %g"), v2num);
-	double v1num = v1.to_number(&env);
-	//log_msg(_("v1 num = %g"), v1num);
+#if GNASH_DEBUG
+	log_debug(_("ActionNewAdd(%s, %s) [primitive conversion done]"),
+			v1.to_debug_string().c_str(),
+			v2.to_debug_string().c_str());
+#endif
 
-        v2.set_double(v2num + v1num); 
+	if (v1.is_string() || v2.is_string() )
+	{
+		int version = env.get_version();
+		v2.convert_to_string_versioned(version, &env);
+		v2.string_concat(v1.to_string_versioned(version, &env));
+		env.top(1) = v2;
+	}
+	else
+	{
+		// use numeric semantic
+		double v2num = v2.to_number(&env);
+		//log_msg(_("v2 num = %g"), v2num);
+		double v1num = v1.to_number(&env);
+		//log_msg(_("v1 num = %g"), v1num);
 
-	env.top(1) = v2;
-    }
-    env.drop(1);
+		v2.set_double(v2num + v1num); 
+
+		env.top(1) = v2;
+	}
+	env.drop(1);
 }
 
 void
@@ -2860,8 +2873,22 @@ SWFHandlers::ActionNewLessThan(ActionExec& thread)
 	as_value& op1_in = env.top(1);
 	as_value& op2_in = env.top(0);
 
-	as_value operand1 = op1_in.to_primitive(env);
-	as_value operand2 = op2_in.to_primitive(env);
+	as_value operand1;
+	as_value operand2;
+
+	try { operand1 = op1_in.to_primitive(env); }
+	catch (ActionTypeError& e)
+	{
+		log_debug("%s.to_primitive() threw an error during ActionNewLessThen",
+			op1_in.to_debug_string().c_str());
+	}
+
+	try { operand2 = op2_in.to_primitive(env); }
+	catch (ActionTypeError& e)
+	{
+		log_debug("%s.to_primitive() threw an error during ActionNewLessThen",
+			op2_in.to_debug_string().c_str());
+	}
 
 	if ( operand1.is_string() && operand2.is_string() )
 	{

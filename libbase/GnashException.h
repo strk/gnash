@@ -116,6 +116,31 @@ public:
 
 };
 
+/// An ActionScript type error 
+//
+/// This exception can be thrown by as_value::to_primitive when an object
+/// can't be converted to a primitive value or by native function when
+/// they are called as method of an unexpected type
+///
+class ActionTypeError: public ActionException
+{
+
+public:
+
+	ActionTypeError(const std::string& s)
+		:
+		ActionException(s)
+	{}
+
+	ActionTypeError()
+		:
+		ActionException("ActionTypeError")
+	{}
+
+	virtual ~ActionTypeError() throw() {}
+
+};
+
 } // namespace gnash
 
 #endif // def _GNASH_GNASHEXCEPTION__H

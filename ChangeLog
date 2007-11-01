@@ -1,3 +1,14 @@
+2007-11-01 Sandro Santilli <strk@keybit.net>
+
+	* libbase/GnashException.h: Add ActionTypeError exception.
+	* server/as_value.{cpp,h} (to_primitive): a closer to ECMA-262
+	  [[ToPrimitive]] implementation.
+	* server/vm/ASHandlers.cpp: update use of as_value::to_primitive.
+	* testsuite/actionscript.all/toString_valueOf.as: two successes.
+	* testsuite/swfdec/PASSING: some more successes.
+	* server/vm/fn_call.h (dump_args): print debug string version
+	  for each argument.
+
 2007-11-01 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/render_handler_cairo.cpp: Implement draw_poly.

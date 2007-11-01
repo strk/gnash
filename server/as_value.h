@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.72 2007/10/26 07:39:47 strk Exp $ */
+/* $Id: as_value.h,v 1.73 2007/11/01 16:14:20 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -387,6 +387,8 @@ public:
 	/// @param env
 	/// 	The environment to use for calling the valueOf method.
 	///
+	/// @throw ActionTypeError if an object can't be converted to a primitive
+	///
 	as_value to_primitive(as_environment& env) const;
 
 	/// Return value as a primitive type, with a preference
@@ -399,6 +401,8 @@ public:
 	///
 	/// @param hint
 	/// 	NUMBER or STRING, the preferred representation we're asking for.
+	///
+	/// @throw ActionTypeError if an object can't be converted to a primitive
 	///
 	as_value to_primitive(as_environment& env, type hint) const;
 
