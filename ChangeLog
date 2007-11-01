@@ -1,3 +1,18 @@
+2007-10-31 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler_ogl.h: New header file; the beginnings
+	of header/implementaion separation.
+	* backend/render_handler_ogl.cpp: New OpenGL renderer
+	implementation. In this initial version, support for subshapes
+	and poor man's anti-aliasing (only filled shapes are affected)
+	are added. The new renderer will facilitate the addition of
+	more good stuff, like real anti-aliasing and to eliminate the
+	many remaining OpenGL bugs. Simple masking now works.
+	* gui/gtk_glue_cairo.cpp: Use a RGBA buffer by default.
+	* gui/gtk_glue_gtkglext.cpp: Enable the stencil buffer rather
+	than the depth buffer, since the former is used while the
+	latter is not.
+
 2007-10-31 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/TextField.as: add test for

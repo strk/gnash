@@ -86,7 +86,7 @@ GtkCairoGlue::configure(GtkWidget *const /*widget*/,
 
     // Create offscreen image for rendering
     cairo_surface_t* surface = cairo_image_surface_create(
-      CAIRO_FORMAT_RGB24, event->width, event->height);
+      CAIRO_FORMAT_ARGB32, event->width, event->height);
     _cairo_offscreen = cairo_create(surface);
     cairo_surface_destroy(surface);
 

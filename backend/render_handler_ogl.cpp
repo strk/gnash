@@ -1,11 +1,20 @@
-// render_handler_ogl.cpp	-- Willem Kokke <willem@mindparity.com> 2003
+// 
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-// This source code has been donated to the Public Domain.  Do
-// whatever you want with it.
-
-// A render_handler that uses SDL & OpenGL
-
-/* $Id: render_handler_ogl.cpp,v 1.83 2007/09/12 17:13:29 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -14,9 +23,14 @@
 #include <cstring>
 #include <cmath>
 
-//#include "gnash.h"
 #include "render_handler.h"
-#include "render_handler_tri.h"
+
+#include "gnash.h"
+#include "types.h"
+#include "image.h"
+#include "utility.h"
+#include "log.h"
+
 #include "types.h"
 #include "image.h"
 #include "utility.h"
@@ -25,1411 +39,1421 @@
 #  include <Windows.h>
 #endif
 
-#if defined(NOT_SGI_GL) || defined(__APPLE_CC__)
-#include <AGL/agl.h>
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#include <OpenGL/glext.h>
-#else
-# include <GL/gl.h>
-# ifdef WIN32
-#  define GL_CLAMP_TO_EDGE 0x812F
-# else
-# include <GL/glx.h>
-# endif
-# include <GL/glu.h>
-# ifndef APIENTRY
-#  define APIENTRY
-# endif
-#endif
+#include "render_handler_ogl.h"
 
-using namespace gnash;
+#include <boost/utility.hpp>
 
-// choose the resampling method:
-// 1 = hardware (experimental, should be fast, somewhat buggy)
-// 2 = fast software bilinear (default)
-// 3 = use image::resample(), slow software resampling
-#define RESAMPLE_METHOD 2
+/// \file render_handler_ogl.cpp
+/// \brief The OpenGL renderer and related code.
+///
+/// So how does this thing work?
+///
+/// 1. Flash graphics are fundamentally incompatible with OpenGL. Flash shapes
+///    are defined by an arbitrary number of paths, which in turn are formed
+///    from an arbitrary number of edges. An edge describes a quadratic Bezier
+///    curve. A shape is defined by at least one path enclosing a space -- this
+///    space is the shape. Every path may have a left and/or right fill style,
+///    determining (if the shape is thought of as a vector) which side(s) of
+///    the path is to be filled.
+///    OpenGL, on the other hand, understands only triangles, lines and points.
+///    We must break Flash graphics down into primitives that OpenGL can
+///    understand before we can render them.
+///
+/// 2. First, we must ensure that OpenGL receives only closed shapes with a
+///    single fill style. Paths with two fill styles are duplicated. Then,
+///    shapes with
+///    a left fill style are reversed and the fill style is moved to the right.
+///    The shapes must be closed, so the tesselator can parse them; this
+///    involves a fun game of connect-the-dots. Fortunately, Flash guarantees
+///    that shapes are always closed and that they're never self-intersecting.
+///
+/// 3. Now that we have a consistent set of shapes, we can interpolate the
+///    Bezier curves of which each path is made of. OpenGL can do this for us,
+///    using evaluators, but we currently do it ourselves.
+///
+/// 4. Being the proud owners of a brand new set of interpolated coordinates,
+///    we can feed the coordinates into the GLU tesselator. The tesselator will
+///    break our complex (but never self-intersecting) polygon into OpenGL-
+///    grokkable primitives (say, a triangle fan or strip). We let the
+///    tesselator worry about that part. When the tesselator is finished, all
+///    we have to do is set up the fill style and draw the primitives given to
+///    us. The GLU tesselator will take care of shapes having inner boundaries
+///    (for example a donut shape). This makes life a LOT easier!
 
-//#define DEBUG_OPENGL 1
+
+// TODO:
+// - Implement:
+// * Nested masks
+// * Alpha images
+// * Real antialiasing
+// 
+// - Profiling!
+// - Optimize code:
+// * Use display lists
+// * Use better suited standard containers
+// * convert to double at a later stage (oglVertex)
+// * keep data for less time
+
+// * The "Programming Tips" in the OpenGL "red book" discusses a coordinate system
+// that would give "exact two-dimensional rasterization". AGG uses a similar
+// system; consider the benefits and drawbacks of switching.
 
 
-// bitmap_info_ogl declaration
-class bitmap_info_ogl : public gnash::bitmap_info
+namespace gnash {
+
+typedef std::vector<path> PathVec;
+
+class oglScopeEnable : public boost::noncopyable
 {
 public:
-	bitmap_info_ogl();
-	bitmap_info_ogl(int width, int height, uint8_t* data);
-	bitmap_info_ogl(image::rgb* im);
-	bitmap_info_ogl(image::rgba* im);
-
-	~bitmap_info_ogl() {
-		if (m_texture_id > 0) {
-			glDeleteTextures(1, (GLuint*) &m_texture_id);
-		}
-	}
-
-	void layout_image(image::image_base* im);
-
-	std::auto_ptr<image::image_base>  m_suspended_image;
+  oglScopeEnable(GLenum capability)
+    :_cap(capability)
+  {
+    glEnable(_cap);
+  }
+  
+  ~oglScopeEnable()
+  {
+    glDisable(_cap);
+  }
+private:
+  GLenum _cap;
 };
 
-// static GLint iquad[] = {-1, 1, 1, 1, 1, -1, -1, -1};
-
-#ifdef DEBUG_OPENGL
-static void check_error()
+static void
+check_error()
 {
-    GLenum error = glGetError();
+  GLenum error = glGetError();
+  
+  if (error == GL_NO_ERROR) {
+    return;
+  }
+  
+  log_error("OpenGL: %s", gluErrorString(error));
+}
 
-    while (error != GL_NO_ERROR) {
+/// @ret A point in the middle of points a and b, that is, the middle of a line
+///      drawn from a to b.
+point middle(const point& a, const point& b)
+{
+  return point(0.5 * (a.m_x + b.m_x), 0.5 * (a.m_y + b.m_y));
+}
+
+
+
+// Unfortunately, we can't use OpenGL as-is to interpolate the curve for us. It
+// is legal for Flash coordinates to be outside of the viewport, which will
+// be ignored by OpenGL's feedback mode. Feedback mode
+// will simply not return those coordinates, which will destroy a shape which
+// is partly off-screen.
+
+// So, if we transform the coordinates to be always positive, it should be
+// possible to use evaluators. This then presents another problem: what if
+// one coordinate is negative and the other is not, and what if both of
+// those are outside of the viewport?
+
+// one solution would be to use feedback mode unless one of the coordinates
+// is outside of the viewport.
+void trace_curve(const point& startP, const point& controlP,
+                  const point& endP, std::vector<oglVertex>& coords)
+{
+  // Midpoint on line between two endpoints.
+  point mid = middle(startP, endP);
+
+  // Midpoint on the curve.
+  point q = middle(mid, controlP);
+
+  float dist = std::abs(mid.m_x - q.m_x) + std::abs(mid.m_y - q.m_y);
+
+  if (dist < 0.1 /*error tolerance*/) {
+    coords.push_back(oglVertex(endP));
+  } else {
+    // Error is too large; subdivide.
+    trace_curve(startP, middle(startP, controlP), q, coords);
+
+    trace_curve(q, middle(controlP, endP), endP, coords);
+  }
+}
+
+
+
+std::vector<oglVertex> interpolate(const std::vector<edge>& edges, const float& anchor_x,
+                                   const float& anchor_y)
+{
+  point anchor(anchor_x, anchor_y);
+  
+  std::vector<oglVertex> shape_points;
+  shape_points.push_back(oglVertex(anchor));
+  
+  for (std::vector<edge>::const_iterator it = edges.begin(), end = edges.end();
+        it != end; ++it) {
+      const edge& the_edge = *it;
       
-      std::cerr << "OpenGL error: " << (const char*) gluErrorString(error)
-                << std::endl;
-      error = glGetError();
-    }
-}
-#endif // DEBUG_OPENGL
+      point target(the_edge.m_ax, the_edge.m_ay);
 
-class render_handler_ogl : public gnash::triangulating_render_handler
+      if (the_edge.is_straight()) {
+        shape_points.push_back(oglVertex(target));
+      } else {
+        point control(the_edge.m_cx, the_edge.m_cy);
+        
+        trace_curve(anchor, control, target, shape_points);
+      }
+      anchor = target;
+  }
+  
+  return shape_points;  
+}
+
+
+// FIXME: OSX doesn't like void (*)().
+Tesselator::Tesselator()
+: _tessobj(gluNewTess())
 {
-public:
+  gluTessCallback(_tessobj, GLU_TESS_ERROR, 
+                  reinterpret_cast<void (*)()>(Tesselator::error));
+  gluTessCallback(_tessobj, GLU_TESS_COMBINE_DATA,
+                  reinterpret_cast<void (*)()>(Tesselator::combine));
+  
+  gluTessCallback(_tessobj, GLU_TESS_BEGIN,
+                  reinterpret_cast<void (*)()>(glBegin));
+  gluTessCallback(_tessobj, GLU_TESS_END,
+                  reinterpret_cast<void (*)()>(glEnd));
+                  
+  gluTessCallback(_tessobj, GLU_TESS_VERTEX,
+                  reinterpret_cast<void (*)()>(glVertex3dv)); 
+  
+#if 0        
+  // for testing, draw only the outside of shapes.          
+  gluTessProperty(_tessobj, GLU_TESS_BOUNDARY_ONLY, GL_TRUE);
+#endif
+                    
+  // all coordinates lie in the x-y plane
+  // this speeds up tesselation 
+  gluTessNormal(_tessobj, 0.0, 0.0, 1.0);
+}
+  
+Tesselator::~Tesselator()
+{
+  gluDeleteTess(_tessobj);  
+}
+  
+void
+Tesselator::beginPolygon()
+{
+  gluTessBeginPolygon(_tessobj, this);
+}
 
-    // Some renderer state.
+void Tesselator::beginContour()
+{
+  gluTessBeginContour(_tessobj);
+}
+
+void
+Tesselator::feed(std::vector<oglVertex>& vertices)
+{
+  for (std::vector<oglVertex>::const_iterator it = vertices.begin(), end = vertices.end();
+        it != end; ++it) {
+    GLdouble* vertex = const_cast<GLdouble*>(&(*it)._x);
+    gluTessVertex(_tessobj, vertex, vertex);
+  }
+}
+
+void Tesselator::endContour()
+{
+  gluTessEndContour(_tessobj);  
+}
+  
+void 
+Tesselator::tesselate()
+{
+  gluTessEndPolygon(_tessobj);
+
+  for (std::vector<GLdouble*>::iterator it = _vertices.begin(),
+       end = _vertices.end(); it != end; ++it) {
+    delete [] *it;
+  }
+  _vertices.clear();
+}
+
+void
+Tesselator::rememberVertex(GLdouble* v)
+{
+  _vertices.push_back(v);
+}
+
+
+
+// static
+void
+Tesselator::error(GLenum error)
+{  
+  log_error("GLU: %s", gluErrorString(error));
+}
+
+// static
+void
+Tesselator::combine(GLdouble coords [3], void *vertex_data[4],
+                      GLfloat weight[4], void **outData, void* userdata)
+{
+  Tesselator* tess = (Tesselator*)userdata;
+  assert(tess);
+
+  GLdouble* v = new GLdouble[3];
+  v[0] = coords[0];
+  v[1] = coords[1];
+  v[2] = coords[2];
+  
+  *outData = v;
+  
+  tess->rememberVertex(v);
+}
+
+
+bool isEven(const size_t& n)
+{
+  return n % 2 == 0;
+}
+
+class bitmap_info_ogl : public bitmap_info
+{
+  public:
+    bitmap_info_ogl(image::image_base* image, GLenum pixelformat)
+    :
+      _img(image->clone()),
+      _pixel_format(pixelformat),
+      _ogl_img_type(_img->height() == 1 ? GL_TEXTURE_1D : GL_TEXTURE_2D),
+      _ogl_accessible(ogl_accessible()),
+      _texture_id(0),
+      _orig_width(_img->width()),
+      _orig_height(_img->height())
+    {   
+      if (!_ogl_accessible) {
+        return;      
+      }
+      
+      setup();
+    }   
     
-    // Enable/disable antialiasing.
-    bool	m_enable_antialias;
+    ~bitmap_info_ogl()
+    {
+      glDeleteTextures(1, &_texture_id);
+      glDisable(_ogl_img_type);
+    }   
+      
+    inline bool
+    ogl_accessible() const
+    {
+  #if defined(_WIN32) || defined(WIN32)
+      return wglGetCurrentContext();
+  #elif defined(__APPLE_CC__)
+      return aglGetCurrentContext();
+  #else
+      return glXGetCurrentContext();
+  #endif
+    }    
+ 
+    void setup()
+    {      
+      oglScopeEnable enabler(_ogl_img_type);
+      
+      glGenTextures(1, &_texture_id);
+      glBindTexture(_ogl_img_type, _texture_id);
+      
+      bool resize = false;
+      if (_img->height() == 1) {
+        if ( !isEven( _img->width() ) ) {
+          resize = true;
+        }
+      } else {
+        if (!isEven( _img->width() ) || !isEven(_img->height()) ) {
+          resize = true;
+        }     
+      }
+      
+      if (!resize) {
+        upload(_img->data(), _img->width(), _img->height());
+      } else {     
+        
+        size_t w = 1; while (w < _img->width()) { w <<= 1; }
+        size_t h = 1;
+        if (_img->height() != 1) {
+          while (h < _img->height()) { h <<= 1; }
+        }
+        
+        boost::scoped_array<uint8_t> resized_data(new uint8_t[w*h*_img->pixelSize()]);
+        // Q: Would mipmapping these textures aid in performance?
+        
+        GLint rv = gluScaleImage(_pixel_format, _img->width(),
+          _img->height(), GL_UNSIGNED_BYTE, _img->data(), w, h,
+          GL_UNSIGNED_BYTE, resized_data.get());
+        if (rv != 0) {
+          Tesselator::error(rv);
+          assert(0);
+        }
+        
+        upload(resized_data.get(), w, h);
+      }
+      
+      // _img (or a modified version thereof) has been uploaded to OpenGL. We
+      // no longer need to keep it around. Of course this goes against the
+      // principles of auto_ptr...
+      delete _img.release();
+    }
     
-    // Output size.
-    float	m_display_width;
-    float	m_display_height;
-	
-    gnash::matrix	m_current_matrix;
-    gnash::cxform	m_current_cxform;
+    void upload(uint8_t* data, size_t width, size_t height)
+    {
+      glTexParameteri(_ogl_img_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      
+      // FIXME: confirm that OpenGL can handle this image
+      
+      if (_ogl_img_type == GL_TEXTURE_1D) {
+        glTexImage1D(GL_TEXTURE_1D, 0, _pixel_format, width,
+                     0, _pixel_format, GL_UNSIGNED_BYTE, data);
+      
+      } else {      
+        glTexImage2D(_ogl_img_type, 0, _pixel_format, width, height,
+                     0, _pixel_format, GL_UNSIGNED_BYTE, data);
 
-    gnash::point _scale;
-
-    void set_antialiased(bool enable) {
-	m_enable_antialias = enable;
+      }
     }
 
-    // Utility.  Mutates *width, *height and *data to create the
-    // next mip level.
-    static void make_next_miplevel(int* width, int* height, uint8_t* data)
-	{
-	    assert(width);
-	    assert(height);
-	    assert(data);
-
-	    int	new_w = *width >> 1;
-	    int	new_h = *height >> 1;
-	    if (new_w < 1) new_w = 1;
-	    if (new_h < 1) new_h = 1;
-		
-	    if (new_w * 2 != *width	 || new_h * 2 != *height) {
-		// Image can't be shrunk along (at least) one
-		// of its dimensions, so don't bother
-		// resampling.	Technically we should, but
-		// it's pretty useless at this point.  Just
-		// change the image dimensions and leave the
-		// existing pixels.
-	    } else {
-		// Resample.  Simple average 2x2 --> 1, in-place.
-		for (int j = 0; j < new_h; j++) {
-		    uint8_t*	out = ((uint8_t*) data) + j * new_w;
-		    uint8_t*	in = ((uint8_t*) data) + (j << 1) * *width;
-		    for (int i = 0; i < new_w; i++) {
-			int	a;
-			a = (*(in + 0) + *(in + 1) + *(in + 0 + *width) + *(in + 1 + *width));
-			*(out) = a >> 2;
-			out++;
-			in += 2;
-		    }
-		}
-	    }
-	    
-	    // Munge parameters to reflect the shrunken image.
-	    *width = new_w;
-	    *height = new_h;
-	}
+    void apply(const gnash::matrix& bitmap_matrix,
+               render_handler::bitmap_wrap_mode wrap_mode)
+    {
+      glEnable(_ogl_img_type);
     
-    class fill_style
-    {
-    public:
-	enum mode
-	{
-	    INVALID,
-	    COLOR,
-	    BITMAP_WRAP,
-	    BITMAP_CLAMP,
-	    LINEAR_GRADIENT,
-	    RADIAL_GRADIENT
-	};
-	mode	m_mode;
-	gnash::rgba	m_color;
-	bitmap_info_ogl*	m_bitmap_info;
-	gnash::matrix	m_bitmap_matrix;
-	gnash::cxform	m_bitmap_color_transform;
-	bool	m_has_nonzero_bitmap_additive_color;
-		
-	fill_style()
-	    :
-	    m_mode(INVALID),
-            m_bitmap_info(0),
-	    m_has_nonzero_bitmap_additive_color(false)
-	    {
-	    }
-
-	// Push our style into OpenGL.
-	void apply(/*const matrix& current_matrix*/) const
-	{
-//	    GNASH_REPORT_FUNCTION;
-	    assert(m_mode != INVALID);
-	    
-	    if (m_mode == COLOR) {
-		apply_color(m_color);
-		glDisable(GL_TEXTURE_2D);
-	    } else if (m_mode == BITMAP_WRAP
-		       || m_mode == BITMAP_CLAMP) {
-		assert(m_bitmap_info != 0);
-		
-		apply_color(m_color);
-		
-		if (m_bitmap_info == 0) {
-		    glDisable(GL_TEXTURE_2D);
-		} else {
-		    // Set up the texture for rendering.
-		    {
-			// Do the modulate part of the color
-			// transform in the first pass.  The
-			// additive part, if any, needs to
-			// happen in a second pass.
-			glColor4f(m_bitmap_color_transform.m_[0][0],
-				  m_bitmap_color_transform.m_[1][0],
-				  m_bitmap_color_transform.m_[2][0],
-				  m_bitmap_color_transform.m_[3][0]
-			    );
-		    }
-		    
-				if (m_bitmap_info->m_texture_id == 0 && m_bitmap_info->m_suspended_image.get() )
-				{
-					m_bitmap_info->layout_image(m_bitmap_info->m_suspended_image.get());
-					m_bitmap_info->m_suspended_image.reset();
-				}
-
-				// assert(m_bitmap_info->m_texture_id);
-
-				glBindTexture(GL_TEXTURE_2D, m_bitmap_info->m_texture_id);
-		    glEnable(GL_TEXTURE_2D);
-		    glEnable(GL_TEXTURE_GEN_S);
-		    glEnable(GL_TEXTURE_GEN_T);
-		    
-		    if (m_mode == BITMAP_CLAMP)	{	
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		    } else {
-			assert(m_mode == BITMAP_WRAP);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		    }
-		    
-		    // Set up the bitmap matrix for texgen.
-		    
-		    float	inv_width = 1.0f / m_bitmap_info->m_original_width;
-		    float	inv_height = 1.0f / m_bitmap_info->m_original_height;
-		    
-		    const gnash::matrix&	m = m_bitmap_matrix;
-		    glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-		    float	p[4] = { 0, 0, 0, 0 };
-		    p[0] = m.m_[0][0] * inv_width;
-		    p[1] = m.m_[0][1] * inv_width;
-		    p[3] = m.m_[0][2] * inv_width;
-		    glTexGenfv(GL_S, GL_OBJECT_PLANE, p);
-		    
-		    glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-		    p[0] = m.m_[1][0] * inv_height;
-		    p[1] = m.m_[1][1] * inv_height;
-		    p[3] = m.m_[1][2] * inv_height;
-		    glTexGenfv(GL_T, GL_OBJECT_PLANE, p);
-		}
-	    }
-	}
-	
-	
-	// Return true if we need to do a second pass to make
-	// a valid color.  This is for cxforms with additive
-	// parts; this is the simplest way (that we know of)
-	// to implement an additive color with stock OpenGL.
-	bool	needs_second_pass() const
-	    {
-		if (m_mode == BITMAP_WRAP
-		    || m_mode == BITMAP_CLAMP) {
-		    return m_has_nonzero_bitmap_additive_color;
-		} else {
-		    return false;
-		}
-	    }
-	
-	// Set OpenGL state for a necessary second pass.
-	void	apply_second_pass() const
-	    {
-		assert(needs_second_pass());
-		
-		// The additive color also seems to be modulated by the texture. So,
-		// maybe we can fake this in one pass using using the mean value of 
-		// the colors: c0*t+c1*t = ((c0+c1)/2) * t*2
-		// I don't know what the alpha component of the color is for.
-		//glDisable(GL_TEXTURE_2D);
-		
-		glColor4f(
-		    m_bitmap_color_transform.m_[0][1] / 255.0f,
-		    m_bitmap_color_transform.m_[1][1] / 255.0f,
-		    m_bitmap_color_transform.m_[2][1] / 255.0f,
-		    m_bitmap_color_transform.m_[3][1] / 255.0f
-		    );
-		
-		glBlendFunc(GL_ONE, GL_ONE);
-	    }
-
-	void	cleanup_second_pass() const
-	    {
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	    }
+      glEnable(GL_TEXTURE_GEN_S);
+      glEnable(GL_TEXTURE_GEN_T);
+      
+      if (!_ogl_accessible) {
+        // renderer context wasn't available when this class was instantiated.
+        _ogl_accessible=true;
+        setup();
+      }
+      
+      glEnable(_ogl_img_type);
+      glEnable(GL_TEXTURE_GEN_S);
+      glEnable(GL_TEXTURE_GEN_T);    
+      
+      glBindTexture(_ogl_img_type, _texture_id);
+      
+      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+      
+      if (wrap_mode == render_handler::WRAP_CLAMP) {  
+        glTexParameteri(_ogl_img_type, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(_ogl_img_type, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+      } else {
+        glTexParameteri(_ogl_img_type, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(_ogl_img_type, GL_TEXTURE_WRAP_T, GL_REPEAT);
+      }
+        
+      // Set up the bitmap matrix for texgen.
+        
+      float inv_width = 1.0f / _orig_width;
+      float inv_height = 1.0f / _orig_height;
+        
+      const gnash::matrix& m = bitmap_matrix;
+      glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+      float p[4] = { 0, 0, 0, 0 };
+      p[0] = m.m_[0][0] * inv_width;
+      p[1] = m.m_[0][1] * inv_width;
+      p[3] = m.m_[0][2] * inv_width;
+      glTexGenfv(GL_S, GL_OBJECT_PLANE, p);
+    
+      glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+      p[0] = m.m_[1][0] * inv_height;
+      p[1] = m.m_[1][1] * inv_height;
+      p[3] = m.m_[1][2] * inv_height;
+      glTexGenfv(GL_T, GL_OBJECT_PLANE, p);
+      
+    }
+  
+  private:
+    std::auto_ptr<image::image_base> _img;
+    GLenum _pixel_format;
+    GLenum _ogl_img_type;
+    bool _ogl_accessible;  
+    GLuint _texture_id;
+    size_t _orig_width;
+    size_t _orig_height;
+};
 
 
-	void	disable() { m_mode = INVALID; }
-	void	set_color(const gnash::rgba& color) { m_mode = COLOR; m_color = color; }
-	void	set_bitmap(const gnash::bitmap_info* bi_, const gnash::matrix& m, bitmap_wrap_mode wm, const gnash::cxform& color_transform)
-	    {
-		m_mode = (wm == WRAP_REPEAT) ? BITMAP_WRAP : BITMAP_CLAMP;
-
-		bitmap_info* bi = const_cast<bitmap_info*>(bi_);
-
-		assert( dynamic_cast<bitmap_info_ogl*> ( bi ) );
-		m_bitmap_info = static_cast<bitmap_info_ogl*> ( bi );
-		m_bitmap_matrix = m;
-		m_bitmap_color_transform = color_transform;
-		m_bitmap_color_transform.clamp();
-			
-		m_color = gnash::rgba(
-		    uint8_t(m_bitmap_color_transform.m_[0][0] * 255.0f),
-		    uint8_t(m_bitmap_color_transform.m_[1][0] * 255.0f),
-		    uint8_t(m_bitmap_color_transform.m_[2][0] * 255.0f),
-		    uint8_t(m_bitmap_color_transform.m_[3][0] * 255.0f));
-			
-		if (m_bitmap_color_transform.m_[0][1] > 1.0f
-		    || m_bitmap_color_transform.m_[1][1] > 1.0f
-		    || m_bitmap_color_transform.m_[2][1] > 1.0f
-		    || m_bitmap_color_transform.m_[3][1] > 1.0f)
-		    {
-			m_has_nonzero_bitmap_additive_color = true;
-		    }
-		else
-		    {
-			m_has_nonzero_bitmap_additive_color = false;
-		    }
-	    }
-	bool	is_valid() const { return m_mode != INVALID; }
-    };
-
-
-    // Style state.
-    enum style_index
-    {
-	LEFT_STYLE = 0,
-	RIGHT_STYLE,
-	LINE_STYLE,
-
-	STYLE_COUNT
-    };
-    fill_style	m_current_styles[STYLE_COUNT];
-
-
-    gnash::bitmap_info*	create_bitmap_info_rgb(image::rgb* im)
-	// Given an image, returns a pointer to a bitmap_info class
-	// that can later be passed to fill_styleX_bitmap(), to set a
-	// bitmap fill style.
-	{
-	    return new bitmap_info_ogl(im);
-	}
-
-
-    gnash::bitmap_info*	create_bitmap_info_rgba(image::rgba* im)
-	// Given an image, returns a pointer to a bitmap_info class
-	// that can later be passed to fill_style_bitmap(), to set a
-	// bitmap fill style.
-	//
-	// This version takes an image with an alpha channel.
-	{
-	    return new bitmap_info_ogl(im);
-	}
-
-    gnash::bitmap_info*	create_bitmap_info_alpha(int w, int h, uint8_t* data)
-	// Create a bitmap_info so that it contains an alpha texture
-	// with the given data (1 byte per texel).
-	//
-	// Munges *data (in order to make mipmaps)!!
-	{
-	    return new bitmap_info_ogl(w, h, data);
-	}
-
-
-    void	delete_bitmap_info(gnash::bitmap_info* bi)
-	// Delete the given bitmap info class.
-	{
-	    delete bi;
-	}
-
-#define GLYUV 0
-
- 	// Returns the format the current renderer wants videoframes in.
-	int videoFrameFormat() {
-#if GLYUV
-		return YUV;
-#else
-		return RGB;
-#endif
-	}
-	
-	/// Draws the video frames
-	void drawVideoFrame(image::image_base* baseframe, const matrix* m, const rect* bounds){
-#if GLYUV
-		image::yuv* frame = static_cast<image::yuv*>(baseframe);
-#else
-		image::rgb* frame = static_cast<image::rgb*>(baseframe);
-#endif
-		glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT);
-
-#if GLYUV
-		static GLfloat yuv_rgb[16] = {
-			1, 1, 1, 0,
-			0, -0.3946517043589703515f, 2.032110091743119266f, 0,
-			1.139837398373983740f, -0.5805986066674976801f, 0, 0,
-			0, 0, 0, 1
-		};
-#endif
-
-		glMatrixMode(GL_COLOR);
-		glPushMatrix();
-#if GLYUV
-		glLoadMatrixf(yuv_rgb);
-		glPixelTransferf(GL_GREEN_BIAS, -0.5f);
-		glPixelTransferf(GL_BLUE_BIAS, -0.5f);
-#else
-		glLoadIdentity();
-		glPixelTransferf(GL_GREEN_BIAS, 0.0);
-		glPixelTransferf(GL_BLUE_BIAS, 0.0);
-#endif
-		gnash::point a, b, c, d;
-		m->transform(&a, gnash::point(bounds->get_x_min(), bounds->get_y_min()));
-		m->transform(&b, gnash::point(bounds->get_x_max(), bounds->get_y_min()));
-		m->transform(&c, gnash::point(bounds->get_x_min(), bounds->get_y_max()));
-		d.m_x = b.m_x + c.m_x - a.m_x;
-		d.m_y = b.m_y + c.m_y - a.m_y;
-
-		float w_bounds = TWIPS_TO_PIXELS(b.m_x - a.m_x);
-		float h_bounds = TWIPS_TO_PIXELS(c.m_y - a.m_y);
-
-		unsigned char*   ptr = frame->data();
-		float xpos = a.m_x < 0 ? 0.0f : a.m_x;	//hack
-		float ypos = a.m_y < 0 ? 0.0f : a.m_y;	//hack
-		glRasterPos2f(xpos, ypos);	//hack
-
-#if GLYUV
-		GLenum rgb[3] = {GL_RED, GL_GREEN, GL_BLUE}; 
-
-		for (int i = 0; i < 3; ++i)
-		{
-			float zx = w_bounds / (float) frame->planes[i].w;
-			float zy = h_bounds / (float) frame->planes[i].h;
-			glPixelZoom(zx, - zy);	// flip & zoom image
-
-			if (i > 0)
-			{
-				glEnable(GL_BLEND);
-				glBlendFunc(GL_ONE, GL_ONE);
-			}
-
-			glDrawPixels(frame->planes[i].w, frame->planes[i].h, rgb[i], GL_UNSIGNED_BYTE, ptr);
-			ptr += frame->planes[i].size;
-		}
-#else
-		size_t height = frame->height();
-		size_t width = frame->width();
-		float zx = w_bounds / (float) width;
-		float zy = h_bounds / (float) height;
-		glPixelZoom(zx,  -zy);	// flip & zoom image
-		glDrawPixels(width, height, GL_RGB, GL_UNSIGNED_BYTE, ptr);
-#endif
-
-		glPopMatrix();
-
-		glPopAttrib();
-
-		// Restore the default matrix mode.
-		glMatrixMode(GL_MODELVIEW);
-	
-	}
-   
-	// Ctor stub.
-	render_handler_ogl()
-	{
-	}
-
-	// Dtor stub.
-	~render_handler_ogl()
-	{
-	}
-
-    void	begin_display(
-	const gnash::rgba& bg_color,
-	int viewport_x0, int viewport_y0,
-	int viewport_width, int viewport_height,
-	float x0, float x1, float y0, float y1)
-	{
-//	    GNASH_REPORT_FUNCTION;
-	    
-	    m_display_width = fabsf(x1 - x0);
-	    m_display_height = fabsf(y1 - y0);
-
-	    glViewport(viewport_x0, viewport_y0, viewport_width, viewport_height);
-
-	    glPushMatrix();
-	    glOrtho(x0, x1, y0, y1, -1, 1);
-
-	    // Clear the background, if background color has alpha > 0.
-	    if (bg_color.m_a > 0)
-	    {
-	        // Setup the clearing color.
-            	glClearColor(bg_color.m_r / 255, bg_color.m_g / 255, bg_color.m_b / 255, 
-	 	             bg_color.m_a / 255);
-		glClear(GL_COLOR_BUFFER_BIT);
-	    }
-
-#ifdef DEBUG_OPENGL
-	    check_error();
-#endif
-
-	    // Markus: Implement anti-aliasing here...
-#if 0
-/*
-Code from Timo Kanera...
-if (gl_antialias)
+class DSOEXPORT render_handler_ogl : public render_handler
+{
+public: 
+  render_handler_ogl()
+    : _xscale(1.0),
+      _yscale(1.0)
   {
-    glShadeModel (GL_SMOOTH);
-    glEnable (GL_POLYGON_SMOOTH);
-    glEnable (GL_LINE_SMOOTH);
-    glEnable (GL_POINT_SMOOTH);
-    mp_msg(MSGT_VO, MSGL_INFO, "[sgi] antialiasing on\n");
+    // Turn on alpha blending.
+    // FIXME: do this when it's actually used?
+    glEnable(GL_BLEND);
+    // This blend operation is best for rendering antialiased points and lines in 
+    // no particular order.
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // Turn on line smoothing.  Antialiased lines can be used to
+    // smooth the outsides of shapes.
+    glEnable(GL_LINE_SMOOTH);
+#if 0
+    // FIXME: figure out which of these is appropriate.
+    //glHint(GL_LINE_SMOOTH_HINT, GL_NICEST); // GL_NICEST, GL_FASTEST, GL_DONT_CARE
+#endif
+
+    glMatrixMode(GL_PROJECTION);
+    
+    float oversize = 1.0;
+
+    // Flip the image, since (0,0) by default in OpenGL is the bottom left.
+    gluOrtho2D(-oversize, oversize, oversize, -oversize);
+    // Restore the matrix mode to the default.
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+
+#ifdef FIX_I810_LOD_BIAS
+    // If 2D textures weren't previously enabled, enable
+    // them now and force the driver to notice the update,
+    // then disable them again.
+    if (!glIsEnabled(GL_TEXTURE_2D)) {
+      // Clearing a mask of zero *should* have no
+      // side effects, but coupled with enbling
+      // GL_TEXTURE_2D it works around a segmentation
+      // fault in the driver for the Intel 810 chip.
+      oglScopeEnable enabler(GL_TEXTURE_2D);
+      glClear(0);
+    }
+#endif
+
+    glShadeModel(GL_FLAT);
+  
+  }
+  
+  ~render_handler_ogl()
+  {
+  }
+
+
+  virtual bitmap_info*  create_bitmap_info_alpha(int w, int h, unsigned char* data)
+  {
+    log_unimpl("create_bitmap_info_alpha()");
+    return NULL;
+  }
+
+  virtual bitmap_info*  create_bitmap_info_rgb(image::rgb* im)
+  {
+    return new bitmap_info_ogl(im, GL_RGB);
+  }
+
+  virtual bitmap_info*  create_bitmap_info_rgba(image::rgba* im)
+  {
+    return new bitmap_info_ogl(im, GL_RGBA);
+  }
+
+  virtual void  delete_bitmap_info(bitmap_info* bi)
+  {
+    delete bi;
+  }
+  
+  enum video_frame_format
+  {
+    NONE,
+    YUV,
+    RGB
+  };
+
+  virtual int videoFrameFormat()
+  {
+    return RGB;
+  }
+  
+  
+  virtual void drawVideoFrame(image::image_base* baseframe, const matrix* m, const rect* bounds)
+  {
+    GNASH_REPORT_FUNCTION;
+    
+    image::rgb* frame = static_cast<image::rgb*>(baseframe);
+
+    glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT);
+
+
+    glMatrixMode(GL_COLOR);
+    glPushMatrix();
+
+    glLoadIdentity();
+    glPixelTransferf(GL_GREEN_BIAS, 0.0);
+    glPixelTransferf(GL_BLUE_BIAS, 0.0);
+
+    gnash::point a, b, c, d;
+    m->transform(&a, gnash::point(bounds->get_x_min(), bounds->get_y_min()));
+    m->transform(&b, gnash::point(bounds->get_x_max(), bounds->get_y_min()));
+    m->transform(&c, gnash::point(bounds->get_x_min(), bounds->get_y_max()));
+    d.m_x = b.m_x + c.m_x - a.m_x;
+    d.m_y = b.m_y + c.m_y - a.m_y;
+
+    float w_bounds = TWIPS_TO_PIXELS(b.m_x - a.m_x);
+    float h_bounds = TWIPS_TO_PIXELS(c.m_y - a.m_y);
+
+    unsigned char*   ptr = frame->data();
+    float xpos = a.m_x < 0 ? 0.0f : a.m_x;  //hack
+    float ypos = a.m_y < 0 ? 0.0f : a.m_y;  //hack
+    glRasterPos2f(xpos, ypos);  //hack
+
+    size_t height = frame->height();
+    size_t width = frame->width();
+    float zx = w_bounds / (float) width;
+    float zy = h_bounds / (float) height;
+    glPixelZoom(zx,  -zy);  // flip & zoom image
+    glDrawPixels(width, height, GL_RGB, GL_UNSIGNED_BYTE, ptr);
+
+    glPopMatrix();
+
+    glPopAttrib();
+
+    // Restore the default matrix mode.
+    glMatrixMode(GL_MODELVIEW); 
+    
+  }
+
+  // FIXME
+  geometry::Range2d<int>
+  world_to_pixel(const rect& worldbounds)
+  {
+    // TODO: verify this is correct
+    geometry::Range2d<int> ret(worldbounds.getRange());
+    ret.scale(1.0/20.0); // twips to pixels
+    return ret;
+  }
+
+  // FIXME
+  point 
+  pixel_to_world(int x, int y)
+  {
+    // TODO: verify this is correct
+    return point(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+  }
+
+  virtual void  begin_display(
+    const rgba& bg_color,
+    int viewport_x0, int viewport_y0,
+    int viewport_width, int viewport_height,
+    float x0, float x1, float y0, float y1)
+  {    
+    glViewport(viewport_x0, viewport_y0, viewport_width, viewport_height);
+    glLoadIdentity();
+
+    gluOrtho2D(x0, x1, y0, y1);
+
+    if (bg_color.m_a) {
+      // Setup the clearing color.
+      glClearColor(bg_color.m_r / 255.0, bg_color.m_g / 255.0, bg_color.m_b / 255.0, 
+                   bg_color.m_a / 255.0);
+      // Do the actual clearing.
+    } else {
+      glClearColor(1.0, 1.0, 1.0, 1.0);
+    }
+    
+    glClear(GL_COLOR_BUFFER_BIT);  
+  }
+  
+  static void
+  apply_matrix(const gnash::matrix& m)
+  // multiply current matrix with opengl matrix
+  {
+    // FIXME: applying matrix transformations is faster than using glMultMatrix!
+  
+    float mat[16];
+    memset(&mat[0], 0, sizeof(mat));
+    mat[0] = m.m_[0][0];
+    mat[1] = m.m_[1][0];
+    mat[4] = m.m_[0][1];
+    mat[5] = m.m_[1][1];
+    mat[10] = 1;
+    mat[12] = m.m_[0][2];
+    mat[13] = m.m_[1][2];
+    mat[15] = 1;
+    glMultMatrixf(mat);
+  }
+
+  virtual void
+  end_display()
+  {
+    glFlush(); // Make OpenGL execute all commands in the buffer.
+  }
+    
+  /// Geometric transforms for mesh and line_strip rendering.
+  virtual void
+  set_matrix(const matrix& m)
+  {
+    log_unimpl("set_matrix");
+  }
+
+  /// Color transforms for mesh and line_strip rendering.
+  virtual void
+  set_cxform(const cxform& cx)
+  {
+    log_unimpl("set_cxform");
+  }
+    
+  /// Draw a line-strip directly, using a thin, solid line. 
+  //
+  /// Can be used to draw empty boxes and cursors.
+  virtual void
+  draw_line_strip(const void* coords, int vertex_count, const rgba& color)
+  {
+    glPushMatrix();
+    
+    glColor3ub(color.m_r, color.m_g, color.m_b);
+
+    // Send the line-strip to OpenGL
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(2, GL_SHORT, 0 /* tight packing */, coords);
+    glDrawArrays(GL_LINE_STRIP, 0, vertex_count);
+
+    // Draw a dot on the beginning and end coordinates to round lines.
+    //   glVertexPointer: skip all but the first and last coordinates in the line.
+    glVertexPointer(2, GL_SHORT, (sizeof(int16_t) * 2) * (vertex_count - 1), coords);
+    glEnable(GL_POINT_SMOOTH); // Draw a round (antialiased) point.
+    glDrawArrays(GL_POINTS, 0, 2);
+    glDisable(GL_POINT_SMOOTH);
+    glPointSize(1); // return to default
+
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glPopMatrix();
+  }
+
+  virtual void  draw_poly(const point* corners, size_t corner_count, 
+    const rgba& fill, const rgba& outline, bool masked)
+  {
+    log_unimpl("draw_poly");
+  }
+
+  virtual void  draw_bitmap(
+    const matrix&   m,
+    const bitmap_info*  bi,
+    const rect&   coords,
+    const rect&   uv_coords,
+    const rgba&   color)
+  {
+    log_unimpl("draw_bitmap");
+  }
+    
+  virtual void  set_antialiased(bool enable)
+  {
+    log_unimpl("set_antialiased");
+  }
+    
+  virtual void begin_submit_mask()
+  {
+    glEnable(GL_STENCIL_TEST); 
+    glClearStencil(0x0); // FIXME: default is zero, methinks
+    glClear(GL_STENCIL_BUFFER_BIT);
+    
+    // Since we are marking the stencil, the stencil function test should
+    // always succeed.
+    glStencilFunc (GL_NEVER, 0x1, 0x1);    
+    
+    glStencilOp (GL_REPLACE /* Stencil test fails */ ,
+                 GL_ZERO /* Value is ignored */ ,
+                 GL_REPLACE /* Stencil test passes */);     
+  }
+  
+  virtual void end_submit_mask()
+  {        
+    glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
+    glStencilFunc(GL_EQUAL, 0x1, 0x1);
+  }
+  
+  virtual void disable_mask()
+  {  
+    glDisable(GL_STENCIL_TEST);
+  }
+
+#if 0
+  void print_path(const path& path)
+  {
+    std::cout << "Origin: ("
+              << path.m_ax
+              << ", "
+              << path.m_ay
+              << ") fill0: "
+              << path.m_fill0
+              << " fill1: "
+              << path.m_fill1
+              << " line: "
+              << path.m_line
+              << " new shape: "
+              << path.m_new_shape              
+              << " number of edges: "
+              << path.m_edges.size()
+              << " edge endpoint: ("
+              << path.m_edges.back().m_ax
+              << ", "
+              << path.m_edges.back().m_ay
+              << " ) points:";
+
+    for (std::vector<edge>::const_iterator it = path.m_edges.begin(), end = path.m_edges.end();
+         it != end; ++it) {
+      const edge& cur_edge = *it;
+      std::cout << "( " << cur_edge.m_ax << ", " << cur_edge.m_ay << ") ";
+    }
+    std::cout << std::endl;             
+  }
+#endif
+  
+  
+  path reverse_path(const path& cur_path)
+  {
+    const edge& cur_end = cur_path.m_edges.back();    
+        
+    float prev_cx = cur_end.m_cx;
+    float prev_cy = cur_end.m_cy;        
+                
+    path newpath(cur_end.m_ax, cur_end.m_ay, cur_path.m_fill1, cur_path.m_fill0, cur_path.m_line);
+    
+    float prev_ax = cur_end.m_ax;
+    float prev_ay = cur_end.m_ay; 
+
+    for (std::vector<edge>::const_reverse_iterator it = cur_path.m_edges.rbegin()+1, end = cur_path.m_edges.rend();
+         it != end; ++it) {
+      const edge& cur_edge = *it;
+
+      if (prev_ax == prev_cx && prev_ay == prev_cy) {
+        prev_cx = cur_edge.m_ax;
+        prev_cy = cur_edge.m_ay;      
+      }
+
+      edge newedge(prev_cx, prev_cy, cur_edge.m_ax, cur_edge.m_ay); 
+          
+      newpath.m_edges.push_back(newedge);
+          
+      prev_cx = cur_edge.m_cx;
+      prev_cy = cur_edge.m_cy;
+      prev_ax = cur_edge.m_ax;
+      prev_ay = cur_edge.m_ay;
+           
+    }
+        
+    edge newlastedge(prev_cx, prev_cy, cur_path.m_ax, cur_path.m_ay);    
+    newpath.m_edges.push_back(newlastedge);
+        
+    return newpath;
+  }
+  
+  const path* find_connecting_path(const path& to_connect,
+                                   std::list<const path*> path_refs)
+  {
+        
+    float target_x = to_connect.m_edges.back().m_ax;
+    float target_y = to_connect.m_edges.back().m_ay;
+
+    if (target_x == to_connect.m_ax &&
+        target_y == to_connect.m_ay) {
+      return NULL;
+    }
+  
+    for (std::list<const path*>::const_iterator it = path_refs.begin(), end = path_refs.end();
+         it != end; ++it) {
+      const path* cur_path = *it;
+      
+      if (cur_path == &to_connect) {
+      
+        continue;
+      
+      }
+      
+            
+      if (cur_path->m_ax == target_x && cur_path->m_ay == target_y) {
+ 
+        if (cur_path->m_fill1 != to_connect.m_fill1) {
+          continue;
+        }
+        return cur_path;
+      }
+    }
+  
+  
+    return NULL;  
+  }
+  
+  PathVec normalize_paths(const PathVec &paths)
+  {
+    PathVec normalized;
+  
+    for (PathVec::const_iterator it = paths.begin(), end = paths.end();
+         it != end; ++it) {
+      const path& cur_path = *it;
+      
+      if (cur_path.m_edges.empty()) {
+        continue;
+      
+      } else if (cur_path.m_fill0 && cur_path.m_fill1) {     
+        
+        // Two fill styles; duplicate and then reverse the left-filled one.
+        normalized.push_back(cur_path);
+        normalized.back().m_fill0 = 0; 
+     
+        path newpath = reverse_path(cur_path);
+        newpath.m_fill0 = 0;        
+           
+        normalized.push_back(newpath);       
+
+      } else if (cur_path.m_fill0) {
+        // Left fill style.
+        path newpath = reverse_path(cur_path);
+        newpath.m_fill0 = 0;
+           
+        normalized.push_back(newpath);
+      } else if (cur_path.m_fill1) {
+        // Right fill style.
+
+        normalized.push_back(cur_path);
+      } else {
+        // No fill styles; copy without modifying.
+        normalized.push_back(cur_path);
+      }
+
+    }
+    
+    return normalized;
+  }
+  
+  
+  
+  
+  
+  
+  /// Analyzes a set of paths to detect real presence of fills and/or outlines
+  /// TODO: This should be something the character tells us and should be 
+  /// cached. 
+  void analyze_paths(const PathVec &paths, bool& have_shape,
+    bool& have_outline) {
+    //normalize_paths(paths);
+    have_shape=false;
+    have_outline=false;
+    
+    int pcount = paths.size();
+    
+    for (int pno=0; pno<pcount; pno++) {
+    
+      const path &the_path = paths[pno];
+    
+      if ((the_path.m_fill0>0) || (the_path.m_fill1>0)) {
+        have_shape=true;
+        if (have_outline) return; // have both
+      }
+    
+      if (the_path.m_line>0) {
+        have_outline=true;
+        if (have_shape) return; // have both
+      }
+    
+    }    
+  }
+
+  void apply_fill_style(const fill_style& style, const matrix& mat, const cxform& cx)
+  {
+      int fill_type = style.get_type();
+      
+      rgba c = cx.transform(style.get_color());
+
+      glColor4ub(c.m_r, c.m_g, c.m_b, c.m_a);
+          
+          
+      switch (fill_type) {
+
+        case SWF::FILL_LINEAR_GRADIENT:
+        case SWF::FILL_RADIAL_GRADIENT:
+        case SWF::FILL_FOCAL_GRADIENT:
+        {
+                    
+          bitmap_info_ogl* binfo = static_cast<bitmap_info_ogl*>(style.need_gradient_bitmap());       
+          matrix m = style.get_gradient_matrix();
+          
+          binfo->apply(m, render_handler::WRAP_CLAMP); 
+          
+          break;
+        }        
+        case SWF::FILL_TILED_BITMAP_HARD:
+        case SWF::FILL_TILED_BITMAP:
+        {
+          bitmap_info_ogl* binfo = static_cast<bitmap_info_ogl*>(style.get_bitmap_info());
+
+          binfo->apply(style.get_bitmap_matrix(), render_handler::WRAP_REPEAT);
+          break;
+        }
+                
+        case SWF::FILL_CLIPPED_BITMAP:
+        // smooth=true;
+        case SWF::FILL_CLIPPED_BITMAP_HARD:
+        {     
+          bitmap_info_ogl* binfo = dynamic_cast<bitmap_info_ogl*>(style.get_bitmap_info());
+          
+          assert(binfo);
+
+          binfo->apply(style.get_bitmap_matrix(), render_handler::WRAP_CLAMP);
+          
+          break;
+        } 
+
+        case SWF::FILL_SOLID:
+        {
+          rgba c = cx.transform(style.get_color());
+
+          glColor4ub(c.m_r, c.m_g, c.m_b, c.m_a);
+        }
+        
+      } // switch
+  }
+  
+  
+  
+  void apply_line_style(const line_style& style, const cxform& cx, const matrix& mat)
+  {
+  //  GNASH_REPORT_FUNCTION;
+     
+    // In case GL_TEXTURE_2D was enabled by apply_fill_style(), disable it now.
+    // FIXME: this sucks
+    glDisable(GL_TEXTURE_2D);
+    
+    
+    float width = style.get_width();
+    
+    if (width <= 1.0f) {
+      glLineWidth(1.0f);
+    } else {
+      
+      float stroke_scale = fabsf(mat.get_x_scale()) + fabsf(mat.get_y_scale());
+      stroke_scale /= 2.0f;
+      stroke_scale *= (fabsf(_xscale) + fabsf(_yscale)) / 2.0f;
+      width *= stroke_scale;
+      width = TWIPS_TO_PIXELS(width);
+
+      GLfloat width_info[2];
+      
+      glGetFloatv( GL_LINE_WIDTH_RANGE, width_info);          
+      
+      if (width > width_info[1]) {
+        log_error("Your OpenGL implementation does not support the line width" \
+                  " requested. Lines will be drawn with reduced width.");
+      }
+      
+      glLineWidth(width);
+      glPointSize(width);
+    }
+
+    rgba c = cx.transform(style.get_color());
+
+    glColor4ub(c.m_r, c.m_g, c.m_b, c.m_a);
+  }
+ 
+  PathPointMap getPathPoints(const PathVec& path_vec)
+  {
+  
+    PathPointMap pathpoints;
+    
+    for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
+         it != end; ++it) {
+      const path& cur_path = *it;
+
+      if (!cur_path.m_edges.size()) {
+        continue;
+      }
+        
+      pathpoints[&cur_path] = interpolate(cur_path.m_edges, cur_path.m_ax,
+                                                            cur_path.m_ay);
+
+    }
+    
+    return pathpoints;
+  } 
+  
+  typedef std::vector<const path*> PathPtrVec;
+  
+    
+  void
+  draw_outlines(const PathVec& path_vec, const PathPointMap& pathpoints, const matrix& mat,
+                const cxform& cx, const std::vector<fill_style>& fill_styles,
+                const std::vector<line_style>& line_styles)
+  {
+  
+    for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
+         it != end; ++it) {
+      const path& cur_path = *it;
+      
+      if (cur_path.m_line) {
+        apply_line_style(line_styles[cur_path.m_line-1], cx, mat);
+        
+      } else if (fill_styles[cur_path.m_fill1-1].get_type() == SWF::FILL_SOLID) {
+      
+        glLineWidth(1.0);
+        
+        rgba c = cx.transform(fill_styles[cur_path.m_fill1-1].get_color());
+        glColor4ub(c.m_r, c.m_g, c.m_b, c.m_a);
+      } else {
+        continue;
+      }
+      
+      assert(pathpoints.find(&cur_path) != pathpoints.end());
+      
+      const std::vector<oglVertex>& shape_points = (*pathpoints.find(&cur_path)).second;
+      
+      //glDisable(GL_TEXTURE_1D);
+      //glDisable(GL_TEXTURE_2D);
+      // Draw outlines.
+      glEnableClientState(GL_VERTEX_ARRAY);
+      glVertexPointer(3, GL_DOUBLE, 0 /* tight packing */, &shape_points.front());
+      glDrawArrays(GL_LINE_STRIP, 0, shape_points.size());
+      
+      // Draw a dot on the beginning and end coordinates to round lines.
+      //   glVertexPointer: skip all but the first and last coordinates in the line.
+      glVertexPointer(3, GL_DOUBLE, (sizeof(GLdouble) * 3) * (shape_points.size() - 1), &shape_points.front());
+      glEnable(GL_POINT_SMOOTH); // Draw a round (antialiased) point.
+      glDrawArrays(GL_POINTS, 0, 2);
+      glDisable(GL_POINT_SMOOTH);
+      glPointSize(1); // return to default
+        
+      
+      glDisableClientState(GL_VERTEX_ARRAY);
+      
+      
+    }
+  }
+
+
+  std::list<WholeShape> get_whole_shapes(const PathPtrVec &paths)
+  {
+    // First, we create a vector of pointers to the individual paths. This is
+    // intended to allow us to keep track of which paths have already been
+    // used inside a shape.
+    
+    std::list<const path*> path_refs;
+    std::list<WholeShape> shapes;
+
+    for (PathPtrVec::const_iterator it = paths.begin(), end = paths.end();
+         it != end; ++it) {
+      const path* cur_path = *it;
+      path_refs.push_back(cur_path);
+    }
+
+    for (std::list<const path*>::const_iterator it = path_refs.begin(), end = path_refs.end();
+         it != end; ++it) {
+      const path* cur_path = *it;
+      
+      if (cur_path->m_edges.empty()) {
+        continue;
+      }
+      
+      if (!cur_path->m_fill0 && !cur_path->m_fill1) {
+        continue;
+      }
+      
+      WholeShape shape;      
+      
+      shape.newPath(*cur_path);    
+        
+      const path* connector = find_connecting_path(*cur_path, path_refs);
+
+      while (connector) {
+        shape.addPath(*connector);        
+        
+        std::list<const path*>::const_iterator iter = it;
+        iter++;
+        
+        connector = find_connecting_path(*connector, std::list<const path*>(iter, end));
+  
+        // make sure we don't iterate over the connecting path in the for loop.
+        path_refs.remove(connector);        
+      }
+      
+      shapes.push_back(shape);     
+    }
+    
+    return shapes;
+  }
+  
+  
+  
+  std::list<PathPtrVec> get_contours(const PathPtrVec &paths)
+  {
+    std::list<const path*> path_refs;
+    std::list<PathPtrVec> contours;
+    
+    
+    for (PathPtrVec::const_iterator it = paths.begin(), end = paths.end();
+         it != end; ++it) {
+      const path* cur_path = *it;
+      path_refs.push_back(cur_path);
+    }
+        
+    for (std::list<const path*>::const_iterator it = path_refs.begin(), end = path_refs.end();
+         it != end; ++it) {
+      const path* cur_path = *it;
+      
+      if (cur_path->m_edges.empty()) {
+        continue;
+      }
+      
+      if (!cur_path->m_fill0 && !cur_path->m_fill1) {
+        continue;
+      }
+      
+      PathPtrVec contour;
+            
+      contour.push_back(cur_path);
+        
+      const path* connector = find_connecting_path(*cur_path, path_refs);
+
+      while (connector) {       
+        contour.push_back(connector);
+
+        const path* tmp = connector;
+        connector = find_connecting_path(*connector, std::list<const path*>(boost::next(it), end));
+  
+        // make sure we don't iterate over the connecting path in the for loop.
+        path_refs.remove(tmp);
+        
+      } 
+      
+      contours.push_back(contour);   
+    }
+    
+    return contours;
+  }
+
+  
+  
+  
+  PathPtrVec
+  get_paths_by_style(const PathVec& path_vec, unsigned int style)
+  {
+    PathPtrVec paths;
+    for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
+         it != end; ++it) {
+      const path& cur_path = *it;
+      
+      if (cur_path.m_fill0 == style) {
+        paths.push_back(&cur_path);
+      }
+      
+      if (cur_path.m_fill1 == style) {
+        paths.push_back(&cur_path);
+      }
+      
+    }
+    return paths;
+  }
+  
+  
+  std::vector<PathVec::const_iterator>
+  find_subshapes(const PathVec& path_vec)
+  {
+    std::vector<PathVec::const_iterator> subshapes;
+    
+    PathVec::const_iterator it = path_vec.begin(),
+                            end = path_vec.end();
+    
+    subshapes.push_back(it);
+    ++it;
+
+    for (;it != end; ++it) {
+      const path& cur_path = *it;
+    
+      if (cur_path.m_new_shape) {
+        subshapes.push_back(it); 
+      }   
+    } 
+
+    if (subshapes.back() != end) {
+      subshapes.push_back(end);
+    }
+    
+    return subshapes;
+  }
+  
+  
+  void
+  draw_subshape(const PathVec& path_vec,
+    const matrix& mat,
+    const cxform& cx,
+    float pixel_scale,
+    const std::vector<fill_style>& fill_styles,
+    const std::vector<line_style>& line_styles)
+  {
+    PathVec normalized = normalize_paths(path_vec);
+    PathPointMap pathpoints = getPathPoints(normalized);
+    
+
+    for (size_t i = 0; i < fill_styles.size(); ++i) {
+      PathPtrVec paths = get_paths_by_style(normalized, i+1);
+      
+      if (!paths.size()) {
+        continue;
+      }
+      
+      std::list<PathPtrVec> contours = get_contours(paths);
+
+      _tesselator.beginPolygon();
+      
+      for (std::list<PathPtrVec>::const_iterator iter = contours.begin(),
+           final = contours.end(); iter != final; ++iter) {      
+        const PathPtrVec& refs = *iter;
+        
+        _tesselator.beginContour();
+                   
+        for (PathPtrVec::const_iterator it = refs.begin(), end = refs.end();
+             it != end; ++it) {
+          const path& cur_path = *(*it);          
+          
+          assert(pathpoints.find(&cur_path) != pathpoints.end());
+
+          _tesselator.feed(pathpoints[&cur_path]);
+          
+        }
+        
+        _tesselator.endContour();
+      }
+      
+      glNewList(1, GL_COMPILE);
+      
+      _tesselator.tesselate();
+      
+      glEndList();
+      
+      apply_fill_style(fill_styles[i], mat, cx);
+      
+ 
+      if (fill_styles[i].get_type() != SWF::FILL_SOLID) {     
+        // Apply alpha premultiplication.
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+      }
+
+      glCallList(1);
+
+      if (fill_styles[i].get_type() != SWF::FILL_SOLID) {    
+        // restore to original.
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      }
+      
+      glDisable(GL_TEXTURE_1D);
+      glDisable(GL_TEXTURE_2D);
+      
+      // FIXME: free up the display list, or not?        
+    }
+    
+    draw_outlines(normalized, pathpoints, mat, cx, fill_styles, line_styles);
+  }
+  
+// Drawing procedure:
+// 1. Separate paths by subshape.
+// 2. Separate subshapes by fill style.
+// 3. For every subshape/fill style combo:
+//  a. Separate contours: find closed shapes by connecting ends.
+//  b. Apply fill style.
+//  c. Feed the contours in the tesselator. (Render.)
+//  d. Draw outlines for every path in the subshape with a line style.
+//
+// 4. ...
+// 5. Profit!
+  
+  virtual void
+  draw_shape_character(shape_character_def *def, 
+    const matrix& mat,
+    const cxform& cx,
+    float pixel_scale,
+    const std::vector<fill_style>& fill_styles,
+    const std::vector<line_style>& line_styles)
+  {
+  
+    const PathVec& path_vec = def->get_paths();
+
+    if (!path_vec.size()) {
+      // No paths. Nothing to draw...
+      return;
+    }
+    
+    bool have_shape, have_outline;
+    
+    analyze_paths(path_vec, have_shape, have_outline);
+    
+    if (!have_shape && !have_outline) {
+      return; // invisible character
+    }    
+    
+    glPushMatrix();
+    apply_matrix(mat);
+
+    std::vector<PathVec::const_iterator> subshapes = find_subshapes(path_vec);
+    
+    for (size_t i = 0; i < subshapes.size()-1; ++i) {
+      PathVec subshape_paths;
+      
+      if (subshapes[i] != subshapes[i+1]) {
+        subshape_paths = PathVec(subshapes[i], subshapes[i+1]);
+      } else {
+        subshape_paths.push_back(*subshapes[i]);
+      }
+      
+      draw_subshape(subshape_paths, mat, cx, pixel_scale, fill_styles,
+                    line_styles);
+    }
+    
+    glPopMatrix();    
+  }
+
+  virtual void draw_glyph(shape_character_def *def, const matrix& mat,
+    const rgba& c, float pixel_scale)
+  {
+    cxform dummy_cx;
+    std::vector<fill_style> glyph_fs;
+    
+    fill_style coloring;
+    coloring.setSolid(c);
+    
+    glyph_fs.push_back(coloring);
+    
+    std::vector<line_style> dummy_ls;
+    draw_shape_character(def, mat, dummy_cx, pixel_scale, glyph_fs, dummy_ls); 
+  }
+
+  virtual bool allow_glyph_textures()
+  {
+    return false;
+  }
+  
+  virtual void set_scale(float xscale, float yscale) {
+    _xscale = xscale;
+    _yscale = yscale;
+  }
+
+  virtual void get_scale(point& scale) {
+    scale.m_x = _xscale;
+    scale.m_y = _yscale;
+  }
+    
+
+private:
+  Tesselator _tesselator;
+  float _xscale;
+  float _yscale;
+}; // class render_handler_ogl
+  
+render_handler* create_render_handler_ogl()
+// Factory.
+{
+  return new render_handler_ogl;
 }
-else {
-    glShadeModel (GL_FLAT);
-    glDisable (GL_POLYGON_SMOOTH);
-    glDisable (GL_LINE_SMOOTH);
-    glDisable (GL_POINT_SMOOTH);
-    mp_msg(MSGT_VO, MSGL_INFO, "[sgi] antialiasing off\n");
-}
-*/
- 	    // See if we want to, and can, use multitexture
- 	    // antialiasing.
- 	    bool s_multitexture_antialias = false;
- 	    if (m_enable_antialias)
- 		{
- 		    int	tex_units = 0;
- 		    glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &tex_units);
- 		    if (tex_units >= 2)
- 			{
- 			    s_multitexture_antialias = true;
- 			}
- 		    // Make sure we have an edge texture available.
- 		    if (s_multitexture_antialias == true)
- 			{
- 			    // Very simple texture: 2 texels wide, 1 texel high.
- 			    // Both texels are white; left texel is all clear, right texel is all opaque.
- 			    unsigned char	edge_data[8] = { 255, 255, 255, 0, 255, 255, 255, 255 };
-			    GLuint s_edge_texture_id = 0;
+  
+  
+  
+} // namespace gnash
 
- 			    glActiveTextureARB(GL_TEXTURE1_ARB);
- 			    glEnable(GL_TEXTURE_2D);
- 			    glGenTextures(1, (GLuint*)&s_edge_texture_id);
- 			    glBindTexture(GL_TEXTURE_2D, s_edge_texture_id);
-
- 			    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
- 			    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
- 			    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
- 			    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, edge_data);
-
- 			    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);	// @@ should we use a 1D texture???
-
- 			    glDisable(GL_TEXTURE_2D);
- 			    glActiveTextureARB(GL_TEXTURE0_ARB);
- 			    glDisable(GL_TEXTURE_2D);
- 			}
- 		}
-#endif // 0
-	}
-
-    /// Sets the x/y scale for the movie
-    void set_scale(float xscale, float yscale)
-    {
-      _scale.set(xscale, yscale);
-    }
-
-    void get_scale(point& scale) 
-    {
-      scale = _scale;
-    }
-
-
-    bool getPixel(rgba& color_out, int x, int y)
-    {
-       if (x < 0 || y < 0) {
-         return false;
-       }
-
-       GLint viewport[4];
-       glGetIntegerv( GL_VIEWPORT, viewport);
-       GLint buf_width = viewport[2], buf_height = viewport[3];
-
-       if (x >= buf_width || y >= buf_height) {
-         // X/Y coordinates are outside of the framebuffer.
-         return false;
-       }
-
-       char buf[4];
-
-       // Note that (0,0) in OpenGL is the lower left corner, while in Gnash
-       // it is the top left corner.
-       glReadPixels(x, buf_height - y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, buf);
-
-       color_out.set(buf[0], buf[1], buf[2], buf[3]);
-       return true;
-    }
-
-
-
-    void	end_display()
-	// Clean up after rendering a frame.  Client program is still
-	// responsible for calling glSwapBuffers() or whatever.
-	{
-//	    GNASH_REPORT_FUNCTION
-
-#ifdef DEBUG_OPENGL
-	    check_error();
-#endif // DEBUG_OPENGL
-
-	    glPopMatrix();
-	}
-
-
-    void	set_matrix(const gnash::matrix& m)
-	// Set the current transform for mesh & line-strip rendering.
-	{
-	    m_current_matrix = m;
-	}
-
-
-    void	set_cxform(const gnash::cxform& cx)
-	// Set the current color transform for mesh & line-strip rendering.
-	{
-	    m_current_cxform = cx;
-	}
-	
-    static void	apply_matrix(const gnash::matrix& m)
-	// multiply current matrix with opengl matrix
-	{
-	    float	mat[16];
-	    memset(&mat[0], 0, sizeof(mat));
-	    mat[0] = m.m_[0][0];
-	    mat[1] = m.m_[1][0];
-	    mat[4] = m.m_[0][1];
-	    mat[5] = m.m_[1][1];
-	    mat[10] = 1;
-	    mat[12] = m.m_[0][2];
-	    mat[13] = m.m_[1][2];
-	    mat[15] = 1;
-	    glMultMatrixf(mat);
-	}
-
-    static void	apply_color(const gnash::rgba& c)
-	// Set the given color.
-	{
-	    glColor4ub(c.m_r, c.m_g, c.m_b, c.m_a);
-	}
-
-    void	fill_style_disable(int fill_side)
-	// Don't fill on the {0 == left, 1 == right} side of a path.
-	{
-	    assert(fill_side >= 0 && fill_side < 2);
-
-	    m_current_styles[fill_side].disable();
-	}
-
-
-    void	line_style_disable()
-	// Don't draw a line on this path.
-	{
-	    m_current_styles[LINE_STYLE].disable();
-	}
-
-
-    void	fill_style_color(int fill_side, const gnash::rgba& color)
-	// Set fill style for the left interior of the shape.  If
-	// enable is false, turn off fill for the left interior.
-	{
-	    assert(fill_side >= 0 && fill_side < 2);
-
-	    m_current_styles[fill_side].set_color(m_current_cxform.transform(color));
-	}
-
-
-    void	line_style_color(const gnash::rgba& color)
-	// Set the line style of the shape.  If enable is false, turn
-	// off lines for following curve segments.
-	{
-	    m_current_styles[LINE_STYLE].set_color(m_current_cxform.transform(color));
-	}
-
-
-    void	fill_style_bitmap(int fill_side, const gnash::bitmap_info* bi, const gnash::matrix& m, bitmap_wrap_mode wm)
-	{
-	    assert(fill_side >= 0 && fill_side < 2);
-	    m_current_styles[fill_side].set_bitmap(bi, m, wm, m_current_cxform);
-	}
-	
-    void	line_style_width(float width)
-	{
-		float norm_width = std::max(1.0f, width); // TODO: stroke scaling
-
-//	GNASH_REPORT_FUNCTION;
-		if ( norm_width == 1.0 ) // "hairline", see render_handler_tri.h
-		{
-			glLineWidth(1); // expected: 1 pixel
-		}
-		else
-		{
-			// TODO: OpenGL doesn't seem to handle very
-			// low-width lines well, even with anti-aliasing
-			// enabled
-			// But this is a start (20 TWIPS' width = 1 pixel's)
-			float resized_width = 
-			  norm_width * ( (_scale.m_x + _scale.m_y) / 2.0 );
-
-			glLineWidth(TWIPS_TO_PIXELS(resized_width));
-			glPointSize(TWIPS_TO_PIXELS(resized_width));
-		}
-	}
-
-
-    void	draw_mesh_strip(const void* coords, int vertex_count)
-	{
-//	    GNASH_REPORT_FUNCTION;
-	    
-#define NORMAL_RENDERING
-//#define MULTIPASS_ANTIALIASING
-
-#ifdef NORMAL_RENDERING
-	    // Set up current style.
-	    m_current_styles[LEFT_STYLE].apply();
-
-	    glPushMatrix();
-	    apply_matrix(m_current_matrix);
-
-	    // Send the tris to OpenGL
-	    glEnableClientState(GL_VERTEX_ARRAY);
-	    glVertexPointer(2, GL_SHORT, sizeof(int16_t) * 2, coords);
-	    glDrawArrays(GL_TRIANGLE_STRIP, 0, vertex_count);
-
-	    if (m_current_styles[LEFT_STYLE].needs_second_pass())
-		{
-		    m_current_styles[LEFT_STYLE].apply_second_pass();
-		    glDrawArrays(GL_TRIANGLE_STRIP, 0, vertex_count);
-		    m_current_styles[LEFT_STYLE].cleanup_second_pass();
-		}
-
-	    glDisableClientState(GL_VERTEX_ARRAY);
-
-	    glPopMatrix();
-#endif // NORMAL_RENDERING
-
-#ifdef MULTIPASS_ANTIALIASING
-	    // So this approach basically works.  This
-	    // implementation is not totally finished; two pass
-	    // materials (i.e. w/ additive color) aren't correct,
-	    // and there are some texture etc issues because I'm
-	    // just hosing state uncarefully here.  It needs the
-	    // optimization of only filling the bounding box of
-	    // the shape.  You must have destination alpha.
-	    //
-	    // It doesn't look quite perfect on my GF4.  For one
-	    // thing, you kinda want to crank down the max curve
-	    // subdivision error, because suddenly you can see
-	    // sub-pixel shape much better.  For another thing,
-	    // the antialiasing isn't quite perfect, to my eye.
-	    // It could be limited alpha precision, imperfections
-	    // GL_POLYGON_SMOOTH, and/or my imagination.
-
-	    glDisable(GL_TEXTURE_2D);
-
-	    glEnable(GL_POLYGON_SMOOTH);
-	    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);	// GL_NICEST, GL_FASTEST, GL_DONT_CARE
-
-	    // Clear destination alpha.
-	    //
-	    // @@ TODO Instead of drawing this huge screen-filling
-	    // quad, we should take a bounding-box param from the
-	    // caller, and draw the box (after apply_matrix;
-	    // i.e. the box is in object space).  The point being,
-	    // to only fill the part of the screen that the shape
-	    // is in.
-	    glBlendFunc(GL_ZERO, GL_SRC_COLOR);
-	    glColor4f(1, 1, 1, 0);
-	    glBegin(GL_QUADS);
-	    glVertex2f(0, 0);
-	    glVertex2f(100000, 0);
-	    glVertex2f(100000, 100000);
-	    glVertex2f(0, 100000);
-	    glEnd();
-
-	    // Set mode for drawing alpha mask.
-	    glBlendFunc(GL_ONE, GL_ONE);	// additive blending
-	    glColor4f(0, 0, 0, m_current_styles[LEFT_STYLE].m_color.m_a / 255.0f);
-
-	    glPushMatrix();
-	    apply_matrix(m_current_matrix);
-
-	    // Send the tris to OpenGL.  This produces an
-	    // antialiased alpha mask of the mesh shape, in the
-	    // destination alpha channel.
-	    glEnableClientState(GL_VERTEX_ARRAY);
-	    glVertexPointer(2, GL_SHORT, sizeof(int16_t) * 2, coords);
-	    glDrawArrays(GL_TRIANGLE_STRIP, 0, vertex_count);
-	    glDisableClientState(GL_VERTEX_ARRAY);
-
-	    glPopMatrix();
-		
-	    // Set up desired fill style.
-	    m_current_styles[LEFT_STYLE].apply();
-
-	    // Apply fill, modulated with alpha mask.
-	    //
-	    // @@ TODO see note above about filling bounding box only.
-	    glBlendFunc(GL_DST_ALPHA, GL_ONE_MINUS_DST_ALPHA);
-	    glBegin(GL_QUADS);
-	    glVertex2f(0, 0);
-	    glVertex2f(100000, 0);
-	    glVertex2f(100000, 100000);
-	    glVertex2f(0, 100000);
-	    glEnd();
-
-// xxxxx ??? Hm, is our mask still intact, or did we just erase it?
-// 		if (m_current_styles[LEFT_STYLE].needs_second_pass())
-// 		{
-// 			m_current_styles[LEFT_STYLE].apply_second_pass();
-// 			glDrawArrays(GL_TRIANGLE_STRIP, 0, vertex_count);
-// 			m_current_styles[LEFT_STYLE].cleanup_second_pass();
-// 		}
-
-	    // @@ hm, there is perhaps more state that needs
-	    // fixing here, or setting elsewhere.
-	    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-#endif // MULTIPASS_ANTIALIASING
-	}
-
-
-    void	draw_line_strip(const void* coords, int vertex_count)
-	// Draw the line strip formed by the sequence of points.
-	{
-//	    GNASH_REPORT_FUNCTION;
-	    // Set up current style.
-	    m_current_styles[LINE_STYLE].apply();
-
-	    glPushMatrix();
-	    apply_matrix(m_current_matrix);
-
-	    // Send the line-strip to OpenGL
-	    glEnableClientState(GL_VERTEX_ARRAY);
-	    glVertexPointer(2, GL_SHORT, 0 /* tight packing */, coords);
-	    glDrawArrays(GL_LINE_STRIP, 0, vertex_count);
-
-
-	    // Draw a dot on the beginning and end coordinates to round lines.
-	    //   glVertexPointer: skip all but the first and last coordinates in the line.
-	    glVertexPointer(2, GL_SHORT, (sizeof(int16_t) * 2) * (vertex_count - 1), coords);
-	    glEnable(GL_POINT_SMOOTH); // Draw a round (antialiased) point.
-	    glDrawArrays(GL_POINTS, 0, 2);
-	    glDisable(GL_POINT_SMOOTH);
-	    glPointSize(1); // return to default
-
-	    glDisableClientState(GL_VERTEX_ARRAY);
-	    glPopMatrix();
-	}
-
-
-    void	draw_bitmap(
-	const gnash::matrix& m,
-	const gnash::bitmap_info* bi_,
-	const gnash::rect& coords,
-	const gnash::rect& uv_coords,
-	const gnash::rgba& color)
-	// Draw a rectangle textured with the given bitmap, with the
-	// given color.	 Apply given transform; ignore any currently
-	// set transforms.
-	//
-	// Intended for textured glyph rendering.
-	{
-//	    GNASH_REPORT_FUNCTION;
-	    assert(bi_);
-
-	    apply_color(color);
-
-	    gnash::point a, b, c, d;
-	    m.transform(&a, gnash::point(coords.get_x_min(), coords.get_y_min()));
-	    m.transform(&b, gnash::point(coords.get_x_max(), coords.get_y_min()));
-	    m.transform(&c, gnash::point(coords.get_x_min(), coords.get_y_max()));
-	    d.m_x = b.m_x + c.m_x - a.m_x;
-	    d.m_y = b.m_y + c.m_y - a.m_y;
-
-		gnash::bitmap_info* cbi_ = const_cast<gnash::bitmap_info*>(bi_);
-
-		assert(dynamic_cast<bitmap_info_ogl*>(cbi_));
-		bitmap_info_ogl* bi = static_cast<bitmap_info_ogl*>(cbi_);
-
-			if (bi->m_texture_id == 0 && bi->m_suspended_image.get() )
-			{
-				bi->layout_image(bi->m_suspended_image.get());
-				bi->m_suspended_image.reset();
-			}
-
-			// assert(bi->m_texture_id);
-
-			glBindTexture(GL_TEXTURE_2D, bi->m_texture_id);
-	    glEnable(GL_TEXTURE_2D);
-	    glDisable(GL_TEXTURE_GEN_S);
-	    glDisable(GL_TEXTURE_GEN_T);
-
-	    glBegin(GL_TRIANGLE_STRIP);
-
-            float xmin = uv_coords.get_x_min();
-            float xmax = uv_coords.get_x_max();
-            float ymin = uv_coords.get_y_min();
-            float ymax = uv_coords.get_y_max();
-
-	    glTexCoord2f(xmin, ymin);
-	    glVertex2f(a.m_x, a.m_y);
-
-	    glTexCoord2f(xmax, ymin);
-	    glVertex2f(b.m_x, b.m_y);
-
-	    glTexCoord2f(xmin, ymax);
-	    glVertex2f(c.m_x, c.m_y);
-
-	    glTexCoord2f(xmax, ymax);
-	    glVertex2f(d.m_x, d.m_y);
-
-	    glEnd();
-	}
-	
-    void begin_submit_mask()
-	{
-//	    GNASH_REPORT_FUNCTION;
-	    glEnable(GL_STENCIL_TEST); 
-	    glClearStencil(0);
-	    glClear(GL_STENCIL_BUFFER_BIT);
-	    glColorMask(0,0,0,0);	// disable framebuffer writes
-	    glEnable(GL_STENCIL_TEST);	// enable stencil buffer for "marking" the mask
-	    glStencilFunc(GL_ALWAYS, 1, 1);	// always passes, 1 bit plane, 1 as mask
-	    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);	// we set the stencil buffer to 1 where we draw any polygon
-							// keep if test fails, keep if test passes but buffer test fails
-							// replace if test passes 
-	}
-	
-    void end_submit_mask()
-	{	     
-	    glColorMask(1,1,1,1);	// enable framebuffer writes
-	    glStencilFunc(GL_EQUAL, 1, 1);	// we draw only where the stencil is 1 (where the mask was drawn)
-	    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);	// don't change the stencil buffer    
-	}
-	
-    void disable_mask()
-	{	       
-	    glDisable(GL_STENCIL_TEST); 
-	}
-	
-};	// end class render_handler_ogl
-
-
-// bitmap_info_ogl implementation
 
 /*
 
 Markus: A. A. I still miss you and the easter 2006, you know.
-	A. J. I miss you too, but you'll probably not read this code ever... :/
+  A. J. I miss you too, but you'll probably not read this code ever... :/
 
 */
 
-void	hardware_resample(int bytes_per_pixel, int src_width, int src_height, uint8_t* src_data, int dst_width, int dst_height)
-// Code from Alex Streit
-//
-// Sets the current texture to a resampled/expanded version of the
-// given image data.
-{
-//    GNASH_REPORT_FUNCTION;
-    assert(bytes_per_pixel == 3 || bytes_per_pixel == 4);
-
-    unsigned int	in_format = bytes_per_pixel == 3 ? GL_RGB : GL_RGBA;
-    unsigned int	out_format = bytes_per_pixel == 3 ? GL_RGB : GL_RGBA;
-
-    // alex: use the hardware to resample the image
-    // issue: does not work when image > allocated window size!
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glPushAttrib(GL_TEXTURE_BIT | GL_ENABLE_BIT);
-    {
-	char* temp = new char[dst_width * dst_height * bytes_per_pixel];
-	//memset(temp,255,w*h*3);
-	glTexImage2D(GL_TEXTURE_2D, 0, in_format, dst_width, dst_height, 0, out_format, GL_UNSIGNED_BYTE, temp);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, src_width, src_height, out_format, GL_UNSIGNED_BYTE, src_data);
-
-	glLoadIdentity();
-	glViewport(0, 0, dst_width, dst_height);
-	glOrtho(0, dst_width, 0, dst_height, 0.9, 1.1);
-	glColor3f(1, 1, 1);
-	glNormal3f(0, 0, 1);
-	glBegin(GL_QUADS);
-	{
-	    glTexCoord2f(0, (float) src_height / dst_height);
-	    glVertex3f(0, 0, -1);
-	    glTexCoord2f( (float) src_width / dst_width, (float) src_height / dst_height);
-	    glVertex3f((float) dst_width, 0, -1);
-	    glTexCoord2f( (float) src_width / dst_width, 0);
-	    glVertex3f((float) dst_width, (float) dst_height, -1);
-	    glTexCoord2f(0, 0);
-	    glVertex3f(0, (float) dst_height, -1);
-	}
-	glEnd();
-	glCopyTexImage2D(GL_TEXTURE_2D, 0, out_format, 0,0, dst_width, dst_height, 0);
-	delete[] temp;
-    }
-    glPopAttrib();
-    glPopMatrix();
-    glPopMatrix();
-}
-
-
-
-void	software_resample(
-    int bytes_per_pixel,
-    int src_width,
-    int src_height,
-    int src_pitch,
-    uint8_t* src_data,
-    int dst_width,
-    int dst_height)
-// Code from Alex Streit
-//
-// Creates an OpenGL texture of the specified dst dimensions, from a
-// resampled version of the given src image.  Does a bilinear
-// resampling to create the dst image.
-{
-//    GNASH_REPORT_FUNCTION;
-    assert(bytes_per_pixel == 3 || bytes_per_pixel == 4);
-
-    assert(dst_width >= src_width);
-    assert(dst_height >= src_height);
-
-    unsigned int	internal_format = bytes_per_pixel == 3 ? GL_RGB : GL_RGBA;
-    unsigned int	input_format = bytes_per_pixel == 3 ? GL_RGB : GL_RGBA;
-
-    // FAST bi-linear filtering
-    // the code here is designed to be fast, not readable
-    uint8_t* rescaled = new uint8_t[dst_width * dst_height * bytes_per_pixel];
-    float Uf, Vf;		// fractional parts
-    float Ui, Vi;		// integral parts
-    float w1, w2, w3, w4;	// weighting
-    uint8_t* psrc;
-    uint8_t* pdst = rescaled;
-    // i1,i2,i3,i4 are the offsets of the surrounding 4 pixels
-    const int i1 = 0;
-    const int i2 = bytes_per_pixel;
-    int i3 = src_pitch;
-    int i4 = src_pitch + bytes_per_pixel;
-    // change in source u and v
-    float dv = (float)(src_height-2) / dst_height;
-    float du = (float)(src_width-2) / dst_width;
-    // source u and source v
-    float U;
-    float V=0;
-
-#define BYTE_SAMPLE(offset)	\
-	(uint8_t) (w1 * psrc[i1 + (offset)] + w2 * psrc[i2 + (offset)] + w3 * psrc[i3 + (offset)] + w4 * psrc[i4 + (offset)])
-
-    if (bytes_per_pixel == 3)
-	{
-	    for (int v = 0; v < dst_height; ++v)
-		{
-		    Vf = modff(V, &Vi);
-		    V+=dv;
-		    U=0;
-
-		    for (int u = 0; u < dst_width; ++u)
-			{
-			    Uf = modff(U, &Ui);
-			    U+=du;
-
-			    w1 = (1 - Uf) * (1 - Vf);
-			    w2 = Uf * (1 - Vf);
-			    w3 = (1 - Uf) * Vf;
-			    w4 = Uf * Vf;
-			    psrc = &src_data[(int) (Vi * src_pitch) + (int) (Ui * bytes_per_pixel)];
-
-			    *pdst++ = BYTE_SAMPLE(0);	// red
-			    *pdst++ = BYTE_SAMPLE(1);	// green
-			    *pdst++ = BYTE_SAMPLE(2);	// blue
-
-			    psrc += 3;
-			}
-		}
-	}
-    else
-	{
-	    assert(bytes_per_pixel == 4);
-
-	    for (int v = 0; v < dst_height; ++v)
-		{
-		    Vf = modff(V, &Vi);
-		    V+=dv;
-		    U=0;
-
-		    for (int u = 0; u < dst_width; ++u)
-			{
-			    Uf = modff(U, &Ui);
-			    U+=du;
-
-			    w1 = (1 - Uf) * (1 - Vf);
-			    w2 = Uf * (1 - Vf);
-			    w3 = (1 - Uf) * Vf;
-			    w4 = Uf * Vf;
-			    psrc = &src_data[(int) (Vi * src_pitch) + (int) (Ui * bytes_per_pixel)];
-
-			    *pdst++ = BYTE_SAMPLE(0);	// red
-			    *pdst++ = BYTE_SAMPLE(1);	// green
-			    *pdst++ = BYTE_SAMPLE(2);	// blue
-			    *pdst++ = BYTE_SAMPLE(3);	// alpha
-
-			    psrc += 4;
-			}
-		}
-	}
-
-    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, dst_width, dst_height, 0, input_format, GL_UNSIGNED_BYTE, rescaled);
-
-    delete [] rescaled;
-}
-
-
-bitmap_info_ogl::bitmap_info_ogl()
-// Make a placeholder bitmap_info.  Must be filled in later before
-// using.
-{
-//    GNASH_REPORT_FUNCTION;
-    m_texture_id = 0;
-    m_original_width = 0;
-    m_original_height = 0;
-}
-
-void bitmap_info_ogl::layout_image(image::image_base* im) 
-{
-
-	assert(im);
-
-	// Create the texture.
-	glEnable(GL_TEXTURE_2D);
-	glGenTextures(1, (GLuint*)&m_texture_id);
-	glBindTexture(GL_TEXTURE_2D, m_texture_id);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	m_original_width = im->width();
-	m_original_height = im->height();
-
-	switch (im->m_type)
-	{
-		case image::image_base::RGB:
-		{
-
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-			size_t	w = 1; while (w < im->width()) { w <<= 1; }
-			size_t	h = 1; while (h < im->height()) { h <<= 1; }
-
-			if (w != im->width() || h != im->height())
-			{
-#if (RESAMPLE_METHOD == 1)
-				int	viewport_dim[2] = { 0, 0 };
-				glGetIntegerv(GL_MAX_VIEWPORT_DIMS, &viewport_dim[0]);
-				if (w > viewport_dim[0]
-			|| h > viewport_dim[1]
-			|| im->m_width * 3 != im->m_pitch)
-			{
-					// Can't use hardware resample.  Either frame
-					// buffer isn't big enough to fit the source
-					// texture, or the source data isn't padded
-					// quite right.
-					software_resample(3, im->width(), im->height(), im->pitch(), im->data(), w, h);
-			}
-				else
-			{
-					hardware_resample(3, im->width(), im->height(), im->data(), w, h);
-			}
-#elif (RESAMPLE_METHOD == 2)
-				{
-			// Faster/simpler software bilinear rescale.
-			software_resample(3, im->width(), im->height(), im->pitch(), im->data(), w, h);
-				}
-#else
-				{
-			// Fancy but slow software resampling.
-			std::auto_ptr<image::rgb> rescaled ( image::create_rgb(w, h) );
-			image::resample(rescaled.get(), 0, 0, w - 1, h - 1,
-					im, 0, 0, (float) im->m_width, (float) im->m_height);
-
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, rescaled->data());
-
-				}
-#endif
-			}
-			else
-			{
-				// Use original image directly.
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, im->data());
-			}
-
-			break;
-		}
-		case image::image_base::RGBA:
-		{
-
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-			size_t	w = 1; while (w < im->width()) { w <<= 1; }
-			size_t	h = 1; while (h < im->height()) { h <<= 1; }
-
-			if (w != im->width() || h != im->height())
-			{
-#if (RESAMPLE_METHOD == 1)
-				int	viewport_dim[2] = { 0, 0 };
-				glGetIntegerv(GL_MAX_VIEWPORT_DIMS, &viewport_dim[0]);
-				if (w > viewport_dim[0]
-			|| h > viewport_dim[1]
-			|| im->m_width * 4 != im->m_pitch)
-			{
-					// Can't use hardware resample.  Either frame
-					// buffer isn't big enough to fit the source
-					// texture, or the source data isn't padded
-					// quite right.
-					software_resample(4, im->width(), im->height(), im->pitch(), im->data(), w, h);
-			}
-				else
-			{
-					hardware_resample(4, im->width(), im->height(), im->data(), w, h);
-			}
-#elif (RESAMPLE_METHOD == 2)
-				{
-			// Faster/simpler software bilinear rescale.
-			software_resample(4, im->width(), im->height(), im->pitch(), im->data(), w, h);
-				}
-#else
-				{
-			// Fancy but slow software resampling.
-			image::rgba*	rescaled = image::create_rgba(w, h);
-			image::resample(rescaled, 0, 0, w - 1, h - 1,
-					im, 0, 0, (float) im->m_width, (float) im->m_height);
-
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, rescaled->m_data);
-
-			delete rescaled;
-				}
-#endif
-			}
-			else
-			{
-				// Use original image directly.
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, im->data());
-			}
-
-			break;
-		}
-		case image::image_base::ALPHA:
-		{
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-#ifndef NDEBUG
-			// You must use power-of-two dimensions!!
-			size_t	w = 1; while (w < im->width()) { w <<= 1; }
-			size_t	h = 1; while (h < im->height()) { h <<= 1; }
-			assert(w == im->width());
-			assert(h == im->height());
-#endif // not NDEBUG
-
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA,
-				im->width(), im->height(), 0, GL_ALPHA, GL_UNSIGNED_BYTE, im->data());
-
-			// Build mips.
-			int	level = 1;
-			while (im->width() > 1 || im->height() > 1)
-			{
-				im->make_next_miplevel();
-				glTexImage2D(GL_TEXTURE_2D, level, GL_ALPHA, 
-					im->width(), im->height(), 0, GL_ALPHA, GL_UNSIGNED_BYTE, im->data());
-				level++;
-			}
-
-			break;
-		}
-
-		default:
-//			log_error("Unsupported image type");
-			break;
-	}
-
-}
-
-inline bool opengl_accessible()
-{
-#if defined(_WIN32) || defined(WIN32)
-	return wglGetCurrentContext() != 0;
-#elif defined(__APPLE_CC__)
-	return aglGetCurrentContext() != 0;
-#else
-	return glXGetCurrentContext() != 0;
-#endif
-}
-
-bitmap_info_ogl::bitmap_info_ogl(int width, int height, uint8_t* data)
-// Initialize this bitmap_info to an alpha image
-// containing the specified data (1 byte per texel).
-//
-// !! Munges *data in order to create mipmaps !!
-{
-//    GNASH_REPORT_FUNCTION;
-	assert(width > 0);
-	assert(height > 0);
-	assert(data);
-
-	// TODO optimization
-	//image::image_base* im = new image::image_base(data, width, height, 1, image::image_base::ALPHA);
-	//memcpy(im->data(), data, width * height);
-	std::auto_ptr<image::image_base> im ( image::create_alpha(width, height) );
-	im->update(data);
-
-	if (opengl_accessible() == false) 
-	{
-		m_suspended_image = im;
-		return;
-	}
-	layout_image(im.get());
-}
-
-
-bitmap_info_ogl::bitmap_info_ogl(image::rgb* im)
-// NOTE: This function destroys im's data in the process of making mipmaps.
-{
-//    GNASH_REPORT_FUNCTION;
-	assert(im);
-
-	if (opengl_accessible() == false) 
-	{
-		m_suspended_image = im->clone();
-		return;
-	}
-	layout_image(im);
-}
-
-
-bitmap_info_ogl::bitmap_info_ogl(image::rgba* im)
-// Version of the constructor that takes an image with alpha.
-// NOTE: This function destroys im's data in the process of making mipmaps.
-{
-//    GNASH_REPORT_FUNCTION;
-	assert(im);
-
-	if (opengl_accessible() == false) 
-	{
-		m_suspended_image = im->clone();
-		return;
-	}
-	layout_image(im);
-}
-
-
-gnash::render_handler*	gnash::create_render_handler_ogl()
-// Factory.
-{
-//    GNASH_REPORT_FUNCTION;
-
-    // Do some initialisation.
-#define OVERSIZE	1.0f
- 
-    //This makes fonts look nice (actually!)
-#if 0
-    glEnable(GL_POLYGON_SMOOTH);
-    glEnable(GL_POINT_SMOOTH);
-#endif    
-        // Turn on alpha blending.
-        glEnable(GL_BLEND);
-	// This blend operation is best for rendering antialiased points and lines in 
-	// no particular order.
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
- 
-        // Turn on line smoothing.  Antialiased lines can be used to
-        // smooth the outsides of shapes.
-        glEnable(GL_LINE_SMOOTH);
-        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);	// GL_NICEST, GL_FASTEST, GL_DONT_CARE
-
-#if 0
-        // Enabling polygon smoothing has a side effect of filled "surfaces" gain some
-	// transparency. So let's disable this for now.
-        glEnable (GL_POLYGON_SMOOTH);
-#endif
-        
-        glMatrixMode(GL_PROJECTION);
-	// Flip the image
-        glOrtho(-OVERSIZE, OVERSIZE, OVERSIZE, -OVERSIZE, -1, 1);
-	// Restore the matrix mode to the default.
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-        
-        // glColorPointer(4, GL_UNSIGNED_BYTE, 0, *);
-        // glInterleavedArrays(GL_T2F_N3F_V3F, 0, *)
-        glPushAttrib (GL_ALL_ATTRIB_BITS);
-
-
-#ifdef FIX_I810_LOD_BIAS
-	// If 2D textures weren't previously enabled, enable
-	// them now and force the driver to notice the update,
-	// then disable them again.
-	if (!glIsEnabled(GL_TEXTURE_2D)) {
-	  // Clearing a mask of zero *should* have no
-	  // side effects, but coupled with enbling
-	  // GL_TEXTURE_2D it works around a segmentation
-	  // fault in the driver for the Intel 810 chip.
-	  glEnable(GL_TEXTURE_2D);
-	  glClear(0);
-	  glDisable(GL_TEXTURE_2D);
-	}
-#endif
-
-    return new render_handler_ogl;
-}
-
-
-// Local Variables:
-// mode: C++
-// indent-tabs-mode: t
-// End:

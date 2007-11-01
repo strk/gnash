@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk_glue_gtkglext.cpp,v 1.12 2007/07/01 10:54:02 bjacques Exp $ */
+/* $Id: gtk_glue_gtkglext.cpp,v 1.13 2007/11/01 08:04:09 bjacques Exp $ */
 
 #include "gtk_glue_gtkglext.h"
 #include "log.h"
@@ -69,7 +69,7 @@ GtkGlExtGlue::init(int argc, char** argv[])
               (int)major, (int)minor);
 
     GdkGLConfigMode glcmode = (GdkGLConfigMode)(GDK_GL_MODE_RGB |
-                                                GDK_GL_MODE_DEPTH |
+                                                GDK_GL_MODE_STENCIL |
                                                 GDK_GL_MODE_DOUBLE);
     _glconfig = gdk_gl_config_new_by_mode (glcmode);
 
