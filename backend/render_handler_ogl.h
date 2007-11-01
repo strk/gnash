@@ -134,6 +134,29 @@ private:
 };
 
 
+class bitmap_info_ogl : public bitmap_info
+{
+  public:
+    bitmap_info_ogl(image::image_base* image, GLenum pixelformat);
+    ~bitmap_info_ogl();
+
+    void apply(const gnash::matrix& bitmap_matrix,
+               render_handler::bitmap_wrap_mode wrap_mode);
+  private:
+    inline bool ogl_accessible() const;
+    void setup();    
+    void upload(uint8_t* data, size_t width, size_t height);
+    
+    std::auto_ptr<image::image_base> _img;
+    GLenum _pixel_format;
+    GLenum _ogl_img_type;
+    bool _ogl_accessible;  
+    GLuint _texture_id;
+    size_t _orig_width;
+    size_t _orig_height;
+};
+
+
 
 
 

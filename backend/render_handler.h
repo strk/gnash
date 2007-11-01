@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.48 2007/11/01 09:35:46 bjacques Exp $ */
+/* $Id: render_handler.h,v 1.49 2007/11/01 20:21:55 bjacques Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -365,7 +365,7 @@ public:
   virtual void  draw_line_strip(const void* coords, int vertex_count,
       const rgba& color) = 0;
     
-  /// Draw a simple, solid filled polygon (no outline).
+  /// Draw a simple, solid filled polygon with a thin (~1 pixel) outline.
   //
   /// This can't be used for 
   /// Flash shapes but is intended for internal drawings like bounding boxes 

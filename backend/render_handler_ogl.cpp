@@ -315,170 +315,160 @@ bool isEven(const size_t& n)
   return n % 2 == 0;
 }
 
-class bitmap_info_ogl : public bitmap_info
-{
-  public:
-    bitmap_info_ogl(image::image_base* image, GLenum pixelformat)
-    :
-      _img(image->clone()),
-      _pixel_format(pixelformat),
-      _ogl_img_type(_img->height() == 1 ? GL_TEXTURE_1D : GL_TEXTURE_2D),
-      _ogl_accessible(ogl_accessible()),
-      _texture_id(0),
-      _orig_width(_img->width()),
-      _orig_height(_img->height())
-    {   
-      if (!_ogl_accessible) {
-        return;      
-      }
-      
-      setup();
-    }   
-    
-    ~bitmap_info_ogl()
-    {
-      glDeleteTextures(1, &_texture_id);
-      glDisable(_ogl_img_type);
-    }   
-      
-    inline bool
-    ogl_accessible() const
-    {
-  #if defined(_WIN32) || defined(WIN32)
-      return wglGetCurrentContext();
-  #elif defined(__APPLE_CC__)
-      return aglGetCurrentContext();
-  #else
-      return glXGetCurrentContext();
-  #endif
-    }    
- 
-    void setup()
-    {      
-      oglScopeEnable enabler(_ogl_img_type);
-      
-      glGenTextures(1, &_texture_id);
-      glBindTexture(_ogl_img_type, _texture_id);
-      
-      bool resize = false;
-      if (_img->height() == 1) {
-        if ( !isEven( _img->width() ) ) {
-          resize = true;
-        }
-      } else {
-        if (!isEven( _img->width() ) || !isEven(_img->height()) ) {
-          resize = true;
-        }     
-      }
-      
-      if (!resize) {
-        upload(_img->data(), _img->width(), _img->height());
-      } else {     
-        
-        size_t w = 1; while (w < _img->width()) { w <<= 1; }
-        size_t h = 1;
-        if (_img->height() != 1) {
-          while (h < _img->height()) { h <<= 1; }
-        }
-        
-        boost::scoped_array<uint8_t> resized_data(new uint8_t[w*h*_img->pixelSize()]);
-        // Q: Would mipmapping these textures aid in performance?
-        
-        GLint rv = gluScaleImage(_pixel_format, _img->width(),
-          _img->height(), GL_UNSIGNED_BYTE, _img->data(), w, h,
-          GL_UNSIGNED_BYTE, resized_data.get());
-        if (rv != 0) {
-          Tesselator::error(rv);
-          assert(0);
-        }
-        
-        upload(resized_data.get(), w, h);
-      }
-      
-      // _img (or a modified version thereof) has been uploaded to OpenGL. We
-      // no longer need to keep it around. Of course this goes against the
-      // principles of auto_ptr...
-      delete _img.release();
-    }
-    
-    void upload(uint8_t* data, size_t width, size_t height)
-    {
-      glTexParameteri(_ogl_img_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      
-      // FIXME: confirm that OpenGL can handle this image
-      
-      if (_ogl_img_type == GL_TEXTURE_1D) {
-        glTexImage1D(GL_TEXTURE_1D, 0, _pixel_format, width,
-                     0, _pixel_format, GL_UNSIGNED_BYTE, data);
-      
-      } else {      
-        glTexImage2D(_ogl_img_type, 0, _pixel_format, width, height,
-                     0, _pixel_format, GL_UNSIGNED_BYTE, data);
 
-      }
-    }
-
-    void apply(const gnash::matrix& bitmap_matrix,
-               render_handler::bitmap_wrap_mode wrap_mode)
-    {
-      glEnable(_ogl_img_type);
-    
-      glEnable(GL_TEXTURE_GEN_S);
-      glEnable(GL_TEXTURE_GEN_T);
-      
-      if (!_ogl_accessible) {
-        // renderer context wasn't available when this class was instantiated.
-        _ogl_accessible=true;
-        setup();
-      }
-      
-      glEnable(_ogl_img_type);
-      glEnable(GL_TEXTURE_GEN_S);
-      glEnable(GL_TEXTURE_GEN_T);    
-      
-      glBindTexture(_ogl_img_type, _texture_id);
-      
-      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-      
-      if (wrap_mode == render_handler::WRAP_CLAMP) {  
-        glTexParameteri(_ogl_img_type, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(_ogl_img_type, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-      } else {
-        glTexParameteri(_ogl_img_type, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(_ogl_img_type, GL_TEXTURE_WRAP_T, GL_REPEAT);
-      }
-        
-      // Set up the bitmap matrix for texgen.
-        
-      float inv_width = 1.0f / _orig_width;
-      float inv_height = 1.0f / _orig_height;
-        
-      const gnash::matrix& m = bitmap_matrix;
-      glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-      float p[4] = { 0, 0, 0, 0 };
-      p[0] = m.m_[0][0] * inv_width;
-      p[1] = m.m_[0][1] * inv_width;
-      p[3] = m.m_[0][2] * inv_width;
-      glTexGenfv(GL_S, GL_OBJECT_PLANE, p);
-    
-      glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-      p[0] = m.m_[1][0] * inv_height;
-      p[1] = m.m_[1][1] * inv_height;
-      p[3] = m.m_[1][2] * inv_height;
-      glTexGenfv(GL_T, GL_OBJECT_PLANE, p);
-      
-    }
+bitmap_info_ogl::bitmap_info_ogl(image::image_base* image, GLenum pixelformat)
+:
+  _img(image->clone()),
+  _pixel_format(pixelformat),
+  _ogl_img_type(_img->height() == 1 ? GL_TEXTURE_1D : GL_TEXTURE_2D),
+  _ogl_accessible(ogl_accessible()),
+  _texture_id(0),
+  _orig_width(_img->width()),
+  _orig_height(_img->height())
+{   
+  if (!_ogl_accessible) {
+    return;      
+  }
   
-  private:
-    std::auto_ptr<image::image_base> _img;
-    GLenum _pixel_format;
-    GLenum _ogl_img_type;
-    bool _ogl_accessible;  
-    GLuint _texture_id;
-    size_t _orig_width;
-    size_t _orig_height;
-};
+  setup();
+}   
+    
+bitmap_info_ogl::~bitmap_info_ogl()
+{
+  glDeleteTextures(1, &_texture_id);
+  glDisable(_ogl_img_type);
+}
+      
+inline bool
+bitmap_info_ogl::ogl_accessible() const
+{
+#if defined(_WIN32) || defined(WIN32)
+  return wglGetCurrentContext();
+#elif defined(__APPLE_CC__)
+  return aglGetCurrentContext();
+#else
+  return glXGetCurrentContext();
+#endif
+}    
 
+void
+bitmap_info_ogl::setup()
+{      
+  oglScopeEnable enabler(_ogl_img_type);
+  
+  glGenTextures(1, &_texture_id);
+  glBindTexture(_ogl_img_type, _texture_id);
+  
+  bool resize = false;
+  if (_img->height() == 1) {
+    if ( !isEven( _img->width() ) ) {
+      resize = true;
+    }
+  } else {
+    if (!isEven( _img->width() ) || !isEven(_img->height()) ) {
+      resize = true;
+    }     
+  }
+  
+  if (!resize) {
+    upload(_img->data(), _img->width(), _img->height());
+  } else {     
+    
+    size_t w = 1; while (w < _img->width()) { w <<= 1; }
+    size_t h = 1;
+    if (_img->height() != 1) {
+      while (h < _img->height()) { h <<= 1; }
+    }
+    
+    boost::scoped_array<uint8_t> resized_data(new uint8_t[w*h*_img->pixelSize()]);
+    // Q: Would mipmapping these textures aid in performance?
+    
+    GLint rv = gluScaleImage(_pixel_format, _img->width(),
+      _img->height(), GL_UNSIGNED_BYTE, _img->data(), w, h,
+      GL_UNSIGNED_BYTE, resized_data.get());
+    if (rv != 0) {
+      Tesselator::error(rv);
+      assert(0);
+    }
+    
+    upload(resized_data.get(), w, h);
+  }
+  
+  // _img (or a modified version thereof) has been uploaded to OpenGL. We
+  // no longer need to keep it around. Of course this goes against the
+  // principles of auto_ptr...
+  delete _img.release();
+}
+
+void
+bitmap_info_ogl::upload(uint8_t* data, size_t width, size_t height)
+{
+  glTexParameteri(_ogl_img_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  
+  // FIXME: confirm that OpenGL can handle this image
+  
+  if (_ogl_img_type == GL_TEXTURE_1D) {
+    glTexImage1D(GL_TEXTURE_1D, 0, _pixel_format, width,
+                  0, _pixel_format, GL_UNSIGNED_BYTE, data);
+  
+  } else {      
+    glTexImage2D(_ogl_img_type, 0, _pixel_format, width, height,
+                  0, _pixel_format, GL_UNSIGNED_BYTE, data);
+
+  }
+}
+
+void
+bitmap_info_ogl::apply(const gnash::matrix& bitmap_matrix,
+                       render_handler::bitmap_wrap_mode wrap_mode)
+{
+  glEnable(_ogl_img_type);
+
+  glEnable(GL_TEXTURE_GEN_S);
+  glEnable(GL_TEXTURE_GEN_T);
+  
+  if (!_ogl_accessible) {
+    // renderer context wasn't available when this class was instantiated.
+    _ogl_accessible=true;
+    setup();
+  }
+  
+  glEnable(_ogl_img_type);
+  glEnable(GL_TEXTURE_GEN_S);
+  glEnable(GL_TEXTURE_GEN_T);    
+  
+  glBindTexture(_ogl_img_type, _texture_id);
+  
+  glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+  
+  if (wrap_mode == render_handler::WRAP_CLAMP) {  
+    glTexParameteri(_ogl_img_type, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(_ogl_img_type, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  } else {
+    glTexParameteri(_ogl_img_type, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(_ogl_img_type, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  }
+    
+  // Set up the bitmap matrix for texgen.
+    
+  float inv_width = 1.0f / _orig_width;
+  float inv_height = 1.0f / _orig_height;
+    
+  const gnash::matrix& m = bitmap_matrix;
+  glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+  float p[4] = { 0, 0, 0, 0 };
+  p[0] = m.m_[0][0] * inv_width;
+  p[1] = m.m_[0][1] * inv_width;
+  p[3] = m.m_[0][2] * inv_width;
+  glTexGenfv(GL_S, GL_OBJECT_PLANE, p);
+
+  glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+  p[0] = m.m_[1][0] * inv_height;
+  p[1] = m.m_[1][1] * inv_height;
+  p[3] = m.m_[1][2] * inv_height;
+  glTexGenfv(GL_T, GL_OBJECT_PLANE, p);
+  
+}
 
 class DSOEXPORT render_handler_ogl : public render_handler
 {
@@ -680,6 +670,7 @@ public:
   virtual void
   end_display()
   {
+    check_error();
     glFlush(); // Make OpenGL execute all commands in the buffer.
   }
     

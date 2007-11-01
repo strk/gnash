@@ -1,3 +1,10 @@
+2007-11-01 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler.h: Document that draw_poly draws a
+	thin border specified by the outline parameter.
+	* backend/render_handler_ogl.{cpp,h}: Header/impl separation
+	for class bitmap_info_ogl.
+
 2007-11-01 Sandro Santilli <strk@keybit.net>
 
 	* libbase/GnashException.h: Add ActionTypeError exception.
