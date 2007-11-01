@@ -1,5 +1,9 @@
 2007-11-01 Bastiaan Jacques <bastiaan@bjacques.org>
 
+	* backend/render_handler_cairo.cpp: Implement draw_poly.
+	
+2007-11-01 Bastiaan Jacques <bastiaan@bjacques.org>
+
 	* backend/render_handler.h: Document that renderers should
 	ignore subshapes in glyphs, as demonstrated by Agg and
 	evidenced in text-test.swf.

@@ -18,6 +18,7 @@
 // Known bugs:
 // - Shape filling problems: renderer skips certain fills. See car_smash.swf.
 // - Rotation problem in gradient-tests.swf.
+// - The current coordinate system 
 //
 // TODOs:
 // - Implement focal gradients.
@@ -340,7 +341,35 @@ public:
   virtual void  draw_poly(const point* corners, size_t corner_count, 
     const rgba& fill, const rgba& outline, bool masked)
   {
-    log_unimpl("draw_poly");
+    if (corner_count < 1) {
+      return;
+    }
+        
+    cairo_move_to(_cr, corners[0].m_x, corners[0].m_y);
+    
+    for (size_t i = 0; i < corner_count; ++i) {
+      cairo_line_to(_cr, corners[i].m_x, corners[i].m_y);
+    }
+    
+    cairo_close_path(_cr);
+    
+    if (fill.m_a) {
+      set_color(fill);
+      cairo_fill_preserve(_cr);    
+    }
+    
+    if (outline.m_a) {
+      set_color(outline);
+      
+      // FIXME: coordinate alignment (for single-pixel lines should be in
+      //        between two pixels for sharp hair line.
+      
+      cairo_set_line_width(_cr, 20.0);
+      cairo_stroke_preserve(_cr);    
+    }
+    
+    // Clear the current path which was _preserve()d.
+    cairo_new_path(_cr);    
   }
   
   virtual void  draw_bitmap(
