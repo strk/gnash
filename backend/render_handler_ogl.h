@@ -30,6 +30,9 @@
 #  define GL_CLAMP_TO_EDGE 0x812F
 # else
 # include <GL/glx.h>
+# ifdef OSMESA_TESTING
+#  include <GL/osmesa.h>
+# endif // OSMESA_TESTING
 # endif
 # include <GL/glu.h>
 # ifndef APIENTRY
@@ -137,7 +140,8 @@ private:
 class bitmap_info_ogl : public bitmap_info
 {
   public:
-    bitmap_info_ogl(image::image_base* image, GLenum pixelformat);
+    bitmap_info_ogl(image::image_base* image, GLenum pixelformat,
+                    bool ogl_accessible);
     ~bitmap_info_ogl();
 
     void apply(const gnash::matrix& bitmap_matrix,

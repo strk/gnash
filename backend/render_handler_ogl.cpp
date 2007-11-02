@@ -101,6 +101,76 @@
 
 namespace gnash {
 
+#ifdef OSMESA_TESTING
+
+class OSRenderMesa : public boost::noncopyable
+{
+public:
+  OSRenderMesa(size_t width, size_t height)
+    : _width(width),
+      _height(height),
+      _buffer(new uint8_t[width * height * 3]), 
+#if OSMESA_MAJOR_VERSION * 100 + OSMESA_MINOR_VERSION >= 305
+      _context(OSMesaCreateContextExt(OSMESA_RGB, 0, 2, 0, NULL))
+#else
+      _context(OSMesaCreateContext(OSMESA_RGB, NULL))
+#endif
+  {
+    if (!_context) {
+      log_error("OSMesaCreateContext failed!");
+      return; // FIXME: throw an exception?
+    }
+
+    if (!OSMesaMakeCurrent(_context, _buffer.get(), GL_UNSIGNED_BYTE, width,
+                           height)) {
+      log_error("OSMesaMakeCurrent failed!");
+      return;
+    }
+   
+    // FIXME: is there any reason to do this?
+    OSMesaColorClamp(GL_TRUE);
+
+    log_msg("OSMesa handle successfully created. with width " SIZET_FMT \
+            " and height " SIZET_FMT ".", width, height);  
+  }
+  
+  ~OSRenderMesa()
+  {
+    if (!_context) {
+      return;
+    }
+    OSMesaDestroyContext(_context);
+  }
+  
+  bool getPixel(rgba& color_out, int x, int y) const
+  {  
+    glFinish(); // Force pending commands out (and wait until they're done).    
+
+    if (x > _width || y > _height) {
+      return false;
+    }
+    
+    ptrdiff_t offset = (_height - y) * (_width * 3) + x * 3;
+    color_out.set(_buffer[offset], _buffer[offset+1], _buffer[offset+2], 255);
+
+    return true;
+  }
+  
+  unsigned int getBitsPerPixel() const
+  {
+    return 24;
+  }
+
+private:
+  size_t _width;
+  size_t _height;
+  boost::scoped_array<uint8_t> _buffer;
+  OSMesaContext _context;  
+};
+
+#endif // OSMESA_TESTING
+
+
 typedef std::vector<path> PathVec;
 
 class oglScopeEnable : public boost::noncopyable
@@ -316,12 +386,13 @@ bool isEven(const size_t& n)
 }
 
 
-bitmap_info_ogl::bitmap_info_ogl(image::image_base* image, GLenum pixelformat)
+bitmap_info_ogl::bitmap_info_ogl(image::image_base* image, GLenum pixelformat,
+                                 bool ogl_accessible)
 :
   _img(image->clone()),
   _pixel_format(pixelformat),
   _ogl_img_type(_img->height() == 1 ? GL_TEXTURE_1D : GL_TEXTURE_2D),
-  _ogl_accessible(ogl_accessible()),
+  _ogl_accessible(ogl_accessible),
   _texture_id(0),
   _orig_width(_img->width()),
   _orig_height(_img->height())
@@ -338,18 +409,6 @@ bitmap_info_ogl::~bitmap_info_ogl()
   glDeleteTextures(1, &_texture_id);
   glDisable(_ogl_img_type);
 }
-      
-inline bool
-bitmap_info_ogl::ogl_accessible() const
-{
-#if defined(_WIN32) || defined(WIN32)
-  return wglGetCurrentContext();
-#elif defined(__APPLE_CC__)
-  return aglGetCurrentContext();
-#else
-  return glXGetCurrentContext();
-#endif
-}    
 
 void
 bitmap_info_ogl::setup()
@@ -477,6 +536,10 @@ public:
     : _xscale(1.0),
       _yscale(1.0)
   {
+  }
+  
+  void init()
+  {
     // Turn on alpha blending.
     // FIXME: do this when it's actually used?
     glEnable(GL_BLEND);
@@ -524,6 +587,23 @@ public:
   ~render_handler_ogl()
   {
   }
+  
+  inline bool
+  ogl_accessible() const
+  {
+#if defined(_WIN32) || defined(WIN32)
+    return wglGetCurrentContext();
+#elif defined(__APPLE_CC__)
+    return aglGetCurrentContext();
+#else
+# ifdef OSMESA_TESTING
+    if (_offscreen.get()) {
+      return OSMesaGetCurrentContext();
+    }
+# endif
+    return glXGetCurrentContext();
+#endif
+  }    
 
 
   virtual bitmap_info*  create_bitmap_info_alpha(int w, int h, unsigned char* data)
@@ -534,12 +614,12 @@ public:
 
   virtual bitmap_info*  create_bitmap_info_rgb(image::rgb* im)
   {
-    return new bitmap_info_ogl(im, GL_RGB);
+    return new bitmap_info_ogl(im, GL_RGB, ogl_accessible());
   }
 
   virtual bitmap_info*  create_bitmap_info_rgba(image::rgba* im)
   {
-    return new bitmap_info_ogl(im, GL_RGBA);
+    return new bitmap_info_ogl(im, GL_RGBA, ogl_accessible());
   }
 
   virtual void  delete_bitmap_info(bitmap_info* bi)
@@ -630,7 +710,7 @@ public:
     int viewport_x0, int viewport_y0,
     int viewport_width, int viewport_height,
     float x0, float x1, float y0, float y1)
-  {    
+  {
     glViewport(viewport_x0, viewport_y0, viewport_width, viewport_height);
     glLoadIdentity();
 
@@ -1113,60 +1193,6 @@ public:
     }
   }
 
-
-  std::list<WholeShape> get_whole_shapes(const PathPtrVec &paths)
-  {
-    // First, we create a vector of pointers to the individual paths. This is
-    // intended to allow us to keep track of which paths have already been
-    // used inside a shape.
-    
-    std::list<const path*> path_refs;
-    std::list<WholeShape> shapes;
-
-    for (PathPtrVec::const_iterator it = paths.begin(), end = paths.end();
-         it != end; ++it) {
-      const path* cur_path = *it;
-      path_refs.push_back(cur_path);
-    }
-
-    for (std::list<const path*>::const_iterator it = path_refs.begin(), end = path_refs.end();
-         it != end; ++it) {
-      const path* cur_path = *it;
-      
-      if (cur_path->m_edges.empty()) {
-        continue;
-      }
-      
-      if (!cur_path->m_fill0 && !cur_path->m_fill1) {
-        continue;
-      }
-      
-      WholeShape shape;      
-      
-      shape.newPath(*cur_path);    
-        
-      const path* connector = find_connecting_path(*cur_path, path_refs);
-
-      while (connector) {
-        shape.addPath(*connector);        
-        
-        std::list<const path*>::const_iterator iter = it;
-        iter++;
-        
-        connector = find_connecting_path(*connector, std::list<const path*>(iter, end));
-  
-        // make sure we don't iterate over the connecting path in the for loop.
-        path_refs.remove(connector);        
-      }
-      
-      shapes.push_back(shape);     
-    }
-    
-    return shapes;
-  }
-  
-  
-  
   std::list<PathPtrVec> get_contours(const PathPtrVec &paths)
   {
     std::list<const path*> path_refs;
@@ -1254,8 +1280,8 @@ public:
     
       if (cur_path.m_new_shape) {
         subshapes.push_back(it); 
-      }   
-    } 
+      } 
+    }
 
     if (subshapes.back() != end) {
       subshapes.push_back(end);
@@ -1429,18 +1455,48 @@ public:
     scale.m_x = _xscale;
     scale.m_y = _yscale;
   }
+
+#ifdef OSMESA_TESTING
+  bool getPixel(rgba& color_out, int x, int y)
+  {  
+    return _offscreen->getPixel(color_out, x, y);
+  }
+  
+  bool initTestBuffer(unsigned width, unsigned height)
+  {
+    GNASH_REPORT_FUNCTION;
+
+    _offscreen.reset(new OSRenderMesa(width, height));
+
+    init();
+    
+    return true;
+  }
+
+  unsigned int getBitsPerPixel() const
+  {
+    return _offscreen->getBitsPerPixel();
+  }
+#endif // OSMESA_TESTING
     
 
 private:
   Tesselator _tesselator;
   float _xscale;
   float _yscale;
+#ifdef OSMESA_TESTING
+  std::auto_ptr<OSRenderMesa> _offscreen;
+#endif
 }; // class render_handler_ogl
   
-render_handler* create_render_handler_ogl()
+render_handler* create_render_handler_ogl(bool init)
 // Factory.
 {
-  return new render_handler_ogl;
+  render_handler_ogl* renderer = new render_handler_ogl;
+  if (init) {
+    renderer->init();
+  }
+  return renderer;
 }
   
   

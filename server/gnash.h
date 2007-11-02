@@ -153,7 +153,7 @@ float   get_curve_max_pixel_error();
 // Some helpers that may or may not be compiled into your
 // version of the library, depending on platform etc.
 DSOEXPORT render_handler*   create_render_handler_xbox();
-DSOEXPORT render_handler*   create_render_handler_ogl();
+DSOEXPORT render_handler*   create_render_handler_ogl(bool init = true);
 //DSOEXPORT render_handler* create_render_handler_cairo(void* cairohandle);
 
 class font;

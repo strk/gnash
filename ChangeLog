@@ -1,3 +1,25 @@
+2007-11-02 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler_ogl.cpp: Add OSRenderMesa, a class
+	implementing OSMesa's offscreen rendering system. Move
+	ogl_accessible() to the render_handler_ogl class because it
+	now needs access to members of that class. Remove the unused
+	get_whole_shapes method. Implement getPixel and friends.
+	Please note that this offscreen code is only enabled when
+	OSMESA_TESTING is defined, which the build system currently
+	does not yet do due to issues described in 
+	http://gnashdev.org/?q=node/46 .
+	* server/gnash.h: Add an optional boolean argument to
+	create_render_handler_ogl, which specifies whether the
+	factory should immediately run OpenGL initialization code.
+	This code should not be run immediately in the OSMesa case,
+	since OpenGL calls should not be made until a context is
+	available, which is not the case until initTestBuffer is
+	called. initTestBuffer, in turn, cannot be called until
+	renderer instantiation.
+	* testsuite/MovieTester.cpp: Add support for OpenGL renderer
+	testing.
+
 2007-11-02 Sandro Santilli <strk@keybit.net>
 
 	* gui/gui.cpp (getMovieInfo): add info about the current active
