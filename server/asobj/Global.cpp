@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.74 2007/10/25 10:10:53 strk Exp $ */
+/* $Id: Global.cpp,v 1.75 2007/11/02 15:10:43 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -492,6 +492,8 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 	// reference at all, most likely.
 	init_member("NaN", as_value(NAN));
 	init_member("Infinity", as_value(INFINITY));
+
+	color_class_init(*this);
 
 	if ( vm.getSWFVersion() < 6 ) goto extscan;
 	//-----------------------

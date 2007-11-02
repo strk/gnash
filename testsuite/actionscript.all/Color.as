@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Color.as,v 1.10 2007/09/29 16:22:57 strk Exp $";
+rcsid="$Id: Color.as,v 1.11 2007/11/02 15:10:43 strk Exp $";
 
 #include "check.as"
 
@@ -30,20 +30,141 @@ rcsid="$Id: Color.as,v 1.10 2007/09/29 16:22:57 strk Exp $";
 //--------------------------------
 
 check_equals ( typeof(Color), 'function')
-var colorObj = new Color;
+check_equals ( typeof(Color.prototype), 'object')
+check_equals ( typeof(Color.prototype.getRGB), 'function')
+check_equals ( typeof(Color.prototype.setRGB), 'function')
+check_equals ( typeof(Color.prototype.getTransform), 'function')
+check_equals ( typeof(Color.prototype.setTransform), 'function')
+check_equals ( typeof(Color.getRGB), 'undefined')
+check_equals ( typeof(Color.setRGB), 'undefined')
+check_equals ( typeof(Color.getTransform), 'undefined')
+check_equals ( typeof(Color.setTransform), 'undefined')
 
+#if OUTPUT_VERSION > 5
+check ( Color.prototype.hasOwnProperty('getRGB') );
+check ( Color.prototype.hasOwnProperty('setRGB') );
+check ( Color.prototype.hasOwnProperty('getTransform') );
+check ( Color.prototype.hasOwnProperty('setTransform') );
+#endif
+
+//-----------------------------------------------------------
 // test the Color constuctor
+//-----------------------------------------------------------
+
+colorObj = new Color;
 check_equals ( typeof(colorObj), 'object')
+check ( colorObj instanceof Color );
+check ( colorObj instanceof Object );
+check_equals ( typeof(colorObj.getRGB()), 'undefined' );
+check_equals ( typeof(colorObj.getTransform()), 'undefined' );
 
-// test the Color::getrgb method
-check_equals ( typeof(colorObj.getRGB), 'function');
+colorObj = new Color(__shared_assets);
+check_equals ( typeof(colorObj), 'object')
+check ( colorObj instanceof Color );
+check ( colorObj instanceof Object );
 
-// test the Color::gettransform method
-check_equals ( typeof(colorObj.getTransform), 'function');
+invalidColorObj = new Color(4);
+check_equals ( typeof(colorObj), 'object')
+check ( colorObj instanceof Color );
+check ( colorObj instanceof Object );
 
-// test the Color::setrgb method
-check_equals ( typeof(colorObj.setRGB), 'function');
+//-----------------------------------------------------------
+// test the Color::getRGB method
+//-----------------------------------------------------------
 
-// test the Color::settransform method
+rgb = colorObj.getRGB();
+check_equals ( typeof(rgb), 'number' );
+check_equals ( rgb, 0 );
+
+//-----------------------------------------------------------
+// test the Color::getTransform method
+//
+// ra - red multiplier -100 .. +100
+// rb - red offset -255 .. +255
+// ga = green multiplier -100 .. +100
+// gb = green offset -255 .. +255
+// ba = blu multiplier -100 .. +100
+// bb = blu offset offset -255 .. +255
+// aa = alpha multiplier -100 .. +100
+// ab = alpha offset -255 .. +255
+//
+//-----------------------------------------------------------
+
+trans = colorObj.getTransform();
+check_equals ( typeof(trans), 'object' );
+check ( trans instanceof Object );
+check_equals ( trans.ra, 100 );
+check_equals ( trans.rb, 0 );
+check_equals ( trans.ga, 100 );
+check_equals ( trans.gb, 0 );
+check_equals ( trans.ba, 100 );
+check_equals ( trans.bb, 0 );
+check_equals ( trans.aa, 100 );
+check_equals ( trans.ab, 0 );
+
+
+//-----------------------------------------------------------
+// test the Color::setTransform method
+//-----------------------------------------------------------
+
 check_equals ( typeof(colorObj.setTransform), 'function');
+
+trans.rb = 255;
+colorObj.setTransform(trans);
+rgb = colorObj.getRGB();
+check_equals ( rgb, 0xFF0000 );
+
+trans.gb = 128;
+colorObj.setTransform(trans);
+rgb = colorObj.getRGB();
+check_equals ( rgb, 0xFF8000 );
+
+trans.bb = 32; 
+colorObj.setTransform(trans);
+rgb = colorObj.getRGB();
+check_equals ( rgb, 0xFF8020 );
+
+trans = { ra:-100, ga:-50, ba:50 };
+colorObj.setTransform(trans);
+rgb = colorObj.getRGB();
+check_equals ( rgb, 0xFF8020 );
+
+trans = { rb:0 }; // only modify the red channel
+colorObj.setTransform(trans);
+rgb = colorObj.getRGB();
+check_equals ( rgb, 0x008020 );
+
+o = {}; o.valueOf = function() { return 255; };
+trans = { gb:o }; // only modify the green channel
+colorObj.setTransform(trans);
+rgb = colorObj.getRGB();
+check_equals ( rgb, 0x00FF20 );
+
+trans = { bb:2 }; // only modify the blue channel
+colorObj.setTransform(trans);
+rgb = colorObj.getRGB();
+check_equals ( rgb, 0x00FF02 );
+
+//-----------------------------------------------------------
+// test the Color::setRGB method
+//-----------------------------------------------------------
+
+check_equals ( typeof(colorObj.setRGB), 'function');
+colorObj.setRGB(0x667799);
+xcheck_equals ( colorObj.getRGB(), 0x667799 );
+trans = colorObj.getTransform();
+xcheck_equals ( trans.ra, 0 );
+xcheck_equals ( trans.rb, 102 );
+xcheck_equals ( trans.ga, 0 );
+xcheck_equals ( trans.gb, 119 );
+xcheck_equals ( trans.ba, 0 );
+xcheck_equals ( trans.bb, 153 );
+check_equals ( trans.aa, 100 );
+check_equals ( trans.ab, 0 );
+
+//-----------------------------------------------------------
+// end of test
+//-----------------------------------------------------------
+
+
 totals();

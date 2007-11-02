@@ -3832,4 +3832,12 @@ sprite_instance::destroy()
 	character::destroy();
 }
 
+cxform
+sprite_instance::get_world_cxform() const
+{
+	cxform cf = character::get_world_cxform();
+	cf.concatenate(_userCxform); 
+	return cf;
+}
+
 } // namespace gnash

@@ -271,6 +271,30 @@ public:
 	///
 	bool get_frame_number(const as_value& frame_spec, size_t& frameno) const;
 
+	/// MovieClip instances need to handle cxform specially 
+	//
+	/// This is to suppor the Color asobject class
+	///
+	cxform	get_world_cxform() const;
+
+	/// Update user-defined color transform
+	//
+	/// This should only be used by the Color AS class
+	///
+	void set_user_cxform(const cxform& cx)
+	{
+		set_invalidated();
+		_userCxform = cx;
+	}
+
+	/// Return the user-defined color transform
+	//
+	/// This should only be used by the Color AS class
+	///
+	cxform  get_user_cxform() const
+	{
+		return _userCxform;
+	}
 
 	/// Look up the labeled frame, and jump to it.
 	bool goto_labeled_frame(const std::string& label);
@@ -975,6 +999,8 @@ private:
 	int m_sound_stream_id;
 
 	std::string _origTarget;
+
+	cxform _userCxform;
 
 protected:
 

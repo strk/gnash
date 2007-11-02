@@ -1,5 +1,18 @@
 2007-11-02 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Global.cpp: don't forget to initialize the Color class.
+	* server/sprite_instance.{cpp,h}: add a _userCxform and accessor 
+	  methods; override get_world_cxform to take it into account.
+	* server/asobj/Color.cpp: implement {get,set}Transform and
+	  {get,set}RGB. Not 100% correct, but good progress on
+	  halloweenpaint.swf (see bug #21498)
+	* testsuite/actionscript.all/Color.as: test {get,set}Transform and
+	  {get,set}RGB.
+	* testsuite/swfdec/PASSING: couple of color-related tests now succeed,
+	  more still fail.
+
+2007-11-02 Sandro Santilli <strk@keybit.net>
+
 	* server/drag_state.h: add x/y offset members.
 	* server/movie_root.cpp (set_drag_state, doMouseDrag):
 	  implement relative dragging. Fixes bug #21496.
