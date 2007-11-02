@@ -663,6 +663,26 @@ void
 movie_root::set_drag_state(const drag_state& st)
 {
 	m_drag_state = st;
+	character* ch = st.getCharacter();
+	if ( ch && ! st.isLockCentered() )
+	{
+		// Get coordinates of the character's origin
+		point origin(0, 0);
+		matrix chmat = ch->get_world_matrix();
+		point world_origin;
+		chmat.transform(&world_origin, origin);
+
+		// Get current mouse coordinates
+		int x, y, buttons;
+		get_mouse_state(x, y, buttons);
+		point world_mouse(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+
+		// Compute offset
+		int xoffset = world_mouse.m_x - world_origin.m_x;
+		int yoffset = world_mouse.m_y - world_origin.m_y;
+
+		m_drag_state.setOffset(xoffset, yoffset);
+	}
 	assert(testInvariant());
 }
 
@@ -684,20 +704,9 @@ movie_root::doMouseDrag()
 
 	if (! m_drag_state.isLockCentered())
 	{
-		// FIXME: Implement relative drag...
-		static bool warned_relative_drag = false;
-		if ( ! warned_relative_drag )
-		{
-			log_unimpl(_("Relative drag"));
-			warned_relative_drag = true;
-		}
+		world_mouse.m_x -= m_drag_state.xOffset();
+		world_mouse.m_y -= m_drag_state.yOffset();
 	}
-
-#if 0
-	matrix	world_mat = dragChar->get_world_matrix();
-	point	local_mouse;
-	world_mat.transform_by_inverse(&local_mouse, world_mouse);
-#endif
 
 	matrix	parent_world_mat;
 	character* parent = dragChar->get_parent();

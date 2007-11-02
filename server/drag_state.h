@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: drag_state.h,v 1.4 2007/07/01 10:54:22 bjacques Exp $ */
+/* $Id: drag_state.h,v 1.5 2007/11/02 01:11:44 strk Exp $ */
 
 
 #ifndef GNASH_DRAG_STATE_H
@@ -51,6 +51,13 @@ class drag_state
 
 	bool	_lock_centered;
 
+	/// Offsets of displacement from character origin
+	/// at time of drag start. These are used for non
+	/// lock-centered dragging.
+	/// Coordinates are in stage space (TWIPS)
+	int _xoffset;
+	int _yoffset;
+
 public:
 
 	bool isLockCentered() const {
@@ -60,6 +67,19 @@ public:
 	void setLockCentered(bool lock) {
 		_lock_centered = lock;
 	}
+
+	/// Set displacement offset from origin
+	/// at time of drag start.
+	/// Coordinates are in stage space (twips)
+	///
+	void setOffset(int x, int y)
+	{
+		_xoffset = x;
+		_yoffset = y;
+	}
+
+	int xOffset() const { return _xoffset; }
+	int yOffset() const { return _yoffset; }
 
 	bool hasBounds() const {
 		return _hasbounds;
@@ -93,7 +113,7 @@ public:
 	}
 
 	/// May return NULL !!
-	character* getCharacter() {
+	character* getCharacter() const {
 		return _character.get();
 	}
 
