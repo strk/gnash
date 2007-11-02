@@ -321,7 +321,7 @@ color_settransform(const fn_call& fn)
 
 	obj->setTransform(newTrans);
 
-#if 1 // debugging
+#ifdef GNASH_DEBUG_COLOR 
 	std::stringstream ss; 
 	as_value tmp;
 	if ( trans->get_member(st.find("ra"), &tmp) ) ss << " ra:" << tmp.to_number();
