@@ -217,10 +217,10 @@ color_gettransform(const fn_call& fn)
 	ret->init_member("ba", cx.m_[2][0]*100);
 	ret->init_member("aa", cx.m_[3][0]*100);
 
-	ret->init_member("rb", cx.m_[0][1]*255);
-	ret->init_member("gb", cx.m_[1][1]*255);
-	ret->init_member("bb", cx.m_[2][1]*255);
-	ret->init_member("ab", cx.m_[3][1]*255);
+	ret->init_member("rb", cx.m_[0][1]);
+	ret->init_member("gb", cx.m_[1][1]);
+	ret->init_member("bb", cx.m_[2][1]);
+	ret->init_member("ab", cx.m_[3][1]);
 
 	return ret;
 }
@@ -242,12 +242,15 @@ color_setrgb(const fn_call& fn)
 
 	int r = (color&0xFF0000) >> 16;
 	int g = (color&0x00FF00) >> 8;
-	int b = (color&0x0000FF) >> 8;
+	int b = (color&0x0000FF);
 
-	cxform newTrans;
+	cxform newTrans = obj->getTransform();
 	newTrans.m_[0][1] = r;
 	newTrans.m_[1][1] = g;
 	newTrans.m_[2][1] = b;
+	newTrans.m_[0][0] = 0;
+	newTrans.m_[1][0] = 0;
+	newTrans.m_[2][0] = 0;
 
 	obj->setTransform(newTrans);
 
@@ -262,7 +265,7 @@ parseColorTransProp (as_object& obj, as_environment& env, string_table::key key,
 
 	if ( ! obj.get_member(key, &tmp) ) return;
 	d = tmp.to_number(&env);
-	if ( scale ) *target = d/100;
+	if ( scale ) *target = d/100.0;
 	else *target = d;
 }
 

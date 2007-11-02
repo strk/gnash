@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Color.as,v 1.11 2007/11/02 15:10:43 strk Exp $";
+rcsid="$Id: Color.as,v 1.12 2007/11/02 17:50:50 strk Exp $";
 
 #include "check.as"
 
@@ -113,37 +113,115 @@ trans.rb = 255;
 colorObj.setTransform(trans);
 rgb = colorObj.getRGB();
 check_equals ( rgb, 0xFF0000 );
+trans2 = colorObj.getTransform();
+check_equals ( trans2.ra, 100 );
+check_equals ( trans2.rb, 255 );
+check_equals ( trans2.ga, 100 );
+check_equals ( trans2.gb, 0 );
+check_equals ( trans2.ba, 100 );
+check_equals ( trans2.bb, 0 );
+check_equals ( trans2.aa, 100 );
+check_equals ( trans2.ab, 0 );
 
 trans.gb = 128;
 colorObj.setTransform(trans);
 rgb = colorObj.getRGB();
 check_equals ( rgb, 0xFF8000 );
+trans2 = colorObj.getTransform();
+check_equals ( trans2.ra, 100 );
+check_equals ( trans2.rb, 255 );
+check_equals ( trans2.ga, 100 );
+check_equals ( trans2.gb, 128 );
+check_equals ( trans2.ba, 100 );
+check_equals ( trans2.bb, 0 );
+check_equals ( trans2.aa, 100 );
+check_equals ( trans2.ab, 0 );
 
 trans.bb = 32; 
 colorObj.setTransform(trans);
 rgb = colorObj.getRGB();
 check_equals ( rgb, 0xFF8020 );
+trans2 = colorObj.getTransform();
+check_equals ( trans2.ra, 100 );
+check_equals ( trans2.rb, 255 );
+check_equals ( trans2.ga, 100 );
+check_equals ( trans2.gb, 128 );
+check_equals ( trans2.ba, 100 );
+check_equals ( trans2.bb, 32 );
+check_equals ( trans2.aa, 100 );
+check_equals ( trans2.ab, 0 );
 
 trans = { ra:-100, ga:-50, ba:50 };
 colorObj.setTransform(trans);
 rgb = colorObj.getRGB();
 check_equals ( rgb, 0xFF8020 );
+trans2 = colorObj.getTransform();
+check_equals ( trans2.ra, -100 );
+check_equals ( trans2.rb, 255 );
+check_equals ( trans2.ga, -50 );
+check_equals ( trans2.gb, 128 );
+check_equals ( trans2.ba, 50 );
+check_equals ( trans2.bb, 32 );
+check_equals ( trans2.aa, 100 );
+check_equals ( trans2.ab, 0 );
 
 trans = { rb:0 }; // only modify the red channel
 colorObj.setTransform(trans);
 rgb = colorObj.getRGB();
 check_equals ( rgb, 0x008020 );
+trans2 = colorObj.getTransform();
+check_equals ( trans2.ra, -100 );
+check_equals ( trans2.rb, 0 );
+check_equals ( trans2.ga, -50 );
+check_equals ( trans2.gb, 128 );
+check_equals ( trans2.ba, 50 );
+check_equals ( trans2.bb, 32 );
+check_equals ( trans2.aa, 100 );
+check_equals ( trans2.ab, 0 );
 
 o = {}; o.valueOf = function() { return 255; };
 trans = { gb:o }; // only modify the green channel
 colorObj.setTransform(trans);
 rgb = colorObj.getRGB();
 check_equals ( rgb, 0x00FF20 );
+trans2 = colorObj.getTransform();
+check_equals ( trans2.ra, -100 );
+check_equals ( trans2.rb, 0 );
+check_equals ( trans2.ga, -50 );
+check_equals ( trans2.gb, 255 );
+check_equals ( trans2.ba, 50 );
+check_equals ( trans2.bb, 32 );
+check_equals ( trans2.aa, 100 );
+check_equals ( trans2.ab, 0 );
 
 trans = { bb:2 }; // only modify the blue channel
 colorObj.setTransform(trans);
 rgb = colorObj.getRGB();
 check_equals ( rgb, 0x00FF02 );
+trans2 = colorObj.getTransform();
+check_equals ( trans2.ra, -100 );
+check_equals ( trans2.rb, 0 );
+check_equals ( trans2.ga, -50 );
+check_equals ( trans2.gb, 255 );
+check_equals ( trans2.ba, 50 );
+check_equals ( trans2.bb, 2 );
+check_equals ( trans2.aa, 100 );
+check_equals ( trans2.ab, 0 );
+
+trans = { ba:32 }; // modify the scale of blue channel
+colorObj.setTransform(trans);
+rgb = colorObj.getRGB();
+check_equals ( rgb, 0x00FF02 );
+
+trans2 = colorObj.getTransform();
+check_equals ( trans2.ra, -100 );
+check_equals ( trans2.rb, 0 );
+check_equals ( trans2.ga, -50 );
+check_equals ( trans2.gb, 255 );
+xcheck_equals ( Math.round(trans2.ba*100)/100, 31.64 ); // gnash returns 32, who's right ?
+check_equals ( trans2.bb, 2 );
+check_equals ( trans2.aa, 100 );
+check_equals ( trans2.ab, 0 );
 
 //-----------------------------------------------------------
 // test the Color::setRGB method
@@ -151,14 +229,14 @@ check_equals ( rgb, 0x00FF02 );
 
 check_equals ( typeof(colorObj.setRGB), 'function');
 colorObj.setRGB(0x667799);
-xcheck_equals ( colorObj.getRGB(), 0x667799 );
+check_equals ( colorObj.getRGB(), 0x667799 );
 trans = colorObj.getTransform();
-xcheck_equals ( trans.ra, 0 );
-xcheck_equals ( trans.rb, 102 );
-xcheck_equals ( trans.ga, 0 );
-xcheck_equals ( trans.gb, 119 );
-xcheck_equals ( trans.ba, 0 );
-xcheck_equals ( trans.bb, 153 );
+check_equals ( trans.ra, 0 );
+check_equals ( trans.rb, 102 );
+check_equals ( trans.ga, 0 );
+check_equals ( trans.gb, 119 );
+check_equals ( trans.ba, 0 );
+check_equals ( trans.bb, 153 );
 check_equals ( trans.aa, 100 );
 check_equals ( trans.ab, 0 );
 

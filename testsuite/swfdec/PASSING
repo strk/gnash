@@ -54,6 +54,8 @@ clonesprite-depths-7.swf:c70968c65e52392d9c61470d0d698394
 clonesprite-depths-8.swf:af472e7f31b31e886ca86430fb71106f
 color-getters.swf:4cee4418f75171e7bf423759a468b36b
 color-new.swf:b19cf3d46f416b919eb312da473b6756
+color-setRGB.swf:0841414e9ac7d2f9b57e40aec3d2f44f
+color-setTransform-empty.swf:2a72a5273ab8713ee289ff1726b0959c
 color-setTransform-negative.swf:0bc0510c35fc5c82de31b0db887fe535
 comparisons-5.swf:d4dfeb4ec80ec1f5a7390eb699e269ee
 comparisons-6.swf:5a7bf1ffb3a4dd23828d6e180f1871b0

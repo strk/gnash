@@ -1,5 +1,13 @@
 2007-11-02 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Color.cpp: more bug fixes.
+	* testsuite/actionscript.all/Color.as: more tests. Most pass
+	  except a suspicious one about some kind of rounding which is
+	  not clear to me.
+	* testsuite/swfdec/PASSING: two more tests pass.
+
+2007-11-02 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/Global.cpp: don't forget to initialize the Color class.
 	* server/sprite_instance.{cpp,h}: add a _userCxform and accessor 
 	  methods; override get_world_cxform to take it into account.
