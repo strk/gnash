@@ -844,6 +844,9 @@ Gui::getMovieInfo() const
     ret->insert(ret->begin(), StringPair("_level0 URL", def0->get_url()));
     ret->insert(ret->begin(), StringPair("Stage scripts", stage.scriptsDisabled() ? " disabled" : "enabled"));
 
+    character* ch = stage.getActiveEntityUnderPointer();
+    ret->insert(ret->begin(), StringPair("Topmost mouse entity", ch ? ch->getTarget() : "NONE" ));
+
     return ret;
 }
 

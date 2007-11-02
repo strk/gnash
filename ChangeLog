@@ -1,5 +1,10 @@
 2007-11-02 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui.cpp (getMovieInfo): add info about the current active
+	  mouse entity.
+
+2007-11-02 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/Color.cpp: more bug fixes.
 	* testsuite/actionscript.all/Color.as: more tests. Most pass
 	  except a suspicious one about some kind of rounding which is
