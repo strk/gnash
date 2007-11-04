@@ -23,6 +23,7 @@
 #include "tu_file.h"
 #include "tesselate.h"
 #include "rect.h"
+#include "log.h"
 
 #include <cfloat>
 #include <map>
@@ -189,13 +190,10 @@ path::expandBounds(rect& r, unsigned int thickness) const
 	}
 }
 
-
-bool	path::point_test(float x, float y) const
+void
+path::ray_crossing(int& ray_crossings, float x, float y) const
 {
-    if ( m_edges.empty() ) return false;
-
-    // No fill, nothing more to check.
-    if (m_fill0 == 0 && m_fill1 == 0) return false;
+    if ( m_edges.empty() ) return;
 
     // Shoot a horizontal ray from (x,y) to the right, and
     // count the number of edge crossings.  An even number
@@ -205,7 +203,6 @@ bool	path::point_test(float x, float y) const
     float x0 = m_ax;
     float y0 = m_ay;
 
-    int ray_crossings = 0;
     for (int i = 0, n = m_edges.size(); i < n; i++) {
 	const edge& e = m_edges[i];
 	
@@ -319,6 +316,20 @@ bool	path::point_test(float x, float y) const
 	x0 = x1;
 	y0 = y1;
     }
+
+    return;
+}
+
+
+bool	path::point_test(float x, float y) const
+{
+    if ( m_edges.empty() ) return false;
+
+    // No fill, nothing more to check.
+    if (m_fill0 == 0 && m_fill1 == 0) return false;
+
+    int ray_crossings = 0;
+    ray_crossing(ray_crossings, x, y);
 
     if (ray_crossings & 1) {
 	// Odd number of ray crossings means the point

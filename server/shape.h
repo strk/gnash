@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.h,v 1.24 2007/09/14 16:02:51 strk Exp $ */
+/* $Id: shape.h,v 1.25 2007/11/04 23:12:56 strk Exp $ */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
@@ -119,9 +119,26 @@ namespace gnash {
 		///
 		/// WARNING: often a filled shape is composed by multiple
 		///          paths. we probably fail in those cases.
-		///
+		///          Use the ray_crossing() function to compute
+		///          Point-in-shape for multi-path shapes.
 		///
 		bool	point_test(float x, float y) const;
+
+		/// Ray crossing count.
+		//
+		/// Update ray crossing for the given query point using
+		/// edges in this path.
+		///
+		/// @param ray_crossings
+		///	Number of crossings, updated by this method.
+		///
+		/// @param x
+		///     X ordinate of the query point, in local coordinate space.
+		///
+		/// @param y
+		///     Y ordinate of the query point, in local coordinate space.
+		///
+		void ray_crossing(int& ray_crossings, float x, float y) const;
 
 		/// Push the path into the tesselator.
 		void	tesselate() const;
@@ -250,7 +267,9 @@ namespace gnash {
 		/// Close this path with a straight line, if not already closed
 		void close();
 
-		/// return true if the given point is withing the given squared distance
+		/// \brief
+		/// Return true if the given point is withing the given squared distance
+		/// from this path edges.
 		//
 		/// NOTE: if the path is empty, false is returned.
 		///

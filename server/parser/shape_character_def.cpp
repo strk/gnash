@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.41 2007/10/03 06:52:42 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.42 2007/11/04 23:12:56 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -731,6 +731,8 @@ bool	shape_character_def::point_test_local(float x, float y)
     
     point pt(x, y);
 
+    int ray_crossings=0;
+
     // Try each of the paths.
     for (size_t i = 0; i < npaths; ++i)
     {
@@ -755,14 +757,25 @@ bool	shape_character_def::point_test_local(float x, float y)
 			float dist = thickness/2;
 			sqdist = dist*dist;
 		}
+
 		//cout << "Thickness of line is " << thickness << " squared is " << sqdist << endl;
 		if ( pth.withinSquareDistance(pt, sqdist) ) return true;
 	}
 
 	// Check for point in polygon (if filled - but that test is in point_test itself)
-	if (pth.point_test(x, y)) return true;
+	if ( pth.m_fill0 || pth.m_fill1 )
+	{
+		pth.ray_crossing(ray_crossings, x, y);
+	}
+
+	//if (pth.point_test(x, y)) return true;
     }
 
+    if (ray_crossings & 1) {
+	// Odd number of ray crossings means the point
+	// is inside the poly.
+	return true;
+    }
     return false;
 }
 

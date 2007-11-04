@@ -1,3 +1,10 @@
+2007-11-05 Sandro Santilli <strk@keybit.net>
+
+	* server/shape.{cpp,h}: extract a ray_crossing out of point_test.
+	* server/parser/shape_character_def.cpp (point_test): use 
+	  path::ray_crossing against any filled path, to detect fills
+	  composed by multiple paths. Fixes bug #21498.
+
 2007-11-02 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/render_handler_ogl.cpp: Add OSRenderMesa, a class
