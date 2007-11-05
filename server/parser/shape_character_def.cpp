@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.44 2007/11/05 14:56:10 udog Exp $ */
+/* $Id: shape_character_def.cpp,v 1.45 2007/11/05 17:26:30 udog Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -35,11 +35,6 @@
 
 #include <cfloat>
 #include <algorithm>
-
-// Define the macro below to use the new (Udo's) point-in-shape algorithm
-// which should work perfectly for any shape but ignores strokes at the 
-// moment.
-//#define USE_NEW_POINT_TEST
 
 // Define the macro below to always compute bounds for shape characters
 // and compare them with the bounds encoded in the SWF
@@ -721,8 +716,6 @@ void  shape_character_def::tesselate(float error_tolerance, tesselate::trapezoid
 }
 
 
-#ifdef USE_NEW_POINT_TEST
-
 // TODO: this should be moved to libgeometry or something
 int curve_x_crossings(float x0, float y0, float x1, float y1, 
   float cx, float cy, float y, float &cross1, float &cross2)
@@ -816,12 +809,19 @@ bool  shape_character_def::point_test_local(float x, float y)
     // Incoming coords are local coords.
 {
 
+  point pt(x, y);
+
+  if (m_bound.point_test(x, y) == false) {
+    // Early out.
+    return false;
+  }
+
   bool result = false;
   unsigned npaths = m_paths.size();
   float last_crossing;
   bool first = true;
 
-  // browse all paths...  
+  // browse all paths  
   for (unsigned pno=0; pno<npaths; pno++) {
   
     const path& pth = m_paths[pno];
@@ -841,7 +841,31 @@ bool  shape_character_def::point_test_local(float x, float y)
       first = true;
     }
     
-    // ...and edges
+    // If the path has a line style, check for strokes there
+    if (pth.m_line != 0 ) {
+    
+      assert(m_line_styles.size() >= pth.m_line);
+      
+      line_style& ls = m_line_styles[pth.m_line-1];
+      
+      int thickness = ls.get_width();
+      float sqdist;
+      
+      if (thickness == 0) {
+        // hairline has always a tolerance of a single twip
+        sqdist = 1;
+      } else {
+        float dist = thickness/2;
+        sqdist = dist*dist;
+      }
+      
+      //cout << "Thickness of line is " << thickness << " squared is " << sqdist << endl;
+      if (pth.withinSquareDistance(pt, sqdist)) 
+        return true;
+    }
+    
+    
+    // browse all edges of the path
     for (unsigned eno=0; eno<nedges; eno++) {
     
       const edge& edg = pth.m_edges[eno];
@@ -946,7 +970,7 @@ bool  shape_character_def::point_test_local(float x, float y)
       
       
       // ==> we have now:
-      //  - a valid cross_x, which is left to "x"
+      //  - a valid cross_x
       //  - cross_dir tells the direction of the crossing 
       //    (+1 = downward, -1 = upward)
       
@@ -985,71 +1009,6 @@ bool  shape_character_def::point_test_local(float x, float y)
   return result;
 }
 
-#else // ifdef USE_NEW_POINT_TEST
-
-bool  shape_character_def::point_test_local(float x, float y)
-    // Return true if the specified point is on the interior of our shape.
-    // Incoming coords are local coords.
-{
-    if (m_bound.point_test(x, y) == false) {
-  // Early out.
-  return false;
-    }
-
-    size_t npaths = m_paths.size();
-    
-    if ( ! npaths ) return false;
-    
-    point pt(x, y);
-
-    int ray_crossings=0;
-
-    // Try each of the paths.
-    for (size_t i = 0; i < npaths; ++i)
-    {
-  const path& pth = m_paths[i];
-
-  if ( pth.empty() ) continue;
-
-  // If it has a line style, check for strokes there
-  if ( pth.m_line != 0 )
-  {
-    assert(m_line_styles.size() >= pth.m_line);
-    line_style& ls = m_line_styles[pth.m_line-1];
-    int thickness = ls.get_width();
-    float sqdist;
-    if ( thickness == 0 )
-    {
-      // hairline has always a tolerance of a single twip
-      sqdist = 1;
-    }
-    else
-    {
-      float dist = thickness/2;
-      sqdist = dist*dist;
-    }
-
-    //cout << "Thickness of line is " << thickness << " squared is " << sqdist << endl;
-    if ( pth.withinSquareDistance(pt, sqdist) ) return true;
-  }
-
-  // Check for point in polygon (if filled - but that test is in point_test itself)
-  if ( pth.m_fill0 || pth.m_fill1 )
-  {
-    pth.ray_crossing(ray_crossings, x, y);
-  }
-
-  //if (pth.point_test(x, y)) return true;
-    }
-
-    if (ray_crossings & 1) {
-  // Odd number of ray crossings means the point
-  // is inside the poly.
-  return true;
-    }
-    return false;
-}
-#endif
 
 float shape_character_def::get_height_local() const
 {

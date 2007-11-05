@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.h,v 1.26 2007/11/05 08:06:03 strk Exp $ */
+/* $Id: shape.h,v 1.27 2007/11/05 17:26:55 udog Exp $ */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
@@ -106,10 +106,11 @@ namespace gnash {
 			return is_empty();
 		}
 
-		/// Ray crossing count.
+		/// Ray crossing count. (OBSOLETE)
 		//
 		/// Update ray crossing for the given query point using
-		/// edges in this path. Used to detect point in shape.
+		/// edges in this path. Was used to detect point in shape,
+    /// but now we're using a different method.
 		///
 		/// @param ray_crossings
 		///	Number of crossings, updated by this method.

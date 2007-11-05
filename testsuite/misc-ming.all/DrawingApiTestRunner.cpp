@@ -170,7 +170,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	// Over the green curve
 	tester.movePointerTo(376, 139);
-	xcheck(tester.isMouseOverMouseEntity()); // fails due to edge::withinSquareDistance bug
+	check(tester.isMouseOverMouseEntity()); // failed due to edge::withinSquareDistance bug
 	check_pixel(376, 139, 2, green, 2); // fails due to bug in AGG
 
 	// Over the center of the green circle fill
@@ -180,7 +180,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	// Over the boundary of the green circle fill
 	tester.movePointerTo(363, 174);
-	xcheck(tester.isMouseOverMouseEntity());  // fails due to edge::withinSquareDistance bug
+	check(tester.isMouseOverMouseEntity());  // failed due to edge::withinSquareDistance bug
 	check_pixel(363, 174, 2, black, 2); 
 
 	// Check that nothing is drawin in the bottom line

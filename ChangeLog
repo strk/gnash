@@ -1,3 +1,12 @@
+2007-11-05 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/parser/shape_character_def.cpp: take outline hit test 
+	  algorithm from old implementation; drop the old point_test 
+	  method in favor of the new one; avoid browsing the paths
+	  in point_test_local() when the point is already out of the
+	  shape bounds 
+	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: two new PASSes
+
 2007-11-05 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/FreetypeGlyphsProvider.cpp: Pass bold and italic values
