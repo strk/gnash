@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.29 2007/10/31 11:17:48 strk Exp $";
+rcsid="$Id: TextField.as,v 1.30 2007/11/05 09:04:08 strk Exp $";
 
 #include "check.as"
 
@@ -535,15 +535,42 @@ xcheck_equals(tf._url, _root._url);
 tf._url = "fake url";
 xcheck_equals(tf._url, _root._url); // read-only
 
+//-------------------------------------------------------------------------
 // Check TextField.variable (variable name associated with the textfield)
+//-------------------------------------------------------------------------
+//
+// SUMMARY: write summary here
+//
+//-------------------------------------------------------------------------
 
 xcheck_equals(typeof(tf.variable), 'null');
 check( ! tf.hasOwnProperty('variable') ); 
 tf.variable = _level0.inputVar;
-xcheck_equals(typeof(tf.variable), 'null'); // read-only
-// TODO: test 'variable' in misc-ming.all/DefineEditTextVariableName.c,
-//       as it seems the 'variable' member is not settable on a dynamic
-//       text field.
+xcheck_equals(typeof(tf.variable), 'null'); // _level0.inputVar doesn't exist !
+tf.variable = "_level0.inputVar";
+check_equals(tf.variable, '_level0.inputVar'); 
+xcheck_equals(typeof(_level0.inputVar), 'undefined');
+xcheck_equals(tf.text, "hello world");  // as _level0.inputVar is unexistent
+_level0.inputVar = "dynamic variable";
+check_equals(tf.text, "dynamic variable");
+tf.text = "back-propagated";
+check_equals(_level0.inputVar, "back-propagated");
+o = new Object();
+tf.variable = "_level0.o.t"; // non-existent member (yet)
+xcheck_equals(tf.text, "back-propagated");  // _level0.o.t doesn't exist yet
+o.t = "from object"; // here we create _level0.o.t
+xcheck_equals(tf.text, "back-propagated"); // but creating _level0.o.t doesn't trigger textfield text update
+tf.text = "back-to-object"; // instead, assigning to TextField.text updates the object
+xcheck_equals(o.t, "back-to-object");  
+o.t = "from object again"; // but updates to the object still don't update the TextField
+check_equals(tf.text, "back-to-object");  // assigning to the object doesn't trigger update of text ?
+tf.variable = "_level0.o.t"; // We re-assign TextField.variable, now the variable exists
+xcheck_equals(tf.text, "from object again");  // this time the TextField.text is updated
+check_equals(o.t, "from object again");
+o.t = "and forever";
+xcheck_equals(tf.text, "from object again"); // but updating o.t still doesn't trigger update of the text ?
+tf.text = "and forever back";
+xcheck_equals(o.t, "and forever back"); // while updating textfield's text updates o.t
 
 
 // Check TextField._visible 
