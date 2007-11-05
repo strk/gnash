@@ -1,3 +1,11 @@
+2007-11-05 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler_agg.cpp: Use agg::renderer_mclip instead
+	of agg::renderer_base, since the latter supports multiple clipping
+	boxes. This allows us to apply all the clipping regions at once. A
+	performance gain should be expected for movies with multiple
+	clipping regions.
+
 2007-11-05 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/TextField.as: add more test for
