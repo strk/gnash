@@ -320,26 +320,6 @@ path::ray_crossing(int& ray_crossings, float x, float y) const
     return;
 }
 
-
-bool	path::point_test(float x, float y) const
-{
-    if ( m_edges.empty() ) return false;
-
-    // No fill, nothing more to check.
-    if (m_fill0 == 0 && m_fill1 == 0) return false;
-
-    int ray_crossings = 0;
-    ray_crossing(ray_crossings, x, y);
-
-    if (ray_crossings & 1) {
-	// Odd number of ray crossings means the point
-	// is inside the poly.
-	return true;
-    }
-    return false;
-}
-
-
 void	path::tesselate() const
     // Push this path into the tesselator.
 {

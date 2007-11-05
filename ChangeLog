@@ -1,5 +1,10 @@
 2007-11-05 Sandro Santilli <strk@keybit.net>
 
+	* server/shape.{cpp,h}: drop the point_test method, not much useful
+	  on its own ...
+
+2007-11-05 Sandro Santilli <strk@keybit.net>
+
 	* server/shape.{cpp,h}: extract a ray_crossing out of point_test.
 	* server/parser/shape_character_def.cpp (point_test): use 
 	  path::ray_crossing against any filled path, to detect fills

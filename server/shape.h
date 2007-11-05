@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.h,v 1.25 2007/11/04 23:12:56 strk Exp $ */
+/* $Id: shape.h,v 1.26 2007/11/05 08:06:03 strk Exp $ */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
@@ -106,28 +106,10 @@ namespace gnash {
 			return is_empty();
 		}
 
-		/// Point-in-shape test. 
-		//
-		/// Return true if the query point is on the filled
-		/// interior of this shape.
-		///
-		/// Note that boundaries are NOT checked (a point of the boundary
-		/// will return false here).
-		/// Use withinSquareDistance() for boundary checking.
-		///
-		/// Return false if this path has no associated fill.
-		///
-		/// WARNING: often a filled shape is composed by multiple
-		///          paths. we probably fail in those cases.
-		///          Use the ray_crossing() function to compute
-		///          Point-in-shape for multi-path shapes.
-		///
-		bool	point_test(float x, float y) const;
-
 		/// Ray crossing count.
 		//
 		/// Update ray crossing for the given query point using
-		/// edges in this path.
+		/// edges in this path. Used to detect point in shape.
 		///
 		/// @param ray_crossings
 		///	Number of crossings, updated by this method.
