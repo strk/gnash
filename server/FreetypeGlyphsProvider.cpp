@@ -233,8 +233,8 @@ FreetypeGlyphsProvider::draw_bitmap(const FT_Bitmap& bitmap)
 
 // private
 bool
-FreetypeGlyphsProvider::getFontFilename(const std::string& name,
-		bool /*bold*/, bool /*italic*/, std::string& filename)
+FreetypeGlyphsProvider::getFontFilename(const std::string &name,
+		bool bold, bool italic, std::string& filename)
 {
 
 #define DEFAULT_FONTFILE "/usr/share/fonts/truetype/freefont/FreeSans.ttf"
@@ -249,12 +249,21 @@ FreetypeGlyphsProvider::getFontFilename(const std::string& name,
 		return true;
 		//return false;
 	}
-
+	
 	FcResult    result;
 
 	FcPattern* pat = FcNameParse((const FcChar8*)name.c_str());
-
+	
 	FcConfigSubstitute (0, pat, FcMatchPattern);
+
+	if (italic) {
+		FcPatternAddInteger (pat, FC_SLANT, FC_SLANT_ITALIC);
+	}
+
+	if (bold) {
+		FcPatternAddInteger (pat, FC_WEIGHT, FC_WEIGHT_BOLD);
+	}
+
 	FcDefaultSubstitute (pat);
 
 	FcPattern   *match;

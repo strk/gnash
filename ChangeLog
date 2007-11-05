@@ -1,3 +1,8 @@
+2007-11-05 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/FreetypeGlyphsProvider.cpp: Pass bold and italic values
+	  to fontconfig for system fonts. Fixes bug #20597. 
+
 2007-11-05 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/parser/shape_character_def.cpp: Implement a new point_test
