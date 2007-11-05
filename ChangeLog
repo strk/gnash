@@ -1,5 +1,7 @@
 2007-11-05 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: make "missing KDE" message more didactic
+	  (see bug #21497)
 	* server/shape.{cpp,h}: drop the point_test method, not much useful
 	  on its own ...
 
