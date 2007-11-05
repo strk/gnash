@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.43 2007/11/05 14:55:02 udog Exp $ */
+/* $Id: shape_character_def.cpp,v 1.44 2007/11/05 14:56:10 udog Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -39,7 +39,7 @@
 // Define the macro below to use the new (Udo's) point-in-shape algorithm
 // which should work perfectly for any shape but ignores strokes at the 
 // moment.
-#define USE_NEW_POINT_TEST
+//#define USE_NEW_POINT_TEST
 
 // Define the macro below to always compute bounds for shape characters
 // and compare them with the bounds encoded in the SWF
