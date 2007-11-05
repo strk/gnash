@@ -1,3 +1,8 @@
+2007-11-05 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/parser/shape_character_def.cpp: Implement a new point_test
+	  algorithm (disabled by default since it's subject to discussion)	
+
 2007-11-05 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/render_handler_agg.cpp: Use agg::renderer_mclip instead
