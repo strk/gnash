@@ -1,3 +1,12 @@
+2007-11-06 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* libgeometry/snappingrange.h: replace the distance method with a
+	  more efficient area before/after comparison method; make 
+	  snap_factor and single_mode private members and provide access
+	  methods
+	* libgeometry/Range2d.h: new getArea() function
+	* gui/gui.cpp, server/character.cpp: apply snappingrange changes
+
 2007-11-06 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/DrawingApiTest.as: add self-contained test

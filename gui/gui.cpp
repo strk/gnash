@@ -61,7 +61,7 @@
 /// debug the GUI part, however (see if blitting the region works), then you 
 /// probably won't define this.
 #ifdef ENABLE_REGION_UPDATES_DEBUGGING 
-#define REGION_UPDATES_DEBUGGING_FULL_REDRAW 1
+//#define REGION_UPDATES_DEBUGGING_FULL_REDRAW 1
 #endif 
 
 #ifdef ENABLE_REGION_UPDATES_DEBUGGING
@@ -525,15 +525,12 @@ Gui::display(movie_root* m)
 	//
 	if (!redraw_flag) {
 		
-		// Choose distance (note these are TWIPS!) 
-		// 10% of normalized stage size
-		changed_ranges.snap_distance = sqrt(
-		  m->get_movie_definition()->get_width_pixels() * 20.0 * 
-			m->get_movie_definition()->get_height_pixels() * 20.0) * 0.10;
+		// choose snapping ranges factor 
+		changed_ranges.setSnapFactor(1.3f);  
 			
 		// Use multi ranges only when GUI/Renderer supports it
 		// (Useless CPU overhead, otherwise)
-		changed_ranges.single_mode = !want_multiple_regions();
+		changed_ranges.setSingleMode(!want_multiple_regions());
 
 		// scan through all sprites to compute invalidated bounds  
 		m->add_invalidated_bounds(changed_ranges, false);

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.60 2007/11/01 21:54:45 strk Exp $ */
+/* $Id: character.cpp,v 1.61 2007/11/06 15:44:27 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -167,15 +167,10 @@ character::set_invalidated(const char* debug_file, int debug_line)
 			debug_file, debug_line);
 		#endif
 		
-		// NOTE: we need to set snap_distance in order to avoid too tight 
-		// invalidated ranges. The GUI chooses the appropriate distance in base
-		// of various parameters but for this internal ranges list we don't know
-		// that value. So we set snap_distance to some generic value and hope this
-		// does not produce too many nor too coarse ranges. Note when calculating
-		// the actual invalidated ranges the correct distance is used (but there
-		// may be problems when the GUI chooses a smaller value). Needs to be 
-		// fixed. 
-		m_old_invalidated_ranges.snap_distance = 200.0; 
+		// NOTE: the SnappingRanges instance used here is not initialized by the
+    // GUI and therefore uses the default settings. This should not be a 
+    // problem but special snapping ranges configuration done in gui.cpp
+    // is ignored here... 
 				
 		m_old_invalidated_ranges.setNull();
 		add_invalidated_bounds(m_old_invalidated_ranges, true);

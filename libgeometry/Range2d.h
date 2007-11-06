@@ -20,7 +20,7 @@
 //
 
 
-/* $Id: Range2d.h,v 1.17 2007/07/01 10:54:11 bjacques Exp $ */
+/* $Id: Range2d.h,v 1.18 2007/11/06 15:43:41 udog Exp $ */
 
 #ifndef GNASH_RANGE2D_H
 #define GNASH_RANGE2D_H
@@ -652,6 +652,18 @@ public:
 		assert ( isFinite() );
 		return _ymax;
 	}
+	
+	
+	/// Get area (width*height)
+  ///  
+	T getArea() const
+  {
+    assert ( !isWorld() );
+    if ( isNull() ) return 0;
+    return (_xmax - _xmin) * (_ymax - _ymin);
+    // this implementation is for float types, see specialization below
+    // for ints... 
+  } 
 
 	/// Expand this range to include the given Range2d
 	//
@@ -812,6 +824,29 @@ template <> inline unsigned int
 Range2d<unsigned int>::roundMax(float max)
 {
 	return static_cast<unsigned int>(ceil((float)max));
+}
+
+/// Specialization of area value for int type.
+//
+/// Add one.
+///
+template <> inline int
+Range2d<int>::getArea() const
+{
+  assert ( !isWorld() );
+  if ( isNull() ) return 0;
+  return (_xmax - _xmin + 1) * (_ymax - _ymin + 1);
+}
+
+/// Specialization of area value for unsigned int type.
+//
+/// Add one.
+///
+template <> inline unsigned int
+Range2d<unsigned int>::getArea() const
+{
+  assert ( isFinite() );
+  return (_xmax - _xmin + 1) * (_ymax - _ymin + 1);
 }
 
 
