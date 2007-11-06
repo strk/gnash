@@ -116,6 +116,9 @@ main(int /*argc*/, char** /*argv*/)
 
 	// Inside cyan clockwise fill
 	tester.movePointerTo(190, 112);
+	// this fails since Udo's rewrite of shape_character_def::point_test
+	// won't turn it into an 'expected' change as reverting the point_test 
+	// would fix it.
 	check(tester.isMouseOverMouseEntity());
 	check_pixel(190, 112, 2, cyan, 1);
 
@@ -499,11 +502,81 @@ main(int /*argc*/, char** /*argv*/)
 	tester.advance(); // commit 
 	check_pixel(146, 146, 2, red, 2);
 
+	tester.click(); // disable the mask
+	tester.advance(); // commit
+
 
 	//--------------------------------------------------------------
-	// TODO: go to drawing #2 (hit the '2' ascii key)
-	//       and test rendering of those invalid shapes.
+	// Go to drawing #2 (hit the '2' ascii key)
+	// and test rendering of those invalid shapes.
 	//--------------------------------------------------------------
 
+	tester.pressKey(gnash::key::_2); // go to second drawing
+	tester.advance(); // commit
+
+	//--------------------------------------------------------------
+	// The double "EL"s case
+	//--------------------------------------------------------------
+
+	// In the right green 'el' shape (not explicitly closed fill)
+	xcheck_pixel(80, 170, 2, green, 2);
+
+	// Outside the right green 'el' shape
+	// (but close to the auto-closing edge)
+	check_pixel(25, 148, 2, white, 2);
+
+	// In the left green horizontally flipped 'el' shape
+	// (not explicitly closed fill)
+	xcheck_pixel(30, 170, 2, green, 2);
+
+	// Outside the left green 'el' shape
+	// (but close to the auto-closing edge)
+	check_pixel(85, 148, 2, white, 2);
+
+	// Between the two 'el' shapes
+	xcheck_pixel(56, 170, 2, white, 2);
+
+	//--------------------------------------------------------------
+	// The red crossing edges case 
+	//--------------------------------------------------------------
+
+	// In the left niche
+	check_pixel(46, 60, 2, white, 2);
+
+	// In the right niche
+	check_pixel(74, 60, 2, white, 2);
+
+	// In the upper niche
+	check_pixel(60, 48, 2, red, 2);
+
+	// In the lower niche
+	check_pixel(60, 72, 2, red, 2);
+
+	//--------------------------------------------------------------
+	// The four-in-a-row case (there should be no visible fill)
+	//--------------------------------------------------------------
+
+	// upper-left
+	check_pixel(136, 35, 2, white, 2);
+	// center-left
+	check_pixel(136, 56, 2, white, 2);
+	// lower-left
+	check_pixel(136, 75, 2, white, 2);
+	// lower-center
+	xcheck_pixel(156, 75, 2, white, 2);
+	// lower-right
+	check_pixel(175, 75, 2, white, 2);
+	// center-right
+	check_pixel(175, 56, 2, white, 2);
+	// upper-right
+	check_pixel(175, 35, 2, white, 2);
+	// upper-center
+	xcheck_pixel(156, 35, 2, white, 2);
+	// center
+	xcheck_pixel(156, 57, 2, white, 2);
+
+	//--------------------------------------------------------------
+	// The nested squares case (TODO)
+	//--------------------------------------------------------------
 }
 

@@ -1,5 +1,7 @@
 2007-11-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: pixel checking
+	  for some invalid drawing (missing the nested squares to complete).
 	* testsuite/misc-ming.all/DrawingApiTest.as: 3 more nested squares:
 	  One with different edge directions for outer and inner squares
 	  (which doesn't make a difference), and one with a new beginFill
