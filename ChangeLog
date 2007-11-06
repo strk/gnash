@@ -1,3 +1,7 @@
+2007-11-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* macros/freetype.m4: clean up space before default filename.
+
 2007-11-06 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: add test for

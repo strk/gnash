@@ -132,7 +132,7 @@ dnl   fi
   dnl default (unless fontconfig is removed after building gnash, for instance).
   AC_PATH_PROG(FC_MATCH, fc-match, ,[${pathlist}])
   if test x"$FC_MATCH" != x; then
-    DEFAULT_FONT=`$FC_MATCH -v 'Sans' | grep '^.file:' | sed 's/\(file: \"\)\(.*\)\(\".*\)/\2/g'`
+    DEFAULT_FONT=`$FC_MATCH -v 'Sans' | grep '^.file:' | sed 's/\(.*\"\)\(.*\)\(\".*\)/\2/g'`
   fi
 
   dnl Hard-coded last resort, which is only likely to work
