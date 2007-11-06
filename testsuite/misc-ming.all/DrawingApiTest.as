@@ -14,7 +14,7 @@
 // Only page 1 have automatic testing so far.
 //
 
-rcsid="$Id: DrawingApiTest.as,v 1.16 2007/11/06 08:56:06 strk Exp $";
+rcsid="$Id: DrawingApiTest.as,v 1.17 2007/11/06 08:59:58 strk Exp $";
 
 #include "../actionscript.all/check.as"
 
@@ -421,20 +421,26 @@ page[0] = a;
 page[1] = inv;
 onKeyDown = function()
 {
-	with (page[visibleIndex])
+	var ascii = Key.getAscii();
+	if ( ascii >= 48 && ascii <= 57 ) // 0..9 - activate corresponding drawing 
 	{
-		_visible = false;
-		_enabled = false;
-		setMask(null);
+		with (page[visibleIndex])
+		{
+			_visible = false;
+			setMask(null);
+		}
+
+		visibleIndex = parseInt(ascii)-49;
+		trace("Key "+visibleIndex+" hit");
+
+		with (page[visibleIndex])
+		{
+			_visible = true;
+		}
 	}
-
-	visibleIndex = parseInt(Key.getAscii())-49;
-	trace("Key "+visibleIndex+" hit");
-
-	with (page[visibleIndex])
+	else if ( ascii == 104 ) // 'h' - toggle visibility
 	{
-		_visible = true;
-		_enabled = true;
+		page[visibleIndex]._visible = ! page[visibleIndex]._visible;
 	}
 
 };

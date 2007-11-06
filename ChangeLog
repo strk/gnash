@@ -1,5 +1,9 @@
 2007-11-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/DrawingApiTest.as: add support for 'h' key
+	  hitting to change visibility of currently active drawing. Exposes
+	  a bug with setMask, which triggers drawing of the maskee even when
+	  invisible.
 	* testsuite/misc-ming.all/DrawingApiTest.as: add a second drawing
 	  with 3 "invalid" shapes. Hitting a number key switches between
 	  the first (1) and second (2) drawing. 
