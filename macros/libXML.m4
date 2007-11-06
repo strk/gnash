@@ -1,5 +1,5 @@
 dnl  
-dnl    Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+dnl    Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: libXML.m4,v 1.32 2007/10/13 23:24:08 rsavoye Exp $
+dnl $Id: libXML.m4,v 1.33 2007/11/06 04:00:39 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_LIBXML], [
   has_xml=no
@@ -32,7 +32,7 @@ AC_DEFUN([GNASH_PATH_LIBXML], [
 
   if test x"${ac_cv_path_libxml_incl}" = x; then
     AC_PATH_PROG(XML2_CONFIG, xml2-config, ,[${pathlist}])
-    if test "x$XML2_CONFIG" != "x"  -a x"${darwin}" = xno ; then
+    if test "x$XML2_CONFIG" != "x" -a x"${darwin}" = xno ; then
       if test "x$XML2_CFLAGS" = "x" ; then
         ac_cv_path_libxml_incl=`$XML2_CONFIG --cflags`
       fi
@@ -54,7 +54,6 @@ AC_DEFUN([GNASH_PATH_LIBXML], [
       	  gnash_libxml_topdir=`basename $j`
       	  gnash_libxml_version=`echo ${gnash_libxml2_topdir} | sed -e 's:libxml2::' -e 's:-::'`
       	  ac_cv_path_libxml_incl="-I$j"
-          AC_MSG_RESULT(${ac_cv_path_libxml_incl})
           break
         fi
       done
@@ -62,9 +61,10 @@ AC_DEFUN([GNASH_PATH_LIBXML], [
   fi
  
   if test x"${ac_cv_path_libxml_incl}" = x ; then
-    AC_MSG_RESULT(no)
     AC_CHECK_HEADERS(libxml/xmlmemory.h, [ac_cv_path_libxml_incl=""])
   fi
+
+  AC_MSG_RESULT(${ac_cv_path_libxml_incl}) 
 
   dnl Look for the library
   AC_ARG_WITH(libxml_lib, AC_HELP_STRING([--with-libxml-lib], [directory where libxml2 library is]), with_libxml_lib=${withval})
@@ -75,7 +75,7 @@ AC_DEFUN([GNASH_PATH_LIBXML], [
       fi
     fi
   ])
-  AC_MSG_CHECKING([for libxml library])
+  dnl AC_MSG_CHECKING([for libxml library])
   if test x"${ac_cv_path_libxml_lib}" = x ; then
     for i in $libslist; do
       if test -f $i/libxml2.a -o -f $i/libxml2.${shlibext}; then
@@ -89,7 +89,6 @@ AC_DEFUN([GNASH_PATH_LIBXML], [
         fi
       fi
     done
-    AC_MSG_RESULT(${ac_cv_path_libxml_lib}) 
   fi
   if test x"${ac_cv_path_libxml_lib}" = x ; then
     AC_CHECK_LIB(libxml2, libxml_Init, [ac_cv_path_libxml_lib="-lxml2"])

@@ -1,3 +1,7 @@
+2007-11-06 Markus Gothe <nietzsche@lysator.liu.se>
+	
+	* macros/libXML.m4: Cleaned up output.
+
 2007-11-05 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/parser/shape_character_def.cpp: take outline hit test 
