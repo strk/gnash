@@ -14,7 +14,7 @@
 // Only page 1 have automatic testing so far.
 //
 
-rcsid="$Id: DrawingApiTest.as,v 1.19 2007/11/06 15:25:10 strk Exp $";
+rcsid="$Id: DrawingApiTest.as,v 1.20 2007/11/06 15:50:19 strk Exp $";
 
 #include "../actionscript.all/check.as"
 
@@ -248,7 +248,7 @@ with(inv)
 	createEmptyMovieClip("inv2", 2);
 	with (inv2)
 	{
-		lineStyle(1, 0);
+		lineStyle(0, 0); // hairline
 		beginFill(0x00FF00);
 
 		moveTo(10, 8);
@@ -271,7 +271,7 @@ with(inv)
 	createEmptyMovieClip("inv3", 3);
 	with (inv3)
 	{
-		lineStyle(1, 0);
+		lineStyle(0, 0); // hairline
 		beginFill(0x00FF00);
 
 		moveTo(10, 8);
@@ -290,7 +290,7 @@ with(inv)
 	createEmptyMovieClip("inv4", 4);
 	with (inv4)
 	{
-		lineStyle(1, 0);
+		lineStyle(0, 0); // hairline
 		beginFill(0x00FF00);
 
 		moveTo(10, 10);
