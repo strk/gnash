@@ -26,6 +26,7 @@
 #include "dlist.h"
 #include "container.h"
 #include "log.h"
+#include "gnash.h" // for gnash::key::code
 
 #include "check.h"
 #include <string>
@@ -441,7 +442,19 @@ main(int /*argc*/, char** /*argv*/)
 	check_pixel(c3b.x, c3b.y, 1, yellow, 2); 
 
 	//--------------------------------------------------------------
-	// Check setMask effect (triggered onMouseDown)
+	// Check _visible toggling effects
+	// (triggered onKeyDown 'h', effects visible after advance)
+	//--------------------------------------------------------------
+
+	check_pixel(330, 160, 2, green, 2); 
+	tester.pressKey(gnash::key::h); tester.advance();
+	check_pixel(330, 160, 2, white, 2); 
+	tester.pressKey(gnash::key::h); tester.advance();
+	check_pixel(330, 160, 2, green, 2); 
+
+	//--------------------------------------------------------------
+	// Check setMask effect
+	// (triggered onMouseDown, effects visible after advance)
 	//--------------------------------------------------------------
 
 	tester.click(); // this should enable cursor shape masking drawing
@@ -464,6 +477,33 @@ main(int /*argc*/, char** /*argv*/)
 	tester.movePointerTo(146, 146); tester.advance(); // move the mask over it
 	check_pixel(146, 146, 2, red, 2);
 
+	// Inside the violet fill
+	check_pixel(250, 112, 2, white, 2);
+	tester.click(); // this should disable the mask
+	check_pixel(250, 112, 2, violet, 2);
+
+	//--------------------------------------------------------------
+	// Check setMask on invisible shape 
+	//--------------------------------------------------------------
+
+	tester.movePointerTo(146, 146); // move pointer over red shape
+	tester.click(); // enable the mask
+	tester.advance(); // commit all of the above
+	check_pixel(146, 146, 2, red, 2);
+
+	tester.pressKey(gnash::key::h); // make it invisible
+	tester.advance(); // commit 
+	xcheck_pixel(146, 146, 2, white, 2); // gnash still draws invisible dynamic maskees !
+
+	tester.pressKey(gnash::key::h); // make it visible again
+	tester.advance(); // commit 
+	check_pixel(146, 146, 2, red, 2);
+
+
+	//--------------------------------------------------------------
+	// TODO: go to drawing #2 (hit the '2' ascii key)
+	//       and test rendering of those invalid shapes.
+	//--------------------------------------------------------------
 
 }
 
