@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.28 2007/11/06 16:04:07 udog Exp $
+// $Id: snappingrange.h,v 1.29 2007/11/06 16:06:59 udog Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
@@ -259,7 +259,7 @@ public:
     
     
     // limit number of ranges
-    if (_ranges.size > ranges_limit) {
+    if (_ranges.size() > ranges_limit) {
     
       // We found way too much ranges, so reduce to just one single range.
       // We could also double the factor and try again, but that probably
