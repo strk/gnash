@@ -1,3 +1,12 @@
+2007-11-06 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/DrawingApiTest.as: 3 more nested squares:
+	  One with different edge directions for outer and inner squares
+	  (which doesn't make a difference), and one with a new beginFill
+	  call before drawing the second shape (which renders as two
+	  overlapping squares, try using '-' and '+' to change _alpha
+	  for testing).
+
 2007-11-06 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* libgeometry/snappingrange.h: add range count limiting functionality

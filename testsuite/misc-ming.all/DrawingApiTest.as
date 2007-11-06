@@ -13,8 +13,11 @@
 // We currently have two pages: 1 and 2.
 // Only page 1 have automatic testing so far.
 //
+// '-' and '+' decrement and increment _alpha
+// 'h' toggles _visible
+//
 
-rcsid="$Id: DrawingApiTest.as,v 1.20 2007/11/06 15:50:19 strk Exp $";
+rcsid="$Id: DrawingApiTest.as,v 1.21 2007/11/06 18:49:29 strk Exp $";
 
 #include "../actionscript.all/check.as"
 
@@ -287,6 +290,7 @@ with(inv)
 	inv3.onRollOver = function() {};
 
 	// Nested squares (inner is an hole)
+	// Both squares are defined in counterclockwise order
 	createEmptyMovieClip("inv4", 4);
 	with (inv4)
 	{
@@ -319,9 +323,128 @@ with(inv)
 	check( inv4.hitTest(100 + (11*4), 100 + (19*4), true) );  // Lower-Left
 	check( inv4.hitTest(100 + (14*4), 100 + (19*4), true) );  // Lower-Center
 	check( inv4.hitTest(100 + (19*4), 100 + (19*4), true) );  // Lower-Right
-	check( inv4.hitTest(100 + (19*4), 100 + (14*4), true) );  // Center-Right
+	xcheck( inv4.hitTest(100 + (19*4), 100 + (14*4), true) );  // Center-Right
 	check( inv4.hitTest(100 + (19*4), 100 + (11*4), true) );  // Upper-Right
 	check( inv4.hitTest(100 + (14*4), 100 + (11*4), true) );  // Upper-Center
+
+	// Nested squares (inner is an hole)
+	// Outer square counterclockwise order, inner in closwise order
+	// NOTE that there's no difference with inv4 in rendering and hit test
+	createEmptyMovieClip("inv5", 5);
+	with (inv5)
+	{
+		lineStyle(0, 0); // hairline
+		beginFill(0x00FF00);
+
+		moveTo(10, 10);
+		lineTo(10, 20);
+		lineTo(20, 20);
+		lineTo(20, 10);
+		lineTo(10, 10);
+
+		moveTo(12, 12);
+		lineTo(18, 12);
+		lineTo(18, 18);
+		lineTo(12, 18);
+		lineTo(12, 12);
+	}
+	inv5._xscale = inv5._yscale = 400;
+	inv5._y = 100; inv5._x = 150;
+	inv5.onRollOver = function() {};
+
+	// check that a point inside the hole doesn't hit the shape
+	// (gnash fails due to bogus point_test, or missing normalization)
+	xcheck( ! inv5.hitTest(150 + (15*4), 100 + (15*4), true) ); 
+
+	// while a points on the border do hit it
+	check( inv5.hitTest(150 + (11*4), 100 + (11*4), true) );  // Upper-Left
+	check( inv5.hitTest(150 + (11*4), 100 + (14*4), true) );  // Center-Left
+	check( inv5.hitTest(150 + (11*4), 100 + (19*4), true) );  // Lower-Left
+	check( inv5.hitTest(150 + (14*4), 100 + (19*4), true) );  // Lower-Center
+	check( inv5.hitTest(150 + (19*4), 100 + (19*4), true) );  // Lower-Right
+	check( inv5.hitTest(150 + (19*4), 100 + (14*4), true) );  // Center-Right
+	check( inv5.hitTest(150 + (19*4), 100 + (11*4), true) );  // Upper-Right
+	check( inv5.hitTest(150 + (14*4), 100 + (11*4), true) );  // Upper-Center
+
+	// Nested squares (this time we call beginFill again before the move)
+	// Outer square counterclockwise order, inner in clockwise order
+	// This time, the inner square will NOT be considered an hole !
+	createEmptyMovieClip("inv6", 6);
+	with (inv6)
+	{
+		lineStyle(0, 0); // hairline
+		beginFill(0x00FF00);
+
+		moveTo(10, 10);
+		lineTo(10, 20);
+		lineTo(20, 20);
+		lineTo(20, 10);
+		lineTo(10, 10);
+
+		// this forces endFill call, which triggers finalization of previous path (I think)
+		beginFill(0x00FF00);
+
+		moveTo(12, 12);
+		lineTo(18, 12);
+		lineTo(18, 18);
+		lineTo(12, 18);
+		lineTo(12, 12);
+	}
+	inv6._xscale = inv6._yscale = 400;
+	inv6._y = 100; inv6._x = 200;
+	inv6.onRollOver = function() {};
+
+	// Point inside the inner square hits the shape !
+	check( inv6.hitTest(200 + (15*4), 100 + (15*4), true) ); 
+	// As points on the outer borders
+	check( inv6.hitTest(200 + (11*4), 100 + (11*4), true) );  // Upper-Left
+	check( inv6.hitTest(200 + (11*4), 100 + (14*4), true) );  // Center-Left
+	check( inv6.hitTest(200 + (11*4), 100 + (19*4), true) );  // Lower-Left
+	check( inv6.hitTest(200 + (14*4), 100 + (19*4), true) );  // Lower-Center
+	check( inv6.hitTest(200 + (19*4), 100 + (19*4), true) );  // Lower-Right
+	check( inv6.hitTest(200 + (19*4), 100 + (14*4), true) );  // Center-Right
+	check( inv6.hitTest(200 + (19*4), 100 + (11*4), true) );  // Upper-Right
+	check( inv6.hitTest(200 + (14*4), 100 + (11*4), true) );  // Upper-Center
+
+	// Nested squares, calling beginFill again after the move)
+	// Outer square counterclockwise order, inner in clockwise order
+	createEmptyMovieClip("inv7", 7);
+	with (inv7)
+	{
+		lineStyle(0, 0); // hairline
+		beginFill(0x00FF00);
+
+		moveTo(10, 10);
+		lineTo(10, 20);
+		lineTo(20, 20);
+		lineTo(20, 10);
+		lineTo(10, 10);
+
+		moveTo(12, 12);
+
+		// this forces endFill call, which triggers finalization of previous path (I think)
+		beginFill(0x00FF00);
+
+		lineTo(18, 12);
+		lineTo(18, 18);
+		lineTo(12, 18);
+		lineTo(12, 12);
+	}
+	inv7._xscale = inv7._yscale = 400;
+	inv7._y = 100; inv7._x = 250;
+	inv7.onRollOver = function() {};
+
+	// Point inside the inner square hits the shape !
+	check( inv7.hitTest(250 + (15*4), 100 + (15*4), true) ); 
+	// As points on the outer borders
+	check( inv7.hitTest(250 + (11*4), 100 + (11*4), true) );  // Upper-Left
+	check( inv7.hitTest(250 + (11*4), 100 + (14*4), true) );  // Center-Left
+	check( inv7.hitTest(250 + (11*4), 100 + (19*4), true) );  // Lower-Left
+	check( inv7.hitTest(250 + (14*4), 100 + (19*4), true) );  // Lower-Center
+	check( inv7.hitTest(250 + (19*4), 100 + (19*4), true) );  // Lower-Right
+	check( inv7.hitTest(250 + (19*4), 100 + (14*4), true) );  // Center-Right
+	check( inv7.hitTest(250 + (19*4), 100 + (11*4), true) );  // Upper-Right
+	check( inv7.hitTest(250 + (14*4), 100 + (11*4), true) );  // Upper-Center
 
 	_visible = false;
 }
@@ -478,6 +601,18 @@ onKeyDown = function()
 	else if ( ascii == 104 ) // 'h' - toggle visibility
 	{
 		page[visibleIndex]._visible = ! page[visibleIndex]._visible;
+	}
+	else if ( ascii == 45 ) // '-' - decrease alpha
+	{
+		var newAlpha = page[visibleIndex]._alpha - 20;
+		if ( newAlpha < 0 ) newAlpha = 0;
+		page[visibleIndex]._alpha = newAlpha;
+	}
+	else if ( ascii == 43 ) // '+' - increase alpha
+	{
+		var newAlpha = page[visibleIndex]._alpha + 20;
+		if ( newAlpha > 100 ) newAlpha = 100;
+		page[visibleIndex]._alpha = newAlpha;
 	}
 
 };
