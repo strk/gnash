@@ -762,7 +762,7 @@ DisplayList::display()
 		assert(ch);
 
 		character* mask = ch->getMask();
-		if ( mask && ! mask->isUnloaded() )
+		if ( mask && ch->get_visible() && ! mask->isUnloaded() )
 		{
 			render::begin_submit_mask();
 			mask->display();

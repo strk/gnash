@@ -493,7 +493,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	tester.pressKey(gnash::key::h); // make it invisible
 	tester.advance(); // commit 
-	xcheck_pixel(146, 146, 2, white, 2); // gnash still draws invisible dynamic maskees !
+	check_pixel(146, 146, 2, white, 2); // gnash failed drawing invisible dynamic maskees !
 
 	tester.pressKey(gnash::key::h); // make it visible again
 	tester.advance(); // commit 
