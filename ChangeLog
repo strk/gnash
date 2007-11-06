@@ -1,5 +1,8 @@
 2007-11-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/Makefile.am: MEDIADIR define must use
+	  absolute path (the local sandboxes check isn't ready for relative
+	  paths yet).
 	* server/dlist.cpp (display): don't display masked characters
 	  if invisible.
 	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: fixed drawing

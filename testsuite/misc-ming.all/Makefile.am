@@ -1490,7 +1490,7 @@ loadMovieTestRunner_LDADD = \
 loadMovieTestRunner_CXXFLAGS = \
 	-DSRCDIR='"$(srcdir)"' \
 	-DTGTDIR='"$(abs_builddir)"' \
-	-DMEDIADIR='"$(top_srcdir)/testsuite/media"'
+	-DMEDIADIR='"$(abs_mediadir)"' \
 	$(NULL)
 loadMovieTestRunner_DEPENDENCIES = \
 	loadMovieTest.swf \
