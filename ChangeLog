@@ -1,5 +1,10 @@
 2007-11-06 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
+	* libgeometry/snappingrange.h: add range count limiting functionality
+	  and limit to 50 ranges by default 	
+
+2007-11-06 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
 	* libgeometry/snappingrange.h: replace the distance method with a
 	  more efficient area before/after comparison method; make 
 	  snap_factor and single_mode private members and provide access

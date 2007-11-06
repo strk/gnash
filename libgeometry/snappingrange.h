@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.27 2007/11/06 15:43:41 udog Exp $
+// $Id: snappingrange.h,v 1.28 2007/11/06 16:04:07 udog Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
@@ -84,6 +84,7 @@ public:
     :
     snap_factor(1.3f),
     single_mode(false),
+    ranges_limit(50),
     _combine_counter(0)
   {
   }
@@ -94,6 +95,7 @@ public:
     :
     snap_factor(T(from.snap_factor)), // does it make sense ?
     single_mode(from.single_mode),
+    ranges_limit(from.ranges_limit),
     _combine_counter(0)
   {
     if ( from.isWorld() ) {
@@ -126,6 +128,12 @@ public:
   /// if mode==true, then the snapping ranges will act like a normal Range2d
   void setSingleMode(bool mode) {
     single_mode = mode;
+  }
+  
+  /// Sets the maximum number of ranges allowed (to avoid lots of small
+  /// ranges)
+  void setRangeCountLimit(unsigned limit) {
+    ranges_limit = limit;
   }
   
   /// Copy the snapping settings from another ranges list, without
@@ -248,6 +256,20 @@ public:
       } //for
     
     } //while
+    
+    
+    // limit number of ranges
+    if (_ranges.size > ranges_limit) {
+    
+      // We found way too much ranges, so reduce to just one single range.
+      // We could also double the factor and try again, but that probably
+      // won't make much difference, so we avoid the trouble...
+      
+      RangeType single = getFullArea();      
+      _ranges.resize(1);
+      _ranges[0] = single;
+    
+    }
   
   }
   
@@ -587,7 +609,10 @@ private:
   float snap_factor;
   
   /// if set, only a single, outer range is maintained (extended). 
-  bool single_mode;   
+  bool single_mode;
+  
+  /// maximum number of ranges allowed
+  unsigned ranges_limit;   
   
   unsigned int _combine_counter;
     
