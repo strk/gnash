@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.29 2007/11/06 16:06:59 udog Exp $
+// $Id: snappingrange.h,v 1.30 2007/11/06 16:40:10 udog Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
@@ -93,9 +93,9 @@ public:
   template <typename U>
   SnappingRanges2d(const SnappingRanges2d<U>& from)
     :
-    snap_factor(T(from.snap_factor)), // does it make sense ?
-    single_mode(from.single_mode),
-    ranges_limit(from.ranges_limit),
+    snap_factor(T(from.getSnapFactor())), // does it make sense ?
+    single_mode(from.getSingleMode()),
+    ranges_limit(from.getRangeCountLimit()),
     _combine_counter(0)
   {
     if ( from.isWorld() ) {
@@ -125,15 +125,27 @@ public:
     snap_factor = factor;
   }
   
+  float getSnapFactor() const {
+    return snap_factor;
+  }
+  
   /// if mode==true, then the snapping ranges will act like a normal Range2d
   void setSingleMode(bool mode) {
     single_mode = mode;
   }
   
+  bool getSingleMode() const {
+    return single_mode;
+  }  
+  
   /// Sets the maximum number of ranges allowed (to avoid lots of small
   /// ranges)
   void setRangeCountLimit(unsigned limit) {
     ranges_limit = limit;
+  }
+  
+  unsigned getRangeCountLimit() const {
+    return ranges_limit;
   }
   
   /// Copy the snapping settings from another ranges list, without
@@ -604,7 +616,8 @@ private:
     
   // The current Ranges list
   RangeList _ranges;
-  
+
+public:   
   /// snapping factor - see setSnapFactor() 
   float snap_factor;
   
