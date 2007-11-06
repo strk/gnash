@@ -7,8 +7,14 @@
 // Or:
 //	gnash DrawingApi.swf
 //
+//
+// Click the mouse button to turn the cursor shape into a mask and back.
+// Press a number on the keyboard to switch between "pages" of the drawing.
+// We currently have two pages: 1 and 2.
+// Only page 1 have automatic testing so far.
+//
 
-rcsid="$Id: DrawingApiTest.as,v 1.15 2007/10/29 21:23:16 strk Exp $";
+rcsid="$Id: DrawingApiTest.as,v 1.16 2007/11/06 08:56:06 strk Exp $";
 
 #include "../actionscript.all/check.as"
 
@@ -217,6 +223,76 @@ a.onEnterFrame = function()
 	}
 };
 
+//---------------------------------------------------------------------------
+// Some invalid shapes, get there hitting the right-arrow
+//---------------------------------------------------------------------------
+
+createEmptyMovieClip("inv", 100);
+with(inv)
+{
+	// Crossing edge
+	createEmptyMovieClip("inv1", 1);
+	with (inv1)
+	{
+		moveTo(10, 10);
+		beginFill(0xFF0000);
+		lineTo(20, 10);
+		lineTo(10, 20);
+		lineTo(20, 20);
+		endFill(); // should close to 10,10
+	}
+	inv1._xscale = inv1._yscale = 400;
+	inv1.onRollOver = function() {};
+
+	// Four intersecting edges  (like in "four in a row")
+	createEmptyMovieClip("inv2", 2);
+	with (inv2)
+	{
+		lineStyle(1, 0);
+		beginFill(0x00FF00);
+
+		moveTo(10, 8);
+		lineTo(10, 20);
+
+		moveTo(8, 10);
+		lineTo(20, 10);
+
+		moveTo(18, 8);
+		lineTo(18, 20);
+
+		moveTo(8, 18);
+		lineTo(20, 18);
+
+	}
+	inv2._xscale = inv2._yscale = 400; inv2._x = 100;
+	inv2.onRollOver = function() {};
+
+	// Opposite el shapes
+	createEmptyMovieClip("inv3", 3);
+	with (inv3)
+	{
+		lineStyle(1, 0);
+		beginFill(0x00FF00);
+
+		moveTo(10, 8);
+		lineTo(10, 20);
+		lineTo(5, 20);
+
+		moveTo(18, 8);
+		lineTo(18, 20);
+		lineTo(23, 20);
+
+	}
+	inv3._xscale = inv3._yscale = 400; inv3._y = 100;
+	inv3.onRollOver = function() {};
+
+	_visible = false;
+}
+
+//---------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------
+
 createEmptyMovieClip("hitdetector", 3);
 hitdetector.createEmptyMovieClip("shapeshape", 1);
 with(hitdetector.shapeshape)
@@ -285,8 +361,10 @@ with(cursor)
 		_x = _root._xmouse;
 		_y = _root._ymouse;
 
+		var ch = _root.page[_root.visibleIndex];
+
 		// Bounding box check
-		if ( hitTest(_root.a) ) {
+		if ( hitTest(ch) ) {
 			hd.shapeshape._xscale=150;
 			hd.shapeshape._yscale=150;
 		} else {
@@ -295,7 +373,7 @@ with(cursor)
 		}
 
 		// Bounding box check with circle center
-		if ( _root.a.hitTest(_x, _y) ) {
+		if ( ch.hitTest(_x, _y) ) {
 			hd.bboxpoint._xscale=150;
 			hd.bboxpoint._yscale=150;
 		} else {
@@ -304,7 +382,7 @@ with(cursor)
 		}
 
 		// Shape check with circle center
-		if ( _root.a.hitTest(_x, _y, true) ) {
+		if ( ch.hitTest(_x, _y, true) ) {
 			hd.shapepoint._xscale=150;
 			hd.shapepoint._yscale=150;
 		} else {
@@ -318,18 +396,46 @@ with(cursor)
 isMask = false;
 onMouseDown = function()
 {
+	var ch = _root.page[_root.visibleIndex];
+
 	if ( isMask )
 	{
-		a.setMask(); // no effect !
-		a.setMask(true); // no effect !
+		ch.setMask(); // no effect !
+		ch.setMask(true); // no effect !
 		trace("Disabling cursor mask");
-		a.setMask(undefined); // works
+		ch.setMask(undefined); // works
 		//a.setMask(null); // also work
 	}
 	else
 	{
 		trace("Enabling cursor mask");
-		a.setMask(cursor);
+		ch.setMask(cursor);
 	}
 	isMask = !isMask;
 };
+
+
+visibleIndex = 0;
+page = new Array;
+page[0] = a;
+page[1] = inv;
+onKeyDown = function()
+{
+	with (page[visibleIndex])
+	{
+		_visible = false;
+		_enabled = false;
+		setMask(null);
+	}
+
+	visibleIndex = parseInt(Key.getAscii())-49;
+	trace("Key "+visibleIndex+" hit");
+
+	with (page[visibleIndex])
+	{
+		_visible = true;
+		_enabled = true;
+	}
+
+};
+Key.addListener(this);

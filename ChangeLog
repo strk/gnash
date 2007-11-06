@@ -1,3 +1,9 @@
+2007-11-06 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/DrawingApiTest.as: add a second drawing
+	  with 3 "invalid" shapes. Hitting a number key switches between
+	  the first (1) and second (2) drawing. 
+
 2007-11-06 Markus Gothe <nietzsche@lysator.liu.se>
 	
 	* macros/libXML.m4: Cleaned up output.
