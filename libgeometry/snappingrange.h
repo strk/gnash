@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.30 2007/11/06 16:40:10 udog Exp $
+// $Id: snappingrange.h,v 1.31 2007/11/06 16:43:36 udog Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
@@ -617,7 +617,6 @@ private:
   // The current Ranges list
   RangeList _ranges;
 
-public:   
   /// snapping factor - see setSnapFactor() 
   float snap_factor;
   
