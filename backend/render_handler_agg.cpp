@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.114 2007/11/05 10:00:11 bjacques Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.115 2007/11/06 14:18:53 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -152,7 +152,6 @@ AGG ressources
 //#endif
 #include <agg_rasterizer_scanline_aa.h>
 #include <agg_rasterizer_compound_aa.h>
-#include <agg_renderer_mclip.h>
 #include <agg_span_allocator.h>
 #include <agg_path_storage.h>
 #include <agg_conv_curve.h>
@@ -514,7 +513,7 @@ public:
     img_source_type img_src(img_pixf);
     
     // renderer base for the stage buffer (not the frame image!)
-    agg::renderer_mclip<PixelFormat> rbase(*m_pixf);
+    renderer_base rbase(*m_pixf);
         
     // nearest neighbor method for scaling
     typedef agg::span_image_filter_rgb_nn<img_source_type, interpolator_type>
@@ -537,23 +536,24 @@ public:
     path.line_to(c.m_x, c.m_y);
     path.line_to(d.m_x, d.m_y);
     path.line_to(a.m_x, a.m_y);
-    
-    for (unsigned int cno=0; cno<_clipbounds_selected.size(); cno++) {
-      add_clip_box(rbase, *_clipbounds_selected[cno]);
-    }
 
     if (m_alpha_mask.empty()) {
     
       // No mask active
 
       agg::scanline_u8 sl;
-
-      // <Udo>: AFAIK add_path() rewinds the vertex list (clears previous
-      // path), so there should be no problem with multiple clipbounds.      
-      ras.add_path(path);     
-          
-      agg::render_scanlines_aa(ras, sl, rbase, sa, sg);
-
+  
+      for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {    
+      
+        const geometry::Range2d<int>& cbounds = _clipbounds[cno];
+        apply_clip_box<ras_type> (ras, cbounds);
+  
+        // <Udo>: AFAIK add_path() rewinds the vertex list (clears previous
+        // path), so there should be no problem with multiple clipbounds.      
+        ras.add_path(path);     
+           
+        agg::render_scanlines_aa(ras, sl, rbase, sa, sg);
+      }
       
     } else {
     
@@ -564,12 +564,17 @@ public:
       typedef agg::scanline_u8_am<agg::alpha_mask_gray8> scanline_type;
       scanline_type sl(m_alpha_mask.back()->get_amask());
   
-      // <Udo>: AFAIK add_path() rewinds the vertex list (clears previous
-      // path), so there should be no problem with multiple clipbounds.      
-      ras.add_path(path);     
+      for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {    
+      
+        const geometry::Range2d<int>& cbounds = _clipbounds[cno];
+        apply_clip_box<ras_type> (ras, cbounds);
+  
+        // <Udo>: AFAIK add_path() rewinds the vertex list (clears previous
+        // path), so there should be no problem with multiple clipbounds.      
+        ras.add_path(path);     
            
-      agg::render_scanlines_aa(ras, sl, rbase, sa, sg);
-
+        agg::render_scanlines_aa(ras, sl, rbase, sa, sg);
+      }
       
     
     } // if alpha mask
@@ -756,17 +761,20 @@ public:
     log_msg("apply_color(); called - NOT IMPLEMENTED");
   }
 
-  template <typename clip_type>
-  void add_clip_box(clip_type& renderer,
-    const geometry::Range2d<int>& bounds) const
+
+  template <class ras_type>
+  void apply_clip_box(ras_type& ras, 
+    const geometry::Range2d<int>& bounds)
   {
     assert(bounds.isFinite());
-    renderer.add_clip_box(
-      bounds.getMinX(),
-      bounds.getMinY(),
-      bounds.getMaxX()+1,
-      bounds.getMaxY()+1);
+    ras.clip_box(
+      (double)bounds.getMinX(),
+      (double)bounds.getMinY(),
+      (double)bounds.getMaxX()+1,
+      (double)bounds.getMaxY()+1);  
   }
+
+
   
   void  draw_line_strip(const void* coords, int vertex_count, const rgba& color)
   // Draw the line strip formed by the sequence of points.
@@ -781,13 +789,13 @@ public:
 
     point pnt;
     
-    agg::renderer_mclip<PixelFormat> rbase(*m_pixf);
+    renderer_base rbase(*m_pixf);
     
     typedef agg::rasterizer_scanline_aa<> ras_type;
 
     ras_type ras;    
     agg::renderer_scanline_aa_solid<
-      agg::renderer_mclip<PixelFormat> > ren_sl(rbase);
+      agg::renderer_base<PixelFormat> > ren_sl(rbase);
       
     // -- create path --
     agg::path_storage path;
@@ -807,10 +815,6 @@ public:
       path.line_to(pnt.m_x, pnt.m_y);
     }
     
-    for (unsigned int cno=0; cno<_clipbounds_selected.size(); cno++) {
-      add_clip_box(rbase, *_clipbounds_selected[cno]);
-    }
-    
     // -- render --
     
     if (m_alpha_mask.empty()) {
@@ -818,16 +822,23 @@ public:
       // No mask active
       
       agg::scanline_p8 sl;      
-
+      
+      for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {
+      
+        const geometry::Range2d<int>& bounds = _clipbounds[cno];
+              
+        apply_clip_box<ras_type> (ras, bounds);
         
-      // The vectorial pipeline
-      ras.add_path(stroke);
+        // The vectorial pipeline
+        ras.add_path(stroke);
     
-      // Set the color and render the scanlines
-      ren_sl.color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));
+        // Set the color and render the scanlines
+        ren_sl.color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));
         
-      agg::render_scanlines(ras, sl, ren_sl);
-
+        agg::render_scanlines(ras, sl, ren_sl);     
+        
+      }
+      
     } else {
     
       // Mask is active!
@@ -836,13 +847,21 @@ public:
       
       sl_type sl(m_alpha_mask.back()->get_amask());      
       
-      // The vectorial pipeline
-      ras.add_path(stroke);
-    
-      // Set the color and render the scanlines
-      ren_sl.color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));
+      for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {
+      
+        const geometry::Range2d<int>& bounds = _clipbounds[cno];
+              
+        apply_clip_box<ras_type> (ras, bounds);
         
-      agg::render_scanlines(ras, sl, ren_sl);     
+        // The vectorial pipeline
+        ras.add_path(stroke);
+    
+        // Set the color and render the scanlines
+        ren_sl.color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));
+        
+        agg::render_scanlines(ras, sl, ren_sl);     
+        
+      }
     
     }
 
@@ -1551,10 +1570,10 @@ public:
 
     // AGG stuff
     typedef agg::rasterizer_compound_aa<agg::rasterizer_sl_clip_dbl> ras_type;
-    agg::renderer_mclip<PixelFormat> rbase(*m_pixf);
+    renderer_base rbase(*m_pixf);
     ras_type rasc;  // flash-like renderer
     agg::renderer_scanline_aa_solid<
-      agg::renderer_mclip<PixelFormat> > ren_sl(rbase); // solid fills
+      agg::renderer_base<PixelFormat> > ren_sl(rbase); // solid fills
     agg::span_allocator<agg::rgba8> alloc;  // span allocator (?)
     
 
@@ -1562,13 +1581,15 @@ public:
     if (even_odd)
       rasc.filling_rule(agg::fill_even_odd);
     else
-      rasc.filling_rule(agg::fill_non_zero); 
+      rasc.filling_rule(agg::fill_non_zero);
+      
     
     for (unsigned int cno=0; cno<_clipbounds_selected.size(); cno++) {
-      add_clip_box(rbase, *_clipbounds_selected[cno]);
-    }
     
-    {      
+      const geometry::Range2d<int>* bounds = _clipbounds_selected[cno];
+      
+      apply_clip_box<ras_type> (rasc, *bounds);
+      
       int current_subshape=0;
         
       // push paths to AGG
@@ -1790,17 +1811,17 @@ public:
     // AGG stuff
     typedef agg::rasterizer_scanline_aa<> ras_type; 
     ras_type ras;  // anti alias
-    agg::renderer_mclip<PixelFormat> rbase(*m_pixf);
+    renderer_base rbase(*m_pixf);
     agg::renderer_scanline_aa_solid<
-      agg::renderer_mclip<PixelFormat> > ren_sl(rbase); // solid fills
-    
-
-    for (unsigned int cno=0; cno<_clipbounds_selected.size(); cno++) {
-      add_clip_box(rbase, *_clipbounds_selected[cno]);
-    }
+      agg::renderer_base<PixelFormat> > ren_sl(rbase); // solid fills
       
     
-    {
+    for (unsigned int cno=0; cno<_clipbounds_selected.size(); cno++) {
+    
+      const geometry::Range2d<int>* bounds = _clipbounds_selected[cno];
+          
+      apply_clip_box<ras_type> (ras, *bounds);
+      
       int current_subshape=0;
 
       for (size_t pno=0, pcount=paths.size(); pno<pcount; pno++) {
@@ -1869,10 +1890,10 @@ public:
     mat.concatenate(m_current_matrix);
     
     typedef agg::rasterizer_scanline_aa<> ras_type;
-    agg::renderer_mclip<PixelFormat> rbase(*m_pixf);
+    renderer_base rbase(*m_pixf);
     ras_type ras;
     agg::renderer_scanline_aa_solid<
-      agg::renderer_mclip<PixelFormat> > ren_sl(rbase);
+      agg::renderer_base<PixelFormat> > ren_sl(rbase);
       
     // -- create path --
     agg::path_storage path;
@@ -1896,15 +1917,17 @@ public:
     // close polygon
     path.line_to(trunc(origin.m_x)+0.5, trunc(origin.m_y)+0.5);
     
-
     
-    for (unsigned int cno=0; cno<_clipbounds_selected.size(); cno++) {
-      add_clip_box(rbase, *_clipbounds_selected[cno]);
-    }
     
     // -- render --
       
-    {            
+    // iterate through clipping bounds
+    for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {
+    
+      const geometry::Range2d<int>& bounds = _clipbounds[cno];         
+      apply_clip_box<ras_type> (ras, bounds);     
+            
+      
       // fill polygon
       if (fill.m_a>0) {
         ras.add_path(path);

@@ -1,3 +1,9 @@
+2007-11-06 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler_agg.cpp: Reverted last commit because it
+	  turned out that it really dropped performance (in some real world
+    cases it was up to six times slower)
+
 2007-11-06 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/DrawingApiTest.as: add another interesting
