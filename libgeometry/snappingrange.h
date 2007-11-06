@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.31 2007/11/06 16:43:36 udog Exp $
+// $Id: snappingrange.h,v 1.32 2007/11/06 16:46:23 udog Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
@@ -93,7 +93,7 @@ public:
   template <typename U>
   SnappingRanges2d(const SnappingRanges2d<U>& from)
     :
-    snap_factor(T(from.getSnapFactor())), // does it make sense ?
+    snap_factor(from.getSnapFactor()), 
     single_mode(from.getSingleMode()),
     ranges_limit(from.getRangeCountLimit()),
     _combine_counter(0)
