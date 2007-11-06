@@ -14,7 +14,7 @@
 // Only page 1 have automatic testing so far.
 //
 
-rcsid="$Id: DrawingApiTest.as,v 1.18 2007/11/06 13:55:52 strk Exp $";
+rcsid="$Id: DrawingApiTest.as,v 1.19 2007/11/06 15:25:10 strk Exp $";
 
 #include "../actionscript.all/check.as"
 
@@ -286,7 +286,7 @@ with(inv)
 	inv3._xscale = inv3._yscale = 400; inv3._y = 100;
 	inv3.onRollOver = function() {};
 
-	// Nested squares 
+	// Nested squares (inner is an hole)
 	createEmptyMovieClip("inv4", 4);
 	with (inv4)
 	{
@@ -308,6 +308,20 @@ with(inv)
 	inv4._xscale = inv4._yscale = 400;
 	inv4._y = 100; inv4._x = 100;
 	inv4.onRollOver = function() {};
+
+	// check that a point inside the hole doesn't hit the shape
+	// (gnash fails due to bogus point_test, or missing normalization)
+	xcheck( ! inv4.hitTest(100 + (15*4), 100 + (15*4), true) ); 
+
+	// while a points on the border do hit it
+	check( inv4.hitTest(100 + (11*4), 100 + (11*4), true) );  // Upper-Left
+	check( inv4.hitTest(100 + (11*4), 100 + (14*4), true) );  // Center-Left
+	check( inv4.hitTest(100 + (11*4), 100 + (19*4), true) );  // Lower-Left
+	check( inv4.hitTest(100 + (14*4), 100 + (19*4), true) );  // Lower-Center
+	check( inv4.hitTest(100 + (19*4), 100 + (19*4), true) );  // Lower-Right
+	check( inv4.hitTest(100 + (19*4), 100 + (14*4), true) );  // Center-Right
+	check( inv4.hitTest(100 + (19*4), 100 + (11*4), true) );  // Upper-Right
+	check( inv4.hitTest(100 + (14*4), 100 + (11*4), true) );  // Upper-Center
 
 	_visible = false;
 }
