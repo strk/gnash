@@ -1,3 +1,11 @@
+2007-11-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* macros/freetype.m4: use fontconfig to find a default sans font for
+	  use if gnash runtime fails to find a suitable system font. Revert
+	  to the old hard-coded path if fc-match fails.
+	* server/FreetypeGlyphsProvider.cpp: take DEFAULT_FONTFILE from
+	  config.h.
+	
 2007-11-06 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/DrawingApiTest.as: add support for 'h' key

@@ -237,8 +237,6 @@ FreetypeGlyphsProvider::getFontFilename(const std::string &name,
 		bool bold, bool italic, std::string& filename)
 {
 
-#define DEFAULT_FONTFILE "/usr/share/fonts/truetype/freefont/FreeSans.ttf"
-
 #ifdef HAVE_FONTCONFIG
 
 	if (!FcInit ())

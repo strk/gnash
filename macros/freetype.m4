@@ -89,7 +89,7 @@ dnl   fi
 
   dnl If the path hasn't been specified, go look for it.
   if test x"${ac_cv_path_freetype_lib}" = x; then
-    dnl freetype-config gives us way to many libraries, which create nasty linking
+    dnl freetype-config gives us way too many libraries, which create nasty linking
     dnl dependancy issue, so we strip them off here. The real dependencies are
     dnl are taken care of by other config tests.
     AC_MSG_CHECKING([for ${libname} library])
@@ -125,6 +125,23 @@ dnl   fi
   if test -n "$FREETYPE2_LIBS"; then
     AC_DEFINE(USE_FREETYPE, [1], [Define this if you want to enable freetype usage])
   fi
+
+  dnl Look for fontconfig's fc-match to set a hard-coded font path.
+  dnl If fontconfig is available, gnash should always manage to find a
+  dnl suitable system font in run time, so will never need this hard-coded
+  dnl default (unless fontconfig is removed after building gnash, for instance).
+  AC_PATH_PROG(FC_MATCH, fc-match, ,[${pathlist}])
+  if test x"$FC_MATCH" != x; then
+    DEFAULT_FONT=`$FC_MATCH -v 'Sans' | grep '^.file:' | sed 's/\(file: \"\)\(.*\)\(\".*\)/\2/g'`
+  fi
+
+  dnl Hard-coded last resort, which is only likely to work
+  dnl on UNIX-like systems.
+  if test -z "$DEFAULT_FONT"; then
+    DEFAULT_FONT="/usr/share/fonts/truetype/freefont/FreeSans.ttf"
+  fi
+  
+  AC_DEFINE_UNQUOTED(DEFAULT_FONTFILE, ["$DEFAULT_FONT"], [Path to default font])
 
   AC_SUBST(FREETYPE2_CFLAGS)
   AC_SUBST(FREETYPE2_LIBS)
