@@ -14,7 +14,7 @@
 // Only page 1 have automatic testing so far.
 //
 
-rcsid="$Id: DrawingApiTest.as,v 1.17 2007/11/06 08:59:58 strk Exp $";
+rcsid="$Id: DrawingApiTest.as,v 1.18 2007/11/06 13:55:52 strk Exp $";
 
 #include "../actionscript.all/check.as"
 
@@ -285,6 +285,29 @@ with(inv)
 	}
 	inv3._xscale = inv3._yscale = 400; inv3._y = 100;
 	inv3.onRollOver = function() {};
+
+	// Nested squares 
+	createEmptyMovieClip("inv4", 4);
+	with (inv4)
+	{
+		lineStyle(1, 0);
+		beginFill(0x00FF00);
+
+		moveTo(10, 10);
+		lineTo(10, 20);
+		lineTo(20, 20);
+		lineTo(20, 10);
+		lineTo(10, 10);
+
+		moveTo(12, 12);
+		lineTo(12, 18);
+		lineTo(18, 18);
+		lineTo(18, 12);
+		lineTo(12, 12);
+	}
+	inv4._xscale = inv4._yscale = 400;
+	inv4._y = 100; inv4._x = 100;
+	inv4.onRollOver = function() {};
 
 	_visible = false;
 }
