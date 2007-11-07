@@ -1,3 +1,10 @@
+2007-11-07 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/libgeometry/snappingrangetest.cpp: don't
+	  attempt to set snap_distance, not more existent.
+	  I dunno if this makes the tests pointless (didn't
+	  check), but at least allows its build. Udo ?
+
 2007-11-06 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: pixel checking
