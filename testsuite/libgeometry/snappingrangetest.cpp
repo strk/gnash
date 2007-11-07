@@ -90,7 +90,7 @@ main(int /*argc*/, char** /*argv*/)
 	Range2d<float> left1 (10, 10, 50, 50); 
 	Range2d<float> right1 (50, 10, 100, 50);
 	SnappingRanges2d<float> touchSnap;
-	//touchSnap.snap_distance = 20;
+	touchSnap.setSnapFactor(1.3f);
 	touchSnap.add(left1);
 	touchSnap.add(right1);
 	check( ! touchSnap.isNull() );
@@ -112,7 +112,7 @@ main(int /*argc*/, char** /*argv*/)
 	Range2d<float> left2 (10, 10, 50, 50); 
 	Range2d<float> right2 (60, 10, 100, 50);
 	SnappingRanges2d<float> nearSnap;
-	//nearSnap.snap_distance = 20;
+	touchSnap.setSnapFactor(1.3f);
 	nearSnap.add(left2);
 	nearSnap.add(right2);
 	check( ! nearSnap.isNull() );
@@ -135,7 +135,7 @@ main(int /*argc*/, char** /*argv*/)
 	Range2d<float> horiz (10, 10, 500, 20); 
 	Range2d<float> vert (290, 22, 300, 500);
 	SnappingRanges2d<float> irrSnap;
-	//irrSnap.snap_distance = 20;
+	touchSnap.setSnapFactor(1.3f);
 	irrSnap.add(horiz);
 	irrSnap.add(vert);
 	check( ! irrSnap.isNull() );

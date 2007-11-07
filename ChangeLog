@@ -1,3 +1,8 @@
+2007-11-07 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* testsuite/libgeometry/snappingrangetest.cpp: update testcase
+	  to match new SnappingRanges design
+
 2007-11-07 Sandro Santilli <strk@keybit.net>
 
 	* server/shape.cpp: don't forget to initialize m_new_shape
