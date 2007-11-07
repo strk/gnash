@@ -131,6 +131,8 @@ path::path()
 }
 
 path::path(float ax, float ay, int fill0, int fill1, int line)
+    :
+    m_new_shape(false)
 {
     reset(ax, ay, fill0, fill1, line);
 }

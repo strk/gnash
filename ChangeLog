@@ -1,5 +1,9 @@
 2007-11-07 Sandro Santilli <strk@keybit.net>
 
+	* server/shape.cpp: don't forget to initialize m_new_shape
+	  in the overridden constructo !! This fixes uninitialized
+	  memory giving unstable results with the nested-squares
+	  cases in DrawingApiTest.swf
 	* testsuite/libgeometry/snappingrangetest.cpp: don't
 	  attempt to set snap_distance, not more existent.
 	  I dunno if this makes the tests pointless (didn't
