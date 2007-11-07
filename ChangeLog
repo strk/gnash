@@ -1,5 +1,11 @@
 2007-11-07 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/ming_utils.c (get_dejagnu_actions): don't
+	  use printf to write the code into a buffer, just make the code a
+	  const static const C-string.
+
+2007-11-07 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/DrawingApiTest.as: Add Udo's example drawing
 	  and associated hitTest tests (xfailing)
 	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: Add pixel checking

@@ -166,10 +166,7 @@ make_fill_square(int x, int y, int width, int height, byte or, byte og, byte ob,
 static SWFAction
 get_dejagnu_actions()
 {
-	static const size_t BUFLEN = 4096;
-
-	char buf[BUFLEN];
-	snprintf(buf, BUFLEN,
+	static const char *buf = 
 		"TestState = function() {\n"
 		" this.passed = 0;\n"
 		" this.failed = 0;\n"
@@ -282,8 +279,7 @@ get_dejagnu_actions()
 		"_root.xtotals = function(exp, info) {\n"
 		" _root.runtest.xtotals(exp, info);\n"
 		"};\n"
-		"_root.dejagnu_module_initialized = 1;\n"
-	);
+		"_root.dejagnu_module_initialized = 1;\n";
 
 	return compileSWFActionCode(buf);
 }
