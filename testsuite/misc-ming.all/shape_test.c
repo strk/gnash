@@ -124,7 +124,7 @@ main(int argc, char** argv)
    * See DrawingApiTest.as (inv8)
    *
    */
-  { /*  using left fill */
+  { /*  using left fill, non-closed paths */
 	SWFDisplayItem it;
 	SWFShape sh = newSWFShape();
 	SWFMovieClip mc = newSWFMovieClip();
@@ -141,12 +141,12 @@ main(int argc, char** argv)
 	SWFShape_drawLineTo(sh, 30, 30);	/* 8 */
 	SWFShape_drawLineTo(sh, 20, 30);	/* 9 */
 	it = SWFMovieClip_add(mc, (SWFBlock)sh);
-	SWFDisplayItem_moveTo(it, 80, 150);
+	SWFDisplayItem_moveTo(it, 80, 120);
 	SWFDisplayItem_scale(it, 2, 2);
 	SWFMovieClip_nextFrame(mc);
 	it = SWFMovie_add(mo, (SWFBlock)mc);
   }
-  { /*  using right fill */
+  { /*  using right fill, non-closed paths */
 	SWFDisplayItem it;
 	SWFShape sh = newSWFShape();
 	SWFMovieClip mc = newSWFMovieClip();
@@ -163,7 +163,53 @@ main(int argc, char** argv)
 	SWFShape_drawLineTo(sh, 30, 30);	/* 8 */
 	SWFShape_drawLineTo(sh, 20, 30);	/* 9 */
 	it = SWFMovieClip_add(mc, (SWFBlock)sh);
-	SWFDisplayItem_moveTo(it, 500, 150);
+	SWFDisplayItem_moveTo(it, 200, 120);
+	SWFDisplayItem_scale(it, 2, 2);
+	SWFMovieClip_nextFrame(mc);
+	it = SWFMovie_add(mo, (SWFBlock)mc);
+  }
+  { /*  using left fill, closed paths */
+	SWFDisplayItem it;
+	SWFShape sh = newSWFShape();
+	SWFMovieClip mc = newSWFMovieClip();
+	SWFShape_setLineStyle(sh, 1, 0, 0, 0, 255);
+	SWFShape_setLeftFillStyle(sh, SWFShape_addSolidFillStyle(sh, 255, 0, 0, 255));
+	SWFShape_movePenTo(sh, 20, 10);		/* 0 */
+	SWFShape_drawLineTo(sh, 40, 10);	/* 1 */
+	SWFShape_drawLineTo(sh, 40, 40);	/* 2 */
+	SWFShape_drawLineTo(sh, 20, 40);	/* 3 */
+	SWFShape_drawLineTo(sh, 20, 10);	/* 4 */
+	SWFShape_drawLineTo(sh, 10, 10);	/* 5 */
+	SWFShape_drawLineTo(sh, 10, 20);	/* 6 */
+	SWFShape_drawLineTo(sh, 30, 20);	/* 7 */
+	SWFShape_drawLineTo(sh, 30, 30);	/* 8 */
+	SWFShape_drawLineTo(sh, 20, 30);	/* 9 */
+	SWFShape_drawLineTo(sh, 20, 10);	/* 0 */
+	it = SWFMovieClip_add(mc, (SWFBlock)sh);
+	SWFDisplayItem_moveTo(it, 80, 200);
+	SWFDisplayItem_scale(it, 2, 2);
+	SWFMovieClip_nextFrame(mc);
+	it = SWFMovie_add(mo, (SWFBlock)mc);
+  }
+  { /*  using right fill, closed paths */
+	SWFDisplayItem it;
+	SWFShape sh = newSWFShape();
+	SWFMovieClip mc = newSWFMovieClip();
+	SWFShape_setLineStyle(sh, 1, 0, 0, 0, 255);
+	SWFShape_setRightFillStyle(sh, SWFShape_addSolidFillStyle(sh, 255, 0, 0, 255));
+	SWFShape_movePenTo(sh, 20, 10);		/* 0 */
+	SWFShape_drawLineTo(sh, 40, 10);	/* 1 */
+	SWFShape_drawLineTo(sh, 40, 40);	/* 2 */
+	SWFShape_drawLineTo(sh, 20, 40);	/* 3 */
+	SWFShape_drawLineTo(sh, 20, 10);	/* 4 */
+	SWFShape_drawLineTo(sh, 10, 10);	/* 5 */
+	SWFShape_drawLineTo(sh, 10, 20);	/* 6 */
+	SWFShape_drawLineTo(sh, 30, 20);	/* 7 */
+	SWFShape_drawLineTo(sh, 30, 30);	/* 8 */
+	SWFShape_drawLineTo(sh, 20, 30);	/* 9 */
+	SWFShape_drawLineTo(sh, 20, 10);	/* 0 */
+	it = SWFMovieClip_add(mc, (SWFBlock)sh);
+	SWFDisplayItem_moveTo(it, 200, 200);
 	SWFDisplayItem_scale(it, 2, 2);
 	SWFMovieClip_nextFrame(mc);
 	it = SWFMovie_add(mo, (SWFBlock)mc);
