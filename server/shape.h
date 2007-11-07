@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.h,v 1.28 2007/11/07 10:13:50 udog Exp $ */
+/* $Id: shape.h,v 1.29 2007/11/07 12:08:16 strk Exp $ */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
@@ -53,7 +53,12 @@ namespace gnash {
 	class path
 	{
 	public:
-		path();
+		/// Default constructor
+		//
+		/// @param newShape
+		///	True if this path starts a new subshape
+		///
+		path(bool newShape=false);
 
 		/// Initialize a path 
 		//
@@ -75,10 +80,13 @@ namespace gnash {
 		///	Line style index for right fill (1-based).
 		///	Zero means NO style.
 		///
+		/// @param newShape
+		///	True if this path starts a new subshape
 		///
-		path(float ax, float ay, int fill0, int fill1, int line);
+		///
+		path(float ax, float ay, int fill0, int fill1, int line, bool newShape=false);
 
-		/// Re-initialize a path 
+		/// Re-initialize a path, maintaining the "new shape" flag untouched
 		//
 		/// @param ax
 		///	X coordinate of path origin in TWIPS
@@ -96,6 +104,12 @@ namespace gnash {
 		///	Line style index for right fill
 		///
 		void	reset(float ax, float ay, int fill0, int fill1, int line);
+
+		/// Set this path as the start of a new (sub)shape
+		void setNewShape() { m_new_shape=true; }
+
+		/// Return true if this path starts a new (sub)shape
+		bool getNewShape() const { return m_new_shape; }
 
 		/// Return true if this path contains no edges
 		bool	is_empty() const;

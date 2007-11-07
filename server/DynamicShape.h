@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: DynamicShape.h,v 1.5 2007/07/01 10:54:18 bjacques Exp $ */
+/* $Id: DynamicShape.h,v 1.6 2007/11/07 12:08:16 strk Exp $ */
 
 #ifndef GNASH_DYNAMIC_SHAPE_H
 #define GNASH_DYNAMIC_SHAPE_H
@@ -102,13 +102,16 @@ public:
 
 private:
 
-	// Initialize a new path, used when changing
-	// style or moving the pen
+	/// Initialize a new path
 	//
-	// The newly added path will use current values
-	// for origin, fill and line styles.
-	//
-	void startNewPath();
+	/// Used when changing style or moving the pen
+	///
+	/// The newly added path will use current values
+	/// for origin, fill and line styles.
+	///
+	/// If newShape is true the new shape will start a new subshape.
+	///
+	void startNewPath(bool newShape);
 
 	path* _currpath;
 

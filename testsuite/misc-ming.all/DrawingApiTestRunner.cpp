@@ -650,7 +650,7 @@ main(int /*argc*/, char** /*argv*/)
 	// lower-center
 	check_pixel(260, 175, 2, light_green, 2);
 	// center-center (two overlapping subshapes)
-	xcheck_pixel(260, 160, 2, overlapping_light_green, 2);
+	check_pixel(260, 160, 2, overlapping_light_green, 2);
 
 	tester.pressKey(gnash::key::PLUS); // alpha goes up to 75
 	tester.pressKey(gnash::key::PLUS); // alpha goes up to 100
@@ -687,7 +687,7 @@ main(int /*argc*/, char** /*argv*/)
 	// lower-center
 	check_pixel(309, 175, 2, light_green, 2);
 	// center-center (two overlapping subshapes)
-	xcheck_pixel(309, 160, 2, overlapping_light_green, 2);
+	check_pixel(309, 160, 2, overlapping_light_green, 2);
 
 	tester.pressKey(gnash::key::PLUS); // alpha goes up to 75
 	tester.pressKey(gnash::key::PLUS); // alpha goes up to 100

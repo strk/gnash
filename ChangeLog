@@ -1,5 +1,14 @@
 2007-11-07 Sandro Santilli <strk@keybit.net>
 
+	* server/DynamicShape.{cpp,h}: Start new paths as new shapes
+	  when beginFill is called.
+	* server/shape.{cpp,h}: add interfaces for setting m_new_shape
+	  both in constructors and standalone.
+	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: fix the
+	  two-overlapping squares case.
+
+2007-11-07 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.cpp (display): skip display of null-sized levels.
 	* testsuite/misc-ming.all/DrawingApiTest.as: have '-' and '+'
 	  use a step of 25% instead of 20% (easier for pixel checking);

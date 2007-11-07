@@ -17,7 +17,7 @@
 
 
 
-/* $Id: DynamicShape.cpp,v 1.10 2007/09/14 17:15:58 strk Exp $ */
+/* $Id: DynamicShape.cpp,v 1.11 2007/11/07 12:08:16 strk Exp $ */
 
 #include "DynamicShape.h"
 
@@ -84,12 +84,12 @@ DynamicShape::beginFill(const rgba& color)
 	// TODO: how to know wheter the fill should be set
 	//       as *left* or *right* fill ?
 	//       A quick test shows that *left* always work fine !
-	path newPath(_x, _y, _currfill, 0, _currline);
+	path newPath(_x, _y, _currfill, 0, _currline, true); // new fill start new subshapes
 	add_path(newPath);
 }
 
 void
-DynamicShape::startNewPath()
+DynamicShape::startNewPath(bool newShape)
 {
 	// Close any pending filled style
 	// The DrawingApiTest.swf file shows we should NOT
@@ -98,7 +98,7 @@ DynamicShape::startNewPath()
 
 	// A quick test shows that *left* always work fine !
 	// More than that, using a *right* fill seems to break the tests !
-	path newPath(_x, _y, _currfill, 0, _currline);
+	path newPath(_x, _y, _currfill, 0, _currline, newShape);
 	add_path(newPath);
 }
 
@@ -118,14 +118,14 @@ DynamicShape::lineStyle(uint16_t thickness, const rgba& color)
 {
 	line_style style(thickness, color);
 	_currline = add_line_style(style);
-	startNewPath();
+	startNewPath(false); // don't make this the start of a new subshape (to verify)
 }
 
 void
 DynamicShape::resetLineStyle()
 {
 	_currline = 0;
-	startNewPath();
+	startNewPath(false); // don't make this the start of a new subshape (to verify)
 }
 
 void
@@ -135,14 +135,15 @@ DynamicShape::moveTo(float x, float y)
 	{
 		_x = x;
 		_y = y;
-		startNewPath();
+		// TODO: close previous path if any and filled ?
+		startNewPath(false); // don't make this the start of a new subshape (to verify)
 	}
 }
 
 void
 DynamicShape::lineTo(float x, float y)
 {
-	if ( ! _currpath ) startNewPath();
+	if ( ! _currpath ) startNewPath(true); // first shape is always new (I hope this doesn't break anything)
 	assert(_currpath);
 
 	_currpath->drawLineTo(x, y);
@@ -166,7 +167,7 @@ DynamicShape::lineTo(float x, float y)
 void
 DynamicShape::curveTo(float cx, float cy, float ax, float ay)
 {
-	if ( ! _currpath ) startNewPath();
+	if ( ! _currpath ) startNewPath(true); // first shape is always new (I hope this doesn't break anything)
 	assert(_currpath);
 
 	_currpath->drawCurveTo(cx, cy, ax, ay);

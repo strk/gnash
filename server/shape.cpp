@@ -123,16 +123,16 @@ DSOEXPORT bool edge::is_straight() const
 //
 
 
-path::path()
+path::path(bool newShape)
     :
-    m_new_shape(false)
+    m_new_shape(newShape)
 {
     reset(0, 0, 0, 0, 0);
 }
 
-path::path(float ax, float ay, int fill0, int fill1, int line)
+path::path(float ax, float ay, int fill0, int fill1, int line, bool newShape)
     :
-    m_new_shape(false)
+    m_new_shape(newShape)
 {
     reset(ax, ay, fill0, fill1, line);
 }
