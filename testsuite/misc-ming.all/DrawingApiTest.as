@@ -17,7 +17,7 @@
 // 'h' toggles _visible
 //
 
-rcsid="$Id: DrawingApiTest.as,v 1.21 2007/11/06 18:49:29 strk Exp $";
+rcsid="$Id: DrawingApiTest.as,v 1.22 2007/11/07 10:05:37 strk Exp $";
 
 #include "../actionscript.all/check.as"
 
@@ -279,15 +279,23 @@ with(inv)
 
 		moveTo(10, 8);
 		lineTo(10, 20);
-		lineTo(5, 20);
+		lineTo(2, 20);
 
 		moveTo(18, 8);
 		lineTo(18, 20);
-		lineTo(23, 20);
+		lineTo(26, 20);
 
 	}
 	inv3._xscale = inv3._yscale = 400; inv3._y = 100;
 	inv3.onRollOver = function() {};
+
+	check(  inv3.hitTest((8*4), 100 + (18*4), true)  );  // Inside the left autofill
+	check( !inv3.hitTest((4*4), 100 + (10*4), true)  );  // Outside the left autofill (but in the boundaries)
+	check(  inv3.hitTest((4*4), 100 + (10*4), false) );  // Outside the left autofill (but in the boundaries)
+
+	check(  inv3.hitTest((20*4), 100 + (18*4), true)  );  // Inside the right autofill
+	check( !inv3.hitTest((24*4), 100 + (10*4), true)  );  // Outside the right autofill (but in the boundaries)
+	check(  inv3.hitTest((24*4), 100 + (10*4), false) );  // Outside the right autofill (but in the boundaries)
 
 	// Nested squares (inner is an hole)
 	// Both squares are defined in counterclockwise order
@@ -604,13 +612,13 @@ onKeyDown = function()
 	}
 	else if ( ascii == 45 ) // '-' - decrease alpha
 	{
-		var newAlpha = page[visibleIndex]._alpha - 20;
+		var newAlpha = page[visibleIndex]._alpha - 25;
 		if ( newAlpha < 0 ) newAlpha = 0;
 		page[visibleIndex]._alpha = newAlpha;
 	}
 	else if ( ascii == 43 ) // '+' - increase alpha
 	{
-		var newAlpha = page[visibleIndex]._alpha + 20;
+		var newAlpha = page[visibleIndex]._alpha + 25;
 		if ( newAlpha > 100 ) newAlpha = 100;
 		page[visibleIndex]._alpha = newAlpha;
 	}

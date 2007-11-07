@@ -90,6 +90,9 @@ main(int /*argc*/, char** /*argv*/)
 	rgba blue(0, 0, 255, 255);
 	rgba cyan(0, 255, 255, 255);
 	rgba green(0, 255, 0, 255);
+	rgba light_green(128, 255, 128, 255); 
+	// Two greens at 50% alpha overlapping
+	rgba overlapping_light_green(64, 255, 64, 255); 
 	rgba red(255, 0, 0, 255);
 	rgba yellow(255, 255, 0, 255);
 	rgba black(0, 0, 0, 255);
@@ -523,7 +526,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	// Outside the right green 'el' shape
 	// (but close to the auto-closing edge)
-	check_pixel(25, 148, 2, white, 2);
+	check_pixel(90, 144, 2, white, 2);
 
 	// In the left green horizontally flipped 'el' shape
 	// (not explicitly closed fill)
@@ -531,7 +534,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	// Outside the left green 'el' shape
 	// (but close to the auto-closing edge)
-	check_pixel(85, 148, 2, white, 2);
+	check_pixel(20, 144, 2, white, 2);
 
 	// Between the two 'el' shapes
 	xcheck_pixel(56, 170, 2, white, 2);
@@ -576,7 +579,118 @@ main(int /*argc*/, char** /*argv*/)
 	xcheck_pixel(156, 57, 2, white, 2);
 
 	//--------------------------------------------------------------
-	// The nested squares case (TODO)
+	// The nested squares cases 
 	//--------------------------------------------------------------
+
+
+	//--------------------------------------------------------------
+	// First nested squares case (hole)
+	//--------------------------------------------------------------
+
+	// X (145..160..175)
+	// Y (145..160..175)
+
+	// center-left
+	check_pixel(145, 160, 2, green, 2);
+	// center-right
+	check_pixel(175, 160, 2, green, 2);
+	// upper-center
+	check_pixel(160, 145, 2, green, 2);
+	// lower-center
+	check_pixel(160, 175, 2, green, 2);
+	// center-center (hole)
+	check_pixel(160, 160, 2, white, 2);
+
+	//--------------------------------------------------------------
+	// Second nested squares case (hole)
+	//--------------------------------------------------------------
+
+	// X (194..210..226)
+	// Y (145..160..175)
+
+	// center-left
+	check_pixel(194, 160, 2, green, 2);
+	// center-right
+	check_pixel(226, 160, 2, green, 2);
+	// upper-center
+	check_pixel(210, 145, 2, green, 2);
+	// lower-center
+	check_pixel(210, 175, 2, green, 2);
+	// center-center (hole)
+	check_pixel(210, 160, 2, white, 2);
+
+	//--------------------------------------------------------------
+	// Third nested squares case (subshape)
+	//--------------------------------------------------------------
+
+	// X (244..260..276)
+	// Y (145..160..175)
+
+	// center-left
+	check_pixel(244, 160, 2, green, 2);
+	// center-right
+	check_pixel(276, 160, 2, green, 2);
+	// upper-center
+	check_pixel(260, 145, 2, green, 2);
+	// lower-center
+	check_pixel(260, 175, 2, green, 2);
+	// center-center (two overlapping subshapes)
+	check_pixel(260, 160, 2, green, 2);
+
+	tester.pressKey(gnash::key::MINUS); // alpha goes down to 75
+	tester.pressKey(gnash::key::MINUS); // alpha goes down to 50
+	tester.advance(); // commit
+
+	// center-left
+	check_pixel(244, 160, 2, light_green, 2);
+	// center-right
+	check_pixel(276, 160, 2, light_green, 2);
+	// upper-center
+	check_pixel(260, 145, 2, light_green, 2);
+	// lower-center
+	check_pixel(260, 175, 2, light_green, 2);
+	// center-center (two overlapping subshapes)
+	xcheck_pixel(260, 160, 2, overlapping_light_green, 2);
+
+	tester.pressKey(gnash::key::PLUS); // alpha goes up to 75
+	tester.pressKey(gnash::key::PLUS); // alpha goes up to 100
+	tester.advance(); // commit
+
+	//--------------------------------------------------------------
+	// Fourth nested squares case (subshape)
+	//--------------------------------------------------------------
+
+	// X (293..309..325)
+	// Y (145..160..175)
+
+	// center-left
+	check_pixel(294, 160, 2, green, 2);
+	// center-right
+	check_pixel(325, 160, 2, green, 2);
+	// upper-center
+	check_pixel(309, 145, 2, green, 2);
+	// lower-center
+	check_pixel(309, 175, 2, green, 2);
+	// center-center (two overlapping subshapes)
+	check_pixel(309, 160, 2, green, 2);
+
+	tester.pressKey(gnash::key::MINUS); // alpha goes down to 75
+	tester.pressKey(gnash::key::MINUS); // alpha goes down to 50
+	tester.advance(); // commit
+
+	// center-left
+	check_pixel(294, 160, 2, light_green, 2);
+	// center-right
+	check_pixel(325, 160, 2, light_green, 2);
+	// upper-center
+	check_pixel(309, 145, 2, light_green, 2);
+	// lower-center
+	check_pixel(309, 175, 2, light_green, 2);
+	// center-center (two overlapping subshapes)
+	xcheck_pixel(309, 160, 2, overlapping_light_green, 2);
+
+	tester.pressKey(gnash::key::PLUS); // alpha goes up to 75
+	tester.pressKey(gnash::key::PLUS); // alpha goes up to 100
+	tester.advance(); // commit
 }
 

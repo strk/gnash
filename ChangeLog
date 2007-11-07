@@ -1,3 +1,11 @@
+2007-11-07 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/DrawingApiTest.as: have '-' and '+'
+	  use a step of 25% instead of 20% (easier for pixel checking);
+	  add hitTest for the opposite-el case.
+	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: add pixel
+	  checking for the nested-squares cases.
+
 2007-11-07 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* testsuite/libgeometry/snappingrangetest.cpp: update testcase
