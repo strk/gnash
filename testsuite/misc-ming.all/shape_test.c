@@ -17,10 +17,11 @@
  */ 
 
 /*
- *  Try to add variables to shapes, observed behavior is that variables are added 
- *  to _root accidently.
+ *  (1) Verify that shapes can not hold variables, but rather evaluates to their
+ *      containing sprite when referenced by name.
  *
- *  TODO: verify this!
+ *  (2) See effects of inconsistent drawing 
+ *
  */
  
 #include <stdlib.h>
@@ -104,6 +105,8 @@ main(int argc, char** argv)
   check_equals(mo, "sh1._x", "400");
   check_equals(mo, "sh2._x", "400");
   check_equals(mo, "_root._x", "400");
+
+  add_actions(mo, "_root._x = 0;" ); /* cleanup */
     
   // Do these checks mean that shapes are *not* movieclips?
   check_equals(mo, "typeof(sh1.getDepth())", "'undefined'");
@@ -112,6 +115,59 @@ main(int argc, char** argv)
   // Do these checks mean that shapes are *not* movieclips?
   check_equals(mo, "typeof(getInstanceAtDepth(-16381))", "'undefined'");
   check_equals(mo, "typeof(getInstanceAtDepth(-16380))", "'undefined'");
+
+  SWFMovie_nextFrame(mo); 
+
+  /*
+   * UdoG's drawing
+   *
+   * See DrawingApiTest.as (inv8)
+   *
+   */
+  { /*  using left fill */
+	SWFDisplayItem it;
+	SWFShape sh = newSWFShape();
+	SWFMovieClip mc = newSWFMovieClip();
+	SWFShape_setLineStyle(sh, 1, 0, 0, 0, 255);
+	SWFShape_setLeftFillStyle(sh, SWFShape_addSolidFillStyle(sh, 0, 255, 0, 255));
+	SWFShape_movePenTo(sh, 20, 10);		/* 0 */
+	SWFShape_drawLineTo(sh, 40, 10);	/* 1 */
+	SWFShape_drawLineTo(sh, 40, 40);	/* 2 */
+	SWFShape_drawLineTo(sh, 20, 40);	/* 3 */
+	SWFShape_drawLineTo(sh, 20, 10);	/* 4 */
+	SWFShape_drawLineTo(sh, 10, 10);	/* 5 */
+	SWFShape_drawLineTo(sh, 10, 20);	/* 6 */
+	SWFShape_drawLineTo(sh, 30, 20);	/* 7 */
+	SWFShape_drawLineTo(sh, 30, 30);	/* 8 */
+	SWFShape_drawLineTo(sh, 20, 30);	/* 9 */
+	it = SWFMovieClip_add(mc, (SWFBlock)sh);
+	SWFDisplayItem_moveTo(it, 80, 150);
+	SWFDisplayItem_scale(it, 2, 2);
+	SWFMovieClip_nextFrame(mc);
+	it = SWFMovie_add(mo, (SWFBlock)mc);
+  }
+  { /*  using right fill */
+	SWFDisplayItem it;
+	SWFShape sh = newSWFShape();
+	SWFMovieClip mc = newSWFMovieClip();
+	SWFShape_setLineStyle(sh, 1, 0, 0, 0, 255);
+	SWFShape_setLeftFillStyle(sh, SWFShape_addSolidFillStyle(sh, 0, 255, 0, 255));
+	SWFShape_movePenTo(sh, 20, 10);		/* 0 */
+	SWFShape_drawLineTo(sh, 40, 10);	/* 1 */
+	SWFShape_drawLineTo(sh, 40, 40);	/* 2 */
+	SWFShape_drawLineTo(sh, 20, 40);	/* 3 */
+	SWFShape_drawLineTo(sh, 20, 10);	/* 4 */
+	SWFShape_drawLineTo(sh, 10, 10);	/* 5 */
+	SWFShape_drawLineTo(sh, 10, 20);	/* 6 */
+	SWFShape_drawLineTo(sh, 30, 20);	/* 7 */
+	SWFShape_drawLineTo(sh, 30, 30);	/* 8 */
+	SWFShape_drawLineTo(sh, 20, 30);	/* 9 */
+	it = SWFMovieClip_add(mc, (SWFBlock)sh);
+	SWFDisplayItem_moveTo(it, 500, 150);
+	SWFDisplayItem_scale(it, 2, 2);
+	SWFMovieClip_nextFrame(mc);
+	it = SWFMovie_add(mo, (SWFBlock)mc);
+  }
 
   add_actions(mo, "_root.totals(); stop();");
 

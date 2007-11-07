@@ -1,5 +1,8 @@
 2007-11-07 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/shape_test.c: add Udog's drawing, both
+	  non-explicitly closed; one using left fill (the one on the left)
+	  and one using right fill (the one on the right).
 	* testsuite/misc-ming.all/ming_utils.c (get_dejagnu_actions): don't
 	  use printf to write the code into a buffer, just make the code a
 	  const static const C-string.
