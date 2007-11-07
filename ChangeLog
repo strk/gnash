@@ -1,5 +1,12 @@
 2007-11-07 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/DrawingApiTest.as: Add Udo's example drawing
+	  and associated hitTest tests (xfailing)
+	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: Add pixel checking
+	  for Udo's example drawing (xfailing due to visible stroke)
+
+2007-11-07 Sandro Santilli <strk@keybit.net>
+
 	* server/DynamicShape.cpp: close filled paths on pen move and
 	  ::finalize for last path.
 	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: all pixel checking

@@ -17,7 +17,7 @@
 // 'h' toggles _visible
 //
 
-rcsid="$Id: DrawingApiTest.as,v 1.22 2007/11/07 10:05:37 strk Exp $";
+rcsid="$Id: DrawingApiTest.as,v 1.23 2007/11/07 16:15:17 strk Exp $";
 
 #include "../actionscript.all/check.as"
 
@@ -453,6 +453,62 @@ with(inv)
 	check( inv7.hitTest(250 + (19*4), 100 + (14*4), true) );  // Center-Right
 	check( inv7.hitTest(250 + (19*4), 100 + (11*4), true) );  // Upper-Right
 	check( inv7.hitTest(250 + (14*4), 100 + (11*4), true) );  // Upper-Center
+
+	//------------------------------------------------
+	//
+	//  Single path with complex crossing
+	//
+	//
+	//  10     5----4,0----------1
+	//         |#####|###########|
+	//         |#####|###########|
+	//  20     6-----+----7######|
+	//               |    |######|
+	//               |    |######|
+	//  30           9----8######|
+	//               |###########|
+	//  40           3-----------2
+	//
+	//         10   20    30     40
+	//
+	//------------------------------------------------
+	createEmptyMovieClip("inv8", 8);
+	with (inv8)
+	{
+		beginFill(0xFF0000);
+		moveTo(20, 10);  // 0
+		lineTo(40, 10);  // 1
+		lineTo(40, 40);  // 2
+		lineTo(20, 40);  // 3
+		lineTo(20, 10);  // 4
+
+		lineTo(10, 10);   // 5
+		lineTo(10, 20);   // 6
+		lineTo(30, 20);  // 7
+		lineTo(30, 30);  // 8
+		lineTo(20, 30);  // 9
+
+		// implicit close-up to 0 (aka 4, aka 20,10)
+	}
+
+	inv8._xscale = inv8._yscale = 200;
+	inv8._x = 200;
+	inv8.onRollOver = function() {};
+
+	check(  inv8.hitTest(200 + (15*2), 0 + (15*2), true) );  // Upper-Left
+	xcheck(  inv8.hitTest(200 + (25*2), 0 + (15*2), true) );  // Upper-Center
+	xcheck(  inv8.hitTest(200 + (35*2), 0 + (15*2), true) );  // Upper-Right
+
+	check( !inv8.hitTest(200 + (15*2), 0 + (25*2), true) );  // Center-Left
+	check( !inv8.hitTest(200 + (25*2), 0 + (25*2), true) );  // Center-Center
+	check(  inv8.hitTest(200 + (35*2), 0 + (25*2), true) );  // Center-Right
+
+	check( !inv8.hitTest(200 + (15*2), 0 + (35*2), true) );  // Lower-Left
+	xcheck(  inv8.hitTest(200 + (25*2), 0 + (35*2), true) );  // Lower-Center
+	xcheck(  inv8.hitTest(200 + (35*2), 0 + (35*2), true) );  // Lower-Right
+
+	check( !inv8.hitTest(200 + (20*2), 0 + (25*2), true) );  // On the 0-9 stroke, out of fill
+
 
 	_visible = false;
 }

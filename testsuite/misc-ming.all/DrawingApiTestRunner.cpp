@@ -692,5 +692,55 @@ main(int /*argc*/, char** /*argv*/)
 	tester.pressKey(gnash::key::PLUS); // alpha goes up to 75
 	tester.pressKey(gnash::key::PLUS); // alpha goes up to 100
 	tester.advance(); // commit
+
+	//--------------------------------------------------------------
+	// Complex single-path crossing:
+	// 
+	//  10     5----4,0----------1
+	//         |#####|###########|
+	//         |#####|###########|
+	//  20     6-----+----7######|
+	//               |    |######|
+	//               |    |######|
+	//  30           9----8######|
+	//               |###########|
+	//  40           3-----------2
+	//
+	//         10   20    30     40
+	//
+	//  {X,Y} Scale : 200
+	//  X offset    : 200
+	//--------------------------------------------------------------
+
+	int scale = 2;
+	int xo = 200;
+	int yo = 0;
+
+	// Upper-Left
+	check_pixel(xo + (15*scale), yo + (15*scale), 2, red, 2);
+	// Upper-Center
+	check_pixel(xo + (25*scale), yo + (15*scale), 2, red, 2);
+	// Upper-On_09_stroke (Gnash fails rendering a white stroke on the red background)
+	xcheck_pixel(xo + (20*scale), yo + (15*scale), 2, red, 2);
+	// Upper-Right
+	check_pixel(xo + (35*scale), yo + (15*scale), 2, red, 2);
+
+	// Center-Left
+	check_pixel(xo + (15*scale), yo + (25*scale), 2, white, 2);
+	// Center-Center
+	check_pixel(xo + (25*scale), yo + (25*scale), 2, white, 2);
+	// Center-Right
+	check_pixel(xo + (35*scale), yo + (25*scale), 2, red, 2);
+
+	// Lower-Left
+	check_pixel(xo + (15*scale), yo + (35*scale), 2, white, 2);
+	// Lower-Lower
+	check_pixel(xo + (25*scale), yo + (35*scale), 2, red, 2);
+	// Lower-Right
+	check_pixel(xo + (35*scale), yo + (35*scale), 2, red, 2);
+
+	// On the 0-9 stroke, out of fill (gnash fails drawing a red stroke)
+	xcheck_pixel(xo + (20*scale), yo + (25*scale), 3, white, 2);
+
 }
 
