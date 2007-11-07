@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.h,v 1.27 2007/11/05 17:26:55 udog Exp $ */
+/* $Id: shape.h,v 1.28 2007/11/07 10:13:50 udog Exp $ */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
@@ -287,7 +287,10 @@ namespace gnash {
 		/// Edges forming the path
 		std::vector<edge> m_edges;
 
-		/// ?
+		/// This flag is set when the path is the first one of a new "sub-shape".
+		/// All paths with a higher index in the list belong to the same 
+		/// shape unless they have m_new_shape==true on their own.
+		/// Sub-shapes affect the order in which outlines and shapes are rendered.
 		bool m_new_shape;
 
 	};
