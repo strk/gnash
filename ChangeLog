@@ -1,5 +1,6 @@
 2007-11-07 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.cpp (display): skip display of null-sized levels.
 	* testsuite/misc-ming.all/DrawingApiTest.as: have '-' and '+'
 	  use a step of 25% instead of 20% (easier for pixel checking);
 	  add hitTest for the opposite-el case.

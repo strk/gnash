@@ -855,7 +855,7 @@ movie_root::display()
 		// null frame size ? don't display !
 		const rect& sub_frame_size = movie->get_frame_size();
 
-		if ( frame_size.is_null() )
+		if ( sub_frame_size.is_null() )
 		{
 			log_debug("_level%u has null frame size, skipping", i->first);
 			continue;
@@ -1394,7 +1394,7 @@ movie_root::cleanupDisplayList()
 	if ( _liveChars.size() > maxLiveChars )
 	{
 		maxLiveChars = _liveChars.size();
-		log_debug("Global instance list grew to %d entries", maxLiveChars);
+		log_debug("Global instance list grew to " SIZET_FMT " entries", maxLiveChars);
 	}
 #endif
 
