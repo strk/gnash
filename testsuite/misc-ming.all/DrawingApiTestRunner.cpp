@@ -522,7 +522,7 @@ main(int /*argc*/, char** /*argv*/)
 	//--------------------------------------------------------------
 
 	// In the right green 'el' shape (not explicitly closed fill)
-	xcheck_pixel(80, 170, 2, green, 2);
+	check_pixel(80, 170, 2, green, 2);
 
 	// Outside the right green 'el' shape
 	// (but close to the auto-closing edge)
@@ -530,14 +530,14 @@ main(int /*argc*/, char** /*argv*/)
 
 	// In the left green horizontally flipped 'el' shape
 	// (not explicitly closed fill)
-	xcheck_pixel(30, 170, 2, green, 2);
+	check_pixel(30, 170, 2, green, 2);
 
 	// Outside the left green 'el' shape
 	// (but close to the auto-closing edge)
 	check_pixel(20, 144, 2, white, 2);
 
 	// Between the two 'el' shapes
-	xcheck_pixel(56, 170, 2, white, 2);
+	check_pixel(56, 170, 2, white, 2);
 
 	//--------------------------------------------------------------
 	// The red crossing edges case 
@@ -566,7 +566,7 @@ main(int /*argc*/, char** /*argv*/)
 	// lower-left
 	check_pixel(136, 75, 2, white, 2);
 	// lower-center
-	xcheck_pixel(156, 75, 2, white, 2);
+	check_pixel(156, 75, 2, white, 2);
 	// lower-right
 	check_pixel(175, 75, 2, white, 2);
 	// center-right
@@ -574,9 +574,9 @@ main(int /*argc*/, char** /*argv*/)
 	// upper-right
 	check_pixel(175, 35, 2, white, 2);
 	// upper-center
-	xcheck_pixel(156, 35, 2, white, 2);
+	check_pixel(156, 35, 2, white, 2);
 	// center
-	xcheck_pixel(156, 57, 2, white, 2);
+	check_pixel(156, 57, 2, white, 2);
 
 	//--------------------------------------------------------------
 	// The nested squares cases 

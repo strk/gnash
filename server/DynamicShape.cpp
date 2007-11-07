@@ -17,7 +17,7 @@
 
 
 
-/* $Id: DynamicShape.cpp,v 1.11 2007/11/07 12:08:16 strk Exp $ */
+/* $Id: DynamicShape.cpp,v 1.12 2007/11/07 14:06:16 strk Exp $ */
 
 #include "DynamicShape.h"
 
@@ -91,7 +91,9 @@ DynamicShape::beginFill(const rgba& color)
 void
 DynamicShape::startNewPath(bool newShape)
 {
-	// Close any pending filled style
+	// Close any pending filled path
+	if ( _currpath && _currfill) _currpath->close();
+
 	// The DrawingApiTest.swf file shows we should NOT
 	// necessarely end the current fill when starting a new one.
 	//endFill();
@@ -107,6 +109,14 @@ DynamicShape::finalize()
 {
 	// Nothing to do if not changed
 	if ( ! _changed ) return;
+
+	// Close any pending filled path (_currpath should be last path)
+	if ( _currpath && _currfill)
+	{
+		assert( ! m_paths.empty() );
+		assert( _currpath == &(m_paths.back()) );
+		_currpath->close();
+	}
 
 	// TODO: check consistency of fills and such !
 
@@ -135,6 +145,7 @@ DynamicShape::moveTo(float x, float y)
 	{
 		_x = x;
 		_y = y;
+
 		// TODO: close previous path if any and filled ?
 		startNewPath(false); // don't make this the start of a new subshape (to verify)
 	}

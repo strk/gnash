@@ -1,5 +1,13 @@
 2007-11-07 Sandro Santilli <strk@keybit.net>
 
+	* server/DynamicShape.cpp: close filled paths on pen move and
+	  ::finalize for last path.
+	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: all pixel checking
+	  succeed now. The only failures left are hitTest-related. Time to
+	  resume the old point_test implementation.
+
+2007-11-07 Sandro Santilli <strk@keybit.net>
+
 	* server/DynamicShape.{cpp,h}: Start new paths as new shapes
 	  when beginFill is called.
 	* server/shape.{cpp,h}: add interfaces for setting m_new_shape
