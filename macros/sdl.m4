@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: sdl.m4,v 1.44 2007/10/23 21:53:10 nihilus Exp $
+dnl $Id: sdl.m4,v 1.45 2007/11/08 10:58:16 strk Exp $
 
 AC_DEFUN([GNASH_PATH_SDL], [
   has_sdl=no
@@ -58,7 +58,7 @@ AC_DEFUN([GNASH_PATH_SDL], [
 	fi
     fi
     if test "x$SDL_LIBS" = "x" ; then
-      SDL_LIBS=`$SDL_CONFIG --libs | sed -e 's:-L/usr/lib::'`
+      SDL_LIBS=`$SDL_CONFIG --libs | sed -e 's:-L/usr/lib\>::'`
 	if test x${cross_compiling} = xno; then
 		ac_cv_path_sdl_lib=$SDL_LIBS
 	fi
