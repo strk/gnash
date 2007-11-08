@@ -1,5 +1,7 @@
 2007-11-08 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Global.as: add test for existence of
+	  updateAfterEvent (gnash fails).
 	* server/as_environment.cpp (find_object_{slash,dot}syntax):
 	  use get_path_element instead of get_member to get next element
 	  from an old-style path.
