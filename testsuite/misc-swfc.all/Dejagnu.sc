@@ -21,7 +21,7 @@
         //
         //
 
-        _root.Dejagnu = __global.Dejagnu = {
+        _root.Dejagnu = _global.Dejagnu = {
             passed:0,
             failed:0,
             xpassed:0,
