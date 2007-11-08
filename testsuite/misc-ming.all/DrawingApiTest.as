@@ -17,7 +17,7 @@
 // 'h' toggles _visible
 //
 
-rcsid="$Id: DrawingApiTest.as,v 1.24 2007/11/08 17:16:13 udog Exp $";
+rcsid="$Id: DrawingApiTest.as,v 1.25 2007/11/08 18:00:28 udog Exp $";
 
 #include "../actionscript.all/check.as"
 
@@ -294,7 +294,7 @@ with(inv)
 	check(  inv3.hitTest((4*4), 100 + (10*4), false) );  // Outside the left autofill (but in the boundaries)
 
 	check(  inv3.hitTest((20*4), 100 + (18*4), true)  );  // Inside the right autofill
-	check( !inv3.hitTest(92, 150, true)  );  // Outside the right autofill (but in the boundaries)
+	check( !inv3.hitTest((20*4), 100 + (10*4), true)  );  // Outside the right autofill (but in the boundaries)
 	check(  inv3.hitTest((24*4), 100 + (10*4), false) );  // Outside the right autofill (but in the boundaries)
 
 	// Nested squares (inner is an hole)
