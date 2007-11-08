@@ -1,3 +1,8 @@
+2007-11-08 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: reverted because
+	  that problem is still not solved (false PASS earlier)
+
 2007-11-08 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* utilities/parser.cpp: dropped 'bool nodelay' since it's not used.
