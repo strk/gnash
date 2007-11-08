@@ -344,14 +344,26 @@ color_ctor(const fn_call& fn)
 	sprite_instance* sp=0;
 	if ( fn.nargs )
 	{
-		boost::intrusive_ptr<as_object> arg = fn.arg(0).to_object();
-		if ( arg ) sp = arg->to_movie();
+		const as_value& arg = fn.arg(0);
+
+		// TODO: check what should happen if the argument is
+		//       a not-unloaded sprite but another exist with same
+		//       target at lower depth (always looking up would return
+		//       the lowest depth)
+		sp = arg.to_sprite();
+		if ( ! sp )
+		{
+			// must be a target..
+			as_environment& env = fn.env();
+			character* ch = env.find_target(fn.arg(0).to_string(&env));
+			if ( ch ) sp = ch->to_movie();
+		}
 
 		IF_VERBOSE_ASCODING_ERRORS(
 		if ( ! sp )
 		{
 			std::stringstream ss; fn.dump_args(ss);
-			log_aserror(_("new Color(%s) : first argument doesn't evaluate to a MovieClip"),
+			log_aserror(_("new Color(%s) : first argument doesn't evaluate or point to a MovieClip"),
 				ss.str().c_str());
 		}
 		)

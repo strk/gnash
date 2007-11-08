@@ -1,3 +1,9 @@
+2007-11-08 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/Color.cpp (color_ctor): parse first argument to
+	  Color constructor as a string (if not a MovieClip).
+	  Fixes http://www.lsfrench.com/school/couleur/colorepaint.swf.
+
 2007-11-08 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: reverted because
