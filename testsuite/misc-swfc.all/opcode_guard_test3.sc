@@ -131,7 +131,7 @@
         .show b3 as=pressed
         .on_press:
             _root.gotoAndPlay(32);
-            _root.asExecuted5 = true;
+            _root.asExecuted4 = true;
         .end
     .end
     .put btn1 x=0 y=300
@@ -143,7 +143,7 @@
     .del btn1
 .frame 32
     .action:
-        _root.check_equals(asExecuted4, false);
+        _root.check_equals(asExecuted4, true);
     .end
     
     
@@ -152,12 +152,6 @@
 //   remove the button at frame X+2!
 // observed insane behaviour:
 //   opcode in onButtonPress is NOT guarded by isUnloaded()/isDestroyed() in this case
-// comments:
-//   the behaviour is strange to me! As it is not consistent with test1~3, where
-//   all opcode guard works as expected. But this is a very common case is real swfs.
-//   And many of the confusing bugs were caused by the onButtionActions.
-//   Seems the difference is caused by the removing time of the buttons. test6~8
-//   show similar cases. 
 .frame 33
     .button btn2
         .show b1 as=idle
