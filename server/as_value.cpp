@@ -37,6 +37,9 @@
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/lexical_cast.hpp>
+#include <locale>
+#include <sstream>
+#include <iomanip>
 
 
 using namespace std;
@@ -1146,7 +1149,7 @@ as_value::doubleToString(double _val)
 	// 1.11111111111111e+16
 	// ...
 	// For values < 1, print up to 4 leading zeroes after the
-	// deciman point, then switch to scientific notation with up
+	// decimal point, then switch to scientific notation with up
 	// to 15 significant digits, rounding with no trailing zeroes
 	// e.g. for 1.234567890123456789 * 10^-i:
 	// 1.23456789012346
@@ -1163,12 +1166,11 @@ as_value::doubleToString(double _val)
 	// If the value is negative, just add a '-' to the start; this
 	// does not affect the precision of the printed value.
 	//
-	// This almost corresponds to printf("%.15g") format, except
-	// that %.15g switches to scientific notation at e-05 not e-06,
-	// and %g always prints at least two digits for the exponent.
+	// This almost corresponds to iomanip's std::setprecision(15)
+	// format, except that iomanip switches to scientific notation
+	// at e-05 not e-06, and always prints at least two digits for the exponent.
 
-	// The following code gives the same results as Adobe player
-	// except for
+	// The C implementation had problems with the following cases:
 	// 9.99999999999999[39-61] e{-2,-3}. Adobe prints these as
 	// 0.0999999999999999 and 0.00999999999999 while we print them
 	// as 0.1 and 0.01
@@ -1184,88 +1186,64 @@ as_value::doubleToString(double _val)
 	// There may be some milage in comparing against
 	// 0.00009999999999999995 and
 	// 0.000009999999999999995 instead.
+	//
+	// The stringstream implementation seems to have no problems with them,
+	// but that may just be a better compiler.
 
 	// Handle non-numeric values.
 	// "printf" gives "nan", "inf", "-inf", so we check explicitly
 	if(isnan(_val))
 	{
-		//strcpy(_str, "NaN");
 		return "NaN";
 	}
 	else if(isinf(_val))
 	{
 		return _val < 0 ? "-Infinity" : "Infinity";
-		//strcpy(_str, _val < 0 ? "-Infinity" : "Infinity");
 	}
 	else if(_val == 0.0 || _val == -0.0)
 	{
 		return "0";
-		//strcpy(_str, _val < 0 ? "-Infinity" : "Infinity");
 	}
 
-	char _str[256];
-
-	// FP_ZERO, FP_NORMAL and FP_SUBNORMAL
+	ostringstream _ostr;
+	std::string _str;
+	
+	// ActionScript always expects dot as decimal point?
+	_ostr.imbue(std::locale("C")); 
+	
+	// force to decimal notation for this range (because the reference player does)
 	if (fabs(_val) < 0.0001 && fabs(_val) >= 0.00001)
 	{
-		// This is the range for which %.15g gives scientific
-		// notation but for which we must give decimal.
-		// We can't easily use %f bcos it prints a fixed number
-		// of digits after the point, not the maximum number of
-		// significant digits with trailing zeroes removed that
-		// we require. So we just get %g to do its non-e stuff
-		// by multiplying the value by ten and then stuffing
-		// an extra zero into the result after the decimal
-		// point. Yuk!
-		char *cp;
+		// All nineteen digits (4 zeros + up to 15 significant digits)
+		_ostr << fixed << std::setprecision(19) << _val;
 		
-		sprintf(_str, "%.15g", _val * 10.0);
-		if ((cp = strchr(_str, '.')) == NULL || cp[1] != '0') {
-			log_error(_("Internal error: Cannot find \".0\" in %s for %.15g"), _str, _val);
-			// Just give it to them raw instead
-			sprintf(_str, "%.15g", _val);
-		} else {
-#if HAVE_MEMMOVE
-			// Shunt the digits right one place after the
-			// decimal point.
-			memmove(cp+2, cp+1, strlen(cp+1)+1);
-#else
-			// We can't use strcpy() cos the args overlap.
-
-			char c;	// character being moved forward
-			
-			// At this point, cp points at the '.'
-			//
-			// In the loop body it points at where we pick
-			// up the next char to move forward and where
-			// we drop the one we picked up on its left.
-			// We stop when we have just picked up the \0.
-			for (c = '0', cp++; c != '\0'; cp++) {
-				char tmp = *cp; *cp = c; c = tmp;
-			}
-			// Store the '\0' we just picked up
-			*cp = c;
-#endif
+		_str = _ostr.str();
+		
+		// Because 'fixed' also adds trailing zeros, remove them.
+		std::string::size_type pos = _str.find_last_not_of('0');
+		if (pos != std::string::npos) {
+			_str.erase(pos + 1);
 		}
+		
 	}
+	
 	else
 	{
-		// Regular case
-		char *cp;
-
-		sprintf(_str, "%.15g", _val);
+		_ostr << std::setprecision(15) << _val;
+		
+		_str = _ostr.str();
+		
 		// Remove a leading zero from 2-digit exponent if any
-		if ((cp = strchr(_str, 'e')) != NULL &&
-		    cp[2] == '0') {
-			// We can't use strcpy() cos its src&dest can't
-			// overlap. However, this can only be "...e+0n"
-			// or ...e-0n;  3+digit exponents never have
-			// leading 0s.
-			cp[2] = cp[3]; cp[3] = '\0';
+		std::string::size_type pos = _str.find("e", 0);
+
+		if (pos != std::string::npos && _str.at(pos + 2) == '0') {
+			_str.erase(pos + 2, 1);
 		}
+		
 	}
 
-	return std::string(_str);
+	return _str;
+	
 }
 
 void

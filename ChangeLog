@@ -1,5 +1,10 @@
 2007-11-08 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* server/as_value.cpp (doubletoString): replace C code with a c++
+	  implementation that ought to do the same thing. Uses stringstream
+	  and locale to imbue the result with the standard C locale, which
+	  fixes problems with locales that have a comma decimal separator.
+	  The test below should now pass in all locales.
 	* testsuite/actionscript.all/Number.as: add tests for number formatting
 	  based on comments in server/as_value.cpp. Presently they should fail
 	  for locales with a comma decimal separator.
