@@ -1,5 +1,7 @@
 2007-11-08 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfc.all/Makefile.am: make Dejagnu.sc and check.sc
+	  dependencies of all .swf outputs.
 	* testsuite/misc-swfc.all/Dejagnu.sc: typo fix: __global => _global
 
 2007-11-08 Zou Lunkai <zoulunkai@gmail.com>

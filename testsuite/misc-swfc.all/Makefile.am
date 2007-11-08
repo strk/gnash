@@ -62,6 +62,8 @@ alltests-runner: $(srcdir)/../generic-testrunner.sh $(SCTESTS_OUT) $(AUXMOVIES_O
 	sh $< -r 50 $(top_builddir) $(SCTESTS_OUT) > $@
 	chmod 755 $@
 
+*.swf: Dejagnu.sc check.sc
+
 .sc.swf:
 	$(SWFC_CPP) $< > $(@:%.swf=pp_%.sc) 
 	$(SWFC) $(SWFC_FLAGS) -o $@ $(@:%.swf=pp_%.sc)
