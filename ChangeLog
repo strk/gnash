@@ -2,7 +2,9 @@
 
 	* testsuite/misc-swfc.all/Dejagnu.sc: don't create such a big text field bounding 
 	  box for xtrace, it would hiden all button clicks located within the bounding box. 
-	  Enlarge the bounding box when needed.	  	  
+	  Enlarge the bounding box when needed.	 
+	* testsuite/misc-swfc.all/opcode_guard_test3.sc: new tests. found onButtonActions
+	  might not respect the opcode guard model.
 	  
 2007-11-07 Sandro Santilli <strk@keybit.net>
 
