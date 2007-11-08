@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: parser.cpp,v 1.43 2007/09/05 01:51:32 nihilus Exp $ */
+/* $Id: parser.cpp,v 1.44 2007/11/08 15:55:08 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -59,11 +59,6 @@ extern "C"{
 const char *GPARSE_VERSION = "1.0";
 
 bool gofast = false;		// FIXME: this flag gets set based on
-				// an XML message written using
-				// SendCommand(""). This way a movie
-				// can optimize its own performance
-				// when needed,
-bool nodelay = false;           // FIXME: this flag gets set based on
 				// an XML message written using
 				// SendCommand(""). This way a movie
 				// can optimize its own performance

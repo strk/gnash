@@ -1,3 +1,7 @@
+2007-11-08 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* utilities/parser.cpp: dropped 'bool nodelay' since it's not used.
+
 2007-11-08 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/as_value.cpp (doubletoString): replace C code with a c++
