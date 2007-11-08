@@ -1,5 +1,9 @@
 2007-11-08 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.cpp (find_object_{slash,dot}syntax):
+	  use get_path_element instead of get_member to get next element
+	  from an old-style path.
+	  Fixes http://www.orgamez.com/files/swf/alphazoo.swf.
 	* server/asobj/Color.cpp (color_ctor): parse first argument to
 	  Color constructor as a string (if not a MovieClip).
 	  Fixes http://www.lsfrench.com/school/couleur/colorepaint.swf.

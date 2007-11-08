@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.105 2007/10/26 13:03:56 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.106 2007/11/08 23:20:37 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -680,14 +680,16 @@ as_environment::find_object_dotsyntax(const std::string& path, const ScopeStack*
         }
 
 #ifdef DEBUG_TARGET_FINDING 
-        log_debug(_("Invoking get_member(%s) on object %p"), subpart.c_str(), (void *)env);
+        log_debug(_("Invoking get_path_element(%s) on object %p"), subpart.c_str(), (void *)env);
 #endif
 
-        as_value tmp;
+        //as_value tmp;
         string_table::key subpartkey = vm.getStringTable().find(subpart);
 
         // TODO: make sure sprite_instances know about ".."
-        if (!env->get_member(subpartkey, &tmp) )
+	as_object* nextElement = env->get_path_element(subpartkey);
+	if ( ! nextElement )
+        //if (!env->get_member(subpartkey, &tmp) )
         {
             // Try this and _global, but only at first iteration...
 
@@ -702,31 +704,25 @@ as_environment::find_object_dotsyntax(const std::string& path, const ScopeStack*
 
             if ( subpart == "this" )
             {
-                tmp.set_as_object(m_target); 
+                //tmp.set_as_object(m_target); 
+                nextElement = m_target; 
             }
-            else if ( ! vm.getGlobal()->get_member(subpartkey, &tmp) )
+            else
             {
-                IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("Element '%s' of variable '%s' not found in object %p nor in _global (dotsyntax)"),
-                    subpart.c_str(), path.c_str(), (void *)env);
-                );
-                return NULL;
+                nextElement = vm.getGlobal()->get_path_element(subpartkey); 
+                if ( ! nextElement )
+                {
+                  IF_VERBOSE_ASCODING_ERRORS(
+                  log_aserror(_("Path element '%s' of variable '%s' not found in object %p nor in _global (dotsyntax)"),
+                      subpart.c_str(), path.c_str(), (void *)env);
+                  );
+                  return NULL;
+                }
             }
         } 
+	assert(nextElement);
 
-        // Debugging only:
-        if ( ! tmp.is_object() )
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Member %s of object %p doesn't cast to an Object (%s) "
-                "evaluating target path %s (dotsyntax)"),
-                subpart.c_str(), (void *)env, tmp.to_debug_string().c_str(),
-                path.c_str());
-            );
-            return NULL;
-        }
-
-        env = tmp.to_object().get();
+        env = nextElement; // tmp.to_object().get();
 #ifndef GNASH_USE_GC
         assert(env->get_ref_count() > 0); // still alive...
 #endif // ndef GNASH_USE_GC
@@ -852,12 +848,14 @@ as_environment::find_object_slashsyntax(const std::string& path, const ScopeStac
 	    {
 
 #ifdef DEBUG_TARGET_FINDING 
-		    log_debug(_("Invoking get_member(%s) on object %p"), subpart.c_str(), (void *)env);
+		    log_debug(_("Invoking get_path_element(%s) on object %p"), subpart.c_str(), (void *)env);
 #endif
-    		as_value tmp;
+    		//as_value tmp;
     		string_table::key subpartkey = vm.getStringTable().find(subpart);
     		// TODO: make sure sprite_instances know about ".."
-    		if (!env->get_member(subpartkey, &tmp) )
+		as_object* nextElement = env->get_path_element(subpartkey);
+		if ( ! nextElement )
+    		//if (!env->get_member(subpartkey, &tmp) )
     		{
     			// Try this and _global, but only at first iteration...
     
@@ -872,42 +870,36 @@ as_environment::find_object_slashsyntax(const std::string& path, const ScopeStac
     
     			if ( subpart == "this" )
     			{
-    				tmp.set_as_object(m_target);
+    				//tmp.set_as_object(m_target);
+                		nextElement = m_target; 
     			}
     
-    			else if (!vm.getGlobal()->get_member(subpartkey, &tmp) )
-    			{
-    				IF_VERBOSE_ASCODING_ERRORS(
-    				log_aserror(_("Element '%s' of variable '%s' not found in object %p nor in _global (slashsyntax)"),
-    					subpart.c_str(), path.c_str(), (void *)env);
-    				);
-    				return NULL;
-    			}
-		    } 
+    			else
+			{
+				nextElement = vm.getGlobal()->get_path_element(subpartkey); 
+				if ( ! nextElement )
+				{
+					IF_VERBOSE_ASCODING_ERRORS(
+					log_aserror(_("Element '%s' of variable '%s' not found in object %p nor in _global (slashsyntax)"),
+						subpart.c_str(), path.c_str(), (void *)env);
+					);
+					return NULL;
+				}
+			}
+		} 
 
-		    // Debugging only:
-		    if ( ! tmp.is_object() )
-            {
-			    IF_VERBOSE_ASCODING_ERRORS(
-			    log_aserror(_("Member %s of object %p doesn't cast "
-                    "to an Object (%s) evaluating target path %s "
-                    "(slashsyntax)"),
-				    subpart.c_str(), (void *)env,
-                    tmp.to_debug_string().c_str(), path.c_str());
-				);
-			    return NULL;
-		    }
+		assert(nextElement);
 
-		    env = tmp.to_object().get();
+		env = nextElement;
 #ifndef GNASH_USE_GC
-		    assert(env->get_ref_count() > 0);
+		assert(env->get_ref_count() > 0);
 #endif // ndef GNASH_USE_GC
 	    }
 
 	    //@@   _level0 --> root, .. --> parent, . --> this, other == character
 	
 	    if (next_slash == NULL)
-        {
+	    {
 	        break;
 	    }
 	
