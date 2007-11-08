@@ -1,3 +1,9 @@
+2007-11-08 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-swfc.all/Dejagnu.sc: don't create such a big text field bounding 
+	  box for xtrace, it would hiden all button clicks located within the bounding box. 
+	  Enlarge the bounding box when needed.	  	  
+	  
 2007-11-07 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/shape_test.c: add Udog's drawing, 

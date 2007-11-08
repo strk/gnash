@@ -148,6 +148,7 @@
             },
 
             xtrace: function (msg) {
+            	_level0.textout._height += 20;
                 _level0.textout.text += msg + "\n";
                 trace(msg);
             },
@@ -169,7 +170,7 @@
 
         if(_level0.dejagnu_module_initialized != 1) {
             // create a textfield to output to
-            _level0.createTextField("textout", 99, 10, 10, 500, 500);
+            _level0.createTextField("textout", 99, 10, 10, 600, 0);
             _level0.dejagnu_module_initialized = 1;
         }
 
