@@ -1,3 +1,9 @@
+2007-11-08 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* testsuite/actionscript.all/Number.as: add tests for number formatting
+	  based on comments in server/as_value.cpp. Presently they should fail
+	  for locales with a comma decimal separator.
+
 2007-11-08 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ASHandlers.cpp: fix compiler warnings

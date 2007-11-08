@@ -27,7 +27,7 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.32 2007/10/06 08:20:05 strk Exp $";
+rcsid="$Id: Number.as,v 1.33 2007/11/08 14:47:55 bwy Exp $";
 
 #include "check.as"
 
@@ -405,6 +405,53 @@ check( isNaN(450 - undefined) );
 #else
 check_equals(450 - undefined, 450);
 #endif
+
+//-----------------------------------------------------------
+// Check number formatting as documented in as_value.cpp. Not
+// verified with the proprietary player. Rules are:
+// Numbers should be rounded to 15 significant digits.
+// Numbers above 10e+15 are expressed with exponent.
+// Numbers below 0 with more than 4 leading zeros expressed
+// 	with exponent.
+// Exponent has no leading zero.
+// Trailing zeros are always trimmed.
+//-----------------------------------------------------------
+
+a=new Number(11111111111111.11111111);
+check_equals(a.toString(), "11111111111111.1");
+
+a=new Number(111111111111111.1111111);
+check_equals(a.toString(), "111111111111111");
+
+a=new Number(1111111111111111.1111111);
+check_equals(a.toString(), "1.11111111111111e+15");
+
+a=new Number(0.000123456789012346);
+check_equals(a.toString(), "0.000123456789012346");
+
+a=new Number(0.0000123456789012346);
+check_equals(a.toString(), "0.0000123456789012346");
+
+a=new Number(0.00000123456789012346);
+check_equals(a.toString(), "1.23456789012346e-6");
+
+a=new Number(0.000000123456789012346);
+check_equals(a.toString(), "1.23456789012346e-7");
+
+a=new Number(0.0999999999999999);
+check_equals(a.toString(), "0.0999999999999999");
+
+a=new Number(0.99999999999999938);
+check_equals(a.toString(), "0.999999999999999");
+
+a=new Number(9.9999999999999939 / 10);
+check_equals(a.toString(), "0.999999999999999");
+
+a=new Number(5.4 / 100000);
+check_equals(a.toString(), "0.000054");
+
+a=new Number(5.4 / 1000000);
+check_equals(a.toString(), "5.4e-6");
 
 check( isNaN(0/0) );
 totals();
