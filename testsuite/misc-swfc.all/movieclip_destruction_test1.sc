@@ -73,7 +73,7 @@
     .frame 2    
       .action:
 	note("mc1.frame2");
-        check_equals(mc1.getDepth(), -16383);
+        check_equals(_root.mc1.getDepth(), -16383);
         _root.x = 0;
         _root.gotoAndPlay(6);
         // AS below have no chance to be executed.
@@ -300,7 +300,7 @@
   .action:
     _root.check_equals(initActionExecuted, "mc2, mc3, mc61, mc6, mc8");
     stop();
-    totals(38);
+    totals(39);
   .end
   
 .end  // file end

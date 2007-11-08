@@ -1,5 +1,7 @@
 2007-11-08 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfc.all/movieclip_destruction_test1.sc: fix test,
+	  self-name can't be evaluated.
 	* testsuite/misc-swfc.all/Makefile.am: make Dejagnu.sc and check.sc
 	  dependencies of all .swf outputs.
 	* testsuite/misc-swfc.all/Dejagnu.sc: typo fix: __global => _global
