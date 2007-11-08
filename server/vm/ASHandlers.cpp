@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.148 2007/11/01 16:14:20 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.149 2007/11/08 14:31:55 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -473,9 +473,11 @@ SWFHandlers::ActionNextFrame(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
 
 	as_environment& env = thread.env;
-	const action_buffer& code = thread.code;
 
+#ifndef NDEBUG
+	const action_buffer& code = thread.code;
 	assert( code[thread.pc] == SWF::ACTION_NEXTFRAME );
+#endif
 
 	sprite_instance* tgt = env.get_target()->to_movie();
 	assert(tgt);
@@ -488,9 +490,11 @@ SWFHandlers::ActionPrevFrame(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
 
 	as_environment& env = thread.env;
-	const action_buffer& code = thread.code;
 
+#ifndef NDEBUG
+	const action_buffer& code = thread.code;
 	assert( code[thread.pc] == SWF::ACTION_PREVFRAME );
+#endif
 
 	sprite_instance* tgt = env.get_target()->to_movie();
 	assert(tgt);
@@ -503,9 +507,12 @@ SWFHandlers::ActionPlay(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
 
     as_environment& env = thread.env;
-    const action_buffer& code = thread.code;
 
+#ifndef NDEBUG
+    const action_buffer& code = thread.code;
     assert( code[thread.pc] == SWF::ACTION_PLAY );
+#endif
+
     sprite_instance* tgt = env.get_target()->to_movie();
     assert(tgt);
     tgt->set_play_state(sprite_instance::PLAY);
@@ -517,9 +524,11 @@ SWFHandlers::ActionStop(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
 
     as_environment& env = thread.env;
-    const action_buffer& code = thread.code;
 
+#ifndef NDEBUG
+    const action_buffer& code = thread.code;
     assert( code[thread.pc] == SWF::ACTION_STOP );
+#endif
 
     sound_handler* s = get_sound_handler();
 
@@ -541,9 +550,11 @@ SWFHandlers::ActionToggleQuality(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
 
     //as_environment& env = thread.env;
+#ifndef NDEBUG
     const action_buffer& code = thread.code;
-
     assert( code[thread.pc] == SWF::ACTION_TOGGLEQUALITY );
+#endif
+
     log_unimpl (__PRETTY_FUNCTION__);
 }
 
@@ -553,9 +564,11 @@ SWFHandlers::ActionStopSounds(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
 
 	//as_environment& env = thread.env;
-	const action_buffer& code = thread.code;
 
+#ifndef NDEBUG
+	const action_buffer& code = thread.code;
 	assert( code[thread.pc] == SWF::ACTION_STOPSOUNDS );
+#endif
 
 	sound_handler* s = get_sound_handler();
 	if (s != NULL)
@@ -670,7 +683,8 @@ SWFHandlers::ActionSetTarget(ActionExec& thread)
 {
 //	GNASH_REPORT_FUNCTION;
 
-	as_environment& env = thread.env;
+	//as_environment& env = thread.env;
+
 	const action_buffer& code = thread.code;
 	size_t pc = thread.pc;
 
@@ -2974,7 +2988,7 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
     thread.ensureStack(2); // member name, target
 
     // Some corner case behaviors depend on the SWF file version.
-    int version = env.get_version();
+    //int version = env.get_version();
 
     as_value member_name = env.top(0);
     as_value target = env.top(1);
@@ -3683,9 +3697,11 @@ SWFHandlers::ActionTry(ActionExec& thread)
 
 	as_environment& env = thread.env;
 	const action_buffer& code = thread.code;
-	size_t pc = thread.pc;
 
+#ifndef NDEBUG
+	size_t pc = thread.pc;
 	assert( code[pc] == SWF::ACTION_TRY );
+#endif
 
 	size_t i = thread.pc + 3; // skip tag id and length
 
@@ -3805,10 +3821,11 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 	as_environment& env = thread.env;
 	const action_buffer& code = thread.code;
 
+#ifndef NDEBUG
 	int16_t length = code.read_int16(thread.pc+1);
 	assert( length >= 0 );
-
 	//cerr << " length:" << length << endl;
+#endif
 
 	// Create a new swf_function
 	// Code starts at thread.next_pc as the DefineFunction tag

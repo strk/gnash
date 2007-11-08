@@ -1,5 +1,6 @@
 2007-11-08 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp: fix compiler warnings
 	* macros/sdl.m4: strip '-L/usr/lib' only if it's a single world
 	  (ie: not a substring like in -L/usr/lib64)
 	* testsuite/misc-swfc.all/movieclip_destruction_test1.sc: fix test,
