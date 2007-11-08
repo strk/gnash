@@ -21,12 +21,12 @@
  * 
  *  test opcode guard.
  *
- *  onButtonActions are 'insane'(hard to understand) at the moment.
- *  See comments in each test.
+ *  expected behaviour:
+ *     onButtonAction also respects opcode guard. It is guarded by its parent sprite,
+ *     not the button character itself(button._target).
  *
  *  TODO: 
- *    (1) more tests and develop a more general model about the opcode guard.
- *    (2) write a testrunner to support mouse and key presses.
+ *    write a testrunner to support mouse and key presses.
  */
 
 
@@ -105,7 +105,7 @@
     .sprite mc3
         .action:
             _root.mc3.onUnload = function () {};
-            _root.gotoAndPlay(13);
+            _root.gotoAndPlay(12);
             _root.asExecuted3 = true;
         .end
     .end
@@ -122,8 +122,7 @@
 // test4: 
 //   place a button at frame X, _root.gotoAndPlay(X+2)
 //   remove the button at frame X+1
-// observed:
-//   opcode in onButtonPress is guarded by isUnloaded() in this case
+//
 .frame 30
     .button btn1
         .show b1 as=idle
@@ -143,15 +142,15 @@
     .del btn1
 .frame 32
     .action:
+       // the current target for btn1 is _root, never unloaded
         _root.check_equals(asExecuted4, true);
     .end
     
     
 // test5: 
 //   place a button at frame X, _root.gotoAndPlay(X+3)
-//   remove the button at frame X+2!
-// observed insane behaviour:
-//   opcode in onButtonPress is NOT guarded by isUnloaded()/isDestroyed() in this case
+//   remove the button at frame X+2
+//
 .frame 33
     .button btn2
         .show b1 as=idle
@@ -172,15 +171,16 @@
     .del btn2
 .frame 36
     .action:
+      // the current target for btn2 is _root, never unloaded
         _root.check_equals(asExecuted5, true);
     .end
     
 
 // test6:
-//   place a button at frame X, _root.gotoAndPlay(X+3)
-//   remove the button at frame X+2!
-// observed insane behaviour:
-//   opcode in onButtonRelease is NOT guarded by isUnloaded()/isDestroyed() in this case
+//   place a sprite which contains a button at frame X, _root.gotoAndPlay(X+3)
+//   remove the sprite at frame X+1
+// observed:
+//   opcode in onButtonRelease is guarded by isUnloaded()
 .frame 37
     .button btn3
         .show b1 as=idle
@@ -191,25 +191,28 @@
             _root.asExecuted6 = true;
         .end
     .end
-    .put btn3 x=200 y=300
+    .sprite button_target1
+        .put btn3 x=200 y=300
+    .end
+    .put button_target1
     .action:
         stop();
         _root.note("Press the button and release to continue the test!");
     .end
 .frame 38
-.frame 39
-    .del btn3
+    .del button_target1
 .frame 40
     .action:
-        _root.check_equals(asExecuted6, true);
+        // the current target for btn3 is button_target1, already unloaded
+        _root.check_equals(asExecuted6, false);
     .end
 
 
 // test7:
-//   place a button at frame X, _root.gotoAndPlay(X+3)
-//   remove the button at frame X+2!
-// observed insane behaviour:
-//   opcode in onButtonRollOver is NOT guarded by isUnloaded()/isDestroyed() in this case 
+//   place a sprite which contains a button at frame X,  _root.gotoAndPlay(X+3)
+//   remove the sprite at frame X+2
+// observed:
+//   opcode in onButtonRollOver is guarded by isUnloaded(). 
 .frame 41
     .button btn4
         .show b1 as=idle
@@ -220,48 +223,22 @@
             _root.asExecuted7 = true;
         .end
     .end
-    .put btn4 x=300 y=300
+    .sprite button_target2
+        .put btn4 x=300 y=300
+    .end
+    .put button_target2
     .action:
         stop();
         _root.note("Move your mouse over the button to continue the test!");
     .end
 .frame 42
 .frame 43
-    .del btn4
+    .del button_target2
 .frame 44
     .action:
-        _root.check_equals(asExecuted7, true);
+        // the current target for btn4 is button_target2, already unloaded
+        _root.check_equals(asExecuted7, false);
     .end
-
-
-// test8:
-//   place a button at frame X, _root.gotoAndPlay(X+3)
-//   remove the button at frame X+2!
-// observed:
-//   opcode in onButtonRollOut is NOT guarded by isUnloaded()/isDestroyed() in this case
-.frame 45
-    .button btn5
-        .show b1 as=idle
-        .show b2 as=hover
-        .show b3 as=pressed
-        .on_move_out:
-            _root.gotoAndPlay(48);
-            _root.asExecuted8 = true;
-        .end
-    .end
-    .put btn5 x=400 y=300
-    .action:
-        stop();
-        _root.note("Move your mouse across the button to continue the test!");
-    .end
-.frame 46
-.frame 47
-    .del btn5
-.frame 48
-    .action:
-        _root.check_equals(asExecuted8, true);
-    .end    
-    
 
 .frame 60
     .action:
