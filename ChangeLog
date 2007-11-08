@@ -2,6 +2,11 @@
 
 	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: reverted because
 	  that problem is still not solved (false PASS earlier)
+	* server/parser/shape_character_def.cpp: modified point_test_local() 
+	  again to solve problems with some corner cases. It still fails some
+	  rare situations on very complex graphics - I'm still working on that;
+	  failure reports are greatly appreciated!
+	* testsuite/misc-ming.all/DrawingApiTest.as: some new PASSes 
 
 2007-11-08 Markus Gothe <nietzsche@lysator.liu.se>
 

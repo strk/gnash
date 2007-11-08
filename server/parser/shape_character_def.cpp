@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.45 2007/11/05 17:26:30 udog Exp $ */
+/* $Id: shape_character_def.cpp,v 1.46 2007/11/08 17:16:12 udog Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -809,17 +809,35 @@ bool  shape_character_def::point_test_local(float x, float y)
     // Incoming coords are local coords.
 {
 
+
+  /*
+  Principle:
+  For the fill of the shape, we project a ray from the test point to the left
+  side of the shape counting all crossings. When a line or curve segment is 
+  crossed we add 1 if the left fill style is set. Regardless of the left fill
+  style we subtract 1 from the counter then the right fill style is set.
+  This is true when the line goes in downward direction. If it goes upward,
+  the fill styles are reversed.
+  
+  The final counter value reveals if the point is inside the shape (and depends
+  on filling rule, see below).  
+  This method should not depend on subshapes and work for some malformed
+  shapes situations:
+  - wrong fill side (eg. left side set for a clockwise drawen rectangle)
+  - intersecting paths
+  */
+
   point pt(x, y);
+  
+  bool even_odd = true; // later we will need non-zero for glyphs... (TODO)
 
   if (m_bound.point_test(x, y) == false) {
     // Early out.
     return false;
   }
 
-  bool result = false;
   unsigned npaths = m_paths.size();
-  float last_crossing;
-  bool first = true;
+  int counter = 0;
 
   // browse all paths  
   for (unsigned pno=0; pno<npaths; pno++) {
@@ -832,13 +850,13 @@ bool  shape_character_def::point_test_local(float x, float y)
     float pen_x, pen_y;
     
     if (pth.m_new_shape) {
-      // beginning new subshape. if the previous subshape found a hit, return
-      // immediately, otherwise process new subshape.
-      
-      if (result)
+      if ( (even_odd && (counter % 2) != 0) || 
+           (!even_odd && (counter != 0)) ) {
+        // the point is inside the previous subshape, so exit now
         return true;
-      result = false;
-      first = true;
+      }
+      
+      counter=0;
     }
     
     // If the path has a line style, check for strokes there
@@ -885,8 +903,9 @@ bool  shape_character_def::point_test_local(float x, float y)
       */
         
         
-      float cross_x;
-      int cross_dir; // +1 = downward, -1 = upward
+      float cross1, cross2;
+      int dir1, dir2; // +1 = downward, -1 = upward
+      int crosscount=0;
       
       if (edg.is_straight()) {
       
@@ -901,13 +920,15 @@ bool  shape_character_def::point_test_local(float x, float y)
           || ((pen_y >= y) && (edg.m_ay <= y)) ) {
           
           // calculate X crossing
-          cross_x = pen_x + (edg.m_ax - pen_x) *  
+          cross1 = pen_x + (edg.m_ax - pen_x) *  
             (y - pen_y) / (edg.m_ay - pen_y);
             
           if (pen_y > edg.m_ay)
-            cross_dir = -1; // upward
+            dir1 = -1; // upward
           else
-            cross_dir = +1; // downward
+            dir1 = +1; // downward
+            
+          crosscount=1;
         
         } else {
         
@@ -920,17 +941,14 @@ bool  shape_character_def::point_test_local(float x, float y)
       
         // ==> curve case
         
-        float cross1, cross2;
-        int dir1, dir2;
-
-        int scount = curve_x_crossings(pen_x, pen_y, edg.m_ax, edg.m_ay,
+        crosscount = curve_x_crossings(pen_x, pen_y, edg.m_ax, edg.m_ay,
           edg.m_cx, edg.m_cy, y, cross1, cross2);
           
         dir1 = pen_y > y ? -1 : +1;
         dir2 = dir1 * (-1);     // second crossing always in opposite dir.
         
         /*
-        printf("  curve crosses at %d points\n", scount);
+        printf("  curve crosses at %d points\n", crosscount);
         
         if (scount>0)
           printf("    first  crossing at %.2f / %.2f, dir %d\n", cross1, y, dir1);
@@ -938,75 +956,40 @@ bool  shape_character_def::point_test_local(float x, float y)
         if (scount>1)
           printf("    second crossing at %.2f / %.2f, dir %d\n", cross2, y, dir2);
         */
-
-        // ignore crossings on the right side          
-        if ((scount>1) && (cross2 > x)) 
-          scount--;
-        
-        if ((scount>0) && (cross1 > x)) {
-          cross1 = cross2;
-          dir1 = dir2;
-          scount--;
-        }
-
-        if (scount==0)
-          continue;  // no crossing left
-          
-        // still two crossings? take the nearest
-        if (scount==2) {
-          if (cross2 > cross1) {
-            cross_x = cross2;
-            cross_dir = dir2;            
-          } else {
-            cross_x = cross1;
-            cross_dir = dir1;            
-          }
-        } else {
-          cross_x = cross1;
-          cross_dir = dir1;
-        }
-      
+     
       } // curve
       
       
       // ==> we have now:
-      //  - a valid cross_x
-      //  - cross_dir tells the direction of the crossing 
+      //  - one (cross1) or two (cross1, cross2) ray crossings (X coordinate)
+      //  - dir1/dir2 tells the direction of the crossing 
       //    (+1 = downward, -1 = upward)
+      //  - crosscount tells the number of crossings
       
-            
-      //printf(" found a crossing at %.2f / %.2f, dir %d\n", cross_x, y, cross_dir);
-        
-      // we only want crossings at the left of the hit test point
-      if (cross_x > x) 
-        continue;
-        
-      // we are looking for the crossing with the largest X coordinate,
-      // skip others
-      if (!first && (cross_x <= last_crossing))
-        continue;
-        
-      // ==> we found a valid crossing  
-        
-      last_crossing = cross_x;
-      first = false;          
-                            
-      // choose the appropriate fill style index (we need the one
-      // in direction to the hit test point)
-      if (cross_dir < 0)
-        fill = pth.m_fill1;   // upward -> right style
-      else
-        fill = pth.m_fill0;   // downward -> left style
-        
-      result = fill > 0; // current result until we find a better crossing
-        
+      
+      if (crosscount==0)
+        continue;  // need at least one crossing
+
+
+      // check first crossing      
+      if (cross1 <= x) {
+        if (pth.m_fill0 > 0) counter += dir1;
+        if (pth.m_fill1 > 0) counter -= dir1;
+      }
+      
+      // check optional second crossing (only possible with curves)
+      if ((crosscount>1) && (cross2 <= x)) {
+        if (pth.m_fill0 > 0) counter += dir2;
+        if (pth.m_fill1 > 0) counter -= dir2;
+      }             
       
     } // for edge   
   
   } // for path
   
 
-  return result;
+  return ( (even_odd && (counter % 2) != 0) || 
+           (!even_odd && (counter != 0)) );
 }
 
 

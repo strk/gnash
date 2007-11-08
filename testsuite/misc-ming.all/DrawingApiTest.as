@@ -17,7 +17,7 @@
 // 'h' toggles _visible
 //
 
-rcsid="$Id: DrawingApiTest.as,v 1.23 2007/11/07 16:15:17 strk Exp $";
+rcsid="$Id: DrawingApiTest.as,v 1.24 2007/11/08 17:16:13 udog Exp $";
 
 #include "../actionscript.all/check.as"
 
@@ -294,7 +294,7 @@ with(inv)
 	check(  inv3.hitTest((4*4), 100 + (10*4), false) );  // Outside the left autofill (but in the boundaries)
 
 	check(  inv3.hitTest((20*4), 100 + (18*4), true)  );  // Inside the right autofill
-	check( !inv3.hitTest((24*4), 100 + (10*4), true)  );  // Outside the right autofill (but in the boundaries)
+	check( !inv3.hitTest(92, 150, true)  );  // Outside the right autofill (but in the boundaries)
 	check(  inv3.hitTest((24*4), 100 + (10*4), false) );  // Outside the right autofill (but in the boundaries)
 
 	// Nested squares (inner is an hole)
@@ -331,7 +331,7 @@ with(inv)
 	check( inv4.hitTest(100 + (11*4), 100 + (19*4), true) );  // Lower-Left
 	check( inv4.hitTest(100 + (14*4), 100 + (19*4), true) );  // Lower-Center
 	check( inv4.hitTest(100 + (19*4), 100 + (19*4), true) );  // Lower-Right
-	xcheck( inv4.hitTest(100 + (19*4), 100 + (14*4), true) );  // Center-Right
+	check( inv4.hitTest(100 + (19*4), 100 + (14*4), true) );  // Center-Right
 	check( inv4.hitTest(100 + (19*4), 100 + (11*4), true) );  // Upper-Right
 	check( inv4.hitTest(100 + (14*4), 100 + (11*4), true) );  // Upper-Center
 
@@ -496,16 +496,16 @@ with(inv)
 	inv8.onRollOver = function() {};
 
 	check(  inv8.hitTest(200 + (15*2), 0 + (15*2), true) );  // Upper-Left
-	xcheck(  inv8.hitTest(200 + (25*2), 0 + (15*2), true) );  // Upper-Center
-	xcheck(  inv8.hitTest(200 + (35*2), 0 + (15*2), true) );  // Upper-Right
+	check(  inv8.hitTest(200 + (25*2), 0 + (15*2), true) );  // Upper-Center
+	check(  inv8.hitTest(200 + (35*2), 0 + (15*2), true) );  // Upper-Right
 
 	check( !inv8.hitTest(200 + (15*2), 0 + (25*2), true) );  // Center-Left
 	check( !inv8.hitTest(200 + (25*2), 0 + (25*2), true) );  // Center-Center
 	check(  inv8.hitTest(200 + (35*2), 0 + (25*2), true) );  // Center-Right
 
 	check( !inv8.hitTest(200 + (15*2), 0 + (35*2), true) );  // Lower-Left
-	xcheck(  inv8.hitTest(200 + (25*2), 0 + (35*2), true) );  // Lower-Center
-	xcheck(  inv8.hitTest(200 + (35*2), 0 + (35*2), true) );  // Lower-Right
+	check(  inv8.hitTest(200 + (25*2), 0 + (35*2), true) );  // Lower-Center
+	check(  inv8.hitTest(200 + (35*2), 0 + (35*2), true) );  // Lower-Right
 
 	check( !inv8.hitTest(200 + (20*2), 0 + (25*2), true) );  // On the 0-9 stroke, out of fill
 
