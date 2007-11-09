@@ -1,5 +1,7 @@
 2007-11-09 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/DrawingApiTest.as: add test that would have
+	  exposed the just-fixed silly bug.
 	* server/shape.cpp (withinSquareDistance): fixed silly bug checking
 	  for lines connecting origin with end of each edge rather then
 	  all edges. Prepared (but not implemented) section for curves.

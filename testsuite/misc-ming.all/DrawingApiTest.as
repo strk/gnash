@@ -17,7 +17,7 @@
 // 'h' toggles _visible
 //
 
-rcsid="$Id: DrawingApiTest.as,v 1.26 2007/11/08 20:01:57 strk Exp $";
+rcsid="$Id: DrawingApiTest.as,v 1.27 2007/11/09 21:36:05 strk Exp $";
 
 #include "../actionscript.all/check.as"
 
@@ -195,6 +195,37 @@ with (a)
 
 	bnd = printBounds(a.getBounds());
 	check_equals(bnd, "18,80 410,260"); // nothing new..
+
+	createEmptyMovieClip("zshape", 1);
+	with (zshape)
+	{
+		// The Z-shaped 3 edges stroke 
+		//
+		// 
+		//   0-----1--+
+		//            |
+		//            2
+		//            |
+		//            |
+		//            +--3----4
+		//
+		lineStyle(4, 0);
+		x = 223; y=145;
+		moveTo(x, y);
+		lineTo(x+20, y+0);
+		lineTo(x+20, y+20);
+		lineTo(x+50, y+20);
+	}
+	bnd = printBounds(zshape.getBounds());
+	check_equals(bnd, "219,141 277,169");
+	//                "223,145 273,165" + 4 for thickness
+	check_equals( typeof(zshape.hitTest), 'function' );
+	check( zshape.hitTest(223, 145, true) ); // 0
+	check( zshape.hitTest((223+10), (145+0), true) ); // 1
+	check( zshape.hitTest((223+20), (145+5), true) ); // 2
+	check( zshape.hitTest((223+25), (145+20), true) ); // 3
+	check( zshape.hitTest(273, 165, true) ); // 4
+
 }
 
 // Make the MovieClip "active" (grabbing mouse events)
