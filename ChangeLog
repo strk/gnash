@@ -1,5 +1,6 @@
 2007-11-09 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/samples/Makefile.am: don't giveup on failure
 	* testsuite/misc-ming.all/DrawingApiTest.as: add test that would have
 	  exposed the just-fixed silly bug.
 	* server/shape.cpp (withinSquareDistance): fixed silly bug checking
