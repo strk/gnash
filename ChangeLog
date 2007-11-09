@@ -1,5 +1,7 @@
 2007-11-09 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/registerClassTest2.c: 
+	  Document the test
 	* server/movie_root.cpp (dtor, clear): don't try to cleanup action queue
 	  twice..
 	* server/DynamicShape.h, server/parser/shape_character_def.h: 

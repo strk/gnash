@@ -20,8 +20,29 @@
 /*
  *  zou lunkai,  zoulunkai@gmail.com
  *  
- *  Testcase for Object.registerClass().
+ *  Testcases for Object.registerClass().
  *
+ *  -=[ CASE1 ]=- 
+ *
+ *    (1) Export 'libItem1' and 'libItem2' symbols
+ *    (2) DOACTION block
+ *      (2.1) Register 'theClass1' and 'theClass2' to the symbols above
+ *      (2.2) Attach the symbols as instances 'clip1' and 'clip2'
+ *    (3) Other DOACTION blocks 
+ *      (3.1) Verify that 'clip1' and 'clip2' are instances of 'theClass1' and 'theClass2' respectively
+ *
+ *
+ *  -=[ CASE2 ]=-
+ *
+ *    (1) Export 'libItem3'
+ *    (2) INITACTION block
+ *      (2.1) Register 'theClass3' to 'libItem3'
+ *      (2.2) Attach 'libItem3' as instance 'clip3'
+ *      (2.3) Verify that 'clip3' is an instance of 'theClass3'
+ *    (3) INITCLIP event for 'clip3'
+ *      (3.1) Verify thet 'clip3' is an instance of 'theClass3'
+ *    (4) CONSTRUCT event for 'clip3'
+ *      (4.1) Verify thet 'clip3' is an instance of 'theClass3'
  */
 
 #include <stdlib.h>
@@ -130,7 +151,7 @@ main(int argc, char** argv)
   SWFMovieClip_add(mc3, (SWFBlock)sh3);
   SWFMovieClip_nextFrame(mc3);
   
-  // Exprot mc3
+  // Export mc3
   addExport(mo, mc3, "libItem3");  
   
   it3 = SWFMovie_add(mo, mc3);
