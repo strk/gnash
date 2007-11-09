@@ -17,7 +17,7 @@
 // 'h' toggles _visible
 //
 
-rcsid="$Id: DrawingApiTest.as,v 1.27 2007/11/09 21:36:05 strk Exp $";
+rcsid="$Id: DrawingApiTest.as,v 1.28 2007/11/09 23:20:22 strk Exp $";
 
 #include "../actionscript.all/check.as"
 
@@ -354,7 +354,7 @@ with(inv)
 
 	// check that a point inside the hole doesn't hit the shape
 	// (gnash fails due to bogus point_test, or missing normalization)
-	xcheck( ! inv4.hitTest(100 + (15*4), 100 + (15*4), true) ); 
+	check( ! inv4.hitTest(100 + (15*4), 100 + (15*4), true) ); 
 
 	// while a points on the border do hit it
 	check( inv4.hitTest(100 + (11*4), 100 + (11*4), true) );  // Upper-Left
@@ -393,7 +393,7 @@ with(inv)
 
 	// check that a point inside the hole doesn't hit the shape
 	// (gnash fails due to bogus point_test, or missing normalization)
-	xcheck( ! inv5.hitTest(150 + (15*4), 100 + (15*4), true) ); 
+	check( ! inv5.hitTest(150 + (15*4), 100 + (15*4), true) ); 
 
 	// while a points on the border do hit it
 	check( inv5.hitTest(150 + (11*4), 100 + (11*4), true) );  // Upper-Left
