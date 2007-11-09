@@ -370,17 +370,30 @@ path::withinSquareDistance(const point& p, float dist) const
 
 	if ( ! nedges ) return false;
 
-	// TODO: FIXME: we're not considering the control
-	//       point at all so the check will only work
-	//       for straight lines
-
 	point px(m_ax, m_ay);
 	for (size_t i=0; i<nedges; ++i)
 	{
 		const edge& e = m_edges[i];
 		point np(e.m_ax, e.m_ay);
-		float d = edge::squareDistancePtSeg(p, px, np);
-		if ( d < dist ) return true;
+
+		if ( e.is_straight() )
+		{
+			float d = edge::squareDistancePtSeg(p, px, np);
+			if ( d < dist ) return true;
+		}
+		else
+		{
+
+			// TODO: FIXME: we're not considering the control
+			//       point at all so the check will only work
+			//       for straight lines
+			// TODO: for curves...
+			// d(t)=(x(t)-a)^2+(y(t)-b)^2,
+			float d = edge::squareDistancePtSeg(p, px, np);
+			if ( d < dist ) return true;
+		}
+
+		px = np;
 	}
 
 	return false;
