@@ -1,5 +1,14 @@
 2007-11-09 Sandro Santilli <strk@keybit.net>
 
+	* server/character.{cpp,h}: Add level argument to queueEvent method
+	* server/movie_root.{cpp,h}: Add level argument to pushAction*
+	* server/sprite_instance.cpp: Push actions with a level
+	* testsuite/misc-ming.all/action_execution_order_test5.c: one XPASS
+	* testsuite/misc-ming.all/displaylist_depths_test2.c: minor additional
+	  trace
+
+2007-11-09 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/registerClassTest2.c: 
 	  Document the test
 	* server/movie_root.cpp (dtor, clear): don't try to cleanup action queue

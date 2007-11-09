@@ -178,6 +178,8 @@ main(int argc, char** argv)
 		// this repopulates depth -16381 with a *new* instance 
 		"gotoAndStop(4);"
 
+		"note('right after gotoAndStop()');"
+
 		// static3 doesn't refer to the dynamic object anymore !
 		"check_equals(typeof(static3.myThing), 'undefined');"
 

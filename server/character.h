@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.106 2007/11/01 21:54:45 strk Exp $ */
+/* $Id: character.h,v 1.107 2007/11/09 19:58:02 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -966,7 +966,7 @@ public:
 	/// on_event(id) will be called by execution of the queued
 	/// action
 	///
-	void queueEvent(const event_id& id);
+	void queueEvent(const event_id& id, int lvl);
 
 	/// Return true if an handler for the given event is defined
 	//

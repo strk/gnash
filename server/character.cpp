@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.61 2007/11/06 15:44:27 udog Exp $ */
+/* $Id: character.cpp,v 1.62 2007/11/09 19:58:02 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -645,7 +645,7 @@ character::unload()
 	//log_msg(_("Queuing unload event for character %p"), this);
 	//on_event(event_id::UNLOAD);
 	//bool hasEvent = queueEventHandler(event_id::UNLOAD);
-	queueEvent(event_id::UNLOAD);
+	queueEvent(event_id::UNLOAD, movie_root::apDOACTION);
 	bool hasEvent = hasEventHandler(event_id::UNLOAD);
 
 	_unloaded = true;
@@ -654,12 +654,12 @@ character::unload()
 }
 
 void
-character::queueEvent(const event_id& id)
+character::queueEvent(const event_id& id, int lvl)
 {
 
 	movie_root& root = _vm.getRoot();
 	std::auto_ptr<ExecutableCode> event(new QueuedEvent(boost::intrusive_ptr<character>(this), id));
-	root.pushAction(event);
+	root.pushAction(event, lvl);
 }
 
 bool

@@ -45,6 +45,8 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/bind.hpp>
 
+//#define GNASH_DEBUG 1
+
 using namespace std;
 
 namespace gnash
@@ -85,7 +87,8 @@ movie_root::movie_root()
 	m_drag_state(),
 	_allowRescale(true),
 	_invalidated(true),
-	_disableScripts(false)
+	_disableScripts(false),
+	_processingActionLevel(movie_root::apSIZE)
 {
 }
 
@@ -105,13 +108,17 @@ movie_root::disableScripts()
 void
 movie_root::clearActionQueue()
 {
-	for (ActionQueue::iterator it=_actionQueue.begin(),
-			itE=_actionQueue.end();
-			it != itE; ++it)
-	{
-		delete *it;
-	}
-	_actionQueue.clear();
+    for (int lvl=0; lvl<apSIZE; ++lvl)
+    {
+        ActionQueue& q = _actionQueue[lvl];
+	    for (ActionQueue::iterator it=q.begin(),
+	    		itE=q.end();
+	    		it != itE; ++it)
+	    {
+	    	delete *it;
+	    }
+	    q.clear();
+    }
 }
 
 movie_root::~movie_root()
@@ -1175,17 +1182,69 @@ movie_root::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 	}
 }
 
-void
-movie_root::processActionQueue()
+int
+movie_root::minPopulatedPriorityQueue() const
 {
+	for (int l=0; l<apSIZE; ++l)
+	{
+		if ( ! _actionQueue[l].empty() ) return l;
+	}
+	return apSIZE;
+}
+
+int
+movie_root::processActionQueue(int lvl)
+{
+	ActionQueue& q = _actionQueue[lvl];
+
+	assert( minPopulatedPriorityQueue() == lvl );
 
 #ifdef GNASH_DEBUG
 	static unsigned calls=0;
 	++calls;
-	bool actionsToProcess = !_actionQueue.empty();
-	if ( actionsToProcess ) log_msg(" Processing action queue (call %u)", calls);
+	bool actionsToProcess = !q.empty();
+	if ( actionsToProcess )
+	{
+		log_debug(" Processing %d actions in priority queue %d (call %u)", q.size(), lvl, calls);
+	}
 #endif
 
+	// _actionQueue may be changed due to actions (appended-to)
+	// this loop might be optimized by using an iterator
+	// and a final call to .clear() 
+	while ( ! q.empty() )
+	{
+		ExecutableCode* code = q.front();
+		code->execute();
+		q.pop_front(); 
+		delete code;
+
+		int minLevel = minPopulatedPriorityQueue();
+		if ( minLevel < lvl )
+		{
+#ifdef GNASH_DEBUG
+			log_debug(" Actions pushed in priority %d (< %d), restarting the scan (call %u)", minLevel, lvl, calls);
+#endif
+			return minLevel;
+		}
+	}
+
+	assert(q.empty());
+
+#ifdef GNASH_DEBUG
+	if ( actionsToProcess )
+	{
+		log_debug(" Done processing actions in priority queue %d (call %u)", lvl, calls);
+	}
+#endif
+
+	return minPopulatedPriorityQueue();
+
+}
+
+void
+movie_root::processActionQueue()
+{
 	if ( _disableScripts )
 	{
 		//log_debug(_("Scripts are disabled, global instance list has %d elements"), _liveChars.size());
@@ -1194,46 +1253,69 @@ movie_root::processActionQueue()
 		return;
 	}
 
-	// _actionQueue may be changed due to actions (appended-to)
-	// this loop might be optimized by using an iterator
-	// and a final call to .clear() 
-	while ( ! _actionQueue.empty() )
+	_processingActionLevel=minPopulatedPriorityQueue();
+	while ( _processingActionLevel<apSIZE )
 	{
-		ExecutableCode* code = _actionQueue.front();
-		code->execute();
-		_actionQueue.pop_front(); 
-		delete code;
+		_processingActionLevel = processActionQueue(_processingActionLevel);
 	}
 
-	assert(_actionQueue.empty());
-
-#ifdef GNASH_DEBUG
-	if ( actionsToProcess ) log_msg(" Done processing action queue (call %u)", calls);
-#endif
 }
 
 void
-movie_root::pushAction(std::auto_ptr<ExecutableCode> code)
+movie_root::pushAction(std::auto_ptr<ExecutableCode> code, int lvl)
 {
-	_actionQueue.push_back(code.release());
+	assert(lvl >= 0 && lvl < apSIZE);
+
+	// Immediately execute code targetted at a lower level while processing
+	// an higher level.
+	if ( _processingActionLevel < apSIZE && lvl < _processingActionLevel )
+	{
+		code->execute();
+		return;
+	}
+
+	_actionQueue[lvl].push_back(code.release());
 }
 
 void
-movie_root::pushAction(const action_buffer& buf, boost::intrusive_ptr<character> target)
+movie_root::pushAction(const action_buffer& buf, boost::intrusive_ptr<character> target, int lvl)
 {
+	assert(lvl >= 0 && lvl < apSIZE);
 #ifdef GNASH_DEBUG
 	log_msg("Pushed action buffer for target %s", target->getTargetPath().c_str());
 #endif
-	_actionQueue.push_back(new GlobalCode(buf, target));
+
+	std::auto_ptr<ExecutableCode> code ( new GlobalCode(buf, target) );
+
+	// Immediately execute code targetted at a lower level while processing
+	// an higher level.
+	if ( _processingActionLevel < apSIZE && lvl < _processingActionLevel )
+	{
+		code->execute();
+		return;
+	}
+
+	_actionQueue[lvl].push_back(code.release());
 }
 
 void
-movie_root::pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_ptr<character> target)
+movie_root::pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_ptr<character> target, int lvl)
 {
+	assert(lvl >= 0 && lvl < apSIZE);
 #ifdef GNASH_DEBUG
 	log_msg("Pushed function (event hanlder?) with target %s", target->getTargetPath().c_str());
 #endif
-	_actionQueue.push_back(new FunctionCode(func, target));
+
+	std::auto_ptr<ExecutableCode> code ( new FunctionCode(func, target) );
+
+	// Immediately execute code targetted at a lower level while processing
+	// an higher level.
+	if ( _processingActionLevel < apSIZE && lvl < _processingActionLevel )
+	{
+		code->execute();
+		return;
+	}
+	_actionQueue[lvl].push_back(code.release());
 }
 
 /* private */
@@ -1299,11 +1381,15 @@ movie_root::markReachableResources() const
 	}
 
 	// Mark resources reachable by queued action code
-	for (ActionQueue::const_iterator i=_actionQueue.begin(), e=_actionQueue.end();
-			i != e; ++i)
-	{
-		(*i)->markReachableResources();
-	}
+    for (int lvl=0; lvl<apSIZE; ++lvl)
+    {
+        const ActionQueue& q = _actionQueue[lvl];
+    	for (ActionQueue::const_iterator i=q.begin(), e=q.end();
+    			i != e; ++i)
+    	{
+    		(*i)->markReachableResources();
+    	}
+    }
 
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
 	// Mark key listeners

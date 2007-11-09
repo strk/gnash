@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.85 2007/11/01 21:54:45 strk Exp $ */
+/* $Id: movie_root.h,v 1.86 2007/11/09 19:58:03 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -536,14 +536,34 @@ public:
 
     bool testInvariant() const;
 
-    /// Push an executable code to the ActionQueue
-    void pushAction(std::auto_ptr<ExecutableCode> code);
+    /// Action priority levels
+    enum ActionPriorityLevel {
+
+        /// Init actions, Init event handlers
+        apINIT=0,
+
+        /// Construct event handlers
+        apCONSTRUCT=1,
+
+        /// EnterFrame event handlers
+        apENTERFRAME=2,
+
+        /// Frame actions, load handlers, unload handlers
+        apDOACTION=3,
+
+        /// Last element used to easy computation of size...
+        apSIZE
+        
+    };
 
     /// Push an executable code to the ActionQueue
-    void pushAction(const action_buffer& buf, boost::intrusive_ptr<character> target);
+    void pushAction(std::auto_ptr<ExecutableCode> code, int lvl=apDOACTION);
+
+    /// Push an executable code to the ActionQueue
+    void pushAction(const action_buffer& buf, boost::intrusive_ptr<character> target, int lvl=apDOACTION);
 
     /// Push a function code to the ActionQueue
-    void pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_ptr<character> target);
+    void pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_ptr<character> target, int lvl=apDOACTION);
 
 #ifdef GNASH_USE_GC
     /// Mark all reachable resources (for GC)
@@ -653,7 +673,7 @@ private:
 
     typedef std::list<ExecutableCode*> ActionQueue;
 
-    ActionQueue _actionQueue;
+    ActionQueue _actionQueue[apSIZE];
 
     /// Process all actions in the queue
     void processActionQueue();
@@ -806,6 +826,19 @@ private:
     /// This is set to true if execution of scripts
     /// aborted due to action limit set or whatever else
     bool _disableScripts;
+
+    /// Return the priority level of first action queue containing actions.
+    //
+    /// Scanned in proprity order (lower first)
+    ///
+    int minPopulatedPriorityQueue() const;
+
+    /// Process all actions in the the given queue, till more actions
+    /// are found in lower levels, in which case we have an earlier
+    /// return.
+    int processActionQueue(int lvl);
+
+    int _processingActionLevel;
 };
 
 

@@ -2148,6 +2148,14 @@ sprite_instance::on_event(const event_id& id)
 		return false;
 	}
 
+#if 0
+	if ( id.m_id == event_id::INITIALIZE )
+	{
+		// Construct as ActionScript object.
+		constructAsScriptObject();
+	}
+#endif
+
 	if ( id.is_button_event() && ! isEnabled() )
 	{
 #ifdef GNASH_DEBUG
@@ -2339,7 +2347,9 @@ void sprite_instance::advance_sprite(float /*delta_time*/)
 		frame_count);
 #endif
 
-	queueEvent(event_id::ENTER_FRAME);
+	// I'm not sure ENTERFRAME goes in a different queue then DOACTION...
+	queueEvent(event_id::ENTER_FRAME, movie_root::apDOACTION);
+	//queueEvent(event_id::ENTER_FRAME, movie_root::apENTERFRAME);
 
 	// Update current and next frames.
 	if (m_play_state == PLAY)
@@ -3363,7 +3373,19 @@ sprite_instance::stagePlacementCallback()
 	// We *might* avoid this, but better safe then sorry
 	m_def->ensure_frame_loaded(0);
 
-	on_event(event_id::INITIALIZE);
+	constructAsScriptObject();
+	// TODO: should we execute these immediately if jumping
+	//       due to a gotoFrame ?
+	if ( isDynamic() )
+	{
+		on_event(event_id::INITIALIZE);
+		on_event(event_id::CONSTRUCT);
+	}
+	else
+	{
+		queueEvent(event_id::INITIALIZE, movie_root::apINIT);
+		queueEvent(event_id::CONSTRUCT, movie_root::apCONSTRUCT);
+	}
 
 	// Now execute frame tags and take care of queuing the LOAD event.
 	//
@@ -3384,7 +3406,7 @@ sprite_instance::stagePlacementCallback()
 #ifdef GNASH_DEBUG
 		log_debug(_("Queuing ONLOAD event for sprite %s"), getTarget().c_str());
 #endif
-		queueEvent(event_id::LOAD);
+		queueEvent(event_id::LOAD, movie_root::apDOACTION);
 
 	}
 	else
@@ -3393,7 +3415,7 @@ sprite_instance::stagePlacementCallback()
 #ifdef GNASH_DEBUG
 		log_debug(_("Queuing ONLOAD event for sprite %s"), getTarget().c_str());
 #endif
-		queueEvent(event_id::LOAD);
+		queueEvent(event_id::LOAD, movie_root::apDOACTION);
 
 #ifdef GNASH_DEBUG
 		log_debug(_("Executing tags of frame0 in sprite %s"), getTarget().c_str());
@@ -3401,9 +3423,6 @@ sprite_instance::stagePlacementCallback()
 		execute_frame_tags(0, TAG_DLIST|TAG_ACTION);
 	}
 
-
-	// Construct as ActionScript object.
-	constructAsScriptObject();
 }
 
 /*private*/
@@ -3430,7 +3449,7 @@ sprite_instance::constructAsScriptObject()
 		}
 
 		as_function* ctor = def->getRegisteredClass();
-		//log_msg(_("Attached sprite's registered class is %p"), (void*)ctor); 
+		log_msg(_("Attached sprite's registered for %s class is %p"), getTarget().c_str(), (void*)ctor); 
 
 		// TODO: builtin constructors are different from user-defined ones
 		// we should likely change that. See also vm/ASHandlers.cpp (construct_object)
@@ -3463,15 +3482,6 @@ sprite_instance::constructAsScriptObject()
 			}
 		}
 	} while (0);
-
-	// Execute CONSTRUCT event 
-	on_event(event_id::CONSTRUCT);
-	if (isUnloaded())
-	{
-		log_debug("%s construct event handler unloaded self", getTarget().c_str());
-		// TODO: check if we should still execute frame tags (dlist ones in particular)
-		return;
-	}
 
 }
 

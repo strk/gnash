@@ -188,7 +188,7 @@ main(int argc, char** argv)
                          " _root.check_equals(this._parent.__proto__, MovieClip.prototype);"
                          " _root.check_equals(this._parent.mc11.__proto__, MovieClip.prototype);"
                          // test child __proto__
-                         " _root.xcheck_equals(this.mc121.__proto__, MovieClip.prototype);"),
+                         " _root.check_equals(this.mc121.__proto__, MovieClip.prototype);"),
     SWFACTION_INIT);
 
   SWFDisplayItem_addAction(it12, // the inner most child
