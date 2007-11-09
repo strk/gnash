@@ -118,13 +118,6 @@ movie_root::~movie_root()
 {
 	clearActionQueue();
 
-	for (ActionQueue::iterator it=_actionQueue.begin(),
-			itE=_actionQueue.end();
-			it != itE; ++it)
-	{
-		delete *it;
-	}
-
 	for (TimerMap::iterator it=_intervalTimers.begin(),
 			itE=_intervalTimers.end();
 			it != itE; ++it)

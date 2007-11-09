@@ -1,5 +1,7 @@
 2007-11-09 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.cpp (dtor): don't try to cleanup action queue
+	  twice..
 	* server/DynamicShape.h, server/parser/shape_character_def.h: 
 	  override point_test_local in DynamicShape to finalize
 	  the drawing (bogus, contains comment for the why and how to fix)
