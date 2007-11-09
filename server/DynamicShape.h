@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: DynamicShape.h,v 1.6 2007/11/07 12:08:16 strk Exp $ */
+/* $Id: DynamicShape.h,v 1.7 2007/11/09 09:31:22 strk Exp $ */
 
 #ifndef GNASH_DYNAMIC_SHAPE_H
 #define GNASH_DYNAMIC_SHAPE_H
@@ -85,6 +85,29 @@ public:
 	///	reference it in gnash::path instances.
 	///
 	size_t add_line_style(const line_style& stl);
+
+	// Override from shape_character_def to call ::finalize
+	// NOTE: this is not correct in that a call to hitTest should
+	//       not force closing the path being drawn.
+	//       Instead, the closeup should be "temporary" and int
+	//       the point_test_local itself (but only for dynamic drawing).
+	//       We need to add a testcase for this as we currently have none.
+	//       The testcase would look like this:
+	//
+	//       moveTo(0, 0); lineTo(10, 0); lineTo(10, 10); // an L shape so far
+	//       hitTest(8, 2, true); !hitTest(2, 8, true); // imaginarly forming a closed triangle as hitTest is concerned
+	//       lineTo(0, 10); lineTo(0, 0); // explicitly closed as a square now
+	//       hitTest(8, 2, true); hitTest(2, 8, true); // effectively forming a closed square
+	//
+	//       In the test above, permanently closing on hit-test (what this implementation does)
+	//       would result in a triangle and a stroke, which should fail the last hitTest(2,8).
+	//
+	//
+	bool point_test_local(float x, float y)
+	{
+		finalize();
+		return shape_character_def::point_test_local(x, y);
+	}
 
 	/// Add a path, updating _currpath and recomputing bounds
 	//
