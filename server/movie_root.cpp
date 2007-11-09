@@ -233,7 +233,7 @@ movie_root::clear()
 	_liveChars.clear();
 
 	// wipe out queued actions
-	_actionQueue.clear();
+	clearActionQueue();
 
 	// wipe out all levels
 	_movies.clear();
