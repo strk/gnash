@@ -3449,7 +3449,7 @@ sprite_instance::constructAsScriptObject()
 		}
 
 		as_function* ctor = def->getRegisteredClass();
-		log_msg(_("Attached sprite's registered for %s class is %p"), getTarget().c_str(), (void*)ctor); 
+		//log_msg(_("Attached sprite's registered for %s class is %p"), getTarget().c_str(), (void*)ctor); 
 
 		// TODO: builtin constructors are different from user-defined ones
 		// we should likely change that. See also vm/ASHandlers.cpp (construct_object)
