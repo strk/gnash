@@ -1,5 +1,17 @@
 2007-11-10 Sandro Santilli <strk@keybit.net>
 
+	* server/shape.{cpp,h}: add new poinOnCurve and squareDistancePtCurve
+	  static methods for gnash::edge, have path::withinSquareDistance
+	  use them for curves.
+	* testsuite/misc-ming.all/DrawingApiTest.as: add self-contained
+	  equivalent test for the previously failing one checking hitTest
+	  on the green curve.
+	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: success in
+	  green curve hit test.
+	* testsuite/server/EdgeTest.cpp: test edge poinOnCurve.
+
+2007-11-10 Sandro Santilli <strk@keybit.net>
+
 	* backend/render_handler_agg.cpp, backend/render_handler_cairo.cpp,
 	  backend/render_handler_ogl.cpp, server/shape.cpp, server/shape.h,
 	  server/parser/morph2_character_def.cpp,

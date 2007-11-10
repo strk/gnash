@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.h,v 1.31 2007/11/10 14:39:52 strk Exp $ */
+/* $Id: shape.h,v 1.32 2007/11/10 18:07:14 strk Exp $ */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
@@ -65,6 +65,30 @@ namespace gnash {
 
 		/// Return distance between point pt and segment A-B
 		static float distancePtSeg(const point& pt, const point& A, const point& B);
+
+		/// Find point of the quadratic curve defined by points A,C,B
+		//
+		/// @param A The first point
+		/// @param C The second point (control point)
+		/// @param B The third point (anchor point)
+		/// @param ret The point to write result into
+		/// @param t the step factor between 0 and 1
+		///
+		static point pointOnCurve(const point& A, const point& C, const point& B, float t);
+
+		/// Return square distance between point pt and the point on curve found by
+		/// applying the T parameter to the quadratic bezier curve function
+		//
+		/// @param A The first point of the bezier curve
+		/// @param C The second point of the bezier curve (control point)
+		/// @param B The third point of the bezier curve (anchor point)
+		/// @param p The point we want to compute distance from 
+		/// @param t the step factor between 0 and 1
+		///
+		static float squareDistancePtCurve(const point& A, const point& C, const point& B, const point& p, float t)
+		{
+			return p.squareDistance( pointOnCurve(A, C, B, t) );
+		}
 		
 	//private:
 		// *quadratic* bezier: point = p0 * t^2 + p1 * 2t(1-t) + p2 * (1-t)^2

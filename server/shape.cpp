@@ -28,6 +28,10 @@
 #include <cfloat>
 #include <map>
 
+#ifdef DEBUG_POINT_ON_CURVE
+# include <sstream>
+#endif
+
 
 namespace gnash {
 
@@ -45,7 +49,7 @@ tesselating_shape::~tesselating_shape()
 void	edge::tesselate_curve() const
     // Send this segment to the tesselator.
 {
-	if ( is_straight() )
+	if ( isStraight() )
 	{
 		//log_msg("is straight!!");
 		tesselate::add_line_segment(ap.x, ap.y);
@@ -54,6 +58,28 @@ void	edge::tesselate_curve() const
 	{
 		tesselate::add_curve_segment(cp.x, cp.y, ap.x, ap.y);
 	}
+}
+
+/* public static */
+point
+edge::pointOnCurve(const point& A, const point& C, const point& B, float t)
+{
+	// See http://en.wikipedia.org/wiki/B%C3%A9zier_curve#Quadratic_B.C3.A9zier_curves
+
+	point Q1(A, C, t);
+	point Q2(C, B, t);
+	point R = point(Q1, Q2, t);
+
+#ifdef DEBUG_POINT_ON_CURVE
+	std::stringstream ss;
+	ss <<  "A:" << A << " C:" << C << " B:" << B
+		<< " T:" << t
+		<< " Q1:" << Q1 << " Q2:" << Q2
+		<< " R:" << R;
+	log_debug("%s", ss.str().c_str());
+#endif
+
+	return R;
 }
 
 float
@@ -192,7 +218,7 @@ path::ray_crossing(int& ray_crossings, float x, float y) const
 	float x1 = e.ap.x;
 	float y1 = e.ap.y;
 	
-	if (e.is_straight()) {
+	if (e.isStraight()) {
 	    // Straight-line case.
 	    
 	    // See if (x0,y0)-(x1,y1) crosses (x,y)-(infinity,y)
@@ -357,21 +383,57 @@ path::withinSquareDistance(const point& p, float dist) const
 		const edge& e = m_edges[i];
 		point np(e.ap.x, e.ap.y);
 
-		if ( e.is_straight() )
+		if ( e.isStraight() )
 		{
 			float d = edge::squareDistancePtSeg(p, px, np);
 			if ( d < dist ) return true;
 		}
 		else
 		{
+			// It's a curve !
 
-			// TODO: FIXME: we're not considering the control
-			//       point at all so the check will only work
-			//       for straight lines
-			// TODO: for curves...
-			// d(t)=(x(t)-a)^2+(y(t)-b)^2,
-			float d = edge::squareDistancePtSeg(p, px, np);
-			if ( d < dist ) return true;
+			const point& A = px;
+			const point& C = e.cp;
+			const point& B = e.ap;
+
+			// TODO: early break if point is NOT in the area
+			//       defined by the triangle ACB and it's square 
+			//       distance from it is > then the requested one
+
+			// Brute force, try 100 times or give up
+			//
+			// TODO: use a binary search like thing, in where
+			//       we try to find the 't' value taking the average
+			//       between the 2 best 't' values found so far
+			//       (best is the ones giving closer distance)
+			//
+			float minDist = std::numeric_limits<float>::max();
+			bool gettingCloser = false;
+			int attempts = 100; 
+			int i=0;
+			for (; i<=attempts; ++i)
+			{
+				float t = (float)i/attempts;
+				float d = edge::squareDistancePtCurve(A, C, B, p, t);
+				//log_debug("Factor %26.26g, distance %g (asked %g)", t, sqrt(d), sqrt(dist));
+				if ( d <= dist ) return true;
+
+				if ( ! i ) minDist = d;
+				else if ( d < minDist )
+				{
+					minDist = d;
+					gettingCloser = true;
+				}
+				else if ( d > minDist )
+				{
+					if ( gettingCloser )
+					{
+						// we were getting closer before...
+						break;
+					}
+				}
+			}
+			// log_debug("Gave up at attempt %d", i);
 		}
 
 		px = np;

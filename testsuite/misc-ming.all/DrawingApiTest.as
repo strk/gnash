@@ -17,7 +17,7 @@
 // 'h' toggles _visible
 //
 
-rcsid="$Id: DrawingApiTest.as,v 1.28 2007/11/09 23:20:22 strk Exp $";
+rcsid="$Id: DrawingApiTest.as,v 1.29 2007/11/10 18:07:14 strk Exp $";
 
 #include "../actionscript.all/check.as"
 
@@ -120,6 +120,8 @@ with (a)
 	// The green curve
 	lineStyle(8, 0x00FF00, 100);
 	curveTo(400, 120, 300, 100);
+	check( ! hitTest(376, 180, true) ); 
+	check( hitTest(376, 139, true) );
 
 	bnd = printBounds(a.getBounds());
 	check_equals(bnd, "80,80 410,260"); // the curve is all inside the current bounds
