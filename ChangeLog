@@ -1,5 +1,9 @@
 2007-11-10 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: properly quote test arguments.
+
+2007-11-10 Sandro Santilli <strk@keybit.net>
+
 	* (lots of files): typedefed gnash::point to Point2d<float>,
 	  drop some unused functions and cleaned up headers a bit.
 
