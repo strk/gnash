@@ -42,30 +42,17 @@ tesselating_shape::~tesselating_shape()
 // edge
 //
 
-edge::edge()
-    :
-    m_cx(0), m_cy(0),
-    m_ax(0), m_ay(0)
-{}
-
-edge::edge(float cx, float cy, float ax, float ay)
-    :
-    m_cx(cx), m_cy(cy),
-    m_ax(ax), m_ay(ay)
-{
-}
-
 void	edge::tesselate_curve() const
     // Send this segment to the tesselator.
 {
 	if ( is_straight() )
 	{
 		//log_msg("is straight!!");
-		tesselate::add_line_segment(m_ax, m_ay);
+		tesselate::add_line_segment(ap.x, ap.y);
 	}
 	else
 	{
-		tesselate::add_curve_segment(m_cx, m_cy, m_ax, m_ay);
+		tesselate::add_curve_segment(cp.x, cp.y, ap.x, ap.y);
 	}
 }
 
@@ -112,12 +99,6 @@ edge::squareDistancePtSeg(const point& p, const point& A, const point& B)
 }
 
 
-DSOEXPORT bool edge::is_straight() const
-{
-    return m_cx == m_ax && m_cy == m_ay;
-}
-
-
 //
 // path
 //
@@ -141,8 +122,8 @@ path::path(float ax, float ay, int fill0, int fill1, int line, bool newShape)
 void	path::reset(float ax, float ay, int fill0, int fill1, int line)
     // Reset all our members to the given values, and clear our edge list.
 {
-    m_ax = ax;
-    m_ay = ay;
+    ap.x = ax;
+    ap.y = ay;
     m_fill0 = fill0;
     m_fill1 = fill1;
     m_line = line;
@@ -174,21 +155,21 @@ path::expandBounds(rect& r, unsigned int thickness) const
 		// bounds using the drawing API.                        
 		float radius = thickness;
 
-		r.expand_to_circle(m_ax, m_ay, radius);
+		r.expand_to_circle(ap.x, ap.y, radius);
 		for (unsigned int j = 0; j<nedges; j++)
 		{
-			r.expand_to_circle(m_edges[j].m_ax, m_edges[j].m_ay, radius);
-			r.expand_to_circle(m_edges[j].m_cx, m_edges[j].m_cy, radius);
+			r.expand_to_circle(m_edges[j].ap.x, m_edges[j].ap.y, radius);
+			r.expand_to_circle(m_edges[j].cp.x, m_edges[j].cp.y, radius);
 		}
 
 		return;
 	}
 
-	r.expand_to_point(m_ax, m_ay);
+	r.expand_to_point(ap.x, ap.y);
 	for (unsigned int j = 0; j<nedges; j++)
 	{
-		r.expand_to_point(m_edges[j].m_ax, p.m_edges[j].m_ay);
-                r.expand_to_point(m_edges[j].m_cx, p.m_edges[j].m_cy);
+		r.expand_to_point(m_edges[j].ap.x, p.m_edges[j].ap.y);
+                r.expand_to_point(m_edges[j].cp.x, p.m_edges[j].cp.y);
 	}
 }
 
@@ -202,14 +183,14 @@ path::ray_crossing(int& ray_crossings, float x, float y) const
     // of crossings means the point is outside; an odd
     // number means it's inside.
 
-    float x0 = m_ax;
-    float y0 = m_ay;
+    float x0 = ap.x;
+    float y0 = ap.y;
 
     for (int i = 0, n = m_edges.size(); i < n; i++) {
 	const edge& e = m_edges[i];
 	
-	float x1 = e.m_ax;
-	float y1 = e.m_ay;
+	float x1 = e.ap.x;
+	float y1 = e.ap.y;
 	
 	if (e.is_straight()) {
 	    // Straight-line case.
@@ -246,8 +227,8 @@ path::ray_crossing(int& ray_crossings, float x, float y) const
 	    }
 	} else {
 	    // Curve case.
-	    float cx = e.m_cx;
-	    float cy = e.m_cy;
+	    float cx = e.cp.x;
+	    float cy = e.cp.y;
 
 	    // Find whether & where the curve crosses y
 	    if ((y0 < y && y1 < y && cy < y)
@@ -329,7 +310,7 @@ void	path::tesselate() const
 	m_fill0 - 1,
 	m_fill1 - 1,
 	m_line - 1,
-	m_ax, m_ay);
+	ap.x, ap.y);
     for (unsigned int i = 0; i < m_edges.size(); i++) {
 	m_edges[i].tesselate_curve();
     }
@@ -356,9 +337,9 @@ path::close()
 
 	// Close it with a straight edge if needed
 	const edge& lastedge = m_edges.back();
-	if ( lastedge.m_ax != m_ax || lastedge.m_ay != m_ay )
+	if ( lastedge.ap.x != ap.x || lastedge.ap.y != ap.y )
 	{
-		edge newedge(m_ax, m_ay, m_ax, m_ay);
+		edge newedge(ap.x, ap.y, ap.x, ap.y);
 		m_edges.push_back(newedge);
 	}
 }
@@ -370,11 +351,11 @@ path::withinSquareDistance(const point& p, float dist) const
 
 	if ( ! nedges ) return false;
 
-	point px(m_ax, m_ay);
+	point px(ap.x, ap.y);
 	for (size_t i=0; i<nedges; ++i)
 	{
 		const edge& e = m_edges[i];
-		point np(e.m_ax, e.m_ay);
+		point np(e.ap.x, e.ap.y);
 
 		if ( e.is_straight() )
 		{

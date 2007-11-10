@@ -425,17 +425,17 @@ public:
 
   void add_path(cairo_t* cr, const path& cur_path)
   {  
-    cairo_move_to(cr, cur_path.m_ax, cur_path.m_ay);
+    cairo_move_to(cr, cur_path.ap.x, cur_path.ap.y);
     
-    float prev_x = cur_path.m_ax,
-          prev_y = cur_path.m_ay;
+    float prev_x = cur_path.ap.x,
+          prev_y = cur_path.ap.y;
     
     for (std::vector<edge>::const_iterator it = cur_path.m_edges.begin(),
          end = cur_path.m_edges.end(); it != end; ++it) {
       const edge& cur_edge = *it;
       
       if (cur_edge.is_straight()) {
-        cairo_line_to(cr, cur_edge.m_ax, cur_edge.m_ay);
+        cairo_line_to(cr, cur_edge.ap.x, cur_edge.ap.y);
       } else {
       
         // Cairo expects a cubic Bezier curve, while Flash gives us a
@@ -444,21 +444,21 @@ public:
         const float two_thirds = 2.0/3.0;
         const float one_third = 1 - two_thirds;
         
-        float x1 = prev_x + two_thirds * (cur_edge.m_cx - prev_x);
-        float y1 = prev_y + two_thirds * (cur_edge.m_cy - prev_y);
+        float x1 = prev_x + two_thirds * (cur_edge.cp.x - prev_x);
+        float y1 = prev_y + two_thirds * (cur_edge.cp.y - prev_y);
         
-        float x2 = cur_edge.m_cx + one_third * (cur_edge.m_ax - cur_edge.m_cx);
-        float y2 = cur_edge.m_cy + one_third * (cur_edge.m_ay - cur_edge.m_cy);
+        float x2 = cur_edge.cp.x + one_third * (cur_edge.ap.x - cur_edge.cp.x);
+        float y2 = cur_edge.cp.y + one_third * (cur_edge.ap.y - cur_edge.cp.y);
         
-        const float& x3 = cur_edge.m_ax;
-        const float& y3 = cur_edge.m_ay;
+        const float& x3 = cur_edge.ap.x;
+        const float& y3 = cur_edge.ap.y;
     
     
         cairo_curve_to(cr, x1, y1, x2, y2, x3, y3);
       }
       
-      prev_x = cur_edge.m_ax;
-      prev_y = cur_edge.m_ay;
+      prev_x = cur_edge.ap.x;
+      prev_y = cur_edge.ap.y;
       
     }
   
@@ -749,28 +749,28 @@ public:
     for (pno=0; pno<pcount; pno++) {
     
       path &the_path = paths_out[pno];     
-      point oldpnt(the_path.m_ax, the_path.m_ay);
+      point oldpnt(the_path.ap.x, the_path.ap.y);
       point newpnt;
       mat.transform(&newpnt, oldpnt);
-      the_path.m_ax = newpnt.x;    
-      the_path.m_ay = newpnt.y;
+      the_path.ap.x = newpnt.x;    
+      the_path.ap.y = newpnt.y;
       
       ecount = the_path.m_edges.size();
       for (eno=0; eno<ecount; eno++) {
       
         edge &the_edge = the_path.m_edges[eno];
         
-        oldpnt.x = the_edge.m_ax;
-        oldpnt.y = the_edge.m_ay;
+        oldpnt.x = the_edge.ap.x;
+        oldpnt.y = the_edge.ap.y;
         mat.transform(&newpnt, oldpnt);
-        the_edge.m_ax = newpnt.x;
-        the_edge.m_ay = newpnt.y;
+        the_edge.ap.x = newpnt.x;
+        the_edge.ap.y = newpnt.y;
         
-        oldpnt.x = the_edge.m_cx;
-        oldpnt.y = the_edge.m_cy;
+        oldpnt.x = the_edge.cp.x;
+        oldpnt.y = the_edge.cp.y;
         mat.transform(&newpnt, oldpnt);
-        the_edge.m_cx = newpnt.x;
-        the_edge.m_cy = newpnt.y;
+        the_edge.cp.x = newpnt.x;
+        the_edge.cp.y = newpnt.y;
       
       }          
       

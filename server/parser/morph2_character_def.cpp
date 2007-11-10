@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: morph2_character_def.cpp,v 1.17 2007/09/26 19:46:29 strk Exp $ */
+/* $Id: morph2_character_def.cpp,v 1.18 2007/11/10 14:39:52 strk Exp $ */
 
 // Based on the public domain morph2.cpp of:
 // Thatcher Ulrich <tu@tulrich.com>, Mike Shaver <shaver@off.net> 2003,
@@ -159,8 +159,8 @@ private:
 			const path& p1 = i < paths1.size() ? paths1[i] : empty_path;
 			const path& p2 = n < paths2.size() ? paths2[n] : empty_path;
 
-			float new_ax = flerp(p1.m_ax, p2.m_ax, ratio);
-			float new_ay = flerp(p1.m_ay, p2.m_ay, ratio);
+			float new_ax = flerp(p1.ap.x, p2.ap.x, ratio);
+			float new_ay = flerp(p1.ap.y, p2.ap.y, ratio);
 
 			p.reset ( new_ax, new_ay, p1.getLeftFill(), p2.getRightFill(), p1.getLineStyle() );
 
@@ -174,10 +174,10 @@ private:
 				const edge& e1 = j < p1.size() ? p1[j] : empty_edge;
 				const edge& e2 = k < p2.size() ? p2[k] : empty_edge;
 
-				e.m_cx = flerp(e1.m_cx, e2.m_cx, ratio);
-				e.m_cy = flerp(e1.m_cy, e2.m_cy, ratio);
-				e.m_ax = flerp(e1.m_ax, e2.m_ax, ratio);
-				e.m_ay = flerp(e1.m_ay, e2.m_ay, ratio);
+				e.cp.x = flerp(e1.cp.x, e2.cp.x, ratio);
+				e.cp.y = flerp(e1.cp.y, e2.cp.y, ratio);
+				e.ap.x = flerp(e1.ap.x, e2.ap.x, ratio);
+				e.ap.y = flerp(e1.ap.y, e2.ap.y, ratio);
 				k++;
 				if (p2.size() <= k)
 				{

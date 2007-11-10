@@ -259,12 +259,12 @@ std::vector<oglVertex> interpolate(const std::vector<edge>& edges, const float& 
         it != end; ++it) {
       const edge& the_edge = *it;
       
-      point target(the_edge.m_ax, the_edge.m_ay);
+      point target(the_edge.ap.x, the_edge.ap.y);
 
       if (the_edge.is_straight()) {
         shape_points.push_back(oglVertex(target));
       } else {
-        point control(the_edge.m_cx, the_edge.m_cy);
+        point control(the_edge.cp.x, the_edge.cp.y);
         
         trace_curve(anchor, control, target, shape_points);
       }
@@ -846,9 +846,9 @@ public:
   void print_path(const path& path)
   {
     std::cout << "Origin: ("
-              << path.m_ax
+              << path.ap.x
               << ", "
-              << path.m_ay
+              << path.ap.y
               << ") fill0: "
               << path.m_fill0
               << " fill1: "
@@ -860,15 +860,15 @@ public:
               << " number of edges: "
               << path.m_edges.size()
               << " edge endpoint: ("
-              << path.m_edges.back().m_ax
+              << path.m_edges.back().ap.x
               << ", "
-              << path.m_edges.back().m_ay
+              << path.m_edges.back().ap.y
               << " ) points:";
 
     for (std::vector<edge>::const_iterator it = path.m_edges.begin(), end = path.m_edges.end();
          it != end; ++it) {
       const edge& cur_edge = *it;
-      std::cout << "( " << cur_edge.m_ax << ", " << cur_edge.m_ay << ") ";
+      std::cout << "( " << cur_edge.ap.x << ", " << cur_edge.ap.y << ") ";
     }
     std::cout << std::endl;             
   }
@@ -879,35 +879,35 @@ public:
   {
     const edge& cur_end = cur_path.m_edges.back();    
         
-    float prev_cx = cur_end.m_cx;
-    float prev_cy = cur_end.m_cy;        
+    float prev_cx = cur_end.cp.x;
+    float prev_cy = cur_end.cp.y;        
                 
-    path newpath(cur_end.m_ax, cur_end.m_ay, cur_path.m_fill1, cur_path.m_fill0, cur_path.m_line);
+    path newpath(cur_end.ap.x, cur_end.ap.y, cur_path.m_fill1, cur_path.m_fill0, cur_path.m_line);
     
-    float prev_ax = cur_end.m_ax;
-    float prev_ay = cur_end.m_ay; 
+    float prev_ax = cur_end.ap.x;
+    float prev_ay = cur_end.ap.y; 
 
     for (std::vector<edge>::const_reverse_iterator it = cur_path.m_edges.rbegin()+1, end = cur_path.m_edges.rend();
          it != end; ++it) {
       const edge& cur_edge = *it;
 
       if (prev_ax == prev_cx && prev_ay == prev_cy) {
-        prev_cx = cur_edge.m_ax;
-        prev_cy = cur_edge.m_ay;      
+        prev_cx = cur_edge.ap.x;
+        prev_cy = cur_edge.ap.y;      
       }
 
-      edge newedge(prev_cx, prev_cy, cur_edge.m_ax, cur_edge.m_ay); 
+      edge newedge(prev_cx, prev_cy, cur_edge.ap.x, cur_edge.ap.y); 
           
       newpath.m_edges.push_back(newedge);
           
-      prev_cx = cur_edge.m_cx;
-      prev_cy = cur_edge.m_cy;
-      prev_ax = cur_edge.m_ax;
-      prev_ay = cur_edge.m_ay;
+      prev_cx = cur_edge.cp.x;
+      prev_cy = cur_edge.cp.y;
+      prev_ax = cur_edge.ap.x;
+      prev_ay = cur_edge.ap.y;
            
     }
         
-    edge newlastedge(prev_cx, prev_cy, cur_path.m_ax, cur_path.m_ay);    
+    edge newlastedge(prev_cx, prev_cy, cur_path.ap.x, cur_path.ap.y);    
     newpath.m_edges.push_back(newlastedge);
         
     return newpath;
@@ -917,11 +917,11 @@ public:
                                    std::list<const path*> path_refs)
   {
         
-    float target_x = to_connect.m_edges.back().m_ax;
-    float target_y = to_connect.m_edges.back().m_ay;
+    float target_x = to_connect.m_edges.back().ap.x;
+    float target_y = to_connect.m_edges.back().ap.y;
 
-    if (target_x == to_connect.m_ax &&
-        target_y == to_connect.m_ay) {
+    if (target_x == to_connect.ap.x &&
+        target_y == to_connect.ap.y) {
       return NULL;
     }
   
@@ -936,7 +936,7 @@ public:
       }
       
             
-      if (cur_path->m_ax == target_x && cur_path->m_ay == target_y) {
+      if (cur_path->ap.x == target_x && cur_path->ap.y == target_y) {
  
         if (cur_path->m_fill1 != to_connect.m_fill1) {
           continue;
@@ -1133,8 +1133,8 @@ public:
         continue;
       }
         
-      pathpoints[&cur_path] = interpolate(cur_path.m_edges, cur_path.m_ax,
-                                                            cur_path.m_ay);
+      pathpoints[&cur_path] = interpolate(cur_path.m_edges, cur_path.ap.x,
+                                                            cur_path.ap.y);
 
     }
     

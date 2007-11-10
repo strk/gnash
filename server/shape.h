@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.h,v 1.30 2007/11/10 11:51:43 strk Exp $ */
+/* $Id: shape.h,v 1.31 2007/11/10 14:39:52 strk Exp $ */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
@@ -30,10 +30,35 @@ namespace gnash {
 	class edge
 	{
 	public:
-		edge();
-		edge(float cx, float cy, float ax, float ay);
+		edge()
+			:
+			cp(),
+			ap()
+		{
+		}
+
+		edge(float cx, float cy, float ax, float ay)
+			:
+    			cp(cx, cy),
+			ap(ax, ay)
+		{
+		}
+
+		edge(point ncp, point nap)
+			:
+			cp(ncp),
+			ap(nap)
+		{
+		}
+
 		void	tesselate_curve() const;
-		bool	is_straight() const;
+
+		bool isStraight() const
+		{
+			return cp == ap;
+		}
+
+		bool is_straight() const { return isStraight(); }
 
 		/// Return squared distance between point pt and segment A-B
 		static float squareDistancePtSeg(const point& pt, const point& A, const point& B);
@@ -43,8 +68,8 @@ namespace gnash {
 		
 	//private:
 		// *quadratic* bezier: point = p0 * t^2 + p1 * 2t(1-t) + p2 * (1-t)^2
-		float	m_cx, m_cy;		// "control" point
-		float	m_ax, m_ay;		// "anchor" point
+		point cp; // "control" point
+		point ap; // "anchor" point
 	};
 
 
@@ -296,8 +321,8 @@ namespace gnash {
 		/// Line style index (1-based)
 	        unsigned m_line;
 
-		/// Path/shape origin
-		float	m_ax, m_ay;
+		/// Path/shape origin 
+		point ap; 
 
 		/// Edges forming the path
 		std::vector<edge> m_edges;

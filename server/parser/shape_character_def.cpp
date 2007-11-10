@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.47 2007/11/10 11:51:44 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.48 2007/11/10 14:39:52 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -270,8 +270,8 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
     y = move_y;
 
     // Set the beginning of the path.
-    current_path.m_ax = x;
-    current_path.m_ay = y;
+    current_path.ap.x = x;
+    current_path.ap.y = y;
 
 #if SHAPE_LOG
     IF_VERBOSE_PARSE
@@ -286,8 +286,8 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
     if (! current_path.is_empty()) {
         m_paths.push_back(current_path);
         current_path.m_edges.resize(0);
-        current_path.m_ax = x;
-        current_path.m_ay = y;
+        current_path.ap.x = x;
+        current_path.ap.y = y;
     }
     unsigned style = in->read_uint(num_fill_bits);
     if (style > 0) {
@@ -329,8 +329,8 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
     if (! current_path.is_empty()) {
         m_paths.push_back(current_path);
         current_path.m_edges.resize(0);
-        current_path.m_ax = x;
-        current_path.m_ay = y;
+        current_path.ap.x = x;
+        current_path.ap.y = y;
     }
     unsigned style = in->read_uint(num_fill_bits);
     if (style > 0) {
@@ -370,8 +370,8 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
     if (! current_path.is_empty()) {
         m_paths.push_back(current_path);
         current_path.m_edges.resize(0);
-        current_path.m_ax = x;
-        current_path.m_ay = y;
+        current_path.ap.x = x;
+        current_path.ap.y = y;
     }
     unsigned style = in->read_uint(num_line_bits);
     if (style > 0) {
@@ -624,13 +624,13 @@ static void debug_display_shape_paths(
 
   glBegin(GL_LINE_STRIP);
 
-  mat.transform(&pt, point(p.m_ax, p.m_ay));
+  mat.transform(&pt, point(p.ap.x, p.ap.y));
   glVertex2f(pt.x, pt.y);
 
   for (unsigned int j = 0; j < p.m_edges.size(); j++) {
-      mat.transform(&pt, point(p.m_edges[j].m_cx, p.m_edges[j].m_cy));
+      mat.transform(&pt, point(p.m_edges[j].cp.x, p.m_edges[j].cp.y));
       glVertex2f(pt.x, pt.y);
-      mat.transform(&pt, point(p.m_edges[j].m_ax, p.m_edges[j].m_ay));
+      mat.transform(&pt, point(p.m_edges[j].ap.x, p.m_edges[j].ap.y));
       glVertex2f(pt.x, pt.y);
   }
 
@@ -641,8 +641,8 @@ static void debug_display_shape_paths(
   glBegin(GL_LINES);
   {for (unsigned int j = 0; j < p.m_edges.size(); j++)
       {
-    mat.transform(&p0, point(p.m_edges[j].m_cx, p.m_edges[j].m_cy));
-    mat.transform(&p1, point(p.m_edges[j].m_ax, p.m_edges[j].m_ay));
+    mat.transform(&p0, point(p.m_edges[j].cp.x, p.m_edges[j].cp.y));
+    mat.transform(&p1, point(p.m_edges[j].ap.x, p.m_edges[j].ap.y));
     dir = point(p1.x - p0.x, p1.y - p0.y);
     point_normalize(&dir);
     right = point(-dir.y, dir.x); // perpendicular
@@ -845,8 +845,8 @@ bool  shape_character_def::point_test_local(float x, float y)
     const path& pth = m_paths[pno];
     unsigned nedges = pth.m_edges.size();
 
-    float next_pen_x = pth.m_ax;
-    float next_pen_y = pth.m_ay;
+    float next_pen_x = pth.ap.x;
+    float next_pen_y = pth.ap.y;
     float pen_x, pen_y;
     
     if (pth.m_new_shape) {
@@ -892,14 +892,14 @@ bool  shape_character_def::point_test_local(float x, float y)
       pen_x = next_pen_x;
       pen_y = next_pen_y;
       
-      next_pen_x = edg.m_ax;   
-      next_pen_y = edg.m_ay;
+      next_pen_x = edg.ap.x;   
+      next_pen_y = edg.ap.y;
       
       /*
       printf("EDGE #%d #%d [ %d %d ] : %.2f / %.2f -> %.2f / %.2f\n", pno, eno,
         pth.m_fill0, pth.m_fill1, 
         pen_x, pen_y, 
-        edg.m_ax, edg.m_ay);
+        edg.ap.x, edg.ap.y);
       */
         
         
@@ -912,18 +912,18 @@ bool  shape_character_def::point_test_local(float x, float y)
         // ==> straight line case
       
         // ignore horizontal lines
-        if (edg.m_ay == pen_y)   // TODO: better check for small difference? 
+        if (edg.ap.y == pen_y)   // TODO: better check for small difference? 
           continue;          
           
         // does this line cross the Y coordinate?
-        if ( ((pen_y <= y) && (edg.m_ay >= y))
-          || ((pen_y >= y) && (edg.m_ay <= y)) ) {
+        if ( ((pen_y <= y) && (edg.ap.y >= y))
+          || ((pen_y >= y) && (edg.ap.y <= y)) ) {
           
           // calculate X crossing
-          cross1 = pen_x + (edg.m_ax - pen_x) *  
-            (y - pen_y) / (edg.m_ay - pen_y);
+          cross1 = pen_x + (edg.ap.x - pen_x) *  
+            (y - pen_y) / (edg.ap.y - pen_y);
             
-          if (pen_y > edg.m_ay)
+          if (pen_y > edg.ap.y)
             dir1 = -1; // upward
           else
             dir1 = +1; // downward
@@ -941,8 +941,8 @@ bool  shape_character_def::point_test_local(float x, float y)
       
         // ==> curve case
         
-        crosscount = curve_x_crossings(pen_x, pen_y, edg.m_ax, edg.m_ay,
-          edg.m_cx, edg.m_cy, y, cross1, cross2);
+        crosscount = curve_x_crossings(pen_x, pen_y, edg.ap.x, edg.ap.y,
+          edg.cp.x, edg.cp.y, y, cross1, cross2);
           
         dir1 = pen_y > y ? -1 : +1;
         dir2 = dir1 * (-1);     // second crossing always in opposite dir.

@@ -1,5 +1,14 @@
 2007-11-10 Sandro Santilli <strk@keybit.net>
 
+	* backend/render_handler_agg.cpp, backend/render_handler_cairo.cpp,
+	  backend/render_handler_ogl.cpp, server/shape.cpp, server/shape.h,
+	  server/parser/morph2_character_def.cpp,
+	  server/parser/shape_character_def.cpp:
+	  Changed path and edge classes to store a point (Point2d<float>)
+	  for anchor and control points.
+
+2007-11-10 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: properly quote test arguments.
 
 2007-11-10 Sandro Santilli <strk@keybit.net>

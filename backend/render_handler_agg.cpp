@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.116 2007/11/10 11:51:41 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.117 2007/11/10 14:39:51 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1143,28 +1143,28 @@ public:
     for (pno=0; pno<pcount; pno++) {
     
       path &the_path = paths_out[pno];     
-      point oldpnt(the_path.m_ax, the_path.m_ay);
+      point oldpnt(the_path.ap.x, the_path.ap.y);
       point newpnt;
       mat.transform(&newpnt, oldpnt);
-      the_path.m_ax = newpnt.x;    
-      the_path.m_ay = newpnt.y;
+      the_path.ap.x = newpnt.x;    
+      the_path.ap.y = newpnt.y;
       
       ecount = the_path.m_edges.size();
       for (eno=0; eno<ecount; eno++) {
       
         edge &the_edge = the_path.m_edges[eno];
         
-        oldpnt.x = the_edge.m_ax;
-        oldpnt.y = the_edge.m_ay;
+        oldpnt.x = the_edge.ap.x;
+        oldpnt.y = the_edge.ap.y;
         mat.transform(&newpnt, oldpnt);
-        the_edge.m_ax = newpnt.x;
-        the_edge.m_ay = newpnt.y;
+        the_edge.ap.x = newpnt.x;
+        the_edge.ap.y = newpnt.y;
         
-        oldpnt.x = the_edge.m_cx;
-        oldpnt.y = the_edge.m_cy;
+        oldpnt.x = the_edge.cp.x;
+        oldpnt.y = the_edge.cp.y;
         mat.transform(&newpnt, oldpnt);
-        the_edge.m_cx = newpnt.x;
-        the_edge.m_cy = newpnt.y;
+        the_edge.cp.x = newpnt.x;
+        the_edge.cp.y = newpnt.y;
       
       }          
       
@@ -1213,8 +1213,8 @@ public:
       const gnash::path& this_path = paths[pno];
       agg::path_storage& new_path = dest[pno];
       
-      new_path.move_to(this_path.m_ax + subpixel_offset, 
-        this_path.m_ay + subpixel_offset);
+      new_path.move_to(this_path.ap.x + subpixel_offset, 
+        this_path.ap.y + subpixel_offset);
       
       size_t ecount = this_path.m_edges.size();
       
@@ -1223,13 +1223,13 @@ public:
         const edge& this_edge = this_path.m_edges[eno];
         
         if (this_edge.is_straight())
-          new_path.line_to(this_edge.m_ax + subpixel_offset, 
-            this_edge.m_ay + subpixel_offset);
+          new_path.line_to(this_edge.ap.x + subpixel_offset, 
+            this_edge.ap.y + subpixel_offset);
         else
-          new_path.curve3(this_edge.m_cx + subpixel_offset, 
-            this_edge.m_cy + subpixel_offset,
-            this_edge.m_ax + subpixel_offset, 
-            this_edge.m_ay + subpixel_offset);       
+          new_path.curve3(this_edge.cp.x + subpixel_offset, 
+            this_edge.cp.y + subpixel_offset,
+            this_edge.ap.x + subpixel_offset, 
+            this_edge.ap.y + subpixel_offset);       
         
       }    
     }    
@@ -1265,8 +1265,8 @@ public:
       const gnash::path& this_path = paths[pno];
       agg::path_storage& new_path = dest[pno];
       
-      float prev_ax = this_path.m_ax;
-      float prev_ay = this_path.m_ay;  
+      float prev_ax = this_path.ap.x;
+      float prev_ay = this_path.ap.y;  
       bool prev_align_x = true;
       bool prev_align_y = true;
       
@@ -1276,8 +1276,8 @@ public:
         
         const edge& this_edge = this_path.m_edges[eno];
         
-        float this_ax = this_edge.m_ax;  
-        float this_ay = this_edge.m_ay;  
+        float this_ax = this_edge.ap.x;  
+        float this_ay = this_edge.ap.y;  
         
         if (this_edge.is_straight()) {
         
@@ -1346,8 +1346,8 @@ public:
             new_path.move_to(prev_ax, prev_ay);
         
           // never align curves!
-          new_path.curve3(this_edge.m_cx + subpixel_offset, 
-            this_edge.m_cy + subpixel_offset,
+          new_path.curve3(this_edge.cp.x + subpixel_offset, 
+            this_edge.cp.y + subpixel_offset,
             this_ax + subpixel_offset, 
             this_ay + subpixel_offset);
             
@@ -1719,7 +1719,7 @@ public:
                   this_path.m_fill1==0 ? -1 : 0);
                   
       // starting point of path
-      path.move_to(this_path.m_ax, this_path.m_ay);
+      path.move_to(this_path.ap.x, this_path.ap.y);
     
       unsigned int ecount = this_path.m_edges.size();
       for (unsigned int eno=0; eno<ecount; eno++) {
@@ -1727,10 +1727,10 @@ public:
         const edge &this_edge = this_path.m_edges[eno];
 
         if (this_edge.is_straight())
-          path.line_to(this_edge.m_ax, this_edge.m_ay);
+          path.line_to(this_edge.ap.x, this_edge.ap.y);
         else
-          path.curve3(this_edge.m_cx, this_edge.m_cy,
-                      this_edge.m_ax, this_edge.m_ay);
+          path.curve3(this_edge.cp.x, this_edge.cp.y,
+                      this_edge.ap.x, this_edge.ap.y);
         
       } // for edge
       
