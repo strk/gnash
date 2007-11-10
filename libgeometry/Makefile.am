@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.31 2007/08/10 04:36:13 strk Exp $
+# $Id: Makefile.am,v 1.32 2007/11/10 09:46:54 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -57,6 +57,7 @@ libgnashgeo_la_SOURCES = 	\
 
 noinst_HEADERS = \
 	Range2d.h	\
+	Point2d.h	\
 	snappingrange.h \
 	axial_box.h	\
 	bsp.h		\

@@ -35,6 +35,7 @@ INCLUDES = -I.. \
 
 check_PROGRAMS = \
 	Range2dTest	\
+	Point2dTest	\
 	snappingrangetest	\
 	$(NULL)
 
@@ -44,9 +45,11 @@ CLEANFILES = \
       gnash-dbg.log \
       site.exp.bak \
       Range2dTest \
+      Point2dTest \
       snappingrangetest \
       $(NULL)
 
+Point2dTest_SOURCES = Point2dTest.cpp
 Range2dTest_SOURCES = Range2dTest.cpp
 snappingrangetest_SOURCES = snappingrangetest.cpp
 
