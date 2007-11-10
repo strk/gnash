@@ -1,5 +1,11 @@
 2007-11-10 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (goto_frame): always set
+	_callingFrameActions to false before calling restoreDisplayList.
+	Fixes an assertion failure playing make_sleep.swf.
+
+2007-11-10 Sandro Santilli <strk@keybit.net>
+
 	* server/shape.{cpp,h}: add new poinOnCurve and squareDistancePtCurve
 	  static methods for gnash::edge, have path::withinSquareDistance
 	  use them for curves.

@@ -2643,9 +2643,14 @@ sprite_instance::goto_frame(size_t target_frame_number)
     if (target_frame_number < m_current_frame)
     // Go backward to a previous frame
     {
+	// NOTE: just in case we're being called by code in a called frame
+	//       we'll backup and resume the _callingFrameActions flag
+	bool callingFrameActionsBackup = _callingFrameActions;
+	_callingFrameActions = false;
         // restoreDisplayList takes care of properly setting the m_current_frame variable
         restoreDisplayList(target_frame_number);
         assert(m_current_frame == target_frame_number);
+	_callingFrameActions = callingFrameActionsBackup;
 
        // <UdoG> current design is sub-optimal because it causes unnecessary 
        // redraw. Consider a static graphic that stays at it's position all
