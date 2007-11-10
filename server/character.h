@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.107 2007/11/09 19:58:02 strk Exp $ */
+/* $Id: character.h,v 1.108 2007/11/10 11:51:42 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -54,6 +54,7 @@ namespace gnash {
 	class sprite_instance;
 	class movie_instance;
 	class ExecutableCode;
+	class action_buffer;
 }
 
 namespace gnash {

@@ -34,7 +34,6 @@
 #include <cstdarg>  // for va_list arg to sprite_instance::call_method_args()
 #include <string>   // for movie_definition* create_movie(std::auto_ptr<tu_file> in, const std::string& url);
 
-#include "as_value.h" // FIXME: for as_c_function_ptr typedef (register_component)
 
 // FIXME: The local usage of these constants should probably be renamed in this
 // file because they conflict with definitions in the system header files. Luckily
@@ -43,10 +42,6 @@
 #undef INVALID
 #undef ESCAPE
 
-class tu_file;
-class render_handler;
-class weak_proxy;   // forward decl; defined in base/smart_ptr.h
-
 // @@ forward decl to avoid including base/image.h; TODO change the
 // render_handler interface to not depend on these classes at all.
 namespace image { class image_base; class rgb; class rgba; }
@@ -54,23 +49,17 @@ namespace image { class image_base; class rgb; class rgba; }
 // forward decl
 namespace jpeg { class input; }
 
+class tu_file; // for file_opener_callback typedef
+
 namespace gnash {
+
 // Forward declarations.
-class action_buffer;
-class as_value;
-class execute_tag;
-class font;
-class matrix;
-class movie;
-class sprite_instance;
-class movie_definition;
-class render_handler;
-class resource;
-class rgba;
-class sound_handler;
-class stream;
-class URL;
-class rect;
+class sprite_instance; // for fscommand_callback typedef
+class movie_definition; // for create_movie
+class render_handler; // for set_render_handler 
+class sound_handler; // for set_sound_handler
+class URL; // for set_base_url
+
 
 // Sound callbacks stuff
 
@@ -142,6 +131,9 @@ DSOEXPORT void  register_fscommand_callback(fscommand_callback handler);
 ///          calls this function..
 ///
 ///
+class as_value; // for the following typedef
+class fn_call; // for the following typedef
+typedef as_value (*as_c_function_ptr)(const fn_call& fn); // original typedef is in as_value.h ...
 void register_component(const std::string& name, as_c_function_ptr handler);
 
 /// Use this to control how finely curves are subdivided.  1.0
@@ -155,8 +147,6 @@ float   get_curve_max_pixel_error();
 DSOEXPORT render_handler*   create_render_handler_xbox();
 DSOEXPORT render_handler*   create_render_handler_ogl(bool init = true);
 //DSOEXPORT render_handler* create_render_handler_cairo(void* cairohandle);
-
-class font;
 
 /// For caching precomputed stuff.  Generally of
 /// interest to gnash_processor and programs like it.
@@ -346,60 +336,6 @@ DSOEXPORT void  gnashInit();
 ///
 DSOEXPORT void  clear();
     
-
-//
-// point: used by rect which is used by render_handler (otherwise would be in internal gnash_types.h)
-//
-
-
-/// Point class
-//
-/// TODO: move in libgeometry/point2d.{cpp,h}, provide a gnash::point2d typedef
-/// TODO: make m_x and m_y members private ? (or rename to x,y)
-/// TODO: provide a toString() and an output operator
-///
-class DSOLOCAL point
-{
-public:
-    float   m_x, m_y;
-
-    /// Construct a point with X and Y values set to 0
-    point() : m_x(0), m_y(0) {}
-
-    /// Construct a point with X and Y values set to the given values
-    point(float x, float y) : m_x(x), m_y(y) {}
-
-    /// Set X and Y values of the point
-    void set(float x, float y)
-    {
-        m_x = x;
-        m_y = y;
-    }
-
-    /// Set to a + (b - a) * t
-    void    set_lerp(const point& a, const point& b, float t)
-        {
-            m_x = a.m_x + (b.m_x - a.m_x) * t;
-            m_y = a.m_y + (b.m_y - a.m_y) * t;
-        }
-
-    /// Compare two points for 2d equality
-    bool operator==(const point& p) const { return m_x == p.m_x && m_y == p.m_y; }
-
-    /// Return the square of the distance between this and other point.
-    float squareDistance(const point& other) const;
-
-    /// Return the distance between this and other point.
-    float distance(const point& other) const;
-
-    /// Compare two points for bitwise equality
-    //
-    /// TODO: (should this really be different by normal equality?)
-    ///
-    bool    bitwise_equal(const point& p) const;
-};
-
-
 //
 // texture and render callback handler.
 //

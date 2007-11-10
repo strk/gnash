@@ -717,8 +717,8 @@ public:
 		m.transform(&a, gnash::point(coords.m_x_min, coords.m_y_min));
 		m.transform(&b, gnash::point(coords.m_x_max, coords.m_y_min));
 		m.transform(&c, gnash::point(coords.m_x_min, coords.m_y_max));
-		d.m_x = b.m_x + c.m_x - a.m_x;
-		d.m_y = b.m_y + c.m_y - a.m_y;
+		d.x = b.x + c.x - a.x;
+		d.y = b.y + c.y - a.y;
 
 		// Set texture.
 		IDirect3DDevice8::SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
@@ -740,16 +740,16 @@ public:
 		IDirect3DDevice8::Begin(D3DPT_TRIANGLESTRIP);
 		
 		IDirect3DDevice8::SetVertexData2f(D3DVSDE_TEXCOORD0, uv_coords.m_x_min, uv_coords.m_y_min);
-		IDirect3DDevice8::SetVertexData4f(D3DVSDE_VERTEX, a.m_x, a.m_y, 0, 1);
+		IDirect3DDevice8::SetVertexData4f(D3DVSDE_VERTEX, a.x, a.y, 0, 1);
 
 		IDirect3DDevice8::SetVertexData2f(D3DVSDE_TEXCOORD0, uv_coords.m_x_max, uv_coords.m_y_min);
-		IDirect3DDevice8::SetVertexData4f(D3DVSDE_VERTEX, b.m_x, b.m_y, 0, 1);
+		IDirect3DDevice8::SetVertexData4f(D3DVSDE_VERTEX, b.x, b.y, 0, 1);
 
 		IDirect3DDevice8::SetVertexData2f(D3DVSDE_TEXCOORD0, uv_coords.m_x_min, uv_coords.m_y_max);
-		IDirect3DDevice8::SetVertexData4f(D3DVSDE_VERTEX, c.m_x, c.m_y, 0, 1);
+		IDirect3DDevice8::SetVertexData4f(D3DVSDE_VERTEX, c.x, c.y, 0, 1);
 
 		IDirect3DDevice8::SetVertexData2f(D3DVSDE_TEXCOORD0, uv_coords.m_x_max, uv_coords.m_y_max);
-		IDirect3DDevice8::SetVertexData4f(D3DVSDE_VERTEX, d.m_x, d.m_y, 0, 1);
+		IDirect3DDevice8::SetVertexData4f(D3DVSDE_VERTEX, d.x, d.y, 0, 1);
 
 		IDirect3DDevice8::End();
 
@@ -762,16 +762,16 @@ public:
 		glBegin(GL_TRIANGLE_STRIP);
 
 		glTexCoord2f(uv_coords.m_x_min, uv_coords.m_y_min);
-		glVertex2f(a.m_x, a.m_y);
+		glVertex2f(a.x, a.y);
 
 		glTexCoord2f(uv_coords.m_x_max, uv_coords.m_y_min);
-		glVertex2f(b.m_x, b.m_y);
+		glVertex2f(b.x, b.y);
 
 		glTexCoord2f(uv_coords.m_x_min, uv_coords.m_y_max);
-		glVertex2f(c.m_x, c.m_y);
+		glVertex2f(c.x, c.y);
 
 		glTexCoord2f(uv_coords.m_x_max, uv_coords.m_y_max);
-		glVertex2f(d.m_x, d.m_y);
+		glVertex2f(d.x, d.y);
 
 		glEnd();
 #endif // 0

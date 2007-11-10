@@ -19,7 +19,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.h,v 1.11 2007/07/01 10:54:23 bjacques Exp $ 
+// $Id: matrix.h,v 1.12 2007/11/10 11:51:43 strk Exp $ 
 //
 
 #ifndef GNASH_MATRIX_H
@@ -31,12 +31,12 @@
 
 #include "tu_config.h" // for DSOEXPORT
 #include "Range2d.h" // for transforming Range2d<float>
+#include "Point2d.h" // for transforming Point2d<float> (typedefe'd to point)
 
 #include <iosfwd>
 
 // Forward declarations
 namespace gnash {
-	class point;
 	class stream;
 }
 

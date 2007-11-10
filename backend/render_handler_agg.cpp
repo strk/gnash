@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.115 2007/11/06 14:18:53 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.116 2007/11/10 11:51:41 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -531,11 +531,11 @@ public:
     mat.transform(&d, point(bounds->get_x_min(), bounds->get_y_max()));
     
     agg::path_storage path;
-    path.move_to(a.m_x, a.m_y);
-    path.line_to(b.m_x, b.m_y);
-    path.line_to(c.m_x, c.m_y);
-    path.line_to(d.m_x, d.m_y);
-    path.line_to(a.m_x, a.m_y);
+    path.move_to(a.x, a.y);
+    path.line_to(b.x, b.y);
+    path.line_to(c.x, c.y);
+    path.line_to(d.x, d.y);
+    path.line_to(a.x, a.y);
 
     if (m_alpha_mask.empty()) {
     
@@ -808,11 +808,11 @@ public:
     const int16_t *vertex = static_cast<const int16_t*>(coords);
     
     mat.transform(&pnt, point(vertex[0], vertex[1]));
-    path.move_to(pnt.m_x, pnt.m_y);
+    path.move_to(pnt.x, pnt.y);
 
     for (vertex += 2;  vertex_count > 1;  vertex_count--, vertex += 2) {
       mat.transform(&pnt, point(vertex[0], vertex[1]));
-      path.line_to(pnt.m_x, pnt.m_y);
+      path.line_to(pnt.x, pnt.y);
     }
     
     // -- render --
@@ -1146,25 +1146,25 @@ public:
       point oldpnt(the_path.m_ax, the_path.m_ay);
       point newpnt;
       mat.transform(&newpnt, oldpnt);
-      the_path.m_ax = newpnt.m_x;    
-      the_path.m_ay = newpnt.m_y;
+      the_path.m_ax = newpnt.x;    
+      the_path.m_ay = newpnt.y;
       
       ecount = the_path.m_edges.size();
       for (eno=0; eno<ecount; eno++) {
       
         edge &the_edge = the_path.m_edges[eno];
         
-        oldpnt.m_x = the_edge.m_ax;
-        oldpnt.m_y = the_edge.m_ay;
+        oldpnt.x = the_edge.m_ax;
+        oldpnt.y = the_edge.m_ay;
         mat.transform(&newpnt, oldpnt);
-        the_edge.m_ax = newpnt.m_x;
-        the_edge.m_ay = newpnt.m_y;
+        the_edge.m_ax = newpnt.x;
+        the_edge.m_ay = newpnt.y;
         
-        oldpnt.m_x = the_edge.m_cx;
-        oldpnt.m_y = the_edge.m_cy;
+        oldpnt.x = the_edge.m_cx;
+        oldpnt.y = the_edge.m_cy;
         mat.transform(&newpnt, oldpnt);
-        the_edge.m_cx = newpnt.m_x;
-        the_edge.m_cy = newpnt.m_y;
+        the_edge.m_cx = newpnt.x;
+        the_edge.m_cy = newpnt.y;
       
       }          
       
@@ -1904,18 +1904,18 @@ public:
     // center of the pixel. This avoids blurring caused by anti-aliasing.
     
     mat.transform(&origin, 
-      point(trunc(corners[0].m_x), trunc(corners[0].m_y)));
-    path.move_to(trunc(origin.m_x)+0.5, trunc(origin.m_y)+0.5);
+      point(trunc(corners[0].x), trunc(corners[0].y)));
+    path.move_to(trunc(origin.x)+0.5, trunc(origin.y)+0.5);
     
     for (unsigned int i=1; i<corner_count; i++) {
     
-      mat.transform(&pnt, point(corners[i].m_x, corners[i].m_y));
+      mat.transform(&pnt, point(corners[i].x, corners[i].y));
         
-      path.line_to(trunc(pnt.m_x)+0.5, trunc(pnt.m_y)+0.5);
+      path.line_to(trunc(pnt.x)+0.5, trunc(pnt.y)+0.5);
     }
     
     // close polygon
-    path.line_to(trunc(origin.m_x)+0.5, trunc(origin.m_y)+0.5);
+    path.line_to(trunc(origin.x)+0.5, trunc(origin.y)+0.5);
     
     
     
@@ -1993,8 +1993,8 @@ public:
     // and Intersect() against valid range instead.
     point p(world_x, world_y);
     stage_matrix.transform(p);
-    x = (int)p.m_x;
-    y = (int)p.m_y;
+    x = (int)p.x;
+    y = (int)p.y;
   }
 
   geometry::Range2d<int> world_to_pixel(const rect& wb)
@@ -2121,8 +2121,8 @@ public:
   }
 
   virtual void get_scale(point& scale) {
-    scale.m_x = PIXELS_TO_TWIPS(stage_matrix.get_x_scale());
-    scale.m_y = PIXELS_TO_TWIPS(stage_matrix.get_y_scale());
+    scale.x = PIXELS_TO_TWIPS(stage_matrix.get_x_scale());
+    scale.y = PIXELS_TO_TWIPS(stage_matrix.get_y_scale());
   }
   
   virtual unsigned int getBytesPerPixel() const {

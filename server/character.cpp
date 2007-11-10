@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.62 2007/11/09 19:58:02 strk Exp $ */
+/* $Id: character.cpp,v 1.63 2007/11/10 11:51:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -335,7 +335,7 @@ character::xmouse_get(const fn_call& fn)
 		
 	m.transform_by_inverse(&b, a);
 
-	return as_value(TWIPS_TO_PIXELS(b.m_x));
+	return as_value(TWIPS_TO_PIXELS(b.x));
 }
 
 as_value
@@ -354,7 +354,7 @@ character::ymouse_get(const fn_call& fn)
 		
 	m.transform_by_inverse(&b, a);
 
-	return as_value(TWIPS_TO_PIXELS(b.m_y));
+	return as_value(TWIPS_TO_PIXELS(b.y));
 }
 
 as_value

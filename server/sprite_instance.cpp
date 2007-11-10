@@ -987,8 +987,8 @@ sprite_globalToLocal(const fn_call& fn)
 	matrix world_mat = sprite->get_world_matrix();
 	world_mat.transform_by_inverse(pt);
 
-	obj->set_member(NSV::PROP_X, TWIPS_TO_PIXELS(round(pt.m_x)));
-	obj->set_member(NSV::PROP_Y, TWIPS_TO_PIXELS(round(pt.m_y)));
+	obj->set_member(NSV::PROP_X, TWIPS_TO_PIXELS(round(pt.x)));
+	obj->set_member(NSV::PROP_Y, TWIPS_TO_PIXELS(round(pt.y)));
 
 	return ret;
 }
@@ -1049,8 +1049,8 @@ sprite_localToGlobal(const fn_call& fn)
 	matrix world_mat = sprite->get_world_matrix();
 	world_mat.transform(pt);
 
-	obj->set_member(NSV::PROP_X, TWIPS_TO_PIXELS(round(pt.m_x)));
-	obj->set_member(NSV::PROP_Y, TWIPS_TO_PIXELS(round(pt.m_y)));
+	obj->set_member(NSV::PROP_X, TWIPS_TO_PIXELS(round(pt.x)));
+	obj->set_member(NSV::PROP_Y, TWIPS_TO_PIXELS(round(pt.y)));
 
 	return ret;
 
@@ -3105,7 +3105,7 @@ sprite_instance::get_topmost_mouse_entity(float x, float y)
 		matrix parent_world_matrix = parent ? parent->get_world_matrix() : matrix::identity;
 		point wp(x,y);
 		parent_world_matrix.transform(wp);
-		if ( pointInVisibleShape(wp.m_x, wp.m_y) ) return this;
+		if ( pointInVisibleShape(wp.x, wp.y) ) return this;
 		else return NULL;
 	}
 
@@ -3114,12 +3114,12 @@ sprite_instance::get_topmost_mouse_entity(float x, float y)
 	point	p;
 	m.transform_by_inverse(&p, point(x, y));
 
-	MouseEntityFinder finder(p.m_x, p.m_y);
+	MouseEntityFinder finder(p.x, p.y);
 	m_display_list.visitBackward(finder);
 	character* ch = finder.getEntity();
 	if ( ! ch ) 
 	{
-		ch = _drawable_inst->get_topmost_mouse_entity(p.m_x, p.m_y);
+		ch = _drawable_inst->get_topmost_mouse_entity(p.x, p.y);
 	}
 
 	return ch; // might be NULL

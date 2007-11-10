@@ -206,7 +206,7 @@ check_error()
 ///      drawn from a to b.
 point middle(const point& a, const point& b)
 {
-  return point(0.5 * (a.m_x + b.m_x), 0.5 * (a.m_y + b.m_y));
+  return point(0.5 * (a.x + b.x), 0.5 * (a.y + b.y));
 }
 
 
@@ -233,7 +233,7 @@ void trace_curve(const point& startP, const point& controlP,
   // Midpoint on the curve.
   point q = middle(mid, controlP);
 
-  float dist = std::abs(mid.m_x - q.m_x) + std::abs(mid.m_y - q.m_y);
+  float dist = std::abs(mid.x - q.x) + std::abs(mid.y - q.y);
 
   if (dist < 0.1 /*error tolerance*/) {
     coords.push_back(oglVertex(endP));
@@ -660,15 +660,15 @@ public:
     m->transform(&a, gnash::point(bounds->get_x_min(), bounds->get_y_min()));
     m->transform(&b, gnash::point(bounds->get_x_max(), bounds->get_y_min()));
     m->transform(&c, gnash::point(bounds->get_x_min(), bounds->get_y_max()));
-    d.m_x = b.m_x + c.m_x - a.m_x;
-    d.m_y = b.m_y + c.m_y - a.m_y;
+    d.x = b.x + c.x - a.x;
+    d.y = b.y + c.y - a.y;
 
-    float w_bounds = TWIPS_TO_PIXELS(b.m_x - a.m_x);
-    float h_bounds = TWIPS_TO_PIXELS(c.m_y - a.m_y);
+    float w_bounds = TWIPS_TO_PIXELS(b.x - a.x);
+    float h_bounds = TWIPS_TO_PIXELS(c.y - a.y);
 
     unsigned char*   ptr = frame->data();
-    float xpos = a.m_x < 0 ? 0.0f : a.m_x;  //hack
-    float ypos = a.m_y < 0 ? 0.0f : a.m_y;  //hack
+    float xpos = a.x < 0 ? 0.0f : a.x;  //hack
+    float ypos = a.y < 0 ? 0.0f : a.y;  //hack
     glRasterPos2f(xpos, ypos);  //hack
 
     size_t height = frame->height();
@@ -1452,8 +1452,8 @@ public:
   }
 
   virtual void get_scale(point& scale) {
-    scale.m_x = _xscale;
-    scale.m_y = _yscale;
+    scale.x = _xscale;
+    scale.y = _yscale;
   }
 
 #ifdef OSMESA_TESTING

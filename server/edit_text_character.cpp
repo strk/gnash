@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.129 2007/10/18 18:54:33 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.130 2007/11/10 11:51:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -496,10 +496,10 @@ edit_text_character::display()
 		float ymin = _bounds.getMinY();
 		float ymax = _bounds.getMaxY();
 
-		coords[0].set(xmin, ymin); // = def_bounds.get_corner(0);
-		coords[1].set(xmax, ymin); // = def_bounds.get_corner(1);
-		coords[2].set(xmax, ymax); // = def_bounds.get_corner(2);
-		coords[3].set(xmin, ymax); // = def_bounds.get_corner(3);
+		coords[0].setTo(xmin, ymin); 
+		coords[1].setTo(xmax, ymin); 
+		coords[2].setTo(xmax, ymax); 
+		coords[3].setTo(xmin, ymax); 
 
 		rgba borderColor = drawBorder ? getBorderColor() : rgba(0,0,0,0);
 		rgba backgroundColor = drawBackground ? getBackgroundColor() : rgba(0,0,0,0);
@@ -680,8 +680,8 @@ edit_text_character::get_topmost_mouse_entity(float x, float y)
 	m.transform_by_inverse(&p, point(x, y));
 
 	//const rect& def_bounds = m_def->get_bounds();
-	//if (def_bounds.point_test(p.m_x, p.m_y))
-	if ( _bounds.contains(p.m_x, p.m_y) )
+	//if (def_bounds.point_test(p.x, p.y))
+	if ( _bounds.contains(p.x, p.y) )
 	{
 		return this;
 	}
@@ -1664,9 +1664,9 @@ edit_text_character::pointInShape(float x, float y) const
 	matrix wm = get_world_matrix();
 	point lp(x, y);
 	wm.transform_by_inverse(lp);
-	return _bounds.contains(lp.m_x, lp.m_y);
+	return _bounds.contains(lp.x, lp.y);
 	//const rect& def_bounds = m_def->get_bounds();
-	//return def_bounds.point_test(lp.m_x, lp.m_y);
+	//return def_bounds.point_test(lp.x, lp.y);
 }
 
 bool

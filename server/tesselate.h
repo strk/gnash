@@ -13,6 +13,7 @@
 
 #include "gnash.h"
 #include "types.h"
+#include "Point2d.h" // for point
 
 
 namespace gnash {

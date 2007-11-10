@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.49 2007/11/01 20:21:55 bjacques Exp $ */
+/* $Id: render_handler.h,v 1.50 2007/11/10 11:51:41 strk Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -316,8 +316,8 @@ public:
     point topleft     = pixel_to_world(pixelbounds.getMinX(), pixelbounds.getMinY());
     point bottomright = pixel_to_world(pixelbounds.getMaxX(), pixelbounds.getMaxY());
     
-    return geometry::Range2d<float> (topleft.m_x, topleft.m_y, 
-      bottomright.m_x, bottomright.m_y);
+    return geometry::Range2d<float> (topleft.x, topleft.y, 
+      bottomright.x, bottomright.y);
   }
   
   virtual geometry::Range2d<int> world_to_pixel(const geometry::Range2d<float>& worldbounds)

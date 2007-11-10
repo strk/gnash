@@ -1,5 +1,10 @@
 2007-11-10 Sandro Santilli <strk@keybit.net>
 
+	* (lots of files): typedefed gnash::point to Point2d<float>,
+	  drop some unused functions and cleaned up headers a bit.
+
+2007-11-10 Sandro Santilli <strk@keybit.net>
+
 	* libgeometry/: Makefile.am, Point2d.h: initial implementation of
 	  a generalized point class.
 	* testsuite/libgeometry/: Makefile.am, Point2dTest.cpp: initial

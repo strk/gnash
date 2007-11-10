@@ -5,7 +5,7 @@
 
 // A module to take care of all of gnash's loaded fonts.
 
-/* $Id: fontlib.cpp,v 1.35 2007/10/30 18:55:42 strk Exp $ */
+/* $Id: fontlib.cpp,v 1.36 2007/11/10 11:51:42 strk Exp $ */
 
 #include "container.h"
 #include "tu_file.h"
@@ -185,19 +185,19 @@ namespace {
 	class pointi
 	{
 	public:
-		int	m_x, m_y;
+		int	x, y;
 
 		pointi(int x = 0, int y = 0)
 			:
-			m_x(x),
-			m_y(y)
+			x(x),
+			y(y)
 		{
 		}
 
 		bool	operator<(const pointi& p) const
 		// For sorting anchor points.
 		{
-			return imin(m_x, m_y) < imin(p.m_x, p.m_y);
+			return imin(x, y) < imin(p.x, p.y);
 		}
 	};
 	// Candidates for upper-left corner of a new rectangle.  Use
@@ -347,7 +347,7 @@ namespace {
 		for (unsigned int i = 0; i < s_anchor_points.size(); i++)
 		{
 			const pointi&	p = s_anchor_points[i];
-			if (r.contains(p.m_x, p.m_y))
+			if (r.contains(p.x, p.y))
 			{
 				// Eliminate this point from consideration.
 				s_anchor_points.erase(s_anchor_points.begin() + i);
@@ -402,7 +402,7 @@ namespace {
 		for (int i = 0, n = s_anchor_points.size(); i < n; i++)
 		{
 			const pointi&	p = s_anchor_points[i];
-			recti	r(p.m_x, p.m_x + width, p.m_y, p.m_y + height);
+			recti	r(p.x, p.x + width, p.y, p.y + height);
 
 			// Is this spot any good?
 			if (is_rect_available(r))
@@ -716,9 +716,9 @@ namespace {
 				tg = identical_tg;
 
 				// Use our own offset, in case it's different.
-				tg.m_uv_origin.m_x = tg.m_uv_bounds.get_x_min()
+				tg.m_uv_origin.x = tg.m_uv_bounds.get_x_min()
 					+ rgi.m_offset_x / GLYPH_CACHE_TEXTURE_SIZE;
-				tg.m_uv_origin.m_y = tg.m_uv_bounds.get_y_min()
+				tg.m_uv_origin.y = tg.m_uv_bounds.get_y_min()
 					+ rgi.m_offset_y / GLYPH_CACHE_TEXTURE_SIZE;
 
 				if (identical_tg.is_renderable())
@@ -850,8 +850,8 @@ namespace {
 
 					// Fill out the glyph info.
 					texture_glyph	tg;
-					tg.m_uv_origin.m_x = (pack_x + rgi.m_offset_x) / (GLYPH_CACHE_TEXTURE_SIZE);
-					tg.m_uv_origin.m_y = (pack_y + rgi.m_offset_y) / (GLYPH_CACHE_TEXTURE_SIZE);
+					tg.m_uv_origin.x = (pack_x + rgi.m_offset_x) / (GLYPH_CACHE_TEXTURE_SIZE);
+					tg.m_uv_origin.y = (pack_y + rgi.m_offset_y) / (GLYPH_CACHE_TEXTURE_SIZE);
 					tg.m_uv_bounds.enclose_point(
 						float(pack_x) / (GLYPH_CACHE_TEXTURE_SIZE),
 						float(pack_y) / (GLYPH_CACHE_TEXTURE_SIZE)
@@ -1094,8 +1094,8 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 					out->write_float32(tg.m_uv_bounds.get_y_min());
 					out->write_float32(tg.m_uv_bounds.get_x_max());
 					out->write_float32(tg.m_uv_bounds.get_y_max());
-					out->write_float32(tg.m_uv_origin.m_x);
-					out->write_float32(tg.m_uv_origin.m_y);
+					out->write_float32(tg.m_uv_origin.x);
+					out->write_float32(tg.m_uv_origin.y);
 					n++;
 				}
 			}
@@ -1228,8 +1228,8 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 				float ymax = in->read_float32();
 				tg.m_uv_bounds.enclose_point(xmin, ymin);
 				tg.m_uv_bounds.expand_to_point(xmax, ymax);
-				tg.m_uv_origin.m_x = in->read_float32();
-				tg.m_uv_origin.m_y = in->read_float32();
+				tg.m_uv_origin.x = in->read_float32();
+				tg.m_uv_origin.y = in->read_float32();
 
 				if (glyph_index < 0 || glyph_index >= fnt->getEmbedGlyphCount())
 				{
@@ -1338,8 +1338,8 @@ get_default_font()
 			return;
 		}
 
-		bounds.shift_x (-tg.m_uv_origin.m_x);
-		bounds.shift_y (-tg.m_uv_origin.m_y);
+		bounds.shift_x (-tg.m_uv_origin.x);
+		bounds.shift_y (-tg.m_uv_origin.y);
 
 		// Scale from uv coords to the 1024x1024 glyph square.
 		// @@ need to factor this out!

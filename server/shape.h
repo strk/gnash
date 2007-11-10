@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.h,v 1.29 2007/11/07 12:08:16 strk Exp $ */
+/* $Id: shape.h,v 1.30 2007/11/10 11:51:43 strk Exp $ */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
@@ -16,6 +16,7 @@
 
 // Forward declarations
 namespace gnash {
+	class rect; // for path::expandBounds
 	namespace tesselate {
 		class tesselating_shape;
 	}

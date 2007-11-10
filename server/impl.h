@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: impl.h,v 1.47 2007/07/01 10:54:23 bjacques Exp $ */
+/* $Id: impl.h,v 1.48 2007/11/10 11:51:43 strk Exp $ */
 
 #ifndef GNASH_IMPL_H
 #define GNASH_IMPL_H
@@ -31,13 +31,13 @@
 #include "tu_config.h"
 
 #include "gnash.h"
-#include "cxform.h" // for composition of display_info
+//#include "cxform.h" // for composition of display_info
+//#include "matrix.h" // for display_info composition
 #include "types.h"
 #include "container.h"
 #include "utility.h"
 #include "smart_ptr.h"
 #include "swf/TagLoadersTable.h"
-#include "matrix.h" // for display_info composition
 
 #include <cstdarg>
 #include <cassert>
@@ -50,7 +50,6 @@ class bitmap_character_def;
 class bitmap_info;
 class character;
 class character_def;
-class display_info;
 class font;
 class movie_root;
 class stream;
@@ -68,6 +67,7 @@ DSOEXPORT movie_root* get_current_root();
 DSOEXPORT const char* get_workdir();
 DSOEXPORT void set_workdir(const char* dir);
 
+#if 0
 // Information about how to display a character.
 class display_info
 {
@@ -99,6 +99,7 @@ public:
 	    m_clip_depth = di.m_clip_depth;
 	}
 };
+#endif
 
 
 //

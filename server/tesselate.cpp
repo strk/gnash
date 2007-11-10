@@ -71,17 +71,19 @@
 // rationally deals with self-intersection by just overlapping parts
 // of the tesselated poly.
 
-/* $Id: tesselate.cpp,v 1.14 2007/10/30 18:55:43 strk Exp $ */
+/* $Id: tesselate.cpp,v 1.15 2007/11/10 11:51:43 strk Exp $ */
 
 #include "tesselate.h"
 #include "types.h"
 #include "utility.h"
 #include "container.h"
+#include "Point2d.h"
 
 #include <vector>
 
 namespace gnash {
 namespace tesselate {
+
 	// Curve subdivision error tolerance.
 	static float	s_tolerance = 1.0f;
 	static trapezoid_accepter*	s_accepter = NULL;
@@ -115,7 +117,7 @@ namespace tesselate {
 			// For rasterization, we want to ensure that
 			// the segment always points towards positive
 			// y...
-			if (m_begin.m_y > m_end.m_y)
+			if (m_begin.y > m_end.y)
 			{
 				flip();
 			}
@@ -133,9 +135,9 @@ namespace tesselate {
 		float	get_height() const
 		// Return segment height.
 		{
-			assert(m_end.m_y >= m_begin.m_y);
+			assert(m_end.y >= m_begin.y);
 
-			return m_end.m_y - m_begin.m_y;
+			return m_end.y - m_begin.y;
 		}
 	};
 
@@ -186,13 +188,13 @@ namespace tesselate {
 
 
 	static int	compare_segment_y(const void* a, const void* b)
-	// For sorting segments by m_begin.m_y, and then by height.
+	// For sorting segments by m_begin.y, and then by height.
 	{
 		const fill_segment*	A = (const fill_segment*) a;
 		const fill_segment*	B = (const fill_segment*) b;
 
-		const float	ay0 = A->m_begin.m_y;
-		const float	by0 = B->m_begin.m_y;
+		const float	ay0 = A->m_begin.y;
+		const float	by0 = B->m_begin.y;
 
 		if (ay0 < by0)
 		{
@@ -224,13 +226,13 @@ namespace tesselate {
 
 
 	static int	compare_segment_x(const void* a, const void* b)
-	// For sorting segments by m_begin.m_x, and then by m_end.m_x.
+	// For sorting segments by m_begin.x, and then by m_end.y.
 	{
 		const fill_segment*	A = (const fill_segment*) a;
 		const fill_segment*	B = (const fill_segment*) b;
 
-		const float	ax0 = A->m_begin.m_x;
-		const float	bx0 = B->m_begin.m_x;
+		const float	ax0 = A->m_begin.x;
+		const float	bx0 = B->m_begin.x;
 
 		if (ax0 < bx0)
 		{
@@ -238,8 +240,8 @@ namespace tesselate {
 		}
 		else if (ax0 == bx0)
 		{
-			const float	ax1 = A->m_end.m_x;
-			const float	bx1 = B->m_end.m_x;
+			const float	ax1 = A->m_end.y;
+			const float	bx1 = B->m_end.y;
 
 			if (ax1 < bx1)
 			{
@@ -280,12 +282,12 @@ namespace tesselate {
 			unsigned int	base = 0;
 			while (base < s_current_segments.size())
 			{
-				float	        ytop = s_current_segments[base].m_begin.m_y;
+				float	        ytop = s_current_segments[base].m_begin.y;
 				unsigned int	next_base = base + 1;
 				for (;;)
 				{
 					if (next_base == s_current_segments.size()
-					    || s_current_segments[next_base].m_begin.m_y > ytop)
+					    || s_current_segments[next_base].m_begin.y > ytop)
 					{
 						break;
 					}
@@ -301,24 +303,24 @@ namespace tesselate {
 
 				// s_current_segments[base] through s_current_segments[next_base - 1] is all the segs that start at ytop
 				if (next_base >= s_current_segments.size()
-				    || s_current_segments[base].m_end.m_y <= s_current_segments[next_base].m_begin.m_y)
+				    || s_current_segments[base].m_end.y <= s_current_segments[next_base].m_begin.y)
 				{
 					// No segments start between ytop and
-					// [base].m_end.m_y, so we can peel
+					// [base].m_end.y, so we can peel
 					// off that whole interval and render
 					// it right away.
-					float	ybottom = s_current_segments[base].m_end.m_y;
+					float	ybottom = s_current_segments[base].m_end.y;
 					peel_off_and_emit(base, next_base, ytop, ybottom);
 
 					while (base < s_current_segments.size()
-					       && s_current_segments[base].m_end.m_y <= ybottom)
+					       && s_current_segments[base].m_end.y <= ybottom)
 					{
 						base++;
 					}
 				}
 				else
 				{
-					float	ybottom = s_current_segments[next_base].m_begin.m_y;
+					float	ybottom = s_current_segments[next_base].m_begin.y;
 					assert(ybottom > ytop);
 					peel_off_and_emit(base, next_base, ytop, ybottom);
 
@@ -349,18 +351,18 @@ namespace tesselate {
 		for (int i = i0; i < i1; i++)
 		{
 			fill_segment*	f = &s_current_segments[i];
-			assert(f->m_begin.m_y == y0);
-			assert(f->m_end.m_y >= y1);
+			assert(f->m_begin.y == y0);
+			assert(f->m_end.y >= y1);
 
-			float	dy = f->m_end.m_y - f->m_begin.m_y;
+			float	dy = f->m_end.y - f->m_begin.y;
 			float	t = 1.0f;
 			if (dy > 0)
 			{
-				t = (y1 - f->m_begin.m_y) / dy;
+				t = (y1 - f->m_begin.y) / dy;
 			}
 			point	intersection;
-			intersection.m_y = y1;
-			intersection.m_x = f->m_begin.m_x + (f->m_end.m_x - f->m_begin.m_x) * t;
+			intersection.y = y1;
+			intersection.x = f->m_begin.x + (f->m_end.y - f->m_begin.x) * t;
 
 			// Peel off.
 			slab.push_back(*f);
@@ -384,12 +386,12 @@ namespace tesselate {
 				if (slab[i].m_right_style >= 0)
 				{
 					trapezoid	tr;
-					tr.m_y0 = slab[i].m_begin.m_y;
-					tr.m_y1 = slab[i].m_end.m_y;
-					tr.m_lx0 = slab[i].m_begin.m_x;
-					tr.m_lx1 = slab[i].m_end.m_x;
-					tr.m_rx0 = slab[i + 1].m_begin.m_x;
-					tr.m_rx1 = slab[i + 1].m_end.m_x;
+					tr.m_y0 = slab[i].m_begin.y;
+					tr.m_y1 = slab[i].m_end.y;
+					tr.m_lx0 = slab[i].m_begin.x;
+					tr.m_lx1 = slab[i].m_end.y;
+					tr.m_rx0 = slab[i + 1].m_begin.x;
+					tr.m_rx1 = slab[i + 1].m_end.y;
 					s_accepter->accept_trapezoid(slab[i].m_right_style, tr);
 				}
 			}
@@ -401,12 +403,12 @@ namespace tesselate {
 				if (slab[i].m_left_style >= 0)
 				{
 					trapezoid	tr;
-					tr.m_y0 = slab[i].m_begin.m_y;
-					tr.m_y1 = slab[i].m_end.m_y;
-					tr.m_lx0 = slab[i].m_begin.m_x;
-					tr.m_lx1 = slab[i].m_end.m_x;
-					tr.m_rx0 = slab[i + 1].m_begin.m_x;
-					tr.m_rx1 = slab[i + 1].m_end.m_x;
+					tr.m_y0 = slab[i].m_begin.y;
+					tr.m_y1 = slab[i].m_end.y;
+					tr.m_lx0 = slab[i].m_begin.x;
+					tr.m_lx1 = slab[i].m_end.y;
+					tr.m_rx0 = slab[i + 1].m_begin.x;
+					tr.m_rx1 = slab[i + 1].m_end.y;
 					s_accepter->accept_trapezoid(slab[i].m_left_style, tr);
 				}
 			}
@@ -437,8 +439,8 @@ namespace tesselate {
 		s_current_right_style = style_right;
 		s_current_line_style = line_style;
 
-		s_last_point.m_x = ax;
-		s_last_point.m_y = ay;
+		s_last_point.x = ax;
+		s_last_point.y = ay;
 
 		assert(s_current_path.size() == 0);
 		s_current_path.resize(0);
@@ -528,7 +530,7 @@ namespace tesselate {
 	// as the control point in between.
 	{
 		// Subdivide, and add line segments...
-		curve(s_last_point.m_x, s_last_point.m_y, cx, cy, ax, ay);
+		curve(s_last_point.x, s_last_point.y, cx, cy, ax, ay);
 	}
 
 

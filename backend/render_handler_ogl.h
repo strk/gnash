@@ -59,7 +59,7 @@ struct oglVertex {
   }
   
   oglVertex(const point& p)
-    : _x(p.m_x), _y(p.m_y), _z(0.0)
+    : _x(p.x), _y(p.y), _z(0.0)
   {
   }
 

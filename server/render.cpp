@@ -90,8 +90,8 @@ namespace gnash {
 			if (s_render_handler) {
 				s_render_handler->get_scale(scale);
 			} else {
-				scale.m_x = 1.0;
-				scale.m_y = 1.0;
+				scale.x = 1.0;
+				scale.y = 1.0;
 			}
 		}
 

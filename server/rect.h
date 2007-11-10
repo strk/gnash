@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: rect.h,v 1.21 2007/07/01 10:54:24 bjacques Exp $ */
+/* $Id: rect.h,v 1.22 2007/11/10 11:51:43 strk Exp $ */
 
 #ifndef GNASH_RECT_H
 #define GNASH_RECT_H
@@ -30,6 +30,7 @@
 #include "tu_config.h"
 
 #include "Range2d.h"
+#include "Point2d.h"
 
 #include <cassert> // for inlines
 #include <iostream> // for output operator
@@ -38,7 +39,6 @@
 namespace gnash {
 	class matrix;
 	class stream;
-	class point; // is a forward declaration enough for a return type ?
 }
 
 namespace gnash {

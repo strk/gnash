@@ -28,6 +28,8 @@ class tu_file;
 namespace gnash {
 	class movie_def_impl;
 	class texture_glyph;
+	class matrix;
+	class font;
 }
 
 namespace gnash {

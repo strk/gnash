@@ -464,7 +464,7 @@ button_character_instance::get_topmost_mouse_entity(float x, float y)
 		point	sub_p;
 		rec.m_button_matrix.transform_by_inverse(&sub_p, p);
 
-		if (rec.m_character_def->point_test_local(sub_p.m_x, sub_p.m_y))
+		if (rec.m_character_def->point_test_local(sub_p.x, sub_p.y))
 		{
 			// The mouse is inside the shape.
 			return this;

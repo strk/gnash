@@ -25,34 +25,6 @@
 namespace gnash {
 
 	//
-	// point
-	//
-
-
-	bool	point::bitwise_equal(const point& p) const
-	// Bitwise comparison; return true if *this is bitwise
-	// identical to p.
-	{
-		return memcmp(this, &p, sizeof(p)) == 0;
-	}
-
-	float point::squareDistance(const point& other) const
-	{
-		float hside = other.m_x - m_x;
-		float vside = other.m_y - m_y;
-
-		return hside*hside + vside*vside;
-	}
-
-	float point::distance(const point& other) const
-	{
-		float sd = squareDistance(other);
-		if ( ! sd ) return sd;
-		else return sqrt(squareDistance(other));
-	}
-
-
-	//
 	// rgba
 	//
 

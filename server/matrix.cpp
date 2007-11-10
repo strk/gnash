@@ -19,7 +19,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.cpp,v 1.19 2007/10/30 18:55:42 strk Exp $ 
+// $Id: matrix.cpp,v 1.20 2007/11/10 11:51:43 strk Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -254,15 +254,15 @@ matrix::transform(point* result, const point& p) const
 {
 	assert(result);
 
-	result->m_x = m_[0][0] * p.m_x + m_[0][1] * p.m_y + m_[0][2];
-	result->m_y = m_[1][0] * p.m_x + m_[1][1] * p.m_y + m_[1][2];
+	result->x = m_[0][0] * p.x + m_[0][1] * p.y + m_[0][2];
+	result->y = m_[1][0] * p.x + m_[1][1] * p.y + m_[1][2];
 }
 
 void
 matrix::transform(point& p) const
 // Transform point 'p' by our matrix.
 {
-	transform(p.m_x, p.m_y);
+	transform(p.x, p.y);
 }
 
 void
@@ -295,10 +295,10 @@ matrix::transform(geometry::Range2d<float>& r) const
         transform(p2);
         transform(p3);
 
-        r.setTo(p0.m_x, p0.m_y);
-        r.expandTo(p1.m_x, p1.m_y);
-        r.expandTo(p2.m_x, p2.m_y);
-        r.expandTo(p3.m_x, p3.m_y);
+        r.setTo(p0.x, p0.y);
+        r.expandTo(p1.x, p1.y);
+        r.expandTo(p2.x, p2.y);
+        r.expandTo(p3.x, p3.y);
 }
 
 void
@@ -308,8 +308,8 @@ matrix::transform_vector(point* result, const point& v) const
 {
 	assert(result);
 
-	result->m_x = m_[0][0] * v.m_x + m_[0][1] * v.m_y;
-	result->m_y = m_[1][0] * v.m_x + m_[1][1] * v.m_y;
+	result->x = m_[0][0] * v.x + m_[0][1] * v.y;
+	result->y = m_[1][0] * v.x + m_[1][1] * v.y;
 }
 
 void

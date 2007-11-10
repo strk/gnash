@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.46 2007/11/08 17:16:12 udog Exp $ */
+/* $Id: shape_character_def.cpp,v 1.47 2007/11/10 11:51:44 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -541,19 +541,19 @@ void  shape_character_def::display(character* inst)
 
 static void point_normalize(point* p)
 {
-    float mag2 = p->m_x * p->m_x + p->m_y * p->m_y;
+    float mag2 = p->x * p->x + p->y * p->y;
     if (mag2 < 1e-9f) {
   // Very short vector.
   // @@ log error
 
   // Arbitrary unit vector.
-  p->m_x = 1;
-  p->m_y = 0;
+  p->x = 1;
+  p->y = 0;
     }
 
     float inv_mag = 1.0f / sqrtf(mag2);
-    p->m_x *= inv_mag;
-    p->m_y *= inv_mag;
+    p->x *= inv_mag;
+    p->y *= inv_mag;
 }
 
 
@@ -562,8 +562,8 @@ static void show_fill_number(const point& p, int fill_number)
     // We're inside a glBegin(GL_LINES)
 
     // Eh, let's do it in binary, least sig four bits...
-    float x = p.m_x;
-    float y = p.m_y;
+    float x = p.x;
+    float y = p.y;
 
     int mask = 8;
     while (mask) {
@@ -625,13 +625,13 @@ static void debug_display_shape_paths(
   glBegin(GL_LINE_STRIP);
 
   mat.transform(&pt, point(p.m_ax, p.m_ay));
-  glVertex2f(pt.m_x, pt.m_y);
+  glVertex2f(pt.x, pt.y);
 
   for (unsigned int j = 0; j < p.m_edges.size(); j++) {
       mat.transform(&pt, point(p.m_edges[j].m_cx, p.m_edges[j].m_cy));
-      glVertex2f(pt.m_x, pt.m_y);
+      glVertex2f(pt.x, pt.y);
       mat.transform(&pt, point(p.m_edges[j].m_ax, p.m_edges[j].m_ay));
-      glVertex2f(pt.m_x, pt.m_y);
+      glVertex2f(pt.x, pt.y);
   }
 
   glEnd();
@@ -643,33 +643,33 @@ static void debug_display_shape_paths(
       {
     mat.transform(&p0, point(p.m_edges[j].m_cx, p.m_edges[j].m_cy));
     mat.transform(&p1, point(p.m_edges[j].m_ax, p.m_edges[j].m_ay));
-    dir = point(p1.m_x - p0.m_x, p1.m_y - p0.m_y);
+    dir = point(p1.x - p0.x, p1.y - p0.y);
     point_normalize(&dir);
-    right = point(-dir.m_y, dir.m_x); // perpendicular
+    right = point(-dir.y, dir.x); // perpendicular
 
     const float ARROW_MAG = 60.f; // TWIPS?
     if (p.getLeftFill() != 0)
         {
       glColor4f(0, 1, 0, 0.5);
-      glVertex2f(p0.m_x,
-           p0.m_y);
-      glVertex2f(p0.m_x - dir.m_x * ARROW_MAG - right.m_x * ARROW_MAG,
-           p0.m_y - dir.m_y * ARROW_MAG - right.m_y * ARROW_MAG);
+      glVertex2f(p0.x,
+           p0.y);
+      glVertex2f(p0.x - dir.x * ARROW_MAG - right.x * ARROW_MAG,
+           p0.y - dir.y * ARROW_MAG - right.y * ARROW_MAG);
 
-      show_fill_number(point(p0.m_x - right.m_x * ARROW_MAG * 4,
-                 p0.m_y - right.m_y * ARROW_MAG * 4),
+      show_fill_number(point(p0.x - right.x * ARROW_MAG * 4,
+                 p0.y - right.y * ARROW_MAG * 4),
            p.getLeftFill());
         }
     if (p.getRightFill() != 0)
         {
       glColor4f(1, 0, 0, 0.5);
-      glVertex2f(p0.m_x,
-           p0.m_y);
-      glVertex2f(p0.m_x - dir.m_x * ARROW_MAG + right.m_x * ARROW_MAG,
-           p0.m_y - dir.m_y * ARROW_MAG + right.m_y * ARROW_MAG);
+      glVertex2f(p0.x,
+           p0.y);
+      glVertex2f(p0.x - dir.x * ARROW_MAG + right.x * ARROW_MAG,
+           p0.y - dir.y * ARROW_MAG + right.y * ARROW_MAG);
 
-      show_fill_number(point(p0.m_x + right.m_x * ARROW_MAG * 4,
-                 p0.m_y + right.m_y * ARROW_MAG * 4),
+      show_fill_number(point(p0.x + right.x * ARROW_MAG * 4,
+                 p0.y + right.y * ARROW_MAG * 4),
            p.getRightFill());
         }
       }}

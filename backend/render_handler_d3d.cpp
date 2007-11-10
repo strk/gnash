@@ -875,8 +875,8 @@ public
     m.transform(&a, gameswf::point(coords.m_x_min, coords.m_y_min));
     m.transform(&b, gameswf::point(coords.m_x_max, coords.m_y_min));
     m.transform(&c, gameswf::point(coords.m_x_min, coords.m_y_max));
-    d.m_x = b.m_x + c.m_x - a.m_x;
-    d.m_y = b.m_y + c.m_y - a.m_y;
+    d.x = b.x + c.x - a.x;
+    d.y = b.y + c.y - a.y;
 
     // Set texture.
     m_pd3dDevice->SetTexture(0, s_d3d_textures[bi->m_texture_id]);
@@ -901,26 +901,26 @@ public
       abort();
     }
 
-    pVertices[0].x = a.m_x ;
-    pVertices[0].y = a.m_y ;
+    pVertices[0].x = a.x ;
+    pVertices[0].y = a.y ;
     pVertices[0].z = Z_DEPTH;
     pVertices[0].tu       = uv_coords.m_x_min ;
     pVertices[0].tv       = uv_coords.m_y_min ;
 
-    pVertices[1].x = b.m_x ;
-    pVertices[1].y = b.m_y ;
+    pVertices[1].x = b.x ;
+    pVertices[1].y = b.y ;
     pVertices[1].z = Z_DEPTH;
     pVertices[1].tu       = uv_coords.m_x_max ;
     pVertices[1].tv       = uv_coords.m_y_min ;
 
-    pVertices[2].x = c.m_x ;
-    pVertices[2].y = c.m_y ;
+    pVertices[2].x = c.x ;
+    pVertices[2].y = c.y ;
     pVertices[2].z = Z_DEPTH;
     pVertices[2].tu       = uv_coords.m_x_min ;
     pVertices[2].tv       = uv_coords.m_y_max ;
 
-    pVertices[3].x = d.m_x ;
-    pVertices[3].y = d.m_y ;
+    pVertices[3].x = d.x ;
+    pVertices[3].y = d.y ;
     pVertices[3].z = Z_DEPTH;
     pVertices[3].tu       = uv_coords.m_x_max ;
     pVertices[3].tv       = uv_coords.m_y_max ;

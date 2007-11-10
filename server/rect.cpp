@@ -95,10 +95,10 @@ void	rect::enclose_transformed_rect(const matrix& m, const rect& r)
 	m.transform(&p2, r.get_corner(2));
 	m.transform(&p3, r.get_corner(3));
 
-	enclose_point(p0.m_x, p0.m_y);
-	expand_to_point(p1.m_x, p1.m_y);
-	expand_to_point(p2.m_x, p2.m_y);
-	expand_to_point(p3.m_x, p3.m_y);
+	enclose_point(p0.x, p0.y);
+	expand_to_point(p1.x, p1.y);
+	expand_to_point(p2.x, p2.y);
+	expand_to_point(p3.x, p3.y);
 }
 
 void  rect::expand_to_rect(const rect& r) 
@@ -128,10 +128,10 @@ void	rect::expand_to_transformed_rect(const matrix& m, const rect& r)
 
 	// TODO: check for numeric overflow ?
 
-	_range.expandTo(p0.m_x, p0.m_y);
-	_range.expandTo(p1.m_x, p1.m_y);
-	_range.expandTo(p2.m_x, p2.m_y);
-	_range.expandTo(p3.m_x, p3.m_y);
+	_range.expandTo(p0.x, p0.y);
+	_range.expandTo(p1.x, p1.y);
+	_range.expandTo(p2.x, p2.y);
+	_range.expandTo(p3.x, p3.y);
 }
 
 
@@ -163,8 +163,8 @@ rect::clamp(point& p) const
 	// nothing to do, point is surely inside
 	if ( _range.isWorld() ) return;
 
-	p.m_x = fclamp(p.m_x, _range.getMinX(), _range.getMaxX());
-	p.m_y = fclamp(p.m_y, _range.getMinY(), _range.getMaxY());
+	p.x = fclamp(p.x, _range.getMinX(), _range.getMaxX());
+	p.y = fclamp(p.y, _range.getMinY(), _range.getMaxY());
 }
 
 std::string

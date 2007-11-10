@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: generic_character.cpp,v 1.9 2007/10/30 18:55:42 strk Exp $ */
+/* $Id: generic_character.cpp,v 1.10 2007/11/10 11:51:43 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -55,7 +55,7 @@ generic_character::pointInShape(float x, float y) const
 	matrix wm = get_world_matrix();
 	point lp(x, y);
 	wm.transform_by_inverse(lp);
-	return m_def->point_test_local(lp.m_x, lp.m_y);
+	return m_def->point_test_local(lp.x, lp.y);
 }
 
 } // namespace gnash

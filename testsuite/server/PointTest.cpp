@@ -19,12 +19,13 @@
 #include "config.h"
 #endif
 
-#include "gnash.h" // for point !!
 #include <iostream>
 #include <sstream>
 #include <cassert>
+#include <cmath>
 
 #include "check.h"
+#include "Point2d.h" // this is really a point2d test...
 
 using namespace std;
 using namespace gnash;
@@ -58,6 +59,8 @@ std::ostream& operator<<(std::ostream& os, const D& d)
 int
 main(int /*argc*/, char** /*argv*/)
 {
+
+	typedef geometry::Point2d<float> point;
 
 	point p0(0, 0);
 

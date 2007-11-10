@@ -66,7 +66,7 @@ public:
 
 	/// Sets the stream used for the connection, and starts the download
 	/// is the stream is valid. Returns true is the stream is valid, and else false.
-	bool setStream(std::auto_ptr<tu_file> stream);
+	bool setStream(std::auto_ptr<tu_file> str);
 
 	/// Put read pointer at given position
 	/// Will block if there is not enough data buffered,

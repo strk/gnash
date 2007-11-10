@@ -345,10 +345,10 @@ public:
       return;
     }
         
-    cairo_move_to(_cr, corners[0].m_x, corners[0].m_y);
+    cairo_move_to(_cr, corners[0].x, corners[0].y);
     
     for (size_t i = 0; i < corner_count; ++i) {
-      cairo_line_to(_cr, corners[i].m_x, corners[i].m_y);
+      cairo_line_to(_cr, corners[i].x, corners[i].y);
     }
     
     cairo_close_path(_cr);
@@ -752,25 +752,25 @@ public:
       point oldpnt(the_path.m_ax, the_path.m_ay);
       point newpnt;
       mat.transform(&newpnt, oldpnt);
-      the_path.m_ax = newpnt.m_x;    
-      the_path.m_ay = newpnt.m_y;
+      the_path.m_ax = newpnt.x;    
+      the_path.m_ay = newpnt.y;
       
       ecount = the_path.m_edges.size();
       for (eno=0; eno<ecount; eno++) {
       
         edge &the_edge = the_path.m_edges[eno];
         
-        oldpnt.m_x = the_edge.m_ax;
-        oldpnt.m_y = the_edge.m_ay;
+        oldpnt.x = the_edge.m_ax;
+        oldpnt.y = the_edge.m_ay;
         mat.transform(&newpnt, oldpnt);
-        the_edge.m_ax = newpnt.m_x;
-        the_edge.m_ay = newpnt.m_y;
+        the_edge.m_ax = newpnt.x;
+        the_edge.m_ay = newpnt.y;
         
-        oldpnt.m_x = the_edge.m_cx;
-        oldpnt.m_y = the_edge.m_cy;
+        oldpnt.x = the_edge.m_cx;
+        oldpnt.y = the_edge.m_cy;
         mat.transform(&newpnt, oldpnt);
-        the_edge.m_cx = newpnt.m_x;
-        the_edge.m_cy = newpnt.m_y;
+        the_edge.m_cx = newpnt.x;
+        the_edge.m_cy = newpnt.y;
       
       }          
       

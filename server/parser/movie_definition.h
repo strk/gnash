@@ -65,6 +65,7 @@ namespace gnash {
 	class bitmap_info;
 	class movie_instance;
 	class sprite_instance;
+	class execute_tag;
 }
 
 namespace gnash

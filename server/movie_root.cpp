@@ -678,8 +678,8 @@ movie_root::set_drag_state(const drag_state& st)
 		point world_mouse(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
 
 		// Compute offset
-		int xoffset = world_mouse.m_x - world_origin.m_x;
-		int yoffset = world_mouse.m_y - world_origin.m_y;
+		int xoffset = world_mouse.x - world_origin.x;
+		int yoffset = world_mouse.y - world_origin.y;
 
 		m_drag_state.setOffset(xoffset, yoffset);
 	}
@@ -704,8 +704,8 @@ movie_root::doMouseDrag()
 
 	if (! m_drag_state.isLockCentered())
 	{
-		world_mouse.m_x -= m_drag_state.xOffset();
-		world_mouse.m_y -= m_drag_state.yOffset();
+		world_mouse.x -= m_drag_state.xOffset();
+		world_mouse.y -= m_drag_state.yOffset();
 	}
 
 	matrix	parent_world_mat;
@@ -721,7 +721,7 @@ movie_root::doMouseDrag()
 	// Place our origin so that it coincides with the mouse coords
 	// in our parent frame.
 	matrix	local = dragChar->get_matrix();
-	local.set_translation( parent_mouse.m_x, parent_mouse.m_y );
+	local.set_translation( parent_mouse.x, parent_mouse.y );
 	dragChar->set_matrix(local);
 }
 

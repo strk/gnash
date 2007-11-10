@@ -79,14 +79,14 @@ edge::distancePtSeg(const point& pt, const point& A, const point& B)
 float
 edge::squareDistancePtSeg(const point& p, const point& A, const point& B)
 {
-	float dx = B.m_x - A.m_x;
-	float dy = B.m_y - A.m_y;
+	float dx = B.x - A.x;
+	float dy = B.y - A.y;
 
         /* if start==end, then use pt distance */
         if ( dx == 0 && dy == 0 ) return p.squareDistance(A); 
 
-	float pdx = p.m_x - A.m_x;
-	float pdy = p.m_y - A.m_y;
+	float pdx = p.x - A.x;
+	float pdy = p.y - A.y;
 
         float u = (pdx * dx + pdy * dy) / (dx*dx + dy*dy);
 
@@ -103,10 +103,10 @@ edge::squareDistancePtSeg(const point& p, const point& A, const point& B)
 	}
 
 	point px;
-	px.m_x = A.m_x + u * (B.m_x - A.m_x);
-	px.m_y = A.m_y + u * (B.m_y - A.m_y);
+	px.x = A.x + u * (B.x - A.x);
+	px.y = A.y + u * (B.y - A.y);
 
-	//cout << "R was between 0 and 1, u is " << u << " px : " << px.m_x << "," << px.m_y << endl;
+	//cout << "R was between 0 and 1, u is " << u << " px : " << px.x << "," << px.y << endl;
 
 	return p.squareDistance(px);
 }
@@ -442,8 +442,8 @@ void	mesh::set_tri_strip(const point pts[], int count)
 		
     // convert to ints.
     for (int i = 0; i < count; i++) {
-	m_triangle_strip[i * 2] = int16_t(pts[i].m_x);
-	m_triangle_strip[i * 2 + 1] = int16_t(pts[i].m_y);
+	m_triangle_strip[i * 2] = int16_t(pts[i].x);
+	m_triangle_strip[i * 2 + 1] = int16_t(pts[i].y);
     }
 
 //		m_triangle_strip.resize(count);
@@ -494,8 +494,8 @@ m_style(style)
 		
     // convert to ints.
     for (int i = 0; i < coord_count; i++) {
-	m_coords[i * 2] = int16_t(coords[i].m_x);
-	m_coords[i * 2 + 1] = int16_t(coords[i].m_y);
+	m_coords[i * 2] = int16_t(coords[i].x);
+	m_coords[i * 2 + 1] = int16_t(coords[i].y);
     }
 }
 
@@ -540,7 +540,7 @@ public:
 	{
 	    // See if we can attach this mini-strip to an existing strip.
 
-	    if (l0.bitwise_equal(r0) == false) {
+	    if (l0 != r0) {
 		// Check the next strip first; trapezoids will
 		// tend to arrive in rotating order through
 		// the active strips.
@@ -551,7 +551,7 @@ public:
 		    assert(str.size() >= 3);	// should have at least one tri already.
 				
 		    int	last = str.size() - 1;
-		    if (str[last - 1].bitwise_equal(l0) && str[last].bitwise_equal(r0))
+		    if (str[last - 1] == l0 && str[last] == r0)
 			{
 			    // Can join these tris to this strip.
 			    str.push_back(l1);
@@ -565,7 +565,7 @@ public:
 		    assert(str.size() >= 3);	// should have at least one tri already.
 				
 		    int	last = str.size() - 1;
-		    if (str[last - 1].bitwise_equal(l0) && str[last].bitwise_equal(r0))	{
+		    if (str[last - 1] == l0 && str[last] == r0)	{
 			// Can join these tris to this strip.
 			str.push_back(l1);
 			str.push_back(r1);

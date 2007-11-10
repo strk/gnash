@@ -21,7 +21,7 @@
 //
 
 
-/* $Id: Point2d.h,v 1.1 2007/11/10 09:46:54 strk Exp $ */
+/* $Id: Point2d.h,v 1.2 2007/11/10 11:51:42 strk Exp $ */
 
 #ifndef GNASH_POINT2DH
 #define GNASH_POINT2DH
@@ -61,6 +61,15 @@ public:
 	/// The y ordinate
 	T y;
 
+	/// Construct a Point2d with default X and Y ordinates
+	//
+	Point2d()
+		:
+		x(T(0.0)),
+		y(T(0.0))
+	{
+
+	}
 	/// Construct a Point2d with given X and Y ordinates
 	//
 	Point2d(T nx, T ny)
@@ -122,26 +131,45 @@ public:
 	}
 
 	/// Return square distance between this and the given point
-	float squareDistance(const Point2d<T>& p)
+	float squareDistance(const Point2d<T>& p) const
 	{
 		return squareDistance(*this, p);
 	}
 
 	/// Return distance between this and the given point
-	float distance(const Point2d<T>& p)
+	float distance(const Point2d<T>& p) const
 	{
 		return sqrtf(squareDistance(p));
 	}
 };
 
+/// Output operator
 template <typename T> inline std::ostream&
 operator<< (std::ostream& os, const Point2d<T>& p)
 {
 	return os << "Point2d(" << p.x << "," << p.y << ")";
 }
 
+/// Equality operator
+template <typename T> inline bool
+operator== (const Point2d<T>& p1, const Point2d<T>& p2)
+{
+	return p1.x == p2.x && p1.y == p2.y;
+}
+
+/// Inequality operator
+template <typename T> inline bool
+operator!= (const Point2d<T>& p1, const Point2d<T>& p2)
+{
+	return ! ( p1 == p2 );
+}
+
 
 } // namespace gnash::geometry
+
+// for backward compatibility
+typedef geometry::Point2d<float> point;
+
 } // namespace gnash
 
 #endif // GNASH_POINT2DH

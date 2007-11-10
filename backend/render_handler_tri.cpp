@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler_tri.cpp,v 1.22 2007/09/21 20:18:40 bjacques Exp $ */
+/* $Id: render_handler_tri.cpp,v 1.23 2007/11/10 11:51:42 strk Exp $ */
 
 #include "render_handler_tri.h"
 
@@ -318,8 +318,8 @@ void  triangulating_render_handler::draw_poly(const point* corners,
   // Create points array to vertex array 
   int16_t *vertex = new int16_t[(corner_count+1)*2];
   for (unsigned int cno=0; cno<corner_count; cno++) {
-    vertex[vno  ] = static_cast<int16_t>(corners[cno].m_x);
-    vertex[vno+1] = static_cast<int16_t>(corners[cno].m_y);
+    vertex[vno  ] = static_cast<int16_t>(corners[cno].x);
+    vertex[vno+1] = static_cast<int16_t>(corners[cno].y);
     vno+=2;
   }
   // add one more point to close the polygon
