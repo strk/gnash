@@ -201,6 +201,7 @@ static as_value sprite_attach_movie(const fn_call& fn)
 #endif // ndef GNASH_USE_GC
 
 	newch->set_name(newname.c_str());
+	newch->setDynamic();
 
 	// place_character() will set depth on newch
 	if ( ! sprite->attachCharacter(*newch, depth_val) )
@@ -208,8 +209,6 @@ static as_value sprite_attach_movie(const fn_call& fn)
 		log_error(_("Could not attach character at depth %d"), depth_val);
 		return rv;
 	}
-
-	newch->setDynamic();
 
 	/// Properties must be copied *after* the call to attachCharacter
 	/// because attachCharacter() will reset matrix !!
@@ -2148,7 +2147,7 @@ sprite_instance::on_event(const event_id& id)
 		return false;
 	}
 
-#if 0
+#if 1
 	if ( id.m_id == event_id::INITIALIZE )
 	{
 		// Construct as ActionScript object.
@@ -3378,16 +3377,25 @@ sprite_instance::stagePlacementCallback()
 	// We *might* avoid this, but better safe then sorry
 	m_def->ensure_frame_loaded(0);
 
-	constructAsScriptObject();
-	// TODO: should we execute these immediately if jumping
-	//       due to a gotoFrame ?
+	// We execute events immediately when the stage-placed character is dynamic.
+	// This is becase we assume that this means that the character is placed during
+	// processing of actions (opposed that during advancement iteration).
+	//
+	// A more general implementation might ask movie_root about it's state
+	// (iterating or processing actions?)
+	// Another possibility to inspect could be letting movie_root decide
+	// when to really queue and when rather to execute immediately the 
+	// events with priority INITIALIZE or CONSTRUCT ...
+	//
 	if ( isDynamic() )
 	{
+		//log_debug("Sprite %s is dynamic, sending INITIALIZE and CONSTRUCT events immediately", getTarget().c_str());
 		on_event(event_id::INITIALIZE);
 		on_event(event_id::CONSTRUCT);
 	}
 	else
 	{
+		//log_debug("Sprite %s is not dynamic, queuing INITIALIZE and CONSTRUCT events", getTarget().c_str());
 		queueEvent(event_id::INITIALIZE, movie_root::apINIT);
 		queueEvent(event_id::CONSTRUCT, movie_root::apCONSTRUCT);
 	}

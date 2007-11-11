@@ -1,3 +1,12 @@
+2007-11-11 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (sprite_attach_movie): mark the character
+	  as dynamic before placing on stage (so stagePlacementCallback knows
+	  about that); (stagePlacementCallback): don't construct as object
+	  here, let that be done on INITIALIZE event; (on_event): construct
+	  as ActionScript object before running INITIALIZE handlers.
+	  Fixes bug #21556 (youtube regression).
+
 2007-11-10 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (goto_frame): always set
