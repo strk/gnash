@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.149 2007/11/08 14:31:55 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.150 2007/11/11 19:14:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -3564,7 +3564,6 @@ SWFHandlers::ActionExtends(ActionExec& thread)
 	}
 	env.drop(2);
 
-	fprintf(stderr, "Extending.\n");
 	sub->extends(*super);
 
 	//log_msg(_("%s: testing"), __PRETTY_FUNCTION__);
