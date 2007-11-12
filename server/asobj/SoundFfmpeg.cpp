@@ -269,6 +269,7 @@ bool SoundFfmpeg::getAudio(void* owner, uint8_t* stream, int len)
 						int samples = stereo ? frame_size >> 2 : frame_size >> 1;
 						int newDataSize = 0;
 						int16_t* output_data = NULL;
+						bool output_data_allocated = false;
 
 						// Resample if needed
 						if (so->audioCodecCtx->channels != 2 || so->audioCodecCtx->sample_rate != 44100) {
@@ -279,6 +280,7 @@ bool SoundFfmpeg::getAudio(void* owner, uint8_t* stream, int len)
 							}
 							// The size of this is a guess, we don't know yet... Lets hope it's big enough
 							output_data = new int16_t[AVCODEC_MAX_AUDIO_FRAME_SIZE];
+							output_data_allocated = true;
 							samples = audio_resample (so->resampleCtx, output_data, (int16_t*)ptr, samples);
 							newDataSize =  samples * 2 * 2; // 2 for stereo and 2 for samplesize = 2 bytes
 						} else {
@@ -303,7 +305,7 @@ bool SoundFfmpeg::getAudio(void* owner, uint8_t* stream, int len)
 							loop = false;
 							pos += rest;
 						}
-						delete[] output_data;
+						if ( output_data_allocated ) delete[] output_data;
 					}
 				}
 			}

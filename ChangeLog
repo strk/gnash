@@ -1,5 +1,7 @@
 2007-11-12 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/SoundFfmpeg.cpp (getAudio): don't delete 
+	  allocated memory twice. Fixes bug #21195.
 	* gui/gnash.in: Add support for -G list for getting a list
 	  of available guis.
 
