@@ -1,3 +1,7 @@
+2007-11-12 Lucio Flavio Correa <lucio.correa@gmail.com>
+
+	* gui/kdesup.h, gui/kde.cpp: implement setCuror (patch #6266).
+
 2007-11-12 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/SoundFfmpeg.{cpp,h}: Add a LOADS_IN_SEPARATE_THREAD

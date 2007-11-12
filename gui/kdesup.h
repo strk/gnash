@@ -100,6 +100,7 @@ public:
     virtual void setInterval(unsigned int interval);
     virtual void setTimeout(unsigned int timeout);
     virtual void handleKeyEvent(QKeyEvent *event, bool down);
+    virtual void setCursor(gnash_cursor_type newcursor);
     void setInvalidatedRegions(const InvalidatedRanges& ranges);
     void resize(int width, int height);
     void quit();

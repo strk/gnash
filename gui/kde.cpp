@@ -127,6 +127,20 @@ KdeGui::setInterval(unsigned int interval)
     _qwidget->setInterval(interval);
     
 }
+void
+KdeGui::setCursor(gnash_cursor_type newcursor)
+{
+    switch(newcursor) {
+        case CURSOR_HAND:
+            _qwidget->setCursor(Qt::PointingHandCursor);
+            break;
+        case CURSOR_INPUT:
+            _qwidget->setCursor(Qt::IbeamCursor); 
+            break;
+        default:
+            _qwidget->unsetCursor(); 
+    }
+}
 
 bool
 KdeGui::run()
