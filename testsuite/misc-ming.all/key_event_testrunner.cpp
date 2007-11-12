@@ -47,69 +47,114 @@ main(int /*argc*/, char** /*argv*/)
   sprite_instance* root = tester.getRootMovie();
   assert(root);
 
-  check_equals(root->get_frame_count(), 31);
+  check_equals(root->get_frame_count(), 16);
   check_equals(root->get_current_frame(), 0);
 
   tester.advance();
+  tester.advance();
+  // check we are stopped at frame2
   check_equals(root->get_current_frame(), 1);
-
-  character* mc = const_cast<character*>(tester.findDisplayItemByName(*root, "mc"));
-  check(mc);
-
-  as_value tmp;
-  string_table& st = VM::get().getStringTable();
-  string_table::key x1key = st.find("x1");
-
-  check(root->get_member(x1key, &tmp));
-  check_equals(tmp.to_number(), 0);
   
-  // press key 'A' and checks
+  // provide a key press to continue the test
   tester.pressKey(key::A);
   tester.releaseKey(key::A);
-
-  // check that onClipKeyUp/KeyDown have been triggered
-  check(root->get_member(x1key, &tmp));
-  check_equals(tmp.to_string(), "65");
-  check(root->get_member(st.find("x2"), &tmp));
-  check_equals(tmp.to_number(), key::A);
-
-  // check that user defined onKeyUp/KeyDown were not triggered
-  check(root->get_member(st.find("x4"), &tmp));
-  check_equals(tmp.to_number(), 0);
-  check(root->get_member(st.find("x5"), &tmp));
-  check_equals(tmp.to_number(), 0);
-
-  for(int i=1; i<30; i++)
-  {
-    tester.advance();
-  }
-
-  check_equals(root->get_current_frame(), 30); // the 31th frame
-  check_equals(root->get_play_state(), sprite_instance::STOP);
-
-  // press key 'C' and checks
+  
+  tester.advance();
+  check_equals(root->get_current_frame(), 2);
+  
+  tester.advance();
+  tester.advance();
+  // check we are stopped at frame4
+  check_equals(root->get_current_frame(), 3);
+  
+  // provide a key press to continue the test
+  tester.pressKey(key::B);
+  tester.releaseKey(key::B);
+    
+  tester.advance();
+  check_equals(root->get_current_frame(), 4);
+  
+  tester.advance();
+  tester.advance();
+  // check we are stopped at frame6
+  check_equals(root->get_current_frame(), 5);
+ 
+  // provide a key press to continue the test
   tester.pressKey(key::C);
   tester.releaseKey(key::C);
-
-  // check that onClipKeyUp/KeyDown have been triggered
-  check(root->get_member(x1key, &tmp));
-  check_equals(tmp.to_string(), "67");
-  check(root->get_member(st.find("x2"), &tmp));
-  check_equals(tmp.to_number(), key::C);
+    
+  tester.advance();
+  check_equals(root->get_current_frame(), 6);
   
-  // check that user defined onKeyUp/KeyDown have been triggered
-  check(root->get_member(st.find("x4"), &tmp));
-  check_equals(tmp.to_string(), "67");
-  check(root->get_member(st.find("x5"), &tmp));
-  check_equals(tmp.to_number(), key::C);
+  tester.advance();
+  check_equals(root->get_current_frame(), 7);
+  
+  tester.advance();
+  tester.advance();
+  // check we are stopped at frame9
+  check_equals(root->get_current_frame(), 8);
+  
+  // provide a key press to continue the test
+  tester.pressKey(key::D);
+  tester.releaseKey(key::D);
+  
+  // we have jumped back to frame7
+  check_equals(root->get_current_frame(), 7);
+  
+  tester.advance();
+  // and we are in frame8 again
+  check_equals(root->get_current_frame(), 8);
+  
+  // provide a key press to continue the test
+  tester.pressKey(key::E);
+  tester.releaseKey(key::E);
   	
-  // check that user onClipKeyPress and user defined onKeyPress were not triggered
-  // onClipKeyPress was not triggered because the event handler binds a invalid key code
-  check(root->get_member(st.find("x3"), &tmp));
-  check_equals(tmp.to_number(), 0);
-  // onKeyPress was not triggered because I think there is no user defined
-  // KeyPress event handler at all( the defined onKeyPress is just a normal function).
-  check(root->get_member(st.find("x6"), &tmp));
-  check_equals(tmp.to_number(), 0);
+  tester.advance();
+  check_equals(root->get_current_frame(), 9);
   
+  tester.advance();
+  check_equals(root->get_current_frame(), 10);
+  
+  tester.advance();
+  tester.advance();
+  // check we are stopped at frame12
+  check_equals(root->get_current_frame(), 11);
+  
+  // provide a key press to continue the test
+  tester.pressKey(key::F);
+  tester.releaseKey(key::F);
+  
+  // we have jumped back to frame11
+  check_equals(root->get_current_frame(), 11);
+  
+  tester.advance();
+  // and we are in frame12 again
+  check_equals(root->get_current_frame(), 12);
+  
+  // provide a key press to continue the test
+  tester.pressKey(key::G);
+  tester.releaseKey(key::G);
+  	
+  tester.advance();
+  tester.advance();
+  // check we are stopped at frame14
+  check_equals(root->get_current_frame(), 13);
+  
+  // provide a key press to continue the test
+  tester.pressKey(key::H);
+  tester.releaseKey(key::H);
+    
+  tester.advance();
+  tester.advance();
+  // check we are stopped at frame15
+  check_equals(root->get_current_frame(), 14);
+  
+  // provide a key press to continue the test
+  tester.pressKey(key::I);
+  tester.releaseKey(key::I);
+  
+  tester.advance();
+  tester.advance();
+  // check we are stopped at frame16, finish testing
+  check_equals(root->get_current_frame(), 15);
 }

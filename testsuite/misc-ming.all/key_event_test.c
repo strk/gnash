@@ -16,13 +16,6 @@
  *
  */ 
 
-/*
- *  Key events are: KeyUp, KeyDown, KeyPress
- *  (1)KeyUp and KeyDown event handler is unrelated to any key;
- *  (2)KeyPress event handler should bind a valid key, which is hard-coded in the placement tag;
- *  (3)Use Key.addListener() to register user defined key event handler, otherwise it will not
- *     be triggered.
-*/
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -33,6 +26,24 @@
 #define OUTPUT_VERSION  6
 #define OUTPUT_FILENAME  "key_event_test.swf"
 
+SWFDisplayItem
+add_static_mc(SWFMovie mo, const char* name, int depth)
+{
+  SWFShape  sh;
+  SWFMovieClip mc;
+  SWFDisplayItem it;
+
+  mc = newSWFMovieClip();
+  sh = make_fill_square (300, 300, 60, 60, 255, 0, 0, 255, 0, 0);
+  SWFMovieClip_add(mc, (SWFBlock)sh);  
+  SWFMovieClip_nextFrame(mc);
+
+  it = SWFMovie_add(mo, (SWFBlock)mc);
+  SWFDisplayItem_setDepth(it, depth); 
+  SWFDisplayItem_setName(it, name);
+
+  return it;
+}
 
 int
 main(int argc, char** argv)
@@ -40,7 +51,6 @@ main(int argc, char** argv)
   SWFMovie mo;
   SWFMovieClip  mc, dejagnuclip;
   SWFDisplayItem  it;
-  SWFShape  sh_red;
 
   const char *srcdir=".";
   if ( argc>1 ) 
@@ -54,70 +64,173 @@ main(int argc, char** argv)
   Ming_init();
   mo = newSWFMovieWithVersion(OUTPUT_VERSION);
   SWFMovie_setDimension(mo, 800, 600);
+  // low frame rate is needed for visual checking
   SWFMovie_setRate (mo, 1.0);
 
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
-  add_actions(mo, "x1=0; x2=0; x3=0; x4=0; x5=0; x6=0; ");
-  SWFMovie_nextFrame(mo);  /* 1st frame */
-
-  
-  mc = newSWFMovieClip();
-  sh_red = make_fill_square (300, 300, 60, 60, 255, 0, 0, 255, 0, 0);
-  SWFMovieClip_add(mc, (SWFBlock)sh_red);  
-  SWFMovieClip_nextFrame(mc);
+  add_actions(mo, 
+    "test1=0; test2=0; test3=0; test4=0; test5=0; test6=0; "
+    "keyPressed=false; keyReleased=false;"
+    "haslooped1=false; haslooped2=false;");
+  SWFMovie_nextFrame(mo);  // _root frame1
 
 
-  it = SWFMovie_add(mo, (SWFBlock)mc); 
-  SWFDisplayItem_setDepth(it, 20); 
-  SWFDisplayItem_setName(it, "mc"); 
-  /* Define onClipKeyDown */
+  // test1: 
+  //    (1)onKeyDown, onKeyPress and onKeyUp are not global functions
+  //    (2)test that global Key object can be overridden
+  //    (3)after overriden, previously registered handlers could still respond to new key events
+  add_actions(mo, 
+    "_root.var1 = 0; _root.var2 = 0;"
+    "l = new Object();"
+    "l.onKeyDown = function () {_root.var1+=1; _root.Play(); }; "
+    "l.onKeyUp = function () { _root.var2+=1;}; "
+    " Key.addListener(l);"
+    "check_equals(typeof(Key), 'object');"
+    "check_equals(typeof(onKeyUp), 'undefined');"
+    "check_equals(typeof(onKeyDown), 'undefined');"
+    "check_equals(typeof(onKeyPress), 'undefined');"
+    "stop();"
+    "_root.note('press a single key to continue the test');"
+  );
+  SWFMovie_nextFrame(mo);  // _root frame2
+
+  SWFMovie_nextFrame(mo);  // _root frame3
+  
+  add_actions(mo, 
+    "stop();"
+    "check_equals(var1, 1); "
+    "check_equals(var2, 1); "
+    "Key = 3;"
+    "check_equals(typeof(Key), 'number');"
+    "_root.note('press a single key to continue the test');"
+    );
+  SWFMovie_nextFrame(mo);  // _root frame4
+  
+  SWFMovie_nextFrame(mo);  // _root frame5
+  
+  add_actions(mo,
+    "stop();"
+    "check_equals(var1, 2); "
+    "check_equals(var2, 2);"
+    "delete Key; "
+    "check_equals(typeof(Key), 'object');"
+    "Key.removeListener(l);"
+    "_root.note('press a single key to continue the test');"
+    "obj1=new Object(); "
+    " obj1.onKeyDown=function() {"
+    "   _root.play();"
+    "}; "
+    " Key.addListener(obj1); "
+  );
+  SWFMovie_nextFrame(mo);  // _root frame6
+   
+  add_actions(mo, 
+    "check_equals(var1, 2);"
+    "check_equals(var2, 2);"
+    "Key.removeListener(obj1);"
+    "delete l; delete obj1; "
+  );
+  SWFMovie_nextFrame(mo);  // _root frame7
+  
+  // test2:
+  //    test removing of static clip key listeners
+  SWFMovie_nextFrame(mo);  // _root frame8
+  
+  it = add_static_mc(mo, "listenerClip1", 20);
   SWFDisplayItem_addAction(it,
-    newSWFAction(" _root.x1 = Key.getAscii(); "
-                " _root.note('onClipKeyDown triggered'); "
-                " _root.note('key ASCII value: ' + _root.x1); "), 
-    SWFACTION_KEYDOWN); 
-  /* Define onClipKeyUp */
-  SWFDisplayItem_addAction(it,
-    newSWFAction(" _root.x2 = Key.getCode(); "
-                 " _root.note('onClipKeyUp triggered'); "
-                 " _root.note('key code: ' + _root.x2); "), 
-    SWFACTION_KEYUP); 
-  /* Define onClipKeyUp. Question: how to bind a key code with the KeyPress event??? */ 
-  SWFDisplayItem_addAction(it,
-    newSWFAction(" _root.note('onClipKeyPress triggered'); "
-                 " _root.x3 = _root.x1; "), 
-    SWFACTION_KEYPRESS);     
-    
-  /* add user defined events */
-  add_actions(mo, " mc.onKeyDown = function () { " 
-                  " _root.x4 = Key.getAscii(); "
-                  " _root.note('user defined onKeyDown triggered');  "
-                  " _root.note('key ASCII value: ' + _root.x4); }; "
-                  
-                  " mc.onKeyUp = function () { "
-                  " _root.x5 = Key.getCode(); "
-                  " _root.note('user defined onKeyUp triggered'); "
-                  " _root.note('key code: ' +  _root.x5);  }; "
-                  
-                  " mc.onKeyPress = function () { "
-                  " _root.x6 = _root.x3; "
-                  " _root.note('user defined onKeyPress triggered'); }; "
-              );
+    newSWFAction(" _root.note('onClipKeyDown triggered'); "
+                 " _root.test2++; "
+                 "if(!_root.haslooped1){"
+                 "   _root.haslooped1=true;"
+                 "   _root.gotoAndPlay(_root._currentframe-1);"
+                 "} else {"
+                 "   _root.gotoAndPlay(_root._currentframe+1);"
+                 "}"
+                ), 
+    SWFACTION_KEYDOWN);  
+  add_actions(mo,
+    "stop();"
+    "_root.note('press a single key to continue the test');"
+  );
+  SWFMovie_nextFrame(mo);  // _root frame9
   
-  SWFMovie_nextFrame(mo); /* 2nd frame */
+  check_equals(mo, "_root.test2", "2");
+  SWFDisplayItem_remove(it);
+  SWFMovie_nextFrame(mo);  // _root frame10
   
-  int frame_num = 3;
-  for(frame_num; frame_num<=30; frame_num++)
-  {
-      SWFMovie_nextFrame(mo); 
-  }
   
-  add_actions(mo, "_root.note('mc registered by addListener()'); ");
-  /* register "mc" to receive onKeyDown and onKeyUp notification after 30 seconds(30 frames). */
-  add_actions(mo, " Key.addListener(mc); stop(); ");
-  SWFMovie_nextFrame(mo); /* 31th frame */
+  // test3:
+  //    test removing of dynamic sprite key listeners 
+  SWFMovie_nextFrame(mo);  // _root frame11
   
+  add_actions(mo, 
+    "stop();"
+    "_root.note('press a single key to continue the test');"
+    "_root.createEmptyMovieClip('dynamic_mc', -10);"
+    "dynamic_mc.onKeyDown = function() "
+    "{"
+    "   _root.check_equals(this, _root.dynamic_mc);"
+    "   _root.note('user defined KeyDown triggered');"
+    "   _root.test3++;"
+    "   if(!_root.haslooped2){"
+    "       _root.haslooped2=true;"
+    "       _root.gotoAndPlay(_root._currentframe-1);"
+    "   } else {"
+    "       _root.gotoAndPlay(_root._currentframe+1);"
+    "   }"
+    "};"
+    "Key.addListener(dynamic_mc);"
+  );
+  SWFMovie_nextFrame(mo);  // _root frame12
+  
+  add_actions(mo, "dynamic_mc.swapDepths(10);  dynamic_mc.removeMovieClip();");
+  SWFMovie_nextFrame(mo);  // _root frame13
+  
+  // test4:
+  //    GC test
+  add_actions(mo, 
+    "_root.note('press a single key to continue the test');"
+    " obj2 = new Object(); "
+    " obj2.x = 100; "
+    " obj2.onKeyDown = function () { "
+    "   _root.note('user defined KeyDown triggered');"
+    "   _root.test4++; "
+    "   _root.objRef = this; "
+    "   _root.play();"
+    " };" 
+    " Key.addListener(obj2); "
+    // After deleting obj2, we still have a key listener kept alive!
+    " delete obj2; "
+    " stop();"
+  );
+  check_equals(mo, "_root.test4", "0");
+  SWFMovie_nextFrame(mo);  // _root frame14
+  
+  check_equals(mo, "objRef.x", "100");
+  check_equals(mo, "_root.test4", "1");
+  add_actions(mo,
+    "stop();"
+    "_root.note('press a single key to continue the test');"
+    "Key.removeListener(objRef); "
+    // check that objRef is still alive
+    "check_equals(typeof(objRef), 'object');"
+    // delete the objRef, no object and no key listener now.
+    "delete objRef;"
+    "obj3=new Object(); "
+    "obj3.onKeyDown=function() {"
+    "   _root.play();"
+    "}; "
+    "Key.addListener(obj3); "
+  );
+  SWFMovie_nextFrame(mo);  // _root frame15
+  
+  check_equals(mo, "_root.test4", "1");
+  add_actions(mo, 
+    "Key.removeListener(obj3);"
+    "delete obj3; "
+    "totals(); stop();");
+  SWFMovie_nextFrame(mo);  // _root frame16
   
   //Output movie
   puts("Saving " OUTPUT_FILENAME );
@@ -125,5 +238,6 @@ main(int argc, char** argv)
 
   return 0;
 }
+
 
 

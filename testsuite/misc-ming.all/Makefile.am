@@ -30,7 +30,6 @@ CLEANFILES =  \
 	testrun.log
 
 EXTRA_DIST = VarAndCharClashTest.as \
-	KeyTest.as \
 	gotoFrame2Test.as \
 	DrawingApiTest.as \
 	FlashVarsTest.as \
@@ -149,14 +148,6 @@ check_PROGRAMS = \
 	masks_testrunner \
 	key_event_test \
 	key_event_testrunner \
-	key_event_test2 \
-	key_event_test2runner \
-	key_event_test3 \
-	key_event_test3runner \
-	key_event_test4 \
-	key_event_test4runner \
-	key_event_test5 \
-	key_event_test5runner \
 	static_vs_dynamic1 \
 	static_vs_dynamic2 \
 	getTimer_test \
@@ -176,8 +167,7 @@ check_PROGRAMS += \
 endif
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
-check_PROGRAMS += KeyTest-Runner \
-	intervalTestRunner 
+check_PROGRAMS += intervalTestRunner 
 endif
 
 if MING_SUPPORTS_INIT_ACTIONS
@@ -606,90 +596,6 @@ key_event_testrunner_CXXFLAGS = \
 	$(NULL)
 key_event_testrunner_DEPENDENCIES = \
 	key_event_test.swf \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(NULL)
-
-key_event_test2_SOURCES = key_event_test2.c
-key_event_test2_LDADD = libgnashmingutils.la
-
-key_event_test2.swf: key_event_test2
-	./key_event_test2 $(top_srcdir)/testsuite/media
-
-key_event_test2runner_SOURCES = \
-	key_event_test2runner.cpp \
-	$(NULL)
-key_event_test2runner_LDADD = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(NULL)
-key_event_test2runner_CXXFLAGS = \
-	-DSRCDIR='"$(srcdir)"' \
-	-DTGTDIR='"$(abs_builddir)"' \
-	$(NULL)
-key_event_test2runner_DEPENDENCIES = \
-	key_event_test2.swf \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(NULL)
-
-key_event_test3_SOURCES = key_event_test3.c
-key_event_test3_LDADD = libgnashmingutils.la
-
-key_event_test3.swf: key_event_test3
-	./key_event_test3 $(top_srcdir)/testsuite/media
-
-key_event_test3runner_SOURCES = \
-	key_event_test3runner.cpp \
-	$(NULL)
-key_event_test3runner_LDADD = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(NULL)
-key_event_test3runner_CXXFLAGS = \
-	-DSRCDIR='"$(srcdir)"' \
-	-DTGTDIR='"$(abs_builddir)"' \
-	$(NULL)
-key_event_test3runner_DEPENDENCIES = \
-	key_event_test3.swf \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(NULL)
-
-key_event_test4_SOURCES = key_event_test4.c
-key_event_test4_LDADD = libgnashmingutils.la
-
-key_event_test4.swf: key_event_test4
-	./key_event_test4 $(top_srcdir)/testsuite/media
-
-key_event_test4runner_SOURCES = \
-	key_event_test4runner.cpp \
-	$(NULL)
-key_event_test4runner_LDADD = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(NULL)
-key_event_test4runner_CXXFLAGS = \
-	-DSRCDIR='"$(srcdir)"' \
-	-DTGTDIR='"$(abs_builddir)"' \
-	$(NULL)
-key_event_test4runner_DEPENDENCIES = \
-	key_event_test4.swf \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(NULL)
-	
-key_event_test5_SOURCES = key_event_test5.c
-key_event_test5_LDADD = libgnashmingutils.la
-
-key_event_test5.swf: key_event_test5
-	./key_event_test5 $(top_srcdir)/testsuite/media
-
-key_event_test5runner_SOURCES = \
-	key_event_test5runner.cpp \
-	$(NULL)
-key_event_test5runner_LDADD = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(NULL)
-key_event_test5runner_CXXFLAGS = \
-	-DSRCDIR='"$(srcdir)"' \
-	-DTGTDIR='"$(abs_builddir)"' \
-	$(NULL)
-key_event_test5runner_DEPENDENCIES = \
-	key_event_test5.swf \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 	
@@ -1551,26 +1457,6 @@ intervalTestRunner_DEPENDENCIES = \
 	intervalTest.swf	\
 	$(NULL)
 
-# This will only work with Ming-0.4.0beta2 (support for prebuilt clips inclusion)
-# Uses a low frame rate to test immediate redraw on key event
-KeyTest.swf: $(srcdir)/../media/green.swf Dejagnu.swf $(srcdir)/KeyTest.as 
-	$(MAKESWF) -o $@ Dejagnu.swf $(srcdir)/../media/green.swf $(srcdir)/KeyTest.as
-#
-KeyTest_Runner_SOURCES = \
-	KeyTest-Runner.cpp \
-	$(NULL)
-KeyTest_Runner_CXXFLAGS = \
-	-DSRCDIR='"$(srcdir)"' \
-	-DTGTDIR='"$(abs_builddir)"' \
-	$(NULL)
-KeyTest_Runner_LDADD = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(NULL)
-KeyTest_Runner_DEPENDENCIES = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	KeyTest.swf	\
-	$(NULL)
-
 gotoFrame2Test.swf: $(srcdir)/../media/green.swf Dejagnu.swf $(srcdir)/gotoFrame2Test.as 
 	$(MAKESWF) -o $@ -iDejagnu.swf:dejagnu $(srcdir)/../actionscript.all/dejagnu_so_init.as \
 		$(srcdir)/gotoFrame2Test.as 
@@ -1767,10 +1653,6 @@ TEST_CASES = \
 	masks_testrunner \
 	masks_test2runner \
 	key_event_testrunner \
-	key_event_test2runner \
-	key_event_test3runner \
-	key_event_test4runner \
-	key_event_test5runner \
 	static_vs_dynamic1_testrunner \
 	static_vs_dynamic2_testrunner \
 	getTimer_testrunner \
@@ -1796,8 +1678,7 @@ TEST_CASES += \
 endif
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
-TEST_CASES += KeyTest-Runner \
-	VarAndCharClashTest-Runner \
+TEST_CASES += VarAndCharClashTest-Runner \
 	FlashVarsTest-Runner \
 	intervalTestRunner \
 	gotoFrame2Test-Runner 

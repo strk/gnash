@@ -1,3 +1,9 @@
+2007-11-12 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/Makefile.am, key_event_test.c, key_event_testrunner.cpp:
+	  merge all key related tests to key_event_test.c. deprecated key_event_test2,3,4,5
+	  and KeyTest.as to speed up 'make check'.
+	  
 2007-11-11 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (sprite_attach_movie): mark the character
