@@ -1,3 +1,9 @@
+2007-11-12 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/parser/shape_character_def.cpp: point_test_local bugfix:
+	  revert last commit and align test coordinate to a grid instead;
+	  commit some debug so I don't have to rewrite it again... ;)     
+
 2007-11-12 Lucio Flavio Correa <lucio.correa@gmail.com>
 
 	* gui/kdesup.h, gui/kde.cpp: implement setCuror (patch #6266).

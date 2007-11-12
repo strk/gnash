@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.49 2007/11/12 10:56:15 udog Exp $ */
+/* $Id: shape_character_def.cpp,v 1.50 2007/11/12 19:24:28 udog Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -803,12 +803,20 @@ int curve_x_crossings(float x0, float y0, float x1, float y1,
 }
   
   
-  
 bool  shape_character_def::point_test_local(float x, float y)
     // Return true if the specified point is on the interior of our shape.
     // Incoming coords are local coords.
 {
 
+//#define DEBUG_POINT_TEST
+//#define DEBUG_POINT_TEST_EXT  
+
+
+#ifdef DEBUG_POINT_TEST  
+  printf("=== point_test_local ===\n");
+  char debug[1024];
+#endif
+  
   /*
   Principle:
   For the fill of the shape, we project a ray from the test point to the left
@@ -825,6 +833,16 @@ bool  shape_character_def::point_test_local(float x, float y)
   - wrong fill side (eg. left side set for a clockwise drawen rectangle)
   - intersecting paths
   */
+  
+  
+  // Align test coordinates to TWIP coordinate system and shift by a half
+  // TWIP to avoid line junction situations which are hard to handle. Oversample
+  // everything by 100 to get some degree of accuracy (ie. this won't produce
+  // any visible inaccuracy before the shape is scaled more an 2000x). The 
+  // resulting coordinate is *very* close to the original one and still in the
+  // same coordinate system.
+  x = (round(x * 2000.0f) + 0.5f) / 2000.0f;
+  y = (round(y * 2000.0f) + 0.5f) / 2000.0f; 
 
   point pt(x, y);
   
@@ -834,6 +852,7 @@ bool  shape_character_def::point_test_local(float x, float y)
     // Early out.
     return false;
   }
+
 
   unsigned npaths = m_paths.size();
   int counter = 0;
@@ -852,12 +871,24 @@ bool  shape_character_def::point_test_local(float x, float y)
       if ( (even_odd && (counter % 2) != 0) || 
            (!even_odd && (counter != 0)) ) {
         // the point is inside the previous subshape, so exit now
+        
+#ifdef DEBUG_POINT_TEST
+        printf("  subshape early out. counter=%d\n", counter);
+#endif        
+        
         return true;
       }
       
       counter=0;
     }
     
+#ifdef DEBUG_POINT_TEST_EXT
+    printf(" new path, anchor = %.2f / %.2f\n", pth.ap.x, pth.ap.y);
+#endif    
+    
+    if (pth.empty()) 
+      continue;
+      
     // If the path has a line style, check for strokes there
     if (pth.m_line != 0 ) {
     
@@ -893,13 +924,16 @@ bool  shape_character_def::point_test_local(float x, float y)
       next_pen_x = edg.ap.x;   
       next_pen_y = edg.ap.y;
       
-      /*
+#ifdef DEBUG_POINT_TEST_EXT
+      printf("  to %.2f / %.2f |", edg.ap.x, edg.ap.y);
+#endif
+
+      /*      
       printf("EDGE #%d #%d [ %d %d ] : %.2f / %.2f -> %.2f / %.2f\n", pno, eno,
         pth.m_fill0, pth.m_fill1, 
         pen_x, pen_y, 
         edg.ap.x, edg.ap.y);
       */
-        
         
       float cross1, cross2;
       int dir1, dir2; // +1 = downward, -1 = upward
@@ -908,17 +942,22 @@ bool  shape_character_def::point_test_local(float x, float y)
       if (edg.is_straight()) {
       
         // ==> straight line case
+        
+#ifdef DEBUG_POINT_TEST
+        sprintf(debug, "straight");
+#endif        
 
         // ignore horizontal lines
-        if (edg.ap.y == pen_y)   // TODO: better check for small difference? 
-          continue;          
+        if (edg.ap.y == pen_y) {  // TODO: better check for small difference? 
+#ifdef DEBUG_POINT_TEST_EXT
+          printf("  #%02d, #%02d [%s] horizontal line\n", pno, eno, debug);
+#endif      
+          continue;
+        }          
           
         // does this line cross the Y coordinate?
-        // NOTE: We don't want to detect a crossing at the end of the line,
-        // (simply put, the last pixel) because the next line (connected to this 
-        // one) will also cross the Y coordinate.
-        if ( ((pen_y <= y) && (edg.ap.y > y))
-          || ((pen_y >= y) && (edg.ap.y < y)) ) {
+        if ( ((pen_y <= y) && (edg.ap.y >= y))
+          || ((pen_y >= y) && (edg.ap.y <= y)) ) {
           
           // calculate X crossing
           cross1 = pen_x + (edg.ap.x - pen_x) *  
@@ -933,8 +972,8 @@ bool  shape_character_def::point_test_local(float x, float y)
         
         } else {
         
-          // no crossing, ignore edge..
-          continue;
+          // no crossing found          
+          crosscount = 0;
         
         }
         
@@ -942,35 +981,16 @@ bool  shape_character_def::point_test_local(float x, float y)
       
         // ==> curve case
         
+#ifdef DEBUG_POINT_TEST
+        sprintf(debug, "curve   ");
+#endif        
+
         crosscount = curve_x_crossings(pen_x, pen_y, edg.ap.x, edg.ap.y,
           edg.cp.x, edg.cp.y, y, cross1, cross2);
-          
-        // Safety check: remove any crossing at the very end of the curve.
-        // Any line or curve connected to this one would also detect a crossing,
-        // which is bad since we don't want double crossings for a single point.
-        // Assuming that cross2 is always near to the end, we won't find a 
-        // cross1 at the end of the curve when there is a cross2 (so no moving
-        // is necessary). 
-        
-        if ((crosscount==2) && (y==edg.ap.y) && (cross2==edg.ap.x)) 
-          crosscount--;
-        else          
-        if ((crosscount==1) && (y==edg.ap.y) && (cross1==edg.ap.x)) 
-          crosscount--;          
           
         dir1 = pen_y > y ? -1 : +1;
         dir2 = dir1 * (-1);     // second crossing always in opposite dir.
         
-        /*
-        printf("  curve crosses at %d points\n", crosscount);
-        
-        if (scount>0)
-          printf("    first  crossing at %.2f / %.2f, dir %d\n", cross1, y, dir1);
-
-        if (scount>1)
-          printf("    second crossing at %.2f / %.2f, dir %d\n", cross2, y, dir2);
-        */
-     
       } // curve
       
       
@@ -981,26 +1001,56 @@ bool  shape_character_def::point_test_local(float x, float y)
       //  - crosscount tells the number of crossings
       
       
-      if (crosscount==0)
-        continue;  // need at least one crossing
-
+      // need at least one crossing
+      if (crosscount==0) {
+#ifdef DEBUG_POINT_TEST_EXT
+        printf("  #%02d, #%02d [%s] no crossing\n", pno, eno, debug);
+#endif      
+        continue;  
+      }
+      
+      bool touched=false;
 
       // check first crossing      
       if (cross1 <= x) {
         if (pth.m_fill0 > 0) counter += dir1;
         if (pth.m_fill1 > 0) counter -= dir1;
+        
+        touched = true;
+        
+#ifdef DEBUG_POINT_TEST
+        printf("  #%02d, #%02d [%s] crossing at x=%.2f y=%.2f dir=%d fills=[%d,%d] -> C=%d\n",
+          pno, eno, debug, cross1, y, dir1, pth.m_fill0, pth.m_fill1, counter);
+#endif        
       }
       
       // check optional second crossing (only possible with curves)
       if ((crosscount>1) && (cross2 <= x)) {
         if (pth.m_fill0 > 0) counter += dir2;
         if (pth.m_fill1 > 0) counter -= dir2;
-      }             
+        
+        touched = true;
+
+#ifdef DEBUG_POINT_TEST
+        printf("  #%02d, #%02d [%s] crossing at x=%.2f y=%.2f dir=%d fills=[%d,%d] -> C=%d\n",
+          pno, eno, debug, cross2, y, dir2, pth.m_fill0, pth.m_fill1, counter);
+#endif        
+      }
+      
+#ifdef DEBUG_POINT_TEST_EXT
+      if (!touched)
+        printf("  #%02d, #%02d [%s] no crossing at left side\n", pno, eno, debug);
+#endif      
+                   
       
     } // for edge   
   
   } // for path
   
+
+#ifdef DEBUG_POINT_TEST
+  printf("  all paths processed. counter=%d\n", counter);
+#endif        
 
   return ( (even_odd && (counter % 2) != 0) || 
            (!even_odd && (counter != 0)) );
