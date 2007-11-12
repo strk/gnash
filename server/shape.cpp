@@ -59,6 +59,9 @@ edge::pointOnCurve(const point& A, const point& C, const point& B, float t)
 {
 	// See http://en.wikipedia.org/wiki/B%C3%A9zier_curve#Quadratic_B.C3.A9zier_curves
 
+	if ( t == 0.0 ) return A;
+	else if ( t == 1.0 ) return B;
+
 	point Q1(A, C, t);
 	point Q2(C, B, t);
 	point R = point(Q1, Q2, t);
@@ -393,40 +396,31 @@ path::withinSquareDistance(const point& p, float dist) const
 			//       defined by the triangle ACB and it's square 
 			//       distance from it is > then the requested one
 
-			// Brute force, try 100 times or give up
+			// Approximate the curve to segCount segments
+			// and compute distance of query point from each
+			// segment.
 			//
-			// TODO: use a binary search like thing, in where
-			//       we try to find the 't' value taking the average
-			//       between the 2 best 't' values found so far
-			//       (best is the ones giving closer distance)
+			// TODO: find an apprpriate value for segCount based
+			//       on rendering scale ?
 			//
 			float minDist = std::numeric_limits<float>::max();
-			bool gettingCloser = false;
-			int attempts = 100; 
-			int i=0;
-			for (; i<=attempts; ++i)
+			int segCount = 10; 
+			point p0 = A;
+			for (int i=1; i<=segCount; ++i)
 			{
-				float t = (float)i/attempts;
-				float d = edge::squareDistancePtCurve(A, C, B, p, t);
+				float t1 = (float)i/segCount;
+				point p1 = edge::pointOnCurve(A, C, B, t1);
+
+				// distance from point and segment being an approximation
+				// of the curve 
+				float d = edge::squareDistancePtSeg(p, p0, p1);
+
+				//float d = edge::squareDistancePtCurve(A, C, B, p, t);
 				//log_debug("Factor %26.26g, distance %g (asked %g)", t, sqrt(d), sqrt(dist));
 				if ( d <= dist ) return true;
 
-				if ( ! i ) minDist = d;
-				else if ( d < minDist )
-				{
-					minDist = d;
-					gettingCloser = true;
-				}
-				else if ( d > minDist )
-				{
-					if ( gettingCloser )
-					{
-						// we were getting closer before...
-						break;
-					}
-				}
+				p0 = p1;
 			}
-			// log_debug("Gave up at attempt %d", i);
 		}
 
 		px = np;

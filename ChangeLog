@@ -1,5 +1,9 @@
 2007-11-12 Sandro Santilli <strk@keybit.net>
 
+	* server/shape.cpp: (pointOnCurve): quicker return for T in (0,1);
+	  (withinSquareDistance): compute distance from segments, not points,
+	  reducing iterations from 100 to 10 with no detectable precision
+	  reduction.
 	* testsuite/swfdec/swfdec_gnash_tester: it seems diff -u3 doesn't work
 	  anymore (as of GNU diffutils 2.8.1)
 	* server/: shape.cpp, tesselate.h: minor cleanup
