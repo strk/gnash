@@ -98,18 +98,18 @@ main(int /*argc*/, char** /*argv*/)
   tester.pressKey(key::D);
   tester.releaseKey(key::D);
   
-  // we have jumped back to frame7
+  // we have jumped back to frame8
   check_equals(root->get_current_frame(), 7);
   
   tester.advance();
-  // and we are in frame8 again
+  // and we are in frame9 again
   check_equals(root->get_current_frame(), 8);
   
   // provide a key press to continue the test
   tester.pressKey(key::E);
   tester.releaseKey(key::E);
   	
-  tester.advance();
+  // we have jumped forward to frame10
   check_equals(root->get_current_frame(), 9);
   
   tester.advance();
@@ -124,17 +124,19 @@ main(int /*argc*/, char** /*argv*/)
   tester.pressKey(key::F);
   tester.releaseKey(key::F);
   
-  // we have jumped back to frame11
-  check_equals(root->get_current_frame(), 11);
+  // we have jumped backward to frame11
+  // check_equals(root->get_current_frame(), 10);
   
   tester.advance();
   // and we are in frame12 again
-  check_equals(root->get_current_frame(), 12);
+  check_equals(root->get_current_frame(), 11);
   
   // provide a key press to continue the test
   tester.pressKey(key::G);
   tester.releaseKey(key::G);
-  	
+  // we have jumped forward to frame13
+  check_equals(root->get_current_frame(), 12);
+  
   tester.advance();
   tester.advance();
   // check we are stopped at frame14
