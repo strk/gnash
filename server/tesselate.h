@@ -56,7 +56,7 @@ void	end_path();
 
 class tesselating_shape {
 public:
-	virtual ~tesselating_shape();
+	virtual ~tesselating_shape() {}
 	virtual void tesselate(float error_tolerance, 
 			       trapezoid_accepter *accepter) const = 0;
 };

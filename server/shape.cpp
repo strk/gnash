@@ -35,13 +35,6 @@
 
 namespace gnash {
 
-namespace tesselate {
-tesselating_shape::~tesselating_shape()
-{
-}
-}
-
-
 //
 // edge
 //
