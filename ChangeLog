@@ -1,5 +1,7 @@
 2007-11-12 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/swfdec_gnash_tester: it seems diff -u3 doesn't work
+	  anymore (as of GNU diffutils 2.8.1)
 	* server/: shape.cpp, tesselate.h: minor cleanup
 
 2007-11-12 Zou Lunkai <zoulunkai@gmail.com>

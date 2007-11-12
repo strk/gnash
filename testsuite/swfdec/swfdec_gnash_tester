@@ -31,10 +31,10 @@ if test "$?" != 0; then
 	exit 1
 else
 	if [ "$use_orig" != 0 ]; then
-		awk 'BEGIN {body=0;} { if (body) { print $0} else if (/^$/) {body=1} }' "$exp" | diff -u3 - "$out"
+		awk 'BEGIN {body=0;} { if (body) { print $0} else if (/^$/) {body=1} }' "$exp" | diff -u - "$out"
 		exit $?
 	else
-		diff -u3 "$exp" "$out"
+		diff -u "$exp" "$out"
 		exit $?
 	fi
 fi
