@@ -120,6 +120,7 @@ StreamProvider::getStream(const URL& url, const std::string& postdata)
 		}
 		else
 		{
+			if ( ! URLAccessManager::allow(url) ) return NULL;
 			FILE *newin = fopen(path.c_str(), "rb");
 			if (!newin)  { 
 				return NULL;

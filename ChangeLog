@@ -1,3 +1,12 @@
+2007-11-13 Sandro Santilli <strk@keybit.net>
+
+	* server/StreamProvider.cpp (getStream): check security
+	  for post streams too.
+	* server/sprite_instance.cpp (loadVariables): 
+	  Don't abort on not-found url. Don't check security
+	  here as it will be checked by LoadVariablesThread.
+	  Fixes sheepy.swf.
+
 2007-11-12 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/parser/shape_character_def.cpp: point_test_local bugfix:

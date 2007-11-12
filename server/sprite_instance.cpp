@@ -3611,18 +3611,24 @@ void
 sprite_instance::loadVariables(const URL& url, short sendVarsMethod)
 {
 	// Check host security
-	if ( ! URLAccessManager::allow(url) )
-	{
-		return;
-	}
+	// will be done by LoadVariablesThread (down by getStream, that is)
+	//if ( ! URLAccessManager::allow(url) ) return;
 
 	if ( sendVarsMethod )
 	{
 		log_unimpl(_("MovieClip.loadVariables() with GET/POST won't append vars for now"));
 	}
 
-	_loadVariableRequests.push_back(new LoadVariablesThread(url));
-	_loadVariableRequests.back()->process();
+	try 
+	{
+		_loadVariableRequests.push_back(new LoadVariablesThread(url));
+		_loadVariableRequests.back()->process();
+	}
+	catch (NetworkException& ex)
+	{
+		log_error(_("Could not load variables from %s"), url.str().c_str());
+	}
+
 	//log_msg(_(SIZET_FMT " loadVariables requests pending"), _loadVariableRequests.size());
 
 }
