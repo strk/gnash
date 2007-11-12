@@ -80,8 +80,9 @@ SoundFfmpeg::seekMedia(void *opaque, offset_t offset, int whence){
 
 
 void
-SoundFfmpeg::setupDecoder(SoundFfmpeg* so)
+SoundFfmpeg::setupDecoder()
 {
+	SoundFfmpeg* so = this;
 
 	boost::intrusive_ptr<NetConnection> nc = so->connection;
 	assert(nc);
@@ -91,7 +92,9 @@ SoundFfmpeg::setupDecoder(SoundFfmpeg* so)
 	if ( !nc->openConnection(so->externalURL) ) {
 		log_error(_("%s could not open audio url: %s"), 
 				__FUNCTION__, so->externalURL.c_str());
+#ifdef LOADS_IN_SEPARATE_THREAD
 		delete so->lock;
+#endif
 		return;
 	}
 
@@ -115,7 +118,9 @@ SoundFfmpeg::setupDecoder(SoundFfmpeg* so)
  		log_error(_("%s: could not read from audio url: %s"), 
 				__FUNCTION__, so->externalURL.c_str());
  		delete[] pd->buf;
+#ifdef LOADS_IN_SEPARATE_THREAD
  		delete so->lock;
+#endif
  		return;
 	}
 
@@ -134,7 +139,9 @@ SoundFfmpeg::setupDecoder(SoundFfmpeg* so)
 	// Open the stream. the 4th argument is the filename, which we ignore.
 	if(av_open_input_stream(&so->formatCtx, &so->ByteIOCxt, "", inputFmt, NULL) < 0){
 		log_error(_("Couldn't open file '%s' for decoding"), so->externalURL.c_str());
+#ifdef LOADS_IN_SEPARATE_THREAD
 		delete so->lock;
+#endif
 		return;
 	}
 
@@ -144,7 +151,9 @@ SoundFfmpeg::setupDecoder(SoundFfmpeg* so)
 	if (ret < 0)
 	{
 		log_error(_("Couldn't find stream information from '%s', error code: %d"), so->externalURL.c_str(), ret);
+#ifdef LOADS_IN_SEPARATE_THREAD
 		delete so->lock;
+#endif
 		return;
 	}
 
@@ -188,7 +197,9 @@ SoundFfmpeg::setupDecoder(SoundFfmpeg* so)
 	{
 		log_error(_("No available audio decoder %d to process file: '%s'"),
 		   so->audioCodecCtx->codec_id, so->externalURL.c_str());
+#ifdef LOADS_IN_SEPARATE_THREAD
 		delete so->lock;
+#endif
 		return;
 	}
     
@@ -197,12 +208,16 @@ SoundFfmpeg::setupDecoder(SoundFfmpeg* so)
 	{
 		log_error(_("Could not open audio codec %d for %s"),
 		   so->audioCodecCtx->codec_id, so->externalURL.c_str());
+#ifdef LOADS_IN_SEPARATE_THREAD
 		delete so->lock;
+#endif
 		return;
 	}
 
 	// By deleting this lock we allow start() to start playback
+#ifdef LOADS_IN_SEPARATE_THREAD
 	delete so->lock;
+#endif
 	return;
 }
 
@@ -377,17 +392,23 @@ SoundFfmpeg::loadSound(std::string file, bool streaming)
 	externalSound = true;
 	isStreaming = streaming;
 
+#ifdef LOADS_IN_SEPARATE_THREAD
 	lock = new boost::mutex::scoped_lock(setupMutex);
 
 	// To avoid blocking while connecting, we use a thread.
-	setupThread = new boost::thread(boost::bind(SoundFfmpeg::setupDecoder, this));
+	setupThread = new boost::thread(boost::bind(&SoundFfmpeg::setupDecoder, this));
+#else
+	setupDecoder();
+#endif
 
 }
 
 void
 SoundFfmpeg::start(int offset, int loops)
 {
+#ifdef LOADS_IN_SEPARATE_THREAD
 	boost::mutex::scoped_lock lock(setupMutex);
+#endif
 
 	if (externalSound) {
 		if (offset > 0) {

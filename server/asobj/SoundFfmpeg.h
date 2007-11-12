@@ -32,6 +32,10 @@
 #include <boost/bind.hpp> 
 #include <boost/thread/mutex.hpp>
 
+// Undefined the following macro to disable threading
+// TODO: use a global define for disabling all threads at once
+#define LOADS_IN_SEPARATE_THREAD
+
 extern "C" {
 #include <ffmpeg/avformat.h>
 }
@@ -50,10 +54,12 @@ public:
 		audioStream(NULL),
 		formatCtx(NULL),
 		audioFrame(NULL),
-		resampleCtx(NULL),
-		setupThread(NULL),
-		lock(NULL), 
-		inputPos(0),
+		resampleCtx(NULL)
+#ifdef LOADS_IN_SEPARATE_THREAD
+		,setupThread(NULL)
+		,lock(NULL)
+#endif
+		,inputPos(0),
 		ByteIOCxt(), // ?
 		audioIndex(-1),
 		leftOverData(NULL),
@@ -74,9 +80,10 @@ public:
 	static int readPacket(void* opaque, uint8_t* buf, int buf_size);
 	static offset_t seekMedia(void *opaque, offset_t offset, int whence);
 
-	static void setupDecoder(SoundFfmpeg* so);
-	static bool getAudio(void *owner, uint8_t *stream, int len);
 private:
+
+	void setupDecoder();
+	static bool getAudio(void *owner, uint8_t *stream, int len);
 
 	// audio
 	AVCodecContext *audioCodecCtx;
@@ -88,11 +95,13 @@ private:
 
 	ReSampleContext *resampleCtx;
 
+#ifdef LOADS_IN_SEPARATE_THREAD
 	boost::thread *setupThread;
 	boost::mutex setupMutex;
 
 	// TODO: it makes NO SENSE for a scoped_lock to be allocated on the heap !
 	boost::mutex::scoped_lock *lock;
+#endif
 
 	long inputPos;
 

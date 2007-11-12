@@ -1,5 +1,11 @@
 2007-11-12 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/SoundFfmpeg.{cpp,h}: Add a LOADS_IN_SEPARATE_THREAD
+	  macro (defined by default) to disable threading, make the
+	  setupDecoder a non-static private and getAudio also private.
+
+2007-11-12 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/SoundFfmpeg.cpp (getAudio): don't delete 
 	  allocated memory twice. Fixes bug #21195.
 	* gui/gnash.in: Add support for -G list for getting a list
