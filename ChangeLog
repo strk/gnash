@@ -1,3 +1,8 @@
+2007-11-12 Sandro Santilli <strk@keybit.net>
+
+	* gui/gnash.in: Add support for -G list for getting a list
+	  of available guis.
+
 2007-11-12 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/parser/shape_character_def.cpp: point_test_local bugfix:  

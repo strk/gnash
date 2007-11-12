@@ -35,8 +35,22 @@ THIS_DIR="`dirname $0`"
 
 if test "$1" = "-G"; then
 	shift
+	if test "x$1" = "x"; then
+		echo "-G needs an argument (-G list for a list of possible values)" >&2
+		exit 1
+	fi
 	gui=`echo "$1" | tr '[A-Z]' '[a-z]'`
 	shift
+	if test "$gui" = "?" -o "$gui" = "list"; then
+		for g in ${GUIS}; do
+			exe=${THIS_DIR}/${g}-gnash
+			if test -e ${exe}; then
+				list="$list $g"
+			fi
+		done
+		echo "Available guis: $list"
+		exit 0
+	fi
 	if ! test -e ${THIS_DIR}/${gui}-gnash; then
 		echo "Can't find ${gui}-gnash." >&2
 		exit 1
