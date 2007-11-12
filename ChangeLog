@@ -1,3 +1,9 @@
+2007-11-12 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/parser/shape_character_def.cpp: point_test_local bugfix:  
+	  don't detect two crossings for the point at the junction of two 
+	  lines/curves. 
+
 2007-11-12 Sandro Santilli <strk@keybit.net>
 
 	* server/shape.cpp: (pointOnCurve): quicker return for T in (0,1);

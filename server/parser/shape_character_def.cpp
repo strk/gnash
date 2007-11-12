@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.48 2007/11/10 14:39:52 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.49 2007/11/12 10:56:15 udog Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -809,7 +809,6 @@ bool  shape_character_def::point_test_local(float x, float y)
     // Incoming coords are local coords.
 {
 
-
   /*
   Principle:
   For the fill of the shape, we project a ray from the test point to the left
@@ -882,7 +881,6 @@ bool  shape_character_def::point_test_local(float x, float y)
         return true;
     }
     
-    
     // browse all edges of the path
     for (unsigned eno=0; eno<nedges; eno++) {
     
@@ -910,14 +908,17 @@ bool  shape_character_def::point_test_local(float x, float y)
       if (edg.is_straight()) {
       
         // ==> straight line case
-      
+
         // ignore horizontal lines
         if (edg.ap.y == pen_y)   // TODO: better check for small difference? 
           continue;          
           
         // does this line cross the Y coordinate?
-        if ( ((pen_y <= y) && (edg.ap.y >= y))
-          || ((pen_y >= y) && (edg.ap.y <= y)) ) {
+        // NOTE: We don't want to detect a crossing at the end of the line,
+        // (simply put, the last pixel) because the next line (connected to this 
+        // one) will also cross the Y coordinate.
+        if ( ((pen_y <= y) && (edg.ap.y > y))
+          || ((pen_y >= y) && (edg.ap.y < y)) ) {
           
           // calculate X crossing
           cross1 = pen_x + (edg.ap.x - pen_x) *  
@@ -943,6 +944,19 @@ bool  shape_character_def::point_test_local(float x, float y)
         
         crosscount = curve_x_crossings(pen_x, pen_y, edg.ap.x, edg.ap.y,
           edg.cp.x, edg.cp.y, y, cross1, cross2);
+          
+        // Safety check: remove any crossing at the very end of the curve.
+        // Any line or curve connected to this one would also detect a crossing,
+        // which is bad since we don't want double crossings for a single point.
+        // Assuming that cross2 is always near to the end, we won't find a 
+        // cross1 at the end of the curve when there is a cross2 (so no moving
+        // is necessary). 
+        
+        if ((crosscount==2) && (y==edg.ap.y) && (cross2==edg.ap.x)) 
+          crosscount--;
+        else          
+        if ((crosscount==1) && (y==edg.ap.y) && (cross1==edg.ap.x)) 
+          crosscount--;          
           
         dir1 = pen_y > y ? -1 : +1;
         dir2 = dir1 * (-1);     // second crossing always in opposite dir.
