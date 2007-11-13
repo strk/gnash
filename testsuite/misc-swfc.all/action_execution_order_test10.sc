@@ -183,7 +183,13 @@
 
     _root.note("mc4 init actions"); 
     _root.xcheck_equals(typeof(mc4), 'movieclip');
-    _root.xcheck_equals(mc4.__proto__, Object.prototype);
+    // What a bad bug the pp has !
+    // First query of __proto__ turns it into the correct prototype
+    // (MovieClip.prototype) buf first query returns the *old* rather
+    // then the new value 
+    _root.xcheck(mc4.__proto__ == Object.prototype); // returns wrong answer at first, gnash does the right thing here
+    _root.check(mc4.__proto__ != Object.prototype); // and correct at second and subsequent queries
+    _root.xcheck_equals(mc4.__proto__, MovieClip.prototype); // <--- this is the correct one
     
     mc4.onInitialize = function () { 
       _root.note("mc4 user defined onInitialize"); 
@@ -224,7 +230,7 @@
 
 .frame 15
   .action:
-    totals(7);
+    totals(9);
     stop();
   .end
   
