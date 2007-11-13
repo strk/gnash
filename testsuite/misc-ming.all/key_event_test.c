@@ -49,7 +49,7 @@ int
 main(int argc, char** argv)
 {
   SWFMovie mo;
-  SWFMovieClip  mc, dejagnuclip;
+  SWFMovieClip  dejagnuclip;
   SWFDisplayItem  it;
 
   const char *srcdir=".";
@@ -176,14 +176,17 @@ main(int argc, char** argv)
     "   if(!_root.haslooped2){"
     "       _root.haslooped2=true;"
     "       _root.gotoAndPlay(_root._currentframe-1);"
+    "       _root.check_equals(_root._currentframe, 11);"
     "   } else {"
     "       _root.gotoAndPlay(_root._currentframe+1);"
+    "       _root.check_equals(_root._currentframe, 13);"
     "   }"
     "};"
     "Key.addListener(dynamic_mc);"
   );
   SWFMovie_nextFrame(mo);  // _root frame12
   
+  check_equals(mo, "_root.test3", "2");
   add_actions(mo, "dynamic_mc.swapDepths(10);  dynamic_mc.removeMovieClip();");
   SWFMovie_nextFrame(mo);  // _root frame13
   

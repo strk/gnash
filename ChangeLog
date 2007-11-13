@@ -1,3 +1,13 @@
+2007-11-13 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/key_event_test.c, key_event_testrunner.cpp:
+	  few more tests in both swf file and testrunner, invoked a bug.
+	* testsuite/misc-ming.all/key_event_test2.c, key_event_test3.c, 
+	  key_event_test4.c, key_event_test5.c, key_event_test2runner.cpp,
+	  key_event_test3runner.cpp, key_event_test4runner.cpp, 
+	  key_event_test5runner.cpp, KeyTest.as, KeyTest-Runner.cpp: dropped
+	  10 file, we don't need them now, tests were merged to key_event_test.c.
+	  
 2007-11-13 Sandro Santilli <strk@keybit.net>
 
 	* server/StreamProvider.cpp (getStream): check security
