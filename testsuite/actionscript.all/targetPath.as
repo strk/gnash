@@ -20,7 +20,7 @@
  *  Test targetPath tags (0x45)
  */
 
-rcsid="$Id: targetPath.as,v 1.6 2007/10/26 13:03:56 strk Exp $";
+rcsid="$Id: targetPath.as,v 1.7 2007/11/13 19:15:26 strk Exp $";
 
 #include "check.as"
 
@@ -99,6 +99,34 @@ setTarget('...:mc');
 check_equals(_target, '/');
 setTarget("");
 
+setTarget('mc');
+check_equals(_target, '/mc');
+setTarget("/");
+check_equals(_target, '/');
+
+mc2.onUnload = function()
+{
+	note("Running mc2.onUnload");
+	check_equals(_target, '/');
+	check_equals(mc1, '/');
+	mc1.onUnload = function()
+	{
+		note("Running mc1.onUnload ?");
+		check_equals(_target, '/mc');
+		setTarget('mc1');
+		check_equals(_target, '/mc/mc');
+		setTarget("/");
+		check_equals(_target, '/');
+	};
+};
+
+mc2.removeMovieClip();
+mc1.removeMovieClip();
+
 #endif
 
-totals();
+#if OUTPUT_VERSION < 6
+ totals(6);
+#else
+ totals(11);
+#endif

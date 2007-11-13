@@ -1,5 +1,8 @@
 2007-11-13 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/targetPath.as: more tests for setTarget,
+	  could not reproduce the bug just fixed in find_target
+	  (would need actions defined in Button or statically-placed sprites).
 	* server/as_environment.cpp (find_target): "/" is the root.
 	  Fixes bug #21572.
 
