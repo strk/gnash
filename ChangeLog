@@ -1,3 +1,8 @@
+2007-11-13 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/registerClassTest.c: add test for the 
+	  return code of registerClass.
+
 2007-11-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/actionscript.all/XML.as: remove that bogus check (there

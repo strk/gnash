@@ -119,8 +119,11 @@ main(int argc, char** argv)
 
 	add_actions(mo,
 		"function CustomClass() { this._x = 80; }"
-		"Object.registerClass('redsquare', CustomClass);"
+		"registerClassRet = Object.registerClass('redsquare', CustomClass);"
 		);
+
+	check_equals(mo, "typeof(registerClassRet)", "'boolean'");
+	check_equals(mo, "registerClassRet", "true");
 
 	add_actions(mo,
 		"var name2 = 'square'+counter;"
@@ -135,8 +138,11 @@ main(int argc, char** argv)
 	add_actions(mo,
 		"function CustomClass2() { this._x = 160; } "
 		"CustomClass2.prototype = new MovieClip;"
-		"Object.registerClass('redsquare', CustomClass2);"
+		"registerClassRet = Object.registerClass('redsquare', CustomClass2);"
 		);
+
+	check_equals(mo, "typeof(registerClassRet)", "'boolean'");
+	check_equals(mo, "registerClassRet", "true");
 
 	add_actions(mo,
 		"var name3 = 'square'+counter;"
@@ -148,8 +154,11 @@ main(int argc, char** argv)
 	SWFMovie_nextFrame(mo); /* end of frame4 */
 
 	add_actions(mo,
-		"Object.registerClass('redsquare');"
+		"registerClassRet = Object.registerClass('redsquare');"
 		);
+
+	check_equals(mo, "typeof(registerClassRet)", "'boolean'");
+	check_equals(mo, "registerClassRet", "false");
 
 	add_actions(mo,
 		"var name4 = 'square'+counter;"
@@ -182,7 +191,7 @@ main(int argc, char** argv)
 	check(mo, "clip4 instanceOf MovieClip");
 
 	add_actions(mo,
-		"totals(16);"
+		"totals(22);"
 		"stop();"
 		);
 
