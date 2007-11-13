@@ -182,7 +182,7 @@ main(int argc, char** argv)
 	check(mo, "clip4 instanceOf MovieClip");
 
 	add_actions(mo,
-		"totals();"
+		"totals(16);"
 		"stop();"
 		);
 

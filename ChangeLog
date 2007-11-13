@@ -1,3 +1,8 @@
+2007-11-13 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/registerClassTest.c: add expected
+	  number of tests run.
+
 2007-11-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/actionscript.all/XML.as: add first(!) test to check
