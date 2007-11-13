@@ -133,7 +133,7 @@ key_as_object::notify_listeners(const event_id key_event_type)
       boost::intrusive_ptr<as_object>  listener = *iter; // Hold an owning reference.
       as_value method;
 
-      if (listener->get_member(funcname.c_str(), &method))
+       if (listener->get_member(VM::get().getStringTable().find(funcname), &method))
         call_method(method, NULL /* or root? */, listener.get(), 0, 0);
     }
 }
