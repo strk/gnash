@@ -187,6 +187,9 @@
     // First query of __proto__ turns it into the correct prototype
     // (MovieClip.prototype) buf first query returns the *old* rather
     // then the new value 
+    // UPDATE: Company knew about this, he mentions that unless for SWF6
+    //         the first time a movieclip's __proto__ is queried it always
+    //         returns Object.prototype.
     _root.xcheck(mc4.__proto__ == Object.prototype); // returns wrong answer at first, gnash does the right thing here
     _root.check(mc4.__proto__ != Object.prototype); // and correct at second and subsequent queries
     _root.xcheck_equals(mc4.__proto__, MovieClip.prototype); // <--- this is the correct one
