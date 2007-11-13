@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.44 2007/10/23 17:01:32 strk Exp $";
+rcsid="$Id: XML.as,v 1.45 2007/11/13 12:45:42 bwy Exp $";
 
 #include "check.as"
 //#include "dejagnu.as"
@@ -351,10 +351,12 @@ tmp.checkParsed = function ()
 			with (firstChild)
 			{
 				check_equals(nodeName, 'SUBSUBNODE1');
+				xcheck_equals(nodeValue, 'sub sub1 node data 1');
 				check_equals(typeof(nodeValue), 'null');
 				check_equals(nodeType, 1); // element
 				check_equals(typeof(nextSibling), 'object');
 				check_equals(nextSibling.nodeName, 'SUBSUBNODE2');
+				xcheck_equals(nextSibling.nodeValue, 'sub sub1 node data 2');
 				check_equals(typeof(previousSibling), 'null');
 				check_equals(typeof(attributes), 'object');
 				check_equals(attributes.ssna1, 'ssna1val');

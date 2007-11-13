@@ -1,3 +1,8 @@
+2007-11-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* testsuite/actionscript.all/XML.as: add first(!) test to check
+	  whether XML nodeValues are set. Gnash fails (always null).
+	  
 2007-11-13 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-swfc.all/action_execution_order_test10.sc:
