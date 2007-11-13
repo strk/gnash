@@ -35,6 +35,11 @@
  *          delete mc2 by RemoveObject2.
  *          DoAction.
  * 
+ *  frame8:
+ *          PlaceObject(mc4), DoInitAction(mc4):
+ *               - mc4.__proto__ is Object, not MovieClip during init actions
+ *               - onInitialize(mc4) isn't called 
+ *               - other things to note ?
  *
  * Expected behaviour:
  *    (1) user defined onContruct should not be triggered.
@@ -175,6 +180,10 @@
   .put mc4 // PlaceObject2(mc4)
   .initaction mc4:
     _root.mc4_onConstruct_executed = false;
+
+    _root.note("mc4 init actions"); 
+    _root.xcheck_equals(typeof(mc4), 'movieclip');
+    _root.xcheck_equals(mc4.__proto__, Object.prototype);
     
     mc4.onInitialize = function () { 
       _root.note("mc4 user defined onInitialize"); 
@@ -215,7 +224,7 @@
 
 .frame 15
   .action:
-    totals(5);
+    totals(7);
     stop();
   .end
   
