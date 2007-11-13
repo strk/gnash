@@ -1,5 +1,10 @@
 2007-11-13 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.cpp (find_target): "/" is the root.
+	  Fixes bug #21572.
+
+2007-11-13 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/registerClassTest.c: add test for the 
 	  return code of registerClass.
 

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.106 2007/11/08 23:20:37 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.107 2007/11/13 19:11:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -546,11 +546,21 @@ as_environment::find_target(const std::string& path_in) const
     const char*	p = path.c_str();
     if (*p == '/') {
 	// Absolute path.  Start at the root.
-	env = m_target->get_root_movie();
+	sprite_instance* root = m_target->get_root_movie();
+	if ( ! *(++p) )
+	{
+#ifdef DEBUG_TARGET_FINDING 
+		log_msg(_("Path is '/', return the root (%p)"), (void*)root);
+#endif
+		return root; // that's all folks.. 
+	}
+
+	env = root;
+
 #ifdef DEBUG_TARGET_FINDING 
 	log_msg(_("Absolute path, start at the root (%p)"), (void*)env);
 #endif
-	p++;
+
     }
 #ifdef DEBUG_TARGET_FINDING 
     else
@@ -559,12 +569,7 @@ as_environment::find_target(const std::string& path_in) const
     }
 #endif
     
-    if (*p == '\0') {
-#ifdef DEBUG_TARGET_FINDING 
-	log_msg(_("Null path, returning m_target"));
-#endif
-	return m_target;
-    }
+    assert (*p);
 
     std::string	subpart;
     while (env)
