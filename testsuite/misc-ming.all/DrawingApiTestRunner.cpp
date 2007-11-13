@@ -720,7 +720,9 @@ main(int /*argc*/, char** /*argv*/)
 	check_pixel(xo + (15*scale), yo + (15*scale), 2, red, 2);
 	// Upper-Center
 	check_pixel(xo + (25*scale), yo + (15*scale), 2, red, 2);
-	// Upper-On_09_stroke (Gnash fails rendering a white stroke on the red background)
+	// Upper-On_09_stroke
+	// AGG fails rendering a white stroke on the red background.
+	// Cairo succeeds.
 	xcheck_pixel(xo + (20*scale), yo + (15*scale), 2, red, 2);
 	// Upper-Right
 	check_pixel(xo + (35*scale), yo + (15*scale), 2, red, 2);
@@ -739,7 +741,9 @@ main(int /*argc*/, char** /*argv*/)
 	// Lower-Right
 	check_pixel(xo + (35*scale), yo + (35*scale), 2, red, 2);
 
-	// On the 0-9 stroke, out of fill (gnash fails drawing a red stroke)
+	// On the 0-9 stroke, out of fill 
+	// AGG fails rendering a white stroke on the red background.
+	// Cairo succeeds.
 	xcheck_pixel(xo + (20*scale), yo + (25*scale), 3, white, 2);
 
 }

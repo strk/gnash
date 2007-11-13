@@ -55,6 +55,7 @@ main(int /*argc*/, char** /*argv*/)
   check_pixel(15, 15, 30, red, 2); 
   // visual check succeeds with AGG pixel format RGB24
   // don't know why this check fails with AGG pixel format AGG_RGB555
+  // it works with cairo.
   xcheck_pixel(40, 40, 10, white, 3); 
   
   // FRAME 2 
