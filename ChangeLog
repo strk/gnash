@@ -1,3 +1,8 @@
+2007-11-14 Chad Musick <chadmusick@msbx.net>
+
+	* server/PropertyList.cpp: Be stricter about checking for things that
+	  could make insertions fail.
+
 2007-11-13 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/targetPath.as: reverted last change, the
