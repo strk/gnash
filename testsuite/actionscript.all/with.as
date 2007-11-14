@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.37 2007/10/26 13:03:56 strk Exp $";
+rcsid="$Id: with.as,v 1.38 2007/11/14 22:16:05 strk Exp $";
 
 #include "check.as"
 
@@ -354,7 +354,7 @@ check_equals(_target, "/clip1");
 setTarget("");
 
 setTarget('o:t');
-xcheck_equals(_target, "/clip1");
+check_equals(_target, "/clip1");
 setTarget("");
 
 setTarget('../o:t'); // invalid ?
@@ -384,7 +384,7 @@ setTarget("");
 with (o2)
 {
 	setTarget('o:t'); 
-	xcheck_equals(_target, "/clip1");
+	check_equals(_target, "/clip1");
 	setTarget("");
 }
 

@@ -1,5 +1,15 @@
 2007-11-14 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.{cpp,h}: unify object finding and target
+	  finding. The code is pretty dirty but is more correct then 
+	  before.
+	* testsuite/swfdec/PASSING: getsetproperty-target-{6,7,8}.swf succeed
+	* testsuite/actionscript.all/with.as: no more failures (we need more)
+	* testsuite/misc-ming.all/callFunction_test.c: two more successes, one
+	  test still fails.
+
+2007-11-14 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/Object.cpp (object_registerClass): more informative
 	  aserror messages.
 	* testsuite/actionscript.all/TextField.as: more tests.

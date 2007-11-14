@@ -335,6 +335,13 @@ public:
 	///
 	character* find_target(const std::string& path) const;
 
+	/// Find the object referenced by the given path.
+	//
+	/// Supports both /slash/syntax and dot.syntax
+	/// Case insensitive for SWF up to 6, sensitive from 7 up
+	///
+	as_object* find_object(const std::string& path, const ScopeStack* scopeStack=NULL) const;
+
 	/// Dump content of the stack to a std::ostream
 	void dump_stack(std::ostream& out=std::cerr)
 	{

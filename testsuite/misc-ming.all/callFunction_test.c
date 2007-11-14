@@ -148,8 +148,8 @@ main(int argc, char** argv)
   check_equals(mo, "_root.x2", "_root.mc1.mc11");
   check_equals(mo, "_root.x3", "1");
   check_equals(mo, "_root.x4", "0");
-  xcheck_equals(mo, "_root.x5", "1");
-  xcheck_equals(mo, "_root.x6", "_root.mc1");
+  check_equals(mo, "_root.x5", "1");
+  check_equals(mo, "_root.x6", "_root.mc1");
   check_equals(mo, "_root.x7", "1");
   xcheck_equals(mo, "_root.x8", "1");
   
