@@ -1,5 +1,10 @@
 2007-11-14 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp, server/video_stream_instance.cpp:
+	  Remove some debugging output (compile-time defined)
+
+2007-11-14 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.{cpp,h}: add a processingActions method,
 	  might be used to know wheter to push actions or execute
 	  them immediately.

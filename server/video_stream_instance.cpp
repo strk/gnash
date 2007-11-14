@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-// $Id: video_stream_instance.cpp,v 1.42 2007/10/26 18:43:36 tgc Exp $
+// $Id: video_stream_instance.cpp,v 1.43 2007/11/14 14:33:34 strk Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -162,11 +162,9 @@ video_stream_instance::video_stream_instance(video_stream_definition* def,
 	_ns(NULL),
 	_embeddedStream(false)
 {
-	log_debug("video_stream_instance %p ctor", (void*)this);
-	if ( m_def )
-	{
-		_embeddedStream = true;
-	}
+	//log_debug("video_stream_instance %p ctor", (void*)this);
+
+	if ( m_def ) _embeddedStream = true;
 
 	set_prototype(getVideoInterface());
 			

@@ -2433,7 +2433,9 @@ sprite_instance::execute_init_action_buffer(const action_buffer& a)
 {
 	if ( m_init_actions_executed.find(m_current_frame) == m_init_actions_executed.end() )
 	{
+#ifdef GNASH_DEBUG
 		log_debug("Queuing init actions in frame " SIZET_FMT " of sprite %s", m_current_frame, getTarget().c_str());
+#endif
 		std::auto_ptr<ExecutableCode> code ( new GlobalCode(a, boost::intrusive_ptr<sprite_instance>(this)) );
 
 		// NOTE: we should really push these actions, but I still don't understand
@@ -2451,7 +2453,9 @@ sprite_instance::execute_init_action_buffer(const action_buffer& a)
 	}
 	else
 	{
+#ifdef GNASH_DEBUG
 		log_debug("Init actions in frame " SIZET_FMT " of sprite %s already executed", m_current_frame, getTarget().c_str());
+#endif
 	}
 }
 
@@ -3389,15 +3393,22 @@ sprite_instance::stagePlacementCallback()
 	//
 	if ( isDynamic() )
 	{
-		//log_debug("Sprite %s is dynamic, sending INITIALIZE and CONSTRUCT events immediately", getTarget().c_str());
+#ifdef GNASH_DEBUG
+		log_debug("Sprite %s is dynamic, sending INITIALIZE and CONSTRUCT events immediately", getTarget().c_str());
+#endif
 		on_event(event_id::INITIALIZE);
 		on_event(event_id::CONSTRUCT);
 	}
 	else
 	{
+#ifdef GNASH_DEBUG
 		log_debug("Queuing INITIALIZE event for sprite %s", getTarget().c_str());
+#endif
 		queueEvent(event_id::INITIALIZE, movie_root::apINIT);
+
+#ifdef GNASH_DEBUG
 		log_debug("Queuing CONSTRUCT event for sprite %s", getTarget().c_str());
+#endif
 		queueEvent(event_id::CONSTRUCT, movie_root::apCONSTRUCT);
 	}
 
@@ -3464,7 +3475,9 @@ sprite_instance::constructAsScriptObject()
 		}
 
 		as_function* ctor = def->getRegisteredClass();
+#ifdef GNASH_DEBUG
 		log_debug(_("Attached sprites %s registered class is %p"), getTarget().c_str(), (void*)ctor); 
+#endif
 
 		// TODO: builtin constructors are different from user-defined ones
 		// we should likely change that. See also vm/ASHandlers.cpp (construct_object)
