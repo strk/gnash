@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.46 2007/11/13 13:17:36 bwy Exp $";
+rcsid="$Id: XML.as,v 1.47 2007/11/14 09:53:03 bwy Exp $";
 
 #include "check.as"
 //#include "dejagnu.as"
@@ -278,7 +278,7 @@ check(XML);
 // }
 check(XML);
 // Use escaped " instead of ' so that it matches the return value of toString()
-var xml_in = "<TOPNODE tna1=\"tna1val\" tna2=\"tna2val\" tna3=\"tna3val\"><SUBNODE1 sna1=\"sna1val\" sna2=\"sna2val\"><SUBSUBNODE1 ssna1=\"ssna1val\" ssna2=\"ssna2val\">sub sub1 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub1 node data 2</SUBSUBNODE2></SUBNODE1><SUBNODE2><SUBSUBNODE1>sub sub2 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub2 node data 2</SUBSUBNODE2></SUBNODE2></TOPNODE>";
+var xml_in = "<TOPNODE tna1=\"tna1val\" tna2=\"tna2val\" tna3=\"tna3val\"><SUBNODE1 sna1=\"sna1val\" sna2=\"sna2val\"><SUBSUBNODE1 ssna1=\"ssna1val\" ssna2=\"ssna2val\"><!-- comment should be ignored-->sub sub1 node data 1</SUBSUBNODE1><SUBSUBNODE2><!--comment: cdata with illegal characters --><![CDATA[sub /\sub1 <br>\"node data 2\"]]></SUBSUBNODE2></SUBNODE1><SUBNODE2><SUBSUBNODE1>sub sub2 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub2 node data 2</SUBSUBNODE2></SUBNODE2></TOPNODE>";
 check(XML);
 
 check(XML);
@@ -379,7 +379,7 @@ tmp.checkParsed = function ()
 				with (firstChild)
 				{
 					check_equals(typeof(nodeName), 'null')
-					check_equals(nodeValue, 'sub sub1 node data 2')
+					check_equals(nodeValue, 'sub /\sub1 <br>"node data 2"')
 					check_equals(nodeType, 3); // text
 				}
 			}
@@ -437,7 +437,10 @@ check_equals(typeof(ret), 'undefined');
 
 tmp.checkParsed(); // onLoad won't be called
 //note("Parsed XML: "+tmp.toString());
-check_equals(tmp.toString(), xml_in);
+
+// This should not be the same because comments and CDATA tags are
+// dropped.
+// check_equals(tmp.toString(), xml_in);
 
 //------------------------------------------------
 // Test XML editing
