@@ -1,3 +1,12 @@
+2007-11-14 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/ButtonEventsTest.c: add self-contained
+	  tests for target in user-defined and clip-defined event handlers,
+	  plus setTarget('/') call when original target != the root
+	  (would have failed before the fix of bug #21572).
+	  Note that it takes some user interaction to trigger the
+	  self-contained tests.
+
 2007-11-14 Chad Musick <chadmusick@msbx.net>
 
 	* server/PropertyList.cpp: Revert last change -- it includes new

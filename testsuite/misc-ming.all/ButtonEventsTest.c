@@ -100,11 +100,50 @@ add_button(SWFMovie mo)
 	SWFButton_addShape(bu, (SWFCharacter)sh3, SWFBUTTON_DOWN );
 	SWFButton_addShape(bu, (SWFCharacter)sh4, SWFBUTTON_OVER );
 
-	SWFButton_addAction(bu, compileSWFActionCode("_root.msg=\"MouseOut\";"), SWFBUTTON_MOUSEOUT);
-	SWFButton_addAction(bu, compileSWFActionCode("_root.msg=\"MouseOver\";"), SWFBUTTON_MOUSEOVER);
-	SWFButton_addAction(bu, compileSWFActionCode("_root.msg=\"MouseDown\";"), SWFBUTTON_MOUSEDOWN);
-	SWFButton_addAction(bu, compileSWFActionCode("_root.msg=\"MouseUp\";"), SWFBUTTON_MOUSEUP);
-	SWFButton_addAction(bu, compileSWFActionCode("_root.msg=\"MouseUpOutside\";"), SWFBUTTON_MOUSEUPOUTSIDE);
+	SWFButton_addAction(bu, compileSWFActionCode(
+		"_root.msg='MouseOut';"
+		"_root.note('SWFBUTTON_MOUSEOUT');"
+		// Target of button action is the button's parent sprite
+		"_root.check_equals(_target, '/square1');"
+		"setTarget('/');"
+		"_root.check_equals(_target, '/');"
+		), SWFBUTTON_MOUSEOUT);
+
+	SWFButton_addAction(bu, compileSWFActionCode(
+		"_root.msg='MouseOver';"
+		"_root.note('SWFBUTTON_MOUSEOVER');"
+		// Target of button action is the button's parent sprite
+		"_root.check_equals(_target, '/square1');"
+		"setTarget('/');"
+		"_root.check_equals(_target, '/');"
+		), SWFBUTTON_MOUSEOVER);
+
+	SWFButton_addAction(bu, compileSWFActionCode(
+		"_root.msg='MouseDown';"
+		"_root.note('SWFBUTTON_MOUSEDOWN');"
+		// Target of button action is the button's parent sprite
+		"_root.check_equals(_target, '/square1');"
+		"setTarget('/');"
+		"_root.check_equals(_target, '/');"
+		), SWFBUTTON_MOUSEDOWN);
+
+	SWFButton_addAction(bu, compileSWFActionCode(
+		"_root.msg='MouseUp';"
+		"_root.note('SWFBUTTON_MOUSEUP');"
+		// Target of button action is the button's parent sprite
+		"_root.check_equals(_target, '/square1');"
+		"setTarget('/');"
+		"_root.check_equals(_target, '/');"
+		), SWFBUTTON_MOUSEUP);
+
+	SWFButton_addAction(bu, compileSWFActionCode(
+		"_root.msg='MouseUpOutside';"
+		"_root.note('SWFBUTTON_MOUSEUPOUTSIDE');"
+		// Target of button action is the button's parent sprite
+		"_root.check_equals(_target, '/square1');"
+		"setTarget('/');"
+		"_root.check_equals(_target, '/');"
+		), SWFBUTTON_MOUSEUPOUTSIDE);
 
 	it = SWFMovieClip_add(mc, (SWFBlock)bu);
 	SWFDisplayItem_setName(it, "button");
@@ -156,7 +195,7 @@ main(int argc, char **argv)
 	SWFMovie mo;
 	SWFDisplayItem it;
 	const char *srcdir=".";
-	char fdbfont[256];
+	SWFMovieClip dejagnuclip;
 
 	/*********************************************
 	 *
@@ -171,8 +210,8 @@ main(int argc, char **argv)
 	Ming_setScale(20.0); 
  
 	mo = newSWFMovie();
-	SWFMovie_setDimension(mo, 120, 120);
-	SWFMovie_setRate(mo, 1);
+	SWFMovie_setDimension(mo, 800, 600);
+	SWFMovie_setRate(mo, 0.5);
 
 	if ( argc>1 ) srcdir=argv[1];
 	else
@@ -181,15 +220,13 @@ main(int argc, char **argv)
 		return 1;
 	}
 
-	sprintf(fdbfont, "%s/Bitstream Vera Sans.fdb", srcdir);
-	FILE *font_file = fopen(fdbfont, "r");
-	if ( font_file == NULL )
-	{
-		perror(fdbfont);
-		exit(1);
-	}
-	/*SWFBrowserFont bfont = newSWFBrowserFont("_sans");*/
-	font = loadSWFFontFromFile(font_file);
+	font = get_default_font(srcdir); 
+
+	/* Dejagnu equipment */
+	dejagnuclip = get_dejagnu_clip((SWFBlock)font, 10, 0, 0, 800, 600);
+	it = SWFMovie_add(mo, (SWFBlock)dejagnuclip);
+  	SWFDisplayItem_setDepth(it, 200); 
+  	SWFDisplayItem_move(it, 200, 0); 
 
 	add_text_field(mo, "textfield", "_root.msg", "Button events", 10, 0, 5);
 	add_text_field(mo, "textfield2", "_root.msg2", "Mouse events", 11, 0, 100);
@@ -206,21 +243,85 @@ main(int argc, char **argv)
 	SWFDisplayItem_setName(it, "square1");
 	SWFDisplayItem_setDepth(it, 2);
 
+	//
 	// Mouse pointer events
-	add_actions(mo, "square1.button.onRollOver = function() { _root.msg2 = 'RollOver'; };");
-	add_actions(mo, "square1.button.onRollOut = function() { _root.msg2 = 'RollOut'; };");
+	//
 
+	add_actions(mo,
+		"square1.button.onRollOver = function() { "
+		"	_root.msg2 = 'RollOver'; "
+		// Target is the one this function was defined in
+		"	check_equals(_target, '/');"
+		"};"
+		);
+
+	add_actions(mo,
+		"square1.button.onRollOut = function() {"
+		"	_root.msg2 = 'RollOut'; "
+		// Target is the one this function was defined in
+		"	check_equals(_target, '/');"
+		"};"
+		);
+
+	//
 	// Mouse buttons events
-	add_actions(mo, "square1.button.onPress = function() { _root.msg2 = 'Press'; };");
-	add_actions(mo, "square1.button.onRelease = function() { _root.msg2 = 'Release'; };");
-	add_actions(mo, "square1.button.onReleaseOutside = function() { _root.msg2 = 'ReleaseOutside'; };");
+	//
 
+	add_actions(mo,
+		"square1.button.onPress = function() {"
+		"	_root.msg2 = 'Press'; "
+		// Target is the one this function was defined in
+		"	check_equals(_target, '/');"
+		"};"
+		);
+
+	add_actions(mo,
+		"square1.button.onRelease = function() {"
+		"	_root.msg2 = 'Release'; "
+		// Target is the one this function was defined in
+		"	check_equals(_target, '/');"
+		"};"
+		);
+
+	add_actions(mo,
+		"square1.button.onReleaseOutside = function() {"
+		"	_root.msg2 = 'ReleaseOutside'; "
+		// Target is the one this function was defined in
+		"	check_equals(_target, '/');"
+		"};"
+		);
+
+	//
 	// Focus events
-	add_actions(mo, "square1.button.onSetFocus = function() { _root.msg3 = 'SetFocus'; };");
+	//
 
+	add_actions(mo,
+		"square1.button.onSetFocus = function() {"
+		"	_root.msg3 = 'SetFocus';"
+		// Target is the one this function was defined in
+		"	check_equals(_target, '/');"
+		"};"
+		);
+
+	//
 	// Key events - button needs focus for these to work
-	add_actions(mo, "square1.button.onKeyDown = function() { _root.msg3 = 'KeyDown'; };");
-	add_actions(mo, "square1.button.onKeyUp = function() { _root.msg3 = 'KeyUp'; };");
+	//
+
+	add_actions(mo,
+		"square1.button.onKeyDown = function() {"
+		"	_root.msg3 = 'KeyDown';"
+		// Target is the one this function was defined in
+		"	check_equals(_target, '/');"
+		"};"
+		);
+
+	add_actions(mo, 
+		"square1.button.onKeyUp = function() {"
+		"	_root.msg3 = 'KeyUp';"
+		// Target is the one this function was defined in
+		"	check_equals(_target, '/');"
+		"};"
+		);
 
 
 	SWFMovie_nextFrame(mo); /* showFrame */
