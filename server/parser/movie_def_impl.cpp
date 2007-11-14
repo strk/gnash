@@ -1180,7 +1180,8 @@ movie_def_impl::add_init_action(execute_tag* e, int cid)
 	assert(e);
 	if ( m_init_action_defined.insert(cid).second )
 	{
-		m_init_action_list[_frames_loaded].push_back(e);
+		add_execute_tag(e); // ownership transferred
+		//m_init_action_list[_frames_loaded].push_back(e);
 	}
 }
 

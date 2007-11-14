@@ -1268,8 +1268,9 @@ movie_root::pushAction(std::auto_ptr<ExecutableCode> code, int lvl)
 
 	// Immediately execute code targetted at a lower level while processing
 	// an higher level.
-	if ( _processingActionLevel < apSIZE && lvl < _processingActionLevel )
+	if ( processingActions() && lvl < _processingActionLevel )
 	{
+		log_debug("Action pushed in level %d executed immediately (as we are currently executing level %d)", lvl, _processingActionLevel);
 		code->execute();
 		return;
 	}
@@ -1289,8 +1290,9 @@ movie_root::pushAction(const action_buffer& buf, boost::intrusive_ptr<character>
 
 	// Immediately execute code targetted at a lower level while processing
 	// an higher level.
-	if ( _processingActionLevel < apSIZE && lvl < _processingActionLevel )
+	if ( processingActions() && lvl < _processingActionLevel )
 	{
+		log_debug("Action pushed in level %d executed immediately (as we are currently executing level %d)", lvl, _processingActionLevel);
 		code->execute();
 		return;
 	}
@@ -1310,8 +1312,9 @@ movie_root::pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_
 
 	// Immediately execute code targetted at a lower level while processing
 	// an higher level.
-	if ( _processingActionLevel < apSIZE && lvl < _processingActionLevel )
+	if ( processingActions() && lvl < _processingActionLevel )
 	{
+		log_debug("Action pushed in level %d executed immediately (as we are currently executing level %d)", lvl, _processingActionLevel);
 		code->execute();
 		return;
 	}

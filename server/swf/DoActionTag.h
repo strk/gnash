@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: DoActionTag.h,v 1.6 2007/10/04 22:55:53 strk Exp $ */
+/* $Id: DoActionTag.h,v 1.7 2007/11/14 13:23:47 strk Exp $ */
 
 #ifndef GNASH_SWF_DOACTIONTAG_H
 #define GNASH_SWF_DOACTIONTAG_H
@@ -63,11 +63,21 @@ public:
 	    m_buf.readFullTag(in);
 	}
 
+	virtual void execute_state(sprite_instance* m) const
+	{
+		if ( _isInitAction )
+		{
+			//m->execute_action(m_buf);
+			m->execute_init_action_buffer(m_buf);
+		}
+	}
+
 	virtual void execute(sprite_instance* m) const
 	{
 		if ( _isInitAction )
 		{
-			m->execute_action(m_buf);
+			//m->execute_action(m_buf);
+			m->execute_init_action_buffer(m_buf);
 		}
 		else
 		{

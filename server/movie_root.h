@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.86 2007/11/09 19:58:03 strk Exp $ */
+/* $Id: movie_root.h,v 1.87 2007/11/14 13:23:47 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -621,6 +621,11 @@ public:
 
     /// Return true if scripts execution is disabled
     bool scriptsDisabled() const { return _disableScripts; };
+
+    bool processingActions() const
+    {
+        return (_processingActionLevel < apSIZE);
+    }
 
 private:
 

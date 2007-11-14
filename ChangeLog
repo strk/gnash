@@ -1,3 +1,21 @@
+2007-11-14 Sandro Santilli <strk@keybit.net>
+
+	* server/movie_root.{cpp,h}: add a processingActions method,
+	  might be used to know wheter to push actions or execute
+	  them immediately.
+	* server/sprite_instance.{cpp,h}: add an execute_init_action
+	  method to be called by DoInitAction tag executor; add a
+	  YOUTUBE_HAVE_PRECEDENCE macro undefining which we get lots
+	  of new XPASS but break youtube... (pushing init actions
+	  to action queue).
+	* server/parser/movie_def_impl.cpp (add_init_action): store
+	  init actions togheter with all other control tags.
+	* server/swf/DoActionTag.h (execute): call execute_init_action
+	  for init actions, execute them also by execute_state
+	* testsuite/misc-swfc.all/: action_execution_order_test10.sc,
+	  movieclip_destruction_test1.sc: some successes (we'd get much
+	  more with YOUTUBE_HAVE_PRECEDENCE defined in sprite_instance.cpp)
+
 2007-11-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/actionscript.all/XML.as: adapt and reinclude

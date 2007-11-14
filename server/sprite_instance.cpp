@@ -1789,6 +1789,8 @@ character* sprite_instance::get_character_at_depth(int depth)
 bool sprite_instance::get_member(string_table::key name_key, as_value* val,
 	string_table::key nsname)
 {
+	//constructAsScriptObject();
+
 	const std::string& name = VM::get().getStringTable().value(name_key);
 
 	// FIXME: use addProperty interface for these !!
@@ -2147,13 +2149,13 @@ sprite_instance::on_event(const event_id& id)
 		return false;
 	}
 
-#if 1
 	if ( id.m_id == event_id::INITIALIZE )
 	{
 		// Construct as ActionScript object.
+		// TODO: it could be we need to do this on-demand instead
+		// (on __proto__ query)
 		constructAsScriptObject();
 	}
-#endif
 
 	if ( id.is_button_event() && ! isEnabled() )
 	{
@@ -2180,6 +2182,15 @@ sprite_instance::on_event(const event_id& id)
 
 	// Fall through and call the function also, if it's defined!
 
+
+	// user-defined onInitialize is never called
+	if ( id.m_id == event_id::INITIALIZE )
+	{
+			testInvariant();
+			return called;
+	}
+
+
 	// NOTE: user-defined onLoad is not invoked if the corresponding
 	//       clip-defined onLoad is not present (zou mentions if
 	//       NO clip-defined events are instead)
@@ -2195,6 +2206,7 @@ sprite_instance::on_event(const event_id& id)
 			log_debug("Sprite %s won't check for user-defined LOAD event (didn't have a clipLoad event defined)", getTarget().c_str());
 			testInvariant();
 #endif
+			// FIXME: shouldn't we return 'called' ?
 			return false;
 		}
 	}
@@ -2417,20 +2429,39 @@ void sprite_instance::advance(float delta_time)
 }
 
 void
+sprite_instance::execute_init_action_buffer(const action_buffer& a)
+{
+	if ( m_init_actions_executed.find(m_current_frame) == m_init_actions_executed.end() )
+	{
+		log_debug("Queuing init actions in frame " SIZET_FMT " of sprite %s", m_current_frame, getTarget().c_str());
+		std::auto_ptr<ExecutableCode> code ( new GlobalCode(a, boost::intrusive_ptr<sprite_instance>(this)) );
+
+		// NOTE: we should really push these actions, but I still don't understand
+		//       why doing so breaks youtube :/
+		//       Undefining the YOUTUBE_TAKES_PRECEDENCE you'll get many XPASS
+		//       in our testsuite, and no failures, but youtube would break.
+		//
+#define YOUTUBE_TAKES_PRECEDENCE 1
+#ifdef YOUTUBE_TAKES_PRECEDENCE
+		code->execute();
+#else
+		movie_root& root = _vm.getRoot();
+		root.pushAction(code, movie_root::apINIT);
+#endif
+	}
+	else
+	{
+		log_debug("Init actions in frame " SIZET_FMT " of sprite %s already executed", m_current_frame, getTarget().c_str());
+	}
+}
+
+void
 sprite_instance::execute_action(const action_buffer& ab)
 {
 	as_environment& env = m_as_environment; // just type less
 
-	// Do not cleanup locals here, as there's nothing like
-	// a movie-frame local scope...
-	
-	//int local_stack_top = env.get_local_frame_top();
-	//env.add_frame_barrier();
-
 	ActionExec exec(ab, env);
 	exec();
-
-	//env.set_local_frame_top(local_stack_top);
 }
 
 /*private*/
@@ -2491,40 +2522,6 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 
 	assert(typeflags);
 
-	// Execute this frame's init actions, if necessary.
-	if ( m_init_actions_executed.insert(frame).second )
-	{
-
-		const PlayList* init_actions = m_def->get_init_actions(frame);
-
-		if ( init_actions && ! init_actions->empty() )
-		{
-
-			IF_VERBOSE_ACTION(
-				// Use 1-based frame numbers
-				log_action(_("Executing " SIZET_FMT 
-					" *init* tags in frame " SIZET_FMT
-					"/" SIZET_FMT " of sprite %s"),
-					init_actions->size(),
-					frame+1, get_frame_count(),
-					getTargetPath().c_str());
-			);
-
-
-			// Need to execute these actions (init actions should be executed immediately)
-			std::for_each(init_actions->begin(), init_actions->end(),
-				std::bind2nd(std::mem_fun(&execute_tag::execute), this));
-
-			// Mark this frame done, so we never execute these
-			// init actions again.
-			//m_init_actions_executed[frame] = true;
-
-			//do_actions();
-		}
-	}
-
-
-
 	const PlayList* playlist = m_def->getPlaylist(frame);
 	if ( playlist )
 	{
@@ -2551,6 +2548,9 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 			std::for_each(playlist->begin(), playlist->end(), boost::bind(&execute_tag::execute_action, _1, this));
 		}
 	}
+
+	// Mark this frame's init actions as executed 
+	m_init_actions_executed.insert(frame);
 
 	testInvariant();
 }
@@ -3395,8 +3395,9 @@ sprite_instance::stagePlacementCallback()
 	}
 	else
 	{
-		//log_debug("Sprite %s is not dynamic, queuing INITIALIZE and CONSTRUCT events", getTarget().c_str());
+		log_debug("Queuing INITIALIZE event for sprite %s", getTarget().c_str());
 		queueEvent(event_id::INITIALIZE, movie_root::apINIT);
+		log_debug("Queuing CONSTRUCT event for sprite %s", getTarget().c_str());
 		queueEvent(event_id::CONSTRUCT, movie_root::apCONSTRUCT);
 	}
 
@@ -3442,6 +3443,7 @@ sprite_instance::stagePlacementCallback()
 void
 sprite_instance::constructAsScriptObject()
 {
+	//log_debug("constructAsScriptObject called for sprite %s", getTarget().c_str());
 	do {
 		if ( _name.empty() )
 		{
@@ -3462,7 +3464,7 @@ sprite_instance::constructAsScriptObject()
 		}
 
 		as_function* ctor = def->getRegisteredClass();
-		//log_msg(_("Attached sprite's registered for %s class is %p"), getTarget().c_str(), (void*)ctor); 
+		log_debug(_("Attached sprites %s registered class is %p"), getTarget().c_str(), (void*)ctor); 
 
 		// TODO: builtin constructors are different from user-defined ones
 		// we should likely change that. See also vm/ASHandlers.cpp (construct_object)

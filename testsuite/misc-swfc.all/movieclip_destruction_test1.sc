@@ -248,11 +248,11 @@
     _root.xcheck_equals(mc6.__proto__, Object.prototype); 
     _root.xcheck_equals(mc7.__proto__, Object.prototype); 
     trace(mc6.__proto__); trace(mc7.__proto__);
-    _root.xcheck_equals(mc6.__proto__, MovieClip.prototype); 
+    _root.check_equals(mc6.__proto__, MovieClip.prototype); 
     _root.xcheck_equals(mc7.__proto__, MovieClip.prototype); 
 
-    _root.xcheck_equals(typeof(mc6), 'movieclip'); // Gnash fails because executes init actions before DLIST tags
-    _root.xcheck_equals(typeof(mc6.mc61), 'movieclip'); // Gnash fails because executes init actions before DLIST tags
+    _root.check_equals(typeof(mc6), 'movieclip'); // Gnash fails because executes init actions before DLIST tags
+    _root.check_equals(typeof(mc6.mc61), 'movieclip'); // Gnash fails because executes init actions before DLIST tags
     _root.xcheck_equals(typeof(mc7), 'movieclip'); // Gnash fails because executes init actions before DLIST tags
     _root.xcheck_equals(typeof(mc7.mc71), 'movieclip'); // Gnash fails because executes init actions before DLIST tags
     _root.check_equals(this, _root); // target is the root !

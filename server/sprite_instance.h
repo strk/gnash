@@ -518,6 +518,17 @@ public:
 		else execute_action(*a);
 	}
 
+	
+	/// \brief
+	/// Execute the given init action buffer, if not done yet
+	/// for the current frame
+	//
+	/// The action will normally be pushed on queue, but will
+	/// be executed immediately if we are executing actions
+	/// resulting from a callFame instead.
+	///
+	void execute_init_action_buffer(const action_buffer& a);
+
 	/// Execute a single action buffer (DOACTION block)
 	void execute_action(const action_buffer& ab);
 
