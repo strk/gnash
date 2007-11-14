@@ -27,7 +27,6 @@
 #include "log.h"
 
 #include "as_function.h"
-#include "as_environment.h" // for enumerateKeys
 #include "as_value.h" // for enumerateValues
 #include "VM.h" // For string_table
 
@@ -46,7 +45,7 @@ PropertyList::PropertyList(const PropertyList& pl)
 PropertyList&
 PropertyList::operator=(const PropertyList& pl)
 {
-	if (this != &pl)
+	if ( this != &pl )
 	{
 		clear();
 		import(pl);
@@ -55,19 +54,19 @@ PropertyList::operator=(const PropertyList& pl)
 }
 
 // Should find in any namespace if nsId is 0, and any namespace should find
-// something in namespace 0, unless it is strict.
+// something in namespace 0.
 static inline
 PropertyList::container::iterator
 iterator_find(PropertyList::container &p, string_table::key name,
-	string_table::key nsId, bool strict)
+	string_table::key nsId)
 {
-	if (nsId || strict)
+	if (nsId)
 	{
 		PropertyList::container::iterator i =
 			p.find(boost::make_tuple(name, nsId));
 		if (i != p.end())
 			return i;
-		return strict ? p.end() : p.find(boost::make_tuple(name, 0));
+		return p.find(boost::make_tuple(name, 0));
 	}
 
 	return p.find(boost::make_tuple(name));
@@ -141,7 +140,7 @@ bool
 PropertyList::getValue(const string_table::key key, as_value& val,
 		as_object& this_ptr, const string_table::key nsId) 
 {
-	container::iterator found = iterator_find(_props, key, nsId, false);
+	container::iterator found = iterator_find(_props, key, nsId);
 	if (found == _props.end())
 		return false;
 
@@ -153,7 +152,7 @@ bool
 PropertyList::setValue(string_table::key key, as_value val,
 		as_object& this_ptr, string_table::key nsId)
 {
-	container::iterator found = iterator_find(_props, key, nsId, true);
+	container::iterator found = iterator_find(_props, key, nsId);
 	
 	if (found == _props.end())
 	{
@@ -171,7 +170,6 @@ PropertyList::setValue(string_table::key key, as_value val,
 		return false;
 	}
 
-	// This should be okay, since val is the only update here.
 	const_cast<Property*>(&(*found))->setValue(this_ptr, val);
 	return true;
 }
@@ -180,7 +178,7 @@ bool
 PropertyList::setFlags(string_table::key key,
 		int setFlags, int clearFlags, string_table::key nsId)
 {
-	container::iterator found = iterator_find(_props, key, nsId, false);
+	container::iterator found = iterator_find(_props, key, nsId);
 	if ( found == _props.end() ) return false;
 
 	as_prop_flags& f = const_cast<as_prop_flags&>(found->getFlags());
@@ -208,7 +206,7 @@ PropertyList::setFlagsAll(int setFlags, int clearFlags)
 Property*
 PropertyList::getProperty(string_table::key key, string_table::key nsId)
 {
-	container::iterator found = iterator_find(_props, key, nsId, false);
+	container::iterator found = iterator_find(_props, key, nsId);
 	if (found == _props.end()) return NULL;
 	return const_cast<Property*>(&(*found));
 }
@@ -217,7 +215,7 @@ std::pair<bool,bool>
 PropertyList::delProperty(string_table::key key, string_table::key nsId)
 {
 	//GNASH_REPORT_FUNCTION;
-	container::iterator found = iterator_find(_props, key, nsId, false);
+	container::iterator found = iterator_find(_props, key, nsId);
 	if (found == _props.end())
 	{
 		return std::make_pair(false,false);
@@ -273,28 +271,6 @@ PropertyList::enumerateKeys(as_environment& env, propNameSet& donelist) const
 }
 
 void
-PropertyList::enumerateKeys(SafeStack<as_value>& stack,
-	propNameSet& donelist) const
-{
-	string_table& st = VM::get().getStringTable();
-	for (container::const_iterator i = _props.begin(), ie = _props.end();
-		i != ie; ++i)
-	{
-		if (i->getFlags().get_dont_enum())
-			continue;
-
-		if (donelist.insert(std::make_pair(i->mName, i->mNamespace)).second)
-		{
-			if (i->mNamespace)
-				stack.push(as_value(st.value(i->mName) + "." +
-					st.value(i->mNamespace)));
-			else
-				stack.push(as_value(st.value(i->mName)));
-		}
-	}
-}
-
-void
 PropertyList::enumerateKeyValue(as_object& this_ptr, std::map<std::string, std::string>& to) 
 {
 	string_table& st = VM::get().getStringTable();
@@ -336,8 +312,7 @@ PropertyList::import(const PropertyList& o)
 		itEnd = o._props.end(); it != itEnd; ++it)
 	{
 		// overwrite any previous property with this name
-		container::iterator found = iterator_find(_props, it->mName,
-			it->mNamespace, true);
+		container::iterator found = iterator_find(_props, it->mName, it->mNamespace);
 		if (found != _props.end())
 		{
 			Property a = *it;
@@ -360,13 +335,12 @@ PropertyList::addGetterSetter(string_table::key key, as_function& getter,
 	Property a(key, nsId, &getter, &setter);
 	a.setOrder(- ++mDefaultOrder - 1);
 
-	container::iterator found = iterator_find(_props, key, nsId, true);
-	if (found != _props.end() && found->mName == key && found->mNamespace == nsId)
+	container::iterator found = iterator_find(_props, key, nsId);
+	if (found != _props.end())
 	{
 		// copy flags from previous member (even if it's a normal member ?)
 		as_prop_flags& f = a.getFlags();
 		f = found->getFlags();
-		a.setOrder(found->getOrder()); // Override order to match previous.
 		_props.replace(found, a);
 	}
 	else
@@ -381,7 +355,7 @@ bool
 PropertyList::addDestructiveGetterSetter(string_table::key key,
 	as_function& getter, as_function& setter, string_table::key nsId)
 {
-	container::iterator found = iterator_find(_props, key, nsId, true);
+	container::iterator found = iterator_find(_props, key, nsId);
 	if (found != _props.end())
 		return false; // Already exists.
 
