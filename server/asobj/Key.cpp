@@ -379,6 +379,7 @@ void key_class_init(as_object& global)
 void
 key_as_object::markReachableResources() const
 {
+    markAsObjectReachable();
     for (Listeners::const_iterator i=m_listeners.begin(), e=m_listeners.end();
             i != e; ++i)
     {

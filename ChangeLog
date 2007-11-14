@@ -1,3 +1,8 @@
+2007-11-14 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/asobj/Key.cpp: mark built-in properties for Key object, fix a 
+	  segfault with the old key listener design.
+	  
 2007-11-14 Chad Musick <chadmusick@msbx.net>
 
 	* server/PropertyList.cpp: Be stricter about checking for things that
