@@ -21,6 +21,12 @@
  * 
  * Test registerClass
  *
+ * Description:
+ *   frame2: export libItem1, export libItem2
+ *   frame3: DoInitAction(libItem1), DoInitAction(libItem2), PlaceObject(libItem2)
+ * Observed:
+ *   the effect of "Object.registerClass('libItem2', theClass2)" is not visible
+ *   in DoInitAction(libItem2), but in next frame. Note: there's no attachMovie for libItem2.
  */
 
 // use swf6 for case sensitiviness
@@ -83,6 +89,7 @@
      // Gnash failed by executing init actions before DLIST tags.
      xcheck_equals(typeof(libItem2), 'movieclip');
      xcheck_equals(libItem2.__proto__, MovieClip.prototype);
+     xcheck_equals(libItem2.__proto__, MovieClip.prototype);
 
      // Childs of libItem2 have also been placed already
      // Gnash fails by executing init actions before frame0 tags
@@ -90,10 +97,15 @@
   .end
   
   .put libItem2
-  
+
 .frame 4
   .action:
-    totals(10);
+     check_equals(libItem2.__proto__, theClass2.prototype);
+  .end
+   
+.frame 5
+  .action:
+    totals(12);
     stop();
   .end
 

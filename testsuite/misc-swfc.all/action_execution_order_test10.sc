@@ -36,17 +36,18 @@
  *          DoAction.
  * 
  *  frame8:
- *          PlaceObject(mc4), DoInitAction(mc4):
- *               - mc4.__proto__ is Object, not MovieClip during init actions
- *               - onInitialize(mc4) isn't called 
- *               - other things to note ?
+ *          PlaceObject(mc4), DoInitAction(mc4), DoInitAction(mc5), PlaceObject(mc5)
+ *               - user defined onInitialize(mc4) isn't called
+ *               - user defined onInitialize(mc5) isn't called
+ *               - user defined onConstruct(mc4) is called
+ *               - user defined onConstruct(mc5) is called
  *
  * Expected behaviour:
- *    (1) user defined onContruct should not be triggered.
- *    (2) user defined onLoad should not be triggered in this case(when allEventFlags == zero).
- *    (3) If DoAction is before RemoveObject2, then actions in DoAction should be executed before
+ *    (1) user defined onLoad should not be triggered in this case(when allEventFlags == zero).
+ *        (guess: might be a pp bug)
+ *    (2) If DoAction is before RemoveObject2, then actions in DoAction should be executed before
  *        onUnload, otherwise after onUnload.
- *    (4) Frame actions(frameNum>0): first placed last executed.
+ *    (3) Frame actions(frameNum>0): first placed last executed.
  * 
  */
 
