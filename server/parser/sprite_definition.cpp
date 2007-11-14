@@ -31,6 +31,10 @@
 
 using namespace std;
 
+// Define the following macro to get a dump the prototype 
+// members of classes registered to definitions.
+//#define DEBUG_REGISTER_CLASS 1
+
 namespace gnash {
 
 character*
@@ -197,7 +201,7 @@ sprite_definition::registerClass(as_function* the_class)
 	registeredClass = the_class;
 #ifdef DEBUG_REGISTER_CLASS
 	log_msg(_("Registered class %p for sprite_def %p"), (void*)registeredClass.get(), (void*)this);
-	as_object* proto = registeredClass->getPrototype();
+	as_object* proto = registeredClass->getPrototype().get();
 	log_msg(_(" Exported interface: "));
 	proto->dump_members();
 #endif
