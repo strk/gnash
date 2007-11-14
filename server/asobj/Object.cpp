@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Object.cpp,v 1.34 2007/10/24 21:55:33 strk Exp $ */
+/* $Id: Object.cpp,v 1.35 2007/11/14 21:17:32 strk Exp $ */
 
 #include "tu_config.h"
 #include "Object.h"
@@ -272,8 +272,10 @@ object_registerClass(const fn_call& fn)
 	if ( symbolid.empty() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Invalid call to Object.registerClass() - "
-			"empty symbol id (%s)"), fn.arg(0).to_debug_string().c_str());
+		std::stringstream ss;
+		fn.dump_args(ss);
+		log_aserror(_("Invalid call to Object.registerClass(%s) - "
+			"second argument (symbol id) evaluates to empty string"), ss.str().c_str());
 		);
 		return as_value(false);
 	}
@@ -282,8 +284,10 @@ object_registerClass(const fn_call& fn)
 	if ( ! theclass )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Invalid call to Object.registerClass() - "
-			"class is not a function (%s)"), fn.arg(1).to_debug_string().c_str());
+		std::stringstream ss;
+		fn.dump_args(ss);
+		log_aserror(_("Invalid call to Object.registerClass(%s) - "
+			"first argument is not a class/function)"), ss.str().c_str());
 		);
 		return as_value(false);
 	}
