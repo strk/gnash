@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.51 2007/10/20 10:47:14 strk Exp $ */
+/* $Id: xml.cpp,v 1.52 2007/11/14 09:16:49 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -276,8 +276,14 @@ XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
         element._attributes.push_back(attrib);
         attr = attr->next;
     }
-
-    if (node->type == XML_ELEMENT_NODE)
+    if (node->type == XML_COMMENT_NODE)
+    {
+    	// Comments apparently not handled until AS3
+    	// Comments in a text node are a *sibling* of the text node
+    	// for libxml2.
+    	return false;
+    }
+    else if (node->type == XML_ELEMENT_NODE)
     {
             element.nodeTypeSet(tElement);
 
@@ -316,8 +322,7 @@ XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
     {
         child = new XMLNode();
         child->setParent(&element);
-        if ( ! extractNode(*child, childnode, mem) ) break;
-        element._children.push_back(child);
+        if ( extractNode(*child, childnode, mem) ) element._children.push_back(child);
         childnode = childnode->next;
     }
 
@@ -907,8 +912,11 @@ XML::ignoreWhite() const
 int
 XML::getXMLOptions() const
 {
-    int options = XML_PARSE_RECOVER | XML_PARSE_NOWARNING | XML_PARSE_NOERROR;
-
+    int options = XML_PARSE_RECOVER | XML_PARSE_NOWARNING
+    		| XML_PARSE_NOERROR | XML_PARSE_NOCDATA;
+    // Using libxml2 to convert CDATA nodes to text seems to be what is
+    // required.
+    
     if ( ignoreWhite() )
     {
 	    // This doesn't seem to work, so the blanks skipping

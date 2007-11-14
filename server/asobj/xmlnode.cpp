@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.39 2007/08/31 21:53:32 strk Exp $ */
+/* $Id: xmlnode.cpp,v 1.40 2007/11/14 09:16:50 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -71,7 +71,7 @@ static as_value xmlnode_childNodes(const fn_call& fn);
 static as_value xmlnode_parentNode(const fn_call& fn);
 as_object* getXMLNodeInterface();
 
-static LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+//static LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 
 
 //std::vector<as_object *> _xmlobjs;    // FIXME: hack alert
@@ -124,7 +124,7 @@ XMLNode::~XMLNode()
 {
     //log_msg("%s: %p", __PRETTY_FUNCTION__, this);
 #ifdef DEBUG_MEMORY_ALLOCATION
-    log_msg(_("\tDeleting XMLNode data %s at %p"), this->_name.c_str(), this);
+    log_msg(_("\tDeleting XMLNode data %s with value %s at %p"), this->_name.c_str(), this->_value.c_str(), this);
 #endif
 }
 

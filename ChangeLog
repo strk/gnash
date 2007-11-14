@@ -1,3 +1,11 @@
+2007-11-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/asobj/xml.cpp: (getXMLOptions) strip CDATA nodes
+	  and just add text (fixes part of bug 21268); (extractNode)
+	  drop comment nodes but continue to parse siblings (they can
+	  be siblings of a text node).
+	* server/asobj/xmlnode.cpp: minor cleanups, better debugging output.
+
 2007-11-14 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/ButtonEventsTest.c: add self-contained
