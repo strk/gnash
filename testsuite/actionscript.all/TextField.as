@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.30 2007/11/05 09:04:08 strk Exp $";
+rcsid="$Id: TextField.as,v 1.31 2007/11/14 16:31:50 strk Exp $";
 
 #include "check.as"
 
@@ -397,6 +397,7 @@ tf._quality = "FAKE VALUE";
 xcheck_equals(tf._quality, "HIGH");
 tf._quality = "LOW";
 check_equals(tf._quality, "LOW");
+tf._quality = "HIGH";
 
 // Check TextField.restrict (the set of characters a user can input)
 
@@ -547,6 +548,14 @@ xcheck_equals(typeof(tf.variable), 'null');
 check( ! tf.hasOwnProperty('variable') ); 
 tf.variable = _level0.inputVar;
 xcheck_equals(typeof(tf.variable), 'null'); // _level0.inputVar doesn't exist !
+tf.variable = 2;
+check_equals(typeof(tf.variable), 'string'); 
+check_equals(tf.variable, '2'); 
+tf.variable = undefined;
+xcheck_equals(typeof(tf.variable), 'null'); 
+tf.variable = 2;
+tf.variable = null;
+xcheck_equals(typeof(tf.variable), 'null'); 
 tf.variable = "_level0.inputVar";
 check_equals(tf.variable, '_level0.inputVar'); 
 xcheck_equals(typeof(_level0.inputVar), 'undefined');
@@ -677,10 +686,10 @@ check_equals(tf._width, 10);
 origTextWidth = tf.textWidth;
 tf.autoSize = 'center';
 check(tf._width > 10);
-check_equals(origTextWidth, tf.textWidth); // textWidth isn't influenced by autoSize 
+check_equals(tf.textWidth, origTextWidth); // textWidth isn't influenced by autoSize 
 tf.autoSize = 'none';
 tf.wordWrap = true;
-check_equals(origTextWidth, tf.textWidth); 
+xcheck(tf.textWidth < origTextWidth);  // this can fail depending on the font used !
 tf._width = 10;
 check_equals(tf._width, 10);
 

@@ -1,5 +1,6 @@
 2007-11-14 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/TextField.as: more tests.
 	* server/sprite_instance.cpp, server/video_stream_instance.cpp:
 	  Remove some debugging output (compile-time defined)
 
