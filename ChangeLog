@@ -1,5 +1,10 @@
 2007-11-14 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/PASSING: sync'd with results from current swfdec
+	  master branch.
+
+2007-11-14 Sandro Santilli <strk@keybit.net>
+
 	* server/as_environment.{cpp,h}: unify object finding and target
 	  finding. The code is pretty dirty but is more correct then 
 	  before.
