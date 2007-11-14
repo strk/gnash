@@ -1,5 +1,10 @@
 2007-11-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* testsuite/actionscript.all/XML.as: adapt and reinclude
+	  test removed with last change.
+
+2007-11-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* testsuite/actionscript.all/XML.as: adapt test for CDATA node;
 	  add XML comments (which should be ignored).
 	* server/asobj/xml.cpp: (getXMLOptions) strip CDATA nodes

@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.47 2007/11/14 09:53:03 bwy Exp $";
+rcsid="$Id: XML.as,v 1.48 2007/11/14 12:08:12 bwy Exp $";
 
 #include "check.as"
 //#include "dejagnu.as"
@@ -277,9 +277,12 @@ check(XML);
 // 	fail("XML::load() doesn't work");
 // }
 check(XML);
-// Use escaped " instead of ' so that it matches the return value of toString()
+
+// Use escaped " instead of ' so that it matches xml_out (comments and CDATA tags stripped).
 var xml_in = "<TOPNODE tna1=\"tna1val\" tna2=\"tna2val\" tna3=\"tna3val\"><SUBNODE1 sna1=\"sna1val\" sna2=\"sna2val\"><SUBSUBNODE1 ssna1=\"ssna1val\" ssna2=\"ssna2val\"><!-- comment should be ignored-->sub sub1 node data 1</SUBSUBNODE1><SUBSUBNODE2><!--comment: cdata with illegal characters --><![CDATA[sub /\sub1 <br>\"node data 2\"]]></SUBSUBNODE2></SUBNODE1><SUBNODE2><SUBSUBNODE1>sub sub2 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub2 node data 2</SUBSUBNODE2></SUBNODE2></TOPNODE>";
-check(XML);
+// with comments stripped out.
+var xml_out = "<TOPNODE tna1=\"tna1val\" tna2=\"tna2val\" tna3=\"tna3val\"><SUBNODE1 sna1=\"sna1val\" sna2=\"sna2val\"><SUBSUBNODE1 ssna1=\"ssna1val\" ssna2=\"ssna2val\">sub sub1 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub /\sub1 \<br\>\"node data 2\"</SUBSUBNODE2></SUBNODE1><SUBNODE2><SUBSUBNODE1>sub sub2 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub2 node data 2</SUBSUBNODE2></SUBNODE2></TOPNODE>";
+
 
 check(XML);
 tmp.checkParsed = function ()
@@ -438,9 +441,7 @@ check_equals(typeof(ret), 'undefined');
 tmp.checkParsed(); // onLoad won't be called
 //note("Parsed XML: "+tmp.toString());
 
-// This should not be the same because comments and CDATA tags are
-// dropped.
-// check_equals(tmp.toString(), xml_in);
+check_equals(tmp.toString(), xml_out);
 
 //------------------------------------------------
 // Test XML editing
