@@ -328,12 +328,6 @@ private:
 		else return &(it->second);
 	}
 
-	// Sprites do not have init actions in their
-	// playlists!  Only the root movie
-	// (movie_def_impl) does (@@ correct?)
-	// .. no need to override as returning NULL is the default behaviour ..
-	//virtual const PlayList* get_init_actions(size_t /*frame_number*/)
-
 	virtual const std::string& get_url() const
 	{
 		return m_movie_def->get_url();

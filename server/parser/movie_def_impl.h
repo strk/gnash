@@ -215,8 +215,7 @@ private:
 	/// Movie control events for each frame.
 	PlayListMap m_playlist;
 
-	/// Init actions for each frame.
-	PlayListMap m_init_action_list;
+	/// A map to track init actions ids (subsequent init actions for the same id have to be discarded)
 	std::set<int> m_init_action_defined;
 
 	/// 0-based frame #'s
@@ -519,15 +518,6 @@ public:
 
 		PlayListMap::const_iterator it = m_playlist.find(frame_number);
 		if ( it == m_playlist.end() ) return NULL;
-		else return &(it->second);
-	}
-
-	virtual const PlayList* get_init_actions(size_t frame_number)
-	{
-		assert(frame_number <= _frames_loaded);
-
-		PlayListMap::iterator it = m_init_action_list.find(frame_number);
-		if ( it == m_init_action_list.end() ) return NULL;
 		else return &(it->second);
 	}
 

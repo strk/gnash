@@ -241,19 +241,6 @@ public:
 		return 0;
 	}
 
-	/// Return the list of init actions for given frame number
-	//
-	///
-	/// @param frame_number
-	///	 Frame number, 0-based (ie: first frame is 0)
-	///
-	/// @return NULL if the given frame has no init actions associated
-	///         (this is the default behaviour)
-	///
-	virtual const PlayList* get_init_actions(size_t /*frame_number*/) {
-		return NULL;
-	}
-
 	/// Get the named exported resource, if we expose it.
 	//
 	/// @param symbol

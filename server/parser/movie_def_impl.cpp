@@ -228,24 +228,7 @@ movie_def_impl::~movie_def_impl()
 		{
                     delete *j;
                 }
-
-		//pl.clear(); // useless, as we're going to clean the whole map
         }
-	//m_playlist.clear(); // useless, as we're going to call it's destructor next 
-
-	// Release init action data.
-	for (PlayListMap::iterator i=m_init_action_list.begin(), e=m_init_action_list.end(); i!=e; ++i)
-	{
-		PlayList& pl = i->second;
-
-		for (PlayList::iterator j=pl.begin(), je=pl.end(); j!=je; ++j)
-		{
-                    delete *j;
-                }
-
-		//pl.clear(); // useless, as we're going to clean the whole map
-        }
-	//m_init_action_list.clear(); // useless, as we're going to call it's destructor next 
 
 	// It's supposed to be cleaned up in read()
 	// TODO: join with loader thread instead ?
@@ -499,11 +482,6 @@ movie_def_impl::readHeader(std::auto_ptr<tu_file> in, const std::string& url)
 
 	// TODO: This seems dangerous, check closely
 	if(m_frame_count == 0) m_frame_count++;
-
-	// Allocate 1 more then the expected slots
-	// for actions, to make handling malformed SWF easier.
-	//m_playlist.resize(m_frame_count+1);
-	//m_init_action_list.resize(m_frame_count+1);
 
 	IF_VERBOSE_PARSE(
 		m_frame_size.print();
@@ -945,13 +923,12 @@ parse_tag:
 		log_error(_("Parsing exception: %s"), e.what());
 	}
 
-	if ( ! m_playlist[_frames_loaded].empty() || ! m_init_action_list[_frames_loaded].empty() )
+	if ( ! m_playlist[_frames_loaded].empty() )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_(SIZET_FMT " action blocks and " SIZET_FMT " init action blocks are NOT followed by"
+		log_swferror(_(SIZET_FMT " control tags are NOT followed by"
 			" a SHOWFRAME tag"),
-			m_playlist[_frames_loaded].size(),
-			m_init_action_list[_frames_loaded].size());
+			m_playlist[_frames_loaded].size());
 		);
 	}
 
@@ -997,7 +974,6 @@ movie_def_impl::incrementLoadedFrames()
 				m_frame_count);
 		);
 		//m_playlist.resize(_frames_loaded+1);
-		//m_init_action_list.resize(_frames_loaded+1);
 	}
 
 #ifdef DEBUG_FRAMES_LOAD
@@ -1181,7 +1157,6 @@ movie_def_impl::add_init_action(execute_tag* e, int cid)
 	if ( m_init_action_defined.insert(cid).second )
 	{
 		add_execute_tag(e); // ownership transferred
-		//m_init_action_list[_frames_loaded].push_back(e);
 	}
 }
 
