@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.150 2007/11/11 19:14:35 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.151 2007/11/15 20:13:21 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -773,7 +773,15 @@ SWFHandlers::ActionDivide(ActionExec& thread)
 	thread.ensureStack(2);
 	double operand1 = env.top(1).to_number(&env);
 	double operand2 = env.top(0).to_number(&env);
-	env.top(1) = operand1 / operand2;
+
+	if (operand2 == 0 && env.get_version() < 5)
+	{
+		env.top(1).set_string("#ERROR#");
+        }
+	else
+	{
+		env.top(1) = operand1 / operand2;
+	}
 	env.drop(1);
 }
 

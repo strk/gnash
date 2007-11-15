@@ -1,5 +1,11 @@
 2007-11-15 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionDivide): return the string '#ERROR#'
+	  when a division by 0 is requested in SWF<5.
+	* testsuite/swfdec/PASSING: crash-0.5.3-divide-by-zero.swf succeeds.
+
+2007-11-15 Sandro Santilli <strk@keybit.net>
+
 	* server/as_value.cpp (to_string): for MOVIECLIP types return
 	  the empty string when dangling.
 	* testsuite/actionscript.all/MovieClip.as: add test for convertion
