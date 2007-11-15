@@ -171,6 +171,7 @@
         if(_level0.dejagnu_module_initialized != 1) {
             // create a textfield to output to
             _level0.createTextField("textout", 99, 10, 10, 600, 0);
+	    _level0.textout.autoSize = true;
             _level0.dejagnu_module_initialized = 1;
         }
 
