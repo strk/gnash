@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.98 2007/10/25 17:07:57 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.99 2007/11/15 19:41:34 strk Exp $";
 
 #include "check.as"
 
@@ -511,6 +511,7 @@ check_equals(typeof(softref3), 'movieclip');
 check_equals(typeof(softref3child), 'movieclip');
 check_equals(typeof(softref.member), 'undefined');
 check_equals(typeof(softref._target), 'undefined');
+check_equals("x"+softref, 'x');
 check_equals(softref2.member, 2);
 check_equals(softref2._target, '/hardref2');
 check_equals(softref3.member, 3);
@@ -1266,12 +1267,12 @@ check_equals(getInstanceAtDepth(-6.2), tt2);
  check_totals(158); // SWF5
 #else
 #if OUTPUT_VERSION < 7
- check_totals(503); // SWF6
+ check_totals(504); // SWF6
 #else
 #if OUTPUT_VERSION < 8
- check_totals(520); // SWF7
+ check_totals(521); // SWF7
 #else
- check_totals(521); // SWF8+
+ check_totals(522); // SWF8+
 #endif
 #endif
 #endif

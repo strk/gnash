@@ -87,7 +87,15 @@ as_value::to_string(as_environment* env) const
 
 		case MOVIECLIP:
 		{
-			return getSpriteProxy().getTarget();
+			const SpriteProxy& sp = getSpriteProxy();
+			if ( sp.isDangling() )
+			{
+				return "";
+			}
+			else
+			{
+				return sp.getTarget();
+			}
 		}
 
 		case NUMBER:
