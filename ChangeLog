@@ -2,6 +2,7 @@
 
 	* testsuite/misc-swfc.all/Dejagnu.sc: make Dejagnu window automatic
 	  resize to let text fit in (autoSize).
+	* server/sprite_instance.cpp: cleanup debugging output.
 
 2007-11-15 Zou Lunkai <zoulunkai@gmail.com>
 

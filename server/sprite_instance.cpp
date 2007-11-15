@@ -3366,7 +3366,7 @@ sprite_instance::stagePlacementCallback()
 	}
 
 #ifdef GNASH_DEBUG
-	log_debug(_("Constructing sprite '%s'"), _origTarget.c_str());
+	log_debug(_("Sprite '%s' placed on stage"), getTarget().c_str());
 #endif
 
 	// Register this sprite as a live one
@@ -3454,7 +3454,9 @@ sprite_instance::stagePlacementCallback()
 void
 sprite_instance::constructAsScriptObject()
 {
-	//log_debug("constructAsScriptObject called for sprite %s", getTarget().c_str());
+#ifdef GNASH_DEBUG
+	log_debug("constructAsScriptObject called for sprite %s", getTarget().c_str());
+#endif
 	do {
 		if ( _name.empty() )
 		{
