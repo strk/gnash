@@ -1,5 +1,9 @@
 2007-11-15 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/ops.as: a couple of tests more.
+
+2007-11-15 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.{cpp,h}: call constructAsScriptObject
 	  directly rather then on_event(CONSTRUCT) when needed. Doing
 	  so we can invoke the event handler *after* __proto__ is set

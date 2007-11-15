@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.25 2007/10/03 09:26:31 strk Exp $";
+rcsid="$Id: ops.as,v 1.26 2007/11/15 23:38:14 strk Exp $";
 
 #include "check.as"
 
@@ -152,6 +152,26 @@ check(! (undefined < undefined) );
 
 check(! (NaN < undefined) );
 check(! (undefined < NaN) );
+
+r = null < undefined;
+#if OUTPUT_VERSION < 7
+ check_equals(typeof(r), 'boolean');
+ check_equals(r, false);
+#else
+ check_equals(typeof(r), 'undefined');
+ check(r != true);
+ check(r != false);
+#endif
+
+r = null > undefined;
+#if OUTPUT_VERSION < 7
+ check_equals(typeof(r), 'boolean');
+ check_equals(r, false);
+#else
+ check_equals(typeof(r), 'undefined');
+ check(r != true);
+ check(r != false);
+#endif
 
 //------------------------------------------------
 // Logical AND operator (ACTION_LOGICALAND : 0x10)
@@ -644,4 +664,8 @@ y = ++x;
 xcheck(y!=NaN);
 check(isNaN(y));
 
-totals();
+#if OUTPUT_VERSION < 7
+ totals(193);
+#else
+ totals(195);
+#endif
