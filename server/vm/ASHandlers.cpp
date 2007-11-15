@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.151 2007/11/15 20:13:21 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.152 2007/11/15 20:46:40 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1357,25 +1357,25 @@ SWFHandlers::ActionCastOp(ActionExec& thread)
 
 	as_environment& env = thread.env;
 
-	thread.ensureStack(2);  // super, instance
-
-	// Get the "super" function
-	as_function* super = env.top(0).to_as_function();
+	thread.ensureStack(2);  // instance, super 
 
 	// Get the "instance"
-	boost::intrusive_ptr<as_object> instance = env.top(1).to_object();
+	boost::intrusive_ptr<as_object> instance = env.top(0).to_object();
+
+	// Get the "super" function
+	as_function* super = env.top(1).to_as_function();
 
 	// Invalid args!
 	if (!super || ! instance)
 	{
-		IF_VERBOSE_ACTION (
-		log_action(_("-- %s cast_to %s (invalid args?)"),
+		IF_VERBOSE_ASCODING_ERRORS (
+		log_aserror(_("-- %s cast_to %s (invalid args?)"),
 			env.top(1).to_debug_string().c_str(),
 			env.top(0).to_debug_string().c_str());
 		);
 
 		env.drop(1);
-		env.top(0) = as_value();
+		env.top(0).set_null(); // null, not undefined 
 		return;
 	}
 
@@ -1391,7 +1391,7 @@ SWFHandlers::ActionCastOp(ActionExec& thread)
 		env.top(0).set_null(); // null, not undefined.
 	}
 
-	log_msg(_("ActionCastOp TESTING"));
+	log_debug(_("ActionCastOp TESTING"));
 }
 
 void

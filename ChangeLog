@@ -1,5 +1,11 @@
 2007-11-15 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionCastOp): swap order of arguments,
+	  return null on supposedly invalid call.
+	* testsuite/swfdec/PASSING: cast-{5,6,7,8}.swf succeed.
+
+2007-11-15 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ASHandlers.cpp (ActionDivide): return the string '#ERROR#'
 	  when a division by 0 is requested in SWF<5.
 	* testsuite/swfdec/PASSING: crash-0.5.3-divide-by-zero.swf succeeds.
