@@ -45,12 +45,13 @@ add_static_mc(SWFMovie mo, const char* name, int depth)
   return it;
 }
 
+
 int
 main(int argc, char** argv)
 {
   SWFMovie mo;
-  SWFMovieClip  dejagnuclip;
-  SWFDisplayItem  it;
+  SWFMovieClip  mc, dejagnuclip;
+  SWFDisplayItem  it, it1, it2, it3;
 
   const char *srcdir=".";
   if ( argc>1 ) 
@@ -70,11 +71,10 @@ main(int argc, char** argv)
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   add_actions(mo, 
-    "test1=0; test2=0; test3=0; test4=0; test5=0; test6=0; "
+    "test1=0; test2=0; test3=0; test4=0; test5='0'; test6=0; "
     "keyPressed=false; keyReleased=false;"
     "haslooped1=false; haslooped2=false;");
   SWFMovie_nextFrame(mo);  // _root frame1
-
 
   // test1: 
   //    (1)onKeyDown, onKeyPress and onKeyUp are not global functions
@@ -222,7 +222,7 @@ main(int argc, char** argv)
     "delete objRef;"
     "obj3=new Object(); "
     "obj3.onKeyDown=function() {"
-    "   _root.play();"
+    "   _root.gotoAndPlay(_currentframe+1);"
     "}; "
     "Key.addListener(obj3); "
   );
@@ -232,9 +232,68 @@ main(int argc, char** argv)
   add_actions(mo, 
     "Key.removeListener(obj3);"
     "delete obj3; "
-    "totals(); stop();");
+  );
   SWFMovie_nextFrame(mo);  // _root frame16
+
+  // test5:
+  //   test key listeners invoking order.
+  //   expected behaviour:
+  //   (1)for character key listeners, first added last called
+  //   (2)for general object listeners, first added first called
+  //   (3)for character listeners, user defined onKeyDown/Up won't be called
+  //      if not registered to the global Key object.
+  it1 = add_static_mc(mo, "ls1", 30);
+  SWFDisplayItem_addAction(it1,
+    compileSWFActionCode("_root.test5 += '+ls1';"),
+    SWFACTION_KEYDOWN);
+  SWFMovie_nextFrame(mo);  // _root frame17
   
+  it2 = add_static_mc(mo, "ls2", 31);
+  SWFDisplayItem_addAction(it2,
+    compileSWFActionCode("_root.test5 += '+ls2'; "),
+    SWFACTION_KEYDOWN);
+  SWFMovie_nextFrame(mo);  // _root frame18
+   
+  it3 = add_static_mc(mo, "ls3", 29);
+  SWFDisplayItem_addAction(it3,
+    compileSWFActionCode("_root.test5 += '+ls3'; "),
+    SWFACTION_KEYDOWN);
+  SWFMovie_nextFrame(mo);  // _root frame19
+
+  add_actions(mo, 
+    "obj1=new Object();"
+    "obj1.onKeyDown = function () { _root.test5 += '+obj1'; _root.gotoAndPlay(_root._currentframe+1);}; "
+    "Key.addListener(obj1);"
+    "ls1.onKeyDown = function () {_root.test5 += '+ls1'; }; "
+    "Key.addListener(ls1);"
+    "obj2=new Object();"
+    "obj2.onKeyDown = function () {_root.test5 += '+obj2'; }; "
+    "Key.addListener(obj2);"
+    "ls2.onKeyDown = function () {_root.test5 += '+ls2'; }; "
+    "Key.addListener(ls2);"
+    "obj3=new Object();"
+    "obj3.onKeyDown = function () {_root.test5 += '+obj3'; }; "
+    "Key.addListener(obj3);"
+    "ls3.onKeyDown = function () {_root.test5 += '+ls3'; }; "
+    "stop(); "
+    "_root.note('press a single key to continue the test');"
+  );
+  SWFMovie_nextFrame(mo);  // _root frame20
+
+  SWFMovie_nextFrame(mo);  // _root frame21
+  
+  add_actions(mo,
+    "stop(); "
+    "_root.note('press a single key to continue the test');"
+  );
+  SWFDisplayItem_remove(it1);
+  SWFDisplayItem_remove(it2);
+  SWFDisplayItem_remove(it3);
+  SWFMovie_nextFrame(mo);  // _root frame22
+ 
+  xcheck_equals(mo, "test5", "'0+ls3+ls2+ls1+obj1+ls1+obj2+ls2+obj3+obj1+obj2+obj3'");
+  add_actions(mo, "totals(); stop();");
+  SWFMovie_nextFrame(mo);  // _root frame23
   //Output movie
   puts("Saving " OUTPUT_FILENAME );
   SWFMovie_save(mo, OUTPUT_FILENAME);

@@ -156,8 +156,31 @@ main(int /*argc*/, char** /*argv*/)
   tester.pressKey(key::I);
   tester.releaseKey(key::I);
   
-  tester.advance();
-  tester.advance();
-  // check we are stopped at frame16, finish testing
+  // check we have jumped to frame16
   check_equals(root->get_current_frame(), 15);
+  
+  for(int i=0; i<10; i++)
+  {
+ 	 tester.advance();
+  }
+  // check we are stopped at frame20
+  check_equals(root->get_current_frame(), 19);
+  
+  // provide a key press to continue the test
+  tester.pressKey(key::J);
+  tester.releaseKey(key::J);
+  // check have jumped to frame21
+  check_equals(root->get_current_frame(), 20);
+  
+  tester.advance();
+  tester.advance();
+  // check we are stopped at frame22
+  check_equals(root->get_current_frame(), 21);
+  
+  // provide a key press to continue the test
+  tester.pressKey(key::K);
+  tester.releaseKey(key::K);
+  tester.advance();
+  // reached frame23, test finished
+  check_equals(root->get_current_frame(), 22);
 }
