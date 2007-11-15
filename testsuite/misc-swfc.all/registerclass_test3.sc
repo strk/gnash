@@ -51,6 +51,7 @@
   .end
   
   .action:  
+    note("root DoAction of frame1");
     check_equals(typeof(player.movie), 'movieclip');
     check_equals(player.movie.__proto__, logic_Movie.prototype);
     player.movie.setMovie();
@@ -60,6 +61,12 @@
   .sprite id141
     // Place a child sprite name it as 'movie'
     .put movie=fullDisplay
+  .end
+
+  .initaction id141:
+    note("root first InitAction of frame1 (where we check if object placed after is visible)");
+    xcheck_equals(typeof(player.movie), 'movieclip');
+    xcheck_equals(player.movie.__proto__, MovieClip.prototype);
   .end
   
   // Place sprite id141 and name it as 'player'
@@ -71,6 +78,9 @@
   
   // Define class logic_Movie
   .initaction _Packages.logic.Movie:
+    note("root second InitAction of frame1 (where the class is defined)");
+    check_equals(typeof(player.movie), 'movieclip');
+    check_equals(player.movie.__proto__, MovieClip.prototype);
     logic_Movie = function() {};
     logic_Movie.prototype = new MovieClip();
     logic_Movie.prototype.setMovie = function () { _root.testvar = 100; };
@@ -78,6 +88,7 @@
   
   // register sprite player.movie to class logic_Movie
   .initaction fullDisplay:
+    note("root third InitAction of frame1 (where registerClass is invoked)");
     Object.registerClass("fullDisplay", logic_Movie);
   .end
 
@@ -147,7 +158,7 @@
    
 .frame 5
   .action:
-    totals(15);
+    totals(19);
     stop();
   .end
 
