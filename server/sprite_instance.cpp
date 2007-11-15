@@ -2149,7 +2149,8 @@ sprite_instance::on_event(const event_id& id)
 		return false;
 	}
 
-	if ( id.m_id == event_id::INITIALIZE )
+	//if ( id.m_id == event_id::INITIALIZE )
+	if ( id.m_id == event_id::CONSTRUCT )
 	{
 		// Construct as ActionScript object.
 		// TODO: it could be we need to do this on-demand instead
@@ -2443,7 +2444,7 @@ sprite_instance::execute_init_action_buffer(const action_buffer& a)
 		//       Undefining the YOUTUBE_TAKES_PRECEDENCE you'll get many XPASS
 		//       in our testsuite, and no failures, but youtube would break.
 		//
-#define YOUTUBE_TAKES_PRECEDENCE 1
+//#define YOUTUBE_TAKES_PRECEDENCE 1
 #ifdef YOUTUBE_TAKES_PRECEDENCE
 		code->execute();
 #else

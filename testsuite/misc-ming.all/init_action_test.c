@@ -153,7 +153,7 @@ main(int argc, char** argv)
    * to "after" init actions are executed, which would require
    * some book keeping in sprite_instance class
    */
-  xcheck_equals(mo, "_root.x", "'0+1+2+3+4+5+6+7+8+9+10+11+'");
+  check_equals(mo, "_root.x", "'0+1+2+3+4+5+6+7+8+9+10+11+'");
 
   check_equals(mo, "_root.y", "'var_of_root'");
   add_actions(mo, " _root.totals(); stop(); ");

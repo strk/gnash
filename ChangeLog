@@ -1,5 +1,17 @@
 2007-11-15 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp: construct instance on CONSTRUCT
+	  event (not INITIALIZE). YouTube works, and we push all init
+	  actions now.
+	* testsuite/misc-ming.all/init_action_test.c,
+	  testsuite/misc-swfc.all/action_execution_order_test10.sc,
+	  testsuite/misc-swfc.all/movieclip_destruction_test1.sc,
+	  testsuite/misc-swfc.all/registerclass_test3.sc,
+	  testsuite/swfdec/PASSING: Successes due to pushing init
+	  actions on queue.
+
+2007-11-15 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/: movie_definition.h, movie_def_impl.{cpp,h},
 	  sprite_definition.h: drop the obsoleted get_init_actions interface.
 

@@ -229,7 +229,7 @@
 .frame 9
   .action:
     check_equals(mc4_onConstruct_executed, true);
-    xcheck_equals(mc5_onConstruct_executed, true);
+    check_equals(mc5_onConstruct_executed, true);
   .end
 
 .frame 15

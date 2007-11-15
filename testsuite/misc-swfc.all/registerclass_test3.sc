@@ -65,8 +65,8 @@
 
   .initaction id141:
     note("root first InitAction of frame1 (where we check if object placed after is visible)");
-    xcheck_equals(typeof(player.movie), 'movieclip');
-    xcheck_equals(player.movie.__proto__, MovieClip.prototype);
+    check_equals(typeof(player.movie), 'movieclip');
+    check_equals(player.movie.__proto__, MovieClip.prototype);
   .end
   
   // Place sprite id141 and name it as 'player'
@@ -140,13 +140,13 @@
      Object.registerClass('libItem2', theClass2);
      
      // Gnash failed by executing init actions before DLIST tags.
-     xcheck_equals(typeof(libItem2), 'movieclip');
-     xcheck_equals(libItem2.__proto__, MovieClip.prototype);
-     xcheck_equals(libItem2.__proto__, MovieClip.prototype);
+     check_equals(typeof(libItem2), 'movieclip');
+     check_equals(libItem2.__proto__, MovieClip.prototype);
+     check_equals(libItem2.__proto__, MovieClip.prototype);
 
      // Childs of libItem2 have also been placed already
      // Gnash fails by executing init actions before frame0 tags
-     xcheck_equals(typeof(libItem2.child2), 'movieclip');
+     check_equals(typeof(libItem2.child2), 'movieclip');
   .end
   
   .put libItem2
