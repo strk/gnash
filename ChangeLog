@@ -1,3 +1,8 @@
+2007-11-15 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-swfc.all/registerclass_test3.sc: add tests to for youtube
+	  player2 and caught the bug.
+	  
 2007-11-14 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/swfdec/PASSING: sync'd with results from current swfdec

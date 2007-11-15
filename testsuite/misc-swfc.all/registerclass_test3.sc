@@ -22,22 +22,64 @@
  * Test registerClass
  *
  * Description:
+ *   frame1: tests simulate the layout of youtube player2.swf
  *   frame2: export libItem1, export libItem2
  *   frame3: DoInitAction(libItem1), DoInitAction(libItem2), PlaceObject(libItem2)
+ *           "Object.registerClass('libItem1', theClass1)" is called in DoInitAction(libItem1)
+ *           "Object.registerClass('libItem2', theClass2)" is called in DoInitAction(libItem2)
  * Observed:
  *   the effect of "Object.registerClass('libItem2', theClass2)" is not visible
- *   in DoInitAction(libItem2), but in next frame. Note: there's no attachMovie for libItem2.
+ *   in DoInitAction(libItem2). Note: there's no attachMovie for libItem2 in DoInitAction(libItem2)
  */
 
 // use swf6 for case sensitiviness
 .flash  bbox=800x600 filename="registerclass_test3.sc" background=white version=6 fps=12
 
 .frame 1
-  .action:
-   #include "Dejagnu.sc"
+  .box b1 fill=green width=100 height=100
+  
+  .sprite xxx
   .end
   
-  .box b1 fill=green width=100 height=100
+  .initaction xxx:
+    // make sure Dejagnu is available in the first frame
+    #include "Dejagnu.sc"
+  .end
+  
+  // Define fullDisplay and export it
+  .sprite fullDisplay
+  .end
+  
+  .action:  
+    check_equals(typeof(player.movie), 'movieclip');
+    check_equals(player.movie.__proto__, logic_Movie.prototype);
+    player.movie.setMovie();
+    check_equals(_root.testvar, 100);
+  .end
+  
+  .sprite id141
+    // Place a child sprite name it as 'movie'
+    .put movie=fullDisplay
+  .end
+  
+  // Place sprite id141 and name it as 'player'
+  .put player=id141
+  
+  // Define _Packages.logic.Movie and export it
+  .sprite _Packages.logic.Movie
+  .end
+  
+  // Define class logic_Movie
+  .initaction _Packages.logic.Movie:
+    logic_Movie = function() {};
+    logic_Movie.prototype = new MovieClip();
+    logic_Movie.prototype.setMovie = function () { _root.testvar = 100; };
+  .end
+  
+  // register sprite player.movie to class logic_Movie
+  .initaction fullDisplay:
+    Object.registerClass("fullDisplay", logic_Movie);
+  .end
 
 
 .frame 2
@@ -105,7 +147,7 @@
    
 .frame 5
   .action:
-    totals(12);
+    totals(15);
     stop();
   .end
 
