@@ -48,7 +48,7 @@
 #include "StreamProvider.h"
 #include "URLAccessManager.h" // for loadVariables
 #include "LoadVariablesThread.h" 
-#include "ExecutableCode.h"
+#include "ExecutableCode.h" // for inheritance of ConstructEvent
 #include "gnash.h" // for point class !
 #include "Timeline.h" // for restoreDisplayList
 #include "Object.h" // for getObjectInterface
@@ -86,6 +86,56 @@ namespace gnash {
 static as_object* getMovieClipInterface();
 static void attachMovieClipInterface(as_object& o);
 static void attachMovieClipProperties(as_object& o);
+
+/// Anonymous namespace for module-private definitions
+namespace
+{
+
+	/// ConstructEvent, used for queuing construction
+	//
+	/// It's execution will call constructAsScriptObject() 
+	/// on the target sprite
+	///
+	class ConstructEvent: public ExecutableCode {
+
+	public:
+
+		ConstructEvent(sprite_instance* nTarget)
+			:
+			_target(nTarget)
+		{}
+
+
+		ExecutableCode* clone() const
+		{
+			return new ConstructEvent(*this);
+		}
+
+		virtual void execute()
+		{
+			_target->constructAsScriptObject();
+		}
+
+	#ifdef GNASH_USE_GC
+		/// Mark reachable resources (for the GC)
+		//
+		/// Reachable resources are:
+		///	 - the action target (_target)
+		///
+		virtual void markReachableResources() const
+		{
+			_target->setReachable();
+		}
+	#endif // GNASH_USE_GC
+
+	private:
+
+		sprite_instance* _target;
+
+	};
+
+} // anonymous namespace
+
 
 //------------------------------------------------
 // Utility funx
@@ -1789,8 +1839,6 @@ character* sprite_instance::get_character_at_depth(int depth)
 bool sprite_instance::get_member(string_table::key name_key, as_value* val,
 	string_table::key nsname)
 {
-	//constructAsScriptObject();
-
 	const std::string& name = VM::get().getStringTable().value(name_key);
 
 	// FIXME: use addProperty interface for these !!
@@ -2147,15 +2195,6 @@ sprite_instance::on_event(const event_id& id)
 		log_debug("Sprite %s ignored ENTER_FRAME event (is unloaded)", getTarget().c_str());
 #endif
 		return false;
-	}
-
-	//if ( id.m_id == event_id::INITIALIZE )
-	if ( id.m_id == event_id::CONSTRUCT )
-	{
-		// Construct as ActionScript object.
-		// TODO: it could be we need to do this on-demand instead
-		// (on __proto__ query)
-		constructAsScriptObject();
 	}
 
 	if ( id.is_button_event() && ! isEnabled() )
@@ -3398,7 +3437,7 @@ sprite_instance::stagePlacementCallback()
 		log_debug("Sprite %s is dynamic, sending INITIALIZE and CONSTRUCT events immediately", getTarget().c_str());
 #endif
 		on_event(event_id::INITIALIZE);
-		on_event(event_id::CONSTRUCT);
+		constructAsScriptObject(); 
 	}
 	else
 	{
@@ -3410,7 +3449,8 @@ sprite_instance::stagePlacementCallback()
 #ifdef GNASH_DEBUG
 		log_debug("Queuing CONSTRUCT event for sprite %s", getTarget().c_str());
 #endif
-		queueEvent(event_id::CONSTRUCT, movie_root::apCONSTRUCT);
+		std::auto_ptr<ExecutableCode> code ( new ConstructEvent(this) );
+		_vm.getRoot().pushAction(code, movie_root::apCONSTRUCT);
 	}
 
 	// Now execute frame tags and take care of queuing the LOAD event.
@@ -3458,6 +3498,9 @@ sprite_instance::constructAsScriptObject()
 #ifdef GNASH_DEBUG
 	log_debug("constructAsScriptObject called for sprite %s", getTarget().c_str());
 #endif
+
+	bool eventHandlersInvoked = false;
+
 	do {
 		if ( _name.empty() )
 		{
@@ -3472,10 +3515,7 @@ sprite_instance::constructAsScriptObject()
 		sprite_definition* def = dynamic_cast<sprite_definition*>(m_def.get());
 
 		// We won't "construct" top-level movies
-		if ( ! def )
-		{
-			break;
-		}
+		if ( ! def ) break;
 
 		as_function* ctor = def->getRegisteredClass();
 #ifdef GNASH_DEBUG
@@ -3490,21 +3530,29 @@ sprite_instance::constructAsScriptObject()
 			boost::intrusive_ptr<as_object> proto = ctor->getPrototype();
 			set_prototype(proto);
 
-			//log_msg(_("Calling the user-defined constructor against this sprite_instance"));
-			fn_call call(this, &(get_environment()), 0, 0);
-
-			// we don't use the constructor return (should we?)
-			(*ctor)(call);
+			// Call event handlers *after* setting up the __proto__
+			// but *before* calling the registered class constructor
+			on_event(event_id::CONSTRUCT);
+			eventHandlersInvoked = true;
 
 			int swfversion = _vm.getSWFVersion();
 
-			// Set the '__constructor__' and 'constructor' members
+			// Set the '__constructor__' and 'constructor' members, as well as call
+			// the actual constructor.
+			//
 			// TODO: this would be best done by an as_function::constructInstance()
 			//       method. We have one but it returns a new object rather then
 			//       initializing a given object, we just need to add another one...
 			//
 			if ( swfversion > 5 )
 			{
+				//log_debug(_("Calling the user-defined constructor against this sprite_instance"));
+				fn_call call(this, &(get_environment()), 0, 0);
+
+				// we don't use the constructor return (should we?)
+				(*ctor)(call);
+
+
 				set_member(NSV::PROP_uuCONSTRUCTORuu, ctor);
 				if ( swfversion == 6 )
 				{
@@ -3512,8 +3560,14 @@ sprite_instance::constructAsScriptObject()
 				}
 			}
 		}
+
 	} while (0);
 
+	/// Invoke event handlers if not done yet
+	if ( ! eventHandlersInvoked )
+	{
+		on_event(event_id::CONSTRUCT);
+	}
 }
 
 bool

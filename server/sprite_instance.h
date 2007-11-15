@@ -815,8 +815,6 @@ public:
         ///
         void queueAction(const action_buffer& buf);
 
-private:
-
 	/// Construct this instance as an ActionScript object
 	//
 	/// This method invokes the constructor associated with our
@@ -825,6 +823,8 @@ private:
 	/// It will also invoke the onClipConstruct and onConstruct handlers.
 	///
 	void constructAsScriptObject();
+
+private:
 
 	/// Register this sprite as a listener of core broadcasters
 	//
