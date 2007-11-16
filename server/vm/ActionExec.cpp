@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.57 2007/10/09 08:12:26 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.58 2007/11/16 13:24:30 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -495,6 +495,9 @@ ActionExec::cleanupAfterRun(bool expectInconsistencies)
 		}
 	env.drop(env.stack_size()-_initial_stack_size);
     }
+
+    // Have movie_root flush any newly pushed actions in higher priority queues
+    VM::get().getRoot().flushHigherPriorityActionQueues();
 
     //log_debug("After cleanup of ActionExec %p, env %p has stack size of %d and callStackDepth of %d", (void*)this, (void*)&env, env.stack_size(), env.callStackDepth());
 }

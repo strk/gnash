@@ -1,3 +1,14 @@
+2007-11-16 Sandro Santilli <strk@keybit.net>
+
+	* server/movie_root.{cpp,h}: Add a flushHigherPriorityActionQueue
+	  method to be called at the end of every action block execution
+	  (including end of function calls).
+	* server/vm/ActionExec.cpp: flush higher priority actions at end
+	  of execution.
+	* testsuite/misc-swfc.all/: action_execution_order_test12.sc,
+	  movieclip_destruction_test1.sc: fixed two cases.
+
+
 2007-11-16 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-swfc.all/action_execution_order_test12.sc: add tests 

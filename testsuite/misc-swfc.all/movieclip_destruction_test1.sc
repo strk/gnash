@@ -126,8 +126,9 @@
     .end
   
   .initaction mc3: // Add initactions for mc3(mc3 is not placed)
+     note("initaction mc3 in root frame4");
     _root.initActionExecuted += ", mc3";
-    _root.xcheck_equals(typeof(mc1), 'undefined'); // Gnash fails as it execute these immediately , so before mc1 is removed below
+    _root.check_equals(typeof(mc1), 'undefined'); 
     _root.check_equals(typeof(_root.getInstanceAtDepth(-16386)), 'undefined');
   .end
 
@@ -237,8 +238,8 @@
 
     // Due to a bug in the proprietary player, we need to trace(__proto__) to
     // force proper construction of the sprites.
-    _root.xcheck_equals(mc6.__proto__, Object.prototype); 
-    _root.xcheck_equals(mc7.__proto__, Object.prototype); 
+    _root.xcheck_equals(mc6.__proto__, Object.prototype); // returns wrong answer at first, gnash does the right thing here
+    _root.xcheck_equals(mc7.__proto__, Object.prototype); // returns wrong answer at first, gnash does the right thing here
     trace(mc6.__proto__); trace(mc7.__proto__);
     _root.check_equals(mc6.__proto__, MovieClip.prototype); 
     _root.check_equals(mc7.__proto__, MovieClip.prototype); 

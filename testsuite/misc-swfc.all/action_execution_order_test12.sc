@@ -199,7 +199,7 @@
     
 .frame 11
     .action:
-        xcheck_equals(asOrder, '0+1+2+3+4+');
+        check_equals(asOrder, '0+1+2+3+4+');
     .end
 
 .frame 15

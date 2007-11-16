@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.88 2007/11/16 07:43:53 zoulunkai Exp $ */
+/* $Id: movie_root.h,v 1.89 2007/11/16 13:24:30 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -547,10 +547,15 @@ public:
     /// Return true if scripts execution is disabled
     bool scriptsDisabled() const { return _disableScripts; };
 
-    bool processingActions() const
-    {
-        return (_processingActionLevel < apSIZE);
-    }
+    /// Process action queues with higher priority then the priority
+    /// of the action queue currently being processed.
+    //
+    /// This is intended to be called at the end of any function call
+    /// and at the end of an action block.
+    ///
+    /// TODO: be aware of infinite loops !
+    ///
+    void flushHigherPriorityActionQueues();
 
 private:
 
@@ -769,6 +774,12 @@ private:
     int processActionQueue(int lvl);
 
     int _processingActionLevel;
+
+    bool processingActions() const
+    {
+        return (_processingActionLevel < apSIZE);
+    }
+
 };
 
 

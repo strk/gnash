@@ -1073,8 +1073,8 @@ movie_root::processActionQueue(int lvl)
 	while ( ! q.empty() )
 	{
 		ExecutableCode* code = q.front();
-		code->execute();
 		q.pop_front(); 
+		code->execute();
 		delete code;
 
 		int minLevel = minPopulatedPriorityQueue();
@@ -1097,6 +1097,25 @@ movie_root::processActionQueue(int lvl)
 #endif
 
 	return minPopulatedPriorityQueue();
+
+}
+
+void
+movie_root::flushHigherPriorityActionQueues()
+{
+	if ( _disableScripts )
+	{
+		//log_debug(_("Scripts are disabled, global instance list has %d elements"), _liveChars.size());
+		/// cleanup anything pushed later..
+		clearActionQueue();
+		return;
+	}
+
+	int lvl=minPopulatedPriorityQueue();
+	while ( lvl<_processingActionLevel )
+	{
+		lvl = processActionQueue(lvl);
+	}
 
 }
 
@@ -1124,6 +1143,7 @@ movie_root::pushAction(std::auto_ptr<ExecutableCode> code, int lvl)
 {
 	assert(lvl >= 0 && lvl < apSIZE);
 
+#if 0
 	// Immediately execute code targetted at a lower level while processing
 	// an higher level.
 	if ( processingActions() && lvl < _processingActionLevel )
@@ -1132,6 +1152,7 @@ movie_root::pushAction(std::auto_ptr<ExecutableCode> code, int lvl)
 		code->execute();
 		return;
 	}
+#endif
 
 	_actionQueue[lvl].push_back(code.release());
 }
@@ -1146,6 +1167,7 @@ movie_root::pushAction(const action_buffer& buf, boost::intrusive_ptr<character>
 
 	std::auto_ptr<ExecutableCode> code ( new GlobalCode(buf, target) );
 
+#if 0
 	// Immediately execute code targetted at a lower level while processing
 	// an higher level.
 	if ( processingActions() && lvl < _processingActionLevel )
@@ -1154,6 +1176,7 @@ movie_root::pushAction(const action_buffer& buf, boost::intrusive_ptr<character>
 		code->execute();
 		return;
 	}
+#endif
 
 	_actionQueue[lvl].push_back(code.release());
 }
@@ -1168,6 +1191,7 @@ movie_root::pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_
 
 	std::auto_ptr<ExecutableCode> code ( new FunctionCode(func, target) );
 
+#if 0
 	// Immediately execute code targetted at a lower level while processing
 	// an higher level.
 	if ( processingActions() && lvl < _processingActionLevel )
@@ -1176,6 +1200,8 @@ movie_root::pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_
 		code->execute();
 		return;
 	}
+#endif
+
 	_actionQueue[lvl].push_back(code.release());
 }
 
