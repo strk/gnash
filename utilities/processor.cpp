@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: processor.cpp,v 1.67 2007/11/08 18:11:19 nihilus Exp $ */
+/* $Id: processor.cpp,v 1.68 2007/11/16 07:50:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -71,22 +71,9 @@ static const size_t allowloopbacks = 10;
 // TODO: add a command-line switch to control this
 static size_t limit_advances = 0;
 
-bool gofast = false;		// FIXME: this flag gets set based on
-				// an XML message written using
-				// SendCommand(""). This way a movie
-				// can optimize it's own performance
-				// when needed,
-bool nodelay = false;           // FIXME: this flag gets set based on
-				// an XML message written using
-				// SendCommand(""). This way a movie
-				// can optimize it's own performance
-				// when needed,
-
-extern int xml_fd;		// FIXME: this is the file descriptor
-				// from XMLSocket::connect(). This
-				// needs to be propogated up through
-				// the layers properly, but first I
-				// want to make sure it all works.
+// How much time to sleep between advances ?
+// If set to -1 it will be computed based on FPS.
+static long int delay = 0;
 
 const char *GPROC_VERSION = "1.0";
 
@@ -235,6 +222,9 @@ main(int argc, char *argv[])
 	  case 'r':
               allowed_end_hits = strtol(optarg, NULL, 0);
 	      break;
+	  case 'd':
+              delay = atoi(optarg)*1000; // delay is in microseconds
+	      break;
 	  case 'f':
               limit_advances = strtol(optarg, NULL, 0);
 	      break;
@@ -345,6 +335,8 @@ play_movie(const char* filename)
 	exit(1);
     }
 
+    long localDelay = delay == -1 ? long(1000000/md->get_frame_rate())+1 : delay; // microseconds
+
     gnash::movie_root& m = VM::init(*md).getRoot();
 
     md->completeLoad();
@@ -375,13 +367,13 @@ play_movie(const char* filename)
 	size_t	last_frame = m.get_current_frame();
 	m.advance(0.010f);
 
-    if ( quitrequested ) 
-    {
-        quitrequested = false;
-        return md;
-    }
+	if ( quitrequested ) 
+	{
+		quitrequested = false;
+		return md;
+	}
 
-	m.display();
+	m.display(); // FIXME: for which reason are we calling display here ??
 	++nadvances;
 	if ( limit_advances && nadvances >= limit_advances)
 	{
@@ -450,6 +442,8 @@ play_movie(const char* filename)
 	    stop_count = 0;
 	    resetLastAdvanceTimer();
 	}
+
+	usleep(localDelay);
     }
     
     return md;
@@ -518,6 +512,9 @@ usage (const char *name)
 	"",
 #endif
 	_(
+	"  -d [<ms>]\n"
+	"              Milliseconds delay between advances (0 by default).\n"
+	"              If '-1' the delay will be computed from the FPS.\n"
 	"  -r <times>  Allow the given number of complete runs.\n"
 	"              Keep looping undefinitely if set to 0.\n"
 	"              Default is 1 (end as soon as the last frame is reached).\n"

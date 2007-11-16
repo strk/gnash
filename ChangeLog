@@ -1,3 +1,7 @@
+2007-11-16 Sandro Santilli <strk@keybit.net>
+
+	* utilities/processor.cpp: add -d switch to force an advance delay.
+
 2007-11-16 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/as_object.{h,cpp}, server/asobj/Key.{h,cpp},
