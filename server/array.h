@@ -66,7 +66,10 @@ public:
 	///
 	template<class V> void visitAll(V& v)
 	{
-		for (iterator i=elements.begin(), ie=elements.end(); i!=ie; ++i)
+		// NOTE: we copy the elements as the visitor might call arbitrary code
+		//       possibly modifying the container itself.
+		container copy = elements;
+		for (iterator i=copy.begin(), ie=copy.end(); i!=ie; ++i)
 		{
 			v.visit(*i);
 		}

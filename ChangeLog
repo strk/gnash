@@ -1,5 +1,7 @@
 2007-11-16 Sandro Santilli <strk@keybit.net>
 
+	* server/array.h (visitAll): copy the container before executing
+	  arbitrary code while iterating over it. Fixes a memory corruption.
 	* server/asobj/Key.{cpp,h}: Initialize the Key object as an usual
 	  AsBroadcaster.
 	* server/movie_root.cpp: don't cleanup Key object listeners as they
