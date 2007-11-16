@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.109 2007/11/16 07:43:53 zoulunkai Exp $ */
+/* $Id: character.h,v 1.110 2007/11/16 21:28:54 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -546,6 +546,8 @@ public:
 	{
 		return (m_clip_depth==dynClipDepthValue);
 	}
+
+	character* to_character() { return this; }
 
 	/// Return the character masked by this instance (if any)
 	character* getMask() const

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.108 2007/11/14 22:16:05 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.109 2007/11/16 21:28:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -494,7 +494,7 @@ character*
 as_environment::find_target(const std::string& path_in) const
 {
 	as_object* o = find_object(path_in);
-	if ( o ) return o->to_movie(); // can be NULL (not a movie)...
+	if ( o ) return o->to_character(); // can be NULL (not a character)...
 	else return NULL;
 }
 

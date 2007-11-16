@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.152 2007/11/15 20:46:40 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.153 2007/11/16 21:28:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1253,7 +1253,7 @@ void
 SWFHandlers::ActionStartDragMovie(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
+	as_environment& env = thread.env;
 
     	assert(thread.code[thread.pc] == SWF::ACTION_STARTDRAGMOVIE);
 
@@ -1262,11 +1262,16 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
 	drag_state st;
 
 	character* tgt = env.find_target(env.top(0).to_string(&env));
-	if ( tgt ) {
+	if ( tgt )
+	{
 		st.setCharacter( tgt );
-	} else {
-		log_error(_("start_drag of invalid target '%s'"),
+	}
+	else
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("startDrag: unknown target '%s'"),
 			env.top(0).to_debug_string().c_str());
+		);
 	}
 
 	st.setLockCentered( env.top(1).to_bool() );

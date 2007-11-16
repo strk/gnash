@@ -48,6 +48,7 @@
 namespace gnash {
 	class as_function;
 	class sprite_instance;
+	class character;
 	class as_environment;
 	class VM;
 	class Machine;
@@ -623,6 +624,9 @@ public:
 
 	/// Cast to a as_function, or return NULL
 	virtual as_function* to_function() { return NULL; }
+
+	/// Cast to a character, or return NULL
+	virtual character* to_character() { return NULL; }
 
 	/// Return true if this is a Date object.
 	//

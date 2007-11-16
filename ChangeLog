@@ -1,5 +1,14 @@
 2007-11-16 Sandro Santilli <strk@keybit.net>
 
+	* server/: as_object.h, character.h: add virtual to_character()
+	  casting method.
+	* server/as_environment.cpp (find_target): allow characters targets.
+	  Fixes snowman.swf (http://bugs.libming.org/show_bug.cgi?id=41)
+	* server/vm/ASHandlers.cpp (ActionStartDragMovie): unknown target
+	  would be an ASerror, not a generic one.
+
+2007-11-16 Sandro Santilli <strk@keybit.net>
+
 	* server/array.h (visitAll): copy the container before executing
 	  arbitrary code while iterating over it. Fixes a memory corruption.
 	* server/asobj/Key.{cpp,h}: Initialize the Key object as an usual
