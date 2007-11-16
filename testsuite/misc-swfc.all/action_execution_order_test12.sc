@@ -43,7 +43,6 @@
    _root.loadOrder = '0+';
    _root.enterFrameOrder = '0+';
    _root.unloadOrder = '0+';
-   _root.asOder = '0+';
   .end
   
   // Define 3 shapes(b1, b2, b3)
@@ -158,7 +157,7 @@
       _root.enterFrameOrder += '5+';
     };
     mc1.mc12.onUnload = function () {
-    	_root.note('mc1.mc12 unloaded');
+        _root.note('mc1.mc12 unloaded');
       _root.unloadOrder += '3+';
     };
     
@@ -175,9 +174,38 @@
       // mc2.mc21, mc1.mc11 and mc1.mc12 were unloaded when loop back.
       // mc1 and mc2 were unloaded by RemoveObject2 tags.
       check_equals(_root.unloadOrder, '0+1+2+3+4+5+');
-    totals(13);
-    stop();
   .end
 
-  
+
+//
+// test2:
+//   test that a single action block can be interrupted by passing-by init actions 
+.frame 9
+    .action:
+        _root.asOrder = '0+';
+        gotoAndPlay(11);
+        _root.asOrder += '1+';
+        func = function () { _root.asOrder += '2+'; };
+        func();
+        _root.asOrder += '4+';
+    .end
+
+.frame 10
+    .sprite mc3
+    .end
+    .initaction mc3:
+        _root.asOrder += '3+';
+    .end
+    
+.frame 11
+    .action:
+        xcheck_equals(asOrder, '0+1+2+3+4+');
+    .end
+
+.frame 15
+    .action:
+        totals(); stop();
+    .end
+    
+      
 .end // end of the file
