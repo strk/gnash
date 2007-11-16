@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.437 2007/11/10 12:00:21 strk Exp $
+dnl $Id: configure.ac,v 1.438 2007/11/16 15:36:56 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -562,7 +562,7 @@ AC_ARG_WITH(extensions,
          ;;
       esac]
     withval=`echo ${withval} | cut -d ' ' -f 2-6`
-    if test x$val = x$withval; then
+    if test "x$val" = "x$withval"; then
       break;
     fi
   done
