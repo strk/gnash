@@ -1,5 +1,10 @@
 2007-11-16 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/MovieClipLoader.cpp (dispatchEvent): don't lookup
+	  broadcastMessage, as it's a named string.
+
+2007-11-16 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.{cpp,h}: Add a flushHigherPriorityActionQueue
 	  method to be called at the end of every action block execution
 	  (including end of function calls).

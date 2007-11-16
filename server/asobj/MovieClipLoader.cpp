@@ -37,6 +37,7 @@
 #include "builtin_function.h"
 #include "Object.h" // for getObjectInterface
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
+#include "namedStrings.h"
 
 #include <typeinfo> 
 #include <string>
@@ -258,12 +259,10 @@ MovieClipLoader::unloadClip(void *)
 void
 MovieClipLoader::dispatchEvent(const std::string& event, as_environment& env, const as_value& arg)
 {
-	string_table& st = _vm.getStringTable();
-
 	as_value ev(event);
 
 	log_debug("dispatchEvent calling broadcastMessage with args %s and %s", ev.to_debug_string().c_str(), arg.to_debug_string().c_str());
-	callMethod(st.find("broadcastMessage"), env, ev, arg);
+	callMethod(NSV::PROP_BROADCAST_MESSAGE, env, ev, arg);
 }
 
 static as_value
