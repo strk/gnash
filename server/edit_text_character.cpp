@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.130 2007/11/10 11:51:42 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.131 2007/11/16 07:43:53 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2089,11 +2089,9 @@ edit_text_character::setFocus()
 
 	m_has_focus = true;
 
-#ifdef NEW_KEY_LISTENER_LIST_DESIGN
-	_vm.getRoot().add_key_listener(KeyListener(this, KeyListener::ON_CLIP_DEF));
-#else
+	// why should we add to the key listener list every time
+	// we call setFocus()???
 	_vm.getRoot().add_key_listener(this);
-#endif
 
 	m_cursor = _text.size();
 	format_text();

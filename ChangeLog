@@ -1,3 +1,14 @@
+2007-11-16 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/as_object.{h,cpp}, server/asobj/Key.{h,cpp},
+	  server/character.h,
+	  server/button_character_instance.cpp,
+	  server/edit_text_character.cpp,
+	  server/movie_root.{h,cpp},
+	  server/sprite_instance.cpp: drop new key listeners design and fix the
+	  old design with caring about listeners invoking order.
+	* testsuite/key_event_test.c, key_event_testrunner.cpp: xcheck->check.
+	  
 2007-11-15 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/ops.as: a couple of tests more.

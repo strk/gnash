@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: Key.h,v 1.29 2007/10/10 14:07:58 bwy Exp $ */
+/* $Id: Key.h,v 1.30 2007/11/16 07:43:53 zoulunkai Exp $ */
 
 #ifndef __KEY_H__
 #define __KEY_H__
@@ -32,16 +32,12 @@
 #include "gnash.h" // for gnash::key namespace
 
 #ifdef WIN32
-#	undef _CONTROL
-#	undef _SPACE
-#	undef _UP
+#   undef _CONTROL
+#   undef _SPACE
+#   undef _UP
 #endif
 
 namespace gnash {
-
-#ifdef NEW_KEY_LISTENER_LIST_DESIGN
-class KeyListener; //forward declaration
-#endif
 
 /************************************************************************
  *
@@ -54,62 +50,50 @@ class DSOEXPORT key_as_object : public as_object
 {
 
 private:
-	/// bit-array for recording the unreleased keys
-	uint8_t	m_unreleased_keys[key::KEYCOUNT / 8 + 1];	
+    /// bit-array for recording the unreleased keys
+    uint8_t m_unreleased_keys[key::KEYCOUNT / 8 + 1];   
 
-#ifndef NEW_KEY_LISTENER_LIST_DESIGN
-	typedef std::vector<boost::intrusive_ptr<as_object> > Listeners;
-	Listeners m_listeners;
-#endif
+    typedef std::list<boost::intrusive_ptr<as_object> > Listeners;
+    Listeners m_listeners;
 
-	int	m_last_key_event;
+    int m_last_key_event;
 
 protected:
 
 #ifdef GNASH_USE_GC
-#ifndef NEW_KEY_LISTENER_LIST_DESIGN
-	// Mark all key listeners as reachable
-	// (this class has no direct pointer to listeners when
-	//  NEW_KEY_LISTENER_LIST_DESIGN is defined)
-	void markReachableResources() const;
-#endif // ndef NEW_KEY_LISTENER_LIST_DESIGN
+    // Mark all key listeners as reachable
+    void markReachableResources() const;
 #endif // def GNASH_USE_GC
 
 public:
 
-	key_as_object();
+    key_as_object();
 
-	// Pass SWF keycode, returns true if currently pressed.
-	bool is_key_down(int keycode);
+    // Pass SWF keycode, returns true if currently pressed.
+    bool is_key_down(int keycode);
 
-	// Pass gnash::key::code. Changes m_last_key_event
-	// and adds appropriate SWF keycode to bit array of keys
-	// pressed (m_unreleased_keys)
-	void set_key_down(int code);
+    // Pass gnash::key::code. Changes m_last_key_event
+    // and adds appropriate SWF keycode to bit array of keys
+    // pressed (m_unreleased_keys)
+    void set_key_down(int code);
 
-	// Pass gnash::key::code. Changes m_last_key_event
-	// and removes appropriate SWF keycode from bit array of keys
-	// pressed (m_unreleased_keys)
-	void set_key_up(int code);
-	
-#ifndef NEW_KEY_LISTENER_LIST_DESIGN
-	/// responsible for user defined key events handlers only;
-	/// take over both characters and non-characters object.
-	void notify_listeners(const event_id key_event_type);
-#endif // ndef NEW_KEY_LISTENER_LIST_DESIGN
+    // Pass gnash::key::code. Changes m_last_key_event
+    // and removes appropriate SWF keycode from bit array of keys
+    // pressed (m_unreleased_keys)
+    void set_key_up(int code);
+    
+    int get_last_key() const;
 
-#ifdef NEW_KEY_LISTENER_LIST_DESIGN
-	void add_listener(const KeyListener& listener);
+    /// Responsible for user defined key events handlers only;
+    /// take over both characters and non-characters object.
+    void notify_listeners(const event_id key_event_type);
 
-	void remove_listener(boost::intrusive_ptr<as_object> listener);
-#else  
-	void add_listener(boost::intrusive_ptr<as_object> listener);
+    /// Remove unloaded character listeners from the list.
+    void cleanup_unloaded_listeners();
 
-	void remove_listener(boost::intrusive_ptr<as_object> listener);
-#endif
+    void add_listener(boost::intrusive_ptr<as_object> listener);
 
-	int get_last_key() const;
-
+    void remove_listener(boost::intrusive_ptr<as_object> listener);
 };
 
 void key_class_init(as_object& global);

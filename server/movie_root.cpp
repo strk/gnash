@@ -34,9 +34,6 @@
 #include "URL.h"
 #include "namedStrings.h"
 #include "GnashException.h"
-#ifdef NEW_KEY_LISTENER_LIST_DESIGN
-  #include "action.h"
-#endif
 
 #include <iostream>
 #include <string>
@@ -371,19 +368,16 @@ movie_root::notify_global_key(key::code k, bool down)
 bool
 movie_root::notify_key_event(key::code k, bool down)
 {
-//GNASH_REPORT_FUNCTION;
-
 	//
 	// First of all, notify the _global.Key object about key event
 	//
 	key_as_object * global_key = notify_global_key(k, down);
 
-	// Notify character key listeners.
+	// Notify character key listeners for clip key events
 	notify_key_listeners(k, down);
-#ifndef NEW_KEY_LISTENER_LIST_DESIGN
+
 	// Notify both character and non-character Key listeners
 	//	for user defined handerlers.
-	// FIXME: this may violates the event order
 	if(global_key)
 	{
 		if(down)
@@ -394,7 +388,7 @@ movie_root::notify_key_event(key::code k, bool down)
 		else
 			global_key->notify_listeners(event_id::KEY_UP);
 	}
-#endif	
+
 	processActionQueue();
 
 	return false; // should return true if needs update ...
@@ -779,12 +773,6 @@ movie_root::advance(float delta_time)
 	// NOTE: can throw ActionLimitException
 	executeTimers();
 
-#ifndef NEW_KEY_LISTENER_LIST_DESIGN
-	// Cleanup key listeners (remove unloaded characters)
-	// FIXME: not all key listeners could be cleaned here!
-	// (eg. characters unloaded by loop-back won't be cleared until next advancement)
-	cleanup_key_listeners();
-#endif
 	// random should go continuously that:
 	// 1. after restart of the player the situation has not repeated
 	// 2. by different machines the random gave different numbers
@@ -795,9 +783,7 @@ movie_root::advance(float delta_time)
 	// NOTE: can throw ActionLimitException
 	advanceLiveChars(delta_time); 
 
-#ifdef NEW_KEY_LISTENER_LIST_DESIGN
 	cleanup_key_listeners();
-#endif
 
 	// Process queued actions
 	// NOTE: can throw ActionLimitException
@@ -892,212 +878,84 @@ char* movie_root::call_method_args(const char* method_name,
 	return getLevel(0)->call_method_args(method_name, method_arg_fmt, args);
 }
 
-#ifdef NEW_KEY_LISTENER_LIST_DESIGN
-
 void movie_root::cleanup_key_listeners()
 {
-#ifdef KEY_LISTENERS_DEBUG
-    size_t prevsize = _keyListeners.size();
-    log_msg("Cleaning up %u key listeners", _keyListeners.size());
-#endif
-
-    for (KeyListeners::iterator iter = _keyListeners.begin();
-        iter != _keyListeners.end(); )
+    // remove unloaded character listeners from movie_root
+    for (KeyListeners::iterator iter = m_key_listeners.begin(); iter != m_key_listeners.end(); )
     {
-        // The listener object has no registered key event handlers, remove it.
-        if( !iter->hasUserRegistered() && !iter->hasOnClipRegistered() )
+        character* ch = dynamic_cast<character*>(iter->get());
+        if ( ch && ch->isUnloaded() )
         {
-            _keyListeners.erase(iter++);
+            m_key_listeners.erase(iter++);
         }
-        else 
+        else
         {
-            boost::intrusive_ptr<as_object> obj = iter->get();
-			character* ch = dynamic_cast<character*>(obj.get());
-            // The listener object is unloaded, remove it.
-            // TODO: Don't do this again in the character destructors. should we?
-            if ( ch && ch->isUnloaded() ) 
-            {
-                _keyListeners.erase(iter++);
-            }
-            else
-                ++iter;
+            ++iter;
         }
     }
-
-#ifdef KEY_LISTENERS_DEBUG
-    size_t currsize = _keyListeners.size();
-    log_msg("Cleaned up %u listeners (from %u to %u)", prevsize-currsize, prevsize, currsize);
-#endif
+    
+    if( _keyobject )
+    {
+        // remove unloaded character listeners from global Key object
+        _keyobject->cleanup_unloaded_listeners();
+    }
 }
 
 void movie_root::notify_key_listeners(key::code k, bool down)
 {
-    //log_msg("Notifying " SIZET_FMT " keypress listeners", _keyListeners.size());
+    // log_msg("Notifying " SIZET_FMT " character listeners", 
+    //  m_key_listeners.size());
 
-    for (KeyListeners::iterator iter = _keyListeners.begin();
-        iter != _keyListeners.end(); ++iter)
+    for (KeyListeners::iterator iter = m_key_listeners.begin();
+             iter != m_key_listeners.end(); ++iter)
     {
-		boost::intrusive_ptr<as_object> obj = iter->get();
-        character* ch = dynamic_cast<character*>(obj.get());
-        // notify character listeners
-        if ( ch && ! ch->isUnloaded() ) 
+        // sprite, button & input_edit_text characters
+        character* ch = dynamic_cast<character*>(iter->get());
+        if ( ch && ! ch->isUnloaded() )
         {
             if(down)
             {
-                // invoke onClipKeyDown handler
-                ch->on_event(event_id(event_id::KEY_DOWN, key::INVALID));
-                
-                if(iter->hasUserRegistered())
-                // invoke onKeyDown handler
-                {
-			VM& vm = VM::get();
-			string_table& st =vm.getStringTable();
-			ch->callMethod(st.find(PROPNAME("onKeyDown")), ch->get_environment());
-                }
-                // invoke onClipKeyPress handler
+                // KEY_UP and KEY_DOWN events are unrelated to any key!
+                ch->on_event(event_id(event_id::KEY_DOWN, key::INVALID)); 
                 ch->on_event(event_id(event_id::KEY_PRESS, key::codeMap[k][0]));
             }
             else
-            {
-                //invoke onClipKeyUp handler
                 ch->on_event(event_id(event_id::KEY_UP, key::INVALID));   
-
-                if(iter->hasUserRegistered())
-                // invoke onKeyUp handler
-                {
-			VM& vm = VM::get();
-			string_table& st =vm.getStringTable();
-			ch->callMethod(st.find(PROPNAME("onKeyUp")), ch->get_environment());
-                }
-            }
-        }
-        // notify non-character listeners
-        else 
-        {
-            if(down) 
-            {
-                iter->get()->on_event(event_id(event_id::KEY_DOWN, key::INVALID));
-            }
-            else 
-            {
-                iter->get()->on_event(event_id(event_id::KEY_UP, key::INVALID));
-            }
-        }
-    }
-    assert(testInvariant());
-}
-
-void movie_root::add_key_listener(const KeyListener & listener)
-{
-    KeyListeners::iterator target = _keyListeners.find(listener);
-    if(target == _keyListeners.end())
-    // The key listener is not in the container, then add it.
-    {
-        _keyListeners.insert(listener);
-    }
-    else
-    // The key listener is already in the container, then register it(again).
-    {
-        if(listener.hasUserRegistered())
-        {
-            target->registerUserHandler();
-        }
-        if(listener.hasOnClipRegistered())
-        {
-            target->registerOnClipHandler();
         }
     }
 
     assert(testInvariant());
-}
-
-void movie_root::remove_key_listener(as_object* listener)
-{
-    _keyListeners.erase(KeyListener(listener));
-
-    assert(testInvariant());
-}
-
-#else // ndef NEW_KEY_LISTENER_LIST_DESIGN
-
-void movie_root::cleanup_key_listeners()
-{
-#ifdef KEY_LISTENERS_DEBUG
-	size_t prevsize = _keyListeners.size();
-	log_msg("Cleaning up %u key listeners", _keyListeners.size());
-#endif
-
-	for (ListenerSet::iterator iter = m_key_listeners.begin(); iter != m_key_listeners.end(); )
-	{
-		// TODO: handle non-character objects too !
-		character* ch = dynamic_cast<character*>(iter->get());
-		if ( ch && ch->isUnloaded() )
-		{
-			ListenerSet::iterator toremove = iter;
-			++iter;
-			//log_msg("cleanup_key_listeners: Removing unloaded key listener %p", iter->get());
-			m_key_listeners.erase(toremove);
-		}
-		else
-		{
-			++iter;
-		}
-	}
-
-#ifdef KEY_LISTENERS_DEBUG
-	size_t currsize = _keyListeners.size();
-	log_msg("Cleaned up %u listeners (from %u to %u)", prevsize-currsize, prevsize, currsize);
-#endif
-}
-
-void movie_root::notify_key_listeners(key::code k, bool down)
-{
-	log_msg("Notifying " SIZET_FMT " keypress listeners", 
-		m_key_listeners.size());
-
-	for (ListenerSet::iterator iter = m_key_listeners.begin();
-			 iter != m_key_listeners.end(); ++iter)
-	{
-		// sprite, button & input_edit_text characters
-		// TODO: invoke functions on non-characters !
-		character* ch = dynamic_cast<character*>(iter->get());
-		if ( ch && ! ch->isUnloaded() )
-		{
-			if(down)
-			{
-				// KEY_UP and KEY_DOWN events are unrelated to any key!
-				ch->on_event(event_id(event_id::KEY_DOWN, key::INVALID)); 
-        ch->on_event(event_id(event_id::KEY_PRESS, key::codeMap[k][0]));
-			}
-			else
-				ch->on_event(event_id(event_id::KEY_UP, key::INVALID));   
-		}
-	}
-
-	assert(testInvariant());
 }
 
 void movie_root::add_key_listener(as_object* listener)
 {
-	if ( m_key_listeners.insert(listener).second )
-	{
-		//log_msg("Added key listener %p", (void*)listener);
-	}
-	else
-	{
-		//log_msg("key listener %p was already in the known set", (void*)listener);
-	}
-	assert(testInvariant());
+    for(KeyListeners::iterator i = m_key_listeners.begin(), e = m_key_listeners.end();
+            i != e; ++i)
+    {
+        // Conceptually, we don't need to add the same character twice.
+        // but see edit_text_character::setFocus()...
+        if(*i == listener)  return;
+    }
+
+    //for character listeners, first added last called
+    m_key_listeners.push_front(listener);
 }
 
 void movie_root::remove_key_listener(as_object* listener)
 {
-	//log_msg("Removing key listener %p - %u listeners currently ", (void*)listener, m_key_listeners.size());
-	m_key_listeners.erase(listener);
-	//log_msg("After removing key listener %p, %u listeners are left", (void*)listener, m_key_listeners.size());
-	assert(testInvariant());
+    for(KeyListeners::iterator iter = m_key_listeners.begin(); 
+            iter != m_key_listeners.end(); )
+    {
+        if(*iter == listener) 
+        {
+            m_key_listeners.erase(iter++);
+        }
+        else
+        {
+            iter++;
+        }
+    }
 }
-#endif // ndef NEW_KEY_LISTENER_LIST_DESIGN
 
 void movie_root::add_mouse_listener(as_object* listener)
 {
@@ -1367,67 +1225,58 @@ movie_root::executeTimers()
 void
 movie_root::markReachableResources() const
 {
-	// Mark movie levels as reachable
-	for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
-	{
-		i->second->setReachable();
-	}
+    // Mark movie levels as reachable
+    for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
+    {
+        i->second->setReachable();
+    }
 
-	// Mark mouse entities 
-	m_mouse_button_state.markReachableResources();
-	
-	// Mark timer targets
-	for (TimerMap::const_iterator i=_intervalTimers.begin(), e=_intervalTimers.end();
-			i != e; ++i)
-	{
-		i->second->markReachableResources();
-	}
+    // Mark mouse entities 
+    m_mouse_button_state.markReachableResources();
+    
+    // Mark timer targets
+    for (TimerMap::const_iterator i=_intervalTimers.begin(), e=_intervalTimers.end();
+            i != e; ++i)
+    {
+        i->second->markReachableResources();
+    }
 
-	// Mark resources reachable by queued action code
+    // Mark resources reachable by queued action code
     for (int lvl=0; lvl<apSIZE; ++lvl)
     {
         const ActionQueue& q = _actionQueue[lvl];
-    	for (ActionQueue::const_iterator i=q.begin(), e=q.end();
-    			i != e; ++i)
-    	{
-    		(*i)->markReachableResources();
-    	}
+        for (ActionQueue::const_iterator i=q.begin(), e=q.end();
+                i != e; ++i)
+        {
+            (*i)->markReachableResources();
+        }
     }
 
-#ifdef NEW_KEY_LISTENER_LIST_DESIGN
-	// Mark key listeners
-	for (KeyListeners::const_iterator i=_keyListeners.begin(), e=_keyListeners.end();
-			i != e; ++i)
-	{
-		i->setReachable();
-	}
-#else
-	// Mark key listeners
-	for (ListenerSet::const_iterator i=m_key_listeners.begin(), e=m_key_listeners.end();
-			i != e; ++i)
-	{
-		(*i)->setReachable();
-	}
-#endif
+    // Mark character key listeners
+    for (KeyListeners::const_iterator i=m_key_listeners.begin(), e=m_key_listeners.end();
+            i != e; ++i)
+    {
+        (*i)->setReachable();
+    }
 
-	// Mark global key object
-	if ( _keyobject ) _keyobject->setReachable();
+    // Mark global key object
+    if ( _keyobject ) _keyobject->setReachable();
 
-	// TODO: we should theoretically NOT need to mark _liveChars here
-	// 	 as any element in this list should be NOT unloaded and
-	// 	 thus marked as reachable by it's parent or properly unloaded
-	// 	 and thus removed from this list by cleanupDisplayList.
-	// 	 Due to some bug I'm researching on, we'll mark them for now...
-	// 	 See http://savannah.gnu.org/bugs/index.php?21070
-	//
-	//log_debug("Marking %d live chars", _liveChars.size());
-	for (LiveChars::const_iterator i=_liveChars.begin(), e=_liveChars.end();
-			i != e; ++i)
-	{
-		(*i)->setReachable();
-	}
-	
-	
+    // TODO: we should theoretically NOT need to mark _liveChars here
+    //   as any element in this list should be NOT unloaded and
+    //   thus marked as reachable by it's parent or properly unloaded
+    //   and thus removed from this list by cleanupDisplayList.
+    //   Due to some bug I'm researching on, we'll mark them for now...
+    //   See http://savannah.gnu.org/bugs/index.php?21070
+    //
+    //log_debug("Marking %d live chars", _liveChars.size());
+    for (LiveChars::const_iterator i=_liveChars.begin(), e=_liveChars.end();
+            i != e; ++i)
+    {
+        (*i)->setReachable();
+    }
+    
+    
 }
 #endif // GNASH_USE_GC
 

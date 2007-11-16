@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.87 2007/11/14 13:23:47 strk Exp $ */
+/* $Id: movie_root.h,v 1.88 2007/11/16 07:43:53 zoulunkai Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -102,76 +102,6 @@ struct DepthComparator
         return d1->get_depth() < d2->get_depth();
     }
 };
-
-#ifdef NEW_KEY_LISTENER_LIST_DESIGN
-class KeyListener{
-    public:
-        
-        KeyListener(boost::intrusive_ptr<as_object> obj, int flag=0)
-        : _listener(obj), _registered_type(flag)
-        {}
-
-        boost::intrusive_ptr<as_object> get() const { return _listener; }
-
-        bool operator == (const KeyListener & rhs ) const { return _listener == rhs.get(); }
-        bool operator != (const KeyListener & rhs ) const { return _listener != rhs.get(); }
-        bool operator < (const KeyListener & rhs ) const { return _listener < rhs.get(); }
-        
-        enum
-        {
-            ON_CLIP_DEF = 1 << 0,
-            USER_DEF    = 1 << 1
-        };
-
-        /// \brief
-        /// true if the _listener has OnClip defined key event handlers,
-        /// false if the _listener has no OnClip defined key event handlers.
-        ///
-        /// OnClip defined key event handlers are registered automatically and can not
-        /// be unregistered when they are defined.
-        bool hasOnClipRegistered() const { return _registered_type & ON_CLIP_DEF; }
-        
-        /// \brief
-        /// true if the _listener has been registered by Key.addListener(),
-        /// false if the _listener has not been registered by Key.addListener()
-        /// or unregistered by Key.removeListener().
-        bool hasUserRegistered() const { return _registered_type & USER_DEF; }      
-
-        /// register user defined key handler
-        void registerUserHandler() const { _registered_type |= USER_DEF; }
-        
-        /// register OnClip defined key handler
-        void registerOnClipHandler() const { _registered_type |= ON_CLIP_DEF; }
-
-        /// unregister user defined key handler
-        void unregisterUserHandler() const { _registered_type ^= USER_DEF; }
-
-#ifdef GNASH_USE_GC
-        /// Mark the wrapped object as reachable
-        void setReachable() const
-        {
-            if ( _listener ) _listener->setReachable();
-        }
-#endif
-
-    private:
-
-        /// the listener object, could be a character or a general as_object
-        boost::intrusive_ptr<as_object> _listener;
-
-        /// 0: the listener has no registered event handlers, to be removed;
-        /// ON_CLIP_DEF: the listener has registered onClip event handlers;
-        /// USER_DEF: the listener has registered user defined handlers;
-        //
-        // (1) onClip handlers get registered as soon as they are defined, and 
-        //     will never get unregistered;
-        // (2) user defined handlers get registered by Key.addListener(obj),
-        //     and unregistered by Key.removedListener(obj);
-        // mutable here is a hack for using std::set<>, we might drop this class 
-        // or change to another container later.
-        mutable int _registered_type;
-    };
-#endif 
 
 /// The movie stage (absolute top level node in the characters hierarchy)
 //
@@ -334,7 +264,7 @@ public:
     ///
     bool notify_key_event(key::code k, bool down);
 
-    /// \brief
+	/// \brief
     /// Use this to retrieve the last state of the mouse, as set via
     /// notify_mouse_state(). 
     //
@@ -482,24 +412,19 @@ public:
     void * get_userdata() { return m_userdata; }
     void set_userdata(void * ud ) { m_userdata = ud;  }
 
-    DSOEXPORT void notify_key_listeners(key::code k, bool down);
-#ifdef NEW_KEY_LISTENER_LIST_DESIGN
-    // Push a new key listener to the container if it is not there,
-    // otherwise, just register it.
-    void add_key_listener(const KeyListener& listener);
-    
-    // remove the specified listener from the container if found
-    void remove_key_listener(as_object* listener);
+	/// Notify both the character listeners and general object listeners
+	DSOEXPORT void notify_key_listeners(key::code k, bool down);
 
-    typedef std::set<KeyListener> KeyListeners;
-    KeyListeners & getKeyListeners() { return _keyListeners; }
-#else
+	/// Push a new character listener to the container after constructing the character
     void add_key_listener(as_object* listener);
+
+	/// Remove a character from the container only when the character is unloaded
     void remove_key_listener(as_object* listener);
-#endif
 
     DSOEXPORT void notify_mouse_listeners(const event_id& event);
+
     void add_mouse_listener(as_object* listener);
+
     void remove_mouse_listener(as_object* listener);
 
     /// Get the character having focus
@@ -661,7 +586,7 @@ private:
 
     /// Notify the global Key ActionScript object about a key status change
     key_as_object * notify_global_key(key::code k, bool down);
-    
+
     /// Remove all listeners with a ref-count of 1
     /// (only referenced as key listeners)
     // in new design:
@@ -708,15 +633,15 @@ private:
     TimerMap _intervalTimers;
     unsigned int _lastTimerId;
 
-    /// A set of as_objects kept by intrusive_ptr
+	/// A set of as_objects kept by intrusive_ptr
+	/// TODO: dont' use std::use, we need to well control the calling order
     typedef std::set< boost::intrusive_ptr<as_object> > ListenerSet;
 
-    /// Objects listening for key events
-#ifdef NEW_KEY_LISTENER_LIST_DESIGN
-    KeyListeners _keyListeners;
-#else
-    ListenerSet m_key_listeners;
-#endif
+    /// key listeners container
+    typedef std::list< boost::intrusive_ptr<as_object> > KeyListeners;
+
+    /// Characters for listening key events
+    KeyListeners m_key_listeners;
 
     boost::intrusive_ptr<key_as_object> _keyobject;
 

@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.108 2007/11/10 11:51:42 strk Exp $ */
+/* $Id: character.h,v 1.109 2007/11/16 07:43:53 zoulunkai Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -195,7 +195,7 @@ protected:
 	{
 	    return _event_handlers;
 	}
-#ifndef NEW_KEY_LISTENER_LIST_DESIGN
+
 	/// Return a user defined event handler, if any
 	//
 	/// @param name
@@ -208,7 +208,7 @@ protected:
 	///	casts to an as_function. A NULL pointer otherwise.
 	///
 	boost::intrusive_ptr<as_function> getUserDefinedEventHandler(const std::string& name) const;
-#endif	
+
 	void set_event_handlers(const Events& copyfrom);
 
 	/// Used to assign a name to unnamed instances

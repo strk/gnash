@@ -33,10 +33,7 @@
 #include "smart_ptr.h"
 #include "as_prop_flags.h" // for enum
 #include "GnashException.h"
-#define NEW_KEY_LISTENER_LIST_DESIGN
-#ifdef NEW_KEY_LISTENER_LIST_DESIGN
-  #include "event_id.h" // for event_id
-#endif
+#include "event_id.h" // for event_id
 #include <sstream>
 
 #if defined(__GNUC__) && __GNUC__ > 2
@@ -246,9 +243,7 @@ public:
 	std::pair<bool,bool> update_member(string_table::key key, const as_value& val,
 		string_table::key nsname = 0);
 
-#ifdef NEW_KEY_LISTENER_LIST_DESIGN
 	virtual bool on_event(const event_id& id );
-#endif
 
 	/// Reserve a slot
 	///

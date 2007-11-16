@@ -125,8 +125,7 @@ main(int /*argc*/, char** /*argv*/)
   tester.releaseKey(key::F);
   
   // we have jumped backward to frame11
-  // Gnash failed on notifying an unloaded character listener
-  xcheck_equals(root->get_current_frame(), 10);
+  check_equals(root->get_current_frame(), 10);
   
   tester.advance();
   // and we are in frame12 again

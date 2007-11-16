@@ -808,7 +808,6 @@ as_object::get_prototype()
 	return tmp.to_object();
 }
 
-#ifdef NEW_KEY_LISTENER_LIST_DESIGN
 bool
 as_object::on_event(const event_id& id )
 {
@@ -829,7 +828,6 @@ as_object::on_event(const event_id& id )
 
 	return false;
 }
-#endif 
 
 as_value
 as_object::getMember(string_table::key name, string_table::key nsname)

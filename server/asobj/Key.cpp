@@ -36,15 +36,15 @@
 namespace gnash {
 
 /************************************************************************
- *
- * This has been moved from action.cpp, when things are clean
- * everything should have been moved up
- *
- ************************************************************************/
+*
+* This has been moved from action.cpp, when things are clean
+* everything should have been moved up
+*
+************************************************************************/
 
 key_as_object::key_as_object()
     :
-    as_object(getObjectInterface()),
+as_object(getObjectInterface()),
     m_last_key_event(0)
 {
     memset(m_unreleased_keys, 0, sizeof(m_unreleased_keys));
@@ -59,16 +59,16 @@ key_as_object::is_key_down(int keycode)
     int byte_index = keycode >> 3;
     // Find bit within the byte:
     int bit_index = keycode - (byte_index << 3);
-    
+
     uint8_t mask = 1 << bit_index;
-    
+
     if ((m_unreleased_keys[byte_index] & mask) != 0 ) return true;
 
     return false;
 }
 
 void
-key_as_object::set_key_down(int code)
+    key_as_object::set_key_down(int code)
 {
     if (code < 0 || code >= key::KEYCOUNT) return;
 
@@ -78,7 +78,7 @@ key_as_object::set_key_down(int code)
 
     // Key.isDown() only cares about flash keycode, not character, so
     // we lookup keycode to add to m_unreleased_keys.   
-    
+
     int byte_index = key::codeMap[code][1] >> 3;
     int bit_index = key::codeMap[code][1] - (byte_index << 3);
     int mask = 1 << bit_index;
@@ -96,7 +96,7 @@ key_as_object::set_key_up(int code)
     // This is used for getAscii() of the last key event, so we use gnash's
     // internal code.    
     m_last_key_event = code;
-        
+
     // Key.isDown() only cares about flash keycode, not character, so
     // we lookup keycode to add to m_unreleased_keys.
     int byte_index = key::codeMap[code][1] >> 3;
@@ -108,96 +108,109 @@ key_as_object::set_key_up(int code)
     m_unreleased_keys[byte_index] &= ~mask;
 }
 
-#ifndef NEW_KEY_LISTENER_LIST_DESIGN
+
 void 
-key_as_object::notify_listeners(const event_id key_event_type)
-{
-    
-    std::string funcname = key_event_type.get_function_name();
-    // There is no user defined "onKeyPress" event handler
-    if( ( funcname != "onKeyDown") && (funcname != "onKeyUp") )
+key_as_object::notify_listeners(const event_id key_event)
+{  
+    if( m_listeners.empty() )  
+    {
         return;
+    }
 
-    VM& vm = VM::get();
-    if ( vm.getSWFVersion() < 7 )
+    std::string handler_name;
+    // There is no user defined "onKeyPress" event handler
+    if( (key_event.m_id == event_id::KEY_DOWN) || (key_event.m_id == event_id::KEY_UP) )
     {
-        boost::to_lower(funcname, vm.getLocale());
+        handler_name = key_event.get_function_name();
+        if ( _vm.getSWFVersion() < 7 )
+        {
+            boost::to_lower(handler_name, _vm.getLocale());
+        }
     }
-
-    // Notify listeners.
-    for (std::vector<boost::intrusive_ptr<as_object> >::iterator iter = m_listeners.begin();
-         iter != m_listeners.end(); ++iter) {
-      if (*iter == NULL)
-        continue;
-
-      boost::intrusive_ptr<as_object>  listener = *iter; // Hold an owning reference.
-      as_value method;
-
-       if (listener->get_member(VM::get().getStringTable().find(funcname), &method))
-        call_method(method, NULL /* or root? */, listener.get(), 0, 0);
-    }
-}
-#endif // ndef NEW_KEY_LISTENER_LIST_DESIGN
-
-#ifdef NEW_KEY_LISTENER_LIST_DESIGN
-void
-key_as_object::add_listener(const KeyListener& listener)
-{
-    _vm.getRoot().add_key_listener(listener);
-}
-
-void
-key_as_object::remove_listener(boost::intrusive_ptr<as_object> listener)
-{
-    // Should keep consistent with definiton in movie_root.h
-    typedef std::set<KeyListener> KeyListeners;
-
-    KeyListeners & listeners = _vm.getRoot().getKeyListeners();
-    
-    KeyListeners::iterator target = listeners.find(KeyListener(listener));
-
-	KeyListeners::iterator it_end = listeners.end();
-
-    if(target != it_end)
+    else
     {
-        target->unregisterUserHandler();
+        return;
+    }
+
+    for (Listeners::iterator iter = m_listeners.begin(); iter != m_listeners.end(); ++iter) 
+    {
+        if (*iter == NULL)  continue;
+
+        as_value event_handler;
+        bool found_handler = 
+            iter->get()->get_member(_vm.getStringTable().find(handler_name), &event_handler);
+
+        if(found_handler)
+        {
+            character* ch = dynamic_cast<character *>(iter->get());
+            if(ch && !ch->isUnloaded())
+            {
+                // execute character handlers
+                call_method(event_handler, &ch->get_environment(), ch, 0, 0);
+            }
+            else
+            {
+                // execute non-character handlers
+                call_method(event_handler, NULL, iter->get(), 0, 0);
+            }
+        }
+    } // end of for
+
+}
+
+
+void 
+key_as_object::cleanup_unloaded_listeners()
+{
+    for (Listeners::iterator iter = m_listeners.begin(); iter != m_listeners.end();  )
+    {
+        boost::intrusive_ptr<character> ch = dynamic_cast<character *> (iter->get());
+        if (ch && ch->isUnloaded())
+        {
+            m_listeners.erase(iter++);
+            continue;
+        }
+        else
+        {
+            ++iter;
+        }
     }
 }
 
-#else // ndef NEW_KEY_LISTENER_LIST_DESIGN
 
 void
 key_as_object::add_listener(boost::intrusive_ptr<as_object> listener)
 {
     // Should we bother doing this every time someone calls add_listener(),
     // or should we perhaps skip this check and use unique later?
-    std::vector<boost::intrusive_ptr<as_object> >::const_iterator end = m_listeners.end();
-    for (std::vector<boost::intrusive_ptr<as_object> >::iterator iter = m_listeners.begin();
-         iter != end; ++iter) {
-      if (*iter == NULL) {
-        // Already in the list.
-        return;
-      }
+    for (Listeners::iterator i = m_listeners.begin(), e = m_listeners.end(); i != e; ++i)
+    {
+        if (*i == listener) 
+        {
+            // Already in the list.
+            return;
+        }
     }
 
     m_listeners.push_back(listener);
 }
 
+
 void
 key_as_object::remove_listener(boost::intrusive_ptr<as_object> listener)
 {
 
-    for (std::vector<boost::intrusive_ptr<as_object> >::iterator iter = m_listeners.begin(); iter != m_listeners.end(); )
+    for (Listeners::iterator iter = m_listeners.begin(); iter != m_listeners.end(); )
     {
         if (*iter == listener)
         {
-            iter = m_listeners.erase(iter);
+            m_listeners.erase(iter++);
             continue;
         }
         iter++;
     }
 }
-#endif // ndef NEW_KEY_LISTENER_LIST_DESIGN
+
 
 int
 key_as_object::get_last_key() const
@@ -215,7 +228,7 @@ key_add_listener(const fn_call& fn)
     if (fn.nargs < 1)
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Key.addListener needs one argument (the listener object)"));
+            log_aserror(_("Key.addListener needs one argument (the listener object)"));
         );
         return as_value();
     }
@@ -224,45 +237,36 @@ key_add_listener(const fn_call& fn)
     if (toadd == NULL)
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Key.addListener passed a NULL object; ignored"));
+            log_aserror(_("Key.addListener passed a NULL object; ignored"));
         );
         return as_value();
     }
 
-#ifdef NEW_KEY_LISTENER_LIST_DESIGN
-
-    ko->add_listener(KeyListener(toadd, KeyListener::USER_DEF));
-
-#else // ndef NEW_KEY_LISTENER_LIST_DESIGN
-
     ko->add_listener(toadd);
-
-#endif // ndef NEW_KEY_LISTENER_LIST_DESIGN
 
     return as_value();
 }
 
 
-// Return the ascii value of the last key pressed.
-/// FIXME: return the ascii number(not string) of the last pressed key!
+/// Return the ascii number of the last key pressed.
 static as_value   
 key_get_ascii(const fn_call& fn)
 {
     boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr);
 
     int code = ko->get_last_key();
-    
-		return as_value(gnash::key::codeMap[code][2]);
+
+    return as_value(gnash::key::codeMap[code][2]);
 }
 
-// Returns the keycode of the last key pressed.
+/// Returns the keycode of the last key pressed.
 static as_value   
-key_get_code(const fn_call& fn)
+    key_get_code(const fn_call& fn)
 {
     boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr);
-		
-		int code = ko->get_last_key();
-		
+
+    int code = ko->get_last_key();
+
     return as_value(key::codeMap[code][1]);
 }
 
@@ -275,7 +279,7 @@ key_is_down(const fn_call& fn)
     if (fn.nargs < 1)
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Key.isDown needs one argument (the key code)"));
+            log_aserror(_("Key.isDown needs one argument (the key code)"));
         );
         return as_value();
     }
@@ -305,7 +309,7 @@ key_remove_listener(const fn_call& fn)
     if (fn.nargs < 1)
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Key.removeListener needs one argument (the listener object)"));
+            log_aserror(_("Key.removeListener needs one argument (the listener object)"));
         );
         return as_value();
     }
@@ -314,7 +318,7 @@ key_remove_listener(const fn_call& fn)
     if (toremove == NULL)
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Key.removeListener passed a NULL object; ignored"));
+            log_aserror(_("Key.removeListener passed a NULL object; ignored"));
         );
         return as_value();
     }
@@ -329,8 +333,8 @@ key_remove_listener(const fn_call& fn)
 void key_class_init(as_object& global)
 {
 
-//  GNASH_REPORT_FUNCTION;
-//
+    //  GNASH_REPORT_FUNCTION;
+    //
     int swfversion = VM::get().getSWFVersion();
 
     // Create built-in key object.
@@ -375,18 +379,16 @@ void key_class_init(as_object& global)
 }
 
 #ifdef GNASH_USE_GC
-#ifndef NEW_KEY_LISTENER_LIST_DESIGN
 void
 key_as_object::markReachableResources() const
 {
     markAsObjectReachable();
     for (Listeners::const_iterator i=m_listeners.begin(), e=m_listeners.end();
-            i != e; ++i)
+                i != e; ++i)
     {
         (*i)->setReachable();
     }
 }
-#endif // ndef NEW_KEY_LISTENER_LIST_DESIGN
 #endif // def GNASH_USE_GC
 
 } // end of gnash namespace

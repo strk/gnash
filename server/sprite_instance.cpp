@@ -3356,19 +3356,14 @@ sprite_instance::call_method_args(const char* method_name,
 		method_name, method_arg_fmt, args);
 }
 
+/// register characters as key listeners if they have clip key events defined.
+/// Don't call twice for the same chracter.
 void
 sprite_instance::registerAsListener()
 {
 	if (m_has_key_event)
 	{
-#ifdef NEW_KEY_LISTENER_LIST_DESIGN
-		// TODO: Don't do this at every advancement
-		// OnClip key handlers should be registered at construction time, 
-		// User defined handlers should be registered explicitly by Key.addListener();
-		_vm.getRoot().add_key_listener(KeyListener(this, KeyListener::ON_CLIP_DEF));
-#else
 		_vm.getRoot().add_key_listener(this);
-#endif
 	}
 	// Mouse events listening is done in has_mouse_event directly.
 	// This shows to work better for attachMovieTest.swf,
