@@ -19,7 +19,7 @@
 /*
  *  Zou Lunkai, zoulunkai@gmail.com
  * 
- *  test setTarget.
+ *  test opcode guard and setTarget
  */
 
 
@@ -61,7 +61,7 @@
     _root.check_equals(typeof(_root.dup1), 'movieclip');
     _root.check_equals(typeof(_root.dup2), 'movieclip');
     
-    dup1.testVar = 'dup1_var'; // <<-----------------------------
+    dup1.testVar = 'dup1_var'; // 
     setTarget('dup1');
       removeMovieClip(_root.dup1);
       // seems Gnash discarded the following 2 tests, caused by opcode guard with
@@ -78,7 +78,7 @@
       _root.check_equals(testVar, undefined);
     }
 
-    dup3.testVar = 'dup3_var'; // <<-----------------------------
+    dup3.testVar = 'dup3_var'; // 
     setTarget('dup3');
       removeMovieClip(_root.dup3);
       // dup3 is unloaded but not destroyed
@@ -178,13 +178,32 @@
      setTarget('');
   .end
   
-  
+
+//
+// separate tests for setTarget('/')
+//
+.frame 13
+    .sprite mc6
+        .action:
+            setTarget('/');
+                _root.check_equals(_target, "/");
+                gotoAndPlay(15);
+            setTarget('');
+        .end
+    .end
+ 	.put mc6
+ 	
+.frame 14
+    .action:
+        _root.check(false); // shoudn't executed!
+    .end
+    
 .frame 15
  
   .action:
     stop();
     // Gnash failed on totals() by discarding some checks.
-    xtotals(19);
+    xtotals(20);
   .end
   
 .end  // file end

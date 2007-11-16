@@ -154,6 +154,17 @@ main(int argc, char** argv)
   // Export mc3
   addExport(mo, mc3, "libItem3");  
   
+  add_actions(mo, "totals(21); stop();");
+   
+  // add init actions for mc3
+  add_clip_init_actions(mc3, " _root.note('mc3.initactions'); "
+                             " theClass3 = function () {}; "
+                             " theClass3.prototype = new MovieClip(); "
+                             " Object.registerClass('libItem3', theClass3); "
+                             " _root.attachMovie('libItem3', 'clip3', 30); "
+                             // clip3.__proto__ is initialized before executing onClipConstruct
+                             "_root.check_equals(clip3.__proto__, _root.theClass3.prototype); ");
+                             
   it3 = SWFMovie_add(mo, mc3);
   SWFDisplayItem_addAction(it3,
     newSWFAction(" _root.note('mc3.onClipInitialize'); " 
@@ -169,19 +180,8 @@ main(int argc, char** argv)
                  " _root.check_equals(_root.clip3.__proto__, _root.theClass3.prototype);"
                 ),
     SWFACTION_CONSTRUCT);
-
-  // add init actions for mc3
-  add_clip_init_actions(mc3, " _root.note('mc3.initactions'); "
-                             " theClass3 = function () {}; "
-                             " theClass3.prototype = new MovieClip(); "
-                             " Object.registerClass('libItem3', theClass3); "
-                             " _root.attachMovie('libItem3', 'clip3', 30); "
-                             // clip3.__proto__ is initialized before executing onClipConstruct
-                             "_root.check_equals(clip3.__proto__, _root.theClass3.prototype); ");
- 
-  
-  add_actions(mo, "totals(21); stop();");
-  SWFMovie_nextFrame(mo); /* end of frame4 */
+    
+  SWFMovie_nextFrame(mo); /* end of frame3 */
      
  /*****************************************************
   *
