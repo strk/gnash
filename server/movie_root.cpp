@@ -894,11 +894,6 @@ void movie_root::cleanup_key_listeners()
         }
     }
     
-    if( _keyobject )
-    {
-        // remove unloaded character listeners from global Key object
-        _keyobject->cleanup_unloaded_listeners();
-    }
 }
 
 void movie_root::notify_key_listeners(key::code k, bool down)

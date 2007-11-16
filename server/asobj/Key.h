@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: Key.h,v 1.30 2007/11/16 07:43:53 zoulunkai Exp $ */
+/* $Id: Key.h,v 1.31 2007/11/16 17:35:34 strk Exp $ */
 
 #ifndef __KEY_H__
 #define __KEY_H__
@@ -86,14 +86,8 @@ public:
 
     /// Responsible for user defined key events handlers only;
     /// take over both characters and non-characters object.
-    void notify_listeners(const event_id key_event_type);
+    void notify_listeners(const event_id& key_event_type);
 
-    /// Remove unloaded character listeners from the list.
-    void cleanup_unloaded_listeners();
-
-    void add_listener(boost::intrusive_ptr<as_object> listener);
-
-    void remove_listener(boost::intrusive_ptr<as_object> listener);
 };
 
 void key_class_init(as_object& global);

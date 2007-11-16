@@ -1,5 +1,13 @@
 2007-11-16 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Key.{cpp,h}: Initialize the Key object as an usual
+	  AsBroadcaster.
+	* server/movie_root.cpp: don't cleanup Key object listeners as they
+	  will follow usual AsBroadcaster cleaning convention.
+	* testsuite/actionscript.all/Key.as: successes.
+
+2007-11-16 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: quote arguments of test(1)
 	* server/asobj/MovieClipLoader.cpp (dispatchEvent): don't lookup
 	  broadcastMessage, as it's a named string.

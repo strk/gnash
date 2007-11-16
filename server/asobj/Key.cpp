@@ -30,6 +30,8 @@
 #include "VM.h"
 #include "builtin_function.h"
 #include "Object.h" // for getObjectInterface()
+#include "AsBroadcaster.h" // for initializing self as a broadcaster
+#include "namedStrings.h"
 
 #include <boost/algorithm/string/case_conv.hpp>
 
@@ -44,10 +46,17 @@ namespace gnash {
 
 key_as_object::key_as_object()
     :
-as_object(getObjectInterface()),
+    as_object(getObjectInterface()),
     m_last_key_event(0)
 {
-    memset(m_unreleased_keys, 0, sizeof(m_unreleased_keys));
+	memset(m_unreleased_keys, 0, sizeof(m_unreleased_keys));
+
+	// Key is a broadcaster only in SWF6 and up (correct?)
+	int swfversion = VM::get().getSWFVersion();
+	if ( swfversion > 5 )
+	{
+		AsBroadcaster::initialize(*this);
+	}
 }
 
 bool
@@ -110,141 +119,26 @@ key_as_object::set_key_up(int code)
 
 
 void 
-key_as_object::notify_listeners(const event_id key_event)
+key_as_object::notify_listeners(const event_id& key_event)
 {  
-    if( m_listeners.empty() )  
-    {
-        return;
-    }
+	// There is no user defined "onKeyPress" event handler
+	if( (key_event.m_id != event_id::KEY_DOWN) && (key_event.m_id != event_id::KEY_UP) ) return;
 
-    std::string handler_name;
-    // There is no user defined "onKeyPress" event handler
-    if( (key_event.m_id == event_id::KEY_DOWN) || (key_event.m_id == event_id::KEY_UP) )
-    {
-        handler_name = key_event.get_function_name();
-        if ( _vm.getSWFVersion() < 7 )
-        {
-            boost::to_lower(handler_name, _vm.getLocale());
-        }
-    }
-    else
-    {
-        return;
-    }
+	std::string handler_name = PROPNAME(key_event.get_function_name());
 
-    for (Listeners::iterator iter = m_listeners.begin(); iter != m_listeners.end(); ++iter) 
-    {
-        if (*iter == NULL)  continue;
+	as_value ev(handler_name);
 
-        as_value event_handler;
-        bool found_handler = 
-            iter->get()->get_member(_vm.getStringTable().find(handler_name), &event_handler);
+	/// no environment to start with...
+	as_environment env;
 
-        if(found_handler)
-        {
-            character* ch = dynamic_cast<character *>(iter->get());
-            if(ch && !ch->isUnloaded())
-            {
-                // execute character handlers
-                call_method(event_handler, &ch->get_environment(), ch, 0, 0);
-            }
-            else
-            {
-                // execute non-character handlers
-                call_method(event_handler, NULL, iter->get(), 0, 0);
-            }
-        }
-    } // end of for
-
+	log_debug("notify_listeners calling broadcastMessage with arg %s", ev.to_debug_string().c_str());
+	callMethod(NSV::PROP_BROADCAST_MESSAGE, env, ev);
 }
-
-
-void 
-key_as_object::cleanup_unloaded_listeners()
-{
-    for (Listeners::iterator iter = m_listeners.begin(); iter != m_listeners.end();  )
-    {
-        boost::intrusive_ptr<character> ch = dynamic_cast<character *> (iter->get());
-        if (ch && ch->isUnloaded())
-        {
-            m_listeners.erase(iter++);
-            continue;
-        }
-        else
-        {
-            ++iter;
-        }
-    }
-}
-
-
-void
-key_as_object::add_listener(boost::intrusive_ptr<as_object> listener)
-{
-    // Should we bother doing this every time someone calls add_listener(),
-    // or should we perhaps skip this check and use unique later?
-    for (Listeners::iterator i = m_listeners.begin(), e = m_listeners.end(); i != e; ++i)
-    {
-        if (*i == listener) 
-        {
-            // Already in the list.
-            return;
-        }
-    }
-
-    m_listeners.push_back(listener);
-}
-
-
-void
-key_as_object::remove_listener(boost::intrusive_ptr<as_object> listener)
-{
-
-    for (Listeners::iterator iter = m_listeners.begin(); iter != m_listeners.end(); )
-    {
-        if (*iter == listener)
-        {
-            m_listeners.erase(iter++);
-            continue;
-        }
-        iter++;
-    }
-}
-
 
 int
 key_as_object::get_last_key() const
 {
     return m_last_key_event;
-}
-
-
-as_value
-key_add_listener(const fn_call& fn)
-{
-
-    boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr);
-
-    if (fn.nargs < 1)
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Key.addListener needs one argument (the listener object)"));
-        );
-        return as_value();
-    }
-
-    boost::intrusive_ptr<as_object> toadd = fn.arg(0).to_object();
-    if (toadd == NULL)
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Key.addListener passed a NULL object; ignored"));
-        );
-        return as_value();
-    }
-
-    ko->add_listener(toadd);
-
-    return as_value();
 }
 
 
@@ -301,41 +195,11 @@ key_is_toggled(const fn_call& /* fn */)
     return as_value(false);
 }
 
-/// Remove a previously-added listener.
-static as_value    
-key_remove_listener(const fn_call& fn)
-{
-
-    if (fn.nargs < 1)
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Key.removeListener needs one argument (the listener object)"));
-        );
-        return as_value();
-    }
-
-    boost::intrusive_ptr<as_object> toremove = fn.arg(0).to_object();
-    if (toremove == NULL)
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Key.removeListener passed a NULL object; ignored"));
-        );
-        return as_value();
-    }
-
-    boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr); 
-
-    ko->remove_listener(toremove);
-
-    return as_value();
-}
-
 void key_class_init(as_object& global)
 {
 
     //  GNASH_REPORT_FUNCTION;
     //
-    int swfversion = VM::get().getSWFVersion();
 
     // Create built-in key object.
     // NOTE: _global.Key *is* an object, not a constructor
@@ -369,11 +233,14 @@ void key_class_init(as_object& global)
     key_obj->init_member("isToggled", new builtin_function(key_is_toggled));
 
     // These are only for SWF6 and up
+#if 0 // done by AsBroadcaster
+    int swfversion = VM::get().getSWFVersion();
     if ( swfversion > 5 )
     {
         key_obj->init_member("addListener", new builtin_function(key_add_listener));
         key_obj->init_member("removeListener", new builtin_function(key_remove_listener));
     }
+#endif
 
     global.init_member("Key", key_obj);
 }

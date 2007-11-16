@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Key.as,v 1.4 2007/09/29 16:22:57 strk Exp $";
+rcsid="$Id: Key.as,v 1.5 2007/11/16 17:35:34 strk Exp $";
 
 #include "check.as"
 
@@ -38,10 +38,10 @@ check_equals(Key.__proto__, Object.prototype);
  // See http://www.senocular.com/flash/tutorials/listenersasbroadcaster/?page=2
  check_equals(typeof(Key.addListener), 'function');
  check_equals(typeof(Key.removeListener), 'function');
- xcheck_equals(typeof(Key.broadcastMessage), 'function');
- xcheck(Key.hasOwnProperty("_listeners"));
- xcheck_equals(typeof(Key._listeners), 'object');
- xcheck(Key._listeners instanceof Array);
+ check_equals(typeof(Key.broadcastMessage), 'function');
+ check(Key.hasOwnProperty("_listeners"));
+ check_equals(typeof(Key._listeners), 'object');
+ check(Key._listeners instanceof Array);
 
 #else // OUTPUT_VERSION <= 5
 
