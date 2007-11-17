@@ -317,6 +317,9 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
     // Start loader thread
     _movie_def->completeLoad();
 
+    // Parse querystring (before FlashVars, see testsuite/misc-ming.all/FlashVarsTest*)
+    setFlashVars(URL(_url).querystring());
+
     // Parse parameters
     for ( map<string,string>::const_iterator it=params.begin(),
 		itEnd=params.end(); it != itEnd; ++it)
@@ -332,9 +335,6 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
         //log_debug(_("Unused parameter %s = %s"),
 	//	it->first.c_str(), it->second.c_str());
     }
-
-    // Parse querystring
-    setFlashVars(URL(_url).querystring());
 
     _gui->setMovieDefinition(_movie_def);
 
