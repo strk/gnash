@@ -1,5 +1,10 @@
 2007-11-17 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/Makefile.am: split swfdec test runners in
+	  more groups (groups of 3 letters the name starts with)
+
+2007-11-17 Sandro Santilli <strk@keybit.net>
+
 	* gui/Player.cpp: parse querystring before flashvars.
 	* testsuite/misc-ming.all/: FlashVarsTest.as, FlashVarsTest.html,
 	  Makefile.am: add test for fully-qualified variables passed trough
