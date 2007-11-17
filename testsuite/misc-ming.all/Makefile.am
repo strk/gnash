@@ -1424,8 +1424,8 @@ VarAndCharClashTest-Runner: $(srcdir)/../generic-testrunner.sh VarAndCharClashTe
 # This will only work with Ming-0.4.0beta2 (support for prebuilt clips inclusion)
 FlashVarsTest.swf: Dejagnu.swf $(srcdir)/FlashVarsTest.as 
 	$(MAKESWF) -DOUTPUT_VERSION=6 -v6 -o $@ Dejagnu.swf $(srcdir)/FlashVarsTest.as
-FlashVarsTest-Runner: $(srcdir)/../generic-testrunner.sh FlashVarsTest.swf
-	echo "$(top_builddir)/gui/gnash -1 -r0 -v -P 'FlashVars=?a=a_in_fvars&v=v_in_fvars&MixCaseFvars=mixFvars&dejagnu.nested=chFVars&_root.fqv=fqFvars' 'FlashVarsTest.swf?a=a_in_qstring&q=q_in_qstring&MixCaseQstr=mixQstr&dejagnu.nested=chQstr&_root.fqv=fqQstr'" > $@
+FlashVarsTest-Runner: $(srcdir)/../generic-testrunner.sh FlashVarsTest.swf Makefile
+	echo "$(top_builddir)/gui/gnash -1 -r0 -v -P 'FlashVars=?a=a_in_fvars&v=v_in_fvars&MixCaseFvars=mixFvars&dejagnu.nested=chFVars&_root.fqv=fqFVars' 'FlashVarsTest.swf?a=a_in_qstring&q=q_in_qstring&MixCaseQstr=mixQstr&dejagnu.nested=chQstr&_root.fqv=fqQstr'" > $@
 	chmod 755 $@
 
 init_action_test_SOURCES =	\
