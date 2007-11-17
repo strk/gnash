@@ -1,3 +1,7 @@
+2007-11-17 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* server/parser/shape_character_def.cpp: Make IRIX happy.
+
 2007-11-17 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/swfdec/Makefile.am: more splitting, each group

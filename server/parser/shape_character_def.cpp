@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.50 2007/11/12 19:24:28 udog Exp $ */
+/* $Id: shape_character_def.cpp,v 1.51 2007/11/17 16:21:06 nihilus Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -35,6 +35,11 @@
 
 #include <cfloat>
 #include <algorithm>
+
+#ifdef __sgi
+extern double round(double);
+#pragma optional round
+#endif
 
 // Define the macro below to always compute bounds for shape characters
 // and compare them with the bounds encoded in the SWF
