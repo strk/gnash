@@ -1,6 +1,7 @@
 2007-11-17 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/parser/shape_character_def.cpp: Make IRIX happy.
+	* configure.ac: Fix SIZET_FMT detection for non-gcc compilers.
 
 2007-11-17 Sandro Santilli <strk@keybit.net>
 

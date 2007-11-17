@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.438 2007/11/16 15:36:56 strk Exp $
+dnl $Id: configure.ac,v 1.439 2007/11/17 23:44:45 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -88,8 +88,10 @@ dnl       We need to know the size of size_t in the *target* host,
 dnl       not the build host (right?)
 dnl
 AC_LANG_PUSH(C++)
+if test "$GXX" = yes; then
 save_CXXFLAGS="$CXXFLAGS"
 CXXFLAGS="$CXXFLAGS -Werror -Wformat"
+fi
 
 AC_TRY_COMPILE([#include <sys/types.h>
   #include <stdio.h>], [
@@ -116,7 +118,9 @@ AC_TRY_COMPILE([#include <sys/types.h>
   AC_DEFINE(SIZET_FMT, ["%ld"], [size_t printf modifier is ld])
 )])])])
 
+if test "$GXX" = yes; then
 CXXFLAGS="$save_CXXFLAGS"
+fi
 AC_LANG_POP(C++)
 
 dnl This is primarily used when compiling for a similar architecture,
