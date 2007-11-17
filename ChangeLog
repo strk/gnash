@@ -1,5 +1,13 @@
 2007-11-17 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/Makefile.am: more splitting, each group
+	  is for each letter of the alphabet (more friendly to use)
+	* testsuite/swfdec/gen_run_swfdec_testsuite.sh: export
+	  a GNASH_PLAYER so that swfdec_run_test may decide to
+	  use gnash rather then gprocessor...
+
+2007-11-17 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/Color.cpp (color_gettransform): truncate
 	  values to integers.
 	* testsuite/swfdec/PASSING: color1.swf succeeds

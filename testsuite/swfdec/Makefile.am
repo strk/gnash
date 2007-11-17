@@ -23,15 +23,32 @@ abs_topbuilddir=$(shell cd $(top_builddir); pwd)
 if ENABLE_SWFDEC_TESTSUITE
 
 check_SCRIPTS = \
-	run_swfdec_testsuite_abc \
-	run_swfdec_testsuite_def \
-	run_swfdec_testsuite_ghi \
-	run_swfdec_testsuite_jkl \
-	run_swfdec_testsuite_mno \
-	run_swfdec_testsuite_pqr \
-	run_swfdec_testsuite_stu \
-	run_swfdec_testsuite_vwx \
-	run_swfdec_testsuite_yz 
+	run_swfdec_testsuite_a \
+	run_swfdec_testsuite_b \
+	run_swfdec_testsuite_c \
+	run_swfdec_testsuite_d \
+	run_swfdec_testsuite_e \
+	run_swfdec_testsuite_f \
+	run_swfdec_testsuite_g \
+	run_swfdec_testsuite_h \
+	run_swfdec_testsuite_i \
+	run_swfdec_testsuite_j \
+	run_swfdec_testsuite_k \
+	run_swfdec_testsuite_l \
+	run_swfdec_testsuite_m \
+	run_swfdec_testsuite_n \
+	run_swfdec_testsuite_o \
+	run_swfdec_testsuite_p \
+	run_swfdec_testsuite_q \
+	run_swfdec_testsuite_r \
+	run_swfdec_testsuite_s \
+	run_swfdec_testsuite_t \
+	run_swfdec_testsuite_u \
+	run_swfdec_testsuite_v \
+	run_swfdec_testsuite_w \
+	run_swfdec_testsuite_x \
+	run_swfdec_testsuite_y \ 
+	run_swfdec_testsuite_z 
 
 clean-local: 
 	rm -f $(check_SCRIPTS) \
@@ -39,40 +56,108 @@ clean-local:
 		site.bak site.exp site.exp.bak testrun.sum \
 		gnash.sum 
 
-run_swfdec_testsuite_abc: $(srcdir)/gen_run_swfdec_testsuite.sh 
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace aAbBcCd > $@
+run_swfdec_testsuite_a: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace aA > $@
 	chmod 755 $@
 
-run_swfdec_testsuite_def: $(srcdir)/gen_run_swfdec_testsuite.sh 
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace dDeEfF > $@
+run_swfdec_testsuite_b: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace bB > $@
 	chmod 755 $@
 
-run_swfdec_testsuite_ghi: $(srcdir)/gen_run_swfdec_testsuite.sh 
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace gGhHiI > $@
+run_swfdec_testsuite_c: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace cC > $@
 	chmod 755 $@
 
-run_swfdec_testsuite_jkl: $(srcdir)/gen_run_swfdec_testsuite.sh 
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace jJkKlL > $@
+run_swfdec_testsuite_d: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace dD > $@
 	chmod 755 $@
 
-run_swfdec_testsuite_mno: $(srcdir)/gen_run_swfdec_testsuite.sh 
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace mMnNoO > $@
+run_swfdec_testsuite_e: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace eE > $@
 	chmod 755 $@
 
-run_swfdec_testsuite_pqr: $(srcdir)/gen_run_swfdec_testsuite.sh 
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace pPqQrR > $@
+run_swfdec_testsuite_f: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace fF > $@
 	chmod 755 $@
 
-run_swfdec_testsuite_stu: $(srcdir)/gen_run_swfdec_testsuite.sh 
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace sStTuU > $@
+run_swfdec_testsuite_g: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace gG > $@
 	chmod 755 $@
 
-run_swfdec_testsuite_vwx: $(srcdir)/gen_run_swfdec_testsuite.sh 
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace vVwWxXy > $@
+run_swfdec_testsuite_h: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace hH > $@
 	chmod 755 $@
 
-run_swfdec_testsuite_yz: $(srcdir)/gen_run_swfdec_testsuite.sh 
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace yYzZ > $@
+run_swfdec_testsuite_i: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace iI > $@
+	chmod 755 $@
+
+run_swfdec_testsuite_j: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace jJ > $@
+	chmod 755 $@
+
+run_swfdec_testsuite_k: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace kK > $@
+	chmod 755 $@
+
+run_swfdec_testsuite_l: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace lL > $@
+	chmod 755 $@
+
+run_swfdec_testsuite_m: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace mM > $@
+	chmod 755 $@
+
+run_swfdec_testsuite_n: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace nN > $@
+	chmod 755 $@
+
+run_swfdec_testsuite_o: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace oO > $@
+	chmod 755 $@
+
+run_swfdec_testsuite_p: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace pP > $@
+	chmod 755 $@
+
+run_swfdec_testsuite_q: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace qQ > $@
+	chmod 755 $@
+
+run_swfdec_testsuite_r: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace rR > $@
+	chmod 755 $@
+
+run_swfdec_testsuite_s: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace sS > $@
+	chmod 755 $@
+
+run_swfdec_testsuite_t: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace tT > $@
+	chmod 755 $@
+
+run_swfdec_testsuite_u: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace uU > $@
+	chmod 755 $@
+
+run_swfdec_testsuite_v: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace vV > $@
+	chmod 755 $@
+
+run_swfdec_testsuite_w: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace wW > $@
+	chmod 755 $@
+
+run_swfdec_testsuite_x: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace xX > $@
+	chmod 755 $@
+
+run_swfdec_testsuite_y: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace yY > $@
+	chmod 755 $@
+
+run_swfdec_testsuite_z: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace zZ > $@
 	chmod 755 $@
 
 TEST_DRIVERS = ../simple.exp

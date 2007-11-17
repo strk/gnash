@@ -33,6 +33,7 @@ fi
 NOW=`date`
 
 GPROCESSOR="${BUILDDIR}/utilities/gprocessor"
+GNASH_PLAYER="${BUILDDIR}/gui/gnash"
 SWFDEC_GNASH_TESTER="${SRCDIR}/swfdec_gnash_tester"
 
 cat<<EOF 
