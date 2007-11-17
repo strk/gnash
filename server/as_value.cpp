@@ -1426,11 +1426,29 @@ as_value::SpriteProxy::find_sprite_by_target(const std::string& tgtstr)
 {
 	if ( tgtstr.empty() ) return NULL;
 
-	sprite_instance* root = VM::get().getRoot().get_root_movie();
-	as_environment& env = root->get_environment();
-	character* target = env.find_target(tgtstr);
-	if ( ! target ) return NULL;
-	return target->to_movie();
+	VM& vm = VM::get();
+	string_table& st = vm.getStringTable();
+	as_object* o = vm.getRoot().get_root_movie();
+
+	// TODO: for another optimization we may cache
+	//       the string_table::key for each element
+	//       as the SpriteProxy target (instead of
+	//       the full string, to be parsed everytime)
+
+	string::size_type size = tgtstr.size();
+	string::size_type from = 0;
+	while ( string::size_type to=tgtstr.find_first_of('.', from) )
+	{
+		string part(tgtstr, from, to-from);
+		o = o->get_path_element(st.find(part));
+		if ( ! o ) {
+			log_debug("Target path element %s not found", part.c_str());
+			return NULL;
+		}
+		if ( to == string::npos ) break;
+		from = to+1;
+	}
+	return o->to_movie();
 }
 
 void
