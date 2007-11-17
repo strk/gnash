@@ -1,5 +1,8 @@
 2007-11-17 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Color.cpp (color_gettransform): truncate
+	  values to integers.
+	* testsuite/swfdec/PASSING: color1.swf succeeds
 	* testsuite/swfdec/Makefile.am: split swfdec test runners in
 	  more groups (groups of 3 letters the name starts with)
 

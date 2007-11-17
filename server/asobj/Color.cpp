@@ -209,18 +209,19 @@ color_gettransform(const fn_call& fn)
 
 	cxform cx = obj->getTransform();
 
-	// TODO: convert to as_object...
+	// Convert to as_object
+
 	as_object* ret = new as_object(getObjectInterface());
 
-	ret->init_member("ra", cx.m_[0][0]*100);
-	ret->init_member("ga", cx.m_[1][0]*100);
-	ret->init_member("ba", cx.m_[2][0]*100);
-	ret->init_member("aa", cx.m_[3][0]*100);
+	ret->init_member("ra", int(cx.m_[0][0]*100));
+	ret->init_member("ga", int(cx.m_[1][0]*100));
+	ret->init_member("ba", int(cx.m_[2][0]*100));
+	ret->init_member("aa", int(cx.m_[3][0]*100));
 
-	ret->init_member("rb", cx.m_[0][1]);
-	ret->init_member("gb", cx.m_[1][1]);
-	ret->init_member("bb", cx.m_[2][1]);
-	ret->init_member("ab", cx.m_[3][1]);
+	ret->init_member("rb", int(cx.m_[0][1]));
+	ret->init_member("gb", int(cx.m_[1][1]));
+	ret->init_member("bb", int(cx.m_[2][1]));
+	ret->init_member("ab", int(cx.m_[3][1]));
 
 	return ret;
 }
