@@ -18,9 +18,11 @@
 // Test case for passing parameters trough FlashVars (-P switch)
 // and url querystring.
 //
+// Build with 'makeswf -o FlashVarsTest.swf Dejagnu.swf FlashVarsTest.as'
+//
 // execute the movie by passing:
-//	QueryString="?a=a_in_qstring&q=q_in_qstring&MixCaseQstr=mixQstr"
-//	FlashVars="?a=a_in_fvars&q=q_in_fvars&MixCaseFvars=mixFvars"
+//	QueryString="?a=a_in_qstring&q=q_in_qstring&MixCaseQstr=mixQstr&dejagnu.nested=chFvars&_root.fqv=fqQstr"
+//	FlashVars="?a=a_in_fvars&MixCaseFvars=mixFvars&dejagnu.nested=chQstr&_root.fqv=fqFVars"
 //
 // QueryString is what appears embedded in the url,
 // FlashVars can be given as an attribute of the <embed> tag
@@ -28,8 +30,8 @@
 //
 // Example:
 //
-// gnash -P "FlashVars=?a=a_in_fvars&v=v_in_fvars&MixCaseFvars=mixFvars"  
-//	"FlashParamTest.swf?a=a_in_qstring&q=q_in_qstring&MixCaseQstr=mixQst"
+// gnash -P "FlashVars=?a=a_in_fvars&v=v_in_fvars&MixCaseFvars=mixFvars&dejagnu.nested=chFvars&_root.fqv=fqQstr"  
+//	"FlashParamTest.swf?a=a_in_qstring&q=q_in_qstring&MixCaseQstr=mixQst&dejagnu.nested=chQstr&_root.fqv=fqFVars"
 //
 // See FlashVarsTest.html for a way to test with a plugin
 //
@@ -37,7 +39,7 @@
 note("a="+a);
 note("_root.a="+_root.a);
 check(_root.hasOwnProperty('a'));
-check_equals(_root.a, "a_in_qstring");
+check_equals(_root.a, "a_in_fvars");
 _root.a="changed";
 check_equals(_root.a, "changed");
 check(delete _root.a);
@@ -51,6 +53,17 @@ note("v="+v);
 note("_root.v="+_root.v);
 check(_root.hasOwnProperty('v'));
 check_equals(_root.v, "v_in_fvars");
+
+note("_root.fqv="+_root.fqv);
+note("_root['_root.fqv']="+_root['_root.fqv']);
+check_equals(typeof(_root.fqv), "undefined");
+check_equals(_root['_root.fqv'], "fqFVars");
+
+check_equals(typeof(_root.dejagnu), "movieclip");
+note("_root.dejagnu.nested="+_root.dejagnu.nested);
+note("_root['dejagnu.nested']="+_root['dejagnu.nested']);
+check_equals(typeof(_root.dejagnu.nested), "undefined");
+check_equals(_root['dejagnu.nested'], "chFVars");
 
 #if OUTPUT_VERSION < 7
 	// The following tests assume target SWF version is < 7
@@ -67,3 +80,4 @@ check_equals(_root.v, "v_in_fvars");
 #endif // OUTPUT_VERSION >= 7
 
 totals();
+stop();
