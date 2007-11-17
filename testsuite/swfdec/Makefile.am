@@ -23,7 +23,10 @@ abs_topbuilddir=$(shell cd $(top_builddir); pwd)
 if ENABLE_SWFDEC_TESTSUITE
 
 check_SCRIPTS = \
-	run_swfdec_testsuite
+	run_swfdec_testsuite_af \
+	run_swfdec_testsuite_gl \
+	run_swfdec_testsuite_mr \
+	run_swfdec_testsuite_sz
 
 clean-local: 
 	rm -f $(check_SCRIPTS) \
@@ -31,8 +34,20 @@ clean-local:
 		site.bak site.exp site.exp.bak testrun.sum \
 		gnash.sum 
 
-run_swfdec_testsuite: $(srcdir)/gen_run_swfdec_testsuite.sh 
-	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace > $@
+run_swfdec_testsuite_af: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace aAbBcCdDeEfF > $@
+	chmod 755 $@
+
+run_swfdec_testsuite_gl: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace gGhHiIjJkKlL > $@
+	chmod 755 $@
+
+run_swfdec_testsuite_mr: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace mMnNoOpPqQrR > $@
+	chmod 755 $@
+
+run_swfdec_testsuite_sz: $(srcdir)/gen_run_swfdec_testsuite.sh 
+	sh $< $(abs_topbuilddir) $(srcdir) $(SWFDEC_TESTSUITE)/trace sStTuUvVwWxXyYzZ > $@
 	chmod 755 $@
 
 TEST_DRIVERS = ../simple.exp
