@@ -1,5 +1,6 @@
 2007-11-17 Sandro Santilli <strk@keybit.net>
 
+	* utilities/processor.cpp: fix -d switch.
 	* testsuite/swfdec/: Makefile.am, gen_run_swfdec_testsuite.sh:
 	  Split run of swfdec testsuite in 4 steps, to allow shorter
 	  timeouts.

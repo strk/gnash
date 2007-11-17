@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: processor.cpp,v 1.68 2007/11/16 07:50:18 strk Exp $ */
+/* $Id: processor.cpp,v 1.69 2007/11/17 09:32:00 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -184,7 +184,7 @@ main(int argc, char *argv[])
         dbglogfile.setVerbosity();
     }
 
-    while ((c = getopt (argc, argv, ":hwvapr:gf:")) != -1) {
+    while ((c = getopt (argc, argv, ":hwvapr:gf:d:")) != -1) {
 	switch (c) {
 	  case 'h':
 	      usage (argv[0]);
@@ -224,6 +224,8 @@ main(int argc, char *argv[])
 	      break;
 	  case 'd':
               delay = atoi(optarg)*1000; // delay is in microseconds
+              // this will be recognized as a request to run at FPS speed
+              if ( delay < 0 ) delay = -1;
 	      break;
 	  case 'f':
               limit_advances = strtol(optarg, NULL, 0);
