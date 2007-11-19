@@ -25,8 +25,6 @@ sound_sample::~sound_sample()
 	}
 }
 
-
-
 //
 // SWF Tag StartSound (15) 
 //
@@ -95,6 +93,11 @@ start_sound_tag::execute(sprite_instance* /* m */) const
 	}
 }
 
+void
+start_sound_tag::execute_state(sprite_instance* /* m */) const
+{
+}
+
 //
 // SWF Tag SoundStreamBlock (19) 
 //
@@ -121,6 +124,11 @@ start_stream_sound_tag::execute(sprite_instance* m) const
 		m->set_sound_stream_id(m_handler_id);
 		handler->play_sound(m_handler_id, 0, 0, m_start, NULL);
 	}
+}
+
+void
+start_stream_sound_tag::execute_state(sprite_instance* /* m */) const
+{
 }
 
 } // namespace gnash

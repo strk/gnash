@@ -83,7 +83,7 @@ public:
 	void	execute(sprite_instance* m) const;
 
 	/// StartStreamSound is not a "state" tag?
-	void execute_state(sprite_instance* m) const { /*no-op*/ }
+	void execute_state(sprite_instance* m) const;
 
 	/// TODO: provide execute_reverse ?
 	/// (for StartSound would StopSound and vice-versa)
@@ -119,7 +119,7 @@ public:
 	void	execute(sprite_instance* m) const;
 
 	/// StartStreamSound is not a "state" tag?
-	void execute_state(sprite_instance* m) const { /*no-op*/ }
+	void execute_state(sprite_instance* m) const;
 };
 
 } // namespace gnash

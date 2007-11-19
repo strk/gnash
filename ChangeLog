@@ -1,3 +1,8 @@
+2007-11-19 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/parser/sound_definition.{h,cpp}: remove compiler
+	  warnings.
+
 2007-11-17 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/parser/shape_character_def.cpp: Make IRIX happy.
