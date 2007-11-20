@@ -1,5 +1,12 @@
 2007-11-20 Chad Musick <chadmusick@msbx.net>
 
+	* server/array.cpp.h: Remove as_environment parameter from removeLast
+	* server/asobj/AsBroadcaster.cpp Color.cpp Global.cpp LoadVars.cpp
+	  MovieClipLoader.cpp Object.cpp Sound.cpp string.cpp xml.h,.cpp
+	  xmlsocket.cpp: Reduce dependence on as_environment.
+
+2007-11-20 Chad Musick <chadmusick@msbx.net>
+
 	* server/as_object.h,.cpp: Remove as_environment parameter from
 	  callMethod methods.
 	* server/edit_text_character.cpp: Fix call to callMethod

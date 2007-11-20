@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.42 2007/11/20 00:44:04 cmusick Exp $ */
+/* $Id: string.cpp,v 1.43 2007/11/20 12:04:55 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -228,7 +228,7 @@ string_split(const fn_call& fn)
 
     boost::intrusive_ptr<as_array_object> array(new as_array_object());
 
-    int SWFVersion = fn.env().get_version();
+    int SWFVersion = VM::get().getSWFVersion();
 
     if (fn.nargs == 0)
     {
@@ -341,8 +341,6 @@ string_sub_str(const fn_call& fn)
     std::string str = obj->str();
 
     ENSURE_FN_ARGS(1, 2, str);
-
-    as_environment& env = fn.env();
 
     int start = valid_index(str, fn.arg(0).to_int());
 

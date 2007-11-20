@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.54 2007/11/20 10:31:39 cmusick Exp $ */
+/* $Id: xml.cpp,v 1.55 2007/11/20 12:04:56 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -402,7 +402,7 @@ XML::parseXML(const std::string& xml_in)
 }
 
 void
-XML::queueLoad(std::auto_ptr<tu_file> str,  as_environment& env)
+XML::queueLoad(std::auto_ptr<tu_file> str)
 {
 	GNASH_REPORT_FUNCTION;
 
@@ -439,7 +439,7 @@ XML::queueLoad(std::auto_ptr<tu_file> str,  as_environment& env)
 // This reads in an XML file from disk and parses into into a memory resident
 // tree which can be walked through later.
 bool
-XML::load(const URL& url, as_environment& env)
+XML::load(const URL& url)
 {
     GNASH_REPORT_FUNCTION;
   
@@ -455,7 +455,7 @@ XML::load(const URL& url, as_environment& env)
     }
 
     log_msg(_("Loading XML file from url: '%s'"), url.str().c_str());
-    queueLoad(str, env);
+    queueLoad(str);
 
     return true;
 }
@@ -539,7 +539,7 @@ xml_load(const fn_call& fn)
 
     // Set the argument to the function event handler based on whether the load
     // was successful or failed.
-    ret = xml_obj->load(url, fn.env());
+    ret = xml_obj->load(url);
     rv = ret;
 
     if (ret == false) {
@@ -599,7 +599,7 @@ xml_new(const fn_call& fn)
     {
         if ( fn.arg(0).is_object() )
         {
-            boost::intrusive_ptr<as_object> obj = fn.env().top(0).to_object();
+            boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
             xml_obj = boost::dynamic_pointer_cast<XML>(obj);
             if ( xml_obj )
             {
@@ -782,7 +782,6 @@ xml_ondata(const fn_call& fn)
     string_table& st = vm.getStringTable();
     string_table::key onLoadKey = st.find(PROPNAME("onLoad"));
     string_table::key loadedKey = st.find("loaded");
-    as_environment& env = fn.env();
 
     as_object* thisPtr = fn.this_ptr.get();
     assert(thisPtr);

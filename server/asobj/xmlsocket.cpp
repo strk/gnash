@@ -106,7 +106,7 @@ public:
 		/// The method will take care of polling from the
 		/// socket and invoking any onData handler.
 		///
-		void checkForIncomingData(as_environment& env);
+		void checkForIncomingData();
 
         XMLSocket obj;
 
@@ -455,7 +455,6 @@ xmlsocket_connect(const fn_call& fn)
     // XMLSocket.connect() returned in these cases.
     //
     log_debug(_("XMLSocket.connect(): tring to call onConnect"));
-    as_environment& env = fn.env();
     ptr->callMethod(st.find(PROPNAME("onConnect")), success);
 	    
     if ( success )
@@ -533,7 +532,7 @@ xmlsocket_inputChecker(const fn_call& fn)
         return as_value();
     }
 
-    ptr->checkForIncomingData(fn.env());
+    ptr->checkForIncomingData();
 
     return as_value();
 }
@@ -556,7 +555,6 @@ xmlsocket_onData(const fn_call& fn)
         return as_value();
     }
 
-    as_environment& env = fn.env();
     const std::string& xmlin = fn.arg(0).to_string();
 
     if ( xmlin.empty() )
@@ -641,7 +639,7 @@ xmlsocket_as_object::getEventHandler(const std::string& name)
 }
 
 void
-xmlsocket_as_object::checkForIncomingData(as_environment& env)
+xmlsocket_as_object::checkForIncomingData()
 {
     assert(obj.connected());
 
@@ -676,8 +674,11 @@ xmlsocket_as_object::checkForIncomingData(as_environment& env)
 #ifndef USE_DMALLOC
                 //dump_memory_stats(__FUNCTION__, __LINE__, "start");
 #endif
-                env.push(datain);
-                call_method(as_value(onDataHandler.get()), &env, this, 1, env.stack_size()-1);
+				as_environment env;
+				env.push(datain);
+				fn_call call(this, &env, 1, env.stack_size() - 1);
+				onDataHandler->call(call);
+//                call_method(as_value(onDataHandler.get()), &env, this, 1, env.stack_size()-1);
 
 #ifndef USE_DMALLOC
                 //dump_memory_stats(__FUNCTION__, __LINE__, "end");

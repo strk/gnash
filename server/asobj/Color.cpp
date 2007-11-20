@@ -259,7 +259,7 @@ color_setrgb(const fn_call& fn)
 }
 
 static inline void
-parseColorTransProp (as_object& obj, as_environment& env, string_table::key key, float *target, bool scale)
+parseColorTransProp (as_object& obj, string_table::key key, float *target, bool scale)
 {
 	as_value tmp;
 	double d;
@@ -304,21 +304,20 @@ color_settransform(const fn_call& fn)
 	}
 
 	string_table& st = obj->getVM().getStringTable();
-	as_environment& env = fn.env();
 
 	cxform newTrans = obj->getTransform();
 
 	// multipliers
-	parseColorTransProp(*trans, env, st.find("ra"), &newTrans.m_[0][0], true);
-	parseColorTransProp(*trans, env, st.find("ga"), &newTrans.m_[1][0], true);
-	parseColorTransProp(*trans, env, st.find("ba"), &newTrans.m_[2][0], true);
-	parseColorTransProp(*trans, env, st.find("aa"), &newTrans.m_[3][0], true);
+	parseColorTransProp(*trans, st.find("ra"), &newTrans.m_[0][0], true);
+	parseColorTransProp(*trans, st.find("ga"), &newTrans.m_[1][0], true);
+	parseColorTransProp(*trans, st.find("ba"), &newTrans.m_[2][0], true);
+	parseColorTransProp(*trans, st.find("aa"), &newTrans.m_[3][0], true);
 
 	// offsets
-	parseColorTransProp(*trans, env, st.find("rb"), &newTrans.m_[0][1], false);
-	parseColorTransProp(*trans, env, st.find("gb"), &newTrans.m_[1][1], false);
-	parseColorTransProp(*trans, env, st.find("bb"), &newTrans.m_[2][1], false);
-	parseColorTransProp(*trans, env, st.find("ab"), &newTrans.m_[3][1], false);
+	parseColorTransProp(*trans, st.find("rb"), &newTrans.m_[0][1], false);
+	parseColorTransProp(*trans, st.find("gb"), &newTrans.m_[1][1], false);
+	parseColorTransProp(*trans, st.find("bb"), &newTrans.m_[2][1], false);
+	parseColorTransProp(*trans, st.find("ab"), &newTrans.m_[3][1], false);
 
 	obj->setTransform(newTrans);
 
@@ -355,8 +354,7 @@ color_ctor(const fn_call& fn)
 		if ( ! sp )
 		{
 			// must be a target..
-			as_environment& env = fn.env();
-			character* ch = env.find_target(fn.arg(0).to_string());
+			character* ch = fn.env().find_target(fn.arg(0).to_string());
 			if ( ch ) sp = ch->to_movie();
 		}
 

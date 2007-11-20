@@ -129,7 +129,7 @@ public:
     // 	The environment to use for calling event hadlers
     //	TODO: what about 'this' pointer?
     //
-    bool load(const URL& url, as_environment& env);
+    bool load(const URL& url);
 
     // An event handler that returns a
     bool onLoad();
@@ -227,7 +227,7 @@ private:
     void initParser();
 
     /// Queue a load request from the given stream
-    void queueLoad(std::auto_ptr<tu_file> str,  as_environment& env);
+    void queueLoad(std::auto_ptr<tu_file> str);
 
     //static void _xmlErrorHandler(void *ctx, const char* fmt, ...);
 };

@@ -116,7 +116,7 @@ public:
 	struct mcl *getProgress(as_object *ao);
 
 	/// MovieClip
-	bool loadClip(const std::string& url, sprite_instance& target, as_environment& env);
+	bool loadClip(const std::string& url, sprite_instance& target);
 
 	void unloadClip(void *);
 
@@ -193,7 +193,7 @@ MovieClipLoader::getProgress(as_object* /*ao*/)
 
 
 bool
-MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target, as_environment& env)
+MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 {
 	// Prepare function call for events...
 	//env.push(as_value(&target));
@@ -208,6 +208,7 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target, a
 	// Call the callback since we've started loading the file
 	// TODO: probably we should move this below, after 
 	//       the loading thread actually started
+	as_environment env;
 	dispatchEvent("onLoadStart", env, as_value(&target));
 
 	bool ret = target.loadMovie(url);
@@ -270,8 +271,6 @@ moviecliploader_loadclip(const fn_call& fn)
 {
 	as_value	val, method;
 
-	as_environment& env = fn.env();
-
 	//log_msg(_("%s: nargs = %d"), __FUNCTION__, fn.nargs);
 
 	boost::intrusive_ptr<MovieClipLoader> ptr = ensureType<MovieClipLoader>(fn.this_ptr);
@@ -309,7 +308,7 @@ moviecliploader_loadclip(const fn_call& fn)
 		str_url.c_str(), (void*)sprite);
 #endif
 
-	bool ret = ptr->loadClip(str_url, *sprite, fn.env());
+	bool ret = ptr->loadClip(str_url, *sprite);
 
 	return as_value(ret);
 

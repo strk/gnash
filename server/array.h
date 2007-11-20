@@ -188,7 +188,7 @@ public:
 	/// @param env
 	///	The environment to use when comparing (needed by as_value::equals)
 	///
-	bool removeFirst(const as_value& v, as_environment& env);
+	bool removeFirst(const as_value& v);
 
 	/// \brief
 	/// Substitute 'len' elements from 'start' with elements from

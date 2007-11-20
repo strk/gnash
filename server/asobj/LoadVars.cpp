@@ -65,7 +65,7 @@ public:
 	/// @param env
 	/// 	Environment to use for event handlers calls
 	///
-	LoadVars(as_environment* env);
+	LoadVars();
 
 	~LoadVars();
 
@@ -138,7 +138,7 @@ protected:
 
 		if ( _onData ) _onData->setReachable();
 
-		if ( _env ) _env->markReachableResources();
+		_env.markReachableResources();
 
 		// Invoke generic as_object marker
 		markAsObjectReachable();
@@ -227,7 +227,7 @@ private:
 
 	boost::intrusive_ptr<as_function> _onData;
 
-	as_environment* _env;
+	as_environment _env;
 
 	size_t _bytesTotal;
 
@@ -259,10 +259,10 @@ private:
 	unsigned int _loaded;
 };
 
-LoadVars::LoadVars(as_environment* env)
+LoadVars::LoadVars()
 		:
 		as_object(getLoadVarsInterface()),
-		_env(env),
+		_env(),
 		_bytesTotal(0),
 		_bytesLoaded(0),
 		_loadRequests(),
@@ -352,7 +352,7 @@ LoadVars::dispatchDataEvent()
 	//log_msg("Calling _onData func");
 	// This would be the function calls "context"
 	// will likely be the same to all events
-	fn_call fn(this, _env, 0, 0);
+	fn_call fn(this, &_env, 0, 0);
 
 	return _onData->call(fn);
 }
@@ -366,7 +366,7 @@ LoadVars::dispatchLoadEvent()
 	//log_msg("Calling _onLoad func");
 	// This would be the function calls "context"
 	// will likely be the same to all events
-	fn_call fn(this, _env, 0, 0);
+	fn_call fn(this, &_env, 0, 0);
 
 	return _onLoad->call(fn);
 }
@@ -656,7 +656,7 @@ loadvars_tostring(const fn_call& fn)
 static as_value
 loadvars_ctor(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = new LoadVars(&fn.env());
+	boost::intrusive_ptr<as_object> obj = new LoadVars();
 	
 	return as_value(obj.get()); // will keep alive
 }

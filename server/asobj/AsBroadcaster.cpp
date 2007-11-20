@@ -303,7 +303,7 @@ AsBroadcaster::removeListener_method(const fn_call& fn)
 		// Remove the first listener matching the new value
 		// See http://www.senocular.com/flash/tutorials/listenersasbroadcaster/?page=2
 		// TODO: make this call as a normal (don't want to rely on _listeners type at all)
-		bool removed = listeners->removeFirst(listenerToRemove, fn.env());
+		bool removed = listeners->removeFirst(listenerToRemove);
 		return as_value(removed);
 	}
 

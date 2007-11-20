@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Object.cpp,v 1.36 2007/11/20 00:44:04 cmusick Exp $ */
+/* $Id: Object.cpp,v 1.37 2007/11/20 12:04:55 cmusick Exp $ */
 
 #include "tu_config.h"
 #include "Object.h"
@@ -296,7 +296,7 @@ object_registerClass(const fn_call& fn)
 
 	// TODO: check to *which* definition should we ask the export
 	//       this code uses the *relative* root of current environment's target
-	movie_definition* def = fn.env().get_target()->get_root_movie()->get_movie_definition();
+	movie_definition* def = VM::get().getRoot().get_movie_definition();
 	boost::intrusive_ptr<resource> exp_res = def->get_exported_resource(symbolid.c_str());
 	if ( ! exp_res )
 	{

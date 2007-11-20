@@ -780,7 +780,7 @@ as_array_object::splice(unsigned start, unsigned len,
 }
 
 bool
-as_array_object::removeFirst(const as_value& v, as_environment&)
+as_array_object::removeFirst(const as_value& v)
 {
 	for (iterator it = elements.begin(); it != elements.end(); ++it)
 	{

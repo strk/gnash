@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.76 2007/11/20 00:44:04 cmusick Exp $ */
+/* $Id: Global.cpp,v 1.77 2007/11/20 12:04:55 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -304,9 +304,7 @@ as_global_parseint(const fn_call& fn)
 static as_value
 as_global_assetpropflags(const fn_call& fn)
 {
-    as_environment* env = &fn.env();
-    int version = env->get_version();
-    
+    int version = VM::get().getSWFVersion();
 
     //log_msg(_("ASSetPropFlags called with %d args"), fn.nargs);
 
