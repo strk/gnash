@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.74 2007/09/23 08:48:18 cmusick Exp $ */
+/* $Id: NetStream.cpp,v 1.75 2007/11/20 00:44:04 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -152,7 +152,7 @@ static as_value netstream_play(const fn_call& fn)
 		return as_value();
 	}
 
-	ns->play(fn.arg(0).to_string(&fn.env()));
+	ns->play(fn.arg(0).to_string());
 
 	return as_value();
 }
@@ -163,7 +163,7 @@ static as_value netstream_seek(const fn_call& fn) {
 	uint32_t time = 0;
 	if (fn.nargs > 0)
 	{
-		time = fn.arg(0).to_number<uint32_t>(&fn.env());
+		time = fn.arg(0).to_number<uint32_t>();
 	}
 	ns->seek(static_cast<uint32_t>(time*1000.0));
 
@@ -182,7 +182,7 @@ static as_value netstream_setbuffertime(const fn_call& fn)
 	double time = 0;
 	if (fn.nargs > 0)
 	{
-		time = fn.arg(0).to_number(&fn.env());
+		time = fn.arg(0).to_number();
 	}
 	ns->setBufferTime(uint32_t(time*1000));
 

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.131 2007/11/16 07:43:53 zoulunkai Exp $ */
+/* $Id: edit_text_character.cpp,v 1.132 2007/11/20 00:44:03 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -108,7 +108,7 @@ textfield_set_variable(const fn_call& fn)
 	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
 
 	assert ( fn.nargs > 0 );
-	const std::string& newname = fn.arg(0).to_string(&fn.env());
+	const std::string& newname = fn.arg(0).to_string();
 
 	text->set_variable_name(newname);
 
@@ -1842,7 +1842,7 @@ textfield_backgroundColor_getset(const fn_call& fn)
 	else // setter
 	{
 		rgba newColor;
-		newColor.parseRGB( fn.arg(0).to_number<uint32_t>(&fn.env()) );
+		newColor.parseRGB( fn.arg(0).to_number<uint32_t>() );
 		ptr->setBackgroundColor(newColor);
 	}
 
@@ -1861,7 +1861,7 @@ textfield_borderColor_getset(const fn_call& fn)
 	else // setter
 	{
 		rgba newColor;
-		newColor.parseRGB( fn.arg(0).to_number<uint32_t>(&fn.env()) );
+		newColor.parseRGB( fn.arg(0).to_number<uint32_t>() );
 		ptr->setBorderColor(newColor);
 	}
 
@@ -1880,7 +1880,7 @@ textfield_textColor_getset(const fn_call& fn)
 	else // setter
 	{
 		rgba newColor;
-		newColor.parseRGB( fn.arg(0).to_number<uint32_t>(&fn.env()) );
+		newColor.parseRGB( fn.arg(0).to_number<uint32_t>() );
 		ptr->setTextColor(newColor);
 	}
 
@@ -1980,7 +1980,7 @@ textfield_autoSize_getset(const fn_call& fn)
 		}
 		else
 		{
-			std::string strval = arg.to_string(&(fn.env()));
+			std::string strval = arg.to_string();
 			edit_text_character::AutoSizeValue val = ptr->parseAutoSizeValue(strval);
 			//log_debug("%s => %d", strval.c_str(), val);
 			ptr->setAutoSize( val );

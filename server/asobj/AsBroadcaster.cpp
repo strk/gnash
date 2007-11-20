@@ -284,13 +284,13 @@ AsBroadcaster::removeListener_method(const fn_call& fn)
 		);
 
 		// TODO: implement brute force scan of pseudo-array
-		unsigned int length = listenersObj->getMember(NSV::PROP_LENGTH).to_int(fn.env());
+		unsigned int length = listenersObj->getMember(NSV::PROP_LENGTH).to_int();
 		for (unsigned int i=0; i<length; ++i)
 		{
 			as_value iVal(i);
-			std::string n = iVal.to_string(&(fn.env()));
+			std::string n = iVal.to_string();
 			as_value v = listenersObj->getMember(VM::get().getStringTable().find(n));
-			if ( v.equals(listenerToRemove, fn.env()) )
+			if ( v.equals(listenerToRemove) )
 			{
 				listenersObj->callMethod(NSV::PROP_SPLICE, fn.env(), iVal, as_value(1));
 				return as_value(true); 

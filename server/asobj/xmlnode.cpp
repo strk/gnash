@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.40 2007/11/14 09:16:50 bwy Exp $ */
+/* $Id: xmlnode.cpp,v 1.41 2007/11/20 00:44:05 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -439,10 +439,10 @@ xmlnode_new(const fn_call& fn)
     XMLNode *xml_obj = new XMLNode;
     if ( fn.nargs > 0 )
     {
-        xml_obj->nodeTypeSet(XMLNode::NodeType(int(fn.arg(0).to_number(&(fn.env())))));
+        xml_obj->nodeTypeSet(XMLNode::NodeType(int(fn.arg(0).to_number())));
         if (fn.nargs > 1)
         {
-            xml_obj->nodeValueSet(fn.arg(1).to_string(&(fn.env())));
+            xml_obj->nodeValueSet(fn.arg(1).to_string());
         }
     }
     
@@ -590,7 +590,7 @@ xmlnode_nodevalue(const fn_call& fn)
     }
     else
     {
-        ptr->nodeValueSet(fn.arg(0).to_string(&(fn.env())));
+        ptr->nodeValueSet(fn.arg(0).to_string());
     }
     return rv;
 }
@@ -610,7 +610,7 @@ xmlnode_nodename(const fn_call& fn)
     }
     else
     {
-	ptr->nodeNameSet(fn.arg(0).to_string(&(fn.env())));
+	ptr->nodeNameSet(fn.arg(0).to_string());
     }
     return rv;
 }

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.52 2007/11/14 09:16:49 bwy Exp $ */
+/* $Id: xml.cpp,v 1.53 2007/11/20 00:44:05 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -533,7 +533,7 @@ xml_load(const fn_call& fn)
   
     boost::intrusive_ptr<XML> xml_obj = ensureType<XML>(fn.this_ptr);
   
-    const std::string& filespec = fn.arg(0).to_string(&(fn.env()));
+    const std::string& filespec = fn.arg(0).to_string();
 
     URL url(filespec, get_base_url());
 
@@ -608,7 +608,7 @@ xml_new(const fn_call& fn)
             }
         }
 
-        const std::string& xml_in = fn.arg(0).to_string(&(fn.env()));
+        const std::string& xml_in = fn.arg(0).to_string();
         if ( xml_in.empty() )
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -660,7 +660,7 @@ xml_createelement(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     
     if (fn.nargs > 0) {
-        const std::string& text = fn.arg(0).to_string(&(fn.env()));
+        const std::string& text = fn.arg(0).to_string();
 	XMLNode *xml_obj = new XMLNode();
 	xml_obj->nodeNameSet(text);
 	xml_obj->nodeTypeSet(XMLNode::tText);
@@ -690,7 +690,7 @@ xml_createtextnode(const fn_call& fn)
     XMLNode *xml_obj;
 
     if (fn.nargs > 0) {
-	const std::string& text = fn.arg(0).to_string(&(fn.env()));
+	const std::string& text = fn.arg(0).to_string();
 	xml_obj = new XMLNode;
 	xml_obj->nodeValueSet(text);
 	xml_obj->nodeTypeSet(XMLNode::tText);
@@ -743,7 +743,7 @@ as_value xml_parsexml(const fn_call& fn)
         return as_value();
     }
 
-    const std::string& text = fn.arg(0).to_string(&(fn.env()));
+    const std::string& text = fn.arg(0).to_string();
     ptr->parseXML(text);
     
     return as_value();

@@ -1,3 +1,16 @@
+2007-10-20 Chad Musick <chadmusick@msbx.net>
+
+	* server/array.cpp as_value.cpp as_value.h character.cpp
+	  edit_text_character.cpp sprite_instance.cpp timers.cpp:
+	  Remove as_environment from value conversions.
+	* server/asobj/AsBroadcaster.cpp Color.cpp Global.cpp
+	  MoveClipLoader.cpp NetConnection.cpp NetStream.cpp Object.cpp
+	  Sound.cpp Stage.cpp string.cpp xml.cpp xmlnode.cpp xmlsocket.cpp:
+	  Remove as_environment from value conversions.
+	* testsuite/actionscript.all/TextField.as: Unexpected successes.
+	* testsuite/misc-ming.all/intervalTestRunner.cpp: Remove as_environment
+	  from value conversion.
+
 2007-11-19 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/parser/sound_definition.{h,cpp}: remove compiler

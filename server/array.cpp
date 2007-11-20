@@ -74,16 +74,16 @@ struct as_value_lt
 
 	inline int str_cmp(const as_value& a, const as_value& b)
 	{
-		std::string s = a.to_string_versioned(_sv, &_env);
-		return s.compare(b.to_string_versioned(_sv, &_env));
+		std::string s = a.to_string_versioned(_sv);
+		return s.compare(b.to_string_versioned(_sv));
 	}
 
 	inline int str_nocase_cmp(const as_value& a, const as_value& b)
 	{
 		using namespace boost::algorithm;
 
-		std::string c = to_upper_copy(a.to_string_versioned(_sv, &_env));
-		std::string d = to_upper_copy(b.to_string_versioned(_sv, &_env));
+		std::string c = to_upper_copy(a.to_string_versioned(_sv));
+		std::string d = to_upper_copy(b.to_string_versioned(_sv));
 		return c.compare(d);
 	}
 
@@ -93,8 +93,8 @@ struct as_value_lt
 		if (b.is_undefined()) return true;
 		if (a.is_null()) return false;
 		if (b.is_null()) return true;
-		double aval = a.to_number(&_env);
-		double bval = b.to_number(&_env);
+		double aval = a.to_number();
+		double bval = b.to_number();
 		if (isnan(aval)) return false;
 		if (isnan(bval)) return true;
 		return aval < bval;
@@ -106,8 +106,8 @@ struct as_value_lt
 		if (a.is_undefined()) return true;
 		if (b.is_null()) return false;
 		if (a.is_null()) return true;
-		double aval = a.to_number(&_env);
-		double bval = b.to_number(&_env);
+		double aval = a.to_number();
+		double bval = b.to_number();
 		if (isnan(bval)) return false;
 		if (isnan(aval)) return true;
 		return aval > bval;
@@ -117,8 +117,8 @@ struct as_value_lt
 	{
 		if (a.is_undefined() && b.is_undefined()) return true;
 		if (a.is_null() && b.is_null()) return true;
-		double aval = a.to_number(&_env);
-		double bval = b.to_number(&_env);
+		double aval = a.to_number();
+		double bval = b.to_number();
 		if (isnan(aval) && isnan(bval)) return true;
 		return aval == bval;
 	}
@@ -375,7 +375,7 @@ public:
 		assert(prevStackSize == _env.stack_size());
 #endif
 
-		return (*_zeroCmp)((int)ret.to_number(&_env));
+		return (*_zeroCmp)((int)ret.to_number());
 	}
 };
 
@@ -643,7 +643,7 @@ as_array_object::reverse()
 }
 
 std::string
-as_array_object::join(const std::string& separator, as_environment* env) const
+as_array_object::join(const std::string& separator, as_environment*) const
 {
 	// TODO - confirm this is the right format!
 	// Reportedly, flash version 7 on linux, and Flash 8 on IE look like
@@ -664,12 +664,12 @@ as_array_object::join(const std::string& separator, as_environment* env) const
 			itEnd=elements.end();
 
 		// print first element w/out separator prefix
-		temp += (*it++).to_string_versioned(swfversion, env);
+		temp += (*it++).to_string_versioned(swfversion);
 
 		// print subsequent elements with separator prefix
 		while ( it != itEnd )
 		{
-			temp += separator + (*it++).to_string_versioned(swfversion, env);
+			temp += separator + (*it++).to_string_versioned(swfversion);
 		}
 	}
 
@@ -780,11 +780,11 @@ as_array_object::splice(unsigned start, unsigned len,
 }
 
 bool
-as_array_object::removeFirst(const as_value& v, as_environment& env)
+as_array_object::removeFirst(const as_value& v, as_environment&)
 {
 	for (iterator it = elements.begin(); it != elements.end(); ++it)
 	{
-		if ( v.equals(*it, env) )
+		if ( v.equals(*it) )
 		{
 			elements.erase(it);
 			return true;
@@ -892,7 +892,7 @@ array_splice(const fn_call& fn)
 	// Get start offset
 	//----------------
 	unsigned startoffset;
-	int start = fn.arg(0).to_number<int>(&(fn.env()));
+	int start = fn.arg(0).to_number<int>();
 	if ( start < 0 ) start = array->size()+start; // start is negative, so + means -abs()
 	startoffset = iclamp(start, 0, origlen);
 #ifdef GNASH_DEBUG
@@ -906,7 +906,7 @@ array_splice(const fn_call& fn)
 	unsigned len = origlen - start;
 	if (fn.nargs > 1)
 	{
-		int lenval = fn.arg(1).to_number<int>(&(fn.env()));
+		int lenval = fn.arg(1).to_number<int>();
 		if ( lenval < 0 )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
@@ -1012,11 +1012,11 @@ array_sortOn(const fn_call& fn)
 	if ( fn.nargs > 0 && fn.arg(0).is_string() )
 	{
 		std::string propField = 
-			PROPNAME(fn.arg(0).to_string_versioned(sv, &env));
+			PROPNAME(fn.arg(0).to_string_versioned(sv));
 
 		if ( fn.nargs > 1 && fn.arg(1).is_number() )
 		{
-			flags = static_cast<uint8_t>(fn.arg(1).to_number(&env));
+			flags = static_cast<uint8_t>(fn.arg(1).to_number());
 			flags = flag_preprocess(flags, &do_unique, &do_index);
 		}
 		as_value_prop avc = as_value_prop(propField, 
@@ -1049,7 +1049,7 @@ array_sortOn(const fn_call& fn)
 			it != props->end(); ++it)
 		{
 			std::string s = 
-				PROPNAME((*it).to_string_versioned(sv, &env));
+				PROPNAME((*it).to_string_versioned(sv));
 			prp.push_back(s);
 		}
 		
@@ -1229,7 +1229,7 @@ array_join(const fn_call& fn)
 	as_environment* env = &(fn.env());
 
 	if (fn.nargs > 0)
-		separator = fn.arg(0).to_string_versioned(swfversion, env);
+		separator = fn.arg(0).to_string_versioned(swfversion);
 
 	std::string ret = array->join(separator, env);
 
@@ -1251,7 +1251,7 @@ array_to_string(const fn_call& fn)
 {
 	boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
 
-	std::string ret = array->toString(&(fn.env()));
+	std::string ret = array->toString();
 
 		IF_VERBOSE_ACTION
 		(
@@ -1304,7 +1304,6 @@ array_slice(const fn_call& fn)
 	// start and end index of the part we're slicing
 	int startindex, endindex;
 	unsigned int arraysize = array->size();
-	as_environment& env = fn.env();
 
 	if (fn.nargs > 2)
 	{
@@ -1324,7 +1323,7 @@ array_slice(const fn_call& fn)
 	}
 
 
-	startindex = int(fn.arg(0).to_number(&env));
+	startindex = int(fn.arg(0).to_number());
 
 	// if the index is negative, it means "places from the end"
 	// where -1 is the last element
@@ -1333,7 +1332,7 @@ array_slice(const fn_call& fn)
 	// if we sent at least two arguments, setup endindex
 	if (fn.nargs >= 2)
 	{
-		endindex = int(fn.arg(1).to_number(&env));
+		endindex = int(fn.arg(1).to_number());
 
 		// if the index is negative, it means
 		// "places from the end" where -1 is the last element
@@ -1365,7 +1364,7 @@ array_length(const fn_call& fn)
 
 	if ( fn.nargs ) // setter
 	{
-		int length = fn.arg(0).to_int(fn.env());
+		int length = fn.arg(0).to_int();
 		if ( length < 0 ) // TODO: set a max limit too ?
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
@@ -1402,14 +1401,13 @@ array_new(const fn_call& fn)
 		//
 		as_value index_number, undef_value;
 		int sv = VM::get().getSWFVersion();
-		as_environment* env = &(fn.env());
 		string_table& st = VM::get().getStringTable();
 
 		undef_value.set_undefined();
 		for (int i = 0; i < int(fn.arg(0).to_number()); i++)
 		{
 			index_number.set_int(i);
-			ao->set_member(st.find(index_number.to_string_versioned(sv, env)), undef_value);
+			ao->set_member(st.find(index_number.to_string_versioned(sv)), undef_value);
 		}
 	}
 	else

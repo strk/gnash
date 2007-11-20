@@ -286,7 +286,7 @@ sound_stop(const fn_call& fn)
 	int si = -1;
 
 	if (fn.nargs > 0) {
-		const std::string& name = fn.arg(0).to_string(&(fn.env()));
+		const std::string& name = fn.arg(0).to_string();
 
 		// check the import.
 		movie_definition* def = fn.env().get_target()->get_root_movie()->get_movie_definition();
@@ -334,7 +334,7 @@ sound_attachsound(const fn_call& fn)
 
 	boost::intrusive_ptr<Sound> so = ensureType<Sound>(fn.this_ptr);
 
-    const std::string& name = fn.arg(0).to_string(&(fn.env()));
+    const std::string& name = fn.arg(0).to_string();
     if (name.empty()) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("attachSound needs a non-empty string"));
@@ -444,7 +444,7 @@ sound_loadsound(const fn_call& fn)
 	}
 
 	boost::intrusive_ptr<Sound> so = ensureType<Sound>(fn.this_ptr);
-	so->loadSound(fn.arg(0).to_string(&(fn.env())), fn.arg(1).to_bool());
+	so->loadSound(fn.arg(0).to_string(), fn.arg(1).to_bool());
 
 	return as_value();
 }

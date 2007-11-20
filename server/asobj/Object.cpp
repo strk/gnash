@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Object.cpp,v 1.35 2007/11/14 21:17:32 strk Exp $ */
+/* $Id: Object.cpp,v 1.36 2007/11/20 00:44:04 cmusick Exp $ */
 
 #include "tu_config.h"
 #include "Object.h"
@@ -204,7 +204,7 @@ object_addproperty(const fn_call& fn)
 		}
 	}
 
-	const std::string& propname = fn.arg(0).to_string(&(fn.env()));
+	const std::string& propname = fn.arg(0).to_string();
 	if ( propname.empty() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -268,7 +268,7 @@ object_registerClass(const fn_call& fn)
 		}
 	}
 
-	const std::string& symbolid = fn.arg(0).to_string(&(fn.env()));
+	const std::string& symbolid = fn.arg(0).to_string();
 	if ( symbolid.empty() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -345,7 +345,7 @@ object_hasOwnProperty(const fn_call& fn)
 		return as_value(false);
 	}
 	as_value& arg = fn.arg(0);
-	const std::string& propname = arg.to_string(&(fn.env()));
+	const std::string& propname = arg.to_string();
 	if ( arg.is_undefined() || propname.empty() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -368,7 +368,7 @@ object_isPropertyEnumerable(const fn_call& fn)
 		return as_value();
 	}
 	as_value& arg = fn.arg(0);
-	const std::string& propname = arg.to_string(&(fn.env()));
+	const std::string& propname = arg.to_string();
 	if ( arg.is_undefined() || propname.empty() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(

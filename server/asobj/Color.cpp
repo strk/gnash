@@ -239,7 +239,7 @@ color_setrgb(const fn_call& fn)
 		return as_value();
 	}
 
-	int32_t color = fn.arg(0).to_int(fn.env());
+	int32_t color = fn.arg(0).to_int();
 
 	int r = (color&0xFF0000) >> 16;
 	int g = (color&0x00FF00) >> 8;
@@ -265,7 +265,7 @@ parseColorTransProp (as_object& obj, as_environment& env, string_table::key key,
 	double d;
 
 	if ( ! obj.get_member(key, &tmp) ) return;
-	d = tmp.to_number(&env);
+	d = tmp.to_number();
 	if ( scale ) *target = d/100.0;
 	else *target = d;
 }
@@ -356,7 +356,7 @@ color_ctor(const fn_call& fn)
 		{
 			// must be a target..
 			as_environment& env = fn.env();
-			character* ch = env.find_target(fn.arg(0).to_string(&env));
+			character* ch = env.find_target(fn.arg(0).to_string());
 			if ( ch ) sp = ch->to_movie();
 		}
 

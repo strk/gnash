@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.41 2007/10/26 08:26:54 strk Exp $ */
+/* $Id: string.cpp,v 1.42 2007/11/20 00:44:04 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -162,7 +162,7 @@ string_concat(const fn_call& fn)
     std::string str = obj->str();
 
     for (unsigned int i = 0; i < fn.nargs; i++) {
-        str += fn.arg(i).to_string(&(fn.env()));
+        str += fn.arg(i).to_string();
     }
 
     return as_value(str);
@@ -238,7 +238,7 @@ string_split(const fn_call& fn)
         return as_value(array.get());
     }
 
-    const std::string& delim = fn.arg(0).to_string(&(fn.env()));
+    const std::string& delim = fn.arg(0).to_string();
 
     // SWF5 didn't support multichar or empty delimiter
     if ( SWFVersion < 6 )
@@ -314,7 +314,7 @@ string_last_index_of(const fn_call& fn)
 
     ENSURE_FN_ARGS(1, 2, -1);
 
-    const std::string& toFind = fn.arg(0).to_string(&(fn.env()));
+    const std::string& toFind = fn.arg(0).to_string();
 
     size_t start = str.size();
 
@@ -344,13 +344,13 @@ string_sub_str(const fn_call& fn)
 
     as_environment& env = fn.env();
 
-    int start = valid_index(str, fn.arg(0).to_int(env));
+    int start = valid_index(str, fn.arg(0).to_int());
 
     int num = str.size();
 
     if (fn.nargs >= 2)
     {
-        num = fn.arg(1).to_int(env);
+        num = fn.arg(1).to_int();
 	if ( num < 0 )
 	{
 		if ( -num <= start ) num = 0;
@@ -425,14 +425,14 @@ string_index_of(const fn_call& fn)
     ENSURE_FN_ARGS(1, 2, -1);
 
     as_value& tfarg = fn.arg(0); // to find arg
-    const std::string& toFind = tfarg.to_string(&(fn.env()));
+    const std::string& toFind = tfarg.to_string();
 
     size_t start = 0;
 
     if (fn.nargs >= 2)
     {
         as_value& saval = fn.arg(1); // start arg val
-        int start_arg = saval.to_int(fn.env());
+        int start_arg = saval.to_int();
         if ( start_arg > 0 ) start = (size_t) start_arg;
 	else
 	{
@@ -569,7 +569,7 @@ string_ctor(const fn_call& fn)
     std::string& str = obj->str();
 
     if (fn.nargs > 0) {
-        str = fn.arg(0).to_string(&(fn.env()));
+        str = fn.arg(0).to_string();
     }
 
     // this shouldn't be needed

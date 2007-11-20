@@ -77,7 +77,7 @@ as_value::as_value(as_function* func)
 
 // Conversion to const std::string&.
 std::string
-as_value::to_string(as_environment* env) const
+as_value::to_string() const
 {
 	switch (m_type)
 	{
@@ -129,26 +129,22 @@ as_value::to_string(as_environment* env) const
 		case AS_FUNCTION:
 		{
 			as_object* obj = m_type == OBJECT ? getObj().get() : getFun().get();
-			if ( env )
+			try
 			{
-				try
-				{
-					as_value ret = to_primitive(*env, STRING);
-					// This additional is_string test is NOT compliant with ECMA-262
-					// specification, but seems required for compatibility with the
-					// reference player.
+				as_value ret = to_primitive(STRING);
+				// This additional is_string test is NOT compliant with ECMA-262
+				// specification, but seems required for compatibility with the
+				// reference player.
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-					log_debug(" %s.to_primitive(STRING) returned %s", to_debug_string().c_str(), ret.to_debug_string().c_str());
+				log_debug(" %s.to_primitive(STRING) returned %s", to_debug_string().c_str(), ret.to_debug_string().c_str());
 #endif
-					if ( ret.is_string() ) return ret.to_string();
-				}
-				catch (ActionTypeError& e)
-				{
-					log_debug(_("to_primitive(%s, STRING) threw an ActionTypeError %s"),
-							to_debug_string().c_str(), e.what());
-				}
+				if ( ret.is_string() ) return ret.to_string();
 			}
-			else log_debug("%s.to_number() called w/out env", to_debug_string().c_str());
+			catch (ActionTypeError& e)
+			{
+				log_debug(_("to_primitive(%s, STRING) threw an ActionTypeError %s"),
+						to_debug_string().c_str(), e.what());
+			}
 
 			if ( m_type == OBJECT ) return "[type Object]";
 			assert(m_type == AS_FUNCTION);
@@ -164,7 +160,7 @@ as_value::to_string(as_environment* env) const
 
 // Conversion to const std::string&.
 std::string
-as_value::to_string_versioned(int version, as_environment* env) const
+as_value::to_string_versioned(int version) const
 {
 	if (m_type == UNDEFINED)
 	{
@@ -176,7 +172,7 @@ as_value::to_string_versioned(int version, as_environment* env) const
 		return "undefined";
 	}
 		
-	return to_string(env);
+	return to_string();
 }
 
 primitive_types
@@ -212,7 +208,7 @@ as_value::ptype() const
 
 // Conversion to primitive value.
 as_value
-as_value::to_primitive(as_environment& env) const
+as_value::to_primitive() const
 {
 	VM& vm = VM::get();
 	int swfVersion = vm.getSWFVersion();
@@ -231,12 +227,12 @@ as_value::to_primitive(as_environment& env) const
 	}
 #endif
 
-	return to_primitive(env, hint);
+	return to_primitive(hint);
 }
 
 // Conversion to primitive value.
 as_value
-as_value::to_primitive(as_environment& env, type hint) const
+as_value::to_primitive(type hint) const
 {
 	if ( m_type != OBJECT && m_type != AS_FUNCTION ) return *this; 
 	//if ( ! is_object() ) return *this; // include MOVIECLIP !!
@@ -289,7 +285,6 @@ as_value::to_primitive(as_environment& env, type hint) const
 		if ( m_type == OBJECT ) obj = getObj().get();
 		else obj = getFun().get();
 
-		//printf("as_value to string conversion, env=%p\n", env);
 		// @@ Moock says, "the value that results from
 		// calling toString() on the object".
 		//
@@ -324,6 +319,7 @@ as_value::to_primitive(as_environment& env, type hint) const
 
 	assert(obj);
 
+	as_environment env;
 	as_value ret = call_method0(method, &env, obj);
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 	log_debug("to_primitive: method call returned %s", ret.to_debug_string().c_str());
@@ -339,7 +335,7 @@ as_value::to_primitive(as_environment& env, type hint) const
 }
 
 double
-as_value::to_number(as_environment* env) const
+as_value::to_number() const
 {
 	// TODO:  split in to_number_# (version based)
 
@@ -394,35 +390,24 @@ as_value::to_number(as_environment* env) const
 			//
 			// Arrays and Movieclips should return NaN.
 
-			//log_msg(_("OBJECT to number conversion, env is %p"), env);
-
 			as_object* obj = m_type == OBJECT ? getObj().get() : getFun().get();
-			if ( env )
+			try
 			{
-				try
-				{
-					as_value ret = to_primitive(*env, NUMBER);
-					// env shouldn't be needed as to_primitive ensure a primitive type is returned
-					return ret.to_number();
-				}
-				catch (ActionTypeError& e)
-				{
-					log_debug(_("to_primitive(%s, NUMBER) threw an ActionTypeError %s"),
-							to_debug_string().c_str(), e.what());
-					if ( m_type == AS_FUNCTION && swfversion < 6 )
-					{
-						return 0;
-					}
-					else
-					{
-						return NAN;
-					}
-				}
+				as_value ret = to_primitive(NUMBER);
+				return ret.to_number();
 			}
-			else
+			catch (ActionTypeError& e)
 			{
-				log_debug("%s.to_number() called w/out env", to_debug_string().c_str());
-				return obj->get_numeric_value(); 
+				log_debug(_("to_primitive(%s, NUMBER) threw an ActionTypeError %s"),
+						to_debug_string().c_str(), e.what());
+				if ( m_type == AS_FUNCTION && swfversion < 6 )
+				{
+					return 0;
+				}
+				else
+				{
+					return NAN;
+				}
 			}
 		    }
 
@@ -440,9 +425,9 @@ as_value::to_number(as_environment* env) const
 }
 
 int32_t
-as_value::to_int(as_environment& env) const
+as_value::to_int() const
 {
-	double d = to_number(&env);
+	double d = to_number();
 	int i=0;
 
 	if ( ! isfinite(d) ) return 0;
@@ -636,9 +621,9 @@ as_value::to_as_function() const
 
 // Force type to number.
 void
-as_value::convert_to_number(as_environment* env)
+as_value::convert_to_number()
 {
-    set_double(to_number(env));
+    set_double(to_number());
 }
 
 // Force type to string.
@@ -653,10 +638,10 @@ as_value::convert_to_string()
 
 
 void
-as_value::convert_to_string_versioned(int version, as_environment* env)
+as_value::convert_to_string_versioned(int version)
     // Force type to string.
 {
-    std::string ns = to_string_versioned(version, env);
+    std::string ns = to_string_versioned(version);
     drop_refs();
     m_type = STRING;	// force type.
     _value = ns;
@@ -740,7 +725,7 @@ as_value::conforms_to(string_table::key name)
 }
 
 bool
-as_value::equals(const as_value& v, as_environment& env) const
+as_value::equals(const as_value& v) const
 {
     // Comments starting with numbers refer to the ECMA-262 document
 
@@ -749,7 +734,7 @@ as_value::equals(const as_value& v, as_environment& env) const
     log_debug("equals(%s, %s) called [%d]", to_debug_string().c_str(), v.to_debug_string().c_str(), count++);
 #endif
 
-    int SWFVersion = env.get_version();
+    int SWFVersion = VM::get().getSWFVersion();
 
     bool this_nulltype = (m_type == UNDEFINED || m_type == NULLTYPE);
     bool v_nulltype = (v.get_type() == UNDEFINED || v.get_type() == NULLTYPE);
@@ -786,7 +771,7 @@ as_value::equals(const as_value& v, as_environment& env) const
     //    return the result of the comparison x == ToNumber(y).
     if (m_type == NUMBER && v.m_type == STRING)
     {
-	double n = v.to_number(&env); // no need for the env actually
+	double n = v.to_number();
 	if ( ! isfinite(n) ) return false;
         return equalsSameType(n);
     }
@@ -795,7 +780,7 @@ as_value::equals(const as_value& v, as_environment& env) const
     //     return the result of the comparison ToNumber(x) == y.
     if (v.m_type == NUMBER && m_type == STRING)
     {
-	double n = to_number(&env); // no need for the env actually
+	double n = to_number();
 	if ( ! isfinite(n) ) return false;
         return v.equalsSameType(n); 
     }
@@ -803,13 +788,13 @@ as_value::equals(const as_value& v, as_environment& env) const
     // 18. If Type(x) is Boolean, return the result of the comparison ToNumber(x) == y.
     if (m_type == BOOLEAN)
     {
-        return as_value(to_number(&env)).equals(v, env); 
+        return as_value(to_number()).equals(v); 
     }
 
     // 19. If Type(y) is Boolean, return the result of the comparison x == ToNumber(y).
     if (v.m_type == BOOLEAN)
     {
-        return as_value(v.to_number(&env)).equals(*this, env); 
+        return as_value(v.to_number()).equals(*this); 
     }
 
     // 20. If Type(x) is either String or Number and Type(y) is Object,
@@ -819,14 +804,14 @@ as_value::equals(const as_value& v, as_environment& env) const
         // convert this value to a primitive and recurse
 	try
 	{
-		as_value v2 = v.to_primitive(env); 
+		as_value v2 = v.to_primitive(); 
 		if ( v.strictly_equals(v2) ) return false;
 
 #ifdef GNASH_DEBUG_EQUALITY
 		log_debug(" 20: convertion to primitive : %s -> %s", v.to_debug_string().c_str(), v2.to_debug_string().c_str());
 #endif
 
-		return equals(v2, env);
+		return equals(v2);
 	}
 	catch (ActionTypeError& e)
 	{
@@ -845,14 +830,14 @@ as_value::equals(const as_value& v, as_environment& env) const
         // convert this value to a primitive and recurse
         try
 	{
-        	as_value v2 = to_primitive(env); 
+        	as_value v2 = to_primitive(); 
 		if ( strictly_equals(v2) ) return false;
 
 #ifdef GNASH_DEBUG_EQUALITY
 		log_debug(" 21: convertion to primitive : %s -> %s", to_debug_string().c_str(), v2.to_debug_string().c_str());
 #endif
 
-		return v2.equals(v, env);
+		return v2.equals(v);
 	}
 	catch (ActionTypeError& e)
 	{
@@ -880,7 +865,7 @@ as_value::equals(const as_value& v, as_environment& env) const
 	int converted = 0;
 	try
 	{
-		p = to_primitive(env); 
+		p = to_primitive(); 
 		if ( ! strictly_equals(p) ) ++converted;
 #ifdef GNASH_DEBUG_EQUALITY
 		log_debug(" convertion to primitive (this): %s -> %s", to_debug_string().c_str(), p.to_debug_string().c_str());
@@ -896,7 +881,7 @@ as_value::equals(const as_value& v, as_environment& env) const
 
 	try
 	{
-		vp = v.to_primitive(env); 
+		vp = v.to_primitive(); 
 		if ( ! v.strictly_equals(vp) ) ++converted;
 #ifdef GNASH_DEBUG_EQUALITY
 		log_debug(" convertion to primitive (that): %s -> %s", v.to_debug_string().c_str(), vp.to_debug_string().c_str());
@@ -915,7 +900,7 @@ as_value::equals(const as_value& v, as_environment& env) const
 #ifdef GNASH_DEBUG_EQUALITY
 		log_debug(" some conversion took place, recurring");
 #endif
-		return p.equals(vp, env);
+		return p.equals(vp);
 	}
 	else
 	{

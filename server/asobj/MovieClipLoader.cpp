@@ -288,9 +288,9 @@ moviecliploader_loadclip(const fn_call& fn)
 		return;
 	}
 #endif
-	std::string str_url = url_arg.to_string(&env); 
+	std::string str_url = url_arg.to_string(); 
 
-	character* target = fn.env().find_target(fn.arg(1).to_string(&env));
+	character* target = fn.env().find_target(fn.arg(1).to_string());
 	if ( ! target )
 	{
 		log_error(_("Could not find target %s"), fn.arg(1).to_string().c_str());

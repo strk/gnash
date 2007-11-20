@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetConnection.cpp,v 1.50 2007/08/31 21:53:32 strk Exp $ */
+/* $Id: NetConnection.cpp,v 1.51 2007/11/20 00:44:04 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -238,7 +238,7 @@ NetConnection::connect_method(const fn_call& fn)
 	}
 
 	/// .. TODO: checkme ... addToURL ?? shoudnl't we attempt a connection ??
-	ptr->addToURL(url_val.to_string(&fn.env()));
+	ptr->addToURL(url_val.to_string());
 
 	if ( fn.nargs > 1 )
 	{

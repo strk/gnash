@@ -213,7 +213,7 @@ static as_value sprite_attach_movie(const fn_call& fn)
 	}
 
 	// Get exported resource 
-	const std::string& id_name = fn.arg(0).to_string(&fn.env());
+	const std::string& id_name = fn.arg(0).to_string();
 
 	boost::intrusive_ptr<resource> exported = sprite->get_movie_definition()->get_exported_resource(id_name);
 	if ( exported == NULL )
@@ -239,7 +239,7 @@ static as_value sprite_attach_movie(const fn_call& fn)
 		return rv;
 	}
 
-	const std::string& newname = fn.arg(1).to_string(&fn.env());
+	const std::string& newname = fn.arg(1).to_string();
 
 	// should we support negative depths ? YES !
 	int depth_val = uint16_t(fn.arg(2).to_number());
@@ -416,7 +416,7 @@ static as_value sprite_swap_depths(const fn_call& fn)
 	// sprite.swapDepth(depth)
 	else
 	{
-		double td = fn.arg(0).to_number(&(fn.env()));
+		double td = fn.arg(0).to_number();
 		if ( isnan(td) )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
@@ -474,7 +474,7 @@ static as_value sprite_duplicate_movieclip(const fn_call& fn)
 		return as_value();
 	}
 
-	const std::string& newname = fn.arg(0).to_string(&fn.env());
+	const std::string& newname = fn.arg(0).to_string();
 	int depth = int(fn.arg(1).to_number());
 
 	boost::intrusive_ptr<sprite_instance> ch;
@@ -590,7 +590,7 @@ static as_value sprite_load_movie(const fn_call& fn)
 		return as_value();
 	}
 
-	const std::string& urlstr = fn.arg(0).to_string(&fn.env());
+	const std::string& urlstr = fn.arg(0).to_string();
 	if (urlstr.empty())
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -638,7 +638,7 @@ static as_value sprite_load_variables(const fn_call& fn)
 		return as_value();
 	}
 
-	const std::string& urlstr = fn.arg(0).to_string(&fn.env());
+	const std::string& urlstr = fn.arg(0).to_string();
 	if (urlstr.empty())
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -657,7 +657,7 @@ static as_value sprite_load_variables(const fn_call& fn)
 
 	if (fn.nargs > 1)
 	{
-		const std::string& methodstring = fn.arg(1).to_string(&fn.env());
+		const std::string& methodstring = fn.arg(1).to_string();
 		// Should we be case-insensitive in comparing these ?
 		if ( methodstring == "GET" ) method = 1;
 		else if ( methodstring == "POST" ) method = 2;
@@ -694,14 +694,12 @@ static as_value sprite_hit_test(const fn_call& fn)
 	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 	UNUSED(sprite);
 
-	as_environment& env = fn.env();
-
 	switch (fn.nargs)
 	{
 		case 1: // target
 		{
 			as_value& tgt_val = fn.arg(0);
-			character* target = fn.env().find_target(tgt_val.to_string(&env));
+			character* target = fn.env().find_target(tgt_val.to_string());
 			if ( ! target )
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
@@ -726,16 +724,16 @@ static as_value sprite_hit_test(const fn_call& fn)
 
 		case 2: // x, y
 		{
-			float x = PIXELS_TO_TWIPS(fn.arg(0).to_number(&env));
-			float y = PIXELS_TO_TWIPS(fn.arg(1).to_number(&env));
+			float x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
+			float y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
 
 			return sprite->pointInBounds(x, y);
 		}
 
 		case 3: // x, y, shapeFlag
 		{
-			double x = PIXELS_TO_TWIPS(fn.arg(0).to_number(&env));
-			double y = PIXELS_TO_TWIPS(fn.arg(1).to_number(&env));
+			double x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
+			double y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
 			bool shapeFlag = fn.arg(2).to_bool();
 
 			if ( ! shapeFlag ) return sprite->pointInBounds(x, y);
@@ -818,7 +816,7 @@ sprite_create_text_field(const fn_call& fn)
 		);
 		return as_value();
 	}
-	float txt_width = fn.arg(4).to_number(&fn.env());
+	float txt_width = fn.arg(4).to_number();
 	if ( txt_width < 0 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -836,7 +834,7 @@ sprite_create_text_field(const fn_call& fn)
 		);
 		return as_value();
 	}
-	float txt_height = fn.arg(5).to_number(&fn.env());
+	float txt_height = fn.arg(5).to_number();
 	if ( txt_height < 0 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -878,7 +876,7 @@ sprite_getInstanceAtDepth(const fn_call& fn)
 		return as_value();
 	}
 
-	int depth = fn.arg(0).to_number<int>(&fn.env());
+	int depth = fn.arg(0).to_number<int>();
 	boost::intrusive_ptr<character> ch = sprite->get_character_at_depth(depth);
 	if ( ! ch ) return as_value(); // we want 'undefined', not 'null'
 	return as_value(ch.get());
@@ -1019,7 +1017,7 @@ sprite_globalToLocal(const fn_call& fn)
 		);
 		return ret;
 	}
-	x = PIXELS_TO_TWIPS(tmp.to_number(&fn.env()));
+	x = PIXELS_TO_TWIPS(tmp.to_number());
 
 	if ( ! obj->get_member(NSV::PROP_Y, &tmp) )
 	{
@@ -1030,7 +1028,7 @@ sprite_globalToLocal(const fn_call& fn)
 		);
 		return ret;
 	}
-	y = PIXELS_TO_TWIPS(tmp.to_number(&fn.env()));
+	y = PIXELS_TO_TWIPS(tmp.to_number());
 
 	point pt(x, y);
 	matrix world_mat = sprite->get_world_matrix();
@@ -1081,7 +1079,7 @@ sprite_localToGlobal(const fn_call& fn)
 		);
 		return ret;
 	}
-	x = PIXELS_TO_TWIPS(tmp.to_number(&fn.env()));
+	x = PIXELS_TO_TWIPS(tmp.to_number());
 
 	if ( ! obj->get_member(NSV::PROP_Y, &tmp) )
 	{
@@ -1092,7 +1090,7 @@ sprite_localToGlobal(const fn_call& fn)
 		);
 		return ret;
 	}
-	y = PIXELS_TO_TWIPS(tmp.to_number(&fn.env()));
+	y = PIXELS_TO_TWIPS(tmp.to_number());
 
 	point pt(x, y);
 	matrix world_mat = sprite->get_world_matrix();
@@ -1224,19 +1222,19 @@ sprite_lineStyle(const fn_call& fn)
 		return as_value();
 	}
 
-	thickness = uint16_t(PIXELS_TO_TWIPS(uint16_t(fclamp(fn.arg(0).to_number(&fn.env()), 0, 255))));
+	thickness = uint16_t(PIXELS_TO_TWIPS(uint16_t(fclamp(fn.arg(0).to_number(), 0, 255))));
 
 	if ( fn.nargs > 1 )
 	{
 		// 2^24 is the max here
-		uint32_t rgbval = uint32_t(fclamp(fn.arg(1).to_number(&fn.env()), 0, 16777216));
+		uint32_t rgbval = uint32_t(fclamp(fn.arg(1).to_number(), 0, 16777216));
 		r = uint8_t( (rgbval&0xFF0000) >> 16);
 		g = uint8_t( (rgbval&0x00FF00) >> 8);
 		b = uint8_t( (rgbval&0x0000FF) );
 
 		if ( fn.nargs > 2 )
 		{
-			float alphaval = fclamp(fn.arg(2).to_number(&fn.env()), 0, 100);
+			float alphaval = fclamp(fn.arg(2).to_number(), 0, 100);
 			a = uint8_t( 255 * (alphaval/100) );
 		}
 	}
@@ -1950,12 +1948,11 @@ sprite_instance::get_frame_number(const as_value& frame_spec, size_t& frameno) c
 {
 	//GNASH_REPORT_FUNCTION;
 
-	as_environment* env = const_cast<as_environment*>(&m_as_environment);
-	std::string fspecStr = frame_spec.to_string(env);
+	std::string fspecStr = frame_spec.to_string();
 
 	as_value str(fspecStr);
 
-	double num =  str.to_number(env);
+	double num =  str.to_number();
 
 	//log_debug("get_frame_number(%s), num: %g", frame_spec.to_debug_string().c_str(), num);
 
@@ -2347,11 +2344,10 @@ void sprite_instance::set_member(string_table::key name,
 #ifdef DEBUG_DYNTEXT_VARIABLES
 		log_debug(_("it's a Text Variable, associated with " SIZET_FMT " TextFields"), etc->size());
 #endif
-		as_environment* env = const_cast<as_environment*>(&m_as_environment);
 		for (TextFieldPtrVect::iterator i=etc->begin(), e=etc->end(); i!=e; ++i)
 		{
 			TextFieldPtr tf = *i;
-			tf->updateText(val.to_string(env));
+			tf->updateText(val.to_string());
 		}
 	}
 #ifdef DEBUG_DYNTEXT_VARIABLES

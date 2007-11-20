@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.73 2007/11/01 16:14:20 strk Exp $ */
+/* $Id: as_value.h,v 1.74 2007/11/20 00:44:03 cmusick Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -42,7 +42,6 @@ class as_object;
 class fn_call;
 class as_function;
 class sprite_instance;
-class as_environment;
 class asNamespace;
 class asName;
 
@@ -268,7 +267,7 @@ public:
 	///	The environment to use for running the toString() method
 	///	for object values. If NULL, toString() won't be run.
 	///
-	std::string to_string(as_environment* env=NULL) const;
+	std::string to_string() const;
 
 	std::string to_debug_string() const;
 
@@ -283,7 +282,7 @@ public:
 	///	The environment to use for running the toString() method
 	///	for object values. If NULL, toString() won't be run.
 	///
-	std::string to_string_versioned(int version, as_environment* env=NULL) const;
+	std::string to_string_versioned(int version) const;
 
 	/// Get a number representation for this value
 	//
@@ -291,7 +290,7 @@ public:
 	///	The environment to use for running the valueOf() method
 	///	for object values. If NULL, valueOf() won't be run.
 	///
-	double	to_number(as_environment* env=NULL) const;
+	double	to_number() const;
 
 	/// Conversion to 32bit integer
 	//
@@ -302,7 +301,7 @@ public:
 	///	The environment to use for running the valueOf() method
 	///	for object values. 
 	///
-	int32_t	to_int(as_environment& env) const;
+	int32_t	to_int() const;
 
 	/// Shorthand: casts the result of to_number() to the requested number
 	/// type.
@@ -314,9 +313,9 @@ public:
 	///       Implementing specializations for *all* integer types might be tedious
 	///
 	template <typename T>
-	T to_number (as_environment* env=NULL) const
+	T to_number () const
 	{
-		return static_cast<T>(to_number(env));
+		return static_cast<T>(to_number());
 	}
 
 	/// Conversion to boolean.
@@ -389,7 +388,7 @@ public:
 	///
 	/// @throw ActionTypeError if an object can't be converted to a primitive
 	///
-	as_value to_primitive(as_environment& env) const;
+	as_value to_primitive() const;
 
 	/// Return value as a primitive type, with a preference
 	//
@@ -404,7 +403,7 @@ public:
 	///
 	/// @throw ActionTypeError if an object can't be converted to a primitive
 	///
-	as_value to_primitive(as_environment& env, type hint) const;
+	as_value to_primitive(type hint) const;
 
 	/// Force type to number.
 	//
@@ -412,7 +411,7 @@ public:
 	///	The environment to use for running the valueOf() method
 	///	for object values. If NULL, valueOf() won't be run.
 	///
-	void	convert_to_number(as_environment* env);
+	void	convert_to_number();
 
 	/// Force type to string.
 	void	convert_to_string();
@@ -427,7 +426,7 @@ public:
 	///
 	/// @see to_string_versionioned
 	///
-	void	convert_to_string_versioned(int version, as_environment* env=NULL);
+	void	convert_to_string_versioned(int version);
 
 	// These set_*()'s are more type-safe; should be used
 	// in preference to generic overloaded set().  You are
@@ -534,7 +533,7 @@ public:
 	///	The environment to use for running the toString() and valueOf()
 	///	methods for object values. 
 	///
-	bool equals(const as_value& v, as_environment& env) const;
+	bool equals(const as_value& v) const;
 
 	/// Sets this value to this string plus the given string.
 	void	string_concat(const std::string& str);

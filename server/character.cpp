@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.63 2007/11/10 11:51:42 strk Exp $ */
+/* $Id: character.cpp,v 1.64 2007/11/20 00:44:03 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -214,7 +214,7 @@ character::x_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		double newx = fn.arg(0).to_number(&(fn.env()));
+		double newx = fn.arg(0).to_number();
 		matrix m = ptr->get_matrix();
 		m.set_x_translation(infinite_to_fzero(PIXELS_TO_TWIPS(newx)));
 		ptr->set_matrix(m);
@@ -237,7 +237,7 @@ character::y_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		double newy = fn.arg(0).to_number(&(fn.env()));
+		double newy = fn.arg(0).to_number();
 		matrix m = ptr->get_matrix();
 		m.set_y_translation(infinite_to_fzero(PIXELS_TO_TWIPS(newy)));
 		ptr->set_matrix(m);
@@ -263,7 +263,7 @@ character::xscale_getset(const fn_call& fn)
 	{
 		matrix m = ptr->get_matrix();
 
-		double scale_percent = fn.arg(0).to_number(&(fn.env()));
+		double scale_percent = fn.arg(0).to_number();
 
 		// Handle bogus values
 		if (isnan(scale_percent))
@@ -299,7 +299,7 @@ character::yscale_getset(const fn_call& fn)
 	{
 		matrix m = ptr->get_matrix();
 
-		double scale_percent = fn.arg(0).to_number(&(fn.env()));
+		double scale_percent = fn.arg(0).to_number();
 
 		// Handle bogus values
 		if (isnan(scale_percent))
@@ -430,7 +430,7 @@ character::width_getset(const fn_call& fn)
 		double oldwidth = bounds.width();
 		assert(oldwidth>0);
 
-		double newwidth = PIXELS_TO_TWIPS(fn.arg(0).to_number(&(fn.env())));
+		double newwidth = PIXELS_TO_TWIPS(fn.arg(0).to_number());
 		if ( newwidth <= 0 )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
@@ -475,7 +475,7 @@ character::height_getset(const fn_call& fn)
 		double oldheight = bounds.height();
 		assert(oldheight>0);
 
-		double newheight = PIXELS_TO_TWIPS(fn.arg(0).to_number(&(fn.env())));
+		double newheight = PIXELS_TO_TWIPS(fn.arg(0).to_number());
 		if ( newheight <= 0 )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
@@ -511,7 +511,7 @@ character::rotation_getset(const fn_call& fn)
 		matrix m = ptr->get_matrix();
 
 		// input is in degrees
-		float rotation = (float) fn.arg(0).to_number(&(fn.env())) * float(M_PI) / 180.f;
+		float rotation = (float) fn.arg(0).to_number() * float(M_PI) / 180.f;
 		m.set_rotation(rotation);
 
 		ptr->set_matrix(m);
@@ -562,7 +562,7 @@ character::name_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		ptr->set_name(fn.arg(0).to_string(&fn.env()).c_str());
+		ptr->set_name(fn.arg(0).to_string().c_str());
 	}
 
 	return as_value();

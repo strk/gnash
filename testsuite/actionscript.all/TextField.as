@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.31 2007/11/14 16:31:50 strk Exp $";
+rcsid="$Id: TextField.as,v 1.32 2007/11/20 00:44:05 cmusick Exp $";
 
 #include "check.as"
 
@@ -294,7 +294,7 @@ check(!tf.hasOwnProperty('htmlText'));
 check_equals(tf.htmlText, '');
 tf.htmlText = new Array;
 check_equals(typeof(tf.htmlText), 'string'); // forced cast to string
-xcheck_equals(tf.htmlText, ''); 
+check_equals(tf.htmlText, ''); 
 check_equals(tf.html, false);
 tf.htmlText = "Hello <b>html</b> world";
 check_equals(tf.html, false); // assigning to htmlText doesn't change the 'html' flag

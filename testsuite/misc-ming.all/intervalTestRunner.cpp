@@ -118,7 +118,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	root->get_member(st.find("pushed_args"), &tmp);
 	as_environment env; // needed for proper to_string()
-	check_equals(tmp.to_string(&env), std::string("8,9,10"));
+	check_equals(tmp.to_string(), std::string("8,9,10"));
 
 	root->get_member(st.find("test_completed"), &tmp);
 	check_equals(tmp.to_number(), 1);
