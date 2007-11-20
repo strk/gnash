@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.50 2007/11/10 11:51:41 strk Exp $ */
+/* $Id: render_handler.h,v 1.51 2007/11/20 17:17:10 bjacques Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -405,9 +405,23 @@ public:
     
   virtual void  set_antialiased(bool enable) = 0;
     
+  ///@{ Masks
+  ///
+  /// Masks are defined by drawing calls enclosed by begin_submit_mask()
+  /// and end_submit_mask(). Between these two calls, no drawing is to
+  /// occur. The shapes rendered between the two calls define the
+  /// visible region of the mask. Graphics that are irrelevant in the
+  /// context of a mask (lines and fill styles, for example) should be
+  /// ignored. After use, disable_mask() is called to remove the mask.
+  ///
+  /// Masks may be nested. That is, end_submit_mask() may be followed
+  /// by a call to begin_submit_mask(). The resulting mask shall be an
+  /// intersection of the previously created mask. disable_mask() shall
+  /// result in the disabling or destruction of the last created mask.
   virtual void begin_submit_mask() = 0;
   virtual void end_submit_mask() = 0;
   virtual void disable_mask() = 0;
+  ///@}
   
   /// \brief
   /// Draws the given character definition with the stateful properties

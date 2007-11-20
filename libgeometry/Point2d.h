@@ -21,7 +21,7 @@
 //
 
 
-/* $Id: Point2d.h,v 1.2 2007/11/10 11:51:42 strk Exp $ */
+/* $Id: Point2d.h,v 1.3 2007/11/20 17:17:10 bjacques Exp $ */
 
 #ifndef GNASH_POINT2DH
 #define GNASH_POINT2DH
@@ -141,6 +141,16 @@ public:
 	{
 		return sqrtf(squareDistance(p));
 	}
+
+	bool operator== (const Point2d<T>& p) const
+	{
+		return x == p.x && y == p.y;
+	}
+
+	bool operator!=(const Point2d<T>& p) const
+	{
+		return ! (*this == p);
+	}
 };
 
 /// Output operator
@@ -150,19 +160,6 @@ operator<< (std::ostream& os, const Point2d<T>& p)
 	return os << "Point2d(" << p.x << "," << p.y << ")";
 }
 
-/// Equality operator
-template <typename T> inline bool
-operator== (const Point2d<T>& p1, const Point2d<T>& p2)
-{
-	return p1.x == p2.x && p1.y == p2.y;
-}
-
-/// Inequality operator
-template <typename T> inline bool
-operator!= (const Point2d<T>& p1, const Point2d<T>& p2)
-{
-	return ! ( p1 == p2 );
-}
 
 
 } // namespace gnash::geometry

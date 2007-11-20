@@ -1,5 +1,10 @@
 2007-11-20 Bastiaan Jacques <bastiaan@bjacques.org>
 
+	* backend/render_handler.h: Document masks.
+	* libgeometry/Point2d.h: Define equality operators as clas members.
+
+2007-11-20 Bastiaan Jacques <bastiaan@bjacques.org>
+
 	* server/vm/ASHandlers.cpp: Fix typo.
 
 2007-11-20 Chad Musick <chadmusick@msbx.net>
