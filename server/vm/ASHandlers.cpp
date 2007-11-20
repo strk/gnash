@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.154 2007/11/20 00:44:05 cmusick Exp $ */
+/* $Id: ASHandlers.cpp,v 1.155 2007/11/20 05:53:58 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -851,10 +851,14 @@ void
 SWFHandlers::ActionStringEq(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    thread.ensureStack(2);
-    env.top(1).set_bool(env.top(1).to_string() == env.top(0).to_string());
-    env.drop(1);
+	as_environment& env = thread.env;
+	thread.ensureStack(2);
+	int version = env.get_version();
+	const std::string& str0 = env.top(0).to_string_versioned(version);
+	const std::string& str1 = env.top(1).to_string_versioned(version);
+
+	env.top(1).set_bool(str0 == str1);
+	env.drop(1);
 }
 
 void
