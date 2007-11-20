@@ -906,11 +906,11 @@ as_object::callMethod(string_table::key methodName,
 		return ret;
 	}
 
+	as_environment env;
+
 #ifndef NDEBUG
 	size_t origStackSize = env.stack_size();
 #endif
-
-	as_environment env;
 
 	env.push(arg1);
 	env.push(arg0);

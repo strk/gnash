@@ -1,5 +1,7 @@
 2007-11-20 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.cpp, server/asobj/AsBroadcaster.cpp:
+	  Fix build with --enable-cassert.
 	* extensions/fileio/fileio.cpp:
 	  Drop as_environment argument from to_string calls.
 
