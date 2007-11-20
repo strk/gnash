@@ -344,8 +344,8 @@ fileio_fopen(const fn_call& fn)
 		return as_value(false);
     }
 
-    string filespec = fn.arg(0).to_string(&fn.env());
-    string mode = fn.arg(1).to_string(&fn.env());
+    string filespec = fn.arg(0).to_string();
+    string mode = fn.arg(1).to_string();
     return as_value(ptr->fopen(filespec, mode));
 
 }
@@ -448,7 +448,7 @@ fileio_fputs(const fn_call& fn)
     //   GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<Fileio> ptr = ensureType<Fileio>(fn.this_ptr);
 
-    string str = fn.arg(0).to_string(&fn.env());
+    string str = fn.arg(0).to_string();
     return as_value(ptr->fputs(str));
 }
 
