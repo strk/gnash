@@ -1,3 +1,7 @@
+2007-11-20 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/vm/ASHandlers.cpp: Fix typo.
+
 2007-11-20 Chad Musick <chadmusick@msbx.net>
 
 	* server/array.cpp.h: Remove as_environment parameter from removeLast

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.155 2007/11/20 05:53:58 zoulunkai Exp $ */
+/* $Id: ASHandlers.cpp,v 1.156 2007/11/20 16:31:58 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -3223,7 +3223,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 //	// IT IS NOT GUARANTEE WE DO HAVE A METHOD NAME HERE !
 	if ( ! method_name.is_undefined() )
 	{
-		debugger.callStackPush(method_name.to_string();
+		debugger.callStackPush(method_name.to_string());
 		debugger.matchBreakPoint(method_name.to_string(), true);
 	}
 	else
