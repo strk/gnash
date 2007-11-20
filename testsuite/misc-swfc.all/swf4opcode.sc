@@ -60,6 +60,8 @@
         xcheck_equals(testvar, 1); 
         xcheck_equals('xyz', 0);
         xcheck_equals('abc', 0);
+        xcheck_equals('xyz', 'xyz');
+        xcheck_equals('xyz', 'abc');
         
         // test 'undefined' in swf4
         check_equals(uninitialized2, uninitialized3);
@@ -67,6 +69,16 @@
         check_equals(undefined, 0);
         check_equals(0, undefined);
         check_equals(undefined, undefined);
+        
+        // test 'Infinity' in swf4
+        // there's no 'Infinity' constants in swf4
+        check_equals(Infinity, undefined);
+        check_equals(Infinity, Infinity);
+        check_equals(Infinity, -Infinity);
+
+		// test 'null' in swf4
+		// there's no null in swf4
+		check_equals(null, undefined);
     .end
 
 .frame 3

@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.26 2007/11/15 23:38:14 strk Exp $";
+rcsid="$Id: ops.as,v 1.27 2007/11/20 08:54:33 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -28,7 +28,9 @@ rcsid="$Id: ops.as,v 1.26 2007/11/15 23:38:14 strk Exp $";
 //--------------------------------------------
 // Equality operator (ACTION_NEWEQUALS : 0x49)
 //--------------------------------------------
-
+check('xyz' == 'xyz');
+check(!('xyz' == 'XYZ'));
+check(!('xyz' == 'abc'));
 check(1 == 1); // doh
 check(1 == "1");
 check("1" == 1);
@@ -45,10 +47,16 @@ check(! ('string' == 0) );
 check(! (0 == 'string') );
 check(! ('string' == NaN) );
 check(! (NaN == 'string') );
-check(! (Infinite == 'Infinite') );
-check(! ('Infinite' == Infinite) );
-check(! (-Infinite == '-Infinite') );
-check(! ('-Infinite' == -Infinite) );
+check(! (Infinity == 'Infinity') );
+check(! ('Infinity' == Infinity) );
+check(! (-Infinity == '-Infinity') );
+check(! ('-Infinity' == -Infinity) );
+check(Infinity == Infinity);
+check(-Infinity == -Infinity);
+check(! (-Infinity == Infinity));
+x = 1;
+check_equals(x/0, Infinity);
+check_equals(-x/0, -Infinity);
 check(1==true);
 check(true==1);
 check(2!=true);
@@ -665,7 +673,7 @@ xcheck(y!=NaN);
 check(isNaN(y));
 
 #if OUTPUT_VERSION < 7
- totals(193);
+ totals(201);
 #else
- totals(195);
+ totals(203);
 #endif
