@@ -1,5 +1,10 @@
 2007-11-20 Zou Lunkai <zoulunkai@gmail.com>
 
+	* testsuite/misc-swfc.all/swf4opcode.sc, Makefile.am: add tests for swf4
+	  opcodes, get some failures.
+	  
+2007-11-20 Zou Lunkai <zoulunkai@gmail.com>
+
 	* server/vm/AsHandlers.cpp: using to_string_versioned() for opcode ActionStringEq,
 	  fix bug21567.
 	
