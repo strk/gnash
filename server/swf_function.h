@@ -84,17 +84,6 @@ private:
 	/// See http://sswf.sourceforge.net/SWFalexref.html#action_declare_function2
 	uint16_t	m_function2_flags;
 
-	/// Return a pointer to the given object's superclass interface
-	//
-	/// Super class prototype is : obj.__proto__.constructor.prototype
-	/// If any of the above element is undefined NULL is returned.
-	///
-	/// TODO: cleanup and optimize this function, probably delegating
-	///	  parts of it to the as_object class
-	///	  (getConstructor, for example)
-	///
-	static boost::intrusive_ptr<as_object> getSuper(as_object& obj);
-
 	/// Return an 'arguments' object.
 	//
 	/// The 'arguments' variable is an array with an additional

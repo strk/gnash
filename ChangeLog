@@ -1,5 +1,10 @@
 2007-10-20 Chad Musick <chadmusick@msbx.net>
 
+	* server/swf_function.h,.cpp: Remove getSuper function
+	* server/as_object.cpp: Implement get_super function.
+
+2007-10-20 Chad Musick <chadmusick@msbx.net>
+
 	* server/array.cpp as_value.cpp as_value.h character.cpp
 	  edit_text_character.cpp sprite_instance.cpp timers.cpp:
 	  Remove as_environment from value conversions.

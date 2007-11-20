@@ -138,8 +138,27 @@ as_object::getByIndex(int index)
 as_object*
 as_object::get_super()
 {
-	// TODO: Implement
-	return NULL;
+	// Super is this.__proto__.__constructor__.prototype
+	as_object *proto = get_prototype().get();
+	if (!proto)
+		return NULL;
+
+	as_value ctor;
+	bool ret = proto->get_member(NSV::PROP_uuCONSTRUCTORuu, &ctor);
+	if (!ret)
+		return NULL;
+
+	as_object *ctor_obj = ctor.to_object().get();
+	if (!ctor_obj)
+		return NULL;
+
+	as_value ctor_proto;
+	ret = ctor_obj->get_member(NSV::PROP_PROTOTYPE, &ctor_proto);
+	if (!ret)
+		return NULL;
+
+	as_object *super = ctor_proto.to_object().get();
+	return super;
 }
 
 as_function*

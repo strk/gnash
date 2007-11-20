@@ -70,75 +70,6 @@ swf_function::swf_function(const action_buffer* ab,
 }
 
 /*private static*/
-boost::intrusive_ptr<as_object>
-swf_function::getSuper(as_object& obj)
-{ 
-//#define GNASH_DEBUG_GETSUPER
-	// Super class prototype is : obj.__proto__.__constructor__.prototype 
-	boost::intrusive_ptr<as_object> proto = obj.get_prototype();
-	if ( ! proto )
-	{
-#ifdef GNASH_DEBUG_GETSUPER
-		log_msg("Object %p doesn't have a __proto__", &obj);
-#endif
-		return NULL;
-	}
-
-	// TODO: add a getConstructor() method to as_object
-	//       returning an as_function ?
-	//
-	as_value ctor;
-	bool ret = proto->get_member(NSV::PROP_uuCONSTRUCTORuu, &ctor);
-	if ( ! ret )
-	{
-#ifdef GNASH_DEBUG_GETSUPER
-		log_msg("Object.__proto__ %p doesn't have a __constructor__", (void*)proto.get());
-#endif
-		return NULL;
-	}
-
-	// TODO: if we cast ctor to an as_function and call getPrototype on it,
-	// 	 it is possible that the returned object is NOT the current
-	// 	 'prototype' member, as as_function caches it ?
-	//
-	boost::intrusive_ptr<as_object> ctor_obj = ctor.to_object();
-	if ( ! ctor_obj )
-	{
-#ifdef GNASH_DEBUG_GETSUPER
-		log_msg("Object.__proto__.__constructor__ doesn't cast to an object");
-#endif
-		return NULL;
-	}
-
-#ifdef GNASH_DEBUG_GETSUPER
-	log_msg("ctor_obj is %p", ctor_obj.get());
-#endif
-
-	as_value ctor_proto;
-	ret = ctor_obj->get_member(NSV::PROP_PROTOTYPE, &ctor_proto);
-	if ( ! ret )
-
-	{
-#ifdef GNASH_DEBUG_GETSUPER
-		log_msg("Object.__proto__.constructor %p doesn't have a prototype", ctor_obj.get());
-#endif
-		return NULL;
-	}
-
-	boost::intrusive_ptr<as_object> super = ctor_proto.to_object();
-	if ( ! super )
-	{
-#ifdef GNASH_DEBUG_GETSUPER
-		log_msg("Object.__proto__.constructor.prototype doesn't cast to an object");
-#endif
-		return NULL;
-	}
-
-	return super; // FIXME: return the intrusive_ptr directly !!
-
-}
-
-/*private static*/
 as_array_object* 
 swf_function::getArguments(swf_function& callee, const fn_call& fn)
 { 
@@ -181,6 +112,9 @@ swf_function::operator()(const fn_call& fn)
 	log_msg("  first_arg_bottom_index: %d\n", fn.first_arg_bottom_index);
 #endif
 
+	assert(fn.this_ptr);
+	as_object *super = fn.this_ptr->get_super();
+
 	// Some features are version-dependant
 	unsigned swfversion = VM::get().getSWFVersion();
 
@@ -206,7 +140,6 @@ swf_function::operator()(const fn_call& fn)
 		// Add 'super' (SWF6+ only)
 		if ( swfversion > 5 )
 		{
-			boost::intrusive_ptr<as_object> super = getSuper(*(fn.this_ptr));
 			our_env->set_local("super", as_value(super));
 		}
 
@@ -285,7 +218,7 @@ swf_function::operator()(const fn_call& fn)
 		if ( (m_function2_flags & PRELOAD_SUPER) && swfversion > 5)
 		{
 			// Put 'super' in a register (SWF6+ only).
-			our_env->local_register(current_reg).set_as_object(getSuper(*(fn.this_ptr)));
+			our_env->local_register(current_reg).set_as_object(super);
 			current_reg++;
 		}
 
@@ -296,7 +229,7 @@ swf_function::operator()(const fn_call& fn)
 		else if ( swfversion > 5 )
 		{
 			// Put 'super' in a local var (SWF6+ only)
-			our_env->add_local("super", as_value(getSuper(*(fn.this_ptr))));
+			our_env->add_local("super", as_value(super));
 		}
 
 		if (m_function2_flags & PRELOAD_ROOT) 
