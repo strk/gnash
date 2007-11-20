@@ -55,7 +55,18 @@
         testvar = ('' == '');  
         xcheck_equals(testvar, 1); 
         testvar = ('xyz' == 'abc');
+        //Ref: http://swishtutor.com
+        // both hands are converted to zero
         xcheck_equals(testvar, 1); 
+        xcheck_equals('xyz', 0);
+        xcheck_equals('abc', 0);
+        
+        // test 'undefined' in swf4
+        check_equals(uninitialized2, uninitialized3);
+        check_equals(uninitialized2, 0);
+        check_equals(undefined, 0);
+        check_equals(0, undefined);
+        check_equals(undefined, undefined);
     .end
 
 .frame 3
