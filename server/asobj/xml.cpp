@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.53 2007/11/20 00:44:05 cmusick Exp $ */
+/* $Id: xml.cpp,v 1.54 2007/11/20 10:31:39 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -433,7 +433,7 @@ XML::queueLoad(std::auto_ptr<tu_file> str,  as_environment& env)
         src.append(buf, bytes);
         if ( bytes < 255 ) break; // end of buffer
     }
-    callMethod(onDataKey, env, as_value(src));
+    callMethod(onDataKey, as_value(src));
 }
 
 // This reads in an XML file from disk and parses into into a memory resident
@@ -450,7 +450,7 @@ XML::load(const URL& url, as_environment& env)
     {
         log_error(_("Can't load XML file: %s (security?)"), url.str().c_str());
         as_value nullValue; nullValue.set_null();
-        callMethod(VM::get().getStringTable().find("onData"), env, nullValue);
+        callMethod(VM::get().getStringTable().find("onData"), nullValue);
         return false;
     }
 
@@ -797,14 +797,14 @@ xml_ondata(const fn_call& fn)
         string_table::key parseXMLKey = st.find(PROPNAME("parseXML"));
         as_value tmp(true);
         thisPtr->set_member(loadedKey, tmp);
-        thisPtr->callMethod(parseXMLKey, env, src);
-        thisPtr->callMethod(onLoadKey, env, tmp);
+        thisPtr->callMethod(parseXMLKey, src);
+        thisPtr->callMethod(onLoadKey, tmp);
     }
     else
     {
         as_value tmp(true);
         thisPtr->set_member(loadedKey, tmp);
-        thisPtr->callMethod(onLoadKey, env, tmp);
+        thisPtr->callMethod(onLoadKey, tmp);
     }
 
     return as_value();

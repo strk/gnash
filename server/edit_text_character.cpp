@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.132 2007/11/20 00:44:03 cmusick Exp $ */
+/* $Id: edit_text_character.cpp,v 1.133 2007/11/20 10:31:39 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2059,7 +2059,7 @@ edit_text_character::onChanged()
 	string_table& st = _vm.getStringTable();
 	string_table::key key = st.find(PROPNAME("onChanged"));
 	as_environment& env = const_cast<edit_text_character*>(this)->get_environment();
-	callMethod(key, env);
+	callMethod(key);
 }
 
 void
@@ -2068,7 +2068,7 @@ edit_text_character::onSetFocus()
 	string_table& st = _vm.getStringTable();
 	string_table::key key = st.find(PROPNAME("onSetFocus"));
 	as_environment& env = const_cast<edit_text_character*>(this)->get_environment();
-	callMethod(key, env);
+	callMethod(key);
 }
 
 void
@@ -2077,7 +2077,7 @@ edit_text_character::onKillFocus()
 	string_table& st = _vm.getStringTable();
 	string_table::key key = st.find(PROPNAME("onKillFocus"));
 	as_environment& env = const_cast<edit_text_character*>(this)->get_environment();
-	callMethod(key, env);
+	callMethod(key);
 }
 
 void

@@ -858,7 +858,7 @@ as_object::getMember(string_table::key name, string_table::key nsname)
 }
 
 as_value
-as_object::callMethod(string_table::key methodName, as_environment& env)
+as_object::callMethod(string_table::key methodName)
 {
 	as_value ret;
 	as_value method;
@@ -868,11 +868,13 @@ as_object::callMethod(string_table::key methodName, as_environment& env)
 		return ret;
 	}
 
+	as_environment env;
+
 	return call_method(method, &env, this, 0, env.stack_size());
 }
 
 as_value
-as_object::callMethod(string_table::key methodName, as_environment& env, const as_value& arg0)
+as_object::callMethod(string_table::key methodName, const as_value& arg0)
 {
 	as_value ret;
 	as_value method;
@@ -882,6 +884,7 @@ as_object::callMethod(string_table::key methodName, as_environment& env, const a
 		return ret;
 	}
 
+	as_environment env;
 	env.push(arg0);
 
 	ret = call_method(method, &env, this, 1, env.stack_size()-1);
@@ -892,7 +895,7 @@ as_object::callMethod(string_table::key methodName, as_environment& env, const a
 }
 
 as_value
-as_object::callMethod(string_table::key methodName, as_environment& env,
+as_object::callMethod(string_table::key methodName,
 	const as_value& arg0, const as_value& arg1)
 {
 	as_value ret;
@@ -906,6 +909,8 @@ as_object::callMethod(string_table::key methodName, as_environment& env,
 #ifndef NDEBUG
 	size_t origStackSize = env.stack_size();
 #endif
+
+	as_environment env;
 
 	env.push(arg1);
 	env.push(arg0);

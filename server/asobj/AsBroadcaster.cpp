@@ -41,10 +41,7 @@ class BroadcasterVisitor
 	/// Name of the event being broadcasted
 	/// appropriately cased based on SWF version
 	/// of the current VM
-	std::string _eventName;
-
-	/// Environment to use for marshalling and functions invokation
-	as_environment& _env;
+	string_table::key _eventName;
 
 	// These two will be needed for consistency checking
 	//size_t _origEnvStackSize;
@@ -53,7 +50,7 @@ class BroadcasterVisitor
 	/// Number of event dispatches
 	unsigned int _dispatched;
 
-	const fn_call& _fn;
+	fn_call _fn;
 
 public:
 
@@ -64,11 +61,12 @@ public:
 	///
 	BroadcasterVisitor(const fn_call& fn)
 		:
-		_eventName(PROPNAME(fn.arg(0).to_string())),
-		_env(fn.env()),
+		_eventName(0),
 		_dispatched(0),
 		_fn(fn)
 	{
+		_eventName = VM::get().getStringTable().find(PROPNAME(fn.arg(0).to_string()));
+		_fn.drop_bottom();
 	}
 
 	/// Call a method on the given value
@@ -78,7 +76,7 @@ public:
 		if ( ! o ) return;
 
 		as_value method;
-		o->get_member(VM::get().getStringTable().find(_eventName), &method);
+		o->get_member(_eventName, &method);
 
 		if ( method.is_function() )
 		{
@@ -86,7 +84,8 @@ public:
 #ifndef NDEBUG
 			size_t oldStackSize = _env.stack_size();
 #endif
-			call_method(method, &_env, o.get(), _fn.nargs-1, _fn.offset()-1);
+			_fn.this_ptr = o.get();
+			method.to_as_function()->call(_fn);
 
 			assert ( _env.stack_size() == oldStackSize );
 
@@ -182,7 +181,7 @@ AsBroadcaster::addListener_method(const fn_call& fn)
 	as_value newListener; assert(newListener.is_undefined());
 	if ( fn.nargs ) newListener = fn.arg(0);
 
-	obj->callMethod(NSV::PROP_REMOVE_LISTENER, fn.env(), newListener);
+	obj->callMethod(NSV::PROP_REMOVE_LISTENER, newListener);
 
 	as_value listenersValue;
 
@@ -223,7 +222,7 @@ AsBroadcaster::addListener_method(const fn_call& fn)
 			fn.dump_args().c_str(), listenersValue.to_debug_string().c_str());
 		);
 
-		listenersObj->callMethod(NSV::PROP_PUSH, fn.env(), newListener);
+		listenersObj->callMethod(NSV::PROP_PUSH, newListener);
 
 	}
 	else
@@ -292,7 +291,7 @@ AsBroadcaster::removeListener_method(const fn_call& fn)
 			as_value v = listenersObj->getMember(VM::get().getStringTable().find(n));
 			if ( v.equals(listenerToRemove) )
 			{
-				listenersObj->callMethod(NSV::PROP_SPLICE, fn.env(), iVal, as_value(1));
+				listenersObj->callMethod(NSV::PROP_SPLICE, iVal, as_value(1));
 				return as_value(true); 
 			}
 		}

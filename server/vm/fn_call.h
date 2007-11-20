@@ -55,6 +55,14 @@ public:
 	unsigned int nargs;
 
 public:
+	fn_call(const fn_call& fn) : this_ptr(fn.this_ptr), nargs(fn.nargs),
+		_env(fn._env), _stack_offset(fn._stack_offset)
+	{/**/}
+
+	fn_call(const fn_call& fn, as_object* this_in) : this_ptr(this_in),
+		nargs(fn.nargs), _env(fn._env), _stack_offset(fn._stack_offset)
+	{/**/}
+
 	fn_call(as_object* this_in,
 			as_environment* env_in,
 			int nargs_in, int first_in)
@@ -82,6 +90,17 @@ public:
 	{
 		assert(n < nargs);
 		return _env->bottom(_stack_offset - n);
+	}
+
+	void drop_top()
+	{
+		--nargs;
+	}
+
+	void drop_bottom()
+	{
+		--nargs;
+		--_stack_offset;
 	}
 
 	int offset() const

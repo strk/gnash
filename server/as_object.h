@@ -524,10 +524,10 @@ public:
 	///	or undefined if not found. Use get_member if you
 	///	need to know wheter it was found or not.
 	///
-	as_value callMethod(string_table::key name, as_environment& env);
-	as_value callMethod(string_table::key name, as_environment& env, const as_value& arg0);
-	as_value callMethod(string_table::key name, as_environment& env, const as_value& arg0, const as_value& arg1);
-	as_value callMethod(string_table::key name, as_environment& env, const as_value& arg0, const as_value& arg1, const as_value& arg2);
+	as_value callMethod(string_table::key name);
+	as_value callMethod(string_table::key name, const as_value& arg0);
+	as_value callMethod(string_table::key name, const as_value& arg0, const as_value& arg1);
+	as_value callMethod(string_table::key name, const as_value& arg0, const as_value& arg1, const as_value& arg2);
 
 	/// Delete a property of this object, unless protected from deletion.
 	//

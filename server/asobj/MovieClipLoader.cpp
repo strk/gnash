@@ -262,7 +262,7 @@ MovieClipLoader::dispatchEvent(const std::string& event, as_environment& env, co
 	as_value ev(event);
 
 	log_debug("dispatchEvent calling broadcastMessage with args %s and %s", ev.to_debug_string().c_str(), arg.to_debug_string().c_str());
-	callMethod(NSV::PROP_BROADCAST_MESSAGE, env, ev, arg);
+	callMethod(NSV::PROP_BROADCAST_MESSAGE, ev, arg);
 }
 
 static as_value

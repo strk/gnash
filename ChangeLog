@@ -1,3 +1,13 @@
+2007-11-20 Chad Musick <chadmusick@msbx.net>
+
+	* server/as_object.h,.cpp: Remove as_environment parameter from
+	  callMethod methods.
+	* server/edit_text_character.cpp: Fix call to callMethod
+	* server/asobj/AsBroadcaster.cpp Key.cpp MovieClipLoader.cpp
+	  xml.cpp xmlsocket.cpp: Fix calls to callMethod
+	* server/vm/fn_call.h: Add necessary support for removing env()
+	  function (not yet removed).
+
 2007-11-20 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-swfc.all/swf4opcode.sc, Makefile.am: add tests for swf4
@@ -7,8 +17,8 @@
 
 	* server/vm/AsHandlers.cpp: using to_string_versioned() for opcode ActionStringEq,
 	  fix bug21567.
-	
-2007-11-20 Chad Musick <chadmusick@msbx.net>
+
+2007-10-20 Chad Musick <chadmusick@msbx.net>
 
 	* server/swf_function.h,.cpp: Remove getSuper function
 	* server/as_object.cpp: Implement get_super function.

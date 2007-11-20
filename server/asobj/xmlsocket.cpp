@@ -456,7 +456,7 @@ xmlsocket_connect(const fn_call& fn)
     //
     log_debug(_("XMLSocket.connect(): tring to call onConnect"));
     as_environment& env = fn.env();
-    ptr->callMethod(st.find(PROPNAME("onConnect")), env, success);
+    ptr->callMethod(st.find(PROPNAME("onConnect")), success);
 	    
     if ( success )
     {
@@ -573,7 +573,7 @@ xmlsocket_onData(const fn_call& fn)
     VM& vm = VM::get();
     string_table& st = vm.getStringTable();
     
-    ptr->callMethod(st.find(PROPNAME("onXML")), env, arg);
+    ptr->callMethod(st.find(PROPNAME("onXML")), arg);
 
     return as_value();
 
