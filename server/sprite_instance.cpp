@@ -1951,7 +1951,7 @@ sprite_instance::get_frame_number(const as_value& frame_spec, size_t& frameno) c
 
 	//log_debug("get_frame_number(%s), num: %g", frame_spec.to_debug_string().c_str(), num);
 
-	if ( ! isfinite(num) || int(num) != num )
+	if ( ! isfinite(num) || int(num) != num || num == 0)
 	{
 		bool ret = m_def->get_labeled_frame(fspecStr, frameno);
 		//log_debug("get_labeled_frame(%s) returned %d, frameno is %d", fspecStr.c_str(), ret, frameno);
@@ -1959,9 +1959,9 @@ sprite_instance::get_frame_number(const as_value& frame_spec, size_t& frameno) c
 	}
 
 	// TODO: are we sure we shouldn't check for frames labeled with negative numbers ?
-	if ( num < 1 ) return false;
+	if ( num < 0 ) return false;
 
-	// all frame numbers >= 0 are valid, but a valid frame number may still
+	// all frame numbers > 0 are valid, but a valid frame number may still
 	// reference a non-exist frame(eg. frameno > total_frames).
 	frameno = size_t(num) - 1;
 
