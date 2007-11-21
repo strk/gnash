@@ -31,10 +31,12 @@
 // Dejagnu clip does not work/compile in swf4.
 //
 
-#define pass_check() { trace("PASSED: "); trace(__FILE__); }
-#define xpass_check() { trace("XPASSED: "); trace(__FILE__); }
-#define fail_check() { trace("FAILED: " ); trace(__FILE__); }
-#define xfail_check(){ trace("XFAILED: "); trace(__FILE__); }
+#define _INFO_ concat(' [', concat(__FILE__, concat(':', concat(__LINE__,']'))))
+
+#define pass_check() { trace(concat("PASSED: ", _INFO_)); }
+#define xpass_check() { trace(concat("XPASSED: ", _INFO_)); }
+#define fail_check() { trace(concat("FAILED: ", _INFO_)); }
+#define xfail_check(){ trace(concat("XFAILED: ", _INFO_)); }
 
 
 //

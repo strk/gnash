@@ -1,5 +1,11 @@
 2007-11-21 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfc.all/swf4opcode.sc: found a way for better
+	  test result reporting (can be improved to become a full SWF4
+	  compatible Dejagnu thing - lacks actual result message so far).
+
+2007-11-21 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp: implement MovieClip.{start,stop}Drag.
 	* testsuite/misc-ming.all/: DrawingApiTest.as,
 	  DrawingApiTestRunner.cpp:
