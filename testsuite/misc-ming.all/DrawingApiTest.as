@@ -17,7 +17,7 @@
 // 'h' toggles _visible
 //
 
-rcsid="$Id: DrawingApiTest.as,v 1.29 2007/11/10 18:07:14 strk Exp $";
+rcsid="$Id: DrawingApiTest.as,v 1.30 2007/11/21 18:08:58 strk Exp $";
 
 #include "../actionscript.all/check.as"
 
@@ -710,6 +710,16 @@ onKeyDown = function()
 		var newAlpha = page[visibleIndex]._alpha + 25;
 		if ( newAlpha > 100 ) newAlpha = 100;
 		page[visibleIndex]._alpha = newAlpha;
+	}
+	else if ( ascii == 100 ) // 'd' - start/stop dragging something :)
+	{
+		if ( ! hitdetector.dragging ) {
+			hitdetector.dragging = true;
+			hitdetector.startDrag();
+		} else {
+			hitdetector.dragging = flase;
+			hitdetector.stopDrag();
+		}
 	}
 
 };

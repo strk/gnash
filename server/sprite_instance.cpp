@@ -1341,14 +1341,12 @@ static as_value
 sprite_startDrag(const fn_call& fn)
 {
 	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
-	UNUSED(sprite);
 
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_unimpl("MovieClip.startDrag()");
-		warned=true;
-	}
+	drag_state st;
+	st.setCharacter( sprite.get() );
+	VM::get().getRoot().set_drag_state(st);
+
+	log_debug("MovieClip.startDrag() TESTING");
 	return as_value();
 }
 
@@ -1359,12 +1357,9 @@ sprite_stopDrag(const fn_call& fn)
 	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 	UNUSED(sprite);
 
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_unimpl("MovieClip.stopDrag()");
-		warned=true;
-	}
+	VM::get().getRoot().stop_drag();
+
+	log_debug("MovieClip.stopDrag() TESTING");
 	return as_value();
 }
 

@@ -1,5 +1,12 @@
 2007-11-21 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp: implement MovieClip.{start,stop}Drag.
+	* testsuite/misc-ming.all/: DrawingApiTest.as,
+	  DrawingApiTestRunner.cpp:
+	  Prepare for testing MoveClip.{start,stop}Drag
+
+2007-11-21 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.{cpp,h}: generalize key and mouse
 	  listeners management.
 	* server/sprite_instance.cpp (add_display_object): don't

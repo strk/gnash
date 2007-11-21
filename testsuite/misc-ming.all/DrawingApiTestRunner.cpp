@@ -746,5 +746,12 @@ main(int /*argc*/, char** /*argv*/)
 	// Cairo succeeds.
 	xcheck_pixel(xo + (20*scale), yo + (25*scale), 3, white, 2);
 
+	//----------------------------------------------------------
+	// TODO: check startDrag/stopDrag on the hit detector
+	// (hit 'd' key to toggle)
+	//----------------------------------------------------------
+	//
+
+
 }
 
