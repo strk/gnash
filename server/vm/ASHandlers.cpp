@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.156 2007/11/20 16:31:58 bjacques Exp $ */
+/* $Id: ASHandlers.cpp,v 1.157 2007/11/21 21:57:51 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -801,9 +801,7 @@ SWFHandlers::ActionEqual(ActionExec& thread)
     env.top(1).set_bool(op1.to_number() == op2.to_number());
 
     // Flash4 used 1 and 0 as return from this tag
-    if ( env.get_version() < 5 ) {
-      env.top(1).to_number();
-    }
+    if ( env.get_version() < 5 ) env.top(1).convert_to_number();
 
     env.drop(1);
 }
@@ -815,6 +813,10 @@ SWFHandlers::ActionLessThan(ActionExec& thread)
     as_environment& env = thread.env;
     thread.ensureStack(2);
     env.top(1).set_bool(env.top(1).to_number() < env.top(0).to_number());
+
+    // Flash4 used 1 and 0 as return from this tag
+    if ( env.get_version() < 5 ) env.top(1).convert_to_number();
+
     env.drop(1);
 }
 

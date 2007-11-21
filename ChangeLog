@@ -1,5 +1,10 @@
 2007-11-21 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionLessThen, ActionEqual):
+	  return a number rather then a bool in swf4 or lower.
+
+2007-11-21 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-swfc.all/swf4opcode.sc: found a way for better
 	  test result reporting (can be improved to become a full SWF4
 	  compatible Dejagnu thing - lacks actual result message so far).
