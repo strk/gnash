@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.28 2007/11/21 06:56:17 zoulunkai Exp $";
+rcsid="$Id: ops.as,v 1.29 2007/11/21 22:35:37 strk Exp $";
 
 #include "check.as"
 
@@ -350,6 +350,47 @@ z = x || y;
 check(z!=y);
 check_equals(z, true);
 
+//------------------------------------------------
+// String comparison (ACTION_STRINGCOMPARE : 0x29)
+//------------------------------------------------
+
+asm {
+	push "z", undefined, null
+	stringlessthan setvariable
+};
+check_equals(typeof(z), 'boolean');
+#if OUTPUT_VERSION < 7
+ check(z);
+#else
+ check(!z);
+#endif
+
+asm {
+	push "z", null, undefined
+	stringlessthan setvariable
+};
+check_equals(typeof(z), 'boolean');
+#if OUTPUT_VERSION < 7
+ check(!z);
+#else
+ check(z);
+#endif
+
+asm {
+	push "z", null, null
+	stringlessthan setvariable
+};
+check_equals(typeof(z), 'boolean');
+check(!z);
+
+asm {
+	push "z", undefined, undefined
+	stringlessthan setvariable
+};
+check_equals(typeof(z), 'boolean');
+check(!z);
+
+// TODO: add saner tests for stringcompare here
 
 //------------------------------------------------
 // Bitwise AND operator (ACTION_BITWISEAND : 0x60)
@@ -688,7 +729,7 @@ xcheck(y!=NaN);
 check(isNaN(y));
 
 #if OUTPUT_VERSION < 7
- totals(205);
+ totals(213);
 #else
- totals(207);
+ totals(215);
 #endif

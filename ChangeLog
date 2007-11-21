@@ -1,5 +1,12 @@
 2007-11-21 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionStringCompare):
+	  use versioned string conversion.
+	* testsuite/actionscript.all/ops.as: few null/undefined 
+	  string comparison tests.
+
+2007-11-21 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ASHandlers.cpp (ActionLessThen, ActionEqual):
 	  return a number rather then a bool in swf4 or lower.
 
