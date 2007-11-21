@@ -17,7 +17,7 @@
 // 'h' toggles _visible
 //
 
-rcsid="$Id: DrawingApiTest.as,v 1.30 2007/11/21 18:08:58 strk Exp $";
+rcsid="$Id: DrawingApiTest.as,v 1.31 2007/11/21 23:33:23 strk Exp $";
 
 #include "../actionscript.all/check.as"
 
@@ -716,6 +716,8 @@ onKeyDown = function()
 		if ( ! hitdetector.dragging ) {
 			hitdetector.dragging = true;
 			hitdetector.startDrag();
+			// hitdetector.startDrag(true); // lock centered
+			//hitdetector.startDrag(true, 100, 100, 200, 200); // lock centered, box-constrained
 		} else {
 			hitdetector.dragging = flase;
 			hitdetector.stopDrag();

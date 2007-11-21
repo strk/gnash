@@ -1,5 +1,10 @@
 2007-11-21 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (sprite_startDrag): add support for
+	  additional args.
+
+2007-11-21 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (get_frame_number):
 	  Consider frame specs evaluating to 0 as frame labels.
 	  Fixes bug #21567 (snoopy_click.swf).

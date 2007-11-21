@@ -1344,6 +1344,43 @@ sprite_startDrag(const fn_call& fn)
 
 	drag_state st;
 	st.setCharacter( sprite.get() );
+	if ( fn.nargs )
+	{
+		st.setLockCentered( fn.arg(0).to_bool() );
+
+		if ( fn.nargs >= 5)
+		{
+			float y1 = PIXELS_TO_TWIPS(fn.arg(1).to_number());
+			float x1 = PIXELS_TO_TWIPS(fn.arg(2).to_number());
+			float y0 = PIXELS_TO_TWIPS(fn.arg(3).to_number());
+			float x0 = PIXELS_TO_TWIPS(fn.arg(4).to_number());
+
+			// check for swapped values
+			bool swapped = false;
+			if ( y1 < y0 )
+			{
+				swap(y1, y0);
+				swapped = true;
+			}
+
+			if ( x1 < x0 )
+			{
+				swap(x1, x0);
+				swapped = true;
+			}
+
+			IF_VERBOSE_ASCODING_ERRORS(
+			if ( swapped ) {
+				std::stringstream ss; fn.dump_args(ss);
+				log_aserror(_("Y values in MovieClip.startDrag(%s) swapped, fixing"), ss.str().c_str());
+			}
+			);
+
+			rect bounds(x0, y0, x1, y1);
+			st.setBounds(bounds);
+		}
+	}
+
 	VM::get().getRoot().set_drag_state(st);
 
 	log_debug("MovieClip.startDrag() TESTING");
