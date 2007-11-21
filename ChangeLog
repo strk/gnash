@@ -1,3 +1,8 @@
+2007-11-21 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-swfc.all/swf4opcode.sc,
+	  testsuite/misc-actionsript.all/ops.as: more opcode tests. 
+	  
 2007-11-20 Sandro Santilli <strk@keybit.net>
 
 	* server/as_object.cpp, server/asobj/AsBroadcaster.cpp:

@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.27 2007/11/20 08:54:33 zoulunkai Exp $";
+rcsid="$Id: ops.as,v 1.28 2007/11/21 06:56:17 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -69,6 +69,21 @@ check_equals(true+true, 2);
 check_equals(true+false, 1);
 check_equals(false, 0);
 check_equals(false+false, 0);
+
+x = "abc";
+y = 0;
+z = x * y;
+
+// in swf4, z is 0, tested in swf4opcode.sc
+// in swf5~8, z is NaN.
+check(! (z == 0));  
+check(isNaN(z));
+// both EMACS and Moock's book says NaN != NaN, now I believe they are correct.
+// we have enough tests to confirm this.
+xcheck(! (z == NaN)); 
+// Deduction: Flash built-in NaN constant(string) has a special representation.
+// Note: This is the ONLY case where NaN == NaN, IIRC
+check(NaN == NaN);
 
 // for Number
 x = new Number(3);
@@ -673,7 +688,7 @@ xcheck(y!=NaN);
 check(isNaN(y));
 
 #if OUTPUT_VERSION < 7
- totals(201);
+ totals(205);
 #else
- totals(203);
+ totals(207);
 #endif

@@ -19,7 +19,12 @@
 /*
  *  Zou Lunkai, zoulunkai@gmail.com
  *
- *  test opcodes defined in swf4
+ *  test opcodes defined in swf4.
+ *  
+ *  Deduction:
+ *
+ *     There is no NaN number in swf4 at all, invalid numbers are converted to 0.
+ *     Fix as_value::to_number() should fix all tests in this file.
  */
 
 //
@@ -43,11 +48,21 @@
         if ( obt == exp ) xpass_check() \
         else xfail_check()
         
+#define check(expr)  \
+    if ( expr ) pass_check() \
+    else fail_check()
 
+#define xcheck(expr)  \
+        if ( expr ) xpass_check() \
+        else xfail_check() 
+    
 .flash  bbox=800x600 filename="swf4opcode.swf" background=white version=4 fps=12
 
 .frame 1
     .action:
+        // 
+        //  test opcode ActionEquals
+        //
         testvar = (uninitialized1 == '');
         xcheck_equals(testvar, 1);
         testvar = ('' == uninitialized2);
@@ -71,16 +86,58 @@
         check_equals(undefined, undefined);
         
         // test 'Infinity' in swf4
-        // there's no 'Infinity' constants in swf4
+        // there's no 'Infinity' constant in swf4
         check_equals(Infinity, undefined);
         check_equals(Infinity, Infinity);
         check_equals(Infinity, -Infinity);
 
-		// test 'null' in swf4
-		// there's no null in swf4
-		check_equals(null, undefined);
+        // test 'null' in swf4
+        // there's no null in swf4
+        check_equals(null, undefined);
+        check_equals(null, 0);
+        
+        // test 'NaN' in swf4
+        // there's no 'NaN' constant in swf4
+        check_equals(NaN, 0);
     .end
 
+
+.frame 2
+    .action:
+        //
+        // test ActionLessThan
+        //
+        x = 'ab';
+        y = 'abc';
+        // should return 0(false)
+        // x and y are converted to number 0 before comparision
+        check( ! (x < y) );
+        check( ! (x > y) );
+        xcheck( x == y );
+        xcheck( x == 0);
+        
+        //
+        // test swf4 ActionMultiply, ActionDivide, ActionAdd, ActionSubstract
+        //
+        x = "abc";
+        y = 0;
+        z = x * y;
+        xcheck_equals(z, 0);
+        z = x / 1;
+        xcheck_equals(z, 0);
+        z = x + 1;
+        xcheck_equals(z, 1);
+        z = x - 1;
+        xcheck_equals(z, -1);
+        
+        //
+        // TODO: add tests for ActionStringEq, ActionStringGreater,
+        // ActionStringCompare
+        //
+        // Question: how to generate the above opcodes?
+    .end
+    
+    
 .frame 3
     .action:
         stop();
