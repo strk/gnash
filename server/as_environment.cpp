@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.109 2007/11/16 21:28:54 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.110 2007/11/21 09:21:49 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -45,6 +45,8 @@
 //#define GNASH_DEBUG_GET_VARIABLE 1
 
 namespace gnash {
+
+as_environment::CallStack as_environment::_localFrames = as_environment::CallStack();
 
 // Return the value of the given var, if it's defined.
 as_value
@@ -880,7 +882,8 @@ as_environment::CallFrame::markReachableResources() const
 	{
 		i->setReachable();
 	}
-	locals->setReachable();
+	if (locals)
+		locals->setReachable();
 }
 
 void

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.58 2007/11/16 13:24:30 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.59 2007/11/21 09:21:49 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -444,36 +444,6 @@ ActionExec::cleanupAfterRun(bool expectInconsistencies)
     assert(_original_target);
     env.set_target(_original_target);
     _original_target = NULL;
-
-    // Check the call stack depth to be the same as the one we started with
-    // TODO: should this check be switched off based on GNASH_TRUST_SWF_INPUT ?
-    size_t currCallStackDepth = env.callStackDepth();
-    if ( currCallStackDepth != _initialCallStackDepth )
-    {
-	if ( currCallStackDepth > _initialCallStackDepth )
-	{
-		if ( ! expectInconsistencies )
-		{
-			// TODO: try to produce this error hitting script limits
-			log_error(_("Call stack at end of ActionScript execution "
-				"(" SIZET_FMT ") exceeds call stack depth at start "
-				"of it (" SIZET_FMT ") - limits hit ?"),
-				 currCallStackDepth, _initialCallStackDepth);
-		}
-		size_t diff = currCallStackDepth-_initialCallStackDepth;
-		// TODO: implement dropCallFrames(diff) ?
-		while (diff--) env.popCallFrame();
-		assert(env.callStackDepth() == _initialCallStackDepth);
-	}
-	else
-	{
-		// TODO: make this an assertion ?
-		log_error(_("Call stack at end of ActionScript execution "
-			"(" SIZET_FMT ") less then call stack depth at start "
-			"of it (" SIZET_FMT ") - bad bug !"),
-			 currCallStackDepth, _initialCallStackDepth);
-	}
-    }
 
     // check if the stack was smashed
     if ( _initial_stack_size > env.stack_size() ) {

@@ -102,7 +102,8 @@ as_object::get_member_default(string_table::key name, as_value* val,
 	assert(val);
 
 	Property* prop = findProperty(name, nsname);
-	if ( ! prop ) return false;
+	if (!prop)
+		return false;
 
 	try 
 	{
@@ -212,7 +213,7 @@ as_object::findProperty(string_table::key key, string_table::key nsname,
 	as_object **owner)
 {
 	// don't enter an infinite loop looking for __proto__ ...
-	if (key == NSV::PROP_uuPROTOuu)
+	if (key == NSV::PROP_uuPROTOuu && !nsname)
 	{
 		if (owner != NULL)
 			*owner = this;

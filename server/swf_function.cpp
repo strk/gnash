@@ -40,7 +40,6 @@ using namespace std;
 
 namespace gnash {
 
-
 swf_function::~swf_function()
 {
 #ifndef GNASH_USE_GC
@@ -92,6 +91,24 @@ swf_function::getArguments(swf_function& callee, const fn_call& fn)
 
 }
 
+namespace {
+class FrameGuard
+{
+public:
+	FrameGuard(as_environment& env, swf_function *func) : mEnv(env)
+	{
+		env.pushCallFrame(func);
+	}
+
+	~FrameGuard()
+	{
+		mEnv.popCallFrame();
+	}
+
+	as_environment& mEnv;
+};
+} // end of anonymous namespace
+
 // Dispatch.
 as_value
 swf_function::operator()(const fn_call& fn)
@@ -119,7 +136,8 @@ swf_function::operator()(const fn_call& fn)
 	unsigned swfversion = VM::get().getSWFVersion();
 
 	// Set up local stack frame, for parameters and locals.
-	our_env->pushCallFrame(this);
+	FrameGuard guard(*our_env, this);
+//	our_env->pushCallFrame(this);
 
 	if (m_is_function2 == false)
 	{
@@ -272,23 +290,19 @@ swf_function::operator()(const fn_call& fn)
 	catch (ActionLimitException& ale) // expected and sane 
 	{
 		//log_debug("ActionLimitException got from swf_function execution: %s", ale.what());
-		our_env->popCallFrame();
 		throw;
 	}
 	catch (std::exception& ex) // unexpected but we can tell what it is
 	{
 		log_debug("Unexpected exception from swf_function execution: %s", ex.what());
-		our_env->popCallFrame();
 		throw;
 	}
 	catch (...) // unexpected, unknown, but why not cleaning up...
 	{
 		log_debug("Unknown exception got from swf_function execution");
-		our_env->popCallFrame();
 		throw;
 	}
 
-	our_env->popCallFrame();
         return result;
 }
 

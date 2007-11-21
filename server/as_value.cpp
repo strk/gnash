@@ -1250,17 +1250,25 @@ as_value::setReachable() const
 	switch (m_type)
 	{
 		case OBJECT:
-			getObj()->setReachable();
+		{
+			as_value::AsObjPtr op = getObj();
+			if (op)
+				op->setReachable();
 			break;
-
+		}
 		case AS_FUNCTION:
-			getFun()->setReachable();
+		{
+			as_value::AsFunPtr fp = getFun();
+			if (fp)
+				fp->setReachable();
 			break;
-
+		}
 		case MOVIECLIP:
-			getSpriteProxy().setReachable();
+		{
+			as_value::SpriteProxy sp = getSpriteProxy();
+			sp.setReachable();
 			break;
-
+		}
 		default: break;
 	}
 #endif // GNASH_USE_GC

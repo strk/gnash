@@ -73,6 +73,7 @@ static string_table::svt preload_names[] =
 	{ "splice", NSV::PROP_SPLICE },
 	{ "Stage", NSV::PROP_iSTAGE },
 	{ "status", NSV::PROP_STATUS },
+	{ "super", NSV::PROP_SUPER },
 	{ "_target", NSV::PROP_uTARGET },
 	{ "text", NSV::PROP_TEXT },
 	{ "textColor", NSV::PROP_TEXT_COLOR },

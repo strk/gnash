@@ -98,8 +98,10 @@ Property::setReachable() const
 	case 0: // Blank, nothing to do.
 		break;
 	case 1: // Simple property, value
+	{
 		boost::get<as_value>(mBound).setReachable();
 		break;
+	}
 	case 2: // Getter/setter
 	{
 		const as_accessors& a = boost::get<as_accessors>(mBound);

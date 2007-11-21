@@ -1,3 +1,17 @@
+2007-11-21 Chad Musick <chadmusick@msbx.net>
+
+	* server/as_environment.h,.cpp: Initialize _original_target, as this
+	  absence was causing segfaults.  Convert the call stack to a static
+	  one.
+	* server/swf_function.cpp: Use a class for ensuring the call stack,
+	  rather than doing so manually.
+	* server/Property.h,.cpp: Initialize differently.
+	* server/as_value.cpp: Be more careful about return values.
+	* testsuite/actionscript.all/LoadVars.as: Clean up debugging code.
+	* server/namedStrings.h,.cpp: Add 'super' to known strings.
+	* server/vm/ActionExec.cpp: No need to check call stack, as it is
+	  guaranteed correct through use of FrameGuard class.
+	
 2007-11-21 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/as_value.cpp: to_number() convert invalid float literal

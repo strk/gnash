@@ -51,7 +51,9 @@ public:
 
 	as_environment()
 		:
-		m_target(0)
+		m_stack(),
+		m_target(0),
+		_original_target(0)
 	{
 	}
 
@@ -436,6 +438,10 @@ public:
 	{
 		CallFrame(as_function* funcPtr);
 
+		CallFrame(const CallFrame& other) : locals(other.locals),
+			registers(other.registers), func(other.func)
+		{/**/}
+
 		/// function use this 
 		LocalVars locals;
 
@@ -489,12 +495,13 @@ public:
 	{
 		return _localFrames.size();
 	}
-
+/*
 	/// Clear the call stack
 	void clearCallFrames()
 	{
 		_localFrames.clear();
 	}
+*/
 
 private:
 
@@ -502,7 +509,7 @@ private:
 
 	typedef std::vector<CallFrame> CallStack;
 		
-	CallStack _localFrames;
+	static CallStack _localFrames;
 
 	as_value m_global_register[numGlobalRegisters];
 
