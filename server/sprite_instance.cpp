@@ -2887,9 +2887,9 @@ sprite_instance::add_display_object(
     {
         // remove the created character from the key listener list,
         // it might be there(eg. button_character).
-		// TODO: optimize this.  This is not necessary if we don't create
-		// instances blindly above.
-        _vm.getRoot().remove_key_listener(ch.get());
+        // TODO: optimize this.  This is not necessary if we don't create
+        // instances blindly above.
+        if ( ch ) _vm.getRoot().remove_key_listener(ch.get());
 
         move_display_object(depth, &color_transform, &mat, ratio, clip_depth);
     }

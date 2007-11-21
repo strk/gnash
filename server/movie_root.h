@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.89 2007/11/16 13:24:30 strk Exp $ */
+/* $Id: movie_root.h,v 1.90 2007/11/21 17:11:52 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -412,20 +412,35 @@ public:
     void * get_userdata() { return m_userdata; }
     void set_userdata(void * ud ) { m_userdata = ud;  }
 
-	/// Notify both the character listeners and general object listeners
+	/// Notify still loaded character listeners for key events
 	DSOEXPORT void notify_key_listeners(key::code k, bool down);
 
-	/// Push a new character listener to the container after constructing the character
-    void add_key_listener(as_object* listener);
+	/// Push a new character listener for key events
+	void add_key_listener(character* listener)
+    {
+        add_listener(m_key_listeners, listener);
+    }
 
-	/// Remove a character from the container only when the character is unloaded
-    void remove_key_listener(as_object* listener);
+	/// Remove a character listener for key events
+	void remove_key_listener(character* listener)
+    {
+        remove_listener(m_key_listeners, listener);
+    }
 
-    DSOEXPORT void notify_mouse_listeners(const event_id& event);
+	/// Notify still loaded character listeners for mouse events
+	DSOEXPORT void notify_mouse_listeners(const event_id& event);
 
-    void add_mouse_listener(as_object* listener);
+	/// Push a new character listener for mouse events
+	void add_mouse_listener(character* listener)
+    {
+        add_listener(m_mouse_listeners, listener);
+    }
 
-    void remove_mouse_listener(as_object* listener);
+	/// Remove a character listener for mouse events
+	void remove_mouse_listener(character* listener)
+    {
+        remove_listener(m_mouse_listeners, listener);
+    }
 
     /// Get the character having focus
     //
@@ -499,7 +514,8 @@ public:
     /// - Mouse entities (m_mouse_button_state)
     /// - Timer targets (_intervalTimers)
     /// - Resources reachable by ActionQueue code (_actionQueue)
-    /// - Key listeners (_keyListeners || m_key_listeners)
+    /// - Key listeners (m_key_listeners)
+    /// - Mouse listeners (m_mouse_listeners)
     /// - global Key object (_keyobject)
     ///
     void markReachableResources() const;
@@ -559,6 +575,14 @@ public:
 
 private:
 
+    /// Listeners container
+    typedef std::list< boost::intrusive_ptr<character> > CharacterList;
+
+    /// key and mouse listeners container
+    typedef CharacterList KeyListeners;
+    typedef CharacterList MouseListeners;
+
+
     /// Take care of dragging, if needed
     void doMouseDrag();
 
@@ -592,12 +616,21 @@ private:
     /// Notify the global Key ActionScript object about a key status change
     key_as_object * notify_global_key(key::code k, bool down);
 
-    /// Remove all listeners with a ref-count of 1
-    /// (only referenced as key listeners)
-    // in new design:
-    // remove unloaded characters and unregistered as_objects 
-    // from the key listeners container.
-    void cleanup_key_listeners();
+    /// Remove unloaded key and mouselisteners.
+    void cleanupUnloadedListeners()
+    {
+        cleanupUnloadedListeners(m_key_listeners);
+        cleanupUnloadedListeners(m_mouse_listeners);
+    }
+
+    /// Erase unloaded characters from the given listeners list
+    static void cleanupUnloadedListeners(CharacterList& ll);
+
+    /// Push a character listener to the front of given container, if not already present
+    static void add_listener(CharacterList& ll, character* elem);
+
+    /// Remove a listener from the list
+    static void remove_listener(CharacterList& ll, character* elem);
 
     /// Return the current Stage object
     //
@@ -638,20 +671,13 @@ private:
     TimerMap _intervalTimers;
     unsigned int _lastTimerId;
 
-	/// A set of as_objects kept by intrusive_ptr
-	/// TODO: dont' use std::use, we need to well control the calling order
-    typedef std::set< boost::intrusive_ptr<as_object> > ListenerSet;
-
-    /// key listeners container
-    typedef std::list< boost::intrusive_ptr<as_object> > KeyListeners;
-
     /// Characters for listening key events
     KeyListeners m_key_listeners;
 
     boost::intrusive_ptr<key_as_object> _keyobject;
 
     /// Objects listening for mouse events (down,up,move)
-    ListenerSet m_mouse_listeners;
+    MouseListeners m_mouse_listeners;
 
     character*              m_active_input_text;
     float                   m_time_remainder;

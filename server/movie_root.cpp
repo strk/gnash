@@ -783,7 +783,7 @@ movie_root::advance(float delta_time)
 	// NOTE: can throw ActionLimitException
 	advanceLiveChars(delta_time); 
 
-	cleanup_key_listeners();
+	cleanupUnloadedListeners();
 
 	// Process queued actions
 	// NOTE: can throw ActionLimitException
@@ -878,104 +878,84 @@ char* movie_root::call_method_args(const char* method_name,
 	return getLevel(0)->call_method_args(method_name, method_arg_fmt, args);
 }
 
-void movie_root::cleanup_key_listeners()
+void movie_root::cleanupUnloadedListeners(CharacterList& ll)
 {
     // remove unloaded character listeners from movie_root
-    for (KeyListeners::iterator iter = m_key_listeners.begin(); iter != m_key_listeners.end(); )
+    for (CharacterList::iterator iter = ll.begin(); iter != ll.end(); )
     {
-        character* ch = dynamic_cast<character*>(iter->get());
-        if ( ch && ch->isUnloaded() )
-        {
-            m_key_listeners.erase(iter++);
-        }
-        else
-        {
-            ++iter;
-        }
+        character* ch = iter->get();
+        if ( ch->isUnloaded() ) iter = ll.erase(iter++);
+        else ++iter;
     }
     
 }
 
 void movie_root::notify_key_listeners(key::code k, bool down)
 {
-    // log_msg("Notifying " SIZET_FMT " character listeners", 
-    //  m_key_listeners.size());
+	// log_msg("Notifying " SIZET_FMT " character Key listeners", 
+	//  m_key_listeners.size());
 
-    for (KeyListeners::iterator iter = m_key_listeners.begin();
-             iter != m_key_listeners.end(); ++iter)
-    {
-        // sprite, button & input_edit_text characters
-        character* ch = dynamic_cast<character*>(iter->get());
-        if ( ch && ! ch->isUnloaded() )
-        {
-            if(down)
-            {
-                // KEY_UP and KEY_DOWN events are unrelated to any key!
-                ch->on_event(event_id(event_id::KEY_DOWN, key::INVALID)); 
-                ch->on_event(event_id(event_id::KEY_PRESS, key::codeMap[k][0]));
-            }
-            else
-                ch->on_event(event_id(event_id::KEY_UP, key::INVALID));   
-        }
-    }
+	KeyListeners copy = m_key_listeners;
+	for (CharacterList::iterator iter = copy.begin(), itEnd=copy.end();
+			iter != itEnd; ++iter)
+	{
+		// sprite, button & input_edit_text characters
+		character* ch = iter->get();
+		if ( ! ch->isUnloaded() )
+		{
+			if(down)
+			{
+				// KEY_UP and KEY_DOWN events are unrelated to any key!
+				ch->on_event(event_id(event_id::KEY_DOWN, key::INVALID)); 
+				ch->on_event(event_id(event_id::KEY_PRESS, key::codeMap[k][0]));
+			}
+			else
+			{
+				ch->on_event(event_id(event_id::KEY_UP, key::INVALID));   
+			}
+		}
+	}
 
     assert(testInvariant());
 }
 
-void movie_root::add_key_listener(as_object* listener)
+/* static private */
+void movie_root::add_listener(CharacterList& ll, character* listener)
 {
-    for(KeyListeners::iterator i = m_key_listeners.begin(), e = m_key_listeners.end();
-            i != e; ++i)
-    {
-        // Conceptually, we don't need to add the same character twice.
-        // but see edit_text_character::setFocus()...
-        if(*i == listener)  return;
-    }
+	assert(listener);
+	for(CharacterList::iterator i = ll.begin(), e = ll.end(); i != e; ++i)
+	{
+		// Conceptually, we don't need to add the same character twice.
+		// but see edit_text_character::setFocus()...
+		if(*i == listener)  return;
+	}
 
-    //for character listeners, first added last called
-    m_key_listeners.push_front(listener);
+	ll.push_front(listener);
 }
 
-void movie_root::remove_key_listener(as_object* listener)
+/* static private */
+void movie_root::remove_listener(CharacterList& ll, character* listener)
 {
-    for(KeyListeners::iterator iter = m_key_listeners.begin(); 
-            iter != m_key_listeners.end(); )
-    {
-        if(*iter == listener) 
-        {
-            m_key_listeners.erase(iter++);
-        }
-        else
-        {
-            iter++;
-        }
-    }
+	assert(listener);
+	for(CharacterList::iterator iter = ll.begin(); iter != ll.end(); )
+	{
+		if(*iter == listener) iter = ll.erase(iter);
+		else ++iter;
+	}
 }
 
-void movie_root::add_mouse_listener(as_object* listener)
-{
-	m_mouse_listeners.insert(listener);
-	assert(testInvariant());
-}
-
-void movie_root::remove_mouse_listener(as_object* listener)
-{
-	m_mouse_listeners.erase(listener);
-	assert(testInvariant());
-}
-
-void movie_root::notify_mouse_listeners(const event_id& event)
+void
+movie_root::notify_mouse_listeners(const event_id& event)
 {
 	//log_msg("Notifying " SIZET_FMT " listeners about %s",
 	//		m_mouse_listeners.size(), event.get_function_name().c_str());
 
-	for (ListenerSet::iterator iter = m_mouse_listeners.begin();
-			iter != m_mouse_listeners.end(); ++iter)
+	CharacterList copy = m_mouse_listeners;
+	for (CharacterList::iterator iter = copy.begin(), itEnd=copy.end();
+			iter != itEnd; ++iter)
 	{
-		// sprite, button & input_edit_text characters
-		// TODO: invoke functions on non-characters !
-		character* ch = dynamic_cast<character*>(iter->get()); 
-		if ( ch )
+		character* ch = iter->get();
+		if ( ! ch->isUnloaded() )
 		{
 			ch->on_event(event);
 		}
@@ -1274,11 +1254,10 @@ movie_root::markReachableResources() const
     }
 
     // Mark character key listeners
-    for (KeyListeners::const_iterator i=m_key_listeners.begin(), e=m_key_listeners.end();
-            i != e; ++i)
-    {
-        (*i)->setReachable();
-    }
+    std::for_each(m_key_listeners.begin(), m_key_listeners.end(), boost::bind(&character::setReachable, _1));
+
+    // Mark character mouse listeners
+    std::for_each(m_mouse_listeners.begin(), m_mouse_listeners.end(), boost::bind(&character::setReachable, _1));
 
     // Mark global key object
     if ( _keyobject ) _keyobject->setReachable();

@@ -1,3 +1,10 @@
+2007-11-21 Sandro Santilli <strk@keybit.net>
+
+	* server/movie_root.{cpp,h}: generalize key and mouse
+	  listeners management.
+	* server/sprite_instance.cpp (add_display_object): don't
+	  attempt to remove a NULL pointer from the listeners set.
+
 2007-11-21 Chad Musick <chadmusick@msbx.net>
 
 	* server/as_environment.h,.cpp: Initialize _original_target, as this
