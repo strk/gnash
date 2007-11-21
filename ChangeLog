@@ -1,5 +1,11 @@
 2007-11-21 Zou Lunkai <zoulunkai@gmail.com>
 
+	* server/as_value.cpp: to_number() convert invalid float literal
+	  to zero instead of NaN for swf<5.
+	* testsuite/misc-swfc.all/swf4opcode.sc: xcheck->check.
+	
+2007-11-21 Zou Lunkai <zoulunkai@gmail.com>
+
 	* testsuite/misc-swfc.all/swf4opcode.sc,
 	  testsuite/misc-actionsript.all/ops.as: more opcode tests. 
 	  

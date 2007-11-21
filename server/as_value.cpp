@@ -337,91 +337,95 @@ as_value::to_primitive(type hint) const
 double
 as_value::to_number() const
 {
-	// TODO:  split in to_number_# (version based)
+    // TODO:  split in to_number_# (version based)
 
-	int swfversion = VM::get().getSWFVersion();
+    int swfversion = VM::get().getSWFVersion();
 
-	switch (m_type)
-	{
-		case STRING:
-		{
-			// @@ Moock says the rule here is: if the
-			// string is a valid float literal, then it
-			// gets converted; otherwise it is set to NaN.
+    switch (m_type)
+    {
+        case STRING:
+        {
+            // @@ Moock says the rule here is: if the
+            // string is a valid float literal, then it
+            // gets converted; otherwise it is set to NaN.
+            try 
+            { 
+                double d = boost::lexical_cast<double>(getStr());
 
-			try { 
+                if ( isinf(d) ) 
+                {
+                    if(swfversion <= 4)  
+                        return (double)0.0;
+                    else    
+                        return (double)NAN;
+                }
 
-				double d = boost::lexical_cast<double>(getStr());
+                return d;
+            } 
+            catch (boost::bad_lexical_cast &) 
+            {
+                if(swfversion <= 4)  
+                    return (double)0.0;
+                else    
+                    return (double)NAN;
+            }
+        }
 
-				if ( isinf(d) ) {
-					return (double)NAN;
-				}
+        case NULLTYPE:
+        case UNDEFINED:
+            // Evan: from my tests
+            // Martin: FlashPlayer6 gives 0; FP9 gives NaN.
+            return ( swfversion >= 7 ? NAN : 0 );
 
-				return d;
+        case BOOLEAN:
+            // Evan: from my tests
+            // Martin: confirmed
+            return getBool() ? 1 : 0;
 
-			} catch (boost::bad_lexical_cast &) {
+        case NUMBER:
+            return getNum();
 
-				return (double)NAN;
+        case OBJECT:
+        case AS_FUNCTION:
+        {
+            // @@ Moock says the result here should be
+            // "the return value of the object's valueOf()
+            // method".
+            //
+            // Arrays and Movieclips should return NaN.
 
-			}
+            as_object* obj = m_type == OBJECT ? getObj().get() : getFun().get();
+            try
+            {
+                as_value ret = to_primitive(NUMBER);
+                return ret.to_number();
+            }
+            catch (ActionTypeError& e)
+            {
+                log_debug(_("to_primitive(%s, NUMBER) threw an ActionTypeError %s"),
+                        to_debug_string().c_str(), e.what());
+                if ( m_type == AS_FUNCTION && swfversion < 6 )
+                {
+                    return 0;
+                }
+                else
+                {
+                    return NAN;
+                }
+            }
+        }
 
-		}
+        case MOVIECLIP:
+            // This is tested, no valueOf is going
+            // to be invoked for movieclips.
+            return NAN; 
 
-		case NULLTYPE:
-		case UNDEFINED:
-			// Evan: from my tests
-			// Martin: FlashPlayer6 gives 0; FP9 gives NaN.
-			return ( swfversion >= 7 ? NAN : 0 );
-
-		case BOOLEAN:
-			// Evan: from my tests
-			// Martin: confirmed
-			return getBool() ? 1 : 0;
-
-		case NUMBER:
-			return getNum();
-
-		case OBJECT:
-		case AS_FUNCTION:
-		    {
-			// @@ Moock says the result here should be
-			// "the return value of the object's valueOf()
-			// method".
-			//
-			// Arrays and Movieclips should return NaN.
-
-			as_object* obj = m_type == OBJECT ? getObj().get() : getFun().get();
-			try
-			{
-				as_value ret = to_primitive(NUMBER);
-				return ret.to_number();
-			}
-			catch (ActionTypeError& e)
-			{
-				log_debug(_("to_primitive(%s, NUMBER) threw an ActionTypeError %s"),
-						to_debug_string().c_str(), e.what());
-				if ( m_type == AS_FUNCTION && swfversion < 6 )
-				{
-					return 0;
-				}
-				else
-				{
-					return NAN;
-				}
-			}
-		    }
-
-		case MOVIECLIP:
-			// This is tested, no valueOf is going
-			// to be invoked for movieclips.
-			return NAN; 
-
-		default:
-			// Other object types should return NaN, but if we implement that,
-			// every GUI's movie canvas shrinks to size 0x0. No idea why.
-			return NAN; // 0.0;
-	}
-	/* NOTREACHED */
+        default:
+            // Other object types should return NaN, but if we implement that,
+            // every GUI's movie canvas shrinks to size 0x0. No idea why.
+            return NAN; // 0.0;
+    }
+    /* NOTREACHED */
 }
 
 int32_t

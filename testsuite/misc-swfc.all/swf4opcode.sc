@@ -24,7 +24,7 @@
  *  Deduction:
  *
  *     There is no NaN number in swf4 at all, invalid numbers are converted to 0.
- *     Fix as_value::to_number() should fix all tests in this file.
+ *    
  */
 
 //
@@ -64,19 +64,19 @@
         //  test opcode ActionEquals
         //
         testvar = (uninitialized1 == '');
-        xcheck_equals(testvar, 1);
+        check_equals(testvar, 1);
         testvar = ('' == uninitialized2);
-        xcheck_equals(testvar, 1); 
+        check_equals(testvar, 1); 
         testvar = ('' == '');  
-        xcheck_equals(testvar, 1); 
+        check_equals(testvar, 1); 
         testvar = ('xyz' == 'abc');
         //Ref: http://swishtutor.com
         // both hands are converted to zero
-        xcheck_equals(testvar, 1); 
-        xcheck_equals('xyz', 0);
-        xcheck_equals('abc', 0);
-        xcheck_equals('xyz', 'xyz');
-        xcheck_equals('xyz', 'abc');
+        check_equals(testvar, 1); 
+        check_equals('xyz', 0);
+        check_equals('abc', 0);
+        check_equals('xyz', 'xyz');
+        check_equals('xyz', 'abc');
         
         // test 'undefined' in swf4
         check_equals(uninitialized2, uninitialized3);
@@ -113,8 +113,8 @@
         // x and y are converted to number 0 before comparision
         check( ! (x < y) );
         check( ! (x > y) );
-        xcheck( x == y );
-        xcheck( x == 0);
+        check( x == y );
+        check( x == 0);
         
         //
         // test swf4 ActionMultiply, ActionDivide, ActionAdd, ActionSubstract
@@ -122,13 +122,13 @@
         x = "abc";
         y = 0;
         z = x * y;
-        xcheck_equals(z, 0);
+        check_equals(z, 0);
         z = x / 1;
-        xcheck_equals(z, 0);
+        check_equals(z, 0);
         z = x + 1;
-        xcheck_equals(z, 1);
+        check_equals(z, 1);
         z = x - 1;
-        xcheck_equals(z, -1);
+        check_equals(z, -1);
         
         //
         // TODO: add tests for ActionStringEq, ActionStringGreater,
