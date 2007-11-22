@@ -112,7 +112,7 @@ as_object::get_member_default(string_table::key name, as_value* val,
 	}
 	catch (ActionLimitException& exc)
 	{
-		log_error(_("Caught action limit."));
+		// will be logged by outer catcher
 		throw;
 	}
 	catch (ActionException& exc)

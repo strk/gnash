@@ -1,3 +1,8 @@
+2007-11-22 Sandro Santilli <strk@keybit.net>
+
+	* server/as_object.cpp (get_member_default): don't log
+	  ActionLimitException here, will be logged by outer catcher.
+
 2007-11-22 Chad Musick <chadmusick@msbx.net>
 
 	* testsuite/swfdec/PASSING: 23 new passing tests.
