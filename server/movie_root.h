@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.90 2007/11/21 17:11:52 strk Exp $ */
+/* $Id: movie_root.h,v 1.91 2007/11/22 21:48:09 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -285,7 +285,6 @@ public:
 
     void stop_drag()
     {
-        log_msg("stop_drag called");
         m_drag_state.reset();
     }
 
