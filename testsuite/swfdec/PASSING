@@ -146,6 +146,9 @@ empty-function-7.swf:d65a6d323a864fad2965496ff2a69f2b
 empty-function-8.swf:8590a81f543ca2f7a1bc6fb2105f5672
 empty-stack.swf:47ef885ae85e56e2ba8caae6eed46704
 enumerate-5.swf:62ec57ff724247d42c254cfadca06f2d
+enumerate-6.swf:85f81c4443f6137238d4fa5561579812
+enumerate-7.swf:35e50f33fd5b00821d709ce06dc3bcad
+enumerate-8.swf:6c30f609bf36664ce15a7a63ea2857cf
 event-order.swf:6cb896771a691dc394226c3f542b1bec
 export-case-5.swf:8b37704408e27ffb8b51c63179c7702c
 export-case-6.swf:7c3106de02ed0a94ed0bc816bf526c02
@@ -197,6 +200,9 @@ getvariable-dotdot-7.swf:efa5597fe3e61764b6ee937f87d8cf1b
 getvariable-dotdot-8.swf:2861d34a85b5de09f41af572e0b1a6a5
 getvariable-length-5.swf:2d07e2afdf45356cf2df5c1176ed29ad
 getvariable-slashpath-5.swf:3067a6cdf4991af85520d7eb3bb51178
+getvariable-slashpath-6.swf:17d6ee6ddb15296e887944d7c7c45432
+getvariable-slashpath-7.swf:499213312255eba3746c4ff6b7b4782d
+getvariable-slashpath-8.swf:19df043ceda9c1db9efbd185bb5ae2cb
 getvariable-special-5.swf:4baac55533a4cc67a3419dafb97cc888
 glow-filter-properties-5.swf:b3d05908aaa98c7115ec1727d695a16a
 goto1.swf:6f35a27cb3aee7f282eccb3b16290c70
@@ -526,8 +532,8 @@ tointeger-various-5.swf:25fab4b9f2e8739ac63863933a4c7ead
 tointeger-various-6.swf:71257f69e5f3feb6ae18ebf26ad2eb22
 tointeger-various-7.swf:6251bc39b6449a82c89b6c821f9af0ff
 totalframes.swf:cdc0d5e2017d293438ef80fa136c44e8
-transform.swf:5c8533f9168ca3e92d000ce1693ed5ef
 transform-properties-5.swf:b0386824584340e1d0a80f986ce779b9
+transform.swf:5c8533f9168ca3e92d000ce1693ed5ef
 try-throw-in-finally-6.swf:1c12d4b0f949704bd0794d73f0385007
 try-throw-in-finally-7.swf:0342b214948d6bec886863f6f66cab33
 try-throw-in-finally-8.swf:f5b7ae88f4383ebcdb8313674a2d85cb

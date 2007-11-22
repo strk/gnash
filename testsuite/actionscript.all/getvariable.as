@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: getvariable.as,v 1.20 2007/11/22 20:49:38 strk Exp $";
+rcsid="$Id: getvariable.as,v 1.21 2007/11/22 21:45:41 strk Exp $";
 
 #include "check.as"
 
@@ -129,8 +129,8 @@ asm {
         setvariable
 };
 #if OUTPUT_VERSION > 5
- xcheck_equals(typeof(checkpoint), 'movieclip');
- xcheck_equals(checkpoint, _level0.mc.mc);
+ check_equals(typeof(checkpoint), 'movieclip');
+ check_equals(checkpoint, _level0.mc.mc);
 #else
  check_equals(typeof(checkpoint), 'undefined');
  check_equals(checkpoint, _level0.mc.mc);
@@ -147,8 +147,8 @@ asm {
         setvariable
 };
 #if OUTPUT_VERSION > 5
- xcheck_equals(typeof(checkpoint), 'movieclip');
- xcheck_equals(checkpoint, _level0.mc.mc);
+ check_equals(typeof(checkpoint), 'movieclip');
+ check_equals(checkpoint, _level0.mc.mc);
 #else
  check_equals(typeof(checkpoint), 'undefined');
  check_equals(checkpoint, _level0.mc.mc);

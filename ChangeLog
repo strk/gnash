@@ -1,3 +1,13 @@
+2007-11-22 Sandro Santilli <strk@keybit.net>
+
+	* server/as_environment.cpp (get_variable): variables paths containing
+	  slashes but no colon will be attempted to be evaluated as sprites
+	  before falling back to property lookup.
+	* testsuite/actionscript.all/getvariable.as: successes in all newly
+	  added tests.
+	* testsuite/swfdec/PASSING: getvariable-slashpath and enumerate
+	  tests succeed.
+
 2007-11-22 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* macros/archflag.m4: Updated to the latest version.

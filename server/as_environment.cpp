@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.113 2007/11/22 19:40:24 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.114 2007/11/22 21:45:40 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -81,23 +81,31 @@ as_environment::get_variable(const std::string& varname,
             IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("find_object(\"%s\") [ varname = '%s' - current target = '%s' ] failed"),
                 path.c_str(), varname.c_str(),
-                m_target->get_text_value().c_str()
-            );
-            );
-
+                m_target->get_text_value().c_str());
             as_value tmp = get_variable_raw(path, scopeStack, retTarget);
             if ( ! tmp.is_undefined() )
             {
-                IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("...but get_variable_raw(%s, <scopeStack>) succeeded (%s)!"),
                     path.c_str(), tmp.to_debug_string().c_str());
-                )
             }
-			return as_value();
+            );
+            return as_value(); // TODO: should we check get_variable_raw ?
         }
     }
     else
     {
+	// TODO: have this checked by parse_path as an optimization 
+	if ( varname.find_first_of('/') != string::npos )
+	{
+		// Consider it all a path ...
+        	as_object* target = find_object(varname, &scopeStack); 
+		if ( target ) 
+		{
+			// ... but only if it resolves to a sprite
+			sprite_instance* m = target->to_movie();
+			if ( m ) return as_value(m);
+		}
+	}
         return get_variable_raw(varname, scopeStack, retTarget);
     }
 }
