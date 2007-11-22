@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: getvariable.as,v 1.17 2007/11/22 14:29:38 strk Exp $";
+rcsid="$Id: getvariable.as,v 1.18 2007/11/22 18:05:11 strk Exp $";
 
 #include "check.as"
 
@@ -135,6 +135,19 @@ asm {
  check_equals(typeof(checkpoint), 'undefined');
  check_equals(checkpoint, _level0.mc.mc);
 #endif
+
+//---------------------------------------------------------------------
+// Check '/mc/mc:' access 
+//---------------------------------------------------------------------
+
+var variable_in_root = 6;
+asm {
+        push 'checkpoint'
+	push '/mc/mc:'
+	getvariable
+        setvariable
+};
+check_equals(typeof(checkpoint), 'undefined');
 
 //---------------------------------------------------------------------
 // Check '/mc/mc/mem' access 
@@ -540,9 +553,9 @@ check_equals(checkpoint, 4);
 //-----------------------------------------------------------------------
 
 #if OUTPUT_VERSION < 6
- xcheck_totals(39); // ???
+ xcheck_totals(40); // gnash runs 42 tests ?!
 #else
- xcheck_totals(44); // ???
+ xcheck_totals(45); // gnash runs 47 tests ?!
 #endif
 
 #else // ndef MING_SUPPORT_ASM

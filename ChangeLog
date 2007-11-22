@@ -1,3 +1,8 @@
+2007-11-22 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/getvariable.as: additional test
+	  for /slash/based path ending with a colon.
+
 2007-11-22  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* gui/gtksup.h: Sigh, use USE_HILDON and USE_ALP after all.
