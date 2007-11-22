@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: getvariable.as,v 1.16 2007/10/25 16:48:07 strk Exp $";
+rcsid="$Id: getvariable.as,v 1.17 2007/11/22 14:29:38 strk Exp $";
 
 #include "check.as"
 
@@ -116,6 +116,39 @@ check_equals(checkpoint, undefined);
 #else
 check_equals(checkpoint, 5.5);
 #endif
+
+//---------------------------------------------------------------------
+// Check '/mc/mc' access 
+//---------------------------------------------------------------------
+
+var variable_in_root = 6;
+asm {
+        push 'checkpoint'
+	push '/mc/mc'
+	getvariable
+        setvariable
+};
+#if OUTPUT_VERSION > 5
+ xcheck_equals(typeof(checkpoint), 'movieclip');
+ xcheck_equals(checkpoint, _level0.mc.mc);
+#else
+ check_equals(typeof(checkpoint), 'undefined');
+ check_equals(checkpoint, _level0.mc.mc);
+#endif
+
+//---------------------------------------------------------------------
+// Check '/mc/mc/mem' access 
+// (expected to fail, but I'm not sure why)
+//---------------------------------------------------------------------
+
+var variable_in_root = 6;
+asm {
+        push 'checkpoint'
+	push '/mc/mc/mem'
+	getvariable
+        setvariable
+};
+check_equals(typeof(checkpoint), 'undefined');
 
 
 //---------------------------------------------------------------------
@@ -506,5 +539,15 @@ check_equals(checkpoint, 4);
 // TODO: try use of 'with' stack
 //-----------------------------------------------------------------------
 
+#if OUTPUT_VERSION < 6
+ xcheck_totals(39); // ???
+#else
+ xcheck_totals(44); // ???
+#endif
+
+#else // ndef MING_SUPPORT_ASM
+
+check_totals(0);
+
 #endif // MING_SUPPORT_ASM
-totals();
+

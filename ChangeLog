@@ -1,5 +1,11 @@
 2007-11-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/: getvariable.as, targetPath.as:
+	  A couple of additional tests for simple variable paths with
+	  slashes and no columns.
+
+2007-11-22 Sandro Santilli <strk@keybit.net>
+
 	* server/as_object.cpp (get_member_default): don't log
 	  ActionLimitException here, will be logged by outer catcher.
 
