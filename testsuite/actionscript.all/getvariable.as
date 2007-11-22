@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: getvariable.as,v 1.19 2007/11/22 19:37:52 strk Exp $";
+rcsid="$Id: getvariable.as,v 1.20 2007/11/22 20:49:38 strk Exp $";
 
 #include "check.as"
 
@@ -135,6 +135,36 @@ asm {
  check_equals(typeof(checkpoint), 'undefined');
  check_equals(checkpoint, _level0.mc.mc);
 #endif
+
+//---------------------------------------------------------------------
+// Check '/mc/mc/' access 
+//---------------------------------------------------------------------
+
+asm {
+        push 'checkpoint'
+	push '/mc/mc/'
+	getvariable
+        setvariable
+};
+#if OUTPUT_VERSION > 5
+ xcheck_equals(typeof(checkpoint), 'movieclip');
+ xcheck_equals(checkpoint, _level0.mc.mc);
+#else
+ check_equals(typeof(checkpoint), 'undefined');
+ check_equals(checkpoint, _level0.mc.mc);
+#endif
+
+//---------------------------------------------------------------------
+// Check '/mc/mc/:' access 
+//---------------------------------------------------------------------
+
+asm {
+        push 'checkpoint'
+	push '/mc/mc/:'
+	getvariable
+        setvariable
+};
+check_equals(typeof(checkpoint), 'undefined');
 
 //---------------------------------------------------------------------
 // Check '/mc/mc:' access 
@@ -580,9 +610,9 @@ check_equals(checkpoint, 4);
 //-----------------------------------------------------------------------
 
 #if OUTPUT_VERSION < 6
- xcheck_totals(42); // gnash runs 44 tests ?!
+ xcheck_totals(45); // gnash runs +2 tests ?!
 #else
- xcheck_totals(47); // gnash runs 49 tests ?!
+ xcheck_totals(50); // gnash runs +2 tests ?!
 #endif
 
 #else // ndef MING_SUPPORT_ASM
