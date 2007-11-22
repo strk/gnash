@@ -65,6 +65,7 @@ AC_DEFUN([GNASH_PATH_ALP],
 
   if test x"${ac_cv_path_alp_lib}" != x; then
     ALP_LIBS="${ac_cv_path_alp_lib}"
+    AC_DEFINE(HAVE_ALP, [1], [has the ALP/Hiker mobile framework])
     have_alp=yes
   fi
 

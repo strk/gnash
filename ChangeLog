@@ -7,6 +7,11 @@
 
 2007-11-22  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* gui/gtksup.h: Use HAVE_HILDON and HAVE_ALP instead of USE_HILDON
+	and USE_ALP.
+	* macros/alp.m4, hildon.m4: Define HAVE_HILDON or HAVE_ALP if the
+	dependant files exist.
+
 	* Makefile.am: Add dumpconfig prints for ALP and Hildon.
 	* configure.ac: Add support for the ALP and Hildon GUI frameworks,
 	both of which are built on GTK+. Add initial support for the

@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: hildon.m4,v 1.1 2007/11/22 16:19:56 rsavoye Exp $
+dnl $Id: hildon.m4,v 1.2 2007/11/22 17:19:32 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_HILDON],
 [
@@ -128,6 +128,7 @@ AC_DEFUN([GNASH_PATH_HILDON],
 
   if test x"${ac_cv_path_hildon_lib}" != x; then
     HILDON_LIBS="${ac_cv_path_hildon_lib}"
+    AC_DEFINE(HAVE_HILDON, [1], [has the Hildon mobile framework])
   else
     HILDON_LIBS=""
   fi
