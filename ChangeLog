@@ -1,5 +1,10 @@
 2007-11-22 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.{cpp,h}: drop the is_slash_based
+	  parameter from parse_path, which gets simplified a bit.
+
+2007-11-22 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/getvariable.as: additional test
 	  for /slash/based path ending with a colon.
 

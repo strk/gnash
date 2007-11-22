@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.110 2007/11/21 09:21:49 cmusick Exp $ */
+/* $Id: as_environment.cpp,v 1.111 2007/11/22 18:50:56 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -61,8 +61,7 @@ as_environment::get_variable(const std::string& varname,
     log_debug(_("get_variable(%s)"), varname.c_str());
 #endif
 
-    bool is_slash_based;
-    if (parse_path(varname, path, var, &is_slash_based))
+    if ( parse_path(varname, path, var) )
     {
         // TODO: let find_target return generic as_objects, or use 'with' stack,
         //       see player2.swf or bug #18758 (strip.swf)
@@ -258,11 +257,11 @@ as_environment::set_variable(
     std::string	path;
     std::string	var;
     //log_msg(_("set_variable(%s, %s)"), varname.c_str(), val.to_debug_string().c_str());
-    bool is_slash_based;
-    if (parse_path(varname, path, var, &is_slash_based)) {
+    if ( parse_path(varname, path, var) )
+    {
     	//log_msg(_("Variable '%s' parsed into path='%s', var='%s'"), varname.c_str(), path.c_str(), var.c_str());
 	//target = find_target(path);
-        target = find_object(path, &scopeStack); //is_slash_based ? find_object_slashsyntax(path, &scopeStack) : find_object_dotsyntax(path, &scopeStack); 
+        target = find_object(path, &scopeStack); 
 	if (target)
 	{
 	    target->set_member(VM::get().getStringTable().find(var), val);
@@ -412,7 +411,7 @@ as_environment::declare_local(const std::string& varname)
 /* public static */
 bool
 as_environment::parse_path(const std::string& var_path,
-		std::string& path, std::string& var, bool* is_slash_based) 
+		std::string& path, std::string& var)
 {
 //log_msg(_("parse_path(%s)"), var_path.c_str());
     // Search for colon.
@@ -420,7 +419,6 @@ as_environment::parse_path(const std::string& var_path,
     int	var_path_length = var_path.length();
     for ( ; colon_index < var_path_length; colon_index++) {
 	if (var_path[colon_index] == ':') {
-            if ( is_slash_based ) *is_slash_based = true;
 	    // Found it.
 	    break;
 	}
@@ -432,7 +430,6 @@ as_environment::parse_path(const std::string& var_path,
 	for (colon_index = var_path_length - 1; colon_index >= 0; colon_index--) {
 	    if (var_path[colon_index] == '.') {
 		// Found it.
-                if ( is_slash_based ) *is_slash_based = false;
 		break;
 	    }
 	}
@@ -444,14 +441,13 @@ as_environment::parse_path(const std::string& var_path,
     
     // Make the subparts.
     
-    // Var.
+    // Var
     var = &var_path[colon_index + 1];
     
-    // @@ could be better. 
-    path = var_path;
-    path.resize(colon_index);
+    // Path
+    path.assign(var_path, 0, colon_index);
     
-//log_msg(_(" path=%s var=%s"), path.c_str(), var.c_str());
+//log_debug(_(" path=%s var=%s"), path.c_str(), var.c_str());
 
     return true;
 }
@@ -462,9 +458,8 @@ as_environment::parse_path(const std::string& var_path,
 {
 	string path;
 	string var;
-	bool is_slash_based;
-	if( ! parse_path(var_path, path, var, &is_slash_based) ) return false;
-        as_object* target_ptr = find_object(path); // is_slash_based ? find_object_slashsyntax(path) : find_object_dotsyntax(path); 
+	if ( ! parse_path(var_path, path, var) ) return false;
+        as_object* target_ptr = find_object(path); 
 	if ( ! target_ptr ) return false;
 
 	target_ptr->get_member(VM::get().getStringTable().find(var), &val);
