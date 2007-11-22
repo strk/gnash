@@ -1,3 +1,16 @@
+2007-11-22 Chad Musick <chadmusick@msbx.net>
+
+	* testsuite/swfdec/PASSING: 23 new passing tests.
+	* server/as_environment.h: Make pushCallFrame and popCallFrame
+	  private, remove clearCallFrames(), provide FrameGuard nested
+	  class to provide safe access.
+	* server/as_object.cpp: Prevent recursion in get_super, check for
+	  search depth when finding properties and throw a limit exception,
+	* server/swf_function.cpp: Change to use as_environment::FrameGuard
+	  and use it earlier. Only look for super in swf6+.
+	* server/builtin_function.h: Increase call stack on execution.
+	* server/vm/ASHandlers.cpp: Remove leftover debugging output.
+
 2007-11-22 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/key_event_test.c: make the test more verbose

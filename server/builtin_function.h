@@ -23,6 +23,7 @@
 #endif
 
 #include "as_function.h" // for inheritance
+#include "as_environment.h" // for FrameGuard
 
 #include <cassert>
 
@@ -77,6 +78,7 @@ public:
 	/// Invoke this function or this Class constructor
 	virtual as_value operator()(const fn_call& fn)
 	{
+		as_environment::FrameGuard guard(this);
 		assert(_func);
 		return _func(fn);
 	}

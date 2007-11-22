@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.158 2007/11/21 22:35:37 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.159 2007/11/22 11:09:54 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -170,7 +170,6 @@ ActionHandler::~ActionHandler()
 void
 ActionHandler::execute(ActionExec& thread) const
 {
-//    GNASH_REPORT_FUNCTION;
     return _callback(thread);
 }
 
@@ -1394,12 +1393,10 @@ SWFHandlers::ActionCastOp(ActionExec& thread)
 	env.drop(1);
 	if (instance->instanceOf(super))
 	{
-		fprintf(stderr, "Cast succeeded.\n");
 		env.top(0) = as_value(instance);
 	}
 	else
 	{
-		fprintf(stderr, "Cast failed.\n");
 		env.top(0).set_null(); // null, not undefined.
 	}
 
@@ -3058,7 +3055,8 @@ SWFHandlers::ActionSetMember(ActionExec& thread)
 
 	if (obj)
 	{
-		thread.setObjectMember(*obj, member_name, member_value);
+		thread.setObjectMember(*(obj.get()), member_name, member_value);
+
 		IF_VERBOSE_ACTION (
 			log_action(_("-- set_member %s.%s=%s"),
 				env.top(2).to_debug_string().c_str(),

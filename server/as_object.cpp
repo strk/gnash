@@ -110,13 +110,17 @@ as_object::get_member_default(string_table::key name, as_value* val,
 		*val = prop->getValue(*this);
 		return true;
 	}
+	catch (ActionLimitException& exc)
+	{
+		log_error(_("Caught action limit."));
+		throw;
+	}
 	catch (ActionException& exc)
 	{
 		// TODO: check if this should be an 'as' error.. (log_aserror)
 		log_error(_("Caught exception: %s"), exc.what());
 		return false;
 	}
-	
 }
 
 Property*
@@ -139,26 +143,58 @@ as_object::getByIndex(int index)
 as_object*
 as_object::get_super()
 {
+	static bool getting = false;
+	as_object *owner = NULL;
+
+	Property *p = NULL;
+
+	if (getting)
+		return NULL;
+
+	getting = true;
+
 	// Super is this.__proto__.__constructor__.prototype
 	as_object *proto = get_prototype().get();
 	if (!proto)
+	{
+		getting = false;
 		return NULL;
+	}
 
-	as_value ctor;
-	bool ret = proto->get_member(NSV::PROP_uuCONSTRUCTORuu, &ctor);
-	if (!ret)
+	// If an object is its own prototype, we stop looking.
+	if (proto == this)
+	{
+		getting = false;
+		return this;
+	}
+
+	p = proto->findProperty(NSV::PROP_uuCONSTRUCTORuu, 0, &owner);
+	if (!p)
+	{
+		getting = false;
 		return NULL;
+	}
 
+	as_value ctor = p->getValue(*owner);
 	as_object *ctor_obj = ctor.to_object().get();
 	if (!ctor_obj)
+	{
+		getting = false;
 		return NULL;
+	}
 
-	as_value ctor_proto;
-	ret = ctor_obj->get_member(NSV::PROP_PROTOTYPE, &ctor_proto);
-	if (!ret)
+	p = ctor_obj->findProperty(NSV::PROP_PROTOTYPE, 0, &owner);
+	if (!p)
+	{
+		getting = false;
 		return NULL;
+	}
 
+	as_value ctor_proto = p->getValue(*owner);
 	as_object *super = ctor_proto.to_object().get();
+
+	getting = false;
+
 	return super;
 }
 
@@ -224,10 +260,15 @@ as_object::findProperty(string_table::key key, string_table::key nsname,
 	std::set<as_object*> visited;
 
 	int swfVersion = _vm.getSWFVersion();
+	int i = 0;
 
 	boost::intrusive_ptr<as_object> obj = this;
 	while (obj && visited.insert(obj.get()).second)
 	{
+		++i;
+		if ((i > 255 && swfVersion == 5) || i > 257)
+			throw ActionLimitException("Lookup depth exceeded.");
+
 		Property* prop = obj->_members.getProperty(key);
 		if (prop && prop->isVisible(swfVersion) )
 		{
@@ -253,30 +294,30 @@ as_object::findUpdatableProperty(string_table::key key, string_table::key nsname
 	// We won't scan the inheritance chain if we find a member,
 	// even if invisible.
 	// 
-	if ( prop ) return prop; 
+	if ( prop )	return prop; 
 
 	// don't enter an infinite loop looking for __proto__ ...
 	if (key == NSV::PROP_uuPROTOuu) return NULL;
 
-	// this set will keep track of visited objects,
-	// to avoid infinite loops
-	std::set< as_object* > visited;
+	std::set<as_object*> visited;
 	visited.insert(this);
 
+	int i = 0;
+
 	boost::intrusive_ptr<as_object> obj = get_prototype();
-	while ( obj && visited.insert(obj.get()).second )
+	while (obj && visited.insert(obj.get()).second)
 	{
-		Property* prop = obj->_members.getProperty(key, nsname);
-		if ( prop && ( prop->isGetterSetter() || prop->isStatic() ) && prop->isVisible(swfVersion) )
+		++i;
+		if ((i > 255 && swfVersion == 5) || i > 257)
+			throw ActionLimitException("Property lookup depth exceeded.");
+
+		Property* p = obj->_members.getProperty(key, nsname);
+		if (p && (p->isGetterSetter() | p->isStatic()) && p->isVisible(swfVersion))
 		{
-			// what if a property is found which is
-			// NOT a getter/setter ?
-			return prop;
+			return p; // What should we do if this is not a getter/setter ?
 		}
 		obj = obj->get_prototype();
 	}
-
-	// No Getter/Setter or Static property found in inheritance chain
 	return NULL;
 }
 
@@ -521,8 +562,6 @@ as_object::add_interface(as_object* obj)
 
 	if (std::find(mInterfaces.begin(), mInterfaces.end(), obj) == mInterfaces.end())
 		mInterfaces.push_back(obj);
-	else
-		fprintf(stderr, "Not adding duplicate interface.\n");
 }
 
 bool
@@ -817,7 +856,7 @@ as_object::get_prototype()
 
 	int swfVersion = _vm.getSWFVersion();
 
-	boost::intrusive_ptr<as_object> nullRet;
+	boost::intrusive_ptr<as_object> nullRet = NULL;
 
 	Property* prop = _members.getProperty(key);
 	if ( ! prop ) return nullRet;

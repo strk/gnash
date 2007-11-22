@@ -459,28 +459,16 @@ public:
 #endif // GNASH_USE_GC
 	};
 
-	/// Push a frame on the calls stack.
-	//
-	/// This should happen right before calling an ActionScript
-	/// function. Function local registers and variables
-	/// must be set *after* pushCallFrame has been invoked
-	///
-	/// Call popCallFrame() at ActionScript function return.
-	///
-	/// @param func
-	///	The function being called
-	///
-	void pushCallFrame(as_function* func);
-
-	/// Remove current call frame from the stack
-	//
-	/// This should happen when an ActionScript function returns.
-	///
-	void popCallFrame()
+	/// A class to wrap frame access.  Stack allocating a frame guard
+	/// will ensure that all CallFrame pushes have a corresponding
+	/// CallFrame pop, even in the presence of extraordinary returns.
+	class FrameGuard
 	{
-		assert(!_localFrames.empty());
-		_localFrames.pop_back();
-	}
+	public:
+		FrameGuard(as_function* func)
+		{ as_environment::pushCallFrame(func); }
+		~FrameGuard() { as_environment::popCallFrame(); }
+	};
 
 	/// Get top element of the call stack
 	//
@@ -495,13 +483,6 @@ public:
 	{
 		return _localFrames.size();
 	}
-/*
-	/// Clear the call stack
-	void clearCallFrames()
-	{
-		_localFrames.clear();
-	}
-*/
 
 private:
 
@@ -519,6 +500,29 @@ private:
 	/// Movie target. 
 	character* _original_target;
 
+	/// Push a frame on the calls stack.
+	//
+	/// This should happen right before calling an ActionScript
+	/// function. Function local registers and variables
+	/// must be set *after* pushCallFrame has been invoked
+	///
+	/// Call popCallFrame() at ActionScript function return.
+	///
+	/// @param func
+	///	The function being called
+	///
+	static void pushCallFrame(as_function* func);
+
+	/// Remove current call frame from the stack
+	//
+	/// This should happen when an ActionScript function returns.
+	///
+	static void popCallFrame()
+	{
+		assert(!_localFrames.empty());
+		_localFrames.pop_back();
+	}
+	
 	/// Return the (possibly UNDEFINED) value of the named variable.
 	//
 	/// @param varname 

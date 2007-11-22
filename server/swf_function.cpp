@@ -91,28 +91,12 @@ swf_function::getArguments(swf_function& callee, const fn_call& fn)
 
 }
 
-namespace {
-class FrameGuard
-{
-public:
-	FrameGuard(as_environment& env, swf_function *func) : mEnv(env)
-	{
-		env.pushCallFrame(func);
-	}
-
-	~FrameGuard()
-	{
-		mEnv.popCallFrame();
-	}
-
-	as_environment& mEnv;
-};
-} // end of anonymous namespace
-
 // Dispatch.
 as_value
 swf_function::operator()(const fn_call& fn)
 {
+	// Set up local stack frame, for parameters and locals.
+	as_environment::FrameGuard guard(this);
 
 	as_environment*	our_env = m_env;
 	assert(our_env);
@@ -128,16 +112,14 @@ swf_function::operator()(const fn_call& fn)
 	log_msg("swf_function() stack:\n"); fn.env().dump_stack();
 	log_msg("  first_arg_bottom_index: %d\n", fn.first_arg_bottom_index);
 #endif
-
-	assert(fn.this_ptr);
-	as_object *super = fn.this_ptr->get_super();
-
-	// Some features are version-dependant
+	// Some features are version-dependant.
 	unsigned swfversion = VM::get().getSWFVersion();
-
-	// Set up local stack frame, for parameters and locals.
-	FrameGuard guard(*our_env, this);
-//	our_env->pushCallFrame(this);
+	assert(fn.this_ptr);
+	as_object *super = NULL;
+	if (swfversion > 5)
+	{
+		super = fn.this_ptr->get_super();
+	}
 
 	if (m_is_function2 == false)
 	{
@@ -274,7 +256,6 @@ swf_function::operator()(const fn_call& fn)
 			current_reg++;
 		}
 	}
-
 
 	as_value result;
 
