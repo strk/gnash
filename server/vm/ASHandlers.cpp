@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.159 2007/11/22 11:09:54 cmusick Exp $ */
+/* $Id: ASHandlers.cpp,v 1.160 2007/11/22 19:39:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2811,7 +2811,7 @@ SWFHandlers::ActionEnumerate(ActionExec& thread)
 	thread.ensureStack(1);  // var_name
 
 	// Get the object
-	as_value& var_name = env.top(0);
+	as_value var_name = env.top(0);
 	string var_string = var_name.to_string();
 
 	as_value variable = thread.getVariable(var_string);
@@ -2821,9 +2821,9 @@ SWFHandlers::ActionEnumerate(ActionExec& thread)
 	if ( ! variable.is_object() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Top of stack not an object (%s) at "
+		log_aserror(_("Top of stack doesn't evaluate to an object (%s) at "
 			"ActionEnumerate execution"),
-			variable.to_debug_string().c_str());
+			var_name.to_debug_string().c_str());
 		);
 		return;
 	}

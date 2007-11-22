@@ -1,5 +1,6 @@
 2007-11-22 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionEnumerate): cleanup aserror message.
 	* testsuite/actionscript.all/getvariable.as: another test
 
 2007-11-22 Sandro Santilli <strk@keybit.net>

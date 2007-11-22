@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.111 2007/11/22 18:50:56 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.112 2007/11/22 19:39:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -425,6 +425,7 @@ as_environment::parse_path(const std::string& var_path,
     }
     
     if (colon_index >= var_path_length)	{
+log_msg(_(" no colon in path"));
 	// No colon.  Is there a '.'?  Find the last
 	// one, if any.
 	for (colon_index = var_path_length - 1; colon_index >= 0; colon_index--) {
@@ -434,7 +435,7 @@ as_environment::parse_path(const std::string& var_path,
 	    }
 	}
 	if (colon_index < 0) {
-//log_msg(_(" no colon index"));
+log_msg(_(" no dot in path"));
 	    return false;
 	}
     }
