@@ -1,5 +1,9 @@
 2007-11-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/getvariable.as: another test
+
+2007-11-22 Sandro Santilli <strk@keybit.net>
+
 	* server/as_environment.{cpp,h}: drop the is_slash_based
 	  parameter from parse_path, which gets simplified a bit.
 

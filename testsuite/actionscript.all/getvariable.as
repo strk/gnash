@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: getvariable.as,v 1.18 2007/11/22 18:05:11 strk Exp $";
+rcsid="$Id: getvariable.as,v 1.19 2007/11/22 19:37:52 strk Exp $";
 
 #include "check.as"
 
@@ -33,6 +33,7 @@ mc1 = createEmptyMovieClip('mc', 1);
 mc1.mem = 'mc1';
 mc2 = mc1.createEmptyMovieClip('mc', 1);
 mc2.mem = 'mc2';
+mc2.o = new Object();
 
 //---------------------------------------------------------------------
 // Check access to root variable (simplest case)
@@ -121,7 +122,6 @@ check_equals(checkpoint, 5.5);
 // Check '/mc/mc' access 
 //---------------------------------------------------------------------
 
-var variable_in_root = 6;
 asm {
         push 'checkpoint'
 	push '/mc/mc'
@@ -140,7 +140,6 @@ asm {
 // Check '/mc/mc:' access 
 //---------------------------------------------------------------------
 
-var variable_in_root = 6;
 asm {
         push 'checkpoint'
 	push '/mc/mc:'
@@ -154,7 +153,6 @@ check_equals(typeof(checkpoint), 'undefined');
 // (expected to fail, but I'm not sure why)
 //---------------------------------------------------------------------
 
-var variable_in_root = 6;
 asm {
         push 'checkpoint'
 	push '/mc/mc/mem'
@@ -162,6 +160,35 @@ asm {
         setvariable
 };
 check_equals(typeof(checkpoint), 'undefined');
+
+//---------------------------------------------------------------------
+// Check '/mc/mc/o' access 
+// (expected to fail, but I'm not sure why)
+//---------------------------------------------------------------------
+
+asm {
+        push 'checkpoint'
+	push '/mc/mc/o'
+	getvariable
+        setvariable
+};
+check_equals(typeof(checkpoint), 'undefined');
+
+//---------------------------------------------------------------------
+// Check '/mc/mc:mem' access 
+//---------------------------------------------------------------------
+
+asm {
+        push 'checkpoint'
+	push '/mc/mc:mem'
+	getvariable
+        setvariable
+};
+#if OUTPUT_VERSION > 5
+ check_equals(checkpoint, 'mc2');
+#else
+ check_equals(typeof(checkpoint), 'undefined');
+#endif
 
 
 //---------------------------------------------------------------------
@@ -553,9 +580,9 @@ check_equals(checkpoint, 4);
 //-----------------------------------------------------------------------
 
 #if OUTPUT_VERSION < 6
- xcheck_totals(40); // gnash runs 42 tests ?!
+ xcheck_totals(42); // gnash runs 44 tests ?!
 #else
- xcheck_totals(45); // gnash runs 47 tests ?!
+ xcheck_totals(47); // gnash runs 49 tests ?!
 #endif
 
 #else // ndef MING_SUPPORT_ASM
