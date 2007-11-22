@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.440 2007/11/22 16:19:56 rsavoye Exp $
+dnl $Id: configure.ac,v 1.441 2007/11/22 17:11:37 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1849,9 +1849,10 @@ if test x$build_hildon = xyes; then #{
   else
     echo "        ERROR: No HILDON development package installed!"
     echo "               Install it from http://gtk.org"
-    echo "               or .deb users: apt-get install libhildon.0-dev"
+    #echo "               or .deb users: apt-get install libhildon.0-dev"
+    echo "               or .deb users: apt-get install libhildon-1-dev"
     echo "               or .rpm users: yum install hildon-devel"
-dnl    nogo=true
+    nogo=true
   fi
 fi
 

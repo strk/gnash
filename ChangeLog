@@ -1,3 +1,10 @@
+2007-11-22 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: make request for hildon and unavailability a nogo,
+	  suggest installing libhildon-1-dev rather then libhildon.0-dev
+	  for apt-get (the former exists for ubuntu gutsy, the latter
+	  doesn't).
+
 2007-11-22  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* Makefile.am: Add dumpconfig prints for ALP and Hildon.
