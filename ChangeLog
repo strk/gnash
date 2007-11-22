@@ -1,3 +1,8 @@
+2007-11-22  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* gui/gtksup.h: Sigh, use USE_HILDON and USE_ALP after all.
+	* configure.ac: Don't build hildon as part of --enable-gui=all yet.
+
 2007-11-22 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac: make request for hildon and unavailability a nogo,

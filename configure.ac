@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.441 2007/11/22 17:11:37 strk Exp $
+dnl $Id: configure.ac,v 1.442 2007/11/22 17:34:45 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -301,7 +301,7 @@ AC_ARG_ENABLE(gui,
         build_kde=yes
         build_gtk=yes
         build_sdl=yes
-        build_hildon=yes
+dnl        build_hildon=yes
 dnl        build_alp=yes
 dnl        build_riscos=yes
         ;;

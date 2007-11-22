@@ -29,13 +29,13 @@
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
 
-#ifdef HAVE_HILDON
+#ifdef USE_HILDON
 extern "C" {
 # include <hildon/hildon.h>
 }
 #endif
 
-#ifdef HAVE_ALP
+#ifdef USE_ALP
 # include <alp/bundlemgr.h>
 #endif
 
