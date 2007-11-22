@@ -1,5 +1,6 @@
 2007-11-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/key_event_test.c: make the test more verbose
 	* server/movie_root.cpp (cleanupUnloadedListeners): erase the
 	  correct iterator (thanks zou for noticing).
 

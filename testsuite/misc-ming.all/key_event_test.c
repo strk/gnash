@@ -83,15 +83,15 @@ main(int argc, char** argv)
   add_actions(mo, 
     "_root.var1 = 0; _root.var2 = 0;"
     "l = new Object();"
-    "l.onKeyDown = function () {_root.var1+=1; _root.Play(); }; "
-    "l.onKeyUp = function () { _root.var2+=1;}; "
+    "l.onKeyDown = function () { _root.note('l.onKeyDown'); _root.var1+=1; _root.Play(); }; "
+    "l.onKeyUp = function () { _root.note('l.onKeyUp'); _root.var2+=1;}; "
     " Key.addListener(l);"
     "check_equals(typeof(Key), 'object');"
     "check_equals(typeof(onKeyUp), 'undefined');"
     "check_equals(typeof(onKeyDown), 'undefined');"
     "check_equals(typeof(onKeyPress), 'undefined');"
     "stop();"
-    "_root.note('press a single key to continue the test');"
+    "_root.note('1. Press a single key to continue the test');"
   );
   SWFMovie_nextFrame(mo);  // _root frame2
 
@@ -103,7 +103,7 @@ main(int argc, char** argv)
     "check_equals(var2, 1); "
     "Key = 3;"
     "check_equals(typeof(Key), 'number');"
-    "_root.note('press a single key to continue the test');"
+    "_root.note('2. Press a single key to continue the test');"
     );
   SWFMovie_nextFrame(mo);  // _root frame4
   
@@ -116,9 +116,10 @@ main(int argc, char** argv)
     "delete Key; "
     "check_equals(typeof(Key), 'object');"
     "Key.removeListener(l);"
-    "_root.note('press a single key to continue the test');"
+    "_root.note('3. Press a single key to continue the test');"
     "obj1=new Object(); "
     " obj1.onKeyDown=function() {"
+    "   _root.note('obj1.onKeyDown');"
     "   _root.play();"
     "}; "
     " Key.addListener(obj1); "
@@ -139,7 +140,7 @@ main(int argc, char** argv)
   
   it = add_static_mc(mo, "listenerClip1", 20);
   SWFDisplayItem_addAction(it,
-    newSWFAction(" _root.note('onClipKeyDown triggered'); "
+    newSWFAction(" _root.note('listenerClip2.onClipKeyDown'); "
                  " _root.test2++; "
                  "if(!_root.haslooped1){"
                  "   _root.haslooped1=true;"
@@ -151,7 +152,7 @@ main(int argc, char** argv)
     SWFACTION_KEYDOWN);  
   add_actions(mo,
     "stop();"
-    "_root.note('press a single key to continue the test');"
+    "_root.note('4. Press a single key to continue the test');"
   );
   SWFMovie_nextFrame(mo);  // _root frame9
   
@@ -166,12 +167,12 @@ main(int argc, char** argv)
   
   add_actions(mo, 
     "stop();"
-    "_root.note('press a single key to continue the test');"
+    "_root.note('5. Press a single key to continue the test');"
     "_root.createEmptyMovieClip('dynamic_mc', -10);"
     "dynamic_mc.onKeyDown = function() "
     "{"
+    "   _root.note('dynamic_mc.onKeyDown triggered');"
     "   _root.check_equals(this, _root.dynamic_mc);"
-    "   _root.note('user defined KeyDown triggered');"
     "   _root.test3++;"
     "   if(!_root.haslooped2){"
     "       _root.haslooped2=true;"
@@ -193,11 +194,11 @@ main(int argc, char** argv)
   // test4:
   //    GC test
   add_actions(mo, 
-    "_root.note('press a single key to continue the test');"
+    "_root.note('6. Press a single key to continue the test');"
     " obj2 = new Object(); "
     " obj2.x = 100; "
     " obj2.onKeyDown = function () { "
-    "   _root.note('user defined KeyDown triggered');"
+    "   _root.note('obj2.onKeyDown triggered');"
     "   _root.test4++; "
     "   _root.objRef = this; "
     "   _root.play();"
@@ -214,7 +215,7 @@ main(int argc, char** argv)
   check_equals(mo, "_root.test4", "1");
   add_actions(mo,
     "stop();"
-    "_root.note('press a single key to continue the test');"
+    "_root.note('7. Press a single key to continue the test');"
     "Key.removeListener(objRef); "
     // check that objRef is still alive
     "check_equals(typeof(objRef), 'object');"
@@ -222,6 +223,7 @@ main(int argc, char** argv)
     "delete objRef;"
     "obj3=new Object(); "
     "obj3.onKeyDown=function() {"
+    "   _root.note('obj3.onKeyDown');"
     "   _root.gotoAndPlay(_currentframe+1);"
     "}; "
     "Key.addListener(obj3); "
@@ -244,39 +246,67 @@ main(int argc, char** argv)
   //      if not registered to the global Key object.
   it1 = add_static_mc(mo, "ls1", 30);
   SWFDisplayItem_addAction(it1,
-    compileSWFActionCode("_root.test5 += '+ls1';"),
+    compileSWFActionCode(
+       "_root.note('ls1.onClipKeyDown');"
+       "_root.test5 += '+ls1';"
+    ),
     SWFACTION_KEYDOWN);
   SWFMovie_nextFrame(mo);  // _root frame17
   
   it2 = add_static_mc(mo, "ls2", 31);
   SWFDisplayItem_addAction(it2,
-    compileSWFActionCode("_root.test5 += '+ls2'; "),
+    compileSWFActionCode(
+       "_root.note('ls2.onClipKeyDown');"
+       "_root.test5 += '+ls2';"
+    ),
     SWFACTION_KEYDOWN);
   SWFMovie_nextFrame(mo);  // _root frame18
    
   it3 = add_static_mc(mo, "ls3", 29);
   SWFDisplayItem_addAction(it3,
-    compileSWFActionCode("_root.test5 += '+ls3'; "),
+    compileSWFActionCode(
+       "_root.note('ls3.onClipKeyDown');"
+       "_root.test5 += '+ls3';"
+    ),
     SWFACTION_KEYDOWN);
   SWFMovie_nextFrame(mo);  // _root frame19
 
   add_actions(mo, 
     "obj1=new Object();"
-    "obj1.onKeyDown = function () { _root.test5 += '+obj1'; _root.gotoAndPlay(_root._currentframe+1);}; "
+    "obj1.onKeyDown = function () { "
+    "  _root.note('obj1.onKeyDown');"
+    "  _root.test5 += '+obj1'; "
+    "  _root.gotoAndPlay(_root._currentframe+1);"
+    "}; "
     "Key.addListener(obj1);"
-    "ls1.onKeyDown = function () {_root.test5 += '+ls1'; }; "
+    "ls1.onKeyDown = function () {"
+    "  _root.note('ls1.onKeyDown');"
+    "  _root.test5 += '+ls1';"
+    "}; "
     "Key.addListener(ls1);"
     "obj2=new Object();"
-    "obj2.onKeyDown = function () {_root.test5 += '+obj2'; }; "
+    "obj2.onKeyDown = function () {"
+    "  _root.note('obj2.onKeyDown');"
+    "  _root.test5 += '+obj2';"
+    "}; "
     "Key.addListener(obj2);"
-    "ls2.onKeyDown = function () {_root.test5 += '+ls2'; }; "
+    "ls2.onKeyDown = function () {"
+    "  _root.note('ls2.onKeyDown');"
+    "  _root.test5 += '+ls2';"
+    "}; "
     "Key.addListener(ls2);"
     "obj3=new Object();"
-    "obj3.onKeyDown = function () {_root.test5 += '+obj3'; }; "
+    "obj3.onKeyDown = function () {"
+    "  _root.note('obj3.onKeyDown');"
+    "  _root.test5 += '+obj3';"
+    "}; "
     "Key.addListener(obj3);"
-    "ls3.onKeyDown = function () {_root.test5 += '+ls3'; }; "
+    "ls3.onKeyDown = function () {"
+    "  _root.note('ls3.onKeyDown');"
+    "  _root.test5 += '+ls3';"
+    "}; "
     "stop(); "
-    "_root.note('press a single key to continue the test');"
+    "_root.note('8. Press a single key to continue the test');"
   );
   SWFMovie_nextFrame(mo);  // _root frame20
 
@@ -284,7 +314,7 @@ main(int argc, char** argv)
   
   add_actions(mo,
     "stop(); "
-    "_root.note('press a single key to continue the test');"
+    "_root.note('9. Press a single key to continue the test');"
   );
   SWFDisplayItem_remove(it1);
   SWFDisplayItem_remove(it2);
