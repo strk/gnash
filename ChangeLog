@@ -1,3 +1,7 @@
+2007-11-22 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* macros/archflag.m4: Updated to the latest version.
+
 2007-11-22 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ASHandlers.cpp (ActionEnumerate): cleanup aserror message.
