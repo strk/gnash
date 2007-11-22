@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.121 2007/10/03 14:15:22 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.122 2007/11/22 16:19:57 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -54,6 +54,10 @@
 #include "gtk_glue_agg.h"
 #endif
 
+#ifdef GUI_HILDON
+# include <hildon/hildon.h>
+#endif
+
 using namespace std;
 
 namespace gnash 
@@ -87,6 +91,10 @@ GtkGui::init(int argc, char **argv[])
 
     gtk_init (&argc, argv);
 
+#ifdef GUI_HILDON
+    _hildon_program = hildon_program_get_instance();
+#endif
+    
     // TODO: don't rely on a macro to select renderer
 #ifdef RENDERER_CAIRO
     _glue.reset(new GtkCairoGlue);
@@ -103,7 +111,12 @@ GtkGui::init(int argc, char **argv[])
       _window = gtk_plug_new(_xid);
       log_msg (_("Created XEmbedded window"));
     } else {
+#ifdef GUI_HILDON
+      _window = hildon_window_new();
+      hildon_program_add_window(_hildon_program, HILDON_WINDOW(_window));
+#else
       _window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+#endif
       log_msg (_("Created top level window"));
     }
 
@@ -135,7 +148,7 @@ GtkGui::init(int argc, char **argv[])
         _vbox = gtk_vbox_new(FALSE, 0);
         gtk_widget_show(_vbox);
         gtk_container_add(GTK_CONTAINER(_window), _vbox);
-#ifdef USE_MENUS
+#if defined(USE_MENUS) && !defined(GUI_HILDON)
         createMenuBar();
 #endif
         gtk_box_pack_start(GTK_BOX(_vbox), _drawing_area, TRUE, TRUE, 0);
@@ -172,7 +185,13 @@ GtkGui::createMenuBar()
 {
     _menubar = gtk_menu_bar_new();
     gtk_widget_show(_menubar);
-    gtk_box_pack_start(GTK_BOX (_vbox), _menubar, FALSE, FALSE, 0); 
+#ifdef GUI_HILDON
+//     _hildon_toolbar = create_hildon_toolbar(_hildon_program);
+//     hildon_window_add_toolbar(HILDON_WINDOW(_window),
+//                               GTK_TOOLBAR(_hildon_toolbar));
+#else
+    gtk_box_pack_start(GTK_BOX (_vbox), _menubar, FALSE, FALSE, 0);
+#endif
 
     createFileMenu(_menubar);
     createEditMenu(_menubar);
@@ -181,6 +200,56 @@ GtkGui::createMenuBar()
     createHelpMenu(_menubar);
     
     return true;   
+}
+
+
+bool
+GtkGui::createMenu()
+{
+    //GNASH_REPORT_FUNCTION;
+
+    _popup_menu = GTK_MENU(gtk_menu_new());
+//    GtkAccelGroup *accel_group = gtk_accel_group_new();;
+//    gtk_window_add_accel_group (GTK_WINDOW (_popup_menu), accel_group);
+    
+#ifdef USE_MENUS
+    createFileMenu(GTK_WIDGET(_popup_menu));
+    createEditMenu(GTK_WIDGET(_popup_menu));
+    createViewMenu(GTK_WIDGET(_popup_menu));
+    createControlMenu(GTK_WIDGET(_popup_menu));
+#endif
+    createHelpMenu(GTK_WIDGET(_popup_menu));
+    
+//     GtkMenuItem *menuitem_prefs =
+//  	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Preferences..."));
+//     gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_prefs));
+//     gtk_widget_show(GTK_WIDGET(menuitem_prefs));
+
+    if (get_sound_handler()) {
+        GtkMenuItem *menuitem_sound =
+            GTK_MENU_ITEM(gtk_menu_item_new_with_label("Toggle Sound"));
+//         gtk_widget_add_accelerator (GTK_WIDGET(menuitem_sound), "activate", accel_group,
+//                                 GDK_s, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+        gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_sound));
+        gtk_widget_show(GTK_WIDGET(menuitem_sound));
+        g_signal_connect(GTK_OBJECT(menuitem_sound), "activate",
+                         G_CALLBACK(&menuitem_sound_callback), this);
+    }
+
+    GtkMenuItem *menuitem_quit =
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Quit Gnash"));
+    gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_quit));
+    gtk_widget_show(GTK_WIDGET(menuitem_quit));
+    g_signal_connect(GTK_OBJECT(menuitem_quit), "activate",
+                     G_CALLBACK(&menuitem_quit_callback), this);
+
+#ifdef GUI_HILDON
+     hildon_window_set_menu(HILDON_WINDOW(_window),
+                               GTK_MENU(_popup_menu));
+     gtk_widget_show_all(GTK_WIDGET(_popup_menu));   
+#endif
+
+    return true;
 }
 
 bool
@@ -268,102 +337,100 @@ GtkGui::create_pixbuf                          (const gchar     *filename)
 bool
 GtkGui::createWindow(int width, int height)
 {
-	//GNASH_REPORT_FUNCTION;
-
-	assert(_width>0);
-	assert(_height>0);
-
-	_width = width;
-	_height = height;
-
-	_validbounds.setTo(0, 0, _width-1, _height-1);
-	_glue->setRenderHandlerSize(_width, _height);
-
-	return true;
+    //GNASH_REPORT_FUNCTION;
+    
+    assert(_width>0);
+    assert(_height>0);
+    
+    _width = width;
+    _height = height;
+    
+    _validbounds.setTo(0, 0, _width-1, _height-1);
+    _glue->setRenderHandlerSize(_width, _height);
+    
+    return true;
 }
 
 void
 GtkGui::beforeRendering()
 {
-  _glue->beforeRendering();
+    _glue->beforeRendering();
 }
 
 void
 GtkGui::renderBuffer()
 {
-	if ( _drawbounds.size() == 0 ) return; // nothing to do..
-
-	for (unsigned bno=0; bno < _drawbounds.size(); bno++) {
+    if ( _drawbounds.size() == 0 ) return; // nothing to do..
+    
+    for (unsigned bno=0; bno < _drawbounds.size(); bno++) {
 	
-		geometry::Range2d<int>& bounds = _drawbounds[bno];
-		
-		assert ( bounds.isFinite() );
-		
-		_glue->render(bounds.getMinX(), bounds.getMinY(),
-		  bounds.getMaxX(), bounds.getMaxY());
+        geometry::Range2d<int>& bounds = _drawbounds[bno];
+        
+        assert ( bounds.isFinite() );
+        
+        _glue->render(bounds.getMinX(), bounds.getMinY(),
+                      bounds.getMaxX(), bounds.getMaxY());
 	
-	}
+    }
 }
 
 void
 GtkGui::rerenderPixels(int xmin, int ymin, int xmax, int ymax) 
 {
 
-	// This function is called in expose events to force partly re-rendering
-	// of the window. The coordinates are PIXELS.
-
-	// The macro PIXELS_TO_TWIPS can't be used since the renderer might do 
-	// scaling.
-   
-	InvalidatedRanges ranges;
-	
-	geometry::Range2d<int> exposed_pixels(xmin, ymin, xmax, ymax);
-	
-	geometry::Range2d<float> exposed_twips = 
-		_renderer->pixel_to_world(exposed_pixels);	
-	
-	ranges.add(exposed_twips);
-	setInvalidatedRegions(ranges);
-
-	renderBuffer();   
-
+    // This function is called in expose events to force partly re-rendering
+    // of the window. The coordinates are PIXELS.
+    
+    // The macro PIXELS_TO_TWIPS can't be used since the renderer might do 
+    // scaling.
+    
+    InvalidatedRanges ranges;
+    
+    geometry::Range2d<int> exposed_pixels(xmin, ymin, xmax, ymax);
+    
+    geometry::Range2d<float> exposed_twips = 
+        _renderer->pixel_to_world(exposed_pixels);	
+    
+    ranges.add(exposed_twips);
+    setInvalidatedRegions(ranges);
+    
+    renderBuffer();   
+    
 }
 
 void
 GtkGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 {
-	// forward to renderer
-	//
-	// Why? Why have the region been invalidated ??
-	// Was the renderer offscreen buffer also invalidated
-	// (need to rerender)?
-	// Was only the 'onscreen' buffer be invalidated (no need to rerender,
-	// just to blit) ??
-	//
-	// To be safe just assume this 'invalidated' region is actually
-	// the offscreen buffer, for safety, but we need to clarify this.
-	//
-	_renderer->set_invalidated_regions(ranges);
-	
-	_drawbounds.clear();
-		
-	for (unsigned rno=0; rno<ranges.size(); rno++)
-	{
-	
-		geometry::Range2d<int> bounds = Intersection(
-			_renderer->world_to_pixel(ranges.getRange(rno)),
-			_validbounds);
-			
-		// it may happen that a particular range is out of the screen, which 
-		// will lead to bounds==null. 
-		if (bounds.isNull()) continue;
-		
-		assert(bounds.isFinite()); 
-		
-		_drawbounds.push_back(bounds);
-	    
-	}
-
+    // forward to renderer
+    //
+    // Why? Why have the region been invalidated ??
+    // Was the renderer offscreen buffer also invalidated
+    // (need to rerender)?
+    // Was only the 'onscreen' buffer be invalidated (no need to rerender,
+    // just to blit) ??
+    //
+    // To be safe just assume this 'invalidated' region is actually
+    // the offscreen buffer, for safety, but we need to clarify this.
+    //
+    _renderer->set_invalidated_regions(ranges);
+    
+    _drawbounds.clear();
+    
+    for (unsigned rno=0; rno<ranges.size(); rno++) {
+        geometry::Range2d<int> bounds = Intersection(
+            _renderer->world_to_pixel(ranges.getRange(rno)),
+            _validbounds);
+        
+        // it may happen that a particular range is out of the screen, which 
+        // will lead to bounds==null. 
+        if (bounds.isNull()) continue;
+        
+        assert(bounds.isFinite()); 
+        
+        _drawbounds.push_back(bounds);
+        
+    }
+    
 }
 
 void
@@ -404,20 +471,20 @@ GtkGui::quit()
 void
 GtkGui::setInterval(unsigned int interval)
 {
-	_interval = interval;
-
-	// From http://www.idt.mdh.se/kurser/cd5040/ht02/gtk/glib/glib-the-main-event-loop.html#G-TIMEOUT-ADD-FULL
-	//
-	// Note that timeout functions may be delayed, due to the
-	// processing of other event sources. Thus they should not be
-	// relied on for precise timing. After each call to the timeout
-	// function, the time of the next timeout is recalculated based
-	// on the current time and the given interval (it does not try to
-	// 'catch up' time lost in delays).
-	//
-	// TODO: this is not what we need here, we want instead to 'catch up' !!
-	//
-	g_timeout_add_full (G_PRIORITY_LOW, interval, (GSourceFunc)advance_movie,
+    _interval = interval;
+    
+    // From http://www.idt.mdh.se/kurser/cd5040/ht02/gtk/glib/glib-the-main-event-loop.html#G-TIMEOUT-ADD-FULL
+    //
+    // Note that timeout functions may be delayed, due to the
+    // processing of other event sources. Thus they should not be
+    // relied on for precise timing. After each call to the timeout
+    // function, the time of the next timeout is recalculated based
+    // on the current time and the given interval (it does not try to
+    // 'catch up' time lost in delays).
+    //
+    // TODO: this is not what we need here, we want instead to 'catch up' !!
+    //
+    g_timeout_add_full (G_PRIORITY_LOW, interval, (GSourceFunc)advance_movie,
                         this, NULL);
 }
 
@@ -428,51 +495,6 @@ GtkGui::run()
     gtk_main();
     return true;
 }
-
-bool
-GtkGui::createMenu()
-{
-    //GNASH_REPORT_FUNCTION;
-
-    _popup_menu = GTK_MENU(gtk_menu_new());
-//    GtkAccelGroup *accel_group = gtk_accel_group_new();;
-//    gtk_window_add_accel_group (GTK_WINDOW (_popup_menu), accel_group);
- 
-#ifdef USE_MENUS
-    createFileMenu(GTK_WIDGET(_popup_menu));
-    createEditMenu(GTK_WIDGET(_popup_menu));
-    createViewMenu(GTK_WIDGET(_popup_menu));
-    createControlMenu(GTK_WIDGET(_popup_menu));
-#endif
-    createHelpMenu(GTK_WIDGET(_popup_menu));
-    
-//     GtkMenuItem *menuitem_prefs =
-//  	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Preferences..."));
-//     gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_prefs));
-//     gtk_widget_show(GTK_WIDGET(menuitem_prefs));
-
-    if (get_sound_handler()) {
-        GtkMenuItem *menuitem_sound =
-            GTK_MENU_ITEM(gtk_menu_item_new_with_label("Toggle Sound"));
-//         gtk_widget_add_accelerator (GTK_WIDGET(menuitem_sound), "activate", accel_group,
-//                                 GDK_s, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-        gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_sound));
-        gtk_widget_show(GTK_WIDGET(menuitem_sound));
-        g_signal_connect(GTK_OBJECT(menuitem_sound), "activate",
-                         G_CALLBACK(&menuitem_sound_callback), this);
-    }
-
-    GtkMenuItem *menuitem_quit =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Quit Gnash"));
-    gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_quit));
-    gtk_widget_show(GTK_WIDGET(menuitem_quit));
-    g_signal_connect(GTK_OBJECT(menuitem_quit), "activate",
-                     G_CALLBACK(&menuitem_quit_callback), this);
-
-    return true;
-}
-
-
 
 /// This method is called when the "OK" button is clicked in the open file
 /// dialog. For GTK <= 2.4.0, this is a callback called by GTK itself.
@@ -1804,7 +1826,7 @@ bool
 lirc_handler(void*, int, void* data)
 { 
     GNASH_REPORT_FUNCTION;
-    int* fd = static_cast<int*>(data);
+//    int* fd = static_cast<int*>(data);
     
     // want to remove this handler. You may want to close fd.
     log_msg("%s\n", lirc->getButton());

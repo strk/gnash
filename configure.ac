@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.439 2007/11/17 23:44:45 nihilus Exp $
+dnl $Id: configure.ac,v 1.440 2007/11/22 16:19:56 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -126,7 +126,7 @@ AC_LANG_POP(C++)
 dnl This is primarily used when compiling for a similar architecture,
 dnl like pentium->geode, which can use the same compiler, but have
 dnl different development
-AC_ARG_WITH(top_level, AC_HELP_STRING([--with-top-level], [top level directory for cross compiling files]), with_top_level=${withval})
+AC_ARG_WITH(top_level, AC_HELP_STRING([--with-top-level], [top level directory for cross compiling files]), with_top_level=${withval} ; cross_compiling=yes)
 
 AC_ARG_ENABLE(debugger,
   AC_HELP_STRING([--enable-debugger],[Enable the Flash debugger]),
@@ -248,6 +248,8 @@ build_gtk=no
 build_sdl=no
 build_riscos=no
 build_aqua=no
+build_hildon=no
+build_alp=no
 AC_ARG_ENABLE(gui,
   AC_HELP_STRING([--enable-gui=], [Use the specified GUI toolkit (default=gtk,kde)]),
   if test -n ${enableval}; then
@@ -256,7 +258,20 @@ AC_ARG_ENABLE(gui,
   while test -n "${enableval}" ; do
     val=`echo ${enableval} | cut -d ' ' -f 1`
     [case "${val}" in
+      hildon|HILDON|hildon2|HILDON2)
+        build_hildon=yes
+        AC_DEFINE(USE_HILDON, [1], [Use the Hildon mobile framework])
+        build_gtk=yes
+        AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
+        ;;
+      alp|ALP|alp|ALP)
+        build_alp=yes
+        AC_DEFINE(USE_ALP, [1], [Use the ALP framework])
+        build_gtk=yes
+        AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
+        ;;
       gtk|GTK|gtk2|GTK2)
+        AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
         build_gtk=yes
         ;;
       kde|KDE)
@@ -286,9 +301,11 @@ AC_ARG_ENABLE(gui,
         build_kde=yes
         build_gtk=yes
         build_sdl=yes
+        build_hildon=yes
+dnl        build_alp=yes
 dnl        build_riscos=yes
         ;;
-      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde|fltk|sdl|riscos|aqua|fb)])
+      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde|fltk|sdl|riscos|aqua|fb|hildon|alp)])
          ;;
       esac]
     enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
@@ -496,6 +513,7 @@ ext_lirc=no
 ext_dbus=no
 ext_metome=no
 ext_all=no
+ext_launcher=no
 AC_ARG_WITH(extensions,
   AC_HELP_STRING([--with-extensions=], [Specify which extensions to build]),
   if test -n ${withval}; then
@@ -535,6 +553,11 @@ AC_ARG_WITH(extensions,
         ext_gtk=yes
         nextensions=$((nextensions+1))
         ;;
+      launcher|LAUNCHER)
+        AC_DEFINE(USE_LAUNCHER_EXT, [1], [Build the Launcher extension])
+        ext_launcher=yes
+        nextensions=$((nextensions+1))
+        ;;
       lirc|LIRC)
         AC_DEFINE(USE_LIRC_EXT, [1], [Build the LIRC extension])
         ext_lirc=yes
@@ -559,8 +582,9 @@ AC_ARG_WITH(extensions,
         ext_lirc=yes
         ext_dbus=yes
         ext_metome=yes
+        ext_launcher=yes
         ext_all=yes
-        nextensions=8
+        nextensions=9
         ;;
       *) AC_MSG_ERROR([invalid extension specified: ${withval} given (accept: MYSQL|DEJAGNU|FILEIO|GTK|LIRC|DBUS|METOME|ALL)])
          ;;
@@ -580,6 +604,7 @@ AC_ARG_WITH(extensions,
 AM_CONDITIONAL(BUILD_DEJAGNU_EXT, [ test x$ext_dejagnu = xyes ])
 AM_CONDITIONAL(BUILD_FILEIO_EXT, [ test x$ext_fileio = xyes ])
 AM_CONDITIONAL(BUILD_MYSQL_EXT, [ test x$ext_mysql = xyes ])
+AM_CONDITIONAL(BUILD_LAUNCHER_EXT, [ test x$ext_launcher = xyes ])
 AM_CONDITIONAL(BUILD_GTK_EXT, [ test x$ext_gtk = xyes ])
 AM_CONDITIONAL(BUILD_LIRC_EXT, [ test x$ext_lirc = xyes ])
 AM_CONDITIONAL(BUILD_DBUS_EXT, [ test x$ext_dbus = xyes ])
@@ -668,6 +693,23 @@ fi
 dnl Check for PKG_CONFIG before any GNASH_PATH call
 PKG_PROG_PKG_CONFIG
 
+dnl Look for scratchbox
+sbox=no
+if test x"${SBOX_REDIRECT_FROM_DIRS}" != x; then
+  sbox=yes
+fi
+if test x"${build_alp}" = xyes; then
+  GNASH_PATH_ALP
+  if test x"${have_alp}" = x"yes"; then
+    AC_DEFINE([HAVE_ALP], [], [Access Linux Platform framework])
+  fi
+  cross_compiling=yes
+  build_gtk=yes
+  build_kde=no
+  build_ogl=no
+  build_agg=yes
+fi
+
 dnl !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 dnl !! 
 dnl !! IMPORTANT NOTICE 
@@ -706,7 +748,13 @@ if test x$build_gtk = xyes; then
       AC_MSG_WARN(["Disabling GTK GUI, no GTK development tools found"])
    fi
 fi
-
+if test x$build_hildon = xyes; then
+  GNASH_PATH_HILDON
+  build_gtk=yes
+  build_kde=no
+dnl   build_ogl=no
+dnl   build_agg=yes
+fi
 dnl TODO: add checks for all other GUIs
 
 
@@ -1091,6 +1139,8 @@ if test x$build_kde = xno -a x$kparts = xyes; then
   AC_MSG_WARN(["Enabled KPARTS plugin, but you aren't building a KDE based GUI!"])
 fi
 
+AM_CONDITIONAL(BUILD_ALP_GUI, [ test x$build_alp = xyes ])
+AM_CONDITIONAL(BUILD_HILDON_GUI, [ test x$build_hildon = xyes ])
 AM_CONDITIONAL(BUILD_GTK_GUI, [ test x$build_gtk = xyes ])
 AM_CONDITIONAL(BUILD_KDE_GUI, [ test x$build_kde = xyes ])
 dnl AM_CONDITIONAL(BUILD_QT_GUI, [ test x$build_qt = xyes ])
@@ -1787,6 +1837,24 @@ if test x$build_gtk = xyes -a x$build_ogl = xyes ; then
   fi
 fi
 
+
+if test x$build_hildon = xyes; then #{
+  if test x"$HILDON_LIBS" != x; then
+    if test x"$HILDON_CFLAGS" != x; then
+      echo "        HILDON flags are: $HILDON_CFLAGS"
+    else
+      echo "        HILDON flags are: default include path"
+    fi
+      echo "        HILDON libs are: $HILDON_LIBS"
+  else
+    echo "        ERROR: No HILDON development package installed!"
+    echo "               Install it from http://gtk.org"
+    echo "               or .deb users: apt-get install libhildon.0-dev"
+    echo "               or .rpm users: yum install hildon-devel"
+dnl    nogo=true
+  fi
+fi
+
 if test x$build_gtk = xyes; then #{
   if test x"$GTK2_LIBS" != x; then
     if test x"$GTK2_CFLAGS" != x; then
@@ -2254,11 +2322,21 @@ if test x$ext_mysql = xyes; then
   fi
 fi
 
+dnl Access Linux Platform
+if test x"${build_alp}" = xyes; then
+  if test x"${ALP_CFLAGS}" != x; then
+    echo "        ALP flags are: $ALP_CFLAGS"
+    echo "        ALP libs are: $ALP_LIBS"
+  else
+    echo "        ERROR: No ALP development package is installed."
+  fi
+fi
+
 if test x$cross_compiling = xyes; then
   AC_MSG_NOTICE([This build is setup for cross compiling])
 fi
 
-# If anything critical is missing, don't bother to continue
+dnl If anything critical is missing, don't bother to continue
 if test x"$nogo" = x"true"; then
 echo ""
   AC_MSG_ERROR([Please install required packages])

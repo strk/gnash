@@ -30,7 +30,7 @@
 
 #!/bin/sh
 
-GUIS="gtk kde sdl fltk aqua riscos fb"
+GUIS="gtk kde sdl fltk aqua riscos fb alp hildon"
 THIS_DIR="`dirname $0`"
 
 if test "$1" = "-G"; then

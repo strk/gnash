@@ -15,9 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-
 #ifndef __GTKSUP_H__
 #define __GTKSUP_H__
 
@@ -32,6 +29,15 @@
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
 
+#ifdef GUI_HILDON
+extern "C" {
+# include <hildon/hildon.h>
+}
+#endif
+
+#ifdef USE_ALP
+# include <alp/bundlemgr.h>
+#endif
 
 namespace gnash
 {
@@ -157,6 +163,9 @@ class DSOEXPORT GtkGui : public Gui
     GtkWidget *getWindow() { return _window; };
 
  private:
+#ifdef GUI_HILDON
+    HildonProgram *_hildon_program;
+#endif
     GtkWidget   *_window;
     GdkPixbuf 	*_window_icon_pixbuf;
     GtkWidget   *_drawing_area;    

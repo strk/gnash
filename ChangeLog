@@ -1,3 +1,17 @@
+2007-11-22  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* Makefile.am: Add dumpconfig prints for ALP and Hildon.
+	* configure.ac: Add support for the ALP and Hildon GUI frameworks,
+	both of which are built on GTK+. Add initial support for the
+	Launcher extension, which doesn't exist yet.
+	* macros/alp.m4: Find Hildon headers and libraries.
+	* macros/hildon.m4: Find Hildon headers and libraries.
+	* gui/Makefile.am: Add support for the Hildon GUI framework, which
+	is built on GTK+.
+	* gui/gtk.cpp, gtksup.h: Add support for the Hildon GUI framework,
+	which is built on GTK+. Move CreateMenu.
+	* gui/gnash.in: Add ALP and Hildon.
+
 2007-11-22 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/: getvariable.as, targetPath.as:

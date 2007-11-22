@@ -328,11 +328,6 @@ gtk_gnash_SOURCES += gtk_glue_agg.cpp gtk_glue_agg.h \
 		gtk.cpp gtksup.h gtk_glue.h
 gtk_gnash_LDADD = $(top_builddir)/backend/libgnashagg.la \
 		$(GNASH_LIBS) $(GTK_LIBS) $(AGG_LIBS)
-# if ALP				# Access Linux Platform
-# gtk_gnash_LDFLAGS += "-shared -Xlinker -z -Xlinker defs $(GTK2_LIBS)"
-# gtk_gnash_LDADD += $(ALP_LIBS)
-# endif
-
 endif				# BUILD_AGG_RENDERER
 if BUILD_CAIRO_RENDERER
 gtk_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
@@ -342,6 +337,41 @@ gtk_gnash_LDADD = $(top_builddir)/backend/libgnashcairo.la \
 		$(GNASH_LIBS) $(GTK_LIBS) $(CAIRO_LIBS)
 endif				# BUILD_CAIRO_RENDERER
 endif				# BUILD_GTK_GUI
+
+#
+# Build the GTK/HILDON gui
+#
+if BUILD_HILDON_GUI
+bin_PROGRAMS += hildon-gnash
+hildon_gnash_SOURCES = $(GUI_SRCS) gui_gtk.cpp
+hildon_gnash_CPPFLAGS = -DGUI_GTK -DGUI_HILDON -DGUI_CONFIG=\"HILDON\" \
+	$(AM_CPPFLAGS) $(GTK_CFLAGS) $(HILDON_CFLAGS)
+hildon_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
+#gtk_gnash_DEPENDENCIES = .configline
+
+if BUILD_OGL_RENDERER
+hildon_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
+hildon_gnash_SOURCES += gtk_glue_gtkglext.cpp gtk_glue_gtkglext.h \
+		gtk.cpp gtksup.h gtk_glue.h
+hildon_gnash_LDADD = $(top_builddir)/backend/libgnashogl.la \
+		$(GNASH_LIBS) $(GTK_LIBS) $(OPENGL_LIBS) $(HILDON_LIBS)
+endif				# BUILD_OGL_RENDERER
+if BUILD_AGG_RENDERER
+hildon_gnash_CPPFLAGS += $(AGG_CFLAGS) $(HILDON_CFLAGS)
+hildon_gnash_SOURCES += gtk_glue_agg.cpp gtk_glue_agg.h \
+		gtk.cpp gtksup.h gtk_glue.h
+hildon_gnash_LDADD = $(top_builddir)/backend/libgnashagg.la \
+		$(GNASH_LIBS) $(GTK_LIBS) $(AGG_LIBS) $(HILDON_LIBS)
+
+endif				# BUILD_AGG_RENDERER
+if BUILD_CAIRO_RENDERER
+hildon_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
+hildon_gnash_SOURCES += gtk_glue_cairo.cpp gtk_glue_cairo.h \
+		gtk.cpp gtksup.h gtk_glue.h
+hildon_gnash_LDADD = $(top_builddir)/backend/libgnashcairo.la \
+		$(GNASH_LIBS) $(GTK_LIBS) $(CAIRO_LIBS) $(HILDON_LIBS)
+endif				# BUILD_CAIRO_RENDERER
+endif				# BUILD_GTK_HILDON
 
 #
 # Build the FB gui
@@ -428,17 +458,3 @@ clean-hook:
 # 	done
 # endif
 
-# if ALP
-# alpdir = build
-# install-alp: libgnashalp.la
-# 	$(mkinstalldirs) build
-# 	${CP} $(srcdir)/Manifest.xml build/
-# 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(alp_LTLIBRARIES) build
-# 	${RM} build/*.a build/*.T build/*.0
-
-# alp_LTLIBRARIES = libgnashalp.la
-
-# libgnashalp_la_SOURCES = $(gtk_gnash_SOURCES)
-# libgnashalp_la_LDFLAGS = -module -avoid-version
-
-# endif

@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.92 2007/10/22 15:58:40 rsavoye Exp $
+# $Id: Makefile.am,v 1.93 2007/11/22 16:19:56 rsavoye Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -143,6 +143,14 @@ if BUILD_GTK_GUI
 	@echo "	ATK_CFLAGS is $(ATK_CFLAGS)"
 	@echo "	ATK_LIBS is $(ATK_LIBS)"
 endif
+if BUILD_HILDON_GUI
+	@echo "	HILDON_CFLAGS is $(HILDON_CFLAGS)"
+	@echo "	HILDON_LIBS is $(HILDON_LIBS)"
+endif
+if BUILD_ALP_GUI
+	@echo " ALP_CFLAGS is $(ALP_CFLAGS)"
+	@echo "	ALP_LIBS is $(ALP_LIBS)"
+endif
 	@echo "	X11_CFLAGS is $(X11_CFLAGS)"
 	@echo "	X11_LIBS is $(X11_LIBS)"
 	@echo "Support libraries..."
@@ -225,6 +233,12 @@ endif
 
 if BUILD_GTK_GUI
 	@echo "	Supported GUI: GTK"
+endif
+if BUILD_HILDON_GUI
+	@echo "	Supported GUI: HILDON"
+endif
+if BUILD_ALP_GUI
+	@echo "	Supported GUI: ALP/Hiker"
 endif
 if BUILD_KDE_GUI
 	@echo "	Supported GUI: KDE"
