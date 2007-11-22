@@ -684,7 +684,14 @@ void
 movie_root::doMouseDrag()
 {
 	character* dragChar = m_drag_state.getCharacter();
-	if ( ! dragChar || dragChar->isUnloaded() ) return; // nothing to do
+	if ( ! dragChar ) return; // nothing to do
+
+	if ( dragChar->isUnloaded() )
+	{
+		// Reset drag state if dragging char was unloaded
+		m_drag_state.reset();
+		return; 
+	}
 
 	int	x, y, buttons;
 	get_mouse_state(x, y, buttons);
@@ -1261,6 +1268,9 @@ movie_root::markReachableResources() const
 
     // Mark global key object
     if ( _keyobject ) _keyobject->setReachable();
+
+    // Mark character being dragged, if any
+    m_drag_state.markReachableResources();
 
     // TODO: we should theoretically NOT need to mark _liveChars here
     //   as any element in this list should be NOT unloaded and

@@ -1,5 +1,11 @@
 2007-11-22 Sandro Santilli <strk@keybit.net>
 
+	* server/drag_state.h: add markReachableResources method
+	* server/movie_root.{cpp,h}: mark the character being dragged as
+	  reachable.
+
+2007-11-22 Sandro Santilli <strk@keybit.net>
+
 	* server/as_environment.cpp (get_variable): variables paths containing
 	  slashes but no colon will be attempted to be evaluated as sprites
 	  before falling back to property lookup.

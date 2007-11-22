@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.91 2007/11/22 21:48:09 strk Exp $ */
+/* $Id: movie_root.h,v 1.92 2007/11/22 22:57:18 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -516,6 +516,7 @@ public:
     /// - Key listeners (m_key_listeners)
     /// - Mouse listeners (m_mouse_listeners)
     /// - global Key object (_keyobject)
+    /// - Any character being dragged 
     ///
     void markReachableResources() const;
 #endif // GNASH_USE_GC

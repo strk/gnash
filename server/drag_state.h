@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: drag_state.h,v 1.5 2007/11/02 01:11:44 strk Exp $ */
+/* $Id: drag_state.h,v 1.6 2007/11/22 22:57:18 strk Exp $ */
 
 
 #ifndef GNASH_DRAG_STATE_H
@@ -138,6 +138,12 @@ public:
 		_character(0),
 		_lock_centered(false)
 	{
+	}
+
+	/// Mark character as reachable (if any)
+	void markReachableResources() const
+	{
+		if ( _character ) _character->setReachable();
 	}
 };
 
