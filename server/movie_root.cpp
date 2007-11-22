@@ -884,7 +884,7 @@ void movie_root::cleanupUnloadedListeners(CharacterList& ll)
     for (CharacterList::iterator iter = ll.begin(); iter != ll.end(); )
     {
         character* ch = iter->get();
-        if ( ch->isUnloaded() ) iter = ll.erase(iter++);
+        if ( ch->isUnloaded() ) iter = ll.erase(iter);
         else ++iter;
     }
     

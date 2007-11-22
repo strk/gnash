@@ -1,3 +1,8 @@
+2007-11-22 Sandro Santilli <strk@keybit.net>
+
+	* server/movie_root.cpp (cleanupUnloadedListeners): erase the
+	  correct iterator (thanks zou for noticing).
+
 2007-11-21 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (sprite_startDrag): add support for
