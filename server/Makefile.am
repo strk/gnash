@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.131 2007/11/23 13:25:05 strk Exp $
+# $Id: Makefile.am,v 1.132 2007/11/23 22:23:24 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -91,6 +91,7 @@ libgnashserver_la_SOURCES = \
 	swf/DefineFontAlignZonesTag.cpp \
 	swf/PlaceObject2Tag.cpp \
 	swf/RemoveObjectTag.cpp \
+	swf/StartSoundTag.cpp \
 	swf_function.cpp \
 	video_stream_instance.cpp \
 	StreamProvider.cpp \
@@ -181,6 +182,7 @@ noinst_HEADERS = \
 	swf/DoActionTag.h \
 	swf/DoInitActionTag.h \
 	swf/SetBackgroundColorTag.h \
+	swf/StartSoundTag.h \
 	swf_event.h \
 	swf_function.h \
 	tesselate.h \

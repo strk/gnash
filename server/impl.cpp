@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.124 2007/11/23 13:25:05 strk Exp $ */
+/* $Id: impl.cpp,v 1.125 2007/11/23 22:23:24 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -53,6 +53,7 @@
 #include "DoActionTag.h"
 #include "DoInitActionTag.h"
 #include "SetBackgroundColorTag.h"
+#include "StartSoundTag.h"
 #include "swf/tag_loaders.h" // for all tag loaders..
 #include "sound_handler.h" // for get_sound_handler
 #ifdef GNASH_USE_GC
@@ -183,7 +184,7 @@ static void	ensure_loaders_registered()
 	register_tag_loader(SWF::DEFINEFONTINFO, define_font_info_loader);
 	register_tag_loader(SWF::DEFINEFONTINFO2, define_font_info_loader); // 62
 	register_tag_loader(SWF::DEFINESOUND,	define_sound_loader);
-	register_tag_loader(SWF::STARTSOUND,	start_sound_loader);
+	register_tag_loader(SWF::STARTSOUND,	StartSoundTag::loader);
 
         register_tag_loader(SWF::STOPSOUND,     fixme_loader); // 16 
 	

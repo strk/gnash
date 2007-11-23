@@ -32,6 +32,11 @@ namespace gnash {
 
 namespace gnash {
 
+/// TODO: document this
+//
+/// QUESTION: why is this a resource ?
+///           does it really need to be ref-counted ?
+///
 class sound_sample: public resource
 {
 public:
@@ -46,47 +51,6 @@ public:
 	~sound_sample();
 
 	sound_sample* cast_to_sound_sample() { return this; }
-};
-
-/// SWF Tag StartSound (15) 
-//
-/// TODO: move in it's own StartSoundTag files...
-///
-class start_sound_tag : public ControlTag
-{
-public:
-	uint16_t	m_handler_id;
-	int	m_loop_count;
-	bool	m_stop_playback;
-	std::vector<sound_handler::sound_envelope> m_envelopes;
-
-	// envelopes for the current sound instance
-	uint32_t* envelopes;
-
-	start_sound_tag()
-		:
-		m_handler_id(0),
-		m_loop_count(0),
-		m_stop_playback(false)
-	{
-	}
-
-
-	/// \brief
-	/// Initialize this StartSound tag from
-	/// the stream  & given sample.
-	//
-	/// Insert ourself into the movie.
-	void read(stream* in, int tag_type,
-		movie_definition* m, const sound_sample* sam);
-
-	void	execute(sprite_instance* m) const;
-
-	/// StartStreamSound is not a "state" tag?
-	void execute_state(sprite_instance* m) const;
-
-	/// TODO: provide execute_reverse ?
-	/// (for StartSound would StopSound and vice-versa)
 };
 
 /// SWF Tag SoundStreamBlock (19) 

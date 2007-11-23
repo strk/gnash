@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: tag_loaders.h,v 1.23 2007/11/23 13:25:05 strk Exp $ */
+/* $Id: tag_loaders.h,v 1.24 2007/11/23 22:23:25 strk Exp $ */
 
 #ifndef GNASH_SWF_TAG_LOADERS_H
 #define GNASH_SWF_TAG_LOADERS_H
@@ -133,9 +133,6 @@ void	import_loader(stream*, tag_type, movie_definition*);
 
 /// Load a SWF::DEFINESOUND tag.
 void	define_sound_loader(stream*, tag_type, movie_definition*);
-
-/// Load a SWF::STARTSOUND tag.
-void	start_sound_loader(stream*, tag_type, movie_definition*);
 
 void	button_sound_loader(stream*, tag_type, movie_definition*);
 

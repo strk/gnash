@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.151 2007/11/23 13:25:05 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.152 2007/11/23 22:23:25 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1186,40 +1186,6 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 			"the dictionary"),
 		      character_id);
 	}
-}
-
-
-// Load a StartSound tag.
-void
-start_sound_loader(stream* in, tag_type tag, movie_definition* m)
-{
-    sound_handler* handler = get_sound_handler();
-
-    assert(tag == SWF::STARTSOUND); // 15 
-
-    uint16_t	sound_id = in->read_u16();
-
-    sound_sample* sam = m->get_sound_sample(sound_id);
-    if (sam)
-    {
-	start_sound_tag*	sst = new start_sound_tag();
-	sst->read(in, tag, m, sam);
-
-	IF_VERBOSE_PARSE
-	(
-	    log_parse(_("start_sound tag: id=%d, stop = %d, loop ct = %d"),
-		      sound_id, int(sst->m_stop_playback), sst->m_loop_count);
-	);
-    }
-    else
-    {
-	if (handler)
-	{
-	    IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_("start_sound_loader: sound_id %d is not defined"), sound_id);
-	    );
-	}
-    }
 }
 
 // Load a SoundStreamHead(2) tag.
