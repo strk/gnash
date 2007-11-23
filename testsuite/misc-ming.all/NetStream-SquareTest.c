@@ -47,7 +47,9 @@ main(int argc, char** argv)
   SWFVideoStream stream;
   SWFDisplayItem item;
   SWFAction a;
-  char buffer[1024];
+  SWFAction b;
+  char buffer_a[1028];
+  char buffer_b[1028];
 
   int video_width = 128;
   int video_height = 96;
@@ -74,18 +76,25 @@ main(int argc, char** argv)
   //
   //
   
-  sprintf(buffer, 
+  sprintf(buffer_a,
+  	"note(System.capabilities.version);"
+  	"note('SWF version %d');"
+  	
   	"nc=new NetConnection();"
 	"nc.connect(null);"
 	"check(!NetStream.prototype.hasOwnProperty('currentFPS'));" // version 7 here
 	"xcheck(!NetStream.prototype.hasOwnProperty('currentFps'));"
 	"stream = new NetStream(nc);"
-	"check(NetStream.prototype.hasOwnProperty('currentFps'));"
-	"video.attachVideo(stream); "
-	"stream.setBufferTime(2); "
+	"check_equals ( typeof(stream.bytesTotal), 'number' );"
+	"stream.bytesTotal = 'string';"
+	"check_equals ( typeof(stream.bytesTotal), 'number' );",	
+	OUTPUT_VERSION);
+
+  	sprintf(buffer_b,
+  	// bytesTotal (read-only)
 	"stream.play('%s');"
 	"stop();",
-	filename );
+	filename);
 
   Ming_init();
   Ming_useSWFVersion (OUTPUT_VERSION);
@@ -111,10 +120,96 @@ main(int argc, char** argv)
   /* SWFDisplayItem_moveTo(item, 0, 200); */
   SWFDisplayItem_setName(item, "video");
 
-  a = newSWFAction(buffer);
+  a = newSWFAction(buffer_a);
   if(a == NULL) return -1;
   SWFMovie_add(mo, (SWFBlock)a);
 
+  /* Check that properties exist here
+     See actionscript.all/NetStream.as for checks before
+     NetStream is attached to a connection */
+
+  check(mo, "NetStream.prototype.hasOwnProperty('currentFps')"); // currentFps
+  check(mo, "NetStream.prototype.hasOwnProperty('bufferLength')"); // check bufferLength
+  check(mo, "NetStream.prototype.hasOwnProperty('bufferTime')"); // check bufferTime
+  check(mo, "NetStream.prototype.hasOwnProperty('liveDelay')"); // check liveDelay
+  check(mo, "NetStream.prototype.hasOwnProperty('time')"); // check time
+  check(mo, "NetStream.prototype.hasOwnProperty('bytesLoaded')"); // check bytesLoaded
+  check(mo, "NetStream.prototype.hasOwnProperty('bytesTotal')"); // check bytesTotal
+  
+  add_actions(mo, "video.attachVideo(stream);"); 
+  
+  // currentFps (read-only)
+  check_equals (mo, "typeof(stream.currentFps)", "'number'" );
+  add_actions(mo, "stream.currentFps = 'string';");
+  check_equals (mo, "typeof(stream.currentFps)", "'number'" );
+  add_actions(mo, "stream.currentFps = false;");
+  check_equals (mo, "typeof(stream.currentFps)", "'number'" );
+
+  // bufferLength (read-only)
+  check_equals (mo, "typeof(stream.bufferLength)", "'number'" );
+  add_actions(mo, "stream.bufferLength = 'string';");
+  check_equals (mo, "typeof(stream.bufferLength)", "'number'" );
+  add_actions(mo, "stream.bufferLength = false;");
+  check_equals (mo, "typeof(stream.bufferLength)", "'number'" );
+
+  // bufferTime
+  check_equals (mo, "typeof(stream.bufferTime)", "'number'" );
+  add_actions(mo, "stream.setBufferTime(2);");
+  check_equals (mo, "stream.bufferTime", "2");
+  add_actions(mo,"stream.bufferTime = 20;");
+  check_equals (mo, "stream.bufferTime", "2");
+  add_actions(mo,"stream.setBufferTime = 30;");
+  check_equals (mo, "stream.bufferTime", "2");
+  add_actions(mo,"stream.setBufferTime(false);");
+  check_equals (mo, "stream.bufferTime", "2");
+  add_actions(mo,"stream.setBufferTime('string');");
+  check_equals (mo, "stream.bufferTime", "2");
+  add_actions(mo,"stream.setBufferTime('5');");
+  check_equals (mo, "stream.bufferTime", "2");
+  add_actions(mo,"stream.setBufferTime(10);");  // can't change it once set ...
+  check_equals (mo, "stream.bufferTime", "2");
+
+  // liveDelay (read-only)
+  xcheck_equals (mo, "typeof(stream.liveDelay)", "'number'");
+  add_actions(mo, "stream.liveDelay = 'string';");
+  xcheck_equals (mo, "typeof(stream.liveDelay)", "'number'");
+
+  // time (read-only)
+  check_equals (mo, "typeof(stream.time)", "'number'" );
+  add_actions(mo, "stream.time = 'string';");
+  check_equals (mo, "typeof(stream.time)", "'number'" );
+
+  // bytesLoaded (read-only)
+  check_equals (mo, "typeof(stream.bytesLoaded)", "'number'" );
+  add_actions(mo, "stream.bytesLoaded = 'string';");
+  check_equals (mo, "typeof(stream.bytesLoaded)", "'number'" ); 
+
+  check_equals (mo, "stream.currentFps", "0" );
+
+  /* Play video */
+  b = newSWFAction(buffer_b);
+  if(b == NULL) return -1;
+  SWFMovie_add(mo, (SWFBlock)b);
+ 
+  check_equals (mo, "stream.currentFps", "0" );
+ 
+  /* Publisher Methods */
+
+  // These are documented as player methods for connections
+  // to a media server.
+  // Possibly they are only defined if the connection is to
+  // such a server; at this point, they should be undefined in
+  // any case.
+
+  check_equals (mo, "typeof(stream.attachAudio())", "'undefined'");
+  check_equals (mo, "typeof(stream.attachVideo())", "'undefined'");
+  check_equals (mo, "typeof(stream.publish())", "'undefined'");
+  check_equals (mo, "typeof(stream.send())", "'undefined'");
+  check_equals (mo, "typeof(stream.receiveAudio())", "'undefined'");
+  check_equals (mo, "typeof(stream.receiveVideo())", "'undefined'");
+
+  /* Video checks */ 
+  
   check_equals(mo, "video._xscale", "100");
   check_equals(mo, "video._yscale", "100");
   check_equals(mo, "video._rotation", "0");
