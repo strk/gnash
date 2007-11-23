@@ -32,10 +32,25 @@ namespace gnash {
 
 namespace gnash {
 
-/// TODO: document this
+/// This class is simply an identifier for a sound sample managed
+/// by a sound_handler, so should likely be defined in sound_handler.h
+///
+/// Definition tags will maintain a mapping between SWF-defined id
+/// of the sound and these identifiers.
+///
+/// Specifying an identifier for use by sound_handler would likely be
+/// claner, anyway this is what it is *currently*.
+///
+/// NOTE that the destructor of this identifier (thus becoming a "smart"
+/// identifier) requests the currently registered sound_handler removal
+/// of the identified sound_sample. This *might* be the reason why
+/// it is a ref-counted thing (hard to belive...).
+///
 //
 /// QUESTION: why is this a resource ?
 ///           does it really need to be ref-counted ?
+///
+/// TODO: move definition to sound_handler.h and possibly nest inside sound_handler itself ?
 ///
 class sound_sample: public resource
 {
@@ -48,6 +63,8 @@ public:
 	{
 	}
 
+	/// delete the actual sound sample from the currently registered
+	/// sound handler.
 	~sound_sample();
 
 	sound_sample* cast_to_sound_sample() { return this; }

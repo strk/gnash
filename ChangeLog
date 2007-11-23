@@ -1,5 +1,6 @@
 2007-11-23 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/sound_definition.h: document sound_sample a bit.
 	* server/swf/StartSoundTag.{cpp,h}: some more cleanup (attempt).
 
 2007-11-23 Bastiaan Jacques <bastiaan@bjacques.org>
