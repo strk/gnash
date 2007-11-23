@@ -1,5 +1,5 @@
 /* 
- *   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+ *   Copyright (C) 2007 Free Software Foundation, Inc.
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,9 +38,9 @@
  *
  * Observed behaviour:
  *
- *   (1)mc1 constructed and unloaded twice;
- *   (2)mc2 constructed and unloaded twice;
- *   (3)mc3 constructed only *ONCE*, never unloaded.
+ *   (1)mc1 initialized and unloaded twice;
+ *   (2)mc2 initialized and unloaded twice;
+ *   (3)mc3 initialized only *ONCE*, never unloaded.
  *
  * Deduction:
  *

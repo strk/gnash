@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.160 2007/11/22 19:39:18 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.161 2007/11/23 02:37:39 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -3547,6 +3547,7 @@ SWFHandlers::ActionStringGreater(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     thread.ensureStack(2);
+    // No need to use to_string_versioned() here, this is a swf7 opcode
     env.top(1).set_bool(env.top(1).to_string() > env.top(0).to_string());
     env.drop(1);
 }
