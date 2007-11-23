@@ -118,6 +118,25 @@ private:
 
 	/// Run after a complete run, or after an run interrupted by 
 	/// a bail-out exception (ActionLimitException, for example)
+	//
+	/// The method restores original target of the as_environment,
+	/// checks for stack smashing (stack contains less entries
+	/// then it had at time of execution start) or leftovers
+	/// (stack contains more entries then it had at time of execution
+	/// start) and finally gives movie_root a chance to execute
+	/// actions queued in higher priority action queues.
+	///
+	/// The higher priority action queue flush is needed to allow
+	/// initialize/construct/initactions queued by effect of gotoFrame
+	/// calls in DOACTION block before frame actions queued by the same
+	/// cause (the latter would be pushed in the same level gotoFrame is
+	/// found)
+	///
+	/// @param expectInconsistencies
+	///	If true, don't print an error if stack is bigger or smaller
+	///	then we expect. The parameter is used when calling the
+	///	cleanup function due to a thrown ActionLimitException.
+	///
 	void cleanupAfterRun(bool expectInconsistencies=false);
 
 	/// the 'with' stack associated with this execution thread
