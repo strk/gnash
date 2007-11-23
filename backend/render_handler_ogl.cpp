@@ -42,6 +42,7 @@
 #include "render_handler_ogl.h"
 
 #include <boost/utility.hpp>
+#include <boost/bind.hpp>
 
 /// \file render_handler_ogl.cpp
 /// \brief The OpenGL renderer and related code.
@@ -83,9 +84,10 @@
 
 // TODO:
 // - Implement:
-// * Nested masks
 // * Alpha images
-// * Real antialiasing
+// * Real antialiasing: Currently, we just draw an anti-aliased outline around
+//   solid shapes and fonts. Besides not anti-aliasing other types of shapes,
+//   this makes fonts a bit bigger than intended.
 // 
 // - Profiling!
 // - Optimize code:
@@ -233,9 +235,7 @@ void trace_curve(const point& startP, const point& controlP,
   // Midpoint on the curve.
   point q = middle(mid, controlP);
 
-  float dist = std::abs(mid.x - q.x) + std::abs(mid.y - q.y);
-
-  if (dist < 0.1 /*error tolerance*/) {
+  if (mid.distance(q) < 0.1 /*error tolerance*/) {
     coords.push_back(oglVertex(endP));
   } else {
     // Error is too large; subdivide.
@@ -534,7 +534,8 @@ class DSOEXPORT render_handler_ogl : public render_handler
 public: 
   render_handler_ogl()
     : _xscale(1.0),
-      _yscale(1.0)
+      _yscale(1.0),
+      _drawing_mask(false)
   {
   }
   
@@ -818,28 +819,79 @@ public:
     
   virtual void begin_submit_mask()
   {
-    glEnable(GL_STENCIL_TEST); 
-    glClearStencil(0x0); // FIXME: default is zero, methinks
-    glClear(GL_STENCIL_BUFFER_BIT);
+    PathVec mask;
+    _masks.push_back(mask);
     
-    // Since we are marking the stencil, the stencil function test should
-    // always succeed.
-    glStencilFunc (GL_NEVER, 0x1, 0x1);    
-    
-    glStencilOp (GL_REPLACE /* Stencil test fails */ ,
-                 GL_ZERO /* Value is ignored */ ,
-                 GL_REPLACE /* Stencil test passes */);     
+    _drawing_mask = true;
   }
   
   virtual void end_submit_mask()
-  {        
+  {
+    _drawing_mask = false;
+    
+    apply_mask();
+  }
+
+  /// Apply the current mask; nesting is supported.
+  ///
+  /// This method marks the stencil buffer by incrementing every stencil pixel
+  /// by one every time a solid from one of the current masks is drawn. When
+  /// all the mask solids are drawn, we change the stencil operation to permit
+  /// only drawing where all masks have drawn, in other words, where all masks
+  /// intersect, or in even other words, where the stencil pixel buffer equals
+  /// the number of masks.
+  void apply_mask()
+  {
+    if (_masks.empty()) {
+      return;
+    }
+    
+    glEnable(GL_STENCIL_TEST);
+
+    glClearStencil(0x0); // FIXME: default is zero, methinks
+    glClear(GL_STENCIL_BUFFER_BIT);
+
+    // GL_NEVER means the stencil test will never succeed, so OpenGL wil never
+    // continue to the drawing stage.
+    glStencilFunc (GL_NEVER, 0x1, 0x1);
+
+    glStencilOp (GL_INCR /* Stencil test fails */,
+                 GL_KEEP /* ignored */,
+                 GL_KEEP /* Stencil test passes; never happens */);
+
+    // Call add_paths for each mask.
+    std::for_each(_masks.begin(), _masks.end(),
+      boost::bind(&render_handler_ogl::add_paths, boost::ref(this), _1));    
+          
     glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
-    glStencilFunc(GL_EQUAL, 0x1, 0x1);
+    glStencilFunc(GL_EQUAL, _masks.size(), _masks.size());
+  }
+  
+  void
+  add_paths(const PathVec& path_vec)
+  {
+    cxform dummy_cx;
+    std::vector<fill_style> dummy_fs;
+    
+    fill_style coloring;
+    coloring.setSolid(rgba(0,0,0,0));
+    
+    dummy_fs.push_back(coloring);
+    
+    std::vector<line_style> dummy_ls;
+    
+    draw_subshape(path_vec, matrix::identity, dummy_cx, 1.0, dummy_fs, dummy_ls);
   }
   
   virtual void disable_mask()
-  {  
-    glDisable(GL_STENCIL_TEST);
+  {
+    _masks.pop_back();
+    
+    if (_masks.empty()) {
+      glDisable(GL_STENCIL_TEST);
+    } else {
+      apply_mask();
+    }
   }
 
 #if 0
@@ -1241,7 +1293,17 @@ public:
   }
 
   
-  
+  void draw_mask(const PathVec& path_vec)
+  {    
+    for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
+         it != end; ++it) {
+      const path& cur_path = *it;
+      
+      if (cur_path.m_fill0 || cur_path.m_fill1) {
+        _masks.back().push_back(cur_path);     
+      }
+    }  
+  }
   
   PathPtrVec
   get_paths_by_style(const PathVec& path_vec, unsigned int style)
@@ -1288,6 +1350,51 @@ public:
     }
     
     return subshapes;
+  }
+  
+  /// Takes a path and translates it using the given matrix. The new path
+  /// is stored in paths_out.
+  /// Taken from render_handler_agg.cpp.  
+  void apply_matrix_to_paths(const std::vector<path> &paths_in, 
+    std::vector<path> &paths_out, const matrix& mat) {
+    
+    int pcount, ecount;
+    int pno, eno;
+    
+    // copy path
+    paths_out = paths_in;    
+    pcount = paths_out.size();        
+    
+    for (pno=0; pno<pcount; pno++) {
+    
+      path &the_path = paths_out[pno];     
+      point oldpnt(the_path.ap.x, the_path.ap.y);
+      point newpnt;
+      mat.transform(&newpnt, oldpnt);
+      the_path.ap.x = newpnt.x;    
+      the_path.ap.y = newpnt.y;
+      
+      ecount = the_path.m_edges.size();
+      for (eno=0; eno<ecount; eno++) {
+      
+        edge &the_edge = the_path.m_edges[eno];
+        
+        oldpnt.x = the_edge.ap.x;
+        oldpnt.y = the_edge.ap.y;
+        mat.transform(&newpnt, oldpnt);
+        the_edge.ap.x = newpnt.x;
+        the_edge.ap.y = newpnt.y;
+        
+        oldpnt.x = the_edge.cp.x;
+        oldpnt.y = the_edge.cp.y;
+        mat.transform(&newpnt, oldpnt);
+        the_edge.cp.x = newpnt.x;
+        the_edge.cp.y = newpnt.y;
+      
+      }          
+      
+    } 
+    
   }
   
   
@@ -1391,6 +1498,14 @@ public:
       return;
     }
     
+    if (_drawing_mask) {
+      PathVec scaled_path_vec;
+      
+      apply_matrix_to_paths(path_vec, scaled_path_vec, mat);
+      draw_mask(scaled_path_vec); 
+      return;
+    }    
+    
     bool have_shape, have_outline;
     
     analyze_paths(path_vec, have_shape, have_outline);
@@ -1423,6 +1538,7 @@ public:
   virtual void draw_glyph(shape_character_def *def, const matrix& mat,
     const rgba& c, float pixel_scale)
   {
+    if (_drawing_mask) abort();
     cxform dummy_cx;
     std::vector<fill_style> glyph_fs;
     
@@ -1484,6 +1600,10 @@ private:
   Tesselator _tesselator;
   float _xscale;
   float _yscale;
+  
+  std::vector<PathVec> _masks;
+  bool _drawing_mask;
+  
 #ifdef OSMESA_TESTING
   std::auto_ptr<OSRenderMesa> _offscreen;
 #endif
