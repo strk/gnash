@@ -20,63 +20,105 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: NetStream.as,v 1.14 2007/11/23 12:53:26 bwy Exp $";
+rcsid="$Id: NetStream.as,v 1.15 2007/11/23 15:56:16 bwy Exp $";
 
 #include "check.as"
 
 #if OUTPUT_VERSION < 6
 
-// A Player version >= 7 can
-// still provide the class, altought limiting it's use
-//check_equals(typeof(NetStream), undefined);
+// Added in SWF6; some versions of the pp won't care, but not
+// testing anyway.
+// Use changes quite significantly from SWF6 (connections to media
+// server) to SWF7 (streaming from various sources).
 
 #else // OUTPUT_VERSION >= 6
 
 check_equals(typeof(NetStream), 'function');
+check_equals(typeof(NetStream.prototype), 'object');
 
 var netstreamObj = new NetStream;
 
 
 /* Constructor */
 
-// test the NetStream constuctor
+// test the NetStream constuct FAILED: ! NetStream.prototype.hasOwnProperty('bufferLength')or
 check_equals ( typeof(netstreamObj), 'object' );
+
+
+/* 
+ * These properties should not yet exist. They may be added  *
+ * when the NetStream connection is established.             *
+ *                                                           */
+
+xcheck(! NetStream.prototype.hasOwnProperty('currentFps'));
+check(! netstreamObj.hasOwnProperty('currentFps'));
+
+xcheck(! NetStream.prototype.hasOwnProperty('bufferLength'));
+check(! netstreamObj.hasOwnProperty('bufferLength'));
+
+xcheck(! NetStream.prototype.hasOwnProperty('bufferTime'));
+check(! netstreamObj.hasOwnProperty('bufferTime'));
+
+xcheck(! NetStream.prototype.hasOwnProperty('liveDelay'));
+check(! netstreamObj.hasOwnProperty('liveDelay'));
+
+xcheck(! NetStream.prototype.hasOwnProperty('time'));
+check(! netstreamObj.hasOwnProperty('time'));
+
+/* Added in SWF7 (still apply to SWF6) */
+xcheck(! NetStream.prototype.hasOwnProperty('bytesLoaded'));
+check(! netstreamObj.hasOwnProperty('bytesLoaded'));
+
+xcheck(! NetStream.prototype.hasOwnProperty('bytesTotal'));
+check(! netstreamObj.hasOwnProperty('bytesTotal'));
 
 
 /* Subscriber Methods */
 
+# if OUTPUT_VERSION > 5
 // test the NetStream::close method
 check_equals ( typeof(netstreamObj.close), 'function' );
-// test the NetStream::pause method
+// test the NetStream::setBufferTime method
+check_equals ( typeof(netstreamObj.setBufferTime), 'function');
+# else
+// this is verified on at least one pp version for SWF5, but we
+// aren't testing it. 
+// test the NetStream::close method
+check_equals ( typeof(netstreamObj.close), 'undefined' );
+// test the NetStream::setBufferTime method
+check_equals ( typeof(netstreamObj.setBufferTime), 'undefined');
+# endif
 check_equals ( typeof(netstreamObj.pause), 'function' );
 // test the NetStream::play method
 check_equals ( typeof(netstreamObj.play), 'function');
 // test the NetStream::seek method
 check_equals ( typeof(netstreamObj.seek), 'function' );
-// test the NetStream::setBufferTime method
-check_equals ( typeof(netstreamObj.setBufferTime), 'function');
-// receiveAudio (media server)
-xcheck_equals ( typeof(netstreamObj.receiveAudio()), 'function');
-// receiveVideo (media server)
-xcheck_equals ( typeof(netstreamObj.receiveVideo()), 'function');
 
+// receiveAudio (use with media server)
+check_equals ( typeof(netstreamObj.receiveAudio()), 'undefined');
+// receiveVideo (use with media server)
+check_equals ( typeof(netstreamObj.receiveVideo()), 'undefined');
+
+# if OUTPUT_VERSION == 6
+check_equals ( typeof(netstreamObj.setbuffertime), 'function');
+# else 
 // SWF7 up is case-sensitive !
 check_equals ( typeof(netstreamObj.setbuffertime), 'undefined');
-
+# endif 
 
 
 /* Publisher Methods */
 
-// For use with a media server, from SWF6
+// For use with a media server, in SWF6
 // test attachAudio
-xcheck_equals ( typeof(netstreamObj.attachAudio()), 'function');
+check_equals ( typeof(netstreamObj.attachAudio()), 'undefined');
 // test attachVideo
-xcheck_equals ( typeof(netstreamObj.attachVideo()), 'function');
+check_equals ( typeof(netstreamObj.attachVideo()), 'undefined');
 // test publish
-xcheck_equals ( typeof(netstreamObj.publish()), 'function');
+check_equals ( typeof(netstreamObj.publish()), 'undefined');
 // test send
-xcheck_equals ( typeof(netstreamObj.send()), 'function');
-	
+check_equals ( typeof(netstreamObj.send()), 'undefined');
+
 
 /* Event Handlers */
 
@@ -108,30 +150,56 @@ check_equals(typeof(netstreamObj.onMetaData), 'string');
 /* Properties */
 
 // currentFps (read-only)
-xcheck_equals ( typeof(netstreamObj.currentFps), 'number' );
+xcheck_equals ( typeof(netstreamObj.currentFps), 'undefined' );
+netstreamObj.currentFps = 'string';
+xcheck_equals ( typeof(netstreamObj.currentFps), 'string' );
+netstreamObj.currentFps = false;
+xcheck_equals ( typeof(netstreamObj.currentFps), 'boolean' );
+
 // bufferLength (read-only)
-check_equals ( typeof(netstreamObj.bufferLength), 'number' );
+xcheck_equals ( typeof(netstreamObj.bufferLength), 'undefined' );
+netstreamObj.bufferLength = 'string';
+xcheck_equals ( typeof(netstreamObj.bufferLength), 'string' );
+netstreamObj.bufferLength = false;
+xcheck_equals ( typeof(netstreamObj.bufferLength), 'boolean' );
+
 // bufferTime
-check_equals ( typeof(netstreamObj.bufferTime), 'number' );
+xcheck_equals ( typeof(netstreamObj.bufferTime), 'undefined' );
+netstreamObj.setBufferTime(10);
+xcheck_equals(netstreamObj.bufferTime, NULL);
+netstreamObj.bufferTime = 20;
+xcheck_equals(netstreamObj.bufferTime, 20);
+netstreamObj.setBufferTime = 30;
+xcheck_equals(netstreamObj.bufferTime, 20);
+netstreamObj.setBufferTime(false);
+xcheck_equals(netstreamObj.bufferTime, 20);
+netstreamObj.setBufferTime('string');
+xcheck_equals(netstreamObj.bufferTime, 20);
+xnetstreamObj.setBufferTime('5');
+xcheck_equals(netstreamObj.bufferTime, 20);
+
 // liveDelay (read-only)
-xcheck_equals ( typeof(netstreamObj.liveDelay), 'number' );
+check_equals ( typeof(netstreamObj.liveDelay), 'undefined' );
+netstreamObj.liveDelay = 'string';
+xcheck_equals ( typeof(netstreamObj.liveDelay), 'string' );
+
 // time (read-only)
-check_equals ( typeof(netstreamObj.time), 'number' );
+xcheck_equals ( typeof(netstreamObj.time), 'undefined' );
+netstreamObj.time = 'string';
+xcheck_equals ( typeof(netstreamObj.time), 'string' );
 
 
 /* Two properties added in SWF7 */
 
 // bytesLoaded (read-only)
-check_equals ( typeof(netstreamObj.bytesLoaded), 'number' );
+xcheck_equals ( typeof(netstreamObj.bytesLoaded), 'undefined' );
 // bytesLoaded (read-only)
-check_equals ( typeof(netstreamObj.bytesTotal), 'number' );
-
-
-/* Writeable Properties */
-
-// bufferTime (the only writeable property?)
-netstreamObj.setBufferTime(10);
-check_equals(netstreamObj.bufferTime, 10);
+xcheck_equals ( typeof(netstreamObj.bytesTotal), 'undefined' );
 
 #endif // OUTPUT_VERSION >= 6
-totals();
+
+#if OUTPUT_VERSION < 6
+check_totals(0);
+#else
+check_totals(60);
+#endif
