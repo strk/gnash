@@ -1,3 +1,8 @@
+2007-11-23 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* testsuite/actionscript.all/NetStream.as: add missing tests for
+	  various functions.
+
 2007-11-23 Sandro Santilli <strk@keybit.net>
 
 	* server/: stream.h, types.cpp: improved dox.

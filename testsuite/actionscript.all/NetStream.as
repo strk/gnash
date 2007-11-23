@@ -20,24 +20,30 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: NetStream.as,v 1.13 2007/09/29 16:22:58 strk Exp $";
+rcsid="$Id: NetStream.as,v 1.14 2007/11/23 12:53:26 bwy Exp $";
 
 #include "check.as"
 
-#if OUTPUT_VERSION < 7
+#if OUTPUT_VERSION < 6
 
 // A Player version >= 7 can
 // still provide the class, altought limiting it's use
 //check_equals(typeof(NetStream), undefined);
 
-#else // OUTPUT_VERSION >= 7
+#else // OUTPUT_VERSION >= 6
 
 check_equals(typeof(NetStream), 'function');
 
 var netstreamObj = new NetStream;
 
+
+/* Constructor */
+
 // test the NetStream constuctor
 check_equals ( typeof(netstreamObj), 'object' );
+
+
+/* Subscriber Methods */
 
 // test the NetStream::close method
 check_equals ( typeof(netstreamObj.close), 'function' );
@@ -49,9 +55,36 @@ check_equals ( typeof(netstreamObj.play), 'function');
 check_equals ( typeof(netstreamObj.seek), 'function' );
 // test the NetStream::setBufferTime method
 check_equals ( typeof(netstreamObj.setBufferTime), 'function');
+// receiveAudio (media server)
+xcheck_equals ( typeof(netstreamObj.receiveAudio()), 'function');
+// receiveVideo (media server)
+xcheck_equals ( typeof(netstreamObj.receiveVideo()), 'function');
+
 // SWF7 up is case-sensitive !
 check_equals ( typeof(netstreamObj.setbuffertime), 'undefined');
 
+
+
+/* Publisher Methods */
+
+// For use with a media server, from SWF6
+// test attachAudio
+xcheck_equals ( typeof(netstreamObj.attachAudio()), 'function');
+// test attachVideo
+xcheck_equals ( typeof(netstreamObj.attachVideo()), 'function');
+// test publish
+xcheck_equals ( typeof(netstreamObj.publish()), 'function');
+// test send
+xcheck_equals ( typeof(netstreamObj.send()), 'function');
+	
+
+/* Event Handlers */
+
+check_equals(typeof(netstreamObj.onPlayStatus), 'undefined');
+netstreamObj.onPlayStatus = 4;
+check_equals(typeof(netstreamObj.onPlayStatus), 'number');
+netstreamObj.onPlayStatus = "str";
+check_equals(typeof(netstreamObj.onPlayStatus), 'string');
 
 check_equals(typeof(netstreamObj.onStatus), 'undefined');
 netstreamObj.onStatus = 4;
@@ -72,5 +105,33 @@ netstreamObj.onMetaData = "str";
 check_equals(typeof(netstreamObj.onMetaData), 'string');
 
 
-#endif // OUTPUT_VERSION >= 7
+/* Properties */
+
+// currentFps (read-only)
+xcheck_equals ( typeof(netstreamObj.currentFps), 'number' );
+// bufferLength (read-only)
+check_equals ( typeof(netstreamObj.bufferLength), 'number' );
+// bufferTime
+check_equals ( typeof(netstreamObj.bufferTime), 'number' );
+// liveDelay (read-only)
+xcheck_equals ( typeof(netstreamObj.liveDelay), 'number' );
+// time (read-only)
+check_equals ( typeof(netstreamObj.time), 'number' );
+
+
+/* Two properties added in SWF7 */
+
+// bytesLoaded (read-only)
+check_equals ( typeof(netstreamObj.bytesLoaded), 'number' );
+// bytesLoaded (read-only)
+check_equals ( typeof(netstreamObj.bytesTotal), 'number' );
+
+
+/* Writeable Properties */
+
+// bufferTime (the only writeable property?)
+netstreamObj.setBufferTime(10);
+check_equals(netstreamObj.bufferTime, 10);
+
+#endif // OUTPUT_VERSION >= 6
 totals();
