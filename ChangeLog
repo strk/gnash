@@ -1,5 +1,10 @@
 2007-11-23 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* testsuite/misc-ming.all/NetStream-SquareTest: fix expected results for
+	  currentFps.
+
+2007-11-23 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* testsuite/misc-ming.all/NetStream-SquareTest: duplicate some tests from
 	  NetStream.as (different results expected).
 
