@@ -1,3 +1,9 @@
+2007-11-23 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/Makefile.am, loop_test10.c: file a new
+	  test for timeline control, which completely breaks the current model. 
+	  There should be a simpler model.
+
 2007-11-22 Sandro Santilli <strk@keybit.net>
 
 	* server/drag_state.h: add markReachableResources method
