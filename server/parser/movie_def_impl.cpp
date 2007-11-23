@@ -38,7 +38,7 @@
 #include "movie_root.h"
 #include "VM.h" // for assertions
 #include "GnashException.h" // for parser exception
-#include "execute_tag.h"
+#include "ControlTag.h"
 #include "sound_definition.h" // for sound_sample
 #include <boost/bind.hpp>
 
@@ -1151,12 +1151,12 @@ movie_def_impl::markReachableResources() const
 #endif // GNASH_USE_GC
 
 void
-movie_def_impl::add_init_action(execute_tag* e, int cid)
+movie_def_impl::add_init_action(ControlTag* e, int cid)
 {
 	assert(e);
 	if ( m_init_action_defined.insert(cid).second )
 	{
-		add_execute_tag(e); // ownership transferred
+		addControlTag(e); // ownership transferred
 	}
 }
 

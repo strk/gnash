@@ -68,7 +68,7 @@ public:
 	typedef std::list<const action_buffer*> ActionList;
 
 	// definition must match movie_definition::PlayList
-	typedef std::vector<execute_tag*> PlayList;
+	typedef std::vector<ControlTag*> PlayList;
 
 	typedef std::vector<swf_event*> SWFEventsVector;
 
@@ -95,7 +95,7 @@ public:
 
 	/// Type of execute tags
 	//
-	/// TODO: move to execute_tag.h ?
+	/// TODO: move to ControlTag.h ?
 	///
 	enum control_tag_type
 	{

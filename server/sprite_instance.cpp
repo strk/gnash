@@ -30,7 +30,7 @@
 #include "as_value.h"
 #include "as_function.h"
 #include "edit_text_character_def.h" // @@ temp hack for createTextField exp.
-#include "execute_tag.h"
+#include "ControlTag.h"
 #include "fn_call.h"
 #include "Key.h"
 #include "movie_root.h"
@@ -2023,10 +2023,10 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
 
 	// Set the current sound_stream_id to -1, meaning that no stream are
 	// active. If there are an active stream it will be updated while
-	// executing the execute_tags.
+	// executing the ControlTags.
 	set_sound_stream_id(-1);
 
-	// Execute the execute_tag actions
+	// Execute the ControlTag actions
 	// We set _callingFrameActions to true so that add_action_buffer
 	// will execute immediately instead of queuing them.
 	// NOTE: in case gotoFrame is executed by code in the called frame
@@ -2038,7 +2038,7 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
 	if ( playlist )
 	{
 		std::for_each(playlist->begin(), playlist->end(),
-			boost::bind(&execute_tag::execute_action, _1, this)); 
+			boost::bind(&ControlTag::execute_action, _1, this)); 
 	}
 	_callingFrameActions=false;
 
@@ -2606,17 +2606,17 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 
 		if ( (typeflags&TAG_DLIST) && (typeflags&TAG_ACTION) )
 		{
-			std::for_each( playlist->begin(), playlist->end(), boost::bind(&execute_tag::execute, _1, this) );
+			std::for_each( playlist->begin(), playlist->end(), boost::bind(&ControlTag::execute, _1, this) );
 		}
 		else if ( typeflags & TAG_DLIST )
 		{
 			assert( ! (typeflags & TAG_ACTION) );
-			std::for_each( playlist->begin(), playlist->end(), boost::bind(&execute_tag::execute_state, _1, this) );
+			std::for_each( playlist->begin(), playlist->end(), boost::bind(&ControlTag::execute_state, _1, this) );
 		}
 		else
 		{
 			assert(typeflags & TAG_ACTION);
-			std::for_each(playlist->begin(), playlist->end(), boost::bind(&execute_tag::execute_action, _1, this));
+			std::for_each(playlist->begin(), playlist->end(), boost::bind(&ControlTag::execute_action, _1, this));
 		}
 	}
 

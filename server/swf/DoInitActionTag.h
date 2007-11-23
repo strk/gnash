@@ -19,8 +19,8 @@
 //
 //
 
-#ifndef GNASH_SWF_DOACTIONTAG_H
-#define GNASH_SWF_DOACTIONTAG_H
+#ifndef GNASH_SWF_DOINITACTIONTAG_H
+#define GNASH_SWF_DOINITACTIONTAG_H
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -41,27 +41,32 @@ namespace gnash {
 namespace gnash {
 namespace SWF {
 
-/// SWF Tag DoAction (12) 
+/// SWF Tag DoInitAction (59)
 //
 /// Thin wrapper around action_buffer.
 ///
-class DoActionTag : public ControlTag
+class DoInitActionTag : public ControlTag
 {
 public:
 
-	DoActionTag()
+	DoInitActionTag()
 	{}
 
-	/// Read a DoAction block from the stream
+	/// Read a DoInitAction block from the stream
 	//
 	void read(stream* in)
 	{
 	    m_buf.readFullTag(in);
 	}
 
+	virtual void execute_state(sprite_instance* m) const
+	{
+		m->execute_init_action_buffer(m_buf);
+	}
+
 	virtual void execute(sprite_instance* m) const
 	{
-	    	m->add_action_buffer(&m_buf);
+		m->execute_init_action_buffer(m_buf);
 	}
 
 	// Tell the caller that we are an action tag.
@@ -70,17 +75,18 @@ public:
 	    return true;
 	}
 
-	static void doActionLoader(stream* in, tag_type tag, movie_definition* m)
+	static void doInitActionLoader(stream* in, tag_type tag, movie_definition* m)
 	{
-		DoActionTag* da = new DoActionTag();
+		DoInitActionTag* da = new DoInitActionTag;
+		int cid = in->read_u16();
 		da->read(in);
 
 		IF_VERBOSE_PARSE (
-		log_parse(_("tag %d: do_action_loader"), tag);
-		log_parse(_("-- actions in frame " SIZET_FMT), m->get_loading_frame());
+		log_parse(_("  tag %d: do_init_action_loader"), tag);
+		log_parse(_("  -- init actions for sprite %d"), cid);
 		);
 
-		m->addControlTag(da); // ownership transferred
+		m->add_init_action(da, cid); // ownership transferred
 	}
 
 private:
@@ -92,7 +98,7 @@ private:
 } // namespace gnash
 
 
-#endif // GNASH_SWF_DOACTIONTAG_H
+#endif // GNASH_SWF_DOINITACTIONTAG_H
 
 
 // Local Variables:

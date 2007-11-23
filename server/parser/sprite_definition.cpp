@@ -22,7 +22,7 @@
 
 #include "sprite_instance.h"
 #include "sprite_definition.h"
-#include "execute_tag.h" // for dtor visibility
+#include "ControlTag.h" // for dtor visibility
 #include "as_function.h" // for dtor visibility
 
 #include <vector>

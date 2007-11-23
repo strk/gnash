@@ -36,15 +36,15 @@ namespace gnash {
 // Forward declarations
 class sprite_instance;
 
-/// Execute tags include things that control the operation of the movie. 
+/// Control tags are swf tags that control the operation of the movie. 
 //
 /// Essentially, these are the events associated with a frame.
 ///
-class execute_tag
+class ControlTag
 {
 public:
 
-	virtual ~execute_tag()
+	virtual ~ControlTag()
 	{
 	}
 

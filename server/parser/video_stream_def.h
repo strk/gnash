@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.h,v 1.16 2007/10/26 18:43:36 tgc Exp $
+// $Id: video_stream_def.h,v 1.17 2007/11/23 12:21:27 strk Exp $
 
 #ifndef GNASH_VIDEO_STREAM_DEF_H
 #define GNASH_VIDEO_STREAM_DEF_H
@@ -30,7 +30,7 @@
 #include "movie_definition.h"
 #include "swf.h"
 #include "rect.h" // for composition
-#include "execute_tag.h"
+#include "ControlTag.h"
 #include "VideoDecoder.h"
 #include "image.h"
 

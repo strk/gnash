@@ -1,5 +1,25 @@
 2007-11-23 Sandro Santilli <strk@keybit.net>
 
+	* server/Makefile.am, server/execute_tag.h, server/impl.cpp,
+	  server/sprite_instance.cpp, server/sprite_instance.h,
+	  server/parser/movie_def_impl.cpp,
+	  server/parser/movie_def_impl.h,
+	  server/parser/movie_definition.h,
+	  server/parser/sound_definition.cpp,
+	  server/parser/sound_definition.h,
+	  server/parser/sprite_definition.cpp,
+	  server/parser/sprite_definition.h,
+	  server/parser/video_stream_def.h, server/swf/ControlTag.h,
+	  server/swf/DisplayListTag.h, server/swf/DoActionTag.h,
+	  server/swf/DoInitActionTag.h, server/swf/PlaceObject2Tag.cpp,
+	  server/swf/RemoveObjectTag.cpp, server/swf/RemoveObjectTag.h,
+	  server/swf/tag_loaders.cpp:
+	  Renamed execute_tag to ControlTag and moved under server/swf;
+	  renamed movie_definition::add_execute_tag to addControlTag;
+	  split a DoInitActionTag out of DoActionTag.
+
+2007-11-23 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/swfdec/Makefile.am: fix whitespace following trailing
 	  backslash warning.
 	* libbase/tree.hh: we don't want tree.hh documentation

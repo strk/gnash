@@ -65,7 +65,7 @@ namespace gnash {
 	class bitmap_info;
 	class movie_instance;
 	class sprite_instance;
-	class execute_tag;
+	class ControlTag;
 }
 
 namespace gnash
@@ -94,7 +94,7 @@ namespace gnash
 class movie_definition : public character_def
 {
 public:
-	typedef std::vector<execute_tag*> PlayList;
+	typedef std::vector<ControlTag*> PlayList;
 
 	virtual int	get_version() const = 0;
 	virtual float	get_width_pixels() const = 0;
@@ -328,7 +328,7 @@ public:
 		return NULL;
 	}
 
-	/// Add an execute_tag to this movie_definition's playlist
+	/// Add an ControlTag to this movie_definition's playlist
 	//
 	/// The default implementation is a no-op.
 	///
@@ -338,9 +338,9 @@ public:
 	/// 	to the movie_def_impl.
 	///
 	/// TODO: take an auto_ptr.
-	/// NOTE: the default implementation just let the execute_tag leak.
+	/// NOTE: the default implementation just let the ControlTag leak.
 	///
-	virtual void	add_execute_tag(execute_tag* /*c*/)
+	virtual void	addControlTag(ControlTag* /*c*/)
 	{
 	}
 
@@ -350,7 +350,7 @@ public:
 	//
 	/// The default implementation is a no-op.
 	///
-	virtual void	add_init_action(execute_tag* /*c*/, int /*cid*/)
+	virtual void	add_init_action(ControlTag* /*c*/, int /*cid*/)
 	{
 	}
 

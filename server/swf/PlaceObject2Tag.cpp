@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.22 2007/08/30 18:19:16 strk Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.23 2007/11/23 12:21:27 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -415,7 +415,7 @@ PlaceObject2Tag::loader(stream* in, tag_type tag, movie_definition* m)
     PlaceObject2Tag* ch = new PlaceObject2Tag(*m);
     ch->read(in, tag, m->get_version());
 
-    m->add_execute_tag(ch);
+    m->addControlTag(ch);
 
     int depth = ch->getDepth();
     if ( depth < 0 && depth >= character::staticDepthOffset )

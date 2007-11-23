@@ -21,7 +21,7 @@
 
 #include "resource.h" // for sound_sample inheritance
 #include "sound_handler.h"
-#include "execute_tag.h" // for sound tags inheritance
+#include "ControlTag.h" // for sound tags inheritance
 
 // Forward declarations
 namespace gnash {
@@ -52,7 +52,7 @@ public:
 //
 /// TODO: move in it's own StartSoundTag files...
 ///
-class start_sound_tag : public execute_tag
+class start_sound_tag : public ControlTag
 {
 public:
 	uint16_t	m_handler_id;
@@ -93,7 +93,7 @@ public:
 //
 /// TODO: move in it's own SoundStreamBlockTag files...
 ///
-class start_stream_sound_tag : public execute_tag
+class start_stream_sound_tag : public ControlTag
 {
 public:
 	uint16_t	m_handler_id;

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.149 2007/10/19 14:02:13 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.150 2007/11/23 12:21:27 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -49,7 +49,7 @@
 #include "swf/TagLoadersTable.h"
 #include "text_character_def.h"
 #include "edit_text_character_def.h"
-#include "execute_tag.h" // for set_background_color inheritance 
+#include "ControlTag.h" // for set_background_color inheritance 
 #include "URL.h"
 #include "GnashException.h"
 #include "video_stream_def.h"
@@ -191,7 +191,7 @@ frame_label_loader(stream* in, tag_type tag, movie_definition* m)
 //
 /// TODO: Move in it's own SetBackgroundColorTag files
 ///
-class set_background_color : public execute_tag
+class set_background_color : public ControlTag
 {
 private:
     rgba	m_color;
@@ -233,7 +233,7 @@ set_background_color_loader(stream* in, tag_type tag, movie_definition* m)
     set_background_color* t = new set_background_color;
     t->read(in);
 
-    m->add_execute_tag(t);
+    m->addControlTag(t);
 }
 
 // Load JPEG compression tables that can be used to load

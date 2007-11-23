@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.129 2007/10/18 11:47:53 cmusick Exp $
+# $Id: Makefile.am,v 1.130 2007/11/23 12:21:26 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -140,7 +140,6 @@ noinst_HEADERS = \
 	drag_state.h \
 	edit_text_character.h \
 	event_id.h \
-	execute_tag.h \
 	fill_style.h \
         BitmapFilter.h \
         BlurFilter.h \
@@ -174,11 +173,13 @@ noinst_HEADERS = \
 	swf.h \
 	swf/TagLoadersTable.h \
 	swf/tag_loaders.h \
+	swf/ControlTag.h \
 	swf/DefineFontAlignZonesTag.h \
 	swf/PlaceObject2Tag.h \
 	swf/RemoveObjectTag.h \
 	swf/DisplayListTag.h \
 	swf/DoActionTag.h \
+	swf/DoInitActionTag.h \
 	swf_event.h \
 	swf_function.h \
 	tesselate.h \

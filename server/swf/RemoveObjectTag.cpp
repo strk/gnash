@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: RemoveObjectTag.cpp,v 1.5 2007/10/07 21:37:15 strk Exp $ */
+/* $Id: RemoveObjectTag.cpp,v 1.6 2007/11/23 12:21:27 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -80,7 +80,7 @@ RemoveObjectTag::loader(stream* in, tag_type tag, movie_definition* m)
     }
 
     // Ownership transferred to movie_definition
-    m->add_execute_tag(t.release());
+    m->addControlTag(t.release());
 }
 
 } // namespace gnash::SWF

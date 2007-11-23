@@ -20,7 +20,7 @@
 //
 //
 
-/* $Id: RemoveObjectTag.h,v 1.5 2007/07/01 10:54:35 bjacques Exp $ */
+/* $Id: RemoveObjectTag.h,v 1.6 2007/11/23 12:21:27 strk Exp $ */
 
 #ifndef GNASH_SWF_REMOVEOBJECTTAG_H
 #define GNASH_SWF_REMOVEOBJECTTAG_H
@@ -47,7 +47,7 @@ namespace SWF {
 //
 /// The RemoveObject tag removes the character instance at the specified depth.
 ///
-/// TODO: make this and PlaceObject2Tag subclasses of DisplayListTag (subclass of execute_tag)
+/// TODO: make this and PlaceObject2Tag subclasses of DisplayListTag (subclass of ControlTag)
 ///
 class RemoveObjectTag : public DisplayListTag
 {
@@ -65,7 +65,7 @@ public:
 	/// Remove object at specified depth from sprite_instance DisplayList.
 	void	execute(sprite_instance* m) const;
 
-	// See dox in execute_tag.h
+	// See dox in ControlTag.h
 	bool isRemove() const { return true; }
 
 	static void loader(stream* in, tag_type tag, movie_definition* m);

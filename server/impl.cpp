@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.122 2007/10/20 07:06:17 strk Exp $ */
+/* $Id: impl.cpp,v 1.123 2007/11/23 12:21:26 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -52,6 +52,7 @@
 #include "PlaceObject2Tag.h"
 #include "RemoveObjectTag.h"
 #include "DoActionTag.h"
+#include "DoInitActionTag.h"
 #include "sound_handler.h" // for get_sound_handler
 #ifdef GNASH_USE_GC
 #include "GC.h"
@@ -236,7 +237,7 @@ static void	ensure_loaders_registered()
 	// (might be nice to dump the password instead..)
 	register_tag_loader(SWF::ENABLEDEBUGGER, null_loader);    // 58
 
-	register_tag_loader(SWF::INITACTION, DoActionTag::doInitActionLoader);  // 59  
+	register_tag_loader(SWF::INITACTION, DoInitActionTag::doInitActionLoader);  // 59  
 
 	register_tag_loader(SWF::DEFINEVIDEOSTREAM, define_video_loader); // 60
 	register_tag_loader(SWF::VIDEOFRAME, video_loader); // 61

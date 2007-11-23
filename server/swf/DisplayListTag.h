@@ -20,7 +20,7 @@
 //
 //
 
-/* $Id: DisplayListTag.h,v 1.5 2007/07/01 10:54:35 bjacques Exp $ */
+/* $Id: DisplayListTag.h,v 1.6 2007/11/23 12:21:27 strk Exp $ */
 
 #ifndef GNASH_SWF_DISPLAYLISTTAG_H
 #define GNASH_SWF_DISPLAYLISTTAG_H
@@ -29,7 +29,7 @@
 #include "config.h"
 #endif
 
-#include "execute_tag.h" // for inheritance
+#include "ControlTag.h" // for inheritance
 #include "swf.h" // for tag_type definition
 //#include "tu_types.h" // for uint16_t, uint32_t etc. definition 
 
@@ -53,7 +53,7 @@ namespace SWF {
 /// placing, moving, replacing or removing characters at depths.
 ///
 ///
-class DisplayListTag : public execute_tag
+class DisplayListTag : public ControlTag
 {
 public:
 

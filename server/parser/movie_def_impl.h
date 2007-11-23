@@ -482,7 +482,7 @@ public:
 	int get_loading_sound_stream_id() { return m_loading_sound_stream; }
 
 	// See dox in movie_definition.h
-	void	add_execute_tag(execute_tag* tag)
+	void	addControlTag(ControlTag* tag)
 	{
 	    assert(tag);
 	    m_playlist[_frames_loaded].push_back(tag);
@@ -490,7 +490,7 @@ public:
 
 	/// Need to execute the given tag before entering the
 	/// currently-loading frame for the first time.
-	void	add_init_action(execute_tag* e, int cid);
+	void	add_init_action(ControlTag* e, int cid);
 
 	// See dox in movie_definition.h
 	//
