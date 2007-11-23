@@ -1,13 +1,13 @@
 /* 
 
-   $Id: tree.hh,v 1.4 2007/09/14 03:24:15 nihilus Exp $
+   $Id: tree.hh,v 1.5 2007/11/23 11:43:34 strk Exp $
 
    STL-like templated tree class.
    Copyright (C) 2001-2006  Kasper Peeters <kasper.peeters@aei.mpg.de>.
 
 */
 
-/** \mainpage tree.hh
+/** \page tree.hh
     \author   Kasper Peeters
     \version  2.31
     \date     21-Aug-2007

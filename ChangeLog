@@ -1,5 +1,10 @@
 2007-11-23 Sandro Santilli <strk@keybit.net>
 
+	* libbase/tree.hh: we don't want tree.hh documentation
+	  to be the main page...
+
+2007-11-23 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ActionExec.h: document cleanupAfterRun.
 
 2007-11-23 Zou Lunkai <zoulunkai@gmail.com>
