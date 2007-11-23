@@ -1,3 +1,9 @@
+2007-11-23 Sandro Santilli <strk@keybit.net>
+
+	* server/: Makefile.am, impl.cpp, swf/tag_loaders.{cpp,h}:
+	  Extrapolated a SetBackgroundColorTag class out of tag_loaders.cpp
+	  into its own header file, cleaned up.
+
 2007-11-23 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/actionscript.all/NetStream.as: add missing tests for

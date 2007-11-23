@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.150 2007/11/23 12:21:27 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.151 2007/11/23 13:25:05 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -49,7 +49,6 @@
 #include "swf/TagLoadersTable.h"
 #include "text_character_def.h"
 #include "edit_text_character_def.h"
-#include "ControlTag.h" // for set_background_color inheritance 
 #include "URL.h"
 #include "GnashException.h"
 #include "video_stream_def.h"
@@ -185,55 +184,6 @@ frame_label_loader(stream* in, tag_type tag, movie_definition* m)
     }
 
     delete [] n;
-}
-
-/// SWF Tag SetBackgroundColor (9)
-//
-/// TODO: Move in it's own SetBackgroundColorTag files
-///
-class set_background_color : public ControlTag
-{
-private:
-    rgba	m_color;
-
-public:
-    void	execute(sprite_instance* m) const
-	{
-	    float	current_alpha = m->get_background_alpha();
-	    rgba newcolor = m_color; // to avoid making m_color mutable
-	    newcolor.m_a = frnd(current_alpha * 255.0f);
-	    m->set_background_color(newcolor);
-	}
-
-    void	execute_state(sprite_instance* m) const
-	{
-	    execute(m);
-	}
-
-    void	read(stream* in)
-	{
-	    m_color.read_rgb(in);
-
-	    IF_VERBOSE_PARSE
-	    (
-		log_parse(_("  set_background_color: (%d %d %d)"),
-			  m_color.m_r, m_color.m_g, m_color.m_b);
-	    );
-	}
-};
-
-
-// SWF Tag SetBackgroundColor (9)
-void
-set_background_color_loader(stream* in, tag_type tag, movie_definition* m)
-{
-    assert(tag == SWF::SETBACKGROUNDCOLOR); // 9
-    assert(m);
-
-    set_background_color* t = new set_background_color;
-    t->read(in);
-
-    m->addControlTag(t);
 }
 
 // Load JPEG compression tables that can be used to load
@@ -898,12 +848,6 @@ sprite_loader(stream* in, tag_type tag, movie_definition* m)
 //
 
 // end_tag doesn't actually need to exist.
-
-void	end_loader(stream* in, tag_type tag, movie_definition* /*m*/)
-{
-    assert(tag == SWF::END); // 0
-    assert(in->get_position() == in->get_tag_end_position());
-}
 
 void	button_sound_loader(stream* in, tag_type tag, movie_definition* m)
 {

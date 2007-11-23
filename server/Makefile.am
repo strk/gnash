@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.130 2007/11/23 12:21:26 strk Exp $
+# $Id: Makefile.am,v 1.131 2007/11/23 13:25:05 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -180,6 +180,7 @@ noinst_HEADERS = \
 	swf/DisplayListTag.h \
 	swf/DoActionTag.h \
 	swf/DoInitActionTag.h \
+	swf/SetBackgroundColorTag.h \
 	swf_event.h \
 	swf_function.h \
 	tesselate.h \

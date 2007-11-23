@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.123 2007/11/23 12:21:26 strk Exp $ */
+/* $Id: impl.cpp,v 1.124 2007/11/23 13:25:05 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -41,7 +41,6 @@
 #include "movie_def_impl.h"
 #include "swf.h"
 #include "swf/TagLoadersTable.h"
-#include "swf/tag_loaders.h"
 #include "generic_character.h"
 #include "URL.h"
 #include "StreamProvider.h"
@@ -53,6 +52,8 @@
 #include "RemoveObjectTag.h"
 #include "DoActionTag.h"
 #include "DoInitActionTag.h"
+#include "SetBackgroundColorTag.h"
+#include "swf/tag_loaders.h" // for all tag loaders..
 #include "sound_handler.h" // for get_sound_handler
 #ifdef GNASH_USE_GC
 #include "GC.h"
@@ -164,7 +165,10 @@ static void	ensure_loaders_registered()
 	// Register the standard loaders.
 	s_registered = true;
 
+	// End tag doesn't really need to exist.
+	// TODO: use null_loader here ?
 	register_tag_loader(SWF::END,		end_loader);
+
 	register_tag_loader(SWF::DEFINESHAPE,	define_shape_loader);
 	register_tag_loader(SWF::FREECHARACTER, fixme_loader); // 03
 	register_tag_loader(SWF::PLACEOBJECT,	PlaceObject2Tag::loader);
@@ -172,7 +176,7 @@ static void	ensure_loaders_registered()
 	register_tag_loader(SWF::DEFINEBITS,	define_bits_jpeg_loader);
 	register_tag_loader(SWF::DEFINEBUTTON,	button_character_loader);
 	register_tag_loader(SWF::JPEGTABLES,	jpeg_tables_loader);
-	register_tag_loader(SWF::SETBACKGROUNDCOLOR, set_background_color_loader);
+	register_tag_loader(SWF::SETBACKGROUNDCOLOR, SetBackgroundColorTag::loader);
 	register_tag_loader(SWF::DEFINEFONT,	define_font_loader);
 	register_tag_loader(SWF::DEFINETEXT,	define_text_loader);
 	register_tag_loader(SWF::DOACTION,	DoActionTag::doActionLoader);

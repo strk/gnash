@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: tag_loaders.h,v 1.22 2007/09/21 13:40:32 cmusick Exp $ */
+/* $Id: tag_loaders.h,v 1.23 2007/11/23 13:25:05 strk Exp $ */
 
 #ifndef GNASH_SWF_TAG_LOADERS_H
 #define GNASH_SWF_TAG_LOADERS_H
@@ -29,6 +29,8 @@
 #endif
 
 #include "swf.h" // for SWF::tag_type
+
+#include <cassert>
 
 // Forward declarations
 namespace gnash {
@@ -46,9 +48,6 @@ void	null_loader(stream*, tag_type, movie_definition*);
 
 /// This is like null_loader except it prints a message to nag us to fix it.
 void	fixme_loader(stream*, tag_type, movie_definition*);
-
-/// Set background color (SWF::SETBACKGROUNDCOLOR)
-void	set_background_color_loader(stream*, tag_type, movie_definition*);
 
 /// \brief
 /// Load JPEG compression tables that can be used to load
@@ -110,7 +109,13 @@ void	define_bits_lossless_2_loader(stream*, tag_type, movie_definition*);
 ///
 void	sprite_loader(stream*, tag_type, movie_definition*);
 
-void	end_loader(stream*, tag_type, movie_definition*);
+// end_tag doesn't actually need to exist.
+// TODO: drop this loader ?
+void	end_loader(stream* in, tag_type tag, movie_definition*)
+{
+	assert(tag == SWF::END); // 0
+	assert(in->get_position() == in->get_tag_end_position());
+}
 
 void	remove_object_2_loader(stream*, tag_type, movie_definition*);
 
