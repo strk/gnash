@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.75 2007/11/20 00:44:04 cmusick Exp $ */
+/* $Id: NetStream.cpp,v 1.76 2007/11/23 15:14:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -403,7 +403,7 @@ attachNetStreamInterface(as_object& o)
 	o.init_readonly_property("bytesTotal", *gettersetter);
 
 	gettersetter = new builtin_function(&netstream_currentFPS, NULL);
-	o.init_readonly_property("currentFPS", *gettersetter);
+	o.init_readonly_property("currentFps", *gettersetter);
 
 	gettersetter = new builtin_function(&netstream_bufferLength, NULL);
 	o.init_readonly_property("bufferLength", *gettersetter);

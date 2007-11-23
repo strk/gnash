@@ -1,5 +1,9 @@
 2007-11-23 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStream.cpp: correctly case currentFps member.
+	* testsuite/misc-ming.all/NetStream-SquareTest.c: add test for
+	  currentFps only being defined on NetStream.prototype after
+	  construction of a NetStream instance.
 	* server/asobj/ClassHierarchy.cpp: make NetStream available
 	  also in version 6.
 

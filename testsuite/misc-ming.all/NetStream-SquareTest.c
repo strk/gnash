@@ -77,7 +77,10 @@ main(int argc, char** argv)
   sprintf(buffer, 
   	"nc=new NetConnection();"
 	"nc.connect(null);"
+	"check(!NetStream.prototype.hasOwnProperty('currentFPS'));" // version 7 here
+	"xcheck(!NetStream.prototype.hasOwnProperty('currentFps'));"
 	"stream = new NetStream(nc);"
+	"check(NetStream.prototype.hasOwnProperty('currentFps'));"
 	"video.attachVideo(stream); "
 	"stream.setBufferTime(2); "
 	"stream.play('%s');"
