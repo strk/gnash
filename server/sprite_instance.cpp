@@ -1995,7 +1995,6 @@ sprite_instance::get_frame_number(const as_value& frame_spec, size_t& frameno) c
 		return ret;
 	}
 
-	// TODO: are we sure we shouldn't check for frames labeled with negative numbers ?
 	if ( num < 0 ) return false;
 
 	// all frame numbers > 0 are valid, but a valid frame number may still

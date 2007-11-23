@@ -166,6 +166,12 @@ main(int argc, char** argv)
    */
   add_actions(mo, " gotoAndStop(10000); ");  // ActionGotoFrame
   check_equals(mo, "_currentframe", "7");
+  add_actions(mo, "gotoAndStop(0);"); // ActionGotoFrame
+  check_equals(mo, "_currentframe", "7");
+  add_actions(mo, "x = 0; gotoAndStop(x);"); // ActionGotoExpression
+  check_equals(mo, "_currentframe", "7");
+  add_actions(mo, "x = -1; gotoAndStop(x);"); // ActionGotoExpression
+  check_equals(mo, "_currentframe", "7");
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); /* 7th frame */
 
