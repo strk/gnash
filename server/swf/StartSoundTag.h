@@ -59,18 +59,22 @@ class StartSoundTag : public ControlTag
 	uint32_t* envelopes;
 
 	/// \brief
-	/// Initialize this StartSoundTag from
-	/// the stream  & given sample.
+	/// Initialize this StartSoundTag from the stream  
 	//
-	/// Insert ourself into the movie.
+	/// The stream is assumed to be positioned right after the
+	/// sound_id field of the tag structure.
 	///
-	void read(stream* in, int tag_type,
-		movie_definition* m, const sound_sample* sam);
+	void read(stream* in, int tag_type, movie_definition* m);
 
 
-	StartSoundTag()
+	/// Create a StartSoundTag for starting the given sound sample
+	//
+	/// @param sound_handler_id
+	/// Sound sample identifier as provided by sound_handler (sic!)
+	///
+	StartSoundTag(int sound_id)
 		:
-		m_handler_id(0),
+		m_handler_id(sound_id),
 		m_loop_count(0),
 		m_stop_playback(false)
 	{
