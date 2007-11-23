@@ -47,7 +47,7 @@ check_SCRIPTS = \
 	run_swfdec_testsuite_v \
 	run_swfdec_testsuite_w \
 	run_swfdec_testsuite_x \
-	run_swfdec_testsuite_y \ 
+	run_swfdec_testsuite_y \
 	run_swfdec_testsuite_z 
 
 clean-local: 

@@ -1,5 +1,7 @@
 2007-11-23 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/Makefile.am: fix whitespace following trailing
+	  backslash warning.
 	* libbase/tree.hh: we don't want tree.hh documentation
 	  to be the main page...
 
