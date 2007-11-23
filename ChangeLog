@@ -1,5 +1,10 @@
 2007-11-23 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/ClassHierarchy.cpp: make NetStream available
+	  also in version 6.
+
+2007-11-23 Sandro Santilli <strk@keybit.net>
+
 	* server/: Makefile.am, impl.cpp, swf/tag_loaders.{cpp,h},
 	  swf/SetBackgroundColorTag.h:
 	  Extrapolated a SetBackgroundColorTag class out of tag_loaders.cpp
