@@ -274,7 +274,7 @@ namespace gnash {
 		/// Ensure the requested number of bytes are available in the
 		/// currently opened tag.
 		//
-		/// Throws an exception on a short count.
+		/// Throws a ParserException on a short count.
 		/// This method should be called before any attempt to read
 		/// fields from the SWF.
 		///

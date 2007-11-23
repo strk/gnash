@@ -1,5 +1,9 @@
 2007-11-23 Sandro Santilli <strk@keybit.net>
 
+	* server/: stream.h, types.cpp: improved dox.
+
+2007-11-23 Sandro Santilli <strk@keybit.net>
+
 	* server/Makefile.am, server/execute_tag.h, server/impl.cpp,
 	  server/sprite_instance.cpp, server/sprite_instance.h,
 	  server/parser/movie_def_impl.cpp,
