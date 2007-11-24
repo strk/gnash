@@ -5,7 +5,6 @@ gnash.log
 gnash.sum
 site.exp
 *.swf
+*-runner
 testrun.*
-*.pp
-alltests-runner
 gmon.out
