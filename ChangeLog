@@ -24,7 +24,7 @@
 	  server/parser/sound_definition.cpp,
 	  server/parser/video_stream_def.{cpp,h},
 	  server/swf/StartSoundTag.{cpp,h}, server/swf/tag_loaders.cpp,
-	  server/vm/ASHandlers.cpp, testsuite/MovieTester.h:
+	  server/vm/ASHandlers.cpp, testsuite/MovieTester.{h,cpp}:
 	Put libmedia in its own namespace (gnash::media).
 
 2007-11-24  Rob Savoye  <rob@ute.welcomehome.org>
