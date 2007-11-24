@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: sdl.m4,v 1.45 2007/11/08 10:58:16 strk Exp $
+dnl $Id: sdl.m4,v 1.46 2007/11/24 16:47:11 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_SDL], [
   has_sdl=no
@@ -23,7 +23,7 @@ AC_DEFUN([GNASH_PATH_SDL], [
   AC_CACHE_VAL(ac_cv_path_sdl_incl, [
     if test x"${with_sdl_incl}" != x ; then
       if test -f ${with_sdl_incl}/SDL.h ; then
-        ac_cv_path_sdl_incl=-I`(cd ${with_sdl_incl}; pwd)`
+        ac_cv_path_sdl_incl="-I`(cd ${with_sdl_incl}; pwd)`"
       else
         AC_MSG_ERROR([${with_sdl_incl} directory doesn't contain SDL.h])
       fi

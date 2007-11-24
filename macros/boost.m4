@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.70 2007/10/22 15:58:40 rsavoye Exp $
+dnl $Id: boost.m4,v 1.71 2007/11/24 16:47:10 rsavoye Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -49,7 +49,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   dnl Look for the header
   AC_ARG_WITH(boost_incl, AC_HELP_STRING([--with-boost-incl], [directory where boost headers are]), with_boost_incl=${withval})
   if test x"${with_boost_incl}" != x ; then
-    gnash_boost_topdir=`(cd ${with_boost_incl}; pwd)`
+    gnash_boost_topdir="`(cd ${with_boost_incl}; pwd)`"
     gnash_boost_version=`echo ${gnash_boost_topdir} | sed -e 's:.*boost-::'`
     newlist=${gnash_boost_topdir}
   fi
@@ -76,9 +76,9 @@ AC_DEFUN([GNASH_PATH_BOOST],
   for i in $newlist; do
     dirs=`ls -dr $i/boost* 2>/dev/null`
     if test -n "${dirs}"; then
-      gnash_boost_topdir=`(cd ${dirs}; pwd)`
-      gnash_boost_subdir=`dirname ${gnash_boost_topdir}`
-      gnash_boost_version=`echo ${gnash_boost_topdir} | sed -e 's:boost-::'`
+      gnash_boost_topdir="`(cd ${dirs}; pwd)`"
+      gnash_boost_subdir="`dirname ${gnash_boost_topdir}`"
+      gnash_boost_version="`echo ${gnash_boost_topdir} | sed -e 's:boost-::'`"
       dnl Fix for packaging systems not adding extra fluff to the path-name.
       for k in ${boost_headers}; do
        if test ! -f ${gnash_boost_topdir}/boost/$k; then
@@ -107,7 +107,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   dnl Look for the library
   AC_ARG_WITH(boost_lib, AC_HELP_STRING([--with-boost-lib], [directory where boost libraries are]), with_boost_lib=${withval})
   if test x"${with_boost_lib}" != x ; then
-    gnash_boost_libdir=`(cd ${with_boost_lib}; pwd)`
+    gnash_boost_libdir="`(cd ${with_boost_lib}; pwd)`"
     newlist="${gnash_boost_libdir}"
   fi
 

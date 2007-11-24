@@ -67,7 +67,7 @@ AC_DEFUN([AC_PATH_MING], [
     AC_CACHE_VAL(ac_cv_path_ming_incl, [
       if test x"${with_ming_incl}" != x ; then
         if test -f ${with_ming_incl}/ming.h ; then
-	  ac_cv_path_ming_incl=-I`(cd ${with_ming_incl}; pwd)`
+	  ac_cv_path_ming_incl="-I`(cd ${with_ming_incl}; pwd)`"
         else
 	  AC_MSG_ERROR([${with_ming_incl} directory doesn't contain minglib.h])
         fi
@@ -100,7 +100,7 @@ AC_DEFUN([AC_PATH_MING], [
     AC_CACHE_VAL(ac_cv_path_ming_lib, [
       if test x"${with_ming_lib}" != x ; then
         if test -f ${with_ming_lib}/libming.a -o -f ${with_ming_lib}/libming.${shlibext}; then
-	  ac_cv_path_ming_lib=`(cd ${with_ming_lib}; pwd)`
+	        ac_cv_path_ming_lib="`(cd ${with_ming_lib}; pwd)`"
         else
           AC_MSG_ERROR([${with_ming_lib} directory doesn't contain libming.])
         fi

@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: gnashpkgtool.m4,v 1.44 2007/10/13 23:24:07 rsavoye Exp $
+dnl $Id: gnashpkgtool.m4,v 1.45 2007/11/24 16:47:10 rsavoye Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS().
@@ -54,7 +54,7 @@ dnl     esac], $1=yes)
 	    AC_CACHE_VAL(ac_cv_path_$1_incl, [
   	  if test x"${with_$1_incl}" != x ; then
  	      if test -f ${with_$1_incl}/$2 ; then
-  	      ac_cv_path_$1_incl=-I`(cd ${with_$1_incl}; pwd)`
+  	      ac_cv_path_$1_incl="-I`(cd ${with_$1_incl}; pwd)`"
 	      found_$1_incl="yes"
  	      else
 	        AC_MSG_ERROR([${with_$1_incl} directory doesn't contain $2.])
@@ -165,7 +165,7 @@ if test x"${$1}" = x"yes"; then
 	if test x"${with_$1_lib}" != x ; then
 		AC_MSG_CHECKING([for lib$1 library in specified directory])
 		if test -f ${with_$1_lib}/lib$name.a -o -f ${with_$1_lib}/lib$name.${shlibext}; then
-			tmp=`(cd ${with_$1_lib}; pwd)`
+			tmp="`(cd ${with_$1_lib}; pwd)`"
 			ac_cv_path_$1_lib="-L${tmp} -l$name"
 			AC_MSG_RESULT([yes])
 	        else

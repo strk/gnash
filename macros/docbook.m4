@@ -28,7 +28,7 @@ AC_DEFUN([GNASH_DOCBOOK], [
     AC_ARG_WITH(docbook_styles, AC_HELP_STRING([--with-docbook-styles], [directory where Docbook stylesheets are]), with_docbook_styles=${withval})
     if test x"${with_docbook_styles}" != x ; then
       if test -f ${with_docbook_styles}/html/docbook.xsl ; then
-        docbook_styles=`(cd ${with_docbook_styles}; pwd)`
+        docbook_styles="`(cd ${with_docbook_styles}; pwd)`"
       else
         AC_MSG_ERROR([${with_docbook_styles}/html directory doesn't contain docbook.xsl])
       fi
@@ -37,7 +37,7 @@ AC_DEFUN([GNASH_DOCBOOK], [
       dirlist="/usr/share/xml/docbook/stylesheet/nwalsh /usr/share/sgml/docbook/xsl-stylesheets /usr/local/share/sgml/docbook/xsl-stylesheets /opt/share/sgml/docbook/xsl-stylesheets /home/latest/share/sgml/docbook/xsl-stylesheets /usr/share/sgml/docbook/stylesheet/xsl/nwalsh"
       for i in $dirlist; do
         if test -f $i/html/docbook.xsl; then
-          gnash_cv_path_docbook_styles=`(cd $i; pwd)`
+          gnash_cv_path_docbook_styles="`(cd $i; pwd)`"
         break
         fi
       done
@@ -58,14 +58,14 @@ AC_DEFUN([GNASH_DOCBOOK], [
         if test -f $i/bin/java; then
           version=`$i/bin/java -version 2>&1`
           dnl See if it's Sun Java
-          tmp=`echo $version | grep -c "java version" `
+          tmp="`echo $version | grep -c "java version" `"
           if test $tmp -gt 0; then
             version=sun
             JAVA=$i/bin/java
             break;
           fi
           dnl See if it's GCJ
-          tmp=`echo $version | grep -c "java version" `
+          tmp="`echo $version | grep -c "java version" `"
           if test $tmp -gt 0; then
             AC_MSG_WARN([$i/bin/java not Sun version!])
             version=gcj

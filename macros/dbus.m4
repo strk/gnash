@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: dbus.m4,v 1.1 2007/09/27 00:29:30 rsavoye Exp $
+dnl $Id: dbus.m4,v 1.2 2007/11/24 16:47:10 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_DBUS],
 [
@@ -24,7 +24,7 @@ AC_DEFUN([GNASH_PATH_DBUS],
   AC_CACHE_VAL(ac_cv_path_dbus_incl,[
     if test x"${with_dbus_incl}" != x ; then
       if test -f ${with_dbus_incl}/dbus/dbus.h ; then
-        ac_cv_path_dbus_incl=-I`(cd ${with_dbus_incl}; pwd)`
+        ac_cv_path_dbus_incl="-I`(cd ${with_dbus_incl}; pwd)`"
       else
         AC_MSG_ERROR([${with_dbus_incl} directory doesn't contain dbus/dbus.h])
       fi
@@ -81,7 +81,7 @@ AC_DEFUN([GNASH_PATH_DBUS],
   AC_CACHE_VAL(ac_cv_path_dbus_lib,[
     if test x"${with_dbus_lib}" != x ; then
       if test -f ${with_dbus_lib}/libdbus-1.a -o -f ${with_dbus_lib}/libdbus-1.${shlibext}; then
-	      ac_cv_path_dbus_lib=-L`(cd ${with_dbus_lib}; pwd)`
+	      ac_cv_path_dbus_lib="-L`(cd ${with_dbus_lib}; pwd)`"
       else
 	      AC_MSG_ERROR([${with_dbus_lib} directory doesn't contain libdbus.])
       fi

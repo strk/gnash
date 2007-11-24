@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-dnl $Id: jpeg.m4,v 1.25 2007/10/13 23:24:07 rsavoye Exp $
+dnl $Id: jpeg.m4,v 1.26 2007/11/24 16:47:10 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_JPEG],
 [
@@ -32,9 +32,9 @@ AC_DEFUN([GNASH_PATH_JPEG],
     AC_CACHE_VAL(ac_cv_path_jpeg_incl,[
     if test x"${with_jpeg_incl}" != x ; then
       if test -f ${with_jpeg_incl}/jpeglib.h ; then
-	ac_cv_path_jpeg_incl=-I`(cd ${with_jpeg_incl}; pwd)`
+	      ac_cv_path_jpeg_incl="-I`(cd ${with_jpeg_incl}; pwd)`"
       else
-	AC_MSG_ERROR([${with_jpeg_incl} directory doesn't contain jpeglib.h])
+	      AC_MSG_ERROR([${with_jpeg_incl} directory doesn't contain jpeglib.h])
       fi
     fi
     ])

@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: curl.m4,v 1.20 2007/10/28 21:06:51 eh9 Exp $
+dnl $Id: curl.m4,v 1.21 2007/11/24 16:47:10 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_CURL],
 [
@@ -23,7 +23,7 @@ AC_DEFUN([GNASH_PATH_CURL],
     AC_CACHE_VAL(ac_cv_path_curl_incl,[
     if test x"${with_curl_incl}" != x ; then
       if test -f ${with_curl_incl}/curl/curl.h ; then
-	      ac_cv_path_curl_incl=`(cd ${with_curl_incl}; pwd)`
+	      ac_cv_path_curl_incl="`(cd ${with_curl_incl}; pwd)`"
       else
 	      AC_MSG_ERROR([${with_curl_incl} directory doesn't contain curl/curl.h])
       fi
@@ -34,7 +34,7 @@ AC_DEFUN([GNASH_PATH_CURL],
   AC_PATH_PROG(curlconfig, curl-config, ,[${pathlist}])
   if test x"${curlconfig}" != "x" ; then
     AC_MSG_CHECKING([for RTMP support])
-    rtmp=`${curlconfig} --protocols|grep -c RTMP`
+    rtmp="`${curlconfig} --protocols|grep -c RTMP`"
     if test $rtmp -eq 0; then
     	AC_MSG_RESULT([none])
 	    rtmp=no
@@ -47,7 +47,7 @@ AC_DEFUN([GNASH_PATH_CURL],
   dnl If the path hasn't been specified, go look for it.
   if test x"${ac_cv_path_curl_incl}" = x; then
     if test x"${curlconfig}" != "x"; then
-      ac_cv_path_curl_incl=`${curlconfig} --cflags`
+      ac_cv_path_curl_incl="`${curlconfig} --cflags`"
     else
       for i in $incllist; do
         if test -f $i/curl/curl.h; then

@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-dnl $Id: x11.m4,v 1.14 2007/10/13 23:24:08 rsavoye Exp $
+dnl $Id: x11.m4,v 1.15 2007/11/24 16:47:11 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_X11],
 [
@@ -24,7 +24,7 @@ AC_DEFUN([GNASH_PATH_X11],
   AC_CACHE_VAL(ac_cv_path_x11_incl, [
     if test x"${with_x11_incl}" != x ; then
       if test -f ${with_x11_incl}/X11/X.h ; then
-       ac_cv_path_x11_incl=-I`(cd ${with_x11_incl}; pwd)`
+       ac_cv_path_x11_incl="-I`(cd ${with_x11_incl}; pwd)`"
       else
        AC_MSG_ERROR([${with_x11_incl} directory doesn't contain X.h])
       fi

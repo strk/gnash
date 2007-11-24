@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: opengl.m4,v 1.36 2007/10/13 23:24:08 rsavoye Exp $
+dnl $Id: opengl.m4,v 1.37 2007/11/24 16:47:11 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_OPENGL],
 [
@@ -25,7 +25,7 @@ AC_DEFUN([GNASH_PATH_OPENGL],
     AC_CACHE_VAL(ac_cv_path_opengl_includes,[
       if test x"${with_opengl_includes}" != x ; then
         if test -f ${with_opengl_includes}/GL/gl.h -a -f ${with_opengl_includes}/GL/glu.h ; then
-          ac_cv_path_opengl_includes=`(cd ${with_opengl_includes}; pwd)`
+          ac_cv_path_opengl_includes="`(cd ${with_opengl_includes}; pwd)`"
         else
           AC_MSG_ERROR([${with_opengl_includes} directory doesn't contain GL/gl.h])
         fi

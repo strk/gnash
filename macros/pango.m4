@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: pango.m4,v 1.27 2007/10/13 23:24:08 rsavoye Exp $
+dnl $Id: pango.m4,v 1.28 2007/11/24 16:47:11 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_PANGO],
 [
@@ -24,7 +24,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
   AC_CACHE_VAL(ac_cv_path_pango_incl,[
     if test x"${with_pango_incl}" != x ; then
       if test -f ${with_pango_incl}/pango/pango.h ; then
-        ac_cv_path_pango_incl=-I`(cd ${with_pango_incl}; pwd)`
+        ac_cv_path_pango_incl="-I`(cd ${with_pango_incl}; pwd)`"
       else
         AC_MSG_ERROR([${with_pango_incl} directory doesn't contain pango/pango.h])
       fi
@@ -33,7 +33,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
 
   if test x$cross_compiling = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_pango_incl}" = x; then
-      $PKG_CONFIG --exists pangox && ac_cv_path_pango_incl=`$PKG_CONFIG --cflags pangox`
+      $PKG_CONFIG --exists pangox && ac_cv_path_pango_incl="`$PKG_CONFIG --cflags pangox`"
     fi
   fi
 

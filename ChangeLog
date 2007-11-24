@@ -1,3 +1,14 @@
+2007-11-24  Rob Savoye  <rob@ute.welcomehome.org>
+
+	* macros/libtool.m4: Move the serial numbers to the top of the
+	file as required by newer autotools.
+	* macros/archflag.m4, boost.m4, curl.m4, dbus.m4, docbook.m4,
+	freetype.m4, gnashpkgtool.m4, gtk2.m4, gtkglext.m4, jpeg.m4,
+	lib-link.m4, libXML.m4, ming.m4, opengl.m4, pango.m4, sdl.m4,
+	x11.m4: Put double quotes around sub-shell invocation to avoid
+	problems with the buggy bash on RHEL5.
+	
+
 2007-11-24 Sandro Santilli <strk@keybit.net>
 
 	* server/: swf.h, swf/StartSoundTag.{cpp,h}: More dox about
