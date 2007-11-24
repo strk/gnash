@@ -1,3 +1,8 @@
+2007-11-24 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/media/: README, default.orc, majorscale.sco:
+	  Initial sample input for csound-based sound generators.
+
 2007-11-24  Rob Savoye  <rob@ute.welcomehome.org>
 
 	* macros/hildon.m4: Add more double quotes around shell expansion

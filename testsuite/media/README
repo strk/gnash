@@ -24,3 +24,10 @@ sound1.mp3
 	Channels       : 1
 	Sample Rate    : 22050
 
+default.orc
+
+	Csound default orchestra file
+
+majorscale.sco
+
+	Csound score file for a major scale execution
