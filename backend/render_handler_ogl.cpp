@@ -1352,52 +1352,14 @@ public:
     return subshapes;
   }
   
-  /// Takes a path and translates it using the given matrix. The new path
-  /// is stored in paths_out.
-  /// Taken from render_handler_agg.cpp.  
-  void apply_matrix_to_paths(const std::vector<path> &paths_in, 
-    std::vector<path> &paths_out, const matrix& mat) {
-    
-    int pcount, ecount;
-    int pno, eno;
-    
-    // copy path
-    paths_out = paths_in;    
-    pcount = paths_out.size();        
-    
-    for (pno=0; pno<pcount; pno++) {
-    
-      path &the_path = paths_out[pno];     
-      point oldpnt(the_path.ap.x, the_path.ap.y);
-      point newpnt;
-      mat.transform(&newpnt, oldpnt);
-      the_path.ap.x = newpnt.x;    
-      the_path.ap.y = newpnt.y;
-      
-      ecount = the_path.m_edges.size();
-      for (eno=0; eno<ecount; eno++) {
-      
-        edge &the_edge = the_path.m_edges[eno];
-        
-        oldpnt.x = the_edge.ap.x;
-        oldpnt.y = the_edge.ap.y;
-        mat.transform(&newpnt, oldpnt);
-        the_edge.ap.x = newpnt.x;
-        the_edge.ap.y = newpnt.y;
-        
-        oldpnt.x = the_edge.cp.x;
-        oldpnt.y = the_edge.cp.y;
-        mat.transform(&newpnt, oldpnt);
-        the_edge.cp.x = newpnt.x;
-        the_edge.cp.y = newpnt.y;
-      
-      }          
-      
-    } 
-    
-  }
-  
-  
+  /// Takes a path and translates it using the given matrix.
+  void
+  apply_matrix_to_paths(std::vector<path>& paths, const matrix& mat)
+  {  
+    std::for_each(paths.begin(), paths.end(),
+                  boost::bind(&path::transform, _1, boost::ref(mat)));
+  }  
+
   void
   draw_subshape(const PathVec& path_vec,
     const matrix& mat,
@@ -1499,9 +1461,9 @@ public:
     }
     
     if (_drawing_mask) {
-      PathVec scaled_path_vec;
+      PathVec scaled_path_vec = path_vec;;
       
-      apply_matrix_to_paths(path_vec, scaled_path_vec, mat);
+      apply_matrix_to_paths(scaled_path_vec, mat);
       draw_mask(scaled_path_vec); 
       return;
     }    

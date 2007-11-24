@@ -32,6 +32,8 @@
 # include <sstream>
 #endif
 
+#include <boost/bind.hpp>
+
 
 namespace gnash {
 
@@ -119,6 +121,14 @@ edge::squareDistancePtSeg(const point& p, const point& A, const point& B)
 
 	return p.squareDistance(px);
 }
+
+void
+edge::transform(const matrix& mat)
+{
+  mat.transform(ap);
+  mat.transform(cp);
+}
+
 
 
 //
@@ -427,6 +437,16 @@ path::withinSquareDistance(const point& p, float dist) const
 	}
 
 	return false;
+}
+
+void
+path::transform(const matrix& mat)
+{
+  using namespace boost;
+  
+  mat.transform(ap);
+  std::for_each(m_edges.begin(), m_edges.end(),
+                bind(&edge::transform, _1, ref(mat)));                
 }
 
 // Utility.

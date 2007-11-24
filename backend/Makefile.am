@@ -16,7 +16,7 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-# $Id: Makefile.am,v 1.66 2007/10/28 22:01:31 bjacques Exp $
+# $Id: Makefile.am,v 1.67 2007/11/24 04:58:13 bjacques Exp $
 
 ## Process this file with automake to generate Makefile.in
 
@@ -59,12 +59,9 @@ noinst_HEADERS = \
 	render_handler_agg_bitmap.h \
 	render_handler_agg_compat.h \
 	render_handler_agg_style.h \
-	render_handler_cairo.h \
-	render_handler_tri.h
+	render_handler_cairo.h
 
 # bin_PROGRAMS = gnash
-
-# RENDER_SOURCES = render_handler_tri.cpp
 
 noinst_LTLIBRARIES =		# set later on by conditionals
 
@@ -72,7 +69,7 @@ if  BUILD_OGL_RENDERER
 if HAVE_OPENGL
 noinst_LTLIBRARIES += libgnashogl.la
 #plugins_LTLIBRARIES += libgnashogl.la
-libgnashogl_la_SOURCES = render_handler_tri.cpp render_handler_ogl.cpp 
+libgnashogl_la_SOURCES = render_handler_ogl.cpp 
 #libgnashogl_la_LDFLAGS = -module -avoid-version -no-undefined
 libgnashogl_la_LDFLAGS =
 libgnashogl_la_LIBADD = $(OPENGL_LIBS)

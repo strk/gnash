@@ -1,3 +1,12 @@
+2007-11-23 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/Makefile.am: Stop building render_handler_tri.cpp
+	since it is no longer used.
+	* server/shape.{cpp,h}: Introduce path::transform and
+	edge::transform, to be used for matrix transformations.
+	* backend/render_handler_ogl.cpp: Reimplement
+	apply_matrix_to_paths using path::transform.
+
 2007-11-23 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/sound_definition.h: document sound_sample a bit.

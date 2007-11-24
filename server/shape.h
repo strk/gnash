@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.h,v 1.32 2007/11/10 18:07:14 strk Exp $ */
+/* $Id: shape.h,v 1.33 2007/11/24 04:58:14 bjacques Exp $ */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
@@ -59,6 +59,9 @@ namespace gnash {
 		}
 
 		bool is_straight() const { return isStraight(); }
+		
+		/// Transform the edge according to the given matrix.
+		void transform(const matrix& mat);
 
 		/// Return squared distance between point pt and segment A-B
 		static float squareDistancePtSeg(const point& pt, const point& A, const point& B);
@@ -333,6 +336,14 @@ namespace gnash {
 		///	be added in all directions
 		///
 		void expandBounds(rect& r, unsigned int thickness) const;
+
+		bool isNewShape() const
+		{
+			return m_new_shape;
+		}
+		
+		/// Transform all path coordinates according to the given matrix.
+		void transform(const matrix& mat);
 
 	//private:
 
