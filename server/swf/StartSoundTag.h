@@ -45,26 +45,55 @@ namespace gnash {
 namespace SWF {
 
 /// SWF Tag StartSound (15) 
+//
+/// See http://sswf.sourceforge.net/SWFalexref.html#tag_startsound
+///
 class StartSoundTag : public ControlTag
 {
+	/// This should be a reference to an earlier DefineSound tag id
+	/// but in this implementation is instead the sound_handler specific
+	/// identifier corresponding to it.
+	/// movie_definition keeps a mapping between SWF-defined DefineSound
+	/// identifier and sound_handler-provided identifier.
+	/// This one is the latter, probably so with the intention of avoiding
+	/// a lookup at every execution...
+	///
 	uint16_t	m_handler_id;
+
+	/// Number of loops started by an execution of this tag 
+	// 
+	/// This number is 0 if the sound must be played only once,
+	/// 1 to play twice and so on...
+	///
+	/// It is not known whether a value exists to specify "loop forever"
+	///
 	int	m_loop_count;
+
+	/// If true this tag actually *stops* the sound rather then playing it.
+	//
+	/// In a well-formed SWF when this flag is on all others should be off
+	/// (no loops, no envelopes, no in/out points).
+	///
 	bool	m_stop_playback;
+
+	/// In/Out points, currently unsupported
+	//
+	/// See http://sswf.sourceforge.net/SWFalexref.html#swf_soundinfo
+	// unsigned long m_in_point;
+	// unsigned long m_out_point;
+
+	/// Sound effects (envelopes) for this start of the sound
+	//
+	/// See http://sswf.sourceforge.net/SWFalexref.html#swf_envelope
+	///
 	std::vector<sound_handler::sound_envelope> m_envelopes;
 
-	/// Envelopes for the current sound instance
-	//
-	/// TODO: define ownership
-	///
-	uint32_t* envelopes;
-
-	/// \brief
 	/// Initialize this StartSoundTag from the stream  
 	//
 	/// The stream is assumed to be positioned right after the
 	/// sound_id field of the tag structure.
 	///
-	void read(stream* in, int tag_type, movie_definition* m);
+	void read(stream& in);
 
 
 	/// Create a StartSoundTag for starting the given sound sample

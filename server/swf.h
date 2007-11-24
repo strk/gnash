@@ -45,7 +45,10 @@ typedef enum
     DOACTION              = 12,
     DEFINEFONTINFO        = 13,
     DEFINESOUND           = 14,
+
+    /// See http://sswf.sourceforge.net/SWFalexref.html#tag_startsound
     STARTSOUND            = 15,
+
     STOPSOUND             = 16, // SWF 9
     DEFINEBUTTONSOUND     = 17,
     SOUNDSTREAMHEAD       = 18,

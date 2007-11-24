@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: StartSoundTag.cpp,v 1.2 2007/11/23 23:37:04 strk Exp $ */
+/* $Id: StartSoundTag.cpp,v 1.3 2007/11/24 08:23:48 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -60,9 +60,11 @@ StartSoundTag::loader(stream* in, tag_type tag, movie_definition* m)
 		return;
 	}
 
-	// NOTE: sound_id != sam->m_sound_handler_id
+	// NOTE: sound_id is the SWF-defined id,
+	//       sam->m_sound_handler_id is the sound_handler-provided id
+	//
 	StartSoundTag*	sst = new StartSoundTag(sam->m_sound_handler_id);
-	sst->read(in, tag, m);
+	sst->read(*in);
 
 	IF_VERBOSE_PARSE (
 	log_parse(_("StartSound: id=%d, stop = %d, loop ct = %d"),
@@ -74,17 +76,17 @@ StartSoundTag::loader(stream* in, tag_type tag, movie_definition* m)
 
 /* private */
 void
-StartSoundTag::read(stream* in, int /* tag_type */, movie_definition* m)
+StartSoundTag::read(stream& in)
 {
-	in->ensureBytes(1); // header
+	in.ensureBytes(1); // header
 
-	in->read_uint(2);	// skip reserved bits.
-	m_stop_playback = in->read_bit(); 
-	bool	no_multiple = in->read_bit(); 
-	bool	has_envelope = in->read_bit();
-	bool	has_loops = in->read_bit(); 
-	bool	has_out_point = in->read_bit(); 
-	bool	has_in_point = in->read_bit(); 
+	in.read_uint(2);	// skip reserved bits.
+	m_stop_playback = in.read_bit(); 
+	bool	no_multiple = in.read_bit(); 
+	bool	has_envelope = in.read_bit();
+	bool	has_loops = in.read_bit(); 
+	bool	has_out_point = in.read_bit(); 
+	bool	has_in_point = in.read_bit(); 
 
 	UNUSED(no_multiple);
 	UNUSED(has_envelope);
@@ -92,24 +94,24 @@ StartSoundTag::read(stream* in, int /* tag_type */, movie_definition* m)
 	uint32_t	in_point = 0;
 	uint32_t	out_point = 0;
 
-	in->ensureBytes(has_in_point*4 + has_out_point*4 + has_loops*2);
+	in.ensureBytes(has_in_point*4 + has_out_point*4 + has_loops*2);
 
-	if (has_in_point) { in_point = in->read_u32(); }
-	if (has_out_point) { out_point = in->read_u32(); }
-	if (has_loops) { m_loop_count = in->read_u16(); }
+	if (has_in_point) { in_point = in.read_u32(); }
+	if (has_out_point) { out_point = in.read_u32(); }
+	if (has_loops) { m_loop_count = in.read_u16(); }
 
 	if (has_envelope)
 	{
-		in->ensureBytes(1);
-		int nPoints = in->read_u8();
+		in.ensureBytes(1);
+		int nPoints = in.read_u8();
 
 		m_envelopes.resize(nPoints);
-		in->ensureBytes(8*nPoints);
+		in.ensureBytes(8*nPoints);
 		for (int i=0; i < nPoints; i++)
 		{
-			m_envelopes[i].m_mark44 = in->read_u32();
-			m_envelopes[i].m_level0 = in->read_u16();
-			m_envelopes[i].m_level1 = in->read_u16();
+			m_envelopes[i].m_mark44 = in.read_u32();
+			m_envelopes[i].m_level0 = in.read_u16();
+			m_envelopes[i].m_level1 = in.read_u16();
 		}
 	}
 
@@ -128,10 +130,12 @@ StartSoundTag::execute(sprite_instance* /* m */) const
 	{
 		if (m_stop_playback)
 		{
+			log_debug("Execute StartSoundTag with 'stop playback' flag on");
 			handler->stop_sound(m_handler_id);
 		}
 		else
 		{
+			log_debug("Execute StartSoundTag with 'stop playback' flag OFF");
 			handler->play_sound(m_handler_id, m_loop_count, 0, 0, (m_envelopes.empty() ? NULL : &m_envelopes));
 		}
 	}
