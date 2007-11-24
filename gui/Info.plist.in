@@ -5,11 +5,11 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
-	<string>gnash</string>
+	<string>Gnash</string>
 	<key>CFBundleGetInfoString</key>
 	<string>Copyright (C) 2005-2007 Free Software Foundation, Inc.</string>
 	<key>CFBundleIconFile</key>
-	<string>GnashG.icns</string>
+	<string>GnashG</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.gnash.aqua</string>
 	<key>CFBundleInfoDictionaryVersion</key>

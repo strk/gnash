@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua_ogl_glue.cpp,v 1.16 2007/10/28 22:01:32 bjacques Exp $ */
+/* $Id: aqua_ogl_glue.cpp,v 1.17 2007/11/24 00:27:03 bjacques Exp $ */
 
 
 #include "aqua_ogl_glue.h"
@@ -98,38 +98,26 @@ render_handler* AquaOglGlue::createRenderHandler()
 bool AquaOglGlue::prepDrawingArea(int width, int height, AGLDrawable drawable)
 {
 	GNASH_REPORT_FUNCTION;
-    //SDL_SetVideoMode(width, height, _bpp, sdl_flags | SDL_OPENGL);
-#if 0
-     // Turn on alpha blending.
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                     
-    // Turn on line smoothing.  Antialiased lines can be used to
-    // smooth the outsides of shapes.
-    glEnable(GL_LINE_SMOOTH);
-    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST); // GL_NICEST, GL_FASTEST, GL_DONT_CARE
-    glMatrixMode(GL_PROJECTION);
-
-
-    glOrtho(-OVERSIZE, OVERSIZE, OVERSIZE, -OVERSIZE, -1, 1);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
- 
-    // We don't need lighting effects
-    glDisable(GL_LIGHTING);
-    glPushAttrib (GL_ALL_ATTRIB_BITS);         
-#endif
-#ifdef FIX_I810_LOD_BIAS
-    glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, _tex_lod_bias);
-#endif
     bool ret = aglSetDrawable(_context, drawable);
     
+    glMatrixMode(GL_PROJECTION);
+
+    float oversize = 1.0;
+
+    // Flip the image, since (0,0) by default in OpenGL is the bottom left.
+    gluOrtho2D(-oversize, oversize, oversize, -oversize);
+    // Restore the matrix mode to the default.
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity(); 
     return ret;
 }
 
 void AquaOglGlue::render()
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
+    assert(aglSetCurrentContext(_context));
+    aglUpdateContext(_context);
+
     aglSwapBuffers(_context);
 }
 

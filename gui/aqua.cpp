@@ -1,4 +1,4 @@
-// 
+
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua.cpp,v 1.27 2007/10/28 22:01:32 bjacques Exp $ */
+/* $Id: aqua.cpp,v 1.28 2007/11/24 00:27:03 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -54,9 +54,11 @@ pascal OSStatus DoWindowClose (EventHandlerCallRef  nextHandler,
         return noErr;
 }
 
-void DoAdvanceMovie ( EventLoopTimerRef inTimer, void * data)
+void DoAdvanceMovie ( EventLoopTimerRef inTimer, void* data)
 {
-   Gui::advance_movie(static_cast<Gui*>(data));
+   GNASH_REPORT_FUNCTION;
+   AquaGui* gui = static_cast<AquaGui*>(data);
+   Gui::advance_movie(gui);
 }
   
 	
@@ -76,14 +78,14 @@ AquaGui::~AquaGui()
 
 bool AquaGui::run()
 {
-//  GNASH_REPORT_FUNCTION;
+  GNASH_REPORT_FUNCTION;
     double interval = _interval / 1000.0;
 
 
     OSStatus ret = InstallEventLoopTimer (GetMainEventLoop(), 0, interval, 
       DoAdvanceMovie, this, _advance_timer);
-    if (!ret) {
-      return ret;
+    if (ret != noErr) {
+      return false;
     }
 
     RepositionWindow(myWindow, NULL, kWindowCascadeOnMainScreen);
@@ -96,8 +98,12 @@ bool AquaGui::run()
 
 void AquaGui::renderBuffer()
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     _glue.render();
+
+      Rect rectPort;
+      GetWindowPortBounds (myWindow, &rectPort);
+      InvalWindowRect (myWindow,  &rectPort); // force redrow
 }
 
 bool AquaGui::init(int argc, char ***argv)
@@ -184,7 +190,7 @@ bool AquaGui::createWindow(const char* title, int width, int height)
 	InstallWindowEventHandler (myWindow, handlerUPP,  // Install handler
                                  1, &eventType,
                                  NULL, NULL);
-	_glue.prepDrawingArea(_width, _height, GetWindowPort(myWindow));
+ 	assert(_glue.prepDrawingArea(_width, _height, GetWindowPort(myWindow)));
 
     return true;
 }

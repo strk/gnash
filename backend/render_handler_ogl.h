@@ -24,7 +24,9 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #include <OpenGL/glext.h>
+#define GLUCALLBACKTYPE GLvoid (*)(...)
 #else
+# define GLUCALLBACKTYPE void (*)()
 # include <GL/gl.h>
 # ifdef WIN32
 #  define GL_CLAMP_TO_EDGE 0x812F

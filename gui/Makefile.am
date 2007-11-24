@@ -111,7 +111,7 @@ if BUILD_AQUA_GUI
 #OS X stuff goes here...
 GUI_CPPFLAGS += -DGUI_AQUA
 
-bundle_name = gnash.app
+bundle_name = Gnash.app
 
 
 if  HAVE_OPENGL
@@ -174,7 +174,7 @@ GUI_SRCS = gnash.cpp \
 
 if BUILD_AQUA_GUI
 BUILT_SOURCES += bundle
-EXTRA_DIST += gnash.app
+EXTRA_DIST += Gnash.app
 endif
 
 #
@@ -420,7 +420,7 @@ bundle: Info.plist
 	mkdir -p $(bundle_name)/Contents/Resources
 	echo "APPL????" > $(bundle_name)/Contents/PkgInfo
 	cp Info.plist $(bundle_name)/Contents/Info.plist
-	cp -f $(bin_PROGRAMS) $(bundle_name)/Contents/MacOS
+	cp -f .libs/aqua-gnash $(bundle_name)/Contents/MacOS/Gnash
 	cp -f images/GnashG.icns $(bundle_name)/Contents/Resources/
 
 

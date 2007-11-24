@@ -280,17 +280,17 @@ Tesselator::Tesselator()
 : _tessobj(gluNewTess())
 {
   gluTessCallback(_tessobj, GLU_TESS_ERROR, 
-                  reinterpret_cast<void (*)()>(Tesselator::error));
+                  reinterpret_cast<GLUCALLBACKTYPE>(Tesselator::error));
   gluTessCallback(_tessobj, GLU_TESS_COMBINE_DATA,
-                  reinterpret_cast<void (*)()>(Tesselator::combine));
+                  reinterpret_cast<GLUCALLBACKTYPE>(Tesselator::combine));
   
   gluTessCallback(_tessobj, GLU_TESS_BEGIN,
-                  reinterpret_cast<void (*)()>(glBegin));
+                  reinterpret_cast<GLUCALLBACKTYPE>(glBegin));
   gluTessCallback(_tessobj, GLU_TESS_END,
-                  reinterpret_cast<void (*)()>(glEnd));
+                  reinterpret_cast<GLUCALLBACKTYPE>(glEnd));
                   
   gluTessCallback(_tessobj, GLU_TESS_VERTEX,
-                  reinterpret_cast<void (*)()>(glVertex3dv)); 
+                  reinterpret_cast<GLUCALLBACKTYPE>(glVertex3dv)); 
   
 #if 0        
   // for testing, draw only the outside of shapes.          
