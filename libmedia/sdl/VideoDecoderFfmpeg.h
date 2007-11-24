@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderFfmpeg.h,v 1.7 2007/10/26 18:43:36 tgc Exp $
+// $Id: VideoDecoderFfmpeg.h,v 1.8 2007/11/24 17:21:43 strk Exp $
 
 #ifndef __VIDEODECODERFFMPEG_H__
 #define __VIDEODECODERFFMPEG_H__
@@ -34,6 +34,7 @@ extern "C" {
 
 
 namespace gnash {
+namespace media {
 
 
 class VideoDecoderFfmpeg : public VideoDecoder {
@@ -67,6 +68,7 @@ private:
 
 };
 	
+} // gnash.media namespace 
 } // gnash namespace
 
 #endif // __VIDEODECODERFFMPEG_H__

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderMad.cpp,v 1.4 2007/10/08 11:00:06 tgc Exp $
+// $Id: AudioDecoderMad.cpp,v 1.5 2007/11/24 17:21:43 strk Exp $
 
 #include "AudioDecoderMad.h"
 #include "utility.h"
@@ -26,6 +26,7 @@
 #endif
 
 namespace gnash {
+namespace media {
 	
 AudioDecoderMad::AudioDecoderMad ()
 {
@@ -170,5 +171,6 @@ uint8_t* AudioDecoderMad::decode(uint8_t* input, uint32_t inputSize, uint32_t& o
 	return tmp_raw_buffer;
 }
 
+} // gnash.media namespace 
 } // gnash namespace
 

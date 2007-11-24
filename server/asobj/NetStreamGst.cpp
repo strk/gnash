@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.61 2007/10/30 18:55:43 strk Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.62 2007/11/24 17:21:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -661,7 +661,7 @@ NetStreamGst::buildFLVVideoPipeline(bool &video)
 		uint32_t fps = m_parser->videoFrameRate(); 
 
 		GstCaps* videonincaps;
-		if (videoInfo->codec == VIDEO_CODEC_H263) {
+		if (videoInfo->codec == media::VIDEO_CODEC_H263) {
 			videonincaps = gst_caps_new_simple ("video/x-flash-video",
 				"width", G_TYPE_INT, videoInfo->width,
 				"height", G_TYPE_INT, videoInfo->height,
@@ -683,7 +683,7 @@ NetStreamGst::buildFLVVideoPipeline(bool &video)
 #endif // GST_HAS_MODERN_PBUTILS
 			}
 
-		} else if (videoInfo->codec == VIDEO_CODEC_VP6) {
+		} else if (videoInfo->codec == media::VIDEO_CODEC_VP6) {
 			videonincaps = gst_caps_new_simple ("video/x-vp6-flash",
 				"width", G_TYPE_INT, 320, // We don't yet have a size extract for this codec, so we guess...
 				"height", G_TYPE_INT, 240,
@@ -704,7 +704,7 @@ NetStreamGst::buildFLVVideoPipeline(bool &video)
 #endif // GST_HAS_MODERN_PBUTILS
 			}
 
-		} else if (videoInfo->codec == VIDEO_CODEC_SCREENVIDEO) {
+		} else if (videoInfo->codec == media::VIDEO_CODEC_SCREENVIDEO) {
 			videonincaps = gst_caps_new_simple ("video/x-flash-screen",
 				"width", G_TYPE_INT, 320, // We don't yet have a size extract for this codec, so we guess...
 				"height", G_TYPE_INT, 240,
@@ -801,7 +801,7 @@ NetStreamGst::buildFLVSoundPipeline(bool &sound)
 		}
 
 
-		if (audioInfo->codec == AUDIO_CODEC_MP3) { 
+		if (audioInfo->codec == media::AUDIO_CODEC_MP3) { 
 
 			audiodecoder = gst_element_factory_make ("mad", NULL);
 			if ( ! audiodecoder )

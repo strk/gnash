@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderGst.cpp,v 1.4 2007/10/26 18:43:36 tgc Exp $
+// $Id: VideoDecoderGst.cpp,v 1.5 2007/11/24 17:21:42 strk Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -27,6 +27,7 @@
 #include "VideoDecoderGst.h"
 
 namespace gnash {
+namespace media {
 
 VideoDecoderGst::VideoDecoderGst() :
 	pipeline(NULL),
@@ -288,6 +289,7 @@ VideoDecoderGst::callback_output (GstElement * /*c*/, GstBuffer *buffer, GstPad*
 
 }
 
+} // gnash.media namespace 
 } // end of gnash namespace
 
 #endif // SOUND_GST

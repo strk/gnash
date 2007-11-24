@@ -175,7 +175,7 @@ bool SoundMad::getAudio(void* owner, uint8_t* stream, int len)
 	uint8_t* ptr = new uint8_t[8192];
 
 	bool ret = true;
-	sound_handler* s = get_sound_handler();
+	media::sound_handler* s = get_sound_handler();
 	if (bufSize > 0) {
 		if (s) {
 			// temp raw buffer
@@ -332,7 +332,7 @@ SoundMad::~SoundMad() {
 		mad_frame_finish(&frame);
 		mad_stream_finish(&stream);
 
-		sound_handler* s = get_sound_handler();
+		media::sound_handler* s = get_sound_handler();
 		if (s) {
 			s->detach_aux_streamer(this);
 		}
@@ -379,7 +379,7 @@ SoundMad::start(int offset, int loops)
 	}
 
 	// Start sound
-	sound_handler* s = get_sound_handler();
+	media::sound_handler* s = get_sound_handler();
 	if (s) {
 		if (externalSound) {
 			if (1)
@@ -397,7 +397,7 @@ void
 SoundMad::stop(int si)
 {
 	// stop the sound
-	sound_handler* s = get_sound_handler();
+	media::sound_handler* s = get_sound_handler();
 	if (s != NULL)
 	{
 	    if (si < 0) {
@@ -417,7 +417,7 @@ SoundMad::getDuration()
 {
 	// If this is a event sound get the info from the soundhandler
 	if (!externalSound) {
-		sound_handler* s = get_sound_handler();
+		media::sound_handler* s = get_sound_handler();
 		if (s) {		
 	    	return (s->get_duration(soundId));
 	    } else {
@@ -440,7 +440,7 @@ SoundMad::getPosition()
 
 	// If this is a event sound get the info from the soundhandler
 	if (!externalSound) {
-		sound_handler* s = get_sound_handler();
+		media::sound_handler* s = get_sound_handler();
 		if (s) {
 			return s->get_position(soundId);	
 	    } else {

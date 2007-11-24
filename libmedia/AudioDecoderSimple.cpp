@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderSimple.cpp,v 1.6 2007/10/30 18:55:41 strk Exp $
+// $Id: AudioDecoderSimple.cpp,v 1.7 2007/11/24 17:21:42 strk Exp $
 
 #include <boost/scoped_array.hpp>
 
@@ -26,6 +26,7 @@
 #include "BitsReader.h"
 
 namespace gnash {
+namespace media {
 
 // ----------------------------------------------------------------------------
 // ADPCMDecoder class
@@ -425,4 +426,5 @@ uint8_t* AudioDecoderSimple::decode(uint8_t* input, uint32_t inputSize, uint32_t
 	return tmp_raw_buffer;
 }
 
+} // gnash.media namespace 
 } // gnash namespace

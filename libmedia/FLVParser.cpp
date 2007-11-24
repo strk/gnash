@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.1 2007/09/27 23:59:53 tgc Exp $
+// $Id: FLVParser.cpp,v 1.2 2007/11/24 17:21:42 strk Exp $
 
 #include "FLVParser.h"
 #include "amf.h"
@@ -29,6 +29,7 @@
 //#define GNASH_DEBUG_SEEK 1
 
 namespace gnash {
+namespace media {
 
 FLVParser::FLVParser(tu_file* stream)
 	:
@@ -697,6 +698,7 @@ inline uint32_t FLVParser::getUInt24(uint8_t* in)
 	return (in[0] << 16) | (in[1] << 8) | in[2];
 }
 
+} // gnash.media namespace 
 } // end of gnash namespace
 
 #undef PADDING_BYTES

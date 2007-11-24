@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: AudioDecoder.h,v 1.4 2007/10/04 09:37:50 tgc Exp $
+// $Id: AudioDecoder.h,v 1.5 2007/11/24 17:21:41 strk Exp $
 
 #ifndef __AUDIODECODER_H__
 #define __AUDIODECODER_H__
@@ -25,6 +25,7 @@
 #include "SoundInfo.h"
 
 namespace gnash {
+namespace media {
 
 /// Audio decoding base class.
 class AudioDecoder {
@@ -80,6 +81,7 @@ public:
 
 };
 	
+} // gnash.media namespace 
 } // gnash namespace
 
 #endif // __AUDIODECODER_H__

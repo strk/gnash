@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderNellymoser.cpp,v 1.3 2007/10/04 09:37:50 tgc Exp $
+// $Id: AudioDecoderNellymoser.cpp,v 1.4 2007/11/24 17:21:42 strk Exp $
 
 // This file incorporates work covered by the following copyright and permission
 // notice:
@@ -54,6 +54,7 @@
 #include <math.h>
 
 namespace gnash {
+namespace media {
 
 float nelly_neg_unpack_table[64] = {
 -0.0061359000, -0.0306748003, -0.0551952012, -0.0796824023, -0.1041216031,
@@ -823,5 +824,6 @@ uint8_t* AudioDecoderNellymoser::decode(uint8_t* input, uint32_t inputSize, uint
 	return tmp_raw_buffer;
 }
 
+} // gnash.media namespace 
 } // namespace gnash
 

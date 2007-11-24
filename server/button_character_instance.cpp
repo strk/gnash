@@ -512,7 +512,7 @@ button_character_instance::on_button_event(const event_id& event)
 	if (m_def->m_sound != NULL)
 	{
 		int bi; // button sound array index [0..3]
-		sound_handler* s = get_sound_handler();
+		media::sound_handler* s = get_sound_handler();
 
 		// Check if there is a sound handler
 		if (s != NULL) {

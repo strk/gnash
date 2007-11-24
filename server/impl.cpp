@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.125 2007/11/23 22:23:24 strk Exp $ */
+/* $Id: impl.cpp,v 1.126 2007/11/24 17:21:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -86,9 +86,9 @@ namespace globals { // gnash::globals
 } // namespace gnash::global
 
 // global Sound handler stuff. Should this be moved to the VM class ?
-static sound_handler* _sound_handler = 0;
-void	set_sound_handler(sound_handler* s) { _sound_handler = s; }
-sound_handler*	get_sound_handler() { return _sound_handler; }
+static media::sound_handler* _sound_handler = 0;
+void	set_sound_handler(media::sound_handler* s) { _sound_handler = s; }
+media::sound_handler*	get_sound_handler() { return _sound_handler; }
 
 void
 set_base_url(const URL& url)
@@ -834,7 +834,7 @@ void	precompute_cached_data(movie_definition* movie_def)
     {
     public:
 	render_handler*	m_original_rh;
-	sound_handler*	m_original_sh;
+	media::sound_handler*	m_original_sh;
 
 	save_stuff()
 	    {

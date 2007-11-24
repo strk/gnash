@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.5 2007/10/08 11:00:06 tgc Exp $
+// $Id: sound_handler_sdl.cpp,v 1.6 2007/11/24 17:21:43 strk Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -45,6 +45,7 @@
 #include <SDL.h>
 
 namespace gnash {
+namespace media {
 
 SDL_sound_handler::SDL_sound_handler()
 	: soundOpened(false),
@@ -799,6 +800,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 
 }
 
+} // gnash.media namespace 
 } // namespace gnash
 
 // Local Variables:

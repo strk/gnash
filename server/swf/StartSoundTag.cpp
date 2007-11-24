@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: StartSoundTag.cpp,v 1.3 2007/11/24 08:23:48 strk Exp $ */
+/* $Id: StartSoundTag.cpp,v 1.4 2007/11/24 17:21:45 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -39,7 +39,7 @@ StartSoundTag::loader(stream* in, tag_type tag, movie_definition* m)
 	assert(tag == SWF::STARTSOUND); // 15 
 
 	// Make static ?
-	sound_handler* handler = get_sound_handler();
+	media::sound_handler* handler = get_sound_handler();
 
 	in->ensureBytes(2); // sound_id
 
@@ -122,7 +122,7 @@ void
 StartSoundTag::execute(sprite_instance* /* m */) const
 {
 	// Make static ?
-	sound_handler* handler = get_sound_handler();
+	media::sound_handler* handler = get_sound_handler();
 
 	//GNASH_REPORT_FUNCTION;
 

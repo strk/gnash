@@ -184,7 +184,7 @@ private:
 
 	std::auto_ptr<Gui> _gui;
 
-	std::auto_ptr<sound_handler> _sound_handler;
+	std::auto_ptr<media::sound_handler> _sound_handler;
 
 	std::string _url;
 

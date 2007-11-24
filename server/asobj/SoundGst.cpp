@@ -269,7 +269,7 @@ SoundGst::start(int offset, int loops)
 
 
 	// Start sound
-	sound_handler* s = get_sound_handler();
+	media::sound_handler* s = get_sound_handler();
 	if (s) {
 		if (!externalSound) {
 	    	s->play_sound(soundId, loops, offset, 0, NULL);
@@ -281,7 +281,7 @@ void
 SoundGst::stop(int si)
 {
 	// stop the sound
-	sound_handler* s = get_sound_handler();
+	media::sound_handler* s = get_sound_handler();
 	if (s != NULL)
 	{
 	    if (si < 0) {
@@ -303,7 +303,7 @@ SoundGst::getDuration()
 	
 	// If this is a event sound get the info from the soundhandler
 	if (!externalSound) {
-		sound_handler* s = get_sound_handler();
+		media::sound_handler* s = get_sound_handler();
 		if (s) {		
 	    	return (s->get_duration(soundId));
 	    } else {
@@ -328,7 +328,7 @@ SoundGst::getPosition()
 	
 	// If this is a event sound get the info from the soundhandler
 	if (!externalSound) {
-		sound_handler* s = get_sound_handler();
+		media::sound_handler* s = get_sound_handler();
 		if (s) {
 			return s->get_position(soundId);	
 	    } else {

@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: AudioDecoderMad.h,v 1.3 2007/10/04 09:41:46 tgc Exp $
+// $Id: AudioDecoderMad.h,v 1.4 2007/11/24 17:21:43 strk Exp $
 
 #ifndef __AUDIODECODERMAD_H__
 #define __AUDIODECODERMAD_H__
@@ -28,6 +28,7 @@
 
 
 namespace gnash {
+namespace media {
 
 class AudioDecoderMad : public AudioDecoder {
 
@@ -48,6 +49,7 @@ private:
 	mad_synth _synth;
 };
 	
+} // gnash.media namespace 
 } // gnash namespace
 
 #endif // __AUDIODECODERMAD_H__

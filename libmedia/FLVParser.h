@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.h,v 1.2 2007/10/26 18:43:35 tgc Exp $
+// $Id: FLVParser.h,v 1.3 2007/11/24 17:21:42 strk Exp $
 
 // Information about the FLV format can be found at http://osflash.org/flv
 
@@ -32,6 +32,7 @@
 #define HEADER_SKIP 15
 
 namespace gnash {
+namespace media {
 
 enum {
 	CONTAINS_VIDEO = 1,
@@ -265,6 +266,7 @@ private:
 	boost::mutex _mutex;
 };
 
+} // gnash.media namespace 
 } // end of gnash namespace
 
 #endif // __FLVPARSER_H__

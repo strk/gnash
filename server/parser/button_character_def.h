@@ -126,7 +126,7 @@ public:
 		uint32_t m_in_point;
 		uint32_t m_out_point;
 		uint16_t m_loop_count;
-		std::vector<sound_handler::sound_envelope> m_envelopes;
+		std::vector<media::sound_handler::sound_envelope> m_envelopes;
 	};
 
 	struct button_sound_info

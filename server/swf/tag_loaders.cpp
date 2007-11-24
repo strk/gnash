@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.152 2007/11/23 22:23:25 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.153 2007/11/24 17:21:45 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1087,7 +1087,7 @@ define_text_loader(stream* in, tag_type tag, movie_definition* m)
 //
 
 // Forward declaration
-/*static void sound_expand(stream *in, sound_handler::format_type &format,
+/*static void sound_expand(stream *in, media::sound_handler::format_type &format,
 	bool sample_16bit, bool stereo, unsigned int &sample_count,
 	unsigned char* &data, unsigned &data_bytes);
 */
@@ -1103,20 +1103,20 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 {
 	assert(tag == SWF::DEFINESOUND); // 14
 
-	sound_handler* handler = get_sound_handler();
+	media::sound_handler* handler = get_sound_handler();
 
 	in->ensureBytes(2+4+1+4); // character id + flags + sample count
 
 	uint16_t	character_id = in->read_u16();
 
-	audioCodecType	format = static_cast<audioCodecType>(in->read_uint(4));
+	media::audioCodecType	format = static_cast<media::audioCodecType>(in->read_uint(4));
 	int	sample_rate = in->read_uint(2);	// multiples of 5512.5
 	bool	sample_16bit = in->read_bit(); 
 	bool	stereo = in->read_bit(); 
 
 	unsigned int	sample_count = in->read_u32();
 
-	if (format == AUDIO_CODEC_MP3) {
+	if (format == media::AUDIO_CODEC_MP3) {
 		in->ensureBytes(2);
 		int16_t	delay_seek = in->read_s16();	// FIXME - not implemented/used
 		// The DelaySeek field has the following meaning:
@@ -1163,8 +1163,8 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 	    in->read((char*)data, data_bytes);
 
 	    // Store all the data in a SoundInfo object
-	    std::auto_ptr<SoundInfo> sinfo;
-	    sinfo.reset(new SoundInfo(format, stereo, s_sample_rate_table[sample_rate], sample_count, sample_16bit));
+	    std::auto_ptr<media::SoundInfo> sinfo;
+	    sinfo.reset(new media::SoundInfo(format, stereo, s_sample_rate_table[sample_rate], sample_count, sample_16bit));
 
 	    // Stores the sounddata in the soundhandler, and the ID returned
 	    // can be used to starting, stopping and deleting that sound
@@ -1192,7 +1192,7 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 void
 sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 {
-    sound_handler* handler = get_sound_handler();
+    media::sound_handler* handler = get_sound_handler();
 
     // 18 || 45
     assert(tag == SWF::SOUNDSTREAMHEAD || tag == SWF::SOUNDSTREAMHEAD2);
@@ -1209,7 +1209,7 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
     // extract garbage data
     int	garbage = in->read_uint(8);
 
-    audioCodecType format = static_cast<audioCodecType>(in->read_uint(4));
+    media::audioCodecType format = static_cast<media::audioCodecType>(in->read_uint(4));
     int sample_rate = in->read_uint(2);	// multiples of 5512.5
     bool sample_16bit = in->read_bit(); 
     bool stereo = in->read_bit(); 
@@ -1219,7 +1219,7 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 
     unsigned int sample_count = in->read_u16();
 	int latency = 0;
-    if (format == AUDIO_CODEC_MP3) {
+    if (format == media::AUDIO_CODEC_MP3) {
 		latency = in->read_s16();
 		garbage = in->read_uint(16);
 	}
@@ -1242,8 +1242,8 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
     }
 
 	// Store all the data in a SoundInfo object
-	std::auto_ptr<SoundInfo> sinfo;
-	sinfo.reset(new SoundInfo(format, stereo, s_sample_rate_table[sample_rate], sample_count, sample_16bit));
+	std::auto_ptr<media::SoundInfo> sinfo;
+	sinfo.reset(new media::SoundInfo(format, stereo, s_sample_rate_table[sample_rate], sample_count, sample_16bit));
 
 	// Stores the sounddata in the soundhandler, and the ID returned
 	// can be used to starting, stopping and deleting that sound
@@ -1259,7 +1259,7 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::SOUNDSTREAMBLOCK); // 19
 
-    sound_handler* handler = get_sound_handler();
+    media::sound_handler* handler = get_sound_handler();
 
     // If we don't have a sound_handler registered stop here
     if (!handler) return;
@@ -1269,16 +1269,16 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 
 	// Get the SoundInfo object that contains info about the sound stream.
 	// Ownership of the object is in the soundhandler
-	SoundInfo* sinfo = handler->get_sound_info(handle_id);
+	media::SoundInfo* sinfo = handler->get_sound_info(handle_id);
 
     // If there is no SoundInfo something is wrong...
     if (!sinfo) return;
 
-    audioCodecType format = sinfo->getFormat();
+    media::audioCodecType format = sinfo->getFormat();
     unsigned int sample_count = sinfo->getSampleCount();
 
 	// discard garbage data if format is MP3
-    if (format == AUDIO_CODEC_MP3) in->skip_bytes(4);
+    if (format == media::AUDIO_CODEC_MP3) in->skip_bytes(4);
 
     unsigned int data_bytes = in->get_tag_end_position() - in->get_position();
     unsigned char *data = new unsigned char[data_bytes];

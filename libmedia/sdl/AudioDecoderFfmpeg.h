@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: AudioDecoderFfmpeg.h,v 1.3 2007/10/04 09:41:46 tgc Exp $
+// $Id: AudioDecoderFfmpeg.h,v 1.4 2007/11/24 17:21:43 strk Exp $
 
 #ifndef __AUDIODECODERFFMPEG_H__
 #define __AUDIODECODERFFMPEG_H__
@@ -33,6 +33,7 @@ extern "C" {
 #include "AudioDecoder.h"
 
 namespace gnash {
+namespace media {
 
 /// This class is used to provide an easy interface to libavcodecs audio resampler.
 ///
@@ -110,6 +111,7 @@ private:
 	AudioResampler _resampler;
 };
 	
+} // gnash.media namespace 
 } // gnash namespace
 
 #endif // __AUDIODECODERFFMPEG_H__

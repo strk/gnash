@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: VideoDecoderFfmpeg.cpp,v 1.8 2007/10/30 18:55:42 strk Exp $
+// $Id: VideoDecoderFfmpeg.cpp,v 1.9 2007/11/24 17:21:43 strk Exp $
 
 #include "VideoDecoderFfmpeg.h"
 
@@ -29,6 +29,7 @@ extern "C" {
 #include <boost/scoped_array.hpp>
 
 namespace gnash {
+namespace media {
 	
 VideoDecoderFfmpeg::VideoDecoderFfmpeg ()
 	:
@@ -335,4 +336,5 @@ VideoDecoderFfmpeg::decodeToImage(uint8_t* input, uint32_t inputSize)
 	
 }
 
-}
+} // gnash.media namespace 
+} // gnash namespace

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_gst.h,v 1.3 2007/10/04 09:37:50 tgc Exp $
+// $Id: sound_handler_gst.h,v 1.4 2007/11/24 17:21:43 strk Exp $
 
 #ifndef SOUND_HANDLER_GST_H
 #define SOUND_HANDLER_GST_H
@@ -32,6 +32,7 @@
 #define BUFFER_SIZE 5000
 
 namespace gnash {
+namespace media {
 
 // forward declaration
 class GST_sound_handler;
@@ -127,7 +128,7 @@ public:
 };
 
 // Use gstreamer to handle sounds.
-class GST_sound_handler : public gnash::sound_handler
+class GST_sound_handler : public sound_handler
 {
 private:
 	/// Vector containing all the sounds
@@ -200,6 +201,7 @@ public:
 	
 };
 
+} // gnash.media namespace 
 } // namespace gnash
 
 #endif // SOUND_HANDLER_GST_H

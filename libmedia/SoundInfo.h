@@ -18,7 +18,7 @@
 // 
 //
 
-// $Id: SoundInfo.h,v 1.2 2007/10/04 09:37:50 tgc Exp $
+// $Id: SoundInfo.h,v 1.3 2007/11/24 17:21:42 strk Exp $
 
 #ifndef __SOUNDINFO_H__
 #define __SOUNDINFO_H__
@@ -26,6 +26,7 @@
 #include "MediaParser.h"
 
 namespace gnash {
+namespace media {
 
 ///
 /// Class containing information about a sound. Is created by the parser while
@@ -109,6 +110,7 @@ private:
 	bool _is16bit;
 };
 
+} // gnash.media namespace 
 } // namespace gnash
 
 #endif // __SOUNDINFO_H__

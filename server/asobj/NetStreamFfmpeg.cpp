@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.94 2007/10/30 18:55:43 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.95 2007/11/24 17:21:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -124,7 +124,7 @@ void NetStreamFfmpeg::close()
 
 	// When closing gnash before playback is finished, the soundhandler 
 	// seems to be removed before netstream is destroyed.
-	sound_handler* s = get_sound_handler();
+	media::sound_handler* s = get_sound_handler();
 	if (s != NULL)
 	{
 		s->detach_aux_streamer(this);
@@ -294,15 +294,15 @@ initFlvVideo(FLVParser* parser)
 
 	// Find the decoder and init the parser
 	switch(videoInfo->codec) {
-		case VIDEO_CODEC_H263:
+		case media::VIDEO_CODEC_H263:
 			codec_id = CODEC_ID_FLV1;
 			break;
 #ifdef FFMPEG_VP6
-		case VIDEO_CODEC_VP6:
+		case media::VIDEO_CODEC_VP6:
 			codec_id = CODEC_ID_VP6F;
 			break;
 #endif
-		case VIDEO_CODEC_SCREENVIDEO:
+		case media::VIDEO_CODEC_SCREENVIDEO:
 			codec_id = CODEC_ID_FLASHSV;
 			break;
 		default:
@@ -327,13 +327,13 @@ initFlvAudio(FLVParser* parser)
 	enum CodecID codec_id;
 
 	switch(audioInfo->codec) {
-		case AUDIO_CODEC_RAW:
+		case media::AUDIO_CODEC_RAW:
 			codec_id = CODEC_ID_PCM_U16LE;
 			break;
-		case AUDIO_CODEC_ADPCM:
+		case media::AUDIO_CODEC_ADPCM:
 			codec_id = CODEC_ID_ADPCM_SWF;
 			break;
-		case AUDIO_CODEC_MP3:
+		case media::AUDIO_CODEC_MP3:
 			codec_id = CODEC_ID_MP3;
 			break;
 		default:
@@ -543,7 +543,7 @@ NetStreamFfmpeg::startPlayback()
 		m_imageframe = new image::rgb(m_VCodecCtx->width,	m_VCodecCtx->height);
 	}
 
-	sound_handler* s = get_sound_handler();
+	media::sound_handler* s = get_sound_handler();
 	if (m_audio_index >= 0 && s != NULL)
 	{
 		// Get a pointer to the audio codec context for the video stream
@@ -623,7 +623,7 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 	else
 	{
 		// We need to restart the audio
-		sound_handler* s = get_sound_handler();
+		media::sound_handler* s = get_sound_handler();
 		if (s) {
 			s->attach_aux_streamer(audio_streamer, ns);
 		}
@@ -855,7 +855,7 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 			// Don't use depreceted img_convert, use sws_scale
 
 		} else if (m_videoFrameFormat == render::RGB && m_VCodecCtx->pix_fmt != PIX_FMT_RGB24) {
-			buffer.reset(VideoDecoderFfmpeg::convertRGB24(m_VCodecCtx, m_Frame));
+			buffer.reset(media::VideoDecoderFfmpeg::convertRGB24(m_VCodecCtx, m_Frame));
 		}
 
 		raw_mediadata_t* video = new raw_mediadata_t;
@@ -951,7 +951,7 @@ bool NetStreamFfmpeg::decodeMediaFrame()
 	{
 		if (m_unqueued_data->m_stream_index == m_audio_index)
 		{
-			sound_handler* s = get_sound_handler();
+			media::sound_handler* s = get_sound_handler();
 			if (s)
 			{
 				m_unqueued_data = m_qaudio.push(m_unqueued_data) ? NULL : m_unqueued_data;
@@ -1220,7 +1220,7 @@ void NetStreamFfmpeg::unpausePlayback()
 
 	// Re-connect to the soundhandler.
 	// It was disconnected to avoid to keep playing sound while paused
-	sound_handler* s = get_sound_handler();
+	media::sound_handler* s = get_sound_handler();
 	if (s && m_ACodecCtx) s->attach_aux_streamer(audio_streamer, (void*) this);
 }
 

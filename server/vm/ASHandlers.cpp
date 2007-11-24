@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.161 2007/11/23 02:37:39 zoulunkai Exp $ */
+/* $Id: ASHandlers.cpp,v 1.162 2007/11/24 17:21:45 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -529,7 +529,7 @@ SWFHandlers::ActionStop(ActionExec& thread)
     assert( code[thread.pc] == SWF::ACTION_STOP );
 #endif
 
-    sound_handler* s = get_sound_handler();
+    media::sound_handler* s = get_sound_handler();
 
     sprite_instance* tgt = env.get_target()->to_movie();
     assert(tgt);
@@ -569,7 +569,7 @@ SWFHandlers::ActionStopSounds(ActionExec& thread)
 	assert( code[thread.pc] == SWF::ACTION_STOPSOUNDS );
 #endif
 
-	sound_handler* s = get_sound_handler();
+	media::sound_handler* s = get_sound_handler();
 	if (s != NULL)
 	{
 		s->stop_all_sounds();

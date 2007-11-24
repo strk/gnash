@@ -267,7 +267,7 @@ bool SoundFfmpeg::getAudio(void* owner, uint8_t* stream, int len)
 		{
 			if (packet.stream_index == so->audioIndex)
 			{
-				sound_handler* s = get_sound_handler();
+				media::sound_handler* s = get_sound_handler();
 				if (s)
 				{
 					// Decode audio
@@ -365,7 +365,7 @@ SoundFfmpeg::~SoundFfmpeg() {
 		}
 
 		if (isAttached) {
-			sound_handler* s = get_sound_handler();
+			media::sound_handler* s = get_sound_handler();
 			if (s) {
 				s->detach_aux_streamer(this);
 			}
@@ -429,7 +429,7 @@ SoundFfmpeg::start(int offset, int loops)
 	}
 
 	// Start sound
-	sound_handler* s = get_sound_handler();
+	media::sound_handler* s = get_sound_handler();
 	if (s) {
 		if (externalSound) {
 			if (audioIndex >= 0)
@@ -447,7 +447,7 @@ void
 SoundFfmpeg::stop(int si)
 {
 	// stop the sound
-	sound_handler* s = get_sound_handler();
+	media::sound_handler* s = get_sound_handler();
 	if (s != NULL)
 	{
 	    if (si < 0) {
@@ -468,7 +468,7 @@ SoundFfmpeg::getDuration()
 
 	// If this is a event sound get the info from the soundhandler
 	if (!externalSound) {
-		sound_handler* s = get_sound_handler();
+		media::sound_handler* s = get_sound_handler();
 		if (s) {		
 	    	return (s->get_duration(soundId));
 	    } else {
@@ -489,7 +489,7 @@ SoundFfmpeg::getPosition()
 {
 	// If this is a event sound get the info from the soundhandler
 	if (!externalSound) {
-		sound_handler* s = get_sound_handler();
+		media::sound_handler* s = get_sound_handler();
 		if (s) {
 			return s->get_position(soundId);
 	    } else {

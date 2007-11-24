@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaParser.h,v 1.7 2007/10/26 18:43:36 tgc Exp $
+// $Id: MediaParser.h,v 1.8 2007/11/24 17:21:42 strk Exp $
 
 #ifndef __MEDIAPARSER_H__
 #define __MEDIAPARSER_H__
@@ -37,6 +37,7 @@ extern "C"
 #include <memory>
 
 namespace gnash {
+namespace media {
 
 /// Video frame types
 enum videoFrameType
@@ -274,6 +275,7 @@ protected:
 };
 
 
+} // gnash.media namespace 
 } // namespace gnash
 
 #endif // __MEDIAPARSER_H__

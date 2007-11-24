@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_sdl.h,v 1.3 2007/10/03 21:43:05 tgc Exp $
+// $Id: sound_handler_sdl.h,v 1.4 2007/11/24 17:21:43 strk Exp $
 
 #ifndef SOUND_HANDLER_SDL_H
 #define SOUND_HANDLER_SDL_H
@@ -44,6 +44,7 @@ extern "C" {
 #include <boost/thread/mutex.hpp>
 
 namespace gnash {
+namespace media {
 
 class active_sound;
 
@@ -172,7 +173,7 @@ public:
 
 	/// Sound envelopes for the current sound, which determine the volume level
 	/// from a given position. Only used with sound events.
-	const std::vector<gnash::sound_handler::sound_envelope>* envelopes;
+	const std::vector<sound_handler::sound_envelope>* envelopes;
 
 	/// Index of current envelope.
 	uint32_t current_env;
@@ -280,7 +281,7 @@ sound_data::~sound_data()
 }
 
 // Use SDL and ffmpeg/mad/nothing to handle sounds.
-class SDL_sound_handler : public gnash::sound_handler
+class SDL_sound_handler : public sound_handler
 {
 private:
 	/// NetStream audio callbacks
@@ -387,6 +388,7 @@ public:
 	static void sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in);
 };
 
+} // gnash.media namespace 
 } // namespace gnash
 
 #endif // SOUND_HANDLER_SDL_H

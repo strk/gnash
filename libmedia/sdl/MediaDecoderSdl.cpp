@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaDecoderSdl.cpp,v 1.3 2007/10/04 09:41:46 tgc Exp $
+// $Id: MediaDecoderSdl.cpp,v 1.4 2007/11/24 17:21:43 strk Exp $
 
 #include "MediaDecoderSdl.h"
 #include "AudioDecoderNellymoser.h"
@@ -43,6 +43,7 @@
 #endif
 
 namespace gnash {
+namespace media {
 
 MediaDecoderSdl::MediaDecoderSdl(tu_file* stream, MediaBuffer* buffer, uint16_t swfVersion, int format)
 	:
@@ -304,4 +305,5 @@ MediaDecoderSdl::getWidthAndHeight()
 }
 	
 
+} // gnash.media namespace 
 } // namespace gnash

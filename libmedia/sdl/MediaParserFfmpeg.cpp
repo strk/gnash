@@ -16,13 +16,14 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaParserFfmpeg.cpp,v 1.3 2007/10/04 09:41:46 tgc Exp $
+// $Id: MediaParserFfmpeg.cpp,v 1.4 2007/11/24 17:21:43 strk Exp $
 
 #include "MediaParserFfmpeg.h"
 #include "log.h"
 #include <boost/scoped_array.hpp>
 
 namespace gnash {
+namespace media {
 
 MediaParserFfmpeg::MediaParserFfmpeg(tu_file* stream)
 	:
@@ -404,4 +405,5 @@ MediaParserFfmpeg::seekMedia(void *opaque, offset_t offset, int whence){
 	return decoder->_inputPos;
 }
 
+} // gnash.media namespace 
 } // namespace gnash

@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoder.h,v 1.7 2007/10/26 18:43:36 tgc Exp $
+// $Id: VideoDecoder.h,v 1.8 2007/11/24 17:21:42 strk Exp $
 
 #ifndef __VIDEODECODER_H__
 #define __VIDEODECODER_H__
@@ -25,6 +25,7 @@
 #include "image.h"
 
 namespace gnash {
+namespace media {
 
 /// Video decoding base class.
 class VideoDecoder {
@@ -112,6 +113,7 @@ public:
 
 };
 	
+} // gnash.media namespace 
 } // gnash namespace
 
 #endif // __VIDEODECODER_H__

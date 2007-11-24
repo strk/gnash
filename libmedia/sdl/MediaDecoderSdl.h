@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaDecoderSdl.h,v 1.3 2007/10/04 09:41:46 tgc Exp $
+// $Id: MediaDecoderSdl.h,v 1.4 2007/11/24 17:21:43 strk Exp $
 
 #ifndef __MEDIADECODERFFMPEG_H__
 #define __MEDIADECODERFFMPEG_H__
@@ -37,6 +37,7 @@
 #include "image.h"
 
 namespace gnash {
+namespace media {
 
 ///  Media decoding using libs, used with sdl soundhandler.
 class MediaDecoderSdl: public MediaDecoder {
@@ -152,6 +153,7 @@ private:
 	std::auto_ptr<VideoDecoder> _videoDecoder;
 };
 
+} // gnash.media namespace 
 } // namespace gnash
 
 #endif // __MEDIADECODERFFMPEG_H__

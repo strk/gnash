@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//  $Id: AudioDecoderSimple.h,v 1.3 2007/10/04 09:37:50 tgc Exp $
+//  $Id: AudioDecoderSimple.h,v 1.4 2007/11/24 17:21:42 strk Exp $
 
 #ifndef __AUDIODECODERSIMPLE_H__
 #define __AUDIODECODERSIMPLE_H__
@@ -29,6 +29,7 @@ namespace gnash {
 }
 
 namespace gnash {
+namespace media {
 
 /// Audio decoding using "simple" internal decoders.
 class AudioDecoderSimple : public AudioDecoder {
@@ -64,6 +65,7 @@ private:
 	// 
 };
 	
+} // gnash.media namespace 
 } // gnash namespace
 
 #endif // __AUDIODECODERSIMPLE_H__

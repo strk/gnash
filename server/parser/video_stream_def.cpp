@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.25 2007/10/26 23:30:25 tgc Exp $
+// $Id: video_stream_def.cpp,v 1.26 2007/11/24 17:21:45 strk Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -70,16 +70,16 @@ video_stream_definition::readDefineVideoStream(stream* in, SWF::tag_type tag, mo
 	m_deblocking_flags = in->read_uint(2);
 	m_smoothing_flags = in->read_bit(); 
 
-	m_codec_id = static_cast<videoCodecType>(in->read_u8());
+	m_codec_id = static_cast<media::videoCodecType>(in->read_u8());
 #ifdef USE_FFMPEG
-	_decoder.reset( new VideoDecoderFfmpeg() );
+	_decoder.reset( new media::VideoDecoderFfmpeg() );
 #elif defined(SOUND_GST)
-	_decoder.reset( new VideoDecoderGst() );
+	_decoder.reset( new media::VideoDecoderGst() );
 #else
-	_decoder.reset( new VideoDecoder() );
+	_decoder.reset( new media::VideoDecoder() );
 #endif
 	bool ret = _decoder->setup(_width, _height, m_deblocking_flags, m_smoothing_flags, m_codec_id, gnash::render::videoFrameFormat());
-	if (!ret) _decoder.reset(new VideoDecoder()); // This is so statically-defined video_stream_def always have a _decoder != NULL
+	if (!ret) _decoder.reset(new media::VideoDecoder()); // This is so statically-defined video_stream_def always have a _decoder != NULL
 
 }
 
@@ -113,8 +113,8 @@ video_stream_definition::readDefineVideoFrame(stream* in, SWF::tag_type tag, mov
 
 
 	// Check what kind of frame this is
-	videoFrameType ft;
-	if (m_codec_id == VIDEO_CODEC_H263) {
+	media::videoFrameType ft;
+	if (m_codec_id == media::VIDEO_CODEC_H263) {
 		// Parse the h263 header to determine the frame type. The position of the
 		// info varies if the frame size is custom.
 		std::auto_ptr<BitsReader> br (new BitsReader(data.get(), totSize));
@@ -124,19 +124,18 @@ video_stream_definition::readDefineVideoFrame(stream* in, SWF::tag_type tag, mov
 		else if (tmp == 1) tmp = br->read_uint(16);
 		
 		// Finally we're at the info, read and use
-		videoFrameType ft;
 		tmp = br->read_uint(3);
-		if (tmp == 0) ft = KEY_FRAME;
-		else if (tmp == 1) ft = INTER_FRAME;
-		else ft = DIS_INTER_FRAME;
+		if (tmp == 0) ft = media::KEY_FRAME;
+		else if (tmp == 1) ft = media::INTER_FRAME;
+		else ft = media::DIS_INTER_FRAME;
 
-	} else if (m_codec_id == VIDEO_CODEC_VP6 || m_codec_id == VIDEO_CODEC_VP6A) {
+	} else if (m_codec_id == media::VIDEO_CODEC_VP6 || m_codec_id == media::VIDEO_CODEC_VP6A) {
 		// Get the info from the VP6 header
-		if (!(data.get()[0] & 0x80)) ft = KEY_FRAME;
-		else ft = INTER_FRAME;
+		if (!(data.get()[0] & 0x80)) ft = media::KEY_FRAME;
+		else ft = media::INTER_FRAME;
 
 	} else {
-		ft = KEY_FRAME;
+		ft = media::KEY_FRAME;
 	}
 
 	setFrameData(m->get_loading_frame(), data, totSize, ft);
@@ -164,7 +163,7 @@ video_stream_definition::get_frame_data(uint32_t frameNum)
 	}
 
 	// rewind to the nearest keyframe, or the last frame we decoded
-	while (static_cast<uint32_t>(m_last_decoded_frame+1) != it->first && it->second->frameType != KEY_FRAME && it != m_video_frames.begin()) it--;
+	while (static_cast<uint32_t>(m_last_decoded_frame+1) != it->first && it->second->frameType != media::KEY_FRAME && it != m_video_frames.begin()) it--;
 
 	std::auto_ptr<image::image_base> ret(NULL);
 
@@ -172,7 +171,7 @@ video_stream_definition::get_frame_data(uint32_t frameNum)
 	while (it != m_video_frames.end() && it->first <= frameNum) {
 		// If this is a disposable interlaced frame, and it is not the
 		// last one to be decoded, we skip the decoding.
-		if (!(it->second->frameType == DIS_INTER_FRAME && it->first != frameNum)) {
+		if (!(it->second->frameType == media::DIS_INTER_FRAME && it->first != frameNum)) {
 			ret.reset(NULL);
 			ret = _decoder->decodeToImage(it->second->videoData.get(), it->second->dataSize);
 		}
@@ -186,7 +185,7 @@ video_stream_definition::get_frame_data(uint32_t frameNum)
 }
 
 void
-video_stream_definition::setFrameData(uint32_t frameNum, boost::shared_array<uint8_t> data, uint32_t size, videoFrameType ft)
+video_stream_definition::setFrameData(uint32_t frameNum, boost::shared_array<uint8_t> data, uint32_t size, media::videoFrameType ft)
 {
 	EmbedFrameMap::iterator it = m_video_frames.find(frameNum);
 	if( it != m_video_frames.end() )

@@ -177,12 +177,12 @@ static as_value sprite_stop(const fn_call& fn)
 	// Stop sound stream as well, if such exist
 	int stream_id = sprite->get_sound_stream_id();
 	if (sprite->get_sound_stream_id() != -1) {
-		sound_handler* sh = get_sound_handler();
+		media::sound_handler* sh = get_sound_handler();
 		if (sh != NULL) sh->stop_sound(stream_id);
 		sprite->set_sound_stream_id(-1);
 	}
 
-/*	sound_handler* sh = get_sound_handler();
+/*	media::sound_handler* sh = get_sound_handler();
 	if (sh != NULL) sh->stop_all_sounds();*/
 	return as_value();
 }
@@ -2676,7 +2676,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
     int stream_id = get_sound_stream_id();
     if (target_frame_number != m_current_frame+1 && stream_id != -1) 
 	{
-        sound_handler* sh = get_sound_handler();
+        media::sound_handler* sh = get_sound_handler();
         if (sh != NULL) sh->stop_sound(stream_id);
         set_sound_stream_id(-1);
     }
@@ -3238,7 +3238,7 @@ sprite_instance::can_handle_mouse_event() const
 void sprite_instance::restart()
 {
 	// Stop all sounds
-	sound_handler* sh = get_sound_handler();
+	media::sound_handler* sh = get_sound_handler();
 	if (sh != NULL) sh->stop_all_sounds();
 
 	restoreDisplayList(0); // seems OK to me.

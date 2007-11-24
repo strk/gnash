@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaDecoder.h,v 1.3 2007/10/04 09:37:50 tgc Exp $
+// $Id: MediaDecoder.h,v 1.4 2007/11/24 17:21:42 strk Exp $
 
 #ifndef __MEDIADECODER_H__
 #define __MEDIADECODER_H__
@@ -37,6 +37,7 @@
 #endif
 
 namespace gnash {
+namespace media {
 
 
 /// \brief
@@ -233,6 +234,7 @@ protected:
 };
 
 
+} // gnash.media namespace 
 } // namespace gnash
 
 #endif // __MEDIADECODER_H__

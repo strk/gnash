@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.2 2007/10/23 18:13:59 strk Exp $ */
+/* $Id: sound_handler.h,v 1.3 2007/11/24 17:21:42 strk Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -47,6 +47,12 @@ namespace gnash {
 }
 
 namespace gnash {
+
+/// Gnash media subsystem (libmedia)
+//
+/// See http://wiki.gnashdev.org/wiki/index.php/Libmedia
+///
+namespace media {
 
 /// A buffer of bytes
 class Buffer {
@@ -522,6 +528,7 @@ DSOEXPORT sound_handler*	create_sound_handler_test();
 
 	
 
+} // gnash.media namespace 
 }	// namespace gnash
 
 #endif // SOUND_HANDLER_H

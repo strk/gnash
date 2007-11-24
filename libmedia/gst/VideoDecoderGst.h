@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderGst.h,v 1.6 2007/10/26 18:43:36 tgc Exp $
+// $Id: VideoDecoderGst.h,v 1.7 2007/11/24 17:21:42 strk Exp $
 
 #ifndef __VIDEODECODERGST_H__
 #define __VIDEODECODERGST_H__
@@ -35,6 +35,7 @@
 #include <boost/thread/mutex.hpp>
 
 namespace gnash {
+namespace media {
 
 /// Video decoding using Gstreamer.
 class VideoDecoderGst : public VideoDecoder {
@@ -98,6 +99,7 @@ private:
 
 };
 	
+} // gnash.media namespace 
 } // gnash namespace
 
 #endif // __VIDEODECODERGST_H__

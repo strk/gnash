@@ -302,7 +302,7 @@ void
 Gui::menu_toggle_sound()
 {
 //    GNASH_REPORT_FUNCTION;
-    sound_handler* snd_handler = get_sound_handler();
+    media::sound_handler* snd_handler = get_sound_handler();
 
     if (!snd_handler)
        return;

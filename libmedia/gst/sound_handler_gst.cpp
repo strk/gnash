@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.1 2007/09/27 23:59:54 tgc Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.2 2007/11/24 17:21:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -50,6 +50,7 @@
 using namespace boost;
 
 namespace gnash {
+namespace media {
 
 GST_sound_handler::GST_sound_handler()
 	: looping(false),
@@ -702,6 +703,7 @@ sound_handler*	create_sound_handler_gst()
 	return new GST_sound_handler;
 }
 
+} // gnash.media namespace 
 } // namespace gnash
 
 #endif // SOUND_GST

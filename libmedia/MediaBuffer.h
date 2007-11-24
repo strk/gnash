@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaBuffer.h,v 1.3 2007/10/04 09:37:50 tgc Exp $
+// $Id: MediaBuffer.h,v 1.4 2007/11/24 17:21:42 strk Exp $
 
 #ifndef __MEDIABUFFER_H__
 #define __MEDIABUFFER_H__
@@ -25,6 +25,7 @@
 #include <queue>
 
 namespace gnash {
+namespace media {
 
 
 /// This class is used to store decoded video or audio data
@@ -255,6 +256,7 @@ private:
 	uint32_t _bufferTime;
 };
 
+} // gnash.media namespace 
 } // gnash namespace
 
 #endif // __MEDIABUFFER_H__

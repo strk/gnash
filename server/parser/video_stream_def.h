@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.h,v 1.17 2007/11/23 12:21:27 strk Exp $
+// $Id: video_stream_def.h,v 1.18 2007/11/24 17:21:45 strk Exp $
 
 #ifndef GNASH_VIDEO_STREAM_DEF_H
 #define GNASH_VIDEO_STREAM_DEF_H
@@ -46,11 +46,11 @@ namespace gnash {
 /// Contains the data, the data size and the type of the frame
 class VideoData {
 public:
-	VideoData(boost::shared_array<uint8_t> data, uint32_t size, videoFrameType ft)
-	:
-	videoData(data),
-	dataSize(size),
-	frameType(ft)
+	VideoData(boost::shared_array<uint8_t> data, uint32_t size, media::videoFrameType ft)
+		:
+		videoData(data),
+		dataSize(size),
+		frameType(ft)
 	{
 	}
 
@@ -60,7 +60,7 @@ public:
 
 	boost::shared_array<uint8_t> videoData;
 	uint32_t dataSize;
-	videoFrameType frameType;
+	media::videoFrameType frameType;
 };
 
 class video_stream_definition : public character_def
@@ -147,7 +147,7 @@ private:
 	/// 3: screen video (Flash 7+ only)
 	/// 4: VP6
 	///
-	videoCodecType m_codec_id;
+	media::videoCodecType m_codec_id;
 
 	/// Bounds of the video, as read from the DEFINEVIDEOSTREAM tag.
 	rect m_bound;
@@ -177,7 +177,7 @@ private:
 	/// @param img
 	///	Frame data. Ownership is transferred. 
 	///
-	void setFrameData(uint32_t frameNum, boost::shared_array<uint8_t> data, uint32_t size, videoFrameType ft);
+	void setFrameData(uint32_t frameNum, boost::shared_array<uint8_t> data, uint32_t size, media::videoFrameType ft);
 
 	/// Width of the video
 	uint32_t _width;
@@ -186,7 +186,7 @@ private:
 	uint32_t _height;
 
 	/// The decoder used to decode the video frames
-	boost::scoped_ptr<VideoDecoder> _decoder;
+	boost::scoped_ptr<media::VideoDecoder> _decoder;
 };
 
 }	// end namespace gnash

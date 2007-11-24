@@ -18,7 +18,7 @@ namespace gnash {
 
 sound_sample::~sound_sample()
 {
-	sound_handler* handler = get_sound_handler();
+	media::sound_handler* handler = get_sound_handler();
 	if (handler)
 	{
 		handler->delete_sound(m_sound_handler_id);
@@ -44,7 +44,7 @@ void
 start_stream_sound_tag::execute(sprite_instance* m) const
 {
 	// Make static ?
-	sound_handler* handler = get_sound_handler();
+	media::sound_handler* handler = get_sound_handler();
 	if (handler)
 	{
 		// This makes it possible to stop only the stream when framejumping.

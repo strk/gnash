@@ -241,7 +241,7 @@ void nsPluginInstance::main_loop()
 	gnash::render_handler *render = gnash::create_render_handler_ogl();
 	gnash::set_render_handler(render);
 
-	gnash::sound_handler  *sound = NULL;
+	gnash::media::sound_handler  *sound = NULL;
 #ifdef SOUND_SDL
 	// It leads to crash
 //	sound = gnash::create_sound_handler_sdl();

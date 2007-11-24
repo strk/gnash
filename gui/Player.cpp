@@ -161,9 +161,9 @@ Player::init_sound()
 {
     if (do_sound) {
 #ifdef SOUND_SDL
-        _sound_handler.reset( gnash::create_sound_handler_sdl() );
+        _sound_handler.reset( gnash::media::create_sound_handler_sdl() );
 #elif defined(SOUND_GST)
-        _sound_handler.reset( gnash::create_sound_handler_gst() );
+        _sound_handler.reset( gnash::media::create_sound_handler_gst() );
 #else
         log_error(_("Sound requested but no sound support compiled in"));
         return;

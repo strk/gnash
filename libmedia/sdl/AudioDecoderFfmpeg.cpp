@@ -17,11 +17,12 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderFfmpeg.cpp,v 1.5 2007/10/06 09:53:45 tgc Exp $
+// $Id: AudioDecoderFfmpeg.cpp,v 1.6 2007/11/24 17:21:43 strk Exp $
 
 #include "AudioDecoderFfmpeg.h"
 
 namespace gnash {
+namespace media {
 	
 AudioDecoderFfmpeg::AudioDecoderFfmpeg ()
 	:
@@ -253,4 +254,5 @@ uint8_t* AudioDecoderFfmpeg::decode(uint8_t* input, uint32_t inputSize, uint32_t
 }
 
 
-}
+} // gnash.media namespace 
+} // gnash namespace

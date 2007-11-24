@@ -42,24 +42,22 @@
 #undef INVALID
 #undef ESCAPE
 
+class tu_file; // for file_opener_callback typedef
+namespace gnash {
+	class sprite_instance; // for fscommand_callback typedef
+	class movie_definition; // for create_movie
+	class render_handler; // for set_render_handler 
+	class URL; // for set_base_url
+	namespace media {
+		class sound_handler; // for set_sound_handler
+	}
+}
 // @@ forward decl to avoid including base/image.h; TODO change the
 // render_handler interface to not depend on these classes at all.
 namespace image { class image_base; class rgb; class rgba; }
-
-// forward decl
 namespace jpeg { class input; }
 
-class tu_file; // for file_opener_callback typedef
-
 namespace gnash {
-
-// Forward declarations.
-class sprite_instance; // for fscommand_callback typedef
-class movie_definition; // for create_movie
-class render_handler; // for set_render_handler 
-class sound_handler; // for set_sound_handler
-class URL; // for set_base_url
-
 
 // Sound callbacks stuff
 
@@ -71,10 +69,10 @@ class URL; // for set_base_url
 /// If you want sound support, you should set this at startup,
 /// before loading or playing any movies!
 ///
-DSOEXPORT void  set_sound_handler(sound_handler* s);
+DSOEXPORT void  set_sound_handler(media::sound_handler* s);
 
 /// Get currently registered sound handler
-DSOEXPORT sound_handler* get_sound_handler();
+DSOEXPORT media::sound_handler* get_sound_handler();
 
 
 ///

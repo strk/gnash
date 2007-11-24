@@ -128,7 +128,7 @@ int
 Sound::getVolume()
 {
 	int volume = 0;
-	sound_handler* s = get_sound_handler();
+	media::sound_handler* s = get_sound_handler();
 	if (s != NULL)
 	{
 		volume = s->get_volume(soundId);
@@ -178,7 +178,7 @@ Sound::setVolume(int volume)
 	// sanity check
 	if (volume >= 0 && volume <=100)
 	{
-		sound_handler* s = get_sound_handler();
+		media::sound_handler* s = get_sound_handler();
 		if (s != NULL)
 		{
 			s->set_volume(soundId, volume);
@@ -189,7 +189,7 @@ Sound::setVolume(int volume)
 void
 Sound::start(int offset, int loops)
 {
-	    sound_handler* s = get_sound_handler();
+	    media::sound_handler* s = get_sound_handler();
 	    if (s) s->play_sound(soundId, loops, offset, 0, NULL);
     
 }
@@ -198,7 +198,7 @@ void
 Sound::stop(int si)
 {
 
-	sound_handler* s = get_sound_handler();
+	media::sound_handler* s = get_sound_handler();
 	if (s != NULL)
 	{
 	    if (si > -1) {

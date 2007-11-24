@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: AudioDecoderNellymoser.h,v 1.3 2007/10/04 09:37:50 tgc Exp $
+// $Id: AudioDecoderNellymoser.h,v 1.4 2007/11/24 17:21:42 strk Exp $
 
 // This file incorporates work covered by the following copyright and permission
 // notice:
@@ -67,6 +67,7 @@ typedef struct nelly_handle_struct {
 } nelly_handle;
 
 namespace gnash {
+namespace media {
 
 /// Audio decoding using internal Nellymoser decoder.
 class AudioDecoderNellymoser : public AudioDecoder {
@@ -92,6 +93,7 @@ private:
 	bool _stereo;
 };
 	
+} // gnash.media namespace 
 } // gnash namespace
 
 #endif // __AUDIODECODERNELLYMOSER_H__
