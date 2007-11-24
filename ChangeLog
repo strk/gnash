@@ -1,3 +1,8 @@
+2007-11-24  Rob Savoye  <rob@ute.welcomehome.org>
+
+	* macros/hildon.m4: Add more double quotes around shell expansion
+	when setting variables. Fixes #21638
+
 2007-11-24 Sandro Santilli <strk@keybit.net>
 
 	* gui/Player.{cpp,h}, gui/gui.cpp, libmedia/AudioDecoder.h,

@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: hildon.m4,v 1.2 2007/11/22 17:19:32 rsavoye Exp $
+dnl $Id: hildon.m4,v 1.3 2007/11/24 22:59:01 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_HILDON],
 [
@@ -24,7 +24,7 @@ AC_DEFUN([GNASH_PATH_HILDON],
   AC_CACHE_VAL(ac_cv_path_hildon_incl,[
     if test x"${with_hildon_incl}" != x ; then
       if test -f ${with_hildon_incl}/hildon/hildon-program.h ; then
-        ac_cv_path_hildon_incl=-I`(cd ${with_hildon_incl}; pwd)`
+        ac_cv_path_hildon_incl="-I`(cd ${with_hildon_incl}; pwd)`"
       else
         AC_MSG_ERROR([${with_hildon_incl} directory doesn't contain hildon/hildon.h])
       fi
@@ -33,7 +33,7 @@ AC_DEFUN([GNASH_PATH_HILDON],
 
   if test x$cross_compiling = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_hildon_incl}" = x; then
-      $PKG_CONFIG --exists hildon-1 && ac_cv_path_hildon_incl=`$PKG_CONFIG --cflags-only-I hildon-1 | cut -d ' ' -f 1`
+      $PKG_CONFIG --exists hildon-1 && ac_cv_path_hildon_incl="`$PKG_CONFIG --cflags-only-I hildon-1 | cut -d ' ' -f 1`"
     fi
   fi
 
@@ -45,7 +45,7 @@ AC_DEFUN([GNASH_PATH_HILDON],
 
   if test x$cross_compiling = xno; then
     if test x"$PKG_CONFIG" != x; then
-      $PKG_CONFIG --exists hildon-1 && gnash_hildon_version=`$PKG_CONFIG --modversion hildon-1 | cut -d '.'-f 1'`
+      $PKG_CONFIG --exists hildon-1 && gnash_hildon_version="`$PKG_CONFIG --modversion hildon-1 | cut -d '.'-f 1'`"
     fi
   fi
 
