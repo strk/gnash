@@ -34,6 +34,7 @@
 #include "types.h"
 #include "image.h"
 #include "utility.h"
+#include "Range2d.h"
 
 #if defined(_WIN32) || defined(WIN32)
 #  include <Windows.h>
@@ -54,7 +55,7 @@
 ///    from an arbitrary number of edges. An edge describes a quadratic Bezier
 ///    curve. A shape is defined by at least one path enclosing a space -- this
 ///    space is the shape. Every path may have a left and/or right fill style,
-///    determining (if the shape is thought of as a vector) which side(s) of
+///    determining (if the path is thought of as a vector) which side(s) of
 ///    the path is to be filled.
 ///    OpenGL, on the other hand, understands only triangles, lines and points.
 ///    We must break Flash graphics down into primitives that OpenGL can
@@ -343,6 +344,7 @@ Tesselator::tesselate()
        end = _vertices.end(); it != end; ++it) {
     delete [] *it;
   }
+
   _vertices.clear();
 }
 
@@ -528,6 +530,16 @@ bitmap_info_ogl::apply(const gnash::matrix& bitmap_matrix,
   glTexGenfv(GL_T, GL_OBJECT_PLANE, p);
   
 }
+
+template<typename C, typename T, typename R, typename A>
+void 
+for_each(C& container, R (T::*pmf)(const A&),const A& arg)
+{
+    std::for_each(container.begin(), container.end(),
+                  boost::bind(pmf, _1, boost::ref(arg)));
+}
+
+
 
 class DSOEXPORT render_handler_ogl : public render_handler
 {
@@ -751,6 +763,17 @@ public:
   virtual void
   end_display()
   {
+  #if 0
+    GLint box[4];
+    glGetIntegerv(GL_SCISSOR_BOX, box);
+    
+    int x = PIXELS_TO_TWIPS(box[0]),
+        y = PIXELS_TO_TWIPS(box[1]),
+        w = PIXELS_TO_TWIPS(box[2]),
+        h = PIXELS_TO_TWIPS(box[3]);
+
+    glRectd(x, y - h, x + w, y + h);
+  #endif
     check_error();
     glFlush(); // Make OpenGL execute all commands in the buffer.
   }
@@ -1358,6 +1381,8 @@ public:
   {  
     std::for_each(paths.begin(), paths.end(),
                   boost::bind(&path::transform, _1, boost::ref(mat)));
+                  
+    //for_each(paths, &path::transform, mat);
   }  
 
   void
@@ -1461,7 +1486,7 @@ public:
     }
     
     if (_drawing_mask) {
-      PathVec scaled_path_vec = path_vec;;
+      PathVec scaled_path_vec = path_vec;
       
       apply_matrix_to_paths(scaled_path_vec, mat);
       draw_mask(scaled_path_vec); 
@@ -1532,6 +1557,23 @@ public:
   virtual void get_scale(point& scale) {
     scale.x = _xscale;
     scale.y = _yscale;
+  }
+  
+  virtual void set_invalidated_regions(const InvalidatedRanges& ranges)
+  {
+#if 0
+    if (ranges.isWorld() || ranges.isNull()) {
+      glDisable(GL_SCISSOR_TEST);
+      return;
+    }    
+    
+    glEnable(GL_SCISSOR_TEST);
+    
+    geometry::Range2d<float> area = ranges.getFullArea;
+    
+    glScissor( (int)TWIPS_TO_PIXELS(area.getMinX()), window_height-(int)TWIPS_TO_PIXELS(area.getMaxY()),
+               (int)TWIPS_TO_PIXELS(area.width()), (int)TWIPS_TO_PIXELS(area.height()));
+#endif
   }
 
 #ifdef OSMESA_TESTING
