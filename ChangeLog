@@ -1,5 +1,10 @@
 2007-11-24 Bastiaan Jacques <bastiaan@bjacques.org>
 
+	* backend/render_handler_cairo.cpp: Make sure outlines are
+	rounded. Fixes bug #18873.
+
+2007-11-24 Bastiaan Jacques <bastiaan@bjacques.org>
+
 	* backend/render_handler_ogl.cpp: Implement region invalidation,
 	but keep it disabled since it does not appear to affect
 	performance in its current incarnation.

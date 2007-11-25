@@ -626,6 +626,7 @@ public:
   void draw_outlines(const PathVec& path_vec, const std::vector<line_style>& line_styles, const cxform& cx)
   {  
     cairo_set_line_cap(_cr, CAIRO_LINE_CAP_ROUND); // TODO: move to init
+    cairo_set_line_join(_cr, CAIRO_LINE_JOIN_ROUND);
 
     for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
          it != end; ++it) {
