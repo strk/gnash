@@ -1,3 +1,8 @@
+2007-11-25 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/movie_definition.h: corrected some old names
+	  from doxygen page.
+
 2007-11-24 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/render_handler_cairo.cpp: Make sure outlines are

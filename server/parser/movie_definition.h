@@ -27,7 +27,7 @@
 /// multiple instances.
 ///
 /// A Movie definition is defined by the gnash::movie_definition class.
-/// A Movie instance is defined by the gnash::movie_interface class.
+/// A Movie instance is defined by the gnash::movie_instance class.
 /// 
 /// A Movie instance exposes the ActionScript
 /// Object base interface (gnash::as_object),
@@ -35,11 +35,16 @@
 ///
 /// The implementation of SWF parsing for a Movie definition
 /// is found in gnash::movie_def_impl::read.
+///
 /// Note that movie_definition is also used as a base class
-/// to sprite_definition, which is a sub-movie defined in an SWF
+/// for gnash::sprite_definition, which is a sub-movie defined in an SWF
 /// file. This seems to be the only reason to have a
 /// movie_def_impl class, being the top-level definition of
 /// a movie (the one with a CharacterDictionary in it).
+///
+/// Also note that gnash::movie_instance is a subclass of gnash::sprite_instance,
+/// being the instance of a gnash::sprite_definition.
+///
 ///
 
 
