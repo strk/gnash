@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.95 2007/11/24 17:21:44 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.96 2007/11/25 17:50:01 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -969,6 +969,11 @@ bool NetStreamFfmpeg::decodeMediaFrame()
 		return true;
 	}
 
+	// CHECKME: I'm not sure it's safe to call av_free_packet
+	//          on a statically allocated AVPacket.
+	//          Also, heap-allocating and storing in an auto_ptr
+	//          would make this function body simpler.
+	//
 	AVPacket packet;
 	int rc = av_read_frame(m_FormatCtx, &packet);
 
@@ -978,6 +983,7 @@ bool NetStreamFfmpeg::decodeMediaFrame()
 		{
 			if (!decodeAudio(&packet)) {
 				log_error(_("Problems decoding audio frame"));
+				av_free_packet(&packet);
 				return false;
 			}
 		}
@@ -986,6 +992,7 @@ bool NetStreamFfmpeg::decodeMediaFrame()
 		{
 			if (!decodeVideo(&packet)) {
 				log_error(_("Problems decoding video frame"));
+				av_free_packet(&packet);
 				return false;
 			}
 		}
@@ -994,6 +1001,7 @@ bool NetStreamFfmpeg::decodeMediaFrame()
 	else
 	{
 		log_error(_("Problems decoding frame"));
+		av_free_packet(&packet);
 		return false;
 	}
 

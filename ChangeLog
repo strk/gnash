@@ -1,5 +1,8 @@
 2007-11-25 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStreamFfmpeg.cpp (decodeMediaFrame): always call
+	  av_read_frame on the stack-allocated AVPacket before returning.
+	  
 	* server/parser/movie_definition.h: corrected some old names
 	  from doxygen page.
 
