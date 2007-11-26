@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.114 2007/11/22 21:45:40 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.115 2007/11/26 16:27:27 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -186,8 +186,8 @@ as_environment::get_variable_raw(
     
     // Fallback.
     // FIXME, should this be log_error?  or log_swferror?
-    IF_VERBOSE_ACTION (
-    log_action(_("get_variable_raw(\"%s\") failed, returning UNDEFINED"),
+    IF_VERBOSE_ASCODING_ERRORS (
+    log_aserror(_("reference to unexisting variable '%s'"),
            varname.c_str());
     );
 
