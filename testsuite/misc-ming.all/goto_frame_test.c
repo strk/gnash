@@ -19,7 +19,35 @@
 /*
  * Zou Lunkai, zoulunkai@gmail.com
  *
- * Test for ActionGotoFrame 
+ *
+ * Timeline(starts from test2):
+ * 
+ *   Frame  | 7 | 8 | 9 | 10| 11| 12|
+ *  --------+---+---+---+---+---+---+
+ *   Event  | J | P | R | P | R | * |
+ * 
+ *  P = place (by PlaceObject2)
+ *  R = remove (by RemoveObject2)
+ *  J = jump
+ *  * = jump target
+ *
+ * Description:
+ *
+ *  frame7:  gotoAndPlay(12);
+ *  frame8:  place mc1 at depth 100
+ *  frame9:  remove mc1
+ *  frame10: place mc2 at depth 100
+ *  frame11: remove mc2
+ *  frame12: checks
+ *
+ * Observed behaviour:
+ *
+ *   (1) both mc1 and mc2 occupys depth -16485 after gotoFrame.
+ *
+ * Deduction:
+ *
+ *   (1) different characters in the removed depths zone could share the same depth.
+ *   (2) DisplayList::testInvariant() probably fails.
  *
  */
 
@@ -32,6 +60,20 @@
 #define OUTPUT_VERSION 6
 #define OUTPUT_FILENAME "goto_frame_test.swf"
 
+SWFDisplayItem
+add_static_mc(SWFMovie mo, const char* name, int depth)
+{
+  SWFMovieClip mc;
+  SWFDisplayItem it;
+
+  mc = newSWFMovieClip();
+  SWFMovieClip_nextFrame(mc);
+
+  it = SWFMovie_add(mo, (SWFBlock)mc);
+  SWFDisplayItem_setDepth(it, depth); 
+  SWFDisplayItem_setName(it, name);
+  return it;
+}
 
 int
 main(int argc, char** argv)
@@ -39,7 +81,8 @@ main(int argc, char** argv)
   SWFMovie mo;
   SWFMovieClip  mc_red, dejagnuclip;
   SWFShape  sh_red;
-
+  SWFDisplayItem it_red, it;
+  
   const char *srcdir=".";
   if ( argc>1 ) 
       srcdir=argv[1];
@@ -58,6 +101,7 @@ main(int argc, char** argv)
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   // Add a ShowFrame here, do all checks at later frames!
   // This will guarantee all the check-functions are defined before we call them.
+  add_actions(mo, "asOrder = '0+';");
   SWFMovie_nextFrame(mo); //1st frame
   
   mc_red = newSWFMovieClip();
@@ -65,39 +109,80 @@ main(int argc, char** argv)
   SWFMovieClip_add(mc_red, (SWFBlock)sh_red);  
   SWFMovieClip_nextFrame(mc_red);//1st frame
   SWFMovieClip_nextFrame(mc_red);//2st frame
-  add_clip_actions(mc_red, "var flag = \"action_executed\"; \
-                            var x = \"mc_red.frame3\";\
-                            play();");
+  add_clip_actions(mc_red,  "_root.asOrder += '3+';"
+                            "play();");
   SWFMovieClip_nextFrame(mc_red);//3nd frame
   
-  add_clip_actions(mc_red, "x = \"mc_red.frame4\"; \
-                            stop();");
+  add_clip_actions(mc_red, "_root.asOrder += '7+'; stop();");
   SWFMovieClip_nextFrame(mc_red);//4th frame
   
-  SWFDisplayItem it_red;
   it_red = SWFMovie_add(mo, (SWFBlock)mc_red);  
   SWFDisplayItem_setDepth(it_red, 3); 
   SWFDisplayItem_setName(it_red, "mc_red");
-  add_actions(mo, " check_equals(mc_red._currentframe, 1);  \
-                    mc_red.gotoAndStop(3); \
-                    check_equals(mc_red._currentframe, 3); \
-                    _root.gotoAndStop(3); ");               
+  
+  add_actions(mo, "_root.asOrder += '1+';"
+                  "check_equals(mc_red._currentframe, 1); "
+                  "mc_red.gotoAndStop(3);"
+                  "check_equals(mc_red._currentframe, 3); "
+                  "_root.gotoAndStop(3);"
+                  "_root.asOrder += '2+';" );               
   SWFMovie_nextFrame(mo); //2nd frame
   
-  add_actions(mo, " _root.gotoAndStop(4); \
-                    mc_red.x = \"_root.frame3\"; ");
+  add_actions(mo, "_root.asOrder += '4+';"
+                  "_root.gotoAndStop(4);"
+                  "_root.asOrder += '5+';");
   SWFMovie_nextFrame(mo); //3nd frame
   
-  add_actions(mo, " _root.gotoAndStop(5); \
-                    mc_red.x = \"_root.frame4\"; ");
+  add_actions(mo, "_root.asOrder += '6+';"
+                  " _root.gotoAndPlay(5);");
   SWFMovie_nextFrame(mo); //4nd frame
   
   //checks
-  check_equals(mo, "_root.mc_red.flag", "'action_executed'");
-  check_equals(mo, "_root.mc_red.x", "'_root.frame4'");
-  add_actions(mo, " _root.totals(); stop(); ");
+  check_equals(mo, "_root.asOrder", "'0+1+2+3+4+5+6+'");
   SWFMovie_nextFrame(mo); //5th frame
 
+  check_equals(mo, "_root.asOrder", "'0+1+2+3+4+5+6+7+'");
+  SWFMovie_nextFrame(mo); //6th frame
+
+// disable by default, otherwise segfault with NDEBUG undefined
+#if 0
+  //
+  // test2: test forward gotoFrame
+  //
+  add_actions(mo, "gotoAndPlay(_currentframe + 5);");
+  SWFMovie_nextFrame(mo); // 7th frame
+  
+  
+  it = add_static_mc(mo, "mc1", 100);
+  SWFDisplayItem_addAction(it, newSWFAction(
+        "_root.note(this+' unloaded');"
+        ), SWFACTION_UNLOAD);
+  SWFMovie_nextFrame(mo); // 8th frame
+  
+  
+  SWFDisplayItem_remove(it);
+  SWFMovie_nextFrame(mo); // 9th frame
+  
+  
+  it = add_static_mc(mo, "mc2", 100);
+  SWFDisplayItem_addAction(it, newSWFAction(
+        "_root.note(this+' unloaded');"
+        ), SWFACTION_UNLOAD);
+  SWFMovie_nextFrame(mo); // 10th frame
+  
+  
+  SWFDisplayItem_remove(it);
+  SWFMovie_nextFrame(mo); // 11th frame
+  
+  
+  check_equals(mo, "mc1.getDepth()", "-16485");
+  check_equals(mo, "mc1._name", "'mc1'");
+  xcheck_equals(mo, "mc2.getDepth()", "-16485");
+  xcheck_equals(mo, "mc2._name", "'mc2'");
+#endif
+  add_actions(mo, "totals(); stop();");
+  SWFMovie_nextFrame(mo); // 12th frame
+    
   //Output movie
   puts("Saving " OUTPUT_FILENAME );
   SWFMovie_save(mo, OUTPUT_FILENAME);
