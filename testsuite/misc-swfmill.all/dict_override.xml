@@ -36,7 +36,7 @@
             </items>
           </PushData>
 
-	  // Set 'a' to 'A_value'
+	  // Set 'a' to 'A'
           <PushData>
             <items>
               <StackString value="a"/>
@@ -45,7 +45,7 @@
           </PushData>
           <SetVariable/>
 
-	  // Set 'b' to 'A_value'
+	  // Set 'b' to 'B'
           <PushData>
             <items>
               <StackString value="b"/>

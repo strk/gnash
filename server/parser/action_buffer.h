@@ -65,35 +65,6 @@ public:
 	/// Read action bytes from input stream up to end of tag
 	void	readFullTag(stream* in);
 
-#if 0
-	/// \brief
-	/// Interpret the actions in this action buffer, and evaluate
-	/// them in the given environment. 
-	//
-	/// Execute our whole buffer,
-	/// without any arguments passed in.
-	/// 
-	/// FIXME: obsolete this, use ActionExec instead.
-	///
-	void	execute(as_environment* env) const;
-
-	/// Interpret the specified subset of the actions in our buffer.
-	//
-	/// Caller is responsible for cleaning up our local
-	/// stack frame (it may have passed its arguments in via the
-	/// local stack frame).
-	///
-	/// FIXME: obsolete this, use ActionExec instead.
-	///
-	void execute(
-		as_environment* env,
-		size_t start_pc,
-		size_t exec_bytes,
-		as_value* retval, // we should probably drop this parameter
-		const std::vector<with_stack_entry>& initial_with_stack,
-		bool is_function2) const;
-#endif
-
 	bool is_null() const
 	{
 		return m_buffer.size() < 1 || m_buffer[0] == 0;
@@ -232,14 +203,12 @@ public:
 		return m_dictionary[n];
 	}
 
-	/// \brief
 	/// Interpret the SWF::ACTION_CONSTANTPOOL opcode. 
 	//
 	/// Don't read stop_pc or later. 
 	///
-	/// A dictionary is some static strings embedded in the
-	/// action buffer; there should only be one dictionary per
-	/// action buffer.
+	/// A dictionary is a table of indexed strings to be
+	/// used in action blocks to reduce their size.
 	///
 	/// NOTE: Normally the dictionary is declared as the first
 	/// action in an action buffer, but I've seen what looks like
@@ -253,9 +222,8 @@ public:
 	///          ... "protected" code here, including the real decl_dict opcode ...
 	///          <end of the dummy decl_dict [0] opcode>
 	///
-	/// So we just interpret the first decl_dict we come to, and
-	/// cache the results.  If we ever hit a different decl_dict in
-	/// the same action_buffer, then we log an error and ignore it.
+	/// Note also that the dictionary may be overridden multiple times.
+	/// See testsuite/misc-swfmill.all/dict_override.xml
 	///
 	void process_decl_dict(size_t start_pc, size_t stop_pc) const;
 

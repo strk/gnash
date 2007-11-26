@@ -1,5 +1,7 @@
 2007-11-26 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/action_buffer.h: cleanup and comments fix
+	* testsuite/misc-swfmill.all/dict_override.xml: comments fix.
 	* server/parser/movie_def_impl.{cpp,h}: consistent locking for
 	  _frames_loaded (so helgrind is happy).
 	* gui/: Makefile.am, gnash.cpp: add CXXFLAGS in --version output.
