@@ -1037,18 +1037,8 @@ DisplayList::reinsertRemovedCharacter(boost::intrusive_ptr<character> ch)
   container_type::iterator it = find_if(
       _charsByDepth.begin(), _charsByDepth.end(),
       DepthGreaterOrEqual(newDepth));
-  if ( it == _charsByDepth.end() || (*it)->get_depth() != newDepth )
-  {
-    // add the new char
-    _charsByDepth.insert(it, DisplayItem(ch));
-  }
-  else
-  {
-    // the character should not be in the displaylist already !
-    assert(it->get() != ch.get());
 
-    log_error("DisplayList::insertCharacter: target depth (%d) is occupied, and we don't know what we're supposed to do - we'll avoid inserting the character for now", newDepth);
-  }
+  _charsByDepth.insert(it, DisplayItem(ch));
 
   testInvariant();
 }
@@ -1065,7 +1055,8 @@ DisplayList::beginNonRemoved(container_type& c)
 DisplayList::const_iterator
 DisplayList::beginNonRemoved(const container_type& c)
 {
-  return std::find_if(c.begin(), c.end(), DepthGreaterOrEqual(character::removedDepthOffset+1));
+  return std::find_if(c.begin(), c.end(),
+      DepthGreaterOrEqual(character::removedDepthOffset - character::staticDepthOffset));
 }
 
 void

@@ -57,9 +57,9 @@ public:
 	{
 #ifndef NDEBUG
 		DisplayList sorted = *this;
-		// check no duplicated depths in list
+		// check no duplicated depths above non-removed zone.
 		std::set<int> depths;
-		for (const_iterator it=_charsByDepth.begin(), itEnd=_charsByDepth.end(); it!=itEnd; ++it)
+		for (const_iterator it=beginNonRemoved(_charsByDepth), itEnd=_charsByDepth.end(); it!=itEnd; ++it)
 		{
 			boost::intrusive_ptr<character> ch = *it;
 			int depth = ch->get_depth();

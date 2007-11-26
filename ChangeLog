@@ -1,5 +1,11 @@
 2007-11-26 Zou Lunkai <zoulunkai@gmail.com>
 
+	* server/dlist.h: testInvariant(), dlist.cpp: reinsertRemovedCharacter(), 
+	  allow duplicated depths in removed zone.
+	* testsuite/misc-ming.all/goto_frame_test.c: xcheck->check.
+	  
+2007-11-26 Zou Lunkai <zoulunkai@gmail.com>
+
 	* testsuite/misc-ming.all/goto_frame_test.c: cleanups and tests for 
 	  timeline control. new tests are disabled by default, otherwise 
 	  DisplayList::testInvariant() would abort.

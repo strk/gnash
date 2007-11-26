@@ -145,8 +145,6 @@ main(int argc, char** argv)
   check_equals(mo, "_root.asOrder", "'0+1+2+3+4+5+6+7+'");
   SWFMovie_nextFrame(mo); //6th frame
 
-// disable by default, otherwise segfault with NDEBUG undefined
-#if 0
   //
   // test2: test forward gotoFrame
   //
@@ -180,9 +178,9 @@ main(int argc, char** argv)
   
   check_equals(mo, "mc1.getDepth()", "-16485");
   check_equals(mo, "mc1._name", "'mc1'");
-  xcheck_equals(mo, "mc2.getDepth()", "-16485");
-  xcheck_equals(mo, "mc2._name", "'mc2'");
-#endif
+  check_equals(mo, "mc2.getDepth()", "-16485");
+  check_equals(mo, "mc2._name", "'mc2'");
+
   add_actions(mo, "totals(); stop();");
   SWFMovie_nextFrame(mo); // 12th frame
     
