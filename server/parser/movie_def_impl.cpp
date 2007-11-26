@@ -548,11 +548,11 @@ movie_def_impl::read(std::auto_ptr<tu_file> in, const std::string& url)
 bool
 movie_def_impl::ensure_frame_loaded(size_t framenum)
 {
+	boost::mutex::scoped_lock lock(_frames_loaded_mutex);
+
 #ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
 	return ( framenum <= _frames_loaded );
 #endif
-
-	boost::mutex::scoped_lock lock(_frames_loaded_mutex);
 
 	if ( framenum <= _frames_loaded ) return true;
 
@@ -872,8 +872,8 @@ parse_tag:
 				log_parse("  show_frame");
 			);
 
-			incrementLoadedFrames();
-			if ( _frames_loaded == m_frame_count )
+			size_t floaded = incrementLoadedFrames();
+			if ( floaded == m_frame_count )
 			{
 				str.close_tag();
 				tag_type = str.open_tag();
@@ -923,23 +923,23 @@ parse_tag:
 		log_error(_("Parsing exception: %s"), e.what());
 	}
 
-	if ( ! m_playlist[_frames_loaded].empty() )
+	size_t floaded = get_loading_frame();
+	if ( ! m_playlist[floaded].empty() )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
 		log_swferror(_(SIZET_FMT " control tags are NOT followed by"
 			" a SHOWFRAME tag"),
-			m_playlist[_frames_loaded].size());
+			m_playlist[floaded].size());
 		);
 	}
 
-	if ( m_frame_count > _frames_loaded )
+	if ( m_frame_count > floaded )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
 		log_swferror(_(SIZET_FMT " frames advertised in header, but only " SIZET_FMT " SHOWFRAME tags "
-			"found in stream. Updating total frames count"), m_frame_count, _frames_loaded);
+			"found in stream. Updating total frames count"), m_frame_count, floaded);
 		);
-		boost::mutex::scoped_lock lock(_frames_loaded_mutex);
-		m_frame_count = _frames_loaded;
+		m_frame_count = floaded;
 		// Notify any thread waiting on frame reached condition
 		_frame_reached_condition.notify_all();
 	}
@@ -952,7 +952,7 @@ movie_def_impl::get_loading_frame() const
 	return _frames_loaded;
 }
 
-void
+size_t
 movie_def_impl::incrementLoadedFrames()
 {
 	boost::mutex::scoped_lock lock(_frames_loaded_mutex);
@@ -989,6 +989,8 @@ movie_def_impl::incrementLoadedFrames()
 		// See: http://boost.org/doc/html/condition.html
 		_frame_reached_condition.notify_all();
 	}
+
+	return _frames_loaded;
 }
 
 void
@@ -1096,7 +1098,8 @@ movie_def_impl::get_exported_resource(const std::string& symbol)
 void
 movie_def_impl::add_frame_name(const std::string& n)
 {
-	boost::mutex::scoped_lock lock(_namedFramesMutex);
+	boost::mutex::scoped_lock lock1(_namedFramesMutex);
+	boost::mutex::scoped_lock lock2(_frames_loaded_mutex);
 	//log_debug(_("labelframe: frame %d, name %s"), _frames_loaded, n.c_str());
 	_namedFrames[n] = _frames_loaded;
 }

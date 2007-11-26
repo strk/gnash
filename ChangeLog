@@ -1,5 +1,7 @@
 2007-11-26 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/movie_def_impl.{cpp,h}: consistent locking for
+	  _frames_loaded (so helgrind is happy).
 	* gui/: Makefile.am, gnash.cpp: add CXXFLAGS in --version output.
 
 2007-11-26 Zou Lunkai <zoulunkai@gmail.com>

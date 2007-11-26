@@ -306,7 +306,9 @@ private:
 	///
 	/// NOTE: this method locks _frames_loaded_mutex
 	///
-	void incrementLoadedFrames();
+	/// @return the new value of _frames_loaded
+	///
+	size_t incrementLoadedFrames();
 
 	/// Set number of bytes loaded from input stream
 	//
@@ -485,6 +487,7 @@ public:
 	void	addControlTag(ControlTag* tag)
 	{
 	    assert(tag);
+	    boost::mutex::scoped_lock lock(_frames_loaded_mutex);
 	    m_playlist[_frames_loaded].push_back(tag);
 	}
 
@@ -494,7 +497,7 @@ public:
 
 	// See dox in movie_definition.h
 	//
-	// locks _namedFramesMutex
+	// locks _namedFramesMutex and _frames_loaded_mutex
 	//
 	void add_frame_name(const std::string& name);
 
@@ -514,7 +517,10 @@ public:
 
 	virtual const PlayList* getPlaylist(size_t frame_number) const
 	{
+#ifndef NDEBUG
+		boost::mutex::scoped_lock lock(_frames_loaded_mutex);
 		assert(frame_number <= _frames_loaded);
+#endif
 
 		PlayListMap::const_iterator it = m_playlist.find(frame_number);
 		if ( it == m_playlist.end() ) return NULL;
