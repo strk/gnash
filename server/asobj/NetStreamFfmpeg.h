@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.51 2007/11/26 21:53:00 strk Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.52 2007/11/26 21:53:59 strk Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -97,7 +97,7 @@ class multithread_queue
 	}
 
 	// Destroy all elements of the queue. Locks.
-	void clear();
+	void clear()
 	{
 		boost::mutex::scoped_lock lock(_mutex);
 		while (!m_queue.empty())
