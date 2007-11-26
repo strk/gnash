@@ -1,5 +1,8 @@
 2007-11-26 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/MovieClip.as: add failing test
+	  for referenceability of childs of unloaded sprites when
+	  brother has onUnload event and child doesn't.
 	* testsuite/swfdec/PASSING: sync with swfdec git.
 
 2007-11-26 Sandro Santilli <strk@keybit.net>

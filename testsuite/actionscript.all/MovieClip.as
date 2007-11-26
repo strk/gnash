@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.99 2007/11/15 19:41:34 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.100 2007/11/26 17:54:13 strk Exp $";
 
 #include "check.as"
 
@@ -451,6 +451,7 @@ softref = _root.createEmptyMovieClip("hardref", 60);
 softref2 = _root.createEmptyMovieClip("hardref2", 70);
 softref3 = _root.createEmptyMovieClip("hardref3", 80);
 softref3child = softref3.createEmptyMovieClip("hardref3child", 1);
+softref3child2 = softref3.createEmptyMovieClip("hardref3child2", 2);
 softref3child.onUnload = function() { /* note(this+".onUnload called");*/ };
 hardref2.onUnload = function() { /*note(this+".onUnload called");*/ };
 check_equals(typeof(hardref), 'movieclip');
@@ -465,6 +466,7 @@ softref.member = 1;
 softref2.member = 2;
 softref3.member = 3;
 softref3child.member = '3child';
+softref3child2.member = '3child2';
 check_equals(typeof(softref.member), 'number');
 check_equals(typeof(softref2.member), 'number');
 check_equals(typeof(softref3.member), 'number');
@@ -518,6 +520,8 @@ check_equals(softref3.member, 3);
 check_equals(softref3._target, '/hardref3');
 check_equals(softref3child.member, '3child');
 check_equals(softref3child._target, '/hardref3/hardref3child');
+xcheck_equals(softref3child2.member, '3child2');
+xcheck_equals(softref3child2._target, '/hardref3/hardref3child2');
 hardref = 4;
 // Delete is needed, or further inspection functions will hit the variable before the character
 delete hardref;
@@ -1267,12 +1271,12 @@ check_equals(getInstanceAtDepth(-6.2), tt2);
  check_totals(158); // SWF5
 #else
 #if OUTPUT_VERSION < 7
- check_totals(504); // SWF6
+ check_totals(506); // SWF6
 #else
 #if OUTPUT_VERSION < 8
- check_totals(521); // SWF7
+ check_totals(523); // SWF7
 #else
- check_totals(522); // SWF8+
+ check_totals(524); // SWF8+
 #endif
 #endif
 #endif
