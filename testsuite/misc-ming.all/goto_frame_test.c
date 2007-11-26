@@ -43,6 +43,7 @@
  * Observed behaviour:
  *
  *   (1) both mc1 and mc2 occupys depth -16485 after gotoFrame.
+ *   (2) both mc1 and mc2 are visible in frame7 at runtime.
  *
  * Deduction:
  *
@@ -150,6 +151,8 @@ main(int argc, char** argv)
   // test2: test forward gotoFrame
   //
   add_actions(mo, "gotoAndPlay(_currentframe + 5);");
+  check_equals(mo, "mc1._target", "'/mc1'");
+  check_equals(mo, "mc2._target", "'/mc2'");
   SWFMovie_nextFrame(mo); // 7th frame
   
   
