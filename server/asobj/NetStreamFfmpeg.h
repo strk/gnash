@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.49 2007/11/26 20:11:05 bwy Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.50 2007/11/26 20:33:49 bwy Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -311,6 +311,8 @@ private:
 		}
 	private:
 		std::auto_ptr<AVPacket> pktptr;
+		PktPointer(const PktPointer&);
+		PktPointer operator= (const PktPointer&);
 	};
 
 	// Setups the playback
