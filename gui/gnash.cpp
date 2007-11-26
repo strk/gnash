@@ -176,9 +176,10 @@ static void build_options()
     printf (_("Build options %s\n"
               "   Target: %s\n"
               "   Renderer: %s - GUI: %s - Media handler: %s\n"
-              "   Configured with: %s\n"),
+              "   Configured with: %s\n"
+              "   CXXFLAGS: %s\n"),
 		VERSION, TARGET_CONFIG, RENDERER_CONFIG, GUI_CONFIG,
-		MEDIA_CONFIG, CONFIG_CONFIG);
+		MEDIA_CONFIG, CONFIG_CONFIG, CXXFLAGS);
 #ifdef HAVE_FFMPEG_AVCODEC_H
     printf(_("Ffmpeg version is: %s\n"), LIBAVCODEC_IDENT);
 #endif

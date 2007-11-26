@@ -155,6 +155,7 @@ AM_CPPFLAGS += -DRENDERER_CONFIG=\"$(RENDERER_CONFIG)\"
 AM_CPPFLAGS += -DMEDIA_CONFIG=\"$(MEDIA_CONFIG)\"
 AM_CPPFLAGS += -DTARGET_CONFIG=\"$(target)\"
 AM_CPPFLAGS += -DCONFIG_CONFIG="\"$(shell cat .configline)\""
+AM_CPPFLAGS += -DCXXFLAGS="\"$(CXXFLAGS)\"" 
 
 dist_images_DATA = images/gnash_128_96.ico images/GnashG.png
 #dist_images_DATA = images/gnash_G_v3.ico

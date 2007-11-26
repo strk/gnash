@@ -1,3 +1,7 @@
+2007-11-26 Sandro Santilli <strk@keybit.net>
+
+	* gui/: Makefile.am, gnash.cpp: add CXXFLAGS in --version output.
+
 2007-11-26 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/dlist.h, dlist.cpp: testInvariant(), 
