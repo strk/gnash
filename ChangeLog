@@ -1,5 +1,9 @@
 2007-11-26 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStreamFfmpeg.{cpp,h}: more AVPacket wrapping work.
+
+2007-11-26 Sandro Santilli <strk@keybit.net>
+
 	* server/as_value.{cpp,h}: add is_sprite() and a way to get the sprite
 	  value w/out re-evaluating path.
 	* server/sprite_instance.cpp (get_path_element): don't re-evaluate

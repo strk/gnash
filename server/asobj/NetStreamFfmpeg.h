@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.50 2007/11/26 20:33:49 bwy Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.51 2007/11/26 21:53:00 strk Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -92,89 +92,95 @@ class multithread_queue
 
 	// Destroy all elements of the queue. Locks.
 	~multithread_queue()
+	{
+		clear();
+	}
+
+	// Destroy all elements of the queue. Locks.
+	void clear();
+	{
+		boost::mutex::scoped_lock lock(_mutex);
+		while (!m_queue.empty())
 		{
-			boost::mutex::scoped_lock lock(_mutex);
-			while (m_queue.size() > 0)
-			{
-				T x = m_queue.front();
-				m_queue.pop();
-				delete x;
-			}
+			T x = m_queue.front();
+			m_queue.pop();
+			delete x;
 		}
+	}
 
-		/// Returns the size if the queue. Locks.
-		//
-		/// @return the size of the queue
-		///
-		size_t size()
+	/// Returns the size if the queue. Locks.
+	//
+	/// @return the size of the queue
+	///
+	size_t size()
+	{
+		boost::mutex::scoped_lock lock(_mutex);
+		size_t n = m_queue.size();
+		return n;
+	}
+
+	/// Pushes an element to the queue. Locks.
+	//
+	/// @param member
+	/// The element to be pushed unto the queue.
+	///
+	/// @return true if queue isn't full and the element was pushed to the queue,
+	/// or false if the queue was full, and the element wasn't push unto it.
+	///
+	bool push(T member)
+	{
+		bool rc = false;
+		boost::mutex::scoped_lock lock(_mutex);
+
+		// We only keep max 20 items in the queue.
+		// If it's "full" the item must wait, see calls
+		// to this function in read_frame() to see how it is done.
+		if (m_queue.size() < 20)
 		{
-			boost::mutex::scoped_lock lock(_mutex);
-			size_t n = m_queue.size();
-			return n;
+			m_queue.push(member);
+			rc = true;
 		}
+		return rc;
+	}
 
-		/// Pushes an element to the queue. Locks.
-		//
-		/// @param member
-		/// The element to be pushed unto the queue.
-		///
-		/// @return true if queue isn't full and the element was pushed to the queue,
-		/// or false if the queue was full, and the element wasn't push unto it.
-		///
-		bool push(T member)
+	/// Returns a pointer to the first element on the queue. Locks.
+	//
+	/// If no elements are available this function returns NULL.
+	///
+	/// @return a pointer to the first element on the queue, NULL if queue is empty.
+	///
+	T front()
+	{
+		boost::mutex::scoped_lock lock(_mutex);
+		T member = NULL;
+		if (!m_queue.empty())
 		{
-			bool rc = false;
-			boost::mutex::scoped_lock lock(_mutex);
-
-			// We only keep max 20 items in the queue.
-			// If it's "full" the item must wait, see calls
-			// to this function in read_frame() to see how it is done.
-			if (m_queue.size() < 20)
-			{
-				m_queue.push(member);
-				rc = true;
-			}
-			return rc;
+			member = m_queue.front();
 		}
+		return member;
+	}
 
-		/// Returns a pointer to the first element on the queue. Locks.
-		//
-		/// If no elements are available this function returns NULL.
-		///
-		/// @return a pointer to the first element on the queue, NULL if queue is empty.
-		///
-		T front()
+	/// Pops the first element from the queue. Locks.
+	//
+	/// If no elements are available this function is
+	/// a noop. 
+	///
+	void pop()
+	{
+		boost::mutex::scoped_lock lock(_mutex);
+		if (!m_queue.empty())
 		{
-			boost::mutex::scoped_lock lock(_mutex);
-			T member = NULL;
-			if (m_queue.size() > 0)
-			{
-				member = m_queue.front();
-			}
-			return member;
+			m_queue.pop();
 		}
+	}
 
-		/// Pops the first element from the queue. Locks.
-		//
-		/// If no elements are available this function is
-		/// a noop. 
-		///
-		void pop()
-		{
-			boost::mutex::scoped_lock lock(_mutex);
-			if (m_queue.size() > 0)
-			{
-				m_queue.pop();
-			}
-		}
+private:
 
-	private:
+	// Mutex used for locking
+	boost::mutex _mutex;
 
-		// Mutex used for locking
-		boost::mutex _mutex;
-
-		// The actual queue.
-		std::queue < T > m_queue;
+	// The actual queue.
+	std::queue < T > m_queue;
 };
 
 /// This class is used to provide an easy interface to libavcodecs audio resampler.
@@ -280,39 +286,44 @@ public:
 
 private:
 
-	/// A smart pointer class that creates AVPackets used in decodeVideo()
-	/// and decodeAudio() and frees them when no longer needed.
+	/// A C++ wrapper around ffmpeg's AVPacket structure
+	//
+	/// Used in decodeVideo() and decodeAudio(). 
 	/// Use PktPointer.get (as with auto_ptr) to access.
-	class PktPointer
+	///
+	class AvPkt
 	{
 	public:
 	
-		/// Constructs an auto_ptr containing a heap-allocated (is that
-		/// the best idea?) AVPacket and initializes the usual data fields
-		PktPointer () : pktptr(new AVPacket) {
-			av_init_packet(pktptr.get());
+		/// Constructs and initialize an AVPacket 
+		AvPkt ()
+		{
+			av_init_packet(&_pkt);
 		}
 		
-		/// Destructor automatically frees the AVPacket when it goes out
-		/// of scope.
-		~PktPointer () {
-			av_free_packet(pktptr.get());
+		/// Properly deinitialize the owned AVPacket 
+		~AvPkt ()
+		{
+			av_free_packet(&_pkt);
 		}
 
-		/// @ return AVPacket* pointed to by auto_ptr.
-		AVPacket* get () {
-			return pktptr.get();
+		/// @ return AVPacket* owned by this instance
+		AVPacket* get ()
+		{
+			return &_pkt;
+	
 		}
 		
-		// @ return pointers to AVPacket* members in
-		//	    auto_ptr
-		AVPacket* operator-> () {
-			return pktptr.get();
+		/// @ return AVPacket* owned by this instance
+		AVPacket* operator-> ()
+		{
+			return &_pkt;
 		}
+
 	private:
-		std::auto_ptr<AVPacket> pktptr;
-		PktPointer(const PktPointer&);
-		PktPointer operator= (const PktPointer&);
+		AVPacket _pkt;
+		AvPkt(const AvPkt&);
+		AvPkt& operator= (const AvPkt&);
 	};
 
 	// Setups the playback
@@ -366,10 +377,10 @@ private:
 	bool decodeFLVFrame();
 
 	// Used to decode a video frame and push it on the videoqueue
-	bool decodeVideo(AVPacket* packet);
+	bool decodeVideo(AvPkt& packet);
 
 	// Used to decode a audio frame and push it on the audioqueue
-	bool decodeAudio(AVPacket* packet);
+	bool decodeAudio(AvPkt& packet);
 
 	// Used to calculate a decimal value from a ffmpeg fraction
 	inline double as_double(AVRational time)

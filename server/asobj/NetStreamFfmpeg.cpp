@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.97 2007/11/26 20:11:05 bwy Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.98 2007/11/26 21:53:00 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -720,8 +720,6 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, uint8_t *stream, int len)
 
 bool NetStreamFfmpeg::decodeFLVFrame()
 {
-	PktPointer packet;
-
 	FLVFrame* frame = NULL;
 	if (m_qvideo.size() < m_qaudio.size() && m_VCodecCtx) {
 		frame = m_parser->nextVideoFrame();
@@ -745,6 +743,8 @@ bool NetStreamFfmpeg::decodeFLVFrame()
 		return false;
 	}
 
+	AvPkt packet;
+	// TODO: move this logic in AvPkt itself  ?
 	packet->destruct = avpacket_destruct;
 	packet->size = frame->dataSize;
 	packet->data = frame->data;
@@ -753,15 +753,15 @@ bool NetStreamFfmpeg::decodeFLVFrame()
 
 	if (frame->tag == 9) {
 		packet->stream_index = 0;
-		return decodeVideo(packet.get());
+		return decodeVideo(packet);
 	} else {
 		packet->stream_index = 1;
-		return decodeAudio(packet.get());
+		return decodeAudio(packet);
 	}
 
 }
 
-bool NetStreamFfmpeg::decodeAudio(AVPacket* packet)
+bool NetStreamFfmpeg::decodeAudio(AvPkt& packet)
 {
 	if (!m_ACodecCtx) return false;
 
@@ -829,13 +829,14 @@ bool NetStreamFfmpeg::decodeAudio(AVPacket* packet)
 	return true;
 }
 
-bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
+bool NetStreamFfmpeg::decodeVideo(AvPkt& packet)
 {
 	if (!m_VCodecCtx) return false;
 
 	int got = 0;
 	avcodec_decode_video(m_VCodecCtx, m_Frame, &got, packet->data, packet->size);
-	if (got) {
+	if (got)
+	{
 		boost::scoped_array<uint8_t> buffer;
 
 		if (m_imageframe == NULL) {
@@ -969,13 +970,7 @@ bool NetStreamFfmpeg::decodeMediaFrame()
 		return true;
 	}
 
-	// CHECKME: I'm not sure it's safe to call av_free_packet
-	//          on a statically allocated AVPacket.
-	//          Also, heap-allocating and storing in an auto_ptr
-	//          would make this function body simpler.
-	//
-	PktPointer packet;
-	//std::auto_ptr<AVPacket> packet(new AVPacket);
+	AvPkt packet;
 	
 	int rc = av_read_frame(m_FormatCtx, packet.get());
 
@@ -983,7 +978,8 @@ bool NetStreamFfmpeg::decodeMediaFrame()
 	{
 		if (packet->stream_index == m_audio_index && get_sound_handler())
 		{
-			if (!decodeAudio(packet.get())) {
+			if (!decodeAudio(packet))
+			{
 				log_error(_("Problems decoding audio frame"));
 				return false;
 			}
@@ -991,7 +987,8 @@ bool NetStreamFfmpeg::decodeMediaFrame()
 		else
 		if (packet->stream_index == m_video_index)
 		{
-			if (!decodeVideo(packet.get())) {
+			if (!decodeVideo(packet))
+			{
 				log_error(_("Problems decoding video frame"));
 				return false;
 			}
@@ -1013,13 +1010,16 @@ NetStreamFfmpeg::seek(uint32_t pos)
 	double timebase = 0;
 
 	// Seek to new position
-	if (m_isFLV) {
+	if (m_isFLV)
+	{
 		if (m_parser.get()) {
 			newpos = m_parser->seek(pos);
 		} else {
 			newpos = 0;
 		}
-	} else if (m_FormatCtx) {
+	}
+	else if (m_FormatCtx)
+	{
 
 		AVStream* videostream = m_FormatCtx->streams[m_video_index];
 		timebase = static_cast<double>(videostream->time_base.num / videostream->time_base.den);
@@ -1029,19 +1029,25 @@ NetStreamFfmpeg::seek(uint32_t pos)
 			log_error(_("%s: seeking failed"), __FUNCTION__);
 			return;
 		}
-	} else {
+	}
+	else
+	{
+		// TODO: should we log_debug ??
 		return;
 	}
 
 	// This is kindof hackish and ugly :-(
-	if (newpos == 0) {
+	if (newpos == 0)
+	{
 		m_last_video_timestamp = 0;
 		m_last_audio_timestamp = 0;
 		m_current_timestamp = 0;
 
 		m_start_clock = tu_timer::get_ticks();
 
-	} else if (m_isFLV) {
+	}
+	else if (m_isFLV)
+	{
 
 		if (m_VCodecCtx) m_start_clock += m_last_video_timestamp - newpos;
 		else m_start_clock += m_last_audio_timestamp - newpos;
@@ -1049,21 +1055,22 @@ NetStreamFfmpeg::seek(uint32_t pos)
 		if (m_ACodecCtx) m_last_audio_timestamp = newpos;
 		if (m_VCodecCtx) m_last_video_timestamp = newpos;
 		m_current_timestamp = newpos;
-	} else {
-		PktPointer packet;
-		//av_init_packet(&Packet);
+	}
+	else
+	{
+		AvPkt packet;
 		double newtime = 0;
-		while (newtime == 0) {
-			if ( av_read_frame(m_FormatCtx, packet.get()) < 0) {
-				av_seek_frame(m_FormatCtx, -1, 0,AVSEEK_FLAG_BACKWARD);
-				//av_free_packet(&Packet);
+		while (newtime == 0)
+		{
+			if ( av_read_frame(m_FormatCtx, packet.get()) < 0)
+			{
+				av_seek_frame(m_FormatCtx, -1, 0, AVSEEK_FLAG_BACKWARD);
 				return;
 			}
 
 			newtime = timebase * (double)m_FormatCtx->streams[m_video_index]->cur_dts;
 		}
 
-		//av_free_packet(&Packet);
 		av_seek_frame(m_FormatCtx, m_video_index, newpos, 0);
 		uint32_t newtime_ms = static_cast<int32_t>(newtime / 1000.0);
 		m_start_clock += m_last_audio_timestamp - newtime_ms;
@@ -1074,17 +1081,8 @@ NetStreamFfmpeg::seek(uint32_t pos)
 	}
 	
 	// Flush the queues
-	while (m_qvideo.size() > 0)
-	{
-		delete m_qvideo.front();
-		m_qvideo.pop();
-	}
-
-	while (m_qaudio.size() > 0)
-	{
-		delete m_qaudio.front();
-		m_qaudio.pop();
-	}
+	m_qvideo.clear();
+	m_qaudio.clear();
 
 }
 
