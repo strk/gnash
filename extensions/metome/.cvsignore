@@ -1,0 +1,14 @@
+.deps
+.libs
+Makefile
+Makefile.in
+*.lo
+*.la
+site.exp
+testrun.log
+testrun.sum
+*.swf
+*.pp
+gmon.out
+gnash-dbg.log
+test
