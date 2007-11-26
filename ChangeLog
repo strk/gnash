@@ -1,5 +1,9 @@
 2007-11-26 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/PASSING: sync with swfdec git.
+
+2007-11-26 Sandro Santilli <strk@keybit.net>
+
 	* server/as_environment.cpp (get_variable_raw): log an aserror when
 	  referencing an undefined variable.
 	* server/parser/action_buffer.h: cleanup and comments fix

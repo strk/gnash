@@ -35,8 +35,12 @@ asbroadcaster-listeners-8.swf:7daa180ce19d8c4e4dcb17051908e12b
 asbroadcaster-override-5.swf:1a3dacf6579b150773097362b546ee7e
 assetuperror-5.swf:81e05c01c883d200052546a7abfb7ad8
 atan2-5.swf:64be2dd80026448ba20e798dc9b761e0
+atan2-5.swf:f116028da4873f6f32c9d7dbe4be53ec
 atan2-6.swf:090d94fe78d2fec52ac41786494979aa
+atan2-6.swf:96b78b68b0618ba3fe6af0f515155c2b
+atan2-7.swf:13e56f3a822c178d329bbe9b90e2d0d1
 atan2-7.swf:b4b0629233685ed5e518e5bf237bf413
+atan2-8.swf:1f1224383517a707df50dcd2ae0209d1
 atan2-8.swf:d780802cf9d18559de95d517248cf027
 attachmovie-object-5.swf:a1fa0db4e7ac649e5451ff5e96a71436
 attachmovie-object-6.swf:52c0c8d46a3535c7db79d3d827b31b41
@@ -243,6 +247,11 @@ math-constants-5.swf:ca9d0fc66667d7c7863e699367176573
 math-constants-6.swf:cc4a6b92d473f57cb5479c97ba77c2e0
 math-constants-7.swf:53df046dd67c331c79c0c939215ac770
 mouse-scaled-5.swf:9138b10aab35c2d4e969057b9c253b42
+movieclip-get-swf-version-5.swf:fe088f984b71c0e78c2335bb05bbec16
+movieclip-get-swf-version-6.swf:dc4632e3ba339e083676380c81e70e0d
+movieclip-get-swf-version-7.swf:17a8fa635b8b9d109b0fd0795c50b347
+movieclip-get-swf-version-8.swf:5228a59ad74ce8ba27e0fb8a593a2c8d
+movieclip-get-swf-version-load-5.swf:3d7dcf17068a176d72b14ca18b166c21
 movieclip-set-prototype-5.swf:99235a738d69d9c78fa2bc5d355c6dae
 movieclip-set-prototype-6.swf:bae79ccbb89bb7c11cd1961d2c473022
 movieclip-set-prototype-7.swf:f147fff166cc46cdcda77d5012faddb0
@@ -362,6 +371,12 @@ point-properties-5.swf:c3439d59fa29fb709630ee3a3ad230b0
 preload.swf:2fd2da9440e29289e83dadd1ed9c99c4
 print-job-init-5.swf:22889777e5e8230cee8c760c0930b5db
 property-native-5.swf:3609da1095cd97f5373da462b45ead1d
+propflags-set-native-5.swf:a0c0652f4c7a1626e064ae0dd6a867a8
+propflags-set-native-8.swf:b11c0be85a33c08d588897a99ed35f7f
+propflags-set-proto-5.swf:d8cfcbffc8213a9eb60301a877f750e1
+propflags-set-proto-6.swf:739c3e899c6a8b4dbb6c919d8240302a
+propflags-set-proto-7.swf:73907c00d43336ca1d2ba93da48f5d55
+propflags-set-proto-8.swf:19b646958924489b320e58e9c7ba3220
 prototype-addProperty-5.swf:1d9ac80542b3a9238ed09e78bdb8c563
 prototype-propflags-5.swf:43f4ffa51653f54d0182610a01db8f1f
 prototype-propflags-8.swf:3c6f02bf6a3348879f3f50c28ee599cb
