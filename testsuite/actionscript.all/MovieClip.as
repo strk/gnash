@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.100 2007/11/26 17:54:13 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.101 2007/11/26 18:00:19 strk Exp $";
 
 #include "check.as"
 
@@ -483,6 +483,7 @@ check_equals(hardref.getDepth(), 60);
 check_equals(hardref2.getDepth(), 70);
 check_equals(hardref3.getDepth(), 80);
 check_equals(softref3child.getDepth(), 1);
+check_equals(softref3child2.getDepth(), 2);
 #if OUTPUT_VERSION > 6
  check_equals(getInstanceAtDepth(60), hardref);
  check_equals(getInstanceAtDepth(70), hardref2);
@@ -520,8 +521,10 @@ check_equals(softref3.member, 3);
 check_equals(softref3._target, '/hardref3');
 check_equals(softref3child.member, '3child');
 check_equals(softref3child._target, '/hardref3/hardref3child');
+check_equals(softref3child.getDepth(), 1);
 xcheck_equals(softref3child2.member, '3child2');
 xcheck_equals(softref3child2._target, '/hardref3/hardref3child2');
+xcheck_equals(softref3child2.getDepth(), 2);
 hardref = 4;
 // Delete is needed, or further inspection functions will hit the variable before the character
 delete hardref;
@@ -1271,12 +1274,12 @@ check_equals(getInstanceAtDepth(-6.2), tt2);
  check_totals(158); // SWF5
 #else
 #if OUTPUT_VERSION < 7
- check_totals(506); // SWF6
+ check_totals(509); // SWF6
 #else
 #if OUTPUT_VERSION < 8
- check_totals(523); // SWF7
+ check_totals(526); // SWF7
 #else
- check_totals(524); // SWF8+
+ check_totals(527); // SWF8+
 #endif
 #endif
 #endif
