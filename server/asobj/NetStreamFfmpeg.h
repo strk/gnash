@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.48 2007/07/17 22:05:03 nihilus Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.49 2007/11/26 20:11:05 bwy Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -279,6 +279,39 @@ public:
 	static bool audio_streamer(void *udata, uint8_t *stream, int len);
 
 private:
+
+	/// A smart pointer class that creates AVPackets used in decodeVideo()
+	/// and decodeAudio() and frees them when no longer needed.
+	/// Use PktPointer.get (as with auto_ptr) to access.
+	class PktPointer
+	{
+	public:
+	
+		/// Constructs an auto_ptr containing a heap-allocated (is that
+		/// the best idea?) AVPacket and initializes the usual data fields
+		PktPointer () : pktptr(new AVPacket) {
+			av_init_packet(pktptr.get());
+		}
+		
+		/// Destructor automatically frees the AVPacket when it goes out
+		/// of scope.
+		~PktPointer () {
+			av_free_packet(pktptr.get());
+		}
+
+		/// @ return AVPacket* pointed to by auto_ptr.
+		AVPacket* get () {
+			return pktptr.get();
+		}
+		
+		// @ return pointers to AVPacket* members in
+		//	    auto_ptr
+		AVPacket* operator-> () {
+			return pktptr.get();
+		}
+	private:
+		std::auto_ptr<AVPacket> pktptr;
+	};
 
 	// Setups the playback
 	bool startPlayback();

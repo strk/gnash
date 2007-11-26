@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.96 2007/11/25 17:50:01 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.97 2007/11/26 20:11:05 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -720,7 +720,7 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, uint8_t *stream, int len)
 
 bool NetStreamFfmpeg::decodeFLVFrame()
 {
-	AVPacket packet;
+	PktPointer packet;
 
 	FLVFrame* frame = NULL;
 	if (m_qvideo.size() < m_qaudio.size() && m_VCodecCtx) {
@@ -745,18 +745,18 @@ bool NetStreamFfmpeg::decodeFLVFrame()
 		return false;
 	}
 
-	packet.destruct = avpacket_destruct;
-	packet.size = frame->dataSize;
-	packet.data = frame->data;
+	packet->destruct = avpacket_destruct;
+	packet->size = frame->dataSize;
+	packet->data = frame->data;
 	// FIXME: is this the right value for packet.dts?
-	packet.pts = packet.dts = static_cast<int64_t>(frame->timestamp);
+	packet->pts = packet->dts = static_cast<int64_t>(frame->timestamp);
 
 	if (frame->tag == 9) {
-		packet.stream_index = 0;
-		return decodeVideo(&packet);
+		packet->stream_index = 0;
+		return decodeVideo(packet.get());
 	} else {
-		packet.stream_index = 1;
-		return decodeAudio(&packet);
+		packet->stream_index = 1;
+		return decodeAudio(packet.get());
 	}
 
 }
@@ -974,34 +974,32 @@ bool NetStreamFfmpeg::decodeMediaFrame()
 	//          Also, heap-allocating and storing in an auto_ptr
 	//          would make this function body simpler.
 	//
-	AVPacket packet;
-	int rc = av_read_frame(m_FormatCtx, &packet);
+	PktPointer packet;
+	//std::auto_ptr<AVPacket> packet(new AVPacket);
+	
+	int rc = av_read_frame(m_FormatCtx, packet.get());
 
 	if (rc >= 0)
 	{
-		if (packet.stream_index == m_audio_index && get_sound_handler())
+		if (packet->stream_index == m_audio_index && get_sound_handler())
 		{
-			if (!decodeAudio(&packet)) {
+			if (!decodeAudio(packet.get())) {
 				log_error(_("Problems decoding audio frame"));
-				av_free_packet(&packet);
 				return false;
 			}
 		}
 		else
-		if (packet.stream_index == m_video_index)
+		if (packet->stream_index == m_video_index)
 		{
-			if (!decodeVideo(&packet)) {
+			if (!decodeVideo(packet.get())) {
 				log_error(_("Problems decoding video frame"));
-				av_free_packet(&packet);
 				return false;
 			}
 		}
-		av_free_packet(&packet);
 	}
 	else
 	{
 		log_error(_("Problems decoding frame"));
-		av_free_packet(&packet);
 		return false;
 	}
 
@@ -1052,20 +1050,20 @@ NetStreamFfmpeg::seek(uint32_t pos)
 		if (m_VCodecCtx) m_last_video_timestamp = newpos;
 		m_current_timestamp = newpos;
 	} else {
-		AVPacket Packet;
-		av_init_packet(&Packet);
+		PktPointer packet;
+		//av_init_packet(&Packet);
 		double newtime = 0;
 		while (newtime == 0) {
-			if ( av_read_frame(m_FormatCtx, &Packet) < 0) {
+			if ( av_read_frame(m_FormatCtx, packet.get()) < 0) {
 				av_seek_frame(m_FormatCtx, -1, 0,AVSEEK_FLAG_BACKWARD);
-				av_free_packet(&Packet);
+				//av_free_packet(&Packet);
 				return;
 			}
 
 			newtime = timebase * (double)m_FormatCtx->streams[m_video_index]->cur_dts;
 		}
 
-		av_free_packet(&Packet);
+		//av_free_packet(&Packet);
 		av_seek_frame(m_FormatCtx, m_video_index, newpos, 0);
 		uint32_t newtime_ms = static_cast<int32_t>(newtime / 1000.0);
 		m_start_clock += m_last_audio_timestamp - newtime_ms;
