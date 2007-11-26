@@ -595,11 +595,11 @@ as_value::to_object() const
 }
 
 sprite_instance*
-as_value::to_sprite() const
+as_value::to_sprite(bool allowUnloaded) const
 {
 	if ( m_type != MOVIECLIP ) return NULL;
 
-	return getSprite();
+	return getSprite(allowUnloaded);
 }
 
 void
@@ -1296,10 +1296,10 @@ as_value::getSpriteProxy() const
 }
 
 as_value::SpritePtr
-as_value::getSprite() const
+as_value::getSprite(bool allowUnloaded) const
 {
 	assert(m_type == MOVIECLIP);
-	return boost::get<SpriteProxy>(_value).get();
+	return boost::get<SpriteProxy>(_value).get(allowUnloaded);
 }
 
 void

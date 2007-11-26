@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.74 2007/11/20 00:44:03 cmusick Exp $ */
+/* $Id: as_value.h,v 1.75 2007/11/26 20:43:47 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -261,6 +261,14 @@ public:
 		return m_type == OBJECT || m_type == AS_FUNCTION || m_type == MOVIECLIP;
 	}
 
+	/// \brief
+	/// Return true if this value is a MOVIECLIP 
+	/// 
+	bool is_sprite() const
+	{
+		return m_type == MOVIECLIP;
+	}
+
 	/// Get a std::string representation for this value.
 	//
 	/// @param env
@@ -371,7 +379,13 @@ public:
 	/// Note that if the value is NOT a MOVIECLIP, NULL is always
 	/// returned.
 	///
-	sprite_instance* to_sprite() const;
+	/// @param allowUnloaded
+	/// 	If true an unloaded sprite is still returned as such,
+	///	rather then attempted to be resolved as a soft-reference.
+	///	Main use for this is during paths resolution, to avoid
+	///	infinite loops. See bug #21647.
+	///
+	sprite_instance* to_sprite(bool allowUnloaded=false) const;
 
 	/// \brief
 	/// Return value as an ActionScript function ptr
@@ -613,8 +627,10 @@ private:
 		//
 		/// @return the currently bound sprite, NULL if none
 		///
-		sprite_instance* get() const
+		sprite_instance* get(bool allowUnloaded=false) const
 		{
+			if ( allowUnloaded ) return _ptr;
+
 			checkDangling(); // set _ptr to NULL and _tgt to original target if destroyed
 			if ( _ptr ) return _ptr;
 			else return find_sprite_by_target(_tgt);
@@ -693,7 +709,7 @@ private:
 	//
 	/// NOTE: this is possibly NULL !
 	///
-	SpritePtr getSprite() const;
+	SpritePtr getSprite(bool allowUnloaded=false) const;
 
 	/// Get the sprite proxy variant member (we assume m_type == MOVIECLIP)
 	//

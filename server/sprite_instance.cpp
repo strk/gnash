@@ -2345,6 +2345,11 @@ sprite_instance::get_path_element(string_table::key key)
 	{
 		return NULL;
 	}
+	if ( tmp.is_sprite() )
+	{
+		return tmp.to_sprite(true);
+	}
+
 	return tmp.to_object().get();
 }
 

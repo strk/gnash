@@ -1,3 +1,11 @@
+2007-11-26 Sandro Santilli <strk@keybit.net>
+
+	* server/as_value.{cpp,h}: add is_sprite() and a way to get the sprite
+	  value w/out re-evaluating path.
+	* server/sprite_instance.cpp (get_path_element): don't re-evaluate
+	  target paths of unloaded sprites while getting path elements.
+	  Needs more testing, but for now it fixes bug #21647.
+
 2007-11-26 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/asobj/NetStreamFfmpeg.{cpp,h}: add PktPointer class
