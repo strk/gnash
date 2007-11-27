@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.101 2007/11/26 18:00:19 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.102 2007/11/27 09:29:00 strk Exp $";
 
 #include "check.as"
 
@@ -284,63 +284,63 @@ check(mc._xscale != undefined);
 
 // focused test on _* properties
 check_equals(typeof(mc._x), 'number');
-checks(!mc.hasOwnProperty("_x"));
-checks(!mc.__proto__.hasOwnProperty("_x"));
-checks(!MovieClip.prototype.hasOwnProperty("_x"));
+xcheck(!mc.hasOwnProperty("_x"));
+check(!mc.__proto__.hasOwnProperty("_x"));
+check(!MovieClip.prototype.hasOwnProperty("_x"));
 
 check_equals(typeof(mc._y), 'number');
-checks(!mc.hasOwnProperty("_y"));
-checks(!mc.__proto__.hasOwnProperty("_y"));
-checks(!MovieClip.prototype.hasOwnProperty("_y"));
+xcheck(!mc.hasOwnProperty("_y"));
+check(!mc.__proto__.hasOwnProperty("_y"));
+check(!MovieClip.prototype.hasOwnProperty("_y"));
 
 check_equals(typeof(mc._height), 'number');
-checks(!mc.hasOwnProperty("_height"));
-checks(!mc.__proto__.hasOwnProperty("_height"));
-checks(!MovieClip.prototype.hasOwnProperty("_height"));
+xcheck(!mc.hasOwnProperty("_height"));
+check(!mc.__proto__.hasOwnProperty("_height"));
+check(!MovieClip.prototype.hasOwnProperty("_height"));
 
 check_equals(typeof(mc._width), 'number');
-checks(!mc.hasOwnProperty("_width"));
-checks(!mc.__proto__.hasOwnProperty("_width"));
-checks(!MovieClip.prototype.hasOwnProperty("_width"));
+xcheck(!mc.hasOwnProperty("_width"));
+check(!mc.__proto__.hasOwnProperty("_width"));
+check(!MovieClip.prototype.hasOwnProperty("_width"));
 
 check_equals(typeof(mc._xscale), 'number');
-checks(!mc.hasOwnProperty("_xscale"));
-checks(!mc.__proto__.hasOwnProperty("_xscale"));
-checks(!MovieClip.prototype.hasOwnProperty("_xscale"));
+xcheck(!mc.hasOwnProperty("_xscale"));
+check(!mc.__proto__.hasOwnProperty("_xscale"));
+check(!MovieClip.prototype.hasOwnProperty("_xscale"));
 
 check_equals(typeof(mc._yscale), 'number');
-checks(!mc.hasOwnProperty("_yscale"));
-checks(!mc.__proto__.hasOwnProperty("_yscale"));
-checks(!MovieClip.prototype.hasOwnProperty("_yscale"));
+xcheck(!mc.hasOwnProperty("_yscale"));
+check(!mc.__proto__.hasOwnProperty("_yscale"));
+check(!MovieClip.prototype.hasOwnProperty("_yscale"));
 
 check_equals(typeof(mc._xmouse), 'number');
-checks(!mc.hasOwnProperty("_xmouse"));
-checks(!mc.__proto__.hasOwnProperty("_xmouse"));
-checks(!MovieClip.prototype.hasOwnProperty("_xmouse"));
+xcheck(!mc.hasOwnProperty("_xmouse"));
+check(!mc.__proto__.hasOwnProperty("_xmouse"));
+check(!MovieClip.prototype.hasOwnProperty("_xmouse"));
 
 check_equals(typeof(mc._ymouse), 'number');
-checks(!mc.hasOwnProperty("_ymouse"));
-checks(!mc.__proto__.hasOwnProperty("_ymouse"));
-checks(!MovieClip.prototype.hasOwnProperty("_ymouse"));
+xcheck(!mc.hasOwnProperty("_ymouse"));
+check(!mc.__proto__.hasOwnProperty("_ymouse"));
+check(!MovieClip.prototype.hasOwnProperty("_ymouse"));
 
 check_equals(typeof(mc._rotation), 'number');
-checks(!mc.hasOwnProperty("_rotation"));
-checks(!mc.__proto__.hasOwnProperty("_rotation"));
-checks(!MovieClip.prototype.hasOwnProperty("_rotation"));
+xcheck(!mc.hasOwnProperty("_rotation"));
+check(!mc.__proto__.hasOwnProperty("_rotation"));
+check(!MovieClip.prototype.hasOwnProperty("_rotation"));
 
 check_equals(typeof(mc._totalframes), 'number');
-checks(!mc.hasOwnProperty("_totalframes"));
-checks(!mc.__proto__.hasOwnProperty("_totalframes"));
-checks(!MovieClip.prototype.hasOwnProperty("_totalframes"));
+xcheck(!mc.hasOwnProperty("_totalframes"));
+check(!mc.__proto__.hasOwnProperty("_totalframes"));
+check(!MovieClip.prototype.hasOwnProperty("_totalframes"));
 
-checks(!mc.hasOwnProperty("_target"));
-checks(!mc.hasOwnProperty("_url"));
-checks(!mc.hasOwnProperty("_target"));
-checks(!mc.hasOwnProperty("_soundbuftime"));
-checks(!mc.hasOwnProperty("_focusrect"));
-checks(!mc.hasOwnProperty("_framesloaded"));
-checks(!mc.hasOwnProperty("_lockroot"));
-checks(!mc.hasOwnProperty("_highquality"));
+xcheck(!mc.hasOwnProperty("_target"));
+xcheck(!mc.hasOwnProperty("_url"));
+xcheck(!mc.hasOwnProperty("_target"));
+xcheck(!mc.hasOwnProperty("_soundbuftime"));
+xcheck(!mc.hasOwnProperty("_focusrect"));
+xcheck(!mc.hasOwnProperty("_framesloaded"));
+check(!mc.hasOwnProperty("_lockroot"));
+xcheck(!mc.hasOwnProperty("_highquality"));
 #endif //if OUTPUT_VERSION >= 6
 
 //----------------------------------------------
@@ -928,10 +928,10 @@ check_equals(typeof(b.yMax), 'number');
 //check_equals(b.xMax, 6710886.35);
 //check_equals(b.yMin, 6710886.35);
 //check_equals(b.yMax, 6710886.35);
-checks(b.xMin-6710886.35 < 0.001);
-checks(b.xMax-6710886.35 < 0.001);
-checks(b.yMin-6710886.35 < 0.001);
-checks(b.yMax-6710886.35 < 0.001);
+check(b.xMin-6710886.35 < 0.001);
+check(b.xMax-6710886.35 < 0.001);
+check(b.yMin-6710886.35 < 0.001);
+check(b.yMax-6710886.35 < 0.001);
 
 with (draw)
 {
@@ -1274,12 +1274,12 @@ check_equals(getInstanceAtDepth(-6.2), tt2);
  check_totals(158); // SWF5
 #else
 #if OUTPUT_VERSION < 7
- check_totals(509); // SWF6
+ check_totals(551); // SWF6
 #else
 #if OUTPUT_VERSION < 8
- check_totals(526); // SWF7
+ check_totals(568); // SWF7
 #else
- check_totals(527); // SWF8+
+ check_totals(569); // SWF8+
 #endif
 #endif
 #endif

@@ -1,3 +1,8 @@
+2007-11-27 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/MovieClip.as: fix bogus check calls,
+	  reveiling a bunch of failures in gnash...
+
 2007-11-27 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* extensions/fileio/fileio.{cpp,h}: implement feof()
