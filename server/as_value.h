@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.76 2007/11/27 08:04:33 strk Exp $ */
+/* $Id: as_value.h,v 1.77 2007/11/27 08:30:20 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -380,8 +380,8 @@ public:
 	/// returned.
 	///
 	/// @param skipRebinding
-	/// 	If true an unloaded sprite is still returned as such,
-	///	rather then attempted to be resolved as a soft-reference.
+	/// 	If true a reference to a destroyed sprite is still returned
+	///	as such, rather then attempted to be resolved as a soft-reference.
 	///	Main use for this is during paths resolution, to avoid
 	///	infinite loops. See bug #21647.
 	///
