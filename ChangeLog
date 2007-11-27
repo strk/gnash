@@ -1,3 +1,9 @@
+2007-11-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/asobj/NetStreamFfmpeg.{cpp,h}: mainly visual code cleanup. Also make
+	  sure allocated codec context is explicitly freed when stream is closed
+	  (fixes leak when playing FLVs).
+
 2007-11-27 Sandro Santilli <strk@keybit.net>
 
 	* server/as_value.h: rename allowUnloaded parameter of sprite accessor

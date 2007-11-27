@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.98 2007/11/26 21:53:00 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.99 2007/11/27 08:45:33 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -52,7 +52,8 @@
 //#define GNASH_DEBUG_STATUS
 
 // Used to free data in the AVPackets we create our self
-static void avpacket_destruct(AVPacket* av) {
+static void avpacket_destruct(AVPacket* av)
+{
 	delete [] av->data;
 }
 
@@ -99,7 +100,8 @@ void NetStreamFfmpeg::pause(int mode)
 		if (mode == 0) pausePlayback();
 		else unpausePlayback();
 	}
-	if (!m_pause && !m_go) { 
+	if (!m_pause && !m_go)
+	{ 
 		setStatus(playStart);
 		m_go = true;
 		_decodeThread = new boost::thread(boost::bind(NetStreamFfmpeg::av_streamer, this)); 
@@ -133,13 +135,22 @@ void NetStreamFfmpeg::close()
 	if (m_Frame) av_free(m_Frame);
 	m_Frame = NULL;
 
-	if (m_VCodecCtx) avcodec_close(m_VCodecCtx);
+	if (m_VCodecCtx)
+	{
+		avcodec_close(m_VCodecCtx);
+		av_free(m_VCodecCtx);
+	}
 	m_VCodecCtx = NULL;
 
-	if (m_ACodecCtx) avcodec_close(m_ACodecCtx);
+	if (m_ACodecCtx)
+	{
+		avcodec_close(m_ACodecCtx);
+		av_free(m_ACodecCtx);
+	}
 	m_ACodecCtx = NULL;
 
-	if (m_FormatCtx) {
+	if (m_FormatCtx)
+	{
 		m_FormatCtx->iformat->flags = AVFMT_NOFILE;
 		av_close_input_file(m_FormatCtx);
 		m_FormatCtx = NULL;
@@ -182,24 +193,30 @@ NetStreamFfmpeg::readPacket(void* opaque, uint8_t* buf, int buf_size)
 
 // ffmpeg callback function
 offset_t 
-NetStreamFfmpeg::seekMedia(void *opaque, offset_t offset, int whence){
+NetStreamFfmpeg::seekMedia(void *opaque, offset_t offset, int whence)
+{
 
 	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(opaque);
 	boost::intrusive_ptr<NetConnection> nc = ns->_netCon;
 
 
 	// Offset is absolute new position in the file
-	if (whence == SEEK_SET) {
+	if (whence == SEEK_SET)
+	{
 		nc->seek(offset);
 		ns->inputPos = offset;
 
 	// New position is offset + old position
-	} else if (whence == SEEK_CUR) {
+	}
+	else if (whence == SEEK_CUR)
+	{
 		nc->seek(ns->inputPos + offset);
 		ns->inputPos = ns->inputPos + offset;
 
-	// 	// New position is offset + end of file
-	} else if (whence == SEEK_END) {
+	// New position is offset + end of file
+	}
+	else if (whence == SEEK_END)
+	{
 		// This is (most likely) a streamed file, so we can't seek to the end!
 		// Instead we seek to 50.000 bytes... seems to work fine...
 		nc->seek(50000);
@@ -232,7 +249,8 @@ NetStreamFfmpeg::play(const std::string& c_url)
 
 	if (url.size() == 0) url += c_url;
 	// Remove any "mp3:" prefix. Maybe should use this to mark as audio-only
-	if (url.compare(0, 4, std::string("mp3:")) == 0) {
+	if (url.compare(0, 4, std::string("mp3:")) == 0)
+	{
 		url = url.substr(4);
 	}
 
@@ -255,19 +273,22 @@ initContext(enum CodecID codec_id)
 {
 
 	AVCodec* codec = avcodec_find_decoder(codec_id);
-	if (!codec) {
+	if (!codec)
+	{
 		log_error(_("libavcodec couldn't find decoder"));
 		return NULL;
 	}
 
 	AVCodecContext * context = avcodec_alloc_context();
-	if (!context) {
+	if (!context)
+	{
 		log_error(_("libavcodec couldn't allocate context"));
 		return NULL;
 	}
 
 	int rv = avcodec_open(context, codec);
-	if (rv < 0) {
+	if (rv < 0) 
+	{
 		avcodec_close(context);
 		log_error(_("libavcodec failed to initialize codec"));
 		return NULL;
@@ -286,14 +307,16 @@ initFlvVideo(FLVParser* parser)
 {
 	// Get video info from the parser
 	std::auto_ptr<FLVVideoInfo> videoInfo( parser->getVideoInfo() );
-	if (!videoInfo.get()) {
+	if (!videoInfo.get())
+	{
 		return NULL;
 	}
 
 	enum CodecID codec_id;
 
 	// Find the decoder and init the parser
-	switch(videoInfo->codec) {
+	switch(videoInfo->codec)
+	{
 		case media::VIDEO_CODEC_H263:
 			codec_id = CODEC_ID_FLV1;
 			break;
@@ -320,13 +343,15 @@ initFlvAudio(FLVParser* parser)
 {
 	// Get audio info from the parser
 	std::auto_ptr<FLVAudioInfo> audioInfo( parser->getAudioInfo() );
-	if (!audioInfo.get()) {
+	if (!audioInfo.get())
+	{
 		return NULL;
 	}
 
 	enum CodecID codec_id;
 
-	switch(audioInfo->codec) {
+	switch(audioInfo->codec)
+	{
 		case media::AUDIO_CODEC_RAW:
 			codec_id = CODEC_ID_PCM_U16LE;
 			break;
@@ -361,7 +386,8 @@ probeStream(NetStreamFfmpeg* ns)
 	probe_data.buf = buffer.get();
 	probe_data.buf_size = 2048;
 
-	if (ns->readPacket(ns, probe_data.buf, probe_data.buf_size) < 1){
+	if (ns->readPacket(ns, probe_data.buf, probe_data.buf_size) < 1)
+	{
  		log_error(_("Gnash could not read from movie url"));
  		return NULL;
 	}
@@ -377,7 +403,8 @@ NetStreamFfmpeg::startPlayback()
 	assert(nc);
 
 	// Pass stuff from/to the NetConnection object.
-	if ( !nc->openConnection(url) ) {
+	if ( !nc->openConnection(url) )
+	{
 		log_error(_("Gnash could not open movie: %s"), url.c_str());
 		setStatus(streamNotFound);
 		return false;
@@ -388,15 +415,18 @@ NetStreamFfmpeg::startPlayback()
 
 	// Check if the file is a FLV, in which case we use our own parser
 	char head[4] = {0, 0, 0, 0};
-	if (nc->read(head, 3) < 3) {
+	if (nc->read(head, 3) < 3)
+	{
 		setStatus(streamNotFound);
 		return false;
 	}
 
 	nc->seek(0);
-	if (std::string(head) == "FLV") {
+	if (std::string(head) == "FLV")
+	{
 		m_isFLV = true;
-		if (!m_parser.get()) {
+		if (!m_parser.get())
+		{
 			m_parser = nc->getConnectedParser();
 			if (! m_parser.get() )
 			{
@@ -411,16 +441,19 @@ NetStreamFfmpeg::startPlayback()
 		avcodec_register_all();
 
 		m_VCodecCtx = initFlvVideo(m_parser.get());
-		if (!m_VCodecCtx) {
+		if (!m_VCodecCtx)
+		{
 			log_msg(_("Failed to initialize FLV video codec"));
 		}
 
 		m_ACodecCtx = initFlvAudio(m_parser.get());
-		if (!m_ACodecCtx) {
+		if (!m_ACodecCtx)
+		{
 			log_msg(_("Failed to initialize FLV audio codec"));
 		}
 
-		if (!m_ACodecCtx && !m_VCodecCtx) {
+		if (!m_ACodecCtx && !m_VCodecCtx)
+		{
 			return false;
 		}
 
@@ -443,7 +476,8 @@ NetStreamFfmpeg::startPlayback()
 	av_register_all();
 
 	AVInputFormat* inputFmt = probeStream(this);
-	if (!inputFmt) {
+	if (!inputFmt)
+	{
 		log_error(_("Couldn't determine stream input format from URL %s"), url.c_str());
 		return false;
 	}
@@ -459,7 +493,8 @@ NetStreamFfmpeg::startPlayback()
 	m_FormatCtx = av_alloc_format_context();
 
 	// Open the stream. the 4th argument is the filename, which we ignore.
-	if(av_open_input_stream(&m_FormatCtx, &ByteIOCxt, "", inputFmt, NULL) < 0){
+	if(av_open_input_stream(&m_FormatCtx, &ByteIOCxt, "", inputFmt, NULL) < 0)
+	{
 		log_error(_("Couldn't open file '%s' for decoding"), url.c_str());
 		setStatus(streamNotFound);
 		return false;
@@ -537,9 +572,12 @@ NetStreamFfmpeg::startPlayback()
 	m_Frame = avcodec_alloc_frame();
 	
 	// Determine required buffer size and allocate buffer
-	if (m_videoFrameFormat == render::YUV) {
+	if (m_videoFrameFormat == render::YUV)
+	{
 		m_imageframe = new image::yuv(m_VCodecCtx->width,	m_VCodecCtx->height);
-	} else if (m_videoFrameFormat == render::RGB) {
+	}
+	else if (m_videoFrameFormat == render::RGB)
+	{
 		m_imageframe = new image::rgb(m_VCodecCtx->width,	m_VCodecCtx->height);
 	}
 
@@ -551,7 +589,7 @@ NetStreamFfmpeg::startPlayback()
 
 		// Find the decoder for the audio stream
 		AVCodec* pACodec = avcodec_find_decoder(m_ACodecCtx->codec_id);
-	    if(pACodec == NULL)
+	    if (pACodec == NULL)
 		{
 			log_error(_("No available audio decoder %d to process MPEG file: '%s'"), 
 				m_ACodecCtx->codec_id, url.c_str());
@@ -624,7 +662,8 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 	{
 		// We need to restart the audio
 		media::sound_handler* s = get_sound_handler();
-		if (s) {
+		if (s)
+		{
 			s->attach_aux_streamer(audio_streamer, ns);
 		}
 	}
@@ -646,9 +685,11 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 		log_debug("Decoding iteration. bufferTime=%lu, bufferLen=%lu", ns->bufferTime(), ns->bufferLength());
 #endif
 
-		if (ns->m_isFLV) {
+		if (ns->m_isFLV)
+		{
 			// If queues are full then don't bother filling it
-			if ((ns->m_VCodecCtx && ns->m_qvideo.size() < 20) || (ns->m_ACodecCtx && ns->m_qaudio.size() < 20)) {
+			if ((ns->m_VCodecCtx && ns->m_qvideo.size() < 20) || (ns->m_ACodecCtx && ns->m_qaudio.size() < 20))
+			{
 
 				// If we have problems with decoding - break
 				if (!ns->decodeFLVFrame() && ns->m_start_onbuffer == false && ns->m_qvideo.size() == 0 && ns->m_qaudio.size() == 0)
@@ -658,7 +699,9 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 				}
 			}
 
-		} else {
+		}
+		else
+		{
 
 			// If we have problems with decoding - break
 			if (ns->decodeMediaFrame() == false && ns->m_start_onbuffer == false && ns->m_qvideo.size() == 0 && ns->m_qaudio.size() == 0)
@@ -721,13 +764,17 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, uint8_t *stream, int len)
 bool NetStreamFfmpeg::decodeFLVFrame()
 {
 	FLVFrame* frame = NULL;
-	if (m_qvideo.size() < m_qaudio.size() && m_VCodecCtx) {
+	if (m_qvideo.size() < m_qaudio.size() && m_VCodecCtx)
+	{
 		frame = m_parser->nextVideoFrame();
-	} else if (m_ACodecCtx) {
+	}
+	else if (m_ACodecCtx)
+	{
 		frame = m_parser->nextAudioFrame();
 	}
 
-	if (frame == NULL) {
+	if (frame == NULL)
+	{
 		if (_netCon->loadCompleted())
 		{
 #ifdef GNASH_DEBUG_THREADS
@@ -735,7 +782,9 @@ bool NetStreamFfmpeg::decodeFLVFrame()
 #endif
 			// Stop!
 			//m_go = false;
-		} else {
+		}
+		else
+		{
 			pausePlayback();
 			setStatus(bufferEmpty);
 			m_start_onbuffer = true;
@@ -751,10 +800,13 @@ bool NetStreamFfmpeg::decodeFLVFrame()
 	// FIXME: is this the right value for packet.dts?
 	packet->pts = packet->dts = static_cast<int64_t>(frame->timestamp);
 
-	if (frame->tag == 9) {
+	if (frame->tag == 9)
+	{
 		packet->stream_index = 0;
 		return decodeVideo(packet);
-	} else {
+	}
+	else
+	{
 		packet->stream_index = 1;
 		return decodeAudio(packet);
 	}
@@ -780,7 +832,8 @@ bool NetStreamFfmpeg::decodeAudio(AvPkt& packet)
 		bool stereo = m_ACodecCtx->channels > 1 ? true : false;
 		int samples = stereo ? frame_size >> 2 : frame_size >> 1;
 		
-		if (_resampler.init(m_ACodecCtx)){
+		if (_resampler.init(m_ACodecCtx))
+		{
 			// Resampling is needed.
 			
 			uint8_t* output = new uint8_t[bufsize];
@@ -818,8 +871,14 @@ bool NetStreamFfmpeg::decodeAudio(AvPkt& packet)
 
 		// update video clock for next frame
 		uint32_t frame_delay;
-		if (!m_isFLV) frame_delay = static_cast<uint32_t>((as_double(m_audio_stream->time_base) * packet->dts) * 1000.0);
-		else frame_delay = m_parser->audioFrameDelay();
+		if (!m_isFLV)
+		{
+			frame_delay = static_cast<uint32_t>((as_double(m_audio_stream->time_base) * packet->dts) * 1000.0);
+		}
+		else
+		{
+			frame_delay = m_parser->audioFrameDelay();
+		}
 
 		m_last_audio_timestamp += frame_delay;
 
@@ -839,30 +898,44 @@ bool NetStreamFfmpeg::decodeVideo(AvPkt& packet)
 	{
 		boost::scoped_array<uint8_t> buffer;
 
-		if (m_imageframe == NULL) {
-			if (m_videoFrameFormat == render::YUV) {
+		if (m_imageframe == NULL)
+		{
+			if (m_videoFrameFormat == render::YUV)
+			{
 				m_imageframe = new image::yuv(m_VCodecCtx->width, m_VCodecCtx->height);
-			} else if (m_videoFrameFormat == render::RGB) {
+			}
+			else if (m_videoFrameFormat == render::RGB)
+			{
 				m_imageframe = new image::rgb(m_VCodecCtx->width, m_VCodecCtx->height);
 			}
 		}
 
-		if (m_videoFrameFormat == render::NONE) { // NullGui?
+		if (m_videoFrameFormat == render::NONE)
+		{
+			// NullGui?
 			return false;
 
-		} else if (m_videoFrameFormat == render::YUV && m_VCodecCtx->pix_fmt != PIX_FMT_YUV420P) {
+		}
+		else if (m_videoFrameFormat == render::YUV && m_VCodecCtx->pix_fmt != PIX_FMT_YUV420P)
+		{
 			abort();	// TODO
 			//img_convert((AVPicture*) pFrameYUV, PIX_FMT_YUV420P, (AVPicture*) pFrame, pCodecCtx->pix_fmt, pCodecCtx->width, pCodecCtx->height);
 			// Don't use depreceted img_convert, use sws_scale
 
-		} else if (m_videoFrameFormat == render::RGB && m_VCodecCtx->pix_fmt != PIX_FMT_RGB24) {
+		}
+		else if (m_videoFrameFormat == render::RGB && m_VCodecCtx->pix_fmt != PIX_FMT_RGB24)
+		{
 			buffer.reset(media::VideoDecoderFfmpeg::convertRGB24(m_VCodecCtx, m_Frame));
 		}
 
 		raw_mediadata_t* video = new raw_mediadata_t;
-		if (m_videoFrameFormat == render::YUV) {
+
+		if (m_videoFrameFormat == render::YUV)
+		{
 			video->m_data = new uint8_t[static_cast<image::yuv*>(m_imageframe)->size()];
-		} else if (m_videoFrameFormat == render::RGB) {
+		}
+		else if (m_videoFrameFormat == render::RGB)
+		{
 			image::rgb* tmp = static_cast<image::rgb*>(m_imageframe);
 			video->m_data = new uint8_t[m_imageframe->size()]; // tmp->m_pitch * tmp->m_height];
 		}
@@ -898,7 +971,8 @@ bool NetStreamFfmpeg::decodeVideo(AvPkt& packet)
 
 		m_last_video_timestamp += frame_delay;
 
-		if (m_videoFrameFormat == render::YUV) {
+		if (m_videoFrameFormat == render::YUV)
+		{
 			image::yuv* yuvframe = static_cast<image::yuv*>(m_imageframe);
 			int copied = 0;
 			uint8_t* ptr = video->m_data;
@@ -918,7 +992,9 @@ bool NetStreamFfmpeg::decodeVideo(AvPkt& packet)
 				}
 			}
 			video->m_size = copied;
-		} else if (m_videoFrameFormat == render::RGB) {
+		}
+		else if (m_videoFrameFormat == render::RGB)
+		{
 
 			uint8_t* srcptr = m_Frame->data[0];
 			uint8_t* srcend = m_Frame->data[0] + m_Frame->linesize[0] * m_VCodecCtx->height;
@@ -958,8 +1034,7 @@ bool NetStreamFfmpeg::decodeMediaFrame()
 				m_unqueued_data = m_qaudio.push(m_unqueued_data) ? NULL : m_unqueued_data;
 			}
 		}
-		else
-		if (m_unqueued_data->m_stream_index == m_video_index)
+		else if (m_unqueued_data->m_stream_index == m_video_index)
 		{
 			m_unqueued_data = m_qvideo.push(m_unqueued_data) ? NULL : m_unqueued_data;
 		}
@@ -1012,9 +1087,12 @@ NetStreamFfmpeg::seek(uint32_t pos)
 	// Seek to new position
 	if (m_isFLV)
 	{
-		if (m_parser.get()) {
+		if (m_parser.get())
+		{
 			newpos = m_parser->seek(pos);
-		} else {
+		}
+		else
+		{
 			newpos = 0;
 		}
 	}
@@ -1022,10 +1100,11 @@ NetStreamFfmpeg::seek(uint32_t pos)
 	{
 
 		AVStream* videostream = m_FormatCtx->streams[m_video_index];
-		timebase = static_cast<double>(videostream->time_base.num / videostream->time_base.den);
+		timebase = as_double(videostream->time_base);
 		newpos = static_cast<long>(pos / timebase);
 		
-		if (av_seek_frame(m_FormatCtx, m_video_index, newpos, 0) < 0) {
+		if (av_seek_frame(m_FormatCtx, m_video_index, newpos, 0) < 0)
+		{
 			log_error(_("%s: seeking failed"), __FUNCTION__);
 			return;
 		}
@@ -1107,9 +1186,12 @@ NetStreamFfmpeg::refreshVideoFrame()
 
 		// Caclulate the current time
 		uint32_t current_clock;
-		if (m_ACodecCtx && get_sound_handler()) {
+		if (m_ACodecCtx && get_sound_handler())
+		{
 			current_clock = m_current_timestamp;
-		} else {
+		}
+		else
+		{
 			current_clock = tu_timer::get_ticks() - m_start_clock;
 			m_current_timestamp = current_clock;
 		}
@@ -1121,10 +1203,13 @@ NetStreamFfmpeg::refreshVideoFrame()
 		if (current_clock >= video_clock)
 		{
 			boost::mutex::scoped_lock lock(image_mutex);
-			if (m_videoFrameFormat == render::YUV) {
+			if (m_videoFrameFormat == render::YUV)
+			{
 				// XXX m_imageframe might be a byte aligned buffer, while video is not!
 				static_cast<image::yuv*>(m_imageframe)->update(video->m_data);
-			} else if (m_videoFrameFormat == render::RGB) {
+			}
+			else if (m_videoFrameFormat == render::RGB)
+			{
 
 				image::rgb* imgframe = static_cast<image::rgb*>(m_imageframe);
 				rgbcopy(imgframe, video, m_VCodecCtx->width * 3);
@@ -1137,7 +1222,9 @@ NetStreamFfmpeg::refreshVideoFrame()
 			// A frame is ready for pickup
 			m_newFrameReady = true;
 
-		} else {
+		}
+		else
+		{
 			// The timestamp on the first frame in the queue is greater
 			// than the current time, so no need to do anything.
 			return;
@@ -1183,12 +1270,18 @@ int32_t
 NetStreamFfmpeg::time()
 {
 
-	if (m_FormatCtx && m_FormatCtx->nb_streams > 0) {
-		double time = (double)m_FormatCtx->streams[0]->time_base.num / (double)m_FormatCtx->streams[0]->time_base.den * (double)m_FormatCtx->streams[0]->cur_dts;
+	if (m_FormatCtx && m_FormatCtx->nb_streams > 0)
+	{
+		double time = as_double(m_FormatCtx->streams[0]->time_base) * (double)m_FormatCtx->streams[0]->cur_dts;
 		return static_cast<int32_t>(time);
-	} else if (m_isFLV) {
+	}
+	else if
+	(m_isFLV)
+	{
 		return m_current_timestamp;
-	} else {
+	}
+	else
+	{
 		return 0;
 	}
 }
@@ -1214,9 +1307,12 @@ void NetStreamFfmpeg::unpausePlayback()
 
 	m_pause = false;	
 
-	if (m_current_timestamp == 0) {
+	if (m_current_timestamp == 0)
+	{
 		m_start_clock = tu_timer::get_ticks();
-	} else {
+	}
+	else
+	{
 		// Add the paused time to the start time so that the playhead doesn't
 		// noticed that we have been paused
 		m_start_clock += tu_timer::get_ticks() - m_time_of_pause;

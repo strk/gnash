@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.52 2007/11/26 21:53:59 strk Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.53 2007/11/27 08:45:33 bwy Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -289,7 +289,8 @@ private:
 	/// A C++ wrapper around ffmpeg's AVPacket structure
 	//
 	/// Used in decodeVideo() and decodeAudio(). 
-	/// Use PktPointer.get (as with auto_ptr) to access.
+	//
+	/// Use Pkt.get() to access.
 	///
 	class AvPkt
 	{
