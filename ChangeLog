@@ -1,5 +1,13 @@
 2007-11-27 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionMbSubString, ActionMbLength):
+	  always resize the vector passed as third argument to
+	  GuessEncoding so to contain at least one element each
+	  character in the string (not fully tested but fixes
+	  an invalid offset access with panda.swf).
+
+2007-11-27 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/Object.cpp (object_registerClass): hopefully
 	  got arguments index correctly this time (in error messages).
 

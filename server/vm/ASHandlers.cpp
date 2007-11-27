@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.162 2007/11/24 17:21:45 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.163 2007/11/27 17:36:40 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1556,6 +1556,7 @@ SWFHandlers::ActionMbLength(ActionExec& thread)
     {
         int length;
         std::vector<int> unused;
+	unused.resize(str.length()+1);
         (void) GuessEncoding(str, length, unused);
         env.top(0).set_int(length);
     }
@@ -1637,7 +1638,7 @@ SWFHandlers::ActionMbSubString(ActionExec& thread)
     string str = string_val.to_string();
     int length = 0;
     std::vector<int> offsets;
-    offsets.reserve(str.length() + 1);
+    offsets.resize(str.length() + 1);
 
     as_encoding_guess_t encoding = GuessEncoding(str, length, offsets);
 
