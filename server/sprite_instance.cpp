@@ -3458,7 +3458,6 @@ sprite_instance::stagePlacementCallback()
 	// when to really queue and when rather to execute immediately the 
 	// events with priority INITIALIZE or CONSTRUCT ...
 	//
-#if 0
 	if ( isDynamic() )
 	{
 #ifdef GNASH_DEBUG
@@ -3469,7 +3468,6 @@ sprite_instance::stagePlacementCallback()
 	}
 	else
 	{
-#endif
 #ifdef GNASH_DEBUG
 		log_debug("Queuing INITIALIZE event for sprite %s", getTarget().c_str());
 #endif
@@ -3480,7 +3478,7 @@ sprite_instance::stagePlacementCallback()
 #endif
 		std::auto_ptr<ExecutableCode> code ( new ConstructEvent(this) );
 		_vm.getRoot().pushAction(code, movie_root::apCONSTRUCT);
-	//}
+	}
 
 	// Now execute frame tags and take care of queuing the LOAD event.
 	//
