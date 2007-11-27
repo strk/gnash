@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.153 2007/11/24 17:21:45 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.154 2007/11/27 23:29:39 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1407,14 +1407,28 @@ serialnumber_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 {
     assert(tag == SWF::SERIALNUMBER); // 41
 
-    std::string serial;
-    in->read_string_with_length(in->get_tag_length(), serial);
+	in->ensureBytes(26);
 
-    IF_VERBOSE_PARSE (
-	log_parse(_("  serialnumber = [[\n%s\n]]"), serial.c_str());
-    );
+    double id = in->read_u32();
+    double edition = in->read_u32();
+    int major = in->read_u8();
+    int minor = in->read_u8();
 
-    log_msg(_("SERIALNUMBER: %s"), serial.c_str());
+    uint32_t buildL = in->read_u32();
+    uint32_t buildH = in->read_u32();
+    uint64_t build = (((uint64_t)buildH) << 32) + buildL;
+
+    uint32_t timestampL = in->read_u32();
+    uint32_t timestampH = in->read_u32();
+    // This timestamp is number of milliseconds since 1 Jan 1970 (epoch)
+    uint64_t timestamp = (((uint64_t)timestampH) << 32) + timestampL;
+
+    std::stringstream ss;
+    ss << "SERIALNUMBER: Version " << id << "." << edition << "." << major << "." << minor;
+    ss << " - Build " << build;
+    ss << " - Timestamp " << timestamp;
+
+    log_msg("%s", ss.str().c_str());
 
     // attach to movie_definition ?
 }

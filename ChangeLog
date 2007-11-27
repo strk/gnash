@@ -1,5 +1,10 @@
 2007-11-27 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp (serialnumber_loader): fix parsing
+	  of the SERIALNUMBER tag.
+
+2007-11-27 Sandro Santilli <strk@keybit.net>
+
 	* server/swf.h: define ACTION_FSCOMMAND2
 	* server/vm/ASHandlers.{cpp,h}: stub support for fscommand2
 	  (SWF7 opcode)
