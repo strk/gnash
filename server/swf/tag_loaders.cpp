@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.154 2007/11/27 23:29:39 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.155 2007/11/27 23:36:13 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1469,7 +1469,7 @@ abc_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 
 	//TODO: Move this to execution time so that as_object can be used. bool success = a.read(in);
 
-	log_unimpl(_("Action Block tags are parsed but not yet used"));
+	log_unimpl(_("%s tag parsed but not yet used"), tag == SWF::DOABC ? "DOABC" : "DOABCDEFINE");
 }
 
 } // namespace gnash::SWF::tag_loaders
