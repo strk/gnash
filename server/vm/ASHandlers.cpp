@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.163 2007/11/27 17:36:40 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.164 2007/11/27 22:06:03 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -101,7 +101,7 @@ construct_object(as_function* ctor_as_func,
 
 static void unsupported_action_handler(ActionExec& thread)
 {
-	log_error(_("Unsupported action handler invoked, code at pc is %d"), thread.code[thread.pc]);
+	log_error(_("Unsupported action handler invoked, code at pc is %x"), thread.code[thread.pc]);
 }
 
 ActionHandler::ActionHandler()
@@ -293,6 +293,8 @@ SWFHandlers::SWFHandlers()
              string("ActionCastOp"), SWFHandlers::ActionCastOp);
     handlers[ACTION_IMPLEMENTSOP] = ActionHandler(ACTION_IMPLEMENTSOP,
              string("ActionImplementsOp"), SWFHandlers::ActionImplementsOp);
+    handlers[ACTION_FSCOMMAND2] = ActionHandler(ACTION_FSCOMMAND2,
+             string("ActionFscommand2"), SWFHandlers::ActionFscommand2);
     handlers[ACTION_RANDOM] = ActionHandler(ACTION_RANDOM,
              string("ActionRandom"), SWFHandlers::ActionRandom);
     handlers[ACTION_MBLENGTH] = ActionHandler(ACTION_MBLENGTH,
@@ -1434,6 +1436,41 @@ SWFHandlers::ActionImplementsOp(ActionExec& thread)
 		as_object *inter = env.pop().to_as_function()->getPrototype().get();
 		obj->add_interface(inter);
 	}
+}
+
+void
+SWFHandlers::ActionFscommand2(ActionExec& thread)
+{
+//	GNASH_REPORT_FUNCTION;
+
+	assert(thread.code[thread.pc] == SWF::ACTION_FSCOMMAND2); // 0x0E
+
+	as_environment& env = thread.env;
+
+	unsigned int off=0;
+
+	thread.ensureStack(1); // nargs
+	unsigned int nargs = env.top(off++).to_int();
+
+	thread.ensureStack(nargs); // nargs, cmdname
+	std::string cmd = env.top(off++).to_string();
+
+	std::stringstream ss;
+	ss << cmd << "(";
+	for (unsigned int i=1; i<nargs; ++i)
+	{
+		as_value arg = env.top(off++);
+		if ( i ) ss << ", ";
+		ss << arg.to_debug_string();
+	}
+	ss << ")";
+
+	log_unimpl("fscommand2:%s", ss.str().c_str());
+
+	// TODO: check wheter or not we should drop anything from
+	//       the stack, some reports and the Canonical tests
+	//       suggest we shoudn't
+	
 }
 
 void

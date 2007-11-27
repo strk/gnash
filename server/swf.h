@@ -247,6 +247,21 @@ typedef enum
     ///
     ACTION_IMPLEMENTSOP            = 0x2C,
 
+    /// SWF7
+    ///
+    /// This action executes an fscommand.
+    /// Stack In:
+    ///  i1            -- number of arguments (int)
+    ///  s2            -- command string
+    ///  [s3..sn]      -- arguments, as many as specified in i1
+    /// Stack Out:
+    ///  not known
+    ///
+    /// See:
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_fscommand2
+    ///
+    ACTION_FSCOMMAND2              = 0x2D,
+
     ACTION_RANDOM                  = 0x30,
     ACTION_MBLENGTH                = 0x31,
     ACTION_ORD                     = 0x32,

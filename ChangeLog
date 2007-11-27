@@ -1,5 +1,11 @@
 2007-11-27 Sandro Santilli <strk@keybit.net>
 
+	* server/swf.h: define ACTION_FSCOMMAND2
+	* server/vm/ASHandlers.{cpp,h}: stub support for fscommand2
+	  (SWF7 opcode)
+
+2007-11-27 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.{cpp,h}: notify mouse events to _global.Mouse
 	  listeners
 	* server/asobj/Mouse.cpp: initialize _global.Mouse as an

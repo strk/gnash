@@ -209,6 +209,7 @@ private:
 	static void ActionThrow(ActionExec& thread);
 	static void ActionCastOp(ActionExec& thread);
 	static void ActionImplementsOp(ActionExec& thread);
+	static void ActionFscommand2(ActionExec& thread);
 	static void ActionRandom(ActionExec& thread);
 	static void ActionMbLength(ActionExec& thread);
 	static void ActionOrd(ActionExec& thread);
