@@ -1,3 +1,8 @@
+2007-11-27 Sandro Santilli <strk@keybit.net>
+
+	* server/as_value.h: rename allowUnloaded parameter of sprite accessor
+	  methods to skipRebinding, for clarity.
+
 2007-11-27 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/swf/DoInitActionTag.h: make sure DoInitAction tag executed only

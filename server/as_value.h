@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.75 2007/11/26 20:43:47 strk Exp $ */
+/* $Id: as_value.h,v 1.76 2007/11/27 08:04:33 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -379,13 +379,13 @@ public:
 	/// Note that if the value is NOT a MOVIECLIP, NULL is always
 	/// returned.
 	///
-	/// @param allowUnloaded
+	/// @param skipRebinding
 	/// 	If true an unloaded sprite is still returned as such,
 	///	rather then attempted to be resolved as a soft-reference.
 	///	Main use for this is during paths resolution, to avoid
 	///	infinite loops. See bug #21647.
 	///
-	sprite_instance* to_sprite(bool allowUnloaded=false) const;
+	sprite_instance* to_sprite(bool skipRebinding=false) const;
 
 	/// \brief
 	/// Return value as an ActionScript function ptr
@@ -627,9 +627,9 @@ private:
 		//
 		/// @return the currently bound sprite, NULL if none
 		///
-		sprite_instance* get(bool allowUnloaded=false) const
+		sprite_instance* get(bool skipRebinding=false) const
 		{
-			if ( allowUnloaded ) return _ptr;
+			if ( skipRebinding ) return _ptr;
 
 			checkDangling(); // set _ptr to NULL and _tgt to original target if destroyed
 			if ( _ptr ) return _ptr;
@@ -709,7 +709,7 @@ private:
 	//
 	/// NOTE: this is possibly NULL !
 	///
-	SpritePtr getSprite(bool allowUnloaded=false) const;
+	SpritePtr getSprite(bool skipRebinding=false) const;
 
 	/// Get the sprite proxy variant member (we assume m_type == MOVIECLIP)
 	//
