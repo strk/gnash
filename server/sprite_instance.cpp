@@ -3600,7 +3600,6 @@ sprite_instance::constructAsScriptObject()
 bool
 sprite_instance::unload()
 {
-	assert(!isUnloaded());
 #ifdef GNASH_DEBUG
 	log_debug(_("Unloading sprite '%s'"), getTargetPath().c_str());
 #endif
