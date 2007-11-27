@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.99 2007/11/27 08:45:33 bwy Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.100 2007/11/27 11:08:23 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -138,14 +138,20 @@ void NetStreamFfmpeg::close()
 	if (m_VCodecCtx)
 	{
 		avcodec_close(m_VCodecCtx);
-		av_free(m_VCodecCtx);
+		if (m_isFLV)
+		{
+			av_free(m_VCodecCtx);
+		}
 	}
 	m_VCodecCtx = NULL;
 
 	if (m_ACodecCtx)
 	{
 		avcodec_close(m_ACodecCtx);
-		av_free(m_ACodecCtx);
+		if (m_isFLV)
+		{
+			av_free(m_ACodecCtx);
+		}
 	}
 	m_ACodecCtx = NULL;
 
