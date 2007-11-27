@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Object.cpp,v 1.37 2007/11/20 12:04:55 cmusick Exp $ */
+/* $Id: Object.cpp,v 1.38 2007/11/27 15:39:41 strk Exp $ */
 
 #include "tu_config.h"
 #include "Object.h"
@@ -275,7 +275,7 @@ object_registerClass(const fn_call& fn)
 		std::stringstream ss;
 		fn.dump_args(ss);
 		log_aserror(_("Invalid call to Object.registerClass(%s) - "
-			"second argument (symbol id) evaluates to empty string"), ss.str().c_str());
+			"first argument (symbol id) evaluates to empty string"), ss.str().c_str());
 		);
 		return as_value(false);
 	}
@@ -287,7 +287,7 @@ object_registerClass(const fn_call& fn)
 		std::stringstream ss;
 		fn.dump_args(ss);
 		log_aserror(_("Invalid call to Object.registerClass(%s) - "
-			"first argument is not a class/function)"), ss.str().c_str());
+			"second argument (class) is not a function)"), ss.str().c_str());
 		);
 		return as_value(false);
 	}

@@ -1,5 +1,10 @@
 2007-11-27 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Object.cpp (object_registerClass): hopefully
+	  got arguments index correctly this time (in error messages).
+
+2007-11-27 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-mtasc.all/check.as: add some dox over
 	  check_equals aimed at get first and second arguments
 	  in the correct way.
