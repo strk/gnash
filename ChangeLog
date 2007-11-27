@@ -1,3 +1,9 @@
+2007-11-27 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/swf/DoInitActionTag.h: make sure DoInitAction tag executed only
+	  once. Ready to drop sprite_instance::m_init_actions_executed. Executing
+	  DoInitAction or not is independent on the life of associated sprites.
+	
 2007-11-26 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/NetStreamFfmpeg.{cpp,h}: more AVPacket wrapping work.

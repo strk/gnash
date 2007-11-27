@@ -30,12 +30,12 @@
 #include "swf.h" // for tag_type definition
 #include "action_buffer.h" // for composition
 #include "sprite_instance.h" // for inlines
-//#include "tu_types.h" // for uint16_t, uint32_t etc. definition 
+#include "ExecutableCode.h" // for GlobalCode
 
 // Forward declarations
 namespace gnash {
-	class stream;
-	class movie_definition;
+    class stream;
+    class movie_definition;
 }
 
 namespace gnash {
@@ -49,49 +49,65 @@ class DoInitActionTag : public ControlTag
 {
 public:
 
-	DoInitActionTag()
-	{}
+    DoInitActionTag()
+        :m_is_executed(false)
+    {}
 
-	/// Read a DoInitAction block from the stream
-	//
-	void read(stream* in)
-	{
-	    m_buf.readFullTag(in);
-	}
+    /// Read a DoInitAction block from the stream
+    //
+    void read(stream* in)
+    {
+        m_buf.readFullTag(in);
+    }
 
-	virtual void execute_state(sprite_instance* m) const
-	{
-		m->execute_init_action_buffer(m_buf);
-	}
+    virtual void execute_state(sprite_instance* m) const
+    {
+        //m->execute_init_action_buffer(m_buf);
+        if(! m_is_executed)
+        {
+            m_is_executed = true;
+            std::auto_ptr<ExecutableCode> code ( new GlobalCode(m_buf, m) );
+            movie_root& root = VM::get().getRoot();
+            root.pushAction(code, movie_root::apINIT);
+        }
+    }
 
-	virtual void execute(sprite_instance* m) const
-	{
-		m->execute_init_action_buffer(m_buf);
-	}
+    virtual void execute(sprite_instance* m) const
+    {
+        //m->execute_init_action_buffer(m_buf);
+        if(! m_is_executed)
+        {
+            m_is_executed = true;
+            std::auto_ptr<ExecutableCode> code ( new GlobalCode(m_buf, m) );
+            movie_root& root = VM::get().getRoot();
+            root.pushAction(code, movie_root::apINIT);
+        }
+    }
 
-	// Tell the caller that we are an action tag.
-	virtual bool is_action_tag() const
-	{
-	    return true;
-	}
+    // Tell the caller that we are an action tag.
+    virtual bool is_action_tag() const
+    {
+        return true;
+    }
 
-	static void doInitActionLoader(stream* in, tag_type tag, movie_definition* m)
-	{
-		DoInitActionTag* da = new DoInitActionTag;
-		int cid = in->read_u16();
-		da->read(in);
+    static void doInitActionLoader(stream* in, tag_type tag, movie_definition* m)
+    {
+        DoInitActionTag* da = new DoInitActionTag;
+        int cid = in->read_u16();
+        da->read(in);
 
-		IF_VERBOSE_PARSE (
-		log_parse(_("  tag %d: do_init_action_loader"), tag);
-		log_parse(_("  -- init actions for sprite %d"), cid);
-		);
+        IF_VERBOSE_PARSE (
+        log_parse(_("  tag %d: do_init_action_loader"), tag);
+        log_parse(_("  -- init actions for sprite %d"), cid);
+        );
 
-		m->add_init_action(da, cid); // ownership transferred
-	}
+        m->add_init_action(da, cid); // ownership transferred
+    }
 
 private:
 
-	action_buffer m_buf;
+    action_buffer m_buf;
+    mutable bool m_is_executed;
 };
 
 } // namespace gnash::SWF
