@@ -30,7 +30,7 @@
 #include "swf.h" // for tag_type definition
 #include "action_buffer.h" // for composition
 #include "sprite_instance.h" // for inlines
-#include "ExecutableCode.h" // for GlobalCode
+//#include "tu_types.h" // for uint16_t, uint32_t etc. definition 
 
 // Forward declarations
 namespace gnash {
@@ -50,7 +50,6 @@ class DoInitActionTag : public ControlTag
 public:
 
     DoInitActionTag()
-        :m_is_executed(false)
     {}
 
     /// Read a DoInitAction block from the stream
@@ -62,26 +61,12 @@ public:
 
     virtual void execute_state(sprite_instance* m) const
     {
-        //m->execute_init_action_buffer(m_buf);
-        if(! m_is_executed)
-        {
-            m_is_executed = true;
-            std::auto_ptr<ExecutableCode> code ( new GlobalCode(m_buf, m) );
-            movie_root& root = VM::get().getRoot();
-            root.pushAction(code, movie_root::apINIT);
-        }
+        m->execute_init_action_buffer(m_buf);
     }
 
     virtual void execute(sprite_instance* m) const
     {
-        //m->execute_init_action_buffer(m_buf);
-        if(! m_is_executed)
-        {
-            m_is_executed = true;
-            std::auto_ptr<ExecutableCode> code ( new GlobalCode(m_buf, m) );
-            movie_root& root = VM::get().getRoot();
-            root.pushAction(code, movie_root::apINIT);
-        }
+        m->execute_init_action_buffer(m_buf);
     }
 
     // Tell the caller that we are an action tag.
@@ -107,7 +92,6 @@ public:
 private:
 
     action_buffer m_buf;
-    mutable bool m_is_executed;
 };
 
 } // namespace gnash::SWF
@@ -121,3 +105,4 @@ private:
 // mode: C++
 // indent-tabs-mode: t
 // End:
+
