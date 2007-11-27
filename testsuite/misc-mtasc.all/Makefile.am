@@ -27,6 +27,7 @@ ASTESTS = \
 	exception.as \
 	levels.as \
 	super_test1.as \
+	implementsOpTest.as \
 	$(NULL)
 
 
@@ -37,7 +38,7 @@ AUXMOVIES = \
 	    level99.as \
 	    $(NULL)
 
-EXTRA_DIST = $(ASTESTS) $(AUXMOVIES) TestClass.as ../check.h Dejagnu.as check.as Derived1.as Base1.as
+EXTRA_DIST = $(ASTESTS) $(AUXMOVIES) TestClass.as ../check.h Dejagnu.as check.as Derived1.as Base1.as  implementsOp/BExtendingImplementation.as  implementsOp/ImplementationA.as  implementsOp/ImplementationB.as implementsOp/SimpleInterface.as
 
 if ENABLE_MTASC
 

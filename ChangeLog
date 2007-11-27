@@ -1,5 +1,10 @@
 2007-11-27 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-mtasc.all/: Makefile.am, implementsOp*:
+	  Test for implementsOp (adapted patch #6287).
+
+2007-11-27 Sandro Santilli <strk@keybit.net>
+
 	* server/dlist.cpp (unload): don't destroy childs when unloading
 	  parent. 
 	* testsuite/actionscript.all/MovieClip.as: success in tests
