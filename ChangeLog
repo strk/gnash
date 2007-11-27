@@ -1,3 +1,10 @@
+2007-11-27 Sandro Santilli <strk@keybit.net>
+
+	* server/dlist.cpp (unload): don't destroy childs when unloading
+	  parent. 
+	* testsuite/actionscript.all/MovieClip.as: success in tests
+	  of accessibility of unloaded sprites' childs.
+
 2007-11-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/asobj/NetStreamFfmpeg.cpp: don't try to free codec context

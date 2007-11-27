@@ -729,8 +729,8 @@ DisplayList::unload()
 
     if ( ! di->unload() ) // no event handler queued, we remove
     {
-      di->destroy();
-      it = _charsByDepth.erase(it);
+      //di->destroy(); // will be destroyed on next iteration, or by unload handler ? we don't want soft-ref to rebind here
+      it = _charsByDepth.erase(it); 
     }
     else
     {

@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.103 2007/11/27 11:05:28 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.104 2007/11/27 11:28:50 strk Exp $";
 
 #include "check.as"
 
@@ -523,9 +523,9 @@ check_equals(softref3child.member, '3child');
 check_equals(softref3child._target, '/hardref3/hardref3child');
 check_equals(softref3child.getDepth(), 1);
 removeMovieClip(softref3child); // using ActionRemoveClip (0x25)
-xcheck_equals(softref3child2.member, '3child2');
-xcheck_equals(softref3child2._target, '/hardref3/hardref3child2');
-xcheck_equals(softref3child2.getDepth(), 2);
+check_equals(softref3child2.member, '3child2');
+check_equals(softref3child2._target, '/hardref3/hardref3child2');
+check_equals(softref3child2.getDepth(), 2);
 hardref = 4;
 // Delete is needed, or further inspection functions will hit the variable before the character
 delete hardref;
