@@ -57,6 +57,7 @@ as_value fileio_getchar(const fn_call& fn);
 as_value fileio_putchar(const fn_call& fn);
 as_value fileio_fflush(const fn_call& fn);
 as_value fileio_ftell(const fn_call& fn);
+as_value fileio_feof(const fn_call& fn);
 as_value fileio_fseek(const fn_call& fn);
 as_value fileio_unlink(const fn_call& fn);
 
@@ -91,6 +92,7 @@ attachInterface(as_object& obj)
     obj.init_member("fflush", new builtin_function(fileio_fflush));
     obj.init_member("fseek", new builtin_function(fileio_fseek));
     obj.init_member("ftell", new builtin_function(fileio_ftell));
+    obj.init_member("feof", new builtin_function(fileio_feof));
     obj.init_member("fclose", new builtin_function(fileio_fclose));
     
     obj.init_member("unlink", new builtin_function(fileio_unlink));
@@ -187,6 +189,16 @@ Fileio::ftell()
 //    GNASH_REPORT_FUNCTION;
     if (_stream) {
         return ::ftell(_stream);
+    }
+    return -1;
+}
+
+bool
+Fileio::feof()
+{
+//    GNASH_REPORT_FUNCTION;
+    if (_stream) {
+        return ::feof(_stream);
     }
     return -1;
 }
@@ -498,6 +510,16 @@ fileio_ftell(const fn_call& fn)
     assert(ptr);
     int i = ptr->ftell();
     return as_value(i);
+}
+
+as_value
+fileio_feof(const fn_call& fn)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::intrusive_ptr<Fileio> ptr = ensureType<Fileio>(fn.this_ptr);
+    assert(ptr);
+    bool b = ptr->feof();
+    return as_value(b);
 }
 
 as_value
