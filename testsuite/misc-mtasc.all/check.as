@@ -25,11 +25,11 @@
 
 #define _INFO_ ' ['+__FILE__+':'+__LINE__+']'
 
-#define check_equals(a, b) Dejagnu.check_equals(a, b, _INFO_);
-//#define check_equals(a, b, msg) Dejagnu.check(a, b, msg + _INFO_);
+// First argument is the expression we test, second is the result we expect
+#define check_equals(obt, exp) Dejagnu.check_equals(obt, exp, _INFO_);
 
-#define xcheck_equals(a, b) Dejagnu.xcheck_equals(a, b, _INFO_);
-//#define xcheck_equals(a, b, msg) Dejagnu.check(a, b, msg + _INFO_);
+// First argument is the expression we test, second is the result we expect
+#define xcheck_equals(obt, exp) Dejagnu.xcheck_equals(obt, exp, _INFO_);
 
 #define check(a) Dejagnu.check(a, _INFO_);
 #define xcheck(a) Dejagnu.xcheck(a, _INFO_);
