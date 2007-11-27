@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Mouse.as,v 1.14 2007/09/29 16:22:57 strk Exp $";
+rcsid="$Id: Mouse.as,v 1.15 2007/11/27 20:37:53 strk Exp $";
 
 #include "check.as"
 
@@ -39,10 +39,10 @@ check_equals ( typeof(Mouse.hide), 'function' );
  // See http://www.senocular.com/flash/tutorials/listenersasbroadcaster/?page=2
  check_equals ( typeof(Mouse.removeListener), 'function' );
  check_equals ( typeof(Mouse.addListener), 'function' );
- xcheck_equals( typeof(Mouse.broadcastMessage), 'function' );
- xcheck(Mouse.hasOwnProperty("_listeners"));
- xcheck_equals(typeof(Mouse._listeners), 'object');
- xcheck(Mouse._listeners instanceof Array);
+ check_equals( typeof(Mouse.broadcastMessage), 'function' );
+ check(Mouse.hasOwnProperty("_listeners"));
+ check_equals(typeof(Mouse._listeners), 'object');
+ check(Mouse._listeners instanceof Array);
 
 #endif // OUTPUT_VERSION > 5
 

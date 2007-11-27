@@ -106,7 +106,7 @@ AsBroadcaster::initialize(as_object& o)
 {
 	as_object* asb = getAsBroadcaster();
 
-	log_debug("Initializing object %p as an AsBroadcaster", (void*)&o);
+	//log_debug("Initializing object %p as an AsBroadcaster", (void*)&o);
 
 	as_value tmp;
 
@@ -168,7 +168,7 @@ AsBroadcaster::initialize_method(const fn_call& fn)
 
 	AsBroadcaster::initialize(*tgt);
 
-	log_debug("AsBroadcaster.initialize(%s): TESTING", tgtval.to_debug_string().c_str());
+	//log_debug("AsBroadcaster.initialize(%s): TESTING", tgtval.to_debug_string().c_str());
 
 	return as_value();
 }
@@ -230,7 +230,7 @@ AsBroadcaster::addListener_method(const fn_call& fn)
 		listeners->push(newListener);
 	}
 
-	log_debug("%p.addListener(%s) TESTING", (void*)fn.this_ptr.get(), fn.dump_args().c_str());
+	//log_debug("%p.addListener(%s) TESTING", (void*)fn.this_ptr.get(), fn.dump_args().c_str());
 	return as_value(true);
 
 }
@@ -365,7 +365,7 @@ AsBroadcaster::broadcastMessage_method(const fn_call& fn)
 
 	unsigned int dispatched = visitor.eventsDispatched();
 
-	log_debug("AsBroadcaster.broadcastMessage() dispatched %u events", dispatched);
+	//log_debug("AsBroadcaster.broadcastMessage() dispatched %u events", dispatched);
 
 	if ( dispatched ) return as_value(true);
 	else return as_value(); // undefined

@@ -340,6 +340,29 @@ movie_root::getKeyObject()
 	return _keyobject;
 }
 
+boost::intrusive_ptr<as_object>
+movie_root::getMouseObject()
+{
+	VM& vm = VM::get();
+
+	// TODO: test what happens with the global "Mouse" object
+	//       is removed or overridden by the user
+	if ( ! _mouseobject )
+	{
+		as_value val;
+		as_object* global = VM::get().getGlobal();
+
+		std::string objName = PROPNAME("Mouse");
+		if (global->get_member(vm.getStringTable().find(objName), &val) )
+		{
+			//log_debug("Found member 'Mouse' in _global: %s", val.to_debug_string().c_str());
+			_mouseobject = val.to_object();
+		}
+	}
+
+	return _mouseobject;
+}
+
 
 key_as_object *
 movie_root::notify_global_key(key::code k, bool down)
@@ -415,6 +438,7 @@ movie_root::notify_mouse_clicked(bool mouse_pressed, int button_mask)
 	return fire_mouse_event();
 }
 
+#if 0
 void
 movie_root::notify_mouse_state(int x, int y, int buttons)
 {
@@ -427,6 +451,7 @@ movie_root::notify_mouse_state(int x, int y, int buttons)
 
 	assert(testInvariant());
 }
+#endif
 
 // Return wheter any action triggered by this event requires display redraw.
 // See page about events_handling (in movie_interface.h)
@@ -968,6 +993,14 @@ movie_root::notify_mouse_listeners(const event_id& event)
 		}
 	}
 
+	// Now broadcast message for Mouse listeners
+	typedef boost::intrusive_ptr<as_object> ObjPtr;
+	ObjPtr mouseObj = getMouseObject();
+	if ( mouseObj )
+	{
+		mouseObj->callMethod(NSV::PROP_BROADCAST_MESSAGE, as_value(PROPNAME(event.get_function_name())));
+	}
+
 	assert(testInvariant());
 }
 
@@ -1266,8 +1299,11 @@ movie_root::markReachableResources() const
     // Mark character mouse listeners
     std::for_each(m_mouse_listeners.begin(), m_mouse_listeners.end(), boost::bind(&character::setReachable, _1));
 
-    // Mark global key object
+    // Mark global Key object
     if ( _keyobject ) _keyobject->setReachable();
+
+    // Mark global Mouse object
+    if ( _mouseobject ) _mouseobject->setReachable();
 
     // Mark character being dragged, if any
     m_drag_state.markReachableResources();

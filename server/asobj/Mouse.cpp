@@ -27,26 +27,28 @@
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
-//#include "VM.h" // for registering static
+#include "VM.h" // for registerNative
 #include "Object.h" // for getObjectInterface
+#include "AsBroadcaster.h" // for initializing self as a broadcaster
 
 namespace gnash {
 
-as_value mouse_addlistener(const fn_call& fn);
 as_value mouse_hide(const fn_call& fn);
-as_value mouse_removelistener(const fn_call& fn);
 as_value mouse_show(const fn_call& fn);
 as_value mouse_ctor(const fn_call& fn);
 
 static void
 attachMouseInterface(as_object& o)
 {
+	VM& vm = o.getVM();
+
 	// TODO: Mouse is an object, not a constructor ! Attach these interface to
 	//       the singleton Mouse object then !
-	o.init_member("addListener", new builtin_function(mouse_addlistener));
-	o.init_member("hide", new builtin_function(mouse_hide));
-	o.init_member("removeListener", new builtin_function(mouse_removelistener));
-	o.init_member("show", new builtin_function(mouse_show));
+	vm.registerNative(mouse_show, 5, 0);
+	o.init_member("show", vm.getNative(5, 0));
+
+	vm.registerNative(mouse_hide, 5, 1);
+	o.init_member("hide", vm.getNative(5, 1));
 }
 
 static as_object*
@@ -69,7 +71,13 @@ public:
 	mouse_as_object()
 		:
 		as_object(getMouseInterface())
-	{}
+	{
+		int swfversion = _vm.getSWFVersion();
+		if ( swfversion > 5 )
+		{
+			AsBroadcaster::initialize(*this);
+		}
+	}
 
 	// override from as_object ?
 	//std::string get_text_value() const { return "Mouse"; }
@@ -79,35 +87,7 @@ public:
 
 };
 
-as_value mouse_addlistener(const fn_call& fn)
-{
-    boost::intrusive_ptr<mouse_as_object> obj=ensureType<mouse_as_object>(fn.this_ptr);
-    UNUSED(obj);
-
-    static bool warned=false;
-    if ( ! warned )
-    {
-        log_unimpl (__FUNCTION__);
-        warned=true;
-    }
-    return as_value();
-}
-
 as_value mouse_hide(const fn_call& fn)
-{
-    boost::intrusive_ptr<mouse_as_object> obj=ensureType<mouse_as_object>(fn.this_ptr);
-    UNUSED(obj);
-
-    static bool warned=false;
-    if ( ! warned )
-    {
-        log_unimpl (__FUNCTION__);
-        warned=true;
-    }
-    return as_value();
-}
-
-as_value mouse_removelistener(const fn_call& fn)
 {
     boost::intrusive_ptr<mouse_as_object> obj=ensureType<mouse_as_object>(fn.this_ptr);
     UNUSED(obj);

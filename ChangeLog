@@ -1,5 +1,15 @@
 2007-11-27 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.{cpp,h}: notify mouse events to _global.Mouse
+	  listeners
+	* server/asobj/Mouse.cpp: initialize _global.Mouse as an
+	  AsBroadcaster.
+	* server/asobj/AsBroadcaster.cpp: reduce debugging output.
+	* testsuite/actionscript.all/Mouse.as: successes in AsBroadcaster
+	  interfaces availability.
+
+2007-11-27 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ASHandlers.cpp (ActionMbSubString, ActionMbLength):
 	  always resize the vector passed as third argument to
 	  GuessEncoding so to contain at least one element each

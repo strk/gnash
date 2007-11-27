@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.92 2007/11/22 22:57:18 strk Exp $ */
+/* $Id: movie_root.h,v 1.93 2007/11/27 20:37:53 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -252,7 +252,7 @@ public:
 
     /// The host app can use this to tell the movie where the
     /// user's mouse pointer is.
-    void notify_mouse_state(int x, int y, int buttons);
+    //void notify_mouse_state(int x, int y, int buttons);
 
     /// \brief
     /// The host app can use this to tell the movie when
@@ -516,6 +516,7 @@ public:
     /// - Key listeners (m_key_listeners)
     /// - Mouse listeners (m_mouse_listeners)
     /// - global Key object (_keyobject)
+    /// - global Mouse object (_mouseobject)
     /// - Any character being dragged 
     ///
     void markReachableResources() const;
@@ -676,6 +677,8 @@ private:
 
     boost::intrusive_ptr<key_as_object> _keyobject;
 
+    boost::intrusive_ptr<as_object> _mouseobject;
+
     /// Objects listening for mouse events (down,up,move)
     MouseListeners m_mouse_listeners;
 
@@ -759,6 +762,12 @@ private:
     /// @@ might be worth making public
     ///
     boost::intrusive_ptr<key_as_object> getKeyObject();
+
+    /// Return the global Mouse object 
+    //
+    /// TODO: expose the mouse_as_object directly for faster calls ?
+    ///
+    boost::intrusive_ptr<as_object> getMouseObject();
 
     /// Boundaries of the Stage are always world boundaries
     /// and are only invalidated by changes in the background
