@@ -1,5 +1,6 @@
 2007-11-28 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Key.cpp: register native Key methods.
 	* configure.ac: look for QT libs if kde gui is requested;
 	  don't bail out if QTOPIA is not found, unless qtopia gui is
 	  requested.

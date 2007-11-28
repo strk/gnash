@@ -27,7 +27,7 @@
 #include "fn_call.h"
 #include "movie_root.h"
 #include "action.h" // for call_method
-#include "VM.h"
+#include "VM.h" // for registerNative
 #include "builtin_function.h"
 #include "Object.h" // for getObjectInterface()
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
@@ -227,20 +227,20 @@ void key_class_init(as_object& global)
     KEY_CONST(UP);
 
     // methods
-    key_obj->init_member("getAscii", new builtin_function(key_get_ascii));
-    key_obj->init_member("getCode", new builtin_function(key_get_code));
-    key_obj->init_member("isDown", new builtin_function(key_is_down));
-    key_obj->init_member("isToggled", new builtin_function(key_is_toggled));
 
-    // These are only for SWF6 and up
-#if 0 // done by AsBroadcaster
-    int swfversion = VM::get().getSWFVersion();
-    if ( swfversion > 5 )
-    {
-        key_obj->init_member("addListener", new builtin_function(key_add_listener));
-        key_obj->init_member("removeListener", new builtin_function(key_remove_listener));
-    }
-#endif
+    VM& vm = global.getVM();
+
+    vm.registerNative(key_get_ascii, 800, 0);
+    key_obj->init_member("getAscii", vm.getNative(800, 0));
+
+    vm.registerNative(key_get_code, 800, 1);
+    key_obj->init_member("getCode", vm.getNative(800, 1));
+
+    vm.registerNative(key_is_down, 800, 2);
+    key_obj->init_member("isDown", vm.getNative(800, 2));
+
+    vm.registerNative(key_is_toggled, 800, 3);
+    key_obj->init_member("isToggled", vm.getNative(800, 3));
 
     global.init_member("Key", key_obj);
 }
