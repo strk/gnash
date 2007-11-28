@@ -884,7 +884,7 @@ public:
 
     // Call add_paths for each mask.
     std::for_each(_masks.begin(), _masks.end(),
-      boost::bind(&render_handler_ogl::add_paths, boost::ref(this), _1));    
+      boost::bind(&render_handler_ogl::add_paths, boost::ref(*this), _1));    
           
     glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
     glStencilFunc(GL_EQUAL, _masks.size(), _masks.size());

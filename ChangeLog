@@ -1,3 +1,7 @@
+2007-11-28 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* backend/render_handler_ogl.cpp: boost::ref(this) -> *this.
+
 2007-11-28 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/tag_loaders.cpp (inflate_wrapper): pretty-print about
