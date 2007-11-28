@@ -594,14 +594,14 @@ Gui::display(movie_root* m)
 				float ymin = bounds.getMinY();
 				float ymax = bounds.getMaxY();
 				
-				corners[0].m_x = xmin;
-				corners[0].m_y = ymin;
-				corners[1].m_x = xmax;
-				corners[1].m_y = ymin;
-				corners[2].m_x = xmax;
-				corners[2].m_y = ymax;
-				corners[3].m_x = xmin;
-				corners[3].m_y = ymax;
+				corners[0].x = xmin;
+				corners[0].y = ymin;
+				corners[1].x = xmax;
+				corners[1].y = ymin;
+				corners[2].x = xmax;
+				corners[2].y = ymax;
+				corners[3].x = xmin;
+				corners[3].y = ymax;
 				matrix dummy;    	
 				gnash::render::set_matrix(dummy); // reset matrix
 				gnash::render::draw_poly(&corners[0], 4,
