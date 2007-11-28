@@ -1,0 +1,19 @@
+#
+# Build the FB gui
+#
+if BUILD_FB_GUI
+bin_PROGRAMS += fb-gnash
+fb_gnash_SOURCES = $(GUI_SRCS) gui_fb.cpp fb.cpp fbsup.h
+fb_gnash_CPPFLAGS = -DGUI_FB -DGUI_CONFIG=\"FB\" \
+	$(AM_CPPFLAGS) 
+fb_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
+#fb_gnash_DEPENDENCIES = .configline
+
+if BUILD_AGG_RENDERER
+fb_gnash_CPPFLAGS += $(AGG_CFLAGS)
+fb_gnash_SOURCES += 
+fb_gnash_LDADD = $(top_builddir)/backend/libgnashagg.la \
+		$(GNASH_LIBS) $(AGG_LIBS)
+endif				# BUILD_AGG_RENDERER
+endif				# BUILD_FB_GUI
+

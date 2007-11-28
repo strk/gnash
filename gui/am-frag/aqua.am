@@ -1,0 +1,28 @@
+#
+# Build the AQUA gui
+#
+if BUILD_AQUA_GUI
+bin_PROGRAMS += aqua-gnash
+aqua_gnash_CPPFLAGS = -DGUI_AQUA $(AM_CPPFLAGS) -DGUI_CONFIG=\"AQUA\"
+aqua_gnash_SOURCES = $(GUI_SRCS) gui_aqua.cpp
+aqua_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
+#aqua_gnash_DEPENDENCIES = .configline
+aqua_gnash_LDADD = \
+	$(MYSQL_LIBS) \
+	$(GNASH_LIBS) \
+	$(AM_LDFLAGS)
+if BUILD_OGL_RENDERER
+aqua_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
+aqua_gnash_LDADD += $(top_builddir)/backend/libgnashogl.la \
+	$(AQUA_LIBS) $(OPENGL_LIBS)
+aqua_gnash_SOURCES += aqua_ogl_glue.cpp aqua_ogl_glue.h \
+	aqua.cpp aquasup.h aqua_glue.h
+endif
+# if BUILD_AGG_RENDERER
+#	aqua_gnash_CPPFLAGS += $(AGG_CFLAGS)
+# 	aqua_gnash_LDADD += $(top_builddir)/backend/libgnashagg.la \
+#	$(AQUA_LIBS) $(AGG_LIBS)
+# 	aqua_gnash_SOURCES += aqua_agg_glue.cpp aqua_agg_glue.h \
+# 	aqua.cpp aquasup.h aqua_glue.h
+# endif
+endif

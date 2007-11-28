@@ -1,5 +1,11 @@
 2007-11-28  Rob Savoye  <rob@ute.welcomehome.org>
 
+	* gui/am-frag: Automake include files to make the top level
+	gui/makefile.am less huge. It also makes it much cleaner for when
+	you have to add a new GUI target.
+	* gui/Makefile.am: Include Automake stubs if specified by the
+	build.
+	
 	* macros/qt.m4: New file. originally pulled from kde.m4, but then
 	modified heavily to use QTDIR correctly, and to handle multiple
 	differing versions of QT APIs. For now the default is to use Qt3

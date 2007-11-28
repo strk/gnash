@@ -178,239 +178,60 @@ BUILT_SOURCES += bundle
 EXTRA_DIST += Gnash.app
 endif
 
-#
+# Build the QTOPIA gui
+if BUILD_QTOPIA_GUI
+include $(srcdir)/am-frag/qtopia.am
+endif
+
 # Build the KDE gui
-# 
 if BUILD_KDE_GUI
-bin_PROGRAMS += kde-gnash
-kde_gnash_CPPFLAGS = -DGUI_KDE -DGUI_CONFIG=\"KDE\" \
-	 $(AM_CPPFLAGS) $(KDE_CFLAGS) $(QT_CFLAGS)
-kde_gnash_SOURCES = $(GUI_SRCS) gui_kde.cpp
-kde_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
-#kde_gnash_DEPENDENCIES = .configline
-kde_gnash_LDADD = \
-	$(MYSQL_LIBS) \
-	$(GNASH_LIBS) \
-	$(AM_LDFLAGS)
-if BUILD_OGL_RENDERER
-kde_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
-kde_gnash_LDADD += $(top_builddir)/backend/libgnashogl.la \
-	$(KDE_LIBS) $(QT_LIBS) $(OPENGL_LIBS)
-kde_gnash_SOURCES += kde_glue_opengl.cpp kde_glue_opengl.h kde_glue.h \
-	 	kde.cpp kdesup.h kde_glue.h
-endif
-if BUILD_AGG_RENDERER
-kde_gnash_CPPFLAGS += $(AGG_CFLAGS)
-kde_gnash_LDADD += $(top_builddir)/backend/libgnashagg.la \
-	$(KDE_LIBS) $(QT_LIBS) $(AGG_LIBS)
-kde_gnash_SOURCES += kde_glue_agg.cpp kde_glue_agg.h \
-	 	kde.cpp kdesup.h kde_glue.h
-endif
+include $(srcdir)/am-frag/kde.am
 endif
 
-#
 # Build the SDL gui
-#
 if BUILD_SDL_GUI
-bin_PROGRAMS += sdl-gnash
-sdl_gnash_CPPFLAGS = -DGUI_SDL -DGUI_CONFIG=\"SDL\" \
-	 $(AM_CPPFLAGS) $(SDL_CFLAGS) 
-sdl_gnash_SOURCES = $(GUI_SRCS) gui_sdl.cpp sdl.cpp sdlsup.h sdl_glue.h
-sdl_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
-#sdl_gnash_DEPENDENCIES = .configline
-sdl_gnash_LDADD = \
-	$(MYSQL_LIBS) \
-	$(GNASH_LIBS) \
-	$(AM_LDFLAGS) \
-	$(SDL_LIBS)
-
-if BUILD_OGL_RENDERER
-sdl_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
-sdl_gnash_LDADD += $(top_builddir)/backend/libgnashogl.la \
-	$(OPENGL_LIBS)
-sdl_gnash_SOURCES += sdl_ogl_glue.cpp sdl_ogl_glue.h 
+include $(srcdir)/am-frag/sdl.am
 endif
 
-if BUILD_AGG_RENDERER
-sdl_gnash_CPPFLAGS += $(AGG_CFLAGS)
-sdl_gnash_LDADD += $(top_builddir)/backend/libgnashagg.la \
-	$(AGG_LIBS)
-sdl_gnash_SOURCES += sdl_agg_glue.cpp sdl_agg_glue.h 
-endif
-
-if BUILD_CAIRO_RENDERER
-sdl_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
-sdl_gnash_LDADD += $(top_builddir)/backend/libgnashcairo.la \
-	$(CAIRO_LIBS) 
-sdl_gnash_SOURCES += sdl_cairo_glue.cpp sdl_cairo_glue.h 
-endif
-endif
-
-#
 # Build the FLTK gui
-#
 if BUILD_FLTK_GUI
-bin_PROGRAMS += fltk-gnash
-fltk_gnash_CPPFLAGS = -DGUI_FLTK -DGUI_CONFIG=\"FLTK\" \
-	$(AM_CPPFLAGS) $(FLTK2_CFLAGS)
-fltk_gnash_SOURCES = $(GUI_SRCS) gui_fltk.cpp
-fltk_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
-#fltk_gnash_DEPENDENCIES = .configline
-fltk_gnash_LDADD = \
-	$(MYSQL_LIBS) \
-	$(GNASH_LIBS) \
-	$(AM_LDFLAGS)
-# if BUILD_OGL_RENDERER
-#	fltk_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
-# 	fltk_gnash_LDADD += $(top_builddir)/backend/libgnashogl.la
-#	$(SDL_LIBS) $(OPENGL_LIBS)
-# 	fltk_gnash_SOURCES += fltk_glue_ogl.cpp fltk_glue_ogl.h \
-# 	 	fltk.cpp fltksup.h 
-# endif
-if BUILD_AGG_RENDERER
-fltk_gnash_CPPFLAGS += $(AGG_CFLAGS)
-fltk_gnash_LDADD += $(top_builddir)/backend/libgnashagg.la \
-	$(FLTK2_LIBS) $(AGG_LIBS) $(XFT_LIBS) $(X11_LIBS)
-fltk_gnash_SOURCES += fltk_glue_agg.cpp fltk_glue_agg.h \
-	 	fltk.cpp fltksup.h 
-endif
+include $(srcdir)/am-frag/fltk.am
 endif
 
-#
 # Build the AQUA gui
-#
 if BUILD_AQUA_GUI
-bin_PROGRAMS += aqua-gnash
-aqua_gnash_CPPFLAGS = -DGUI_AQUA $(AM_CPPFLAGS) -DGUI_CONFIG=\"AQUA\"
-aqua_gnash_SOURCES = $(GUI_SRCS) gui_aqua.cpp
-aqua_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
-#aqua_gnash_DEPENDENCIES = .configline
-aqua_gnash_LDADD = \
-	$(MYSQL_LIBS) \
-	$(GNASH_LIBS) \
-	$(AM_LDFLAGS)
-if BUILD_OGL_RENDERER
-aqua_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
-aqua_gnash_LDADD += $(top_builddir)/backend/libgnashogl.la \
-	$(AQUA_LIBS) $(OPENGL_LIBS)
-aqua_gnash_SOURCES += aqua_ogl_glue.cpp aqua_ogl_glue.h \
-	aqua.cpp aquasup.h aqua_glue.h
-endif
-# if BUILD_AGG_RENDERER
-#	aqua_gnash_CPPFLAGS += $(AGG_CFLAGS)
-# 	aqua_gnash_LDADD += $(top_builddir)/backend/libgnashagg.la \
-#	$(AQUA_LIBS) $(AGG_LIBS)
-# 	aqua_gnash_SOURCES += aqua_agg_glue.cpp aqua_agg_glue.h \
-# 	aqua.cpp aquasup.h aqua_glue.h
-# endif
+include $(srcdir)/am-frag/aqua.am
 endif
 
-#
 # Build the GTK gui
-#
 if BUILD_GTK_GUI
-bin_PROGRAMS += gtk-gnash
-gtk_gnash_SOURCES = $(GUI_SRCS) gui_gtk.cpp
-gtk_gnash_CPPFLAGS = -DGUI_GTK -DGUI_CONFIG=\"GTK\" \
-	$(AM_CPPFLAGS) $(GTK_CFLAGS)
-gtk_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
-#gtk_gnash_DEPENDENCIES = .configline
+include $(srcdir)/am-frag/gtk.am
+endif
 
-if BUILD_OGL_RENDERER
-gtk_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
-gtk_gnash_SOURCES += gtk_glue_gtkglext.cpp gtk_glue_gtkglext.h \
-		gtk.cpp gtksup.h gtk_glue.h
-gtk_gnash_LDADD = $(top_builddir)/backend/libgnashogl.la \
-		$(GNASH_LIBS) $(GTK_LIBS) $(OPENGL_LIBS)
-endif				# BUILD_OGL_RENDERER
-if BUILD_AGG_RENDERER
-gtk_gnash_CPPFLAGS += $(AGG_CFLAGS)
-gtk_gnash_SOURCES += gtk_glue_agg.cpp gtk_glue_agg.h \
-		gtk.cpp gtksup.h gtk_glue.h
-gtk_gnash_LDADD = $(top_builddir)/backend/libgnashagg.la \
-		$(GNASH_LIBS) $(GTK_LIBS) $(AGG_LIBS)
-endif				# BUILD_AGG_RENDERER
-if BUILD_CAIRO_RENDERER
-gtk_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
-gtk_gnash_SOURCES += gtk_glue_cairo.cpp gtk_glue_cairo.h \
-		gtk.cpp gtksup.h gtk_glue.h
-gtk_gnash_LDADD = $(top_builddir)/backend/libgnashcairo.la \
-		$(GNASH_LIBS) $(GTK_LIBS) $(CAIRO_LIBS)
-endif				# BUILD_CAIRO_RENDERER
-endif				# BUILD_GTK_GUI
-
+# if ALP				# Access Linux Platform
+# gtk_gnash_LDFLAGS += "-shared -Xlinker -z -Xlinker defs $(GTK2_LIBS)"
+# gtk_gnash_LDADD += $(ALP_LIBS)
+# endif
 #
+# Build the GTK/ALP gui
+if BUILD_ALP_GUI
+include $(srcdir)/am-frag/alp.am
+endif
+
 # Build the GTK/HILDON gui
-#
 if BUILD_HILDON_GUI
-bin_PROGRAMS += hildon-gnash
-hildon_gnash_SOURCES = $(GUI_SRCS) gui_gtk.cpp
-hildon_gnash_CPPFLAGS = -DGUI_GTK -DGUI_HILDON -DGUI_CONFIG=\"HILDON\" \
-	$(AM_CPPFLAGS) $(GTK_CFLAGS) $(HILDON_CFLAGS)
-hildon_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
-#gtk_gnash_DEPENDENCIES = .configline
+include $(srcdir)/am-frag/hildon.am
+endif
 
-if BUILD_OGL_RENDERER
-hildon_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
-hildon_gnash_SOURCES += gtk_glue_gtkglext.cpp gtk_glue_gtkglext.h \
-		gtk.cpp gtksup.h gtk_glue.h
-hildon_gnash_LDADD = $(top_builddir)/backend/libgnashogl.la \
-		$(GNASH_LIBS) $(GTK_LIBS) $(OPENGL_LIBS) $(HILDON_LIBS)
-endif				# BUILD_OGL_RENDERER
-if BUILD_AGG_RENDERER
-hildon_gnash_CPPFLAGS += $(AGG_CFLAGS) $(HILDON_CFLAGS)
-hildon_gnash_SOURCES += gtk_glue_agg.cpp gtk_glue_agg.h \
-		gtk.cpp gtksup.h gtk_glue.h
-hildon_gnash_LDADD = $(top_builddir)/backend/libgnashagg.la \
-		$(GNASH_LIBS) $(GTK_LIBS) $(AGG_LIBS) $(HILDON_LIBS)
-
-endif				# BUILD_AGG_RENDERER
-if BUILD_CAIRO_RENDERER
-hildon_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
-hildon_gnash_SOURCES += gtk_glue_cairo.cpp gtk_glue_cairo.h \
-		gtk.cpp gtksup.h gtk_glue.h
-hildon_gnash_LDADD = $(top_builddir)/backend/libgnashcairo.la \
-		$(GNASH_LIBS) $(GTK_LIBS) $(CAIRO_LIBS) $(HILDON_LIBS)
-endif				# BUILD_CAIRO_RENDERER
-endif				# BUILD_GTK_HILDON
-
-#
 # Build the FB gui
-#
 if BUILD_FB_GUI
-bin_PROGRAMS += fb-gnash
-fb_gnash_SOURCES = $(GUI_SRCS) gui_fb.cpp fb.cpp fbsup.h
-fb_gnash_CPPFLAGS = -DGUI_FB -DGUI_CONFIG=\"FB\" \
-	$(AM_CPPFLAGS) 
-fb_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
-#fb_gnash_DEPENDENCIES = .configline
+include $(srcdir)/am-frag/fb.am
+endif
 
-if BUILD_AGG_RENDERER
-fb_gnash_CPPFLAGS += $(AGG_CFLAGS)
-fb_gnash_SOURCES += 
-fb_gnash_LDADD = $(top_builddir)/backend/libgnashagg.la \
-		$(GNASH_LIBS) $(AGG_LIBS)
-endif				# BUILD_AGG_RENDERER
-endif				# BUILD_FB_GUI
-
-#
 # Build the RISCOS gui
-#
 if BUILD_RISCOS_GUI
-bin_PROGRAMS += riscos-gnash
-riscos_gnash_SOURCES = $(GUI_SRCS) gui_riscos.cpp riscos.cpp riscos_glue.h riscossup.h
-riscos_gnash_CPPFLAGS = -DGUI_FB -DGUI_CONFIG=\"FB\" \
-	$(AM_CPPFLAGS) 
-riscos_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
-#riscos_gnash_DEPENDENCIES = .configline
-
-if BUILD_AGG_RENDERER
-riscos_gnash_CPPFLAGS += $(AGG_CFLAGS)
-riscos_gnash_SOURCES += riscos_glue_agg.cpp  riscos_glue_agg.h   
-riscos_gnash_LDADD = $(top_builddir)/backend/libgnashagg.la \
-		$(GNASH_LIBS) $(AGG_LIBS)
-endif				# BUILD_AGG_RENDERER
-endif				# BUILD_FB_GUI
+include $(srcdir)/am-frag/riscos.am
+endif
 
 CLEANFILES = klash.moc .configline gnash
 

@@ -1,0 +1,29 @@
+#
+# Build the FLTK gui
+#
+if BUILD_FLTK_GUI
+bin_PROGRAMS += fltk-gnash
+fltk_gnash_CPPFLAGS = -DGUI_FLTK -DGUI_CONFIG=\"FLTK\" \
+	$(AM_CPPFLAGS) $(FLTK2_CFLAGS)
+fltk_gnash_SOURCES = $(GUI_SRCS) gui_fltk.cpp
+fltk_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
+#fltk_gnash_DEPENDENCIES = .configline
+fltk_gnash_LDADD = \
+	$(MYSQL_LIBS) \
+	$(GNASH_LIBS) \
+	$(AM_LDFLAGS)
+# if BUILD_OGL_RENDERER
+#	fltk_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
+# 	fltk_gnash_LDADD += $(top_builddir)/backend/libgnashogl.la
+#	$(SDL_LIBS) $(OPENGL_LIBS)
+# 	fltk_gnash_SOURCES += fltk_glue_ogl.cpp fltk_glue_ogl.h \
+# 	 	fltk.cpp fltksup.h 
+# endif
+if BUILD_AGG_RENDERER
+fltk_gnash_CPPFLAGS += $(AGG_CFLAGS)
+fltk_gnash_LDADD += $(top_builddir)/backend/libgnashagg.la \
+	$(FLTK2_LIBS) $(AGG_LIBS) $(XFT_LIBS) $(X11_LIBS)
+fltk_gnash_SOURCES += fltk_glue_agg.cpp fltk_glue_agg.h \
+	 	fltk.cpp fltksup.h 
+endif
+endif

@@ -1,0 +1,19 @@
+
+#
+# Build the RISCOS gui
+#
+if BUILD_RISCOS_GUI
+bin_PROGRAMS += riscos-gnash
+riscos_gnash_SOURCES = $(GUI_SRCS) gui_riscos.cpp riscos.cpp riscos_glue.h riscossup.h
+riscos_gnash_CPPFLAGS = -DGUI_FB -DGUI_CONFIG=\"FB\" \
+	$(AM_CPPFLAGS) 
+riscos_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
+#riscos_gnash_DEPENDENCIES = .configline
+
+if BUILD_AGG_RENDERER
+riscos_gnash_CPPFLAGS += $(AGG_CFLAGS)
+riscos_gnash_SOURCES += riscos_glue_agg.cpp  riscos_glue_agg.h   
+riscos_gnash_LDADD = $(top_builddir)/backend/libgnashagg.la \
+		$(GNASH_LIBS) $(AGG_LIBS)
+endif				# BUILD_AGG_RENDERER
+endif				# BUILD_FB_GUI
