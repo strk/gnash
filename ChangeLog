@@ -1,3 +1,15 @@
+2007-11-28  Rob Savoye  <rob@ute.welcomehome.org>
+
+	* macros/qt.m4: New file. originally pulled from kde.m4, but then
+	modified heavily to use QTDIR correctly, and to handle multiple
+	differing versions of QT APIs. For now the default is to use Qt3
+	instead of Qt4.
+	* macros/kde.m4: QT stuff moved to it;'s own file.
+	* macros/qtopia.m4: Change how the version and topdir get set
+	based on now correctly handling QPEDIR.
+	* configure.ac: Add Automake conditrional for cross compiling. Add
+	more Automake conditionals for the different QT versions.
+
 2007-11-28 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* backend/render_handler_ogl.cpp: boost::ref(this) -> *this.

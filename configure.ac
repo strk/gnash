@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.444 2007/11/28 08:26:17 strk Exp $
+dnl $Id: configure.ac,v 1.445 2007/11/28 22:28:52 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -696,6 +696,8 @@ else
   export pathlist=$PATH
 fi
 
+AM_CONDITIONAL(CROSS_COMPILING, [ test x$cross_compiling = xyes ])
+
 dnl Check for PKG_CONFIG before any GNASH_PATH call
 PKG_PROG_PKG_CONFIG
 
@@ -889,7 +891,7 @@ AC_CHECK_LIB(m, log2, AC_DEFINE(HAVE_LOG2, 1, [Has log2()]))
 AC_CHECK_LIB(m, trunc, AC_DEFINE(HAVE_TRUNC, 1, [Has trunc()]))
 
 dnl don't look for X11 when using a raw framebuffer for the GUI
-if test x$build_gtk = xyes -o x$build_kde = xyes -o x$build_fltk = xyes -o x$build_sdl = xyes; then
+if ! test x$build_fb = xyes; then
 dnl AC_PATH_XTRA
 dnl AC_CHECK_LIB(Xmu, XmuCvtStringToOrientation)
 dnl AC_CHECK_LIB(gmp, _gmp_get_memory_functions)
@@ -1128,6 +1130,10 @@ AM_CONDITIONAL(HAVE_QTOPIA, [test x$has_qtopia = xyes])
 AM_CONDITIONAL(HAVE_KDE, [test x$has_kde = xyes])
 AM_CONDITIONAL(HAVE_QT, [test x$has_qt = xyes])
 AM_CONDITIONAL(HAVE_QTOPIA, [test x$has_qtopia = xyes])
+
+AM_CONDITIONAL(HAVE_QT_2, [test $gnash_qt_version -eq 2])
+AM_CONDITIONAL(HAVE_QT_3, [test $gnash_qt_version -eq 3])
+AM_CONDITIONAL(HAVE_QT_4, [test $gnash_qt_version -eq 4])
 
 dnl Need GLIB for both GTK and GST
 if test x$build_gtk = xyes -o x${media_handler} = "xgst"; then
