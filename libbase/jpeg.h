@@ -16,6 +16,8 @@ struct jpeg_decompress_struct;
 struct jpeg_compress_struct;
 class tu_file;
 
+#include <setjmp.h> // for jmp_buf
+
 
 /// Wrapper for jpeg file operations. 
 //
@@ -31,7 +33,7 @@ namespace jpeg
 
 		input()
 			:
-			_errorOccurred(false)
+			_errorOccurred(0)
 		{}
 
 		virtual ~input() {}
@@ -89,10 +91,7 @@ namespace jpeg
 		virtual int	get_width() const = 0;
 		virtual void	read_scanline(unsigned char* rgb_data) = 0;
 
-		void    errorOccurred()
-		{
-			_errorOccurred = true;
-		}
+		void    errorOccurred(const char* msg);
 
 	protected:
 
@@ -100,7 +99,9 @@ namespace jpeg
 		/// invoked by jpeg lib. Will be later used to throw
 		/// a ParserException.
 		///
-		bool _errorOccurred;
+		const char* _errorOccurred;
+
+		jmp_buf _jmpBuf;
 	};
 
 

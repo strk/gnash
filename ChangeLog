@@ -1,3 +1,10 @@
+2007-11-29 Sandro Santilli <strk@keybit.net>
+
+	* libbase/jpeg.{cpp,h}: use setjmp/longjmp from custom error handler
+	  so to not return control to libjpeg which doesn't expect that
+	  and properly throw an exception on first error.
+	  Fixes bug #21609.
+
 2007-11-28  Rob Savoye  <rob@ute.welcomehome.org>
 
 	* gui/am-frag: Automake include files to make the top level

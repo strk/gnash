@@ -16,6 +16,8 @@
 #include <cstdio>
 
 extern "C" {
+
+// do we reall want to undefine HAVE_STDLIB_H here ??
 #undef HAVE_STDLIB_H
 #include <jpeglib.h>
 }
@@ -340,6 +342,13 @@ namespace tu_file_wrappers
 			m_cinfo.err = &m_jerr;
 			m_cinfo.client_data = this;
 
+			if ( setjmp(_jmpBuf) )
+			{
+				std::stringstream ss;
+				ss << "Internal jpeg error: " << _errorOccurred;
+				throw gnash::ParserException(ss.str());
+			}
+
 			// Initialize decompression object.
 			jpeg_create_decompress(&m_cinfo);
 
@@ -372,6 +381,13 @@ namespace tu_file_wrappers
 			m_cinfo.err = &m_jerr;
 			m_cinfo.client_data = this;
 
+			if ( setjmp(_jmpBuf) )
+			{
+				std::stringstream ss;
+				ss << "Internal jpeg error: " << _errorOccurred;
+				throw gnash::ParserException(ss.str());
+			}
+
 			// Initialize decompression object.
 			jpeg_create_decompress(&m_cinfo);
 
@@ -398,7 +414,9 @@ namespace tu_file_wrappers
 
 			if ( _errorOccurred )
 			{
-				throw gnash::ParserException("errors during JPEG header parsing");
+				std::stringstream ss;
+				ss << "Internal jpeg error: " << _errorOccurred;
+				throw gnash::ParserException(ss.str());
 			}
 
 			// Don't start reading any image data!
@@ -468,14 +486,18 @@ namespace tu_file_wrappers
 
 			if ( _errorOccurred )
 			{
-				throw gnash::ParserException("errors during JPEG header parsing");
+				std::stringstream ss;
+				ss << "Internal jpeg error during header parsing: " << _errorOccurred;
+				throw gnash::ParserException(ss.str());
 			}
 
 			jpeg_start_decompress(&m_cinfo);
 
 			if ( _errorOccurred )
 			{
-				throw gnash::ParserException("errors during JPEG decompression");
+				std::stringstream ss;
+				ss << "Internal jpeg error during decompression: " << _errorOccurred;
+				throw gnash::ParserException(ss.str());
 			}
 
 			m_compressor_opened = true;
@@ -611,16 +633,28 @@ static void	setup_jpeg_err(jpeg_error_mgr* jerr)
 
 static void	jpeg_error_exit(j_common_ptr cinfo)
 {
+#if 0 // will be printed by errorOccurred()
 	IF_VERBOSE_MALFORMED_SWF(
 	gnash::log_swferror(_("Internal jpeg error: %s"),
 		cinfo->err->jpeg_message_table[cinfo->err->msg_code]);
 	);
+#endif
 
 	// Set a flag to stop parsing 
 	input* in = static_cast<input*>(cinfo->client_data);
-	in->errorOccurred(); 
+
+	in->errorOccurred(cinfo->err->jpeg_message_table[cinfo->err->msg_code]); 
+
+	//log_error("failing to abort jpeg parser here (would need a long-jump call)");
 }
 
+void
+input::errorOccurred(const char* msg)
+{
+	gnash::log_debug("Long jump: banzaaaaaai!");
+	_errorOccurred = msg;
+	longjmp(_jmpBuf, 1);
+}
 
 
 /*static*/
