@@ -1,5 +1,9 @@
 2007-11-28 Sandro Santilli <strk@keybit.net>
 
+	* server/impl.cpp: stub support for png loading.
+
+2007-11-28 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/Stage.{cpp,h}: make Stage an AsBroadcaster and
 	  register its native methods; stage align and showMenu members.
 	* server/movie_root.cpp: update use of Stage to its AsBroadcaster

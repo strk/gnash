@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.126 2007/11/24 17:21:44 strk Exp $ */
+/* $Id: impl.cpp,v 1.127 2007/11/28 15:38:52 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -392,7 +392,7 @@ create_jpeg_movie(std::auto_ptr<tu_file> in, const std::string& url)
 
 	if ( ! im.get() )
 	{
-		log_error(_("Can't read jpeg"));
+		log_error(_("Can't read jpeg from %u"), url.c_str());
 		return NULL;
 	} 
 
@@ -400,13 +400,34 @@ create_jpeg_movie(std::auto_ptr<tu_file> in, const std::string& url)
 	//log_msg(_("BitmapMovieDefinition %p created"), mdef);
 	return mdef;
 
+}
 
-	// FIXME: create a movie_definition from a jpeg
-	//bitmap_character*	 ch = new bitmap_character(bi);
+// Create a movie_definition from a png stream
+// NOTE: this method assumes this *is* a png stream
+static movie_definition*
+create_png_movie(std::auto_ptr<tu_file> in, const std::string& url)
+{
+	log_unimpl(_("Loading of png"));
+	return NULL;
+
+#if 0
+	std::auto_ptr<image::rgb> im ( image::read_png(in.get()) );
+
+	if ( ! im.get() )
+	{
+		log_error(_("Can't read png from %s"), url.c_str());
+		return NULL;
+	} 
+
+	BitmapMovieDefinition* mdef = new BitmapMovieDefinition(im, url);
+	//log_msg(_("BitmapMovieDefinition %p created"), mdef);
+	return mdef;
+#endif
+
 }
 
 // Get type of file looking at first bytes
-// return "jpeg", "swf" or "unknown"
+// return "jpeg", "png", "swf" or "unknown"
 //
 static std::string
 get_file_type(tu_file* in)
@@ -418,6 +439,7 @@ get_file_type(tu_file* in)
 	if ( 3 < in->read_bytes(buf, 3) )
 	{
 		log_error(_("Can't read file header"));
+		in->set_position(0);
 		return "unknown";
 	}
 	
@@ -426,6 +448,13 @@ get_file_type(tu_file* in)
 	{
 		in->set_position(0);
 		return "jpeg";
+	}
+
+	// This is the magic number for any JPEG format file
+	if ((buf[0] == 137) && (buf[1] == 'P') && (buf[2] == 'N')) // buf[3] == 'G' (we didn't read so far)
+	{
+		in->set_position(0);
+		return "png";
 	}
 
 	// This is for SWF (FWS or CWS)
@@ -440,15 +469,24 @@ get_file_type(tu_file* in)
 	// Check if it is an swf embedded in a player (.exe-file)
 	if ((buf[0] == 'M') && (buf[1] == 'Z')) {
 
-		if ( 3 < in->read_bytes(buf, 3) ) return "unknown";
+		if ( 3 < in->read_bytes(buf, 3) )
+		{
+			in->set_position(0);
+			return "unknown";
+		}
 
-		while (buf[0]!='F' && buf[0]!='C' || buf[1]!='W' || buf[2]!='S') {
+		while (buf[0]!='F' && buf[0]!='C' || buf[1]!='W' || buf[2]!='S')
+		{
 			buf[0] = buf[1];
 			buf[1] = buf[2];
 			buf[2] = in->read_byte();
-			if (in->get_eof()) return "unknown";
+			if (in->get_eof())
+			{
+				in->set_position(0);
+				return "unknown";
+			}
 		}
-		in->set_position(in->get_position()-3);
+		in->set_position(in->get_position()-3); // position to start of the swf itself
 		return "swf";
 	}
 	return "unknown";
@@ -497,6 +535,14 @@ create_movie(std::auto_ptr<tu_file> in, const std::string& url, bool startLoader
 			log_unimpl(_("Requested to keep from completely loading a movie, but the movie in question is a jpeg, for which we don't yet have the concept of a 'loading thread'"));
 		}
 		return create_jpeg_movie(in, url);
+	}
+	else if ( type == "png" )
+	{
+		if ( startLoaderThread == false )
+		{
+			log_unimpl(_("Requested to keep from completely loading a movie, but the movie in question is a png, for which we don't yet have the concept of a 'loading thread'"));
+		}
+		return create_png_movie(in, url);
 	}
 	else if ( type == "swf" )
 	{
