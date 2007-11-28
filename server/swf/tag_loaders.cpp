@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.156 2007/11/28 16:16:30 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.157 2007/11/28 17:35:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -341,7 +341,7 @@ void inflate_wrapper(stream& in, void* buffer, int buffer_bytes)
     int err = inflateInit(&d_stream);
     if (err != Z_OK) {
 	IF_VERBOSE_MALFORMED_SWF(
-	log_swferror(_("inflate_wrapper() inflateInit() returned %d"), err);
+	log_swferror(_("inflate_wrapper() inflateInit() returned %d (%s)"), err, d_stream.msg);
 	);
 	return;
     }
@@ -356,7 +356,18 @@ void inflate_wrapper(stream& in, void* buffer, int buffer_bytes)
 	unsigned int chunkSize = CHUNKSIZE;
 	assert(in.get_position() <= endTagPos);
         unsigned int availableBytes =  endTagPos - in.get_position();
-	if ( availableBytes < chunkSize ) chunkSize = availableBytes;
+	if ( availableBytes < chunkSize )
+	{
+		if ( ! availableBytes )
+		{
+			// nothing more to read
+			IF_VERBOSE_MALFORMED_SWF(
+			log_swferror(_("inflate_wrapper(): no end of zstream found within swf tag boundaries"));
+			);
+			break;
+		}
+		chunkSize = availableBytes;
+	}
 	
 	// Fill the buffer
 	assert(sizeof(char) == sizeof(uint8_t));
@@ -365,11 +376,16 @@ void inflate_wrapper(stream& in, void* buffer, int buffer_bytes)
 	d_stream.avail_in = chunkSize;
 
 	err = inflate(&d_stream, Z_SYNC_FLUSH);
-	if (err == Z_STREAM_END) break;
+	if (err == Z_STREAM_END)
+	{
+		// correct end
+		break;
+	}
+
 	if (err != Z_OK)
 	{
 	    IF_VERBOSE_MALFORMED_SWF(
-	    log_swferror(_("inflate_wrapper() inflate() returned %d"), err);
+	    log_swferror(_("inflate_wrapper() inflate() returned %d (%s)"), err, d_stream.msg);
 	    );
 	    break;
 	}
@@ -378,7 +394,7 @@ void inflate_wrapper(stream& in, void* buffer, int buffer_bytes)
     err = inflateEnd(&d_stream);
     if (err != Z_OK)
     {
-	    log_error(_("inflate_wrapper() inflateEnd() return %d"), err);
+	    log_error(_("inflate_wrapper() inflateEnd() return %d (%s)"), err, d_stream.msg);
     }
 }
 #endif // HAVE_ZLIB_H
