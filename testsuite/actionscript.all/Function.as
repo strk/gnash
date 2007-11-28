@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.58 2007/10/06 06:28:29 strk Exp $";
+rcsid="$Id: Function.as,v 1.59 2007/11/28 12:23:47 strk Exp $";
 
 #include "check.as"
 
@@ -446,14 +446,14 @@ check_equals(factorial(4), 24);
 
 #if OUTPUT_VERSION >= 6
 
-Function.prototype.new = function()
+Function.prototype['new'] = function()
 {
 	return new this;
 };
 
 function Foo() {};
 
-var fooInstance = Foo.new();
+var fooInstance = Foo['new']();
 check_equals(typeof(fooInstance), 'object');
 check(fooInstance instanceOf Foo);
 
