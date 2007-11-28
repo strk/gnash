@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.443 2007/11/28 03:34:26 rsavoye Exp $
+dnl $Id: configure.ac,v 1.444 2007/11/28 08:26:17 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1118,7 +1118,7 @@ dnl # Check KDE if kde gui or kparts were requested
 if test x$build_kde = xyes -o x$kparts = xyes; then
   GNASH_PATH_KDE
 fi
-if test x$build_qt = xyes -o x$build_qtopia = xyes; then
+if test x$build_qt = xyes -o x$build_qtopia = xyes -o x$build_kde = xyes; then
   GNASH_PATH_QT
   if test x$build_qtopia = xyes; then
     GNASH_PATH_QTOPIA
@@ -1779,7 +1779,7 @@ if test x$build_kde = xyes -o x$kparts = xyes; then
   fi
 fi
 
-if test x"$has_qt" = xyes; then
+if test x"$build_qtopia" = xyes; then
   if test x"${QTOPIA_LIBS}" != x ; then
     if test x"${QTOPIA_CFLAGS}" != x ; then
       echo "        QTOPIA flags are: $QTOPIA_CFLAGS"
