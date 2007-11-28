@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.155 2007/11/27 23:36:13 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.156 2007/11/28 16:16:30 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -346,14 +346,23 @@ void inflate_wrapper(stream& in, void* buffer, int buffer_bytes)
 	return;
     }
 
-    uint8_t buf[1];
+#define CHUNKSIZE 256
 
-    for (;;) {
-	// Fill a one-byte (!) buffer.
-	// TODO: sub-optimal, read_u8 also calls align needlessly
-	buf[0] = in.read_u8();
+    uint8_t buf[CHUNKSIZE];
+    unsigned long endTagPos = in.get_tag_end_position();
+
+    for (;;)
+    {
+	unsigned int chunkSize = CHUNKSIZE;
+	assert(in.get_position() <= endTagPos);
+        unsigned int availableBytes =  endTagPos - in.get_position();
+	if ( availableBytes < chunkSize ) chunkSize = availableBytes;
+	
+	// Fill the buffer
+	assert(sizeof(char) == sizeof(uint8_t));
+	in.read((char*)buf, chunkSize);
 	d_stream.next_in = &buf[0];
-	d_stream.avail_in = 1;
+	d_stream.avail_in = chunkSize;
 
 	err = inflate(&d_stream, Z_SYNC_FLUSH);
 	if (err == Z_STREAM_END) break;

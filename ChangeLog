@@ -1,5 +1,8 @@
 2007-11-28 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp (inflate_wrapper): don't read past
+	  end of tag, reads in chunks rather then byte-by-byte.
+	  Fixes bug #21377.
 	* server/impl.cpp: stub support for png loading.
 
 2007-11-28 Sandro Santilli <strk@keybit.net>
