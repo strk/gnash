@@ -287,8 +287,7 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
 	{
 		//log_msg("Rescaling disabled");
 		boost::intrusive_ptr<Stage> stage = getStageObject();
-		// how do I get the environment from ??
-		if ( stage ) stage->onResize(NULL);
+		if ( stage ) stage->onResize();
 	}
 
 	assert(testInvariant());

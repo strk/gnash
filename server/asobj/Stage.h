@@ -54,16 +54,8 @@ public:
 	// override from as_object ?
 	//double get_numeric_value() const { return 0; }
 	
-	void addListener(boost::intrusive_ptr<as_object> obj);
-
-	void removeListener(boost::intrusive_ptr<as_object> obj);
-
 	/// Recive a resize event.
-	//
-	/// @param env
-	///	Environment to use for notifying listeners
-	///
-	void onResize(as_environment* env);
+	void onResize();
 
 	/// Get current stage width, in pixels
 	unsigned getWidth() const;
@@ -86,29 +78,10 @@ public:
 	///
 	const char* getScaleModeString();
 
-protected:
-
-#ifdef GNASH_USE_GC
-	/// Mark all Stage listeners as reachable
-	void markReachableResources() const;
-#endif 
-
 private:
 
 	/// Notify all listeners about a resize event
-	//
-	/// @param env
-	///	Environment to use for notifying listeners
-	///
-	void notifyResize(as_environment* env);
-
-
-	/// Notify an object about an resize event
-	void notifyResize(boost::intrusive_ptr<as_object> obj, as_environment* env);
-
-	typedef std::list<boost::intrusive_ptr<as_object> > ListenersList;
-
-	ListenersList _listeners;
+	void notifyResize();
 
 	ScaleMode _scaleMode;
 };

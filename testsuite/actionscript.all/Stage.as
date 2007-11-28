@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Stage.as,v 1.16 2007/09/29 16:22:58 strk Exp $";
+rcsid="$Id: Stage.as,v 1.17 2007/11/28 12:47:04 strk Exp $";
 
 #include "check.as"
 
@@ -37,11 +37,11 @@ check_equals(Stage.__proto__, Object.prototype);
 // See http://www.senocular.com/flash/tutorials/listenersasbroadcaster/?page=2
 check_equals (typeof(Stage.addListener), 'function');
 check_equals (typeof(Stage.removeListener), 'function');
-xcheck_equals(typeof(Stage.broadcastMessage), 'function');
+check_equals(typeof(Stage.broadcastMessage), 'function');
 
-xcheck(Stage.hasOwnProperty("_listeners"));
-xcheck_equals(typeof(Stage._listeners), 'object');
-xcheck(Stage._listeners instanceof Array);
+check(Stage.hasOwnProperty("_listeners"));
+check_equals(typeof(Stage._listeners), 'object');
+check(Stage._listeners instanceof Array);
 
 listener = new Object;
 listener.onResize = function() {

@@ -33,8 +33,6 @@
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "namedStrings.h"
 
-#include <boost/algorithm/string/case_conv.hpp>
-
 namespace gnash {
 
 /************************************************************************
@@ -52,7 +50,7 @@ key_as_object::key_as_object()
 	memset(m_unreleased_keys, 0, sizeof(m_unreleased_keys));
 
 	// Key is a broadcaster only in SWF6 and up (correct?)
-	int swfversion = VM::get().getSWFVersion();
+	int swfversion = _vm.getSWFVersion();
 	if ( swfversion > 5 )
 	{
 		AsBroadcaster::initialize(*this);
@@ -124,12 +122,7 @@ key_as_object::notify_listeners(const event_id& key_event)
 	// There is no user defined "onKeyPress" event handler
 	if( (key_event.m_id != event_id::KEY_DOWN) && (key_event.m_id != event_id::KEY_UP) ) return;
 
-	std::string handler_name = PROPNAME(key_event.get_function_name());
-
-	as_value ev(handler_name);
-
-	/// no environment to start with...
-	as_environment env;
+	as_value ev(key_event.get_function_name());
 
 	log_debug("notify_listeners calling broadcastMessage with arg %s", ev.to_debug_string().c_str());
 	callMethod(NSV::PROP_BROADCAST_MESSAGE, ev);

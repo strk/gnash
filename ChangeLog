@@ -1,5 +1,16 @@
 2007-11-28 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Stage.{cpp,h}: make Stage an AsBroadcaster and
+	  register its native methods; stage align and showMenu members.
+	* server/movie_root.cpp: update use of Stage to its AsBroadcaster
+	  interface.
+	* server/asobj/Key.cpp: minor cleanups.
+	* server/asobj/MovieClipLoader.cpp: cleanups and native methods
+	  registration.
+	* testsuite/actionscript.all/Stage.as: few more successes.
+
+2007-11-28 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Function.as: 'new' is a reserved word, 
 	  protect it as a string when used as property name (or Ming
 	  0.4.0.beta6 won't compile it)

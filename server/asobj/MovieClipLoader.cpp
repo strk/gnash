@@ -50,8 +50,6 @@ static as_value moviecliploader_loadclip(const fn_call& fn);
 static as_value moviecliploader_unloadclip(const fn_call& fn);
 static as_value moviecliploader_getprogress(const fn_call& fn);
 static as_value moviecliploader_new(const fn_call& fn);
-static as_value moviecliploader_addlistener(const fn_call& fn);
-static as_value moviecliploader_removelistener(const fn_call& fn);
 
 static void
 attachMovieClipLoaderInterface(as_object& o)
@@ -59,11 +57,6 @@ attachMovieClipLoaderInterface(as_object& o)
   	o.init_member("loadClip", new builtin_function(moviecliploader_loadclip));
 	o.init_member("unloadClip", new builtin_function(moviecliploader_unloadclip));
 	o.init_member("getProgress", new builtin_function(moviecliploader_getprogress));
-
-#if 0 // done by AsBroadcaster
-	o.init_member("addListener", new builtin_function(moviecliploader_addlistener));
-	o.init_member("removeListener", new builtin_function(moviecliploader_removelistener));
-#endif
 
 #if 0
 	// Load the default event handlers. These should really never
@@ -124,19 +117,8 @@ public:
 	/// @ {
 	///
 
-#if 0
-	/// Add an object to the list of event listeners
-	//
-	/// This function will call add_ref() on the
-	/// given object.
-	///
-	void addListener(boost::intrusive_ptr<as_object> listener);
-
-	void removeListener(boost::intrusive_ptr<as_object> listener);
-#endif
-
 	/// Invoke any listener for the specified event
-	void dispatchEvent(const std::string& eventName, as_environment& env, const as_value& arg);
+	void dispatchEvent(const std::string& eventName, const as_value& arg);
 
 	/// @ }
 
@@ -208,8 +190,7 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	// Call the callback since we've started loading the file
 	// TODO: probably we should move this below, after 
 	//       the loading thread actually started
-	as_environment env;
-	dispatchEvent("onLoadStart", env, as_value(&target));
+	dispatchEvent("onLoadStart", as_value(&target));
 
 	bool ret = target.loadMovie(url);
 	if ( ! ret ) 
@@ -230,7 +211,7 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	///       this function though...
 	///
 	//dispatchEvent("onLoadInit", events_call);
-	dispatchEvent("onLoadInit", env, as_value(&target));
+	dispatchEvent("onLoadInit", as_value(&target));
 
 	struct mcl *mcl_data = getProgress(&target);
 
@@ -245,7 +226,7 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 
 	log_unimpl (_("FIXME: MovieClipLoader calling onLoadComplete *before* movie has actually been fully loaded (cheating)"));
 	//dispatchEvent("onLoadComplete", events_call);
-	dispatchEvent("onLoadComplete", env, as_value(&target));
+	dispatchEvent("onLoadComplete", as_value(&target));
 
 	return true;
 }
@@ -258,7 +239,7 @@ MovieClipLoader::unloadClip(void *)
 
 // Callbacks
 void
-MovieClipLoader::dispatchEvent(const std::string& event, as_environment& env, const as_value& arg)
+MovieClipLoader::dispatchEvent(const std::string& event, const as_value& arg)
 {
 	as_value ev(event);
 
