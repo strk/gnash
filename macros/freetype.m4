@@ -83,7 +83,7 @@ dnl   fi
   dnl Look for the library
   if test x$cross_compiling = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_freetype_lib}" = x; then
-      $PKG_CONFIG --exists freetype2 && ac_cv_path_freetype_lib=`$PKG_CONFIG --libs-only-l freetype2`
+      $PKG_CONFIG --exists freetype2 && ac_cv_path_freetype_lib=`$PKG_CONFIG --libs freetype2`
     fi
   fi
 

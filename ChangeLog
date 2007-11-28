@@ -26,6 +26,8 @@
 2007-11-28 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* backend/render_handler_ogl.cpp: boost::ref(this) -> *this.
+	* macros/freetype.m4: --libs-only-l is bogus if you have it
+	  installed by default and pkg-config is unaware of it.
 
 2007-11-28 Sandro Santilli <strk@keybit.net>
 
