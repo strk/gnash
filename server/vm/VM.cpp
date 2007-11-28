@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: VM.cpp,v 1.23 2007/10/24 21:32:00 strk Exp $ */
+/* $Id: VM.cpp,v 1.24 2007/11/28 21:18:43 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -80,7 +80,9 @@ VM::VM(movie_definition& topmovie)
 	:
 	_root_movie(new movie_root()),
 	_swfversion(topmovie.get_version()),
-	_start_time(tu_timer::get_ticks())
+	_start_time(tu_timer::get_ticks()),
+	mClassHierarchy(0),
+	mMachine(0)
 {
 }
 
