@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.442 2007/11/22 17:34:45 rsavoye Exp $
+dnl $Id: configure.ac,v 1.443 2007/11/28 03:34:26 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -250,6 +250,7 @@ build_riscos=no
 build_aqua=no
 build_hildon=no
 build_alp=no
+build_qtopia=no
 AC_ARG_ENABLE(gui,
   AC_HELP_STRING([--enable-gui=], [Use the specified GUI toolkit (default=gtk,kde)]),
   if test -n ${enableval}; then
@@ -262,20 +263,24 @@ AC_ARG_ENABLE(gui,
         build_hildon=yes
         AC_DEFINE(USE_HILDON, [1], [Use the Hildon mobile framework])
         build_gtk=yes
-        AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
+dnl        AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
         ;;
       alp|ALP|alp|ALP)
         build_alp=yes
-        AC_DEFINE(USE_ALP, [1], [Use the ALP framework])
+dnl        AC_DEFINE(USE_ALP, [1], [Use the ALP framework])
         build_gtk=yes
-        AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
+dnl         AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
         ;;
       gtk|GTK|gtk2|GTK2)
-        AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
+dnl        AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
         build_gtk=yes
         ;;
       kde|KDE)
         build_kde=yes
+        ;;
+      qtopia|QTOPIA)
+        build_qtopia=yes
+        build_qt=yes
         ;;
       qt|QT)
         build_qt=yes
@@ -301,11 +306,12 @@ AC_ARG_ENABLE(gui,
         build_kde=yes
         build_gtk=yes
         build_sdl=yes
+dnl        build_qtopia=yes
 dnl        build_hildon=yes
 dnl        build_alp=yes
 dnl        build_riscos=yes
         ;;
-      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde|fltk|sdl|riscos|aqua|fb|hildon|alp)])
+      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde|fltk|sdl|riscos|aqua|fb|hildon|alp|qtopia)])
          ;;
       esac]
     enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
@@ -1111,10 +1117,17 @@ AC_CHECK_SIZEOF(short)
 dnl # Check KDE if kde gui or kparts were requested
 if test x$build_kde = xyes -o x$kparts = xyes; then
   GNASH_PATH_KDE
-  GNASH_PATH_QT
 fi
+if test x$build_qt = xyes -o x$build_qtopia = xyes; then
+  GNASH_PATH_QT
+  if test x$build_qtopia = xyes; then
+    GNASH_PATH_QTOPIA
+  fi
+fi
+AM_CONDITIONAL(HAVE_QTOPIA, [test x$has_qtopia = xyes])
 AM_CONDITIONAL(HAVE_KDE, [test x$has_kde = xyes])
 AM_CONDITIONAL(HAVE_QT, [test x$has_qt = xyes])
+AM_CONDITIONAL(HAVE_QTOPIA, [test x$has_qtopia = xyes])
 
 dnl Need GLIB for both GTK and GST
 if test x$build_gtk = xyes -o x${media_handler} = "xgst"; then
@@ -1139,11 +1152,12 @@ if test x$build_kde = xno -a x$kparts = xyes; then
   AC_MSG_WARN(["Enabled KPARTS plugin, but you aren't building a KDE based GUI!"])
 fi
 
+AM_CONDITIONAL(BUILD_QTOPIA_GUI, [ test x$build_qtopia = xyes ])
 AM_CONDITIONAL(BUILD_ALP_GUI, [ test x$build_alp = xyes ])
+AM_CONDITIONAL(BUILD_QT_GUI, [ test x$build_qt = xyes ])
 AM_CONDITIONAL(BUILD_HILDON_GUI, [ test x$build_hildon = xyes ])
 AM_CONDITIONAL(BUILD_GTK_GUI, [ test x$build_gtk = xyes ])
 AM_CONDITIONAL(BUILD_KDE_GUI, [ test x$build_kde = xyes ])
-dnl AM_CONDITIONAL(BUILD_QT_GUI, [ test x$build_qt = xyes ])
 AM_CONDITIONAL(BUILD_FLTK_GUI, [ test x$build_fltk = xyes ])
 AM_CONDITIONAL(BUILD_SDL_GUI, [ test x$build_sdl = xyes ])
 AM_CONDITIONAL(BUILD_FB_GUI, [ test x$build_fb = xyes ])
@@ -1503,6 +1517,15 @@ AC_SUBST(RENDERER_LIBS)
 AC_SUBST(RENDERER_CONFIG)
 
 SUPPORTED_GUIS=
+if test x$build_qtopia = xyes; then
+  SUPPORTED_GUIS="${SUPPORTED_GUIS},qtopia"
+fi
+if test x$build_hildon = xyes; then
+  SUPPORTED_GUIS="${SUPPORTED_GUIS},hildon"
+fi
+if test x$build_alp = xyes; then
+  SUPPORTED_GUIS="${SUPPORTED_GUIS},alp"
+fi
 if test x$build_fb = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},fb"
 fi
@@ -1753,6 +1776,22 @@ if test x$build_kde = xyes -o x$kparts = xyes; then
       fi
       nogo=true
     fi
+  fi
+fi
+
+if test x"$has_qt" = xyes; then
+  if test x"${QTOPIA_LIBS}" != x ; then
+    if test x"${QTOPIA_CFLAGS}" != x ; then
+      echo "        QTOPIA flags are: $QTOPIA_CFLAGS"
+    else
+      echo "        QTOPIA flags are: default include path"
+    fi
+    echo "        QTOPIA libs are: $QTOPIA_LIBS"
+  else
+    echo "        ERROR: No QTOPIA library development package installed!"
+    echo "               Install it from http://trolltech.com/downloads/"
+    echo "               binary packages are not available."
+    nogo=true
   fi
 fi
 
@@ -2317,7 +2356,7 @@ if test x$ext_mysql = xyes; then
     else
       echo "        ERROR: No MySQL development package is installed."
       echo "               Either reconfigure without --with-extensions=mysql"
-      echo "               or install MySQL header files from http://www.mysql.org"
+     echo "               or install MySQL header files from http://www.mysql.org"
       echo "               or .deb users: apt-get install libmysqlclient-dev"
     fi
   fi

@@ -1,3 +1,13 @@
+2007-11-27  Rob Savoye  <rob@ute.welcomehome.org>
+
+	* macros/qtopia.m4: New file to find Qtopia bits. Current supports
+	only QT2 and Qt4.
+	* Makefile.am: Add Qtopia debug statements.
+	* configure.ac: Add Qtopia as a GUI. Look for Qtopia dev files if
+	specified. Currently because of the diversity of Qtopia
+	installation paths, --with-qtopia-incl and --with-qtopia-lib must
+	always be used.
+
 2007-11-27 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/tag_loaders.cpp (serialnumber_loader): fix parsing

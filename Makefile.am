@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.93 2007/11/22 16:19:56 rsavoye Exp $
+# $Id: Makefile.am,v 1.94 2007/11/28 03:34:26 rsavoye Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -121,13 +121,17 @@ endif
 	@echo "GUI Toolkit decoding support..."	
 	@echo "	SDL_CFLAGS is $(SDL_CFLAGS)"
 	@echo "	SDL_LIBS is $(SDL_LIBS)"
-if HAVE_KDE
+if BUILD_KDE_GUI
 	@echo "	KDE_CFLAGS is $(KDE_CFLAGS)"
 	@echo "	KDE_LIBS is $(KDE_LIBS)"
 endif
-if HAVE_QT
+if BUILD_QT_GUI
 	@echo "	QT_CFLAGS is $(QT_CFLAGS)"
 	@echo "	QT_LIBS is $(QT_LIBS)"
+endif
+if BUILD_QTOPIA_GUI
+	@echo "	QTOPIA_CFLAGS is $(QTOPIA_CFLAGS)"
+	@echo "	QTOPIA_LIBS is $(QTOPIA_LIBS)"
 endif
 if BUILD_FLTK_GUI
 	@echo "	FLTK2_CFLAGS is $(FLTK2_CFLAGS)"
@@ -221,6 +225,10 @@ if BUILD_AGG_RENDERER
 	@echo "	AGG_CFLAGS is $(AGG_CFLAGS)"
 	@echo "	AGG_LIBS is $(AGG_LIBS)"
 endif
+if BUILD_ALP_GUI
+        @echo " ALP_CFLAGS is $(ALP_CFLAGS)"
+        @echo " ALP_LIBS is $(ALP_LIBS)"
+endif
 	@echo ""
 	@echo "A blank value for CFLAGS means the header is installed in the"
 	@echo "default system header location. All the LIBS should have a"
@@ -242,6 +250,9 @@ if BUILD_ALP_GUI
 endif
 if BUILD_KDE_GUI
 	@echo "	Supported GUI: KDE"
+endif
+if BUILD_QTOPIA_GUI
+	@echo "	Supported GUI: QTOPIA"
 endif
 if BUILD_SDL_GUI
 	@echo "	Supported GUI: SDL"
