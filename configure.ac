@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.450 2007/11/29 05:21:06 rsavoye Exp $
+dnl $Id: configure.ac,v 1.451 2007/11/29 07:41:02 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -890,15 +890,16 @@ AC_CHECK_LIB(m, exp2, AC_DEFINE(HAVE_EXP2, 1, [Has exp2()]))
 AC_CHECK_LIB(m, log2, AC_DEFINE(HAVE_LOG2, 1, [Has log2()]))
 AC_CHECK_LIB(m, trunc, AC_DEFINE(HAVE_TRUNC, 1, [Has trunc()]))
 
-dnl don't look for X11 when using a raw framebuffer for the GUI
-if ! test x$build_fb = xyes; then
+dnl X11 is needed for fltk (at least),
+dnl and probably for many other guis too ...
+dnl if ! test x$build_fb = xyes; then # <--- this is wrong as build_x is non-exclusive
 dnl AC_PATH_XTRA
 dnl AC_CHECK_LIB(Xmu, XmuCvtStringToOrientation)
 dnl AC_CHECK_LIB(gmp, _gmp_get_memory_functions)
   GNASH_PATH_X11
   AC_CHECK_LIB(Xi, XInput_find_display)
   AC_CHECK_LIB(X11, XDisableAccessControl)
-fi
+dnl fi
 AM_CONDITIONAL(HAVE_X11, [test x$x11 = xyes])
 
 AC_CHECK_LIB(rt, shm_unlink)
