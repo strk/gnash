@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: qtopia.m4,v 1.2 2007/11/28 22:28:53 rsavoye Exp $
+dnl $Id: qtopia.m4,v 1.3 2007/11/29 00:02:22 nihilus Exp $
 
 dnl ~{rob@ute} pts/8> QtCore  QtSvg Qtnetwork QtXml 
 dnl QtCore: Command not found.
@@ -52,10 +52,10 @@ AC_DEFUN([GNASH_PATH_QTOPIA],
   ])
 
   
-  if test x$QPEDIR != x; then
+  if test x"${QPEDIR}" != x; then
     gnash_qtopia_topdir=$QPEDIR
   else
-    if test x $gnash_qtopia_topdir = x; then
+    if test x"${gnash_qtopia_topdir}" = x; then
       AC_MSG_ERROR([QPEDIR must be set in your shell environment or use --with-qtopia=])
     fi
   fi
