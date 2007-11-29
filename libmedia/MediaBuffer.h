@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaBuffer.h,v 1.4 2007/11/24 17:21:42 strk Exp $
+// $Id: MediaBuffer.h,v 1.5 2007/11/29 20:45:01 bwy Exp $
 
 #ifndef __MEDIABUFFER_H__
 #define __MEDIABUFFER_H__
@@ -34,7 +34,7 @@ class raw_mediadata_t
 {
 public:
 	raw_mediadata_t():
-	m_stream_index(-1),
+	//m_stream_index(-1),
 	m_size(0),
 	m_data(NULL),
 	m_ptr(NULL),

@@ -74,11 +74,13 @@ libgnashmedia_la_LIBADD = \
 	$(NULL)
 
 libgnashmedia_la_SOURCES = \
+	FLVParser.cpp \
 	AudioDecoderNellymoser.cpp \
 	AudioDecoderSimple.cpp \
 	$(NULL)
 
 noinst_HEADERS = \
+	FLVParser.h \
 	MediaBuffer.h \
 	MediaDecoder.h \
 	AudioDecoder.h \
@@ -101,10 +103,9 @@ libgnashmedia_la_LIBADD += $(GSTREAMER_LIBS) -lgstbase-0.10
 endif
 
 if USE_FFMPEG_ENGINE
-#libgnashmedia_la_SOURCES += sdl/MediaDecoderSdl.cpp sdl/AudioDecoderFfmpeg.cpp sdl/VideoDecoderFfmpeg.cpp sdl/MediaParserFfmpeg.cpp sdl/sound_handler_sdl.cpp
-libgnashmedia_la_SOURCES += sdl/VideoDecoderFfmpeg.cpp sdl/AudioDecoderFfmpeg.cpp sdl/sound_handler_sdl.cpp
+libgnashmedia_la_SOURCES += sdl/MediaDecoderSdl.cpp sdl/AudioDecoderFfmpeg.cpp sdl/VideoDecoderFfmpeg.cpp sdl/MediaParserFfmpeg.cpp sdl/sound_handler_sdl.cpp
 #noinst_HEADERS += sdl/MediaDecoderSdl.h sdl/AudioDecoderFfmpeg.h sdl/VideoDecoderFfmpeg.h sdl/MediaParserFfmpeg.h sdl/sound_handler_sdl.h
-noinst_HEADERS += sdl/AudioDecoderFfmpeg.h sdl/VideoDecoderFfmpeg.h sdl/sound_handler_sdl.h
+noinst_HEADERS += sdl/AudioDecoderFfmpeg.h sdl/VideoDecoderFfmpeg.h sdl/sound_handler_sdl.h sdl/MediaDecoderSdl.h sdl/MediaParserFfmpeg.h
 libgnashmedia_la_LIBADD += $(FFMPEG_LIBS)
 libgnashmedia_la_CPPFLAGS += $(FFMPEG_CFLAGS)
 endif
