@@ -19,16 +19,21 @@
 AUTOMAKE_OPTIONS = dejagnu
 
 # These will get executed and parsed for test output
-ASTESTS = \
+SANE_ASTESTS = \
 	hello.as \
 	inheritance.as \
 	function_test.as \
 	enum.as \
 	exception.as \
 	levels.as \
-	super_test1.as \
 	implementsOpTest.as \
 	$(NULL)
+# These ones are the ones for which consistency check fail 
+BOGUS_ASTESTS = \
+	super_test1.as \
+	$(NULL)
+
+ASTESTS = $(SANE_ASTESTS) $(BOGUS_ASTESTS)
 
 
 # These will get compiled to SWFs just as above, but will not be executed as a test
@@ -45,19 +50,30 @@ if ENABLE_MTASC
 MTASC_FLAGS = -version 6 -cp $(MTASC_CLASSPATH) -cp $(srcdir) -v -header 800:600:20
 MTASC_CPP = $(CPP) -x c -P -I$(srcdir)
 
-ASTESTS_OUT = $(ASTESTS:.as=.swf)
+SANE_ASTESTS_OUT = $(SANE_ASTESTS:.as=.swf)
+BOGUS_ASTESTS_OUT = $(BOGUS_ASTESTS:.as=.swf)
+ASTESTS_OUT = $(SANE_ASTESTS_OUT) $(BOGUS_ASTESTS_OUT)
 
 AUXMOVIES_OUT = $(AUXMOVIES:.as=.swf)
 
+$(ASTESTS_OUT) $(AUXMOVIES_OUT): Dejagnu.as check.as
+
+
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
-	alltests-runner
+	sanetests-runner \
+	bogustests-runner \
+	$(NULL)
 
-alltests-runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_OUT) $(AUXMOVIES_OUT)
-	sh $< -r 50 $(top_builddir) $(ASTESTS_OUT) > $@
+sanetests-runner: $(srcdir)/../generic-testrunner.sh $(SANE_ASTESTS_OUT) $(AUXMOVIES_OUT) Makefile
+	sh $< -c __END_OF_TEST__ -r 50 $(top_builddir) $(SANE_ASTESTS_OUT) > $@
 	chmod 755 $@
 
-.as.swf:
+bogustests-runner: $(srcdir)/../generic-testrunner.sh $(BOGUS_ASTESTS_OUT) $(AUXMOVIES_OUT) Makefile
+	sh $< -C __END_OF_TEST__ -r 50 $(top_builddir) $(BOGUS_ASTESTS_OUT) > $@
+	chmod 755 $@
+
+.as.swf: 
 	$(MTASC_CPP) $< > $(@:%.swf=pp_%.as) 
 	$(MTASC) $(MTASC_FLAGS) -swf $@ -main $(@:%.swf=pp_%.as)
 

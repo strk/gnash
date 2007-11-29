@@ -153,6 +153,7 @@ class Dejagnu {
 
     static function done() {
         printtotals();
+	trace("__END_OF_TEST__");
     }
 
 }

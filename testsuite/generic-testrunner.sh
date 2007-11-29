@@ -66,9 +66,9 @@ for t in ${testfiles}; do
 	if test "x${endtagpat}" != x; then
 		lasttrace=\`grep TRACE \${outlog} | tail -1 | sed 's/.*TRACE: //'\`
 		if ! expr "\${lasttrace}" : '${endtagpat}' > /dev/null; then
-			echo "${endtagexp}FAILED: consistency check: last trace (\${lasttrace}) doesn't match pattern (${endtagpat})"
+			echo "${endtagexp}FAILED: consistency check: last trace from run of test \${t} (\${lasttrace}) doesn't match pattern (${endtagpat})"
 		else
-			echo "${endtagexp}PASSED: consistency check: last trace (\${lasttrace}) matches pattern (${endtagpat})"
+			echo "${endtagexp}PASSED: consistency check: last trace from run of test \${t} (\${lasttrace}) matches pattern (${endtagpat})"
 		fi
 	fi
 	rm \${outlog}
