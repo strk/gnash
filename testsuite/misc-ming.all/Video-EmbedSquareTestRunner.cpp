@@ -61,6 +61,14 @@ main(int /*argc*/, char** /*argv*/)
 	
 	// Just loop twice, so to catch crashes...
 	for (int j = 0; j < 2; ++j) {
+
+		if ( ! tester.canTestVideo() )
+		{
+			// no pixel checking, but we'd still be interested in crashes...
+			tester.advance();
+			continue;
+		}
+		
 		// Frame 1
 
 		// Check the color in (1,1) - should be red
@@ -96,6 +104,7 @@ main(int /*argc*/, char** /*argv*/)
 
 			i += 10;
 		}
+
 		tester.advance();
 	}
 
