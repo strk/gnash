@@ -1,3 +1,12 @@
+2007-11-29 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler_ogl.cpp: Implement real anti-aliasing using
+	the accumulation buffer. Make sure that video doesn't get
+	anti-aliased. Use a raw pointer instead of boost::ref as an argument
+	to boost::bind. This is safe given that render_handler_ogl is
+	noncopyable. (Suggested by Sandro.)
+	* gui/gtk_glue_gtkglext.cpp: Enable the accumulation buffer.
+
 2007-11-29  Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libmedia/Makefile.am,MediaBuffer.h: build and link FFMPEG part of

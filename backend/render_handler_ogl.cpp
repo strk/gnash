@@ -104,6 +104,14 @@
 
 namespace gnash {
 
+struct video_frame
+{
+  std::auto_ptr<image::image_base> _frame;
+  matrix _mat;
+  rect _bounds;
+};
+
+
 #ifdef OSMESA_TESTING
 
 class OSRenderMesa : public boost::noncopyable
@@ -541,7 +549,7 @@ for_each(C& container, R (T::*pmf)(const A&),const A& arg)
 
 
 
-class DSOEXPORT render_handler_ogl : public render_handler
+class DSOEXPORT render_handler_ogl : public render_handler, boost::noncopyable
 {
 public: 
   render_handler_ogl()
@@ -563,10 +571,9 @@ public:
     // Turn on line smoothing.  Antialiased lines can be used to
     // smooth the outsides of shapes.
     glEnable(GL_LINE_SMOOTH);
-#if 0
-    // FIXME: figure out which of these is appropriate.
-    //glHint(GL_LINE_SMOOTH_HINT, GL_NICEST); // GL_NICEST, GL_FASTEST, GL_DONT_CARE
-#endif
+
+    // Use fastest line smoothing since additional anti-aliasing will happen later.
+    glHint(GL_LINE_SMOOTH_HINT, GL_FASTEST); // GL_NICEST, GL_FASTEST, GL_DONT_CARE
 
     glMatrixMode(GL_PROJECTION);
     
@@ -652,8 +659,28 @@ public:
     return RGB;
   }
   
-  
+  // UGLY HACK ALERT
+  // All OpenGL calls currently go into a display list, so they can be
+  // anti-aliased using the accumulation buffer in end_display. If we were
+  // to draw the video frame *now*, it would end up in the display list as
+  // well, and would likewise be anti-aliased. We want to avoid doing this
+  // for video, though, because not only does video not require anti-aliasing,
+  // doing so anyway will produce blurry video.
+  //
+  // So, instead, we duplicate the frame and safe it until after the
+  // anti-aliasing stage.
+  //
+  // This has the side effect of allowing only one video to be displayed at a
+  // time. And horribly inefficient code, of course.  
   virtual void drawVideoFrame(image::image_base* baseframe, const matrix* m, const rect* bounds)
+  { 
+    _video_frame._frame = baseframe->clone();
+    _video_frame._mat = *m;
+    _video_frame._bounds = *bounds;
+  }
+  // END UGLY HACK ALERT
+  
+  virtual void reallyDrawVideoFrame(image::image_base* baseframe, const matrix* m, const rect* bounds)
   {
     GNASH_REPORT_FUNCTION;
     
@@ -728,17 +755,21 @@ public:
     glLoadIdentity();
 
     gluOrtho2D(x0, x1, y0, y1);
+    
+    _width  = fabsf(x1 - x0);
+    _height = fabsf(y1 - y0);
 
+    // Setup the clear color. The actual clearing will happen in end_display.
     if (bg_color.m_a) {
-      // Setup the clearing color.
       glClearColor(bg_color.m_r / 255.0, bg_color.m_g / 255.0, bg_color.m_b / 255.0, 
                    bg_color.m_a / 255.0);
-      // Do the actual clearing.
     } else {
       glClearColor(1.0, 1.0, 1.0, 1.0);
-    }
+    }    
     
-    glClear(GL_COLOR_BUFFER_BIT);  
+    // Start a new display list which will contain almost everything we draw.
+    glNewList(1, GL_COMPILE);
+    
   }
   
   static void
@@ -763,6 +794,57 @@ public:
   virtual void
   end_display()
   {
+    glEndList();    
+    
+    // This is a table of randomly generated numbers between -0.5 and 0.5.
+    struct {
+      GLfloat x;
+      GLfloat y;
+    } points [] = {
+      {      	-0.448823,  	 0.078771 },
+      {     	-0.430852, 	0.240592 },
+      {     	-0.208887, 	-0.492535 },
+      {     	-0.061232, 	-1.109432 },
+      {     	-0.034984, 	-0.247317 },
+      {     	-0.367119, 	-0.440909 },
+      {     	0.047688, 	0.315757 },
+      {     	0.434600, 	-0.204068 }
+    };
+
+    int numPoints = 8;    
+    
+    GLint viewport[4];
+    glGetIntegerv (GL_VIEWPORT, viewport);
+    const GLint& viewport_width = viewport[2],
+                 viewport_height = viewport[3];
+
+    glClearAccum(0.0, 0.0, 0.0, 0.0);
+
+    glClear(GL_ACCUM_BUFFER_BIT);
+
+    for (int i = 0; i < numPoints; ++i) {
+    
+      glClear(GL_COLOR_BUFFER_BIT);
+      glPushMatrix ();
+
+      glTranslatef (points[i].x * _width / viewport_width,
+                    points[i].y * _height / viewport_height, 0.0);
+
+      glCallList(1); // Draws the scene
+      
+      glPopMatrix ();
+      
+      glAccum(GL_ACCUM, 1.0/numPoints);
+    }
+    
+    glAccum (GL_RETURN, 1.0);
+    
+    if (_video_frame._frame.get()) {
+      // there's a video frame to draw, without anti-aliasing.
+      reallyDrawVideoFrame(_video_frame._frame.get(), &_video_frame._mat,
+                           &_video_frame._bounds);
+    }  
+  
   #if 0
     GLint box[4];
     glGetIntegerv(GL_SCISSOR_BOX, box);
@@ -774,7 +856,9 @@ public:
 
     glRectd(x, y - h, x + w, y + h);
   #endif
+  
     check_error();
+
     glFlush(); // Make OpenGL execute all commands in the buffer.
   }
     
@@ -884,7 +968,7 @@ public:
 
     // Call add_paths for each mask.
     std::for_each(_masks.begin(), _masks.end(),
-      boost::bind(&render_handler_ogl::add_paths, boost::ref(*this), _1));    
+      boost::bind(&render_handler_ogl::add_paths, this, _1));    
           
     glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
     glStencilFunc(GL_EQUAL, _masks.size(), _masks.size());
@@ -1229,18 +1313,11 @@ public:
          it != end; ++it) {
       const path& cur_path = *it;
       
-      if (cur_path.m_line) {
-        apply_line_style(line_styles[cur_path.m_line-1], cx, mat);
-        
-      } else if (fill_styles[cur_path.m_fill1-1].get_type() == SWF::FILL_SOLID) {
-      
-        glLineWidth(1.0);
-        
-        rgba c = cx.transform(fill_styles[cur_path.m_fill1-1].get_color());
-        glColor4ub(c.m_r, c.m_g, c.m_b, c.m_a);
-      } else {
+      if (!cur_path.m_line) {
         continue;
       }
+      
+      apply_line_style(line_styles[cur_path.m_line-1], cx, mat);
       
       assert(pathpoints.find(&cur_path) != pathpoints.end());
       
@@ -1396,7 +1473,6 @@ public:
     PathVec normalized = normalize_paths(path_vec);
     PathPointMap pathpoints = getPathPoints(normalized);
     
-
     for (size_t i = 0; i < fill_styles.size(); ++i) {
       PathPtrVec paths = get_paths_by_style(normalized, i+1);
       
@@ -1427,31 +1503,24 @@ public:
         _tesselator.endContour();
       }
       
-      glNewList(1, GL_COMPILE);
-      
-      _tesselator.tesselate();
-      
-      glEndList();
+
       
       apply_fill_style(fill_styles[i], mat, cx);
       
- 
       if (fill_styles[i].get_type() != SWF::FILL_SOLID) {     
         // Apply alpha premultiplication.
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
       }
-
-      glCallList(1);
-
+      
+      _tesselator.tesselate();
+      
       if (fill_styles[i].get_type() != SWF::FILL_SOLID) {    
         // restore to original.
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       }
       
       glDisable(GL_TEXTURE_1D);
-      glDisable(GL_TEXTURE_2D);
-      
-      // FIXME: free up the display list, or not?        
+      glDisable(GL_TEXTURE_2D);      
     }
     
     draw_outlines(normalized, pathpoints, mat, cx, fill_styles, line_styles);
@@ -1604,9 +1673,13 @@ private:
   Tesselator _tesselator;
   float _xscale;
   float _yscale;
+  float _width; // Width of the movie, in world coordinates.
+  float _height;
   
   std::vector<PathVec> _masks;
   bool _drawing_mask;
+  
+  video_frame _video_frame;
   
 #ifdef OSMESA_TESTING
   std::auto_ptr<OSRenderMesa> _offscreen;
