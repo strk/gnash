@@ -77,6 +77,7 @@ class Test
 		var myTest = new Test;
 		myTest.test_all();
 
+		check_totals(12);
                 Dejagnu.done();
 	}
 

@@ -63,6 +63,7 @@ class Test extends MovieClip
 		var myTest = new Test;
 		myTest.test_all();
 
+		check_totals(13);
                 Dejagnu.done();
 	}
 

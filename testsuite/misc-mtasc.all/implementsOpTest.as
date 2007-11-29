@@ -58,6 +58,7 @@ class implementsOpTest {
 		var myTest = new implementsOpTest;
 		myTest.test_all();
 
+		check_totals(7);
 		Dejagnu.done();
 	}
 }

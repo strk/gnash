@@ -25,6 +25,9 @@ class Test extends MovieClip
 		// This is how you print notes (trace + visual trace)
 		note("Hello world");
 
+                // Check number of tests run (for consistency)
+		check_totals(2);
+
                 // Call this after finishing all tests. It prints out the totals.
                 Dejagnu.done();
 	}

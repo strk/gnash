@@ -55,6 +55,7 @@ class Test extends TestClass
     check_equals(myTest.x, 2);
     check_equals(typeof(myTest.__proto__.x), 'undefined');
 
+    check_totals(18);
     Dejagnu.done();
   }
 }

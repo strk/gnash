@@ -52,6 +52,8 @@ class Derived11 extends Derived1
      check_equals(derivedObj.thisPtr, derivedObj);
      check_equals(derivedObj.derivedThisPtr, derivedObj);
      check_equals(derivedObj.baseThisPtr, derivedObj);
+
+     check_totals(6);
      Dejagnu.done();
   }
 }

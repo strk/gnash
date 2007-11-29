@@ -1,5 +1,11 @@
 2007-11-29 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-mtasc.all/: enum.as, exception.as, function_test.as,
+	  hello.as, implementsOpTest.as, inheritance.as, super_test1.as:
+	  Add total run test checking.
+
+2007-11-29 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-mtasc.all/: Dejagnu.as, check.as: add support for
 	  check_totals, xcheck_totals.
 	* testsuite/misc-mtasc.all/: level5.as, level99.as, levels.as:
