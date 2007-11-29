@@ -32,6 +32,9 @@ class LevelsMain
                 var test = new LevelsMain();
                 test.run();
 
+                // Check our depth
+		xcheck_equals(mc.getDepth(), -16384);
+
                 // The ""+ is there to force conversion to a string
                 check_equals(""+mc, "_level0");
 	}

@@ -42,6 +42,9 @@
 #define untested(text) Dejagnu.untested(text + _INFO_)
 #define unresolved(text) Dejagnu.unresolved(text + _INFO_)
 
+#define check_totals(n) Dejagnu.totals(n,  _INFO_)
+#define xcheck_totals(n) Dejagnu.xtotals(n,  _INFO_)
+
 #define note(text) Dejagnu.note(text + _INFO_);
 
 

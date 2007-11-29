@@ -65,7 +65,16 @@ class Dejagnu {
         trace (msg);
     }
 
-    static function totals() {
+    static function testcount() {
+        var c = 0;
+        if ( passed ) c += passed;
+        if ( failed ) c += failed;
+        if ( xpassed ) c += xpassed;
+        if ( xfailed ) c += xfailed;
+        return c;
+    }
+
+    static function printtotals() {
         xtrace('#passed: '+ passed);
         xtrace('#failed: '+ failed);
         if ( xpassed ) {
@@ -74,7 +83,25 @@ class Dejagnu {
         if ( xfailed ) {
             xtrace('#expected failures: '+ xfailed);
         }
-   
+		xtrace('#total tests run: '+ testcount());
+    }
+
+    static function totals(exp, msg) {
+        var obt = testcount();
+        if ( exp != undefined && obt != exp ) {
+            fail('Test run '+obt+' (expected '+exp+') ['+msg+']');
+        } else {
+            pass('Test run '+obt+' ['+msg+']');
+        }
+    }
+
+    static function xtotals(exp, msg) {
+        var obt = testcount();
+        if ( exp != undefined && obt != exp ) {
+            xfail('Test run '+obt+' (expected '+exp+') ['+msg+']');
+        } else {
+            xpass('Test run '+obt+' ['+msg+']');
+        }
     }
 
     static function check_equals(obt, exp, msg) {
@@ -125,7 +152,7 @@ class Dejagnu {
     }
 
     static function done() {
-        totals();
+        printtotals();
     }
 
 }

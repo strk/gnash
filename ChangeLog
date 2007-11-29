@@ -1,5 +1,12 @@
 2007-11-29 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-mtasc.all/: Dejagnu.as, check.as: add support for
+	  check_totals, xcheck_totals.
+	* testsuite/misc-mtasc.all/: level5.as, level99.as, levels.as:
+	  add test for _level# depths (fail) and total run test count.
+
+2007-11-29 Sandro Santilli <strk@keybit.net>
+
 	* configure.in: always look for X11 libs, even if build_fb is set (may be just
 	  one of the guis, not the only one)
 	* gui/am-frag/qtopia.am: don't append to CXXFLAGS before it's

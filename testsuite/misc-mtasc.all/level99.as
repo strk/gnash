@@ -28,6 +28,9 @@ class Level99
 	{
                 check_equals(mc._currentframe, 1);
 
+                // Check our depth
+		xcheck_equals(mc.getDepth(), -16285);
+
                 // The ""+ is there to force conversion to a string
                 check_equals(""+mc, "_level99");
 
@@ -48,6 +51,7 @@ class Level99
                 _level5.testvar2 = "goodbye";
                 check_equals(_level5.testvar2, "goodbye");
 
+		check_totals(20);
                 Dejagnu.done();
 	}
 }
