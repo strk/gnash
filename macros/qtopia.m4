@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: qtopia.m4,v 1.4 2007/11/29 00:40:21 nihilus Exp $
+dnl $Id: qtopia.m4,v 1.5 2007/11/29 03:47:05 rsavoye Exp $
 
 dnl ~{rob@ute} pts/8> QtCore  QtSvg Qtnetwork QtXml 
 dnl QtCore: Command not found.
@@ -100,8 +100,13 @@ AC_DEFUN([GNASH_PATH_QTOPIA],
   fi
   
   dnl this a sanity check for Qtopia 4
+<<<<<<< qtopia.m4
+  qt_headers="QtXml QtGui QtCore QtNetwork QtSql"
+  if test $gnash_qtopia_version -eq 4; then
+=======
   qt_headers="QtXml QtGui QtCore"
   if test "${gnash_qtopia_version} " -eq 4; then
+>>>>>>> 1.4
     if test x"${ac_cv_path_qtopia_incl}" != x; then
       for i in $qt_headers; do
         if ! test -d ${gnash_qtopia_topdir}/qtopiacore/target/include/$i; then
@@ -125,17 +130,17 @@ AC_DEFUN([GNASH_PATH_QTOPIA],
   fi
   
   dnl the list of Qtopia libs we need
-  qt_libs="qtopiabase qtopia md5 qtopia-sqlite qtopiasecurity"
+  qt_libs="qtopiabase qtopia qpe qt"
 
   if test x"${ac_cv_path_qtopia_lib}" = x; then
     if test x"${ac_cv_path_qtopia_lib}" = x; then
       AC_MSG_CHECKING([for libqtopia library])
-      if test -f $gnash_qtopia_topdir/lib/libqtopiamail.a -o -f $gnash_qtopia_topdir/lib/libqtopiamail.${shlibext}; then
+      if test -f $gnash_qtopia_topdir/lib/libqpe.a -o -f $gnash_qtopia_topdir/lib/libqpe.${shlibext}; then
         if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
-         ac_cv_path_qtopia_lib="-L$gnash_qtopia_topdir/lib -lqtopiamail"
+         ac_cv_path_qtopia_lib="-L$gnash_qtopia_topdir/lib -lqpe"
          break
         else
-         ac_cv_path_qtopia_lib="-lqtopiamail"
+         ac_cv_path_qtopia_lib="-lqpe"
          break
        fi
       fi
@@ -145,8 +150,13 @@ AC_DEFUN([GNASH_PATH_QTOPIA],
   
   AC_MSG_CHECKING([Sanity checking the Qtopia installation])
   dnl this a sanity check for Qtopia 2
+<<<<<<< qtopia.m4
+  qt_libs="libqtopia libqpe"
+  if test $gnash_qtopia_version -eq 2; then
+=======
   qt_libs="libqt libqtopia libqpe"
   if test "${gnash_qtopia_version} " -eq 2; then
+>>>>>>> 1.4
     AC_DEFINE([GNASH_QTOPIA_VERSION], 2, [The Qtopia version])
     if test x"${ac_cv_path_qtopia_lib}" != x; then
       for i in $qt_libs; do

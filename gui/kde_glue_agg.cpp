@@ -15,13 +15,23 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: kde_glue_agg.cpp,v 1.7 2007/10/15 12:31:33 udog Exp $ */
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 
 #include "kde_glue_agg.h"
 #include "render_handler.h"
 #include "render_handler_agg.h"
+#if GNASH_QT_VERSION == 4
+#include <Qt/qpixmap.h>
+#include <Qt/qcolor.h>
+#include <Qt/Qt3Support>
+#else
 #include <qpixmap.h>
 #include <qcolor.h>
+#endif
 
 namespace gnash
 {
@@ -94,8 +104,9 @@ KdeAggGlue::render()
 {
     // In order to use our buffer in QT, we must copy it into a pixmap. This is
     // an expensive operation, but, as far as I can see, the only way to do it.
+#if HAVE_QTOPIA > 2
     QPixmap qpixmap(*_qimage);
-
+#endif
     for (unsigned bno=0; bno < _drawbounds.size(); bno++) {
        geometry::Range2d<int>& bounds = _drawbounds[bno];
 
@@ -105,8 +116,10 @@ KdeAggGlue::render()
        QRect src_rect(bounds.getMinX(), bounds.getMinY(), bounds.width(),
                       bounds.height());
        
+#if HAVE_QTOPIA > 2
        bitBlt (_drawing_area, dest_point, &qpixmap, src_rect, Qt::CopyROP,
                true /* ignore mask */ );
+#endif
     }
 }
 

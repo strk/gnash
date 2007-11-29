@@ -15,15 +15,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//
-//
-
-
-/* $Id: kde_glue.h,v 1.13 2007/07/01 10:54:03 bjacques Exp $ */
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include "gnash.h"
 
-#include <qwidget.h>
+#if GNASH_QT_VERSION == 4
+# include <Qt/qwidget.h>
+#else
+# include <qwidget.h>
+#endif
 #include "snappingrange.h"
 
 namespace gnash

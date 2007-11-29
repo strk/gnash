@@ -20,7 +20,7 @@ dnl between Qt3 and Qt4. In Qt4, all the top level includes are in a
 dnl 'Qt' subdirectory now. Since it's best for now to handle the path
 dnl changes in the source files so we're concious of the changes, we
 dnl set version flags in config.h and use Automake conditionals to
-dnl force onebehaviour or the other.
+dnl force one behaviour or the other.
 
 AC_DEFUN([GNASH_PATH_QT],
 [
@@ -46,10 +46,14 @@ AC_DEFUN([GNASH_PATH_QT],
   if test x$QTDIR != x; then
     if test -f $QTDIR/include/qobject.h; then
       qt_pkg="qt-mt"
-      if test x`basename $QTDIR` = "qt3"; then
-        gnash_qt_version=3
-      else
+      if test x`basename $QTDIR` = "qt4"; then
         gnash_qt_version=4
+      else
+        if test x`basename $QTDIR` = "qt3"; then
+          gnash_qt_version=3
+ 	else
+          gnash_qt_version=2
+        fi
       fi
     else
       qt_pkg="QtCore"
@@ -128,6 +132,9 @@ dnl          gnash_qt_version=`echo "$j" | sed "s:$i/qt::"`
     QT_CFLAGS=""
   fi
 
+  dnl we have to define our own config constant for this, even though
+  dnl QT_VERSION exists, the header path it's in changes, so this
+  dnl seemed easier.
   if test x$gnash_qt_version != x; then
     AC_MSG_NOTICE([QT version is $gnash_qt_version])
     dnl due to a weird problem with variable expansion, we have to use
@@ -151,7 +158,7 @@ dnl   # QT_LIBS =  -lqtui -lqtcore -lqtprint -L/usr/lib/qt-3.3/lib -lqt-mt
   AC_ARG_WITH(qt_lib, AC_HELP_STRING([--with-qt-lib], [directory where qt libraries are]), with_qt_lib=${withval})
   AC_CACHE_VAL(ac_cv_path_qt_lib, [
     if test x"${with_qt_lib}" != x ; then
-      if test `ls -C1 ${gnash_qt_topdir}/lib/libqt-mt.*| wc -l` -gt 0 ; then
+      if test `ls -C1 ${gnash_qt_topdir}/lib/libqt*-mt.*| wc -l` -gt 0 ; then
        ac_cv_path_qt_lib="-L`(cd ${with_qt_lib}; pwd)` ${qt3support} -lqt-mt"
       else
 	AC_MSG_ERROR([${with_qt_lib} directory doesn't contain qt libraries.])

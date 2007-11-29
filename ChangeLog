@@ -1,3 +1,18 @@
+2007-11-28  Rob Savoye  <rob@ute.welcomehome.org>
+
+	* configure.ac: Remove duplicate AC_DEFINE of HAVE_QTOPIA.
+	* macros/agg.m4: Put double quotes around sub-shell invocation to
+	avoid problems with the buggy bash.
+	* macros/qt.m4: Cleanup hpw the version number gets set from
+	QTDIR.
+	* macros/qtopia.m4: Add more modules to qt_headers.
+	* gui/kde.cpp: Add support for Qt2.
+	* gui/kdesup.h.cpp: Add support for Qt2.
+	* gui/kde_glue.h: Add initial support for Qt4.
+	* gui/kde_glue_agg.{cpp,h}:  Add initial support for Qt4.
+	* gui/am-frag/qtopia.am: Add support for Qt2, and Qtopia.
+	* gui/am-frag/kde.am: Add support for the QT4 Qt3Support module.
+	
 2007-11-29 Sandro Santilli <strk@keybit.net>
 
 	* libbase/jpeg.{cpp,h}: use setjmp/longjmp from custom error handler

@@ -15,9 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-
 #ifndef __KDESUP_H__
 #define __KDESUP_H__
 
@@ -60,7 +57,9 @@ public:
     qwidget(KdeGui* godfather);
     void setInterval(unsigned int interval);
 protected:
+#if QT_VERSION > 2312
     void contextMenuEvent(QContextMenuEvent *event);
+#endif
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent( QMouseEvent * );
     void mouseMoveEvent(QMouseEvent *event);

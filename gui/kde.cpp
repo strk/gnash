@@ -25,11 +25,15 @@
 #include <qwidget.h>
 #include <qmessagebox.h>
 #include <qcursor.h>
+//#ifdef HAVE_KDE
 #include <qxembed.h>
+//#endif
 #include <qnamespace.h>
 #include <qtimer.h>
+#include <qcursor.h>
+#if GNASH_QT_VERSION > 2
 #include <qeventloop.h>
-
+#endif
 #include "Range2d.h"
 
 #include "gnash.h"
@@ -62,11 +66,12 @@ KdeGui::init(int argc, char **argv[])
 //    GNASH_REPORT_FUNCTION;
     _qapp.reset(new QApplication(argc, *argv));
     _qwidget.reset(new qwidget(this)); 
+#ifdef HAVE_KDE
     if (_xid) {
         QXEmbed::initialize();
         QXEmbed::embedClientIntoWindow(_qwidget.get(), _xid);
     }
-
+#endif
     _glue.init (argc, argv);
     
     return true;
@@ -132,10 +137,18 @@ KdeGui::setCursor(gnash_cursor_type newcursor)
 {
     switch(newcursor) {
         case CURSOR_HAND:
+#if QT_VERSION > 2312
             _qwidget->setCursor(Qt::PointingHandCursor);
+#else
+            _qwidget->setCursor(PointingHandCursor);
+#endif
             break;
         case CURSOR_INPUT:
+#if QT_VERSION > 2312
             _qwidget->setCursor(Qt::IbeamCursor); 
+#else
+            _qwidget->setCursor(IbeamCursor); 
+#endif
             break;
         default:
             _qwidget->unsetCursor(); 
@@ -222,7 +235,9 @@ KdeGui::qtToGnashKey(QKeyEvent *event)
         } table[] = {
             { Qt::Key_Backspace, gnash::key::BACKSPACE },
             { Qt::Key_Tab, gnash::key::TAB },
+#if QT_VERSION > 2312
             { Qt::Key_Clear, gnash::key::CLEAR },
+#endif
             { Qt::Key_Return, gnash::key::ENTER },
             { Qt::Key_Enter, gnash::key::ENTER },
 
@@ -305,7 +320,9 @@ KdeGui::resize(int width, int height)
 void
 KdeGui::quit()
 {
+#if QT_VERSION > 2312
     _qapp->eventLoop()->exit();
+#endif
 }
 
 
@@ -431,11 +448,13 @@ qwidget::timerEvent(QTimerEvent *)
     Gui::advance_movie(_godfather);
 }
 
+#if QT_VERSION > 2312
 void
 qwidget::contextMenuEvent(QContextMenuEvent*)
 {
     _qmenu.exec(QCursor::pos());
 }
+#endif
 
 void
 qwidget::mousePressEvent(QMouseEvent* /* event */)
