@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.449 2007/11/29 05:15:10 nihilus Exp $
+dnl $Id: configure.ac,v 1.450 2007/11/29 05:21:06 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1129,8 +1129,9 @@ fi
 AM_CONDITIONAL(HAVE_QTOPIA, [test x$has_qtopia = xyes])
 AM_CONDITIONAL(HAVE_KDE, [test x$has_kde = xyes])
 AM_CONDITIONAL(HAVE_QT, [test x$has_qt = xyes])
-AM_CONDITIONAL(HAVE_QTOPIA, [test x$has_qtopia = xyes])
-
+AM_CONDITIONAL(HAVE_QTOPIA_2, [test "$gnash_qtopia_version " -eq 2])
+AM_CONDITIONAL(HAVE_QTOPIA_3, [test "$gnash_qtopia_version " -eq 3])
+AM_CONDITIONAL(HAVE_QTOPIA_4, [test "$gnash_qtopia_version " -eq 4])
 AM_CONDITIONAL(HAVE_QT_2, [test x"${gnash_qt_version}" != x && test "${gnash_qt_version}" -eq 2])
 AM_CONDITIONAL(HAVE_QT_3, [test x"${gnash_qt_version}" != x && test "${gnash_qt_version}" -eq 3])
 AM_CONDITIONAL(HAVE_QT_4, [test x"${gnash_qt_version}" != x && test "${gnash_qt_version}" -eq 4])
