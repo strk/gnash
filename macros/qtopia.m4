@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: qtopia.m4,v 1.6 2007/11/29 04:37:38 rsavoye Exp $
+dnl $Id: qtopia.m4,v 1.7 2007/11/29 05:14:55 rsavoye Exp $
 
 dnl ~{rob@ute} pts/8> QtCore  QtSvg Qtnetwork QtXml 
 dnl QtCore: Command not found.
@@ -25,6 +25,7 @@ AC_DEFUN([GNASH_PATH_QTOPIA],
 [
 
   has_qtopia=no
+  gnash_qtopia_version=0
   dnl the list of Qtopia headers we need
   dnl Look for the header
   AC_ARG_WITH(qtopia, AC_HELP_STRING([--with-qtopia], [directory where Qtopia is installed]), with_qtopia=${withval})
@@ -36,7 +37,7 @@ AC_DEFUN([GNASH_PATH_QTOPIA],
         gnash_qtopia_version=4
       else
         gnash_qtopia_topdir="${with_qtopia}"
-        if test -f ${with_qtopia_incl}/include/qtopia/mail/qtopiamail.h ; then
+        if test -f ${with_qtopia}/include/qtopia/mail/qtopiamail.h ; then
           ac_cv_path_qtopia_incl="-I`(cd ${with_qtopia}/include; pwd)`"
           gnash_qtopia_version=2
         else
@@ -44,7 +45,7 @@ AC_DEFUN([GNASH_PATH_QTOPIA],
         fi
       fi
       if test -f ${with_qtopia}/lib/libqtopiamail.a -o -f ${with_qtopia}/lib/libqtopiamail.${shlibext}; then
-	      ac_cv_path_qtopia_lib="-L`(cd ${with_qtopia_lib}/lib; pwd)`"
+	      ac_cv_path_qtopia_lib="-L`(cd ${with_qtopia}/lib; pwd)`"
       else
 	      AC_MSG_ERROR([${with_qtopia}/lib directory doesn't contain Qtopia libraries])
       fi
@@ -88,7 +89,7 @@ AC_DEFUN([GNASH_PATH_QTOPIA],
   dnl this a sanity check for Qtopia 2
   AC_MSG_CHECKING([Sanity checking the Qtopia header installation])
   qt_headers="qmainwindow.h qmenubar.h qpopupmenu.h qapplication.h"
-  if test "${gnash_qtopia_version} " -eq 2; then
+  if test ${gnash_qtopia_version} -eq 2; then
     if test x"${ac_cv_path_qtopia_incl}" != x; then
       for i in $qt_headers; do
         if ! test -f  ${gnash_qtopia_topdir}/include/$i; then
@@ -101,7 +102,7 @@ AC_DEFUN([GNASH_PATH_QTOPIA],
   
   dnl this a sanity check for Qtopia 4
   qt_headers="QtXml QtGui QtCore QtNetwork QtSql"
-  if test "${gnash_qtopia_version} " -eq 4; then
+  if test ${gnash_qtopia_version} -eq 4; then
     if test x"${ac_cv_path_qtopia_incl}" != x; then
       for i in $qt_headers; do
         if ! test -d ${gnash_qtopia_topdir}/qtopiacore/target/include/$i; then
@@ -118,7 +119,7 @@ AC_DEFUN([GNASH_PATH_QTOPIA],
     AC_MSG_RESULT([fine])
   fi
 
-  if test x"${gnash_qtopia_version}" = x; then
+  if test ${gnash_qtopia_version} -eq 0; then
     AC_MSG_RESULT(none)
   else
     AC_MSG_RESULT([${gnash_qtopia_version}])
@@ -146,7 +147,7 @@ AC_DEFUN([GNASH_PATH_QTOPIA],
   AC_MSG_CHECKING([Sanity checking the Qtopia installation])
   dnl this a sanity check for Qtopia 2
   qt_libs="libqtopia libqpe"
-  if test "${gnash_qtopia_version} " -eq 2; then
+  if test ${gnash_qtopia_version} -eq 2; then
     AC_DEFINE([GNASH_QTOPIA_VERSION], 2, [The Qtopia version])
     if test x"${ac_cv_path_qtopia_lib}" != x; then
       for i in $qt_libs; do
@@ -160,7 +161,7 @@ AC_DEFUN([GNASH_PATH_QTOPIA],
   
   dnl this a sanity check for Qtopia 4
   qt_libs="libqtopia libqtopiabase"
-  if test "${gnash_qtopia_version} " -eq 4; then
+  if test ${gnash_qtopia_version} -eq 4; then
     AC_DEFINE([GNASH_QTOPIA_VERSION], 4, [The Qtopia version])
     gnash_qtopia_version=`dirname ${gnash_qtopia_topdir}`
     if test x"${ac_cv_path_qtopia_lib}" != x; then
