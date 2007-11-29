@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.105 2007/11/29 09:31:03 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.106 2007/11/29 13:03:29 strk Exp $";
 
 #include "check.as"
 
@@ -333,9 +333,10 @@ xcheck(!mc.hasOwnProperty("_totalframes"));
 check(!mc.__proto__.hasOwnProperty("_totalframes"));
 check(!MovieClip.prototype.hasOwnProperty("_totalframes"));
 
+check(!mc.hasOwnProperty("_level"));
+check(!mc.__proto__.hasOwnProperty("_level"));
 xcheck(!mc.hasOwnProperty("_target"));
 xcheck(!mc.hasOwnProperty("_url"));
-xcheck(!mc.hasOwnProperty("_target"));
 xcheck(!mc.hasOwnProperty("_soundbuftime"));
 xcheck(!mc.hasOwnProperty("_focusrect"));
 xcheck(!mc.hasOwnProperty("_framesloaded"));
@@ -394,6 +395,10 @@ check_equals(String(mc3_mc), "_level0.mc3_mc");
 
 // Test the _target property
 check_equals(_root._target, "/");
+
+// Test the _level property
+check_equals(typeof(_root._level), "movieclip");
+check_equals(_root._level, _level0);
 
 #if OUTPUT_VERSION >= 6
 // unfortunately we can't use createEmptyMovieClip with
@@ -1272,15 +1277,15 @@ check_equals(getInstanceAtDepth(-6.2), tt2);
 #endif // OUTPUT_VERSION >= 7
 
 #if OUTPUT_VERSION < 6
- check_totals(158); // SWF5
+ check_totals(160); // SWF5
 #else
 #if OUTPUT_VERSION < 7
- check_totals(551); // SWF6
+ check_totals(554); // SWF6
 #else
 #if OUTPUT_VERSION < 8
- check_totals(568); // SWF7
+ check_totals(571); // SWF7
 #else
- check_totals(569); // SWF8+
+ check_totals(572); // SWF8+
 #endif
 #endif
 #endif

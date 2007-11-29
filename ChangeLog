@@ -1,5 +1,7 @@
 2007-11-29 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/MovieClip.as: add test for
+	  MovieClip._level (gnash fails)
 	* testsuite/misc-mtasc.all/Dejagnu.as: print info message on successes too.
 	* testsuite/misc-mtasc.all/: level5.as, level99.as: test swapDepth and
 	  removeMovieClip effects on levels (gnash fails). 
