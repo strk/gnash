@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.447 2007/11/29 00:40:20 nihilus Exp $
+dnl $Id: configure.ac,v 1.448 2007/11/29 04:54:03 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -662,7 +662,7 @@ archiver=`grep -c dynamic .tmp 2>&1`
 rm -f .tmp
 dnl is there any good way to report what we found here?
 AC_MSG_RESULT()
-if test "${archiver} " -eq 1; then
+if test x"${archiver}" != x -a "${archiver}" -eq 1; then
 dnl   if test "$enable_shared" = no; then
 dnl     AR="libtool -static"
 dnl   else
@@ -1131,9 +1131,9 @@ AM_CONDITIONAL(HAVE_KDE, [test x$has_kde = xyes])
 AM_CONDITIONAL(HAVE_QT, [test x$has_qt = xyes])
 AM_CONDITIONAL(HAVE_QTOPIA, [test x$has_qtopia = xyes])
 
-AM_CONDITIONAL(HAVE_QT_2, [test "${gnash_qt_version} " -eq 2])
-AM_CONDITIONAL(HAVE_QT_3, [test "${gnash_qt_version} " -eq 3])
-AM_CONDITIONAL(HAVE_QT_4, [test "${gnash_qt_version} " -eq 4])
+AM_CONDITIONAL(HAVE_QT_2, [test x"${gnash_qt_version}" != x -a "${gnash_qt_version}" -eq 2])
+AM_CONDITIONAL(HAVE_QT_3, [test x"${gnash_qt_version}" != x -a "${gnash_qt_version}" -eq 3])
+AM_CONDITIONAL(HAVE_QT_4, [test x"${gnash_qt_version}" != x -a "${gnash_qt_version}" -eq 4])
 
 dnl Need GLIB for both GTK and GST
 if test x$build_gtk = xyes -o x${media_handler} = "xgst"; then
