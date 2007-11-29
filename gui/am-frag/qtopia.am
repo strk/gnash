@@ -3,11 +3,11 @@
 # 
 if BUILD_QTOPIA_GUI
 bin_PROGRAMS += qtopia-gnash
+if HAVE_QT_2
+QT_CFLAGS += -DQT_QWS_IPAQ -DQWS
+endif
 qtopia_gnash_CPPFLAGS = -DGUI_QTOPIA -DGUI_CONFIG=\"QTOPIA\" \
 	 $(AM_CPPFLAGS) $(KDE_CFLAGS) $(QT_CFLAGS)
-if HAVE_QTOPIA_2
-qtopia_gnash_CPPFLAGS += -DQT_QWS_IPAQ -DQWS
-endif
 qtopia_gnash_SOURCES = $(GUI_SRCS) gui_kde.cpp
 qtopia_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
 #qtopia_gnash_DEPENDENCIES = .configline

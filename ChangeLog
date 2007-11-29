@@ -1,3 +1,7 @@
+2007-11-29  Rob Savoye  <rob@ute.welcomehome.org>
+
+	* gui/am-frag/qtopia.am: Use HAVE_QT_2 instead of HAVE_QTOPIA_2.
+
 2007-11-29 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/Video-EmbedSquareTestRunner.cpp: don't test video
@@ -55,7 +59,7 @@
 	* configure.ac: Remove duplicate AC_DEFINE of HAVE_QTOPIA.
 	* macros/agg.m4: Put double quotes around sub-shell invocation to
 	avoid problems with the buggy bash.
-	* macros/qt.m4: Cleanup hpw the version number gets set from
+	* macros/qt.m4: Cleanup how the version number gets set from
 	QTDIR.
 	* macros/qtopia.m4: Add more modules to qt_headers.
 	* gui/kde.cpp: Add support for Qt2.
@@ -84,10 +88,10 @@
 	modified heavily to use QTDIR correctly, and to handle multiple
 	differing versions of QT APIs. For now the default is to use Qt3
 	instead of Qt4.
-	* macros/kde.m4: QT stuff moved to it;'s own file.
+	* macros/kde.m4: QT stuff moved to it's own file.
 	* macros/qtopia.m4: Change how the version and topdir get set
 	based on now correctly handling QPEDIR.
-	* configure.ac: Add Automake conditrional for cross compiling. Add
+	* configure.ac: Add Automake conditional for cross compiling. Add
 	more Automake conditionals for the different QT versions.
 
 2007-11-28 Markus Gothe <nietzsche@lysator.liu.se>
