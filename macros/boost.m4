@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.71 2007/11/24 16:47:10 rsavoye Exp $
+dnl $Id: boost.m4,v 1.72 2007/11/29 05:36:01 nihilus Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -50,13 +50,13 @@ AC_DEFUN([GNASH_PATH_BOOST],
   AC_ARG_WITH(boost_incl, AC_HELP_STRING([--with-boost-incl], [directory where boost headers are]), with_boost_incl=${withval})
   if test x"${with_boost_incl}" != x ; then
     gnash_boost_topdir="`(cd ${with_boost_incl}; pwd)`"
-    gnash_boost_version=`echo ${gnash_boost_topdir} | sed -e 's:.*boost-::'`
+    gnash_boost_version="`echo ${gnash_boost_topdir} | sed -e 's:.*boost-::'`"
     newlist=${gnash_boost_topdir}
   fi
 
   dnl munge the GCC version number, which Boost uses to label it's libraries.
   if test x"${GXX}" = xyes; then
-  	gcc_version=`${CXX} --version | head -1 | cut -d ' ' -f 3 | cut -d '.' -f 1-2 | tr -d '.'`
+  	gcc_version="`${CXX} --version | head -1 | cut -d ' ' -f 3 | cut -d '.' -f 1-2 | tr -d '.'`"
   fi
 
   if test x"${gnash_boost_topdir}" = x; then
@@ -66,7 +66,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
     if test x$cross_compiling = xno; then
       if test x"$PKG_CONFIG" != x; then
         AC_MSG_CHECKING([for the Boost Version])
-        $PKG_CONFIG --exists boost && gnash_boost_version=`$PKG_CONFIG --modversion boost | cut -d "." -f 1 | awk '{print $'0'".0"}'`
+        $PKG_CONFIG --exists boost && gnash_boost_version="`$PKG_CONFIG --modversion boost | cut -d "." -f 1 | awk '{print $'0'".0"}'`"
         AC_MSG_RESULT(${gnash_boost_version})
       fi
     fi
@@ -74,7 +74,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
 
   AC_MSG_CHECKING([for boost header])
   for i in $newlist; do
-    dirs=`ls -dr $i/boost* 2>/dev/null`
+    dirs="`ls -dr $i/boost* 2>/dev/null`"
     if test -n "${dirs}"; then
       gnash_boost_topdir="`(cd ${dirs}; pwd)`"
       gnash_boost_subdir="`dirname ${gnash_boost_topdir}`"
@@ -127,11 +127,11 @@ AC_DEFUN([GNASH_PATH_BOOST],
         missing_libs=""
       fi
       for j in ${boost_libs}; do
-        dirs=`ls -dr $i/libboost_${j}*.${shlibext} $i/libboost_${j}*.a 2>/dev/null`
+        dirs="`ls -dr $i/libboost_${j}*.${shlibext} $i/libboost_${j}*.a 2>/dev/null`"
         if test -n "${dirs}"; then
-          libname=`echo ${dirs} | sed -e 's:\..*$::' -e 's:^.*/lib::'`
+          libname="`echo ${dirs} | sed -e 's:\..*$::' -e 's:^.*/lib::'`"
           if test x$dirname = x; then
-            dirname=`echo ${dirs} | sed -e 's:/libboost.*$::'`
+            dirname="`echo ${dirs} | sed -e 's:/libboost.*$::'`"
            if test x"${dirname}" != "x/usr/lib"; then
       	      ac_cv_path_boost_lib="-L${dirname}"
             fi
@@ -143,9 +143,9 @@ AC_DEFUN([GNASH_PATH_BOOST],
       done
     done
     for j in ${extra_boost_libs}; do
-      dirs=`ls -dr ${dirname}/libboost_${j}*.${shlibext} ${dirname}/libboost_${j}*.a 2>/dev/null`
+      dirs="`ls -dr ${dirname}/libboost_${j}*.${shlibext} ${dirname}/libboost_${j}*.a 2>/dev/null`"
       if test -n "${dirs}"; then
-        libname=`echo ${dirs} | sed -e 's:\..*$::' -e 's:^.*/lib::'`
+        libname="`echo ${dirs} | sed -e 's:\..*$::' -e 's:^.*/lib::'`"
         ac_cv_path_boost_extra_lib="${ac_cv_path_boost_extra_lib} -l${libname}"
       else
         extra_missing_libs="${extra_missing_libs} $j"

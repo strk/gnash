@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-dnl $Id: gtk2.m4,v 1.45 2007/11/24 16:47:10 rsavoye Exp $
+dnl $Id: gtk2.m4,v 1.46 2007/11/29 05:36:01 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_GTK2],
 [
@@ -34,8 +34,8 @@ AC_DEFUN([GNASH_PATH_GTK2],
 
   if test x$cross_compiling = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_gtk2_incl}" = x; then
-      $PKG_CONFIG --exists gtk+-2.0 && ac_cv_path_gtk2_incl=`$PKG_CONFIG --cflags gtk+-2.0`
-      $PKG_CONFIG --exists gtk+-2.0 && gnash_gtk2_version=`$PKG_CONFIG --modversion gtk+-2.0`
+      $PKG_CONFIG --exists gtk+-2.0 && ac_cv_path_gtk2_incl="`$PKG_CONFIG --cflags gtk+-2.0`"
+      $PKG_CONFIG --exists gtk+-2.0 && gnash_gtk2_version="`$PKG_CONFIG --modversion gtk+-2.0`"
     fi
   fi
 
@@ -50,8 +50,8 @@ AC_DEFUN([GNASH_PATH_GTK2],
     for i in $incllist; do
       for j in `ls -dr $i/gtk-[[2-9]].[[0-9]] 2>/dev/null`; do
         if test -f $j/gtk/gtk.h; then
-          gnash_gtk2_topdir=`basename $j`
-          gnash_gtk2_version=`echo ${gnash_gtk2_topdir} | sed -e 's:gtk-::'`
+          gnash_gtk2_topdir="`basename $j`"
+          gnash_gtk2_version="`echo ${gnash_gtk2_topdir} | sed -e 's:gtk-::'`"
       	  ac_cv_path_gtk2_incl="-I$i/${gnash_gtk2_topdir}"
           break
         fi
@@ -89,7 +89,7 @@ AC_DEFUN([GNASH_PATH_GTK2],
 
   if test x$cross_compiling = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_gtk2_lib}" = x; then
-      $PKG_CONFIG --exists gtk+-2.0 && ac_cv_path_gtk2_lib=`$PKG_CONFIG --libs-only-l gtk+-2.0`
+      $PKG_CONFIG --exists gtk+-2.0 && ac_cv_path_gtk2_lib="`$PKG_CONFIG --libs-only-l gtk+-2.0`"
     fi
   fi
 

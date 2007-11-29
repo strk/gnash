@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl: $Id: gtkglext.m4,v 1.38 2007/11/24 16:47:10 rsavoye Exp $
+dnl: $Id: gtkglext.m4,v 1.39 2007/11/29 05:36:01 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_GLEXT],
 [
@@ -44,7 +44,7 @@ AC_CACHE_VAL(ac_cv_path_glext_incl,[
 
 
 if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_glext_incl}" = x; then
-	$PKG_CONFIG --exists gtkglext-1.0 && ac_cv_path_glext_incl=`$PKG_CONFIG --cflags gtkglext-1.0`
+	$PKG_CONFIG --exists gtkglext-1.0 && ac_cv_path_glext_incl="`$PKG_CONFIG --cflags gtkglext-1.0`"
 fi
 
 dnl Attempt to find the top level directory, which unfortunately has a
@@ -53,7 +53,7 @@ dnl doesnt seem to get a directory that is unversioned.
 AC_MSG_CHECKING([for the Gtk GL Extensions Version])
 
 if test x"$PKG_CONFIG" != x; then
-	$PKG_CONFIG --exists gtkglext-1.0 && gnash_glext_version=`$PKG_CONFIG --modversion gtkglext-1.0 | cut -d "." -f 1,3`
+	$PKG_CONFIG --exists gtkglext-1.0 && gnash_glext_version="`$PKG_CONFIG --modversion gtkglext-1.0 | cut -d "." -f 1,3`"
 fi
 
 if test x"${gnash_glext_version}" = x ; then
@@ -62,8 +62,8 @@ if test x"${gnash_glext_version}" = x ; then
 	for i in $incllist; do
 		for j in `ls -dr $i/gtkglext-[[0-9]].[[0-9]] 2>/dev/null`; do
 			if test -f $j/gtk/gtkgl.h; then
-				gnash_glext_topdir=`basename $j`
-				gnash_glext_version=`echo ${gnash_glext_topdir} | sed -e 's:gtkglext-::'`
+				gnash_glext_topdir="`basename $j`"
+				gnash_glext_version="`echo ${gnash_glext_topdir} | sed -e 's:gtkglext-::'`"
 				break
 			fi
 		done
@@ -108,7 +108,7 @@ fi
 ])
 
 if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_glext_lib}" = x; then
-	$PKG_CONFIG --exists gtkglext-1.0 && ac_cv_path_glext_lib=`$PKG_CONFIG --libs-only-l gtkglext-1.0`
+	$PKG_CONFIG --exists gtkglext-1.0 && ac_cv_path_glext_lib="`$PKG_CONFIG --libs-only-l gtkglext-1.0`"
 fi
 
 ac_cv_path_glext_incl_config=""

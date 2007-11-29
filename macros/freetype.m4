@@ -30,7 +30,7 @@ AC_DEFUN([GNASH_PATH_FREETYPE2],
 
   if test x$cross_compiling = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_freetype_incl}" = x; then
-      $PKG_CONFIG --exists freetype2 && ac_cv_path_freetype_incl=`$PKG_CONFIG --cflags freetype2`
+      $PKG_CONFIG --exists freetype2 && ac_cv_path_freetype_incl="`$PKG_CONFIG --cflags freetype2`"
     fi
   fi
 
@@ -83,7 +83,7 @@ dnl   fi
   dnl Look for the library
   if test x$cross_compiling = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_freetype_lib}" = x; then
-      $PKG_CONFIG --exists freetype2 && ac_cv_path_freetype_lib=`$PKG_CONFIG --libs freetype2`
+      $PKG_CONFIG --exists freetype2 && ac_cv_path_freetype_lib="`$PKG_CONFIG --libs freetype2`"
     fi
   fi
 
@@ -132,7 +132,7 @@ dnl   fi
   dnl default (unless fontconfig is removed after building gnash, for instance).
   AC_PATH_PROG(FC_MATCH, fc-match, ,[${pathlist}])
   if test x"$FC_MATCH" != x; then
-    DEFAULT_FONT=`$FC_MATCH -v 'Sans' | grep '^.file:' | sed 's/\(.*\"\)\(.*\)\(\".*\)/\2/g'`
+    DEFAULT_FONT="`$FC_MATCH -v 'Sans' | grep '^.file:' | sed 's/\(.*\"\)\(.*\)\(\".*\)/\2/g'`"
   fi
 
   dnl Hard-coded last resort, which is only likely to work
