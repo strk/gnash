@@ -107,7 +107,7 @@ class Dejagnu {
     static function check_equals(obt, exp, msg) {
         if(msg == null) msg = "";
         if ( obt == exp ) 
-            pass(obt+' == '+exp);
+            pass(obt+' == '+exp+' '+msg);
         else 
             fail('expected: "'+exp+'" , obtained: "'+obt+'" '+msg);
     }
@@ -115,7 +115,7 @@ class Dejagnu {
     static function xcheck_equals(obt, exp, msg) {
         if(msg == null) msg = "";
         if ( obt == exp ) 
-            xpass(obt+' == '+exp);
+            xpass(obt+' == '+exp+' '+msg);
         else 
             xfail('expected: '+exp+' , obtained: '+obt+" "+msg);
     }

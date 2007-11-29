@@ -51,7 +51,24 @@ class Level99
                 _level5.testvar2 = "goodbye";
                 check_equals(_level5.testvar2, "goodbye");
 
-		check_totals(20);
+                check_equals(typeof(_level5), 'movieclip');
+		var level5ref = _level5;
+		_level5.swapDepths(10);
+                xcheck_equals(typeof(_level5), 'undefined');
+                check_equals(typeof(level5ref), 'movieclip');
+                xcheck_equals(level5ref.getDepth(), '10');
+                xcheck_equals(level5ref._target, '_level16394');
+                xcheck_equals(typeof(_level16394), 'movieclip');
+
+		_level16394.removeMovieClip();
+
+                check_equals(typeof(level5ref), 'movieclip');
+                xcheck_equals(typeof(level5ref)._target, 'undefined');
+                xcheck_equals(typeof(level5ref.getDepth), 'undefined');
+
+                check_equals(typeof(_level16364), 'undefined')
+
+		check_totals(30);
                 Dejagnu.done();
 	}
 }

@@ -1,5 +1,11 @@
 2007-11-29 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-mtasc.all/Dejagnu.as: print info message on successes too.
+	* testsuite/misc-mtasc.all/: level5.as, level99.as: test swapDepth and
+	  removeMovieClip effects on levels (gnash fails). 
+
+2007-11-29 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.cpp: add staticDepthOffset to _level# movies.
 	* server/character.{cpp,h}: get target right for _level# now
 	  that we encode staticDepthOffset-modified depth.

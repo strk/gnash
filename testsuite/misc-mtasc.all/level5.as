@@ -47,6 +47,11 @@ class Level5
                 _level0.testvar2 = true;
                 check_equals(_level0.testvar2, true);
 
+		_level5.onUnload = function()
+		{
+			check(false); // should not be executed
+			note("Unloading "+this);
+		}
 
                 // load yet another swf
                 getURL("level99.swf","_level"+99);
