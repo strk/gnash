@@ -77,7 +77,7 @@ AC_DEFUN([GNASH_PATH_QT],
       for j in $QTDIR `ls -dr $i/qt[[0-9]] 2>/dev/null`; do
         if test -f $j/include/qobject.h; then
           gnash_qt_topdir="$j"
-	  if test $gnash_qt_version -eq 0; then
+	  if test "${gnash_qt_version} " -eq 0; then
             gnash_qt_version=2
 	  fi
           ac_cv_path_qt_incl="-I$j/include"
@@ -85,7 +85,7 @@ AC_DEFUN([GNASH_PATH_QT],
 	else
           if test -f $j/Qt/qobject.h; then
           gnash_qt_topdir="$j"
-	  if test $gnash_qt_version -eq 0; then
+	  if test "${gnash_qt_version} " -eq 0; then
             gnash_qt_version=4
 	  fi
           ac_cv_path_qt_incl="-I$j/Qt"

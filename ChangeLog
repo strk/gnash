@@ -30,7 +30,8 @@
 	  installed by default and pkg-config is unaware of it.
 	* macros/qtopia.m4: Clean up.
 	* macros/agg.m4: --libs-only-L cannot have worked ever.
-	* configure.ac: Fixed 'test -eq'.
+	* configure.ac, macros/curl.m4, macros/qt.m4, macros/qtopia.m4: 
+	  Fixed 'test -eq'.
 
 2007-11-28 Sandro Santilli <strk@keybit.net>
 

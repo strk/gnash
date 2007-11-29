@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: qtopia.m4,v 1.3 2007/11/29 00:02:22 nihilus Exp $
+dnl $Id: qtopia.m4,v 1.4 2007/11/29 00:40:21 nihilus Exp $
 
 dnl ~{rob@ute} pts/8> QtCore  QtSvg Qtnetwork QtXml 
 dnl QtCore: Command not found.
@@ -88,7 +88,7 @@ AC_DEFUN([GNASH_PATH_QTOPIA],
   dnl this a sanity check for Qtopia 2
   AC_MSG_CHECKING([Sanity checking the Qtopia header installation])
   qt_headers="qmainwindow.h qmenubar.h qpopupmenu.h qapplication.h"
-  if test $gnash_qtopia_version -eq 2; then
+  if test "${gnash_qtopia_version} " -eq 2; then
     if test x"${ac_cv_path_qtopia_incl}" != x; then
       for i in $qt_headers; do
         if ! test -f  ${gnash_qtopia_topdir}/include/$i; then
@@ -101,7 +101,7 @@ AC_DEFUN([GNASH_PATH_QTOPIA],
   
   dnl this a sanity check for Qtopia 4
   qt_headers="QtXml QtGui QtCore"
-  if test $gnash_qtopia_version -eq 4; then
+  if test "${gnash_qtopia_version} " -eq 4; then
     if test x"${ac_cv_path_qtopia_incl}" != x; then
       for i in $qt_headers; do
         if ! test -d ${gnash_qtopia_topdir}/qtopiacore/target/include/$i; then
@@ -146,7 +146,7 @@ AC_DEFUN([GNASH_PATH_QTOPIA],
   AC_MSG_CHECKING([Sanity checking the Qtopia installation])
   dnl this a sanity check for Qtopia 2
   qt_libs="libqt libqtopia libqpe"
-  if test $gnash_qtopia_version -eq 2; then
+  if test "${gnash_qtopia_version} " -eq 2; then
     AC_DEFINE([GNASH_QTOPIA_VERSION], 2, [The Qtopia version])
     if test x"${ac_cv_path_qtopia_lib}" != x; then
       for i in $qt_libs; do
@@ -160,7 +160,7 @@ AC_DEFUN([GNASH_PATH_QTOPIA],
   
   dnl this a sanity check for Qtopia 4
   qt_libs="libqtopia libqtopiabase"
-  if test $gnash_qtopia_version -eq 4; then
+  if test "${gnash_qtopia_version} " -eq 4; then
     AC_DEFINE([GNASH_QTOPIA_VERSION], 4, [The Qtopia version])
     gnash_qtopia_version=`dirname ${gnash_qtopia_topdir}`
     if test x"${ac_cv_path_qtopia_lib}" != x; then
