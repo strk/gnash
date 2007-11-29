@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.104 2007/11/27 11:28:50 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.105 2007/11/29 09:31:03 strk Exp $";
 
 #include "check.as"
 
@@ -889,7 +889,7 @@ xcheck(textfieldTest instanceof MovieClip);
 
 // _level0 is at depth 0 !
 // _level1 is at depth 1 ! (and so on)..
-xcheck_equals(_root.getDepth(), -16384);
+check_equals(_root.getDepth(), -16384);
 
 static_clip_name = "__shared_assets";
 static_clip = eval(static_clip_name);

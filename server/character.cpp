@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.65 2007/11/27 11:05:28 strk Exp $ */
+/* $Id: character.cpp,v 1.66 2007/11/29 09:31:02 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -797,7 +797,7 @@ character::getTarget() const
 		{
 			assert(dynamic_cast<const movie_instance*>(ch));
 			std::stringstream ss;
-			ss << "_level" << ch->get_depth();
+			ss << "_level" << ch->get_depth()-character::staticDepthOffset;
 			path.push_back(ss.str());
 			// it is completely legal to set root's _name
 			//assert(ch->get_name().empty());

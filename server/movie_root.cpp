@@ -140,6 +140,9 @@ movie_root::setRootMovie(movie_instance* movie)
 	m_viewport_height = (int)movie->get_movie_definition()->get_height_pixels();
 	m_pixel_scale = 1;
 
+	// assert(movie->get_depth() == 0); ?
+	movie->set_depth(character::staticDepthOffset);
+
 	try
 	{
 		setLevel(0, movie);
@@ -161,7 +164,7 @@ void
 movie_root::setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movie)
 {
 	assert(movie != NULL);
-	assert(static_cast<unsigned int>(movie->get_depth()) == num);
+	assert(static_cast<unsigned int>(movie->get_depth()) == num+character::staticDepthOffset);
 
 	//movie->setLevel(num)
 	//movie->set_depth(num);
@@ -204,7 +207,7 @@ movie_root::loadLevel(unsigned int num, const URL& url)
 	extern_movie->setVariables(vars);
 
 	character* ch = extern_movie.get();
-	ch->set_depth(num);
+	ch->set_depth(num+character::staticDepthOffset);
 
 	save_extern_movie(extern_movie.get());
 

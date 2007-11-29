@@ -1,5 +1,15 @@
 2007-11-29 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.cpp: add staticDepthOffset to _level# movies.
+	* server/character.{cpp,h}: get target right for _level# now
+	  that we encode staticDepthOffset-modified depth.
+	* testsuite/actionscript.all/MovieClip.as: success getting _root's
+	  depth.
+	* testsuite/misc-mtasc.all/: levels.as, level5.as, level99.as:
+	  success getting levels depth.
+
+2007-11-29 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/generic-testrunner.sh:
 	  print run test on consistency error.
 	* testsuite/misc-mtasc.all/Dejagnu.as: have Dejagnu.done() trace

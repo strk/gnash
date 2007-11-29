@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.110 2007/11/16 21:28:54 strk Exp $ */
+/* $Id: character.h,v 1.111 2007/11/29 09:31:03 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -342,7 +342,7 @@ public:  // TODO: make protected
 
 public:
 
-    /// This is the amount substracted from displaylist tag defined depths.
+    /// This is the amount added to displaylist tag defined depths.
     /// Character placed by tags (vs. characters instantiated by ActionScript)
     /// always have negative depths by effect of this offset.
     //

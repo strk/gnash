@@ -29,7 +29,7 @@ class Level99
                 check_equals(mc._currentframe, 1);
 
                 // Check our depth
-		xcheck_equals(mc.getDepth(), -16285);
+		check_equals(mc.getDepth(), -16285);
 
                 // The ""+ is there to force conversion to a string
                 check_equals(""+mc, "_level99");
