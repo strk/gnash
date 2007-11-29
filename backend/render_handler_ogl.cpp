@@ -1400,7 +1400,8 @@ public:
       const path& cur_path = *it;
       
       if (cur_path.m_fill0 || cur_path.m_fill1) {
-        _masks.back().push_back(cur_path);     
+        _masks.back().push_back(cur_path);
+        _masks.back().back().m_line = 0;    
       }
     }  
   }
@@ -1537,7 +1538,7 @@ public:
 //
 // 4. ...
 // 5. Profit!
-  
+
   virtual void
   draw_shape_character(shape_character_def *def, 
     const matrix& mat,

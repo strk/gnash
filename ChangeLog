@@ -1,5 +1,10 @@
 2007-11-29 Bastiaan Jacques <bastiaan@bjacques.org>
 
+	* backend/render_handler_ogl.cpp: Remove line styles from masks.
+	Fixed bug #21678.
+
+2007-11-29 Bastiaan Jacques <bastiaan@bjacques.org>
+
 	* backend/render_handler_ogl.cpp: Implement real anti-aliasing using
 	the accumulation buffer. Make sure that video doesn't get
 	anti-aliased. Use a raw pointer instead of boost::ref as an argument
