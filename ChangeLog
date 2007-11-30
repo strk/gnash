@@ -1,5 +1,10 @@
 2007-11-30 Sandro Santilli <strk@keybit.net>
 
+	* plugin/plugin.cpp: don't use operator+ on temp string, it seems
+	  to have weird problems in some cases. See bug #21667.
+
+2007-11-30 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.{cpp,h}: support swapping and removing levels,
 	  add a pointer to originally loaded movie for methods still needing 
 	  that.

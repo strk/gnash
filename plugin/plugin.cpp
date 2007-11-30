@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.87 2007/10/23 18:13:59 strk Exp $ */
+/* $Id: plugin.cpp,v 1.88 2007/11/30 12:55:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -583,7 +583,9 @@ nsPluginInstance::startProc(Window win)
         const string& nam=it->first; 
         const string& val=it->second;
 
-        string param = nam + string("=") + val;
+        string param = nam;
+	param += string("=");
+	param += val;
         paramvalues.push_back(param);
     }
 
