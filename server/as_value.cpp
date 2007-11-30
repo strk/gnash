@@ -56,6 +56,7 @@ using namespace std;
 
 namespace {
 
+struct invalidHexDigit {};
 uint8_t parseHex(char c)
 {
 	switch (c)
@@ -76,6 +77,7 @@ uint8_t parseHex(char c)
 		case 'd': case 'D': return 13;
 		case 'e': case 'E': return 14;
 		case 'f': case 'F': return 15;
+		default: throw invalidHexDigit();
 	}
 }
 
@@ -155,7 +157,7 @@ as_value::to_string() const
 		case OBJECT:
 		case AS_FUNCTION:
 		{
-			as_object* obj = m_type == OBJECT ? getObj().get() : getFun().get();
+			//as_object* obj = m_type == OBJECT ? getObj().get() : getFun().get();
 			try
 			{
 				as_value ret = to_primitive(STRING);
@@ -378,10 +380,13 @@ as_value::to_number() const
             {
 		if ( s.length() == 8 && s[0] == '0' && ( s[1] == 'x' || s[1] == 'X' ) )
 		{
+			try {
 			uint8_t r = (parseHex(s[2])<<4) + parseHex(s[3]);
 			uint8_t g = (parseHex(s[4])<<4) + parseHex(s[5]);
 			uint8_t b = (parseHex(s[6])<<4) + parseHex(s[7]);
 			return (double)((r<<16)|(g<<8)|b);
+			} catch (invalidHexDigit) { }
+			
 		}
             }
 
@@ -434,7 +439,7 @@ as_value::to_number() const
             //
             // Arrays and Movieclips should return NaN.
 
-            as_object* obj = m_type == OBJECT ? getObj().get() : getFun().get();
+            //as_object* obj = m_type == OBJECT ? getObj().get() : getFun().get();
             try
             {
                 as_value ret = to_primitive(NUMBER);
@@ -762,7 +767,7 @@ as_value::set_as_function(as_function* func)
 }
 
 bool
-as_value::conforms_to(string_table::key name)
+as_value::conforms_to(string_table::key /*name*/)
 {
 	// TODO: Implement
 	return false;
@@ -1472,7 +1477,7 @@ as_value::SpriteProxy::find_sprite_by_target(const std::string& tgtstr)
 	//       as the SpriteProxy target (instead of
 	//       the full string, to be parsed everytime)
 
-	string::size_type size = tgtstr.size();
+	//string::size_type size = tgtstr.size();
 	string::size_type from = 0;
 	while ( string::size_type to=tgtstr.find_first_of('.', from) )
 	{
