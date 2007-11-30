@@ -833,7 +833,7 @@ Gui::getMovieInfo() const
 
     // Print info about levels (only level0 for now, then will be extended)
     movie_root& stage = vm.getRoot();
-    boost::intrusive_ptr<movie_instance> level0 = stage.getLevel(0);
+    boost::intrusive_ptr<movie_instance> level0 = stage.getRootMovie();
     movie_definition* def0 = level0->get_movie_definition();
     assert(def0);
     snprintf(buf, 16, "SWF%d", def0->get_version()); buf[15] = '\0';

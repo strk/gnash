@@ -34,6 +34,9 @@ class Level5
                 // The ""+ is there to force conversion to a string
                 check_equals(""+mc, "_level5");
 
+                // Mc level is _level0 ? why ? 
+                check_equals(mc._level, _level0);
+
                 // check that we can acess back to _level0
                 check_equals(_level0.testvar, 1239);
 
@@ -52,6 +55,23 @@ class Level5
 			check(false); // should not be executed
 			note("Unloading "+this);
 		}
+
+		mc.createEmptyMovieClip("ch", 1);
+		with(mc.ch)
+		{
+			lineStyle(1, 0x00000);
+			beginFill(0xFF0000, 80);
+			var x=200;
+			var y=200;
+			var width=100;
+			var height=100;
+			moveTo(x, y);
+			lineTo(x+width, y);
+			lineTo(x+width, y+height);
+			lineTo(x, y+height);
+			lineTo(x, y);
+			endFill();
+		};
 
                 // load yet another swf
                 getURL("level99.swf","_level"+99);

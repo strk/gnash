@@ -1,5 +1,19 @@
 2007-11-30 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.{cpp,h}: support swapping and removing levels,
+	  add a pointer to originally loaded movie for methods still needing 
+	  that.
+	* gui/gui.cpp: use movie_root::getRootMovie() instead of getLevel(0)
+	  as we can't assume _level0 is present (I think).
+	* server/character.cpp (computeTargetPath): for _level# movies !=
+	  original root movie return '_level#' string, not '/'.
+	* server/sprite_instance.cpp: allow removing and swapping levels.
+	* testsuite/misc-mtasc.all/: level5.as, level99.as: test swapping
+	  and removing levels.
+	* testsuite/swfdec/PASSING: movieclip-swap-depths tests succeed.
+
+2007-11-30 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/shape_character_def.cpp (computeBounds): don't choke
 	  on glyph shapes with m_line set to 1. Fixes bug #21674.
 

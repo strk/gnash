@@ -26,6 +26,23 @@ class Level99
 {
 	static function main(mc)
 	{
+		mc.createEmptyMovieClip("ch", 1);
+		with(mc.ch)
+		{
+			lineStyle(1, 0x00000);
+			beginFill(0x00FF00, 80);
+			var x=250;
+			var y=250;
+			var width=100;
+			var height=100;
+			moveTo(x, y);
+			lineTo(x+width, y);
+			lineTo(x+width, y+height);
+			lineTo(x, y+height);
+			lineTo(x, y);
+			endFill();
+		};
+
                 check_equals(mc._currentframe, 1);
 
                 // Check our depth
@@ -33,6 +50,9 @@ class Level99
 
                 // The ""+ is there to force conversion to a string
                 check_equals(""+mc, "_level99");
+
+                // Mc level is _level0 ? why ? 
+                check_equals(mc._level, _level0);
 
                 // check that we can acess back to _level0
                 check_equals(_level0.testvar, 1239);
@@ -53,22 +73,60 @@ class Level99
 
                 check_equals(typeof(_level5), 'movieclip');
 		var level5ref = _level5;
-		_level5.swapDepths(10);
-                xcheck_equals(typeof(_level5), 'undefined');
+		check_equals(_level5.getDepth(), -16379);
+		_level5.swapDepths(10); 
+                check_equals(typeof(_level5), 'undefined');
                 check_equals(typeof(level5ref), 'movieclip');
-                xcheck_equals(level5ref.getDepth(), '10');
-                xcheck_equals(level5ref._target, '_level16394');
-                xcheck_equals(typeof(_level16394), 'movieclip');
+                check_equals(level5ref.getDepth(), '10');
+                check_equals(level5ref._target, '_level16394');
+                check_equals(typeof(_level16394), 'movieclip');
+		level5ref.swapDepths(20); // swapDepth doesn't work now because level5ref is out of the static depth zone
+                check_equals(level5ref.getDepth(), '10');
+                check_equals(level5ref._target, '_level16394');
+                xcheck_equals(""+level5ref, '_level5');
 
-		_level16394.removeMovieClip();
+		var level99ref = _level99;
+		_level99.swapDepths(30);
+                check_equals(level99ref.getDepth(), '30');
+                check_equals(level99ref._target, '_level16414');
+		level99ref.swapDepths(40); // swapDepth doesn't work now because level99ref is out of the static depth zone
+                check_equals(level99ref.getDepth(), '30');
+                check_equals(level99ref._target, '_level16414');
+                xcheck_equals(""+level99ref, '_level99');
 
-                check_equals(typeof(level5ref), 'movieclip');
-                xcheck_equals(typeof(level5ref)._target, 'undefined');
-                xcheck_equals(typeof(level5ref.getDepth), 'undefined');
+		note("Setting up onEnterFrame for "+mc.ch);
+		mc.ch.count = 0;
+		mc.ch.l5ref = level5ref;
+		mc.ch.l99ref = level99ref;
+		mc.ch.onEnterFrame = function()
+		{
+			note(this+".enterFrame -- l5ref is "+this.l5ref+" -- l99ref is "+this.l99ref);
+			if ( this.count > 4 )
+			{
+				check_equals(this.l5ref._target, '_level16394');
+				check_equals(this.l99ref._target, '_level16414');
 
-                check_equals(typeof(_level16364), 'undefined')
+				_level16394.removeMovieClip();
 
-		check_totals(30);
-                Dejagnu.done();
+				check_equals(typeof(this.l5ref), 'movieclip');
+				check_equals(typeof(this.l5ref)._target, 'undefined');
+				check_equals(typeof(this.l5ref.getDepth), 'undefined');
+				check_equals(typeof(_level16364), 'undefined')
+
+				// END OF TEST HERE
+				// TODO: add tests for:
+				//  - sane swapping between to levels,
+				//  - swapping & removing _level0 
+				//  
+				check_totals(43);
+				Dejagnu.done();
+				delete this.onEnterFrame;
+			}
+			else
+			{
+				++this.count;
+				this.l5ref.swapDepths(this.l99ref);
+			}
+		}
 	}
 }

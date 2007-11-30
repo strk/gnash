@@ -82,6 +82,8 @@ movie_root::movie_root()
 	m_active_input_text(NULL),
 	m_time_remainder(0.0f),
 	m_drag_state(),
+	_movies(),
+	_rootMovie(),
 	_allowRescale(true),
 	_invalidated(true),
 	_disableScripts(false),
@@ -134,6 +136,8 @@ movie_root::~movie_root()
 void
 movie_root::setRootMovie(movie_instance* movie)
 {
+	_rootMovie = movie;
+
 	m_viewport_x0 = 0;
 	m_viewport_y0 = 0;
 	m_viewport_width = (int)movie->get_movie_definition()->get_width_pixels();
@@ -171,12 +175,116 @@ movie_root::setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movi
 	//movie->set_name(ss.str().c_str());
 
 	//if ( _movies.size() < num+1 ) _movies.resize(num+1);
-	_movies[num] = movie; // [num] = movie;
+	_movies[movie->get_depth()] = movie; // [num] = movie;
 
 	movie->set_invalidated();
 	
 	/// Notify placement 
 	movie->stagePlacementCallback();
+
+	assert(testInvariant());
+}
+
+void
+movie_root::swapLevels(boost::intrusive_ptr<sprite_instance> movie, int depth)
+{
+	assert(movie);
+
+//#define GNASH_DEBUG_LEVELS_SWAPPING 1
+
+	int oldDepth = movie->get_depth();
+
+#ifdef GNASH_DEBUG_LEVELS_SWAPPING
+	log_debug("Before swapLevels (source depth %d, target depth %d) levels are: ", oldDepth, depth);
+	for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
+	{
+		log_debug(" %d: %p (%s @ depth %d)", i->first, (void*)(i->second.get()), i->second->getTarget().c_str(), i->second->get_depth());
+	}
+#endif
+
+	if ( oldDepth < character::staticDepthOffset ) // should include _level0 !
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("%s.swapDepth(%d): movie has a depth (%d) below static depth zone (%d), won't swap it's depth"),
+			movie->getTarget().c_str(), depth, oldDepth, character::staticDepthOffset);
+		);
+		return;
+	}
+
+	if ( oldDepth >= 0 ) 
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("%s.swapDepth(%d): movie has a depth (%d) below static depth zone (%d), won't swap it's depth"),
+			movie->getTarget().c_str(), depth, oldDepth, character::staticDepthOffset);
+		);
+		return;
+	}
+
+	int oldNum = oldDepth; // -character::staticDepthOffset;
+	Levels::iterator oldIt = _movies.find(oldNum);
+	if ( oldIt == _movies.end() )
+	{
+		log_debug("%s.swapDepth(%d): target depth (%d) contains no movie",
+			movie->getTarget().c_str(), depth, oldNum);
+		return;
+	}
+
+	int newNum = depth; // -character::staticDepthOffset;
+	movie->set_depth(depth);
+	Levels::iterator targetIt = _movies.find(newNum);
+	if ( targetIt == _movies.end() )
+	{
+		_movies.erase(oldIt);
+		_movies[newNum] = movie;
+	}
+	else
+	{
+		boost::intrusive_ptr<sprite_instance> otherMovie = targetIt->second;
+		otherMovie->set_depth(oldDepth);
+		oldIt->second = otherMovie;
+		targetIt->second = movie;
+	}
+	
+#ifdef GNASH_DEBUG_LEVELS_SWAPPING
+	log_debug("After swapLevels levels are: ");
+	for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
+	{
+		log_debug(" %d: %p (%s @ depth %d)", i->first, (void*)(i->second.get()), i->second->getTarget().c_str(), i->second->get_depth());
+	}
+#endif
+	
+	// TODO: invalidate self, not the movie
+	movie->set_invalidated();
+	
+	assert(testInvariant());
+}
+
+void
+movie_root::dropLevel(int depth)
+{
+	// should be checked by caller
+	assert ( depth >= 0 && depth <= 1048575 );
+
+	Levels::iterator it = _movies.find(depth);
+	if ( it == _movies.end() )
+	{
+		log_error("movie_root::dropLevel called against a movie not found in the levels container");
+		return;
+	}
+
+	sprite_instance* mo = it->second.get();
+	if ( mo == getRootMovie() )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("Original root movie can't be removed"));
+		);
+		return;
+	}
+
+	// TOCHECK: safe to erase here ?
+	mo->unload();
+	mo->destroy();
+	_movies.erase(it);
 
 	assert(testInvariant());
 }
@@ -219,7 +327,7 @@ movie_root::loadLevel(unsigned int num, const URL& url)
 boost::intrusive_ptr<movie_instance>
 movie_root::getLevel(unsigned int num) const
 {
-	Levels::const_iterator i = _movies.find(num);
+	Levels::const_iterator i = _movies.find(num+character::staticDepthOffset);
 	if ( i == _movies.end() ) return 0;
 
 	assert(boost::dynamic_pointer_cast<movie_instance>(i->second));
@@ -279,7 +387,8 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
 		//log_msg("Rescaling allowed");
 
 		// should we cache this ? it's immutable after all !
-		const rect& frame_size = _movies[0]->get_frame_size();
+		// WARNING: don't allow swapping depth of the root movie !!
+		const rect& frame_size = _rootMovie->get_frame_size();
 
 		float	scale_x = m_viewport_width / TWIPS_TO_PIXELS(frame_size.width());
 		float	scale_y = m_viewport_height / TWIPS_TO_PIXELS(frame_size.height());
@@ -852,7 +961,7 @@ movie_root::display()
 	assert(testInvariant());
 
 	// should we cache this ? it's immutable after all !
-	const rect& frame_size = getLevel(0)->get_frame_size();
+	const rect& frame_size = getRootMovie()->get_frame_size();
 
 	clearInvalidated();
 
@@ -897,7 +1006,7 @@ movie_root::call_method(const char* method_name,
 
 	va_list	args;
 	va_start(args, method_arg_fmt);
-	const char* result = getLevel(0)->call_method_args(method_name,
+	const char* result = getRootMovie()->call_method_args(method_name,
 		method_arg_fmt, args);
 	va_end(args);
 
@@ -909,7 +1018,7 @@ char* movie_root::call_method_args(const char* method_name,
 		const char* method_arg_fmt, va_list args)
 {
 	assert(testInvariant());
-	return getLevel(0)->call_method_args(method_name, method_arg_fmt, args);
+	return getRootMovie()->call_method_args(method_name, method_arg_fmt, args);
 }
 
 void movie_root::cleanupUnloadedListeners(CharacterList& ll)
@@ -1273,6 +1382,10 @@ movie_root::markReachableResources() const
     {
         i->second->setReachable();
     }
+
+    // Mark original top-level movie
+    // This should always be in _movies, but better make sure
+    _rootMovie->setReachable();
 
     // Mark mouse entities 
     m_mouse_button_state.markReachableResources();

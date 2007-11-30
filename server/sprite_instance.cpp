@@ -371,18 +371,6 @@ static as_value sprite_swap_depths(const fn_call& fn)
 
 
 	SpritePtr this_parent = dynamic_cast<sprite_instance*>(sprite->get_parent());
-	if ( ! this_parent )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		stringstream ss; fn.dump_args(ss);
-		log_aserror(_("%s.swapDepths(%s): this sprite has no parent, "
-			"swapping depth of root?"),
-			sprite->getTarget().c_str(),
-			ss.str().c_str());
-		);
-		return rv;
-	}
-	
 
 	//CharPtr target = NULL;
 	int target_depth = 0;
@@ -452,7 +440,16 @@ static as_value sprite_swap_depths(const fn_call& fn)
 
 	}
 
-	this_parent->swapDepths(sprite.get(), target_depth);
+	if ( this_parent )
+	{
+		this_parent->swapDepths(sprite.get(), target_depth);
+	}
+	else
+	{
+		movie_root& root = VM::get().getRoot();
+		root.swapLevels(sprite, target_depth);
+		return rv;
+	}
 
 	return rv;
 
@@ -1886,7 +1883,7 @@ bool sprite_instance::get_member(string_table::key name_key, as_value* val,
 	}
 	if (name.compare(0, 6, "_level") == 0 && name.find_first_not_of("0123456789", 7) == string::npos )
 	{
-		unsigned int levelno = atoi(name.c_str()+6);
+		unsigned int levelno = atoi(name.c_str()+6); // getting 0 here for "_level" is intentional
 		movie_instance* mo = VM::get().getRoot().getLevel(levelno).get();
 		if ( mo )
 		{
@@ -3812,8 +3809,10 @@ sprite_instance::removeMovieClip()
 	}
 	else
 	{
+		// removing _level#
+		_vm.getRoot().dropLevel(depth);
 		// I guess this can only happen if someone uses _root.swapDepth([0..1048575])
-		log_error(_("Can't remove sprite %s as it has no parent"), getTarget().c_str());
+		//log_error(_("Can't remove sprite %s as it has no parent"), getTarget().c_str());
 	}
 
 }

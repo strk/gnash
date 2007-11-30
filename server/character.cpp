@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.66 2007/11/29 09:31:02 strk Exp $ */
+/* $Id: character.cpp,v 1.67 2007/11/30 11:26:05 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -748,7 +748,13 @@ character::computeTargetPath() const
 		ch = parent;
 	} 
 
-	if ( path.empty() ) return "/";
+	if ( path.empty() )
+	{
+		if ( _vm.getRoot().getRootMovie() == this ) return "/";
+		std::stringstream ss;
+		ss << "_level" << m_depth-character::staticDepthOffset;
+		return ss.str();
+	}
 
 	// Build the target string from the parents stack
 	std::string target;

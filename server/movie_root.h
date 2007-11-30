@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.93 2007/11/27 20:37:53 strk Exp $ */
+/* $Id: movie_root.h,v 1.94 2007/11/30 11:26:05 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -173,6 +173,33 @@ public:
     ///
     bool loadLevel(unsigned int num, const URL& url);
 
+    /// Swap depth of a level (or two)
+    //
+    /// Character's depths are updated.
+    ///
+    /// @param sp
+    ///		The level to change depth/level of. A pointer to it is expected
+    ///		to be found in the _level# container, or an error will be printed
+    ///		and the call would result in a no-op.
+    ///
+    /// @param depth
+    ///		New depth to assign to the character. If another level exists at 
+    ///		the target depth the latter is moved in place of the former, with
+    ///		its depth also updated.
+    ///
+    void swapLevels(boost::intrusive_ptr<sprite_instance> sp, int depth);
+
+    /// Drop level at given depth.
+    //
+    /// @param depth
+    ///   Depth of the level to drop. Note that this is -character::staticDepthOffset for
+    ///   the root movie. Must be >=0 and <= 1048575 or an assertion will fail.
+    ///   Note that if the depth evaluates to the original root movie nothing happens
+    ///   (not allowed to remove that). It is not tested if it's allowed to remove 
+    ///   _level0 after loading into it.
+    ///
+    void dropLevel(int depth);
+
     /// @@ should this delegate to _level0?  probably !
     void set_member(
         const std::string& /*name*/,
@@ -276,11 +303,16 @@ public:
 
     void set_drag_state(const drag_state& st);
 
-    /// @return current top-level root sprite (_level0)
-    sprite_instance* get_root_movie()
+    // just an alias to getRootMovie
+    sprite_instance* get_root_movie() const
     {
-        if ( _movies.empty() ) return NULL;
-        return getLevel(0).get();
+	return getRootMovie();
+    }
+
+    /// @return current top-level root sprite (_level0)
+    movie_instance* getRootMovie() const
+    {
+	return _rootMovie.get();
     }
 
     void stop_drag()
@@ -294,8 +326,7 @@ public:
     ///
     movie_definition* get_movie_definition() const
     {
-        assert(!_movies.empty());
-        return getLevel(0)->get_movie_definition(); 
+	return getRootMovie()->get_movie_definition();
     }
 
     /// Add an interval timer
@@ -320,18 +351,19 @@ public:
 
     /// Return 0-based frame index of _level0
     //
-    /// TODO: drop this function
+    /// TODO: drop this function (currently used by gprocessor)
     ///
     size_t get_current_frame() const
     {
-        assert(!_movies.empty());
-        return getLevel(0)->get_current_frame();
+	return getRootMovie()->get_current_frame();
     }
 
+#if 0
     // @@ should this be in movie_instance ?
     float get_frame_rate() const {
         return get_movie_definition()->get_frame_rate();
     }
+#endif
 
     /// \brief
     /// Return the size of a logical movie pixel as
@@ -342,14 +374,15 @@ public:
         return m_pixel_scale;
     }
 
+#if 0
     // @@ Is this one necessary?
     //
     // TODO: drop this
     character* get_character(int character_id)
     {
-        assert(!_movies.empty());
-        return getLevel(0)->get_character(character_id);
+	return getRootMovie()->get_character(character_id);
     }
+#endif
 
     void set_background_color(const rgba& color);
 
@@ -375,19 +408,22 @@ public:
 
     /// 0-based!! delegates to _level0
     //
-    /// TODO: drop this method ?
+    /// TODO: drop this method. currently used by gprocessor.
     ///
     void goto_frame(size_t target_frame_number)
     {
-        getLevel(0)->goto_frame(target_frame_number);
+	getRootMovie()->goto_frame(target_frame_number);
     }
 
     void display();
 
     /// Delegate to _level0
+    //
+    /// TODO: drop ?
+    ///
     void set_play_state(sprite_instance::play_state s)
     {
-        getLevel(0)->set_play_state(s);
+	getRootMovie()->set_play_state(s);
     }
 
     /// For ActionScript interfacing convenience.
@@ -510,6 +546,7 @@ public:
     /// Resources reachable from movie_root are:
     ///
     /// - All _level# movies (_movies)
+    /// - The original root movie (_rootMovie)
     /// - Mouse entities (m_mouse_button_state)
     /// - Timer targets (_intervalTimers)
     /// - Resources reachable by ActionQueue code (_actionQueue)
@@ -699,8 +736,12 @@ private:
     ///       Appropriate container could be list, set or map (order is important)
     ///
     typedef boost::intrusive_ptr<sprite_instance> LevelMovie;
-    typedef std::map<unsigned int, LevelMovie> Levels;
+    typedef std::map<int, LevelMovie> Levels;
     Levels _movies;
+
+    /// The root movie. This is initially the same as getLevel(0) but might
+    /// change during the run. It will be used to setup and retrive initial stage size
+    boost::intrusive_ptr<movie_instance> _rootMovie;
 
     /// This function should return TRUE iff any action triggered
     /// by the event requires redraw, see \ref events_handling for
@@ -752,7 +793,7 @@ private:
     /// @param movie
     /// The movie_instance to store at the given level.
     /// Will be stored in an intrusive_ptr.
-    /// It's depth will be set to <num> and it's name to
+    /// It's depth will be set to <num>+character::staticDepthOffset and it's name to
     /// _level<num>
     ///
     void setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movie);
