@@ -1,7 +1,7 @@
 2007-11-30 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/vm/ExecutableCode.h: don't push or execute any event code
-	  for unloaded characters(don't need to do this check if opcode guard 
+	  for destroyed characters(don't need to do this check if opcode guard 
 	  is clear and sane).
 	* testsuite/misc-ming.all/loop_test6.c: two more xpasses.
 	* testsuite/misc-ming.all/displaylist_depths_test2.c, loop_test8.c,
