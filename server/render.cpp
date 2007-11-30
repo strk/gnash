@@ -142,40 +142,23 @@ namespace gnash {
 		}
 
 
-		// Geometric and color transforms for mesh and line_strip rendering.
-		void	set_matrix(const matrix& m)
+		void	draw_line_strip(const int16_t coords[], int vertex_count, const rgba& color, const matrix& mat)
 		{
 #ifdef DEBUG_RENDER_CALLS
 			GNASH_REPORT_FUNCTION;
 #endif
-			if (s_render_handler) s_render_handler->set_matrix(m);
-		}
-		void	set_cxform(const cxform& cx)
-		{
-#ifdef DEBUG_RENDER_CALLS
-			GNASH_REPORT_FUNCTION;
-#endif
-			if (s_render_handler) s_render_handler->set_cxform(cx);
-		}
-
-
-		void	draw_line_strip(const int16_t coords[], int vertex_count, const rgba& color)
-		{
-#ifdef DEBUG_RENDER_CALLS
-			GNASH_REPORT_FUNCTION;
-#endif
-			if (s_render_handler) s_render_handler->draw_line_strip(coords, vertex_count, color);
+			if (s_render_handler) s_render_handler->draw_line_strip(coords, vertex_count, color, mat);
     }
 
 
     void  draw_poly(const point* corners, int corner_count, const rgba& fill, 
-      const rgba& outline, bool masked) 
+      const rgba& outline, const matrix& mat, bool masked) 
 		{
 #ifdef DEBUG_RENDER_CALLS
 			GNASH_REPORT_FUNCTION;
 #endif
 			if (s_render_handler) s_render_handler->draw_poly(corners, corner_count,
-        fill, outline, masked);
+        fill, outline, mat, masked);
     }
     
     

@@ -145,6 +145,41 @@ class bitmap_info_cairo : public bitmap_info
     cairo_pattern_t* _pattern;
 };
 
+static void
+init_cairo_matrix(cairo_matrix_t* cairo_matrix, const matrix& gnash_matrix)
+{
+  cairo_matrix_init(cairo_matrix,
+    gnash_matrix.m_[0][0], gnash_matrix.m_[1][0],
+    gnash_matrix.m_[0][1], gnash_matrix.m_[1][1],
+    gnash_matrix.m_[0][2], gnash_matrix.m_[1][2]);
+}
+
+
+/// Transforms the current Cairo matrix using the given matrix. When it goes
+/// out of scope, the matrix will be reset to what it was before the new matrix
+/// was applied.
+class CairoScopeMatrix : public boost::noncopyable
+{
+public:
+  CairoScopeMatrix(cairo_t* cr, const matrix& new_mat)
+   : _cr(cr)
+  {
+    cairo_get_matrix(_cr, &old_mat);
+
+    cairo_matrix_t tmp;
+    init_cairo_matrix(&tmp, new_mat);
+    cairo_transform(_cr, &tmp);    
+  }
+
+  ~CairoScopeMatrix()
+  {
+    cairo_set_matrix(_cr, &old_mat);
+  }
+
+private:
+  cairo_t* _cr;
+  cairo_matrix_t old_mat;
+};
 
 
 class DSOEXPORT render_handler_cairo: public render_handler
@@ -322,25 +357,17 @@ public:
   {
   }
     
-  virtual void  set_matrix(const matrix& m)
-  {
-    log_unimpl("set_matrix");
-  }
-
-  virtual void  set_cxform(const cxform& cx)
-  {
-    log_unimpl("set_cxform");
-  }
-
   virtual void  draw_line_strip(const void* coords, int vertex_count,
-      const rgba& color)
+      const rgba& color, const matrix& mat)
   {
     log_unimpl("draw_line_strip");
   }
   
   virtual void  draw_poly(const point* corners, size_t corner_count, 
-    const rgba& fill, const rgba& outline, bool masked)
+    const rgba& fill, const rgba& outline, const matrix& mat, bool masked)
   {
+    CairoScopeMatrix mat_transformer(_cr, mat);
+
     if (corner_count < 1) {
       return;
     }
@@ -642,21 +669,9 @@ public:
       cairo_stroke(_cr);
     }  
   }
-  
-  void	apply_matrix(cairo_t* cr, const gnash::matrix& m)
-	// add user space transformation
-	{
-	    cairo_matrix_t mat;
-	    init_cairo_matrix(&mat, m);
-	    cairo_transform(cr, &mat);
-	}
-	 
 
-	
-	void
-	draw_subshape(const PathVec& path_vec,
-	  const matrix& mat,
-    const cxform& cx,
+void
+draw_subshape(const PathVec& path_vec, const matrix& mat, const cxform& cx,
     float pixel_scale,
     const std::vector<cairo_pattern_t*>& fill_styles,
     const std::vector<line_style>& line_styles)
@@ -804,11 +819,7 @@ public:
       return;
     }
     
-    cairo_matrix_t old_matrix;
-    cairo_get_matrix(_cr, &old_matrix);
-
-    apply_matrix(_cr, mat); 
-
+    CairoScopeMatrix mat_transformer(_cr, mat);
 
     std::vector<PathVec::const_iterator> subshapes = find_subshapes(path_vec);
     
@@ -829,8 +840,6 @@ public:
     }
     
     destroy_cairo_patterns(fill_styles_cairo);
-
-    cairo_set_matrix(_cr, &old_matrix);
   }
   
   void
@@ -862,10 +871,7 @@ public:
     
     std::vector<line_style> dummy_ls;
     
-    cairo_matrix_t old_matrix;
-    cairo_get_matrix(_cr, &old_matrix);
-
-    apply_matrix(_cr, mat);
+    CairoScopeMatrix mat_transformer(_cr, mat);
     
     std::vector<cairo_pattern_t*> fill_styles_cairo
       = build_cairo_styles(glyph_fs, dummy_cx, mat);
@@ -874,8 +880,6 @@ public:
     draw_subshape(path_vec, mat, dummy_cx, pixel_scale, fill_styles_cairo, dummy_ls);
     
     destroy_cairo_patterns(fill_styles_cairo);
-    
-    cairo_set_matrix(_cr, &old_matrix);    
   }
 
   virtual bool allow_glyph_textures()

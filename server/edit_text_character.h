@@ -340,7 +340,7 @@ private:
 
 	bool m_has_focus;
 	size_t m_cursor;
-	void show_cursor();
+	void show_cursor(const matrix& mat);
 	float m_xcursor;
 	float m_ycursor;
 

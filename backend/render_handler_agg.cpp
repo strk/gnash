@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.117 2007/11/10 14:39:51 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.118 2007/11/30 23:11:10 bjacques Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -372,9 +372,6 @@ public:
   float m_display_width;
   float m_display_height;
 
-  gnash::matrix m_current_matrix;
-  gnash::cxform m_current_cxform;
-
   void set_antialiased(bool enable) {
     // enable=false *forces* all bitmaps to be rendered in low quality
     m_enable_antialias = enable;
@@ -598,8 +595,6 @@ public:
       m_enable_antialias(true),
       m_display_width(0.0),
       m_display_height(0.0),
-      m_current_matrix(),
-      m_current_cxform(),
       m_rbuf(),
       m_pixf(NULL), // TODO: use an auto_ptr
       _clipbounds(),
@@ -733,20 +728,6 @@ public:
     // nothing to do
   }
 
-  void  set_matrix(const gnash::matrix& m)
-  // Set the current transform for mesh & line-strip rendering.
-  {
-    // used only for drawing line strips...    
-    m_current_matrix = m;
-  }
-
-  void  set_cxform(const gnash::cxform& cx)
-  // Set the current color transform for mesh & line-strip rendering.
-  {
-    // used only for drawing line strips...    
-    m_current_cxform = cx;
-  }
-
   static void apply_matrix(const gnash::matrix& /*m*/)
   // add user space transformation
   {
@@ -776,14 +757,15 @@ public:
 
 
   
-  void  draw_line_strip(const void* coords, int vertex_count, const rgba& color)
+  void  draw_line_strip(const void* coords, int vertex_count, const rgba& color,
+	                const matrix& line_mat)
   // Draw the line strip formed by the sequence of points.
   {
   
     assert(m_pixf != NULL);
 
     matrix mat = stage_matrix;
-    mat.concatenate(m_current_matrix);    
+    mat.concatenate(line_mat);    
 
     if ( _clipbounds.size()==0 ) return;
 
@@ -1878,7 +1860,7 @@ public:
   /// Draws the given polygon.
   template <class scanline_type>
   void draw_poly_impl(const point* corners, size_t corner_count, const rgba& fill, 
-    const rgba& outline, scanline_type& sl) {
+    const rgba& outline, scanline_type& sl, const matrix& poly_mat) {
     
     assert(m_pixf != NULL);
 
@@ -1887,7 +1869,7 @@ public:
     if ( _clipbounds.size()==0 ) return;
     
     matrix mat = stage_matrix;
-    mat.concatenate(m_current_matrix);
+    mat.concatenate(poly_mat);
     
     typedef agg::rasterizer_scanline_aa<> ras_type;
     renderer_base rbase(*m_pixf);
@@ -1954,7 +1936,7 @@ public:
   
   
   void draw_poly(const point* corners, size_t corner_count, const rgba& fill, 
-    const rgba& outline, bool masked) {
+    const rgba& outline, const matrix& mat, bool masked) {
     
     if (masked && !m_alpha_mask.empty()) {
     
@@ -1964,7 +1946,7 @@ public:
       
       sl_type sl(m_alpha_mask.back()->get_amask());
          
-      draw_poly_impl<sl_type> (corners, corner_count, fill, outline, sl);       
+      draw_poly_impl<sl_type> (corners, corner_count, fill, outline, sl, mat);       
     
     } else {
     
@@ -1974,7 +1956,7 @@ public:
       
       sl_type sl;
          
-      draw_poly_impl<sl_type> (corners, corner_count, fill, outline, sl);
+      draw_poly_impl<sl_type> (corners, corner_count, fill, outline, sl, mat);
     
     }
     

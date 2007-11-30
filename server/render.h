@@ -81,12 +81,6 @@ namespace gnash {
 		/// See render_handler::end_display (in backend/render_handler.h)
 		void	end_display();
 
-		/// See render_handler::set_matrix (in backend/render_handler.h)
-		void	set_matrix(const matrix& m);
-
-		/// See render_handler::set_cxform (in backend/render_handler.h)
-		void	set_cxform(const cxform& cx);
-
 		/// \brief
 		/// Draw triangles using the current fill-style 0.
 		/// Clears the style list after rendering.
@@ -100,11 +94,12 @@ namespace gnash {
 
 		/// See render_handler::draw_line_strip (in backend/render_handler.h)
 		void	draw_line_strip(const int16_t coords[],
-				int vertex_count, const rgba& color);
+				int vertex_count, const rgba& color, const matrix& mat);
 
 		/// See render_handler::draw_poly (in backend/render_handler.h)
 		void  draw_poly(const point* corners, int corner_count,
-				const rgba& fill, const rgba& outline, bool masked);
+				const rgba& fill, const rgba& outline, const matrix& mat,
+				bool masked);
       
 		/// See render_handler::draw_shape_character (in backend/render_handler.h)
 		void draw_shape_character(shape_character_def *def,

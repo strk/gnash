@@ -1,3 +1,22 @@
+2007-11-30 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler.h, server/render.cpp: Drop set_cxform
+	because it's unused; drop set_matrix because its semantics are
+	unclear. Instead of set_matrix, add matrix arguments to
+	draw_line_strip and draw_poly.
+	* backend/render_handler_agg.cpp: Drop set_cxform and set_matrix and
+	adjust draw_{line_strip,poly} to match. Drop m_current_cxform and
+	m_current_matrix wihch were previously used to hold the arguments to
+	set_{matrix,cxform}.
+	* backend/render_handler_cairo.cpp: Make cairo_init_matrix static.
+	Introduce class CairoScopeMatrix which will apply a matrix to the
+	current cairo matrix and revert that application when it goes out of
+	scope. Remove apply_matrix in favour of CairoScopeMatrix.
+	* backend/render_handler_ogl.cpp, gui/gui.cpp,
+	server/edit_text_character.{cpp,h}, server/render.{cpp,h},
+	server/text.cpp : Adjust following the removal of set_{matrix,cxform}
+	and changes to draw_{line_strip,poly}.
+
 2007-11-30 Sandro Santilli <strk@keybit.net>
 
 	* server/edit_text_character.cpp (format_text): reset bounds when in

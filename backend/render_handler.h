@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.51 2007/11/20 17:17:10 bjacques Exp $ */
+/* $Id: render_handler.h,v 1.52 2007/11/30 23:11:10 bjacques Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -353,17 +353,11 @@ public:
 
   virtual void  end_display() = 0;
     
-  /// Geometric transforms for mesh and line_strip rendering.
-  virtual void  set_matrix(const matrix& m) = 0;
-
-  /// Color transforms for mesh and line_strip rendering.
-  virtual void  set_cxform(const cxform& cx) = 0;
-    
   /// Draw a line-strip directly, using a thin, solid line. 
   //
   /// Can be used to draw empty boxes and cursors.
   virtual void  draw_line_strip(const void* coords, int vertex_count,
-      const rgba& color) = 0;
+      const rgba& color, const matrix& mat) = 0;
     
   /// Draw a simple, solid filled polygon with a thin (~1 pixel) outline.
   //
@@ -380,7 +374,7 @@ public:
   /// ignored, otherwise it is respected.
   ///
   virtual void  draw_poly(const point* corners, size_t corner_count, 
-    const rgba& fill, const rgba& outline, bool masked) = 0;
+    const rgba& fill, const rgba& outline, const matrix& mat, bool masked) = 0;
     
     
   /// Set line and fill styles for mesh & line_strip rendering.

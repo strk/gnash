@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: text.cpp,v 1.38 2007/09/03 16:50:09 cmusick Exp $ */
+/* $Id: text.cpp,v 1.39 2007/11/30 23:11:11 bjacques Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -180,8 +180,6 @@ log_error(_("invalid glyph (-1)"));
 #endif
 
 #ifdef DRAW_INVALID_GLYPHS_AS_EMPTY_BOXES
-					render::set_matrix(mat);
-
 					// The EM square is 1024x1024, but usually isn't filled up.
 					// We'll use about half the width, and around 3/4 the height.
 					// Values adjusted by eye.
@@ -194,7 +192,7 @@ log_error(_("invalid glyph (-1)"));
 						 32, -656,
 						 32,   32
 					};
-					render::draw_line_strip(s_empty_char_box, 5, transformed_color);  
+					render::draw_line_strip(s_empty_char_box, 5, transformed_color, mat);  
 #endif
 
 				}

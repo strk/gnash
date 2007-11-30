@@ -880,7 +880,8 @@ public:
   //
   /// Can be used to draw empty boxes and cursors.
   virtual void
-  draw_line_strip(const void* coords, int vertex_count, const rgba& color)
+  draw_line_strip(const void* coords, int vertex_count, const rgba& color,
+                  const matrix& mat)
   {
     glPushMatrix();
     
@@ -904,7 +905,7 @@ public:
   }
 
   virtual void  draw_poly(const point* corners, size_t corner_count, 
-    const rgba& fill, const rgba& outline, bool masked)
+    const rgba& fill, const rgba& outline, const matrix& mat, bool masked)
   {
     log_unimpl("draw_poly");
   }

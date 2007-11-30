@@ -602,10 +602,8 @@ Gui::display(movie_root* m)
 				corners[2].y = ymax;
 				corners[3].x = xmin;
 				corners[3].y = ymax;
-				matrix dummy;    	
-				gnash::render::set_matrix(dummy); // reset matrix
 				gnash::render::draw_poly(&corners[0], 4,
-					rgba(0,0,0,0), rgba(255,0,0,255), false);
+					rgba(0,0,0,0), rgba(255,0,0,255), matrix::identity, false);
 					
 			}
 		}

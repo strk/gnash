@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.134 2007/11/30 22:36:31 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.135 2007/11/30 23:11:11 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -458,7 +458,7 @@ edit_text_character::unload()
 }
 
 void
-edit_text_character::show_cursor()
+edit_text_character::show_cursor(const matrix& mat)
 {
 	uint16_t x = static_cast<uint16_t>(m_xcursor);
 	uint16_t y = static_cast<uint16_t>(m_ycursor);
@@ -470,7 +470,7 @@ edit_text_character::show_cursor()
 	box[2] = x;
 	box[3] = y + h;
 	
-	render::draw_line_strip(box, 2, rgba(0,0,0,255));	// draw line
+	render::draw_line_strip(box, 2, rgba(0,0,0,255), mat);	// draw line
 }
 
 void
@@ -488,7 +488,6 @@ edit_text_character::display()
 	if ( (drawBorder || drawBackground) && _bounds.isFinite() )
 	{
 		matrix	mat = get_world_matrix();
-		render::set_matrix(mat);
 
 		point	coords[4];
 		float xmin = _bounds.getMinX();
@@ -517,7 +516,7 @@ edit_text_character::display()
 	log_debug("rendering a Pol composed by corners %s", ss.str().c_str());
 #endif
 
-		render::draw_poly( &coords[0], 4, backgroundColor, borderColor, true);
+		render::draw_poly( &coords[0], 4, backgroundColor, borderColor, mat, true);
 		
 	}
 
@@ -539,7 +538,7 @@ edit_text_character::display()
 
 	if (m_has_focus)
 	{
-		show_cursor();
+		show_cursor(m);
 	}
 
 	clear_invalidated();
