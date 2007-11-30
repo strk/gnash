@@ -1,4 +1,4 @@
-// MediaDecoderSdl.cpp: Media decoding using libs, used with sdl soundhandler.
+// MediaDecoderGst.cpp: Media decoding using Gstreamer
 // 
 //   Copyright (C) 2007 Free Software Foundation, Inc.
 // 
@@ -16,21 +16,14 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaDecoderSdl.cpp,v 1.5 2007/11/30 00:13:02 tgc Exp $
+// $Id: MediaDecoderGst.cpp,v 1.1 2007/11/30 00:13:01 tgc Exp $
 
-#include "MediaDecoderSdl.h"
+#include "MediaDecoderGst.h"
 #include "AudioDecoderNellymoser.h"
 #include "AudioDecoderSimple.h"
 
-#ifdef USE_FFMPEG
-#include "AudioDecoderFfmpeg.h"
-#include "VideoDecoderFfmpeg.h"
-#include "MediaParserFfmpeg.h"
-#endif
-
-#ifdef USE_MAD
-#include "AudioDecoderMad.h"
-#endif
+#include "AudioDecoderGst.h"
+#include "VideoDecoderGst.h"
 
 #include "log.h"
 
@@ -39,15 +32,15 @@
 namespace gnash {
 namespace media {
 
-MediaDecoderSdl::MediaDecoderSdl(boost::shared_ptr<tu_file> stream, MediaBuffer* buffer, uint16_t swfVersion, int format)
+MediaDecoderGst::MediaDecoderGst(boost::shared_ptr<tu_file> stream, MediaBuffer* buffer, uint16_t swfVersion, int format)
 	:
 	MediaDecoder(stream, buffer, swfVersion, format)
 {
 	// Start the decoding thread which will also setup the decoder and parser
-	_decodeThread = new boost::thread(boost::bind(MediaDecoderSdl::decodeThread, this)); 
+	_decodeThread = new boost::thread(boost::bind(MediaDecoderGst::decodeThread, this)); 
 }
 
-MediaDecoderSdl::~MediaDecoderSdl()
+MediaDecoderGst::~MediaDecoderGst()
 {
 	_running = false;
 
@@ -59,54 +52,7 @@ MediaDecoderSdl::~MediaDecoderSdl()
 	}
 }
 
-bool MediaDecoderSdl::setupDecoding()
-{
-	std::auto_ptr<VideoInfo> vInfo = _parser->getVideoInfo();
-	if (vInfo.get() != NULL) {
-#ifdef USE_FFMPEG
-		_videoDecoder.reset(new VideoDecoderFfmpeg());
-#endif
-		if (_videoDecoder.get() != NULL) {
-			if (!_videoDecoder->setup(vInfo.get())) {
-				_videoDecoder.reset(NULL); // Delete the videoDecoder if it is of no use
-				log_error("No video decoder could be created, since no decoder for this format is available.");
-			}
-			_video = true;
-		} else {
-			log_error("No video decoder could be created, since no decoder is enabled.");
-		}
-	}
-
-	std::auto_ptr<AudioInfo> aInfo = _parser->getAudioInfo();
-	if (get_sound_handler() && aInfo.get() != NULL) {
-#ifdef USE_MAD
-		if (_parser->isAudioMp3()) {
-			_audioDecoder.reset(new AudioDecoderMad());
-		}
-#endif
-		if (_parser->isAudioNellymoser()) {
-			_audioDecoder.reset(new AudioDecoderNellymoser());
-		}
-
-#ifdef USE_FFMPEG
-		if (_audioDecoder.get() == NULL) _audioDecoder.reset(new AudioDecoderFfmpeg());
-#endif
-		if (_audioDecoder.get() != NULL) {
-			if (!_audioDecoder->setup(aInfo.get())) {
-				_audioDecoder.reset(NULL); // Delete the audioDecoder if it is of no use
-				log_error("No audio decoder could be created, since no decoder for this format is available.");
-			}
-			_audio = true;
-		} else {
-			log_error("No audio decoder could be created, since no decoder is enabled.");
-		}
-	}
-
-	// We don't need both audio and video to be happy :)
-	return (_audio || _video);
-}
-
-bool MediaDecoderSdl::setupParser()
+bool MediaDecoderGst::setupParser()
 {
 	// Buffer a bit to make sure the stream is accessable
 	if (_stream->set_position(512) != 0) {
@@ -127,15 +73,56 @@ bool MediaDecoderSdl::setupParser()
 	// Setup the decoding and parser
 	if (std::string(head) == "FLV") {
 		_parser.reset(new FLVParser(_stream));
-#ifdef USE_FFMPEG
+		return _parser->setupParser();
 	} else {
-		_parser.reset(new MediaParserFfmpeg(_stream));
-#endif
+		return false;
 	}
-	return _parser->setupParser();
 }
 
-uint32_t MediaDecoderSdl::seek(uint32_t pos)
+bool MediaDecoderGst::setupDecoding()
+{
+	std::auto_ptr<VideoInfo> vInfo = _parser->getVideoInfo();
+	if (vInfo.get() != NULL) {
+
+		_videoDecoder.reset(new VideoDecoderGst());
+
+		if (_videoDecoder.get() != NULL) {
+			if (!_videoDecoder->setup(vInfo.get())) {
+				_videoDecoder.reset(NULL); // Delete the videoDecoder if it is of no use
+				log_error("No video decoder could be created, since no decoder for this format is available.");
+			}
+			_video = true;
+		} else {
+			log_error("No video decoder could be created, since no decoder is enabled.");
+		}
+	}
+
+	std::auto_ptr<AudioInfo> aInfo = _parser->getAudioInfo();
+	if (get_sound_handler() && aInfo.get() != NULL) {
+
+		if (_parser->isAudioNellymoser()) {
+			_audioDecoder.reset(new AudioDecoderNellymoser());
+		}
+
+		if (_audioDecoder.get() == NULL) _audioDecoder.reset(new AudioDecoderGst());
+
+		if (_audioDecoder.get() != NULL) {
+			if (!_audioDecoder->setup(aInfo.get())) {
+				_audioDecoder.reset(NULL); // Delete the audioDecoder if it is of no use
+				log_error("No audio decoder could be created, since no decoder for this format is available.");
+			}
+			_audio = true;
+		} else {
+			log_error("No audio decoder could be created, since no decoder is enabled.");
+		}
+	}
+
+	// We don't need both audio and video to be happy :)
+	return (_audio || _video);
+}
+
+
+uint32_t MediaDecoderGst::seek(uint32_t pos)
 {
 	uint32_t ret = 0;
 	if (_parser.get()) ret = _parser->seek(pos);
@@ -147,7 +134,7 @@ uint32_t MediaDecoderSdl::seek(uint32_t pos)
 	return ret;
 }
 
-void MediaDecoderSdl::decodeThread(MediaDecoderSdl* decoder)
+void MediaDecoderGst::decodeThread(MediaDecoderGst* decoder)
 {
 printf("\t in the decode thread\n");
 
@@ -162,10 +149,15 @@ printf("\t in the decode thread\n");
 			log_error("Setup of media decoder failed");
 			return;
 		}
+
+	// If the parser setup failed, it is perhaps because it is not a FLV file,
+	// so we set up an gstreamer pipeline instead.
 	} else {
-		decoder->pushOnStatus(streamNotFound);
-		log_error("Setup of media parser failed");
-		return;
+/*		if (!decoder->setupGstPipeline()) {
+			decoder->pushOnStatus(streamNotFound);*/
+			log_error("Setup of media parser failed");
+			return;
+//		}
 	}
 
 	// Everything is setup, so let's play!
@@ -176,7 +168,7 @@ printf("\t in the decode thread\n");
 }
 
 std::pair<uint32_t, uint32_t>
-MediaDecoderSdl::getWidthAndHeight()
+MediaDecoderGst::getWidthAndHeight()
 {
 	if (_parser.get()) {
 		std::auto_ptr<VideoInfo> vInfo = _parser->getVideoInfo();
@@ -186,6 +178,6 @@ MediaDecoderSdl::getWidthAndHeight()
 }
 	
 
-} // gnash.media namespace 
-} // namespace gnash
+} // namespace media
 
+} // namespace gnash

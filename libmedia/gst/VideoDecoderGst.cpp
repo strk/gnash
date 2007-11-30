@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderGst.cpp,v 1.5 2007/11/24 17:21:42 strk Exp $
+// $Id: VideoDecoderGst.cpp,v 1.6 2007/11/30 00:13:02 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -52,6 +52,11 @@ VideoDecoderGst::~VideoDecoderGst()
 		gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
 		gst_object_unref (GST_OBJECT (pipeline));
 	}
+}
+
+bool VideoDecoderGst::setup(VideoInfo* info)
+{
+	return setup(info->width, info->height, 0, true, (videoCodecType)info->codec, 0);
 }
 
 bool
@@ -209,7 +214,7 @@ VideoDecoderGst::decodeToImage(uint8_t* data, uint32_t size)
 
 	frame = data;
 	frameSize = size;
-
+//printf("datasize: %d\n", size);
 	delete input_lock;
 
 	output_lock = new boost::mutex::scoped_lock(output_mutex);
@@ -225,37 +230,6 @@ VideoDecoderGst::decodeToImage(uint8_t* data, uint32_t size)
 	ret_image->update(*decodedFrame);
 	return ret_image;
 }
-
-// gnash calls this when it wants you to decode the given videoframe
-/*uint8_t*
-VideoDecoderGst::decode(uint8_t* data, uint32_t size, uint32_t& outputSize)
-{
-	// If there is nothing to decode in the new frame
-	// we just return the lastest.
-	if (data == NULL || size == 0 || !decoder)
-	{
-		outputSize = 0;
-		return NULL;
-	}
-
-	frame = data;
-	frameSize = size;
-
-	delete input_lock;
-
-	output_lock = new boost::mutex::scoped_lock(output_mutex);
-
-	// If we never decoded any frame return a NULL
-	// auto pointer ..
-	if ( ! decodedFrame.get() )
-	{
-		outputSize = 0;
-		return NULL;
-	}
-
-	outputSize = width * height * 3;
-	return decodedFrame->data();
-}*/
 
 // The callback function which refills the buffer with data
 void
@@ -277,7 +251,7 @@ void
 VideoDecoderGst::callback_output (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data)
 {
 	VideoDecoderGst* decoder = static_cast<VideoDecoderGst*>(user_data);
-
+//printf("datadecoded\n");
 	if (decoder->stop) return;
 
 	if (decoder->decodedFrame.get())

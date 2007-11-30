@@ -16,25 +16,25 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaBuffer.h,v 1.5 2007/11/29 20:45:01 bwy Exp $
+// $Id: MediaBuffer.h,v 1.6 2007/11/30 00:13:01 tgc Exp $
 
 #ifndef __MEDIABUFFER_H__
 #define __MEDIABUFFER_H__
 
 #include <boost/thread/mutex.hpp>
 #include <queue>
+#include "image.h"
 
 namespace gnash {
 namespace media {
 
 
-/// This class is used to store decoded video or audio data
+/// This class is used to store decoded audio data
 /// while it is in the MediaBuffer.
-class raw_mediadata_t
+class raw_audiodata_t
 {
 public:
-	raw_mediadata_t():
-	//m_stream_index(-1),
+	raw_audiodata_t():
 	m_size(0),
 	m_data(NULL),
 	m_ptr(NULL),
@@ -42,7 +42,7 @@ public:
 	{
 	}
 
-	~raw_mediadata_t()
+	~raw_audiodata_t()
 	{
 		if (m_data) delete [] m_data;
 	}
@@ -61,6 +61,28 @@ public:
 
 	/// Timestamp in millisec
 	uint32_t m_pts;
+};
+
+/// This class is used to store decoded video data
+/// while it is in the MediaBuffer.
+class raw_videodata_t
+{
+public:
+	raw_videodata_t():
+	image(NULL),
+	timestamp(0)
+	{
+	}
+
+	~raw_videodata_t()
+	{
+	}
+
+	/// Pointer to the data. The data is owned by this class.
+	std::auto_ptr<image::image_base> image;
+
+	/// Timestamp in millisec
+	uint32_t timestamp;
 };
 
 /// Threadsafe elements-owning queue
@@ -106,7 +128,7 @@ public:
 	/// @param member
 	/// The element to be pushed unto the audio queue.
 	///
-	void pushAudio(raw_mediadata_t* member) {
+	void pushAudio(raw_audiodata_t* member) {
 		boost::mutex::scoped_lock lock(_mutex);
 		audioQueue.push(member);
 	}
@@ -116,7 +138,7 @@ public:
 	/// @param member
 	/// The element to be pushed unto the video queue.
 	///
-	void pushVideo(raw_mediadata_t* member) {
+	void pushVideo(raw_videodata_t* member) {
 		boost::mutex::scoped_lock lock(_mutex);
 		videoQueue.push(member);
 	}
@@ -127,7 +149,7 @@ public:
 	///
 	/// @return a pointer to the first element on the audio queue, NULL if queue is empty.
 	///
-	raw_mediadata_t* audioFront() {
+	raw_audiodata_t* audioFront() {
 		boost::mutex::scoped_lock lock(_mutex);
 		if (audioQueue.empty()) return NULL;
 		return audioQueue.front();
@@ -139,7 +161,7 @@ public:
 	///
 	/// @return a pointer to the first element on the video queue, NULL if queue is empty.
 	///
-	raw_mediadata_t* videoFront() {
+	raw_videodata_t* videoFront() {
 		boost::mutex::scoped_lock lock(_mutex);
 		if (videoQueue.empty()) return NULL;
 		return videoQueue.front();
@@ -201,12 +223,11 @@ public:
 	/// Gets the real size of the buffer in milliseconds. The size of
 	/// the audio and video buffer is compared and the biggest is returned. Locks.
 	//
-	/// @return the real size of the buffer in milliseconds.
+	/// @return the current size of the buffer in milliseconds.
 	///
 	uint32_t getBufferTime() {
 		boost::mutex::scoped_lock lock(_mutex);
-		bool ret = calcBufferTime();
-		return ret;
+		return calcBufferTime();
 	}
 
 	/// Checks if the contents of the buffer span a timeframe larger than
@@ -238,7 +259,7 @@ private:
 		// Get the size of video buffer, and use that if it is bigger than
 		// the vaule from the audio buffer.
 		if (!videoQueue.empty()) {
-			uint32_t vSize = videoQueue.back()->m_pts - videoQueue.front()->m_pts;
+			uint32_t vSize = videoQueue.back()->timestamp - videoQueue.front()->timestamp;
 			if (vSize > size) size = vSize;
 		}
 		return size;
@@ -249,8 +270,8 @@ private:
 	boost::mutex _mutex;
 
 	/// The queues of audio and video data.
-	std::queue <raw_mediadata_t*> audioQueue;
-	std::queue <raw_mediadata_t*> videoQueue;
+	std::queue <raw_audiodata_t*> audioQueue;
+	std::queue <raw_videodata_t*> videoQueue;
 
 	/// The requested size of the buffer in milliseconds
 	uint32_t _bufferTime;

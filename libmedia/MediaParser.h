@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaParser.h,v 1.8 2007/11/24 17:21:42 strk Exp $
+// $Id: MediaParser.h,v 1.9 2007/11/30 00:13:01 tgc Exp $
 
 #ifndef __MEDIAPARSER_H__
 #define __MEDIAPARSER_H__
@@ -25,6 +25,7 @@
 #include "config.h"
 #endif
 
+#include <boost/shared_ptr.hpp>
 #include "tu_file.h"
 
 #ifdef USE_FFMPEG
@@ -192,7 +193,7 @@ public:
 class MediaParser
 {
 public:
-	MediaParser(tu_file* stream)
+	MediaParser(boost::shared_ptr<tu_file> stream)
 	:
 	_isAudioMp3(false),
 	_isAudioNellymoser(false),
@@ -271,7 +272,7 @@ protected:
 	bool _isAudioNellymoser;
 
 	/// The stream used to access the file
-	tu_file* _stream;
+	boost::shared_ptr<tu_file> _stream;
 };
 
 

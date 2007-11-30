@@ -77,6 +77,7 @@ libgnashmedia_la_SOURCES = \
 	FLVParser.cpp \
 	AudioDecoderNellymoser.cpp \
 	AudioDecoderSimple.cpp \
+	MediaDecoder.cpp \
 	$(NULL)
 
 noinst_HEADERS = \
@@ -94,9 +95,9 @@ noinst_HEADERS = \
 
 
 if USE_SOUND_GST
-#libgnashmedia_la_SOURCES += gst/gstgnashsrc.c gst/VideoDecoderGst.cpp gst/gstappbuffer.c gst/gstappsink.c gst/gstappsrc.c gst/sound_handler_gst.cpp
+#libgnashmedia_la_SOURCES += gst/gstgnashsrc.c gst/VideoDecoderGst.cpp gst/AudioDecoderGst.cpp gst/gstappbuffer.c gst/gstappsink.c gst/gstappsrc.c gst/sound_handler_gst.cpp
 libgnashmedia_la_SOURCES += gst/VideoDecoderGst.cpp gst/sound_handler_gst.cpp gst/gstgnashsrc.c
-#noinst_HEADERS += gst/gstgnashsrc.h gst/gstappbuffer.h gst/VideoDecoderGst.h gst/gstappsink.h gst/gstappsrc.h gst/sound_handler_gst.h
+#noinst_HEADERS += gst/gstgnashsrc.h gst/gstappbuffer.h gst/AudioDecoderGst.h gst/VideoDecoderGst.h gst/gstappsink.h gst/gstappsrc.h gst/sound_handler_gst.h
 noinst_HEADERS += gst/VideoDecoderGst.h gst/sound_handler_gst.h gst/gstgnashsrc.h
 libgnashmedia_la_CPPFLAGS += $(GSTREAMER_CFLAGS)
 libgnashmedia_la_LIBADD += $(GSTREAMER_LIBS) -lgstbase-0.10

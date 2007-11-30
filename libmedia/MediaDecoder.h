@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaDecoder.h,v 1.4 2007/11/24 17:21:42 strk Exp $
+// $Id: MediaDecoder.h,v 1.5 2007/11/30 00:13:01 tgc Exp $
 
 #ifndef __MEDIADECODER_H__
 #define __MEDIADECODER_H__
@@ -25,11 +25,14 @@
 #include <boost/bind.hpp> 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
+#include <boost/shared_ptr.hpp>
 #include <vector> 
 
 #include "MediaBuffer.h"
 #include "MediaParser.h"
 #include "FLVParser.h"
+#include "AudioDecoder.h"
+#include "VideoDecoder.h"
 #include "log.h"
 
 #ifdef HAVE_CONFIG_H
@@ -39,6 +42,36 @@
 namespace gnash {
 namespace media {
 
+/// Status codes used for NetStream onStatus notifications
+enum StatusCode {
+
+	// Internal status, not a valid ActionScript value
+	invalidStatus,
+
+	/// NetStream.Buffer.Empty (level: status)
+	bufferEmpty,
+
+	/// NetStream.Buffer.Full (level: status)
+	bufferFull,
+
+	/// NetStream.Buffer.Flush (level: status)
+	bufferFlush,
+
+	/// NetStream.Play.Start (level: status)
+	playStart,
+
+	/// NetStream.Play.Stop  (level: status)
+	playStop,
+
+	/// NetStream.Seek.Notify  (level: status)
+	seekNotify,
+
+	/// NetStream.Play.StreamNotFound (level: error)
+	streamNotFound,
+
+	/// NetStream.Seek.InvalidTime (level: error)
+	invalidTime
+};
 
 /// \brief
 /// The MediaDecoder class decodes media data and puts it on a given buffer.
@@ -52,39 +85,6 @@ class MediaDecoder
 {
 
 public:
-	/// Status codes used for NetStream onStatus notifications
-	// Copied from NetSteam.h, so it should be updated it the orginal
-	// is changed.
-	enum StatusCode {
-	
-		// Internal status, not a valid ActionScript value
-		invalidStatus,
-
-		/// NetStream.Buffer.Empty (level: status)
-		bufferEmpty,
-
-		/// NetStream.Buffer.Full (level: status)
-		bufferFull,
-
-		/// NetStream.Buffer.Flush (level: status)
-		bufferFlush,
-
-		/// NetStream.Play.Start (level: status)
-		playStart,
-
-		/// NetStream.Play.Stop  (level: status)
-		playStop,
-
-		/// NetStream.Seek.Notify  (level: status)
-		seekNotify,
-
-		/// NetStream.Play.StreamNotFound (level: error)
-		streamNotFound,
-
-		/// NetStream.Seek.InvalidTime (level: error)
-		invalidTime
-	};
-
 	/// This is copied from the render and should be changed if the original is.
 	enum videoOutputFormat
 	{
@@ -121,7 +121,7 @@ public:
 	/// 	The buffer we will use.
 	/// 	Ownership left to the caller.
 	///
-	MediaDecoder(tu_file* stream, MediaBuffer* buffer, uint16_t swfVersion, int format)
+	MediaDecoder(boost::shared_ptr<tu_file> stream, MediaBuffer* buffer, uint16_t swfVersion, int format)
 		:
 	_buffer(buffer),
 	_stream(stream),
@@ -133,20 +133,19 @@ public:
 	_error(noError),
 	_isFLV(true),
 	_inputPos(0),
-	_audio(true),
-	_video(true)
+	_audio(false),
+	_video(false),
+	_running(true),
+	_audioDecoder(NULL),
+	_videoDecoder(NULL),
+	_decodeThread(NULL)
 	{
 	}
 
 	/// Destroys the Decoder
-	~MediaDecoder() {}
-
-	/// Pause decoding (needed ?)
-	virtual void pause() {}
-
-	/// Resume/start decoding (needed ?)
-	virtual void decode() {}
-
+#if !defined(sgi) || defined(__GNUC__)
+	virtual ~MediaDecoder() {}
+#endif
 	/// Seeks to pos, returns the new position
 	virtual uint32_t seek(uint32_t /*pos*/) { return 0;}
 
@@ -164,13 +163,7 @@ public:
 	}
 
 	/// Returns a vector with the waiting onStatus events (AS2)
-	std::vector<StatusCode> getOnStatusEvents() {
-		boost::mutex::scoped_lock lock(_onStatusMutex);
-
-		const std::vector<StatusCode> statusQueue(_onStatusQueue);
-		_onStatusQueue.clear();
-		return statusQueue;
-	}
+	std::vector<StatusCode> getOnStatusEvents();
 
 	/// Returns whether we got audio
 	bool gotAudio() {
@@ -182,18 +175,46 @@ public:
 		return _video;
 	}
 
+	/// Used to wake up the decoder when it is needed
+	void wakeUp()
+	{
+		boost::mutex::scoped_lock lock(_monitor);
+		_nothingToDo.notify_all();
+	}
+
 protected:
+
+	/// Decodes data with the decoders that has been setup and pushes the data
+	/// unto the buffer. Returns when decoding stops.
+	void decodingLoop();
+
+	/// Decodes a frame and push it unto the buffer
+	bool decodeAndBufferFrame();
+
+	// Used to decode a video frame and push it on the videoqueue
+	void decodeVideo(MediaFrame* packet);
+
+	// Used to decode a audio frame and push it on the audioqueue
+	void decodeAudio(MediaFrame* packet);
+
 	/// Push an event to the onStatus event queue (AS2)
 	void pushOnStatus(StatusCode code) {
 		boost::mutex::scoped_lock lock(_onStatusMutex);
 		_onStatusQueue.push_back(code);	
 	}
 
+	/// used to wait for something to do
+	void relax()
+	{
+		boost::mutex::scoped_lock lock(_monitor);
+		_nothingToDo.wait(lock);
+	}
+
 	/// The media buffer
 	MediaBuffer* _buffer;
 
 	/// The stream we decode
-	tu_file* _stream;
+	boost::shared_ptr<tu_file> _stream;
 
 	/// Version of the SWF playing
 	uint16_t _swfVersion;
@@ -231,6 +252,21 @@ protected:
 	/// Do we have video ?
 	bool _video;
 
+	/// Used to wait when there is nothing to do
+	boost::condition _nothingToDo;
+	boost::mutex _monitor;
+
+	// Should the decode loop run or not
+	volatile bool _running;
+	
+	// An audio decoder
+	std::auto_ptr<AudioDecoder> _audioDecoder;
+
+	// A video decoder
+	std::auto_ptr<VideoDecoder> _videoDecoder;
+
+	// The decoding thread
+	boost::thread* _decodeThread;
 };
 
 

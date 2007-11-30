@@ -17,11 +17,12 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.2 2007/11/24 17:21:42 strk Exp $
+// $Id: FLVParser.cpp,v 1.3 2007/11/30 00:13:00 tgc Exp $
 
 #include "FLVParser.h"
 #include "amf.h"
 #include "log.h"
+#include "BitsReader.h"
 
 #define PADDING_BYTES 8
 
@@ -31,7 +32,7 @@
 namespace gnash {
 namespace media {
 
-FLVParser::FLVParser(tu_file* stream)
+FLVParser::FLVParser(boost::shared_ptr<tu_file> stream)
 	:
 	MediaParser(stream),
 	_lastParsedPosition(0),
@@ -171,9 +172,9 @@ MediaFrame* FLVParser::parseMediaFrame()
 		frame->dataSize = _audioFrames[_nextAudioFrame]->dataSize;
 		frame->timestamp = _audioFrames[_nextAudioFrame]->timestamp;
 
-		_stream->set_position(_audioFrames[_nextAudioFrame]->dataPosition); //_lt.seek(_audioFrames[_nextAudioFrame]->dataPosition);
+		_stream->set_position(_audioFrames[_nextAudioFrame]->dataPosition);
 		frame->data = new uint8_t[frame->dataSize + PADDING_BYTES];
-		size_t bytesread = _stream->read_bytes(frame->data, frame->dataSize); //_lt.read(frame->data, frame->dataSize);
+		size_t bytesread = _stream->read_bytes(frame->data, frame->dataSize);
 		memset(frame->data + bytesread, 0, PADDING_BYTES);
 
 		frame->tag = 8;
@@ -186,9 +187,9 @@ MediaFrame* FLVParser::parseMediaFrame()
 		frame->dataSize = _videoFrames[_nextVideoFrame]->dataSize;
 		frame->timestamp = _videoFrames[_nextVideoFrame]->timestamp;
 
-		_stream->set_position(_videoFrames[_nextVideoFrame]->dataPosition); //_lt.seek(_videoFrames[_nextVideoFrame]->dataPosition);
+		_stream->set_position(_videoFrames[_nextVideoFrame]->dataPosition);
 		frame->data = new uint8_t[frame->dataSize + PADDING_BYTES];
-		size_t bytesread  = _stream->read_bytes(frame->data, frame->dataSize); //_lt.read(frame->data, frame->dataSize);
+		size_t bytesread  = _stream->read_bytes(frame->data, frame->dataSize);
 		memset(frame->data + bytesread, 0, PADDING_BYTES);
 
 		frame->tag = 9;
@@ -218,10 +219,10 @@ MediaFrame* FLVParser::nextAudioFrame()
 	frame->timestamp = _audioFrames[_nextAudioFrame]->timestamp;
 	frame->tag = 8;
 
-	_stream->set_position(_audioFrames[_nextAudioFrame]->dataPosition); //_lt.seek(_audioFrames[_nextAudioFrame]->dataPosition);
+	_stream->set_position(_audioFrames[_nextAudioFrame]->dataPosition);
 	frame->data = new uint8_t[_audioFrames[_nextAudioFrame]->dataSize +
 				  PADDING_BYTES];
-	size_t bytesread = _stream->read_bytes(frame->data, _audioFrames[_nextAudioFrame]->dataSize); //_lt.read(frame->data, _audioFrames[_nextAudioFrame]->dataSize);
+	size_t bytesread = _stream->read_bytes(frame->data, _audioFrames[_nextAudioFrame]->dataSize);
 	memset(frame->data + bytesread, 0, PADDING_BYTES);
 
 	_nextAudioFrame++;
@@ -259,10 +260,10 @@ MediaFrame* FLVParser::nextVideoFrame()
 	frame->timestamp = _videoFrames[_nextVideoFrame]->timestamp;
 	frame->tag = 9;
 
-	_stream->set_position(_videoFrames[_nextVideoFrame]->dataPosition); //_lt.seek(_videoFrames[_nextVideoFrame]->dataPosition);
+	_stream->set_position(_videoFrames[_nextVideoFrame]->dataPosition);
 	frame->data = new uint8_t[_videoFrames[_nextVideoFrame]->dataSize + 
 				  PADDING_BYTES];
-	size_t bytesread = _stream->read_bytes(frame->data, _videoFrames[_nextVideoFrame]->dataSize); //_lt.read(frame->data, _videoFrames[_nextVideoFrame]->dataSize);
+	size_t bytesread = _stream->read_bytes(frame->data, _videoFrames[_nextVideoFrame]->dataSize);
 	memset(frame->data + bytesread, 0, PADDING_BYTES);
 
 	_nextVideoFrame++;
@@ -520,36 +521,29 @@ uint32_t FLVParser::seek(uint32_t time)
 	return time;
 }
 
+#define HEADER_SKIP 15
+
 bool FLVParser::parseNextFrame()
 {
 	// Parse the header if not done already. If unsuccesfull return false.
 	if (_lastParsedPosition == 0 && !parseHeader()) return false;
 
-	// Check if there is enough data to parse the header of the frame
-	//if (!_lt.isPositionConfirmed(_lastParsedPosition+14)) return false;
-
 	// Seek to next frame and skip the size of the last tag,
 	// return false on error
 	if (_stream->set_position(_lastParsedPosition+4) != 0) return false;
-	//_lt.seek(_lastParsedPosition+4);
 
 	// Read the tag info
 	uint8_t tag[12];
 	_stream->read_bytes(tag, 12);
-	//_lt.read(tag, 12);
 
 	// Extract length and timestamp
 	uint32_t bodyLength = getUInt24(&tag[1]);
 	uint32_t timestamp = getUInt24(&tag[4]);
 
-	// Check if there is enough data to parse the body of the frame
-	//if (!_lt.isPositionConfirmed(_lastParsedPosition+15+bodyLength)) return false;
-	/*if (_stream->set_position(_lastParsedPosition+15+bodyLength) != 0) return false;*/
-	//_stream->set_position(_lastParsedPosition + HEADER_SKIP + bodyLength);
+	_lastParsedPosition += HEADER_SKIP + bodyLength;
 
 	// check for empty tag
 	if (bodyLength == 0) {
-		_lastParsedPosition += HEADER_SKIP + bodyLength;
 		return true;
 	}
 
@@ -557,9 +551,8 @@ bool FLVParser::parseNextFrame()
 		FLVAudioFrame* frame = new FLVAudioFrame;
 		frame->dataSize = bodyLength - 1;
 		frame->timestamp = timestamp;
-		frame->dataPosition = _lastParsedPosition + HEADER_SKIP + 1; // _stream->get_position(); //_lt.tell(); 
+		frame->dataPosition = _stream->get_position();
 		_audioFrames.push_back(frame);
-//log_debug("audio tag, timestamp: %d", timestamp);
 
 		// If this is the first audioframe no info about the
 		// audio format has been noted, so we do that now
@@ -576,17 +569,15 @@ bool FLVParser::parseNextFrame()
 
 			_audioInfo.reset(new AudioInfo(static_cast<audioCodecType>((tag[11] & 0xf0) >> 4), samplerate, samplesize, (tag[11] & 0x01) >> 0, 0, FLASH));
 		}
-		_lastParsedPosition += HEADER_SKIP + bodyLength;
 
 	} else if (tag[0] == VIDEO_TAG) {
 		FLVVideoFrame* frame = new FLVVideoFrame;
 		frame->dataSize = bodyLength - 1;
 		frame->timestamp = timestamp;
-		frame->dataPosition = _lastParsedPosition + HEADER_SKIP + 1; //_stream->get_position(); //_lt.tell();
+		frame->dataPosition = _stream->get_position();
 		frame->frameType = (tag[11] & 0xf0) >> 4;
 		_videoFrames.push_back(frame);
 
-//log_debug("video tag, timestamp: %d", timestamp);
 
 		// If this is the first videoframe no info about the
 		// video format has been noted, so we do that now
@@ -597,11 +588,11 @@ bool FLVParser::parseNextFrame()
 			uint16_t height = 240;
 
 			// Extract the video size from the videodata header
-			if (codec == VIDEO_CODEC_H263) {
-				_stream->set_position(frame->dataPosition); //_lt.seek(frame->dataPosition);
-				uint8_t videohead[12];
-				_stream->read_bytes(videohead, 12); //_lt.read(videohead, 12);
+			_stream->set_position(frame->dataPosition);
+			uint8_t videohead[12];
+			_stream->read_bytes(videohead, 12);
 
+			if (codec == VIDEO_CODEC_H263) {
 				bool sizebit1 = (videohead[3] & 0x02);
 				bool sizebit2 = (videohead[3] & 0x01);
 				bool sizebit3 = (videohead[4] & 0x80);
@@ -623,37 +614,58 @@ bool FLVParser::parseNextFrame()
 					width = 160;
 					height = 120;
 
-				// Then the custom sizes (1 byte - untested and ugly)
+				// Then the custom sizes (1 byte)
 				} else if (!sizebit1 && !sizebit2 && !sizebit3 ) {
-					width = (videohead[4] & 0x40) | (videohead[4] & 0x20) | (videohead[4] & 0x20) | (videohead[4] & 0x08) | (videohead[4] & 0x04) | (videohead[4] & 0x02) | (videohead[4] & 0x01) | (videohead[5] & 0x80);
+					BitsReader* br = new BitsReader(&videohead[4], 8);
+					br->read_bit();
+					width = br->read_uint(8);
+					height = br->read_uint(8);
+					delete br;
 
-					height = (videohead[5] & 0x40) | (videohead[5] & 0x20) | (videohead[5] & 0x20) | (videohead[5] & 0x08) | (videohead[5] & 0x04) | (videohead[5] & 0x02) | (videohead[5] & 0x01) | (videohead[6] & 0x80);
-
-				// Then the custom sizes (2 byte - untested and ugly)
+				// Then the custom sizes (2 byte)
 				} else if (!sizebit1 && !sizebit2 && sizebit3 ) {
-					width = (videohead[4] & 0x40) | (videohead[4] & 0x20) | (videohead[4] & 0x20) | (videohead[4] & 0x08) | (videohead[4] & 0x04) | (videohead[4] & 0x02) | (videohead[4] & 0x01) | (videohead[5] & 0x80) | (videohead[5] & 0x40) | (videohead[5] & 0x20) | (videohead[5] & 0x20) | (videohead[5] & 0x08) | (videohead[5] & 0x04) | (videohead[5] & 0x02) | (videohead[5] & 0x01) | (videohead[6] & 0x80);
-
-					height = (videohead[6] & 0x40) | (videohead[6] & 0x20) | (videohead[6] & 0x20) | (videohead[6] & 0x08) | (videohead[6] & 0x04) | (videohead[6] & 0x02) | (videohead[6] & 0x01) | (videohead[7] & 0x80) | (videohead[7] & 0x40) | (videohead[7] & 0x20) | (videohead[7] & 0x20) | (videohead[7] & 0x08) | (videohead[7] & 0x04) | (videohead[7] & 0x02) | (videohead[7] & 0x01) | (videohead[8] & 0x80);
+					BitsReader* br = new BitsReader(&videohead[4], 8);
+					br->read_bit();
+					width = br->read_uint(16);
+					height = br->read_uint(16);
+					delete br;
 				}
+			} else if (codec == VIDEO_CODEC_VP6) {
+				if (!(videohead[0] & 0x80)) {
+					uint32_t index = 0;
+					if ((videohead[index] & 1) || !(videohead[index+1] & 0x06)) {
+						index += 2;
+					}
+					index += 2;
+					width = videohead[index++] * 16;
+					height = videohead[index] * 16;
+
+				}
+			} else if (codec == VIDEO_CODEC_SCREENVIDEO) {
+				BitsReader* br = new BitsReader(&videohead[0], 12);
+				br->read_uint(4);
+				width = br->read_uint(12);
+				br->read_uint(4);
+				height = br->read_uint(12);
+				delete br;
 			}
+			
 
 			// Create the videoinfo
 			_videoInfo.reset(new VideoInfo(codec, width, height, 0 /*frameRate*/, 0 /*duration*/, FLASH));
 		}
-		_lastParsedPosition += HEADER_SKIP + bodyLength;
 
 	} else if (tag[0] == META_TAG) {
-//log_debug("meta tag");
+		//log_debug("meta tag");
 		// Extract information from the meta tag
 		/*_lt.seek(_lastParsedPosition+16);
 		char* metaTag = new char[bodyLength];
 		_lt.read(metaTag, bodyLength);
 		amf::AMF* amfParser = new amf::AMF();
 		amfParser->parseAMF(metaTag);*/
-		_lastParsedPosition += HEADER_SKIP + bodyLength;
 
 	} else {
-log_debug("no tag - the end?");
+		//log_debug("no tag - the end?");
 		// We can't be sure that the parsing is really complete,
 		// maybe it's a corrupt FLV.
 		_parsingComplete = true;

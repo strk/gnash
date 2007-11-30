@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_sdl.h,v 1.4 2007/11/24 17:21:43 strk Exp $
+// $Id: sound_handler_sdl.h,v 1.5 2007/11/30 00:13:02 tgc Exp $
 
 #ifndef SOUND_HANDLER_SDL_H
 #define SOUND_HANDLER_SDL_H
@@ -284,8 +284,8 @@ sound_data::~sound_data()
 class SDL_sound_handler : public sound_handler
 {
 private:
-	/// NetStream audio callbacks
-	hash_wrapper< void* /* owner */, aux_streamer_ptr /* callback */> m_aux_streamer;	//vv
+	/// AS classes (NetStream, Sound) audio callbacks
+	hash_wrapper< void* /* owner */, aux_streamer_ptr /* callback */> m_aux_streamer;
 
 	/// Vector containing all sounds.
 	//

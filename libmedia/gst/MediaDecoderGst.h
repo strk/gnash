@@ -1,4 +1,4 @@
-// MediaDecoderSdl.h: Media decoding using libs, used with sdl soundhandler.
+// MediaDecoderGst.h: Media decoding using Gstreamer
 // 
 //   Copyright (C) 2007 Free Software Foundation, Inc.
 // 
@@ -16,17 +16,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaDecoderSdl.h,v 1.5 2007/11/30 00:13:02 tgc Exp $
+// $Id: MediaDecoderGst.h,v 1.1 2007/11/30 00:13:01 tgc Exp $
 
-#ifndef __MEDIADECODERSDL_H__
-#define __MEDIADECODERSDL_H__
+#ifndef __MEDIADECODERGST_H__
+#define __MEDIADECODERGST_H__
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
-
-#ifndef __STDC_CONSTANT_MACROS
-#define __STDC_CONSTANT_MACROS
 #endif
 
 #include "MediaDecoder.h"
@@ -39,11 +35,11 @@
 namespace gnash {
 namespace media {
 
-///  Media decoding using libs, used with sdl soundhandler.
-class MediaDecoderSdl: public MediaDecoder {
+///  Media decoding using Gstreamer
+class MediaDecoderGst: public MediaDecoder {
 public:
-	MediaDecoderSdl(boost::shared_ptr<tu_file> stream, MediaBuffer* buffer, uint16_t swfVersion, int format);
-	~MediaDecoderSdl();
+	MediaDecoderGst(boost::shared_ptr<tu_file> stream, MediaBuffer* buffer, uint16_t swfVersion, int format);
+	~MediaDecoderGst();
 
 	/// Seeks to pos
 	uint32_t seek(uint32_t pos);
@@ -55,13 +51,12 @@ private:
 	bool setupParser();
 
 	/// The decoding thread. Sets up the decoder, and decodes.
-	static void decodeThread(MediaDecoderSdl* decoder);
+	static void decodeThread(MediaDecoderGst* decoder);
 
-	/// Sets up the decoder
+	/// Sets up the decoder and parser
 	bool setupDecoding();
 };
 
-} // gnash.media namespace 
+} // namespace media
 } // namespace gnash
-
-#endif // __MEDIADECODERSDL_H__
+#endif // __MEDIADECODERGST_H__

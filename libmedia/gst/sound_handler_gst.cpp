@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.2 2007/11/24 17:21:42 strk Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.3 2007/11/30 00:13:02 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -609,14 +609,199 @@ bool GST_sound_handler::is_muted() {
 	return muted;
 }
 
-void GST_sound_handler::attach_aux_streamer(aux_streamer_ptr /*ptr*/, void* /*owner*/)
+
+
+// The callback function which refills the buffer with data
+void GST_sound_handler::callback_as_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data)
 {
-	log_unimpl(__PRETTY_FUNCTION__);
+	gst_elements *gstelements = static_cast<gst_elements*>(user_data);
+
+	try_mutex::scoped_try_lock lock(gstelements->handler->_mutex);
+
+	// If we couldn't obtain a lock return to avoid a deadlock
+	if (!lock.locked()) {
+
+		// We return nothing in this case to avoid noise being decoded and played
+		if (GST_BUFFER_SIZE(buffer) != 0 && GST_BUFFER_DATA(buffer)) {
+			GST_BUFFER_DATA(buffer) = 0;
+			GST_BUFFER_SIZE(buffer) = 0;
+		}
+		return;
+	}
+
+	// First callback or after a couldn't-get-lock-return 
+	if (GST_BUFFER_SIZE(buffer) == 0) {
+		if (gstelements->data_size > BUFFER_SIZE) {
+			GST_BUFFER_SIZE(buffer) = BUFFER_SIZE;
+		} else {
+			GST_BUFFER_SIZE(buffer) = gstelements->data_size;
+		}
+
+		// Reallocate the required memory.
+		guint8* tmp_buf = new guint8[GST_BUFFER_SIZE(buffer)];
+		memcpy(tmp_buf, GST_BUFFER_DATA(buffer), sizeof(buffer));
+
+		delete [] GST_BUFFER_DATA(buffer);
+		GST_BUFFER_DATA(buffer) = tmp_buf;
+	}
+
+	/*GST_sound_handler::*/aux_streamer_ptr aux_streamer = gstelements->handler->m_aux_streamer[gstelements->owner];
+	
+	// If false is returned the sound doesn't want to be attached anymore
+	bool ret = (aux_streamer)(gstelements->owner, GST_BUFFER_DATA(buffer), GST_BUFFER_SIZE(buffer));
+/*	if (!ret) {
+		handler->m_aux_streamer.erase(it++);
+		handler->soundsPlaying--;
+
+		// All the data has been given to the pipeline, so now we need to stop
+		// the pipeline. g_idle_add() makes sure sound_killer is called soon.
+		if (gstelements->position > gstelements->data_size) {
+			g_idle_add(sound_killer, user_data);
+			GST_BUFFER_SIZE(buffer) = 0;
+			GST_BUFFER_DATA(buffer) = 0;
+			return;
+		}
+	}*/
+
 }
 
-void GST_sound_handler::detach_aux_streamer(void* /*owner*/)
+void GST_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 {
-	log_unimpl(__PRETTY_FUNCTION__);
+	try_mutex::scoped_lock lock(_mutex);
+	assert(owner);
+	assert(ptr);
+
+	aux_streamer_ptr p;
+	if (m_aux_streamer.get(owner, &p))
+	{
+		// Already in the hash.
+		return;
+	}
+	m_aux_streamer[owner] = ptr;
+
+	// Make a pipeline that can play the raw data
+
+	// Make a "gst_elements" for this sound which is latter placed on the vector of instances of this sound being played
+	gst_elements* gst_element = new gst_elements;
+	if (gst_element == NULL) {
+		log_error (_("Could not allocate memory for gst_element"));
+		return;
+	}
+
+	// Set the handler
+	gst_element->handler = this;
+
+	// create main pipeline
+	gst_element->pipeline = gst_pipeline_new (NULL);
+
+	// create an audio sink - use oss, alsa or...? make a commandline option?
+	// we first try atudetect, then alsa, then oss, then esd, then...?
+#if !defined(__NetBSD__)
+	gst_element->audiosink = gst_element_factory_make ("autoaudiosink", NULL);
+	if (!gst_element->audiosink) gst_element->audiosink = gst_element_factory_make ("alsasink", NULL);
+	if (!gst_element->audiosink) gst_element->audiosink = gst_element_factory_make ("osssink", NULL);
+#endif
+	if (!gst_element->audiosink) gst_element->audiosink = gst_element_factory_make ("esdsink", NULL);
+
+	// Check if the creation of the gstreamer pipeline, adder and audiosink was a succes
+	if (!gst_element->pipeline) {
+		log_error(_("The gstreamer pipeline element could not be created"));
+	}
+	if (!gst_element->audiosink) {
+		log_error(_("The gstreamer audiosink element could not be created"));
+	}
+
+	// link adder and output to bin
+	gst_bin_add (GST_BIN (gst_element->pipeline), gst_element->audiosink);
+
+	gst_element->bin = gst_bin_new(NULL);
+	gst_element->input = gst_element_factory_make ("fakesrc", NULL);
+	gst_element->capsfilter = gst_element_factory_make ("capsfilter", NULL);
+	gst_element->audioconvert = gst_element_factory_make ("audioconvert", NULL);
+	gst_element->audioresample = gst_element_factory_make ("audioresample", NULL);
+	gst_element->volume = gst_element_factory_make ("volume", NULL);
+
+	// Put the gstreamer elements in the pipeline
+	gst_bin_add_many (GST_BIN (gst_element->bin), gst_element->input,
+					gst_element->capsfilter,
+					gst_element->audioconvert,
+					gst_element->audioresample, 
+					gst_element->volume, NULL);
+
+	// Test if the fakesrc, typefind and audio* elements was correctly created
+	if (!gst_element->input
+		|| !gst_element->capsfilter
+		|| !gst_element->audioconvert
+		|| !gst_element->audioresample) {
+
+		log_error(_("Gstreamer element for audio handling could not be created"));
+		return;
+	}
+
+	// Create a gstreamer decoder for the chosen sound.
+
+	// Set the info about the stream so that gstreamer knows what it is.
+	// We know what the pre-decoded data format is.
+	GstCaps *caps = gst_caps_new_simple ("audio/x-raw-int",
+		"rate", G_TYPE_INT, 44100,
+		"channels", G_TYPE_INT, 2,
+		"endianness", G_TYPE_INT, G_BIG_ENDIAN,
+		"width", G_TYPE_INT, 16,
+		"depth", G_TYPE_INT, 16,
+		//"signed", G_TYPE_INT, 1,
+		 NULL);
+	g_object_set (G_OBJECT (gst_element->capsfilter), "caps", caps, NULL);
+	gst_caps_unref (caps);
+
+	// setup fake source
+	g_object_set (G_OBJECT (gst_element->input),
+				"sizetype", 2, "can-activate-pull", FALSE, "signal-handoffs", TRUE,
+				"sizemax", BUFFER_SIZE, NULL);
+	// Setup the callback
+	gst_element->handoff_signal_id = g_signal_connect (gst_element->input, "handoff", G_CALLBACK (callback_as_handoff), gst_element);
+
+	// we receive raw native sound-data, output directly
+	gst_element_link_many (gst_element->input, 
+				gst_element->capsfilter, 
+				gst_element->audioconvert,
+				gst_element->audioresample,
+				gst_element->volume, NULL);
+
+	// Add ghostpad
+	GstPad *pad = gst_element_get_pad (gst_element->volume, "src");
+	gst_element_add_pad (gst_element->bin, gst_ghost_pad_new ("src", pad));
+	gst_object_unref (GST_OBJECT (pad));
+	
+	// Add the bin to the main pipeline
+	gst_bin_add(GST_BIN (gst_element->pipeline), gst_element->bin);
+	// Link to the adder sink pad
+	GstPad *sinkpad = gst_element_get_pad (gst_element->audiosink, "sink");
+	GstPad *srcpad = gst_element_get_pad (gst_element->bin, "src");
+	gst_pad_link (srcpad, sinkpad);
+	gst_object_unref (GST_OBJECT (srcpad));
+	gst_object_unref (GST_OBJECT (sinkpad));
+
+	gst_element->owner = owner;
+
+	// Put the gst_element on the vector
+	m_aux_streamer_gstelements[owner] = gst_element;
+	
+	// If not already playing, start doing it
+	gst_element_set_state (GST_ELEMENT (gst_element->pipeline), GST_STATE_PLAYING);
+printf("pipeline stated playing\n");
+}
+
+void GST_sound_handler::detach_aux_streamer(void* owner)
+{
+	try_mutex::scoped_lock lock(_mutex);
+	aux_streamer_ptr p;	
+	if (m_aux_streamer.get(owner, &p))
+	{
+		m_aux_streamer.erase(owner);
+		delete m_aux_streamer_gstelements[owner];
+		m_aux_streamer_gstelements.erase(owner);
+	}
+
 }
 
 unsigned int GST_sound_handler::get_duration(int sound_handle)

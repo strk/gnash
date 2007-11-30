@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderFfmpeg.cpp,v 1.6 2007/11/24 17:21:43 strk Exp $
+// $Id: AudioDecoderFfmpeg.cpp,v 1.7 2007/11/30 00:13:02 tgc Exp $
 
 #include "AudioDecoderFfmpeg.h"
 
@@ -221,10 +221,10 @@ uint8_t* AudioDecoderFfmpeg::decode(uint8_t* input, uint32_t inputSize, uint32_t
 
 	// Error handling
 	if (bufsize < 1) {
+		log_error(_("Error while decoding audio data."));
+		delete [] output;
 		decodedBytes = 0;
 		outputSize = 0;
-		delete [] output;
-		log_error(_("Error while decoding audio data."));
 		return NULL;
 	}
 

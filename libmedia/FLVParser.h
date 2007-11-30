@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.h,v 1.3 2007/11/24 17:21:42 strk Exp $
+// $Id: FLVParser.h,v 1.4 2007/11/30 00:13:01 tgc Exp $
 
 // Information about the FLV format can be found at http://osflash.org/flv
 
@@ -28,8 +28,6 @@
 #include <vector>
 #include <boost/thread/mutex.hpp>
 #include "MediaParser.h"
-
-#define HEADER_SKIP 15
 
 namespace gnash {
 namespace media {
@@ -91,7 +89,7 @@ public:
 	/// 	tu_file to use for input.
 	/// 	Ownership left to the caller.
 	///
-	FLVParser(tu_file* stream);
+	FLVParser(boost::shared_ptr<tu_file> stream);
 
 	/// Kills the parser...
 	~FLVParser();

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_gst.h,v 1.4 2007/11/24 17:21:43 strk Exp $
+// $Id: sound_handler_gst.h,v 1.5 2007/11/30 00:13:02 tgc Exp $
 
 #ifndef SOUND_HANDLER_GST_H
 #define SOUND_HANDLER_GST_H
@@ -28,6 +28,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp>
 #include <boost/thread/mutex.hpp>
+#include "hash_wrapper.h"
 
 #define BUFFER_SIZE 5000
 
@@ -77,6 +78,10 @@ public:
 
 	/// Set the undecoded data pointer
 	void set_data(const uint8_t*);
+
+	/// The owner of the audio data this element will get data from.
+	/// Only used when getting data from NetStream or Sound.
+	void* owner;
 
 private:
 	// The (un)compressed data
@@ -131,6 +136,11 @@ public:
 class GST_sound_handler : public sound_handler
 {
 private:
+	/// AS classes (NetStream, Sound) audio callbacks
+	hash_wrapper< void* /* owner */, aux_streamer_ptr /* callback */> m_aux_streamer;
+
+	hash_wrapper< void* /* owner */, gst_elements*> m_aux_streamer_gstelements;
+
 	/// Vector containing all the sounds
 	std::vector<sound_data*>	m_sound_data;
 	
@@ -147,6 +157,9 @@ public:
 
 	/// Gstreamer callback function
 	static void callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
+
+	/// Gstreamer callback function when using ActionScript audio source (NetStream, Sound)
+	static void callback_as_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
 
 	GST_sound_handler();
 	virtual ~GST_sound_handler();
@@ -196,8 +209,8 @@ public:
 	/// Gets the playhead position in milliseconds of an event sound connected to an AS Soound obejct.
 	virtual unsigned int get_position(int sound_handle);
 
-	virtual void	attach_aux_streamer(aux_streamer_ptr ptr, void* owner);	//vv
-	virtual void	detach_aux_streamer(void* owner);	//vv
+	virtual void	attach_aux_streamer(aux_streamer_ptr ptr, void* owner);
+	virtual void	detach_aux_streamer(void* owner);
 	
 };
 

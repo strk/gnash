@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaParserFfmpeg.h,v 1.4 2007/11/24 17:21:43 strk Exp $
+// $Id: MediaParserFfmpeg.h,v 1.5 2007/11/30 00:13:02 tgc Exp $
 
 #ifndef __MEDIAPARSERFFMPEG_H__
 #define __MEDIAPARSERFFMPEG_H__
@@ -47,7 +47,7 @@ namespace media {
 class MediaParserFfmpeg : public MediaParser
 {
 public:
-	MediaParserFfmpeg(tu_file* stream);
+	MediaParserFfmpeg(boost::shared_ptr<tu_file> stream);
 	~MediaParserFfmpeg();
 
 	/// Setup the parser

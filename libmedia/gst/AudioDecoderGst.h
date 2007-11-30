@@ -1,4 +1,4 @@
-// VideoDecoderGst.h: Video decoding using Gstreamer.
+// AudioDecoderGst.h: Audio decoding using Gstreamer.
 // 
 //   Copyright (C) 2007 Free Software Foundation, Inc.
 // 
@@ -16,17 +16,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderGst.h,v 1.8 2007/11/30 00:13:02 tgc Exp $
+// $Id: AudioDecoderGst.h,v 1.1 2007/11/30 00:13:01 tgc Exp $
 
-#ifndef __VIDEODECODERGST_H__
-#define __VIDEODECODERGST_H__
+#ifndef __AUDIODECODERGST_H__
+#define __AUDIODECODERGST_H__
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include "log.h"
-#include "VideoDecoder.h"
+#include "AudioDecoder.h"
 
 #include <gst/gst.h>
 #include "image.h"
@@ -38,25 +38,15 @@ namespace gnash {
 namespace media {
 
 /// Video decoding using Gstreamer.
-class VideoDecoderGst : public VideoDecoder {
+class AudioDecoderGst : public AudioDecoder {
 	
 public:
-	VideoDecoderGst();
-	~VideoDecoderGst();
+	AudioDecoderGst();
+	~AudioDecoderGst();
 
-	bool setup(VideoInfo* info);
+	bool setup(AudioInfo* info);
 
-	bool setup(
-		int /*width*/,
-		int /*height*/,
-		int /*deblocking*/,
-		bool /*smoothing*/,
-		videoCodecType /*format*/,
-		int /*outputFormat*/);
-
-	//uint8_t* decode(uint8_t* input, uint32_t inputSize, uint32_t& outputSize);
-
-	std::auto_ptr<image::image_base> decodeToImage(uint8_t* /*input*/, uint32_t /*inputSize*/);
+	uint8_t* decode(uint8_t* /*input*/, uint32_t /*inputSize*/, uint32_t& /*outputSize*/, uint32_t& /*decodedData*/, bool /*parse*/);
 
 	static void callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
 	static void callback_output (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
@@ -65,15 +55,16 @@ private:
 	// gstreamer pipeline objects
 
 	/// the main bin containing the elements
-	GstElement *pipeline;
+	GstElement* _pipeline;
 
 	/// Gstreamer objects
-	GstElement *input;
-	GstElement *inputcaps;
-	GstElement *videocaps;
-	GstElement *output;
-	GstElement *decoder;
-	GstElement *colorspace;
+	GstElement* _input;
+	GstElement* _inputcaps;
+	GstElement* _outputcaps;
+	GstElement* _output;
+	GstElement* _decoder;
+	GstElement* _resampler;
+	GstElement* _converter;
 
 	/// mutexes and locks used to handle input and output.
 	boost::mutex input_mutex;
@@ -82,26 +73,23 @@ private:
 	boost::mutex::scoped_lock* output_lock;
 
 	/// Info from the video tag header. Might be usefull...
-	uint32_t width;
-	uint32_t height;
-	int deblocking;
-	bool smoothing;
-	videoCodecType format;
-	int outputFormat;
-
-	/// Input data and size for current frame
-	uint8_t* frame;
-	int frameSize;
-	
-	/// Last decoded frame
-	std::auto_ptr<image::image_base> decodedFrame;
+	bool _stereo;
+	uint32_t _sampleRate;
+	audioCodecType _format;
 
 	/// If we should stop this will be true
-	volatile bool stop;
+	volatile bool _stop;
+
+	uint32_t _undecodedDataSize;
+	uint8_t* _undecodedData;
+
+	uint32_t _decodedDataSize;
+	uint8_t* _decodedData;
 
 };
-	
-} // gnash.media namespace 
+
+} // media namespace
 } // gnash namespace
 
-#endif // __VIDEODECODERGST_H__
+#endif // __AUDIODECODERGST_H__
+

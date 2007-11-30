@@ -1,3 +1,25 @@
+2007-11-29 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libmedia/Makefile.am: Added new files.
+	* libmedia/FLVParser.{h,cpp}: Use a shared pointer for the tu_file stream.
+	* libmedia/MediaBuffer.h: Changed from using a combined audio-video
+	  container, to seperate containers.
+	* libmedia/MediaDecoder.{cpp,h}: Split into a header and source file. Move
+	  shared code to MediaDecoder.cpp.
+	* libmedia/MediaParser.h: Use a shared pointer for the tu_file stream.
+	* libmedia/sound_handler.h: Removed duplicate code.
+	* libmedia/gst/VideoDecoderGst.{cpp,h}: Updated to changed API.
+	* libmedia/gst/sound_handler_gst.{h,cpp}: Initial code for callbacks.
+	* libmedia/sdl/AudioDecoderFfmpeg.cpp: Free at the right point(?)
+	* libmedia/sdl/MediaDecoderSdl.{cpp,h}: Moved shared code to MediaDecoder.cpp.
+	* libmedia/sdl/MediaParserFfmpeg.{h,cpp}: Use a shared pointer for the tu_file stream.
+	* libmedia/sdl/sound_handler_sdl.h: Updated some comments.
+	* libmedia/gst/AudioDecoderGst.{cpp,h}: Added. Implements the audiodecoder
+	  used by GST when playing FLVs.
+	* libmedia/gst/MediaDecoderGst.{cpp,h}: Added. Implements the MediaDecoder
+	  used when playing movies and sounds. Doesn't work. Should not be far from
+	  playing FLVs.
+
 2007-11-29 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/render_handler_ogl.cpp: Remove line styles from masks.

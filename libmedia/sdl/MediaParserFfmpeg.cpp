@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaParserFfmpeg.cpp,v 1.4 2007/11/24 17:21:43 strk Exp $
+// $Id: MediaParserFfmpeg.cpp,v 1.5 2007/11/30 00:13:02 tgc Exp $
 
 #include "MediaParserFfmpeg.h"
 #include "log.h"
@@ -25,7 +25,7 @@
 namespace gnash {
 namespace media {
 
-MediaParserFfmpeg::MediaParserFfmpeg(tu_file* stream)
+MediaParserFfmpeg::MediaParserFfmpeg(boost::shared_ptr<tu_file> stream)
 	:
 	MediaParser(stream),
 	_videoIndex(-1),
@@ -86,7 +86,7 @@ bool MediaParserFfmpeg::setupParser()
 	// XXX should we call avcodec_init() first?
 	av_register_all();
 
-	AVInputFormat* inputFmt = probeStream(_stream);
+	AVInputFormat* inputFmt = probeStream(_stream.get());
 	if (!inputFmt) {
 		log_error(_("Couldn't determine stream input format"));
 		//pushOnStatus(streamNotFound);
