@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: StartSoundTag.cpp,v 1.4 2007/11/24 17:21:45 strk Exp $ */
+/* $Id: StartSoundTag.cpp,v 1.5 2007/11/30 11:31:03 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -130,12 +130,12 @@ StartSoundTag::execute(sprite_instance* /* m */) const
 	{
 		if (m_stop_playback)
 		{
-			log_debug("Execute StartSoundTag with 'stop playback' flag on");
+			//log_debug("Execute StartSoundTag with 'stop playback' flag on");
 			handler->stop_sound(m_handler_id);
 		}
 		else
 		{
-			log_debug("Execute StartSoundTag with 'stop playback' flag OFF");
+			//log_debug("Execute StartSoundTag with 'stop playback' flag OFF");
 			handler->play_sound(m_handler_id, m_loop_count, 0, 0, (m_envelopes.empty() ? NULL : &m_envelopes));
 		}
 	}
