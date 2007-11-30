@@ -1,5 +1,7 @@
 2007-11-30 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Number.as: add test for '0xRRGGBB'
+	  automatic conversion to number in SWF6+ (gnash fails).
 	* testsuite/misc-mtasc.all/: Makefile.am, TextFieldTest.as:
 	  New test for TextField, contributed by Asger Ottar Alstrup
 	  <asger@area9.dk>.

@@ -27,7 +27,7 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.33 2007/11/08 14:47:55 bwy Exp $";
+rcsid="$Id: Number.as,v 1.34 2007/11/30 18:36:06 strk Exp $";
 
 #include "check.as"
 
@@ -250,28 +250,20 @@ check_equals((-7<undefined), true);
 check_equals((-7>undefined), false);
 #endif
 
-note(2+Number);
-note(Number+2);
-note(null+2);
-note(2+null);
-note(2-Number);
-note(Number-2);
-note(null-2);
-note(2-null);
-note(2*Number);
-note(Number*2);
-note(null*2);
-note(2*null);
-note(2/Number);
-note(Number/2);
-note(null/2);
-note(2/null);
-
 // ActionNewAdd
 check_equals('0' + -1, '0-1');
 
 // string:00 number:0 equality
 check_equals('00', 0);
+
+// string:0xFF0000 number:0xFF0000 equality
+#if OUTPUT_VERSION > 5
+ xcheck_equals("0xFF0000", 0xFF0000);
+ xcheck_equals("0XFF0000", 0xFF0000);
+#else
+ check("0xFF0000" != 0xFF0000);
+ check("0XFF0000" != 0xFF0000);
+#endif
 
 check_equals(typeof(Number.prototype.valueOf), 'function'); 
 check_equals(typeof(Number.prototype.toString), 'function'); 
@@ -454,4 +446,15 @@ a=new Number(5.4 / 1000000);
 check_equals(a.toString(), "5.4e-6");
 
 check( isNaN(0/0) );
-totals();
+
+// END OF TEST
+
+#if OUTPUT_VERSION < 6
+ check_totals(146);
+#else
+#if OUTPUT_VERSION < 7
+ check_totals(156);
+#else
+ check_totals(154);
+#endif
+#endif
