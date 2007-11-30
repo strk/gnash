@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.451 2007/11/29 07:41:02 strk Exp $
+dnl $Id: configure.ac,v 1.452 2007/11/30 23:44:17 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1050,6 +1050,7 @@ AC_LANG_POP(C++)
 dnl AC_CHECK_LIB(c, mremap)
 GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
 GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
+GNASH_PKG_FIND(png, [png.h], [png images], png_info_init)
 GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
 
 dnl Find freetype and fontconfig
@@ -1816,6 +1817,21 @@ else
   echo "               or .deb users: apt-get install libjpeg-dev"
   echo "               or .rpm users: yum install libjpeg-devel"
   nogo=true
+fi
+
+if test x"${PNG_LIBS}" != x ; then
+  if test x"${PNG_CFLAGS}" != x ; then
+    echo "        PNG flags are: $PNG_CFLAGS"
+  else
+    echo "        PNG flags are: default include path"
+  fi
+  echo "        PNG libs are: $PNG_LIBS"
+else
+  echo "        WARNING: No PNG library development package installed!"
+  echo "                 Gnash will be built without support for dynamic loading of PNG files."
+  echo "                 Install it from http://www.libpng.org"
+  echo "                 or .deb users: apt-get install libpng12-dev"
+  echo "                 or .rpm users: yum install libpng-devel"
 fi
 
 dnl if test x"$OGG_LIBS" != x; then
