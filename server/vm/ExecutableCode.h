@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ExecutableCode.h,v 1.10 2007/09/04 21:50:21 strk Exp $ */
+/* $Id: ExecutableCode.h,v 1.11 2007/11/30 09:59:04 zoulunkai Exp $ */
 
 #ifndef GNASH_EXECUTABLECODE_H
 #define GNASH_EXECUTABLECODE_H
@@ -39,17 +39,17 @@ namespace gnash
 class ExecutableCode {
 
 public:
-	ExecutableCode() {}
+    ExecutableCode() {}
 
-	virtual void execute()=0;
+    virtual void execute()=0;
 
-	virtual ExecutableCode* clone() const=0;
+    virtual ExecutableCode* clone() const=0;
 
-	virtual ~ExecutableCode() {}
+    virtual ~ExecutableCode() {}
 
 #ifdef GNASH_USE_GC
-	/// Mark reachable resources (for the GC)
-	virtual void markReachableResources() const=0;
+    /// Mark reachable resources (for the GC)
+    virtual void markReachableResources() const=0;
 #endif // GNASU_USE_GC
 };
 
@@ -58,47 +58,47 @@ class GlobalCode: public ExecutableCode {
 
 public:
 
-	GlobalCode(const action_buffer& nBuffer, boost::intrusive_ptr<character> nTarget)
-		:
-		buffer(nBuffer),
-		target(nTarget)
-	{}
+    GlobalCode(const action_buffer& nBuffer, boost::intrusive_ptr<character> nTarget)
+        :
+        buffer(nBuffer),
+        target(nTarget)
+    {}
 
-	ExecutableCode* clone() const
-	{
-		return new GlobalCode(*this);
-	}
+    ExecutableCode* clone() const
+    {
+        return new GlobalCode(*this);
+    }
 
-	virtual void execute()
-	{
-		if ( ! target->isUnloaded() )
-		{
-			ActionExec exec(buffer, target->get_environment());
-			exec();
-		}
-		else
-		{
-			//log_msg("Sprite %s unloaded, won't execute global code in it", target->getTargetPath().c_str());
-		}
-	}
+    virtual void execute()
+    {
+        if ( ! target->isUnloaded() )
+        {
+            ActionExec exec(buffer, target->get_environment());
+            exec();
+        }
+        else
+        {
+            //log_msg("Sprite %s unloaded, won't execute global code in it", target->getTargetPath().c_str());
+        }
+    }
 
 #ifdef GNASH_USE_GC
-	/// Mark reachable resources (for the GC)
-	//
-	/// Reachable resources are:
-	///	 - the action target (target)
-	///
-	virtual void markReachableResources() const
-	{
-		if ( target ) target->setReachable();
-	}
+    /// Mark reachable resources (for the GC)
+    //
+    /// Reachable resources are:
+    ///  - the action target (target)
+    ///
+    virtual void markReachableResources() const
+    {
+        if ( target ) target->setReachable();
+    }
 #endif // GNASU_USE_GC
 
 private:
 
-	const action_buffer& buffer;
+    const action_buffer& buffer;
 
-	boost::intrusive_ptr<character> target;
+    boost::intrusive_ptr<character> target;
 };
 
 /// Event code 
@@ -106,70 +106,72 @@ class EventCode: public ExecutableCode {
 
 public:
 
-	typedef vector<const action_buffer*> BufferList;
+    typedef vector<const action_buffer*> BufferList;
 
-	EventCode(boost::intrusive_ptr<character> nTarget)
-		:
-		_target(nTarget)
-	{}
+    EventCode(boost::intrusive_ptr<character> nTarget)
+        :
+        _target(nTarget)
+    {}
 
-	EventCode(boost::intrusive_ptr<character> nTarget, const BufferList& buffers)
-		:
-		_target(nTarget),
-		_buffers(buffers)
-	{}
+    EventCode(boost::intrusive_ptr<character> nTarget, const BufferList& buffers)
+        :
+        _target(nTarget),
+        _buffers(buffers)
+    {}
 
 
-	ExecutableCode* clone() const
-	{
-		return new EventCode(*this);
-	}
+    ExecutableCode* clone() const
+    {
+        return new EventCode(*this);
+    }
 
-	/// Add an action buffer to this event handler
-	//
-	/// @param buffer
-	///	An action buffer to execute. Externally owned
-	///	and not copied, so make sure it's kept
-	///	alive for the whole EventCode lifetime.
-	///
-	void addAction(const action_buffer& buffer)
-	{
-		_buffers.push_back(&buffer);
-	}
+    /// Add an action buffer to this event handler
+    //
+    /// @param buffer
+    /// An action buffer to execute. Externally owned
+    /// and not copied, so make sure it's kept
+    /// alive for the whole EventCode lifetime.
+    ///
+    void addAction(const action_buffer& buffer)
+    {
+        // don't push actions for destroyed characters, 
+        // our opcode guard is bogus at the moment.
+        if( ! _target->isDestroyed() )
+        {
+            _buffers.push_back(&buffer);
+        }
+    }
 
-	virtual void execute()
-	{
-		// We do want to call the onUnload event handler !!
-		//if ( _target->isUnloaded() )
-		//{
-			//log_msg("Sprite %s unloaded, won't execute global code in it", target->getTargetPath().c_str());
-		//	return;
-		//}
-		for (BufferList::iterator it=_buffers.begin(), itEnd=_buffers.end();
-				it != itEnd; ++it)
-		{
-			ActionExec exec(*(*it), _target->get_environment(), false);
-			exec();
-		}
-	}
+    virtual void execute()
+    {
+        for (BufferList::iterator it=_buffers.begin(), itEnd=_buffers.end();
+                it != itEnd; ++it)
+        {
+            // onClipEvents code are guarded by isDestroyed(), still might be also guarded by isUnloaded()
+            if( _target->isDestroyed() )  break;
+
+            ActionExec exec(*(*it), _target->get_environment(), false);
+            exec();
+        }
+    }
 
 #ifdef GNASH_USE_GC
-	/// Mark reachable resources (for the GC)
-	//
-	/// Reachable resources are:
-	///	 - the action target (_target)
-	///
-	virtual void markReachableResources() const
-	{
-		if ( _target ) _target->setReachable();
-	}
+    /// Mark reachable resources (for the GC)
+    //
+    /// Reachable resources are:
+    ///  - the action target (_target)
+    ///
+    virtual void markReachableResources() const
+    {
+        if ( _target ) _target->setReachable();
+    }
 #endif // GNASU_USE_GC
 
 private:
 
-	boost::intrusive_ptr<character> _target;
+    boost::intrusive_ptr<character> _target;
 
-	BufferList _buffers;
+    BufferList _buffers;
 
 };
 
@@ -178,40 +180,44 @@ class QueuedEvent: public ExecutableCode {
 
 public:
 
-	QueuedEvent(boost::intrusive_ptr<character> nTarget, const event_id& id)
-		:
-		_target(nTarget),
-		_eventId(id)
-	{}
+    QueuedEvent(boost::intrusive_ptr<character> nTarget, const event_id& id)
+        :
+        _target(nTarget),
+        _eventId(id)
+    {}
 
 
-	ExecutableCode* clone() const
-	{
-		return new QueuedEvent(*this);
-	}
+    ExecutableCode* clone() const
+    {
+        return new QueuedEvent(*this);
+    }
 
-	virtual void execute()
-	{
-		_target->on_event(_eventId);
-	}
+    virtual void execute()
+    {
+        // don't execute any events for destroyed character.
+        if( !_target->isDestroyed() )
+        {
+            _target->on_event(_eventId);
+        }
+    }
 
 #ifdef GNASH_USE_GC
-	/// Mark reachable resources (for the GC)
-	//
-	/// Reachable resources are:
-	///	 - the action target (_target)
-	///
-	virtual void markReachableResources() const
-	{
-		if ( _target ) _target->setReachable();
-	}
+    /// Mark reachable resources (for the GC)
+    //
+    /// Reachable resources are:
+    ///  - the action target (_target)
+    ///
+    virtual void markReachableResources() const
+    {
+        if ( _target ) _target->setReachable();
+    }
 #endif // GNASU_USE_GC
 
 private:
 
-	boost::intrusive_ptr<character> _target;
+    boost::intrusive_ptr<character> _target;
 
-	const event_id _eventId;
+    const event_id _eventId;
 
 };
 
@@ -220,42 +226,42 @@ class FunctionCode: public ExecutableCode {
 
 public:
 
-	FunctionCode(boost::intrusive_ptr<as_function> nFunc, boost::intrusive_ptr<character> nTarget)
-		:
-		func(nFunc),
-		target(nTarget)
-	{}
+    FunctionCode(boost::intrusive_ptr<as_function> nFunc, boost::intrusive_ptr<character> nTarget)
+        :
+        func(nFunc),
+        target(nTarget)
+    {}
 
-	ExecutableCode* clone() const
-	{
-		return new FunctionCode(*this);
-	}
+    ExecutableCode* clone() const
+    {
+        return new FunctionCode(*this);
+    }
 
-	virtual void execute()
-	{
-		as_environment env; env.set_target(target.get());
-		func->call(fn_call(target.get(), &env, 0, 0));
-	}
+    virtual void execute()
+    {
+        as_environment env; env.set_target(target.get());
+        func->call(fn_call(target.get(), &env, 0, 0));
+    }
 
 #ifdef GNASH_USE_GC
-	/// Mark reachable resources (for the GC)
-	//
-	/// Reachable resources are:
-	///	 - the function body (func)
-	///	 - the action target (target)
-	///
-	virtual void markReachableResources() const
-	{
-		if ( func ) func->setReachable();
-		if ( target ) target->setReachable();
-	}
+    /// Mark reachable resources (for the GC)
+    //
+    /// Reachable resources are:
+    ///  - the function body (func)
+    ///  - the action target (target)
+    ///
+    virtual void markReachableResources() const
+    {
+        if ( func ) func->setReachable();
+        if ( target ) target->setReachable();
+    }
 #endif // GNASU_USE_GC
 
 private:
 
-	boost::intrusive_ptr<as_function> func;
+    boost::intrusive_ptr<as_function> func;
 
-	boost::intrusive_ptr<character> target;
+    boost::intrusive_ptr<character> target;
 };
 
 

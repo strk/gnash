@@ -162,8 +162,8 @@ main(int argc, char** argv)
   // onClipConstruct invoked or not during jumping back is dependent 
   // on whether the onClipUnload has been defined.
   // Gnash fails by calling onClipConstruct again without considering onClipUnload!!
-  xcheck_equals(mo, "_root.mc1Constructed", "1");
-  xcheck_equals(mo, "_root.mc1Initialized", "1");
+  check_equals(mo, "_root.mc1Constructed", "1");
+  check_equals(mo, "_root.mc1Initialized", "1");
 
   check_equals(mo, "_root.mc2Constructed", "2");
   check_equals(mo, "_root.mc2Initialized", "2");

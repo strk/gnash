@@ -19,11 +19,28 @@
 /*
  * Zou Lunkai, zoulunkai@gmail.com
  *
- * Test for tag PlaceObject2 and also sprite_instance::advance_sprite(float delta_time)
+ * Timeline:
+ * 
+ *   Frame  | 1  | 2  | 3  | 
+ *  --------+----+----+----+
+ *   Event  |PPP |RRR |PPPP|  
+ * 
+ *  P = place (by PlaceObject2)
+ *  R = remove (by RemoveObject)
+ * 
+ * Description:
+ * 
+ *  frame1: place mc_red at depth3, mc_blue at depth30, mc_black at depth40
+ *  frame2: remove mc_red, mc_blue, mc_black
+ *  frame3: place mc_red at depth3 again with a different ratio; place mc_blue 
+ *          at depth30 again with the same ratio; place mc_black at depth40 again
+ *          but with a different name; place mc_green at depth4.
  *
- * TODO: add description here !
+ * Observed:
+ *    
+ *    loop back obeys the same rule as jump back.
  *
- * run as ./place_and_remove_object_insane_test
+ *  run as ./place_and_remove_object_insane_test
  */
 
 #include <stdlib.h>
@@ -102,9 +119,7 @@ main(int argc, char** argv)
   check_equals(mo, "typeof(_root.mc_blue)", "'movieclip'");
 
   check_equals(mo, "_root.mc_green",  "undefined");
-  // For myself, all xchecks bellow are insane.
-  // I don't know why MM player pass it. The mystery seems 
-  //   related to ratio value.
+
   add_actions(mo, " _root.mc_red._x += 10; \
                     if(counter == undefined) \
                     { \
@@ -142,12 +157,10 @@ main(int argc, char** argv)
   it_blue = SWFMovie_add(mo, (SWFBlock)mc_blue); //add mc_blue to the 3rd frame at depth 30 again
   SWFDisplayItem_setDepth(it_blue, 30); 
   SWFDisplayItem_setName(it_blue, "mc_blue");
-  //SWFDisplayItem_setRatio(it, 2.0);  //Don't set ratio this time!
 
   it_black = SWFMovie_add(mo, (SWFBlock)mc_black);  //add mc_black to the 3rd frame at depth 40 again
   SWFDisplayItem_setDepth(it_black, 40); 
   SWFDisplayItem_setName(it_black, "mc_black_name_changed");
-  //SWFDisplayItem_setRatio(it_black, 2.0);  //Don't set ratio this time!
     
   it_green = SWFMovie_add(mo, (SWFBlock)mc_green);  //add mc_green to the 3rd frame at depth 4
   SWFDisplayItem_setDepth(it_green, 4); 

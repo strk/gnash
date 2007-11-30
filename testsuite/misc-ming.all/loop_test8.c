@@ -230,6 +230,8 @@ main(int argc, char** argv)
   check_equals(mo, "mc1Unloaded", "0");
   check_equals(mo, "mc2Unloaded", "1");
   check_equals(mo, "mc3Unloaded", "1");
+  
+  add_actions(mo, "totals();");
   SWFMovie_nextFrame(mo); // 6th frame 
   
   //Output movie

@@ -39,7 +39,7 @@
  * 
  *  frame2: character placed at depth -16381 at position (10,200)
  *  frame4: position of instance at depth -16381 shifted to the right (50,200)
- *  frame5: position of instance at depth -16381 shifted to the right (100,200)
+ *  frame5: position of instance at depth -16381 shifted to the right (200,200)
  *  frame6: depth of instance changed to 10 (dynamic zone) and stop.
  *  frame7: jump back to frame 4
  * 
@@ -49,7 +49,7 @@
  *  After the jump we have two instances:
  *         - one at depth 10 and position 100,200
  *           (the same we had before, with its state intact)
- *         - another at depth -16381 and position 20,200
+ *         - another at depth -16381 and position 50,200
  *           (newly created and placed accordingly to the PlaceObject2 tag on frame4)
  *  Two distinct instances have been constructed in total.
  * 
@@ -148,7 +148,7 @@ main(int argc, char** argv)
 		);
 	SWFMovie_nextFrame(mo); 
 
-	// Frame 5: move character at depth 3 to position 100,200
+	// Frame 5: move character at depth 3 to position 200,200
 	SWFDisplayItem_moveTo(it1, 200, 200); 
 	add_actions(mo,
 		"check_equals(static3.myThing, 'guess');"
