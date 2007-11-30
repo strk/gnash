@@ -1,3 +1,8 @@
+2007-11-30 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/shape_character_def.cpp (computeBounds): don't choke
+	  on glyph shapes with m_line set to 1. Fixes bug #21674.
+
 2007-11-30 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/vm/ExecutableCode.h: don't push or execute any event code

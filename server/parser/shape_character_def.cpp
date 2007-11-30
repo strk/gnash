@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.51 2007/11/17 16:21:06 nihilus Exp $ */
+/* $Id: shape_character_def.cpp,v 1.52 2007/11/30 11:13:32 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -1083,9 +1083,24 @@ void  shape_character_def::compute_bound(rect* r) const
     {
         const path& p = m_paths[i];
 
-  unsigned thickness = 0;
-  if ( p.m_line ) thickness = m_line_styles[p.m_line-1].get_width();
-  p.expandBounds(*r, thickness);
+	unsigned thickness = 0;
+	if ( p.m_line )
+	{
+		// For glyph shapes m_line is allowed to be 1
+		// while no defined line styles are allowed.
+		if ( m_line_styles.empty() )
+		{
+			// This is either a Glyph, for which m_line==1 is valid
+			// or a bug in the parser, which we have no way to 
+			// check at this time
+			assert(p.m_line == 1);
+		}
+		else
+		{
+			thickness = m_line_styles[p.m_line-1].get_width();
+		}
+	}
+	p.expandBounds(*r, thickness);
     }
 }
 
