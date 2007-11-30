@@ -29,14 +29,15 @@ class Text
 		mc.createTextField("textf", 100, 200, 100, 100, 100);
 		_level0.createTextField("textout", 99, 10, 10, 500, 500);
 		var tf = _level0.textf;
+                check_equals(tf._height, 100);
 		tf.autoSize = true;
 		tf.text = "Hello world";
 		tf.backgroundColor = "0xFFEEEE";
 		tf.background = true;
 		var height = tf._height;
 		note("textfield height is "+height);
-                xcheck(height < 50);
-		check_totals(1);
+                check(height < 50);
+		check_totals(2);
 		Dejagnu.done();
 	}
 }

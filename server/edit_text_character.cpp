@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.133 2007/11/20 10:31:39 cmusick Exp $ */
+/* $Id: edit_text_character.cpp,v 1.134 2007/11/30 22:36:31 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1098,6 +1098,23 @@ edit_text_character::format_text()
 {
 	m_text_glyph_records.resize(0);
 
+	// nothing more to do if text is empty
+	if ( _text.empty() ) return;
+
+
+	AutoSizeValue autoSize = getAutoSize();
+	if ( autoSize != autoSizeNone )
+	{
+		static bool warned = false;
+		if ( ! warned ) {
+			log_debug(_("TextField.autoSize != 'none' TESTING"));
+			warned = true;
+		}
+
+		_bounds.setTo(0,0,0,0);
+		//_bounds.setNull();
+	}
+
 	// Should get info from autoSize too maybe ?
 	edit_text_character_def::alignment textAlignment = getTextAlignment();
 
@@ -1330,8 +1347,6 @@ edit_text_character::format_text()
 after_x_advance:
 
 		float width = _bounds.width(); // m_def->width()
-		//float right_margin = m_def->get_right_margin();
-
 		if (x >= width - rightMargin - PADDING_TWIPS)
 		{
 			//log_debug("Text in character %s exceeds margins", getTarget().c_str());
@@ -1341,16 +1356,7 @@ after_x_advance:
 			if ( ! doWordWrap() )
 			{
 				//log_debug(" No word wrapping");
-				AutoSizeValue autoSize = getAutoSize();
-				if ( autoSize != autoSizeNone )
-				{
-					static bool warned = false;
-					if ( ! warned ) {
-						log_debug(_("TextField.autoSize != 'none' TESTING"));
-						warned = true;
-					}
-				}
-				else
+				if ( autoSize == autoSizeNone )
 				{
 					//log_debug(" autoSize=NONE!");
 					// truncate long line, but keep expanding text box
@@ -1456,7 +1462,7 @@ after_x_advance:
 	// Expand bounding box to include the whole text (if autoSize)
 	if ( _autoSize != autoSizeNone )
 	{
-		_bounds.expandTo(x+PADDING_TWIPS, y);
+		_bounds.expandTo(x+PADDING_TWIPS, y+PADDING_TWIPS);
 	}
 	else
 	{

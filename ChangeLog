@@ -1,5 +1,11 @@
 2007-11-30 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.cpp (format_text): reset bounds when in
+	  autoSize mode.
+	* testsuite/misc-mtasc.all/TextFieldTest.as: success and a new test.
+
+2007-11-30 Sandro Santilli <strk@keybit.net>
+
 	* server/as_value.cpp (to_number): add support for parsing hex
 	  strings in swf6+
 	* testsuite/actionscript.all/Number.as: success in hex parsing tests.
