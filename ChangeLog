@@ -1,5 +1,11 @@
 2007-11-30 Sandro Santilli <strk@keybit.net>
 
+	* gui/kde.cpp (quit): use QApplication::exit.
+	* gui/kde_glue_agg.cpp: keep rendering no matter what HAVE_QTOPIA says
+	  (or rendering would be disabled for normal kde-gnash)
+
+2007-11-30 Sandro Santilli <strk@keybit.net>
+
 	* plugin/plugin.cpp: don't use operator+ on temp string, it seems
 	  to have weird problems in some cases. See bug #21667.
 

@@ -320,8 +320,12 @@ KdeGui::resize(int width, int height)
 void
 KdeGui::quit()
 {
+#if 1
+    _qapp->exit();
+#else // dunno what this wanted to achive
 #if QT_VERSION > 2312
     _qapp->eventLoop()->exit();
+#endif
 #endif
 }
 
