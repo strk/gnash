@@ -31,8 +31,8 @@
 // First argument is the expression we test, second is the result we expect
 #define xcheck_equals(obt, exp) Dejagnu.xcheck_equals(obt, exp, _INFO_);
 
-#define check(a) Dejagnu.check(a, _INFO_);
-#define xcheck(a) Dejagnu.xcheck(a, _INFO_);
+#define check(a) Dejagnu.check(a, #a+' '+_INFO_);
+#define xcheck(a) Dejagnu.xcheck(a, #a+' '+_INFO_);
 
 #define pass(text) Dejagnu.pass(text + _INFO_)
 #define xpass(text) Dejagnu.xpass(text + _INFO_)

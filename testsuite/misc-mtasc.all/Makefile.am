@@ -27,6 +27,7 @@ SANE_ASTESTS = \
 	exception.as \
 	levels.as \
 	implementsOpTest.as \
+	TextFieldTest.as \
 	$(NULL)
 # These ones are the ones for which consistency check fail 
 BOGUS_ASTESTS = \
