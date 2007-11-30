@@ -1240,7 +1240,7 @@ public:
   
   
   
-  void apply_line_style(const line_style& style, const cxform& cx, const matrix& mat)
+  bool apply_line_style(const line_style& style, const cxform& cx, const matrix& mat)
   {
   //  GNASH_REPORT_FUNCTION;
      
@@ -1248,6 +1248,8 @@ public:
     // FIXME: this sucks
     glDisable(GL_TEXTURE_2D);
     
+    
+    bool rv = true;
     
     float width = style.get_width();
     
@@ -1270,13 +1272,25 @@ public:
                   " requested. Lines will be drawn with reduced width.");
       }
       
+      
       glLineWidth(width);
-      glPointSize(width);
+      
+      if (width >= 1.5) {
+        
+        glPointSize(width-1);
+      } else {
+        // Don't draw rounded lines.
+        rv = false;
+      }
+      
+      
     }
 
     rgba c = cx.transform(style.get_color());
 
     glColor4ub(c.m_r, c.m_g, c.m_b, c.m_a);
+    
+    return rv;
   }
  
   PathPointMap getPathPoints(const PathVec& path_vec)
@@ -1302,6 +1316,11 @@ public:
   
   typedef std::vector<const path*> PathPtrVec;
   
+  static void
+  draw_point(const edge& point_edge)
+  {  
+    glVertex2d(point_edge.ap.x, point_edge.ap.y);  
+  }
     
   void
   draw_outlines(const PathVec& path_vec, const PathPointMap& pathpoints, const matrix& mat,
@@ -1317,31 +1336,33 @@ public:
         continue;
       }
       
-      apply_line_style(line_styles[cur_path.m_line-1], cx, mat);
+      bool draw_points = apply_line_style(line_styles[cur_path.m_line-1], cx, mat);
       
       assert(pathpoints.find(&cur_path) != pathpoints.end());
       
       const std::vector<oglVertex>& shape_points = (*pathpoints.find(&cur_path)).second;
-      
-      //glDisable(GL_TEXTURE_1D);
-      //glDisable(GL_TEXTURE_2D);
+
       // Draw outlines.
       glEnableClientState(GL_VERTEX_ARRAY);
       glVertexPointer(3, GL_DOUBLE, 0 /* tight packing */, &shape_points.front());
       glDrawArrays(GL_LINE_STRIP, 0, shape_points.size());
-      
-      // Draw a dot on the beginning and end coordinates to round lines.
-      //   glVertexPointer: skip all but the first and last coordinates in the line.
-      glVertexPointer(3, GL_DOUBLE, (sizeof(GLdouble) * 3) * (shape_points.size() - 1), &shape_points.front());
-      glEnable(GL_POINT_SMOOTH); // Draw a round (antialiased) point.
-      glDrawArrays(GL_POINTS, 0, 2);
-      glDisable(GL_POINT_SMOOTH);
-      glPointSize(1); // return to default
-        
-      
       glDisableClientState(GL_VERTEX_ARRAY);
+
+      if (!draw_points) {
+        continue;
+      }
       
-      
+      // Drawing points on the edges will allow us to simulate rounded lines.
+
+      glEnable(GL_POINT_SMOOTH); // Draw round points.      
+
+      glBegin(GL_POINTS);
+      {
+        glVertex2d(cur_path.ap.x, cur_path.ap.y);
+        std::for_each(cur_path.m_edges.begin(), cur_path.m_edges.end(),
+                      draw_point);
+      }
+      glEnd();
     }
   }
 
