@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaParserFfmpeg.cpp,v 1.5 2007/11/30 00:13:02 tgc Exp $
+// $Id: MediaParserFfmpeg.cpp,v 1.6 2007/11/30 13:56:04 bwy Exp $
 
 #include "MediaParserFfmpeg.h"
 #include "log.h"
@@ -66,13 +66,13 @@ probeStream(tu_file* stream)
 	probe_data.buf = buffer.get();
 	probe_data.buf_size = 4096;
 
-	// Check if the needed amount of data is available
-	if (stream->set_position(probe_data.buf_size) != 0) {
- 		log_error(_("Gnash could not read from movie url"));
+	// Get probe data, making sure the necessary data is available
+	if (stream->read_bytes(probe_data.buf, probe_data.buf_size)
+				< probe_data.buf_size)
+	{
+	 	log_error(_("Stream too short to determine input format"));
  		return NULL;
 	}
-	
-	stream->read_bytes(probe_data.buf, probe_data.buf_size);
 
 	return av_probe_input_format(&probe_data, 1);
 }

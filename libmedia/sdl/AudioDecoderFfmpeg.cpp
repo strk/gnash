@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderFfmpeg.cpp,v 1.7 2007/11/30 00:13:02 tgc Exp $
+// $Id: AudioDecoderFfmpeg.cpp,v 1.8 2007/11/30 13:56:04 bwy Exp $
 
 #include "AudioDecoderFfmpeg.h"
 
@@ -33,7 +33,7 @@ AudioDecoderFfmpeg::AudioDecoderFfmpeg ()
 
 AudioDecoderFfmpeg::~AudioDecoderFfmpeg()
 {
-	if (_audioCodec) avcodec_close(_audioCodecCtx);
+	if (_audioCodecCtx) avcodec_close(_audioCodecCtx);
 	if (_parser) av_parser_close(_parser);
 }
 
