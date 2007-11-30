@@ -1,5 +1,11 @@
 2007-11-30 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.cpp (to_number): add support for parsing hex
+	  strings in swf6+
+	* testsuite/actionscript.all/Number.as: success in hex parsing tests.
+
+2007-11-30 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Number.as: add test for '0xRRGGBB'
 	  automatic conversion to number in SWF6+ (gnash fails).
 	* testsuite/misc-mtasc.all/: Makefile.am, TextFieldTest.as:

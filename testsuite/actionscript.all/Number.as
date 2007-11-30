@@ -27,7 +27,7 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.34 2007/11/30 18:36:06 strk Exp $";
+rcsid="$Id: Number.as,v 1.35 2007/11/30 19:01:03 strk Exp $";
 
 #include "check.as"
 
@@ -258,8 +258,10 @@ check_equals('00', 0);
 
 // string:0xFF0000 number:0xFF0000 equality
 #if OUTPUT_VERSION > 5
- xcheck_equals("0xFF0000", 0xFF0000);
- xcheck_equals("0XFF0000", 0xFF0000);
+ check_equals("0xFF0000", 0xFF0000);
+ check_equals("0XFF0000", 0xFF0000);
+ check_equals("0Xff0000", 0xFF0000);
+ check("0Xff000000" != 0xFF000000);
 #else
  check("0xFF0000" != 0xFF0000);
  check("0XFF0000" != 0xFF0000);
@@ -453,8 +455,8 @@ check( isNaN(0/0) );
  check_totals(146);
 #else
 #if OUTPUT_VERSION < 7
- check_totals(156);
+ check_totals(158);
 #else
- check_totals(154);
+ check_totals(156);
 #endif
 #endif
