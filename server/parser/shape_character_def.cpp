@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.53 2007/12/01 01:08:09 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.54 2007/12/01 15:40:59 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -160,7 +160,6 @@ shape_character_def::shape_character_def()
 shape_character_def::shape_character_def(const shape_character_def& o)
   :
   character_def(o),
-  tesselate::tesselating_shape(o),
   m_fill_styles(o.m_fill_styles),
   m_line_styles(o.m_line_styles),
   m_paths(o.m_paths),
@@ -700,26 +699,6 @@ void  shape_character_def::display(
   renderer->draw_shape_character(this_non_const, mat, cx, pixel_scale,
     fill_styles, line_styles);
 }
-
-
-
-
-void  shape_character_def::tesselate(float error_tolerance, tesselate::trapezoid_accepter* accepter) const
-    // Push our shape data through the tesselator.
-{
-    tesselate::begin_shape(accepter, error_tolerance);
-    for (unsigned int i = 0; i < m_paths.size(); i++) {
-  if (m_paths[i].m_new_shape == true) {
-      // Hm; should handle separate sub-shapes in a less lame way.
-      tesselate::end_shape();
-      tesselate::begin_shape(accepter, error_tolerance);
-  } else {
-      m_paths[i].tesselate();
-  }
-    }
-    tesselate::end_shape();
-}
-
 
 // TODO: this should be moved to libgeometry or something
 int curve_x_crossings(float x0, float y0, float x1, float y1, 

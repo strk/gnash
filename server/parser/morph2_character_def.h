@@ -78,7 +78,6 @@ namespace gnash {
 		int fill_style_count;
 		int line_style_count;
 		float m_last_ratio;
-		mesh_set*	m_mesh;
 		mutable rect m_bound;
 	};
 }

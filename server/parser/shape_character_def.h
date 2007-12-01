@@ -5,14 +5,13 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape_character_def.h,v 1.19 2007/12/01 01:08:10 strk Exp $ */
+/* $Id: shape_character_def.h,v 1.20 2007/12/01 15:40:59 strk Exp $ */
 
 #ifndef GNASH_SHAPE_CHARACTER_DEF_H
 #define GNASH_SHAPE_CHARACTER_DEF_H
 
 
 #include "character_def.h" // for inheritance of shape_character_def
-#include "tesselate.h" 
 #include "shape.h" // for path
 #include "rect.h" // for composition
 
@@ -30,10 +29,7 @@ namespace gnash {
 	/// Represents the outline of one or more shapes, along with
 	/// information on fill and line styles.
 	//
-	/// Inheritance from tesselating_shape is only needed to expose a known interface
-	/// for mesh_set class use.
-	///
-	class shape_character_def : public character_def, public tesselate::tesselating_shape
+	class shape_character_def : public character_def
 	{
 	public:
 
@@ -81,7 +77,6 @@ namespace gnash {
 			float pixel_scale,
 			const std::vector<fill_style>& fill_styles,
 			const std::vector<line_style>& line_styles) const;
-		virtual void	tesselate(float error_tolerance, tesselate::trapezoid_accepter* accepter) const;
 
 		/// Get cached bounds of this shape.
 		const rect&	get_bound() const { return m_bound; }
@@ -147,8 +142,6 @@ namespace gnash {
 			return *this;
 		}
 
-		// Cached pre-tesselated meshes. (deprecated)
-		//mutable std::vector<mesh_set*>	m_cached_meshes;
 	};
 
 }	// end namespace gnash

@@ -1,9 +1,16 @@
+2007-12-01 Sandro Santilli <strk@keybit.net>
+
+	* server/: Makefile.am, fontlib.cpp, shape.{cpp,h},
+	  tesselate.{cpp,h}, parser/morph2_character_def.{cpp,h},
+	  parser/shape_character_def.{cpp,h}:
+	  Drop unused software renderer (tesselator, mesh_set and friends)
+
 2007-12-01 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libmedia/sdl/MediaParserFfmpeg.cpp: Add buffer to prevent invalid
 	  reads when decoding media frames.
 
-2007-11-30 Sandro Santilli <strk@keybit.net>
+2007-12-01 Sandro Santilli <strk@keybit.net>
 
 	* server/: font.{cpp,h}, fontlib.{cpp,h}, text.cpp:
 	  Drop deprecated textured glyphs support.

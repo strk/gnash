@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.132 2007/11/23 22:23:24 strk Exp $
+# $Id: Makefile.am,v 1.133 2007/12/01 15:40:59 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -107,7 +107,6 @@ libgnashserver_la_SOURCES = \
 	shape.cpp \
 	stream.cpp \
 	styles.cpp \
-	tesselate.cpp \
 	text.cpp \
 	textformat.cpp \
 	timers.cpp \
@@ -185,7 +184,6 @@ noinst_HEADERS = \
 	swf/StartSoundTag.h \
 	swf_event.h \
 	swf_function.h \
-	tesselate.h \
 	text.h \
 	textformat.h \
 	timers.h \

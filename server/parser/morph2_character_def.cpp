@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: morph2_character_def.cpp,v 1.18 2007/11/10 14:39:52 strk Exp $ */
+/* $Id: morph2_character_def.cpp,v 1.19 2007/12/01 15:40:59 strk Exp $ */
 
 // Based on the public domain morph2.cpp of:
 // Thatcher Ulrich <tu@tulrich.com>, Mike Shaver <shaver@off.net> 2003,
@@ -99,7 +99,7 @@ private:
 };
 
 	morph2_character_def::morph2_character_def():
-		m_last_ratio(-1.0f), m_mesh(0)
+		m_last_ratio(-1.0f)
 	{
 		m_shape1 = new shape_character_def();
 		m_shape2 = new shape_character_def();
@@ -192,18 +192,6 @@ private:
     gnash::render::draw_shape_character(this, inst);
     }
 
-/*
-		matrix mat = inst->get_world_matrix();
-		cxform cx = inst->get_world_cxform();
-		float max_error = 20.0f / mat.get_max_scale() /	inst->get_parent()->get_pixel_scale();
-		if (ratio != m_last_ratio)
-		{
-			delete m_mesh;
-			m_last_ratio = ratio;
-			m_mesh = new mesh_set(this, max_error * 0.75f);
-		}
-  	m_mesh->display(mat, cx, m_fill_styles, m_line_styles);
-*/
 	}
 
 

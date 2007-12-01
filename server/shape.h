@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.h,v 1.35 2007/12/01 01:08:09 strk Exp $ */
+/* $Id: shape.h,v 1.36 2007/12/01 15:40:59 strk Exp $ */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
@@ -19,9 +19,6 @@
 // Forward declarations
 namespace gnash {
 	class rect; // for path::expandBounds
-	namespace tesselate {
-		class tesselating_shape;
-	}
 }
 
 namespace gnash {
@@ -52,8 +49,6 @@ namespace gnash {
 			ap(nap)
 		{
 		}
-
-		void	tesselate_curve() const;
 
 		bool isStraight() const
 		{
@@ -191,9 +186,6 @@ namespace gnash {
 		///     Y ordinate of the query point, in local coordinate space.
 		///
 		void ray_crossing(int& ray_crossings, float x, float y) const;
-
-		/// Push the path into the tesselator.
-		void	tesselate() const;
 
 		/// @{ Primitives for the Drawing API
 		///
@@ -371,60 +363,6 @@ namespace gnash {
 		bool m_new_shape;
 
 	};
-
-	/// For holding a pre-tesselated shape.
-	class mesh
-	{
-	public:
-		mesh();
-
-		void	set_tri_strip(const point pts[], int count);
-
-
-	private:
-	  friend class triangulating_render_handler; 
-		std::vector<int16_t>	m_triangle_strip;
-	};
-
-
-	/// For holding a line-strip (i.e. polyline).
-	class line_strip
-	{
-	public:
-		line_strip();
-		line_strip(int style, const point coords[], int coord_count);
-
-		int	get_style() const { return m_style; }
-	private:
-    friend class triangulating_render_handler; 
-		int	m_style;
-		std::vector<int16_t>	m_coords;
-	};
-
-
-	/// A whole shape, tesselated to a certain error tolerance.
-	class DSOEXPORT mesh_set
-	{
-	public:
-		mesh_set();
-		mesh_set(const tesselate::tesselating_shape* sh,
-			 float error_tolerance);
-
-//		int	get_last_frame_rendered() const;
-//		void	set_last_frame_rendered(int frame_counter);
-		float	get_error_tolerance() const { return m_error_tolerance; }
-
-		void	set_tri_strip(int style, const point pts[], int count);
-		void	add_line_strip(int style, const point coords[], int coord_count);
-
-	private:
-    friend class triangulating_render_handler; 
-//		int	m_last_frame_rendered;	// @@ Hm, we shouldn't spontaneously drop cached data I don't think...
-		float	m_error_tolerance;
-		std::vector<mesh>	m_meshes;	// One mesh per style.
-		std::vector<line_strip>	m_line_strips;
-	};
-
 
 }	// end namespace gnash
 
