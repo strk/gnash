@@ -19,7 +19,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.cpp,v 1.20 2007/11/10 11:51:43 strk Exp $ 
+// $Id: matrix.cpp,v 1.21 2007/12/01 00:14:59 strk Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -31,6 +31,7 @@
 #include "types.h" // for TWIPS_TO_PIXEL define
                    // (should probably not use it though)
 #include "log.h"
+#include "utility.h" // for infinite_to_fzero
 
 #ifndef HAVE_ISFINITE
 # ifndef isfinite 

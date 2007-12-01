@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character_def.cpp,v 1.14 2007/10/16 22:00:27 strk Exp $ */
+/* $Id: edit_text_character_def.cpp,v 1.15 2007/12/01 00:15:00 strk Exp $ */
 
 // Based on the public domain text.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -36,9 +36,9 @@ class movie_definition;
 
 void
 edit_text_character_def::read(stream* in, int tag_type,
-		movie_definition* m)
+		movie_definition* /*m*/)
 {
-	assert(m != NULL);
+	//assert(m != NULL);
 	assert(tag_type == SWF::DEFINEEDITTEXT); // 37
 
 	m_rect.read(in);

@@ -24,11 +24,12 @@
 
 
 #include "gnash.h"
-//#include "as_object.h"
 #include "types.h"
-#include <cwchar>
 
-#include "container.h"
+//#include <cwchar>
+#include <boost/cstdint.hpp> // for uint8_t
+#include <vector> // for composition
+
 #include "smart_ptr.h"
 
 // Forward declarations

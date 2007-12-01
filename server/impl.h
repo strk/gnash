@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: impl.h,v 1.48 2007/11/10 11:51:43 strk Exp $ */
+/* $Id: impl.h,v 1.49 2007/12/01 00:14:59 strk Exp $ */
 
 #ifndef GNASH_IMPL_H
 #define GNASH_IMPL_H
@@ -34,7 +34,6 @@
 //#include "cxform.h" // for composition of display_info
 //#include "matrix.h" // for display_info composition
 #include "types.h"
-#include "container.h"
 #include "utility.h"
 #include "smart_ptr.h"
 #include "swf/TagLoadersTable.h"

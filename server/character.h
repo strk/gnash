@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.111 2007/11/29 09:31:03 strk Exp $ */
+/* $Id: character.h,v 1.112 2007/12/01 00:14:59 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -30,7 +30,6 @@
 
 #include "gnash.h"
 #include "types.h"
-#include "container.h" // still needed ?
 #include "utility.h"
 #include "event_id.h" // for inlines
 #include "as_object.h" // for inheritance

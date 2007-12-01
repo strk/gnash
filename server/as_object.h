@@ -25,7 +25,6 @@
 #include "tu_config.h"
 
 #include "string_table.h"
-#include "container.h"
 #include "ref_counted.h" // for inheritance  (to drop)
 #include "GC.h" // for inheritance from GcResource (to complete)
 #include "PropertyList.h"

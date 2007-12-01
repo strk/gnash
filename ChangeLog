@@ -1,5 +1,10 @@
 2007-11-30 Sandro Santilli <strk@keybit.net>
 
+	* lots of files: drop most includes of container.h, the only
+	  ones left are in files which can probably die on their own.
+
+2007-11-30 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: go find PNG libs (still not used, but planned)
 
 2007-11-30 Bastiaan Jacques <bastiaan@bjacques.org>

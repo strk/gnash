@@ -17,7 +17,7 @@
 
 // Based on work of Thatcher Ulrich <tu@tulrich.com> 2003
 
-/* $Id: fill_style.h,v 1.10 2007/09/04 11:27:42 cmusick Exp $ */
+/* $Id: fill_style.h,v 1.11 2007/12/01 00:14:59 strk Exp $ */
 
 #ifndef GNASH_FILL_STYLE_H
 #define GNASH_FILL_STYLE_H
@@ -26,10 +26,11 @@
 #include "config.h"
 #endif
 
-//#include "impl.h"
 #include "types.h"
 #include "matrix.h"
 #include "bitmap_character_def.h"
+
+#include <vector> // for composition
 
 namespace gnash {
 

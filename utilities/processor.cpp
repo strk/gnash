@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: processor.cpp,v 1.69 2007/11/17 09:32:00 strk Exp $ */
+/* $Id: processor.cpp,v 1.70 2007/12/01 00:15:03 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -33,7 +33,6 @@
 
 #include "gettext.h"
 #include "tu_file.h"
-#include "container.h"
 #include "gnash.h"
 #include "movie_definition.h"
 #include "sprite_instance.h"

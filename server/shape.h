@@ -5,13 +5,15 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.h,v 1.33 2007/11/24 04:58:14 bjacques Exp $ */
+/* $Id: shape.h,v 1.34 2007/12/01 00:15:00 strk Exp $ */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
 
 #include "tu_config.h"
 #include "styles.h"
+
+#include <vector> // for path composition
 
 
 // Forward declarations

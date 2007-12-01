@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: cxform.cpp,v 1.5 2007/08/27 12:44:28 strk Exp $ 
+// $Id: cxform.cpp,v 1.6 2007/12/01 00:14:59 strk Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -27,6 +27,7 @@
 #include "types.h" // for rgba type :(
 #include "stream.h" // for reading from SWF
 #include "log.h"
+#include "utility.h" // for fclamp
 
 using namespace std;
 

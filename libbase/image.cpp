@@ -7,7 +7,6 @@
 
 #include "image.h"
 
-#include "container.h"
 #include "utility.h"
 #include "jpeg.h"
 #include "tu_file.h"

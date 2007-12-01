@@ -5,20 +5,17 @@
 
 // A module to take care of all of gnash's loaded fonts.
 
-/* $Id: fontlib.cpp,v 1.36 2007/11/10 11:51:42 strk Exp $ */
+/* $Id: fontlib.cpp,v 1.37 2007/12/01 00:14:59 strk Exp $ */
 
-#include "container.h"
 #include "tu_file.h"
 #include "gnash.h"
 #include "font.h"
 #include "impl.h"
 #include "log.h"
 #include "render.h"
-//#include "shape.h"
 #include "shape_character_def.h"
 #include "styles.h"
 #include "tesselate.h"
-#include "render.h"
 #include "movie_definition.h"
 
 // Define to the name of a default font.

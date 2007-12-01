@@ -23,6 +23,7 @@
 #include "stream.h"
 #include "matrix.h"
 #include "types.h" // for TWIPS_TO_PIXELS
+#include "utility.h" // for flerp, fclamp...
 
 #include <sstream> // for ::print and ::toString
 

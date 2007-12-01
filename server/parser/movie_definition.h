@@ -52,7 +52,6 @@
 #define GNASH_MOVIE_DEFINITION_H
 
 #include "character_def.h" // for inheritance
-#include "container.h"
 #include "fontlib.h"
 #include "jpeg.h"
 #include "tu_file.h"

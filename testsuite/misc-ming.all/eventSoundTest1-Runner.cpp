@@ -24,7 +24,6 @@
 #include "sprite_instance.h"
 #include "character.h"
 #include "dlist.h"
-#include "container.h"
 #include "log.h"
 #include "GnashException.h"
 

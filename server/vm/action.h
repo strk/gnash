@@ -34,7 +34,6 @@
 #include "gnash.h"
 #include "as_object.h"
 #include "types.h"
-#include "container.h"
 #include "smart_ptr.h"
 
 #include <cwchar>

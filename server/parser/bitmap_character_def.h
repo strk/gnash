@@ -29,7 +29,6 @@
 #include "gnash.h" // for bitmap_info definition
 #include "ref_counted.h" // for character_def inheritance
 #include "types.h"
-#include "container.h"
 #include "utility.h"
 #include "smart_ptr.h"
 #include "bitmap_info.h" // for dtor visibility by intrusive_ptr

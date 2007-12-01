@@ -34,6 +34,7 @@
 #include "tu_timer.h"
 
 #include <string>
+#include <vector> 
 
 // Forward declarations
 namespace gnash {

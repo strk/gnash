@@ -23,6 +23,8 @@
 
 #include "types.h"
 
+#include <vector> // for generate_font_bitmaps and {input,output}_cached_data
+
 // Forward declarations
 class tu_file;
 namespace gnash {

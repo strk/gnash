@@ -24,7 +24,6 @@
 #define GNASH_FONT_H
 
 
-#include "container.h"
 #include "rect.h" // for composition of class texture_glyph 
 #include "types.h"
 #include "resource.h" // for inheritance of font

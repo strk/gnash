@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: BitsReader.h,v 1.3 2007/10/04 11:25:31 tgc Exp $
+// $Id: BitsReader.h,v 1.4 2007/12/01 00:14:58 strk Exp $
 
 #ifndef BITSREADER_H
 #define BITSREADER_H
@@ -26,7 +26,6 @@
 #include "config.h"
 #endif
 
-#include "container.h"
 #include "swf.h"
 #include "tu_config.h"
 #include "GnashException.h"

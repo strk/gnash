@@ -21,7 +21,6 @@
 #ifndef GNASH_MOVIE_DEF_IMPL_H
 #define GNASH_MOVIE_DEF_IMPL_H
 
-#include "container.h"
 #include "smart_ptr.h"
 #include "fontlib.h"
 #include "font.h"

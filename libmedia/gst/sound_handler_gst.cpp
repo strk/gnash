@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.3 2007/11/30 00:13:02 tgc Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.4 2007/12/01 00:14:59 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -37,7 +37,6 @@
 
 #include "sound_handler_gst.h"
 #include "gnash.h"
-#include "container.h"
 #include "log.h"
 #include "types.h"	// for IF_VERBOSE_* macros
 #include <cmath>

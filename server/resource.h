@@ -26,7 +26,6 @@
 #endif
 
 #include "ref_counted.h" // for inheritance
-#include "container.h"
 #include "smart_ptr.h"
 
 namespace gnash {

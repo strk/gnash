@@ -9,13 +9,13 @@
 #ifndef GNASH_STREAM_H
 #define GNASH_STREAM_H
 
-#include "container.h"
 #include "swf.h"
 #include "tu_config.h"
 #include "GnashException.h"
 
 #include <string>
 #include <sstream>
+#include <vector> // for composition
 
 // Define the following macro if you want to want Gnash parser
 // to assume the underlying SWF is well-formed. It would make
