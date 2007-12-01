@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.118 2007/11/30 23:11:10 bjacques Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.119 2007/12/01 22:49:18 bjacques Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -590,17 +590,11 @@ public:
       bpp(bits_per_pixel),
       /*xscale(1.0/20.0),
       yscale(1.0/20.0),*/
-      stage_matrix(),
       scale_set(false),
       m_enable_antialias(true),
       m_display_width(0.0),
       m_display_height(0.0),
-      m_rbuf(),
-      m_pixf(NULL), // TODO: use an auto_ptr
-      _clipbounds(),
-      _clipbounds_selected(),
-      m_drawing_mask(false),
-      m_alpha_mask()
+      m_drawing_mask(false)
   {
     // TODO: we really don't want to set the scale here as the core should
     // tell us the right values before rendering anything. However this is
@@ -613,7 +607,6 @@ public:
   // Destructor
   ~render_handler_agg()
   {
-      delete m_pixf;   
   }
 
   /// Initializes the rendering buffer. The memory pointed by "mem" is not
@@ -632,12 +625,10 @@ public:
     xres    = x;
     yres    = y;
     
-    delete m_pixf;   
-    
     m_rbuf.attach(memaddr, xres, yres, rowstride);
 
     // allocate pixel format accessor   
-    m_pixf = new PixelFormat(m_rbuf);
+    m_pixf.reset(new PixelFormat(m_rbuf));
     //m_rbase = new renderer_base(*m_pixf);  --> does not work!!??
     
     // by default allow drawing everywhere
@@ -666,7 +657,7 @@ public:
   // coordinates of the movie that correspond to the viewport
   // bounds.
   {
-    assert(m_pixf != NULL);
+    assert(m_pixf.get());
     
     assert(scale_set);
     // clear the stage using the background color
@@ -728,21 +719,6 @@ public:
     // nothing to do
   }
 
-  static void apply_matrix(const gnash::matrix& /*m*/)
-  // add user space transformation
-  {
-    // TODO: what's the use for this, anyway?? 
-    log_msg("apply_matrix(); called - NOT IMPLEMENTED");
-  }
-
-  static void apply_color(const gnash::rgba& /*c*/)
-  // Set the given color.
-  {
-    // TODO: what's the use for this, anyway?? 
-    log_msg("apply_color(); called - NOT IMPLEMENTED");
-  }
-
-
   template <class ras_type>
   void apply_clip_box(ras_type& ras, 
     const geometry::Range2d<int>& bounds)
@@ -762,7 +738,7 @@ public:
   // Draw the line strip formed by the sequence of points.
   {
   
-    assert(m_pixf != NULL);
+    assert(m_pixf.get());
 
     matrix mat = stage_matrix;
     mat.concatenate(line_mat);    
@@ -1544,7 +1520,7 @@ public:
     Thank to Maxim Shemanarev for providing us such a great tool with AGG...
     */
     
-    assert(m_pixf != NULL);
+    assert(m_pixf.get());
     
     assert(!m_drawing_mask);
     
@@ -1771,7 +1747,7 @@ public:
     const std::vector<line_style> &line_styles, const cxform& cx, 
     const matrix& linestyle_matrix, scanline_type& sl) {
     
-    assert(m_pixf != NULL);
+    assert(m_pixf.get());
     
     if (m_drawing_mask)    // Flash ignores lines in mask /definitions/
       return;    
@@ -1862,7 +1838,7 @@ public:
   void draw_poly_impl(const point* corners, size_t corner_count, const rgba& fill, 
     const rgba& outline, scanline_type& sl, const matrix& poly_mat) {
     
-    assert(m_pixf != NULL);
+    assert(m_pixf.get());
 
     if (corner_count<1) return;
     
@@ -2129,8 +2105,7 @@ private:  // private variables
 
   agg::rendering_buffer m_rbuf;  
 
-  // TODO: use an auto_ptr, since we're deleting in the destructor...
-  PixelFormat *m_pixf;
+  std::auto_ptr<PixelFormat> m_pixf;
   
   /// clipping rectangle
   std::vector< geometry::Range2d<int> > _clipbounds;

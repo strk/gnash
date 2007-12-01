@@ -1,3 +1,11 @@
+2007-12-01 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler_tri.{cpp,h}: Remove these unused
+	files.
+	* backend/render_handler_agg.cpp: Minor cleanups: Avoid calling
+	default constructors (they are called anyway). Switch m_pixf to
+	std::auto_ptr. Remove the unused stubs apply_color and apply_matrix.
+
 2007-12-01 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/swfdec/PASSING: sync to master.
