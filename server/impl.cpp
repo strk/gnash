@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.127 2007/11/28 15:38:52 strk Exp $ */
+/* $Id: impl.cpp,v 1.128 2007/12/01 01:08:09 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -577,35 +577,6 @@ create_movie(const URL& url, const char* reset_url, bool startLoaderThread)
 	const char* movie_url = reset_url ? reset_url : c_url;
 	movie_definition* ret = create_movie(in, movie_url, startLoaderThread);
 
-	if (s_use_cache_files)
-	{
-		// Try to load a .gsc file.
-		// WILL NOT WORK FOR NETWORK URLS, would need an hash
-		std::string cache_filename(movie_url);
-		cache_filename += ".gsc";
-		std::auto_ptr<tu_file> cache_in ( new tu_file(cache_filename.c_str(), "rb") );
-		if (cache_in.get() == NULL
-			|| cache_in->get_error() != TU_FILE_NO_ERROR)
-		{
-			// Can't open cache file; don't sweat it.
-			IF_VERBOSE_PARSE (
-		        log_parse(_("note: couldn't open cache file '%s'"),
-					cache_filename.c_str());
-			)
-
-			// can't read cache, so generate font texture data.
-			ret->generate_font_bitmaps();
-		}
-		else
-		{
-			log_msg(_("Loading cache file %s"),
-				cache_filename.c_str());
-			// Load the cached data.
-			ret->input_cached_data(cache_in.get());
-		}
-
-	}
-
 	return ret;
 
 
@@ -613,31 +584,6 @@ create_movie(const URL& url, const char* reset_url, bool startLoaderThread)
 
 
 bool	s_no_recurse_while_loading = false;	// @@ TODO get rid of this; make it the normal mode.
-
-
-#if 0 // This function seems unused
-movie_definition*	create_movie_no_recurse(
-    tu_file* in,
-    create_bitmaps_flag cbf,
-    create_font_shapes_flag cfs)
-{
-    ensure_loaders_registered();
-
-    // @@ TODO make no_recurse the standard way to load.
-    // In create_movie(), use the visit_ API to keep
-    // visiting dependent movies, until everything is
-    // loaded.  That way we only have one code path and
-    // the resource_proxy stuff gets tested.
-    s_no_recurse_while_loading = true;
-
-    movie_def_impl*	m = new movie_def_impl(cbf, cfs);
-    if ( ! m->read(in) ) return NULL;
-
-    s_no_recurse_while_loading = false;
-
-    return m;
-}
-#endif
 
 
 //

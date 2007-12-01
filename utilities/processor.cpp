@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: processor.cpp,v 1.70 2007/12/01 00:15:03 strk Exp $ */
+/* $Id: processor.cpp,v 1.71 2007/12/01 01:08:10 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -96,7 +96,6 @@ struct movie_data
 };
 
 static gnash::movie_definition*	play_movie(const char* filename);
-static int write_cache_file(const movie_data& md);
 
 static bool s_do_output = false;
 static bool s_stop_on_errors = true;
@@ -289,20 +288,6 @@ main(int argc, char *argv[])
 	data.push_back(md);
     }
     
-    // Now append processed data.
-    if (s_do_output) {
-	for (int i = 0, n = data.size(); i < n; i++) {
-	    int	error = write_cache_file(data[i]);
-	    if (error) {
-		if (s_stop_on_errors) {
-		    // Fail.
-		    fprintf(stderr, "error processing movie '%s', quitting\n", data[i].m_filename.c_str());
-		    exit(1);
-		}
-	    }
-	}
-    }
-
     // Signal core lib we're willing to quit.
     gnash::clear();
     
@@ -449,38 +434,6 @@ play_movie(const char* filename)
     
     return md;
 }
-
-int
-// Write a cache file for the given movie.
-write_cache_file(const movie_data& md)
-{
-    // Open cache file.
-    std::string	cache_filename(md.m_filename);
-    cache_filename += ".gsc";
-    tu_file	out(cache_filename.c_str(), "wb");	// "gsc" == "gnash cache"
-    if (out.get_error() == TU_FILE_NO_ERROR) {
-	// Write out the data.
-	gnash::cache_options	opt;
-	md.m_movie->output_cached_data(&out, opt);
-	if (out.get_error() == TU_FILE_NO_ERROR) {
-	    printf(
-		"wrote '%s'\n",
-		cache_filename.c_str());
-	} else {
-	    fprintf(stderr, "error: write failure to '%s'\n", cache_filename.c_str());
-	}
-    } else {
-	fprintf(stderr, "error: can't open '%s' for cache file output\n", cache_filename.c_str());
-	return 1;
-    }
-    
-    // // xxx temp debug code: dump cached data to stdout
-    // tu_file	tu_stdout(stdout, false);
-    // tu_stdout.copy_from(&cached_data);
-    
-    return 0;
-}
-
 
 static void
 usage (const char *name)

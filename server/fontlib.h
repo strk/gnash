@@ -23,8 +23,6 @@
 
 #include "types.h"
 
-#include <vector> // for generate_font_bitmaps and {input,output}_cached_data
-
 // Forward declarations
 class tu_file;
 namespace gnash {
@@ -46,19 +44,6 @@ namespace gnash {
 /// provide glyphs for it, and then the OS is expected to
 /// provide the font or a suitable replacement.
 ///
-/// gnash does not try to handle this automatically; if your
-/// host program wants to emulate this behavior, it needs to
-/// load a movie that includes glyph info for the standard
-/// fonts you want, and then explicitly pull those fonts out of
-/// the movie_def and add them to fontlib.
-///
-/// @@ TODO: not all public APIs to enable this are in place
-/// yet!  Need md::get_font_count()/get_font(), and
-/// fontlib::add_font().
-///
-/// Otherwise, text written in a font with no glyphs just
-/// doesn't render at all.  (@@ Hm, should probably render it
-/// as boxes or something?)
 ///
 namespace fontlib {
 
@@ -72,21 +57,6 @@ namespace fontlib {
 	// texture glyphs are sampled 1-to-1 texels-to-pixels.
 	// I.e. the height of the glyph box, in texels.
 	float	get_texture_glyph_max_height(const font* f);
-
-	// Builds cached glyph textures from shape info.
-	void	generate_font_bitmaps(const std::vector<font*>& fonts, movie_definition* owner);
-	
-	// Save cached font data, including glyph textures, to a
-	// stream.
-	void	output_cached_data(
-		tu_file* out,
-		const std::vector<font*>& fonts,
-		movie_definition* owner,
-		const cache_options& options);
-	
-	// Load a stream containing previously-saved cachded font
-	// data, including glyph texture info.
-	void	input_cached_data(tu_file* in, const std::vector<font*>& fonts, movie_definition* owner);
 
 	// Controls how large to render textured glyphs.
 	// Applies to fonts processed *after* this call only.

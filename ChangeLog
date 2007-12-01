@@ -1,5 +1,10 @@
 2007-11-30 Sandro Santilli <strk@keybit.net>
 
+	* another bunch of files: drop deprecated cache data management
+	  and generate_font_bitmaps interface.
+
+2007-11-30 Sandro Santilli <strk@keybit.net>
+
 	* server/batch_test.py => testsuite/samples/batch_test.py:
 	  moved what looks like a tester for movies in testsuite/samples
 	  in a more likely place.

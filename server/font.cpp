@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.49 2007/10/30 18:55:42 strk Exp $ */
+/* $Id: font.cpp,v 1.50 2007/12/01 01:08:08 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -592,50 +592,6 @@ GlyphInfo::markReachableResources() const
 		return 0;
 	}
 
-
-        void	font::output_cached_data(tu_file* /* out */, const cache_options& /* options */)
-	// Dump our cached data into the given stream.
-	{
-// @@ Disabled.  Need to fix input_cached_data, so that it has a
-// reliable and cheap way to skip over data for NULL glyphs.
-#if 0
-		// Dump cached shape data for glyphs (i.e. this will
-		// be tesselations used to render larger glyph sizes).
-		int	 n = m_glyphs.size();
-		out->write_le32(n);
-		for (int i = 0; i < n; i++)
-		{
-			shape_character_def*	s = m_glyphs[i].get();
-			if (s)
-			{
-				s->output_cached_data(out, options);
-			}
-		}
-#endif // 0
-	}
-
-	
-	void	font::input_cached_data(tu_file* /* in */)
-	// Read our cached data from the given stream.
-	{
-// @@ Disable.  See comment in output_cached_data().
-#if 0
-		// Read cached shape data for glyphs.
-		int	n = in->read_le32();
-		if (n != m_glyphs.size())
-		{
-			log_error(_("error reading cache file in font::input_cached_data(): "
-				  "glyph count mismatch"));
-			in->go_to_end();	// ensure that no more data will be read from this stream.
-			return;
-		}
-
-		for (int i = 0; i < n; i++)
-		{
-			m_glyphs[i]->input_cached_data(in);
-		}
-#endif // 0
-	}
 
 	int
 	font::add_os_glyph(uint16_t code)

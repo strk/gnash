@@ -61,6 +61,7 @@
 
 #include <string>
 #include <memory> // for auto_ptr
+#include <vector> // for PlayList typedef
 #include <set> 
 
 // Forward declarations
@@ -144,21 +145,6 @@ public:
 	virtual movie_instance* create_movie_instance() {
 		return NULL;
 	}
-	
-	virtual void	output_cached_data(tu_file* /*out*/, const cache_options& /*options*/) {}
-	virtual void	input_cached_data(tu_file* /*in*/) {}
-	
-	/// \brief
-	/// Causes this movie def to generate texture-mapped
-	/// versions of all the fonts it owns. 
-	//
-	/// This improves
-	/// speed and quality of text rendering.  The
-	/// texture-map data is serialized in the
-	/// output/input_cached_data() calls, so you can
-	/// preprocess this if you load cached data.
-	///
-	virtual void	generate_font_bitmaps() {}
 	
 	//
 	// (optional) API to support gnash::create_movie_no_recurse().

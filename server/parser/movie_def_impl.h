@@ -577,18 +577,6 @@ public:
 	/// Fill up *fonts with fonts that we own.
 	void get_owned_fonts(std::vector<font*>* fonts);
 
-	/// Generate bitmaps for our fonts, if necessary.
-	void generate_font_bitmaps();
-
-	/// Dump our cached data into the given stream.
-	void output_cached_data(tu_file* out,
-		const cache_options& options);
-
-	/// \brief
-	/// Read in cached data and use it to prime our
-	/// loaded characters.
-	void	input_cached_data(tu_file* in);
-
 	/// \brief
 	/// Create a playable movie_root instance from a def.
 	//

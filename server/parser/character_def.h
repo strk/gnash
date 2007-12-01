@@ -105,19 +105,6 @@ public:
 	// Declared as virtual here because generic_character needs access to it
 	virtual const rect&	get_bound() const = 0;
 	
-	//
-	// Caching.
-	//
-	
-	virtual void output_cached_data(tu_file* /*out*/,
-			const cache_options& /*options*/)
-	{
-	}
-
-	virtual void	input_cached_data(tu_file* /*in*/)
-	{
-	}
-		
 public:  
   
   /// Cache holder for renderer (contents depend on renderer handler)

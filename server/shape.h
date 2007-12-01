@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.h,v 1.34 2007/12/01 00:15:00 strk Exp $ */
+/* $Id: shape.h,v 1.35 2007/12/01 01:08:09 strk Exp $ */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
@@ -381,8 +381,6 @@ namespace gnash {
 		void	set_tri_strip(const point pts[], int count);
 
 
-		void	output_cached_data(tu_file* out);
-		void	input_cached_data(tu_file* in);
 	private:
 	  friend class triangulating_render_handler; 
 		std::vector<int16_t>	m_triangle_strip;
@@ -397,8 +395,6 @@ namespace gnash {
 		line_strip(int style, const point coords[], int coord_count);
 
 		int	get_style() const { return m_style; }
-		void	output_cached_data(tu_file* out);
-		void	input_cached_data(tu_file* in);
 	private:
     friend class triangulating_render_handler; 
 		int	m_style;
@@ -420,9 +416,6 @@ namespace gnash {
 
 		void	set_tri_strip(int style, const point pts[], int count);
 		void	add_line_strip(int style, const point coords[], int coord_count);
-
-		void	output_cached_data(tu_file* out);
-		void	input_cached_data(tu_file* in);
 
 	private:
     friend class triangulating_render_handler; 

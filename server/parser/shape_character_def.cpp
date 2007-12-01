@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.52 2007/11/30 11:13:32 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.53 2007/12/01 01:08:09 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -1104,45 +1104,6 @@ void  shape_character_def::compute_bound(rect* r) const
     }
 }
 
-
-#if 0 // deprecated
-
-void
-shape_character_def::clear_meshes()
-{
-    // Free our mesh_sets.
-    for (unsigned int i = 0; i < m_cached_meshes.size(); i++) {
-  delete m_cached_meshes[i];
-    }
-}
-
-void  shape_character_def::output_cached_data(tu_file* out, const cache_options& /* options */)
-    // Dump our precomputed mesh data to the given stream.
-{
-    int n = m_cached_meshes.size();
-    out->write_le32(n);
-
-    for (int i = 0; i < n; i++) {
-  m_cached_meshes[i]->output_cached_data(out);
-    }
-}
-
-
-void  shape_character_def::input_cached_data(tu_file* in)
-    // Initialize our mesh data from the given stream.
-{
-    int n = in->read_le32();
-
-    m_cached_meshes.resize(n);
-
-    for (int i = 0; i < n; i++) {
-  mesh_set* ms = new mesh_set();
-  ms->input_cached_data(in);
-  m_cached_meshes[i] = ms;
-    }
-}
-
-#endif // deprecated cached data
 
 #ifdef GNASH_USE_GC
 void

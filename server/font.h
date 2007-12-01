@@ -241,12 +241,6 @@ public:
         ///
         void read_font_name(stream* in, SWF::tag_type tag, movie_definition* m);
 
-	/// Dump our cached data into the given stream.
-	void	output_cached_data(tu_file* out, const cache_options& options);
-
-	/// Read our cached data from the given stream.
-	void	input_cached_data(tu_file* in);
-
 	/// Delete all our texture glyph info (both embedded and device)
 	void	wipe_texture_glyphs();
 

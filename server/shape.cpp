@@ -449,33 +449,6 @@ path::transform(const matrix& mat)
                 bind(&edge::transform, _1, ref(mat)));                
 }
 
-// Utility.
-
-
-void	write_coord_array(tu_file* out, const std::vector<int16_t>& pt_array)
-    // Dump the given coordinate array into the given stream.
-{
-    int	n = pt_array.size();
-
-    out->write_le32(n);
-    for (int i = 0; i < n; i++)	{
-	out->write_le16((uint16_t) pt_array[i]);
-    }
-}
-
-
-void	read_coord_array(tu_file* in, std::vector<int16_t>* pt_array)
-    // Read the coordinate array data from the stream into *pt_array.
-{
-    int	n = in->read_le32();
-
-    pt_array->resize(n);
-    for (int i = 0; i < n; i ++) {
-	(*pt_array)[i] = (int16_t) in->read_le16();
-    }
-}
-
-
 //
 // mesh
 //
@@ -501,20 +474,6 @@ void	mesh::set_tri_strip(const point pts[], int count)
 }
 
 
-
-
-void	mesh::output_cached_data(tu_file* out)
-    // Dump our data to *out.
-{
-    write_coord_array(out, m_triangle_strip);
-}
-
-	
-void	mesh::input_cached_data(tu_file* in)
-    // Slurp our data from *out.
-{
-    read_coord_array(in, &m_triangle_strip);
-}
 
 
 //
@@ -551,22 +510,6 @@ m_style(style)
 
 
 
-
-
-void	line_strip::output_cached_data(tu_file* out)
-    // Dump our data to *out.
-{
-    out->write_le32(m_style);
-    write_coord_array(out, m_coords);
-}
-
-	
-void	line_strip::input_cached_data(tu_file* in)
-    // Slurp our data from *out.
-{
-    m_style = in->read_le32();
-    read_coord_array(in, &m_coords);
-}
 
 
 // Utility: very simple greedy tri-stripper.  Useful for
@@ -807,45 +750,6 @@ void	mesh_set::add_line_strip(int style, const point coords[], int coord_count)
     m_line_strips.push_back(line_strip(style, coords, coord_count));
 }
 
-
-void	mesh_set::output_cached_data(tu_file* out)
-    // Dump our data to the output stream.
-{
-    out->write_float32(m_error_tolerance);
-
-    int	mesh_n = m_meshes.size();
-    out->write_le32(mesh_n);
-    for (int i = 0; i < mesh_n; i++) {
-	m_meshes[i].output_cached_data(out);
-    }
-
-    int	lines_n = m_line_strips.size();
-    out->write_le32(lines_n);
-    {for (int i = 0; i < lines_n; i++)
-	{
-	    m_line_strips[i].output_cached_data(out);
-	}}
-}
-
-
-void	mesh_set::input_cached_data(tu_file* in)
-    // Grab our data from the input stream.
-{
-    m_error_tolerance = in->read_float32();
-
-    int	mesh_n = in->read_le32();
-    m_meshes.resize(mesh_n);
-    for (int i = 0; i < mesh_n; i++) {
-	m_meshes[i].input_cached_data(in);
-    }
-
-    int	lines_n = in->read_le32();
-    m_line_strips.resize(lines_n);
-    {for (int i = 0; i < lines_n; i++)
-	{
-	    m_line_strips[i].input_cached_data(in);
-	}}
-}
 
 }	// end namespace gnash
 
