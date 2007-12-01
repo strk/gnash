@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.6 2007/12/01 21:17:44 strk Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.7 2007/12/01 21:49:19 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -659,7 +659,7 @@ void GST_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 	assert(owner);
 	assert(ptr);
 
-	if ( m_aux_streamer.insert(std::make_pair(owner, ptr)).second )
+	if ( ! m_aux_streamer.insert(std::make_pair(owner, ptr)).second )
 	{
 		// Already in the hash.
 		return;
