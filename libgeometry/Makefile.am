@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.32 2007/11/10 09:46:54 strk Exp $
+# $Id: Makefile.am,v 1.33 2007/12/01 22:11:24 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -51,8 +51,6 @@ libgnashgeo_la_SOURCES = 	\
 	collision.cpp		\
 	cull.cpp		\
 	geometry.cpp		\
-	kd_tree_dynamic.cpp	\
-	kd_tree_packed.cpp	\
 	tqt.cpp
 
 noinst_HEADERS = \
@@ -64,8 +62,6 @@ noinst_HEADERS = \
 	collision.h	\
 	cull.h		\
 	geometry.h	\
-	kd_tree_dynamic.h	\
-	kd_tree_packed.h	\
 	tqt.h		\
 	view_state.h	\
 	visual.h

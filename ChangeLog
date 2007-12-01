@@ -1,5 +1,12 @@
 2007-12-01 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/PASSING: sync to master.
+	* libgeometry/: Makefile.am, kd_tree_dynamic.{cpp,h},
+	  kd_tree_packed.{cpp,h}: drop unused files guilty of
+	  using hash_wrapper.h
+
+2007-12-01 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/sdl/sound_handler_sdl.{cpp,h}: drop dependency on
 	  hash_wrapper.h.
 
