@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: processor.cpp,v 1.71 2007/12/01 01:08:10 strk Exp $ */
+/* $Id: processor.cpp,v 1.72 2007/12/01 19:55:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -43,6 +43,7 @@
 #include "GnashException.h"
 #include "debugger.h"
 #include "VM.h"
+#include "noseek_fd_adapter.h"
 
 extern "C"{
 	#include <unistd.h>
@@ -309,7 +310,15 @@ play_movie(const char* filename)
     gnash::movie_definition* md;
     try
     {
-      md = gnash::create_library_movie(URL(filename), NULL, false);
+      if ( ! strcmp(filename, "-") )
+      {
+         std::auto_ptr<tu_file> in ( noseek_fd_adapter::make_stream(fileno(stdin)) );
+         md = gnash::create_movie(in, filename, false);
+      }
+      else
+      {
+         md = gnash::create_library_movie(URL(filename), NULL, false);
+      }
     }
     catch (GnashException& ge)
     {

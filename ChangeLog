@@ -1,5 +1,9 @@
 2007-12-01 Sandro Santilli <strk@keybit.net>
 
+	* utilities/processor.cpp: add support for reading from stdin.
+
+2007-12-01 Sandro Santilli <strk@keybit.net>
+
 	* libbase/: Makefile.am, triangulate.h, triangulate_float.cpp,
 	  triangulate_impl.h, triangulate_sint32.cpp: drop dead code.
 
