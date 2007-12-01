@@ -18,12 +18,11 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.34 2007/12/01 23:21:46 strk Exp $
+# $Id: Makefile.am,v 1.35 2007/12/01 23:29:44 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
 noinst_HEADERS = \
 	Range2d.h	\
 	Point2d.h	\
-	snappingrange.h \
-	axial_box.h	
+	snappingrange.h 
