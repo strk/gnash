@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: text.cpp,v 1.39 2007/11/30 23:11:11 bjacques Exp $ */
+/* $Id: text.cpp,v 1.40 2007/12/01 10:19:39 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -98,12 +98,7 @@ namespace gnash {
 		cxform	cx = inst->get_world_cxform();
 		float	pixel_scale = inst->get_pixel_scale();
 
-//		display_info	sub_di = di;
-//		sub_di.m_matrix.concatenate(mat);
-
-//		matrix	base_matrix = sub_di.m_matrix;
 		matrix	base_matrix = mat;
-		float	base_matrix_max_scale = base_matrix.get_max_scale();
 
 		float	scale = 1.0f;
 		float	x = 0.0f;
@@ -127,25 +122,9 @@ namespace gnash {
 			}
 
 			scale = rec.m_style.m_text_height / 1024.0f;	// the EM square is 1024 x 1024
-			float	text_screen_height = base_matrix_max_scale
-				* scale
-				* 1024.0f
-				/ 20.0f
-				* pixel_scale;
 
 #ifdef GNASH_DEBUG_TEXT_RENDERING
-			log_debug("text_screen_height for record %u == %g", i, text_screen_height);
 			log_debug("font for record %u == %p", i, (const void*)rec.m_style.getFont());
-#endif
-
-			int	nominal_glyph_height = fnt->get_texture_glyph_nominal_size();
-			float	max_glyph_height = fontlib::get_texture_glyph_max_height(fnt);
-#ifdef GNASH_ALWAYS_USE_TEXTURES_FOR_TEXT_WHEN_POSSIBLE
-			bool	use_glyph_textures = gnash::render::allow_glyph_textures();
-#else
-			bool	use_glyph_textures =
-				(text_screen_height <= max_glyph_height * 1.0f) &&
-        (gnash::render::allow_glyph_textures());    
 #endif
 
 			if (rec.m_style.m_has_x_offset)
@@ -198,30 +177,17 @@ log_error(_("invalid glyph (-1)"));
 				}
 				else
 				{
-					const texture_glyph&	tg = fnt->get_texture_glyph(index, useEmbeddedGlyphs);
 					shape_character_def*	glyph = fnt->get_glyph(index, useEmbeddedGlyphs);
 
-					if (tg.is_renderable()
-					    && (use_glyph_textures || glyph == NULL))
+					// Draw the character using the filled outline.
+					if (glyph)
 					{
-#ifdef GNASH_DEBUG_TEXT_RENDERING
-log_msg(_("render textured glyph (fontlib::draw_glyph)"));
-#endif
-						fontlib::draw_glyph(mat, tg, transformed_color, nominal_glyph_height);
-					}
-					else
-					{
-
-						// Draw the character using the filled outline.
-						if (glyph)
-						{
 #ifdef GNASH_DEBUG_TEXT_RENDERING
 log_msg(_("render shape glyph using filled outline (render::draw_glyph)"));
 #endif
 
-							gnash::render::draw_glyph(glyph, mat, transformed_color, pixel_scale);
-							
-						}
+						gnash::render::draw_glyph(glyph, mat, transformed_color, pixel_scale);
+						
 					}
 				}
 				x += rec.m_glyphs[j].m_glyph_advance;

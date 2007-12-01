@@ -1,5 +1,10 @@
 2007-11-30 Sandro Santilli <strk@keybit.net>
 
+	* server/: font.{cpp,h}, fontlib.{cpp,h}, text.cpp:
+	  Drop deprecated textured glyphs support.
+
+2007-11-30 Sandro Santilli <strk@keybit.net>
+
 	* another bunch of files: drop deprecated cache data management
 	  and generate_font_bitmaps interface.
 

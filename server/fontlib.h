@@ -27,7 +27,6 @@
 class tu_file;
 namespace gnash {
 	class movie_def_impl;
-	class texture_glyph;
 	class matrix;
 	class font;
 }
@@ -50,20 +49,6 @@ namespace fontlib {
 	// For adding fonts.
 	void	add_font(font* f);
 
-	// For drawing a textured glyph w/ current render transforms.
-	void	draw_glyph(const matrix& m, const texture_glyph& g, const rgba& color, int nominal_glyph_height);
-
-	// Return the pixel height of text, such that the
-	// texture glyphs are sampled 1-to-1 texels-to-pixels.
-	// I.e. the height of the glyph box, in texels.
-	float	get_texture_glyph_max_height(const font* f);
-
-	// Controls how large to render textured glyphs.
-	// Applies to fonts processed *after* this call only.
-	// The "nominal" size is perhaps around twice the
-	// average glyph height.
-	void	set_nominal_glyph_pixel_size(size_t pixel_size);
-
 	/// Clean up the font library
 	void	clear();
 
@@ -77,12 +62,6 @@ namespace fontlib {
 	boost::intrusive_ptr<font> get_default_font();
 
 	const char*	get_font_name(const font* f);
-
-	// @@ also need to add color controls (or just set the diffuse color
-	// in the API?), perhaps matrix xform, and maybe spacing, etc.
-	//
-	// // For direct text rendering from the host app.
-	void	draw_string(const font* f, float x, float y, float size, const char* text);
 
 	
 }	// end namespace fontlib

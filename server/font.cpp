@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.50 2007/12/01 01:08:08 strk Exp $ */
+/* $Id: font.cpp,v 1.51 2007/12/01 10:19:39 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -37,21 +37,18 @@ namespace gnash {
 GlyphInfo::GlyphInfo()
 	:
 	glyph(),
-	textureGlyph(),
 	advance(0)
 {}
 
 GlyphInfo::GlyphInfo(boost::intrusive_ptr<shape_character_def> nGlyph, float nAdvance)
 	:
 	glyph(nGlyph.get()),
-	textureGlyph(),
 	advance(nAdvance)
 {}
 
 GlyphInfo::GlyphInfo(const GlyphInfo& o)
 	:
 	glyph(o.glyph.get()),
-	textureGlyph(o.textureGlyph),
 	advance(o.advance)
 {}
 
@@ -59,14 +56,12 @@ GlyphInfo::GlyphInfo(const GlyphInfo& o)
 void
 GlyphInfo::markReachableResources() const
 {
-	textureGlyph.markReachableResources();
 	if ( glyph ) glyph->setReachable();
 }
 #endif
 
 	font::font()
 		:
-		m_texture_glyph_nominal_size(96),	// Default is not important; gets overridden during glyph generation
 		m_name(),
                 m_display_name(),
                 m_copyright_name(),
@@ -86,7 +81,6 @@ GlyphInfo::markReachableResources() const
 
 	font::font(const std::string& name)
 		:
-		m_texture_glyph_nominal_size(96),	// Default is not important; gets overridden during glyph generation
 		m_name(name),
                 m_display_name(),
                 m_copyright_name(),
@@ -127,50 +121,6 @@ GlyphInfo::markReachableResources() const
 		{
 			// TODO: should we log an error here ?
 			return NULL;
-		}
-	}
-
-
-	const texture_glyph&	font::get_texture_glyph(int glyph_index, bool embedded) const
-	{
-		const GlyphInfoVect& lookup = embedded ? _embedGlyphTable : _deviceGlyphTable;
-
-		if (glyph_index < 0 || (size_t)glyph_index >= lookup.size())
-		{
-			// TODO: should we log an error here ?
-			static const texture_glyph	s_dummy_texture_glyph;
-			return s_dummy_texture_glyph;
-		}
-
-		return lookup[glyph_index].textureGlyph;
-	}
-
-
-	void	font::add_texture_glyph(int glyph_index, const texture_glyph& glyph, bool embedded)
-	{
-		GlyphInfoVect& lookup = embedded ? _embedGlyphTable : _deviceGlyphTable;
-
-		assert(glyph_index >= 0 && (size_t)glyph_index < lookup.size());
-		assert(glyph.is_renderable());
-
-		assert(lookup[glyph_index].textureGlyph.is_renderable() == false);
-
-		lookup[glyph_index].textureGlyph = glyph;
-	}
-
-
-	void	font::wipe_texture_glyphs()
-	{
-
-		// Replace with default (empty) glyph info.
-		texture_glyph	default_tg;
-		for (size_t i = 0, n = _embedGlyphTable.size(); i < n; i++)
-		{
-			_embedGlyphTable[i].textureGlyph = default_tg;
-		}
-		for (size_t i = 0, n = _deviceGlyphTable.size(); i < n; i++)
-		{
-			_deviceGlyphTable[i].textureGlyph = default_tg;
 		}
 	}
 
@@ -648,8 +598,8 @@ GlyphInfo::markReachableResources() const
 /// Mark reachable resources (for the GC)
 //
 /// Reachable resources are:
-///	- texture_glyphs
-///	- shape_character_defs (vector glyphs)
+///	- shape_character_defs (vector glyphs, devide and embeded)
+///
 void
 font::markReachableResources() const
 {

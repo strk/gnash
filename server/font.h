@@ -24,10 +24,8 @@
 #define GNASH_FONT_H
 
 
-#include "rect.h" // for composition of class texture_glyph 
 #include "types.h"
 #include "resource.h" // for inheritance of font
-#include "ref_counted.h" // for inheritance of texture_glyph
 #include "swf.h" // for tag_type definition
 #include "bitmap_info.h" // for dtor visibility by smart pointer
 #include "FreetypeGlyphsProvider.h" // for device fonts support
@@ -47,52 +45,6 @@ class movie;
 class shape_character_def;
 class stream;
 
-
-/// class for holding (cached) textured glyph info.
-class texture_glyph // : public ref_counted
-{
-
-public:
-
-	texture_glyph() : m_bitmap_info(NULL) {}
-
-	~texture_glyph()
-	{
-	}
-
-	/// Return true if this can be used for rendering.
-	bool	is_renderable() const
-	{
-		return m_bitmap_info != NULL;
-	}
-
-	/// Argument will be assigned to a boost::intrusive_ptr
-	void	set_bitmap_info(bitmap_info* bi)
-	{
-		m_bitmap_info = bi;
-	}
-
-#ifdef GNASH_USE_GC
-	/// Mark the contained bitmap info as being reachable
-	void markReachableResources() const
-	{
-		if ( m_bitmap_info.get() ) m_bitmap_info->setReachable();
-	}
-#endif
-
-
-// too early to make these private, fontlib directly accesses
-// them, postponed.
-//private:
-
-	boost::intrusive_ptr<bitmap_info>	m_bitmap_info;
-
-	rect	m_uv_bounds;
-
-	// the origin of the glyph box, in uv coords
-	point	m_uv_origin;
-
-};
 
 // @@ replace this with a flat hash, or else a sorted array
 //    (binary search)
@@ -145,8 +97,6 @@ struct GlyphInfo
 
 	boost::intrusive_ptr<shape_character_def> glyph;
 
-	texture_glyph textureGlyph;
-
 	float advance;
 };
 
@@ -170,19 +120,6 @@ public:
 
 	void testInvariant()
 	{
-#if 0
-		assert(m_texture_glyphs.size() == m_glyphs.size());
-#ifndef NDEBUG
-		if (m_texture_glyphs.size() != m_advance_table.size())
-		{
-			log_error("Font '%s': Number of texture glyphs: %lu, advance records: %lu",
-					m_name.c_str(),
-					static_cast<unsigned long>(m_texture_glyphs.size()),
-					static_cast<unsigned long>(m_advance_table.size()));
-			abort();
-		}
-#endif
-#endif
 	}
 
 	/// Get number of embedded glyphs defined for this font
@@ -241,53 +178,11 @@ public:
         ///
         void read_font_name(stream* in, SWF::tag_type tag, movie_definition* m);
 
-	/// Delete all our texture glyph info (both embedded and device)
-	void	wipe_texture_glyphs();
-
 	/// Get name of this font. Warning: can be NULL.
 	const std::string& get_name() const { return m_name; }
 
 	/// Return the movie_definition "owning" this font
 	movie_definition* get_owning_movie() const { return m_owning_movie; }
-
-	/// \brief
-	/// Return a pointer to a texture_glyph class
-	/// corresponding to the given glyph_index, if we
-	/// have one.  Otherwise return a "dummy" texture_glyph.
-	//
-	/// @param glyph_index
-	///	Index of the glyph. See get_glyph_index() to obtain by character code.
-	///
-	/// @param embedded
-	///	If true, queries the 'embedded' glyphs table, 
-	///	otherwise, looks in the 'device' font table.
-	///
-	/// Note: the "dummy" texture_glyph is a default-constructed
-	/// texture_glyph.
-	///
-	const texture_glyph& get_texture_glyph(int glyph_index, bool embedded) const;
-
-	/// \brief
-	/// Register some texture info for the glyph at the specified
-	/// index.  The texture_glyph can be used later to render the
-	/// glyph.
-	//
-	/// @param glyph_index
-	///	Index of the glyph. See get_glyph_index() to obtain by character code.
-	///
-	/// @param glyph
-	///	The textured glyph.
-	///
-	/// @param embedded
-	///	If true, queries the 'embedded' glyphs table, 
-	///	otherwise, looks in the 'device' font table.
-	///
-	/// TODO: deprecate this, probably only used by the caching mechanism
-	///
-	void	add_texture_glyph(int glyph_index, const texture_glyph& glyph, bool embedded);
-
-	void	set_texture_glyph_nominal_size(int size) { m_texture_glyph_nominal_size = imax(1, size); }
-	int	get_texture_glyph_nominal_size() const { return m_texture_glyph_nominal_size; }
 
 	/// Return the glyph index for a given character code
 	//
@@ -370,8 +265,6 @@ private:
 	// Device glyphs
 	GlyphInfoVect _deviceGlyphTable;
 
-	int	m_texture_glyph_nominal_size;
-
 	std::string	m_name;
         std::string     m_display_name;
         std::string     m_copyright_name;
@@ -413,7 +306,6 @@ protected:
 	/// Mark reachable resources (for the GC)
 	//
 	/// Reachable resources are:
-	///	- texture_glyphs
 	///	- shape_character_defs (vector glyphs)
 	///
 	void markReachableResources() const;
