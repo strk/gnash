@@ -20,13 +20,15 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.4 2007/12/01 00:14:59 strk Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.5 2007/12/01 21:07:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include "utility.h" // for convert_raw_data
+
+#include <utility> // for std::make_pair
 
 // Assume people running --enable-media=gst know what they are doing
 // (HAVE_GST_GST_H seems broken atm, specifically when an older glib
@@ -644,23 +646,10 @@ void GST_sound_handler::callback_as_handoff (GstElement * /*c*/, GstBuffer *buff
 		GST_BUFFER_DATA(buffer) = tmp_buf;
 	}
 
-	/*GST_sound_handler::*/aux_streamer_ptr aux_streamer = gstelements->handler->m_aux_streamer[gstelements->owner];
+	aux_streamer_ptr aux_streamer = gstelements->handler->m_aux_streamer[gstelements->owner];
 	
 	// If false is returned the sound doesn't want to be attached anymore
 	bool ret = (aux_streamer)(gstelements->owner, GST_BUFFER_DATA(buffer), GST_BUFFER_SIZE(buffer));
-/*	if (!ret) {
-		handler->m_aux_streamer.erase(it++);
-		handler->soundsPlaying--;
-
-		// All the data has been given to the pipeline, so now we need to stop
-		// the pipeline. g_idle_add() makes sure sound_killer is called soon.
-		if (gstelements->position > gstelements->data_size) {
-			g_idle_add(sound_killer, user_data);
-			GST_BUFFER_SIZE(buffer) = 0;
-			GST_BUFFER_DATA(buffer) = 0;
-			return;
-		}
-	}*/
 
 }
 
@@ -670,13 +659,11 @@ void GST_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 	assert(owner);
 	assert(ptr);
 
-	aux_streamer_ptr p;
-	if (m_aux_streamer.get(owner, &p))
+	if ( m_aux_streamer.insert(std::make_pair(owner, ptr)).second )
 	{
 		// Already in the hash.
 		return;
 	}
-	m_aux_streamer[owner] = ptr;
 
 	// Make a pipeline that can play the raw data
 
@@ -782,7 +769,7 @@ void GST_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 
 	gst_element->owner = owner;
 
-	// Put the gst_element on the vector
+	// Put the gst_element in the map
 	m_aux_streamer_gstelements[owner] = gst_element;
 	
 	// If not already playing, start doing it
@@ -793,14 +780,13 @@ printf("pipeline stated playing\n");
 void GST_sound_handler::detach_aux_streamer(void* owner)
 {
 	try_mutex::scoped_lock lock(_mutex);
-	aux_streamer_ptr p;	
-	if (m_aux_streamer.get(owner, &p))
-	{
-		m_aux_streamer.erase(owner);
-		delete m_aux_streamer_gstelements[owner];
-		m_aux_streamer_gstelements.erase(owner);
-	}
 
+	GstElementsMap::iterator it=m_aux_streamer_gstelements.find(owner);
+	if ( it == m_aux_streamer_gstelements.end() ) return; // not found
+
+	delete it->second;
+	// WARNING: erasing would break any iteration in the map
+	m_aux_streamer_gstelements.erase(it);
 }
 
 unsigned int GST_sound_handler::get_duration(int sound_handle)

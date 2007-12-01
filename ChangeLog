@@ -1,5 +1,7 @@
 2007-12-01 Sandro Santilli <strk@keybit.net>
 
+	* libmedia/gst/sound_handler_gst.{cpp,h}: drop dependency on
+	  hash_wrapper.h
 	* utilities/processor.cpp: add support for reading from stdin.
 
 2007-12-01 Sandro Santilli <strk@keybit.net>

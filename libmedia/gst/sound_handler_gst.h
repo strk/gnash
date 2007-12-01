@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_gst.h,v 1.5 2007/11/30 00:13:02 tgc Exp $
+// $Id: sound_handler_gst.h,v 1.6 2007/12/01 21:07:20 strk Exp $
 
 #ifndef SOUND_HANDLER_GST_H
 #define SOUND_HANDLER_GST_H
@@ -23,12 +23,12 @@
 #include "sound_handler.h" // for inheritance
 
 #include <vector>
+#include <map>
 
 #include <gst/gst.h>
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp>
 #include <boost/thread/mutex.hpp>
-#include "hash_wrapper.h"
 
 #define BUFFER_SIZE 5000
 
@@ -137,9 +137,11 @@ class GST_sound_handler : public sound_handler
 {
 private:
 	/// AS classes (NetStream, Sound) audio callbacks
-	hash_wrapper< void* /* owner */, aux_streamer_ptr /* callback */> m_aux_streamer;
+	typedef std::map< void* /* owner */, aux_streamer_ptr /* callback */> CallbacksMap;
+	CallbacksMap m_aux_streamer;
 
-	hash_wrapper< void* /* owner */, gst_elements*> m_aux_streamer_gstelements;
+	typedef std::map< void* /* owner */, gst_elements*> GstElementsMap;
+	GstElementsMap m_aux_streamer_gstelements;
 
 	/// Vector containing all the sounds
 	std::vector<sound_data*>	m_sound_data;
