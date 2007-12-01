@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.5 2007/12/01 21:07:20 strk Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.6 2007/12/01 21:17:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -781,12 +781,22 @@ void GST_sound_handler::detach_aux_streamer(void* owner)
 {
 	try_mutex::scoped_lock lock(_mutex);
 
-	GstElementsMap::iterator it=m_aux_streamer_gstelements.find(owner);
-	if ( it == m_aux_streamer_gstelements.end() ) return; // not found
+	// TODO: stuff both gstelements and callbacks in the same container !
 
-	delete it->second;
-	// WARNING: erasing would break any iteration in the map
-	m_aux_streamer_gstelements.erase(it);
+	GstElementsMap::iterator it=m_aux_streamer_gstelements.find(owner);
+	if ( it != m_aux_streamer_gstelements.end() )
+	{
+		delete it->second;
+		// WARNING: erasing would break any iteration in the map
+		m_aux_streamer_gstelements.erase(it);
+	}
+
+	CallbacksMap::iterator it2=m_aux_streamer.find(owner);
+	if ( it2 != m_aux_streamer.end() )
+	{
+		// WARNING: erasing would break any iteration in the map
+		m_aux_streamer.erase(it2);
+	}
 }
 
 unsigned int GST_sound_handler::get_duration(int sound_handle)
