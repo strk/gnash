@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.6 2007/11/24 17:21:43 strk Exp $
+// $Id: sound_handler_sdl.cpp,v 1.7 2007/12/01 21:54:24 strk Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -42,6 +42,7 @@
 #include "log.h"
 #include <cmath>
 #include <vector>
+#include <boost/scoped_array.hpp>
 #include <SDL.h>
 
 namespace gnash {
@@ -406,13 +407,11 @@ void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 	assert(owner);
 	assert(ptr);
 
-	aux_streamer_ptr p;
-	if (m_aux_streamer.get(owner, &p))
+	if ( ! m_aux_streamer.insert(std::make_pair(owner, ptr)).second )
 	{
 		// Already in the hash.
 		return;
 	}
-	m_aux_streamer[owner] = ptr;
 
 	++soundsPlaying;
 
@@ -430,13 +429,14 @@ void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 void	SDL_sound_handler::detach_aux_streamer(void* owner)
 {
 	boost::mutex::scoped_lock lock(_mutex);
-	aux_streamer_ptr p;	
-	if (m_aux_streamer.get(owner, &p))
-	{
-		--soundsPlaying;
-		m_aux_streamer.erase(owner);
-	}
 
+	CallbacksMap::iterator it2=m_aux_streamer.find(owner);
+	if ( it2 != m_aux_streamer.end() )
+	{
+		// WARNING: erasing would break any iteration in the map
+		--soundsPlaying;
+		m_aux_streamer.erase(it2);
+	}
 }
 
 unsigned int SDL_sound_handler::get_duration(int sound_handle)
@@ -649,34 +649,36 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 	memset(buffer, 0, buffer_length);
 
 	// call NetStream or Sound audio callbacks
-	if (handler->m_aux_streamer.size() > 0)
+	if ( !handler->m_aux_streamer.empty() )
 	{
-		uint8_t* buf = new uint8_t[buffer_length];
+		boost::scoped_array<uint8_t> buf ( new uint8_t[buffer_length] );
 
 		// Loop through the attached sounds
-		hash_wrapper< void*, sound_handler::aux_streamer_ptr >::iterator it = handler->m_aux_streamer.begin();
-		hash_wrapper< void*, sound_handler::aux_streamer_ptr >::iterator end = handler->m_aux_streamer.end();
+		CallbacksMap::iterator it = handler->m_aux_streamer.begin();
+		CallbacksMap::iterator end = handler->m_aux_streamer.end();
 		while (it != end) {
-			memset(buf, 0, buffer_length);
+			memset(buf.get(), 0, buffer_length);
 
-			SDL_sound_handler::aux_streamer_ptr aux_streamer = it->second; //handler->m_aux_streamer[i]->ptr;
+			SDL_sound_handler::aux_streamer_ptr aux_streamer = it->second; 
 			void* owner = it->first;
 
 			// If false is returned the sound doesn't want to be attached anymore
-			bool ret = (aux_streamer)(owner, buf, buffer_length);
+			bool ret = (aux_streamer)(owner, buf.get(), buffer_length);
 			if (!ret) {
-				handler->m_aux_streamer.erase(it++);
+				CallbacksMap::iterator it2=it;
+				++it2; // before we erase it
+				handler->m_aux_streamer.erase(it); // FIXME: isn't this terribly wrong ?
+				it = it2;
 				handler->soundsPlaying--;
 			} else {
 				++it;
 			}
-			SDL_MixAudio(stream, buf, buffer_length, SDL_MIX_MAXVOLUME);
+			SDL_MixAudio(stream, buf.get(), buffer_length, SDL_MIX_MAXVOLUME);
 
 		}
-		delete [] buf;
 	}
 
-	// Run through all the sounds.
+	// Run through all the sounds. TODO: don't call .size() at every iteration !
 	for(uint32_t i=0; i < handler->m_sound_data.size(); i++) {
 		sound_data* sounddata = handler->m_sound_data[i];
 		for(uint32_t j = 0; j < sounddata->m_active_sounds.size(); j++) {

@@ -16,14 +16,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_sdl.h,v 1.5 2007/11/30 00:13:02 tgc Exp $
+// $Id: sound_handler_sdl.h,v 1.6 2007/12/01 21:54:24 strk Exp $
 
 #ifndef SOUND_HANDLER_SDL_H
 #define SOUND_HANDLER_SDL_H
 
 
 #include "sound_handler.h" // for inheritance
-#include "hash_wrapper.h"
 #include "AudioDecoder.h"
 
 #include "log.h"
@@ -37,6 +36,7 @@ extern "C" {
 #endif
 
 #include <vector>
+#include <map> // for composition
 
 #include <SDL_audio.h>
 #include <boost/thread/thread.hpp>
@@ -285,7 +285,8 @@ class SDL_sound_handler : public sound_handler
 {
 private:
 	/// AS classes (NetStream, Sound) audio callbacks
-	hash_wrapper< void* /* owner */, aux_streamer_ptr /* callback */> m_aux_streamer;
+	typedef std::map< void* /* owner */, aux_streamer_ptr /* callback */> CallbacksMap;
+	CallbacksMap m_aux_streamer;
 
 	/// Vector containing all sounds.
 	//
