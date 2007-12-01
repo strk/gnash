@@ -6,6 +6,11 @@
 # whatever you want with it.
 
 # Script for batch regression tests on gameswf.
+#
+#
+# TODO: port this tester to dejagnu
+#
+#
 
 import string
 import sys

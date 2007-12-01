@@ -1,5 +1,11 @@
 2007-11-30 Sandro Santilli <strk@keybit.net>
 
+	* server/batch_test.py => testsuite/samples/batch_test.py:
+	  moved what looks like a tester for movies in testsuite/samples
+	  in a more likely place.
+
+2007-11-30 Sandro Santilli <strk@keybit.net>
+
 	* lots of files: drop most includes of container.h, the only
 	  ones left are in files which can probably die on their own.
 
