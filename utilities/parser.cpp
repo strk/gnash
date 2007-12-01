@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: parser.cpp,v 1.44 2007/11/08 15:55:08 nihilus Exp $ */
+/* $Id: parser.cpp,v 1.45 2007/12/01 23:42:39 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -50,8 +50,9 @@ extern "C"{
 #include "log.h"
 #include "gnash.h"
 #include "rc.h"
-#include "hash_wrapper.h"
 #include "debugger.h"
+
+#include <map>
 
 #define TWIPS_TO_PIXELS(x) ((x) / 20.f)
 #define PIXELS_TO_TWIPS(x) ((x) * 20.f)
@@ -92,14 +93,14 @@ static int current_frame = 0;
 //std::auto_ptr<tu_file> out;
 
 typedef void (*loader_function)(stream* input, int tag_type);
-static hash_wrapper<int, loader_function> tag_loaders;
+static std::map<int, loader_function> tag_loaders;
   
 void
 register_tag_loader(int tag_type, loader_function lf)
 {
-    assert(tag_loaders.get(tag_type, NULL) == false);
     assert(lf != NULL);
-    tag_loaders.add(tag_type, lf);
+    bool inserted = tag_loaders.insert(std::make_pair(tag_type, lf)).second;
+    assert(inserted);
 }
   
 // parse a matrix
@@ -496,7 +497,7 @@ void parse_define_sprite(stream* input, int tag_type)
 	    ident--;
 	    ident--;
 	    log_msg("end of sprite definition\n");
-	} else if (tag_loaders.get(tag_type, &lf)) {
+	} else if (lf = tag_loaders[tag_type]) {
 	    (*lf)(input, tag_type);
 	} else {
 	    log_msg("warning: no tag loader for tag_type %d", tag_type);
@@ -583,7 +584,7 @@ void parse_swf(std::auto_ptr<tu_file> file)
 	
 	loader_function	lf = NULL;
 	
-	if (tag_loaders.get(tag_type, &lf)) {
+	if (lf = tag_loaders[tag_type]) {
 	    (*lf)(&str, tag_type);	    
 	} else {
 	    log_msg("warning: no tag loader for tag_type %d", tag_type);

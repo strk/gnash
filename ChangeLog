@@ -1,5 +1,10 @@
 2007-12-01 Sandro Santilli <strk@keybit.net>
 
+	* libbase/: drop demo.{cpp,h} and hash_wrapper.h
+	* utilities/parser.cpp: use std::map instead of hash_wrapper.
+
+2007-12-01 Sandro Santilli <strk@keybit.net>
+
 	* libgeometry: drop libgnashgeo.
 
 2007-12-01 Bastiaan Jacques <bastiaan@bjacques.org>

@@ -111,7 +111,6 @@ libgnashbase_la_SOURCES = \
 noinst_HEADERS = \
 	$(LIBLTDLHEAD) \
 	container.h \
-	demo.h \
 	dlmalloc.h \
 	extension.h \
 	GnashException.h \
@@ -121,7 +120,6 @@ noinst_HEADERS = \
 	jpeg.h \
 	membuf.h \
 	network.h \
-	hash_wrapper.h \
 	lirc.h \
 	log.h \
 	ogl.h \
@@ -165,16 +163,6 @@ CLEANFILES = libltdl.la libltdlc.la
 libltdl_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
 libltdl_la_LDFLAGS = -no-undefined -version-info 4:4:1
 libltdl_la_LIBADD = $(LIBADD_DL)
-
-# We use our own rule to build the demo so it isn't built by default.
-# Since it doesn't contain a main() routine, we only try to compile,
-# and not link it.
-#noinst_PROGRAMS = demo
-#demo_SOURCES = demo.cpp
-#demo_LDADD = libgnashbase.la
-demo$(EXEEXT): demo.o $(pkglib_LTLIBRARIES)
-# 	@$(RM) demo$(EXEEXT)
-# 	$(CXXLINK) $(AM_LDFLAGS) demo.o $(pkglib_LTLIBRARIES) $(LIBS)
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
