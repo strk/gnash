@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.40 2007/09/27 23:59:56 tgc Exp $
+# $Id: Makefile.am,v 1.41 2007/12/01 23:21:49 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -85,7 +85,6 @@ noinst_HEADERS = \
 
 libgnashparser_la_LIBADD = \
 	$(top_builddir)/libamf/libgnashamf.la \
-	$(top_builddir)/libgeometry/libgnashgeo.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libmedia/libgnashmedia.la
 

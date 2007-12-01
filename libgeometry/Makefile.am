@@ -18,64 +18,12 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.33 2007/12/01 22:11:24 strk Exp $
+# $Id: Makefile.am,v 1.34 2007/12/01 23:21:46 strk Exp $
 
 AUTOMAKE_OPTIONS = 
-
-# AM_CXXFLAGS =  $(CXXFLAGS) $(SDL_CFLAGS) $(AM_CPPFLAGS)
-# AM_CPPFLAGS = #-Wall
-# AM_LDFLAGS  = $(OPENGL_LIBNS) $(SDL_LIBS)
-
-# noinst_LTLIBRARIES = libgeometry.la
-pkglib_LTLIBRARIES = libgnashgeo.la
-# noinst_LIBRARIES = libgeometry.a
-
-# These headers get installed
-# include_HEADERS = log.h err.h proc.h serial.h xantrex.h outback.h
-
-AM_CPPFLAGS = -I.. -I$(srcdir)	\
-        -I$(top_srcdir)/libbase \
-	$(BOOST_CFLAGS)		\
-	$(PTHREAD_CFLAGS)	\
-        $(NULL)
-
-#        -I$(top_srcdir) 	\
-#	$(PTHREAD_CFLAGS)	\
-#        $(SDL_CFLAGS) 		\
-#        $(OPENGL_CFLAGS) 	\
-#
-
-libgnashgeo_la_SOURCES = 	\
-	axial_box.cpp		\
-	bsp.cpp			\
-	collision.cpp		\
-	cull.cpp		\
-	geometry.cpp		\
-	tqt.cpp
 
 noinst_HEADERS = \
 	Range2d.h	\
 	Point2d.h	\
 	snappingrange.h \
-	axial_box.h	\
-	bsp.h		\
-	collision.h	\
-	cull.h		\
-	geometry.h	\
-	tqt.h		\
-	view_state.h	\
-	visual.h
-
-#libgeometry_la_LIBDADD =  #@DL_LIB@  # $(LIBLTDL)
-libgnashgeo_la_LIBADD = $(top_builddir)/libbase/libgnashbase.la
-libgnashgeo_la_LDFLAGS = -release $(VERSION)
-
-
-# Rebuild with GCC 4.x Mudflap support
-mudflap:
-	@echo "Rebuilding with GCC Mudflap support"
-	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
-
-clean-hook:
-	-rm -f core.*
-
+	axial_box.h	

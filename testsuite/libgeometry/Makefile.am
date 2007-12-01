@@ -22,7 +22,6 @@
 AUTOMAKE_OPTIONS = dejagnu
 
 AM_LDFLAGS =  \
-	$(top_builddir)/libgeometry/libgnashgeo.la \
 	$(NULL)
 
 # AM_CPPFLAGS isn't right here since per-program *_CPPFLAGS override global
