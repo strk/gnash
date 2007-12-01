@@ -90,8 +90,6 @@ libgnashbase_la_SOURCES = \
 	rc.cpp \
 	sharedlib.cpp \
 	string_table.cpp \
-	triangulate_float.cpp \
-	triangulate_sint32.cpp \
 	tu_file.cpp \
 	$(SDL_FILE) \
 	tu_random.cpp \
@@ -134,8 +132,6 @@ noinst_HEADERS = \
 	sharedlib.h \
 	string_table.h \
 	tree.hh \
-	triangulate.h \
-	triangulate_impl.h \
 	tu_config.h \
 	tu_file.h \
 	tu_math.h \
