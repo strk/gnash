@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaParserFfmpeg.cpp,v 1.6 2007/11/30 13:56:04 bwy Exp $
+// $Id: MediaParserFfmpeg.cpp,v 1.7 2007/12/01 12:58:41 bwy Exp $
 
 #include "MediaParserFfmpeg.h"
 #include "log.h"
@@ -212,8 +212,17 @@ MediaFrame* MediaParserFfmpeg::parseMediaFrame()
 	{
 		MediaFrame* ret = new MediaFrame;
 		ret->dataSize = packet.size;
-		ret->data = new uint8_t[packet.size];
+		
+		// "The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE
+		// larger than the actual read bytes because some optimized bitstream
+		// readers read 32 or 64 bits at once and could read over the end."
+		ret->data = new uint8_t[packet.size + FF_INPUT_BUFFER_PADDING_SIZE];
+		
 		memcpy(ret->data, packet.data, packet.size);
+		
+		// "The end of the input buffer should be set to 0 to ensure
+		// that no overreading happens for damaged MPEG streams."
+		memset(ret->data + packet.size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
 
 		if (packet.stream_index == _audioIndex)
 		{
