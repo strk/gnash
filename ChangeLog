@@ -1,5 +1,7 @@
 2007-12-01 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Boolean.as: add test for Boolean()
+	  constructor call out of an 'new' statement. Gnash fails.
 	* testsuite/actionscript.all/String.as: add test for String()
 	  constructor call out of an 'new' statement. Gnash fails.
 
