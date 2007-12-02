@@ -22,14 +22,14 @@
 #define UTILITY_H
 
 #include "tu_config.h"
-#include "tu_math.h"
-#include "tu_types.h"
-#include "tu_swap.h"
+//#include "tu_math.h"
+//#include "tu_types.h"
 
 #include <cassert>
 #include <cctype>
 #include <string>
 #include <typeinfo>
+#include <cmath>
 
 #if defined(__GNUC__) && __GNUC__ > 2
 #  include <cxxabi.h>
@@ -86,6 +86,12 @@ void	operator delete[](void* ptr);
 #ifndef M_PI
 #define M_PI 3.141592654
 #endif // M_PI
+
+#ifndef HAVE_ISFINITE
+# ifndef isfinite 
+#  define isfinite finite
+# endif 
+#endif 
 
 //
 // some misc handy math functions

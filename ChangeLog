@@ -1,3 +1,10 @@
+2007-12-02 Sandro Santilli <strk@keybit.net>
+
+	* libbase/: Makefile.am, tu_file.h, utility.h,
+	  libmedia/AudioDecoderSimple.cpp, server/asobj/:
+	  Global.cpp, string.cpp, server/vm/action.cpp:
+	  Drop tu_swap.h
+
 2007-12-01 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/fn_call.h: add isInstantiation() method to distinguish

@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.44 2007/12/02 09:15:54 strk Exp $ */
+/* $Id: string.cpp,v 1.45 2007/12/02 14:54:33 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -36,6 +36,7 @@
 #include "namedStrings.h"
 
 #include <boost/algorithm/string/case_conv.hpp>
+#include <algorithm>
 
 #define ENSURE_FN_ARGS(min, max, rv)                                    \
     if (fn.nargs < min) {                                               \
@@ -203,7 +204,7 @@ string_slice(const fn_call& fn)
 
         if (end < start) {
             // Swap start and end like substring
-            swap(&start, &end);
+            std::swap(start, end);
         }
 
         start = valid_index(str, start);
@@ -400,7 +401,7 @@ string_sub_string(const fn_call& fn)
                 IF_VERBOSE_ASCODING_ERRORS(
                     log_aserror(_("string.slice() called with end < start"));
                 )
-                swap(&end, &start);
+                std::swap(end, start);
             }
 
             end -= start;

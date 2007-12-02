@@ -17,13 +17,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderSimple.cpp,v 1.7 2007/11/24 17:21:42 strk Exp $
-
-#include <boost/scoped_array.hpp>
+// $Id: AudioDecoderSimple.cpp,v 1.8 2007/12/02 14:54:33 strk Exp $
 
 #include "AudioDecoderSimple.h"
 #include "utility.h"
 #include "BitsReader.h"
+
+#include <boost/scoped_array.hpp>
+#include <algorithm> // for std::swap
 
 namespace gnash {
 namespace media {
@@ -373,7 +374,7 @@ uint8_t* AudioDecoderSimple::decode(uint8_t* input, uint32_t inputSize, uint32_t
 					assert(inputSize & 1 == 0);
 					for (unsigned i = 0; i < inputSize; i+=2)
 					{
-						swap(&decodedData[i], &decodedData[i+1]);
+						std::swap(decodedData[i], decodedData[i+1]);
 					}
 					break;
     			default:	// Impossible

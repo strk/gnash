@@ -50,6 +50,7 @@
 
 #include <typeinfo>
 #include <string>
+#include <algorithm>
 
 using namespace gnash;
 using namespace SWF;
@@ -282,7 +283,7 @@ const char*	call_method_parsed(
 	    int	i1 = starting_index + nargs - i;
 	    assert(i0 < i1);
 
-	    swap(&(env->bottom(i0)), &(env->bottom(i1)));
+	    std::swap(env->bottom(i0), env->bottom(i1));
 	}
 
     // Do the call.

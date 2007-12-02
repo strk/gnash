@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.77 2007/11/20 12:04:55 cmusick Exp $ */
+/* $Id: Global.cpp,v 1.78 2007/12/02 14:54:33 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -125,7 +125,7 @@ as_global_isfinite(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
-    return as_value( isfinite(fn.arg(0).to_number()) );
+    return as_value( (bool)isfinite(fn.arg(0).to_number()) );
 }
 
 /// \brief Encode a string to URL-encoded format

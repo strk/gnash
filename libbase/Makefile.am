@@ -135,7 +135,6 @@ noinst_HEADERS = \
 	tu_math.h \
 	tu_opengl_includes.h \
 	tu_random.h \
-	tu_swap.h \
 	tu_timer.h \
 	WallClockTimer.h \
 	tu_types.h \
