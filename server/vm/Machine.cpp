@@ -1169,7 +1169,6 @@ Machine::execute()
 	case SWF::ABC_ACTION_RETURNVALUE:
 	{
 		// Slot the return.
-		if (mGlobalReturn != &mStack.top(0));
 		*mGlobalReturn = mStack.top(0);
 		// And restore the previous state.
 		restoreState();

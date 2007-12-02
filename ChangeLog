@@ -1,5 +1,11 @@
 2007-12-01 Bastiaan Jacques <bastiaan@bjacques.org>
 
+	* server/vm/Machine.cpp: Remove an "empty" if-statement that, if it
+	weren't empty, would probably be a premature optimization. Pointed out
+	by Hubert Figuiere.
+
+2007-12-01 Bastiaan Jacques <bastiaan@bjacques.org>
+
 	* backend/render_handler{.h,_ogl.cpp,_agg.cpp,_cairo.cpp},
 	server/render.{h,cpp}: Drop create_bitmap_info_alpha, since it is
 	unused and none of the current renderers implement it.
