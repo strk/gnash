@@ -20,12 +20,13 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Boolean.as,v 1.16 2007/12/02 00:45:29 strk Exp $";
+rcsid="$Id: Boolean.as,v 1.17 2007/12/02 00:46:59 strk Exp $";
 
 #include "check.as"
 
 check_equals(typeof(Boolean), 'function');
 xcheck_equals(typeof(Boolean()), 'undefined');
+xcheck_equals(typeof(Boolean(true)), 'boolean');
 check_equals(typeof(new Boolean()), 'object');
 
 var boolObj = new Boolean;
@@ -104,4 +105,4 @@ trueBoolean = new Boolean(true);
 check( trueBoolean );
 
 
-check_totals(30);
+check_totals(31);
