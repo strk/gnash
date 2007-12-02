@@ -1,5 +1,10 @@
 2007-12-01 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/String.as: add test for String()
+	  constructor call out of an 'new' statement. Gnash fails.
+
+2007-12-01 Sandro Santilli <strk@keybit.net>
+
 	* libbase/: drop demo.{cpp,h} and hash_wrapper.h
 	* utilities/parser.cpp: use std::map instead of hash_wrapper.
 

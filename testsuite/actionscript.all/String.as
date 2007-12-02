@@ -16,9 +16,13 @@
 
 // Original author: Mike Carlson - June 19th, 2006
 
-rcsid="$Id: String.as,v 1.26 2007/10/26 08:26:54 strk Exp $";
+rcsid="$Id: String.as,v 1.27 2007/12/02 00:24:48 strk Exp $";
 
 #include "check.as"
+
+// Gnash fails this always returning an object when String 
+// constructor is invoked.
+xcheck_equals(typeof(String()), 'string');
 
 var a;
 a = new String("wallawallawashinGTON");
@@ -366,4 +370,8 @@ check_equals(typeof(s.toString), 'undefined');
 Object.prototype.toString = ObjectProtoToStringBackup;
 String.prototype.toString = StringProtoToStringBackup;
 
-totals();
+#if OUTPUT_VERSION < 6
+ check_totals(130);
+#else
+ check_totals(135);
+#endif
