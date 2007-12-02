@@ -24,6 +24,7 @@
 #include "utility.h"
 #include "GnashException.h"
 #include "log.h"
+
 #include <unistd.h>
 #include <cstring>
 
@@ -55,8 +56,7 @@ namespace noseek_fd_adapter
  *
  *  NoSeekFile definition
  *
- *  TODO: optimize this class, it makes too many unneeded allocs/deallocs
- *        and calls fstat far too often.
+ *  TODO: cleanup this class, it makes too many seeks
  * 
  **********************************************************************/
 
@@ -100,6 +100,9 @@ public:
 
 private:
 
+	/// Read buffer size
+	static const unsigned int chunkSize = 512;
+
 	// Open either a temporary file or a named file
 	// (depending on value of _cachefilename)
 	void openCacheFile();
@@ -118,6 +121,12 @@ private:
 
 	// cache filename
 	const char* _cachefilename;
+
+	// Current size of cached data
+	long unsigned _cached;
+
+	// Current read buffer
+	char _buf[chunkSize];
 
 	// Attempt at filling the cache up to the given size.
 	void fill_cache(size_t size);
@@ -173,6 +182,8 @@ NoSeekFile::cache(void *from, size_t sz)
 		throw gnash::GnashException(errmsg);
 	}
 
+	_cached += sz;
+
 #ifdef GNASH_NOSEEK_FD_VERBOSE
 	fprintf(stderr, " after write, position: %ld\n", ftell(_cache));
 #endif
@@ -198,54 +209,47 @@ NoSeekFile::fill_cache(size_t size)
 	fprintf(stderr, "fill_cache(%d) called\n", size);
 #endif
 
-	struct stat statbuf;
-
 	// See how big is the cache
-	fstat(_cachefd, &statbuf);
-	if ( (size_t)statbuf.st_size >= size ) 
+	while ( _cached < size ) 
 	{
-#ifdef GNASH_NOSEEK_FD_VERBOSE
-		fprintf(stderr,
-			" big enough (%d), returning\n",
-			statbuf.st_size);
-#endif
-		return;
-	}
 
-	// Let's see how many bytes are left to read
-	size_t bytes_needed = size-statbuf.st_size;
+		// Let's see how many bytes are left to read
+		unsigned int bytesNeeded = size-_cached;
+		if ( bytesNeeded > chunkSize ) bytesNeeded = chunkSize;
+
+		bytesNeeded = chunkSize; // why read less ?
+
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-	fprintf(stderr, " bytes needed = " SIZET_FMT "\n", bytes_needed);
+		fprintf(stderr, " bytes needed = " SIZET_FMT "\n", bytesNeeded);
 #endif
 
-
-	boost::scoped_array<char> buf ( new char[bytes_needed] );
-	int bytes_read = read(_fd, (void*)buf.get(), bytes_needed);
-	if ( bytes_read < 0 )
-	{
-		fprintf(stderr,
-			"Error reading " SIZET_FMT " bytes from input stream",
-			bytes_needed);
-		_running = false;
-		// this looks like a CRITICAL error (since we don't handle it..)
-		throw gnash::GnashException("Error reading from input stream");
-		return;
-	}
-
-	if ( static_cast<size_t>(bytes_read) < bytes_needed )
-	{
-		if ( bytes_read == 0 )
+		ssize_t bytesRead = read(_fd, (void*)_buf, bytesNeeded);
+		if ( bytesRead < 0 )
 		{
-#ifdef GNASH_NOSEEK_FD_VERBOSE
-			fprintf(stderr, "EOF reached\n");
-#endif
+			fprintf(stderr,
+				"Error reading " SIZET_FMT " bytes from input stream",
+				bytesNeeded);
 			_running = false;
+			// this looks like a CRITICAL error (since we don't handle it..)
+			throw gnash::GnashException("Error reading from input stream");
 			return;
 		}
+
+		if ( static_cast<size_t>(bytesRead) < bytesNeeded )
+		{
+			if ( bytesRead == 0 )
+			{
+#ifdef GNASH_NOSEEK_FD_VERBOSE
+				fprintf(stderr, "EOF reached\n");
+#endif
+				_running = false;
+				return;
+			}
+		}
+
+		cache(_buf, static_cast<size_t>(bytesRead));
+
 	}
-
-	cache(buf.get(), static_cast<size_t>(bytes_read));
-
 }
 
 /*private*/
@@ -283,7 +287,8 @@ NoSeekFile::NoSeekFile(int fd, const char* filename)
 	:
 	_fd(fd),
 	_running(1),
-	_cachefilename(filename)
+	_cachefilename(filename),
+	_cached(0)
 {
 	// might throw an exception
 	openCacheFile();

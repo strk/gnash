@@ -1,5 +1,11 @@
 2007-12-02 Sandro Santilli <strk@keybit.net>
 
+	* libbase/noseek_fd_adapter.cpp: stop calling fstat and needlessly
+	  allocate/deallocate buffers. Read in chunks of 512 bytes.
+	  This makes reading from stdin more then 15 times faster.
+
+2007-12-02 Sandro Santilli <strk@keybit.net>
+
 	* libbase/: Makefile.am, tu_file.h, utility.h,
 	  libmedia/AudioDecoderSimple.cpp, server/asobj/:
 	  Global.cpp, string.cpp, server/vm/action.cpp:
