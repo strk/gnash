@@ -84,18 +84,14 @@
 
 
 // TODO:
-// - Implement:
-// * Alpha images
-// * Real antialiasing: Currently, we just draw an anti-aliased outline around
-//   solid shapes and fonts. Besides not anti-aliasing other types of shapes,
-//   this makes fonts a bit bigger than intended.
-// 
 // - Profiling!
 // - Optimize code:
 // * Use display lists
 // * Use better suited standard containers
 // * convert to double at a later stage (oglVertex)
 // * keep data for less time
+// * implement hardware accelerated gradients. Most likely this will require
+//   the use of fragment shader language.
 
 // * The "Programming Tips" in the OpenGL "red book" discusses a coordinate system
 // that would give "exact two-dimensional rasterization". AGG uses a similar
@@ -624,13 +620,6 @@ public:
     return glXGetCurrentContext();
 #endif
   }    
-
-
-  virtual bitmap_info*  create_bitmap_info_alpha(int w, int h, unsigned char* data)
-  {
-    log_unimpl("create_bitmap_info_alpha()");
-    return NULL;
-  }
 
   virtual bitmap_info*  create_bitmap_info_rgb(image::rgb* im)
   {

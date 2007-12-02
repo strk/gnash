@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.52 2007/11/30 23:11:10 bjacques Exp $ */
+/* $Id: render_handler.h,v 1.53 2007/12/02 01:06:30 bjacques Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -223,14 +223,6 @@ public:
   virtual ~render_handler() {}
 
   // Your handler should return these with a ref-count of 0.  (@@ is that the right policy?)
-
-  /// \brief
-  ///  Create a bitmap_info so that it contains an alpha texture
-  /// with the given data (1 byte per texel).
-  //
-  /// Munges *data (in order to make mipmaps)!!
-  ///
-  virtual bitmap_info*  create_bitmap_info_alpha(int w, int h, unsigned char* data) = 0;
 
   /// \brief
   /// Given an image, returns a pointer to a bitmap_info class

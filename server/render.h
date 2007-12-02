@@ -37,11 +37,6 @@ namespace gnash {
 	///
 	namespace render
 	{
-
-		/// See render_handler::create_bitmap_info_alpha (in backend/render_handler.h)
-		bitmap_info*	create_bitmap_info_alpha(int w, int h,
-					unsigned char* data);
-
 		/// See render_handler::create_bitmap_info_rgb (in backend/render_handler.h)
 		bitmap_info*	create_bitmap_info_rgb(image::rgb* im);
 

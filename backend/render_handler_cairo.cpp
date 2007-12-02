@@ -22,7 +22,6 @@
 //
 // TODOs:
 // - Implement focal gradients.
-// - Implement alpha bitmaps.
 // - Implement unimplemented methods.
 // - Would be nice to have a header/implementation separation.
 // - Document workings of Cairo and this renderer.
@@ -35,7 +34,7 @@
 // Already implemented:
 // - outlines
 // - fills: solid, linear, radial and bitmap
-// - bitmaps (excluding alpha)
+// - bitmaps
 // - fonts
 // - masks
 // - video (from old Cairo renderer)
@@ -200,13 +199,6 @@ public:
   
   ~render_handler_cairo()
   {
-  }
-
-
-  virtual bitmap_info*  create_bitmap_info_alpha(int w, int h, unsigned char* data)
-  {
-    log_unimpl("create_bitmap_info_alpha");
-    return NULL;
   }
 
   virtual bitmap_info*  create_bitmap_info_rgb(image::rgb* im) 

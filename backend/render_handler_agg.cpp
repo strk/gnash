@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.119 2007/12/01 22:49:18 bjacques Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.120 2007/12/02 01:06:30 bjacques Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -421,19 +421,6 @@ public:
     unsigned char dummy=0;
     return new agg_bitmap_info<agg::pixfmt_rgb24_pre> (0, 0, 0, &dummy, 24);
   }
-
-  gnash::bitmap_info* create_bitmap_info_alpha(int /*w*/, int /*h*/, uint8_t* /*data*/)
-  // Create a bitmap_info so that it contains an alpha texture
-  // with the given data (1 byte per texel).
-  {
-    //return new agg_bitmap_info<agg::pixfmt_gray8> (w, h, w, data, 8);
-
-    // where is this used, anyway??
-    log_msg("create_bitmap_info_alpha() currently not supported");
-    
-    return new bitmap_info();
-  }
-
 
   void  delete_bitmap_info(gnash::bitmap_info* bi)
   // Delete the given bitmap info class.

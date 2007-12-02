@@ -1,3 +1,9 @@
+2007-12-01 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler{.h,_ogl.cpp,_agg.cpp,_cairo.cpp},
+	server/render.{h,cpp}: Drop create_bitmap_info_alpha, since it is
+	unused and none of the current renderers implement it.
+
 2007-12-01 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Boolean.as: add test for Boolean()

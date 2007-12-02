@@ -48,15 +48,6 @@ namespace gnash {
 			bogus_bi() {}
 		};
 
-		bitmap_info*	create_bitmap_info_alpha(int w, int h, unsigned char* data)
-		{
-#ifdef DEBUG_RENDER_CALLS
-			GNASH_REPORT_FUNCTION;
-#endif
-			if (s_render_handler) return s_render_handler->create_bitmap_info_alpha(w, h, data);
-			else return new bogus_bi;
-		}
-
 		bitmap_info*	create_bitmap_info_rgb(image::rgb* im)
 		{
 #ifdef DEBUG_RENDER_CALLS
