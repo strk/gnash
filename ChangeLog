@@ -1,3 +1,17 @@
+2007-12-01 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/fn_call.h: add isInstantiation() method to distinguish
+	  between normal call and instantiating call to builtin constructors.
+	* server/asobj/Boolean.cpp (boolean_ctor): return a boolean (or
+	  undefined) type if not instantiating.
+	* server/asobj/Number.cpp (number_ctor): return a number type if not
+	  instantiating.
+	* server/asobj/string.cpp (string_ctor): return a string type if not
+	  instantiating.
+	* testsuite/actionscript.all/: Boolean.as, Number.as, String.as,
+	  ops.as: successes.
+	* testsuite/swfdec/PASSING: string-construct tests pass.
+
 2007-12-01 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/vm/Machine.cpp: Remove an "empty" if-statement that, if it

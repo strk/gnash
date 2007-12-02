@@ -107,14 +107,28 @@ as_value boolean_valueof(const fn_call& fn)
 as_value
 boolean_ctor(const fn_call& fn)
 {
-	bool val = false;
 	if (fn.nargs > 0)
 	{
-		val = fn.arg(0).to_bool();
+		bool val = fn.arg(0).to_bool();
+		if ( ! fn.isInstantiation() )
+		{
+			return as_value(val);
+		}
+		else
+		{
+			return as_value(new boolean_as_object(val));
+		}
 	}
-	boost::intrusive_ptr<as_object> obj = new boolean_as_object(val);
 
-	return as_value(obj.get()); // will keep alive
+	if ( ! fn.isInstantiation() )
+	{
+		return as_value();
+	}
+	else
+	{
+		return as_value(new boolean_as_object(false));
+	}
+
 }
 
 static boost::intrusive_ptr<builtin_function>

@@ -85,6 +85,18 @@ public:
 	{
 	}
 
+	/// Return true if this call is an object instantiation
+	bool isInstantiation() const
+	{
+		// Currently the as_function::constructInstance
+		// will set 'this_ptr' to NULL when calling a builtin
+		// function, so we use this info to find out.
+		// For the future, we might use an explicit flag instead
+		// as I belive there are some cases in which 'this' is
+		// undefined even in a normal function call.
+		return (this_ptr == 0);
+	}
+
 	/// Access a particular argument.
 	as_value& arg(unsigned int n) const
 	{

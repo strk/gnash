@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.29 2007/11/21 22:35:37 strk Exp $";
+rcsid="$Id: ops.as,v 1.30 2007/12/02 09:15:55 strk Exp $";
 
 #include "check.as"
 
@@ -94,7 +94,7 @@ check(x == y);
 x = Number(new Number(NaN));
 y = NaN;
 z = 0/0;
-xcheck_equals(typeof(x), 'number')
+check_equals(typeof(x), 'number')
 check_equals(typeof(y), 'number');
 check_equals(typeof(z), 'number');
 check(isNaN(x));
@@ -233,7 +233,7 @@ x=String("adcd");
 y=true;
 z=x && y;
 #if OUTPUT_VERSION < 7
-	xcheck_equals(z, false);
+	check_equals(z, false);
 #else
 	check_equals(z, true);
 #endif 
@@ -242,7 +242,7 @@ x=true;
 y=String("adcd");
 z=x && y;
 #if OUTPUT_VERSION < 7
-	xcheck_equals(z, false);
+	check_equals(z, false);
 #else
 	check_equals(z, true);
 #endif
@@ -306,7 +306,7 @@ x = 0;
 y = String("abcd");
 z = x || y;
 #if OUTPUT_VERSION < 7
-	xcheck_equals(z, false); 
+	check_equals(z, false); 
 #else
 	check_equals(z, true);
 #endif
@@ -339,7 +339,7 @@ x = 0;
 y = String("0");
 z = x || y;
 #if OUTPUT_VERSION < 7
-	xcheck_equals(z, false);
+	check_equals(z, false);
 #else
 	check_equals(z, true);
 #endif

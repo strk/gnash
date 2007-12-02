@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.43 2007/11/20 12:04:55 cmusick Exp $ */
+/* $Id: string.cpp,v 1.44 2007/12/02 09:15:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -562,18 +562,23 @@ string_to_string(const fn_call& fn)
 static as_value
 string_ctor(const fn_call& fn)
 {
-    boost::intrusive_ptr<string_as_object> obj = new string_as_object;
+	std::string str;
+	
+	if (fn.nargs )
+	{
+		str = fn.arg(0).to_string();
+	}
 
-    std::string& str = obj->str();
+	if ( ! fn.isInstantiation() )
+	{
+		return as_value(str);
+	}
+	
+	boost::intrusive_ptr<string_as_object> obj = new string_as_object;
 
-    if (fn.nargs > 0) {
-        str = fn.arg(0).to_string();
-    }
+	obj->str() = str;
 
-    // this shouldn't be needed
-    //attachStringInterface(*str);
-
-    return as_value(obj.get());
+	return as_value(obj.get());
 }
 
 static boost::intrusive_ptr<builtin_function>

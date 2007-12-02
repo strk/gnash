@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Number.cpp,v 1.33 2007/08/31 21:53:32 strk Exp $ */
+/* $Id: Number.cpp,v 1.34 2007/12/02 09:15:54 strk Exp $ */
 
 #include "log.h"
 #include "tu_config.h"
@@ -134,6 +134,11 @@ number_ctor(const fn_call& fn)
 	if (fn.nargs > 0)
 	{
 		val = fn.arg(0).to_number();
+	}
+
+	if ( ! fn.isInstantiation() )
+	{
+		return as_value(val);
 	}
 
 	number_as_object* obj = new number_as_object(val);
