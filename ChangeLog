@@ -1,5 +1,7 @@
 2007-12-03 Sandro Santilli <strk@keybit.net>
 
+	* libbase/BitsReader.h, libmedia/AudioDecoderSimple.cpp: renamed
+	  BitsReader::got_bits to gotBits (style).
 	* testsuite/swfdec/PASSING: countdown.swf succeeds after zou commit
 	  (unload event related).
 

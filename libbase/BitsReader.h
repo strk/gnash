@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: BitsReader.h,v 1.4 2007/12/01 00:14:58 strk Exp $
+// $Id: BitsReader.h,v 1.5 2007/12/03 08:35:34 strk Exp $
 
 #ifndef BITSREADER_H
 #define BITSREADER_H
@@ -57,6 +57,11 @@ public:
 	}
 
 	~BitsReader() {}
+
+	size_t size() const
+	{
+		return end-start;
+	}
 
 	/// Set a new buffer to work with
 	void setBuffer(byte* input, size_t len)
@@ -139,7 +144,7 @@ public:
 	}
 
 	/// Checks if the stream contains X bits
-	bool got_bits(uint32_t nbits)
+	bool gotBits(uint32_t nbits)
 	{
 		uint32_t gotbits = 8-usedBits +8*(end-ptr-1);
 		if (gotbits > nbits) return true;

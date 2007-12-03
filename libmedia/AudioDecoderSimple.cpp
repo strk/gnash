@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderSimple.cpp,v 1.8 2007/12/02 14:54:33 strk Exp $
+// $Id: AudioDecoderSimple.cpp,v 1.9 2007/12/03 08:35:34 strk Exp $
 
 #include "AudioDecoderSimple.h"
 #include "utility.h"
@@ -97,7 +97,7 @@ private:
 		uint32_t sample_count = 1;
 		*(*out_data)++ = (int16_t) sample;
 
-		while (sample_count < 4096 && in->got_bits(n_bits))
+		while (sample_count < 4096 && in->gotBits(n_bits))
 		{
 			int	raw_code = in->read_uint(n_bits);
 			doSample(n_bits, sample, stepsize_index, raw_code);	/* sample & stepsize_index are in/out params */
@@ -125,7 +125,7 @@ private:
 		*(*out_data)++ = (int16_t) left_sample;
 		*(*out_data)++ = (int16_t) right_sample;
 
-		while (sample_count < 4096 && in->got_bits(n_bits*2))
+		while (sample_count < 4096 && in->gotBits(n_bits*2))
 		{														
 			int	left_raw_code = in->read_uint(n_bits);
 			doSample(n_bits, left_sample, left_stepsize_index, left_raw_code);
@@ -160,7 +160,7 @@ public:
 
 		uint32_t sample_count = 0;
 
-		while (/*sample_count && !in->overread()*/in->got_bits(22))
+		while (/*sample_count && !in->overread()*/in->gotBits(22))
 		{
 			// Read initial sample & index values.
 
