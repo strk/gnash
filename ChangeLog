@@ -1,4 +1,10 @@
+2007-12-03 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/swfdec/PASSING: countdown.swf succeeds after zou commit
+	  (unload event related).
+
 2007-12-03 Zou Lunkai <zoulunkai@gmail.com>
+
 	* server/dlist.{h, cpp}: add mergeDisplayList() for timeline control attempt5.
 	* server/sprite_instance.{h,cpp): restoreDisplayList(), use the new 
 	  mergeDisplayList() interface; cleanups for executing a PlaceObject2 tag.
