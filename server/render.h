@@ -104,9 +104,6 @@ namespace gnash {
 		void draw_glyph(shape_character_def *def, const matrix& mat,
 				const rgba& color, float pixel_scale);
 
-		/// See render_handler::allow_glyph_textures (in backend/render_handler.h)
-		bool allow_glyph_textures();				
-				
 		/// See render_handler::bounds_in_clipping_area (in backend/render_handler.h)
 		bool bounds_in_clipping_area(const rect& bounds);
 		bool bounds_in_clipping_area(const InvalidatedRanges& ranges);
@@ -120,11 +117,6 @@ namespace gnash {
 
 		/// See render_handler::disable_mask (in backend/render_handler.h)
 		void	disable_mask();
-
-		/// See render_handler::draw_bitmap (in backend/render_handler.h)
-		void	draw_bitmap(const matrix& m, const bitmap_info* bi,
-				const rect& coords,
-				const rect& uv_coords, const rgba& color);
 
 	}	// end namespace render
 

@@ -390,17 +390,7 @@ public:
     // Clear the current path which was _preserve()d.
     cairo_new_path(_cr);    
   }
-  
-  virtual void  draw_bitmap(
-    const matrix&   m,
-    const bitmap_info*  bi,
-    const rect&   coords,
-    const rect&   uv_coords,
-    const rgba&   color)
-  {
-    log_unimpl("draw_bitmap");
-  }
-    
+
   virtual void  set_antialiased(bool enable)
   {
     log_unimpl("set_antialiased");
@@ -874,11 +864,6 @@ draw_subshape(const PathVec& path_vec, const matrix& mat, const cxform& cx,
     destroy_cairo_patterns(fill_styles_cairo);
   }
 
-  virtual bool allow_glyph_textures()
-  {
-    return false;
-  }
-  
   void
   set_context(cairo_t* context)
   {

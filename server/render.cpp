@@ -173,14 +173,6 @@ namespace gnash {
 			if (s_render_handler) s_render_handler->draw_glyph(def, mat, color, pixel_scale);
     }
     
-    
-    bool allow_glyph_textures() {
-      if (s_render_handler) 
-        return s_render_handler->allow_glyph_textures();
-      else
-        return true;
-    }
-
     bool bounds_in_clipping_area(const rect& bounds) {
     	return bounds_in_clipping_area(bounds.getRange());
       if (s_render_handler) 
@@ -228,21 +220,6 @@ namespace gnash {
 			GNASH_REPORT_FUNCTION;
 #endif
 			if (s_render_handler) s_render_handler->disable_mask();
-		}
-
-		// Special function to draw a rectangular bitmap;
-		// intended for textured glyph rendering.  Ignores
-		// current transforms.
-		void	draw_bitmap(const matrix& m, const bitmap_info* bi, const rect& coords, const rect& uv_coords, const rgba& color)
-		{
-#ifdef DEBUG_RENDER_CALLS
-			GNASH_REPORT_FUNCTION;
-#endif
-			if (s_render_handler)
-			{
-				s_render_handler->draw_bitmap(
-					m, bi, coords, uv_coords, color);
-			}
 		}
 	}
 }

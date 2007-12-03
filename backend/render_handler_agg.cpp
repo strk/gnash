@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.120 2007/12/02 01:06:30 bjacques Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.121 2007/12/03 05:29:34 bjacques Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -685,11 +685,6 @@ public:
       }
   }
 
-  bool allow_glyph_textures() {
-    // We want to render all glyphs in place 
-    return false; 
-  }
-
   void  end_display()
   // Clean up after rendering a frame.  Client program is still
   // responsible for calling glSwapBuffers() or whatever.
@@ -812,22 +807,6 @@ public:
 
   } // draw_line_strip
 
-
-  void  draw_bitmap(
-  const gnash::matrix& /*m*/,
-  const gnash::bitmap_info* /*bi*/,
-  const gnash::rect& /*coords*/,
-  const gnash::rect& /*uv_coords*/,
-  const gnash::rgba& /*color*/)
-  // Draw a rectangle textured with the given bitmap, with the
-  // given color.  Apply given transform; ignore any currently
-  // set transforms.
-  //
-  // Intended for textured glyph rendering.
-  {
-    log_msg("  draw_bitmap NOT IMPLEMENTED\n");
-    // could be implemented, but is not used
-  }
 
   void begin_submit_mask()
   {

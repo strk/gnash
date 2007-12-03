@@ -899,16 +899,6 @@ public:
     log_unimpl("draw_poly");
   }
 
-  virtual void  draw_bitmap(
-    const matrix&   m,
-    const bitmap_info*  bi,
-    const rect&   coords,
-    const rect&   uv_coords,
-    const rgba&   color)
-  {
-    log_unimpl("draw_bitmap");
-  }
-    
   virtual void  set_antialiased(bool enable)
   {
     log_unimpl("set_antialiased");
@@ -1625,11 +1615,6 @@ public:
     glPopMatrix();
   }
 
-  virtual bool allow_glyph_textures()
-  {
-    return false;
-  }
-  
   virtual void set_scale(float xscale, float yscale) {
     _xscale = xscale;
     _yscale = yscale;

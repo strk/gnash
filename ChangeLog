@@ -1,3 +1,10 @@
+2007-12-02 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler{.h,_ogl.cpp,_agg.cpp,_cairo.cpp},
+	server/render.{h,cpp}: Drop allow_glyph_textures and draw_bitmap
+	because the glyph texturing code was removed from the Gnash core
+	recently. (This was the only purpose for draw_bitmap.)
+
 2007-12-02  Rob Savoye  <rob@ute.welcomehome.org>
 
 	* Makefile.am: Add target to build ipk packages.

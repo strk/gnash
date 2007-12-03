@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.53 2007/12/02 01:06:30 bjacques Exp $ */
+/* $Id: render_handler.h,v 1.54 2007/12/03 05:29:34 bjacques Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -376,19 +376,6 @@ public:
     WRAP_CLAMP
   };
     
-    
-  /// Special function to draw a rectangular bitmap.
-  //
-  /// Intended for textured glyph rendering.  Ignores
-  /// current transforms.
-  ///
-  virtual void  draw_bitmap(
-    const matrix&   m,
-    const bitmap_info*  bi,
-    const rect&   coords,
-    const rect&   uv_coords,
-    const rgba&   color) = 0;
-    
   virtual void  set_antialiased(bool enable) = 0;
     
   ///@{ Masks
@@ -510,14 +497,7 @@ public:
   ///
   virtual void draw_glyph(shape_character_def *def, const matrix& mat,
     const rgba& color, float pixel_scale) = 0;
-    
-  /// The render handler can choose if it wishes to use textured glyphs 
-  /// (pre-computed bitmaps which are used for small text sizes) or if 
-  /// draw_glyph() should be used in any case. When glyph textures are not
-  /// desired, then draw_bitmap() is never called in the *current* version.  
-  virtual bool allow_glyph_textures() = 0;
-    
-    
+
   /// This function returns the color at any position in the stage. It is used
   /// for automatic testing only, it should not be used for anything else!
   /// x and y are pixel coordinates (<0 won't make any sense) and the color of 
