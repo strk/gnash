@@ -314,6 +314,7 @@ void movie_def_impl::resolve_import(const std::string& source_url, movie_definit
 void movie_def_impl::add_character(int character_id, character_def* c)
 {
 	assert(c);
+	boost::mutex::scoped_lock lock(_dictionaryMutex);
 	_dictionary.add_character(character_id, c);
 }
 
@@ -328,6 +329,8 @@ movie_def_impl::get_character_def(int character_id)
                       character_id);
         }
 #endif // not NDEBUG
+
+	boost::mutex::scoped_lock lock(_dictionaryMutex);
 
 	boost::intrusive_ptr<character_def> ch = _dictionary.get_character(character_id);
 #ifndef GNASH_USE_GC
@@ -1039,6 +1042,7 @@ movie_def_impl::markReachableResources() const
 		(*i)->setReachable();
 	}
 
+	boost::mutex::scoped_lock lock(_dictionaryMutex);
 	_dictionary.markReachableResources();
 
 }

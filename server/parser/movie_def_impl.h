@@ -197,6 +197,9 @@ private:
 	/// Characters Dictionary
 	CharacterDictionary	_dictionary;
 
+	/// Mutex protecting _dictionary
+	mutable boost::mutex _dictionaryMutex;
+
 	/// Tags loader table
 	SWF::TagLoadersTable& _tag_loaders;
 
