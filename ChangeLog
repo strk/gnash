@@ -1,5 +1,12 @@
 2007-12-03 Sandro Santilli <strk@keybit.net>
 
+	* server/DynamicShape.cpp (clear): set current path to NULL
+	  or would point to deleted memory. Fixes bug #21583.
+	* server/sprite_instance.cpp (markReachableResources): assert
+	  that the tmp backup list is empty.
+
+2007-12-03 Sandro Santilli <strk@keybit.net>
+
 	* server/swf/tag_loaders.cpp (sound_stream_head_loader): ensure 
 	  needed bytes are available, fix long read for mp3 case.
 	* server/stream.cpp (open_tag): don't trust a tag advertising

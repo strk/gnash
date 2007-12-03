@@ -17,7 +17,7 @@
 
 
 
-/* $Id: DynamicShape.cpp,v 1.12 2007/11/07 14:06:16 strk Exp $ */
+/* $Id: DynamicShape.cpp,v 1.13 2007/12/03 16:17:49 strk Exp $ */
 
 #include "DynamicShape.h"
 
@@ -46,6 +46,9 @@ DynamicShape::clear()
 	m_fill_styles.clear();
 	m_line_styles.clear();
 	m_bound.set_null();
+	_currpath=0; // or would point to invalid memory
+
+	// TODO: set _changed=true ? reset _currfill and _currline ?
 }
 
 void

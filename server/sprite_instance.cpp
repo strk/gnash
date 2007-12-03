@@ -3856,6 +3856,8 @@ sprite_instance::markReachableResources() const
 
 	m_display_list.visitAll(marker);
 
+	assert(m_tmp_display_list.empty());
+
 	_drawable->setReachable();
 
 	_drawable_inst->setReachable();
