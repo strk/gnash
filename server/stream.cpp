@@ -434,6 +434,11 @@ namespace gnash {
 		if (tag_length == 0x3F) {
 			tag_length = m_input->read_le32();
 		}
+
+		if ( tag_length > 1024*62 )
+		{
+			log_debug("Tag %d has a size of %d bytes !!", tag_type, tag_length);
+		}
 			
 		// Remember where the end of the tag is, so we can
 		// fast-forward past it when we're done reading it.
