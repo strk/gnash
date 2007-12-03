@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaDecoderSdl.cpp,v 1.5 2007/11/30 00:13:02 tgc Exp $
+// $Id: MediaDecoderSdl.cpp,v 1.6 2007/12/03 16:50:25 bwy Exp $
 
 #include "MediaDecoderSdl.h"
 #include "AudioDecoderNellymoser.h"
@@ -69,10 +69,18 @@ bool MediaDecoderSdl::setupDecoding()
 		if (_videoDecoder.get() != NULL) {
 			if (!_videoDecoder->setup(vInfo.get())) {
 				_videoDecoder.reset(NULL); // Delete the videoDecoder if it is of no use
-				log_error("No video decoder could be created, since no decoder for this format is available.");
+				log_error("No video decoder could be created, "
+					"since no decoder for this format "
+					"is available.");
 			}
-			_video = true;
-		} else {
+			else
+			{
+				// Video decoder setup succeeded
+				_video = true;
+			}
+		}
+		else
+		{
 			log_error("No video decoder could be created, since no decoder is enabled.");
 		}
 	}
@@ -92,12 +100,21 @@ bool MediaDecoderSdl::setupDecoding()
 		if (_audioDecoder.get() == NULL) _audioDecoder.reset(new AudioDecoderFfmpeg());
 #endif
 		if (_audioDecoder.get() != NULL) {
-			if (!_audioDecoder->setup(aInfo.get())) {
+			if (!_audioDecoder->setup(aInfo.get()))
+			{
 				_audioDecoder.reset(NULL); // Delete the audioDecoder if it is of no use
-				log_error("No audio decoder could be created, since no decoder for this format is available.");
+				log_error("No audio decoder could be created, "
+					"since no decoder for this"
+					" format is available.");
 			}
-			_audio = true;
-		} else {
+			else
+			{
+				// Audio decoder setup succeeded
+				_audio = true;
+			}
+		}
+		else
+		{
 			log_error("No audio decoder could be created, since no decoder is enabled.");
 		}
 	}
@@ -108,7 +125,7 @@ bool MediaDecoderSdl::setupDecoding()
 
 bool MediaDecoderSdl::setupParser()
 {
-	// Buffer a bit to make sure the stream is accessable
+	// Buffer a bit to make sure the stream is accessible
 	if (_stream->set_position(512) != 0) {
 		_error = streamError;
 		pushOnStatus(streamNotFound);
@@ -132,6 +149,7 @@ bool MediaDecoderSdl::setupParser()
 		_parser.reset(new MediaParserFfmpeg(_stream));
 #endif
 	}
+	
 	return _parser->setupParser();
 }
 
@@ -155,7 +173,6 @@ printf("\t in the decode thread\n");
 	if (!decoder->_running) return;
 
 	// Setup the decoder and parser
-
 	if (decoder->setupParser()) {
 		if (!decoder->setupDecoding()) {
 			decoder->pushOnStatus(streamNotFound);

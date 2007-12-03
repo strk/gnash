@@ -1,3 +1,9 @@
+2007-12-03 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libmedia/sdl/MediaDecoderSdl.cpp: make gotAudio() and gotVideo()
+	  return false when decoder setup failed. With any luck, we'll
+	  just play the decodable stream.
+
 2007-12-03 Sandro Santilli <strk@keybit.net>
 
 	* server/DynamicShape.cpp (clear): set current path to NULL
