@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.158 2007/12/03 11:34:08 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.159 2007/12/03 14:33:55 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1231,44 +1231,55 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
     // The right way to do it is to make seperate structures for streams
     // in movie_def_impl.
 
-    // extract garbage data
-    int	garbage = in->read_uint(8);
+    // 1 byte for playback info, 1 for stream info, 2 for sample count
+    in->ensureBytes(4);
 
-    media::audioCodecType format = static_cast<media::audioCodecType>(in->read_uint(4));
-    int sample_rate = in->read_uint(2);	// multiples of 5512.5
-    bool sample_16bit = in->read_bit(); 
-    bool stereo = in->read_bit(); 
+    // These are all unused by current implementation
+    int reserved = in->read_uint(4); UNUSED(reserved);
+    int playbackSoundRate = in->read_uint(2);
+    bool playbackSound16bit = in->read_bit();
+    bool playbackSoundStereo = in->read_bit();
+
+    // These are the used ones
+    media::audioCodecType format = static_cast<media::audioCodecType>(in->read_uint(4)); // TODO: check input !
+    int streamSoundRate = in->read_uint(2);	// multiples of 5512.5
+    bool streamSound16bit = in->read_bit(); 
+    bool streamSoundStereo = in->read_bit(); 
 
     // checks if this is a new streams header or just one in the row
-    if (format == 0 && sample_rate == 0 && !sample_16bit && !stereo) return;
+    if (format == 0 && streamSoundRate == 0 && !streamSound16bit && !streamSoundStereo) return;
 
-    unsigned int sample_count = in->read_u16();
-	int latency = 0;
-    if (format == media::AUDIO_CODEC_MP3) {
-		latency = in->read_s16();
-		garbage = in->read_uint(16);
-	}
+    // 2 bytes here
+    unsigned int sampleCount = in->read_u16();
+
+    int latency = 0;
+    if (format == media::AUDIO_CODEC_MP3)
+    {
+        in->ensureBytes(2);
+        latency = in->read_s16(); // UNUSED !!
+        //garbage = in->read_uint(16);
+    }
 
     IF_VERBOSE_PARSE
     (
-	log_parse(_("sound stream head: format=%d, rate=%d, 16=%d, stereo=%d, ct=%d"),
-		  int(format), sample_rate, int(sample_16bit), int(stereo), sample_count);
+	log_parse(_("sound stream head: format=%d, rate=%d, 16=%d, stereo=%d, ct=%d, latency=%d"),
+		  int(format), streamSoundRate, int(streamSound16bit), int(streamSoundStereo), sampleCount, latency);
     );
 
-   // Wot about reading the sample_count samples?
+    // Wot about reading the sample_count samples?
 
-    if (! (sample_rate >= 0 && sample_rate <= 3))
+    if (! (streamSoundRate >= 0 && streamSoundRate <= 3))
     {
-	IF_VERBOSE_MALFORMED_SWF(
+        IF_VERBOSE_MALFORMED_SWF(
 	    log_swferror(_("Bad sound sample rate %d read from SWF header"),
-			 sample_rate);
+			 streamSoundRate);
 	    );
-	return;
+        return;
     }
 
 	// Store all the data in a SoundInfo object
 	std::auto_ptr<media::SoundInfo> sinfo;
-	sinfo.reset(new media::SoundInfo(format, stereo, s_sample_rate_table[sample_rate], sample_count, sample_16bit));
+	sinfo.reset(new media::SoundInfo(format, streamSoundStereo, s_sample_rate_table[streamSoundRate], sampleCount, streamSound16bit));
 
 	// Stores the sounddata in the soundhandler, and the ID returned
 	// can be used to starting, stopping and deleting that sound
@@ -1305,7 +1316,9 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
     // discard garbage data if format is MP3
     if (format == media::AUDIO_CODEC_MP3)
     {
-        //log_debug("Skipping 4 garbage bytes of MP3 format... (CHECKME!)");
+        // 2bytes is sampleCount
+        // 2bytes is seekSamples
+        //log_debug("Skipping 4 garbage bytes of MP3 format... (2 are samples count, 2 are seek samples!)");
         in->ensureBytes(4);
         in->skip_bytes(4);
     }
