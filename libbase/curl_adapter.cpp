@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: curl_adapter.cpp,v 1.44 2007/10/30 18:55:41 strk Exp $ */
+/* $Id: curl_adapter.cpp,v 1.45 2007/12/03 19:05:01 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -304,6 +304,9 @@ CurlStreamFile::fill_cache(long unsigned size)
 #ifdef GNASH_CURL_VERBOSE
 	fprintf(stderr, "fill_cache(%lu) called\n", size);
 #endif
+
+	// early out
+	if ( ! _running || _cached >= size ) return;
 
 	// I don't think we can rely on this, unless we
 	// can trust the result (the interface isn't documented

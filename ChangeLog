@@ -1,5 +1,7 @@
 2007-12-03 Sandro Santilli <strk@keybit.net>
 
+	* libbase/curl_adapter.cpp (fill_cache): one liner early-out to
+	  improve loading speed x3.
 	* server/array.cpp: register native functions, fix interface
 	  initialization and logging.
 	* server/asobj/Global.cpp: ASNative => ASnative
