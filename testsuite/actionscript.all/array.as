@@ -18,18 +18,22 @@
 
 // Initial test written by Mike Carlson
 
-rcsid="$Id: array.as,v 1.35 2007/09/29 16:22:58 strk Exp $";
+rcsid="$Id: array.as,v 1.36 2007/12/03 18:05:07 strk Exp $";
 
 #include "check.as"
 
 check_equals(typeof(Array), 'function');
+check_equals ( Array.CASEINSENSITIVE , 1 );
+check_equals ( Array.DESCENDING , 2 );
+check_equals ( Array.UNIQUESORT , 4 );
+check_equals ( Array.RETURNINDEXEDARRAY , 8 );
+check_equals ( Array.NUMERIC , 16 );
 check_equals(typeof(Array.prototype), 'object');
 check_equals(typeof(Array.prototype.__proto__), 'object');
 check_equals(Array.prototype.__proto__, Object.prototype);
 check_equals(typeof(Array.prototype.concat), 'function');
 check_equals(typeof(Array.prototype.join), 'function');
 check_equals(typeof(Array.prototype.pop), 'function');
-
 check_equals(typeof(Array.prototype.push), 'function');
 check_equals(typeof(Array.prototype.reverse), 'function');
 check_equals(typeof(Array.prototype.shift), 'function');
@@ -40,7 +44,18 @@ check_equals(typeof(Array.prototype.splice), 'function');
 check_equals(typeof(Array.prototype.unshift), 'function');
 check_equals(typeof(Array.prototype.toString), 'function');
 check_equals(typeof(Array.prototype.length), 'undefined');
+check_equals(typeof(Array.prototype.size), 'undefined');
+check_equals ( typeof(Array.prototype.CASEINSENSITIVE), 'undefined' );
+check_equals ( typeof(Array.prototype.DESCENDING), 'undefined' );
+check_equals ( typeof(Array.prototype.UNIQUESORT), 'undefined' );
+check_equals ( typeof(Array.prototype.RETURNINDEXEDARRAY), 'undefined' );
+check_equals ( typeof(Array.prototype.NUMERIC), 'undefined' );
 #if OUTPUT_VERSION >= 6
+check ( Array.hasOwnProperty('CASEINSENSITIVE') );
+check ( Array.hasOwnProperty('DESCENDING') );
+check ( Array.hasOwnProperty('UNIQUESORT') );
+check ( Array.hasOwnProperty('RETURNINDEXEDARRAY') );
+check ( Array.hasOwnProperty('NUMERIC') );
 check(Array.prototype.hasOwnProperty('concat'));
 check(Array.prototype.hasOwnProperty('join'));
 check(Array.prototype.hasOwnProperty('pop'));
@@ -55,7 +70,16 @@ check(Array.prototype.hasOwnProperty('unshift'));
 check(Array.prototype.hasOwnProperty('toString'));
 check(!Array.prototype.hasOwnProperty('length'));
 check(!Array.prototype.hasOwnProperty('valueOf'));
+check(!Array.prototype.hasOwnProperty('size'));
 #endif // OUTPUT_VERSION >= 6
+
+check_equals(typeof(Array()), 'object');
+check_equals(typeof(new Array()), 'object');
+f = ASnative(252, 0);
+check_equals(typeof(f), 'function');
+a = f();
+check_equals(typeof(a), 'object');
+check_equals(typeof(a.pop), 'function');
 
 neg = new Object();
 neg.valueOf = function () { return -1; };
@@ -137,12 +161,6 @@ check_equals ( a.join.apply(a), undefined );
 check_equals ( a.join("test") , "9test8test7test551test200" );
 
 // Test one of our sorting type members
-check_equals ( Array.CASEINSENSITIVE , 1 );
-check_equals ( Array.DESCENDING , 2 );
-check_equals ( Array.UNIQUESORT , 4 );
-check_equals ( Array.RETURNINDEXEDARRAY , 8 );
-check_equals ( Array.NUMERIC , 16 );
-
 check_equals( typeof(Array.UNIQUE), 'undefined' );
 
 // the following tests do not belong here, but
@@ -162,13 +180,6 @@ check_equals( Array.UNIQUE | Array.CASEINSENSITIVE | Array.RETURNINDEXEDARRAY, 9
 // Check sort functions
 a.sort();
 check_equals ( a.toString(), "200,551,7,8,9" );
-
-// test flags
-check_equals ( Array.CASEINSENSITIVE, 1 );
-check_equals ( Array.DESCENDING, 2 );
-check_equals ( Array.UNIQUESORT, 4 );
-check_equals ( Array.RETURNINDEXEDARRAY, 8 );
-check_equals ( Array.NUMERIC, 16 );
 
 a.push(200,7,200,7,200,8,8,551,7,7);
 a.sort( Array.NUMERIC );
@@ -952,4 +963,31 @@ out = {len:0}; for (var i in b) { out[i] = 1; out['len']++; }
 xcheck_equals(out['len'], 2);
 check_equals(out[1], 1);
 check_equals(out[0], 1);
-totals();
+
+
+// TODO: test ASnative-returned functions:
+//
+// ASnative(252, 1) - [Array.prototype] push
+// ASnative(252, 2) - [Array.prototype] pop
+// ASnative(252, 3) - [Array.prototype] concat
+// ASnative(252, 4) - [Array.prototype] shift
+// ASnative(252, 5) - [Array.prototype] unshift
+// ASnative(252, 6) - [Array.prototype] slice
+// ASnative(252, 7) - [Array.prototype] join
+// ASnative(252, 8) - [Array.prototype] splice
+// ASnative(252, 9) - [Array.prototype] toString
+// ASnative(252, 10) - [Array.prototype] sort
+// ASnative(252, 11) - [Array.prototype] reverse
+// ASnative(252, 12) - [Array.prototype] sortOn 
+//
+
+
+#if OUTPUT_VERSION < 6
+ check_totals(363);
+#else
+# if OUTPUT_VERSION < 7
+  check_totals(391);
+# else
+  check_totals(398);
+# endif
+#endif

@@ -1,3 +1,11 @@
+2007-12-03 Sandro Santilli <strk@keybit.net>
+
+	* server/array.cpp: register native functions, fix interface
+	  initialization and logging.
+	* server/asobj/Global.cpp: ASNative => ASnative
+	* testsuite/actionscript.all/array.as: test for calling Array()
+	  as a normal function, ctor use trough ASnative, flag position.
+
 2007-12-03 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libmedia/sdl/MediaDecoderSdl.cpp: make gotAudio() and gotVideo()

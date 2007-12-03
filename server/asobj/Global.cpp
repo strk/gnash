@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.78 2007/12/02 14:54:33 strk Exp $ */
+/* $Id: Global.cpp,v 1.79 2007/12/03 18:05:07 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -426,7 +426,7 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 
 	// ASSetPropFlags
 	init_member("ASSetPropFlags", new builtin_function(as_global_assetpropflags));
-	init_member("ASNative", new builtin_function(as_global_asnative));
+	init_member("ASnative", new builtin_function(as_global_asnative));
 
 	// Defined in timers.h
 	init_member("setInterval", new builtin_function(timer_setinterval));

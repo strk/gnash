@@ -29,7 +29,7 @@
 #include "fn_call.h"
 #include "GnashException.h"
 #include "action.h" // for call_method
-#include "VM.h" // for PROPNAME macro to work
+#include "VM.h" // for PROPNAME, registerNative
 #include "Object.h" // for getObjectInterface()
 
 #include <string>
@@ -47,6 +47,7 @@ typedef boost::function2<bool, const as_value&, const as_value&> as_cmp_fn;
 static as_object* getArrayInterface();
 static void attachArrayProperties(as_object& proto);
 static void attachArrayInterface(as_object& proto);
+static void attachArrayStatics(as_object& proto);
 
 inline static bool int_lt_or_eq (int a)
 {
@@ -609,7 +610,9 @@ as_array_object::pop()
 	// If the array is empty, report an error and return undefined!
 	if ( elements.empty() ) 
 	{
-	    log_error(_("tried to pop element from back of empty array, returning undef"));
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("tried to pop element from back of empty array, returning undef"));
+		);
 		return as_value(); // undefined
 	}
 
@@ -625,7 +628,9 @@ as_array_object::shift()
 	// If the array is empty, report an error and return undefined!
 	if ( elements.empty() ) 
 	{
-		log_error(_("tried to shift element from front of empty array, returning undef"));
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("tried to shift element from front of empty array, returning undef"));
+		);
 		return as_value(); // undefined
 	}
 
@@ -1386,7 +1391,7 @@ as_value
 array_new(const fn_call& fn)
 {
 	IF_VERBOSE_ACTION (
-		log_action(_("array_new called, nargs = %d"), fn.nargs);
+	log_action(_("array_new called, nargs = %d"), fn.nargs);
 	);
 
 	boost::intrusive_ptr<as_array_object>	ao = new as_array_object;
@@ -1421,7 +1426,7 @@ array_new(const fn_call& fn)
 	}
 
 	IF_VERBOSE_ACTION (
-		log_action(_("array_new setting object %p in result"), (void*)ao.get());
+	log_action(_("array_new setting object %p in result"), (void*)ao.get());
 	);
 
 	return as_value(ao.get());
@@ -1435,31 +1440,73 @@ attachArrayProperties(as_object& proto)
 
 	gettersetter = new builtin_function(&array_length, NULL);
 	proto.init_property("length", *gettersetter, *gettersetter);
+
+	proto.init_member("size", new builtin_function(array_size));
 }
 
 static void
-attachArrayInterface(as_object& proto)
+attachArrayStatics(as_object& proto)
 {
-
-	proto.init_member("join", new builtin_function(array_join));
-	proto.init_member("concat", new builtin_function(array_concat));
-	proto.init_member("slice", new builtin_function(array_slice));
-	proto.init_member("push", new builtin_function(array_push));
-	proto.init_member("unshift", new builtin_function(array_unshift));
-	proto.init_member("pop", new builtin_function(array_pop));
-	proto.init_member("shift", new builtin_function(array_shift));
-	proto.init_member("splice", new builtin_function(array_splice));
-	proto.init_member("sort", new builtin_function(array_sort));
-	proto.init_member("size", new builtin_function(array_size));
-	proto.init_member("sortOn", new builtin_function(array_sortOn));
-	proto.init_member("reverse", new builtin_function(array_reverse));
-	proto.init_member("toString", new builtin_function(array_to_string));
-
 	proto.init_member("CASEINSENSITIVE", as_array_object::fCaseInsensitive);
 	proto.init_member("DESCENDING", as_array_object::fDescending);
 	proto.init_member("UNIQUESORT", as_array_object::fUniqueSort);
 	proto.init_member("RETURNINDEXEDARRAY", as_array_object::fReturnIndexedArray);
 	proto.init_member("NUMERIC", as_array_object::fNumeric);
+}
+
+static void
+attachArrayInterface(as_object& proto)
+{
+	VM& vm = proto.getVM();
+
+	// Array.push
+	vm.registerNative(array_push, 252, 1);
+	proto.init_member("push", vm.getNative(252, 1));
+
+	// Array.pop
+	vm.registerNative(array_pop, 252, 2);
+	proto.init_member("pop", vm.getNative(252, 2));
+
+	// Array.concat
+	vm.registerNative(array_concat, 252, 3);
+	proto.init_member("concat", vm.getNative(252, 3));
+
+	// Array.shift
+	vm.registerNative(array_shift, 252, 4);
+	proto.init_member("shift", vm.getNative(252, 4));
+
+	// Array.unshift
+	vm.registerNative(array_unshift, 252, 5);
+	proto.init_member("unshift", vm.getNative(252, 5));
+
+	// Array.slice
+	vm.registerNative(array_slice, 252, 6);
+	proto.init_member("slice", vm.getNative(252, 6));
+
+	// Array.join
+	vm.registerNative(array_join, 252, 7);
+	proto.init_member("join", vm.getNative(252, 7));
+
+	// Array.splice
+	vm.registerNative(array_splice, 252, 8);
+	proto.init_member("splice", vm.getNative(252, 8));
+
+	// Array.toString
+	vm.registerNative(array_to_string, 252, 9);
+	proto.init_member("toString", vm.getNative(252, 9));
+
+	// Array.sort
+	vm.registerNative(array_sort, 252, 10);
+	proto.init_member("sort", vm.getNative(252, 10));
+
+	// Array.reverse
+	vm.registerNative(array_reverse, 252, 11);
+	proto.init_member("reverse", vm.getNative(252, 11));
+
+	// Array.sortOn
+	vm.registerNative(array_sortOn, 252, 12);
+	proto.init_member("sortOn", vm.getNative(252, 12));
+
 }
 
 static as_object*
@@ -1489,11 +1536,13 @@ array_class_init(as_object& glob)
 
 	if ( ar == NULL )
 	{
+		VM& vm = glob.getVM();
+		vm.registerNative(array_new, 252, 0);
 		ar = new builtin_function(&array_new, getArrayInterface());
-		VM::get().addStatic(ar.get());
+		vm.addStatic(ar.get());
 
-		// We replicate interface to the Array class itself
-		attachArrayInterface(*ar);
+		// Attach static members
+		attachArrayStatics(*ar);
 	}
 
 	// Register _global.Array
