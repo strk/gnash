@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaParserFfmpeg.cpp,v 1.7 2007/12/01 12:58:41 bwy Exp $
+// $Id: MediaParserFfmpeg.cpp,v 1.8 2007/12/03 20:48:51 bwy Exp $
 
 #include "MediaParserFfmpeg.h"
 #include "log.h"
@@ -34,7 +34,6 @@ MediaParserFfmpeg::MediaParserFfmpeg(boost::shared_ptr<tu_file> stream)
 	_videoCodecCtx(NULL),
 	_audioCodecCtx(NULL),
 	_formatCtx(NULL),
-	_frame(NULL),
 
 	_lastVideoTimestamp(0),
 	_lastAudioTimestamp(0),

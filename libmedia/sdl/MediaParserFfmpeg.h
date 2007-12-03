@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaParserFfmpeg.h,v 1.5 2007/11/30 00:13:02 tgc Exp $
+// $Id: MediaParserFfmpeg.h,v 1.6 2007/12/03 20:48:51 bwy Exp $
 
 #ifndef __MEDIAPARSERFFMPEG_H__
 #define __MEDIAPARSERFFMPEG_H__
@@ -103,13 +103,10 @@ private:
 	// the format (mp3, avi, etc.)
 	AVFormatContext *_formatCtx;
 
-	// A ffmpeg frame
-	AVFrame* _frame;
-
 	// A ffmpeg thingy
 	ByteIOContext _byteIOCxt;
 
-	// The timestamp of the last parsed video frame, in milseconds.
+	// The timestamp of the last parsed video frame, in milliseconds.
 	uint32_t _lastVideoTimestamp;
 
 	// The timestamp of the last parsed audio frame, in seconds.

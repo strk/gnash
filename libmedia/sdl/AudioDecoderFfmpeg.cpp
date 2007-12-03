@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderFfmpeg.cpp,v 1.8 2007/11/30 13:56:04 bwy Exp $
+// $Id: AudioDecoderFfmpeg.cpp,v 1.9 2007/12/03 20:48:51 bwy Exp $
 
 #include "AudioDecoderFfmpeg.h"
 
@@ -33,7 +33,11 @@ AudioDecoderFfmpeg::AudioDecoderFfmpeg ()
 
 AudioDecoderFfmpeg::~AudioDecoderFfmpeg()
 {
-	if (_audioCodecCtx) avcodec_close(_audioCodecCtx);
+	if (_audioCodecCtx)
+	{
+		avcodec_close(_audioCodecCtx);
+		av_free(_audioCodecCtx);
+	}
 	if (_parser) av_parser_close(_parser);
 }
 
@@ -104,7 +108,8 @@ bool AudioDecoderFfmpeg::setup(AudioInfo* info)
 	if (info->type == FLASH) {
 		enum CodecID codec_id;
 
-		switch(info->codec) {
+		switch(info->codec)
+		{
 			case AUDIO_CODEC_RAW:
 				codec_id = CODEC_ID_PCM_U16LE;
 				break;
@@ -121,25 +126,35 @@ bool AudioDecoderFfmpeg::setup(AudioInfo* info)
 		_audioCodec = avcodec_find_decoder(codec_id);
 		// Init the parser
 		_parser = av_parser_init(codec_id);
-	} else if (info->type == FFMPEG) {
+	}
+	else if (info->type == FFMPEG)
+	{
 		_audioCodec = avcodec_find_decoder(static_cast<CodecID>(info->codec));
 		// Init the parser
 		_parser = av_parser_init(static_cast<CodecID>(info->codec));
-	} else {
+	}
+	else
+	{
 		return false;
 	}
 
-	if (!_parser) {	
-		log_error(_("libavcodec can't parse the current audio format"));
-		return false;
-	}
-
-	if (!_audioCodec) {
+	if (!_audioCodec)
+	{
 		log_error(_("libavcodec can't decode the current audio format"));
 		return false;
 	}
 
-	_audioCodecCtx = avcodec_alloc_context();
+	// Reuse the audioCodecCtx from the ffmpeg parser if exists/possible
+	if (info->audioCodecCtx)
+	{
+		log_debug("re-using the parser's audioCodecCtx");
+		_audioCodecCtx = info->audioCodecCtx;
+	} 
+	else
+	{
+		_audioCodecCtx = avcodec_alloc_context();
+	}
+
 	if (!_audioCodecCtx) {
 		log_error(_("libavcodec couldn't allocate context"));
 		return false;
@@ -171,6 +186,14 @@ uint8_t* AudioDecoderFfmpeg::decode(uint8_t* input, uint32_t inputSize, uint32_t
 	decodedBytes = 0;
 
 	if (parse) {
+	
+		if (!_parser)
+		{	
+			log_error(_("libavcodec can't parse the current audio format"));
+			return NULL;
+		}
+	
+	
 		bufsize = 0;
 		while (bufsize == 0 && decodedBytes < inputSize) {
 			uint8_t* frame;
@@ -200,11 +223,14 @@ uint8_t* AudioDecoderFfmpeg::decode(uint8_t* input, uint32_t inputSize, uint32_t
 	} else {
 
 		int tmp = 0;
+
 #ifdef FFMPEG_AUDIO2
 		tmp = avcodec_decode_audio2(_audioCodecCtx, reinterpret_cast<int16_t*>(output), &bufsize, input, inputSize);
 #else
 		tmp = avcodec_decode_audio(_audioCodecCtx, reinterpret_cast<int16_t*>(output), &bufsize, input, inputSize);
 #endif
+
+
 
 		if (bytes_decoded < 0 || tmp < 0 || bufsize < 0) {
 			log_error(_("Error while decoding audio data. Upgrading ffmpeg/libavcodec might fix this issue."));
