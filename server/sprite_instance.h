@@ -432,6 +432,8 @@ public:
 	/// in which case we want the event handler to find the 'this'
 	/// variable w/out attempting to rebind it.
 	///
+	/// When a sprite is destroyed, all its children are also destroyed.
+	/// 
 	/// Note: this function will release most memory associated with
 	/// the sprite as no members or drawable should be needed anymore.
 	///

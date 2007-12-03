@@ -215,6 +215,7 @@ public:
 	///
 	bool unload();
 
+	/// destroy all characters in this DisplayList
 	void destroy();
 
 	/// Add all characters in the list, maintaining depth-order
