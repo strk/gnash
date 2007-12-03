@@ -218,26 +218,18 @@ namespace gnash {
 		//
 		///
 		/// If we're scanning a tag, don't allow seeking past
-		/// the tag end. Ideally we shouldn't also allow seeking
-		/// before tag start but this is currently unimplemented.
+		/// the end or before start of it.
 		///
 		/// @return true on success, false on failure
 		/// 	Possible failures:
 		///	- given position is after end of stream.
 		///	- given position is after end of current tag, if any.
+		///	- given position is before start of current tag, if any.
 		///
 		bool set_position(unsigned long pos);
 
 		/// Return the file position of the end of the current tag.
 		unsigned long get_tag_end_position();
-
-		/// Return the length of the current tag.
-		//
-		/// should return a  'long' ?
-		///
-		unsigned get_tag_length() {
-			return _current_tag_length;
-		}
 
 		/// Return the tag type.
 		SWF::tag_type	open_tag();
@@ -294,14 +286,14 @@ namespace gnash {
 		}
 
 	private:
-		// should this be long ?
-		unsigned _current_tag_length;
 
 		tu_file*	m_input;
 		uint8_t	m_current_byte;
 		uint8_t	m_unused_bits;
 
-		std::vector<unsigned long> m_tag_stack;	// position of end of tag
+		typedef std::pair<unsigned long,unsigned long> TagBoundaries;
+		// position of start and end of tag
+		std::vector<TagBoundaries> _tagBoundsStack;
 	};
 
 

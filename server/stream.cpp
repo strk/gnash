@@ -378,16 +378,25 @@ namespace gnash {
 		align();
 
 		// If we're in a tag, make sure we're not seeking outside the tag.
-		if (m_tag_stack.size() > 0)
+		if (_tagBoundsStack.size() > 0)
 		{
-			unsigned long end_pos = m_tag_stack.back();
+			TagBoundaries& tb = _tagBoundsStack.back();
+			unsigned long end_pos = tb.second;
 			if ( pos > end_pos )
 			{
 				log_error("Attempt to seek past the end of an opened tag");
-				// abort(); ?
+				// abort(); // ?
+				// throw ParserException ?
 				return false;
 			}
-			// @@ check start pos somehow???
+			unsigned long start_pos = tb.first;
+			if ( pos < start_pos )
+			{
+				log_error("Attempt to seek before start of an opened tag");
+				// abort(); // ?
+				// throw ParserException ?
+				return false;
+			}
 		}
 
 		// Do the seek.
@@ -406,9 +415,9 @@ namespace gnash {
 
 	unsigned long stream::get_tag_end_position()
 	{
-		assert(m_tag_stack.size() > 0);
+		assert(_tagBoundsStack.size() > 0);
 
-		return m_tag_stack.back();
+		return _tagBoundsStack.back().second;
 	}
 
 
@@ -416,7 +425,6 @@ namespace gnash {
 	{
 		align();
 
-		// for debugging
 		unsigned long offset=get_position();
 
 		int	tag_header = read_u16();
@@ -426,15 +434,14 @@ namespace gnash {
 		if (tag_length == 0x3F) {
 			tag_length = m_input->read_le32();
 		}
-		_current_tag_length = tag_length;
 			
 		// Remember where the end of the tag is, so we can
 		// fast-forward past it when we're done reading it.
-		m_tag_stack.push_back(get_position() + tag_length);
+		_tagBoundsStack.push_back(std::make_pair(offset, get_position() + tag_length));
 
 		IF_VERBOSE_PARSE (
 			log_parse("SWF[%lu]: tag type = %d, tag length = %d, end tag = %lu",
-			offset, tag_type, tag_length, m_tag_stack.back());
+			offset, tag_type, tag_length, _tagBoundsStack.back().second);
 		);
 
 		return static_cast<SWF::tag_type>(tag_type);
@@ -443,9 +450,9 @@ namespace gnash {
 
 	void	stream::close_tag()
 	{
-		assert(m_tag_stack.size() > 0);
-		unsigned long end_pos = m_tag_stack.back();
-		m_tag_stack.pop_back();
+		assert(_tagBoundsStack.size() > 0);
+		unsigned long end_pos = _tagBoundsStack.back().second;
+		_tagBoundsStack.pop_back();
 
 		if ( m_input->set_position(end_pos) == TU_FILE_SEEK_ERROR )
 		{
