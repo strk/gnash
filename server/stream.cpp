@@ -425,7 +425,7 @@ namespace gnash {
 	{
 		align();
 
-		unsigned long offset=get_position();
+		unsigned long tagStart=get_position();
 
 		int	tag_header = read_u16();
 		int	tag_type = tag_header >> 6;
@@ -439,14 +439,38 @@ namespace gnash {
 		{
 			log_debug("Tag %d has a size of %d bytes !!", tag_type, tag_length);
 		}
+
+		unsigned long tagEnd = get_position()+tag_length;
+
+		if ( ! _tagBoundsStack.empty() )
+		{
+			// check that this tag doesn't cross containing tag bounds
+			unsigned long containerTagEnd = _tagBoundsStack.back().second;
+			if ( tagEnd > containerTagEnd )
+			{
+				unsigned long containerTagStart = _tagBoundsStack.back().first;
+				std::stringstream ss;
+				ss << "Tag " << tag_type << " starting at offset " << tagStart
+				   << " is advertised to end at offset " << tagEnd
+				   << " which is after end of previously opened tag starting "
+				   << " at offset " << containerTagStart
+				   << " and ending at offset " << containerTagEnd << "."
+				   << " Making it end where container tag ends.";
+				log_swferror("%s", ss.str().c_str());
+
+				// what to do now ?
+				tagEnd = containerTagEnd;
+				//throw ParserException(ss.str());
+			}
+		}
 			
 		// Remember where the end of the tag is, so we can
 		// fast-forward past it when we're done reading it.
-		_tagBoundsStack.push_back(std::make_pair(offset, get_position() + tag_length));
+		_tagBoundsStack.push_back(std::make_pair(tagStart, tagEnd));
 
 		IF_VERBOSE_PARSE (
 			log_parse("SWF[%lu]: tag type = %d, tag length = %d, end tag = %lu",
-			offset, tag_type, tag_length, _tagBoundsStack.back().second);
+			tagStart, tag_type, tag_length, tagEnd);
 		);
 
 		return static_cast<SWF::tag_type>(tag_type);

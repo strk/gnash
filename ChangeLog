@@ -1,3 +1,7 @@
+2007-12-03 Sandro Santilli <strk@keybit.net>
+
+	* server/stream.cpp (open_tag): don't trust a tag advertising
+	  to go past end of it's containing tag.
 
 2007-12-03 Sandro Santilli <strk@keybit.net>
 
