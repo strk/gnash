@@ -454,7 +454,8 @@ public:
 			int ratio,
 			int clip_depth)
 	{
-	    m_display_list.move_display_object(depth, color_xform, mat, ratio, clip_depth);
+		DisplayList& dlist = const_cast<DisplayList &>( getDisplayList() );
+	    dlist.move_display_object(depth, color_xform, mat, ratio, clip_depth);
 	}
 
 
@@ -505,7 +506,8 @@ public:
 	void	remove_display_object(int depth, int /* id */)
 	{
 	    set_invalidated();
-	    m_display_list.remove_display_object(depth);
+		DisplayList& dlist = const_cast<DisplayList &>( getDisplayList() );
+	    dlist.remove_display_object(depth);
 	}
 
 
@@ -674,7 +676,11 @@ public:
 			
 
 	const DisplayList& getDisplayList() const {
-		return m_display_list;
+		if(! is_jumping_back)	{
+			return m_display_list;
+		} else {
+			return m_tmp_display_list;
+		}
 	}
 
 	/// Return the next highest available depth
@@ -928,6 +934,9 @@ private:
 
 	/// Current Display List contents.
 	DisplayList	m_display_list;
+
+	/// temporary display list used for timeline construction during jump back
+	DisplayList m_tmp_display_list;
 
 	/// The canvas for dynamic drawing
 	//

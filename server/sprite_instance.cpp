@@ -2546,43 +2546,26 @@ sprite_instance::restoreDisplayList(size_t tgtFrame)
 	//       for jump-forwards would do
 	assert(tgtFrame <= m_current_frame);
 
+	// Just invalidate this character before jumping back.
+	// Should be optimized, but the invalidating model is not clear enough,
+	// and there are some old questions spreading the source files.
+	set_invalidated();
+
 	is_jumping_back = true; //remember we are jumping back
-
-	// 1. Find all "timeline depth" for the target frame, querying the
-	//    Timeline object in the sprite/movie definition (see implementation details)
-	// 2. Remove step 
-	//	2.1 Remove all current dynamic instances found in static depth zone 
-	//	2.2 Remove all current timeline instances at a depth NOT in the set found in step 1 
-	//  2.3 Remove all non-script-referencable instances, suboptimal!
-
-	// NOTE: reset() will call our set_invalidated() before making any change
-	m_display_list.reset(*m_def, tgtFrame, *this);
-
-	// 3. Execute all displaylist tags from first to target frame, with
-	//    target frame tag execution including ACTION tags
 
 	for (size_t f = 0; f<tgtFrame; ++f)
 	{
-		//
-		// Set m_current_frame so it is correct (0-based) during
-		// execute_frame_tags and thus timeline objects placement
-		// (need to correctly set TimelineInfo record).
-		//
 		m_current_frame = f;
 		execute_frame_tags(f, TAG_DLIST);
 	}
 
-	// call_frame (setting _callignFrameActions) should never trigger ::advance,
-	// at most it shoudl trigger goto_frame which would temporarly set _callingFrameAction to false
-	// ::advance and ::goto_frame are supposedly the only callers to restoreDisplayList
-	//
-	assert(!_callingFrameActions);
-
-	// Finally, execute target frame tags, both ACTION and DLIST
+	// Execute both action tags and DLIST tags of the target frame
 	m_current_frame = tgtFrame;
 	execute_frame_tags(tgtFrame, TAG_DLIST|TAG_ACTION);
 
 	is_jumping_back = false; // finished jumping back
+
+	m_display_list.mergeDisplayList(m_tmp_display_list);
 }
 
 // 0-based frame number !
@@ -2632,137 +2615,116 @@ void
 sprite_instance::goto_frame(size_t target_frame_number)
 {
 #if defined(DEBUG_GOTOFRAME) || defined(GNASH_DEBUG_TIMELINE)
-    log_debug(_("sprite %s ::goto_frame(" SIZET_FMT ") - current frame is "
-        SIZET_FMT),
-        getTargetPath().c_str(), target_frame_number, m_current_frame);
+	log_debug(_("sprite %s ::goto_frame(" SIZET_FMT ") - current frame is "
+		SIZET_FMT),
+		getTargetPath().c_str(), target_frame_number, m_current_frame);
 #endif
 
-    // TODO: the assertion fails against all.swf with NEW_TIMELINE_DESIGN 
-    //       (swf from http://www.ferryhalim.com/orisinal/)
-    //assert(! isUnloaded() );
-    if ( isUnloaded() )
-    {
-        log_error("Sprite %s unloaded on gotoFrame call... let Gnash developers know please", getTarget().c_str());
-    }
+	// goto_frame stops by default.
+	// ActionGotoFrame tells the movieClip to go to the target frame 
+	// and stop at that frame. 
+	set_play_state(STOP);
 
-    // goto_frame stops by default.
-    // ActionGotoFrame tells the movieClip to go to the target frame 
-    // and stop at that frame. 
-    set_play_state(STOP);
-
-    if ( target_frame_number > m_def->get_frame_count() - 1)
-    {
-	target_frame_number = m_def->get_frame_count() - 1;
-
-        if ( ! m_def->ensure_frame_loaded(target_frame_number+1) )
+	if ( target_frame_number > m_def->get_frame_count() - 1)
 	{
-		log_error("Target frame of a gotoFrame(%d) was never loaded, altought frame count in header (%d) said we would have found it",
-			target_frame_number+1, m_def->get_frame_count());
-		return; // ... I guess, or not ?
+		target_frame_number = m_def->get_frame_count() - 1;
+
+		if ( ! m_def->ensure_frame_loaded(target_frame_number+1) )
+		{
+			log_error("Target frame of a gotoFrame(%d) was never loaded, altought frame count in header (%d) said we would have found it",
+				target_frame_number+1, m_def->get_frame_count());
+			return; // ... I guess, or not ?
+		}
+
+		// Just set _currentframe and return.
+		m_current_frame = target_frame_number;
+
+		// don't push actions, already tested.
+		return;
 	}
 
-	// Just set _currentframe and return.
-        m_current_frame = target_frame_number;
-
-	// don't push actions, already tested.
-	return;
-    }
-
-    if(target_frame_number == m_current_frame)
-    {
-        // don't push actions
-        return;
-    }
-
-    // Unless the target frame is the next one, stop playback of soundstream
-    int stream_id = get_sound_stream_id();
-    if (target_frame_number != m_current_frame+1 && stream_id != -1) 
+	if(target_frame_number == m_current_frame)
 	{
-        media::sound_handler* sh = get_sound_handler();
-        if (sh != NULL) sh->stop_sound(stream_id);
-        set_sound_stream_id(-1);
-    }
-
-    size_t loaded_frames = get_loaded_frames();
-    // target_frame_number is 0-based, get_loaded_frames() is 1-based
-    // so in order to goto_frame(3) loaded_frames must be at least 4
-    // if goto_frame(4) is called, and loaded_frames is 4 we're jumping
-    // forward
-    if ( target_frame_number >= loaded_frames )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("GotoFrame(" SIZET_FMT ") targets a yet "
-                "to be loaded frame (" SIZET_FMT ") loaded). "
-                "We'll wait for it but a more correct form "
-                "is explicitly using WaitForFrame instead"),
-                target_frame_number+1,
-                loaded_frames);
-
-        );
-        if ( ! m_def->ensure_frame_loaded(target_frame_number+1) )
-	{
-		log_error("Target frame of a gotoFrame(%d) was never loaded, altought frame count in header (%d) said we would have found it",
-			target_frame_number+1, m_def->get_frame_count());
-		return; // ... I guess, or not ?
+		// don't push actions
+		return;
 	}
-    }
 
-
-    //
-    // Construct the DisplayList of the target frame
-    //
-    
-    if (target_frame_number < m_current_frame)
-    // Go backward to a previous frame
-    {
-	// NOTE: just in case we're being called by code in a called frame
-	//       we'll backup and resume the _callingFrameActions flag
-	bool callingFrameActionsBackup = _callingFrameActions;
-	_callingFrameActions = false;
-        // restoreDisplayList takes care of properly setting the m_current_frame variable
-        restoreDisplayList(target_frame_number);
-        assert(m_current_frame == target_frame_number);
-	_callingFrameActions = callingFrameActionsBackup;
-
-       // <UdoG> current design is sub-optimal because it causes unnecessary 
-       // redraw. Consider a static graphic that stays at it's position all
-       // the time. When looping betwen two frames 
-       // gotoAndPlay(_currentframe-1);
-       // then restoreDisplayList() will remove that character and 
-       // execute_frame_tags() will insert it again. So the next 
-       // set_invalidated() call (which currently *is* correct) will cause
-       // redraw of the whole sprite even if it doesn't change visually
-       // at all.
-    }
-    else
-    // Go forward to a later frame
-    {
-        // We'd immediately return if target_frame_number == m_current_frame
-        assert(target_frame_number > m_current_frame);
-	while (++m_current_frame < target_frame_number)
+	// Unless the target frame is the next one, stop playback of soundstream
+	int stream_id = get_sound_stream_id();
+	if (target_frame_number != m_current_frame+1 && stream_id != -1) 
 	{
-            //for (size_t f = m_current_frame+1; f<target_frame_number; ++f) 
-            // Second argument requests that only "DisplayList" tags
-            // are executed. This means NO actions will be
-            // pushed on m_action_list.
-            execute_frame_tags(m_current_frame, TAG_DLIST);
-        }
-        assert(m_current_frame == target_frame_number);
+		media::sound_handler* sh = get_sound_handler();
+		if (sh != NULL) sh->stop_sound(stream_id);
+		set_sound_stream_id(-1);
+	}
 
-#if defined(GNASH_DEBUG_TIMELINE)
-    cout << "At end of DisplayList reconstruction, m_current_frame is " << m_current_frame << endl;
-#endif
+	size_t loaded_frames = get_loaded_frames();
+	// target_frame_number is 0-based, get_loaded_frames() is 1-based
+	// so in order to goto_frame(3) loaded_frames must be at least 4
+	// if goto_frame(4) is called, and loaded_frames is 4 we're jumping
+	// forward
+	if ( target_frame_number >= loaded_frames )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("GotoFrame(" SIZET_FMT ") targets a yet "
+			"to be loaded frame (" SIZET_FMT ") loaded). "
+			"We'll wait for it but a more correct form "
+			"is explicitly using WaitForFrame instead"),
+			target_frame_number+1,
+			loaded_frames);
 
-       // Now execute target frame tags (queuing actions)
-       // NOTE: just in case we're being called by code in a called frame
-       //       we'll backup and resume the _callingFrameActions flag
-       bool callingFrameActionsBackup = _callingFrameActions;
-       _callingFrameActions = false;
-       execute_frame_tags(target_frame_number, TAG_DLIST|TAG_ACTION);
-       _callingFrameActions = callingFrameActionsBackup;
-    }
+		);
+		if ( ! m_def->ensure_frame_loaded(target_frame_number+1) )
+		{
+			log_error("Target frame of a gotoFrame(%d) was never loaded, altought frame count in header (%d) said we would have found it",
+				target_frame_number+1, m_def->get_frame_count());
+			return; // ... I guess, or not ?
+		}
+	}
 
-    assert(m_current_frame == target_frame_number);
+
+	//
+	// Construct the DisplayList of the target frame
+	//
+
+	if (target_frame_number < m_current_frame)
+	// Go backward to a previous frame
+	{
+		// NOTE: just in case we're being called by code in a called frame
+		//       we'll backup and resume the _callingFrameActions flag
+		bool callingFrameActionsBackup = _callingFrameActions;
+		_callingFrameActions = false;
+		// restoreDisplayList takes care of properly setting the m_current_frame variable
+		restoreDisplayList(target_frame_number);
+		assert(m_current_frame == target_frame_number);
+		_callingFrameActions = callingFrameActionsBackup;
+	}
+	else
+	// Go forward to a later frame
+	{
+		// We'd immediately return if target_frame_number == m_current_frame
+		assert(target_frame_number > m_current_frame);
+		while (++m_current_frame < target_frame_number)
+		{
+			//for (size_t f = m_current_frame+1; f<target_frame_number; ++f) 
+			// Second argument requests that only "DisplayList" tags
+			// are executed. This means NO actions will be
+			// pushed on m_action_list.
+			execute_frame_tags(m_current_frame, TAG_DLIST);
+		}
+		assert(m_current_frame == target_frame_number);
+
+
+		// Now execute target frame tags (queuing actions)
+		// NOTE: just in case we're being called by code in a called frame
+		//       we'll backup and resume the _callingFrameActions flag
+		bool callingFrameActionsBackup = _callingFrameActions;
+		_callingFrameActions = false;
+		execute_frame_tags(target_frame_number, TAG_DLIST|TAG_ACTION);
+		_callingFrameActions = callingFrameActionsBackup;
+	}
+
+	assert(m_current_frame == target_frame_number);
 }
 
 bool sprite_instance::goto_labeled_frame(const std::string& label)
@@ -2859,35 +2821,20 @@ sprite_instance::add_display_object(
         );
         return NULL;
     }
-
-    character* existing_char = m_display_list.get_character_at_depth(depth);
+	
+	DisplayList& dlist = const_cast<DisplayList &>( getDisplayList() );
+    character* existing_char = dlist.get_character_at_depth(depth);
     
-    boost::intrusive_ptr<character> ch;
-    
-    bool is_ratio_compatible=true;
     if(existing_char)
     {
-     is_ratio_compatible= (ratio == existing_char->get_ratio())
-        || (ratio==character::noRatioValue && existing_char->get_ratio()==0)
-        || (ratio==0 && existing_char->get_ratio()==character::noRatioValue);
+		return NULL;
     }
-
-    // Place a new character if:
-    //  (1)target depth is empty 
-    //  (2)target depth is not empty but the character has a different ratio 
-    // in jump-back-mode.
-    if(!existing_char || (is_jumping_back && !is_ratio_compatible))
-    {
-        // TODO: Optimize this.
-        // Create_character_instance() is too expensive for some characters.
-        // All I need to do here might be just syntetize a new instance name,
-        // the real character is not needed.
-        // To decide whether a new instance name is needed for static characters, 
-        // a single character_id should be enough. 
-        ch = cdef->create_character_instance(this, character_id);
-        ch->setTimelineInfo(depth, m_current_frame, false);
-
-        if(name)
+	else
+	{
+		boost::intrusive_ptr<character> ch = cdef->create_character_instance(this, character_id);
+		ch->setTimelineInfo(depth, m_current_frame, false);
+		
+		if(name)
         {
             ch->set_name(name);
         }
@@ -2896,15 +2843,15 @@ sprite_instance::add_display_object(
             std::string instance_name = getNextUnnamedInstanceName();
             ch->set_name(instance_name.c_str());
         }
-
-        // Attach event handlers (if any).
+	    
+		// Attach event handlers (if any).
         for (size_t i = 0, n = event_handlers.size(); i < n; i++)
         {
             swf_event* ev = event_handlers[i];
             ch->add_event_handler(ev->event(), ev->action());
         }
 
-        m_display_list.place_character(
+		dlist.place_character(
             ch.get(),
             depth,
             color_transform,
@@ -2913,21 +2860,7 @@ sprite_instance::add_display_object(
             clip_depth);
 
         return ch.get();
-    }
-    
-    // move the existing charater if has same ratio in jump-back-mode
-    if(existing_char && is_jumping_back && is_ratio_compatible)
-    {
-        // remove the created character from the key listener list,
-        // it might be there(eg. button_character).
-        // TODO: optimize this.  This is not necessary if we don't create
-        // instances blindly above.
-        if ( ch ) _vm.getRoot().remove_key_listener(ch.get());
-
-        move_display_object(depth, &color_transform, &mat, ratio, clip_depth);
-    }
-
-    return NULL;
+	}
 }
 
 void
@@ -2951,7 +2884,9 @@ sprite_instance::replace_display_object(
     }
     assert(cdef);
 
-    character* existing_char = m_display_list.get_character_at_depth(depth);
+   	DisplayList& dlist = const_cast<DisplayList &>( getDisplayList() );
+    character* existing_char = dlist.get_character_at_depth(depth);
+
     if (existing_char)
     {
         // if the existing character is not a shape, move it instead of replace
@@ -2967,15 +2902,18 @@ sprite_instance::replace_display_object(
             ch->setTimelineInfo(depth, m_current_frame, true);
     
             replace_display_object(
-                ch.get(), name, depth,
+                ch.get(), 
+				name, 
+				depth,
                 color_transform,
                 mat,
-                ratio, clip_depth);
+                ratio, 
+				clip_depth);
         }
     }
     else // non-existing character
     {
-	log_error("sprite_instance::replace_display_object: could not find any character at depth %d", depth);
+		log_error("sprite_instance::replace_display_object: could not find any character at depth %d", depth);
     } 
 }
 
@@ -2997,13 +2935,15 @@ void sprite_instance::replace_display_object(
         ch->set_name(name);
     }
 
-    m_display_list.replace_character(
-    ch,
-    depth,
-    color_transform,
-    mat,
-    ratio,
-    clip_depth);
+	DisplayList& dlist = const_cast<DisplayList &>( getDisplayList() );
+
+    dlist.replace_character(
+		ch,
+		depth,
+		color_transform,
+		mat,
+		ratio,
+		clip_depth);
     
 }
 
@@ -3952,6 +3892,8 @@ sprite_instance::markReachableResources() const
 void
 sprite_instance::destroy()
 {
+	m_display_list.destroy();
+
 	/// We don't need these anymore
 	clearProperties();
 

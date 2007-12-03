@@ -1,3 +1,13 @@
+2007-12-03 Zou Lunkai <zoulunkai@gmail.com>
+	* server/dlist.{h, cpp}: add mergeDisplayList() for timeline control attempt5.
+	* server/sprite_instance.{h,cpp): restoreDisplayList(), use the new 
+	  mergeDisplayList() interface; cleanups for executing a PlaceObject2 tag.
+	* testsuite/misc-ming.all/loop_test10.c: xchecks to checks.
+	* testsuite/misc-ming.all/loop_test-Runner.cpp: allow a invalidated bound
+	  detection regression, one check to xcheck. This regression is caused by
+	  always invalidating a looping back character, could be fixed in later 
+	  optimization step.	
+
 2007-12-02 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/render_handler{.h,_ogl.cpp,_agg.cpp,_cairo.cpp},

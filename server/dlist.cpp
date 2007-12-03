@@ -743,7 +743,35 @@ DisplayList::unload()
   return ! _charsByDepth.empty();
 
 }
-  
+
+
+void
+DisplayList::destroy()
+{
+  //GNASH_REPORT_FUNCTION;
+
+  testInvariant();
+
+  // Should we start looking from beginNonRemoved ?
+  // If I try, I get a failure in swfdec/gotoframe.swf
+  for (iterator it = _charsByDepth.begin(), itEnd = _charsByDepth.end(); it != itEnd; )
+  {
+    // make a copy
+    DisplayItem di = *it;
+
+    // skip if already unloaded
+    if ( di->isDestroyed() )
+    {
+      ++it;
+      continue;
+    }
+
+	di->destroy();
+	it = _charsByDepth.erase(it); 
+  }
+  testInvariant();
+}
+
 // Display the referenced characters. Lower depths
 // are obscured by higher depths.
 void
@@ -1003,6 +1031,156 @@ DisplayList::sort()
   _charsByDepth.sort(DisplayItemDepthLess());
 }
 
+void
+DisplayList::mergeDisplayList(DisplayList & newList)
+{
+	testInvariant();
+
+	iterator itOld = beginNonRemoved(_charsByDepth);
+	iterator itNew = beginNonRemoved(newList._charsByDepth);
+
+	iterator itOldEnd = staticZoneEnd(_charsByDepth);
+	iterator itNewEnd = staticZoneEnd(newList._charsByDepth); 
+
+	while( itOld != itOldEnd )
+	{
+		iterator itOldBack = itOld;
+		
+		boost::intrusive_ptr<character> chOld = itOldBack->get();
+		int depthOld = chOld->get_depth();
+
+		while( itNew != itNewEnd )
+		{
+			iterator itNewBack = itNew;
+			
+			boost::intrusive_ptr<character> chNew = itNewBack->get();
+			int depthNew = chNew->get_depth();
+			
+			// unload the old character if it is not in the new list
+			if( depthOld < depthNew )
+			{
+				itOld++;
+
+				_charsByDepth.erase(itOldBack);
+
+				if ( chOld->unload() )
+				{
+					reinsertRemovedCharacter(chOld);
+				}
+				else 
+				{
+					chOld->destroy();
+				}
+
+				break;
+			}
+			// if depth is occupied in both lists
+			else if( depthOld == depthNew )
+			{
+				itOld++;
+				itNew++;
+
+				bool is_ratio_compatible = ( ( chOld->get_ratio() == chNew->get_ratio() )
+					|| ( chOld->get_ratio()==0 && chNew->get_ratio()==character::noRatioValue )
+					|| ( chOld->get_ratio()==character::noRatioValue && chNew->get_ratio()==0 )	);
+				
+				if( !is_ratio_compatible || chOld->isDynamic() || !chOld->isActionScriptReferenceable() )
+				{
+					// replace the old character with the character in the new depth
+					_charsByDepth.insert(itOldBack, *itNewBack);
+					_charsByDepth.erase(itOldBack);
+					
+					// unload the old character
+					if ( chOld->unload() )
+					{
+						reinsertRemovedCharacter(chOld);
+					} 
+					else 
+					{
+						chOld->destroy();
+					}
+				}
+				else
+				{
+					newList._charsByDepth.erase(itNewBack);
+
+					// replace the transformation matrix if the old character accepts transform
+					if( chOld->get_accept_anim_moves() )
+					{
+						chOld->set_matrix(chNew->get_matrix());
+						chOld->set_cxform(chNew->get_cxform());
+						
+						// TODO: update the name if needed
+						//chOld->set_name(chNew->get_name().c_str());
+					}
+					chNew->unload();
+					chNew->destroy();
+				}
+
+				break;
+			}
+			// add the new character if it is not in the old list
+			else 
+			{
+				itNew++;
+
+				_charsByDepth.insert(itOldBack, *itNewBack );
+			}
+		}// end of while
+
+		if( itNew == itNewEnd )
+		{
+			break;
+		}
+	}// end of while
+	
+	// unload remaining characters in old list
+	while( itOld != itOldEnd )
+	{
+		boost::intrusive_ptr<character> chOld = itOld->get();
+
+		itOld = _charsByDepth.erase(itOld);
+
+		if ( chOld->unload() )
+		{
+			reinsertRemovedCharacter(chOld);
+		}
+		else 
+		{
+			chOld->destroy();
+		}
+	}
+
+	// add remaining characters in new list to the old list
+	if( itNew != itNewEnd )
+	{
+		_charsByDepth.insert(itOld, itNew, itNewEnd);
+	}
+
+	// Copy all unloaded characters from the new display list to the old display list, 
+	// and clear the new display list
+	for (itNew = newList._charsByDepth.begin(); itNew != itNewEnd; ++itNew)
+	{
+		boost::intrusive_ptr<character> chNew = itNew->get();
+		int depthNew = chNew->get_depth();
+
+		if( chNew->isUnloaded() )
+		{
+			iterator it = find_if(_charsByDepth.begin(), _charsByDepth.end(),
+					DepthGreaterOrEqual(depthNew));
+			
+			_charsByDepth.insert(it, *itNew);
+		}
+	}
+
+	// clear the new display list after merge
+	newList._charsByDepth.clear();
+
+	testInvariant();
+}
+
+
+
 std::ostream& operator<< (std::ostream& os, const DisplayList& dl)
 {
   os << "By depth: ";
@@ -1025,13 +1203,12 @@ void
 DisplayList::reinsertRemovedCharacter(boost::intrusive_ptr<character> ch)
 {
   assert(ch->isUnloaded());
+  testInvariant();
 
   // TODO: have this done by character::unload() instead ?
   int oldDepth = ch->get_depth();
   int newDepth = character::removedDepthOffset - oldDepth;
   ch->set_depth(newDepth);
-
-  testInvariant();
 
   // TODO: optimize this by searching from the end(lowest depth).
   container_type::iterator it = find_if(
@@ -1057,6 +1234,20 @@ DisplayList::beginNonRemoved(const container_type& c)
 {
   return std::find_if(c.begin(), c.end(),
       DepthGreaterOrEqual(character::removedDepthOffset - character::staticDepthOffset));
+}
+
+/*private static*/
+DisplayList::iterator
+DisplayList::staticZoneEnd(container_type& c)
+{
+	return std::find_if(c.begin(), c.end(), DepthGreaterOrEqual(0));
+}
+
+/*private static*/
+DisplayList::const_iterator
+DisplayList::staticZoneEnd(const container_type& c)
+{
+	return std::find_if(c.begin(), c.end(), DepthGreaterOrEqual(0));
 }
 
 void

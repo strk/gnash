@@ -215,6 +215,8 @@ public:
 	///
 	bool unload();
 
+	void destroy();
+
 	/// Add all characters in the list, maintaining depth-order
 	//
 	/// @param chars
@@ -382,6 +384,10 @@ public:
 	///
 	void sort ();
 	
+	/// \brief
+	/// merge the given display list
+	void mergeDisplayList(DisplayList& newList);
+
 	bool operator==(const DisplayList& other) const { return _charsByDepth == other._charsByDepth; }
 
 	bool operator!=(const DisplayList& other) const { return _charsByDepth != other._charsByDepth; }
@@ -397,8 +403,15 @@ private:
 	/// Return an iterator to the first element of the container NOT in the "removed" depth zone
 	static iterator beginNonRemoved(container_type& c);
 
-	/// Return an iterator to the first element of the container NOT in the "removed" depth zone
+	/// Return an constant iterator to the first element of the container NOT in the "removed" depth zone
 	static const_iterator beginNonRemoved(const container_type& c);
+
+	/// Return an iterator succeeding the last element in the static zone
+	static iterator staticZoneEnd(container_type& c);
+	
+	/// Return an constant iterator succeeding the last element in the static zone
+	static const_iterator staticZoneEnd(const container_type& c);
+
 
 	/// Re-insert a removed-from-stage character after appropriately
 	/// shifting its depth based on the character::removedDepthOffset

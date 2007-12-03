@@ -174,12 +174,11 @@ main(int argc, char** argv)
   
   check_equals(mo, "mc1Initialized", "2");
   check_equals(mo, "mc2Initialized", "2");
-  xcheck_equals(mo, "mc3Initialized", "1");
+  check_equals(mo, "mc3Initialized", "1");
   check_equals(mo, "mc1Unloaded", "2");
   check_equals(mo, "mc2Unloaded", "2");
-  xcheck_equals(mo, "mc3Unloaded", "0");
+  check_equals(mo, "mc3Unloaded", "0");
   
-  // Don't bother to fix this order untill timeline control is fixed.
   xcheck_equals(mo, "asOrder", "'0+1+2+3+4+5+1+2+3+5+'");
   add_actions(mo, "totals(); stop();");
   SWFMovie_nextFrame(mo);  // frame 7
