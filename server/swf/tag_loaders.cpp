@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.157 2007/11/28 17:35:44 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.158 2007/12/03 11:34:08 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1289,12 +1289,12 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
     // If we don't have a sound_handler registered stop here
     if (!handler) return;
 
-	// Get the ID of the sound stream currently being loaded
+    // Get the ID of the sound stream currently being loaded
     int handle_id = m->get_loading_sound_stream_id();
 
-	// Get the SoundInfo object that contains info about the sound stream.
-	// Ownership of the object is in the soundhandler
-	media::SoundInfo* sinfo = handler->get_sound_info(handle_id);
+    // Get the SoundInfo object that contains info about the sound stream.
+    // Ownership of the object is in the soundhandler
+    media::SoundInfo* sinfo = handler->get_sound_info(handle_id);
 
     // If there is no SoundInfo something is wrong...
     if (!sinfo) return;
@@ -1302,10 +1302,23 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
     media::audioCodecType format = sinfo->getFormat();
     unsigned int sample_count = sinfo->getSampleCount();
 
-	// discard garbage data if format is MP3
-    if (format == media::AUDIO_CODEC_MP3) in->skip_bytes(4);
+    // discard garbage data if format is MP3
+    if (format == media::AUDIO_CODEC_MP3)
+    {
+        //log_debug("Skipping 4 garbage bytes of MP3 format... (CHECKME!)");
+        in->ensureBytes(4);
+        in->skip_bytes(4);
+    }
 
     unsigned int data_bytes = in->get_tag_end_position() - in->get_position();
+    if ( ! data_bytes )
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+        log_swferror("No data bytes left to read in SOUNDSTREAMBLOCK tag");
+        );
+        return;
+    }
+
     unsigned char *data = new unsigned char[data_bytes];
     in->read((char*)data, data_bytes);
 

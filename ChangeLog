@@ -1,5 +1,8 @@
 2007-12-03 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp (sound_stream_block_loader): ensure
+	  needed bytes are available, don't attempt to read 0 bytes
+	  from stream (malformed swf).
 	* server/stream.{cpp,h}: drop unused get_tag_length, forbid
 	  seek-backs to before any opened tag start.
 	* server/parser/movie_def_impl.{cpp,h}: mutex-protect
