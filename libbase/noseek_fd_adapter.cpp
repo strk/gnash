@@ -110,9 +110,6 @@ private:
 	// Use this file to cache data
 	FILE* _cache;
 
-	// _cache file descriptor
-	int _cachefd;
-
 	// the input file descriptor
 	int _fd;
 
@@ -278,7 +275,6 @@ NoSeekFile::openCacheFile()
 			throw gnash::GnashException("Could not create temporary cache file");
 		}
 	}
-	_cachefd = fileno(_cache);
 
 }
 
