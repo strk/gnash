@@ -1,0 +1,6 @@
+[Desktop Entry]
+Comment=Gnash, the GNU swf movie player
+Exec=gnash
+Icon=gnash.png
+Type=Application
+Name=FooBar

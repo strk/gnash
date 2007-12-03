@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.94 2007/11/28 03:34:26 rsavoye Exp $
+# $Id: Makefile.am,v 1.95 2007/12/03 00:22:04 rsavoye Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -65,19 +65,77 @@ noinst_HEADERS = compatibility_include.h
 # 	rpmbuild -rcfile=$(srcdir)/packaging/redhat/rpmrc:/usr/lib/rpm/rpmrc \
 # 	         -ba --target=geode-olpc /usr/src/redhat/SPECS/gnash.spec
 
-# Build an RPM package
+# Build an Redhat/Fedora .rpm package
 rpm redhat: dist-gzip $(srcdir)/packaging/redhat/gnash.spec
 	cp -f $(srcdir)/packaging/redhat/gnash.spec /usr/src/redhat/SPECS/
 	cp -f gnash-$(VERSION).tar.gz /usr/src/redhat/SOURCES/
 	rpmbuild -ba /usr/src/redhat/SPECS/gnash.spec
 
-# Build a Debian GNU/Linux package
+# Build a Debian/Ubuntu .deb GNU/Linux package
 deb debian: dist-bzip2 $(srcdir)/packaging/debian/rules
 	rm -rf gnash-${VERSION}
 	tar jxf gnash-${VERSION}.tar.bz2
 	cp -fr $(srcdir)/packaging/debian gnash-${VERSION}/
 	(cd gnash-${VERSION}; dpkg-buildpackage)
 
+# Build a Debian Familiar .ipk GNU/Linux package. These are always
+# cross compiled, typically for the ARM or XScale.
+
+# this is where the output of "make install" goes, which is what
+# we use to build the package.
+IPKG_TMP=/tmp/$(host_alias)-gnash
+
+# this is where the gnash gets compiled
+IPKG_BUILD=gnash-${VERSION}
+
+CLEANFILES = ipkg-*
+
+ipkg-configure: ipkg-unpack $(IPKG_BUILD)
+	-@rm -f ipkg-configure
+	cd $(IPKG_BUILD); ./configure --host=$(host_alias) \
+	  --build=$(build_triplet) --prefix=/usr \
+	  --mandir=/usr/share/man \
+	  --infodir=/usr/share/info \
+	  --with-plugindir=/usr/lib/mozilla/plugins \
+	  --enable-static --disable-shared --disable-kparts \
+	  --enable-gui=qtopia --enable-media=none
+	@touch  ipkg-configure
+
+ipkg-unpack: $(top_builddir)/config.status
+	-@rm -f ipkg-*		# nuke everything, we're starting over
+	-@rm -f ipkg-unpack
+	rm -rf $(IPKG_BUILD)
+	tar jxf $(IPKG_BUILD).tar.bz2
+	@touch ipkg-unpack
+
+ipkg-build: ipkg-configure
+	-@rm -f ipkg-build
+	$(MAKE) -C $(IPKG_BUILD) all
+	@touch ipkg-build
+
+ipkg-install: ipkg-build Makefile
+	-@rm -f ipkg-install
+	@echo "FIXME:	$@"
+	$(MAKE) -C $(IPKG_BUILD) install DESTDIR=$(IPKG_TMP)
+	@touch ipkg-install
+
+ipk ipkg: ipkg-install
+	if ! test -d $(IPKG_TMP)/CONTROL ; then \
+	  mkdir $(IPKG_TMP)/CONTROL; \
+	fi
+	topdir=`cd ${top_srcdir}; pwd`; \
+	for i in control postinst; do \
+	  cp -f $${topdir}/packaging/ipkg/$$i $(IPKG_TMP)/CONTROL; \
+	done; \
+	for i in rules Gnash.desktop; do \
+	  cp -f $${topdir}/packaging/ipkg/$$i $(IPKG_TMP)/ ; \
+	done;
+	ipkg-build $(IPKG_TMP)
+
+ipkg-clean:
+	rm -fr ipkg-* $(IPKG_BUILD)
+
+# build a snapshot
 snapshot: distdir
 	now=`date -u "+%Y%m%d"`; \
 	mv gnash-${VERSION} gnash-$${now}; \
@@ -287,5 +345,5 @@ check: check-recursive anal
 anal testreport checksum:
 	$(srcdir)/testsuite/anaylse-results.sh
 
-.PHONY : dumpconfig anal testreport checksum check mudflap mudflap-check snapshot deb debian rmp redhat
+.PHONY : dumpconfig anal testreport checksum check mudflap mudflap-check snapshot deb debian rpm redhat ipkg ipk
 

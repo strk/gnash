@@ -1,0 +1,9 @@
+Package: gnash
+Priority: optional
+Version: 0.8.1.cvs
+Section: Misc
+Architecture: arm
+Maintainer: Rob Savoye
+Source: Gnash cvs HEAD
+Depends: libc6
+Description: Gnash is the GNU swf movie player client, and web browser plugin.

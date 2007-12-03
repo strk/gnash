@@ -1,3 +1,10 @@
+2007-12-02  Rob Savoye  <rob@ute.welcomehome.org>
+
+	* Makefile.am: Add target to build ipk packages.
+	* packaging/ipkg: new directory for ipk packaging files.
+	* packaging/ipkg/{Gnash.desktop, control, postinst, prerm,
+	GnashG.xpm}: New files to build ipks. 
+
 2007-12-02 Sandro Santilli <strk@keybit.net>
 
 	* libbase/noseek_fd_adapter.cpp: stop calling fstat and needlessly

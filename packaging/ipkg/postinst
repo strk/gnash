@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# put any post-install stuff in here that you need to do
+
+# echo "application/x-shockwave-flash                   swf swfl" $QTDIR/etc/mime.types
