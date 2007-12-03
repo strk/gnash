@@ -95,9 +95,13 @@ namespace zlib_adapter
 		}
 
 
-		void	reset()
 		// Discard current results and rewind to the beginning.
 		// Necessary in order to seek backwards.
+		//
+		// might throw a ParserException if unable to reset the uderlying
+		// stream to original position.
+		//
+		void	reset()
 		{
 			m_error = 0;
 			m_at_eof = 0;
@@ -115,7 +119,12 @@ namespace zlib_adapter
 			m_zstream.avail_out = 0;
 
 			// Rewind the underlying stream.
-			m_in->set_position(m_initial_stream_pos);
+			if ( m_in->set_position(m_initial_stream_pos) == TU_FILE_SEEK_ERROR )
+			{
+				std::stringstream ss;
+				ss << "inflater_impl::reset: unable to seek underlying stream to position " <<  m_initial_stream_pos;
+				throw gnash::ParserException(ss.str());
+			}
 
 			m_logical_stream_pos = m_initial_stream_pos;
 		}
@@ -125,10 +134,9 @@ namespace zlib_adapter
 		{
 			using gnash::ParserException;
 
-			if (m_error)
-			{
-				return 0;
-			}
+			assert(bytes);
+
+			if (m_error) return 0;
 
 			m_zstream.next_out = (unsigned char*) dst;
 			m_zstream.avail_out = bytes;
@@ -159,26 +167,31 @@ namespace zlib_adapter
 				}
 				if (err == Z_BUF_ERROR)
 				{
-					//gnash::log_error("inflater_impl::inflate_from_stream() inflate() returned Z_BUF_ERROR");
+					std::stringstream ss;
+					ss << __FILE__ << ":" << __LINE__ << ": " << m_zstream.msg;
 					// we should call inflate again... giving more input or output space !
-					//m_error = 1;
+					gnash::log_error("%s", ss.str().c_str());
 					break;
 				}
 				if (err == Z_DATA_ERROR)
 				{
-					throw ParserException("Data error inflating input");
+					std::stringstream ss;
+					ss << __FILE__ << ":" << __LINE__ << ": " << m_zstream.msg;
+					throw ParserException(ss.str());
 					break;
 				}
 				if (err == Z_MEM_ERROR)
 				{
-					throw ParserException("Memory error inflating input");
+					std::stringstream ss;
+					ss << __FILE__ << ":" << __LINE__ << ": " << m_zstream.msg;
+					throw ParserException(ss.str());
 					break;
 				}
 				if (err != Z_OK)
 				{
 					// something's wrong.
 					std::stringstream ss;
-					ss << "inflater_impl::inflate_from_stream() inflate() returned " << err;
+					ss << __FILE__ << ":" << __LINE__ << ": " << m_zstream.msg;
 					throw ParserException(ss.str());
 					//m_error = 1;
 					break;
@@ -256,6 +269,7 @@ namespace zlib_adapter
 		// If we're seeking backwards, then restart from the beginning.
 		if (pos < inf->m_logical_stream_pos)
 		{
+			log_debug("inflater reset due to seek back");
 			inf->reset();
 		}
 
@@ -265,6 +279,7 @@ namespace zlib_adapter
 		while (inf->m_logical_stream_pos < pos)
 		{
 			int	to_read = pos - inf->m_logical_stream_pos;
+			assert(to_read > 0);
 			int	to_read_this_time = imin(to_read, ZBUF_SIZE);
 			assert(to_read_this_time > 0);
 
