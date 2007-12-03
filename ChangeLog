@@ -1,5 +1,8 @@
+
 2007-12-03 Sandro Santilli <strk@keybit.net>
 
+	* libbase/zlib_adapter.cpp: print error messages from zlib, few more
+	  checks for robustness.
 	* server/swf/tag_loaders.cpp (sound_stream_block_loader): ensure
 	  needed bytes are available, don't attempt to read 0 bytes
 	  from stream (malformed swf).
