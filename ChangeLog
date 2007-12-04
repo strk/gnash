@@ -4,6 +4,7 @@
 	  for mouse dragging, fix this should help fixing zoonmheng.swf.
 	* testsuite/misc-ming.all/loop_test10.c: more tests for name synthesis,
 	  all passed.
+	* server/dlist.cpp: mergeDisplayList(), minor cleanups.
 
 2007-12-03 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 

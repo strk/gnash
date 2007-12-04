@@ -764,8 +764,8 @@ DisplayList::destroy()
       continue;
     }
 
-	di->destroy();
-	it = _charsByDepth.erase(it); 
+    di->destroy();
+    it = _charsByDepth.erase(it); 
   }
   testInvariant();
 }
@@ -775,89 +775,89 @@ DisplayList::destroy()
 void
 DisplayList::display()
 {
-	testInvariant();
+    testInvariant();
 
-	//GNASH_REPORT_FUNCTION;
-	std::stack<int> clipDepthStack;
+    //GNASH_REPORT_FUNCTION;
+    std::stack<int> clipDepthStack;
     
-	// We only advance characters which are out of the "removed" zone (or should we check isUnloaded?)
-	iterator it = beginNonRemoved(_charsByDepth);
-	for(iterator endIt = _charsByDepth.end(); it != endIt; ++it)
-	{
-		character* ch = it->get();
-		assert(ch);
+    // We only advance characters which are out of the "removed" zone (or should we check isUnloaded?)
+    iterator it = beginNonRemoved(_charsByDepth);
+    for(iterator endIt = _charsByDepth.end(); it != endIt; ++it)
+    {
+        character* ch = it->get();
+        assert(ch);
 
-		character* mask = ch->getMask();
-		if ( mask && ch->get_visible() && ! mask->isUnloaded() )
-		{
-			render::begin_submit_mask();
-			mask->display();
-			render::end_submit_mask();
-			ch->display();
-			render::disable_mask();
-			continue;
-		}
+        character* mask = ch->getMask();
+        if ( mask && ch->get_visible() && ! mask->isUnloaded() )
+        {
+            render::begin_submit_mask();
+            mask->display();
+            render::end_submit_mask();
+            ch->display();
+            render::disable_mask();
+            continue;
+        }
 
-		// Don't display dynamic masks
-		if ( ch->isDynamicMask() )
-		{
-			continue;
-		}
+        // Don't display dynamic masks
+        if ( ch->isDynamicMask() )
+        {
+            continue;
+        }
 
-		assert(! ch->isUnloaded() ); // we don't advance unloaded chars
+        assert(! ch->isUnloaded() ); // we don't advance unloaded chars
 
-		// Check if this charater or any of its parents is a mask.
-		// Characters acting as masks should always be rendered to the
-		// mask buffer despite their visibility.
-		//
-		character * parent = ch->get_parent();
-		bool renderAsMask = ch->isMaskLayer();
-		while(!renderAsMask && parent)
-		{
-		    renderAsMask = parent->isMaskLayer();
-		    parent = parent->get_parent();
-		}
+        // Check if this charater or any of its parents is a mask.
+        // Characters acting as masks should always be rendered to the
+        // mask buffer despite their visibility.
+        //
+        character * parent = ch->get_parent();
+        bool renderAsMask = ch->isMaskLayer();
+        while(!renderAsMask && parent)
+        {
+            renderAsMask = parent->isMaskLayer();
+            parent = parent->get_parent();
+        }
         
-		// check for non-mask hiden characters
-		if( !renderAsMask && (ch->get_visible() == false))
-		{
-			// Avoid stale old_invalidated_rect
-			ch->clear_invalidated(); 
-			// Don't display non-mask hidden characters
-			continue;
-		}
+        // check for non-mask hiden characters
+        if( !renderAsMask && (ch->get_visible() == false))
+        {
+            // Avoid stale old_invalidated_rect
+            ch->clear_invalidated(); 
+            // Don't display non-mask hidden characters
+            continue;
+        }
     
-		int depth = ch->get_depth();
-		// Discard useless masks
-		while(!clipDepthStack.empty() && (depth > clipDepthStack.top()))
-		{
-			clipDepthStack.pop();
-			render::disable_mask();
-		}
+        int depth = ch->get_depth();
+        // Discard useless masks
+        while(!clipDepthStack.empty() && (depth > clipDepthStack.top()))
+        {
+            clipDepthStack.pop();
+            render::disable_mask();
+        }
 
-		int clipDepth = ch->get_clip_depth();
-		// Push a new mask to the masks stack
-		if(clipDepth != character::noClipDepthValue)
-		{
-			clipDepthStack.push(clipDepth);
-			render::begin_submit_mask();
-		}
+        int clipDepth = ch->get_clip_depth();
+        // Push a new mask to the masks stack
+        if(clipDepth != character::noClipDepthValue)
+        {
+            clipDepthStack.push(clipDepth);
+            render::begin_submit_mask();
+        }
         
-		ch->display();
+        ch->display();
         
-		// Notify the renderer that mask drawing has finished.
-		if (ch->isMaskLayer())
-		{
-			render::end_submit_mask();
-		}
-	} //end of for
+        // Notify the renderer that mask drawing has finished.
+        if (ch->isMaskLayer())
+        {
+            render::end_submit_mask();
+        }
+    } //end of for
 
-	// Discard any remaining masks
-	while(!clipDepthStack.empty())
-	{
-		clipDepthStack.pop();
-		render::disable_mask();
-	}
+    // Discard any remaining masks
+    while(!clipDepthStack.empty())
+    {
+        clipDepthStack.pop();
+        render::disable_mask();
+    }
 }
 
 /*public*/
@@ -1032,149 +1032,147 @@ DisplayList::sort()
 void
 DisplayList::mergeDisplayList(DisplayList & newList)
 {
-	testInvariant();
+    testInvariant();
 
-	iterator itOld = beginNonRemoved(_charsByDepth);
-	iterator itNew = beginNonRemoved(newList._charsByDepth);
+    iterator itOld = beginNonRemoved(_charsByDepth);
+    iterator itNew = beginNonRemoved(newList._charsByDepth);
 
-	iterator itOldEnd = staticZoneEnd(_charsByDepth);
-	iterator itNewEnd = staticZoneEnd(newList._charsByDepth); 
+    iterator itOldEnd = staticZoneEnd(_charsByDepth);
+    iterator itNewEnd = staticZoneEnd(newList._charsByDepth); 
 
-	while( itOld != itOldEnd )
-	{
-		iterator itOldBack = itOld;
-		
-		boost::intrusive_ptr<character> chOld = itOldBack->get();
-		int depthOld = chOld->get_depth();
+    while( itOld != itOldEnd )
+    {
+        iterator itOldBackup = itOld;
+        
+        boost::intrusive_ptr<character> chOld = itOldBackup->get();
+        int depthOld = chOld->get_depth();
 
-		while( itNew != itNewEnd )
-		{
-			iterator itNewBack = itNew;
-			
-			boost::intrusive_ptr<character> chNew = itNewBack->get();
-			int depthNew = chNew->get_depth();
-			
-			// unload the old character if it is not in the new list
-			if( depthOld < depthNew )
-			{
-				itOld++;
+        while( itNew != itNewEnd )
+        {
+            iterator itNewBackup = itNew;
+            
+            boost::intrusive_ptr<character> chNew = itNewBackup->get();
+            int depthNew = chNew->get_depth();
+            
+            // unload the old character if it is not in the new list
+            if( depthOld < depthNew )
+            {
+                itOld++;
 
-				_charsByDepth.erase(itOldBack);
+                _charsByDepth.erase(itOldBackup);
 
-				if ( chOld->unload() )
-				{
-					reinsertRemovedCharacter(chOld);
-				}
-				else 
-				{
-					chOld->destroy();
-				}
+                if ( chOld->unload() )
+                {
+                    reinsertRemovedCharacter(chOld);
+                }
+                else 
+                {
+                    chOld->destroy();
+                }
 
-				break;
-			}
-			// if depth is occupied in both lists
-			else if( depthOld == depthNew )
-			{
-				itOld++;
-				itNew++;
+                break;
+            }
+            // if depth is occupied in both lists
+            else if( depthOld == depthNew )
+            {
+                itOld++;
+                itNew++;
 
-				bool is_ratio_compatible = ( ( chOld->get_ratio() == chNew->get_ratio() )
-					|| ( chOld->get_ratio()==0 && chNew->get_ratio()==character::noRatioValue )
-					|| ( chOld->get_ratio()==character::noRatioValue && chNew->get_ratio()==0 )	);
-				
-				if( !is_ratio_compatible || chOld->isDynamic() || !chOld->isActionScriptReferenceable() )
-				{
-					// replace the old character with the character in the new depth
-					_charsByDepth.insert(itOldBack, *itNewBack);
-					_charsByDepth.erase(itOldBack);
-					
-					// unload the old character
-					if ( chOld->unload() )
-					{
-						reinsertRemovedCharacter(chOld);
-					} 
-					else 
-					{
-						chOld->destroy();
-					}
-				}
-				else
-				{
-					newList._charsByDepth.erase(itNewBack);
+                bool is_ratio_compatible = ( ( chOld->get_ratio() == chNew->get_ratio() )
+                    || ( chOld->get_ratio()==0 && chNew->get_ratio()==character::noRatioValue )
+                    || ( chOld->get_ratio()==character::noRatioValue && chNew->get_ratio()==0 ) );
+                
+                if( !is_ratio_compatible || chOld->isDynamic() || !chOld->isActionScriptReferenceable() )
+                {
+                    // replace the character in old list with corresponding character in new list
+                    _charsByDepth.insert(itOldBackup, *itNewBackup);
+                    _charsByDepth.erase(itOldBackup);
+                    
+                    // unload the old character
+                    if ( chOld->unload() )
+                    {
+                        reinsertRemovedCharacter(chOld);
+                    } 
+                    else 
+                    {
+                        chOld->destroy();
+                    }
+                }
+                else
+                {
+                    newList._charsByDepth.erase(itNewBackup);
 
-					// replace the transformation matrix if the old character accepts transform
-					if( chOld->get_accept_anim_moves() )
-					{
-						chOld->set_matrix(chNew->get_matrix());
-						chOld->set_cxform(chNew->get_cxform());
-						
-						// TODO: update the name if needed
-						//chOld->set_name(chNew->get_name().c_str());
-					}
-					chNew->unload();
-					chNew->destroy();
-				}
+                    // replace the transformation matrix if the old character accepts 
+					// static transformation.
+                    if( chOld->get_accept_anim_moves() )
+                    {
+                        chOld->set_matrix(chNew->get_matrix());
+                        chOld->set_cxform(chNew->get_cxform());
+                    }
+                    chNew->unload();
+                    chNew->destroy();
+                }
 
-				break;
-			}
-			// add the new character if it is not in the old list
-			else 
-			{
-				itNew++;
+                break;
+            }
+            // add the character in new list if it is not in the old list
+            else 
+            {
+                itNew++;
 
-				_charsByDepth.insert(itOldBack, *itNewBack );
-			}
-		}// end of while
+                _charsByDepth.insert(itOldBackup, *itNewBackup );
+            }
+        }// end of while
 
-		if( itNew == itNewEnd )
-		{
-			break;
-		}
-	}// end of while
-	
-	// unload remaining characters in old list
-	while( itOld != itOldEnd )
-	{
-		boost::intrusive_ptr<character> chOld = itOld->get();
+        if( itNew == itNewEnd )
+        {
+            break;
+        }
+    }// end of while
+    
+    // unload remaining characters in old list
+    while( itOld != itOldEnd )
+    {
+        boost::intrusive_ptr<character> chOld = itOld->get();
 
-		itOld = _charsByDepth.erase(itOld);
+        itOld = _charsByDepth.erase(itOld);
 
-		if ( chOld->unload() )
-		{
-			reinsertRemovedCharacter(chOld);
-		}
-		else 
-		{
-			chOld->destroy();
-		}
-	}
+        if ( chOld->unload() )
+        {
+            reinsertRemovedCharacter(chOld);
+        }
+        else 
+        {
+            chOld->destroy();
+        }
+    }
 
-	// add remaining characters in new list to the old list
-	if( itNew != itNewEnd )
-	{
-		_charsByDepth.insert(itOld, itNew, itNewEnd);
-	}
+    // add remaining characters in new list to the old list
+    if( itNew != itNewEnd )
+    {
+        _charsByDepth.insert(itOld, itNew, itNewEnd);
+    }
 
-	// Copy all unloaded characters from the new display list to the old display list, 
-	// and clear the new display list
-	for (itNew = newList._charsByDepth.begin(); itNew != itNewEnd; ++itNew)
-	{
-		boost::intrusive_ptr<character> chNew = itNew->get();
-		int depthNew = chNew->get_depth();
+    // Copy all unloaded characters from the new display list to the old display list, 
+    // and clear the new display list
+    for (itNew = newList._charsByDepth.begin(); itNew != itNewEnd; ++itNew)
+    {
+        boost::intrusive_ptr<character> chNew = itNew->get();
+        int depthNew = chNew->get_depth();
 
-		if( chNew->isUnloaded() )
-		{
-			iterator it = find_if(_charsByDepth.begin(), _charsByDepth.end(),
-					DepthGreaterOrEqual(depthNew));
-			
-			_charsByDepth.insert(it, *itNew);
-		}
-	}
+        if( chNew->isUnloaded() )
+        {
+            iterator it = find_if(_charsByDepth.begin(), _charsByDepth.end(),
+                    DepthGreaterOrEqual(depthNew));
+            
+            _charsByDepth.insert(it, *itNew);
+        }
+    }
 
-	// clear the new display list after merge
-	newList._charsByDepth.clear();
+    // clear the new display list after merge
+    newList._charsByDepth.clear();
 
-	testInvariant();
+    testInvariant();
 }
 
 
@@ -1238,14 +1236,14 @@ DisplayList::beginNonRemoved(const container_type& c)
 DisplayList::iterator
 DisplayList::staticZoneEnd(container_type& c)
 {
-	return std::find_if(c.begin(), c.end(), DepthGreaterOrEqual(0));
+    return std::find_if(c.begin(), c.end(), DepthGreaterOrEqual(0));
 }
 
 /*private static*/
 DisplayList::const_iterator
 DisplayList::staticZoneEnd(const container_type& c)
 {
-	return std::find_if(c.begin(), c.end(), DepthGreaterOrEqual(0));
+    return std::find_if(c.begin(), c.end(), DepthGreaterOrEqual(0));
 }
 
 void
