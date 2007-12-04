@@ -1,3 +1,7 @@
+2007-12-04 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libmedia/Makefile.am: Add missing gstreamer files.
+
 2007-12-04 Sandro Santilli <strk@keybit.net>
 
 	* (tons of files): drop tu_types.h, use boost/cstdint.hpp instead.
