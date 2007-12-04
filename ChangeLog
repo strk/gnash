@@ -1,3 +1,10 @@
+2007-12-04 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/misc-swfc.all/Makefile.am, mouse_drag_test.sc: new test file
+	  for mouse dragging, fix this should help fixing zoonmheng.swf.
+	* testsuite/misc-ming.all/loop_test10.c: more tests for name synthesis,
+	  all passed.
+
 2007-12-03 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libmedia/MediaParser.h, libmedia/sdl/MediaParserFfmpeg.h: pass pointer

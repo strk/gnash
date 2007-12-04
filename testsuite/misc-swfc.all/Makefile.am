@@ -33,6 +33,7 @@ SCTESTS = \
 	edittext_test1.sc \
 	opcode_guard_test2.sc \
 	swf4opcode.sc \
+	mouse_drag_test.sc \
 	$(NULL)
 
 # These will get compiled to SWFs just as above, but will not be executed as a test

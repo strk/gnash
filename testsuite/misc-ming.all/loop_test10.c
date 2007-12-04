@@ -17,6 +17,8 @@
  */ 
 
 /* 
+ * ==case1==
+ *
  * Timeline:
  * 
  *   Frame  | 1 | 2 | 3 | 4 | 5 | 6 |
@@ -47,6 +49,48 @@
  *   we need a temporary displaylist when jumping back, otherwise cann't keep mc3 alive
  *   in the current design attempt.
  *
+ *
+ * ==case2==
+ *
+ * timeline:
+ *
+ *   Frame  | 1 | 2 |
+ *  --------+---+---+
+ *   Event  | P | R |
+ *
+ * Description:
+ *
+ *  frame1: place an unnamed sprite 
+ *  frame2: remove the sprite
+ *
+ * Observed behaviour:
+ *  
+ *  (1)before loop-back, the sprite has a synthesized name instance4
+ *  (2)after loop-back, the sprite has a synthesized name instance5
+ *
+ *
+ *  ==case3==
+ *
+ * timeline:
+ *
+ *   Frame  | 1 | 2 |
+ *  --------+---+---+
+ *   Event  | P |   |
+ *
+ * Description:
+ *
+ *  frame1: place an unnamed sprite 
+ *  frame2: do nothing
+ *
+ * Observed behaviour:
+ *  
+ *  (1)before loop-back, the sprite has a synthesized name instance7
+ *  (2)after loop-back, the sprite still has the name instance7
+ *
+ *  (3)but when placing another unnamed sprite after the loop back,
+ *     the new instance gets a name instance9. 
+ *
+ *  Deduction on (3): instance8 was created and discarded during the loop-back.
  */
 
 
@@ -56,7 +100,7 @@
 
 #include "ming_utils.h"
 
-#define OUTPUT_VERSION 6
+#define OUTPUT_VERSION 7
 #define OUTPUT_FILENAME "loop_test10.swf"
 
 
@@ -64,8 +108,12 @@ int
 main(int argc, char** argv)
 {
   SWFMovie mo;
-   SWFDisplayItem it1, it2, it3;
+  SWFDisplayItem it1, it2, it3;
+  SWFDisplayItem it4, it41;
+  SWFDisplayItem it5, it51;
   SWFMovieClip mc1, mc2, mc3, dejagnuclip;
+  SWFMovieClip mc4, mc41;
+  SWFMovieClip mc5, mc51;
   SWFShape  sh1, sh2, sh3;
   SWFAction ac;
   int i;
@@ -84,11 +132,11 @@ main(int argc, char** argv)
   
   mo = newSWFMovie();
   SWFMovie_setDimension(mo, 800, 600);
-  SWFMovie_setRate(mo, 2);
+  SWFMovie_setRate(mo, 12);
 
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
-  add_actions(mo, " haslooped = false; "
+  add_actions(mo, " haslooped1=false; haslooped2=false; haslooped3=false;"
                   " mc1Initialized=0; mc1Unloaded=0;"
                   " mc2Initialized=0; mc2Unloaded=0;"
                   " mc3Initialized=0; mc3Unloaded=0;"
@@ -165,9 +213,9 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo);  // frame 5
 
   
-  add_actions(mo, "if(! haslooped) {"
+  add_actions(mo, "if(! haslooped1) {"
                   "   gotoAndPlay(5);"
-                  "   haslooped = true;"
+                  "   haslooped1 = true;"
                   "}" );
   SWFMovie_nextFrame(mo);  // frame 6
   
@@ -180,9 +228,74 @@ main(int argc, char** argv)
   check_equals(mo, "mc3Unloaded", "0");
   
   xcheck_equals(mo, "asOrder", "'0+1+2+3+4+5+1+2+3+5+'");
-  add_actions(mo, "totals(); stop();");
   SWFMovie_nextFrame(mo);  // frame 7
-   
+  
+  //
+  // ==case 2==
+  //
+  mc4 = newSWFMovieClip();
+    mc41 = newSWFMovieClip(); 
+    SWFMovieClip_nextFrame(mc41);
+    
+    it41 = SWFMovieClip_add(mc4, (SWFBlock)mc41); 
+    add_clip_actions(mc4, 
+        "_root.check_equals(this._target, '/instance3');"
+        "inst = this.getInstanceAtDepth(-16383);"
+        "if(! haslooped2) {"
+        "   haslooped2 = true;"
+        "   _root.check_equals(inst._target, '/instance3/instance4');"
+        "} else {"
+        "   _root.check_equals(inst._target, '/instance3/instance5');"
+        "   stop();"
+        "}"
+   );
+  SWFMovieClip_nextFrame(mc4);
+    SWFDisplayItem_remove(it41);
+  SWFMovieClip_nextFrame(mc4);  
+  
+  SWFMovie_add(mo, mc4);
+  SWFMovie_nextFrame(mo);  // frame 9
+  
+  SWFMovie_nextFrame(mo);  // frame 10
+  
+  //
+  // ==case 3==
+  //
+  mc5 = newSWFMovieClip();
+    mc51 = newSWFMovieClip(); 
+    SWFMovieClip_nextFrame(mc51);
+    
+    it51 = SWFMovieClip_add(mc5, (SWFBlock)mc51); 
+    add_clip_actions(mc5, 
+        "_root.check_equals(this._target, '/instance6');"
+        "inst = this.getInstanceAtDepth(-16383);"
+        "if(! haslooped3) {"
+        "   haslooped3 = true;"
+        "   _root.check_equals(inst._target, '/instance6/instance7');"
+        "} else {"
+        "   _root.check_equals(inst._target, '/instance6/instance7');"
+        "   stop();"
+        "}"
+   );
+  SWFMovieClip_nextFrame(mc5);
+  SWFMovieClip_nextFrame(mc5); 
+  
+  SWFMovie_add(mo, mc5);
+  SWFMovie_nextFrame(mo);  // frame 11
+  
+  SWFMovie_nextFrame(mo);  // frame 12
+  
+  SWFMovie_nextFrame(mo);  // frame 13
+  
+  mc5 = newSWFMovieClip();
+  add_clip_actions(mc5, "_root.check_equals(this._target, '/instance9');");
+  SWFMovieClip_nextFrame(mc5);
+  
+  SWFMovie_add(mo, mc5);
+  SWFMovie_nextFrame(mo);  // frame 14
+  
+  add_actions(mo, "totals(15); stop();");
+  SWFMovie_nextFrame(mo);  // frame 15
   //Output movie
   puts("Saving " OUTPUT_FILENAME );
   SWFMovie_save(mo, OUTPUT_FILENAME);
