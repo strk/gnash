@@ -33,14 +33,14 @@ main(int /*argc*/, char** /*argv*/)
 {
 
 	// Check typedef sizes.
-	check_equals (sizeof(uint8_t), 1);
-	check_equals (sizeof(uint16_t), 2);
-	check_equals (sizeof(uint32_t), 4);
-	check_equals (sizeof(uint64_t), 8);
-	check_equals (sizeof(int8_t), 1);
-	check_equals (sizeof(int16_t), 2);
-	check_equals (sizeof(int32_t), 4);
-	check_equals (sizeof(int64_t), 8);
+	check_equals (sizeof(boost::uint8_t), 1);
+	check_equals (sizeof(boost::uint16_t), 2);
+	check_equals (sizeof(boost::uint32_t), 4);
+	check_equals (sizeof(boost::uint64_t), 8);
+	check_equals (sizeof(boost::int8_t), 1);
+	check_equals (sizeof(boost::int16_t), 2);
+	check_equals (sizeof(boost::int32_t), 4);
+	check_equals (sizeof(boost::int64_t), 8);
 
 }
 
