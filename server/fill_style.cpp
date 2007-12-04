@@ -66,10 +66,6 @@ fill_style::fill_style()
 }
 
 
-fill_style::~fill_style()
-{
-}
-
 void
 fill_style::read(stream* in, int tag_type, movie_definition* md,
 	fill_style *pOther)

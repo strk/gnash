@@ -17,7 +17,7 @@
 
 // Based on work of Thatcher Ulrich <tu@tulrich.com> 2003
 
-/* $Id: fill_style.h,v 1.11 2007/12/01 00:14:59 strk Exp $ */
+/* $Id: fill_style.h,v 1.12 2007/12/04 22:41:42 strk Exp $ */
 
 #ifndef GNASH_FILL_STYLE_H
 #define GNASH_FILL_STYLE_H
@@ -66,7 +66,7 @@ public:
 
 	void setSolid(const rgba& color);
 
-	virtual ~fill_style();
+	~fill_style() {}
 	
 	/// Read the fill style from a stream
 	//

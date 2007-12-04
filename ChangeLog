@@ -1,5 +1,10 @@
 2007-12-04 Sandro Santilli <strk@keybit.net>
 
+	* server/fill_style.{cpp,h}: make fill_style a concrete class,
+	  only had the destructor as a virtual anyway...
+
+2007-12-04 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/AudioDecoderSimple.cpp (decode): don't leak BitsReader
 	  objects, minor cleanups (still sucks pretty much).
 	* server/parser/video_stream_def.cpp (readDefineVideoFrame): read all
