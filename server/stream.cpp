@@ -28,6 +28,8 @@
 #include <cstring>
 //#include <iostream> // debugging only
 
+//#define USE_TU_FILE_BYTESWAPPING 1
+
 namespace gnash {
 	
 stream::stream(tu_file* input)
@@ -45,33 +47,15 @@ stream::~stream()
 
 unsigned stream::read(char *buf, unsigned count)
 {
+	align();
 	return m_input->read_bytes(buf, count);
 }
-
-// @@ better?
-// 	int	stream::read_uint(int bitcount)
-// 	{
-//		assert(bitcount <= 24);
-// 		while (m_unused_bits < bitcount)
-// 		{
-// 			// Get more data.
-// 			m_current_bits |= m_input->read_byte() << m_unused_bits;
-// 			m_unused_bits += 8;
-// 		}
-
-// 		int	result = m_current_bits & ((1 << bitcount) - 1);
-// 		m_current_bits >>= bitcount;
-// 		m_unused_bits -= bitcount;
-	
-// 		return result;
-// 	}
-
 
 bool stream::read_bit()
 {
 	if (!m_unused_bits)
 	{
-		m_current_byte = m_input->read_byte();
+		m_current_byte = m_input->read_byte(); // don't want to align here
 		m_unused_bits = 7;
 		return (m_current_byte&0x80);
 	}
@@ -86,11 +70,6 @@ unsigned stream::read_uint(unsigned short bitcount)
 	//assert(bitcount <= 24);
 	// should be 24, check why htf_sweet.swf fails this assertion
 	assert(bitcount <= 32);
-
-
-#define OPTIMIZE_FOR_MULTIBYTE_BITS_READ 1
-
-#ifdef OPTIMIZE_FOR_MULTIBYTE_BITS_READ
 
 	// Optimization for multibyte read
 	if ( bitcount > m_unused_bits )
@@ -163,54 +142,6 @@ unsigned stream::read_uint(unsigned short bitcount)
 		return ((m_current_byte&unusedMask) >> m_unused_bits);
 	}
 
-#else // ndef OPTIMIZE_FOR_MULTIBYTE_BITS_READ
-
-	boost::uint32_t value = 0;
-
-	unsigned short bits_needed = bitcount;
-	do
-	{
-		int unusedMask = (1 << m_unused_bits)-1;
-
-		if (bits_needed == m_unused_bits)
-		{
-			// Consume all the unused bits.
-			value |= (m_current_byte&unusedMask);
-			m_unused_bits = 0;
-			break;
-
-		}
-		else if (bits_needed > m_unused_bits) // TODO: obsolete this !!
-		{
-			// Consume all the unused bits.
-
-			bits_needed -= m_unused_bits; // assert(bits_needed>0)
-
-			value |= ((m_current_byte&unusedMask) << bits_needed);
-
-			m_current_byte = m_input->read_byte();
-			m_unused_bits = 8;
-
-		}
-		else
-		{
-			assert(bits_needed <= m_unused_bits);
-			// Consume some of the unused bits.
-
-			m_unused_bits -= bits_needed;
-
-			value |= ((m_current_byte&unusedMask) >> m_unused_bits);
-
-			// We're done.
-			break;
-		}
-	}
-	while (bits_needed > 0);
-
-	//std::cerr << "Returning value: " << value << " unused bits: " << (int)m_unused_bits << std::endl;
-	return value;
-#endif // ndef OPTIMIZE_FOR_MULTIBYTE_BITS_READ
-
 }
 
 
@@ -233,64 +164,125 @@ int	stream::read_sint(unsigned short bitcount)
 
 float	stream::read_fixed()
 {
-	align();
-	return static_cast<float> (static_cast<double> (static_cast<long int> (m_input->read_le32())) / 65536.0f);
+	// align(); // read_u32 will align 
+	return static_cast<float> (
+		static_cast<double>(read_s32()) / 65536.0f
+	);
+
 }
 
 // float is not large enough to hold a 32 bit value without doing the wrong thing with the sign.
 // So we upgrade to double for the calculation and then resize when we know it's small enough.
 float	stream::read_ufixed()
 {
-	align();
-	return static_cast<float> (static_cast<double> (static_cast<unsigned long int> (m_input->read_le32())) / 65536.0f);
+	// align(); // read_u32 will align 
+	return static_cast<float> (
+		static_cast<double>(read_u32()) / 65536.0f
+	);
 }
 
 // Read a short fixed value, unsigned.
 float   stream::read_short_ufixed()
 {
-	align();
-	return static_cast<float> (static_cast<boost::uint16_t> (m_input->read_le16())) / 256.0f;
+	// align(); // read_u16 will align 
+	return static_cast<float> ( read_u16() / 256.0f );
 }
 
 // Read a short fixed value, signed.
 float	stream::read_short_sfixed()
 {
-	align();
-	return static_cast<float> (static_cast<boost::int16_t> (m_input->read_le16())) / 256.0f;
+	// align(); // read_s16 will align 
+	return static_cast<float> ( read_s16() / 256.0f );
 }
 
 // Read a signed float value.
 float	stream::read_float()
 {
-	align();
-	return static_cast<float> (m_input->read_le32());
+	// align(); // read_s16 will align
+	return static_cast<float> ( read_s16() );
 }
 
 // Read a 64-bit double value
 long double stream::read_d64()
 {
+#ifdef USE_TU_FILE_BYTESWAPPING 
 	align();
 	return m_input->read_le_double64();
+#else
+	using boost::uint32_t;
+
+	unsigned char _buf[8]; read((char*)_buf, 8); // would align
+	uint64_t low = _buf[0];
+		 low |= _buf[1] << 8;
+		 low |= _buf[2] << 16;
+		 low |= _buf[3] << 24;
+
+	uint64_t hi = _buf[4];
+		 hi |= _buf[5] << 8;
+		 hi |= _buf[6] << 16;
+		 hi |= _buf[7] << 24;
+
+	return static_cast<long double> ( low | (hi<<32) );
+#endif
 }
 
-uint8_t	stream::read_u8() { align(); return m_input->read_byte(); }
-int8_t	stream::read_s8() { align(); return m_input->read_byte(); }
+uint8_t	stream::read_u8()
+{
+	align();
+	return m_input->read_byte();
+}
+
+int8_t	stream::read_s8()
+{
+	// read_u8 will align
+	return read_u8();
+}
+
 boost::uint16_t	stream::read_u16()
 {
+#ifdef USE_TU_FILE_BYTESWAPPING 
 	align();
-//		IF_DEBUG(printf("filepos = %d ", SDL_RWtell(m_input)));
-	int	val = m_input->read_le16();
-//		IF_DEBUG(log_msg("val = 0x%X\n", val));
-	return val;
+	return m_input->read_le16();
+#else
+	using boost::uint32_t;
+
+	unsigned char _buf[2]; read((char*)_buf, 2); // would align
+	uint32_t result = _buf[0];
+		 result |= (_buf[1] << 8);
+
+	return result;
+#endif
 }
-boost::int16_t	stream::read_s16() { align(); return m_input->read_le16(); }
+
+boost::int16_t stream::read_s16()
+{
+	// read_u16 will align
+	return read_u16();
+}
+
 boost::uint32_t	stream::read_u32()
 {
+#ifdef USE_TU_FILE_BYTESWAPPING 
 	align();
-	boost::uint32_t	val = m_input->read_le32();
-	return val;
+	return m_input->read_le32();
+#else
+	using boost::uint32_t;
+
+	unsigned char _buf[4]; read((char*)_buf, 4); // would align
+	uint32_t result = _buf[0];
+		 result |= _buf[1] << 8;
+		 result |= _buf[2] << 16;
+		 result |= _buf[3] << 24;
+
+	return result;
+#endif
 }
-boost::int32_t	stream::read_s32() { align(); return m_input->read_le32(); }
+
+boost::int32_t	stream::read_s32()
+{
+	// read_u32 will align
+	return read_u32();
+}
 
 
 char*	stream::read_string()
@@ -443,7 +435,7 @@ SWF::tag_type stream::open_tag()
 	int	tag_length = tag_header & 0x3F;
 	assert(m_unused_bits == 0);
 	if (tag_length == 0x3F) {
-		tag_length = m_input->read_le32();
+		tag_length = read_u32();
 	}
 
 	if ( tag_length > 1024*64 )

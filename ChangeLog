@@ -1,5 +1,7 @@
 2007-12-04 Sandro Santilli <strk@keybit.net>
 
+	* server/stream.cpp: reduce direct accesses to the underlying stream
+	  in preparation for using a cache buffer.
 	* libmedia/Makefile.am: don't put <tab> characters before variable
 	  assignment.
 
