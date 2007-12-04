@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaDecoder.cpp,v 1.1 2007/11/30 00:24:00 tgc Exp $
+// $Id: MediaDecoder.cpp,v 1.2 2007/12/04 09:20:29 bwy Exp $
 
 #include "MediaDecoder.h"
 
@@ -34,40 +34,52 @@ std::vector<StatusCode> MediaDecoder::getOnStatusEvents()
 	return statusQueue;
 }
 
-	bool decodingFailed = false;
-
 void MediaDecoder::decodingLoop()
 {
+
+	bool decodingFailed = false;
+	
 	// The decode loop
-	while (_running) {
+	while (_running)
+	{
 
 		// If the buffer is not full, put something into it!
-		if (!_buffer->isFull()) {
-			while (!_buffer->isFull()) {
-				if (!decodeAndBufferFrame()) {
+		if (!_buffer->isFull())
+		{
+			while (!_buffer->isFull() && _running)
+			{
+				if (!decodeAndBufferFrame())
+				{
 					decodingFailed = true;
 					break;
 				}
 				//log_debug("decoded a frame");
 			}
 		
+		}
 		// "Warm up" the data.
-		} else if (_streamSize > _lastConfirmedPosition) {
-			if (_stream->set_position(_lastConfirmedPosition+2048) != 0) {
+		else if (_streamSize > _lastConfirmedPosition)
+		{
+			if (_stream->set_position(_lastConfirmedPosition+2048) != 0)
+			{
 				// We assume we're done now
 				// TODO: check for errors
 				_lastConfirmedPosition = _streamSize;
-			} else {
+			}
+			else
+			{
 				_lastConfirmedPosition += 2048;
 			}
 			//log_debug("warming up the file");
-
 		}
-		if (_buffer->isFull()) {
+		
+		if (_buffer->isFull())
+		{
 			pushOnStatus(bufferFull);
-			
+
 			// If download is complete there is nothing to do, so we take a break.
-			if (_streamSize <= _lastConfirmedPosition) {
+			if (_streamSize <= _lastConfirmedPosition)
+			{
 				relax();
 				continue;
 			}
@@ -75,9 +87,11 @@ void MediaDecoder::decodingLoop()
 
 		// If decoding failed, there's a good chance playback has ended, so
 		// we take a breake until someone tells us to wake up.
-		if (decodingFailed) {
+		if (decodingFailed)
+		{
 			relax();
 		}
+
 	}
 	log_debug("Left the decoding loop");
 }

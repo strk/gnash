@@ -1,3 +1,9 @@
+2007-12-04 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libmedia/MediaDecoder.cpp: make sure we can stop decoding before the
+	  buffer is full. Avoids waiting interminably for the thread to finish
+	  if gnash is closed in the decoding loop.
+
 2007-12-04 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/libbase/: Makefile.am, IntTypesTest.cpp: 
