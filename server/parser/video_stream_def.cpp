@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.28 2007/12/04 21:22:54 strk Exp $
+// $Id: video_stream_def.cpp,v 1.29 2007/12/04 21:42:18 strk Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -58,6 +58,9 @@ video_stream_definition::readDefineVideoStream(stream* in, SWF::tag_type tag, mo
 
 	m_start_frame = m->get_loading_frame();
 
+	// numFrames:2 width:2 height:2 flags:1
+	in->ensureBytes(8);
+
 	m_num_frames = in->read_u16();
 
 	_width = in->read_u16();
@@ -71,6 +74,7 @@ video_stream_definition::readDefineVideoStream(stream* in, SWF::tag_type tag, mo
 	m_smoothing_flags = in->read_bit(); 
 
 	m_codec_id = static_cast<media::videoCodecType>(in->read_u8());
+
 #ifdef USE_FFMPEG
 	_decoder.reset( new media::VideoDecoderFfmpeg() );
 #elif defined(SOUND_GST)
@@ -91,10 +95,13 @@ video_stream_definition::readDefineVideoFrame(stream* in, SWF::tag_type tag, mov
 	assert(tag == SWF::VIDEOFRAME);
 	assert ( _decoder.get() ); // not allowed to be called for a dynamically-created video_stream_def
 
-	// We don't use the videoframe number, but instead
-	// each video frame is tied to the swf-frame where
-	// it belongs.
-	in->skip_bytes(2); //int frameNum = in->read_u16();
+	in->ensureBytes(2);
+	unsigned int frameNum = in->read_u16(); // in->skip_bytes(2); 
+	if ( m->get_loading_frame() != frameNum )
+	{
+		log_debug("frameNum field in tag is %d, currently loading frame is %d, we'll use the latter.");
+		frameNum = m->get_loading_frame();
+	}
 
 	// We need to make the buffer a FF_INPUT_BUFFER_PADDING_SIZE
 	// bigger than the data to avoid libavcodec (ffmpeg) making
@@ -112,30 +119,32 @@ video_stream_definition::readDefineVideoFrame(stream* in, SWF::tag_type tag, mov
 	// Check what kind of frame this is
 	media::videoFrameType ft;
 	if (m_codec_id == media::VIDEO_CODEC_H263) {
+		//log_debug("H263 embedded video!");
 		// Parse the h263 header to determine the frame type. The position of the
 		// info varies if the frame size is custom.
-		std::auto_ptr<BitsReader> br (new BitsReader(data.get(), totSize));
-		boost::uint32_t tmp = br->read_uint(30);
-		tmp = br->read_uint(3);
-		if (tmp == 0) tmp = br->read_uint(32);
-		else if (tmp == 1) tmp = br->read_uint(16);
+		BitsReader br(data.get(), totSize);
+		boost::uint32_t tmp = br.read_uint(30);
+		tmp = br.read_uint(3);
+		if (tmp == 0) tmp = br.read_uint(32);
+		else if (tmp == 1) tmp = br.read_uint(16);
 		
 		// Finally we're at the info, read and use
-		tmp = br->read_uint(3);
+		tmp = br.read_uint(3);
 		if (tmp == 0) ft = media::KEY_FRAME;
 		else if (tmp == 1) ft = media::INTER_FRAME;
 		else ft = media::DIS_INTER_FRAME;
 
 	} else if (m_codec_id == media::VIDEO_CODEC_VP6 || m_codec_id == media::VIDEO_CODEC_VP6A) {
 		// Get the info from the VP6 header
-		if (!(data.get()[0] & 0x80)) ft = media::KEY_FRAME;
+		//if (!(data.get()[0] & 0x80)) ft = media::KEY_FRAME;
+		if (! (data[0] & 0x80) ) ft = media::KEY_FRAME;
 		else ft = media::INTER_FRAME;
 
 	} else {
 		ft = media::KEY_FRAME;
 	}
 
-	setFrameData(m->get_loading_frame(), data, totSize, ft);
+	setFrameData(frameNum, data, totSize, ft);
 
 }
 
