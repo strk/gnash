@@ -1,5 +1,7 @@
 2007-12-04 Sandro Santilli <strk@keybit.net>
 
+	* libmedia/AudioDecoderSimple.cpp (decode): don't leak BitsReader
+	  objects, minor cleanups (still sucks pretty much).
 	* server/parser/video_stream_def.cpp (readDefineVideoFrame): read all
 	  data at once rather then reading a byte each iteration of a loop,
 	  read frame number from tag, improve robustness and other minor cleanups.
