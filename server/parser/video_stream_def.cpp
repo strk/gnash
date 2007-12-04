@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.27 2007/12/04 11:45:33 strk Exp $
+// $Id: video_stream_def.cpp,v 1.28 2007/12/04 21:22:54 strk Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -105,10 +105,7 @@ video_stream_definition::readDefineVideoFrame(stream* in, SWF::tag_type tag, mov
 	unsigned int totSize = dataSize+padding;
 
 	boost::shared_array<uint8_t> data ( new uint8_t[totSize] );
-	for (unsigned int i = 0; i < dataSize; ++i) 
-	{
-		data[i] = in->read_u8();
-	}
+	in->read((char*)data.get(), dataSize);
 	if ( padding ) memset(&data[dataSize], 0, padding);  // pad with zeroes if needed
 
 
