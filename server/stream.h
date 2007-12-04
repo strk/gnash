@@ -11,6 +11,7 @@
 
 #include "swf.h"
 #include "tu_config.h"
+#include "tu_types.h" // for uint32_t, uint8_t used in this file
 #include "GnashException.h"
 
 #include <string>

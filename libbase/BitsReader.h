@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: BitsReader.h,v 1.5 2007/12/03 08:35:34 strk Exp $
+// $Id: BitsReader.h,v 1.6 2007/12/04 06:37:37 zoulunkai Exp $
 
 #ifndef BITSREADER_H
 #define BITSREADER_H
@@ -28,9 +28,11 @@
 
 #include "swf.h"
 #include "tu_config.h"
+#include "tu_types.h" // for uint32_t used in this file
 #include "GnashException.h"
 #include "log.h"
 
+#include <cassert> // for assert used in this file
 #include <string>
 #include <sstream>
 
