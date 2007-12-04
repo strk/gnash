@@ -1,5 +1,7 @@
 2007-12-04 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/Makefile.am: registerClassTest2 requires
+	  init actions support in Ming.
 	* server/fill_style.{cpp,h}: make fill_style a concrete class,
 	  only had the destructor as a virtual anyway...
 

@@ -114,7 +114,6 @@ check_PROGRAMS = \
 	attachMovieLoopingTestRunner \
 	registerClassTest \
 	registerClassTestRunner \
-	registerClassTest2 \
 	goto_frame_test \
 	consecutive_goto_frame_test \
 	matrix_test \
@@ -174,6 +173,7 @@ endif
 if MING_SUPPORTS_INIT_ACTIONS
 check_PROGRAMS += \
 	init_action_test \
+	registerClassTest2 \
 	$(NULL)
 endif
 
@@ -241,7 +241,6 @@ check_SCRIPTS = \
 	loop_test9runner \
 	loop_test10runner \
 	shape_testrunner \
-	registerClassTest2runner \
 	DefineEditTextVariableNameTest-Runner \
 	DefineEditTextVariableNameTest2-Runner \
 	opcode_guard_testrunner \
@@ -262,6 +261,7 @@ endif
 if MING_SUPPORTS_INIT_ACTIONS
 check_SCRIPTS += \
 	init_action_testrunner \
+	registerClassTest2runner \
 	$(NULL)
 endif
 
