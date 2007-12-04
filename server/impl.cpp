@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.128 2007/12/01 01:08:09 strk Exp $ */
+/* $Id: impl.cpp,v 1.129 2007/12/04 11:45:28 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -312,10 +312,10 @@ void	get_movie_info(
 	return;
     }
     
-    uint32_t	file_start_pos = in->get_position();
-    uint32_t	header = in->read_le32();
-    uint32_t	file_length = in->read_le32();
-    uint32_t	file_end_pos = file_start_pos + file_length;
+    boost::uint32_t	file_start_pos = in->get_position();
+    boost::uint32_t	header = in->read_le32();
+    boost::uint32_t	file_length = in->read_le32();
+    boost::uint32_t	file_end_pos = file_start_pos + file_length;
     
     int	local_version = (header >> 24) & 255;
     if ((header & 0x0FFFFFF) != 0x00535746
@@ -364,7 +364,7 @@ void	get_movie_info(
 	{
 	    // Count tags.
 	    int local_tag_count = 0;
-	    while ((uint32_t) str.get_position() < file_end_pos)
+	    while ((boost::uint32_t) str.get_position() < file_end_pos)
 		{
 		    str.open_tag();
 		    str.close_tag();

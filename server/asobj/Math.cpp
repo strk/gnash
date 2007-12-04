@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Math.cpp,v 1.23 2007/07/01 10:54:28 bjacques Exp $ */
+/* $Id: Math.cpp,v 1.24 2007/12/04 11:45:31 strk Exp $ */
 
 //
 // This file implements methods of the ActionScript Math class.
@@ -145,7 +145,7 @@ MATH_WRAP_FUNC2_EXP(pow, (pow(arg0, arg1)))
 as_value	math_random(const fn_call& /* fn */)
 {
     // Random number between 0 and 1.
-    return as_value(tu_random::next_random() / double(uint32_t(0x0FFFFFFFF)));
+    return as_value(tu_random::next_random() / double(boost::uint32_t(0x0FFFFFFFF)));
 }
 
 as_value	math_round(const fn_call& fn)

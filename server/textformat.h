@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: textformat.h,v 1.19 2007/07/01 10:54:25 bjacques Exp $
+// $Id: textformat.h,v 1.20 2007/12/04 11:45:30 strk Exp $
 //
 
 #ifndef __TEXTFORMAT_H__
@@ -59,7 +59,7 @@ public:
 	//
 	/// A number containing three 8-bit RGB components; for example,
         /// 0xFF0000 is red, 0x00FF00 is green.
-	uint32_t color() const { return _color; }
+	boost::uint32_t color() const { return _color; }
 
 	/// \brief
 	/// Return ann integer that indicates the indentation from the left
@@ -99,7 +99,7 @@ public:
 	void italicedSet(bool x)     { _italic = x; }
 	void boldSet(bool x)         { _bold = x; }
 	void bulletSet(bool x)       { _bullet = x; }
-	void colorSet(uint32_t x)      { _color = x; }
+	void colorSet(boost::uint32_t x)      { _color = x; }
 	void indentSet(float x)      { _indent = x; }
 
 	void alignSet(const std::string& x)  { _align = x; }
@@ -152,7 +152,7 @@ public:
 	//
 	/// A number containing three 8-bit RGB components; for example,
         /// 0xFF0000 is red, 0x00FF00 is green.
-	uint32_t	_color;	
+	boost::uint32_t	_color;	
 
 	// The name of a font for text as a string.
 	std::string _font;	

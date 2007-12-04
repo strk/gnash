@@ -312,7 +312,7 @@ SoundGst::getDuration()
 	}
 	
 	GstFormat fmt = GST_FORMAT_TIME;
-	int64_t len;
+	boost::int64_t len;
 
 	if (pipeline && gst_element_query_duration (pipeline, &fmt, &len)) {
 		return static_cast<unsigned int>(len / GST_MSECOND);
@@ -339,7 +339,7 @@ SoundGst::getPosition()
 	if (!pipeline) return 0;
 
 	GstFormat fmt = GST_FORMAT_TIME;
-	int64_t pos;
+	boost::int64_t pos;
 	GstStateChangeReturn ret;
 	GstState current, pending;
 

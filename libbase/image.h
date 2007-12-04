@@ -10,7 +10,6 @@
 
 
 #include "tu_config.h"
-#include "tu_types.h"
 
 #include <boost/scoped_array.hpp>
 #include <memory> // for auto_ptr

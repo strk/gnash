@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: amf.cpp,v 1.41 2007/08/23 14:10:54 strk Exp $ */
+/* $Id: amf.cpp,v 1.42 2007/12/04 11:45:23 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -36,6 +36,8 @@
 #include "log.h"
 #include "amf.h"
 #include "amfutf8.h"
+
+#include <boost/cstdint.hpp> // for boost::?int??_t 
 
 using namespace std;
 using namespace gnash;
@@ -118,7 +120,7 @@ static void *
 swapBytes(void *word, int size)
 {
     union {
-	uint16_t s;
+	boost::uint16_t s;
 	struct {
 	    uint8_t c0;
 	    uint8_t c1;

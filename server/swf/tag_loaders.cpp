@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.159 2007/12/03 14:33:55 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.160 2007/12/04 11:45:33 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -230,7 +230,7 @@ define_bits_jpeg_loader(stream* in, tag_type tag, movie_definition* m)
     assert(tag == SWF::DEFINEBITS); // 6
     assert(in);
 
-    uint16_t	character_id = in->read_u16();
+    boost::uint16_t	character_id = in->read_u16();
 
     //
     // Read the image data.
@@ -284,7 +284,7 @@ define_bits_jpeg2_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::DEFINEBITSJPEG2); // 21
 
-    uint16_t	character_id = in->read_u16();
+    boost::uint16_t	character_id = in->read_u16();
 
     IF_VERBOSE_PARSE
     (
@@ -407,7 +407,7 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::DEFINEBITSJPEG3); // 35
 
-    uint16_t	character_id = in->read_u16();
+    boost::uint16_t	character_id = in->read_u16();
 
     IF_VERBOSE_PARSE
     (
@@ -415,8 +415,8 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 		  character_id, in->get_position());
     );
 
-    uint32_t	jpeg_size = in->read_u32();
-    uint32_t	alpha_position = in->get_position() + jpeg_size;
+    boost::uint32_t	jpeg_size = in->read_u32();
+    boost::uint32_t	alpha_position = in->get_position() + jpeg_size;
 
     if (m->get_create_bitmaps() == DO_LOAD_BITMAPS)
     {
@@ -472,10 +472,10 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 
     in->ensureBytes(2+2+2+1); // the initial header 
 
-    uint16_t	character_id = in->read_u16();
+    boost::uint16_t	character_id = in->read_u16();
     uint8_t	bitmap_format = in->read_u8();	// 3 == 8 bit, 4 == 16 bit, 5 == 32 bit
-    uint16_t	width = in->read_u16();
-    uint16_t	height = in->read_u16();
+    boost::uint16_t	width = in->read_u16();
+    boost::uint16_t	height = in->read_u16();
 
     IF_VERBOSE_PARSE
     (
@@ -551,7 +551,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 		    uint8_t*	image_out_row = image->scanline(j);
 		    for (int i = 0; i < width; i++)
 		    {
-			uint16_t	pixel = image_in_row[i * 2] | (image_in_row[i * 2 + 1] << 8);
+			boost::uint16_t	pixel = image_in_row[i * 2] | (image_in_row[i * 2 + 1] << 8);
 
 			// @@ How is the data packed???  I'm just guessing here that it's 565!
 			image_out_row[i * 3 + 0] = (pixel >> 8) & 0xF8;	// red
@@ -666,7 +666,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 		    uint8_t*	image_out_row = image->scanline(j);
 		    for (int i = 0; i < width; i++)
 		    {
-		        uint16_t	pixel = image_in_row[i * 2] | (image_in_row[i * 2 + 1] << 8);
+		        boost::uint16_t	pixel = image_in_row[i * 2] | (image_in_row[i * 2 + 1] << 8);
 
 		        // @@ How is the data packed???  I'm just guessing here that it's 565!
 		        image_out_row[i * 4 + 0] = 255;			// alpha
@@ -739,7 +739,7 @@ void define_shape_loader(stream* in, tag_type tag, movie_definition* m)
 	   || tag == SWF::DEFINESHAPE3
 	   || tag == SWF::DEFINESHAPE4 || tag == SWF::DEFINESHAPE4_);
 
-    uint16_t	character_id = in->read_u16();
+    boost::uint16_t	character_id = in->read_u16();
     IF_VERBOSE_PARSE
     (
 	log_parse(_("  shape_loader: id = %d"), character_id);
@@ -757,7 +757,7 @@ void define_shape_morph_loader(stream* in, tag_type tag, movie_definition* m)
 		|| tag == SWF::DEFINEMORPHSHAPE2
 		|| tag == SWF::DEFINEMORPHSHAPE2_); 
 
-    uint16_t character_id = in->read_u16();
+    boost::uint16_t character_id = in->read_u16();
 
     IF_VERBOSE_PARSE
     (
@@ -781,7 +781,7 @@ void	define_font_loader(stream* in, tag_type tag, movie_definition* m)
 	   || tag == SWF::DEFINEFONT2
 	   || tag == SWF::DEFINEFONT3 ); // 10 || 48 || 75
 
-    uint16_t font_id = in->read_u16();
+    boost::uint16_t font_id = in->read_u16();
 
     font* f = new font;
     f->read(in, tag, m);
@@ -800,7 +800,7 @@ void	define_font_info_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::DEFINEFONTINFO || tag == SWF::DEFINEFONTINFO2);
 
-    uint16_t font_id = in->read_u16();
+    boost::uint16_t font_id = in->read_u16();
 
     font* f = m->get_font(font_id);
     if (f)
@@ -821,7 +821,7 @@ void define_font_name_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::DEFINEFONTNAME);
 
-    uint16_t font_id = in->read_u16();
+    boost::uint16_t font_id = in->read_u16();
 
     font* f = m->get_font(font_id);
     if (f)
@@ -928,7 +928,7 @@ void	export_loader(stream* in, tag_type tag, movie_definition* m)
     // Read the exports.
     for (int i = 0; i < count; i++)
     {
-	uint16_t	id = in->read_u16();
+	boost::uint16_t	id = in->read_u16();
 	char*	symbol_name = in->read_string();
 
 	IF_VERBOSE_PARSE (
@@ -1024,7 +1024,7 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
     // Get the imports.
     for (int i = 0; i < count; i++)
     {
-	uint16_t	id = in->read_u16();
+	boost::uint16_t	id = in->read_u16();
 	char*	symbol_name = in->read_string();
 	IF_VERBOSE_PARSE
 	(
@@ -1075,7 +1075,7 @@ void	define_edit_text_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::DEFINEEDITTEXT); // 37
 
-    uint16_t	character_id = in->read_u16();
+    boost::uint16_t	character_id = in->read_u16();
 
     edit_text_character_def* ch = new edit_text_character_def(m);
     IF_VERBOSE_PARSE
@@ -1093,7 +1093,7 @@ define_text_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::DEFINETEXT || tag == SWF::DEFINETEXT2);
 
-    uint16_t	character_id = in->read_u16();
+    boost::uint16_t	character_id = in->read_u16();
 
     text_character_def* ch = new text_character_def(m);
     IF_VERBOSE_PARSE
@@ -1132,7 +1132,7 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 
 	in->ensureBytes(2+4+1+4); // character id + flags + sample count
 
-	uint16_t	character_id = in->read_u16();
+	boost::uint16_t	character_id = in->read_u16();
 
 	media::audioCodecType	format = static_cast<media::audioCodecType>(in->read_uint(4));
 	int	sample_rate = in->read_uint(2);	// multiples of 5512.5
@@ -1143,7 +1143,7 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 
 	if (format == media::AUDIO_CODEC_MP3) {
 		in->ensureBytes(2);
-		int16_t	delay_seek = in->read_s16();	// FIXME - not implemented/used
+		boost::int16_t	delay_seek = in->read_s16();	// FIXME - not implemented/used
 		// The DelaySeek field has the following meaning:
 		// * If this value is positive, the player seeks this number of
 		//   samples into the sound block before the sound is played.
@@ -1350,7 +1350,7 @@ void
 define_video_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::DEFINEVIDEOSTREAM); // 60
-    uint16_t character_id = in->read_u16();
+    boost::uint16_t character_id = in->read_u16();
 
     std::auto_ptr<video_stream_definition> chdef ( new video_stream_definition(character_id) );
     chdef->readDefineVideoStream(in, tag, m);
@@ -1364,7 +1364,7 @@ video_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::VIDEOFRAME); // 61
 
-    uint16_t character_id = in->read_u16();
+    boost::uint16_t character_id = in->read_u16();
     character_def* chdef = m->get_character_def(character_id);
 
     if ( ! chdef )
@@ -1465,14 +1465,14 @@ serialnumber_loader(stream* in, tag_type tag, movie_definition* /*m*/)
     int major = in->read_u8();
     int minor = in->read_u8();
 
-    uint32_t buildL = in->read_u32();
-    uint32_t buildH = in->read_u32();
-    uint64_t build = (((uint64_t)buildH) << 32) + buildL;
+    boost::uint32_t buildL = in->read_u32();
+    boost::uint32_t buildH = in->read_u32();
+    boost::uint64_t build = (((boost::uint64_t)buildH) << 32) + buildL;
 
-    uint32_t timestampL = in->read_u32();
-    uint32_t timestampH = in->read_u32();
+    boost::uint32_t timestampL = in->read_u32();
+    boost::uint32_t timestampH = in->read_u32();
     // This timestamp is number of milliseconds since 1 Jan 1970 (epoch)
-    uint64_t timestamp = (((uint64_t)timestampH) << 32) + timestampL;
+    boost::uint64_t timestamp = (((boost::uint64_t)timestampH) << 32) + timestampL;
 
     std::stringstream ss;
     ss << "SERIALNUMBER: Version " << id << "." << edition << "." << major << "." << minor;

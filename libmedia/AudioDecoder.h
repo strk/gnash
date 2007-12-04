@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: AudioDecoder.h,v 1.5 2007/11/24 17:21:41 strk Exp $
+// $Id: AudioDecoder.h,v 1.6 2007/12/04 11:45:25 strk Exp $
 
 #ifndef __AUDIODECODER_H__
 #define __AUDIODECODER_H__
@@ -77,7 +77,7 @@ public:
 	/// @return a pointer to the decoded data, or NULL if decoding fails.
 	///     The caller owns the decoded data.
 	///
-	virtual uint8_t* decode(uint8_t* /*input*/, uint32_t /*inputSize*/, uint32_t& /*outputSize*/, uint32_t& /*decodedData*/, bool /*parse*/) { return NULL; }
+	virtual uint8_t* decode(uint8_t* /*input*/, boost::uint32_t /*inputSize*/, boost::uint32_t& /*outputSize*/, boost::uint32_t& /*decodedData*/, bool /*parse*/) { return NULL; }
 
 };
 	

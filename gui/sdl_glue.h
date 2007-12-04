@@ -20,6 +20,8 @@
 
 #include "gnash.h"
 
+#include <boost/cstdint.hpp> // for boost::?int??_t 
+
 namespace gnash
 {
 
@@ -29,7 +31,7 @@ class SdlGlue
     virtual ~SdlGlue() { }
     virtual bool init(int argc, char **argv[]) = 0;
 
-    virtual bool prepDrawingArea(int width, int height, uint32_t sdl_flags) = 0;
+    virtual bool prepDrawingArea(int width, int height, boost::uint32_t sdl_flags) = 0;
     virtual render_handler* createRenderHandler(int depth) = 0;
     virtual void render() = 0;
   protected:

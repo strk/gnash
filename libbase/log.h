@@ -387,6 +387,20 @@ public:
     }
 };
 
+#ifndef HAVE_FUNCTION
+	#ifndef HAVE_func
+		#define dummystr(x) # x
+		#define dummyestr(x) dummystr(x)
+		#define __FUNCTION__ __FILE__":"dummyestr(__LINE__)
+	#else
+		#define __FUNCTION__ __func__	
+	#endif
+#endif
+
+#ifndef HAVE_PRETTY_FUNCTION
+	#define __PRETTY_FUNCTION__ __FUNCTION__
+#endif
+
 #if defined(__cplusplus) && defined(__GNUC__)
 #define GNASH_REPORT_FUNCTION   \
 	gnash::__Host_Function_Report__ __host_function_report__( __PRETTY_FUNCTION__)

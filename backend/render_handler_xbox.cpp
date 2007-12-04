@@ -651,13 +651,13 @@ public:
 		// @@ we'd like to use a VB instead, and use DrawPrimitive().
 
 		// Draw the mesh.
-		IDirect3DDevice8::DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, vertex_count - 2, coords, sizeof(int16_t) * 2);
+		IDirect3DDevice8::DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, vertex_count - 2, coords, sizeof(boost::int16_t) * 2);
 
 		if (m_current_styles[LEFT_STYLE].needs_second_pass())
 		{
 			// 2nd pass, if necessary.
 			m_current_styles[LEFT_STYLE].apply_second_pass();
-			IDirect3DDevice8::DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, vertex_count - 2, coords, sizeof(int16_t) * 2);
+			IDirect3DDevice8::DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, vertex_count - 2, coords, sizeof(boost::int16_t) * 2);
 			m_current_styles[LEFT_STYLE].cleanup_second_pass();
 		}
 
@@ -668,7 +668,7 @@ public:
 
 		// Send the tris to OpenGL
 		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(2, GL_SHORT, sizeof(int16_t) * 2, coords);
+		glVertexPointer(2, GL_SHORT, sizeof(boost::int16_t) * 2, coords);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, vertex_count);
 
 		if (m_current_styles[LEFT_STYLE].needs_second_pass())
@@ -693,7 +693,7 @@ public:
 
 		apply_matrix(m_current_matrix);
 
-		IDirect3DDevice8::DrawPrimitiveUP(D3DPT_LINESTRIP, vertex_count - 1, coords, sizeof(int16_t) * 2);
+		IDirect3DDevice8::DrawPrimitiveUP(D3DPT_LINESTRIP, vertex_count - 1, coords, sizeof(boost::int16_t) * 2);
 	}
 
 

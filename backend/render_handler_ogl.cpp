@@ -883,7 +883,7 @@ public:
 
     // Draw a dot on the beginning and end coordinates to round lines.
     //   glVertexPointer: skip all but the first and last coordinates in the line.
-    glVertexPointer(2, GL_SHORT, (sizeof(int16_t) * 2) * (vertex_count - 1), coords);
+    glVertexPointer(2, GL_SHORT, (sizeof(boost::int16_t) * 2) * (vertex_count - 1), coords);
     glEnable(GL_POINT_SMOOTH); // Draw a round (antialiased) point.
     glDrawArrays(GL_POINTS, 0, 2);
     glDisable(GL_POINT_SMOOTH);

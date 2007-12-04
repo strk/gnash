@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.45 2007/12/02 14:54:33 strk Exp $ */
+/* $Id: string.cpp,v 1.46 2007/12/04 11:45:31 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -463,7 +463,7 @@ string_from_char_code(const fn_call& fn)
     // isn't this function supposed to take one argument?
 
     for (unsigned int i = 0; i < fn.nargs; i++) {
-        uint32_t c = fn.arg(i).to_number<uint32_t>();
+        boost::uint32_t c = fn.arg(i).to_number<boost::uint32_t>();
         result += c;
     }
 

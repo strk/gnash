@@ -19,12 +19,9 @@
 //
 
 #include "sdl_glue.h"
+
 #include <SDL.h>
-
-
-
-using namespace std;
-
+#include <boost/cstdint.hpp> // for boost::?int??_t 
 
 namespace gnash
 {
@@ -37,8 +34,8 @@ class SdlAggGlue : public SdlGlue
 
     bool init(int argc, char **argv[]);
     render_handler* createRenderHandler(int depth);
-    bool prepDrawingArea(int width, int height, uint32_t sdl_flags);
-    uint32_t maskFlags(uint32_t sdl_flags);
+    bool prepDrawingArea(int width, int height, boost::uint32_t sdl_flags);
+    boost::uint32_t maskFlags(boost::uint32_t sdl_flags);
     void render();
     void render(int minx, int miny, int maxx, int maxy);
   private:

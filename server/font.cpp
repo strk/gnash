@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.51 2007/12/01 10:19:39 strk Exp $ */
+/* $Id: font.cpp,v 1.52 2007/12/04 11:45:28 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -240,21 +240,21 @@ GlyphInfo::markReachableResources() const
 			delete [] name;
 		}
 
-		uint16_t glyph_count = in->read_u16();
+		boost::uint16_t glyph_count = in->read_u16();
 		
 		unsigned long table_base = in->get_position();
 
 		// Read the glyph offsets.  Offsets
 		// are measured from the start of the
 		// offset table. Make sure wide offsets fit into elements
-		std::vector<uint32_t>	offsets;
+		std::vector<boost::uint32_t>	offsets;
 		int	font_code_offset;
 		if (wide_offsets)
 		{
 			// 32-bit offsets.
 			for (unsigned int i = 0; i < glyph_count; i++)
 			{
-				uint32_t off = in->read_u32();	
+				boost::uint32_t off = in->read_u32();	
 
 				IF_VERBOSE_PARSE (
 				log_parse(_("Glyph %d at offset %u"), i, off);
@@ -269,7 +269,7 @@ GlyphInfo::markReachableResources() const
 			// 16-bit offsets.
 			for (unsigned int i = 0; i < glyph_count; i++)
 			{
-				uint16_t off = in->read_u16();	
+				boost::uint16_t off = in->read_u16();	
 
 				IF_VERBOSE_PARSE (
 				log_parse(_("Glyph %d at offset %u"), i, off);
@@ -357,7 +357,7 @@ GlyphInfo::markReachableResources() const
 			int	kerning_count = in->read_u16();
 			for (int i = 0; i < kerning_count; i++)
 			{
-				uint16_t	char0, char1;
+				boost::uint16_t	char0, char1;
 				if (m_wide_codes)
 				{
 					char0 = in->read_u16();
@@ -457,10 +457,10 @@ GlyphInfo::markReachableResources() const
 
 		if (m_wide_codes)
 		{
-			// Code table is made of uint16_t's.
+			// Code table is made of boost::uint16_t's.
 			for (size_t i=0, n=_embedGlyphTable.size(); i<n; ++i)
 			{
-				uint16_t code = in->read_u16();
+				boost::uint16_t code = in->read_u16();
 				_embedded_code_table.insert(std::make_pair(code, i));
 			}
 		}
@@ -475,7 +475,7 @@ GlyphInfo::markReachableResources() const
 		}
 	}
 
-	int	font::get_glyph_index(uint16_t code, bool embedded) const
+	int	font::get_glyph_index(boost::uint16_t code, bool embedded) const
 	{
 		const code_table& ctable = embedded ? _embedded_code_table : _device_code_table;
 
@@ -544,7 +544,7 @@ GlyphInfo::markReachableResources() const
 
 
 	int
-	font::add_os_glyph(uint16_t code)
+	font::add_os_glyph(boost::uint16_t code)
 	{
 		assert ( _ftProvider.get() );
 		assert(_device_code_table.find(code) == _device_code_table.end());

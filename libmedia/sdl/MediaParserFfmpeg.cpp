@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaParserFfmpeg.cpp,v 1.8 2007/12/03 20:48:51 bwy Exp $
+// $Id: MediaParserFfmpeg.cpp,v 1.9 2007/12/04 11:45:27 strk Exp $
 
 #include "MediaParserFfmpeg.h"
 #include "log.h"
@@ -230,7 +230,7 @@ MediaFrame* MediaParserFfmpeg::parseMediaFrame()
 			// set presentation timestamp
 			if (packet.dts != static_cast<signed long>(AV_NOPTS_VALUE))
 			{
-				ret->timestamp = static_cast<uint64_t>(as_double(_audioStream->time_base) * packet.dts * 1000.0);
+				ret->timestamp = static_cast<boost::uint64_t>(as_double(_audioStream->time_base) * packet.dts * 1000.0);
 			}
 
 			if (ret->timestamp != 0)
@@ -242,8 +242,8 @@ MediaFrame* MediaParserFfmpeg::parseMediaFrame()
 			}
 
 			// update video clock for next frame
-			uint32_t frame_delay;
-			frame_delay = static_cast<uint32_t>((as_double(_audioStream->time_base) * packet.dts) * 1000.0);
+			boost::uint32_t frame_delay;
+			frame_delay = static_cast<boost::uint32_t>((as_double(_audioStream->time_base) * packet.dts) * 1000.0);
 
 			_lastAudioTimestamp += frame_delay;
 
@@ -255,7 +255,7 @@ MediaFrame* MediaParserFfmpeg::parseMediaFrame()
 			// set presentation timestamp
 			if (packet.dts != static_cast<signed long>(AV_NOPTS_VALUE))
 			{
-				ret->timestamp = static_cast<uint32_t>((as_double(_videoStream->time_base) * packet.dts) * 1000.0);
+				ret->timestamp = static_cast<boost::uint32_t>((as_double(_videoStream->time_base) * packet.dts) * 1000.0);
 			}
 
 			if (ret->timestamp != 0)
@@ -267,11 +267,11 @@ MediaFrame* MediaParserFfmpeg::parseMediaFrame()
 			}
 
 			// update video clock for next frame
-			uint32_t frame_delay;
-			frame_delay = static_cast<uint32_t>(as_double(_videoStream->codec->time_base) * 1000.0);
+			boost::uint32_t frame_delay;
+			frame_delay = static_cast<boost::uint32_t>(as_double(_videoStream->codec->time_base) * 1000.0);
 
 			// for MPEG2, the frame can be repeated, so we update the clock accordingly
-			//frame_delay += static_cast<uint32_t>(_frame->repeat_pict * (frame_delay * 0.5) * 1000.0);
+			//frame_delay += static_cast<boost::uint32_t>(_frame->repeat_pict * (frame_delay * 0.5) * 1000.0);
 
 			_lastVideoTimestamp += frame_delay;
 
@@ -287,11 +287,11 @@ MediaFrame* MediaParserFfmpeg::parseMediaFrame()
 
 }
 
-uint32_t MediaParserFfmpeg::seek(uint32_t pos)
+boost::uint32_t MediaParserFfmpeg::seek(boost::uint32_t pos)
 {
 	long newpos = 0;
 	double timebase = 0;
-	uint32_t ret = 0;
+	boost::uint32_t ret = 0;
 
 	AVStream* videostream = _formatCtx->streams[_videoIndex];
 	timebase = static_cast<double>(videostream->time_base.num / videostream->time_base.den);
@@ -318,7 +318,7 @@ uint32_t MediaParserFfmpeg::seek(uint32_t pos)
 
 	av_free_packet(&Packet);
 	av_seek_frame(_formatCtx, _videoIndex, newpos, 0);
-	uint32_t newtime_ms = static_cast<int32_t>(newtime / 1000.0);
+	boost::uint32_t newtime_ms = static_cast<boost::int32_t>(newtime / 1000.0);
 
 	_lastAudioTimestamp = newtime_ms;
 	_lastVideoTimestamp = newtime_ms;
@@ -335,7 +335,7 @@ MediaParserFfmpeg::getVideoInfo()
 	std::auto_ptr<VideoInfo> ret (new VideoInfo(_videoCodecCtx->codec_id,
 												_videoCodecCtx->width, 
 												_videoCodecCtx->height,
-												static_cast<int16_t>(as_double(_videoStream->r_frame_rate)), // Is this correct? What do we use the framerate for?
+												static_cast<boost::int16_t>(as_double(_videoStream->r_frame_rate)), // Is this correct? What do we use the framerate for?
 												_videoStream->duration,
 												FFMPEG));
 	ret->videoCodecCtx = _videoCodecCtx;

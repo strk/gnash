@@ -17,12 +17,12 @@ namespace tu_random
 	// Global generator.
 	static generator	s_generator;
 
-	uint32_t	next_random()
+	boost::uint32_t	next_random()
 	{
 		return s_generator.next_random();
 	}
 
-	void	seed_random(uint32_t seed)
+	void	seed_random(boost::uint32_t seed)
 	{
 		s_generator.seed_random(seed);
 	}
@@ -52,14 +52,14 @@ namespace tu_random
 	// random number generator.  _Statistics and Probability Letters
 	// 8_ (1990), 35-39.
 
-//	const uint64_t	a = 123471786;	// for SEED_COUNT=1024
-//	const uint64_t	a = 123554632;	// for SEED_COUNT=512
-//	const uint64_t	a = 8001634;	// for SEED_COUNT=255
-//	const uint64_t	a = 8007626;	// for SEED_COUNT=128
-//	const uint64_t	a = 647535442;	// for SEED_COUNT=64
-//	const uint64_t	a = 547416522;	// for SEED_COUNT=32
-//	const uint64_t	a = 487198574;	// for SEED_COUNT=16
-	const uint64_t	a = 716514398;	// for SEED_COUNT=8
+//	const boost::uint64_t	a = 123471786;	// for SEED_COUNT=1024
+//	const boost::uint64_t	a = 123554632;	// for SEED_COUNT=512
+//	const boost::uint64_t	a = 8001634;	// for SEED_COUNT=255
+//	const boost::uint64_t	a = 8007626;	// for SEED_COUNT=128
+//	const boost::uint64_t	a = 647535442;	// for SEED_COUNT=64
+//	const boost::uint64_t	a = 547416522;	// for SEED_COUNT=32
+//	const boost::uint64_t	a = 487198574;	// for SEED_COUNT=16
+	const boost::uint64_t	a = 716514398;	// for SEED_COUNT=8
 
 
 	generator::generator()
@@ -71,11 +71,11 @@ namespace tu_random
 	}
 
 
-	void	generator::seed_random(uint32_t seed)
+	void	generator::seed_random(boost::uint32_t seed)
 	{
 		// Simple pseudo-random to reseed the seeds.
 		// Suggested by the above article.
-		uint32_t	j = seed;
+		boost::uint32_t	j = seed;
 		for (int i = 0; i < SEED_COUNT; i++)
 		{
 			j = j ^ (j << 13);
@@ -86,27 +86,27 @@ namespace tu_random
 	}
 
 
-	uint32_t	generator::next_random()
+	boost::uint32_t	generator::next_random()
 	// Return the next pseudo-random number in the sequence.
 	{
-		uint64_t	t;
-		uint32_t	x;
+		boost::uint64_t	t;
+		boost::uint32_t	x;
 
-		//static uint32_t	c = 362436;
-		//static uint32_t	i = SEED_COUNT - 1;
-		const uint32_t	r = 0xFFFFFFFE;
+		//static boost::uint32_t	c = 362436;
+		//static boost::uint32_t	i = SEED_COUNT - 1;
+		const boost::uint32_t	r = 0xFFFFFFFE;
 
 		i = (i+1) & (SEED_COUNT - 1);
 		t = a * Q[i] + c;
-		c = (uint32_t) (t >> 32);
-		x = (uint32_t) (t + c);
+		c = (boost::uint32_t) (t >> 32);
+		x = (boost::uint32_t) (t + c);
 		if (x < c)
 		{
 			x++;
 			c++;
 		}
 		
-		uint32_t	val = r - x;
+		boost::uint32_t	val = r - x;
 		Q[i] = val;
 		return val;
 	}
@@ -114,7 +114,7 @@ namespace tu_random
 	
 	float	generator::get_unit_float()
 	{
-		uint32_t	r = next_random();
+		boost::uint32_t	r = next_random();
 
 		// 24 bits of precision.
 		return float(r >> 8) / (16777216.0f - 1.0f);
@@ -136,7 +136,7 @@ int	main()
 
 	for (int i = 0; i < COUNT; i++)
 	{
-		uint32_t	val = tu_random::next_random();
+		boost::uint32_t	val = tu_random::next_random();
 		fwrite(&val, sizeof(val), 1, stdout);
 	}
 }

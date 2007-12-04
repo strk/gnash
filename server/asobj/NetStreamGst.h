@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamGst.h,v 1.28 2007/07/01 10:54:29 bjacques Exp $ */
+/* $Id: NetStreamGst.h,v 1.29 2007/12/04 11:45:31 strk Exp $ */
 
 #ifndef __NETSTREAMGST_H__
 #define __NETSTREAMGST_H__
@@ -53,8 +53,8 @@ public:
 	void close();
 	void pause(int mode);
 	void play(const std::string& source);
-	void seek(uint32_t pos);
-	int32_t time();
+	void seek(boost::uint32_t pos);
+	boost::int32_t time();
 	void advance();
 
 	// Used for gstreamer data read and seek callbacks

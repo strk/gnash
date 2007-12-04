@@ -10,15 +10,15 @@
 #define TU_RANDOM_H
 
 
-#include "tu_config.h"
-#include "tu_types.h"
+#include "tu_config.h" // needed ?
 
+#include <boost/cstdint.hpp> // for boost::uint32_t used in this file
 
 namespace tu_random
 {
 	// Global generator.
-	DSOEXPORT uint32_t	next_random();
-	void	seed_random(uint32_t seed);
+	DSOEXPORT boost::uint32_t	next_random();
+	void	seed_random(boost::uint32_t seed);
 	DSOEXPORT float	get_unit_float();
 
 	// In case you need independent generators.  The global
@@ -28,14 +28,14 @@ namespace tu_random
 	{
 	public:
 		generator();
-		void	seed_random(uint32_t seed);	// not necessary
-		uint32_t	next_random();
+		void	seed_random(boost::uint32_t seed);	// not necessary
+		boost::uint32_t	next_random();
 		float	get_unit_float();
 
 	private:
-		uint32_t	Q[SEED_COUNT];
-		uint32_t	c;
-		uint32_t	i;
+		boost::uint32_t	Q[SEED_COUNT];
+		boost::uint32_t	c;
+		boost::uint32_t	i;
 	};
 
 }	// end namespace tu_random

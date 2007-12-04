@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderNellymoser.cpp,v 1.4 2007/11/24 17:21:42 strk Exp $
+// $Id: AudioDecoderNellymoser.cpp,v 1.5 2007/12/04 11:45:25 strk Exp $
 
 // This file incorporates work covered by the following copyright and permission
 // notice:
@@ -770,13 +770,13 @@ bool AudioDecoderNellymoser::setup(AudioInfo* info)
 }
 
 
-uint8_t* AudioDecoderNellymoser::decode(uint8_t* input, uint32_t inputSize, uint32_t& outputSize, uint32_t& decodedBytes, bool /*parse*/)
+uint8_t* AudioDecoderNellymoser::decode(uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool /*parse*/)
 {
 
 	float float_buf[256];
-	uint32_t out_buf_size = (inputSize / 64) * 256;
-	int16_t* out_buf = new int16_t[out_buf_size];
-	int16_t* out_buf_start = out_buf;
+	boost::uint32_t out_buf_size = (inputSize / 64) * 256;
+	boost::int16_t* out_buf = new boost::int16_t[out_buf_size];
+	boost::int16_t* out_buf_start = out_buf;
 
 	while (inputSize > 0) {
 		nelly_decode_block(_nh, input, float_buf);
@@ -787,12 +787,12 @@ uint8_t* AudioDecoderNellymoser::decode(uint8_t* input, uint32_t inputSize, uint
 	}
 			
 	uint8_t* tmp_raw_buffer = reinterpret_cast<uint8_t*>(out_buf_start);
-	uint32_t tmp_raw_buffer_size = out_buf_size * 2;
+	boost::uint32_t tmp_raw_buffer_size = out_buf_size * 2;
 
 	// If we need to convert samplerate or/and from mono to stereo...
 	if (out_buf_size > 0 && (_sampleRate != 44100 || !_stereo)) {
 
-		int16_t* adjusted_data = 0;
+		boost::int16_t* adjusted_data = 0;
 		int	adjusted_size = 0;
 		int sample_count = out_buf_size / (_stereo ? 2 : 1);
 

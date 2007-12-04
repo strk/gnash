@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: AudioDecoderGst.h,v 1.1 2007/11/30 00:13:01 tgc Exp $
+// $Id: AudioDecoderGst.h,v 1.2 2007/12/04 11:45:26 strk Exp $
 
 #ifndef __AUDIODECODERGST_H__
 #define __AUDIODECODERGST_H__
@@ -46,7 +46,7 @@ public:
 
 	bool setup(AudioInfo* info);
 
-	uint8_t* decode(uint8_t* /*input*/, uint32_t /*inputSize*/, uint32_t& /*outputSize*/, uint32_t& /*decodedData*/, bool /*parse*/);
+	uint8_t* decode(uint8_t* /*input*/, boost::uint32_t /*inputSize*/, boost::uint32_t& /*outputSize*/, boost::uint32_t& /*decodedData*/, bool /*parse*/);
 
 	static void callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
 	static void callback_output (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
@@ -74,16 +74,16 @@ private:
 
 	/// Info from the video tag header. Might be usefull...
 	bool _stereo;
-	uint32_t _sampleRate;
+	boost::uint32_t _sampleRate;
 	audioCodecType _format;
 
 	/// If we should stop this will be true
 	volatile bool _stop;
 
-	uint32_t _undecodedDataSize;
+	boost::uint32_t _undecodedDataSize;
 	uint8_t* _undecodedData;
 
-	uint32_t _decodedDataSize;
+	boost::uint32_t _decodedDataSize;
 	uint8_t* _decodedData;
 
 };

@@ -133,7 +133,7 @@ namespace gnash {
 		}
 
 
-		void	draw_line_strip(const int16_t coords[], int vertex_count, const rgba& color, const matrix& mat)
+		void	draw_line_strip(const boost::int16_t coords[], int vertex_count, const rgba& color, const matrix& mat)
 		{
 #ifdef DEBUG_RENDER_CALLS
 			GNASH_REPORT_FUNCTION;

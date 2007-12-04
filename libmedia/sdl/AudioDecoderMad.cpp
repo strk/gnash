@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderMad.cpp,v 1.5 2007/11/24 17:21:43 strk Exp $
+// $Id: AudioDecoderMad.cpp,v 1.6 2007/12/04 11:45:27 strk Exp $
 
 #include "AudioDecoderMad.h"
 #include "utility.h"
@@ -64,7 +64,7 @@ bool AudioDecoderMad::setup(AudioInfo* info)
 	}
 }
 
-uint8_t* AudioDecoderMad::decode(uint8_t* input, uint32_t inputSize, uint32_t& outputSize, uint32_t& decodedBytes, bool parse)
+uint8_t* AudioDecoderMad::decode(uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool parse)
 {
 	// Setup the mad decoder
 	mad_stream_buffer(&_stream, input, inputSize);
@@ -105,13 +105,13 @@ uint8_t* AudioDecoderMad::decode(uint8_t* input, uint32_t inputSize, uint32_t& o
 
 	mad_synth_frame (&_synth, &_frame);
 	
-	uint32_t outsize = _synth.pcm.length * _synth.pcm.channels * 2;
+	boost::uint32_t outsize = _synth.pcm.length * _synth.pcm.channels * 2;
 
 	uint8_t* tmp_raw_buffer = new uint8_t[outsize];
-	uint32_t tmp_raw_buffer_size = 0;
+	boost::uint32_t tmp_raw_buffer_size = 0;
 	int sample;
 	
-	int16_t* dst = reinterpret_cast<int16_t*>(tmp_raw_buffer);
+	boost::int16_t* dst = reinterpret_cast<boost::int16_t*>(tmp_raw_buffer);
 
 	// transfer the decoded samples into the sound-struct, and do some
 	// scaling while we're at it.
@@ -131,7 +131,7 @@ uint8_t* AudioDecoderMad::decode(uint8_t* input, uint32_t inputSize, uint32_t& o
 			// quantize
 			sample = mad_sample >> (MAD_F_FRACBITS + 1 - 16);
 
-			if ( sample != static_cast<int16_t>(sample) ) sample = sample < 0 ? -32768 : 32767;
+			if ( sample != static_cast<boost::int16_t>(sample) ) sample = sample < 0 ? -32768 : 32767;
 
 			*dst++ = sample;
 		}
@@ -140,7 +140,7 @@ uint8_t* AudioDecoderMad::decode(uint8_t* input, uint32_t inputSize, uint32_t& o
 	// If we need to convert samplerate or/and from mono to stereo...
 	if (outsize > 0 && ( _synth.pcm.samplerate != 44100 || _synth.pcm.channels != 2)) {
 
-		int16_t* adjusted_data = 0;
+		boost::int16_t* adjusted_data = 0;
 		int	adjusted_size = 0;
 		int sample_count = outsize / (_synth.pcm.channels * 2); // samples are of size 2
 

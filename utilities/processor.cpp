@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: processor.cpp,v 1.72 2007/12/01 19:55:20 strk Exp $ */
+/* $Id: processor.cpp,v 1.73 2007/12/04 11:45:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -136,8 +136,6 @@ void execFsCommand(sprite_instance* movie, const char* command, const char* args
 int
 main(int argc, char *argv[])
 {
-    assert(tu_types_validate());
-
     /// Initialize gnash core library
     gnashInit();
 

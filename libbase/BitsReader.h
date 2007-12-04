@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: BitsReader.h,v 1.6 2007/12/04 06:37:37 zoulunkai Exp $
+// $Id: BitsReader.h,v 1.7 2007/12/04 11:45:23 strk Exp $
 
 #ifndef BITSREADER_H
 #define BITSREADER_H
@@ -28,13 +28,13 @@
 
 #include "swf.h"
 #include "tu_config.h"
-#include "tu_types.h" // for uint32_t used in this file
 #include "GnashException.h"
 #include "log.h"
 
 #include <cassert> // for assert used in this file
 #include <string>
 #include <sstream>
+#include <boost/cstdint.hpp> // for boost::uint32_t used in this file
 
 namespace gnash {
 
@@ -88,7 +88,7 @@ public:
 	/// Reads a bit-packed little-endian signed integer
 	/// from the stream.  The given bitcount determines the
 	/// number of bits to read.
-	int32_t read_sint(unsigned short bitcount);
+	boost::int32_t read_sint(unsigned short bitcount);
 
 	/// Read a byte as an unsigned int (aligned)
 	uint8_t  read_u8()
@@ -104,27 +104,27 @@ public:
 	}
 
 	/// Read two bytes as an unsigned int (aligned)
-	uint16_t read_u16()
+	boost::uint16_t read_u16()
 	{
 		align();
 		assert(ptr+2 < end);
-		uint16_t result = *ptr++;
+		boost::uint16_t result = *ptr++;
 		result |= *ptr++ << 8;
 		return result ;
 	}
 
 	/// Read two bytes as a signed int (aligned)
-	int16_t	read_s16()
+	boost::int16_t	read_s16()
 	{
-		return static_cast<int16_t>(read_u16());
+		return static_cast<boost::int16_t>(read_u16());
 	}
 
 	/// Read four bytes as an unsigned int (aligned)
-	uint32_t read_u32()
+	boost::uint32_t read_u32()
 	{
 		align();
 		assert(ptr+4 < end);
-		uint32_t result = *ptr++;
+		boost::uint32_t result = *ptr++;
 		result |= *ptr++ << 8;
 		result |= *ptr++ << 16;
 		result |= *ptr++ << 24;
@@ -132,9 +132,9 @@ public:
 	}
 
 	/// Read four bytes as an signed int (aligned)
-	int32_t read_s32()
+	boost::int32_t read_s32()
 	{
-		return static_cast<int32_t>(read_u32());
+		return static_cast<boost::int32_t>(read_u32());
 	}
 
 	/// \brief
@@ -146,9 +146,9 @@ public:
 	}
 
 	/// Checks if the stream contains X bits
-	bool gotBits(uint32_t nbits)
+	bool gotBits(boost::uint32_t nbits)
 	{
-		uint32_t gotbits = 8-usedBits +8*(end-ptr-1);
+		boost::uint32_t gotbits = 8-usedBits +8*(end-ptr-1);
 		if (gotbits > nbits) return true;
 		else return false;
 	}

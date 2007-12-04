@@ -9,10 +9,10 @@
 #define __TYPES_H__
 
 
-#include "gnash.h"
-#include "tu_types.h"
+#include "gnash.h" // what for ?
 
 #include <string>
+#include <boost/cstdint.hpp> // for boost::?int??_t 
 
 
 namespace gnash {
@@ -64,7 +64,7 @@ namespace gnash {
 		/// This function is meant to be used to
 		/// parse ActionScript colors in numeric format.
 		///
-		void parseRGB(uint32_t rgbCol)
+		void parseRGB(boost::uint32_t rgbCol)
 		{
 			m_r = (uint8_t)(rgbCol>>16);
 			m_g = (uint8_t)(rgbCol>>8);
@@ -80,7 +80,7 @@ namespace gnash {
 		/// This function is meant to be used to
 		/// output ActionScript colors in numeric format.
 		///
-		uint32_t toRGB() const
+		boost::uint32_t toRGB() const
 		{
 			return (m_r<<16) + (m_g<<8) + m_b;
 		}

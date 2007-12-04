@@ -38,14 +38,14 @@ public:
 	/// \brief
 	/// Return time elapsed in milliseconds since construction
 	/// or last call to ::restart()
-	DSOEXPORT uint32_t elapsed() const;
+	DSOEXPORT boost::uint32_t elapsed() const;
 
 	/// Restart the timer
 	DSOEXPORT void restart();
 
 private:
 
-	uint64_t startTimer;
+	boost::uint64_t startTimer;
 
 };
 

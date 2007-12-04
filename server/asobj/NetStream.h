@@ -19,7 +19,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.52 2007/10/17 04:58:59 nihilus Exp $ */
+/*  $Id: NetStream.h,v 1.53 2007/12/04 11:45:31 strk Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -131,7 +131,7 @@ protected:
 	as_environment* m_env;
 
 	// The size of the buffer in milliseconds
-	uint32_t m_bufferTime;
+	boost::uint32_t m_bufferTime;
 
 	// The video outputformat
 	int m_videoFrameFormat;
@@ -217,13 +217,13 @@ public:
 	/// @param position
 	///	Defines in milliseconds where to seek to
 	///
-	virtual void seek(uint32_t /*pos*/){}
+	virtual void seek(boost::uint32_t /*pos*/){}
 
 	/// Tells where the playhead currently is
 	//
 	/// @return The time in milliseconds of the current playhead position
 	///
-	virtual int32_t time() { return 0; }
+	virtual boost::int32_t time() { return 0; }
 
 	/// Called at the SWF framerate. Used to process queued status messages
 	/// and (re)start after a buffering pause. In NetStreamFfmpeg it is also
@@ -255,13 +255,13 @@ public:
 	/// @param time
 	/// The time in milliseconds that should be buffered.
 	///
-	void setBufferTime(uint32_t time);
+	void setBufferTime(boost::uint32_t time);
 
 	/// Returns what the buffer time has been set to. (100 miliseconds is default)
 	//
 	/// @return The size of the buffer in milliseconds.
 	///
-	uint32_t bufferTime() { return m_bufferTime; }
+	boost::uint32_t bufferTime() { return m_bufferTime; }
 
 	/// Returns the number of bytes loaded of the media file
 	//

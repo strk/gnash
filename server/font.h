@@ -51,7 +51,7 @@ class stream;
 class kerning_pair
 {
 public:
-	uint16_t	m_char0, m_char1;
+	boost::uint16_t	m_char0, m_char1;
 
 	bool	operator==(const kerning_pair& k) const
 	{
@@ -201,7 +201,7 @@ public:
 	///         positive index to use in subsequent calls to other glyph-index-based
 	///	    methods.
 	///
-	int	get_glyph_index(uint16_t code, bool embedded) const;
+	int	get_glyph_index(boost::uint16_t code, bool embedded) const;
 
 	/// Return the advance value for the given glyph index
 	//
@@ -250,7 +250,7 @@ private:
 	///
 	/// @return index of the newly added glyph, or -1 on error.
 	///
-	int add_os_glyph(uint16_t code);
+	int add_os_glyph(boost::uint16_t code);
 
 	/// Initialize the freetype rasterizer
 	//
@@ -281,7 +281,7 @@ private:
 	bool	m_subpixel_font;
 
 	// This table maps from Unicode character number to glyph index.
-	typedef std::map<uint16_t, int> code_table;
+	typedef std::map<boost::uint16_t, int> code_table;
 
 	/// Code to index table for embedded glyphs
 	code_table _embedded_code_table; 

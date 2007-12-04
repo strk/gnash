@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderGst.cpp,v 1.6 2007/11/30 00:13:02 tgc Exp $
+// $Id: VideoDecoderGst.cpp,v 1.7 2007/12/04 11:45:26 strk Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -192,7 +192,7 @@ VideoDecoderGst::setup(int widthi, int heighti, int deblockingi, bool smoothingi
 
 // gnash calls this when it wants you to decode the given videoframe
 std::auto_ptr<image::image_base>
-VideoDecoderGst::decodeToImage(uint8_t* data, uint32_t size)
+VideoDecoderGst::decodeToImage(uint8_t* data, boost::uint32_t size)
 {
 
 	std::auto_ptr<image::image_base> ret_image(new image::rgb(width, height));

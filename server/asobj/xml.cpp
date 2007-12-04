@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.55 2007/11/20 12:04:56 cmusick Exp $ */
+/* $Id: xml.cpp,v 1.56 2007/12/04 11:45:32 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -160,7 +160,7 @@ XML::set_member(string_table::key name, const as_value& val,
 	{
 		if ( ! val.is_number() )
 		{
-			_status = static_cast<XML::Status>(std::numeric_limits<int32_t>::min());
+			_status = static_cast<XML::Status>(std::numeric_limits<boost::int32_t>::min());
 		}
 		else
 		{

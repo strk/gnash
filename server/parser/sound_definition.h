@@ -77,7 +77,7 @@ public:
 class start_stream_sound_tag : public ControlTag
 {
 public:
-	uint16_t	m_handler_id;
+	boost::uint16_t	m_handler_id;
 	long		m_start;
 	int		latency;
 

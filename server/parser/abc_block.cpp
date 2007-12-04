@@ -161,7 +161,7 @@ abc_Trait::finalize_mbody(abc_block *pBlock, asMethod *pMethod)
 bool
 abc_Trait::read(stream* in, abc_block *pBlock)
 {
-	uint32_t name = in->read_V32();
+	boost::uint32_t name = in->read_V32();
 	if (name >= pBlock->mMultinamePool.size())
 	{
 		ERR((_("ABC: Bad name for trait.\n")));
@@ -185,7 +185,7 @@ abc_Trait::read(stream* in, abc_block *pBlock)
 	{
 		mSlotId = in->read_V32();
 		mTypeIndex = in->read_V32();
-		uint32_t vindex = in->read_V32();
+		boost::uint32_t vindex = in->read_V32();
 		if (vindex)
 		{
 			if (!pBlock->pool_value(vindex, in->read_u8(), mValue))
@@ -203,7 +203,7 @@ abc_Trait::read(stream* in, abc_block *pBlock)
 		// Ignore the 'disp_id'
 		in->skip_V32();
 
-		uint32_t moffset = in->read_V32();
+		boost::uint32_t moffset = in->read_V32();
 		if (moffset >= pBlock->mMethods.size())
 		{
 			ERR((_("Bad method id in trait.\n")));
@@ -226,7 +226,7 @@ abc_Trait::read(stream* in, abc_block *pBlock)
 	case KIND_FUNCTION:
 	{
 		mSlotId = in->read_V32();
-		uint32_t moffset = in->read_V32();
+		boost::uint32_t moffset = in->read_V32();
 		if (moffset >= pBlock->mMethods.size())
 		{
 			ERR((_("Bad method id in trait.\n")));
@@ -245,7 +245,7 @@ abc_Trait::read(stream* in, abc_block *pBlock)
 	// Ignore the metadata, but it must be read to know how to ignore it.
 	if ((kind >> 4) & 0x04) // has metadata
 	{
-		uint32_t mcount = in->read_V32();
+		boost::uint32_t mcount = in->read_V32();
 		for (unsigned int i = 0; i < mcount; ++i)
 		{
 			in->skip_V32();
@@ -317,13 +317,13 @@ bool
 abc_block::read_integer_constants()
 {
 	// count overestimates by 1.
-	uint32_t count = mS->read_V32();
+	boost::uint32_t count = mS->read_V32();
 	mIntegerPool.resize(count);
 	if (count)
 		mIntegerPool[0] = 0;
 	for (unsigned int i = 1; i < count; ++i)
 	{
-		mIntegerPool[i] = static_cast<int32_t> (mS->read_V32());
+		mIntegerPool[i] = static_cast<boost::int32_t> (mS->read_V32());
 	}
 	return true;
 }
@@ -333,7 +333,7 @@ bool
 abc_block::read_unsigned_integer_constants()
 {
 	// count overestimates by 1.
-	uint32_t count = mS->read_V32();
+	boost::uint32_t count = mS->read_V32();
 	mUIntegerPool.resize(count);
 	if (count)
 		mUIntegerPool[0] = 0;
@@ -348,7 +348,7 @@ abc_block::read_unsigned_integer_constants()
 bool
 abc_block::read_double_constants()
 {
-	uint32_t count = mS->read_V32();
+	boost::uint32_t count = mS->read_V32();
 	mDoublePool.resize(count);
 	if (count)
 		mDoublePool[0] = 0.0;
@@ -363,7 +363,7 @@ abc_block::read_double_constants()
 bool
 abc_block::read_string_constants()
 {
-	uint32_t count = mS->read_V32();
+	boost::uint32_t count = mS->read_V32();
 	mStringPool.resize(count);
 	mStringPoolTableIds.resize(count);
 	if (count)
@@ -373,7 +373,7 @@ abc_block::read_string_constants()
 	}
 	for (unsigned int i = 1; i < count; ++i)
 	{
-		uint32_t length = mS->read_V32();
+		boost::uint32_t length = mS->read_V32();
 		mS->read_string_with_length(length, mStringPool[i]);
 		mStringPoolTableIds[i] = 0;
 	}
@@ -386,7 +386,7 @@ abc_block::read_string_constants()
 bool
 abc_block::read_namespaces()
 {
-	uint32_t count = mS->read_V32();
+	boost::uint32_t count = mS->read_V32();
 	mNamespacePool.resize(count);
 	if (count)
 	{
@@ -395,7 +395,7 @@ abc_block::read_namespaces()
 	for (unsigned int i = 1; i < count; ++i)
 	{
 		uint8_t kind = mS->read_u8();
-		uint32_t nameIndex = mS->read_V32();
+		boost::uint32_t nameIndex = mS->read_V32();
 
 		if (nameIndex && nameIndex < mStringPool.size())
 		{
@@ -434,7 +434,7 @@ abc_block::read_namespaces()
 bool
 abc_block::read_namespace_sets()
 {
-	uint32_t count = mS->read_V32();
+	boost::uint32_t count = mS->read_V32();
 	mNamespaceSetPool.resize(count);
 	if (count)
 	{
@@ -442,11 +442,11 @@ abc_block::read_namespace_sets()
 	}
 	for (unsigned int i = 1; i < count; ++i)
 	{
-		uint32_t icount = mS->read_V32();
+		boost::uint32_t icount = mS->read_V32();
 		mNamespaceSetPool[i].resize(icount);
 		for (unsigned int j = 0; j < icount; ++j)
 		{
-			uint32_t selection = mS->read_V32();
+			boost::uint32_t selection = mS->read_V32();
 			if (!selection || selection >= mNamespacePool.size())
 			{
 				ERR((_("ABC: Out of bounds namespace for namespace set.\n")));
@@ -462,7 +462,7 @@ abc_block::read_namespace_sets()
 bool
 abc_block::read_multinames()
 {
-	uint32_t count = mS->read_V32();
+	boost::uint32_t count = mS->read_V32();
 	mMultinamePool.resize(count);
 	if (count)
 	{
@@ -472,9 +472,9 @@ abc_block::read_multinames()
 	for (unsigned int i = 1; i < count; ++i)
 	{
 		uint8_t kind = mS->read_u8();
-		uint32_t ns = 0;
-		uint32_t name = 0;
-		uint32_t nsset = 0;
+		boost::uint32_t ns = 0;
+		boost::uint32_t name = 0;
+		boost::uint32_t nsset = 0;
 
 		mMultinamePool[i].mFlags = 0;
 
@@ -583,7 +583,7 @@ abc_block::read_multinames()
 }
 
 bool
-abc_block::pool_value(uint32_t index, uint8_t type, as_value &v)
+abc_block::pool_value(boost::uint32_t index, uint8_t type, as_value &v)
 {
 	if (!index)
 		return true;
@@ -668,15 +668,15 @@ abc_block::pool_value(uint32_t index, uint8_t type, as_value &v)
 bool
 abc_block::read_method_infos()
 {
-	uint32_t count = mS->read_V32();
+	boost::uint32_t count = mS->read_V32();
 	mMethods.resize(count);
 	for (unsigned int i = 0; i < count; ++i)
 	{
 		asMethod *pMethod = mCH->newMethod();
 		mMethods[i] = pMethod;
 
-		uint32_t param_count = mS->read_V32();
-		uint32_t return_type = mS->read_V32();
+		boost::uint32_t param_count = mS->read_V32();
+		boost::uint32_t return_type = mS->read_V32();
 
 		pMethod->setMinArgumentCount(param_count);
 		pMethod->setMaxArgumentCount(param_count);
@@ -699,7 +699,7 @@ abc_block::read_method_infos()
 		for (unsigned int j = 0; j < param_count; ++j)
 		{
 			// The parameter type.
-			uint32_t ptype = mS->read_V32();
+			boost::uint32_t ptype = mS->read_V32();
 			if (ptype >= mMultinamePool.size())
 			{
 				ERR((_("ABC: Out of bounds parameter type in method.\n")));
@@ -724,11 +724,11 @@ abc_block::read_method_infos()
 		// be assigned to the corresponding parameters.
 		if (flags & METHOD_OPTIONAL_ARGS)
 		{
-			uint32_t ocount = mS->read_V32();
+			boost::uint32_t ocount = mS->read_V32();
 			pMethod->setMinArgumentCount(pMethod->maxArgumentCount() - ocount);
 			for (unsigned int j = 0; j < ocount; ++j)
 			{
-				uint32_t index = mS->read_V32();
+				boost::uint32_t index = mS->read_V32();
 				uint8_t kindof = mS->read_u8();
 				as_value v;
 				if (!pool_value(index, kindof, v))
@@ -753,11 +753,11 @@ abc_block::read_method_infos()
 bool
 abc_block::skip_metadata()
 {
-	uint32_t count = mS->read_V32();
+	boost::uint32_t count = mS->read_V32();
 	for (unsigned int i = 0; i < count; ++i)
 	{
 		mS->skip_V32(); // A name index.
-		uint32_t icount = mS->read_V32();
+		boost::uint32_t icount = mS->read_V32();
 		for (unsigned int j = 0; j < icount; ++j)
 		{
 			// key/values may not be stored together, but this still works.
@@ -772,13 +772,13 @@ abc_block::skip_metadata()
 bool
 abc_block::read_instances()
 {
-	uint32_t count = mS->read_V32();
+	boost::uint32_t count = mS->read_V32();
 	mClasses.resize(count);
 	for (unsigned int i = 0; i < count; ++i)
 	{
 		asClass *pClass;
 
-		uint32_t index = mS->read_V32();
+		boost::uint32_t index = mS->read_V32();
 		// 0 is allowed as a name, typically for the last entry.
 		if (index >= mMultinamePool.size())
 		{
@@ -810,7 +810,7 @@ abc_block::read_instances()
 		}
 		pClass->setDeclared();
 		mClasses[i] = pClass;
-		uint32_t super_index = mS->read_V32();
+		boost::uint32_t super_index = mS->read_V32();
 
 		if (super_index && super_index >= mMultinamePool.size())
 		{
@@ -869,7 +869,7 @@ abc_block::read_instances()
 
 		if (flags & INSTANCE_PROTECTED_NS) // Protected Namespace
 		{
-			uint32_t ns_index = mS->read_V32();
+			boost::uint32_t ns_index = mS->read_V32();
 			if (ns_index >= mNamespacePool.size())
 			{
 				ERR((_("ABC: Out of bounds namespace for protected.\n")));
@@ -883,11 +883,11 @@ abc_block::read_instances()
 
 		// This is the list of interfaces which the instances has agreed to
 		// implement. They must be interfaces, and they must exist.
-		uint32_t intcount = mS->read_V32();
+		boost::uint32_t intcount = mS->read_V32();
 
 		for (unsigned int j = 0; j < intcount; ++j)
 		{
-			uint32_t i_index = mS->read_V32();
+			boost::uint32_t i_index = mS->read_V32();
 			// 0 is allowed as an interface, typically for the last one.
 			if (i_index >= mMultinamePool.size())
 			{
@@ -907,7 +907,7 @@ abc_block::read_instances()
 		// The next thing should be the constructor.
 		// TODO: What does this mean exactly? How does it differ from the one in
 		// the class info block?
-		uint32_t moffset = mS->read_V32();
+		boost::uint32_t moffset = mS->read_V32();
 		if (moffset >= mMethods.size())
 		{
 			ERR((_("ABC: Out of bounds method for initializer.\n")));
@@ -918,7 +918,7 @@ abc_block::read_instances()
 		mMethods[moffset]->setOwner(pClass);
 
 		// Next come the 'traits' of the instance. (The members.)
-		uint32_t tcount = mS->read_V32();
+		boost::uint32_t tcount = mS->read_V32();
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
 			abc_Trait &aTrait = newTrait();
@@ -935,12 +935,12 @@ bool
 abc_block::read_classes()
 {
 	// Count was found in read_instances().
-	uint32_t count = mClasses.size();
+	boost::uint32_t count = mClasses.size();
 
 	for (unsigned int i = 0; i < count; ++i)
 	{
 		asClass *pClass = mClasses[i];
-		uint32_t moffset = mS->read_V32();
+		boost::uint32_t moffset = mS->read_V32();
 		if (moffset >= mMethods.size())
 		{
 			ERR((_("ABC: Out of bound static constructor for class.\n")));
@@ -950,7 +950,7 @@ abc_block::read_classes()
 		pClass->setStaticConstructor(mMethods[moffset]);
 		mMethods[moffset]->setOwner(pClass);
 		
-		uint32_t tcount = mS->read_V32();
+		boost::uint32_t tcount = mS->read_V32();
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
 			abc_Trait &aTrait = newTrait();
@@ -967,7 +967,7 @@ abc_block::read_classes()
 bool
 abc_block::read_scripts()
 {
-	uint32_t count = mS->read_V32();
+	boost::uint32_t count = mS->read_V32();
 
 	mScripts.resize(count);
 	for (unsigned int i = 0; i < count; ++i)
@@ -975,7 +975,7 @@ abc_block::read_scripts()
 		asClass *pScript = mCH->newClass();
 		mScripts[i] = pScript;
 
-		uint32_t moffset = mS->read_V32();
+		boost::uint32_t moffset = mS->read_V32();
 		if (moffset >= mMethods.size())
 		{
 			ERR((_("ABC: Out of bounds method for script.\n")));
@@ -986,7 +986,7 @@ abc_block::read_scripts()
 		pScript->setConstructor(mMethods[moffset]);
 		pScript->setSuper(mTheObject);
 
-		uint32_t tcount = mS->read_V32();
+		boost::uint32_t tcount = mS->read_V32();
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
 			abc_Trait &aTrait = newTrait();
@@ -1002,11 +1002,11 @@ abc_block::read_scripts()
 bool
 abc_block::read_method_bodies()
 {
-	uint32_t count = mS->read_V32();
+	boost::uint32_t count = mS->read_V32();
 
 	for (unsigned int i = 0; i < count; ++i)
 	{
-		uint32_t moffset = mS->read_V32();
+		boost::uint32_t moffset = mS->read_V32();
 		if (moffset >= mMethods.size())
 		{
 			ERR((_("ABC: Out of bounds for method body.\n")));
@@ -1028,7 +1028,7 @@ abc_block::read_method_bodies()
 		// Max scope depth.
 		mS->skip_V32();
 		// Code length
-		uint32_t clength = mS->read_V32();
+		boost::uint32_t clength = mS->read_V32();
 		// The code.
 		std::vector<char> body(clength);
 		body.resize(clength);
@@ -1042,7 +1042,7 @@ abc_block::read_method_bodies()
 		else
 			mMethods[moffset]->getBody()->reInitialize(&body.front(), clength, true);
 
-		uint32_t ecount = mS->read_V32();
+		boost::uint32_t ecount = mS->read_V32();
 		for (unsigned int j = 0; j < ecount; ++j)
 		{
 			asException *pExcept = mCH->newException();
@@ -1055,7 +1055,7 @@ abc_block::read_method_bodies()
 			pExcept->setCatch(mS->read_V32());
 
 			// What types should be caught.
-			uint32_t catch_type = mS->read_V32();
+			boost::uint32_t catch_type = mS->read_V32();
 			if (catch_type >= mMultinamePool.size())
 			{
 				ERR((_("ABC: Out of bound type for exception.\n")));
@@ -1086,7 +1086,7 @@ abc_block::read_method_bodies()
 			// In version 46.15, no names.
 			if (mVersion != (46 << 16) | 15)
 			{
-				uint32_t cvn = mS->read_V32();
+				boost::uint32_t cvn = mS->read_V32();
 				if (cvn >= mMultinamePool.size())
 				{
 					ERR((_("ABC: Out of bound name for caught exception.\n")));
@@ -1097,7 +1097,7 @@ abc_block::read_method_bodies()
 			}
 		} // end of exceptions
 
-		uint32_t tcount = mS->read_V32();
+		boost::uint32_t tcount = mS->read_V32();
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
 			abc_Trait &aTrait = newTrait();

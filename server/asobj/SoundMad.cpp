@@ -229,7 +229,7 @@ bool SoundMad::getAudio(void* owner, uint8_t* stream, int len)
 				tmp_raw_buffer = new uint8_t[outsize];
 				int sample;
 				
-				int16_t* dst = reinterpret_cast<int16_t*>(tmp_raw_buffer);
+				boost::int16_t* dst = reinterpret_cast<boost::int16_t*>(tmp_raw_buffer);
 
 				// transfer the decoded samples into the sound-struct, and do some
 				// scaling while we're at it.
@@ -249,7 +249,7 @@ bool SoundMad::getAudio(void* owner, uint8_t* stream, int len)
 						// quantize
 						sample = mad_sample >> (MAD_F_FRACBITS + 1 - 16);
 
-						if ( sample != static_cast<int16_t>(sample) ) sample = sample < 0 ? -32768 : 32767;
+						if ( sample != static_cast<boost::int16_t>(sample) ) sample = sample < 0 ? -32768 : 32767;
 
 						*dst++ = sample;
 					}
@@ -258,7 +258,7 @@ bool SoundMad::getAudio(void* owner, uint8_t* stream, int len)
 				// If we need to convert samplerate or/and from mono to stereo...
 				if (outsize > 0 && (so->frame.header.samplerate != 44100 || !so->frame.header.mode)) {
 
-					int16_t* adjusted_data = 0;
+					boost::int16_t* adjusted_data = 0;
 					int	adjusted_size = 0;
 					int sample_count = outsize / ((so->frame.header.mode) ? 4 : 2);
 

@@ -22,14 +22,13 @@
 #define UTILITY_H
 
 #include "tu_config.h"
-//#include "tu_math.h"
-//#include "tu_types.h"
 
 #include <cassert>
 #include <cctype>
 #include <string>
 #include <typeinfo>
 #include <cmath>
+#include <boost/cstdint.hpp>
 
 #if defined(__GNUC__) && __GNUC__ > 2
 #  include <cxxabi.h>
@@ -252,7 +251,7 @@ namespace gnash {
 /// @param m_stereo
 /// Do we want the output data to be in stereo?
 ///
-void	convert_raw_data(int16_t** adjusted_data,
+void	convert_raw_data(boost::int16_t** adjusted_data,
 		  int* adjusted_size, void* data, int sample_count,
 		  int sample_size, int sample_rate, bool stereo,
 		  int m_sample_rate, bool m_stereo);

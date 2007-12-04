@@ -16,14 +16,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaBuffer.h,v 1.6 2007/11/30 00:13:01 tgc Exp $
+// $Id: MediaBuffer.h,v 1.7 2007/12/04 11:45:25 strk Exp $
 
 #ifndef __MEDIABUFFER_H__
 #define __MEDIABUFFER_H__
 
-#include <boost/thread/mutex.hpp>
-#include <queue>
 #include "image.h"
+
+#include <queue>
+#include <boost/thread/mutex.hpp>
+#include <boost/cstdint.hpp> // for boost::?int??_t
 
 namespace gnash {
 namespace media {
@@ -50,7 +52,7 @@ public:
 //	int m_stream_index;
 
 	/// Size of the data stored
-	uint32_t m_size;
+	boost::uint32_t m_size;
 
 	/// Pointer to the data. The data is owned by this class.
 	uint8_t* m_data;
@@ -60,7 +62,7 @@ public:
 	uint8_t* m_ptr;
 
 	/// Timestamp in millisec
-	uint32_t m_pts;
+	boost::uint32_t m_pts;
 };
 
 /// This class is used to store decoded video data
@@ -82,7 +84,7 @@ public:
 	std::auto_ptr<image::image_base> image;
 
 	/// Timestamp in millisec
-	uint32_t timestamp;
+	boost::uint32_t timestamp;
 };
 
 /// Threadsafe elements-owning queue
@@ -206,7 +208,7 @@ public:
 	/// @param size
 	/// The size of the buffer.
 	///
-	void setBufferTime(uint32_t size) {
+	void setBufferTime(boost::uint32_t size) {
 		boost::mutex::scoped_lock lock(_mutex);
 		_bufferTime = size;
 	}
@@ -215,7 +217,7 @@ public:
 	//
 	/// @return the requested size of the buffer.
 	///
-	uint32_t getReqBufferTime() {
+	boost::uint32_t getReqBufferTime() {
 		boost::mutex::scoped_lock lock(_mutex);
 		return _bufferTime;
 	}
@@ -225,7 +227,7 @@ public:
 	//
 	/// @return the current size of the buffer in milliseconds.
 	///
-	uint32_t getBufferTime() {
+	boost::uint32_t getBufferTime() {
 		boost::mutex::scoped_lock lock(_mutex);
 		return calcBufferTime();
 	}
@@ -248,8 +250,8 @@ private:
 	//
 	/// @return the real size of the buffer in milliseconds.
 	///
-	uint32_t calcBufferTime() {
-		uint32_t size = 0;
+	boost::uint32_t calcBufferTime() {
+		boost::uint32_t size = 0;
 
 		// Get the size of audio buffer
 		if (!audioQueue.empty()) {
@@ -259,7 +261,7 @@ private:
 		// Get the size of video buffer, and use that if it is bigger than
 		// the vaule from the audio buffer.
 		if (!videoQueue.empty()) {
-			uint32_t vSize = videoQueue.back()->timestamp - videoQueue.front()->timestamp;
+			boost::uint32_t vSize = videoQueue.back()->timestamp - videoQueue.front()->timestamp;
 			if (vSize > size) size = vSize;
 		}
 		return size;
@@ -274,7 +276,7 @@ private:
 	std::queue <raw_videodata_t*> videoQueue;
 
 	/// The requested size of the buffer in milliseconds
-	uint32_t _bufferTime;
+	boost::uint32_t _bufferTime;
 };
 
 } // gnash.media namespace 

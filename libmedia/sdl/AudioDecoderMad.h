@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: AudioDecoderMad.h,v 1.4 2007/11/24 17:21:43 strk Exp $
+// $Id: AudioDecoderMad.h,v 1.5 2007/12/04 11:45:27 strk Exp $
 
 #ifndef __AUDIODECODERMAD_H__
 #define __AUDIODECODERMAD_H__
@@ -39,7 +39,7 @@ public:
 	bool setup(AudioInfo* info);
 	bool setup(SoundInfo* info);
 
-	uint8_t* decode(uint8_t* input, uint32_t inputSize, uint32_t& outputSize, uint32_t& decodedBytes, bool parse);
+	uint8_t* decode(uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool parse);
 
 private:
 

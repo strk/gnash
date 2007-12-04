@@ -187,7 +187,7 @@ color_getrgb(const fn_call& fn)
 	log_debug ("Color.getRGB found Color transform with rgb = %d/%d/%d (%f,%f,%f)", r, g, b, trans.m_[0][1], trans.m_[1][1], trans.m_[2][1]);
 #endif
 
-	int32_t rgb = (r<<16) | (g<<8) | b;
+	boost::int32_t rgb = (r<<16) | (g<<8) | b;
 
 	return as_value(rgb);
 }
@@ -239,7 +239,7 @@ color_setrgb(const fn_call& fn)
 		return as_value();
 	}
 
-	int32_t color = fn.arg(0).to_int();
+	boost::int32_t color = fn.arg(0).to_int();
 
 	int r = (color&0xFF0000) >> 16;
 	int g = (color&0x00FF00) >> 8;

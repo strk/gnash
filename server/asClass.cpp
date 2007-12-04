@@ -43,7 +43,7 @@ asMethod::setReturnType(asClass */*type*/)
 }
 
 bool
-asMethod::addValue(string_table::key name, asNamespace *ns, uint32_t slotId,
+asMethod::addValue(string_table::key name, asNamespace *ns, boost::uint32_t slotId,
 	asClass *type, as_value& val, bool isconst)
 {
 	if (val.is_object())
@@ -61,7 +61,7 @@ asMethod::addValue(string_table::key name, asNamespace *ns, uint32_t slotId,
 }
 
 bool
-asClass::addValue(string_table::key name, asNamespace *ns, uint32_t slotId,
+asClass::addValue(string_table::key name, asNamespace *ns, boost::uint32_t slotId,
 	asClass *type, as_value& val, bool isconst, bool isstatic)
 {
 	if (val.is_object())
@@ -81,20 +81,20 @@ asClass::addValue(string_table::key name, asNamespace *ns, uint32_t slotId,
 
 bool
 asMethod::addMemberClass(string_table::key name, asNamespace *ns,
-	uint32_t slotId, asClass *type)
+	boost::uint32_t slotId, asClass *type)
 {
 	return addSlot(name, ns, slotId, type);
 }
 
 bool
 asClass::addMemberClass(string_table::key name, asNamespace *ns,
-	uint32_t slotId, asClass *type, bool isstatic)
+	boost::uint32_t slotId, asClass *type, bool isstatic)
 {
 	return addSlot(name, ns, slotId, type, isstatic);
 }
 
 bool
-asMethod::addSlot(string_table::key name, asNamespace* ns, uint32_t slotId,
+asMethod::addSlot(string_table::key name, asNamespace* ns, boost::uint32_t slotId,
 	asClass */*type*/)
 {
 	string_table::key nsname = ns ? ns->getURI() : 0;
@@ -106,7 +106,7 @@ asMethod::addSlot(string_table::key name, asNamespace* ns, uint32_t slotId,
 
 bool
 asMethod::addSlotFunction(string_table::key name, asNamespace *ns,
-	uint32_t slotId, asMethod *method)
+	boost::uint32_t slotId, asMethod *method)
 {
 	asClass a;
 	a.setName(NSV::CLASS_FUNCTION);
@@ -116,7 +116,7 @@ asMethod::addSlotFunction(string_table::key name, asNamespace *ns,
 
 bool
 asClass::addSlotFunction(string_table::key name, asNamespace *ns,
-	uint32_t slotId, asMethod *method, bool isstatic)
+	boost::uint32_t slotId, asMethod *method, bool isstatic)
 {
 	asClass a;
 	a.setName(NSV::CLASS_FUNCTION);
@@ -125,7 +125,7 @@ asClass::addSlotFunction(string_table::key name, asNamespace *ns,
 }
 
 bool
-asClass::addSlot(string_table::key name, asNamespace* ns, uint32_t slotId,
+asClass::addSlot(string_table::key name, asNamespace* ns, boost::uint32_t slotId,
 	asClass */*type*/, bool isstatic)
 {
 	string_table::key nsname = ns ? ns->getURI() : 0;
@@ -278,7 +278,7 @@ asClass::buildFromPrototype(as_object *o, string_table::key name,
 }
 
 bool
-asClass::addValue(string_table::key name, asNamespace *ns, uint32_t slotId,
+asClass::addValue(string_table::key name, asNamespace *ns, boost::uint32_t slotId,
 	asClass *type, as_value& val, bool isconst, bool isstatic,
 	ClassHierarchy *CH)
 {
@@ -291,7 +291,7 @@ asClass::addValue(string_table::key name, asNamespace *ns, uint32_t slotId,
 }
 
 bool
-asClass::addSlot(string_table::key name, asNamespace *ns, uint32_t slotId,
+asClass::addSlot(string_table::key name, asNamespace *ns, boost::uint32_t slotId,
 	asClass *type, bool isstatic, ClassHierarchy *CH)
 {
 	asBoundValue *bv = CH->newBoundValue();
@@ -313,7 +313,7 @@ asClass::addMethod(string_table::key name, asNamespace *ns, asMethod *method,
 
 bool
 asClass::addMemberClass(string_table::key name, asNamespace *ns,
-	uint32_t slotId, asClass *type, bool isstatic)
+	boost::uint32_t slotId, asClass *type, bool isstatic)
 {
 	if (!isstatic)
 		return addBinding(name, asBinding(ns, type, slotId, isstatic));
@@ -323,7 +323,7 @@ asClass::addMemberClass(string_table::key name, asNamespace *ns,
 // TODO: Figure out how this differs from addMethod
 bool
 asClass::addSlotFunction(string_table::key name, asNamespace *ns,
-	uint32_t slotId, asMethod *method, bool isstatic)
+	boost::uint32_t slotId, asMethod *method, bool isstatic)
 {
 	if (!isstatic)
 		return addBinding(name, asBinding(ns, method, slotId, isstatic));

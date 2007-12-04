@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: BitsReader.cpp,v 1.2 2007/10/04 09:37:49 tgc Exp $
+// $Id: BitsReader.cpp,v 1.3 2007/12/04 11:45:23 strk Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -40,7 +40,7 @@ unsigned BitsReader::read_uint(unsigned short bitcount)
 {
 	assert(bitcount <= 32);
 
-	uint32_t value = 0;
+	boost::uint32_t value = 0;
 
 	unsigned short bits_needed = bitcount;
 	do
@@ -90,9 +90,9 @@ unsigned BitsReader::read_uint(unsigned short bitcount)
 }
 
 
-int32_t BitsReader::read_sint(unsigned short bitcount)
+boost::int32_t BitsReader::read_sint(unsigned short bitcount)
 {
-	int32_t	value = int32_t(read_uint(bitcount));
+	boost::int32_t	value = boost::int32_t(read_uint(bitcount));
 
 	// Sign extend...
 	if (value & (1 << (bitcount - 1))) 

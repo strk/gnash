@@ -242,7 +242,7 @@ static as_value sprite_attach_movie(const fn_call& fn)
 	const std::string& newname = fn.arg(1).to_string();
 
 	// should we support negative depths ? YES !
-	int depth_val = uint16_t(fn.arg(2).to_number());
+	int depth_val = boost::uint16_t(fn.arg(2).to_number());
 
 	boost::intrusive_ptr<character> newch = exported_movie->create_character_instance(sprite.get(), depth_val);
 	assert( newch.get() > (void*)0xFFFF );
@@ -1206,7 +1206,7 @@ sprite_lineStyle(const fn_call& fn)
 {
 	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
-	uint16_t thickness = 0;
+	boost::uint16_t thickness = 0;
 	uint8_t r = 0;
 	uint8_t g = 0;
 	uint8_t b = 0;
@@ -1219,12 +1219,12 @@ sprite_lineStyle(const fn_call& fn)
 		return as_value();
 	}
 
-	thickness = uint16_t(PIXELS_TO_TWIPS(uint16_t(fclamp(fn.arg(0).to_number(), 0, 255))));
+	thickness = boost::uint16_t(PIXELS_TO_TWIPS(boost::uint16_t(fclamp(fn.arg(0).to_number(), 0, 255))));
 
 	if ( fn.nargs > 1 )
 	{
 		// 2^24 is the max here
-		uint32_t rgbval = uint32_t(fclamp(fn.arg(1).to_number(), 0, 16777216));
+		boost::uint32_t rgbval = boost::uint32_t(fclamp(fn.arg(1).to_number(), 0, 16777216));
 		r = uint8_t( (rgbval&0xFF0000) >> 16);
 		g = uint8_t( (rgbval&0x00FF00) >> 8);
 		b = uint8_t( (rgbval&0x0000FF) );
@@ -1300,7 +1300,7 @@ sprite_beginFill(const fn_call& fn)
 	if ( fn.nargs > 0 )
 	{
 		// 2^24 is the max here
-		uint32_t rgbval = uint32_t(fclamp(fn.arg(0).to_number(), 0, 16777216));
+		boost::uint32_t rgbval = boost::uint32_t(fclamp(fn.arg(0).to_number(), 0, 16777216));
 		r = uint8_t( (rgbval&0xFF0000) >> 16);
 		g = uint8_t( (rgbval&0x00FF00) >> 8);
 		b = uint8_t( (rgbval&0x0000FF) );
@@ -2806,7 +2806,7 @@ sprite_instance::attachCharacter(character& newch, int depth)
 
 character*
 sprite_instance::add_display_object(
-    uint16_t character_id,
+    boost::uint16_t character_id,
     const char* name,
     const std::vector<swf_event*>& event_handlers,
     int depth, 
@@ -2869,7 +2869,7 @@ sprite_instance::add_display_object(
 
 void
 sprite_instance::replace_display_object(
-        uint16_t character_id,
+        boost::uint16_t character_id,
         const char* name,
         int depth,
         const cxform* color_transform,

@@ -105,7 +105,7 @@ public:
 	/// @return A shape_character_def in 1024 EM coordinates, or a NULL pointer if the given
 	///         character code doesn't exist in this font.
 	///
-	boost::intrusive_ptr<shape_character_def> getGlyph(uint16_t code, float& advance);
+	boost::intrusive_ptr<shape_character_def> getGlyph(boost::uint16_t code, float& advance);
 
 
 private:

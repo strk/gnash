@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: DropShadowFilter.h,v 1.4 2007/09/26 19:00:46 strk Exp $ */
+/* $Id: DropShadowFilter.h,v 1.5 2007/12/04 11:45:27 strk Exp $ */
 
 #ifndef GNASH_DROPSHADOWFILTER_H
 #define GNASH_DROPSHADOWFILTER_H
@@ -45,7 +45,7 @@ public:
         m_inner(false), m_knockout(false), m_hideObject(false)
     { return; }
 
-    DropShadowFilter(float distance, float angle, uint32_t color,
+    DropShadowFilter(float distance, float angle, boost::uint32_t color,
         uint8_t alpha, float blurX, float blurY, float strength,
         uint8_t quality, bool inner, bool knockout, bool hideObject) :
         m_distance(distance), m_angle(angle), m_color(color),
@@ -57,7 +57,7 @@ public:
 protected:
     float m_distance; // Distance of the filter in pixels.
     float m_angle; // Angle of the filter.
-    uint32_t m_color; // RGB color.
+    boost::uint32_t m_color; // RGB color.
     uint8_t m_alpha; // Alpha strength, as a percentage(?)
     float m_blurX; // horizontal blur
     float m_blurY; // vertical blur

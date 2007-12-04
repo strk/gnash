@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.100 2007/11/27 11:08:23 bwy Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.101 2007/12/04 11:45:31 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -804,7 +804,7 @@ bool NetStreamFfmpeg::decodeFLVFrame()
 	packet->size = frame->dataSize;
 	packet->data = frame->data;
 	// FIXME: is this the right value for packet.dts?
-	packet->pts = packet->dts = static_cast<int64_t>(frame->timestamp);
+	packet->pts = packet->dts = static_cast<boost::int64_t>(frame->timestamp);
 
 	if (frame->tag == 9)
 	{
@@ -829,9 +829,9 @@ bool NetStreamFfmpeg::decodeAudio(AvPkt& packet)
 	uint8_t* ptr = new uint8_t[bufsize];
 #ifdef FFMPEG_AUDIO2
 	frame_size = bufsize;
-	if (avcodec_decode_audio2(m_ACodecCtx, (int16_t*) ptr, &frame_size, packet->data, packet->size) >= 0)
+	if (avcodec_decode_audio2(m_ACodecCtx, (boost::int16_t*) ptr, &frame_size, packet->data, packet->size) >= 0)
 #else
-	if (avcodec_decode_audio(m_ACodecCtx, (int16_t*) ptr, &frame_size, packet->data, packet->size) >= 0)
+	if (avcodec_decode_audio(m_ACodecCtx, (boost::int16_t*) ptr, &frame_size, packet->data, packet->size) >= 0)
 #endif
 	{
 
@@ -844,8 +844,8 @@ bool NetStreamFfmpeg::decodeAudio(AvPkt& packet)
 			
 			uint8_t* output = new uint8_t[bufsize];
 			
-			samples = _resampler.resample(reinterpret_cast<int16_t*>(ptr), 
-							 reinterpret_cast<int16_t*>(output), 
+			samples = _resampler.resample(reinterpret_cast<boost::int16_t*>(ptr), 
+							 reinterpret_cast<boost::int16_t*>(output), 
 							 samples);
 			delete [] ptr;
 			ptr = reinterpret_cast<uint8_t*>(output);
@@ -861,8 +861,8 @@ bool NetStreamFfmpeg::decodeAudio(AvPkt& packet)
 		// set presentation timestamp
 		if (packet->dts != static_cast<signed long>(AV_NOPTS_VALUE))
 		{
-			if (!m_isFLV) raw->m_pts = static_cast<uint32_t>(as_double(m_audio_stream->time_base) * packet->dts * 1000.0);
-			else raw->m_pts = static_cast<uint32_t>((as_double(m_ACodecCtx->time_base) * packet->dts) * 1000.0);
+			if (!m_isFLV) raw->m_pts = static_cast<boost::uint32_t>(as_double(m_audio_stream->time_base) * packet->dts * 1000.0);
+			else raw->m_pts = static_cast<boost::uint32_t>((as_double(m_ACodecCtx->time_base) * packet->dts) * 1000.0);
 		}
 
 		if (raw->m_pts != 0)
@@ -876,10 +876,10 @@ bool NetStreamFfmpeg::decodeAudio(AvPkt& packet)
 		}
 
 		// update video clock for next frame
-		uint32_t frame_delay;
+		boost::uint32_t frame_delay;
 		if (!m_isFLV)
 		{
-			frame_delay = static_cast<uint32_t>((as_double(m_audio_stream->time_base) * packet->dts) * 1000.0);
+			frame_delay = static_cast<boost::uint32_t>((as_double(m_audio_stream->time_base) * packet->dts) * 1000.0);
 		}
 		else
 		{
@@ -953,8 +953,8 @@ bool NetStreamFfmpeg::decodeVideo(AvPkt& packet)
 		// set presentation timestamp
 		if (packet->dts != static_cast<signed long>(AV_NOPTS_VALUE))
 		{
-			if (!m_isFLV)	video->m_pts = static_cast<uint32_t>((as_double(m_video_stream->time_base) * packet->dts) * 1000.0);
-			else video->m_pts = static_cast<uint32_t>((as_double(m_VCodecCtx->time_base) * packet->dts) * 1000.0);
+			if (!m_isFLV)	video->m_pts = static_cast<boost::uint32_t>((as_double(m_video_stream->time_base) * packet->dts) * 1000.0);
+			else video->m_pts = static_cast<boost::uint32_t>((as_double(m_VCodecCtx->time_base) * packet->dts) * 1000.0);
 		}
 
 		if (video->m_pts != 0)
@@ -968,12 +968,12 @@ bool NetStreamFfmpeg::decodeVideo(AvPkt& packet)
 		}
 
 		// update video clock for next frame
-		uint32_t frame_delay;
-		if (!m_isFLV) frame_delay = static_cast<uint32_t>(as_double(m_video_stream->codec->time_base) * 1000.0);
+		boost::uint32_t frame_delay;
+		if (!m_isFLV) frame_delay = static_cast<boost::uint32_t>(as_double(m_video_stream->codec->time_base) * 1000.0);
 		else frame_delay = m_parser->videoFrameDelay();
 
 		// for MPEG2, the frame can be repeated, so we update the clock accordingly
-		frame_delay += static_cast<uint32_t>(m_Frame->repeat_pict * (frame_delay * 0.5) * 1000.0);
+		frame_delay += static_cast<boost::uint32_t>(m_Frame->repeat_pict * (frame_delay * 0.5) * 1000.0);
 
 		m_last_video_timestamp += frame_delay;
 
@@ -1085,7 +1085,7 @@ bool NetStreamFfmpeg::decodeMediaFrame()
 }
 
 void
-NetStreamFfmpeg::seek(uint32_t pos)
+NetStreamFfmpeg::seek(boost::uint32_t pos)
 {
 	long newpos = 0;
 	double timebase = 0;
@@ -1157,7 +1157,7 @@ NetStreamFfmpeg::seek(uint32_t pos)
 		}
 
 		av_seek_frame(m_FormatCtx, m_video_index, newpos, 0);
-		uint32_t newtime_ms = static_cast<int32_t>(newtime / 1000.0);
+		boost::uint32_t newtime_ms = static_cast<boost::int32_t>(newtime / 1000.0);
 		m_start_clock += m_last_audio_timestamp - newtime_ms;
 
 		m_last_audio_timestamp = newtime_ms;
@@ -1191,7 +1191,7 @@ NetStreamFfmpeg::refreshVideoFrame()
 		}
 
 		// Caclulate the current time
-		uint32_t current_clock;
+		boost::uint32_t current_clock;
 		if (m_ACodecCtx && get_sound_handler())
 		{
 			current_clock = m_current_timestamp;
@@ -1202,7 +1202,7 @@ NetStreamFfmpeg::refreshVideoFrame()
 			m_current_timestamp = current_clock;
 		}
 
-		uint32_t video_clock = video->m_pts;
+		boost::uint32_t video_clock = video->m_pts;
 
 		// If the timestamp on the videoframe is smaller than the
 		// current time, we put it in the output image.
@@ -1272,14 +1272,14 @@ NetStreamFfmpeg::advance()
 	refreshVideoFrame();
 }
 
-int32_t
+boost::int32_t
 NetStreamFfmpeg::time()
 {
 
 	if (m_FormatCtx && m_FormatCtx->nb_streams > 0)
 	{
 		double time = as_double(m_FormatCtx->streams[0]->time_base) * (double)m_FormatCtx->streams[0]->cur_dts;
-		return static_cast<int32_t>(time);
+		return static_cast<boost::int32_t>(time);
 	}
 	else if
 	(m_isFLV)

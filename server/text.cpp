@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: text.cpp,v 1.40 2007/12/01 10:19:39 strk Exp $ */
+/* $Id: text.cpp,v 1.41 2007/12/04 11:45:30 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -163,7 +163,7 @@ log_error(_("invalid glyph (-1)"));
 					// We'll use about half the width, and around 3/4 the height.
 					// Values adjusted by eye.
 					// The Y baseline is at 0; negative Y is up.
-					static const int16_t	s_empty_char_box[5 * 2] =
+					static const boost::int16_t	s_empty_char_box[5 * 2] =
 					{
 						 32,   32,
 						480,   32,

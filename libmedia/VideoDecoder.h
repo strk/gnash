@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoder.h,v 1.8 2007/11/24 17:21:42 strk Exp $
+// $Id: VideoDecoder.h,v 1.9 2007/12/04 11:45:26 strk Exp $
 
 #ifndef __VIDEODECODER_H__
 #define __VIDEODECODER_H__
@@ -96,7 +96,7 @@ public:
 	/// @return a pointer to the decoded data, or NULL if decoding fails.
 	///     The caller owns the decoded data.
 	///	
-	virtual uint8_t* decode(uint8_t* /*input*/, uint32_t /*inputSize*/, uint32_t& /*outputSize*/) { return NULL; }
+	virtual uint8_t* decode(uint8_t* /*input*/, boost::uint32_t /*inputSize*/, boost::uint32_t& /*outputSize*/) { return NULL; }
 
 	/// Decodes a frame and returns an image::base containing it
 	//
@@ -109,7 +109,7 @@ public:
 	/// @return a pointer to the image with the decoded data, or NULL if decoding fails.
 	///     The caller owns the decoded data.
 	///
-	virtual std::auto_ptr<image::image_base> decodeToImage(uint8_t* /*input*/, uint32_t /*inputSize*/) { return std::auto_ptr<image::image_base>(NULL); }
+	virtual std::auto_ptr<image::image_base> decodeToImage(uint8_t* /*input*/, boost::uint32_t /*inputSize*/) { return std::auto_ptr<image::image_base>(NULL); }
 
 };
 	

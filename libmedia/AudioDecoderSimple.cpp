@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderSimple.cpp,v 1.9 2007/12/03 08:35:34 strk Exp $
+// $Id: AudioDecoderSimple.cpp,v 1.10 2007/12/04 11:45:25 strk Exp $
 
 #include "AudioDecoderSimple.h"
 #include "utility.h"
@@ -91,17 +91,17 @@ private:
 	}
 
 	/* Uncompress 4096 mono samples of ADPCM. */
-	static uint32_t doMonoBlock(int16_t** out_data, int n_bits, BitsReader* in, int sample, int stepsize_index)
+	static boost::uint32_t doMonoBlock(boost::int16_t** out_data, int n_bits, BitsReader* in, int sample, int stepsize_index)
 	{
 		/* First sample doesn't need to be decompressed. */
-		uint32_t sample_count = 1;
-		*(*out_data)++ = (int16_t) sample;
+		boost::uint32_t sample_count = 1;
+		*(*out_data)++ = (boost::int16_t) sample;
 
 		while (sample_count < 4096 && in->gotBits(n_bits))
 		{
 			int	raw_code = in->read_uint(n_bits);
 			doSample(n_bits, sample, stepsize_index, raw_code);	/* sample & stepsize_index are in/out params */
-			*(*out_data)++ = (int16_t) sample;
+			*(*out_data)++ = (boost::int16_t) sample;
 
 			sample_count++;
 		}	
@@ -111,7 +111,7 @@ private:
 
 	/* Uncompress 4096 stereo sample pairs of ADPCM. */
 	static int doStereoBlock(
-			int16_t** out_data,	// in/out param
+			boost::int16_t** out_data,	// in/out param
 			int n_bits,
 			BitsReader* in,
 			int left_sample,
@@ -121,19 +121,19 @@ private:
 			)
 	{
 		/* First samples don't need to be decompressed. */
-		uint32_t sample_count = 2;
-		*(*out_data)++ = (int16_t) left_sample;
-		*(*out_data)++ = (int16_t) right_sample;
+		boost::uint32_t sample_count = 2;
+		*(*out_data)++ = (boost::int16_t) left_sample;
+		*(*out_data)++ = (boost::int16_t) right_sample;
 
 		while (sample_count < 4096 && in->gotBits(n_bits*2))
 		{														
 			int	left_raw_code = in->read_uint(n_bits);
 			doSample(n_bits, left_sample, left_stepsize_index, left_raw_code);
-			*(*out_data)++ = (int16_t) left_sample;
+			*(*out_data)++ = (boost::int16_t) left_sample;
 
 			int	right_raw_code = in->read_uint(n_bits);
 			doSample(n_bits, right_sample, right_stepsize_index, right_raw_code);
-			*(*out_data)++ = (int16_t) right_sample;
+			*(*out_data)++ = (boost::int16_t) right_sample;
 
 			sample_count++;
 		}
@@ -144,21 +144,21 @@ public:
 
 	// Utility function: uncompress ADPCM data from in BitReader to
 	// out_data[]. Returns the output samplecount.
-	static uint32_t adpcm_expand(
+	static boost::uint32_t adpcm_expand(
 		unsigned char* &data,
 		BitsReader* in,
 		unsigned int insize,
 		bool stereo)
 	{
 		// The compression ratio is 4:1, so this should be enough...
-		int16_t* out_data = new int16_t[insize * 5];
+		boost::int16_t* out_data = new boost::int16_t[insize * 5];
 		data = reinterpret_cast<unsigned char *>(out_data);
 
 		// Read header.
 		//in->ensureBytes(1); // nbits
 		unsigned int n_bits = in->read_uint(2) + 2;	// 2 to 5 bits (TODO: use unsigned...)
 
-		uint32_t sample_count = 0;
+		boost::uint32_t sample_count = 0;
 
 		while (/*sample_count && !in->overread()*/in->gotBits(22))
 		{
@@ -252,18 +252,18 @@ int ADPCMDecoder::s_stepsize[STEPSIZE_CT] = {
 static void u8_expand(
 	unsigned char * &data,
 	unsigned char* input,
-	uint32_t input_size) // This is also the number of u8bit samples
+	boost::uint32_t input_size) // This is also the number of u8bit samples
 {
 	boost::scoped_array<uint8_t> in_data ( new uint8_t[input_size] );
-	int16_t	*out_data = new int16_t[input_size];
+	boost::int16_t	*out_data = new boost::int16_t[input_size];
 
 	memcpy((char *)in_data.get(), input, input_size);
 
 	// Convert 8-bit to 16
 	uint8_t *inp = in_data.get();
-	int16_t *outp = out_data;
+	boost::int16_t *outp = out_data;
 	for (unsigned int i = input_size; i>0; i--) {
-		*outp++ = ((int16_t)(*inp++) - 128) * 256;
+		*outp++ = ((boost::int16_t)(*inp++) - 128) * 256;
 	}
 	
 	data = (unsigned char *)out_data;
@@ -311,7 +311,7 @@ bool AudioDecoderSimple::setup(AudioInfo* info)
 	}
 }
 
-uint8_t* AudioDecoderSimple::decode(uint8_t* input, uint32_t inputSize, uint32_t& outputSize, uint32_t& decodedBytes, bool /*parse*/)
+uint8_t* AudioDecoderSimple::decode(uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool /*parse*/)
 {
 
 	unsigned char* decodedData = NULL;
@@ -320,8 +320,8 @@ uint8_t* AudioDecoderSimple::decode(uint8_t* input, uint32_t inputSize, uint32_t
     switch (_codec) {
 	case AUDIO_CODEC_ADPCM:
 		{
-		//uint32_t sample_count = inputSize * ( _stereo ? 1 : 2 ); //(_sampleCount == 0 ? inputSize / ( _stereo ? 4 : 2 ) : _sampleCount);
-		uint32_t sample_count = ADPCMDecoder::adpcm_expand(decodedData, new BitsReader(input,inputSize), inputSize, _stereo);
+		//boost::uint32_t sample_count = inputSize * ( _stereo ? 1 : 2 ); //(_sampleCount == 0 ? inputSize / ( _stereo ? 4 : 2 ) : _sampleCount);
+		boost::uint32_t sample_count = ADPCMDecoder::adpcm_expand(decodedData, new BitsReader(input,inputSize), inputSize, _stereo);
 		outsize = sample_count * (_stereo ? 4 : 2);
 		}
 		break;
@@ -359,7 +359,7 @@ uint8_t* AudioDecoderSimple::decode(uint8_t* input, uint32_t inputSize, uint32_t
 			// nothing and is less of a continual maintenance headache
 			// than compile-time detection.
 			union u {
-				uint16_t s;
+				boost::uint16_t s;
 				struct {
 					uint8_t c0;
 					uint8_t c1;
@@ -389,12 +389,12 @@ uint8_t* AudioDecoderSimple::decode(uint8_t* input, uint32_t inputSize, uint32_t
 	}
 
 	uint8_t* tmp_raw_buffer = decodedData;
-	uint32_t tmp_raw_buffer_size = 0;
+	boost::uint32_t tmp_raw_buffer_size = 0;
 
 	// If we need to convert samplerate or/and from mono to stereo...
 	if (outsize > 0 && (_sampleRate != 44100 || !_stereo)) {
 
-		int16_t* adjusted_data = 0;
+		boost::int16_t* adjusted_data = 0;
 		int	adjusted_size = 0;
 		int sample_count = outsize / (_stereo ? 4 : 2); // samples are of size 2
 

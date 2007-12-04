@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.23 2007/11/23 12:21:27 strk Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.24 2007/12/04 11:45:33 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -67,7 +67,7 @@ void
 PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 {
 
-	uint16_t reserved = in->read_u16();
+	boost::uint16_t reserved = in->read_u16();
 	IF_VERBOSE_MALFORMED_SWF (
 		if ( reserved != 0 ) // must be 0
 		{
@@ -88,14 +88,14 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 		// Read event.
 		in->align();
 
-		uint32_t flags = (movie_version >= 6) ? in->read_u32() : in->read_u16();
+		boost::uint32_t flags = (movie_version >= 6) ? in->read_u32() : in->read_u16();
 
 		if (flags == 0) // no other events
 		{
 			break;
 		}
 
-		uint32_t event_length = in->read_u32();
+		boost::uint32_t event_length = in->read_u32();
 		if ( in->get_tag_end_position()-in->get_position() <  event_length )
 		{
 			IF_VERBOSE_MALFORMED_SWF(

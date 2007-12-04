@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: morph2_character_def.cpp,v 1.19 2007/12/01 15:40:59 strk Exp $ */
+/* $Id: morph2_character_def.cpp,v 1.20 2007/12/04 11:45:32 strk Exp $ */
 
 // Based on the public domain morph2.cpp of:
 // Thatcher Ulrich <tu@tulrich.com>, Mike Shaver <shaver@off.net> 2003,
@@ -139,7 +139,7 @@ private:
 			line_style& ls = m_line_styles[i];
 			const line_style& ls1 = m_shape1->get_line_styles()[i];
 			const line_style& ls2 = m_shape2->get_line_styles()[i];
-			ls.m_width = (uint16_t)frnd(flerp(ls1.get_width(), ls2.get_width(), ratio));
+			ls.m_width = (boost::uint16_t)frnd(flerp(ls1.get_width(), ls2.get_width(), ratio));
 			ls.m_color.set_lerp(ls1.get_color(), ls2.get_color(), ratio);
 		}
 

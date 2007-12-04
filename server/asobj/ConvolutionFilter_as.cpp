@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ConvolutionFilter_as.cpp,v 1.3 2007/09/14 01:39:31 nihilus Exp $ */
+/* $Id: ConvolutionFilter_as.cpp,v 1.4 2007/12/04 11:45:30 strk Exp $ */
 
 #include "as_object.h"
 #include "ConvolutionFilter.h"
@@ -71,7 +71,7 @@ phelp_property(float, number<float>, divisor)
 phelp_property(float, number<float>, bias)
 phelp_property(bool, bool, preserveAlpha)
 phelp_property(bool, bool, clamp)
-phelp_property(uint32_t, number<uint32_t>, color)
+phelp_property(boost::uint32_t, number<boost::uint32_t>, color)
 phelp_property(uint8_t, number<uint8_t>, alpha)
 phelp_array_property(matrix)
 

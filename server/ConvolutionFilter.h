@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ConvolutionFilter.h,v 1.4 2007/09/26 19:00:46 strk Exp $ */
+/* $Id: ConvolutionFilter.h,v 1.5 2007/12/04 11:45:27 strk Exp $ */
 
 #ifndef GNASH_CONVOLUTIONFILTER_H
 #define GNASH_CONVOLUTIONFILTER_H
@@ -47,7 +47,7 @@ public:
 
     ConvolutionFilter(uint8_t matrixX, uint8_t matrixY, 
         std::vector<float> a_matrix,
-        float divisor, float bias, bool preserveAlpha, bool clamp, uint32_t color,
+        float divisor, float bias, bool preserveAlpha, bool clamp, boost::uint32_t color,
         uint8_t alpha) :
         m_matrixX(matrixX), m_matrixY(matrixY), m_matrix(a_matrix),
         m_divisor(divisor), m_bias(bias), m_preserveAlpha(preserveAlpha),
@@ -62,7 +62,7 @@ protected:
     float m_bias;
     bool m_preserveAlpha; // If true, don't convolute the alpha channel
     bool m_clamp; // Whether or not to clamp
-    uint32_t m_color; // For off-image pixels
+    boost::uint32_t m_color; // For off-image pixels
     uint8_t m_alpha; // For off-image pixels
 };
 

@@ -52,49 +52,49 @@ public:
 };
 
 // Functions for getting pool constants.
-static inline std::string& pool_string(uint32_t index, abc_block *pool)
+static inline std::string& pool_string(boost::uint32_t index, abc_block *pool)
 {
 	if (!pool)
 		throw ASException();
 	return pool->mStringPool.at(index);
 }
 
-static inline int pool_int(uint32_t index, abc_block *pool)
+static inline int pool_int(boost::uint32_t index, abc_block *pool)
 {
 	if (!pool)
 		throw ASException();
 	return pool->mIntegerPool.at(index);
 }
 
-static inline unsigned int pool_uint(uint32_t index, abc_block *pool)
+static inline unsigned int pool_uint(boost::uint32_t index, abc_block *pool)
 {
 	if (!pool)
 		throw ASException();
 	return pool->mUIntegerPool.at(index);
 }
 
-static inline double pool_double(uint32_t index, abc_block *pool)
+static inline double pool_double(boost::uint32_t index, abc_block *pool)
 {
 	if (!pool)
 		throw ASException();
 	return pool->mDoublePool.at(index);
 }
 
-static inline asNamespace* pool_namespace(uint32_t index, abc_block *pool)
+static inline asNamespace* pool_namespace(boost::uint32_t index, abc_block *pool)
 {
 	if (!pool)
 		throw ASException();
 	return pool->mNamespacePool.at(index);
 }
 
-static inline asMethod* pool_method(uint32_t index, abc_block* pool)
+static inline asMethod* pool_method(boost::uint32_t index, abc_block* pool)
 {
 	if (!pool)
 		throw ASException();
 	return pool->mMethods.at(index);
 }
 
-static inline asClass* pool_class(uint32_t index, abc_block* pool)
+static inline asClass* pool_class(boost::uint32_t index, abc_block* pool)
 {
 	if (!pool)
 		throw ASException();
@@ -102,7 +102,7 @@ static inline asClass* pool_class(uint32_t index, abc_block* pool)
 }
 
 // Don't make this a reference or you'll taint the pool.
-static inline asName pool_name(uint32_t index, abc_block* pool)
+static inline asName pool_name(boost::uint32_t index, abc_block* pool)
 {
 	if (!pool)
 		throw ASException();
@@ -248,7 +248,7 @@ static inline asName pool_name(uint32_t index, abc_block* pool)
 
 #define JUMPIF(jtruth)														\
 {																			\
-	int32_t jumpOffset = mStream->read_S24();								\
+	boost::int32_t jumpOffset = mStream->read_S24();								\
 	if (jtruth)																\
 		mStream->seekBy(jumpOffset);										\
 	break;																	\
@@ -360,7 +360,7 @@ Machine::execute()
 ///  default XML namespace. 
 	case SWF::ABC_ACTION_DXNS:
 	{
-		uint32_t soffset = mStream->read_V32();
+		boost::uint32_t soffset = mStream->read_V32();
 		std::string& uri = pool_string(soffset, mPoolObject);
 		mDefaultXMLNamespace = mCH->anonNamespace(mST.find(uri));
 		break;
@@ -386,7 +386,7 @@ Machine::execute()
 /// Equivalent: ACTION_DELETE
 	case SWF::ABC_ACTION_KILL:
 	{
-		uint32_t regNum = mStream->read_V32();
+		boost::uint32_t regNum = mStream->read_V32();
 		mFrame.value(regNum).set_undefined();
 		break;
 	}
@@ -642,11 +642,11 @@ Machine::execute()
 		if (!mStack.top(0).is_number())
 			throw ASException();
 
-		uint32_t index = mStack.top(0).to_number<uint32_t>();
+		boost::uint32_t index = mStack.top(0).to_number<boost::uint32_t>();
 		mStack.drop(1);
 
 		mStream->seekBy(3); // Skip the intial offset.
-		uint32_t cases = mStream->read_V32();
+		boost::uint32_t cases = mStream->read_V32();
 		// Read from our original position and use it to skip if the case
 		// is out of range.
 		if (index > cases)
@@ -657,7 +657,7 @@ Machine::execute()
 		else
 		{
 			mStream->seekTo(npos + 3 * (index + 1));
-			uint32_t newpos = mStream->read_S24();
+			boost::uint32_t newpos = mStream->read_S24();
 			mStream->seekTo(npos - 1 + newpos);
 		}
 		break;
@@ -718,7 +718,7 @@ Machine::execute()
 		ENSURE_NUMBER(mStack.top(0));
 		ENSURE_OBJECT(mStack.top(1));
 		as_object *obj = mStack.top(1).to_object().get();
-		uint32_t index = mStack.top(0).to_number<uint32_t>();
+		boost::uint32_t index = mStack.top(0).to_number<boost::uint32_t>();
 		mStack.drop(1);
 		Property *b = obj->getByIndex(index);
 		if (b)
@@ -741,7 +741,7 @@ Machine::execute()
 		ENSURE_NUMBER(mStack.top(0));
 		ENSURE_OBJECT(mStack.top(1));
 		as_object *obj = mStack.top(1).to_object().get();
-		uint32_t index = mStack.top(0).to_number<uint32_t>();
+		boost::uint32_t index = mStack.top(0).to_number<boost::uint32_t>();
 		mStack.drop(1);
 		mStack.top(0) = obj->nextIndex(index);
 		break;
@@ -775,7 +775,7 @@ Machine::execute()
 		ENSURE_NUMBER(mStack.top(0));
 		ENSURE_OBJECT(mStack.top(1));
 		as_object *obj = mStack.top(1).to_object().get();
-		uint32_t index = mStack.top(0).to_number<uint32_t>();
+		boost::uint32_t index = mStack.top(0).to_number<boost::uint32_t>();
 		const Property *b = obj->getByIndex(index);
 		mStack.drop(1);
 		if (!b)
@@ -935,14 +935,14 @@ Machine::execute()
 /// property.
 	case SWF::ABC_ACTION_HASNEXT2:
 	{
-		int32_t oindex = mStream->read_V32();
-		int32_t iindex = mStream->read_V32();
+		boost::int32_t oindex = mStream->read_V32();
+		boost::int32_t iindex = mStream->read_V32();
 		as_value &objv = mFrame.value(oindex);
 		as_value &indexv = mFrame.value(iindex);
 		ENSURE_OBJECT(objv);
 		ENSURE_NUMBER(indexv);
 		as_object *obj = objv.to_object().get();
-		uint32_t index = indexv.to_number<uint32_t>();
+		boost::uint32_t index = indexv.to_number<boost::uint32_t>();
 		as_object *owner = NULL;
 		int next = obj->nextIndex(index, &owner);
 		mStack.grow(1);
@@ -986,7 +986,7 @@ Machine::execute()
 ///  value -- the value returned by obj->func(arg1, ...., argN)
 	case SWF::ABC_ACTION_CALL:
 	{
-		uint32_t argc = mStream->read_V32();
+		boost::uint32_t argc = mStream->read_V32();
 		ENSURE_OBJECT(mStack.top(argc + 1)); // The func
 		ENSURE_OBJECT(mStack.top(argc)); // The 'this'
 		as_function *f = mStack.top(argc + 1).to_as_function();
@@ -1011,7 +1011,7 @@ Machine::execute()
 ///  value -- obj after it has been constructed as obj(arg1, ..., argN)
 	case SWF::ABC_ACTION_CONSTRUCT:
 	{
-		uint32_t argc = mStream->read_V32();
+		boost::uint32_t argc = mStream->read_V32();
 		as_function *f = mStack.top(argc).to_as_function();
 		Property b(0, 0, f, NULL);
 		pushCall(f, NULL, mStack.top(argc), argc, 0);
@@ -1026,8 +1026,8 @@ Machine::execute()
 ///  value -- the value returned by obj::'method_id'(arg1, ..., argN)
 	case SWF::ABC_ACTION_CALLMETHOD:
 	{
-		uint32_t dispatch_id = mStream->read_V32() - 1;
-		uint32_t argc = mStream->read_V32();
+		boost::uint32_t dispatch_id = mStream->read_V32() - 1;
+		boost::uint32_t argc = mStream->read_V32();
 		ENSURE_OBJECT(mStack.top(argc));
 		as_object *obj = mStack.top(argc).to_object().get();
 		Property *f = obj->getByIndex(dispatch_id);
@@ -1057,7 +1057,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_CALLSTATIC:
 	{
 		asMethod *m = pool_method(mStream->read_V32(), mPoolObject);
-		uint32_t argc = mStream->read_V32();
+		boost::uint32_t argc = mStream->read_V32();
 		as_function *func = m->getPrototype();
 		ENSURE_OBJECT(mStack.top(argc));
 		as_object *obj = mStack.top(argc).to_object().get();
@@ -1079,7 +1079,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_CALLSUPERVOID:
 	{
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
-		uint32_t argc = mStream->read_V32();
+		boost::uint32_t argc = mStream->read_V32();
 		int dropsize = completeName(a);
 		ENSURE_OBJECT(mStack.top(argc + dropsize));
 		mStack.drop(dropsize);
@@ -1118,7 +1118,7 @@ Machine::execute()
 	{
 		bool lex_only = (opcode == SWF::ABC_ACTION_CALLPROPLEX);
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
-		uint32_t argc = mStream->read_V32();
+		boost::uint32_t argc = mStream->read_V32();
 		int shift = completeName(a, argc);
 		ENSURE_OBJECT(mStack.top(shift + argc));
 		as_object *obj = mStack.top(argc + shift).to_object().get();
@@ -1184,7 +1184,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_CONSTRUCTSUPER:
 	{
 		// TODO
-		uint32_t argc = mStream->read_V32();
+		boost::uint32_t argc = mStream->read_V32();
 		ENSURE_OBJECT(mStack.top(argc));
 		as_object *obj = mStack.top(argc).to_object().get();
 		as_object *super = mStack.top(argc).to_object()->get_super();
@@ -1213,13 +1213,13 @@ Machine::execute()
 	{
 		// TODO
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
-		uint32_t argc = mStream->read_V32();
+		boost::uint32_t argc = mStream->read_V32();
 		int shift = completeName(a, argc);
 		ENSURE_OBJECT(mStack.top(argc + shift));
 		// We have to move the stack if there was a shift.
 		if (shift)
 		{
-			uint32_t i = argc;
+			boost::uint32_t i = argc;
 			while (i--)
 				mStack.top(i + shift) = mStack.top(i);
 			mStack.drop(shift);
@@ -1243,7 +1243,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_NEWOBJECT:
 	{
 		as_object *obj = new as_object;
-		uint32_t argc = mStream->read_V32();
+		boost::uint32_t argc = mStream->read_V32();
 		int i = argc;
 		while (i--)
 		{
@@ -1266,10 +1266,10 @@ Machine::execute()
 ///  array -- an array { value_1, value_2, ..., value_n }
 	case SWF::ABC_ACTION_NEWARRAY:
 	{
-		uint32_t asize = mStream->read_V32();
+		boost::uint32_t asize = mStream->read_V32();
 		as_array_object *arr = new as_array_object;
 		arr->resize(asize);
-		uint32_t i = asize;
+		boost::uint32_t i = asize;
 		while (i--)
 			arr->set_indexed(i, mStack.value(i));
 		mStack.drop(asize - 1);
@@ -1294,7 +1294,7 @@ Machine::execute()
 /// NB: This depends on scope and scope base (to determine lifetime(?))
 	case SWF::ABC_ACTION_NEWCLASS:
 	{
-		uint32_t cid = mStream->read_V32();
+		boost::uint32_t cid = mStream->read_V32();
 		asClass *c = pool_class(cid, mPoolObject);
 		ENSURE_OBJECT(mStack.top(0));
 		as_object *obj = mStack.top(0).to_object().get();
@@ -1550,7 +1550,7 @@ Machine::execute()
 ///  slot -- obj.slots[slot_index]
 	case SWF::ABC_ACTION_GETSLOT:
 	{
-		uint32_t sindex = mStream->read_V32();
+		boost::uint32_t sindex = mStream->read_V32();
 		if (!sindex)
 			throw ASException();
 		--sindex;
@@ -1567,7 +1567,7 @@ Machine::execute()
 /// Do: obj.slots[slot_index] = value
 	case SWF::ABC_ACTION_SETSLOT:
 	{
-		uint32_t sindex = mStream->read_V32();
+		boost::uint32_t sindex = mStream->read_V32();
 		if (!sindex)
 			throw ASException();
 		--sindex;
@@ -1584,7 +1584,7 @@ Machine::execute()
 /// NB: Deprecated
 	case SWF::ABC_ACTION_GETGLOBALSLOT:
 	{
-		uint32_t sindex = mStream->read_V32();
+		boost::uint32_t sindex = mStream->read_V32();
 		if (!sindex)
 			throw ASException();
 		--sindex;
@@ -1602,7 +1602,7 @@ Machine::execute()
 /// NB: Deprecated
 	case SWF::ABC_ACTION_SETGLOBALSLOT:
 	{
-		uint32_t sindex = mStream->read_V32();
+		boost::uint32_t sindex = mStream->read_V32();
 		if (!sindex)
 			throw ASException();
 		--sindex;
@@ -1818,7 +1818,7 @@ Machine::execute()
 /// Frame: Load i from frame_addr and increment it.
 	case SWF::ABC_ACTION_INCLOCAL:
 	{
-		uint32_t foff = mStream->read_V32();
+		boost::uint32_t foff = mStream->read_V32();
 		mFrame.value(foff) = mFrame.value(foff).to_number() + 1;
 		break;
 	}
@@ -1837,7 +1837,7 @@ Machine::execute()
 /// Frame: Load i from frame_addr and decrement it.
 	case SWF::ABC_ACTION_DECLOCAL:
 	{
-		uint32_t foff = mStream->read_V32();
+		boost::uint32_t foff = mStream->read_V32();
 		mFrame.value(foff) = mFrame.value(foff).to_number() - 1;
 		break;
 	}
@@ -2166,7 +2166,7 @@ Machine::execute()
 /// See: 0x92 (ABC_ACTION_INCLOCAL), but forces types to int, not double
 	case SWF::ABC_ACTION_INCLOCAL_I:
 	{
-		uint32_t foff = mStream->read_V32();
+		boost::uint32_t foff = mStream->read_V32();
 		mFrame.value(foff) = mFrame.value(foff).to_number<int>() + 1;
 		break;
 	}
@@ -2174,7 +2174,7 @@ Machine::execute()
 /// See: 0x94 (ABC_ACTION_DECLOCAL), but forces types to int, not double
 	case SWF::ABC_ACTION_DECLOCAL_I:
 	{
-		uint32_t foff = mStream->read_V32();
+		boost::uint32_t foff = mStream->read_V32();
 		mFrame.value(foff) = mFrame.value(foff).to_number<int>() - 1;
 		break;
 	}

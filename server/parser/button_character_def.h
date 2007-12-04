@@ -123,15 +123,15 @@ public:
 		bool m_has_loops;
 		bool m_has_out_point;
 		bool m_has_in_point;
-		uint32_t m_in_point;
-		uint32_t m_out_point;
-		uint16_t m_loop_count;
+		boost::uint32_t m_in_point;
+		boost::uint32_t m_out_point;
+		boost::uint16_t m_loop_count;
 		std::vector<media::sound_handler::sound_envelope> m_envelopes;
 	};
 
 	struct button_sound_info
 	{
-		uint16_t m_sound_id;
+		boost::uint16_t m_sound_id;
 		sound_sample*	m_sam;
 		sound_info m_sound_style;
 

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: StartSoundTag.cpp,v 1.5 2007/11/30 11:31:03 strk Exp $ */
+/* $Id: StartSoundTag.cpp,v 1.6 2007/12/04 11:45:33 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -91,8 +91,8 @@ StartSoundTag::read(stream& in)
 	UNUSED(no_multiple);
 	UNUSED(has_envelope);
 	
-	uint32_t	in_point = 0;
-	uint32_t	out_point = 0;
+	boost::uint32_t	in_point = 0;
+	boost::uint32_t	out_point = 0;
 
 	in.ensureBytes(has_in_point*4 + has_out_point*4 + has_loops*2);
 

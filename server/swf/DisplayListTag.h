@@ -20,7 +20,7 @@
 //
 //
 
-/* $Id: DisplayListTag.h,v 1.6 2007/11/23 12:21:27 strk Exp $ */
+/* $Id: DisplayListTag.h,v 1.7 2007/12/04 11:45:33 strk Exp $ */
 
 #ifndef GNASH_SWF_DISPLAYLISTTAG_H
 #define GNASH_SWF_DISPLAYLISTTAG_H
@@ -31,9 +31,7 @@
 
 #include "ControlTag.h" // for inheritance
 #include "swf.h" // for tag_type definition
-//#include "tu_types.h" // for uint16_t, uint32_t etc. definition 
 
-//#include <vector>
 
 // Forward declarations
 namespace gnash {

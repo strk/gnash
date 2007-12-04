@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.h,v 1.18 2007/11/24 17:21:45 strk Exp $
+// $Id: video_stream_def.h,v 1.19 2007/12/04 11:45:33 strk Exp $
 
 #ifndef GNASH_VIDEO_STREAM_DEF_H
 #define GNASH_VIDEO_STREAM_DEF_H
@@ -46,7 +46,7 @@ namespace gnash {
 /// Contains the data, the data size and the type of the frame
 class VideoData {
 public:
-	VideoData(boost::shared_array<uint8_t> data, uint32_t size, media::videoFrameType ft)
+	VideoData(boost::shared_array<uint8_t> data, boost::uint32_t size, media::videoFrameType ft)
 		:
 		videoData(data),
 		dataSize(size),
@@ -59,7 +59,7 @@ public:
 	}
 
 	boost::shared_array<uint8_t> videoData;
-	uint32_t dataSize;
+	boost::uint32_t dataSize;
 	media::videoFrameType frameType;
 };
 
@@ -73,7 +73,7 @@ public:
 	///       you can use an id of -1. See character_def constructor, as that's the
 	///	  one which will eventually get passed the id.
 	///
-	video_stream_definition(uint16_t char_id);
+	video_stream_definition(boost::uint16_t char_id);
 
 	~video_stream_definition();
 
@@ -112,7 +112,7 @@ public:
 	///
 	/// @return pointer (possibly NULL) to an image. The ownership is with the callee
 	///
-	std::auto_ptr<image::image_base> get_frame_data(uint32_t frameNum);
+	std::auto_ptr<image::image_base> get_frame_data(boost::uint32_t frameNum);
 
 private:
 
@@ -121,7 +121,7 @@ private:
 	/// The id is currently set to -1 when the definition is actually
 	/// created dynamically (instantiating the ActionScript Video class)
 	///
-	uint16_t m_char_id;
+	boost::uint16_t m_char_id;
 
 	/// Reserved flags read from DEFINEVIDEOSTREAM tag
 	uint8_t m_reserved_flags;
@@ -133,12 +133,12 @@ private:
 	bool m_smoothing_flags;
 
 	/// Frame in which the DEFINEVIDEOSTREAM was found
-	uint16_t m_start_frame;
+	boost::uint16_t m_start_frame;
 
 	/// Number of frames in the embedded video, as reported
 	/// by the DEFINEVIDEOSTREAM tag
 	///
-	uint16_t m_num_frames;
+	boost::uint16_t m_num_frames;
 
 	/// Codec ID as read from DEFINEVIDEOSTREAM tag
 	//
@@ -157,11 +157,11 @@ private:
 	/// Elements of this map are owned by this instance, and will be deleted 
 	/// at instance destruction time.
 	///
-	typedef std::map<uint32_t, boost::shared_ptr<VideoData> > EmbedFrameMap;
+	typedef std::map<boost::uint32_t, boost::shared_ptr<VideoData> > EmbedFrameMap;
 	EmbedFrameMap m_video_frames;
 
 	/// Last decoded frame number
-	int32_t m_last_decoded_frame;
+	boost::int32_t m_last_decoded_frame;
 
 	/// Set data for the given frame
 	//
@@ -177,13 +177,13 @@ private:
 	/// @param img
 	///	Frame data. Ownership is transferred. 
 	///
-	void setFrameData(uint32_t frameNum, boost::shared_array<uint8_t> data, uint32_t size, media::videoFrameType ft);
+	void setFrameData(boost::uint32_t frameNum, boost::shared_array<uint8_t> data, boost::uint32_t size, media::videoFrameType ft);
 
 	/// Width of the video
-	uint32_t _width;
+	boost::uint32_t _width;
 
 	/// Height of the video
-	uint32_t _height;
+	boost::uint32_t _height;
 
 	/// The decoder used to decode the video frames
 	boost::scoped_ptr<media::VideoDecoder> _decoder;

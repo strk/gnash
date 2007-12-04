@@ -5,7 +5,7 @@
 
 // line style types.
 
-/* $Id: styles.h,v 1.22 2007/09/04 11:27:42 cmusick Exp $ */
+/* $Id: styles.h,v 1.23 2007/12/04 11:45:29 strk Exp $ */
 
 #ifndef GNASH_STYLES_H
 #define GNASH_STYLES_H
@@ -42,7 +42,7 @@ public:
 	/// @param color
 	///	Line color
 	///
-	line_style(uint16_t width, const rgba& color)
+	line_style(boost::uint16_t width, const rgba& color)
 		:
 		m_width(width),
 		m_color(color)
@@ -65,7 +65,7 @@ public:
 		line_style *pOther);
 
 	/// Return thickness of the line, in TWIPS
-	uint16_t	get_width() const { return m_width; }
+	boost::uint16_t	get_width() const { return m_width; }
 
 	/// Return line color and alpha
 	const rgba&	get_color() const { return m_color; }
@@ -74,7 +74,7 @@ private:
 	friend class morph2_character_def;
 	friend class triangulating_render_handler;
 	
-	uint16_t	m_width;	// in TWIPS
+	boost::uint16_t	m_width;	// in TWIPS
 	rgba	m_color;
 };
 
@@ -87,7 +87,7 @@ public:
 	void read(stream* in);
 	
 private:
-	uint16_t m_width[2];
+	boost::uint16_t m_width[2];
 	rgba   m_color[2];
 };
 

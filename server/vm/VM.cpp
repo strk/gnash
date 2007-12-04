@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: VM.cpp,v 1.24 2007/11/28 21:18:43 strk Exp $ */
+/* $Id: VM.cpp,v 1.25 2007/12/04 11:45:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -138,7 +138,7 @@ VM::setGlobal(as_object* o)
 	_global = o;
 }
 
-uint64_t
+boost::uint64_t
 VM::getTime()
 {
   return  (tu_timer::get_ticks() -  _start_time);

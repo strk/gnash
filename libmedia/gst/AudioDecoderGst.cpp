@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: AudioDecoderGst.cpp,v 1.1 2007/11/30 00:13:01 tgc Exp $
+// $Id: AudioDecoderGst.cpp,v 1.2 2007/12/04 11:45:26 strk Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -145,7 +145,7 @@ bool AudioDecoderGst::setup(AudioInfo* info)
 
 }
 
-uint8_t* AudioDecoderGst::decode(uint8_t* input, uint32_t inputSize, uint32_t& outputSize, uint32_t& decodedData, bool /*parse*/)
+uint8_t* AudioDecoderGst::decode(uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedData, bool /*parse*/)
 {
 	// If there is nothing to decode in the new data we return NULL
 	if (input == NULL || inputSize == 0 || !_decoder)

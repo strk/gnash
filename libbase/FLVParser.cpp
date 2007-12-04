@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.23 2007/09/06 12:21:06 tgc Exp $
+// $Id: FLVParser.cpp,v 1.24 2007/12/04 11:45:23 strk Exp $
 
 #include "FLVParser.h"
 #include "amf.h"
@@ -52,7 +52,7 @@ FLVParser::~FLVParser()
 }
 
 
-uint32_t FLVParser::getBufferLength()
+boost::uint32_t FLVParser::getBufferLength()
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
@@ -70,7 +70,7 @@ uint32_t FLVParser::getBufferLength()
 	}
 	return 0;
 }
-uint16_t FLVParser::videoFrameRate()
+boost::uint16_t FLVParser::videoFrameRate()
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
@@ -81,13 +81,13 @@ uint16_t FLVParser::videoFrameRate()
 
 	if (_videoFrames.size() < 2) return 0;
 
- 	uint32_t framedelay = _videoFrames[1]->timestamp - _videoFrames[0]->timestamp;
+ 	boost::uint32_t framedelay = _videoFrames[1]->timestamp - _videoFrames[0]->timestamp;
 
-	return static_cast<int16_t>(1000 / framedelay);
+	return static_cast<boost::int16_t>(1000 / framedelay);
 }
 
 
-uint32_t FLVParser::videoFrameDelay()
+boost::uint32_t FLVParser::videoFrameDelay()
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
@@ -105,7 +105,7 @@ uint32_t FLVParser::videoFrameDelay()
 	return _videoFrames[_nextVideoFrame-1]->timestamp - _videoFrames[_nextVideoFrame-2]->timestamp;
 }
 
-uint32_t FLVParser::audioFrameDelay()
+boost::uint32_t FLVParser::audioFrameDelay()
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
@@ -127,8 +127,8 @@ FLVFrame* FLVParser::nextMediaFrame()
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
-	uint32_t video_size = _videoFrames.size();
-	uint32_t audio_size = _audioFrames.size();
+	boost::uint32_t video_size = _videoFrames.size();
+	boost::uint32_t audio_size = _audioFrames.size();
 
 	if (audio_size <= _nextAudioFrame && video_size <= _nextVideoFrame)
 	{
@@ -234,7 +234,7 @@ FLVFrame* FLVParser::nextVideoFrame()
 	}
 
 	// Make sure that there are parsed enough frames to return the need frame
-	while(_videoFrames.size() <= static_cast<uint32_t>(_nextVideoFrame) && !_parsingComplete)
+	while(_videoFrames.size() <= static_cast<boost::uint32_t>(_nextVideoFrame) && !_parsingComplete)
 	{
 		if (!parseNextFrame()) break;
 	}
@@ -264,7 +264,7 @@ FLVFrame* FLVParser::nextVideoFrame()
 }
 
 
-uint32_t FLVParser::seekAudio(uint32_t time)
+boost::uint32_t FLVParser::seekAudio(boost::uint32_t time)
 {
 
 	// Make sure that there are parsed some frames
@@ -318,7 +318,7 @@ uint32_t FLVParser::seekAudio(uint32_t time)
 }
 
 
-uint32_t FLVParser::seekVideo(uint32_t time)
+boost::uint32_t FLVParser::seekVideo(boost::uint32_t time)
 {
 	// Make sure that there are parsed some frames
 	while(_videoFrames.size() < 1 && !_parsingComplete) {
@@ -371,13 +371,13 @@ uint32_t FLVParser::seekVideo(uint32_t time)
 	}
 
 #if 0
-	uint32_t diff = abs(_videoFrames[bestFrame]->timestamp - time);
+	boost::uint32_t diff = abs(_videoFrames[bestFrame]->timestamp - time);
 	while (true)
 	{
-		if (bestFrame+1 < numFrames && static_cast<uint32_t>(abs(_videoFrames[bestFrame+1]->timestamp - time)) < diff) {
+		if (bestFrame+1 < numFrames && static_cast<boost::uint32_t>(abs(_videoFrames[bestFrame+1]->timestamp - time)) < diff) {
 			diff = abs(_videoFrames[bestFrame+1]->timestamp - time);
 			bestFrame = bestFrame + 1;
-		} else if (bestFrame > 0 && static_cast<uint32_t>(abs(_videoFrames[bestFrame-1]->timestamp - time)) < diff) {
+		} else if (bestFrame > 0 && static_cast<boost::uint32_t>(abs(_videoFrames[bestFrame-1]->timestamp - time)) < diff) {
 			diff = abs(_videoFrames[bestFrame-1]->timestamp - time);
 			bestFrame = bestFrame - 1;
 		} else {
@@ -410,8 +410,8 @@ uint32_t FLVParser::seekVideo(uint32_t time)
 	}
 	else
 	{
-		int32_t forwardDiff = _videoFrames[forwardKeyframe]->timestamp - time;
-		int32_t rewindDiff = time - _videoFrames[rewindKeyframe]->timestamp;
+		boost::int32_t forwardDiff = _videoFrames[forwardKeyframe]->timestamp - time;
+		boost::int32_t rewindDiff = time - _videoFrames[rewindKeyframe]->timestamp;
 
 		if (forwardDiff < rewindDiff) bestFrame = forwardKeyframe;
 		else bestFrame = rewindKeyframe;
@@ -469,7 +469,7 @@ FLVAudioInfo* FLVParser::getAudioInfo()
 
 }
 
-bool FLVParser::isTimeLoaded(uint32_t time)
+bool FLVParser::isTimeLoaded(boost::uint32_t time)
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
@@ -494,7 +494,7 @@ bool FLVParser::isTimeLoaded(uint32_t time)
 
 }
 
-uint32_t FLVParser::seek(uint32_t time)
+boost::uint32_t FLVParser::seek(boost::uint32_t time)
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
@@ -524,8 +524,8 @@ bool FLVParser::parseNextFrame()
 	_lt.read(tag, 12);
 
 	// Extract length and timestamp
-	uint32_t bodyLength = getUInt24(&tag[1]);
-	uint32_t timestamp = getUInt24(&tag[4]);
+	boost::uint32_t bodyLength = getUInt24(&tag[1]);
+	boost::uint32_t timestamp = getUInt24(&tag[4]);
 
 	// Check if there is enough data to parse the body of the frame
 	if (!_lt.isPositionConfirmed(_lastParsedPosition+15+bodyLength)) return false;
@@ -570,10 +570,10 @@ bool FLVParser::parseNextFrame()
 		// If this is the first videoframe no info about the
 		// video format has been noted, so we do that now
 		if (_videoInfo == NULL) {
-			uint16_t codec = (tag[11] & 0x0f) >> 0;
+			boost::uint16_t codec = (tag[11] & 0x0f) >> 0;
 			// Set standard guessed size...
-			uint16_t width = 320;
-			uint16_t height = 240;
+			boost::uint16_t width = 320;
+			boost::uint16_t height = 240;
 
 			// Extract the video size from the videodata header
 			if (codec == VIDEO_CODEC_H263) {
@@ -667,7 +667,7 @@ bool FLVParser::parseHeader()
 	return true;
 }
 
-inline uint32_t FLVParser::getUInt24(uint8_t* in)
+inline boost::uint32_t FLVParser::getUInt24(uint8_t* in)
 {
 	// The bits are in big endian order
 	return (in[0] << 16) | (in[1] << 8) | in[2];

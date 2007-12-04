@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: GradientGlowFilter.h,v 1.4 2007/09/26 19:00:46 strk Exp $ */
+/* $Id: GradientGlowFilter.h,v 1.5 2007/12/04 11:45:28 strk Exp $ */
 
 #ifndef GNASH_GRADIENTGLOWFILTER_H
 #define GNASH_GRADIENTGLOWFILTER_H
@@ -55,7 +55,7 @@ public:
     { return; }
 
     GradientGlowFilter(float distance, float angle,
-        std::vector<uint32_t> colors,
+        std::vector<boost::uint32_t> colors,
         std::vector<uint8_t> alphas,
         std::vector<uint8_t> ratios,
         float blurX, float blurY, float strength,
@@ -68,7 +68,7 @@ public:
 protected:
     float m_distance; // Distance of the filter in pixels.
     float m_angle; // Angle of the filter.
-    std::vector<uint32_t> m_colors; // Colors of the gradients.
+    std::vector<boost::uint32_t> m_colors; // Colors of the gradients.
     std::vector<uint8_t> m_alphas; // Alphas of the gradients.
     std::vector<uint8_t> m_ratios; // Ratios of the gradients.
     float m_blurX; // horizontal blur

@@ -81,7 +81,7 @@ private:
 	uint8_t mReg;
 	tryState mState;
 	as_value mThrownFromCatch;
-	uint32_t mStackDepth;
+	boost::uint32_t mStackDepth;
 };
 
 /// Executor of an action_buffer 
@@ -205,7 +205,7 @@ private:
 
 	/// Return the number of milliseconds after which
 	/// execution of a script block should abort.
-	uint32_t getScriptTimeout();
+	boost::uint32_t getScriptTimeout();
 
 public:
 

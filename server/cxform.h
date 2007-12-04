@@ -23,10 +23,10 @@
 #endif
 
 #include "tu_config.h" // for DSOEXPORT
-#include "tu_types.h" // for uint8_t
 
 #include <string>
 #include <iosfwd>
+#include <boost/cstdint.hpp> // for boost::?int??_t 
 
 namespace gnash {
 	class rgba;
@@ -60,7 +60,7 @@ public:
     rgba transform(const rgba& in) const;
     
     /// Faster transform() method for loops (avoids creation of rgba object)
-    void transform(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const;    
+    void transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_t& b, boost::uint8_t& a) const;    
     
     /// Read RGB from the SWF input stream.
     void read_rgb(stream* in);

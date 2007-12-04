@@ -46,18 +46,18 @@ class asName;
 class asException
 {
 public:
-	void setStart(uint32_t i) { mStart = i; }
-	void setEnd(uint32_t i) { mEnd = i; }
-	void setCatch(uint32_t i) { mCatch = i; }
+	void setStart(boost::uint32_t i) { mStart = i; }
+	void setEnd(boost::uint32_t i) { mEnd = i; }
+	void setCatch(boost::uint32_t i) { mCatch = i; }
 	void catchAny() { mCatchAny = true; }
 	void setCatchType(asClass* p) { mCatchType = p; }
 	void setNamespace(asNamespace* n) { mNamespace = n; }
 	void setName(string_table::key name) { mName = name; }
 
 private:
-	uint32_t mStart;
-	uint32_t mEnd;
-	uint32_t mCatch;
+	boost::uint32_t mStart;
+	boost::uint32_t mEnd;
+	boost::uint32_t mCatch;
 	bool mCatchAny;
 	asClass *mCatchType;
 	asNamespace *mNamespace;
@@ -78,8 +78,8 @@ public:
 	void unsetStatic() { mStatic = false; }
 	bool isStatic() { return mStatic; }
 
-	uint32_t getSlotId() { return mSlotId; }
-	void setSlotId(uint32_t s) { mSlotId = s; }
+	boost::uint32_t getSlotId() { return mSlotId; }
+	void setSlotId(boost::uint32_t s) { mSlotId = s; }
 
 	// Chad: Document
 	string_table::key getName() { return mName; }
@@ -104,17 +104,17 @@ public:
 	{/**/}
 
 	// As an assignable function.
-	asBinding(asNamespace *ns, asMethod *pMethod, uint32_t sid, bool isstatic) :
+	asBinding(asNamespace *ns, asMethod *pMethod, boost::uint32_t sid, bool isstatic) :
 		mNamespace(ns), mType(T_METHOD), mSlotId(sid), mConst(false),
 		mStatic(isstatic),	mMethod(pMethod)
 	{/**/}
 
-	asBinding(asNamespace *ns, asBoundValue *pValue, uint32_t sid, bool isconstant,
+	asBinding(asNamespace *ns, asBoundValue *pValue, boost::uint32_t sid, bool isconstant,
 		bool isstatic) : mNamespace(ns), mType(T_VALUE), mSlotId(sid), mConst(isconstant),
 		mStatic(isstatic), mValue(pValue)
 	{/**/}
 
-	asBinding(asNamespace *ns, asBoundValue *pValue, uint32_t sid, bool isstatic) :
+	asBinding(asNamespace *ns, asBoundValue *pValue, boost::uint32_t sid, bool isstatic) :
 		mNamespace(ns), mType(T_VALUE), mSlotId(sid), mConst(false), mStatic(isstatic),
 		mValue(pValue)
 	{/**/}
@@ -124,7 +124,7 @@ public:
 		mAccess(pAccess)
 	{/**/}
 
-	asBinding(asNamespace *ns, asClass *pClass, uint32_t sid, bool isstatic) :
+	asBinding(asNamespace *ns, asClass *pClass, boost::uint32_t sid, bool isstatic) :
 		mNamespace(ns), mType(T_CLASS), mSlotId(sid), mConst(true), mStatic(isstatic),
 		mClass(pClass)
 	{/**/}
@@ -170,7 +170,7 @@ public:
 	} types;
 	types mType;
 
-	uint32_t mSlotId;
+	boost::uint32_t mSlotId;
 	bool mConst;
 	bool mStatic;
 	string_table::key mName;
@@ -356,10 +356,10 @@ public:
 	CodeStream *getBody() { return mBody; }
 	void setBody(CodeStream *b) { mBody = b; }
 
-	bool addValue(string_table::key name, asNamespace *ns, uint32_t slotId,
+	bool addValue(string_table::key name, asNamespace *ns, boost::uint32_t slotId,
 		asClass *type, as_value& val, bool isconst);
 
-	bool addSlot(string_table::key name, asNamespace *ns, uint32_t slotId,
+	bool addSlot(string_table::key name, asNamespace *ns, boost::uint32_t slotId,
 		asClass *type);
 
 	bool addMethod(string_table::key name, asNamespace *ns, asMethod *method);
@@ -369,10 +369,10 @@ public:
 	bool addSetter(string_table::key name, asNamespace *ns, asMethod *method);
 
 	bool addMemberClass(string_table::key name, asNamespace *ns,
-		uint32_t slotId, asClass *type);
+		boost::uint32_t slotId, asClass *type);
 	
 	bool addSlotFunction(string_table::key name, asNamespace *ns,
-		uint32_t slotId, asMethod *method);
+		boost::uint32_t slotId, asMethod *method);
 
 	/// \brief
 	/// Set the owner of this method.
@@ -482,10 +482,10 @@ public:
 
 	void dump();
 
-	bool addValue(string_table::key name, asNamespace *ns, uint32_t slotId,
+	bool addValue(string_table::key name, asNamespace *ns, boost::uint32_t slotId,
 		asClass *type, as_value& val, bool isconst, bool isstatic);
 
-	bool addSlot(string_table::key name, asNamespace *ns, uint32_t slotId,
+	bool addSlot(string_table::key name, asNamespace *ns, boost::uint32_t slotId,
 		asClass *type, bool isstatic);
 
 	bool addMethod(string_table::key name, asNamespace *ns, asMethod *method,
@@ -498,11 +498,11 @@ public:
 		bool isstatic);
 
 	bool addMemberClass(string_table::key name, asNamespace *ns,
-		uint32_t slotId, asClass *type, bool isstatic);
+		boost::uint32_t slotId, asClass *type, bool isstatic);
 
 	// TODO: Figure out how this differs from addMethod
 	bool addSlotFunction(string_table::key name, asNamespace *ns,
-		uint32_t slotId, asMethod *method, bool isstatic);
+		boost::uint32_t slotId, asMethod *method, bool isstatic);
 
 	/// Is the class final?
 	bool isFinal() const { return mFinal; }

@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//  $Id: AudioDecoderSimple.h,v 1.4 2007/11/24 17:21:42 strk Exp $
+//  $Id: AudioDecoderSimple.h,v 1.5 2007/12/04 11:45:25 strk Exp $
 
 #ifndef __AUDIODECODERSIMPLE_H__
 #define __AUDIODECODERSIMPLE_H__
@@ -42,7 +42,7 @@ public:
 
 	bool setup(SoundInfo* info);
 
-	uint8_t* decode(uint8_t* input, uint32_t inputSize, uint32_t& outputSize, uint32_t& decodedBytes, bool parse);
+	uint8_t* decode(uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool parse);
 
 private:
 
@@ -50,10 +50,10 @@ private:
 	audioCodecType _codec;
 
 	// samplerate
-	uint16_t _sampleRate;
+	boost::uint16_t _sampleRate;
 
 	// sampleCount
-	uint32_t _sampleCount;
+	boost::uint32_t _sampleCount;
 
 	// stereo
 	bool _stereo;

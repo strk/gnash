@@ -95,7 +95,6 @@ libgnashbase_la_SOURCES = \
 	tu_random.cpp \
 	tu_timer.cpp \
 	WallClockTimer.cpp \
-	tu_types.cpp \
 	utf8.cpp \
 	utility.cpp \
 	curl_adapter.cpp \
@@ -137,7 +136,6 @@ noinst_HEADERS = \
 	tu_random.h \
 	tu_timer.h \
 	WallClockTimer.h \
-	tu_types.h \
 	utf8.h \
 	utility.h \
 	curl_adapter.h \

@@ -148,23 +148,23 @@ public:
 	}
 
 	/// Get right margin in twips
-	uint16_t get_right_margin() const {
+	boost::uint16_t get_right_margin() const {
 		return m_right_margin;
 	}
 
 	/// Get left margin in twips
-	uint16_t get_left_margin() const {
+	boost::uint16_t get_left_margin() const {
 		return m_left_margin;
 	}
 
 	/// Get indentation in  twips
-	uint16_t get_indent() const {
+	boost::uint16_t get_indent() const {
 		return m_indent;
 	}
 
 	/// Get height of font  in twips.
 	// @@ what if has_font is false ??
-	uint16_t get_font_height() const {
+	boost::uint16_t get_font_height() const {
 		return m_text_height;
 	}
 
@@ -172,7 +172,7 @@ public:
 	// 
 	/// Used by dynamically created textfields.
 	///
-	void set_font_height(uint16_t h) {
+	void set_font_height(boost::uint16_t h) {
 		m_text_height = h;
 	}
 
@@ -197,7 +197,7 @@ public:
 	/// Get extra space between lines (in twips).
 	//
 	/// This is in addition to default font line spacing.
-	uint16_t get_leading() const {
+	boost::uint16_t get_leading() const {
 		return m_leading;
 	}
 
@@ -324,7 +324,7 @@ private:
 	font*	m_font;
 
 	/// height of font text, in twips
-	uint16_t m_text_height;
+	boost::uint16_t m_text_height;
 
 	/// Text color
 	rgba	m_color;
@@ -338,18 +338,18 @@ private:
 	alignment m_alignment;
 	
 	/// extra space between box's left border and text (in twips)
-	uint16_t m_left_margin;
+	boost::uint16_t m_left_margin;
 
 	/// extra space between box's right border and text (in twips)
-	uint16_t m_right_margin;
+	boost::uint16_t m_right_margin;
 
 	/// how much to indent the first line of multiline text (in twips)
-	uint16_t	m_indent;
+	boost::uint16_t	m_indent;
 
 	/// \brief
 	/// Extra space between lines
 	/// (in addition to default font line spacing)
-	uint16_t	m_leading;
+	boost::uint16_t	m_leading;
 
 	/// The default text to be displayed
 	std::string	m_default_text;

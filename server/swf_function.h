@@ -82,7 +82,7 @@ private:
 	/// used by function2 to control implicit arg register assignments
 	// 
 	/// See http://sswf.sourceforge.net/SWFalexref.html#action_declare_function2
-	uint16_t	m_function2_flags;
+	boost::uint16_t	m_function2_flags;
 
 	/// Return an 'arguments' object.
 	//
@@ -202,7 +202,7 @@ public:
 
 	void	set_local_register_count(uint8_t ct) { assert(m_is_function2); m_local_register_count = ct; }
 
-	void	set_function2_flags(uint16_t flags) { assert(m_is_function2); m_function2_flags = flags; }
+	void	set_function2_flags(boost::uint16_t flags) { assert(m_is_function2); m_function2_flags = flags; }
 
 	void	add_arg(int arg_register, const char* name)
 	{

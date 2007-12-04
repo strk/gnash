@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.121 2007/12/03 05:29:34 bjacques Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.122 2007/12/04 11:45:21 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -745,7 +745,7 @@ public:
     stroke.line_join(agg::round_join);
     path.remove_all(); // Not obligatory in this case
 
-    const int16_t *vertex = static_cast<const int16_t*>(coords);
+    const boost::int16_t *vertex = static_cast<const boost::int16_t*>(coords);
     
     mat.transform(&pnt, point(vertex[0], vertex[1]));
     path.move_to(pnt.x, pnt.y);
@@ -2091,7 +2091,7 @@ private:  // private variables
 bool is_little_endian_host() {
 
   union {
-    uint16_t word;
+    boost::uint16_t word;
     struct {
       uint8_t b1;
       uint8_t b2;

@@ -86,7 +86,7 @@ public:
       ///	It is allowed to be NULL as long as fn_call is allowed
       ///	a NULL as 'this_ptr' (we might want to change this).
       ///
-      void setInterval(as_function& method, uint64_t ms, boost::intrusive_ptr<as_object> this_ptr);
+      void setInterval(as_function& method, boost::uint64_t ms, boost::intrusive_ptr<as_object> this_ptr);
 
       /// Setup the Timer, enabling it.
       //
@@ -106,7 +106,7 @@ public:
       /// @param args
       /// 	The list of arguments to pass to the function being invoked.
       ///
-      void setInterval(as_function& method, uint64_t ms, boost::intrusive_ptr<as_object> this_ptr, 
+      void setInterval(as_function& method, boost::uint64_t ms, boost::intrusive_ptr<as_object> this_ptr, 
 		      std::vector<as_value>& args);
 
       /// Clear the timer, ready for reuse
@@ -137,10 +137,10 @@ public:
       typedef std::vector<as_value> ArgsContainer;
 
       /// Return number of microseconds between expirations 
-      uint64_t getInterval() const { return _interval; }
+      boost::uint64_t getInterval() const { return _interval; }
 
       /// Return number of milliseconds after VM start this timer was last reset
-      uint64_t getStart() const { return _start; }
+      boost::uint64_t getStart() const { return _start; }
 
 #ifdef GNASH_USE_GC
 	/// Mark all reachable resources (for GC)
@@ -163,10 +163,10 @@ private:
       void start();
 
       /// Number of milliseconds between expirations 
-      uint64_t _interval;
+      boost::uint64_t _interval;
 
       /// Number of microseconds since epoch at Timer start (?)
-      uint64_t _start;
+      boost::uint64_t _start;
 
       /// The associated function, stored in an intrusive pointer
       boost::intrusive_ptr<as_function> _function;

@@ -98,9 +98,9 @@ public:
 
 	/// Get a variable length 32-bit integer from the stream.
 	/// Store its length in the passed uint8_t.
-	uint32_t read_V32(size_t pc, uint8_t& length) const
+	boost::uint32_t read_V32(size_t pc, uint8_t& length) const
 	{
-		uint32_t res = m_buffer[pc];
+		boost::uint32_t res = m_buffer[pc];
 		if (!(res & 0x00000080))
 		{
 			length = 1;
@@ -151,9 +151,9 @@ public:
 	//
 	/// Useful to hide complexity of underlying buffer access.
 	///
-	int16_t read_int16(size_t pc) const
+	boost::int16_t read_int16(size_t pc) const
 	{
-		int16_t ret = m_buffer[pc] | (m_buffer[pc + 1] << 8);
+		boost::int16_t ret = m_buffer[pc] | (m_buffer[pc + 1] << 8);
 		return ret;
 	}
 
@@ -161,18 +161,18 @@ public:
 	//
 	/// Useful to hide complexity of underlying buffer access.
 	///
-	uint16_t read_uint16(size_t pc) const
+	boost::uint16_t read_uint16(size_t pc) const
 	{
-		return static_cast<uint16_t>(read_int16(pc));
+		return static_cast<boost::uint16_t>(read_int16(pc));
 	}
 
 	/// Read a 32-bit integer starting at given offset.
 	//
 	/// Useful to hide complexity of underlying buffer access.
 	///
-	int32_t read_int32(size_t pc) const
+	boost::int32_t read_int32(size_t pc) const
 	{
-		int32_t	val = m_buffer[pc]
+		boost::int32_t	val = m_buffer[pc]
 		      | (m_buffer[pc + 1] << 8)
 		      | (m_buffer[pc + 2] << 16)
 		      | (m_buffer[pc + 3] << 24);

@@ -706,15 +706,15 @@ Gui::advanceMovie()
 
 #ifdef SKIP_RENDERING_IF_LATE
 
-	uint32_t advanceTime = advanceTimer.elapsed(); // in milliseconds !
+	boost::uint32_t advanceTime = advanceTimer.elapsed(); // in milliseconds !
 
-	uint32_t timeSlot = _interval; // milliseconds between advance calls 
+	boost::uint32_t timeSlot = _interval; // milliseconds between advance calls 
 
 	if ( advanceTime+gui->estimatedDisplayTime < timeSlot )
 	{
 		advanceTimer.restart();
 		display(m);
-		uint32_t displayTime = advanceTimer.elapsed();
+		boost::uint32_t displayTime = advanceTimer.elapsed();
 
 		if ( displayTime > estimatedDisplayTime)
 		{
@@ -860,11 +860,11 @@ Gui::fpsCounterTick()
 	  return;
   }
 
-  uint64_t current_timer = tu_timer::get_ticks();
+  boost::uint64_t current_timer = tu_timer::get_ticks();
 
   // TODO: keep fps_timer_interval in milliseconds to avoid the multiplication
   //       at each fpsCounterTick call...
-  uint64_t interval_ms = (uint64_t)(fps_timer_interval * 1000.0);
+  boost::uint64_t interval_ms = (boost::uint64_t)(fps_timer_interval * 1000.0);
 
   if (fps_counter_total==1) {
     fps_timer = current_timer;

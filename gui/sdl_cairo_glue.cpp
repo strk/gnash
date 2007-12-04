@@ -63,7 +63,7 @@ SdlCairoGlue::createRenderHandler(int depth)
 
 
 bool
-SdlCairoGlue::prepDrawingArea(int width, int height, uint32_t sdl_flags)
+SdlCairoGlue::prepDrawingArea(int width, int height, boost::uint32_t sdl_flags)
 {
     _screen = SDL_SetVideoMode(width, height, _bpp, sdl_flags | SDL_SWSURFACE);
 
@@ -85,7 +85,7 @@ SdlCairoGlue::prepDrawingArea(int width, int height, uint32_t sdl_flags)
 
     renderer::cairo::set_handle(_cairo_handle);
 
-    uint32_t rmask, gmask, bmask, amask;
+    boost::uint32_t rmask, gmask, bmask, amask;
 
     rmask = 0x00ff0000;
     gmask = 0x0000ff00;

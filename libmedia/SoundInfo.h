@@ -18,7 +18,7 @@
 // 
 //
 
-// $Id: SoundInfo.h,v 1.3 2007/11/24 17:21:42 strk Exp $
+// $Id: SoundInfo.h,v 1.4 2007/12/04 11:45:26 strk Exp $
 
 #ifndef __SOUNDINFO_H__
 #define __SOUNDINFO_H__
@@ -55,7 +55,7 @@ public:
 	/// Defines whether the sound is in 16bit format (samplesize == 2)? else it 
 	/// is 8bit (samplesize == 1). Used for streams when decoding adpcm.
 	///
-	SoundInfo(audioCodecType format, bool stereo, uint32_t sampleRate, uint32_t sampleCount, bool is16bit)
+	SoundInfo(audioCodecType format, bool stereo, boost::uint32_t sampleRate, boost::uint32_t sampleCount, bool is16bit)
 	:	_format(format),
 		_stereo(stereo),
 		_sampleRate(sampleRate),
@@ -100,10 +100,10 @@ private:
 	bool _stereo;
 
 	/// Sample rate, one of 5512, 11025, 22050, 44100
-	uint32_t _sampleRate;
+	boost::uint32_t _sampleRate;
 
 	/// Number of samples
-	uint32_t _sampleCount;
+	boost::uint32_t _sampleCount;
 
 	/// Is the audio in 16bit format (samplesize == 2)? else it 
 	/// is 8bit (samplesize == 1). Used for streams when decoding adpcm.

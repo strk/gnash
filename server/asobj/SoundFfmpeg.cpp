@@ -274,16 +274,16 @@ bool SoundFfmpeg::getAudio(void* owner, uint8_t* stream, int len)
 					int frame_size;
 #ifdef FFMPEG_AUDIO2
 					frame_size = (AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2;
-					if (avcodec_decode_audio2(so->audioCodecCtx, (int16_t*) ptr, &frame_size, packet.data, packet.size) >= 0)
+					if (avcodec_decode_audio2(so->audioCodecCtx, (boost::int16_t*) ptr, &frame_size, packet.data, packet.size) >= 0)
 #else
-					if (avcodec_decode_audio(so->audioCodecCtx, (int16_t*) ptr, &frame_size, packet.data, packet.size) >= 0)
+					if (avcodec_decode_audio(so->audioCodecCtx, (boost::int16_t*) ptr, &frame_size, packet.data, packet.size) >= 0)
 #endif
 					{
 
 						bool stereo = so->audioCodecCtx->channels > 1 ? true : false;
 						int samples = stereo ? frame_size >> 2 : frame_size >> 1;
 						int newDataSize = 0;
-						int16_t* output_data = NULL;
+						boost::int16_t* output_data = NULL;
 						bool output_data_allocated = false;
 
 						// Resample if needed
@@ -294,12 +294,12 @@ bool SoundFfmpeg::getAudio(void* owner, uint8_t* stream, int len)
 								so->resampleCtx = audio_resample_init (2, so->audioCodecCtx->channels, 44100, so->audioCodecCtx->sample_rate);
 							}
 							// The size of this is a guess, we don't know yet... Lets hope it's big enough
-							output_data = new int16_t[AVCODEC_MAX_AUDIO_FRAME_SIZE];
+							output_data = new boost::int16_t[AVCODEC_MAX_AUDIO_FRAME_SIZE];
 							output_data_allocated = true;
-							samples = audio_resample (so->resampleCtx, output_data, (int16_t*)ptr, samples);
+							samples = audio_resample (so->resampleCtx, output_data, (boost::int16_t*)ptr, samples);
 							newDataSize =  samples * 2 * 2; // 2 for stereo and 2 for samplesize = 2 bytes
 						} else {
-							output_data = (int16_t*)ptr;
+							output_data = (boost::int16_t*)ptr;
 							newDataSize = samples * 2 * 2;
 						}
 

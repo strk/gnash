@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.4 2007/11/30 00:13:01 tgc Exp $ */
+/* $Id: sound_handler.h,v 1.5 2007/12/04 11:45:26 strk Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -33,7 +33,6 @@
 #endif
 
 #include "tu_config.h" // for DSOEXPORT
-#include "tu_types.h"
 #include "SoundInfo.h"
 
 #include <vector>
@@ -219,9 +218,9 @@ public:
 	/// envelopes can be assigned to a sound to make a fade out or similar stuff.
 	struct sound_envelope
 	{
-		uint32_t m_mark44;
-		uint16_t m_level0;
-		uint16_t m_level1;
+		boost::uint32_t m_mark44;
+		boost::uint16_t m_level0;
+		boost::uint16_t m_level1;
 	};
 
 	// If stereo is true, samples are interleaved w/ left sample first.

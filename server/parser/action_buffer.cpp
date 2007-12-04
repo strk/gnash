@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: action_buffer.cpp,v 1.27 2007/10/30 18:55:43 strk Exp $ */
+/* $Id: action_buffer.cpp,v 1.28 2007/12/04 11:45:32 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -120,10 +120,10 @@ action_buffer::read(stream* in)
 	
 	if (action_id & 0x80) {
 	    // Action contains extra data.  Read it.
-	    uint16_t length = in->read_u16();
+	    boost::uint16_t length = in->read_u16();
 	    m_buffer.push_back(length & 0x0FF);
 	    m_buffer.push_back((length >> 8) & 0x0FF);
-	    for (uint16_t i = 0; i < length; i++) {
+	    for (boost::uint16_t i = 0; i < length; i++) {
 		uint8_t b = in->read_u8(); // bytes ensured outside loop
 		m_buffer.push_back(b);
 	    }
@@ -164,8 +164,8 @@ action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
     
     // Actual processing.
     size_t i = start_pc;
-    uint16_t length = uint16_t(read_int16(i+1));
-    uint16_t count = uint16_t(read_int16(i+3)); 
+    boost::uint16_t length = boost::uint16_t(read_int16(i+1));
+    boost::uint16_t count = boost::uint16_t(read_int16(i+3)); 
     i += 2;
     
 //log_msg(_("Start at %d, stop at %d, length read was %d, count read was %d"), start_pc, stop_pc, length, count);
@@ -355,8 +355,8 @@ disasm_instruction(const unsigned char* instruction_data)
 		}
 		else if (type == 7)
 		{
-		    // int32_t
-		    int32_t	val = instruction_data[3 + i]
+		    // boost::int32_t
+		    boost::int32_t	val = instruction_data[3 + i]
 			| (instruction_data[3 + i + 1] << 8)
 			| (instruction_data[3 + i + 2] << 16)
 			| (instruction_data[3 + i + 3] << 24);
@@ -425,7 +425,7 @@ disasm_instruction(const unsigned char* instruction_data)
 		       << " arg_count = " << arg_count
 		       << " reg_count = " << reg_count;
 	    
-	    uint16_t	flags = (instruction_data[3 + i]) | (instruction_data[3 + i + 1] << 8);
+	    boost::uint16_t	flags = (instruction_data[3 + i]) | (instruction_data[3 + i + 1] << 8);
 	    i += 2;
 	    
 	    // @@ What is the difference between "super" and "_parent"?
@@ -502,10 +502,10 @@ convert_float_little(const void *p)
 	// Hairy union for endian detection and munging
 	union {
 		float	f;
-		uint32_t i;
+		boost::uint32_t i;
 		struct {	// for endian detection
-			uint16_t s0;
-			uint16_t s1;
+			boost::uint16_t s0;
+			boost::uint16_t s1;
 		} s;
 		struct {	// for byte-swapping
 			uint8_t c0;
@@ -546,16 +546,16 @@ convert_double_wacky(const void *p)
 	const uint8_t *cp = (const uint8_t *)p;	// Handy uchar version
 	union {
 		double	d;
-		uint64_t	i;
+		boost::uint64_t	i;
 		struct {
-			uint32_t l0;
-			uint32_t l1;
+			boost::uint32_t l0;
+			boost::uint32_t l1;
 		} l;
 		struct {
-			uint16_t s0;
-			uint16_t s1;
-			uint16_t s2;
-			uint16_t s3;
+			boost::uint16_t s0;
+			boost::uint16_t s1;
+			boost::uint16_t s2;
+			boost::uint16_t s3;
 		} s;
 		struct {
 			uint8_t c0;

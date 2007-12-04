@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.h,v 1.19 2007/09/27 23:59:52 tgc Exp $
+// $Id: FLVParser.h,v 1.20 2007/12/04 11:45:23 strk Exp $
 
 // Information about the FLV format can be found at http://osflash.org/flv
 
@@ -38,9 +38,9 @@ namespace gnash {
 class FLVFrame
 {
 public:
-	uint32_t dataSize;
+	boost::uint32_t dataSize;
 	uint8_t* data;
-	uint64_t timestamp;
+	boost::uint64_t timestamp;
 	uint8_t tag;
 };
 
@@ -52,7 +52,7 @@ public:
 class FLVAudioInfo
 {
 public:
-	FLVAudioInfo(uint16_t codeci, uint16_t sampleRatei, uint16_t sampleSizei, bool stereoi, uint64_t durationi)
+	FLVAudioInfo(boost::uint16_t codeci, boost::uint16_t sampleRatei, boost::uint16_t sampleSizei, bool stereoi, boost::uint64_t durationi)
 		: codec(codeci),
 		sampleRate(sampleRatei),
 		sampleSize(sampleSizei),
@@ -61,11 +61,11 @@ public:
 		{
 		}
 
-	uint16_t codec;
-	uint16_t sampleRate;
-	uint16_t sampleSize;
+	boost::uint16_t codec;
+	boost::uint16_t sampleRate;
+	boost::uint16_t sampleSize;
 	bool stereo;
-	uint64_t duration;
+	boost::uint64_t duration;
 };
 
 /// \brief
@@ -76,7 +76,7 @@ public:
 class FLVVideoInfo
 {
 public:
-	FLVVideoInfo(uint16_t codeci, uint16_t widthi, uint16_t heighti, uint16_t frameRatei, uint64_t durationi)
+	FLVVideoInfo(boost::uint16_t codeci, boost::uint16_t widthi, boost::uint16_t heighti, boost::uint16_t frameRatei, boost::uint64_t durationi)
 		: codec(codeci),
 		width(widthi),
 		height(heighti),
@@ -85,23 +85,23 @@ public:
 		{
 		}
 
-	uint16_t codec;
-	uint16_t width;
-	uint16_t height;
-	uint16_t frameRate;
-	uint64_t duration;
+	boost::uint16_t codec;
+	boost::uint16_t width;
+	boost::uint16_t height;
+	boost::uint16_t frameRate;
+	boost::uint64_t duration;
 };
 
 
 class FLVVideoFrame
 {
 public:
-	uint16_t frameType;
-	uint32_t dataSize;
-	uint64_t dataPosition;
+	boost::uint16_t frameType;
+	boost::uint32_t dataSize;
+	boost::uint64_t dataPosition;
 
 	/// in milliseconds 
-	uint32_t timestamp;
+	boost::uint32_t timestamp;
 
 	/// Return true if this video frame is a key frame
 	bool isKeyFrame() const
@@ -114,11 +114,11 @@ public:
 class FLVAudioFrame
 {
 public:
-	uint32_t dataSize;
-	uint64_t dataPosition;
+	boost::uint32_t dataSize;
+	boost::uint64_t dataPosition;
 
 	/// in milliseconds 
-	uint32_t timestamp;
+	boost::uint32_t timestamp;
 
 };
 
@@ -248,7 +248,7 @@ public:
 	/// @param time
 	///	Timestamp, in milliseconds.
 	///
-	bool isTimeLoaded(uint32_t time);
+	bool isTimeLoaded(boost::uint32_t time);
 
 	/// \brief
 	/// Seeks to the closest possible position the given position,
@@ -256,14 +256,14 @@ public:
 	//
 	/// Locks the _mutex
 	///
-	uint32_t seek(uint32_t);
+	boost::uint32_t seek(boost::uint32_t);
 
 	/// Returns the framedelay from the last to the current
 	/// audioframe in milliseconds. This is used for framerate.
 	//
 	/// Locks the _mutex
 	///
-	uint32_t audioFrameDelay();
+	boost::uint32_t audioFrameDelay();
 
 	/// \brief
 	/// Returns the framedelay from the last to the current
@@ -271,13 +271,13 @@ public:
 	//
 	/// Locks the _mutex
 	///
-	uint32_t videoFrameDelay();
+	boost::uint32_t videoFrameDelay();
 
 	/// Returns the framerate of the video
 	//
 	/// Locks the _mutex
 	///
-	uint16_t videoFrameRate();
+	boost::uint16_t videoFrameRate();
 
 	/// Returns the "bufferlength", meaning the differens between the
 	/// current frames timestamp and the timestamp of the last parseable
@@ -285,17 +285,17 @@ public:
 	//
 	/// Locks the _mutex
 	///
-	uint32_t getBufferLength();
+	boost::uint32_t getBufferLength();
 
 private:
 
 	/// seeks to the closest possible position the given position,
 	/// and returns the new position.
-	uint32_t seekAudio(uint32_t time);
+	boost::uint32_t seekAudio(boost::uint32_t time);
 
 	/// seeks to the closest possible position the given position,
 	/// and returns the new position.
-	uint32_t seekVideo(uint32_t time);
+	boost::uint32_t seekVideo(boost::uint32_t time);
 
 
 	/// Parses next frame from the file, returns true is a frame
@@ -306,7 +306,7 @@ private:
 	bool parseHeader();
 
 	// Functions used to extract numbers from the file
-	inline uint32_t getUInt24(uint8_t* in);
+	inline boost::uint32_t getUInt24(uint8_t* in);
 
 	/// The interface to the file, externally owned
 	LoadThread& _lt;
@@ -322,7 +322,7 @@ private:
 	AudioFrames _audioFrames;
 
 	/// The position where the parsing should continue from.
-	uint64_t _lastParsedPosition;
+	boost::uint64_t _lastParsedPosition;
 
 	/// Whether the parsing is complete or not
 	bool _parsingComplete;

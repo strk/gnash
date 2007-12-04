@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: impl.h,v 1.49 2007/12/01 00:14:59 strk Exp $ */
+/* $Id: impl.h,v 1.50 2007/12/04 11:45:28 strk Exp $ */
 
 #ifndef GNASH_IMPL_H
 #define GNASH_IMPL_H
@@ -76,7 +76,7 @@ public:
     cxform	m_color_transform;
     matrix	m_matrix;
     float	m_ratio;
-    uint16_t 	m_clip_depth;
+    boost::uint16_t 	m_clip_depth;
 
     display_info()
 	:

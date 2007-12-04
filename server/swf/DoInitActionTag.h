@@ -30,7 +30,6 @@
 #include "swf.h" // for tag_type definition
 #include "action_buffer.h" // for composition
 #include "sprite_instance.h" // for inlines
-//#include "tu_types.h" // for uint16_t, uint32_t etc. definition 
 
 // Forward declarations
 namespace gnash {

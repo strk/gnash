@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.7 2007/12/01 21:49:19 strk Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.8 2007/12/04 11:45:26 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -332,7 +332,7 @@ void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offse
 	// Temp variables to make the code simpler and easier to read
 	audioCodecType soundFormat = sounddata->soundinfo->getFormat();
 	bool soundStereo = sounddata->soundinfo->isStereo();
-	uint32_t soundSampleRate = sounddata->soundinfo->getSampleRate();
+	boost::uint32_t soundSampleRate = sounddata->soundinfo->getSampleRate();
 
 	if (soundFormat == AUDIO_CODEC_MP3) {
 
@@ -812,8 +812,8 @@ unsigned int GST_sound_handler::get_duration(int sound_handle)
 
 	sound_data* sounddata = m_sound_data[sound_handle];
 
-	uint32_t sampleCount = sounddata->soundinfo->getSampleCount();
-	uint32_t sampleRate = sounddata->soundinfo->getSampleRate();
+	boost::uint32_t sampleCount = sounddata->soundinfo->getSampleCount();
+	boost::uint32_t sampleRate = sounddata->soundinfo->getSampleRate();
 
 	// Return the sound duration in milliseconds
 	if (sampleCount > 0 && sampleRate > 0) {
@@ -848,7 +848,7 @@ unsigned int GST_sound_handler::get_position(int sound_handle)
 	GstElement *pipeline,*audioconvert;
 	GstStateChangeReturn ret;
 	GstState current, pending;
-	int64_t pos;
+	boost::int64_t pos;
 	GstFormat fmt = GST_FORMAT_TIME;
 	
 	pipeline = sounddata->m_gst_elements[sounddata->m_gst_elements.size()-1]->pipeline;

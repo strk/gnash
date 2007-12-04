@@ -286,7 +286,7 @@ private:
 
 
 	int	m_loading_sound_stream;
-	uint32_t	m_file_length;
+	boost::uint32_t	m_file_length;
 
 	std::auto_ptr<jpeg::input> m_jpeg_in;
 

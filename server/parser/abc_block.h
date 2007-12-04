@@ -58,9 +58,9 @@ public:
 
 	bool mHasValue;
 	kinds mKind;
-	uint32_t mSlotId;
-	uint32_t mTypeIndex;
-	uint32_t mClassInfoIndex;
+	boost::uint32_t mSlotId;
+	boost::uint32_t mTypeIndex;
+	boost::uint32_t mClassInfoIndex;
 	as_value mValue;
 	string_table::key mName;
 	asNamespace *mNamespace;
@@ -127,8 +127,8 @@ public:
 		POOL_NULL = 0x0C
 	} constants;
 
-	std::vector<int32_t> mIntegerPool;
-	std::vector<uint32_t> mUIntegerPool;
+	std::vector<boost::int32_t> mIntegerPool;
+	std::vector<boost::uint32_t> mUIntegerPool;
 	std::vector<double> mDoublePool;
 	std::vector<std::string> mStringPool;
 	std::vector<string_table::key> mStringPoolTableIds;
@@ -146,7 +146,7 @@ public:
 	asClass *mTheObject;
 	ClassHierarchy *mCH;
 
-	uint32_t mVersion;
+	boost::uint32_t mVersion;
 
 	asClass *locateClass(asName &m);
 
@@ -175,7 +175,7 @@ public:
 
 	bool read(stream* in);
 
-	bool pool_value(uint32_t index, uint8_t type, as_value &v);
+	bool pool_value(boost::uint32_t index, uint8_t type, as_value &v);
 
 	abc_block();
 };

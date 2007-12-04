@@ -516,7 +516,7 @@ public
     delete bi;
   }
 
-  void prepare_vertex_buffer(const int16_t* coords, int vertex_count)
+  void prepare_vertex_buffer(const boost::int16_t* coords, int vertex_count)
   {
     HRESULT hr;
 
@@ -690,11 +690,11 @@ public
       }
       else
       {
-        const int16_t backgroundCoords[] = {
-          (int16_t)x0,(int16_t)y0,
-          (int16_t)x1,(int16_t)y0,
-          (int16_t)x0,(int16_t)y1,
-          (int16_t)x1,(int16_t)y1};
+        const boost::int16_t backgroundCoords[] = {
+          (boost::int16_t)x0,(boost::int16_t)y0,
+          (boost::int16_t)x1,(boost::int16_t)y0,
+          (boost::int16_t)x0,(boost::int16_t)y1,
+          (boost::int16_t)x1,(boost::int16_t)y1};
         apply_color(background_color);
         set_matrix(gameswf::matrix::identity);
         apply_matrix(m_current_matrix);
@@ -824,7 +824,7 @@ public
     m_current_styles[LEFT_STYLE].apply(m_current_matrix);
 
     apply_matrix(m_current_matrix);
-    prepare_vertex_buffer((int16_t*)coords, vertex_count);
+    prepare_vertex_buffer((boost::int16_t*)coords, vertex_count);
     HRESULT hr = m_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, vertex_count - 2);
     assert(hr==S_OK);
 
@@ -846,7 +846,7 @@ public
     m_current_styles[LINE_STYLE].apply(m_current_matrix);
 
     apply_matrix(m_current_matrix);
-    prepare_vertex_buffer((int16_t*)coords, vertex_count);
+    prepare_vertex_buffer((boost::int16_t*)coords, vertex_count);
     HRESULT hr = m_pd3dDevice->DrawPrimitive( D3DPT_LINESTRIP, 0, vertex_count-1);
     assert(hr==S_OK);
   }

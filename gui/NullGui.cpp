@@ -40,15 +40,15 @@ namespace gnash
 bool
 NullGui::run()
 {
-  uint64_t prevtimer=0;
-  uint64_t start_timer = tu_timer::get_ticks();  // returns milliseconds
+  boost::uint64_t prevtimer=0;
+  boost::uint64_t start_timer = tu_timer::get_ticks();  // returns milliseconds
 
   prevtimer = start_timer;
 
   while (true)
   {
   
-    uint64_t timer=0;
+    boost::uint64_t timer=0;
 
     // synchronize to frame time 
     if (_timeout || (_interval>1))  // avoid timing completely for interval==1

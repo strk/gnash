@@ -84,11 +84,11 @@ namespace gnash {
 		/// triangle-strip order.  The type of the array should
 		/// be float[vertex_count*2]
 		///
-		void	draw_mesh_strip(const int16_t coords[],
+		void	draw_mesh_strip(const boost::int16_t coords[],
 				int vertex_count);
 
 		/// See render_handler::draw_line_strip (in backend/render_handler.h)
-		void	draw_line_strip(const int16_t coords[],
+		void	draw_line_strip(const boost::int16_t coords[],
 				int vertex_count, const rgba& color, const matrix& mat);
 
 		/// See render_handler::draw_poly (in backend/render_handler.h)

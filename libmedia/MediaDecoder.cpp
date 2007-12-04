@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaDecoder.cpp,v 1.2 2007/12/04 09:20:29 bwy Exp $
+// $Id: MediaDecoder.cpp,v 1.3 2007/12/04 11:45:26 strk Exp $
 
 #include "MediaDecoder.h"
 
@@ -99,7 +99,7 @@ void MediaDecoder::decodingLoop()
 bool MediaDecoder::decodeAndBufferFrame()
 {
 	MediaFrame* frame = _parser->parseMediaFrame();
-	uint32_t parserPosition = _parser->getLastParsedPos();
+	boost::uint32_t parserPosition = _parser->getLastParsedPos();
 	if (parserPosition > _lastConfirmedPosition) _lastConfirmedPosition = parserPosition;
 
 	if (frame == NULL) {
@@ -132,8 +132,8 @@ void MediaDecoder::decodeAudio(MediaFrame* packet)
 	// We don't handle audio
 	if (!_audioDecoder.get()) return;
 
-	uint32_t datasize;
-	uint32_t bufsize;
+	boost::uint32_t datasize;
+	boost::uint32_t bufsize;
 
 	uint8_t* ptr = _audioDecoder->decode(packet->data, packet->dataSize, bufsize, datasize, false);
 

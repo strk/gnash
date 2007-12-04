@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.60 2007/09/25 08:53:54 zoulunkai Exp $ */
+/* $Id: sdl.cpp,v 1.61 2007/12/04 11:45:22 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -202,7 +202,7 @@ SDLGui::createWindow(const char *title, int width, int height)
     _width = width;
     _height = height;
 
-    uint32_t sdl_flags = 0;
+    boost::uint32_t sdl_flags = 0;
 
     if (!_core_trap) {
         sdl_flags |= SDL_INIT_NOPARACHUTE;

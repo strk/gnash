@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.59 2007/11/21 09:21:49 cmusick Exp $ */
+/* $Id: ActionExec.cpp,v 1.60 2007/12/04 11:45:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -181,7 +181,7 @@ ActionExec::operator() ()
 	// TODO: specify in the .gnashrc !!
 	static const size_t maxBranchCount = 65536; // what's enough ?
 
-	uint32_t timeLimit = getScriptTimeout();
+	boost::uint32_t timeLimit = getScriptTimeout();
 	WallClockTimer timer;
 
 	size_t branchCount = 0;
@@ -315,7 +315,7 @@ ActionExec::operator() ()
 		next_pc = pc+1;
 	} else {
 		// action with extra data
-		uint16_t length = uint16_t(code.read_int16(pc+1));
+		boost::uint16_t length = boost::uint16_t(code.read_int16(pc+1));
 		next_pc = pc + length + 3;
 		if ( next_pc > stop_pc )
 		{
@@ -504,7 +504,7 @@ ActionExec::skip_actions(size_t offset)
 		next_pc++;
 	    } else {
 		// action with extra data
-		int16_t length = code.read_int16(next_pc+1);
+		boost::int16_t length = code.read_int16(next_pc+1);
 		assert( length >= 0 );
 		next_pc += length + 3;
 	    }
@@ -722,7 +722,7 @@ ActionExec::dumpActions(size_t from, size_t to, ostream& os)
 		lpc++;
 	    } else {
 		// action with extra data
-		int16_t length = code.read_int16(lpc+1);
+		boost::int16_t length = code.read_int16(lpc+1);
 		assert( length >= 0 );
 		lpc += length + 3;
 	    }
@@ -736,7 +736,7 @@ ActionExec::getThisPointer()
 	return _function_var ? _this_ptr.get() : env.get_original_target(); 
 }
 
-uint32_t
+boost::uint32_t
 ActionExec::getScriptTimeout()
 {
 	// TODO1: allow specifying this in the .gnashrc file

@@ -78,7 +78,7 @@ sprite_definition::read(stream* in)
 
 	m_loading_frame = 0;
 
-	while ((uint32_t) in->get_position() < (uint32_t) tag_end)
+	while ((boost::uint32_t) in->get_position() < (boost::uint32_t) tag_end)
 	{
 		SWF::tag_type tag_type = in->open_tag();
 

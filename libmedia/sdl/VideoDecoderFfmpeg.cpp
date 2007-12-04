@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: VideoDecoderFfmpeg.cpp,v 1.9 2007/11/24 17:21:43 strk Exp $
+// $Id: VideoDecoderFfmpeg.cpp,v 1.10 2007/12/04 11:45:27 strk Exp $
 
 #include "VideoDecoderFfmpeg.h"
 
@@ -212,7 +212,7 @@ VideoDecoderFfmpeg::convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame)
 	return buffer;
 }
 
-uint8_t* VideoDecoderFfmpeg::decode(uint8_t* input, uint32_t inputSize, uint32_t& outputSize)
+uint8_t* VideoDecoderFfmpeg::decode(uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize)
 {
 	// Allocate a frame to store the decoded frame in
 	AVFrame* frame = avcodec_alloc_frame();
@@ -272,7 +272,7 @@ uint8_t* VideoDecoderFfmpeg::decode(uint8_t* input, uint32_t inputSize, uint32_t
 		video->m_stream_index = _videoIndex;
 		video->m_pts = 0;
 
-		video->m_pts = static_cast<uint32_t>((as_double(_videoStream->time_base) * packet->dts) * 1000.0);
+		video->m_pts = static_cast<boost::uint32_t>((as_double(_videoStream->time_base) * packet->dts) * 1000.0);
 
 
 		if (_videoFrameFormat == YUV) {
@@ -320,9 +320,9 @@ uint8_t* VideoDecoderFfmpeg::decode(uint8_t* input, uint32_t inputSize, uint32_t
 }
 
 std::auto_ptr<image::image_base>
-VideoDecoderFfmpeg::decodeToImage(uint8_t* input, uint32_t inputSize)
+VideoDecoderFfmpeg::decodeToImage(uint8_t* input, boost::uint32_t inputSize)
 {
-	uint32_t outputSize = 0;
+	boost::uint32_t outputSize = 0;
 	uint8_t* decodedData = decode(input, inputSize, outputSize);
 
 	if (!decodedData || outputSize == 0) {

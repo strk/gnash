@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.135 2007/11/30 23:11:11 bjacques Exp $ */
+/* $Id: edit_text_character.cpp,v 1.136 2007/12/04 11:45:28 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -460,11 +460,11 @@ edit_text_character::unload()
 void
 edit_text_character::show_cursor(const matrix& mat)
 {
-	uint16_t x = static_cast<uint16_t>(m_xcursor);
-	uint16_t y = static_cast<uint16_t>(m_ycursor);
-	uint16_t h = m_def->get_font_height();
+	boost::uint16_t x = static_cast<boost::uint16_t>(m_xcursor);
+	boost::uint16_t y = static_cast<boost::uint16_t>(m_ycursor);
+	boost::uint16_t h = m_def->get_font_height();
 
-	int16_t box[4];
+	boost::int16_t box[4];
 	box[0] = x;
 	box[1] = y;
 	box[2] = x;
@@ -1134,10 +1134,10 @@ edit_text_character::format_text()
 	float scale = m_def->get_font_height() / 1024.0f;	// the EM square is 1024 x 1024
 	float fontDescent = _font->get_descent() * scale;
 	float fontLeading = _font->get_leading() * scale;
-	uint16_t fontHeight = m_def->get_font_height();
-	uint16_t leftMargin = m_def->get_left_margin();
-	uint16_t rightMargin = m_def->get_right_margin();
-	uint16_t indent = m_def->get_indent();
+	boost::uint16_t fontHeight = m_def->get_font_height();
+	boost::uint16_t leftMargin = m_def->get_left_margin();
+	boost::uint16_t rightMargin = m_def->get_right_margin();
+	boost::uint16_t indent = m_def->get_indent();
 
 	text_glyph_record	rec;	// one to work on
 	rec.m_style.setFont(_font);
@@ -1169,7 +1169,7 @@ edit_text_character::format_text()
 
 	assert(! _text.empty() );
 	const char*	text = &_text[0]; 
-	while (uint32_t code = utf8::decode_next_unicode_character(&text))
+	while (boost::uint32_t code = utf8::decode_next_unicode_character(&text))
 	{
 		if ( _embedFonts )
 		{
@@ -1297,7 +1297,7 @@ edit_text_character::format_text()
 
 		{ // need a sub-scope to avoid the 'goto' in TAB handling to cross
 		  // initialization of the 'index' variable
-		int index = _font->get_glyph_index((uint16_t) code, _embedFonts);
+		int index = _font->get_glyph_index((boost::uint16_t) code, _embedFonts);
 
 		IF_VERBOSE_MALFORMED_SWF (
 		    if (index == -1)
@@ -1382,7 +1382,7 @@ after_x_advance:
 							break;
 						}
 
-						int index = _font->get_glyph_index((uint16_t) code, _embedFonts);
+						int index = _font->get_glyph_index((boost::uint16_t) code, _embedFonts);
 						x += scale * _font->get_advance(index, _embedFonts);
 
 					}
@@ -1847,7 +1847,7 @@ textfield_backgroundColor_getset(const fn_call& fn)
 	else // setter
 	{
 		rgba newColor;
-		newColor.parseRGB( fn.arg(0).to_number<uint32_t>() );
+		newColor.parseRGB( fn.arg(0).to_number<boost::uint32_t>() );
 		ptr->setBackgroundColor(newColor);
 	}
 
@@ -1866,7 +1866,7 @@ textfield_borderColor_getset(const fn_call& fn)
 	else // setter
 	{
 		rgba newColor;
-		newColor.parseRGB( fn.arg(0).to_number<uint32_t>() );
+		newColor.parseRGB( fn.arg(0).to_number<boost::uint32_t>() );
 		ptr->setBorderColor(newColor);
 	}
 
@@ -1885,7 +1885,7 @@ textfield_textColor_getset(const fn_call& fn)
 	else // setter
 	{
 		rgba newColor;
-		newColor.parseRGB( fn.arg(0).to_number<uint32_t>() );
+		newColor.parseRGB( fn.arg(0).to_number<boost::uint32_t>() );
 		ptr->setTextColor(newColor);
 	}
 

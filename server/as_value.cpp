@@ -473,7 +473,7 @@ as_value::to_number() const
     /* NOTREACHED */
 }
 
-int32_t
+boost::int32_t
 as_value::to_int() const
 {
 	double d = to_number();
@@ -483,11 +483,11 @@ as_value::to_int() const
 
 	if (d < 0)
 	{
-		i = - (uint32_t) fmod (-d, 4294967296.0);
+		i = - (boost::uint32_t) fmod (-d, 4294967296.0);
 	}
 	else
 	{
-		i = (uint32_t) fmod (d, 4294967296.0);
+		i = (boost::uint32_t) fmod (d, 4294967296.0);
 	}
 
 	return i;

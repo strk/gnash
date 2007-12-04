@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.26 2007/11/24 17:21:45 strk Exp $
+// $Id: video_stream_def.cpp,v 1.27 2007/12/04 11:45:33 strk Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -31,7 +31,7 @@
 
 namespace gnash {
 
-video_stream_definition::video_stream_definition(uint16_t char_id)
+video_stream_definition::video_stream_definition(boost::uint16_t char_id)
 	:
 	m_char_id(char_id),
 	m_last_decoded_frame(-1),
@@ -118,7 +118,7 @@ video_stream_definition::readDefineVideoFrame(stream* in, SWF::tag_type tag, mov
 		// Parse the h263 header to determine the frame type. The position of the
 		// info varies if the frame size is custom.
 		std::auto_ptr<BitsReader> br (new BitsReader(data.get(), totSize));
-		uint32_t tmp = br->read_uint(30);
+		boost::uint32_t tmp = br->read_uint(30);
 		tmp = br->read_uint(3);
 		if (tmp == 0) tmp = br->read_uint(32);
 		else if (tmp == 1) tmp = br->read_uint(16);
@@ -151,7 +151,7 @@ video_stream_definition::create_character_instance(character* parent, int id)
 }
 
 std::auto_ptr<image::image_base>
-video_stream_definition::get_frame_data(uint32_t frameNum)
+video_stream_definition::get_frame_data(boost::uint32_t frameNum)
 {
 
 	// Check if the requested frame hold any video data.
@@ -163,7 +163,7 @@ video_stream_definition::get_frame_data(uint32_t frameNum)
 	}
 
 	// rewind to the nearest keyframe, or the last frame we decoded
-	while (static_cast<uint32_t>(m_last_decoded_frame+1) != it->first && it->second->frameType != media::KEY_FRAME && it != m_video_frames.begin()) it--;
+	while (static_cast<boost::uint32_t>(m_last_decoded_frame+1) != it->first && it->second->frameType != media::KEY_FRAME && it != m_video_frames.begin()) it--;
 
 	std::auto_ptr<image::image_base> ret(NULL);
 
@@ -185,7 +185,7 @@ video_stream_definition::get_frame_data(uint32_t frameNum)
 }
 
 void
-video_stream_definition::setFrameData(uint32_t frameNum, boost::shared_array<uint8_t> data, uint32_t size, media::videoFrameType ft)
+video_stream_definition::setFrameData(boost::uint32_t frameNum, boost::shared_array<uint8_t> data, boost::uint32_t size, media::videoFrameType ft)
 {
 	EmbedFrameMap::iterator it = m_video_frames.find(frameNum);
 	if( it != m_video_frames.end() )

@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.39 2007/11/20 00:44:04 cmusick Exp $ */
+/* $Id: timers.cpp,v 1.40 2007/12/04 11:45:30 strk Exp $ */
 
 #include "timers.h"
 #include "as_function.h" // for class as_function
@@ -49,7 +49,7 @@ namespace gnash {
   
 
   void
-  Timer::setInterval(as_function& method, uint64_t ms, boost::intrusive_ptr<as_object> this_ptr)
+  Timer::setInterval(as_function& method, boost::uint64_t ms, boost::intrusive_ptr<as_object> this_ptr)
   {
     _function = &method;
     _interval = ms; // keep milliseconds
@@ -59,7 +59,7 @@ namespace gnash {
   }
 
   void
-  Timer::setInterval(as_function& method, uint64_t ms, boost::intrusive_ptr<as_object> this_ptr, 
+  Timer::setInterval(as_function& method, boost::uint64_t ms, boost::intrusive_ptr<as_object> this_ptr, 
 		  std::vector<as_value>& args)
   {
     _function = &method;
@@ -90,7 +90,7 @@ Timer::expired()
 {
 	if (_start)
 	{
-		uint64_t now = VM::get().getTime();
+		boost::uint64_t now = VM::get().getTime();
 		assert(now >= _start); // it is possible for now to be == _start 
 
 		//cout << "Start is " << _start << " interval is " << _interval << " now is " << now << endl;
@@ -229,7 +229,7 @@ timer_setinterval(const fn_call& fn)
 	}
 
 	// Get interval time
-	uint64_t ms = uint64_t(fn.arg(timer_arg).to_number());
+	boost::uint64_t ms = boost::uint64_t(fn.arg(timer_arg).to_number());
 
 	// Parse arguments 
 	Timer::ArgsContainer args;

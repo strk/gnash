@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaParserFfmpeg.h,v 1.6 2007/12/03 20:48:51 bwy Exp $
+// $Id: MediaParserFfmpeg.h,v 1.7 2007/12/04 11:45:27 strk Exp $
 
 #ifndef __MEDIAPARSERFFMPEG_H__
 #define __MEDIAPARSERFFMPEG_H__
@@ -60,7 +60,7 @@ public:
 
 	/// Try to seek to the given millisecond. Returns the millisecond where the
 	/// seek got to.
-	uint32_t seek(uint32_t);
+	boost::uint32_t seek(boost::uint32_t);
 
 	/// Returns a VideoInfo class about the videostream
 	//
@@ -79,7 +79,7 @@ public:
 	static offset_t seekMedia(void *opaque, offset_t offset, int whence);
 
 	/// Returns the last parsed position in the file in bytes
-	uint32_t getLastParsedPos() { return _maxInputPos; }
+	boost::uint32_t getLastParsedPos() { return _maxInputPos; }
 
 private:
 
@@ -107,16 +107,16 @@ private:
 	ByteIOContext _byteIOCxt;
 
 	// The timestamp of the last parsed video frame, in milliseconds.
-	uint32_t _lastVideoTimestamp;
+	boost::uint32_t _lastVideoTimestamp;
 
 	// The timestamp of the last parsed audio frame, in seconds.
-	uint32_t _lastAudioTimestamp;
+	boost::uint32_t _lastAudioTimestamp;
 
 	// The position of the parserhead.
-	uint32_t _inputPos;
+	boost::uint32_t _inputPos;
 
 	// The max value inputPos ever had.
-	uint32_t _maxInputPos;
+	boost::uint32_t _maxInputPos;
 };
 
 

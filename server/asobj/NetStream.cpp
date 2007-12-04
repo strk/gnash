@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.76 2007/11/23 15:14:35 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.77 2007/12/04 11:45:31 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -160,12 +160,12 @@ static as_value netstream_play(const fn_call& fn)
 static as_value netstream_seek(const fn_call& fn) {
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
-	uint32_t time = 0;
+	boost::uint32_t time = 0;
 	if (fn.nargs > 0)
 	{
-		time = fn.arg(0).to_number<uint32_t>();
+		time = fn.arg(0).to_number<boost::uint32_t>();
 	}
-	ns->seek(static_cast<uint32_t>(time*1000.0));
+	ns->seek(static_cast<boost::uint32_t>(time*1000.0));
 
 	return as_value();
 }
@@ -184,7 +184,7 @@ static as_value netstream_setbuffertime(const fn_call& fn)
 	{
 		time = fn.arg(0).to_number();
 	}
-	ns->setBufferTime(uint32_t(time*1000));
+	ns->setBufferTime(boost::uint32_t(time*1000));
 
 	return as_value();
 }
@@ -510,7 +510,7 @@ NetStream::setStatus(StatusCode status)
 }
 
 void
-NetStream::setBufferTime(uint32_t time)
+NetStream::setBufferTime(boost::uint32_t time)
 {
 	// The argument is in milliseconds,
 	m_bufferTime = time;

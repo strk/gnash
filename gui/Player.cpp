@@ -237,8 +237,6 @@ int
 Player::run(int argc, char* argv[], const char* infile, const char* url)
 {
     
-	assert(tu_types_validate());
-
 	// Call this at run() time, so the caller has
 	// a cache of setting some parameter before calling us...
 	// (example: setDoSound(), setWindowId() etc.. ) 

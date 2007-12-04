@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.78 2007/12/01 00:14:59 strk Exp $ */
+/* $Id: as_value.h,v 1.79 2007/12/04 11:45:28 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -302,13 +302,13 @@ public:
 	/// Conversion to 32bit integer
 	//
 	/// Use this conversion whenever an int is needed.
-	/// This is NOT the same as calling to_number<int32_t>().
+	/// This is NOT the same as calling to_number<boost::int32_t>().
 	///
 	/// @param env
 	///	The environment to use for running the valueOf() method
 	///	for object values. 
 	///
-	int32_t	to_int() const;
+	boost::int32_t	to_int() const;
 
 	/// Shorthand: casts the result of to_number() to the requested number
 	/// type.

@@ -82,7 +82,7 @@ namespace tools {
 	};
 
 
-	void	write_placeholder_bitmap(tu_file* out, uint16_t character_id)
+	void	write_placeholder_bitmap(tu_file* out, boost::uint16_t character_id)
 	// Write a minimal bitmap character tag into the given stream,
 	// with the given character_id.
 	{
@@ -133,10 +133,10 @@ int	gnash::tools::process_swf(tu_file* swf_out, tu_file* in, const process_optio
 	// @@ Copied & adapted from movie_def_impl::read()
 	// @@ TODO share this wrapper code somehow (also with parser)
 
-	uint32_t	file_start_pos = in->get_position();
-	uint32_t	header = in->read_le32();
-	uint32_t	file_length = in->read_le32();
-	uint32_t	file_end_pos = file_start_pos + file_length;
+	boost::uint32_t	file_start_pos = in->get_position();
+	boost::uint32_t	header = in->read_le32();
+	boost::uint32_t	file_length = in->read_le32();
+	boost::uint32_t	file_end_pos = file_start_pos + file_length;
 
 	int	version = (header >> 24) & 255;
 	if ((header & 0x0FFFFFF) != 0x00535746
@@ -215,7 +215,7 @@ int	gnash::tools::process_swf(tu_file* swf_out, tu_file* in, const process_optio
 //	IF_VERBOSE_PARSE(m_frame_size.print());
 	IF_VERBOSE_PARSE(log_msg("frame rate = %f, frames = %d\n", frame_rate, frame_count));
 
-	while ((uint32_t) str.get_position() < file_end_pos)
+	while ((boost::uint32_t) str.get_position() < file_end_pos)
 	{
 		copy_helper	cp(in, swf_out);
 
@@ -234,7 +234,7 @@ int	gnash::tools::process_swf(tu_file* swf_out, tu_file* in, const process_optio
 			     || tag_type == 36))
 		{
 			// Some type of bitmap character tag; replace it with a minimal stand-in.
-			uint16_t	cid = str.read_u16();
+			boost::uint16_t	cid = str.read_u16();
 			str.close_tag();
 
 			// Insert substitute tag.

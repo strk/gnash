@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: GlowFilter.h,v 1.4 2007/09/26 19:00:46 strk Exp $ */
+/* $Id: GlowFilter.h,v 1.5 2007/12/04 11:45:28 strk Exp $ */
 
 #ifndef GNASH_GLOWFILTER_H
 #define GNASH_GLOWFILTER_H
@@ -26,7 +26,7 @@
 
 #include "BitmapFilter.h"
 
-#include <boost/cstdint.hpp> // for uint32_t
+#include <boost/cstdint.hpp> // for boost::uint32_t
 
 namespace gnash {
 
@@ -45,7 +45,7 @@ public:
         m_inner(false), m_knockout(false)
     { return; }
 
-    GlowFilter(uint32_t color,
+    GlowFilter(boost::uint32_t color,
         uint8_t alpha, float blurX, float blurY, float strength,
         uint8_t quality, bool inner, bool knockout) :
         m_color(color),
@@ -54,7 +54,7 @@ public:
     { return; }
 
 protected:
-    uint32_t m_color; // RGB color.
+    boost::uint32_t m_color; // RGB color.
     uint8_t m_alpha; // Alpha strength, as a percentage(?)
     float m_blurX; // horizontal blur
     float m_blurY; // vertical blur

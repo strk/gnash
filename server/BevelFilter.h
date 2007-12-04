@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BevelFilter.h,v 1.5 2007/09/26 19:00:46 strk Exp $ */
+/* $Id: BevelFilter.h,v 1.6 2007/12/04 11:45:27 strk Exp $ */
 
 #ifndef GNASH_BEVELFILTER_H
 #define GNASH_BEVELFILTER_H
@@ -53,8 +53,8 @@ public:
         m_type(FULL_BEVEL), m_knockout(false)
     { return; }
 
-    BevelFilter(float distance, float angle, uint32_t hcolor,
-        uint8_t halpha, uint32_t scolor, uint8_t salpha,
+    BevelFilter(float distance, float angle, boost::uint32_t hcolor,
+        uint8_t halpha, boost::uint32_t scolor, uint8_t salpha,
         float blurX, float blurY, float strength,
         uint8_t quality, bevel_type type, bool knockout) :
         m_distance(distance), m_angle(angle), m_highlightColor(hcolor),
@@ -66,9 +66,9 @@ public:
 protected:
     float m_distance; // Distance of the filter in pixels.
     float m_angle; // Angle of the filter.
-    uint32_t m_highlightColor; // Color of the highlight.
+    boost::uint32_t m_highlightColor; // Color of the highlight.
     uint8_t m_highlightAlpha; // Alpha of the highlight.
-    uint32_t m_shadowColor; // RGB color.
+    boost::uint32_t m_shadowColor; // RGB color.
     uint8_t m_shadowAlpha; // Alpha strength, as a percentage(?)
     float m_blurX; // horizontal blur
     float m_blurY; // vertical blur

@@ -399,7 +399,7 @@ FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string&, bool, bool)
 
 #ifdef USE_FREETYPE
 boost::intrusive_ptr<shape_character_def>
-FreetypeGlyphsProvider::getGlyph(uint16_t code, float& advance)
+FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 {
 	boost::intrusive_ptr<DynamicShape> sh;
 
@@ -462,7 +462,7 @@ FreetypeGlyphsProvider::getGlyph(uint16_t code, float& advance)
 }
 #else // ndef(USE_FREETYPE)
 boost::intrusive_ptr<shape_character_def>
-FreetypeGlyphsProvider::getGlyph(uint16_t, float& advance)
+FreetypeGlyphsProvider::getGlyph(boost::uint16_t, float& advance)
 {
 	abort(); // should never be called... 
 }

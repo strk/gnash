@@ -97,7 +97,7 @@ public:
 	/// Check if given position is confirmed to be accessable
 	bool isPositionConfirmed(size_t pos) const
 	{
-		return (static_cast<int32_t>(pos) <= _loadPosition);
+		return (static_cast<boost::int32_t>(pos) <= _loadPosition);
 	}
 
     /// Request download cancel

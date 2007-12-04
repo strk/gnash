@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaDecoderGst.h,v 1.1 2007/11/30 00:13:01 tgc Exp $
+// $Id: MediaDecoderGst.h,v 1.2 2007/12/04 11:45:26 strk Exp $
 
 #ifndef __MEDIADECODERGST_H__
 #define __MEDIADECODERGST_H__
@@ -38,13 +38,13 @@ namespace media {
 ///  Media decoding using Gstreamer
 class MediaDecoderGst: public MediaDecoder {
 public:
-	MediaDecoderGst(boost::shared_ptr<tu_file> stream, MediaBuffer* buffer, uint16_t swfVersion, int format);
+	MediaDecoderGst(boost::shared_ptr<tu_file> stream, MediaBuffer* buffer, boost::uint16_t swfVersion, int format);
 	~MediaDecoderGst();
 
 	/// Seeks to pos
-	uint32_t seek(uint32_t pos);
+	boost::uint32_t seek(boost::uint32_t pos);
 
-	std::pair<uint32_t, uint32_t> getWidthAndHeight();
+	std::pair<boost::uint32_t, boost::uint32_t> getWidthAndHeight();
 
 private:
 	/// Sets up the parser

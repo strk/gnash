@@ -25,12 +25,12 @@
 
 #include "smart_ptr.h" // for boost::intrusive_ptr
 #include "movie_root.h" // for composition
-#include "tu_types.h"  // for uint64_t
 #include "GC.h" // for ineritance of VmGcRoot
 #include "string_table.h" // for the string table
 
 #include <memory> // for auto_ptr
 #include <locale>
+#include <boost/cstdint.hpp> // for boost::?int??_t 
 
 // Forward declarations
 namespace gnash {
@@ -122,7 +122,7 @@ private:
 	int _swfversion;
 
 	/// Time when the VM get started
-	uint64_t _start_time;
+	boost::uint64_t _start_time;
 
 	/// Set the _global Object for actions run by Virtual Machine
 	//
@@ -187,7 +187,7 @@ public:
 	int getSWFVersion() const;
 
 	/// Get the number of milliseconds since VM was started
-	uint64_t getTime();
+	boost::uint64_t getTime();
 
 	/// Get a reference to the string table used by the VM.
 	string_table& getStringTable() const { return mStringTable; }

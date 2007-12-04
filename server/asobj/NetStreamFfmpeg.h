@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.53 2007/11/27 08:45:33 bwy Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.54 2007/12/04 11:45:31 strk Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -69,10 +69,10 @@ public:
 	}
 
 	int m_stream_index;
-	uint32_t m_size;
+	boost::uint32_t m_size;
 	uint8_t* m_data;
 	uint8_t* m_ptr;
-	uint32_t m_pts;	// presentation timestamp in millisec
+	boost::uint32_t m_pts;	// presentation timestamp in millisec
 };
 
 /// Threadsafe elements-owning queue
@@ -228,7 +228,7 @@ public:
 	///
 	/// @return the number of samples in the output data.
 	///
-	int resample(int16_t* input, int16_t* output, int samples)
+	int resample(boost::int16_t* input, boost::int16_t* output, int samples)
 	{
 		return audio_resample (_context, output, input, samples);
 	}
@@ -259,10 +259,10 @@ public:
 	//	- ::startPlayback() non locking but called by av_streamer which locks
 	//	- ::seekMedia() set as a callback with init_put_byte (??)
 	//
-	void seek(uint32_t pos);
+	void seek(boost::uint32_t pos);
 
 	// See dox in NetStream.h
-	int32_t time();
+	boost::int32_t time();
 
 	// See dox in NetStream.h
 	void advance();
@@ -412,21 +412,21 @@ private:
 	boost::thread* _decodeThread;
 
 	// The timestamp of the last decoded video frame, in seconds.
-	volatile uint32_t m_last_video_timestamp;
+	volatile boost::uint32_t m_last_video_timestamp;
 
 	// The timestamp of the last decoded audio frame, in seconds.
-	volatile uint32_t m_last_audio_timestamp;
+	volatile boost::uint32_t m_last_audio_timestamp;
 
 	// The timestamp of the last played audio (default) or video (if no audio) frame.
 	// Misured in seconds.
-	uint32_t m_current_timestamp;
+	boost::uint32_t m_current_timestamp;
 
 	// The queues of audio and video data.
 	multithread_queue <raw_mediadata_t*> m_qaudio;
 	multithread_queue <raw_mediadata_t*> m_qvideo;
 
 	// The time we started playing in seconds (since VM start ?)
-	volatile uint64_t m_start_clock;
+	volatile boost::uint64_t m_start_clock;
 
 	// When the queues are full, this is where we keep the audio/video frame
 	// there wasn't room for on its queue
@@ -435,7 +435,7 @@ private:
 	ByteIOContext ByteIOCxt;
 
 	// Time of when pause started, in seconds since VM started
-	volatile uint64_t m_time_of_pause;
+	volatile boost::uint64_t m_time_of_pause;
 };
 
 } // gnash namespace

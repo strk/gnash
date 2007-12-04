@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.7 2007/12/01 21:54:24 strk Exp $
+// $Id: sound_handler_sdl.cpp,v 1.8 2007/12/04 11:45:27 strk Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -278,7 +278,7 @@ void	SDL_sound_handler::stop_sound(int sound_handle)
 	
 		sound_data* sounddata = m_sound_data[sound_handle];
 	
-		for (int32_t i = (int32_t) sounddata->m_active_sounds.size()-1; i >-1; i--) {
+		for (boost::int32_t i = (boost::int32_t) sounddata->m_active_sounds.size()-1; i >-1; i--) {
 
 			//active_sound* sound = sounddata->m_active_sounds[i];
 
@@ -315,11 +315,11 @@ void	SDL_sound_handler::stop_all_sounds()
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
-	int32_t num_sounds = (int32_t) m_sound_data.size()-1;
-	for (int32_t j = num_sounds; j > -1; j--) {//Optimized
+	boost::int32_t num_sounds = (boost::int32_t) m_sound_data.size()-1;
+	for (boost::int32_t j = num_sounds; j > -1; j--) {//Optimized
 		sound_data* sounddata = m_sound_data[j];
-		int32_t num_active_sounds = (int32_t) sounddata->m_active_sounds.size()-1;
-		for (int32_t i = num_active_sounds; i > -1; i--) {
+		boost::int32_t num_active_sounds = (boost::int32_t) sounddata->m_active_sounds.size()-1;
+		for (boost::int32_t i = num_active_sounds; i > -1; i--) {
 
 			//active_sound* sound = sounddata->m_active_sounds[i];
 
@@ -452,8 +452,8 @@ unsigned int SDL_sound_handler::get_duration(int sound_handle)
 
 	sound_data* sounddata = m_sound_data[sound_handle];
 
-	uint32_t sampleCount = sounddata->soundinfo->getSampleCount();
-	uint32_t sampleRate = sounddata->soundinfo->getSampleRate();
+	boost::uint32_t sampleCount = sounddata->soundinfo->getSampleCount();
+	boost::uint32_t sampleRate = sounddata->soundinfo->getSampleRate();
 
 	// Return the sound duration in milliseconds
 	if (sampleCount > 0 && sampleRate > 0) {
@@ -528,7 +528,7 @@ void active_sound::deleteDecodedData()
 }
 
 // AS-volume adjustment
-void adjust_volume(int16_t* data, int size, int volume)
+void adjust_volume(boost::int16_t* data, int size, int volume)
 {
 	for (int i=0; i < size*0.5; i++) {
 		data[i] = data[i] * volume/100;
@@ -552,10 +552,10 @@ use_envelopes(active_sound* sound, unsigned int length)
 	}
 
 	// Current envelope position
-	int32_t cur_env_pos = sound->envelopes->operator[](sound->current_env).m_mark44;
+	boost::int32_t cur_env_pos = sound->envelopes->operator[](sound->current_env).m_mark44;
 
 	// Next envelope position
-	uint32_t next_env_pos = 0;
+	boost::uint32_t next_env_pos = 0;
 	if (sound->current_env == (sound->envelopes->size()-1)) {
 		// If there is no "next envelope" then set the next envelope start point to be unreachable
 		next_env_pos = cur_env_pos + length;
@@ -571,14 +571,14 @@ use_envelopes(active_sound* sound, unsigned int length)
 		startpos = sound->raw_position;
 	}
 
-	int16_t* data = reinterpret_cast<int16_t*>(sound->get_raw_data_ptr(startpos));
+	boost::int16_t* data = reinterpret_cast<boost::int16_t*>(sound->get_raw_data_ptr(startpos));
 
 	for (unsigned int i=0; i < length/2; i+=2) {
 		float left = static_cast<float>((*sound->envelopes)[sound->current_env].m_level0 / 32768.0);
 		float right = static_cast<float>((*sound->envelopes)[sound->current_env].m_level1 / 32768.0);
 
-		data[i] = static_cast<int16_t>(data[i] * left); // Left
-		data[i+1] = static_cast<int16_t>(data[i+1] * right); // Right
+		data[i] = static_cast<boost::int16_t>(data[i] * left); // Left
+		data[i+1] = static_cast<boost::int16_t>(data[i+1] * right); // Right
 
 		if ((sound->samples_played+(length/2-i)) >= next_env_pos && sound->current_env != (sound->envelopes->size()-1)) {
 			sound->current_env++;
@@ -599,7 +599,7 @@ static void
 do_mixing(Uint8* stream, active_sound* sound, Uint8* data, unsigned int mix_length, unsigned int volume) {
 	// If the volume needs adjustments we call a function to do that
 	if (volume != 100) {
-		adjust_volume(reinterpret_cast<int16_t*>(data), mix_length, volume);
+		adjust_volume(reinterpret_cast<boost::int16_t*>(data), mix_length, volume);
 	} else if (sound->envelopes != NULL) {
 		use_envelopes(sound, mix_length);
 	}
@@ -679,9 +679,9 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 	}
 
 	// Run through all the sounds. TODO: don't call .size() at every iteration !
-	for(uint32_t i=0; i < handler->m_sound_data.size(); i++) {
+	for(boost::uint32_t i=0; i < handler->m_sound_data.size(); i++) {
 		sound_data* sounddata = handler->m_sound_data[i];
-		for(uint32_t j = 0; j < sounddata->m_active_sounds.size(); j++) {
+		for(boost::uint32_t j = 0; j < sounddata->m_active_sounds.size(); j++) {
 
 			// Temp variables to make the code simpler and easier to read
 			active_sound* sound = sounddata->m_active_sounds[j];
@@ -729,10 +729,10 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 					
 					// temp raw buffer
 					Uint8* tmp_raw_buffer;
-					uint32_t tmp_raw_buffer_size = 0;
-					uint32_t decodedBytes = 0;
+					boost::uint32_t tmp_raw_buffer_size = 0;
+					boost::uint32_t decodedBytes = 0;
 
-					uint32_t inputSize = 0;
+					boost::uint32_t inputSize = 0;
 					bool parse = true;
 					if (sounddata->soundinfo->getFormat() == AUDIO_CODEC_ADPCM) {
 						parse = false;

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: WallClockTimer.cpp,v 1.1 2007/09/25 14:17:20 strk Exp $ */
+/* $Id: WallClockTimer.cpp,v 1.2 2007/12/04 11:45:23 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -41,10 +41,10 @@ WallClockTimer::restart()
 	startTimer = tu_timer::get_ticks();
 }
 
-uint32_t
+boost::uint32_t
 WallClockTimer::elapsed() const
 {
-	uint64_t currTime = tu_timer::get_ticks();
+	boost::uint64_t currTime = tu_timer::get_ticks();
 	
 	// be aware of time glitches
 	if ( currTime <= startTimer ) return 0;

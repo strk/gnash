@@ -9,8 +9,9 @@
 #ifndef UTF8_H
 #define UTF8_H
 
-#include "tu_config.h"
-#include "tu_types.h"
+#include "tu_config.h" // needed ?
+
+#include <boost/cstdint.hpp> // for boost::?int??_t
 
 
 namespace utf8
@@ -20,7 +21,7 @@ namespace utf8
 	// as output.  Advances *utf8_buffer past the character
 	// returned, unless the returned character is '\0', in which
 	// case the buffer does not advance.
-	DSOEXPORT uint32_t	decode_next_unicode_character(const char** utf8_buffer);
+	DSOEXPORT boost::uint32_t	decode_next_unicode_character(const char** utf8_buffer);
 
 	// Encodes the given UCS character into the given UTF-8
 	// buffer.  Writes the data starting at buffer[offset], and
@@ -28,7 +29,7 @@ namespace utf8
 	//
 	// May write up to 6 bytes, so make sure there's room in the
 	// buffer!
-	DSOEXPORT void	encode_unicode_character(char* buffer, int* offset, uint32_t ucs_character);
+	DSOEXPORT void	encode_unicode_character(char* buffer, int* offset, boost::uint32_t ucs_character);
 }
 
 

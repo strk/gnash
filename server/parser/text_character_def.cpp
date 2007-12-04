@@ -65,7 +65,7 @@ void text_character_def::read(stream* in, int tag_type,
 
 			if (has_font)
 			{
-				uint16_t	font_id = in->read_u16();
+				boost::uint16_t	font_id = in->read_u16();
 				if ( ! style.setFont(font_id, *m) )
 				{
 					// setFont would have already printed an swferror on failure

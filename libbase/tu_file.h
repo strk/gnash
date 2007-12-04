@@ -10,10 +10,10 @@
 #define TU_FILE_H
 
 
-#include "tu_config.h"
-#include <cstdio>
-#include "tu_types.h"
+#include "tu_config.h" // needed ?
 #include "utility.h"
+
+#include <cstdio>
 
 class membuf;
 struct SDL_RWops;
@@ -109,12 +109,12 @@ public:
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
-    uint32_t 	read_le32() {
+    boost::uint32_t 	read_le32() {
 	// read8() is uint8_t, so no masks with 0xff are required.
-	uint32_t result = (uint32_t)read8();
-	result |= (uint32_t)read8() << 8;
-	result |= (uint32_t)read8() << 16;
-	result |= (uint32_t)read8() << 24;
+	boost::uint32_t result = (boost::uint32_t)read8();
+	result |= (boost::uint32_t)read8() << 8;
+	result |= (boost::uint32_t)read8() << 16;
+	result |= (boost::uint32_t)read8() << 24;
 	return(result);
     }
 	
@@ -126,8 +126,8 @@ public:
 	/// TODO: define a platform-neutral type for 64 bits.
 	long double read_le_double64() {
 		return static_cast<long double> (
-			static_cast<int64_t> (read_le32()) |
-			static_cast<int64_t> (read_le32()) << 32
+			static_cast<boost::int64_t> (read_le32()) |
+			static_cast<boost::int64_t> (read_le32()) << 32
 		);
 	}
 
@@ -136,9 +136,9 @@ public:
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
-    uint16_t 	read_le16() {
-	uint16_t result = (uint16_t)read8();
-	result |= (uint16_t)read8() << 8;
+    boost::uint16_t 	read_le16() {
+	boost::uint16_t result = (boost::uint16_t)read8();
+	result |= (boost::uint16_t)read8() << 8;
 	return(result);
     }
 
@@ -147,7 +147,7 @@ public:
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
-    void 	write_le32(uint32_t u) {
+    void 	write_le32(boost::uint32_t u) {
 	write8((uint8_t)u);
 	write8((uint8_t)(u>>8));
 	write8((uint8_t)(u>>16));
@@ -159,7 +159,7 @@ public:
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
-    void 	write_le16(uint16_t u) {
+    void 	write_le16(boost::uint16_t u) {
 	write8((uint8_t)u);
 	write8((uint8_t)(u>>8));
     }
@@ -277,18 +277,18 @@ public:
     
     
 private:
-    uint64_t	read64() {
-	uint64_t u;
+    boost::uint64_t	read64() {
+	boost::uint64_t u;
 	m_read(&u, 8, m_data);
 	return u;
     }
-    uint32_t	read32() {
-	uint32_t u;
+    boost::uint32_t	read32() {
+	boost::uint32_t u;
 	m_read(&u, 4, m_data);
 	return u;
     }
-    uint16_t	read16() {
-	uint16_t u;
+    boost::uint16_t	read16() {
+	boost::uint16_t u;
 	m_read(&u, 2, m_data);
 	return u;
     }
@@ -298,13 +298,13 @@ private:
 	return u;
     }
     
-    void	write64(uint64_t u) {
+    void	write64(boost::uint64_t u) {
 	m_write(&u, 8, m_data);
     }
-    void	write32(uint32_t u) {
+    void	write32(boost::uint32_t u) {
 	m_write(&u, 4, m_data);
     }
-    void	write16(uint16_t u) {
+    void	write16(boost::uint16_t u) {
 	m_write(&u, 2, m_data);
     }
     void	write8(uint8_t u) {
@@ -338,9 +338,9 @@ inline void	tu_file::write_float32(float value)
 {
     union alias {
 	float	f;
-	uint32_t	i;
+	boost::uint32_t	i;
     } u;
-    compiler_assert(sizeof(alias) == sizeof(uint32_t));
+    compiler_assert(sizeof(alias) == sizeof(boost::uint32_t));
     
     u.f = value;
     write_le32(u.i);
@@ -355,7 +355,7 @@ inline float	tu_file::read_float32()
 {
     union {
 	float	f;
-	uint32_t	i;
+	boost::uint32_t	i;
     } u;
     compiler_assert(sizeof(u) == sizeof(u.i));
     

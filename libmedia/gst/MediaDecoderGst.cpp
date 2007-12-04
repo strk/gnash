@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaDecoderGst.cpp,v 1.1 2007/11/30 00:13:01 tgc Exp $
+// $Id: MediaDecoderGst.cpp,v 1.2 2007/12/04 11:45:26 strk Exp $
 
 #include "MediaDecoderGst.h"
 #include "AudioDecoderNellymoser.h"
@@ -32,7 +32,7 @@
 namespace gnash {
 namespace media {
 
-MediaDecoderGst::MediaDecoderGst(boost::shared_ptr<tu_file> stream, MediaBuffer* buffer, uint16_t swfVersion, int format)
+MediaDecoderGst::MediaDecoderGst(boost::shared_ptr<tu_file> stream, MediaBuffer* buffer, boost::uint16_t swfVersion, int format)
 	:
 	MediaDecoder(stream, buffer, swfVersion, format)
 {
@@ -122,9 +122,9 @@ bool MediaDecoderGst::setupDecoding()
 }
 
 
-uint32_t MediaDecoderGst::seek(uint32_t pos)
+boost::uint32_t MediaDecoderGst::seek(boost::uint32_t pos)
 {
-	uint32_t ret = 0;
+	boost::uint32_t ret = 0;
 	if (_parser.get()) ret = _parser->seek(pos);
 	else ret = 0;
 
@@ -167,14 +167,14 @@ printf("\t in the decode thread\n");
 	decoder->decodingLoop();
 }
 
-std::pair<uint32_t, uint32_t>
+std::pair<boost::uint32_t, boost::uint32_t>
 MediaDecoderGst::getWidthAndHeight()
 {
 	if (_parser.get()) {
 		std::auto_ptr<VideoInfo> vInfo = _parser->getVideoInfo();
-		if (vInfo.get()) return std::pair<uint32_t, uint32_t>(vInfo->width, vInfo->height);
+		if (vInfo.get()) return std::pair<boost::uint32_t, boost::uint32_t>(vInfo->width, vInfo->height);
 	}
-	return std::pair<uint32_t, uint32_t>(0,0);
+	return std::pair<boost::uint32_t, boost::uint32_t>(0,0);
 }
 	
 

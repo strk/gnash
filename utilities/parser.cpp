@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: parser.cpp,v 1.45 2007/12/01 23:42:39 strk Exp $ */
+/* $Id: parser.cpp,v 1.46 2007/12/04 11:45:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -150,7 +150,7 @@ bool matrix::has_scale, matrix::has_rotate;
 
 struct rect
 {
-    static uint32_t x_min,x_max,y_min,y_max;
+    static boost::uint32_t x_min,x_max,y_min,y_max;
     static void parse(stream* in)
 	{
 	    in->align();
@@ -168,10 +168,10 @@ struct rect
 	    ident--;
 	}
 };
-uint32_t rect::x_min;
-uint32_t rect::y_min;
-uint32_t rect::x_max;
-uint32_t rect::y_max;
+boost::uint32_t rect::x_min;
+boost::uint32_t rect::y_min;
+boost::uint32_t rect::x_max;
+boost::uint32_t rect::y_max;
 
 struct rgb
 {
@@ -476,11 +476,11 @@ void parse_define_sprite(stream* input, int tag_type)
     log_msg("define a new sprite:");
     ident++;
     int	tag_end = input->get_tag_end_position();
-    uint32_t char_id = input->read_u16();
-    uint32_t sprite_frame_count = input->read_u16();
+    boost::uint32_t char_id = input->read_u16();
+    boost::uint32_t sprite_frame_count = input->read_u16();
     log_msg("character ID: %i", char_id);
     log_msg("frame count of sprite: %i", sprite_frame_count);
-    uint32_t old_current_frame = current_frame;
+    boost::uint32_t old_current_frame = current_frame;
     current_frame = 0;
     
     ident++;
@@ -488,7 +488,7 @@ void parse_define_sprite(stream* input, int tag_type)
     log_msg("starting frame 0\n");
     ident++;
     
-    while ((uint32_t) input->get_position() < (uint32_t) tag_end) {
+    while ((boost::uint32_t) input->get_position() < (boost::uint32_t) tag_end) {
 	int	tag_type = input->open_tag();
 	loader_function lf = NULL;
 	
@@ -546,10 +546,10 @@ void parse_swf(std::auto_ptr<tu_file> file)
 {
     ident = 1;
     
-    uint32_t header = file->read_le32();
-    uint32_t file_length = file->read_le32();
+    boost::uint32_t header = file->read_le32();
+    boost::uint32_t file_length = file->read_le32();
     
-    uint32_t version = (header >> 24) & 255;
+    boost::uint32_t version = (header >> 24) & 255;
     if ((header & 0x0FFFFFF) != 0x00535746 && (header & 0x0FFFFFF) != 0x00535743) {
 	log_error("No valid SWF file, header is incorrect");
 	return;
@@ -579,7 +579,7 @@ void parse_swf(std::auto_ptr<tu_file> file)
     log_msg("starting frame 0\n");
     ident++;
     
-    while ((uint32_t) str.get_position() < file_length) {
+    while ((boost::uint32_t) str.get_position() < file_length) {
 	int	tag_type = str.open_tag();
 	
 	loader_function	lf = NULL;

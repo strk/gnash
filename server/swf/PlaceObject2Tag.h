@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: PlaceObject2Tag.h,v 1.13 2007/08/24 05:55:52 cmusick Exp $ */
+/* $Id: PlaceObject2Tag.h,v 1.14 2007/12/04 11:45:33 strk Exp $ */
 
 #ifndef GNASH_SWF_PLACEOBJECT2TAG_H
 #define GNASH_SWF_PLACEOBJECT2TAG_H
@@ -32,9 +32,7 @@
 #include "swf.h" // for tag_type definition
 #include "matrix.h" // for composition
 #include "cxform.h" // for composition 
-#include "tu_types.h" // for uint16_t, uint32_t etc. definition 
 
-//#include <boost/ptr_container/ptr_vector.hpp>
 #include <vector>
 
 // Forward declarations
@@ -114,9 +112,9 @@ private:
 	matrix	m_matrix;
 	bool	m_has_matrix;
 	bool	m_has_cxform;
-	uint16_t	m_character_id;
+	boost::uint16_t	m_character_id;
 	int 	m_clip_depth;
-	uint32_t all_event_flags; 
+	boost::uint32_t all_event_flags; 
 
 	enum place_type
 	{

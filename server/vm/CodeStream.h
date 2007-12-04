@@ -19,7 +19,6 @@
 #ifndef GNASH_CODESTREAM_H
 #define GNASH_CODESTREAM_H
 
-#include "tu_types.h"
 #include <boost/utility.hpp>
 
 namespace gnash {
@@ -105,14 +104,14 @@ public:
 	}
 
 	/// Read a variable length encoded 32 bit unsigned integer
-	uint32_t read_V32()
+	boost::uint32_t read_V32()
 	{
 		if (mCurrent == mEnd) throw CodeStreamException();
 
 		// We can do an unchecked read in these cases.
 		if (mEnd - mCurrent > 4 || !(*(mEnd - 1) & 0x80))
 		{
-			uint32_t result = *mCurrent++;
+			boost::uint32_t result = *mCurrent++;
 			if (!(result & 0x00000080))	return result;
 			result = (result & 0x0000007F) | *mCurrent++ << 7;
 			if (!(result & 0x00004000)) return result;
@@ -122,7 +121,7 @@ public:
 			if (!(result & 0x10000000)) return result;
 			return (result & 0x0FFFFFFF) | *mCurrent++ << 28;
 		}	
-		uint32_t result = *mCurrent++;
+		boost::uint32_t result = *mCurrent++;
 		if (!(result & 0x00000080))	return result;
 		if (mCurrent == mEnd) throw CodeStreamException();
 		result = (result & 0x0000007F) | *mCurrent++ << 7;
@@ -168,14 +167,14 @@ public:
 	}
 
 	/// Read a signed integer encoded in 24 bits.
-	int32_t read_S24()
+	boost::int32_t read_S24()
 	{
 		if (mEnd - mCurrent < 3)
 			throw CodeStreamException();
 		int result = *mCurrent++ + (*mCurrent++ << 8) + (*mCurrent ++ << 16);
 		if (result & (1 << 23)) // Negative result, adjust appropriately.
 			result = -(result & ~(1 << 23));
-		return static_cast<int32_t>(result);
+		return static_cast<boost::int32_t>(result);
 	}
 
 	/// Read a signed 8-bit character.

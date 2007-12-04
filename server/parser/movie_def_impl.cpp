@@ -421,8 +421,8 @@ movie_def_impl::readHeader(std::auto_ptr<tu_file> in, const std::string& url)
 	if ( url == "" ) _url = "<anonymous>";
 	else _url = url;
 
-	uint32_t file_start_pos = _in->get_position();
-	uint32_t header = _in->read_le32();
+	boost::uint32_t file_start_pos = _in->get_position();
+	boost::uint32_t header = _in->read_le32();
 	m_file_length = _in->read_le32();
 	_swf_end_pos = file_start_pos + m_file_length;
 
@@ -721,7 +721,7 @@ movie_def_impl::read_all_swf()
 	try {
 
 	//size_t it=0;
-	while ( (uint32_t) str.get_position() < _swf_end_pos )
+	while ( (boost::uint32_t) str.get_position() < _swf_end_pos )
 	{
 		if ( _loadingCanceled )
 		{
@@ -737,7 +737,7 @@ parse_tag:
 
 		if (s_progress_function != NULL)
                 {
-			s_progress_function((uint32_t)str.get_position(),
+			s_progress_function((boost::uint32_t)str.get_position(),
 				_swf_end_pos);
                 }
 

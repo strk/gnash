@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_sdl.h,v 1.6 2007/12/01 21:54:24 strk Exp $
+// $Id: sound_handler_sdl.h,v 1.7 2007/12/04 11:45:27 strk Exp $
 
 #ifndef SOUND_HANDLER_SDL_H
 #define SOUND_HANDLER_SDL_H
@@ -64,7 +64,7 @@ public:
 	/// Object holding information about the sound
 	std::auto_ptr<SoundInfo> soundinfo;
 
-	std::map<uint32_t,uint32_t> m_frames_size;
+	std::map<boost::uint32_t,boost::uint32_t> m_frames_size;
 
 	/// Append size bytes to this sound
 	//
@@ -176,7 +176,7 @@ public:
 	const std::vector<sound_handler::sound_envelope>* envelopes;
 
 	/// Index of current envelope.
-	uint32_t current_env;
+	boost::uint32_t current_env;
 
 	/// Number of samples played so far.
 	unsigned long samples_played;

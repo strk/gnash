@@ -26,8 +26,6 @@
 #include "config.h"
 #endif
 
-#include "tu_types.h" // for uint32_t typedef
-
 #include <cstdarg>
 #include <cassert>
 

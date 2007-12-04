@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderFfmpeg.cpp,v 1.9 2007/12/03 20:48:51 bwy Exp $
+// $Id: AudioDecoderFfmpeg.cpp,v 1.10 2007/12/04 11:45:26 strk Exp $
 
 #include "AudioDecoderFfmpeg.h"
 
@@ -176,13 +176,13 @@ bool AudioDecoderFfmpeg::setup(AudioInfo* info)
 	return true;
 }
 
-uint8_t* AudioDecoderFfmpeg::decode(uint8_t* input, uint32_t inputSize, uint32_t& outputSize, uint32_t& decodedBytes, bool parse)
+uint8_t* AudioDecoderFfmpeg::decode(uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool parse)
 {
 
 	long bytes_decoded = 0;
 	int bufsize = (AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2;
 	uint8_t* output = new uint8_t[bufsize];
-	uint32_t orgbufsize = bufsize;
+	boost::uint32_t orgbufsize = bufsize;
 	decodedBytes = 0;
 
 	if (parse) {
@@ -204,9 +204,9 @@ uint8_t* AudioDecoderFfmpeg::decode(uint8_t* input, uint32_t inputSize, uint32_t
 			int tmp = 0;
 #ifdef FFMPEG_AUDIO2
 			bufsize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-			tmp = avcodec_decode_audio2(_audioCodecCtx, reinterpret_cast<int16_t*>(output), &bufsize, frame, framesize);
+			tmp = avcodec_decode_audio2(_audioCodecCtx, reinterpret_cast<boost::int16_t*>(output), &bufsize, frame, framesize);
 #else
-			tmp = avcodec_decode_audio(_audioCodecCtx, reinterpret_cast<int16_t*>(output), &bufsize, frame, framesize);
+			tmp = avcodec_decode_audio(_audioCodecCtx, reinterpret_cast<boost::int16_t*>(output), &bufsize, frame, framesize);
 #endif
 
 			if (bytes_decoded < 0 || tmp < 0 || bufsize < 0) {
@@ -225,9 +225,9 @@ uint8_t* AudioDecoderFfmpeg::decode(uint8_t* input, uint32_t inputSize, uint32_t
 		int tmp = 0;
 
 #ifdef FFMPEG_AUDIO2
-		tmp = avcodec_decode_audio2(_audioCodecCtx, reinterpret_cast<int16_t*>(output), &bufsize, input, inputSize);
+		tmp = avcodec_decode_audio2(_audioCodecCtx, reinterpret_cast<boost::int16_t*>(output), &bufsize, input, inputSize);
 #else
-		tmp = avcodec_decode_audio(_audioCodecCtx, reinterpret_cast<int16_t*>(output), &bufsize, input, inputSize);
+		tmp = avcodec_decode_audio(_audioCodecCtx, reinterpret_cast<boost::int16_t*>(output), &bufsize, input, inputSize);
 #endif
 
 
@@ -261,8 +261,8 @@ uint8_t* AudioDecoderFfmpeg::decode(uint8_t* input, uint32_t inputSize, uint32_t
 
 		uint8_t* tmp = new uint8_t[orgbufsize];
 			
-		samples = _resampler.resample(reinterpret_cast<int16_t*>(output),
-						 reinterpret_cast<int16_t*>(tmp),
+		samples = _resampler.resample(reinterpret_cast<boost::int16_t*>(output),
+						 reinterpret_cast<boost::int16_t*>(tmp),
 						 samples);
 		outputSize = samples *2 *2; // the resampled audio has samplesize 2, and is stereo
 		uint8_t* ret = new uint8_t[outputSize];

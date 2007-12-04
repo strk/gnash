@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-// $Id: textformat.cpp,v 1.30 2007/09/23 08:48:18 cmusick Exp $
+// $Id: textformat.cpp,v 1.31 2007/12/04 11:45:30 strk Exp $
 
 #include "log.h"
 #include "textformat.h"
@@ -188,7 +188,7 @@ as_value textformat_setformat(const fn_call& fn)
 
   if (obj->get_member(NSV::PROP_COLOR, &method)) {
     //log_msg(_("Color exists and is set to %f", method.to_number());
-    obj->obj.colorSet((uint32_t)method.to_number());
+    obj->obj.colorSet((boost::uint32_t)method.to_number());
   }
 
   if (obj->get_member(NSV::PROP_INDENT, &method)) {

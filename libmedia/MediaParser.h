@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaParser.h,v 1.10 2007/12/03 20:48:51 bwy Exp $
+// $Id: MediaParser.h,v 1.11 2007/12/04 11:45:26 strk Exp $
 
 #ifndef __MEDIAPARSER_H__
 #define __MEDIAPARSER_H__
@@ -125,7 +125,7 @@ enum tagType
 class AudioInfo
 {
 public:
-	AudioInfo(int codeci, uint16_t sampleRatei, uint16_t sampleSizei, bool stereoi, uint64_t durationi, codecType typei)
+	AudioInfo(int codeci, boost::uint16_t sampleRatei, boost::uint16_t sampleSizei, bool stereoi, boost::uint64_t durationi, codecType typei)
 		: codec(codeci),
 		sampleRate(sampleRatei),
 		sampleSize(sampleSizei),
@@ -139,10 +139,10 @@ public:
 		}
 
 	int codec;
-	uint16_t sampleRate;
-	uint16_t sampleSize;
+	boost::uint16_t sampleRate;
+	boost::uint16_t sampleSize;
 	bool stereo;
-	uint64_t duration;
+	boost::uint64_t duration;
 #ifdef USE_FFMPEG
 	AVCodecContext* audioCodecCtx; // If videoCodecCtx is ugly, so is this.
 #endif
@@ -157,7 +157,7 @@ public:
 class VideoInfo
 {
 public:
-	VideoInfo(int codeci, uint16_t widthi, uint16_t heighti, uint16_t frameRatei, uint64_t durationi, codecType typei)
+	VideoInfo(int codeci, boost::uint16_t widthi, boost::uint16_t heighti, boost::uint16_t frameRatei, boost::uint64_t durationi, codecType typei)
 		: codec(codeci),
 		width(widthi),
 		height(heighti),
@@ -171,10 +171,10 @@ public:
 		}
 
 	int codec;
-	uint16_t width;
-	uint16_t height;
-	uint16_t frameRate;
-	uint64_t duration;
+	boost::uint16_t width;
+	boost::uint16_t height;
+	boost::uint16_t frameRate;
+	boost::uint64_t duration;
 #ifdef USE_FFMPEG
 	AVCodecContext* videoCodecCtx; // UGLY!!
 #endif
@@ -187,9 +187,9 @@ public:
 class MediaFrame
 {
 public:
-	uint32_t dataSize;
+	boost::uint32_t dataSize;
 	uint8_t* data;
-	uint64_t timestamp;
+	boost::uint64_t timestamp;
 	uint8_t tag;
 };
 
@@ -247,27 +247,27 @@ public:
 	/// and returns the new position.
 	//
 	/// @return the position the seek reached
-	virtual uint32_t seek(uint32_t) { return 0; }
+	virtual boost::uint32_t seek(boost::uint32_t) { return 0; }
 
 	/// Returns the framedelay from the last to the current
 	/// audioframe in milliseconds. This is used for framerate.
 	//
 	/// @return the diff between the current and last frame
-	virtual uint32_t audioFrameDelay() { return 0; }
+	virtual boost::uint32_t audioFrameDelay() { return 0; }
 
 	/// Returns the framedelay from the last to the current
 	/// videoframe in milliseconds. 
 	//
 	/// @return the diff between the current and last frame
-	virtual uint32_t videoFrameDelay() { return 0; }
+	virtual boost::uint32_t videoFrameDelay() { return 0; }
 
 	/// Returns the framerate of the video
 	//
 	/// @return the framerate of the video
-	virtual uint16_t videoFrameRate() { return 0; }
+	virtual boost::uint16_t videoFrameRate() { return 0; }
 
 	/// Returns the last parsed position in the file in bytes
-	virtual uint32_t getLastParsedPos() { return 0; }
+	virtual boost::uint32_t getLastParsedPos() { return 0; }
 
 protected:
 

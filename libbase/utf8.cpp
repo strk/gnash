@@ -11,9 +11,9 @@
 #include "utf8.h"
 
 
-uint32_t	utf8::decode_next_unicode_character(const char** utf8_buffer)
+boost::uint32_t	utf8::decode_next_unicode_character(const char** utf8_buffer)
 {
-	uint32_t	uc;
+	boost::uint32_t	uc;
 	char	c;
 
 	// Security considerations:
@@ -48,7 +48,7 @@ uint32_t	utf8::decode_next_unicode_character(const char** utf8_buffer)
 	if (c == 0) return 0;	// End of buffer.  Do not advance.
 
 	(*utf8_buffer)++;
-	if ((c & 0x80) == 0) return (uint32_t) c;	// Conventional 7-bit ASCII.
+	if ((c & 0x80) == 0) return (boost::uint32_t) c;	// Conventional 7-bit ASCII.
 
 	// Multi-byte sequences.
 	if ((c & 0xE0) == 0xC0)
@@ -111,7 +111,7 @@ uint32_t	utf8::decode_next_unicode_character(const char** utf8_buffer)
 }
 
 
-void	utf8::encode_unicode_character(char* buffer, int* index, uint32_t ucs_character)
+void	utf8::encode_unicode_character(char* buffer, int* index, boost::uint32_t ucs_character)
 {
 	if (ucs_character <= 0x7F)
 	{
@@ -188,12 +188,12 @@ void	utf8::encode_unicode_character(char* buffer, int* index, uint32_t ucs_chara
 #include <cstdio>
 
 
-bool	check_equal(const char* utf8_in, const uint32_t* ucs_in)
+bool	check_equal(const char* utf8_in, const boost::uint32_t* ucs_in)
 {
 	for (;;)
 	{
-		uint32_t	next_ucs = *ucs_in++;
-		uint32_t	next_ucs_from_utf8 = utf8::decode_next_unicode_character(&utf8_in);
+		boost::uint32_t	next_ucs = *ucs_in++;
+		boost::uint32_t	next_ucs_from_utf8 = utf8::decode_next_unicode_character(&utf8_in);
 		if (next_ucs != next_ucs_from_utf8)
 		{
 			return false;
@@ -233,11 +233,11 @@ void	log_ascii(const char* line)
 }
 
 
-void	log_ucs(const uint32_t* line)
+void	log_ucs(const boost::uint32_t* line)
 {
 	for (;;)
 	{
-		uint32_t	uc = *line++;
+		boost::uint32_t	uc = *line++;
 		if (uc == 0)
 		{
 			// End of line.
@@ -262,7 +262,7 @@ int main(int argc, const char* argv[])
 	// Simple canned test.
 	{
 		const char*	test8 = "Ignacio Castaño";
-		const uint32_t	test32[] =
+		const boost::uint32_t	test32[] =
 			{
 				0x49, 0x67, 0x6E, 0x61, 0x63,
 				0x69, 0x6F, 0x20, 0x43, 0x61,
@@ -288,7 +288,7 @@ int main(int argc, const char* argv[])
 		const int LINE_SIZE = 200;	// max line size
 		char	line_buffer_utf8[LINE_SIZE];
 		char	reencoded_utf8[6 * LINE_SIZE];
-		uint32_t	line_buffer_ucs[LINE_SIZE];
+		boost::uint32_t	line_buffer_ucs[LINE_SIZE];
 
 		int	byte_counter = 0;
 		for (;;)
@@ -307,10 +307,10 @@ int main(int argc, const char* argv[])
 
 				// Decode into UCS.
 				const char*	p = line_buffer_utf8;
-				uint32_t*	q = line_buffer_ucs;
+				boost::uint32_t*	q = line_buffer_ucs;
 				for (;;)
 				{
-					uint32_t	uc = utf8::decode_next_unicode_character(&p);
+					boost::uint32_t	uc = utf8::decode_next_unicode_character(&p);
 					*q++ = uc;
 
 					assert(q < line_buffer_ucs + LINE_SIZE);
@@ -324,7 +324,7 @@ int main(int argc, const char* argv[])
 				int	index = 0;
 				for (;;)
 				{
-					uint32_t	uc = *q++;
+					boost::uint32_t	uc = *q++;
 					assert(index < LINE_SIZE * 6 - 6);
 					int	last_index = index;
 					utf8::encode_unicode_character(reencoded_utf8, &index, uc);

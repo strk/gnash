@@ -52,7 +52,7 @@ namespace gnash {
 static void
 rgb_to_cairo_rgb24(uint8_t* dst, const image::rgb* im)
 {
-  uint32_t* dst32 = reinterpret_cast<uint32_t*>(dst);
+  boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
   for (size_t y = 0;  y < im->height();  y++)
   {
 	  const uint8_t* src = im->scanline(y);
@@ -67,7 +67,7 @@ rgb_to_cairo_rgb24(uint8_t* dst, const image::rgb* im)
 static void
 rgba_to_cairo_argb(uint8_t* dst, const image::rgba* im)
 {
-  uint32_t* dst32 = reinterpret_cast<uint32_t*>(dst);
+  boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
   for (size_t y = 0;  y < im->height();  y++)
   {
 	  const uint8_t* src = im->scanline(y);

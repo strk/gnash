@@ -8,18 +8,19 @@
 
 #ifndef TU_TIMER_H
 
-#include "tu_config.h"
-#include "tu_types.h"
+#include "tu_config.h" // needed ?
+
+#include <boost/cstdint.hpp> // for boost::?int??_t 
 
 
 namespace tu_timer
 {
 	// General-purpose wall-clock timer.  May not be hi-res enough
 	// for profiling. Time Unit: millisecond
-	DSOEXPORT uint64_t get_ticks();
+	DSOEXPORT boost::uint64_t get_ticks();
 
 	// Time Unit: second
-	DSOEXPORT double ticks_to_seconds(uint64_t ticks);
+	DSOEXPORT double ticks_to_seconds(boost::uint64_t ticks);
 	
 	// Hi-res timer for CPU profiling.
 
@@ -28,10 +29,10 @@ namespace tu_timer
 	// operation, and pass the difference to
 	// profile_ticks_to_seconds() to find out how long the
 	// operation took.
-	DSOEXPORT uint64_t	get_profile_ticks();
+	DSOEXPORT boost::uint64_t	get_profile_ticks();
 
 	// Convert a hi-res ticks value into seconds.
-	DSOEXPORT double	profile_ticks_to_seconds(uint64_t profile_ticks);
+	DSOEXPORT double	profile_ticks_to_seconds(boost::uint64_t profile_ticks);
 }
 
 

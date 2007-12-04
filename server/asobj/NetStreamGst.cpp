@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.62 2007/11/24 17:21:44 strk Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.63 2007/12/04 11:45:31 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -658,7 +658,7 @@ NetStreamGst::buildFLVVideoPipeline(bool &video)
 			return false;
 		}
 
-		uint32_t fps = m_parser->videoFrameRate(); 
+		boost::uint32_t fps = m_parser->videoFrameRate(); 
 
 		GstCaps* videonincaps;
 		if (videoInfo->codec == media::VIDEO_CODEC_H263) {
@@ -1119,7 +1119,7 @@ NetStreamGst::startPlayback()
 }
 
 void
-NetStreamGst::seek(uint32_t pos)
+NetStreamGst::seek(boost::uint32_t pos)
 {
 	if (!pipeline) {
 		if (m_parser.get())  {
@@ -1131,9 +1131,9 @@ NetStreamGst::seek(uint32_t pos)
 
 	if (m_isFLV) {
 		assert(m_parser.get()); // why assumed here and not above ?
-		uint32_t newpos = m_parser->seek(pos);
+		boost::uint32_t newpos = m_parser->seek(pos);
 		GstClock* clock = GST_ELEMENT_CLOCK(pipeline);
-		uint64_t currenttime = gst_clock_get_time (clock);
+		boost::uint64_t currenttime = gst_clock_get_time (clock);
 		gst_object_unref(clock);
 		
 		m_clock_offset = (currenttime / GST_MSECOND) - newpos;
@@ -1205,7 +1205,7 @@ NetStreamGst::advance()
 				log_error("Could not pause pipeline");
 			}
 
-			int64_t pos;
+			boost::int64_t pos;
 			GstState current, pending;
 			GstStateChangeReturn ret;
 			GstFormat fmt = GST_FORMAT_TIME;
@@ -1233,14 +1233,14 @@ NetStreamGst::advance()
 	processStatusNotifications();
 }
 
-int32_t
+boost::int32_t
 NetStreamGst::time()
 {
 
 	if (!pipeline) return 0;
 
 	GstFormat fmt = GST_FORMAT_TIME;
-	int64_t pos;
+	boost::int64_t pos;
 	GstStateChangeReturn ret;
 	GstState current, pending;
 

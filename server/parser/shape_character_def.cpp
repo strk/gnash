@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.54 2007/12/01 15:40:59 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.55 2007/12/04 11:45:32 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -80,7 +80,7 @@ read_fill_styles(std::vector<fill_style>& styles, stream* in,
 
   // Get the count.
   in->ensureBytes(1);
-  uint16_t fill_style_count = in->read_u8();
+  boost::uint16_t fill_style_count = in->read_u8();
   if (tag_type > 2)
   {
     if (fill_style_count == 0xFF)
@@ -96,7 +96,7 @@ read_fill_styles(std::vector<fill_style>& styles, stream* in,
 
   // Read the styles.
   styles.reserve(styles.size()+fill_style_count);
-  for (uint16_t i = 0; i < fill_style_count; ++i)
+  for (boost::uint16_t i = 0; i < fill_style_count; ++i)
   {
     // TODO: add a fill_style constructor directly
     //       reading from stream

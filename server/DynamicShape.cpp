@@ -17,7 +17,7 @@
 
 
 
-/* $Id: DynamicShape.cpp,v 1.13 2007/12/03 16:17:49 strk Exp $ */
+/* $Id: DynamicShape.cpp,v 1.14 2007/12/04 11:45:27 strk Exp $ */
 
 #include "DynamicShape.h"
 
@@ -127,7 +127,7 @@ DynamicShape::finalize()
 }
 
 void
-DynamicShape::lineStyle(uint16_t thickness, const rgba& color)
+DynamicShape::lineStyle(boost::uint16_t thickness, const rgba& color)
 {
 	line_style style(thickness, color);
 	_currline = add_line_style(style);

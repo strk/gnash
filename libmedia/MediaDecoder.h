@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaDecoder.h,v 1.5 2007/11/30 00:13:01 tgc Exp $
+// $Id: MediaDecoder.h,v 1.6 2007/12/04 11:45:26 strk Exp $
 
 #ifndef __MEDIADECODER_H__
 #define __MEDIADECODER_H__
@@ -121,7 +121,7 @@ public:
 	/// 	The buffer we will use.
 	/// 	Ownership left to the caller.
 	///
-	MediaDecoder(boost::shared_ptr<tu_file> stream, MediaBuffer* buffer, uint16_t swfVersion, int format)
+	MediaDecoder(boost::shared_ptr<tu_file> stream, MediaBuffer* buffer, boost::uint16_t swfVersion, int format)
 		:
 	_buffer(buffer),
 	_stream(stream),
@@ -147,18 +147,18 @@ public:
 	virtual ~MediaDecoder() {}
 #endif
 	/// Seeks to pos, returns the new position
-	virtual uint32_t seek(uint32_t /*pos*/) { return 0;}
+	virtual boost::uint32_t seek(boost::uint32_t /*pos*/) { return 0;}
 
-	virtual std::pair<uint32_t, uint32_t> getWidthAndHeight() { return std::pair<uint32_t, uint32_t>(0,0); }
+	virtual std::pair<boost::uint32_t, boost::uint32_t> getWidthAndHeight() { return std::pair<boost::uint32_t, boost::uint32_t>(0,0); }
 
 	/// Returns the size of the file being loaded, in bytes
-	uint32_t getBytesTotal()
+	boost::uint32_t getBytesTotal()
 	{
 		return _streamSize;
 	}
 
 	/// Returns the amount of bytes of the current file that has been loaded.
-	uint32_t getBytesLoaded() {
+	boost::uint32_t getBytesLoaded() {
 		return _lastConfirmedPosition;
 	}
 
@@ -217,7 +217,7 @@ protected:
 	boost::shared_ptr<tu_file> _stream;
 
 	/// Version of the SWF playing
-	uint16_t _swfVersion;
+	boost::uint16_t _swfVersion;
 	
 	/// The output format
 	int _videoFrameFormat;
@@ -226,10 +226,10 @@ protected:
 	std::auto_ptr<MediaParser> _parser;
 
 	/// The last confirmed size of the downloaded file
-	uint32_t _lastConfirmedPosition;
+	boost::uint32_t _lastConfirmedPosition;
 
 	/// total size of the file being downloaded
-	uint32_t _streamSize;
+	boost::uint32_t _streamSize;
 
 	/// Is everything ok?
 	MediaDecoderErrorCode _error;

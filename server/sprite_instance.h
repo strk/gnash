@@ -379,7 +379,7 @@ public:
 	///	or in a no-op due to is_jumping_back being false. 
 	///       
 	character* add_display_object(
-		uint16_t character_id,
+		boost::uint16_t character_id,
 		const char* name,
 		const SWFEventsVector& event_handlers,
 		int depth,
@@ -471,7 +471,7 @@ public:
 	///	If NULL the default matrix will be kept.
 	///
 	void	replace_display_object(
-			uint16_t character_id,
+			boost::uint16_t character_id,
 			const char* name,
 			int depth,
 			const cxform* color_xform,
@@ -744,7 +744,7 @@ public:
 
 	/// @{ Drawing API
 	
-	void lineStyle(uint16_t thickness, const rgba& color)
+	void lineStyle(boost::uint16_t thickness, const rgba& color)
 	{
 		_drawable->lineStyle(thickness, color);
 	}

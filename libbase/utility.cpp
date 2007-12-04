@@ -22,7 +22,7 @@
 #include "config.h"
 #endif
 
-#include <boost/cstdint.hpp> // for int16_t
+#include <boost/cstdint.hpp> // for boost::int16_t
 #include <cstring> // for memcpy
 
 
@@ -109,7 +109,7 @@ namespace gnash {
 // Converts input data to output format.
 // sample_size
 void convert_raw_data(
-    int16_t** adjusted_data,
+    boost::int16_t** adjusted_data,
     int* adjusted_size,
     void* data,
     int sample_count,	// A stereo pair counts as one
@@ -147,9 +147,9 @@ void convert_raw_data(
     }
 
     int	output_sample_count = (sample_count * dup * (stereo ? 2 : 1)) / inc;
-    int16_t*	out_data = new int16_t[output_sample_count];
+    boost::int16_t*	out_data = new boost::int16_t[output_sample_count];
     *adjusted_data = out_data;
-    *adjusted_size = output_sample_count * sizeof(int16_t); // in bytes
+    *adjusted_size = output_sample_count * sizeof(boost::int16_t); // in bytes
 
     // Either inc > 1 (decimate the audio)
     // or dup > 1 (repeat samples)
@@ -157,12 +157,12 @@ void convert_raw_data(
     if (inc == 1 && dup == 1)
     {
 	    // No tranformation required
-	    memcpy(out_data, data, output_sample_count * sizeof(int16_t));
+	    memcpy(out_data, data, output_sample_count * sizeof(boost::int16_t));
     }
     else if (inc > 1)
     {
 	// Downsample by skipping samples from the input
-	int16_t*	in = (int16_t*) data;
+	boost::int16_t*	in = (boost::int16_t*) data;
 	for (int i = output_sample_count; i > 0; i--)
 	{
 	    *out_data++ = *in;
@@ -179,7 +179,7 @@ void convert_raw_data(
 	// then the right sample in both channels alternately.
 	// So for stereo-stereo transforms we have a stereo routine.
 
-	int16_t*	in = (int16_t*) data;
+	boost::int16_t*	in = (boost::int16_t*) data;
 
 	if (stereo && m_stereo) {
 	    // Stereo-to-stereo upsampling: Replicate pairs of samples

@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderGst.h,v 1.8 2007/11/30 00:13:02 tgc Exp $
+// $Id: VideoDecoderGst.h,v 1.9 2007/12/04 11:45:26 strk Exp $
 
 #ifndef __VIDEODECODERGST_H__
 #define __VIDEODECODERGST_H__
@@ -54,9 +54,9 @@ public:
 		videoCodecType /*format*/,
 		int /*outputFormat*/);
 
-	//uint8_t* decode(uint8_t* input, uint32_t inputSize, uint32_t& outputSize);
+	//uint8_t* decode(uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize);
 
-	std::auto_ptr<image::image_base> decodeToImage(uint8_t* /*input*/, uint32_t /*inputSize*/);
+	std::auto_ptr<image::image_base> decodeToImage(uint8_t* /*input*/, boost::uint32_t /*inputSize*/);
 
 	static void callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
 	static void callback_output (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
@@ -82,8 +82,8 @@ private:
 	boost::mutex::scoped_lock* output_lock;
 
 	/// Info from the video tag header. Might be usefull...
-	uint32_t width;
-	uint32_t height;
+	boost::uint32_t width;
+	boost::uint32_t height;
 	int deblocking;
 	bool smoothing;
 	videoCodecType format;

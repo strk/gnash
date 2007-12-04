@@ -359,7 +359,7 @@ private:
     // the number of calls to movie_advance()
     unsigned int fps_counter_total;
 
-    uint64_t fps_timer, fps_start_timer;     
+    boost::uint64_t fps_timer, fps_start_timer;     
 
     ///	The time, in seconds, between prints (which also resets the fps counter).
     //
@@ -380,7 +380,7 @@ private:
 #ifdef SKIP_RENDERING_IF_LATE
     /// Estimated max number of milliseconds required for a call to ::display
     /// This should be incremented everytime we take more
-    uint32_t estimatedDisplayTime;
+    boost::uint32_t estimatedDisplayTime;
 #endif // SKIP_RENDERING_IF_LATE
 
     VariableMap _flashVars;

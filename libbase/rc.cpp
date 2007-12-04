@@ -22,6 +22,10 @@
 # include "config.h"
 #endif
 
+#include "StringPredicates.h"
+#include "log.h"
+#include "rc.h"
+
 #ifdef HAVE_PWD_H
 # include <pwd.h>
 #endif
@@ -36,10 +40,6 @@
 #include <iostream>
 #include <fstream>
 
-#include "tu_types.h"
-#include "StringPredicates.h"
-#include "log.h"
-#include "rc.h"
 
 #ifndef DEFAULT_STREAMS_TIMEOUT
 // TODO: add a ./configure switch to set this

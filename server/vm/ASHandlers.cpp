@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.166 2007/12/04 07:33:56 zoulunkai Exp $ */
+/* $Id: ASHandlers.cpp,v 1.167 2007/12/04 11:45:33 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1826,7 +1826,7 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 		"register",	// 4
 		"bool",		// 5
 		"double",	// 6
-		"int32_t",	// 7
+		"boost::int32_t",	// 7
 		"dict8",	// 8
 		"dict16"	// 9
 	};
@@ -1835,7 +1835,7 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 	const action_buffer& code = thread.code;
 
 	size_t pc = thread.pc;
-	int16_t length = code.read_int16(pc+1);
+	boost::int16_t length = code.read_int16(pc+1);
 	assert( length >= 0 );
 
 #if 0 // is this really useful ?
@@ -1949,7 +1949,7 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 
 			case pushInt32: // 7
 			{
-				int32_t val = code.read_int32(i+3);
+				boost::int32_t val = code.read_int32(i+3);
 				i += 4;
 				env.push(val);
 				break;
@@ -2013,7 +2013,7 @@ SWFHandlers::ActionBranchAlways(ActionExec& thread)
 {
 //	GNASH_REPORT_FUNCTION;
 
-	int16_t offset = thread.code.read_int16(thread.pc+3);
+	boost::int16_t offset = thread.code.read_int16(thread.pc+3);
 	thread.next_pc += offset;
 	// @@ TODO range checks
 }
@@ -2317,7 +2317,7 @@ SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
 
 	thread.ensureStack(1); // bool
 
-	int16_t offset = code.read_int16(pc+3);
+	boost::int16_t offset = code.read_int16(pc+3);
 
 	bool test = env.pop().to_bool();
 	if (test)
@@ -3497,8 +3497,8 @@ SWFHandlers::ActionShiftLeft(ActionExec& thread)
 	as_environment& env = thread.env;
 	thread.ensureStack(2);
 
-	int16_t operand1 = env.top(1).to_int();
-	int16_t operand2 = env.top(0).to_int();
+	boost::int16_t operand1 = env.top(1).to_int();
+	boost::int16_t operand2 = env.top(0).to_int();
 
 	env.top(1) = operand1 << operand2;
 	env.drop(1);
@@ -3511,10 +3511,10 @@ SWFHandlers::ActionShiftRight(ActionExec& thread)
 	as_environment& env = thread.env;
 	thread.ensureStack(2);
 
-	int32_t operand1 = env.top(1).to_int();
-	int32_t operand2 = env.top(0).to_int();
+	boost::int32_t operand1 = env.top(1).to_int();
+	boost::int32_t operand2 = env.top(0).to_int();
 
-	int32_t res = operand1 >> operand2;
+	boost::int32_t res = operand1 >> operand2;
 
 	//log_debug("%d >> %d == %d", operand1, operand2, res);
 
@@ -3531,10 +3531,10 @@ SWFHandlers::ActionShiftRight2(ActionExec& thread)
 	as_environment& env = thread.env;
 	thread.ensureStack(2);
 
-	uint32_t operand1 = env.top(1).to_int();
-	int32_t operand2 = env.top(0).to_int(); // TODO: check this !
+	boost::uint32_t operand1 = env.top(1).to_int();
+	boost::int32_t operand2 = env.top(0).to_int(); // TODO: check this !
 
-	env.top(1) = uint32_t( operand1 >> operand2 );
+	env.top(1) = boost::uint32_t( operand1 >> operand2 );
 	env.drop(1);
 }
 
@@ -3675,7 +3675,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 	func->set_local_register_count(register_count);
 
 	// Flags, for controlling register assignment of implicit args.
-	uint16_t	flags = code.read_int16(i);
+	boost::uint16_t	flags = code.read_int16(i);
 	i += 2;
 
 	func->set_function2_flags(flags);
@@ -3696,7 +3696,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 	}
 
 	// Get the length of the actual function code.
-	uint16_t code_size = code.read_int16(i);
+	boost::uint16_t code_size = code.read_int16(i);
 
 	// Check code_size value consistency
 	size_t actionbuf_size = thread.code.size();
@@ -3771,9 +3771,9 @@ SWFHandlers::ActionTry(ActionExec& thread)
 	bool catchInRegister = flags&(1<<2);
 	uint8_t reserved = flags&0xE0;
 
-	uint16_t trySize = code.read_uint16(i); i += 2;
-	uint16_t catchSize = code.read_uint16(i); i += 2;
-	uint16_t finallySize = code.read_uint16(i); i += 2;
+	boost::uint16_t trySize = code.read_uint16(i); i += 2;
+	boost::uint16_t catchSize = code.read_uint16(i); i += 2;
+	boost::uint16_t finallySize = code.read_uint16(i); i += 2;
 
 	const char* catchName = NULL;
 	uint8_t catchRegister = 0;
@@ -3880,7 +3880,7 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 	const action_buffer& code = thread.code;
 
 #ifndef NDEBUG
-	int16_t length = code.read_int16(thread.pc+1);
+	boost::int16_t length = code.read_int16(thread.pc+1);
 	assert( length >= 0 );
 	//cerr << " length:" << length << endl;
 #endif
@@ -3920,7 +3920,7 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 	}
 
 	// Get the length of the actual function code.
-	int16_t code_size = code.read_int16(i);
+	boost::int16_t code_size = code.read_int16(i);
 
 	//cerr << " code size:" << code_size << endl;
 

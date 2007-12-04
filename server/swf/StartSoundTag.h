@@ -31,7 +31,7 @@
 #include "swf.h" // for tag_type definition
 
 #include <vector> // for composition
-#include <boost/cstdint.hpp> // for uint16_t and friends
+#include <boost/cstdint.hpp> // for boost::uint16_t and friends
  
 
 // Forward declarations
@@ -58,7 +58,7 @@ class StartSoundTag : public ControlTag
 	/// This one is the latter, probably so with the intention of avoiding
 	/// a lookup at every execution...
 	///
-	uint16_t	m_handler_id;
+	boost::uint16_t	m_handler_id;
 
 	/// Number of loops started by an execution of this tag 
 	// 
