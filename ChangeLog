@@ -1,3 +1,8 @@
+2007-12-04 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/libbase/: Makefile.am, IntTypesTest.cpp: 
+	  Add test for size of *int*_t structs.
+
 2007-12-04 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/sprite_instance.cpp, server/vm/ASHandlers.cpp: 

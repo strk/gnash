@@ -43,6 +43,7 @@ check_PROGRAMS = \
 	NoSeekFileTest \
 	URLTest \
 	RcTest \
+	IntTypesTest \
 	$(NULL)
 
 if CURL
@@ -56,12 +57,6 @@ CLEANFILES = \
       site.exp.bak \
       NoSeekFileTestCache
 
-# TESTS = \
-# 	NoSeekFileTest		\
-# 	URLTest			\
-# 	RcTest
-
-
 CurlStreamTest_SOURCES = CurlStreamTest.cpp
 CurlStreamTest_CPPFLAGS = '-DINPUT="$(srcdir)/CurlStreamTest.cpp"'
 
@@ -73,6 +68,9 @@ URLTest_CPPFLAGS = '-DBUILDDIR="$(abs_builddir)"'
 
 RcTest_SOURCES = TCXXRc.cpp
 RcTest_CPPFLAGS = -DSRCDIR="$(srcdir)"
+
+IntTypesTest_SOURCES = TCXXRc.cpp
+IntTypesTest_CPPFLAGS = -DSRCDIR="$(srcdir)"
 
 # LogTest_SOURCES = TCXXLog.cpp
 # LogTest_CPPFLAGS = '-DBUILDDIR="$(abs_builddir)"'
