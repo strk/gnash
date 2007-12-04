@@ -54,8 +54,8 @@
     .jump mc1 x=200 y=200 //MOVE
     .action:
         // static transformation does not work after startDrag
-        xcheck(mc1._x != 200);
-        xcheck(mc1._y != 200);
+        check(mc1._x != 200);
+        check(mc1._y != 200);
         mc1.stopDrag();
     .end
 
@@ -63,8 +63,8 @@
     .jump mc1 x=300 y=300
     .action:
         // static transformation does not work even after stopDrag
-        xcheck(mc1._x != 300);
-        xcheck(mc1._y != 300);
+        check(mc1._x != 300);
+        check(mc1._y != 300);
     .end
 
 .frame 5

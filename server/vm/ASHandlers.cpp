@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.164 2007/11/27 22:06:03 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.165 2007/12/04 07:30:43 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1262,7 +1262,7 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
 
-    	assert(thread.code[thread.pc] == SWF::ACTION_STARTDRAGMOVIE);
+	assert(thread.code[thread.pc] == SWF::ACTION_STARTDRAGMOVIE);
 
 	thread.ensureStack(3);
 
@@ -1271,6 +1271,8 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
 	character* tgt = env.find_target(env.top(0).to_string());
 	if ( tgt )
 	{
+		// mark this character is script transformed.
+        tgt->transformedByScript();
 		st.setCharacter( tgt );
 	}
 	else
