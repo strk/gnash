@@ -1,3 +1,8 @@
+2007-12-04 Sandro Santilli <strk@keybit.net>
+
+	* libmedia/Makefile.am: don't put <tab> characters before variable
+	  assignment.
+
 2007-12-04 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libmedia/Makefile.am: Add missing gstreamer files.

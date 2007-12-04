@@ -95,7 +95,7 @@ noinst_HEADERS = \
 
 
 if USE_SOUND_GST
-	libgnashmedia_la_SOURCES += \
+   libgnashmedia_la_SOURCES += \
 		gst/gstgnashsrc.c \
 		gst/VideoDecoderGst.cpp \
 		gst/AudioDecoderGst.cpp \
@@ -105,7 +105,7 @@ if USE_SOUND_GST
 		gst/sound_handler_gst.cpp \
 		gst/MediaDecoderGst.cpp
 	
-	noinst_HEADERS += \
+   noinst_HEADERS += \
 		gst/gstgnashsrc.h \
 		gst/gstappbuffer.h \
 		gst/AudioDecoderGst.h \
@@ -115,55 +115,55 @@ if USE_SOUND_GST
 		gst/sound_handler_gst.h \
 		gst/MediaDecoderGst.h
 
-	libgnashmedia_la_CPPFLAGS += \
+   libgnashmedia_la_CPPFLAGS += \
 		$(GSTREAMER_CFLAGS)
 
-	libgnashmedia_la_LIBADD += \
+   libgnashmedia_la_LIBADD += \
 		$(GSTREAMER_LIBS) -lgstbase-0.10
 
 endif
 
 if USE_FFMPEG_ENGINE
-	libgnashmedia_la_SOURCES += \
+   libgnashmedia_la_SOURCES += \
 		sdl/MediaDecoderSdl.cpp \
 		sdl/AudioDecoderFfmpeg.cpp \
 		sdl/VideoDecoderFfmpeg.cpp \
 		sdl/MediaParserFfmpeg.cpp \
 		sdl/sound_handler_sdl.cpp
 
-	noinst_HEADERS += \
+   noinst_HEADERS += \
 		sdl/AudioDecoderFfmpeg.h \
 		sdl/VideoDecoderFfmpeg.h \
 		sdl/sound_handler_sdl.h \
 		sdl/MediaDecoderSdl.h \
 		sdl/MediaParserFfmpeg.h
 
-	libgnashmedia_la_LIBADD += \
+   libgnashmedia_la_LIBADD += \
 		$(FFMPEG_LIBS)
 
-	libgnashmedia_la_CPPFLAGS += \
+   libgnashmedia_la_CPPFLAGS += \
 		$(FFMPEG_CFLAGS)
 endif
 
 if USE_MAD_ENGINE
-	libgnashmedia_la_SOURCES += \
+   libgnashmedia_la_SOURCES += \
 		sdl/MediaDecoderSdl.cpp \
 		sdl/AudioDecoderMad.cpp \
 		sdl/sound_handler_sdl.cpp \
 		sdl/AudioDecoderMad.cpp \
 		sdl/sound_handler_sdl.cpp
 
-	noinst_HEADERS += \
+   noinst_HEADERS += \
 		sdl/MediaDecoderSdl.h \
 		sdl/AudioDecoderMad.h \
 		sdl/sound_handler_sdl.h \
 		sdl/AudioDecoderMad.h \
 		sdl/sound_handler_sdl.h
 
-	libgnashmedia_la_LIBADD += \
+   libgnashmedia_la_LIBADD += \
 		$(MAD_LIBS)
 
-	libgnashmedia_la_CPPFLAGS += \
+   libgnashmedia_la_CPPFLAGS += \
 		$(MAD_CFLAGS)
 endif
 
