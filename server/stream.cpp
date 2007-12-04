@@ -435,7 +435,7 @@ namespace gnash {
 			tag_length = m_input->read_le32();
 		}
 
-		if ( tag_length > 1024*62 )
+		if ( tag_length > 1024*64 )
 		{
 			log_debug("Tag %d has a size of %d bytes !!", tag_type, tag_length);
 		}
