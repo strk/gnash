@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.453 2007/11/30 23:51:26 nihilus Exp $
+dnl $Id: configure.ac,v 1.454 2007/12/04 23:50:06 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1453,13 +1453,13 @@ if test x"$GCC" = x"yes"; then
 fi
 
 AC_ARG_ENABLE([cassert],
-  AC_HELP_STRING([--enable-cassert],[Enable assertion checking]),
+  AC_HELP_STRING([--disable-cassert],[Disable assertion checking]),
   [case "${enableval}" in
     yes) cassert=yes ;;
     no) cassert=no ;;
     *) AC_MSG_ERROR([bad value ${enableval} for --enable-cassert option]) ;;
   esac],
-  [cassert=no]
+  [cassert=yes]
 )
 
 if test x"$cassert" = x"no"; then

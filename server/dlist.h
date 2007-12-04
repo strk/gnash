@@ -32,6 +32,13 @@
 #include <set>  // for testInvariant
 #endif
 
+// GNASH_PARANOIA_LEVEL:
+// 0 : (not unimplemented)
+// 1 : quick assertions
+// 2 : add testInvariant
+//
+#define GNASH_PARANOIA_LEVEL 1
+
 namespace gnash {
 	class cxform;
 }
@@ -54,6 +61,7 @@ public:
 
 	void testInvariant() const
 	{
+#if GNASH_PARANOIA_LEVEL > 1
 #ifndef NDEBUG
 		DisplayList sorted = *this;
 		// check no duplicated depths above non-removed zone.
@@ -70,6 +78,7 @@ public:
 		}
 		assert(isSorted()); // check we didn't screw up ordering
 #endif
+#endif // GNASH_PARANOIA_LEVEL > 1
 	}
 
 	/// Output operator

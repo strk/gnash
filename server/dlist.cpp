@@ -107,7 +107,6 @@ DisplayList::getNextHighestDepth() const
     it != itEnd; ++it)
   {
     character* ch = it->get();
-    assert(ch); // is this really needed ?
 
     int chdepth = ch->get_depth();
     if ( chdepth >= nexthighestdepth )
@@ -131,7 +130,6 @@ DisplayList::get_character_at_depth(int depth)
     it != itEnd; ++it)
   {
     character* ch = it->get();
-    assert(ch); // is this really needed ?
 
     // found
     if ( ch->get_depth() == depth ) return ch;
@@ -190,7 +188,6 @@ DisplayList::place_character(
   //log_msg(_("Before adding, list is:"));
   //dump();
 
-  assert(ch);
   assert(!ch->isUnloaded());
   ch->set_invalidated();
   ch->set_depth(depth);
@@ -291,7 +288,6 @@ DisplayList::replace_character(
   testInvariant();
 
   //GNASH_REPORT_FUNCTION;
-  assert(ch);
   assert(!ch->isUnloaded());
 
   ch->set_invalidated();
@@ -486,9 +482,7 @@ DisplayList::remove_display_object(int depth)
     }
   }
 
-#ifndef NDEBUG
   assert(size >= _charsByDepth.size());
-#endif
 
   testInvariant();
 
@@ -785,7 +779,6 @@ DisplayList::display()
     for(iterator endIt = _charsByDepth.end(); it != endIt; ++it)
     {
         character* ch = it->get();
-        assert(ch);
 
         character* mask = ch->getMask();
         if ( mask && ch->get_visible() && ! mask->isUnloaded() )
