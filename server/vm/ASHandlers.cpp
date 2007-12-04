@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.165 2007/12/04 07:30:43 zoulunkai Exp $ */
+/* $Id: ASHandlers.cpp,v 1.166 2007/12/04 07:33:56 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1272,7 +1272,7 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
 	if ( tgt )
 	{
 		// mark this character is script transformed.
-        tgt->transformedByScript();
+		tgt->transformedByScript();
 		st.setCharacter( tgt );
 	}
 	else
