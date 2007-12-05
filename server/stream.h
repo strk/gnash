@@ -90,8 +90,13 @@ public:
 	/// Read 64-bit double values.
 	long double read_d64();
 
-	/// \brief
-	/// Discard any left-over bits from previous bit reads
+	/// Consume all bits of current byte
+	//
+	/// NOTE:
+	/// The position returned by get_position() won't be changed
+	/// by calls to this function, altought any subsequent reads
+	/// will start on next byte. See get_position() for more info.
+	///
 	void	align()
 	{
 		m_unused_bits=0;
@@ -227,6 +232,14 @@ public:
 	void	read_string_with_length(unsigned len, std::string& to);
 
 	/// Return our current (byte) position in the input stream.
+	//
+	/// NOTE:
+	/// This is not necessarely the byte you'll read on next read.
+	/// - For bit reads the byte will be used only if not
+	///   completely consumed. See align().
+	/// - For aligned reads the byte will be used only if not
+	///   consumed at all.
+	///
 	unsigned long get_position();
 
 	/// Set the file position to the given value.
