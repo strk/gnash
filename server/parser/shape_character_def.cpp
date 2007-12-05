@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.55 2007/12/04 11:45:32 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.56 2007/12/05 08:24:36 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -280,7 +280,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 #if SHAPE_LOG
     IF_VERBOSE_PARSE
     (
-        log_parse(_("  shape_character read: moveto %4g %4g"), x, y);
+        log_parse(_("  shape_character read: moveto %d %d"), x, y);
     );
 #endif
       }
@@ -456,7 +456,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 
 #if SHAPE_LOG
     IF_VERBOSE_PARSE (
-        log_parse(_("  shape_character read: curved edge   = %4g %4g - %4g %4g - %4g %4g"), x, y, cx, cy, ax, ay);
+        log_parse(_("  shape_character read: curved edge   = %d %d - %d %d - %d %d"), x, y, cx, cy, ax, ay);
     );
 #endif
 
@@ -486,7 +486,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 
 #if SHAPE_LOG
     IF_VERBOSE_PARSE (
-        log_parse(_("  shape_character_read: straight edge = %4g %4g - %4g %4g"), x, y, x + dx, y + dy);
+        log_parse(_("  shape_character_read: straight edge = %d %d - %d %d"), x, y, x + dx, y + dy);
     );
 #endif
 

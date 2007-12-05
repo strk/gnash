@@ -1,5 +1,10 @@
 2007-12-05 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/shape_character_def.cpp (read):
+	  fix format strings for SHAPE_LOG builds.
+
+2007-12-05 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac, server/dlist.{cpp,h}: get assertion checking
 	  back to enabled by default, disable instead the invariant testing
 	  function for DisplayList, unless explicitly requested with a compile
