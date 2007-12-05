@@ -45,8 +45,12 @@ namespace gnash {
 
 /// SWF stream wrapper class
 //
-/// This class is used for loading variable-length data from
-/// a stream, and keeping track of SWF tag boundaries.
+/// This class is used for loading variable-length data
+/// from a stream, and keeping track of SWF tag boundaries.
+///
+/// Provides 'aligned' and 'bitwise' read functions:
+/// - aligned reads always start on a byte boundary
+/// - bitwise reads can cross byte boundaries
 /// 
 class DSOEXPORT stream
 {
@@ -58,40 +62,68 @@ public:
 	/// Reads a bit-packed unsigned integer from the stream
 	/// and returns it.  The given bitcount determines the
 	/// number of bits to read.
+	//
+	/// bitwise read
+	///
 	unsigned read_uint(unsigned short bitcount);
 
 	/// \brief
 	/// Reads a single bit off the stream
 	/// and returns it.  
+	//
+	/// bitwise read
+	///
 	bool read_bit();
 
 	/// \brief
 	/// Reads a bit-packed little-endian signed integer
 	/// from the stream.  The given bitcount determines the
 	/// number of bits to read.
+	//
+	/// bitwise read
+	///
 	int	read_sint(unsigned short bitcount);
 
-	/// \brief
-	/// Reads a little-endian decimal point value in the
-	/// format that the first half is before the decimal
-	/// point and the second half is after the decimal.
-	/// _fixed is 32 bits, short_fixed is 16. The _sfixed
-	/// versions read a signed fixed value.
+	/// Read a 16.16 fixed point signed value
+	//
+	/// aligned read
+	///
 	float	read_fixed();
+
+	/// Read a 16.16 fixed point unsigned value
+	//
+	/// aligned read
+	///
 	float	read_ufixed();
+
+	/// Read a 8.8 fixed point unsigned value
+	//
+	/// aligned read
+	///
 	float   read_short_ufixed();
+
+	/// Read a 8.8 fixed point signed value
+	//
+	/// aligned read
+	///
 	float	read_short_sfixed();
 
-	/// \brief
-	/// Read floating point values, not in the fixed format.
+	/// Read a 16bit floating point value
+	//
+	/// aligned read
+	///
 	float	read_float();
 
-	/// \brief
-	/// Read 64-bit double values.
+	/// Read a 64-bit double value
+	//
+	/// aligned read
+	///
 	long double read_d64();
 
 	/// Consume all bits of current byte
 	//
+	/// This method is implicitly called by all 'aligned' reads.
+	///
 	/// NOTE:
 	/// The position returned by get_position() won't be changed
 	/// by calls to this function, altought any subsequent reads
@@ -103,39 +135,56 @@ public:
 		// m_current_byte = 0; // this is not needed
 	}
 
-	/// \brief
 	/// Read <count> bytes from the source stream and copy that data to <buf>.
-	/// Implicitely aligns to the next byte.
+	//
+	/// aligned read
+	///
 	unsigned read(char *buf, unsigned count);
 	
-	/// \brief
 	/// Read a aligned unsigned 8-bit value from the stream.		
+	//
+	/// aligned read
+	///
 	uint8_t  read_u8();
 
-	/// \brief
 	/// Read a aligned signed 8-bit value from the stream.		
+	//
+	/// aligned read
+	///
 	int8_t   read_s8();
 
-	/// \brief
 	/// Read a aligned unsigned 16-bit value from the stream.		
+	//
+	/// aligned read
+	///
 	boost::uint16_t read_u16();
 
-	/// \brief
 	/// Read a aligned signed 16-bit value from the stream.		
+	//
+	/// aligned read
+	///
 	boost::int16_t  read_s16();
 
-	/// \brief
 	/// Read a aligned unsigned 32-bit value from the stream.		
+	//
+	/// aligned read
+	///
 	boost::uint32_t read_u32();
 
 	/// \brief
 	/// Read a aligned signed 32-bit value from the stream.		
+	//
+	/// aligned read
+	///
 	boost::int32_t  read_s32();
 
 	/// \brief
 	/// Read a variable length unsigned 32-bit value from the stream.
 	/// These values continue until either the high bit is not set or
 	/// until 5 bytes have been read.
+	//
+	/// aligned read
+	///
 	boost::uint32_t read_V32()
 	{
 		boost::uint32_t res = read_u8();
@@ -157,6 +206,9 @@ public:
 	/// \brief
 	/// Skip a variable length unsigned 32-bit value in the stream.
 	/// This is faster than doing the bitwise arithmetic of full reading.
+	///
+	/// aligned read
+	///
 	void skip_V32()
 	{
 		if (!(read_u8() & 0x80))
@@ -175,8 +227,10 @@ public:
 	//
 	/// If the byte == 0xff, read the lenght in 
 	/// next two bytes.
-	//
+	///
 	/// Takes care of integrity check (ensureByte)
+	///
+	/// aligned read
 	///
 	unsigned read_variable_count()
 	{
@@ -194,12 +248,17 @@ public:
 	/// Reads *and new[]'s* the string from the given file.
 	/// Ownership passes to the caller; caller must delete[] the
 	/// string when it is done with it.
+	///
+	/// aligned read
+	///
 	char*	read_string();	
 
 	/// \brief
 	/// Reads a null-terminated string from the given file and
 	/// assigns it to the given std::string, overriding any
 	/// previous value of it.
+	///
+	/// aligned read
 	///
 	void	read_string(std::string& to);
 
@@ -209,6 +268,8 @@ public:
 	/// string when it is done with it.
 	/// Length of string is read from the first byte.
 	///
+	/// aligned read
+	///
 	char*	read_string_with_length();
 
 	/// Reads a sized string into a provided std::string.
@@ -217,6 +278,8 @@ public:
 	///
 	/// @param to
 	/// 	Output argument. Any previous value will be overriden.
+	///
+	/// aligned read
 	///
 	void	read_string_with_length(std::string& to);
 
@@ -228,6 +291,8 @@ public:
 	///
 	/// @param to
 	/// 	Output argument. Any previous value will be overriden.
+	///
+	/// aligned read
 	///
 	void	read_string_with_length(unsigned len, std::string& to);
 
@@ -242,9 +307,8 @@ public:
 	///
 	unsigned long get_position();
 
-	/// Set the file position to the given value.
+	/// Set the file position to the given value (byte aligned)
 	//
-	///
 	/// If we're scanning a tag, don't allow seeking past
 	/// the end or before start of it.
 	///
@@ -259,7 +323,10 @@ public:
 	/// Return the file position of the end of the current tag.
 	unsigned long get_tag_end_position();
 
-	/// Return the tag type.
+	/// Open an SWF tag and return it's type.
+	//
+	/// aligned read
+	///
 	SWF::tag_type	open_tag();
 
 	/// Seek to the end of the most-recently-opened tag.
@@ -274,6 +341,11 @@ public:
 	///	- skipping given number of bytes reaches end of
 	///	  current tag, if any.
 	///
+	/// WARNING: alignment is not specified here, the method uses
+	///          get_position() which is known NOT to consider
+	///          a fully-read byte as already "skipped"
+	///	     TODO: force alignment and see what happens !!
+	///
 	bool skip_bytes(unsigned num)
 	{
 		// there's probably a better way, but
@@ -285,6 +357,7 @@ public:
 	/// Discard all bytes up to end of tag
 	void skip_to_tag_end()
 	{
+		// set_position will call align...
 		set_position(get_tag_end_position());
 	}
 
@@ -297,6 +370,10 @@ public:
 	/// fields from the SWF.
 	///
 	/// NOTE: if GNASH_TRUST_SWF_INPUT is defined this function is a no-op 
+	///
+	/// WARNING: this function is BOGUS as it will consider the current
+	///          byte as available no matter if bits have been read from
+	/// 	     it or not. TODO: consider consumed bits and see what happens.
 	///
 	void ensureBytes(unsigned long needed)
 	{

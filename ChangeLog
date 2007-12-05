@@ -1,5 +1,10 @@
 2007-12-05 Sandro Santilli <strk@keybit.net>
 
+	* server/stream.h: document align reads and bitwise
+	  reads, add a couple of WARNING for possible bugs.
+
+2007-12-05 Sandro Santilli <strk@keybit.net>
+
 	* server/stream.h: document align() and get_position().
 	* testsuite/server/StreamTest.cpp: add tests for
 	  stream::get_position()
