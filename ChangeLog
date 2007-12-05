@@ -1,5 +1,7 @@
 2007-12-05 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/server/StreamTest.cpp: add tests for
+	  stream::get_position()
 	* server/parser/shape_character_def.cpp (read):
 	  fix format strings for SHAPE_LOG builds.
 
