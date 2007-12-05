@@ -29,6 +29,7 @@
 
 #include "tu_file.h"
 #include "stream.h"
+#include "log.h"
 
 #include <cstdio>
 #include <iostream>
@@ -95,6 +96,9 @@ struct ByteReader
 int
 main(int /*argc*/, char** /*argv*/)
 {
+	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+	dbglogfile.setVerbosity(1);
+
 	ByteReader br(0xAA);
 
 	tu_file fakeIn(
@@ -110,11 +114,13 @@ main(int /*argc*/, char** /*argv*/)
 		0 // close_func cf
 	);
 
-	stream s(&fakeIn);
-
 	int ret;
 
+	{
 	/// bits: 10101010 (0xAA)
+	br.setByte(0xAA);
+	stream s(&fakeIn);
+
 
 	check_equals(s.get_position(), 0);
 	s.align();
@@ -338,9 +344,14 @@ main(int /*argc*/, char** /*argv*/)
 	ret = s.read_bit(); check_equals(ret, 0);
 	check_equals(s.get_position(), 27);
 
-	/// bits: 10011001 (0x99)
+	}
 
+	{
+	/// bits: 10011001 (0x99)
 	br.setByte(0x99);
+	stream s(&fakeIn);
+	s.set_position(27);
+
 	s.align();
 	check_equals(s.get_position(), 27);
 	ret = s.read_bit(); check_equals(ret, 1);
@@ -415,6 +426,8 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(s.get_position(), 52);
 	u16 = s.read_uint(3); check_equals(u16, 1);
 	check_equals(s.get_position(), 52);
+
+	}
 
 	return 0;
 }

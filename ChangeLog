@@ -1,5 +1,11 @@
 2007-12-05 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/server/StreamTest.cpp: don't assume
+	  we have a non-caching stream, accidentally test
+	  set_position too..
+
+2007-12-05 Sandro Santilli <strk@keybit.net>
+
 	* server/stream.h: document align reads and bitwise
 	  reads, add a couple of WARNING for possible bugs.
 
