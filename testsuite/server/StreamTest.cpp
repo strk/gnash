@@ -427,6 +427,45 @@ main(int /*argc*/, char** /*argv*/)
 	u16 = s.read_uint(3); check_equals(u16, 1);
 	check_equals(s.get_position(), 52);
 
+
+	// Test some seeking here...
+
+	s.set_position(52);
+	check_equals(s.get_position(), 52);
+	s.set_position(0);
+	check_equals(s.get_position(), 0);
+	s.set_position(325);
+	check_equals(s.get_position(), 325);
+	s.read_bit(); // might trigger caching
+	check_equals(s.get_position(), 326);
+	s.set_position(372); // might seek in cache
+	check_equals(s.get_position(), 372);
+	s.set_position(327); // might seek in cache
+	check_equals(s.get_position(), 327);
+	s.set_position(326); // might seek in cache
+	check_equals(s.get_position(), 326);
+
+	s.set_position(512);
+	for (int i=0; i<512; ++i)
+	{
+		s.read_uint(8); // read_uint triggers caching (or should)
+	}
+	check_equals(s.get_position(), 1024);
+	s.set_position(512); // seek to origin
+	check_equals(s.get_position(), 512);
+
+	s.set_position(1000); // seek back (-45)
+	check_equals(s.get_position(), 1000);
+	s.set_position(200); // long seek back (-800)
+	check_equals(s.get_position(), 200);
+	s.set_position(220); // short seek forw (+20)
+	check_equals(s.get_position(), 220);
+	s.set_position(2000); 
+	s.read_uint(4);
+	check_equals(s.get_position(), 2001);
+	s.set_position(1960); 
+	check_equals(s.get_position(), 1960);
+
 	}
 
 	return 0;

@@ -1,5 +1,9 @@
 2007-12-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/server/StreamTest.cpp: add seek tests.
+
+2007-12-06 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/shape_character_def.cpp (read): don't
 	  consume an additional byte if both fill and line bits
 	  are zero. Fixes an out-of-bound access during Glyph
