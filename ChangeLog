@@ -1,3 +1,14 @@
+2007-12-06 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-swfc.all/Dejagnu.sc: print __END_OF_TEST__ 
+	  and fscommand:quit in done(), call this.done() from totals()
+	  and xtotals().
+	* testsuite/misc-swfc.all/Makefile.am: add consistency checks
+	  for tests.
+	* testsuite/misc-swfc.all/: sound.sc, gotoFrameFromInterval.sc:
+	  Don't include check.sc, let Dejagnu.sc do that to avoid symbols
+	  redefinition.
+
 2007-12-06 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* gui/fb.{h,cpp}: switch to graphics mode (and back) to get rid

@@ -1,8 +1,5 @@
 .flash bbox=200x200 filename="gotoandplay_stop.swf" version=6 fps=10
 
-#include "check.sc"
-
-
 .frame 1
     .action:
 #include "Dejagnu.sc"
@@ -15,7 +12,7 @@
 
     stop();
     
-    note("starting! ($Id: gotoFrameFromInterval.sc,v 1.2 2007/12/06 13:12:07 udog Exp $)");
+    note("starting! ($Id: gotoFrameFromInterval.sc,v 1.3 2007/12/06 15:19:11 strk Exp $)");
     
     function doit() {
       note("now jumping...");
@@ -36,7 +33,8 @@
             check_equals(_root._currentframe, 5);
             note("Test done");
 
-            Dejagnu.done();
+	    totals(1);
+            //Dejagnu.done();
             
             // BUG NOTICE: jumping to frame 10 makes Gnash restart the movie
             // even with the -1 switch!

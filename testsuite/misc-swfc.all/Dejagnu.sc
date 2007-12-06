@@ -79,6 +79,7 @@
                     this.xtrace('#expected failures: '+ this.xfailed);
                 }
            
+		this.done();
             },
 
             xtotals: function (expectedTestsRun, msg) {
@@ -111,6 +112,7 @@
                     this.xtrace('#expected failures: '+ this.xfailed);
                 }
            
+		this.done();
             },
 
             check_equals: function (obt, exp, msg, expression) {
@@ -162,8 +164,9 @@
             },
 
             done: function () {
-                this.totals();
                 _root.stop();
+		trace("__END_OF_TEST__");
+		loadMovie("fscommand:quit", _level0);
             }
 
         };

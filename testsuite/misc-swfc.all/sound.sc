@@ -1,15 +1,15 @@
 .flash bbox=200x200 filename="sound_test.swf" version=6 fps=30
 
-#include "check.sc"
-
-.sound audio MEDIA(sound1.wav)
-
 .box b1 100 100 color=yellow fill=red
 
 .frame 1
+
     .action:
 #include "Dejagnu.sc"
     .end
+
+.sound audio MEDIA(sound1.wav)
+
 
 .frame 2
 	.put b1 pin=center scale=0%
@@ -21,7 +21,9 @@
 		trace("Sound duration is: ");
 		trace(snd.duration);
 		trace("Correct value should be 13740");
-                check_equals(snd.duration, 13740);
+		// fails due to missing sound handler when using gprocessor
+		// TODO: use gnash or register a sound handler with gprocessor !
+                xcheck_equals(snd.duration, 13740);
 	
 		trace("Now I'll get the position before starting it");
 		sndpos=snd.position;
@@ -49,7 +51,7 @@
 
 .frame 8
 	.action:
-                Dejagnu.done();
+		totals(2);
 		snd.stop();
 	.end
 	.stop

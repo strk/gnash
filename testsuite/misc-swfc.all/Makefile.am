@@ -19,7 +19,7 @@
 AUTOMAKE_OPTIONS = dejagnu
 
 # These will get executed and parsed for test output
-SCTESTS = \
+SANE_SCTESTS = \
 	hello.sc \
 	sound.sc \
 	soft_reference_test1.sc \
@@ -34,6 +34,10 @@ SCTESTS = \
 	opcode_guard_test2.sc \
 	swf4opcode.sc \
 	mouse_drag_test.sc \
+	$(NULL)
+
+# These ones are the ones for which consistency check fail 
+BOGO_SCTESTS = \
 	gotoFrameFromInterval.sc \
 	$(NULL)
 
@@ -53,16 +57,23 @@ abs_mediadir = $(shell cd $(srcdir)/../media; pwd)
 SWFC_FLAGS = 
 SWFC_CPP = cpp -P -I$(srcdir) -DMEDIADIR='$(abs_mediadir)'
 
-SCTESTS_OUT = $(SCTESTS:.sc=.swf)
+SANE_SCTESTS_OUT = $(SANE_SCTESTS:.sc=.swf)
+BOGO_SCTESTS_OUT = $(BOGO_SCTESTS:.sc=.swf)
+SCTESTS_OUT = $(SANE_SCTESTS_OUT) $(BOGO_SCTESTS_OUT)
 
 AUXMOVIES_OUT = $(AUXMOVIES:.sc=.swf)
 
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
-	alltests-runner
+	sanetests-runner \
+	bogustests-runner
 
-alltests-runner: $(srcdir)/../generic-testrunner.sh $(SCTESTS_OUT) $(AUXMOVIES_OUT) Makefile
-	sh $< -f 50 -r 50 $(top_builddir) $(SCTESTS_OUT) > $@
+sanetests-runner: $(srcdir)/../generic-testrunner.sh $(SANE_SCTESTS_OUT) $(AUXMOVIES_OUT) Makefile
+	sh $< -c __END_OF_TEST__ -f 50 -r 50 $(top_builddir) $(SANE_SCTESTS_OUT) > $@
+	chmod 755 $@
+
+bogustests-runner: $(srcdir)/../generic-testrunner.sh $(BOGO_SCTESTS_OUT) $(AUXMOVIES_OUT) Makefile
+	sh $< -C __END_OF_TEST__ -f 50 -r 50 $(top_builddir) $(BOGO_SCTESTS_OUT) > $@
 	chmod 755 $@
 
 *.swf: Dejagnu.sc check.sc
