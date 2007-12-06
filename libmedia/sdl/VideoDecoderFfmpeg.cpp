@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: VideoDecoderFfmpeg.cpp,v 1.10 2007/12/04 11:45:27 strk Exp $
+// $Id: VideoDecoderFfmpeg.cpp,v 1.11 2007/12/06 12:50:24 bwy Exp $
 
 #include "VideoDecoderFfmpeg.h"
 
@@ -39,7 +39,11 @@ VideoDecoderFfmpeg::VideoDecoderFfmpeg ()
 
 VideoDecoderFfmpeg::~VideoDecoderFfmpeg()
 {
-	if (_videoCodec) avcodec_close(_videoCodecCtx);
+	if (_videoCodecCtx)
+	{
+		avcodec_close(_videoCodecCtx);
+		av_free(_videoCodecCtx);
+	}
 }
 
 bool VideoDecoderFfmpeg::setup(
@@ -70,7 +74,8 @@ bool VideoDecoderFfmpeg::setup(
 			codec_id = CODEC_ID_FLASHSV;
 			break;
 		default:
-			log_error(_("Unsupported video codec %d"), static_cast<int>(format));
+			log_error(_("Unsupported video codec %d"),
+						static_cast<int>(format));
 			return false;
 	}
 
@@ -89,7 +94,6 @@ bool VideoDecoderFfmpeg::setup(
 
 	int ret = avcodec_open(_videoCodecCtx, _videoCodec);
 	if (ret < 0) {
-		avcodec_close(_videoCodecCtx);
 		log_error(_("libavcodec failed to initialize codec"));
 		return false;
 	}
@@ -124,14 +128,16 @@ bool VideoDecoderFfmpeg::setup(VideoInfo* info)
 				codec_id = CODEC_ID_FLASHSV;
 				break;
 			default:
-				log_error(_("Unsupported video codec %d"), static_cast<int>(info->codec));
+				log_error(_("Unsupported video codec %d"),
+						static_cast<int>(info->codec));
 				return false;
 		}
 		_videoCodec = avcodec_find_decoder(static_cast<CodecID>(codec_id));
 	} else if (info->type == FFMPEG) {
 		_videoCodec = avcodec_find_decoder(static_cast<CodecID>(info->codec));
 	} else {
-		//log_error("Video codecType unknown: %d, %d, %d", info->type, FLASH, FFMPEG);
+		//log_error("Video codecType unknown: %d, %d, %d",
+		//				info->type, FLASH, FFMPEG);
 		return false;
 	}
 
@@ -155,7 +161,6 @@ bool VideoDecoderFfmpeg::setup(VideoInfo* info)
 
 	int ret = avcodec_open(_videoCodecCtx, _videoCodec);
 	if (ret < 0) {
-		avcodec_close(_videoCodecCtx);
 		log_error(_("libavcodec failed to initialize codec"));
 		return false;
 	}
@@ -181,17 +186,21 @@ VideoDecoderFfmpeg::convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame)
 	AVPicture picture;
 
 	avpicture_fill(&picture, buffer, PIX_FMT_RGB24, width, height);
+
 #ifndef HAVE_SWSCALE_H
-	img_convert(&picture, PIX_FMT_RGB24, (AVPicture*) srcFrame, srcCtx->pix_fmt,
-		    width, height);
+	img_convert(&picture, PIX_FMT_RGB24, (AVPicture*) srcFrame,
+			srcCtx->pix_fmt, width, height);
 #else
 	static SwsContext* context = NULL;
 
-	if (!context) {
+	if (!context)
+	{
 		context = sws_getContext(width, height, srcCtx->pix_fmt,
 					 width, height, PIX_FMT_RGB24,
 					 SWS_FAST_BILINEAR, NULL, NULL, NULL);
-		if (!context) {
+		
+		if (!context)
+		{
 			delete [] buffer;
 			return NULL;
 		}
@@ -199,7 +208,8 @@ VideoDecoderFfmpeg::convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame)
 
 	int rv = sws_scale(context, srcFrame->data, srcFrame->linesize, 0, 
 			   width, picture.data, picture.linesize);
-	if (rv == -1) {
+	if (rv == -1)
+	{
 		delete [] buffer;
 		return NULL;
 	}
@@ -212,7 +222,9 @@ VideoDecoderFfmpeg::convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame)
 	return buffer;
 }
 
-uint8_t* VideoDecoderFfmpeg::decode(uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize)
+uint8_t* VideoDecoderFfmpeg::decode(uint8_t* input,
+				boost::uint32_t inputSize,
+				boost::uint32_t& outputSize)
 {
 	// Allocate a frame to store the decoded frame in
 	AVFrame* frame = avcodec_alloc_frame();
@@ -223,22 +235,34 @@ uint8_t* VideoDecoderFfmpeg::decode(uint8_t* input, boost::uint32_t inputSize, b
 	}
 
 	int got = 0;
+	
 	avcodec_decode_video(_videoCodecCtx, frame, &got, input, inputSize);
-	if (got) {
+	
+	if (got)
+	{
 		boost::scoped_array<uint8_t> buffer;
+		
+		// Set to the next multiple of four. Some videos have
+		// padding bytes, so that the source width is more than three times
+		// the video width. A likely explanation (supported by
+		// tests) is that it is always padded out to a multiple of 4.
+		// Have found no documenation on this.
+		unsigned int srcwidth = (_videoCodecCtx->width * 3 + 3) &~ 3; 
 
-		uint8_t* decodedData = new uint8_t[_videoCodecCtx->width * _videoCodecCtx->height * 3];
+		uint8_t* decodedData = new uint8_t[srcwidth * _videoCodecCtx->height];
 		buffer.reset(convertRGB24(_videoCodecCtx, frame));
 
 		// Copy the data to the buffer in the correct RGB format
 		uint8_t* srcptr = frame->data[0];
-		uint8_t* srcend = frame->data[0] + frame->linesize[0] * _videoCodecCtx->height;
+		uint8_t* srcend = frame->data[0]
+					+ frame->linesize[0]
+					* _videoCodecCtx->height;
 		uint8_t* dstptr = decodedData;
-		unsigned int srcwidth = _videoCodecCtx->width * 3;
 
 		outputSize = 0;
 
-		while (srcptr < srcend) {
+		while (srcptr < srcend)
+		{
 			memcpy(dstptr, srcptr, srcwidth);
 			srcptr += frame->linesize[0];
 			dstptr += srcwidth;
@@ -312,7 +336,9 @@ uint8_t* VideoDecoderFfmpeg::decode(uint8_t* input, boost::uint32_t inputSize, b
 			}
 
 		}*/
-	} else {
+	}
+	else
+	{
 		log_error("Decoding of a video frame failed");
 		av_free(frame);
 		return NULL;
@@ -325,11 +351,15 @@ VideoDecoderFfmpeg::decodeToImage(uint8_t* input, boost::uint32_t inputSize)
 	boost::uint32_t outputSize = 0;
 	uint8_t* decodedData = decode(input, inputSize, outputSize);
 
-	if (!decodedData || outputSize == 0) {
+	if (!decodedData || outputSize == 0)
+	{
 		return std::auto_ptr<image::image_base>(NULL);
 	}
 
-	std::auto_ptr<image::image_base> ret(new image::rgb(_videoCodecCtx->width, _videoCodecCtx->height));
+	std::auto_ptr<image::image_base> ret(new image::rgb(
+						_videoCodecCtx->width,
+						_videoCodecCtx->height
+						));
 	ret->update(decodedData);
 	delete [] decodedData;
 	return ret;

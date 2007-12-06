@@ -1,3 +1,11 @@
+2007-12-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/swf/tag_loaders.cpp: Omit read of evidently optional latency
+	  bytes in MP3 audio. (Unused anyway).
+	* libmedia/sdl/VideoDecoderFfmpeg.cpp: set FLV source line width
+	  to next multiple of four. Fixes slanted video rendering in bug #21712
+	  and doesn't appear to break other cases. Minor cleanups.
+
 2007-12-06 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-swfc.all/Makefile.am: fix deps for

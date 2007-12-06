@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.160 2007/12/04 11:45:33 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.161 2007/12/06 12:50:24 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1255,8 +1255,8 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
     int latency = 0;
     if (format == media::AUDIO_CODEC_MP3)
     {
-        in->ensureBytes(2);
-        latency = in->read_s16(); // UNUSED !!
+        //in->ensureBytes(2);
+        //latency = in->read_s16(); // UNUSED !!
         //garbage = in->read_uint(16);
     }
 
