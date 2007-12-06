@@ -60,8 +60,8 @@ TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
 	alltests-runner
 
-alltests-runner: $(srcdir)/../generic-testrunner.sh $(SCTESTS_OUT) $(AUXMOVIES_OUT)
-	sh $< -r 50 $(top_builddir) $(SCTESTS_OUT) > $@
+alltests-runner: $(srcdir)/../generic-testrunner.sh $(SCTESTS_OUT) $(AUXMOVIES_OUT) Makefile
+	sh $< -f 50 -r 50 $(top_builddir) $(SCTESTS_OUT) > $@
 	chmod 755 $@
 
 *.swf: Dejagnu.sc check.sc
