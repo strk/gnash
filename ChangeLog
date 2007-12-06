@@ -1,5 +1,10 @@
 2007-12-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* server/swf/tag_loaders.cpp: revert last change; it stops
+	  the parsing errors but causes segfaults.
+
+2007-12-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* server/swf/tag_loaders.cpp: Omit read of evidently optional latency
 	  bytes in MP3 audio. (Unused anyway).
 	* libmedia/sdl/VideoDecoderFfmpeg.cpp: set FLV source line width
