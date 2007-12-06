@@ -116,7 +116,7 @@
             check_equals: function (obt, exp, msg, expression) {
                 if(msg == null) msg = "";
                 if ( obt == exp ) 
-                    this.pass(expression+' == '+exp);
+                    this.pass(expression+' == '+exp+" "+msg);
                 else 
                     this.fail(expression+': expected: "'+exp+'" , obtained: "'+obt+'" '+msg);
             },
