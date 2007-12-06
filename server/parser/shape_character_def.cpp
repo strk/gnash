@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.56 2007/12/05 08:24:36 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.57 2007/12/06 00:32:54 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -224,6 +224,11 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
     (
     log_parse(_("  shape_character_def read: nfillbits = %d, nlinebits = %d"), num_fill_bits, num_line_bits);
         );
+
+    if ( !num_fill_bits && !num_line_bits )
+    {
+	return;
+    }
 
     // These are state variables that keep the
     // current position & style of the shape

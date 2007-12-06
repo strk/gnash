@@ -1,3 +1,10 @@
+2007-12-06 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/shape_character_def.cpp (read): don't
+	  consume an additional byte if both fill and line bits
+	  are zero. Fixes an out-of-bound access during Glyph
+	  parsing of bgtest.swf (1a2bd0411b38db40e74916a3b413522c)
+
 2007-12-05 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/server/StreamTest.cpp: don't assume
