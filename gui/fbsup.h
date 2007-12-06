@@ -63,6 +63,11 @@
 #endif
 
 
+// Define this to request a new virtual terminal at startup. This doesn't always
+// work and probably is not necessary anyway
+//#define REQUEST_NEW_VT
+
+
 namespace gnash
 {
 
@@ -111,6 +116,9 @@ class FBGui : public Gui
 {
 	private:
 		int fd;
+		int original_vt;       // virtual terminal that was active at startup
+		int original_kd;       // keyboard mode at startup
+		int own_vt;            // virtual terminal we are running in   
 		unsigned char *fbmem;  // framebuffer memory
 #ifdef DOUBLE_BUFFER
 		unsigned char *buffer; // offscreen buffer
@@ -141,11 +149,15 @@ class FBGui : public Gui
   	
   	bool initialize_renderer();
   	
+  	/// Tries to find a accessible tty
+  	char* find_accessible_tty(int no);
+  	char* find_accessible_tty(const char* format, int no);
+  	
   	/// switches from text mode to graphics mode (disables the text terminal)
-  	void disable_terminal();
+  	bool disable_terminal();
   	
   	/// reverts disable_terminal() changes
-  	void enable_terminal();
+  	bool enable_terminal();
 
 #ifdef USE_MOUSE_PS2  	
   	/// Sends a command to the mouse and waits for the response

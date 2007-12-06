@@ -1,3 +1,8 @@
+2007-12-06 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/fb.{h,cpp}: switch to graphics mode (and back) to get rid
+	  of any text console output and the cursor
+
 2007-12-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/swf/tag_loaders.cpp: revert last change; it stops

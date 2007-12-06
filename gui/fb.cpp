@@ -76,6 +76,8 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <linux/fb.h>
+#include <linux/kd.h>
+#include <linux/vt.h>
 #include <unistd.h>
 #include <signal.h>
 
@@ -501,19 +503,180 @@ void FBGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
   
 }
 
-void FBGui::disable_terminal() 
-{
-  /*
-  --> doesn't work as this hides the cursor of the *current* terminal (which
-  --> doesn't have to be the fb one). Maybe just detach from terminal?
-  printf("\033[?25l"); 
-  fflush(stdout);*/
+char* FBGui::find_accessible_tty(int no) {
+
+  char* fn;
+  
+  fn = find_accessible_tty("/dev/vc/%d", no);   if (fn) return fn;
+  fn = find_accessible_tty("/dev/tty%d", no);   if (fn) return fn;
+  fn = find_accessible_tty("/dev/tty%02x", no); if (fn) return fn;
+  fn = find_accessible_tty("/dev/tty%x", no);   if (fn) return fn;
+  fn = find_accessible_tty("/dev/tty%02d", no); if (fn) return fn;
+  
+  if (no==0) {
+    fn = find_accessible_tty("/dev/tty", no);  // just "/dev/tty" 
+    if (fn) return fn;
+  }
+  
+  return NULL;
+
 }
 
-void FBGui::enable_terminal() 
+char* FBGui::find_accessible_tty(const char* format, int no) {
+
+  static char fname[1024];
+  
+  snprintf(fname, sizeof fname, format, no);
+    
+  if (access(fname, R_OK|W_OK) != -1) {
+    return fname;
+  }
+
+  return NULL; 
+}
+
+bool FBGui::disable_terminal() 
 {
-  /*printf("\033[?25h");  
-  fflush(stdout);*/
+  original_kd = -1;
+  
+  struct vt_stat vts;
+  
+  // Find the TTY device name
+  
+  char* tty = find_accessible_tty(0);
+  
+  int fd;
+  
+  if (!tty) {
+    log_msg("WARNING: Could not detect controlling TTY");
+    return false;
+  }
+  
+  
+  // Detect the currently active virtual terminal (so we can switch back to
+  // it later)
+  
+  fd = open(tty, O_RDWR);
+  if (fd<0) {
+    log_msg("WARNING: Could not open %s", tty);
+    return false;
+  }
+  
+  if (ioctl(fd, VT_GETSTATE, &vts) == -1) {
+    log_msg("WARNING: Could not get current VT state");
+    close(fd);
+    return false;
+  }
+    
+  original_vt = vts.v_active;
+  log_msg("Original TTY NO = %d", original_vt);
+  
+#ifdef REQUEST_NEW_VT
+
+  // Request a new VT number
+  if (ioctl(fd, VT_OPENQRY, &own_vt) == -1) {
+    log_msg("WARNING: Could not request a new VT");
+    close(fd);
+    return false;
+  }
+  
+  log_msg("Own TTY NO = %d", own_vt);
+  
+  close(fd);
+  
+  // Activate our new VT
+  tty = find_accessible_tty(own_vt);
+  if (!tty) {
+    log_msg("WARNING: Could not find device for VT number %d", own_vt);
+    return false;
+  }
+  
+  fd = open(tty, O_RDWR);
+  if (fd<0) {
+    log_msg("WARNING: Could not open %s", tty);
+    return false;
+  }
+  
+  if (ioctl(fd, VT_ACTIVATE, own_vt)) {
+    log_msg("WARNING: Could not activate VT number %d", own_vt);
+    close(fd);
+    return false;
+  }
+  
+  if (ioctl(fd, VT_WAITACTIVE, own_vt)) {
+    log_msg("WARNING: Error waiting for VT %d becoming active", own_vt);
+    //close(tty);
+    //return false;   don't abort
+  }
+
+#else
+
+  own_vt = original_vt;   // keep on using the original VT
+
+#endif  
+  
+  // Disable keyboard cursor
+  
+  if (ioctl(fd, KDGETMODE, &original_kd)) {
+    log_msg("WARNING: Could not query current keyboard mode on VT");
+  }
+
+  if (ioctl(fd, KDSETMODE, KD_GRAPHICS)) {
+    log_msg("WARNING: Could not switch to graphics mode on new VT");
+  }
+   
+  close(fd);
+  
+  log_msg("VT %d ready", own_vt);
+  
+  
+  // NOTE: We could also implement virtual console switching by using 
+  // VT_GETMODE / VT_SETMODE ioctl calls and handling their signals, but
+  // probably nobody will ever want to switch consoles, so I don't bother... 
+  
+  return true;
+}
+
+bool FBGui::enable_terminal() 
+{
+
+  log_msg("Restoring terminal...");
+
+  char* tty = find_accessible_tty(own_vt);
+  if (!tty) {
+    log_msg("WARNING: Could not find device for VT number %d", own_vt);
+    return false;
+  }
+
+  int fd = open(tty, O_RDWR);
+  if (fd<0) {
+    log_msg("WARNING: Could not open %s", tty);
+    return false;
+  }
+
+  if (ioctl(fd, VT_ACTIVATE, original_vt)) {
+    log_msg("WARNING: Could not activate VT number %d", original_vt);
+    close(fd);
+    return false;
+  }
+
+  if (ioctl(fd, VT_WAITACTIVE, original_vt)) {
+    log_msg("WARNING: Error waiting for VT %d becoming active", original_vt);
+    //close(tty);
+    //return false;   don't abort
+  }
+
+  
+  
+  // Restore keyboard
+  
+  if (ioctl(fd, KDSETMODE, original_kd)) {
+    log_msg("WARNING: Could not restore keyboard mode");
+  }  
+  
+  close(fd);
+  
+  return true;
 }
 
 void FBGui::read_mouse_data()
