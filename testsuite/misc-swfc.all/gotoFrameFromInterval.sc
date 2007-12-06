@@ -15,6 +15,8 @@
 
     stop();
     
+    note("starting! ($Id: gotoFrameFromInterval.sc,v 1.2 2007/12/06 13:12:07 udog Exp $)");
+    
     function doit() {
       note("now jumping...");
       gotoAndPlay(5);
@@ -36,7 +38,9 @@
 
             Dejagnu.done();
             
-            gotoAndPlay("10"); // end
+            // BUG NOTICE: jumping to frame 10 makes Gnash restart the movie
+            // even with the -1 switch!
+            gotoAndPlay(9); 
           }
           
         }
