@@ -12,7 +12,7 @@
 
     stop();
     
-    note("starting! ($Id: gotoFrameFromInterval.sc,v 1.3 2007/12/06 15:19:11 strk Exp $)");
+    note("starting! ($Id: gotoFrameFromInterval.sc,v 1.4 2007/12/06 15:34:08 udog Exp $)");
     
     function doit() {
       note("now jumping...");
@@ -31,9 +31,9 @@
             _root.done = true;
             
             check_equals(_root._currentframe, 5);
-            note("Test done");
+            note("test activated in frame "+_root._currentframe);
 
-	    totals(1);
+            totals(1);
             //Dejagnu.done();
             
             // BUG NOTICE: jumping to frame 10 makes Gnash restart the movie
