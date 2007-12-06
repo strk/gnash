@@ -34,6 +34,7 @@ SCTESTS = \
 	opcode_guard_test2.sc \
 	swf4opcode.sc \
 	mouse_drag_test.sc \
+	gotoFrameFromInterval.sc \
 	$(NULL)
 
 # These will get compiled to SWFs just as above, but will not be executed as a test
