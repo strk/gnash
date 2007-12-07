@@ -2,6 +2,8 @@
 
 	* testsuite/misc-swfc.all/gotoFrameFromInterval2.sc:
 	  new testcase for gotoAndPlay -> stop
+	* testsuite/misc-swfc.all/gotoFrameFromInterval.sc:
+	  fix sanity check
 	  
 2007-12-07 Sandro Santilli <strk@keybit.net>
 

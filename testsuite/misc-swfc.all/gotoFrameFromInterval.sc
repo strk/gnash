@@ -18,6 +18,18 @@
           gotoAndStop(6);
        }
        ,0.0001);
+       
+
+    _root.framecount = 0; 
+    
+    this.onEnterFrame = function() {
+      _root.framecount++;
+      
+      if (_root.framecount==10) {
+        totals(1);
+      }
+    };
+       
   .end
 
 .frame 6
@@ -54,7 +66,6 @@
     
     .action:
         xcheck_equals(asOrder, '0+1+2+3+4+1+2+3+4+1+2+3+4+');
-        totals(1);
     .end
 
 

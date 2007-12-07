@@ -1,7 +1,6 @@
-// just like gotoFrameFromInterval, but using gotoAndPlay (and using 
-// onEnterFrame to catch the gotoAndPlay bug)
+// just like gotoFrameFromInterval, but using gotoAndPlay 
 
-.flash bbox=800x600 filename="gotoFrameFromInterval.swf" version=6 fps=10
+.flash bbox=800x600 filename="gotoFrameFromInterval2.swf" version=6 fps=10
 
 .frame 1
     .action:
