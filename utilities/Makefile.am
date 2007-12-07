@@ -75,15 +75,9 @@ endif
  GNASH_LIBS += $(GLIB_LIBS) $(GSTREAMER_LIBS)
 #endif
 
-bin_PROGRAMS = gparser gprocessor
+bin_PROGRAMS = gprocessor
 noinst_PROGRAMS = dumpshm
 #check_PROGRAMS = gdebug.swf
-
-gparser_SOURCES = parser.cpp
-# export our symbols so they can be used by Gnash plugins
-gparser_LDFLAGS = -export-dynamic $(LIBLTDL)
-gparser_LDADD = $(GNASH_LIBS) 
-#gparser_DEPENDENCIES = 
 
 gprocessor_SOURCES = processor.cpp
 # export our symbols so they can be used by Gnash plugins
@@ -93,7 +87,6 @@ gprocessor_LDADD = $(GNASH_LIBS)
 
 dumpshm_SOURCES = dumpshm.cpp
 dumpshm_LDADD = $(GNASH_LIBS)
-#gparser_LDFLAGS = $(AM_LDFLAGS)
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

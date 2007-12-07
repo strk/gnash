@@ -1,5 +1,9 @@
 2007-12-07 Sandro Santilli <strk@keybit.net>
 
+	* utilities/: parser.cpp, Makefile.am: drop gparser.
+
+2007-12-07 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/VM.{cpp,h}: take a VirtualClock at init time
 	  and use it from getTimer().
 	* gui/Player.cpp: initialize the VM with SystemClock.
