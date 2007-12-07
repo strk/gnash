@@ -23,26 +23,37 @@ check_equals(typeof(clearInterval), 'function');
 
 do_this = function() {
 	++this_counter;
-	xtrace("Doing this "+this_counter);
+	var now = getTimer();
+	var int = now-this_timer;
+	this_timer = now;
+	check(int >= this_ms, this_ms+" interval (this) called after " + int + " milliseconds [" + __FILE__ + ":" + __LINE__ + "]");
+	//note("Doing this "+this_counter+" after " + int + " milliseconds");
 	if ( this_counter > 3 )
 	{
 		clearInterval(this_interval);
-		xtrace("This interval cleared ");
+		note("This interval cleared ");
 		if ( this_counter > 4 )
 		{
-			totals();
+			totals(16, __FILE__ + ":" + __LINE__ );
 			test_completed = 1;
+			loadMovie("fscommand:quit", _level0);
 		}
 	}
 };
 
 do_that = function() {
 	++that_counter;
-	xtrace("Doing that "+that_counter);
+	var now = getTimer();
+	var int = now-that_timer;
+	that_timer = now;
+	check(int >= that_ms, that_ms+" interval (that) called after " + int + " milliseconds [" + __FILE__ + ":" + __LINE__ + "]");
+	//note("Doing that "+that_counter+" after " + int + " milliseconds");
 	if ( that_counter > 3 )
 	{
 		clearInterval(that_interval);
-		xtrace("That interval cleared ");
+		note("That interval cleared ");
+		this_time = getTimer();
+		this_ms = 1;
 		this_interval = setInterval(do_this, 1);
 		// interval 1 is NOT reused
 		check_equals(this_interval, 4); // interval 3 is set from within do_that
@@ -52,7 +63,7 @@ do_that = function() {
 push_args = function() {
 	check_equals(arguments.length, 3);
 	clearInterval(push_interval);
-	xtrace("Pushing "+arguments.length+" args");
+	note("Pushing "+arguments.length+" args");
 	for (var i=0; i<arguments.length; i++)
 	{
 		pushed_args[i] = arguments[i];
@@ -60,10 +71,14 @@ push_args = function() {
 };
 
 this_counter = 0;
+this_timer = getTimer();
+this_ms = 0.0001;
 this_interval  = setInterval(do_this, 0.0001);
 check_equals(this_interval, 1);
 
 that_counter = 0;
+that_ms = 1000;
+that_timer = getTimer();
 that_interval  = setInterval(do_that, 1000);
 check_equals(that_interval, 2);
 

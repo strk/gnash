@@ -1,4 +1,10 @@
+2007-12-07 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/intervalTest.as: more self-contained
+	  tests, to reduce relying on MovieTester concept of time;
+
 2007-12-07 Zou Lunkai <zoulunkai@gmail.com>
+
 	* server/character.h, sprite_instance.cpp, dlist.{h,cpp}:
 	  deprecate the TimelineInfor class, it's no longer needed in the
 	  new timeline control design.
