@@ -502,9 +502,19 @@ static as_value sprite_goto_and_play(const fn_call& fn)
 		return as_value();
 	}
 
+	size_t frame_number;
+	if ( ! sprite->get_frame_number(fn.arg(0), frame_number) )
+	{
+		// No dice.
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("sprite_goto_and_play('%s') -- invalid frame"),
+			    fn.arg(0).to_debug_string().c_str());
+		);
+		return as_value();
+	}
+
 	// Convert to 0-based
-	size_t target_frame = size_t(fn.arg(0).to_number() - 1);
-	sprite->goto_frame(target_frame);
+	sprite->goto_frame(frame_number);
 	sprite->set_play_state(sprite_instance::PLAY);
 	return as_value();
 }
@@ -521,10 +531,19 @@ static as_value sprite_goto_and_stop(const fn_call& fn)
 		return as_value();
 	}
 
-	// Convert to 0-based
-	size_t target_frame = size_t(fn.arg(0).to_number() - 1);
+	size_t frame_number;
+	if ( ! sprite->get_frame_number(fn.arg(0), frame_number) )
+	{
+		// No dice.
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("sprite_goto_and_stop('%s') -- invalid frame"),
+			    fn.arg(0).to_debug_string().c_str());
+		);
+		return as_value();
+	}
 
-	sprite->goto_frame(target_frame);
+	// Convert to 0-based
+	sprite->goto_frame(frame_number);
 	sprite->set_play_state(sprite_instance::STOP);
 	return as_value();
 }

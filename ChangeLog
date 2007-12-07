@@ -6,6 +6,7 @@
 	  fix sanity check
 	* testsuite/misc-swfc.all/gotoFrameLabelAsFunction.sc:
 	  new test for gotoAndPlay(label) *function*
+	* server/sprite_instance.cpp: fix gotoAndXXX for frame labels
 	  
 2007-12-07 Sandro Santilli <strk@keybit.net>
 

@@ -14,7 +14,7 @@
     this.onEnterFrame = function() {
     	_root.framecount++;
     	if (_root.framecount==10) {
-    		xcheck_equals(_root._currentframe, 5);
+    		check_equals(_root._currentframe, 5);
     		totals(1);
     	}
     };
@@ -27,6 +27,7 @@
 .frame 4
   .action:
     trace("reached label 4 (wrong)");
+    check(0);
     stop();       
   .end
 
@@ -39,6 +40,7 @@
 .frame 6
   .action:
     trace("reached label 6 (wrong)");
+    check(0);
     stop();       
   .end
   
