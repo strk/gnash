@@ -27,6 +27,7 @@
 #include "types.h" // for rgba class
 #include "render_handler.h" // for dtor visibility by auto_ptr
 #include "movie_instance.h" 
+#include "ManualClock.h" // for composition
 
 #include <memory> // for auto_ptr
 #include <string> 
@@ -53,6 +54,7 @@ namespace gnash {
 	class sprite_instance;
 	class character;
 	class FuzzyPixel;
+	class VirtualClock;
 }
 
 namespace gnash {
@@ -106,6 +108,9 @@ public:
 
 	/// Advance the movie by one frame
 	void advance();
+
+	/// Advance the clock by the given amount of milliseconds
+	void advanceClock(unsigned long ms);
 
 	/// Fully redraw of current frame
 	//
@@ -318,6 +323,10 @@ private:
 	// When true, pass world invalidated ranges
 	// to the renderer(s) at ::render time.
 	bool _forceRedraw;
+
+	/// Virtual clock to use to let test runners
+	/// control time flow
+	std::auto_ptr<VirtualClock> _clock;
 };
 
 } // namespace gnash

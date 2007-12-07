@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: processor.cpp,v 1.73 2007/12/04 11:45:35 strk Exp $ */
+/* $Id: processor.cpp,v 1.74 2007/12/07 15:34:37 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -44,6 +44,7 @@
 #include "debugger.h"
 #include "VM.h"
 #include "noseek_fd_adapter.h"
+#include "SystemClock.h" 
 
 extern "C"{
 	#include <unistd.h>
@@ -330,7 +331,9 @@ play_movie(const char* filename)
 
     long localDelay = delay == -1 ? long(1000000/md->get_frame_rate())+1 : delay; // microseconds
 
-    gnash::movie_root& m = VM::init(*md).getRoot();
+    // TODO: use a fake clock if running at different then FPS rate
+    SystemClock cl;
+    gnash::movie_root& m = VM::init(*md, cl).getRoot();
 
     md->completeLoad();
 

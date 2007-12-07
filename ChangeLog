@@ -1,3 +1,18 @@
+2007-12-07 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/VM.{cpp,h}: take a VirtualClock at init time
+	  and use it from getTimer().
+	* gui/Player.cpp: initialize the VM with SystemClock.
+	* testsuite/: Makefile.am, ManualClock.h: manual clock
+	  for test runners.
+	* testsuite/MovieTester.{cpp,h}: initialize the VM
+	  with a SystemClock.
+	* testsuite/server/: DisplayListTest.cpp,
+	  PropertyListTest.cpp: initialize the VM
+	  with a ManualClock.
+	* utilities/processor.cpp: initialize the VM with
+	  SystemClock.
+
 2007-12-07 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* testsuite/misc-swfc.all/gotoFrameFromInterval2.sc:

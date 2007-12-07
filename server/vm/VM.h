@@ -38,6 +38,7 @@ namespace gnash {
 	class builtin_function;
 	class as_object;
 	class Machine;
+	class VirtualClock;
 }
 
 namespace gnash {
@@ -95,7 +96,7 @@ private:
 	//
 	/// Initializes the GC singleton
 	///
-	VM(movie_definition& movie);
+	VM(movie_definition& movie, VirtualClock& clock);
 
 	/// Don't copy
 	VM(const VM&);
@@ -150,6 +151,8 @@ private:
 	/// A running execution thread.
 	Machine *mMachine;
 
+	VirtualClock& _clock;
+
 public:
 
 	/// \brief
@@ -166,7 +169,10 @@ public:
 	///	used to fetch SWF version from.
 	///	TODO: take SWF version directly ?
 	///
-	static VM& init(movie_definition& movie);
+	/// @param clock
+	///	Virtual clock used as system time.
+	///
+	static VM& init(movie_definition& movie, VirtualClock& clock);
 
 	/// Return true if the singleton VM has been initialized
 	static bool isInitialized();
@@ -187,7 +193,7 @@ public:
 	int getSWFVersion() const;
 
 	/// Get the number of milliseconds since VM was started
-	boost::uint64_t getTime();
+	unsigned long int getTime() const;
 
 	/// Get a reference to the string table used by the VM.
 	string_table& getStringTable() const { return mStringTable; }

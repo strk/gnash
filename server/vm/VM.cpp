@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: VM.cpp,v 1.25 2007/12/04 11:45:34 strk Exp $ */
+/* $Id: VM.cpp,v 1.26 2007/12/07 15:34:37 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -28,10 +28,10 @@
 #include "movie_instance.h"
 #include "movie_root.h"
 #include "Global.h"
-#include "tu_timer.h" // for tu_timer::get_ticks()
 #include "rc.h" //for overriding default version string with rcfile
 #include "namedStrings.h"
 #include "ClassHierarchy.h"
+#include "VirtualClock.h" // for getTime()
 
 #include <memory>
 
@@ -45,12 +45,12 @@ namespace gnash {
 std::auto_ptr<VM> VM::_singleton;
 
 VM&
-VM::init(movie_definition& movie)
+VM::init(movie_definition& movie, VirtualClock& clock)
 {
 	// Don't call more then once !
 	assert(!_singleton.get());
 
-	_singleton.reset(new VM(movie));
+	_singleton.reset(new VM(movie, clock));
 
 	assert(_singleton.get());
 	NSV::load_strings(&_singleton->mStringTable, _singleton->getSWFVersion());
@@ -76,14 +76,16 @@ VM::isInitialized()
 	return _singleton.get();
 }
 
-VM::VM(movie_definition& topmovie)
+VM::VM(movie_definition& topmovie, VirtualClock& clock)
 	:
 	_root_movie(new movie_root()),
 	_swfversion(topmovie.get_version()),
 	_start_time(tu_timer::get_ticks()),
 	mClassHierarchy(0),
-	mMachine(0)
+	mMachine(0),
+	_clock(clock)
 {
+	_clock.restart();
 }
 
 VM::~VM()
@@ -138,10 +140,10 @@ VM::setGlobal(as_object* o)
 	_global = o;
 }
 
-boost::uint64_t
-VM::getTime()
+unsigned long int
+VM::getTime() const
 {
-  return  (tu_timer::get_ticks() -  _start_time);
+	return _clock.elapsed();
 }
 
 void

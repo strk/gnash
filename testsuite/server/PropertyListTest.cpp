@@ -27,6 +27,7 @@
 #include "log.h"
 #include "smart_ptr.h"
 #include "as_prop_flags.h"
+#include "ManualClock.h"
 
 #include <iostream>
 #include <sstream>
@@ -51,7 +52,8 @@ main(int /*argc*/, char** /*argv*/)
 	boost::intrusive_ptr<movie_definition> md5 ( new DummyMovieDefinition(5) );
 	boost::intrusive_ptr<movie_definition> md6 ( new DummyMovieDefinition(6) );
 
-	VM& vm = VM::init(*md5);
+	ManualClock clock;
+	VM& vm = VM::init(*md5, clock);
     	vm.getRoot().setRootMovie( md5->create_movie_instance() );
 
 	log_debug("VM version %d", vm.getSWFVersion());

@@ -41,6 +41,7 @@
 #include "GnashException.h"
 #include "noseek_fd_adapter.h"
 #include "VM.h"
+#include "SystemClock.h"
 
 #include "log.h"
 #include <iostream>
@@ -308,7 +309,8 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
     // Now that we know about movie size, create gui window.
     _gui->createWindow(_url.c_str(), width, height);
 
-    movie_root& root = VM::init(*_movie_def).getRoot();
+    SystemClock clock; // use system clock here...
+    movie_root& root = VM::init(*_movie_def, clock).getRoot();
 
     _gui->setStage(&root);
 

@@ -36,6 +36,7 @@
 #include "render.h"
 #include "render_handler.h"
 #include "render_handler_agg.h"
+#include "SystemClock.h"
 #ifdef RENDERER_CAIRO
 #include "render_handler_cairo.h"
 #endif
@@ -56,7 +57,8 @@ namespace gnash {
 
 MovieTester::MovieTester(const std::string& url)
 	:
-	_forceRedraw(true)
+	_forceRedraw(true),
+	_clock(new SystemClock()) // TODO: use a manual clock
 {
 
 	// Initialize gnash code lib
@@ -87,7 +89,7 @@ MovieTester::MovieTester(const std::string& url)
 	// Initialize the sound handler(s)
 	initTestingSoundHandlers();
 
-	_movie_root = &(VM::init(*_movie_def).getRoot());
+	_movie_root = &(VM::init(*_movie_def, *_clock).getRoot());
 
 	// Initialize viewport size with the one advertised in the header
 	_width = unsigned(_movie_def->get_width_pixels());
@@ -201,7 +203,7 @@ MovieTester::render()
 }
 
 void
-MovieTester::advance() 
+MovieTester::advance()
 {
 	_movie_root->advance(1.0);
 
