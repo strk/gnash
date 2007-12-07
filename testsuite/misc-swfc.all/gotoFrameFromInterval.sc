@@ -17,7 +17,7 @@
           if (_currentframe != 2) return;
           gotoAndStop(6);
        }
-       ,1000);
+       ,0.0001);
   .end
 
 .frame 6
