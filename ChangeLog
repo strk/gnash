@@ -1,3 +1,8 @@
+2007-12-07 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* testsuite/misc-swfc.all/gotoFrameFromInterval2.sc:
+	  new testcase for gotoAndPlay -> stop
+	  
 2007-12-07 Sandro Santilli <strk@keybit.net>
 
 	* server/: Makefile.am, SystemClock.{cpp,h}, VirtualClock.cpp:

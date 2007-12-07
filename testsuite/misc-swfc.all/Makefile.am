@@ -34,11 +34,12 @@ SANE_SCTESTS = \
 	opcode_guard_test2.sc \
 	swf4opcode.sc \
 	mouse_drag_test.sc \
+	gotoFrameFromInterval.sc \
+	gotoFrameFromInterval2.sc \
 	$(NULL)
 
 # These ones are the ones for which consistency check fail 
 BOGO_SCTESTS = \
-	gotoFrameFromInterval.sc \
 	$(NULL)
 
 # These will get compiled to SWFs just as above, but will not be executed as a test
