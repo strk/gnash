@@ -36,11 +36,11 @@ namespace gnash
 /// This class uses the system clock for computing elapsed time.
 /// See http://en.wikipedia.org/wiki/System_time for capacity
 ///
-class SystemClock
+class SystemClock: public VirtualClock
 {
 public:
 
-    //
+    /// Construct the clock, starting it
     SystemClock();
 
     // see VirtualClock.h for dox

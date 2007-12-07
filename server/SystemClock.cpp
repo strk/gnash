@@ -40,6 +40,13 @@ SystemClock::fetchSystemTime()
 }
 
 /* public */
+SystemClock::SystemClock() 
+	:
+	_startTime(fetchSystemTime())
+{
+}
+
+/* public */
 unsigned long int
 SystemClock::elapsed() const
 {
