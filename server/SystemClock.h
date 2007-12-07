@@ -1,0 +1,65 @@
+// SystemClock.h -- system-time based VirtualClock for gnash core lib
+// 
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+#ifndef GNASH_SYSTEM_CLOCK_H
+#define GNASH_SYSTEM_CLOCK_H
+
+// What's the policy for when to include config.h ? --strk Dec 7 2007;
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include "VirtualClock.h" // for inheritance
+
+#include <boost/cstdint.hpp> // for boost::uint64_t typedef
+
+namespace gnash
+{
+
+/// A system-clock based virtual clock
+//
+/// This class uses the system clock for computing elapsed time.
+/// See http://en.wikipedia.org/wiki/System_time for capacity
+///
+class SystemClock
+{
+public:
+
+    //
+    SystemClock();
+
+    // see VirtualClock.h for dox
+    unsigned long int elapsed() const;
+
+    // see VirtualClock.h for dox
+    void restart();
+
+private:
+
+    /// Query system time and return it in milliseconds
+    static boost::uint64_t fetchSystemTime();
+
+    /// System time at time of start
+    boost::uint64_t _startTime;
+};
+
+
+} // namespace gnash
+
+#endif // GNASH_SYSTEM_CLOCK_H
+

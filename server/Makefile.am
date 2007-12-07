@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.133 2007/12/01 15:40:59 strk Exp $
+# $Id: Makefile.am,v 1.134 2007/12/07 11:45:37 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -60,6 +60,7 @@ libgnashserver_la_SOURCES = \
 	Property.cpp \
 	PropertyList.cpp \
 	URLAccessManager.cpp \
+	SystemClock.cpp \
 	as_environment.cpp \
 	as_function.cpp	\
 	as_object.cpp \
@@ -121,6 +122,8 @@ noinst_HEADERS = \
 	StreamProvider.h \
 	StringPredicates.h \
 	URLAccessManager.h \
+	VirtualClock.h \
+	SystemClock.h \
 	array.h	\
 	as_environment.h \
 	as_function.h \

@@ -1,5 +1,10 @@
 2007-12-07 Sandro Santilli <strk@keybit.net>
 
+	* server/: Makefile.am, SystemClock.{cpp,h}, VirtualClock.cpp:
+	  New VirtualClock virtual class and system time based implementation.
+
+2007-12-07 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/intervalTest.as: more self-contained
 	  tests, to reduce relying on MovieTester concept of time;
 
