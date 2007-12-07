@@ -1,5 +1,6 @@
 2007-12-07 Sandro Santilli <strk@keybit.net>
 
+	* gui/NullGui.cpp (run): stop keeping CPU busy for nothing.
 	* utilities/: parser.cpp, Makefile.am: drop gparser.
 
 2007-12-07 Sandro Santilli <strk@keybit.net>

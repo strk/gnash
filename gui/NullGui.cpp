@@ -32,7 +32,9 @@
 # include <unistd.h> // for usleep
 #endif
 
-#include "tu_timer.h"
+#include "SystemClock.h"
+
+//#include <iostream>
 
 namespace gnash
 {
@@ -40,51 +42,33 @@ namespace gnash
 bool
 NullGui::run()
 {
-  boost::uint64_t prevtimer=0;
-  boost::uint64_t start_timer = tu_timer::get_ticks();  // returns milliseconds
 
-  prevtimer = start_timer;
+  SystemClock timer;
 
-  while (true)
+  unsigned long prevtime = timer.elapsed();
+  while (!_quit)
   {
-  
-    boost::uint64_t timer=0;
-
-    // synchronize to frame time 
-    if (_timeout || (_interval>1))  // avoid timing completely for interval==1
-    while (1) 
-    {
-        
-      timer = tu_timer::get_ticks();
-            
-      if (timer - prevtimer >= _interval)
-        break; // next frame, please!
-    
-      if (timer < prevtimer) // time glitch protection
-        prevtimer = timer;
-        
-      usleep(1);
-      
-    }
-    
-    if ( _timeout )
-    {
-      if ( timer - start_timer > _timeout)
-      {
-        break;
-      }
-    }
-    
-    
-    prevtimer = timer;
-          
 
     Gui::advance_movie(this);
+    unsigned long now = timer.elapsed();
+    unsigned long spent = now-prevtime;
 
-    // when runnign gnash with -1 switch ::advance_movie() will call ::quit()
-    // at last frame
-    if ( _quit ) break;
+    long rem = _interval-spent;
+    if ( rem > 0 )
+    {
+      //std::cout << "spent: " << spent << " - rem: " << rem << std::endl;
+      usleep( rem * 1000 );
+    }
+
+    if ( _timeout && now > _timeout)
+    {
+        break;
+    }
+    
+    prevtime = now;
+
   }
+
   return false;
 }
 
