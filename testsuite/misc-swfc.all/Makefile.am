@@ -36,6 +36,7 @@ SANE_SCTESTS = \
 	mouse_drag_test.sc \
 	gotoFrameFromInterval.sc \
 	gotoFrameFromInterval2.sc \
+	gotoFrameLabelAsFunction.sc \
 	$(NULL)
 
 # These ones are the ones for which consistency check fail 

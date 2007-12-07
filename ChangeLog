@@ -4,6 +4,8 @@
 	  new testcase for gotoAndPlay -> stop
 	* testsuite/misc-swfc.all/gotoFrameFromInterval.sc:
 	  fix sanity check
+	* testsuite/misc-swfc.all/gotoFrameLabelAsFunction.sc:
+	  new test for gotoAndPlay(label) *function*
 	  
 2007-12-07 Sandro Santilli <strk@keybit.net>
 
