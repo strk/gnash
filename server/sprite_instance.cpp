@@ -2836,7 +2836,6 @@ sprite_instance::add_display_object(
 	else
 	{
 		boost::intrusive_ptr<character> ch = cdef->create_character_instance(this, character_id);
-		ch->setTimelineInfo(depth, m_current_frame, false);
 		
 		if(name)
         {
@@ -2902,9 +2901,7 @@ sprite_instance::replace_display_object(
         else
         {
             boost::intrusive_ptr<character> ch = cdef->create_character_instance(this, character_id);
-
-            ch->setTimelineInfo(depth, m_current_frame, true);
-    
+   
             replace_display_object(
                 ch.get(), 
 				name, 

@@ -1,3 +1,8 @@
+2007-12-07 Zou Lunkai <zoulunkai@gmail.com>
+	* server/character.h, sprite_instance.cpp, dlist.{h,cpp}:
+	  deprecate the TimelineInfor class, it's no longer needed in the
+	  new timeline control design.
+	  
 2007-12-06 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-swfc.all/Dejagnu.sc: print __END_OF_TEST__ 

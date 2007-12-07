@@ -251,32 +251,6 @@ public:
 	void add(character* ch, bool replace);
 
 	/// \brief
-	/// Reset the list removing any static character not supposed to be there
-	/// in the given target frame.
-	//
-	/// Only instances in static depth are candidates for removal, and not all
-	/// of them are removed. Dynamic instances in static depth zone are always
-	/// removed. Timeline instances are only removed if not supposed to be
-	/// there in the target frame. This information is extracted from the
-	/// Timeline object associated with the given movie_definition (movieDef).
-	///
-	/// This method implements steps 1 and 2 of 3rd redesign attempt for
-	/// display list reconstruction. 
-	/// See: http://www.gnashdev.org/wiki/index.php/TimelineControl
-	///
-	/// @param movieDef
-	///	Movie definition from which to extract Timeline information.
-	///
-	/// @param targetFrame
-	///	0-based frame number we are jumping back to.
-	///
-	/// @param owner
-	///	The owner of this DisplayList, for calling set_invalidated() on it before
-	///	making any modification to the list.
-	///
-	void reset(movie_definition& movieDef, size_t targetFrame, sprite_instance& owner);
-
-	/// \brief
 	/// Display the referenced characters.
 	/// Lower depths are obscured by higher depths.
 	void display();

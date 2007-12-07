@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.112 2007/12/01 00:14:59 strk Exp $ */
+/* $Id: character.h,v 1.113 2007/12/07 01:33:25 zoulunkai Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -57,57 +57,6 @@ namespace gnash {
 }
 
 namespace gnash {
-
-/// Informations about timeline instances creation
-//
-/// See: http://www.gnashdev.org/wiki/index.php/TimelineControl#Timeline_instances
-///
-class TimelineInfo
-{
-
-public:
-
-	/// Construct a TimelineInfo
-	//
-	/// @param depth
-	///	Depth at which the instance was placed 
-	///
-	/// @param frame
-	///	Frame number in which the instance was placed (0-based)
-	///
-	/// @param replace
-	///	True if this object was placed by a REPLACE tag
-	///	(see PlaceObject2).
-	///
-	TimelineInfo(int depth, int frame, bool replace)
-		:
-		_depth(depth),
-		_frame(frame),
-		_replace(replace)
-	{
-	}
-
-
-	/// Return depth of initial placement 
-	int placedAtDepth() const { return _depth; }
-
-	/// Return frame number of initial placement (0-based)
-	size_t placedInFrame() const { return _frame; }
-
-	/// Return true if this instance replaced an other one at same depth
-	bool placedByReplaceTag() const { return _replace; }
-
-private:
-
-	/// Original depth
-	int _depth;
-
-	/// Frame of placement, 0-based
-	size_t _frame;
-
-	/// Placed by Replace tag ?
-	bool _replace;
-};
 
 /// Character is a live, stateful instance of a character_def.
 //
@@ -147,12 +96,6 @@ private:
 
 	/// Build the _target member recursive on parent
 	std::string computeTargetPath() const;
-
-	/// Timeline info, for timeline instances
-	//
-	/// For dynamically-created instances this is always NULL
-	///
-	std::auto_ptr<TimelineInfo> _timelineInfo;
 
 	/// The character masking this instance (if any)
 	character* _mask;
@@ -856,34 +799,12 @@ public:
 	///
 	///
 	bool isDynamic() const {
-
-		// WARNING: cannot use _timelinInfo for this, unless 
-		// we'll provide a TimelineInfo object for top level movies
-		// (_level#) and dynamically loaded movies too...
-		// which would have no use except implementing
-		// isDynamic(). Note that we have NO automated test for this, but
-		// the "Magical Trevor 2" movie aborts due to a call to getBytesTotal
-		// against the root movie, and bug #19844 show the effect with dynamically
-		// loaded movies.
-
-		// Anyway, any dynamically created character must NOT have a
-		// _timelineInfo object (see setDynamic)
-		assert(_dynamicallyCreated ? (_timelineInfo.get() == 0) : 1 );
-
 		return _dynamicallyCreated;
 	}
 
 	/// Mark this character as dynamically created
-	//
-	/// "Dynamically created" means created trough ActionScript
-	///
-	/// TODO: deprecate this function, all characters should be
-	///	  dynamic by default Unless setTimelineInfo is called.
-	///
 	void setDynamic() {
-		assert(_timelineInfo.get() == NULL);
 		_dynamicallyCreated = true;
-		//assert(get_depth() > 0);
 	}
 
 	/// \brief
@@ -1157,44 +1078,6 @@ public: // istn't this 'public' reduntant ?
 	/// e.g. "_level0.sprite1.sprite2.ourSprite"
 	///
 	std::string getTarget() const;
-
-	/// Set timeline information for this instance
-	//
-	/// Timeline info should be set only once, right after creation
-	/// of a timeline instance. If this function is called twice
-	/// Gnash will abort.
-	/// Once timeline informations are added to a character, the
-	/// character become a "timeline instance". If not timeline info
-	/// is available, this is a dynamically-created character.
-	/// See isDynamic();
-	///
-	/// @param depth
-	///	Depth of first placement.
-	///
-	/// @param frame
-	///	Frame of first placement. 0-based.
-	///
-	/// @param replacing
-	///	True if this object was placed by a REPLACE tag
-	///	(see PlaceObject2).
-	///
-	/// NOTE: if we want to compute TimelineInfo records once at
-	/// 	  parse time and reuse pointers we'll just need to take
-	///	  a TimelineInfo pointer as parameter, externally owned.
-	///	  For now, we'll use a new object for each instance.
-	///
-	void setTimelineInfo(int depth, int frame, bool replacing)
-	{
-		assert(_timelineInfo.get()==NULL); // don't call twice !
-		_timelineInfo.reset(new TimelineInfo(depth, frame, replacing));
-	}
-
-	/// Return timeline information, if this is a timeline instance
-	//
-	/// For dynamic instances, NULL is returned.
-	/// Ownership of the returned object belong to this character.
-	///
-	TimelineInfo* getTimelineInfo() { return _timelineInfo.get(); }
 
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
 	boost::intrusive_ptr<as_function> getUserDefinedEventHandler(const std::string& name) const;
