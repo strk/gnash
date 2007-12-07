@@ -1,69 +1,61 @@
-.flash bbox=200x200 filename="gotoandplay_stop.swf" version=6 fps=10
+.flash bbox=800x600 filename="gotoFrameFromInterval.swf" version=6 fps=10
 
 .frame 1
     .action:
 #include "Dejagnu.sc"
+    asOrder = '0+';
     .end
 
 .frame 2
   .action:
-    _root.jumped = false;
-    _root.done = false;
-
     stop();
     
-    note("starting! ($Id: gotoFrameFromInterval.sc,v 1.5 2007/12/06 15:41:30 udog Exp $)");
+    function local_whatever() {}
     
-    function doit() {
-      note("now jumping...");
-      gotoAndPlay(5);
-    }
+    intervalID = setInterval(
+       function() {
+          if (_currentframe != 2) return;
+          gotoAndStop(6);
+       }
+       ,1000);
+  .end
+
+.frame 6
+    .sprite mc1  // Define a sprite mc1
+        .action:
+            _parent.init_me(this);
+        .end
+    .end
     
-    // test:
-    setInterval(
-        function() {
-          if (!_root.jumped && (getTimer() > 1000)) {
-            _root.jumped = true;
-            doit();
-          }
-          
-          if (!_root.done && (getTimer() > 2000)) {
-            _root.done = true;
-            
-            check_equals(_root._currentframe, 5);
-            note("test activated in frame "+_root._currentframe);
-            
-            //Dejagnu.done();
-            
-            // BUG NOTICE: jumping to frame 10 makes Gnash restart the movie
-            // even with the -1 switch!
-            gotoAndPlay(9); 
-          }
-          
-        }
-        , 100);
+    .action:
+        stop();
+        clearInterval( intervalID );
         
+        function init_me(obj) {
+            // traces here are just for visual check, can be safely removed.
+            // Please don't use _root.note() here, we don't need extra function calls.
+            trace(obj);
+            trace(obj+" --> 1 =");
+            _root.asOrder += '1+';
+            trace(obj+" --> 2 ==");
+            _root.asOrder += '2+';
+            local_whatever();
+            trace(obj+" --> 3 ===");
+            _root.asOrder += '3+';
+            local_whatever();
+            trace(obj+" --> 4 ====");
+            _root.asOrder += '4+';
+        }
+    .end    
     
+    .put clip1=mc1 // place a named sprite clip1
+    .put clip2=mc1 // place a named sprite clip2
+    .put clip3=mc1 // place a named sprite clip3
     
-  .end
+    .action:
+        xcheck_equals(asOrder, '0+1+2+3+4+1+2+3+4+1+2+3+4+');
+        totals(1);
+    .end
 
-.frame 5
-  .action:
-    stop();
-    note("frame 5 reached (good)");
-  .end
 
-.frame 8
-  .action:
-    stop();
-    note("frame 6 reached (bad)");
-  .end
-  .stop
-
-.frame 10
-  .action:    
-    note("goodbye");
-    totals(1);
-  .end
-
-.end
+.end // end of file
