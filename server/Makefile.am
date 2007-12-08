@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.134 2007/12/07 11:45:37 strk Exp $
+# $Id: Makefile.am,v 1.135 2007/12/08 09:11:24 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -124,6 +124,7 @@ noinst_HEADERS = \
 	URLAccessManager.h \
 	VirtualClock.h \
 	SystemClock.h \
+	ManualClock.h \
 	array.h	\
 	as_environment.h \
 	as_function.h \

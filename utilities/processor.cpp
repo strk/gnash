@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: processor.cpp,v 1.74 2007/12/07 15:34:37 strk Exp $ */
+/* $Id: processor.cpp,v 1.75 2007/12/08 09:11:25 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -44,7 +44,7 @@
 #include "debugger.h"
 #include "VM.h"
 #include "noseek_fd_adapter.h"
-#include "SystemClock.h" 
+#include "ManualClock.h"
 
 extern "C"{
 	#include <unistd.h>
@@ -329,11 +329,17 @@ play_movie(const char* filename)
 	exit(1);
     }
 
-    long localDelay = delay == -1 ? long(1000000/md->get_frame_rate())+1 : delay; // microseconds
+    float fps = md->get_frame_rate();
+    long fpsDelay = long(1000000/fps);
+    long clockAdvance = fpsDelay/1000;
+    long localDelay = delay == -1 ? fpsDelay : delay; // microseconds
+
+    printf("Will sleep %ld microseconds between iterations - fps is %g, clockAdvance is %lu\n", localDelay, fps, clockAdvance);
 
     // TODO: use a fake clock if running at different then FPS rate
-    SystemClock cl;
+    ManualClock cl;
     gnash::movie_root& m = VM::init(*md, cl).getRoot();
+    cl.advance(10); // pretend we spent 10 milliseconds before getting to executing first frame
 
     md->completeLoad();
 
@@ -361,6 +367,8 @@ play_movie(const char* filename)
 	// safety margin on scaled shapes.
 	
 	size_t	last_frame = m.get_current_frame();
+	//printf("advancing clock by %lu\n", clockAdvance);
+	cl.advance(clockAdvance);
 	m.advance(0.010f);
 
 	if ( quitrequested ) 
@@ -439,6 +447,7 @@ play_movie(const char* filename)
 	    resetLastAdvanceTimer();
 	}
 
+	printf("iteration, timer: %lu, localDelay: %ld\n", cl.elapsed(), localDelay);
 	usleep(localDelay);
     }
     

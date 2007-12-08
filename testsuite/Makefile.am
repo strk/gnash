@@ -29,7 +29,6 @@ libtestsuite_la_SOURCES = \
 	MovieTester.cpp \
 	FuzzyPixel.cpp \
 	FuzzyPixel.h \
-	ManualClock.h \
 	$(NULL)
 libtestsuite_la_LIBADD = \
 	$(RENDERER_LIBS) \

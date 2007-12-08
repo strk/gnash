@@ -1,3 +1,10 @@
+2007-12-08 Sandro Santilli <strk@keybit.net>
+
+	* ManualClock.h: moved from testsuite to server
+	* utilities/processor.cpp: use a manual clock for running
+	  tests.
+	* testsuite/swfdec/PASSING: setinterval-arguments succeeded.
+
 2007-12-07 Sandro Santilli <strk@keybit.net>
 
 	* gui/NullGui.cpp (run): stop keeping CPU busy for nothing.
