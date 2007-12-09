@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: processor.cpp,v 1.75 2007/12/08 09:11:25 strk Exp $ */
+/* $Id: processor.cpp,v 1.76 2007/12/09 21:47:16 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -336,10 +336,9 @@ play_movie(const char* filename)
 
     printf("Will sleep %ld microseconds between iterations - fps is %g, clockAdvance is %lu\n", localDelay, fps, clockAdvance);
 
-    // TODO: use a fake clock if running at different then FPS rate
+    // Use a clock advanced at every iteration to match exact FPS speed.
     ManualClock cl;
     gnash::movie_root& m = VM::init(*md, cl).getRoot();
-    cl.advance(10); // pretend we spent 10 milliseconds before getting to executing first frame
 
     md->completeLoad();
 
