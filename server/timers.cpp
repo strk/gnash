@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.40 2007/12/04 11:45:30 strk Exp $ */
+/* $Id: timers.cpp,v 1.41 2007/12/09 20:40:49 strk Exp $ */
 
 #include "timers.h"
 #include "as_function.h" // for class as_function
@@ -31,13 +31,15 @@
 #include "VM.h"
 #include "movie_root.h"
 
+#include <limits> // for numeric_limits
+
 using namespace std;
 
 namespace gnash {
 
   Timer::Timer() :
       _interval(0),
-      _start(0),
+      _start(std::numeric_limits<unsigned long>::max()),
       _object(0)
   {
   }
@@ -49,7 +51,7 @@ namespace gnash {
   
 
   void
-  Timer::setInterval(as_function& method, boost::uint64_t ms, boost::intrusive_ptr<as_object> this_ptr)
+  Timer::setInterval(as_function& method, unsigned long ms, boost::intrusive_ptr<as_object> this_ptr)
   {
     _function = &method;
     _interval = ms; // keep milliseconds
@@ -59,7 +61,7 @@ namespace gnash {
   }
 
   void
-  Timer::setInterval(as_function& method, boost::uint64_t ms, boost::intrusive_ptr<as_object> this_ptr, 
+  Timer::setInterval(as_function& method, unsigned long ms, boost::intrusive_ptr<as_object> this_ptr, 
 		  std::vector<as_value>& args)
   {
     _function = &method;
@@ -74,7 +76,7 @@ namespace gnash {
   Timer::clearInterval()
   {
     _interval = 0;
-    _start = 0;
+    _start = std::numeric_limits<unsigned long>::max();
   }
   
   void
@@ -88,9 +90,9 @@ namespace gnash {
 bool
 Timer::expired()
 {
-	if (_start)
+	if ( _start != std::numeric_limits<unsigned long>::max() )
 	{
-		boost::uint64_t now = VM::get().getTime();
+		unsigned long now = VM::get().getTime();
 		assert(now >= _start); // it is possible for now to be == _start 
 
 		//cout << "Start is " << _start << " interval is " << _interval << " now is " << now << endl;
@@ -229,7 +231,7 @@ timer_setinterval(const fn_call& fn)
 	}
 
 	// Get interval time
-	boost::uint64_t ms = boost::uint64_t(fn.arg(timer_arg).to_number());
+	unsigned long ms = static_cast<unsigned long>(fn.arg(timer_arg).to_number());
 
 	// Parse arguments 
 	Timer::ArgsContainer args;

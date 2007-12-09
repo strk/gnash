@@ -1,3 +1,8 @@
+2007-12-09 Sandro Santilli <strk@keybit.net>
+
+	* server/timers.{cpp,h}: let 0 be a valid start timer
+	  for intervals.
+
 2007-12-08 Sandro Santilli <strk@keybit.net>
 
 	* ManualClock.h: moved from testsuite to server
