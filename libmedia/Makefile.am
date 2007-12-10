@@ -149,14 +149,10 @@ if USE_MAD_ENGINE
    libgnashmedia_la_SOURCES += \
 		sdl/MediaDecoderSdl.cpp \
 		sdl/AudioDecoderMad.cpp \
-		sdl/sound_handler_sdl.cpp \
-		sdl/AudioDecoderMad.cpp \
 		sdl/sound_handler_sdl.cpp
 
    noinst_HEADERS += \
 		sdl/MediaDecoderSdl.h \
-		sdl/AudioDecoderMad.h \
-		sdl/sound_handler_sdl.h \
 		sdl/AudioDecoderMad.h \
 		sdl/sound_handler_sdl.h
 
