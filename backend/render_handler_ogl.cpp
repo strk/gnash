@@ -851,20 +851,6 @@ public:
     glFlush(); // Make OpenGL execute all commands in the buffer.
   }
     
-  /// Geometric transforms for mesh and line_strip rendering.
-  virtual void
-  set_matrix(const matrix& m)
-  {
-    log_unimpl("set_matrix");
-  }
-
-  /// Color transforms for mesh and line_strip rendering.
-  virtual void
-  set_cxform(const cxform& cx)
-  {
-    log_unimpl("set_cxform");
-  }
-    
   /// Draw a line-strip directly, using a thin, solid line. 
   //
   /// Can be used to draw empty boxes and cursors.
