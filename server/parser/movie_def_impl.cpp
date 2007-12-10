@@ -478,7 +478,9 @@ movie_def_impl::readHeader(std::auto_ptr<tu_file> in, const std::string& url)
 		log_swferror("non-finite movie bounds");
 		);
 	}
-	m_frame_rate = _str->read_u16() / 256.0f;
+	m_frame_rate = _str->read_u16();
+	if ( ! m_frame_rate ) m_frame_rate = 65535;
+	else m_frame_rate /= 256.0f;
 	m_frame_count = _str->read_u16();
 
 	/* Markus: Probably this is better anyways */

@@ -1,5 +1,7 @@
 2007-12-10 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/movie_def_impl.cpp (readHeader): 0 FPS 
+	  must be interpreted as max FPS (65535).
 	* server/timers.{cpp,h}: evaluate object property name
 	  at execution, not initialization.
 	* testsuite/swfdec/PASSING: setinterval2.swf passes.
