@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.81 2007/12/10 17:45:33 rsavoye Exp $
+# $Id: Makefile.am,v 1.82 2007/12/10 23:17:19 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -26,8 +26,8 @@ AUTOMAKE_OPTIONS = dejagnu
 # so I take responsibility of dropping that for the moment...
 if ENABLE_MING
 
-#abs_mediadir = $(shell cd $(srcdir)/../media; pwd)
-DEF_MAKESWF_FLAGS=-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR="\"`cd $(srcdir)/../media; pwd`\""
+abs_mediadir = `cd $(srcdir)/../media; pwd`
+DEF_MAKESWF_FLAGS=-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR='\"$(abs_mediadir)\"'
 
 quickcheck_RUNNERS = \
 	alltests-v5-Runner \
