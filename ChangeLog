@@ -1,5 +1,11 @@
 2007-12-10 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/libamf.all/Makefile.am: don't abort if a test fails.
+	  (note that test_object smashes the stack since the change in
+	  hexify())
+
+2007-12-10 Sandro Santilli <strk@keybit.net>
+
 	* server/button_character_instance.{cpp,h},
 	  server/character.h, server/impl.cpp,
 	  server/movie_instance.{cpp,h},

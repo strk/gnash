@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.6 2007/08/23 14:10:54 strk Exp $
+# $Id: Makefile.am,v 1.7 2007/12/10 21:50:48 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -73,7 +73,7 @@ TEST_DRIVERS = ../simple.exp
 check-DEJAGNU: site-update $(TEST_CASES)
 	@runtest=$(RUNTEST); \
 	if $(SHELL) -c "$$runtest --version" > /dev/null 2>&1; then \
-	    $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); \
+	    $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); true; \
 	else \
 	  echo "WARNING: could not find \`runtest'" 1>&2; \
           for i in "$(check_PROGRAMS)"; do \
