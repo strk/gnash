@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.167 2007/12/04 11:45:33 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.168 2007/12/10 10:54:33 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -31,7 +31,6 @@
 #include "array.h"
 #include "swf_function.h"
 #include "as_function.h"
-#include "tu_random.h"
 #include "fn_call.h"
 #include "ActionExec.h"
 #include "sprite_instance.h"
@@ -58,6 +57,7 @@
 #include <utility> // for std::pair
 #include <locale.h>
 #include <boost/scoped_array.hpp>
+#include <boost/random.hpp>
 
 using namespace std;
 
@@ -1479,13 +1479,28 @@ void
 SWFHandlers::ActionRandom(ActionExec& thread)
 {
 //	GNASH_REPORT_FUNCTION;
+
+	// Action random(n) should return an integer from 0 up to (not
+	// including) n.
+	// It was introduced in SWF4 and deprecated in favour of
+	// Math.random() in SWF5.
+	
 	as_environment& env = thread.env;
 
 	thread.ensureStack(1);  // max
 
-	int	max = int(env.top(0).to_number()); // TODO: use to_int ?
+	int max = int(env.top(0).to_number()); // TODO: use to_int ?
+
 	if (max < 1) max = 1;
-	env.top(0).set_int(tu_random::next_random() % max);
+
+  	// Get pointer to static random generator in VM
+  	VM::RNG& rnd = VM::get().randomNumberGenerator();
+
+  	// Produces int (0 <= n <= max - 1)
+  	boost::uniform_int<> uni_dist(0, max - 1);
+  	boost::variate_generator<VM::RNG&, boost::uniform_int<> > uni(rnd, uni_dist);
+
+	env.top(0).set_int(uni());
 }
 
 as_encoding_guess_t

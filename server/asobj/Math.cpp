@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Math.cpp,v 1.24 2007/12/04 11:45:31 strk Exp $ */
+/* $Id: Math.cpp,v 1.25 2007/12/10 10:54:33 bwy Exp $ */
 
 //
 // This file implements methods of the ActionScript Math class.
@@ -34,7 +34,9 @@
 #endif
 #include <cmath>
 #include <string>
-#include "tu_random.h"
+#include <boost/random.hpp>
+
+#include "VM.h" // get random generator
 #include "fn_call.h"
 #include "GMath.h"
 #include "log.h"
@@ -142,13 +144,22 @@ MATH_WRAP_FUNC2_EXP(min, (arg0 < arg1 ? arg0 : arg1))
 MATH_WRAP_FUNC2_EXP(pow, (pow(arg0, arg1)))
 
 // A couple of oddballs.
-as_value	math_random(const fn_call& /* fn */)
+as_value
+math_random(const fn_call& /* fn */)
 {
-    // Random number between 0 and 1.
-    return as_value(tu_random::next_random() / double(boost::uint32_t(0x0FFFFFFFF)));
+
+	VM::RNG& rnd = VM::get().randomNumberGenerator();
+
+	// Produces double ( 0 <= n < 1)
+	boost::uniform_real<> uni_dist(0, 1);
+	boost::variate_generator<VM::RNG&, boost::uniform_real<> > uni(rnd, uni_dist);
+
+	return as_value(uni());
+
 }
 
-as_value	math_round(const fn_call& fn)
+as_value
+math_round(const fn_call& fn)
 {
 	// round argument to nearest int. 0.5 goes to 1 and -0.5 goes to 0
 	double result;

@@ -31,6 +31,7 @@
 #include <memory> // for auto_ptr
 #include <locale>
 #include <boost/cstdint.hpp> // for boost::?int??_t 
+#include <boost/random.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -207,6 +208,32 @@ public:
 	/// and $version ActionScript variables.
 	///
 	const std::string& getPlayerVersion() const;
+	
+	// The boost Random Number Generator to use.
+	//
+	// http://www.boost.org/libs/random/random-generators.html
+	//
+	// TODO: boost/nondet_random.hpp provides access to a random device,
+	// which can be used in preference to a pseudo-RNG. It is only
+	// presently available on some platforms.
+	// http://www.boost.org/libs/random/nondet_random.html
+	//
+	// Generators have different limits on the size of the seed. Please
+	// check if replacing the generator.
+	//
+	// The mt11213b provides a pseudo-random number cycle
+	// of length 2^11213-1 and requires approx 352*sizeof(uint32_t) memory
+	// once initialized. It is more than adequate for most purposes.
+	typedef boost::mt11213b RNG;	
+
+	// Get a pointer to the random number generator for
+	// use by Math.random() and random().
+	//
+	// The seed is the system time in milliseconds at the first call
+	// to a random function. This allows a potentially variable amount
+	// of time to elapse between starting gnash and initialization of
+	// the generator, so decreasing predictability.
+	RNG& randomNumberGenerator() const;
 
 	/// Get a pointer to this VM's Root movie (stage)
 	movie_root& getRoot() const;

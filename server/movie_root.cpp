@@ -27,7 +27,6 @@
 #include "movie_instance.h" // for implicit upcast to sprite_instance
 #include "render.h"
 #include "VM.h"
-#include "tu_random.h"
 #include "ExecutableCode.h"
 #include "Stage.h"
 #include "utility.h"
@@ -916,11 +915,6 @@ movie_root::advance(float delta_time)
 	// NOTE: can throw ActionLimitException
 	executeTimers();
 
-	// random should go continuously that:
-	// 1. after restart of the player the situation has not repeated
-	// 2. by different machines the random gave different numbers
-	tu_random::next_random();
-			
 	// Advance all non-unloaded characters in the LiveChars list
 	// in reverse order (last added, first advanced)
 	// NOTE: can throw ActionLimitException

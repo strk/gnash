@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: VM.cpp,v 1.26 2007/12/07 15:34:37 strk Exp $ */
+/* $Id: VM.cpp,v 1.27 2007/12/10 10:54:34 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -34,6 +34,7 @@
 #include "VirtualClock.h" // for getTime()
 
 #include <memory>
+#include <boost/random.hpp> // for random generator
 
 namespace {
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
@@ -109,6 +110,14 @@ int
 VM::getSWFVersion() const
 {
 	return _swfversion;
+}
+
+VM::RNG&
+VM::randomNumberGenerator() const
+{
+
+	static RNG rnd(tu_timer::get_ticks());
+	return rnd;
 }
 
 const std::string&

@@ -1,3 +1,16 @@
+2007-12-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/vm/VM.{h,cpp}: add randomNumberGenerator() to return
+	  pointer to a boost pseudo-RNG.
+	* server/vm/ASHandlers.cpp: use boost RNG instead of tu_random
+	  in ActionRandom().
+	* server/asobj/Math.cpp: use boost RNG instead of tu_random in
+	  math_random().
+	* server/movie_root.cpp: remove calls to tu_random::next_random.
+	* server/action.cpp: remove tu_random include.
+	* libbase/tu_random{cpp,h}: removed.
+	* libbase/Makefile: remove deleted files
+
 2007-12-10 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/movie_def_impl.cpp (readHeader): 0 FPS 
