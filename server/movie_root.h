@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.94 2007/11/30 11:26:05 strk Exp $ */
+/* $Id: movie_root.h,v 1.95 2007/12/10 20:17:17 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -779,14 +779,10 @@ private:
     /// @param ch
     ///     The character to advance, will NOT be advanced if unloaded
     ///
-    /// @param delta_time
-    ///     A left-over parameter from the ancient times... will be forwarded
-    ///     to the calls to ::advance
-    ///
-    static void advanceLiveChar(boost::intrusive_ptr<character> ch, float delta_time);
+    static void advanceLiveChar(boost::intrusive_ptr<character> ch);
 
     /// Advance all non-unloaded live chars
-    void advanceLiveChars(float delta_time);
+    void advanceLiveChars();
 
     /// Put the given movie at the given level 
     //

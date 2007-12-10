@@ -918,7 +918,7 @@ movie_root::advance(float delta_time)
 	// Advance all non-unloaded characters in the LiveChars list
 	// in reverse order (last added, first advanced)
 	// NOTE: can throw ActionLimitException
-	advanceLiveChars(delta_time); 
+	advanceLiveChars(); 
 
 	cleanupUnloadedListeners();
 
@@ -1507,7 +1507,7 @@ movie_root::cleanupDisplayList()
 
 /*static private*/
 void
-movie_root::advanceLiveChar(boost::intrusive_ptr<character> ch, float delta_time)
+movie_root::advanceLiveChar(boost::intrusive_ptr<character> ch)
 {
 
 	if ( ! ch->isUnloaded() )
@@ -1515,7 +1515,7 @@ movie_root::advanceLiveChar(boost::intrusive_ptr<character> ch, float delta_time
 #ifdef GNASH_DEBUG
 		log_debug("    advancing character %s", ch->getTarget().c_str());
 #endif
-		ch->advance(delta_time);
+		ch->advance();
 	}
 #ifdef GNASH_DEBUG
 	else {
@@ -1525,14 +1525,14 @@ movie_root::advanceLiveChar(boost::intrusive_ptr<character> ch, float delta_time
 }
 
 void
-movie_root::advanceLiveChars(float delta_time)
+movie_root::advanceLiveChars()
 {
 
 #ifdef GNASH_DEBUG
 	log_debug("---- movie_root::advance: %d live characters in the global list", _liveChars.size());
 #endif
 
-	std::for_each(_liveChars.begin(), _liveChars.end(), boost::bind(advanceLiveChar, _1, delta_time));
+	std::for_each(_liveChars.begin(), _liveChars.end(), boost::bind(advanceLiveChar, _1));
 }
 
 void

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.129 2007/12/04 11:45:28 strk Exp $ */
+/* $Id: impl.cpp,v 1.130 2007/12/10 20:17:17 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -405,7 +405,7 @@ create_jpeg_movie(std::auto_ptr<tu_file> in, const std::string& url)
 // Create a movie_definition from a png stream
 // NOTE: this method assumes this *is* a png stream
 static movie_definition*
-create_png_movie(std::auto_ptr<tu_file> in, const std::string& url)
+create_png_movie(std::auto_ptr<tu_file> /*in*/, const std::string& /*url*/)
 {
 	log_unimpl(_("Loading of png"));
 	return NULL;
@@ -810,107 +810,6 @@ sprite_instance* create_library_movie_inst(movie_definition* md)
     return mov;
 }
 
-
-void	precompute_cached_data(movie_definition* movie_def)
-    // Fill in cached data in movie_def.
-    // @@@@ NEEDS TESTING -- MIGHT BE BROKEN!!!
-{
-    assert(movie_def != NULL);
-
-    // Temporarily install null render and sound handlers,
-    // so we don't get output during preprocessing.
-    //
-    // Use automatic class var to make sure we restore
-    // when exiting the function.
-    class save_stuff
-    {
-    public:
-	render_handler*	m_original_rh;
-	media::sound_handler*	m_original_sh;
-
-	save_stuff()
-	    {
-		// Save.
-		m_original_rh = get_render_handler();
-		m_original_sh = get_sound_handler();
-		set_render_handler(NULL);
-		set_sound_handler(NULL);
-	    }
-
-	~save_stuff()
-	    {
-		// Restore.
-		set_render_handler(m_original_rh);
-		set_sound_handler(m_original_sh);
-	    }
-    } save_stuff_instance;
-
-    // Need an instance.
-    gnash::sprite_instance*	m = movie_def->create_instance();
-    if (m == NULL)
-	{
-	    log_error(_("precompute_cached_data can't create instance of movie"));
-	    return;
-	}
-		
-    // Run through the movie's frames.
-    //
-    // @@ there might be cleaner ways to do this; e.g. do
-    // execute_frame_tags(i, true) on movie and all child
-    // sprites.
-    int	kick_count = 0;
-    for (;;)
-	{
-	    // @@ do we also have to run through all sprite frames
-	    // as well?
-	    //
-	    // @@ also, ActionScript can rescale things
-	    // dynamically -- we can't really do much about that I
-	    // guess?
-	    //
-	    // @@ Maybe we should allow the user to specify some
-	    // safety margin on scaled shapes.
-
-	    size_t last_frame = m->get_current_frame();
-	    m->advance(0.010f);
-	    m->display();
-
-	    if (m->get_current_frame() == movie_def->get_frame_count() - 1)
-		{
-		    // Done.
-		    break;
-		}
-
-	    if (m->get_play_state() == gnash::sprite_instance::STOP)
-		{
-		    // Kick the movie.
-		    //log_msg(_("kicking movie, kick ct = %d"), kick_count);
-		    m->goto_frame(last_frame + 1);
-		    m->set_play_state(gnash::sprite_instance::PLAY);
-		    kick_count++;
-
-		    if (kick_count > 10)
-			{
-			    //log_msg(_("movie is stalled; giving up on playing it through"));
-			    break;
-			}
-		}
-	    else if (m->get_current_frame() < last_frame)
-		{
-		    // Hm, apparently we looped back.  Skip ahead...
-		    log_error(_("loop back; jumping to frame " SIZET_FMT), last_frame);
-		    m->goto_frame(last_frame + 1);
-		}
-	    else
-		{
-		    kick_count = 0;
-		}
-	}
-
-#ifndef GNASH_USE_GC
-    m->drop_ref();
-#endif //ndef GNASH_USE_GC
-}
 
 #ifdef GNASH_USE_GC
 /// A GC root used to mark all reachable collectable pointers

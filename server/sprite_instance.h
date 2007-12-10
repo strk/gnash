@@ -241,9 +241,9 @@ public:
 		return true; // sprites can be referenced 
 	}
 
-	virtual void	advance(float delta_time);
-	//virtual void	advance_root(float delta_time);
-	virtual void	advance_sprite(float delta_time);
+	virtual void	advance();
+
+	void	advance_sprite();
 
 	/// Set the sprite state at the specified frame number.
 	//

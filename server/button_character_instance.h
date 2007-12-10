@@ -21,7 +21,7 @@
 
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
-/* $Id: button_character_instance.h,v 1.27 2007/10/26 13:03:56 strk Exp $ */
+/* $Id: button_character_instance.h,v 1.28 2007/12/10 20:17:16 strk Exp $ */
 
 #ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
 #define GNASH_BUTTON_CHARACTER_INSTANCE_H
@@ -92,7 +92,7 @@ public:
 
 	void	restart();
 
-	virtual void	advance(float delta_time);
+	virtual void	advance();
 
 	void	display();
 	

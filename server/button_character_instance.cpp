@@ -368,7 +368,7 @@ button_character_instance::restart()
 }
 
 void
-button_character_instance::advance(float delta_time)
+button_character_instance::advance()
 {
 //			printf("%s:\n", __PRETTY_FUNCTION__); // FIXME:
 
@@ -393,7 +393,7 @@ button_character_instance::advance(float delta_time)
 		    ((m_mouse_state == DOWN) && (rec.m_down)) ||
 		    ((m_mouse_state == OVER) && (rec.m_over)))
 		{
-			m_record_character[i]->advance(delta_time);
+			m_record_character[i]->advance();
 		}
 	}}
 }

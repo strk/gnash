@@ -69,7 +69,7 @@ movie_instance::stagePlacementCallback()
 
 // Advance of an SWF-defined movie instance
 void
-movie_instance::advance(float delta_time)
+movie_instance::advance()
 {
 	//GNASH_REPORT_FUNCTION;
 
@@ -91,7 +91,7 @@ movie_instance::advance(float delta_time)
 		);
 	}
 
-	advance_sprite(delta_time); 
+	advance_sprite(); 
 
 	//_def->resumeLoader();
 }

@@ -1,3 +1,15 @@
+2007-12-10 Sandro Santilli <strk@keybit.net>
+
+	* server/button_character_instance.{cpp,h},
+	  server/character.h, server/impl.cpp,
+	  server/movie_instance.{cpp,h},
+	  server/movie_root.{cpp,h},
+	  server/sprite_instance.{cpp,h},
+	  server/video_stream_instance.{cpp,h}:
+	  Drop the delta time argument to character::advance,
+	  make sprite_instance::advance_sprite non-virtual,
+	  drop unused cache-related code in impl.cpp
+
 2007-12-10  Rob Savoye  <rob@ute.welcomehome.org>
 
 	* libbase/image.h: Include boost/cstdint.hpp to get uint8_t in a

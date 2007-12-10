@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.113 2007/12/07 01:33:25 zoulunkai Exp $ */
+/* $Id: character.h,v 1.114 2007/12/10 20:17:16 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -761,7 +761,7 @@ public:
 	/// 
 	/// Frame advancement include execution of all control tags.
 	/// 
-	virtual void advance(float /*delta_time*/)
+	virtual void advance()
 	{
 		// GNASH_REPORT_FUNCTION 
 	}

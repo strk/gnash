@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-// $Id: video_stream_instance.cpp,v 1.43 2007/11/14 14:33:34 strk Exp $
+// $Id: video_stream_instance.cpp,v 1.44 2007/12/10 20:17:17 strk Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -229,7 +229,7 @@ video_stream_instance::stagePlacementCallback()
 
 
 void
-video_stream_instance::advance(float /*delta_time*/)
+video_stream_instance::advance()
 {
 	if (_ns) {
 		_ns->advance();

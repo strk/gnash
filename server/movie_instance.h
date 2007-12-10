@@ -56,7 +56,7 @@ public:
 
 	virtual ~movie_instance() {}
 
-	virtual void advance(float delta_time);
+	virtual void advance();
 
 	// Could be implemented in sprite_instance too,
 	// returning m_root like it is done for get_root_movie...

@@ -2418,7 +2418,7 @@ void sprite_instance::set_member(string_table::key name,
 
 }
 
-void sprite_instance::advance_sprite(float /*delta_time*/)
+void sprite_instance::advance_sprite()
 {
 	//GNASH_REPORT_FUNCTION;
 
@@ -2503,7 +2503,7 @@ void sprite_instance::advance_sprite(float /*delta_time*/)
 }
 
 // child movieclip advance
-void sprite_instance::advance(float delta_time)
+void sprite_instance::advance()
 {
 //	GNASH_REPORT_FUNCTION;
 
@@ -2516,7 +2516,7 @@ void sprite_instance::advance(float delta_time)
 	// child movieclip frame rate is the same the root movieclip frame rate
 	// that's why it is not needed to analyze 'm_time_remainder'
 
-	advance_sprite(delta_time);
+	advance_sprite();
 
 }
 

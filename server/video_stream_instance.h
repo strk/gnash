@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_instance.h,v 1.23 2007/10/18 15:56:55 tgc Exp $
+// $Id: video_stream_instance.h,v 1.24 2007/12/10 20:17:18 strk Exp $
 
 #ifndef GNASH_VIDEO_STREAM_INSTANCE_H
 #define GNASH_VIDEO_STREAM_INSTANCE_H
@@ -59,7 +59,7 @@ public:
 	}
 
 	/// We use the call to ::advance to properly set invalidated status
-	virtual void	advance(float delta_time);
+	virtual void	advance();
 
 	/// Register this video instance as a live character
 	virtual void stagePlacementCallback();
