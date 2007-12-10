@@ -195,7 +195,7 @@ private:
       /// This will be numeric_limits<unsigned long>::max()
       /// if the timer is not active (or cleared)
       ///
-      unsigned int _start;
+      unsigned long _start;
 
       /// The associated function (if statically-bound) stored in an intrusive pointer
       boost::intrusive_ptr<as_function> _function;

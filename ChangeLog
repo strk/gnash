@@ -1,3 +1,7 @@
+2007-12-10 Sandro Santilli <strk@keybit.net>
+
+	* server/timers.h: _start must be a long.
+
 2007-12-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/vm/VM.{h,cpp}: add randomNumberGenerator() to return
