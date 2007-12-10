@@ -1,5 +1,6 @@
 2007-12-10 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/PASSING: synced with master git.
 	* testsuite/libamf.all/Makefile.am: don't abort if a test fails.
 	  (note that test_object smashes the stack since the change in
 	  hexify())
