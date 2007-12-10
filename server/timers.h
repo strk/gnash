@@ -110,6 +110,26 @@ public:
       void setInterval(as_function& method, unsigned long ms, boost::intrusive_ptr<as_object> this_ptr, 
 		      std::vector<as_value>& args);
 
+      /// Setup the Timer to call a late-evaluated object method, enabling it.
+      //
+      /// @param this_ptr
+      ///	The object to be used as 'this' pointer when calling the
+      ///	associated function. Will be stored in an intrusive_ptr.
+      ///	It is allowed to be NULL as long as fn_call is allowed
+      ///	a NULL as 'this_ptr' (we might want to change this).
+      ///
+      /// @param methodName
+      ///	The method name to call from execution operator.
+      ///
+      /// @param ms
+      ///	The number of milliseconds between expires.
+      ///
+      /// @param args
+      /// 	The list of arguments to pass to the function being invoked.
+      ///
+      void setInterval(boost::intrusive_ptr<as_object> obj, const std::string& methodName, unsigned long ms, 
+		      std::vector<as_value>& args);
+
       /// Clear the timer, ready for reuse
       //
       /// When a Timer is cleared, the expired() function
@@ -177,8 +197,11 @@ private:
       ///
       unsigned int _start;
 
-      /// The associated function, stored in an intrusive pointer
+      /// The associated function (if statically-bound) stored in an intrusive pointer
       boost::intrusive_ptr<as_function> _function;
+
+      /// The associated method name, stored in an intrusive pointer
+      std::string _methodName;
 
       /// Context for the function call. Will be used as 'this' pointer.
       boost::intrusive_ptr<as_object> _object;

@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.42 2007/12/10 04:59:24 strk Exp $ */
+/* $Id: timers.cpp,v 1.43 2007/12/10 09:23:48 strk Exp $ */
 
 #include "timers.h"
 #include "as_function.h" // for class as_function
@@ -48,17 +48,6 @@ namespace gnash {
   {
     //log_msg("%s: \n", __FUNCTION__);
   }
-  
-
-  void
-  Timer::setInterval(as_function& method, unsigned long ms, boost::intrusive_ptr<as_object> this_ptr)
-  {
-    _function = &method;
-    _interval = ms; // keep milliseconds
-    //log_msg("_interval milliseconds: %lu", _interval);
-    _object = this_ptr;
-    start();
-  }
 
   void
   Timer::setInterval(as_function& method, unsigned long ms, boost::intrusive_ptr<as_object> this_ptr, 
@@ -68,6 +57,28 @@ namespace gnash {
     _interval = ms; // keep as milliseconds
     //log_msg("_interval milliseconds: %llu", _interval);
     _object = this_ptr;
+    _args = args;
+    start();
+  }
+
+  void
+  Timer::setInterval(as_function& method, unsigned long ms, boost::intrusive_ptr<as_object> this_ptr)
+  {
+    _function = &method;
+    _interval = ms; // keep as milliseconds
+    //log_msg("_interval milliseconds: %llu", _interval);
+    _object = this_ptr;
+    start();
+  }
+
+  void
+  Timer::setInterval(boost::intrusive_ptr<as_object> this_ptr, const std::string& methodName, unsigned long ms, 
+		  std::vector<as_value>& args)
+  {
+    _object = this_ptr;
+    _methodName = methodName;
+    _interval = ms; // keep as milliseconds
+    //log_msg("_interval milliseconds: %llu", _interval);
     _args = args;
     start();
   }
@@ -119,7 +130,29 @@ Timer::operator() ()
     //printf("FIXME: %s:\n", __FUNCTION__);
     //log_msg("INTERVAL ID is %d\n", getIntervalID());
 
-    as_value timer_method(_function.get());
+    as_value timer_method;
+
+    if ( _function.get() )
+    {
+        timer_method.set_as_function(_function.get());
+    }
+    else
+    {
+        as_value tmp;
+        if (!_object->get_member(VM::get().getStringTable().find(_methodName), &tmp) )
+        {
+            //log_debug("Can't find interval method %s on object %p (%s)", _methodName.c_str(), (void*)_object.get(), _object->get_text_value().c_str());
+            return;
+        }
+        as_function* f = tmp.to_as_function();
+        if ( ! f )
+        {
+            //log_debug("member %s of object %p (interval method) is not a function (%s)",
+            //   _methodName.c_str(), (void*)_object.get(), tmp.to_debug_string().c_str());
+            return;
+        }
+        timer_method.set_as_function(f);
+    }
 
     as_environment env;
 
@@ -157,8 +190,10 @@ Timer::markReachableResources() const
 as_value
 timer_setinterval(const fn_call& fn)
 {
+	//std::stringstream ss; fn.dump_args(ss);
+	//log_debug("setInterval(%s)", ss.str().c_str());
+
 	//log_msg("%s: args=%d", __FUNCTION__, fn.nargs);
-	// TODO: support setInterval(object, propertyname, intervaltime, arguments...) too
     
 	if ( fn.nargs < 2 )
 	{
@@ -185,37 +220,13 @@ timer_setinterval(const fn_call& fn)
 		return as_value();
 	}
 
+    std::string methodName;
+
 	// Get interval function
 	boost::intrusive_ptr<as_function> as_func = obj->to_function(); 
 	if ( ! as_func )
 	{
-		as_value method;
-		const std::string& method_name = fn.arg(1).to_string();
-		if (!obj->get_member(VM::get().getStringTable().find(method_name), &method) )
-		{
-			IF_VERBOSE_ASCODING_ERRORS(
-				std::stringstream ss; fn.dump_args(ss);
-				log_aserror("Invalid call to setInterval(%s) "
-					"- can't find member %s of object %s",
-					ss.str().c_str(), method_name.c_str(),
-					fn.arg(0).to_debug_string().c_str());
-			);
-			return as_value();
-		}
-		as_func = method.to_as_function();
-		if ( ! as_func )
-		{
-			IF_VERBOSE_ASCODING_ERRORS(
-				std::stringstream ss; fn.dump_args(ss);
-				log_aserror("Invalid call to setInterval(%s) "
-					"- %s.%s is not a function",
-					ss.str().c_str(),
-					fn.arg(0).to_debug_string().c_str(),
-					method_name.c_str());
-			);
-			return as_value();
-		}
-
+		methodName = fn.arg(1).to_string();
 		timer_arg = 2;
 	}
 
@@ -233,6 +244,7 @@ timer_setinterval(const fn_call& fn)
 
 	// Get interval time
 	unsigned long ms = static_cast<unsigned long>(fn.arg(timer_arg).to_number());
+	// TODO: check validity of interval time number ?
 
 	// Parse arguments 
 	Timer::ArgsContainer args;
@@ -242,7 +254,16 @@ timer_setinterval(const fn_call& fn)
 	}
 
 	std::auto_ptr<Timer> timer(new Timer);
-	timer->setInterval(*as_func, ms, fn.this_ptr, args);
+	if ( as_func )
+	{
+		// TODO: 'this_ptr' should be NULL/undefined in this case
+		timer->setInterval(*as_func, ms, fn.this_ptr, args);
+	}
+	else
+	{
+		timer->setInterval(obj, methodName, ms, args);
+	}
+    
     
 	movie_root& root = VM::get().getRoot();
 	int id = root.add_interval_timer(timer);
