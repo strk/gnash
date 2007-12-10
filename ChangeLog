@@ -1,3 +1,10 @@
+2007-12-10 Sandro Santilli <strk@keybit.net>
+
+	* server/timers.cpp (expired): add interval to start time
+	  when expired (rather then using current time); expire
+	  also when start+interval == now.
+	* testsuite/swfdec/PASSING: setinterval.swf succeeds.
+
 2007-12-09 Sandro Santilli <strk@keybit.net>
 
 	* server/timers.{cpp,h}: let 0 be a valid start timer

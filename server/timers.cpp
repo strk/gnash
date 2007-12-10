@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.41 2007/12/09 20:40:49 strk Exp $ */
+/* $Id: timers.cpp,v 1.42 2007/12/10 04:59:24 strk Exp $ */
 
 #include "timers.h"
 #include "as_function.h" // for class as_function
@@ -96,9 +96,10 @@ Timer::expired()
 		assert(now >= _start); // it is possible for now to be == _start 
 
 		//cout << "Start is " << _start << " interval is " << _interval << " now is " << now << endl;
-		if (now > _start + _interval)
+		if (now >= _start + _interval)
 		{
-			_start = now; // reset the timer
+			// TODO: set _start to save lost time in calling expired ?
+			_start += _interval; // reset the timer
 			//cout << " Expired, reset start to " << _start << endl;
 			//log_msg("Timer expired! \n");
 			return true;
