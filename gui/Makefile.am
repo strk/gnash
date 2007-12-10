@@ -174,7 +174,7 @@ GUI_SRCS = gnash.cpp \
 
 if BUILD_AQUA_GUI
 BUILT_SOURCES += bundle
-EXTRA_DIST += Gnash.app
+EXTRA_DIST += Gnash.app am-frag
 endif
 
 # Build the QTOPIA gui

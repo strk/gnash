@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: log.cpp,v 1.57 2007/08/20 16:21:04 strk Exp $ */
+/* $Id: log.cpp,v 1.58 2007/12/10 17:45:32 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -74,20 +74,56 @@ hexify(unsigned char *p, const unsigned char *s, int length, bool ascii) {
     // convert some characters so it'll look right in the log
     for (int i=0 ; i<length; i++) {
         // use the hex value
-	if (isprint(s[i]) && ascii) {
-	    if (i>1) {
-		if (!isprint(s[i-1])) {
-		    *p++ = ' ';
-		}
+
+	if (ascii) {
+	    if (isprint(s[i])) {
+		*p++ = s[i];
+		continue;
+	    } else {
+ 		if ((s[i] == 0xd) || (s[i] == 0xa)) {
+		    *p++ = s[i];
+ 		    continue;
+ 		}
+		*p++ = '^';
 	    }
-	    *p++ = s[i];
-	    if (!isprint(s[i+1])) {
-		*p++ = ' ';
-	    }
-	} else {
+	} else {		// if not ascii outout requested
 	    *p++ = hexchars[s[i] >> 4];
 	    *p++ = hexchars[s[i] & 0xf];
+	    *p++ = ' ';		// add a space between bytes
 	}
+	    
+// 	if (isascii(s[i]) && ascii) {
+// 	    *p++ = hexchars[s[i] >> 4];
+// 	    *p++ = hexchars[s[i] & 0xf];
+// //		    *p++ = ' ';
+// 	    *p++ = '%';
+// 	    continue;
+// 	}
+// 	*p++ = s[i];
+// // 	    if (!isprint(s[i+1])) {
+// // 		*p++ = hexchars[s[i] >> 4];
+// // 		*p++ = hexchars[s[i] & 0xf];
+// // //		*p++ = ' ';
+// // 		*p++ = '$';
+// // 	    }
+
+//     } else {
+// 	    if (ascii) {
+// 		if (s[i] == 0xd) {
+// //		    *p++ = '\r';
+// 		    *p++ = '@';
+// 		    continue;
+// 		}
+// 		if (s[i] == 0xa) {		
+// //		    *p++ = '\n';
+// 		    *p++ = '#';
+// 		    continue;
+// 		}
+// 	    } else {
+// 		*p++ = hexchars[s[i] >> 4];
+// 		*p++ = hexchars[s[i] & 0xf];
+// 	    }
+// 	}
     }
 
     *p = '\0';

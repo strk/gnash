@@ -49,11 +49,11 @@ AUXMOVIES = \
 	    $(NULL)
 
 
-EXTRA_DIST = $(SCTESTS) $(AUXMOVIES) check.sc Dejagnu.sc
+EXTRA_DIST = $(SCTESTS) $(AUXMOVIES) check.sc Dejagnu.sc hello.sc
 
 if ENABLE_SWFC
 
-abs_mediadir = $(shell cd $(srcdir)/../media; pwd)
+abs_mediadir = `cd $(srcdir)/../media; pwd`
 
 #SWFC = swfc # this is set by ./configure
 SWFC_FLAGS = 

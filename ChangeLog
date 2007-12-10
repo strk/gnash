@@ -1,3 +1,18 @@
+2007-12-10  Rob Savoye  <rob@ute.welcomehome.org>
+
+	* libbase/image.h: Include boost/cstdint.hpp to get uint8_t in a
+	portable fashion.
+	* gui/Makefile.am: Add am-frag to EXTRA_DIST.	
+	* libbase/log.cpp: Make hexify() handle CR/LF better. Cleanup the
+	output to handle pure binary files.
+	* asobj/Sound.cpp: Include sound_handler.h.
+	* testsuite/Makefile.am: Cleanup non POSIX variable name
+	warnings.
+	* testsuite/actionscript.all/Makefile.am: Cleanup non POSIX
+	variable name warnings. 
+	* testsuite/misc-swfc.all/Makefile.am: Cleanup non POSIX variable
+	name warnings.
+
 2007-12-10 Sandro Santilli <strk@keybit.net>
 
 	* server/timers.h: _start must be a long.

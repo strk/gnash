@@ -10,6 +10,7 @@
 
 
 #include "tu_config.h"
+#include <boost/cstdint.hpp>
 
 #include <boost/scoped_array.hpp>
 #include <memory> // for auto_ptr
@@ -51,7 +52,7 @@ namespace image
 		
 			
 			
-		image_base(uint8_t* data, int width, int height, int pitch, id_image type);
+		image_base(uint8_t *data, int width, int height, int pitch, id_image type);
 
 		/// Construct an image_base allocating data for height*pitch bytes
 		image_base(int width, int height, int pitch, id_image type);
