@@ -1,9 +1,14 @@
+2007-12-11 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/shape_character_def.cpp (read): still read an
+	  additional byte even if fill and line bits are zero if we're
+	  reading a morph shape.
+
 2007-12-10  Rob Savoye  <rob@ute.welcomehome.org>
 
 	* cygnal/testsuite/cygnal.all/test_http.cpp: Add extracing fields
 	from an HTTP header tests to go with the ones that create the same
 	fields.
-
 	* cygnal/cygnal.cpp: Use a cygnal-dbg.log file instead of
 	gnash-dbg.log. Use boost bind variables for all threads.
 	* cygnal/http.{cpp,h}: Add methods for encoding HTTP header
@@ -14,7 +19,6 @@
 	for anything but win32 anyway. Add testsuite directory.
 	* cygnal/testsuite: New testsuite directory. It's here rather than
 	in gnash/testsuite since these tests are very different from
-
 	ones gnash needs for most things.
 	* cygnal/testsuite/Makefile.am: New Makefile for Cygnal test
 	directories.
@@ -33,7 +37,6 @@
 	* testsuite/actionscript.all/Makefile.am: fix abs_mediadir to
 	  contain quotes. Prior version failed building XML-*.swf files,
 	  dunno if this patch breaks POSIX compatibility.
-
 	* utilities/processor.cpp: check for quit request right
 	  after calling movie_root::setRootMovie, as that would
 	  execute actions in first frame.
