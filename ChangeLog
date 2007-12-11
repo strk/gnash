@@ -1,3 +1,9 @@
+2007-12-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* testsuite/actionscript.all/Random.as: tests for distribution
+	  of all (pseudo-)random output; and for correctness of random(n)
+	  behaviour.
+
 2007-12-11 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/string.cpp: fix slice, register native functions,
