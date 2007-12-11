@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.130 2007/12/10 20:17:17 strk Exp $ */
+/* $Id: impl.cpp,v 1.131 2007/12/11 14:36:06 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -392,7 +392,7 @@ create_jpeg_movie(std::auto_ptr<tu_file> in, const std::string& url)
 
 	if ( ! im.get() )
 	{
-		log_error(_("Can't read jpeg from %u"), url.c_str());
+		log_error(_("Can't read jpeg from %s"), url.c_str());
 		return NULL;
 	} 
 
