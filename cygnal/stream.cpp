@@ -17,8 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: stream.cpp,v 1.7 2007/07/01 10:53:50 bjacques Exp $ */
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -53,7 +51,7 @@ namespace {
 static void
 sendfile_thread()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     struct stat stats;
     struct filedes loadfile;
@@ -83,7 +81,9 @@ sendfile_thread()
 	    log_msg (_("File %s mapped to: %p"), loadfile.filespec,
 		       (void *)fdptr);
 	}
-	
+
+	printf("FIXME: st_dev is: %d\n", stats.st_dev);
+    
 // 	if (stats.st_size > 1024*8) {
 // 	}
 	
@@ -132,23 +132,23 @@ Stream::Stream()
       _seekptr(0),
       _filesize(0)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
 }
 
 Stream::~Stream() {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     if (_filefd) {
         close(_filefd);
     }
     if (_netfd) {
-        close(_netfd);
+	::close(_netfd);
     }
 }
 
 bool
 Stream::open(const char *filespec) {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     return open(filespec, _netfd);
 }
@@ -156,7 +156,7 @@ Stream::open(const char *filespec) {
 bool
 Stream::open(const char *filespec, int /*netfd*/)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     //struct stat stats;
     // TODO: should we use the 'netfd' passed as parameter instead ?
@@ -164,47 +164,48 @@ Stream::open(const char *filespec, int /*netfd*/)
 }
 
 bool
-Stream::open(const char *filespec, int netfd, Statistics  *statistics) {
+Stream::open(const char *filespec, int netfd, Statistics *statistics) {
     GNASH_REPORT_FUNCTION;
 
     struct stat st;
-
+    
     _netfd = netfd;
     _statistics = statistics;
 
     log_debug("Trying to open %s", filespec);
-    
+
     if (stat(filespec, &st) == 0) {
-        _filesize = st.st_size;
-        boost::mutex::scoped_lock lock(io_mutex);
+	_filesize = st.st_size;
+	boost::mutex::scoped_lock lock(io_mutex);
 	_filefd = ::open(filespec, O_RDONLY);
-  	log_msg (_("File %s is %lld bytes in size."), filespec,
-  		   (long long int) _filesize);
+	log_msg (_("File %s is %lld bytes in size."), filespec,
+		 (long long int) _filesize);
 	if (_filefd) {
 	    _dataptr = static_cast<unsigned char *>(mmap(0, _filesize,
-		   PROT_READ, MAP_SHARED, _filefd, 0));
+				 PROT_READ, MAP_SHARED, _filefd, 0));
 	} else {
 	    log_error (_("Couldn't load file %s"), filespec);
-            return false;
+	    return false;
 	}
 	
 	if (_seekptr == MAP_FAILED) {
 	    log_error (_("Couldn't map file %s into memory: %s"),
 		       filespec, strerror(errno));
-            return false;
+	    return false;
 	} else {	    
 	    log_msg (_("File %s mapped to: %p"), filespec,
-		       (void *)_dataptr);
-            _seekptr = _dataptr;
-            _state = OPEN;
-            return true;
-	}
+		     (void *)_dataptr);
+	    _seekptr = _dataptr;
+	    _state = OPEN;
+	    return true;
+	}	
+	::close(_filefd);
 // 	if (stats.st_size > 1024*8) {
 // 	}
 	
 // 	if (stats.st_blksize > 10) {
 // 	}
-
+	    
 // 	if (stats.st_blocks > 10) {
 // 	}
     } else {
@@ -217,14 +218,14 @@ Stream::open(const char *filespec, int netfd, Statistics  *statistics) {
 // Stream the movie
 bool
 Stream::play() {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     return play(_netfd);
 }
 
 bool
 Stream::play(int netfd) {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     _netfd = netfd;
     _state = PLAY;
@@ -276,7 +277,7 @@ Stream::play(int netfd) {
 // Stream a preview, instead of the full movie.
 bool
 Stream::preview(const char* /*filespec*/, int /*frames*/) {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     _state = PREVIEW;
     return true; // Default to true    
@@ -285,7 +286,7 @@ Stream::preview(const char* /*filespec*/, int /*frames*/) {
 // Stream a series of thumbnails
 bool
 Stream::thumbnail(const char* /*filespec*/, int /*quantity*/) {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     _state = THUMBNAIL;
     return true; // Default to true
@@ -294,7 +295,7 @@ Stream::thumbnail(const char* /*filespec*/, int /*quantity*/) {
 // Pause the stream
 bool
 Stream::pause(int /*frame*/) {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     _state = PAUSE;
     return true; // Default to true
@@ -303,7 +304,7 @@ Stream::pause(int /*frame*/) {
 // Seek within the stream
 bool
 Stream::seek(int /*frame*/) {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     _state = SEEK;
     return true; // Default to true    
@@ -312,7 +313,7 @@ Stream::seek(int /*frame*/) {
 // Upload a stream into a sandbox
 bool
 Stream::upload(const char* /*filespec*/) {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     _state = UPLOAD;
     return true; // Default to true
@@ -320,7 +321,7 @@ Stream::upload(const char* /*filespec*/) {
 
 // Stream a single "real-time" source.
 bool Stream::multicast(const char* /*filespec*/) {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     _state = MULTICAST;
     return true; // Default to true    

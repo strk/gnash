@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.454 2007/12/04 23:50:06 strk Exp $
+dnl $Id: configure.ac,v 1.455 2007/12/11 03:23:01 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -269,7 +269,6 @@ dnl        AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
         build_alp=yes
 dnl        AC_DEFINE(USE_ALP, [1], [Use the ALP framework])
         build_gtk=yes
-dnl         AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
         ;;
       gtk|GTK|gtk2|GTK2)
 dnl        AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
@@ -709,10 +708,10 @@ fi
 if test x"${build_alp}" = xyes; then
   GNASH_PATH_ALP
   if test x"${have_alp}" = x"yes"; then
-    AC_DEFINE([HAVE_ALP], [], [Access Linux Platform framework])
+    AC_DEFINE([HAVE_ALP], 1, [Access Linux Platform framework])
   fi
   cross_compiling=yes
-  build_gtk=yes
+dnl  build_gtk=yes
   build_kde=no
   build_ogl=no
   build_agg=yes
@@ -741,7 +740,7 @@ dnl   Verify dependencies for requested GUIs are met, and
 dnl   disable build of the GUIS for which deps are NOT met
 dnl ------------------------------------------------------------
 
-if test x$build_gtk = xyes; then
+if test x$build_gtk = xyes -o $build_alp = xyes -o x$build_hildon = xyes; then
    GNASH_PATH_GTK2
    GNASH_PATH_PANGO
    GNASH_PKG_FIND(atk, [atk/atk.h], [atk library], atk_focus_tracker_init, [1.0])
@@ -749,6 +748,7 @@ if test x$build_gtk = xyes; then
       GNASH_PATH_GLEXT
    fi
 
+  GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
    dnl if gtk isn't installed, even if it's specified, don't try to build
    dnl the GTK gui. 
    if test x$has_gtk2 = xno; then
@@ -786,6 +786,7 @@ AM_CONDITIONAL(HAVE_DMALLOC, [ test x$has_dmalloc = xyes ])
 
 AC_CHECK_FUNCS(mallinfo)
 AC_PATH_TOOL([AUTOTRACE], [autotrace])
+AC_PATH_TOOL([NETCAT], [netcat])
 AC_HEADER_DIRENT
 
 dnl -----------------------------------------------------------------
@@ -1608,13 +1609,13 @@ extensions/metome/Makefile
 plugin/Makefile
 plugin/klash/Makefile
 cygnal/Makefile
-cygnal/ACT/Makefile
-cygnal/ACT/test_support/Makefile
-cygnal/ACT/unit_tests/Makefile
-cygnal/IO/Makefile
-cygnal/HTTP/Makefile
-cygnal/Net/Makefile
-cygnal/unit_tests/Makefile
+cygnal/testsuite/Makefile
+cygnal/testsuite/cygnal.all/Makefile
+dnl cygnal/ACT/unit_tests/Makefile
+dnl cygnal/IO/Makefile
+dnl cygnal/HTTP/Makefile
+dnl cygnal/Net/Makefile
+dnl cygnal/unit_tests/Makefile
 )
 
 ###

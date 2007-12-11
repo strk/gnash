@@ -17,16 +17,20 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: http.cpp,v 1.9 2007/07/01 10:53:49 bjacques Exp $ */
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <boost/thread/mutex.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
+//#include <boost/date_time/local_time/local_time.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+//#include <boost/date_time/time_zone_base.hpp>
 #include <string>
 #include <iostream>
 #include <cstring>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "http.h"
 #include "log.h"
 
@@ -34,7 +38,6 @@ using namespace gnash;
 using namespace std;
 
 static boost::mutex stl_mutex;
-
 
 namespace cygnal
 {
@@ -85,15 +88,15 @@ HTTP::waitForGetRequest()
     }
     
     extractMethod(buffer);
-//     extractReferer(buffer);
-//     extractHost(buffer);
+    extractReferer(buffer);
+    extractHost(buffer);
     extractAgent(buffer);
     extractLanguage(buffer);
     extractCharset(buffer);
     extractConnection(buffer);
-//     extractEncoding(buffer);
-//     extractTE(buffer);
-//    dump();
+    extractEncoding(buffer);
+    extractTE(buffer);
+    dump();
 
     // See if we got a legit GET request
     if (strncmp(buffer, "GET ", 4) == 0) {
@@ -106,40 +109,221 @@ HTTP::waitForGetRequest()
 }
 
 bool
+HTTP::formatHeader(const short type)
+{
+    GNASH_REPORT_FUNCTION;
+
+    formatHeader(0, type);
+}
+
+
+bool
+HTTP::formatHeader(int filesize, const short type)
+{
+    GNASH_REPORT_FUNCTION;
+
+    _header << "HTTP/1.1 200 OK" << endl;
+//    _header << "Server: Cygnal/0.8.1 (Linux)" << endl;
+    this->formatDate();
+    this->formatConnection("close");
+//     _header << "Accept-Ranges: bytes" << endl;
+    this->formatContentLength(filesize);
+    this->formatContentType();
+    // All HTTP messages are followed by a blank line.
+    this->terminateHeader();
+}
+
+bool
+HTTP::formatDate()
+{
+    GNASH_REPORT_FUNCTION;
+    boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
+    
+//    cout <<  now.time_of_day() << endl;
+    
+    boost::gregorian::date d(now.date());
+//     boost::gregorian::date d(boost::gregorian::day_clock::local_day());
+//     cout << boost::posix_time::to_simple_string(now) << endl;
+//     cout << d.day_of_week() << endl;
+//     cout << d.day() << endl;
+//     cout << d.year() << endl;
+//     cout << d.month() << endl;
+    
+//    boost::date_time::time_zone_ptr zone(new posix_time_zone("MST"));
+//    boost::date_time::time_zone_base b(now "MST");
+//    cout << zone.dst_zone_abbrev() << endl;
+
+    _header << "Date: " << d.day_of_week();
+    _header << ", " << d.day();
+    _header << " "  << d.month();
+    _header << " "  << d.year();
+    _header << " "  << now.time_of_day();
+    _header << " GMT" << endl;
+
+}
+
+bool
+HTTP::formatMethod(const char *data)
+{
+    GNASH_REPORT_FUNCTION;
+    _header << "Method: " << data << endl;
+}
+
+bool
+HTTP::formatReferer(const char *refer)
+{
+    GNASH_REPORT_FUNCTION;
+    _header << "Referer: " << refer << endl;
+}
+
+bool
+HTTP::formatConnection(const char *options)
+{
+    GNASH_REPORT_FUNCTION;
+    _header << "Connection: " << options << endl;
+}
+
+bool
+HTTP::formatContentType()
+{
+    return formatContentType(_filetype);
+}
+
+bool
+HTTP::formatContentType(filetype_e filetype)
+{
+    GNASH_REPORT_FUNCTION;
+    
+    switch (filetype) {
+      case HTML:
+	  _header << "Content-Type: text/html; charset=UTF-8" << endl;
+	  break;
+      case SWF:
+//	  _header << "Content-Type: application/x-shockwave-flash" << endl;
+	  _header << "Content-Type: application/futuresplash" << endl;
+	  break;
+      case VIDEO:
+	  _header << "Content-Type: video/flv" << endl;
+	  break;
+      case MP3:
+	  _header << "Content-Type: audio/mpeg" << endl;
+	  break;
+      default:
+	  _header << "Content-Type: text/html; charset=UTF-8" << endl;
+    }
+}
+
+bool
+HTTP::formatContentLength(int filesize)
+{
+    GNASH_REPORT_FUNCTION;
+    _header << "Content-Length: " << filesize << endl;
+}
+
+bool
+HTTP::formatHost(const char *host)
+{
+    GNASH_REPORT_FUNCTION;
+    _header << "Host: " << host << endl;
+}
+
+bool
+HTTP::formatAgent(const char *agent)
+{
+    GNASH_REPORT_FUNCTION;
+    _header << "User-Agent: " << agent << endl;
+}
+
+bool
+HTTP::formatLanguage(const char *lang)
+{
+    GNASH_REPORT_FUNCTION;
+
+    // For some browsers this appears to also be Content-Language
+    _header << "Accept-Language: " << lang << endl;
+}
+
+bool
+HTTP::formatCharset(const char *set)
+{
+    GNASH_REPORT_FUNCTION;
+    // For some browsers this appears to also be Content-Charset
+    _header << "Accept-Charset: " << set << endl;
+}
+
+bool
+HTTP::formatEncoding(const char *code)
+{
+    GNASH_REPORT_FUNCTION;
+    _header << "Accept-Encoding: " << code << endl;
+}
+
+bool
+HTTP::formatTE(const char *te)
+{
+    GNASH_REPORT_FUNCTION;
+    _header << "TE: " << te << endl;
+}
+
+bool
 HTTP::sendGetReply(int filesize)
 {
     GNASH_REPORT_FUNCTION;
-    boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time();
-
-    now.time_of_day();
     
-    const char reply[] =
-        "HTTP/1.1 200 OK\r\n"
-        "Date: Sun, 20 Apr 2006 04:20:00 GMT\r\n"
-        "Content-Type: application/futuresplash\r\n"
-        "Connection: close\r\n"
-        "Content-Length: XX      \r\n"
-        "\r\n"                  // All HTTP messages are followed by a blank line.
-        ;
+//     const char reply[] =
+//         "HTTP/1.1 200 OK\r\n"
+//         "Date: Sun, 20 Apr 2006 04:20:00 GMT\r\n"
+//         "Content-Type: application/futuresplash\r\n"
+//         "Connection: close\r\n"
+//         "Content-Length: XX      \r\n"
+//         "\r\n"                  // All HTTP messages are followed by a blank line.
+//         ;
 
-    // This is a bit ugly, but we splice the file size onto the request string
-    // without any memory allocation, which could incur a small performance hit.
-    char *length = strstr(reply, " XX");
-    sprintf(length, " %d", filesize);
-// FIXME:  Doesn't this write to a const array?  And doesn't it fail to
-// supply the two \r\n's needed to finish the string?  --gnu
-    
-    int ret = writeNet(reply, strlen(reply));
+// //     // This is a bit ugly, but we splice the file size onto the request string
+// //     // without any memory allocation, which could incur a small performance hit.
+//      char *length = strstr(reply, " XX");
+//      sprintf(length, " %d", filesize);
+//      case SWF:
+//	  _header << "Content-Type: application/futuresplash" << endl;
+//	  break;
+ // // FIXME:  Doesn't this write to a const array?  And doesn't it fail to
+// // // supply the two \r\n's needed to finish the string?  --gnu
 
-    if (ret >= 0 && (unsigned)ret == strlen(reply)) {
-        log_msg (_("Sent GET Reply: %s"), reply);
+    formatHeader(filesize, RTMP);
+    int ret = writeNet(_header.str().c_str(), _header.str().size());
+
+    if (ret >= 0 && (unsigned)ret == _header.str().size()) {
+        log_msg (_("Sent GET Reply"));
+//        log_msg (_("Sent GET Reply: %s"), _header.str().c_str());
     } else {
         log_msg (_("Couldn't send GET Reply, writeNet returned %d"), ret);
-	// TODO: FIXME: shouldn't we return false here ?
+	return false;
     }
+//    cout << "GET Header is:" << endl << _header.str() << endl;
     return true; // Default to true
 }
 
+bool
+HTTP::formatRequest(const char *url, http_method_e req)
+{
+    GNASH_REPORT_FUNCTION;
+
+    _header.str("");
+
+    _header << req << " " << url << "HTTP/1.1" << endl;
+    _header << "User-Agent: Opera/9.01 (X11; Linux i686; U; en)" << endl;
+    _header << "Accept: text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/jpeg, image/gif, image/x-xbitmap, */*;q=0.1" << endl;
+
+    _header << "Accept-Language: en" << endl;
+    _header << "Accept-Charset: iso-8859-1, utf-8, utf-16, *;q=0.1" << endl;
+    
+    _header << "Accept-Encoding: deflate, gzip, x-gzip, identity, *;q=0" << endl;
+    _header << "Referer: " << url << endl;
+
+    _header << "Connection: Keep-Alive, TE" << endl;
+    _header << "TE: deflate, gzip, chunked, identity, trailers" << endl;
+    
+}
 // bool
 // HTTP::sendGetReply(Network &net)
 // {
@@ -371,6 +555,58 @@ HTTP::keepAlive()
     // FIXME: is their a way to make find case insensitive that's
     // less than 20 lines long ?
     return keepAlive(_connection.c_str());
+}
+
+    // Get the file type, so we know how to set the
+    // Content-type in the header.
+HTTP::filetype_e
+HTTP::getFileType(std::string filespec)
+{
+    GNASH_REPORT_FUNCTION;    
+    bool try_again = true;
+    string actual_filespec = filespec;
+    struct stat st;
+
+    while (try_again) {
+	try_again = false;
+	if (stat(actual_filespec.c_str(), &st) == 0) {
+	    // If it's a directory, then we emulate what apache
+	    // does, which is to load the index.html file in that
+	    // directry if it exists.
+	    if (S_ISDIR(st.st_mode)) {
+		log_msg("%s is a directory\n", actual_filespec.c_str());
+		if (actual_filespec[actual_filespec.size()-1] != '/') {
+		    actual_filespec += '/';
+		}
+		actual_filespec += "index.html";
+		try_again = true;
+		continue;
+	    } else { 		// not a directory
+		log_msg("%s is not a directory\n", actual_filespec.c_str());
+		string::size_type pos;
+		pos = filespec.rfind(".");
+		if (pos != string::npos) {
+		    string suffix = filespec.substr(pos, filespec.size());
+		    if (suffix == "html") {
+			_filetype = HTML;
+			log_msg("HTML content found");
+		    }
+		    if (suffix == "swf") {
+			_filetype = SWF;
+			log_msg("SWF content found");
+		    }
+		    if (suffix == "flv") {
+			_filetype = VIDEO;
+			log_msg("FLV content found");
+		    }
+		    if (suffix == "mp3") {
+			_filetype = AUDIO;
+			log_msg("MP3 content found");
+		    }
+		}
+	    }
+	} // end of stat()
+    } // end of try_waiting
 }
 
 void

@@ -24,9 +24,6 @@
 #endif
 
 #include "network.h"
-
-#include <boost/date_time/posix_time/posix_time.hpp> //include all types plus i/o
-
 #include <string>
 #include <map>
 
@@ -100,6 +97,15 @@ public:
         const char *code;
         const char *msg;
     };
+    typedef enum {
+	NONE,
+	HTML,
+	SWF,
+	VIDEO,
+	AUDIO,
+	MP3,
+	OSCP
+    } filetype_e;
     HTTP();
     ~HTTP();
     std::string waitForGetRequest();
@@ -122,10 +128,41 @@ public:
     std::string extractCharset(const char *data);
     std::string extractEncoding(const char *data);
     std::string extractTE(const char *data);
+
+    // These methods add data to the fields in the HTTP header.
+    bool clearHeader() { _header.str(""); };
+    bool formatHeader(int filesize, const short type);
+    bool formatHeader(const short type);
+    bool formatRequest(const char *url, http_method_e req);
+    bool formatMethod(const char *data);
+    bool formatDate();
+    bool formatReferer(const char *data);
+    bool formatConnection(const char *data);
+    bool formatContentLength(int filesize);
+    bool formatContentType();
+    bool formatContentType(filetype_e type);
+    bool formatHost(const char *data);
+    bool formatAgent(const char *data);
+    bool formatLanguage(const char *data);
+    bool formatCharset(const char *data);
+    bool formatEncoding(const char *data);
+    bool formatTE(const char *data);
+
     bool keepAlive(const char *data);
     bool keepAlive();
+
+    // All HTTP messages are terminated with a blank line
+    void terminateHeader() { _header << std::endl; };
+    
+    // Return the header that's been built up.
+    std::string getHeader() { return _header.str(); };
+
+    // Get the file type, so we know how to set the
+    // Content-type in the header.
+    filetype_e getFileType(std::string filespec);
     void dump();
 private:
+    filetype_e  _filetype;
     std::string _filespec;
     std::string _url;
     std::map<int, struct status_codes *> _status_codes;
@@ -134,11 +171,13 @@ private:
     std::string _referer;
     std::string _connection;
     std::string _host;
+    int         _port;
     std::string _agent;
     std::string _language;
     std::string _charset;
     std::string _encoding;
     std::string _te;
+    std::stringstream _header;
 };  
     
 } // end of cygnal namespace

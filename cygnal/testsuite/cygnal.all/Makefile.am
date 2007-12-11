@@ -20,23 +20,11 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
-SUBDIRS = \
-	. \
-	testsuite
-
-#DIST_SUBDIRS  = ACT IO HTTP Net unit_tests 
-
 AM_CPPFLAGS = # -Wall
 
-## WARNING: make sure GLIB_LIBS appears first
-## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_LDFLAGS = \
-	../libbase/libgnashbase.la \
-	../libamf/libgnashamf.la \
-	$(LIBLTDL) \
-	$(GLIB_LIBS) \
-	$(LIBXML_LIBS) \
-	$(CURL_LIBS) \
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(top_builddir)/libamf/libgnashamf.la \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS)
 
@@ -46,38 +34,36 @@ INCLUDES = -I.. \
         -I$(top_srcdir)	\
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/server \
+        -I$(top_srcdir)/cygnal \
         -DLOCALEDIR=\"$(localedir)\" \
-        $(LIBXML_CFLAGS) \
-	$(DMALLOC_CFLAGS) \
-	$(CURL_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(PTHREAD_CFLAGS)
 
-bin_PROGRAMS = cygnal
-
-cygnal_SOURCES = \
-	cygnal.cpp \
-	http.cpp \
-	alloc.cpp \
-	netstats.cpp \
-	stream.cpp \
-	statistics.cpp
-#	transcode.cpp
-#	flash.cpp
-
-noinst_HEADERS = \
-	http.h \
-	netstats.h \
-	stream.h \
-	statistics.h
-#	transcode.h
-#	flash.h
-
-#	protocol.cpp protocol.h
-cygnal_LDADD = $(AM_LDFLAGS)
-
+check_PROGRAMS = test_http
+test_http_SOURCES = test_http.cpp ../../http.o
+test_http_LDADD = $(AM_LDFLAGS) ../../http.o
+test_http_DEPENDENCIES = site-update
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
 	@echo "Rebuilding with GCC Mudflap support"
 	$(MAKE) CXXFLAGS="$(CXXFLAGS) $(MUDFLAP_OPT)" LIBS="$(LIBS) $(MUDFLAP_LIB)"
+
+TEST_DRIVERS = ../simple.exp
+
+check-DEJAGNU: site-update
+	@runtest=$(RUNTEST); \
+	if $(SHELL) -c "$$runtest --version" > /dev/null 2>&1; then \
+	  $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); true; \
+	else \
+	  echo "WARNING: could not find \`runtest'" 1>&2; \
+	  for i in "$(check_PROGRAMS)"; do \
+	    $(SHELL) $$i; \
+	  done; \
+	fi
+
+site-update: site.exp
+	@rm -fr site.exp.bak
+	@cp site.exp site.exp.bak
+	@sed -e '/testcases/d' site.exp.bak > site.exp
+	@echo "# This is a list of the pre-compiled testcases" >> site.exp
+	@echo "set testcases \"$(check_PROGRAMS)\"" >> site.exp

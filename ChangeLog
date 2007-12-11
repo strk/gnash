@@ -1,4 +1,34 @@
+2007-12-10  Rob Savoye  <rob@ute.welcomehome.org>
+
+	* cygnal/cygnal.cpp: Use a cygnal-dbg.log file instead of
+	gnash-dbg.log. Use boost bind variables for all threads.
+	* cygnal/http.{cpp,h}: Add methods for encoding HTTP header
+	fields. Use a real date, instead of the bogus one. Check the file
+	types to set the Content-Type HTTP field correctly.
+	* cygnal/stream.cpp: Comment out lotsa debug messages.
+	* cygnal/Makefile.am: Drop DIST_SUBDIRS, they don't compile
+	for anything but win32 anyway. Add testsuite directory.
+	* cygnal/testsuite: New testsuite directory. It's here rather than
+	in gnash/testsuite since these tests are very different from
+
+	ones gnash needs for most things.
+	* cygnal/testsuite/Makefile.am: New Makefile for Cygnal test
+	directories.
+	* cygnal/testsuite/cygnal.all: Cygnal specific test cases live
+	here.
+	* cygnal/testsuite/cygnal.all/Makefile.am: Build the test cases
+	and run DejaGnu on them.
+	* cygnal/testsuite/cygnal.all/test_http.cpp: Test case for HTTP
+	protocol.
+	* configure.ac: Add new cygnal/testsuite Makefiles.
+	* cygnal/testsuite/simpe.exp: clone the one used currently for
+	Gnash testing.
+
 2007-12-10 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Makefile.am: fix abs_mediadir to
+	  contain quotes. Prior version failed building XML-*.swf files,
+	  dunno if this patch breaks POSIX compatibility.
 
 	* utilities/processor.cpp: check for quit request right
 	  after calling movie_root::setRootMovie, as that would

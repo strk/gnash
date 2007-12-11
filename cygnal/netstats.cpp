@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: netstats.cpp,v 1.7 2007/07/01 10:53:50 bjacques Exp $ */
+/* $Id: netstats.cpp,v 1.8 2007/12/11 03:23:02 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -31,25 +31,29 @@ using namespace boost::posix_time;
 
 namespace cygnal {
 
-NetStats::NetStats() {
-    GNASH_REPORT_FUNCTION;
+NetStats::NetStats()
+{
+//    GNASH_REPORT_FUNCTION;
 }
 
-NetStats::~NetStats() {
-    GNASH_REPORT_FUNCTION;    
+NetStats::~NetStats()
+{
+//    GNASH_REPORT_FUNCTION;    
 }
 
 boost::posix_time::ptime
-NetStats::startClock() {
-    GNASH_REPORT_FUNCTION;
+NetStats::startClock()
+{
+//    GNASH_REPORT_FUNCTION;
 
     _starttime = boost::posix_time::microsec_clock::local_time();
     return _stoptime;
 }
 
 boost::posix_time::ptime
-NetStats::stopClock() {
-    GNASH_REPORT_FUNCTION;
+NetStats::stopClock()
+{
+//    GNASH_REPORT_FUNCTION;
     
     _stoptime = boost::posix_time::microsec_clock::local_time();
     return _stoptime;
