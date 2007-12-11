@@ -99,8 +99,14 @@ function_ctor(const fn_call& /* fn */)
 as_function::as_function()
 	:
 	// all functions inherit from global Function class
-	as_object(getFunctionPrototype())
+	//as_object(getFunctionPrototype())
+	as_object()
 {
+	if ( VM::get().getSWFVersion() > 5 )
+	{
+		init_member(NSV::PROP_uuPROTOuu, as_value(getFunctionPrototype()));
+	}
+
 	as_object* iface = new as_object(getObjectInterface());
 	iface->init_member("constructor", this); 
 	init_member("prototype", as_value(iface));
@@ -111,8 +117,14 @@ as_function::as_function()
 as_function::as_function(as_object* iface)
 	:
 	// all functions inherit from global Function class
-	as_object(getFunctionPrototype())
+	//as_object(getFunctionPrototype())
+	as_object()
 {
+	if ( VM::get().getSWFVersion() > 5 )
+	{
+		init_member(NSV::PROP_uuPROTOuu, as_value(getFunctionPrototype()));
+	}
+
 	if ( iface )
 	{
 		iface->init_member("constructor", this); 

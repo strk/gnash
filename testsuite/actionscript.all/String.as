@@ -16,17 +16,13 @@
 
 // Original author: Mike Carlson - June 19th, 2006
 
-rcsid="$Id: String.as,v 1.29 2007/12/11 11:34:58 strk Exp $";
+rcsid="$Id: String.as,v 1.30 2007/12/11 19:23:50 strk Exp $";
 
 #include "check.as"
 
 check_equals(typeof(String), 'function');
 check_equals(typeof(String.prototype), 'object');
-#if OUTPUT_VERSION > 5
- check_equals(String.__proto__, Function.prototype); // both undefined in swf5
-#else
- xcheck_equals(String.__proto__, Function.prototype); // gnash fails 
-#endif
+check_equals(String.__proto__, Function.prototype); // both undefined in swf5
 check_equals(typeof(String.prototype.valueOf), 'function');
 check_equals(typeof(String.prototype.toString), 'function');
 check_equals(typeof(String.prototype.toUpperCase), 'function');
@@ -45,8 +41,8 @@ check_equals(typeof(String.prototype.fromCharCode), 'undefined');
  check_equals(typeof(String.valueOf), 'function');
  check_equals(typeof(String.toString), 'function');
 #else
- xcheck_equals(typeof(String.valueOf), 'undefined');
- xcheck_equals(typeof(String.toString), 'undefined');
+ check_equals(typeof(String.valueOf), 'undefined');
+ check_equals(typeof(String.toString), 'undefined');
 #endif
 check_equals(typeof(String.toUpperCase), 'undefined');
 check_equals(typeof(String.toLowerCase), 'undefined');

@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.59 2007/11/28 12:23:47 strk Exp $";
+rcsid="$Id: Function.as,v 1.60 2007/12/11 19:23:50 strk Exp $";
 
 #include "check.as"
 
@@ -475,7 +475,7 @@ check(!Function.prototype.hasOwnProperty('toString'));
 check(Object.prototype.hasOwnProperty('toString'));
 check_equals(textOutFunc.toString, Object.prototype.toString);
 #else
-xcheck_equals(typeof(textOutFunc.toString), 'undefined');
+check_equals(typeof(textOutFunc.toString), 'undefined');
 #endif
 textOutFunc.toString = function() { return "custom text rep"; };
 #if OUTPUT_VERSION >= 6
@@ -575,7 +575,7 @@ check_equals(typeof(Email.prototype.__constructor__), 'undefined');
 // tells us so
 #if OUTPUT_VERSION == 5
 // Function is supported in SWF6 and above
-xcheck_equals(Email.constructor.toString(), undefined);
+check_equals(Email.constructor.toString(), undefined);
 check_equals(Function, undefined);
 #endif
 check_equals(typeof(Email.constructor), 'function');

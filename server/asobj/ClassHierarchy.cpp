@@ -250,7 +250,7 @@ static ClassHierarchy::nativeClass knownClasses[] =
 	{ xmlnode_class_init, NSV::CLASS_X_M_L_NODE, NSV::CLASS_OBJECT, NSV::NS_FLASH_XML, 5 },
 	{ mouse_class_init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 5 },
 	{ number_class_init, NSV::CLASS_NUMBER, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-	{ string_class_init, NSV::CLASS_STRING, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
+//	{ string_class_init, NSV::CLASS_STRING, NSV::CLASS_OBJECT, NS_GLOBAL, 5 }, // string is special
 	{ key_class_init, NSV::CLASS_KEY, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ AsBroadcaster_init, NSV::CLASS_AS_BROADCASTER, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ textsnapshot_class_init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 6 },
