@@ -30,8 +30,6 @@
 
 #include "check.as"
 
-#if OUTPUT_VERSION <= 6
-
 // Number of random numbers to generate.
 var max = 1000;
 
@@ -43,11 +41,13 @@ including n.
 */
 
 // With n = integer (how it should be used...)
-var tally = array();
+var tally = new Array();
 
-for (i = 0; i < max; i++)
+for (var i = 0; i < max; i++)
 {
-	tally[random(4)] += 1;
+	rnd = random(4);
+	if (typeof(tally[rnd]) == "undefined") { tally[rnd] = 0; }
+	tally[rnd] += 1;
 }
 
 // Check proportion of each number exceeds 10%; should be about
@@ -61,10 +61,12 @@ check_equals(typeof(tally[4]), "undefined"); // Should not exist
 
 // With n = non-integer
 
-var tally = array();
-for (i = 0; i < max; i++)
+var tally = new Array();
+for (var i = 0; i < max; i++)
 {
-	tally[random(4.5)] += 1;
+	rnd = random(4.5);
+	if (typeof(tally[rnd]) == "undefined") { tally[rnd] = 0; }
+	tally[rnd] += 1;
 }
 
 // Check proportion of each number exceeds 10%; should be about
@@ -78,10 +80,12 @@ check_equals(typeof(tally[4]), "undefined"); // Should not exist
 
 // With n = negative number
 
-var tally = array();
-for (i = 0; i < max / 5; i++)
+var tally = new Array();
+for (var i = 0; i < max / 5; i++)
 {
-	tally[random(-1)] += 1;
+	rnd = random(-1);
+	if (typeof(tally[rnd]) == "undefined") { tally[rnd] = 0; }
+	tally[rnd] += 1;
 }
 
 check_equals (tally[0], max / 5 );
@@ -97,11 +101,12 @@ Returns double n where 0 <= n < 1.
 
 
 // Note: test also relies on Math.round()!
-var tally = array();
+var tally = new Array();
 
 for (i = 0; i < max; i++)
 {
 	rnd = Math.round(Math.random() * 10 + 0.5);
+	if (typeof(tally[rnd]) == "undefined") { tally[rnd] = 0; }
 	tally[rnd] += 1;
 }
 
@@ -143,6 +148,3 @@ note(tally[11]);
 
 /* End of tests */
 check_totals(24);
-totals();
-
-#endif // OUTPUT_VERSION <= 6
