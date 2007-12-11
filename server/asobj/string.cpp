@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.47 2007/12/11 11:34:58 strk Exp $ */
+/* $Id: string.cpp,v 1.48 2007/12/11 11:38:40 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -89,10 +89,12 @@ attachStringInterface(as_object& o)
 	o.init_member("toString", vm.getNative(251, 2));
 
 	// ASnative(251, 3) - [String.prototype] toUpperCase
+	// TODO: register as ASnative(102, 0) for SWF5 ?
 	vm.registerNative(string_to_upper_case, 251, 3);
 	o.init_member("toUpperCase", vm.getNative(251, 3));
 
 	// ASnative(251, 4) - [String.prototype] toLowerCase
+	// TODO: register as ASnative(102, 1) for SWF5 ?
 	vm.registerNative(string_to_lower_case, 251, 4);
 	o.init_member("toLowerCase", vm.getNative(251, 4));
 
@@ -654,6 +656,8 @@ void string_class_init(as_object& global)
     boost::intrusive_ptr<builtin_function> cl = getStringConstructor();
 
     // Register _global.String
+    // TODO: register as ASnative(251, 0)
+    // TODO: register as ASnative(3, 0) for SWF5 ?
     global.init_member("String", cl.get());
 }
 
