@@ -30,6 +30,8 @@
 
 #include "check.as"
 
+#if OUTPUT_VERSION <= 6
+
 // Number of random numbers to generate.
 var max = 1000;
 
@@ -142,3 +144,5 @@ note(tally[11]);
 /* End of tests */
 check_totals(24);
 totals();
+
+#endif // OUTPUT_VERSION <= 6
