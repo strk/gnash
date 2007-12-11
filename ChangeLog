@@ -1,5 +1,12 @@
 2007-12-11 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/string.cpp: fix slice, register native functions,
+	  fix static vs. prototoype methods.
+	* testsuite/actionscript.all/String.as: add more tests
+	* testsuite/swfdec/PASSING: String.slice tests pass.
+
+2007-12-11 Sandro Santilli <strk@keybit.net>
+
 	* server/swf/tag_loaders.cpp (sound_stream_head_loader): tolerate
 	  lack of a 'latency' field in MP3 stream. Fixes bug #21729.
 	  Note that Ming also reports the file to have the same problem

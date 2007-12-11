@@ -16,12 +16,71 @@
 
 // Original author: Mike Carlson - June 19th, 2006
 
-rcsid="$Id: String.as,v 1.28 2007/12/02 09:15:55 strk Exp $";
+rcsid="$Id: String.as,v 1.29 2007/12/11 11:34:58 strk Exp $";
 
 #include "check.as"
 
-// Gnash fails this always returning an object when String 
-// constructor is invoked.
+check_equals(typeof(String), 'function');
+check_equals(typeof(String.prototype), 'object');
+#if OUTPUT_VERSION > 5
+ check_equals(String.__proto__, Function.prototype); // both undefined in swf5
+#else
+ xcheck_equals(String.__proto__, Function.prototype); // gnash fails 
+#endif
+check_equals(typeof(String.prototype.valueOf), 'function');
+check_equals(typeof(String.prototype.toString), 'function');
+check_equals(typeof(String.prototype.toUpperCase), 'function');
+check_equals(typeof(String.prototype.toLowerCase), 'function');
+check_equals(typeof(String.prototype.charAt), 'function');
+check_equals(typeof(String.prototype.charCodeAt), 'function');
+check_equals(typeof(String.prototype.concat), 'function');
+check_equals(typeof(String.prototype.indexOf), 'function');
+check_equals(typeof(String.prototype.lastIndexOf), 'function');
+check_equals(typeof(String.prototype.slice), 'function');
+check_equals(typeof(String.prototype.substring), 'function');
+check_equals(typeof(String.prototype.split), 'function');
+check_equals(typeof(String.prototype.substr), 'function');
+check_equals(typeof(String.prototype.fromCharCode), 'undefined');
+#if OUTPUT_VERSION > 5
+ check_equals(typeof(String.valueOf), 'function');
+ check_equals(typeof(String.toString), 'function');
+#else
+ xcheck_equals(typeof(String.valueOf), 'undefined');
+ xcheck_equals(typeof(String.toString), 'undefined');
+#endif
+check_equals(typeof(String.toUpperCase), 'undefined');
+check_equals(typeof(String.toLowerCase), 'undefined');
+check_equals(typeof(String.charAt), 'undefined');
+check_equals(typeof(String.charCodeAt), 'undefined');
+check_equals(typeof(String.concat), 'undefined');
+check_equals(typeof(String.indexOf), 'undefined');
+check_equals(typeof(String.lastIndexOf), 'undefined');
+check_equals(typeof(String.slice), 'undefined');
+check_equals(typeof(String.substring), 'undefined');
+check_equals(typeof(String.split), 'undefined');
+check_equals(typeof(String.substr), 'undefined');
+check_equals(typeof(String.fromCharCode), 'function');
+
+#if OUTPUT_VERSION > 5
+check(String.hasOwnProperty('fromCharCode'));
+check(!String.hasOwnProperty('toString'));
+check(!String.hasOwnProperty('valueOf'));
+check(String.prototype.hasOwnProperty('valueOf'));
+check(String.prototype.hasOwnProperty('toString'));
+check(String.prototype.hasOwnProperty('toUpperCase'));
+check(String.prototype.hasOwnProperty('toLowerCase'));
+check(String.prototype.hasOwnProperty('charAt'));
+check(String.prototype.hasOwnProperty('charCodeAt'));
+check(String.prototype.hasOwnProperty('concat'));
+check(String.prototype.hasOwnProperty('indexOf'));
+check(String.prototype.hasOwnProperty('lastIndexOf'));
+check(String.prototype.hasOwnProperty('slice'));
+check(String.prototype.hasOwnProperty('substring'));
+check(String.prototype.hasOwnProperty('split'));
+check(String.prototype.hasOwnProperty('substr'));
+#endif
+
+
 check_equals(typeof(String()), 'string');
 
 var a;
@@ -42,7 +101,9 @@ check_equals ( a.lastIndexOf("lawa"), 8);
 
 //----------------------------------------
 // Check String.indexOf
+// TODO: test with ASnative(251,8)
 //-----------------------------------------
+
 
 // wallawallawashinGTON
 check_equals ( a.indexOf("lawa"), 3 );
@@ -69,6 +130,7 @@ check_equals ( a.indexOf(o2, o), 4 );
 
 //----------------------------------------
 // Check String.split
+// TODO: test with ASnative(251,12)
 //-----------------------------------------
 
 check_equals ( typeof(a.split), 'function' );
@@ -138,6 +200,7 @@ check_equals(ret[0], 'abcde');
 
 //----------------------------------------
 // Check String.fromCharCode
+// TODO: test with ASnative(251,14)
 //-----------------------------------------
 
 
@@ -147,13 +210,15 @@ check_equals ( b, "abcd" );
 
 //-------------------------------------------
 // Check String.toUpperCase and toLowerCase
+// TODO: test with ASnative(251,3)
 //-------------------------------------------
 
 check_equals ( a.toUpperCase(), "WALLAWALLAWASHINGTON" );
 check_equals ( a.toLowerCase(), "wallawallawashington" );
 
 //-------------------------------------------
-// Check substr / slice / substring
+// Check substr 
+// TODO: test with ASnative(251,13)
 //-------------------------------------------
 
 a = new String("abcdefghijklmnopqrstuvwxyz");
@@ -162,7 +227,25 @@ check_equals ( a.substr(5,7), "fghijkl" );
 check_equals ( a.substr(-1,1), "z" );
 check_equals ( a.substr(-2,3), "yz" );
 check_equals ( a.substr(-3,2), "xy" );
+var b = new String("1234");
+check_equals ( b.substr(3, 6), "4");
+
+//-------------------------------------------
+// Check slice 
+// TODO: test with ASnative(251,10)
+//-------------------------------------------
+
+a = new String("abcdefghijklmnopqrstuvwxyz");
 check_equals ( a.slice(-5,-3), "vw" );
+check_equals ( typeof(a.slice()), "undefined" );
+check_equals ( typeof(a.slice(-5,3)), "string" );
+check_equals ( a.slice(-5,3), "" );
+check_equals ( typeof(a.slice(-10,22)), "string" );
+check_equals ( a.slice(-10,22), "qrstuv" );
+check_equals ( a.slice(0,0), "" );
+check_equals ( a.slice(0,1), "a" );
+check_equals ( a.slice(1,1), "" );
+check_equals ( a.slice(1,2), "b" );
 #if OUTPUT_VERSION > 5
 check_equals ( a.slice.call(a, -5, -3), "vw" );
 check_equals ( String.prototype.slice.call(a, -5, -3), "vw" );
@@ -173,14 +256,22 @@ check_equals ( a.slice.call(a, -5, -3), undefined );
 check_equals ( String.prototype.slice.call(a, -5, -3), undefined );
 #endif
 check_equals ( a.slice(-4), "wxyz" );
+
+//-------------------------------------------
+// Check substring
+// TODO: test with ASnative(251,11)
+//-------------------------------------------
+
+a = new String("abcdefghijklmnopqrstuvwxyz");
 check_equals ( a.substring(5,2), "cde" );
 check_equals ( a.substring(5,7), "fg" );
 check_equals ( a.substring(3,3), "" );
+
 check_equals ( a.length, 26 );
 check_equals ( a.concat("sir ","william",15), "abcdefghijklmnopqrstuvwxyzsir william15");
+
 var b = new String("1234");
 check_equals ( b.substring(3, 6), "4");
-check_equals ( b.substr(3, 6), "4");
 
 // see check.as
 #ifdef MING_SUPPORTS_ASM
@@ -371,7 +462,7 @@ Object.prototype.toString = ObjectProtoToStringBackup;
 String.prototype.toString = StringProtoToStringBackup;
 
 #if OUTPUT_VERSION < 6
- check_totals(130);
+ check_totals(170);
 #else
- check_totals(135);
+ check_totals(191);
 #endif

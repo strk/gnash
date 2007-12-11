@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.46 2007/12/04 11:45:31 strk Exp $ */
+/* $Id: string.cpp,v 1.47 2007/12/11 11:34:58 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -76,24 +76,65 @@ static as_value string_ctor(const fn_call& fn);
 static void
 attachStringInterface(as_object& o)
 {
-    // TODO fill in the rest
-    o.init_member("concat", new builtin_function(string_concat));
-    o.init_member("slice", new builtin_function(string_slice));
-    o.init_member("split", new builtin_function(string_split));
-    o.init_member("lastIndexOf", new builtin_function(string_last_index_of));
-    o.init_member("substr", new builtin_function(string_sub_str));
-    o.init_member("substring", new builtin_function(string_sub_string));
-    o.init_member("indexOf", new builtin_function(string_index_of));
-    o.init_member("toString", new builtin_function(string_to_string));
-    o.init_member("fromCharCode", new builtin_function(string_from_char_code));
-    o.init_member("charAt", new builtin_function(string_char_at));
-    o.init_member("charCodeAt", new builtin_function(string_char_code_at));
-    o.init_member("toUpperCase", new builtin_function(string_to_upper_case));
-    o.init_member("toLowerCase", new builtin_function(string_to_lower_case));
-    o.init_member("valueOf", new builtin_function(as_object::tostring_method));
+	VM& vm = o.getVM();
 
-    boost::intrusive_ptr<builtin_function> length_getter(new builtin_function(string_get_length));
-    o.init_readonly_property("length", *length_getter);
+	// TODO fill in the rest
+
+	// ASnative(251, 1) - [String.prototype] valueOf
+	vm.registerNative(as_object::tostring_method, 251, 1);
+	o.init_member("valueOf", vm.getNative(251, 1));
+
+	// ASnative(251, 2) - [String.prototype] toString
+	vm.registerNative(string_to_string, 251, 2);
+	o.init_member("toString", vm.getNative(251, 2));
+
+	// ASnative(251, 3) - [String.prototype] toUpperCase
+	vm.registerNative(string_to_upper_case, 251, 3);
+	o.init_member("toUpperCase", vm.getNative(251, 3));
+
+	// ASnative(251, 4) - [String.prototype] toLowerCase
+	vm.registerNative(string_to_lower_case, 251, 4);
+	o.init_member("toLowerCase", vm.getNative(251, 4));
+
+	// ASnative(251, 5) - [String.prototype] charAt
+	vm.registerNative(string_char_at, 251, 5);
+	o.init_member("charAt", vm.getNative(251, 5));
+
+	// ASnative(251, 6) - [String.prototype] charCodeAt
+	vm.registerNative(string_char_code_at, 251, 6);
+	o.init_member("charCodeAt", vm.getNative(251, 6));
+
+	// ASnative(251, 7) - [String.prototype] concat
+	vm.registerNative(string_concat, 251, 7);
+	o.init_member("concat", vm.getNative(251, 7));
+
+	// ASnative(251, 8) - [String.prototype] indexOf
+	vm.registerNative(string_index_of, 251, 8);
+	o.init_member("indexOf", vm.getNative(251, 8));
+
+	// ASnative(251, 9) - [String.prototype] lastIndexOf
+	vm.registerNative(string_last_index_of, 251, 9);
+	o.init_member("lastIndexOf", vm.getNative(251, 9));
+
+	// ASnative(251, 10) - [String.prototype] slice
+	vm.registerNative(string_slice, 251, 10);
+	o.init_member("slice", vm.getNative(251, 10));
+
+	// ASnative(251, 11) - [String.prototype] substring
+	vm.registerNative(string_sub_string, 251, 11);
+	o.init_member("substring", vm.getNative(251, 11));
+
+	// ASnative(251, 12) - [String.prototype] split
+	vm.registerNative(string_split, 251, 12);
+	o.init_member("split", vm.getNative(251, 12));
+
+	// ASnative(251, 13) - [String.prototype] substr
+	vm.registerNative(string_sub_str, 251, 13);
+	o.init_member("substr", vm.getNative(251, 13));
+
+	// This isn't advertised as native, so might be a proper property ?
+	boost::intrusive_ptr<builtin_function> length_getter(new builtin_function(string_get_length));
+	o.init_readonly_property("length", *length_getter);
 
 }
 
@@ -171,7 +212,7 @@ string_concat(const fn_call& fn)
 
 
 static size_t
-valid_index(std::string subject, int index)
+valid_index(const std::string& subject, int index)
 {
     int myIndex = index;
 
@@ -193,28 +234,29 @@ string_slice(const fn_call& fn)
     // Make a copy.
     std::string str = obj->str();
 
-    ENSURE_FN_ARGS(1, 2, str);
+    ENSURE_FN_ARGS(1, 2, as_value());
 
-    int start = fn.arg(0).to_number<int>();
+    size_t start = valid_index(str, fn.arg(0).to_int());
 
-    int end = str.size();
+    size_t len = str.length();
 
-    if (fn.nargs >= 2) {
-        end = fn.arg(1).to_number<int>();
+    size_t end = len;
+    if (fn.nargs >= 2)
+    {
+    	end = valid_index(str, fn.arg(1).to_int());
 
-        if (end < start) {
-            // Swap start and end like substring
-            std::swap(start, end);
-        }
+    } 
 
-        start = valid_index(str, start);
-
-        end = valid_index(str, end) - start ;
-    } else {
-        start = valid_index(str, start);
+    if (end < start) // move out of if ?
+    {
+            return as_value("");
     }
 
-    return as_value(str.substr(start, end));
+    size_t retlen = end-start;
+
+    log_msg("start:%d, end:%d, retlen:%d", start, end, retlen);
+
+    return as_value(str.substr(start, retlen));
 }
 
 static as_value
@@ -591,12 +633,14 @@ getStringConstructor()
 
     if ( cl == NULL )
     {
-        cl=new builtin_function(&string_ctor, getStringInterface());
-	VM::get().addStatic(cl.get());
+	VM& vm = VM::get();
 
-        // replicate all interface to class, to be able to access
-        // all methods as static functions
-        attachStringInterface(*cl);
+        cl=new builtin_function(&string_ctor, getStringInterface());
+	vm.addStatic(cl.get());
+
+	// ASnative(251, 14) - [String] fromCharCode 
+	vm.registerNative(string_from_char_code, 251, 14);
+	cl->init_member("fromCharCode", vm.getNative(251, 14)); 
 
     }
 
