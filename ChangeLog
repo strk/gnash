@@ -1,5 +1,7 @@
 2007-12-11 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/DisplayListTag.h: streamline included headers and
+	  forward declarations.
 	* server/impl.cpp (create_jpeg_movie): fix log message format.
 
 2007-12-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>

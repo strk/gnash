@@ -20,7 +20,7 @@
 //
 //
 
-/* $Id: DisplayListTag.h,v 1.7 2007/12/04 11:45:33 strk Exp $ */
+/* $Id: DisplayListTag.h,v 1.8 2007/12/11 15:13:28 strk Exp $ */
 
 #ifndef GNASH_SWF_DISPLAYLISTTAG_H
 #define GNASH_SWF_DISPLAYLISTTAG_H
@@ -30,15 +30,12 @@
 #endif
 
 #include "ControlTag.h" // for inheritance
-#include "swf.h" // for tag_type definition
+//#include "swf.h" // for tag_type definition
 
 
 // Forward declarations
 namespace gnash {
-	class stream;
 	class sprite_instance;
-	class swf_event;
-	class movie_definition;
 }
 
 namespace gnash {
