@@ -1,5 +1,9 @@
 2007-12-10  Rob Savoye  <rob@ute.welcomehome.org>
 
+	* cygnal/testsuite/cygnal.all/test_http.cpp: Add extracing fields
+	from an HTTP header tests to go with the ones that create the same
+	fields.
+
 	* cygnal/cygnal.cpp: Use a cygnal-dbg.log file instead of
 	gnash-dbg.log. Use boost bind variables for all threads.
 	* cygnal/http.{cpp,h}: Add methods for encoding HTTP header
