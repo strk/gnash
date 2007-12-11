@@ -50,10 +50,10 @@ for (i = 0; i < max; i++)
 
 // Check proportion of each number exceeds 10%; should be about
 // 25%.
-check (tally[0] > max / 10);
-check (tally[1] > max / 10);
-check (tally[2] > max / 10);
-check (tally[3] > max / 10);
+check (tally[0] > (max / 10));
+check (tally[1] > (max / 10));
+check (tally[2] > (max / 10));
+check (tally[3] > (max / 10));
 
 check_equals(typeof(tally[4]), "undefined"); // Should not exist
 
@@ -67,10 +67,10 @@ for (i = 0; i < max; i++)
 
 // Check proportion of each number exceeds 10%; should be about
 // 25%.
-check (tally[0] > max / 10);
-check (tally[1] > max / 10);
-check (tally[2] > max / 10);
-check (tally[3] > max / 10);
+check (tally[0] > (max / 10));
+check (tally[1] > (max / 10));
+check (tally[2] > (max / 10));
+check (tally[3] > (max / 10));
 
 check_equals(typeof(tally[4]), "undefined"); // Should not exist
 
@@ -106,34 +106,34 @@ for (i = 0; i < max; i++)
 check_equals(typeof(tally[0]), "undefined"); // Should not exist
 note(tally[0]);
 
-check (tally[1] > max / 20);
+check (tally[1] > (max / 20));
 note(tally[1]);
 
-check (tally[2] > max / 20);
+check (tally[2] > (max / 20));
 note(tally[2]);
 
-check (tally[3] > max / 20);
+check (tally[3] > (max / 20));
 note(tally[3]);
 
-check (tally[4] > max / 20);
+check (tally[4] > (max / 20));
 note(tally[4]);
 
-check (tally[5] > max / 20);
+check (tally[5] > (max / 20));
 note(tally[5]);
 
-check (tally[6] > max / 20);
+check (tally[6] > (max / 20));
 note(tally[6]);
 
-check (tally[7] > max / 20);
+check (tally[7] > (max / 20));
 note(tally[7]);
 
-check (tally[8] > max / 20);
+check (tally[8] > (max / 20));
 note(tally[8]);
 
-check (tally[9] > max / 20);
+check (tally[9] > (max / 20));
 note(tally[9]);
 
-check (tally[10] > max / 20);
+check (tally[10] > (max / 20));
 note(tally[10]);
 
 check_equals(typeof(tally[11]), "undefined"); // Should not exist
