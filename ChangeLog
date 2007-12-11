@@ -1,5 +1,13 @@
 2007-12-11 Sandro Santilli <strk@keybit.net>
 
+	* server/swf_event.h: leave ownership of action_buffer to the 
+	  caller as a single action buffer can be triggered by multiple
+	  system events.
+	* server/swf/PlaceObject2Tag.{cpp,h}: keep ownership of event
+	  action buffers, split PlaceObject2 and PlaceObject3 parser.
+
+2007-12-11 Sandro Santilli <strk@keybit.net>
+
 	* server/swf/DisplayListTag.h: streamline included headers and
 	  forward declarations.
 	* server/impl.cpp (create_jpeg_movie): fix log message format.

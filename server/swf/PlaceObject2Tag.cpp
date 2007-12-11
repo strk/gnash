@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.24 2007/12/04 11:45:33 strk Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.25 2007/12/11 15:33:10 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -117,7 +117,8 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 		}
 
 		// Read the actions for event(s)
-		std::auto_ptr<action_buffer> action(new action_buffer);
+		action_buffer* action = new action_buffer();
+		_actionBuffers.push_back(action); // take ownership
 		action->read(in);
 
 		size_t readlen = action->size();
@@ -191,12 +192,15 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 			);
 		}
 
+		// Aah! same action for multiple events !
 		for (int i = 0, mask = 1; i < total_known_events; i++, mask <<= 1)
 		{
 			if (flags & mask)
 			{
-				std::auto_ptr<swf_event> ev ( new swf_event(s_code_bits[i], action) );
-				//log_action("---- actions for event %s", ev->event().get_function_name().c_str());
+				std::auto_ptr<swf_event> ev ( new swf_event(s_code_bits[i], *action) );
+				IF_VERBOSE_PARSE (
+				log_parse("---- actions for event %s", ev->event().get_function_name().c_str());
+				);
 
 				if (i == 17)	// has KeyPress event
 				{
@@ -211,15 +215,9 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 
 // read SWF::PLACEOBJECT2
 void
-PlaceObject2Tag::readPlaceObject2(stream* in, int movie_version, bool place_2)
+PlaceObject2Tag::readPlaceObject2(stream* in, int movie_version)
 {
 	in->align();
-
-        uint8_t blend_mode = 0;
-        uint8_t bitmask = 0;
-        bool has_bitmap_caching = false;
-        bool has_blend_mode = false;
-        bool has_filters = false;
 
 	bool	has_actions = in->read_bit(); 
 	bool	has_clip_bracket = in->read_bit(); 
@@ -230,17 +228,123 @@ PlaceObject2Tag::readPlaceObject2(stream* in, int movie_version, bool place_2)
 	bool	has_char = in->read_bit(); 
 	bool	flag_move = in->read_bit(); 
 
-        if (!place_2 && movie_version >= 8)
-        {
-            in->read_uint(5); // Ignore on purpose.
-            has_bitmap_caching = in->read_bit(); 
-            has_blend_mode = in->read_bit(); 
-            has_filters = in->read_bit(); 
-        }
-
 	m_depth = in->read_u16()+character::staticDepthOffset;
 
 	if (has_char) m_character_id = in->read_u16();
+
+	if (has_matrix)
+	{
+		m_has_matrix = true;
+		m_matrix.read(in);
+	}
+
+	if (has_cxform)
+	{
+		m_has_cxform = true;
+		m_color_transform.read_rgba(in);
+	}
+
+	if (has_ratio) 
+		m_ratio = in->read_u16();
+	else
+		m_ratio = character::noRatioValue;
+
+	if (has_name) m_name = in->read_string();
+
+	if (has_clip_bracket)
+		m_clip_depth = in->read_u16()+character::staticDepthOffset;
+	else
+		m_clip_depth = character::noClipDepthValue;
+
+	if (has_actions)
+	{
+		readPlaceActions(in, movie_version);
+	}
+
+	if (has_char == true && flag_move == true)
+	{
+		// Remove whatever's at m_depth, and put m_character there.
+		m_place_type = REPLACE;
+	}
+	else if (has_char == false && flag_move == true)
+	{
+		// Moves the object at m_depth to the new location.
+		m_place_type = MOVE;
+	}
+	else if (has_char == true && flag_move == false)
+	{
+		// Put m_character at m_depth.
+		m_place_type = PLACE;
+	}
+        else if (has_char == false && flag_move == false)
+        {
+             m_place_type = REMOVE;
+        }
+
+	IF_VERBOSE_PARSE (
+		log_parse(_("  PLACEOBJECT2: depth = %d (%d)"), m_depth, m_depth-character::staticDepthOffset);
+		if ( has_char ) log_parse(_("  char id = %d"), m_character_id);
+		if ( has_matrix )
+		{
+			log_parse(_("  mat:"));
+			m_matrix.print();
+		}
+		if ( has_cxform )
+		{
+			log_parse(_("  cxform:"));
+			m_color_transform.print();
+		}
+		if ( has_ratio ) log_parse(_("  ratio: %d"), m_ratio);
+		if ( has_name ) log_parse(_("  name = %s"), m_name ? m_name : "<null>");
+		if ( has_clip_bracket ) log_parse(_("  clip_depth = %d (%d)"), m_clip_depth, m_clip_depth-character::staticDepthOffset);
+		log_parse(_(" m_place_type: %d"), m_place_type);
+	);
+
+	//log_msg("place object at depth %i", m_depth);
+}
+
+// read SWF::PLACEOBJECT4
+void
+PlaceObject2Tag::readPlaceObject3(stream* in, int movie_version)
+{
+	in->align();
+
+        uint8_t blend_mode = 0;
+        uint8_t bitmask = 0;
+        bool has_bitmap_caching = false;
+        bool has_blend_mode = false;
+        bool has_filters = false;
+	std::string className;
+
+	bool	has_actions = in->read_bit(); 
+	bool	has_clip_bracket = in->read_bit(); 
+	bool	has_name = in->read_bit();
+	bool	has_ratio = in->read_bit();
+	bool	has_cxform = in->read_bit();
+	bool	has_matrix = in->read_bit(); 
+	bool	has_char = in->read_bit(); 
+	bool	flag_move = in->read_bit(); 
+
+	in->align();
+        in->read_uint(3); // Ignore on purpose.
+	bool    hasImage = in->read_bit();
+	bool    hasClassName = in->read_bit();
+        has_bitmap_caching = in->read_bit(); 
+        has_blend_mode = in->read_bit(); 
+        has_filters = in->read_bit(); 
+
+	m_depth = in->read_u16()+character::staticDepthOffset;
+
+	if (has_char)
+	{
+		m_character_id = in->read_u16();
+	}
+
+	if (hasClassName || (hasImage && has_char) )
+	{
+		log_unimpl("PLACEOBJECT3 with associated class name");
+		in->read_string(className);
+	}
 
 	if (has_matrix)
 	{
@@ -310,7 +414,7 @@ PlaceObject2Tag::readPlaceObject2(stream* in, int movie_version, bool place_2)
         }
 
 	IF_VERBOSE_PARSE (
-		log_parse(_("  PLACEOBJECT2: depth = %d (%d)"), m_depth, m_depth-character::staticDepthOffset);
+		log_parse(_("  PLACEOBJECT3: depth = %d (%d)"), m_depth, m_depth-character::staticDepthOffset);
 		if ( has_char ) log_parse(_("  char id = %d"), m_character_id);
 		if ( has_matrix )
 		{
@@ -324,6 +428,7 @@ PlaceObject2Tag::readPlaceObject2(stream* in, int movie_version, bool place_2)
 		}
 		if ( has_ratio ) log_parse(_("  ratio: %d"), m_ratio);
 		if ( has_name ) log_parse(_("  name = %s"), m_name ? m_name : "<null>");
+		if ( hasClassName ) log_parse(_("  class name = %s"), className.c_str());
 		if ( has_clip_bracket ) log_parse(_("  clip_depth = %d (%d)"), m_clip_depth, m_clip_depth-character::staticDepthOffset);
 		log_parse(_(" m_place_type: %d"), m_place_type);
 	);
@@ -341,9 +446,13 @@ PlaceObject2Tag::read(stream* in, tag_type tag, int movie_version)
 	{
 		readPlaceObject(in);
 	}
+	else if ( tag == SWF::PLACEOBJECT2 )
+	{
+		readPlaceObject2(in, movie_version);
+	}
 	else
 	{
-		readPlaceObject2(in, movie_version, tag == SWF::PLACEOBJECT3 ? false : true);
+		readPlaceObject3(in, movie_version);
 	}
 }
 
@@ -393,10 +502,17 @@ PlaceObject2Tag::execute(sprite_instance* m) const
 PlaceObject2Tag::~PlaceObject2Tag()
 {
 	delete [] m_name;
+
 	m_name = NULL;
+
 	for(size_t i=0; i<m_event_handlers.size(); ++i)
 	{
 		delete m_event_handlers[i];
+	}
+
+	for(size_t i=0; i<_actionBuffers.size(); ++i)
+	{
+		delete _actionBuffers[i];
 	}
 }
 

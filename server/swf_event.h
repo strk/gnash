@@ -1,3 +1,4 @@
+// swf_event.h -- clip events (PlaceObject-defined)
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -42,20 +43,23 @@ class swf_event
 {
 public:
 
-	swf_event(const event_id& ev, std::auto_ptr<action_buffer> buf)
+	swf_event(const event_id& ev, action_buffer& buf)
 		:
 		m_event(ev),
 		m_action_buffer(buf)
 	{
 	}
 
-	swf_event()
+	swf_event(const swf_event& o)
+		:
+		m_event(o.m_event),
+		m_action_buffer(o.m_action_buffer)
 	{
 	}
 
 	const action_buffer& action()
 	{
-		return *m_action_buffer;
+		return m_action_buffer;
 	}
 
 	event_id& event()
@@ -65,16 +69,19 @@ public:
 
 private:
 
-    // NOTE: DO NOT USE THESE AS VALUE TYPES IN AN
-    // std::vector<>!  They cannot be moved!  The private
-    // operator=(const swf_event&) should help guard
-    // against that.
+	/// System event id
+	event_id	m_event;
 
-    event_id	m_event;
-    std::auto_ptr<action_buffer> m_action_buffer;
-    // DON'T USE THESE
-    swf_event(const swf_event& /*s*/) { abort(); }
-    void	operator=(const swf_event& /*s*/) { abort(); }
+	/// Action buffer associated with this event
+	//
+	/// The buffer is externally owned
+	/// (by PlaceObject tag in this design)
+	/// and may be shared between multiple swf_events
+	///
+	action_buffer& m_action_buffer;
+
+	/// Can't assign to an swf_event
+	void	operator=(const swf_event& /*s*/) { abort(); }
 };
 
 

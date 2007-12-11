@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: PlaceObject2Tag.h,v 1.14 2007/12/04 11:45:33 strk Exp $ */
+/* $Id: PlaceObject2Tag.h,v 1.15 2007/12/11 15:33:10 strk Exp $ */
 
 #ifndef GNASH_SWF_PLACEOBJECT2TAG_H
 #define GNASH_SWF_PLACEOBJECT2TAG_H
@@ -40,6 +40,7 @@ namespace gnash {
 	class stream;
 	class sprite_instance;
 	class swf_event;
+	class action_buffer;
 	class movie_definition;
 }
 
@@ -61,6 +62,7 @@ class PlaceObject2Tag : public DisplayListTag
 {
 public:
 
+	typedef std::vector<action_buffer*> ActionBuffers;
 	typedef std::vector<swf_event*> EventHandlers;
 
 	PlaceObject2Tag(const movie_definition& def)
@@ -126,6 +128,8 @@ private:
 
 	const movie_definition& _movie_def;
 
+	ActionBuffers _actionBuffers;
+
 	EventHandlers m_event_handlers;
 
 	// read SWF::PLACEOBJECT 
@@ -134,8 +138,11 @@ private:
 	// read placeObject2 actions
 	void readPlaceActions(stream* in, int movie_version);
 
-	// read SWF::PLACEOBJECT2 or SWF::PLACEOBJECT3
-	void readPlaceObject2(stream* in, int movie_version, bool place_2);
+	// read SWF::PLACEOBJECT2 
+	void readPlaceObject2(stream* in, int movie_version);
+
+	// read SWF::PLACEOBJECT3
+	void readPlaceObject3(stream* in, int movie_version);
 
 };
 
