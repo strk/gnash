@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.162 2007/12/06 13:23:35 bwy Exp $ */
+/* $Id: tag_loaders.cpp,v 1.163 2007/12/11 10:06:01 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1252,11 +1252,25 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
     // 2 bytes here
     unsigned int sampleCount = in->read_u16();
 
+    if ( ! sampleCount )
+    {
+        log_error("No samples advertised for sound stream");
+    }
+
     int latency = 0;
     if (format == media::AUDIO_CODEC_MP3)
     {
-        in->ensureBytes(2);
-        latency = in->read_s16(); // UNUSED !!
+        try
+	{
+                in->ensureBytes(2);
+                latency = in->read_s16(); // UNUSED !!
+        }
+	catch (ParserException& ex)
+	{
+		// See https://savannah.gnu.org/bugs/?21729 for an example 
+		// triggering this.
+		log_swferror("MP3 sound stream lacks a 'latency' field");
+        }
         //garbage = in->read_uint(16);
     }
 

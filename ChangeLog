@@ -1,5 +1,9 @@
 2007-12-11 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp (sound_stream_head_loader): tolerate
+	  lack of a 'latency' field in MP3 stream. Fixes bug #21729.
+	  Note that Ming also reports the file to have the same problem
+	  so it may actually be malformed.
 	* server/parser/shape_character_def.cpp (read): still read an
 	  additional byte even if fill and line bits are zero if we're
 	  reading a morph shape.
