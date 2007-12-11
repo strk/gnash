@@ -87,7 +87,10 @@ public:
       ///	It is allowed to be NULL as long as fn_call is allowed
       ///	a NULL as 'this_ptr' (we might want to change this).
       ///
-      void setInterval(as_function& method, unsigned long ms, boost::intrusive_ptr<as_object> this_ptr);
+      /// @param runOnce
+      /// 	If true the interval will run only once. False if omitted.
+      ///
+      void setInterval(as_function& method, unsigned long ms, boost::intrusive_ptr<as_object> this_ptr, bool runOnce=false);
 
       /// Setup the Timer, enabling it.
       //
@@ -107,8 +110,11 @@ public:
       /// @param args
       /// 	The list of arguments to pass to the function being invoked.
       ///
+      /// @param runOnce
+      /// 	If true the interval will run only once. False if omitted.
+      ///
       void setInterval(as_function& method, unsigned long ms, boost::intrusive_ptr<as_object> this_ptr, 
-		      std::vector<as_value>& args);
+		      std::vector<as_value>& args, bool runOnce=false);
 
       /// Setup the Timer to call a late-evaluated object method, enabling it.
       //
@@ -127,8 +133,11 @@ public:
       /// @param args
       /// 	The list of arguments to pass to the function being invoked.
       ///
+      /// @param runOnce
+      /// 	If true the interval will run only once. False if omitted.
+      ///
       void setInterval(boost::intrusive_ptr<as_object> obj, const std::string& methodName, unsigned long ms, 
-		      std::vector<as_value>& args);
+		      std::vector<as_value>& args, bool runOnce=false);
 
       /// Clear the timer, ready for reuse
       //
@@ -139,11 +148,12 @@ public:
       ///
       void clearInterval();
 
-      /// Return true if interval ticks are passed since last call to start()
+      /// Execute the associated callback if timer expired.
       //
-      /// Always returns false if the timer is cleared.
-      //
-      bool expired();
+      /// If single run is requested the timer is cleared after execution,
+      /// otherwise the timer is reset after that.
+      ///
+      void executeIfExpired();
 
       /// Return true if interval has been cleared.
       //
@@ -155,7 +165,11 @@ public:
       }
 
       /// Execute associated function properly setting up context
-      void operator() ();
+      void execute();
+
+      /// Execute associated function properly setting up context
+      void operator() () { execute(); }
+
       
       /// Arguments list type
       typedef std::vector<as_value> ArgsContainer;
@@ -208,11 +222,14 @@ private:
 
       /// List of arguments
       ArgsContainer _args;
+
+      /// True if the timer should execute only once (for setTimeout)
+      bool _runOnce;
 };
   
   as_value timer_setinterval(const fn_call& fn);
+  as_value timer_settimeout(const fn_call& fn);
   as_value timer_clearinterval(const fn_call& fn);
-  as_value timer_expire(const fn_call& fn);
   
 } // end of namespace gnash
 

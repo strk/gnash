@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: processor.cpp,v 1.76 2007/12/09 21:47:16 strk Exp $ */
+/* $Id: processor.cpp,v 1.77 2007/12/11 00:14:23 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -345,6 +345,11 @@ play_movie(const char* filename)
     std::auto_ptr<movie_instance> mi ( md->create_movie_instance() );
 
     m.setRootMovie( mi.release() );
+    if ( quitrequested )  // setRootMovie would execute actions in first frame
+    {
+        quitrequested = false;
+        return md;
+    }
     
     resetLastAdvanceTimer();
     int	kick_count = 0;

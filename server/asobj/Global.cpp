@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.79 2007/12/03 18:05:07 strk Exp $ */
+/* $Id: Global.cpp,v 1.80 2007/12/11 00:14:23 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -431,6 +431,8 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 	// Defined in timers.h
 	init_member("setInterval", new builtin_function(timer_setinterval));
 	init_member("clearInterval", new builtin_function(timer_clearinterval));
+	init_member("setTimeout", new builtin_function(timer_settimeout));
+	init_member("clearTimeout", new builtin_function(timer_clearinterval));
 
 	ch->setGlobal(this);
 

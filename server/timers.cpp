@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.43 2007/12/10 09:23:48 strk Exp $ */
+/* $Id: timers.cpp,v 1.44 2007/12/11 00:14:23 strk Exp $ */
 
 #include "timers.h"
 #include "as_function.h" // for class as_function
@@ -40,7 +40,8 @@ namespace gnash {
   Timer::Timer() :
       _interval(0),
       _start(std::numeric_limits<unsigned long>::max()),
-      _object(0)
+      _object(0),
+      _runOnce(false)
   {
   }
   
@@ -51,35 +52,38 @@ namespace gnash {
 
   void
   Timer::setInterval(as_function& method, unsigned long ms, boost::intrusive_ptr<as_object> this_ptr, 
-		  std::vector<as_value>& args)
+		  std::vector<as_value>& args, bool runOnce)
   {
     _function = &method;
     _interval = ms; // keep as milliseconds
     //log_msg("_interval milliseconds: %llu", _interval);
     _object = this_ptr;
     _args = args;
+    _runOnce = runOnce;
     start();
   }
 
   void
-  Timer::setInterval(as_function& method, unsigned long ms, boost::intrusive_ptr<as_object> this_ptr)
+  Timer::setInterval(as_function& method, unsigned long ms, boost::intrusive_ptr<as_object> this_ptr, bool runOnce)
   {
     _function = &method;
     _interval = ms; // keep as milliseconds
     //log_msg("_interval milliseconds: %llu", _interval);
     _object = this_ptr;
+    _runOnce = runOnce;
     start();
   }
 
   void
   Timer::setInterval(boost::intrusive_ptr<as_object> this_ptr, const std::string& methodName, unsigned long ms, 
-		  std::vector<as_value>& args)
+		  std::vector<as_value>& args, bool runOnce)
   {
     _object = this_ptr;
     _methodName = methodName;
     _interval = ms; // keep as milliseconds
     //log_msg("_interval milliseconds: %llu", _interval);
     _args = args;
+    _runOnce = runOnce;
     start();
   }
 
@@ -98,8 +102,8 @@ namespace gnash {
   }
   
 
-bool
-Timer::expired()
+void
+Timer::executeIfExpired()
 {
 	if ( _start != std::numeric_limits<unsigned long>::max() )
 	{
@@ -109,11 +113,19 @@ Timer::expired()
 		//cout << "Start is " << _start << " interval is " << _interval << " now is " << now << endl;
 		if (now >= _start + _interval)
 		{
-			// TODO: set _start to save lost time in calling expired ?
-			_start += _interval; // reset the timer
-			//cout << " Expired, reset start to " << _start << endl;
-			//log_msg("Timer expired! \n");
-			return true;
+			execute();
+			if ( _runOnce )
+			{
+				clearInterval();
+			}
+			else
+			{
+				// TODO: set _start to save lost time in calling expired ?
+				_start += _interval; // reset the timer
+				//cout << " Expired, reset start to " << _start << endl;
+				//log_msg("Timer expired! \n");
+				//return true;
+			}
 		}
 	}
 	else
@@ -121,11 +133,11 @@ Timer::expired()
 		log_msg("Timer not enabled!");
 	}
 
-	return false;
+	//return false;
 }
 
 void
-Timer::operator() ()
+Timer::execute()
 {
     //printf("FIXME: %s:\n", __FUNCTION__);
     //log_msg("INTERVAL ID is %d\n", getIntervalID());
@@ -266,6 +278,91 @@ timer_setinterval(const fn_call& fn)
     
     
 	movie_root& root = VM::get().getRoot();
+	int id = root.add_interval_timer(timer);
+	return as_value(id);
+}
+
+// TODO: move to Global.cpp
+as_value
+timer_settimeout(const fn_call& fn)
+{
+	//std::stringstream ss; fn.dump_args(ss);
+	//log_debug("setTimeout(%s)", ss.str().c_str());
+
+	//log_msg("%s: args=%d", __FUNCTION__, fn.nargs);
+    
+	if ( fn.nargs < 2 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss; fn.dump_args(ss);
+			log_aserror("Invalid call to setTimeout(%s) "
+				"- need at least 2 arguments",
+				ss.str().c_str());
+		);
+		return as_value();
+	}
+
+	unsigned timer_arg = 1;
+
+	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+	if ( ! obj )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss; fn.dump_args(ss);
+			log_aserror("Invalid call to setInterval(%s) "
+				"- first argument is not an object or function",
+				ss.str().c_str());
+		);
+		return as_value();
+	}
+
+	std::string methodName;
+
+	// Get interval function
+	boost::intrusive_ptr<as_function> as_func = obj->to_function(); 
+	if ( ! as_func )
+	{
+		methodName = fn.arg(1).to_string();
+		timer_arg = 2;
+	}
+
+
+	if ( fn.nargs < timer_arg+1 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss; fn.dump_args(ss);
+			log_aserror("Invalid call to setTimeout(%s) "
+				"- missing timeout argument",
+				ss.str().c_str());
+		);
+		return as_value();
+	}
+
+	// Get interval time
+	unsigned long ms = static_cast<unsigned long>(fn.arg(timer_arg).to_number());
+	// TODO: check validity of interval time number ?
+
+	// Parse arguments 
+	Timer::ArgsContainer args;
+	for (unsigned i=timer_arg+1; i<fn.nargs; ++i)
+	{
+		args.push_back(fn.arg(i));
+	}
+
+	std::auto_ptr<Timer> timer(new Timer);
+	if ( as_func )
+	{
+		// TODO: 'this_ptr' should be NULL/undefined in this case
+		timer->setInterval(*as_func, ms, fn.this_ptr, args, true);
+	}
+	else
+	{
+		timer->setInterval(obj, methodName, ms, args, true);
+	}
+    
+    
+	movie_root& root = VM::get().getRoot();
+
 	int id = root.add_interval_timer(timer);
 	return as_value(id);
 }

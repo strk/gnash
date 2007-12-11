@@ -261,6 +261,7 @@ load-4.swf:f3cbfe0e2ed88ad664c4aa5e1c0dabfb
 load-5.swf:e2efd27e8813c647072fe7bbe5fecff3
 loadmovie-case-5.swf:a7d492cb23eef08a115d7a667c9b5089
 loadmovie-case-6.swf:e5bc78b62bb2688bd99a57bfec7e4eb1
+loadmovie-case-7.swf:0ce485bdd81c872df4b7327c1d048936
 loadvars-5.swf:378a93e3fc7821a72f61332dcfa6cbf7
 local.swf:12135ef5103f1b0dcc428308511b9c07
 math-constants-5.swf:ca9d0fc66667d7c7863e699367176573
@@ -279,6 +280,7 @@ movieclip-get-swf-version-7.swf:77fd36d2dbdec306c3b4f59e1456419a
 movieclip-get-swf-version-8.swf:5228a59ad74ce8ba27e0fb8a593a2c8d
 movieclip-get-swf-version-8.swf:c79a3ef15927fe63fa9bc66cd6959e55
 movieclip-get-swf-version-load-5.swf:3d7dcf17068a176d72b14ca18b166c21
+movieclip-get-swf-version-load-5.swf:9dce6c61d27b304a590ac0206daee064
 movieclip-set-prototype-5.swf:99235a738d69d9c78fa2bc5d355c6dae
 movieclip-set-prototype-6.swf:bae79ccbb89bb7c11cd1961d2c473022
 movieclip-set-prototype-7.swf:f147fff166cc46cdcda77d5012faddb0
@@ -291,6 +293,8 @@ moviecliploader-constructor-5.swf:fd0fb9a785017456810f06b61c109d35
 moviecliploader-constructor-6.swf:e50f068ebde835d503c43ae1fcaf4371
 moviecliploader-getprogress-5.swf:0d58d1e3762e678c27f38309c34906ec
 moviecliploader-getprogress-6.swf:80231ce07d7197f269532a7d9f920c06
+moviecliploader-unknown-format-5.swf:b28db9ff343a9487fbb90adfc46725b9
+moviecliploader-unknown-format-6.swf:08cab100a05f91617b55f30492ff814d
 name.swf:88260c60778020b3c5610a8fa804b979
 name2.swf:6a0c27c17dd51d4f52276ab675324eff
 names.swf:04f10e23865b40240e7d295967f18ba9
@@ -517,6 +521,10 @@ settarget-tostring-8.swf:44126b78c91c4e5d32a924b741bb4971
 settarget2-tostring-5.swf:66b7402854ca261fc8102c916a3efe6d
 settarget2-tostring-7.swf:cfa9318ea413cc8ebf950902c952a3fd
 settarget2-tostring-8.swf:ca6f5fe29c73ef074a6ad39c0ecfa1d8
+settimeout-clear-self-5.swf:4b87d29d2b95ef3e19b0bd166a663824
+settimeout-clear-self-6.swf:c3af4774a839a83d71900e49ffbd472f
+settimeout-clear-self-7.swf:be3a0acb447f02e06fe2599c020c3aba
+settimeout-clear-self-8.swf:c27de1bb237678e6f9f06c3edb94f243
 setvariable-callback-6.swf:bc09506d6000aaf6f989f9d493272350
 setvariable-callback-7.swf:c9a0c81393da6900bf5281353db99b70
 setvariable-function-5.swf:d2f9d5e1a83833c452d2d752cd2bbf1c
@@ -606,6 +614,7 @@ undefinedtrace-v5.swf:
 undefinedtrace-v6.swf:
 undefinedtrace-v7.swf:
 undefinedtrace-v8.swf:
+unloadmovie-simple-5.swf:3b897f539cb7eb764692def6fcc62853
 with-delete-5.swf:e4db8598315a7f70785e7e96af7f3c3f
 with-delete-6.swf:49de7093280168a4013377eaf7753fa0
 with-delete-7.swf:f7668d30827a77f415ec325f052125c6

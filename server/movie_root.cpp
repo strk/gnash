@@ -1355,11 +1355,7 @@ movie_root::executeTimers()
 		}
 		else
 		{
-			if ( timer->expired() )
-			{
-				//cout << " EXPIRED, start time is now " << timer.getStart() << endl;
-				(*timer)();
-			}
+			timer->executeIfExpired();
 		}
 
 		it = nextIterator;

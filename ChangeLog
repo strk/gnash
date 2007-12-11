@@ -1,5 +1,16 @@
 2007-12-10 Sandro Santilli <strk@keybit.net>
 
+	* utilities/processor.cpp: check for quit request right
+	  after calling movie_root::setRootMovie, as that would
+	  execute actions in first frame.
+	* server/timers.{cpp,h}, server/asobj/Global.cpp: implement
+	  setTimeout/clearTimeout.
+	* testsuite/actionscript.all/Global.as: test existance of
+	  setTiemout/clearTimeout.
+	* testsuite/swfdec/PASSING: setTimeout-related successes.
+
+2007-12-10 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Makefile.am: fix abs_mediadir to contain
 	  quotes. Prior version failed building XML-*.swf files, dunno if this
 	  patch breaks POSIX compatibility.
