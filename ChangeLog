@@ -1,5 +1,6 @@
 2007-12-11 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/PASSING: sync with master git.
 	* server/swf_event.h: leave ownership of action_buffer to the 
 	  caller as a single action buffer can be triggered by multiple
 	  system events.
