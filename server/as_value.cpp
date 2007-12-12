@@ -904,11 +904,14 @@ as_value::equals(const as_value& v) const
 
     }
 
+
+#ifdef GNASH_DEBUG_EQUALITY
 	// Both operands are objects (OBJECT,AS_FUNCTION,MOVIECLIP)
 	if ( ! is_object() || ! v.is_object() )
 	{
-		log_error("Equals(%s,%s)", to_debug_string().c_str(), v.to_debug_string().c_str());
+		log_debug("Equals(%s,%s)", to_debug_string().c_str(), v.to_debug_string().c_str());
 	}
+#endif
 
     // If any of the two converts to a primitive, we recurse
 
