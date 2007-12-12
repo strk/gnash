@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.456 2007/12/12 12:09:01 strk Exp $
+dnl $Id: configure.ac,v 1.457 2007/12/12 12:19:55 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -74,11 +74,11 @@ case "${host}" in
     AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["WIN"], [Default 3-letter platform identifier for version string])
     AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["Windows"], [Default value for System.capabilities.os])
     ;;
-  *-*solaris*
+  *-*solaris*)
     AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["SUN"], [Default 3-letter platform identifier for version string])
     AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["Solaris"], [Default value for System.capabilities.os])
     ;;
-  *-os2*
+  *-os2*)
     AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["OS2"], [Default 3-letter platform identifier for version string])
     AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["OS/2"], [Default value for System.capabilities.os])
     ;;
