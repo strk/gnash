@@ -21,13 +21,14 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Global.as,v 1.37 2007/12/11 00:14:23 strk Exp $";
+rcsid="$Id: Global.as,v 1.38 2007/12/12 14:05:25 strk Exp $";
 
 #include "check.as"
 
 #if OUTPUT_VERSION > 5
-xcheck_equals(typeof(_global.updateAfterEvent), 'function');
+check_equals(typeof(_global.updateAfterEvent), 'function');
 check( ! _global.hasOwnProperty('updateAfterEvent') );
+check( ! _global.__proto__.hasOwnProperty('updateAfterEvent') );
 
 // Check that _global.parseInt is in effect what parseInt resolves to
 check ( parseInt == _global.parseInt );
@@ -46,7 +47,7 @@ check_equals(typeof(_global.toString), 'undefined');
 
 #else
 
-xcheck_equals(typeof(updateAfterEvent), 'function');
+check_equals(typeof(updateAfterEvent), 'function');
 check_equals ( typeof(_global.parseInt), 'undefined' );
 
 #endif
@@ -266,12 +267,12 @@ function set2() { this.s2++; }
 	check_totals(46); // SWF5
 #else
 # if OUTPUT_VERSION == 6
-	check_totals(79); // SWF6
+	check_totals(80); // SWF6
 # else
 #  if OUTPUT_VERSION == 7
-	check_totals(61); // SWF7
+	check_totals(62); // SWF7
 #  else
-	check_totals(48); // SWF8+
+	check_totals(49); // SWF8+
 #  endif
 # endif
 #endif

@@ -1,5 +1,11 @@
 2007-12-12 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Global.cpp: stub updateAfterEvent().
+	* testsuite/actionscript.all/Global.as: one more test for
+	  updateAfterEvent().
+
+2007-12-12 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: define DEFAULT_FLASH_PLATFORM_ID and
 	  DEFAULT_FLASH_SYSTEM_OS based on $host (should likely
 	  be based on $target or something similar, to check

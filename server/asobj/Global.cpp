@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.81 2007/12/11 19:23:50 strk Exp $ */
+/* $Id: Global.cpp,v 1.82 2007/12/12 14:05:25 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -406,6 +406,18 @@ as_global_asnative(const fn_call& fn)
 		
 }
 
+// updateAfterEvent function
+static as_value
+as_global_updateAfterEvent(const fn_call& fn)
+{
+	static bool warned=false;
+	if ( ! warned )
+	{
+		log_unimpl("updateAfterEvent()");
+		warned=true;
+	}
+}
+
 Global::Global(VM& vm, ClassHierarchy *ch)
 	:
 	as_object()
@@ -427,6 +439,7 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 	// ASSetPropFlags
 	init_member("ASSetPropFlags", new builtin_function(as_global_assetpropflags));
 	init_member("ASnative", new builtin_function(as_global_asnative));
+	init_member("updateAfterEvent", new builtin_function(as_global_updateAfterEvent));
 
 	// Defined in timers.h
 	init_member("setInterval", new builtin_function(timer_setinterval));
