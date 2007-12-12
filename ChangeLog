@@ -1,5 +1,7 @@
 2007-12-12 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp (read_jpeg_tables): survive malformed swf
+	  with empty JPEGTABLES tag.
 	* server/swf/tag_loaders.cpp (StreamAdapter::readFunc): don't attempt
 	  to fetch 0 bytes from underlying stream... Fixes bug #21779.
 

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.167 2007/12/12 19:48:27 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.168 2007/12/12 20:29:10 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -113,7 +113,7 @@ class StreamAdapter
 		if ( bytesLeft < (unsigned)bytes )
 		{
 			if ( ! bytesLeft ) return 0;
-			log_debug("Requested to read past end of stream range");
+			//log_debug("Requested to read past end of stream range");
 			bytes = bytesLeft;
 		}
 		unsigned actuallyRead = br->s.read((char*)dst, bytes);
@@ -230,12 +230,23 @@ jpeg_tables_loader(stream* in, tag_type tag, movie_definition* m)
         log_parse(_("  jpeg_tables_loader"));
     );
 
+    unsigned long currPos = in->get_position();
+    unsigned long endPos = in->get_tag_end_position();
+
+    if ( endPos == currPos )
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+        log_swferror(_("No bytes to read in JPEGTABLES tag at offset %lu"), currPos);
+        );
+        return;
+    }
+
     std::auto_ptr<jpeg::input> j_in;
 
     try
     {
-	std::auto_ptr<tu_file> ad( StreamAdapter::getFile(*in, in->get_tag_end_position()) );
-	//  transfer ownerhip to the jpeg::input
+        std::auto_ptr<tu_file> ad( StreamAdapter::getFile(*in, endPos) );
+        //  transfer ownerhip to the jpeg::input
         j_in.reset(jpeg::input::create_swf_jpeg2_header_only(ad.release(), true));
 
     }
