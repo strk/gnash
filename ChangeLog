@@ -1,3 +1,10 @@
+2007-12-12 Sandro Santilli <strk@keybit.net>
+
+	* libmedia/sound_handler.h: add a reset() method to put
+	  the sound handler in starting conditions (for movie restart).
+	* libmedia/gst/sound_handler_{gst,sdl}.{cpp,h}: implement reset()
+	* server/movie_root.cpp (restart): reset sound handler if any.
+
 2007-12-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/asobj/System.cpp: implement language, hasAudio; find os

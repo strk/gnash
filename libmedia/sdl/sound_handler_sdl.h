@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_sdl.h,v 1.8 2007/12/12 10:23:07 zoulunkai Exp $
+// $Id: sound_handler_sdl.h,v 1.9 2007/12/12 18:56:37 strk Exp $
 
 #ifndef SOUND_HANDLER_SDL_H
 #define SOUND_HANDLER_SDL_H
@@ -309,6 +309,9 @@ private:
 	/// Mutex for making sure threads doesn't mess things up
 	boost::mutex _mutex;
 
+	// stop and delete all sounds
+	void delete_all_sounds();
+
 public:
 	SDL_sound_handler();
 	virtual ~SDL_sound_handler();
@@ -329,6 +332,9 @@ public:
 
 	/// This gets called when it's done with a sample.
 	virtual void	delete_sound(int sound_handle);
+
+	// See dox in sound_handler.h
+	virtual void reset();
 
 	/// This will stop all sounds playing.
 	virtual void	stop_all_sounds();

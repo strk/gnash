@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.6 2007/12/12 10:07:00 zoulunkai Exp $ */
+/* $Id: sound_handler.h,v 1.7 2007/12/12 18:56:36 strk Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -338,6 +338,13 @@ public:
 	///	The sound_handlers id for the sound to be deleted
 	///
 	virtual void	delete_sound(int sound_handle) = 0;
+
+	/// gnash calls this when restarting playback from scratch
+	//
+	/// The function should stop all sounds and get ready
+	/// for a "parse from scratch" operation.
+	///
+	virtual void reset() = 0;
 		
 	/// gnash calls this to mute audio
 	virtual void	mute() = 0;

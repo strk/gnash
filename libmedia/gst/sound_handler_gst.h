@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_gst.h,v 1.7 2007/12/12 10:23:06 zoulunkai Exp $
+// $Id: sound_handler_gst.h,v 1.8 2007/12/12 18:56:37 strk Exp $
 
 #ifndef SOUND_HANDLER_GST_H
 #define SOUND_HANDLER_GST_H
@@ -155,6 +155,9 @@ private:
 	/// Mutex for making sure threads doesn't mess things up
 	boost::try_mutex _mutex;
 
+	/// stop and delete all sounds
+	void delete_all_sounds();
+
 public:
 
 	/// Gstreamer callback function
@@ -186,6 +189,9 @@ public:
 
 	/// This will stop all sounds playing.
 	virtual void	stop_all_sounds();
+
+	// See dox in sound_handler.h
+	virtual void reset();
 
 	/// Returns the sound volume level as an integer from 0 to 100. AS-script only.
 	virtual int	get_volume(int sound_handle);

@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.9 2007/12/12 10:23:06 zoulunkai Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.10 2007/12/12 18:56:36 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -61,13 +61,19 @@ GST_sound_handler::GST_sound_handler()
 	gst_init(NULL, NULL);
 }
 
-GST_sound_handler::~GST_sound_handler()
+void
+GST_sound_handler::delete_all_sounds()
 {
-
 	for (size_t i=0, e=m_sound_data.size(); i < e; ++i)  {
 		stop_sound(i);
 		delete_sound(i);
 	}
+	m_sound_data.clear();
+}
+
+GST_sound_handler::~GST_sound_handler()
+{
+	delete_all_sounds();
 }
 
 
@@ -532,6 +538,12 @@ void	GST_sound_handler::stop_all_sounds()
 {
 	for (size_t i=0, e=m_sound_data.size(); i < e; ++i) 
 		stop_sound(i);
+}
+
+void
+GST_sound_handler::reset()
+{
+	stop_all_sounds();
 }
 
 

@@ -33,6 +33,7 @@
 #include "URL.h"
 #include "namedStrings.h"
 #include "GnashException.h"
+#include "sound_handler.h"
 
 #include <iostream>
 #include <string>
@@ -336,6 +337,8 @@ movie_root::getLevel(unsigned int num) const
 void
 movie_root::reset()
 {
+	media::sound_handler* sh = get_sound_handler();
+	if ( sh ) sh->reset();
 	clear();
 	_disableScripts = false;
 }

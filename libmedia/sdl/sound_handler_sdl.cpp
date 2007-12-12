@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.9 2007/12/12 10:23:07 zoulunkai Exp $
+// $Id: sound_handler_sdl.cpp,v 1.10 2007/12/12 18:56:37 strk Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -62,13 +62,28 @@ SDL_sound_handler::SDL_sound_handler()
 	audioSpec.samples = 2048;		//512 - not enough for  videostream
 }
 
-SDL_sound_handler::~SDL_sound_handler()
+void
+SDL_sound_handler::reset()
 {
+	//delete_all_sounds();
+	stop_all_sounds();
+}
+
+void
+SDL_sound_handler::delete_all_sounds()
+{
+	stop_all_sounds();
 	for (size_t i=0, e=m_sound_data.size(); i < e; ++i)
 	{
 		stop_sound(i);
 		delete_sound(i);
 	}
+	m_sound_data.clear();
+}
+
+SDL_sound_handler::~SDL_sound_handler()
+{
+	delete_all_sounds();
 	if (soundOpened) SDL_CloseAudio();
 }
 
