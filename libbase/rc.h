@@ -15,8 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
 #ifndef __RC_H__
 #define __RC_H__
 
@@ -78,7 +76,9 @@ public:
     int verbosityLevel() const { return _verbosity; }
     void verbosityLevel(int value) { _verbosity = value; }
     
+    void setDebugLog(std::string &x) { _log = x; }
     const std::string& getDebugLog() const { return _log; }
+    void setDocumentRoot(std::string &x) { _wwwroot = x; }
     std::string getDocumentRoot() { return _wwwroot; }
     
     bool useDebugger() const { return _debugger; }
@@ -137,16 +137,9 @@ public:
         _localSandboxPath = path;
     }
 
-    void dump();
-    
+    void dump();    
+
 private:
-
-    /// Construct only by getDefaultInstance()
-    RcInitFile();
-
-    /// Never destroy (TODO: add a destroyDefaultInstance)
-    ~RcInitFile();
-
     int  _delay;                // the timer delay
     bool _debug;                // enable debugging of this class
     bool _debugger;             // enable the Flash movie debugger
@@ -197,6 +190,14 @@ private:
     /// Local sendbox: the set of resources on the filesystem we want to
     /// give the current movie access to.
     PathList _localSandboxPath;
+
+  protected:
+    
+    /// Construct only by getDefaultInstance()
+    RcInitFile();
+
+    /// Never destroy (TODO: add a destroyDefaultInstance)
+    ~RcInitFile();
 
     void expandPath(std::string& path); //path string operations
 

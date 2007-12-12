@@ -35,6 +35,7 @@ extern int optind, getopt(int, char *const *, const char *);
 #include <sys/types.h>
 #include <iostream>
 #include <string>
+#include <vector>
 #include <regex.h>
 
 #include "log.h"
@@ -266,25 +267,26 @@ main(int argc, char *argv[])
     //
     // Decoding tests for HTTP
     //
-    const char *buffer = "GET /software/gnash/tests/flvplayer.swf?file=http://localhost/software/gnash/tests/Ouray_Ice_Festival_Climbing_Competition.flv HTTP/1.1"
-"User-Agent: Gnash/0.8.1-cvs (X11; Linux i686; U; en)";   
-"Host: localhost:4080"
-"Accept: text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/jpeg, image/gif, image/x-xbitmap, */*;q=0.1"
-"Accept-Language: en-US,en;q=0.9"
-"Accept-Charset: iso-8859-1, utf-8, utf-16, *;q=0.1"
-"Accept-Encoding: deflate, gzip, x-gzip, identity, *;q=0"
-"If-Modified-Since: Mon, 10 Dec 2007 02:26:31 GMT"
-"If-None-Match: \"4cc434-e266-52ff63c0\""
-"Connection: Keep-Alive, TE"
-"Referer: http://localhost/software/gnash/tests/index.html"
-"TE: deflate, gzip, chunked, identity, trailers"
-    ;
+    const char *buffer = "GET /software/gnash/tests/flvplayer.swf?file=http://localhost/software/gnash/tests/Ouray_Ice_Festival_Climbing_Competition.flv HTTP/1.1\r\n"
+"User-Agent: Gnash/0.8.1-cvs (X11; Linux i686; U; en)\r\n"
+"Host: localhost:4080\r\n"
+"Accept: text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/jpeg, image/gif, image/x-xbitmap, */*;q=0.1\r\n"
+"Accept-Language: en-US,en;q=0.9\r\n"
+"Accept-Charset: iso-8859-1, utf-8, utf-16, *;q=0.1\r\n"
+"Accept-Encoding: deflate, gzip, x-gzip, identity, *;q=0\r\n"
+"If-Modified-Since: Mon, 10 Dec 2007 02:26:31 GMT\r\n"
+"If-None-Match: \"4cc434-e266-52ff63c0\"\r\n"
+"Connection: Keep-Alive, TE\r\n"
+"Referer: http://localhost/software/gnash/tests/index.html\r\n"
+"TE: deflate, gzip, chunked, identity, trailers\r\n"
+"\r\n";
+    
 // Some browsers have a different synatax, of course, to keep things
 // interesting.
-    const char *buffer2 = "GET /software/gnash/tests/flvplayer.swf?file=http://localhost/software/gnash/tests/Ouray_Ice_Festival_Climbing_Competition.flv HTTP/1.1"
-"Content-Language: en-US,en;q=0.9"
-"Content-Charset: iso-8859-1, utf-8, utf-16, *;q=0.1"
-"Content-Encoding: deflate, gzip, x-gzip, identity, *;q=0";
+    const char *buffer2 = "GET /software/gnash/tests/flvplayer.swf?file=http://localhost/software/gnash/tests/Ouray_Ice_Festival_Climbing_Competition.flv HTTP/1.1\r\n"
+"Content-Language: en-US,en;q=0.9\r\n"
+"Content-Charset: iso-8859-1, utf-8, utf-16, *;q=0.1\r\n"
+"Content-Encoding: deflate, gzip, x-gzip, identity, *;q=0\r\n";
 //    http.extractMethod(buffer);
     string result;
     result = http.extractReferer(buffer);
@@ -334,16 +336,19 @@ main(int argc, char *argv[])
     }
 
     result = http.extractConnection(buffer);
-    if (result == "Keep-Alive, TE") {
-        runtest.fail ("Date::extractConnection()");
-    } else {
+    std::vector<std::string> connections = http.getConnection();
+    if ((result == "Keep-Alive, TE") &&
+        (connections[0] == "Keep-Alive") &&
+        (connections[1] == "TE")) {
         runtest.pass ("Date::extractConnection()");
+    } else {
+        runtest.fail ("Date::extractConnection()");
     }
 
     result = http.extractEncoding(buffer);
     if (result == "deflate, gzip, x-gzip, identity, *;q=0") {
         runtest.fail ("Date::extractEncoding(Accept-)");
-    } else {
+    } else{
         runtest.pass ("Date::extractEncoding(Accept-)");
     }
     result = http.extractEncoding(buffer2);
@@ -354,12 +359,16 @@ main(int argc, char *argv[])
     }
 
     result = http.extractTE(buffer);
-    if (result == "deflate, gzip, chunked, identity, trailers") {
-        runtest.fail ("Date::extractTE()");
-    } else {
+    std::vector<std::string> te = http.getTE();
+    if ((te[0] == "deflate") &&
+        (te[1] == "gzip") &&
+        (te[2] == "chunked") &&
+        (te[3] == "identity") &&
+        (te[4] == "trailers")) {
         runtest.pass ("Date::extractTE()");
+    } else {
+        runtest.fail ("Date::extractTE()");
     }
-
 
 //     http.formatHeader(666, RTMP);
 //     http.formatRequest("http://localhost:4080", HTTP::GET);

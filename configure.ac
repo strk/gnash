@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.458 2007/12/12 18:19:27 bwy Exp $
+dnl $Id: configure.ac,v 1.459 2007/12/12 23:56:28 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -542,12 +542,12 @@ AC_ARG_ENABLE(media,
  [media_handler=ffmpeg]
 )
 
-AC_ARG_ENABLE(lirc, AC_HELP_STRING([--disable-lirc], [Disable support for Lirc]),
+AC_ARG_ENABLE(lirc, AC_HELP_STRING([--enable-lirc], [Disable support for Lirc]),
 [case "${enableval}" in
   yes) lirc=yes ;;
   no)  lirc=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for disble-lirc option]) ;;
-esac], lirc=yes)
+  *)   AC_MSG_ERROR([bad value ${enableval} for enable-lirc option]) ;;
+esac], lirc=no)
 
 if test x"$lirc" = x"yes"; then
   AC_DEFINE([USE_LIRC], [], [LIRC daemon support])
@@ -1614,6 +1614,7 @@ MEDIA_CONFIG=${media_handler}
 AC_SUBST(MEDIA_CONFIG)
 
 dnl AC_CONFIG_LINKS(doc/C/images)
+AC_CONFIG_LINKS(cygnal/testsuite/cygnal.all/cygnalrc:cygnal/testsuite/cygnal.all/cygnalrc.in)
 AC_CONFIG_LINKS(testsuite/libbase/gnashrc:testsuite/libbase/gnashrc.in)
 AC_CONFIG_LINKS(testsuite/libbase/gnashrc-local:testsuite/libbase/gnashrc-local.in)
 

@@ -1,0 +1,14 @@
+# The default verbosity level
+set verbosity 11
+
+# Print debug info about the ActionScript classes as they are processed
+set actionDump off
+
+# Print debug info about how Gnash is parsing the file
+set parserDump off
+
+# The full path to the debug log
+set debuglog /tmp/cygnal-dbg.log
+
+# The Port offset to use when we're not root
+set portOffset 4000

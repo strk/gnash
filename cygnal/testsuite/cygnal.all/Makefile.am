@@ -39,10 +39,17 @@ INCLUDES = -I.. \
 	$(BOOST_CFLAGS) \
 	$(PTHREAD_CFLAGS)
 
-check_PROGRAMS = test_http
+check_PROGRAMS = test_http test_crc
+
 test_http_SOURCES = test_http.cpp ../../http.o
 test_http_LDADD = $(AM_LDFLAGS) ../../http.o
 test_http_DEPENDENCIES = site-update
+
+test_crc_SOURCES = test_crc.cpp ../../crc.o
+test_crc_LDADD = $(AM_LDFLAGS) ../../crc.o
+test_crc_DEPENDENCIES = site-update
+
+
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
 	@echo "Rebuilding with GCC Mudflap support"

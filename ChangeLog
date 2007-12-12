@@ -1,3 +1,22 @@
+2007-12-12  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* configure.ac: Disable LIRC by default. Link cygnalrc test file
+	to copy in source tree.
+	* libbase/rc.h: Add new accessors so we can set private data from
+	a derived class. Make constructor/destructor protected instead of
+	private.
+	* cygnal/crc.{cpp,h}: Cygnal specific init file derived from Gnash
+	RcInitFile to avoid bloating out Gnash's init file handling for
+	options it'll never use, but also let Cygnal share those values,
+	or override them.
+	* cygnal/Makefile.am: Add crc.cpp and crc.h.
+	* cygnal/cygnal.cpp: Use new init file. Clean up port offset
+	handling.
+	* cygnal/testsuite/cygnal.all/cygnalrc.in: Test cygnal init file.
+	* cygnal/testsuite/cygnal.all/test_crc.cpp: Test the Cygnal init
+	file handling.
+	* cygnal/testsuite/cygnal.all/Makefile.am: Add test_crc target.
+
 2007-12-12 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/button_character_def.{cpp,h}: cleanup parser by 

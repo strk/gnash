@@ -41,7 +41,7 @@ extern "C"{
 
 #include "network.h"
 #include "log.h"
-#include "rc.h"
+#include "crc.h"
 #include "rtmp.h"
 #include "http.h"
 #include "limits.h"
@@ -82,10 +82,8 @@ static void ssl_thread(struct thread_params *conndata);
 static void stream_thread(struct thread_params *sendfile);
 static void dispatch_thread(struct thread_params *params);
 
-namespace {
-gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
-}
+LogFile& dbglogfile = LogFile::getDefaultInstance();
+CRcInitFile& crcfile = CRcInitFile::getDefaultInstance();
 
 struct thread_params {
     int netfd;
@@ -142,33 +140,21 @@ main(int argc, char *argv[])
         }
     }
 
-    dbglogfile.setWriteDisk(false);
-    rcfile.loadFiles();
-//    rcfile.dump();
+    crcfile.loadFiles();
 
-    if (rcfile.useWriteLog()) {
-        dbglogfile.setWriteDisk(true);
-    }
-    
-    if (rcfile.verbosityLevel() > 0) {
-        dbglogfile.setVerbosity(rcfile.verbosityLevel());
+    if (crcfile.verbosityLevel() > 0) {
+        dbglogfile.setVerbosity(crcfile.verbosityLevel());
     }    
     
-    if (rcfile.getRetries() > 0) {
-        thread_retries = rcfile.getRetries();
-    } else {
-	thread_retries = 3;
-    }
-    
-    if (rcfile.getDocumentRoot().size() > 0) {
-	docroot = rcfile.getDocumentRoot().c_str();
+    if (crcfile.getDocumentRoot().size() > 0) {
+	docroot = crcfile.getDocumentRoot().c_str();
 	log_msg (_("Document Root for media files is: %s"),
 		   docroot);
     } else {
 	docroot = "/var/www/html/software/gnash/tests/";
     }
     
-    while ((c = getopt (argc, argv, "hvwp:")) != -1) {
+    while ((c = getopt (argc, argv, "hvp:d")) != -1) {
 	switch (c) {
 	  case 'h':
 	      usage (argv[0]);
@@ -177,12 +163,13 @@ main(int argc, char *argv[])
               dbglogfile.setVerbosity();
 	      log_msg (_("Verbose output turned on"));
 	      break;
-	  case 'w':
-              dbglogfile.setWriteDisk(true);
-	      log_msg (_("Logging to disk enabled"));
-	      break;
 	  case 'p':
 	      port_offset = strtol(optarg, NULL, 0);
+	      crcfile.setPortOffset(port_offset);
+	      break;
+	  case 'd':
+	      crcfile.dump();
+	      exit(0);
 	      break;
         }
     }
@@ -192,12 +179,6 @@ main(int argc, char *argv[])
     while (optind < argc) {
         log_error (_("Extraneous argument: %s"), argv[optind]);
     }
-
-    // Remove the logfile that's created by default, since leaving a short
-    // file is confusing.
-    if (dbglogfile.getWriteDisk() == false) {
-        dbglogfile.removeLog();
-    }
     
     // Trap ^C (SIGINT) so we can kill all the threads
     act.sa_handler = cntrlc_handler;
@@ -206,15 +187,15 @@ main(int argc, char *argv[])
     struct thread_params rtmp_data;
     struct thread_params http_data;
     struct thread_params ssl_data;
-    rtmp_data.port = 1935;
+    rtmp_data.port = port_offset + RTMP;
 //    boost::thread rtmp_port(boost::bind(&rtmp_thread, &rtmp_data));
 
-    http_data.port = 4080;
+    http_data.port = port_offset + RTMPT;
     Statistics st;
     http_data.statistics = &st;
     boost::thread http_port(boost::bind(&http_thread, &http_data));
 
-    ssl_data.port = 4443;
+    ssl_data.port = port_offset + RTMPTS;
 //    boost::thread ssl_port(boost::bind(&ssl_thread, &ssl_data));
     
 //    boost::thread rtmp_port(&rtmp_thread);
@@ -229,13 +210,6 @@ main(int argc, char *argv[])
     log_msg (_("All done I think..."));
     
     return(0);
-}
-
-static void
-dispatch_thread(struct thread_params *params)
-{
-    GNASH_REPORT_FUNCTION;
-    log_msg("Param port is: %d", params->port);
 }
 
 static void
@@ -415,7 +389,9 @@ usage(const char* /*proc*/)
 	"  --port-offset (-p)   RTMPT port offset.\n"
 	));
 }
- 
+
+//} // end of cygnal namespace
+
 // local Variables:
 // mode: C++
 // indent-tabs-mode: t

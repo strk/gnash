@@ -62,7 +62,8 @@ cygnal_SOURCES = \
 	alloc.cpp \
 	netstats.cpp \
 	stream.cpp \
-	statistics.cpp
+	statistics.cpp \
+	crc.cpp
 #	transcode.cpp
 #	flash.cpp
 
@@ -70,7 +71,8 @@ noinst_HEADERS = \
 	http.h \
 	netstats.h \
 	stream.h \
-	statistics.h
+	statistics.h \
+	crc.h
 #	transcode.h
 #	flash.h
 
