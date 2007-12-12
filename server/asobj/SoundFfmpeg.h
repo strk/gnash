@@ -77,13 +77,13 @@ public:
 	unsigned int getPosition();
 
 	// Used for ffmpeg data read and seek callbacks
-	static int readPacket(void* opaque, uint8_t* buf, int buf_size);
+	static int readPacket(void* opaque, boost::uint8_t* buf, int buf_size);
 	static offset_t seekMedia(void *opaque, offset_t offset, int whence);
 
 private:
 
 	void setupDecoder();
-	static bool getAudio(void *owner, uint8_t *stream, int len);
+	static bool getAudio(void *owner, boost::uint8_t *stream, int len);
 
 	// audio
 	AVCodecContext *audioCodecCtx;
@@ -111,7 +111,7 @@ private:
 	int audioIndex;
 
 	// If the decoded data doesn't fit the buffer we put the leftovers here
-	uint8_t* leftOverData;
+	boost::uint8_t* leftOverData;
 	int leftOverSize;
 
 	// Are this sound attached to the soundhandler?

@@ -257,7 +257,7 @@ static inline asName pool_name(boost::uint32_t index, abc_block* pool)
 void
 Machine::execute()
 {
-	uint8_t opcode;
+	boost::uint8_t opcode;
 
 	for ( ; ; )
 	{
@@ -1472,7 +1472,7 @@ Machine::execute()
 ///  scope -- The scope object at depth
 	case SWF::ABC_ACTION_GETSCOPEOBJECT:
 	{
-		uint8_t depth = mStream->read_u8();
+		boost::uint8_t depth = mStream->read_u8();
 		mStack.grow(1);
 		mStack.top(0) = mScopeStack.top(depth).mScope;
 		break;

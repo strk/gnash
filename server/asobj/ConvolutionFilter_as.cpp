@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ConvolutionFilter_as.cpp,v 1.4 2007/12/04 11:45:30 strk Exp $ */
+/* $Id: ConvolutionFilter_as.cpp,v 1.5 2007/12/12 10:23:45 zoulunkai Exp $ */
 
 #include "as_object.h"
 #include "ConvolutionFilter.h"
@@ -65,14 +65,14 @@ phelp_gs_attach(color);
 phelp_gs_attach(alpha);
 phelp_gs_attach_end
 
-phelp_property(uint8_t, number<uint8_t>, matrixX)
-phelp_property(uint8_t, number<uint8_t>, matrixY)
+phelp_property(boost::uint8_t, number<boost::uint8_t>, matrixX)
+phelp_property(boost::uint8_t, number<boost::uint8_t>, matrixY)
 phelp_property(float, number<float>, divisor)
 phelp_property(float, number<float>, bias)
 phelp_property(bool, bool, preserveAlpha)
 phelp_property(bool, bool, clamp)
 phelp_property(boost::uint32_t, number<boost::uint32_t>, color)
-phelp_property(uint8_t, number<uint8_t>, alpha)
+phelp_property(boost::uint8_t, number<boost::uint8_t>, alpha)
 phelp_array_property(matrix)
 
 easy_clone(ConvolutionFilter_as)

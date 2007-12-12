@@ -144,7 +144,7 @@ private:
 	///
 	static void CommonGetUrl(as_environment& env, 
 			as_value target, const char* url,
-			uint8_t method);
+			boost::uint8_t method);
 
 	/// Common code for SetTarget and SetTargetExpression
 	//

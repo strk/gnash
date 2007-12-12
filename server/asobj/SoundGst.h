@@ -67,7 +67,7 @@ public:
 	static int seekMedia(void *opaque, int offset, int whence);
 
 	static void setupDecoder(SoundGst* so);
-	static bool getAudio(void *owner, uint8_t *stream, int len);
+	static bool getAudio(void *owner, boost::uint8_t *stream, int len);
 
 	static void callback_newpad (GstElement *decodebin, GstPad *pad, gboolean last, gpointer data);
 private:

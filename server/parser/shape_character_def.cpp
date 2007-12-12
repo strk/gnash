@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.58 2007/12/11 09:10:24 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.59 2007/12/12 10:23:47 zoulunkai Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -194,7 +194,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
   {
     rect tbound;
     tbound.read(in);
-    /*uint8_t scales =*/static_cast<void>(in->read_u8());
+    /*boost::uint8_t scales =*/static_cast<void>(in->read_u8());
   }
 
   read_fill_styles(m_fill_styles, in, tag_type, m);
@@ -216,7 +216,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
     //log_msg("Read %u fill styles, %u line styles", m_fill_styles.size(), m_line_styles.size());
 
   // Use read_u8 to force alignment.
-  uint8_t num_bits = in->read_u8();
+  boost::uint8_t num_bits = in->read_u8();
   int num_fill_bits = (num_bits & 0xF0) >> 4;
   int num_line_bits = (num_bits & 0x0F);
 

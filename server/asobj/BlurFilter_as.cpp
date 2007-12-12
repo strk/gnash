@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BlurFilter_as.cpp,v 1.3 2007/09/14 01:26:40 nihilus Exp $ */
+/* $Id: BlurFilter_as.cpp,v 1.4 2007/12/12 10:23:45 zoulunkai Exp $ */
 
 #include "as_object.h"
 #include "BlurFilter.h"
@@ -56,7 +56,7 @@ phelp_gs_attach_end
 
 phelp_property(float, number<float>, blurX)
 phelp_property(float, number<float>, blurY)
-phelp_property(uint8_t, number<uint8_t>, quality)
+phelp_property(boost::uint8_t, number<boost::uint8_t>, quality)
 
 easy_clone(BlurFilter_as)
 

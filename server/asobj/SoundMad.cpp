@@ -36,7 +36,7 @@
 namespace gnash {
 
 int 
-SoundMad::readPacket(uint8_t* buf, int buf_size)
+SoundMad::readPacket(boost::uint8_t* buf, int buf_size)
 {
 
 	size_t ret = connection->read(static_cast<void*>(buf), buf_size);
@@ -97,7 +97,7 @@ SoundMad::setupDecoder(SoundMad* so)
 
 	// Fetch data from the file
 	so->seekMedia(0, SEEK_SET);
-	uint8_t* buf = new uint8_t[1024];
+	boost::uint8_t* buf = new boost::uint8_t[1024];
 	int bufSize = so->readPacket(buf, 1024);
 
 	// Setup the mad decoder
@@ -134,7 +134,7 @@ SoundMad::setupDecoder(SoundMad* so)
 }
 
 // audio callback is running in sound handler thread
-bool SoundMad::getAudio(void* owner, uint8_t* stream, int len)
+bool SoundMad::getAudio(void* owner, boost::uint8_t* stream, int len)
 {
 	SoundMad* so = static_cast<SoundMad*>(owner);
 
@@ -152,7 +152,7 @@ bool SoundMad::getAudio(void* owner, uint8_t* stream, int len)
 				delete[] so->leftOverData;
 				so->leftOverSize = 0;
 			} else {
-				uint8_t* buf = new uint8_t[rest];
+				boost::uint8_t* buf = new boost::uint8_t[rest];
 				memcpy(stream, so->leftOverData+len, rest);
 				delete[] so->leftOverData;
 				so->leftOverData = buf;
@@ -167,19 +167,19 @@ bool SoundMad::getAudio(void* owner, uint8_t* stream, int len)
 		}
 	}
 
-	uint8_t* buf = new uint8_t[8192];
+	boost::uint8_t* buf = new boost::uint8_t[8192];
 	int bufSize = so->readPacket(buf, 8192);
 	int orgBufSize = bufSize;
 
 	bool loop = true;
-	uint8_t* ptr = new uint8_t[8192];
+	boost::uint8_t* ptr = new boost::uint8_t[8192];
 
 	bool ret = true;
 	media::sound_handler* s = get_sound_handler();
 	if (bufSize > 0) {
 		if (s) {
 			// temp raw buffer
-			uint8_t* tmp_raw_buffer;
+			boost::uint8_t* tmp_raw_buffer;
 			unsigned int tmp_raw_buffer_size;
 			int outsize = 0;
 			while (loop) {
@@ -226,7 +226,7 @@ bool SoundMad::getAudio(void* owner, uint8_t* stream, int len)
 				
 				outsize = so->synth.pcm.length * ((so->frame.header.mode) ? 4 : 2);
 
-				tmp_raw_buffer = new uint8_t[outsize];
+				tmp_raw_buffer = new boost::uint8_t[outsize];
 				int sample;
 				
 				boost::int16_t* dst = reinterpret_cast<boost::int16_t*>(tmp_raw_buffer);
@@ -275,7 +275,7 @@ bool SoundMad::getAudio(void* owner, uint8_t* stream, int len)
 
 					// Move the new data to the sound-struct
 					delete[] tmp_raw_buffer;
-					tmp_raw_buffer = reinterpret_cast<uint8_t*>(adjusted_data);
+					tmp_raw_buffer = reinterpret_cast<boost::uint8_t*>(adjusted_data);
 					tmp_raw_buffer_size = adjusted_size;
 
 				} else {
@@ -297,7 +297,7 @@ bool SoundMad::getAudio(void* owner, uint8_t* stream, int len)
 					int rest = len-pos;
 					so->leftOverSize = tmp_raw_buffer_size - rest;
 					memcpy(stream+pos, tmp_raw_buffer, rest);
-					so->leftOverData = new uint8_t[so->leftOverSize];
+					so->leftOverData = new boost::uint8_t[so->leftOverSize];
 					memcpy(so->leftOverData, (tmp_raw_buffer)+rest, so->leftOverSize);
 					loop = false;
 					pos += rest;

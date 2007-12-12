@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderMad.cpp,v 1.6 2007/12/04 11:45:27 strk Exp $
+// $Id: AudioDecoderMad.cpp,v 1.7 2007/12/12 10:23:06 zoulunkai Exp $
 
 #include "AudioDecoderMad.h"
 #include "utility.h"
@@ -64,7 +64,7 @@ bool AudioDecoderMad::setup(AudioInfo* info)
 	}
 }
 
-uint8_t* AudioDecoderMad::decode(uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool parse)
+boost::uint8_t* AudioDecoderMad::decode(boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool parse)
 {
 	// Setup the mad decoder
 	mad_stream_buffer(&_stream, input, inputSize);
@@ -107,7 +107,7 @@ uint8_t* AudioDecoderMad::decode(uint8_t* input, boost::uint32_t inputSize, boos
 	
 	boost::uint32_t outsize = _synth.pcm.length * _synth.pcm.channels * 2;
 
-	uint8_t* tmp_raw_buffer = new uint8_t[outsize];
+	boost::uint8_t* tmp_raw_buffer = new boost::uint8_t[outsize];
 	boost::uint32_t tmp_raw_buffer_size = 0;
 	int sample;
 	
@@ -160,7 +160,7 @@ uint8_t* AudioDecoderMad::decode(uint8_t* input, boost::uint32_t inputSize, boos
 
 		// Move the new data to the sound-struct
 		delete[] tmp_raw_buffer;
-		tmp_raw_buffer = reinterpret_cast<uint8_t*>(adjusted_data);
+		tmp_raw_buffer = reinterpret_cast<boost::uint8_t*>(adjusted_data);
 		tmp_raw_buffer_size = adjusted_size;
 
 	} else {

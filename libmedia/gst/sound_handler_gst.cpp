@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.8 2007/12/04 11:45:26 strk Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.9 2007/12/12 10:23:06 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -867,13 +867,13 @@ unsigned int GST_sound_handler::get_position(int sound_handle)
 }
 
 // Pointer handling and checking functions
-const uint8_t* gst_elements::get_data_ptr(unsigned long int pos)
+const boost::uint8_t* gst_elements::get_data_ptr(unsigned long int pos)
 {
 	assert(data_size > pos);
 	return data + pos;
 }
 
-void gst_elements::set_data(const uint8_t* idata) {
+void gst_elements::set_data(const boost::uint8_t* idata) {
 	data = idata;
 }
 

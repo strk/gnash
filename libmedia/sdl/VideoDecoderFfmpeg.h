@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderFfmpeg.h,v 1.9 2007/12/04 11:45:27 strk Exp $
+// $Id: VideoDecoderFfmpeg.h,v 1.10 2007/12/12 10:23:07 zoulunkai Exp $
 
 #ifndef __VIDEODECODERFFMPEG_H__
 #define __VIDEODECODERFFMPEG_H__
@@ -55,11 +55,11 @@ public:
 		videoCodecType /*format*/,
 		int /*outputFormat*/);
 
-	uint8_t* decode(uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize);
+	boost::uint8_t* decode(boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize);
 
-	std::auto_ptr<image::image_base> decodeToImage(uint8_t* /*input*/, boost::uint32_t /*inputSize*/);
+	std::auto_ptr<image::image_base> decodeToImage(boost::uint8_t* /*input*/, boost::uint32_t /*inputSize*/);
 
-	static uint8_t* convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame);
+	static boost::uint8_t* convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame);
 
 private:
 

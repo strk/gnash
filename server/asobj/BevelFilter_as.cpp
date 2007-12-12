@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BevelFilter_as.cpp,v 1.5 2007/12/04 11:45:30 strk Exp $ */
+/* $Id: BevelFilter_as.cpp,v 1.6 2007/12/12 10:23:45 zoulunkai Exp $ */
 
 #include "as_object.h"
 #include "BevelFilter.h"
@@ -77,13 +77,13 @@ phelp_gs_attach_end
 phelp_property(float, number<float>, distance)
 phelp_property(float, number<float>, angle)
 phelp_property(boost::uint32_t, number<boost::uint32_t>, highlightColor)
-phelp_property(uint8_t, number<uint8_t>, highlightAlpha)
+phelp_property(boost::uint8_t, number<boost::uint8_t>, highlightAlpha)
 phelp_property(boost::uint32_t, number<boost::uint32_t>, shadowColor)
-phelp_property(uint8_t, number<uint8_t>, shadowAlpha)
+phelp_property(boost::uint8_t, number<boost::uint8_t>, shadowAlpha)
 phelp_property(float, number<float>, blurX)
 phelp_property(float, number<float>, blurY)
 phelp_property(float, number<float>, strength)
-phelp_property(uint8_t, number<uint8_t>, quality)
+phelp_property(boost::uint8_t, number<boost::uint8_t>, quality)
 phelp_property(bool, bool, knockout)
 
 easy_clone(BevelFilter_as)

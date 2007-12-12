@@ -69,7 +69,7 @@ public:
 		FLAG_NSSET = 0x10
 	} flags;
 
-	uint8_t mFlags;
+	boost::uint8_t mFlags;
 	std::vector<asNamespace*> *mNamespaceSet;
 
 	asName() : mFlags(0), mNamespaceSet(NULL), mName(0), mPairName(0),

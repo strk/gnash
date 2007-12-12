@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.169 2007/12/12 04:06:40 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.170 2007/12/12 10:23:47 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -651,7 +651,7 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
 	// skip the specified number of actions.
 	//
 	unsigned int framenum = code.read_int16(thread.pc+3);
-	uint8_t skip = code[thread.pc+5];
+	boost::uint8_t skip = code[thread.pc+5];
 
 	character* target = env.get_target();
 	sprite_instance* target_sprite = target->to_movie();
@@ -1771,7 +1771,7 @@ SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
 	thread.ensureStack(1); // expression
 
 	// how many actions to skip if frame has not been loaded
-	uint8_t skip = code[thread.pc+3];
+	boost::uint8_t skip = code[thread.pc+3];
 
 	// env.top(0) contains frame specification,
 	// evaluated as for ActionGotoExpression
@@ -1866,7 +1866,7 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 		int id=0; // for dict (constant pool) lookup
 		          // declared here because also used
 			  // by verbose action output
-		uint8_t type = code[3 + i];
+		boost::uint8_t type = code[3 + i];
 		i++;
 
 		switch (type)
@@ -1914,7 +1914,7 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 
 			case pushRegister: // 4
 			{
-				uint8_t reg = code[3 + i];
+				boost::uint8_t reg = code[3 + i];
 				++i;
 				if ( thread.isFunction2() && env.num_local_registers() )
 				{
@@ -2055,7 +2055,7 @@ void
 SWFHandlers::CommonGetUrl(as_environment& env,
 		as_value target, // the target window, or _level1..10
 		const char* url_c,
-                uint8_t method /*
+                boost::uint8_t method /*
 				* Bit-packed as follow
 				*
                         	* SendVarsMethod:2 (0:NONE 1:GET 2:POST)
@@ -2300,7 +2300,7 @@ SWFHandlers::ActionGetUrl2(ActionExec& thread)
 
 	assert( code[thread.pc] == SWF::ACTION_GETURL2 );
 
-	uint8_t method = code[thread.pc + 3];
+	boost::uint8_t method = code[thread.pc + 3];
 
 	as_value url_val = env.top(1);
 	if ( url_val.is_undefined() )
@@ -3690,7 +3690,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 	//cerr << " nargs:" << nargs << endl;
 
 	// Get the count of local registers used by this function.
-	uint8_t register_count = code[i];
+	boost::uint8_t register_count = code[i];
 	i++;
 
 	//cerr << " nregisters:" << nargs << endl;
@@ -3706,7 +3706,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 	// Get the register assignments and names of the arguments.
 	for (unsigned n = 0; n < nargs; n++)
 	{
-		uint8_t arg_register = code[i];
+		boost::uint8_t arg_register = code[i];
 		++i;
 
 		// @@ security: watch out for possible missing terminator here!
@@ -3786,20 +3786,20 @@ SWFHandlers::ActionTry(ActionExec& thread)
 
 	size_t i = thread.pc + 3; // skip tag id and length
 
-	uint8_t flags = code[i];
+	boost::uint8_t flags = code[i];
 	++i;
 
 	bool doCatch = flags & 1;
 	bool doFinally = flags & (1<<1);
 	bool catchInRegister = flags&(1<<2);
-	uint8_t reserved = flags&0xE0;
+	boost::uint8_t reserved = flags&0xE0;
 
 	boost::uint16_t trySize = code.read_uint16(i); i += 2;
 	boost::uint16_t catchSize = code.read_uint16(i); i += 2;
 	boost::uint16_t finallySize = code.read_uint16(i); i += 2;
 
 	const char* catchName = NULL;
-	uint8_t catchRegister = 0;
+	boost::uint8_t catchRegister = 0;
 
 	if (!doFinally)
 		finallySize = 0;
@@ -3998,7 +3998,7 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
 
 	const action_buffer& code = thread.code;
 
-	uint8_t reg = code[thread.pc + 3];
+	boost::uint8_t reg = code[thread.pc + 3];
 
 	// Save top of stack in specified register.
 	if ( thread.isFunction2() && env.num_local_registers() )

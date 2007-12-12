@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.101 2007/12/04 11:45:31 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.102 2007/12/12 10:23:46 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -185,7 +185,7 @@ void NetStreamFfmpeg::close()
 
 // ffmpeg callback function
 int 
-NetStreamFfmpeg::readPacket(void* opaque, uint8_t* buf, int buf_size)
+NetStreamFfmpeg::readPacket(void* opaque, boost::uint8_t* buf, int buf_size)
 {
 
 	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(opaque);
@@ -384,7 +384,7 @@ initFlvAudio(FLVParser* parser)
 static AVInputFormat*
 probeStream(NetStreamFfmpeg* ns)
 {
-	boost::scoped_array<uint8_t> buffer(new uint8_t[2048]);
+	boost::scoped_array<boost::uint8_t> buffer(new boost::uint8_t[2048]);
 
 	// Probe the file to detect the format
 	AVProbeData probe_data;
@@ -493,7 +493,7 @@ NetStreamFfmpeg::startPlayback()
 
 	// Setup the filereader/seeker mechanism. 7th argument (NULL) is the writer function,
 	// which isn't needed.
-	init_put_byte(&ByteIOCxt, new uint8_t[500000], 500000, 0, this, NetStreamFfmpeg::readPacket, NULL, NetStreamFfmpeg::seekMedia);
+	init_put_byte(&ByteIOCxt, new boost::uint8_t[500000], 500000, 0, this, NetStreamFfmpeg::readPacket, NULL, NetStreamFfmpeg::seekMedia);
 	ByteIOCxt.is_streamed = 1;
 
 	m_FormatCtx = av_alloc_format_context();
@@ -631,10 +631,10 @@ rgbcopy(image::rgb* dst, raw_mediadata_t* src, int width)
 	dst->update(src->m_data);
 
 #if 0
-	uint8_t* dstptr = dst->m_data;
+	boost::uint8_t* dstptr = dst->m_data;
 
-	uint8_t* srcptr = src->m_data;
-	uint8_t* srcend = src->m_data + src->m_size;
+	boost::uint8_t* srcptr = src->m_data;
+	boost::uint8_t* srcend = src->m_data + src->m_size;
 
 	while (srcptr < srcend) {
 		memcpy(dstptr, srcptr, width);
@@ -733,7 +733,7 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 }
 
 // audio callback is running in sound handler thread
-bool NetStreamFfmpeg::audio_streamer(void *owner, uint8_t *stream, int len)
+bool NetStreamFfmpeg::audio_streamer(void *owner, boost::uint8_t *stream, int len)
 {
 	//GNASH_REPORT_FUNCTION;
 
@@ -826,7 +826,7 @@ bool NetStreamFfmpeg::decodeAudio(AvPkt& packet)
 	int frame_size;
 	unsigned int bufsize = (AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2;
 
-	uint8_t* ptr = new uint8_t[bufsize];
+	boost::uint8_t* ptr = new boost::uint8_t[bufsize];
 #ifdef FFMPEG_AUDIO2
 	frame_size = bufsize;
 	if (avcodec_decode_audio2(m_ACodecCtx, (boost::int16_t*) ptr, &frame_size, packet->data, packet->size) >= 0)
@@ -842,13 +842,13 @@ bool NetStreamFfmpeg::decodeAudio(AvPkt& packet)
 		{
 			// Resampling is needed.
 			
-			uint8_t* output = new uint8_t[bufsize];
+			boost::uint8_t* output = new boost::uint8_t[bufsize];
 			
 			samples = _resampler.resample(reinterpret_cast<boost::int16_t*>(ptr), 
 							 reinterpret_cast<boost::int16_t*>(output), 
 							 samples);
 			delete [] ptr;
-			ptr = reinterpret_cast<uint8_t*>(output);
+			ptr = reinterpret_cast<boost::uint8_t*>(output);
 		}
 		
 	  	raw_mediadata_t* raw = new raw_mediadata_t();
@@ -902,7 +902,7 @@ bool NetStreamFfmpeg::decodeVideo(AvPkt& packet)
 	avcodec_decode_video(m_VCodecCtx, m_Frame, &got, packet->data, packet->size);
 	if (got)
 	{
-		boost::scoped_array<uint8_t> buffer;
+		boost::scoped_array<boost::uint8_t> buffer;
 
 		if (m_imageframe == NULL)
 		{
@@ -938,12 +938,12 @@ bool NetStreamFfmpeg::decodeVideo(AvPkt& packet)
 
 		if (m_videoFrameFormat == render::YUV)
 		{
-			video->m_data = new uint8_t[static_cast<image::yuv*>(m_imageframe)->size()];
+			video->m_data = new boost::uint8_t[static_cast<image::yuv*>(m_imageframe)->size()];
 		}
 		else if (m_videoFrameFormat == render::RGB)
 		{
 			image::rgb* tmp = static_cast<image::rgb*>(m_imageframe);
-			video->m_data = new uint8_t[m_imageframe->size()]; // tmp->m_pitch * tmp->m_height];
+			video->m_data = new boost::uint8_t[m_imageframe->size()]; // tmp->m_pitch * tmp->m_height];
 		}
 
 		video->m_ptr = video->m_data;
@@ -981,11 +981,11 @@ bool NetStreamFfmpeg::decodeVideo(AvPkt& packet)
 		{
 			image::yuv* yuvframe = static_cast<image::yuv*>(m_imageframe);
 			int copied = 0;
-			uint8_t* ptr = video->m_data;
+			boost::uint8_t* ptr = video->m_data;
 			for (int i = 0; i < 3 ; i++)
 			{
 				int shift = (i == 0 ? 0 : 1);
-				uint8_t* yuv_factor = m_Frame->data[i];
+				boost::uint8_t* yuv_factor = m_Frame->data[i];
 				int h = m_VCodecCtx->height >> shift;
 				int w = m_VCodecCtx->width >> shift;
 				for (int j = 0; j < h; j++)
@@ -1002,9 +1002,9 @@ bool NetStreamFfmpeg::decodeVideo(AvPkt& packet)
 		else if (m_videoFrameFormat == render::RGB)
 		{
 
-			uint8_t* srcptr = m_Frame->data[0];
-			uint8_t* srcend = m_Frame->data[0] + m_Frame->linesize[0] * m_VCodecCtx->height;
-			uint8_t* dstptr = video->m_data;
+			boost::uint8_t* srcptr = m_Frame->data[0];
+			boost::uint8_t* srcend = m_Frame->data[0] + m_Frame->linesize[0] * m_VCodecCtx->height;
+			boost::uint8_t* dstptr = video->m_data;
 			unsigned int srcwidth = m_VCodecCtx->width * 3;
 
 			video->m_size = 0;

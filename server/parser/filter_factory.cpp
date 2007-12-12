@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: filter_factory.cpp,v 1.5 2007/08/29 03:32:59 cmusick Exp $ */
+/* $Id: filter_factory.cpp,v 1.6 2007/12/12 10:23:47 zoulunkai Exp $ */
 
 #include "filter_factory.h"
 #include "BitmapFilter.h"
@@ -137,7 +137,7 @@ bool BlurFilter::read(stream* in)
     m_blurX = in->read_ufixed();
     m_blurY = in->read_ufixed();
 
-    m_quality = static_cast<uint8_t> (in->read_uint(5));
+    m_quality = static_cast<boost::uint8_t> (in->read_uint(5));
 
     static_cast<void> (in->read_uint(3)); // Throw these away.
 
@@ -196,7 +196,7 @@ bool BevelFilter::read(stream* in)
 
 bool GradientGlowFilter::read(stream* in)
 {
-    uint8_t count = in->read_u8(); // How many colorings.
+    boost::uint8_t count = in->read_u8(); // How many colorings.
 
     m_colors.reserve(count);
     m_alphas.reserve(count);
@@ -227,7 +227,7 @@ bool GradientGlowFilter::read(stream* in)
 
     m_type = outer ? (inner ? FULL_GLOW : OUTER_GLOW) : INNER_GLOW;
 
-    m_quality = static_cast<uint8_t> (in->read_uint(4));
+    m_quality = static_cast<boost::uint8_t> (in->read_uint(4));
 
     return true;
 }
@@ -270,7 +270,7 @@ bool ColorMatrixFilter::read(stream* in)
 
 bool GradientBevelFilter::read(stream* in)
 {
-    uint8_t count = in->read_u8(); // How many colorings.
+    boost::uint8_t count = in->read_u8(); // How many colorings.
 
     m_colors.reserve(count);
     m_alphas.reserve(count);
@@ -301,7 +301,7 @@ bool GradientBevelFilter::read(stream* in)
 
     m_type = outer ? (inner ? FULL_BEVEL : OUTER_BEVEL) : INNER_BEVEL;
 
-    m_quality = static_cast<uint8_t> (in->read_uint(4));
+    m_quality = static_cast<boost::uint8_t> (in->read_uint(4));
 
     return true;
 }

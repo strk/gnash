@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_sdl.h,v 1.7 2007/12/04 11:45:27 strk Exp $
+// $Id: sound_handler_sdl.h,v 1.8 2007/12/12 10:23:07 zoulunkai Exp $
 
 #ifndef SOUND_HANDLER_SDL_H
 #define SOUND_HANDLER_SDL_H
@@ -74,7 +74,7 @@ public:
 	/// @param size
 	///	Size of the 'data' buffer.
 	///
-	void append(uint8_t* data, unsigned int size)
+	void append(boost::uint8_t* data, unsigned int size)
 	{
 		_buf.append(data, size);
 	}
@@ -86,12 +86,12 @@ public:
 	}
 
 	/// Return a pointer to the underlying buffer
-	const uint8_t* data() const {
+	const boost::uint8_t* data() const {
 		return _buf.data();
 	}
 
 	/// Return a pointer to the underlying buffer
-	uint8_t* data() {
+	boost::uint8_t* data() {
 		return _buf.data();
 	}
 
@@ -100,7 +100,7 @@ public:
 	/// @param pos The offset value.
 	/// 	An assertion will fail if pos > size()
 	///
-	const uint8_t* data(size_t pos) const {
+	const boost::uint8_t* data(size_t pos) const {
 		return _buf.data(pos);
 	}
 
@@ -109,7 +109,7 @@ public:
 	/// @param pos The offset value.
 	/// 	An assertion will fail if pos > size()
 	///
-	uint8_t* data(size_t pos) {
+	boost::uint8_t* data(size_t pos) {
 		return _buf.data(pos);
 	}
 
@@ -191,11 +191,11 @@ public:
 
 	/// Returns the data pointer in the undecoded datastream
 	/// for the given position. Boundaries are checked.
-	uint8_t* get_data_ptr(unsigned long int pos);
+	boost::uint8_t* get_data_ptr(unsigned long int pos);
 
 	/// Returns the data pointer in the decoded datastream
 	/// for the given position. Boundaries are checked.
-	uint8_t* get_raw_data_ptr(unsigned long int pos);
+	boost::uint8_t* get_raw_data_ptr(unsigned long int pos);
 
 	/// Release resources associated with decoded data, if any.
 	//
@@ -213,7 +213,7 @@ public:
 	/// @param size
 	///	Size of the 'data' buffer.
 	///
-	void appendDecodedData(uint8_t* data, unsigned int size)
+	void appendDecodedData(boost::uint8_t* data, unsigned int size)
 	{
 		if ( ! _decodedData.get() )
 		{
@@ -231,7 +231,7 @@ public:
 	/// @param size
 	///	Size of the 'data' buffer.
 	///
-	void setDecodedData(uint8_t* data, unsigned int size)
+	void setDecodedData(boost::uint8_t* data, unsigned int size)
 	{
 		if ( ! _decodedData.get() )
 		{

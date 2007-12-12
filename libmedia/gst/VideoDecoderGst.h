@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderGst.h,v 1.9 2007/12/04 11:45:26 strk Exp $
+// $Id: VideoDecoderGst.h,v 1.10 2007/12/12 10:23:06 zoulunkai Exp $
 
 #ifndef __VIDEODECODERGST_H__
 #define __VIDEODECODERGST_H__
@@ -54,9 +54,9 @@ public:
 		videoCodecType /*format*/,
 		int /*outputFormat*/);
 
-	//uint8_t* decode(uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize);
+	//boost::uint8_t* decode(boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize);
 
-	std::auto_ptr<image::image_base> decodeToImage(uint8_t* /*input*/, boost::uint32_t /*inputSize*/);
+	std::auto_ptr<image::image_base> decodeToImage(boost::uint8_t* /*input*/, boost::uint32_t /*inputSize*/);
 
 	static void callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
 	static void callback_output (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
@@ -90,7 +90,7 @@ private:
 	int outputFormat;
 
 	/// Input data and size for current frame
-	uint8_t* frame;
+	boost::uint8_t* frame;
 	int frameSize;
 	
 	/// Last decoded frame

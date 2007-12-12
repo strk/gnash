@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.h,v 1.19 2007/12/04 11:45:33 strk Exp $
+// $Id: video_stream_def.h,v 1.20 2007/12/12 10:23:47 zoulunkai Exp $
 
 #ifndef GNASH_VIDEO_STREAM_DEF_H
 #define GNASH_VIDEO_STREAM_DEF_H
@@ -46,7 +46,7 @@ namespace gnash {
 /// Contains the data, the data size and the type of the frame
 class VideoData {
 public:
-	VideoData(boost::shared_array<uint8_t> data, boost::uint32_t size, media::videoFrameType ft)
+	VideoData(boost::shared_array<boost::uint8_t> data, boost::uint32_t size, media::videoFrameType ft)
 		:
 		videoData(data),
 		dataSize(size),
@@ -58,7 +58,7 @@ public:
 	{
 	}
 
-	boost::shared_array<uint8_t> videoData;
+	boost::shared_array<boost::uint8_t> videoData;
 	boost::uint32_t dataSize;
 	media::videoFrameType frameType;
 };
@@ -124,10 +124,10 @@ private:
 	boost::uint16_t m_char_id;
 
 	/// Reserved flags read from DEFINEVIDEOSTREAM tag
-	uint8_t m_reserved_flags;
+	boost::uint8_t m_reserved_flags;
 
 	/// Flags read from DEFINEVIDEOSTREAM tag
-	uint8_t m_deblocking_flags;
+	boost::uint8_t m_deblocking_flags;
 
 	/// Smoothing flag, as read from DEFINEVIDEOSTREAM tag
 	bool m_smoothing_flags;
@@ -177,7 +177,7 @@ private:
 	/// @param img
 	///	Frame data. Ownership is transferred. 
 	///
-	void setFrameData(boost::uint32_t frameNum, boost::shared_array<uint8_t> data, boost::uint32_t size, media::videoFrameType ft);
+	void setFrameData(boost::uint32_t frameNum, boost::shared_array<boost::uint8_t> data, boost::uint32_t size, media::videoFrameType ft);
 
 	/// Width of the video
 	boost::uint32_t _width;

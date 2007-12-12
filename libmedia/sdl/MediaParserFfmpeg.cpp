@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaParserFfmpeg.cpp,v 1.9 2007/12/04 11:45:27 strk Exp $
+// $Id: MediaParserFfmpeg.cpp,v 1.10 2007/12/12 10:23:06 zoulunkai Exp $
 
 #include "MediaParserFfmpeg.h"
 #include "log.h"
@@ -57,7 +57,7 @@ MediaParserFfmpeg::~MediaParserFfmpeg()
 static AVInputFormat*
 probeStream(tu_file* stream)
 {
-	boost::scoped_array<uint8_t> buffer(new uint8_t[4096]);
+	boost::scoped_array<boost::uint8_t> buffer(new boost::uint8_t[4096]);
 
 	// Probe the file to detect the format
 	AVProbeData probe_data;
@@ -97,7 +97,7 @@ bool MediaParserFfmpeg::setupParser()
 
 	// Setup the filereader/seeker mechanism. 7th argument (NULL) is the writer function,
 	// which isn't needed.
-	init_put_byte(&_byteIOCxt, new uint8_t[500000], 500000, 0, this, MediaParserFfmpeg::readPacket, NULL, MediaParserFfmpeg::seekMedia);
+	init_put_byte(&_byteIOCxt, new boost::uint8_t[500000], 500000, 0, this, MediaParserFfmpeg::readPacket, NULL, MediaParserFfmpeg::seekMedia);
 	_byteIOCxt.is_streamed = 1;
 
 	_formatCtx = av_alloc_format_context();
@@ -215,7 +215,7 @@ MediaFrame* MediaParserFfmpeg::parseMediaFrame()
 		// "The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE
 		// larger than the actual read bytes because some optimized bitstream
 		// readers read 32 or 64 bits at once and could read over the end."
-		ret->data = new uint8_t[packet.size + FF_INPUT_BUFFER_PADDING_SIZE];
+		ret->data = new boost::uint8_t[packet.size + FF_INPUT_BUFFER_PADDING_SIZE];
 		
 		memcpy(ret->data, packet.data, packet.size);
 		
@@ -360,7 +360,7 @@ MediaParserFfmpeg::getAudioInfo()
 
 // ffmpeg callback function
 int 
-MediaParserFfmpeg::readPacket(void* opaque, uint8_t* buf, int buf_size)
+MediaParserFfmpeg::readPacket(void* opaque, boost::uint8_t* buf, int buf_size)
 {
 
 	MediaParserFfmpeg* decoder = static_cast<MediaParserFfmpeg*>(opaque);

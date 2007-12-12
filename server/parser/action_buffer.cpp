@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: action_buffer.cpp,v 1.28 2007/12/04 11:45:32 strk Exp $ */
+/* $Id: action_buffer.cpp,v 1.29 2007/12/12 10:23:46 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -115,7 +115,7 @@ action_buffer::read(stream* in)
 	size_t pc = m_buffer.size();
 #endif
 
-	uint8_t action_id = in->read_u8();
+	boost::uint8_t action_id = in->read_u8();
 	m_buffer.push_back(action_id);
 	
 	if (action_id & 0x80) {
@@ -124,7 +124,7 @@ action_buffer::read(stream* in)
 	    m_buffer.push_back(length & 0x0FF);
 	    m_buffer.push_back((length >> 8) & 0x0FF);
 	    for (boost::uint16_t i = 0; i < length; i++) {
-		uint8_t b = in->read_u8(); // bytes ensured outside loop
+		boost::uint8_t b = in->read_u8(); // bytes ensured outside loop
 		m_buffer.push_back(b);
 	    }
 	}
@@ -508,10 +508,10 @@ convert_float_little(const void *p)
 			boost::uint16_t s1;
 		} s;
 		struct {	// for byte-swapping
-			uint8_t c0;
-			uint8_t c1;
-			uint8_t c2;
-			uint8_t c3;
+			boost::uint8_t c0;
+			boost::uint8_t c1;
+			boost::uint8_t c2;
+			boost::uint8_t c3;
 		} c;
 	} u;
 
@@ -522,7 +522,7 @@ convert_float_little(const void *p)
 		break;
 	case 0x3f80:	// big-endian host
 	    {
-		const uint8_t *cp = (const uint8_t *) p;
+		const boost::uint8_t *cp = (const boost::uint8_t *) p;
 		u.c.c0 = cp[3];
 		u.c.c1 = cp[2];
 		u.c.c2 = cp[1];
@@ -543,7 +543,7 @@ convert_float_little(const void *p)
 static double
 convert_double_wacky(const void *p)
 {
-	const uint8_t *cp = (const uint8_t *)p;	// Handy uchar version
+	const boost::uint8_t *cp = (const boost::uint8_t *)p;	// Handy uchar version
 	union {
 		double	d;
 		boost::uint64_t	i;
@@ -558,14 +558,14 @@ convert_double_wacky(const void *p)
 			boost::uint16_t s3;
 		} s;
 		struct {
-			uint8_t c0;
-			uint8_t c1;
-			uint8_t c2;
-			uint8_t c3;
-			uint8_t c4;
-			uint8_t c5;
-			uint8_t c6;
-			uint8_t c7;
+			boost::uint8_t c0;
+			boost::uint8_t c1;
+			boost::uint8_t c2;
+			boost::uint8_t c3;
+			boost::uint8_t c4;
+			boost::uint8_t c5;
+			boost::uint8_t c6;
+			boost::uint8_t c7;
 		} c;
 	} u;
 

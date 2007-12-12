@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.163 2007/12/11 10:06:01 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.164 2007/12/12 10:23:47 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -348,7 +348,7 @@ void inflate_wrapper(stream& in, void* buffer, int buffer_bytes)
 
 #define CHUNKSIZE 256
 
-    uint8_t buf[CHUNKSIZE];
+    boost::uint8_t buf[CHUNKSIZE];
     unsigned long endTagPos = in.get_tag_end_position();
 
     for (;;)
@@ -370,7 +370,7 @@ void inflate_wrapper(stream& in, void* buffer, int buffer_bytes)
 	}
 	
 	// Fill the buffer
-	assert(sizeof(char) == sizeof(uint8_t));
+	assert(sizeof(char) == sizeof(boost::uint8_t));
 	in.read((char*)buf, chunkSize);
 	d_stream.next_in = &buf[0];
 	d_stream.avail_in = chunkSize;
@@ -441,7 +441,7 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 
 	size_t	buffer_bytes = imWidth * imHeight;
 
-	boost::scoped_array<uint8_t> buffer ( new uint8_t[buffer_bytes] );
+	boost::scoped_array<boost::uint8_t> buffer ( new boost::uint8_t[buffer_bytes] );
 
 	inflate_wrapper(*in, buffer.get(), buffer_bytes);
 
@@ -449,7 +449,7 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 	// magical trevor contains this tag
 	//  ea8bbad50ccbc52dd734dfc93a7f06a7  6964trev3c.swf
 	//
-	uint8_t* data = im->data();
+	boost::uint8_t* data = im->data();
 	for (size_t i = 0; i < buffer_bytes; ++i)
 	{
 	    data[4*i+3] = buffer[i];
@@ -473,7 +473,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
     in->ensureBytes(2+2+2+1); // the initial header 
 
     boost::uint16_t	character_id = in->read_u16();
-    uint8_t	bitmap_format = in->read_u8();	// 3 == 8 bit, 4 == 16 bit, 5 == 32 bit
+    boost::uint8_t	bitmap_format = in->read_u8();	// 3 == 8 bit, 4 == 16 bit, 5 == 32 bit
     boost::uint16_t	width = in->read_u16();
     boost::uint16_t	height = in->read_u16();
 
@@ -512,20 +512,20 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 		int pitch = (width * bytes_per_pixel + 3) & ~3;
 
 		int buffer_bytes = color_table_size * 3 + pitch * height;
-		boost::scoped_array<uint8_t> buffer ( new uint8_t[buffer_bytes] );
+		boost::scoped_array<boost::uint8_t> buffer ( new boost::uint8_t[buffer_bytes] );
 
 		inflate_wrapper(*in, buffer.get(), buffer_bytes);
 		assert(in->get_position() <= in->get_tag_end_position());
 
-		uint8_t* color_table = buffer.get();
+		boost::uint8_t* color_table = buffer.get();
 
 		for (int j = 0; j < height; j++)
 		{
-		    uint8_t*	image_in_row = buffer.get() + color_table_size * 3 + j * pitch;
-		    uint8_t*	image_out_row = image->scanline(j);
+		    boost::uint8_t*	image_in_row = buffer.get() + color_table_size * 3 + j * pitch;
+		    boost::uint8_t*	image_out_row = image->scanline(j);
 		    for (int i = 0; i < width; i++)
 		    {
-			uint8_t	pixel = image_in_row[i * bytes_per_pixel];
+			boost::uint8_t	pixel = image_in_row[i * bytes_per_pixel];
 			image_out_row[i * 3 + 0] = color_table[pixel * 3 + 0];
 			image_out_row[i * 3 + 1] = color_table[pixel * 3 + 1];
 			image_out_row[i * 3 + 2] = color_table[pixel * 3 + 2];
@@ -540,15 +540,15 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 		int pitch = (width * bytes_per_pixel + 3) & ~3;
 
 		int buffer_bytes = pitch * height;
-		boost::scoped_array<uint8_t> buffer ( new uint8_t[buffer_bytes] );
+		boost::scoped_array<boost::uint8_t> buffer ( new boost::uint8_t[buffer_bytes] );
 
 		inflate_wrapper(*in, buffer.get(), buffer_bytes);
 		assert(in->get_position() <= in->get_tag_end_position());
 
 		for (int j = 0; j < height; j++)
 		{
-		    uint8_t*	image_in_row = buffer.get() + j * pitch;
-		    uint8_t*	image_out_row = image->scanline(j);
+		    boost::uint8_t*	image_in_row = buffer.get() + j * pitch;
+		    boost::uint8_t*	image_out_row = image->scanline(j);
 		    for (int i = 0; i < width; i++)
 		    {
 			boost::uint16_t	pixel = image_in_row[i * 2] | (image_in_row[i * 2 + 1] << 8);
@@ -568,7 +568,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 		int pitch = width * bytes_per_pixel;
 
 		int buffer_bytes = pitch * height;
-		boost::scoped_array<uint8_t> buffer ( new uint8_t[buffer_bytes] );
+		boost::scoped_array<boost::uint8_t> buffer ( new boost::uint8_t[buffer_bytes] );
 
 		inflate_wrapper(*in, buffer.get(), buffer_bytes);
 		assert(in->get_position() <= in->get_tag_end_position());
@@ -576,14 +576,14 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 		// Need to re-arrange ARGB into RGB.
 		for (int j = 0; j < height; j++)
 		{
-		    uint8_t*	image_in_row = buffer.get() + j * pitch;
-		    uint8_t*	image_out_row = image->scanline(j);
+		    boost::uint8_t*	image_in_row = buffer.get() + j * pitch;
+		    boost::uint8_t*	image_out_row = image->scanline(j);
 		    for (int i = 0; i < width; i++)
 		    {
-			uint8_t a = image_in_row[i * 4 + 0];
-			uint8_t r = image_in_row[i * 4 + 1];
-			uint8_t g = image_in_row[i * 4 + 2];
-			uint8_t b = image_in_row[i * 4 + 3];
+			boost::uint8_t a = image_in_row[i * 4 + 0];
+			boost::uint8_t r = image_in_row[i * 4 + 1];
+			boost::uint8_t g = image_in_row[i * 4 + 2];
+			boost::uint8_t b = image_in_row[i * 4 + 3];
 			image_out_row[i * 3 + 0] = r;
 			image_out_row[i * 3 + 1] = g;
 			image_out_row[i * 3 + 2] = b;
@@ -626,20 +626,20 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 		int pitch = (width * bytes_per_pixel + 3) & ~3;
 
 		int buffer_bytes = color_table_size * 4 + pitch * height;
-		boost::scoped_array<uint8_t> buffer ( new uint8_t[buffer_bytes] );
+		boost::scoped_array<boost::uint8_t> buffer ( new boost::uint8_t[buffer_bytes] );
 
 		inflate_wrapper(*in, buffer.get(), buffer_bytes);
 		assert(in->get_position() <= in->get_tag_end_position());
 
-		uint8_t* color_table = buffer.get();
+		boost::uint8_t* color_table = buffer.get();
 
 		for (int j = 0; j < height; j++)
 		{
-		    uint8_t*	image_in_row = buffer.get() + color_table_size * 4 + j * pitch;
-		    uint8_t*	image_out_row = image->scanline(j);
+		    boost::uint8_t*	image_in_row = buffer.get() + color_table_size * 4 + j * pitch;
+		    boost::uint8_t*	image_out_row = image->scanline(j);
 		    for (int i = 0; i < width; i++)
 		    {
-			uint8_t	pixel = image_in_row[i * bytes_per_pixel];
+			boost::uint8_t	pixel = image_in_row[i * bytes_per_pixel];
 			image_out_row[i * 4 + 0] = color_table[pixel * 4 + 0];
 			image_out_row[i * 4 + 1] = color_table[pixel * 4 + 1];
 			image_out_row[i * 4 + 2] = color_table[pixel * 4 + 2];
@@ -655,15 +655,15 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 		int pitch = (width * bytes_per_pixel + 3) & ~3;
 
 		int buffer_bytes = pitch * height;
-		boost::scoped_array<uint8_t> buffer ( new uint8_t[buffer_bytes] );
+		boost::scoped_array<boost::uint8_t> buffer ( new boost::uint8_t[buffer_bytes] );
 
 		inflate_wrapper(*in, buffer.get(), buffer_bytes);
 		assert(in->get_position() <= in->get_tag_end_position());
 
 		for (int j = 0; j < height; j++)
 		{
-		    uint8_t*	image_in_row = buffer.get() + j * pitch;
-		    uint8_t*	image_out_row = image->scanline(j);
+		    boost::uint8_t*	image_in_row = buffer.get() + j * pitch;
+		    boost::uint8_t*	image_out_row = image->scanline(j);
 		    for (int i = 0; i < width; i++)
 		    {
 		        boost::uint16_t	pixel = image_in_row[i * 2] | (image_in_row[i * 2 + 1] << 8);
@@ -687,13 +687,13 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 		// Need to re-arrange ARGB into RGBA.
 		for (int j = 0; j < height; j++)
 		{
-		    uint8_t*	image_row = image->scanline(j);
+		    boost::uint8_t*	image_row = image->scanline(j);
 		    for (int i = 0; i < width; i++)
 		    {
-			uint8_t	a = image_row[i * 4 + 0];
-			uint8_t	r = image_row[i * 4 + 1];
-			uint8_t	g = image_row[i * 4 + 2];
-			uint8_t	b = image_row[i * 4 + 3];
+			boost::uint8_t	a = image_row[i * 4 + 0];
+			boost::uint8_t	r = image_row[i * 4 + 1];
+			boost::uint8_t	g = image_row[i * 4 + 2];
+			boost::uint8_t	b = image_row[i * 4 + 3];
 			image_row[i * 4 + 0] = r;
 			image_row[i * 4 + 1] = g;
 			image_row[i * 4 + 2] = b;
@@ -1504,9 +1504,9 @@ reflex_loader(stream* in, tag_type tag, movie_definition* /*m*/)
     assert(tag == SWF::REFLEX); // 777
 
     in->ensureBytes(3);
-    uint8_t first = in->read_u8();
-    uint8_t second = in->read_u8();
-    uint8_t third = in->read_u8();
+    boost::uint8_t first = in->read_u8();
+    boost::uint8_t second = in->read_u8();
+    boost::uint8_t third = in->read_u8();
 
     IF_VERBOSE_PARSE (
 	log_parse(_("  reflex = \"%c%c%c\""), first, second, third);

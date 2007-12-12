@@ -27,7 +27,7 @@
 #include "types.h"
 
 //#include <cwchar>
-#include <boost/cstdint.hpp> // for uint8_t
+#include <boost/cstdint.hpp> // for boost::uint8_t
 #include <vector> // for composition
 
 #include "smart_ptr.h"
@@ -77,7 +77,7 @@ public:
 
 	size_t size() const { return m_buffer.size(); }
 
-	uint8_t operator[] (size_t off) const
+	boost::uint8_t operator[] (size_t off) const
 	{
 		assert(off < m_buffer.size() );
 		return m_buffer[off];
@@ -97,8 +97,8 @@ public:
 	}
 
 	/// Get a variable length 32-bit integer from the stream.
-	/// Store its length in the passed uint8_t.
-	boost::uint32_t read_V32(size_t pc, uint8_t& length) const
+	/// Store its length in the passed boost::uint8_t.
+	boost::uint32_t read_V32(size_t pc, boost::uint8_t& length) const
 	{
 		boost::uint32_t res = m_buffer[pc];
 		if (!(res & 0x00000080))
@@ -237,7 +237,7 @@ private:
 	action_buffer(const action_buffer& /*a*/) { abort(); }
 
 	/// the code itself, as read from the SWF
-	std::vector<uint8_t> m_buffer;
+	std::vector<boost::uint8_t> m_buffer;
 
 	/// The dictionary
 	mutable std::vector<const char*> m_dictionary;

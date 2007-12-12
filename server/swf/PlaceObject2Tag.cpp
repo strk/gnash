@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.26 2007/12/12 06:16:31 zoulunkai Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.27 2007/12/12 10:23:47 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -108,7 +108,7 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 			break;
 		}
 
-		uint8_t ch = key::INVALID;
+		boost::uint8_t ch = key::INVALID;
 
 		if (flags & (1 << 17))	// has KeyPress event
 		{
@@ -220,7 +220,7 @@ PlaceObject2Tag::readPlaceObject2(stream* in, int movie_version)
     in->align();
 
     // PlaceObject2 specific flags
-    uint8_t has_flags2 = in->read_u8();
+    boost::uint8_t has_flags2 = in->read_u8();
 
     bool    has_actions    = has_flags2 & (1 << 7); 
     bool    has_clip_depth = has_flags2 & (1 << 6); 
@@ -313,7 +313,7 @@ PlaceObject2Tag::readPlaceObject3(stream* in, int movie_version)
     in->align();
 
     // PlaceObject2 specific flags
-    uint8_t has_flags2 = in->read_u8();
+    boost::uint8_t has_flags2 = in->read_u8();
 
     bool    has_actions    = has_flags2 & (1 << 7); 
     bool    has_clip_depth = has_flags2 & (1 << 6); 
@@ -325,7 +325,7 @@ PlaceObject2Tag::readPlaceObject3(stream* in, int movie_version)
     bool    flag_move      = has_flags2 & (1 << 0); 
 
     // PlaceObject3 specific flags, first 3 bits are unused
-    uint8_t has_flags3 = in->read_u8();
+    boost::uint8_t has_flags3 = in->read_u8();
 
     bool    hasImage           = has_flags3 & (1 << 4); 
     bool    hasClassName       = has_flags3 & (1 << 3); 
@@ -333,8 +333,8 @@ PlaceObject2Tag::readPlaceObject3(stream* in, int movie_version)
     bool    has_blend_mode     = has_flags3 & (1 << 1); 
     bool    has_filters        = has_flags3 & (1 << 0);
 
-    uint8_t blend_mode = 0;
-    uint8_t bitmask = 0;
+    boost::uint8_t blend_mode = 0;
+    boost::uint8_t bitmask = 0;
     std::string className;
 
     m_depth = in->read_u16()+character::staticDepthOffset;

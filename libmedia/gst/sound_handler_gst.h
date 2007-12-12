@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_gst.h,v 1.6 2007/12/01 21:07:20 strk Exp $
+// $Id: sound_handler_gst.h,v 1.7 2007/12/12 10:23:06 zoulunkai Exp $
 
 #ifndef SOUND_HANDLER_GST_H
 #define SOUND_HANDLER_GST_H
@@ -74,10 +74,10 @@ public:
 
 	/// Returns the data pointer in the undecoded datastream
 	/// for the given position. Boundaries are checked.
-	const uint8_t* get_data_ptr(unsigned long int pos);
+	const boost::uint8_t* get_data_ptr(unsigned long int pos);
 
 	/// Set the undecoded data pointer
-	void set_data(const uint8_t*);
+	void set_data(const boost::uint8_t*);
 
 	/// The owner of the audio data this element will get data from.
 	/// Only used when getting data from NetStream or Sound.
@@ -118,7 +118,7 @@ public:
 	size_t dataSize() const { return _data.size(); }
 
 	/// Return data buffer
-	const uint8_t* data() { return _data.data(); }
+	const boost::uint8_t* data() { return _data.data(); }
 
 	// Object holding information about the sound
 	std::auto_ptr<SoundInfo> soundinfo;

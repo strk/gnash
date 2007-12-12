@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.63 2007/12/04 11:45:31 strk Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.64 2007/12/12 10:23:46 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -303,11 +303,11 @@ NetStreamGst::callback_output (GstElement* /*c*/, GstBuffer *buffer, GstPad* /*p
 
 		/*	image::yuv* yuvframe = static_cast<image::yuv*>(m_imageframe);
 			int copied = 0;
-			uint8_t* ptr = GST_BUFFER_DATA(buffer);
+			boost::uint8_t* ptr = GST_BUFFER_DATA(buffer);
 			for (int i = 0; i < 3 ; i++)
 			{
 				int shift = (i == 0 ? 0 : 1);
-				uint8_t* yuv_factor = m_Frame->data[i];
+				boost::uint8_t* yuv_factor = m_Frame->data[i];
 				int h = ns->videoheight >> shift;
 				int w = ns->videowidth >> shift;
 				for (int j = 0; j < h; j++)
@@ -917,7 +917,7 @@ NetStreamGst::startPlayback()
 
 	inputPos = 0;
 
-	uint8_t head[3];
+	boost::uint8_t head[3];
 	if (nc->read(head, 3) < 3) {
 		setStatus(streamNotFound);
 		return;

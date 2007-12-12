@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.60 2007/12/04 11:45:34 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.61 2007/12/12 10:23:47 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -300,7 +300,7 @@ ActionExec::operator() ()
 	    }
 
 	// Get the opcode.
-	uint8_t action_id = code[pc];
+	boost::uint8_t action_id = code[pc];
 	size_t oldPc = pc;
 
 	IF_VERBOSE_ACTION (
@@ -495,7 +495,7 @@ ActionExec::skip_actions(size_t offset)
 #endif
 
 	    // Get the opcode.
-	    uint8_t action_id = code[next_pc];
+	    boost::uint8_t action_id = code[next_pc];
 
 	    // Set default next_pc offset, control flow action handlers
 	    // will be able to reset it.
@@ -711,7 +711,7 @@ ActionExec::dumpActions(size_t from, size_t to, ostream& os)
 	while (lpc < to)
 	{
 	    // Get the opcode.
-	    uint8_t action_id = code[lpc];
+	    boost::uint8_t action_id = code[lpc];
 
 	    os << " PC:" << lpc << " - EX: " <<  code.disasm(lpc) << std::endl;
 

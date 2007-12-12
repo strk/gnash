@@ -137,11 +137,11 @@ public:
 	}
 
 	/// Read an opcode for ActionScript 3
-	uint8_t read_as3op()
+	boost::uint8_t read_as3op()
 	{
 		if (mCurrent == mEnd)
 			return 0;
-		return static_cast<uint8_t> (*mCurrent++);
+		return static_cast<boost::uint8_t> (*mCurrent++);
 	}
 
 	/// Provide the offset into the stream of the current position. Can be
@@ -186,11 +186,11 @@ public:
 	}
 
 	/// Read an unsigned 8-bit character.
-	uint8_t read_u8()
+	boost::uint8_t read_u8()
 	{
 		if (mCurrent == mEnd)
 			throw CodeStreamException();
-		return static_cast<uint8_t> (*mCurrent++);
+		return static_cast<boost::uint8_t> (*mCurrent++);
 	}
 
 	/// Set a stop at position bytes from the start. This becomes the new

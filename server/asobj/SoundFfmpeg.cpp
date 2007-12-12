@@ -36,7 +36,7 @@ namespace gnash {
 
 // ffmpeg callback function
 int 
-SoundFfmpeg::readPacket(void* opaque, uint8_t* buf, int buf_size)
+SoundFfmpeg::readPacket(void* opaque, boost::uint8_t* buf, int buf_size)
 {
 
 	SoundFfmpeg* so = static_cast<SoundFfmpeg*>(opaque);
@@ -111,7 +111,7 @@ SoundFfmpeg::setupDecoder()
 	// Probe the file to detect the format
 	AVProbeData probe_data, *pd = &probe_data;
 	pd->filename = "";
-	pd->buf = new uint8_t[2048];
+	pd->buf = new boost::uint8_t[2048];
 	pd->buf_size = 2048;
 
 	if (readPacket(so, pd->buf, pd->buf_size) < 1){
@@ -131,7 +131,7 @@ SoundFfmpeg::setupDecoder()
 
 	// Setup the filereader/seeker mechanism. 7th argument (NULL) is the writer function,
 	// which isn't needed.
-	init_put_byte(&so->ByteIOCxt, new uint8_t[500000], 500000, 0, so, SoundFfmpeg::readPacket, NULL, SoundFfmpeg::seekMedia);
+	init_put_byte(&so->ByteIOCxt, new boost::uint8_t[500000], 500000, 0, so, SoundFfmpeg::readPacket, NULL, SoundFfmpeg::seekMedia);
 	so->ByteIOCxt.is_streamed = 1;
 
 	so->formatCtx = av_alloc_format_context();
@@ -222,7 +222,7 @@ SoundFfmpeg::setupDecoder()
 }
 
 // audio callback is running in sound handler thread
-bool SoundFfmpeg::getAudio(void* owner, uint8_t* stream, int len)
+bool SoundFfmpeg::getAudio(void* owner, boost::uint8_t* stream, int len)
 {
 	SoundFfmpeg* so = static_cast<SoundFfmpeg*>(owner);
 
@@ -240,7 +240,7 @@ bool SoundFfmpeg::getAudio(void* owner, uint8_t* stream, int len)
 				delete[] so->leftOverData;
 				so->leftOverSize = 0;
 			} else {
-				uint8_t* buf = new uint8_t[rest];
+				boost::uint8_t* buf = new boost::uint8_t[rest];
 				memcpy(stream, so->leftOverData+len, rest);
 				delete[] so->leftOverData;
 				so->leftOverData = buf;
@@ -258,7 +258,7 @@ bool SoundFfmpeg::getAudio(void* owner, uint8_t* stream, int len)
 	AVPacket packet;
 	int rc;
 	bool loop = true;
-	uint8_t* ptr = new uint8_t[AVCODEC_MAX_AUDIO_FRAME_SIZE];
+	boost::uint8_t* ptr = new boost::uint8_t[AVCODEC_MAX_AUDIO_FRAME_SIZE];
 	bool ret = true;
 	while (loop) {
 		// Parse file
@@ -307,16 +307,16 @@ bool SoundFfmpeg::getAudio(void* owner, uint8_t* stream, int len)
 						// If the decoded data isn't enough to fill the buffer, we put the decoded
 						// data into the buffer, and continues decoding.
 						if (newDataSize <= len-pos) {
-							memcpy(stream+pos, (uint8_t*)output_data, newDataSize);
+							memcpy(stream+pos, (boost::uint8_t*)output_data, newDataSize);
 							pos += newDataSize;
 						} else {
 						// If we can fill the buffer, and still have "leftovers", we save them
 						// and use them later.
 							int rest = len-pos;
 							so->leftOverSize = newDataSize - rest;
-							memcpy(stream+pos, (uint8_t*)output_data, rest);
-							so->leftOverData = new uint8_t[so->leftOverSize];
-							memcpy(so->leftOverData, ((uint8_t*)output_data)+rest, so->leftOverSize);
+							memcpy(stream+pos, (boost::uint8_t*)output_data, rest);
+							so->leftOverData = new boost::uint8_t[so->leftOverSize];
+							memcpy(so->leftOverData, ((boost::uint8_t*)output_data)+rest, so->leftOverSize);
 							loop = false;
 							pos += rest;
 						}

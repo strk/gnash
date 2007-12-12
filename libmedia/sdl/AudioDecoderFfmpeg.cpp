@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderFfmpeg.cpp,v 1.10 2007/12/04 11:45:26 strk Exp $
+// $Id: AudioDecoderFfmpeg.cpp,v 1.11 2007/12/12 10:23:06 zoulunkai Exp $
 
 #include "AudioDecoderFfmpeg.h"
 
@@ -176,12 +176,12 @@ bool AudioDecoderFfmpeg::setup(AudioInfo* info)
 	return true;
 }
 
-uint8_t* AudioDecoderFfmpeg::decode(uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool parse)
+boost::uint8_t* AudioDecoderFfmpeg::decode(boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool parse)
 {
 
 	long bytes_decoded = 0;
 	int bufsize = (AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2;
-	uint8_t* output = new uint8_t[bufsize];
+	boost::uint8_t* output = new boost::uint8_t[bufsize];
 	boost::uint32_t orgbufsize = bufsize;
 	decodedBytes = 0;
 
@@ -196,7 +196,7 @@ uint8_t* AudioDecoderFfmpeg::decode(uint8_t* input, boost::uint32_t inputSize, b
 	
 		bufsize = 0;
 		while (bufsize == 0 && decodedBytes < inputSize) {
-			uint8_t* frame;
+			boost::uint8_t* frame;
 			int framesize;
 
 			bytes_decoded = av_parser_parse(_parser, _audioCodecCtx, &frame, &framesize, input+decodedBytes, inputSize-decodedBytes, 0, 0); //the last 2 is pts & dts
@@ -259,20 +259,20 @@ uint8_t* AudioDecoderFfmpeg::decode(uint8_t* input, boost::uint32_t inputSize, b
 		bool stereo = _audioCodecCtx->channels > 1 ? true : false;
 		int samples = stereo ? bufsize >> 2 : bufsize >> 1;
 
-		uint8_t* tmp = new uint8_t[orgbufsize];
+		boost::uint8_t* tmp = new boost::uint8_t[orgbufsize];
 			
 		samples = _resampler.resample(reinterpret_cast<boost::int16_t*>(output),
 						 reinterpret_cast<boost::int16_t*>(tmp),
 						 samples);
 		outputSize = samples *2 *2; // the resampled audio has samplesize 2, and is stereo
-		uint8_t* ret = new uint8_t[outputSize];
+		boost::uint8_t* ret = new boost::uint8_t[outputSize];
 		memcpy(ret, tmp, outputSize);
 		delete [] tmp;
 		delete [] output;
 		return ret;
 	} else {
 		outputSize = bufsize;
-		uint8_t* ret = new uint8_t[outputSize];
+		boost::uint8_t* ret = new boost::uint8_t[outputSize];
 		memcpy(ret, output, outputSize);
 		delete [] output;
 		return ret;		

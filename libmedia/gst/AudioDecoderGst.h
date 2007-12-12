@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: AudioDecoderGst.h,v 1.2 2007/12/04 11:45:26 strk Exp $
+// $Id: AudioDecoderGst.h,v 1.3 2007/12/12 10:23:06 zoulunkai Exp $
 
 #ifndef __AUDIODECODERGST_H__
 #define __AUDIODECODERGST_H__
@@ -46,7 +46,7 @@ public:
 
 	bool setup(AudioInfo* info);
 
-	uint8_t* decode(uint8_t* /*input*/, boost::uint32_t /*inputSize*/, boost::uint32_t& /*outputSize*/, boost::uint32_t& /*decodedData*/, bool /*parse*/);
+	boost::uint8_t* decode(boost::uint8_t* /*input*/, boost::uint32_t /*inputSize*/, boost::uint32_t& /*outputSize*/, boost::uint32_t& /*decodedData*/, bool /*parse*/);
 
 	static void callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
 	static void callback_output (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
@@ -81,10 +81,10 @@ private:
 	volatile bool _stop;
 
 	boost::uint32_t _undecodedDataSize;
-	uint8_t* _undecodedData;
+	boost::uint8_t* _undecodedData;
 
 	boost::uint32_t _decodedDataSize;
-	uint8_t* _decodedData;
+	boost::uint8_t* _decodedData;
 
 };
 

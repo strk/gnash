@@ -62,7 +62,7 @@ public:
 	{/**/}
 
 	tryBlock(size_t cur_off, size_t try_size, size_t catch_size,
-		size_t finally_size, uint8_t register_index, int stack_depth)
+		size_t finally_size, boost::uint8_t register_index, int stack_depth)
 		: mCatchOffset(cur_off + try_size),
 		mFinallyOffset(cur_off + try_size + catch_size),
 		mAfterTriedOffset(cur_off + try_size + catch_size + finally_size),
@@ -78,7 +78,7 @@ private:
 	size_t mSavedEndOffset;
 	bool mNamed;
 	std::string mName;
-	uint8_t mReg;
+	boost::uint8_t mReg;
 	tryState mState;
 	as_value mThrownFromCatch;
 	boost::uint32_t mStackDepth;

@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaParserFfmpeg.h,v 1.7 2007/12/04 11:45:27 strk Exp $
+// $Id: MediaParserFfmpeg.h,v 1.8 2007/12/12 10:23:06 zoulunkai Exp $
 
 #ifndef __MEDIAPARSERFFMPEG_H__
 #define __MEDIAPARSERFFMPEG_H__
@@ -73,7 +73,7 @@ public:
 	std::auto_ptr<AudioInfo> getAudioInfo();
 
 	// Used for ffmpeg data read and seek callbacks
-	static int readPacket(void* opaque, uint8_t* buf, int buf_size);
+	static int readPacket(void* opaque, boost::uint8_t* buf, int buf_size);
 
 	// Used for ffmpeg data read and seek callbacks
 	static offset_t seekMedia(void *opaque, offset_t offset, int whence);

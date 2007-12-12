@@ -175,7 +175,7 @@ public:
 
 	bool read(stream* in);
 
-	bool pool_value(boost::uint32_t index, uint8_t type, as_value &v);
+	bool pool_value(boost::uint32_t index, boost::uint8_t type, as_value &v);
 
 	abc_block();
 };

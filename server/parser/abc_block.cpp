@@ -175,7 +175,7 @@ abc_Trait::read(stream* in, abc_block *pBlock)
 	mName = pBlock->mMultinamePool[name].getName();
 	mNamespace = pBlock->mMultinamePool[name].getNamespace();
 
-	uint8_t kind = in->read_u8();
+	boost::uint8_t kind = in->read_u8();
 	mKind = static_cast<kinds> (kind & 0x0F);
 
 	switch (mKind)
@@ -394,7 +394,7 @@ abc_block::read_namespaces()
 	}
 	for (unsigned int i = 1; i < count; ++i)
 	{
-		uint8_t kind = mS->read_u8();
+		boost::uint8_t kind = mS->read_u8();
 		boost::uint32_t nameIndex = mS->read_V32();
 
 		if (nameIndex && nameIndex < mStringPool.size())
@@ -471,7 +471,7 @@ abc_block::read_multinames()
 	}
 	for (unsigned int i = 1; i < count; ++i)
 	{
-		uint8_t kind = mS->read_u8();
+		boost::uint8_t kind = mS->read_u8();
 		boost::uint32_t ns = 0;
 		boost::uint32_t name = 0;
 		boost::uint32_t nsset = 0;
@@ -583,7 +583,7 @@ abc_block::read_multinames()
 }
 
 bool
-abc_block::pool_value(boost::uint32_t index, uint8_t type, as_value &v)
+abc_block::pool_value(boost::uint32_t index, boost::uint8_t type, as_value &v)
 {
 	if (!index)
 		return true;
@@ -717,7 +717,7 @@ abc_block::read_method_infos()
 		// A skippable name index.
 		mS->skip_V32();
 
-		uint8_t flags = mS->read_u8();
+		boost::uint8_t flags = mS->read_u8();
 
 		// If there are default parameters, read them now.
 		// Runtime will do validation of whether or not these can actually
@@ -729,7 +729,7 @@ abc_block::read_method_infos()
 			for (unsigned int j = 0; j < ocount; ++j)
 			{
 				boost::uint32_t index = mS->read_V32();
-				uint8_t kindof = mS->read_u8();
+				boost::uint8_t kindof = mS->read_u8();
 				as_value v;
 				if (!pool_value(index, kindof, v))
 					return false; // message done by pool_value
@@ -856,7 +856,7 @@ abc_block::read_instances()
 			pSuper->setInherited();
 		}
 
-		uint8_t flags = mS->read_u8();
+		boost::uint8_t flags = mS->read_u8();
 
 		if (flags & INSTANCE_SEALED)
 			pClass->setSealed();

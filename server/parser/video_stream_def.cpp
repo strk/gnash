@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.29 2007/12/04 21:42:18 strk Exp $
+// $Id: video_stream_def.cpp,v 1.30 2007/12/12 10:23:47 zoulunkai Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -111,7 +111,7 @@ video_stream_definition::readDefineVideoFrame(stream* in, SWF::tag_type tag, mov
 	unsigned int dataSize = in->get_tag_end_position() - in->get_position();
 	unsigned int totSize = dataSize+padding;
 
-	boost::shared_array<uint8_t> data ( new uint8_t[totSize] );
+	boost::shared_array<boost::uint8_t> data ( new boost::uint8_t[totSize] );
 	in->read((char*)data.get(), dataSize);
 	if ( padding ) memset(&data[dataSize], 0, padding);  // pad with zeroes if needed
 
@@ -191,7 +191,7 @@ video_stream_definition::get_frame_data(boost::uint32_t frameNum)
 }
 
 void
-video_stream_definition::setFrameData(boost::uint32_t frameNum, boost::shared_array<uint8_t> data, boost::uint32_t size, media::videoFrameType ft)
+video_stream_definition::setFrameData(boost::uint32_t frameNum, boost::shared_array<boost::uint8_t> data, boost::uint32_t size, media::videoFrameType ft)
 {
 	EmbedFrameMap::iterator it = m_video_frames.find(frameNum);
 	if( it != m_video_frames.end() )

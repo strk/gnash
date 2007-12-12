@@ -67,7 +67,7 @@ key_as_object::is_key_down(int keycode)
     // Find bit within the byte:
     int bit_index = keycode - (byte_index << 3);
 
-    uint8_t mask = 1 << bit_index;
+    boost::uint8_t mask = 1 << bit_index;
 
     if ((m_unreleased_keys[byte_index] & mask) != 0 ) return true;
 

@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.8 2007/12/04 11:45:27 strk Exp $
+// $Id: sound_handler_sdl.cpp,v 1.9 2007/12/12 10:23:07 zoulunkai Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -99,14 +99,14 @@ int	SDL_sound_handler::create_sound(
 		return -1;
 #endif
 #endif
-		sounddata->append(reinterpret_cast<uint8_t*>(data), data_bytes);
+		sounddata->append(reinterpret_cast<boost::uint8_t*>(data), data_bytes);
 		break;
 
 	case AUDIO_CODEC_RAW:
 	case AUDIO_CODEC_ADPCM:
 	case AUDIO_CODEC_UNCOMPRESSED:
 	case AUDIO_CODEC_NELLYMOSER:
-		sounddata->append(reinterpret_cast<uint8_t*>(data), data_bytes);
+		sounddata->append(reinterpret_cast<boost::uint8_t*>(data), data_bytes);
 		break;
 
 	default:
@@ -144,7 +144,7 @@ long	SDL_sound_handler::fill_stream_data(unsigned char* data, unsigned int data_
 
 	// Handling of the sound data
 	size_t start_size = sounddata->size();
-	sounddata->append(reinterpret_cast<uint8_t*>(data), data_bytes);
+	sounddata->append(reinterpret_cast<boost::uint8_t*>(data), data_bytes);
 
 	return start_size;
 }
@@ -500,7 +500,7 @@ create_sound_handler_sdl()
 }
 
 // Pointer handling and checking functions
-uint8_t*
+boost::uint8_t*
 active_sound::get_raw_data_ptr(unsigned long int pos)
 {
 	if ( _decodedData.get() )
@@ -510,7 +510,7 @@ active_sound::get_raw_data_ptr(unsigned long int pos)
 	else return 0;
 }
 
-uint8_t*
+boost::uint8_t*
 active_sound::get_data_ptr(unsigned long int pos)
 {
 	assert(_undecodedData);
@@ -651,7 +651,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 	// call NetStream or Sound audio callbacks
 	if ( !handler->m_aux_streamer.empty() )
 	{
-		boost::scoped_array<uint8_t> buf ( new uint8_t[buffer_length] );
+		boost::scoped_array<boost::uint8_t> buf ( new boost::uint8_t[buffer_length] );
 
 		// Loop through the attached sounds
 		CallbacksMap::iterator it = handler->m_aux_streamer.begin();

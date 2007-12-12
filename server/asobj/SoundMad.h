@@ -60,7 +60,7 @@ public:
 	unsigned int getPosition();
 
 	static void setupDecoder(SoundMad* so);
-	static bool getAudio(void *owner, uint8_t *stream, int len);
+	static bool getAudio(void *owner, boost::uint8_t *stream, int len);
 private:
 
 	long inputPos;
@@ -72,7 +72,7 @@ private:
 	// bitrate in bps
 	unsigned long bitrate;
 
-	int readPacket(uint8_t* buf, int buf_size);
+	int readPacket(boost::uint8_t* buf, int buf_size);
 	int seekMedia(int offset, int whence);
 
 	/// mad stuff
@@ -81,7 +81,7 @@ private:
 	mad_synth 	synth;
 
 	// If the decoded data doesn't fit the buffer we put the leftovers here
-	uint8_t* leftOverData;
+	boost::uint8_t* leftOverData;
 	int leftOverSize;
 
 	// Are this sound attached to the soundhandler?

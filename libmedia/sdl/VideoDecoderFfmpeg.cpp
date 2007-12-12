@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: VideoDecoderFfmpeg.cpp,v 1.11 2007/12/06 12:50:24 bwy Exp $
+// $Id: VideoDecoderFfmpeg.cpp,v 1.12 2007/12/12 10:23:06 zoulunkai Exp $
 
 #include "VideoDecoderFfmpeg.h"
 
@@ -168,7 +168,7 @@ bool VideoDecoderFfmpeg::setup(VideoInfo* info)
 	return true;
 }
 
-uint8_t*
+boost::uint8_t*
 VideoDecoderFfmpeg::convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame)
 {
 	int width = srcCtx->width, height = srcCtx->height;
@@ -178,7 +178,7 @@ VideoDecoderFfmpeg::convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame)
 		return NULL;
 	}
 
-	uint8_t* buffer = new uint8_t[bufsize];
+	boost::uint8_t* buffer = new boost::uint8_t[bufsize];
 	if (!buffer) {
 		return NULL;
 	}
@@ -222,7 +222,7 @@ VideoDecoderFfmpeg::convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame)
 	return buffer;
 }
 
-uint8_t* VideoDecoderFfmpeg::decode(uint8_t* input,
+boost::uint8_t* VideoDecoderFfmpeg::decode(boost::uint8_t* input,
 				boost::uint32_t inputSize,
 				boost::uint32_t& outputSize)
 {
@@ -240,7 +240,7 @@ uint8_t* VideoDecoderFfmpeg::decode(uint8_t* input,
 	
 	if (got)
 	{
-		boost::scoped_array<uint8_t> buffer;
+		boost::scoped_array<boost::uint8_t> buffer;
 		
 		// Set to the next multiple of four. Some videos have
 		// padding bytes, so that the source width is more than three times
@@ -249,15 +249,15 @@ uint8_t* VideoDecoderFfmpeg::decode(uint8_t* input,
 		// Have found no documenation on this.
 		unsigned int srcwidth = (_videoCodecCtx->width * 3 + 3) &~ 3; 
 
-		uint8_t* decodedData = new uint8_t[srcwidth * _videoCodecCtx->height];
+		boost::uint8_t* decodedData = new boost::uint8_t[srcwidth * _videoCodecCtx->height];
 		buffer.reset(convertRGB24(_videoCodecCtx, frame));
 
 		// Copy the data to the buffer in the correct RGB format
-		uint8_t* srcptr = frame->data[0];
-		uint8_t* srcend = frame->data[0]
+		boost::uint8_t* srcptr = frame->data[0];
+		boost::uint8_t* srcend = frame->data[0]
 					+ frame->linesize[0]
 					* _videoCodecCtx->height;
-		uint8_t* dstptr = decodedData;
+		boost::uint8_t* dstptr = decodedData;
 
 		outputSize = 0;
 
@@ -287,9 +287,9 @@ uint8_t* VideoDecoderFfmpeg::decode(uint8_t* input,
 		raw_mediadata_t* video = new raw_mediadata_t;
 		if (_videoFrameFormat == YUV) {
 			abort(); // See image.cpp to see what yuv size is
-			//video->m_data = new uint8_t[static_cast<image::yuv*>(m_imageframe)->size()];
+			//video->m_data = new boost::uint8_t[static_cast<image::yuv*>(m_imageframe)->size()];
 		} else if (_videoFrameFormat == RGB) {
-			video->m_data = new uint8_t[_videoCodecCtx->width * _videoCodecCtx->height * 3];
+			video->m_data = new boost::uint8_t[_videoCodecCtx->width * _videoCodecCtx->height * 3];
 		//}
 
 		video->m_ptr = video->m_data;
@@ -302,11 +302,11 @@ uint8_t* VideoDecoderFfmpeg::decode(uint8_t* input,
 		if (_videoFrameFormat == YUV) {
 			//image::yuv* yuvframe = static_cast<image::yuv*>(_imageframe);
 			int copied = 0;
-			uint8_t* ptr = video->m_data;
+			boost::uint8_t* ptr = video->m_data;
 			for (int i = 0; i < 3 ; i++)
 			{
 				int shift = (i == 0 ? 0 : 1);
-				uint8_t* yuv_factor = _frame->data[i];
+				boost::uint8_t* yuv_factor = _frame->data[i];
 				int h = _videoCodecCtx->height >> shift;
 				int w = _videoCodecCtx->width >> shift;
 				for (int j = 0; j < h; j++)
@@ -321,9 +321,9 @@ uint8_t* VideoDecoderFfmpeg::decode(uint8_t* input,
 			video->m_size = copied;
 		} else if (_videoFrameFormat == RGB) {
 
-			uint8_t* srcptr = _frame->data[0];
-			uint8_t* srcend = _frame->data[0] + _frame->linesize[0] * _videoCodecCtx->height;
-			uint8_t* dstptr = video->m_data;
+			boost::uint8_t* srcptr = _frame->data[0];
+			boost::uint8_t* srcend = _frame->data[0] + _frame->linesize[0] * _videoCodecCtx->height;
+			boost::uint8_t* dstptr = video->m_data;
 			unsigned int srcwidth = _videoCodecCtx->width * 3;
 
 			video->m_size = 0;
@@ -346,10 +346,10 @@ uint8_t* VideoDecoderFfmpeg::decode(uint8_t* input,
 }
 
 std::auto_ptr<image::image_base>
-VideoDecoderFfmpeg::decodeToImage(uint8_t* input, boost::uint32_t inputSize)
+VideoDecoderFfmpeg::decodeToImage(boost::uint8_t* input, boost::uint32_t inputSize)
 {
 	boost::uint32_t outputSize = 0;
-	uint8_t* decodedData = decode(input, inputSize, outputSize);
+	boost::uint8_t* decodedData = decode(input, inputSize, outputSize);
 
 	if (!decodedData || outputSize == 0)
 	{

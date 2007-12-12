@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.54 2007/12/04 11:45:31 strk Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.55 2007/12/12 10:23:46 zoulunkai Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -70,8 +70,8 @@ public:
 
 	int m_stream_index;
 	boost::uint32_t m_size;
-	uint8_t* m_data;
-	uint8_t* m_ptr;
+	boost::uint8_t* m_data;
+	boost::uint8_t* m_ptr;
 	boost::uint32_t m_pts;	// presentation timestamp in millisec
 };
 
@@ -268,7 +268,7 @@ public:
 	void advance();
 
 	// Used for ffmpeg data read and seek callbacks with non-FLV
-	static int readPacket(void* opaque, uint8_t* buf, int buf_size);
+	static int readPacket(void* opaque, boost::uint8_t* buf, int buf_size);
 
 	// Used for ffmpeg data read and seek callbacks with non-FLV
 	static offset_t seekMedia(void *opaque, offset_t offset, int whence);
@@ -282,7 +282,7 @@ public:
 	///
 	/// It will be invoked by a separate thread (neither main, nor decoder thread).
 	///
-	static bool audio_streamer(void *udata, uint8_t *stream, int len);
+	static bool audio_streamer(void *udata, boost::uint8_t *stream, int len);
 
 private:
 

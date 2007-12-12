@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: Key.h,v 1.31 2007/11/16 17:35:34 strk Exp $ */
+/* $Id: Key.h,v 1.32 2007/12/12 10:23:46 zoulunkai Exp $ */
 
 #ifndef __KEY_H__
 #define __KEY_H__
@@ -51,7 +51,7 @@ class DSOEXPORT key_as_object : public as_object
 
 private:
     /// bit-array for recording the unreleased keys
-    uint8_t m_unreleased_keys[key::KEYCOUNT / 8 + 1];   
+    boost::uint8_t m_unreleased_keys[key::KEYCOUNT / 8 + 1];   
 
     typedef std::list<boost::intrusive_ptr<as_object> > Listeners;
     Listeners m_listeners;

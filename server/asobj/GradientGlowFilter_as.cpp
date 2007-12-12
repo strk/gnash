@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: GradientGlowFilter_as.cpp,v 1.3 2007/09/14 01:39:31 nihilus Exp $ */
+/* $Id: GradientGlowFilter_as.cpp,v 1.4 2007/12/12 10:23:46 zoulunkai Exp $ */
 
 #include "as_object.h"
 #include "GradientGlowFilter.h"
@@ -82,7 +82,7 @@ phelp_array_property(ratios)
 phelp_property(float, number<float>, blurX)
 phelp_property(float, number<float>, blurY)
 phelp_property(float, number<float>, strength)
-phelp_property(uint8_t, number<uint8_t>, quality)
+phelp_property(boost::uint8_t, number<boost::uint8_t>, quality)
 // Type is not automatable.
 phelp_property(bool, bool, knockout)
 
