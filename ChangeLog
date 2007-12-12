@@ -1,3 +1,7 @@
+2007-12-12 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/libbase/Makefile.am: actually run the IntTypesTest.
+
 2007-12-12 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/button_character_instance.cpp: stagePlacementCallback(), don't 
