@@ -1,5 +1,7 @@
 2007-12-12 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp: add support for limiting reads from
+	  the tu_file StreamAdapter (bitmaps parsing).
 	* server/asobj/Global.cpp: stub updateAfterEvent().
 	* testsuite/actionscript.all/Global.as: one more test for
 	  updateAfterEvent().

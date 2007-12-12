@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.165 2007/12/12 15:00:14 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.166 2007/12/12 16:35:19 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -84,16 +84,46 @@ namespace { // anonymous
 class StreamAdapter
 {
 	stream& s;
+	unsigned long startPos;
+	unsigned long endPos;
+	unsigned long currPos;
 
-	StreamAdapter(stream& str)
+	StreamAdapter(stream& str, unsigned long maxPos)
 		:
-		s(str)
-	{}
+		s(str),
+		startPos(s.get_position()),
+		endPos(maxPos),
+		currPos(startPos)
+	{
+		assert(endPos > startPos);
+#if 0
+		if (endPos <= startPos)
+		{
+			log_error("startPos: %lu, endPos: %lu", startPos, endPos);
+			abort();
+		}
+#endif
+	}
 
 	static int readFunc(void* dst, int bytes, void* appdata) 
 	{
 		StreamAdapter* br = (StreamAdapter*) appdata;
-		return br->s.read((char*)dst, bytes);
+
+		unsigned bytesLeft = br->endPos - br->currPos;
+		if ( bytesLeft < (unsigned)bytes )
+		{
+			log_debug("Requested to read past end of stream range");
+			bytes = bytesLeft;
+		}
+		unsigned actuallyRead = br->s.read((char*)dst, bytes);
+		br->currPos += actuallyRead;
+		return actuallyRead;
+	}
+
+	static long int getStreamSizeFunc(void* appdata)
+	{
+		StreamAdapter* br = (StreamAdapter*) appdata;
+		return (br->endPos - br->startPos);
 	}
 
 	static int closeFunc(void* appdata)
@@ -106,11 +136,11 @@ class StreamAdapter
 public:
 
 	/// Get a tu_file from a gnash::stream
-	static std::auto_ptr<tu_file> getFile(stream& str)
+	static std::auto_ptr<tu_file> getFile(stream& str, unsigned long endPos)
 	{
 		std::auto_ptr<tu_file> ret ( 
 			new tu_file (
-				new StreamAdapter(str),
+				new StreamAdapter(str, endPos),
 				readFunc,
 				0, // write_func wf,
 				0, //seek_func sf,
@@ -118,7 +148,7 @@ public:
 				0, //tell_func tf,
 				0, //get_eof_func gef,
 				0, //get_err_func ger
-				0, // get_stream_size_func gss,
+				getStreamSizeFunc, // get_stream_size_func gss,
 				closeFunc
 			)
 		);
@@ -203,11 +233,10 @@ jpeg_tables_loader(stream* in, tag_type tag, movie_definition* m)
 
     try
     {
-	std::auto_ptr<tu_file> ad( StreamAdapter::getFile(*in) );
+	std::auto_ptr<tu_file> ad( StreamAdapter::getFile(*in, in->get_tag_end_position()) );
 	//  transfer ownerhip to the jpeg::input
         j_in.reset(jpeg::input::create_swf_jpeg2_header_only(ad.release(), true));
 
-        //j_in.reset(jpeg::input::create_swf_jpeg2_header_only(in->get_underlying_stream()));
     }
     catch (std::exception& e)
     {
@@ -284,6 +313,7 @@ define_bits_jpeg2_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::DEFINEBITSJPEG2); // 21
 
+    in->ensureBytes(2);
     boost::uint16_t	character_id = in->read_u16();
 
     IF_VERBOSE_PARSE
@@ -298,7 +328,7 @@ define_bits_jpeg2_loader(stream* in, tag_type tag, movie_definition* m)
 
     if (m->get_create_bitmaps() == DO_LOAD_BITMAPS)
     {
-	std::auto_ptr<tu_file> ad( StreamAdapter::getFile(*in) );
+	std::auto_ptr<tu_file> ad( StreamAdapter::getFile(*in, in->get_tag_end_position()) );
 	std::auto_ptr<image::rgb> im ( image::read_jpeg(ad.get()) );
 
 	if ( m->get_bitmap_character_def(character_id) )
@@ -429,7 +459,7 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 	//
 
 	// Read rgb data.
-	std::auto_ptr<tu_file> ad( StreamAdapter::getFile(*in) );
+	std::auto_ptr<tu_file> ad( StreamAdapter::getFile(*in, in->get_tag_end_position()) );
 	std::auto_ptr<image::rgba> im( image::read_swf_jpeg3(ad.get()) );
 
 	// Read alpha channel.
