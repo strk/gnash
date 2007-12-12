@@ -269,7 +269,7 @@ namespace zlib_adapter
 		// If we're seeking backwards, then restart from the beginning.
 		if (pos < inf->m_logical_stream_pos)
 		{
-			log_debug("inflater reset due to seek back");
+			log_debug("inflater reset due to seek back from %d to %d", inf->m_logical_stream_pos, pos );
 			inf->reset();
 		}
 
