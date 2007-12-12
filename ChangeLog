@@ -1,4 +1,6 @@
+2007-12-12 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/System.as: update expected results.
 	* server/swf/tag_loaders.cpp (define_bits_jpeg3_loader): don't read
 	  rgb data past alpha_position.
 

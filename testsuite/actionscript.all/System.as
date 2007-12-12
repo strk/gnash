@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: System.as,v 1.14 2007/12/12 04:31:05 strk Exp $";
+rcsid="$Id: System.as,v 1.15 2007/12/12 22:45:27 strk Exp $";
 
 #include "check.as"
 
@@ -71,7 +71,7 @@ xcheck_equals(typeof(System.capabilities.screenDPI), 'number');
 xcheck_equals(typeof(System.capabilities.screenColor), 'string');
 xcheck_equals(typeof(System.capabilities.pixelAspectRatio), 'string');
 xcheck_equals(typeof(System.capabilities.localFileReadDisable), 'boolean');
-xcheck_equals(typeof(System.capabilities.language), 'string');
+check_equals(typeof(System.capabilities.language), 'string');
 xcheck_equals(typeof(System.capabilities.isDebugger), 'boolean');
 xcheck_equals(typeof(System.capabilities.hasVideoEncoder), 'boolean');
 xcheck_equals(typeof(System.capabilities.hasStreamingVideo), 'boolean');
@@ -82,7 +82,7 @@ xcheck_equals(typeof(System.capabilities.hasPrinting), 'boolean');
 xcheck_equals(typeof(System.capabilities.hasMP3), 'boolean');
 xcheck_equals(typeof(System.capabilities.hasEmbeddedVideo), 'boolean');
 xcheck_equals(typeof(System.capabilities.hasAudioEncoder), 'boolean');
-xcheck_equals(typeof(System.capabilities.hasAudio), 'boolean');
+check_equals(typeof(System.capabilities.hasAudio), 'boolean');
 xcheck_equals(typeof(System.capabilities.hasAccessibility), 'boolean');
 xcheck_equals(typeof(System.capabilities.avHardwareDisable), 'boolean');
 
