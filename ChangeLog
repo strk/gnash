@@ -1,5 +1,13 @@
 2007-12-12 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/System.cpp: add System.capabilities properties
+	  os, playerType and manufactorer. Would need a real implementation
+	  as this is just a placeholder.
+	* testsuite/actionscript.all/System.as: test availability of
+	  known System.capabilities members.
+
+2007-12-12 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ASHandlers.cpp (ActionGetMember): print ascoding error
 	  if trying to reference unexisitng object member.
 	* testsuite/misc-swfc.all/Makefile.am: use double quotes to allow for

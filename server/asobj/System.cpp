@@ -93,8 +93,24 @@ getSystemCapabilitiesInterface()
 	static boost::intrusive_ptr<as_object> proto;
 	if ( proto == NULL )
 	{
+		int flags  = as_prop_flags::dontDelete;
+		    flags |= as_prop_flags::dontEnum;
+		    flags |= as_prop_flags::readOnly;
+
 		proto = new as_object(getObjectInterface());
-		proto->init_member("version", VM::get().getPlayerVersion() );
+
+		proto->init_member("version", VM::get().getPlayerVersion(), flags);
+
+		// TODO:
+		// "stand-alone", "external", "plug-in", or "ActiveX". 
+		proto->init_member("playerType", "stand-alone", flags);
+
+		// TODO: 
+		// "Windows XP", "Windows 2000", "Windows NT", "Windows 98/ME", "Windows 95", "Windows CE", "Linux", "MacOS"
+		proto->init_member("os", "GNU", flags);
+
+		// TODO: should be manufacturer and platform
+		proto->init_member("manufacturer", "GNU Gnash", flags);
 	}
 	return proto.get();
 }

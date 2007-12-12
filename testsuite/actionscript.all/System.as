@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: System.as,v 1.13 2007/09/29 16:22:58 strk Exp $";
+rcsid="$Id: System.as,v 1.14 2007/12/12 04:31:05 strk Exp $";
 
 #include "check.as"
 
@@ -61,9 +61,42 @@ check_equals(System.capabilities.version, $version);
 check_equals(typeof(_global.$version), 'undefined');
 check_equals(typeof(this.$version), 'string');
 check_equals(this.$version, System.capabilities.version);
+check_equals(typeof(System.capabilities.os), 'string');
+check_equals(typeof(System.capabilities.manufacturer), 'string');
+check_equals(typeof(System.capabilities.playerType), 'string');
+xcheck_equals(typeof(System.capabilities.serverString), 'string');
+xcheck_equals(typeof(System.capabilities.screenResolutionX), 'number');
+xcheck_equals(typeof(System.capabilities.screenResolutionY), 'number');
+xcheck_equals(typeof(System.capabilities.screenDPI), 'number');
+xcheck_equals(typeof(System.capabilities.screenColor), 'string');
+xcheck_equals(typeof(System.capabilities.pixelAspectRatio), 'string');
+xcheck_equals(typeof(System.capabilities.localFileReadDisable), 'boolean');
+xcheck_equals(typeof(System.capabilities.language), 'string');
+xcheck_equals(typeof(System.capabilities.isDebugger), 'boolean');
+xcheck_equals(typeof(System.capabilities.hasVideoEncoder), 'boolean');
+xcheck_equals(typeof(System.capabilities.hasStreamingVideo), 'boolean');
+xcheck_equals(typeof(System.capabilities.hasStreamingAudio), 'boolean');
+xcheck_equals(typeof(System.capabilities.hasScreenPlayback), 'boolean');
+xcheck_equals(typeof(System.capabilities.hasScreenBroadcast), 'boolean');
+xcheck_equals(typeof(System.capabilities.hasPrinting), 'boolean');
+xcheck_equals(typeof(System.capabilities.hasMP3), 'boolean');
+xcheck_equals(typeof(System.capabilities.hasEmbeddedVideo), 'boolean');
+xcheck_equals(typeof(System.capabilities.hasAudioEncoder), 'boolean');
+xcheck_equals(typeof(System.capabilities.hasAudio), 'boolean');
+xcheck_equals(typeof(System.capabilities.hasAccessibility), 'boolean');
+xcheck_equals(typeof(System.capabilities.avHardwareDisable), 'boolean');
+
 #if OUTPUT_VERSION >= 6
 check(this.hasOwnProperty("$version"));
 check(! MovieClip.prototype.hasOwnProperty("$version") );
 #endif
 
-totals();
+#if OUTPUT_VERSION > 6
+ check_totals(40);
+#else
+# if OUTPUT_VERSION == 6
+   check_totals(39);
+# else
+   check_totals(37);
+# endif
+#endif
