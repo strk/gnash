@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: VM.cpp,v 1.27 2007/12/10 10:54:34 bwy Exp $ */
+/* $Id: VM.cpp,v 1.28 2007/12/12 18:19:27 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -32,6 +32,10 @@
 #include "namedStrings.h"
 #include "ClassHierarchy.h"
 #include "VirtualClock.h" // for getTime()
+
+#ifdef HAVE_SYS_UTSNAME_H
+# include <sys/utsname.h> // For system information
+#endif
 
 #include <memory>
 #include <boost/random.hpp> // for random generator
@@ -126,6 +130,74 @@ VM::getPlayerVersion() const
 	//From rcfile
 	static const std::string version(rcfile.getFlashVersionString());
 	return version;
+}
+
+const std::string
+VM::getOSName()
+{
+
+	// The directive in gnashrc must override OS detection.
+	if (rcfile.getFlashSystemOS() != "")
+	{
+		return rcfile.getFlashSystemOS();
+	}
+	else
+	{
+#ifdef HAVE_SYS_UTSNAME_H
+// For Linux- or UNIX-based systems (POSIX 4.4 conformant)
+
+		utsname osname;
+		std::string tmp;
+		
+		uname (&osname);
+		
+		tmp = osname.sysname;
+		tmp += " ";
+		tmp += osname.release;
+		
+		return tmp;
+#else
+// Last resort, hard-coded from compile-time options
+
+		return DEFAULT_FLASH_SYSTEM_OS;
+#endif
+	}
+}
+
+const std::string
+VM::getSystemLanguage()
+{
+	std::string lang;
+	char *loc;
+	
+	// Try various environment variables. These should
+	// be in the standard form "de", "de_DE" or "de_DE.utf8"
+	// We'll return the first two characters anyway.
+	// This should work on most UNIX-like systems.
+	// TODO: Other OSs.
+	if ((loc = getenv("LANG")))
+	{
+		lang = loc;
+	}
+	else if ((loc = getenv("LANGUAGE")))
+	{
+		lang = loc;
+	}
+	else if ((loc = getenv("LC_MESSAGES")))
+	{
+		lang = loc;
+	}
+	
+	if (lang.length() >= 2)
+	{
+		return lang.substr(0,2);
+	}
+	else
+	{
+		// TODO: what should be returned if we fail to
+		// find a language string?
+		return "";
+	}
 }
 
 movie_root&

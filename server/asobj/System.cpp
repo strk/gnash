@@ -74,13 +74,22 @@ getSystemCapabilitiesInterface()
 		// "stand-alone", "external", "plug-in", or "ActiveX". 
 		proto->init_member("playerType", "stand-alone", flags);
 
-		// TODO: 
 		// "Windows XP", "Windows 2000", "Windows NT", "Windows 98/ME", "Windows 95", "Windows CE", "Linux", "MacOS"
-		proto->init_member("os", rcfile.getFlashSystemOS(), flags);
+		proto->init_member("os", VM::get().getOSName(), flags);
 
-		// TODO: should be manufacturer and platform
 		// "Macromedia Windows", "Macromedia Linux", "Macromedia MacOS"
 		proto->init_member("manufacturer", rcfile.getFlashSystemManufacturer(), flags);
+		
+		/* Human Interface */
+		
+		// Two-letter language code ('en', 'de')
+		proto->init_member("language", VM::get().getSystemLanguage(), flags);
+		
+		/* Media */
+		
+		// Is audio available?
+		proto->init_member("hasAudio", (get_sound_handler() != NULL), flags);
+		
 	}
 	return proto.get();
 }

@@ -1,4 +1,4 @@
-dnl  
+hednl  
 dnl    Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.457 2007/12/12 12:19:55 strk Exp $
+dnl $Id: configure.ac,v 1.458 2007/12/12 18:19:27 bwy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -933,6 +933,7 @@ AC_CHECK_HEADERS(malloc.h)
 AC_CHECK_HEADERS(getopt.h)
 AC_CHECK_HEADERS(libgen.h)
 AC_CHECK_HEADERS(pwd.h)
+AC_CHECK_HEADERS(sys/utsname.h)
 AC_CHECK_LIB(m, sqrt)
 AC_CHECK_LIB(c, getpwnam,AC_DEFINE(HAVE_GETPWNAM, 1, [Has getpwnam] ))
 

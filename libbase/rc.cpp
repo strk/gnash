@@ -68,7 +68,7 @@ RcInitFile::RcInitFile() : _delay(0),
 				DEFAULT_FLASH_MAJOR_VERSION","\
 				DEFAULT_FLASH_MINOR_VERSION","\
 				DEFAULT_FLASH_REV_NUMBER ",0"),
-                           _flashSystemOS(DEFAULT_FLASH_SYSTEM_OS),
+                           _flashSystemOS(), 
                            _flashSystemManufacturer("Gnash "DEFAULT_FLASH_SYSTEM_OS),
                            _actiondump(false),
                            _parserdump(false),

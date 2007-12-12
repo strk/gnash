@@ -1,3 +1,13 @@
+2007-12-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/asobj/System.cpp: implement language, hasAudio; find os
+	  at runtime.
+	* libbase/rc.{h,cpp}: do not set _flashSystemOS by default; doing
+	  so overrides runtime OS detection.
+	* server/vm/VM.{h,cpp}: add methods to retrieve current OS and
+	  current language for System.capabilities.
+	* configure.ac: test for sys/utsname.h (for system information).
+
 2007-12-12 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/tag_loaders.cpp: add support for limiting reads from

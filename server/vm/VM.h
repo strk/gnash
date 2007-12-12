@@ -209,6 +209,17 @@ public:
 	///
 	const std::string& getPlayerVersion() const;
 	
+	/// Get current OS name. This is used for System.capabilites.os. If
+	/// defined in gnashrc, that takes precedence. For Linux, the string
+	/// includes the kernel version (unname -sr). Only works for systems
+	/// with sys/utsname.h (POSIX 4.4).
+	const std::string getOSName();
+	
+	/// Return the current language of the system. This is used for
+	/// System.capabilities.language. Only works for systems with 
+	/// a language environment variable.
+	const std::string getSystemLanguage();
+	
 	// The boost Random Number Generator to use.
 	//
 	// http://www.boost.org/libs/random/random-generators.html

@@ -151,9 +151,13 @@ private:
     bool _debug;                // enable debugging of this class
     bool _debugger;             // enable the Flash movie debugger
     int  _verbosity;
-    std::string  _flashVersionString;   //String to pass as $version in Actionscript
-    std::string  _flashSystemOS;        //String to pass as System.capabilities.os in Actionscript
-    std::string  _flashSystemManufacturer;        //String to pass as System.capabilities.manufacturer in Actionscript
+    std::string  _flashVersionString;   // String to pass as $version in Actionscript
+    std::string  _flashSystemOS;        // String to pass as System.capabilities.os
+    					// in Actionscript. If empty, leaves detection
+    					// to System.cpp (default).
+    std::string  _flashSystemManufacturer;	// String to pass as
+    						// System.capabilities.manufacturer
+    						// in Actionscript
     bool _actiondump;           // enable dumping actionscript classes
     bool _parserdump;           // enable dumping parser data
 
