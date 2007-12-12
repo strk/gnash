@@ -801,6 +801,7 @@ void
 button_character_instance::stagePlacementCallback()
 {
 	// Register this button instance as a live character
+	// do we need this???
 	_vm.getRoot().addLiveChar(this);
 
 	size_t r, r_num =  m_def->m_button_records.size();
@@ -810,26 +811,29 @@ button_character_instance::stagePlacementCallback()
 	{
 		button_record& bdef = m_def->m_button_records[r];
 
-		const matrix&	mat = m_def->m_button_records[r].m_button_matrix;
-		const cxform&	cx = m_def->m_button_records[r].m_button_cxform;
+		const matrix&	mat = bdef.m_button_matrix;
+		const cxform&	cx = bdef.m_button_cxform;
+		int ch_depth = bdef.m_button_layer;
+		int ch_id = bdef.m_character_id;
 
-		// we don't need an id here, do we ?
-		boost::intrusive_ptr<character> ch = bdef.m_character_def->create_character_instance(this, 0);
-		ch->stagePlacementCallback(); // give this character life (TODO: they aren't on stage, are them ?)
-		m_record_character[r] = ch;
+		boost::intrusive_ptr<character> ch = bdef.m_character_def->create_character_instance(this, ch_id);
 		ch->set_matrix(mat);
 		ch->set_cxform(cx);
+		ch->set_depth(ch_depth);
 		ch->set_parent(this);
-		
-		if (ch->get_name().empty() && ch->wantsInstanceName()) {
+
+		if (ch->get_name().empty() && ch->wantsInstanceName()) 
+		{
 			std::string instance_name = getNextUnnamedInstanceName();
 			ch->set_name(instance_name.c_str());
 		}
 
+		m_record_character[r] = ch;
+
+		ch->stagePlacementCallback(); // give this character life (TODO: they aren't on stage, are them ?)
 	}
 
-	// does a CONSTRUCT event even exist ?
-	// We'll not call it here..
+	// there's no INITIALIZE/CONSTRUCT/LOAD/ENTERFRAME/UNLOAD events for buttons
 }
 
 #ifdef GNASH_USE_GC
