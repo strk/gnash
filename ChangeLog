@@ -1,3 +1,8 @@
+2007-12-12 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-swfc.all/Makefile.am: use double quotes to allow for
+	  abs_mediadir to expand.
+
 2007-12-12 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/sprite_instance.cpp: don't restart an unloaded character, 
