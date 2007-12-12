@@ -56,7 +56,11 @@ public:
 	/// Read a button record from the SWF stream.
 	//
 	/// Return true if we read a record; false if this is a null
-	bool	read(stream* in, int tag_type, movie_definition* m);
+	///
+	/// @param endPos
+	///	Last stream offset available for a valid read
+	///
+	bool	read(stream* in, int tag_type, movie_definition* m, unsigned long endPos);
 
 	/// Return true if the button_record is valid
 	//
@@ -96,6 +100,8 @@ public:
 	int	m_conditions;
 
 	typedef std::vector<action_buffer*> ActionList;
+
+	// TODO: define ownership of list elements !!
 	ActionList m_actions;
 
 	~button_action();
@@ -153,7 +159,9 @@ public:
 
 	struct button_sound_def
 	{
-		void	read(stream* in, movie_definition* m);
+		// TODO: implement ?
+		//void	read(stream* in, movie_definition* m);
+
 		button_sound_info m_button_sounds[4];
 
 #ifdef GNASH_USE_GC
@@ -181,6 +189,7 @@ public:
 	typedef std::vector<button_action> ButtonActVect;
 	ButtonActVect m_button_actions;
 
+	// TODO: define ownership of this sound !
 	button_sound_def*	m_sound;
 
 	button_character_definition();
@@ -189,7 +198,17 @@ public:
 	/// Create a mutable instance of our definition.
 	character* create_character_instance(character* parent, int id);
 
+	/// Read a SWF::DEFINEBUTTON, SWF::DEFINEBUTTONSOUND or SWF::DEFINEBUTTON2
 	void	read(stream* in, int tag_type, movie_definition* m);
+
+	/// Read a SWF::DEFINEBUTTON tag
+	void	readDefineButton(stream* in, movie_definition* m);
+
+	/// Read a SWF::DEFINEBUTTON2 tag
+	void	readDefineButton2(stream* in, movie_definition* m);
+
+	/// Read a SWF::DEFINEBUTTONSOUND tag
+	void	readDefineButtonSound(stream* in, movie_definition* m);
 	
 	const rect&	get_bound() const {
     // It is required that get_bound() is implemented in character definition

@@ -1,5 +1,13 @@
 2007-12-12 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/button_character_def.{cpp,h}: cleanup parser by 
+	  splitting DEFINEBUTTON, DEFINEBUTTON2 and DEFINEBUTTONSOUND
+	  reading functions. Added a boundary arg to button_record parser
+	  to avoid reading out of bounds (with side-effect of reducing
+	  seek-back need)
+
+2007-12-12 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/System.as: update expected results.
 	* server/swf/tag_loaders.cpp (define_bits_jpeg3_loader): don't read
 	  rgb data past alpha_position.
