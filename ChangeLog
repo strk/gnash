@@ -1,5 +1,10 @@
 2007-12-12 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp (StreamAdapter::readFunc): don't attempt
+	  to fetch 0 bytes from underlying stream... Fixes bug #21779.
+
+2007-12-12 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/sound_handler.h: add a reset() method to put
 	  the sound handler in starting conditions (for movie restart).
 	* libmedia/gst/sound_handler_{gst,sdl}.{cpp,h}: implement reset()

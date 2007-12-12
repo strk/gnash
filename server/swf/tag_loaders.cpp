@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.166 2007/12/12 16:35:19 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.167 2007/12/12 19:48:27 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -112,6 +112,7 @@ class StreamAdapter
 		unsigned bytesLeft = br->endPos - br->currPos;
 		if ( bytesLeft < (unsigned)bytes )
 		{
+			if ( ! bytesLeft ) return 0;
 			log_debug("Requested to read past end of stream range");
 			bytes = bytesLeft;
 		}
