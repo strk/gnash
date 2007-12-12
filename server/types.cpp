@@ -89,10 +89,10 @@ namespace gnash {
 	
 	void	rgba::set_lerp(const rgba& a, const rgba& b, float f)
 	{
-		m_r = (uint8_t) frnd(flerp(a.m_r, b.m_r, f));
-		m_g = (uint8_t) frnd(flerp(a.m_g, b.m_g, f));
-		m_b = (uint8_t) frnd(flerp(a.m_b, b.m_b, f));
-		m_a = (uint8_t) frnd(flerp(a.m_a, b.m_a, f));
+		m_r = (boost::uint8_t) frnd(flerp(a.m_r, b.m_r, f));
+		m_g = (boost::uint8_t) frnd(flerp(a.m_g, b.m_g, f));
+		m_b = (boost::uint8_t) frnd(flerp(a.m_b, b.m_b, f));
+		m_a = (boost::uint8_t) frnd(flerp(a.m_a, b.m_a, f));
 	}
 
 std::ostream&

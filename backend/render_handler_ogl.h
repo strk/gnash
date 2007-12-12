@@ -151,7 +151,7 @@ class bitmap_info_ogl : public bitmap_info
   private:
     inline bool ogl_accessible() const;
     void setup();    
-    void upload(uint8_t* data, size_t width, size_t height);
+    void upload(boost::uint8_t* data, size_t width, size_t height);
     
     std::auto_ptr<image::image_base> _img;
     GLenum _pixel_format;

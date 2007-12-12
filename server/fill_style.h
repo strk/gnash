@@ -17,7 +17,7 @@
 
 // Based on work of Thatcher Ulrich <tu@tulrich.com> 2003
 
-/* $Id: fill_style.h,v 1.12 2007/12/04 22:41:42 strk Exp $ */
+/* $Id: fill_style.h,v 1.13 2007/12/12 10:07:00 zoulunkai Exp $ */
 
 #ifndef GNASH_FILL_STYLE_H
 #define GNASH_FILL_STYLE_H
@@ -43,7 +43,7 @@ public:
 	void	read(stream* in, int tag_type);
 	
 	//data:
-	uint8_t	m_ratio;
+	boost::uint8_t	m_ratio;
 	rgba	m_color;
 };
 
@@ -150,7 +150,7 @@ private:
 	/// @param ratio
 	///	Ratio is in the range [0, 255].
 	///
-	rgba sample_gradient(uint8_t ratio) const;
+	rgba sample_gradient(boost::uint8_t ratio) const;
 
 	friend class morph2_character_def;
 	friend class triangulating_render_handler;

@@ -219,8 +219,8 @@ FreetypeGlyphsProvider::draw_bitmap(const FT_Bitmap& bitmap)
 	// copy image to alpha
 	for (int i = 0; i < bitmap.rows; i++)
 	{
-		uint8_t*	src = bitmap.buffer + bitmap.pitch * i;
-		uint8_t*	dst = alpha->scanline(i); 
+		boost::uint8_t*	src = bitmap.buffer + bitmap.pitch * i;
+		boost::uint8_t*	dst = alpha->scanline(i); 
 		int	x = bitmap.width;
 		while (x-- > 0)
 		{

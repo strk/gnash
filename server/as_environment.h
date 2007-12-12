@@ -287,14 +287,14 @@ public:
 	//
 	/// Local registers are only meaningful within a function2 context.
 	///
-	as_value& local_register(uint8_t n)
+	as_value& local_register(boost::uint8_t n)
 	{
 		assert(!_localFrames.empty());
 		return _localFrames.back().registers[n];
 	}
 
         /// Set the Nth local register to something
-        void set_local_register(uint8_t n, as_value &val)
+        void set_local_register(boost::uint8_t n, as_value &val)
 	{
 		if ( ! _localFrames.empty() )
 		{
@@ -314,7 +314,7 @@ public:
 	}
 
         /// Set the Nth local register to something
-        void set_global_register(uint8_t n, as_value &val) {
+        void set_global_register(boost::uint8_t n, as_value &val) {
 	    if (n <= 4) {
 		m_global_register[n] = val;
 	    }

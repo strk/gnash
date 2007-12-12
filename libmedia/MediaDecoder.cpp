@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaDecoder.cpp,v 1.3 2007/12/04 11:45:26 strk Exp $
+// $Id: MediaDecoder.cpp,v 1.4 2007/12/12 10:06:59 zoulunkai Exp $
 
 #include "MediaDecoder.h"
 
@@ -135,7 +135,7 @@ void MediaDecoder::decodeAudio(MediaFrame* packet)
 	boost::uint32_t datasize;
 	boost::uint32_t bufsize;
 
-	uint8_t* ptr = _audioDecoder->decode(packet->data, packet->dataSize, bufsize, datasize, false);
+	boost::uint8_t* ptr = _audioDecoder->decode(packet->data, packet->dataSize, bufsize, datasize, false);
 
 	if (bufsize > 0 && ptr != NULL)
 	{

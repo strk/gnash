@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: GlowFilter.h,v 1.5 2007/12/04 11:45:28 strk Exp $ */
+/* $Id: GlowFilter.h,v 1.6 2007/12/12 10:07:00 zoulunkai Exp $ */
 
 #ifndef GNASH_GLOWFILTER_H
 #define GNASH_GLOWFILTER_H
@@ -46,8 +46,8 @@ public:
     { return; }
 
     GlowFilter(boost::uint32_t color,
-        uint8_t alpha, float blurX, float blurY, float strength,
-        uint8_t quality, bool inner, bool knockout) :
+        boost::uint8_t alpha, float blurX, float blurY, float strength,
+        boost::uint8_t quality, bool inner, bool knockout) :
         m_color(color),
         m_alpha(alpha), m_blurX(blurX), m_blurY(blurY), m_strength(strength),
         m_quality(quality), m_inner(inner), m_knockout(knockout)
@@ -55,11 +55,11 @@ public:
 
 protected:
     boost::uint32_t m_color; // RGB color.
-    uint8_t m_alpha; // Alpha strength, as a percentage(?)
+    boost::uint8_t m_alpha; // Alpha strength, as a percentage(?)
     float m_blurX; // horizontal blur
     float m_blurY; // vertical blur
     float m_strength; // How strong is the filter.
-    uint8_t m_quality; // How many times to apply the filter.
+    boost::uint8_t m_quality; // How many times to apply the filter.
     bool m_inner; // Is this an inner shadow?
     bool m_knockout; // If true, render only the filter effect.
 };

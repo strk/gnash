@@ -110,7 +110,7 @@ public:
     ///       is in error condition, see get_error().
     ///
     boost::uint32_t 	read_le32() {
-	// read8() is uint8_t, so no masks with 0xff are required.
+	// read8() is boost::uint8_t, so no masks with 0xff are required.
 	boost::uint32_t result = (boost::uint32_t)read8();
 	result |= (boost::uint32_t)read8() << 8;
 	result |= (boost::uint32_t)read8() << 16;
@@ -148,10 +148,10 @@ public:
     ///       is in error condition, see get_error().
     ///
     void 	write_le32(boost::uint32_t u) {
-	write8((uint8_t)u);
-	write8((uint8_t)(u>>8));
-	write8((uint8_t)(u>>16));
-	write8((uint8_t)(u>>24));
+	write8((boost::uint8_t)u);
+	write8((boost::uint8_t)(u>>8));
+	write8((boost::uint8_t)(u>>16));
+	write8((boost::uint8_t)(u>>24));
     }
 
     /// \brief Write a 16-bit word to a little-endian stream.
@@ -160,8 +160,8 @@ public:
     ///       is in error condition, see get_error().
     ///
     void 	write_le16(boost::uint16_t u) {
-	write8((uint8_t)u);
-	write8((uint8_t)(u>>8));
+	write8((boost::uint8_t)u);
+	write8((boost::uint8_t)(u>>8));
     }
     
     /// \brief Read a single byte from the stream
@@ -169,14 +169,14 @@ public:
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
-    uint8_t 	read_byte() { return read8(); }
+    boost::uint8_t 	read_byte() { return read8(); }
 
     /// \brief write a single byte to the stream
     //
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
-    void	write_byte(uint8_t u) { write8(u); }
+    void	write_byte(boost::uint8_t u) { write8(u); }
     
     /// \brief Read the given number of bytes from the stream
     //
@@ -292,8 +292,8 @@ private:
 	m_read(&u, 2, m_data);
 	return u;
     }
-    uint8_t	read8() {
-	uint8_t u;
+    boost::uint8_t	read8() {
+	boost::uint8_t u;
 	m_read(&u, 1, m_data);
 	return u;
     }
@@ -307,7 +307,7 @@ private:
     void	write16(boost::uint16_t u) {
 	m_write(&u, 2, m_data);
     }
-    void	write8(uint8_t u) {
+    void	write8(boost::uint8_t u) {
 	m_write(&u, 1, m_data);
     }
     

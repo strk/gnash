@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: amf.cpp,v 1.42 2007/12/04 11:45:23 strk Exp $ */
+/* $Id: amf.cpp,v 1.43 2007/12/12 10:06:58 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -122,8 +122,8 @@ swapBytes(void *word, int size)
     union {
 	boost::uint16_t s;
 	struct {
-	    uint8_t c0;
-	    uint8_t c1;
+	    boost::uint8_t c0;
+	    boost::uint8_t c1;
 	} c;
     } u;
 	   

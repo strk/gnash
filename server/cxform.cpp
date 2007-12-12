@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: cxform.cpp,v 1.6 2007/12/01 00:14:59 strk Exp $ 
+// $Id: cxform.cpp,v 1.7 2007/12/12 10:07:00 zoulunkai Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -75,13 +75,13 @@ rgba	cxform::transform(const rgba& in) const
 	return result;
 }
 
-void	cxform::transform(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const
+void	cxform::transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_t& b, boost::uint8_t& a) const
 // Faster transform() method for loops (avoids creation of rgba object)
 {
-	r = (uint8_t) fclamp(r * m_[0][0] + m_[0][1], 0, 255);
-	g = (uint8_t) fclamp(g * m_[1][0] + m_[1][1], 0, 255);
-	b = (uint8_t) fclamp(b * m_[2][0] + m_[2][1], 0, 255);
-	a = (uint8_t) fclamp(a * m_[3][0] + m_[3][1], 0, 255);
+	r = (boost::uint8_t) fclamp(r * m_[0][0] + m_[0][1], 0, 255);
+	g = (boost::uint8_t) fclamp(g * m_[1][0] + m_[1][1], 0, 255);
+	b = (boost::uint8_t) fclamp(b * m_[2][0] + m_[2][1], 0, 255);
+	a = (boost::uint8_t) fclamp(a * m_[3][0] + m_[3][1], 0, 255);
 }
 
 void	cxform::read_rgb(stream* in)

@@ -36,10 +36,10 @@ public:
   int get_height() const { return m_height;  }  
   int get_bpp() const { return m_bpp; }  
   int get_rowlen() const { return m_rowlen; }  
-  uint8_t* get_data() const { return m_data; }
+  boost::uint8_t* get_data() const { return m_data; }
 
 protected:
-  uint8_t* m_data;
+  boost::uint8_t* m_data;
   int m_width;
   int m_height;
   int m_bpp;
@@ -56,7 +56,7 @@ class agg_bitmap_info : public agg_bitmap_info_base
 {
 public:
 
-  agg_bitmap_info(int width, int height, int rowlen, uint8_t* data, int bpp) 
+  agg_bitmap_info(int width, int height, int rowlen, boost::uint8_t* data, int bpp) 
   {
     //printf("creating bitmap %dx%d pixels with %d bytes rowsize\n", width,height,rowlen);
 
@@ -65,7 +65,7 @@ public:
     m_height = height;
     m_rowlen = rowlen;
 
-    m_data = new uint8_t[height*rowlen];
+    m_data = new boost::uint8_t[height*rowlen];
     memcpy(m_data, data, height*rowlen);   
   }
   

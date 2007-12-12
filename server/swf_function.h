@@ -77,7 +77,7 @@ private:
 	};
 	std::vector<arg_spec>	m_args;
 	bool	m_is_function2;
-	uint8_t	m_local_register_count;
+	boost::uint8_t	m_local_register_count;
 
 	/// used by function2 to control implicit arg register assignments
 	// 
@@ -200,7 +200,7 @@ public:
 
 	void	set_is_function2() { m_is_function2 = true; }
 
-	void	set_local_register_count(uint8_t ct) { assert(m_is_function2); m_local_register_count = ct; }
+	void	set_local_register_count(boost::uint8_t ct) { assert(m_is_function2); m_local_register_count = ct; }
 
 	void	set_function2_flags(boost::uint16_t flags) { assert(m_is_function2); m_function2_flags = flags; }
 

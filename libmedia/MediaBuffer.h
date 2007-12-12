@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaBuffer.h,v 1.7 2007/12/04 11:45:25 strk Exp $
+// $Id: MediaBuffer.h,v 1.8 2007/12/12 10:06:59 zoulunkai Exp $
 
 #ifndef __MEDIABUFFER_H__
 #define __MEDIABUFFER_H__
@@ -55,11 +55,11 @@ public:
 	boost::uint32_t m_size;
 
 	/// Pointer to the data. The data is owned by this class.
-	uint8_t* m_data;
+	boost::uint8_t* m_data;
 
 	/// Pointer to where the data should be used from. Used with audio, since we
 	/// don't always use all the data.
-	uint8_t* m_ptr;
+	boost::uint8_t* m_ptr;
 
 	/// Timestamp in millisec
 	boost::uint32_t m_pts;

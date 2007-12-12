@@ -226,7 +226,7 @@ long double stream::read_d64()
 #endif
 }
 
-uint8_t	stream::read_u8()
+boost::uint8_t	stream::read_u8()
 {
 	align();
 	return m_input->read_byte();

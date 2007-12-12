@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.4 2007/12/04 11:45:25 strk Exp $
+// $Id: FLVParser.cpp,v 1.5 2007/12/12 10:06:59 zoulunkai Exp $
 
 #include "FLVParser.h"
 #include "amf.h"
@@ -173,7 +173,7 @@ MediaFrame* FLVParser::parseMediaFrame()
 		frame->timestamp = _audioFrames[_nextAudioFrame]->timestamp;
 
 		_stream->set_position(_audioFrames[_nextAudioFrame]->dataPosition);
-		frame->data = new uint8_t[frame->dataSize + PADDING_BYTES];
+		frame->data = new boost::uint8_t[frame->dataSize + PADDING_BYTES];
 		size_t bytesread = _stream->read_bytes(frame->data, frame->dataSize);
 		memset(frame->data + bytesread, 0, PADDING_BYTES);
 
@@ -188,7 +188,7 @@ MediaFrame* FLVParser::parseMediaFrame()
 		frame->timestamp = _videoFrames[_nextVideoFrame]->timestamp;
 
 		_stream->set_position(_videoFrames[_nextVideoFrame]->dataPosition);
-		frame->data = new uint8_t[frame->dataSize + PADDING_BYTES];
+		frame->data = new boost::uint8_t[frame->dataSize + PADDING_BYTES];
 		size_t bytesread  = _stream->read_bytes(frame->data, frame->dataSize);
 		memset(frame->data + bytesread, 0, PADDING_BYTES);
 
@@ -220,7 +220,7 @@ MediaFrame* FLVParser::nextAudioFrame()
 	frame->tag = 8;
 
 	_stream->set_position(_audioFrames[_nextAudioFrame]->dataPosition);
-	frame->data = new uint8_t[_audioFrames[_nextAudioFrame]->dataSize +
+	frame->data = new boost::uint8_t[_audioFrames[_nextAudioFrame]->dataSize +
 				  PADDING_BYTES];
 	size_t bytesread = _stream->read_bytes(frame->data, _audioFrames[_nextAudioFrame]->dataSize);
 	memset(frame->data + bytesread, 0, PADDING_BYTES);
@@ -261,7 +261,7 @@ MediaFrame* FLVParser::nextVideoFrame()
 	frame->tag = 9;
 
 	_stream->set_position(_videoFrames[_nextVideoFrame]->dataPosition);
-	frame->data = new uint8_t[_videoFrames[_nextVideoFrame]->dataSize + 
+	frame->data = new boost::uint8_t[_videoFrames[_nextVideoFrame]->dataSize + 
 				  PADDING_BYTES];
 	size_t bytesread = _stream->read_bytes(frame->data, _videoFrames[_nextVideoFrame]->dataSize);
 	memset(frame->data + bytesread, 0, PADDING_BYTES);
@@ -533,7 +533,7 @@ bool FLVParser::parseNextFrame()
 	if (_stream->set_position(_lastParsedPosition+4) != 0) return false;
 
 	// Read the tag info
-	uint8_t tag[12];
+	boost::uint8_t tag[12];
 	_stream->read_bytes(tag, 12);
 
 	// Extract length and timestamp
@@ -589,7 +589,7 @@ bool FLVParser::parseNextFrame()
 
 			// Extract the video size from the videodata header
 			_stream->set_position(frame->dataPosition);
-			uint8_t videohead[12];
+			boost::uint8_t videohead[12];
 			_stream->read_bytes(videohead, 12);
 
 			if (codec == VIDEO_CODEC_H263) {
@@ -681,7 +681,7 @@ bool FLVParser::parseHeader()
 	_stream->set_position(0); //_lt.seek(0);
 
 	// Read the header
-	uint8_t header[9];
+	boost::uint8_t header[9];
 	_stream->read_bytes(header, 9); //_lt.read(header, 9);
 
 	// Check if this is really a FLV file
@@ -704,7 +704,7 @@ bool FLVParser::parseHeader()
 	return true;
 }
 
-inline boost::uint32_t FLVParser::getUInt24(uint8_t* in)
+inline boost::uint32_t FLVParser::getUInt24(boost::uint8_t* in)
 {
 	// The bits are in big endian order
 	return (in[0] << 16) | (in[1] << 8) | in[2];

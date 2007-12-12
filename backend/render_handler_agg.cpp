@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.122 2007/12/04 11:45:21 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.123 2007/12/12 10:06:58 zoulunkai Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -273,7 +273,7 @@ public:
     // * = m_rbuf is first initialized with a NULL buffer so that m_pixf and
     // m_rbase initialize with the correct buffer extents
   
-    m_buffer = new uint8_t[width*height];
+    m_buffer = new boost::uint8_t[width*height];
     
     m_rbuf.attach(m_buffer, width, height, width);
     
@@ -320,7 +320,7 @@ public:
   
 private:
   // in-memory buffer
-  uint8_t* m_buffer;
+  boost::uint8_t* m_buffer;
   
   // agg class to access the buffer
   agg::rendering_buffer m_rbuf;
@@ -2093,8 +2093,8 @@ bool is_little_endian_host() {
   union {
     boost::uint16_t word;
     struct {
-      uint8_t b1;
-      uint8_t b2;
+      boost::uint8_t b1;
+      boost::uint8_t b2;
     };
   } u;
     

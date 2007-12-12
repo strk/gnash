@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: BitsReader.h,v 1.7 2007/12/04 11:45:23 strk Exp $
+// $Id: BitsReader.h,v 1.8 2007/12/12 10:06:59 zoulunkai Exp $
 
 #ifndef BITSREADER_H
 #define BITSREADER_H
@@ -91,7 +91,7 @@ public:
 	boost::int32_t read_sint(unsigned short bitcount);
 
 	/// Read a byte as an unsigned int (aligned)
-	uint8_t  read_u8()
+	boost::uint8_t  read_u8()
 	{
 		align();
 		return *ptr++;

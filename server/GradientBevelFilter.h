@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: GradientBevelFilter.h,v 1.5 2007/12/04 11:45:28 strk Exp $ */
+/* $Id: GradientBevelFilter.h,v 1.6 2007/12/12 10:07:00 zoulunkai Exp $ */
 
 #ifndef GNASH_GRADIENTBEVELFILTER_H
 #define GNASH_GRADIENTBEVELFILTER_H
@@ -55,10 +55,10 @@ public:
 
     GradientBevelFilter(float distance, float angle,
         std::vector<boost::uint32_t> colors,
-        std::vector<uint8_t> alphas,
-        std::vector<uint8_t> ratios,
+        std::vector<boost::uint8_t> alphas,
+        std::vector<boost::uint8_t> ratios,
         float blurX, float blurY, float strength,
-        uint8_t quality, glow_types type, bool knockout) :
+        boost::uint8_t quality, glow_types type, bool knockout) :
         m_distance(distance), m_angle(angle),
         m_colors(colors), m_alphas(alphas), m_ratios(ratios),
         m_blurX(blurX), m_blurY(blurY), m_strength(strength),
@@ -69,12 +69,12 @@ protected:
     float m_distance; // Distance of the filter in pixels.
     float m_angle; // Angle of the filter.
     std::vector<boost::uint32_t> m_colors; // Colors of the gradients.
-    std::vector<uint8_t> m_alphas; // Alphas of the gradients.
-    std::vector<uint8_t> m_ratios; // Ratios of the gradients.
+    std::vector<boost::uint8_t> m_alphas; // Alphas of the gradients.
+    std::vector<boost::uint8_t> m_ratios; // Ratios of the gradients.
     float m_blurX; // horizontal blur
     float m_blurY; // vertical blur
     float m_strength; // How strong is the filter.
-    uint8_t m_quality; // How many times to apply the filter.
+    boost::uint8_t m_quality; // How many times to apply the filter.
     glow_types m_type; // What type of effect.
     bool m_knockout; // If true, render only the filter effect.
 };

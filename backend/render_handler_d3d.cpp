@@ -97,7 +97,7 @@ public:
   void convert_to_argb(image::rgba* im);
   bitmap_info_d3d(image::rgb* im);
   bitmap_info_d3d(image::rgba* im);
-  bitmap_info_d3d(int width, int height, uint8_t* data);
+  bitmap_info_d3d(int width, int height, boost::uint8_t* data);
 };
 
 
@@ -126,7 +126,7 @@ public
     // not supported
   }
 
-  static void make_next_miplevel(int* width, int* height, uint8_t* data)
+  static void make_next_miplevel(int* width, int* height, boost::uint8_t* data)
     // Utility.  Mutates *width, *height and *data to create the
     // next mip level.
   {
@@ -152,12 +152,12 @@ public
     {
       // Resample.  Simple average 2x2 --> 1, in-place.
       for (int j = 0; j < new_h; j++) {
-        uint8_t*  out = ((uint8_t*) data) + j * new_w;
-        uint8_t*  in = ((uint8_t*) data) + (j << 1) * *width;
+        boost::uint8_t*  out = ((boost::uint8_t*) data) + j * new_w;
+        boost::uint8_t*  in = ((boost::uint8_t*) data) + (j << 1) * *width;
         for (int i = 0; i < new_w; i++) {
           int a;
           a = (*(in + 0) + *(in + 1) + *(in + 0 + *width) + *(in + 1 + *width));
-          *(out) = (uint8_t) (a >> 2);
+          *(out) = (boost::uint8_t) (a >> 2);
           out++;
           in += 2;
         }
@@ -303,10 +303,10 @@ public
 
       // Additive color.
       apply_color(gameswf::rgba(
-        uint8_t(m_bitmap_color_transform.m_[0][1]), 
-        uint8_t(m_bitmap_color_transform.m_[1][1]), 
-        uint8_t(m_bitmap_color_transform.m_[2][1]), 
-        uint8_t(m_bitmap_color_transform.m_[3][1])));
+        boost::uint8_t(m_bitmap_color_transform.m_[0][1]), 
+        boost::uint8_t(m_bitmap_color_transform.m_[1][1]), 
+        boost::uint8_t(m_bitmap_color_transform.m_[2][1]), 
+        boost::uint8_t(m_bitmap_color_transform.m_[3][1])));
 
       m_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG2);
       m_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG2);
@@ -345,10 +345,10 @@ public
       m_bitmap_color_transform.m_[3][1] = clamp(color_transform.m_[3][1], -255.0f, 255.0f);
       
       m_color = gameswf::rgba(
-        uint8_t(m_bitmap_color_transform.m_[0][0]*255.0f), 
-        uint8_t(m_bitmap_color_transform.m_[1][0]*255.0f), 
-        uint8_t(m_bitmap_color_transform.m_[2][0]*255.0f), 
-        uint8_t(m_bitmap_color_transform.m_[3][0]*255.0f));
+        boost::uint8_t(m_bitmap_color_transform.m_[0][0]*255.0f), 
+        boost::uint8_t(m_bitmap_color_transform.m_[1][0]*255.0f), 
+        boost::uint8_t(m_bitmap_color_transform.m_[2][0]*255.0f), 
+        boost::uint8_t(m_bitmap_color_transform.m_[3][0]*255.0f));
 
       if (m_bitmap_color_transform.m_[0][1] > 1.0f
         || m_bitmap_color_transform.m_[1][1] > 1.0f
@@ -497,7 +497,7 @@ public
     return new bitmap_info_d3d(im);
   }
 
-  void  set_alpha_image(gameswf::bitmap_info* bi, int w, int h, uint8_t* data)
+  void  set_alpha_image(gameswf::bitmap_info* bi, int w, int h, boost::uint8_t* data)
     // Set the specified bitmap_info so that it contains an alpha
     // texture with the given data (1 byte per texel).
     //
@@ -1053,11 +1053,11 @@ bitmap_info_d3d::bitmap_info_d3d(image::rgb* im)
   // Need to insert a dummy alpha byte in the image data, for
   // D3DXLoadSurfaceFromMemory.
   // @@ this sucks :(
-  uint8_t*  expanded_data = new uint8_t[m_original_width * m_original_height * 4];
-  uint8_t*  pdata = expanded_data;
+  boost::uint8_t*  expanded_data = new boost::uint8_t[m_original_width * m_original_height * 4];
+  boost::uint8_t*  pdata = expanded_data;
   for (int y = 0; y < m_original_height; y++)
   {
-    uint8_t*  scanline = image::scanline(im, y);
+    boost::uint8_t*  scanline = image::scanline(im, y);
     for (int x = 0; x < m_original_width; x++)
     {
       *pdata++ = scanline[x * 3 + 2]; // blue
@@ -1117,10 +1117,10 @@ bitmap_info_d3d::bitmap_info_d3d(image::rgb* im)
 
 typedef struct
 {
-  uint8_t r;
-  uint8_t g;
-  uint8_t b;
-  uint8_t a;
+  boost::uint8_t r;
+  boost::uint8_t g;
+  boost::uint8_t b;
+  boost::uint8_t a;
 } RGBA;
 
 void bitmap_info_d3d::convert_to_argb(image::rgba* im)
@@ -1209,7 +1209,7 @@ bitmap_info_d3d::bitmap_info_d3d(image::rgba* im)
 }
 
 
-bitmap_info_d3d::bitmap_info_d3d(int width, int height, uint8_t* data)
+bitmap_info_d3d::bitmap_info_d3d(int width, int height, boost::uint8_t* data)
 // Initialize this bitmap_info to an alpha image
 // containing the specified data (1 byte per texel).
 //

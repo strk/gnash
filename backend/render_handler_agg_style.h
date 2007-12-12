@@ -116,7 +116,7 @@ public:
 
   bool m_force_premultiply;
     
-  agg_style_bitmap(int width, int height, int rowlen, uint8_t* data, 
+  agg_style_bitmap(int width, int height, int rowlen, boost::uint8_t* data, 
     gnash::matrix mat, gnash::cxform cx) :
     
     m_force_premultiply(false),

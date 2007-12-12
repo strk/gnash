@@ -11,7 +11,7 @@
 // converted from K&R C to C-like C++, changed the interfaces a bit,
 // etc.
 
-/* $Id: image_filters.cpp,v 1.17 2007/10/30 18:55:41 strk Exp $ */
+/* $Id: image_filters.cpp,v 1.18 2007/12/12 10:06:59 zoulunkai Exp $ */
 
 #include "image.h"
 #include "utility.h"
@@ -42,7 +42,7 @@ inline void	my_cfree(void* mem)
 }
 
 
-void	get_row(uint8_t* row, image::rgb* image, int x0, int xsize, int y)
+void	get_row(boost::uint8_t* row, image::rgb* image, int x0, int xsize, int y)
 // Copy RGB data from the specified row into the given buffer.
 {
     y = iclamp(y, 0, image->height() - 1);
@@ -50,11 +50,11 @@ void	get_row(uint8_t* row, image::rgb* image, int x0, int xsize, int y)
     if (x1 >= image->width()) {
 	// clip, then extend.
 	int	extra_pixels = x1 - image->width() + 1;
-	uint8_t*	p = ((uint8_t*) image->data()) + (y * image->pitch());
+	boost::uint8_t*	p = ((boost::uint8_t*) image->data()) + (y * image->pitch());
 	memcpy(row, p + x0 * 3, (3 * (image->width() - x0)));
 	// repeat last pixel
 	p = p + (image->width() - 1) * 3;
-	uint8_t*	q = row + (image->width() - x0) * 3;
+	boost::uint8_t*	q = row + (image->width() - x0) * 3;
 	while (extra_pixels > 0) {
 	    *(q + 0) = *(p + 0);
 	    *(q + 1) = *(p + 1);
@@ -65,12 +65,12 @@ void	get_row(uint8_t* row, image::rgb* image, int x0, int xsize, int y)
     }
     else
 	{
-	    memcpy(row, ((uint8_t*) image->data()) + (y * image->pitch()) + x0 * 3, (3 * xsize));
+	    memcpy(row, ((boost::uint8_t*) image->data()) + (y * image->pitch()) + x0 * 3, (3 * xsize));
 	}
 }
 
 
-void	get_row(uint8_t* row, image::rgba* image, int x0, int xsize, int y)
+void	get_row(boost::uint8_t* row, image::rgba* image, int x0, int xsize, int y)
 // Copy RGBA data from the specified row into the given buffer.
 {
     y = iclamp(y, 0, image->height() - 1);
@@ -78,11 +78,11 @@ void	get_row(uint8_t* row, image::rgba* image, int x0, int xsize, int y)
     if (x1 >= image->width()) {
 	// clip, then extend.
 	int	extra_pixels = x1 - image->width() + 1;
-	uint8_t*	p = ((uint8_t*) image->data()) + (y * image->pitch());
+	boost::uint8_t*	p = ((boost::uint8_t*) image->data()) + (y * image->pitch());
 	memcpy(row, p + x0 * 4, (4 * (image->width() - x0)));
 	// repeat last pixel
 	p = p + (image->width() - 1) * 4;
-	uint8_t*	q = row + (image->width() - x0) * 4;
+	boost::uint8_t*	q = row + (image->width() - x0) * 4;
 	while (extra_pixels > 0) {
 	    *(q + 0) = *(p + 0);
 	    *(q + 1) = *(p + 1);
@@ -94,12 +94,12 @@ void	get_row(uint8_t* row, image::rgba* image, int x0, int xsize, int y)
     }
     else
 	{
-	    memcpy(row, ((uint8_t*) image->data()) + (y * image->pitch()) + x0 * 4, (4 * xsize));
+	    memcpy(row, ((boost::uint8_t*) image->data()) + (y * image->pitch()) + x0 * 4, (4 * xsize));
 	}
 }
 
 
-void	get_column(uint8_t* column, image::rgb* image, int x)
+void	get_column(boost::uint8_t* column, image::rgb* image, int x)
 // Copy RGB data from the specified column into the given buffer.
 {
 
@@ -109,7 +109,7 @@ void	get_column(uint8_t* column, image::rgb* image, int x)
     }
 
     int d = image->pitch();
-    uint8_t* p = ((uint8_t*) image->data()) + x * 3;
+    boost::uint8_t* p = ((boost::uint8_t*) image->data()) + x * 3;
     for (int i = image->height(); i-- > 0; p += d) {
 	*column++ = *p;
 	*column++ = *(p + 1);
@@ -118,7 +118,7 @@ void	get_column(uint8_t* column, image::rgb* image, int x)
 }
 
 
-void	get_column(uint8_t* column, image::rgba* image, int x)
+void	get_column(boost::uint8_t* column, image::rgba* image, int x)
 // Copy RGBA data from the specified column into the given buffer.
 {
     if ((x < 0) || (x >= image->width())) {
@@ -127,7 +127,7 @@ void	get_column(uint8_t* column, image::rgba* image, int x)
     }
 
     int d = image->pitch();
-    uint8_t* p = ((uint8_t*) image->data()) + x * 4;
+    boost::uint8_t* p = ((boost::uint8_t*) image->data()) + x * 4;
     for (int i = image->height(); i-- > 0; p += d) {
 	*column++ = *p;
 	*column++ = *(p + 1);
@@ -143,7 +143,7 @@ void	put_pixel(image::rgb* image, int x, int y, float r, float g, float b)
 {
     static image::rgb*	im = NULL;
     static int		yy = -1;
-    static uint8_t*	p = NULL;
+    static boost::uint8_t*	p = NULL;
 
     if ((x < 0) || (x >= image->width()) || (y < 0) || (y >= image->height())) {
 	abort();
@@ -152,7 +152,7 @@ void	put_pixel(image::rgb* image, int x, int y, float r, float g, float b)
     if ((im != image) || (yy != y)) {
 	im = image;
 	yy = y;
-	p = ((uint8_t*) image->data()) + (y * image->pitch());
+	p = ((boost::uint8_t*) image->data()) + (y * image->pitch());
     }
     p[x * 3 + 0] = iclamp(frnd(r), 0, 255);
     p[x * 3 + 1] = iclamp(frnd(g), 0, 255);
@@ -166,7 +166,7 @@ void	put_pixel(image::rgba* image, int x, int y, float r, float g, float b, floa
 {
     static image::rgba*	im = NULL;
     static int		yy = -1;
-    static uint8_t*	p = NULL;
+    static boost::uint8_t*	p = NULL;
 
     if ((x < 0) || (x >= image->width()) || (y < 0) || (y >= image->height())) {
 	abort();
@@ -175,7 +175,7 @@ void	put_pixel(image::rgba* image, int x, int y, float r, float g, float b, floa
     if ((im != image) || (yy != y)) {
 	im = image;
 	yy = y;
-	p = ((uint8_t*) image->data()) + (y * image->pitch());
+	p = ((boost::uint8_t*) image->data()) + (y * image->pitch());
     }
     p[x * 4	+ 0] = iclamp(frnd(r), 0, 255);
     p[x * 4	+ 1] = iclamp(frnd(g), 0, 255);
@@ -392,7 +392,7 @@ void	resample(image::rgb* out, int out_x0, int out_y0, int out_x1, int out_y1,
     int n;				/* pixel number */
     float center; int left, right;	/* filter calculation variables */
     float width, fscale, weight;	/* filter calculation variables */
-    uint8_t*	raster;			/* a row or column of pixels */
+    boost::uint8_t*	raster;			/* a row or column of pixels */
 
     std::vector< std::vector<CONTRIB> >	contrib;
 
@@ -452,7 +452,7 @@ void	resample(image::rgb* out, int out_x0, int out_y0, int out_x1, int out_y1,
     }
 
     /* apply filter to zoom horizontally from src to tmp */
-    raster = (uint8_t*) my_calloc(in_window_w, 3);
+    raster = (boost::uint8_t*) my_calloc(in_window_w, 3);
     for (k = 0; k < tmp->height(); ++k) {
 	get_row(raster, in, int(floorf(in_x0)), in_window_w, k);
 	for (i = 0; i < tmp->width(); ++i) {
@@ -504,7 +504,7 @@ void	resample(image::rgb* out, int out_x0, int out_y0, int out_x1, int out_y1,
     }
 
     /* apply filter to zoom vertically from tmp to dst */
-    raster = (uint8_t*) my_calloc(tmp->height(), 3);
+    raster = (boost::uint8_t*) my_calloc(tmp->height(), 3);
     for (k = 0; k < tmp->width(); ++k) {
 	get_column(raster, tmp.get(), k);
 	for (i = 0; i < out_height; ++i) {
@@ -557,7 +557,7 @@ void	resample(image::rgba* out, int out_x0, int out_y0, int out_x1, int out_y1,
     int n;				/* pixel number */
     float center; int left, right;	/* filter calculation variables */
     float width, fscale, weight;	/* filter calculation variables */
-    uint8_t*	raster;			/* a row or column of pixels */
+    boost::uint8_t*	raster;			/* a row or column of pixels */
 
     std::vector< std::vector<CONTRIB> >	contrib;
 
@@ -617,7 +617,7 @@ void	resample(image::rgba* out, int out_x0, int out_y0, int out_x1, int out_y1,
     }
 
     /* apply filter to zoom horizontally from src to tmp */
-    raster = (uint8_t*) my_calloc(in_window_w, 4);
+    raster = (boost::uint8_t*) my_calloc(in_window_w, 4);
     for (k = 0; k < tmp->height(); ++k) {
 	get_row(raster, in, int(floorf(in_x0)), in_window_w, k);
 	for (i = 0; i < tmp->width(); ++i) {
@@ -671,7 +671,7 @@ void	resample(image::rgba* out, int out_x0, int out_y0, int out_x1, int out_y1,
     }
 
     /* apply filter to zoom vertically from tmp to dst */
-    raster = (uint8_t*) my_calloc(tmp->height(), 4);
+    raster = (boost::uint8_t*) my_calloc(tmp->height(), 4);
     for (k = 0; k < tmp->width(); ++k) {
 	get_column(raster, tmp.get(), k);
 	for (i = 0; i < out_height; ++i) {

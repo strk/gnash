@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaParser.h,v 1.11 2007/12/04 11:45:26 strk Exp $
+// $Id: MediaParser.h,v 1.12 2007/12/12 10:07:00 zoulunkai Exp $
 
 #ifndef __MEDIAPARSER_H__
 #define __MEDIAPARSER_H__
@@ -188,9 +188,9 @@ class MediaFrame
 {
 public:
 	boost::uint32_t dataSize;
-	uint8_t* data;
+	boost::uint8_t* data;
 	boost::uint64_t timestamp;
-	uint8_t tag;
+	boost::uint8_t tag;
 };
 
 /// \brief

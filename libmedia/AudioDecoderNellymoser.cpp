@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderNellymoser.cpp,v 1.5 2007/12/04 11:45:25 strk Exp $
+// $Id: AudioDecoderNellymoser.cpp,v 1.6 2007/12/12 10:06:59 zoulunkai Exp $
 
 // This file incorporates work covered by the following copyright and permission
 // notice:
@@ -770,7 +770,7 @@ bool AudioDecoderNellymoser::setup(AudioInfo* info)
 }
 
 
-uint8_t* AudioDecoderNellymoser::decode(uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool /*parse*/)
+boost::uint8_t* AudioDecoderNellymoser::decode(boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool /*parse*/)
 {
 
 	float float_buf[256];
@@ -786,7 +786,7 @@ uint8_t* AudioDecoderNellymoser::decode(uint8_t* input, boost::uint32_t inputSiz
 		inputSize -= 64;
 	}
 			
-	uint8_t* tmp_raw_buffer = reinterpret_cast<uint8_t*>(out_buf_start);
+	boost::uint8_t* tmp_raw_buffer = reinterpret_cast<boost::uint8_t*>(out_buf_start);
 	boost::uint32_t tmp_raw_buffer_size = out_buf_size * 2;
 
 	// If we need to convert samplerate or/and from mono to stereo...
@@ -812,7 +812,7 @@ uint8_t* AudioDecoderNellymoser::decode(uint8_t* input, boost::uint32_t inputSiz
 
 		// Move the new data to the sound-struct
 		delete[] tmp_raw_buffer;
-		tmp_raw_buffer = reinterpret_cast<uint8_t*>(adjusted_data);
+		tmp_raw_buffer = reinterpret_cast<boost::uint8_t*>(adjusted_data);
 		tmp_raw_buffer_size = adjusted_size;
 
 	} else {

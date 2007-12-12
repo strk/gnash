@@ -138,7 +138,7 @@ private:
     bool _cancelRequested;
 
 	// Cache...
-	boost::scoped_array<uint8_t> _cache;
+	boost::scoped_array<boost::uint8_t> _cache;
 
 	// The fileposition where the cache start
 	volatile long _cacheStart;

@@ -1226,10 +1226,10 @@ sprite_lineStyle(const fn_call& fn)
 	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 	boost::uint16_t thickness = 0;
-	uint8_t r = 0;
-	uint8_t g = 0;
-	uint8_t b = 0;
-	uint8_t a = 255;
+	boost::uint8_t r = 0;
+	boost::uint8_t g = 0;
+	boost::uint8_t b = 0;
+	boost::uint8_t a = 255;
 
 
 	if ( ! fn.nargs )
@@ -1244,14 +1244,14 @@ sprite_lineStyle(const fn_call& fn)
 	{
 		// 2^24 is the max here
 		boost::uint32_t rgbval = boost::uint32_t(fclamp(fn.arg(1).to_number(), 0, 16777216));
-		r = uint8_t( (rgbval&0xFF0000) >> 16);
-		g = uint8_t( (rgbval&0x00FF00) >> 8);
-		b = uint8_t( (rgbval&0x0000FF) );
+		r = boost::uint8_t( (rgbval&0xFF0000) >> 16);
+		g = boost::uint8_t( (rgbval&0x00FF00) >> 8);
+		b = boost::uint8_t( (rgbval&0x0000FF) );
 
 		if ( fn.nargs > 2 )
 		{
 			float alphaval = fclamp(fn.arg(2).to_number(), 0, 100);
-			a = uint8_t( 255 * (alphaval/100) );
+			a = boost::uint8_t( 255 * (alphaval/100) );
 		}
 	}
 
@@ -1311,18 +1311,18 @@ sprite_beginFill(const fn_call& fn)
 {
 	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
-	uint8_t r = 0;
-	uint8_t g = 0;
-	uint8_t b = 0;
-	uint8_t a = 255;
+	boost::uint8_t r = 0;
+	boost::uint8_t g = 0;
+	boost::uint8_t b = 0;
+	boost::uint8_t a = 255;
 
 	if ( fn.nargs > 0 )
 	{
 		// 2^24 is the max here
 		boost::uint32_t rgbval = boost::uint32_t(fclamp(fn.arg(0).to_number(), 0, 16777216));
-		r = uint8_t( (rgbval&0xFF0000) >> 16);
-		g = uint8_t( (rgbval&0x00FF00) >> 8);
-		b = uint8_t( (rgbval&0x0000FF) );
+		r = boost::uint8_t( (rgbval&0xFF0000) >> 16);
+		g = boost::uint8_t( (rgbval&0x00FF00) >> 8);
+		b = boost::uint8_t( (rgbval&0x0000FF) );
 
 	}
 

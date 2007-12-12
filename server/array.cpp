@@ -256,7 +256,7 @@ struct as_value_num_nocase_eq : public as_value_lt
 // Note:
 // fUniqueSort and fReturnIndexedArray must first be stripped from the flag
 as_cmp_fn
-get_basic_cmp(uint8_t flags, as_environment& env)
+get_basic_cmp(boost::uint8_t flags, as_environment& env)
 {
 	as_cmp_fn f;
 
@@ -309,7 +309,7 @@ get_basic_cmp(uint8_t flags, as_environment& env)
 // Note:
 // fUniqueSort and fReturnIndexedArray must first be stripped from the flag
 as_cmp_fn
-get_basic_eq(uint8_t flags, as_environment& env)
+get_basic_eq(boost::uint8_t flags, as_environment& env)
 {
 	as_cmp_fn f;
 	flags &= ~(as_array_object::fDescending);
@@ -482,8 +482,8 @@ public:
 
 // Convenience function to strip fUniqueSort and fReturnIndexedArray from sort
 // flag. Presence of flags recorded in douniq and doindex.
-static inline uint8_t
-flag_preprocess(uint8_t flgs, bool* douniq, bool* doindex)
+static inline boost::uint8_t
+flag_preprocess(boost::uint8_t flgs, bool* douniq, bool* doindex)
 {
 	*douniq = (flgs & as_array_object::fUniqueSort);
 	*doindex = (flgs & as_array_object::fReturnIndexedArray);
@@ -494,17 +494,17 @@ flag_preprocess(uint8_t flgs, bool* douniq, bool* doindex)
 
 // Convenience function to process and extract flags from an as_value array
 // of flags (as passed to sortOn when sorting on multiple properties)
-std::deque<uint8_t> 
+std::deque<boost::uint8_t> 
 get_multi_flags(std::deque<as_value>::const_iterator itBegin, 
 	std::deque<as_value>::const_iterator itEnd, bool* uniq, bool* index)
 {
 	std::deque<as_value>::const_iterator it = itBegin;
-	std::deque<uint8_t> flgs;
+	std::deque<boost::uint8_t> flgs;
 
 	// extract fUniqueSort and fReturnIndexedArray from first flag
 	if (it != itEnd)
 	{
-		uint8_t flag = static_cast<uint8_t>((*it).to_number());
+		boost::uint8_t flag = static_cast<boost::uint8_t>((*it).to_number());
 		flag = flag_preprocess(flag, uniq, index);
 		flgs.push_back(flag);
 		++it;
@@ -512,7 +512,7 @@ get_multi_flags(std::deque<as_value>::const_iterator itBegin,
 
 	while (it != itEnd)
 	{
-		uint8_t flag = static_cast<uint8_t>((*it).to_number());
+		boost::uint8_t flag = static_cast<boost::uint8_t>((*it).to_number());
 		flag &= ~(as_array_object::fReturnIndexedArray);
 		flag &= ~(as_array_object::fUniqueSort);
 		flgs.push_back(flag);
@@ -946,7 +946,7 @@ array_sort(const fn_call& fn)
 		ensureType<as_array_object>(fn.this_ptr);
 
 	as_environment& env = fn.env();
-	uint8_t flags = 0;
+	boost::uint8_t flags = 0;
 
 	if ( fn.nargs == 0 )
 	{
@@ -955,7 +955,7 @@ array_sort(const fn_call& fn)
 	}
 	else if ( fn.nargs == 1 && fn.arg(0).is_number() )
 	{
-		flags=static_cast<uint8_t>(fn.arg(0).to_number());
+		flags=static_cast<boost::uint8_t>(fn.arg(0).to_number());
 	}
 	else if ( fn.arg(0).is_as_function() )
 	{
@@ -964,7 +964,7 @@ array_sort(const fn_call& fn)
 		bool (*icmp)(int);
 	
 		if ( fn.nargs == 2 && fn.arg(1).is_number() )
-			flags=static_cast<uint8_t>(fn.arg(1).to_number());
+			flags=static_cast<boost::uint8_t>(fn.arg(1).to_number());
 		
 		if (flags & as_array_object::fDescending) icmp = &int_lt_or_eq;
 		else icmp = &int_gt;
@@ -1010,7 +1010,7 @@ array_sortOn(const fn_call& fn)
 		ensureType<as_array_object>(fn.this_ptr);
 	as_environment& env = fn.env();
 	bool do_unique = false, do_index = false;
-	uint8_t flags = 0;
+	boost::uint8_t flags = 0;
 	int sv = VM::get().getSWFVersion();
 
 	// cases: sortOn("prop) and sortOn("prop", Array.FLAG)
@@ -1021,7 +1021,7 @@ array_sortOn(const fn_call& fn)
 
 		if ( fn.nargs > 1 && fn.arg(1).is_number() )
 		{
-			flags = static_cast<uint8_t>(fn.arg(1).to_number());
+			flags = static_cast<boost::uint8_t>(fn.arg(1).to_number());
 			flags = flag_preprocess(flags, &do_unique, &do_index);
 		}
 		as_value_prop avc = as_value_prop(propField, 
@@ -1076,11 +1076,11 @@ array_sortOn(const fn_call& fn)
 					fBegin = farray->begin(),
 					fEnd = farray->end();
 
-				std::deque<uint8_t> flgs = 
+				std::deque<boost::uint8_t> flgs = 
 					get_multi_flags(fBegin, fEnd, 
 						&do_unique, &do_index);
 
-				std::deque<uint8_t>::const_iterator it = 
+				std::deque<boost::uint8_t>::const_iterator it = 
 					flgs.begin();
 
 				while (it != flgs.end())
@@ -1102,8 +1102,8 @@ array_sortOn(const fn_call& fn)
 		// case: sortOn(["prop1", "prop2"], Array.FLAG)
 		else if ( fn.arg(1).is_number() )
 		{
-			uint8_t flags = 
-				static_cast<uint8_t>(fn.arg(1).to_number());
+			boost::uint8_t flags = 
+				static_cast<boost::uint8_t>(fn.arg(1).to_number());
 			flag_preprocess(flags, &do_unique, &do_index);
 			as_cmp_fn c = get_basic_cmp(flags, env);
 

@@ -116,7 +116,7 @@ public:
   OSRenderMesa(size_t width, size_t height)
     : _width(width),
       _height(height),
-      _buffer(new uint8_t[width * height * 3]), 
+      _buffer(new boost::uint8_t[width * height * 3]), 
 #if OSMESA_MAJOR_VERSION * 100 + OSMESA_MINOR_VERSION >= 305
       _context(OSMesaCreateContextExt(OSMESA_RGB, 0, 2, 0, NULL))
 #else
@@ -171,7 +171,7 @@ public:
 private:
   size_t _width;
   size_t _height;
-  boost::scoped_array<uint8_t> _buffer;
+  boost::scoped_array<boost::uint8_t> _buffer;
   OSMesaContext _context;  
 };
 
@@ -445,7 +445,7 @@ bitmap_info_ogl::setup()
       while (h < _img->height()) { h <<= 1; }
     }
     
-    boost::scoped_array<uint8_t> resized_data(new uint8_t[w*h*_img->pixelSize()]);
+    boost::scoped_array<boost::uint8_t> resized_data(new boost::uint8_t[w*h*_img->pixelSize()]);
     // Q: Would mipmapping these textures aid in performance?
     
     GLint rv = gluScaleImage(_pixel_format, _img->width(),
@@ -466,7 +466,7 @@ bitmap_info_ogl::setup()
 }
 
 void
-bitmap_info_ogl::upload(uint8_t* data, size_t width, size_t height)
+bitmap_info_ogl::upload(boost::uint8_t* data, size_t width, size_t height)
 {
   glTexParameteri(_ogl_img_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   

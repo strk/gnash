@@ -89,7 +89,7 @@ public:
 	bitmap_info_xbox(create_empty e);
 	bitmap_info_xbox(image::rgb* im);
 	bitmap_info_xbox(image::rgba* im);
-	virtual void set_alpha_image(int width, int height, uint8_t* data);
+	virtual void set_alpha_image(int width, int height, boost::uint8_t* data);
 };
 
 
@@ -107,7 +107,7 @@ public:
 		// not supported
 	}
 
-	static void make_next_miplevel(int* width, int* height, uint8_t* data)
+	static void make_next_miplevel(int* width, int* height, boost::uint8_t* data)
 	// Utility.  Mutates *width, *height and *data to create the
 	// next mip level.
 	{
@@ -133,12 +133,12 @@ public:
 		{
 			// Resample.  Simple average 2x2 --> 1, in-place.
 			for (int j = 0; j < new_h; j++) {
-				uint8_t*	out = ((uint8_t*) data) + j * new_w;
-				uint8_t*	in = ((uint8_t*) data) + (j << 1) * *width;
+				boost::uint8_t*	out = ((boost::uint8_t*) data) + j * new_w;
+				boost::uint8_t*	in = ((boost::uint8_t*) data) + (j << 1) * *width;
 				for (int i = 0; i < new_w; i++) {
 					int	a;
 					a = (*(in + 0) + *(in + 1) + *(in + 0 + *width) + *(in + 1 + *width));
-					*(out) = (uint8_t) (a >> 2);
+					*(out) = (boost::uint8_t) (a >> 2);
 					out++;
 					in += 2;
 				}
@@ -400,7 +400,7 @@ public:
 	}
 
 
-	void	set_alpha_image(gnash::bitmap_info* bi, int w, int h, uint8_t* data)
+	void	set_alpha_image(gnash::bitmap_info* bi, int w, int h, boost::uint8_t* data)
 	// Set the specified bitmap_info so that it contains an alpha
 	// texture with the given data (1 byte per texel).
 	//
@@ -840,10 +840,10 @@ bitmap_info_xbox::bitmap_info_xbox(image::rgb* im)
 	// D3DXLoadSurfaceFromMemory.
 	// @@ this sucks :(
 	int	pixel_count = w * h;
-	uint8_t*	expanded_data = new uint8_t[pixel_count * 4];
+	boost::uint8_t*	expanded_data = new boost::uint8_t[pixel_count * 4];
 	for (int y = 0; y < h; y++)
 	{
-		uint8_t*	scanline = image::scanline(rescaled, y);
+		boost::uint8_t*	scanline = image::scanline(rescaled, y);
 		for (int x = 0; x < w; x++)
 		{
 			expanded_data[((y * w) + x) * 4 + 0] = scanline[x * 3 + 0];	// red
@@ -1070,7 +1070,7 @@ bitmap_info_xbox::bitmap_info_xbox(image::rgba* im)
 }
 
 
-void bitmap_info_xbox::set_alpha_image(int width, int height, uint8_t* data)
+void bitmap_info_xbox::set_alpha_image(int width, int height, boost::uint8_t* data)
 // Initialize this bitmap_info to an alpha image
 // containing the specified data (1 byte per texel).
 //

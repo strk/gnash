@@ -21,7 +21,7 @@ namespace image
 	//
 
 	/// Create an image taking ownership of the given buffer, supposedly of height*pitch bytes
-	image_base::image_base(uint8_t* data, int width, int height, int pitch, id_image type)
+	image_base::image_base(boost::uint8_t* data, int width, int height, int pitch, id_image type)
 		:
 		m_type(type),
 		m_size(height*pitch),
@@ -37,7 +37,7 @@ namespace image
 		:
 		m_type(type),
 		m_size(height*pitch),
-		m_data(new uint8_t[m_size]),
+		m_data(new boost::uint8_t[m_size]),
 		m_width(width),
 		m_height(height),
 		m_pitch(pitch)
@@ -45,7 +45,7 @@ namespace image
 		assert(pitch >= width);
 	}
 
-	void image_base::update(uint8_t* data)
+	void image_base::update(boost::uint8_t* data)
 	{
 		memcpy(m_data.get(), data, m_size);
 	}
@@ -58,7 +58,7 @@ namespace image
 		memcpy(m_data.get(), from.m_data.get(), m_size);
 	}
 
-	uint8_t* image_base::scanline(size_t y)
+	boost::uint8_t* image_base::scanline(size_t y)
 	{
 		assert(y < m_height);
 		return m_data.get() + m_pitch * y;
@@ -126,8 +126,8 @@ namespace image
 		// Resample.  Simple average 2x2 --> 1, in-place.
 		size_t	pitch = m_pitch;
 		for (size_t j = 0; j < new_h; j++) {
-			uint8_t*	out = m_data.get() + j * new_pitch;
-			uint8_t*	in = m_data.get() + (j << 1) * pitch;
+			boost::uint8_t*	out = m_data.get() + j * new_pitch;
+			boost::uint8_t*	in = m_data.get() + (j << 1) * pitch;
 			for (size_t i = 0; i < new_w; i++) {
 				int	r, g, b;
 				r = (*(in + 0) + *(in + 3) + *(in + 0 + pitch) + *(in + 3 + pitch));
@@ -184,13 +184,13 @@ namespace image
 	}
 
 
-	void	rgba::set_pixel(size_t x, size_t y, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+	void	rgba::set_pixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a)
 	// Set the pixel at the given position.
 	{
 		assert(x < m_width);
 		assert(y < m_height);
 
-		uint8_t*	data = scanline(y) + 4 * x;
+		boost::uint8_t*	data = scanline(y) + 4 * x;
 
 		data[0] = r;
 		data[1] = g;
@@ -199,12 +199,12 @@ namespace image
 	}
 
 	// Set alpha value for given pixel 
-	void	rgba::set_alpha(size_t x, size_t y, uint8_t a)
+	void	rgba::set_alpha(size_t x, size_t y, boost::uint8_t a)
 	{
 		assert(x < m_width);
 		assert(y < m_height);
 
-		uint8_t*	data = scanline(y) + 4 * x;
+		boost::uint8_t*	data = scanline(y) + 4 * x;
 
 		data[3] = a;
 	}
@@ -235,8 +235,8 @@ namespace image
 		// Resample.  Simple average 2x2 --> 1, in-place.
 		size_t	pitch = m_pitch;
 		for (size_t j = 0; j < new_h; j++) {
-			uint8_t*	out = ((uint8_t*) m_data.get()) + j * new_pitch;
-			uint8_t*	in = ((uint8_t*) m_data.get()) + (j << 1) * pitch;
+			boost::uint8_t*	out = ((boost::uint8_t*) m_data.get()) + j * new_pitch;
+			boost::uint8_t*	in = ((boost::uint8_t*) m_data.get()) + (j << 1) * pitch;
 			for (size_t i = 0; i < new_w; i++) {
 				int	r, g, b, a;
 				r = (*(in + 0) + *(in + 4) + *(in + 0 + pitch) + *(in + 4 + pitch));
@@ -282,7 +282,7 @@ namespace image
 		assert(width > 0);
 		assert(height > 0);
 
-		//m_data = new uint8_t[m_pitch * m_height];
+		//m_data = new boost::uint8_t[m_pitch * m_height];
 	}
 
 
@@ -314,8 +314,8 @@ namespace image
 		// Resample.  Simple average 2x2 --> 1, in-place.
 		for (size_t j = 0; j < new_h; j++)
 		{
-			uint8_t* out = m_data.get() + j * new_w;
-			uint8_t* in = m_data.get() + (j << 1) * m_width;
+			boost::uint8_t* out = m_data.get() + j * new_w;
+			boost::uint8_t* in = m_data.get() + (j << 1) * m_width;
 			for (size_t i = 0; i < new_w; i++)
 			{
 				int	a;
@@ -337,13 +337,13 @@ namespace image
 	}
 
 
-	void	alpha::set_pixel(size_t x, size_t y, uint8_t a)
+	void	alpha::set_pixel(size_t x, size_t y, boost::uint8_t a)
 	// Set the pixel at the given position.
 	{
 		assert(x < m_width);
 		assert(y < m_height);
 
-		uint8_t*	data = scanline(y) + x;
+		boost::uint8_t*	data = scanline(y) + x;
 
 		data[0] = a;
 	}
@@ -432,7 +432,7 @@ namespace image
 			planes[i].coords[3][1] = th;
 		}
 
-		m_data.reset( new uint8_t[m_size] );
+		m_data.reset( new boost::uint8_t[m_size] );
 
 	//		m_bounds->m_x_min = 0.0f;
 	//		m_bounds->m_x_max = 1.0f;
@@ -540,13 +540,13 @@ namespace image
 
 		std::auto_ptr<rgba> im ( image::create_rgba(j_in->get_width(), j_in->get_height()) );
 
-		boost::scoped_array<uint8_t> line ( new uint8_t[3*j_in->get_width()] );
+		boost::scoped_array<boost::uint8_t> line ( new boost::uint8_t[3*j_in->get_width()] );
 
 		for (int y = 0; y < j_in->get_height(); y++) 
 		{
 			j_in->read_scanline(line.get());
 
-			uint8_t*	data = im->scanline(y);
+			boost::uint8_t*	data = im->scanline(y);
 			for (int x = 0; x < j_in->get_width(); x++) 
 			{
 				data[4*x+0] = line[3*x+0];
@@ -583,7 +583,7 @@ namespace image
 
 		for (size_t y = 0; y < imHeight; y++)
 		{
-			uint8_t*	p = im->scanline(y);
+			boost::uint8_t*	p = im->scanline(y);
 			for (size_t x = 0; x < imWidth; x++)
 			{
 				out->write_byte(p[x * 4]);

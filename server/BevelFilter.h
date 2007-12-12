@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BevelFilter.h,v 1.6 2007/12/04 11:45:27 strk Exp $ */
+/* $Id: BevelFilter.h,v 1.7 2007/12/12 10:07:00 zoulunkai Exp $ */
 
 #ifndef GNASH_BEVELFILTER_H
 #define GNASH_BEVELFILTER_H
@@ -54,9 +54,9 @@ public:
     { return; }
 
     BevelFilter(float distance, float angle, boost::uint32_t hcolor,
-        uint8_t halpha, boost::uint32_t scolor, uint8_t salpha,
+        boost::uint8_t halpha, boost::uint32_t scolor, boost::uint8_t salpha,
         float blurX, float blurY, float strength,
-        uint8_t quality, bevel_type type, bool knockout) :
+        boost::uint8_t quality, bevel_type type, bool knockout) :
         m_distance(distance), m_angle(angle), m_highlightColor(hcolor),
         m_highlightAlpha(halpha), m_shadowColor(scolor), m_shadowAlpha(salpha),
         m_blurX(blurX), m_blurY(blurY), m_strength(strength),
@@ -67,13 +67,13 @@ protected:
     float m_distance; // Distance of the filter in pixels.
     float m_angle; // Angle of the filter.
     boost::uint32_t m_highlightColor; // Color of the highlight.
-    uint8_t m_highlightAlpha; // Alpha of the highlight.
+    boost::uint8_t m_highlightAlpha; // Alpha of the highlight.
     boost::uint32_t m_shadowColor; // RGB color.
-    uint8_t m_shadowAlpha; // Alpha strength, as a percentage(?)
+    boost::uint8_t m_shadowAlpha; // Alpha strength, as a percentage(?)
     float m_blurX; // horizontal blur
     float m_blurY; // vertical blur
     float m_strength; // How strong is the filter.
-    uint8_t m_quality; // How many times to apply the filter.
+    boost::uint8_t m_quality; // How many times to apply the filter.
     bevel_type m_type; // The type of filter. (Rendered as string in AS)
     bool m_knockout; // If true, render only the filter effect.
 };

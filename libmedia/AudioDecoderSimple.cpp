@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderSimple.cpp,v 1.11 2007/12/04 22:03:30 strk Exp $
+// $Id: AudioDecoderSimple.cpp,v 1.12 2007/12/12 10:06:59 zoulunkai Exp $
 
 #include "AudioDecoderSimple.h"
 #include "utility.h"
@@ -261,13 +261,13 @@ static void u8_expand(
 	unsigned char* input,
 	boost::uint32_t input_size) // This is also the number of u8bit samples
 {
-	boost::scoped_array<uint8_t> in_data ( new uint8_t[input_size] );
+	boost::scoped_array<boost::uint8_t> in_data ( new boost::uint8_t[input_size] );
 	boost::int16_t	*out_data = new boost::int16_t[input_size];
 
 	memcpy((char *)in_data.get(), input, input_size);
 
 	// Convert 8-bit to 16
-	uint8_t *inp = in_data.get();
+	boost::uint8_t *inp = in_data.get();
 	boost::int16_t *outp = out_data;
 	for (unsigned int i = input_size; i>0; i--) {
 		*outp++ = ((boost::int16_t)(*inp++) - 128) * 256;
@@ -318,7 +318,7 @@ bool AudioDecoderSimple::setup(AudioInfo* info)
 	}
 }
 
-uint8_t* AudioDecoderSimple::decode(uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool /*parse*/)
+boost::uint8_t* AudioDecoderSimple::decode(boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool /*parse*/)
 {
 
 	unsigned char* decodedData = NULL;
@@ -369,8 +369,8 @@ uint8_t* AudioDecoderSimple::decode(uint8_t* input, boost::uint32_t inputSize, b
 			union u {
 				boost::uint16_t s;
 				struct {
-					uint8_t c0;
-					uint8_t c1;
+					boost::uint8_t c0;
+					boost::uint8_t c1;
 				} c;
 			} u = { 0x0001 };
 
@@ -396,7 +396,7 @@ uint8_t* AudioDecoderSimple::decode(uint8_t* input, boost::uint32_t inputSize, b
 		// ???, this should only decode ADPCM, RAW and UNCOMPRESSED
 	}
 
-	uint8_t* tmp_raw_buffer = decodedData;
+	boost::uint8_t* tmp_raw_buffer = decodedData;
 	boost::uint32_t tmp_raw_buffer_size = 0;
 
 	// If we need to convert samplerate or/and from mono to stereo...
@@ -422,7 +422,7 @@ uint8_t* AudioDecoderSimple::decode(uint8_t* input, boost::uint32_t inputSize, b
 
 		// Move the new data to the sound-struct
 		delete[] tmp_raw_buffer;
-		tmp_raw_buffer = reinterpret_cast<uint8_t*>(adjusted_data);
+		tmp_raw_buffer = reinterpret_cast<boost::uint8_t*>(adjusted_data);
 		tmp_raw_buffer_size = adjusted_size;
 
 	} else {

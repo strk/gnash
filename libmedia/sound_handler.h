@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.5 2007/12/04 11:45:26 strk Exp $ */
+/* $Id: sound_handler.h,v 1.6 2007/12/12 10:07:00 zoulunkai Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -70,7 +70,7 @@ public:
 	///
 	/// @param size number of bytes in the new data
 	///
-	Buffer(uint8_t* newData, size_t size)
+	Buffer(boost::uint8_t* newData, size_t size)
 		:
 		_capacity(size),
 		_data(newData),
@@ -84,7 +84,7 @@ public:
 	///
 	/// @param size number of bytes in the new data
 	///
-	void append(uint8_t* newData, size_t size)
+	void append(boost::uint8_t* newData, size_t size)
 	{
 		if ( ! _capacity )
 		{
@@ -109,7 +109,7 @@ public:
 	///
 	/// @param size number of bytes in the new data
 	///
-	void assign(uint8_t* newData, size_t size)
+	void assign(boost::uint8_t* newData, size_t size)
 	{
 		if ( ! _capacity )
 		{
@@ -130,23 +130,23 @@ public:
 		delete [] newData;
 	}
 
-	const uint8_t* data() const
+	const boost::uint8_t* data() const
 	{
 		return _data;
 	}
 
-	uint8_t* data() 
+	boost::uint8_t* data() 
 	{
 		return _data;
 	}
 
-	const uint8_t* data(size_t pos) const
+	const boost::uint8_t* data(size_t pos) const
 	{
 		assert(pos < _capacity);
 		return _data+pos;
 	}
 
-	uint8_t* data(size_t pos) 
+	boost::uint8_t* data(size_t pos) 
 	{
 		assert(pos < _capacity);
 		return _data+pos;
@@ -166,8 +166,8 @@ public:
 		// TODO: use smalles power of 2 bigger then newCapacity
 		_capacity = std::max(newCapacity, _capacity*2);
 
-		uint8_t* tmp = _data;
-		_data = new uint8_t[_capacity];
+		boost::uint8_t* tmp = _data;
+		_data = new boost::uint8_t[_capacity];
 		if ( tmp )
 		{
 			if ( _size ) memcpy(_data, tmp, _size);
@@ -189,7 +189,7 @@ private:
 
 	size_t _capacity;
 
-	uint8_t* _data;
+	boost::uint8_t* _data;
 
 	size_t _size;
 
@@ -211,7 +211,7 @@ public:
 
 	// See attach_aux_streamer
 	// TODO: change third parameter type to unsigned
-	typedef bool (*aux_streamer_ptr)(void *udata, uint8_t *stream, int len);
+	typedef bool (*aux_streamer_ptr)(void *udata, boost::uint8_t *stream, int len);
 
 	/// Used to control volume for event sounds. It basically tells that from
 	/// sample X the volume for left out is Y and for right out is Z. Several

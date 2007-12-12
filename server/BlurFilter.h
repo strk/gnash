@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BlurFilter.h,v 1.4 2007/09/26 19:00:46 strk Exp $ */
+/* $Id: BlurFilter.h,v 1.5 2007/12/12 10:07:00 zoulunkai Exp $ */
 
 #ifndef GNASH_BLURFILTER_H
 #define GNASH_BLURFILTER_H
@@ -26,7 +26,7 @@
 
 #include "BitmapFilter.h"
 
-#include <boost/cstdint.hpp> // for uint8_t
+#include <boost/cstdint.hpp> // for boost::uint8_t
 
 namespace gnash {
 
@@ -43,14 +43,14 @@ public:
         m_blurX(0.0f), m_blurY(0.0f), m_quality(0)
     { return; }
 
-    BlurFilter(float blurX, float blurY, uint8_t quality) :
+    BlurFilter(float blurX, float blurY, boost::uint8_t quality) :
         m_blurX(blurX), m_blurY(blurY), m_quality(quality)
     { return; }
 
 protected:
     float m_blurX; // How much horizontal blur.
     float m_blurY; // How much vertical blur.
-    uint8_t m_quality; // How many passes to take.
+    boost::uint8_t m_quality; // How many passes to take.
 };
 
 } // Namespace gnash

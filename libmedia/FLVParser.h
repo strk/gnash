@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.h,v 1.5 2007/12/04 11:45:25 strk Exp $
+// $Id: FLVParser.h,v 1.6 2007/12/12 10:06:59 zoulunkai Exp $
 
 // Information about the FLV format can be found at http://osflash.org/flv
 
@@ -221,7 +221,7 @@ private:
 	bool parseHeader();
 
 	// Functions used to extract numbers from the file
-	inline boost::uint32_t getUInt24(uint8_t* in);
+	inline boost::uint32_t getUInt24(boost::uint8_t* in);
 
 	/// The interface to the file, externally owned
 //	tu_file* _stream;

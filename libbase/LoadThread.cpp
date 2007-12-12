@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: LoadThread.cpp,v 1.16 2007/10/20 09:33:28 strk Exp $
+// $Id: LoadThread.cpp,v 1.17 2007/12/12 10:06:59 zoulunkai Exp $
 
 #include "LoadThread.h"
 
@@ -194,7 +194,7 @@ size_t LoadThread::read(void *dst, size_t bytes)
 	// check if the cache is big enough to contain the wanted data
 	if (static_cast<long>(bytes) > _cacheSize-20000) {
 		_cacheSize = bytes+20000;
-		_cache.reset( new uint8_t[_cacheSize] );
+		_cache.reset( new boost::uint8_t[_cacheSize] );
 	}
 
 	// To avoid recaching all the time, we cache some data from before
@@ -277,7 +277,7 @@ void LoadThread::setupCache()
 	boost::mutex::scoped_lock lock(_mutex);
 #endif
 
-	_cache.reset( new uint8_t[1024*500] );
+	_cache.reset( new boost::uint8_t[1024*500] );
 	_cacheSize = 1024*500;
 
 	int ret = _stream->read_bytes(_cache.get(), 1024);

@@ -36,7 +36,7 @@ namespace gnash {
 
 		friend std::ostream& operator<< (std::ostream& os, const rgba& r);
 
-		uint8_t	m_r, m_g, m_b, m_a;
+		boost::uint8_t	m_r, m_g, m_b, m_a;
 
 		/// Default RGBA value is FF.FF.FF.FF
 		rgba() : m_r(255), m_g(255), m_b(255), m_a(255) {}
@@ -48,7 +48,7 @@ namespace gnash {
 		/// @param b Blue
 		/// @param a Alpha (transparency)
 		///
-		rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+		rgba(boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a)
 			:
 			m_r(r), m_g(g), m_b(b), m_a(a)
 		{
@@ -66,9 +66,9 @@ namespace gnash {
 		///
 		void parseRGB(boost::uint32_t rgbCol)
 		{
-			m_r = (uint8_t)(rgbCol>>16);
-			m_g = (uint8_t)(rgbCol>>8);
-			m_b = (uint8_t)(rgbCol);
+			m_r = (boost::uint8_t)(rgbCol>>16);
+			m_g = (boost::uint8_t)(rgbCol>>8);
+			m_b = (boost::uint8_t)(rgbCol);
 		}
 
 		/// \brief
@@ -112,7 +112,7 @@ namespace gnash {
 		void	read_rgb(stream* in);
 
 		/// Set r,g,b.a values
-		void	set(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+		void	set(boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a)
 		{
 			m_r = r;
 			m_g = g;

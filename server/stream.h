@@ -145,7 +145,7 @@ public:
 	//
 	/// aligned read
 	///
-	uint8_t  read_u8();
+	boost::uint8_t  read_u8();
 
 	/// Read a aligned signed 8-bit value from the stream.		
 	//
@@ -391,8 +391,8 @@ public:
 private:
 
 	tu_file*	m_input;
-	uint8_t	m_current_byte;
-	uint8_t	m_unused_bits;
+	boost::uint8_t	m_current_byte;
+	boost::uint8_t	m_unused_bits;
 
 	typedef std::pair<unsigned long,unsigned long> TagBoundaries;
 	// position of start and end of tag

@@ -42,7 +42,7 @@ namespace image
 			:
 			m_type(o.m_type),
 			m_size(o.size()),
-			m_data(new uint8_t[m_size]),
+			m_data(new boost::uint8_t[m_size]),
 			m_width(o.width()),
 			m_height(o.height()),
 			m_pitch(o.m_pitch)
@@ -52,7 +52,7 @@ namespace image
 		
 			
 			
-		image_base(uint8_t *data, int width, int height, int pitch, id_image type);
+		image_base(boost::uint8_t *data, int width, int height, int pitch, id_image type);
 
 		/// Construct an image_base allocating data for height*pitch bytes
 		image_base(int width, int height, int pitch, id_image type);
@@ -86,7 +86,7 @@ namespace image
 		///
 		/// @param data buffer to copy data from.
 		///
-		void update(uint8_t* data);
+		void update(boost::uint8_t* data);
 
 		/// Copy image data from another image data
 		//
@@ -98,13 +98,13 @@ namespace image
 		void update(const image_base& from);
 
 		/// Return a pointer to the underlying data
-		uint8_t* data() { return m_data.get(); }
+		boost::uint8_t* data() { return m_data.get(); }
 
 		/// Return a pointer to first byte of given line
-		DSOEXPORT uint8_t* scanline(size_t y);
+		DSOEXPORT boost::uint8_t* scanline(size_t y);
 
 		/// Return a read-only pointer to first byte of given line
-		DSOEXPORT const uint8_t* scanline(size_t y) const
+		DSOEXPORT const boost::uint8_t* scanline(size_t y) const
 		{
 			return const_cast<image_base*>(this)->scanline(y);
 		}
@@ -127,7 +127,7 @@ namespace image
 		size_t m_size;
 
 		/// Data bytes, geometry defined by members below
-		boost::scoped_array<uint8_t> m_data;
+		boost::scoped_array<boost::uint8_t> m_data;
 
 		/// Width of image, in pixels
 		size_t	m_width;
@@ -196,13 +196,13 @@ namespace image
 		//
 		/// TODO: move in base class ?
 		///
-		void	set_pixel(size_t x, size_t y, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+		void	set_pixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g, boost::uint8_t b, boost::uint8_t a);
 
 		/// Set alpha value for given pixel
 		//
 		/// TODO: move in base class ?
 		///
-		void	set_alpha(size_t x, size_t y, uint8_t a);
+		void	set_alpha(size_t x, size_t y, boost::uint8_t a);
 
 		// See dox in base class
 		bool make_next_miplevel();
@@ -233,7 +233,7 @@ namespace image
 		//
 		/// TODO: move in base class ?
 		///
-		void	set_pixel(size_t x, size_t y, uint8_t a);
+		void	set_pixel(size_t x, size_t y, boost::uint8_t a);
 
 		// Bitwise content comparison.
 		bool	operator==(const alpha& a) const;

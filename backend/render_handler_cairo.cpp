@@ -50,12 +50,12 @@ namespace gnash {
 
 // Converts from RGB image to 32-bit pixels in CAIRO_FORMAT_RGB24 format
 static void
-rgb_to_cairo_rgb24(uint8_t* dst, const image::rgb* im)
+rgb_to_cairo_rgb24(boost::uint8_t* dst, const image::rgb* im)
 {
   boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
   for (size_t y = 0;  y < im->height();  y++)
   {
-	  const uint8_t* src = im->scanline(y);
+	  const boost::uint8_t* src = im->scanline(y);
 	  for (size_t x = 0;  x < im->width();  x++, src += 3)
 	  {
 	      *dst32++ = (src[0] << 16) | (src[1] << 8) | src[2];
@@ -65,15 +65,15 @@ rgb_to_cairo_rgb24(uint8_t* dst, const image::rgb* im)
 
 // Converts from RGBA image to 32-bit pixels in CAIRO_FORMAT_ARGB32 format
 static void
-rgba_to_cairo_argb(uint8_t* dst, const image::rgba* im)
+rgba_to_cairo_argb(boost::uint8_t* dst, const image::rgba* im)
 {
   boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
   for (size_t y = 0;  y < im->height();  y++)
   {
-	  const uint8_t* src = im->scanline(y);
+	  const boost::uint8_t* src = im->scanline(y);
 	  for (size_t x = 0;  x < im->width();  x++, src += 4)
 	  {
-      const uint8_t& r = src[0],
+      const boost::uint8_t& r = src[0],
                      g = src[1],
                      b = src[2],
                      a = src[3];
@@ -92,7 +92,7 @@ rgba_to_cairo_argb(uint8_t* dst, const image::rgba* im)
 class bitmap_info_cairo : public bitmap_info
 {
   public:
-    bitmap_info_cairo(uint8_t* data, int width, int height,
+    bitmap_info_cairo(boost::uint8_t* data, int width, int height,
                            size_t bpp, cairo_format_t format)
     : _data(data),
       _width(width),
@@ -135,7 +135,7 @@ class bitmap_info_cairo : public bitmap_info
     }
    
   private:
-    boost::scoped_array<uint8_t> _data;
+    boost::scoped_array<boost::uint8_t> _data;
     int _width;
     int _height;
     size_t _bytes_per_pixel;
@@ -204,7 +204,7 @@ public:
   virtual bitmap_info*  create_bitmap_info_rgb(image::rgb* im) 
   {
     int buf_size = im->width() * im->height() * 4;
-    uint8_t* buffer = new uint8_t[buf_size];
+    boost::uint8_t* buffer = new boost::uint8_t[buf_size];
     
     rgb_to_cairo_rgb24(buffer, im);
     
@@ -215,7 +215,7 @@ public:
   virtual bitmap_info*  create_bitmap_info_rgba(image::rgba* im)
   {        
     int buf_size = im->width() * im->height() * 4;
-    uint8_t* buffer = new uint8_t[buf_size];
+    boost::uint8_t* buffer = new boost::uint8_t[buf_size];
     
     rgba_to_cairo_argb(buffer, im);
     
@@ -263,7 +263,7 @@ public:
     size_t buf_size = w * h * 4;
     
     if (_video_bufsize < buf_size) {
-      _video_buffer.reset(new uint8_t[buf_size]);
+      _video_buffer.reset(new boost::uint8_t[buf_size]);
 	    _video_bufsize = buf_size;
     }    
     
@@ -961,7 +961,7 @@ draw_subshape(const PathVec& path_vec, const matrix& mat, const cxform& cx,
 private:
   /// The cairo context.
   cairo_t* _cr;
-  boost::scoped_array<uint8_t> _video_buffer;
+  boost::scoped_array<boost::uint8_t> _video_buffer;
   std::vector<PathVec> _masks;
   size_t _video_bufsize;
   bool _drawing_mask;

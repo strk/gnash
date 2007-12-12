@@ -57,7 +57,7 @@ using namespace std;
 namespace {
 
 struct invalidHexDigit {};
-uint8_t parseHex(char c)
+boost::uint8_t parseHex(char c)
 {
 	switch (c)
 	{
@@ -381,9 +381,9 @@ as_value::to_number() const
 		if ( s.length() == 8 && s[0] == '0' && ( s[1] == 'x' || s[1] == 'X' ) )
 		{
 			try {
-			uint8_t r = (parseHex(s[2])<<4) + parseHex(s[3]);
-			uint8_t g = (parseHex(s[4])<<4) + parseHex(s[5]);
-			uint8_t b = (parseHex(s[6])<<4) + parseHex(s[7]);
+			boost::uint8_t r = (parseHex(s[2])<<4) + parseHex(s[3]);
+			boost::uint8_t g = (parseHex(s[4])<<4) + parseHex(s[5]);
+			boost::uint8_t b = (parseHex(s[6])<<4) + parseHex(s[7]);
 			return (double)((r<<16)|(g<<8)|b);
 			} catch (invalidHexDigit) { }
 			

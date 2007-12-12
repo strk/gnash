@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.52 2007/12/04 11:45:28 strk Exp $ */
+/* $Id: font.cpp,v 1.53 2007/12/12 10:07:00 zoulunkai Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -217,7 +217,7 @@ GlyphInfo::markReachableResources() const
 		m_wide_codes = in->read_bit();
 		m_is_italic = in->read_bit();
 		m_is_bold = in->read_bit();
-		uint8_t	reserved = in->read_u8();
+		boost::uint8_t	reserved = in->read_u8();
 
 		IF_VERBOSE_PARSE (
 		log_parse(" has_layout = %d", has_layout);
@@ -469,7 +469,7 @@ GlyphInfo::markReachableResources() const
 			// Code table is made of bytes.
 			for (int i=0, n=_embedGlyphTable.size(); i<n; ++i)
 			{
-				uint8_t code = in->read_u8();
+				boost::uint8_t code = in->read_u8();
 				_embedded_code_table.insert(std::make_pair(code, i));
 			}
 		}

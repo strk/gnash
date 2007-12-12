@@ -48,9 +48,9 @@ line_style::read_morph(stream* in, int tag_type, movie_definition *md,
 	pOther->m_width = in->read_u16();
 	// TODO: Same as in read(...), use these.
 	// 0 -- Round caps, 1 -- No caps, 2 -- square caps
-	uint8_t caps = in->read_uint(2);
+	boost::uint8_t caps = in->read_uint(2);
 	// 0 -- Round join, 1 -- Bevel join, 2 -- Miter join
-	uint8_t joins = in->read_uint(2);
+	boost::uint8_t joins = in->read_uint(2);
 	bool has_fill = in->read_uint(1);
 	bool no_hscale = in->read_uint(1);
 	bool no_vscale = in->read_uint(1);
@@ -95,9 +95,9 @@ line_style::read(stream* in, int tag_type, movie_definition *md)
 	in->ensureBytes(2);
 	m_width = in->read_u16();
 	// 0 -- Round caps, 1 -- No caps, 2 -- square caps
-	uint8_t caps = in->read_uint(2);
+	boost::uint8_t caps = in->read_uint(2);
 	// 0 -- Round join, 1 -- Bevel join, 2 -- Miter join
-	uint8_t joins = in->read_uint(2);
+	boost::uint8_t joins = in->read_uint(2);
 	bool has_fill = in->read_uint(1);
 	bool no_hscale = in->read_uint(1);
 	bool no_vscale = in->read_uint(1);

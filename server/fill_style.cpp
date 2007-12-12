@@ -150,7 +150,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md,
 		// num_gradients is not 8 bits, it is only the last 4.
 		// at the moment, the first four are unused, so we may
 		// mask, but this needs to be changed.
-        uint8_t num_gradients = in->read_u8() & 15;
+        boost::uint8_t num_gradients = in->read_u8() & 15;
         if ( ! num_gradients )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
@@ -323,7 +323,7 @@ fill_style::get_gradient_matrix() const
 }
 
 rgba
-fill_style::sample_gradient(uint8_t ratio) const
+fill_style::sample_gradient(boost::uint8_t ratio) const
 {
 	assert(m_type == SWF::FILL_LINEAR_GRADIENT
 		|| m_type == SWF::FILL_RADIAL_GRADIENT
@@ -501,7 +501,7 @@ fill_style::set_lerp(const fill_style& a, const fill_style& b, float t)
     for (size_t j=0, nj=m_gradients.size(); j<nj; ++j)
     {
         m_gradients[j].m_ratio =
-            (uint8_t) frnd(
+            (boost::uint8_t) frnd(
                 flerp(a.m_gradients[j].m_ratio, b.m_gradients[j].m_ratio, t)
                 );
         m_gradients[j].m_color.set_lerp(a.m_gradients[j].m_color, b.m_gradients[j].m_color, t);

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.h,v 1.20 2007/12/04 11:45:23 strk Exp $
+// $Id: FLVParser.h,v 1.21 2007/12/12 10:06:59 zoulunkai Exp $
 
 // Information about the FLV format can be found at http://osflash.org/flv
 
@@ -39,9 +39,9 @@ class FLVFrame
 {
 public:
 	boost::uint32_t dataSize;
-	uint8_t* data;
+	boost::uint8_t* data;
 	boost::uint64_t timestamp;
-	uint8_t tag;
+	boost::uint8_t tag;
 };
 
 /// \brief
@@ -306,7 +306,7 @@ private:
 	bool parseHeader();
 
 	// Functions used to extract numbers from the file
-	inline boost::uint32_t getUInt24(uint8_t* in);
+	inline boost::uint32_t getUInt24(boost::uint8_t* in);
 
 	/// The interface to the file, externally owned
 	LoadThread& _lt;
