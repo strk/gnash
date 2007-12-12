@@ -103,6 +103,10 @@ public:
 
     const std::string& getFlashVersionString() const { return _flashVersionString; }
 
+    const std::string& getFlashSystemOS() const { return _flashSystemOS; }
+
+    const std::string& getFlashSystemManufacturer() const { return _flashSystemManufacturer; }
+
     int getRetries() const { return _retries; }
     void setRetries(int x) { _retries = x; }
 
@@ -148,6 +152,8 @@ private:
     bool _debugger;             // enable the Flash movie debugger
     int  _verbosity;
     std::string  _flashVersionString;   //String to pass as $version in Actionscript
+    std::string  _flashSystemOS;        //String to pass as System.capabilities.os in Actionscript
+    std::string  _flashSystemManufacturer;        //String to pass as System.capabilities.manufacturer in Actionscript
     bool _actiondump;           // enable dumping actionscript classes
     bool _parserdump;           // enable dumping parser data
 

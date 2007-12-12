@@ -30,45 +30,12 @@
 
 namespace gnash {
 
-#if 0
-System::System() {
-}
-
-System::~System() {
-}
-
-
-void
-System::security_allowDomain()
-{
-    log_unimpl (__PRETTY_FUNCTION__);
-}
-
-void
-System::security_allowInsecureDomain()
-{
-    log_unimpl (__PRETTY_FUNCTION__);
-}
-
-void
-System::security_loadPolicyFile()
-{
-    log_unimpl (__PRETTY_FUNCTION__);
-}
-
-void
-System::setClipboard()
-{
-    log_unimpl (__PRETTY_FUNCTION__);
-}
-
-void
-System::showSettings()
-{
-    log_unimpl (__PRETTY_FUNCTION__);
-}
-
-#endif
+static as_value system_security_allowdomain(const fn_call& fn);
+static as_value system_security_allowinsecuredomain(const fn_call& fn);
+static as_value system_security_loadpolicyfile(const fn_call& fn);
+static as_value system_setclipboard(const fn_call& fn);
+static as_value system_showsettings(const fn_call& fn);
+static as_value system_showsettings(const fn_call& fn);
 
 static as_object*
 getSystemSecurityInterface()
@@ -90,6 +57,8 @@ getSystemSecurityInterface()
 static as_object*
 getSystemCapabilitiesInterface()
 {
+	static RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+
 	static boost::intrusive_ptr<as_object> proto;
 	if ( proto == NULL )
 	{
@@ -107,10 +76,11 @@ getSystemCapabilitiesInterface()
 
 		// TODO: 
 		// "Windows XP", "Windows 2000", "Windows NT", "Windows 98/ME", "Windows 95", "Windows CE", "Linux", "MacOS"
-		proto->init_member("os", "GNU", flags);
+		proto->init_member("os", rcfile.getFlashSystemOS(), flags);
 
 		// TODO: should be manufacturer and platform
-		proto->init_member("manufacturer", "GNU Gnash", flags);
+		// "Macromedia Windows", "Macromedia Linux", "Macromedia MacOS"
+		proto->init_member("manufacturer", rcfile.getFlashSystemManufacturer(), flags);
 	}
 	return proto.get();
 }
@@ -133,7 +103,6 @@ getSystemInterface()
 	{
 		proto = new as_object(getObjectInterface());
 		attachSystemInterface(*proto);
-		//proto->init_member("constructor", new builtin_function(system_new)); 
 	}
 	return proto.get();
 }
@@ -142,14 +111,6 @@ system_as_object::system_as_object()
 	:
 	as_object(getSystemInterface()) // pass System inheritence
 {
-}
-
-as_value
-system_new(const fn_call& /* fn */)
-{
-    system_as_object *system_obj = new system_as_object();
-
-    return as_value(system_obj);
 }
 
 as_value system_security_allowdomain(const fn_call& /*fn*/) {

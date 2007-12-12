@@ -1,5 +1,18 @@
 2007-12-12 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: define DEFAULT_FLASH_PLATFORM_ID and
+	  DEFAULT_FLASH_SYSTEM_OS based on $host (should likely
+	  be based on $target or something similar, to check
+	  when cross compiling)
+	* libbase/rc.{cpp,h}: add getFlashVersionString() and
+	  getFlashSystemManufacturer() methods. Currently there's
+	  no .gnashrc label for them, which are instead only initialized
+	  based on values detected at configure time.
+	* server/asobj/System.{cpp,h}: delegate System.capabilities.os
+	  and System.capabilities.manufacturer to RcInitFile.
+
+2007-12-12 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/libbase/Makefile.am: actually run the IntTypesTest.
 
 2007-12-12 Zou Lunkai <zoulunkai@gmail.com>

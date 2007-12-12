@@ -31,64 +31,11 @@
 
 namespace gnash {
   
-#if 0
-class System {
-public:
-    System();
-    ~System();
-   void security_allowDomain();
-   void security_allowInsecureDomain();
-   void security_loadPolicyFile();
-   void setClipboard();
-   void showSettings();
-private:
-    bool _capabilities;
-    bool _object;
-    bool _capabilities_avHardwareDisable;
-    bool _capabilities_hasAccessibility;
-    bool _capabilities_hasAudio;
-    bool _capabilities_hasAudioEncoder;
-    bool _capabilities_hasEmbeddedVideo;
-    bool _capabilities_hasMP3;
-    bool _capabilities_hasPrinting;
-    bool _capabilities_hasScreenBroadcast;
-    bool _capabilities_hasScreenPlayback;
-    bool _capabilities_hasStreamingAudio;
-    bool _capabilities_hasStreamingVideo;
-    bool _capabilities_hasVideoEncoder;
-    bool _capabilities_isDebugger;
-    bool _capabilities_language;
-    bool _capabilities_localFileReadDisable;
-    bool _capabilities_manufacturer;
-    bool _capabilities_os;
-    bool _capabilities_pixelAspectRatio;
-    bool _capabilities_playerType;
-    bool _capabilities_screenColor;
-    bool _capabilities_screenDPI;
-    bool _capabilities_screenResolutionX;
-    bool _capabilities_screenResolutionY;
-    bool _capabilities_serverString;
-    bool _capabilities_version;
-    bool _security;
-    bool _exactSettings;
-    bool _onStatus;
-    bool _useCodepage;
-};
-#endif
-
 class system_as_object : public as_object
 {
-    //System obj;
 public:
 	system_as_object();
 };
-
-as_value system_new(const fn_call& fn);
-as_value system_security_allowdomain(const fn_call& fn);
-as_value system_security_allowinsecuredomain(const fn_call& fn);
-as_value system_security_loadpolicyfile(const fn_call& fn);
-as_value system_setclipboard(const fn_call& fn);
-as_value system_showsettings(const fn_call& fn);
 
 void system_class_init(as_object& global);
 

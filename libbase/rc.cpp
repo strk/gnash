@@ -63,10 +63,13 @@ RcInitFile::RcInitFile() : _delay(0),
                            _debug(false),
                            _debugger(false),
                            _verbosity(-1),
-                           _flashVersionString("GSH "\
+                           _flashVersionString(
+				DEFAULT_FLASH_PLATFORM_ID" "\
 				DEFAULT_FLASH_MAJOR_VERSION","\
 				DEFAULT_FLASH_MINOR_VERSION","\
 				DEFAULT_FLASH_REV_NUMBER ",0"),
+                           _flashSystemOS(DEFAULT_FLASH_SYSTEM_OS),
+                           _flashSystemManufacturer("Gnash "DEFAULT_FLASH_SYSTEM_OS),
                            _actiondump(false),
                            _parserdump(false),
 			   _verboseASCodingErrors(false),

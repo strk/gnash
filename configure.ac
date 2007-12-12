@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.455 2007/12/11 03:23:01 rsavoye Exp $
+dnl $Id: configure.ac,v 1.456 2007/12/12 12:09:01 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -43,6 +43,55 @@ dnl recognize Gnash as a Flash Player.
 AC_DEFINE([DEFAULT_FLASH_MAJOR_VERSION], ["8"], [Default Flash major version])
 AC_DEFINE([DEFAULT_FLASH_MINOR_VERSION], ["0"], [Default Flash minor version])
 AC_DEFINE([DEFAULT_FLASH_REV_NUMBER], ["99"], [Default Flash revision number])
+
+dnl TODO: use host/build/target -- whatever is more appropriate
+case "${host}" in
+  *-apple-*)
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["MAC"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["MacOS"], [Default value for System.capabilities.os])
+    ;;
+  *-openbsd*)
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["BSD"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["OpenBSD"], [Default value for System.capabilities.os])
+    ;;
+  *-freebsd*)
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["BSD"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["FreeBSD"], [Default value for System.capabilities.os])
+    ;;
+  *-netbsd*)
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["BSD"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["NetBSD"], [Default value for System.capabilities.os])
+    ;;
+  *-linux-gnu)
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["LNX"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["GNU/Linux"], [Default value for System.capabilities.os])
+    ;;
+  *-linux*)
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["LNX"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["Linux"], [Default value for System.capabilities.os])
+    ;;
+  *-cygwin* | *-mingw* | *-pw32*)
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["WIN"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["Windows"], [Default value for System.capabilities.os])
+    ;;
+  *-*solaris*
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["SUN"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["Solaris"], [Default value for System.capabilities.os])
+    ;;
+  *-os2*
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["OS2"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["OS/2"], [Default value for System.capabilities.os])
+    ;;
+  *-sco*)
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["SCO"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["SCO/Unix"], [Default value for System.capabilities.os])
+    ;;
+  *)
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["UNK"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["Unknown"], [Default value for System.capabilities.os])
+    ;;
+esac
+
 
 dnl Some things you can only do by looking at the platform name.
 case "${host}" in
