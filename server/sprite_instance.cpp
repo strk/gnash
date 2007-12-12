@@ -1156,7 +1156,7 @@ sprite_setMask(const fn_call& fn)
 		sprite->setMask(ch); 
 	}
 
-	log_debug("MovieClip.setMask() TESTING");
+	//log_debug("MovieClip.setMask() TESTING");
 
 	return as_value();
 }

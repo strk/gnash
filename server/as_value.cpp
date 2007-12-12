@@ -171,8 +171,10 @@ as_value::to_string() const
 			}
 			catch (ActionTypeError& e)
 			{
+#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 				log_debug(_("to_primitive(%s, STRING) threw an ActionTypeError %s"),
 						to_debug_string().c_str(), e.what());
+#endif
 			}
 
 			if ( m_type == OBJECT ) return "[type Object]";
@@ -447,8 +449,10 @@ as_value::to_number() const
             }
             catch (ActionTypeError& e)
             {
+#if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
                 log_debug(_("to_primitive(%s, NUMBER) threw an ActionTypeError %s"),
                         to_debug_string().c_str(), e.what());
+#endif
                 if ( m_type == AS_FUNCTION && swfversion < 6 )
                 {
                     return 0;
@@ -864,9 +868,9 @@ as_value::equals(const as_value& v) const
 	}
 	catch (ActionTypeError& e)
 	{
-//#ifdef GNASH_DEBUG_EQUALITY
+#ifdef GNASH_DEBUG_EQUALITY
 		log_debug(" %s.to_primitive() threw an ActionTypeError %s", v.to_debug_string().c_str(), e.what());
-//#endif
+#endif
 		return false; // no valid conversion
 	}
 
@@ -891,9 +895,9 @@ as_value::equals(const as_value& v) const
 	catch (ActionTypeError& e)
 	{
 
-//#ifdef GNASH_DEBUG_EQUALITY
+#ifdef GNASH_DEBUG_EQUALITY
 		log_debug(" %s.to_primitive() threw an ActionTypeError %s", to_debug_string().c_str(), e.what());
-//#endif
+#endif
 
 		return false; // no valid conversion
 	}
