@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.60 2007/12/11 19:23:50 strk Exp $";
+rcsid="$Id: Function.as,v 1.61 2007/12/12 02:11:50 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -728,5 +728,63 @@ check_equals(f(), 42);
 #else
 check_equals(typeof(f()), 'undefined');
 #endif
+
+#ifdef MING_SUPPORTS_ASM
+
+testvar1 = 0;
+testvar2 = 0;
+testvar3 = 0;
+asm{
+    push 'testvar1'
+    push 1
+    push 'testvar2'
+    push 2
+    push 'testvar3'
+    push 3
+};
+function stack_test1()
+{
+    asm{
+        setvariable
+        setvariable
+        setvariable
+    };
+}
+
+stack_test1();
+
+xcheck_equals(testvar1, 1);
+xcheck_equals(testvar2, 2);
+xcheck_equals(testvar3, 3);
+
+testvar1 = 0;
+testvar2 = 0;
+testvar3 = 0;
+asm{
+    push 'testvar1'
+    push 4
+    push 'testvar2'
+    push 5
+    push 'testvar3'
+    push 6
+};
+_root.createEmptyMovieClip("clip1", '9');
+clip1.stack_test2 = function () {
+    asm{
+        setvariable
+        setvariable
+        setvariable
+    };
+};
+
+clip1.stack_test2();
+
+#if OUTPUT_VERSION > 5
+	xcheck_equals(testvar1, 4);
+	xcheck_equals(testvar2, 5);
+	xcheck_equals(testvar3, 6);
+#endif
+
+#endif //MING_SUPPORTS_ASM
 
 totals();
