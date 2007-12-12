@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.164 2007/12/12 10:23:47 zoulunkai Exp $ */
+/* $Id: tag_loaders.cpp,v 1.165 2007/12/12 15:00:14 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -288,7 +288,7 @@ define_bits_jpeg2_loader(stream* in, tag_type tag, movie_definition* m)
 
     IF_VERBOSE_PARSE
     (
-	log_parse(_("  define_bits_jpeg2_loader: charid = %d pos = %lx"),
+	log_parse(_("  define_bits_jpeg2_loader: charid = %d pos = %ld"),
 		  character_id, in->get_position());
     );
 
@@ -300,7 +300,6 @@ define_bits_jpeg2_loader(stream* in, tag_type tag, movie_definition* m)
     {
 	std::auto_ptr<tu_file> ad( StreamAdapter::getFile(*in) );
 	std::auto_ptr<image::rgb> im ( image::read_jpeg(ad.get()) );
-	//std::auto_ptr<image::rgb> im ( image::read_jpeg(in->get_underlying_stream()) );
 
 	if ( m->get_bitmap_character_def(character_id) )
 	{
