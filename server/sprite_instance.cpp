@@ -3199,11 +3199,18 @@ sprite_instance::can_handle_mouse_event() const
 		
 void sprite_instance::restart()
 {
+// see Whack-a-doc.swf, we tried to restart an unloaded character.
+// It shouldn't happen anyway.
+// TODO: drop this function.
+
 	// Stop all sounds
 	media::sound_handler* sh = get_sound_handler();
 	if (sh != NULL) sh->stop_all_sounds();
 
-	restoreDisplayList(0); // seems OK to me.
+	if( ! isUnloaded() )
+	{
+		restoreDisplayList(0); 
+	}
 
 	m_play_state = PLAY;
 }

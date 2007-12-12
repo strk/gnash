@@ -1,3 +1,8 @@
+2007-12-12 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/sprite_instance.cpp: don't restart an unloaded character, 
+	  fix bug#21754.
+	  
 2007-12-11 Sandro Santilli <strk@keybit.net>
 
 	* server/as_function.cpp: don't set function prototypes
