@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.61 2007/12/12 02:11:50 zoulunkai Exp $";
+rcsid="$Id: Function.as,v 1.62 2007/12/12 07:30:12 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -730,7 +730,9 @@ check_equals(typeof(f()), 'undefined');
 #endif
 
 #ifdef MING_SUPPORTS_ASM
-
+//
+// --case1--
+//
 testvar1 = 0;
 testvar2 = 0;
 testvar3 = 0;
@@ -757,6 +759,9 @@ xcheck_equals(testvar1, 1);
 xcheck_equals(testvar2, 2);
 xcheck_equals(testvar3, 3);
 
+//
+// --case2--
+//
 testvar1 = 0;
 testvar2 = 0;
 testvar3 = 0;
@@ -780,10 +785,64 @@ clip1.stack_test2 = function () {
 clip1.stack_test2();
 
 #if OUTPUT_VERSION > 5
-	xcheck_equals(testvar1, 4);
-	xcheck_equals(testvar2, 5);
-	xcheck_equals(testvar3, 6);
+    xcheck_equals(testvar1, 4);
+    xcheck_equals(testvar2, 5);
+    xcheck_equals(testvar3, 6);
 #endif
+
+//
+// --case3--
+//
+
+testvar1 = 0;
+testvar2 = 0;
+testvar3 = 0;
+
+function stack_test3 () {
+    asm{
+        // Please check the produced swf file to see if the 
+        // structure of opcodes are that you expect.
+        push 7, 8, 9, 'pad to make Ming work as I expect'
+        // pop out the pad stuff, I just want to push 7,8,9 actually. 
+        pop 
+    };
+}
+
+outer_func1 = function () {
+    stack_test3();
+};
+
+outer_func2 = function () {
+    outer_func1();
+};
+
+outer_func2();
+
+//stack content after calling outer_func2:
+//    7, 8, 9
+
+asm{
+    push 'testvar1'
+    swap
+    setvariable
+};
+
+//stack: 7, 8
+asm{
+    push 'testvar2'
+    swap
+    setvariable
+};
+
+//stack: 7
+asm{
+    push 'testvar3'
+    swap
+    setvariable
+};
+xcheck_equals(testvar1, 9);
+xcheck_equals(testvar2, 8);
+xcheck_equals(testvar3, 7);
 
 #endif //MING_SUPPORTS_ASM
 
