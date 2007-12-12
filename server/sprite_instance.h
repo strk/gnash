@@ -875,12 +875,6 @@ private:
 	///	Member name. 
 	///
 	void checkForKeyOrMouseEvent(const std::string& name);
-#if 0
-	/// Duplicate the object with the specified name
-	/// and add it with a new name  at a new depth.
-	void clone_display_object(const std::string& name,
-		const std::string& newname, int depth);
-#endif
 
 	/// Advance to a previous frame.
 	//

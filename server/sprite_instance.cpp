@@ -2175,38 +2175,6 @@ sprite_instance::duplicateMovieClip(const std::string& newname, int depth,
 	return newsprite;
 }
 
-#if 0
-void sprite_instance::clone_display_object(const std::string& name,
-	const std::string& newname, int depth)
-{
-//            GNASH_REPORT_FUNCTION;
-
-    character* ch = m_display_list.get_character_by_name(name);
-    if (ch) // TODO: should we check for isActionScriptReferenceable here ?
-	{
-
-	    std::vector<swf_event*>	dummy_event_handlers;
-
-	    add_display_object(
-		ch->get_id(),
-		newname.c_str(),
-		dummy_event_handlers,
-		depth,
-		ch->get_cxform(),
-		ch->get_matrix(),
-		ch->get_ratio(),
-		ch->get_clip_depth());
-	    // @@ TODO need to duplicate ch's event handlers, and presumably other members?
-	    // Probably should make a character::clone() function to handle this.
-	}
-    else
-    {
-	    log_error(_("clone_display_object(%s, %s, %d): could not find a character named %s to clone"),
-			    name.c_str(), newname.c_str(), depth, name.c_str());
-    }
-}
-#endif
-
 /* public */
 void
 sprite_instance::queueAction(const action_buffer& action)

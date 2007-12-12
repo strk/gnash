@@ -4,6 +4,7 @@
 	  forget to set charcter depth and id.
 	* server/swf/PlaceObject2Tag.cpp: readPlaceObject2() and readPlaceObject3(),
 	  replace 8 read_bit() with one read_u8().
+	* server/sprite_instance.{h,cpp}: clone_display_object(), remove dead function.
 	  
 2007-12-12 Sandro Santilli <strk@keybit.net>
 
