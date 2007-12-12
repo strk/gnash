@@ -1,3 +1,7 @@
+
+	* server/swf/tag_loaders.cpp (define_bits_jpeg3_loader): don't read
+	  rgb data past alpha_position.
+
 2007-12-12 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/tag_loaders.cpp (read_jpeg_tables): survive malformed swf

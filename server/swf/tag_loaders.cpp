@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.168 2007/12/12 20:29:10 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.169 2007/12/12 20:40:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -471,7 +471,7 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 	//
 
 	// Read rgb data.
-	std::auto_ptr<tu_file> ad( StreamAdapter::getFile(*in, in->get_tag_end_position()) );
+	std::auto_ptr<tu_file> ad( StreamAdapter::getFile(*in, alpha_position) );
 	std::auto_ptr<image::rgba> im( image::read_swf_jpeg3(ad.get()) );
 
 	// Read alpha channel.
