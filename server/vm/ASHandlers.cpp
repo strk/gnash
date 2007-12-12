@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.168 2007/12/10 10:54:33 bwy Exp $ */
+/* $Id: ASHandlers.cpp,v 1.169 2007/12/12 04:06:40 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -3054,35 +3054,43 @@ SWFHandlers::ActionSwap(ActionExec& thread)
 void
 SWFHandlers::ActionGetMember(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
+	//    GNASH_REPORT_FUNCTION;
+	as_environment& env = thread.env;
 
-    thread.ensureStack(2); // member name, target
+	thread.ensureStack(2); // member name, target
 
-    // Some corner case behaviors depend on the SWF file version.
-    //int version = env.get_version();
+	// Some corner case behaviors depend on the SWF file version.
+	//int version = env.get_version();
 
-    as_value member_name = env.top(0);
-    as_value target = env.top(1);
+	as_value member_name = env.top(0);
+	as_value target = env.top(1);
 
-    boost::intrusive_ptr<as_object> obj = target.to_object();
-    if (!obj) {
-//         IF_VERBOSE_DEBUG(log_msg(_("getMember called against "
-//                                  "a value that does not cast "
-//                                  "to an as_object: %s"), target.to_string.c_str()));
-        env.top(1).set_undefined();
-        env.drop(1);
-        return;
-    }
+	boost::intrusive_ptr<as_object> obj = target.to_object();
+	if (!obj)
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("getMember called against "
+			"a value that does not cast "
+			"to an as_object: %s"),
+			target.to_debug_string().c_str()));
+		env.top(1).set_undefined();
+		env.drop(1);
+		return;
+	}
 
 	IF_VERBOSE_ACTION (
-    log_action(_(" ActionGetMember: target: %s (object %p)"),
+	log_action(_(" ActionGetMember: target: %s (object %p)"),
                target.to_debug_string().c_str(), (void*)obj.get());
 	);
 
         if ( ! thread.getObjectMember(*obj, member_name.to_string(), env.top(1)) )
 	{
-            env.top(1).set_undefined();
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Reference to undefined member %s of object %s",
+			member_name.to_debug_string().c_str(),
+			target.to_debug_string().c_str());
+		);
+		env.top(1).set_undefined();
         }
 
 	IF_VERBOSE_ACTION (

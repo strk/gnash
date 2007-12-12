@@ -1,5 +1,7 @@
 2007-12-12 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionGetMember): print ascoding error
+	  if trying to reference unexisitng object member.
 	* testsuite/misc-swfc.all/Makefile.am: use double quotes to allow for
 	  abs_mediadir to expand.
 
