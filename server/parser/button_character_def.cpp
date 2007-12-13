@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: button_character_def.cpp,v 1.20 2007/12/12 23:49:28 strk Exp $ */
+/* $Id: button_character_def.cpp,v 1.21 2007/12/13 00:26:50 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -326,36 +326,39 @@ button_character_definition::readDefineButton2(stream* in, movie_definition* m)
 		}
 	}
 
-	in->set_position(next_action_pos);
-
-	// Read Button2ActionConditions
-	// Don't read past tag end
-	while ( in->get_position() < tagEndPosition ) 
+	if ( button_2_action_offset )
 	{
-		unsigned next_action_offset = in->read_u16();
-		next_action_pos = in->get_position() + next_action_offset - 2;
-
-		m_button_actions.resize(m_button_actions.size() + 1);
-		m_button_actions.back().read(in, SWF::DEFINEBUTTON2);
-
-		if (next_action_offset == 0 )
-		{
-			// done.
-			break;
-		}
-
-		//was: in->get_position() >= in->get_tag_end_position()
-		if ( next_action_pos >= in->get_tag_end_position() )
-		{
-			IF_VERBOSE_MALFORMED_SWF(
-			log_swferror(_("Next action offset (%u) in Button2ActionConditions points past the end of tag"),
-				next_action_offset);
-			);
-			break;
-		}
-
-		// seek to next action.
 		in->set_position(next_action_pos);
+
+		// Read Button2ActionConditions
+		// Don't read past tag end
+		while ( in->get_position() < tagEndPosition ) 
+		{
+			unsigned next_action_offset = in->read_u16();
+			next_action_pos = in->get_position() + next_action_offset - 2;
+
+			m_button_actions.resize(m_button_actions.size() + 1);
+			m_button_actions.back().read(in, SWF::DEFINEBUTTON2);
+
+			if (next_action_offset == 0 )
+			{
+				// done.
+				break;
+			}
+
+			//was: in->get_position() >= in->get_tag_end_position()
+			if ( next_action_pos >= in->get_tag_end_position() )
+			{
+				IF_VERBOSE_MALFORMED_SWF(
+				log_swferror(_("Next action offset (%u) in Button2ActionConditions points past the end of tag"),
+					next_action_offset);
+				);
+				break;
+			}
+
+			// seek to next action.
+			in->set_position(next_action_pos);
+		}
 	}
 
 	// detect min/max layer number

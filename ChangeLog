@@ -1,3 +1,8 @@
+2007-12-12 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/button_character_def.cpp (readDefineButton2):
+	  don't attempt to read button actions if there are none..
+
 2007-12-12  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* configure.ac: Disable LIRC by default. Link cygnalrc test file
