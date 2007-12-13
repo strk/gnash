@@ -1,5 +1,13 @@
 2007-12-13 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp (jpeg_tables_loader): don't limit
+	  StreamAdapter input as the *same* jpeg loader will be used
+	  to parse subsequent tags. This reintroduces possible seek-backs
+	  but fixes regressions in elvis.swf and strip.swf (bug #21786).
+	  We'll need to rethink the robustness issue for jpeg loading.
+
+2007-12-13 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/action_buffer.{cpp,h}: drop readFullTag(),
 	  get additional arg to read() to limit input stream.
 	* server/parser/button_character_def.{cpp,h}: limit input
