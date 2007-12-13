@@ -46,7 +46,7 @@ namespace cygnal
 static const int readsize = 1024;
 
 HTTP::HTTP() 
-    : _keepalive(false)
+    : _port(80), _filesize(0), _keepalive(false)
 {
 //    GNASH_REPORT_FUNCTION;
 //    struct status_codes *status = new struct status_codes;
@@ -58,6 +58,20 @@ HTTP::~HTTP()
 {
 //    GNASH_REPORT_FUNCTION;
 }
+
+bool
+HTTP::clearHeader()
+{
+    _header.str("");
+    _body.str("");
+    _charset.clear();
+    _connections.clear();
+    _language.clear();
+    _encoding.clear();
+    _te.clear();
+    _accept.clear();
+    _filesize = 0;
+};
 
 HTTP &
 HTTP::operator = (HTTP& /*obj*/)
@@ -107,6 +121,7 @@ HTTP::waitForGetRequest()
         log_error (_("Got bogus GET request"));
     }
 
+    _filespec = _url;
     return _url;
 }
 
@@ -133,6 +148,33 @@ HTTP::formatHeader(int filesize, const short type)
     this->formatContentType();
     // All HTTP messages are followed by a blank line.
     this->terminateHeader();
+}
+
+bool
+HTTP::formatErrorResponse(http_status_e code)
+{
+    GNASH_REPORT_FUNCTION;
+
+    // First build the message body, so we know how to set Content-Length
+    _body << "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">" << endl;
+    _body << "<html><head>" << endl;
+    _body << "<title>" << code << " Not Found</title>" << endl;
+    _body << "</head><body>" << endl;
+    _body << "<h1>Not Found</h1>" << endl;
+    _body << "<p>The requested URL " << _filespec << " was not found on this server.</p>" << endl;
+    _body << "<hr>" << endl;
+    _body << "<address>Cygnal (GNU/Linux) Server at localhost Port " << _port << " </address>" << endl;
+    _body << "</body></html>" << endl;
+    _body << endl;
+
+    // First build the header
+    _header << "HTTP/1.1 " << code << " Not Found" << endl;
+    formatDate();
+    formatServer();
+    _filesize = _body.str().size();
+    formatContentLength(_filesize);
+    formatConnection("close");
+    formatContentType(HTTP::HTML);
 }
 
 bool
@@ -165,6 +207,20 @@ HTTP::formatDate()
 }
 
 bool
+HTTP::formatServer()
+{
+    GNASH_REPORT_FUNCTION;
+    _header << "Server: Cygnal (GNU/Linux)" << endl;
+}
+
+bool
+HTTP::formatServer(const char *data)
+{
+    GNASH_REPORT_FUNCTION;
+    _header << "Server: " << data << endl;
+}
+
+bool
 HTTP::formatMethod(const char *data)
 {
     GNASH_REPORT_FUNCTION;
@@ -194,7 +250,7 @@ HTTP::formatContentType()
 bool
 HTTP::formatContentType(filetype_e filetype)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     switch (filetype) {
       case HTML:
@@ -216,30 +272,37 @@ HTTP::formatContentType(filetype_e filetype)
 }
 
 bool
+HTTP::formatContentLength()
+{
+//    GNASH_REPORT_FUNCTION;
+    _header << "Content-Length: " << _filesize << endl;
+}
+
+bool
 HTTP::formatContentLength(int filesize)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     _header << "Content-Length: " << filesize << endl;
 }
 
 bool
 HTTP::formatHost(const char *host)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     _header << "Host: " << host << endl;
 }
 
 bool
 HTTP::formatAgent(const char *agent)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     _header << "User-Agent: " << agent << endl;
 }
 
 bool
 HTTP::formatLanguage(const char *lang)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     // For some browsers this appears to also be Content-Language
     _header << "Accept-Language: " << lang << endl;
@@ -268,35 +331,20 @@ HTTP::formatTE(const char *te)
 }
 
 bool
-HTTP::sendGetReply(int filesize)
+HTTP::sendGetReply(http_status_e code)
 {
     GNASH_REPORT_FUNCTION;
     
-//     const char reply[] =
-//         "HTTP/1.1 200 OK\r\n"
-//         "Date: Sun, 20 Apr 2006 04:20:00 GMT\r\n"
-//         "Content-Type: application/futuresplash\r\n"
-//         "Connection: close\r\n"
-//         "Content-Length: XX      \r\n"
-//         "\r\n"                  // All HTTP messages are followed by a blank line.
-//         ;
-
-// //     // This is a bit ugly, but we splice the file size onto the request string
-// //     // without any memory allocation, which could incur a small performance hit.
-//      char *length = strstr(reply, " XX");
-//      sprintf(length, " %d", filesize);
-//      case SWF:
-//	  _header << "Content-Type: application/futuresplash" << endl;
-//	  break;
- // // FIXME:  Doesn't this write to a const array?  And doesn't it fail to
-// // // supply the two \r\n's needed to finish the string?  --gnu
-
-    formatHeader(filesize, RTMP);
+    formatHeader(_filesize, RTMP);
     int ret = writeNet(_header.str().c_str(), _header.str().size());
+    if ( _body.str().size() > 0) {
+	ret += writeNet(_body.str().c_str(), _body.str().size());
+    }
 
-    if (ret >= 0 && (unsigned)ret == _header.str().size()) {
+    if (ret >= 0) {
         log_msg (_("Sent GET Reply"));
 //        log_msg (_("Sent GET Reply: %s"), _header.str().c_str());
+	clearHeader();
     } else {
         log_msg (_("Couldn't send GET Reply, writeNet returned %d"), ret);
 	return false;
@@ -366,6 +414,9 @@ HTTP::extractAccept(const char *data) {
     pos = start;
     while (pos <= end) {
 	pos = (body.find(",", start) + 2);
+	if (pos <= start) {
+	    return _encoding.size();
+	}
 	if ((pos == string::npos) || (pos > end)) {
 	    length = end - start;
 	} else {
@@ -452,6 +503,9 @@ HTTP::extractConnection(const char *data) {
     pos = start;
     while (pos <= end) {
 	pos = (body.find(",", start) + 2);
+	if (pos <= start) {
+	    return _encoding.size();
+	}
 	if ((pos == string::npos) || (pos > end)) {
 	    length = end - start;
 	} else {
@@ -516,7 +570,7 @@ HTTP::extractLanguage(const char *data) {
 //    GNASH_REPORT_FUNCTION;
     
     string body = data;
-    string::size_type start, end, length, pos;
+    string::size_type start, end, length, pos, terminate;
     // match both Accept-Language and Content-Language
     string pattern = "-Language: ";
     
@@ -532,17 +586,25 @@ HTTP::extractLanguage(const char *data) {
     length = end-start-pattern.size();
     start = start+pattern.size();
     pos = start;
+    terminate = (body.find(";", start));
+    if (terminate == string::npos) {
+	terminate = end;
+    }
+    
     while (pos <= end) {
 	pos = (body.find(",", start));
-	if ((pos == string::npos) || (pos >= end)) {
-	    length = end - start;
+	if (pos <= start) {
+	    return _encoding.size();
+	}
+	if ((pos == string::npos) || (pos >= terminate)) {
+	    length = terminate - start;
 	} else {
 	    length = pos - start;
 	}
 	string substr = body.substr(start, length);
 //	printf("FIXME: \"%s\"\n", substr.c_str());
 	_language.push_back(substr);
-	start = pos + 2;
+	start = pos + 1;
     }
     
 //    _language = body.substr(start+pattern.size(), end-start-1);
@@ -554,7 +616,7 @@ HTTP::extractCharset(const char *data) {
 //    GNASH_REPORT_FUNCTION;
     
     string body = data;
-    string::size_type start, end, length, pos;
+    string::size_type start, end, length, pos, terminate;
 // match both Accept-Charset and Content-Charset
     string pattern = "-Charset: ";
     
@@ -572,10 +634,17 @@ HTTP::extractCharset(const char *data) {
     start = start+pattern.size();
     string _connection = body.substr(start, length);
     pos = start;
+    terminate = (body.find(";", start));
+    if (terminate == string::npos) {
+	terminate = end;
+    }
     while (pos <= end) {
 	pos = (body.find(",", start) + 2);
-	if ((pos == string::npos) || (pos > end)) {
-	    length = end - start;
+	if (pos <= start) {
+	    return _encoding.size();
+	}
+	if ((pos == string::npos) || (pos >= terminate)) {
+	    length = terminate - start;
 	} else {
 	    length = pos - start - 2;
 	}
@@ -593,7 +662,7 @@ HTTP::extractEncoding(const char *data) {
 //    GNASH_REPORT_FUNCTION;
     
     string body = data;
-    string::size_type start, end, length, pos;
+    string::size_type start, end, length, pos, terminate;
     // match both Accept-Encoding and Content-Encoding
     string pattern = "-Encoding: ";
     
@@ -611,10 +680,18 @@ HTTP::extractEncoding(const char *data) {
     start = start+pattern.size();
     string _connection = body.substr(start, length);
     pos = start;
+    // Drop anything after a ';' character
+    terminate = (body.find(";", start));
+    if (terminate == string::npos) {
+	terminate = end;
+    }
     while (pos <= end) {
 	pos = (body.find(",", start) + 2);
-	if ((pos == string::npos) || (pos > end)) {
-	    length = end - start;
+	if (pos <= start) {
+	    return _encoding.size();
+	}
+	if ((pos == string::npos) || (pos >= terminate)) {
+	    length = terminate - start;
 	} else {
 	    length = pos - start - 2;
 	}
@@ -651,6 +728,9 @@ HTTP::extractTE(const char *data) {
     pos = start;
     while (pos <= end) {
 	pos = (body.find(",", start));
+	if (pos <= start) {
+	    return _encoding.size();
+	}
 	if ((pos == string::npos) || (pos >= end)) {
 	    length = end - start;
 	} else {
@@ -667,7 +747,7 @@ HTTP::extractTE(const char *data) {
 // Get the file type, so we know how to set the
 // Content-type in the header.
 HTTP::filetype_e
-HTTP::getFileType(std::string filespec)
+HTTP::getFileType(std::string &filespec)
 {
     GNASH_REPORT_FUNCTION;    
     bool try_again = true;
@@ -676,6 +756,7 @@ HTTP::getFileType(std::string filespec)
 
     while (try_again) {
 	try_again = false;
+//	cerr << "Trying to open " << actual_filespec << endl;
 	if (stat(actual_filespec.c_str(), &st) == 0) {
 	    // If it's a directory, then we emulate what apache
 	    // does, which is to load the index.html file in that
@@ -712,8 +793,14 @@ HTTP::getFileType(std::string filespec)
 		    }
 		}
 	    }
+	} else {
+	    _filetype = HTTP::ERROR;
 	} // end of stat()
     } // end of try_waiting
+
+    _filesize = st.st_mode;
+
+    return _filetype;
 }
 
 void
@@ -728,7 +815,7 @@ HTTP::dump() {
     log_msg (_("URL: %s"), _url.c_str());
     log_msg (_("Version: %s"), _version.c_str());
     for (it = _accept.begin(); it != _accept.end(); it++) {
-        log_msg("Accept: \"%s\"", (*(it)).c_str());
+        log_msg("Accept param: \"%s\"", (*(it)).c_str());
     }
     log_msg (_("Method: %s"), _method.c_str());
     log_msg (_("Referer: %s"), _referer.c_str());
@@ -739,16 +826,16 @@ HTTP::dump() {
     log_msg (_("Host: %s"), _host.c_str());
     log_msg (_("User Agent: %s"), _agent.c_str());
     for (it = _language.begin(); it != _language.end(); it++) {
-        log_msg("Language: \"%s\"", (*(it)).c_str());
+        log_msg("Language param: \"%s\"", (*(it)).c_str());
     }
     for (it = _charset.begin(); it != _charset.end(); it++) {
-        log_msg("Charset: \"%s\"", (*(it)).c_str());
+        log_msg("Charset param: \"%s\"", (*(it)).c_str());
     }
     for (it = _encoding.begin(); it != _encoding.end(); it++) {
-        log_msg("Encodings: \"%s\"", (*(it)).c_str());
+        log_msg("Encodings param: \"%s\"", (*(it)).c_str());
     }
     for (it = _te.begin(); it != _te.end(); it++) {
-        log_msg("TE: \"%s\"", (*(it)).c_str());
+        log_msg("TE param: \"%s\"", (*(it)).c_str());
     }
     log_msg (_("==== ==== ===="));
 }

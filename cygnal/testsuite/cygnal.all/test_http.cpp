@@ -48,28 +48,28 @@ using namespace std;
 
 static void usage (void);
 
-static int verbosity;
-
 static TestState runtest;
+
+LogFile& dbglogfile = LogFile::getDefaultInstance();
 
 int
 main(int argc, char *argv[])
 {
     int c;
-
+    
     while ((c = getopt (argc, argv, "hdvsm:")) != -1) {
         switch (c) {
           case 'h':
-            usage ();
-            break;
-            
+              usage ();
+              break;
+              
           case 'v':
-            verbosity++;
-            break;
-            
+              dbglogfile.setVerbosity();
+              break;
+              
           default:
-            usage ();
-            break;
+              usage ();
+              break;
         }
     }
 
@@ -120,6 +120,19 @@ main(int argc, char *argv[])
         runtest.fail ("HTTP::formatConnection()");
     } else {
         runtest.pass ("HTTP::formatConnection()");
+    }
+    regfree(&regex_pat);
+
+    // Check the Server field
+    http.clearHeader();
+    http.formatServer();
+//    cerr << "FIXME: " << http.getHeader() << endl;
+    regcomp (&regex_pat, "Server: Cygnal (GNU/Linux)$",
+             REG_NOSUB|REG_NEWLINE);
+    if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
+        runtest.fail ("HTTP::formatServer()");
+    } else {
+        runtest.pass ("HTTP::formatServer()");
     }
     regfree(&regex_pat);
 
@@ -222,7 +235,7 @@ main(int argc, char *argv[])
     if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatContentType(type)");
     } else {
-        runtest.pass ("HTTP::formatConetnType(type)");
+        runtest.pass ("HTTP::formatContentType(type)");
     }
     regfree(&regex_pat);
 
@@ -265,9 +278,32 @@ main(int argc, char *argv[])
     }
     regfree(&regex_pat);
 
+    // Check the Server field
+    http.clearHeader();
+    http.formatErrorResponse(HTTP::NOT_FOUND);
+//    cerr << "FIXME: " << http.getHeader() << endl;
+//    cerr << "FIXME: " << http.getBody() << endl;
+    regcomp (&regex_pat, "Date:.*Server:.*Content-Length:.*Connection:.*Content-Type:.*$",
+             REG_NOSUB);        // note that we do want to look for NL
+    if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
+        runtest.fail ("HTTP::formatErrorResponse(header)");
+    } else {
+        runtest.pass ("HTTP::formatErrorResponse(header)");
+    }
+    regfree(&regex_pat);
+    regcomp (&regex_pat, "DOCTYPE.*<title>404 Not Found</title>.*$",
+             REG_NOSUB);        // note that we do want to look for NL
+    if (regexec (&regex_pat, http.getBody().c_str(), 0, (regmatch_t *)0, 0)) {
+        runtest.fail ("HTTP::formatErrorResponse(body)");
+    } else {
+        runtest.pass ("HTTP::formatErrorResponse(body)");
+    }
+    regfree(&regex_pat);
+    
     //
     // Decoding tests for HTTP
     //
+    http.clearHeader();
     const char *buffer = "GET /software/gnash/tests/flvplayer.swf?file=http://localhost/software/gnash/tests/Ouray_Ice_Festival_Climbing_Competition.flv HTTP/1.1\r\n"
 "User-Agent: Gnash/0.8.1-cvs (X11; Linux i686; U; en)\r\n"
 "Host: localhost:4080\r\n"
@@ -281,6 +317,18 @@ main(int argc, char *argv[])
 "Referer: http://localhost/software/gnash/tests/index.html\r\n"
 "TE: deflate, gzip, chunked, identity, trailers\r\n"
 "\r\n";
+
+// GET /software/gnash/tests/ HTTP/1.1
+// Host: localhost:4080
+// User-Agent: Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.5) Gecko/20070718 Fedora/2.0.0.5-1.fc7 Firefox/2.0.0.5
+// Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+// Accept-Language: en-us,en;q=0.5
+// Accept-Encoding: gzip,deflate
+// Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+// Keep-Alive: 300
+// Connection: keep-alive
+
+// User Agent: Lynx/2.8.6rel.2 libwww-FM/2.14 SSL-MM/1.4.1 OpenSSL/0.9.8b
     
 // Some browsers have a different synatax, of course, to keep things
 // interesting.
@@ -313,7 +361,7 @@ main(int argc, char *argv[])
     int count;
     count = http.extractLanguage(buffer);
     std::vector<std::string> language = http.getLanguage();
-    if ((count == 2) &&
+    if ((count > 2) &&
         (language[0] == "en-US") &&
         (language[1] == "en")) {
         runtest.fail ("HTTP::extractLanguage(Accept-)");
@@ -385,7 +433,7 @@ main(int argc, char *argv[])
     } else {
         runtest.fail ("HTTP::extractTE()");
     }
-    
+
 //     http.formatHeader(666, RTMP);
 //     http.formatRequest("http://localhost:4080", HTTP::GET);
     
@@ -401,6 +449,11 @@ main(int argc, char *argv[])
 //     }
 
 //    delete num;
+
+    
+    if (dbglogfile.getVerbosity() > 0) {
+        http.dump();
+    }
 }
 static void
 usage (void)

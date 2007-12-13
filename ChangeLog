@@ -1,3 +1,17 @@
+2007-12-13  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* cygnal/cygnal.cpp: Check the file type to set the HTTP
+	Content-Tytpe field correctly. Also handle "file not found".
+	* cygnal/http.cpp: Trap file not found errors. Format responses
+	correctly, including a 404 error. Make all fields with multiple
+	values an array.
+	* cygnal/http.h: Add an ERROR for file type. Stash the message
+	body and filesize as private data.
+	* cygnal/testsuite/cygnal.all/test_crc.cpp: Use the global LogFile
+	instance so verbosity works.
+	* cygnal/testsuite/cygnal.all/test_http.cpp: Use the global
+	LogFile instance so verbosity works. Test responses.
+
 2007-12-13 Sandro Santilli <strk@keybit.net>
 
 	* server/PropertyList.cpp (addGetterSetter): since the function

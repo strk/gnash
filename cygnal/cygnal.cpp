@@ -104,7 +104,7 @@ static struct sigaction  act;
 const char *docroot;
 
 // This is the number of times a thread loop continues, for debugging only
-int thread_retries;
+int thread_retries = 10;
 
 // This is added to the default ports for testing so it doesn't
 // conflict with apache on the same machine.
@@ -187,15 +187,15 @@ main(int argc, char *argv[])
     struct thread_params rtmp_data;
     struct thread_params http_data;
     struct thread_params ssl_data;
-    rtmp_data.port = port_offset + RTMP;
+    rtmp_data.port = port_offset + 1935;
 //    boost::thread rtmp_port(boost::bind(&rtmp_thread, &rtmp_data));
 
-    http_data.port = port_offset + RTMPT;
+    http_data.port = port_offset + 80;
     Statistics st;
     http_data.statistics = &st;
     boost::thread http_port(boost::bind(&http_thread, &http_data));
 
-    ssl_data.port = port_offset + RTMPTS;
+    ssl_data.port = port_offset + 443;
 //    boost::thread ssl_port(boost::bind(&ssl_thread, &ssl_data));
     
 //    boost::thread rtmp_port(&rtmp_thread);
@@ -241,14 +241,12 @@ http_thread(struct thread_params *conndata)
 	filespec = url.substr(0, pos);
 	parameters = url.substr(pos + 1, url.size());
 	// Get the file size for the HTTP header
-	if (stat(filespec.c_str(), &filestats) == 0) {
-	    filesize = filestats.st_size;
-	} else {
-	    filesize = 0;
+	
+	if (www.getFileType(filespec) == HTTP::ERROR) {
+	    www.formatErrorResponse(HTTP::NOT_FOUND);
 	}
 	
-	www.getFileType(filespec);
-	www.sendGetReply(filesize);
+	www.sendGetReply(HTTP::LIFE_IS_GOOD);
 //	strcpy(thread_data.filespec, filespec.c_str());
 //	thread_data.statistics = conndata->statistics;
 	

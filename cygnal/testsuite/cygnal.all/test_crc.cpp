@@ -51,6 +51,7 @@ using namespace gnash;
 using namespace cygnal;
 
 TestState runtest;
+LogFile& dbglogfile = LogFile::getDefaultInstance();
 
 int
 main (int /*argc*/, char** /*argv*/) {

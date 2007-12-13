@@ -34,6 +34,7 @@ namespace cygnal
 class HTTP : public gnash::Network
 {
 public:
+// as defined by the W3: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
     typedef enum {
         // 1xx: Informational - Request received, continuing process
         CONTINUE = 100,
@@ -82,7 +83,8 @@ public:
         BAD_GATEWAY = 502,
         SERVICE_UNAVAILABLE = 503,
         GATEWAY_TIMEOUT = 504,
-        HTTP_VERSION_NOT_SUPPORTED = 505
+        HTTP_VERSION_NOT_SUPPORTED = 505,
+	LIFE_IS_GOOD = 1234
     } http_status_e;
     typedef enum {
         OPTIONS,
@@ -99,7 +101,8 @@ public:
         const char *msg;
     };
     typedef enum {
-	NONE,
+	ERROR = -1,
+	NONE = 0,
 	HTML,
 	SWF,
 	VIDEO,
@@ -113,7 +116,7 @@ public:
     std::string waitForGetRequest(Network &net);
     
     // Handle the GET request response
-    bool sendGetReply(int filesize);
+    bool sendGetReply(http_status_e code);
 //    bool sendGetReply(Network &net);
 
     // Make copies of ourself
@@ -135,14 +138,17 @@ public:
     std::string extractAgent(const char *data);
 
     // These methods add data to the fields in the HTTP header.
-    bool clearHeader() { _header.str(""); };
+    bool clearHeader();
     bool formatHeader(int filesize, const short type);
     bool formatHeader(const short type);
     bool formatRequest(const char *url, http_method_e req);
     bool formatMethod(const char *data);
     bool formatDate();
+    bool formatServer();
+    bool formatServer(const char *data);
     bool formatReferer(const char *data);
     bool formatConnection(const char *data);
+    bool formatContentLength();
     bool formatContentLength(int filesize);
     bool formatContentType();
     bool formatContentType(filetype_e type);
@@ -153,19 +159,26 @@ public:
     bool formatEncoding(const char *data);
     bool formatTE(const char *data);
 
+    bool formatErrorResponse(http_status_e err);
+    
     // All HTTP messages are terminated with a blank line
     void terminateHeader() { _header << std::endl; };
     
     // Return the header that's been built up.
     std::string getHeader() { return _header.str(); };
 
+    // Return the body that's been built up.
+    std::string getBody() { return _body.str(); };
+
     // Get the file type, so we know how to set the
     // Content-type in the header.
-    filetype_e getFileType(std::string filespec);
+//    filetype_e getFileType(std::string &filespec);
+    filetype_e getFileType(std::string &filespec);
     void dump();
 
     // These accessors are used mostly just for debugging.
     bool keepAlive() { return _keepalive; }
+    int getFileSize() { return _filesize; }
     std::string getFilespec() { return _filespec; }
     std::string getURL() { return _url; }
     std::map<int, struct status_codes *> getStatusCodes()
@@ -182,12 +195,13 @@ public:
     int         getHostPort(){ return _port; }
     std::string getHost() { return _host; }
     std::string getUserAgent() { return _agent; }
-    
 
 private:
     std::stringstream _header;
+    std::stringstream _body;
     filetype_e  _filetype;
     std::string _filespec;
+    int         _filesize;
     std::string _url;
     std::map<int, struct status_codes *> _status_codes;
     std::string _version;
