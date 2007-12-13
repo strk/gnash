@@ -426,6 +426,14 @@ URL::encode(std::string& input)
 	}
 }
 
+std::string
+URL::encode (const std::string& str)
+{
+	std::string escapestring(str);
+	encode(escapestring);
+	return escapestring;
+}
+
 /* public static */
 void
 URL::decode(std::string& input)

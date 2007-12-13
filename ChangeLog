@@ -1,3 +1,9 @@
+2007-12-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/URL.{h,cpp}: add another encode() function to return
+	  a new escaped string.
+	* server/asobj/System.cpp: implement capabilities.serverString.
+
 2007-12-12  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* cygnal/http.{cpp,h}: Extract the fields with multiple values

@@ -27,6 +27,9 @@
 #include "builtin_function.h"
 #include "VM.h" // for getPlayerVersion() 
 #include "Object.h" // for getObjectInterface
+#include "URL.h" // for encoding serverString
+
+#define TF(x) (x ? "t" : "f")
 
 namespace gnash {
 
@@ -59,6 +62,72 @@ getSystemCapabilitiesInterface()
 {
 	static RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
+	// "LNX 9,0,22,0", "MAC 8,0,99,0"
+	// Override in gnashrc
+	static const std::string version = VM::get().getPlayerVersion();
+
+	// Flash 7: "StandAlone", "External", "PlugIn", "ActiveX"
+	// TODO: Implement properly
+	static const std::string playerType = "StandAlone";
+
+	// "Windows XP", "Windows 2000", "Windows NT", "Windows 98/ME", "Windows 95", "Windows CE", "Linux", "MacOS"
+	// Override in gnashrc
+	static const std::string os = VM::get().getOSName();
+
+	// "Macromedia Windows", "Macromedia Linux", "Macromedia MacOS"
+	// Override in gnashrc
+	static const std::string manufacturer = rcfile.getFlashSystemManufacturer();
+
+
+	/* Human Interface */
+	
+	// Two-letter language code ('en', 'de') corresponding to ISO 639-1
+	// TODO: Chinese should be either zh-CN or zh-TW
+	// TODO: Are there more than the 20 officially documented? 
+	// TODO: Other / unknown should return 'xu'. 
+	static const std::string language = VM::get().getSystemLanguage();
+
+
+	/* Media */
+		
+	// Is audio available?
+	static const bool hasAudio = (get_sound_handler() != NULL);
+
+
+	/* A URL-encoded string to send system info to a server.*/
+	/* Boolean values are represented as t or f.		*/
+	/* Privacy concerns should probably be addressed by 	*/
+	/* allowing this string to be sent or not; individual	*/
+	/* values that might affect privacy can be overridden	*/
+	/* in gnashrc.						*/
+		
+	std::string serverString =
+		 	+ "OS=" + URL::encode(os) 
+			+ "&A=" + TF(hasAudio)
+			+ "&V=" + URL::encode(version)
+			+ "&PT=" + playerType
+			+ "&L=" + language
+			+ "&AVD="	// avHardwareDisable (bool)
+			+ "&ACC"	// hasAccessibility (bool)
+			+ "&AE="	// hasAudioEncoder (bool)
+			+ "&EV="	// hasEmbeddedVideo (bool)
+			+ "&IME="	// hasIME (bool)
+			+ "&MP3="	// hasMP3 (bool)
+			+ "&PR="	// hasPrinting (bool)
+			+ "&SB="	// hasScreenBroadcast (bool)
+			+ "&SP="	// hasScreenPlayback (bool)
+			+ "&SA="	// hasStreamingAudio (bool)
+			+ "&SV="	// hasStreamingVideo (bool)
+			+ "&VE="	// hasVideoEncoder (bool)
+			+ "&DEB="	// isDebugger (bool)
+			+ "&LFD="	// localFileReadDisable (bool)
+			+ "&M=" + URL::encode(manufacturer)
+			+ "&AR="	// pixelAspectRatio (double)
+			+ "&COL="	// screenColor (?)
+			+ "&DP="	// screenDPI (int?)
+			+ "&R="	// + screenResolutionX + "x" + screenResolutionY
+			;
+		
 	static boost::intrusive_ptr<as_object> proto;
 	if ( proto == NULL )
 	{
@@ -68,27 +137,13 @@ getSystemCapabilitiesInterface()
 
 		proto = new as_object(getObjectInterface());
 
-		proto->init_member("version", VM::get().getPlayerVersion(), flags);
-
-		// TODO:
-		// "stand-alone", "external", "plug-in", or "ActiveX". 
-		proto->init_member("playerType", "stand-alone", flags);
-
-		// "Windows XP", "Windows 2000", "Windows NT", "Windows 98/ME", "Windows 95", "Windows CE", "Linux", "MacOS"
-		proto->init_member("os", VM::get().getOSName(), flags);
-
-		// "Macromedia Windows", "Macromedia Linux", "Macromedia MacOS"
-		proto->init_member("manufacturer", rcfile.getFlashSystemManufacturer(), flags);
-		
-		/* Human Interface */
-		
-		// Two-letter language code ('en', 'de')
-		proto->init_member("language", VM::get().getSystemLanguage(), flags);
-		
-		/* Media */
-		
-		// Is audio available?
-		proto->init_member("hasAudio", (get_sound_handler() != NULL), flags);
+		proto->init_member("version", version, flags);
+		proto->init_member("playerType", playerType, flags);
+		proto->init_member("os", os, flags);
+		proto->init_member("manufacturer", manufacturer, flags);
+		proto->init_member("language", language, flags);
+		proto->init_member("hasAudio", hasAudio, flags);
+		proto->init_member("serverString", serverString, flags);
 		
 	}
 	return proto.get();

@@ -128,6 +128,17 @@ public:
 	static void encode(std::string& str);
 
 	/// \brief
+	/// Encode a string to URL-encoded format
+	/// converting all dodgy characters to %AB hex sequences. This
+	/// merely uses the void encode() function on a new string.
+	///
+	/// @ param str
+	///	The input string
+	/// @ return
+	///	An encoded version of the input string	
+	static std::string encode(const std::string& str);
+
+	/// \brief
 	/// Decode a string from URL-encoded format
 	/// converting all hexadecimal sequences to ASCII characters.
 	//
