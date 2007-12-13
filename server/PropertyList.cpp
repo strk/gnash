@@ -38,6 +38,8 @@
 namespace gnash {
 
 PropertyList::PropertyList(const PropertyList& pl)
+	:
+	mDefaultOrder(pl.mDefaultOrder) // correct ?
 {
 	import(pl);
 }
@@ -48,6 +50,7 @@ PropertyList::operator=(const PropertyList& pl)
 	if ( this != &pl )
 	{
 		clear();
+		mDefaultOrder = pl.mDefaultOrder;
 		import(pl);
 	}
 	return *this;
@@ -207,7 +210,11 @@ Property*
 PropertyList::getProperty(string_table::key key, string_table::key nsId)
 {
 	container::iterator found = iterator_find(_props, key, nsId);
-	if (found == _props.end()) return NULL;
+	if (found == _props.end())
+	{
+		//log_error("getProperty(%s): not found", VM::get().getStringTable().value(key).c_str());
+		return NULL;
+	}
 	return const_cast<Property*>(&(*found));
 }
 

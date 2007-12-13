@@ -145,5 +145,5 @@ private:
 	bool mSetToLower; // If true, affects the next group addition.
 };
 
-}; /* namespace gnash */
+} /* namespace gnash */
 #endif /* GNASH_STRING_TABLE_H */

@@ -113,6 +113,6 @@ Property::setReachable() const
 		abort(); // Not here.
 		break;
 	}
-};
+}
 
 } // namespace gnash

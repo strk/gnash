@@ -1,5 +1,14 @@
 2007-12-13 Sandro Santilli <strk@keybit.net>
 
+	* backend/render_handler_agg.cpp, libbase/string_table.h,
+	  server/Property.{cpp,h}, server/PropertyList.{cpp,h},
+	  server/parser/abc_block.{cpp,h}:
+	  Fix -pedantic errors, make sure PropertyList always initialize
+	  all members. Unfortunately, this doesn't fix the valgrind-reported
+	  conditional jumps based on uninitialized memory.
+
+2007-12-13 Sandro Santilli <strk@keybit.net>
+
 	* server/swf/tag_loaders.cpp (jpeg_tables_loader): don't limit
 	  StreamAdapter input as the *same* jpeg loader will be used
 	  to parse subsequent tags. This reintroduces possible seek-backs

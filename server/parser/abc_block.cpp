@@ -254,7 +254,7 @@ abc_Trait::read(stream* in, abc_block *pBlock)
 	return true;
 }
 
-}; // namespace abc_parsing
+} // namespace abc_parsing
 
 using namespace abc_parsing;
 
@@ -1148,5 +1148,5 @@ abc_block::abc_block() : mStringTable(&VM::get().getStringTable())
 	mTheObject = mCH->getGlobalNs()->getClass(NSV::CLASS_OBJECT);
 }
 
-}; /* namespace gnash */
+} /* namespace gnash */
 

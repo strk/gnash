@@ -93,7 +93,7 @@ public:
 	}
 };
 
-}; // namespace abc_parsing
+} // namespace abc_parsing
 
 typedef std::vector<asNamespace*> NamespaceSet;
 			
@@ -180,7 +180,7 @@ public:
 	abc_block();
 };
 
-}; /* namespace gnash */
+} /* namespace gnash */
 
 #endif /* GNASH_ABC_BLOCK_H */
 

@@ -84,7 +84,10 @@ public:
 	> container;
 
 	/// Construct the PropertyList 
-	PropertyList() : _props()
+	PropertyList()
+		:
+		_props(),
+		mDefaultOrder(0) // correct ?
 	{/**/}
 
 	/// Copy constructor

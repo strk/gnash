@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: Property.h,v 1.15 2007/11/21 09:21:49 cmusick Exp $ */ 
+/* $Id: Property.h,v 1.16 2007/12/13 15:56:06 strk Exp $ */ 
 
 #ifndef GNASH_PROPERTY_H
 #define GNASH_PROPERTY_H
@@ -82,7 +82,7 @@ private:
 public:
 	/// Default constructor
 	Property(string_table::key name = 0, string_table::key nsId = 0) : 
-		mBound(as_value()), mName(name), mNamespace(nsId)
+		mBound(as_value()), mDestructive(false), mName(name), mNamespace(nsId)
 	{/**/}
 
 	/// Copy constructor

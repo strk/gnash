@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.123 2007/12/12 10:06:58 zoulunkai Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.124 2007/12/13 15:56:06 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -2095,11 +2095,11 @@ bool is_little_endian_host() {
     struct {
       boost::uint8_t b1;
       boost::uint8_t b2;
-    };
+    } s;
   } u;
     
-  u.b1 = 1;
-  u.b2 = 2;
+  u.s.b1 = 1;
+  u.s.b2 = 2;
   
   return u.word == 0x0201;
 
