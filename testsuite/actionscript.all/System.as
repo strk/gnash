@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: System.as,v 1.15 2007/12/12 22:45:27 strk Exp $";
+rcsid="$Id: System.as,v 1.16 2007/12/13 08:47:48 strk Exp $";
 
 #include "check.as"
 
@@ -64,7 +64,7 @@ check_equals(this.$version, System.capabilities.version);
 check_equals(typeof(System.capabilities.os), 'string');
 check_equals(typeof(System.capabilities.manufacturer), 'string');
 check_equals(typeof(System.capabilities.playerType), 'string');
-xcheck_equals(typeof(System.capabilities.serverString), 'string');
+check_equals(typeof(System.capabilities.serverString), 'string');
 xcheck_equals(typeof(System.capabilities.screenResolutionX), 'number');
 xcheck_equals(typeof(System.capabilities.screenResolutionY), 'number');
 xcheck_equals(typeof(System.capabilities.screenDPI), 'number');
