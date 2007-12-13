@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: Property.h,v 1.16 2007/12/13 15:56:06 strk Exp $ */ 
+/* $Id: Property.h,v 1.17 2007/12/13 21:33:41 strk Exp $ */ 
 
 #ifndef GNASH_PROPERTY_H
 #define GNASH_PROPERTY_H
@@ -82,43 +82,49 @@ private:
 public:
 	/// Default constructor
 	Property(string_table::key name = 0, string_table::key nsId = 0) : 
-		mBound(as_value()), mDestructive(false), mName(name), mNamespace(nsId)
+		mBound(as_value()), mDestructive(false), mName(name), mNamespace(nsId),
+		mOrderId(0)
 	{/**/}
 
 	/// Copy constructor
 	Property(const Property& p) :
 		_flags(p._flags), mBound(p.mBound), mDestructive(p.mDestructive),
-		mName(p.mName), mNamespace(p.mNamespace)
+		mName(p.mName), mNamespace(p.mNamespace), mOrderId(p.mOrderId)
 	{/**/}
 
 	/// Constructor taking initial flags
 	Property(string_table::key name, string_table::key nsId,
 		const as_prop_flags& flags) : _flags(flags),
-		mBound(as_value()), mDestructive(false), mName(name), mNamespace(nsId)
+		mBound(as_value()), mDestructive(false), mName(name), mNamespace(nsId),
+		mOrderId(0)
 	{/**/}
 
 	Property(string_table::key name, string_table::key nsId, 
 		const as_value& value) : mBound(value), mDestructive(false),
-		mName(name), mNamespace(nsId)
+		mName(name), mNamespace(nsId),
+		mOrderId(0)
 	{/**/}
 
 	Property(string_table::key name, string_table::key nsId,
 		const as_value& value, const as_prop_flags& flags) :
 		_flags(flags), mBound(value), mDestructive(false),
-		mName(name), mNamespace(nsId)
+		mName(name), mNamespace(nsId),
+		mOrderId(0)
 	{/**/}
 
 	Property(string_table::key name, string_table::key nsId,
 		as_function *getter, as_function *setter, 
 		const as_prop_flags& flags, bool destroy = false) :
 		_flags(flags), mBound(as_accessors(getter, setter)),
-		mDestructive(destroy), mName(name), mNamespace(nsId)
+		mDestructive(destroy), mName(name), mNamespace(nsId),
+		mOrderId(0)
 	{/**/}
 
 	Property(string_table::key name, string_table::key nsId,
 		as_function *getter, as_function *setter, bool destroy = false) :
 		_flags(), mBound(as_accessors(getter, setter)), mDestructive(destroy),
-		mName(name), mNamespace(nsId)
+		mName(name), mNamespace(nsId),
+		mOrderId(0)
 	{/**/}
 
 	/// accessor to the properties flags
@@ -190,6 +196,14 @@ public:
 	}
 
 	/// Set the order id
+	//
+	/// NOTE: this field is used by one of the indexes
+	///       in the boost::multi_index used by PropertlyList,
+	///       so changing this value on an instance which was
+	///       put in that index might result in corruption of
+	///       the index invariant. (at least this is what happens
+	///       with standard containers indexed on an element's member).
+	///
 	void setOrder(int order) { mOrderId = order; }
 
 	/// Get the order id

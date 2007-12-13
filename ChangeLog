@@ -1,3 +1,11 @@
+2007-12-13 Sandro Santilli <strk@keybit.net>
+
+	* server/Property.h: always initialize mOrderId, which is used
+	  as the key for secondary multi_index in PropertyList.
+	  Seems to fix the infamous conditional jumps based on uninitialized
+	  values and with it the occasional assertion failure.
+	  See bug #21783.
+
 2007-12-13  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* cygnal/http.h: Rename getFileType() to getFileStats()
