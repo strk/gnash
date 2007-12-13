@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.84 2007/12/13 09:09:25 bwy Exp $ */
+/* $Id: Global.cpp,v 1.85 2007/12/13 09:18:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -410,7 +410,7 @@ as_global_asnative(const fn_call& fn)
 
 // updateAfterEvent function
 static as_value
-as_global_updateAfterEvent(const fn_call& fn)
+as_global_updateAfterEvent(const fn_call& /*fn*/)
 {
 	static bool warned=false;
 	if ( ! warned )
