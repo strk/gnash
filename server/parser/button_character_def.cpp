@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: button_character_def.cpp,v 1.21 2007/12/13 00:26:50 strk Exp $ */
+/* $Id: button_character_def.cpp,v 1.22 2007/12/13 10:58:10 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -56,7 +56,7 @@ button_action::~button_action()
 	m_actions.clear(); // this is useless, will be done automatically
 }
 
-void	button_action::read(stream* in, int tag_type)
+void	button_action::read(stream* in, int tag_type, unsigned long endPos)
 {
 	// Read condition flags.
 	if (tag_type == SWF::DEFINEBUTTON) // 7
@@ -66,6 +66,14 @@ void	button_action::read(stream* in, int tag_type)
 	else
 	{
 		assert(tag_type == SWF::DEFINEBUTTON2); // 34
+
+		if ( in->get_position()+2 > endPos ) 
+		{
+			IF_VERBOSE_MALFORMED_SWF(
+			log_swferror(_("Premature end of button action input: can't read conditions"));
+			);
+			return;
+		}
 		m_conditions = in->read_u16();
 	}
 
@@ -75,7 +83,7 @@ void	button_action::read(stream* in, int tag_type)
 
 	// Read actions.
 	action_buffer*	a = new action_buffer;
-	a->read(in);
+	a->read(*in, endPos);
 	m_actions.push_back(a);
 }
 
@@ -266,7 +274,7 @@ button_character_definition::readDefineButton(stream* in, movie_definition* m)
 	// Read actions.
 	button_action actions;
 	// TODO: pass valid end position to button_action parser
-	actions.read(in, SWF::DEFINEBUTTON);
+	actions.read(in, SWF::DEFINEBUTTON, endTagPos);
 	m_button_actions.push_back(actions);
 
 	// detect min/max layer number
@@ -337,8 +345,10 @@ button_character_definition::readDefineButton2(stream* in, movie_definition* m)
 			unsigned next_action_offset = in->read_u16();
 			next_action_pos = in->get_position() + next_action_offset - 2;
 
+			unsigned long endActionPos = next_action_offset ? next_action_pos : tagEndPosition;
+
 			m_button_actions.resize(m_button_actions.size() + 1);
-			m_button_actions.back().read(in, SWF::DEFINEBUTTON2);
+			m_button_actions.back().read(in, SWF::DEFINEBUTTON2, endActionPos);
 
 			if (next_action_offset == 0 )
 			{

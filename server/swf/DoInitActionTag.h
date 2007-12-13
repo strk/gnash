@@ -30,10 +30,10 @@
 #include "swf.h" // for tag_type definition
 #include "action_buffer.h" // for composition
 #include "sprite_instance.h" // for inlines
+#include "stream.h" // for inlines
 
 // Forward declarations
 namespace gnash {
-    class stream;
     class movie_definition;
 }
 
@@ -55,7 +55,7 @@ public:
     //
     void read(stream* in)
     {
-        m_buf.readFullTag(in);
+        m_buf.read(*in, in->get_tag_end_position());
     }
 
     virtual void execute_state(sprite_instance* m) const

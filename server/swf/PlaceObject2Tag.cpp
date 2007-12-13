@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.27 2007/12/12 10:23:47 zoulunkai Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.28 2007/12/13 10:58:10 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -119,41 +119,9 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 		// Read the actions for event(s)
 		action_buffer* action = new action_buffer();
 		_actionBuffers.push_back(action); // take ownership
-		action->read(in);
+		action->read(*in, in->get_position()+event_length);
 
-		size_t readlen = action->size();
-		if (readlen > event_length)
-		{
-			IF_VERBOSE_MALFORMED_SWF(
-			log_swferror(_("swf_event::read(), "
-				"event_length = %d, "
-				"but read " SIZET_FMT
-				". Breaking for safety."),
-				event_length, readlen);
-			);
-			// or should we just continue here ?
-			break;
-		}
-		else if ( readlen < event_length )
-		{
-			IF_VERBOSE_MALFORMED_SWF(
-			log_swferror(_("swf_event::read(), "
-				"event_length = %d, "
-				"but read " SIZET_FMT
-				". Skipping excessive bytes."),
-				event_length, readlen);
-			);
-
-			if ( ! in->skip_bytes(event_length - readlen) )
-			{
-				// TODO: should we throw a ParserException instead
-				//       so to completely discard this tag ?
-				IF_VERBOSE_MALFORMED_SWF(
-				log_swferror(_("Bytes skipping failed."));
-				);
-				break;
-			}
-		}
+		assert(action->size() == event_length); 
 
 		// 13 bits reserved, 19 bits used
 		const int total_known_events = 19;

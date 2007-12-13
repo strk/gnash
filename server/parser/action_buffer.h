@@ -60,11 +60,15 @@ public:
 
 	action_buffer();
 
-	/// Read action bytes from input stream up to an SWF::ACTION_END or end of tag
-	void	read(stream* in);
-
-	/// Read action bytes from input stream up to end of tag
-	void	readFullTag(stream* in);
+	/// Read action bytes from input stream up to but not including endPos
+	//
+	/// @param endPos
+	///	One past last valid-to-read byte position.
+	///	Make sure it's > then in.get_position() and
+	///	<= in.get_tag_end_position() or an assertion will
+	///	fail.
+	///
+	void	read(stream& in, unsigned long endPos);
 
 	bool is_null() const
 	{

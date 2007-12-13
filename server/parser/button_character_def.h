@@ -105,7 +105,11 @@ public:
 	ActionList m_actions;
 
 	~button_action();
-	void	read(stream* in, int tag_type);
+
+	/// @param endPos
+	///	One past last valid-to-read byte position
+	///
+	void read(stream* in, int tag_type, unsigned long endPos);
 };
 
 

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: action_buffer.cpp,v 1.29 2007/12/12 10:23:46 zoulunkai Exp $ */
+/* $Id: action_buffer.cpp,v 1.30 2007/12/13 10:58:10 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -56,10 +56,11 @@ action_buffer::action_buffer()
 }
 
 void
-action_buffer::readFullTag(stream* in)
+action_buffer::read(stream& in, unsigned long endPos)
 {
-	unsigned long endPos = in->get_tag_end_position();
-	unsigned long startPos = in->get_position();
+	unsigned long startPos = in.get_position();
+	assert(endPos > startPos); // caller should check this
+	assert(endPos <= in.get_tag_end_position());
 	unsigned size = endPos-startPos;
 
 	// Allocate the buffer
@@ -80,7 +81,7 @@ action_buffer::readFullTag(stream* in)
 	// tag should give significant speedup in parsing
 	// large action-based movies.
 	//
-	in->read(reinterpret_cast<char*>(buf), size);
+	in.read(reinterpret_cast<char*>(buf), size);
 
 	// Consistency checks here
 	//
@@ -95,48 +96,6 @@ action_buffer::readFullTag(stream* in)
 	}
 	);
 }
-
-void
-action_buffer::read(stream* in)
-{
-    // NOTE:
-    // This method is called for tags like button actions, 
-    // where we don't know the size of the action block in advance
-    // and are thus forced to seek for an END opcode.
-    // For DoAction and DoInitAction you can use the readFullTag method
-    // instead, which is faster.
-
-    // Read action bytes.
-    unsigned long endPos = in->get_tag_end_position();
-    while ( in->get_position() < endPos )
-    {
-#if 0
-	size_t instruction_start = m_buffer.size();
-	size_t pc = m_buffer.size();
-#endif
-
-	boost::uint8_t action_id = in->read_u8();
-	m_buffer.push_back(action_id);
-	
-	if (action_id & 0x80) {
-	    // Action contains extra data.  Read it.
-	    boost::uint16_t length = in->read_u16();
-	    m_buffer.push_back(length & 0x0FF);
-	    m_buffer.push_back((length >> 8) & 0x0FF);
-	    for (boost::uint16_t i = 0; i < length; i++) {
-		boost::uint8_t b = in->read_u8(); // bytes ensured outside loop
-		m_buffer.push_back(b);
-	    }
-	}
-	
-	if (action_id == SWF::ACTION_END)
-	{
-	    // end of action buffer.
-	    break;
-	}
-    }
-}
-
 
 /*public*/
 void

@@ -1,3 +1,12 @@
+2007-12-13 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/action_buffer.{cpp,h}: drop readFullTag(),
+	  get additional arg to read() to limit input stream.
+	* server/parser/button_character_def.{cpp,h}: limit input
+	  stream while reading button_actions.
+	* server/swf/: DoActionTag.h, DoInitActionTag.h,
+	  PlaceObject2Tag.cpp: update calls to action_buffer parser.
+
 2007-12-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/asobj/Global.cpp: put return in updateAfterEvent();
