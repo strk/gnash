@@ -264,9 +264,11 @@ button_character_instance::button_character_instance(
 	attachButtonInterface(*this);
 
 	// check up presence Key events
+	// TODO: use a service of button_character_def, not this hard-coded thing here
 	for (size_t i = 0, e = m_def->m_button_actions.size(); i < e; ++i)
 	{
-		if (m_def->m_button_actions[i].m_conditions & 0xFE00)	// check up on CondKeyPress: UB[7]
+		// TODO: use labels, not magic numbers here !!
+		if (m_def->m_button_actions[i]->m_conditions & 0xFE00)	// check up on CondKeyPress: UB[7]
 		{
 			_vm.getRoot().add_key_listener(this);
 			break;
@@ -323,7 +325,7 @@ bool
 button_character_instance::on_event(const event_id& id)
 {
 
-    if( (id.m_id==event_id::KEY_PRESS) && (id.m_key_code == key::INVALID) )
+	if( (id.m_id==event_id::KEY_PRESS) && (id.m_key_code == key::INVALID) )
 	{
 		// onKeypress only responds to valid key code
 		return false;
@@ -335,17 +337,14 @@ button_character_instance::on_event(const event_id& id)
 	// TODO: should we execute immediately instead ?
 	for (size_t i = 0, ie=m_def->m_button_actions.size(); i<ie; ++i)
 	{
-		button_action& ba = m_def->m_button_actions[i];
+		button_action& ba = *(m_def->m_button_actions[i]);
 
 		int keycode = (ba.m_conditions & 0xFE00) >> 9;
 		event_id key_event(event_id::KEY_PRESS, (key::code) keycode);
 		if (key_event == id)
 		{
 			// Matching action.
-			for (size_t j=0, je=ba.m_actions.size(); j<je; ++j)
-			{
-				VM::get().getRoot().pushAction(*(ba.m_actions[j]), boost::intrusive_ptr<character>(this));
-			}
+			VM::get().getRoot().pushAction(ba.m_actions, boost::intrusive_ptr<character>(this));
 			called = true;
 		}
 	}
@@ -580,21 +579,18 @@ button_character_instance::on_button_event(const event_id& event)
 
 	for (size_t i = 0; i < m_def->m_button_actions.size(); i++)
 	{
-		if (m_def->m_button_actions[i].m_conditions & c)
+		button_action& ba = *(m_def->m_button_actions[i]);
+
+		if (ba.m_conditions & c)
 		{
 			// Matching action.
-			for (size_t j = 0; j < m_def->m_button_actions[i].m_actions.size(); j++)
-			{
-				action_buffer* ab = m_def->m_button_actions[i].m_actions[j];
-				assert(ab);
-				IF_VERBOSE_ACTION(
-					log_action(_("Executing actions for "
-						"button condition %d"), c);
-				);
-				ActionExec exec(*ab, get_environment());
-				exec();
-				
-			}
+			action_buffer& ab = ba.m_actions;
+			IF_VERBOSE_ACTION(
+				log_action(_("Executing actions for "
+					"button condition %d"), c);
+			);
+			ActionExec exec(ab, get_environment());
+			exec();
 		}
 	}
 

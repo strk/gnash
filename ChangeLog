@@ -1,5 +1,12 @@
 2007-12-13 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/button_character_def.{cpp,h}: don't leak
+	  button action buffers.
+	* server/button_character_instance.cpp: update access to
+	  button actions (needs more isolation work).
+
+2007-12-13 Sandro Santilli <strk@keybit.net>
+
 	* server/Property.h: always initialize mOrderId, which is used
 	  as the key for secondary multi_index in PropertyList.
 	  Seems to fix the infamous conditional jumps based on uninitialized

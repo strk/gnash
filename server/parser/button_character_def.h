@@ -15,6 +15,9 @@
 #include "rect.h" // for get_bound
 #include "matrix.h" // for composition
 #include "cxform.h" // for composition
+#include "action_buffer.h" // for composition of button_action
+
+#include <boost/scoped_ptr.hpp>
 
 #ifndef UNUSED
 #define UNUSED(x) ((x) = (x))
@@ -23,7 +26,6 @@
 // Forward declarations
 namespace gnash {
 	class sprite_instance;
-	class action_buffer;
 }
 
 namespace gnash {
@@ -39,7 +41,10 @@ public:
 	bool	m_over;
 	bool	m_up;
 	int	m_character_id;
+
+	// Who owns this ?
 	character_def* m_character_def;
+
 	int	m_button_layer;
 	matrix	m_button_matrix;
 	cxform	m_button_cxform;
@@ -99,17 +104,14 @@ public:
 	};
 	int	m_conditions;
 
-	typedef std::vector<action_buffer*> ActionList;
-
 	// TODO: define ownership of list elements !!
-	ActionList m_actions;
-
-	~button_action();
+	action_buffer m_actions;
 
 	/// @param endPos
 	///	One past last valid-to-read byte position
 	///
-	void read(stream* in, int tag_type, unsigned long endPos);
+	button_action(stream& in, int tag_type, unsigned long endPos);
+
 };
 
 
@@ -190,11 +192,10 @@ public:
 	typedef std::vector<button_record> ButtonRecVect; 
 	ButtonRecVect m_button_records;
 
-	typedef std::vector<button_action> ButtonActVect;
+	typedef std::vector<button_action*> ButtonActVect;
 	ButtonActVect m_button_actions;
 
-	// TODO: define ownership of this sound !
-	button_sound_def*	m_sound;
+	boost::scoped_ptr<button_sound_def> m_sound;
 
 	button_character_definition();
 	virtual ~button_character_definition();
@@ -248,6 +249,7 @@ protected:
 		{
 			i->markReachableResources();
 		}
+
 		if ( m_sound ) m_sound->markReachableResources();
 	}
 #endif // GNASH_USE_GC

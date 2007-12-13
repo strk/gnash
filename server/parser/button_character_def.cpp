@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: button_character_def.cpp,v 1.22 2007/12/13 10:58:10 strk Exp $ */
+/* $Id: button_character_def.cpp,v 1.23 2007/12/13 23:01:15 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -36,27 +36,7 @@ namespace gnash {
 //
 
 
-button_action::~button_action()
-{
-	for (ActionList::iterator i=m_actions.begin(), e=m_actions.end();
-			i != e; ++i)
-	{
-		// We can NOT delete action_buffers here becase they 
-		// may contain the action currently being executed and
-		// triggering the deletion.
-		// I'm not really sure about whether this is the problem,
-		// anyway clip_as_button2.swf fails on segfault when clicking
-		// the upper-right button if we delete here.
-		//
-		// TODO: properly implement management of these resources
-		//       which are otherwise just leaking..
-		//
-		//delete (*i);
-	}
-	m_actions.clear(); // this is useless, will be done automatically
-}
-
-void	button_action::read(stream* in, int tag_type, unsigned long endPos)
+button_action::button_action(stream& in, int tag_type, unsigned long endPos)
 {
 	// Read condition flags.
 	if (tag_type == SWF::DEFINEBUTTON) // 7
@@ -67,14 +47,14 @@ void	button_action::read(stream* in, int tag_type, unsigned long endPos)
 	{
 		assert(tag_type == SWF::DEFINEBUTTON2); // 34
 
-		if ( in->get_position()+2 > endPos ) 
+		if ( in.get_position()+2 > endPos ) 
 		{
 			IF_VERBOSE_MALFORMED_SWF(
 			log_swferror(_("Premature end of button action input: can't read conditions"));
 			);
 			return;
 		}
-		m_conditions = in->read_u16();
+		m_conditions = in.read_u16();
 	}
 
 	IF_VERBOSE_PARSE (
@@ -82,9 +62,7 @@ void	button_action::read(stream* in, int tag_type, unsigned long endPos)
 	);
 
 	// Read actions.
-	action_buffer*	a = new action_buffer;
-	a->read(*in, endPos);
-	m_actions.push_back(a);
+	m_actions.read(in, endPos);
 }
 
 //
@@ -189,7 +167,12 @@ button_character_definition::button_character_definition()
 
 button_character_definition::~button_character_definition()
 {
-	delete m_sound;
+	for (ButtonActVect::iterator i=m_button_actions.begin(),
+			ie=m_button_actions.end();
+			i != ie; ++i )
+	{
+		delete *i;
+	}
 }
 
 
@@ -272,10 +255,7 @@ button_character_definition::readDefineButton(stream* in, movie_definition* m)
 	}
 
 	// Read actions.
-	button_action actions;
-	// TODO: pass valid end position to button_action parser
-	actions.read(in, SWF::DEFINEBUTTON, endTagPos);
-	m_button_actions.push_back(actions);
+	m_button_actions.push_back(new button_action(*in, SWF::DEFINEBUTTON, endTagPos));
 
 	// detect min/max layer number
 	m_min_layer=0;
@@ -347,8 +327,7 @@ button_character_definition::readDefineButton2(stream* in, movie_definition* m)
 
 			unsigned long endActionPos = next_action_offset ? next_action_pos : tagEndPosition;
 
-			m_button_actions.resize(m_button_actions.size() + 1);
-			m_button_actions.back().read(in, SWF::DEFINEBUTTON2, endActionPos);
+			m_button_actions.push_back(new button_action(*in, SWF::DEFINEBUTTON2, endActionPos));
 
 			if (next_action_offset == 0 )
 			{
@@ -396,7 +375,7 @@ button_character_definition::readDefineButtonSound(stream* in, movie_definition*
 		return;
 	}
 
-	m_sound = new button_sound_def();
+	m_sound.reset( new button_sound_def() );
 
 	IF_VERBOSE_PARSE(
 	log_parse(_("button sound options: "));
