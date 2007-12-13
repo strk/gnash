@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.83 2007/12/13 07:38:23 zoulunkai Exp $ */
+/* $Id: Global.cpp,v 1.84 2007/12/13 09:09:25 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -418,6 +418,7 @@ as_global_updateAfterEvent(const fn_call& fn)
 		log_unimpl("updateAfterEvent()");
 		warned=true;
 	}
+	return as_value();
 }
 
 Global::Global(VM& vm, ClassHierarchy *ch)
