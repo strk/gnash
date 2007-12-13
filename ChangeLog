@@ -1,3 +1,8 @@
+2007-12-13 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* server/asobj/Global.cpp: as_global_parseint(), ignore more leading
+	  characters.
+	
 2007-12-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/URL.{h,cpp}: add another encode() function to return

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.82 2007/12/12 14:05:25 strk Exp $ */
+/* $Id: Global.cpp,v 1.83 2007/12/13 07:38:23 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -224,8 +224,10 @@ as_global_parseint(const fn_call& fn)
     bool bNegative;
 
     // Skip leading whitespace
-    while ((input[0] == ' ') || (input[0] == 0x9))
-	input++;
+    while( input[0] == ' ' || input[0] == '\n' || input[0] == '\t' || input[0] == '\r' )
+    {
+        input++;
+    }
 
     if (input[0] == '-')
 	{
