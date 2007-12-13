@@ -26,6 +26,7 @@
 #include "network.h"
 #include <string>
 #include <map>
+#include <vector>
 
 namespace cygnal
 {
@@ -119,15 +120,19 @@ public:
     HTTP &operator = (HTTP &obj);
 
     // These methods extract the fields in the HTTP header.
+    // These all return the number of items found, or 0
+    int extractAccept(const char *data);
+    int extractLanguage(const char *data);
+    int extractCharset(const char *data);
+    int extractEncoding(const char *data);
+    int extractTE(const char *data);
+    int extractConnection(const char *data);
+
+    // These return the string that was found for this field.
     std::string extractMethod(const char *data);
     std::string extractReferer(const char *data);
-    std::string extractConnection(const char *data);
     std::string extractHost(const char *data);
     std::string extractAgent(const char *data);
-    std::string extractLanguage(const char *data);
-    std::string extractCharset(const char *data);
-    std::string extractEncoding(const char *data);
-    std::string extractTE(const char *data);
 
     // These methods add data to the fields in the HTTP header.
     bool clearHeader() { _header.str(""); };
@@ -148,9 +153,6 @@ public:
     bool formatEncoding(const char *data);
     bool formatTE(const char *data);
 
-    bool keepAlive(const char *data);
-    bool keepAlive();
-
     // All HTTP messages are terminated with a blank line
     void terminateHeader() { _header << std::endl; };
     
@@ -161,7 +163,29 @@ public:
     // Content-type in the header.
     filetype_e getFileType(std::string filespec);
     void dump();
+
+    // These accessors are used mostly just for debugging.
+    bool keepAlive() { return _keepalive; }
+    std::string getFilespec() { return _filespec; }
+    std::string getURL() { return _url; }
+    std::map<int, struct status_codes *> getStatusCodes()
+	{ return _status_codes; }
+    std::string getVersion() { return _version; }
+    std::string getMethod() { return _method; }
+    std::string getReferer() { return _referer; }
+    std::vector<std::string> getLanguage() { return _language;  }
+    std::vector<std::string> getConnection() { return _connections; }
+    std::vector<std::string> getTE() { return _te; }
+    std::vector<std::string> getCharset() { return _charset; }
+    std::vector<std::string> getEncoding() { return _encoding; }
+
+    int         getHostPort(){ return _port; }
+    std::string getHost() { return _host; }
+    std::string getUserAgent() { return _agent; }
+    
+
 private:
+    std::stringstream _header;
     filetype_e  _filetype;
     std::string _filespec;
     std::string _url;
@@ -169,15 +193,18 @@ private:
     std::string _version;
     std::string _method;
     std::string _referer;
-    std::string _connection;
     std::string _host;
     int         _port;
     std::string _agent;
-    std::string _language;
-    std::string _charset;
-    std::string _encoding;
-    std::string _te;
-    std::stringstream _header;
+    std::vector<std::string> _connections;
+    std::vector<std::string> _language;
+    std::vector<std::string> _charset;
+    std::vector<std::string> _encoding;
+    std::vector<std::string> _te;
+    std::vector<std::string> _accept;
+    // Connection parameters we care about
+    bool	_keepalive;
+//    bool	_te;
 };  
     
 } // end of cygnal namespace

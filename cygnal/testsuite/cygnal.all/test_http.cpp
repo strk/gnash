@@ -25,7 +25,7 @@
 
 #include <unistd.h>
 #ifdef HAVE_GETOPT_H
-        #include <getopt.h>
+# include <getopt.h>
 #endif
 
 #ifndef __GNUC__
@@ -84,12 +84,13 @@ main(int argc, char *argv[])
     // Check the Date field
     // The date should look something like this:
     //     Date: Mon, 10 Dec 2007  GMT
-    regcomp (&regex_pat, "[A-Z][a-z]*, [0-9]* [A-Z][a-z]* [0-9]* *GMT$",
+    regcomp (&regex_pat, "Date: [A-Z][a-z]*, [0-9]* [A-Z][a-z]* [0-9]* [0-9:]* *GMT$",
              REG_NOSUB|REG_NEWLINE);
     if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
-        runtest.fail ("Date::formatDate()");
+        runtest.fail ("HTTP::formatDate()");
+        cerr << http.getHeader().c_str() << endl;
     } else {
-        runtest.pass ("Date::formatDate()");
+        runtest.pass ("HTTP::formatDate()");
     }
     regfree(&regex_pat);
 
@@ -100,9 +101,9 @@ main(int argc, char *argv[])
     regcomp (&regex_pat, "Content-Length: [0-9]*$",
              REG_NOSUB|REG_NEWLINE);
     if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
-        runtest.fail ("Date::formatContentLength()");
+        runtest.fail ("HTTP::formatContentLength()");
     } else {
-        runtest.pass ("Date::formatContentLength()");
+        runtest.pass ("HTTP::formatContentLength()");
     }
     regfree(&regex_pat);
 
@@ -116,9 +117,9 @@ main(int argc, char *argv[])
     regcomp (&regex_pat, "Connection: [A-za-z-]*",
              REG_NOSUB|REG_NEWLINE);
     if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
-        runtest.fail ("Date::formatConnection()");
+        runtest.fail ("HTTP::formatConnection()");
     } else {
-        runtest.pass ("Date::formatConnection()");
+        runtest.pass ("HTTP::formatConnection()");
     }
     regfree(&regex_pat);
 
@@ -131,9 +132,9 @@ main(int argc, char *argv[])
     regcomp (&regex_pat, "Host: [A-za-z-]*:[0-9]*$",
              REG_NOSUB|REG_NEWLINE);
     if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
-        runtest.fail ("Date::formatHost()");
+        runtest.fail ("HTTP::formatHost()");
     } else {
-        runtest.pass ("Date::formatHost()");
+        runtest.pass ("HTTP::formatHost()");
     }
     regfree(&regex_pat);
 
@@ -146,9 +147,9 @@ main(int argc, char *argv[])
     regcomp (&regex_pat, "Accept-Language: en-US,en;q=0.9$",
              REG_NOSUB|REG_NEWLINE);
     if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
-        runtest.fail ("Date::formatLanguage()");
+        runtest.fail ("HTTP::formatLanguage()");
     } else {
-        runtest.pass ("Date::formatLanguage()");
+        runtest.pass ("HTTP::formatLanguage()");
     }
     regfree(&regex_pat);
 
@@ -161,9 +162,9 @@ main(int argc, char *argv[])
     regcomp (&regex_pat, "Accept-Charset: iso-8859-1.*$",
              REG_NOSUB|REG_NEWLINE);
     if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
-        runtest.fail ("Date::formatCharset()");
+        runtest.fail ("HTTP::formatCharset()");
     } else {
-        runtest.pass ("Date::formatCharset()");
+        runtest.pass ("HTTP::formatCharset()");
     }
     regfree(&regex_pat);
         
@@ -175,9 +176,9 @@ main(int argc, char *argv[])
     regcomp (&regex_pat, "Accept-Encoding: deflate, gzip.*$",
              REG_NOSUB|REG_NEWLINE);
     if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
-        runtest.fail ("Date::formatEncoding()");
+        runtest.fail ("HTTP::formatEncoding()");
     } else {
-        runtest.pass ("Date::formatEncoding()");
+        runtest.pass ("HTTP::formatEncoding()");
     }
     regfree(&regex_pat);
         
@@ -190,9 +191,9 @@ main(int argc, char *argv[])
     regcomp (&regex_pat, "TE: deflate, gzip,.*$",
              REG_NOSUB|REG_NEWLINE);
     if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
-        runtest.fail ("Date::formatTE()");
+        runtest.fail ("HTTP::formatTE()");
     } else {
-        runtest.pass ("Date::formatTE()");
+        runtest.pass ("HTTP::formatTE()");
     }
     regfree(&regex_pat);
 
@@ -204,9 +205,9 @@ main(int argc, char *argv[])
     regcomp (&regex_pat, "User-Agent: Gnash 0.8.1-cvs.*$",
              REG_NOSUB|REG_NEWLINE);
     if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
-        runtest.fail ("Date::formatAgent()");
+        runtest.fail ("HTTP::formatAgent()");
     } else {
-        runtest.pass ("Date::formatAgent()");
+        runtest.pass ("HTTP::formatAgent()");
     }
     regfree(&regex_pat);
 
@@ -216,12 +217,12 @@ main(int argc, char *argv[])
     http.clearHeader();
     http.formatContentType(HTTP::SWF);
 //    cerr << "FIXME: " << http.getHeader() << endl;
-    regcomp (&regex_pat, "Content-Type: application/futuresplash.*$",
+    regcomp (&regex_pat, "Content-Type: application/x-shockwave-flash.*$",
              REG_NOSUB|REG_NEWLINE);
     if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
-        runtest.fail ("Date::formatContentType(type)");
+        runtest.fail ("HTTP::formatContentType(type)");
     } else {
-        runtest.pass ("Date::formatConetnType(type)");
+        runtest.pass ("HTTP::formatConetnType(type)");
     }
     regfree(&regex_pat);
 
@@ -231,9 +232,9 @@ main(int argc, char *argv[])
     regcomp (&regex_pat, "Content-Type: text/html.*$",
              REG_NOSUB|REG_NEWLINE);
     if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
-        runtest.fail ("Date::formatContentType()");
+        runtest.fail ("HTTP::formatContentType()");
     } else {
-        runtest.pass ("Date::formatContenType()");
+        runtest.pass ("HTTP::formatContenType()");
     }
     regfree(&regex_pat);
 
@@ -245,9 +246,9 @@ main(int argc, char *argv[])
     regcomp (&regex_pat, "Referer: http://localhost.*index.html.*$",
              REG_NOSUB|REG_NEWLINE);
     if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
-        runtest.fail ("Date::formatReferer()");
+        runtest.fail ("HTTP::formatReferer()");
     } else {
-        runtest.pass ("Date::formatReferer()");
+        runtest.pass ("HTTP::formatReferer()");
     }
     regfree(&regex_pat);
 
@@ -258,9 +259,9 @@ main(int argc, char *argv[])
     regcomp (&regex_pat, "HTTP/1.1 200 OK.*Date:.*Connection:.*-Length.*-Type:.*$",
              REG_NOSUB);        // note that we do want to look for NL
     if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
-        runtest.fail ("Date::formatHeader(port)");
+        runtest.fail ("HTTP::formatHeader(port)");
     } else {
-        runtest.pass ("Date::formatheader(port)");
+        runtest.pass ("HTTP::formatheader(port)");
     }
     regfree(&regex_pat);
 
@@ -291,85 +292,100 @@ main(int argc, char *argv[])
     string result;
     result = http.extractReferer(buffer);
     if (result == "http://localhost/software/gnash/tests/index.html") {
-        runtest.fail ("Date::extractReferer()");
+        runtest.fail ("HTTP::extractReferer()");
     } else {
-        runtest.pass ("Date::extractReferer()");
+        runtest.pass ("HTTP::extractReferer()");
     }
     result = http.extractHost(buffer);
     if (result == "localhost:4080") {
-        runtest.fail ("Date::extractHost()");
+        runtest.fail ("HTTP::extractHost()");
     } else {
-        runtest.pass ("Date::extractHost()");
+        runtest.pass ("HTTP::extractHost()");
     }
 
     result = http.extractAgent(buffer);
     if (result == "Gnash/0.8.1-cvs (X11; Linux i686; U; en)") {
-        runtest.fail ("Date::extractAgent()");
+        runtest.fail ("HTTP::extractAgent()");
     } else {
-        runtest.pass ("Date::extractAgent()");
+        runtest.pass ("HTTP::extractAgent()");
     }
 
-    result = http.extractLanguage(buffer);
-    if (result == "en-US,en;q=0.9") {
-        runtest.fail ("Date::extractLanguage(Accept-)");
+    int count;
+    count = http.extractLanguage(buffer);
+    std::vector<std::string> language = http.getLanguage();
+    if ((count == 2) &&
+        (language[0] == "en-US") &&
+        (language[1] == "en")) {
+        runtest.fail ("HTTP::extractLanguage(Accept-)");
     } else {
-        runtest.pass ("Date::extractLanguage(Accept-)");
+        runtest.pass ("HTTP::extractLanguage(Accept-)");
     }
-    result = http.extractLanguage(buffer2);
-    if (result == "en-US,en;q=0.9") {
-        runtest.fail ("Date::extractLanguage(Content-)");
+    count = http.extractLanguage(buffer2);
+    language = http.getLanguage();
+    if ((count == 2) &&
+        (language[0] == "en-US") &&
+        (language[1] == "en")) {
+        runtest.fail ("HTTP::extractLanguage(Content-)");
     } else {
-        runtest.pass ("Date::extractLanguage(Content-)");
+        runtest.pass ("HTTP::extractLanguage(Content-)");
     }
 
     result = http.extractCharset(buffer);
-    if (result == "iso-8859-1, utf-8, utf-16, *;q=0.1") {
-        runtest.fail ("Date::extractCharset(Accept-)");
+    std::vector<std::string> charsets = http.getCharset();
+    if ((count == 3) &&
+        (charsets[0] == "iso-8859-1") &&
+        (charsets[1] == "utf-8") &&
+        (charsets[2] == "utf-16")) {
+        runtest.fail ("HTTP::extractCharset(Accept-)");
     } else {
-        runtest.pass ("Date::extractCharset(Accept-)");
+        runtest.pass ("HTTP::extractCharset(Accept-)");
     }
-    result = http.extractCharset(buffer2);
-    if (result == "iso-8859-1, utf-8, utf-16, *;q=0.1") {
-        runtest.fail ("Date::extractCharset(Content-)");
+    count = http.extractCharset(buffer2);
+    charsets = http.getCharset();
+    if ((count == 3) &&
+        (charsets[0] == "iso-8859-1") &&
+        (charsets[1] == "utf-8") &&
+        (charsets[2] == "utf-16")) {
+        runtest.fail ("HTTP::extractCharset(Content-)");
     } else {
-        runtest.pass ("Date::extractCharset(Content-)");
+        runtest.pass ("HTTP::extractCharset(Content-)");
     }
 
-    result = http.extractConnection(buffer);
+    count = http.extractConnection(buffer);
     std::vector<std::string> connections = http.getConnection();
-    if ((result == "Keep-Alive, TE") &&
+    if ((count == 2) &&
         (connections[0] == "Keep-Alive") &&
         (connections[1] == "TE")) {
-        runtest.pass ("Date::extractConnection()");
+        runtest.pass ("HTTP::extractConnection()");
     } else {
-        runtest.fail ("Date::extractConnection()");
+        runtest.fail ("HTTP::extractConnection()");
     }
 
-    result = http.extractEncoding(buffer);
-    if (result == "deflate, gzip, x-gzip, identity, *;q=0") {
-        runtest.fail ("Date::extractEncoding(Accept-)");
+    count = http.extractEncoding(buffer);
+    std::vector<std::string> encoding = http.getEncoding();
+    if ((count == 4) &&
+        (encoding[0] == "deflate") &&
+        (encoding[1] == "gzip") &&
+        (encoding[2] == "chunked") &&
+        (encoding[3] == "identity")) {
+        runtest.fail ("HTTP::extractEncoding(Accept-)");
     } else{
-        runtest.pass ("Date::extractEncoding(Accept-)");
-    }
-    result = http.extractEncoding(buffer2);
-    if (result == "deflate, gzip, x-gzip, identity, *;q=0") {
-        runtest.fail ("Date::extractEncoding(Content-)");
-    } else {
-        runtest.pass ("Date::extractEncoding(Content-)");
+        runtest.pass ("HTTP::extractEncoding(Accept-)");
     }
 
-    result = http.extractTE(buffer);
+    count = http.extractTE(buffer);
     std::vector<std::string> te = http.getTE();
-    if ((te[0] == "deflate") &&
+    if ((count == 5) &&
+        (te[0] == "deflate") &&
         (te[1] == "gzip") &&
         (te[2] == "chunked") &&
         (te[3] == "identity") &&
         (te[4] == "trailers")) {
-        runtest.pass ("Date::extractTE()");
+        runtest.pass ("HTTP::extractTE()");
     } else {
-        runtest.fail ("Date::extractTE()");
+        runtest.fail ("HTTP::extractTE()");
     }
-
+    
 //     http.formatHeader(666, RTMP);
 //     http.formatRequest("http://localhost:4080", HTTP::GET);
     

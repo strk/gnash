@@ -45,7 +45,8 @@ namespace cygnal
 // FIXME, this seems too small to me.  --gnu
 static const int readsize = 1024;
 
-HTTP::HTTP()
+HTTP::HTTP() 
+    : _keepalive(false)
 {
 //    GNASH_REPORT_FUNCTION;
 //    struct status_codes *status = new struct status_codes;
@@ -87,6 +88,7 @@ HTTP::waitForGetRequest()
         log_error (_("Couldn't read initial GET Request"));
     }
     
+    extractAccept(buffer);
     extractMethod(buffer);
     extractReferer(buffer);
     extractHost(buffer);
@@ -199,8 +201,8 @@ HTTP::formatContentType(filetype_e filetype)
 	  _header << "Content-Type: text/html; charset=UTF-8" << endl;
 	  break;
       case SWF:
-//	  _header << "Content-Type: application/x-shockwave-flash" << endl;
-	  _header << "Content-Type: application/futuresplash" << endl;
+	  _header << "Content-Type: application/x-shockwave-flash" << endl;
+//	  _header << "Content-Type: application/futuresplash" << endl;
 	  break;
       case VIDEO:
 	  _header << "Content-Type: video/flv" << endl;
@@ -341,6 +343,43 @@ HTTP::formatRequest(const char *url, http_method_e req)
 // Referer: http://localhost/software/gnash/tests/
 // Connection: Keep-Alive, TE
 // TE: deflate, gzip, chunked, identity, trailers
+int
+HTTP::extractAccept(const char *data) {
+//    GNASH_REPORT_FUNCTION;
+    
+    string body = data;
+    string::size_type start, end, length, pos;
+    string pattern = "Accept: ";
+    
+    start = body.find(pattern, 0);
+    if (start == string::npos) {
+        return -1;
+    }
+    end =  body.find("\r\n", start);
+    if (end == string::npos) {
+	end = body.find("\n", start);
+//	    return "error";
+    }
+
+    length = end-start-pattern.size();
+    start = start+pattern.size();
+    pos = start;
+    while (pos <= end) {
+	pos = (body.find(",", start) + 2);
+	if ((pos == string::npos) || (pos > end)) {
+	    length = end - start;
+	} else {
+	    length = pos - start - 2;
+	}
+	string substr = body.substr(start, length);
+//	printf("FIXME: \"%s\"\n", substr.c_str());
+	_accept.push_back(substr);
+	start = pos;
+    }
+
+    return _accept.size();
+}
+
 string
 HTTP::extractMethod(const char *data) {
 //    GNASH_REPORT_FUNCTION;
@@ -389,25 +428,45 @@ HTTP::extractReferer(const char *data) {
     return _referer;
 }
 
-string 
+int
 HTTP::extractConnection(const char *data) {
 //    GNASH_REPORT_FUNCTION;
     
     string body = data;
-    string::size_type start, end;
+    string::size_type start, end, length, pos;
     string pattern = "Connection: ";
     
     start = body.find(pattern, 0);
     if (start == string::npos) {
-        return "error";
+        return -1;
     }
     end =  body.find("\r\n", start);
     if (end == string::npos) {
-        return "error";
+	end = body.find("\n", start);
+//	    return "error";
     }
-    
-    _connection = body.substr(start+pattern.size(), end-start-1);
-    return _connection;
+
+    length = end-start-pattern.size();
+    start = start+pattern.size();
+    string _connection = body.substr(start, length);
+    pos = start;
+    while (pos <= end) {
+	pos = (body.find(",", start) + 2);
+	if ((pos == string::npos) || (pos > end)) {
+	    length = end - start;
+	} else {
+	    length = pos - start - 2;
+	}
+	string substr = body.substr(start, length);
+//	printf("FIXME: \"%s\"\n", substr.c_str());
+	_connections.push_back(substr);
+	if (substr == "Keep-Alive") {
+	    _keepalive = true;
+	}
+	start = pos;
+    }
+
+    return _connections.size();
 }
 
 string
@@ -452,113 +511,161 @@ HTTP::extractAgent(const char *data) {
     return _agent;
 }
 
-string 
+int
 HTTP::extractLanguage(const char *data) {
 //    GNASH_REPORT_FUNCTION;
     
     string body = data;
-    string::size_type start, end;
-    string pattern = "Accept-Language: ";
+    string::size_type start, end, length, pos;
+    // match both Accept-Language and Content-Language
+    string pattern = "-Language: ";
     
     start = body.find(pattern, 0);
     if (start == string::npos) {
-        return "error";
+        return -1;
     }
     end =  body.find("\r\n", start);
     if (end == string::npos) {
-        return "error";
+	end = body.find("\n", start);
+//        return "error";
+    }
+    length = end-start-pattern.size();
+    start = start+pattern.size();
+    pos = start;
+    while (pos <= end) {
+	pos = (body.find(",", start));
+	if ((pos == string::npos) || (pos >= end)) {
+	    length = end - start;
+	} else {
+	    length = pos - start;
+	}
+	string substr = body.substr(start, length);
+//	printf("FIXME: \"%s\"\n", substr.c_str());
+	_language.push_back(substr);
+	start = pos + 2;
     }
     
-    _language = body.substr(start+pattern.size(), end-start-1);
-    return _language;
+//    _language = body.substr(start+pattern.size(), end-start-1);
+    return _language.size();
 }
 
-string 
+int
 HTTP::extractCharset(const char *data) {
 //    GNASH_REPORT_FUNCTION;
     
     string body = data;
-    string::size_type start, end;
-    string pattern = "Accept-Charset: ";
+    string::size_type start, end, length, pos;
+// match both Accept-Charset and Content-Charset
+    string pattern = "-Charset: ";
     
     start = body.find(pattern, 0);
     if (start == string::npos) {
-        return "error";
+        return -1;
     }
     end =  body.find("\r\n", start);
     if (end == string::npos) {
-        return "error";
+	end = body.find("\n", start);
+//        return "error";
     }
     
-    _charset = body.substr(start+pattern.size(), end-start-1);
-    return _charset;
+    length = end-start-pattern.size();
+    start = start+pattern.size();
+    string _connection = body.substr(start, length);
+    pos = start;
+    while (pos <= end) {
+	pos = (body.find(",", start) + 2);
+	if ((pos == string::npos) || (pos > end)) {
+	    length = end - start;
+	} else {
+	    length = pos - start - 2;
+	}
+	string substr = body.substr(start, length);
+//	printf("FIXME: \"%s\"\n", substr.c_str());
+	_charset.push_back(substr);
+	start = pos;
+    }
+//    _charset = body.substr(start+pattern.size(), end-start-1);
+    return _charset.size();
 }
 
-string 
+int
 HTTP::extractEncoding(const char *data) {
 //    GNASH_REPORT_FUNCTION;
     
     string body = data;
-    string::size_type start, end;
-    string pattern = "Accept-Encoding: ";
+    string::size_type start, end, length, pos;
+    // match both Accept-Encoding and Content-Encoding
+    string pattern = "-Encoding: ";
     
     start = body.find(pattern, 0);
     if (start == string::npos) {
-        return "error";
+        return -1;
     }
     end =  body.find("\r\n", start);
     if (end == string::npos) {
-        return "error";
+	end = body.find("\n", start);
+//        return "error";
     }
     
-    _encoding = body.substr(start+pattern.size(), end-start-1);
-    return _encoding;
+   length = end-start-pattern.size();
+    start = start+pattern.size();
+    string _connection = body.substr(start, length);
+    pos = start;
+    while (pos <= end) {
+	pos = (body.find(",", start) + 2);
+	if ((pos == string::npos) || (pos > end)) {
+	    length = end - start;
+	} else {
+	    length = pos - start - 2;
+	}
+	string substr = body.substr(start, length);
+//	printf("FIXME: \"%s\"\n", substr.c_str());
+	_encoding.push_back(substr);
+	start = pos;
+    }
+
+//    _encoding = body.substr(start+pattern.size(), end-start-1);
+    return _encoding.size();
 }
 
-string 
+int
 HTTP::extractTE(const char *data) {
 //    GNASH_REPORT_FUNCTION;
     
     string body = data;
-    string::size_type start, end;
+    string::size_type start, end, length, pos;
     string pattern = "TE: ";
     
     start = body.find(pattern, 0);
     if (start == string::npos) {
-        return "error";
+        return -1;
     }
-    end =  body.find("\r\n", start);
+    end = body.find("\r\n", start);
     if (end == string::npos) {
-        return "error";
+	end = body.find("\n", start);
+//        return "error";
     }
     
-    _te = body.substr(start+pattern.size(), end-start-1);
-    return _te;
-}
-
-bool
-HTTP::keepAlive(const char *data)
-{
-//    GNASH_REPORT_FUNCTION;
-
-    if (strcasecmp(data, "Keep-Alive")) {
-	return true;
-    } else {
-	return false;
+    length = end-start-pattern.size();
+    start = start+pattern.size();
+    pos = start;
+    while (pos <= end) {
+	pos = (body.find(",", start));
+	if ((pos == string::npos) || (pos >= end)) {
+	    length = end - start;
+	} else {
+	    length = pos - start;
+	}
+	string substr = body.substr(start, length);
+//	printf("FIXME: \"%s\"\n", substr.c_str());
+	_te.push_back(substr);
+	start = pos + 2;
     }
+    return _te.size();
 }
 
-bool
-HTTP::keepAlive()
-{
-//    GNASH_REPORT_FUNCTION;
-    // FIXME: is their a way to make find case insensitive that's
-    // less than 20 lines long ?
-    return keepAlive(_connection.c_str());
-}
-
-    // Get the file type, so we know how to set the
-    // Content-type in the header.
+// Get the file type, so we know how to set the
+// Content-type in the header.
 HTTP::filetype_e
 HTTP::getFileType(std::string filespec)
 {
@@ -614,20 +721,35 @@ HTTP::dump() {
     GNASH_REPORT_FUNCTION;
     
     boost::mutex::scoped_lock lock(stl_mutex);
+    vector<string>::iterator it;
     
     log_msg (_("==== The HTTP header breaks down as follows: ===="));
     log_msg (_("Filespec: %s"), _filespec.c_str());
     log_msg (_("URL: %s"), _url.c_str());
     log_msg (_("Version: %s"), _version.c_str());
+    for (it = _accept.begin(); it != _accept.end(); it++) {
+        log_msg("Accept: \"%s\"", (*(it)).c_str());
+    }
     log_msg (_("Method: %s"), _method.c_str());
     log_msg (_("Referer: %s"), _referer.c_str());
-    log_msg (_("Connection: %s"), _connection.c_str());
+    log_msg (_("Connections:"));
+    for (it = _connections.begin(); it != _connections.end(); it++) {
+        log_msg("Connection param is: \"%s\"", (*(it)).c_str());
+    }
     log_msg (_("Host: %s"), _host.c_str());
     log_msg (_("User Agent: %s"), _agent.c_str());
-    log_msg (_("Language: %s"), _language.c_str());
-    log_msg (_("Charset: %s"), _charset.c_str());
-    log_msg (_("Encoding: %s"), _encoding.c_str());
-    log_msg (_("TE: %s"), _te.c_str());
+    for (it = _language.begin(); it != _language.end(); it++) {
+        log_msg("Language: \"%s\"", (*(it)).c_str());
+    }
+    for (it = _charset.begin(); it != _charset.end(); it++) {
+        log_msg("Charset: \"%s\"", (*(it)).c_str());
+    }
+    for (it = _encoding.begin(); it != _encoding.end(); it++) {
+        log_msg("Encodings: \"%s\"", (*(it)).c_str());
+    }
+    for (it = _te.begin(); it != _te.end(); it++) {
+        log_msg("TE: \"%s\"", (*(it)).c_str());
+    }
     log_msg (_("==== ==== ===="));
 }
 
