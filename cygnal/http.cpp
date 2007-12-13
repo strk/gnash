@@ -101,7 +101,8 @@ HTTP::waitForGetRequest()
     } else {
         log_error (_("Couldn't read initial GET Request"));
     }
-    
+
+    clearHeader();
     extractAccept(buffer);
     extractMethod(buffer);
     extractReferer(buffer);
@@ -130,7 +131,7 @@ HTTP::formatHeader(const short type)
 {
     GNASH_REPORT_FUNCTION;
 
-    formatHeader(0, type);
+    formatHeader(_filesize, type);
 }
 
 
@@ -140,7 +141,7 @@ HTTP::formatHeader(int filesize, const short type)
     GNASH_REPORT_FUNCTION;
 
     _header << "HTTP/1.1 200 OK" << endl;
-//    _header << "Server: Cygnal/0.8.1 (Linux)" << endl;
+    this->formatServer();
     this->formatDate();
     this->formatConnection("close");
 //     _header << "Accept-Ranges: bytes" << endl;
@@ -335,7 +336,7 @@ HTTP::sendGetReply(http_status_e code)
 {
     GNASH_REPORT_FUNCTION;
     
-    formatHeader(_filesize, RTMP);
+    formatHeader(_filesize, HTML);
     int ret = writeNet(_header.str().c_str(), _header.str().size());
     if ( _body.str().size() > 0) {
 	ret += writeNet(_body.str().c_str(), _body.str().size());
@@ -747,7 +748,7 @@ HTTP::extractTE(const char *data) {
 // Get the file type, so we know how to set the
 // Content-type in the header.
 HTTP::filetype_e
-HTTP::getFileType(std::string &filespec)
+HTTP::getFileStats(std::string &filespec)
 {
     GNASH_REPORT_FUNCTION;    
     bool try_again = true;
@@ -798,8 +799,7 @@ HTTP::getFileType(std::string &filespec)
 	} // end of stat()
     } // end of try_waiting
 
-    _filesize = st.st_mode;
-
+    _filesize = st.st_size;
     return _filetype;
 }
 

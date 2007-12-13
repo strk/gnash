@@ -1,5 +1,10 @@
 2007-12-13  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* cygnal/http.h: Rename getFileType() to getFileStats()
+	* cygnal/http.cpp: Set the file size right so it works with all
+	browsers.
+	* cygnal/cygnal.cpp: Use getFileStats() instead of getFileType().
+	
 	* cygnal/cygnal.cpp: Check the file type to set the HTTP
 	Content-Tytpe field correctly. Also handle "file not found".
 	* cygnal/http.cpp: Trap file not found errors. Format responses

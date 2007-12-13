@@ -173,7 +173,7 @@ public:
     // Get the file type, so we know how to set the
     // Content-type in the header.
 //    filetype_e getFileType(std::string &filespec);
-    filetype_e getFileType(std::string &filespec);
+    filetype_e getFileStats(std::string &filespec);
     void dump();
 
     // These accessors are used mostly just for debugging.

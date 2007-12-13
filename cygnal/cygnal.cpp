@@ -242,10 +242,11 @@ http_thread(struct thread_params *conndata)
 	parameters = url.substr(pos + 1, url.size());
 	// Get the file size for the HTTP header
 	
-	if (www.getFileType(filespec) == HTTP::ERROR) {
+	if (www.getFileStats(filespec) == HTTP::ERROR) {
 	    www.formatErrorResponse(HTTP::NOT_FOUND);
 	}
-	
+
+	cerr << "FileSize is: " << www.getFileSize() << endl;
 	www.sendGetReply(HTTP::LIFE_IS_GOOD);
 //	strcpy(thread_data.filespec, filespec.c_str());
 //	thread_data.statistics = conndata->statistics;
