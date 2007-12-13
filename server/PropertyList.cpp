@@ -348,12 +348,17 @@ PropertyList::addGetterSetter(string_table::key key, as_function& getter,
 		// copy flags from previous member (even if it's a normal member ?)
 		as_prop_flags& f = a.getFlags();
 		f = found->getFlags();
+
 		_props.replace(found, a);
+		assert ( iterator_find(_props, key, nsId) != _props.end() );
+
 	}
 	else
 	{
 		_props.insert(a);
+        	assert ( iterator_find(_props, key, nsId) != _props.end() );
 	}
+
 
 	return true;
 }

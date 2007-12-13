@@ -1,5 +1,17 @@
 2007-12-13 Sandro Santilli <strk@keybit.net>
 
+	* server/PropertyList.cpp (addGetterSetter): since the function
+	  always returns true, which by documentation means the property
+	  was successfully added, this patch adds an assertion checking
+	  that the just-added property can be successfully looked up.
+	  This assertion seems to fail, so the commit makes Gnash less
+	  robust, but hopefully helps fixing the bug which we keep
+	  occasionally finding. Over here, I can trigger failure of that
+	  assertion by running testsuite/misc-ming.all/loop_test-Runner
+	  (but oddly enough not playing loop_test.swf using Gnash).
+
+2007-12-13 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/video_stream_def.cpp (readDefineVideoFrame): fix
 	  log_debug call (missing params).
 	* backend/render_handler_agg.cpp, libbase/string_table.h,
