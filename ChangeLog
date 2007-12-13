@@ -1,5 +1,7 @@
 2007-12-13 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/video_stream_def.cpp (readDefineVideoFrame): fix
+	  log_debug call (missing params).
 	* backend/render_handler_agg.cpp, libbase/string_table.h,
 	  server/Property.{cpp,h}, server/PropertyList.{cpp,h},
 	  server/parser/abc_block.{cpp,h}:

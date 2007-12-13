@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.30 2007/12/12 10:23:47 zoulunkai Exp $
+// $Id: video_stream_def.cpp,v 1.31 2007/12/13 16:19:47 strk Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -99,7 +99,8 @@ video_stream_definition::readDefineVideoFrame(stream* in, SWF::tag_type tag, mov
 	unsigned int frameNum = in->read_u16(); // in->skip_bytes(2); 
 	if ( m->get_loading_frame() != frameNum )
 	{
-		log_debug("frameNum field in tag is %d, currently loading frame is %d, we'll use the latter.");
+		log_debug("frameNum field in tag is %d, currently loading frame is %d, we'll use the latter.",
+			frameNum, m->get_loading_frame());
 		frameNum = m->get_loading_frame();
 	}
 
