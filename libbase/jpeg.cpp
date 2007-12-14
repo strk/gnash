@@ -85,6 +85,7 @@ namespace tu_file_wrappers
 		{
 			rw_source_tu_file*	src = (rw_source_tu_file*) cinfo->src;
 
+			// TODO: limit read as requested by caller
 			size_t	bytes_read = src->m_in_stream->read_bytes(src->m_buffer, IO_BUF_SIZE);
 
 			if (bytes_read <= 0) {
@@ -373,7 +374,7 @@ namespace tu_file_wrappers
 		///	If true, we take ownership of the input stream. 
 		///
 		input_tu_file(SWF_DEFINE_BITS_JPEG2_HEADER_ONLY /* e */, tu_file* in,
-				bool takeOwnership=false)
+				unsigned int maxHeaderBytes, bool takeOwnership=false)
 			:
 			m_compressor_opened(false)
 		{
@@ -393,30 +394,42 @@ namespace tu_file_wrappers
 
 			rw_source_tu_file::setup(&m_cinfo, in, takeOwnership);
 
-			// Read the encoding tables.
-			int ret = jpeg_read_header(&m_cinfo, FALSE);
-			switch (ret)
+			if ( maxHeaderBytes )
 			{
-				case JPEG_SUSPENDED: // suspended due to lack of data
-					throw gnash::ParserException("lack of data during JPEG header parsing");
-					//log_debug("jpeg_read_header returned JPEG_SUSPENDED");
-					break;
-				case JPEG_HEADER_OK: // Found valid image datastream
-					//gnash::log_debug("unexpected: jpeg_read_header returned JPEG_HEADER_OK [%s:%d]", __FILE__, __LINE__);
-					break;
-				case JPEG_HEADER_TABLES_ONLY: // Found valid table-specs-only datastream
-					//log_debug("jpeg_read_header returned JPEG_HEADER_TABLES_ONLY");
-					break;
-				default:
-					gnash::log_debug("unexpected: jpeg_read_header returned %d [%s:%d]", ret, __FILE__, __LINE__);
-					break;
-			}
+				unsigned long startPos = in->get_position();
 
-			if ( _errorOccurred )
-			{
-				std::stringstream ss;
-				ss << "Internal jpeg error: " << _errorOccurred;
-				throw gnash::ParserException(ss.str());
+				// Read the encoding tables.
+				// TODO: how to limit reads ?
+				int ret = jpeg_read_header(&m_cinfo, FALSE);
+				switch (ret)
+				{
+					case JPEG_SUSPENDED: // suspended due to lack of data
+						throw gnash::ParserException("lack of data during JPEG header parsing");
+						//log_debug("jpeg_read_header returned JPEG_SUSPENDED");
+						break;
+					case JPEG_HEADER_OK: // Found valid image datastream
+						//gnash::log_debug("unexpected: jpeg_read_header returned JPEG_HEADER_OK [%s:%d]", __FILE__, __LINE__);
+						break;
+					case JPEG_HEADER_TABLES_ONLY: // Found valid table-specs-only datastream
+						//log_debug("jpeg_read_header returned JPEG_HEADER_TABLES_ONLY");
+						break;
+					default:
+						gnash::log_debug("unexpected: jpeg_read_header returned %d [%s:%d]", ret, __FILE__, __LINE__);
+						break;
+				}
+
+				if ( _errorOccurred )
+				{
+					std::stringstream ss;
+					ss << "Internal jpeg error: " << _errorOccurred;
+					throw gnash::ParserException(ss.str());
+				}
+
+				unsigned long endPos = in->get_position();
+				if ( endPos - startPos > maxHeaderBytes )
+				{
+					gnash::log_error("Reading of jpeg headers went past requested maxHeaderBytes");
+				}
 			}
 
 			// Don't start reading any image data!
@@ -667,10 +680,10 @@ input::create(tu_file* in, bool takeOwnership)
 
 /*static*/
 input*
-input::create_swf_jpeg2_header_only(tu_file* in, bool takeOwnership)
+input::create_swf_jpeg2_header_only(tu_file* in, unsigned int maxHeaderBytes, bool takeOwnership)
 {
 	using tu_file_wrappers::input_tu_file;
-	input* ret = new input_tu_file(input_tu_file::SWF_JPEG2_HEADER_ONLY, in, takeOwnership);
+	input* ret = new input_tu_file(input_tu_file::SWF_JPEG2_HEADER_ONLY, in, maxHeaderBytes, takeOwnership);
 	return ret;
 }
 

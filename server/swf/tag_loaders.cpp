@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.170 2007/12/13 11:40:13 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.171 2007/12/14 12:35:17 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -233,12 +233,13 @@ jpeg_tables_loader(stream* in, tag_type tag, movie_definition* m)
     unsigned long currPos = in->get_position();
     unsigned long endPos = in->get_tag_end_position();
 
-    if ( endPos == currPos )
+    assert(endPos >= currPos);
+
+    unsigned int jpegHeaderSize = endPos-currPos;
+
+    if ( ! jpegHeaderSize )
     {
-        IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("No bytes to read in JPEGTABLES tag at offset %lu"), currPos);
-        );
-        return;
+        log_debug(_("No bytes to read in JPEGTABLES tag at offset %lu"), currPos);
     }
 
     std::auto_ptr<jpeg::input> j_in;
@@ -258,7 +259,7 @@ jpeg_tables_loader(stream* in, tag_type tag, movie_definition* m)
 	//
         std::auto_ptr<tu_file> ad( StreamAdapter::getFile(*in, std::numeric_limits<unsigned long>::max()) );
         //  transfer ownerhip to the jpeg::input
-        j_in.reset(jpeg::input::create_swf_jpeg2_header_only(ad.release(), true));
+        j_in.reset(jpeg::input::create_swf_jpeg2_header_only(ad.release(), jpegHeaderSize, true));
 
     }
     catch (std::exception& e)
@@ -269,7 +270,7 @@ jpeg_tables_loader(stream* in, tag_type tag, movie_definition* m)
         return;
     }
 
-    log_debug("Setting jpeg loader to %p", j_in.get());
+    log_debug("Setting jpeg loader to %p", (void*)j_in.get());
     m->set_jpeg_loader(j_in);
 }
 

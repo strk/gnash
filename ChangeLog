@@ -1,5 +1,13 @@
 2007-12-14 Sandro Santilli <strk@keybit.net>
 
+	* libbase/jpeg.{cpp,h}: get a max header bytes parameter to limit
+	  input stream. Currently only used to skip a 0-sized header
+	  while still allowing further parsing of DEFINEBITS tag.
+	* server/swf/tag_loaders.cpp: pass max header bytes when parsing
+	  JPEGTABLES. Fixes the 0-length JPEGTABLES tag (missing a testcase).
+
+2007-12-14 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/movies.all/Makefile.am: don't abort on failure.
 	  
 2007-12-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>

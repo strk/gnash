@@ -69,6 +69,9 @@ namespace jpeg
 		///	The tu_file to use for input. Ownership specified
 		///	by last arg.
 		///
+		/// @param maxHeaderBytes
+		///	Max number of bytes to read from input for header.
+		///
 		/// @param takeOwnership
 		///	If false, ownership of the stream 
 		///	is left to caller, otherwise we take it.
@@ -79,7 +82,7 @@ namespace jpeg
 		/// @return NULL on error
 		///
 		DSOEXPORT static input*	create_swf_jpeg2_header_only(tu_file* in,
-				bool takeOwnership=false);
+				unsigned int maxHeaderBytes, bool takeOwnership=false);
 
 		/// Discard existing bytes in our buffer.
 		virtual void	discard_partial_buffer() = 0;
