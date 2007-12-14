@@ -498,10 +498,13 @@ SoundFfmpeg::getPosition()
 	}
 
 	// Return the position in the file in milliseconds
-	if (formatCtx && audioIndex) {
+	if (formatCtx && audioIndex >= 0)
+	{
 		double time = (double)formatCtx->streams[audioIndex]->time_base.num / formatCtx->streams[audioIndex]->time_base.den * (double)formatCtx->streams[audioIndex]->cur_dts;
 		return static_cast<unsigned int>(time * 1000);
-	} else {
+	}
+	else
+	{
 		return 0;
 	}
 }

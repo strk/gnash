@@ -1,3 +1,8 @@
+2007-12-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/asobj/SoundFfmpeg.cpp: fix a segfault in getPosition()
+	  when no audio stream is found.
+
 2007-12-14 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* testsuite/misc-ming.all/runtime_vm_stack_test.c, Makefile.am:
