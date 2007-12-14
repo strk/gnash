@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.172 2007/12/14 13:20:15 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.173 2007/12/14 16:31:49 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -256,12 +256,8 @@ jpeg_tables_loader(stream* in, tag_type tag, movie_definition* m)
 	// instance will be used for reading subsequent DEFINEBITS and similar
 	// tags, which are *different* tags, so have different boundaries !!
 	//
-	// What we'll need to do is add boundary checking in jpeg::input::createXXX
-	// directly, which would use the tu_file adapter which should supposedly 
-	// share the same position as the underlying gnash::stream
-	//
-	// For now we'll just set the limit to max unsigned long value.
-	// This fixes elvis.swf, strip.swf and gansta_rap_se.swf (and who knows which others)
+	// Anyway the actual reads are limited to currently opened tag as 
+	// of gnash::stream::read(), so this is not a problem.
 	//
         std::auto_ptr<tu_file> ad( StreamAdapter::getFile(*in, std::numeric_limits<unsigned long>::max()) );
         //  transfer ownerhip to the jpeg::input
