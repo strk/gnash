@@ -135,6 +135,7 @@ main(int argc, char** argv)
   
   
   add_actions(mo,
+    "orignal_target_var = 100;"
     "setTarget('non-exist-target');"
     "current_target = 0;"
     "asm{   "
@@ -152,11 +153,14 @@ main(int argc, char** argv)
     " gotoAndPlay(10);"
     // the above gotoFrame has no effect as it was acting on an non-exist-target
     "   _root.xcheck_equals(_root._currentframe, 9);"
+    // ascend to the orignal target is the current target is undefined
+    // we succeed by luck.
+    "   _root.check_equals(orignal_target_var, 100);"
     "setTarget('');"); 
   SWFMovie_nextFrame(mo); // 9th frame
   
   
-  add_actions(mo, "xtotals(10); stop();");
+  add_actions(mo, "xtotals(11); stop();");
   SWFMovie_nextFrame(mo); // 10th frame
   
   //Output movie
