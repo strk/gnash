@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.67 2007/11/30 11:26:05 strk Exp $ */
+/* $Id: character.cpp,v 1.68 2007/12/14 20:51:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -77,16 +77,6 @@ character::get_world_cxform() const
 	return m;
 }
 
-sprite_instance*
-character::get_root_movie()
-{
-	assert(m_parent != NULL);
-#ifndef GNASH_USE_GC
-	assert(m_parent->get_ref_count() > 0);
-#endif // GNASH_USE_GC
-	return m_parent->get_root_movie();
-}
-
 void
 character::get_mouse_state(int& x, int& y, int& buttons)
 {
@@ -125,7 +115,8 @@ character::get_path_element_character(string_table::key key)
 	}
 	else if (name == "_root")
 	{
-		return get_root_movie();
+		// TODO: handle lockroot ? or have get_root handle it ?
+		return get_root();
 	}
 	else if (name.compare(0, 6, "_level") == 0 && name.find_first_not_of("0123456789", 7) == string::npos )
 	{

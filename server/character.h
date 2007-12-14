@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.114 2007/12/10 20:17:16 strk Exp $ */
+/* $Id: character.h,v 1.115 2007/12/14 20:51:20 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -709,12 +709,9 @@ public:
 	/// TODO: what about programmatically created characters ?
 	///	  which would their "relative" root be ?
 	///
-	/// The default implementation is to invoke get_root_movie
+	/// The default implementation is to invoke get_root
 	/// against this character's parent.
 	///
-	virtual sprite_instance* get_root_movie();
-
-	/// By default call get_root on the parent
 	virtual movie_instance* get_root() const {
 		return get_parent()->get_root();
 	}

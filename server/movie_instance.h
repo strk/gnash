@@ -59,13 +59,6 @@ public:
 
 	virtual void advance();
 
-	// Could be implemented in sprite_instance too,
-	// returning m_root like it is done for get_root_movie...
-	virtual movie_instance* get_root() const
-	{
-		return const_cast<movie_instance*>(this);
-	}
-
 	/// Handle a top-level movie on stage placement.
 	//
 	/// This method will just ensure first frame is loaded

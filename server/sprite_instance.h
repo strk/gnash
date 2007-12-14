@@ -116,7 +116,10 @@ public:
 	/// Return this sprite's relative root as
 	/// specified at contruction time
 	///
-	virtual sprite_instance* get_root_movie();
+	virtual movie_instance* get_root() const
+	{
+		return m_root;
+	}
 
 	/// \brief
 	/// Return the sprite_definition (or movie_definition)

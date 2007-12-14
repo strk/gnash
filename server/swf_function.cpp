@@ -235,8 +235,9 @@ swf_function::operator()(const fn_call& fn)
 		if (m_function2_flags & PRELOAD_ROOT) 
 		{
 			// Put '_root' in a register.
+			// TODO: handle lockroot ? (or let get_root() do that?)
 			our_env->local_register(current_reg).set_as_object(
-				our_env->get_target()->get_root_movie());
+				our_env->get_target()->get_root());
 			current_reg++;
 		}
 

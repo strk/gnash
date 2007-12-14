@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.170 2007/12/12 10:23:47 zoulunkai Exp $ */
+/* $Id: ASHandlers.cpp,v 1.171 2007/12/14 20:51:21 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1336,7 +1336,7 @@ SWFHandlers::ActionStopDragMovie(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
-    sprite_instance *root_movie = env.get_target()->get_root_movie();
+    sprite_instance *root_movie = env.get_target()->get_root();
     assert(root_movie);
     root_movie->stop_drag();
 }
@@ -2103,7 +2103,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		if (s_fscommand_handler)
 		{
 			// Call into the app.
-			(*s_fscommand_handler)(env.get_target()->get_root_movie(), url_c + 10, target_string.c_str());
+			(*s_fscommand_handler)(env.get_target()->get_root(), url_c + 10, target_string.c_str());
 		}
 
 		return;

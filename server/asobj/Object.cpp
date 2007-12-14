@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Object.cpp,v 1.38 2007/11/27 15:39:41 strk Exp $ */
+/* $Id: Object.cpp,v 1.39 2007/12/14 20:51:21 strk Exp $ */
 
 #include "tu_config.h"
 #include "Object.h"
@@ -26,7 +26,7 @@
 #include "as_object.h" // for inheritance
 #include "builtin_function.h" // need builtin_function
 #include "movie_definition.h" // for Object.registerClass (get_exported_resource)
-#include "character.h" // for Object.registerClass  (get_root_movie)
+//#include "character.h" // for Object.registerClass  (get_root_movie)
 #include "sprite_instance.h" // for Object.registerClass  (get_movie_definition)
 #include "sprite_definition.h" // for Object.registerClass  (get_movie_definition)
 #include "VM.h" // for SWF version (attachObjectInterface)

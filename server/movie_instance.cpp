@@ -49,7 +49,7 @@ movie_instance::stagePlacementCallback()
 {
 	//GNASH_REPORT_FUNCTION;
 
-	assert ( get_root()->get_root_movie() == this );
+	assert ( get_root()->get_root() == this );
 
 	//_def->stopLoader();
 
@@ -73,7 +73,7 @@ movie_instance::advance()
 {
 	//GNASH_REPORT_FUNCTION;
 
-	assert ( get_root()->get_root_movie() == this );
+	assert ( get_root()->get_root() == this );
 
 	//_def->stopLoader();
 

@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.95 2007/12/10 20:17:17 strk Exp $ */
+/* $Id: movie_root.h,v 1.96 2007/12/14 20:51:20 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -302,12 +302,6 @@ public:
     void get_drag_state(drag_state& st);
 
     void set_drag_state(const drag_state& st);
-
-    // just an alias to getRootMovie
-    sprite_instance* get_root_movie() const
-    {
-	return getRootMovie();
-    }
 
     /// @return current top-level root sprite (_level0)
     movie_instance* getRootMovie() const

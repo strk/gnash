@@ -1,5 +1,17 @@
 2007-12-14 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui.cpp, server/as_environment.cpp, server/as_value.cpp,
+	  server/character.cpp, server/character.h,
+	  server/movie_instance.cpp, server/movie_instance.h,
+	  server/movie_root.h, server/sprite_instance.cpp,
+	  server/sprite_instance.h, server/swf_function.cpp,
+	  server/asobj/Object.cpp, server/vm/ASHandlers.cpp:
+	  Drop duplicated character::get_root_movie(), which does the same as
+	  character::get_root(); drop movie_root::get_root_movie, use the
+	  new getRootMovie name.
+
+2007-12-14 Sandro Santilli <strk@keybit.net>
+
 	* server/swf/DoInitActionTag.h: store referenced character
 	  in the instance, pass to execute_init_actions when
 	  executing; add self as a normal control tag.

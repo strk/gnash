@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.115 2007/11/26 16:27:27 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.116 2007/12/14 20:51:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -537,7 +537,7 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
     if (*p == '/')
     {
 	// Absolute path.  Start at the root.
-	sprite_instance* root = m_target->get_root_movie();
+	sprite_instance* root = m_target->get_root();
 	if ( ! *(++p) )
 	{
 #ifdef DEBUG_TARGET_FINDING 

@@ -1477,7 +1477,7 @@ as_value::SpriteProxy::find_sprite_by_target(const std::string& tgtstr)
 
 	VM& vm = VM::get();
 	string_table& st = vm.getStringTable();
-	as_object* o = vm.getRoot().get_root_movie();
+	as_object* o = vm.getRoot().getRootMovie();
 
 	// TODO: for another optimization we may cache
 	//       the string_table::key for each element

@@ -694,8 +694,8 @@ Gui::advanceMovie()
 	// Advance movie by one frame
 	m->advance(1.0);
 #else
-	size_t cur_frame = m->get_root_movie()->get_current_frame();
-	size_t tot_frames = m->get_root_movie()->get_frame_count();
+	size_t cur_frame = m->getRootMovie()->get_current_frame();
+	size_t tot_frames = m->getRootMovie()->get_frame_count();
 	m->advance(1.0);
 	m->get_movie_definition()->ensure_frame_loaded(tot_frames);
 	m->goto_frame(cur_frame+1);
@@ -748,7 +748,7 @@ Gui::advanceMovie()
 	if ( ! loops() )
 	{
 		size_t curframe = m->get_current_frame(); // can be 0 on malformed SWF
-		gnash::sprite_instance* si = m->get_root_movie();
+		gnash::sprite_instance* si = m->getRootMovie();
 		if (curframe + 1 >= si->get_frame_count())
 		{
 			quit(); 
