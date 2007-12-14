@@ -48,6 +48,20 @@ stream::~stream()
 unsigned stream::read(char *buf, unsigned count)
 {
 	align();
+
+	// If we're in a tag, make sure we're not seeking outside the tag.
+	if ( ! _tagBoundsStack.empty() )
+	{
+		TagBoundaries& tb = _tagBoundsStack.back();
+		unsigned long end_pos = tb.second;
+		unsigned long cur_pos = get_position();
+		assert(end_pos >= cur_pos);
+		unsigned long left = end_pos - cur_pos;
+		if ( left < count ) count = left;
+	}
+
+	if ( ! count ) return 0;
+
 	return m_input->read_bytes(buf, count);
 }
 
@@ -381,7 +395,7 @@ bool	stream::set_position(unsigned long pos)
 	align();
 
 	// If we're in a tag, make sure we're not seeking outside the tag.
-	if (_tagBoundsStack.size() > 0)
+	if ( ! _tagBoundsStack.empty() )
 	{
 		TagBoundaries& tb = _tagBoundsStack.back();
 		unsigned long end_pos = tb.second;

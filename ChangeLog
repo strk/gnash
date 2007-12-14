@@ -1,5 +1,10 @@
 2007-12-14 Sandro Santilli <strk@keybit.net>
 
+	* server/stream.cpp (read): don't allow block reads to cross
+	  tag boundaries.
+
+2007-12-14 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/FLVParser.h: drop comma at end of enumerator list
 	* server/swf/tag_loaders.cpp: provide a 'tell' function to
 	  StreamAdapter. 
