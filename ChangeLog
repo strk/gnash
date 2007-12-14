@@ -1,5 +1,10 @@
 2007-12-14 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/shape_character_def.cpp: fix compiler warnings,
+	  one of which about possible use of uninitialized value...
+
+2007-12-14 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.{cpp,h}, 
 	  server/parser/movie_def_impl.{cpp,h},
 	  server/parser/movie_definition.h,

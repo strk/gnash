@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.59 2007/12/12 10:23:47 zoulunkai Exp $ */
+/* $Id: shape_character_def.cpp,v 1.60 2007/12/14 22:21:21 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -918,7 +918,6 @@ bool  shape_character_def::point_test_local(float x, float y)
     for (unsigned eno=0; eno<nedges; eno++) {
     
       const edge& edg = pth.m_edges[eno];
-      int fill;
       
       pen_x = next_pen_x;
       pen_y = next_pen_y;
@@ -938,7 +937,7 @@ bool  shape_character_def::point_test_local(float x, float y)
       */
         
       float cross1, cross2;
-      int dir1, dir2; // +1 = downward, -1 = upward
+      int dir1, dir2=0; // +1 = downward, -1 = upward
       int crosscount=0;
       
       if (edg.is_straight()) {
