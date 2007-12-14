@@ -1,5 +1,11 @@
 2007-12-14 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp: immediately store bitmap_character_def
+	  instances into an instrusive_ptr to make add_bitmap_character_def
+	  calls safe. Should fix bug #21377.
+
+2007-12-14 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/shape_character_def.cpp: fix compiler warnings,
 	  one of which about possible use of uninitialized value...
 

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.173 2007/12/14 16:31:49 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.174 2007/12/14 23:10:17 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -319,7 +319,7 @@ define_bits_jpeg_loader(stream* in, tag_type tag, movie_definition* m)
     }
     
     
-    bitmap_character_def* ch = new bitmap_character_def(im);
+    boost::intrusive_ptr<bitmap_character_def> ch = new bitmap_character_def(im);
     
     if ( m->get_bitmap_character_def(character_id) )
     {
@@ -329,7 +329,7 @@ define_bits_jpeg_loader(stream* in, tag_type tag, movie_definition* m)
     }
     else
     {
-        m->add_bitmap_character_def(character_id, ch);
+        m->add_bitmap_character_def(character_id, ch.get());
     }
 }
 
@@ -365,8 +365,8 @@ define_bits_jpeg2_loader(stream* in, tag_type tag, movie_definition* m)
 	}
 	else
 	{
-	    bitmap_character_def* ch = new bitmap_character_def(im);
-    	    m->add_bitmap_character_def(character_id, ch);
+	    boost::intrusive_ptr<bitmap_character_def> ch = new bitmap_character_def(im);
+    	    m->add_bitmap_character_def(character_id, ch.get());
 	}
     }
 }
@@ -511,9 +511,9 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 	}
 
 	// Create bitmap character.
-	bitmap_character_def* ch = new bitmap_character_def(im);
+	boost::intrusive_ptr<bitmap_character_def> ch = new bitmap_character_def(im);
 
-	m->add_bitmap_character_def(character_id, ch);
+	m->add_bitmap_character_def(character_id, ch.get());
 #endif
     }
 }
@@ -656,10 +656,10 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 	    }
 	    else
 	    {
-		bitmap_character_def* ch = new bitmap_character_def(image);
+		boost::intrusive_ptr<bitmap_character_def> ch = new bitmap_character_def(image);
 
 		// add image to movie, under character id.
-		m->add_bitmap_character_def(character_id, ch);
+		m->add_bitmap_character_def(character_id, ch.get());
 	    }
 	}
 	else
@@ -757,10 +757,10 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 		}
 	    }
 
-	    bitmap_character_def* ch = new bitmap_character_def(image);
+	    boost::intrusive_ptr<bitmap_character_def> ch = new bitmap_character_def(image);
 
 	    // add image to movie, under character id.
-	    m->add_bitmap_character_def(character_id, ch);
+	    m->add_bitmap_character_def(character_id, ch.get());
 	}
 #endif // HAVE_ZLIB_H
 
