@@ -1,5 +1,13 @@
 2007-12-14 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfmill.all/: Makefile.am,
+	  initaction_in_definesprite.xml: test that DOINITACTION
+	  tags in sprite definitions are valid, and that whether or
+	  not an INITACTION tag was executed should be registered
+	  in the definition being referenced.
+
+2007-12-14 Sandro Santilli <strk@keybit.net>
+
 	* server/stream.cpp (read): don't allow block reads to cross
 	  tag boundaries.
 

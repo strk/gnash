@@ -27,6 +27,7 @@ SC_XMLTESTS =			\
 	hello.xml		\
 	jump_after_end.xml	\
 	dict_override.xml	\
+	initaction_in_definesprite.xml \
 	$(NULL)
 
 ## Path to Dejagnu.swf file
@@ -43,6 +44,7 @@ Dejagnu.swf: $(DEJAGNU_SO_PATH)
 check_SCRIPTS = \
 	jump_after_end-runner	\
 	dict_override-runner	\
+	initaction_in_definesprite-runner	\
 	$(NULL)
 
 jump_after_end-runner: $(srcdir)/../generic-testrunner.sh jump_after_end.swf Makefile
@@ -51,6 +53,10 @@ jump_after_end-runner: $(srcdir)/../generic-testrunner.sh jump_after_end.swf Mak
 
 dict_override-runner: $(srcdir)/../generic-testrunner.sh dict_override.swf Makefile
 	sh $< -r 50 -c "END OF TEST" $(top_builddir) dict_override.swf > $@
+	chmod 755 $@
+
+initaction_in_definesprite-runner: $(srcdir)/../generic-testrunner.sh initaction_in_definesprite.swf Makefile
+	sh $< -r 50 -C "END OF TEST" $(top_builddir) initaction_in_definesprite.swf > $@
 	chmod 755 $@
 
 .xml.swf: 

@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<swf version="6" compressed="1">
+
+<!--
+  |
+  |  This file test that DOINITACTION tag inside a DEFINESPRITE is allowed
+  |  and results in the action to be executed only once and only if the 
+  |  defined sprite is placed.
+  |
+  |  Also, this file tests that of multiple DOINITACTION tags referring to
+  |  the *same* character only the first executed gets trough, no matter in
+  |  which timeline the DOINITACTION tag is.
+  |
+  |  Expected output is just an 'END OF TEST' trace.
+  |
+  |  The test could be improved a lot but it ain't easy to do AS coding
+  |  in swfmill....
+  |
+-->
+  <Header framerate="12" frames="1">
+    <size>
+      <Rectangle left="0" right="12800" top="0" bottom="9600"/>
+    </size>
+    <tags>
+
+      <DefineSprite objectID="1" frames="1">
+        <tags>
+          <ShowFrame/>
+          <End/>
+        </tags>
+      </DefineSprite>
+
+      <DefineSprite objectID="3" frames="1">
+        <tags>
+          <DoInitAction sprite="1">
+            <actions>
+              <PushData>
+                <items>
+                  <StackString value="init action from sprite3 for sprite 1"/>
+                </items>
+              </PushData>
+              <Trace/>
+              <EndAction/>
+            </actions>
+          </DoInitAction>
+          <ShowFrame/>
+          <End/>
+        </tags>
+      </DefineSprite>
+
+      <DefineSprite objectID="2" frames="1">
+        <tags>
+          <DoInitAction sprite="1">
+            <actions>
+              <PushData>
+                <items>
+                  <StackString value="END OF TEST"/>
+                </items>
+              </PushData>
+              <Trace/>
+              <EndAction/>
+            </actions>
+          </DoInitAction>
+          <ShowFrame/>
+          <End/>
+        </tags>
+      </DefineSprite>
+
+      <!--
+        |  Place the sprite2 containing DOINITACTION block
+        |  referring to object2
+       -->
+      <PlaceObject2 replace="0" depth="1" objectID="2">
+      </PlaceObject2>
+
+      <!--
+        |  Place the sprite2 containing DOINITACTION block
+        |  referring to object2 *again* at a different depth.
+        | Init actions won't be executed again
+       -->
+      <PlaceObject2 replace="0" depth="2" objectID="2">
+      </PlaceObject2>
+
+      <!--
+        |  Place the sprite3 containing DOINITACTION block
+        |  referring to object2, for which init actions where
+        |  already executed !
+       -->
+      <PlaceObject2 replace="0" depth="3" objectID="3">
+      </PlaceObject2>
+
+      <ShowFrame/>
+      <End/>
+
+    </tags>
+  </Header>
+</swf>
