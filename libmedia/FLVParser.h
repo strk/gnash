@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.h,v 1.6 2007/12/12 10:06:59 zoulunkai Exp $
+// $Id: FLVParser.h,v 1.7 2007/12/14 14:24:36 strk Exp $
 
 // Information about the FLV format can be found at http://osflash.org/flv
 
@@ -34,7 +34,7 @@ namespace media {
 
 enum {
 	CONTAINS_VIDEO = 1,
-	CONTAINS_AUDIO = 4,
+	CONTAINS_AUDIO = 4
 };
 
 class FLVVideoFrame
