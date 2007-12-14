@@ -159,6 +159,7 @@ check_PROGRAMS = \
 	morph_test1 \
 	morph_test1runner \
 	opcode_guard_test \
+	runtime_vm_stack_test \
 	$(NULL)
 
 if MING_VERSION_0_4
@@ -244,6 +245,7 @@ check_SCRIPTS = \
 	DefineEditTextVariableNameTest-Runner \
 	DefineEditTextVariableNameTest2-Runner \
 	opcode_guard_testrunner \
+	runtime_vm_stack_testrunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -339,6 +341,18 @@ opcode_guard_test.swf: opcode_guard_test
 
 opcode_guard_testrunner: $(srcdir)/../generic-testrunner.sh opcode_guard_test.swf
 	sh $< $(top_builddir) opcode_guard_test.swf > $@
+	chmod 755 $@
+
+runtime_vm_stack_test_SOURCES =	\
+	runtime_vm_stack_test.c	\
+	$(NULL)
+runtime_vm_stack_test_LDADD = libgnashmingutils.la
+
+runtime_vm_stack_test.swf: runtime_vm_stack_test
+	./runtime_vm_stack_test $(top_srcdir)/testsuite/media
+
+runtime_vm_stack_testrunner: $(srcdir)/../generic-testrunner.sh runtime_vm_stack_test.swf
+	sh $< $(top_builddir) runtime_vm_stack_test.swf > $@
 	chmod 755 $@
 	
 PlaceObject2Test_SOURCES =	\
@@ -1627,7 +1641,7 @@ TEST_CASES = \
 	consecutive_goto_frame_testrunner \
 	multi_doactions_and_goto_frame_testrunner \
 	registerClassTestRunner \
-        action_execution_order_testrunner \
+	action_execution_order_testrunner \
 	action_execution_order_extend_testrunner \
 	simple_loop_testrunner \
 	loadMovieTestRunner \
@@ -1684,6 +1698,7 @@ TEST_CASES = \
 	morph_test1runner \
 	registerClassTest2runner \
 	opcode_guard_testrunner \
+	runtime_vm_stack_testrunner \
 	$(NULL)
 
 if MING_VERSION_0_4
