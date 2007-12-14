@@ -60,6 +60,7 @@ main(int argc, char** argv)
   
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
+  add_actions(mo, "testvar1 = 0; testvar2 = 0;");
   SWFMovie_nextFrame(mo); // frame1
   
   //
@@ -84,10 +85,16 @@ main(int argc, char** argv)
   it1 = SWFMovie_add(mo, (SWFBlock)mc1);  
   SWFDisplayItem_setDepth(it1, 3); 
   SWFDisplayItem_setName(it1, "static_mc1");
+  SWFDisplayItem_addAction(it1,
+    newSWFAction(" _root.testvar1++; trace(this); trace(_root.testvar1); "),
+    SWFACTION_INIT | SWFACTION_CONSTRUCT | SWFACTION_ONLOAD);  
   
   it2 = SWFMovie_add(mo, (SWFBlock)mc2); 
   SWFDisplayItem_setDepth(it2, 3); 
   SWFDisplayItem_setName(it2, "static_mc2");
+  SWFDisplayItem_addAction(it2,
+    newSWFAction(" _root.testvar2++; trace(this); trace(_root.testvar2); "),
+    SWFACTION_INIT | SWFACTION_CONSTRUCT | SWFACTION_ONLOAD); 
   
   check_equals(mo, "typeof(static_mc1)", "'movieclip'");
   if(OUTPUT_VERSION > 5)
@@ -101,6 +108,18 @@ main(int argc, char** argv)
     check_equals(mo, "typeof(static_mc2)", "'movieclip'");
   }
   SWFMovie_nextFrame(mo); // frame3
+  
+  if(OUTPUT_VERSION > 5)
+  {
+    check_equals(mo, "testvar1", "3");
+    check_equals(mo, "testvar2", "0");
+  }
+  else
+  {
+    // swf5 does not support CONSTRUCT event
+    check_equals(mo, "testvar1", "2");
+    check_equals(mo, "testvar2", "2");
+  }
   
   //
   // Place mc2 at depth 3 again.
