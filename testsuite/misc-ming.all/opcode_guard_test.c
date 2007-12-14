@@ -133,8 +133,31 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); // 7th frame
   SWFMovie_nextFrame(mo); // 8th frame
   
-  add_actions(mo, "xtotals(6); stop();");
+  
+  add_actions(mo,
+    "setTarget('non-exist-target');"
+    "current_target = 0;"
+    "asm{   "
+    "   push  'current_target' "
+    "   push  '' "
+    "   push  11 " //_target   
+    "   getproperty  "
+    "   setvariable  "
+    "}; "
+    // non-exist target does not evaluated to _root!
+    " _root.xcheck_equals(current_target, undefined);"
+    // No surprise, getVariable will ascend to _root!
+    " _root.check_equals(_target, '/');"
+    " _root.check_equals(_root._currentframe, 9);"
+    " gotoAndPlay(10);"
+    // the above gotoFrame has no effect as it was acting on an non-exist-target
+    "   _root.xcheck_equals(_root._currentframe, 9);"
+    "setTarget('');"); 
   SWFMovie_nextFrame(mo); // 9th frame
+  
+  
+  add_actions(mo, "xtotals(10); stop();");
+  SWFMovie_nextFrame(mo); // 10th frame
   
   //Output movie
   puts("Saving " OUTPUT_FILENAME );
