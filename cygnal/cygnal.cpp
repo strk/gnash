@@ -116,8 +116,6 @@ static int port_offset = 0;
 int
 main(int argc, char *argv[])
 {
-    dbglogfile.openLog("cygnal-dbg.log");
-    
     // Initialize national language support
 #ifdef ENABLE_NLS
     setlocale (LC_MESSAGES, "");
@@ -142,6 +140,12 @@ main(int argc, char *argv[])
 
     crcfile.loadFiles();
 
+    if (crcfile.getDebugLog().size()) {
+	dbglogfile.openLog(crcfile.getDebugLog());
+    } else {
+	dbglogfile.openLog("/tmp/cygnal-dbg.log");
+    }
+    
     if (crcfile.verbosityLevel() > 0) {
         dbglogfile.setVerbosity(crcfile.verbosityLevel());
     }    
@@ -245,8 +249,6 @@ http_thread(struct thread_params *conndata)
 	if (www.getFileStats(filespec) == HTTP::ERROR) {
 	    www.formatErrorResponse(HTTP::NOT_FOUND);
 	}
-
-	cerr << "FileSize is: " << www.getFileSize() << endl;
 	www.sendGetReply(HTTP::LIFE_IS_GOOD);
 //	strcpy(thread_data.filespec, filespec.c_str());
 //	thread_data.statistics = conndata->statistics;
