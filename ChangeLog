@@ -1,3 +1,7 @@
+2007-12-14 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/movies.all/Makefile.am: don't abort on failure.
+	  
 2007-12-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/asobj/SoundFfmpeg.cpp: fix a segfault in getPosition()
