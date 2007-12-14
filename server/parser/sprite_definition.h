@@ -300,16 +300,6 @@ private:
 		m_playlist[m_loading_frame].push_back(c);
 	}
 
-	/// Overridden just for complaining  about malformed SWF
-	//
-	/// Sprite def's should not have do_init_action tags in them!  (@@ correct?)
-	virtual void	add_init_action(ControlTag* /*c*/, int /*cid*/)
-	{
-		IF_VERBOSE_MALFORMED_SWF (
-		log_swferror(_("sprite_definition::add_init_action called!  Ignored"));
-		);
-	}
-
 	// See dox in movie_definition.h
 	virtual void	add_frame_name(const std::string& name);
 

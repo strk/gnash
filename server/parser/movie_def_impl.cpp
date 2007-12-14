@@ -1050,14 +1050,4 @@ movie_def_impl::markReachableResources() const
 }
 #endif // GNASH_USE_GC
 
-void
-movie_def_impl::add_init_action(ControlTag* e, int cid)
-{
-	assert(e);
-	if ( m_init_action_defined.insert(cid).second )
-	{
-		addControlTag(e); // ownership transferred
-	}
-}
-
 } // namespace gnash

@@ -217,9 +217,6 @@ private:
 	/// Movie control events for each frame.
 	PlayListMap m_playlist;
 
-	/// A map to track init actions ids (subsequent init actions for the same id have to be discarded)
-	std::set<int> m_init_action_defined;
-
 	/// 0-based frame #'s
 	typedef std::map<std::string, size_t> NamedFrameMap;
 	NamedFrameMap _namedFrames;
@@ -492,10 +489,6 @@ public:
 	    boost::mutex::scoped_lock lock(_frames_loaded_mutex);
 	    m_playlist[_frames_loaded].push_back(tag);
 	}
-
-	/// Need to execute the given tag before entering the
-	/// currently-loading frame for the first time.
-	void	add_init_action(ControlTag* e, int cid);
 
 	// See dox in movie_definition.h
 	//

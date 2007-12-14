@@ -979,9 +979,6 @@ private:
 	// true is we're calling frame actions
 	bool _callingFrameActions;
 
-	// a bit-array class would be ideal for this
-	//std::set<size_t>	m_init_actions_executed;
-
 	/// This timeline's variable scope
 	as_environment	m_as_environment;
 

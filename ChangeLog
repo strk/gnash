@@ -1,5 +1,13 @@
 2007-12-14 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.{cpp,h}, 
+	  server/parser/movie_def_impl.{cpp,h},
+	  server/parser/movie_definition.h,
+	  server/parser/sprite_definition.h:
+	  Remove dead init actions code. 
+
+2007-12-14 Sandro Santilli <strk@keybit.net>
+
 	* gui/gui.cpp, server/as_environment.cpp, server/as_value.cpp,
 	  server/character.cpp, server/character.h,
 	  server/movie_instance.cpp, server/movie_instance.h,

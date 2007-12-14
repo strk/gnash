@@ -1829,7 +1829,6 @@ sprite_instance::sprite_instance(
 	m_has_looped(false),
 	is_jumping_back(false),
 	_callingFrameActions(false),
-	//m_init_actions_executed(),
 	m_as_environment(),
 	m_has_key_event(false),
 	m_has_mouse_event(false),
@@ -1845,9 +1844,6 @@ sprite_instance::sprite_instance(
 			
 	//m_root->add_ref();	// @@ circular!
 	m_as_environment.set_target(this);
-
-	// Initialize the flags for init action executed.
-	//m_init_actions_executed.assign(m_def->get_frame_count(), false);
 
 	// TODO: have the 'MovieClip' constructor take care of this !
 	attachMovieClipProperties(*this);
@@ -2604,9 +2600,6 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 			std::for_each(playlist->begin(), playlist->end(), boost::bind(&ControlTag::execute_action, _1, this));
 		}
 	}
-
-	// Mark this frame's init actions as executed 
-	//m_init_actions_executed.insert(frame);
 
 	testInvariant();
 }

@@ -334,21 +334,11 @@ public:
 	{
 	}
 
-	/// \brief
-	/// Add an init action to the frame currently being loaded
-	/// and the specified character id
-	//
-	/// The default implementation is a no-op.
-	///
-	virtual void	add_init_action(ControlTag* /*c*/, int /*cid*/)
-	{
-	}
-
 	/// Labels the frame currently being loaded with the given name. 
 	//
 	/// A copy of the name string is made and kept in this object.
-    /// In case of multiple frames with the same name, the last added
-    /// will be the one referenced by that name.
+	/// In case of multiple frames with the same name, the last added
+	/// will be the one referenced by that name.
 	///
 	/// The default implementation is a no-op.
 	///
