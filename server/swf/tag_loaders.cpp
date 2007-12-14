@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.171 2007/12/14 12:35:17 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.172 2007/12/14 13:20:15 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -127,6 +127,12 @@ class StreamAdapter
 		return (br->endPos - br->startPos);
 	}
 
+	static int tellFunc(void* appdata)
+	{
+		StreamAdapter* br = (StreamAdapter*) appdata;
+		return br->currPos;
+	}
+
 	static int closeFunc(void* appdata)
 	{
 		StreamAdapter* br = (StreamAdapter*) appdata;
@@ -146,7 +152,7 @@ public:
 				0, // write_func wf,
 				0, //seek_func sf,
 				0, //seek_to_end_func ef,
-				0, //tell_func tf,
+				tellFunc, //tell_func tf,
 				0, //get_eof_func gef,
 				0, //get_err_func ger
 				getStreamSizeFunc, // get_stream_size_func gss,

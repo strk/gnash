@@ -1,5 +1,7 @@
 2007-12-14 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp: provide a 'tell' function to
+	  StreamAdapter. 
 	* libbase/jpeg.{cpp,h}: get a max header bytes parameter to limit
 	  input stream. Currently only used to skip a 0-sized header
 	  while still allowing further parsing of DEFINEBITS tag.
