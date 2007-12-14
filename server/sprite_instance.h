@@ -525,13 +525,19 @@ public:
 	
 	/// \brief
 	/// Execute the given init action buffer, if not done yet
-	/// for the current frame
+	/// for the target character id.
 	//
 	/// The action will normally be pushed on queue, but will
 	/// be executed immediately if we are executing actions
 	/// resulting from a callFame instead.
 	///
-	void execute_init_action_buffer(const action_buffer& a);
+	/// @param a
+	///	The action buffer to execute
+	///
+	/// @param cid
+	///	The referenced character id
+	///
+	void execute_init_action_buffer(const action_buffer& a, int cid);
 
 	/// Execute a single action buffer (DOACTION block)
 	void execute_action(const action_buffer& ab);
@@ -971,7 +977,7 @@ private:
 	bool _callingFrameActions;
 
 	// a bit-array class would be ideal for this
-	std::set<size_t>	m_init_actions_executed;
+	//std::set<size_t>	m_init_actions_executed;
 
 	/// This timeline's variable scope
 	as_environment	m_as_environment;

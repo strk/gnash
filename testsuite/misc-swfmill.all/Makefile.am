@@ -56,7 +56,7 @@ dict_override-runner: $(srcdir)/../generic-testrunner.sh dict_override.swf Makef
 	chmod 755 $@
 
 initaction_in_definesprite-runner: $(srcdir)/../generic-testrunner.sh initaction_in_definesprite.swf Makefile
-	sh $< -r 50 -C "END OF TEST" $(top_builddir) initaction_in_definesprite.swf > $@
+	sh $< -r 50 -c "END OF TEST" $(top_builddir) initaction_in_definesprite.swf > $@
 	chmod 755 $@
 
 .xml.swf: 

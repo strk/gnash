@@ -1829,7 +1829,7 @@ sprite_instance::sprite_instance(
 	m_has_looped(false),
 	is_jumping_back(false),
 	_callingFrameActions(false),
-	m_init_actions_executed(),
+	//m_init_actions_executed(),
 	m_as_environment(),
 	m_has_key_event(false),
 	m_has_mouse_event(false),
@@ -2489,9 +2489,10 @@ void sprite_instance::advance()
 }
 
 void
-sprite_instance::execute_init_action_buffer(const action_buffer& a)
+sprite_instance::execute_init_action_buffer(const action_buffer& a, int cid)
 {
-	if ( m_init_actions_executed.find(m_current_frame) == m_init_actions_executed.end() )
+	movie_instance* mi = get_root();
+	if ( mi->setCharacterInitialized(cid) )
 	{
 #ifdef GNASH_DEBUG
 		log_debug("Queuing init actions in frame " SIZET_FMT " of sprite %s", m_current_frame, getTarget().c_str());
@@ -2514,7 +2515,7 @@ sprite_instance::execute_init_action_buffer(const action_buffer& a)
 	else
 	{
 #ifdef GNASH_DEBUG
-		log_debug("Init actions in frame " SIZET_FMT " of sprite %s already executed", m_current_frame, getTarget().c_str());
+		log_debug("Init actions for character %d already executed", cid);
 #endif
 	}
 }
@@ -2597,7 +2598,7 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 	}
 
 	// Mark this frame's init actions as executed 
-	m_init_actions_executed.insert(frame);
+	//m_init_actions_executed.insert(frame);
 
 	testInvariant();
 }

@@ -48,24 +48,21 @@ class DoInitActionTag : public ControlTag
 {
 public:
 
-    DoInitActionTag()
-    {}
-
-    /// Read a DoInitAction block from the stream
-    //
-    void read(stream* in)
+    DoInitActionTag(stream& in, int cid)
+	:
+	_cid(cid)
     {
-        m_buf.read(*in, in->get_tag_end_position());
+        read(in);
     }
 
     virtual void execute_state(sprite_instance* m) const
     {
-        m->execute_init_action_buffer(m_buf);
+        m->execute_init_action_buffer(m_buf, _cid);
     }
 
     virtual void execute(sprite_instance* m) const
     {
-        m->execute_init_action_buffer(m_buf);
+        m->execute_init_action_buffer(m_buf, _cid);
     }
 
     // Tell the caller that we are an action tag.
@@ -76,21 +73,32 @@ public:
 
     static void doInitActionLoader(stream* in, tag_type tag, movie_definition* m)
     {
-        DoInitActionTag* da = new DoInitActionTag;
         int cid = in->read_u16();
-        da->read(in);
+        DoInitActionTag* da = new DoInitActionTag(*in, cid);
 
         IF_VERBOSE_PARSE (
         log_parse(_("  tag %d: do_init_action_loader"), tag);
         log_parse(_("  -- init actions for sprite %d"), cid);
         );
 
-        m->add_init_action(da, cid); // ownership transferred
+        //m->add_init_action(da, cid); // ownership transferred
+        m->addControlTag(da); // ownership transferred
     }
 
 private:
 
+    /// Read a DoInitAction block from the stream
+    //
+    void read(stream& in)
+    {
+        m_buf.read(in, in.get_tag_end_position());
+    }
+
+
     action_buffer m_buf;
+
+    // id of referenced character definition
+    int _cid;
 };
 
 } // namespace gnash::SWF

@@ -1,5 +1,20 @@
 2007-12-14 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/DoInitActionTag.h: store referenced character
+	  in the instance, pass to execute_init_actions when
+	  executing; add self as a normal control tag.
+	* server/movie_instance.h: maintain a set of 'initialized'
+	  characters (characters referenced by executed DoInitAction
+	  tags).
+	* server/sprite_instance.{cpp,h} (execute_init_action):
+	  update the movie_instance maintained set of initialized
+	  characters and use that set to figure out whether or not
+	  to execute them again.
+	* testsuite/misc-swfmill.all/Makefile.am: expect a success
+	  for initaction in definesprite test.
+
+2007-12-14 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-swfmill.all/: Makefile.am,
 	  initaction_in_definesprite.xml: test that DOINITACTION
 	  tags in sprite definitions are valid, and that whether or

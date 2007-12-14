@@ -29,6 +29,7 @@
 #endif
 
 #include <vector>
+#include <set>
 
 #include "sprite_instance.h" // for inheritance
 #include "smart_ptr.h" // for composition
@@ -74,7 +75,21 @@ public:
 	///
 	void stagePlacementCallback();
 
+	/// Set a character in the dictionary as initialized, returning
+	/// true if not already initialized.
+	bool setCharacterInitialized(int cid)
+	{
+		return _initializedCharacters.insert(cid).second;
+	}
+
 private:
+
+	/// A map to track execution of init actions
+	//
+	/// Elements of this set are ids of characters
+	/// in our definition's CharacterDictionary.
+	///
+	std::set<int> _initializedCharacters;
 
 	boost::intrusive_ptr<movie_definition> _def;
 };
