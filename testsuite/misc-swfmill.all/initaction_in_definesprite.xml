@@ -36,7 +36,7 @@
             <actions>
               <PushData>
                 <items>
-                  <StackString value="init action from sprite3 for sprite 1"/>
+                  <StackString value="FAILED: init actions targetting sprite 1 executed again (defined in sprite3)"/>
                 </items>
               </PushData>
               <Trace/>
@@ -52,11 +52,14 @@
         <tags>
           <DoInitAction sprite="1">
             <actions>
+              <!-- TODO: automate test for these actions to being only executed once -->
               <PushData>
                 <items>
                   <StackString value="END OF TEST"/>
+                  <StackString value="PASSED: executing init actions defined in sprite2 and targetting sprite1"/>
                 </items>
               </PushData>
+              <Trace/>
               <Trace/>
               <EndAction/>
             </actions>
