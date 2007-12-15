@@ -104,15 +104,21 @@ test_read()
         buf = new char[st.st_size + 1];
 
         sol.readFile(filespec);
-        string name = "TestString";
-        char *data = "testing, 1-2-3, testing";
-        AMF::amf_element_t el = sol.getElement(0);        
-        if ((name == el.name) && (memcmp(data, el.data, el.length) == 0)) {
+        vector<AMF::amf_element_t> els = sol.getElements();
+
+        string str = reinterpret_cast<const char *>(els[2].data);
+
+        // Make sure multiple elements of varying datatypes are checked for.
+        if ((els[0].name == "gain") &&
+            (els[2].name == "defaultmicrophone") &&
+            (str == "/dev/input/mic") &&
+            (els[5].name == "defaultalways") &&
+            (els[9].name == "trustedPaths")) {
             runtest.pass("Read SOL File");
         } else {
             runtest.fail("Read SOL file");
         }
-        sol.dump();
+//        sol.dump();
     }
 }
 

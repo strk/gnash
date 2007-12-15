@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.8 2007/12/15 06:58:40 rsavoye Exp $
+# $Id: Makefile.am,v 1.9 2007/12/15 17:13:58 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -82,24 +82,22 @@ AMFS =	\
 	result-success.amf
 
 SOLS = \
-	array.xml \
-	boolean.xml \
-	date.xml \
-	null.xml \
-	number.xml \
-	object.xml \
-	string.xml \
-	settings.xml \
-	test.xml \
-	undefined.xml \
-	xml.xml
+	array.sol \
+	boolean.sol \
+	date.sol \
+	null.sol \
+	number.sol \
+	object.sol \
+	string.sol \
+	settings.sol \
+	test.sol \
+	undefined.sol \
+	xml.sol
 
 EXTRA_DIST = $(AMFS) $(SOLS)
 
 # solfiles := $(patsubst %.xml,%.sol,$(SOLS))
-
-CLEANFILES = $(solfiles)
-
+#CLEANFILES = $(solfiles)
 # solfiles: $(solfiles) 
 
 # this script converts between SOL Shared Objects and XML files. Very useful for testing.

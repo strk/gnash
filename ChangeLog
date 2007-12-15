@@ -1,3 +1,10 @@
+2007-12-15  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* testsuite/libamf.all/test_sol.cpp: When reading a SOL file,
+	test for multiple elements of varying data types.
+	* testsuite/libamf.all/Makefile.am: rather than generate the .sol
+	files, these are now checked in, so we don't havwe to build them.
+	
 2007-12-15 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/Makefile.am: fix abs_mediadir for gnashrc generation.
@@ -5,7 +12,7 @@
 	  more automation, and more to do.
 
 2007-12-14  Rob Savoye  <rob@ripple.welcomehome.org>
-
+	
 	* libamf/sol.{cpp,h}: New files for Shared Object file support.
 	* libamf/Makefile.am: Build sol into libamf.
 	* libamf/amf.{cpp,h}: Use cstdint for data types.
@@ -21,9 +28,10 @@
 	object.xml, string.xml, undefined.xml: New XML files to generate
 	.sol files using s2x.py.
 	* testsuite/libamf.all/solfiles/array.sol, date.sol, number.sol,
-	settings.sol, test.sol, sol.sol, boolean.sol, null.sol,
+	settings.sol, test.sol, boolean.sol, null.sol,
 	object.sol, string.sol, undefined.sol: New binary SOL files for
-	testcases. 
+	testcases.
+	* testsuite/libamf.all/test_sol.cpp: Test case for SOL support.
 	* configure.ac: Look for python so we can use it for testing.
 
 2007-12-14 Sandro Santilli <strk@keybit.net>
