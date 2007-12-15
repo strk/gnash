@@ -1,5 +1,6 @@
 2007-12-15 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/Makefile.am: fix abs_mediadir for gnashrc generation.
 	* testsuite/misc-swfmill.all/initaction_in_definesprite.xml:
 	  more automation, and more to do.
 

@@ -8,7 +8,6 @@ SUBDIRS = \
 	libgeometry \
 	server \
 	samples	\
-	libamf.all \
 	misc-ming.all \
 	misc-mtasc.all \
 	misc-swfmill.all \
@@ -20,6 +19,8 @@ SUBDIRS = \
 EXTRA_DIST = check.h DummyMovieDefinition.h DummyCharacter.h media gnashrc.in
 
 dist_noinst_SCRIPTS = anaylse-results.sh generic-testrunner.sh
+
+abs_mediadir = `cd $(srcdir)/media; pwd`
 
 # could not find a way to only build this on make check
 check_LTLIBRARIES = libtestsuite.la 
@@ -49,9 +50,8 @@ libtestsuite_la_CXXFLAGS = \
 	$(NULL)
 
 
-gnashrc: gnashrc.in
-	abs_mediadir="`cd $(srcdir)/media; pwd`"; \
-	sed -e 's#@@MEDIADIR@@#$${abs_mediadir}/#g' $< > $@
+gnashrc: gnashrc.in Makefile
+	sed -e 's#@@MEDIADIR@@#'$(abs_mediadir)'#g' $< > $@
 
 if ENABLE_MING
 
