@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<solx sol_name="boolean" std_author="iceeLyne" std_version="0.75">
+	<data name="TestBoolean" type="boolean" value="true"/>
+</solx>

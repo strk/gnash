@@ -1,3 +1,25 @@
+2007-12-14  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libamf/sol.{cpp,h}: New files for Shared Object file support.
+	* libamf/Makefile.am: Build sol into libamf.
+	* libamf/amf.{cpp,h}: Use cstdint for data types.
+	* libamf/protocol.h: Define an enum for protocols supported.
+	* testsuite/libamf.all/Makefile.am: Add test_sol. Build	.sol files
+	from XML.
+	* testsuite/libamf.all/test_*.cpp: Use cstdint for data types.
+	* testsuite/libamf.all/settings.sol: 
+	* testsuite/libamf.all/xmlfiles: Directory for xml files to
+	recreate .sol files.
+	* testsuite/libamf.all/xmlfiles/array.xml, date.xml, number.xml,
+	settings.xml, test.xml, xml.xml, boolean.xml, null.xml,
+	object.xml, string.xml, undefined.xml: New XML files to generate
+	.sol files using s2x.py.
+	* testsuite/libamf.all/solfiles/array.sol, date.sol, number.sol,
+	settings.sol, test.sol, sol.sol, boolean.sol, null.sol,
+	object.sol, string.sol, undefined.sol: New binary SOL files for
+	testcases. 
+	* configure.ac: Look for python so we can use it for testing.
+
 2007-12-14 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/tag_loaders.cpp: immediately store bitmap_character_def
@@ -103,7 +125,7 @@
 	* cygnal/http.cpp: Set the file size right so it works with all
 	browsers.
 	* cygnal/cygnal.cpp: Use getFileStats() instead of getFileType().
-	
+
 	* cygnal/cygnal.cpp: Check the file type to set the HTTP
 	Content-Tytpe field correctly. Also handle "file not found".
 	* cygnal/http.cpp: Trap file not found errors. Format responses

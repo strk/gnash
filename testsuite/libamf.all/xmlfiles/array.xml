@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<solx sol_name="array2" std_author="iceeLyne" std_version="0.75">
+	<data length="2" name="TestArray" type="array">
+		<data name="element-zero" type="number" value="0.0"/>
+		<data name="element-one" type="number" value="1.0"/>
+	</data>
+</solx>

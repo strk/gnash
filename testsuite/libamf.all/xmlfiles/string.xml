@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<solx sol_name="string" std_author="iceeLyne" std_version="0.75">
+	<data name="TestString" type="string">
+<![CDATA[testing, 1-2-3, testing]]>	</data>
+</solx>

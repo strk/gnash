@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.7 2007/12/10 21:50:48 strk Exp $
+# $Id: Makefile.am,v 1.8 2007/12/15 06:58:40 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -48,16 +48,62 @@ INCLUDES = -I.. \
 # AM_LDFLAGS  = $(OPENGL_LIBNS) $(SDL_LIBS)
 
 
-check_PROGRAMS = test_number test_string test_object test_variable
+check_PROGRAMS = \
+	test_number \
+	test_string \
+	test_object \
+	test_sol \
+	test_variable
+
+test_sol_SOURCES = test_sol.cpp
+test_sol_LDADD = $(AM_LDFLAGS)
+test_sol_DEPENDENCIES = $(solfiles)
+
 test_number_SOURCES = test_number.cpp
 test_number_LDADD = $(AM_LDFLAGS)
+
 test_string_SOURCES = test_string.cpp
 test_string_LDADD = $(AM_LDFLAGS)
+
 test_object_SOURCES = test_object.cpp
 test_object_LDADD = $(AM_LDFLAGS)
+
 test_variable_SOURCES = test_variable.cpp
 test_variable_LDADD = $(AM_LDFLAGS)
 
+# These are captured AMF object in binary form.
+AMFS =	\
+	connect-object.amf \
+	number-variable.amf \
+	string-variable.amf \
+	connect-string.amf \
+	result-fail.amf \
+	f03f.amf \
+	result-success.amf
+
+SOLS = \
+	array.xml \
+	boolean.xml \
+	date.xml \
+	null.xml \
+	number.xml \
+	object.xml \
+	string.xml \
+	settings.xml \
+	test.xml \
+	undefined.xml \
+	xml.xml
+
+EXTRA_DIST = $(AMFS) $(SOLS)
+
+# solfiles := $(patsubst %.xml,%.sol,$(SOLS))
+
+CLEANFILES = $(solfiles)
+
+# solfiles: $(solfiles) 
+
+# this script converts between SOL Shared Objects and XML files. Very useful for testing.
+dist_noinst_SCRIPTS = s2x.py
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
@@ -69,6 +115,13 @@ clean-local:
 
 TEST_DRIVERS = ../simple.exp
 
+SUFFIXES = .sol .xml
+
+# .sol.xml:
+# 	$(PYTHON) $(srcdir)/s2x.py -x $< $@
+
+.xml.sol:
+	$(PYTHON) $(srcdir)/s2x.py -s $(srcdir)/xmlfiles/$< $@
 
 check-DEJAGNU: site-update $(TEST_CASES)
 	@runtest=$(RUNTEST); \

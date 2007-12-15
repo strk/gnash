@@ -23,12 +23,12 @@
 
 #include <sys/types.h>
 extern "C"{
-        #include <unistd.h>
+#include <unistd.h>
 #ifdef HAVE_GETOPT_H
-        #include <getopt.h>
+#include <getopt.h>
 #endif
 #ifndef __GNUC__
-        extern int optind, getopt(int, char *const *, const char *);
+extern int optind, getopt(int, char *const *, const char *);
 #endif
 }
 #include <sys/types.h>
@@ -154,15 +154,15 @@ main(int argc, char *argv[])
     // This extracts a "connect" message from the RTMP data stream. We
     // look for everything ourselves to be the most accurate.
     tmpptr = buf  + amf_obj.getHeaderSize();
-    char *str = amf_obj.extractString(tmpptr);
-    if (strcmp(str, "connect") == 0) {
+    int8_t *str = amf_obj.extractString(tmpptr);
+    if (strcmp(reinterpret_cast<const char *>(str), "connect") == 0) {
         runtest.pass("Extracted \"connect\" string");
     } else {
         runtest.fail("Extracted \"connect\" string");
     }
     
-    tmpptr += strlen(str) + AMF_HEADER_SIZE;    
-    amfnum_t *num = amf_obj.extractNumber((char *)tmpptr);
+    tmpptr += strlen(reinterpret_cast<const char *>(str)) + AMF_HEADER_SIZE;    
+    amfnum_t *num = amf_obj.extractNumber(tmpptr);
     char     *numptr = (char *)num;
     if ((numptr[6] == -16)
         && (numptr[7] == 0x3f)) {
@@ -312,7 +312,7 @@ main(int argc, char *argv[])
     unsigned char *var;
 
     var = (unsigned char *)rtmp.encodeString("connect");
-    char* c_out = rtmp.extractString(var);
+    int8_t *c_out = rtmp.extractString(var);
     if ( ! c_out )
     {
         runtest.fail("Encoded \"connect\" string could not be extracted");
@@ -320,7 +320,7 @@ main(int argc, char *argv[])
     else
     {
         std::string s_in("connect");
-        std::string s_out(c_out);
+        std::string s_out(reinterpret_cast<const char *>(c_out));
 
         if (s_in == s_out) {
             runtest.pass("Encoded \"connect\" string");
@@ -335,7 +335,7 @@ main(int argc, char *argv[])
     amfnum_t bignum = 0x3ff0000000000000LL;
     numptr = (char *)&bignum;
     var = (unsigned char *)rtmp.encodeNumber(bignum);
-    if (*rtmp.extractNumber((char *)var) == bignum) {
+    if (*rtmp.extractNumber(var) == bignum) {
         runtest.pass("Encoded \"connect\" number");
     } else {
         runtest.fail("Encoded \"connect\" number");

@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.459 2007/12/12 23:56:28 rsavoye Exp $
+dnl $Id: configure.ac,v 1.460 2007/12/15 06:58:39 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -748,6 +748,8 @@ AM_CONDITIONAL(CROSS_COMPILING, [ test x$cross_compiling = xyes ])
 
 dnl Check for PKG_CONFIG before any GNASH_PATH call
 PKG_PROG_PKG_CONFIG
+
+AC_PATH_PROG(PYTHON, python, ,[${pathlist}])
 
 dnl Look for scratchbox
 sbox=no
@@ -1662,11 +1664,6 @@ plugin/klash/Makefile
 cygnal/Makefile
 cygnal/testsuite/Makefile
 cygnal/testsuite/cygnal.all/Makefile
-dnl cygnal/ACT/unit_tests/Makefile
-dnl cygnal/IO/Makefile
-dnl cygnal/HTTP/Makefile
-dnl cygnal/Net/Makefile
-dnl cygnal/unit_tests/Makefile
 )
 
 ###
@@ -2366,6 +2363,13 @@ else
     echo "        WARNING: You need to have 'swfc' from SWFTools installed"
     echo "                 to run some of the tests in Gnash testsuite."
     echo "                 You can install it from http://www.swftools.org/"
+  fi
+
+  if test x"$PYTHON" != x; then
+    echo "        PYTHON is $PYTHON"
+  else
+    echo "        WARNING: You need to have python installed"
+    echo "                 to run some of the tests in Gnash testsuite."
   fi
 
 fi

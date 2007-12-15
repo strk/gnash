@@ -36,10 +36,12 @@ extern "C"{
 #include <fcntl.h>
 
 #include "dejagnu.h"
+#include "log.h"
 #include "amf.h"
 
 using namespace amf;
 using namespace std;
+using namespace gnash;
 
 static void usage (void);
 
@@ -47,27 +49,29 @@ static int verbosity;
 
 static TestState runtest;
 
+LogFile& dbglogfile = LogFile::getDefaultInstance();
+
 int
 main(int argc, char *argv[])
 {
     char buffer[300];
     int c;
-
+    
     memset(buffer, 0, 300);
     
     while ((c = getopt (argc, argv, "hdvsm:")) != -1) {
         switch (c) {
           case 'h':
-            usage ();
-            break;
-            
+              usage ();
+              break;
+              
           case 'v':
-            verbosity++;
-            break;
-            
+              dbglogfile.setVerbosity();
+              break;
+              
           default:
-            usage ();
-            break;
+              usage ();
+              break;
         }
     }
     
@@ -79,7 +83,7 @@ main(int argc, char *argv[])
 
     AMF amf_obj;
     int fd, ret;
-    byte buf[AMF_VIDEO_PACKET_SIZE+1];
+    uint8_t buf[AMF_VIDEO_PACKET_SIZE+1];
 
     // First see if we can read strings. This file is produced by
     // using a network packet sniffer, and should be binary correct.
@@ -91,8 +95,8 @@ main(int argc, char *argv[])
     close(fd);
 
     char *connect = "connect";
-    char *str = amf_obj.extractString(buf);
-    if (strcmp(str, connect) == 0) {
+    int8_t *str = amf_obj.extractString(buf);
+    if (memcmp(str, connect, strlen(connect)) == 0) {
         runtest.pass("Extracted \"connect\" string");
     } else {
         runtest.fail("Extracted \"connect\" string");

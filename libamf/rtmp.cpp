@@ -17,11 +17,9 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: rtmp.cpp,v 1.17 2007/07/01 10:54:05 bjacques Exp $ */
-
-// #ifdef HAVE_CONFIG_H
-// #include "config.h"
-// #endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include <iostream>
 
@@ -91,7 +89,7 @@ RTMPproto::handShakeWait()
     } else {
         log_error (_("Handshake isn't correct; "
         	     "Data read is: 0x%x"), *buffer);
-//        return false;
+        return false;
     }
     
     if (readNet(buffer, RTMP_BODY_SIZE) == RTMP_BODY_SIZE) {        
@@ -250,7 +248,7 @@ RTMPproto::packetRead()
     //char *amfdata;
     unsigned int amf_index, headersize;
     AMF *amf=NULL;
-#if 0
+#if 1
     unsigned char hexint[512];
 #endif
     
@@ -288,18 +286,19 @@ RTMPproto::packetRead()
     tmpptr += headersize;
     tmpptr = buffer;
     
-    while ((ret = readNet(reinterpret_cast<char *>(buffer), packetsize)) > 0) {
+    while ((ret = readNet(reinterpret_cast<char *>(buffer), packetsize, 1)) > 0) {
         log_msg (_("Reading AMF packets till we're done..."));
         amf->addPacketData(tmpptr, ret);
-        tmpptr = buffer + 1;
+        tmpptr = buffer + ret;
         _inbytes += ret;
-#if 0
-        hexify(hexint, buffer, packetsize, true);
-        log_msg (_("The packet data is: 0x%s"), (char *)hexint);
-        hexify(hexint, buffer, packetsize, false);
-        log_msg (_("The packet data is: 0x%s"), (char *)hexint);
+#if 1
+	hexify(hexint, buffer, packetsize, true);
+	log_msg (_("The packet data is: 0x%s"), (char *)hexint);
+	hexify(hexint, buffer, packetsize, false);
+	log_msg (_("The packet data is: 0x%s"), (char *)hexint);
 #endif    
     }
+    
     log_msg (_("Done reading packet"));
     amf->parseBody();
     

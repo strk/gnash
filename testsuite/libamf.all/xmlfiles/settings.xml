@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<solx sol_name="settings" std_author="iceeLyne" std_version="0.75">
+	<data name="gain" type="number" value="50.0"/>
+	<data name="echosuppression" type="boolean" value="false"/>
+	<data name="defaultmicrophone" type="string">
+<![CDATA[/dev/input/mic]]>	</data>
+	<data name="defaultcamera" type="string">
+<![CDATA[]]>	</data>
+	<data name="defaultklimit" type="number" value="100.0"/>
+	<data name="defaultalways" type="boolean" value="false"/>
+	<data name="crossdomainAllow" type="boolean" value="true"/>
+	<data name="crossdomainAlways" type="boolean" value="true"/>
+	<data name="allowThirdPartyLSOAccess" type="boolean" value="true"/>
+	<data name="trustedPaths" type="object"/>
+	<data name="localSecPath" type="string">
+<![CDATA[]]>	</data>
+	<data name="localSecPathTime" type="number" value="1.19751160683e+12"/>
+</solx>

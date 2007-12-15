@@ -15,12 +15,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.28 2007/08/10 04:36:13 strk Exp $
+# $Id: Makefile.am,v 1.29 2007/12/15 06:58:40 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
 pkglib_LTLIBRARIES = libgnashamf.la
-libgnashamf_la_SOURCES = amf.cpp rtmp.cpp
+libgnashamf_la_SOURCES = \
+	amf.cpp \
+	rtmp.cpp \
+	sol.cpp
 
 libgnashamf_la_LIBADD = $(top_builddir)/libbase/libgnashbase.la
 libgnashamf_la_LDFLAGS =  -release $(VERSION) ${AM_LDFLAGS} 
@@ -34,7 +37,12 @@ AM_CPPFLAGS = -I.. -I$(srcdir) \
 
 AM_LDFLAGS = $(BOOST_LIBS)
 
-noinst_HEADERS = amfutf8.h amf.h rtmp.h protocol.h
+noinst_HEADERS = \
+	amfutf8.h \
+	amf.h \
+	rtmp.h \
+	protocol.h \
+	sol.h
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

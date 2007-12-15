@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<solx sol_name="date" std_author="iceeLyne" std_version="0.75">
+	<!--DateObject:Milliseconds Count From Dec. 1, 1969; Timezone UTC + Offset.-->
+	<data msec="1.197635557e+12" name="TestDate" type="date" utcoffset="-7"/>
+</solx>
