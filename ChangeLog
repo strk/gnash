@@ -1,3 +1,9 @@
+2007-12-16 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/Player.cpp: allow setting base URL with -P (to support 
+	  <embed base="myurl"> tag; move parsing of flashvars and query
+	  string before the base URL gets set.
+
 2007-12-15  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* testsuite/libamf.all/test_sol.cpp: When reading a SOL file,

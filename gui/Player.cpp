@@ -274,6 +274,31 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 		return EXIT_FAILURE;
 	}
 
+    	// Parse querystring (before FlashVars, see testsuite/misc-ming.all/FlashVarsTest*)
+	setFlashVars(URL(_url).querystring());
+
+	// Parse parameters
+	StringNoCaseEqual noCaseCompare;
+	for ( map<string,string>::const_iterator it=params.begin(),
+		itEnd=params.end(); it != itEnd; ++it)
+	{
+		if ( noCaseCompare(it->first, "flashvars") )
+		{
+			setFlashVars(it->second);
+			continue;
+		}
+
+	    	if ( noCaseCompare(it->first, "base") )
+		{
+			setBaseUrl(it->second);
+			continue;
+		}
+
+		// too much noise...
+		//log_debug(_("Unused parameter %s = %s"),
+		//	it->first.c_str(), it->second.c_str());
+	}
+
 	// Set base url for this movie (needed before parsing)
 	gnash::set_base_url(URL(_baseurl));
 
@@ -317,27 +342,7 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
     // Start loader thread
     _movie_def->completeLoad();
 
-    // Parse querystring (before FlashVars, see testsuite/misc-ming.all/FlashVarsTest*)
-    setFlashVars(URL(_url).querystring());
-
-    // Parse parameters
-    for ( map<string,string>::const_iterator it=params.begin(),
-		itEnd=params.end(); it != itEnd; ++it)
-    {
-	// todo: use a case-insensitive string type
-    	if ( it->first == "flashvars" || it->first == "FlashVars" )
-	{
-		setFlashVars(it->second);
-		continue;
-	}
-
-	// too much noise...
-        //log_debug(_("Unused parameter %s = %s"),
-	//	it->first.c_str(), it->second.c_str());
-    }
-
     _gui->setMovieDefinition(_movie_def);
-
 
     if (!delay) {
       delay = (unsigned int) (1000 / movie_fps) ; // milliseconds per frame
