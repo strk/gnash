@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.171 2007/12/14 20:51:21 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.172 2007/12/16 10:10:52 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1435,7 +1435,16 @@ SWFHandlers::ActionImplementsOp(ActionExec& thread)
 	thread.ensureStack(count);
 	while (count--)
 	{
-		as_object *inter = env.pop().to_as_function()->getPrototype().get();
+		as_value funval = env.pop();
+		as_function* fun = funval.to_as_function();
+		if ( ! fun )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("class found on stack on IMPLEMENTSOP is not a function: %s"), funval.to_debug_string().c_str());
+			);
+			continue;
+		}
+		as_object *inter = fun->getPrototype().get();
 		obj->add_interface(inter);
 	}
 }
