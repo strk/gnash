@@ -107,7 +107,14 @@ public:
 	MovieTester(const std::string& filespec);
 
 	/// Advance the movie by one frame
-	void advance();
+	//
+	/// @param updateClock
+	///	If true (the default), this method also
+	///     advances the clock by the nominal delay expected
+	///     between frame advancements before performing the
+	///     actual playhead advancement.
+	///
+	void advance(bool updateClock=true);
 
 	/// Advance the clock by the given amount of milliseconds
 	void advanceClock(unsigned long ms);
@@ -326,7 +333,8 @@ private:
 
 	/// Virtual clock to use to let test runners
 	/// control time flow
-	std::auto_ptr<VirtualClock> _clock;
+	ManualClock _clock;
+	//std::auto_ptr<VirtualClock> _clock;
 };
 
 } // namespace gnash

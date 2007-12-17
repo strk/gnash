@@ -53,6 +53,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_current_frame(), 0);
 	check_equals(root->get_play_state(), sprite_instance::PLAY);
 
+	tester.advanceClock(50); // "sleep" 50 milliseconds
 	tester.advance(); // execute actions in second frame frame
 
 	check_equals(root->get_current_frame(), 1);
@@ -66,49 +67,56 @@ main(int /*argc*/, char** /*argv*/)
 	root->get_member(st.find("that_counter"), &tmp);
 	check_equals(tmp.to_number(), 0);
 
-	usleep(500000); tester.advance(); // run expired timers
+	tester.advanceClock(500); // "sleep" 500 milliseconds
+	tester.advance(); // run expired timers
 
 	root->get_member(st.find("this_counter"), &tmp);
 	check_equals(tmp.to_number(), 1);
 	root->get_member(st.find("that_counter"), &tmp);
 	check_equals(tmp.to_number(), 0);
 
-	usleep(500000); tester.advance(); // run expired timers
+	tester.advanceClock(600); // "sleep" 500 milliseconds
+	tester.advance(); // run expired timers
 
 	root->get_member(st.find("this_counter"), &tmp);
 	check_equals(tmp.to_number(), 2);
 	root->get_member(st.find("that_counter"), &tmp);
 	check_equals(tmp.to_number(), 1);
 
-	usleep(500000); tester.advance(); // run expired timers
+	tester.advanceClock(500); // "sleep" 500 milliseconds
+	tester.advance(); // run expired timers
 
 	root->get_member(st.find("this_counter"), &tmp);
 	check_equals(tmp.to_number(), 3);
 	root->get_member(st.find("that_counter"), &tmp);
 	check_equals(tmp.to_number(), 1);
 
-	usleep(500000); tester.advance(); // run expired timers
+	tester.advanceClock(520); // "sleep" 520 milliseconds
+	tester.advance(); // run expired timers
 
 	root->get_member(st.find("this_counter"), &tmp);
 	check_equals(tmp.to_number(), 4);
 	root->get_member(st.find("that_counter"), &tmp);
 	check_equals(tmp.to_number(), 2);
 
-	usleep(1000000); tester.advance(); // run expired timers
+	tester.advanceClock(1020); // "sleep" 1020 milliseconds
+	tester.advance(); // run expired timers
 
 	root->get_member(st.find("this_counter"), &tmp);
 	check_equals(tmp.to_number(), 4);
 	root->get_member(st.find("that_counter"), &tmp);
 	check_equals(tmp.to_number(), 3);
 
-	usleep(1000000); tester.advance(); // run expired timers
+	tester.advanceClock(1020); // "sleep" 1020 milliseconds
+	tester.advance(); // run expired timers
 
 	root->get_member(st.find("this_counter"), &tmp);
 	check_equals(tmp.to_number(), 4);
 	root->get_member(st.find("that_counter"), &tmp);
 	check_equals(tmp.to_number(), 4);
 
-	usleep(500000); tester.advance(); // run expired timers
+	tester.advanceClock(520); // "sleep" 520 milliseconds
+	tester.advance(); // run expired timers
 
 	root->get_member(st.find("this_counter"), &tmp);
 	check_equals(tmp.to_number(), 5);

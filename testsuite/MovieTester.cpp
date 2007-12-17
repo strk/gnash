@@ -57,8 +57,7 @@ namespace gnash {
 
 MovieTester::MovieTester(const std::string& url)
 	:
-	_forceRedraw(true),
-	_clock(new SystemClock()) // TODO: use a manual clock
+	_forceRedraw(true)
 {
 
 	// Initialize gnash code lib
@@ -89,7 +88,7 @@ MovieTester::MovieTester(const std::string& url)
 	// Initialize the sound handler(s)
 	initTestingSoundHandlers();
 
-	_movie_root = &(VM::init(*_movie_def, *_clock).getRoot());
+	_movie_root = &(VM::init(*_movie_def, _clock).getRoot());
 
 	// Initialize viewport size with the one advertised in the header
 	_width = unsigned(_movie_def->get_width_pixels());
@@ -203,8 +202,22 @@ MovieTester::render()
 }
 
 void
-MovieTester::advance()
+MovieTester::advanceClock(unsigned long ms)
 {
+	_clock.advance(ms);
+}
+
+void
+MovieTester::advance(bool updateClock)
+{
+	if ( updateClock )
+	{
+		// TODO: cache 'clockAdvance' 
+		float fps = _movie_def->get_frame_rate();
+		unsigned long clockAdvance = long(1000/fps);
+		advanceClock(clockAdvance);
+	}
+
 	_movie_root->advance(1.0);
 
 	render();

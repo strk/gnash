@@ -1,5 +1,13 @@
 2007-12-17 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/MovieTester.{cpp,h}: use a manual clock, to make
+	  time predictable. Expose an additional advanceClock method
+	  to control it (one way)
+	* testsuite/misc-ming.all/intervalTestRunner.cpp: use advanceClock
+	  instead of unpredictable usleep() calls.
+
+2007-12-17 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/case.as: fix testcase, add test for
 	  .length.
 
