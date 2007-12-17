@@ -1,3 +1,9 @@
+2007-12-17 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* plugin/plugin.cpp: change NPAPI error messages so as not to
+	  annoy Opera users (doesn't make it work on Opera, unfortunately),
+	  general code cleanup.
+
 2007-12-17 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/: Sound.{cpp,h}, SoundFfmpeg.{cpp,h},

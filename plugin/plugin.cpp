@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.88 2007/11/30 12:55:54 strk Exp $ */
+/* $Id: plugin.cpp,v 1.89 2007/12/17 13:15:49 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -24,7 +24,7 @@
 #define MIME_TYPES_HANDLED  "application/x-shockwave-flash"
 // The name must be this value to get flash movies that check the
 // plugin version to load.
-#define PLUGIN_NAME     "Shockwave Flash"
+#define PLUGIN_NAME	"Shockwave Flash"
 #define MIME_TYPES_DESCRIPTION  MIME_TYPES_HANDLED":swf:"PLUGIN_NAME
 
 //Some javascript plugin detectors use the description
@@ -62,7 +62,6 @@
 #include <vector>
 #include <iostream>
 
-
 // Mozilla SDK headers
 #include "prinit.h"
 #include "prlock.h"
@@ -75,9 +74,9 @@ using namespace std;
 
 extern NPNetscapeFuncs NPNFuncs;
 
-NPBool      plugInitialized = FALSE;
+NPBool plugInitialized = FALSE;
 
-static bool  waitforgdb = false;
+static bool waitforgdb = false;
 
 static const char* getPluginDescription();
 
@@ -98,7 +97,7 @@ PR_CALLBACK Destructor(void * /* data */)
 char*
 NPP_GetMIMEDescription(void)
 {
-    return const_cast<char *>(MIME_TYPES_DESCRIPTION);
+	return const_cast<char *>(MIME_TYPES_DESCRIPTION);
 }
 
 //
@@ -114,48 +113,76 @@ NPP_GetMIMEDescription(void)
 NPError
 NS_PluginInitialize()
 {
-    NPError err = NPERR_NO_ERROR;
-    PRBool supportsXEmbed = PR_TRUE;
-    NPNToolkitType toolkit;
 
-    // Make sure that the browser supports functionality we need
-    err = CallNPN_GetValueProc(NPNFuncs.getvalue, NULL,
-                               NPNVSupportsXEmbedBool,
-                               (void *)&supportsXEmbed);
+	/* Browser Functionality Checks */
 
-    if (err != NPERR_NO_ERROR || !supportsXEmbed) {
-	cout << "No xEmbed support in this Mozilla version!" << endl;
-        return NPERR_INCOMPATIBLE_VERSION_ERROR;
-    } else {
-	cout << "xEmbed supported in this Mozilla version" << endl;
-    }
+	NPError err = NPERR_NO_ERROR;
+	PRBool supportsXEmbed = PR_TRUE;
+	NPNToolkitType toolkit;
 
-    err = CallNPN_GetValueProc(NPNFuncs.getvalue, NULL,
-                               NPNVToolkit,
-                               (void *)&toolkit);
+	/* 
+	First, check for XEmbed support. The NPAPI Gnash plugin
+	only works with XEmbed, so tell the plugin API to fail if
+	XEmbed is not found.
+	*/	
+	
+	err = CallNPN_GetValueProc(NPNFuncs.getvalue, NULL,
+				NPNVSupportsXEmbedBool,
+				(void *)&supportsXEmbed);
 
-    if (err != NPERR_NO_ERROR || toolkit != NPNVGtk2) {
-	cout << "No GTK2 support in this Mozilla version! Have "
-	     << (int)toolkit << endl;
-        return NPERR_INCOMPATIBLE_VERSION_ERROR;
-    } else {
-	cout << "Gtk2+ supported in this Mozilla version" << endl;
-    }
 
-    char* opts = getenv("GNASH_OPTIONS");
-    if ( opts )
-    {
-	cout << "GNASH_OPTIONS : " << opts << endl;
-	if ( strstr(opts, "waitforgdb") )
+	if (err != NPERR_NO_ERROR || !supportsXEmbed)
 	{
-		waitforgdb = true;
+		cout << "NPAPI ERROR: No xEmbed support in this browser!"
+							<< endl;
+		return NPERR_INCOMPATIBLE_VERSION_ERROR;
+	}
+	else
+	{
+		cout << "xEmbed supported in this browser" << endl;
 	}
 
-    }
+	err = CallNPN_GetValueProc(NPNFuncs.getvalue, NULL,
+				NPNVToolkit,
+				(void *)&toolkit);
 
-    plugInitialized = TRUE;
+	/*
+	GTK2 support is currently also necessary. Fail if not
+	present.
+	*/
+	if (err != NPERR_NO_ERROR || toolkit != NPNVGtk2)
+	{
+		cout << "NPAPI ERROR: No GTK2 support in this browser!"
+			" Have version " << (int)toolkit << endl;
 
-    return NPERR_NO_ERROR;
+		return NPERR_INCOMPATIBLE_VERSION_ERROR;
+	}
+	else
+	{
+		cout << "GTK2 supported in this browser" << endl;
+	}
+
+	/*
+	Check for environment variables.
+	*/
+	char* opts = getenv("GNASH_OPTIONS");
+	if ( opts )
+	{
+		cout << "GNASH_OPTIONS : " << opts << endl;
+		
+		// Should the plugin wait for gdb to be attached?
+		if ( strstr(opts, "waitforgdb") )
+		{
+			waitforgdb = true;
+		}
+
+	}
+
+	/* Success */
+
+	plugInitialized = TRUE;
+
+	return NPERR_NO_ERROR;
 }
 
 /// \brief Shutdown the plugin
@@ -167,12 +194,13 @@ NS_PluginInitialize()
 void
 NS_PluginShutdown()
 {
-    if (!plugInitialized) {
-	cout << "Plugin already shut down" << endl;
-	return;
-    }
+	if (!plugInitialized)
+	{
+		cout << "Plugin already shut down" << endl;
+		return;
+	}
 
-    plugInitialized = FALSE;
+	plugInitialized = FALSE;
 }
 
 
@@ -185,33 +213,40 @@ NS_PluginShutdown()
 NPError
 NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 {
-    NPError err = NPERR_NO_ERROR;
+	NPError err = NPERR_NO_ERROR;
 
-    switch (aVariable) {
-      case NPPVpluginNameString:
-          *static_cast<char **> (aValue) = PLUGIN_NAME;
-          break;
+	switch (aVariable)
+	{
+		case NPPVpluginNameString:
+			*static_cast<char **> (aValue) = PLUGIN_NAME;
+			break;
 
-      // This becomes the description field you see below the opening
-      // text when you type about:plugins
-      case NPPVpluginDescriptionString:
-          *static_cast<const char **>(aValue) = getPluginDescription();
-          break;
+		// This becomes the description field you see below the opening
+		// text when you type about:plugins and in
+		// navigator.plugins["Shockwave Flash"].description, used in
+		// many flash version detection scripts.
+		case NPPVpluginDescriptionString:
+			*static_cast<const char **>(aValue) =
+						getPluginDescription();
+			break;
 
-      case NPPVpluginNeedsXEmbed:
+		case NPPVpluginNeedsXEmbed:
 #ifdef HAVE_GTK2
-	  *static_cast<PRBool *>(aValue) = PR_TRUE;
+			*static_cast<PRBool *>(aValue) = PR_TRUE;
 #else
-	  *static_cast<PRBool *>(aValue) = PR_FALSE;
+			*static_cast<PRBool *>(aValue) = PR_FALSE;
 #endif
-	  break;
-      case NPPVpluginTimerInterval:
-      case NPPVpluginKeepLibraryInMemory:
-      default:
-          err = NPERR_INVALID_PARAM;
-          break;
-    }
-    return err;
+			break;
+
+		case NPPVpluginTimerInterval:
+
+		case NPPVpluginKeepLibraryInMemory:
+
+		default:
+			err = NPERR_INVALID_PARAM;
+			break;
+	}
+	return err;
 }
 
 /// \brief construct our plugin instance object
@@ -221,10 +256,9 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 nsPluginInstanceBase *
 NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
 {
-    if(!aCreateDataStruct)
-      return NULL;
+	if(!aCreateDataStruct) return NULL;
 
-    return new nsPluginInstance(aCreateDataStruct);
+	return new nsPluginInstance(aCreateDataStruct);
 }
 
 /// \brief destroy our plugin instance object
@@ -234,7 +268,7 @@ NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
 void
 NS_DestroyPluginInstance(nsPluginInstanceBase * aPlugin)
 {
-    delete static_cast<nsPluginInstance *> (aPlugin);
+	delete static_cast<nsPluginInstance *> (aPlugin);
 }
 
 //
@@ -243,21 +277,25 @@ NS_DestroyPluginInstance(nsPluginInstanceBase * aPlugin)
 
 /// \brief Constructor
 nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
-  : nsPluginInstanceBase(),
-    _instance(data->instance),
-    _window(0),
-    _width(0),
-    _height(0),
-    _childpid(0)
+	:
+	nsPluginInstanceBase(),
+	_instance(data->instance),
+	_window(0),
+	_width(0),
+	_height(0),
+	_childpid(0)
 {
-	for (size_t i=0, n=data->argc; i<n; ++i) {
+	for (size_t i=0, n=data->argc; i<n; ++i)
+	{
 		string name, val;
 
-		if (data->argn[i]) {
+		if (data->argn[i])
+		{
 			name = data->argn[i];
 		}
 
-		if (data->argv[i]) {
+		if (data->argv[i])
+		{
 			val = data->argv[i];
 		}
 		//log_msg("PARAM: %s = %s", name.c_str(), val.c_str());
@@ -278,17 +316,20 @@ nsPluginInstance::~nsPluginInstance()
 NPBool
 nsPluginInstance::init(NPWindow* aWindow)
 {
-    if(!aWindow) {
-	cout <<  __PRETTY_FUNCTION__ << " ERROR: Window handle was bogus!" << endl;
-        return FALSE;
-    } else {
-	cout << "X origin: = " << aWindow->x 
-	     << ", Y Origin = " << aWindow->y
-	     << ", Width = " << aWindow->width
-	     << ", Height = " << aWindow->height
-             << ", WindowID = " << aWindow->window
-             << ", this = " << static_cast<void*>(this) << endl;
-    }
+	if(!aWindow)
+	{
+		cout <<  __PRETTY_FUNCTION__ << " ERROR: Window handle was bogus!" << endl;
+		return FALSE;
+	}
+	else
+	{
+		cout << "X origin: = " << aWindow->x 
+			<< ", Y Origin = " << aWindow->y
+			<< ", Width = " << aWindow->width
+			<< ", Height = " << aWindow->height
+			<< ", WindowID = " << aWindow->window
+			<< ", this = " << static_cast<void*>(this) << endl;
+	}
 
 #if 0
     // Only for developers. Make the plugin block here so we can
@@ -300,7 +341,8 @@ nsPluginInstance::init(NPWindow* aWindow)
 	sleep(5);
     }
 #endif
-    return TRUE;
+
+	return TRUE;
 }
 
 /// \brief Shutdown an instantiated object
@@ -311,17 +353,18 @@ nsPluginInstance::init(NPWindow* aWindow)
 void
 nsPluginInstance::shut()
 {
-    if (_childpid > 0) {
-	// it seems that waiting after a SIGINT hangs firefox
-	// IFF not run from the console (see bug#17082).
-	// SIGTERM instead solves this problem
-	kill(_childpid, SIGTERM);
-	int status;
-	waitpid(_childpid, &status, 0);
-	cout << "Child process exited with status " << status << endl;	
-    }
+	if (_childpid > 0)
+	{
+		// it seems that waiting after a SIGINT hangs firefox
+		// IFF not run from the console (see bug#17082).
+		// SIGTERM instead solves this problem
+		kill(_childpid, SIGTERM);
+		int status;
+		waitpid(_childpid, &status, 0);
+		cout << "Child process exited with status " << status << endl;	
+	}
 
-    _childpid = 0;
+	_childpid = 0;
 }
 
 /// \brief Set the window to be used to render in
@@ -334,32 +377,35 @@ nsPluginInstance::shut()
 NPError
 nsPluginInstance::SetWindow(NPWindow* aWindow)
 {
-    if(!aWindow) {
-	cout << __FUNCTION__ << ": ERROR: Window handle was bogus!" << endl;
-        return NPERR_INVALID_PARAM;
+	if(!aWindow)
+	{
+		cout << __FUNCTION__ << ": ERROR: Window handle was bogus!" << endl;
+		return NPERR_INVALID_PARAM;
 #if 0
-    } else {
- 	log_msg("%s: X origin = %d, Y Origin = %d, Width = %d,"
+	}
+	else
+	{
+		log_msg("%s: X origin = %d, Y Origin = %d, Width = %d,"
  	       " Height = %d, WindowID = %p, this = %p",
  	       __FUNCTION__,
  	       aWindow->x, aWindow->y, aWindow->width, aWindow->height,
  	       aWindow->window, this);
 #endif
-    }
+	}
 
-    _width = aWindow->width;
-    _height = aWindow->height;
+	_width = aWindow->width;
+	_height = aWindow->height;
 
-    _window = reinterpret_cast<Window> (aWindow->window);
+	_window = reinterpret_cast<Window> (aWindow->window);
 
-    return NPERR_NO_ERROR;
+	return NPERR_NO_ERROR;
 }
 
 
 NPError
 nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
 {
-    return NS_PluginGetValue(aVariable, aValue) ;
+	return NS_PluginGetValue(aVariable, aValue) ;
 }
 
 /// \brief Write a status message
@@ -369,16 +415,16 @@ nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
 NPError
 nsPluginInstance::WriteStatus(char *msg) const
 {
-    NPN_Status(_instance, msg);
-    cout << msg << endl;
+	NPN_Status(_instance, msg);
+	cout << msg << endl;
 
-    return NPERR_NO_ERROR;
+	return NPERR_NO_ERROR;
 }
 
 NPError
 nsPluginInstance::WriteStatus(std::string msg) const
 {
-  return WriteStatus( const_cast<char*>(msg.c_str()) );
+	return WriteStatus( const_cast<char*>(msg.c_str()) );
 }
 
 /// \brief Open a new data stream
@@ -395,29 +441,30 @@ NPError
 nsPluginInstance::NewStream(NPMIMEType /* type */, NPStream * stream,
                             NPBool /* seekable */, uint16_t * /* stype */)
 {
-    _swf_url = stream->url;
+	_swf_url = stream->url;
 
-    cout << __FUNCTION__ << ": The full URL is " << _swf_url << endl;
-
+	cout << __FUNCTION__ << ": The full URL is " << _swf_url << endl;
 
 #ifdef WRITE_FILE
-    size_t start, end;
-    string fname;
-    end   = _swf_url.find(".swf", 0) + 4;
-    start = _swf_url.rfind("/", end) + 1;
-    fname = "/tmp/";
-    fname += _swf_url.substr(start, end - start);
-    cout << "The Flash movie name is: " << fname << endl;
+	size_t start, end;
+	string fname;
+	end   = _swf_url.find(".swf", 0) + 4;
+	start = _swf_url.rfind("/", end) + 1;
+	fname = "/tmp/";
+	fname += _swf_url.substr(start, end - start);
+	cout << "The Flash movie name is: " << fname << endl;
 
-    _filefd = open(fname.c_str(), O_CREAT | O_WRONLY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
-    if (_filefd < 0) {
-        _filefd = open(fname.c_str(), O_TRUNC | O_WRONLY, S_IRUSR|S_IRGRP|S_IROTH);
-    }
+	_filefd = open(fname.c_str(), O_CREAT | O_WRONLY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+    
+	if (_filefd < 0)
+	{
+		_filefd = open(fname.c_str(), O_TRUNC | O_WRONLY, S_IRUSR|S_IRGRP|S_IROTH);
+	}
 #endif
     
-    startProc(_window);
+	startProc(_window);
 
-    return NPERR_NO_ERROR;
+	return NPERR_NO_ERROR;
 }
 
 /// \brief Destroy the data stream we've been reading.
@@ -431,19 +478,27 @@ nsPluginInstance::DestroyStream(NPStream * /* stream */, NPError /* reason */)
       (void *)arg, stream->url);
 #endif
 
-    if (_streamfd != -1) {
-        if (close(_streamfd) == -1) {
+    if (_streamfd != -1)
+    {
+        if (close(_streamfd) == -1)
+        {
             perror(strerror(errno));
-        } else {
+        }
+        else
+        {
             _streamfd = -1;
         }
     }
 
 #ifdef WRITE_FILE
-    if (_filefd != -1) {
-        if (close(_filefd) == -1) {
+    if (_filefd != -1)
+    {
+        if (close(_filefd) == -1)
+        {
             perror(strerror(errno));
-        } else {
+        }
+        else
+        {
             _filefd = -1;
         }
     }
@@ -457,9 +512,9 @@ int32_t
 nsPluginInstance::WriteReady(NPStream * /* stream */ )
 {
 #if 0
-    cout << "Stream for " << stream->url << " is ready" << endl;
+	cout << "Stream for " << stream->url << " is ready" << endl;
 #endif
-    return 1024;
+	return 1024;
 }
 
 /// \brief Read the data stream from Mozilla/Firefox
@@ -467,191 +522,252 @@ nsPluginInstance::WriteReady(NPStream * /* stream */ )
 /// For now we read the bytes and write them to a disk file.
 int32_t
 nsPluginInstance::Write(NPStream * /* stream */, int32_t /* offset */, int32_t len,
-                        void * buffer)
+				void * buffer)
 {
+
 #if 0
-    log_msg("Reading Stream %s, offset is %d, length = %d",
-      stream->url, offset, len);
+	log_msg("Reading Stream %s, offset is %d, length = %d",
+	stream->url, offset, len);
 #endif
+
 #ifdef WRITE_FILE
-    write(_filefd, buffer, len);
+	write(_filefd, buffer, len);
 #endif
-    return write(_streamfd, buffer, len);
+	return write(_streamfd, buffer, len);
 }
 
 void
 nsPluginInstance::startProc(Window win)
 {
-    string procname;
-    char *gnash_env = getenv("GNASH_PLAYER");
-    if (!gnash_env) {
-      procname = GNASHBINDIR;
-      procname += "/gtk-gnash";
-    } else {
-      procname = gnash_env;
-    }
-
-    const char* pageurl = getCurrentPageURL();
-    if ( ! pageurl )
-    {
-	cout << "Could not get current page URL!" << endl;
-	//log_msg("UNIMPLEMENTED: current page url: %s", pageurl);
-	// invoke gnash with -U <current_page_url>
-    }
-
-    struct stat procstats;
-
-    // See if the file actually exists, otherwise we can't spawn it
-    if (stat(procname.c_str(), &procstats) == -1) {
-	cout << "Invalid filename: " << procname << endl;
-      return;
-    }
-
-    int pipefd[2]; // 0 For reading, 1 for writing.
-
-    int ret = pipe(pipefd);
-    if (ret == -1) {
-      cout << "ERROR: pipe() failed: " << strerror(errno) << endl;
-    }
-
-    _streamfd = pipefd[1];
-
-    _childpid = fork();
-    // childpid is -1, if the fork failed, so print out an error message
-    if (_childpid == -1) {
-      cout << "ERROR: dup2() failed: " << strerror(errno) << endl;
-      return;
-    }
-
-    // childpid is a positive integer, if we are the parent, and
-    // fork() worked
-    if (_childpid > 0) {
-      ret = close (pipefd[0]); // we want to write, so close read-fd0
-      if (ret == -1) {
-        cout << "ERROR: close() failed: " << strerror(errno) << endl;
-      }
-
-      cout << "Forked sucessfully, child process PID is " << _childpid << endl;
-
-      return;
-    }
-
-    // This is the child scope.
-
-    ret = close (pipefd[1]); // We want to read, so close write-fd1
-    if (ret == -1) {
-      cout << "ERROR: close() failed: " << strerror(errno) << endl;
-    }
-
-    // close standard input and direct read-fd1 to standard input
-    ret = dup2 (pipefd[0], fileno(stdin));
-    if (ret == -1) {
-      cout << "ERROR: dup2() failed: " << strerror(errno) << endl;
-    }
-
-    // Close all of the browser's file descriptors that we just 
-    // inherited (including pipefd[0] that we just dup'd to fd 0).
-    // Experiments show seventy or eighty file descriptors open in
-    // typical cases.  Rather than close all the thousands of possible file
-    // descriptors, we start after stderr and keep closing higher numbers
-    // until we encounter ten fd's in a row that
-    // aren't open.  This will tend to close most fd's in most programms.
-    int numfailed = 0, closed = 0;
-    int anfd = fileno(stderr)+1;
-    for ( ; numfailed < 10; anfd++) {
-	ret = close (anfd);
-	if (ret < 0) numfailed++;
-	else         { numfailed = 0; closed++; }
-    }
-    cout << "Closed " << closed << "files." <<endl;
-
-    // setup the command line
-
-    const size_t buf_size = 30;
-    char xid[buf_size], width[buf_size], height[buf_size];
-    snprintf(xid, buf_size, "%ld", win);
-    snprintf(width, buf_size, "%d", _width);
-    snprintf(height, buf_size, "%d", _height);
-
-    // Write -P values 
-    vector<string> paramvalues;
-    paramvalues.reserve(_params.size());
-    for ( map<string,string>::const_iterator it=_params.begin(),
-		itEnd=_params.end();
-		it != itEnd; ++it)
-    {
-        const string& nam=it->first; 
-        const string& val=it->second;
-
-        string param = nam;
-	param += string("=");
-	param += val;
-        paramvalues.push_back(param);
-    }
-
-    // REMEMBER TO INCREMENT THE maxargc COUNT IF YOU
-    // ADD NEW ARGUMENTS 
-
-    const size_t maxargc = 16 + paramvalues.size()*2;
-    char **argv = new char *[maxargc];
-
-    size_t argc = 0;
-    argv[argc++] = const_cast<char*>( procname.c_str() );
-    // don't specify rendering flags, so that the rcfile
-    // will control that 
-    //argv[argc++] = "-r";
-    //argv[argc++] = "3";
-    argv[argc++] = "-v";
-    argv[argc++] = "-x";
-    argv[argc++] = xid;
-    argv[argc++] = "-j";
-    argv[argc++] = width;
-    argv[argc++] = "-k";
-    argv[argc++] = height;
-    argv[argc++] = "-u";
-    argv[argc++] = const_cast<char*>( _swf_url.c_str() );
-    if ( pageurl )
-    {
-    	argv[argc++] = "-U";
-    	argv[argc++] = const_cast<char*>( pageurl );
-    }
-
-    for ( size_t i=0, n=paramvalues.size(); i<n; ++i)
-    {
-        argv[argc++] = "-P";
-        argv[argc++] = const_cast<char*>( paramvalues[i].c_str() );
-    }
-
-    argv[argc++] = "-";
-    argv[argc++] = 0;
-
-    assert(argc <= maxargc);
-
-    // Start the desired executable and go away
-    cout << "Starting process: ";
-
-    for (int i=0; argv[i] != 0; ++i) {
-      cout << argv[i] << " ";
-    }
-    cout << endl;
-
-    if (waitforgdb) {
-	cout << endl << "  Attach GDB to PID " << getpid() << " to debug!" << endl;
-	cout << "  This thread will block until then!..." << endl;
-	cout << "  Once blocked here, you can set other breakpoints." << endl;
-	cout << "  do a \"set variable waitforgdb=false\" to continue" << endl << endl;
-	while (waitforgdb) {
-	    sleep(1);
+	string procname;
+	char *gnash_env = getenv("GNASH_PLAYER");
+	if (!gnash_env) {
+		procname = GNASHBINDIR;
+		procname += "/gtk-gnash";
 	}
-    }
+	else
+	{
+		procname = gnash_env;
+	}
 
-    execv(argv[0], argv);
-    // if execv returns, an error has occurred.
-    perror(strerror(errno));
+	const char* pageurl = getCurrentPageURL();
+	if ( ! pageurl )
+	{
+		cout << "Could not get current page URL!" << endl;
+	}
 
-    delete[] argv;
+	struct stat procstats;
 
-    exit (-1);
+	// See if the file actually exists, otherwise we can't spawn it
+	if (stat(procname.c_str(), &procstats) == -1)
+	{
+		cout << "Invalid filename: " << procname << endl;
+		return;
+	}
+
+	// 0 For reading, 1 for writing.
+	int pipefd[2];
+	
+	int ret = pipe(pipefd);
+	if (ret == -1)
+	{
+		cout << "ERROR: pipe() failed: " << strerror(errno) << endl;
+	}
+
+	_streamfd = pipefd[1];
+
+	_childpid = fork();
+
+	// If the fork failed, childpid is -1. So print out an error message.
+	if (_childpid == -1)
+	{
+		cout << "ERROR: dup2() failed: " << strerror(errno) << endl;
+		return;
+	}
+
+	// If we are the parent and fork() worked, childpid is a positive integer.
+	if (_childpid > 0)
+	{
+
+		// we want to write, so close read-fd0
+		ret = close (pipefd[0]);
+	
+		if (ret == -1)
+		{
+			cout << "ERROR: close() failed: " << strerror(errno)
+								<< endl;
+		}
+
+		cout << "Forked successfully, child process PID is " 
+								<< _childpid
+								<< endl;
+
+		return;
+	}
+
+	// This is the child scope.
+
+	// We want to read, so close write-fd1
+	ret = close (pipefd[1]); 
+	if (ret == -1)
+	{
+		cout << "ERROR: close() failed: " << strerror(errno) << endl;
+	}
+
+	// close standard input and direct read-fd1 to standard input
+	ret = dup2 (pipefd[0], fileno(stdin));
+	
+	if (ret == -1)
+	{
+		cout << "ERROR: dup2() failed: " << strerror(errno) << endl;
+	}
+
+	// Close all of the browser's file descriptors that we just 
+	// inherited (including pipefd[0] that we just dup'd to fd 0).
+	// Experiments show seventy or eighty file descriptors open in
+	// typical cases.  Rather than close all the thousands of possible file
+	// descriptors, we start after stderr and keep closing higher numbers
+	// until we encounter ten fd's in a row that
+	// aren't open. This will tend to close most fd's in most programs.
+	int numfailed = 0, closed = 0;
+	int anfd = fileno(stderr)+1;
+	for ( ; numfailed < 10; anfd++)
+	{
+		ret = close (anfd);
+		if (ret < 0) numfailed++;
+		else
+		{
+			numfailed = 0;
+			closed++;
+		}
+	}
+
+	cout << "Closed " << closed << "files." << endl;
+
+	/*
+	Setup the command line for starting Gnash
+	*/
+
+	// Prepare width, height and window ID variables
+	const size_t buf_size = 30;
+	char xid[buf_size], width[buf_size], height[buf_size];
+	snprintf(xid, buf_size, "%ld", win);
+	snprintf(width, buf_size, "%d", _width);
+	snprintf(height, buf_size, "%d", _height);
+
+	// Prepare Actionscript variables (e.g. Flashvars).
+	vector<string> paramvalues;
+	paramvalues.reserve(_params.size());
+
+	for (map<string,string>::const_iterator it=_params.begin(),
+		itEnd=_params.end();
+		it != itEnd; ++it
+		)
+	{
+		const string& nam=it->first; 
+		const string& val=it->second;
+
+		string param = nam;
+		param += string("=");
+		param += val;
+		paramvalues.push_back(param);
+	}
+
+	/*
+	We pass the necessary arguments to the gnash executable for
+	it to run as a plugin. We do not specify rendering flags so
+	they can be set in gnashrc. Gnash defaults to -r3 anyway.
+	
+	REMEMBER TO INCREMENT THE maxargc COUNT IF YOU
+	ADD NEW ARGUMENTS
+	*/ 
+
+	const size_t maxargc = 16 + paramvalues.size() * 2;
+	char **argv = new char *[maxargc];
+
+	size_t argc = 0;
+	argv[argc++] = const_cast<char*>( procname.c_str() );
+	
+	// Verbose
+	argv[argc++] = const_cast<char*>("-v");
+	
+	// X window ID (necessary for gnash to function as a plugin)
+	argv[argc++] = const_cast<char*>("-x");
+	argv[argc++] = xid;
+	
+	// Height and width
+	argv[argc++] = const_cast<char*>("-j");
+	argv[argc++] = width;
+	argv[argc++] = const_cast<char*>("-k");
+	argv[argc++] = height;
+	
+	argv[argc++] = const_cast<char*>("-u");
+	argv[argc++] = const_cast<char*>( _swf_url.c_str() );
+
+	// Base URL is the page that the SWF is embedded in. It is 
+	// by Gnash for resolving relative URLs in the movie. If the
+	// embed tag "base" is specified, its value overrides the -U
+	// flag later (Player.cpp).
+	if ( pageurl )
+	{
+		argv[argc++] = const_cast<char*> ("-U");
+		argv[argc++] = const_cast<char*>( pageurl );
+	}
+
+	// Variables for use by Actionscript.
+	for ( size_t i=0, n=paramvalues.size(); i<n; ++i)
+	{
+		argv[argc++] = const_cast<char*>("-P");
+		argv[argc++] = const_cast<char*>( paramvalues[i].c_str() );
+	}
+
+	argv[argc++] = const_cast<char*>("-");
+	argv[argc++] = 0;
+
+	assert(argc <= maxargc);
+
+	/*
+	Start the desired executable and go away.
+	*/
+	
+	cout << "Starting process: ";
+
+	for (int i=0; argv[i] != 0; ++i)
+	{
+		cout << argv[i] << " ";
+	}
+	cout << endl;
+
+	/*
+	For debugging the plugin (GNASH_OPTIONS=waitforgdb)
+	Block here until gdb is attached and sets waitforgdb to
+	false.
+	*/
+
+	if (waitforgdb) {
+
+		cout << endl << "  Attach GDB to PID " << getpid()
+				<< " to debug!" << endl;
+		cout << "  This thread will block until then!" << endl;
+		cout << "  Once blocked here, you can set other breakpoints."
+				<< endl;
+		cout << "  Do a \"set variable waitforgdb=$false\" to continue"
+				<< endl << endl;
+		
+		while (waitforgdb)
+		{
+			sleep(1);
+		}
+	}
+
+	execv(argv[0], argv);
+
+	// if execv returns, an error has occurred.
+	perror(strerror(errno));
+
+	delete[] argv;
+
+	exit (-1);
 }
 
 const char*
@@ -667,10 +783,13 @@ nsPluginInstance::getCurrentPageURL() const
         NPVariant vDoc;
         NPN_GetProperty(npp, window, sDocument, &vDoc);
         NPN_ReleaseObject(window);
-        if (!NPVARIANT_IS_OBJECT(vDoc)) {
-	    cout << "Can't get window object" << endl;
-	    return NULL;
+
+	if (!NPVARIANT_IS_OBJECT(vDoc))
+	{
+		cout << "Can't get window object" << endl;
+		return NULL;
 	}
+	
         NPObject* npDoc = NPVARIANT_TO_OBJECT(vDoc);
 
         NPIdentifier sLocation = NPN_GetStringIdentifier("location");
@@ -679,8 +798,8 @@ nsPluginInstance::getCurrentPageURL() const
         NPN_ReleaseObject(npDoc);
         if (!NPVARIANT_IS_OBJECT(vLoc))
 	{
-	    cout <<"Can't get window.location object" << endl;
-	    return NULL;
+		cout <<"Can't get window.location object" << endl;
+		return NULL;
 	}
         NPObject* npLoc = NPVARIANT_TO_OBJECT(vLoc);
 
@@ -690,8 +809,8 @@ nsPluginInstance::getCurrentPageURL() const
         NPN_ReleaseObject(npLoc);
         if (!NPVARIANT_IS_STRING(vProp))
 	{
-	    cout << "Can't get window.location.href object" << endl;
-	    return NULL;
+		cout << "Can't get window.location.href object" << endl;
+		return NULL;
 	}
         const NPString& propValue = NPVARIANT_TO_STRING(vProp);
 
@@ -703,7 +822,7 @@ static const char* getPluginDescription()
 	static const char* desc = NULL;
 	if ( ! desc )
 	{
-    		desc = getenv("GNASH_PLUGIN_DESCRIPTION");
+		desc = getenv("GNASH_PLUGIN_DESCRIPTION");
 		if ( ! desc ) desc = PLUGIN_DESCRIPTION;
 	}
 	return desc;
