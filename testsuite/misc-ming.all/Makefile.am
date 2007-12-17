@@ -160,6 +160,7 @@ check_PROGRAMS = \
 	morph_test1runner \
 	opcode_guard_test \
 	runtime_vm_stack_test \
+	new_child_in_unload_test \
 	$(NULL)
 
 if MING_VERSION_0_4
@@ -246,6 +247,7 @@ check_SCRIPTS = \
 	DefineEditTextVariableNameTest2-Runner \
 	opcode_guard_testrunner \
 	runtime_vm_stack_testrunner \
+	new_child_in_unload_testrunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -354,7 +356,19 @@ runtime_vm_stack_test.swf: runtime_vm_stack_test
 runtime_vm_stack_testrunner: $(srcdir)/../generic-testrunner.sh runtime_vm_stack_test.swf
 	sh $< $(top_builddir) runtime_vm_stack_test.swf > $@
 	chmod 755 $@
-	
+
+new_child_in_unload_test_SOURCES =	\
+	new_child_in_unload_test.c	\
+	$(NULL)
+new_child_in_unload_test_LDADD = libgnashmingutils.la
+
+new_child_in_unload_test.swf: new_child_in_unload_test
+	./new_child_in_unload_test $(top_srcdir)/testsuite/media
+
+new_child_in_unload_testrunner: $(srcdir)/../generic-testrunner.sh new_child_in_unload_test.swf
+	sh $< $(top_builddir) new_child_in_unload_test.swf > $@
+	chmod 755 $@
+		
 PlaceObject2Test_SOURCES =	\
 	PlaceObject2Test.c	\
 	$(NULL)
