@@ -297,13 +297,14 @@ main(int argc, char *argv[])
     } else {
         size_t s = 12;
         runtest.fail("RTMP Headers mismatch");
-        unsigned char hexint[(s*2)+1];
+        unsigned char* hexint = new unsigned char[(s*2)+1];
         hexify((unsigned char *)hexint, (unsigned char *)buf, s, true);
 	hexint[s*2] = '\0';
         cerr << "buf is: 0x" << hexint << endl;
         hexify((unsigned char *)hexint, (unsigned char *)out, s, true);
 	hexint[s*2] = '\0';
         cerr << "out is: 0x" << hexint << endl;
+	delete [] hexint;
     }
 
     tmpptr += rtmp.getHeaderSize();
@@ -483,13 +484,15 @@ main(int argc, char *argv[])
     }    
 
     size_t hexsize = std::max(AMF_PACKET_SIZE, amf_obj.getTotalSize())*2;
-    unsigned char hexint[hexsize+1];
+    unsigned char* hexint = new unsigned char[hexsize+1];
     hexify((unsigned char *)hexint, (unsigned char *)buf, amf_obj.getTotalSize() + 10, true);
     hexint[hexsize] = '\0';
     cerr << "buf is: 0x" << hexint << ", size is: " << amf_obj.getTotalSize() << endl;
     hexify((unsigned char *)hexint, (unsigned char *)out, rtmp.getTotalSize() + 10, true);
     hexint[hexsize] = '\0';
     cerr << "out is: 0x" << hexint << ", size is: " << rtmp.getTotalSize() << endl;
+
+    delete [] hexint;
     
 //    delete out;
 }
