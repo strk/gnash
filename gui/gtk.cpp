@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.122 2007/11/22 16:19:57 rsavoye Exp $ */
+/* $Id: gtk.cpp,v 1.123 2007/12/17 09:32:39 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -129,6 +129,10 @@ GtkGui::init(int argc, char **argv[])
 	gdk_pixbuf_unref (_window_icon_pixbuf);
     }
     _drawing_area = gtk_drawing_area_new();
+
+    // IF we don't set this flag we won't be able to grab focus
+    // ( grabFocus() would be a no-op )
+    GTK_WIDGET_SET_FLAGS (GTK_WIDGET(_drawing_area), GTK_CAN_FOCUS);
 
     createMenu();
 #ifdef RENDERER_OPENGL
@@ -460,6 +464,12 @@ GtkGui::addFDListener(int fd, callback_t callback, void* data)
     }
     
     return true;    
+}
+
+void
+GtkGui::grabFocus()
+{
+    gtk_widget_grab_focus(GTK_WIDGET(_drawing_area));
 }
 
 void
@@ -1536,7 +1546,9 @@ GtkGui::button_press_event(GtkWidget *const /*widget*/,
                            const gpointer data)
 {
     //GNASH_REPORT_FUNCTION;
-    Gui *obj = static_cast<Gui *>(data);
+    GtkGui *obj = static_cast<GtkGui *>(data);
+
+    obj->grabFocus();
 
     int	mask = 1 << (event->button - 1);
     obj->notify_mouse_clicked(true, mask);

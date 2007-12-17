@@ -78,6 +78,13 @@ class DSOEXPORT GtkGui : public Gui
     /// @return true on success, false on failure.
     bool addFDListener(int fd, callback_t callback, void* data);
 
+
+    /// Grab focus so to receive all key events
+    //
+    /// Might become a virtual in the base class
+    ///
+    void grabFocus();
+
     /// Create a menu bar for the application, attach to our window. 
     //  This should only appear in the standalone player.
     bool createMenuBar();
