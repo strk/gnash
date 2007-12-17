@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.77 2007/12/04 11:45:31 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.78 2007/12/17 22:24:59 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -481,7 +481,7 @@ NetStream::processStatusNotifications()
 		// TODO: optimize by reusing the same as_object ?
 		boost::intrusive_ptr<as_object> o = getStatusObject(code);
 
-		m_env->push_val(as_value(o.get()));
+		m_env->push(as_value(o.get()));
 		call_method(status, m_env, this, 1, m_env->get_top_index() );
 
 	}

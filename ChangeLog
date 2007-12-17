@@ -1,3 +1,12 @@
+2007-12-17 Sandro Santilli <strk@keybit.net>
+
+	* server/as_environment.h: drop push_val, make push non-templated
+	  and taking an as_value. I belive this drops a copy-construction
+	  of as_value for every push use ...
+	* extensions/gtk2/gtkext.cpp, server/as_function.cpp,
+	  server/asobj/NetStream.cpp, server/vm/ASHandlers.cpp: replace
+	  the few push_val calls with push.
+
 2007-12-17 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* plugin/plugin.cpp: change NPAPI error messages so as not to

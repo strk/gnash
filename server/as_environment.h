@@ -60,18 +60,18 @@ public:
 	character* get_target() { return m_target; }
 	void set_target(character* target);
 
-    character* get_original_target() { return _original_target; }
+	character* get_original_target() { return _original_target; }
 
 	// Reset target to its original value
 	void reset_target() { m_target = _original_target; }
 
 	/// @{ Stack access/manipulation
 
-	// @@ TODO do more checking on these
-	template<class T>
-	// stack access/manipulation
-	void	push(T val) { push_val(as_value(val)); }
-	void	push_val(const as_value& val) { m_stack.push_back(val); }
+	/// Push a value on the stack
+	void	push(const as_value& val)
+	{
+		m_stack.push_back(val);
+	}
 
 
 	/// Pops an as_value off the stack top and return it.

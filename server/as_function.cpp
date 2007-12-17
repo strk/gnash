@@ -267,11 +267,9 @@ function_apply(const fn_call& fn)
 			unsigned int nelems = arg_array->size();
 
 			//log_error(_("Function.apply(this_ref, array[%d])\n"), nelems);
-			as_value index, value;
 			for (unsigned int i=nelems; i; i--)
 			{
-				value=arg_array->at(i-1);
-				fn.env().push_val(value);
+				fn.env().push(arg_array->at(i-1));
 				pushed++;
 			}
 

@@ -106,9 +106,9 @@ generic_callback(GtkWidget *widget, gpointer data)
     
     as_value	val;
     as_environment env;
-    env.push_val(handler.to_object());
+    env.push(handler);
     env.push(event);
-    env.push(handler.to_string());
+    env.push(handler);
     as_object obj = val.to_object();
 
     // Call the AS function defined in the source file using this extension

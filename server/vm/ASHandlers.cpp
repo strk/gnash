@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.172 2007/12/16 10:10:52 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.173 2007/12/17 22:24:59 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -3764,7 +3764,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 	// Otherwise push the function literal on the stack
 	else
 	{
-		env.push_val(function_value);
+		env.push(function_value);
 	}
 #ifdef USE_DEBUGGER
 	// WARNING: function_value.to_object() can return a newly allocated
@@ -3989,7 +3989,7 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 	// Otherwise push the function literal on the stack
 	else
 	{
-		env.push_val(function_value);
+		env.push(function_value);
 	}
 
 	//cerr << "After ActionDefineFunction:"<<endl;
