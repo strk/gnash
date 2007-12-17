@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.68 2007/12/14 20:51:20 strk Exp $ */
+/* $Id: character.cpp,v 1.69 2007/12/17 07:41:42 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -833,13 +833,11 @@ character::get_text_value() const
 void
 character::destroy()
 {
-	/// We can't be destroyed w/out being unloaded first, right ?
-	/// we may change this in the future...
-	assert(isUnloaded());
 
+	/// we may destory a character that's not unloaded.
+	///(we don't have chance to unload it in current model, see new_child_in_unload_test.c)
 	/// We don't destroy ourself twice, right ?
 	assert(!_destroyed);
-
 	_destroyed = true;
 }
 

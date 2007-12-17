@@ -3,6 +3,8 @@
 	* testsuite/misc-ming.all/new_child_in_unload_test.c, Makefile.am:
 	  new test for inspecting ::destroy(). We may want to destroy an character
 	  that is not unloaded.
+	* server/character.cpp: remove the assertion in charcter::destroy(), it's not
+	  correct as tests confirmed.
 	  
 2007-12-16 Sandro Santilli <strk@keybit.net>
 
