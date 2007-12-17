@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.56 2007/12/04 11:45:32 strk Exp $ */
+/* $Id: xml.cpp,v 1.57 2007/12/17 22:57:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -427,12 +427,14 @@ XML::queueLoad(std::auto_ptr<tu_file> str)
     //
     std::string src;
     char buf[256];
+    log_debug("Started loading of XML in main tread... ");
     while ( 1 )
     {
         size_t bytes = str->read_bytes(buf, 255);
         src.append(buf, bytes);
         if ( bytes < 255 ) break; // end of buffer
     }
+    log_debug("... finished loading of XML in main tread.");
     callMethod(onDataKey, as_value(src));
 }
 
