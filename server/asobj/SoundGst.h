@@ -56,7 +56,7 @@ public:
 	{}
 	~SoundGst();
 
-	void loadSound(std::string file, bool streaming);
+	void loadSound(const std::string& file, bool streaming);
 	void start(int offset, int loops);
 	void stop(int si);
 	unsigned int getDuration();

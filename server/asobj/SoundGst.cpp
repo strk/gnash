@@ -220,7 +220,7 @@ SoundGst::~SoundGst() {
 }
 
 void
-SoundGst::loadSound(std::string file, bool streaming)
+SoundGst::loadSound(const std::string& file, bool streaming)
 {
 	pipeline = NULL;
 	remainingLoops = 0;

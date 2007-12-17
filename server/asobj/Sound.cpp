@@ -139,7 +139,7 @@ Sound::getVolume()
 }
 
 void
-Sound::loadSound(std::string file, bool /*streaming*/)
+Sound::loadSound(const std::string& file, bool /*streaming*/)
 {
 	log_msg(_("%s is still testing!"), __FUNCTION__);
 

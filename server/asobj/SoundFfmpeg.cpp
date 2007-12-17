@@ -374,7 +374,7 @@ SoundFfmpeg::~SoundFfmpeg() {
 }
 
 void
-SoundFfmpeg::loadSound(std::string file, bool streaming)
+SoundFfmpeg::loadSound(const std::string& file, bool streaming)
 {
 	leftOverData = NULL;
 	leftOverSize = 0;

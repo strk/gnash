@@ -1,5 +1,10 @@
 2007-12-17 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/: Sound.{cpp,h}, SoundFfmpeg.{cpp,h},
+	  SoundGst.{cpp,h}: don't copy the string passed to loadSound.
+
+2007-12-17 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/libamf.all/test_object.cpp: ISO C++ forbids variable-size
 	  arrays (-pedantic).
 

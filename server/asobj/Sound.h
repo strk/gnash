@@ -46,7 +46,7 @@ public:
 	virtual void getPan();
 	virtual void getTransform();
 	virtual int getVolume();
-	virtual void loadSound(std::string file, bool streaming);
+	virtual void loadSound(const std::string& file, bool streaming);
 	virtual void setPan();
 	virtual void setTransform();
 	virtual void setVolume(int volume);
