@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.89 2007/12/17 13:15:49 bwy Exp $ */
+/* $Id: plugin.cpp,v 1.90 2007/12/17 16:06:45 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -27,10 +27,10 @@
 #define PLUGIN_NAME	"Shockwave Flash"
 #define MIME_TYPES_DESCRIPTION  MIME_TYPES_HANDLED":swf:"PLUGIN_NAME
 
-//Some javascript plugin detectors use the description
-//to decide the flash version to display. They expect the
-//form (major version).(minor version) r(revision).
-//e.g. "8.0 r99."
+// Some javascript plugin detectors use the description
+// to decide the flash version to display. They expect the
+// form (major version).(minor version) r(revision).
+// e.g. "8.0 r99."
 #define FLASH_VERSION DEFAULT_FLASH_MAJOR_VERSION"."\
 	DEFAULT_FLASH_MINOR_VERSION" r"DEFAULT_FLASH_REV_NUMBER"."
 
@@ -551,7 +551,7 @@ nsPluginInstance::startProc(Window win)
 	}
 
 	const char* pageurl = getCurrentPageURL();
-	if ( ! pageurl )
+	if (!pageurl)
 	{
 		cout << "Could not get current page URL!" << endl;
 	}
@@ -659,13 +659,13 @@ nsPluginInstance::startProc(Window win)
 	vector<string> paramvalues;
 	paramvalues.reserve(_params.size());
 
-	for (map<string,string>::const_iterator it=_params.begin(),
-		itEnd=_params.end();
+	for (map<string,string>::const_iterator it = _params.begin(),
+		itEnd = _params.end();
 		it != itEnd; ++it
 		)
 	{
-		const string& nam=it->first; 
-		const string& val=it->second;
+		const string& nam = it->first; 
+		const string& val = it->second;
 
 		string param = nam;
 		param += string("=");
@@ -683,26 +683,26 @@ nsPluginInstance::startProc(Window win)
 	*/ 
 
 	const size_t maxargc = 16 + paramvalues.size() * 2;
-	char **argv = new char *[maxargc];
+	const char **argv = new const char *[maxargc];
 
 	size_t argc = 0;
-	argv[argc++] = const_cast<char*>( procname.c_str() );
+	argv[argc++] = procname.c_str();
 	
 	// Verbose
-	argv[argc++] = const_cast<char*>("-v");
+	argv[argc++] = "-v";
 	
 	// X window ID (necessary for gnash to function as a plugin)
-	argv[argc++] = const_cast<char*>("-x");
+	argv[argc++] = "-x";
 	argv[argc++] = xid;
 	
 	// Height and width
-	argv[argc++] = const_cast<char*>("-j");
+	argv[argc++] = "-j";
 	argv[argc++] = width;
-	argv[argc++] = const_cast<char*>("-k");
+	argv[argc++] = "-k";
 	argv[argc++] = height;
 	
-	argv[argc++] = const_cast<char*>("-u");
-	argv[argc++] = const_cast<char*>( _swf_url.c_str() );
+	argv[argc++] = "-u";
+	argv[argc++] = _swf_url.c_str();
 
 	// Base URL is the page that the SWF is embedded in. It is 
 	// by Gnash for resolving relative URLs in the movie. If the
@@ -710,18 +710,18 @@ nsPluginInstance::startProc(Window win)
 	// flag later (Player.cpp).
 	if ( pageurl )
 	{
-		argv[argc++] = const_cast<char*> ("-U");
-		argv[argc++] = const_cast<char*>( pageurl );
+		argv[argc++] = "-U";
+		argv[argc++] = pageurl;
 	}
 
 	// Variables for use by Actionscript.
-	for ( size_t i=0, n=paramvalues.size(); i<n; ++i)
+	for ( size_t i = 0, n = paramvalues.size(); i < n; ++i)
 	{
-		argv[argc++] = const_cast<char*>("-P");
-		argv[argc++] = const_cast<char*>( paramvalues[i].c_str() );
+		argv[argc++] = "-P";
+		argv[argc++] = paramvalues[i].c_str();
 	}
 
-	argv[argc++] = const_cast<char*>("-");
+	argv[argc++] = "-";
 	argv[argc++] = 0;
 
 	assert(argc <= maxargc);
@@ -732,7 +732,7 @@ nsPluginInstance::startProc(Window win)
 	
 	cout << "Starting process: ";
 
-	for (int i=0; argv[i] != 0; ++i)
+	for (int i = 0; argv[i] != 0; ++i)
 	{
 		cout << argv[i] << " ";
 	}
@@ -760,7 +760,7 @@ nsPluginInstance::startProc(Window win)
 		}
 	}
 
-	execv(argv[0], argv);
+	execv(argv[0], const_cast<char**>(argv));
 
 	// if execv returns, an error has occurred.
 	perror(strerror(errno));
@@ -820,10 +820,10 @@ nsPluginInstance::getCurrentPageURL() const
 static const char* getPluginDescription() 
 {
 	static const char* desc = NULL;
-	if ( ! desc )
+	if (!desc)
 	{
 		desc = getenv("GNASH_PLUGIN_DESCRIPTION");
-		if ( ! desc ) desc = PLUGIN_DESCRIPTION;
+		if (!desc) desc = PLUGIN_DESCRIPTION;
 	}
 	return desc;
 }

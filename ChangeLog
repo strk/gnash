@@ -3,6 +3,7 @@
 	* plugin/plugin.cpp: change NPAPI error messages so as not to
 	  annoy Opera users (doesn't make it work on Opera, unfortunately),
 	  general code cleanup.
+	* plugin/plugin.cpp (second commit): more cleanup.
 
 2007-12-17 Sandro Santilli <strk@keybit.net>
 
