@@ -22,7 +22,7 @@
  *  Test case sensitivity 
  */
 
-rcsid="$Id: case.as,v 1.12 2007/09/29 16:22:58 strk Exp $";
+rcsid="$Id: case.as,v 1.13 2007/12/17 09:35:44 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -196,6 +196,53 @@ func(100);
   check_equals(typeof(_root['mc_XYZ']), 'movieclip');
   check_equals(typeof(_root['mcRef']), 'movieclip');
   check_equals(typeof(mcRef['gotoAndStop']), 'function');
+#endif 
+
+
+delete obj;
+propRecorder = new Array();
+obj = { A: 1, b: 2 };
+for(var prop in obj)
+{
+   propRecorder.push(prop);
+}
+propRecorder.sort(1); //caseinsensitive sort
+xcheck_equals(propRecorder[0], 'A')
+check_equals(propRecorder[1], 'b')
+
+propRecorder = new Array();
+obj.a = 3;
+for(var prop in obj)
+{
+   propRecorder.push(prop);
+}
+propRecorder.sort(1); //caseinsensitive sort
+#if OUTPUT_VERSION < 7
+    xcheck_equals(propRecorder[0], 'A')
+    check_equals(propRecorder[1], 'b')
+#endif
+
+propRecorder = new Array();
+obj.B = 4;
+for(var prop in obj)
+{
+   propRecorder.push(prop);
+}
+propRecorder.sort(1); //caseinsensitive sort
+#if OUTPUT_VERSION < 7
+    xcheck_equals(propRecorder[0], 'A')
+    check_equals(propRecorder[1], 'b')
+#endif
+
+propRecorder = new Array();
+delete obj.a;
+for(var prop in obj)
+{
+   propRecorder.push(prop);
+}
+propRecorder.sort(1); //caseinsensitive sort
+#if OUTPUT_VERSION < 7
+    check_equals(propRecorder[0], 'b')
 #endif 
 
 totals();
