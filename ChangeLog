@@ -1,5 +1,10 @@
 2007-12-17 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/case.as: fix testcase, add test for
+	  .length.
+
+2007-12-17 Sandro Santilli <strk@keybit.net>
+
 	* gui/: gtk.cpp, gtksup.h: grab focus on click.
 	  Fixes bug #21808. Thanks Benjamin Wolsey for research
 	  on the topic.
