@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.460 2007/12/15 06:58:39 rsavoye Exp $
+dnl $Id: configure.ac,v 1.461 2007/12/18 11:06:03 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -2255,7 +2255,8 @@ if test x$build_agg = xyes; then # {
     if test x"$AGG_LIBS" != x; then # {
       if test x"${agg25}" != xyes; then # {
         echo "        ERROR: Your installation of AGG appears to be version 2.4 or older."
-        echo "               Please upgrade to AGG 2.5 or greater"
+        echo "               Please upgrade to AGG 2.5 or greater."
+        echo "               Install it from http://www.antigrain.com"
         echo "               or .deb users: apt-get install libagg-dev"
         echo "               or .rpm users: yum install agg-devel"
         nogo=true

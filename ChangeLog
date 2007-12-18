@@ -1,5 +1,6 @@
 2007-12-18 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: point to AGG website when warning about old version.
 	* testsuite/misc-ming.all/DefineEditTextVariableNameTest2.c:
 	  Found out the "toString not invoked" was a bogus deduction.
 	  Added checking of total tests run.
