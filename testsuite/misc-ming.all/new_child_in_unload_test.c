@@ -61,7 +61,6 @@ main(int argc, char** argv)
 {
   SWFMovie mo;
   SWFMovieClip  mc1, mc2, dejagnuclip;
-  SWFShape  sh1, sh2;
   SWFDisplayItem it1, it2;
   
   const char *srcdir=".";
@@ -113,6 +112,10 @@ main(int argc, char** argv)
   SWFDisplayItem_addAction(it2,
     newSWFAction(
       " _root.check_equals(_level0.dyn1Ref.getDepth(), 100);"
+      " _level0.dyn1Ref.swapDepths(101); "
+      // Check that we can still swap the new child created in onClipUnload(mc1)
+      // Note mc1 is already unloaded(this is in mc2.unload).
+      " _root.check_equals(_level0.dyn1Ref.getDepth(), 101);"
     ),
     SWFACTION_UNLOAD); 
   SWFMovie_nextFrame(mo); // frame2
@@ -127,7 +130,7 @@ main(int argc, char** argv)
   check_equals(mo, "_root.dyn2testvar", "'executed'");
   SWFMovie_nextFrame(mo); // frame4
 
-  add_actions(mo, " _root.totals(6); stop(); ");
+  add_actions(mo, " _root.totals(7); stop(); ");
   SWFMovie_nextFrame(mo); // frame5 
   
   //Output movie
