@@ -1,5 +1,10 @@
 2007-12-17 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui.cpp, server/movie_root.{cpp,h}, testsuite/MovieTester.cpp,
+	  utilities/processor.cpp: drop argument from movie_root::advance.
+
+2007-12-17 Sandro Santilli <strk@keybit.net>
+
 	* server/as_environment.h: drop push_val, make push non-templated
 	  and taking an as_value. I belive this drops a copy-construction
 	  of as_value for every push use ...

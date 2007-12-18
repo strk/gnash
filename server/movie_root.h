@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.96 2007/12/14 20:51:20 strk Exp $ */
+/* $Id: movie_root.h,v 1.97 2007/12/18 00:07:11 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -398,7 +398,7 @@ public:
     ///     - Remove unloaded characters from the advanceable characters list.
     ///     - Run the GC collector
     ///
-    void advance(float delta_time);
+    void advance();
 
     /// 0-based!! delegates to _level0
     //

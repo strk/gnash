@@ -692,11 +692,11 @@ Gui::advanceMovie()
 
 #ifndef REVIEW_ALL_FRAMES
 	// Advance movie by one frame
-	m->advance(1.0);
+	m->advance();
 #else
 	size_t cur_frame = m->getRootMovie()->get_current_frame();
 	size_t tot_frames = m->getRootMovie()->get_frame_count();
-	m->advance(1.0);
+	m->advance();
 	m->get_movie_definition()->ensure_frame_loaded(tot_frames);
 	m->goto_frame(cur_frame+1);
     	m->set_play_state(gnash::sprite_instance::PLAY);

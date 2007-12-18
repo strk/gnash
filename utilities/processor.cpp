@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: processor.cpp,v 1.77 2007/12/11 00:14:23 strk Exp $ */
+/* $Id: processor.cpp,v 1.78 2007/12/18 00:07:12 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -373,7 +373,7 @@ play_movie(const char* filename)
 	size_t	last_frame = m.get_current_frame();
 	//printf("advancing clock by %lu\n", clockAdvance);
 	cl.advance(clockAdvance);
-	m.advance(0.010f);
+	m.advance();
 
 	if ( quitrequested ) 
 	{

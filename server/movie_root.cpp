@@ -904,7 +904,7 @@ movie_root::clear_interval_timer(unsigned int x)
 }
 	
 void
-movie_root::advance(float delta_time)
+movie_root::advance()
 {
 	// GNASH_REPORT_FUNCTION;
 
