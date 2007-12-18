@@ -55,7 +55,6 @@ SWFDisplayItem
 add_text_field(SWFMovie mo, SWFBlock font, const char* varname, const char* text)
 {
   SWFTextField tf;
-  SWFDisplayItem it;
 
   tf = newSWFTextField();
 
@@ -202,17 +201,19 @@ main(int argc, char** argv)
 
   add_actions(mo, "Object.prototype.toString = function() {return 'TO_STRING';}; ");
   check_equals(mo, "typeof(dtext4.text)", "'string'");
-  // Object.prototype.toString not invoked for dtext4.text!
+  // Object.prototype.toString not invoked for dtext4.text (associated variable didn't change it's value)
   check_equals(mo, "dtext4.text", "'[object Object]'");
+  add_actions(mo, "edit_text_var = new Object();");
+  check_equals(mo, "dtext4.text", "'TO_STRING'");
   check_equals(mo, "typeof(dtext4.text.toString)", "'function'");
-  check_equals(mo, "dtext4.text.toString()", "'[object Object]'");
-  check_equals(mo, "dtext4.text.valueOf()", "'[object Object]'");
+  check_equals(mo, "dtext4.text.toString()", "'TO_STRING'");
+  check_equals(mo, "dtext4.text.valueOf()", "'TO_STRING'");
   SWFMovie_nextFrame(mo);
   
   // Frame 12: dtext4.text still not updated
   // Deduction: dtext4.text won't update if edit_text_var is untouched.
   check_equals(mo, "edit_text_var.toString()", "'TO_STRING'");
-  check_equals(mo, "dtext4.text", "'[object Object]'");
+  check_equals(mo, "dtext4.text", "'TO_STRING'");
   SWFMovie_nextFrame(mo);
   
   // Frame 13: dtext4.text updated. 
@@ -223,7 +224,7 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo);
   
   // Frame 14: end
-  add_actions(mo, "totals(); stop();");
+  add_actions(mo, "totals(36); stop();");
   SWFMovie_nextFrame(mo); 
  
   // Output movie
