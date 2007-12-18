@@ -1,3 +1,8 @@
+2007-12-18 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/impl.cpp: limit media library size to 8 entries and keep 
+	  track of cache hits
+	  
 2007-12-18 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/TextField.as: add a test and check total
