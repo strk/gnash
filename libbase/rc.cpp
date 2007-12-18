@@ -60,6 +60,7 @@ RcInitFile::getDefaultInstance()
 
 
 RcInitFile::RcInitFile() : _delay(0),
+			   _movieLibraryLimit(8),
                            _debug(false),
                            _debugger(false),
                            _verbosity(-1),
@@ -70,17 +71,17 @@ RcInitFile::RcInitFile() : _delay(0),
 				DEFAULT_FLASH_REV_NUMBER ",0"),
                            _flashSystemOS(), 
                            _flashSystemManufacturer("Gnash "DEFAULT_FLASH_SYSTEM_OS),
-                           _actiondump(false),
-                           _parserdump(false),
+                           _actionDump(false),
+                           _parserDump(false),
 			   _verboseASCodingErrors(false),
 			   _verboseMalformedSWF(false),
-                           _splash_screen(true),
-                           _localdomain_only(false),
-                           _localhost_only(false),
+                           _splashScreen(true),
+                           _localdomainOnly(false),
+                           _localhostOnly(false),
                            _log("gnash-dbg.log"),
-			   _writelog(false),
+			   _writeLog(false),
                            _sound(true),
-                           _plugin_sound(true),
+                           _pluginSound(true),
 			   _extensionsEnabled(false),
 			   _startStopped(false),
 			   _insecureSSL(false),
@@ -367,6 +368,16 @@ RcInitFile::parseFile(const std::string& filespec)
                     _flashVersionString = value;
                     continue;
                 }
+                
+                if (noCaseCompare(variable, "flashSystemOS")) {
+                    _flashSystemOS = value;
+                    continue;
+                }
+
+                if (noCaseCompare(variable, "flashSystemManufacturer")) {
+                    _flashSystemManufacturer = value;
+                    continue;
+                }
 
                 if (noCaseCompare(variable, "debuglog")) {
                     expandPath (value);
@@ -395,20 +406,20 @@ RcInitFile::parseFile(const std::string& filespec)
                 }
 
 		if (noCaseCompare(action , "set") ) {
-                     extractSetting(&_splash_screen, "splash_screen", variable,
+                     extractSetting(&_splashScreen, "splash_screen", variable,
                                value);
-                     extractSetting(&_localhost_only, "localhost", variable,
+                     extractSetting(&_localhostOnly, "localhost", variable,
                                value);
-                     extractSetting(&_localdomain_only, "localdomain", variable,
+                     extractSetting(&_localdomainOnly, "localdomain", variable,
                                value);
                      extractSetting(&_insecureSSL, "InsecureSSL", variable,
                                value);
                      extractSetting(&_debugger, "debugger", variable, value);
-                     extractSetting(&_actiondump, "actionDump", variable, value);
-                     extractSetting(&_parserdump, "parserDump", variable, value);
-                     extractSetting(&_writelog, "writelog", variable, value);
+                     extractSetting(&_actionDump, "actionDump", variable, value);
+                     extractSetting(&_parserDump, "parserDump", variable, value);
+                     extractSetting(&_writeLog, "writelog", variable, value);
                      extractSetting(&_sound, "sound", variable, value);
-                     extractSetting(&_plugin_sound, "pluginsound", variable, value);
+                     extractSetting(&_pluginSound, "pluginsound", variable, value);
                      extractSetting(&_verboseASCodingErrors,
                                "ASCodingErrorsVerbosity", variable, value);
                      extractSetting(&_verboseMalformedSWF, "MalformedSWFVerbosity",
@@ -418,7 +429,8 @@ RcInitFile::parseFile(const std::string& filespec)
                      extractSetting(&_startStopped, "StartStopped", variable, value);
 
                      extractDouble(_streamsTimeout, "StreamsTimeout", variable, value);
-                
+
+                     extractNumber(&_movieLibraryLimit, "movieLibraryLimit", variable, value);                
                      extractNumber(&_delay, "delay", variable, value);
                      extractNumber(&_verbosity, "verbosity", variable, value);
 		}
@@ -450,26 +462,26 @@ RcInitFile::updateFile(const std::string& /* filespec */)
 void
 RcInitFile::useSplashScreen(bool value)
 {
-    _splash_screen = value;
+    _splashScreen = value;
 }
 
 void
 RcInitFile::useLocalDomain(bool value)
 {
-    _localdomain_only = value;
+    _localdomainOnly = value;
 }
 
 void
 RcInitFile::useLocalHost(bool value)
 {
-    _localhost_only = value;
+    _localhostOnly = value;
 }
 
 void
 RcInitFile::useActionDump(bool value)
 {
 //    GNASH_REPORT_FUNCTION;
-    _actiondump = value;
+    _actionDump = value;
     if (value) {
         _verbosity++;
     }
@@ -491,7 +503,7 @@ RcInitFile::useParserDump(bool value)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    _parserdump = value;
+    _parserDump = value;
     if (value) {
         _verbosity++;
     }
@@ -502,7 +514,7 @@ RcInitFile::useWriteLog(bool value)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    _writelog = value;
+    _writeLog = value;
 }
 
 void
@@ -514,27 +526,27 @@ RcInitFile::dump()
          << ((_debugger)?"enabled":"disabled") << endl;
     cerr << "\tVerbosity Level: " << _verbosity << endl;
     cerr << "\tDump ActionScript processing: "
-         << ((_actiondump)?"enabled":"disabled") << endl;
+         << ((_actionDump)?"enabled":"disabled") << endl;
     cerr << "\tDump parser info: "
-         << ((_parserdump)?"enabled":"disabled") << endl;
+         << ((_parserDump)?"enabled":"disabled") << endl;
     cerr << "\tActionScript coding errors verbosity: "
          << ((_verboseASCodingErrors)?"enabled":"disabled") << endl;
     cerr << "\tMalformed SWF verbosity: "
          << ((_verboseASCodingErrors)?"enabled":"disabled") << endl;
     cerr << "\tUse Splash Screen: "
-         << ((_splash_screen)?"enabled":"disabled") << endl;
+         << ((_splashScreen)?"enabled":"disabled") << endl;
     cerr << "\tUse Local Domain Only: "
-         << ((_localdomain_only)?"enabled":"disabled") << endl;
+         << ((_localdomainOnly)?"enabled":"disabled") << endl;
     cerr << "\tUse Localhost Only: "
-         << ((_localhost_only)?"enabled":"disabled") << endl;
+         << ((_localhostOnly)?"enabled":"disabled") << endl;
     cerr << "\tWrite Debug Log To Disk: "
-         << ((_writelog)?"enabled":"disabled") << endl;
+         << ((_writeLog)?"enabled":"disabled") << endl;
     cerr << "\tAllow insecure SSL connections: "
          << ((_insecureSSL)?"yes":"no") << endl;
     cerr << "\tEnable sound: "
          << ((_sound)?"enabled":"disabled") << endl;
     cerr << "\tEnable Plugin sound: "
-         << ((_plugin_sound)?"enabled":"disabled") << endl;
+         << ((_pluginSound)?"enabled":"disabled") << endl;
     cerr << "\tEnable Extensions: "
          << ((_extensionsEnabled)?"enabled":"disabled") << endl;
     if (_log.size()) {

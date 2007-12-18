@@ -42,20 +42,22 @@ public:
     bool parseFile(const std::string& filespec);
     bool updateFile(const std::string& filespec);
     
-    bool useSplashScreen() const { return _splash_screen; }
+    bool useSplashScreen() const { return _splashScreen; }
     void useSplashScreen(bool value);
 
-    bool useActionDump() const { return _actiondump; }
+    bool useActionDump() const { return _actionDump; }
     void useActionDump(bool value);
 
-    bool useParserDump() const { return _parserdump; }
+    bool useParserDump() const { return _parserDump; }
     void useParserDump(bool value);
 
-    bool useWriteLog() const { return _writelog; }
+    bool useWriteLog() const { return _writeLog; }
     void useWriteLog(bool value);
 
     int getTimerDelay() const { return _delay; }
     void setTimerDelay(int x) { _delay = x; }
+
+    int getMovieLibraryLimit() const { return _movieLibraryLimit; }
 
     bool showASCodingErrors() const { return _verboseASCodingErrors; }
     void showASCodingErrors(bool value);
@@ -89,13 +91,13 @@ public:
 
     // strk: I'd drop this, and allow an -f switch to select
     //       the gnashrc file to use instead
-    bool usePluginSound() const { return _plugin_sound; }
-    void usePluginSound(bool value) { _plugin_sound = value; }
+    bool usePluginSound() const { return _pluginSound; }
+    void usePluginSound(bool value) { _pluginSound = value; }
 
-    bool useLocalDomain() const { return _localdomain_only; }
+    bool useLocalDomain() const { return _localdomainOnly; }
     void useLocalDomain(bool value);
     
-    bool useLocalHost() const { return _localhost_only; }
+    bool useLocalHost() const { return _localhostOnly; }
     void useLocalHost(bool value);
 
     const std::vector<std::string>& getWhiteList() const { return _whitelist; }
@@ -141,6 +143,7 @@ public:
 
 private:
     int  _delay;                // the timer delay
+    int  _movieLibraryLimit;    // max number of movie clips to store in the library
     bool _debug;                // enable debugging of this class
     bool _debugger;             // enable the Flash movie debugger
     int  _verbosity;
@@ -151,8 +154,8 @@ private:
     std::string  _flashSystemManufacturer;	// String to pass as
     						// System.capabilities.manufacturer
     						// in Actionscript
-    bool _actiondump;           // enable dumping actionscript classes
-    bool _parserdump;           // enable dumping parser data
+    bool _actionDump;           // enable dumping actionscript classes
+    bool _parserDump;           // enable dumping parser data
 
     /// Enable ActionScript errors verbosity
     bool _verboseASCodingErrors;
@@ -162,20 +165,20 @@ private:
     
     
     // End user Features
-    bool _splash_screen;        // display a splash screen when
+    bool _splashScreen;        // display a splash screen when
                                 // loading a movie
     // Security Features
-    bool _localdomain_only;     // only access network resources for
+    bool _localdomainOnly;     // only access network resources for
                                 // the local domain
-    bool _localhost_only;       // only access network resources 
+    bool _localhostOnly;       // only access network resources 
     std::vector<std::string> _whitelist; // domains we allow
     std::vector<std::string> _blacklist; // domains we don't allow
     std::string _log;           // the name of the debug log
-    bool _writelog;             // enable writing the debug log to disk
+    bool _writeLog;             // enable writing the debug log to disk
     std::string _wwwroot;       // the root path for the streaming server
     int _retries;               // the number of retries for a thread
     bool _sound;		// whether sound is enable or not
-    bool _plugin_sound;		// whether sound is desired for the plugin
+    bool _pluginSound;		// whether sound is desired for the plugin
 
     bool _extensionsEnabled;	// whether to scan plugin path for extensions
 

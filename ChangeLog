@@ -1,3 +1,13 @@
+2007-12-18 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/rc.{h,cpp}: add settings to gnashrc. Override
+	  System.capabilities.os: "set flashSystemOS The OS SUPER PREMIUM
+	  EDITION";
+	  Override System.capabilities.manufacturer: "set flashSystemManufacturer
+	  Gnash Linux";
+	  Maximum movie library size: "set movieLibraryLimit 3"
+	  (defaults to 8, not yet used).
+	
 2007-12-18 Sandro Santilli <strk@keybit.net>
 
 	* gui/gtk.cpp (run): set interval timeout here rather then on
