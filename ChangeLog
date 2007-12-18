@@ -1,5 +1,6 @@
 2007-12-18 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.h: add a visitProperties templated method.
 	* server/edit_text_character.{cpp,h}: allow TextField.variable
 	  to point to a normal object, not fully correct yet but a minimal
 	  step forward.

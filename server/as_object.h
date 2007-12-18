@@ -721,6 +721,25 @@ public:
 	///
 	void enumerateProperties(std::map<std::string, std::string>& to);
 
+	/// Visit the list of properties 
+	//
+	/// The method will invoke the given visitor method
+	/// passing it two arguments: key of the property and
+	/// value of it.
+	///
+	/// @param visitor
+	///	The visitor function. Will be invoked for each property
+	///	of this object with a string_table::key
+	///	reference as first argument and a const as_value reference
+	///	as second argument.
+	///
+	template <class V>
+	void visitProperties(V& visitor) const
+	{
+		_members.visitValues(visitor, *this);
+	}
+
+
 	/// \brief
 	/// Add a getter/setter property, if no member already has
 	/// that name (or should we allow override ? TODO: check this)
