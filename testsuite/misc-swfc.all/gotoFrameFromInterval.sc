@@ -1,4 +1,4 @@
-.flash bbox=800x600 filename="gotoFrameFromInterval.swf" version=6 fps=10
+.flash bbox=800x600 filename="gotoFrameFromInterval.swf" background=white version=6 fps=10
 
 .frame 1
     .action:
@@ -15,7 +15,7 @@
     intervalID = setInterval(
        function() {
           if (_currentframe != 2) return;
-          gotoAndStop(6);
+          gotoAndPlay(6);
        }
        ,0.0001);
        
@@ -26,7 +26,7 @@
       _root.framecount++;
       
       if (_root.framecount==10) {
-        totals(1);
+        totals(3);
       }
     };
        
@@ -40,7 +40,6 @@
     .end
     
     .action:
-        stop();
         clearInterval( intervalID );
         
         function init_me(obj) {
@@ -68,5 +67,62 @@
         xcheck_equals(asOrder, '0+1+2+3+4+1+2+3+4+1+2+3+4+');
     .end
 
+
+//
+// --case2--
+// (1) test that a function block shouldn't be interrupted by init actions.
+// (2) test interval callbacks shouldn't be interrupted by init actions.
+.frame 7
+    .action:
+        _root.i = 0;
+        _root.asOrder = String();
+        
+        function func() {
+            return 'x';
+        }
+        
+        function callback() {
+            _root.asOrder += func();
+            _root.asOrder += (i++);
+            _root.gotoAndPlay(9);
+            _root.asOrder += func();
+        }
+        
+        intervalID1 = setInterval(callback, 0.0001);
+        intervalID2 = setInterval(callback, 0.0001);
+        check(intervalID1 != intervalID2);
+        
+        trace('frame7');
+    .end
+
+
+
+.frame 8
+    .sprite sp1
+    .end
+    .sprite sp2
+    .end
+    .sprite sp3
+    .end
+    .initaction sp1:
+        // clear the interval callbacks
+        clearInterval( intervalID1 );
+        clearInterval( intervalID2 );
+   
+        _root.asOrder += (i++);
+    .end
+    .initaction sp2:
+        _root.asOrder += (i++);
+    .end
+    .initaction sp3:
+        _root.asOrder += (i++);
+    .end
+
+
+.frame 10
+    .action:
+        stop();
+        xcheck_equals(_root.asOrder, 'x0xx1x234');
+    .end
 
 .end // end of file
