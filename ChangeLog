@@ -1,3 +1,18 @@
+2007-12-17  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* cygnal/testsuite/cygnal.all/Makefile.am: Add server to include
+	paths.
+	* libamf/amf.{cpp,h}: Include as_objecth Don't make swapBytes
+	static,	we want to use it elsewhere. Add methods for creating
+	elements, and encoding elements.
+	* libamf/sol.cpp: Store elements in a vactor as they get
+	added. Format a header for a .sol file. Write a SOL object to disk
+	as an .sol file.
+	* libamf/sol.h: Use boost cstdint.hpp instead of homegrown
+	typedefs. Write a SOL object to disk as an .sol file.
+	* testsuite/libamf.all/test_sol.cpp: Include as_object.h. Create
+	an output file and test all it's elements.
+
 2007-12-17 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/action_buffer.cpp: don't be noisy about overriding

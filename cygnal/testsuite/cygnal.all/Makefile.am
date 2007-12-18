@@ -35,6 +35,7 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/cygnal \
+        -I$(top_srcdir)/server \
         -DLOCALEDIR=\"$(localedir)\" \
 	$(BOOST_CFLAGS) \
 	$(PTHREAD_CFLAGS)

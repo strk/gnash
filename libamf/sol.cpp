@@ -54,12 +54,13 @@ using namespace gnash;
 // Padding      - 4 bytes
 // After this is a series of AMF objects
 const short SOL_MAGIC = 0xbf00;
-const char *SOL_FILETYPE = "TCSO";
+//char *SOL_FILETYPE = "TCSO";
 const short SOL_BLOCK_MARK = 0x0004;
 
 namespace amf
 {
-SOL::SOL()
+SOL::SOL() 
+    : _filesize(0)
 {
     GNASH_REPORT_FUNCTION;
 }
@@ -80,24 +81,193 @@ SOL::extractHeader(vector<unsigned char> &data)
 {
 }
 
+void
+SOL::addObj(AMF::amf_element_t &el)
+{
+    GNASH_REPORT_FUNCTION;
+    _amfobjs.push_back(el);
+    _filesize += el.name.size() + el.length + 5;
+}
+
 bool
 SOL::formatHeader(vector<unsigned char> &data)
 {
     GNASH_REPORT_FUNCTION;
 }
 
+// name is the object name
 bool
 SOL::formatHeader(std::string &name)
 {
+    return formatHeader(name, _filesize);
+}
+
+bool
+SOL::formatHeader(std::string &name, int filesize)
+{
     GNASH_REPORT_FUNCTION;
+    uint32_t i;
+
+    // First we add the magic number. All SOL data is in big-endian format,
+    // so we swap it first.
+    uint16_t swapped = SOL_MAGIC;
+//    swapped = htons(swapped);
+    uint8_t *ptr = reinterpret_cast<uint8_t *>(&swapped);
+    for (i=0; i<sizeof(uint16_t); i++) {
+        _header.push_back(ptr[i]);
+    }
+
+    // Next is the file size to be created. We adjust it as the filesize
+    // includes the padding in the header, the mystery bytes, and the
+    // padding, plus the length of the name itself.
+    filesize += name.size() + 16;
+    uint32_t len = filesize;
+    len = htonl(len);
+    ptr = reinterpret_cast<uint8_t *>(&len);
+    for (i=0; i<sizeof(uint32_t); i++) {
+        _header.push_back(ptr[i]);
+    }
+
+    // Then the mystery block, but as the value never seems to every change,
+    // we just built it the same way it always is.
+    // first is the TCSO, we have no idea what this stands for.
+//    ptr = reinterpret_cast<uint8_t *>(const_cast<uint8_t *>("TCSO");
+    ptr = (uint8_t *)"TCSO";
+    for (i=0; i<sizeof(uint32_t); i++) {
+        _header.push_back(ptr[i]);
+    }
+    // then the 0x0004 bytes, also a mystery
+    swapped = SOL_BLOCK_MARK;
+    swapped = htons(swapped);
+    ptr = reinterpret_cast<uint8_t *>(&swapped);
+    for (i=0; i<sizeof(uint16_t); i++) {
+        _header.push_back(ptr[i]);
+    }
+    // finally a bunch of zeros to pad things for this field
+    for (i=0; i<sizeof(uint32_t); i++) {
+        _header.push_back('\0');
+    }
+
+    // Encode the name. This is not a string object, which has a type field
+    // one byte field precedding the length as a file type of AMF::STRING.
+    //  First the length in two bytes
+    swapped = name.size();
+    swapped = htons(swapped);
+    ptr = reinterpret_cast<uint8_t *>(&swapped);
+    for (i=0; i<sizeof(uint16_t); i++) {
+        _header.push_back(ptr[i]);
+    }
+    // then the string itself
+    ptr = (uint8_t *)name.c_str();
+    for (i=0; i<name.size(); i++) {
+        _header.push_back(ptr[i]);
+    }
+    
+    // finally a bunch of zeros to pad things at the end of the header
+    for (i=0; i<sizeof(uint32_t); i++) {
+        _header.push_back('\0');
+    }
+
+#if 0
+    unsigned char *hexint;
+    hexint = new unsigned char[(_header.size() + 3) *3];
+    
+    hexify(hexint, (unsigned char *)_header, _header.size(), true);
+    log_msg (_("%s: SOL file header is: \n%s"), __FUNCTION__, (char *)hexint);
+    delete hexint;
+#endif    
+    
 }    
 
 // write the data to disk as a .sol file
+
 bool
-SOL::writeFile(std::string &filespec)
+SOL::writeFile(string &filespec, const char *name)
 {
     GNASH_REPORT_FUNCTION;
-    ofstream ofs("filename", ios::binary);
+    string str = name;
+    return writeFile(filespec, str);
+}
+
+bool
+SOL::writeFile(const char *filespec, const char *name)
+{
+    GNASH_REPORT_FUNCTION;
+    string str1 = filespec;
+    string str2 = name;
+    return writeFile(str1, str2);
+}
+
+bool
+SOL::writeFile(string &filespec, string &name)
+{
+    GNASH_REPORT_FUNCTION;
+    ofstream ofs("test.sol", ios::binary);
+    vector<uint8_t>::iterator it;
+    vector<AMF::amf_element_t>::iterator ita; 
+    AMF amf_obj;
+    char *ptr;
+    
+    char *body = new char[_filesize]; // FIXME: bogus size!
+    memset(body, 0, _filesize);
+    ptr = body;
+    
+    for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
+        AMF::amf_element_t *el = &(*(ita));
+        int outsize = el->name.size() + el->length + 5;
+        uint8_t *foo = amf_obj.encodeVariable(el); 
+        switch (el->type) {
+	  case AMF::BOOLEAN:
+//	      *ptr++ = el->data[0];
+	      outsize = el->name.size() + 5;
+	      memcpy(ptr, foo, outsize);
+	      ptr += outsize;
+	      break;
+	  case AMF::OBJECT:
+	      outsize = el->name.size() + 5;
+	      memcpy(ptr, foo, outsize);
+	      ptr += outsize;
+	      *ptr++ = AMF::OBJECT_END;
+	      *ptr++ = 0;	// objects are terminated too!
+	      break;
+	  case AMF::NUMBER:
+	      outsize = el->name.size() + AMF_NUMBER_SIZE + 2;
+	      memcpy(ptr, foo, outsize);
+	      ptr += outsize;
+	      *ptr++ = 0;	// doubles are terminated too!
+	      *ptr++ = 0;	// doubles are terminated too!
+	      break;
+	  case AMF::STRING:
+	      if (el->length == 0) {
+		  memcpy(ptr, foo, outsize+1);
+		  ptr += outsize+1;
+	      } else {		// null terminate the string
+		  memcpy(ptr, foo, outsize);
+		  ptr += outsize;
+		  *ptr++ = 0;
+	      }
+	      break;
+	  default:
+	      memcpy(ptr, foo, outsize);
+	      ptr += outsize;
+	}
+	delete foo;
+    }
+
+    _filesize = ptr - body;
+    int len = name.size() + sizeof(uint16_t) + 16;
+    char *head = new char[len + 4];
+    memset(head, 0, len);
+    ptr = head;
+    formatHeader(name);
+    for (it = _header.begin(); it != _header.end(); it++) {
+        *ptr++ = (*(it));
+    }
+    
+    ofs.write(head, _header.size());
+//    ofs.write(body, (ptr - body));
+    ofs.write(body, _filesize);
+    ofs.close();
 }
 
 // read the .sol file from disk
@@ -131,8 +301,14 @@ SOL::readFile(std::string &filespec)
 //        char *marker = ptr;
         ptr += 10;
         
-        if ((memcmp(buf, &SOL_MAGIC, 2) == 0) && (_filesize - 6 == length)) {
-            log_debug("%s is an SOL file", filespec.c_str());
+        if (memcmp(buf, &SOL_MAGIC, 2) == 0) {
+            if (_filesize - 6 == length) {
+                log_debug("%s is an SOL file", filespec.c_str());
+            } else {
+                log_error("%s looks like an SOL file, but the length is wrong",
+                          filespec.c_str());
+            }
+            
         } else {
             log_error("%s isn't an SOL file", filespec.c_str());
         }
@@ -187,7 +363,10 @@ SOL::dump()
         }
         if (el->type == AMF::NUMBER) {
             double *dd = (double *)el->data;
-            cerr << *dd << "    ";
+            double ddd = *((double *)el->data);
+	    swapBytes(&ddd, 8);
+            cerr << ddd << " ";
+            cerr << *dd << " ";
             hexint = new uint8_t[(sizeof(double) *3) + 3];
             hexify(hexint, el->data, 8, false);
             cerr << "( " << hexint << ")";

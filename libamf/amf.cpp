@@ -32,6 +32,7 @@
 
 #include "log.h"
 #include "amf.h"
+#include "as_object.h"
 #include "amfutf8.h"
 #include <boost/cstdint.hpp> // for boost::?int??_t
 
@@ -112,7 +113,7 @@ AMF::~AMF()
 /// anything if we happen to be on a big-endian machine.
 ///
 /// Returns its first parameter, pointing to the (maybe-byte-swapped) data.
-static void *
+void *
 swapBytes(void *word, int size)
 {
     union {
@@ -757,11 +758,217 @@ AMF::extractNumber(const uint8_t *in)
     return num;
 }
 
-uint8_t *
-AMF::encodeVariable(amf_element_t & /* el */)
+AMF::amf_element_t *
+AMF::createElement(amf_element_t *el, astype_e type,
+		  std::string &name, uint8_t *data, int nbytes)
 {
     GNASH_REPORT_FUNCTION;
-    return NULL;
+    log_debug("Creating element %s", name.c_str());
+    
+    el->type = type;
+    el->name = name;
+    el->length = nbytes;
+    el->data = data;
+    return el;
+}
+
+AMF::amf_element_t *
+AMF::createElement(amf_element_t *el, const char *name, amfnum_t data)
+{
+    GNASH_REPORT_FUNCTION;
+    string str = name;
+    return createElement(el, str, data);
+}
+
+AMF::amf_element_t *
+AMF::createElement(amf_element_t *el, std::string &name, amfnum_t data)
+{
+    GNASH_REPORT_FUNCTION;
+    log_debug("Creating element %s", name.c_str());
+
+    el->type = AMF::NUMBER;
+    el->name = name;
+    el->length = AMF_NUMBER_SIZE;
+//    char *numptr = (char *)&data;
+    el->data = new uint8_t[AMF_NUMBER_SIZE + 1];
+    memset(el->data, 0, AMF_NUMBER_SIZE + 1);
+    memcpy(el->data, &data, AMF_NUMBER_SIZE);
+
+    return el;
+}
+
+AMF::amf_element_t *
+AMF::createElement(amf_element_t *el, const char *name, double data)
+{
+    GNASH_REPORT_FUNCTION;
+    string str = name;
+    return createElement(el, str, data);
+}
+
+AMF::amf_element_t *
+AMF::createElement(amf_element_t *el, std::string &name, double data)
+{
+    GNASH_REPORT_FUNCTION;
+    log_debug("Creating element %s", name.c_str());
+
+    el->type = AMF::NUMBER;
+    el->name = name;
+    el->length = AMF_NUMBER_SIZE;
+//    char *numptr = (char *)&data;
+    el->data = new uint8_t[AMF_NUMBER_SIZE + 1];
+    memset(el->data, 0, AMF_NUMBER_SIZE + 1);
+    memcpy(el->data, &data, AMF_NUMBER_SIZE);
+
+    return el;
+}
+
+AMF::amf_element_t *
+AMF::createElement(amf_element_t *el, const char *name, const char *data)
+{
+    GNASH_REPORT_FUNCTION;
+    log_debug("Creating element %s", name);
+
+    el->type = AMF::STRING;
+    el->name = name;
+    el->length = strlen(data);
+    char *str = const_cast<char *>(data);
+    el->data = reinterpret_cast<uint8_t *>(str);
+    return el;
+}
+
+AMF::amf_element_t *
+AMF::createElement(amf_element_t *el, std::string &name, std::string &data)
+{
+    GNASH_REPORT_FUNCTION;
+    log_debug("Creating element %s", name.c_str());
+
+    el->type = AMF::STRING;
+    el->name = name;
+    el->length = data.size();
+    char *str = const_cast<char *>(data.c_str());
+    el->data = reinterpret_cast<uint8_t *>(str);
+    return el;
+}
+
+AMF::amf_element_t *
+AMF::createElement(amf_element_t *el, const char *name, bool data)
+{
+    GNASH_REPORT_FUNCTION;
+    string str = name;
+    return createElement(el, str, data);
+}
+
+AMF::amf_element_t *
+AMF::createElement(AMF::amf_element_t *el, std::string &name, bool data)
+{
+    GNASH_REPORT_FUNCTION;
+    log_debug("Creating element %s", name.c_str());
+
+    el->type = AMF::BOOLEAN;
+    el->name = name;
+    el->length = 1;
+    el->data = new uint8_t[sizeof(uint16_t)];
+    memset(el->data, 0, sizeof(uint16_t));
+    *el->data = data;
+    return el;
+}
+
+
+AMF::amf_element_t *
+createElement(AMF::amf_element_t *el, std::string &name,
+	      boost::intrusive_ptr<gnash::as_object> &data)
+{
+    GNASH_REPORT_FUNCTION;
+    log_debug("Creating element %s", name.c_str());
+
+    el->type = AMF::OBJECT;
+    el->name = name;
+    el->length = sizeof(data);
+    el->data = new uint8_t[sizeof(uint16_t)];
+    memset(el->data, 0, sizeof(uint16_t));
+    memcpy(el->data, (char *)&data, el->length);
+    return el;
+}
+
+AMF::amf_element_t *
+createElement(AMF::amf_element_t *el, const char *name,
+	      boost::intrusive_ptr<gnash::as_object> &data)
+{
+    GNASH_REPORT_FUNCTION;
+    string str = name;
+    return createElement(el, str, data);
+}
+
+uint8_t *
+AMF::encodeVariable(amf_element_t *el)
+{
+    GNASH_REPORT_FUNCTION;
+    int outsize = el->name.size() + el->length + 5;
+    uint8_t *out = new uint8_t[outsize];
+    memset(out, 0, outsize);
+    uint8_t *tmpptr = out;
+
+    // Add the length of the string for the name of the variable
+    size_t length = el->name.size();
+    uint16_t enclength = length;
+    swapBytes(&enclength, 2);
+    memcpy(tmpptr, &enclength, 2);
+
+    // Add the actual name
+    tmpptr += sizeof(uint16_t);
+    memcpy(tmpptr, el->name.c_str(), length);
+    tmpptr += length;
+    // Add the type of the variable's data
+    *tmpptr++ = el->type;
+    // Booleans appear to be encoded weird. Just a short after
+    // the type byte that's the value.
+    switch (el->type) {
+      case AMF::BOOLEAN:
+	  enclength = el->data[0];
+	  memcpy(tmpptr, &enclength, 2);
+	  tmpptr += sizeof(uint16_t);
+	  break;
+      case AMF::NUMBER:
+	  swapBytes(el->data, AMF_NUMBER_SIZE);
+	  memcpy(tmpptr, el->data, AMF_NUMBER_SIZE);
+	  break;
+      default:
+	enclength = el->length;
+	swapBytes(&enclength, 2);
+	memcpy(tmpptr, &enclength, 2);
+	tmpptr += sizeof(uint16_t);
+	// Now the data for the variable
+	memcpy(tmpptr, el->data, el->length);
+    }
+    
+    return out;    
+}
+
+uint8_t *
+AMF::encodeVariable(amf_element_t &el)
+{
+    GNASH_REPORT_FUNCTION;
+    int outsize = el.name.size() + el.length + 5;
+    uint8_t *out = new uint8_t[outsize];
+    uint8_t *tmpptr = out;
+
+    // Add the length of the string for the name of the variable
+    size_t length = el.name.size();
+    short enclength = length;
+    swapBytes(&enclength, 2);
+    memcpy(tmpptr, &enclength, 2);
+
+    // Add the actual name
+    tmpptr += 2;
+    memcpy(tmpptr, el.name.c_str(), length);
+    tmpptr += length;
+    *tmpptr = el.type;
+    tmpptr++;
+
+    // Now the data for the variable
+    memcpy(tmpptr, el.data, el.length);
+
+    return out;    
 }
 
 uint8_t *
@@ -1171,45 +1378,48 @@ AMF::extractVariable(AMF::amf_element_t *el, uint8_t *in)
     
     switch (type) {
       case NUMBER:
-        {
+      {
           memcpy(buffer, tmpptr, AMF_NUMBER_SIZE);
           swapBytes(buffer, AMF_NUMBER_SIZE);
-          uint8_t* tmp = new uint8_t[AMF_NUMBER_SIZE+1];
-          memset(tmp, 0, AMF_NUMBER_SIZE+1);
-          memcpy(tmp, buffer, AMF_NUMBER_SIZE);
-          el->data = tmp;
+	  uint8_t* tmp = new uint8_t[AMF_NUMBER_SIZE+1];
+	  memset(tmp, 0, AMF_NUMBER_SIZE+1);
+	  memcpy(tmp, buffer, AMF_NUMBER_SIZE);
+	  swapBytes(tmp, AMF_NUMBER_SIZE);
+	  el->data = tmp;
+#if 1
           uint8_t hexint[AMF_NUMBER_SIZE*3];
           hexify((uint8_t *)hexint, (uint8_t *)buffer,
 		 AMF_NUMBER_SIZE, false);
           log_msg(_("Number \"%s\" is: 0x%s"), el->name.c_str(), hexint);
 //          amfnum_t *num = extractNumber(tmpptr);
+#endif
           tmpptr += 8;
+	  el->length = AMF_NUMBER_SIZE;
           break;
-        }
+      }
       case BOOLEAN:
-        {
+      {
 //          int value = *tmpptr;
-          uint8_t* tmp = new uint8_t[1];
-          memcpy(tmp, tmpptr, 1); 
-          el->data = tmp;
+	  el->length = 1;
+          el->data = new uint8_t[2];
+//          memcpy(tmp, tmpptr, 2); 
+          el->data[0] =* tmpptr;
 	  log_msg((*tmpptr == 0) ? 
 		  _("Boolean \"%s\" is: true"):
 		  _("Boolean \"%s\" is: false"), el->name.c_str());
 	  tmpptr += 1;
 	  break;
-        }
+    }
       case STRING:
-      {
 	  // extractString returns a printable char *
 	  length = ntohs((*(const short *)tmpptr) & 0xffff);
           tmpptr += sizeof(short);
           el->length = length;
           el->data = tmpptr; 
-//           std::string v(el->data+3, length);
-//           log_msg(_("Variable \"%s\" is: %s"), el->name.c_str(), v.c_str()); // el->data);
+//            std::string v(el->data+3, length);
+//            log_msg(_("Variable \"%s\" is: %s"), el->name.c_str(), v.c_str()); // el->data);
           tmpptr += length;
           break;
-      }
       case OBJECT:
   	  while (*(tmpptr++) != AMF::OBJECT_END) {
 	      log_msg("Look for end of object...");
@@ -1221,14 +1431,12 @@ AMF::extractVariable(AMF::amf_element_t *el, uint8_t *in)
 	  // Undefined types have a name, but no value
 		//FIXME this shouldn't fall through!
       case UNDEFINED:
-      {
           log_msg(_("Undefined type"));
           el->data = 0; // (const uint8_t*)tmpptr; 
           //log_msg(_("Variable \"%s\" is of undefined type"), el->name.c_str());
           el->length = 0;
           el->type = AMF::UNDEFINED;
           break;
-      }
       case REFERENCE:
       case ECMA_ARRAY:
 			// FIXME this shouldn't fall thru

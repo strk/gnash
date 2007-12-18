@@ -22,6 +22,7 @@
 #include "config.h"
 #endif
 
+#include <boost/cstdint.hpp>
 #include <string>
 #include <vector>
 #include "amf.h"
@@ -46,27 +47,34 @@ public:
     size_t size() { return _amfobjs.size(); };
 
     // extract the header
-    bool extractHeader(std::vector<unsigned char> &data);
+    bool extractHeader(std::vector<uint8_t> &data);
     bool extractHeader(std::string &filespec);
 
     // Create the header
-    bool formatHeader(std::vector<unsigned char> &data);
+    bool formatHeader(std::vector<uint8_t> &data);
     bool formatHeader(std::string &name);
+    bool formatHeader(std::string &name, int filesize);
 
     // write the data to disk as a .sol file
-    bool writeFile(std::string &filespec);
+    bool writeFile(std::string &filespec, std::string &objname);
+    bool writeFile(std::string &filespec, const char *objname);
+    bool writeFile(const char *filespec, const char *objname);
     
     // read the .sol file from disk
     bool readFile(std::string &filespec);
 
+    
+    std::vector<uint8_t> getHeader() { return _header; };
+
     // Add the AMF objects that are the data of the file
-    void addObj(AMF::amf_element_t &x) { _amfobjs.push_back(x); };
+    void addObj(AMF::amf_element_t &x);
     std::vector<AMF::amf_element_t> getElements() { return _amfobjs; };
     AMF::amf_element_t getElement(int x) { return _amfobjs[x]; };
 
     void dump();
  private:
-    std::vector<unsigned char> _data;
+    std::vector<uint8_t> _header;
+    std::vector<uint8_t> _data;
     std::string      _objname;
     std::string      _filespec;
     std::vector<AMF::amf_element_t> _amfobjs;

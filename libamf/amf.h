@@ -27,6 +27,8 @@
 #include <cstring>
 #include <map>
 
+#include "as_object.h"
+
 #include "amfutf8.h"
 #include <boost/cstdint.hpp>
 
@@ -34,10 +36,10 @@ namespace amf
 {
 
 # if __WORDSIZE == 64
-typedef long amfnum_t;
+typedef unsigned long amfnum_t;
 #define AMFNUM_F "%ld"
 #else
-typedef long long amfnum_t;
+typedef unsigned long long amfnum_t;
 #define AMFNUM_F "%lld"
 #endif
 // TIDO FIXME: this will be longer then the actual amfnum_t 
@@ -172,7 +174,7 @@ public:
 
     struct amf_element_t {
         astype_e       type;
-        short          length;
+        int16_t        length;
         std::string    name;
         uint8_t        *data;
 
@@ -223,6 +225,32 @@ public:
     };
 
     /// Encode a variable. These are a name, followed by a string or number
+
+    ///
+    /// @ return an element all filled in correctly for passing to other
+    /// methods.
+    amf_element_t *createElement(amf_element_t *el, astype_e type,
+				 std::string &name, uint8_t *data, int nbytes);
+    amf_element_t *createElement(amf_element_t *el, std::string &name,
+				 amfnum_t data);
+    amf_element_t *createElement(amf_element_t *el, const char *name,
+				 double data);
+    amf_element_t *createElement(amf_element_t *el, std::string &name,
+				 double data);
+    amf_element_t *createElement(amf_element_t *el, const char *name,
+				 amfnum_t data);
+    amf_element_t *createElement(amf_element_t *el, std::string &name,
+				 std::string &data);
+    amf_element_t *createElement(amf_element_t *el, const char *name,
+				 const char *data);
+    amf_element_t *createElement(amf_element_t *el, std::string &name,
+				 bool data);
+    amf_element_t *createElement(amf_element_t *el, const char *name,
+				 bool data);
+    amf_element_t *createElement(amf_element_t *el, std::string &name,
+				  boost::intrusive_ptr<gnash::as_object> &data);
+    amf_element_t *createElement(amf_element_t *el, const char *name,
+				 boost::intrusive_ptr<gnash::as_object> &data);
     //
     /// @return a newly allocated byte array,
     /// to be deleted by caller using delete [] operator, or NULL
@@ -235,6 +263,7 @@ public:
     /// to be deleted by caller using delete [] operator, or NULL
     ///
     uint8_t* encodeVariable(amf_element_t &el);
+    uint8_t* encodeVariable(amf_element_t *el);
 
     /// Encode a boolean variable. This is a name followed by a boolean value.
     //
@@ -326,6 +355,9 @@ public:
 };
 
  
+void *swapBytes(void *word, int size);
+
+
 } // end of amf namespace
 
 // end of _AMF_H_
