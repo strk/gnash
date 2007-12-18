@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.33 2007/12/18 07:49:57 strk Exp $";
+rcsid="$Id: TextField.as,v 1.34 2007/12/18 11:24:45 strk Exp $";
 
 #include "check.as"
 
@@ -563,6 +563,7 @@ tf.variable = "_level0.inputVar";
 check_equals(tf.variable, '_level0.inputVar'); 
 xcheck_equals(typeof(_level0.inputVar), 'undefined');
 xcheck_equals(tf.text, "hello world");  // as _level0.inputVar is unexistent
+xcheck(!_level0.hasOwnProperty('inputVar'));
 _level0.inputVar = "dynamic variable";
 check_equals(tf.text, "dynamic variable");
 tf.text = "back-propagated";
@@ -715,5 +716,14 @@ check_equals(tf2._x, 5);
 check_equals(tf2._y, 6);
 
 
-#endif // OUTPUT_VERSION > 5
-totals();
+#if OUTPUT_VERSION < 8
+ check_totals(352);
+#else
+ check_totals(353);
+#endif
+
+#else // OUTPUT_VERSION <= 5
+
+ totals();
+
+#endif
