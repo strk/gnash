@@ -1,3 +1,8 @@
+2007-12-18 Sandro Santilli <strk@keybit.net>
+
+	* server/character.cpp (destroy): make sure to set the _unloaded
+	  flag to avoid leaks (Fixes bug #21842).
+
 2007-12-18 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/rc.{h,cpp}: add settings to gnashrc. Override

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.69 2007/12/17 07:41:42 zoulunkai Exp $ */
+/* $Id: character.cpp,v 1.70 2007/12/18 21:28:58 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -833,6 +833,9 @@ character::get_text_value() const
 void
 character::destroy()
 {
+	// in case we are destroyed w/out being unloaded first
+	// see bug #21842
+	_unloaded = true;
 
 	/// we may destory a character that's not unloaded.
 	///(we don't have chance to unload it in current model, see new_child_in_unload_test.c)
