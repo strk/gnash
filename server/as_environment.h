@@ -622,22 +622,6 @@ private:
 	///
 	static bool setLocal(LocalVars& locals, const std::string& varname, const as_value& val);
 
-	/// Find an object referenced by the given path (slash syntax).
-	//
-	/// Supports /slash/syntax 
-	///
-	/// Return NULL if path doesn't point to an object.
-	///
-	as_object* find_object_slashsyntax(const std::string& path, const ScopeStack* scopeStack=NULL) const;
-
-	/// Find an object referenced by the given path (dot syntax).
-	//
-	/// Supports dot.syntax
-	///
-	/// Return NULL if path doesn't point to an object.
-	///
-	as_object* find_object_dotsyntax(const std::string& path, const ScopeStack* scopeStack=NULL) const;
-
 };
 
 
