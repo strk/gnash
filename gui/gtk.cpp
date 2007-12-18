@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.123 2007/12/17 09:32:39 strk Exp $ */
+/* $Id: gtk.cpp,v 1.124 2007/12/18 15:02:24 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -482,6 +482,15 @@ void
 GtkGui::setInterval(unsigned int interval)
 {
     _interval = interval;
+}
+
+bool
+GtkGui::run()
+{
+    //GNASH_REPORT_FUNCTION;
+
+    // Kick-start before setting the interval timeout
+    advance_movie(this);
     
     // From http://www.idt.mdh.se/kurser/cd5040/ht02/gtk/glib/glib-the-main-event-loop.html#G-TIMEOUT-ADD-FULL
     //
@@ -494,14 +503,9 @@ GtkGui::setInterval(unsigned int interval)
     //
     // TODO: this is not what we need here, we want instead to 'catch up' !!
     //
-    g_timeout_add_full (G_PRIORITY_LOW, interval, (GSourceFunc)advance_movie,
+    g_timeout_add_full (G_PRIORITY_LOW, _interval, (GSourceFunc)advance_movie,
                         this, NULL);
-}
 
-bool
-GtkGui::run()
-{
-    //GNASH_REPORT_FUNCTION;
     gtk_main();
     return true;
 }
