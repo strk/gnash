@@ -20,7 +20,7 @@
  *
  * observed behaviour:
  *   (1) different timelines still share the same vm stack
- *   (2) vm stack should be cleared at frame boundary
+ *   (2) vm stack should be cleared before next advancement.
  *
  */
 
