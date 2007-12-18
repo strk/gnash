@@ -1,5 +1,7 @@
 2007-12-18 Sandro Santilli <strk@keybit.net>
 
+	* doc/C/extensions.xml: gave a review of how to create extensions.
+	  Should be a currently correct way of doing it.
 	* server/character.cpp (destroy): make sure to set the _unloaded
 	  flag to avoid leaks (Fixes bug #21842).
 
