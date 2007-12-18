@@ -1,5 +1,7 @@
 2007-12-17 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/TextField.as: test maxChars having
+	  no effect on code-assigned text.
 	* server/as_environment.h: drop obsoleted interfaces.
 
 2007-12-17  Rob Savoye  <rob@ripple.welcomehome.org>

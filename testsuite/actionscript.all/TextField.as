@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.32 2007/11/20 00:44:05 cmusick Exp $";
+rcsid="$Id: TextField.as,v 1.33 2007/12/18 07:49:57 strk Exp $";
 
 #include "check.as"
 
@@ -321,8 +321,11 @@ xcheck_equals(tf.length, 18); // the tags are also counted
 
 xcheck_equals(typeof(tf.maxChars), 'null');
 check(!tf.hasOwnProperty('maxChars'));
-tf.maxChars = 10;
-check_equals(tf.maxChars, 10);
+tf.maxChars = 5;
+check_equals(tf.maxChars, 5);
+tf.text = "0123456789";
+// no effect (maybe only limits user input)
+check_equals(tf.text, "0123456789");
 tf.maxChars = null;
 
 // Check TextField.maxhscroll
