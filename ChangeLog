@@ -1,5 +1,7 @@
 2007-12-17 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/action_buffer.cpp: don't be noisy about overriding
+	  dictionary.
 	* gui/gui.cpp, server/movie_root.{cpp,h}, testsuite/MovieTester.cpp,
 	  utilities/processor.cpp: drop argument from movie_root::advance.
 

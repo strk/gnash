@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: action_buffer.cpp,v 1.30 2007/12/13 10:58:10 strk Exp $ */
+/* $Id: action_buffer.cpp,v 1.31 2007/12/18 00:09:48 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -112,12 +112,14 @@ action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
 	return;
     }
     
+#if 0 // debugging
     if (m_decl_dict_processed_at != -1)	{
 	log_debug(_("process_decl_dict(" SIZET_FMT ", " SIZET_FMT "): decl_dict was already processed at %d. "
 		"Overriding."),
 		  start_pc, stop_pc, m_decl_dict_processed_at);
 	//return;
     }
+#endif
     
     m_decl_dict_processed_at = start_pc;
     
