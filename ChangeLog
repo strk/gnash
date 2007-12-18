@@ -1,5 +1,12 @@
 2007-12-18 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.{cpp,h}: allow TextField.variable
+	  to point to a normal object, not fully correct yet but a minimal
+	  step forward.
+	* testsuite/actionscript.all/TextField.as: 2 small successes.
+
+2007-12-18 Sandro Santilli <strk@keybit.net>
+
 	* doc/C/extensions.xml: gave a review of how to create extensions.
 	  Should be a currently correct way of doing it.
 	* server/character.cpp (destroy): make sure to set the _unloaded

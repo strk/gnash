@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.34 2007/12/18 11:24:45 strk Exp $";
+rcsid="$Id: TextField.as,v 1.35 2007/12/18 23:39:59 strk Exp $";
 
 #include "check.as"
 
@@ -574,7 +574,7 @@ xcheck_equals(tf.text, "back-propagated");  // _level0.o.t doesn't exist yet
 o.t = "from object"; // here we create _level0.o.t
 xcheck_equals(tf.text, "back-propagated"); // but creating _level0.o.t doesn't trigger textfield text update
 tf.text = "back-to-object"; // instead, assigning to TextField.text updates the object
-xcheck_equals(o.t, "back-to-object");  
+check_equals(o.t, "back-to-object");  
 o.t = "from object again"; // but updates to the object still don't update the TextField
 check_equals(tf.text, "back-to-object");  // assigning to the object doesn't trigger update of text ?
 tf.variable = "_level0.o.t"; // We re-assign TextField.variable, now the variable exists
@@ -583,7 +583,7 @@ check_equals(o.t, "from object again");
 o.t = "and forever";
 xcheck_equals(tf.text, "from object again"); // but updating o.t still doesn't trigger update of the text ?
 tf.text = "and forever back";
-xcheck_equals(o.t, "and forever back"); // while updating textfield's text updates o.t
+check_equals(o.t, "and forever back"); // while updating textfield's text updates o.t
 
 
 // Check TextField._visible 

@@ -363,7 +363,7 @@ private:
 	///
 	void registerTextVariable();
 
-	typedef std::pair<sprite_instance*, string_table::key> VariableRef;
+	typedef std::pair<as_object*, string_table::key> VariableRef;
 
 	/// \brief
 	/// Parse the given variable name

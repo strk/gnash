@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.136 2007/12/04 11:45:28 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.137 2007/12/18 23:39:59 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -725,15 +725,15 @@ edit_text_character::set_text_value(const char* new_text_cstr)
 	{
 		// TODO: notify sprite_instance if we have a variable name !
 		VariableRef ref = parseTextVariableRef(_variable_name);
-		sprite_instance* sp = ref.first;
-		if ( sp )
+		as_object* tgt = ref.first;
+		if ( tgt )
 		{
-			sp->set_member(ref.second, newText); // we shouldn't truncate, right ?
+			tgt->set_member(ref.second, newText); // we shouldn't truncate, right ?
 		}
 		else	
 		{
 			// nothing to do (too early ?)
-			log_debug("set_text_value: variable name %s points to an unexisting sprite, I guess we would not be registered in this was true, or the sprite we've registered our variable name has been unloaded", _variable_name.c_str());
+			log_debug("set_text_value: variable name %s points to an unexisting target, I guess we would not be registered in this was true, or the sprite we've registered our variable name has been unloaded", _variable_name.c_str());
 		}
 	}
 }
@@ -1483,11 +1483,7 @@ edit_text_character::parseTextVariableRef(const std::string& variableName) const
 	VariableRef ret;
 	ret.first = 0;
 
-	std::string var_str = variableName;
-	if ( _vm.getSWFVersion() < 7 )
-	{
-		boost::to_lower( var_str, _vm.getLocale() );
-	}
+	std::string var_str = PROPNAME(variableName);
 
 	const char* varname = var_str.c_str();
 
@@ -1498,7 +1494,7 @@ edit_text_character::parseTextVariableRef(const std::string& variableName) const
 	/// Why isn't get_environment const again ?
 	as_environment& env = const_cast<edit_text_character*>(this)->get_environment();
 
-	character* target = env.get_target();
+	as_object* target = env.get_target();
 	assert(target); // is this correct ?
 
 	// If the variable string contains a path, we extract
@@ -1512,7 +1508,7 @@ edit_text_character::parseTextVariableRef(const std::string& variableName) const
 #endif
 		// find target for the path component
 		// we use our parent's environment for this
-		target = env.find_target(path);
+		target = env.find_object(path);
 
 		// update varname (with path component stripped)
 		varname = var.c_str();
@@ -1526,10 +1522,7 @@ edit_text_character::parseTextVariableRef(const std::string& variableName) const
 		return ret;
 	}
 
-	assert(dynamic_cast<sprite_instance*>(target));
-	sprite_instance* sprite = static_cast<sprite_instance*>(target);
-
-	ret.first = sprite;
+	ret.first = target;
 	ret.second = _vm.getStringTable().find(varname);
 
 	return ret;
@@ -1562,23 +1555,21 @@ edit_text_character::registerTextVariable()
 	}
 
 	VariableRef varRef = parseTextVariableRef(_variable_name);
-	sprite_instance* sprite = varRef.first;
-	if ( ! sprite )
+	as_object* target = varRef.first;
+	if ( ! target )
 	{
-		//IF_VERBOSE_MALFORMED_SWF(
-			log_swferror(_("VariableName associated to text field (%s) refer to an unknown target. "
+		log_debug(_("VariableName associated to text field (%s) refer to an unknown target. "
 				"It is possible that the character will be instantiated later in the SWF stream. "
 				"Gnash will try to register again on next access."), _variable_name.c_str());
-		//);
 		return;
 	}
 
-	string_table::key& key = varRef.second;
+	string_table::key key = varRef.second;
 
 	// check if the VariableName already has a value,
 	// in that case update text value
 	as_value val;
-	if (sprite->get_member(key, &val) )
+	if (target->get_member(key, &val) )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
 		log_msg(_("target sprite (%p) does have a member named %s"), (void*)sprite, _vm.getStringTable().value(key).c_str());
@@ -1592,17 +1583,23 @@ edit_text_character::registerTextVariable()
 #ifdef DEBUG_DYNTEXT_VARIABLES
 		log_msg(_("target sprite (%p) does NOT have a member named %s (no problem, we'll add it)"), (void*)sprite, _vm.getStringTable().value(key).c_str());
 #endif
-		sprite->set_member(key, as_value(_text));
+		target->set_member(key, as_value(_text));
 	}
 
-	// add the textfield variable to the target sprite
-	// TODO: have set_textfield_variable take a string_table::key instead ?
-#ifdef DEBUG_DYNTEXT_VARIABLES
-	log_debug("Calling set_textfield_variable(%s) against sprite %s", _vm.getStringTable().value(key).c_str(), sprite->getTarget().c_str());
-#endif
-	sprite->set_textfield_variable(_vm.getStringTable().value(key), this);
+	sprite_instance* sprite = target->to_movie();
 
+	if ( sprite )
+	{
+		// add the textfield variable to the target sprite
+		// TODO: have set_textfield_variable take a string_table::key instead ?
+#ifdef DEBUG_DYNTEXT_VARIABLES
+		log_debug("Calling set_textfield_variable(%s) against sprite %s", _vm.getStringTable().value(key).c_str(), sprite->getTarget().c_str());
+#endif
+		sprite->set_textfield_variable(_vm.getStringTable().value(key), this);
+
+	}
 	_text_variable_registered=true;
+
 }
 
 void
@@ -2063,7 +2060,6 @@ edit_text_character::onChanged()
 {
 	string_table& st = _vm.getStringTable();
 	string_table::key key = st.find(PROPNAME("onChanged"));
-	as_environment& env = const_cast<edit_text_character*>(this)->get_environment();
 	callMethod(key);
 }
 
@@ -2072,7 +2068,6 @@ edit_text_character::onSetFocus()
 {
 	string_table& st = _vm.getStringTable();
 	string_table::key key = st.find(PROPNAME("onSetFocus"));
-	as_environment& env = const_cast<edit_text_character*>(this)->get_environment();
 	callMethod(key);
 }
 
@@ -2081,7 +2076,6 @@ edit_text_character::onKillFocus()
 {
 	string_table& st = _vm.getStringTable();
 	string_table::key key = st.find(PROPNAME("onKillFocus"));
-	as_environment& env = const_cast<edit_text_character*>(this)->get_environment();
 	callMethod(key);
 }
 
