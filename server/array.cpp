@@ -1410,6 +1410,10 @@ array_new(const fn_call& fn)
 	}
 	else if (fn.nargs == 1 && fn.arg(0).is_number() )
 	{
+		// TODO: limit max size !!
+		unsigned int newSize = fn.arg(0).to_number();
+		ao->resize(newSize);
+#if 0
 		// Create an empty array with the given number of undefined elements.
 		//
 		as_value index_number, undef_value;
@@ -1423,6 +1427,7 @@ array_new(const fn_call& fn)
 			index_number.set_int(i);
 			ao->set_member(st.find(index_number.to_string_versioned(sv)), undef_value);
 		}
+#endif
 	}
 	else
 	{

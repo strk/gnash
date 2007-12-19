@@ -1,5 +1,12 @@
 2007-12-18 Sandro Santilli <strk@keybit.net>
 
+	* server/array.cpp (array_new): drop an absurdly complex and unneeded
+	  round trip to set initial array size. Makes PlanarityBig5 go to
+	  level 15 in a second or two. See
+	  http://wiki.gnashdev.org/wiki/index.php/PlanarityProfile.
+
+2007-12-18 Sandro Santilli <strk@keybit.net>
+
 	* server/array.cpp: slightly reduced string_table::find calls.
 	* server/as_object.{h,cpp}: rename visitProperties to
 	  visitPropertyValues, use it from copyProperties.
