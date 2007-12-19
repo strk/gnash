@@ -709,9 +709,7 @@ as_object::copyProperties(const as_object& o)
 	PropsCopier copier(*this);
 
 	// TODO: check if non-visible properties should be also copied !
-	o._members.visitValues(copier,
-			// Need const_cast due to getValue getting non-const ...
-			const_cast<as_object&>(o));
+	o.visitPropertyValues(copier);
 }
 
 void

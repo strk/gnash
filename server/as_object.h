@@ -721,7 +721,7 @@ public:
 	///
 	void enumerateProperties(std::map<std::string, std::string>& to);
 
-	/// Visit the list of properties 
+	/// Visit the properties of this object by key/as_value pairs
 	//
 	/// The method will invoke the given visitor method
 	/// passing it two arguments: key of the property and
@@ -734,9 +734,11 @@ public:
 	///	as second argument.
 	///
 	template <class V>
-	void visitProperties(V& visitor) const
+	void visitPropertyValues(V& visitor) const
 	{
-		_members.visitValues(visitor, *this);
+		_members.visitValues(visitor, 
+			// Need const_cast due to getValue getting non-const ...
+			const_cast<as_object&>(*this));
 	}
 
 
