@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.138 2007/12/19 09:40:54 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.139 2007/12/19 18:40:07 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -267,11 +267,12 @@ static as_value
 textfield_removeTextField(const fn_call& fn)
 {
 	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
-	UNUSED(text);
+
+	text->removeTextField();
 
 	static bool warned = false;
 	if ( ! warned ) {
-		log_unimpl("TextField.removeTextField()");
+		log_debug("TextField.removeTextField() TESTING");
 		warned = true;
 	}
 
@@ -455,6 +456,36 @@ edit_text_character::unload()
 	on_event(event_id::KILLFOCUS);
 
 	return character::unload(); 
+}
+
+void
+edit_text_character::removeTextField()
+{
+	int depth = get_depth();
+	if ( depth < 0 || depth > 1048575 )
+	{
+		//IF_VERBOSE_ASCODING_ERRORS(
+		log_debug(_("CHECKME: removeTextField(%s): TextField depth (%d) out of the "
+			"'dynamic' zone [0..1048575], won't remove"),
+			getTarget().c_str(), depth);
+		//);
+		return;
+	}
+
+	character* parent = get_parent();
+	assert(parent); // every TextField must have a parent, right ?
+
+	sprite_instance* parentSprite = parent->to_movie();
+
+	if ( ! parentSprite )
+	{
+		log_error("FIXME: attempt to remove a TextField being a child of a %s", typeName(*parent).c_str());
+		return;
+	}
+
+	// second argument is arbitrary, see comments above
+	// the function declaration in sprite_instance.h
+	parentSprite->remove_display_object(depth, 0);
 }
 
 void

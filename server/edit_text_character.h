@@ -278,6 +278,16 @@ public:
 		return isSelectable();
 	}
 
+	/// Remove this textfield from the stage
+	//
+	/// This is to implement TextField.removeTextField, will
+	/// basically forward the request to its parent.
+	/// Eventually this and sprite_instance::removeMovieClip
+	/// will be merged in a single function to be later used
+	/// also for AS3 removeChild().
+	///
+	void removeTextField();
+
 private:
 
 	/// Set focus 

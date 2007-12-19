@@ -1,5 +1,12 @@
 2007-12-18 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.{cpp,h}:
+	  implement removeTextField().
+	* testsuite/actionscript.all/TextField.as: update expected
+	  results (2 xpass, 2 fail - used to suceed by luck).
+
+2007-12-18 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/TextField.as: add tests for
 	  TextField soft references (unimplemented in Gnash).
 

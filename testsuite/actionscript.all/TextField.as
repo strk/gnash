@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.37 2007/12/19 16:38:49 strk Exp $";
+rcsid="$Id: TextField.as,v 1.38 2007/12/19 18:40:07 strk Exp $";
 
 #include "check.as"
 
@@ -609,19 +609,19 @@ check_equals(typeof(softref), 'object');
 check_equals(softref.prop, 5);
 check_equals(softref.getDepth(), 23);
 hardref.removeTextField();
-xcheck_equals(typeof(hardref), 'undefined');
+check_equals(typeof(hardref), 'undefined');
 xcheck_equals(typeof(softref), 'movieclip'); // becomes a movieclip ??
 xcheck_equals(typeof(softref.prop), 'undefined');
 createEmptyMovieClip("hardref", 24);
-xcheck_equals(typeof(hardref), 'movieclip');
+check_equals(typeof(hardref), 'movieclip');
 hardref.prop = 7;
 xcheck_equals(typeof(softref), 'movieclip');
-check_equals(softref.prop, 7);
+xcheck_equals(softref.prop, 7);
 hardref.removeMovieClip();
 createTextField("hardref", 25, 10, 10, 160, 200);
 hardref.prop = 9;
 check_equals(typeof(softref), 'object'); // changes type on rebind
-check_equals(softref.prop, 9);
+xcheck_equals(softref.prop, 9);
 
 
 //-------------------------------------------------------------------------
