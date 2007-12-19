@@ -1,5 +1,8 @@
 2007-12-19 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/SharedObject.cpp: make SharedObject.flush more
+	  robust, reduce string_table lookups in PropsSerializer, cleanup
+	  class initialization and SharedObject constructor.
 	* libamf/amf.{cpp,h} (createElement): take element names by
 	  const refs.
 

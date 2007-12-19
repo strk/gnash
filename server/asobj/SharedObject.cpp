@@ -48,28 +48,38 @@ as_value sharedobject_ctor(const fn_call& fn);
 void sharedobject_iter(SOL &sol, string_table::key key, const as_value &reference);
 
 class PropsSerializer {
-    SOL& _sol; public: PropsSerializer(SOL& sol) : _sol(sol) {};
-    virtual as_value operator() (string_table::key key, const as_value& val)
+
+    SOL& _sol;
+
+    string_table& _st;
+
+public:
+
+    PropsSerializer(SOL& sol, VM& vm)
+        :
+        _sol(sol),
+        _st(vm.getStringTable())
+    {};
+
+    void operator() (string_table::key key, const as_value& val) const
         {
             GNASH_REPORT_FUNCTION;
             AMF amf;
             AMF::amf_element_t el;
-            string_table& st = VM::get().getStringTable();
-            string str = st.string_table::value(key);
-            cerr << "FIXME: yes!!!!! " << str << ": "<< val.to_string() << endl;
+
+            const string& name = _st.string_table::value(key);
+
+            cerr << "FIXME: yes!!!!! " << name << ": "<< val.to_debug_string() << endl;
 
             if (val.is_string()) {
                 string str;
-                if (val.is_undefined()) {
-                    str = "";
-                } else {
+                if (!val.is_undefined()) {
                     str = val.to_string();
                 }
-                amf.createElement(&el, str, str);
+                amf.createElement(&el, name, str);
             }
             if (val.is_bool()) {
-                bool b;
-                amf.createElement(&el, str, b);
+                amf.createElement(&el, name, val.to_bool());
             }
             if (val.is_number()) { 
                 double dub;
@@ -78,11 +88,10 @@ class PropsSerializer {
                 } else {
                     dub = val.to_number();
                 }
-                amf.createElement(&el, str, dub);
+                amf.createElement(&el, name, dub);
             }
             
             _sol.addObj(el);
-            return as_value(true);
         }
 };
 
@@ -98,26 +107,31 @@ static void
 attachSharedObjectInterface(as_object& o)
 {
     GNASH_REPORT_FUNCTION;
-    // TODO: clear, flush and getSize not in SWF<6 , it seems
+
+    VM& vm = o.getVM();
+    int swfVersion = vm.getSWFVersion();
+
+    // clear, flush and getSize not in SWF<6 , it seems
+    if ( swfVersion < 6 ) return; 
+
     o.init_member("clear", new builtin_function(sharedobject_clear));
     o.init_member("flush", new builtin_function(sharedobject_flush));
-    //o.init_member("getLocal", new builtin_function(sharedobject_getlocal));
     o.init_member("getSize", new builtin_function(sharedobject_getsize));
-    attachProperties(o);
 }
 
 static void
 attachSharedObjectStaticInterface(as_object& o)
 {
     GNASH_REPORT_FUNCTION;
+
     o.init_member("getLocal", new builtin_function(sharedobject_getlocal));
-    attachProperties(o);
 }
 
 static as_object*
 getSharedObjectInterface()
 {
     GNASH_REPORT_FUNCTION;
+
     static boost::intrusive_ptr<as_object> o;
     if ( ! o ) {
         o = new as_object(getObjectInterface());
@@ -133,8 +147,9 @@ public:
     SharedObject()
         :
         as_object(getSharedObjectInterface())
-        { 
-        }
+    { 
+		attachProperties(*this);
+    }
 };
 
 #if 0
@@ -192,15 +207,27 @@ sharedobject_flush(const fn_call& fn)
 
 //    log_msg("Flushing to file %s", obj->getFilespec().c_str());
 
-     string_table::key dataKey = VM::get().getStringTable().find("data");
+    VM& vm = obj->getVM();
+
+     // TODO: cache the dataKey in SharedObject prototype on first use ?
+     //       a SharedObject::getDataKey() might do...
+     string_table::key dataKey = vm.getStringTable().find("data");
+
      as_value as = obj->getMember(dataKey);
      boost::intrusive_ptr<as_object> ptr = as.to_object();
+      if ( ! ptr )
+      {
+            log_error("'data' member of SharedObject is not an object (%s)",
+                 as.to_debug_string().c_str());
+            return as_value();
+      }
      
-      auto_ptr<SOL> sol(new SOL);
-      PropsSerializer props(*sol);     
+      SOL sol;
+      PropsSerializer props(sol, vm);
       ptr->visitPropertyValues(props);
-      sol->writeFile(obj->getFilespec(), obj->getObjectName().c_str());
-     return as_value(true);
+      sol.writeFile(obj->getFilespec(), obj->getObjectName().c_str());
+
+      return as_value(true); // TODO: check expected return type from SharedObject.flush
 }
 
 as_value
@@ -214,9 +241,12 @@ sharedobject_getlocal(const fn_call& fn)
 
     if (fn.nargs > 0) {
         std::string filespec = fn.arg(0).to_string();
+
+        // FIXME: check security !!!
+        //        This is scary... 
         obj->setFilespec(filespec);
         obj->setObjectName(filespec);
-        log_msg("Opening SharedObject file: %s", filespec.c_str());
+        log_security("Opening SharedObject file: %s", filespec.c_str());
     }
     
     return as_value(obj.get()); // will keep alive
@@ -234,8 +264,8 @@ as_value
 sharedobject_ctor(const fn_call& /* fn */)
 {
     GNASH_REPORT_FUNCTION;
-//    boost::intrusive_ptr<as_object> obj = new SharedObject;
-    static boost::intrusive_ptr<as_object> obj = new as_object(getSharedObjectInterface());
+    boost::intrusive_ptr<as_object> obj = new SharedObject;
+//    static boost::intrusive_ptr<as_object> obj = new as_object(getSharedObjectInterface());
     
     return as_value(obj.get()); // will keep alive
 }
@@ -249,8 +279,6 @@ void sharedobject_class_init(as_object& global)
     
     if (cl == NULL) {
         cl=new builtin_function(&sharedobject_ctor, getSharedObjectInterface());
-        // replicate all interface to class, to be able to access
-        // all methods as static functions
         attachSharedObjectStaticInterface(*cl);
     }
     
