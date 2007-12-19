@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.36 2007/12/19 09:40:54 strk Exp $";
+rcsid="$Id: TextField.as,v 1.37 2007/12/19 16:38:49 strk Exp $";
 
 #include "check.as"
 
@@ -590,8 +590,38 @@ check_equals(o.t, "and forever back"); // while updating textfield's text update
 //-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
-// TODO: check TextField.removeTextField (and soft references?)
+// Check TextField.removeTextField and soft references
 //-------------------------------------------------------------------------
+//
+// TextField as_value references are soft references like MovieClip ones.
+// Till the ref is not danglign, typeof(ref) will return 'object', once
+// the ref is dangling it will return 'movieclip' and will successfully 
+// rebind to a real MovieClip ! When rebound, typeof(ref) will return 'object'
+// or 'movieclip' depending on the bound thing.
+//
+//-------------------------------------------------------------------------
+
+createTextField("hardref", 23, 10, 10, 160, 200);
+hardref.prop = 5;
+softref = hardref;
+check_equals(typeof(hardref), 'object');
+check_equals(typeof(softref), 'object');
+check_equals(softref.prop, 5);
+check_equals(softref.getDepth(), 23);
+hardref.removeTextField();
+xcheck_equals(typeof(hardref), 'undefined');
+xcheck_equals(typeof(softref), 'movieclip'); // becomes a movieclip ??
+xcheck_equals(typeof(softref.prop), 'undefined');
+createEmptyMovieClip("hardref", 24);
+xcheck_equals(typeof(hardref), 'movieclip');
+hardref.prop = 7;
+xcheck_equals(typeof(softref), 'movieclip');
+check_equals(softref.prop, 7);
+hardref.removeMovieClip();
+createTextField("hardref", 25, 10, 10, 160, 200);
+hardref.prop = 9;
+check_equals(typeof(softref), 'object'); // changes type on rebind
+check_equals(softref.prop, 9);
 
 
 //-------------------------------------------------------------------------
@@ -778,9 +808,9 @@ check_equals(typeof(tf6), 'undefined');
 
 
 #if OUTPUT_VERSION < 8
- check_totals(371);
+ check_totals(383);
 #else
- check_totals(372);
+ check_totals(384);
 #endif
 
 #else // OUTPUT_VERSION <= 5
