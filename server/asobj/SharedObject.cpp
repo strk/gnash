@@ -21,6 +21,8 @@
 #include "config.h"
 #endif
 
+#include "amf.h"
+#include "sol.h"
 #include "SharedObject.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
@@ -28,6 +30,12 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "Object.h" // for getObjectInterface
+#include "VM.h"
+#include "PropertyList.h"
+#include "Property.h"
+#include "string_table.h"
+
+using namespace amf;
 
 namespace gnash {
 
@@ -37,131 +45,174 @@ as_value sharedobject_getlocal(const fn_call& fn);
 as_value sharedobject_getsize(const fn_call& fn);
 as_value sharedobject_ctor(const fn_call& fn);
 
+void sharedobject_iter(string_table::key key, const as_value &reference);
+
+static SOL sol;
+
+static void
+attachProperties(as_object& o)
+{
+    GNASH_REPORT_FUNCTION;
+     as_object *proto = new as_object();
+     o.init_member("data", proto);
+}
+
 static void
 attachSharedObjectInterface(as_object& o)
 {
-	// TODO: clear, flush and getSize not in SWF<6 , it seems
-	o.init_member("clear", new builtin_function(sharedobject_clear));
-	o.init_member("flush", new builtin_function(sharedobject_flush));
-	//o.init_member("getLocal", new builtin_function(sharedobject_getlocal));
-	o.init_member("getSize", new builtin_function(sharedobject_getsize));
+    GNASH_REPORT_FUNCTION;
+    // TODO: clear, flush and getSize not in SWF<6 , it seems
+    o.init_member("clear", new builtin_function(sharedobject_clear));
+    o.init_member("flush", new builtin_function(sharedobject_flush));
+    //o.init_member("getLocal", new builtin_function(sharedobject_getlocal));
+    o.init_member("getSize", new builtin_function(sharedobject_getsize));
+    attachProperties(o);
 }
 
 static void
 attachSharedObjectStaticInterface(as_object& o)
 {
-	o.init_member("getLocal", new builtin_function(sharedobject_getlocal));
+    GNASH_REPORT_FUNCTION;
+    o.init_member("getLocal", new builtin_function(sharedobject_getlocal));
+    attachProperties(o);
 }
 
 static as_object*
 getSharedObjectInterface()
 {
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
-		o = new as_object(getObjectInterface());
-		attachSharedObjectInterface(*o);
-	}
-	return o.get();
+    GNASH_REPORT_FUNCTION;
+    static boost::intrusive_ptr<as_object> o;
+    if ( ! o ) {
+        o = new as_object(getObjectInterface());
+        attachSharedObjectInterface(*o);
+    }
+    return o.get();
 }
 
-class SharedObject: public as_object
+
+class SharedObject: public as_object, public amf::SOL
 {
-
 public:
-
-	SharedObject()
-		:
-		as_object(getSharedObjectInterface())
-	{}
-
-	// override from as_object ?
-	//std::string get_text_value() const { return "SharedObject"; }
-
-	// override from as_object ?
-	//double get_numeric_value() const { return 0; }
+    SharedObject()
+        :
+        as_object(getSharedObjectInterface())
+        { 
+        }
 };
 
-as_value sharedobject_clear(const fn_call& fn)
+// Turn each property into an AMF element
+void
+sharedobject_iter(string_table::key key, const as_value &reference)
 {
-	boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
-	UNUSED(obj);
+//    GNASH_REPORT_FUNCTION;
 
-	static bool warned=false;
-	if ( ! warned ) {
-		log_unimpl (__FUNCTION__);
-		warned=true;
-	}
-	return as_value();
+    AMF amf;
+    AMF::amf_element_t el;
+    string_table& st = VM::get().getStringTable();
+    string str = st.string_table::value(key);
+//    cerr << "FIXME: yes!!!!! " << str << ": "<< reference.to_string() << endl;
+
+    if (reference.is_string()) {
+        string str = reference.to_string();
+        amf.createElement(&el, str, str);
+    }
+    if (reference.is_bool()) {
+        bool b;
+        amf.createElement(&el, str, b);
+    }
+    if (reference.is_number()) {
+        double dub = reference.to_number();
+        amf.createElement(&el, str, dub);
+    }
+    
+    sol.addObj(el);
 }
 
-as_value sharedobject_flush(const fn_call& fn)
+as_value
+sharedobject_clear(const fn_call& fn)
 {
-	boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
-	UNUSED(obj);
-
-	static bool warned=false;
-	if ( ! warned ) {
-		log_unimpl (__FUNCTION__);
-		warned=true;
-	}
-	return as_value();
+    GNASH_REPORT_FUNCTION;
+    boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
+    UNUSED(obj);
+    
+    static bool warned=false;
+    if ( ! warned ) {
+        log_unimpl (__FUNCTION__);
+        warned=true;
+    }
+    return as_value();
 }
 
-as_value sharedobject_getlocal(const fn_call& /*fn*/)
+as_value
+sharedobject_flush(const fn_call& fn)
 {
-	// This should return a SharedObject, and it's a static function
+    GNASH_REPORT_FUNCTION;
 
-	//boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
-	//UNUSED(obj);
+     boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
 
-	static bool warned=false;
-	if ( ! warned ) {
-		log_unimpl (__FUNCTION__);
-		warned=true;
-	}
-	return as_value();
+     log_msg("Flushing to file %s", obj->getFilespec().c_str());
+
+     string_table::key dataKey = VM::get().getStringTable().find("data");
+     as_value as = obj->getMember(dataKey);
+     boost::intrusive_ptr<as_object> ptr = as.to_object();
+     ptr->visitPropertyValues(sharedobject_iter);
+     sol.writeFile(obj->getFilespec(), "settings");
+    return as_value(true);
 }
 
-as_value sharedobject_getsize(const fn_call& fn)
+as_value
+sharedobject_getlocal(const fn_call& fn)
 {
-	boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
-	UNUSED(obj);
+    GNASH_REPORT_FUNCTION;
+    // This should return a SharedObject, and it's a static function
+    
+//    static boost::intrusive_ptr<as_object> obj = new as_object(getSharedObjectInterface());
+    static boost::intrusive_ptr<SharedObject> obj = new SharedObject();
 
-	static bool warned=false;
-	if ( ! warned ) {
-		log_unimpl (__FUNCTION__);
-		warned=true;
-	}
-	return as_value();
+    if (fn.nargs > 0) {
+        std::string filespec = fn.arg(0).to_string();
+        obj->setFilespec(filespec);
+        obj->setObjectName(filespec);
+        log_msg("Opening SharedObject file: %s", filespec.c_str());
+    }
+    
+    return as_value(obj.get()); // will keep alive
+}
+
+as_value
+sharedobject_getsize(const fn_call& fn)
+{
+    GNASH_REPORT_FUNCTION;
+    boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
+    return as_value(obj->size());
 }
 
 as_value
 sharedobject_ctor(const fn_call& /* fn */)
 {
-	boost::intrusive_ptr<as_object> obj = new SharedObject;
-	
-	return as_value(obj.get()); // will keep alive
+    GNASH_REPORT_FUNCTION;
+//    boost::intrusive_ptr<as_object> obj = new SharedObject;
+    static boost::intrusive_ptr<as_object> obj = new as_object(getSharedObjectInterface());
+    
+    return as_value(obj.get()); // will keep alive
 }
 
 // extern (used by Global.cpp)
 void sharedobject_class_init(as_object& global)
 {
-	// This is going to be the global SharedObject "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
-
-	if ( cl == NULL )
-	{
-		cl=new builtin_function(&sharedobject_ctor, getSharedObjectInterface());
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		attachSharedObjectStaticInterface(*cl);
-		     
-	}
-
-	// Register _global.SharedObject
-	global.init_member("SharedObject", cl.get());
-
+    GNASH_REPORT_FUNCTION;
+    // This is going to be the global SharedObject "class"/"function"
+    static boost::intrusive_ptr<builtin_function> cl;
+    
+    if (cl == NULL) {
+        cl=new builtin_function(&sharedobject_ctor, getSharedObjectInterface());
+        // replicate all interface to class, to be able to access
+        // all methods as static functions
+        attachSharedObjectStaticInterface(*cl);
+    }
+    
+    // Register _global.SharedObject
+    global.init_member("SharedObject", cl.get());    
 }
 
 } // end of gnash namespace

@@ -40,12 +40,12 @@
 // After this is a series of AMF objects
 namespace amf
 {
-  class SOL {
+class SOL {
 public:
     SOL();
     ~SOL();
     size_t size() { return _amfobjs.size(); };
-
+    
     // extract the header
     bool extractHeader(std::vector<uint8_t> &data);
     bool extractHeader(std::string &filespec);
@@ -56,13 +56,13 @@ public:
     bool formatHeader(std::string &name, int filesize);
 
     // write the data to disk as a .sol file
+    bool writeFile();
     bool writeFile(std::string &filespec, std::string &objname);
     bool writeFile(std::string &filespec, const char *objname);
     bool writeFile(const char *filespec, const char *objname);
     
     // read the .sol file from disk
     bool readFile(std::string &filespec);
-
     
     std::vector<uint8_t> getHeader() { return _header; };
 
@@ -72,6 +72,13 @@ public:
     AMF::amf_element_t getElement(int x) { return _amfobjs[x]; };
 
     void dump();
+//protected:
+    void setFilespec(std::string &x) { _filespec = x; };
+    std::string &getFilespec() { return _filespec; };
+
+    void setObjectName(std::string &x) { _objname = x; };
+    std::string &getObjectName() { return _objname; };
+        
  private:
     std::vector<uint8_t> _header;
     std::vector<uint8_t> _data;
