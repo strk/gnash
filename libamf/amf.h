@@ -251,6 +251,10 @@ public:
 				  boost::intrusive_ptr<gnash::as_object> &data);
     amf_element_t *createElement(amf_element_t *el, const char *name,
 				 boost::intrusive_ptr<gnash::as_object> &data);
+//     amf_element_t *createElement(amf_element_t *el, std::string &name,
+// 				 const gnash::as_value &data);
+//     amf_element_t *createElement(amf_element_t *el, const char *name,
+// 				 const gnash::as_value &data);
     //
     /// @return a newly allocated byte array,
     /// to be deleted by caller using delete [] operator, or NULL

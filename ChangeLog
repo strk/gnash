@@ -1,3 +1,11 @@
+2007-12-19  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* server/asobj/SharedObject.cpp: Add handler for properties
+	visitor function. Handle "undefined" values when encoding into
+	AMF. Fixes #21848.
+	* libamf/amf.cpp: Comment out function traces.
+	* libamf/sol.cpp: Trap undefiend filespec.
+
 2007-12-18 Sandro Santilli <strk@keybit.net>
 
 	* server/edit_text_character.{cpp,h}:

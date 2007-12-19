@@ -45,9 +45,46 @@ as_value sharedobject_getlocal(const fn_call& fn);
 as_value sharedobject_getsize(const fn_call& fn);
 as_value sharedobject_ctor(const fn_call& fn);
 
-void sharedobject_iter(string_table::key key, const as_value &reference);
+void sharedobject_iter(SOL &sol, string_table::key key, const as_value &reference);
 
-static SOL sol;
+class PropsSerializer {
+    SOL& _sol; public: PropsSerializer(SOL& sol) : _sol(sol) {};
+    virtual as_value operator() (string_table::key key, const as_value& val)
+        {
+            GNASH_REPORT_FUNCTION;
+            AMF amf;
+            AMF::amf_element_t el;
+            string_table& st = VM::get().getStringTable();
+            string str = st.string_table::value(key);
+            cerr << "FIXME: yes!!!!! " << str << ": "<< val.to_string() << endl;
+
+            if (val.is_string()) {
+                string str;
+                if (val.is_undefined()) {
+                    str = "";
+                } else {
+                    str = val.to_string();
+                }
+                amf.createElement(&el, str, str);
+            }
+            if (val.is_bool()) {
+                bool b;
+                amf.createElement(&el, str, b);
+            }
+            if (val.is_number()) { 
+                double dub;
+                if (val.is_undefined()) {
+                    dub = 0.0;
+                } else {
+                    dub = val.to_number();
+                }
+                amf.createElement(&el, str, dub);
+            }
+            
+            _sol.addObj(el);
+            return as_value(true);
+        }
+};
 
 static void
 attachProperties(as_object& o)
@@ -100,11 +137,12 @@ public:
         }
 };
 
+#if 0
 // Turn each property into an AMF element
 void
-sharedobject_iter(string_table::key key, const as_value &reference)
+sharedobject_iter(SOL &sol, string_table::key key, const as_value &reference)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     AMF amf;
     AMF::amf_element_t el;
@@ -124,9 +162,10 @@ sharedobject_iter(string_table::key key, const as_value &reference)
         double dub = reference.to_number();
         amf.createElement(&el, str, dub);
     }
-    
+
     sol.addObj(el);
 }
+#endif
 
 as_value
 sharedobject_clear(const fn_call& fn)
@@ -148,16 +187,20 @@ sharedobject_flush(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
 
-     boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
+    
+    boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
 
-     log_msg("Flushing to file %s", obj->getFilespec().c_str());
+//    log_msg("Flushing to file %s", obj->getFilespec().c_str());
 
      string_table::key dataKey = VM::get().getStringTable().find("data");
      as_value as = obj->getMember(dataKey);
      boost::intrusive_ptr<as_object> ptr = as.to_object();
-     ptr->visitPropertyValues(sharedobject_iter);
-     sol.writeFile(obj->getFilespec(), "settings");
-    return as_value(true);
+     
+      auto_ptr<SOL> sol(new SOL);
+      PropsSerializer props(*sol);     
+      ptr->visitPropertyValues(props);
+      sol->writeFile(obj->getFilespec(), obj->getObjectName().c_str());
+     return as_value(true);
 }
 
 as_value

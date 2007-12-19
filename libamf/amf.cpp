@@ -80,7 +80,7 @@ AMF::AMF()
       _seekptr(0),
       _mystery_word(0)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 }
 
 AMF::AMF(int size) 
@@ -92,7 +92,7 @@ AMF::AMF(int size)
       _amf_data(0),
       _mystery_word(0)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     if (!_amf_data) {
         _amf_data = new uint8_t(size+1);
         memset(_amf_data, 0, size+1);
@@ -102,7 +102,7 @@ AMF::AMF(int size)
 
 AMF::~AMF()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 }
 
 
@@ -167,7 +167,7 @@ swapBytes(void *word, int size)
 bool
 AMF::parseAMF(uint8_t *in)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     uint8_t *x = in;
 
@@ -180,7 +180,7 @@ AMF::parseAMF(uint8_t *in)
 uint8_t *
 AMF::readElement(void *in)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     uint8_t *x = static_cast<uint8_t *>(in);
     astype_e type = (astype_e)*x;
@@ -523,7 +523,7 @@ AMF::encodeRTMPHeader(int amf_index, amf_headersize_e head_size,
 amfhead_t *
 AMF::encodeHeader(amfutf8_t *name, bool required, int nbytes, void *data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     AMF_Int_t length = sizeof(amfhead_t) + nbytes + name->length + 1;
     char *buf = new char[length];
@@ -567,7 +567,7 @@ AMF::encodeHeader(amfutf8_t *name, bool required, int nbytes, void *data)
 amfbody_t *
 AMF::encodeBody(amfutf8_t *target, amfutf8_t *response, int nbytes, void *data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     char *buf = new char[sizeof(amfbody_t) + nbytes];
     memset(buf, 0, sizeof(amfbody_t) + nbytes );
@@ -600,7 +600,7 @@ AMF::encodeBody(amfutf8_t *target, amfutf8_t *response, int nbytes, void *data)
 amfpacket_t *
 AMF::encodePacket(std::vector<amfpacket_t *> messages)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     int total = 0;
     amfpacket_t pkt;
@@ -637,7 +637,7 @@ AMF::encodePacket(std::vector<amfpacket_t *> messages)
 AMF::astype_e
 AMF::extractElementHeader(void *in)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     return (AMF::astype_e)*(char *)in;
 }
@@ -645,7 +645,7 @@ AMF::extractElementHeader(void *in)
 int
 AMF::extractElementLength(void *in)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     char *x = (char *)in;
     astype_e type = (astype_e)*x;
@@ -719,7 +719,7 @@ AMF::extractElementLength(void *in)
 int8_t *
 AMF::extractString(const uint8_t *in)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     int8_t *buf = NULL;
     uint8_t *x = const_cast<uint8_t *>(in);
     
@@ -742,7 +742,7 @@ AMF::extractString(const uint8_t *in)
 amfnum_t *
 AMF::extractNumber(const uint8_t *in)
 {
-    GNASH_REPORT_FUNCTION;    
+//    GNASH_REPORT_FUNCTION;    
     uint8_t *x = const_cast<uint8_t *>(in);
     amfnum_t *num = new amfnum_t;
     memset(num, 0, AMF_NUMBER_SIZE);
@@ -762,7 +762,7 @@ AMF::amf_element_t *
 AMF::createElement(amf_element_t *el, astype_e type,
 		  std::string &name, uint8_t *data, int nbytes)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     log_debug("Creating element %s", name.c_str());
     
     el->type = type;
@@ -775,7 +775,7 @@ AMF::createElement(amf_element_t *el, astype_e type,
 AMF::amf_element_t *
 AMF::createElement(amf_element_t *el, const char *name, amfnum_t data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     string str = name;
     return createElement(el, str, data);
 }
@@ -800,7 +800,7 @@ AMF::createElement(amf_element_t *el, std::string &name, amfnum_t data)
 AMF::amf_element_t *
 AMF::createElement(amf_element_t *el, const char *name, double data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     string str = name;
     return createElement(el, str, data);
 }
@@ -853,7 +853,7 @@ AMF::createElement(amf_element_t *el, std::string &name, std::string &data)
 AMF::amf_element_t *
 AMF::createElement(amf_element_t *el, const char *name, bool data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     string str = name;
     return createElement(el, str, data);
 }
@@ -874,38 +874,39 @@ AMF::createElement(AMF::amf_element_t *el, std::string &name, bool data)
 }
 
 
-AMF::amf_element_t *
-createElement(AMF::amf_element_t *el, std::string &name,
-	      boost::intrusive_ptr<gnash::as_object> &data)
-{
-    GNASH_REPORT_FUNCTION;
-    log_debug("Creating element %s", name.c_str());
+// AMF::amf_element_t *
+// createElement(AMF::amf_element_t *el, std::string &name,
+// 	      boost::intrusive_ptr<gnash::as_object> &data)
+// {
+//     GNASH_REPORT_FUNCTION;
+//     log_debug("Creating element %s", name.c_str());
 
-    el->type = AMF::OBJECT;
-    el->name = name;
-    el->length = sizeof(data);
-    el->data = new uint8_t[sizeof(uint16_t)];
-    memset(el->data, 0, sizeof(uint16_t));
-    memcpy(el->data, (char *)&data, el->length);
-    return el;
-}
+//     el->type = AMF::OBJECT;
+//     el->name = name;
+//     el->length = sizeof(data);
+//     el->data = new uint8_t[sizeof(uint16_t)];
+//     memset(el->data, 0, sizeof(uint16_t));
+//     memcpy(el->data, (char *)&data, el->length);
+//     return el;
+// }
 
-AMF::amf_element_t *
-createElement(AMF::amf_element_t *el, const char *name,
-	      boost::intrusive_ptr<gnash::as_object> &data)
-{
-    GNASH_REPORT_FUNCTION;
-    string str = name;
-    return createElement(el, str, data);
-}
+// AMF::amf_element_t *
+// createElement(AMF::amf_element_t *el, const char *name,
+// 	      boost::intrusive_ptr<gnash::as_object> &data)
+// {
+//     GNASH_REPORT_FUNCTION;
+//     string str = name;
+//     return createElement(el, str, data);
+// }
 
 uint8_t *
 AMF::encodeVariable(amf_element_t *el)
 {
     GNASH_REPORT_FUNCTION;
     int outsize = el->name.size() + el->length + 5;
-    uint8_t *out = new uint8_t[outsize];
-    memset(out, 0, outsize);
+    log_debug("FIXME: Outsize is: %d", outsize);
+    uint8_t *out = new uint8_t[outsize + 2];
+    memset(out, 0, outsize + 2);
     uint8_t *tmpptr = out;
 
     // Add the length of the string for the name of the variable
@@ -929,8 +930,10 @@ AMF::encodeVariable(amf_element_t *el)
 	  tmpptr += sizeof(uint16_t);
 	  break;
       case AMF::NUMBER:
-	  swapBytes(el->data, AMF_NUMBER_SIZE);
-	  memcpy(tmpptr, el->data, AMF_NUMBER_SIZE);
+	  if (el->data) {
+	      swapBytes(el->data, AMF_NUMBER_SIZE);
+	      memcpy(tmpptr, el->data, AMF_NUMBER_SIZE);
+	  }
 	  break;
       default:
 	enclength = el->length;
@@ -947,7 +950,7 @@ AMF::encodeVariable(amf_element_t *el)
 uint8_t *
 AMF::encodeVariable(amf_element_t &el)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     int outsize = el.name.size() + el.length + 5;
     uint8_t *out = new uint8_t[outsize];
     uint8_t *tmpptr = out;
@@ -974,7 +977,7 @@ AMF::encodeVariable(amf_element_t &el)
 uint8_t *
 AMF::encodeVariable(const char *name, bool flag)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     int outsize = strlen(name) + AMF_NUMBER_SIZE + 5;
     uint8_t *out = new uint8_t[outsize];
@@ -997,7 +1000,7 @@ AMF::encodeVariable(const char *name, bool flag)
 uint8_t *
 AMF::encodeVariable(const char *name)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     size_t outsize = strlen(name) + AMF_NUMBER_SIZE + 5;
     uint8_t *out = new uint8_t[outsize];
     uint8_t *tmpptr = out;
@@ -1018,7 +1021,7 @@ AMF::encodeVariable(const char *name)
 uint8_t *
 AMF::encodeVariable(const char *name, amfnum_t bignum)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     int outsize = strlen(name) + AMF_NUMBER_SIZE + 5;
     uint8_t *out = new uint8_t[outsize];
     uint8_t *tmpptr = out;
@@ -1043,7 +1046,7 @@ AMF::encodeVariable(const char *name, amfnum_t bignum)
 uint8_t *
 AMF::encodeVariable(const char *name, const char *val)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     int outsize = strlen(name) + strlen(val) + 5;
     uint8_t *out = new uint8_t[outsize];
@@ -1071,7 +1074,7 @@ AMF::encodeVariable(const char *name, const char *val)
 uint8_t *
 AMF::encodeVariable(std::string &name, std::string &val)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     int outsize = name.size() + val.size() + 5;
     uint8_t *out = new uint8_t[outsize];
@@ -1128,7 +1131,7 @@ AMF::headerSize(int8_t header)
 int
 AMF::parseHeader(uint8_t *in)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     uint8_t *tmpptr = in;
     
@@ -1206,7 +1209,7 @@ AMF::parseHeader(uint8_t *in)
 uint8_t *
 AMF::addPacketData(uint8_t *data, int bytes)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     memcpy(_seekptr, data, bytes);
     _seekptr+=bytes;
     return _seekptr;
@@ -1215,7 +1218,7 @@ AMF::addPacketData(uint8_t *data, int bytes)
 int
 AMF::parseBody()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     return parseBody(_amf_data, _total_size);
 }
@@ -1223,7 +1226,7 @@ AMF::parseBody()
 int
 AMF::parseBody(uint8_t *in, int bytes)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     uint8_t *tmpptr;
 
@@ -1320,7 +1323,7 @@ AMF::parseBody(uint8_t *in, int bytes)
 uint8_t *
 AMF::extractVariable(AMF::amf_element_t *el, uint8_t *in)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     uint8_t buffer[AMF_PACKET_SIZE];
     uint8_t *tmpptr = in;

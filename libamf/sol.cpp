@@ -59,6 +59,7 @@ const short SOL_BLOCK_MARK = 0x0004;
 
 namespace amf
 {
+
 SOL::SOL() 
     : _filesize(0)
 {
@@ -184,7 +185,7 @@ SOL::formatHeader(std::string &name, int filesize)
 bool
 SOL::writeFile(string &filespec, const char *name)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     string str = name;
     return writeFile(filespec, str);
 }
@@ -192,7 +193,7 @@ SOL::writeFile(string &filespec, const char *name)
 bool
 SOL::writeFile(const char *filespec, const char *name)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     string str1 = filespec;
     string str2 = name;
     return writeFile(str1, str2);
@@ -207,18 +208,22 @@ SOL::writeFile(string &filespec, string &name)
     vector<AMF::amf_element_t>::iterator ita; 
     AMF amf_obj;
     char *ptr;
+
+    
+    if (filespec.size() == 0) {
+	return false;
+    }
     
     char *body = new char[_filesize]; // FIXME: bogus size!
     memset(body, 0, _filesize);
     ptr = body;
-    
+
     for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
         AMF::amf_element_t *el = &(*(ita));
         int outsize = el->name.size() + el->length + 5;
         uint8_t *foo = amf_obj.encodeVariable(el); 
         switch (el->type) {
 	  case AMF::BOOLEAN:
-//	      *ptr++ = el->data[0];
 	      outsize = el->name.size() + 5;
 	      memcpy(ptr, foo, outsize);
 	      ptr += outsize;
@@ -251,9 +256,11 @@ SOL::writeFile(string &filespec, string &name)
 	      memcpy(ptr, foo, outsize);
 	      ptr += outsize;
 	}
-	delete foo;
+	if (foo) {
+	    delete foo;
+	}
     }
-
+    
     _filesize = ptr - body;
     int len = name.size() + sizeof(uint16_t) + 16;
     char *head = new char[len + 4];
