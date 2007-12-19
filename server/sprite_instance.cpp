@@ -332,6 +332,7 @@ static as_value sprite_create_empty_movieclip(const fn_call& fn)
 
 static as_value sprite_get_depth(const fn_call& fn)
 {
+	// TODO: make this a character::getDepth_method function...
 	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 	int n = sprite->get_depth();
@@ -775,7 +776,7 @@ sprite_create_text_field(const fn_call& fn)
 {
 	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
-	if (fn.nargs != 6) // name, depth, x, y, width, height
+	if (fn.nargs < 6) // name, depth, x, y, width, height
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("createTextField called with %d args, "
@@ -784,55 +785,15 @@ sprite_create_text_field(const fn_call& fn)
 		return as_value();
 	}
 
-	if ( ! fn.arg(0).is_string() ) 
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("First argument of createTextField is not a string"
-			" - returning undefined"));
-		);
-		return as_value();
-	}
 	std::string txt_name = fn.arg(0).to_string();
 
-	if ( ! fn.arg(1).is_number() )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Second argument of createTextField is not a number"
-			" - returning undefined"));
-		);
-		return as_value();
-	}
-	int txt_depth = int(fn.arg(1).to_number());
+	int txt_depth = fn.arg(1).to_int();
 
-	if ( ! fn.arg(2).is_number() ) 
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Third argument of createTextField is not a number"
-			" - returning undefined"));
-		);
-		return as_value();
-	}
-	float txt_x = fn.arg(2).to_number();
+	int txt_x = fn.arg(2).to_int();
 
-	if ( ! fn.arg(3).is_number() )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Fourth argument of createTextField is not a number"
-			" - returning undefined"));
-		);
-		return as_value();
-	}
-	float txt_y = fn.arg(3).to_number();
+	int txt_y = fn.arg(3).to_int();
 
-	if ( ! fn.arg(4).is_number() )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Fifth argument of createTextField is not a number"
-			" - returning undefined"));
-		);
-		return as_value();
-	}
-	float txt_width = fn.arg(4).to_number();
+	int txt_width = fn.arg(4).to_int();
 	if ( txt_width < 0 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -842,15 +803,7 @@ sprite_create_text_field(const fn_call& fn)
 		txt_width = -txt_width;
 	}
 
-	if ( ! fn.arg(5).is_number() ) 
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Sixth argument of createTextField is not a number"
-			" - returning undefined"));
-		);
-		return as_value();
-	}
-	float txt_height = fn.arg(5).to_number();
+	int txt_height = fn.arg(5).to_int();
 	if ( txt_height < 0 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(

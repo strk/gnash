@@ -1,3 +1,12 @@
+2007-12-18 Sandro Santilli <strk@keybit.net>
+
+	* server/edit_text_character.cpp: implement getDepth()
+	* server/sprite_instance.cpp make createTextField more
+	  tolerant and correct about parameters.
+	* testsuite/actionscript.all/TextField.as: add more 
+	  createTextField tests (uhm.. should be in MovieClip.as)
+	  and a getDepth one.
+
 2007-12-18  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* testsuite/actionscript.all/SharedObject.as: Test creating a .sol

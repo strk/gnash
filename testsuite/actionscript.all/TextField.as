@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.35 2007/12/18 23:39:59 strk Exp $";
+rcsid="$Id: TextField.as,v 1.36 2007/12/19 09:40:54 strk Exp $";
 
 #include "check.as"
 
@@ -585,8 +585,18 @@ xcheck_equals(tf.text, "from object again"); // but updating o.t still doesn't t
 tf.text = "and forever back";
 check_equals(o.t, "and forever back"); // while updating textfield's text updates o.t
 
+//-------------------------------------------------------------------------
+// TODO: check TextField.getDepth() 
+//-------------------------------------------------------------------------
 
+//-------------------------------------------------------------------------
+// TODO: check TextField.removeTextField (and soft references?)
+//-------------------------------------------------------------------------
+
+
+//-------------------------------------------------------------------------
 // Check TextField._visible 
+//-------------------------------------------------------------------------
 
 check_equals(typeof(tf._visible), 'boolean');
 check( ! tf.hasOwnProperty('_visible') ); 
@@ -596,7 +606,9 @@ tf._visible = false;
 check_equals(tf._visible, false);
 tf._visible = true;
 
+//-------------------------------------------------------------------------
 // Check TextField._width (how is this different from textWidth ?)
+//-------------------------------------------------------------------------
 
 check_equals(typeof(tf._width), 'number');
 check( ! tf.hasOwnProperty('_width') ); 
@@ -606,14 +618,18 @@ tf._width = 99999;
 check_equals(tf._width, 99999); 
 tf._width = 500;
 
+//-------------------------------------------------------------------------
 // Check TextField.wordWrap (should text wrap when bbox limit is hit?)
+//-------------------------------------------------------------------------
 
 check_equals(typeof(tf.wordWrap), 'boolean');
 check( ! tf.hasOwnProperty('wordWrap') ); 
 check_equals(tf.wordWrap, false);
 // TODO: check what can be assigned to wordWrap and what not...
 
+//-------------------------------------------------------------------------
 // Check TextField._x 
+//-------------------------------------------------------------------------
 
 check_equals(typeof(tf._x), 'number');
 check( ! tf.hasOwnProperty('_x') );
@@ -622,7 +638,9 @@ check_equals(tf._x, 10); // as set by createTextField
 tf._x = 20;
 check_equals(tf._x, 20);
 
+//-------------------------------------------------------------------------
 // Check TextField._xmouse
+//-------------------------------------------------------------------------
 
 xcheck_equals(typeof(tf._xmouse), 'number');
 check( ! tf.hasOwnProperty('_xmouse') );
@@ -632,7 +650,9 @@ tf._xmouse = "a string";
 xcheck_equals(typeof(tf._xmouse), 'number');
 xcheck_equals(tf._xmouse, currXmouse); // possibly unsafe, if user moves the mouse while running the test
 
+//-------------------------------------------------------------------------
 // Check TextField._xscale
+//-------------------------------------------------------------------------
 
 xcheck_equals(typeof(tf._xscale), 'number');
 check( ! tf.hasOwnProperty('_xscale') );
@@ -647,7 +667,9 @@ note("textWidth: _xscale=100: "+currTextWidth+"; _xscale=200: "+tf.textWidth);
 xcheck_equals(tf._width, currWidth*2);
 tf._xscale = 100;
 
+//-------------------------------------------------------------------------
 // Check TextField._y 
+//-------------------------------------------------------------------------
 
 check_equals(typeof(tf._y), 'number');
 check( ! tf.hasOwnProperty('_y') );
@@ -656,7 +678,9 @@ check_equals(tf._y, 10); // as set by createTextField
 tf._y = 5;
 check_equals(tf._y, 5);
 
+//-------------------------------------------------------------------------
 // Check TextField._ymouse
+//-------------------------------------------------------------------------
 
 xcheck_equals(typeof(tf._ymouse), 'number');
 check( ! tf.hasOwnProperty('_ymouse') );
@@ -666,7 +690,9 @@ tf._ymouse = "a string";
 xcheck_equals(typeof(tf._ymouse), 'number');
 xcheck_equals(tf._ymouse, currYmouse); // possibly unsafe, if user moves the mouse while running the test
 
+//-------------------------------------------------------------------------
 // Check TextField._yscale
+//-------------------------------------------------------------------------
 
 xcheck_equals(typeof(tf._yscale), 'number');
 check( ! tf.hasOwnProperty('_yscale') );
@@ -681,7 +707,10 @@ note("textHeight: _yscale=100: "+currTextHeight+"; _yscale=200: "+tf.textHeight)
 xcheck_equals(tf._height, currHeight*2);
 tf._yscale = 100;
 
+//-------------------------------------------------------------------------
 // Check interaction between autoSize and _width
+//-------------------------------------------------------------------------
+
 tf._width = 10; // "hello world" text should overflow this
 tf.text = "Hello world";
 tf.autoSize = 'none';
@@ -715,11 +744,43 @@ check_equals(tf2._height, 2);
 check_equals(tf2._x, 5);
 check_equals(tf2._y, 6);
 
+createTextField("tf3", 99, 10.87, 10.12, NAN, 50.74);
+check_equals(tf3._x, 10);
+check_equals(tf3._y, 10);
+check_equals(tf3._width, 0);
+check_equals(tf3._height, 50);
+
+createTextField("tf4", 99, 10, 50, NAN, "20");
+check_equals(tf4._width, 0);
+check_equals(tf4._height, 20);
+
+createTextField(3, "101", "10", '100', '32', '15');
+check_equals(_root[3].getDepth(), 101);
+check_equals(_root[3]._x, 10);
+check_equals(_root[3]._y, 100);
+check_equals(_root[3]._width, 32);
+check_equals(_root[3]._height, 15);
+
+// One argument more
+createTextField("tf5", 102, 10, 130, 3, 2, 12);
+check_equals(tf5._name, "tf5");
+check_equals(tf5._target, "/tf5");
+check_equals(tf5.getDepth(), 102);
+check_equals(tf5._x, 10);
+check_equals(tf5._y, 130);
+check_equals(tf5._width, 3);
+check_equals(tf5._height, 2);
+
+// One argument missing
+createTextField("tf6", 103, 10, 10, 160);
+check_equals(typeof(tf6), 'undefined');
+
+
 
 #if OUTPUT_VERSION < 8
- check_totals(352);
+ check_totals(371);
 #else
- check_totals(353);
+ check_totals(372);
 #endif
 
 #else // OUTPUT_VERSION <= 5

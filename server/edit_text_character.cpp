@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.137 2007/12/18 23:39:59 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.138 2007/12/19 09:40:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -179,16 +179,13 @@ textfield_setNewTextFormat(const fn_call& fn)
 static as_value
 textfield_getDepth(const fn_call& fn)
 {
+	// TODO: make this a character::getDepth_method function...
 	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
-	UNUSED(text);
 
-	static bool warned = false;
-	if ( ! warned ) {
-		log_unimpl("TextField.getDepth()");
-		warned = true;
-	}
+	int n = text->get_depth();
 
-	return as_value();
+	return as_value(n);
+
 }
 
 static as_value
@@ -309,8 +306,11 @@ attachTextFieldInterface(as_object& o)
 	o.init_property("variable", *variable_getter, *variable_setter);
 	o.init_member("setTextFormat", new builtin_function(textfield_setTextFormat));
 	o.init_member("getTextFormat", new builtin_function(textfield_getTextFormat));
+
+	// TODO: make a normal AsBroadcaster ?
 	o.init_member("addListener", new builtin_function(textfield_addListener));
 	o.init_member("removeListener", new builtin_function(textfield_removeListener));
+
 	o.init_member("setNewTextFormat", new builtin_function(textfield_setNewTextFormat));
 	o.init_member("getNewTextFormat", new builtin_function(textfield_getNewTextFormat));
 	o.init_member("getNewTextFormat", new builtin_function(textfield_getNewTextFormat));
