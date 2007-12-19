@@ -796,6 +796,8 @@ button_character_instance::get_path_element(string_table::key key)
 void
 button_character_instance::stagePlacementCallback()
 {
+	saveOriginalTarget(); // for soft refs
+
 	// Register this button instance as a live character
 	// do we need this???
 	_vm.getRoot().addLiveChar(this);
@@ -816,7 +818,7 @@ button_character_instance::stagePlacementCallback()
 		ch->set_matrix(mat);
 		ch->set_cxform(cx);
 		ch->set_depth(ch_depth);
-		ch->set_parent(this);
+		assert(ch->get_parent() == this);
 
 		if (ch->get_name().empty() && ch->wantsInstanceName()) 
 		{

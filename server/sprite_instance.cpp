@@ -1787,7 +1787,6 @@ sprite_instance::sprite_instance(
 	m_has_mouse_event(false),
 	_text_variables(),
 	m_sound_stream_id(-1),
-	_origTarget(),
 	m_def(def)
 {
 	assert(m_def != NULL);
@@ -3292,6 +3291,8 @@ sprite_instance::stagePlacementCallback()
 {
 	assert(!isUnloaded());
 
+	saveOriginalTarget();
+
 	// We might have loaded NO frames !
 	if ( get_loaded_frames() == 0 )
 	{
@@ -3311,9 +3312,6 @@ sprite_instance::stagePlacementCallback()
 
 	// Register this sprite as a live one
 	_vm.getRoot().addLiveChar(this);
-
-	// Take note of our original target (for soft references)
-	_origTarget = getTarget();
 
 	// Register this sprite as a core broadcasters listener
 	registerAsListener();
@@ -3492,13 +3490,6 @@ sprite_instance::unload()
 	bool shouldKeepAlive =  ( selfHaveUnloadHandler || childHaveUnloadHandler );
 
 	return shouldKeepAlive;
-}
-
-void
-sprite_instance::set_name(const char* name)
-{
-	_name = name;
-
 }
 
 bool

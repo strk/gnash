@@ -25,6 +25,7 @@
 #include "as_object.h"
 #include "as_function.h" // for as_function
 #include "sprite_instance.h" // for MOVIECLIP values
+#include "character.h" // for MOVIECLIP values
 #include "as_environment.h" // for MOVIECLIP values
 #include "VM.h" // for MOVIECLIP values
 #include "movie_root.h" // for MOVIECLIP values
@@ -116,7 +117,7 @@ as_value::to_string() const
 
 		case MOVIECLIP:
 		{
-			const SpriteProxy& sp = getSpriteProxy();
+			const CharacterProxy& sp = getCharacterProxy();
 			if ( sp.isDangling() )
 			{
 				return "";
@@ -309,7 +310,7 @@ as_value::to_primitive(type hint) const
 #if 1
 		if ( m_type == MOVIECLIP )
 		{
-			return as_value(getSpriteProxy().getTarget());
+			return as_value(getCharacterProxy().getTarget());
 		}
 #endif
 
@@ -626,7 +627,7 @@ as_value::to_object() const
 		case MOVIECLIP:
 			// FIXME: update when to_sprite will return
 			//        an intrusive_ptr directly
-			return ptr(to_sprite());
+			return ptr(to_character());
 
 		case STRING:
 			return init_string_instance(getStr().c_str());
@@ -646,17 +647,33 @@ as_value::to_object() const
 sprite_instance*
 as_value::to_sprite(bool allowUnloaded) const
 {
+	if ( m_type != MOVIECLIP ) return 0;
+
+	character *ch = getCharacter(allowUnloaded);
+	if ( ! ch ) return 0;
+	return ch->to_movie();
+}
+
+character*
+as_value::to_character(bool allowUnloaded) const
+{
 	if ( m_type != MOVIECLIP ) return NULL;
 
-	return getSprite(allowUnloaded);
+	return getCharacter(allowUnloaded);
 }
 
 void
 as_value::set_sprite(sprite_instance& sprite)
 {
+	set_character(sprite);
+}
+
+void
+as_value::set_character(character& sprite)
+{
 	drop_refs();
 	m_type = MOVIECLIP;
-	_value = SpriteProxy(&sprite);
+	_value = CharacterProxy(&sprite);
 }
 
 // Return value as an ActionScript function.  Returns NULL if value is
@@ -725,10 +742,10 @@ as_value::set_as_object(as_object* obj)
 		set_null();
 		return;
 	}
-	sprite_instance* sp = obj->to_movie();
+	character* sp = obj->to_character();
 	if ( sp )
 	{
-		set_sprite(*sp);
+		set_character(*sp);
 		return;
 	}
 	as_function* func = obj->to_function();
@@ -999,7 +1016,12 @@ as_value::typeOf() const
 			return "object";
 
 		case as_value::MOVIECLIP:
-			return "movieclip";
+		{
+			character* ch = getCharacter();
+			if ( ! ch ) return "movieclip"; // dangling
+			if ( ch->to_movie() ) return "movieclip"; // bound to movieclip
+			return "object"; // bound to some other character
+		}
 
 		case as_value::NULLTYPE:
 			return "null";
@@ -1037,7 +1059,7 @@ as_value::equalsSameType(const as_value& v) const
 			return _value == v._value;
 
 		case MOVIECLIP:
-			return to_sprite() == v.to_sprite(); 
+			return to_character() == v.to_character(); 
 
 		case NUMBER:
 		{
@@ -1106,22 +1128,27 @@ as_value::to_debug_string() const
 		}
 		case MOVIECLIP:
 		{
-			const SpriteProxy& sp = getSpriteProxy();
+			const CharacterProxy& sp = getCharacterProxy();
 			if ( sp.isDangling() )
 			{
-				sprite_instance* rebound = sp.get();
+				character* rebound = sp.get();
 				if ( rebound )
 				{
-					snprintf(buf, 511, "[rebound movieclip(%s):%p]", sp.getTarget().c_str(), rebound);
+					snprintf(buf, 511, "[rebound %s(%s):%p]",
+						typeName(*rebound).c_str(),
+						sp.getTarget().c_str(),
+						(void*)rebound);
 				}
 				else
 				{
-					snprintf(buf, 511, "[dangling movieclip:%s]", sp.getTarget().c_str());
+					snprintf(buf, 511, "[dangling character:%s]",
+						sp.getTarget().c_str());
 				}
 			}
 			else
 			{
-				snprintf(buf, 511, "[movieclip(%s):%p]", sp.getTarget().c_str(), (void *)sp.get());
+				character* ch = sp.get();
+				snprintf(buf, 511, "[%s(%s):%p]", typeName(*ch).c_str(), sp.getTarget().c_str(), (void *)ch);
 			}
 			buf[511] = '\0';
 			return buf;
@@ -1317,7 +1344,7 @@ as_value::setReachable() const
 		}
 		case MOVIECLIP:
 		{
-			as_value::SpriteProxy sp = getSpriteProxy();
+			as_value::CharacterProxy sp = getCharacterProxy();
 			sp.setReachable();
 			break;
 		}
@@ -1340,18 +1367,26 @@ as_value::getObj() const
 	return boost::get<AsObjPtr>(_value);
 }
 
-as_value::SpriteProxy
-as_value::getSpriteProxy() const
+as_value::CharacterProxy
+as_value::getCharacterProxy() const
 {
 	assert(m_type == MOVIECLIP);
-	return boost::get<SpriteProxy>(_value);
+	return boost::get<CharacterProxy>(_value);
+}
+
+as_value::CharacterPtr
+as_value::getCharacter(bool allowUnloaded) const
+{
+	return getCharacterProxy().get(allowUnloaded);
 }
 
 as_value::SpritePtr
 as_value::getSprite(bool allowUnloaded) const
 {
 	assert(m_type == MOVIECLIP);
-	return boost::get<SpriteProxy>(_value).get(allowUnloaded);
+	character* ch = getCharacter(allowUnloaded);
+	if ( ! ch ) return 0;
+	return ch->to_movie();
 }
 
 void
@@ -1466,12 +1501,12 @@ as_value::as_value(as_object* obj)
 }
 
 //-------------------------------------
-// as_value::SpriteProxy
+// as_value::CharacterProxy
 //-------------------------------------
 
 /* static private */
-sprite_instance*
-as_value::SpriteProxy::find_sprite_by_target(const std::string& tgtstr)
+character*
+as_value::CharacterProxy::find_character_by_target(const std::string& tgtstr)
 {
 	if ( tgtstr.empty() ) return NULL;
 
@@ -1481,7 +1516,7 @@ as_value::SpriteProxy::find_sprite_by_target(const std::string& tgtstr)
 
 	// TODO: for another optimization we may cache
 	//       the string_table::key for each element
-	//       as the SpriteProxy target (instead of
+	//       as the CharacterProxy target (instead of
 	//       the full string, to be parsed everytime)
 
 	//string::size_type size = tgtstr.size();
@@ -1491,27 +1526,29 @@ as_value::SpriteProxy::find_sprite_by_target(const std::string& tgtstr)
 		string part(tgtstr, from, to-from);
 		o = o->get_path_element(st.find(part));
 		if ( ! o ) {
-			log_debug("Target path element %s not found", part.c_str());
+			log_debug("Evaluating target path for soft ref rebinding: element '%s' of path '%s' not found",
+				part.c_str(), tgtstr.c_str());
 			return NULL;
 		}
 		if ( to == string::npos ) break;
 		from = to+1;
 	}
-	return o->to_movie();
+	return o->to_character();
 }
 
 void
-as_value::SpriteProxy::checkDangling() const
+as_value::CharacterProxy::checkDangling() const
 {
 	if ( _ptr && _ptr->isDestroyed() ) 
 	{
 		_tgt = _ptr->getOrigTarget();
+		log_debug("char %s was destroyed, stored it's orig target (%s) for later rebinding", _ptr->getTarget().c_str(), _tgt.c_str());
 		_ptr = 0;
 	}
 }
 
 std::string
-as_value::SpriteProxy::getTarget() const
+as_value::CharacterProxy::getTarget() const
 {
 	checkDangling(); // set _ptr to NULL and _tgt to original target if destroyed
 	if ( _ptr ) return _ptr->getTarget();
@@ -1519,7 +1556,7 @@ as_value::SpriteProxy::getTarget() const
 }
 
 void
-as_value::SpriteProxy::setReachable() const
+as_value::CharacterProxy::setReachable() const
 {
 	checkDangling();
 	if ( _ptr ) _ptr->setReachable();

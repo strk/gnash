@@ -49,9 +49,9 @@ class DummyCharacter : public character
 
 public:
 
-	DummyCharacter()
+	DummyCharacter(character* parent)
 		:
-		character(NULL, -1)
+		character(parent, parent ? 0 : -1)
 	{
 	}
 

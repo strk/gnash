@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.38 2007/12/19 18:40:07 strk Exp $";
+rcsid="$Id: TextField.as,v 1.39 2007/12/19 20:40:32 strk Exp $";
 
 #include "check.as"
 
@@ -610,18 +610,18 @@ check_equals(softref.prop, 5);
 check_equals(softref.getDepth(), 23);
 hardref.removeTextField();
 check_equals(typeof(hardref), 'undefined');
-xcheck_equals(typeof(softref), 'movieclip'); // becomes a movieclip ??
-xcheck_equals(typeof(softref.prop), 'undefined');
+check_equals(typeof(softref), 'movieclip'); // a dangling character ref is always reported to be a 'movieclip' (historical reasons probably)
+check_equals(typeof(softref.prop), 'undefined');
 createEmptyMovieClip("hardref", 24);
 check_equals(typeof(hardref), 'movieclip');
 hardref.prop = 7;
-xcheck_equals(typeof(softref), 'movieclip');
-xcheck_equals(softref.prop, 7);
+check_equals(typeof(softref), 'movieclip');
+check_equals(softref.prop, 7); // and it's actually also rebound to one if available
 hardref.removeMovieClip();
 createTextField("hardref", 25, 10, 10, 160, 200);
 hardref.prop = 9;
 check_equals(typeof(softref), 'object'); // changes type on rebind
-xcheck_equals(softref.prop, 9);
+check_equals(softref.prop, 9);
 
 
 //-------------------------------------------------------------------------

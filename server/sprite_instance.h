@@ -723,10 +723,6 @@ public:
 	/// Get the current m_sound_stream_id
 	virtual int get_sound_stream_id() { return m_sound_stream_id;}
 
-	/// Override for character::set_name to proprely update
-	/// _target and _target_dot.
-	virtual void set_name(const char* name);
-
 	/// Remove this sprite from the stage.
 	//
 	/// This function is intended to be called by 
@@ -809,17 +805,6 @@ public:
 	/// See as_object::enumerateNonProperties(as_environment&) for more info.
 	///
 	virtual void enumerateNonProperties(as_environment&) const;
-
-	/// Return original target path to this object, in dot notation
-	/// as of at construction time.
-	//
-	/// This is needed to properly dereference dangling soft-references
-	/// See testcase misc-swfc.all/soft_reference_test1.sc
-	///
-	const std::string& getOrigTarget() const
-	{
-		return _origTarget;
-	}
 
 	/// Delete characters removed from the stage
 	/// from the display lists
@@ -1019,8 +1004,6 @@ private:
 
 	/// soundid for current playing stream. If no stream set to -1
 	int m_sound_stream_id;
-
-	std::string _origTarget;
 
 	cxform _userCxform;
 

@@ -1,3 +1,22 @@
+2007-12-19 Sandro Santilli <strk@keybit.net>
+
+	* server/as_value.{cpp,h}: turn SpriteProxy to a generic
+	  CharacterProxy, keep all characters by soft-refs.
+	* server/character.h: expose a getOrigTarget and provide
+	  a saveOriginalTarget to subclasses intended to be called by
+	  stage placement callbacks.
+	* server/button_character_instance.cpp, server/movie_instance.cpp,
+	  server/sprite_instance.{cpp,h}, video_stream_instance.cpp:
+	  Call saveOriginalTarget from the overridden stagePlacementCallback.
+	* testsuite/DummyCharacter.h, testsuite/server/DisplayListTest.cpp:
+	  make DummyCharacter take a 'parent' argument, to avoid failing
+	  an assertion in getTarget checking for characters with no parent
+	  to be in effect of the movie_instance class of derivates.
+	* testsuite/server/Makefile.am: don't let failures in server
+	  testsuite interrupt the check run.
+	* testsuite/simple.exp: comment units of the timeout
+	* testsuite/actionscript.all/TextField.as: soft-ref tests succeed.
+
 2007-12-19  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* server/asobj/SharedObject.cpp: Add handler for properties
@@ -6,19 +25,19 @@
 	* libamf/amf.cpp: Comment out function traces.
 	* libamf/sol.cpp: Trap undefiend filespec.
 
-2007-12-18 Sandro Santilli <strk@keybit.net>
+2007-12-19 Sandro Santilli <strk@keybit.net>
 
 	* server/edit_text_character.{cpp,h}:
 	  implement removeTextField().
 	* testsuite/actionscript.all/TextField.as: update expected
 	  results (2 xpass, 2 fail - used to suceed by luck).
 
-2007-12-18 Sandro Santilli <strk@keybit.net>
+2007-12-19 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/TextField.as: add tests for
 	  TextField soft references (unimplemented in Gnash).
 
-2007-12-18 Sandro Santilli <strk@keybit.net>
+2007-12-19 Sandro Santilli <strk@keybit.net>
 
 	* server/edit_text_character.cpp: implement getDepth()
 	* server/sprite_instance.cpp make createTextField more

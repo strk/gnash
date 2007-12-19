@@ -47,6 +47,8 @@ movie_instance::movie_instance(movie_definition* def, character* parent)
 void
 movie_instance::stagePlacementCallback()
 {
+	saveOriginalTarget();
+
 	//GNASH_REPORT_FUNCTION;
 
 	assert ( get_root()->get_root() == this );

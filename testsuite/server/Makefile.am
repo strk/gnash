@@ -110,7 +110,7 @@ TEST_CASES = \
 check-DEJAGNU: site-update $(TEST_CASES)
 	@runtest=$(RUNTEST); \
 	if $(SHELL) -c "$$runtest --version" > /dev/null 2>&1; then \
-	    $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); \
+	    $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); true; \
 	else \
 	  echo "WARNING: could not find \`runtest'" 1>&2; \
           for i in "$(TEST_CASES)"; do \

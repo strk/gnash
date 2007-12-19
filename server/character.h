@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.115 2007/12/14 20:51:20 strk Exp $ */
+/* $Id: character.h,v 1.116 2007/12/19 20:40:31 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -100,7 +100,21 @@ private:
 	/// The character masking this instance (if any)
 	character* _mask;
 
+	/// Original target, as at construction time
+	std::string _origTarget;
+
 protected:
+
+	/// Register currently computable target as
+	/// the "original" one. This will be used by
+	/// soft references (as_value) and should be
+	/// called as soon as the stagePlacementCallback
+	/// is invoked.
+	///
+	void saveOriginalTarget()
+	{
+		_origTarget=getTarget();
+	}
 
 #ifdef GNASH_USE_GC
 	/// Mark all reachable resources, override from as_object.
@@ -356,6 +370,7 @@ public:
 	_unloaded(false),
 	_destroyed(false),
 	_mask(0),
+	_origTarget(),
 	m_visible(true),
 	m_parent(parent),
 	m_invalidated(true),
@@ -392,8 +407,12 @@ public:
 			return m_parent.get();
 	}
 
-    // for extern movie
-    void set_parent(character* parent) { m_parent = parent; }
+	/// for extern movie
+	void set_parent(character* parent)
+	{
+		assert(_origTarget.empty());
+		m_parent = parent;
+	}
 
     int	get_depth() const { return m_depth; }
 
@@ -528,7 +547,11 @@ public:
 		return isDynamicMask() || isMaskLayer();
 	}
 
-    virtual void set_name(const char* name) { _name = name; }
+	/// Set character name, initializing the original target member
+	void set_name(const char* name)
+	{
+		_name = name;
+	}
 
     const std::string& get_name() const { return _name; }
 
@@ -1021,8 +1044,14 @@ public:
 	/// This function must be called when the character is placed on
 	/// stage for the first time.
 	///
+	/// The character version of this call sets the original target
+	/// of the character, for soft references to work.
+	/// If you override the method remember to call saveOriginalTarget()
+	/// as the first thing.
+	///
 	virtual void stagePlacementCallback()
 	{
+		saveOriginalTarget();
 	}
 
 	/// Unload this instance from the stage.
@@ -1069,6 +1098,17 @@ public: // istn't this 'public' reduntant ?
 	/// e.g. "/sprite1/sprite2/ourSprite"
 	///
 	std::string getTargetPath() const;
+
+	/// Return original target path to this object, in dot notation
+	/// as of at construction time.
+	//
+	/// This is needed to properly dereference dangling soft-references
+	/// See testcase misc-swfc.all/soft_reference_test1.sc
+	///
+	const std::string& getOrigTarget() const
+	{
+		return _origTarget;
+	}
 
 	/// Return full path to this object, in dot notation
 	//

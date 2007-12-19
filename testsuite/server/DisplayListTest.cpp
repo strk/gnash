@@ -58,7 +58,9 @@ main(int /*argc*/, char** /*argv*/)
 
 	ManualClock clock;
 	VM& vm = VM::init(*md5, clock);
-    	vm.getRoot().setRootMovie( md5->create_movie_instance() );
+
+	movie_instance* root = md5->create_movie_instance();
+    	vm.getRoot().setRootMovie( root );
 
 	DisplayList dlist1;
 
@@ -69,8 +71,8 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(dlist1, dlist2);
 
 	// just a couple of characters
-	boost::intrusive_ptr<character> ch1 ( new DummyCharacter() );
-	boost::intrusive_ptr<character> ch2 ( new DummyCharacter() );
+	boost::intrusive_ptr<character> ch1 ( new DummyCharacter(root) );
+	boost::intrusive_ptr<character> ch2 ( new DummyCharacter(root) );
 
 	dlist1.place_character( ch1.get(), 1, color, mat, 0, 0);
 	dlist1.place_character( ch2.get(), 2, color, mat, 0, 0);

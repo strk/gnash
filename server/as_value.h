@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.79 2007/12/04 11:45:28 strk Exp $ */
+/* $Id: as_value.h,v 1.80 2007/12/19 20:40:31 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -41,6 +41,7 @@ class as_object;
 class fn_call;
 class as_function;
 class sprite_instance;
+class character;
 class asNamespace;
 class asName;
 
@@ -369,22 +370,28 @@ public:
 
 	/// Return value as a sprite or NULL if this is not possible.
 	//
-	/// If the value is a MOVIECLIP value, the stored sprite target
-	/// is evaluated using the root movie's environment
-	/// (see gnash::as_environment::find_target). If the target
-	/// points to something that doesn't cast to a sprite,
+	/// This is just a wrapper around to_character() performing 
+	/// an additional final cast.
+	///
+	sprite_instance* to_sprite(bool skipRebinding=false) const;
+
+	/// Return value as a character or NULL if this is not possible.
+	//
+	/// If the value is a MOVIECLIP value, the stored character target
+	/// is evaluated using the root movie's environment.
+	/// If the target points to something that doesn't cast to a character,
 	/// NULL is returned.
 	///
-	/// Note that if the value is NOT a MOVIECLIP, NULL is always
+	/// Note that if the value is NOT a MOVIECLIP type, NULL is always
 	/// returned.
 	///
 	/// @param skipRebinding
-	/// 	If true a reference to a destroyed sprite is still returned
+	/// 	If true a reference to a destroyed character is still returned
 	///	as such, rather then attempted to be resolved as a soft-reference.
 	///	Main use for this is during paths resolution, to avoid
 	///	infinite loops. See bug #21647.
 	///
-	sprite_instance* to_sprite(bool skipRebinding=false) const;
+	character* to_character(bool skipRebinding=false) const;
 
 	/// \brief
 	/// Return value as an ActionScript function ptr
@@ -462,6 +469,8 @@ public:
 	void	set_bool(bool val);
 
 	void	set_sprite(sprite_instance& sp);
+
+	void	set_character(character& sp);
 
 	void	set_int(int val) { set_double(val); }
 
@@ -559,19 +568,19 @@ public:
 
 private:
 
-	/// A proxy for sprite pointers.
+	/// A proxy for character pointers.
 	//
-	/// The proxy will store a pointer to a sprite_instance until the 
-	/// sprite is destroyed, in which case it will only store the original
+	/// The proxy will store a pointer to a character until the 
+	/// character is destroyed, in which case it will only store the original
 	/// target path of it and always use that for rebinding when needed.
 	///
-	class SpriteProxy {
+	class CharacterProxy {
 
-		mutable sprite_instance* _ptr;
+		mutable character* _ptr;
 
 		mutable std::string _tgt;
 
-		static sprite_instance* find_sprite_by_target(const std::string& target);
+		static character* find_character_by_target(const std::string& target);
 
 		/// If we still have a sprite pointer check if it was destroyed
 		/// in which case we drop the pointer and only keep the target.
@@ -579,25 +588,25 @@ private:
 
 	public:
 
-		/// Construct a SpriteProxy pointing to the given sprite
-		SpriteProxy(sprite_instance* sp)
+		/// Construct a CharacterProxy pointing to the given sprite
+		CharacterProxy(character* sp)
 			:
 			_ptr(sp)
 		{
 			checkDangling();
 		}
 
-		/// Construct a copy of the given SpriteProxy 
+		/// Construct a copy of the given CharacterProxy 
 		//
 		/// @param sp
-		///	The SpriteProxy to make a copy of.
+		///	The CharacterProxy to make a copy of.
 		///	NOTE: if the given proxy is dangling, this proxy
 		///	      will also be dangling. If you want to 
 		///	      create a non-dangling proxy you can
-		///           use the constructor taking a sprite_instance
-		///	      as in SpriteProxy newProxy(oldProxy.get())
+		///           use the constructor taking a character
+		///	      as in CharacterProxy newProxy(oldProxy.get())
 		///
-		SpriteProxy(const SpriteProxy& sp)
+		CharacterProxy(const CharacterProxy& sp)
 		{
 			sp.checkDangling();
 			_ptr=sp._ptr;
@@ -607,14 +616,14 @@ private:
 		/// Make this proxy a copy of the given one
 		//
 		/// @param sp
-		///	The SpriteProxy to make a copy of.
+		///	The CharacterProxy to make a copy of.
 		///	NOTE: if the given proxy is dangling, this proxy
 		///	      will also be dangling. If you want to 
 		///	      create a non-dangling proxy you can
-		///           use the constructor taking a sprite_instance
-		///	      as in SpriteProxy newProxy(oldProxy.get())
+		///           use the constructor taking a character
+		///	      as in CharacterProxy newProxy(oldProxy.get())
 		///
-		SpriteProxy& operator=(const SpriteProxy& sp)
+		CharacterProxy& operator=(const CharacterProxy& sp)
 		{
 			sp.checkDangling();
 			_ptr=sp._ptr;
@@ -626,13 +635,13 @@ private:
 		//
 		/// @return the currently bound sprite, NULL if none
 		///
-		sprite_instance* get(bool skipRebinding=false) const
+		character* get(bool skipRebinding=false) const
 		{
 			if ( skipRebinding ) return _ptr;
 
 			checkDangling(); // set _ptr to NULL and _tgt to original target if destroyed
 			if ( _ptr ) return _ptr;
-			else return find_sprite_by_target(_tgt);
+			else return find_character_by_target(_tgt);
 		}
 
 		/// Get the sprite target, either current (if not dangling) or bounded-to one.
@@ -655,7 +664,7 @@ private:
 		/// Two sprite_proxies are equal if they point to the
 		/// same sprite
 		///
-		bool operator==(const SpriteProxy& sp) const
+		bool operator==(const CharacterProxy& sp) const
 		{
 			return get() == sp.get();
 		}
@@ -684,6 +693,7 @@ private:
 	type	m_type;
 
 	typedef sprite_instance* SpritePtr;
+	typedef character* CharacterPtr;
 	typedef boost::intrusive_ptr<as_function> AsFunPtr;
 	typedef boost::intrusive_ptr<as_object> AsObjPtr;
 
@@ -693,7 +703,7 @@ private:
                          bool,		// BOOLEAN
                          AsObjPtr,	// OBJECT,
 //                        AsFuncPtr,	// AS_FUNCTION
-                         SpriteProxy,	// MOVIECLIP
+                         CharacterProxy,	// MOVIECLIP
 			 std::string	// STRING 
                       > _value;
 
@@ -710,9 +720,15 @@ private:
 	///
 	SpritePtr getSprite(bool skipRebinding=false) const;
 
+	/// Get the character pointer variant member (we assume m_type == MOVIECLIP)
+	//
+	/// NOTE: this is possibly NULL !
+	///
+	CharacterPtr getCharacter(bool skipRebinding=false) const;
+
 	/// Get the sprite proxy variant member (we assume m_type == MOVIECLIP)
 	//
-	SpriteProxy getSpriteProxy() const;
+	CharacterProxy getCharacterProxy() const;
 
 	/// Get the number variant member (we assume m_type == NUMBER)
 	double getNum() const
