@@ -760,7 +760,7 @@ AMF::extractNumber(const uint8_t *in)
 
 AMF::amf_element_t *
 AMF::createElement(amf_element_t *el, astype_e type,
-		  std::string &name, uint8_t *data, int nbytes)
+		  const std::string &name, uint8_t *data, int nbytes)
 {
 //    GNASH_REPORT_FUNCTION;
     log_debug("Creating element %s", name.c_str());
@@ -781,7 +781,7 @@ AMF::createElement(amf_element_t *el, const char *name, amfnum_t data)
 }
 
 AMF::amf_element_t *
-AMF::createElement(amf_element_t *el, std::string &name, amfnum_t data)
+AMF::createElement(amf_element_t *el, const std::string &name, amfnum_t data)
 {
     GNASH_REPORT_FUNCTION;
     log_debug("Creating element %s", name.c_str());
@@ -806,7 +806,7 @@ AMF::createElement(amf_element_t *el, const char *name, double data)
 }
 
 AMF::amf_element_t *
-AMF::createElement(amf_element_t *el, std::string &name, double data)
+AMF::createElement(amf_element_t *el, const std::string &name, double data)
 {
     GNASH_REPORT_FUNCTION;
     log_debug("Creating element %s", name.c_str());
@@ -837,7 +837,7 @@ AMF::createElement(amf_element_t *el, const char *name, const char *data)
 }
 
 AMF::amf_element_t *
-AMF::createElement(amf_element_t *el, std::string &name, std::string &data)
+AMF::createElement(amf_element_t *el, const std::string &name, std::string &data)
 {
     GNASH_REPORT_FUNCTION;
     log_debug("Creating element %s", name.c_str());
@@ -859,7 +859,7 @@ AMF::createElement(amf_element_t *el, const char *name, bool data)
 }
 
 AMF::amf_element_t *
-AMF::createElement(AMF::amf_element_t *el, std::string &name, bool data)
+AMF::createElement(AMF::amf_element_t *el, const std::string &name, bool data)
 {
     GNASH_REPORT_FUNCTION;
     log_debug("Creating element %s", name.c_str());

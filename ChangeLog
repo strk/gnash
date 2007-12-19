@@ -1,5 +1,10 @@
 2007-12-19 Sandro Santilli <strk@keybit.net>
 
+	* libamf/amf.{cpp,h} (createElement): take element names by
+	  const refs.
+
+2007-12-19 Sandro Santilli <strk@keybit.net>
+
 	* server/as_value.{cpp,h}: turn SpriteProxy to a generic
 	  CharacterProxy, keep all characters by soft-refs.
 	* server/character.h: expose a getOrigTarget and provide

@@ -230,28 +230,28 @@ public:
     /// @ return an element all filled in correctly for passing to other
     /// methods.
     amf_element_t *createElement(amf_element_t *el, astype_e type,
-				 std::string &name, uint8_t *data, int nbytes);
-    amf_element_t *createElement(amf_element_t *el, std::string &name,
+				 const std::string &name, uint8_t *data, int nbytes);
+    amf_element_t *createElement(amf_element_t *el, const std::string &name,
 				 amfnum_t data);
     amf_element_t *createElement(amf_element_t *el, const char *name,
 				 double data);
-    amf_element_t *createElement(amf_element_t *el, std::string &name,
+    amf_element_t *createElement(amf_element_t *el, const std::string &name,
 				 double data);
     amf_element_t *createElement(amf_element_t *el, const char *name,
 				 amfnum_t data);
-    amf_element_t *createElement(amf_element_t *el, std::string &name,
+    amf_element_t *createElement(amf_element_t *el, const std::string &name,
 				 std::string &data);
     amf_element_t *createElement(amf_element_t *el, const char *name,
 				 const char *data);
-    amf_element_t *createElement(amf_element_t *el, std::string &name,
+    amf_element_t *createElement(amf_element_t *el, const std::string &name,
 				 bool data);
     amf_element_t *createElement(amf_element_t *el, const char *name,
 				 bool data);
-    amf_element_t *createElement(amf_element_t *el, std::string &name,
+    amf_element_t *createElement(amf_element_t *el, const std::string &name,
 				  boost::intrusive_ptr<gnash::as_object> &data);
     amf_element_t *createElement(amf_element_t *el, const char *name,
 				 boost::intrusive_ptr<gnash::as_object> &data);
-//     amf_element_t *createElement(amf_element_t *el, std::string &name,
+//     amf_element_t *createElement(amf_element_t *el, const std::string &name,
 // 				 const gnash::as_value &data);
 //     amf_element_t *createElement(amf_element_t *el, const char *name,
 // 				 const gnash::as_value &data);
