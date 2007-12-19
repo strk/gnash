@@ -1,5 +1,6 @@
 2007-12-18 Sandro Santilli <strk@keybit.net>
 
+	* server/array.cpp: slightly reduced string_table::find calls.
 	* server/as_object.{h,cpp}: rename visitProperties to
 	  visitPropertyValues, use it from copyProperties.
 

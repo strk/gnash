@@ -385,10 +385,10 @@ class as_value_prop
 {
 public:
 	as_cmp_fn _comp;
-	const std::string& _prop;
+	string_table::key _prop;
 	
 	// Note: cmpfn must implement a strict weak ordering
-	as_value_prop(const std::string& name, 
+	as_value_prop(string_table::key name, 
 		as_cmp_fn cmpfn)
 		:
 		_comp(cmpfn),
@@ -399,12 +399,13 @@ public:
 	bool operator() (const as_value& a, const as_value& b)
 	{
 		as_value av, bv;
-		string_table& st = VM::get().getStringTable();
+
+		// why do we cast ao/bo to objects here ?
 		boost::intrusive_ptr<as_object> ao = a.to_object();
 		boost::intrusive_ptr<as_object> bo = b.to_object();
 		
-		ao->get_member(st.find(_prop), &av);
-		bo->get_member(st.find(_prop), &bv);
+		ao->get_member(_prop, &av);
+		bo->get_member(_prop, &bv);
 		return _comp(av, bv);
 	}
 };
@@ -413,11 +414,14 @@ public:
 class as_value_multiprop
 {
 public:
-	std::deque<as_cmp_fn>& _cmps;
-	std::deque<std::string>& _prps;
+	typedef std::deque<as_cmp_fn> Comps;
+	Comps& _cmps;
+
+	typedef std::deque<string_table::key> Props;
+	Props& _prps;
 
 	// Note: all as_cmp_fns in *cmps must implement strict weak ordering
-	as_value_multiprop(std::deque<std::string>& prps, 
+	as_value_multiprop(std::deque<string_table::key>& prps, 
 		std::deque<as_cmp_fn>& cmps)
 		:
 		_cmps(cmps),
@@ -428,16 +432,18 @@ public:
 	bool operator() (const as_value& a, const as_value& b)
 	{
 		std::deque<as_cmp_fn>::iterator cmp = _cmps.begin();
-		std::deque<std::string>::iterator pit;
-		string_table& st = VM::get().getStringTable();
+		Props::iterator pit;
+
+		// why do we cast ao/bo to objects here ?
+		boost::intrusive_ptr<as_object> ao = a.to_object();
+		boost::intrusive_ptr<as_object> bo = b.to_object();
 		
 		for (pit = _prps.begin(); pit != _prps.end(); ++pit, ++cmp)
 		{
 			as_value av, bv;
-			boost::intrusive_ptr<as_object> ao = a.to_object();
-			boost::intrusive_ptr<as_object> bo = b.to_object();
-			ao->get_member(st.find(*pit), &av);
-			bo->get_member(st.find(*pit), &bv);
+
+			ao->get_member(*pit, &av);
+			bo->get_member(*pit, &bv);
 
 			if ( (*cmp)(av, bv) ) return true;
 			if ( (*cmp)(bv, av) ) return false;
@@ -453,7 +459,7 @@ public:
 class as_value_multiprop_eq : public as_value_multiprop
 {
 public:
-	as_value_multiprop_eq(std::deque<std::string>& prps, 
+	as_value_multiprop_eq(std::deque<string_table::key>& prps, 
 		std::deque<as_cmp_fn>& cmps)
 		: as_value_multiprop(prps, cmps)
 	{
@@ -461,17 +467,18 @@ public:
 
 	bool operator() (const as_value& a, const as_value& b)
 	{
-		std::deque<as_cmp_fn>::iterator cmp = _cmps.begin();
-		std::deque<std::string>::iterator pit;
-		string_table& st = VM::get().getStringTable();
+		Comps::iterator cmp = _cmps.begin();
+		Props::iterator pit;
+
+		// why do we cast ao/bo to objects here ?
+		boost::intrusive_ptr<as_object> ao = a.to_object();
+		boost::intrusive_ptr<as_object> bo = b.to_object();
 
 		for (pit = _prps.begin(); pit != _prps.end(); ++pit, ++cmp)
 		{
 			as_value av, bv;
-			boost::intrusive_ptr<as_object> ao = a.to_object();
-			boost::intrusive_ptr<as_object> bo = b.to_object();
-			ao->get_member(st.find(*pit), &av);
-			bo->get_member(st.find(*pit), &bv);
+			ao->get_member(*pit, &av);
+			bo->get_member(*pit, &bv);
 
 			if ( !(*cmp)(av, bv) ) return false;
 		}
@@ -1011,13 +1018,15 @@ array_sortOn(const fn_call& fn)
 	as_environment& env = fn.env();
 	bool do_unique = false, do_index = false;
 	boost::uint8_t flags = 0;
-	int sv = VM::get().getSWFVersion();
+
+	VM& vm = VM::get();
+	int sv = vm.getSWFVersion();
+	string_table& st = vm.getStringTable();
 
 	// cases: sortOn("prop) and sortOn("prop", Array.FLAG)
 	if ( fn.nargs > 0 && fn.arg(0).is_string() )
 	{
-		std::string propField = 
-			PROPNAME(fn.arg(0).to_string_versioned(sv));
+		string_table::key propField = st.find(PROPNAME(fn.arg(0).to_string_versioned(sv)));
 
 		if ( fn.nargs > 1 && fn.arg(1).is_number() )
 		{
@@ -1045,7 +1054,7 @@ array_sortOn(const fn_call& fn)
 	{
 		boost::intrusive_ptr<as_array_object> props = 
 			ensureType<as_array_object>(fn.arg(0).to_object());
-		std::deque<std::string> prp;
+		std::deque<string_table::key> prp;
 		unsigned int optnum = props->size();
 		std::deque<as_cmp_fn> cmp;
 		std::deque<as_cmp_fn> eq;
@@ -1053,8 +1062,7 @@ array_sortOn(const fn_call& fn)
 		for (std::deque<as_value>::const_iterator it = props->begin();
 			it != props->end(); ++it)
 		{
-			std::string s = 
-				PROPNAME((*it).to_string_versioned(sv));
+			string_table::key s = st.find(PROPNAME((*it).to_string_versioned(sv)));
 			prp.push_back(s);
 		}
 		
@@ -1405,8 +1413,9 @@ array_new(const fn_call& fn)
 		// Create an empty array with the given number of undefined elements.
 		//
 		as_value index_number, undef_value;
-		int sv = VM::get().getSWFVersion();
-		string_table& st = VM::get().getStringTable();
+		VM& vm = VM::get();
+		int sv = vm.getSWFVersion();
+		string_table& st = vm.getStringTable();
 
 		undef_value.set_undefined();
 		for (int i = 0; i < int(fn.arg(0).to_number()); i++)
