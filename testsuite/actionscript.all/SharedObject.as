@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: SharedObject.as,v 1.11 2007/09/29 16:22:58 strk Exp $";
+rcsid="$Id: SharedObject.as,v 1.12 2007/12/19 05:42:29 rsavoye Exp $";
 
 #include "check.as"
 
@@ -51,6 +51,45 @@ check_equals (typeof(SharedObject.getLocal), 'function');
 
 // test the SharedObject::getsize method
 check_equals (typeof(sharedobjectObj.getSize), 'function');
+
+
+// FIXME: Test code that will soon be a formal test case.
+so = SharedObject.getLocal("settings");
+
+// Private data
+so.name = "Joe";
+so.age = 20;
+so.pet = "Dog";
+
+// public data that gets written
+so.data.gain = 50.0;
+so.data.echosuppression = false;
+so.data.defaultmicrophone = "/dev/input/mic";
+so.data.defaultcamera = "";
+so.data.defaultklimit = 100.0;
+so.data.defaultalways = false;
+so.data.crossdomainAllow = true;
+so.data.crossdomainAlways = true;
+so.data.allowThirdPartyLSOAccess = true;
+so.data.localSecPath = "";
+so.data.localSecPathTime = 1.19751160683e+12;
+
+trace(so.getSize());
+so.flush();
+
+newso = SharedObject.getLocal("settings");
+check_equals (typeof(newso), 'object');
+check_equals (typeof(newso.data.gain), 'number');
+check_equals (typeof(newso.data.echosuppression), 'boolean');
+check_equals (typeof(newso.data.defaultmicrophone), 'string');
+check_equals (typeof(newso.data.defaultcamera), 'string');
+check_equals (typeof(newso.data.defaultklimit), 'number');
+check_equals (typeof(newso.data.defaultalways), 'boolean');
+check_equals (typeof(newso.data.crossdomainAllow), 'boolean');
+check_equals (typeof(newso.data.crossdomainAlways), 'boolean');
+check_equals (typeof(newso.data.allowThirdPartyLSOAccess), 'boolean');
+check_equals (typeof(newso.data.localSecPath), 'string');
+check_equals (typeof(newso.data.localSecPathTime), 'number');
 
 #endif // OUTPUT_VERSION >= 6
 totals();

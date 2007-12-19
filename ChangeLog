@@ -1,5 +1,9 @@
 2007-12-18  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* testsuite/actionscript.all/SharedObject.as: Test creating a .sol
+	file and reading it back in. This test is still somewhat bogus, as
+	it mostly just makes sure everything exists.
+	
 	* libamf/sol.h: Add overloaded writeFile with no args that uses
 	only private data. Add accessors for filespec and the object
 	name. 
