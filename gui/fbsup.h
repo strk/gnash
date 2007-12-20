@@ -128,6 +128,7 @@ class FBGui : public Gui
 
     int m_stage_width;
     int m_stage_height;
+    unsigned m_rowsize;
 
   	int input_fd; /// file descriptor for /dev/input/mice
   	int keyb_fd; /// file descriptor for /dev/input/event* (keyboard)

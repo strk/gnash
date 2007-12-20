@@ -351,7 +351,9 @@ bool FBGui::initialize_renderer() {
 
   set_render_handler(agg_handler);
   
-  agg_handler->init_buffer(_mem, _size, _width, _height, _width*((_bpp+7)/8));
+  m_rowsize = var_screeninfo.xres_virtual*((_bpp+7)/8);
+  
+  agg_handler->init_buffer(_mem, _size, _width, _height, m_rowsize);
   
   disable_terminal();
 
@@ -405,10 +407,6 @@ void FBGui::renderBuffer()
   // NOTE: +7 to support 15 bpp
   const unsigned int pixel_size = (var_screeninfo.bits_per_pixel+7)/8;
 
-  // Size, in bytes, of a framebuffer row
-  const unsigned int scanline_size =
-    var_screeninfo.xres * pixel_size;
-    
     
   for (unsigned int bno=0; bno < _drawbounds.size(); bno++) {
   
@@ -425,7 +423,7 @@ void FBGui::renderBuffer()
     
     for (int y=bounds.getMinY(); y<=maxy; ++y) {
     
-      const unsigned int pixel_index = y * scanline_size + minx*pixel_size;
+      const unsigned int pixel_index = y * m_rowsize + minx*pixel_size;
       
       memcpy(&fbmem[pixel_index], &buffer[pixel_index], row_size);
       
@@ -517,7 +515,7 @@ char* FBGui::find_accessible_tty(int no) {
     fn = find_accessible_tty("/dev/tty", no);  // just "/dev/tty" 
     if (fn) return fn;
   }
-  
+    
   return NULL;
 
 }
@@ -569,7 +567,7 @@ bool FBGui::disable_terminal()
   }
     
   original_vt = vts.v_active;
-  log_msg("Original TTY NO = %d", original_vt);
+  log_msg("Original TTY NO = %d", original_vt);   
   
 #ifdef REQUEST_NEW_VT
 
@@ -597,13 +595,13 @@ bool FBGui::disable_terminal()
     return false;
   }
   
-  if (ioctl(fd, VT_ACTIVATE, own_vt)) {
+  if (ioctl(fd, VT_ACTIVATE, own_vt) == -1) {
     log_msg("WARNING: Could not activate VT number %d", own_vt);
     close(fd);
     return false;
   }
   
-  if (ioctl(fd, VT_WAITACTIVE, own_vt)) {
+  if (ioctl(fd, VT_WAITACTIVE, own_vt) == -1) {
     log_msg("WARNING: Error waiting for VT %d becoming active", own_vt);
     //close(tty);
     //return false;   don't abort
@@ -612,16 +610,40 @@ bool FBGui::disable_terminal()
 #else
 
   own_vt = original_vt;   // keep on using the original VT
+  
+  close(fd);
+  
+  // Activate our new VT
+  tty = find_accessible_tty(own_vt);
+  if (!tty) {
+    log_msg("WARNING: Could not find device for VT number %d", own_vt);
+    return false;
+  }
+  
+  fd = open(tty, O_RDWR);
+  if (fd<0) {
+    log_msg("WARNING: Could not open %s", tty);
+    return false;
+  }
+  
+  /*
+  // Become session leader and attach to terminal
+  setsid();
+  if (ioctl(fd, TIOCSCTTY, 0) == -1) {
+    log_msg("WARNING: Could not attach controlling terminal (%s)", tty);
+  }
+  */
+  
 
 #endif  
   
   // Disable keyboard cursor
   
-  if (ioctl(fd, KDGETMODE, &original_kd)) {
+  if (ioctl(fd, KDGETMODE, &original_kd) == -1) {
     log_msg("WARNING: Could not query current keyboard mode on VT");
   }
 
-  if (ioctl(fd, KDSETMODE, KD_GRAPHICS)) {
+  if (ioctl(fd, KDSETMODE, KD_GRAPHICS) == -1) {
     log_msg("WARNING: Could not switch to graphics mode on new VT");
   }
    

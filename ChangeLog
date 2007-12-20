@@ -1,3 +1,8 @@
+2007-12-20 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/fbsup.h, gui/fb.cpp: Calculate rowsize from virtual resolution
+	  instead from visible resolution   
+
 2007-12-19 Sandro Santilli <strk@keybit.net>
 
 	* server/as_object.cpp: implement callMethod taking 3 args.
