@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.50 2007/12/20 22:37:13 strk Exp $";
+rcsid="$Id: XML.as,v 1.51 2007/12/20 22:49:38 strk Exp $";
 
 #include "check.as"
 //#include "dejagnu.as"
@@ -714,7 +714,7 @@ myxml.onLoad = function(success)
 #if OUTPUT_VERSION < 6
 		check_totals(262);
 #else
-		xcheck_totals(337);
+		check_totals(337);
 #endif
 		play();
 	}
