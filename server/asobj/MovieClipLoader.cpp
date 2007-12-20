@@ -38,6 +38,7 @@
 #include "Object.h" // for getObjectInterface
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "namedStrings.h"
+#include "array.h" // for _listeners construction
 
 #include <typeinfo> 
 #include <string>
@@ -57,6 +58,12 @@ attachMovieClipLoaderInterface(as_object& o)
   	o.init_member("loadClip", new builtin_function(moviecliploader_loadclip));
 	o.init_member("unloadClip", new builtin_function(moviecliploader_unloadclip));
 	o.init_member("getProgress", new builtin_function(moviecliploader_getprogress));
+
+	// NOTE: we want addListener/removeListener/broadcastMessage
+	//       but don't what the _listeners property here...
+	// TODO: add an argument to AsBroadcaster::initialize skip listeners ?
+	AsBroadcaster::initialize(o);
+	o.delProperty(NSV::PROP_uLISTENERS);
 
 #if 0
 	// Load the default event handlers. These should really never
@@ -156,7 +163,7 @@ MovieClipLoader::MovieClipLoader()
 	_mcl.bytes_loaded = 0;
 	_mcl.bytes_total = 0;  
 
-	AsBroadcaster::initialize(*this);
+	set_member(NSV::PROP_uLISTENERS, new as_array_object());
 }
 
 MovieClipLoader::~MovieClipLoader()
@@ -177,9 +184,6 @@ MovieClipLoader::getProgress(as_object* /*ao*/)
 bool
 MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 {
-	// Prepare function call for events...
-	//env.push(as_value(&target));
-	//fn_call events_call(this, &env, 1, 0);
 
 	URL url(url_str.c_str(), get_base_url());
 	
@@ -187,18 +191,29 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	log_msg(_(" resolved url: %s"), url.str().c_str());
 #endif
 			 
-	// Call the callback since we've started loading the file
-	// TODO: probably we should move this below, after 
-	//       the loading thread actually started
-	dispatchEvent("onLoadStart", as_value(&target));
+	string_table& st = _vm.getStringTable();
 
 	bool ret = target.loadMovie(url);
 	if ( ! ret ) 
 	{
-		// TODO: dispatchEvent("onLoadError", ...)
+		// TODO: find semantic of last argument
+		callMethod(st.find("onLoadError"), as_value(&target), as_value("Failed to load movie or jpeg"), as_value(0));
+
 		return false;
 	}
 
+	// Dispatch onLoadStart
+	callMethod(st.find("onLoadStart"), as_value(&target));
+
+	// Dispatch onLoadProgress
+	struct mcl *mcl_data = getProgress(&target);
+	// the callback since we're done loading the file
+	mcl_data->bytes_loaded = target.get_bytes_loaded();
+	mcl_data->bytes_total = target.get_bytes_total();
+	callMethod(st.find("onLoadProgress"), as_value(&target), mcl_data->bytes_loaded, mcl_data->bytes_total);
+
+	// Dispatch onLoadComplete
+	callMethod(st.find("onLoadComplete"), as_value(&target), as_value(0)); // TODO: find semantic of last arg
 
 	/// This event must be dispatched when actions
 	/// in first frame of loaded clip have been executed.
@@ -210,23 +225,7 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	/// TODO: check if we need to place it before calling
 	///       this function though...
 	///
-	//dispatchEvent("onLoadInit", events_call);
-	dispatchEvent("onLoadInit", as_value(&target));
-
-	struct mcl *mcl_data = getProgress(&target);
-
-	// the callback since we're done loading the file
-	// FIXME: these both probably shouldn't be set to the same value
-	//mcl_data->bytes_loaded = stats.st_size;
-	//mcl_data->bytes_total = stats.st_size;
-	mcl_data->bytes_loaded = 666; // fake values for now
-	mcl_data->bytes_total = 666;
-
-	// TODO: dispatchEvent("onLoadProgress", ...)
-
-	log_unimpl (_("FIXME: MovieClipLoader calling onLoadComplete *before* movie has actually been fully loaded (cheating)"));
-	//dispatchEvent("onLoadComplete", events_call);
-	dispatchEvent("onLoadComplete", as_value(&target));
+	callMethod(st.find("onLoadInit"), as_value(&target));
 
 	return true;
 }
@@ -256,31 +255,37 @@ moviecliploader_loadclip(const fn_call& fn)
 
 	boost::intrusive_ptr<MovieClipLoader> ptr = ensureType<MovieClipLoader>(fn.this_ptr);
   
-	as_value& url_arg = fn.arg(0);
-#if 0 // whatever it is, we'll need a string, the check below would only be worth
-      // IF_VERBOSE_MALFORMED_SWF, but I'm not sure it's worth the trouble of
-      // checking it, and chances are that the reference player will be trying
-      // to convert to string anyway...
-	if ( ! url_arg.is_string() )
+	if ( fn.nargs < 2 )
 	{
-		log_swferror(_("MovieClipLoader.loadClip() first argument is not a string (%s)"), url_arg.to_string());
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss; fn.dump_args(ss);
+		log_aserror(_("MovieClipLoader.loadClip(%s): missing arguments"), ss.str().c_str());
+		);
 		return as_value(false);
-		return;
 	}
-#endif
+
+	as_value url_arg = fn.arg(0);
 	std::string str_url = url_arg.to_string(); 
 
-	character* target = fn.env().find_target(fn.arg(1).to_string());
+	as_value tgt_arg = fn.arg(1);
+	std::string tgt_str = tgt_arg.to_string();
+	character* target = fn.env().find_target(tgt_str);
 	if ( ! target )
 	{
-		log_error(_("Could not find target %s"), fn.arg(1).to_string().c_str());
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("Could not find target %s (evaluated from %s)"),
+			tgt_str.c_str(), tgt_arg.to_debug_string().c_str());
+		);
 		return as_value(false);
 	}
-	sprite_instance* sprite = dynamic_cast<sprite_instance*>(target);
+
+	sprite_instance* sprite = target->to_movie();
 	if ( ! sprite )
 	{
-		log_error(_("Target is not a sprite instance (%s)"),
-			typeid(*target).name());
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("Target %s is not a sprite instance (%s)"),
+			target->getTarget().c_str(), typeName(*target).c_str());
+		);
 		return as_value(false);
 	}
 
@@ -289,9 +294,10 @@ moviecliploader_loadclip(const fn_call& fn)
 		str_url.c_str(), (void*)sprite);
 #endif
 
-	bool ret = ptr->loadClip(str_url, *sprite);
+	ptr->loadClip(str_url, *sprite);
 
-	return as_value(ret);
+	// We always want to return true unless something went wrong
+	return as_value(true);
 
 }
 
@@ -343,9 +349,6 @@ moviecliploader_class_init(as_object& global)
 	if ( cl == NULL )
 	{
 		cl=new builtin_function(&moviecliploader_new, getMovieClipLoaderInterface());
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		attachMovieClipLoaderInterface(*cl);  // not sure we should be doing this..
 	}
 	global.init_member("MovieClipLoader", cl.get()); //as_value(moviecliploader_new));
 	//log_msg(_("MovieClipLoader class @ %p"), cl.get());

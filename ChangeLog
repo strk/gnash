@@ -1,3 +1,11 @@
+2007-12-19 Sandro Santilli <strk@keybit.net>
+
+	* server/as_object.cpp: implement callMethod taking 3 args.
+	* server/asobj/MovieClipLoader.cpp: cleanup interfaces, send
+	  all required events (altought still not in async mode).
+	* testsuite/actionscript.all/MovieClipLoader.as: test events
+	  execution.
+
 2007-12-19  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* utilities/soldumper: Dump the contents of any .sol file. Useful

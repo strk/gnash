@@ -964,6 +964,39 @@ as_object::callMethod(string_table::key methodName,
 	return ret;
 }
 
+as_value
+as_object::callMethod(string_table::key methodName,
+	const as_value& arg0, const as_value& arg1, const as_value& arg2)
+{
+	as_value ret;
+	as_value method;
+
+	if (! get_member(methodName, &method))
+	{
+		return ret;
+	}
+
+	as_environment env;
+
+#ifndef NDEBUG
+	size_t origStackSize = env.stack_size();
+#endif
+
+	env.push(arg2);
+	env.push(arg1);
+	env.push(arg0);
+
+	ret = call_method(method, &env, this, 3, env.stack_size()-1);
+
+	env.drop(3);
+
+#ifndef NDEBUG
+	assert(origStackSize == env.stack_size());
+#endif
+
+	return ret;
+}
+
 as_object*
 as_object::get_path_element(string_table::key key)
 {

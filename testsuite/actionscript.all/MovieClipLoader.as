@@ -21,43 +21,270 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClipLoader.as,v 1.5 2007/10/02 12:17:47 strk Exp $";
+rcsid="$Id: MovieClipLoader.as,v 1.6 2007/12/20 14:28:50 strk Exp $";
 
 #include "check.as"
+
+//#define MEDIA(x) x
 
 // MovieClipLoader was added in player7
 #if OUTPUT_VERSION >= 7
 
 check_equals(typeOf(MovieClipLoader), 'function');
+check_equals(typeOf(MovieClipLoader.prototype), 'object');
+check(MovieClipLoader.prototype.hasOwnProperty('loadClip'));
+check(MovieClipLoader.prototype.hasOwnProperty('unloadClip'));
+check(MovieClipLoader.prototype.hasOwnProperty('getProgress'));
+check(MovieClipLoader.prototype.hasOwnProperty('addListener'));
+check(MovieClipLoader.prototype.hasOwnProperty('removeListener'));
+check(MovieClipLoader.prototype.hasOwnProperty('broadcastMessage'));
+check_equals(typeOf(MovieClipLoader._listeners), 'undefined');
 
 var mcl = new MovieClipLoader();
 check_equals(typeOf(mcl), 'object');
-check_equals(typeOf(mcl.addListener), 'function');
-check_equals(typeOf(mcl.getProgress), 'function');
-check_equals(typeOf(mcl.loadClip), 'function');
-check_equals(typeOf(mcl.removeListener), 'function');
-check_equals(typeOf(mcl.broadcastMessage), 'function');
-check_equals(typeOf(mcl.unloadClip), 'function');
 check(mcl instanceOf MovieClipLoader);
 
+check_equals(typeOf(mcl.loadClip), 'function');
+check(!mcl.hasOwnProperty('loadClip'));
+
+check_equals(typeOf(mcl.unloadClip), 'function');
+check(!mcl.hasOwnProperty('unloadClip'));
+
+check_equals(typeOf(mcl.getProgress), 'function');
+check(!mcl.hasOwnProperty('getProgress'));
+
+check_equals(typeOf(mcl.addListener), 'function');
+check(!mcl.hasOwnProperty('addListener'));
+
+check_equals(typeOf(mcl.removeListener), 'function');
+check(!mcl.hasOwnProperty('removeListener'));
+
+check_equals(typeOf(mcl.broadcastMessage), 'function');
+check(!mcl.hasOwnProperty('broadcastMessage'));
+
+check_equals(typeOf(mcl._listeners), 'object');
+check(mcl.hasOwnProperty('_listeners'));
+
+MovieClipLoader.prototype.bm = MovieClipLoader.prototype.broadcastMessage;
+MovieClipLoader.prototype.broadcastMessage = function(arg1, arg2, arg3, arg4)
+{
+	note("Broadcasting "+arg1);
+	//this.bm(arg1, arg2, arg3, arg4);
+	this.bm.apply(this, arguments);
+};
+
+//---------------------------------------------------------
+// Test loadClip and events
+//---------------------------------------------------------
+//
 // TODO: test even handlers (actionscript.all framework
 //       not enough for this)
 //
-// Invoked when a file loaded with MovieClipLoader.loadClip() has completely downloaded.
-// MovieClipLoader.onLoadComplete
-// 
 // Invoked when a file loaded with MovieClipLoader.loadClip() has failed to load.
 // MovieClipLoader.onLoadError
-// 
-// Invoked when the actions on the first frame of the loaded clip have been executed.
-// MovieClipLoader.onLoadInit
+//
+// Invoked when a call to MovieClipLoader.loadClip() has successfully begun to download a file.
+// MovieClipLoader.onLoadStart
 // 
 // Invoked every time the loading content is written to disk during the loading process.
 // MovieClipLoader.onLoadProgress
 //
-// Invoked when a call to MovieClipLoader.loadClip() has successfully begun to download a file.
-// MovieClipLoader.onLoadStart
+// Invoked when a file loaded with MovieClipLoader.loadClip() has completely downloaded.
+// MovieClipLoader.onLoadComplete
+// 
+// Invoked when the actions on the first frame of the loaded clip have been executed.
+// MovieClipLoader.onLoadInit
 //
+//---------------------------------------------------------
 
-#endif // OUTPUT_VERSION >= 7
+dumpObj = function(o, lvl)
+{
+	if ( typeof(lvl) == 'undefined' ) lvl=0;
+	for (var i in o)
+	{
+		note(lvl+' - '+i+': '+o[i]+' ('+typeof(o[i])+')');
+		if ( typeof(o[i]) == 'object' ) dumpObj(o[i], lvl+1);
+	}
+};
+
+
+createEmptyMovieClip("loadtarget", 10);
+
+expected = {
+	target: undefined
+};
+
+resetState = function()
+{
+	state = {
+		onLoadStartCalls:0,
+		onLoadErrorCalls:0,
+		onLoadProgressCalls:0,
+		onLoadCompleteCalls:0,
+		onLoadInitCalls:0
+	};
+};
+totalProgressCalls=0;
+
+mcl.onLoadError = function(target, msg, n)
+{
+	check_equals(arguments.length, 3);
+	check_equals(target, expected.target);
+	note("onLoadError called ("+msg+")");
+	if ( state.nextFunction == undefined )
+	{
+		// we don't know how many times onLoadProgress will be called
+		// so we have that handler increment a totalProgressCalls and
+		// we use that value to  figure out how many tests to expect to
+		// be run (6 tests each onLoadProgress call).
+		// Note that if we miss to call onLoadProgress at all we'd catch
+		// the bug from supposedly subsequent callbacks, which check for
+		// a local flag set by the onLoadProgress handler.
+		//
+		progCallbackTests = totalProgressCalls*6;
+		note("Number of onLoadProgress runs: "+totalProgressCalls+" - tests: "+progCallbackTests);
+		if ( expect.failtotals ) {
+			xcheck_totals(expected.totals + progCallbackTests);
+		} else {
+			check_totals(expected.totals + progCallbackTests);
+		}
+		play();
+	}
+	else
+	{
+		state.nextFunction();
+	}
+	//dumpObj(arguments);
+};
+
+mcl.onLoadStart = function(target)
+{
+	check_equals(arguments.length, 1);
+	check_equals(target, expected.target);
+	state.onLoadStartCalls++;
+	//note("onLoadStart called with "+arguments.length+" args:"); dumpObj(arguments);
+};
+
+mcl.onLoadProgress = function(target, bytesLoaded, bytesTotal)
+{
+	check_equals(arguments.length, 3);
+	check_equals(target, expected.target);
+	check_equals(state.onLoadStartCalls, 1);
+	check_equals(typeof(bytesLoaded), 'number')
+	check_equals(typeof(bytesTotal), 'number')
+	check(bytesTotal <= bytesTotal);
+	++state.onLoadProgressCalls;
+	++totalProgressCalls;
+	//note("onLoadProgress called with "+arguments.length+" args:"); dumpObj(arguments);
+};
+
+mcl.onLoadComplete = function(target, n)
+{
+	check_equals(arguments.length, 2);
+	check_equals(target, expected.target);
+	check_equals(state.onLoadStartCalls, 1);
+	check(state.onLoadProgressCalls > 0);
+	check_equals(typeof(n), 'number'); // what is this ?
+	state.onLoadCompleteCalls++;
+
+	note("onLoadComplete second arg is "+n+" ("+typeof(n)+")");
+};
+
+mcl.onLoadInit = function(target)
+{
+	check_equals(arguments.length, 1);
+	check_equals(target, expected.target);
+	check_equals(state.onLoadStartCalls, 1);
+	check(state.onLoadProgressCalls > 0);
+	check_equals(state.onLoadCompleteCalls, 1);
+	state.onLoadInitCalls++;
+
+	//note("target.var1: "+target.var1);
+	//note("onLoadInit called with "+arguments.length+" args:"); dumpObj(arguments);
+	if ( state.nextFunction == undefined )
+	{
+		// we don't know how many times onLoadProgress will be called
+		// so we have that handler increment a totalProgressCalls and
+		// we use that value to  figure out how many tests to expect to
+		// be run (6 tests each onLoadProgress call).
+		// Note that if we miss to call onLoadProgress at all we'd catch
+		// the bug from supposedly subsequent callbacks, which check for
+		// a local flag set by the onLoadProgress handler.
+		//
+		progCallbackTests = totalProgressCalls*6;
+		note("Number of onLoadProgress runs: "+totalProgressCalls+" - tests: "+progCallbackTests);
+		if ( expect.failtotals ) {
+			xcheck_totals(expected.totals + progCallbackTests);
+		} else {
+			check_totals(expected.totals + progCallbackTests);
+		}
+		
+		play();
+	}
+	else
+	{
+		state.nextFunction();
+	}
+};
+
+check( ! mcl.loadClip() );
+check( ! mcl.loadClip( MEDIA(vars.txt) ) );
+
+check( ! mcl.loadClip( MEDIA(vars.txt), 'unexistent' ) );
+
+function test1()
+{
+	resetState();
+	state.nextFunction = test2;
+	expected.target = _root.loadtarget;
+	check( mcl.loadClip( MEDIA(unexistent), 'loadtarget' ) );
+}
+
+function test2()
+{
+	resetState();
+	state.nextFunction = test3;
+	expected.target = _root.loadtarget;
+	check( mcl.loadClip( MEDIA(vars.txt), 'loadtarget' ) );
+}
+
+function test3()
+{
+	resetState();
+	state.nextFunction = undefined;
+	expected.target = _root.loadtarget;
+
+	// set expected.totals when willing to end the test
+	// we don't know how many times onLoadProgress will be called
+	// so we only count the tests we can determine.
+	// The  onLoadInit function will do the rest, by checking the actual
+	// number of times onLoadProgress was called and add to our expected
+	// count (appropriately multiplied to count *every* test in the
+	// onLoadProgress)
+	//
+	// subtract the number of progress callback runs reported when playing from the totals to get the correct number
+	//
+	expected.totals = 57;
+	// gnash doesn't call onLoadInit if the data at the url is not an SWF or JPG
+	// (or whatever else can become a movie_instance), while the PP does.
+	// So in this testcase, the attempt to load vars.txt is invalid for Gnash
+	// (triggers onLoadError) 
+	//
+	expected.failtotals = true;
+
+
+	loadtarget._y = 200;
+	loadtarget._x = 200;
+	loadtarget._alpha = 20;
+	check( mcl.loadClip( MEDIA(green.jpg), 'loadtarget' ) );
+}
+
+test1();
+
+stop();
+
+#else // OUTPUT_VERSION < 7
+
 totals();
+
+#endif
