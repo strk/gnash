@@ -139,6 +139,12 @@ public:
         _localSandboxPath = path;
     }
 
+    // Get the location of the sandbox for .sol files
+    const std::string &getSOLSafeDir() const { return _solsandbox; }
+
+    // Set the location of the sandbox for .sol files
+    void setSOLSafeDir(std::string &x) { _solsandbox = x; }
+
     void dump();    
 
 private:
@@ -190,9 +196,13 @@ private:
     /// The number of seconds of inactivity triggering download timeout
     double _streamsTimeout;
 
-    /// Local sendbox: the set of resources on the filesystem we want to
+    /// Local sandbox: the set of resources on the filesystem we want to
     /// give the current movie access to.
     PathList _localSandboxPath;
+
+    // SOL Sandbox: This is the only dir .sol (Shared Object) files can be written in,
+    // or read from.
+    std::string _solsandbox;
 
   protected:
     

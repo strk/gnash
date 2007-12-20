@@ -405,6 +405,12 @@ RcInitFile::parseFile(const std::string& filespec)
                     continue;
                 }
 
+                if (noCaseCompare(variable, "SOLSafeDir")) {
+                    expandPath (value);
+                    _solsandbox = value;
+                    continue;
+                }
+
 		if (noCaseCompare(action , "set") ) {
                      extractSetting(&_splashScreen, "splash_screen", variable,
                                value);
