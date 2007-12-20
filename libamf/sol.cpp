@@ -39,6 +39,7 @@
 #else
 #include <arpa/inet.h>
 #endif
+
 using namespace std;
 using namespace gnash;
 
@@ -63,29 +64,30 @@ namespace amf
 SOL::SOL() 
     : _filesize(0)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 }
 
 SOL::~SOL()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 }
 
 bool
 SOL::extractHeader(std::string &filespec)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 }
 
 bool
 SOL::extractHeader(vector<unsigned char> &data)
 {
+//    GNASH_REPORT_FUNCTION;
 }
 
 void
 SOL::addObj(AMF::amf_element_t &el)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     _amfobjs.push_back(el);
     _filesize += el.name.size() + el.length + 5;
 }
@@ -93,7 +95,7 @@ SOL::addObj(AMF::amf_element_t &el)
 bool
 SOL::formatHeader(vector<unsigned char> &data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 }
 
 // name is the object name
@@ -106,7 +108,7 @@ SOL::formatHeader(std::string &name)
 bool
 SOL::formatHeader(std::string &name, int filesize)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     uint32_t i;
 
     // First we add the magic number. All SOL data is in big-endian format,
@@ -202,8 +204,8 @@ SOL::writeFile(const char *filespec, const char *name)
 bool
 SOL::writeFile(string &filespec, string &name)
 {
-    GNASH_REPORT_FUNCTION;
-    ofstream ofs("test.sol", ios::binary);
+//    GNASH_REPORT_FUNCTION;
+    ofstream ofs(filespec.c_str(), ios::binary);
     vector<uint8_t>::iterator it;
     vector<AMF::amf_element_t>::iterator ita; 
     AMF amf_obj;
@@ -214,7 +216,7 @@ SOL::writeFile(string &filespec, string &name)
 	return false;
     }
     
-    char *body = new char[_filesize]; // FIXME: bogus size!
+    char *body = new char[_filesize + 16];
     memset(body, 0, _filesize);
     ptr = body;
 
@@ -281,7 +283,7 @@ SOL::writeFile(string &filespec, string &name)
 bool
 SOL::readFile(std::string &filespec)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     struct stat st;
     uint16_t magic, size;
     char *buf, *ptr;

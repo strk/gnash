@@ -25,9 +25,9 @@
 #include <vector>
 
 #if defined(_WIN32) || defined(WIN32)
-#	include <winsock2.h>
+# include <winsock2.h>
 #else
-#	include <netinet/in.h>
+# include <netinet/in.h>
 #endif
 
 #include "log.h"
@@ -190,18 +190,18 @@ AMF::readElement(void *in)
     amfnum_t nanosecs;
     short length;
     
-    log_msg(_("Type is %s"), astype_str[type]);
+//    log_msg(_("Type is %s"), astype_str[type]);
 
     x++;                        // skip the type byte
     switch (type) {
       case NUMBER:
 	  // AMF numbers are 64-bit big-endian integers.
           num = *(amfnum_t *)swapBytes(x+1, 8);
-          log_msg(_("Number is " AMFNUM_F), num);
+//          log_msg(_("Number is " AMFNUM_F), num);
           break;
       case BOOLEAN:
           boolshift = *x;
-          log_msg(_("Boolean is %d"), boolshift);
+//          log_msg(_("Boolean is %d"), boolshift);
           break;
       case STRING:
 //        int length = *(short *)swapBytes(x, 2);
@@ -214,7 +214,7 @@ AMF::readElement(void *in)
           // *src to a sequence of wide characters as if by repeated
           // calls of the form:
 //          mbsrtowcs
-          log_msg(_("String is %s"), mstr);
+//          log_msg(_("String is %s"), mstr);
           break;
       case OBJECT:
 //          readElement();
@@ -246,14 +246,14 @@ AMF::readElement(void *in)
           break;
       case DATE:
           nanosecs = *(amfnum_t *)swapBytes(x+1, 8);
-          log_msg(_("Date is " AMFNUM_F " nanoseconds"), nanosecs);
+//          log_msg(_("Date is " AMFNUM_F " nanoseconds"), nanosecs);
           break;
       case LONG_STRING:
 //          int length = *(short *)swapBytes(x, 4);
           x+=4;                  // skip the length bytes
 //        mstr = new char[length+1];
 //          memcpy(mstr, x, length);
-          log_msg(_("String is %s"), mstr);
+//          log_msg(_("String is %s"), mstr);
           break;
       case RECORD_SET:
           log_unimpl("Recordset AMF decoder");
@@ -265,7 +265,7 @@ AMF::readElement(void *in)
           log_unimpl("TypedObject AMF decoder");
           break;
       default:
-          log_msg("Warning: Unknown AMF element type %d\n", type);
+          log_error("Warning: Unknown AMF element type %d\n", type);
           break;
     }
     
@@ -293,7 +293,7 @@ AMF::readElement(void *in)
 uint8_t *
 AMF::encodeElement(astype_e type, const void *in, int nbytes)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     amfnum_t num;
     int pktsize = 0;
@@ -474,7 +474,7 @@ AMF::encodeRTMPHeader(int amf_index, amf_headersize_e head_size,
 		      int total_size, content_types_e type,
 		      amfsource_e routing)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     void *out = new char[total_size + 12 + 4];
     memset(out, 0, total_size + 12 + 4);
     char *tmpptr = reinterpret_cast<char *>(out);
@@ -783,7 +783,7 @@ AMF::createElement(amf_element_t *el, const char *name, amfnum_t data)
 AMF::amf_element_t *
 AMF::createElement(amf_element_t *el, const std::string &name, amfnum_t data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     log_debug("Creating element %s", name.c_str());
 
     el->type = AMF::NUMBER;
@@ -808,7 +808,7 @@ AMF::createElement(amf_element_t *el, const char *name, double data)
 AMF::amf_element_t *
 AMF::createElement(amf_element_t *el, const std::string &name, double data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     log_debug("Creating element %s", name.c_str());
 
     el->type = AMF::NUMBER;
@@ -825,7 +825,7 @@ AMF::createElement(amf_element_t *el, const std::string &name, double data)
 AMF::amf_element_t *
 AMF::createElement(amf_element_t *el, const char *name, const char *data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     log_debug("Creating element %s", name);
 
     el->type = AMF::STRING;
@@ -839,7 +839,7 @@ AMF::createElement(amf_element_t *el, const char *name, const char *data)
 AMF::amf_element_t *
 AMF::createElement(amf_element_t *el, const std::string &name, std::string &data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     log_debug("Creating element %s", name.c_str());
 
     el->type = AMF::STRING;
@@ -861,7 +861,7 @@ AMF::createElement(amf_element_t *el, const char *name, bool data)
 AMF::amf_element_t *
 AMF::createElement(AMF::amf_element_t *el, const std::string &name, bool data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     log_debug("Creating element %s", name.c_str());
 
     el->type = AMF::BOOLEAN;
@@ -902,9 +902,8 @@ AMF::createElement(AMF::amf_element_t *el, const std::string &name, bool data)
 uint8_t *
 AMF::encodeVariable(amf_element_t *el)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     int outsize = el->name.size() + el->length + 5;
-    log_debug("FIXME: Outsize is: %d", outsize);
     uint8_t *out = new uint8_t[outsize + 2];
     memset(out, 0, outsize + 2);
     uint8_t *tmpptr = out;
@@ -1365,17 +1364,17 @@ AMF::extractVariable(AMF::amf_element_t *el, uint8_t *in)
     tmpptr += 2;
     // get the name of the element
     if (length > 0) {
-        log_msg(_("AMF element length is: %d"), length);
+//        log_msg(_("AMF element length is: %d"), length);
         memcpy(buffer, tmpptr, length);
         el->name = reinterpret_cast<char *>(buffer);
         tmpptr += length;
     }
     
-    log_msg(_("AMF element name is: %s"), buffer);
+//    log_msg(_("AMF element name is: %s"), buffer);
     astype_e type = (astype_e)((*tmpptr++) & 0xff);
 
     if (type <= AMF::TYPED_OBJECT) {
-        log_msg(_("AMF type is: %s"), astype_str[(int)type]);
+//        log_msg(_("AMF type is: %s"), astype_str[(int)type]);
 	el->type = type;
     }
     
@@ -1393,7 +1392,7 @@ AMF::extractVariable(AMF::amf_element_t *el, uint8_t *in)
           uint8_t hexint[AMF_NUMBER_SIZE*3];
           hexify((uint8_t *)hexint, (uint8_t *)buffer,
 		 AMF_NUMBER_SIZE, false);
-          log_msg(_("Number \"%s\" is: 0x%s"), el->name.c_str(), hexint);
+//          log_msg(_("Number \"%s\" is: 0x%s"), el->name.c_str(), hexint);
 //          amfnum_t *num = extractNumber(tmpptr);
 #endif
           tmpptr += 8;
@@ -1407,9 +1406,9 @@ AMF::extractVariable(AMF::amf_element_t *el, uint8_t *in)
           el->data = new uint8_t[2];
 //          memcpy(tmp, tmpptr, 2); 
           el->data[0] =* tmpptr;
-	  log_msg((*tmpptr == 0) ? 
-		  _("Boolean \"%s\" is: true"):
-		  _("Boolean \"%s\" is: false"), el->name.c_str());
+// 	  log_msg((*tmpptr == 0) ? 
+// 		  _("Boolean \"%s\" is: true"):
+// 		  _("Boolean \"%s\" is: false"), el->name.c_str());
 	  tmpptr += 1;
 	  break;
     }
@@ -1434,7 +1433,7 @@ AMF::extractVariable(AMF::amf_element_t *el, uint8_t *in)
 	  // Undefined types have a name, but no value
 		//FIXME this shouldn't fall through!
       case UNDEFINED:
-          log_msg(_("Undefined type"));
+//          log_msg(_("Undefined type"));
           el->data = 0; // (const uint8_t*)tmpptr; 
           //log_msg(_("Variable \"%s\" is of undefined type"), el->name.c_str());
           el->length = 0;
@@ -1444,7 +1443,7 @@ AMF::extractVariable(AMF::amf_element_t *el, uint8_t *in)
       case ECMA_ARRAY:
 			// FIXME this shouldn't fall thru
       case OBJECT_END:
-          log_msg(_("End of Object definition"));
+//          log_msg(_("End of Object definition"));
           el->name.erase();
           el->length = 0;
           el->data = 0;
