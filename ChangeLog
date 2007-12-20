@@ -1,3 +1,8 @@
+2007-12-20 Sandro Santilli <strk@keybit.net>
+
+	* libbase/LoadThread.{cpp,h}: (setupCache) fix current position
+	  and _completed computation, (reset) join thread.
+
 2007-12-20  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* server/asobj/SharedObject.cpp: Make less verbose, don't dump

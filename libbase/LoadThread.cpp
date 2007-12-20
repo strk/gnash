@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: LoadThread.cpp,v 1.17 2007/12/12 10:06:59 zoulunkai Exp $
+// $Id: LoadThread.cpp,v 1.18 2007/12/20 22:31:31 strk Exp $
 
 #include "LoadThread.h"
 
@@ -47,6 +47,14 @@ LoadThread::LoadThread()
 void
 LoadThread::reset()
 {
+#ifdef THREADED_LOADS
+	boost::mutex::scoped_lock lock(_mutex);
+	if ( _thread.get() )
+	{
+		_thread->join();
+		_thread.reset(NULL);
+	}
+#endif
 	_completed=false;
 	_loadPosition=0;
 	_userPosition=0;
@@ -60,7 +68,6 @@ LoadThread::reset()
 	_streamSize=0;
 	_needAccess=false;
 	_stream.reset();
-	_thread.reset();
 }
 
 LoadThread::~LoadThread()
@@ -280,11 +287,15 @@ void LoadThread::setupCache()
 	_cache.reset( new boost::uint8_t[1024*500] );
 	_cacheSize = 1024*500;
 
-	int ret = _stream->read_bytes(_cache.get(), 1024);
+    size_t setupSize = 1024;
+
+	size_t ret = _stream->read_bytes(_cache.get(), setupSize);
 	_cacheStart = 0;
 	_cachedData = ret;
-	_loadPosition = 1024;
+	_loadPosition = ret;
 	_streamSize = _stream->get_size();
+
+    if ( ret < setupSize ) _completed = true;
 }
 
 void LoadThread::downloadThread(LoadThread* lt)

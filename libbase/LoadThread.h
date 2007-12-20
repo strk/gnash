@@ -26,6 +26,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/bind.hpp>
 #include <boost/scoped_array.hpp>
+#include <boost/noncopyable.hpp>
 
 #include <memory>
 
@@ -54,7 +55,7 @@
 /// @todo When we read from a real movie stream (rtmp) we might
 /// want to use a cirkular-buffer.
 
-class DSOEXPORT LoadThread
+class DSOEXPORT LoadThread : private boost::noncopyable
 {
 
 public:
@@ -100,13 +101,13 @@ public:
 		return (static_cast<boost::int32_t>(pos) <= _loadPosition);
 	}
 
-    /// Request download cancel
-    void requestCancel();
+	/// Request download cancel
+	void requestCancel();
 
 private:
 
-    /// Return true if cancel was requested
-    bool cancelRequested() const;
+	/// Return true if cancel was requested
+	bool cancelRequested() const;
 
 	/// The thread function used to download from the stream
 	static void downloadThread(LoadThread* lt);
@@ -135,7 +136,8 @@ private:
 	volatile long _userPosition;
 	volatile long _actualPosition;
 
-    bool _cancelRequested;
+	// If true, download request was canceled
+	bool _cancelRequested;
 
 	// Cache...
 	boost::scoped_array<boost::uint8_t> _cache;
@@ -162,8 +164,8 @@ private:
 	// makes read() wait for for a really long time.
 	volatile bool _needAccess;
 
-    /// Reset all values to original state
-    void reset();
+	/// Reset all values to original state
+	void reset();
 };
 
 #endif // __LOADTHREAD_H__
