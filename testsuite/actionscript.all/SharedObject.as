@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: SharedObject.as,v 1.13 2007/12/20 21:14:39 rsavoye Exp $";
+rcsid="$Id: SharedObject.as,v 1.14 2007/12/20 21:18:21 rsavoye Exp $";
 
 #include "check.as"
 
@@ -54,30 +54,30 @@ check_equals (typeof(sharedobjectObj.getSize), 'function');
 
 
 // FIXME: Test code that will soon be a formal test case.
-// so = SharedObject.getLocal("settings");
+so = SharedObject.getLocal("settings");
 
-// // Private data
-// so.name = "Joe";
-// so.age = 20;
-// so.pet = "Dog";
+// Private data
+so.name = "Joe";
+so.age = 20;
+so.pet = "Dog";
 
-// // public data that gets written
-// so.data.gain = 50.0;
-// so.data.echosuppression = false;
-// so.data.defaultmicrophone = "/dev/input/mic";
-// so.data.defaultcamera = "";
-// so.data.defaultklimit = 100.0;
-// so.data.defaultalways = false;
-// so.data.crossdomainAllow = true;
-// so.data.crossdomainAlways = true;
-// so.data.allowThirdPartyLSOAccess = true;
-// so.data.localSecPath = "";
-// so.data.localSecPathTime = 1.19751160683e+12;
+// public data that gets written
+so.data.gain = 50.0;
+so.data.echosuppression = false;
+so.data.defaultmicrophone = "/dev/input/mic";
+so.data.defaultcamera = "";
+so.data.defaultklimit = 100.0;
+so.data.defaultalways = false;
+so.data.crossdomainAllow = true;
+so.data.crossdomainAlways = true;
+so.data.allowThirdPartyLSOAccess = true;
+so.data.localSecPath = "";
+so.data.localSecPathTime = 1.19751160683e+12;
 
 // trace(so.getSize());
 // so.flush();
 
-newso = SharedObject.getLocal("settingsXXX");
+newso = SharedObject.getLocal("settings");
 check_equals (typeof(newso), 'object');
 trace(newso.getSize());
 check_equals (newso.getSize(), 11);
@@ -99,16 +99,16 @@ if (typeof(newso.data) != 'undefined') {
 
     // FIXME: why did all these start failing ? Accoring to dump() they
     // all still exist.
-    xcheck_equals (typeof(newso.data.crossdomainAllow), 'boolean');
-    xcheck_equals (newso.data.crossdomainAllow, true);
-    xcheck_equals (typeof(newso.data.crossdomainAlways), 'boolean');
-    xcheck_equals (newso.data.crossdomainAlways, true);
-    xcheck_equals (typeof(newso.data.allowThirdPartyLSOAccess), 'boolean');
-    xcheck_equals (newso.data.allowThirdPartyLSOAccess, true);
-    xcheck_equals (typeof(newso.data.localSecPath), 'string');
-    xcheck_equals (newso.data.localSecPath, 'undefined');
-    xcheck_equals (typeof(newso.data.localSecPathTime), 'number');
-    xcheck_equals (newso.data.localSecPathTime, 1.19751160683e+12);
+    check_equals (typeof(newso.data.crossdomainAllow), 'boolean');
+    check_equals (newso.data.crossdomainAllow, true);
+    check_equals (typeof(newso.data.crossdomainAlways), 'boolean');
+    check_equals (newso.data.crossdomainAlways, true);
+    check_equals (typeof(newso.data.allowThirdPartyLSOAccess), 'boolean');
+    check_equals (newso.data.allowThirdPartyLSOAccess, true);
+    check_equals (typeof(newso.data.localSecPath), 'string');
+    check_equals (newso.data.localSecPath, 'undefined');
+    check_equals (typeof(newso.data.localSecPathTime), 'number');
+    check_equals (newso.data.localSecPathTime, 1.19751160683e+12);
 } else {
     trace("New Shared Object doesn't exist!");
 }
