@@ -1,5 +1,11 @@
 2007-12-20 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xmlnode.cpp: attributes are note instances
+	  of Object class.
+	* testsuite/actionscript.all/XML.as: few more fixes.
+
+2007-12-20 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/xml.{cpp,h}: don't abort on XML.load() [ no args ].
 	  Engage a thread for each load request.
 	* testsuite/actionscript.all/XML.as: the test is now sane, and

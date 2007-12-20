@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.41 2007/11/20 00:44:05 cmusick Exp $ */
+/* $Id: xmlnode.cpp,v 1.42 2007/12/20 23:29:04 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -635,7 +635,7 @@ xmlnode_attributes(const fn_call& fn)
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
 
     XMLNode::AttribList& attrs = ptr->attributes();
-    boost::intrusive_ptr<as_object> ret = new as_object(getObjectInterface());
+    boost::intrusive_ptr<as_object> ret = new as_object(); // attributes are not Object types (getObjectInterface());
     for (XMLNode::AttribList::const_iterator it=attrs.begin(),
          itEnd=attrs.end(); it != itEnd; ++it) {
 

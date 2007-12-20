@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.51 2007/12/20 22:49:38 strk Exp $";
+rcsid="$Id: XML.as,v 1.52 2007/12/20 23:29:04 strk Exp $";
 
 #include "check.as"
 //#include "dejagnu.as"
@@ -685,8 +685,8 @@ myxml.onLoad = function(success)
 
 	//note("myxml.toString(): "+myxml.toString());
 	check_equals(typeof(myxml.attributes), 'object');
-	xcheck(! myxml.attributes instanceof Object);
-	xcheck_equals(typeof(myxml.attributes.__proto__), 'undefined');
+	check(! myxml.attributes instanceof Object);
+	check_equals(typeof(myxml.attributes.__proto__), 'undefined');
 
 	check(myxml.hasChildNodes());
 	check_equals(myxml.nodeName, null);
