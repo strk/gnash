@@ -1364,6 +1364,11 @@ AMF::extractVariable(AMF::amf_element_t *el, uint8_t *in)
     tmpptr += 2;
     // get the name of the element
     if (length > 0) {
+	if (length > 20000) {
+	    log_error("Length field corrupted! parsed value is: %hd", length);
+	    return 0;
+	}
+	
 //        log_msg(_("AMF element length is: %d"), length);
         memcpy(buffer, tmpptr, length);
         el->name = reinterpret_cast<char *>(buffer);
@@ -1387,11 +1392,11 @@ AMF::extractVariable(AMF::amf_element_t *el, uint8_t *in)
 	  memset(tmp, 0, AMF_NUMBER_SIZE+1);
 	  memcpy(tmp, buffer, AMF_NUMBER_SIZE);
 	  el->data = tmp;
-#if 1
+#if 0
           uint8_t hexint[AMF_NUMBER_SIZE*3];
           hexify((uint8_t *)hexint, (uint8_t *)buffer,
 		 AMF_NUMBER_SIZE, false);
-//          log_msg(_("Number \"%s\" is: 0x%s"), el->name.c_str(), hexint);
+          log_msg(_("Number \"%s\" is: 0x%s"), el->name.c_str(), hexint);
 //          amfnum_t *num = extractNumber(tmpptr);
 #endif
           tmpptr += 8;

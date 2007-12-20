@@ -336,11 +336,12 @@ SOL::readFile(std::string &filespec)
         AMF::amf_element_t el;
         while ((buf - ptr) <= _filesize) {
             ptr = (char *)amf_obj.extractVariable(&el, reinterpret_cast<uint8_t *>(ptr));
-            if (ptr == 0) {
-                return true;
-            }
-            ptr += 1;            
-            addObj(el);
+            if (ptr != 0) {
+		ptr += 1;            
+		addObj(el);
+	    } else {
+		break;
+	    }
         }
         
         ifs.close();

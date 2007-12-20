@@ -259,7 +259,7 @@ sharedobject_getlocal(const fn_call& fn)
     
     for (it = els.begin(); it != els.end(); it++) {
         AMF::amf_element_t *el = &(*(it));
-        log_debug("Adding \"%s\"", el->name.c_str());
+//        log_debug("Adding \"%s\"", el->name.c_str());
         if (el->type == AMF::NUMBER) {
             double dub =  *((double *)el->data);
             ptr->set_member(st.string_table::find(el->name), as_value(dub));
@@ -285,7 +285,7 @@ sharedobject_getlocal(const fn_call& fn)
         } 
     }
 
-    ptr->dump_members();        // FIXME: debug crap
+//    ptr->dump_members();        // FIXME: debug crap
     
     return as_value(obj.get()); // will keep alive
 }

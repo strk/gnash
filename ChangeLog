@@ -1,5 +1,14 @@
 2007-12-20  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* server/asobj/SharedObject.cpp: Make less verbose, don't dump
+	members after reading.
+	* libamf/amf.cpp: Check for a corrupted length field so we don't
+	try to memcpy() an obscene amount of data... 
+	* libamf/sol.cpp: Handle an error from trying to parse corrupted
+	.sol files so we don't core dump.
+	* testsuite/actionscript.all/SharedObject.as: Test the new values
+	against the previous ones we just wrote.
+	
 	* server/asobj/SharedObject.cpp: Get rcinit file, and use the
 	SOLSafeDir setting, or defaul tto "./", for all SOL file
 	locations. This now can both write and read SOL files.

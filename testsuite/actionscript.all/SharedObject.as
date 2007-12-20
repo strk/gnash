@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: SharedObject.as,v 1.14 2007/12/20 21:18:21 rsavoye Exp $";
+rcsid="$Id: SharedObject.as,v 1.15 2007/12/20 21:50:09 rsavoye Exp $";
 
 #include "check.as"
 
@@ -75,7 +75,8 @@ so.data.localSecPath = "";
 so.data.localSecPathTime = 1.19751160683e+12;
 
 // trace(so.getSize());
-// so.flush();
+so.flush();
+
 
 newso = SharedObject.getLocal("settings");
 check_equals (typeof(newso), 'object');
@@ -85,17 +86,17 @@ check_equals (newso.getSize(), 11);
 if (typeof(newso.data) != 'undefined') {
     trace("New Shared Object, checking data...");
     check_equals (typeof(newso.data.gain), 'number');
-    check_equals (newso.data.gain, 50.0);
+    check_equals (newso.data.gain, so.data.gain);
     check_equals (typeof(newso.data.echosuppression), 'boolean');
-    check_equals (newso.data.echosuppression, false);
+    check_equals (newso.data.echosuppression, so.data.echosuppression);
     check_equals (typeof(newso.data.defaultmicrophone), 'string');
-    check_equals (newso.data.defaultmicrophone, "/dev/input/mic");
+    check_equals (newso.data.defaultmicrophone, so.data.defaultmicrophone);
     check_equals (typeof(newso.data.defaultcamera), 'string');
     check_equals (newso.data.defaultcamera,  'undefined');
     check_equals (typeof(newso.data.defaultklimit), 'number');
-    check_equals (newso.data.defaultklimit, 100.0);
+    check_equals (newso.data.defaultklimit, so.data.defaultklimit);
     check_equals (typeof(newso.data.defaultalways), 'boolean');
-    check_equals (newso.data.defaultalways, false);
+    check_equals (newso.data.defaultalways, so.data.defaultalways);
 
     // FIXME: why did all these start failing ? Accoring to dump() they
     // all still exist.
