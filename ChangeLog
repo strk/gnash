@@ -1,3 +1,9 @@
+2007-12-19  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* utilities/soldumper: Dump the contents of any .sol file. Useful
+	to know what's being stored about you in binary files.
+	* utilities/Makefile.am: Add soldumper.
+
 2007-12-19 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/SharedObject.cpp: make SharedObject.flush more

@@ -49,6 +49,7 @@ AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)	\
         -I$(top_srcdir)/libgeometry \
         -I$(top_srcdir)/libbase \
+        -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/server \
         -I$(top_srcdir)/server/parser \
         -I$(top_srcdir)/server/vm \
@@ -75,7 +76,7 @@ endif
  GNASH_LIBS += $(GLIB_LIBS) $(GSTREAMER_LIBS)
 #endif
 
-bin_PROGRAMS = gprocessor
+bin_PROGRAMS = gprocessor soldumper
 noinst_PROGRAMS = dumpshm
 #check_PROGRAMS = gdebug.swf
 
@@ -87,6 +88,9 @@ gprocessor_LDADD = $(GNASH_LIBS)
 
 dumpshm_SOURCES = dumpshm.cpp
 dumpshm_LDADD = $(GNASH_LIBS)
+
+soldumper_SOURCES = soldumper.cpp
+soldumper_LDADD = $(GNASH_LIBS)
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
