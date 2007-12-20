@@ -346,7 +346,8 @@ SOL::readFile(std::string &filespec)
         ifs.close();
         return true;
     }
-    
+
+    log_error("Couldn't open file: %s", strerror(errno));
     return false;
 }
 
@@ -371,11 +372,8 @@ SOL::dump()
             }
         }
         if (el->type == AMF::NUMBER) {
-            double *dd = (double *)el->data;
             double ddd = *((double *)el->data);
-	    swapBytes(&ddd, 8);
-            cerr << ddd << " ";
-            cerr << *dd << " ";
+             cerr << ddd << " ";
             hexint = new uint8_t[(sizeof(double) *3) + 3];
             hexify(hexint, el->data, 8, false);
             cerr << "( " << hexint << ")";

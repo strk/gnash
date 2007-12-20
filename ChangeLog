@@ -1,3 +1,14 @@
+2007-12-20  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* server/asobj/SharedObject.cpp: Get rcinit file, and use the
+	SOLSafeDir setting, or defaul tto "./", for all SOL file
+	locations. This now can both write and read SOL files.
+	* testsuite/actionscript.all/SharedObject.as: Test for the values
+	gotten from the SOL file so we know we parsed it correctly.
+	* libamf/amf.cpp: Don't swap numbers twice.
+	* libamf/sol.cpp: Don't swap numbers when dumping, they should be
+	in the correct byte order by default.
+
 2007-12-20 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/XML.as:

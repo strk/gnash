@@ -1386,7 +1386,6 @@ AMF::extractVariable(AMF::amf_element_t *el, uint8_t *in)
 	  uint8_t* tmp = new uint8_t[AMF_NUMBER_SIZE+1];
 	  memset(tmp, 0, AMF_NUMBER_SIZE+1);
 	  memcpy(tmp, buffer, AMF_NUMBER_SIZE);
-	  swapBytes(tmp, AMF_NUMBER_SIZE);
 	  el->data = tmp;
 #if 1
           uint8_t hexint[AMF_NUMBER_SIZE*3];
