@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.57 2007/12/17 22:57:18 strk Exp $ */
+/* $Id: xml.cpp,v 1.58 2007/12/20 22:37:13 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -65,10 +65,6 @@ static as_object* getXMLInterface();
 static void attachXMLInterface(as_object& o);
 static void attachXMLProperties(as_object& o);
 
-// Callback functions for xmlReadIO
-static int closeTuFile (void * context);
-static int readFromTuFile (void * context, char * buffer, int len);
-
 DSOEXPORT as_value xml_new(const fn_call& fn);
 static as_value xml_load(const fn_call& fn);
 static as_value xml_addrequestheader(const fn_call& fn);
@@ -81,7 +77,6 @@ static as_value xml_send(const fn_call& fn);
 static as_value xml_sendandload(const fn_call& fn);
 static as_value xml_ondata(const fn_call& fn);
 
-static LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 #ifdef USE_DEBUGGER
 static Debugger& debugger = Debugger::getDefaultInstance();
 #endif
@@ -89,10 +84,12 @@ static Debugger& debugger = Debugger::getDefaultInstance();
 XML::XML() 
     :
     XMLNode(getXMLInterface()),
+    _doc(0),
+    _firstChild(0),
     _loaded(-1), 
-    _bytes_loaded(0),
-    _bytes_total(0),
-    _status(sOK)
+    _status(sOK),
+    _loadThreads(),
+    _loadCheckerTimer(0)
 {
     //GNASH_REPORT_FUNCTION;
 #ifdef DEBUG_MEMORY_ALLOCATION
@@ -107,31 +104,18 @@ XML::XML()
 XML::XML(const std::string& xml_in)
     :
     XMLNode(getXMLInterface()),
+    _doc(0),
+    _firstChild(0),
     _loaded(-1), 
-    _bytes_loaded(0),
-    _bytes_total(0),
-    _status(sOK)
+    _status(sOK),
+    _loadThreads(),
+    _loadCheckerTimer(0)
 {
     //GNASH_REPORT_FUNCTION;
 #ifdef DEBUG_MEMORY_ALLOCATION
     log_msg(_("Creating XML data at %p"), this);
 #endif
     parseXML(xml_in);
-}
-
-XML::XML(struct node * /* childNode */)
-    :
-    XMLNode(getXMLInterface()),
-    _loaded(-1), 
-    _bytes_loaded(0),
-    _bytes_total(0),
-    _status(sOK)
-{
-    GNASH_REPORT_FUNCTION;
-#ifdef DEBUG_MEMORY_ALLOCATION
-    log_msg(_("\tCreating XML data at %p"), this);
-#endif
-    //log_msg("%s: %p", __FUNCTION__, this);
 }
 
 bool
@@ -184,6 +168,11 @@ XML::set_member(string_table::key name, const as_value& val,
 XML::~XML()
 {
     //GNASH_REPORT_FUNCTION;
+
+    for (LoadThreadList::iterator it=_loadThreads.begin(); it != _loadThreads.end(); ++it)
+    {
+        delete *it; // supposedly joins the thread
+    }
     
 #ifdef DEBUG_MEMORY_ALLOCATION
     log_msg(_("\tDeleting XML top level node at %p"), this);
@@ -404,38 +393,119 @@ XML::parseXML(const std::string& xml_in)
 void
 XML::queueLoad(std::auto_ptr<tu_file> str)
 {
-	GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     // Set the "loaded" parameter to false
-    VM& vm = _vm;
+    VM& vm = getVM();
     string_table& st = vm.getStringTable();
     string_table::key loadedKey = st.find("loaded");
-    string_table::key onDataKey = st.find(PROPNAME("onData"));
     set_member(loadedKey, as_value(false));
 
-    // TODO:
-    // 1. interrupt any pre-existing loading thread (send onLoad event in that case?)
-    // 2. start new loading thread
-    //
-    // Using LoadThread should do. Most likely we should do something
-    // similar for LoadVars or ::loadVariables, so might consider generalizing
-    // a load-in-a-separate-thread-calling-onLoad-when-done class
-    //
-    // The class would use a separate thread, provide cancelling and
-    // will call a specified function (or functor) when all data arrived,
-    // passing it the full data buffer.
-    //
-    std::string src;
-    char buf[256];
-    log_debug("Started loading of XML in main tread... ");
-    while ( 1 )
+    bool startTimer = _loadThreads.empty();
+
+    std::auto_ptr<LoadThread> lt ( new LoadThread );
+    lt->setStream(str);
+
+    // we push on the front to avoid invalidating
+    // iterators when queueLoad is called as effect
+    // of onData invocation.
+    // Doing so also avoids processing queued load
+    // request immediately
+    // 
+    _loadThreads.push_front(lt.get());
+    log_debug("Pushed thread %p to _loadThreads, number of XML load threads now: " SIZET_FMT, (void*)lt.get(),  _loadThreads.size());
+    lt.release();
+
+
+    if ( startTimer )
     {
-        size_t bytes = str->read_bytes(buf, 255);
-        src.append(buf, bytes);
-        if ( bytes < 255 ) break; // end of buffer
+        boost::intrusive_ptr<builtin_function> loadsChecker = \
+            new builtin_function(&XML::checkLoads_wrapper);
+        std::auto_ptr<Timer> timer(new Timer);
+        timer->setInterval(*loadsChecker, 50, this);
+        _loadCheckerTimer = getVM().getRoot().add_interval_timer(timer, true);
+        log_debug("Registered XML loads interval %d", _loadCheckerTimer);
     }
-    log_debug("... finished loading of XML in main tread.");
-    callMethod(onDataKey, as_value(src));
+
+}
+
+size_t
+XML::getBytesLoaded() const
+{
+    if ( _loadThreads.empty() ) return 0;
+    LoadThread* lt = _loadThreads.front();
+    return lt->getBytesLoaded();
+}
+
+size_t
+XML::getBytesTotal() const
+{
+    if ( _loadThreads.empty() ) return 0;
+    LoadThread* lt = _loadThreads.front();
+    return lt->getBytesTotal();
+}
+
+/* private */
+void
+XML::checkLoads()
+{
+    static int call=0;
+    log_debug("XML %p checkLoads call %d, _loadThreads: %d", (void *)this, _loadThreads.size(), ++call);
+
+    if ( _loadThreads.empty() ) return; // nothing to do
+
+    VM& vm = getVM();
+    string_table& st = vm.getStringTable();
+    string_table::key onDataKey = st.find(PROPNAME("onData"));
+
+    for (LoadThreadList::iterator it=_loadThreads.begin();
+            it != _loadThreads.end(); )
+    {
+        LoadThread* lt = *it;
+
+        // TODO: notify progress 
+
+        log_debug("XML loads thread %p got %ld/%ld bytes", (void*)lt, lt->getBytesLoaded(), lt->getBytesTotal() );
+        if ( lt->completed() )
+        {
+            size_t xmlsize = lt->getBytesTotal();
+            boost::scoped_array<char> buf(new char[xmlsize+1]);
+            size_t actuallyRead = lt->read(buf.get(), xmlsize);
+            assert(actuallyRead = xmlsize);
+            buf[xmlsize] = '\0';
+            as_value dataVal(buf.get()); // memory copy here (optimize?)
+
+            it = _loadThreads.erase(it);
+            delete lt; // supposedly joins the thread...
+
+            // might push_front on the list..
+            callMethod(onDataKey, dataVal);
+
+            log_debug("Completed load, _loadThreads have now " SIZET_FMT " elements", _loadThreads.size());
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    if ( _loadThreads.empty() ) 
+    {
+        log_debug("Clearing XML load checker interval timer");
+        vm.getRoot().clear_interval_timer(_loadCheckerTimer);
+        _loadCheckerTimer=0;
+    }
+}
+
+/* private static */
+as_value
+XML::checkLoads_wrapper(const fn_call& fn)
+{
+    log_debug("checkLoads_wrapper called");
+
+	boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
+	ptr->checkLoads();
+	return as_value();
 }
 
 // This reads in an XML file from disk and parses into into a memory resident
@@ -451,9 +521,10 @@ XML::load(const URL& url)
     if ( ! str.get() ) 
     {
         log_error(_("Can't load XML file: %s (security?)"), url.str().c_str());
-        as_value nullValue; nullValue.set_null();
-        callMethod(VM::get().getStringTable().find("onData"), nullValue);
         return false;
+        // TODO: this is still not correct.. we should still send onData later...
+        //as_value nullValue; nullValue.set_null();
+        //callMethod(VM::get().getStringTable().find(PROPNAME("onData")), nullValue);
     }
 
     log_msg(_("Loading XML file from url: '%s'"), url.str().c_str());
@@ -535,6 +606,14 @@ xml_load(const fn_call& fn)
   
     boost::intrusive_ptr<XML> xml_obj = ensureType<XML>(fn.this_ptr);
   
+    if ( ! fn.nargs )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("XML.load(): missing argument"));
+        );
+        return rv;
+    }
+
     const std::string& filespec = fn.arg(0).to_string();
 
     URL url(filespec, get_base_url());
@@ -832,26 +911,6 @@ void xml_class_init(as_object& global)
     // Register _global.String
     global.init_member("XML", cl.get());
 
-}
-
-// Callback function for xmlReadIO
-static int
-readFromTuFile (void * context, char * buffer, int len)
-{
-        tu_file* str = static_cast<tu_file*>(context);
-        size_t read = str->read_bytes(buffer, len);
-        if ( str->get_error() ) return -1;
-        else return read;
-}
-
-// Callback function for xmlReadIO
-static int
-closeTuFile (void * /*context*/)
-{
-        // nothing to do, the tu_file destructor will close
-        //tu_file* str = static_cast<tu_file*>(context);
-        //str->close();
-        return 0; // no error
 }
 
 #if 0 // not time for this (yet)

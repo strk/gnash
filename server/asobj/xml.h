@@ -26,21 +26,18 @@
 
 #include "event_id.h"
 #include "action.h"
-
-//#define DEBUG_MEMORY_ALLOCATION 1
-#include <vector>
-#include <sstream>
-
+#include "LoadThread.h"
 #include "xmlattrs.h"
 #include "xmlnode.h"
+#include "log.h"
 
-#ifdef DEBUG_MEMORY_ALLOCATION
-	#include "log.h"
-#endif
-
+#include <vector>
+#include <sstream>
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 #include <libxml/xmlreader.h>
+
+//#define DEBUG_MEMORY_ALLOCATION 1
 
 using namespace std;
 
@@ -49,6 +46,7 @@ namespace gnash {
 // Forward declarations
 class fn_call;
 class URL;
+class LoaderThread;
 
 /// XML class and ActionScript object
 class DSOLOCAL XML : public XMLNode
@@ -92,8 +90,7 @@ public:
 
     XML();
     XML(const std::string& xml_in);
-    XML(struct node * childNode);
-    virtual ~XML();
+    ~XML();
   
     /// This is overridden to provide the 'status' and 'loaded' members,
     /// which are NOT proper properties !
@@ -106,8 +103,8 @@ public:
     /// which are NOT proper properties !
     /// See actionscript.all/XML.as
     ///
-	void set_member(string_table::key name, const as_value& val,
-		string_table::key nsname = 0);
+    void set_member(string_table::key name, const as_value& val,
+                string_table::key nsname = 0);
 
     // Methods
 
@@ -138,13 +135,11 @@ public:
     // the XML object was successfully
     // loaded with XML.load() or
     // XML.sendAndLoad().
-
     bool loaded()    { return _loaded; }
     
     XMLNode *processNode(xmlTextReaderPtr reader, XMLNode *node);
 
     void  change_stack_frame(int frame, gnash::as_object *xml, gnash::as_environment *env);
-//    void  setupStackFrames(gnash::as_object *xml, gnash::as_environment *env);
 
     void  cleanupStackFrames( XMLNode *data);
 
@@ -163,8 +158,8 @@ public:
 
     void sendAndLoad();
 
-    int getBytesLoaded()         { return _bytes_loaded; };
-    int getBytesTotal()          { return _bytes_total; };
+    size_t getBytesLoaded() const;
+    size_t getBytesTotal() const;
 
 private:
 
@@ -199,10 +194,6 @@ private:
     //  1 if successfully loaded
     int _loaded;
 
-    size_t      _bytes_loaded;
- 
-    size_t      _bytes_total;
-    
     Status      _status;	
 
     /// Trigger the onLoad event, if any
@@ -230,6 +221,22 @@ private:
     void queueLoad(std::auto_ptr<tu_file> str);
 
     //static void _xmlErrorHandler(void *ctx, const char* fmt, ...);
+
+    typedef std::list<LoadThread*> LoadThreadList;
+
+    /// Queue of load requests
+    LoadThreadList _loadThreads; 
+
+    /// The load checker interval timer used to make loads async
+    unsigned int _loadCheckerTimer;
+
+    /// Wrapper around checkLoads for use as a Timer
+    /// interval for checking loads
+    static as_value checkLoads_wrapper(const fn_call& fn);
+
+    /// Scan the LoadThread queue (_loadThreads) to see if any of
+    /// them completed. If any did, invoke the onData event
+    void checkLoads();
 };
 
 

@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.49 2007/12/20 17:49:57 strk Exp $";
+rcsid="$Id: XML.as,v 1.50 2007/12/20 22:37:13 strk Exp $";
 
 #include "check.as"
 //#include "dejagnu.as"
@@ -712,7 +712,7 @@ myxml.onLoad = function(success)
 	if ( this.onLoadCalls == 2 )
 	{
 #if OUTPUT_VERSION < 6
-		xcheck_totals(262);
+		check_totals(262);
 #else
 		xcheck_totals(337);
 #endif
@@ -741,9 +741,9 @@ check_equals(typeof(myxml.LOADED), 'boolean');
 #else // OUTPUT_VERSION >= 7
 check_equals(typeof(myxml.LOADED), 'undefined');
 #endif // OUTPUT_VERSION >= 7
-xcheck(! myxml.loaded ); // is really loaded in a background thread
+check(! myxml.loaded ); // is really loaded in a background thread
 
-xcheck_equals(myxml.loaded, false ); // is really loaded in a background thread
+check_equals(myxml.loaded, false ); // is really loaded in a background thread
 note("myxml.loaded = "+myxml.loaded);
 note("myxml.load() returned "+ret);
 

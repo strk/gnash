@@ -1,5 +1,9 @@
 2007-12-20 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xml.{cpp,h}: don't abort on XML.load() [ no args ].
+	  Engage a thread for each load request.
+	* testsuite/actionscript.all/XML.as: the test is now sane, and
+	  have few more successes.
 	* libbase/LoadThread.{cpp,h}: (setupCache) fix current position
 	  and _completed computation, (reset) join thread.
 
