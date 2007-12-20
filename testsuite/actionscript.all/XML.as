@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.48 2007/11/14 12:08:12 bwy Exp $";
+rcsid="$Id: XML.as,v 1.49 2007/12/20 17:49:57 strk Exp $";
 
 #include "check.as"
 //#include "dejagnu.as"
@@ -281,7 +281,8 @@ check(XML);
 // Use escaped " instead of ' so that it matches xml_out (comments and CDATA tags stripped).
 var xml_in = "<TOPNODE tna1=\"tna1val\" tna2=\"tna2val\" tna3=\"tna3val\"><SUBNODE1 sna1=\"sna1val\" sna2=\"sna2val\"><SUBSUBNODE1 ssna1=\"ssna1val\" ssna2=\"ssna2val\"><!-- comment should be ignored-->sub sub1 node data 1</SUBSUBNODE1><SUBSUBNODE2><!--comment: cdata with illegal characters --><![CDATA[sub /\sub1 <br>\"node data 2\"]]></SUBSUBNODE2></SUBNODE1><SUBNODE2><SUBSUBNODE1>sub sub2 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub2 node data 2</SUBSUBNODE2></SUBNODE2></TOPNODE>";
 // with comments stripped out.
-var xml_out = "<TOPNODE tna1=\"tna1val\" tna2=\"tna2val\" tna3=\"tna3val\"><SUBNODE1 sna1=\"sna1val\" sna2=\"sna2val\"><SUBSUBNODE1 ssna1=\"ssna1val\" ssna2=\"ssna2val\">sub sub1 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub /\sub1 \<br\>\"node data 2\"</SUBSUBNODE2></SUBNODE1><SUBNODE2><SUBSUBNODE1>sub sub2 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub2 node data 2</SUBSUBNODE2></SUBNODE2></TOPNODE>";
+var xml_out = '<TOPNODE tna1="tna1val" tna2="tna2val" tna3="tna3val"><SUBNODE1 sna1="sna1val" sna2="sna2val"><SUBSUBNODE1 ssna1="ssna1val" ssna2="ssna2val">sub sub1 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub /sub1 &lt;br&gt;&quot;node data 2&quot;</SUBSUBNODE2></SUBNODE1><SUBNODE2><SUBSUBNODE1>sub sub2 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub2 node data 2</SUBSUBNODE2></SUBNODE2></TOPNODE>';
+//var xml_out = "<TOPNODE tna1=\"tna1val\" tna2=\"tna2val\" tna3=\"tna3val\"><SUBNODE1 sna1=\"sna1val\" sna2=\"sna2val\"><SUBSUBNODE1 ssna1=\"ssna1val\" ssna2=\"ssna2val\">sub sub1 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub /\sub1 \<br\>\"node data 2\"</SUBSUBNODE2></SUBNODE1><SUBNODE2><SUBSUBNODE1>sub sub2 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub2 node data 2</SUBSUBNODE2></SUBNODE2></TOPNODE>";
 
 
 check(XML);
@@ -441,7 +442,8 @@ check_equals(typeof(ret), 'undefined');
 tmp.checkParsed(); // onLoad won't be called
 //note("Parsed XML: "+tmp.toString());
 
-check_equals(tmp.toString(), xml_out);
+// TODO: FIX THIS !
+xcheck_equals(tmp.toString(), xml_out);
 
 //------------------------------------------------
 // Test XML editing
@@ -638,6 +640,8 @@ check_equals(typeof(myxml.onData), 'function');
 check(myxml.onData != XML.prototype.parseXML);
 #endif
 
+myxml.onLoadCalls = 0;
+
 myxml.onLoad = function(success)
 {
 	note("myxml.onLoad("+success+") called");
@@ -701,7 +705,22 @@ myxml.onLoad = function(success)
 		check_equals(myxml.childNodes.length, myxml.lastChildNodesCount);
 	}
 	xcheck_equals(myxml.childNodes.length, 3); // gnash fails discarding the comment and the ending blanks
+
+	// We're done
+	++this.onLoadCalls;
+	note("onLoad called "+this.onLoadCalls+" times");
+	if ( this.onLoadCalls == 2 )
+	{
+#if OUTPUT_VERSION < 6
+		xcheck_totals(262);
+#else
+		xcheck_totals(337);
+#endif
+		play();
+	}
+
 };
+
 check_equals(typeof(myxml.status), 'number');
 #if OUTPUT_VERSION < 7
 check_equals(typeof(myxml.STATUS), 'number');
@@ -777,15 +796,5 @@ myxml2.ignoreWhite = true;
 myxml2.parseXML("<X1> t </X1>");
 check_equals(myxml2.toString(), "<X1> t </X1>"); 
 
-// We're done
-#if OUTPUT_VERSION < 6
- // NOTE: tests inside onLoad are not counted here as onLoad handler
- //       should execute later !
- //       Gnash fails executing onLoad immediately
- xcheck_totals(230);
-#else
- // NOTE: tests inside onLoad are not counted here as onLoad handler
- //       should execute later !
- //       Gnash fails executing onLoad immediately
- xcheck_totals(301);
-#endif
+stop();
+

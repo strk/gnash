@@ -1,9 +1,16 @@
+2007-12-20 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/XML.as:
+	  Cleanup the test to actually check calls to onLoad handler.
+	  Gnash is failing, and I didn't bother to use xcheck as I plan
+	  to do more work on it later.
+
 2007-12-20 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* gui/fbsup.h, gui/fb.cpp: Calculate rowsize from virtual resolution
 	  instead from visible resolution   
 
-2007-12-19 Sandro Santilli <strk@keybit.net>
+2007-12-20 Sandro Santilli <strk@keybit.net>
 
 	* server/as_object.cpp: implement callMethod taking 3 args.
 	* server/asobj/MovieClipLoader.cpp: cleanup interfaces, send
