@@ -34,6 +34,7 @@
 #include "log.h"
 #include "URL.h" // for url parsing
 #include "VM.h" // for the string table.
+#include "string_table.h" // for the string table.
 #include "builtin_function.h"
 #include "Object.h" // for getObjectInterface
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
@@ -43,6 +44,7 @@
 #include <typeinfo> 
 #include <string>
 #include <set>
+#include <boost/algorithm/string/case_conv.hpp> // for PROPNAME 
 
 namespace gnash {
 
@@ -324,20 +326,30 @@ moviecliploader_new(const fn_call& /* fn */)
 static as_value
 moviecliploader_getprogress(const fn_call& fn)
 {
-  //log_msg(_("%s: nargs = %d"), __FUNCTION__, nargs);
-  
-  boost::intrusive_ptr<MovieClipLoader> ptr = ensureType<MovieClipLoader>(fn.this_ptr);
-  
-  boost::intrusive_ptr<as_object> target = fn.arg(0).to_object();
-  
-  struct mcl *mcl_data = ptr->getProgress(target.get());
+	//log_debug(_("%s: nargs = %d"), __FUNCTION__, nargs);
 
-  boost::intrusive_ptr<mcl_as_object> mcl_obj ( new mcl_as_object );
-
-  mcl_obj->init_member("bytesLoaded", mcl_data->bytes_loaded);
-  mcl_obj->init_member("bytesTotal",  mcl_data->bytes_total);
+	boost::intrusive_ptr<MovieClipLoader> ptr = ensureType<MovieClipLoader>(fn.this_ptr);
   
-  return as_value(mcl_obj.get()); // will store in a boost::intrusive_ptr
+	if ( ! fn.nargs )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("MovieClipLoader.getProgress(): missing argument"));
+		);
+		return as_value();
+	}
+
+	boost::intrusive_ptr<as_object> target = fn.arg(0).to_object();
+  
+	struct mcl *mcl_data = ptr->getProgress(target.get());
+
+	boost::intrusive_ptr<mcl_as_object> mcl_obj ( new mcl_as_object );
+
+	// We want these to be enumerable
+	string_table& st = ptr->getVM().getStringTable();
+	mcl_obj->set_member(st.find(PROPNAME("bytesLoaded")), mcl_data->bytes_loaded);
+	mcl_obj->set_member(st.find(PROPNAME("bytesTotal")),  mcl_data->bytes_total);
+  
+	return as_value(mcl_obj.get()); // will keep alive
 }
 
 void

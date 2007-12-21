@@ -1,3 +1,11 @@
+2007-12-20 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/MovieClipLoader.cpp: don't abort if getProgress
+	  is called w/out an argument, make the members of returned object
+	  enumerable.
+	* testsuite/actionscript.all/MovieClipLoader.as: test
+	  MovieClipLoader.getProgress.
+
 2007-12-20  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* server/asobj/SharedObject.cpp: Use the domain name as part of the

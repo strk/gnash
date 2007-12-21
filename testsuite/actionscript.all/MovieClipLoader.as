@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClipLoader.as,v 1.6 2007/12/20 14:28:50 strk Exp $";
+rcsid="$Id: MovieClipLoader.as,v 1.7 2007/12/21 02:27:53 strk Exp $";
 
 #include "check.as"
 
@@ -68,7 +68,7 @@ check(mcl.hasOwnProperty('_listeners'));
 MovieClipLoader.prototype.bm = MovieClipLoader.prototype.broadcastMessage;
 MovieClipLoader.prototype.broadcastMessage = function(arg1, arg2, arg3, arg4)
 {
-	note("Broadcasting "+arg1);
+	//note("Broadcasting "+arg1);
 	//this.bm(arg1, arg2, arg3, arg4);
 	this.bm.apply(this, arguments);
 };
@@ -126,11 +126,8 @@ resetState = function()
 };
 totalProgressCalls=0;
 
-mcl.onLoadError = function(target, msg, n)
+nextTestOrEnd = function()
 {
-	check_equals(arguments.length, 3);
-	check_equals(target, expected.target);
-	note("onLoadError called ("+msg+")");
 	if ( state.nextFunction == undefined )
 	{
 		// we don't know how many times onLoadProgress will be called
@@ -141,9 +138,10 @@ mcl.onLoadError = function(target, msg, n)
 		// the bug from supposedly subsequent callbacks, which check for
 		// a local flag set by the onLoadProgress handler.
 		//
-		progCallbackTests = totalProgressCalls*6;
+		var testsPerProgressCallback = 15;
+		progCallbackTests = totalProgressCalls*testsPerProgressCallback;
 		note("Number of onLoadProgress runs: "+totalProgressCalls+" - tests: "+progCallbackTests);
-		if ( expect.failtotals ) {
+		if ( expected.failtotals ) {
 			xcheck_totals(expected.totals + progCallbackTests);
 		} else {
 			check_totals(expected.totals + progCallbackTests);
@@ -154,6 +152,14 @@ mcl.onLoadError = function(target, msg, n)
 	{
 		state.nextFunction();
 	}
+};
+
+mcl.onLoadError = function(target, msg, n)
+{
+	check_equals(arguments.length, 3);
+	check_equals(target, expected.target);
+	note("onLoadError called ("+msg+")");
+	nextTestOrEnd();
 	//dumpObj(arguments);
 };
 
@@ -162,17 +168,37 @@ mcl.onLoadStart = function(target)
 	check_equals(arguments.length, 1);
 	check_equals(target, expected.target);
 	state.onLoadStartCalls++;
+	note("onLoadStart("+target+", "+target._url+") called");
 	//note("onLoadStart called with "+arguments.length+" args:"); dumpObj(arguments);
 };
 
 mcl.onLoadProgress = function(target, bytesLoaded, bytesTotal)
 {
+	//note("onLoadProgress("+target+", "+target._url+") called");
+
 	check_equals(arguments.length, 3);
 	check_equals(target, expected.target);
 	check_equals(state.onLoadStartCalls, 1);
 	check_equals(typeof(bytesLoaded), 'number')
 	check_equals(typeof(bytesTotal), 'number')
 	check(bytesTotal <= bytesTotal);
+
+	check_equals(this, mcl);
+
+	var tmp = this.getProgress();
+	check_equals(typeof(tmp), 'undefined');
+
+	var prog = this.getProgress(target);
+	check_equals(typeof(prog), 'object');
+	check_equals(prog.__proto__, undefined);
+	check_equals(prog.bytesLoaded, bytesLoaded);
+	check_equals(prog.bytesTotal, bytesTotal);
+	var progcopy = {}; var progcount=0;
+	for (var i in prog) { progcopy[i] = prog[i]; progcount++; }
+	check_equals(progcount, 2);
+	check_equals(progcopy.bytesLoaded, bytesLoaded);
+	check_equals(progcopy.bytesTotal, bytesTotal);
+
 	++state.onLoadProgressCalls;
 	++totalProgressCalls;
 	//note("onLoadProgress called with "+arguments.length+" args:"); dumpObj(arguments);
@@ -180,6 +206,7 @@ mcl.onLoadProgress = function(target, bytesLoaded, bytesTotal)
 
 mcl.onLoadComplete = function(target, n)
 {
+	note("onLoadComplete("+target+", "+target._url+") called");
 	check_equals(arguments.length, 2);
 	check_equals(target, expected.target);
 	check_equals(state.onLoadStartCalls, 1);
@@ -192,6 +219,7 @@ mcl.onLoadComplete = function(target, n)
 
 mcl.onLoadInit = function(target)
 {
+	note("onLoadInit("+target+", "+target._url+") called");
 	check_equals(arguments.length, 1);
 	check_equals(target, expected.target);
 	check_equals(state.onLoadStartCalls, 1);
@@ -201,30 +229,7 @@ mcl.onLoadInit = function(target)
 
 	//note("target.var1: "+target.var1);
 	//note("onLoadInit called with "+arguments.length+" args:"); dumpObj(arguments);
-	if ( state.nextFunction == undefined )
-	{
-		// we don't know how many times onLoadProgress will be called
-		// so we have that handler increment a totalProgressCalls and
-		// we use that value to  figure out how many tests to expect to
-		// be run (6 tests each onLoadProgress call).
-		// Note that if we miss to call onLoadProgress at all we'd catch
-		// the bug from supposedly subsequent callbacks, which check for
-		// a local flag set by the onLoadProgress handler.
-		//
-		progCallbackTests = totalProgressCalls*6;
-		note("Number of onLoadProgress runs: "+totalProgressCalls+" - tests: "+progCallbackTests);
-		if ( expect.failtotals ) {
-			xcheck_totals(expected.totals + progCallbackTests);
-		} else {
-			check_totals(expected.totals + progCallbackTests);
-		}
-		
-		play();
-	}
-	else
-	{
-		state.nextFunction();
-	}
+	nextTestOrEnd();
 };
 
 check( ! mcl.loadClip() );
@@ -263,12 +268,15 @@ function test3()
 	// onLoadProgress)
 	//
 	// subtract the number of progress callback runs reported when playing from the totals to get the correct number
+	// BUT MAKE SURE nextTestOrEnd CONTAINS THE CORRECT testsPerProgressCallback INFO !!
 	//
 	expected.totals = 57;
 	// gnash doesn't call onLoadInit if the data at the url is not an SWF or JPG
 	// (or whatever else can become a movie_instance), while the PP does.
 	// So in this testcase, the attempt to load vars.txt is invalid for Gnash
 	// (triggers onLoadError) 
+	// TODO: fix gnash to be compatible and find out if there's anything
+	//       actually dont for loadVariable-like data
 	//
 	expected.failtotals = true;
 
