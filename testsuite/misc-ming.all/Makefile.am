@@ -30,6 +30,7 @@ CLEANFILES =  \
 	testrun.log
 
 EXTRA_DIST = VarAndCharClashTest.as \
+	DragDropTest.as \
 	gotoFrame2Test.as \
 	DrawingApiTest.as \
 	FlashVarsTest.as \
