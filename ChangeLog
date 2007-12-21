@@ -1,3 +1,8 @@
+2007-12-20  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* server/asobj/SharedObject.cpp: Use the domain name as part of the
+	path for the .sol files. This avoids name collision.
+	
 2007-12-20 Sandro Santilli <strk@keybit.net>
 
 	* libbase/LoadThread.h: add warnings about getBytesTotal() use

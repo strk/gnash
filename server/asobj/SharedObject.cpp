@@ -21,6 +21,10 @@
 #include "config.h"
 #endif
 
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+
 #include "amf.h"
 #include "sol.h"
 #include "SharedObject.h"
@@ -46,6 +50,10 @@ gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 using namespace amf;
 
 namespace gnash {
+
+#ifndef MAXHOSTNAMELEN
+#define MAXHOSTNAMELEN 64
+#endif
 
 as_value sharedobject_clear(const fn_call& fn);
 as_value sharedobject_flush(const fn_call& fn);
@@ -198,10 +206,7 @@ sharedobject_flush(const fn_call& fn)
     PropsSerializer props(sol, vm);
     ptr->visitPropertyValues(props);
     // We only want to access files in this directory
-    string newspec = rcfile.getSOLSafeDir();
-    if (newspec.size() == 0) {
-        newspec = "./";
-    }
+    string newspec; 
     newspec += obj->getFilespec();
     sol.writeFile(newspec, obj->getObjectName().c_str());
     
@@ -238,9 +243,37 @@ sharedobject_getlocal(const fn_call& fn)
     string newspec = rcfile.getSOLSafeDir();
     if (newspec.size() == 0) {
         newspec = "./";
-    } 
+    }
+    
+    char *domain;
+    domain = new char[MAXHOSTNAMELEN+1];
+    memset(domain, 0, MAXHOSTNAMELEN+1);
+//     if (getdomainname(domain, MAXHOSTNAMELEN) == -1) {
+//         log_error("Couldn't get domain name! %s", strerror(errno));
+//     }
+
+
+    string url_s;
+    const URL& baseurl = get_base_url();
+    URL url(url_s, baseurl);
+    log_msg(_("BASE URL=%s (%s)"), baseurl.str().c_str(), url.hostname().c_str());
+    
+    if (url.hostname().size() == 0) {
+        strcpy(domain, "localhost");
+    }
+    
+    newspec += domain;
+    int ret = mkdir(newspec.c_str(), S_IRUSR|S_IWUSR|S_IXUSR);
+    newspec += "/";
+    if ((errno != EEXIST) && (ret != 0)) {
+        log_error("Couldn't create directory for .sol files: %s\n\t%s",
+                  newspec.c_str(), strerror(errno));
+        return as_value(false);
+    }
+    
     newspec += obj->getFilespec();
-    log_security("Opening SharedObject file: %s", newspec.c_str());    
+    obj->setFilespec(newspec);
+    log_security("Opening SharedObject file: %s", newspec.c_str());
 
     SOL sol;
     if (sol.readFile(newspec) == false) {
