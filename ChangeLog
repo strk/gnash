@@ -1,5 +1,14 @@
 2007-12-20 Sandro Santilli <strk@keybit.net>
 
+	* libbase/LoadThread.h: add warnings about getBytesTotal() use
+	  and a call for better documenting current behaviour.
+	* server/asobj/xml.cpp (checkLoad): drop the assertion completely
+	  and substitute with a check & log_debug. The assertion was
+	  about LoadThread::getBytesTotal() returning a number which would
+	  be fully available for a singleLoadThread::read() to consume...
+
+2007-12-20 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/xml.cpp (checkLoad): fixed typo in an assertion.
 
 2007-12-20 Sandro Santilli <strk@keybit.net>

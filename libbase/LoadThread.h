@@ -90,6 +90,19 @@ public:
 	long getBytesLoaded();
 
 	///	Returns the total size of the file
+	//
+	/// NOTE:
+	/// You can't rely on returned
+	/// value to know the exact size, as network
+	/// server (http/ftp) might return misleading
+	/// information about the size of a resource.
+	///
+	/// TODO:
+	/// Document current implementation when it
+	/// comes to read past that advertised size
+	/// or short of it... Reading the code is
+	/// discouraging for me (--strk)
+	///
 	long getBytesTotal();
 
 	/// Check if the load is completed
