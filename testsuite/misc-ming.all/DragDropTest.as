@@ -8,7 +8,7 @@
 //
 //
 
-rcsid="$Id: DragDropTest.as,v 1.3 2007/12/21 23:39:14 strk Exp $";
+rcsid="$Id: DragDropTest.as,v 1.4 2007/12/21 23:43:39 strk Exp $";
 
 #define info _root.note
 #define note _root.note
@@ -289,7 +289,13 @@ test10 = function()
 	_root.onMouseDown = function()
 	{
 		xcheck_equals(_root.draggable50._droptarget, "/loadedTarget/target100");
-        _root.draggable50.stopDrag(); // stop the drag here
+
+        // move the draggable over the first green square
+        _root.draggable50._x = _root.draggable50._y = 50;
+
+        // and stop the drag 
+        _root.draggable50.stopDrag();
+
 		test11();
 	};
 };
