@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.53 2007/12/21 00:10:12 strk Exp $";
+rcsid="$Id: XML.as,v 1.54 2007/12/21 17:29:51 strk Exp $";
 
 #include "check.as"
 //#include "dejagnu.as"
@@ -45,6 +45,7 @@ check(! XML.prototype.hasOwnProperty("loaded"));
 check(! XML.prototype.hasOwnProperty("attributes"));
 check(! XML.prototype.hasOwnProperty("nodeValue"));
 check(XML.prototype.hasOwnProperty("onData"));
+xcheck(XML.prototype.hasOwnProperty("onLoad")); // it seems it wouldn't do anything anyway, would it ?
 check(XML.prototype.hasOwnProperty("createElement") );
 check(XML.prototype.hasOwnProperty("addRequestHeader") );
 check(XML.prototype.hasOwnProperty("createTextNode") );
@@ -647,6 +648,8 @@ check_equals(typeof(myxml.onData), 'function');
 check(myxml.onData != XML.prototype.parseXML);
 #endif
 
+check(!myxml.hasOwnProperty('onLoad'));
+
 myxml.onLoadCalls = 0;
 
 myxml.onLoad = function(success)
@@ -719,9 +722,9 @@ myxml.onLoad = function(success)
 	if ( this.onLoadCalls == 2 )
 	{
 #if OUTPUT_VERSION < 6
-		check_totals(264);
+		check_totals(265);
 #else
-		check_totals(339);
+		check_totals(341);
 #endif
 		play();
 	}
