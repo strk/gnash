@@ -797,7 +797,7 @@ sprite_create_text_field(const fn_call& fn)
 	if ( txt_width < 0 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("createTextField: negative width (%g)"
+		log_aserror(_("createTextField: negative width (%d)"
 			" - reverting sign"), txt_width);
 		);
 		txt_width = -txt_width;
@@ -807,7 +807,7 @@ sprite_create_text_field(const fn_call& fn)
 	if ( txt_height < 0 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("createTextField: negative height (%g)"
+		log_aserror(_("createTextField: negative height (%d)"
 			" - reverting sign"), txt_height);
 		);
 		txt_height = -txt_height;
@@ -1323,10 +1323,10 @@ sprite_startDrag(const fn_call& fn)
 
         if ( fn.nargs >= 5)
         {
-            float y1 = PIXELS_TO_TWIPS(fn.arg(1).to_number());
-            float x1 = PIXELS_TO_TWIPS(fn.arg(2).to_number());
-            float y0 = PIXELS_TO_TWIPS(fn.arg(3).to_number());
-            float x0 = PIXELS_TO_TWIPS(fn.arg(4).to_number());
+            float x0 = PIXELS_TO_TWIPS(fn.arg(1).to_number());
+            float y0 = PIXELS_TO_TWIPS(fn.arg(2).to_number());
+            float x1 = PIXELS_TO_TWIPS(fn.arg(3).to_number());
+            float y1 = PIXELS_TO_TWIPS(fn.arg(4).to_number());
 
             // check for swapped values
             bool swapped = false;
@@ -1345,7 +1345,7 @@ sprite_startDrag(const fn_call& fn)
             IF_VERBOSE_ASCODING_ERRORS(
             if ( swapped ) {
                 std::stringstream ss; fn.dump_args(ss);
-                log_aserror(_("Y values in MovieClip.startDrag(%s) swapped, fixing"), ss.str().c_str());
+                log_aserror(_("min/max bbox values in MovieClip.startDrag(%s) swapped, fixing"), ss.str().c_str());
             }
             );
 

@@ -1,3 +1,8 @@
+2007-12-21 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (sprite_startDrag): get the bounding box
+	  arguments right.
+
 2007-12-20 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/MovieClipLoader.cpp: don't abort if getProgress
