@@ -1,5 +1,12 @@
 2007-12-20 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xmlnode.cpp: make XMLNode.attributes
+	  members enumerable.
+	* testsuite/actionscript.all/XML.as: test enumerability
+	  of XMLNode.attributes.
+
+2007-12-20 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/xmlnode.cpp: attributes are note instances
 	  of Object class.
 	* testsuite/actionscript.all/XML.as: few more fixes.

@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.52 2007/12/20 23:29:04 strk Exp $";
+rcsid="$Id: XML.as,v 1.53 2007/12/21 00:10:12 strk Exp $";
 
 #include "check.as"
 //#include "dejagnu.as"
@@ -325,9 +325,16 @@ tmp.checkParsed = function ()
 		check_equals(typeof(nextSibling), 'null');
 		check_equals(typeof(previousSibling), 'null');
 
+		// Check attributes
 		check_equals(typeof(attributes), 'object');
 		check_equals(attributes.tna1, 'tna1val');
 		check_equals(attributes.tna2, 'tna2val');
+		// Check attributes enumerability
+		var attrcopy = {};
+		for (var i in attributes) attrcopy[i] = attributes[i];
+		check_equals(attrcopy.tna1, 'tna1val');
+		check_equals(attrcopy.tna2, 'tna2val');
+		
 
 		// Check that nodeValue is overridable
 		nodeValue = 4;
@@ -712,9 +719,9 @@ myxml.onLoad = function(success)
 	if ( this.onLoadCalls == 2 )
 	{
 #if OUTPUT_VERSION < 6
-		check_totals(262);
+		check_totals(264);
 #else
-		check_totals(337);
+		check_totals(339);
 #endif
 		play();
 	}

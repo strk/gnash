@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.42 2007/12/20 23:29:04 strk Exp $ */
+/* $Id: xmlnode.cpp,v 1.43 2007/12/21 00:10:11 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -30,6 +30,8 @@
 #include "xmlnode.h"
 #include "log.h"
 #include "Object.h" // for getObjectInterface
+#include "VM.h" // for getting the string_table..
+#include "string_table.h" // ..for using the string_table
 
 #include <boost/algorithm/string/case_conv.hpp>
 
@@ -630,19 +632,27 @@ xmlnode_nodetype(const fn_call& fn)
 static as_value
 xmlnode_attributes(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
     
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
 
+    VM& vm = ptr->getVM();
+    string_table& st = vm.getStringTable();
+
     XMLNode::AttribList& attrs = ptr->attributes();
+    //log_debug("Node %p has %d attributes", (void*)ptr.get(), attrs.size());
+
     boost::intrusive_ptr<as_object> ret = new as_object(); // attributes are not Object types (getObjectInterface());
     for (XMLNode::AttribList::const_iterator it=attrs.begin(),
-         itEnd=attrs.end(); it != itEnd; ++it) {
+        itEnd=attrs.end(); it != itEnd; ++it)
+    {
 
-         const XMLAttr& at = *it;
-         const std::string& name = at.name();
-         const std::string& val = at.value();
-         ret->init_member(name, val);
+        const XMLAttr& at = *it;
+        const std::string& name = at.name();
+        const std::string& val = at.value();
+        //log_debug("%s: %s", name.c_str(), val.c_str());
+        // These must be enumerable !
+        ret->set_member(st.find(name), val);
     }
 
     return as_value(ret); 
