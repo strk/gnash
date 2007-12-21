@@ -1525,6 +1525,12 @@ DrawingApiTestRunner_DEPENDENCIES = \
 	DrawingApiTest.swf	\
 	$(NULL)
 
+DragDropTest.swf: $(srcdir)/DragDropTest.as Dejagnu.swf DragDropTestLoaded.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
+	$(MAKESWF) -r12 -o $@ -v6 -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 Dejagnu.swf $(srcdir)/DragDropTest.as
+
+DragDropTestLoaded.swf: $(srcdir)/DragDropTest.as Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
+	$(MAKESWF) -r12 -o $@ -v6 -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 -DLOADED_VERSION $(srcdir)/DragDropTest.as
+
 
 static_vs_dynamic1_SOURCES = \
 	static_vs_dynamic1.c \

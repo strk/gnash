@@ -1,5 +1,12 @@
 2007-12-21 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: Makefile.am, DragDropTest.as:
+	  Self-explaining testcase for _droptarget. Requires user
+	  interaction so will need a MovieTester based runner to
+	  be automated. Pretty nice test, give it a try ;P
+
+2007-12-21 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (sprite_startDrag): get the bounding box
 	  arguments right.
 
