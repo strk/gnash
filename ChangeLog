@@ -1,5 +1,14 @@
 2007-12-21 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.h: provide const versions of to_movie()
+	  and to_character().
+	* testsuite/misc-ming.all/DragDropTest.as: fix expected
+	  results.
+	* testsuite/misc-ming.all/: Makefile.am, DragDropTestRunner.cpp:
+	  Implemented test runner for DragDropTest.swf and enabled it.
+
+2007-12-21 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: Makefile.am, DragDropTest.as:
 	  Self-explaining testcase for _droptarget. Requires user
 	  interaction so will need a MovieTester based runner to

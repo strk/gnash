@@ -140,6 +140,7 @@ check_PROGRAMS = \
 	eventSoundTest1 \
 	eventSoundTest1-Runner \
 	DrawingApiTestRunner \
+	DragDropTestRunner   \
 	frame_label_test \
 	path_format_test \
 	callFunction_test \
@@ -1532,6 +1533,21 @@ DragDropTest.swf: $(srcdir)/DragDropTest.as Dejagnu.swf DragDropTestLoaded.swf M
 DragDropTestLoaded.swf: $(srcdir)/DragDropTest.as Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
 	$(MAKESWF) -r12 -o $@ -v6 -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 -DLOADED_VERSION $(srcdir)/DragDropTest.as
 
+DragDropTestRunner_SOURCES = \
+	DragDropTestRunner.cpp \
+	$(NULL)
+DragDropTestRunner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+DragDropTestRunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+DragDropTestRunner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	DragDropTest.swf	\
+	$(NULL)
+
 
 static_vs_dynamic1_SOURCES = \
 	static_vs_dynamic1.c \
@@ -1668,6 +1684,7 @@ TEST_CASES = \
 	loadMovieTestRunner \
 	eventSoundTest1-Runner \
 	DrawingApiTestRunner \
+	DragDropTestRunner   \
 	action_execution_order_test1runner \
 	action_execution_order_test2runner \
 	action_execution_order_test3runner \

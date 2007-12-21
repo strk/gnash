@@ -8,14 +8,14 @@
 //
 //
 
-rcsid="$Id: DragDropTest.as,v 1.1 2007/12/21 15:39:49 strk Exp $";
+rcsid="$Id: DragDropTest.as,v 1.2 2007/12/21 17:18:45 strk Exp $";
 
 #define info _root.note
 #define note _root.note
 #define fail_check _root.fail
 #define pass_check  _root.pass
 #define xfail_check _root.xfail
-#define xpass_check = _root.xpass
+#define xpass_check _root.xpass
 
 #ifdef LOADED_VERSION
 #define SUPPRESS_RCSID_DUMP
@@ -208,7 +208,7 @@ test2 = function()
 	note("2. Click on the FIRST RED circle.");
 	_root.onMouseDown = function()
 	{
-		check_equals(_root.draggable50._droptarget, "/target10");
+		xcheck_equals(_root.draggable50._droptarget, "/target10");
 		test3();
 	};
 };
@@ -218,7 +218,7 @@ test3 = function()
 	note("3. Click on the FIRST GREEN circle.");
 	_root.onMouseDown = function()
 	{
-		check_equals(_root.draggable50._droptarget, "/target20");
+		xcheck_equals(_root.draggable50._droptarget, "/target20");
 		test4();
 	};
 };
@@ -228,7 +228,7 @@ test4 = function()
 	note("4. Click on the FIRST BLUE circle.");
 	_root.onMouseDown = function()
 	{
-		check_equals(_root.draggable50._droptarget, "/target100");
+		xcheck_equals(_root.draggable50._droptarget, "/target100");
 		test5();
 	};
 };
@@ -238,7 +238,7 @@ test5 = function()
 	note("5. Click on the SECOND RED circle.");
 	_root.onMouseDown = function()
 	{
-		check_equals(_root.draggable50._droptarget, "_level50/target10");
+		xcheck_equals(_root.draggable50._droptarget, "_level50/target10");
 		test6();
 	};
 };
@@ -248,7 +248,7 @@ test6 = function()
 	note("6. Click on the SECOND GREEN circle.");
 	_root.onMouseDown = function()
 	{
-		check_equals(_root.draggable50._droptarget, "_level50/target20");
+		xcheck_equals(_root.draggable50._droptarget, "_level50/target20");
 		test7();
 	};
 };
@@ -258,7 +258,7 @@ test7 = function()
 	note("7. Click on the SECOND BLUE circle.");
 	_root.onMouseDown = function()
 	{
-		check_equals(_root.draggable50._droptarget, "_level50/target100");
+		xcheck_equals(_root.draggable50._droptarget, "_level50/target100");
 		test8();
 	};
 };
@@ -268,7 +268,7 @@ test8 = function()
 	note("8. Click on the THIRD RED circle.");
 	_root.onMouseDown = function()
 	{
-		check_equals(_root.draggable50._droptarget, "/loadedTarget/target10");
+		xcheck_equals(_root.draggable50._droptarget, "/loadedTarget/target10");
 		test9();
 	};
 };
@@ -278,7 +278,7 @@ test9 = function()
 	note("9. Click on the THIRD GREEN circle.");
 	_root.onMouseDown = function()
 	{
-		check_equals(_root.draggable50._droptarget, "/loadedTarget/target20");
+		xcheck_equals(_root.draggable50._droptarget, "/loadedTarget/target20");
 		test10();
 	};
 };
@@ -288,7 +288,7 @@ test10 = function()
 	note("10. Click on the THIRD BLUE circle.");
 	_root.onMouseDown = function()
 	{
-		check_equals(_root.draggable50._droptarget, "/loadedTarget/target100");
+		xcheck_equals(_root.draggable50._droptarget, "/loadedTarget/target100");
 		test11();
 	};
 };
@@ -306,6 +306,7 @@ test11 = function()
 
 endOfTest = function()
 {
+	_root.ENDOFTEST = true;
 	note("END OF TEST");
 	check_totals(11);
 	_root.onMouseDown = undefined;

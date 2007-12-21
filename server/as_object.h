@@ -621,11 +621,15 @@ public:
 	/// Cast to a sprite, or return NULL
 	virtual sprite_instance* to_movie() { return NULL; }
 
+	const sprite_instance* to_movie() const { return const_cast<as_object*>(this)->to_movie(); }
+
 	/// Cast to a as_function, or return NULL
 	virtual as_function* to_function() { return NULL; }
 
 	/// Cast to a character, or return NULL
 	virtual character* to_character() { return NULL; }
+
+	const character* to_character() const { return const_cast<as_object*>(this)->to_character(); }
 
 	/// Return true if this is a Date object.
 	//
