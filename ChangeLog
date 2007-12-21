@@ -1,5 +1,11 @@
 2007-12-21 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: DragDropTest.as,
+	  DragDropTestRunner.cpp: improved the test to verify
+	  persistance of _droptarget after stopDrag().
+
+2007-12-21 Sandro Santilli <strk@keybit.net>
+
 	* server/as_object.h: provide const versions of to_movie()
 	  and to_character().
 	* testsuite/misc-ming.all/DragDropTest.as: fix expected

@@ -157,8 +157,8 @@ main(int /*argc*/, char** /*argv*/)
 	tester.movePointerTo(bc3.x, bc3.y);
 	tester.click(); 
 
-	// 11. Click OUTSIDE of any drawing (this is last thing).
-	tester.movePointerTo(out.x, out.y);
+	// 11. Click ANYWHERE OUT of the THIRD BLUE circle (on another circle makes a better test)
+	tester.movePointerTo(rc1.x, rc1.y);
 	tester.click();
 
 	// Consistency check !!

@@ -8,7 +8,7 @@
 //
 //
 
-rcsid="$Id: DragDropTest.as,v 1.2 2007/12/21 17:18:45 strk Exp $";
+rcsid="$Id: DragDropTest.as,v 1.3 2007/12/21 23:39:14 strk Exp $";
 
 #define info _root.note
 #define note _root.note
@@ -289,16 +289,17 @@ test10 = function()
 	_root.onMouseDown = function()
 	{
 		xcheck_equals(_root.draggable50._droptarget, "/loadedTarget/target100");
+        _root.draggable50.stopDrag(); // stop the drag here
 		test11();
 	};
 };
 
 test11 = function()
 {
-	note("11. Click OUTSIDE of any drawing (this is last thing).");
+	note("11. Click ANYWHERE OUT of the THIRD BLUE circle (on another circle makes a better test)");
 	_root.onMouseDown = function()
 	{
-		check_equals(_root.draggable50._droptarget, "");
+		xcheck_equals(_root.draggable50._droptarget, "/loadedTarget/target100");
 		endOfTest();
 	};
 };
