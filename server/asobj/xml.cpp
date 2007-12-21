@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.60 2007/12/21 00:55:24 strk Exp $ */
+/* $Id: xml.cpp,v 1.61 2007/12/21 01:36:48 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -477,7 +477,7 @@ XML::checkLoads()
 				// possibility which lacks documentation (thus a bug in documentation)
 				//
 				log_debug("LoadThread::getBytesTotal() returned %d but ::read(%d) returned %d",
-					xmlsize, actuallyRead);
+					xmlsize, xmlsize, actuallyRead);
 			}
             buf[actuallyRead] = '\0';
             as_value dataVal(buf.get()); // memory copy here (optimize?)
