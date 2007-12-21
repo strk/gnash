@@ -24,6 +24,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <boost/tokenizer.hpp>
 
 #include "amf.h"
 #include "sol.h"
@@ -48,6 +49,7 @@ gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 }
 
 using namespace amf;
+using namespace boost;
 
 namespace gnash {
 
@@ -256,20 +258,44 @@ sharedobject_getlocal(const fn_call& fn)
     string url_s;
     const URL& baseurl = get_base_url();
     URL url(url_s, baseurl);
-    log_msg(_("BASE URL=%s (%s)"), baseurl.str().c_str(), url.hostname().c_str());
+//    log_msg(_("BASE URL=%s (%s)"), baseurl.str().c_str(), url.hostname().c_str());
     
     if (url.hostname().size() == 0) {
         strcpy(domain, "localhost");
     }
-    
+
     newspec += domain;
-    int ret = mkdir(newspec.c_str(), S_IRUSR|S_IWUSR|S_IXUSR);
-    newspec += "/";
-    if ((errno != EEXIST) && (ret != 0)) {
-        log_error("Couldn't create directory for .sol files: %s\n\t%s",
-                  newspec.c_str(), strerror(errno));
-        return as_value(false);
+    newspec += "/";    
+    if (obj->getFilespec().find("/", 0) != string::npos) {
+        typedef tokenizer<char_separator<char> > Tok;
+        char_separator<char> sep("/");
+        Tok t(obj->getFilespec(), sep);
+        tokenizer<char_separator <char> >::iterator tit;
+        string newdir = newspec;
+        for(tit=t.begin(); tit!=t.end();++tit){
+            cout << *tit << "\n";
+            newdir += *tit;
+            if (newdir.find("..", 0 != string::npos)) {
+                return as_value(false);
+            }
+            if (newdir.rfind(".sol", newdir.size()) == string::npos) {
+                int ret = mkdir(newdir.c_str(), S_IRUSR|S_IWUSR|S_IXUSR);
+                if ((errno != EEXIST) && (ret != 0)) {
+                    log_error("Couldn't create directory for .sol files: %s\n\t%s",
+                              newdir.c_str(), strerror(errno));
+                    return as_value(false);
+                }
+            }
+            newdir += "/";
+        }
     }
+    
+//     int ret = mkdir(newspec.c_str(), S_IRUSR|S_IWUSR|S_IXUSR);
+//     if ((errno != EEXIST) && (ret != 0)) {
+//         log_error("Couldn't create directory for .sol files: %s\n\t%s",
+//                   newspec.c_str(), strerror(errno));
+//         return as_value(false);
+//     }
     
     newspec += obj->getFilespec();
     obj->setFilespec(newspec);
