@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.58 2007/12/20 22:37:13 strk Exp $ */
+/* $Id: xml.cpp,v 1.59 2007/12/21 00:39:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -471,7 +471,7 @@ XML::checkLoads()
             size_t xmlsize = lt->getBytesTotal();
             boost::scoped_array<char> buf(new char[xmlsize+1]);
             size_t actuallyRead = lt->read(buf.get(), xmlsize);
-            assert(actuallyRead = xmlsize);
+            assert(actuallyRead == xmlsize);
             buf[xmlsize] = '\0';
             as_value dataVal(buf.get()); // memory copy here (optimize?)
 

@@ -1,5 +1,9 @@
 2007-12-20 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xml.cpp (checkLoad): fixed typo in an assertion.
+
+2007-12-20 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/xmlnode.cpp: make XMLNode.attributes
 	  members enumerable.
 	* testsuite/actionscript.all/XML.as: test enumerability
