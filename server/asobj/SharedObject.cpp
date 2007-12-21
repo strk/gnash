@@ -226,10 +226,12 @@ sharedobject_getlocal(const fn_call& fn)
     static boost::intrusive_ptr<SharedObject> obj = new SharedObject();
     
     string::size_type pos;
-    
+    string rootdir;
     if (fn.nargs > 0) {
-        std::string filespec = fn.arg(0).to_string();
-        
+        string filespec = fn.arg(0).to_string();
+        // If there is a second argument to getLocal(), it replaces
+        // the default path, which is the swf file name, with this
+        // supplied path.
         // the object name appears to be the same as the file name, but
         // minus the suffix. 
         if ((pos = filespec.find(".sol", 0) == string::npos)) {
@@ -266,6 +268,15 @@ sharedobject_getlocal(const fn_call& fn)
 
     newspec += domain;
     newspec += "/";    
+    if (fn.nargs == 2) {
+        rootdir = fn.arg(1).to_string();
+//        log_msg("The root dir is now %s", rootdir.c_str());
+        newspec += rootdir;
+    } else {
+        log_debug("If I had my swf filename. I'd be writing it to the .sol file path");
+    }
+    newspec += "/";    
+        
     if (obj->getFilespec().find("/", 0) != string::npos) {
         typedef tokenizer<char_separator<char> > Tok;
         char_separator<char> sep("/");
@@ -275,9 +286,10 @@ sharedobject_getlocal(const fn_call& fn)
         for(tit=t.begin(); tit!=t.end();++tit){
             cout << *tit << "\n";
             newdir += *tit;
-            if (newdir.find("..", 0 != string::npos)) {
+            if (newdir.find("..", 0) != string::npos) {
                 return as_value(false);
             }
+            // Don't try to create a directory of the .sol file name!
             if (newdir.rfind(".sol", newdir.size()) == string::npos) {
                 int ret = mkdir(newdir.c_str(), S_IRUSR|S_IWUSR|S_IXUSR);
                 if ((errno != EEXIST) && (ret != 0)) {
