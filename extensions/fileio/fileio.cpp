@@ -27,6 +27,7 @@
 
 #include <dirent.h> // used by scandir()
 #include <unistd.h> // used by unlink()
+#include <fcntl.h>  // used by asyncmode()
 
 #include "VM.h"
 #include "log.h"
@@ -60,6 +61,7 @@ as_value fileio_ftell(const fn_call& fn);
 as_value fileio_feof(const fn_call& fn);
 as_value fileio_fseek(const fn_call& fn);
 as_value fileio_unlink(const fn_call& fn);
+as_value fileio_asyncmode(const fn_call& fn);
 
 // <Udo> I needed a scandir() function and implemented it here for simplicity.
 // Maybe this should be moved to a dedicated extension and a different class? 
@@ -92,6 +94,7 @@ attachInterface(as_object& obj)
     obj.init_member("fflush", new builtin_function(fileio_fflush));
     obj.init_member("fseek", new builtin_function(fileio_fseek));
     obj.init_member("ftell", new builtin_function(fileio_ftell));
+    obj.init_member("asyncmode", new builtin_function(fileio_asyncmode));
     obj.init_member("feof", new builtin_function(fileio_feof));
     obj.init_member("fclose", new builtin_function(fileio_fclose));
     
@@ -191,6 +194,28 @@ Fileio::ftell()
         return ::ftell(_stream);
     }
     return -1;
+}
+
+bool
+Fileio::asyncmode(bool async)
+{
+//    GNASH_REPORT_FUNCTION;
+    if (_stream) {
+    
+        int fd = fileno(_stream);
+        
+        long flags = fcntl(fd, F_GETFL);
+        
+        int res;
+    
+        if (async)
+          res = fcntl(fd, F_SETFL, flags|O_NONBLOCK);
+        else
+          res = fcntl(fd, F_SETFL, flags&(~O_NONBLOCK));
+          
+        return res>=0;
+    }
+    return false;
 }
 
 bool
@@ -395,8 +420,15 @@ fileio_fgetc(const fn_call& fn)
     boost::intrusive_ptr<Fileio> ptr = ensureType<Fileio>(fn.this_ptr);
     assert(ptr);
     int i = ptr->fgetc();
-    char *c = reinterpret_cast<char *>(&i);
-    return as_value(c);
+    
+    if ((i==EOF) || (i<0)) 
+    {
+      return as_value(false);  // possible in async mode
+    } else {
+      char c[2]="x"; // set to 1 char to get the zero byte!
+      c[0] = i;
+      return as_value(c);
+    }
 }
 
 as_value
@@ -510,6 +542,16 @@ fileio_ftell(const fn_call& fn)
     assert(ptr);
     int i = ptr->ftell();
     return as_value(i);
+}
+
+as_value 
+fileio_asyncmode(const fn_call& fn)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::intrusive_ptr<Fileio> ptr = ensureType<Fileio>(fn.this_ptr);
+    assert(ptr);
+    bool b = (bool) fn.arg(0).to_bool();
+    return as_value(ptr->asyncmode(b));
 }
 
 as_value

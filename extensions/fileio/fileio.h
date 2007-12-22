@@ -52,6 +52,7 @@ public:
     int fseek(long offset);
     int fseek(long offset, int whence);
     long ftell();
+    bool asyncmode(bool async); 
     bool feof();
     bool unlink(const std::string &filespec);
     void scandir(const std::string& dir, as_value* result);    
