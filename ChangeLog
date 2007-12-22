@@ -1,3 +1,8 @@
+2007-12-23 Sandro Santilli <strk@keybit.net>
+
+	* utilities/dumpshm.cpp: ISO C++ forbids variable-size array 'buf'
+	  (unused, btw)
+
 2007-12-22  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* utilities/dumpshm.cpp: Add support to dump LocalConnection files

@@ -333,7 +333,7 @@ dump_shm(bool convert)
     // If the -c convert options was specified, dump the memory segment to disk.
     // This makes it easy to store them as well as to examine them in great detail.
     if (convert) {
-	char buf[size+1];
+	//char buf[size+1];
 	int fd = open("segment.raw",O_WRONLY|O_CREAT, S_IRWXU);
 	if (fd == -1) {
 	    perror("open");
