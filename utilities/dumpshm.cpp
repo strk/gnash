@@ -15,28 +15,24 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-//
-
-
-/* $Id: dumpshm.cpp,v 1.14 2007/09/05 01:51:32 nihilus Exp $ */
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <stdarg.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
+
 
 extern "C"{
-	#include <unistd.h>
+#include <unistd.h>
 #ifdef HAVE_GETOPT_H
-	#include <getopt.h>
+#include <getopt.h>
 #endif
 #ifndef __GNUC__
-	extern int optind, getopt(int, char *const *, const char *);
-	extern char *optarg;
+extern int optind, getopt(int, char *const *, const char *);
+extern char *optarg;
 #endif
 }
 #include <dirent.h>
@@ -61,6 +57,7 @@ extern "C"{
 #include <strstream>
 #endif
 #include <cstdio>
+#include <cerrno>
 
 #ifdef ENABLE_NLS
 #include <locale.h>
@@ -76,12 +73,13 @@ using namespace gnash;
 
 static void usage (void);
 void dump_ctrl(void *ptr);
+void dump_shm(bool convert);
 
 const int PIDSTART = 20000;
 const int PIDEND   = 23000;
 const int LINELEN  = 80;
 const unsigned int LOOPCNT  = 5;
-const int DEFAULT_SHM_SIZE = 1024;
+const int DEFAULT_SHM_SIZE = 65535;
 
 int
 main(int argc, char *argv[])
@@ -92,6 +90,8 @@ main(int argc, char *argv[])
     bool                  nuke  = false;
     bool                  listfiles  = false;
     bool                  force = false;
+    bool		  sysv = false;
+    bool		  convert = false;
     int                   size  = 0;
     string                filespec, realname, tmpname;
     struct dirent         *entry;
@@ -110,7 +110,7 @@ main(int argc, char *argv[])
     textdomain (PACKAGE);
 #endif
     /* This initializes the DBG_MSG macros */ 
-    while ((c = getopt (argc, argv, "hdnl:if")) != -1) {
+    while ((c = getopt (argc, argv, "hdnl:ifrc")) != -1) {
         switch (c) {
           case 'h':
             usage ();
@@ -118,6 +118,16 @@ main(int argc, char *argv[])
             
           case 'f':
             force = true;
+            break;
+            
+          case 'r':
+            sysv = true;
+            convert = false;
+            break;
+            
+          case 'c':
+            sysv = true;
+            convert = true;
             break;
             
           case 'i':
@@ -160,6 +170,11 @@ main(int argc, char *argv[])
         filespec = argv[optind];
         cout << "Will use \"" << filespec << "\" for memory segment file"
              << endl;
+    }
+
+    if (sysv) {
+	dump_shm(convert);
+	exit(0);
     }
     
     DIR *library_dir = NULL;
@@ -284,7 +299,51 @@ main(int argc, char *argv[])
 //        in.read(reinterpret_cast<char*>(memblks), mmptr->blockCountGet());
 //        tmpptr[1] = reinterpret_cast<long>(memblks);        
 //        mmptr->memBlocksSet(memblks);
+	 
     }
+
+//     const char *item = shmptr + 40976;
+//     while (*item != 0) {
+// 	cerr << "Listener: " << item << endl;
+// 	item += strlen(item) + 1;
+//     }    
+}
+
+// Dump the older style SYS V shared memory segments
+void
+dump_shm(bool convert)
+{
+// These are here for debugging purposes. It
+//     key_t key1 = 0x0056a4d5;		// size is 488
+//     key_t key2 = 0x0056a4d6;		// size is 131072
+//     int size1 = 488;
+//     int size2 = 131072;
+    int id; 
+    char *shmaddr;
+    key_t key = 0xdd3adabd;		// size is 64528
+    int size = 64528;			// 1007 bytes less than unsigned
+    int flags = 0660 | IPC_CREAT;
+    
+    id = shmget(key, size, flags);
+    
+    shmaddr = (char *)shmat (id, 0, SHM_RDONLY); // attach segment for reading
+    if (shmaddr == (char *) -1)
+	perror ("shmat");	
+    
+    // If the -c convert options was specified, dump the memory segment to disk.
+    // This makes it easy to store them as well as to examine them in great detail.
+    if (convert) {
+	char buf[size+1];
+	int fd = open("segment.raw",O_WRONLY|O_CREAT, S_IRWXU);
+	if (fd == -1) {
+	    perror("open");
+	}
+	write(fd, shmaddr, size);
+	close(fd);
+    }
+    
+    shmdt (shmaddr);		// detach segment
+    exit (0);			// quit leaving resource allocated
 }
 
 /// \brief  Display the command line arguments
@@ -299,6 +358,8 @@ usage (void)
     cerr << _("-n [optional name]\tNuke everything") << endl;
     cerr << _("-l\tLength of segment") << endl;
     cerr << _("-i\tList segments") << endl;
+    cerr << _("-r\tDump SYSV segments") << endl;
+    cerr << _("-c\tDump SYSV segments to disk") << endl;
     cerr << _("-f\tForce to use builtin names for nuke") << endl;
     exit (-1);
 }
