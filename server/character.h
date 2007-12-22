@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.116 2007/12/19 20:40:31 strk Exp $ */
+/* $Id: character.h,v 1.117 2007/12/22 00:24:41 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -710,7 +710,7 @@ public:
 	/// Point coordinates are in world TWIPS
 	///
 	/// The default implementation returns false if the character is
-	/// not visible, calling pointInBounds() otherwise.
+	/// not visible, calling pointInShape() otherwise.
 	///
 	/// Note that this is good for simple characters but needs
 	/// to be overridden for characters with childs. When a
