@@ -73,6 +73,8 @@ class Level5
 			endFill();
 		};
 
+                check_equals(mc.ch._target, "_level5/ch");
+
                 // load yet another swf
                 getURL("level99.swf","_level"+99);
 	}

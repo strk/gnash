@@ -8,7 +8,7 @@
 //
 //
 
-rcsid="$Id: DragDropTest.as,v 1.4 2007/12/21 23:43:39 strk Exp $";
+rcsid="$Id: DragDropTest.as,v 1.5 2007/12/23 22:29:57 strk Exp $";
 
 #define info _root.note
 #define note _root.note
@@ -208,7 +208,7 @@ test2 = function()
 	note("2. Click on the FIRST RED circle.");
 	_root.onMouseDown = function()
 	{
-		xcheck_equals(_root.draggable50._droptarget, "/target10");
+		check_equals(_root.draggable50._droptarget, "/target10");
 		test3();
 	};
 };
@@ -218,7 +218,7 @@ test3 = function()
 	note("3. Click on the FIRST GREEN circle.");
 	_root.onMouseDown = function()
 	{
-		xcheck_equals(_root.draggable50._droptarget, "/target20");
+		check_equals(_root.draggable50._droptarget, "/target20");
 		test4();
 	};
 };
@@ -228,7 +228,7 @@ test4 = function()
 	note("4. Click on the FIRST BLUE circle.");
 	_root.onMouseDown = function()
 	{
-		xcheck_equals(_root.draggable50._droptarget, "/target100");
+		check_equals(_root.draggable50._droptarget, "/target100");
 		test5();
 	};
 };
@@ -238,7 +238,7 @@ test5 = function()
 	note("5. Click on the SECOND RED circle.");
 	_root.onMouseDown = function()
 	{
-		xcheck_equals(_root.draggable50._droptarget, "_level50/target10");
+		check_equals(_root.draggable50._droptarget, "_level50/target10"); 
 		test6();
 	};
 };
@@ -248,7 +248,7 @@ test6 = function()
 	note("6. Click on the SECOND GREEN circle.");
 	_root.onMouseDown = function()
 	{
-		xcheck_equals(_root.draggable50._droptarget, "_level50/target20");
+		check_equals(_root.draggable50._droptarget, "_level50/target20"); 
 		test7();
 	};
 };
@@ -258,7 +258,7 @@ test7 = function()
 	note("7. Click on the SECOND BLUE circle.");
 	_root.onMouseDown = function()
 	{
-		xcheck_equals(_root.draggable50._droptarget, "_level50/target100");
+		check_equals(_root.draggable50._droptarget, "_level50/target100");
 		test8();
 	};
 };
@@ -268,7 +268,7 @@ test8 = function()
 	note("8. Click on the THIRD RED circle.");
 	_root.onMouseDown = function()
 	{
-		xcheck_equals(_root.draggable50._droptarget, "/loadedTarget/target10");
+		check_equals(_root.draggable50._droptarget, "/loadedTarget/target10");
 		test9();
 	};
 };
@@ -278,7 +278,7 @@ test9 = function()
 	note("9. Click on the THIRD GREEN circle.");
 	_root.onMouseDown = function()
 	{
-		xcheck_equals(_root.draggable50._droptarget, "/loadedTarget/target20");
+		check_equals(_root.draggable50._droptarget, "/loadedTarget/target20");
 		test10();
 	};
 };
@@ -288,7 +288,7 @@ test10 = function()
 	note("10. Click on the THIRD BLUE circle.");
 	_root.onMouseDown = function()
 	{
-		xcheck_equals(_root.draggable50._droptarget, "/loadedTarget/target100");
+		check_equals(_root.draggable50._droptarget, "/loadedTarget/target100");
 
         // move the draggable over the first green square
         _root.draggable50._x = _root.draggable50._y = 50;
@@ -305,8 +305,8 @@ test11 = function()
 	note("11. Click ANYWHERE OUT of the THIRD BLUE circle (on another circle makes a better test)");
 	_root.onMouseDown = function()
 	{
-		xcheck_equals(_root.draggable50._droptarget, "/loadedTarget/target100");
-		endOfTest();
+		check_equals(_root.draggable50._droptarget, "/loadedTarget/target100");
+		endOfTest(); // TODO: test that moving the draggable out of any drawing changes _droptarget to the empty string
 	};
 };
 

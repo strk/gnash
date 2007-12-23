@@ -307,6 +307,8 @@ public:
 	///
 	template <class V>
 	inline void visitBackward(V& visitor);
+	template <class V>
+	inline void visitBackward(V& visitor) const;
 
 	/// \brief 
 	/// Visit each and all character in the list.
@@ -437,6 +439,19 @@ DisplayList::visitBackward(V& visitor)
 		it != itEnd; ++it)
 	{
 		DisplayItem& di = *it;
+		if ( ! visitor(di.get()) ) break;
+	}
+}
+
+template <class V>
+void
+DisplayList::visitBackward(V& visitor) const
+{
+	for (const_reverse_iterator it = _charsByDepth.rbegin(),
+			itEnd = _charsByDepth.rend();
+		it != itEnd; ++it)
+	{
+		const DisplayItem& di = *it;
 		if ( ! visitor(di.get()) ) break;
 	}
 }

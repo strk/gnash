@@ -1410,6 +1410,8 @@ static as_value
 sprite_droptarget_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
+
+	return ptr->getDropTarget();
 	UNUSED(ptr);
 
 	static bool warned = false;
@@ -3082,6 +3084,72 @@ sprite_instance::get_topmost_mouse_entity(float x, float y)
 	}
 
 	return ch; // might be NULL
+}
+
+/// Find the first visible character whose shape contain the point
+/// and is not the character being dragged or any of its childs
+//
+/// Point coordinates in world TWIPS
+///
+class DropTargetFinder {
+
+	float _x;
+	float _y;
+	character* _dragging;
+	const character* _dropch;
+
+public:
+
+	DropTargetFinder(float x, float y, character* dragging)
+		:
+		_x(x),
+		_y(y),
+		_dragging(dragging),
+		_dropch(0)
+	{}
+
+	bool operator() (const character* ch)
+	{
+		const character* dropChar = ch->findDropTarget(_x, _y, _dragging);
+		if ( dropChar )
+		{
+			_dropch = dropChar;
+			return false;
+		}
+		else return true;
+	}
+
+	const character* getDropChar() const { return _dropch; }
+};
+
+const character*
+sprite_instance::findDropTarget(float x, float y, character* dragging) const
+{
+	//GNASH_REPORT_FUNCTION;
+
+	if ( this == dragging ) return 0; // not here...
+
+	if ( ! get_visible() ) return 0; // isn't me !
+
+	DropTargetFinder finder(x, y, dragging);
+	m_display_list.visitBackward(finder);
+
+	// does it hit any child ?
+	const character* ch = finder.getDropChar();
+	if ( ch )
+	{
+		// TODO: find closest actionscript referenceable container
+		//       (possibly itself)
+		return ch;
+	}
+
+	// does it hit us ?
+	if ( _drawable_inst->pointInVisibleShape(x, y) )
+	{
+		return this;
+	}
+
+	return NULL;
 }
 
 bool

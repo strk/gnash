@@ -750,9 +750,30 @@ movie_root::fire_mouse_event()
 
 	assert(testInvariant());
 
+    float x = PIXELS_TO_TWIPS(m_mouse_x);
+    float y = PIXELS_TO_TWIPS(m_mouse_y);
+
     // Generate a mouse event
-    m_mouse_button_state.m_topmost_entity = getTopmostMouseEntity(PIXELS_TO_TWIPS(m_mouse_x), PIXELS_TO_TWIPS(m_mouse_y));
+    m_mouse_button_state.m_topmost_entity = getTopmostMouseEntity(x, y);
     m_mouse_button_state.m_mouse_button_state_current = (m_mouse_buttons & 1);
+
+    // Set _droptarget if dragging a sprite
+    sprite_instance* dragging = 0;
+    character* draggingChar = m_drag_state.getCharacter();
+    if ( draggingChar ) dragging = draggingChar->to_movie();
+    if ( dragging )
+    {
+	// TODO: optimize making findDropTarget and getTopmostMouseEntity
+	//       use a single scan.
+        const character* dropChar = findDropTarget(x, y, dragging);
+        if ( dropChar )
+        {
+            // TODO: use target of closest script character containing this
+            dragging->setDropTarget(dropChar->getTargetPath());
+        }
+	else dragging->setDropTarget("");
+
+    }
 
     bool need_redraw = generate_mouse_button_events(&m_mouse_button_state);
 
@@ -1440,6 +1461,17 @@ movie_root::getTopmostMouseEntity(float x, float y)
 	for (Levels::reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
 	{
 		character* ret = i->second->get_topmost_mouse_entity(x, y);
+		if ( ret ) return ret;
+	}
+	return NULL;
+}
+
+const character *
+movie_root::findDropTarget(float x, float y, character* dragging) const
+{
+	for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
+	{
+		const character* ret = i->second->findDropTarget(x, y, dragging);
 		if ( ret ) return ret;
 	}
 	return NULL;

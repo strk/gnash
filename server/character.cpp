@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.70 2007/12/18 21:28:58 strk Exp $ */
+/* $Id: character.cpp,v 1.71 2007/12/23 22:29:56 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -722,6 +722,7 @@ character::computeTargetPath() const
 	Path path;
 
 	// Build parents stack
+	const character* topLevel = 0;
 	const character* ch = this;
 	for (;;)
 	{
@@ -732,12 +733,15 @@ character::computeTargetPath() const
 		{
 			// it is completely legal to set root's _name
 			//assert(ch->get_name().empty());
+			topLevel = ch;
 			break;
 		}
 
 		path.push_back(ch->get_name());
 		ch = parent;
 	} 
+
+	assert(topLevel);
 
 	if ( path.empty() )
 	{
@@ -749,6 +753,12 @@ character::computeTargetPath() const
 
 	// Build the target string from the parents stack
 	std::string target;
+	if ( topLevel != _vm.getRoot().getRootMovie() )
+	{
+		std::stringstream ss;
+		ss << "_level" << topLevel->get_depth()-character::staticDepthOffset;
+		target = ss.str();
+	}
 	for ( Path::reverse_iterator
 			it=path.rbegin(), itEnd=path.rend();
 			it != itEnd;

@@ -1,5 +1,18 @@
 2007-12-23 Sandro Santilli <strk@keybit.net>
 
+	* server/dlist.h: const version of visitBackward.
+	* server/character.h: add virtual findDropTarget method.
+	* server/character.cpp (computeTargetPath): include _levelX prefix
+	  when topmost movie is not _level0.
+	* server/movie_root.{cpp,h}: if a character is being dragged
+	  find it's current _droptarget on mouse move.
+	* server/sprite_instance.{cpp,h}: implement findDropTarget.
+	* testsuite/misc-ming.all/DragDropTest.as: no more failures.
+	* testsuite/misc-mtasc.all/: level5.as, level99.as:
+	  add test for _target member of clips inside _level#.
+
+2007-12-23 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/MovieClipLoader.as: stop() before
 	  invoking the tests chaing. This is to workaround bogus blocking
 	  MovieClipLoader.loadClip of Gnash.

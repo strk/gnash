@@ -238,6 +238,19 @@ public:
 	/// covers that can receive mouse events.  NULL if
 	/// none.  Coords are in parent's frame.
 	virtual character* get_topmost_mouse_entity(float x, float y);
+
+    // see dox in character.h
+	const character* findDropTarget(float x, float y, character* dragging) const;
+
+    void setDropTarget(const std::string& tgt)
+    {
+        _droptarget = tgt;
+    }
+
+    const std::string& getDropTarget() const
+    {
+        return _droptarget;
+    }
 	
 	virtual bool wantsInstanceName()
 	{
@@ -1006,6 +1019,8 @@ private:
 	int m_sound_stream_id;
 
 	cxform _userCxform;
+
+    std::string _droptarget;
 
 protected:
 

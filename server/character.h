@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.117 2007/12/22 00:24:41 strk Exp $ */
+/* $Id: character.h,v 1.118 2007/12/23 22:29:56 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -953,6 +953,21 @@ public:
 	virtual character* get_topmost_mouse_entity(float /* x */, float /* y */)
 	{
 		return NULL;
+	}
+
+	/// Find highest depth character whose shape contains the given
+	/// point and is not the character being dragged or any of its childs.
+	//
+	/// Point coordinates in global twips.
+	///
+	virtual const character* findDropTarget(float x, float y, character* dragging) const
+	{
+		if ( this != dragging && get_visible()
+			&& pointInVisibleShape(x, y) )
+		{
+			return this;
+		}
+		else return 0;
 	}
 
 	/// Returns true when the object (type) should get a instance name even 

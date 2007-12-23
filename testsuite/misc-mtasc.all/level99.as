@@ -118,7 +118,7 @@ class Level99
 				//  - sane swapping between to levels,
 				//  - swapping & removing _level0 
 				//  
-				check_totals(43);
+				check_totals(44);
 				Dejagnu.done();
 				delete this.onEnterFrame;
 			}

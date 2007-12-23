@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.97 2007/12/18 00:07:11 strk Exp $ */
+/* $Id: movie_root.h,v 1.98 2007/12/23 22:29:56 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -845,6 +845,8 @@ private:
     {
         return (_processingActionLevel < apSIZE);
     }
+
+    const character* findDropTarget(float x, float y, character* dragging) const;
 
 };
 
