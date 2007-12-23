@@ -1,5 +1,8 @@
 2007-12-23 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/MovieClipLoader.as: stop() before
+	  invoking the tests chaing. This is to workaround bogus blocking
+	  MovieClipLoader.loadClip of Gnash.
 	* utilities/dumpshm.cpp: ISO C++ forbids variable-size array 'buf'
 	  (unused, btw)
 

@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClipLoader.as,v 1.7 2007/12/21 02:27:53 strk Exp $";
+rcsid="$Id: MovieClipLoader.as,v 1.8 2007/12/23 22:24:51 strk Exp $";
 
 #include "check.as"
 
@@ -128,6 +128,7 @@ totalProgressCalls=0;
 
 nextTestOrEnd = function()
 {
+	note("nextTestOrEnd");
 	if ( state.nextFunction == undefined )
 	{
 		// we don't know how many times onLoadProgress will be called
@@ -287,9 +288,12 @@ function test3()
 	check( mcl.loadClip( MEDIA(green.jpg), 'loadtarget' ) );
 }
 
-test1();
-
+// Due to a bug in Gnash we must stop() before calling test1.
+// This is because Gnash's version of loadClip is blocking !!
+// TODO: fix it !
 stop();
+
+test1();
 
 #else // OUTPUT_VERSION < 7
 
