@@ -1,5 +1,10 @@
 2007-12-23 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/DragDropTest.as: add eval(_droptarget)
+	  tests.
+
+2007-12-23 Sandro Santilli <strk@keybit.net>
+
 	* server/dlist.h: const version of visitBackward.
 	* server/character.h: add virtual findDropTarget method.
 	* server/character.cpp (computeTargetPath): include _levelX prefix

@@ -8,7 +8,7 @@
 //
 //
 
-rcsid="$Id: DragDropTest.as,v 1.5 2007/12/23 22:29:57 strk Exp $";
+rcsid="$Id: DragDropTest.as,v 1.6 2007/12/23 23:16:41 strk Exp $";
 
 #define info _root.note
 #define note _root.note
@@ -199,6 +199,7 @@ test1 = function()
 	_root.onMouseDown = function()
 	{
 		check_equals(_root.draggable50._droptarget, "");
+		check_equals(eval(_root.draggable50._droptarget), undefined);
 		test2();
 	};
 };
@@ -209,6 +210,7 @@ test2 = function()
 	_root.onMouseDown = function()
 	{
 		check_equals(_root.draggable50._droptarget, "/target10");
+		check_equals(eval(_root.draggable50._droptarget), _level0.target10);
 		test3();
 	};
 };
@@ -219,6 +221,7 @@ test3 = function()
 	_root.onMouseDown = function()
 	{
 		check_equals(_root.draggable50._droptarget, "/target20");
+		check_equals(eval(_root.draggable50._droptarget), _level0.target20);
 		test4();
 	};
 };
@@ -229,6 +232,7 @@ test4 = function()
 	_root.onMouseDown = function()
 	{
 		check_equals(_root.draggable50._droptarget, "/target100");
+		check_equals(eval(_root.draggable50._droptarget), _level0.target100);
 		test5();
 	};
 };
@@ -239,6 +243,7 @@ test5 = function()
 	_root.onMouseDown = function()
 	{
 		check_equals(_root.draggable50._droptarget, "_level50/target10"); 
+		check_equals(eval(_root.draggable50._droptarget), _level50.target10);
 		test6();
 	};
 };
@@ -249,6 +254,7 @@ test6 = function()
 	_root.onMouseDown = function()
 	{
 		check_equals(_root.draggable50._droptarget, "_level50/target20"); 
+		check_equals(eval(_root.draggable50._droptarget), _level50.target20);
 		test7();
 	};
 };
@@ -259,6 +265,7 @@ test7 = function()
 	_root.onMouseDown = function()
 	{
 		check_equals(_root.draggable50._droptarget, "_level50/target100");
+		check_equals(eval(_root.draggable50._droptarget), _level50.target100);
 		test8();
 	};
 };
@@ -269,6 +276,7 @@ test8 = function()
 	_root.onMouseDown = function()
 	{
 		check_equals(_root.draggable50._droptarget, "/loadedTarget/target10");
+		check_equals(eval(_root.draggable50._droptarget), _level0.loadedTarget.target10);
 		test9();
 	};
 };
@@ -279,6 +287,7 @@ test9 = function()
 	_root.onMouseDown = function()
 	{
 		check_equals(_root.draggable50._droptarget, "/loadedTarget/target20");
+		check_equals(eval(_root.draggable50._droptarget), _level0.loadedTarget.target20);
 		test10();
 	};
 };
@@ -289,12 +298,13 @@ test10 = function()
 	_root.onMouseDown = function()
 	{
 		check_equals(_root.draggable50._droptarget, "/loadedTarget/target100");
+		check_equals(eval(_root.draggable50._droptarget), _level0.loadedTarget.target100);
 
-        // move the draggable over the first green square
-        _root.draggable50._x = _root.draggable50._y = 50;
+		// move the draggable over the first green square
+		_root.draggable50._x = _root.draggable50._y = 50;
 
-        // and stop the drag 
-        _root.draggable50.stopDrag();
+		// and stop the drag 
+		_root.draggable50.stopDrag();
 
 		test11();
 	};
@@ -315,7 +325,7 @@ endOfTest = function()
 {
 	_root.ENDOFTEST = true;
 	note("END OF TEST");
-	check_totals(11);
+	check_totals(21);
 	_root.onMouseDown = undefined;
 };
 
