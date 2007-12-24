@@ -95,7 +95,9 @@ void	operator delete[](void* ptr);
 //
 // some misc handy math functions
 //
-inline float	infinite_to_fzero(float x) { return std::isfinite(x) ? x : 0.0f; }
+namespace std {
+inline float	infinite_to_fzero(float x) { return isfinite(x) ? x : 0.0f; }
+}
 inline int	iabs(int i) { if (i < 0) return -i; else return i; }
 /* fmax()/fmin() is C99 */
 inline float	fmax(float a, float b) { if (a < b) return b; else return a; }
