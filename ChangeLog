@@ -1,3 +1,11 @@
+2007-12-24  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* server/asobj/SharedObject.cpp: Include cerrno.
+	* libamf/sol.cpp: Include cerrno.
+	* configure.ac: Add --with-shm= option to specify whether to use
+	POSIX named shared memory or the older SYSV shared memory for
+	compatibility. Look for the remap() function in libc.
+
 2007-12-24 Sandro Santilli <strk@keybit.net>
 
 	* server/as_object.{cpp,h}: callMethod with 4 args..
