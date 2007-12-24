@@ -1,3 +1,8 @@
+2007-12-24 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* Santa Claus is coming to town.
+	* libbase/utility.h: Fixed isfinte -> std::isfinite. Fixes building issue on OS X Leopard.
+
 2007-12-23 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/DragDropTest.as: add eval(_droptarget)
