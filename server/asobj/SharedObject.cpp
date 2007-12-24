@@ -25,6 +25,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <boost/tokenizer.hpp>
+#include <cerrno>
 
 #include "amf.h"
 #include "sol.h"

@@ -20,6 +20,7 @@
 #endif
 
 #include <boost/cstdint.hpp>
+#include <cerrno>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string>

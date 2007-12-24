@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.461 2007/12/18 11:06:03 strk Exp $
+dnl $Id: configure.ac,v 1.462 2007/12/24 18:21:03 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -208,6 +208,23 @@ AC_ARG_WITH(cpu,
 if test x"$with_cpu" != x"none"; then
 dnl   $CXXFLAGS="$CXXFLAGS -march=${with_cpu}"
    cross_compiling=yes
+fi
+
+AC_ARG_WITH(shm,
+  AC_HELP_STRING([--with-shm],[specify a cpu when cross compiling.]),
+  [case "${withval}" in
+    sysv) with_shm=sysv
+          ;;
+    posix) with_shm=posix
+          ;;    
+    *)   AC_MSG_ERROR([bad value ${enableval} for --with-shm option (try sysv or posix])
+          ;;
+   esac],with_shm=sysv)
+
+if test x"${with_shm}" = x"sysv"; then
+  AC_DEFINE([USE_SYSV_SHM], [1], [Use SYSV shared memory for compatability])
+else
+  AC_DEFINE([USE_POSIX_SHM], [1], [Use POSIX shared memory])
 fi
 
 dnl Don't add the GUI menu. Some educational systems think this adds
@@ -1100,7 +1117,9 @@ AC_LANG_PUSH(C++)
 	])
 AC_LANG_POP(C++)
 
-dnl AC_CHECK_LIB(c, mremap)
+dnl Shm::resize() uses this if it exists
+AC_CHECK_LIB(c, mremap)
+
 GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
 GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
 GNASH_PKG_FIND(png, [png.h], [png images], png_info_init)
@@ -1763,7 +1782,7 @@ echo "        Media handler: "$media_handler
 if test x"$media_handler" = xffmpeg -o x"$media_handler" = xmad; then
 echo "        Using SDL for sound handling"
 fi
-
+echo "        Using $with_shm mode for shared memory"
 echo ""
 echo "Configured paths for ${build} are:"
 
