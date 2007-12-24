@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClipLoader.as,v 1.8 2007/12/23 22:24:51 strk Exp $";
+rcsid="$Id: MovieClipLoader.as,v 1.9 2007/12/24 14:00:31 strk Exp $";
 
 #include "check.as"
 
@@ -64,6 +64,8 @@ check(!mcl.hasOwnProperty('broadcastMessage'));
 
 check_equals(typeOf(mcl._listeners), 'object');
 check(mcl.hasOwnProperty('_listeners'));
+check_equals(mcl._listeners.length, 1);
+check_equals(mcl._listeners[0], mcl);
 
 MovieClipLoader.prototype.bm = MovieClipLoader.prototype.broadcastMessage;
 MovieClipLoader.prototype.broadcastMessage = function(arg1, arg2, arg3, arg4)
@@ -271,7 +273,7 @@ function test3()
 	// subtract the number of progress callback runs reported when playing from the totals to get the correct number
 	// BUT MAKE SURE nextTestOrEnd CONTAINS THE CORRECT testsPerProgressCallback INFO !!
 	//
-	expected.totals = 57;
+	expected.totals = 59;
 	// gnash doesn't call onLoadInit if the data at the url is not an SWF or JPG
 	// (or whatever else can become a movie_instance), while the PP does.
 	// So in this testcase, the attempt to load vars.txt is invalid for Gnash

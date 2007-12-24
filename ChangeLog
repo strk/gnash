@@ -1,5 +1,13 @@
 2007-12-24 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.{cpp,h}: callMethod with 4 args..
+	* server/asobj/MovieClipLoader.cpp: dispatch events to all listeners,
+	  not just self. Fixes bug #21881.
+	* testsuite/actionscript.all/MovieClipLoader.as: test that a
+	  MovieClipLoader instance is a listener of self.
+
+2007-12-24 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (get_member): use get_root() to evaluate
 	  the _root member. This is to get relative url rather then absolute,
 	  more correct in swf6 and should be easier to handle _lockroot for

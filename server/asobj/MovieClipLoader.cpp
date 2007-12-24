@@ -165,7 +165,9 @@ MovieClipLoader::MovieClipLoader()
 	_mcl.bytes_loaded = 0;
 	_mcl.bytes_total = 0;  
 
-	set_member(NSV::PROP_uLISTENERS, new as_array_object());
+	as_array_object* ar = new as_array_object();
+	ar->push(this);
+	set_member(NSV::PROP_uLISTENERS, ar);
 }
 
 MovieClipLoader::~MovieClipLoader()
@@ -195,27 +197,35 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 			 
 	string_table& st = _vm.getStringTable();
 
+	as_value targetVal(&target);
+	log_debug("Target is %s", targetVal.to_debug_string().c_str());
+
 	bool ret = target.loadMovie(url);
 	if ( ! ret ) 
 	{
 		// TODO: find semantic of last argument
-		callMethod(st.find("onLoadError"), as_value(&target), as_value("Failed to load movie or jpeg"), as_value(0));
+		as_value met("onLoadError");
+		as_value arg1("Failed to load movie or jpeg");
+		as_value arg2(0);
+		callMethod(NSV::PROP_BROADCAST_MESSAGE, met, targetVal, arg1, arg2);
 
 		return false;
 	}
 
 	// Dispatch onLoadStart
-	callMethod(st.find("onLoadStart"), as_value(&target));
+	callMethod(NSV::PROP_BROADCAST_MESSAGE, as_value("onLoadStart"), targetVal);
 
 	// Dispatch onLoadProgress
 	struct mcl *mcl_data = getProgress(&target);
 	// the callback since we're done loading the file
 	mcl_data->bytes_loaded = target.get_bytes_loaded();
 	mcl_data->bytes_total = target.get_bytes_total();
-	callMethod(st.find("onLoadProgress"), as_value(&target), mcl_data->bytes_loaded, mcl_data->bytes_total);
+	callMethod(NSV::PROP_BROADCAST_MESSAGE, as_value("onLoadProgress"), targetVal,
+		mcl_data->bytes_loaded, mcl_data->bytes_total);
 
 	// Dispatch onLoadComplete
-	callMethod(st.find("onLoadComplete"), as_value(&target), as_value(0)); // TODO: find semantic of last arg
+	callMethod(NSV::PROP_BROADCAST_MESSAGE, as_value("onLoadComplete"), targetVal,
+		as_value(0)); // TODO: find semantic of last arg
 
 	/// This event must be dispatched when actions
 	/// in first frame of loaded clip have been executed.
@@ -227,7 +237,7 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	/// TODO: check if we need to place it before calling
 	///       this function though...
 	///
-	callMethod(st.find("onLoadInit"), as_value(&target));
+	callMethod(NSV::PROP_BROADCAST_MESSAGE, as_value("onLoadInit"), targetVal);
 
 	return true;
 }

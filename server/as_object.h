@@ -527,6 +527,7 @@ public:
 	as_value callMethod(string_table::key name, const as_value& arg0);
 	as_value callMethod(string_table::key name, const as_value& arg0, const as_value& arg1);
 	as_value callMethod(string_table::key name, const as_value& arg0, const as_value& arg1, const as_value& arg2);
+	as_value callMethod(string_table::key name, const as_value& arg0, const as_value& arg1, const as_value& arg2, const as_value& arg3);
 
 	/// Delete a property of this object, unless protected from deletion.
 	//
