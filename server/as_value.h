@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.80 2007/12/19 20:40:31 strk Exp $ */
+/* $Id: as_value.h,v 1.81 2007/12/24 05:33:44 zoulunkai Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -191,7 +191,7 @@ public:
 	/// Construct a NULL or AS_FUNCTION value
 	as_value(as_function* func);
 
-	~as_value() { drop_refs(); }
+	~as_value();
 
 	/// Convert numeric value to string value, following ECMA-262 specification
 	//

@@ -1500,6 +1500,11 @@ as_value::as_value(as_object* obj)
 	set_as_object(obj);
 }
 
+as_value::~as_value()
+{ 
+	drop_refs(); 
+}
+
 //-------------------------------------
 // as_value::CharacterProxy
 //-------------------------------------

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.116 2007/12/14 20:51:20 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.117 2007/12/24 05:33:44 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -848,6 +848,13 @@ as_environment::pushCallFrame(as_function* func)
 	_localFrames.push_back(CallFrame(func));
 }
 
+void 
+as_environment::popCallFrame()
+{
+	assert(!_localFrames.empty());
+	_localFrames.pop_back();
+}
+	
 void
 as_environment::set_target(character* target)
 {

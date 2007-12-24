@@ -515,11 +515,7 @@ private:
 	//
 	/// This should happen when an ActionScript function returns.
 	///
-	static void popCallFrame()
-	{
-		assert(!_localFrames.empty());
-		_localFrames.pop_back();
-	}
+	static void popCallFrame();
 	
 	/// Return the (possibly UNDEFINED) value of the named variable.
 	//

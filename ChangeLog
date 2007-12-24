@@ -1,3 +1,9 @@
+2007-12-24 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* server/as_value.{h, cpp}: ~as_value(), don't inline the destructor.
+	* server/as_environment.{h, cpp}: popCallFrame(), don't inline this function.
+	  fix the 'link once' problem here with -O2 option.
+	
 2007-12-24 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* Santa Claus is coming to town.
