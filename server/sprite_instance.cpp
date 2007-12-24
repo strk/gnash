@@ -1850,16 +1850,9 @@ bool sprite_instance::get_member(string_table::key name_key, as_value* val,
 	{
 		//if ( isUnloaded() ) return false; // see movieclip_destruction_test3.sc
 
-		// TODO: handle lockroot
-		//
-		// get_root() would return relative root of this instance
-		// VM::getRoot().getRootMovie() would return _level0 or something
-		// like that (check dox)
-		//
-		// If _lockroot is true we should return the relative root, otherwise
-		// we should return the absolute one (_level0?)
-		//
-		val->set_as_object( VM::get().getRoot().getRootMovie() );
+		// Let ::get_root() take care of _lockroot
+		val->set_as_object( get_root() ); 
+
 		return true;
 	}
 	if (name.compare(0, 6, "_level") == 0 && name.find_first_not_of("0123456789", 7) == string::npos )

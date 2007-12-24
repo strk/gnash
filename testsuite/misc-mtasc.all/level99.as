@@ -48,6 +48,12 @@ class Level99
                 // Check our depth
 		check_equals(mc.getDepth(), -16285);
 
+		// _root is relative. TODO: check _lockroot effect !
+                check_equals(mc._root, _level99);
+                check_equals(_root, _level99);
+		// "/" in path is relative !
+		check_equals(eval("/ch"), _level99.ch);
+
                 // The ""+ is there to force conversion to a string
                 check_equals(""+mc, "_level99");
 
@@ -118,7 +124,7 @@ class Level99
 				//  - sane swapping between to levels,
 				//  - swapping & removing _level0 
 				//  
-				check_totals(44);
+				check_totals(47);
 				Dejagnu.done();
 				delete this.onEnterFrame;
 			}

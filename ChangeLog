@@ -1,3 +1,12 @@
+2007-12-24 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (get_member): use get_root() to evaluate
+	  the _root member. This is to get relative url rather then absolute,
+	  more correct in swf6 and should be easier to handle _lockroot for
+	  SWF7.
+	* testsuite/misc-mtasc.all/level99.as: add test for "_root" and
+	  '/path' resolution in levels.
+
 2007-12-24 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* server/as_value.{h, cpp}: ~as_value(), don't inline the destructor.
