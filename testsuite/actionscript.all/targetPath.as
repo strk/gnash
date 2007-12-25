@@ -20,7 +20,7 @@
  *  Test targetPath tags (0x45)
  */
 
-rcsid="$Id: targetPath.as,v 1.9 2007/11/22 14:29:38 strk Exp $";
+rcsid="$Id: targetPath.as,v 1.10 2007/12/25 05:40:30 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -88,16 +88,56 @@ _global.pass_check = pass_check;
 _global.xpass_check = xpass_check;
 
 setTarget(null);
+// getVaiable(_target) would ascend to other target
 check_equals(_target, '/');
+asm{          
+    push 'checkpoint'         
+    push ''
+    push 11         
+    getproperty  //_target         
+    setvariable             
+};
+//check current target is undefined
+xcheck_equals(checkpoint, undefined);
 setTarget("");
 
 setTarget('...:mc1');
+// getVaiable(_target) would ascend to other target
 check_equals(_target, '/');
+asm{          
+    push 'checkpoint'         
+    push ''
+    push 11         
+    getproperty  //_target         
+    setvariable             
+};
+//check current target is undefined
+xcheck_equals(checkpoint, undefined);
 setTarget("");
 
 setTarget('...:mc');
+// getVaiable(_target) would ascend to other target
 check_equals(_target, '/');
+asm{          
+    push 'checkpoint'         
+    push ''
+    push 11         
+    getproperty  //_target         
+    setvariable             
+};
+//check current target is undefined
+xcheck_equals(checkpoint, undefined);
 setTarget("");
+
+asm{          
+    push 'checkpoint'         
+    push ''
+    push 11         
+    getproperty  //_target         
+    setvariable             
+};
+//check current target is undefined
+check_equals(checkpoint, '/');
 
 setTarget('mc');
 check_equals(_target, '/mc');
@@ -114,5 +154,5 @@ check_equals(_target, '/');
 #if OUTPUT_VERSION < 6
  check_totals(6);
 #else
- check_totals(13);
+ check_totals(17);
 #endif
