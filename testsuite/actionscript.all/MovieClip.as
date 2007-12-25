@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.106 2007/11/29 13:03:29 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.107 2007/12/25 06:12:54 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -1132,15 +1132,24 @@ container.removeMovieClip();
 check_equals(typeof(container), 'movieclip');
 check_equals(typeof(container_ref.getBounds), 'function');
 b = container.getBounds(); 
-check_equals(b.xMin, 6710886.35);
-check_equals(b.xMax, 6710886.35);
-check_equals(b.yMin, 6710886.35);
-check_equals(b.yMax, 6710886.35);
+// check_equals(b.xMin, 6710886.35);
+// check_equals(b.xMax, 6710886.35);
+// check_equals(b.yMin, 6710886.35);
+// check_equals(b.yMax, 6710886.35);
+check(b.xMin - 6710886.35 < 0.0001);
+check(b.xMax - 6710886.35 < 0.0001);
+check(b.yMin - 6710886.35 < 0.0001);
+check(b.yMax - 6710886.35 < 0.0001);
+
 b = container_ref.getBounds(); 
-check_equals(b.xMin, 6710886.35);
-check_equals(b.xMax, 6710886.35);
-check_equals(b.yMin, 6710886.35);
-check_equals(b.yMax, 6710886.35);
+// check_equals(b.xMin, 6710886.35);
+// check_equals(b.xMax, 6710886.35);
+// check_equals(b.yMin, 6710886.35);
+// check_equals(b.yMax, 6710886.35);
+check(b.xMin - 6710886.35 < 0.0001);
+check(b.xMax - 6710886.35 < 0.0001);
+check(b.yMin - 6710886.35 < 0.0001);
+check(b.yMax - 6710886.35 < 0.0001);
 
 #endif // OUTPUT_VERSION >= 6
 
