@@ -1078,6 +1078,12 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 	}
 
     assert(testInvariant());
+
+    if( ! copy.empty() )
+	{
+		// process actions queued in the above step
+		processActionQueue();
+	}
 }
 
 /* static private */
@@ -1131,6 +1137,12 @@ movie_root::notify_mouse_listeners(const event_id& event)
 	}
 
 	assert(testInvariant());
+
+    if( ! copy.empty() )
+	{
+		// process actions queued in the above step
+		processActionQueue();
+	}
 }
 
 character*
@@ -1247,6 +1259,14 @@ movie_root::processActionQueue(int lvl)
 void
 movie_root::flushHigherPriorityActionQueues()
 {
+    if( ! processingActions() )
+	{
+		// only flush the actions queue when we are processing the queue.
+		// ie. we don't want to flush the queue during executing user event handlers,
+		// which are not pushed at the moment.
+		return;
+	}
+
 	if ( _disableScripts )
 	{
 		//log_debug(_("Scripts are disabled, global instance list has %d elements"), _liveChars.size());
@@ -1383,6 +1403,12 @@ movie_root::executeTimers()
 		}
 
 		it = nextIterator;
+	}
+
+    if( ! _intervalTimers.empty() )
+	{
+		// process actions queued when executing interval callbacks
+		processActionQueue();
 	}
 
 }

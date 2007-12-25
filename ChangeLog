@@ -1,3 +1,12 @@
+2007-12-25 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* server/movie_root.cpp: flushHigherPriorityActionQueues(), only flush when
+	  we are processing an actions queue; notify_key_listeners(),notify_mouse_listeners(),
+	  executeTimers, process queued actions after finish all event handlers.
+	* testsuite/misc-ming.all/key_event_test.c,
+	  testsuite/misc-swfc.all/gotoFrameFromInterval.sc, gotoFrameFromInterval2.sc:
+	  xchecks to checks.
+	  
 2007-12-24  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* server/asobj/SharedObject.cpp: Include cerrno.

@@ -321,7 +321,7 @@ main(int argc, char** argv)
   SWFDisplayItem_remove(it3);
   SWFMovie_nextFrame(mo);  // _root frame22
  
-  xcheck_equals(mo, "test5", "'0+ls3+ls2+ls1+obj1+ls1+obj2+ls2+obj3+obj1+obj2+obj3'");
+  check_equals(mo, "test5", "'0+ls3+ls2+ls1+obj1+ls1+obj2+ls2+obj3+obj1+obj2+obj3'");
   add_actions(mo, "totals(); stop();");
   SWFMovie_nextFrame(mo);  // _root frame23
   //Output movie

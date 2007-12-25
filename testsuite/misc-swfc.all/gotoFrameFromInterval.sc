@@ -64,7 +64,7 @@
     .put clip3=mc1 // place a named sprite clip3
     
     .action:
-        xcheck_equals(asOrder, '0+1+2+3+4+1+2+3+4+1+2+3+4+');
+        check_equals(asOrder, '0+1+2+3+4+1+2+3+4+1+2+3+4+');
     .end
 
 
@@ -122,7 +122,7 @@
 .frame 10
     .action:
         stop();
-        xcheck_equals(_root.asOrder, 'x0xx1x234');
+        check_equals(_root.asOrder, 'x0xx1x234');
     .end
 
 .end // end of file

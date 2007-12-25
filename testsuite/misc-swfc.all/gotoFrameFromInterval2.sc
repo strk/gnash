@@ -71,7 +71,7 @@
     .put clip3=mc1 // place a named sprite clip3
     
     .action:
-        xcheck_equals(asOrder, '0+1+2+3+4+1+2+3+4+1+2+3+4+');
+        check_equals(asOrder, '0+1+2+3+4+1+2+3+4+1+2+3+4+');
     .end
     
     
