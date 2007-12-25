@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClipLoader.as,v 1.9 2007/12/24 14:00:31 strk Exp $";
+rcsid="$Id: MovieClipLoader.as,v 1.10 2007/12/25 18:56:06 strk Exp $";
 
 #include "check.as"
 
@@ -230,6 +230,21 @@ mcl.onLoadInit = function(target)
 	check_equals(state.onLoadCompleteCalls, 1);
 	state.onLoadInitCalls++;
 
+	if ( target._url = MEDIA(green.jpg) )
+	{
+		with (target)
+		{
+			note("---- Target's root is "+_root);
+			xcheck_equals(_root, _level0);
+			_lockroot = true;
+			check_equals(_root, _level0.loadtarget);
+			note("---- After setting _lockroot to true, target's root is "+_root);
+			_lockroot = false;
+			xcheck_equals(_root, _level0);
+			note("---- After setting _lockroot to false, target's root is "+_root);
+		}
+	}
+
 	//note("target.var1: "+target.var1);
 	//note("onLoadInit called with "+arguments.length+" args:"); dumpObj(arguments);
 	nextTestOrEnd();
@@ -273,7 +288,7 @@ function test3()
 	// subtract the number of progress callback runs reported when playing from the totals to get the correct number
 	// BUT MAKE SURE nextTestOrEnd CONTAINS THE CORRECT testsPerProgressCallback INFO !!
 	//
-	expected.totals = 59;
+	expected.totals = 65;
 	// gnash doesn't call onLoadInit if the data at the url is not an SWF or JPG
 	// (or whatever else can become a movie_instance), while the PP does.
 	// So in this testcase, the attempt to load vars.txt is invalid for Gnash

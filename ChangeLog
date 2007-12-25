@@ -1,3 +1,9 @@
+2007-12-25 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/MovieClipLoader.cpp: remove dead code.
+	* testsuite/actionscript.all/MovieClipLoader.as: add test for
+	  _lockroot.
+
 2007-12-25 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* server/movie_root.cpp: flushHigherPriorityActionQueues(), only flush when

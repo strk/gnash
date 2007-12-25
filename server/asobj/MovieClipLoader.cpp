@@ -122,15 +122,6 @@ public:
 
 	void unloadClip(void *);
 
-	/// @todo make an EventDispatcher class for this
-	/// @ {
-	///
-
-	/// Invoke any listener for the specified event
-	void dispatchEvent(const std::string& eventName, const as_value& arg);
-
-	/// @ }
-
 protected:
 
 #if 0
@@ -195,8 +186,6 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	log_msg(_(" resolved url: %s"), url.str().c_str());
 #endif
 			 
-	string_table& st = _vm.getStringTable();
-
 	as_value targetVal(&target);
 	log_debug("Target is %s", targetVal.to_debug_string().c_str());
 
@@ -246,16 +235,6 @@ void
 MovieClipLoader::unloadClip(void *)
 {
   GNASH_REPORT_FUNCTION;
-}
-
-// Callbacks
-void
-MovieClipLoader::dispatchEvent(const std::string& event, const as_value& arg)
-{
-	as_value ev(event);
-
-	log_debug("dispatchEvent calling broadcastMessage with args %s and %s", ev.to_debug_string().c_str(), arg.to_debug_string().c_str());
-	callMethod(NSV::PROP_BROADCAST_MESSAGE, ev, arg);
 }
 
 static as_value
