@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: SharedObject.as,v 1.15 2007/12/20 21:50:09 rsavoye Exp $";
+rcsid="$Id: SharedObject.as,v 1.16 2007/12/25 05:57:26 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -81,7 +81,7 @@ so.flush();
 newso = SharedObject.getLocal("settings");
 check_equals (typeof(newso), 'object');
 trace(newso.getSize());
-check_equals (newso.getSize(), 11);
+xcheck_equals (newso.getSize(), 283);
 
 if (typeof(newso.data) != 'undefined') {
     trace("New Shared Object, checking data...");
@@ -92,7 +92,7 @@ if (typeof(newso.data) != 'undefined') {
     check_equals (typeof(newso.data.defaultmicrophone), 'string');
     check_equals (newso.data.defaultmicrophone, so.data.defaultmicrophone);
     check_equals (typeof(newso.data.defaultcamera), 'string');
-    check_equals (newso.data.defaultcamera,  'undefined');
+    check_equals (newso.data.defaultcamera,  '');
     check_equals (typeof(newso.data.defaultklimit), 'number');
     check_equals (newso.data.defaultklimit, so.data.defaultklimit);
     check_equals (typeof(newso.data.defaultalways), 'boolean');
@@ -107,7 +107,7 @@ if (typeof(newso.data) != 'undefined') {
     check_equals (typeof(newso.data.allowThirdPartyLSOAccess), 'boolean');
     check_equals (newso.data.allowThirdPartyLSOAccess, true);
     check_equals (typeof(newso.data.localSecPath), 'string');
-    check_equals (newso.data.localSecPath, 'undefined');
+    check_equals (newso.data.localSecPath, '');
     check_equals (typeof(newso.data.localSecPathTime), 'number');
     check_equals (newso.data.localSecPathTime, 1.19751160683e+12);
 } else {
