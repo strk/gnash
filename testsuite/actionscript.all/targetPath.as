@@ -20,7 +20,7 @@
  *  Test targetPath tags (0x45)
  */
 
-rcsid="$Id: targetPath.as,v 1.10 2007/12/25 05:40:30 zoulunkai Exp $";
+rcsid="$Id: targetPath.as,v 1.11 2007/12/25 05:43:59 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -136,7 +136,6 @@ asm{
     getproperty  //_target         
     setvariable             
 };
-//check current target is undefined
 check_equals(checkpoint, '/');
 
 setTarget('mc');
