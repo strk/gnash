@@ -1,5 +1,10 @@
 2007-12-26 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.cpp (format_text): don't truncate
+	  or word-wrap long lines if autoSize is on.
+
+2007-12-26 Sandro Santilli <strk@keybit.net>
+
 	* server/: movie_instance.cpp, sprite_instance.{cpp,h}:
 	  Implement _lockroot
 	* testsuite/actionscript.all/: MovieClip.as, MovieClipLoader.as:

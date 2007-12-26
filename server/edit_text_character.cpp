@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.139 2007/12/19 18:40:07 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.140 2007/12/26 15:52:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1382,11 +1382,9 @@ after_x_advance:
 			//log_debug("Text in character %s exceeds margins", getTarget().c_str());
 			// Whoops, we just exceeded the box width. 
 			// Do word-wrap if requested to do so.
-
-			if ( ! doWordWrap() )
+			if ( autoSize == autoSizeNone )
 			{
-				//log_debug(" No word wrapping");
-				if ( autoSize == autoSizeNone )
+				if ( ! doWordWrap() )
 				{
 					//log_debug(" autoSize=NONE!");
 					// truncate long line, but keep expanding text box
@@ -1419,63 +1417,63 @@ after_x_advance:
 					}
 					if ( ! newlinefound ) break;
 				}
-			}
-			else // do word wrap
-			{
-
-				// Insert newline.
-
-				// Close out this stretch of glyphs.
-				m_text_glyph_records.push_back(rec);
-				float	previous_x = x;
-				x = m_def->get_left_margin() + PADDING_TWIPS;
-				y += m_def->get_font_height() + leading;
-
-
-				// Start a new record on the next line.
-				rec.m_glyphs.resize(0);
-				rec.m_style.setFont(_font);
-				rec.m_style.m_color = getTextColor();
-				rec.m_style.m_x_offset = x;
-				rec.m_style.m_y_offset = y;
-				rec.m_style.m_text_height = m_def->get_font_height();
-				rec.m_style.m_has_x_offset = true;
-				rec.m_style.m_has_y_offset = true;
-				
-				// TODO : what if m_text_glyph_records is empty ? Is it possible ?
-				assert(!m_text_glyph_records.empty());
-				text_glyph_record&	last_line = m_text_glyph_records.back();
-				if (last_space_glyph == -1)
+				else 
 				{
-					// Pull the previous glyph down onto the
-					// new line.
-					if (last_line.m_glyphs.size() > 0)
+
+					// Insert newline.
+
+					// Close out this stretch of glyphs.
+					m_text_glyph_records.push_back(rec);
+					float	previous_x = x;
+					x = m_def->get_left_margin() + PADDING_TWIPS;
+					y += m_def->get_font_height() + leading;
+
+
+					// Start a new record on the next line.
+					rec.m_glyphs.resize(0);
+					rec.m_style.setFont(_font);
+					rec.m_style.m_color = getTextColor();
+					rec.m_style.m_x_offset = x;
+					rec.m_style.m_y_offset = y;
+					rec.m_style.m_text_height = m_def->get_font_height();
+					rec.m_style.m_has_x_offset = true;
+					rec.m_style.m_has_y_offset = true;
+					
+					// TODO : what if m_text_glyph_records is empty ? Is it possible ?
+					assert(!m_text_glyph_records.empty());
+					text_glyph_record&	last_line = m_text_glyph_records.back();
+					if (last_space_glyph == -1)
 					{
-						rec.m_glyphs.push_back(last_line.m_glyphs.back());
-						x += last_line.m_glyphs.back().m_glyph_advance;
-						previous_x -= last_line.m_glyphs.back().m_glyph_advance;
-						last_line.m_glyphs.resize(last_line.m_glyphs.size() - 1);
+						// Pull the previous glyph down onto the
+						// new line.
+						if (last_line.m_glyphs.size() > 0)
+						{
+							rec.m_glyphs.push_back(last_line.m_glyphs.back());
+							x += last_line.m_glyphs.back().m_glyph_advance;
+							previous_x -= last_line.m_glyphs.back().m_glyph_advance;
+							last_line.m_glyphs.resize(last_line.m_glyphs.size() - 1);
+						}
 					}
-				}
-				else
-				{
-					// Move the previous word down onto the next line.
-
-					previous_x -= last_line.m_glyphs[last_space_glyph].m_glyph_advance;
-
-					for (unsigned int i = last_space_glyph + 1; i < last_line.m_glyphs.size(); i++)
+					else
 					{
-						rec.m_glyphs.push_back(last_line.m_glyphs[i]);
-						x += last_line.m_glyphs[i].m_glyph_advance;
-						previous_x -= last_line.m_glyphs[i].m_glyph_advance;
+						// Move the previous word down onto the next line.
+
+						previous_x -= last_line.m_glyphs[last_space_glyph].m_glyph_advance;
+
+						for (unsigned int i = last_space_glyph + 1; i < last_line.m_glyphs.size(); i++)
+						{
+							rec.m_glyphs.push_back(last_line.m_glyphs[i]);
+							x += last_line.m_glyphs[i].m_glyph_advance;
+							previous_x -= last_line.m_glyphs[i].m_glyph_advance;
+						}
+						last_line.m_glyphs.resize(last_space_glyph);
 					}
-					last_line.m_glyphs.resize(last_space_glyph);
+
+					align_line(textAlignment, last_line_start_record, previous_x);
+
+					last_space_glyph = -1;
+					last_line_start_record = m_text_glyph_records.size();
 				}
-
-				align_line(textAlignment, last_line_start_record, previous_x);
-
-				last_space_glyph = -1;
-				last_line_start_record = m_text_glyph_records.size();
 			}
 		}
 
