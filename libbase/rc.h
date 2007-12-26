@@ -27,6 +27,7 @@
 
 #include <string>
 #include <vector>
+#include <sys/shm.h>		// for key_t
 
 namespace gnash {
   
@@ -145,14 +146,28 @@ public:
     // Set the location of the sandbox for .sol files
     void setSOLSafeDir(std::string &x) { _solsandbox = x; }
 
+    bool getSOLLocalDomain() const { return _sollocaldomain; }
+    void setSOLLocalDomain(bool x) { _sollocaldomain = x; }
+    bool getSOLReadOnly() const { return _solreadonly; }
+    void setSOLReadOnly(bool x) { _solreadonly = x; }
+    bool getLocalConnection() const { return _lcdisabled; }
+    void setLocalConnection(bool x) { _lcdisabled = x; }
+    // Enable tracing all LocalConnection traffic
+    bool getLCTrace() const { return _lctrace; }
+    void setLCTrace(bool x) { _lctrace = x; }
+
+    // 
+    key_t getLCShmKey() const { return _lcshmkey; }
+    void setLCShmKey(bool x) { _lcshmkey = x; }
+    
     void dump();    
 
 private:
-    int  _delay;                // the timer delay
-    int  _movieLibraryLimit;    // max number of movie clips to store in the library
+    uint32_t  _delay;                // the timer delay
+    uint32_t  _movieLibraryLimit;    // max number of movie clips to store in the library
     bool _debug;                // enable debugging of this class
     bool _debugger;             // enable the Flash movie debugger
-    int  _verbosity;
+    uint32_t  _verbosity;
     std::string  _flashVersionString;   // String to pass as $version in Actionscript
     std::string  _flashSystemOS;        // String to pass as System.capabilities.os
     					// in Actionscript. If empty, leaves detection
@@ -204,7 +219,12 @@ private:
     // or read from.
     std::string _solsandbox;
 
-  protected:
+    bool _solreadonly;
+    bool _sollocaldomain;
+    bool _lcdisabled;
+    bool _lctrace;
+    key_t _lcshmkey;
+protected:
     
     /// Construct only by getDefaultInstance()
     RcInitFile();
@@ -217,7 +237,7 @@ private:
     static bool extractSetting(bool *var, const char *pattern,
                         std::string &variable, std::string &value);
     
-    static int extractNumber(int *num, const char *pattern,
+    static uint32_t extractNumber(uint32_t *num, const char *pattern,
                         std::string &variable, std::string &value);
 
     static void extractDouble(double& out, const char *pattern,

@@ -171,7 +171,7 @@ public:
 as_value
 sharedobject_clear(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
     UNUSED(obj);
     
@@ -193,6 +193,13 @@ sharedobject_flush(const fn_call& fn)
 //    log_msg("Flushing to file %s", obj->getFilespec().c_str());        
     VM& vm = obj->getVM();
 
+#ifndef USE_SOL_READONLY
+    if (rcfile.getSOLReadOnly() ) {
+        log_security("Attempting to write object when it's SOL Read Only is set! Refusing...",
+                     obj->getFilespec().c_str());
+        return as_value(false);
+    }
+    
     // TODO: cache the dataKey in SharedObject prototype on first use ?
     //       a SharedObject::getDataKey() might do...
     string_table::key dataKey = vm.getStringTable().find("data");
@@ -212,15 +219,17 @@ sharedobject_flush(const fn_call& fn)
     string newspec; 
     newspec += obj->getFilespec();
     sol.writeFile(newspec, obj->getObjectName().c_str());
-    
     return as_value(true); // TODO: check expected return type from SharedObject.flush
+#else
+    return as_value(false);
+#endif
 }
 
 // Set the file name
 as_value
 sharedobject_getlocal(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     // This should return a SharedObject, and it's a static function
     
 //    static boost::intrusive_ptr<as_object> obj = new as_object(getSharedObjectInterface());
@@ -266,6 +275,12 @@ sharedobject_getlocal(const fn_call& fn)
     if (url.hostname().size() == 0) {
         strcpy(domain, "localhost");
     }
+    
+    if ((rcfile.getSOLLocalDomain()) && (strcmp(domain, "localhost") > 0) ) {
+        log_security("Attempting to open non localhost created SOL file!!",
+                     obj->getFilespec().c_str());
+        return as_value(false);
+     }
 
     newspec += domain;
     newspec += "/";    
@@ -345,7 +360,7 @@ sharedobject_getlocal(const fn_call& fn)
         } 
         if (el->type == AMF::STRING) {
             if (el->length == 0) {
-                ptr->set_member(st.string_table::find(el->name), as_value("undefined"));
+                ptr->set_member(st.string_table::find(el->name), as_value(""));
             } else {
                 string str = (const char *)el->data;
                 ptr->set_member(st.string_table::find(el->name), as_value(str));
@@ -365,7 +380,7 @@ sharedobject_getlocal(const fn_call& fn)
 as_value
 sharedobject_getsize(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
     return as_value(obj->size());
 }

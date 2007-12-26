@@ -30,9 +30,12 @@
 # include <pwd.h>
 #endif
 
+#include <boost/cstdint.hpp>
 #include <sys/types.h>
 #include <unistd.h> // for getuid()
 #include <sys/stat.h>
+#include <cerrno>
+#include <limits.h>
 
 #include <cctype>  // for toupper
 #include <string>
@@ -85,7 +88,11 @@ RcInitFile::RcInitFile() : _delay(0),
 			   _extensionsEnabled(false),
 			   _startStopped(false),
 			   _insecureSSL(false),
-			   _streamsTimeout(DEFAULT_STREAMS_TIMEOUT)
+			   _streamsTimeout(DEFAULT_STREAMS_TIMEOUT),
+                           _solreadonly(false),
+                           _sollocaldomain(false),
+                           _lcdisabled(false),
+                           _lctrace(true)
 
 {
 //    GNASH_REPORT_FUNCTION;
@@ -152,8 +159,8 @@ RcInitFile::extractSetting(bool *var, const char *pattern,
     return *var;
 }
 
-int
-RcInitFile::extractNumber(int *num, const char *pattern, string &variable,
+uint32_t
+RcInitFile::extractNumber(uint32_t *num, const char *pattern, string &variable,
                            string &value)
 {      
 //    GNASH_REPORT_FUNCTION;
@@ -162,7 +169,12 @@ RcInitFile::extractNumber(int *num, const char *pattern, string &variable,
 
 //        log_msg ("%s: %s", variable.c_str(), value.c_str());
     if ( noCaseCompare(variable, pattern) ) {
-        *num = strtol(value.c_str(), NULL, 0);
+        *num = strtoul(value.c_str(), NULL, 0);
+        if (*num == LONG_MAX) {
+            long long foo = strtoll(value.c_str(), NULL, 0);
+            log_error("Conversion overflow!: %ll", foo);
+            
+        }
     }
     return *num;
 }
@@ -439,6 +451,15 @@ RcInitFile::parseFile(const std::string& filespec)
                      extractNumber(&_movieLibraryLimit, "movieLibraryLimit", variable, value);                
                      extractNumber(&_delay, "delay", variable, value);
                      extractNumber(&_verbosity, "verbosity", variable, value);
+
+
+                     extractSetting(&_solreadonly, "SOLReadOnly", variable,
+                               value);
+                     extractSetting(&_lcdisabled, "LocalConnection", variable,
+                               value);
+                     extractSetting(&_lctrace, "LCTrace", variable,
+                               value);
+                     extractNumber((uint32_t *)&_lcshmkey, "LCShmkey", variable, value);
 		}
             }
         } while (!in.eof());

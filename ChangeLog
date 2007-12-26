@@ -1,3 +1,11 @@
+2007-12-25  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libbase/rc.{cpp,h}: Add new security options for Shared Objects
+	and Local Connections. Make extractNumber() return a uint32_t
+	intead of just an int as we keep overflowing strtol().
+	* server/asobj/SharedObject.cpp: Use new security options for
+	files.
+
 2007-12-25 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/MovieClipLoader.cpp: remove dead code.
