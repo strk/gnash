@@ -5,6 +5,7 @@ SUBDIRS = \
 	.	\
 	swfdec \
 	libbase	\
+	libamf.all \
 	libgeometry \
 	server \
 	samples	\
