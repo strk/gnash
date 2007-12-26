@@ -51,8 +51,6 @@ movie_instance::stagePlacementCallback()
 
 	//GNASH_REPORT_FUNCTION;
 
-	assert ( get_root()->get_root() == this );
-
 	//_def->stopLoader();
 
 	// Load first frame  (1-based index)
@@ -74,8 +72,6 @@ void
 movie_instance::advance()
 {
 	//GNASH_REPORT_FUNCTION;
-
-	assert ( get_root()->get_root() == this );
 
 	//_def->stopLoader();
 

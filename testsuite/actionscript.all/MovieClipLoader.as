@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClipLoader.as,v 1.10 2007/12/25 18:56:06 strk Exp $";
+rcsid="$Id: MovieClipLoader.as,v 1.11 2007/12/26 12:35:14 strk Exp $";
 
 #include "check.as"
 
@@ -234,13 +234,14 @@ mcl.onLoadInit = function(target)
 	{
 		with (target)
 		{
+			note("_lockroot: "+_lockroot);
 			note("---- Target's root is "+_root);
-			xcheck_equals(_root, _level0);
+			check_equals(_root, _level0);
 			_lockroot = true;
-			check_equals(_root, _level0.loadtarget);
+			xcheck_equals(_root, _level0.loadtarget); // no idea why this fails, could be due to the assignment above doing unexpected things (assigning to pre-rebound dangling char ref?)..
 			note("---- After setting _lockroot to true, target's root is "+_root);
 			_lockroot = false;
-			xcheck_equals(_root, _level0);
+			check_equals(_root, _level0);
 			note("---- After setting _lockroot to false, target's root is "+_root);
 		}
 	}

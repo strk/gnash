@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.118 2007/12/23 22:29:56 strk Exp $ */
+/* $Id: character.h,v 1.119 2007/12/26 12:35:13 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -723,11 +723,13 @@ public:
 		else return false;
 	}
 
-	/// Return the "relative" root of this character
+	/// Return the relative or absolute root of this character
 	//
 	/// The "relative" is the movie_instance created by
 	/// the same SWF definition that contained the
 	/// definition of this character.
+	///
+	/// The "absolute" is top of parent's tree.
 	///
 	/// TODO: what about programmatically created characters ?
 	///	  which would their "relative" root be ?

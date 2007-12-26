@@ -1536,6 +1536,9 @@ attachMovieClipInterface(as_object& o)
 	o.init_member("getSWFVersion", new builtin_function(sprite_getSWFVersion));
 	o.init_member("enabled", true); // see MovieClip.as testcase
 
+	gettersetter = new builtin_function(&sprite_instance::lockroot_getset, NULL);
+	o.init_property("_lockroot", *gettersetter, *gettersetter); // see MovieClip.as testcase
+
 	if ( target_version  < 6 ) return;
 
 	// SWF6 or higher
@@ -1789,6 +1792,9 @@ sprite_instance::sprite_instance(
 	m_has_mouse_event(false),
 	_text_variables(),
 	m_sound_stream_id(-1),
+	_userCxform(),
+	_droptarget(),
+	_lockroot(false),
 	m_def(def)
 {
 	assert(m_def != NULL);
@@ -1846,11 +1852,10 @@ bool sprite_instance::get_member(string_table::key name_key, as_value* val,
 	//
 	if (name_key == NSV::PROP_uROOT)
 	{
-		//if ( isUnloaded() ) return false; // see movieclip_destruction_test3.sc
 
 		// Let ::get_root() take care of _lockroot
-		val->set_as_object( get_root() ); 
-
+		movie_instance* relRoot = get_root();
+		val->set_as_object( relRoot );
 		return true;
 	}
 
@@ -3584,6 +3589,9 @@ sprite_instance::loadMovie(const URL& url)
 		url.parse_querystring(url.querystring(), vars);
 		extern_movie->setVariables(vars);
 
+		// Set lockroot to our value of it
+		extern_movie->set_member( PROP_uLOCKROOT, getLockRoot() );
+
 		save_extern_movie(extern_movie.get());
 
 		const char* name = get_name().c_str();
@@ -3618,6 +3626,7 @@ sprite_instance::loadMovie(const URL& url)
 		assert(get_ref_count() > 1);
 #endif // ndef GNASH_USE_GC
 
+		// how about lockRoot here ?
 		root.loadLevel(level, url); // extern_movie.get());
 	}
 
@@ -3897,6 +3906,50 @@ sprite_instance::get_world_cxform() const
 	cxform cf = character::get_world_cxform();
 	cf.concatenate(_userCxform); 
 	return cf;
+}
+
+movie_instance*
+sprite_instance::get_root() const
+{
+	movie_instance* relRoot = m_root;
+	character* rootParent = relRoot->get_parent();
+	if ( rootParent )
+	{
+		// if the relative root has a parent we descend
+		// to it unless SWF version of relRoot is >= 7
+		// AND _lockroot is true
+		if ( relRoot->getSWFVersion() >= 7 )
+		{
+			//string_table& st = _vm.getStringTable();
+			//as_value lockRoot = relRoot->getMember(st.find("_lockroot"));
+			//if ( lockRoot.to_bool() )
+			if ( relRoot->getLockRoot() )
+			{
+				return relRoot;
+			}
+		}
+
+		return rootParent->get_root();
+	}
+	return relRoot;
+}
+
+as_value
+sprite_instance::lockroot_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
+
+	as_value rv;
+	if ( fn.nargs == 0 ) // getter
+	{
+		rv.set_bool(ptr->getLockRoot());
+	}
+	else // setter
+	{
+		ptr->setLockRoot(fn.arg(0).to_bool());
+	}
+	return rv;
+
 }
 
 } // namespace gnash

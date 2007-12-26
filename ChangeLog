@@ -1,5 +1,12 @@
 2007-12-26 Sandro Santilli <strk@keybit.net>
 
+	* server/: movie_instance.cpp, sprite_instance.{cpp,h}:
+	  Implement _lockroot
+	* testsuite/actionscript.all/: MovieClip.as, MovieClipLoader.as:
+	  Update expected results.
+
+2007-12-26 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/swfdec/gen_run_swfdec_testsuite.sh: skip tests requiring
 	  user interaction (see task #7556).
 	* testsuite/actionscript.all/MovieClip.as: add test for _lockroot

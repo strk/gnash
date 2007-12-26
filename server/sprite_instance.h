@@ -113,13 +113,14 @@ public:
 	virtual void has_mouse_event();
 
 	/// \brief
-	/// Return this sprite's relative root as
+	/// Return this sprite's root as
 	/// specified at contruction time
+	//
+	/// Relative or absolute is determined by
+	/// the _lockroot property, see getLockRoot
+	/// and setLockRoot.
 	///
-	virtual movie_instance* get_root() const
-	{
-		return m_root;
-	}
+	virtual movie_instance* get_root() const;
 
 	/// \brief
 	/// Return the sprite_definition (or movie_definition)
@@ -839,6 +840,19 @@ public:
 	///
 	void constructAsScriptObject();
 
+
+	/// Return true if get_root() should return the *relative* root,
+	/// false otherwise.
+	bool getLockRoot() const { return _lockroot; }
+
+	/// Set whether get_root() should return the *relative* root,
+	/// false otherwise. True for relative root.
+	///
+	void setLockRoot(bool lr) { _lockroot=lr; }
+
+	/// Getter-setter for MovieClip._lockroot
+	static as_value lockroot_getset(const fn_call& fn);
+
 private:
 
 	/// Register this sprite as a listener of core broadcasters
@@ -1020,7 +1034,9 @@ private:
 
 	cxform _userCxform;
 
-    std::string _droptarget;
+	std::string _droptarget;
+
+	bool _lockroot;
 
 protected:
 

@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.110 2007/12/26 10:50:19 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.111 2007/12/26 12:35:13 strk Exp $";
 
 #include "check.as"
 
@@ -83,7 +83,7 @@ check_equals(mc.getSWFVersion(), OUTPUT_VERSION);
 
 #if OUTPUT_VERSION >= 6
 check(MovieClip.prototype.hasOwnProperty('loadMovie'));
-xcheck(MovieClip.prototype.hasOwnProperty('_lockroot')); 
+check(MovieClip.prototype.hasOwnProperty('_lockroot')); 
 check(!MovieClip.prototype.hasOwnProperty('loadMovieNum'));
 check(!MovieClip.prototype.hasOwnProperty('valueOf')); 
 check(!MovieClip.prototype.hasOwnProperty('toString')); 
@@ -256,14 +256,14 @@ check(mc._y != undefined);
 check(mc._ymouse != undefined);
 check(mc._yscale != undefined);
 check_equals(typeof(MovieClip.prototype._lockroot), 'undefined');
-xcheck_equals(typeof(mc._lockroot), 'boolean');
-xcheck_equals(mc._lockroot, false);
+check_equals(typeof(mc._lockroot), 'boolean');
+check_equals(mc._lockroot, false);
 mc._lockroot = 56;
-xcheck_equals(typeof(mc._lockroot), 'boolean');
-xcheck_equals(mc._lockroot, true);
+check_equals(typeof(mc._lockroot), 'boolean');
+check_equals(mc._lockroot, true);
 mc._lockroot = "";
-xcheck_equals(typeof(mc._lockroot), 'boolean');
-xcheck_equals(mc._lockroot, false);
+check_equals(typeof(mc._lockroot), 'boolean');
+check_equals(mc._lockroot, false);
 
 #if OUTPUT_VERSION > 5
 check_equals(mc._name, "");
@@ -349,7 +349,7 @@ xcheck(!mc.hasOwnProperty("_url"));
 xcheck(!mc.hasOwnProperty("_soundbuftime"));
 xcheck(!mc.hasOwnProperty("_focusrect"));
 xcheck(!mc.hasOwnProperty("_framesloaded"));
-xcheck(!mc.hasOwnProperty("_lockroot"));
+check(!mc.hasOwnProperty("_lockroot"));
 xcheck(!mc.hasOwnProperty("_highquality"));
 #endif //if OUTPUT_VERSION >= 6
 
