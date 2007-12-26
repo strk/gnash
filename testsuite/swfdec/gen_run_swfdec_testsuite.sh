@@ -49,6 +49,13 @@ for test in \`ls ${SWFDECTRACEDIR}/[$STARTPATTERN]*.swf\`; do
 	testname=\`basename \${test}\`
 	md5=\`md5sum \${test} | cut -d' ' -f1\`
 	testid="\${testname}:\${md5}"
+
+	if [ -f \${test}.act ]; then
+		echo "NOTE: skipping \${testname} (unsupported user interaction)"
+		echo "UNTESTED: \${testid} (requires unsupported user interaction)"
+		continue
+	fi
+
 	expectpass=no
 	if grep -q "^\${testid}\$" \${EXPECTPASS}; then
 		expectpass="yes"
