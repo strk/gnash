@@ -269,5 +269,11 @@ main (int /*argc*/, char** /*argv*/) {
             }
         }
     }
+
+    if (rc.getURLOpenerFormat() == "lynx %u") {
+        runtest.pass ("getURLOpenerFormat");
+    } else {
+        runtest.fail ("getURLOpenerFormat");
+    }
 }
 

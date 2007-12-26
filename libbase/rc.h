@@ -143,6 +143,16 @@ public:
     // Get the location of the sandbox for .sol files
     const std::string &getSOLSafeDir() const { return _solsandbox; }
 
+    /// Get the URL opener command format
+    //
+    /// The %u label will need to be substituted by the actual url
+    /// properly excaped.
+    ///
+    const std::string &getURLOpenerFormat() const
+    {
+        return _urlOpenerFormat;
+    }
+
     // Set the location of the sandbox for .sol files
     void setSOLSafeDir(std::string &x) { _solsandbox = x; }
 
@@ -168,15 +178,32 @@ private:
     bool _debug;                // enable debugging of this class
     bool _debugger;             // enable the Flash movie debugger
     uint32_t  _verbosity;
-    std::string  _flashVersionString;   // String to pass as $version in Actionscript
-    std::string  _flashSystemOS;        // String to pass as System.capabilities.os
-    					// in Actionscript. If empty, leaves detection
-    					// to System.cpp (default).
-    std::string  _flashSystemManufacturer;	// String to pass as
-    						// System.capabilities.manufacturer
-    						// in Actionscript
-    bool _actionDump;           // enable dumping actionscript classes
-    bool _parserDump;           // enable dumping parser data
+
+    /// Command format to use to open urls
+    //
+    /// The %u label will need to be substituted by the url
+    /// (properly escaped)
+    ///
+    std::string  _urlOpenerFormat;
+
+    /// String to pass as $version in Actionscript
+    std::string  _flashVersionString;
+
+    /// String to pass as System.capabilities.os
+    /// in Actionscript. If empty, leaves detection
+    /// to System.cpp (default).
+    std::string  _flashSystemOS;       
+
+    /// String to pass as
+    /// System.capabilities.manufacturer
+    /// in Actionscript
+    std::string  _flashSystemManufacturer;
+
+    /// enable dumping actionscript classes
+    bool _actionDump;
+
+    /// enable dumping parser data
+    bool _parserDump;
 
     /// Enable ActionScript errors verbosity
     bool _verboseASCodingErrors;
@@ -185,10 +212,10 @@ private:
     bool _verboseMalformedSWF;
     
     
-    // End user Features
+    /// End user Features
     bool _splashScreen;        // display a splash screen when
                                 // loading a movie
-    // Security Features
+    /// Security Features
     bool _localdomainOnly;     // only access network resources for
                                 // the local domain
     bool _localhostOnly;       // only access network resources 

@@ -194,6 +194,22 @@ certificate could be invalid, may not belong to the host, or both. Equivalent
 to curl --insecure. By default, this option is <emphasis>off</emphasis> and
 connections will fail when a host cannot be verified.</entry>
 </row>
+
+<row>
+<entry>URLOpenerFormat</entry>
+<entry>string</entry>
+<entry>
+Set the format of an url opener command. The %u label would be substituted by the actual url to be opened.
+Examples:
+<programlisting>
+ set urlOpenerFormat firefox -remote 'openurl(%u)'
+ set urlOpenerFormat xdg-open %u
+ set urlOpenerFormat open %u
+ set urlOpenerFormat kfmclient exec %u
+</programlisting>
+</entry>
+</row>
+
 </tbody>
 </tgroup>
 </table>
@@ -253,6 +269,9 @@ The following example <filename>.gnashrc</filename> file allows a user to only p
 
     # Make sure SSL connections are always verified
     set insecureSSL off
+
+    # Use firefox to open urls
+    set urlOpenerFormat firefox -remote 'openurl(%u)'
 
   </programlisting>
 

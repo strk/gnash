@@ -67,6 +67,8 @@ RcInitFile::RcInitFile() : _delay(0),
                            _debug(false),
                            _debugger(false),
                            _verbosity(-1),
+                           // will be reset to something else if __OS2__x is defined
+                           _urlOpenerFormat("firefox -remote 'openurl(%u)'"),
                            _flashVersionString(
 				DEFAULT_FLASH_PLATFORM_ID" "\
 				DEFAULT_FLASH_MAJOR_VERSION","\
@@ -97,6 +99,14 @@ RcInitFile::RcInitFile() : _delay(0),
 {
 //    GNASH_REPORT_FUNCTION;
     loadFiles();
+#ifdef __OS2__x
+    _urlOpenerFormat = PrfQueryProfileString( HINI_USER, (PSZ) "WPURLDEFAULTSETTINGS",
+			(PSZ) "DefaultBrowserExe", NULL,
+			(PVOID) browserExe, (LONG)sizeof(browserExe) );
+	_urlOPenerFormat += " -remote 'openurl(%u)'";
+#endif
+
+    // TODO: fetch GNASH_URLOPENER_FORMAT from the environment
 }
 
 RcInitFile::~RcInitFile()
@@ -375,6 +385,11 @@ RcInitFile::parseFile(const std::string& filespec)
             if(position != string::npos) value.erase(0, position);
 
             if (noCaseCompare(action, "set") || noCaseCompare(action, "append") ) {
+
+                if (noCaseCompare(variable, "urlOpenerFormat")) {
+                    _urlOpenerFormat = value;
+                    continue;
+                }
 
                 if (noCaseCompare(variable, "flashVersionString")) {
                     _flashVersionString = value;

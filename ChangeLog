@@ -1,5 +1,16 @@
 2007-12-26 Sandro Santilli <strk@keybit.net>
 
+	* libbase/rc.{cpp,h}: add support for an urlOpenerFormat directive.
+	* server/vm/ASHandlers.cpp (CommonGetUrl): use new
+	  RcInitFile::geURLOpenerFormat() method to obtain command to
+	  use for opening an external url. See bug #21155.
+	* doc/C/usermanual/usage/gnashrc.xml: document new urlOpenerFormat
+	  directive.
+	* testsuite/libbase/: TCXXRc.cpp, gnashrc.in: test urlOpenerFormat
+	  directive.
+
+2007-12-26 Sandro Santilli <strk@keybit.net>
+
 	* server/edit_text_character.cpp (format_text): don't truncate
 	  or word-wrap long lines if autoSize is on.
 
