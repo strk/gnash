@@ -33,6 +33,7 @@
 #include <sys/types.h>
 #include <unistd.h> // for getuid()
 #include <sys/stat.h>
+#include <boost/cstdint.hpp>
 
 #include <cctype>  // for toupper
 #include <string>
@@ -174,11 +175,11 @@ CRcInitFile::parseFile(const std::string& filespec)
             useParserDump(test);
             useActionDump(test);
 
-            int num;
+            uint32_t num;
             extractNumber(&num, "verbosity", variable, value);
             verbosityLevel(num);
             
-            extractNumber(&_port_offset, "portOffset", variable, value);
+            extractNumber((uint32_t *)&_port_offset, "portOffset", variable, value);
         } while (!in.eof());
 
     } else {
