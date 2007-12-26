@@ -26,27 +26,25 @@ check_equals(NetConnection, undefined);
 
 #else // OUTPUT_VERSION >= 7
 
+check_equals(typeof(NetConnection), 'function');
+check_equals(typeof(NetConnection.prototype), 'object');
+check_equals(typeof(NetConnection.prototype.isConnected), 'undefined');
+check_equals(typeof(NetConnection.prototype.connect), 'function');
+// TODO: add tests for all interfaces
+
 var tmp = new NetConnection;
-
-
-// test the NetConnection constuctor
-if (tmp) {
-    pass("NetConnection::NetConnection() constructor");
-} else {
-    fail("NetConnection::NetConnection()");		
-}
-
-// test the NetConnection::connect method
-if (tmp.connect) {
-    pass("NetConnection::connect() exists");
-} else {
-    fail("NetConnection::connect() doesn't exist");
-}
+check_equals(typeof(tmp), 'object');
+check_equals(tmp.__proto__, NetConnection.prototype);
+check(tmp instanceof NetConnection);
+check_equals(typeof(tmp.isConnected), 'boolean');
+check_equals(tmp.isConnected, false);
+// TODO: add tests for all properties
 
 // test the NetConnection::connect method
 tmp.connect();
 if ( ! tmp.connect("rtmp://www.mediacollege.com/flash/media-player/testclip-4sec.flv") )
 {
+	// FIXME: this would fail in the reference player too...
 	xfail("NetConnection::connect() didn't initialized correctly");
 }
 else

@@ -1,5 +1,11 @@
 2007-12-26 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetConnection.cpp: implement NetConnection.isConnected
+	* testsuite/actionscript.all/NetConnection.as: first pass of cleanup,
+	  lots to be done still...
+
+2007-12-26 Sandro Santilli <strk@keybit.net>
+
 	* libbase/rc.{cpp,h}: add support for an urlOpenerFormat directive.
 	* server/vm/ASHandlers.cpp (CommonGetUrl): use new
 	  RcInitFile::geURLOpenerFormat() method to obtain command to

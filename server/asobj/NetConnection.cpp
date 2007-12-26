@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetConnection.cpp,v 1.51 2007/11/20 00:44:04 cmusick Exp $ */
+/* $Id: NetConnection.cpp,v 1.52 2007/12/26 20:30:14 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -289,12 +289,16 @@ NetConnection::isConnected_getset(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		log_unimpl("NetConnection.isConnected get");
-		return as_value();
+		// TODO: define a NetConnection::isConnected method
+		return as_value((bool)ptr->_loader.get());
+		//log_unimpl("NetConnection.isConnected get");
+		//return as_value();
 	}
 	else // setter
 	{
-		log_unimpl("NetConnection.isConnected set");
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Tried to set read-only property NetConnection.isConnected");
+		);
 		return as_value();
 	}
 }
