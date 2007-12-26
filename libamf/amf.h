@@ -174,9 +174,9 @@ public:
 
     struct amf_element_t {
         astype_e       type;
-        int16_t        length;
+        boost::int16_t        length;
         std::string    name;
-        uint8_t        *data;
+        boost::uint8_t        *data;
 
         amf_element_t()
                 :
@@ -206,13 +206,13 @@ public:
     ///
     /// @return an amf packet (header,data)
     ///
-    uint8_t* encodeElement(astype_e type, const void *in, int nbytes);
+    boost::uint8_t* encodeElement(astype_e type, const void *in, int nbytes);
 
     /// Encode a string
     ///
     /// @return an amf packet (header,data)
     ///
-    uint8_t* encodeString(const char *str)  {
+    boost::uint8_t* encodeString(const char *str)  {
         return encodeElement (STRING, str, strlen(str));
     };
 
@@ -220,7 +220,7 @@ public:
     ///
     /// @return an amf packet (header,data)
     ///
-    uint8_t* encodeNumber(amfnum_t num)  {
+    boost::uint8_t* encodeNumber(amfnum_t num)  {
         return encodeElement (NUMBER, &num, AMF_NUMBER_SIZE);
     };
 
@@ -230,7 +230,7 @@ public:
     /// @ return an element all filled in correctly for passing to other
     /// methods.
     amf_element_t *createElement(amf_element_t *el, astype_e type,
-				 const std::string &name, uint8_t *data, int nbytes);
+				 const std::string &name, boost::uint8_t *data, int nbytes);
     amf_element_t *createElement(amf_element_t *el, const std::string &name,
 				 amfnum_t data);
     amf_element_t *createElement(amf_element_t *el, const char *name,
@@ -259,43 +259,43 @@ public:
     /// @return a newly allocated byte array,
     /// to be deleted by caller using delete [] operator, or NULL
     ///
-    uint8_t* encodeVariable(const char *name);
+    boost::uint8_t* encodeVariable(const char *name);
 
     /// Encode a variable. 
     //
     /// @return a newly allocated byte array,
     /// to be deleted by caller using delete [] operator, or NULL
     ///
-    uint8_t* encodeVariable(amf_element_t &el);
-    uint8_t* encodeVariable(amf_element_t *el);
+    boost::uint8_t* encodeVariable(amf_element_t &el);
+    boost::uint8_t* encodeVariable(amf_element_t *el);
 
     /// Encode a boolean variable. This is a name followed by a boolean value.
     //
     /// @return a newly allocated byte array,
     /// to be deleted by caller using delete [] operator, or NULL
     ///
-    uint8_t* encodeVariable(const char *name, bool flag);
+    boost::uint8_t* encodeVariable(const char *name, bool flag);
 
     /// Encode a variable. 
     //
     /// @return a newly allocated byte array,
     /// to be deleted by caller using delete [] operator, or NULL
     ///
-    uint8_t* encodeVariable(const char *name, amfnum_t num);
+    boost::uint8_t* encodeVariable(const char *name, amfnum_t num);
 
     /// Encode a variable. 
     //
     /// @return a newly allocated byte array,
     /// to be deleted by caller using delete [] operator, or NULL
     ///
-    uint8_t* encodeVariable(std::string &name, std::string &val);
+    boost::uint8_t* encodeVariable(std::string &name, std::string &val);
 
     /// Encode a variable. 
     //
     /// @return a newly allocated byte array,
     /// to be deleted by caller using delete [] operator, or NULL
     ///
-    uint8_t* encodeVariable(const char *name, const char *val);
+    boost::uint8_t* encodeVariable(const char *name, const char *val);
 
     void *encodeRTMPHeader(int amf_index, amf_headersize_e head_size, int total_size,
                            content_types_e type, amfsource_e routing);
@@ -303,7 +303,7 @@ public:
 //     amfbody_t *encodeBody(amfutf8_t *target, amfutf8_t *response, int nbytes, void *data);
 //    amfpacket_t *encodePacket(std::vector<amfhead_t *> messages);
 
-    uint8_t *readElement(void *in);
+    boost::uint8_t *readElement(void *in);
     
     /// Extract the string from a string-type AMF packet
     //
@@ -312,20 +312,20 @@ public:
     ///
     /// Caller is responsible for deletion using delete [] operator.
     ///
-    int8_t *extractString(const uint8_t* in);
+    boost::int8_t *extractString(const boost::uint8_t* in);
 
-    amfnum_t *extractNumber(const uint8_t *in);
-    amf_element_t *extractObject(const uint8_t *in);
+    amfnum_t *extractNumber(const boost::uint8_t *in);
+    amf_element_t *extractObject(const boost::uint8_t *in);
     
-    unsigned char *extractVariable(amf_element_t *el, uint8_t *in);
+    unsigned char *extractVariable(amf_element_t *el, boost::uint8_t *in);
     
-    bool parseAMF(uint8_t *in);
+    bool parseAMF(boost::uint8_t *in);
     static int headerSize(int8_t header);
     int packetReadAMF(int bytes);
 
-    int parseHeader(uint8_t *in);
+    int parseHeader(boost::uint8_t *in);
     int parseBody();
-    int parseBody(uint8_t *in, int bytes);
+    int parseBody(boost::uint8_t *in, int bytes);
     
     int getHeaderSize()         { return _header_size; }; 
     int getTotalSize()          { return _total_size; }; 
@@ -336,9 +336,9 @@ public:
 
     content_types_e getType()   { return _type; };
     
-    uint8_t *addPacketData(uint8_t *data, int bytes);
+    boost::uint8_t *addPacketData(boost::uint8_t *data, int bytes);
     std::map<std::string, amf_element_t *> *getElements() { return &_elements; };
-    uint8_t *appendPtr(uint8_t *data, uint8_t *var, int bytes) {
+    boost::uint8_t *appendPtr(boost::uint8_t *data, boost::uint8_t *var, int bytes) {
       memcpy(data, var, bytes);
       return data += bytes;
     }
@@ -352,8 +352,8 @@ public:
     int                 _header_size;
     int                 _total_size;
     int                 _packet_size;
-    uint8_t             *_amf_data;
-    uint8_t             *_seekptr;
+    boost::uint8_t             *_amf_data;
+    boost::uint8_t             *_seekptr;
     int                 _mystery_word;
     amfsource_e         _src_dest;
 };

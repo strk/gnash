@@ -133,25 +133,25 @@ swapBytes(void *word, int size)
     // Little-endian machine: byte-swap the word
 
     // A conveniently-typed pointer to the source data
-    uint8_t *x = static_cast<uint8_t *>(word);
+    boost::uint8_t *x = static_cast<boost::uint8_t *>(word);
 
     switch (size) {
     case 2: // 16-bit integer
       {
-	uint8_t c;
+	boost::uint8_t c;
 	c=x[0]; x[0]=x[1]; x[1]=c;
 	break;
       }
     case 4: // 32-bit integer
       {
-	uint8_t c;
+	boost::uint8_t c;
 	c=x[0]; x[0]=x[3]; x[3]=c;
 	c=x[1]; x[1]=x[2]; x[2]=c;
 	break;
       }
     case 8: // 64-bit integer
       {
-	uint8_t c;
+	boost::uint8_t c;
 	c=x[0]; x[0]=x[7]; x[7]=c;
 	c=x[1]; x[1]=x[6]; x[6]=c;
 	c=x[2]; x[2]=x[5]; x[5]=c;
@@ -165,11 +165,11 @@ swapBytes(void *word, int size)
 
 
 bool
-AMF::parseAMF(uint8_t *in)
+AMF::parseAMF(boost::uint8_t *in)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    uint8_t *x = in;
+    boost::uint8_t *x = in;
 
     while (*x != OBJECT_END) {
         x = readElement(x);
@@ -177,12 +177,12 @@ AMF::parseAMF(uint8_t *in)
     return true;
 }
 
-uint8_t *
+boost::uint8_t *
 AMF::readElement(void *in)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    uint8_t *x = static_cast<uint8_t *>(in);
+    boost::uint8_t *x = static_cast<boost::uint8_t *>(in);
     astype_e type = (astype_e)*x;
     bool boolshift;
     const char *mstr = NULL;
@@ -290,15 +290,15 @@ AMF::readElement(void *in)
 /// normal ASCII. It may be that these need to be converted to wide
 /// characters, but for now we just leave them as standard multibyte
 /// characters.
-uint8_t *
+boost::uint8_t *
 AMF::encodeElement(astype_e type, const void *in, int nbytes)
 {
 //    GNASH_REPORT_FUNCTION;
 
     amfnum_t num;
     int pktsize = 0;
-    uint8_t* out = NULL;
-    uint8_t* x = NULL;
+    boost::uint8_t* out = NULL;
+    boost::uint8_t* x = NULL;
 
     // Packets are of varying length. A few pass in a byte count, but
     // most packets have a hardcoded size.
@@ -368,7 +368,7 @@ AMF::encodeElement(astype_e type, const void *in, int nbytes)
     switch (type) {
       case NUMBER:
           // Encode the data as a 64 bit, big-endian, numeric value
-          x = out = new uint8_t[pktsize];
+          x = out = new boost::uint8_t[pktsize];
           memset(x, 0, pktsize);
           *x++ = (char)AMF::NUMBER;
           memcpy(&num, in, AMF_NUMBER_SIZE);
@@ -377,7 +377,7 @@ AMF::encodeElement(astype_e type, const void *in, int nbytes)
           break;
       case BOOLEAN:
           // Encode a boolean value. 0 for false, 1 for true
-          out = new uint8_t[pktsize];
+          out = new boost::uint8_t[pktsize];
           x = out;    
           *x++ = (char)AMF::BOOLEAN;
           *x = *static_cast<const char *>(in);
@@ -406,7 +406,7 @@ AMF::encodeElement(astype_e type, const void *in, int nbytes)
           log_unimpl("Null AMF encoder");
           break;
       case UNDEFINED:
-          x = out = new uint8_t[pktsize];
+          x = out = new boost::uint8_t[pktsize];
           memset(x, 0, pktsize);
           *x++ = AMF::UNDEFINED;
           num = nbytes;
@@ -429,7 +429,7 @@ AMF::encodeElement(astype_e type, const void *in, int nbytes)
           break;
           // Encode the date as a 64 bit, big-endian, numeric value
       case DATE:
-          x = out = new uint8_t[pktsize];
+          x = out = new boost::uint8_t[pktsize];
           memset(x, 0, pktsize);
           *x++ = AMF::DATE;
           num = *static_cast<const amfnum_t*>(in);
@@ -448,7 +448,7 @@ AMF::encodeElement(astype_e type, const void *in, int nbytes)
       case XML_OBJECT:
           // Encode an XML object. The data follows a 4 byte length
           // field. (which must be big-endian)
-          x = out = new uint8_t[pktsize];
+          x = out = new boost::uint8_t[pktsize];
           memset(x, 0, pktsize);
           *x++ = AMF::STRING;
           num = nbytes;
@@ -716,12 +716,12 @@ AMF::extractElementLength(void *in)
     return 0;
 }
 
-int8_t *
-AMF::extractString(const uint8_t *in)
+boost::int8_t *
+AMF::extractString(const boost::uint8_t *in)
 {
 //    GNASH_REPORT_FUNCTION;
-    int8_t *buf = NULL;
-    uint8_t *x = const_cast<uint8_t *>(in);
+    boost::int8_t *buf = NULL;
+    boost::uint8_t *x = const_cast<boost::uint8_t *>(in);
     
     if (*x == AMF::STRING) {
         x++;
@@ -740,10 +740,10 @@ AMF::extractString(const uint8_t *in)
 }
 
 amfnum_t *
-AMF::extractNumber(const uint8_t *in)
+AMF::extractNumber(const boost::uint8_t *in)
 {
 //    GNASH_REPORT_FUNCTION;    
-    uint8_t *x = const_cast<uint8_t *>(in);
+    boost::uint8_t *x = const_cast<uint8_t *>(in);
     amfnum_t *num = new amfnum_t;
     memset(num, 0, AMF_NUMBER_SIZE);
     
@@ -760,7 +760,7 @@ AMF::extractNumber(const uint8_t *in)
 
 AMF::amf_element_t *
 AMF::createElement(amf_element_t *el, astype_e type,
-		  const std::string &name, uint8_t *data, int nbytes)
+		  const std::string &name, boost::uint8_t *data, int nbytes)
 {
 //    GNASH_REPORT_FUNCTION;
     log_debug("Creating element %s", name.c_str());
@@ -790,7 +790,7 @@ AMF::createElement(amf_element_t *el, const std::string &name, amfnum_t data)
     el->name = name;
     el->length = AMF_NUMBER_SIZE;
 //    char *numptr = (char *)&data;
-    el->data = new uint8_t[AMF_NUMBER_SIZE + 1];
+    el->data = new boost::uint8_t[AMF_NUMBER_SIZE + 1];
     memset(el->data, 0, AMF_NUMBER_SIZE + 1);
     memcpy(el->data, &data, AMF_NUMBER_SIZE);
 
@@ -815,7 +815,7 @@ AMF::createElement(amf_element_t *el, const std::string &name, double data)
     el->name = name;
     el->length = AMF_NUMBER_SIZE;
 //    char *numptr = (char *)&data;
-    el->data = new uint8_t[AMF_NUMBER_SIZE + 1];
+    el->data = new boost::uint8_t[AMF_NUMBER_SIZE + 1];
     memset(el->data, 0, AMF_NUMBER_SIZE + 1);
     memcpy(el->data, &data, AMF_NUMBER_SIZE);
 
@@ -832,7 +832,7 @@ AMF::createElement(amf_element_t *el, const char *name, const char *data)
     el->name = name;
     el->length = strlen(data);
     char *str = const_cast<char *>(data);
-    el->data = reinterpret_cast<uint8_t *>(str);
+    el->data = reinterpret_cast<boost::uint8_t *>(str);
     return el;
 }
 
@@ -846,7 +846,7 @@ AMF::createElement(amf_element_t *el, const std::string &name, std::string &data
     el->name = name;
     el->length = data.size();
     char *str = const_cast<char *>(data.c_str());
-    el->data = reinterpret_cast<uint8_t *>(str);
+    el->data = reinterpret_cast<boost::uint8_t *>(str);
     return el;
 }
 
@@ -867,7 +867,7 @@ AMF::createElement(AMF::amf_element_t *el, const std::string &name, bool data)
     el->type = AMF::BOOLEAN;
     el->name = name;
     el->length = 1;
-    el->data = new uint8_t[sizeof(uint16_t)];
+    el->data = new boost::uint8_t[sizeof(uint16_t)];
     memset(el->data, 0, sizeof(uint16_t));
     *el->data = data;
     return el;
@@ -904,13 +904,13 @@ AMF::encodeVariable(amf_element_t *el)
 {
 //    GNASH_REPORT_FUNCTION;
     int outsize = el->name.size() + el->length + 5;
-    uint8_t *out = new uint8_t[outsize + 2];
+    boost::uint8_t *out = new boost::uint8_t[outsize + 2];
     memset(out, 0, outsize + 2);
-    uint8_t *tmpptr = out;
+    boost::uint8_t *tmpptr = out;
 
     // Add the length of the string for the name of the variable
     size_t length = el->name.size();
-    uint16_t enclength = length;
+    boost::uint16_t enclength = length;
     swapBytes(&enclength, 2);
     memcpy(tmpptr, &enclength, 2);
 
@@ -946,13 +946,13 @@ AMF::encodeVariable(amf_element_t *el)
     return out;    
 }
 
-uint8_t *
+boost::uint8_t *
 AMF::encodeVariable(amf_element_t &el)
 {
 //    GNASH_REPORT_FUNCTION;
     int outsize = el.name.size() + el.length + 5;
-    uint8_t *out = new uint8_t[outsize];
-    uint8_t *tmpptr = out;
+    boost::uint8_t *out = new uint8_t[outsize];
+    boost::uint8_t *tmpptr = out;
 
     // Add the length of the string for the name of the variable
     size_t length = el.name.size();
@@ -973,14 +973,14 @@ AMF::encodeVariable(amf_element_t &el)
     return out;    
 }
 
-uint8_t *
+boost::uint8_t *
 AMF::encodeVariable(const char *name, bool flag)
 {
 //    GNASH_REPORT_FUNCTION;
     
     int outsize = strlen(name) + AMF_NUMBER_SIZE + 5;
-    uint8_t *out = new uint8_t[outsize];
-    uint8_t *tmpptr = out;
+    boost::uint8_t *out = new uint8_t[outsize];
+    boost::uint8_t *tmpptr = out;
 
     size_t length = strlen(name);
     short enclength = length;
@@ -996,13 +996,13 @@ AMF::encodeVariable(const char *name, bool flag)
     return out;    
 }
 
-uint8_t *
+boost::uint8_t *
 AMF::encodeVariable(const char *name)
 {
 //    GNASH_REPORT_FUNCTION;
     size_t outsize = strlen(name) + AMF_NUMBER_SIZE + 5;
-    uint8_t *out = new uint8_t[outsize];
-    uint8_t *tmpptr = out;
+    boost::uint8_t *out = new boost::uint8_t[outsize];
+    boost::uint8_t *tmpptr = out;
 
     size_t length = strlen(name);
     short enclength = length;
@@ -1017,13 +1017,13 @@ AMF::encodeVariable(const char *name)
     return out;    
 }
 
-uint8_t *
+boost::uint8_t *
 AMF::encodeVariable(const char *name, amfnum_t bignum)
 {
 //    GNASH_REPORT_FUNCTION;
     int outsize = strlen(name) + AMF_NUMBER_SIZE + 5;
-    uint8_t *out = new uint8_t[outsize];
-    uint8_t *tmpptr = out;
+    boost::uint8_t *out = new boost::uint8_t[outsize];
+    boost::uint8_t *tmpptr = out;
     amfnum_t newnum = bignum;
     char *numptr = (char *)&newnum;
 
@@ -1048,8 +1048,8 @@ AMF::encodeVariable(const char *name, const char *val)
 //    GNASH_REPORT_FUNCTION;
 
     int outsize = strlen(name) + strlen(val) + 5;
-    uint8_t *out = new uint8_t[outsize];
-    uint8_t *tmpptr = out;
+    boost::uint8_t *out = new boost::uint8_t[outsize];
+    boost::uint8_t *tmpptr = out;
 
     size_t length = strlen(name);
     short enclength = length;
@@ -1070,14 +1070,14 @@ AMF::encodeVariable(const char *name, const char *val)
     return out;
 }
 
-uint8_t *
+boost::uint8_t *
 AMF::encodeVariable(std::string &name, std::string &val)
 {
 //    GNASH_REPORT_FUNCTION;
 
     int outsize = name.size() + val.size() + 5;
-    uint8_t *out = new uint8_t[outsize];
-    uint8_t *tmpptr = out;
+    boost::uint8_t *out = new boost::uint8_t[outsize];
+    boost::uint8_t *tmpptr = out;
     short length;
 
     length = name.size() && 0xffff;
@@ -1098,7 +1098,7 @@ AMF::encodeVariable(std::string &name, std::string &val)
 }
 
 int
-AMF::headerSize(int8_t header)
+AMF::headerSize(boost::int8_t header)
 {
 //    GNASH_REPORT_FUNCTION;
     
@@ -1128,11 +1128,11 @@ AMF::headerSize(int8_t header)
 }
 
 int
-AMF::parseHeader(uint8_t *in)
+AMF::parseHeader(boost::uint8_t *in)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    uint8_t *tmpptr = in;
+    boost::uint8_t *tmpptr = in;
     
     log_msg (_("AMF header byte is: 0x%X"), *in);
 
@@ -1143,13 +1143,13 @@ AMF::parseHeader(uint8_t *in)
     log_msg (_("The header size is %d"), _header_size);
 
 #if 1
-    uint8_t *hexint;
-    hexint = new uint8_t[(_header_size + 3) *3];
-    hexify((uint8_t *)hexint, (uint8_t *)in, _header_size, false);
+    boost::uint8_t *hexint;
+    hexint = new boost::uint8_t[(_header_size + 3) *3];
+    hexify((boost::uint8_t *)hexint, (uint8_t *)in, _header_size, false);
     log_msg(_("The packet head is: 0x%s"), hexint);
 #endif
     if (_header_size >= 4) {
-        hexify((uint8_t *)hexint, (uint8_t *)tmpptr, 3, false);
+        hexify((boost::uint8_t *)hexint, (boost::uint8_t *)tmpptr, 3, false);
         _mystery_word = *tmpptr++;
         _mystery_word = (_mystery_word << 12) + *tmpptr++;
         _mystery_word = (_mystery_word << 8) + *tmpptr++;
@@ -1157,7 +1157,7 @@ AMF::parseHeader(uint8_t *in)
     }
 
     if (_header_size >= 8) {
-        hexify((uint8_t *)hexint, (uint8_t *)tmpptr, 3, false);
+        hexify((boost::uint8_t *)hexint, (boost::uint8_t *)tmpptr, 3, false);
         _total_size = *tmpptr++;
         _total_size = (_total_size << 12) + *tmpptr++;
         _total_size = (_total_size << 8) + *tmpptr++;
@@ -1169,7 +1169,7 @@ AMF::parseHeader(uint8_t *in)
     }
 
     if (_header_size >= 8) {
-        hexify((uint8_t *)hexint, (uint8_t *)tmpptr, 1, false);
+        hexify((boost::uint8_t *)hexint, (boost::uint8_t *)tmpptr, 1, false);
         _type = *(content_types_e *)tmpptr;
         tmpptr++;
         log_msg(_("The type is: %d, or 0x%s"), _type, hexint);
@@ -1196,7 +1196,7 @@ AMF::parseHeader(uint8_t *in)
     };
     
     if (_header_size == 12) {
-        hexify((uint8_t *)hexint, (uint8_t *)tmpptr, 3, false);
+        hexify((boost::uint8_t *)hexint, (boost::uint8_t *)tmpptr, 3, false);
         _src_dest = *(reinterpret_cast<amfsource_e *>(tmpptr));
         tmpptr += sizeof(unsigned int);
         log_msg(_("The source/destination is: %d, or 0x%s"), _src_dest, hexint);
@@ -1205,8 +1205,8 @@ AMF::parseHeader(uint8_t *in)
     return _packet_size;
 }
 
-uint8_t *
-AMF::addPacketData(uint8_t *data, int bytes)
+boost::uint8_t *
+AMF::addPacketData(boost::uint8_t *data, int bytes)
 {
 //    GNASH_REPORT_FUNCTION;
     memcpy(_seekptr, data, bytes);
@@ -1223,14 +1223,14 @@ AMF::parseBody()
 }
 
 int
-AMF::parseBody(uint8_t *in, int bytes)
+AMF::parseBody(boost::uint8_t *in, int bytes)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    uint8_t *tmpptr;
+    boost::uint8_t *tmpptr;
 
 //    uint8_t hexint[(bytes*2)+1];
-    uint8_t* hexint;
+    boost::uint8_t* hexint;
 
     char buffer[500];
 //    char *name;
@@ -1246,12 +1246,12 @@ AMF::parseBody(uint8_t *in, int bytes)
         return -1;
     }
 
-    hexint =  (uint8_t*) malloc((bytes * 3) + 12);
+    hexint =  (boost::uint8_t*) malloc((bytes * 3) + 12);
 
 //     memcpy(_amf_data +_read_size, in, AMF_VIDEO_PACKET_SIZE);
 //     _read_size += bytes;
 #if 1
-    hexify((uint8_t *)hexint, (uint8_t *)in, bytes, true);
+    hexify((boost::uint8_t *)hexint, (boost::uint8_t *)in, bytes, true);
     log_msg(_("The packet body is: 0x%s"), hexint);
 #endif
 
@@ -1319,14 +1319,14 @@ AMF::parseBody(uint8_t *in, int bytes)
     return -1;
 }
 
-uint8_t *
-AMF::extractVariable(AMF::amf_element_t *el, uint8_t *in)
+boost::uint8_t *
+AMF::extractVariable(AMF::amf_element_t *el, boost::uint8_t *in)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    uint8_t buffer[AMF_PACKET_SIZE];
-    uint8_t *tmpptr = in;
-    int16_t length;
+    boost::uint8_t buffer[AMF_PACKET_SIZE];
+    boost::uint8_t *tmpptr = in;
+    boost::int16_t length;
 
     if (el == 0) {
 	return 0;

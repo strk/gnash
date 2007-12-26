@@ -47,11 +47,11 @@ public:
     size_t size() { return _amfobjs.size(); };
     
     // extract the header
-    bool extractHeader(std::vector<uint8_t> &data);
+    bool extractHeader(std::vector<boost::uint8_t> &data);
     bool extractHeader(std::string &filespec);
 
     // Create the header
-    bool formatHeader(std::vector<uint8_t> &data);
+    bool formatHeader(std::vector<boost::uint8_t> &data);
     bool formatHeader(std::string &name);
     bool formatHeader(std::string &name, int filesize);
 
@@ -64,7 +64,7 @@ public:
     // read the .sol file from disk
     bool readFile(std::string &filespec);
     
-    std::vector<uint8_t> getHeader() { return _header; };
+    std::vector<boost::uint8_t> getHeader() { return _header; };
 
     // Add the AMF objects that are the data of the file
     void addObj(AMF::amf_element_t &x);
@@ -80,8 +80,8 @@ public:
     std::string &getObjectName() { return _objname; };
         
  private:
-    std::vector<uint8_t> _header;
-    std::vector<uint8_t> _data;
+    std::vector<boost::uint8_t> _header;
+    std::vector<boost::uint8_t> _data;
     std::string      _objname;
     std::string      _filespec;
     std::vector<AMF::amf_element_t> _amfobjs;
