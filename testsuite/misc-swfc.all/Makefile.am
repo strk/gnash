@@ -78,8 +78,9 @@ bogustests-runner: $(srcdir)/../generic-testrunner.sh $(BOGO_SCTESTS_OUT) $(AUXM
 	sh $< -C __END_OF_TEST__ -f 50 -r 50 $(top_builddir) $(BOGO_SCTESTS_OUT) > $@
 	chmod 755 $@
 
-*.swf: Dejagnu.sc check.sc
+$(SANE_SCTESTS_OUT): Dejagnu.sc check.sc
 
+SUFFIXES = .sc .swf
 .sc.swf:
 	$(SWFC_CPP) $< > $(@:%.swf=pp_%.sc) 
 	$(SWFC) $(SWFC_FLAGS) -o $@ $(@:%.swf=pp_%.sc)

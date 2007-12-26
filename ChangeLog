@@ -1,3 +1,9 @@
+2007-12-26  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* testsuite/misc-swfc.all/Makefile.am: Use SUFFIXES so the
+	translation rule works. Use $(SANE_SCTESTS_OUT) instead of the
+	bogus *.swf.
+
 2007-12-26 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/NetConnection.cpp: implement NetConnection.isConnected
@@ -45,7 +51,7 @@
 	and Local Connections. Make extractNumber() return a uint32_t
 	intead of just an int as we keep overflowing strtol().
 	* server/asobj/SharedObject.cpp: Use new security options for
-	files.
+	files. Return null for strings instead of undefined.
 
 2007-12-25 Sandro Santilli <strk@keybit.net>
 
