@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.109 2007/12/26 09:50:05 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.110 2007/12/26 10:50:19 strk Exp $";
 
 #include "check.as"
 
@@ -258,6 +258,12 @@ check(mc._yscale != undefined);
 check_equals(typeof(MovieClip.prototype._lockroot), 'undefined');
 xcheck_equals(typeof(mc._lockroot), 'boolean');
 xcheck_equals(mc._lockroot, false);
+mc._lockroot = 56;
+xcheck_equals(typeof(mc._lockroot), 'boolean');
+xcheck_equals(mc._lockroot, true);
+mc._lockroot = "";
+xcheck_equals(typeof(mc._lockroot), 'boolean');
+xcheck_equals(mc._lockroot, false);
 
 #if OUTPUT_VERSION > 5
 check_equals(mc._name, "");
@@ -343,7 +349,7 @@ xcheck(!mc.hasOwnProperty("_url"));
 xcheck(!mc.hasOwnProperty("_soundbuftime"));
 xcheck(!mc.hasOwnProperty("_focusrect"));
 xcheck(!mc.hasOwnProperty("_framesloaded"));
-check(!mc.hasOwnProperty("_lockroot"));
+xcheck(!mc.hasOwnProperty("_lockroot"));
 xcheck(!mc.hasOwnProperty("_highquality"));
 #endif //if OUTPUT_VERSION >= 6
 
@@ -1289,15 +1295,15 @@ check_equals(getInstanceAtDepth(-6.2), tt2);
 #endif // OUTPUT_VERSION >= 7
 
 #if OUTPUT_VERSION < 6
- check_totals(162); // SWF5
+ check_totals(166); // SWF5
 #else
 #if OUTPUT_VERSION < 7
- check_totals(557); // SWF6
+ check_totals(561); // SWF6
 #else
 #if OUTPUT_VERSION < 8
- check_totals(574); // SWF7
+ check_totals(578); // SWF7
 #else
- check_totals(575); // SWF8+
+ check_totals(579); // SWF8+
 #endif
 #endif
 #endif
