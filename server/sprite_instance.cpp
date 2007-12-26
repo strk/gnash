@@ -2449,7 +2449,7 @@ void sprite_instance::advance()
 void
 sprite_instance::execute_init_action_buffer(const action_buffer& a, int cid)
 {
-	movie_instance* mi = get_root();
+	movie_instance* mi = m_root; // get_root(); // WARNING! get_root() would depend on _lockroot !!
 	if ( mi->setCharacterInitialized(cid) )
 	{
 #ifdef GNASH_DEBUG
@@ -3590,7 +3590,7 @@ sprite_instance::loadMovie(const URL& url)
 		extern_movie->setVariables(vars);
 
 		// Set lockroot to our value of it
-		extern_movie->set_member( PROP_uLOCKROOT, getLockRoot() );
+		extern_movie->setLockRoot( getLockRoot() );
 
 		save_extern_movie(extern_movie.get());
 
