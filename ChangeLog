@@ -1,5 +1,7 @@
 2007-12-26 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/MovieClip.as: add test for _lockroot
+	  location.
 	* server/: sprite_instance.cpp, as_environment.cpp,
 	  namedStrings.{cpp,h}:
 	  Add PROP_uROOT and PROP_uGLOBAL

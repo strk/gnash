@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.107 2007/12/25 06:12:54 zoulunkai Exp $";
+rcsid="$Id: MovieClip.as,v 1.108 2007/12/26 09:45:56 strk Exp $";
 
 #include "check.as"
 
@@ -83,6 +83,7 @@ check_equals(mc.getSWFVersion(), OUTPUT_VERSION);
 
 #if OUTPUT_VERSION >= 6
 check(MovieClip.prototype.hasOwnProperty('loadMovie'));
+xcheck(MovieClip.prototype.hasOwnProperty('_lockroot')); 
 check(!MovieClip.prototype.hasOwnProperty('loadMovieNum'));
 check(!MovieClip.prototype.hasOwnProperty('valueOf')); 
 check(!MovieClip.prototype.hasOwnProperty('toString')); 
@@ -255,6 +256,8 @@ check(mc._y != undefined);
 check(mc._ymouse != undefined);
 check(mc._yscale != undefined);
 xcheck(mc._lockroot != undefined);
+xcheck_equals(typeof(mc._lockroot), 'boolean');
+xcheck_equals(mc._lockroot, false);
 
 #if OUTPUT_VERSION > 5
 check_equals(mc._name, "");
@@ -1286,15 +1289,15 @@ check_equals(getInstanceAtDepth(-6.2), tt2);
 #endif // OUTPUT_VERSION >= 7
 
 #if OUTPUT_VERSION < 6
- check_totals(160); // SWF5
+ check_totals(162); // SWF5
 #else
 #if OUTPUT_VERSION < 7
- check_totals(554); // SWF6
+ check_totals(557); // SWF6
 #else
 #if OUTPUT_VERSION < 8
- check_totals(571); // SWF7
+ check_totals(574); // SWF7
 #else
- check_totals(572); // SWF8+
+ check_totals(575); // SWF8+
 #endif
 #endif
 #endif
