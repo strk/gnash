@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.117 2007/12/24 05:33:44 zoulunkai Exp $ */
+/* $Id: as_environment.cpp,v 1.118 2007/12/26 08:04:59 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -33,6 +33,7 @@
 #include "log.h"
 #include "Property.h"
 #include "as_object.h"
+#include "namedStrings.h"
 
 #include <string>
 #include <utility> // for std::pair
@@ -171,7 +172,7 @@ as_environment::get_variable_raw(
 
     as_object* global = vm.getGlobal();
 
-    if ( swfVersion > 5 && varname == "_global" )
+    if ( swfVersion > 5 && key == NSV::PROP_uGLOBAL )
     {
         // The "_global" ref was added in SWF6
         if ( retTarget ) *retTarget = NULL; // correct ??
@@ -633,7 +634,7 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
 
 			// Looking for _global ?
 			as_object* global = VM::get().getGlobal();
-			if ( swfVersion > 5 && subpart == "_global" )
+			if ( swfVersion > 5 && subpartKey == NSV::PROP_uGLOBAL )
 			{
 				element = global;
 				break;

@@ -1839,14 +1839,12 @@ character* sprite_instance::get_character_at_depth(int depth)
 bool sprite_instance::get_member(string_table::key name_key, as_value* val,
 	string_table::key nsname)
 {
-	const std::string& name = VM::get().getStringTable().value(name_key);
-
 	// FIXME: use addProperty interface for these !!
 	// TODO: or at least have a character:: protected method take
 	//       care of these ?
 	//       Duplicates code in character::get_path_element_character too..
 	//
-	if (name == "_root" )
+	if (name_key == NSV::PROP_uROOT)
 	{
 		//if ( isUnloaded() ) return false; // see movieclip_destruction_test3.sc
 
@@ -1855,10 +1853,20 @@ bool sprite_instance::get_member(string_table::key name_key, as_value* val,
 
 		return true;
 	}
+
+	if ( _vm.getSWFVersion() > 5 && name_key == NSV::PROP_uGLOBAL ) // see MovieClip.as
+	{
+		// The "_global" ref was added in SWF6
+		val->set_as_object( _vm.getGlobal() );
+		return true;
+	}
+
+	const std::string& name = _vm.getStringTable().value(name_key);
+
 	if (name.compare(0, 6, "_level") == 0 && name.find_first_not_of("0123456789", 7) == string::npos )
 	{
 		unsigned int levelno = atoi(name.c_str()+6); // getting 0 here for "_level" is intentional
-		movie_instance* mo = VM::get().getRoot().getLevel(levelno).get();
+		movie_instance* mo = _vm.getRoot().getLevel(levelno).get();
 		if ( mo )
 		{
 			val->set_as_object(mo);
@@ -1868,12 +1876,6 @@ bool sprite_instance::get_member(string_table::key name_key, as_value* val,
 		{
 			return false;
 		}
-	}
-	if ( _vm.getSWFVersion() > 5 && name == "_global" ) // see MovieClip.as
-	{
-		// The "_global" ref was added in SWF6
-		val->set_as_object( _vm.getGlobal() );
-		return true;
 	}
 
 	// Try object members, BEFORE display list items!

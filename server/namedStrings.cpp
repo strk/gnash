@@ -61,6 +61,8 @@ static string_table::svt preload_names[] =
 	{ "onSelect", NSV::PROP_ON_SELECT },
 	{ "onStatus", NSV::PROP_ON_STATUS },
 	{ "_parent", NSV::PROP_uPARENT },
+	{ "_root", NSV::PROP_uROOT },
+	{ "_global", NSV::PROP_uGLOBAL },
 	{ "__proto__", NSV::PROP_uuPROTOuu },
 	{ "prototype", NSV::PROP_PROTOTYPE },
 	{ "push", NSV::PROP_PUSH },

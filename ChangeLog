@@ -1,3 +1,9 @@
+2007-12-26 Sandro Santilli <strk@keybit.net>
+
+	* server/: sprite_instance.cpp, as_environment.cpp,
+	  namedStrings.{cpp,h}:
+	  Add PROP_uROOT and PROP_uGLOBAL
+
 2007-12-25  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* configure.ac: Add new security settings.
