@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.462 2007/12/24 18:21:03 rsavoye Exp $
+dnl $Id: configure.ac,v 1.463 2007/12/26 01:11:07 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -174,8 +174,39 @@ AC_LANG_POP(C++)
 
 dnl This is primarily used when compiling for a similar architecture,
 dnl like pentium->geode, which can use the same compiler, but have
-dnl different development
-AC_ARG_WITH(top_level, AC_HELP_STRING([--with-top-level], [top level directory for cross compiling files]), with_top_level=${withval} ; cross_compiling=yes)
+dnl different developmentAC_ARG_WITH(top_level, AC_HELP_STRING([--with-top-level], [top level directory for cross compiling files]), with_top_level=${withval} ; cross_compiling=yes)
+
+
+AC_ARG_WITH(top_level,
+  AC_HELP_STRING([--with-top-level],
+  [top level directory for cross compiling files]),
+  with_top_level=${withval} ;
+  cross_compiling=yes)
+
+soldir=/tmp
+AC_ARG_WITH(soldir,
+ AC_HELP_STRING([--with-soldir],
+ [directory for .sol files]),
+ with_soldir=${withval})
+if test x${with_soldir} != x; then
+  soldir=${with_soldir}
+fi
+SOLDIR=${soldir}
+AC_SUBST(SOLDIR)
+
+dnl lckey=0xdd3adabd
+AC_ARG_WITH(lckey,
+ AC_HELP_STRING([--with-lckey],
+ [shared memory key for your system]),
+ with_lckey=${withval})
+
+if test x${with_lckey} != x; then
+  lckey=${with_lckey}
+else
+  lckey=0xcbc384f8
+fi
+LC_KEY=${lckey}
+AC_SUBST(LC_KEY)
 
 AC_ARG_ENABLE(debugger,
   AC_HELP_STRING([--enable-debugger],[Enable the Flash debugger]),
@@ -189,8 +220,6 @@ if test x"$debugger" = x"yes"; then
   AC_DEFINE([USE_DEBUGGER], [], [Flash Debugger support])
 fi
 AM_CONDITIONAL(DEBUGGER, test x$debugger = xyes)
-
-AC_ARG_WITH(top_level, AC_HELP_STRING([--with-top-level], [top level directory for cross compiling files]), with_top_level=${withval})
 
 AC_ARG_ENABLE(fps-debug,
   AC_HELP_STRING([--enable-fps-debug],[Enable FPS debugging code]),
@@ -701,6 +730,91 @@ AM_CONDITIONAL(BUILD_CAIRO_RENDERER, [ test x$build_cairo = xyes ])
 
 dnl AC_CHECK_LIB(ltdl, lt_dlmutex_register, AC_DEFINE(LT_DLMUTEX, 1, [Has lt_dlmutex_register]),
 dnl                                         AC_DEFINE(LT_DLMUTEX, 0, [doesn't have lt_dlmutex_register]) )
+
+#
+# These settings are compile time options for the security
+# setting for anything that lets gnash exchange data with
+# other applications. Currently this only supports Shared
+# Objects and Local Connections. Shared Objects are like
+# your web browsers cookies, and Local Connections use
+# shared memory to execute methods remotely, and to
+# exchange data.
+#
+# The default is to enable everything, and these can
+# also be controlled dynamically by the $HOME/.gnashrc
+# file.
+#
+solreadonly=no
+localconnection=yes
+lctrace=yes
+
+AC_ARG_WITH(security,
+  AC_HELP_STRING([--with-security=], [Specify which security features to enable]),
+  if test -n ${withval}; then
+    if test "x${withval}" != "xno"; then
+      extlist="${withval}"
+      withval=`echo ${withval} | tr '\054' ' ' `
+    else
+      extlist=""
+      withval=""
+    fi
+  fi
+  security_list=""
+  nsecurity=0
+  while test -n "${withval}" ; do
+    val=`echo ${withval} | cut -d ' ' -f 1`
+dnl    security_list="${security_list} ${val}"
+    [case "${val}" in
+      solreadonly)
+        solreadonly=yes
+        nsecurity=$((nsecurity+1))
+        ;;
+      lc)
+        localconnection=yes
+        nsecurity=$((nsecurity+1))
+        ;;
+      lctrace)
+        lctrace=yes
+        nsecurity=$((nsecurity+1))
+        ;;
+      all|ALL)
+        solreadonly=yes
+        lc=yes
+        lctrace=yes
+        nsecurity=3
+        ;;
+      *) AC_MSG_ERROR([invalid security feature specified: ${withval} given (accept: solreadonly|lc|lctrace)])
+        ;;
+      esac]
+    withval=`echo ${withval} | cut -d ' ' -f 2-6`
+    if test "x$val" = "x$withval"; then
+      break;
+    fi
+  done
+)
+if test xlctrace = xyes; then
+  security_list="${security_list} lctrace"
+  AC_DEFINE(USE_LC_TRACE, [1],
+           [Support LocalConnection])
+  AC_MSG_NOTICE([This build supports LocalConnection tracing])
+  AC_MSG_WARN([This option will effect your performance])
+fi
+
+if test x$localconnection = xyes; then
+  security_list="${security_list} localconnection"
+  AC_DEFINE(USE_LC, [1],
+                 [Support LocalConnection])
+  AC_MSG_NOTICE([This build supports LocalConnection])
+fi
+if test x$solreadonly = xyes; then
+  security_list="${security_list} solreadonly"
+  AC_DEFINE(USE_SOL_READONLY, [1],
+                 [Shared Objects are read-only])
+  AC_MSG_NOTICE([Shared Objects are read-only])
+fi
+SECURITY_LIST="$security_list"
+AC_SUBST(SECURITY_LIST)
+
 
 if test x$build_agg = xyes; then
   AC_DEFINE([RENDERER_AGG], [], [Use AntiGrain renderer])
@@ -1770,6 +1884,10 @@ fi
 
 if test x"$extensions_list" != x; then
   echo "        Building extensions: ${extensions_list}"
+fi
+
+if test x"$security_list" != x; then
+  echo "        Enabling security features: ${security_list}"
 fi
 
 if test x"${SUPPORTED_GUIS}" = x; then

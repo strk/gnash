@@ -1,5 +1,7 @@
 2007-12-25  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* configure.ac: Add new security settings.
+	
 	* libbase/rc.{cpp,h}: Add new security options for Shared Objects
 	and Local Connections. Make extractNumber() return a uint32_t
 	intead of just an int as we keep overflowing strtol().
