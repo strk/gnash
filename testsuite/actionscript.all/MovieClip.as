@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.108 2007/12/26 09:45:56 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.109 2007/12/26 09:50:05 strk Exp $";
 
 #include "check.as"
 
@@ -255,7 +255,7 @@ check(mc._highquality != undefined);
 check(mc._y != undefined);
 check(mc._ymouse != undefined);
 check(mc._yscale != undefined);
-xcheck(mc._lockroot != undefined);
+check_equals(typeof(MovieClip.prototype._lockroot), 'undefined');
 xcheck_equals(typeof(mc._lockroot), 'boolean');
 xcheck_equals(mc._lockroot, false);
 
