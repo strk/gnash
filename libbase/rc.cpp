@@ -182,7 +182,7 @@ RcInitFile::extractNumber(uint32_t *num, const char *pattern, string &variable,
         *num = strtoul(value.c_str(), NULL, 0);
         if (*num == LONG_MAX) {
             long long foo = strtoll(value.c_str(), NULL, 0);
-            log_error("Conversion overflow!: %ll", foo);
+            log_error("Conversion overflow!: %lld", foo);
             
         }
     }

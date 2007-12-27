@@ -177,6 +177,19 @@ The variables in the <filename>.gnashrc</filename> file support three types of a
        instead you need to set the GNASH_FLASH_VERSION environment variable for
        the latter (which doesn't affect $version and System.capabilities.version).</entry>
 </row>
+
+<row>
+<entry>flashSystemOS</entry>
+<entry>string</entry>
+<entry>The string that Gnash should return for System.capabilities.OS</entry>
+</row>
+
+<row>
+<entry>flashSystemManufacturer</entry>
+<entry>string</entry>
+<entry>The string that Gnash should return for System.capabilities.manufacturer</entry>
+</row>
+
 <row>
 <entry>StreamsTimeout</entry>
 <entry>double</entry>
@@ -185,6 +198,7 @@ Set the number of seconds after which streams download time out. Note that timeo
 passed w/out anything was received.
 </entry>
 </row>
+
 <row>
 <entry>insecureSSL</entry>
 <entry>on/off</entry>
@@ -193,6 +207,19 @@ is performed. This means that, although the connection is encrypted, the server
 certificate could be invalid, may not belong to the host, or both. Equivalent
 to curl --insecure. By default, this option is <emphasis>off</emphasis> and
 connections will fail when a host cannot be verified.</entry>
+</row>
+
+<row>
+<entry>SOLsafedir</entry>
+<entry>Absolute path</entry>
+<entry>The full path to a directory where &app; should store Shared Object files (&quot;flash cookies&quot;) if
+they are enabled.</entry>
+</row>
+
+<row>
+<entry>SOLreadonly</entry>
+<entry>on/off</entry>
+<entry>If set to <emphasis>on</emphasis>, &app; will not write Shared Object files.</entry>
 </row>
 
 <row>
