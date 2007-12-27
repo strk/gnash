@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.62 2007/12/12 07:30:12 zoulunkai Exp $";
+rcsid="$Id: Function.as,v 1.63 2007/12/27 02:42:16 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -397,14 +397,64 @@ check_equals(this.a, "a_in_root");
 //  Test the 'arguments' object
 //----------------------------------------------------------
 
+function f()
+{
+    check_equals(typeof(arguments), 'object');
+    check(arguments instanceOf Array);
+    check(arguments instanceOf Object);
+    check_equals(arguments.length, 0);
+    
+    check_equals(typeof(arguments.callee), 'function');
+    // callee: the function being called
+    check_equals(arguments.callee, _root.f);
+    // caller: the caller function
+    xcheck_equals(typeof(arguments.caller), 'null'); //? typeof return 'null', seems new!
+    check_equals(arguments.caller, null);
+    
+    var a = arguments;
+    var propRecorder = new Array();
+    for(var props in a)
+    {
+        propRecorder.push(props.toString());
+    }
+    // no enumerable properties in default mode.
+    xcheck_equals(propRecorder.length, 0); //? shouldn't fail here
+    
+    ASSetPropFlags(a, null, 6, 1 );
+    for(var props in a)
+    {
+        propRecorder.push(props.toString());
+    }
+    propRecorder.sort();
+    check_equals(propRecorder.length, 5);
+    check_equals(propRecorder[0], '__proto__');
+    check_equals(propRecorder[1], 'callee');
+    xcheck_equals(propRecorder[2], 'caller');
+    xcheck_equals(propRecorder[3], 'constructor');
+    xcheck_equals(propRecorder[4], 'length');
+}
+f();
+
+// test argument.caller
+function child_func()
+{
+#if OUTPUT_VERSION == 5
+    check_equals(arguments.caller, parent_func);
+#else
+    //? passed on swf5, but failed on swf6,7,8
+    xcheck_equals(arguments.caller, parent_func);
+#endif
+}
+function parent_func()
+{
+    child_func();
+}
+parent_func();
+
+
 // this is to be called argsChecker(1,2,3)
 function argsChecker(a, b, c, d, e, f, g)
 {
-	check_equals(typeof(arguments), 'object');
-	check(arguments instanceOf Array);
-	check(arguments instanceOf Object);
-	check_equals(typeof(arguments.callee), 'function');
-	check_equals(arguments.callee, argsChecker); 
 	check_equals(arguments.length, 3);
 	check_equals(arguments[0], 1);
 	check_equals(arguments[1], 2);
@@ -435,7 +485,7 @@ check_equals(argsCounter(a,b,c,d), 4);
 check_equals(argsCounter([a,b]), 1);
 
 function factorial(n) {
-	return n <= 1 ? n : n*factorial(n-1);
+	return n <= 1 ? n : n*arguments.callee(n-1);
 }
 check_equals(factorial(3), 6);
 check_equals(factorial(4), 24);
