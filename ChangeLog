@@ -1,3 +1,13 @@
+2007-12-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+        * libamf/sol.cpp: use correct delete[].
+
+2007-12-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+        * libbase/rc.cpp: fix lld format.
+        * doc/C/usermanual/usage/gnashrc.xml: document flashSystemOS,
+          flashSystemManufacturer, SOLSafeDir, SOLReadOnly.
+
 2007-12-26  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* testsuite/misc-swfc.all/Makefile.am: Use SUFFIXES so the

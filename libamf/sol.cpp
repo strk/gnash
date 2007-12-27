@@ -260,7 +260,7 @@ SOL::writeFile(string &filespec, string &name)
 	      ptr += outsize;
 	}
 	if (foo) {
-	    delete foo;
+	    delete[] foo;
 	}
     }
     
