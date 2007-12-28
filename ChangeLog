@@ -1,5 +1,7 @@
 2007-12-28 Sandro Santilli <strk@keybit.net>
 
+	* doc/C/usermanual/usage/gnashrc.xml: update info about
+	  localSandboxPath directive.
 	* gui/Player.cpp, server/impl.cpp: don't add the "base url"
 	  of the movie to the local sandboxes list, since it may be
 	  set by HTML tags attribute (think base=/).
