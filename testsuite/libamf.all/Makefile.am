@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.10 2007/12/26 21:05:32 rsavoye Exp $
+# $Id: Makefile.am,v 1.11 2007/12/28 03:30:50 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -53,15 +53,15 @@ check_PROGRAMS = \
 	test_string \
 	test_object \
 	test_sol \
-	test_variable \
-	test_lc
+	test_variable
+#	test_lc
 
 test_sol_SOURCES = test_sol.cpp
 test_sol_LDADD = $(AM_LDFLAGS)
 test_sol_DEPENDENCIES = $(solfiles)
 
-test_lc_SOURCES = test_lc.cpp
-test_lc_LDADD = $(AM_LDFLAGS)
+# test_lc_SOURCES = test_lc.cpp
+# test_lc_LDADD = $(AM_LDFLAGS)
 
 test_number_SOURCES = test_number.cpp
 test_number_LDADD = $(AM_LDFLAGS)
