@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.132 2007/12/18 12:34:45 udog Exp $ */
+/* $Id: impl.cpp,v 1.133 2007/12/28 19:35:14 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -98,6 +98,17 @@ set_base_url(const URL& url)
   globals::baseurl.reset(new URL(url));
   log_debug(_("Base url set to: %s"), globals::baseurl->str().c_str());
 
+#ifdef ALLOW_ACCESS_TO_ARBITRARY_LOCATIONS_OF_MY_FILESYSTEM_FROM_FLASH_MOVIE_PUBLISHERS
+// 
+// Adding the "base url" as a local sandbox used to be kind of fine until we
+// added support for the 'base' attribute of EMBED and OBJECT html tags.
+// That attribute determines how to resolve relative urls, so affects the
+// call to set_base_url. 
+// This means that the HTML author might specify '/' as the base url and obtain
+// access to any filesystem location if we do append the 'virtual base url'
+// to the local sandbox paths.
+//
+#if 0
   // If base url is a local file, we push the local file's directory
   // to the list of local sandboxes
   if ( url.protocol() == "file" )
@@ -110,6 +121,8 @@ set_base_url(const URL& url)
     rcfile.addLocalSandboxPath(path.substr(0, lastSlash+1));
     log_debug(_("Dir %s appended to local sandboxes"), url.path().c_str());
   }
+#endif
+#endif
 }
 
 const URL&

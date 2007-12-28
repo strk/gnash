@@ -1,3 +1,15 @@
+2007-12-28 Sandro Santilli <strk@keybit.net>
+
+	* gui/Player.cpp, server/impl.cpp: don't add the "base url"
+	  of the movie to the local sandboxes list, since it may be
+	  set by HTML tags attribute (think base=/).
+	  Instead, add the basedir of the actual filename loaded.
+	  This might be /tmp for konqueror plugin, or none for npapi
+	  plugin (loads from stdin). Using the basedir helps testing
+	  where you have required data in the same dir of the main
+	  movie. -u, -U, -P base=x do not modify the local sandbox
+	  paths anymore.
+
 2007-12-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
         * libamf/sol.cpp: use correct delete[].

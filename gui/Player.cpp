@@ -216,8 +216,27 @@ Player::load_movie()
 	}
 	else
 	{
+		URL url(_infile);
+
+		// If the movie is loaded from the filesystem we need
+		// to grant access to it
+		if ( url.protocol() == "file" )
+		{
+			RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+
+			const std::string& path = url.path();
+
+#if 1 // add the *directory* the movie was loaded from to the local sandbox path
+			size_t lastSlash = path.find_last_of('/');
+			rcfile.addLocalSandboxPath(path.substr(0, lastSlash+1));
+#else // add the *file* to be loaded to the local sandbox path
+			rcfile.addLocalSandboxPath(path);
+#endif
+			log_debug(_("%s appended to local sandboxes"), url.path().c_str());
+		}
+
 		// _url should be always set at this point...
-		md = gnash::create_library_movie(URL(_infile), _url.c_str(), false);
+		md = gnash::create_library_movie(url, _url.c_str(), false);
 	}
     } catch (const GnashException& er) {
 	fprintf(stderr, "%s\n", er.what());
