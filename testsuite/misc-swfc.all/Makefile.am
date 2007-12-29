@@ -86,6 +86,7 @@ SUFFIXES = .sc .swf
 	$(SWFC) $(SWFC_FLAGS) -o $@ $(@:%.swf=pp_%.sc)
 
 CLEANFILES =  \
+	$(TEST_CASES) \
 	gnash-dbg.log \
 	site.exp.bak \
 	alltests-runner \

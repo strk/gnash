@@ -1,3 +1,8 @@
+2007-12-29  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* testsuite/misc-swfc.all/Makefile.am: Add TEST_CASES to
+	CLEANFILES.
+
 2007-12-29 Sandro Santilli <strk@keybit.net>
 
 	* server/: BevelFilter.h, BitmapFilter.h,
