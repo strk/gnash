@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: processor.cpp,v 1.78 2007/12/18 00:07:12 strk Exp $ */
+/* $Id: processor.cpp,v 1.79 2007/12/29 13:02:59 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -316,7 +316,21 @@ play_movie(const char* filename)
       }
       else
       {
-         md = gnash::create_library_movie(URL(filename), NULL, false);
+         URL url(filename);
+         if ( url.protocol() == "file" )
+         {
+             const std::string& path = url.path();
+#if 1 // add the *directory* the movie was loaded from to the local sandbox path
+             size_t lastSlash = path.find_last_of('/');
+             std::string dir = path.substr(0, lastSlash+1);
+             rcfile.addLocalSandboxPath(dir);
+             log_debug(_("%s appended to local sandboxes"), dir.c_str());
+#else // add the *file* to be loaded to the local sandbox path
+             rcfile.addLocalSandboxPath(path);
+             log_debug(_("%s appended to local sandboxes"), path.c_str());
+#endif
+         }
+         md = gnash::create_library_movie(url, NULL, false);
       }
     }
     catch (GnashException& ge)
