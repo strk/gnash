@@ -15,15 +15,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.35 2007/08/18 02:54:22 strk Exp $
+# $Id: Makefile.am,v 1.36 2007/12/29 13:54:48 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
 if KPARTS
 AM_CPPFLAGS= $(KDE_CFLAGS) $(QT_CFLAGS) -DGNASHBINDIR=\"${bindir}\"
 
-plugindir   = $(libdir)/kde3
-kde_servicesdir = $(prefix)/share/services
+plugindir   = `$(KDE_CONFIG) --install module --expandvars` # $(libdir)/kde3
+kde_servicesdir = `$(KDE_CONFIG) --install services --expandvars` # $(prefix)/share/services
 rcdir       = $(prefix)/share/apps/klash
 appsdatadir = $(prefix)/share/apps/klash
 configdir = $(prefix)/share/config
@@ -57,10 +57,13 @@ klash_part.moc: $(srcdir)/klash_part.h
 	  ln -s $(srcdir)/klash_part.moc.in klash_part.moc; \
 	fi
 
+install-data: $(dist_kde_services_DATA)
+	$(INSTALL) $(dist_kde_services_DATA) $(kde_servicesdir)
+
 install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 	test -d "$(DESTDIR)$(plugindir)" || $(mkinstalldirs) "$(DESTDIR)$(plugindir)"
 #	cp .libs/libklashpart.so $(DESTDIR)$(plugindir)/libklashpart.so
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(plugin_LTLIBRARIES) "$(DESTDIR)$(plugindir)/$(plugin_LTLIBRARIES)"
+	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(plugin_LTLIBRARIES) $(DESTDIR)$(plugindir)
 #	$(RM) libklashpart.*a $(DESTDIR)$(plugindir)/libklashpart.so.0
 
 uninstall-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
