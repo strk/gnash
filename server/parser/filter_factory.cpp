@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: filter_factory.cpp,v 1.6 2007/12/12 10:23:47 zoulunkai Exp $ */
+/* $Id: filter_factory.cpp,v 1.7 2007/12/29 20:15:25 strk Exp $ */
 
 #include "filter_factory.h"
 #include "BitmapFilter.h"
@@ -45,22 +45,22 @@ typedef enum
     GRADIENT_BEVEL = 7
 } filter_types;
 
-int const filter_factory::read(stream* in, int /* movie_version */,
+int const filter_factory::read(stream& in, 
     bool read_multiple, Filters* store)
 {
     int count = 1;
 
     if (read_multiple)
     {
-        in->ensureBytes(1);
-        count = static_cast<int> (in->read_u8());
+        in.ensureBytes(1);
+        count = static_cast<int> (in.read_u8());
     }
 
     for (int i = 0; i < count; ++i)
     {
         BitmapFilter *the_filter = NULL;
 
-        filter_types filter_type = static_cast<filter_types> (in->read_u8());
+        filter_types filter_type = static_cast<filter_types> (in.read_u8());
 
         switch (filter_type)
         {
@@ -110,198 +110,198 @@ int const filter_factory::read(stream* in, int /* movie_version */,
     return count;
 }
 
-bool DropShadowFilter::read(stream* in)
+bool DropShadowFilter::read(stream& in)
 {
-    m_color = in->read_u8() << 16 + in->read_u8() << 8 + in->read_u8();
-    m_alpha = in->read_u8();
+    m_color = in.read_u8() << 16 + in.read_u8() << 8 + in.read_u8();
+    m_alpha = in.read_u8();
 
-    m_blurX = in->read_fixed();
-    m_blurY = in->read_fixed();
+    m_blurX = in.read_fixed();
+    m_blurY = in.read_fixed();
 
-    m_angle = in->read_fixed();
-    m_distance = in->read_fixed();
+    m_angle = in.read_fixed();
+    m_distance = in.read_fixed();
 
-    m_strength = in->read_short_sfixed();
+    m_strength = in.read_short_sfixed();
 
-    m_inner = in->read_bit(); 
-    m_knockout = in->read_bit(); 
-    m_hideObject = in->read_bit(); 
+    m_inner = in.read_bit(); 
+    m_knockout = in.read_bit(); 
+    m_hideObject = in.read_bit(); 
 
-    static_cast<void> (in->read_uint(5)); // Throw these away on purpose.
+    static_cast<void> (in.read_uint(5)); // Throw these away on purpose.
 
     return true;
 }
 
-bool BlurFilter::read(stream* in)
+bool BlurFilter::read(stream& in)
 {
-    m_blurX = in->read_ufixed();
-    m_blurY = in->read_ufixed();
+    m_blurX = in.read_ufixed();
+    m_blurY = in.read_ufixed();
 
-    m_quality = static_cast<boost::uint8_t> (in->read_uint(5));
+    m_quality = static_cast<boost::uint8_t> (in.read_uint(5));
 
-    static_cast<void> (in->read_uint(3)); // Throw these away.
+    static_cast<void> (in.read_uint(3)); // Throw these away.
 
     return true;
 }
 
-bool GlowFilter::read(stream* in)
+bool GlowFilter::read(stream& in)
 {
-    m_color = in->read_u8() << 16 + in->read_u8() << 8 + in->read_u8();
-    m_alpha = in->read_u8();
+    m_color = in.read_u8() << 16 + in.read_u8() << 8 + in.read_u8();
+    m_alpha = in.read_u8();
 
-    m_blurX = in->read_fixed();
-    m_blurY = in->read_fixed();
+    m_blurX = in.read_fixed();
+    m_blurY = in.read_fixed();
 
-    m_strength = in->read_short_sfixed();
+    m_strength = in.read_short_sfixed();
 
-    m_inner = in->read_bit(); 
-    m_knockout = in->read_bit(); 
+    m_inner = in.read_bit(); 
+    m_knockout = in.read_bit(); 
 
-    static_cast<void> (in->read_uint(6)); // Throw these away.
+    static_cast<void> (in.read_uint(6)); // Throw these away.
 
     return true;
 }
 
-bool BevelFilter::read(stream* in)
+bool BevelFilter::read(stream& in)
 {
     // TODO: It is possible that the order of these two should be reversed.
     // highlight might come first. Find out for sure and then fix and remove
     // this comment.
-    m_shadowColor = in->read_u8() << 16 + in->read_u8() << 8 + in->read_u8();
-    m_shadowAlpha = in->read_u8();
+    m_shadowColor = in.read_u8() << 16 + in.read_u8() << 8 + in.read_u8();
+    m_shadowAlpha = in.read_u8();
 
-    m_highlightColor = in->read_u8() << 16 + in->read_u8() << 8 + in->read_u8();
-    m_highlightAlpha = in->read_u8();
+    m_highlightColor = in.read_u8() << 16 + in.read_u8() << 8 + in.read_u8();
+    m_highlightAlpha = in.read_u8();
 
-    m_blurX = in->read_fixed();
-    m_blurY = in->read_fixed();
+    m_blurX = in.read_fixed();
+    m_blurY = in.read_fixed();
 
-    m_angle = in->read_fixed();
-    m_distance = in->read_fixed();
+    m_angle = in.read_fixed();
+    m_distance = in.read_fixed();
     
-    m_strength = in->read_short_sfixed();
+    m_strength = in.read_short_sfixed();
 
-    bool inner_shadow = in->read_bit(); 
-    m_knockout = in->read_bit(); 
-    in->read_bit();  // reserved ?
-    bool on_top = in->read_bit(); 
+    bool inner_shadow = in.read_bit(); 
+    m_knockout = in.read_bit(); 
+    in.read_bit();  // reserved ?
+    bool on_top = in.read_bit(); 
 
     // Set the bevel type. top and inner is full, top is outer, inner is inner
     m_type = on_top ? (inner_shadow ? FULL_BEVEL : OUTER_BEVEL) : INNER_BEVEL;
     
-    static_cast<void> (in->read_uint(4)); // Throw these away.
+    static_cast<void> (in.read_uint(4)); // Throw these away.
 
     return true;
 }
 
-bool GradientGlowFilter::read(stream* in)
+bool GradientGlowFilter::read(stream& in)
 {
-    boost::uint8_t count = in->read_u8(); // How many colorings.
+    boost::uint8_t count = in.read_u8(); // How many colorings.
 
     m_colors.reserve(count);
     m_alphas.reserve(count);
     m_ratios.reserve(count);
     for (int i = 0; i < count; ++i)
     {
-        m_colors.push_back(in->read_u8() << 16 + in->read_u8() << 8 + in->read_u8());
-        m_alphas.push_back(in->read_u8());
+        m_colors.push_back(in.read_u8() << 16 + in.read_u8() << 8 + in.read_u8());
+        m_alphas.push_back(in.read_u8());
     }
 
     for (int i = 0; i < count; ++i)
     {
-        m_ratios.push_back(in->read_u8());
+        m_ratios.push_back(in.read_u8());
     }
 
-    m_blurX = in->read_fixed();
-    m_blurY = in->read_fixed();
+    m_blurX = in.read_fixed();
+    m_blurY = in.read_fixed();
 
-    m_angle = in->read_fixed();
-    m_distance = in->read_fixed();
+    m_angle = in.read_fixed();
+    m_distance = in.read_fixed();
 
-    m_strength = in->read_short_sfixed();
+    m_strength = in.read_short_sfixed();
 
-    bool inner = in->read_bit();
-    m_knockout = in->read_bit();
-    in->read_bit(); // reserved ?
-    bool outer = in->read_bit(); 
+    bool inner = in.read_bit();
+    m_knockout = in.read_bit();
+    in.read_bit(); // reserved ?
+    bool outer = in.read_bit(); 
 
     m_type = outer ? (inner ? FULL_GLOW : OUTER_GLOW) : INNER_GLOW;
 
-    m_quality = static_cast<boost::uint8_t> (in->read_uint(4));
+    m_quality = static_cast<boost::uint8_t> (in.read_uint(4));
 
     return true;
 }
 
-bool ConvolutionFilter::read(stream* in)
+bool ConvolutionFilter::read(stream& in)
 {
-    m_matrixX = in->read_u8();
-    m_matrixY = in->read_u8();
+    m_matrixX = in.read_u8();
+    m_matrixY = in.read_u8();
 
-    m_divisor = in->read_float();
-    m_bias = in->read_float();
+    m_divisor = in.read_float();
+    m_bias = in.read_float();
 
     m_matrix.reserve(m_matrixX * m_matrixY);
     for (int i = 0; i < m_matrixX * m_matrixY; ++i)
     {
-        m_matrix.push_back(in->read_float());
+        m_matrix.push_back(in.read_float());
     }
 
-    m_color = in->read_u8() << 16 + in->read_u8() << 8 + in->read_u8();
-    m_alpha = in->read_u8();
+    m_color = in.read_u8() << 16 + in.read_u8() << 8 + in.read_u8();
+    m_alpha = in.read_u8();
 
-    static_cast<void> (in->read_uint(6)); // Throw away.
+    static_cast<void> (in.read_uint(6)); // Throw away.
 
-    m_clamp = in->read_bit(); 
-    m_preserveAlpha = in->read_bit(); 
+    m_clamp = in.read_bit(); 
+    m_preserveAlpha = in.read_bit(); 
 
     return true;
 }
 
-bool ColorMatrixFilter::read(stream* in)
+bool ColorMatrixFilter::read(stream& in)
 {
     m_matrix.reserve(20);
     for (int i = 0; i < 20; ++i)
     {
-        m_matrix.push_back(in->read_float());
+        m_matrix.push_back(in.read_float());
     }
 
     return true;
 }
 
-bool GradientBevelFilter::read(stream* in)
+bool GradientBevelFilter::read(stream& in)
 {
-    boost::uint8_t count = in->read_u8(); // How many colorings.
+    boost::uint8_t count = in.read_u8(); // How many colorings.
 
     m_colors.reserve(count);
     m_alphas.reserve(count);
     m_ratios.reserve(count);
     for (int i = 0; i < count; ++i)
     {
-        m_colors.push_back(in->read_u8() << 16 + in->read_u8() << 8 + in->read_u8());
-        m_alphas.push_back(in->read_u8());
+        m_colors.push_back(in.read_u8() << 16 + in.read_u8() << 8 + in.read_u8());
+        m_alphas.push_back(in.read_u8());
     }
 
     for (int i = 0; i < count; ++i)
     {
-        m_ratios.push_back(in->read_u8());
+        m_ratios.push_back(in.read_u8());
     }
 
-    m_blurX = in->read_fixed();
-    m_blurY = in->read_fixed();
+    m_blurX = in.read_fixed();
+    m_blurY = in.read_fixed();
 
-    m_angle = in->read_fixed();
-    m_distance = in->read_fixed();
+    m_angle = in.read_fixed();
+    m_distance = in.read_fixed();
 
-    m_strength = in->read_short_sfixed();
+    m_strength = in.read_short_sfixed();
 
-    bool inner = in->read_bit();
-    m_knockout = in->read_bit();
-    in->read_bit(); // reserved ?
-    bool outer = in->read_bit();
+    bool inner = in.read_bit();
+    m_knockout = in.read_bit();
+    in.read_bit(); // reserved ?
+    bool outer = in.read_bit();
 
     m_type = outer ? (inner ? FULL_BEVEL : OUTER_BEVEL) : INNER_BEVEL;
 
-    m_quality = static_cast<boost::uint8_t> (in->read_uint(4));
+    m_quality = static_cast<boost::uint8_t> (in.read_uint(4));
 
     return true;
 }

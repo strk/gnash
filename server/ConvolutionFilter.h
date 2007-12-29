@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ConvolutionFilter.h,v 1.6 2007/12/12 10:07:00 zoulunkai Exp $ */
+/* $Id: ConvolutionFilter.h,v 1.7 2007/12/29 20:15:25 strk Exp $ */
 
 #ifndef GNASH_CONVOLUTIONFILTER_H
 #define GNASH_CONVOLUTIONFILTER_H
@@ -36,7 +36,7 @@ class ConvolutionFilter : public BitmapFilter
 {
 public:
     // Fill from a stream. See parser/filter_factory.cpp for the implementations.
-    virtual bool read(stream* in);
+    virtual bool read(stream& in);
 
     virtual ~ConvolutionFilter() { return; }
 

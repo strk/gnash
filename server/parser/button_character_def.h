@@ -110,7 +110,11 @@ public:
 	/// @param endPos
 	///	One past last valid-to-read byte position
 	///
-	button_action(stream& in, int tag_type, unsigned long endPos);
+	/// @param mdef
+	///	The movie_definition this button action was read from
+	///
+	///
+	button_action(stream& in, int tag_type, unsigned long endPos, movie_definition& mdef);
 
 };
 

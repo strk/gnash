@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: filter_factory.h,v 1.1 2007/08/26 15:14:13 cmusick Exp $ */
+/* $Id: filter_factory.h,v 1.2 2007/12/29 20:15:25 strk Exp $ */
 
 #ifndef GNASH_FILTER_FACTORY_H
 #define GNASH_FILTER_FACTORY_H
@@ -40,7 +40,7 @@ public:
     /// and push them into the vector store. Returns the number read.
     /// If read_multiple is true, the first byte of the stream is
     /// expected to contain the number of filters to be read.
-    static int const read(stream* in, int movie_version, bool read_multiple,
+    static int const read(stream& in, bool read_multiple,
         Filters* store);
 };
 

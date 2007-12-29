@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BitmapFilter.h,v 1.3 2007/08/29 03:32:57 cmusick Exp $ */
+/* $Id: BitmapFilter.h,v 1.4 2007/12/29 20:15:25 strk Exp $ */
 
 #ifndef GNASH_BITMAPFILTER_H
 #define GNASH_BITMAPFILTER_H
@@ -37,7 +37,7 @@ class BitmapFilter
 {
 public:
     // Fill from a stream. See parser/filter_factory.cpp for the implementations.
-    virtual bool read(stream* /*in*/) { return true; }
+    virtual bool read(stream& /*in*/) { return true; }
 
     BitmapFilter() { return; }
     virtual ~BitmapFilter() { return; }

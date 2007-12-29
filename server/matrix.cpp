@@ -19,7 +19,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.cpp,v 1.21 2007/12/01 00:14:59 strk Exp $ 
+// $Id: matrix.cpp,v 1.22 2007/12/29 20:15:25 strk Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -204,36 +204,36 @@ matrix::set_rotation(float rotation)
 
 
 void
-matrix::read(stream* in)
+matrix::read(stream& in)
 // Initialize from the stream.
 {
 	// TODO: compute number of bytes needed to read the matrix
 	//       and ensure their availability using stream::ensureBytes
 
-	in->align();
+	in.align();
 
 	set_identity();
 
-	bool	has_scale = in->read_bit(); 
+	bool	has_scale = in.read_bit(); 
 	if (has_scale)
 	{
-		int	scale_nbits = in->read_uint(5);
-		m_[0][0] = in->read_sint(scale_nbits) / 65536.0f;
-		m_[1][1] = in->read_sint(scale_nbits) / 65536.0f;
+		int	scale_nbits = in.read_uint(5);
+		m_[0][0] = in.read_sint(scale_nbits) / 65536.0f;
+		m_[1][1] = in.read_sint(scale_nbits) / 65536.0f;
 	}
-	bool	has_rotate = in->read_bit();
+	bool	has_rotate = in.read_bit();
 	if (has_rotate)
 	{
-		int	rotate_nbits = in->read_uint(5);
-		m_[1][0] = in->read_sint(rotate_nbits) / 65536.0f;
-		m_[0][1] = in->read_sint(rotate_nbits) / 65536.0f;
+		int	rotate_nbits = in.read_uint(5);
+		m_[1][0] = in.read_sint(rotate_nbits) / 65536.0f;
+		m_[0][1] = in.read_sint(rotate_nbits) / 65536.0f;
 	}
 
-	int	translate_nbits = in->read_uint(5);
+	int	translate_nbits = in.read_uint(5);
 	if (translate_nbits > 0)
 	{
-		m_[0][2] = (float) in->read_sint(translate_nbits);
-		m_[1][2] = (float) in->read_sint(translate_nbits);
+		m_[0][2] = (float) in.read_sint(translate_nbits);
+		m_[1][2] = (float) in.read_sint(translate_nbits);
 	}
 
 	//IF_VERBOSE_PARSE(log_msg("  mat: has_scale = %d, has_rotate = %d\n", has_scale, has_rotate));

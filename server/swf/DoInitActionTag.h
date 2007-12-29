@@ -48,8 +48,9 @@ class DoInitActionTag : public ControlTag
 {
 public:
 
-    DoInitActionTag(stream& in, int cid)
+    DoInitActionTag(stream& in, movie_definition& md, int cid)
 	:
+	_buf(md),
 	_cid(cid)
     {
         read(in);
@@ -57,12 +58,12 @@ public:
 
     virtual void execute_state(sprite_instance* m) const
     {
-        m->execute_init_action_buffer(m_buf, _cid);
+        m->execute_init_action_buffer(_buf, _cid);
     }
 
     virtual void execute(sprite_instance* m) const
     {
-        m->execute_init_action_buffer(m_buf, _cid);
+        m->execute_init_action_buffer(_buf, _cid);
     }
 
     // Tell the caller that we are an action tag.
@@ -74,7 +75,7 @@ public:
     static void doInitActionLoader(stream* in, tag_type tag, movie_definition* m)
     {
         int cid = in->read_u16();
-        DoInitActionTag* da = new DoInitActionTag(*in, cid);
+        DoInitActionTag* da = new DoInitActionTag(*in, *m, cid);
 
         IF_VERBOSE_PARSE (
         log_parse(_("  tag %d: do_init_action_loader"), tag);
@@ -91,11 +92,11 @@ private:
     //
     void read(stream& in)
     {
-        m_buf.read(in, in.get_tag_end_position());
+        _buf.read(in, in.get_tag_end_position());
     }
 
 
-    action_buffer m_buf;
+    action_buffer _buf;
 
     // id of referenced character definition
     int _cid;

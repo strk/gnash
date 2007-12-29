@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BevelFilter.h,v 1.7 2007/12/12 10:07:00 zoulunkai Exp $ */
+/* $Id: BevelFilter.h,v 1.8 2007/12/29 20:15:24 strk Exp $ */
 
 #ifndef GNASH_BEVELFILTER_H
 #define GNASH_BEVELFILTER_H
@@ -42,7 +42,7 @@ public:
     } bevel_type;
 
     // Fill from a stream. See parser/filter_factory.cpp for the implementations.
-    virtual bool read(stream* in);
+    virtual bool read(stream& in);
 
     virtual ~BevelFilter() { return; }
 

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: button_character_def.cpp,v 1.23 2007/12/13 23:01:15 strk Exp $ */
+/* $Id: button_character_def.cpp,v 1.24 2007/12/29 20:15:25 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -36,7 +36,9 @@ namespace gnash {
 //
 
 
-button_action::button_action(stream& in, int tag_type, unsigned long endPos)
+button_action::button_action(stream& in, int tag_type, unsigned long endPos, movie_definition& mdef)
+	:
+	m_actions(mdef)
 {
 	// Read condition flags.
 	if (tag_type == SWF::DEFINEBUTTON) // 7
@@ -222,6 +224,9 @@ void button_character_definition::sound_info::read(stream* in)
 void
 button_character_definition::readDefineButton(stream* in, movie_definition* m)
 {
+	assert(m);
+	assert(in);
+
 	// Character ID has been read already
 
 	// Old button tag.
@@ -255,7 +260,7 @@ button_character_definition::readDefineButton(stream* in, movie_definition* m)
 	}
 
 	// Read actions.
-	m_button_actions.push_back(new button_action(*in, SWF::DEFINEBUTTON, endTagPos));
+	m_button_actions.push_back(new button_action(*in, SWF::DEFINEBUTTON, endTagPos, *m));
 
 	// detect min/max layer number
 	m_min_layer=0;
@@ -327,7 +332,7 @@ button_character_definition::readDefineButton2(stream* in, movie_definition* m)
 
 			unsigned long endActionPos = next_action_offset ? next_action_pos : tagEndPosition;
 
-			m_button_actions.push_back(new button_action(*in, SWF::DEFINEBUTTON2, endActionPos));
+			m_button_actions.push_back(new button_action(*in, SWF::DEFINEBUTTON2, endActionPos, *m));
 
 			if (next_action_offset == 0 )
 			{

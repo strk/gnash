@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: PlaceObject2Tag.h,v 1.15 2007/12/11 15:33:10 strk Exp $ */
+/* $Id: PlaceObject2Tag.h,v 1.16 2007/12/29 20:15:26 strk Exp $ */
 
 #ifndef GNASH_SWF_PLACEOBJECT2TAG_H
 #define GNASH_SWF_PLACEOBJECT2TAG_H
@@ -83,7 +83,7 @@ public:
 	~PlaceObject2Tag();
 
 	/// Read SWF::PLACEOBJECT or SWF::PLACEOBJECT2
-	void read(stream* in, tag_type tag, int movie_version);
+	void read(stream& in, tag_type tag);
 
 	/// Place/move/whatever our object in the given movie.
 	void execute(sprite_instance* m) const;
@@ -133,16 +133,16 @@ private:
 	EventHandlers m_event_handlers;
 
 	// read SWF::PLACEOBJECT 
-	void readPlaceObject(stream* in);
+	void readPlaceObject(stream& in);
 
 	// read placeObject2 actions
-	void readPlaceActions(stream* in, int movie_version);
+	void readPlaceActions(stream& in);
 
 	// read SWF::PLACEOBJECT2 
-	void readPlaceObject2(stream* in, int movie_version);
+	void readPlaceObject2(stream& in);
 
 	// read SWF::PLACEOBJECT3
-	void readPlaceObject3(stream* in, int movie_version);
+	void readPlaceObject3(stream& in);
 
 };
 

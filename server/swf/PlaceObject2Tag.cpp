@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.28 2007/12/13 10:58:10 strk Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.29 2007/12/29 20:15:26 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -35,11 +35,11 @@ namespace gnash {
 namespace SWF {
 
 void
-PlaceObject2Tag::readPlaceObject(stream* in)
+PlaceObject2Tag::readPlaceObject(stream& in)
 {
 	// Original place_object tag; very simple.
-	m_character_id = in->read_u16();
-	m_depth = in->read_u16()+character::staticDepthOffset;
+	m_character_id = in.read_u16();
+	m_depth = in.read_u16()+character::staticDepthOffset;
 	m_matrix.read(in);
 
 	IF_VERBOSE_PARSE
@@ -49,7 +49,7 @@ PlaceObject2Tag::readPlaceObject(stream* in)
 		m_matrix.print();
 	);
 
-	if (in->get_position() < in->get_tag_end_position())
+	if (in.get_position() < in.get_tag_end_position())
 	{
 		m_color_transform.read_rgb(in);
 
@@ -64,10 +64,11 @@ PlaceObject2Tag::readPlaceObject(stream* in)
 
 // read placeObject2 actions
 void
-PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
+PlaceObject2Tag::readPlaceActions(stream& in)
 {
+	int movie_version = _movie_def.get_version();
 
-	boost::uint16_t reserved = in->read_u16();
+	boost::uint16_t reserved = in.read_u16();
 	IF_VERBOSE_MALFORMED_SWF (
 		if ( reserved != 0 ) // must be 0
 		{
@@ -76,7 +77,7 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 	);
 	
 	// The logical 'or' of all the following handlers.
-	all_event_flags = (movie_version >= 6) ? in->read_u32() : in->read_u16();
+	all_event_flags = (movie_version >= 6) ? in.read_u32() : in.read_u16();
 
 	IF_VERBOSE_PARSE (
 		log_parse(_("  actions: flags = 0x%X"), all_event_flags);
@@ -86,24 +87,24 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 	for (;;)
 	{
 		// Read event.
-		in->align();
+		in.align();
 
-		boost::uint32_t flags = (movie_version >= 6) ? in->read_u32() : in->read_u16();
+		boost::uint32_t flags = (movie_version >= 6) ? in.read_u32() : in.read_u16();
 
 		if (flags == 0) // no other events
 		{
 			break;
 		}
 
-		boost::uint32_t event_length = in->read_u32();
-		if ( in->get_tag_end_position()-in->get_position() <  event_length )
+		boost::uint32_t event_length = in.read_u32();
+		if ( in.get_tag_end_position() - in.get_position() <  event_length )
 		{
 			IF_VERBOSE_MALFORMED_SWF(
 			log_swferror(_("swf_event::read(), "
 				"even_length = %u, but only %lu bytes left "
 				"to the end of current tag."
 				" Breaking for safety."),
-				event_length, in->get_tag_end_position()-in->get_position());
+				event_length, in.get_tag_end_position() - in.get_position());
 			);
 			break;
 		}
@@ -112,14 +113,14 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 
 		if (flags & (1 << 17))	// has KeyPress event
 		{
-			ch = in->read_u8();
+			ch = in.read_u8();
 			event_length--;
 		}
 
 		// Read the actions for event(s)
-		action_buffer* action = new action_buffer();
+		action_buffer* action = new action_buffer(_movie_def); // ownership will be xferred to _actionBuffers
 		_actionBuffers.push_back(action); // take ownership
-		action->read(*in, in->get_position()+event_length);
+		action->read(in, in.get_position()+event_length);
 
 		assert(action->size() == event_length); 
 
@@ -183,12 +184,12 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 
 // read SWF::PLACEOBJECT2
 void
-PlaceObject2Tag::readPlaceObject2(stream* in, int movie_version)
+PlaceObject2Tag::readPlaceObject2(stream& in)
 {
-    in->align();
+    in.align();
 
     // PlaceObject2 specific flags
-    boost::uint8_t has_flags2 = in->read_u8();
+    boost::uint8_t has_flags2 = in.read_u8();
 
     bool    has_actions    = has_flags2 & (1 << 7); 
     bool    has_clip_depth = has_flags2 & (1 << 6); 
@@ -199,9 +200,9 @@ PlaceObject2Tag::readPlaceObject2(stream* in, int movie_version)
     bool    has_char       = has_flags2 & (1 << 1);
     bool    flag_move      = has_flags2 & (1 << 0); 
 
-    m_depth = in->read_u16()+character::staticDepthOffset;
+    m_depth = in.read_u16()+character::staticDepthOffset;
 
-    if (has_char) m_character_id = in->read_u16();
+    if (has_char) m_character_id = in.read_u16();
 
     if (has_matrix)
     {
@@ -216,20 +217,20 @@ PlaceObject2Tag::readPlaceObject2(stream* in, int movie_version)
     }
 
     if (has_ratio) 
-        m_ratio = in->read_u16();
+        m_ratio = in.read_u16();
     else
         m_ratio = character::noRatioValue;
 
-    if (has_name) m_name = in->read_string();
+    if (has_name) m_name = in.read_string();
 
     if (has_clip_depth)
-        m_clip_depth = in->read_u16()+character::staticDepthOffset;
+        m_clip_depth = in.read_u16()+character::staticDepthOffset;
     else
         m_clip_depth = character::noClipDepthValue;
 
     if (has_actions)
     {
-        readPlaceActions(in, movie_version);
+        readPlaceActions(in);
     }
 
     if (has_char == true && flag_move == true)
@@ -276,12 +277,12 @@ PlaceObject2Tag::readPlaceObject2(stream* in, int movie_version)
 
 // read SWF::PLACEOBJECT3
 void
-PlaceObject2Tag::readPlaceObject3(stream* in, int movie_version)
+PlaceObject2Tag::readPlaceObject3(stream& in)
 {
-    in->align();
+    in.align();
 
     // PlaceObject2 specific flags
-    boost::uint8_t has_flags2 = in->read_u8();
+    boost::uint8_t has_flags2 = in.read_u8();
 
     bool    has_actions    = has_flags2 & (1 << 7); 
     bool    has_clip_depth = has_flags2 & (1 << 6); 
@@ -293,7 +294,7 @@ PlaceObject2Tag::readPlaceObject3(stream* in, int movie_version)
     bool    flag_move      = has_flags2 & (1 << 0); 
 
     // PlaceObject3 specific flags, first 3 bits are unused
-    boost::uint8_t has_flags3 = in->read_u8();
+    boost::uint8_t has_flags3 = in.read_u8();
 
     bool    hasImage           = has_flags3 & (1 << 4); 
     bool    hasClassName       = has_flags3 & (1 << 3); 
@@ -305,17 +306,17 @@ PlaceObject2Tag::readPlaceObject3(stream* in, int movie_version)
     boost::uint8_t bitmask = 0;
     std::string className;
 
-    m_depth = in->read_u16()+character::staticDepthOffset;
+    m_depth = in.read_u16()+character::staticDepthOffset;
 
     if (has_char)
     {
-        m_character_id = in->read_u16();
+        m_character_id = in.read_u16();
     }
 
     if (hasClassName || (hasImage && has_char) )
     {
         log_unimpl("PLACEOBJECT3 with associated class name");
-        in->read_string(className);
+        in.read_string(className);
     }
 
     if (has_matrix)
@@ -331,38 +332,38 @@ PlaceObject2Tag::readPlaceObject3(stream* in, int movie_version)
     }
 
     if (has_ratio) 
-        m_ratio = in->read_u16();
+        m_ratio = in.read_u16();
     else
         m_ratio = character::noRatioValue;
 
-    if (has_name) m_name = in->read_string();
+    if (has_name) m_name = in.read_string();
 
     if (has_clip_depth)
-        m_clip_depth = in->read_u16()+character::staticDepthOffset;
+        m_clip_depth = in.read_u16()+character::staticDepthOffset;
     else
         m_clip_depth = character::noClipDepthValue;
 
     if (has_filters)
     {
         Filters v; // TODO: Attach the filters to the display object.
-        filter_factory::read(in, movie_version, true, &v);
+        filter_factory::read(in, true, &v);
     }
 
     if (has_blend_mode)
     {
-        blend_mode = in->read_u8();
+        blend_mode = in.read_u8();
     }
 
     if (has_bitmap_caching)
     {
         // It is not certain that this actually exists, so if this reader
         // is broken, it is probably here!
-        bitmask = in->read_u8();
+        bitmask = in.read_u8();
     }
 
     if (has_actions)
     {
-        readPlaceActions(in, movie_version);
+        readPlaceActions(in);
     }
 
     if (has_char == true && flag_move == true)
@@ -409,7 +410,7 @@ PlaceObject2Tag::readPlaceObject3(stream* in, int movie_version)
 }
 
 void
-PlaceObject2Tag::read(stream* in, tag_type tag, int movie_version)
+PlaceObject2Tag::read(stream& in, tag_type tag)
 {
 
 	m_tag_type = tag;
@@ -420,11 +421,11 @@ PlaceObject2Tag::read(stream* in, tag_type tag, int movie_version)
 	}
 	else if ( tag == SWF::PLACEOBJECT2 )
 	{
-		readPlaceObject2(in, movie_version);
+		readPlaceObject2(in);
 	}
 	else
 	{
-		readPlaceObject3(in, movie_version);
+		readPlaceObject3(in);
 	}
 }
 
@@ -501,7 +502,7 @@ PlaceObject2Tag::loader(stream* in, tag_type tag, movie_definition* m)
 
     // TODO: who owns and is going to remove this tag ?
     PlaceObject2Tag* ch = new PlaceObject2Tag(*m);
-    ch->read(in, tag, m->get_version());
+    ch->read(*in, tag);
 
     m->addControlTag(ch);
 

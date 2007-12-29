@@ -19,7 +19,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.h,v 1.12 2007/11/10 11:51:43 strk Exp $ 
+// $Id: matrix.h,v 1.13 2007/12/29 20:15:25 strk Exp $ 
 //
 
 #ifndef GNASH_MATRIX_H
@@ -144,7 +144,10 @@ public:
 	}
 
 	/// Initialize from the SWF input stream.
-	void	read(stream* in);
+	void	read(stream& in);
+
+	// temp hack, should drop..
+	void	read(stream* in) { read(*in); }
 
 	/// Debug log.
 	void	print() const;

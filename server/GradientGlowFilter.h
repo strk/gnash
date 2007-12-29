@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: GradientGlowFilter.h,v 1.6 2007/12/12 10:07:00 zoulunkai Exp $ */
+/* $Id: GradientGlowFilter.h,v 1.7 2007/12/29 20:15:25 strk Exp $ */
 
 #ifndef GNASH_GRADIENTGLOWFILTER_H
 #define GNASH_GRADIENTGLOWFILTER_H
@@ -44,7 +44,7 @@ public:
     } glow_types;
 
     // Fill from a stream. See parser/filter_factory.cpp for the implementations.
-    virtual bool read(stream* in);
+    virtual bool read(stream& in);
 
     virtual ~GradientGlowFilter() { return; }
 

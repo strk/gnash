@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: cxform.cpp,v 1.7 2007/12/12 10:07:00 zoulunkai Exp $ 
+// $Id: cxform.cpp,v 1.8 2007/12/29 20:15:25 strk Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -84,27 +84,27 @@ void	cxform::transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_t& b, 
 	a = (boost::uint8_t) fclamp(a * m_[3][0] + m_[3][1], 0, 255);
 }
 
-void	cxform::read_rgb(stream* in)
+void	cxform::read_rgb(stream& in)
 {
-	in->align();
+	in.align();
 
-	bool	has_add = in->read_bit();
-	bool	has_mult = in->read_bit();
-	int	nbits = in->read_uint(4);
+	bool	has_add = in.read_bit();
+	bool	has_mult = in.read_bit();
+	int	nbits = in.read_uint(4);
 
 	if (has_mult) {
-		m_[0][0] = in->read_sint(nbits) / 255.0f;
-		m_[1][0] = in->read_sint(nbits) / 255.0f;
-		m_[2][0] = in->read_sint(nbits) / 255.0f;
+		m_[0][0] = in.read_sint(nbits) / 255.0f;
+		m_[1][0] = in.read_sint(nbits) / 255.0f;
+		m_[2][0] = in.read_sint(nbits) / 255.0f;
 		m_[3][0] = 1;
 	}
 	else {
 		for (int i = 0; i < 4; i++) { m_[i][0] = 1; }
 	}
 	if (has_add) {
-		m_[0][1] = (float) in->read_sint(nbits);
-		m_[1][1] = (float) in->read_sint(nbits);
-		m_[2][1] = (float) in->read_sint(nbits);
+		m_[0][1] = (float) in.read_sint(nbits);
+		m_[1][1] = (float) in.read_sint(nbits);
+		m_[2][1] = (float) in.read_sint(nbits);
 		m_[3][1] = 1;
 	}
 	else {
@@ -112,28 +112,28 @@ void	cxform::read_rgb(stream* in)
 	}
 }
 
-void	cxform::read_rgba(stream* in)
+void	cxform::read_rgba(stream& in)
 {
-	in->align();
+	in.align();
 
-	bool	has_add = in->read_bit();
-	bool	has_mult = in->read_bit();
-	int	nbits = in->read_uint(4);
+	bool	has_add = in.read_bit();
+	bool	has_mult = in.read_bit();
+	int	nbits = in.read_uint(4);
 
 	if (has_mult) {
-		m_[0][0] = in->read_sint(nbits) / 256.0f;
-		m_[1][0] = in->read_sint(nbits) / 256.0f;
-		m_[2][0] = in->read_sint(nbits) / 256.0f;
-		m_[3][0] = in->read_sint(nbits) / 256.0f;
+		m_[0][0] = in.read_sint(nbits) / 256.0f;
+		m_[1][0] = in.read_sint(nbits) / 256.0f;
+		m_[2][0] = in.read_sint(nbits) / 256.0f;
+		m_[3][0] = in.read_sint(nbits) / 256.0f;
 	}
 	else {
 		for (int i = 0; i < 4; i++) { m_[i][0] = 1; }
 	}
 	if (has_add) {
-		m_[0][1] = (float) in->read_sint(nbits);
-		m_[1][1] = (float) in->read_sint(nbits);
-		m_[2][1] = (float) in->read_sint(nbits);
-		m_[3][1] = (float) in->read_sint(nbits);
+		m_[0][1] = (float) in.read_sint(nbits);
+		m_[1][1] = (float) in.read_sint(nbits);
+		m_[2][1] = (float) in.read_sint(nbits);
+		m_[3][1] = (float) in.read_sint(nbits);
 	}
 	else {
 		for (int i = 0; i < 4; i++) { m_[i][1] = 0; }

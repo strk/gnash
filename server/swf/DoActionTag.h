@@ -48,7 +48,9 @@ class DoActionTag : public ControlTag
 {
 public:
 
-	DoActionTag()
+	DoActionTag(movie_definition& md)
+		:
+		m_buf(md)
 	{}
 
 	/// Read a DoAction block from the stream
@@ -71,7 +73,7 @@ public:
 
 	static void doActionLoader(stream* in, tag_type tag, movie_definition* m)
 	{
-		DoActionTag* da = new DoActionTag();
+		DoActionTag* da = new DoActionTag(*m);
 		da->read(in);
 
 		IF_VERBOSE_PARSE (

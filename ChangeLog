@@ -1,5 +1,23 @@
 2007-12-29 Sandro Santilli <strk@keybit.net>
 
+	* server/: BevelFilter.h, BitmapFilter.h,
+	  BlurFilter.h, ColorMatrixFilter.h, ConvolutionFilter.h,
+	  DropShadowFilter.h, GlowFilter.h, GradientBevelFilter.h,
+	  GradientGlowFilter.h, cxform.{cpp,h}, matrix.{cpp,h},
+	  parser/filter_factory.{cpp,h}:
+	  Change interfaces to take gnash::stream
+	  by ref rather then by pointer.
+	* server/parser/action_buffer.{cpp,h}: add a movie_definition
+	  reference in code segments, and provide a getDefinitionURL()
+	  method to retrive the originatin url.
+	* server/parser/button_character_def.{cpp,h}, 
+	  server/swf/DoActionTag.h, server/swf/DoInitActionTag.h,
+	  server/swf/PlaceObject2Tag.{h,cpp}:
+	  Properly construct action_buffer by passing originating movie
+	  definition.
+
+2007-12-29 Sandro Santilli <strk@keybit.net>
+
 	* plugin/klash/Makefile.am: use kde-config to find install
 	  system dirs for kde plugin. 
 	* testsuite/MovieTester.cpp: allow loading initial movie

@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ColorMatrixFilter.h,v 1.3 2007/08/29 03:32:58 cmusick Exp $ */
+/* $Id: ColorMatrixFilter.h,v 1.4 2007/12/29 20:15:25 strk Exp $ */
 
 #ifndef GNASH_COLORMATRIXFILTER_H
 #define GNASH_COLORMATRIXFILTER_H
@@ -34,7 +34,7 @@ class ColorMatrixFilter : public BitmapFilter
 {
 public:
     // Fill from a stream. See parser/filter_factory.cpp for the implementations.
-    virtual bool read(stream* in);
+    virtual bool read(stream& in);
 
     virtual ~ColorMatrixFilter() { return; }
 

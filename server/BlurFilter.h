@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BlurFilter.h,v 1.5 2007/12/12 10:07:00 zoulunkai Exp $ */
+/* $Id: BlurFilter.h,v 1.6 2007/12/29 20:15:25 strk Exp $ */
 
 #ifndef GNASH_BLURFILTER_H
 #define GNASH_BLURFILTER_H
@@ -35,7 +35,7 @@ class BlurFilter : public BitmapFilter
 {
 public:
     // Fill from a stream. See parser/filter_factory.cpp for the implementations.
-    virtual bool read(stream* in);
+    virtual bool read(stream& in);
 
     virtual ~BlurFilter() { return; }
 

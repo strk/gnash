@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: action_buffer.cpp,v 1.31 2007/12/18 00:09:48 strk Exp $ */
+/* $Id: action_buffer.cpp,v 1.32 2007/12/29 20:15:25 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -29,6 +29,7 @@
 #include "swf.h"
 #include "ASHandlers.h"
 #include "as_environment.h"
+#include "movie_definition.h"
 
 #include <typeinfo> 
 
@@ -47,9 +48,10 @@ namespace gnash {
 static float convert_float_little(const void *p);
 static double convert_double_wacky(const void *p);
 
-action_buffer::action_buffer()
+action_buffer::action_buffer(const movie_definition& md)
     :
-    m_decl_dict_processed_at(-1)
+    m_decl_dict_processed_at(-1),
+    _src(md)
 {
 //	static int count=0;
 //	printf("Action buffer %d created\n", ++count);
@@ -584,6 +586,12 @@ double
 action_buffer::read_double_wacky(size_t pc) const
 {
 	return(convert_double_wacky(&m_buffer[pc]));
+}
+
+const std::string&
+action_buffer::getDefinitionURL() const
+{
+	return _src.get_url();
 }
 
 }

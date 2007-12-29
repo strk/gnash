@@ -63,10 +63,16 @@ public:
     void transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_t& b, boost::uint8_t& a) const;    
     
     /// Read RGB from the SWF input stream.
-    void read_rgb(stream* in);
+    void read_rgb(stream& in);
+
+    // temp hack, should drop..
+    void read_rgb(stream* in) { read_rgb(*in); }
     
     /// Read RGBA from the SWF input stream.
-    void read_rgba(stream* in);
+    void read_rgba(stream& in);
+
+    // temp hack, should drop..
+    void read_rgba(stream* in) { read_rgba(*in); }
     
     /// Force component values to be in range.
     void clamp();

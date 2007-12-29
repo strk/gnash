@@ -36,9 +36,7 @@
 namespace gnash {
 	class as_environment;
 	class as_value;
-	namespace SWF {
-		class ActionHandler;
-	}
+	class movie_definition;
 }
 
 
@@ -58,7 +56,7 @@ class action_buffer
 public:
 	friend class ActionExec;
 
-	action_buffer();
+	action_buffer(const movie_definition& md);
 
 	/// Read action bytes from input stream up to but not including endPos
 	//
@@ -232,13 +230,15 @@ public:
 	///
 	void process_decl_dict(size_t start_pc, size_t stop_pc) const;
 
+	const std::string& getDefinitionURL() const;
+
 private:
 
 	// Don't put these as values in std::vector<>!  They contain
 	// internal pointers and cannot be moved or copied.
 	// If you need to keep an array of them, keep pointers
 	// to new'd instances.
-	action_buffer(const action_buffer& /*a*/) { abort(); }
+	action_buffer(const action_buffer& a) : _src(a._src) { abort(); }
 
 	/// the code itself, as read from the SWF
 	std::vector<boost::uint8_t> m_buffer;
@@ -249,6 +249,12 @@ private:
 	/// FIXME: move to ActionExec
 	mutable int m_decl_dict_processed_at;
 
+	/// The movie_definition containing this action buffer
+	//
+	/// This pointer will be used to determine domain-based
+	/// permissions to grant to the action code.
+	/// 
+	const movie_definition& _src;
 };
 
 
