@@ -1,5 +1,7 @@
 2007-12-29 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/MovieTester.cpp: allow loading initial movie
+	  (local sandboxes..)
 	* utilities/processor.cpp: add main movie base dir
 	  to local sandboxes, or gprocessor won't be able to 
 	  play anything not explicitly in the sandboxes list.
