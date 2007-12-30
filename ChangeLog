@@ -1,3 +1,8 @@
+2007-12-30  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libamf/lcshm.{cpp,h}: New LcShm class for manipulating AMF
+	objects as used within LocalConnection shared memory segments.
+
 2007-12-30 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac,
@@ -20,6 +25,12 @@
 
 2007-12-29  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* utilities/dumpshm.cpp: Add support to search through all sysv
+	style shared memory segments and look for the LocalConnection
+	one so the user doesn't have to know anything to find it.
+	* configure.ac: Add test for the key field of ipc_perm data
+	structure used by shmctl() to get the key.
+
 	* testsuite/misc-swfc.all/Makefile.am: Add TEST_CASES to
 	CLEANFILES.
 
@@ -34,7 +45,7 @@
 	  by ref rather then by pointer.
 	* server/parser/action_buffer.{cpp,h}: add a movie_definition
 	  reference in code segments, and provide a getDefinitionURL()
-	  method to retrive the originatin url.
+	  method to retrive the originating url.
 	* server/parser/button_character_def.{cpp,h}, 
 	  server/swf/DoActionTag.h, server/swf/DoInitActionTag.h,
 	  server/swf/PlaceObject2Tag.{h,cpp}:
