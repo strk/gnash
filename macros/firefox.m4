@@ -36,7 +36,7 @@ dnl   esac], plugin=yes)
   FIREFOX_PLUGINS=""
   if test x"${nsapi}" = x"yes"; then
 
-    AC_ARG_WITH(plugindir, AC_HELP_STRING([--with-plugindir=DIR], [Directory to install Firefox plugin in]),
+    AC_ARG_WITH(plugindir, AC_HELP_STRING([--with-plugindir=DIR], [Directory to install NPAPI plugin in]),
       [FIREFOX_PLUGINS=$withval]
     )
 

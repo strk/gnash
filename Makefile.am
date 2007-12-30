@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.95 2007/12/03 00:22:04 rsavoye Exp $
+# $Id: Makefile.am,v 1.96 2007/12/30 10:44:44 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -326,15 +326,18 @@ if BUILD_FB_GUI
 endif
 
 if KPARTS
-	@echo "	Konqueror (KPARTS) plugin enabled"
+	@echo "	KPARTS (KDE) plugin enabled"
+	@echo "	  KPARTS plugin install dir: $(KDE_PLUGINDIR)"
+	@echo "	  KPARTS service install dir: $(KDE_SERVICESDIR)"
 else
-	@echo "	Konqueror (KPARTS) plugin disabled"
+	@echo "	KPARTS (KDE) plugin disabled"
 endif
 
 if NSAPI
-	@echo "	Firefox (NSAPI) plugin enabled"
+	@echo "	NPAPI (Mozilla) plugin enabled"
+	@echo "	  NPAPI plugin install dir: $(FIREFOX_PLUGINS)"
 else
-	@echo "	Firefox (NSAPI) plugin disabled"
+	@echo "	NPAPI (Mozilla) plugin disabled"
 endif
 	@if test -n "$(EXTENSIONS_LIST)" ; then \
 	  echo "	Extensions added are: $(EXTENSIONS_LIST)"; \

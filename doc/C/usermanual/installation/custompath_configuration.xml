@@ -144,7 +144,21 @@
     <option>--with-plugindir</option>
     </entry>
       <entry>
-        This is the directory to install the Firefox plugin in.
+        This is the directory to install the NPAPI (Mozilla) plugin in.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-kde-plugindir</option>
+    </entry>
+      <entry>
+        This is the directory to install the KPARTS (kde) plugin in.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-kde-servicesdir</option>
+    </entry>
+      <entry>
+        This is the directory to install the KPARTS (kde) service in.
       </entry>
   </row><row>
   <entry>

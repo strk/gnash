@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.464 2007/12/30 05:23:37 rsavoye Exp $
+dnl $Id: configure.ac,v 1.465 2007/12/30 10:44:44 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1370,6 +1370,26 @@ if test x$build_kde = xno -a x$kparts = xyes; then
   AC_MSG_WARN(["Enabled KPARTS plugin, but you aren't building a KDE based GUI!"])
 fi
 
+if test x$kparts = xyes; then
+
+  KDE_PLUGINDIR=`${KDE_CONFIG} --install module --expandvars`
+  AC_SUBST(KDE_PLUGINDIR)
+  AC_ARG_WITH(kde-plugindir,
+    AC_HELP_STRING([--with-kde-plugindir=DIR],
+      [Directory to install KDE plugin in]),
+    [KDE_PLUGINDIR=${withval}]
+  )
+
+  KDE_SERVICESDIR=`${KDE_CONFIG} --install services --expandvars`
+  AC_SUBST(KDE_SERVICESDIR)
+  AC_ARG_WITH(kde-servicesdir,
+    AC_HELP_STRING([--with-kde-servicesdir=DIR],
+      [Directory to install KDE service in]),
+    [KDE_SERVICESDIR=${withval}]
+  )
+
+fi
+
 AM_CONDITIONAL(BUILD_QTOPIA_GUI, [ test x$build_qtopia = xyes ])
 AM_CONDITIONAL(BUILD_ALP_GUI, [ test x$build_alp = xyes ])
 AM_CONDITIONAL(BUILD_QT_GUI, [ test x$build_qt = xyes ])
@@ -1855,15 +1875,18 @@ else
 fi
 
 if test x"$nsapi" = x"yes"; then
-  echo "        Firefox plugin enabled (default). Use --disable-nsapi to disable."
+  echo "        NPAPI plugin enabled (default). Use --disable-nsapi to disable."
+  echo "            NPAPI plugin will be installed in ${FIREFOX_PLUGINS}"
 else
-  echo "        Firefox plugin disabled."
+  echo "        NPAPI plugin disabled."
 fi
 
 if test x"$kparts" = x"yes"; then
-  echo "        Konqueror plugin enabled (default). Use --disable-kparts to disable"
+  echo "        KPARTS plugin enabled (default). Use --disable-kparts to disable"
+  echo "            KDE plugin will be installed in ${KDE_PLUGINDIR}"
+  echo "            KDE service will be installed in ${KDE_SERVICESDIR}"
 else
-  echo "        Konqueror plugin disabled."
+  echo "        KPARTS plugin disabled."
 fi
 
 dnl -- if test x"${dynamic_gui}" = x"yes"; then

@@ -15,15 +15,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.36 2007/12/29 13:54:48 strk Exp $
+# $Id: Makefile.am,v 1.37 2007/12/30 10:44:45 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
 if KPARTS
 AM_CPPFLAGS= $(KDE_CFLAGS) $(QT_CFLAGS) -DGNASHBINDIR=\"${bindir}\"
 
-plugindir   = `$(KDE_CONFIG) --install module --expandvars` # $(libdir)/kde3
-kde_servicesdir = `$(KDE_CONFIG) --install services --expandvars` # $(prefix)/share/services
+plugindir   = $(KDE_PLUGINDIR)
+kde_servicesdir = $(KDE_SERVICESDIR)
 rcdir       = $(prefix)/share/apps/klash
 appsdatadir = $(prefix)/share/apps/klash
 configdir = $(prefix)/share/config

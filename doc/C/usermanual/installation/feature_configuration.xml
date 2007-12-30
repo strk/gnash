@@ -179,13 +179,29 @@ selected.  The default is FFMPEG with SDL sound.
       </para></entry>
 </row>
 <row>
-  <entry><option>--disable-plugin</option>
-</entry>
-  <entry>Enable building the plugin. By default the
-        Mozilla Firefox plugin is built if all the required
-        files are found by configure. Specify the 
-        <option>--with-plugindir=</option> option to specify where the
-        plugin should be installed.</entry>
+  <entry>
+    <option>--disable-nsapi</option>
+    <option>--enable-nsapi</option>
+  </entry>
+  <entry>Force disable/enable building the NPAPI plugin.
+         By default the Mozilla plugin is built if the GTK gui 
+         is selected.  Specify the 
+         <option>--with-plugindir=</option> option to specify where the
+         plugin should be installed.
+   </entry>
+</row>
+<row>
+  <entry>
+     <option>--disable-kparts</option>
+     <option>--enable-kparts</option>
+  </entry>
+  <entry>Force disable/enable building the KPARTS plugin. By default the
+        KDE plugin is built if the kde gui is selected. 
+        Specify the <option>--with-kde-plugindir=</option> and
+        <option>--with-kde-servicesdir=</option> options to specify where the
+        plugin should be installed. The default installation dir is extracted
+        from kde-config.
+  </entry>
 </row>
 <row>
   <entry>    <option>--enable-qtopia</option>

@@ -1,3 +1,15 @@
+2007-12-30 Sandro Santilli <strk@keybit.net>
+
+	* Makefile.am, configure.ac: add --with-kde-plugindir
+	  and --with-kde-servicesdir options.
+	* doc/C/usermanual/installation/: custompath_configuration.xml,
+	  feature_configuration.xml: document new kparts options and cleanup
+	  info about the npapi plugin a bit.
+	* macros/firefox.m4: use the NPAPI acronym when referring to the
+	  formerly known as "Firefox" plugin.
+	* plugin/klash/Makefile.am: use kparts installation patsh as detected
+	  or specified by user at configure time.
+
 2007-12-29  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* testsuite/misc-swfc.all/Makefile.am: Add TEST_CASES to
