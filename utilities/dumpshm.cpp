@@ -353,8 +353,9 @@ dump_shm(bool convert)
  	cerr << "shmat() failed!: " <<  strerror(errno) << endl;
 	return;
     }
-    
-    Listener list(shmaddr);
+
+#if 0
+    Listener list(reinterpret_cast<boost::uint8_t *>(shmaddr));
     vector<string>::const_iterator it;
     vector<string> *listeners = list.listListeners();
     if (listeners->size() == 0) {
@@ -368,7 +369,8 @@ dump_shm(bool convert)
 	    }
         }
     }
-
+#endif
+    
     cout << "There are " << total << " Listeners listening" << endl; 
     // If the -c convert options was specified, dump the memory segment to disk.
     // This makes it easy to store them as well as to examine them in great detail.
