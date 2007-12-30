@@ -1,5 +1,13 @@
 2007-12-30 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac,
+	  doc/C/usermanual/installation/custompath_configuration.xml:
+	  Fallback to old installation path for kparts plugin if kde-config
+	  is not found. Document defaults for both kparts and npapi
+	  plugins.
+
+2007-12-30 Sandro Santilli <strk@keybit.net>
+
 	* Makefile.am, configure.ac: add --with-kde-plugindir
 	  and --with-kde-servicesdir options.
 	* doc/C/usermanual/installation/: custompath_configuration.xml,

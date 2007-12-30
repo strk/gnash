@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.465 2007/12/30 10:44:44 strk Exp $
+dnl $Id: configure.ac,v 1.466 2007/12/30 11:03:50 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1372,16 +1372,23 @@ fi
 
 if test x$kparts = xyes; then
 
-  KDE_PLUGINDIR=`${KDE_CONFIG} --install module --expandvars`
+  KDE_PLUGINDIR='$(libdir)/kde3'
+  KDE_SERVICESDIR='$(prefix)/share/services'
+
   AC_SUBST(KDE_PLUGINDIR)
+  AC_SUBST(KDE_SERVICESDIR)
+
+  if test x${KDE_CONFIG} != x; then
+     KDE_PLUGINDIR=`${KDE_CONFIG} --install module --expandvars`
+     KDE_SERVICESDIR=`${KDE_CONFIG} --install services --expandvars`
+  fi
+
   AC_ARG_WITH(kde-plugindir,
     AC_HELP_STRING([--with-kde-plugindir=DIR],
       [Directory to install KDE plugin in]),
     [KDE_PLUGINDIR=${withval}]
   )
 
-  KDE_SERVICESDIR=`${KDE_CONFIG} --install services --expandvars`
-  AC_SUBST(KDE_SERVICESDIR)
   AC_ARG_WITH(kde-servicesdir,
     AC_HELP_STRING([--with-kde-servicesdir=DIR],
       [Directory to install KDE service in]),

@@ -145,6 +145,7 @@
     </entry>
       <entry>
         This is the directory to install the NPAPI (Mozilla) plugin in.
+        By default it goes to ~/.mozilla/plugins.
       </entry>
   </row><row>
   <entry>
@@ -152,6 +153,8 @@
     </entry>
       <entry>
         This is the directory to install the KPARTS (kde) plugin in.
+        By default it is what's returned by kde-config --install module --expandvars,
+        or $(prefix)/share/services if kde-config is not found.
       </entry>
   </row><row>
   <entry>
@@ -159,6 +162,8 @@
     </entry>
       <entry>
         This is the directory to install the KPARTS (kde) service in.
+        By default it is what's returned by kde-config --install services --expandvars,
+        or $(libdir)/kde3 if kde-config is not found.
       </entry>
   </row><row>
   <entry>
