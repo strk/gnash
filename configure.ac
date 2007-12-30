@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.463 2007/12/26 01:11:07 rsavoye Exp $
+dnl $Id: configure.ac,v 1.464 2007/12/30 05:23:37 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1094,6 +1094,29 @@ AC_TRY_COMPILE([#include <strings.h>], [
   strcasecmp(p1, p2); ],
   AC_DEFINE(HAVE_STRINGCASECMP, [1], [Has strcasecmp])
 )
+
+dnl See if ipc_perm structure has the ipc_perm.key field, and if so,
+dnl which variant of the name is used.
+ipc_key=no
+AC_TRY_COMPILE([
+  #include <sys/ipc.h>
+  #include <sys/shm.h>], [
+ struct shmid_ds shmseg;      
+ key_t x = shmseg.shm_perm.key;],
+ ipc_key=yes
+ AC_DEFINE(IPC_PERM_KEY, [key], [Has the key field in ipc_perm])
+)
+
+if test x$ipc_key = xno; then
+  AC_TRY_COMPILE([
+    #include <sys/ipc.h>
+    #include <sys/shm.h>], [
+    struct shmid_ds shmseg;      
+    key_t x = shmseg.shm_perm.__key;],
+    AC_DEFINE(IPC_PERM_KEY, [__key], [Has the key field in ipc_perm])
+    ipc_key=yes
+  )
+fi
 
 dnl AC_CHECK_FUNCS(strcasecmp stricmp)
 AC_CHECK_FUNCS(vsnprintf)

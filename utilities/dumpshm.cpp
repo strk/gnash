@@ -23,7 +23,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
-
+#include <cerrno>
 
 extern "C"{
 #include <unistd.h>
@@ -67,6 +67,8 @@ extern char *optarg;
 #include "rc.h"
 #include "shm.h"
 #include "gnash.h"
+#include "amf.h"
+#include "lcshm.h"
 
 using namespace std;
 using namespace gnash;
@@ -74,12 +76,25 @@ using namespace gnash;
 static void usage (void);
 void dump_ctrl(void *ptr);
 void dump_shm(bool convert);
+key_t list_lcs();
 
 const int PIDSTART = 20000;
 const int PIDEND   = 23000;
 const int LINELEN  = 80;
 const unsigned int LOOPCNT  = 5;
-const int DEFAULT_SHM_SIZE = 65535;
+const int DEFAULT_SHM_SIZE = 64528;
+
+#ifndef SHM_STAT
+const int SHM_STAT = 13;
+const int SHM_INFO = 14;
+#endif
+
+int verbosity = 0;
+
+namespace {
+gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+}
 
 int
 main(int argc, char *argv[])
@@ -109,8 +124,7 @@ main(int argc, char *argv[])
     bindtextdomain (PACKAGE, LOCALEDIR);
     textdomain (PACKAGE);
 #endif
-    /* This initializes the DBG_MSG macros */ 
-    while ((c = getopt (argc, argv, "hdnl:ifrc")) != -1) {
+    while ((c = getopt (argc, argv, "hdnl:ifrcv")) != -1) {
         switch (c) {
           case 'h':
             usage ();
@@ -131,6 +145,7 @@ main(int argc, char *argv[])
             break;
             
           case 'i':
+            sysv = true;
             listfiles = true;
             break;
             
@@ -140,6 +155,11 @@ main(int argc, char *argv[])
             
           case 'n':
             nuke = true;
+            break;
+
+          case 'v':
+	      dbglogfile.setVerbosity();
+	      verbosity++;
             break;
 
           case 'l':
@@ -160,6 +180,16 @@ main(int argc, char *argv[])
         exit(0);
     }
     
+    // Just list the shared memory segments
+    if (listfiles && sysv) {
+	list_lcs();
+        exit(0);
+    }
+
+    if (sysv) {
+	dump_shm(convert);
+	exit(0);
+    }    
     
     if (size == 0) {
         size = DEFAULT_SHM_SIZE;
@@ -172,11 +202,6 @@ main(int argc, char *argv[])
              << endl;
     }
 
-    if (sysv) {
-	dump_shm(convert);
-	exit(0);
-    }
-    
     DIR *library_dir = NULL;
 
     // Solaris stores shared memory segments in /var/tmp/.SHMD and
@@ -213,24 +238,7 @@ main(int argc, char *argv[])
 #endif
         exit(0);
     }
-
-    // Just list the shared memory segments
-    if (listfiles) {
-        if (library_dir != NULL)
-        {
-            for (i=0; entry>0; i++) {
-                entry = readdir(library_dir);
-                if (entry != NULL) {
-                    cout << "Found segment: " << entry->d_name << endl;
-                }
-            }
-        } else {
-            cout << _("Sorry, we can only list the files on systems with"
-		      " disk based shared memory") << endl;
-        }
-        exit(0);
-    }
-
+    
     //Destroy shared memory segments
     if (nuke) {
         if (filespec.size() == 0) {
@@ -314,22 +322,54 @@ void
 dump_shm(bool convert)
 {
 // These are here for debugging purposes. It
-//     key_t key1 = 0x0056a4d5;		// size is 488
-//     key_t key2 = 0x0056a4d6;		// size is 131072
-//     int size1 = 488;
-//     int size2 = 131072;
     int id; 
     char *shmaddr;
-    key_t key = 0xdd3adabd;		// size is 64528
+    
+    key_t key = rcfile.getLCShmKey();
+
+    if (key == 0) {
+	cerr << "No LcShmKey set in ~/.gnashrc, trying to find it ourselves" << endl;
+	key = list_lcs();
+    }
+    
+    if (key == 0) {
+	cerr << "No shared memory segments found!" << endl;
+	return;
+    }
+    log_msg("SHM Key 0x%x", key);
+  
     int size = 64528;			// 1007 bytes less than unsigned
     int flags = 0660 | IPC_CREAT;
+    int total = 0;
     
     id = shmget(key, size, flags);
-    
+    if (id < 0) {
+ 	cerr << "shmget() failed!: " <<  strerror(errno) << endl;
+	return;
+    }
+
     shmaddr = (char *)shmat (id, 0, SHM_RDONLY); // attach segment for reading
-    if (shmaddr == (char *) -1)
-	perror ("shmat");	
+    if (shmaddr == (char *)-1) {
+ 	cerr << "shmat() failed!: " <<  strerror(errno) << endl;
+	return;
+    }
     
+    Listener list(shmaddr);
+    vector<string>::const_iterator it;
+    vector<string> *listeners = list.listListeners();
+    if (listeners->size() == 0) {
+        cout << "Nobody is listening" << endl;
+    } else {
+        for (it=listeners->begin(); it!=listeners->end(); it++) {
+            string str = *it;
+	    if ((str[0] != ':') || (verbosity > 0)) {
+		cout << " Listeners: " << str << endl;
+		total++;
+	    }
+        }
+    }
+
+    cout << "There are " << total << " Listeners listening" << endl; 
     // If the -c convert options was specified, dump the memory segment to disk.
     // This makes it easy to store them as well as to examine them in great detail.
     if (convert) {
@@ -346,6 +386,65 @@ dump_shm(bool convert)
     exit (0);			// quit leaving resource allocated
 }
 
+key_t
+list_lcs()
+{
+    int maxid, shmid, id;
+    struct shmid_ds shmseg;
+    struct shm_info shm_info;
+    struct shminfo shminfo;
+
+#ifdef USE_POSIX_SHM
+    if (library_dir != NULL) {
+	for (i=0; entry>0; i++) {
+	    entry = readdir(library_dir);
+	    if (entry != NULL) {
+                    cout << "Found segment: " << entry->d_name << endl;
+                }
+            }
+        } else {
+	cout << _("Sorry, we can only list the files on systems with"
+		  " disk based shared memory") << endl;
+    }
+#else
+    // If we're using SYSV shared memory, we can get a list of shared memory segments.
+    // By examing the size of each one, we can make a reasonable guess if it's one
+    // used for flash. As permissions apply, this will only list the segments created
+    // by the user running dumpshm.
+#ifdef USE_SYSV_SHM
+    maxid = shmctl(0, SHM_INFO, (struct shmid_ds *) (void *) &shm_info);
+    if (maxid < 0) {
+	cerr << "kernel not configured for shared memory";
+	return 0;
+    }
+
+    if ((shmctl(0, IPC_INFO, (struct shmid_ds *) (void *) &shminfo)) < 0) {
+	return 0;
+    }
+
+    for (id = 0; id <= maxid; id++) {
+	shmid = shmctl(id, SHM_STAT, &shmseg);
+	if (shmid < 0) {
+	    continue;
+	}
+	if (shmseg.shm_segsz == 64528) {
+	    cout << "Found it! \"set LCShmKey 0x"
+		 << hex << shmseg.shm_perm.IPC_PERM_KEY
+		 << "\" in your ~/.gnashrc" << endl;
+	    cout << "Last changed on: " << ctime(&shmseg.shm_ctime);
+	    cout << "Last attached on: " << ctime(&shmseg.shm_atime);
+	    cout << "Last detached on: " << ctime(&shmseg.shm_dtime);
+	    return shmseg.shm_perm.__key;
+	}
+    }
+#else
+#error "No supported shared memory type for this platform"
+#endif
+#endif
+    // Didn't find any segments of the right size
+    return 0;
+}
+
 /// \brief  Display the command line arguments
 static void
 usage (void)
@@ -360,6 +459,7 @@ usage (void)
     cerr << _("-i\tList segments") << endl;
     cerr << _("-r\tDump SYSV segments") << endl;
     cerr << _("-c\tDump SYSV segments to disk") << endl;
+    cerr << _("-v\tVerbose output") << endl;
     cerr << _("-f\tForce to use builtin names for nuke") << endl;
     exit (-1);
 }
