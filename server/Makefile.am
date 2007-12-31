@@ -15,11 +15,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# 
-#
-
-# $Id: Makefile.am,v 1.135 2007/12/08 09:11:24 strk Exp $
-
 AUTOMAKE_OPTIONS = 
 
 SUBDIRS = asobj parser vm
@@ -85,7 +80,6 @@ libgnashserver_la_SOURCES = \
 	movie_root.cpp \
 	namedStrings.cpp \
 	rect.cpp \
-	shm.cpp	\
 	sprite_instance.cpp \
 	swf/TagLoadersTable.cpp	\
 	swf/tag_loaders.cpp \
@@ -170,7 +164,6 @@ noinst_HEADERS = \
 	render.h \
 	resource.h \
 	shape.h	\
-	shm.h \
 	sprite_instance.h \
 	stream.h \
 	styles.h \

@@ -1,3 +1,10 @@
+2007-12-31  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libbase/shm.{cpp,h}: Move from server directory.
+	* libbase/Makefile.am: Build Shm class here.
+	* server/shm.{cpp,h}: Move to libbase directory.
+	* sever/Makefile.am: Don't build Shm class here.
+
 2007-12-30  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* libamf/sol.cpp: Various tweaks for 64bit big-endian systems,

@@ -15,12 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-//
-
-/* $Id: shm.cpp,v 1.34 2007/08/10 14:06:35 strk Exp $ */
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -45,13 +39,16 @@
 
 #include "log.h"
 #include "shm.h"
-#include "fn_call.h"
+
+namespace {
+gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+}
 
 using namespace std;
 
 namespace gnash {
 
-const int DEFAULT_SHM_SIZE = 10240;
+const int DEFAULT_SHM_SIZE = 64528;
 
 #ifdef darwin
 # ifndef MAP_INHERIT
@@ -93,6 +90,7 @@ Shm::attach(char const *filespec, bool nuke)
 
     _size = DEFAULT_SHM_SIZE;
 
+#ifdef USE_POSIX_SHM
 #ifdef darwin
     absfilespec = "/tmp";
 #else
@@ -119,7 +117,7 @@ Shm::attach(char const *filespec, bool nuke)
 //	log_msg("Adjusting segment size to %d to be page aligned.\n", _size);
     }
 #endif
-    
+
     errno = 0;
 #ifdef HAVE_SHM_OPEN
     // Create the shared memory segment
@@ -127,10 +125,26 @@ Shm::attach(char const *filespec, bool nuke)
 		      S_IRUSR|S_IWUSR);
     if (_shmfd < 0 && errno == EEXIST)
 #else
+#error "You need POSIX Shared memory support to use this option"
+#endif
+#endif	// USE_POSIX_SHM    
+
+#ifdef USE_SYSV_SHM
 # ifdef HAVE_SHMGET
-    const int shmflg = 0660 | IPC_CREAT | IPC_EXCL;
-    _shmkey = 1234567;		// FIXME:
-    filespec = "1234567";
+    const int shmflg = 0660 | IPC_CREAT;
+    // this is the magic size of shared memory segments used by the other flash player;
+    _size = 64528;
+    // this is the magic shared memory key used by the other player.
+    _shmkey = rcfile.getLCShmKey();
+    // If there is no SYSV style shared memory key in the users ~/.gnashrc file, warn them
+    // that compatibility will be broken, and then just pick our own key so things still work
+    // finer when using just Gnash.
+    if (_shmkey == 0) {
+	log_error("No Shared Memory key specified in ~/.gnashrc! Please run \"dumpshm -i\" to find your key if you want to be conpatible with the other swf player.");
+	_shmkey = 0xdd3adabd;
+    }
+    
+    filespec = "default";	// this is unused for sysv memory segments
     _shmfd = shmget(_shmkey, _size, shmflg);
     if (_shmfd < 0 && errno == EEXIST)
 # else
@@ -142,18 +156,20 @@ Shm::attach(char const *filespec, bool nuke)
 					_size, filespec);
     if (_shmhandle <= 0)
 #  endif
-# endif	// end of HAVE_SHMGET
-#endif // end of HAVE_SHM_OPEN
+# endif	 // end of HAVE_SHMGET
+#else
+#error "You need SYSV Shared memory support to use this option"
+#endif	 // end of USE_SYSV_SHM
 	{
     // If it already exists, then just attach to it.
 	exists = true;
 	log_msg("Shared Memory segment \"%s\" already exists\n",
 		filespec);
-#ifdef HAVE_SHM_OPEN
+#ifdef USE_POSIX_SHM
 //	shm_unlink(filespec);
 	_shmfd = shm_open(filespec, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR);
 #else
-# ifdef HAVE_SHMGET
+# ifdef USE_SYSV_SHM
 	// Get the shared memory id for this segment
 	_shmfd = shmget(_shmkey, _size, 0);
 # else
@@ -170,7 +186,7 @@ Shm::attach(char const *filespec, bool nuke)
     
     // MacOSX returns this when you use O_EXCL for shm_open() instead
     // of EEXIST
-#if defined(HAVE_SHMGET) ||  defined(HAVE_SHM_OPEN)
+#if defined(HAVE_SHMGET) || defined(HAVE_SHM_OPEN)
     if (_shmfd < 0 && errno == EINVAL)
 #else
 # ifdef __riscos__
@@ -182,10 +198,10 @@ Shm::attach(char const *filespec, bool nuke)
 	{
 	exists = true;
 	log_msg(
-#ifdef HAVE_SHM_OPEN
+#ifdef USE_POSIX_SHM
 	    "WARNING: shm_open() failed, retrying: %s\n",
 #else
-# ifdef HAVE_SHMGET
+# ifdef USE_SYSV_SHM
 	    "WARNING: shmget() failed, retrying: %s\n",
 # else
 	    "WARNING: CreateFileMapping() failed, retrying: %s\n",
@@ -197,7 +213,7 @@ Shm::attach(char const *filespec, bool nuke)
     }
     
     // We got the file descriptor, now map it into our process.
-#if defined(HAVE_SHMGET) ||  defined(HAVE_SHM_OPEN)
+#if defined(HAVE_SHMGET) || defined(HAVE_SHM_OPEN)
     if (_shmfd >= 0)
 #else
 # ifdef __riscos__
@@ -207,7 +223,7 @@ Shm::attach(char const *filespec, bool nuke)
 #endif
 #endif
     {
-#ifdef HAVE_SHM_OPEN
+#ifdef USE_POSIX_SHM
 	if (!exists) {
 	    // Set the size so we can write to new segment
 	    ftruncate(_shmfd, _size);
@@ -261,7 +277,7 @@ Shm::attach(char const *filespec, bool nuke)
 	    } else {
 #ifdef FLAT_ADDR_SPACE
 	    log_msg("Adjusting address to 0x%lx\n", addr);
-#ifdef HAVE_SHM_OPEN
+#ifdef USE_POSIX_SHM
 	    munmap(_addr, _size);
 	    log_msg("Unmapped address %p\n", _addr);
 #ifdef darwin
@@ -301,9 +317,10 @@ Shm::attach(char const *filespec, bool nuke)
 	log_msg("Opened Shared Memory segment \"%s\": " SIZET_FMT " bytes at %p.\n",
 		filespec, _size, _addr);
 	}
-    
+
+#ifdef USE_POSIX_SHM
 	if (nuke) {
-	    //            log_msg("Zeroing %d bytes at %p.\n", _size, _addr);
+	    log_msg("Zeroing %d bytes at %p.\n", _size, _addr);
 	    // Nuke all the segment, so we don't have any problems
 	    // with leftover data.
  	    memset(_addr, 0, _size);
@@ -311,13 +328,16 @@ Shm::attach(char const *filespec, bool nuke)
 	} else {
 	    sc = reinterpret_cast<Shm *>(_addr);
 	}
+#else
+	    sc = reinterpret_cast<Shm *>(_addr);
+#endif
     } else {
 	log_msg("ERROR: Couldn't open the Shared Memory segment \"%s\"! %s\n",
 		filespec, strerror(errno));
 	return false;
     }
     
-#ifdef HAVE_SHM_OPEN
+#ifdef USE_POSIX_SHM
 // don't close it on an error
     if (_shmfd) {
 	::close(_shmfd);
@@ -357,10 +377,10 @@ Shm::resize()
 }
 
 bool
-Shm::resize(int /* bytes */)
+Shm::resize(int bytes)
     
 {
-# ifdef HAVE_MREMAP
+#ifdef HAVE_MREMAP
     _addr = mremap(_shmAddr, _shmSize, _shmSize + bytes, MREMAP_MAYMOVE);
     if (_addr != 0) {
         return true;
@@ -368,6 +388,8 @@ Shm::resize(int /* bytes */)
 #else
     // FIXME: alloc a whole new segment, and copy this one
     // into it. Yeuch...
+    // Get rid of the compiler warning, this will get optimized out anyway.
+    bytes += 0;
 #endif
     return false;
 }
@@ -423,6 +445,7 @@ bool
 Shm::closeMem()
 {
     // Only nuke the shared memory segement if we're the last one.
+#ifdef USE_POSIX_SHM
 #ifdef HAVE_SHM_UNLINK
     if (strlen(_filespec) != 0) {
         shm_unlink(_filespec);
@@ -433,8 +456,8 @@ Shm::closeMem()
          // detach memory
          munmap(_addr, _size);
      }
-#else
-#ifdef HAVE_SHMGET
+#endif
+#ifdef USE_SYSV_SHM
      shmctl(_shmfd, IPC_RMID, 0);
 #else
 # ifdef __riscos__
@@ -493,34 +516,6 @@ Shm::exists()
     }
     
     return false;
-}
-
-// These are the callbacks used to define custom methods for our AS
-// classes. This way we can examine the private data after calling a
-// method to see if it worked correctly.
-as_value shm_getname(const fn_call& fn)
-{
-    boost::intrusive_ptr<shm_as_object> ptr = ensureType<shm_as_object>(fn.this_ptr);
-    assert(ptr);
-    return as_value(ptr->obj.getName());
-}
-as_value shm_getsize(const fn_call& fn)
-{
-    boost::intrusive_ptr<shm_as_object> ptr = ensureType<shm_as_object>(fn.this_ptr);
-    assert(ptr);
-    return as_value(ptr->obj.getSize());
-}
-as_value shm_getallocated(const fn_call& fn)
-{
-    boost::intrusive_ptr<shm_as_object> ptr = ensureType<shm_as_object>(fn.this_ptr);
-    assert(ptr);
-    return as_value(ptr->obj.getAllocated());
-}
-as_value shm_exists(const fn_call& fn)
-{
-    boost::intrusive_ptr<shm_as_object> ptr = ensureType<shm_as_object>(fn.this_ptr);
-    assert(ptr);
-    return as_value(ptr->obj.exists());
 }
 
 } // end of gnash namespace

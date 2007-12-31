@@ -88,6 +88,7 @@ libgnashbase_la_SOURCES = \
 	network.cpp \
 	postscript.cpp \
 	rc.cpp \
+	shm.cpp \
 	sharedlib.cpp \
 	string_table.cpp \
 	tu_file.cpp \
@@ -124,6 +125,7 @@ noinst_HEADERS = \
 	postscript.h \
 	rc.h \
 	ref_counted.h \
+	shm.h \
 	smart_ptr.h \
 	sharedlib.h \
 	string_table.h \
