@@ -1,5 +1,8 @@
 2007-12-30  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* utilities/dumpshm.cpp: Don't use ipc_perm if the __key field
+	doesn't exist.
+
 	* server/asobj/SharedObject.cpp: Handle the second argument to
 	getLocal() correctly, which doesn't add either the domain nor the
 	swf file name. Fixes the Shared Object part of #21377, which now

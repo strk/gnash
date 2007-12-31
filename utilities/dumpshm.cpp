@@ -354,7 +354,6 @@ dump_shm(bool convert)
 	return;
     }
 
-#if 0
     Listener list(reinterpret_cast<boost::uint8_t *>(shmaddr));
     vector<string>::const_iterator it;
     vector<string> *listeners = list.listListeners();
@@ -369,7 +368,6 @@ dump_shm(bool convert)
 	    }
         }
     }
-#endif
     
     cout << "There are " << total << " Listeners listening" << endl; 
     // If the -c convert options was specified, dump the memory segment to disk.
@@ -429,6 +427,7 @@ list_lcs()
 	if (shmid < 0) {
 	    continue;
 	}
+#ifdef IPC_PERM_KEY
 	if (shmseg.shm_segsz == 64528) {
 	    cout << "Found it! \"set LCShmKey 0x"
 		 << hex << shmseg.shm_perm.IPC_PERM_KEY
@@ -438,6 +437,7 @@ list_lcs()
 	    cout << "Last detached on: " << ctime(&shmseg.shm_dtime);
 	    return shmseg.shm_perm.__key;
 	}
+#endif
     }
 #else
 #error "No supported shared memory type for this platform"
