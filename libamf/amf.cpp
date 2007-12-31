@@ -332,7 +332,7 @@ AMF::encodeBoolean(bool flag)
     memset(x, 0, pktsize);
     // Encode a boolean value. 0 for false, 1 for true
     *x++ = (char)Element::BOOLEAN;
-    *x = *reinterpret_cast<boost::uint8_t *>(flag);
+    *x = flag;
     swapBytes(x, 2);
     x += sizeof(boost::uint16_t);
     
