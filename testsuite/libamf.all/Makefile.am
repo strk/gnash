@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.12 2007/12/31 00:26:48 rsavoye Exp $
+# $Id: Makefile.am,v 1.13 2007/12/31 19:16:53 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -49,12 +49,12 @@ INCLUDES = -I.. \
 
 
 check_PROGRAMS = \
-	test_number \
-	test_string \
-	test_object \
-	test_sol \
-	test_variable \
-	test_el
+	test_el \
+	test_sol
+# 	test_number
+# 	test_string
+# 	test_object
+# 	test_variable
 #	test_lc
 
 test_el_SOURCES = test_el.cpp ../../libamf/element.cpp
