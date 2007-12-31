@@ -1,6 +1,9 @@
 2007-12-30  Rob Savoye  <rob@ripple.welcomehome.org>
 
-	* libamf/element.{cpp,h}: New Elemnent class to represent an AMF
+	* server/asobj/SharedObject.cpp: Use Element class instead of
+	amf_element_t everywhere. 
+	
+	* libamf/element.{cpp,h}: New Element class to represent an AMF
 	element. 
 	* libamf/Makefile.am: Add element.{cpp,h}, and lcshm.{cpp,h}.
 	* libamf/amf.{cpp,h}: Use Element class instead of amf_element_t

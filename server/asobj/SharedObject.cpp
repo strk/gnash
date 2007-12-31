@@ -28,6 +28,7 @@
 #include <cerrno>
 
 #include "amf.h"
+#include "element.h"
 #include "sol.h"
 #include "SharedObject.h"
 #include "as_object.h" // for inheritance
@@ -80,9 +81,9 @@ public:
         {
 //            GNASH_REPORT_FUNCTION;
             AMF amf;
-            AMF::amf_element_t el;
+            Element *el;
 
-            const string& name = _st.string_table::value(key);
+            string& name = const_cast<string &>(_st.string_table::value(key));
 
 //            cerr << "FIXME: yes!!!!! " << name << ": "<< val.to_debug_string() << endl;
 
@@ -91,10 +92,11 @@ public:
                 if (!val.is_undefined()) {
                     str = val.to_string();
                 }
-                amf.createElement(&el, name, str);
+                el = new amf::Element(name, str);
             }
             if (val.is_bool()) {
-                amf.createElement(&el, name, val.to_bool());
+                bool flag = val.to_bool();
+                el = new amf::Element(name, flag);
             }
             if (val.is_number()) { 
                 double dub;
@@ -103,7 +105,7 @@ public:
                 } else {
                     dub = val.to_number();
                 }
-                amf.createElement(&el, name, dub);
+                el = new amf::Element(name, dub);
             }
             
             _sol.addObj(el);
@@ -195,7 +197,7 @@ sharedobject_flush(const fn_call& fn)
 
 #ifndef USE_SOL_READONLY
     if (rcfile.getSOLReadOnly() ) {
-        log_security("Attempting to write object when it's SOL Read Only is set! Refusing...",
+        log_security("Attempting to write object %s when it's SOL Read Only is set! Refusing...",
                      obj->getFilespec().c_str());
         return as_value(false);
     }
@@ -277,7 +279,7 @@ sharedobject_getlocal(const fn_call& fn)
     }
     
     if ((rcfile.getSOLLocalDomain()) && (strcmp(domain, "localhost") > 0) ) {
-        log_security("Attempting to open non localhost created SOL file!!",
+        log_security("Attempting to open non localhost created SOL file!! %s",
                      obj->getFilespec().c_str());
         return as_value(false);
      }
@@ -335,8 +337,8 @@ sharedobject_getlocal(const fn_call& fn)
         return as_value(obj.get());
     }
     
-    vector<AMF::amf_element_t>::iterator it;
-    vector<AMF::amf_element_t> els = sol.getElements();
+    vector<Element *>::iterator it;
+    vector<Element *> els = sol.getElements();
     log_msg("Read %d AMF objects from %s", els.size(), newspec.c_str());
 
     string_table& st = obj->getVM().getStringTable();
@@ -345,28 +347,28 @@ sharedobject_getlocal(const fn_call& fn)
     boost::intrusive_ptr<as_object> ptr = as.to_object();
     
     for (it = els.begin(); it != els.end(); it++) {
-        AMF::amf_element_t *el = &(*(it));
+        Element *el = (*(it));
 //        log_debug("Adding \"%s\"", el->name.c_str());
-        if (el->type == AMF::NUMBER) {
-            double dub =  *((double *)el->data);
-            ptr->set_member(st.string_table::find(el->name), as_value(dub));
+        if (el->getType() == Element::NUMBER) {
+            double dub =  *((double *)el->getData());
+            ptr->set_member(st.string_table::find(el->getName()), as_value(dub));
         } 
-        if (el->type == AMF::BOOLEAN) {
-            if (el->data[0]) {
-                ptr->set_member(st.string_table::find(el->name), as_value(true));
+        if (el->getType() == Element::BOOLEAN) {
+            if (el[0] == true) {
+                ptr->set_member(st.string_table::find(el->getName()), as_value(true));
             } else {
-                ptr->set_member(st.string_table::find(el->name), as_value(false));
+                ptr->set_member(st.string_table::find(el->getName()), as_value(false));
             }       
         } 
-        if (el->type == AMF::STRING) {
-            if (el->length == 0) {
-                ptr->set_member(st.string_table::find(el->name), as_value(""));
+        if (el->getType() == Element::STRING) {
+            if (el->getLength() == 0) {
+                ptr->set_member(st.string_table::find(el->getName()), as_value(""));
             } else {
-                string str = (const char *)el->data;
-                ptr->set_member(st.string_table::find(el->name), as_value(str));
+                string str = (const char *)el->getData();
+                ptr->set_member(st.string_table::find(el->getName()), as_value(str));
             }
         } 
-        if (el->type == AMF::OBJECT) {
+        if (el->getType() == Element::OBJECT) {
 //            data.convert_to_object();
 //            ptr->set_member(st.string_table::find(el->name), data);
         } 
