@@ -24,6 +24,7 @@
 
 #include "tu_config.h"
 
+#include <boost/cstdint.hpp>
 #include <vector>
 
 #include "amf.h"
@@ -35,6 +36,13 @@ namespace gnash
 #define RTMP_HANDSHAKE 0x3
 #define RTMP_BODY_SIZE 1536
 #define MAX_AMF_INDEXES 64
+
+// These are the textual responses
+const char *response_str[] = {
+    "/onStatus",
+    "/onResult",
+    "/onDebugEvents"
+};
 
 class DSOEXPORT RTMPproto : public Protocol
 {
@@ -83,8 +91,8 @@ public:
 // * Variable - Actual data (including a type code)
     typedef struct {
         amf::amfutf8_t name;
-        amf::AMF_Byte_t required;
-        amf::AMF_Long_t length;
+	boost::uint8_t required;
+	boost::uint32_t length;
         void *data;
     } rtmp_head_t;
     
@@ -97,7 +105,7 @@ public:
     typedef struct {
         amf::amfutf8_t target;
         amf::amfutf8_t response;
-        amf::AMF_Long_t length;
+	boost::uint32_t length;
         void *data;
     } rtmp_body_t;
     

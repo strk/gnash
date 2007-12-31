@@ -62,6 +62,12 @@ LcShm::LcShm()
 LcShm::~LcShm()
 {
     GNASH_REPORT_FUNCTION;
+    
+    vector<amf::Element *>::iterator it;
+    for (it = _amfobjs.begin(); it != _amfobjs.end(); it++) {
+	amf::Element *el = (*(it));
+	delete el;
+    }
 }
 
 Listener::Listener()
@@ -185,12 +191,13 @@ LcShm::close()
     closeMem();
 }
 
+#if 0
 boost::uint8_t *
-LcShm::parseElement(amf::AMF::amf_element_t *el, boost::uint8_t *data)
+LcShm::parseElement(amf::Element *el, boost::uint8_t *data)
 {
     GNASH_REPORT_FUNCTION;
     boost::uint8_t *ptr = reinterpret_cast<uint8_t *>(data);
-    AMF::astype_e type = (AMF::astype_e)*ptr;
+    Element::astype_e type = (Element::astype_e)*ptr;
     switch (type) {
       case AMF::NUMBER:
           double dub = 50.0;
@@ -203,17 +210,17 @@ LcShm::parseElement(amf::AMF::amf_element_t *el, boost::uint8_t *data)
           break;
     };
 }
+#endif
 
-
-vector<AMF::amf_element_t> 
+vector<amf::Element *> 
 LcShm::parseBody(boost::uint8_t *data)
 {
     GNASH_REPORT_FUNCTION;
 
     boost::uint8_t *ptr = reinterpret_cast<uint8_t *>(data);
-    AMF::astype_e type = (AMF::astype_e)*ptr;
+    Element::astype_e type = (Element::astype_e)*ptr;
 //    log_msg(_("Type is %s"), astype_str[type]);
-    AMF::amf_element_t el;
+    amf::Element el;
     AMF amf;
 
 #if 0
@@ -269,6 +276,7 @@ LcShm::parseHeader(boost::uint8_t *data)
 //     log_debug("name: %s", _object.hostname);
     ptr += LC_HEADER_SIZE;
     AMF amf;
+#if 0
     _object.connection_name = amf.extractString(ptr);
     ptr += _object.connection_name.size() + 3;
     _object.hostname = amf.extractString(ptr);
@@ -279,7 +287,8 @@ LcShm::parseHeader(boost::uint8_t *data)
     ptr += AMF_NUMBER_SIZE + 1;
     _object.unknown_num1 = amf.extractNumber(ptr);
     ptr += AMF_NUMBER_SIZE + 2;
-
+#endif
+    
 //    memcpy(&_object, data + LC_HEADER_SIZE, _header.length);
     log_debug("Connection: %s", _object.connection_name.c_str());
     log_debug("name: %s", _object.hostname.c_str());
@@ -321,7 +330,7 @@ LcShm::connect(string &name)
 }
 
 bool
-LcShm::addObject(AMF::amf_element_t &el)
+LcShm::addObject(amf::Element * /* el */)
 {
     GNASH_REPORT_FUNCTION;
     
@@ -329,7 +338,7 @@ LcShm::addObject(AMF::amf_element_t &el)
 
 /// \brief Invokes a method on a specified LcShm object.
 void
-LcShm::send(std::string &name, std::string &dataname, amf::AMF::amf_element_t data)
+LcShm::send(std::string &name, std::string &dataname, amf::Element *data)
 {
     
     log_unimpl (__FUNCTION__);

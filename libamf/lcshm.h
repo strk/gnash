@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "amf.h"
+#include "element.h"
 #include "shm.h"
 
 namespace gnash {
@@ -61,7 +62,7 @@ public:
         std::string connection_name;
         std::string protocol;
         std::string method_name;
-        std::vector<amf::AMF::amf_element_t> data; // this can be any AMF data type
+        std::vector<amf::Element *> data; // this can be any AMF data type
     } lc_message_t;
     typedef struct {
 	std::string connection_name;
@@ -74,19 +75,19 @@ public:
     ~LcShm();
     bool connect(std::string &name);
     void close(void);
-    void send(std::string &name, std::string &dataname, amf::AMF::amf_element_t data);
-    void recv(std::string &name, std::string &dataname, amf::AMF::amf_element_t *data);
-    std::vector<amf::AMF::amf_element_t> parseBody(boost::uint8_t *data);
+    void send(std::string &name, std::string &dataname, amf::Element *data);
+    void recv(std::string &name, std::string &dataname, amf::Element *data);
+    std::vector<amf::Element *> parseBody(boost::uint8_t *data);
     boost::uint8_t *parseHeader(boost::uint8_t *data);
     boost::uint8_t *formatHeader(boost::uint8_t *data);
-    bool addObject(amf::AMF::amf_element_t &el);
+    bool addObject(amf::Element *el);
     size_t size() { return _amfobjs.size(); };
-    std::vector<amf::AMF::amf_element_t> getElements() { return _amfobjs; };
+    std::vector<amf::Element *> getElements() { return _amfobjs; };
 private:
     uint8_t *_baseaddr;
     lc_header_t _header;
     lc_object_t _object;
-    std::vector<amf::AMF::amf_element_t> _amfobjs;
+    std::vector<amf::Element *> _amfobjs;
 };
 
 } // end of gnash namespace

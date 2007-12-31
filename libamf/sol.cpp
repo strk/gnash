@@ -71,6 +71,12 @@ SOL::SOL()
 SOL::~SOL()
 {
 //    GNASH_REPORT_FUNCTION;
+
+    vector<amf::Element *>::iterator it;
+    for (it = _amfobjs.begin(); it != _amfobjs.end(); it++) {
+	amf::Element *el = (*(it));
+	delete el;
+    }
 }
 
 bool
@@ -86,11 +92,11 @@ SOL::extractHeader(vector<unsigned char> &data)
 }
 
 void
-SOL::addObj(AMF::amf_element_t &el)
+SOL::addObj(amf::Element *el)
 {
 //    GNASH_REPORT_FUNCTION;
     _amfobjs.push_back(el);
-    _filesize += el.name.size() + el.length + 5;
+    _filesize += el->getName().size() + el->getLength() + 5;
 }
 
 bool
@@ -208,7 +214,7 @@ SOL::writeFile(string &filespec, string &name)
 //    GNASH_REPORT_FUNCTION;
     ofstream ofs(filespec.c_str(), ios::binary);
     vector<uint8_t>::iterator it;
-    vector<AMF::amf_element_t>::iterator ita; 
+    vector<amf::Element *>::iterator ita; 
     AMF amf_obj;
     char *ptr;
 
@@ -220,33 +226,33 @@ SOL::writeFile(string &filespec, string &name)
     char *body = new char[_filesize + 16];
     memset(body, 0, _filesize);
     ptr = body;
-
+    
     for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
-        AMF::amf_element_t *el = &(*(ita));
-        int outsize = el->name.size() + el->length + 5;
+        amf::Element *el = (*(ita));
+        int outsize = el->getName().size() + el->getLength() + 5;
         uint8_t *foo = amf_obj.encodeVariable(el); 
-        switch (el->type) {
-	  case AMF::BOOLEAN:
-	      outsize = el->name.size() + 5;
+        switch (el->getType()) {
+	  case Element::BOOLEAN:
+	      outsize = el->getName().size() + 5;
 	      memcpy(ptr, foo, outsize);
 	      ptr += outsize;
 	      break;
-	  case AMF::OBJECT:
-	      outsize = el->name.size() + 5;
+	  case Element::OBJECT:
+	      outsize = el->getName().size() + 5;
 	      memcpy(ptr, foo, outsize);
 	      ptr += outsize;
-	      *ptr++ = AMF::OBJECT_END;
+	      *ptr++ = Element::OBJECT_END;
 	      *ptr++ = 0;	// objects are terminated too!
 	      break;
-	  case AMF::NUMBER:
-	      outsize = el->name.size() + AMF_NUMBER_SIZE + 2;
+	  case Element::NUMBER:
+	      outsize = el->getName().size() + AMF_NUMBER_SIZE + 2;
 	      memcpy(ptr, foo, outsize);
 	      ptr += outsize;
 	      *ptr++ = 0;	// doubles are terminated too!
 	      *ptr++ = 0;	// doubles are terminated too!
 	      break;
-	  case AMF::STRING:
-	      if (el->length == 0) {
+	  case Element::STRING:
+	      if (el->getLength() == 0) {
 		  memcpy(ptr, foo, outsize+1);
 		  ptr += outsize+1;
 	      } else {		// null terminate the string
@@ -286,24 +292,24 @@ SOL::readFile(std::string &filespec)
 {
 //    GNASH_REPORT_FUNCTION;
     struct stat st;
-    uint16_t magic, size;
-    char *buf, *ptr;
+    boost::uint16_t magic, size;
+    boost::uint8_t *buf, *ptr;
 
     // Make sure it's an SOL file
     if (stat(filespec.c_str(), &st) == 0) {
         ifstream ifs(filespec.c_str(), ios::binary);
         _filesize = st.st_size;
         _filespec = filespec;
-        ptr = buf = new char[_filesize+1];
-        ifs.read(buf, _filesize);
+        ptr = buf = new boost::uint8_t[_filesize+1];
+        ifs.read(reinterpret_cast<char *>(buf), _filesize);
 
         // extract the magic number
-        magic = *(reinterpret_cast<uint16_t *>(ptr));
+        magic = *(reinterpret_cast<boost::uint16_t *>(ptr));
         magic = ntohs(magic);
         ptr += 2;
 
         // extract the file size
-        int length = *(reinterpret_cast<uint32_t *>(ptr));
+        int length = *(reinterpret_cast<boost::uint32_t *>(ptr));
         length = ntohl(length);
         ptr += 4;
 
@@ -324,19 +330,19 @@ SOL::readFile(std::string &filespec)
         }
 
         // 2 bytes for the length of the object name, but it's also null terminated
-        size = *(reinterpret_cast<uint16_t *>(ptr));
+        size = *(reinterpret_cast<boost::uint16_t *>(ptr));
         size = ntohs(size);
         ptr += 2;
-        _objname = ptr;
+        _objname = reinterpret_cast<const char *>(ptr);
 
         ptr += size;
         // Go past the padding
         ptr += 4;
 
         AMF amf_obj;
-        AMF::amf_element_t el;
         while ((buf - ptr) <= _filesize) {
-            ptr = (char *)amf_obj.extractVariable(&el, reinterpret_cast<uint8_t *>(ptr));
+	    amf::Element *el = new amf::Element;
+	    ptr = amf_obj.extractVariable(el, ptr);
             if (ptr != 0) {
 		ptr += 1;            
 		addObj(el);
@@ -357,38 +363,38 @@ void
 SOL::dump()
 {
     uint8_t *hexint;
-    vector<AMF::amf_element_t>::iterator it;
+    vector<amf::Element *>::iterator it;
 
     cerr << "Dumping SOL file" << endl;
     cerr << "The file name is: " << _filespec << endl;
     cerr << "The size of the file is: " << _filesize << endl;
     cerr << "The name of the object is: " << _objname << endl;
     for (it = _amfobjs.begin(); it != _amfobjs.end(); it++) {
-        AMF::amf_element_t *el = &(*(it));
-        cerr << el->name << ": ";
-        if (el->type == AMF::STRING) {
-            if (el->length != 0) {
-                cerr << el->data;
+	amf::Element *el = (*(it));
+        cerr << el->getName() << ": ";
+        if (el->getType() == Element::STRING) {
+            if (el->getLength() != 0) {
+                cerr << el->getData();
             } else {
                 cerr << "null";
             }
         }
-        if (el->type == AMF::NUMBER) {
-            double ddd = *((double *)el->data);
+        if (el->getType() == Element::NUMBER) {
+            double ddd = *((double *)el->getData());
              cerr << ddd << " ";
             hexint = new uint8_t[(sizeof(double) *3) + 3];
-            hexify(hexint, el->data, 8, false);
+            hexify(hexint, el->getData(), 8, false);
             cerr << "( " << hexint << ")";
         }
-        if ((*(it)).type == AMF::BOOLEAN) {
-            if (el->data[0] == true) {
+        if ((*(it))->getType() == Element::BOOLEAN) {
+            if (el[0] == true) {
                 cerr << "true";
             }
-            if (el->data[0] == false) {
+            if (el[0] == false) {
                 cerr << "false";
             }
         }
-        if (el->type == AMF::OBJECT) {
+        if (el->getType() == Element::OBJECT) {
             cerr << "is an object";
         }
         cerr << endl;

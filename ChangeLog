@@ -1,5 +1,21 @@
 2007-12-30  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* libamf/element.{cpp,h}: New Elemnent class to represent an AMF
+	element. 
+	* libamf/Makefile.am: Add element.{cpp,h}, and lcshm.{cpp,h}.
+	* libamf/amf.{cpp,h}: Use Element class instead of amf_element_t
+	everywhere. Move object types to element.h. Refactor all encoders
+	and decoders. Ifdef out for now stuff that should really be in
+	rtmp.
+	* libamf/lcshm.{cpp,h}: Use Element class instead of amf_element_t
+	everywhere. 
+	* libamf/sol.{cpp,h}: Use Element class instead of amf_element_t
+	everywhere. Use new style encoders and decoders.
+	* testsuite/libamf.all/Makefile.am: Add new test_el test case for
+	testing the Element class.
+	* testsuite/libamf.all/test_sol.cpp: Use Element class instead of
+	amf_element_t everywhere. Use new style encoders and decoders.
+	
 	* libamf/lcshm.{cpp,h}: New LcShm class for manipulating AMF
 	objects as used within LocalConnection shared memory segments.
 

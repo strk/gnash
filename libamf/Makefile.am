@@ -15,15 +15,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.30 2007/12/20 03:13:41 rsavoye Exp $
+# $Id: Makefile.am,v 1.31 2007/12/31 00:26:48 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
 pkglib_LTLIBRARIES = libgnashamf.la
 libgnashamf_la_SOURCES = \
 	amf.cpp \
-	rtmp.cpp \
+	element.cpp \
+	lcshm.cpp \
 	sol.cpp
+#	rtmp.cpp
 
 libgnashamf_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la
@@ -42,6 +44,8 @@ AM_LDFLAGS = $(BOOST_LIBS)
 noinst_HEADERS = \
 	amfutf8.h \
 	amf.h \
+	element.h \
+	lcshm.h \
 	rtmp.h \
 	protocol.h \
 	sol.h

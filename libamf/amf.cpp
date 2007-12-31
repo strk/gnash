@@ -32,7 +32,7 @@
 
 #include "log.h"
 #include "amf.h"
-#include "as_object.h"
+#include "element.h"
 #include "amfutf8.h"
 #include <boost/cstdint.hpp> // for boost::?int??_t
 
@@ -42,63 +42,41 @@ using namespace gnash;
 namespace amf 
 {
 
-// These are used to print more intelligent debug messages
-const char *astype_str[] = {
-    "Number",
-    "Boolean",
-    "String",
-    "Object",
-    "MovieClip",
-    "Null",
-    "Undefined",
-    "Reference",
-    "ECMAArray",
-    "ObjectEnd",
-    "StrictArray",
-    "Date",
-    "LongString",
-    "Unsupported",
-    "Recordset",
-    "XMLObject",
-    "TypedObject"
-};
-
-// These are the textual responses
-const char *response_str[] = {
-    "/onStatus",
-    "/onResult",
-    "/onDebugEvents"
-};
-
 AMF::AMF() 
     : _type(NONE),
+#if 0
       _amf_index(0),
       _header_size(0),
       _total_size(0),
       _packet_size(0),
       _amf_data(0),
       _seekptr(0),
+#endif
       _mystery_word(0)
 {
 //    GNASH_REPORT_FUNCTION;
 }
 
-AMF::AMF(int size) 
-    : _type(NONE),
-      _amf_index(0),
-      _header_size(0),
-      _total_size(0),
-      _packet_size(0),
-      _amf_data(0),
-      _mystery_word(0)
-{
-//    GNASH_REPORT_FUNCTION;
-    if (!_amf_data) {
-        _amf_data = new uint8_t(size+1);
-        memset(_amf_data, 0, size+1);
-    }
-    _seekptr = _amf_data;
-}
+// AMF::AMF(int size) 
+//     : _type(NONE),
+// #if 0
+//       _amf_index(0),
+//       _header_size(0),
+//       _total_size(0),
+//       _packet_size(0),
+//       _amf_data(0),
+// #endif
+//       _mystery_word(0)
+// {
+// //    GNASH_REPORT_FUNCTION;
+// #if 0
+//     if (!_amf_data) {
+//         _amf_data = new uint8_t(size+1);
+//         memset(_amf_data, 0, size+1);
+//     }
+//     _seekptr = _amf_data;
+// #endif
+// }
 
 AMF::~AMF()
 {
@@ -163,105 +141,114 @@ swapBytes(void *word, int size)
     return word;
 }
 
-
+#if 0
 bool
-AMF::parseAMF(boost::uint8_t *in)
+AMF::parseAMF(boost::uint8_t * /* in */)
 {
 //    GNASH_REPORT_FUNCTION;
 
+#if 0
     boost::uint8_t *x = in;
 
-    while (*x != OBJECT_END) {
-        x = readElement(x);
+    while (*x != Element::OBJECT_END) {
+        x = readElements(x);
     }
     return true;
+#endif
+    return false;
 }
 
-boost::uint8_t *
-AMF::readElement(void *in)
+vector<AMF::amf_element_t *> *
+AMF::readElements(boost::uint8_t *in)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
-    boost::uint8_t *x = static_cast<boost::uint8_t *>(in);
+    boost::uint8_t *x = in;
     astype_e type = (astype_e)*x;
     bool boolshift;
     const char *mstr = NULL;
-    amfnum_t num;
-    amfnum_t nanosecs;
+    double *num;
+    double nanosecs;
     short length;
-    
-//    log_msg(_("Type is %s"), astype_str[type]);
 
-    x++;                        // skip the type byte
+    vector<AMF::amf_element_t> list;
+    AMF::amf_element_t el;
+    
+    
+    log_msg(_("Type is %s"), astype_str[type]);
+
+//    x++;                        // skip the type byte
     switch (type) {
-      case NUMBER:
+      case Element::NUMBER:
 	  // AMF numbers are 64-bit big-endian integers.
-          num = *(amfnum_t *)swapBytes(x+1, 8);
-//          log_msg(_("Number is " AMFNUM_F), num);
+	  num = extractNumber(x);
+//	  log_msg(_("Number is " AMFNUM_F), num));
           break;
-      case BOOLEAN:
+      case Element::BOOLEAN:
           boolshift = *x;
-//          log_msg(_("Boolean is %d"), boolshift);
+          log_msg(_("Boolean is %d"), boolshift);
           break;
-      case STRING:
+      case Element::STRING:
+          string str = extractString(x);
 //        int length = *(short *)swapBytes(x, 2);
-          length = *(short *)x;
-          x+=2;                  // skip the length bytes
-          mstr = new char[length+1];
+//           length = *(short *)x;
+//           x+=2;                  // skip the length bytes
+//           mstr = new char[length+1];
 //           memset(mstr, 0, length+1);
 //           memcpy(mstr, x, length);
           // The function converts the multibyte string beginning at
           // *src to a sequence of wide characters as if by repeated
           // calls of the form:
 //          mbsrtowcs
-//          log_msg(_("String is %s"), mstr);
+		  log_msg(_("String is %s"), mstr);
           break;
-      case OBJECT:
+      case Element::OBJECT:
+//          return reinterpret_cast<uint8_t *>(extractObject(x));
 //          readElement();
           log_unimpl("Object AMF decoder");
           break;
-      case MOVIECLIP:
+      case Element::MOVIECLIP:
         log_unimpl("MovieClip AMF decoder");
           break;
-      case UNSUPPORTED:
+      case Element::UNSUPPORTED:
         log_unimpl("Unsupported AMF decoder");
           break;
-      case NULL_VALUE: 
+      case Element::NULL_VALUE: 
           log_unimpl("Null AMF decoder");
           break;
-      case UNDEFINED:
+      case Element::UNDEFINED:
           log_msg(_("Undefined element"));
           break;
-      case REFERENCE:
+      case Element::REFERENCE:
           log_unimpl("Reference AMF decoder");
           break;
-      case ECMA_ARRAY:
+      case Element::ECMA_ARRAY:
           log_unimpl("ECMAArray AMF decoder");
           break;
-      case OBJECT_END:
+      case Element::OBJECT_END:
           log_unimpl("ObjectEnd AMF decoder");
           break;
-      case STRICT_ARRAY:
+      case Element::STRICT_ARRAY:
           log_unimpl("StrictArray AMF decoder");
           break;
-      case DATE:
-          nanosecs = *(amfnum_t *)swapBytes(x+1, 8);
+      case Element::DATE:
+          nanosecs = *(double *)swapBytes(x+1, 8);
 //          log_msg(_("Date is " AMFNUM_F " nanoseconds"), nanosecs);
           break;
-      case LONG_STRING:
+      case Element::LONG_STRING:
 //          int length = *(short *)swapBytes(x, 4);
           x+=4;                  // skip the length bytes
 //        mstr = new char[length+1];
 //          memcpy(mstr, x, length);
 //          log_msg(_("String is %s"), mstr);
           break;
-      case RECORD_SET:
+      case Element::RECORD_SET:
           log_unimpl("Recordset AMF decoder");
           break;
-      case XML_OBJECT:
+      case Element::XML_OBJECT:
           log_unimpl("XMLObject AMF decoder");
           break;
-      case TYPED_OBJECT:
+      case Element::TYPED_OBJECT:
           log_unimpl("TypedObject AMF decoder");
           break;
       default:
@@ -271,7 +258,292 @@ AMF::readElement(void *in)
     
     return x;
 }
+#endif
 
+
+//
+// Methods for encoding data into big endian formatted raw AMF data.
+//
+
+/// Encode a string object
+///
+/// @return a binary AMF packet in big endian format (header,data) which
+/// needs to be deleted[] after being used.
+///
+boost::uint8_t *
+AMF::encodeString(const char *str)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::uint16_t length;
+    
+    int pktsize = strlen(str) + AMF_HEADER_SIZE;
+    // Encode a string value. The data follows a 2 byte length
+    // field. (which must be big-endian)
+    boost::uint8_t* x = new boost::uint8_t[pktsize + 1];
+    memset(x, 0, pktsize);
+    *x++ = Element::STRING;
+    log_debug("Encoded data size is going to be %d", length);
+    swapBytes(&length, 2);
+    memcpy(x, &length, 2);
+    x += 2;
+    memcpy(x, str, pktsize - AMF_HEADER_SIZE);
+    x += pktsize - AMF_HEADER_SIZE;
+    
+    return x;
+}
+
+/// Encode a 64 bit number
+///
+/// @return a binary AMF packet in big endian format (header,data) which
+/// needs to be deleted[] after being used.
+///
+boost::uint8_t *
+AMF::encodeNumber(double indata)
+{
+//    GNASH_REPORT_FUNCTION;
+    int pktsize = AMF_NUMBER_SIZE + AMF_HEADER_SIZE;
+    double num;
+    // Encode the data as a 64 bit, big-endian, numeric value
+    boost::uint8_t* x = new boost::uint8_t[pktsize + 1];
+    memset(x, 0, pktsize);
+    *x++ = (char)Element::NUMBER;
+    memcpy(&num, &indata, AMF_NUMBER_SIZE);
+    swapBytes(&num, AMF_NUMBER_SIZE);
+    memcpy(x, &num, AMF_NUMBER_SIZE);
+    x += pktsize - AMF_HEADER_SIZE;
+    
+    return x;
+}
+
+/// Encode a Boolean object
+///
+/// @return a binary AMF packet in big endian format (header,data) which
+/// needs to be deleted[] after being used.
+///
+/// Although a boolean is one byte in size, swf uses 16bit short integers
+/// heavily, so this value is also a short.
+boost::uint8_t *
+AMF::encodeBoolean(bool flag)
+{
+//    GNASH_REPORT_FUNCTION;
+    int pktsize = AMF_HEADER_SIZE;
+
+    boost::uint8_t* x = new boost::uint8_t[pktsize + 1];
+    memset(x, 0, pktsize);
+    // Encode a boolean value. 0 for false, 1 for true
+    *x++ = (char)Element::BOOLEAN;
+    *x = *reinterpret_cast<boost::uint8_t *>(flag);
+    swapBytes(x, 2);
+    x += sizeof(boost::uint16_t);
+    
+    return x;
+}
+
+/// Encode an object
+///
+/// @return a binary AMF packet in big endian format (header,data) which
+/// needs to be deleted[] after being used.
+///
+boost::uint8_t *
+AMF::encodeObject(const boost::uint8_t *data, int size)
+{
+//    GNASH_REPORT_FUNCTION;
+    int pktsize = AMF_HEADER_SIZE + size;
+
+    // Encode an XML object. The data follows a 4 byte length
+    // field. (which must be big-endian)
+    boost::uint8_t *x = new boost::uint8_t[pktsize + 1];
+    memset(x, 0, pktsize);
+    *x++ = Element::OBJECT;
+    uint32_t num = size;
+    swapBytes(&num, 4);
+    memcpy(x, data, size);
+    
+    return x;
+}
+
+/// Encode an "Undefined" object
+///
+/// @return a binary AMF packet in big endian format (header,data) which
+/// needs to be deleted[] after being used.
+///
+boost::uint8_t *
+AMF::encodeUndefined()
+{
+//    GNASH_REPORT_FUNCTION;
+    int pktsize = AMF_HEADER_SIZE;;
+    boost::uint8_t* x = new boost::uint8_t[pktsize + 1];
+    memset(x, 0, pktsize);
+    *x++ = (char)Element::UNDEFINED;
+//    *x = *static_cast<const char *>(flag);
+    x += pktsize - AMF_HEADER_SIZE;
+    
+    return x;
+}
+
+/// Encode an "Undefined" object
+///
+/// @return a binary AMF packet in big endian format (header,data) which
+/// needs to be deleted[] after being used.
+///
+boost::uint8_t *
+AMF::encodeUnsupported()
+{
+//    GNASH_REPORT_FUNCTION;
+    int pktsize = AMF_HEADER_SIZE;;
+    boost::uint8_t* x = new boost::uint8_t[pktsize + 1];
+    memset(x, 0, pktsize);
+    *x++ = (char)Element::UNSUPPORTED;
+//    *x = *static_cast<const char *>(flag);
+    x += pktsize - AMF_HEADER_SIZE;
+    
+    return x;
+}
+
+/// Encode a Date
+///
+/// @return a binary AMF packet in big endian format (header,data) which
+/// needs to be deleted[] after being used.
+///
+boost::uint8_t *encodeDate(boost::uint8_t *data)
+{
+//    GNASH_REPORT_FUNCTION;
+    int pktsize = AMF_HEADER_SIZE;;
+    boost::uint8_t *x = new boost::uint8_t[pktsize + 1];
+    memset(x, 0, pktsize);
+    *x++ = Element::DATE;
+    double num = *reinterpret_cast<const double*>(data);
+    swapBytes(&num, 8);
+    memcpy(x, &num, 8);
+    
+    return x;
+}
+/// Encode a "NULL" object
+///
+/// @return a binary AMF packet in big endian format (header,data) which
+/// needs to be deleted[] after being used.
+///
+boost::uint8_t *
+AMF::encodeNull()
+{
+//    GNASH_REPORT_FUNCTION;
+
+    log_unimpl("NULL AMF object not supported yet");
+    return 0;
+}
+
+/// Encode an XML object
+///
+/// @return a binary AMF packet in big endian format (header,data) which
+/// needs to be deleted[] after being used.
+///
+boost::uint8_t *
+AMF::encodeXMLObject(boost::uint8_t * /*data */, int /* size */)
+{
+//    GNASH_REPORT_FUNCTION;
+    log_unimpl("XML AMF objects not supported yet");
+    
+    return 0;
+}
+
+/// Encode a Typed Object
+///
+/// @return a binary AMF packet in big endian format (header,data) which
+/// needs to be deleted[] after being used.
+///
+boost::uint8_t *
+AMF::encodeTypedObject(boost::uint8_t * /* data */, int /* size */)
+{
+//    GNASH_REPORT_FUNCTION;
+    log_unimpl("Typed AMF objects not supported yet");
+
+    return 0;
+}
+
+/// Encode a Reference to an object
+///
+/// @return a binary AMF packet in big endian format (header,data) which
+/// needs to be deleted[] after being used.
+///
+boost::uint8_t *
+AMF::encodeReference(boost::uint8_t * /* data */, int /* size */)
+{
+//    GNASH_REPORT_FUNCTION;
+    log_unimpl("Reference AMF objects not supported yet");
+    
+    return 0;
+}
+
+/// Encode a Movie Clip
+///
+/// @return a binary AMF packet in big endian format (header,data) which
+/// needs to be deleted[] after being used.
+///
+boost::uint8_t *
+AMF::encodeMovieClip(boost::uint8_t * /*data */, int /* size */)
+{
+//    GNASH_REPORT_FUNCTION;
+    log_unimpl("Movie Clip AMF objects not supported yet");
+    
+    return 0;
+}
+
+/// Encode an ECMA Array
+///
+/// @return a binary AMF packet in big endian format (header,data) which
+/// needs to be deleted[] after being used.
+///
+boost::uint8_t *
+AMF::encodeECMAArray(boost::uint8_t * /*data */, int /* size */)
+{
+//    GNASH_REPORT_FUNCTION;
+    log_unimpl("ECMA Array AMF objects not supported yet");
+    
+    return 0;
+}
+
+/// Encode a long string
+///
+/// @return a binary AMF packet in big endian format (header,data) which
+/// needs to be deleted[] after being used.
+///
+boost::uint8_t *
+AMF::encodeLongString(boost::uint8_t * /* data */, int /* size */)
+{
+//    GNASH_REPORT_FUNCTION;
+    log_unimpl("Long String AMF objects not supported yet");
+    
+    return 0;
+}
+
+/// Encode a Record Set
+///
+/// @return a binary AMF packet in big endian format (header,data) which
+/// needs to be deleted[] after being used.
+///
+boost::uint8_t *
+AMF::encodeRecordSet(boost::uint8_t * /* data */, int /* size */)
+{
+//    GNASH_REPORT_FUNCTION;
+    log_unimpl("Reecord Set AMF objects not supported yet");
+    
+    return 0;
+}
+
+
+/// Encode a Strict Array
+///
+/// @return a binary AMF packet in big endian format (header,data) which
+/// needs to be deleted[] after being used.
+///
+boost::uint8_t *
+AMF::encodeStrictArray(boost::uint8_t * /* data */, int /* size */)
+{
+//    GNASH_REPORT_FUNCTION;
+    log_unimpl("Strict Array AMF objects not supported yet");
+    
+    return 0;
+}
 
 /// \brief Write an AMF element
 ///
@@ -291,178 +563,78 @@ AMF::readElement(void *in)
 /// characters, but for now we just leave them as standard multibyte
 /// characters.
 boost::uint8_t *
-AMF::encodeElement(astype_e type, const void *in, int nbytes)
+AMF::encodeElement(Element *el)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    amfnum_t num;
-    int pktsize = 0;
-    boost::uint8_t* out = NULL;
-    boost::uint8_t* x = NULL;
-
-    // Packets are of varying length. A few pass in a byte count, but
-    // most packets have a hardcoded size.
-    switch (type) {
-        // Encode the data as a 64 bit, big-endian, numeric value
-      case NUMBER:
-          // one 64 bit number
-          pktsize = AMF_NUMBER_SIZE + AMF_HEADER_SIZE;
-          break;
-      case BOOLEAN:
-          pktsize = 2;          // just one data byte
-          break;
-      case STRING:
-          pktsize = nbytes + 3; // two length bytes after the header
-          break;
-      case OBJECT:
-          pktsize = 0;          // look for the terminator
-          break;
-      case MOVIECLIP:
-          pktsize = -1;         // FIXME: no clue
-          break;
-      case NULL_VALUE: 
-          pktsize = -1;         // FIXME: no clue
-          break;
-      case UNDEFINED:
-	  // just the header, no data
-          pktsize = nbytes + 3; // two length bytes after the header
-          break;
-      case REFERENCE:
-          pktsize = -1;         // FIXME: no clue
-          break;
-      case ECMA_ARRAY:
-          pktsize = 0;          // look for the terminator
-          break;
-      case OBJECT_END:
-          pktsize = -1;         // FIXME: no clue
-          break;
-      case STRICT_ARRAY:
-          pktsize = nbytes + 5; // 4 length bytes, then data
-          break;
-      case DATE:
-          pktsize = 9;          // one 64 bit number
-          break;
-      case LONG_STRING:
-          pktsize = nbytes + 5; // 4 length bytes, then data
-          break;
-      case UNSUPPORTED:
-          pktsize = -1;         // FIXME: no clue
-          break;
-      case RECORD_SET:
-          pktsize = -1;         // FIXME: no clue
-          break;
-      case XML_OBJECT:
-          pktsize = nbytes + 5;// 4 length bytes, then data
-          break;
-      case TYPED_OBJECT:
-          pktsize = 0;          // look for the terminator
-          break;
-// FIXME, shouldn't there be a default case here?
-      default:
-          log_error("Unknown AMF packet type %d", type);
-          return 0;
-    };
-
-    log_debug("pktsize:%d, nbytes:%d", pktsize, nbytes);
-    
-    switch (type) {
-      case NUMBER:
-          // Encode the data as a 64 bit, big-endian, numeric value
-          x = out = new boost::uint8_t[pktsize];
-          memset(x, 0, pktsize);
-          *x++ = (char)AMF::NUMBER;
-          memcpy(&num, in, AMF_NUMBER_SIZE);
-          swapBytes(&num, AMF_NUMBER_SIZE);
-          memcpy(x, &num, AMF_NUMBER_SIZE);
-          break;
-      case BOOLEAN:
-          // Encode a boolean value. 0 for false, 1 for true
-          out = new boost::uint8_t[pktsize];
-          x = out;    
-          *x++ = (char)AMF::BOOLEAN;
-          *x = *static_cast<const char *>(in);
-          break;
-      case STRING:
-          // Encode a string value. The data follows a 2 byte length
-          // field. (which must be big-endian)
-          x = out = new uint8_t[pktsize];
-          memset(x, 0, pktsize);
-          *x++ = AMF::STRING;
-          num = nbytes;
-          log_debug("Encoded data size is going to be " AMFNUM_F, num);
-          swapBytes(&num, 2);
-          log_debug("After swapping, it's " AMFNUM_F, num);
-          memcpy(x, &num, 2);
-          x+=2;
-          memcpy(x, in, nbytes);
-          break;
-      case OBJECT:
-          log_unimpl("Object AMF encoder");
-          break;
-      case MOVIECLIP:
-          log_unimpl("MovieClip AMF encoder");
-          break;
-      case NULL_VALUE: 
-          log_unimpl("Null AMF encoder");
-          break;
-      case UNDEFINED:
-          x = out = new boost::uint8_t[pktsize];
-          memset(x, 0, pktsize);
-          *x++ = AMF::UNDEFINED;
-          num = nbytes;
-          swapBytes(&num, 2);
-          memcpy(x, &num, 2);
-          x+=2;
-          memcpy(x, in, nbytes);
+    switch (el->getType()) {
+      case Element::NOTYPE:
+	  return 0;
 	  break;
-      case REFERENCE:
-          log_unimpl("Reference AMF encoder");
+      case Element::NUMBER:
+	  return encodeNumber(*(reinterpret_cast<double *>(el->getData())));
           break;
-      case ECMA_ARRAY:
-          log_unimpl("ECMAArray AMF encoder");
+      case Element::BOOLEAN:
+	  return encodeBoolean(*(reinterpret_cast<bool *>(el->getData())));
           break;
-      case OBJECT_END:
-          log_unimpl("ObjectEnd AMF encoder");
+      case Element::STRING:
+	  return encodeBoolean(*(reinterpret_cast<const char *>(el->getData())));
           break;
-      case STRICT_ARRAY:
-          log_unimpl("StrictArray AMF encoder");
+      case Element::OBJECT:
+	  return encodeObject(el->getData(), el->getLength());
           break;
-          // Encode the date as a 64 bit, big-endian, numeric value
-      case DATE:
-          x = out = new boost::uint8_t[pktsize];
-          memset(x, 0, pktsize);
-          *x++ = AMF::DATE;
-          num = *static_cast<const amfnum_t*>(in);
-          swapBytes(&num, 8);
-          memcpy(x, &num, 8);
+      case Element::MOVIECLIP:
+	  return encodeMovieClip(el->getData(), el->getLength());
           break;
-      case LONG_STRING:
-          log_unimpl("LongString AMF encoder");
+      case Element::NULL_VALUE: 
+	  return encodeNull();
           break;
-      case UNSUPPORTED:
-          log_unimpl("Unsupported AMF encoder");
+      case Element::UNDEFINED:
+	  return encodeUndefined();
+	  break;
+      case Element::REFERENCE:
+	  return encodeReference(el->getData(), el->getLength());
           break;
-      case RECORD_SET:
-          log_unimpl("Recordset AMF encoder");
+      case Element::ECMA_ARRAY:
+	  return encodeECMAArray(el->getData(), el->getLength());
           break;
-      case XML_OBJECT:
+	  // The Object End gets added when creating the object, so we can jusy ignore it here.
+      case Element::OBJECT_END:
+          break;
+      case Element::STRICT_ARRAY:
+	  return encodeStrictArray(el->getData(), el->getLength());
+          break;
+      case Element::DATE:
+//	  return encodeDate(el->getData());
+          break;
+      case Element::LONG_STRING:
+	  return encodeLongString(el->getData(), el->getLength());
+          break;
+      case Element::UNSUPPORTED:
+	  return encodeUnsupported();
+          break;
+      case Element::RECORD_SET:
+	  return encodeRecordSet(el->getData(), el->getLength());
+          break;
+      case Element::XML_OBJECT:
+	  return encodeXMLObject(el->getData(), el->getLength());
           // Encode an XML object. The data follows a 4 byte length
           // field. (which must be big-endian)
-          x = out = new boost::uint8_t[pktsize];
-          memset(x, 0, pktsize);
-          *x++ = AMF::STRING;
-          num = nbytes;
-          swapBytes(&num, 4);
-          memcpy(x, in, nbytes);
           break;
-      case TYPED_OBJECT:
-          log_unimpl("TypedObject AMF encoder");
+      case Element::TYPED_OBJECT:
+	  return encodeTypedObject(el->getData(), el->getLength());
+          break;
+	  // This is a Gnash specific value
+      case Element::VARIABLE:
+	  return 0;
           break;
     };
-    
-    return out;
+
+    // you should never get here
+    return 0;
 }
 
+#if 0
 /// \brief \ Each RTMP header consists of the following:
 ///
 /// * Index & header size - The header size and amf channel index.
@@ -513,7 +685,6 @@ AMF::encodeRTMPHeader(int amf_index, amf_headersize_e head_size,
     return out;
 }
 
-#if 0
 /// \brief Each header consists of the following:
 ///
 /// * UTF string (including length bytes) - name
@@ -633,7 +804,7 @@ AMF::encodePacket(std::vector<amfpacket_t *> messages)
 }
 #endif
 
-
+#if 0
 AMF::astype_e
 AMF::extractElementHeader(void *in)
 {
@@ -648,67 +819,67 @@ AMF::extractElementLength(void *in)
 //    GNASH_REPORT_FUNCTION;
 
     char *x = (char *)in;
-    astype_e type = (astype_e)*x;
+    Element::astype_e type = (Element::astype_e)*x;
     x++;                        // skip the header byte
     
     switch (type) {
-      case NUMBER:              // a 64 bit numeric value
+      case Element::NUMBER:              // a 64 bit numeric value
           return 8;
           break;
-      case BOOLEAN:             // a single byte
+      case Element::BOOLEAN:             // a single byte
           return 1;
           break;
-      case STRING:              // the length is a 2 byte value
+      case Element::STRING:              // the length is a 2 byte value
 		//FIXME, there are all kinds of byte order problems in this code.
           return (short)*(short *)x;
           break;
-      case OBJECT:
+      case Element::OBJECT:
           return x - strchr(x, TERMINATOR);
           break;
-      case MOVIECLIP:
+      case Element::MOVIECLIP:
           return -1;
           log_unimpl("MovieClip AMF extractor");
           break;
-      case NULL_VALUE: 
+      case Element::NULL_VALUE: 
           return -1;
           log_unimpl("Null AMF extractor");
           break;
-      case UNDEFINED:
+      case Element::UNDEFINED:
           return 0;
           break;
-      case REFERENCE:
+      case Element::REFERENCE:
           return -1;
           log_unimpl("Reference AMF extractor");
           break;
-      case ECMA_ARRAY:
+      case Element::ECMA_ARRAY:
           return x - strchr(x, TERMINATOR);
           break;
-      case OBJECT_END:
+      case Element::OBJECT_END:
           return -1;
           log_unimpl("ObjectEnd AMF extractor");
           break;
-      case STRICT_ARRAY:         // the length is a 4 byte value
+      case Element::STRICT_ARRAY:         // the length is a 4 byte value
 //          return (int *)x;
           break;
-      case DATE:              // a 64 bit numeric value
+      case Element::DATE:              // a 64 bit numeric value
           return 8;
           break;
-      case LONG_STRING:
+      case Element::LONG_STRING:
           return -1;
           log_unimpl("LongString AMF extractor");
           break;
-      case UNSUPPORTED:
+      case Element::UNSUPPORTED:
           return -1;
           log_unimpl("Unsupported AMF extractor");
           break;
-      case RECORD_SET:
+      case Element::RECORD_SET:
           return -1;
           log_unimpl("Recordset AMF extractor");
           break;
-      case XML_OBJECT:           // the length is a 4 byte value
+      case Element::XML_OBJECT:           // the length is a 4 byte value
 //          return (int)*(int *)x;
           break;
-      case TYPED_OBJECT:
+      case Element::TYPED_OBJECT:
           return x - strchr(x, TERMINATOR);
           break;
     };
@@ -716,14 +887,14 @@ AMF::extractElementLength(void *in)
     return 0;
 }
 
-boost::int8_t *
+char *
 AMF::extractString(const boost::uint8_t *in)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::int8_t *buf = NULL;
     boost::uint8_t *x = const_cast<boost::uint8_t *>(in);
     
-    if (*x == AMF::STRING) {
+    if (*x == Element::STRING) {
         x++;
         short length = *(reinterpret_cast<const short *>(x));
         swapBytes(&length, 2);
@@ -736,21 +907,22 @@ AMF::extractString(const boost::uint8_t *in)
         log_error("Tried to extract AMF string from non String object!");
     }
     
-    return buf;
+    return reinterpret_cast<char *>(buf);
 }
 
-amfnum_t *
+double
 AMF::extractNumber(const boost::uint8_t *in)
 {
 //    GNASH_REPORT_FUNCTION;    
     boost::uint8_t *x = const_cast<uint8_t *>(in);
-    amfnum_t *num = new amfnum_t;
-    memset(num, 0, AMF_NUMBER_SIZE);
+//    double *num = new double;
+    double num = 0.0;
+//    memset(num, 0, AMF_NUMBER_SIZE);
     
-    if (*x == AMF::NUMBER) {
+    if (*x == Element::NUMBER) {
         x++;
-        memcpy(num, x, AMF_NUMBER_SIZE);
-        swapBytes(num, AMF_NUMBER_SIZE);
+        memcpy(&num, x, AMF_NUMBER_SIZE);
+        swapBytes(&num, AMF_NUMBER_SIZE);
     } else {
         log_error("Tried to extract AMF Number from non Number object!");
     }
@@ -758,7 +930,7 @@ AMF::extractNumber(const boost::uint8_t *in)
     return num;
 }
 
-AMF::amf_element_t *
+Element &
 AMF::createElement(amf_element_t *el, astype_e type,
 		  const std::string &name, boost::uint8_t *data, int nbytes)
 {
@@ -772,30 +944,30 @@ AMF::createElement(amf_element_t *el, astype_e type,
     return el;
 }
 
-AMF::amf_element_t *
-AMF::createElement(amf_element_t *el, const char *name, amfnum_t data)
-{
-//    GNASH_REPORT_FUNCTION;
-    string str = name;
-    return createElement(el, str, data);
-}
+// AMF::amf_element_t *
+// AMF::createElement(amf_element_t *el, const char *name, double data)
+// {
+// //    GNASH_REPORT_FUNCTION;
+//     string str = name;
+//     return createElement(el, str, data);
+// }
 
-AMF::amf_element_t *
-AMF::createElement(amf_element_t *el, const std::string &name, amfnum_t data)
-{
-//    GNASH_REPORT_FUNCTION;
-    log_debug("Creating element %s", name.c_str());
+// AMF::amf_element_t *
+// AMF::createElement(amf_element_t *el, const std::string &name, double data)
+// {
+// //    GNASH_REPORT_FUNCTION;
+//     log_debug("Creating element %s", name.c_str());
 
-    el->type = AMF::NUMBER;
-    el->name = name;
-    el->length = AMF_NUMBER_SIZE;
-//    char *numptr = (char *)&data;
-    el->data = new boost::uint8_t[AMF_NUMBER_SIZE + 1];
-    memset(el->data, 0, AMF_NUMBER_SIZE + 1);
-    memcpy(el->data, &data, AMF_NUMBER_SIZE);
+//     el->type = AMF::NUMBER;
+//     el->name = name;
+//     el->length = AMF_NUMBER_SIZE;
+// //    char *numptr = (char *)&data;
+//     el->data = new boost::uint8_t[AMF_NUMBER_SIZE + 1];
+//     memset(el->data, 0, AMF_NUMBER_SIZE + 1);
+//     memcpy(el->data, &data, AMF_NUMBER_SIZE);
 
-    return el;
-}
+//     return el;
+// }
 
 AMF::amf_element_t *
 AMF::createElement(amf_element_t *el, const char *name, double data)
@@ -898,81 +1070,56 @@ AMF::createElement(AMF::amf_element_t *el, const std::string &name, bool data)
 //     string str = name;
 //     return createElement(el, str, data);
 // }
+#endif
 
 uint8_t *
-AMF::encodeVariable(amf_element_t *el)
+AMF::encodeVariable(amf::Element *el)
 {
 //    GNASH_REPORT_FUNCTION;
-    int outsize = el->name.size() + el->length + 5;
+    int outsize = el->getName().size() + el->getLength() + 5;
     boost::uint8_t *out = new boost::uint8_t[outsize + 2];
     memset(out, 0, outsize + 2);
     boost::uint8_t *tmpptr = out;
 
     // Add the length of the string for the name of the variable
-    size_t length = el->name.size();
+    size_t length = el->getName().size();
     boost::uint16_t enclength = length;
     swapBytes(&enclength, 2);
     memcpy(tmpptr, &enclength, 2);
 
     // Add the actual name
     tmpptr += sizeof(uint16_t);
-    memcpy(tmpptr, el->name.c_str(), length);
+    memcpy(tmpptr, el->getName().c_str(), length);
     tmpptr += length;
     // Add the type of the variable's data
-    *tmpptr++ = el->type;
+    *tmpptr++ = el->getType();
     // Booleans appear to be encoded weird. Just a short after
     // the type byte that's the value.
-    switch (el->type) {
-      case AMF::BOOLEAN:
-	  enclength = el->data[0];
+    switch (el->getType()) {
+      case Element::BOOLEAN:
+	  enclength = el->to_bool();
 	  memcpy(tmpptr, &enclength, 2);
 	  tmpptr += sizeof(uint16_t);
 	  break;
-      case AMF::NUMBER:
-	  if (el->data) {
-	      swapBytes(el->data, AMF_NUMBER_SIZE);
-	      memcpy(tmpptr, el->data, AMF_NUMBER_SIZE);
+      case Element::NUMBER:
+	  if (el->getData()) {
+	      swapBytes(el->getData(), AMF_NUMBER_SIZE);
+	      memcpy(tmpptr, el->getData(), AMF_NUMBER_SIZE);
 	  }
 	  break;
       default:
-	enclength = el->length;
-	swapBytes(&enclength, 2);
-	memcpy(tmpptr, &enclength, 2);
-	tmpptr += sizeof(uint16_t);
-	// Now the data for the variable
-	memcpy(tmpptr, el->data, el->length);
+	  enclength = el->getLength();
+	  swapBytes(&enclength, 2);
+	  memcpy(tmpptr, &enclength, 2);
+	  tmpptr += sizeof(uint16_t);
+	  // Now the data for the variable
+	  memcpy(tmpptr, el->getData(), el->getLength());
     }
     
     return out;    
 }
 
-boost::uint8_t *
-AMF::encodeVariable(amf_element_t &el)
-{
-//    GNASH_REPORT_FUNCTION;
-    int outsize = el.name.size() + el.length + 5;
-    boost::uint8_t *out = new uint8_t[outsize];
-    boost::uint8_t *tmpptr = out;
-
-    // Add the length of the string for the name of the variable
-    size_t length = el.name.size();
-    short enclength = length;
-    swapBytes(&enclength, 2);
-    memcpy(tmpptr, &enclength, 2);
-
-    // Add the actual name
-    tmpptr += 2;
-    memcpy(tmpptr, el.name.c_str(), length);
-    tmpptr += length;
-    *tmpptr = el.type;
-    tmpptr++;
-
-    // Now the data for the variable
-    memcpy(tmpptr, el.data, el.length);
-
-    return out;    
-}
-
+#if 0
 boost::uint8_t *
 AMF::encodeVariable(const char *name, bool flag)
 {
@@ -989,7 +1136,7 @@ AMF::encodeVariable(const char *name, bool flag)
     tmpptr += 2;
     memcpy(tmpptr, name, length);
     tmpptr += length;
-    *tmpptr = AMF::BOOLEAN;
+    *tmpptr = Element::BOOLEAN;
     tmpptr++;
     *tmpptr = flag;
 
@@ -1011,20 +1158,20 @@ AMF::encodeVariable(const char *name)
     tmpptr += 2;
     memcpy(tmpptr, name, length);
     tmpptr += length;
-    *tmpptr = AMF::UNDEFINED;
+    *tmpptr = Element::UNDEFINED;
     tmpptr++;
 
     return out;    
 }
 
 boost::uint8_t *
-AMF::encodeVariable(const char *name, amfnum_t bignum)
+AMF::encodeVariable(const char *name, double bignum)
 {
 //    GNASH_REPORT_FUNCTION;
     int outsize = strlen(name) + AMF_NUMBER_SIZE + 5;
     boost::uint8_t *out = new boost::uint8_t[outsize];
     boost::uint8_t *tmpptr = out;
-    amfnum_t newnum = bignum;
+    double newnum = bignum;
     char *numptr = (char *)&newnum;
 
     size_t length = strlen(name);
@@ -1034,7 +1181,7 @@ AMF::encodeVariable(const char *name, amfnum_t bignum)
     tmpptr += 2;
     memcpy(tmpptr, name, length);
     tmpptr += length;
-    *tmpptr = AMF::NUMBER;
+    *tmpptr = Element::NUMBER;
     tmpptr++;
 //    swapBytes(numptr, AMF_NUMBER_SIZE);
     memcpy(tmpptr, numptr, AMF_NUMBER_SIZE);
@@ -1058,7 +1205,7 @@ AMF::encodeVariable(const char *name, const char *val)
     tmpptr += 2;
     memcpy(tmpptr, name, length);
     tmpptr += length;
-    *tmpptr = AMF::STRING;
+    *tmpptr = Element::STRING;
     tmpptr++;
     length = strlen(val);
     enclength = length;
@@ -1086,7 +1233,7 @@ AMF::encodeVariable(std::string &name, std::string &val)
     tmpptr += 2;
     memcpy(tmpptr, name.c_str(), name.size());
     tmpptr += name.size();
-    *tmpptr = AMF::STRING;
+    *tmpptr = Element::STRING;
     tmpptr++;
     length = val.size() && 0xffff;
     swapBytes(&length, 2);
@@ -1219,11 +1366,11 @@ AMF::parseBody()
 {
 //    GNASH_REPORT_FUNCTION;
 
-    return parseBody(_amf_data, _total_size);
+//    return parseBody(_amf_data, _total_size);
 }
 
-int
-AMF::parseBody(boost::uint8_t *in, int bytes)
+uint8_t *
+AMF::extractElement(Element &el, boost::uint8_t *in)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -1232,30 +1379,23 @@ AMF::parseBody(boost::uint8_t *in, int bytes)
 //    uint8_t hexint[(bytes*2)+1];
     boost::uint8_t* hexint;
 
-    char buffer[500];
-//    char *name;
     short length;
-    amf_element_t el;
 
-    if (bytes == 0) {
-        return 0;
-    }
-    
     if (in == 0) {
         log_error(_("AMF body input data is NULL"));
-        return -1;
+        return 0;
     }
+//     if (reinterpret_cast<int>(el) == 0)) {
+//         log_error(_("Got NULL instead of amf_element_t!"));
+//         return 0;
+//     }
 
+#if 0
     hexint =  (boost::uint8_t*) malloc((bytes * 3) + 12);
-
-//     memcpy(_amf_data +_read_size, in, AMF_VIDEO_PACKET_SIZE);
-//     _read_size += bytes;
-#if 1
     hexify((boost::uint8_t *)hexint, (boost::uint8_t *)in, bytes, true);
     log_msg(_("The packet body is: 0x%s"), hexint);
 #endif
 
-//    tmpptr = in;
     tmpptr = in;
     
 // All elements look like this:
@@ -1267,17 +1407,17 @@ AMF::parseBody(boost::uint8_t *in, int bytes)
     while (tmpptr  <= (in + bytes)) {
         memset(buffer, 0, sizeof(buffer));	//FIXME, slow
         // Check the type of the element data
-        char type = *(astype_e *)tmpptr;
+        char type = *(Element::astype_e *)tmpptr;
         tmpptr++;                        // skip the header byte
 
-        switch ((astype_e)type) {
-          case NUMBER:
+        switch ((Element::astype_e)type) {
+          case Element::NUMBER:
 //              memcpy(buffer, tmpptr, 8);
               tmpptr += 8;
               continue;
               break;
-          case BOOLEAN:
-          case STRING:
+          case Element::BOOLEAN:
+          case Element::STRING:
               // get the length of the name
               length = ntohs((*(short *)tmpptr) & 0xffff);
               tmpptr += 2;
@@ -1290,37 +1430,38 @@ AMF::parseBody(boost::uint8_t *in, int bytes)
               log_msg(_("AMF String is: %s"), buffer);              
               el.name = buffer;
               break;
-          case OBJECT:
+          case Element::OBJECT:
               do {
                   tmpptr = extractVariable(&el, tmpptr);
-              } while (el.type != AMF::OBJECT_END);
+              } while (el.type != Element::OBJECT_END);
               break;
-          case MOVIECLIP:
-          case NULL_VALUE: 
-          case UNDEFINED:
-          case REFERENCE:
-          case ECMA_ARRAY:
-          case OBJECT_END:
-          case STRICT_ARRAY:
-          case DATE:
-          case LONG_STRING:
-          case UNSUPPORTED:
-          case RECORD_SET:
-          case XML_OBJECT:
-          case TYPED_OBJECT:
+          case Element::MOVIECLIP:
+          case Element::NULL_VALUE: 
+          case Element::UNDEFINED:
+          case Element::REFERENCE:
+          case Element::ECMA_ARRAY:
+          case Element::OBJECT_END:
+          case Element::STRICT_ARRAY:
+          case Element::DATE:
+          case Element::LONG_STRING:
+          case Element::UNSUPPORTED:
+          case Element::RECORD_SET:
+          case Element::XML_OBJECT:
+          case Element::TYPED_OBJECT:
           default:
 	    log_unimpl("%s: type %d", __PRETTY_FUNCTION__, (int)type);
-              return -1;
+              return 0;
         }
     }
 
     free(hexint);
 
-    return -1;
+    return 0;
 }
+#endif
 
 boost::uint8_t *
-AMF::extractVariable(AMF::amf_element_t *el, boost::uint8_t *in)
+AMF::extractVariable(Element *el, boost::uint8_t *in)
 {
 //    GNASH_REPORT_FUNCTION;
     
@@ -1328,15 +1469,11 @@ AMF::extractVariable(AMF::amf_element_t *el, boost::uint8_t *in)
     boost::uint8_t *tmpptr = in;
     boost::int16_t length;
 
-    if (el == 0) {
-	return 0;
-    }
+//     if (el == 0) {
+// 	return 0;
+//     }
     
-    el->length = 0;
-    el->name.erase();
-    if (el->data) {
-        el->data = 0;
-    }
+    el->clear();
     
     memset(buffer, 0, AMF_PACKET_SIZE);
     // @@ casting generic pointers to bigger types may be dangerous
@@ -1344,12 +1481,12 @@ AMF::extractVariable(AMF::amf_element_t *el, boost::uint8_t *in)
     length = *((short *)tmpptr);
     swapBytes(&length, 2);
 //    length = ntohs((*(const short *)tmpptr) & 0xffff);
-    el->length = length;
+    el->setLength(length);
     if (length == 0) {
-        if (*(tmpptr+2) == AMF::OBJECT_END) {
-            log_msg(_("End of Object definition"));
-            el->length = 0;
-            el->type = AMF::OBJECT_END;
+        if (*(tmpptr+2) == Element::OBJECT_END) {
+//            log_msg(_("End of Object definition"));
+            el->setLength(0);
+            el->setType(Element::OBJECT_END);
             tmpptr+=3;
             return tmpptr;
         }
@@ -1371,95 +1508,90 @@ AMF::extractVariable(AMF::amf_element_t *el, boost::uint8_t *in)
 	
 //        log_msg(_("AMF element length is: %d"), length);
         memcpy(buffer, tmpptr, length);
-        el->name = reinterpret_cast<char *>(buffer);
+        el->setName(buffer);
         tmpptr += length;
     }
     
 //    log_msg(_("AMF element name is: %s"), buffer);
-    astype_e type = (astype_e)((*tmpptr++) & 0xff);
+    Element::astype_e type = (Element::astype_e)((*tmpptr++) & 0xff);
 
-    if (type <= AMF::TYPED_OBJECT) {
-//        log_msg(_("AMF type is: %s"), astype_str[(int)type]);
-	el->type = type;
+    if (type <= Element::TYPED_OBJECT) {
+//        log_msg(_("AMF type is: %s"), Element::astype_str[(int)type]);
+	el->setType(type);
     }
     
     switch (type) {
-      case NUMBER:
+      case Element::NUMBER:
       {
           memcpy(buffer, tmpptr, AMF_NUMBER_SIZE);
           swapBytes(buffer, AMF_NUMBER_SIZE);
 	  uint8_t* tmp = new uint8_t[AMF_NUMBER_SIZE+1];
 	  memset(tmp, 0, AMF_NUMBER_SIZE+1);
 	  memcpy(tmp, buffer, AMF_NUMBER_SIZE);
-	  el->data = tmp;
+	  el->setData(tmp);
 #if 0
           uint8_t hexint[AMF_NUMBER_SIZE*3];
           hexify((uint8_t *)hexint, (uint8_t *)buffer,
 		 AMF_NUMBER_SIZE, false);
-          log_msg(_("Number \"%s\" is: 0x%s"), el->name.c_str(), hexint);
-//          amfnum_t *num = extractNumber(tmpptr);
+          log_msg(_("Number \"%s\" is: 0x%s"), el->getName().c_str(), hexint);
+//          double *num = extractNumber(tmpptr);
 #endif
           tmpptr += 8;
-	  el->length = AMF_NUMBER_SIZE;
+	  el->setLength(AMF_NUMBER_SIZE);
           break;
       }
-      case BOOLEAN:
+      case Element::BOOLEAN:
       {
-//          int value = *tmpptr;
-	  el->length = 1;
-          el->data = new uint8_t[2];
-//          memcpy(tmp, tmpptr, 2); 
-          el->data[0] =* tmpptr;
-// 	  log_msg((*tmpptr == 0) ? 
-// 		  _("Boolean \"%s\" is: true"):
-// 		  _("Boolean \"%s\" is: false"), el->name.c_str());
+	  bool sheet = *tmpptr;
+          el->init(sheet);
 	  tmpptr += 1;
 	  break;
     }
-      case STRING:
+      case Element::STRING:
 	  // extractString returns a printable char *
 	  length = ntohs((*(const short *)tmpptr) & 0xffff);
           tmpptr += sizeof(short);
-          el->length = length;
-          el->data = tmpptr; 
-//            std::string v(el->data+3, length);
-//            log_msg(_("Variable \"%s\" is: %s"), el->name.c_str(), v.c_str()); // el->data);
+          el->setLength(length);
+	  boost::uint8_t *str;
+	  str = new boost::uint8_t[length + 1];
+ 	  memset(str, 0, length + 1);
+ 	  memcpy(str, tmpptr, length);
+	  el->setData(str);
+// 	  string v(reinterpret_cast<const char *>(str) + 3, (int)length);
+// 	  log_msg(_("Variable \"%s\" is: %s"), el->getName().c_str(), v.c_str());
           tmpptr += length;
           break;
-      case OBJECT:
-  	  while (*(tmpptr++) != AMF::OBJECT_END) {
+      case Element::OBJECT:
+  	  while (*(tmpptr++) != Element::OBJECT_END) {
 	      log_msg("Look for end of object...");
   	  }
 	  
 	  break;
-      case MOVIECLIP:
-      case NULL_VALUE:
-	  // Undefined types have a name, but no value
-		//FIXME this shouldn't fall through!
-      case UNDEFINED:
-//          log_msg(_("Undefined type"));
-          el->data = 0; // (const uint8_t*)tmpptr; 
-          //log_msg(_("Variable \"%s\" is of undefined type"), el->name.c_str());
-          el->length = 0;
-          el->type = AMF::UNDEFINED;
+      case Element::MOVIECLIP:
+      case Element::NULL_VALUE:
+	  el->makeUndefined();
+	  break;
+      case Element::UNDEFINED:
+	  el->makeUndefined();
           break;
-      case REFERENCE:
-      case ECMA_ARRAY:
+      case Element::REFERENCE:
+      case Element::ECMA_ARRAY:
 			// FIXME this shouldn't fall thru
-      case OBJECT_END:
+      case Element::OBJECT_END:
 //          log_msg(_("End of Object definition"));
-          el->name.erase();
-          el->length = 0;
-          el->data = 0;
-          el->type = AMF::OBJECT_END;
+	  el->makeObjectEnd();
           break;
-      case TYPED_OBJECT:
-      case STRICT_ARRAY:
-      case DATE:
-      case LONG_STRING:
-      case UNSUPPORTED:
-      case RECORD_SET:
-      case XML_OBJECT:
+      case Element::TYPED_OBJECT:
+	  el->makeTypedObject(tmpptr, 0);
+          break;
+      case Element::STRICT_ARRAY:
+      case Element::DATE:
+	  el->makeDate(tmpptr);
+          break;
+      case Element::LONG_STRING:
+      case Element::UNSUPPORTED:
+      case Element::RECORD_SET:
+      case Element::XML_OBJECT:
       default:
           log_unimpl(_("astype_e of value: %x"), (int)type);
           break;

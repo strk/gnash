@@ -25,6 +25,7 @@
 #include <boost/cstdint.hpp>
 #include <string>
 #include <vector>
+#include "element.h"
 #include "amf.h"
 
 // It comprises of a magic number, followed by the file length, a
@@ -67,9 +68,9 @@ public:
     std::vector<boost::uint8_t> getHeader() { return _header; };
 
     // Add the AMF objects that are the data of the file
-    void addObj(AMF::amf_element_t &x);
-    std::vector<AMF::amf_element_t> getElements() { return _amfobjs; };
-    AMF::amf_element_t getElement(int x) { return _amfobjs[x]; };
+    void addObj(amf::Element *x);
+    std::vector<amf::Element *> getElements() { return _amfobjs; };
+    Element *getElement(int x) { return _amfobjs[x]; };
 
     void dump();
 //protected:
@@ -84,7 +85,7 @@ public:
     std::vector<boost::uint8_t> _data;
     std::string      _objname;
     std::string      _filespec;
-    std::vector<AMF::amf_element_t> _amfobjs;
+    std::vector<amf::Element *> _amfobjs;
     int              _filesize;
   };
 
