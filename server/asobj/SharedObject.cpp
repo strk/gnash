@@ -79,9 +79,9 @@ public:
 
     void operator() (string_table::key key, const as_value& val) const
         {
-//            GNASH_REPORT_FUNCTION;
+            GNASH_REPORT_FUNCTION;
             AMF amf;
-            Element *el;
+            Element *el = 0;
 
             string& name = const_cast<string &>(_st.string_table::value(key));
 
@@ -107,8 +107,10 @@ public:
                 }
                 el = new amf::Element(name, dub);
             }
-            
-            _sol.addObj(el);
+
+            if (el) {
+                _sol.addObj(el);
+            }
         }
 };
 
@@ -258,7 +260,7 @@ sharedobject_getlocal(const fn_call& fn)
 
     string newspec = rcfile.getSOLSafeDir();
     if (newspec.size() == 0) {
-        newspec = "./";
+        newspec = "/tmp/";
     }
     
     char *domain;
@@ -274,6 +276,12 @@ sharedobject_getlocal(const fn_call& fn)
     URL url(url_s, baseurl);
 //    log_msg(_("BASE URL=%s (%s)"), baseurl.str().c_str(), url.hostname().c_str());
     
+    string swfile;
+    pos = baseurl.str().rfind("/", baseurl.str().size());
+    if (pos != string::npos) {
+        swfile = baseurl.str().substr(pos + 1, baseurl.str().size());
+    }
+    
     if (url.hostname().size() == 0) {
         strcpy(domain, "localhost");
     }
@@ -284,16 +292,18 @@ sharedobject_getlocal(const fn_call& fn)
         return as_value(false);
      }
 
-    newspec += domain;
-    newspec += "/";    
+    // The optional second argument drops the domain and the swf file name
     if (fn.nargs == 2) {
         rootdir = fn.arg(1).to_string();
-//        log_msg("The root dir is now %s", rootdir.c_str());
+        log_debug("The rootdir is: %s", rootdir.c_str());
         newspec += rootdir;
     } else {
-        log_debug("If I had my swf filename. I'd be writing it to the .sol file path");
+        newspec += "/";    
+        newspec += domain;
+        newspec += "/";
+        newspec += swfile;
+        newspec += "/";
     }
-    newspec += "/";    
         
     if (obj->getFilespec().find("/", 0) != string::npos) {
         typedef tokenizer<char_separator<char> > Tok;
@@ -354,7 +364,7 @@ sharedobject_getlocal(const fn_call& fn)
             ptr->set_member(st.string_table::find(el->getName()), as_value(dub));
         } 
         if (el->getType() == Element::BOOLEAN) {
-            if (el[0] == true) {
+            if (el->to_bool() == true) {
                 ptr->set_member(st.string_table::find(el->getName()), as_value(true));
             } else {
                 ptr->set_member(st.string_table::find(el->getName()), as_value(false));

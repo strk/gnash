@@ -355,7 +355,7 @@ SOL::readFile(std::string &filespec)
         return true;
     }
 
-    log_error("Couldn't open file: %s", strerror(errno));
+//    log_error("Couldn't open file: %s", strerror(errno));
     return false;
 }
 

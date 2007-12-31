@@ -104,7 +104,19 @@ Element::Element(const char *name, string &indata)
     init(name, indata);
 }
 
+Element::Element(string &name, string &indata)
+{
+//    GNASH_REPORT_FUNCTION;
+    init(name, indata);
+}
+
 Element::Element(const char *name, bool indata)
+{
+//    GNASH_REPORT_FUNCTION;
+    init(name, indata);
+}
+
+Element::Element(string &name, bool indata)
 {
 //    GNASH_REPORT_FUNCTION;
     init(name, indata);

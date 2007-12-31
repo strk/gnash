@@ -37,6 +37,13 @@ using namespace std;
 namespace gnash
 {
 
+// These are the textual responses
+const char *response_str[] = {
+    "/onStatus",
+    "/onResult",
+    "/onDebugEvents"
+};
+
 RTMPproto::RTMPproto() 
 {
 //    GNASH_REPORT_FUNCTION;

@@ -64,8 +64,10 @@ public:
     Element(const char *name, double data);
     Element(std::string &data);
     Element(const char *name, std::string &data);
+    Element(std::string &name, std::string &data);
     Element(bool data);
     Element(const char *name, bool data);
+    Element(std::string &name, bool data);
     ~Element();
     void clear();
     boost::uint8_t *init(boost::uint8_t *data);

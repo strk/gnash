@@ -1,5 +1,13 @@
 2007-12-30  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* server/asobj/SharedObject.cpp: Handle the second argument to
+	getLocal() correctly, which doesn't add either the domain nor the
+	swf file name. Fixes the Shared Object part of #21377, which now
+	gets to the next frame.
+	* libamf/element.{cpp,h}: Add a few constructors that take a
+	std::string argument for the name.
+	* libamf/sol.cpp: Remove bogus error message.
+	
 	* server/asobj/SharedObject.cpp: Use Element class instead of
 	amf_element_t everywhere. 
 	

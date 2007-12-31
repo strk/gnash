@@ -37,13 +37,6 @@ namespace gnash
 #define RTMP_BODY_SIZE 1536
 #define MAX_AMF_INDEXES 64
 
-// These are the textual responses
-const char *response_str[] = {
-    "/onStatus",
-    "/onResult",
-    "/onDebugEvents"
-};
-
 class DSOEXPORT RTMPproto : public Protocol
 {
 public:
