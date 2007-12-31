@@ -1370,7 +1370,7 @@ AMF::parseBody()
 }
 
 uint8_t *
-AMF::extractElement(Element &el, boost::uint8_t *in)
+AMF::extractElement(Element *el, boost::uint8_t *in)
 {
 //    GNASH_REPORT_FUNCTION;
 

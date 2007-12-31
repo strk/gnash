@@ -1,5 +1,8 @@
 2007-12-30  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* libamf/sol.cpp: Various tweaks for 64bit big-endian systems,
+	namely the ppc in a G5 or PS3.
+
 	* utilities/dumpshm.cpp: Don't use ipc_perm if the __key field
 	doesn't exist.
 

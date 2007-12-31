@@ -55,7 +55,7 @@ using namespace gnash;
 // Object Name  - variable (the name of the object as an AMF encoded string)
 // Padding      - 4 bytes
 // After this is a series of AMF objects
-const short SOL_MAGIC = 0xbf00;
+const short SOL_MAGIC = 0x00bf;	// this is in big-endian format already
 //char *SOL_FILETYPE = "TCSO";
 const short SOL_BLOCK_MARK = 0x0004;
 
@@ -96,7 +96,7 @@ SOL::addObj(amf::Element *el)
 {
 //    GNASH_REPORT_FUNCTION;
     _amfobjs.push_back(el);
-    _filesize += el->getName().size() + el->getLength() + 5;
+//    _filesize += el->getName().size() + el->getLength() + 5;
 }
 
 bool
@@ -121,7 +121,7 @@ SOL::formatHeader(std::string &name, int filesize)
     // First we add the magic number. All SOL data is in big-endian format,
     // so we swap it first.
     uint16_t swapped = SOL_MAGIC;
-//    swapped = htons(swapped);
+//    swapped = ntohs(swapped);
     uint8_t *ptr = reinterpret_cast<uint8_t *>(&swapped);
     for (i=0; i<sizeof(uint16_t); i++) {
         _header.push_back(ptr[i]);
@@ -294,18 +294,20 @@ SOL::readFile(std::string &filespec)
     struct stat st;
     boost::uint16_t magic, size;
     boost::uint8_t *buf, *ptr;
+    int bodysize;
 
     // Make sure it's an SOL file
     if (stat(filespec.c_str(), &st) == 0) {
         ifstream ifs(filespec.c_str(), ios::binary);
         _filesize = st.st_size;
+	bodysize = st.st_size - 6;
         _filespec = filespec;
         ptr = buf = new boost::uint8_t[_filesize+1];
         ifs.read(reinterpret_cast<char *>(buf), _filesize);
 
         // extract the magic number
-        magic = *(reinterpret_cast<boost::uint16_t *>(ptr));
-        magic = ntohs(magic);
+        memcpy(&magic, buf, 2);
+//        magic = ntohl(magic);
         ptr += 2;
 
         // extract the file size
@@ -316,13 +318,12 @@ SOL::readFile(std::string &filespec)
         // extract the file marker field
 //        char *marker = ptr;
         ptr += 10;
-        
-        if (memcmp(buf, &SOL_MAGIC, 2) == 0) {
-            if (_filesize - 6 == length) {
+        if ((buf[0] == 0) && (buf[1] == 0xbf)) {
+            if (bodysize == length) {
                 log_debug("%s is an SOL file", filespec.c_str());
             } else {
-                log_error("%s looks like an SOL file, but the length is wrong",
-                          filespec.c_str());
+                log_error("%s looks like an SOL file, but the length is wrong. Should be %d, got %d",
+                          filespec.c_str(), (_filesize - 6), length);
             }
             
         } else {
@@ -340,11 +341,11 @@ SOL::readFile(std::string &filespec)
         ptr += 4;
 
         AMF amf_obj;
-        while ((buf - ptr) <= _filesize) {
+        while ((ptr - buf) < bodysize) {
 	    amf::Element *el = new amf::Element;
 	    ptr = amf_obj.extractVariable(el, ptr);
             if (ptr != 0) {
-		ptr += 1;            
+		ptr += 1;    
 		addObj(el);
 	    } else {
 		break;
@@ -354,7 +355,7 @@ SOL::readFile(std::string &filespec)
         ifs.close();
         return true;
     }
-
+    
 //    log_error("Couldn't open file: %s", strerror(errno));
     return false;
 }
