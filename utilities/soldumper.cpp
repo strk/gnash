@@ -151,6 +151,7 @@ main(int argc, char *argv[])
         newspec = filespec;
     } else {
         newspec = rcfile.getSOLSafeDir();
+	newspec += "/";
         newspec += filespec;
     }
     
@@ -173,6 +174,8 @@ usage (void)
          << endl;
     cerr << _("Usage: soldumper [h] filename") << endl;
     cerr << _("-h\tHelp") << endl;
+    cerr << _("-f\tForce local directory access") << endl;
+    cerr << _("-l\tList all .sol files in default dir") << endl;
     exit (-1);
 }
 
