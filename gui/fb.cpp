@@ -1126,6 +1126,10 @@ void FBGui::check_mouse()
   static int new_mouse_y = 0;
   static int new_mouse_btn = 0;
   
+  int notify_x;     // coordinate to be sent via notify_mouse_moved()
+  int notify_y;
+  bool move_pending = false;  // true: notify_mouse_moved() should be called
+  
   // this is necessary for our quick'n'dirty touchscreen calibration: 
   static int coordinatedebug = getenv("DUMP_RAW")!=NULL;
   
@@ -1137,7 +1141,7 @@ void FBGui::check_mouse()
   
   // Assuming we will never read less than one full struct...  
   
-  while ((loops++ < 8) && (read(input_fd, &ev, sizeof ev) == (sizeof ev))) {
+  while ((loops++ < 100) && (read(input_fd, &ev, sizeof ev) == (sizeof ev))) {
   
     if (ev.type == EV_SYN) {    // synchronize (apply information)
     
@@ -1156,10 +1160,21 @@ void FBGui::check_mouse()
         else
           { cx=mouse_x; cy=mouse_y; }
               
-        notify_mouse_moved(int(cx / xscale), int(cy / yscale));
+        // Don't call notify_mouse_moved() here because this would lead to
+        // lots of calls, especially for touchscreens. Instead we save the
+        // coordinate and call notify_mouse_moved() only once.
+        notify_x = cx / xscale;
+        notify_y = cy / yscale;
+        move_pending = true;        
       }
       
       if (new_mouse_btn != mouse_btn) {
+      
+        if (move_pending) {
+          notify_mouse_moved(notify_x, notify_y);
+          move_pending = false;
+        }
+      
         mouse_btn = new_mouse_btn;
         notify_mouse_clicked(mouse_btn, 1);  // mark=??
       }
@@ -1193,6 +1208,9 @@ void FBGui::check_mouse()
     }      
   
   } 
+  
+  if (move_pending) 
+    notify_mouse_moved(notify_x, notify_y);
  
 } //check_mouse
 #endif

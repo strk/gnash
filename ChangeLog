@@ -1,3 +1,8 @@
+2008-01-01 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/fb.cpp: Limit calls to notify_mouse_moved(), process
+	  more events at once (8 -> 100 max)	
+
 2008-01-01 Sandro Santilli <strk@keybit.net>
 
 	* libamf/element.{cpp,h}: improve const correctness.
