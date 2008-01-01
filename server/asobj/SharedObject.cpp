@@ -83,7 +83,9 @@ public:
             AMF amf;
             Element *el = 0;
 
-            string& name = const_cast<string &>(_st.string_table::value(key));
+            const string& name_c = _st.string_table::value(key);
+            // TODO: fix amf::Element interface to take const strings !!!
+            string& name = const_cast<string&>(name_c);
 
 //            cerr << "FIXME: yes!!!!! " << name << ": "<< val.to_debug_string() << endl;
 
@@ -263,37 +265,54 @@ sharedobject_getlocal(const fn_call& fn)
         newspec = "/tmp/";
     }
     
-    char *domain;
-    domain = new char[MAXHOSTNAMELEN+1];
-    memset(domain, 0, MAXHOSTNAMELEN+1);
-//     if (getdomainname(domain, MAXHOSTNAMELEN) == -1) {
-//         log_error("Couldn't get domain name! %s", strerror(errno));
-//     }
+    // Which URL we should use here is under research.
+    // The reference player uses the URL from which definition
+    // of the call to SharedObject.getLocal was parsed.
+    //
+    // There is in Gnash support for tracking action_buffer 
+    // urls but not yet an interface to fetch it from fn_call;
+    // also, it's not clear how good would the model be (think
+    // of movie A loading movie B creating the SharedObject).
+    //
+    // What we'll do for now is use the URL of the initially
+    // loaded SWF, so that in the A loads B scenario above the
+    // domain would be the one of A, not B.
+    //
+    // NOTE: using the base url (get_base_url) would mean
+    // blindly trusting the SWF publisher as base url is changed
+    // by the 'base' attribute of OBJECT or EMBED tags trough
+    // -P base=xxx
+    //
+    movie_root& mroot = obj->getVM().getRoot();
+    sprite_instance* origMovie = mroot.getRootMovie();
+    movie_definition* origMovieDef = origMovie->get_movie_definition();
+    const string origURL = origMovieDef->get_url();
+    
+    URL url(origURL);
+//  log_debug(_("BASE URL=%s (%s)"), url.str().c_str(), url.hostname().c_str());
 
-
-    string url_s;
-    const URL& baseurl = get_base_url();
-    URL url(url_s, baseurl);
-//    log_msg(_("BASE URL=%s (%s)"), baseurl.str().c_str(), url.hostname().c_str());
+    // Get the domain part, or take as 'localhost' if none
+    // (loaded from filesystem)
+    //
+    string domain=url.hostname();
+    if (domain.empty()) domain = "localhost";
     
-    string swfile;
-    pos = baseurl.str().rfind("/", baseurl.str().size());
-    if (pos != string::npos) {
-        swfile = baseurl.str().substr(pos + 1, baseurl.str().size());
-    }
+    // Get the path part
+    string swfile = url.path();
     
-    if (url.hostname().size() == 0) {
-        strcpy(domain, "localhost");
-    }
-    
-    if ((rcfile.getSOLLocalDomain()) && (strcmp(domain, "localhost") > 0) ) {
+    if ( rcfile.getSOLLocalDomain() && domain != "localhost") 
+    {
         log_security("Attempting to open non localhost created SOL file!! %s",
                      obj->getFilespec().c_str());
         return as_value(false);
-     }
+    }
 
     // The optional second argument drops the domain and the swf file name
-    if (fn.nargs == 2) {
+    //
+    // NOTE: having more then 2 args should still use the second
+    //       (and discard the subsequents).
+    //
+    if (fn.nargs > 1) {
         rootdir = fn.arg(1).to_string();
         log_debug("The rootdir is: %s", rootdir.c_str());
         newspec += rootdir;
