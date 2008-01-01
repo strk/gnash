@@ -83,11 +83,9 @@ public:
             AMF amf;
             Element *el = 0;
 
-            const string& name_c = _st.string_table::value(key);
-            // TODO: fix amf::Element interface to take const strings !!!
-            string& name = const_cast<string&>(name_c);
+            const string& name = _st.string_table::value(key);
 
-//            cerr << "FIXME: yes!!!!! " << name << ": "<< val.to_debug_string() << endl;
+//          cerr << "FIXME: yes!!!!! " << name << ": "<< val.to_debug_string() << endl;
 
             if (val.is_string()) {
                 string str;

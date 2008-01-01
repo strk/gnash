@@ -80,43 +80,25 @@ Element::Element(boost::uint8_t *indata)
     init(indata);
 }
 
-Element::Element(const char *name, double indata)
-{
-//    GNASH_REPORT_FUNCTION;
-    init(name, indata);
-}
-
 Element::Element(double indata)
 {
 //    GNASH_REPORT_FUNCTION;
     init(indata);
 }
 
-Element::Element(string &indata)
+Element::Element(const string &indata)
 {
 //    GNASH_REPORT_FUNCTION;
     init(indata);
 }
 
-Element::Element(const char *name, string &indata)
+Element::Element(const string &name, const string &indata)
 {
 //    GNASH_REPORT_FUNCTION;
     init(name, indata);
 }
 
-Element::Element(string &name, string &indata)
-{
-//    GNASH_REPORT_FUNCTION;
-    init(name, indata);
-}
-
-Element::Element(const char *name, bool indata)
-{
-//    GNASH_REPORT_FUNCTION;
-    init(name, indata);
-}
-
-Element::Element(string &name, bool indata)
+Element::Element(const string &name, bool indata)
 {
 //    GNASH_REPORT_FUNCTION;
     init(name, indata);
@@ -150,14 +132,14 @@ Element::init(const string &name, double indata)
 }
 
 Element &
-Element::init(string &indata)
+Element::init(const string &indata)
 {
 //    GNASH_REPORT_FUNCTION;
     return init("", indata);
 }
 
 Element &
-Element::init(const string &name, string &indata)
+Element::init(const string &name, const string &indata)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::STRING;

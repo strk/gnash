@@ -1,5 +1,10 @@
 2008-01-01 Sandro Santilli <strk@keybit.net>
 
+	* libamf/element.{cpp,h}: improve const correctness.
+	* server/asobj/SharedObject.cpp: drop useless const_casts.
+
+2008-01-01 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/SharedObject.cpp (sharedobject_getlocal):
 	  Use URL of first movie loaded, not base url, for security:
 	  base url can be set arbitrarily by publishers.

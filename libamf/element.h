@@ -61,20 +61,17 @@ public:
     Element();
     Element(boost::uint8_t *data);
     Element(double data);
-    Element(const char *name, double data);
-    Element(std::string &data);
-    Element(const char *name, std::string &data);
-    Element(std::string &name, std::string &data);
+    Element(const std::string &data);
+    Element(const std::string &name, const std::string &data);
     Element(bool data);
-    Element(const char *name, bool data);
-    Element(std::string &name, bool data);
+    Element(const std::string &name, bool data);
     ~Element();
     void clear();
     boost::uint8_t *init(boost::uint8_t *data);
     Element &init(const std::string &name, double data);
     Element &init(double data);
-    Element &init(const std::string &name, std::string &data);
-    Element &init(std::string &data);
+    Element &init(const std::string &name, const std::string &data);
+    Element &init(const std::string &data);
     Element &init(const std::string &name, bool data);
     Element &init(bool data);
 
@@ -115,8 +112,8 @@ public:
     
     boost::uint16_t getLength() { return _length; };
     void setLength(boost::uint16_t x) { _length = x; };
-    std::string &getName() { return _name; };
-    void setName(std::string &name) { _name = name; };
+    const std::string &getName() const { return _name; };
+    void setName(const std::string &name) { _name = name; };
     void setName(boost::uint8_t *name) { _name = reinterpret_cast<const char *>(name); };
 //    boost::posix_time::ptime to_date();
 private:
