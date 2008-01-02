@@ -18,26 +18,14 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.54 2007/12/03 05:29:34 bjacques Exp $ */
+/* $Id: render_handler.h,v 1.55 2008/01/02 11:45:20 strk Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
 
 /// \page render_handler_intro Render handler introduction
 ///
-/// Information for writing new render handlers:
-///
-/// There are two ways to write a new render handler:
-/// - either you write a handler that must only be able to draw line strips and
-///   and triangles (with various fill styles, however). This we call a 
-///   triangulating render handler.
-/// - or your handler can deal with the special fill style Flash uses directly,
-///   which does *not* apply to most hardware accelerations. In this case the
-///   unaltered original shapes are passed to the renderer, which is responsible
-///   of drawing them correctly. 
-///
-/// For triangulating render handlers, see gnash::triangulating_render_handler
-/// (defined in render_handler_tri.h), otherwise read on...
+/// Information for writing new render handlers.
 ///
 /// The most important thing about drawing Flash shapes is to understand how 
 /// their fill styles work. 

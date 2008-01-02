@@ -1,3 +1,9 @@
+2008-01-02 Sandro Santilli <strk@keybit.net>
+
+	* backend/: render_handler.h, render_handler_d3d.cpp,
+	  render_handler_xbox.cpp: remove last references to the
+	  triangulating render handler.
+
 2008-01-01 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* gui/fb.cpp: Limit calls to notify_mouse_moved(), process
