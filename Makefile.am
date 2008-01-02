@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.97 2008/01/02 12:04:43 strk Exp $
+# $Id: Makefile.am,v 1.98 2008/01/02 12:19:25 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -329,8 +329,8 @@ if KPARTS
 	@echo "	KPARTS (KDE) plugin enabled"
 	@echo "	  KPARTS plugin install dir: $(KDE_PLUGINDIR)"
 	@echo "	  KPARTS service install dir: $(KDE_SERVICESDIR)"
-	@echo "   KPARTS config dir: ${KDE_CONFIGDIR}"
-	@echo "   KPARTS appsdata dir: ${KDE_APPSDATADIR}"
+	@echo "	  KPARTS config dir: ${KDE_CONFIGDIR}"
+	@echo "	  KPARTS appsdata dir: ${KDE_APPSDATADIR}"
 else
 	@echo "	KPARTS (KDE) plugin disabled"
 endif
