@@ -1,5 +1,16 @@
 2008-01-02 Sandro Santilli <strk@keybit.net>
 
+	* doc/C/usermanual/installation/custompath_configuration.xml:
+	  Document new KDE switches.
+
+2008-01-02 Fredrik Johansson <fredrik@mumme.se>
+
+	* Makefile.am, configure.ac, plugin/klash/Makefile.am:
+	  Add --with-kde-appsdatadir and --with-kde-configdir switches.
+	  (see bug #21907)
+
+2008-01-02 Sandro Santilli <strk@keybit.net>
+
 	* backend/: render_handler.h, render_handler_d3d.cpp,
 	  render_handler_xbox.cpp: remove last references to the
 	  triangulating render handler.

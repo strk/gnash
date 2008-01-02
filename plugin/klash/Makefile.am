@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.37 2007/12/30 10:44:45 strk Exp $
+# $Id: Makefile.am,v 1.38 2008/01/02 12:04:43 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -24,9 +24,12 @@ AM_CPPFLAGS= $(KDE_CFLAGS) $(QT_CFLAGS) -DGNASHBINDIR=\"${bindir}\"
 
 plugindir   = $(KDE_PLUGINDIR)
 kde_servicesdir = $(KDE_SERVICESDIR)
-rcdir       = $(prefix)/share/apps/klash
-appsdatadir = $(prefix)/share/apps/klash
-configdir = $(prefix)/share/config
+kde_rcdir       = $(KDE_APPSDATADIR)/klash
+#$(prefix)/share/apps/klash
+kde_appsdatadir = $(KDE_APPSDATADIR)/klash
+#$(prefix)/share/apps/klash
+kde_configdir   = $(KDE_CONFIGDIR)
+#$(prefix)/share/config
 
 plugin_LTLIBRARIES= libklashpart.la
 
@@ -39,11 +42,11 @@ libklashpart_la_LDFLAGS = -module -avoid-version -L$(plugindir)
 endif
 
 dist_kde_services_DATA = klash_part.desktop
-dist_rc_DATA = klashpartui.rc
-dist_appsdata_DATA = pluginsinfo
-#dist_config_DATA = klashrc
+dist_kde_rc_DATA = klashpartui.rc
+dist_kde_appsdata_DATA = pluginsinfo
+#dist_kde_config_DATA = klashrc
 
-# DIST_COMMON = $(dist_appsdata_DATA) $(dist_kde_services_DATA) $(dist_rc_DATA)
+# DIST_COMMON = $(dist_kde_appsdata_DATA) $(dist_kde_services_DATA) $(dist_kde_rc_DATA)
 
 BUILT_SOURCES = klash_part.moc
 CLEANFILES = klash_part.moc

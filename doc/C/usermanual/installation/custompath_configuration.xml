@@ -167,6 +167,24 @@
       </entry>
   </row><row>
   <entry>
+    <option>--with-kde-configdir</option>
+    </entry>
+      <entry>
+        This is the directory to install the KPARTS (kde) config files in.
+        By default it is what's returned by kde-config --install config --expandvars,
+        or $(prefix)/share/config if kde-config is not found.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-kde-appsdatadir</option>
+    </entry>
+      <entry>
+        This is the directory to install the KPARTS (kde) application data files in.
+        By default it is what's returned by kde-config --install data --expandvars,
+        or $(prefix)/share/apps if kde-config is not found.
+      </entry>
+  </row><row>
+  <entry>
     <option>--with-ming</option>
     </entry>
       <entry>

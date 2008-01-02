@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.466 2007/12/30 11:03:50 strk Exp $
+dnl $Id: configure.ac,v 1.467 2008/01/02 12:04:43 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1374,13 +1374,19 @@ if test x$kparts = xyes; then
 
   KDE_PLUGINDIR='$(libdir)/kde3'
   KDE_SERVICESDIR='$(prefix)/share/services'
+  KDE_CONFIGDIR='$(prefix)/share/config'
+  KDE_APPSDATADIR='$(prefix)/share/apps'
 
   AC_SUBST(KDE_PLUGINDIR)
   AC_SUBST(KDE_SERVICESDIR)
+  AC_SUBST(KDE_CONFIGDIR)
+  AC_SUBST(KDE_APPSDATADIR)
 
   if test x${KDE_CONFIG} != x; then
      KDE_PLUGINDIR=`${KDE_CONFIG} --install module --expandvars`
      KDE_SERVICESDIR=`${KDE_CONFIG} --install services --expandvars`
+     KDE_CONFIGDIR=`${KDE_CONFIG} --install config --expandvars`
+     KDE_APPSDATADIR=`${KDE_CONFIG} --install data --expandvars`
   fi
 
   AC_ARG_WITH(kde-plugindir,
@@ -1393,6 +1399,18 @@ if test x$kparts = xyes; then
     AC_HELP_STRING([--with-kde-servicesdir=DIR],
       [Directory to install KDE service in]),
     [KDE_SERVICESDIR=${withval}]
+  )
+
+  AC_ARG_WITH(kde-configdir,
+    AC_HELP_STRING([--with-kde-configdir=DIR],
+      [Directory to install KDE configfile in]),
+    [KDE_CONFIGDIR=${withval}]
+  )
+
+  AC_ARG_WITH(kde-appsdatadir,
+    AC_HELP_STRING([--with-kde-appsdatadir=DIR],
+      [Directory to install KDE data in]),
+    [KDE_APPSDATADIR=${withval}]
   )
 
 fi
@@ -1892,6 +1910,8 @@ if test x"$kparts" = x"yes"; then
   echo "        KPARTS plugin enabled (default). Use --disable-kparts to disable"
   echo "            KDE plugin will be installed in ${KDE_PLUGINDIR}"
   echo "            KDE service will be installed in ${KDE_SERVICESDIR}"
+  echo "            KDE config dir will be in ${KDE_CONFIGDIR}"
+  echo "            KDE appsdata will be installed in ${KDE_APPSDATADIR}"
 else
   echo "        KPARTS plugin disabled."
 fi
