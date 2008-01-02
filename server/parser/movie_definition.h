@@ -495,20 +495,6 @@ public:
 
 	// ...
 
-	// This interface should be nice not to have in movie_definition
-	// The default returns DO_LOAD_BITMAPS.
-	virtual create_bitmaps_flag	get_create_bitmaps() const
-	{
-		return DO_LOAD_BITMAPS;
-	}
-
-	// This interface should be nice not to have in movie_definition
-	// The default returns DO_LOAD_FONT_SHAPES.
-	virtual create_font_shapes_flag	get_create_font_shapes() const
-	{
-		return DO_LOAD_FONT_SHAPES;
-	}
-
 	/// \brief
 	/// Return the URL of the SWF stream this definition has been read
 	/// from.

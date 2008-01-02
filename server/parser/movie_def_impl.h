@@ -240,9 +240,6 @@ private:
 	typedef std::vector<boost::intrusive_ptr<bitmap_info> >	BitmapVect;
 	BitmapVect m_bitmap_list;
 
-	create_bitmaps_flag	m_create_bitmaps;
-	create_font_shapes_flag	m_create_font_shapes;
-
 	rect	m_frame_size;
 	float	m_frame_rate;
 	size_t	m_frame_count;
@@ -334,7 +331,7 @@ private:
 
 public:
 
-	movie_def_impl(create_bitmaps_flag cbf, create_font_shapes_flag cfs);
+	movie_def_impl();
 
 	~movie_def_impl();
 
@@ -379,26 +376,6 @@ public:
 	/// Get total number of bytes as parsed from the SWF header
 	size_t	get_bytes_total() const {
 		return m_file_length;
-	}
-
-	/// Returns DO_CREATE_BITMAPS if we're supposed to
-	/// initialize our bitmap infos, or DO_NOT_INIT_BITMAPS
-	/// if we're supposed to create blank placeholder
-	/// bitmaps (to be init'd later explicitly by the host
-	/// program).
-	virtual create_bitmaps_flag get_create_bitmaps() const
-	{
-		return m_create_bitmaps;
-	}
-
-	/// Returns DO_LOAD_FONT_SHAPES if we're supposed to
-	/// initialize our font shape info, or
-	/// DO_NOT_LOAD_FONT_SHAPES if we're supposed to not
-	/// create any (vector) font glyph shapes, and instead
-	/// rely on precached textured fonts glyphs.
-	virtual create_font_shapes_flag	get_create_font_shapes() const
-	{
-	    return m_create_font_shapes;
 	}
 
 	/// All bitmap_info's used by this movie should be

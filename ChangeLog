@@ -1,5 +1,13 @@
 2008-01-02 Sandro Santilli <strk@keybit.net>
 
+	* server/fill_style.cpp, server/font.cpp,
+	  server/impl.cpp, server/parser/movie_def_impl.{cpp,h},
+	  server/parser/movie_definition.h, server/swf/tag_loaders.cpp:
+	  Remove obsoleted get_create_bitmaps and get_create_font_shapes
+	  methods of movie_definition.
+
+2008-01-02 Sandro Santilli <strk@keybit.net>
+
 	* doc/C/usermanual/installation/custompath_configuration.xml:
 	  Document new KDE switches.
 

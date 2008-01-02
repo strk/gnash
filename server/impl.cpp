@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.133 2007/12/28 19:35:14 strk Exp $ */
+/* $Id: impl.cpp,v 1.134 2008/01/02 14:13:58 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -513,9 +513,7 @@ create_swf_movie(std::auto_ptr<tu_file> in, const std::string& url, bool startLo
 {
 
   // Avoid leaks on error 
-  std::auto_ptr<movie_def_impl> m(
-    new movie_def_impl(DO_LOAD_BITMAPS, DO_LOAD_FONT_SHAPES)
-    );
+  std::auto_ptr<movie_def_impl> m ( new movie_def_impl() );
 
   if ( ! m->readHeader(in, url) )
   {

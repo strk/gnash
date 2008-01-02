@@ -202,17 +202,15 @@ fill_style::read(stream* in, int tag_type, movie_definition* md,
 				pOther->m_color = pOther->m_gradients[0].m_color;
         }
 
-        if (md->get_create_bitmaps() == DO_LOAD_BITMAPS) {
-            m_gradient_bitmap_info = create_gradient_bitmap();
-			if (is_morph)
-			{
-				pOther->m_gradient_bitmap_info = 
-					pOther->create_gradient_bitmap();
-				md->add_bitmap_info(pOther->m_gradient_bitmap_info.get());
-			}
+	m_gradient_bitmap_info = create_gradient_bitmap();
+	if (is_morph)
+	{
+		pOther->m_gradient_bitmap_info = 
+			pOther->need_gradient_bitmap();
+		md->add_bitmap_info(pOther->m_gradient_bitmap_info.get());
+	}
         // Make sure our movie_def_impl knows about this bitmap.
         md->add_bitmap_info(m_gradient_bitmap_info.get());
-        }
     }
     else if (m_type == SWF::FILL_TILED_BITMAP
           || m_type == SWF::FILL_CLIPPED_BITMAP

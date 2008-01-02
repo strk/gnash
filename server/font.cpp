@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.53 2007/12/12 10:07:00 zoulunkai Exp $ */
+/* $Id: font.cpp,v 1.54 2008/01/02 14:13:58 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -180,25 +180,22 @@ GlyphInfo::markReachableResources() const
 
 		_embedGlyphTable.resize(count);
 
-		if (m->get_create_font_shapes() == DO_LOAD_FONT_SHAPES)
+		// Read the glyph shapes.
+		for (int i = 0; i < count; i++)
 		{
-			// Read the glyph shapes.
-			{for (int i = 0; i < count; i++)
+			// Seek to the start of the shape data.
+			unsigned long new_pos = table_base + offsets[i];
+
+			if ( ! in->set_position(new_pos) )
 			{
-				// Seek to the start of the shape data.
-				unsigned long new_pos = table_base + offsets[i];
+				throw ParserException(_("Glyphs offset table corrupted in DefineFont tag"));
+			}
 
-				if ( ! in->set_position(new_pos) )
-				{
-        				throw ParserException(_("Glyphs offset table corrupted in DefineFont tag"));
-				}
+			// Create & read the shape.
+			shape_character_def* s = new shape_character_def;
+			s->read(in, SWF::DEFINEFONT, false, m); 
 
-				// Create & read the shape.
-				shape_character_def* s = new shape_character_def;
-				s->read(in, SWF::DEFINEFONT, false, m); 
-
-				_embedGlyphTable[i].glyph = s;
-			}}
+			_embedGlyphTable[i].glyph = s;
 		}
 	}
 
@@ -282,51 +279,36 @@ GlyphInfo::markReachableResources() const
 
 		_embedGlyphTable.resize(glyph_count);
 
-		if (m->get_create_font_shapes() == DO_LOAD_FONT_SHAPES)
+		// Read the glyph shapes.
+		for (int i = 0; i < glyph_count; i++)
 		{
-			// Read the glyph shapes.
-			{for (int i = 0; i < glyph_count; i++)
+			// Seek to the start of the shape data.
+			unsigned long new_pos = table_base + offsets[i];
+
+			// It seems completely possible to
+			// have such seeks-back, see bug #16311
+			//assert(new_pos >= in->get_position());
+
+			if ( ! in->set_position(new_pos) )
 			{
-				// Seek to the start of the shape data.
-				unsigned long new_pos = table_base + offsets[i];
-
-				// It seems completely possible to
-				// have such seeks-back, see bug #16311
-				//assert(new_pos >= in->get_position());
-
-				if ( ! in->set_position(new_pos) )
-				{
-        				throw ParserException(_("Glyphs offset table corrupted in DefineFont2/3 tag"));
-				}
-
-				// Create & read the shape.
-				shape_character_def* s = new shape_character_def;
-				s->read(in, SWF::DEFINEFONT2, false, m); // .. or DEFINEFONT3 actually..
-
-				_embedGlyphTable[i].glyph = s;
-			}}
-
-			unsigned long current_position = in->get_position();
-			if (font_code_offset + table_base != current_position)
-			{
-				// Bad offset!  Don't try to read any more.
-				IF_VERBOSE_MALFORMED_SWF(
-				log_swferror(_("Bad offset in DefineFont2"));
-				);
-				return;
+				throw ParserException(_("Glyphs offset table corrupted in DefineFont2/3 tag"));
 			}
+
+			// Create & read the shape.
+			shape_character_def* s = new shape_character_def;
+			s->read(in, SWF::DEFINEFONT2, false, m); // .. or DEFINEFONT3 actually..
+
+			_embedGlyphTable[i].glyph = s;
 		}
-		else
-		{
-			// Skip the shape data.
-			unsigned long new_pos = table_base + font_code_offset;
-			if (new_pos >= in->get_tag_end_position())
-			{
-				// No layout data!
-				return;
-			}
 
-			in->set_position(new_pos);
+		unsigned long current_position = in->get_position();
+		if (font_code_offset + table_base != current_position)
+		{
+			// Bad offset!  Don't try to read any more.
+			IF_VERBOSE_MALFORMED_SWF(
+			log_swferror(_("Bad offset in DefineFont2"));
+			);
+			return;
 		}
 
 		read_code_table(in);
