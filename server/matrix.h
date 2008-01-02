@@ -19,7 +19,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.h,v 1.13 2007/12/29 20:15:25 strk Exp $ 
+// $Id: matrix.h,v 1.14 2008/01/02 19:08:31 strk Exp $ 
 //
 
 #ifndef GNASH_MATRIX_H
@@ -237,6 +237,11 @@ public: // must be switched to private
 	///
 	///	| scale_x  x_dep_y  translate_x |
 	///	| y_dep_x  scale_y  translate_y |
+	///
+	/// In cairo dialect, these are:
+	///
+	///	|      xx       xy           x0 |
+	///	|      yx       yy           y0 |
 	///
 	float	m_[2][3];
 };

@@ -34,13 +34,6 @@ namespace gnash {
 // gradient_record
 //
 
-gradient_record::gradient_record()
-    :
-    m_ratio(0)
-{
-}
-
-
 void
 gradient_record::read(stream* in, int tag_type)
 {
@@ -538,6 +531,24 @@ fill_style::setSolid(const rgba& color)
 {
 	m_type = SWF::FILL_SOLID;
 	m_color = color;
+}
+
+void
+fill_style::setLinearGradient(const std::vector<gradient_record>& gradients, const matrix& mat)
+{
+	m_type = SWF::FILL_LINEAR_GRADIENT;
+	m_gradients = gradients;
+	m_gradient_matrix = mat;
+	m_gradient_bitmap_info = 0;
+}
+
+void
+fill_style::setRadialGradient(const std::vector<gradient_record>& gradients, const matrix& mat)
+{
+	m_type = SWF::FILL_RADIAL_GRADIENT;
+	m_gradients = gradients;
+	m_gradient_matrix = mat;
+	m_gradient_bitmap_info = 0;
 }
 
 

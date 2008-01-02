@@ -1,5 +1,13 @@
 2008-01-02 Sandro Santilli <strk@keybit.net>
 
+	* server/DynamicShape.{cpp,h},
+	  server/fill_style.{cpp,h}, server/matrix.h,
+	  server/sprite_instance.{cpp,h}:
+	  Draft beginGradientFill support. Almost works, just
+	  needs to get the matrix argument right ...
+
+2008-01-02 Sandro Santilli <strk@keybit.net>
+
 	* server/fill_style.cpp, server/font.cpp,
 	  server/impl.cpp, server/parser/movie_def_impl.{cpp,h},
 	  server/parser/movie_definition.h, server/swf/tag_loaders.cpp:

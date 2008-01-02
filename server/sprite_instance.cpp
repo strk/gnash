@@ -54,6 +54,7 @@
 #include "Object.h" // for getObjectInterface
 #include "DynamicShape.h" // for composition
 #include "namedStrings.h"
+#include "fill_style.h" // for beginGradientFill
 
 #include <vector>
 #include <string>
@@ -1293,12 +1294,180 @@ static as_value
 sprite_beginGradientFill(const fn_call& fn)
 {
 	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
-	UNUSED(sprite);
+
+	if ( fn.nargs < 5 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss; fn.dump_args(ss);
+		log_aserror(_("%s.beginGradientFill(%s): invalid call: 5 arguments needed"),
+			sprite->getTarget().c_str(), ss.str().c_str());
+		);
+		return as_value();
+	}
+
+	bool radial = false;
+	string typeStr = fn.arg(0).to_string();
+	// Case-sensitive comparison needed for this ...
+	if ( typeStr == "radial" ) radial = true;
+	else if ( typeStr == "linear" ) radial = false;
+	else
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss; fn.dump_args(ss);
+		log_aserror(_("%s.beginGradientFill(%s): first arg must be "
+			"'radial' or 'linear'"),
+			sprite->getTarget().c_str(), ss.str().c_str());
+		);
+		return as_value();
+	}
+
+	typedef boost::intrusive_ptr<as_object> ObjPtr;
+
+	ObjPtr colors = fn.arg(1).to_object();
+	ObjPtr alphas = fn.arg(2).to_object();
+	ObjPtr ratios = fn.arg(3).to_object();
+	ObjPtr matrixArg = fn.arg(4).to_object();
+
+	if ( ! colors || ! alphas || ! ratios || ! matrixArg )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss; fn.dump_args(ss);
+		log_aserror(_("%s.beginGradientFill(%s): one or more of the "
+			" args from 2nd to 5th don't cast to objects"),
+			sprite->getTarget().c_str(), ss.str().c_str());
+		);
+		return as_value();
+	}
+
+	VM& vm = sprite->getVM();
+	string_table& st = vm.getStringTable();
+
+	// ----------------------------
+	// Parse matrix
+	// ----------------------------
+	//
+	//
+	// TODO: fix this matrix build-up, it is NOT correct
+
+	matrix mat;
+	matrix input_matrix;
+
+	string_table::key keyT = st.find(PROPNAME("matrixType"));
+	if ( matrixArg->getMember(keyT).to_string() == "box" )
+	{
+		
+		string_table::key keyX = st.find("x");
+		string_table::key keyY = st.find("y");
+		string_table::key keyW = st.find("w");
+		string_table::key keyH = st.find("h");
+		string_table::key keyR = st.find("r");
+
+		float valX = matrixArg->getMember(keyX).to_number(); 
+		float valY = matrixArg->getMember(keyY).to_number(); 
+		float valW = matrixArg->getMember(keyW).to_number(); 
+		float valH = matrixArg->getMember(keyH).to_number(); 
+		float valR = matrixArg->getMember(keyR).to_number(); 
+
+		input_matrix.set_translation( (valX+valW)/2, (valY+valH)/2 );
+		input_matrix.set_scale(valW, valH);
+		input_matrix.set_rotation(valR);
+
+		mat.concatenate_scale(20/16384.0);
+		mat.concatenate(input_matrix);
+	}
+	else
+	{
+		string_table::key keyA = st.find("a");
+		string_table::key keyB = st.find("b");
+		string_table::key keyD = st.find("d");
+		string_table::key keyE = st.find("e");
+		string_table::key keyG = st.find("g");
+		string_table::key keyH = st.find("h");
+		float valA = matrixArg->getMember(keyA).to_number() ; // xx
+		float valB = matrixArg->getMember(keyB).to_number() ; // yx
+		float valD = matrixArg->getMember(keyD).to_number() ; // xy
+		float valE = matrixArg->getMember(keyE).to_number() ; // yy
+		float valG = PIXELS_TO_TWIPS(matrixArg->getMember(keyG).to_number()); // x0
+		float valH = PIXELS_TO_TWIPS(matrixArg->getMember(keyH).to_number()); // y0
+
+		input_matrix.m_[0][0] = valA;
+		input_matrix.m_[1][0] = valB;
+		input_matrix.m_[0][1] = valD;
+		input_matrix.m_[1][1] = valE;
+		input_matrix.m_[0][2] = valG;
+		input_matrix.m_[1][2] = valH;
+
+		mat.concatenate_scale(20/16384.0);
+		mat.concatenate(input_matrix);
+	}
+
+	//cout << mat << endl;
+
+	// ----------------------------
+	// Create the gradients vector
+	// ----------------------------
+
+	size_t ngradients = colors->getMember(NSV::PROP_LENGTH).to_int();
+	// Check length compatibility of all args
+	if ( ngradients != (size_t)alphas->getMember(NSV::PROP_LENGTH).to_int() ||
+		ngradients != (size_t)ratios->getMember(NSV::PROP_LENGTH).to_int() )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss; fn.dump_args(ss);
+		log_aserror(_("%s.beginGradientFill(%s): colors, alphas and "
+			"ratios args don't have same length"),
+			sprite->getTarget().c_str(), ss.str().c_str());
+		);
+		return as_value();
+	}
+
+	// TODO: limit ngradients to a max ?
+	if ( ngradients > 8 )
+	{
+		std::stringstream ss; fn.dump_args(ss);
+		log_debug("%s.beginGradientFill(%s) : too many array elements"
+			" for colors and ratios (%d), trim to 8", 
+			sprite->getTarget().c_str(), ss.str().c_str(), ngradients); 
+		ngradients = 8;
+	}
+
+	std::vector<gradient_record> gradients;
+	gradients.reserve(ngradients);
+	for (size_t i=0; i<ngradients; ++i)
+	{
+		char buf[32];
+		sprintf(buf, "%d", i);
+		string_table::key key = st.find(buf);
+
+		as_value colVal = colors->getMember(key);
+		boost::uint32_t col = colVal.is_number() ? colVal.to_int() : 0;
+
+		as_value alpVal = alphas->getMember(key);
+		boost::uint8_t alp = alpVal.is_number() ? iclamp(alpVal.to_int(), 0, 255) : 0;
+
+		as_value ratVal = ratios->getMember(key);
+		boost::uint8_t rat = ratVal.is_number() ? iclamp(ratVal.to_int(), 0, 255) : 0;
+
+		rgba color;
+		color.parseRGB(col);
+		color.m_a = alp;
+
+		gradients.push_back(gradient_record(rat, color));
+	}
+
+	if ( radial )
+	{
+		sprite->beginRadialGradientFill(gradients, mat);
+	}
+	else
+	{
+		sprite->beginLinearGradientFill(gradients, mat);
+	}
 
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_unimpl("MovieClip.beginGradientFill()");
+		log_debug("MovieClip.beginGradientFill() TESTING");
 		warned=true;
 	}
 	return as_value();

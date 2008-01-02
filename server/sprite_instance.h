@@ -49,6 +49,7 @@ namespace gnash {
 	class swf_event;
 	class drag_state;
 	class LoadVariablesThread;
+	class gradient_record;
 }
 
 namespace gnash
@@ -776,6 +777,16 @@ public:
 	void beginFill(const rgba& color)
 	{
 		_drawable->beginFill(color);
+	}
+
+	void beginLinearGradientFill(const std::vector<gradient_record>& grad, const matrix& mat)
+	{
+		_drawable->beginLinearGradientFill(grad, mat);
+	}
+
+	void beginRadialGradientFill(const std::vector<gradient_record>& grad, const matrix& mat)
+	{
+		_drawable->beginRadialGradientFill(grad, mat);
 	}
 
 	void endFill()

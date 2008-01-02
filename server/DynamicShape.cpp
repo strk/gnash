@@ -17,7 +17,7 @@
 
 
 
-/* $Id: DynamicShape.cpp,v 1.14 2007/12/04 11:45:27 strk Exp $ */
+/* $Id: DynamicShape.cpp,v 1.15 2008/01/02 19:08:31 strk Exp $ */
 
 #include "DynamicShape.h"
 
@@ -80,6 +80,38 @@ DynamicShape::beginFill(const rgba& color)
 {
 	// Add the new fill style and set as current
 	fill_style style; style.setSolid(color);
+
+	endFill();
+
+	_currfill = add_fill_style(style);
+	// TODO: how to know wheter the fill should be set
+	//       as *left* or *right* fill ?
+	//       A quick test shows that *left* always work fine !
+	path newPath(_x, _y, _currfill, 0, _currline, true); // new fill start new subshapes
+	add_path(newPath);
+}
+
+void
+DynamicShape::beginLinearGradientFill(const std::vector<gradient_record>& grad, const matrix& mat)
+{
+	// Add the new fill style and set as current
+	fill_style style; style.setLinearGradient(grad, mat);
+
+	endFill();
+
+	_currfill = add_fill_style(style);
+	// TODO: how to know wheter the fill should be set
+	//       as *left* or *right* fill ?
+	//       A quick test shows that *left* always work fine !
+	path newPath(_x, _y, _currfill, 0, _currline, true); // new fill start new subshapes
+	add_path(newPath);
+}
+
+void
+DynamicShape::beginRadialGradientFill(const std::vector<gradient_record>& grad, const matrix& mat)
+{
+	// Add the new fill style and set as current
+	fill_style style; style.setRadialGradient(grad, mat);
 
 	endFill();
 

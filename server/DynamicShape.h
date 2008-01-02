@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: DynamicShape.h,v 1.8 2007/12/04 11:45:27 strk Exp $ */
+/* $Id: DynamicShape.h,v 1.9 2008/01/02 19:08:31 strk Exp $ */
 
 #ifndef GNASH_DYNAMIC_SHAPE_H
 #define GNASH_DYNAMIC_SHAPE_H
@@ -54,6 +54,12 @@ public:
 
 	/// Start drawing with a solid fill
 	void beginFill(const rgba& color);
+
+	/// Start drawing with a linear gradient fill
+	void beginLinearGradientFill(const std::vector<gradient_record>& grad, const matrix& mat);
+
+	/// Start drawing with a radial gradient fill
+	void beginRadialGradientFill(const std::vector<gradient_record>& grad, const matrix& mat);
 
 	/// Close an existing filled path, if any.
 	void endFill();

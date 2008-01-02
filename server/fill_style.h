@@ -17,7 +17,7 @@
 
 // Based on work of Thatcher Ulrich <tu@tulrich.com> 2003
 
-/* $Id: fill_style.h,v 1.13 2007/12/12 10:07:00 zoulunkai Exp $ */
+/* $Id: fill_style.h,v 1.14 2008/01/02 19:08:31 strk Exp $ */
 
 #ifndef GNASH_FILL_STYLE_H
 #define GNASH_FILL_STYLE_H
@@ -39,7 +39,18 @@ class stream;
 class gradient_record
 {
 public:
-	gradient_record();
+	gradient_record()
+		:
+		m_ratio(0),
+		m_color()
+	{}
+
+	gradient_record(boost::uint8_t ratio, const rgba& color)
+		:
+		m_ratio(ratio),
+		m_color(color)
+	{}
+
 	void	read(stream* in, int tag_type);
 	
 	//data:
@@ -65,6 +76,44 @@ public:
 	fill_style(bitmap_character_def* bitmap);
 
 	void setSolid(const rgba& color);
+
+	/// Turn this fill style into a linear gradient
+	//
+	/// @param gradients
+	///	Gradient records.
+	///
+	/// @param mat
+	///	Gradient matrix.
+	///
+	///
+	void setLinearGradient(const std::vector<gradient_record>& gradients, 
+			const matrix& mat);
+
+	/// Turn this fill style into a radial gradient
+	//
+	/// @param gradients
+	///	Gradient records.
+	///
+	/// @param mat
+	///	Gradient matrix.
+	///
+	///
+	void setRadialGradient(const std::vector<gradient_record>& gradients,
+			const matrix& mat);
+
+	/// Turn this fill style into a focal gradient
+	//
+	/// @param gradients
+	///	Gradient records.
+	///
+	/// @param mat
+	///	Gradient matrix.
+	///
+	/// @param fpoint
+	///	Focal point.
+	///
+	void setRadialGradient(const std::vector<gradient_record>& gradients,
+			const matrix& mat, float fpoint);
 
 	~fill_style() {}
 	
