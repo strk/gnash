@@ -1345,8 +1345,7 @@ sprite_beginGradientFill(const fn_call& fn)
 	// ----------------------------
 	// Parse matrix
 	// ----------------------------
-	//
-	//
+	
 	// TODO: fix this matrix build-up, it is NOT correct
 
 	matrix mat;
@@ -1356,33 +1355,59 @@ sprite_beginGradientFill(const fn_call& fn)
 	if ( matrixArg->getMember(keyT).to_string() == "box" )
 	{
 		
-		string_table::key keyX = st.find("x");
-		string_table::key keyY = st.find("y");
-		string_table::key keyW = st.find("w");
-		string_table::key keyH = st.find("h");
-		string_table::key keyR = st.find("r");
+		// TODO: add to namedStrings.{cpp,h}
+		static const string_table::key keyX = st.find("x");
+		static const string_table::key keyY = st.find("y");
+		static const string_table::key keyW = st.find("w");
+		static const string_table::key keyH = st.find("h");
+		static const string_table::key keyR = st.find("r");
 
-		float valX = matrixArg->getMember(keyX).to_number(); 
-		float valY = matrixArg->getMember(keyY).to_number(); 
-		float valW = matrixArg->getMember(keyW).to_number(); 
-		float valH = matrixArg->getMember(keyH).to_number(); 
+		float valX = PIXELS_TO_TWIPS(matrixArg->getMember(keyX).to_number()); 
+		float valY = PIXELS_TO_TWIPS(matrixArg->getMember(keyY).to_number()); 
+		float valW = PIXELS_TO_TWIPS(matrixArg->getMember(keyW).to_number()); 
+		float valH = PIXELS_TO_TWIPS(matrixArg->getMember(keyH).to_number()); 
 		float valR = matrixArg->getMember(keyR).to_number(); 
 
-		input_matrix.set_translation( (valX+valW)/2, (valY+valH)/2 );
-		input_matrix.set_scale(valW, valH);
-		input_matrix.set_rotation(valR);
+		if ( radial )
+		{
+			// Radial gradient is 64x64 twips.
+			input_matrix.set_scale_rotation(64.0f/valW, 64.0f/valH, -valR);
 
-		mat.concatenate_scale(20/16384.0);
+			// For radial gradients, dunno why translation must be negative...
+			input_matrix.concatenate_translation( -valX, -valY );
+
+			// TODO: fix the rotation, isn't working as it should
+			//       In particular, it seems the origin is wrong 
+			//       while rotating.
+
+		}
+		else
+		{
+			// Linear gradient is 256x1 twips.
+			//
+			// No idea why we should use the 256 value for Y scale, but empirically
+			// seems to give closer results. Note that it only influences rotation,
+			// which is still not correct... TODO: fix it !
+			//
+			input_matrix.set_scale_rotation(256.0f/valW, 256.0f/valH, -valR);
+
+			// For linear gradients, dunno why translation must be negative...
+			input_matrix.concatenate_translation( -valX, -valY );
+			//cout << "inpt matrix with concatenated translation: " << input_matrix << endl;
+		}
+
 		mat.concatenate(input_matrix);
 	}
 	else
 	{
-		string_table::key keyA = st.find("a");
-		string_table::key keyB = st.find("b");
-		string_table::key keyD = st.find("d");
-		string_table::key keyE = st.find("e");
-		string_table::key keyG = st.find("g");
-		string_table::key keyH = st.find("h");
+		// TODO: add to namedStrings.{cpp,h}
+		static const string_table::key keyA = st.find("a");
+		static const string_table::key keyB = st.find("b");
+		static const string_table::key keyD = st.find("d");
+		static const string_table::key keyE = st.find("e");
+		static const string_table::key keyG = st.find("g");
+		static const string_table::key keyH = st.find("h");
+
 		float valA = matrixArg->getMember(keyA).to_number() ; // xx
 		float valB = matrixArg->getMember(keyB).to_number() ; // yx
 		float valD = matrixArg->getMember(keyD).to_number() ; // xy
