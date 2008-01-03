@@ -171,6 +171,8 @@ public:
 
     /// @return Whether or not the movie should be looped indefinitely.
     bool loops();
+    
+    bool isFullscreen() { return _fullscreen; }
 
     /// Mouse notification callback to be called when the mouse is moved.
     //
@@ -215,7 +217,15 @@ public:
 
     /// Force immediate redraw
     ///
-    void refresh_view();
+    void refreshView();
+
+    /// Run fullscreen
+    ///
+    virtual void setFullscreen();
+
+    /// Exit fullscreen
+    ///
+    virtual void unsetFullscreen();
 
     /// Put the application in "stop" mode
     //
@@ -346,6 +356,9 @@ protected:
     /// Signals that the next frame must be re-rendered completely because the
     /// window size did change.
     bool            _redraw_flag;
+    
+    // True if Gnash is running in fullscreen
+    bool	    _fullscreen;
 
 private:
 
@@ -394,7 +407,7 @@ private:
 
     /// True if the application didn't start yet
     bool            _started;
-
+    
 #ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS 
 	int _xpointer;
 	int _ypointer;

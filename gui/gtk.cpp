@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.124 2007/12/18 15:02:24 strk Exp $ */
+/* $Id: gtk.cpp,v 1.125 2008/01/03 15:11:32 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -119,7 +119,7 @@ GtkGui::init(int argc, char **argv[])
 #endif
       log_msg (_("Created top level window"));
     }
-
+    
     // XXXbjacques: why do we need this?
     gtk_container_set_reallocate_redraws(GTK_CONTAINER (_window), TRUE);
 
@@ -239,6 +239,13 @@ GtkGui::createMenu()
         g_signal_connect(GTK_OBJECT(menuitem_sound), "activate",
                          G_CALLBACK(&menuitem_sound_callback), this);
     }
+
+        GtkMenuItem *menuitem_fsc =
+            GTK_MENU_ITEM(gtk_menu_item_new_with_label("Toggle Fullscreen"));
+        gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_fsc));
+        gtk_widget_show(GTK_WIDGET(menuitem_fsc));
+        g_signal_connect(GTK_OBJECT(menuitem_fsc), "activate",
+                         G_CALLBACK(&menuitem_fullscreen_callback), this);
 
     GtkMenuItem *menuitem_quit =
  	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Quit Gnash"));
@@ -464,6 +471,50 @@ GtkGui::addFDListener(int fd, callback_t callback, void* data)
     }
     
     return true;    
+}
+
+void
+GtkGui::setFullscreen()
+{
+
+    if (_fullscreen) return;
+    // Plugin
+    if (_xid) {
+    
+        // Create new window
+        _overlay = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+                
+        gtk_widget_reparent (_drawing_area, _overlay);
+        gtk_window_fullscreen(GTK_WINDOW(_overlay));
+        gtk_widget_show_all(_overlay);
+    }
+    
+    // Stand-alone
+    else {
+    	gtk_window_fullscreen(GTK_WINDOW(_window));
+    }
+    
+    _fullscreen = true;
+}
+
+void
+GtkGui::unsetFullscreen()
+{
+
+    if (!_fullscreen) return;
+    
+    // Plugin
+    if (_xid) {
+        gtk_widget_reparent (_drawing_area, _window);
+        gtk_widget_destroy(_overlay);
+    }
+    
+    // Stand-alone
+    else {
+	gtk_window_unfullscreen(GTK_WINDOW(_window));
+    }
+    
+    _fullscreen = false;
 }
 
 void
@@ -876,7 +927,9 @@ GtkGui::setCursor(gnash_cursor_type newcursor)
     gdkcursor = gdk_cursor_new(cursortype);
   }
 
-  gdk_window_set_cursor (_window->window, gdkcursor);
+  // The parent of _drawing_area is different for the plugin in fullscreen
+  gdk_window_set_cursor (gtk_widget_get_parent_window(_drawing_area),
+  		gdkcursor);
   
   if (gdkcursor) {
     gdk_cursor_unref(gdkcursor);
@@ -1243,6 +1296,20 @@ GtkGui::menuitem_sound_callback(GtkMenuItem* /*menuitem*/, gpointer data)
     gui->menu_toggle_sound();
 }
 
+void
+GtkGui::menuitem_fullscreen_callback(GtkMenuItem* /*menuitem*/, gpointer data)
+{
+//    GNASH_REPORT_FUNCTION;
+    Gui* gui = static_cast<Gui*>(data);
+    
+    if (!gui->isFullscreen()) {
+         gui->setFullscreen();
+    }
+    else {
+    	 gui->unsetFullscreen();
+    }
+}
+
 
 /// \brief restart the movie from the beginning
 void
@@ -1336,7 +1403,7 @@ GtkGui::menuitem_refresh_view_callback(GtkMenuItem* /*menuitem*/,
 {
 //    GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
-    gui->menu_refresh_view();
+    gui->refreshView();
 }
 
 //
@@ -1839,7 +1906,7 @@ GtkGui::createControlMenu(GtkWidget *obj)
 }
 
 bool
-lirc_handler(void*, int, void* data)
+lirc_handler(void*, int, void* /*data*/)
 { 
     GNASH_REPORT_FUNCTION;
 //    int* fd = static_cast<int*>(data);

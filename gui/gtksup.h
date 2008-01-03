@@ -78,6 +78,8 @@ class DSOEXPORT GtkGui : public Gui
     /// @return true on success, false on failure.
     bool addFDListener(int fd, callback_t callback, void* data);
 
+    void setFullscreen();
+    void unsetFullscreen();
 
     /// Grab focus so to receive all key events
     //
@@ -97,6 +99,8 @@ class DSOEXPORT GtkGui : public Gui
     // Menu Item callbacks
 
     static void menuitem_sound_callback(GtkMenuItem *menuitem,
+                                   gpointer instance);
+    static void menuitem_fullscreen_callback(GtkMenuItem *menuitem,
                                    gpointer instance);
     static void menuitem_restart_callback(GtkMenuItem *menuitem,
                                    gpointer instance);
@@ -153,7 +157,7 @@ class DSOEXPORT GtkGui : public Gui
     static gboolean motion_notify_event(GtkWidget *widget, GdkEventMotion *event,
                                         gpointer data);
     static gint popup_handler(GtkWidget *widget, GdkEvent *event);    
-
+    
     void add_pixmap_directory(const gchar *directory);
 
     gchar* find_pixmap_file(const gchar *filename);
@@ -174,6 +178,9 @@ class DSOEXPORT GtkGui : public Gui
     HildonProgram *_hildon_program;
 #endif
     GtkWidget   *_window;
+    
+    // A window only for rendering the plugin as fullscreen.
+    GtkWidget	*_overlay;
     GdkPixbuf 	*_window_icon_pixbuf;
     GtkWidget   *_drawing_area;    
     GtkMenu     *_popup_menu;

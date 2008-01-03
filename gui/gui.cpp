@@ -90,7 +90,8 @@ Gui::Gui() :
     _depth(16),
     _interval(0),
     _renderer(NULL),
-    _redraw_flag(true)
+    _redraw_flag(true),
+    _fullscreen(false)
 #ifdef GNASH_FPS_DEBUG
     ,fps_counter(0)
     ,fps_counter_total(0)
@@ -158,9 +159,13 @@ Gui::~Gui()
 }
 
 void
-Gui::menu_refresh_view()
+Gui::setFullscreen()
 {
-	refresh_view();
+}
+
+void
+Gui::unsetFullscreen()
+{
 }
 
 void
@@ -378,7 +383,7 @@ Gui::notify_mouse_clicked(bool mouse_pressed, int mask)
 }
 
 void
-Gui::refresh_view()
+Gui::refreshView()
 {
 	movie_root* m = _stage;
 
@@ -398,6 +403,14 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 	/* Handle GUI shortcuts */
 	if (pressed)
 	{
+		if (k == gnash::key::ESCAPE)
+		{
+			if (isFullscreen())
+			{
+				unsetFullscreen();
+			}
+		}
+		
 		if (modifier & gnash::key::MOD_CONTROL)
 		{
 			switch(k)
@@ -412,7 +425,7 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 					break;
 				case gnash::key::l:
 				case gnash::key::L:
-					menu_refresh_view();
+					refreshView();
 					break;
 				case gnash::key::q:
 				case gnash::key::Q:
