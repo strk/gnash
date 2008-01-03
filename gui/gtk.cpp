@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.125 2008/01/03 15:11:32 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.126 2008/01/03 15:46:58 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -492,6 +492,7 @@ GtkGui::setFullscreen()
     // Stand-alone
     else {
     	gtk_window_fullscreen(GTK_WINDOW(_window));
+    	gtk_widget_hide(_menubar);
     }
     
     _fullscreen = true;
@@ -512,6 +513,7 @@ GtkGui::unsetFullscreen()
     // Stand-alone
     else {
 	gtk_window_unfullscreen(GTK_WINDOW(_window));
+	gtk_widget_show(_menubar);
     }
     
     _fullscreen = false;
@@ -1301,13 +1303,7 @@ GtkGui::menuitem_fullscreen_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
 //    GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
-    
-    if (!gui->isFullscreen()) {
-         gui->setFullscreen();
-    }
-    else {
-    	 gui->unsetFullscreen();
-    }
+    gui->toggleFullscreen();
 }
 
 

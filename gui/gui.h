@@ -226,6 +226,9 @@ public:
     /// Exit fullscreen
     ///
     virtual void unsetFullscreen();
+    
+    // Toggle between fullscreen and normal mode
+    void toggleFullscreen();
 
     /// Put the application in "stop" mode
     //

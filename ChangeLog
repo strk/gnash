@@ -1,5 +1,11 @@
 2008-01-03 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+        * gui/gui.{h,cpp}: ^F toggles fullscreen (not in the plugin - no shortcuts work
+          here). Add toggleFullscreen() to avoid code duplication.
+        * gui/gtk.cpp: hide menu bar for fullscreen in standalone player.
+
+2008-01-03 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
         * gui/gui.{cpp,h}: add setFullscreen(), unsetFullscreen() and
           _isFullscreen flag as virtual methods. At present only available
           as a menu toggle in the GTK GUI.

@@ -169,6 +169,18 @@ Gui::unsetFullscreen()
 }
 
 void
+Gui::toggleFullscreen()
+{
+	if (_fullscreen) {
+		unsetFullscreen();
+	}
+	else {
+		setFullscreen();
+	} 
+}
+
+
+void
 Gui::menu_restart()
 {
 //    GNASH_REPORT_FUNCTION;
@@ -432,6 +444,10 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 				case gnash::key::w:
 				case gnash::key::W:
 					menu_quit();
+					break;
+				case gnash::key::f:
+				case gnash::key::F:
+					toggleFullscreen();
 					break;
 				case gnash::key::RIGHT_BRACKET:
 					menu_step_forward();
