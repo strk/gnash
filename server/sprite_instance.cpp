@@ -1371,14 +1371,14 @@ sprite_beginGradientFill(const fn_call& fn)
 		if ( radial )
 		{
 			// Radial gradient is 64x64 twips.
-			input_matrix.set_scale_rotation(64.0f/valW, 64.0f/valH, -valR);
+			input_matrix.set_scale(64.0f/valW, 64.0f/valH);
 
 			// For radial gradients, dunno why translation must be negative...
 			input_matrix.concatenate_translation( -valX, -valY );
 
-			// TODO: fix the rotation, isn't working as it should
-			//       In particular, it seems the origin is wrong 
-			//       while rotating.
+			// NOTE: rotation is intentionally discarded as it would
+			//       have no effect (theoretically origin of the radial
+			//       fill is at 0,0 making any rotation meaningless).
 
 		}
 		else
