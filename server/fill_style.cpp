@@ -320,7 +320,11 @@ fill_style::sample_gradient(boost::uint8_t ratio) const
 		|| m_type == SWF::FILL_RADIAL_GRADIENT
 		|| m_type == SWF::FILL_FOCAL_GRADIENT);
 
-	assert(m_gradients.size());
+	if ( m_gradients.empty() )
+	{
+		static const rgba black;
+		return black;
+	}
 
 	// By specs, first gradient should *always* be 0, 
 	// anyway a malformed SWF could break this,

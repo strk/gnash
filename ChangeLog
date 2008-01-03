@@ -1,3 +1,9 @@
+2008-01-03 Sandro Santilli <strk@keybit.net>
+
+	* server/fill_style.cpp (sample_gradient): if no gradients
+	  are defined return the black color. Fixes an assertion failure
+	  on malformed or as-defined gradientrecord-less linear grads.
+
 2008-01-02 Sandro Santilli <strk@keybit.net>
 
 	* server/DynamicShape.{cpp,h},
