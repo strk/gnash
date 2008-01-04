@@ -183,7 +183,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	m1.set_identity();
 
-	// Scale points by 1/32
+	// Make a distance of 64 become a distance of 20 .. 
 
 	m1.set_scale(20.0/64, 20.0/64);
 
