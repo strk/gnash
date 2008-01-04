@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.124 2007/12/13 15:56:06 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.125 2008/01/04 09:08:37 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -68,8 +68,7 @@ Status
   
   video               COMPLETE
   
-  Currently the renderer should be able to render everything correctly,
-  except videos.
+  Currently the renderer should be able to render everything correctly.
   
   
 What could and should be /optimized/
@@ -1401,7 +1400,7 @@ public:
           cm.set_inverse(fillstyle_matrix);
           m.concatenate(cm);
           m.concatenate(inv_stage_matrix);
-          
+
           sh.add_bitmap(dynamic_cast<agg_bitmap_info_base*> 
             (fill_styles[fno].get_bitmap_info()), m, cx, 
             (fill_type==SWF::FILL_TILED_BITMAP) || (fill_type==SWF::FILL_TILED_BITMAP_HARD),
