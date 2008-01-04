@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.467 2008/01/02 12:04:43 strk Exp $
+dnl $Id: configure.ac,v 1.468 2008/01/04 13:35:11 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1371,23 +1371,35 @@ if test x$build_kde = xno -a x$kparts = xyes; then
 fi
 
 if test x$kparts = xyes; then
+  AC_ARG_WITH(kde-pluginprefix,
+    AC_HELP_STRING([--with-kde-pluginprefix=DIR],
+      [Prefix for KDE plugin, like /usr]),
+    [KDE_PLUGINPREFIX=${withval}]
+  )
 
-  KDE_PLUGINDIR='$(libdir)/kde3'
-  KDE_SERVICESDIR='$(prefix)/share/services'
-  KDE_CONFIGDIR='$(prefix)/share/config'
-  KDE_APPSDATADIR='$(prefix)/share/apps'
+  if test $KDE_PLUGINPREFIX; then
+    KDE_PLUGINDIR=$KDE_PLUGINPREFIX'/lib/kde3'
+    KDE_SERVICESDIR=$KDE_PLUGINPREFIX'/share/services'
+    KDE_CONFIGDIR=$KDE_PLUGINPREFIX'/share/config'
+    KDE_APPSDATADIR=$KDE_PLUGINPREFIX'/share/apps/klash'
+  else
+    if test x${KDE_CONFIG} != x; then
+      KDE_PLUGINDIR=`${KDE_CONFIG} --install module --expandvars`
+      KDE_SERVICESDIR=`${KDE_CONFIG} --install services --expandvars`
+      KDE_CONFIGDIR=`${KDE_CONFIG} --install config --expandvars`
+      KDE_APPSDATADIR=`${KDE_CONFIG} --install data --expandvars`'/klash'
+    else
+      KDE_PLUGINDIR='$(libdir)/kde3'
+      KDE_SERVICESDIR='$(prefix)/share/services'
+      KDE_CONFIGDIR='$(prefix)/share/config'
+      KDE_APPSDATADIR='$(prefix)/share/apps/klash'
+    fi
+  fi
 
   AC_SUBST(KDE_PLUGINDIR)
   AC_SUBST(KDE_SERVICESDIR)
   AC_SUBST(KDE_CONFIGDIR)
   AC_SUBST(KDE_APPSDATADIR)
-
-  if test x${KDE_CONFIG} != x; then
-     KDE_PLUGINDIR=`${KDE_CONFIG} --install module --expandvars`
-     KDE_SERVICESDIR=`${KDE_CONFIG} --install services --expandvars`
-     KDE_CONFIGDIR=`${KDE_CONFIG} --install config --expandvars`
-     KDE_APPSDATADIR=`${KDE_CONFIG} --install data --expandvars`
-  fi
 
   AC_ARG_WITH(kde-plugindir,
     AC_HELP_STRING([--with-kde-plugindir=DIR],
@@ -1412,7 +1424,6 @@ if test x$kparts = xyes; then
       [Directory to install KDE data in]),
     [KDE_APPSDATADIR=${withval}]
   )
-
 fi
 
 AM_CONDITIONAL(BUILD_QTOPIA_GUI, [ test x$build_qtopia = xyes ])

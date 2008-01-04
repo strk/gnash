@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.38 2008/01/02 12:04:43 strk Exp $
+# $Id: Makefile.am,v 1.39 2008/01/04 13:35:12 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -24,9 +24,9 @@ AM_CPPFLAGS= $(KDE_CFLAGS) $(QT_CFLAGS) -DGNASHBINDIR=\"${bindir}\"
 
 plugindir   = $(KDE_PLUGINDIR)
 kde_servicesdir = $(KDE_SERVICESDIR)
-kde_rcdir       = $(KDE_APPSDATADIR)/klash
+kde_rcdir       = $(KDE_APPSDATADIR)
 #$(prefix)/share/apps/klash
-kde_appsdatadir = $(KDE_APPSDATADIR)/klash
+kde_appsdatadir = $(KDE_APPSDATADIR)
 #$(prefix)/share/apps/klash
 kde_configdir   = $(KDE_CONFIGDIR)
 #$(prefix)/share/config

@@ -149,11 +149,22 @@
       </entry>
   </row><row>
   <entry>
+    <option>--with-kde-pluginprefix</option>
+    </entry>
+      <entry>
+        This option sets the default install dir for all KPARTS (kde) files.
+	The plugin will be installed in PREFIX/lib/kde3, use -with-kde-plugindir to override.
+	The service file in PREFIX/share/services, use --with-kde-servicesdir to override.
+	The config file in PREFIX/share/config, use --with-kde-configdir to override.
+	The appdata file in PREFIX/share/apps/klash, use --with-kde-appsdatadir to override.
+      </entry>
+  </row><row>
+  <entry>
     <option>--with-kde-plugindir</option>
     </entry>
       <entry>
         This is the directory to install the KPARTS (kde) plugin in.
-        By default it is what's returned by kde-config --install module --expandvars,
+        By default it is what's set by --with-kde-pluginprefix or what's returned by kde-config --install module --expandvars,
         or $(prefix)/share/services if kde-config is not found.
       </entry>
   </row><row>
@@ -162,7 +173,7 @@
     </entry>
       <entry>
         This is the directory to install the KPARTS (kde) service in.
-        By default it is what's returned by kde-config --install services --expandvars,
+        By default it is what's set by --with-kde-pluginprefix or what's returned by kde-config --install services --expandvars,
         or $(libdir)/kde3 if kde-config is not found.
       </entry>
   </row><row>
@@ -171,7 +182,7 @@
     </entry>
       <entry>
         This is the directory to install the KPARTS (kde) config files in.
-        By default it is what's returned by kde-config --install config --expandvars,
+        By default it is what's set by --with-kde-pluginprefix or what's returned by kde-config --install config --expandvars,
         or $(prefix)/share/config if kde-config is not found.
       </entry>
   </row><row>
@@ -180,7 +191,7 @@
     </entry>
       <entry>
         This is the directory to install the KPARTS (kde) application data files in.
-        By default it is what's returned by kde-config --install data --expandvars,
+        By default it is what's set by --with-kde-pluginprefix or what's returned by kde-config --install data --expandvars,
         or $(prefix)/share/apps if kde-config is not found.
       </entry>
   </row><row>

@@ -1,5 +1,16 @@
 2008-01-04 Sandro Santilli <strk@keybit.net>
 
+	*  doc/C/usermanual/installation/custompath_configuration.xml:
+	  Document --with-kde-pluginprefix configure switch.
+
+2008-01-04 Fredrik Johansson <fredrik@mumme.se>
+
+	* configure.ac, plugin/klash/Makefile.am: 
+	  add --with-kde-pluginprefix configure switch.
+	  See bug #21907.
+
+2008-01-04 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (beginGradientFill): 
 	  Improvements in non-boxed matrixType use, comments
 	  about future improvements.
