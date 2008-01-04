@@ -173,5 +173,57 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(m1.get_x_translation(), 5);
 	check_equals(m1.get_y_translation(), 6);
 
+	//---------------------------------------------
+	// Test transformations
+	//---------------------------------------------
+
+	point p1(0, 0);
+	point p2(64, 64);
+	point r;
+
+	m1.set_identity();
+
+	// Scale points by 1/32
+
+	m1.set_scale(20.0/64, 20.0/64);
+
+	m1.transform(&r, p1);
+	check_equals(r.x, 0);
+	check_equals(r.y, 0);
+
+	m1.transform(&r, p2);
+	check_equals(r.x, 20);
+	check_equals(r.y, 20);
+
+	// Translate points to have the origin at 32,32
+	// (coordinates expressed in prior-to-scaling matrix)
+
+	m1.concatenate_translation(-32, -32);
+
+	m1.transform(&r, p1);
+	check_equals(r.x, -10);
+	check_equals(r.y, -10);
+
+	m1.transform(&r, p2);
+	check_equals(r.x, 10);
+	check_equals(r.y, 10);
+
+	// Apply a final scaling by 10 keeping
+	// the current origin (reached after
+	// translation)
+
+	matrix final;
+	final.set_scale(10, 10);
+	final.concatenate(m1);
+	m1 = final;
+
+	m1.transform(&r, p1);
+	check_equals(r.x, -100);
+	check_equals(r.y, -100);
+
+	m1.transform(&r, p2);
+	check_equals(r.x, 100);
+	check_equals(r.y, 100);
+
 }
 

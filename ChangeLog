@@ -1,3 +1,12 @@
+2008-01-04 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/server/MatrixTest.cpp: add a test
+	  for transforming a couple of points using
+	  a translate + scale approach. This is the
+	  way we should transform radial gradients
+	  for beginGradientFill, probably optimizable
+	  but helpful for understanding it.
+
 2008-01-03 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (beginGradientFill): 
