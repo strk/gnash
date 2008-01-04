@@ -1,6 +1,8 @@
 2008-01-04 Sandro Santilli <strk@keybit.net>
 
-	*  doc/C/usermanual/installation/custompath_configuration.xml:
+	* Makefile.am: install plugins under /tmp/ during 'distcheck'.
+	  (we can do something a bit smarter, but it's a start).
+	* doc/C/usermanual/installation/custompath_configuration.xml:
 	  Document --with-kde-pluginprefix configure switch.
 
 2008-01-04 Fredrik Johansson <fredrik@mumme.se>

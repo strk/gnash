@@ -15,12 +15,28 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.98 2008/01/02 12:19:25 strk Exp $
+# $Id: Makefile.am,v 1.99 2008/01/04 23:57:10 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
 ACLOCAL_AMFLAGS = -I macros
 noinst_SCRIPT = autogen.sh
+
+##
+## Any custom ./configure switch we want to be
+## given at 'make distcheck' time should go here
+##
+## We set plugins install dirs to a user-writable 
+## and likely unused directory for now to avoid
+## permission problems and unexpected unistalls
+## from home dir. Ideally we should put them somewhere
+## under ${prefix} to make the uninstall check effective
+## (and I belive it should actually be the default when
+## --prefix is given, but that's another story --strk)
+##
+DISTCHECK_CONFIGURE_FLAGS = \
+	--with-kde-pluginprefix=/tmp/gnash-distcheck/kparts \
+	--with-plugindir=/tmp/gnash-distcheck/npapi 
 
 STD_DIRS = \
 	libbase \
