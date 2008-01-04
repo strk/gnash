@@ -1346,7 +1346,21 @@ sprite_beginGradientFill(const fn_call& fn)
 	// Parse matrix
 	// ----------------------------
 	
-	// TODO: fix this matrix build-up, it is NOT correct
+	//
+	// TODO: fix the matrix build-up, it is NOT correct for
+	//       rotation.
+	//       For the "boxed" matrixType and radial fills this
+	//       is not a problem as this code just discards the
+	//       rotation (which doesn't make sense), but for
+	//       the explicit matrix type (a..i) it is a problem.
+	//       The whole code can likely be simplified by 
+	//       always transforming the gnash gradients to the
+	//       expected gradients and subsequently applying
+	//       user-specified matrix; for 'boxed' matrixType
+	//       this simplification would increas cost, but
+	//       it's too early to apply optimizations to the
+	//       code (correctness first!!).
+	//
 
 	matrix mat;
 	matrix input_matrix;
@@ -1394,6 +1408,7 @@ sprite_beginGradientFill(const fn_call& fn)
 			// For linear gradients, dunno why translation must be negative...
 			input_matrix.concatenate_translation( -valX, -valY );
 			//cout << "inpt matrix with concatenated translation: " << input_matrix << endl;
+
 		}
 
 		mat.concatenate(input_matrix);
@@ -1415,15 +1430,52 @@ sprite_beginGradientFill(const fn_call& fn)
 		float valG = PIXELS_TO_TWIPS(matrixArg->getMember(keyG).to_number()); // x0
 		float valH = PIXELS_TO_TWIPS(matrixArg->getMember(keyH).to_number()); // y0
 
-		input_matrix.m_[0][0] = valA;
-		input_matrix.m_[1][0] = valB;
-		input_matrix.m_[0][1] = valD;
-		input_matrix.m_[1][1] = valE;
-		input_matrix.m_[0][2] = valG;
-		input_matrix.m_[1][2] = valH;
+		input_matrix.m_[0][0] = valA; // xx
+		input_matrix.m_[1][0] = valB; // yx
+		input_matrix.m_[0][1] = valD; // xy
+		input_matrix.m_[1][1] = valE; // yy
+		input_matrix.m_[0][2] = valG; // x0
+		input_matrix.m_[1][2] = valH; // y0
 
-		mat.concatenate_scale(20/16384.0);
-		mat.concatenate(input_matrix);
+		// This is the matrix that would transform the gnash
+		// gradient to the expected flash gradient.
+		// Transformation is different for linear and radial
+		// gradient for Gnash (in flash they should be the same)
+		matrix gnashToFlash;
+
+		if ( radial )
+		{
+
+			// Gnash radial gradients are 64x64 with center at 32,32
+			// Should be 20x20 with center at 0,0
+			float g2fs = 20.0/64.0; // gnash to flash scale
+			gnashToFlash.set_scale(g2fs, g2fs);
+			gnashToFlash.concatenate_translation(-32.0, -32.0);
+
+		}
+		else
+		{
+			// First define a matrix that would transform
+			// the gnash gradient to the expected flash gradient:
+			// this means translating our gradient to put the
+			// center of gradient at 0,0 and then scale it to
+			// have a size of 20x20 instead of 256x1 as it is
+			//
+			// Gnash linear gradients are 256x1 with center at 128,0
+			// Should be 20x20 with center at 0,0
+			gnashToFlash.set_scale(20.0/256.0, 20.0/1);
+			gnashToFlash.concatenate_translation(-128.0, 0.0);
+
+		}
+
+		// Apply gnash to flash matrix before user-defined one
+		input_matrix.concatenate(gnashToFlash);
+
+		// Finally, and don't know why, take
+		// the inverse of the resulting matrix as
+		// the one which would be used
+		mat.set_inverse( input_matrix );
+
 	}
 
 	//cout << mat << endl;

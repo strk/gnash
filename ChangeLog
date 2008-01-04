@@ -1,5 +1,11 @@
 2008-01-04 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (beginGradientFill): 
+	  Improvements in non-boxed matrixType use, comments
+	  about future improvements.
+
+2008-01-04 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/server/MatrixTest.cpp: add a test
 	  for transforming a couple of points using
 	  a translate + scale approach. This is the
