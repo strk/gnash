@@ -1,5 +1,7 @@
 2008-01-05 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/SharedObject.as: fix the testcase's
+	  expected result.
 	* server/asobj/ClassHierarchy.cpp: make NetConnection available
 	  starting at SWF6.
 	* testsuite/actionscript.all/NetConnection.as: fix testcase.

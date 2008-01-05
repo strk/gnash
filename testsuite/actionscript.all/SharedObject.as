@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: SharedObject.as,v 1.17 2008/01/05 03:55:00 rsavoye Exp $";
+rcsid="$Id: SharedObject.as,v 1.18 2008/01/05 10:13:09 strk Exp $";
 
 #include "check.as"
 
@@ -34,6 +34,8 @@ xcheck_equals (typeof(sharedobjectObj), 'object');
 // test the SharedObject::getlocal method
 check_equals (typeof(sharedobjectObj.getLocal), 'undefined');
 xcheck_equals (typeof(SharedObject.getLocal), 'function');
+
+check_totals(3);
 
 #else // OUTPUT_VERSION >= 6
 
@@ -81,7 +83,7 @@ so.flush();
 newso = SharedObject.getLocal("level1/level2/settings", "/");
 check_equals (typeof(newso), 'object');
 trace(newso.getSize());
-xcheck_equals (newso.getSize(), 283);
+xcheck_equals (newso.getSize(), 297);
 
 if (typeof(newso.data) != 'undefined') {
     trace("New Shared Object, checking data...");
@@ -115,6 +117,6 @@ if (typeof(newso.data) != 'undefined') {
     trace("New Shared Object doesn't exist!");
 }
 
+check_totals(30);
 
 #endif // OUTPUT_VERSION >= 6
-totals();
