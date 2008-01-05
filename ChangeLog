@@ -1,5 +1,10 @@
 2008-01-04 Sandro Santilli <strk@keybit.net>
 
+	* plugin/Makefile.am: drop useless install/uninstall rules,
+	  automatically provided by automake.
+
+2008-01-04 Sandro Santilli <strk@keybit.net>
+
 	* plugin/klash/Makefile.am: actually drop all install rules,
 	  automake does a perfect job at it.
 

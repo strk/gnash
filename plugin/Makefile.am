@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.64 2007/08/18 02:54:22 strk Exp $
+# $Id: Makefile.am,v 1.65 2008/01/05 01:27:01 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -91,27 +91,5 @@ libgnashplugin_la_LDFLAGS = -avoid-version -L$(plugindir)
 else
 libgnashplugin_la_LDFLAGS = -module -avoid-version -L$(plugindir)
 endif
-
-# The default directory for the plugin is $(HOME)/.firefox/plugins.
-install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-	test -d "$(DESTDIR)$(plugindir)" || $(mkinstalldirs) "$(DESTDIR)$(plugindir)"
-#	cp .libs/libgnashplugin.so $(DESTDIR)$(plugindir)/libgnashplugin.so
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(plugin_LTLIBRARIES) "$(DESTDIR)$(plugindir)/$(plugin_LTLIBRARIES)"
-#if PLUGIN_LINK_UNDEFINED
-#cp $(DESTDIR)$(plugindir)/.libs/libgnashplugin.so.0.* $(DESTDIR)$(plugindir)/libgnashplugin.so
-#endif
-	$(RM) $(DESTDIR)$(plugindir)/libgnashplugin.*a $(DESTDIR)$(plugindir)/libgnashplugin.so.0 $(DESTDIR)$(plugindir)/libgnashplugin.*.T
-
-# install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-# 	if test -d $(HOME)/.firefox ; then \
-# 	   $(mkinstalldirs) $(HOME)/.firefox/plugins; \
-# 	   $(INSTALL) .libs/libgnash.so $(HOME)/.firefox/plugins/libgnash.so; \
-# 	else \
-# 	    $(mkinstalldirs) $(HOME)/.mozilla/plugins; \
-# 	   $(INSTALL) .libs/libgnash.so $(HOME)/.mozilla/plugins/libgnash.so; \
-# 	fi
-
-uninstall-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-	$(RM) -f $(DESTDIR)$(plugindir)/libgnashplugin.so
 
 endif
