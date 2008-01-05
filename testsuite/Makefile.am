@@ -70,4 +70,5 @@ endif
 
 clean-local:
 	rm -f Dejagnu.swf gnashrc
+	rm -rf tmpSharedObject
 
