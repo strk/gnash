@@ -85,7 +85,7 @@ public:
 
             const string& name = _st.string_table::value(key);
 
-          cerr << "FIXME: yes!!!!! " << name << ": "<< val.to_debug_string() << endl;
+//          cerr << "FIXME: yes!!!!! " << name << ": "<< val.to_debug_string() << endl;
 
             if (val.is_string()) {
                 string str;
