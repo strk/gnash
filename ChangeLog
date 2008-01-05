@@ -1,5 +1,7 @@
 2008-01-05 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/libbase/: TCXXRc.cpp, gnashrc.in: test set SOLSafeDir
+	  directive.
 	* testsuite/actionscript.all/SharedObject.as: fix the testcase's
 	  expected result.
 	* server/asobj/ClassHierarchy.cpp: make NetConnection available

@@ -275,5 +275,11 @@ main (int /*argc*/, char** /*argv*/) {
     } else {
         runtest.fail ("getURLOpenerFormat");
     }
+
+    if (rc.getSOLSafeDir() == "/tmp/SharedObjects") {
+        runtest.pass ("getSOLSafeDir");
+    } else {
+        runtest.fail ("getSOLSafeDir");
+    }
 }
 

@@ -66,3 +66,6 @@ set localSandboxPath /tmp/p1
 
 # Use the following command format to open urls
 set urlOpenerFormat lynx %u
+
+# Set SOLSafeDir to /tmp/SharedObjects
+set SOLSafeDir /tmp/SharedObjects
