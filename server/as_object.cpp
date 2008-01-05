@@ -643,7 +643,7 @@ as_object::setPropFlags(as_value& props_val, int set_false, int set_true)
 			else
 			{
 				prop=propstr.substr(0,next_comma);
-				propstr=propstr.substr(next_comma);
+				propstr=propstr.substr(next_comma+1);
 			}
 
 			// set_member_flags will take care of case conversion
