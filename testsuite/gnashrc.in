@@ -1,4 +1,8 @@
 # Allow load of resources in the MEDIA dir
 append localSandboxPath @@MEDIADIR@@
 
+# Read/Write shared object to testsuite temp so dir
+set SOLSafeDir @@TMPSODIR@@
+set SOLReadOnly false
+
 # TODO: enable extensions ?

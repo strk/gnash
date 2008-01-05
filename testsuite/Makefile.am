@@ -22,6 +22,7 @@ EXTRA_DIST = check.h DummyMovieDefinition.h DummyCharacter.h media gnashrc.in
 dist_noinst_SCRIPTS = anaylse-results.sh generic-testrunner.sh
 
 abs_mediadir = `cd $(srcdir)/media; pwd`
+abs_tmpsodir = `cd tmpSharedObject; pwd`
 
 # could not find a way to only build this on make check
 check_LTLIBRARIES = libtestsuite.la 
@@ -50,9 +51,11 @@ libtestsuite_la_CXXFLAGS = \
 	$(CAIRO_CFLAGS) \
 	$(NULL)
 
+tmpSharedObject: 
+	mkdir tmpSharedObject
 
-gnashrc: gnashrc.in Makefile
-	sed -e 's#@@MEDIADIR@@#'$(abs_mediadir)'#g' $< > $@
+gnashrc: gnashrc.in Makefile tmpSharedObject
+	sed -e 's#@@MEDIADIR@@#'$(abs_mediadir)'#g' -e 's#@@TMPSODIR@@#'$(abs_tmpsodir)'#g' $< > $@
 
 if ENABLE_MING
 

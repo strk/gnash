@@ -69,3 +69,6 @@ set urlOpenerFormat lynx %u
 
 # Set SOLSafeDir to /tmp/SharedObjects
 set SOLSafeDir /tmp/SharedObjects
+
+# Set read-only SharedObjects
+set SOLReadOnly true
