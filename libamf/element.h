@@ -116,6 +116,8 @@ public:
     void setName(const std::string &name) { _name = name; };
     void setName(boost::uint8_t *name) { _name = reinterpret_cast<const char *>(name); };
 //    boost::posix_time::ptime to_date();
+    void dump();
+    
 private:
     astype_e  _type;
     boost::int16_t _length;

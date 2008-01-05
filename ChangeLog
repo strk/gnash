@@ -1,3 +1,16 @@
+2008-01-05  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* testsuite/libamf.all/Makefile.am: Remove the old bogus AMF
+	tests. Things are too different now for these to work without a
+	lot of effort, and their functionality is covered by the other
+	tests anyway.
+	* testsuiote/libamf.all/test_{number,object,variable,string}.cpp:
+	Remove as these are now bogus.
+	* testsuite/libamf.all/test_sol.cpp: Use ::init() instead of the
+	constructor.
+	* testsuite/libamf.all/test_el.cpp: Dump the element too.
+	* libamf/element.{cpp,h}: Add a dump() method.
+
 2008-01-05 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
         * gui/gui.cpp: add messages for unimplemented fullscreen.

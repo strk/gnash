@@ -1075,9 +1075,9 @@ AMF::createElement(AMF::amf_element_t *el, const std::string &name, bool data)
 uint8_t *
 AMF::encodeVariable(amf::Element *el)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     int outsize = el->getName().size() + el->getLength() + 5;
-    boost::uint8_t *out = new boost::uint8_t[outsize + 2];
+    boost::uint8_t *out = new boost::uint8_t[outsize + 4];
     memset(out, 0, outsize + 2);
     boost::uint8_t *tmpptr = out;
 

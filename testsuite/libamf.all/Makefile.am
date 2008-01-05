@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.13 2007/12/31 19:16:53 rsavoye Exp $
+# $Id: Makefile.am,v 1.14 2008/01/05 17:44:44 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -50,12 +50,8 @@ INCLUDES = -I.. \
 
 check_PROGRAMS = \
 	test_el \
-	test_sol
-# 	test_number
-# 	test_string
-# 	test_object
-# 	test_variable
-#	test_lc
+	test_sol \
+	test_lc
 
 test_el_SOURCES = test_el.cpp ../../libamf/element.cpp
 test_el_LDADD = $(AM_LDFLAGS)
@@ -64,20 +60,20 @@ test_sol_SOURCES = test_sol.cpp
 test_sol_LDADD = $(AM_LDFLAGS)
 test_sol_DEPENDENCIES = $(solfiles)
 
-# test_lc_SOURCES = test_lc.cpp
-# test_lc_LDADD = $(AM_LDFLAGS)
+test_lc_SOURCES = test_lc.cpp
+test_lc_LDADD = $(AM_LDFLAGS)
 
-test_number_SOURCES = test_number.cpp
-test_number_LDADD = $(AM_LDFLAGS)
+# test_number_SOURCES = test_number.cpp
+# test_number_LDADD = $(AM_LDFLAGS)
 
-test_string_SOURCES = test_string.cpp
-test_string_LDADD = $(AM_LDFLAGS)
+# test_string_SOURCES = test_string.cpp
+# test_string_LDADD = $(AM_LDFLAGS)
 
-test_object_SOURCES = test_object.cpp
-test_object_LDADD = $(AM_LDFLAGS)
+# test_object_SOURCES = test_object.cpp
+# test_object_LDADD = $(AM_LDFLAGS)
 
-test_variable_SOURCES = test_variable.cpp
-test_variable_LDADD = $(AM_LDFLAGS)
+# test_variable_SOURCES = test_variable.cpp
+# test_variable_LDADD = $(AM_LDFLAGS)
 
 # These are captured AMF object in binary form.
 AMFS =	\

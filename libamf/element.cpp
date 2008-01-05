@@ -414,6 +414,21 @@ Element::makeStrictArray(boost::uint8_t *indata, int size)
     return *this;
 }
 
+void
+Element::dump()
+{
+    log_debug("AMF Type is: ", astype_str[_type]);
+    log_debug("AMF Length is: ", _length);
+    if (_name.size()) {
+	log_debug("AMF Name is: ", _name.c_str());
+    }
+#if 0
+    boost::uint8_t *hexint;
+    hexint = new boost::uint8_t[(_length + 3) * 3];
+    hexify((boost::uint8_t *)hexint, _data, _length, false);
+    log_debug("AMF data is: 0x%s", hexint);
+#endif
+}
 
 } // end of amf namespace
 

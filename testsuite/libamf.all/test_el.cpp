@@ -100,6 +100,7 @@ main(int argc, char *argv[])
         runtest.fail("Created double element");
     }
 
+    el.dump();
     el.clear();
     
     string str = "Hello World!";
@@ -135,6 +136,7 @@ main(int argc, char *argv[])
     } else {
         runtest.fail("Created Undefined element");
     }
+
 }
 
 static void

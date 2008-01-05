@@ -101,6 +101,7 @@ main(int argc, char *argv[])
 bool
 test_read(std::string &filespec)
 {
+    GNASH_REPORT_FUNCTION;
     struct stat st;
 
     if (stat(filespec.c_str(), &st) == 0) {
@@ -135,6 +136,8 @@ test_read(std::string &filespec)
 bool
 test_write(std::string &filespec)
 {
+    GNASH_REPORT_FUNCTION;
+    
     SOL sol;
     AMF amf_obj;
     
@@ -144,8 +147,10 @@ test_write(std::string &filespec)
 
     double dub = 50.0;
 
-    amf::Element *el = new amf::Element("gain", dub);
-//    el->init("gain", dub);
+
+//    amf::Element *el = new amf::Element("gain", dub);
+    amf::Element *el = new amf::Element;
+    el->init("gain", dub);
 //    amf_obj.createElement(&el, "gain", dub);
     sol.addObj(el);
     if ((el->getName() == "gain") &&
@@ -209,6 +214,7 @@ test_write(std::string &filespec)
 
     data = "";
     el = new amf::Element("defaultcamera", data);
+    el->init("defaultcamera", data);
     sol.addObj(el);
     if ((el->getName() == "defaultcamera") &&
         (el->getType() == Element::STRING) &&
@@ -220,7 +226,9 @@ test_write(std::string &filespec)
     }
 
     dub = 100.0;
-    el = new amf::Element("defaultklimit", dub);
+    el = new amf::Element;
+//    el = new amf::Element("defaultklimit", dub);
+    el->init("defaultklimit", dub);
     sol.addObj(el);
     if ((el->getName() == "defaultklimit") &&
         (el->getType() == Element::NUMBER) &&
@@ -311,7 +319,9 @@ test_write(std::string &filespec)
     dub = 1.8379389592608646e-304;
     swapBytes(&dub, 8);
     
-    el = new amf::Element("localSecPathTime", dub);
+    el = new amf::Element;
+    el->init("localSecPathTime", dub);
+//    el = new amf::Element("localSecPathTime", dub);
     sol.addObj(el);
     if ((el->getName() == "localSecPathTime") &&
         (el->getType() == Element::NUMBER) &&
