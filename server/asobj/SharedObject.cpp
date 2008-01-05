@@ -85,18 +85,20 @@ public:
 
             const string& name = _st.string_table::value(key);
 
-//          cerr << "FIXME: yes!!!!! " << name << ": "<< val.to_debug_string() << endl;
+          cerr << "FIXME: yes!!!!! " << name << ": "<< val.to_debug_string() << endl;
 
             if (val.is_string()) {
                 string str;
                 if (!val.is_undefined()) {
                     str = val.to_string();
                 }
-                el = new amf::Element(name, str);
+                el = new amf::Element;
+                el->init(name, str);
             }
             if (val.is_bool()) {
                 bool flag = val.to_bool();
-                el = new amf::Element(name, flag);
+                el = new amf::Element;
+                el->init(name, flag);
             }
             if (val.is_number()) { 
                 double dub;
@@ -105,7 +107,8 @@ public:
                 } else {
                     dub = val.to_number();
                 }
-                el = new amf::Element(name, dub);
+                el = new amf::Element;
+                el->init(name, dub);
             }
 
             if (el) {

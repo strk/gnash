@@ -1,3 +1,9 @@
+2008-01-04  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* server/asobj/SharedObject.cpp: Use Element::init() instead of
+	constructing, as it appears to have problems with some gcc
+	versions. This fixes the SharedObject.as test case.
+
 2008-01-05 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/VM.{cpp,h}: add getSWFUrl() method to fetch
