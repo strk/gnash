@@ -33,6 +33,7 @@
 #include "network.h"
 #include "fn_call.h"
 #include "builtin_function.h"
+#include "amf.h"
 
 using namespace std;
 using namespace amf;
@@ -95,7 +96,7 @@ LocalConnection::~LocalConnection()
     GNASH_REPORT_FUNCTION;
 }
 
-#if 0
+#if 0 // {
 Listener::Listener()
     : _baseaddr(0)
 {
@@ -169,6 +170,7 @@ Listener::listListeners()
 
     return listeners;
 }
+#endif // }
 
 /// \brief Closes (disconnects) the LocalConnection object.
 void
@@ -187,23 +189,25 @@ LocalConnection::close()
 /// send() command to signify which local connection to send the
 /// object to.
 bool
-LocalConnection::connect(const char *name)
+LocalConnection::connect(const std::string& name)
 {
     GNASH_REPORT_FUNCTION;
     
     _name = name;
 
-    log_debug("trying to open shared memory segment: \"%s\"", name);
+    log_debug("trying to open shared memory segment: \"%s\"", name.c_str());
     
-    if (Shm::attach(name, true) == false) {
+    if (Shm::attach(name.c_str(), true) == false) {
         return false;
     }
 
     if (Shm::getAddr() <= 0) {
-        log_error("Failed to open shared memory segment: \"%s\"", name);
+        log_error("Failed to open shared memory segment: \"%s\"", name.c_str());
         return false; 
     }
     
+#if 0 // { // what are these Listeners ?
+
     Listener::setBaseAddress(Shm::getAddr());
         
     string str1 = "HelloWorld";
@@ -237,10 +241,10 @@ LocalConnection::connect(const char *name)
     }
     
     delete listeners;
+#endif // }
     
     return true;
 }
-#endif
 
 /// \brief Returns a string representing the superdomain of the
 /// location of the current SWF file.
@@ -259,11 +263,9 @@ LocalConnection::domain(int version)
         return _name;
     }
     
-    string url_s;
-    const URL& baseurl = get_base_url();
-    URL url(url_s, baseurl);
-//    log_msg(_("BASE URL=%s (%s)"), baseurl.str().c_str(), url.hostname().c_str());
-    if (url.hostname().size() == 0) {
+    URL url(getVM().getSWFUrl());
+//    log_debug(_("ORIG URL=%s (%s)"), url.str().c_str(), url.hostname().c_str());
+    if (url.hostname().empty()) {
         _name = "localhost";
     } else {
         _name = url.hostname();
@@ -284,7 +286,7 @@ LocalConnection::domain(int version)
     }
 
     // If unset, pick the default. Yes, we're paranoid.
-    if (_name.size() == 0) {
+    if (_name.empty()) {
         _name =  "localhost";
     }
     

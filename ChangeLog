@@ -1,3 +1,7 @@
+2008-01-05 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/LocalConnection.{cpp,h}: allow build to complete.
+
 2008-01-04  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* server/asobj/LocalConnection.cpp: A mostly implemented

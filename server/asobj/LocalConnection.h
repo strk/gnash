@@ -41,17 +41,17 @@
 namespace gnash {
   
 #ifdef NETWORK_CONN
-class LocalConnection {
+class LocalConnection : public as_object {
 #else
-class LocalConnection : public Shm {
+class LocalConnection : public as_object, Shm {
 #endif
 
 public:
     LocalConnection();
     ~LocalConnection();
     void close(void);
-    bool connect(const char *name);
-    std::string domain(void);
+    bool connect(const std::string& name);
+    std::string domain(int version);
     void send();
 // FIXME: these should be callbacks
 //     bool        _allowDomain;
@@ -62,11 +62,13 @@ private:
     std::map<const char *, short> _allocated;
 };
 
+#if 0
 class localconnection_as_object : public as_object
 {
 public:
     LocalConnection obj;
 };
+#endif
 
 as_value localconnection_new(const fn_call& fn);
 as_value localconnection_close(const fn_call& fn);
