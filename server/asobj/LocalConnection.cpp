@@ -21,30 +21,160 @@
 #include "config.h"
 #endif
 
+#include <unistd.h>
 #include <cerrno>
+#include <cstring>
 
+#include "VM.h"
+#include "URLAccessManager.h"
+#include "URL.h"
 #include "log.h"
 #include "LocalConnection.h"
 #include "network.h"
 #include "fn_call.h"
-#include "builtin_function.h" 
+#include "builtin_function.h"
+
+using namespace std;
+using namespace amf;
+
+// http://www.osflash.org/localconnection
+//
+// Listening
+// To create a listening LocalConnection, you just have to set a thread to:
+
+//    1.register the application as a valid LocalConnection listener,
+//    2.require the mutex to have exclusive access to the shared memory,
+//    3.access the shared memory and check the recipient,
+//    4.if you are the recipient, read the message and mark it read,
+//    5.release the shared memory and the mutex,
+//    6.repeat indefinitely from step 2.
+//
+// Sending
+// To send a message to a LocalConnection apparently works like that:
+//    1. require the mutex to have exclusive access to the shared memory,
+//    2. access the shared memory and check that the listener is connected,
+//    3. if the recipient is registered, write the message,
+//    4. release the shared memory and the mutex.
+//
+// The main thing you have to care about is the timestamp - simply call GetTickCount()
+//  and the message size. If your message is correctly encoded, it should be received
+// by the listening LocalConnection 
+//
+// Some facts:
+//     * The header is 16 bytes,
+//     * The message can be up to 40k,
+//     * The listeners block starts at 40k+16 = 40976 bytes,
+//     * To add a listener, simply append its name in the listeners list (null terminated strings)
+namespace {
+gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();    
+}
 
 namespace gnash {
+
+// The maximum 
+const int LC_HEADER_SIZE = 16;
+const int MAX_LC_HEADER_SIZE = 40960;
+const int LC_LISTENERS_START  = MAX_LC_HEADER_SIZE +  LC_HEADER_SIZE;
+
+// This doesn't exist on all systems, but here's the vaue used on Unix.
+#ifndef MAXHOSTNAMELEN
+# define MAXHOSTNAMELEN 64
+#endif
 
 // \class LocalConnection
 /// \brief Open a connection between two SWF movies so they can send
 /// each other Flash Objects to be executed.
 ///
-LocalConnection::LocalConnection() {
+LocalConnection::LocalConnection()
+{
+    GNASH_REPORT_FUNCTION;
 }
 
-LocalConnection::~LocalConnection() {
+LocalConnection::~LocalConnection()
+{
+    GNASH_REPORT_FUNCTION;
+}
+
+#if 0
+Listener::Listener()
+    : _baseaddr(0)
+{
+    GNASH_REPORT_FUNCTION;
+}
+
+Listener::Listener(char *x)
+{
+    GNASH_REPORT_FUNCTION;
+    _baseaddr = x;
+}
+
+Listener::~Listener()
+{
+    GNASH_REPORT_FUNCTION;
+}
+
+bool
+Listener::addListener(std::string &name)
+{
+    GNASH_REPORT_FUNCTION;
+
+    char *addr = _baseaddr + LC_LISTENERS_START;
+    char *item = addr;
+    // Walk to the end of the list
+    while (*item != 0) {
+        item += strlen(item)+1;
+    }
+    // Add ourselves to the list
+    if (memcpy(item, name.c_str(), name.size()) == 0) {
+        return false;
+    }
+    return true;
+}
+
+bool
+Listener::removeListener(std::string &name)
+{
+    GNASH_REPORT_FUNCTION;
+
+    char *addr = _baseaddr + LC_LISTENERS_START;
+
+    char *item = addr;
+    while (*item != 0) {
+        if (name == item) {
+            int len = strlen(item) + 1;
+            while (*item != 0) {
+                strcpy(item, item + len);
+                item += len + 1;
+            }
+            return true;
+        }
+        item += strlen(item) + 1;
+    }
+    return false;
+}
+
+std::vector<std::string> *
+Listener::listListeners()
+{
+    GNASH_REPORT_FUNCTION;
+
+    char *addr = _baseaddr + LC_LISTENERS_START;
+
+    vector<string> *listeners = new vector<string>;
+    const char *item = addr;
+    while (*item != 0) {
+        listeners->push_back(item);
+        item += strlen(item) + 1;
+    }    
+
+    return listeners;
 }
 
 /// \brief Closes (disconnects) the LocalConnection object.
 void
 LocalConnection::close()
 {
+    GNASH_REPORT_FUNCTION;
 #ifndef NETWORK_CONN
     closeMem();
 #endif
@@ -59,15 +189,58 @@ LocalConnection::close()
 bool
 LocalConnection::connect(const char *name)
 {
-#ifndef NETWORK_CONN
-    if (attach(name, true) == false) {
-        return false;
-    }
-#endif
+    GNASH_REPORT_FUNCTION;
+    
     _name = name;
 
+    log_debug("trying to open shared memory segment: \"%s\"", name);
+    
+    if (Shm::attach(name, true) == false) {
+        return false;
+    }
+
+    if (Shm::getAddr() <= 0) {
+        log_error("Failed to open shared memory segment: \"%s\"", name);
+        return false; 
+    }
+    
+    Listener::setBaseAddress(Shm::getAddr());
+        
+    string str1 = "HelloWorld";
+    addListener(str1);
+    str1 = "GutenTag";
+    addListener(str1);
+    str1 = "Aloha";
+    addListener(str1);
+    
+    vector<string>::const_iterator it;
+    vector<string> *listeners = listListeners();
+    if (listeners->size() == 0) {
+        log_msg("Nobody is listening");
+    } else {
+        log_msg("There are %d", listeners->size());
+        for (it=listeners->begin(); it!=listeners->end(); it++) {
+            string str = *it;
+            log_debug("Listeners: %s", str.c_str());
+        }
+    }
+
+    delete listeners;
+    
+    str1 = "HelloWorld";
+    removeListener(str1);
+    listeners = listListeners();  
+    log_msg("There are %d", listeners->size());
+    for (it=listeners->begin(); it != listeners->end(); it++) {
+        string str = *it;
+        log_debug("Listeners: %s", str.c_str());
+    }
+    
+    delete listeners;
+    
     return true;
 }
+#endif
 
 /// \brief Returns a string representing the superdomain of the
 /// location of the current SWF file.
@@ -76,89 +249,119 @@ LocalConnection::connect(const char *name)
 /// network connection. This behaviour changed for SWF v7. Prior to v7
 /// only the domain was returned, ie dropping off node names like
 /// "www". As of v7, the behaviour is to return the full host
-/// name. Gnash defaults to the v7 behaviour.
-/// \note If this becomes a problem, we'll have to implemented the
-/// older behaviour based on the version of the flash movie being
-/// played.
+/// name. Gnash supports both behaviours based on the version.
 std::string
-LocalConnection::domain(void)
+LocalConnection::domain(int version)
 {
-    if (_name.size() == 0) {
-        return "localhost";
-    } else {
+//    GNASH_REPORT_FUNCTION;
+    // We already figured out the name
+    if (_name.size()) {
         return _name;
     }
-}
+    
+    string url_s;
+    const URL& baseurl = get_base_url();
+    URL url(url_s, baseurl);
+//    log_msg(_("BASE URL=%s (%s)"), baseurl.str().c_str(), url.hostname().c_str());
+    if (url.hostname().size() == 0) {
+        _name = "localhost";
+    } else {
+        _name = url.hostname();
+    }
 
-/// \brief Invokes a method on a specified LocalConnection object.
-void
-LocalConnection::send()
-{
-    log_unimpl (__FUNCTION__);
+    // Adjust the name based on the swf version. Prior to v7, the nodename part
+    // was removed. For v7 or later. the full hostname is returned. The localhost
+    // is always just the localhost.
+    if (version <= 6) {
+        string::size_type pos;
+        pos = _name.rfind(".", _name.size());
+        if (pos != string::npos) {
+            pos = _name.rfind(".", pos-1);
+            if (pos != string::npos) {
+                _name = _name.substr(pos+1, _name.size());
+            }
+        }
+    }
+
+    // If unset, pick the default. Yes, we're paranoid.
+    if (_name.size() == 0) {
+        _name =  "localhost";
+    }
+    
+    log_msg("The domain for this host is: %s", _name.c_str());
+
+    return _name;
 }
 
 /// \brief Instantiate a new LocalConnection object within a flash movie
 as_value
 localconnection_new(const fn_call& /* fn */)
 {
-    localconnection_as_object *localconnection_obj = new localconnection_as_object;
+//    GNASH_REPORT_FUNCTION;
+    LocalConnection *localconnection_obj = new LocalConnection;
 
     localconnection_obj->init_member("close", new builtin_function(localconnection_close));
     localconnection_obj->init_member("connect", new builtin_function(localconnection_connect));
     localconnection_obj->init_member("domain", new builtin_function(localconnection_domain));
     localconnection_obj->init_member("send", new builtin_function(localconnection_send));
-#if 0
-    // Apparently these AS methods were added for testing purposes. However,
-    // they do not appear to be part of the LocalConnection AS object.
-    localconnection_obj->init_member("getname",  new builtin_function(shm_getname));
-    localconnection_obj->init_member("getsize",  new builtin_function(shm_getsize));
-    localconnection_obj->init_member("getallocated",  new builtin_function(shm_getallocated));
-    localconnection_obj->init_member("exists",  new builtin_function(shm_exists));
-#endif
 
     return as_value(localconnection_obj);
 }
 
 /// \brief The callback for LocalConnection::close()
-as_value localconnection_close(const fn_call& fn)
+as_value
+localconnection_close(const fn_call& fn)
 {
-//    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
+    GNASH_REPORT_FUNCTION;
     
-    boost::intrusive_ptr<localconnection_as_object> ptr = ensureType<localconnection_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<LocalConnection> ptr = ensureType<LocalConnection>(fn.this_ptr);
     
-    ptr->obj.close();
+    ptr->close();
     return as_value();
 }
 
 /// \brief The callback for LocalConnection::connect()
-as_value localconnection_connect(const fn_call& fn)
+as_value
+localconnection_connect(const fn_call& fn)
 {
+    GNASH_REPORT_FUNCTION;
 //    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
     bool ret;
-    boost::intrusive_ptr<localconnection_as_object> ptr = ensureType<localconnection_as_object>(fn.this_ptr);
-    
+    boost::intrusive_ptr<LocalConnection> ptr = ensureType<LocalConnection>(fn.this_ptr);
+    string name = fn.arg(0).to_string().c_str();
     if (fn.nargs != 0) {
-        ret = ptr->obj.connect(fn.arg(0).to_string().c_str());
+        ret = ptr->connect(name);
+        name = "localhost";
     } else {
         log_error(_("No connection name specified to LocalConnection.connect()"));
-        ret = ptr->obj.connect("localhost"); // FIXME: This should probably
+        ret = ptr->connect(name); // FIXME: This should probably
                                        // fail instead
     }
     return as_value(ret);
 }
 
 /// \brief The callback for LocalConnection::domain()
-as_value localconnection_domain(const fn_call& fn)
+as_value
+localconnection_domain(const fn_call& fn)
 {
-//    log_msg("%s:\n", __PRETTY_FUNCTION__);
-    boost::intrusive_ptr<localconnection_as_object> ptr = ensureType<localconnection_as_object>(fn.this_ptr);
-    return as_value(ptr->obj.domain().c_str());
+    GNASH_REPORT_FUNCTION;
+    boost::intrusive_ptr<LocalConnection> ptr = ensureType<LocalConnection>(fn.this_ptr);
+    VM& vm = ptr->getVM();
+    int swfVersion = vm.getSWFVersion();
+
+    return as_value(ptr->domain(swfVersion).c_str());
 }
 
 // \brief The callback for LocalConnection::send()
-as_value localconnection_send(const fn_call& /*fn*/)
+as_value
+localconnection_send(const fn_call& fn)
 {
-    log_unimpl (__FUNCTION__);
+    boost::intrusive_ptr<LocalConnection> obj = ensureType<LocalConnection>(fn.this_ptr);
+    if (rcfile.getLocalConnection() ) {
+        log_security("Attempting to write to disabled LocalConnection!");
+        return as_value(false);
+    }
+    
     return as_value();
 }
 

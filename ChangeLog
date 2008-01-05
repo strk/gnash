@@ -1,5 +1,8 @@
 2008-01-04  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* server/asobj/LocalConnection.cpp: A mostly implemented
+	LocalConnection class.
+	
 	* testsuite/actionscript.all/SharedObject.as: Use a multi level
 	path.
 	* testsuite/actionscript.all/NetConnection.as: Use check.a
