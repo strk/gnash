@@ -24,6 +24,7 @@
 #include <unistd.h>
 #include <cerrno>
 #include <cstring>
+#include <boost/cstdint.hpp> // for boost::?int??_t
 
 #include "VM.h"
 #include "URLAccessManager.h"
@@ -34,6 +35,7 @@
 #include "fn_call.h"
 #include "builtin_function.h"
 #include "amf.h"
+#include "lcshm.h"
 
 using namespace std;
 using namespace amf;
@@ -96,14 +98,13 @@ LocalConnection::~LocalConnection()
     GNASH_REPORT_FUNCTION;
 }
 
-#if 0 // {
 Listener::Listener()
     : _baseaddr(0)
 {
     GNASH_REPORT_FUNCTION;
 }
 
-Listener::Listener(char *x)
+Listener::Listener(boost::uint8_t *x)
 {
     GNASH_REPORT_FUNCTION;
     _baseaddr = x;
@@ -119,11 +120,11 @@ Listener::addListener(std::string &name)
 {
     GNASH_REPORT_FUNCTION;
 
-    char *addr = _baseaddr + LC_LISTENERS_START;
-    char *item = addr;
+    boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
+    boost::uint8_t *item = addr;
     // Walk to the end of the list
     while (*item != 0) {
-        item += strlen(item)+1;
+        item += strlen(reinterpret_cast<char *>(item))+1;
     }
     // Add ourselves to the list
     if (memcpy(item, name.c_str(), name.size()) == 0) {
@@ -137,19 +138,18 @@ Listener::removeListener(std::string &name)
 {
     GNASH_REPORT_FUNCTION;
 
-    char *addr = _baseaddr + LC_LISTENERS_START;
-
-    char *item = addr;
+    boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
+    boost::uint8_t *item = addr;
     while (*item != 0) {
-        if (name == item) {
-            int len = strlen(item) + 1;
+        if (name.c_str() == reinterpret_cast<char *>(item)) {
+            int len = strlen(reinterpret_cast<char *>(item)) + 1;
             while (*item != 0) {
-                strcpy(item, item + len);
+                memcpy(item, item + len, len);
                 item += len + 1;
             }
             return true;
         }
-        item += strlen(item) + 1;
+        item += strlen(reinterpret_cast<char *>(item)) + 1;
     }
     return false;
 }
@@ -159,10 +159,10 @@ Listener::listListeners()
 {
     GNASH_REPORT_FUNCTION;
 
-    char *addr = _baseaddr + LC_LISTENERS_START;
+    boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
 
     vector<string> *listeners = new vector<string>;
-    const char *item = addr;
+    const char *item = reinterpret_cast<char *>(addr);
     while (*item != 0) {
         listeners->push_back(item);
         item += strlen(item) + 1;
@@ -170,7 +170,6 @@ Listener::listListeners()
 
     return listeners;
 }
-#endif // }
 
 /// \brief Closes (disconnects) the LocalConnection object.
 void

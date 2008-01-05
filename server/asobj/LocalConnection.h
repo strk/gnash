@@ -15,10 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-//
-
 #ifndef __LOCALCONNECTION_H__
 #define __LOCALCONNECTION_H__
 
@@ -28,24 +24,15 @@
 
 #include <string>
 #include <map>
+#include <boost/cstdint.hpp> // for boost::?int??_t
 
 #include "as_object.h" // for inheritance
 #include "fn_call.h"
-
-#ifdef NETWORK_CONN
-#include "network.h"
-#else
 #include "shm.h"
-#endif
 
 namespace gnash {
   
-#ifdef NETWORK_CONN
-class LocalConnection : public as_object {
-#else
 class LocalConnection : public as_object, Shm {
-#endif
-
 public:
     LocalConnection();
     ~LocalConnection();
