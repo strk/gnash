@@ -1,5 +1,11 @@
 2008-01-05 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/ClassHierarchy.cpp: make NetConnection available
+	  starting at SWF6.
+	* testsuite/actionscript.all/NetConnection.as: fix testcase.
+
+2008-01-05 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/DummyMovieDefinition.h: set a fake url for the dummy
 	  definition, or VM initialization would abort.
 	* server/asobj/LocalConnection.{cpp,h}: allow build to complete.

@@ -20,14 +20,16 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
+rcsid="$Id: NetConnection.as,v 1.15 2008/01/05 10:01:42 strk Exp $";
+
 #include "check.as"
-#include "dejagnu.as"
 
-// #if OUTPUT_VERSION < 7
+#if OUTPUT_VERSION < 6
 
-// // check_equals(NetConnection, undefined);
+check_equals(NetConnection, undefined);
+check_totals(1);
 
-// #else // OUTPUT_VERSION >= 7
+#else // OUTPUT_VERSION >= 7
 
 check_equals(typeof(NetConnection), 'function');
 check_equals(typeof(NetConnection.prototype), 'object');
@@ -55,6 +57,6 @@ else
 	pass("NetConnection::connect() initialized correctly");
 }
 
+check_totals(10);
 
-//#endif // OUTPUT_VERSION >= 7
-totals();
+#endif // OUTPUT_VERSION >= 7
