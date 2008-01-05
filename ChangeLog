@@ -1,5 +1,14 @@
 2008-01-04 Sandro Santilli <strk@keybit.net>
 
+	* server/URLAccessManager.cpp (local_check): don't use base url
+	  (-U) to tell apart local movies from remote ones, as base url
+	  is web-author-forgeable ('base' attribute).
+	  Use non web-author-forgeable virtual url of starting movie
+	  instead (-u).
+	  Skip the "forbid load of local resources by network movie"
+	  check if no starting movie exists yet (to allow loading a local
+	  file pretending it was a remote one).
+	  Should fix bug #21930 and allow more flexibility.
 	* Makefile.am: install plugins under /tmp/ during 'distcheck'.
 	  (we can do something a bit smarter, but it's a start).
 	* doc/C/usermanual/installation/custompath_configuration.xml:

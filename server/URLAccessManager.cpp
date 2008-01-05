@@ -23,7 +23,8 @@
 #include "URL.h"
 #include "log.h"
 #include "StringPredicates.h" // for case-insensitive host match
-#include "gnash.h" // for get_base_url
+//#include "gnash.h" // for get_base_url
+#include "VM.h" // for getRoot().getRootMovie()
 
 #include "rc.h" // for rcfile
 #include <cerrno> // for errno :)
@@ -220,15 +221,20 @@ local_check(const std::string& path)
 
     assert( ! path.empty() );
 
-    // Don't allow local access if base url is a network resource
-    // TODO: let user override this behaviour using the .gnashrc file
-    const URL& baseUrl = get_base_url();
-    if ( baseUrl.protocol() != "file" )
+    // Don't allow local access if starting movie is a network resource.
+    if ( VM::isInitialized() )
     {
-        log_security("Load of file %s forbidden (base url %s is not a local resource).",
-           path.c_str(), baseUrl.str().c_str());
-        return false;
-    }
+       sprite_instance* startingMovie = VM::get().getRoot().getRootMovie();
+       assert(startingMovie); // or VM would not be initialized (currently)
+       const URL& baseUrl = startingMovie->get_movie_definition()->get_url(); // get_base_url();
+       if ( baseUrl.protocol() != "file" )
+       {
+          log_security("Load of file %s forbidden"
+              " (starting url %s is not a local resource).",
+              path.c_str(), baseUrl.str().c_str());
+          return false;
+       }
+    } // else we didn't start yet, so path *is* the starting movie
 
     RcInitFile& rcfile = RcInitFile::getDefaultInstance();
     
