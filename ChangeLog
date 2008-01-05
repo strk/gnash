@@ -1,3 +1,7 @@
+2008-01-04  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libamf/sol.cpp: Properly caluculate the filesize.
+
 2008-01-04 Sandro Santilli <strk@keybit.net>
 
 	* plugin/Makefile.am: drop useless install/uninstall rules,

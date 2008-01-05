@@ -75,7 +75,7 @@ SOL::~SOL()
     vector<amf::Element *>::iterator it;
     for (it = _amfobjs.begin(); it != _amfobjs.end(); it++) {
 	amf::Element *el = (*(it));
-	delete el;
+//	delete el;
     }
 }
 
@@ -217,16 +217,22 @@ SOL::writeFile(string &filespec, string &name)
     vector<amf::Element *>::iterator ita; 
     AMF amf_obj;
     char *ptr;
-
+    int size = 0;
     
     if (filespec.size() == 0) {
 	return false;
     }
+
+    for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
+        amf::Element *el = (*(ita));
+	size += el->getName().size() + el->getLength() + 5;
+    }
+    _filesize = size;
     
-    char *body = new char[_filesize + 16];
-    memset(body, 0, _filesize);
+    char *body = new char[size + 20];
+    memset(body, 0, size);
     ptr = body;
-    
+
     for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
         amf::Element *el = (*(ita));
         int outsize = el->getName().size() + el->getLength() + 5;
