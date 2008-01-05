@@ -282,7 +282,7 @@ main (int /*argc*/, char** /*argv*/) {
         runtest.fail ("getSOLSafeDir");
     }
 
-    if (rc.getSOLReadOnly() == false) {
+    if (rc.getSOLReadOnly() == true) {
         runtest.pass ("getSOLReadOnly");
     } else {
         runtest.fail ("getSOLReadOnly");
