@@ -1547,7 +1547,8 @@ as_value::CharacterProxy::checkDangling() const
 	if ( _ptr && _ptr->isDestroyed() ) 
 	{
 		_tgt = _ptr->getOrigTarget();
-		log_debug("char %s was destroyed, stored it's orig target (%s) for later rebinding", _ptr->getTarget().c_str(), _tgt.c_str());
+		log_debug("char %s (%s) was destroyed, stored it's orig target (%s) for later rebinding", _ptr->getTarget().c_str(),
+			typeName(*_ptr).c_str(), _tgt.c_str());
 		_ptr = 0;
 	}
 }
