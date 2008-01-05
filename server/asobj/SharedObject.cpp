@@ -281,10 +281,7 @@ sharedobject_getlocal(const fn_call& fn)
     // by the 'base' attribute of OBJECT or EMBED tags trough
     // -P base=xxx
     //
-    movie_root& mroot = obj->getVM().getRoot();
-    sprite_instance* origMovie = mroot.getRootMovie();
-    movie_definition* origMovieDef = origMovie->get_movie_definition();
-    const string origURL = origMovieDef->get_url();
+    const string& origURL = obj->getVM().getSWFUrl(); 
     
     URL url(origURL);
 //  log_debug(_("BASE URL=%s (%s)"), url.str().c_str(), url.hostname().c_str());

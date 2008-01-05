@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: VM.cpp,v 1.28 2007/12/12 18:19:27 bwy Exp $ */
+/* $Id: VM.cpp,v 1.29 2008/01/05 02:26:19 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -85,12 +85,14 @@ VM::VM(movie_definition& topmovie, VirtualClock& clock)
 	:
 	_root_movie(new movie_root()),
 	_swfversion(topmovie.get_version()),
+	_swfurl(topmovie.get_url()),
 	_start_time(tu_timer::get_ticks()),
 	mClassHierarchy(0),
 	mMachine(0),
 	_clock(clock)
 {
 	_clock.restart();
+	assert(!_swfurl.empty());
 }
 
 VM::~VM()
@@ -114,6 +116,12 @@ int
 VM::getSWFVersion() const
 {
 	return _swfversion;
+}
+
+const std::string&
+VM::getSWFUrl() const
+{
+	return _swfurl;
 }
 
 VM::RNG&

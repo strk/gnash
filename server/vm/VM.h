@@ -123,6 +123,9 @@ private:
 	/// Target SWF version
 	int _swfversion;
 
+	/// Originating URL 
+	std::string _swfurl;
+
 	/// Time when the VM get started
 	boost::uint64_t _start_time;
 
@@ -192,6 +195,12 @@ public:
 	/// This information will drive operations of the virtual machine
 	///
 	int getSWFVersion() const;
+
+	/// Get URL of the SWF movie used to initialize this VM
+	//
+	/// This information will be used for security checks
+	///
+	const std::string& getSWFUrl() const;
 
 	/// Get the number of milliseconds since VM was started
 	unsigned long int getTime() const;

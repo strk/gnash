@@ -224,9 +224,7 @@ local_check(const std::string& path)
     // Don't allow local access if starting movie is a network resource.
     if ( VM::isInitialized() )
     {
-       sprite_instance* startingMovie = VM::get().getRoot().getRootMovie();
-       assert(startingMovie); // or VM would not be initialized (currently)
-       const URL& baseUrl = startingMovie->get_movie_definition()->get_url(); // get_base_url();
+       URL baseUrl(VM::get().getSWFUrl());
        if ( baseUrl.protocol() != "file" )
        {
           log_security("Load of file %s forbidden"

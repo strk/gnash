@@ -1,3 +1,13 @@
+2008-01-05 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/VM.{cpp,h}: add getSWFUrl() method to fetch
+	  url of originating movie in a reliable way.
+	* server/URLAccessManager.cpp (local_check): don't assume
+	  the movie_root always has an instance of originating if
+	  the VM is initialized (fixes a race condition).
+	* server/asobj/SharedObject.cpp: use the new VM::getSWFUrl() method
+	  to figure out domain for .sol files (simplifies the code).
+
 2008-01-04  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* libamf/sol.cpp: Properly caluculate the filesize.
