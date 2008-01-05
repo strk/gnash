@@ -1,5 +1,8 @@
 2008-01-05  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* po/Makefile.am: Make the dircetories before trying to install in
+	them.
+	
 	* testsuite/libamf.all/test_lc.cpp: New test for LocalConnection
 	base class.
 	

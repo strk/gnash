@@ -86,11 +86,11 @@ endif # not HAS_GETTEXT
 
 force:
 
-# install-hook: rename the es.gmo files to gnash.mo at installtion time
+# install-hook: rename the .gmo files to gnash.mo at installation time
 install-data-hook: $(gmofiles)
 	@for i in $(translations); do \
-	  $(mkinstalldirs) "$(DESTDIR)$(datadir)/locale/$$i"; \
+	  $(mkinstalldirs) "$(DESTDIR)$(datadir)/locale/$$i/LC_MESSAGES/"; \
 	  if test -f $$i.gmo; then \
-	    $(INSTALL_DATA) $$i.gmo $(DESTDIR)$(datadir)/locale/$$i/gnash.mo; \
+	    $(INSTALL_DATA) $$i.gmo $(DESTDIR)$(datadir)/locale/$$i/LC_MESSAGES/gnash.mo; \
 	  fi; \
 	done
