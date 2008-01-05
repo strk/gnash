@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.40 2008/01/05 00:37:42 strk Exp $
+# $Id: Makefile.am,v 1.41 2008/01/05 01:04:11 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -60,20 +60,18 @@ klash_part.moc: $(srcdir)/klash_part.h
 	  ln -s $(srcdir)/klash_part.moc.in klash_part.moc; \
 	fi
 
-install-data: $(dist_kde_services_DATA)
-	test -d $(DESTDIR)$(kde_servicesdir) || $(mkinstalldirs) $(DESTDIR)$(kde_servicesdir)
-	$(INSTALL) $(dist_kde_services_DATA) $(DESTDIR)$(kde_servicesdir)
-
-install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-	test -d $(DESTDIR)$(plugindir) || $(mkinstalldirs) $(DESTDIR)$(plugindir)
-#	cp .libs/libklashpart.so $(DESTDIR)$(plugindir)/libklashpart.so
-	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(plugin_LTLIBRARIES) $(DESTDIR)$(plugindir)
-#	$(RM) libklashpart.*a $(DESTDIR)$(plugindir)/libklashpart.so.0
-
-uninstall-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.so
-	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.la
-	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.a
+# install-data: $(dist_kde_services_DATA)
+# 	test -d $(DESTDIR)$(kde_servicesdir) || $(mkinstalldirs) $(DESTDIR)$(kde_servicesdir)
+# 	$(INSTALL) $(dist_kde_services_DATA) $(DESTDIR)$(kde_servicesdir)
+# 
+# install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
+# 	test -d $(DESTDIR)$(plugindir) || $(mkinstalldirs) $(DESTDIR)$(plugindir)
+# 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(plugin_LTLIBRARIES) $(DESTDIR)$(plugindir)
+# 
+# uninstall-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
+# 	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.so
+# 	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.la
+# 	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.a
 
 endif
 
