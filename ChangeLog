@@ -1,3 +1,9 @@
+2008-01-05 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+        * gui/gui.cpp: add messages for unimplemented fullscreen.
+        * gui/gtk.cpp: cleanup, comment out tree display (we don't need two
+          of the same thing for the release).
+
 2008-01-05 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/TextField.as: check that a textfield

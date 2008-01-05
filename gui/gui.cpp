@@ -126,7 +126,8 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
     _depth(depth),
     _interval(0),
     _renderer(NULL),
-    _redraw_flag(true)
+    _redraw_flag(true),
+    _fullscreen(false)
 #ifdef GNASH_FPS_DEBUG
     ,fps_counter(0)    
     ,fps_counter_total(0)    
@@ -161,11 +162,13 @@ Gui::~Gui()
 void
 Gui::setFullscreen()
 {
+    log_unimpl("Fullscreen not yet supported in this GUI");
 }
 
 void
 Gui::unsetFullscreen()
 {
+    log_unimpl("Fullscreen not yet supported in this GUI");
 }
 
 void
@@ -178,7 +181,6 @@ Gui::toggleFullscreen()
 		setFullscreen();
 	} 
 }
-
 
 void
 Gui::menu_restart()
@@ -397,13 +399,13 @@ Gui::notify_mouse_clicked(bool mouse_pressed, int mask)
 void
 Gui::refreshView()
 {
-	movie_root* m = _stage;
+    movie_root* m = _stage;
 
     if ( ! _started ) return;
 
-	assert(m);
-	_redraw_flag=true;
-	display(m);
+    assert(m);
+    _redraw_flag=true;
+    display(m);
 }
 
 
@@ -972,4 +974,3 @@ Gui::setStage(movie_root* stage)
 
 // end of namespace
 }
-

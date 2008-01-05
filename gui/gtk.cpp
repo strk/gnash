@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.126 2008/01/03 15:46:58 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.127 2008/01/05 16:22:37 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -108,16 +108,16 @@ GtkGui::init(int argc, char **argv[])
     add_pixmap_directory (PKGDATADIR);
 
     if (_xid) {
-      _window = gtk_plug_new(_xid);
-      log_msg (_("Created XEmbedded window"));
+        _window = gtk_plug_new(_xid);
+        log_msg (_("Created XEmbedded window"));
     } else {
 #ifdef GUI_HILDON
-      _window = hildon_window_new();
-      hildon_program_add_window(_hildon_program, HILDON_WINDOW(_window));
+        _window = hildon_window_new();
+        hildon_program_add_window(_hildon_program, HILDON_WINDOW(_window));
 #else
-      _window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+        _window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 #endif
-      log_msg (_("Created top level window"));
+        log_msg (_("Created top level window"));
     }
     
     // XXXbjacques: why do we need this?
@@ -240,11 +240,11 @@ GtkGui::createMenu()
                          G_CALLBACK(&menuitem_sound_callback), this);
     }
 
-        GtkMenuItem *menuitem_fsc =
-            GTK_MENU_ITEM(gtk_menu_item_new_with_label("Toggle Fullscreen"));
-        gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_fsc));
-        gtk_widget_show(GTK_WIDGET(menuitem_fsc));
-        g_signal_connect(GTK_OBJECT(menuitem_fsc), "activate",
+    GtkMenuItem *menuitem_fsc =
+        GTK_MENU_ITEM(gtk_menu_item_new_with_label("Toggle Fullscreen"));
+    gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_fsc));
+    gtk_widget_show(GTK_WIDGET(menuitem_fsc));
+    g_signal_connect(GTK_OBJECT(menuitem_fsc), "activate",
                          G_CALLBACK(&menuitem_fullscreen_callback), this);
 
     GtkMenuItem *menuitem_quit =
@@ -273,13 +273,13 @@ GtkGui::createWindow(const char *title, int width, int height)
 
     if (!_xid) {
     
-      // This sets the *minimum* size for the drawing area and thus will
-      // also resize the window. 
-      // Advantage: The window is sized correctly, no matter what other
-      // widgets are visible
-      // Disadvantage: The window cannot be shrinked, which is bad.   
+       // This sets the *minimum* size for the drawing area and thus will
+       // also resize the window. 
+       // Advantage: The window is sized correctly, no matter what other
+       // widgets are visible
+       // Disadvantage: The window cannot be shrinked, which is bad.   
     
-      gtk_widget_set_size_request(_drawing_area, width, height);
+        gtk_widget_set_size_request(_drawing_area, width, height);
     }
 
     return ret;
@@ -461,13 +461,13 @@ GtkGui::addFDListener(int fd, callback_t callback, void* data)
     GIOChannel* gio_read = g_io_channel_unix_new(fd);
     
     if (!gio_read) {
-      return false;
+        return false;
     }
     
     if (!g_io_add_watch (gio_read, GIOCondition(G_IO_IN | G_IO_HUP),
                          GIOFunc (callback), data)) {
-      g_io_channel_unref(gio_read);
-      return false;    
+        g_io_channel_unref(gio_read);
+        return false;    
     }
     
     return true;    
@@ -501,7 +501,6 @@ GtkGui::setFullscreen()
 void
 GtkGui::unsetFullscreen()
 {
-
     if (!_fullscreen) return;
     
     // Plugin
@@ -944,37 +943,37 @@ GtkGui::setupEvents()
 {
   //GNASH_REPORT_FUNCTION;
 
-  g_signal_connect(G_OBJECT(_window), "delete_event",
+    g_signal_connect(G_OBJECT(_window), "delete_event",
                    G_CALLBACK(delete_event), this);
-  g_signal_connect(G_OBJECT(_window), "key_press_event",
+    g_signal_connect(G_OBJECT(_window), "key_press_event",
                    G_CALLBACK(key_press_event), this);
-  g_signal_connect(G_OBJECT(_window), "key_release_event",
+    g_signal_connect(G_OBJECT(_window), "key_release_event",
                    G_CALLBACK(key_release_event), this);
 
-   gtk_widget_add_events(_drawing_area, GDK_EXPOSURE_MASK
+    gtk_widget_add_events(_drawing_area, GDK_EXPOSURE_MASK
                         | GDK_BUTTON_PRESS_MASK
                         | GDK_BUTTON_RELEASE_MASK
                         | GDK_KEY_RELEASE_MASK
                         | GDK_KEY_PRESS_MASK        
                         | GDK_POINTER_MOTION_MASK);
   
-   g_signal_connect_swapped(G_OBJECT(_drawing_area),
+    g_signal_connect_swapped(G_OBJECT(_drawing_area),
                             "button_press_event",
                             G_CALLBACK(popup_handler),
                             GTK_OBJECT(_popup_menu));
   
-  g_signal_connect(G_OBJECT(_drawing_area), "button_press_event",
+    g_signal_connect(G_OBJECT(_drawing_area), "button_press_event",
                    G_CALLBACK(button_press_event), this);
-  g_signal_connect(G_OBJECT(_drawing_area), "button_release_event",
+    g_signal_connect(G_OBJECT(_drawing_area), "button_release_event",
                    G_CALLBACK(button_release_event), this);
-  g_signal_connect(G_OBJECT(_drawing_area), "motion_notify_event",
+    g_signal_connect(G_OBJECT(_drawing_area), "motion_notify_event",
                    G_CALLBACK(motion_notify_event), this);
   
-  g_signal_connect_after(G_OBJECT (_drawing_area), "realize",
+    g_signal_connect_after(G_OBJECT (_drawing_area), "realize",
                          G_CALLBACK (realize_event), NULL);
-  g_signal_connect(G_OBJECT (_drawing_area), "configure_event",
+    g_signal_connect(G_OBJECT (_drawing_area), "configure_event",
                    G_CALLBACK (configure_event), this);
-   g_signal_connect(G_OBJECT (_drawing_area), "expose_event",
+    g_signal_connect(G_OBJECT (_drawing_area), "expose_event",
                     G_CALLBACK (expose_event), this);
 //   g_signal_connect(G_OBJECT (_drawing_area), "unrealize",
 //                           G_CALLBACK (unrealize_event), NULL);
@@ -1093,180 +1092,182 @@ GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 
     if ( ! infoptr.get() )
     {
-            label = gtk_label_new (_("VM not initialized yet"));
-            gtk_widget_show (label);
-            gtk_table_attach_defaults (GTK_TABLE (table1), label, 0, 1, 0, 1);
-            return;
+        label = gtk_label_new (_("VM not initialized yet"));
+        gtk_widget_show (label);
+        gtk_table_attach_defaults (GTK_TABLE (table1), label, 0, 1, 0, 1);
+        return;
     }
 
     else {
 
+#if 1
             // Table display
             // This left in while tree information isn't selectable
 
-            InfoTree& info = *infoptr;
+        InfoTree& info = *infoptr;
 
-            size_t size = info.size();
+        size_t size = info.size();
 
-            for (InfoTree::leaf_iterator i=info.begin_leaf(), e=info.end_leaf();
+        for (InfoTree::leaf_iterator i=info.begin_leaf(), e=info.end_leaf();
                  i!=e; ++i)
-            {
-                StringPair& p = *i;
-                guint up = size;
-                guint bot = size-1;
+        {
+            StringPair& p = *i;
+            guint up = size;
+            guint bot = size-1;
 
-                GtkWidget *label_table11 = gtk_label_new(p.first.c_str());
-                gtk_table_attach (GTK_TABLE (table1), label_table11, 0, 1, bot, up,
+            GtkWidget *label_table11 = gtk_label_new(p.first.c_str());
+            gtk_table_attach (GTK_TABLE (table1), label_table11, 0, 1, bot, up,
+                         (GtkAttachOptions) (GTK_FILL),
+                         (GtkAttachOptions) (0), 0, 0);
+            gtk_misc_set_alignment (GTK_MISC (label_table11), 0.0, 1.0);
+            gtk_widget_show (label_table11);
+
+            GtkWidget *label_table12 = gtk_label_new(p.second.c_str());
+            gtk_table_attach (GTK_TABLE (table1), label_table12, 1, 2, bot, up,
                              (GtkAttachOptions) (GTK_FILL),
                              (GtkAttachOptions) (0), 0, 0);
-                gtk_misc_set_alignment (GTK_MISC (label_table11), 0.0, 1.0);
-                gtk_widget_show (label_table11);
+            gtk_label_set_selectable (GTK_LABEL (label_table12), TRUE);
+            gtk_widget_show (label_table12);
 
-                GtkWidget *label_table12 = gtk_label_new(p.second.c_str());
-                gtk_table_attach (GTK_TABLE (table1), label_table12, 1, 2, bot, up,
-                                 (GtkAttachOptions) (GTK_FILL),
-                                 (GtkAttachOptions) (0), 0, 0);
-                gtk_label_set_selectable (GTK_LABEL (label_table12), TRUE);
-                gtk_widget_show (label_table12);
+            --size;
+        }
 
-                --size;
-            }
+#else
+        // Tree display
+        // Should replace table display when proper
+        // InfoTrees are available 
 
-            // Tree display
-            // Should replace table display when proper
-            // InfoTrees are available 
+        enum
+        {
+            NODENAME_COLUMN = 0,
+            STRING1_COLUMN,
+            STRING2_COLUMN,
+            COMMENT_COLUMN,
+            NUM_COLUMNS
+        };
 
-            enum
-            {
-                NODENAME_COLUMN = 0,
-                STRING1_COLUMN,
-                STRING2_COLUMN,
-                COMMENT_COLUMN,
-                NUM_COLUMNS
-            };
+        GtkTreeModel *model = makeTreeModel(infoptr);
 
-            GtkTreeModel *model = makeTreeModel(infoptr);
+        GtkWidget *treeview = gtk_tree_view_new_with_model (model);
 
-            GtkWidget *treeview = gtk_tree_view_new_with_model (model);
+        g_object_unref (model);
 
-            g_object_unref (model);
+        gint col_offset;
+        GtkCellRenderer *renderer;
+        GtkTreeViewColumn *column;
 
-            gint col_offset;
-            GtkCellRenderer *renderer;
-            GtkTreeViewColumn *column;
+        //Add columns:
+        //First column:
+        renderer = gtk_cell_renderer_text_new ();
+        g_object_set (renderer, "xalign", 0.0, NULL);
+        col_offset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
+       						       -1, _("Depth"),
+						       renderer, "text",
+						       NODENAME_COLUMN,
+						       NULL);
+        column = gtk_tree_view_get_column (GTK_TREE_VIEW(treeview), col_offset - 1);
 
-            //Add columns:
-            //First column:
-            renderer = gtk_cell_renderer_text_new ();
-            g_object_set (renderer, "xalign", 0.0, NULL);
-            col_offset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
-	       						       -1, _("Depth"),
-							       renderer, "text",
-							       NODENAME_COLUMN,
-							       NULL);
-            column = gtk_tree_view_get_column (GTK_TREE_VIEW(treeview), col_offset - 1);
+        //Second column:
 
-            //Second column:
+        renderer = gtk_cell_renderer_text_new ();
+        g_object_set (renderer, "xalign", 0.0, NULL);
+        col_offset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
+						       -1, _("Variable"),
+						       renderer, "text",
+						       STRING1_COLUMN,
+						       NULL);
+        column = gtk_tree_view_get_column (GTK_TREE_VIEW (treeview), col_offset - 1);
 
-            renderer = gtk_cell_renderer_text_new ();
-            g_object_set (renderer, "xalign", 0.0, NULL);
-            col_offset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
-							       -1, _("Variable"),
-							       renderer, "text",
-							       STRING1_COLUMN,
-							       NULL);
-            column = gtk_tree_view_get_column (GTK_TREE_VIEW (treeview), col_offset - 1);
+        //Third column:
 
-            //Third column:
+        renderer = gtk_cell_renderer_text_new ();
+        g_object_set (renderer, "xalign", 0.0, NULL);
+        col_offset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
+						       -1, _("Value"),
+						       renderer, "text",
+						       STRING2_COLUMN,
+						       NULL);
+        column = gtk_tree_view_get_column (GTK_TREE_VIEW (treeview), col_offset - 1);
 
-            renderer = gtk_cell_renderer_text_new ();
-            g_object_set (renderer, "xalign", 0.0, NULL);
-            col_offset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
-							       -1, _("Value"),
-							       renderer, "text",
-							       STRING2_COLUMN,
-							       NULL);
-            column = gtk_tree_view_get_column (GTK_TREE_VIEW (treeview), col_offset - 1);
+        //Add tree to scrollwindow.
+        gtk_container_add (GTK_CONTAINER (scrollwindow1), treeview);
 
-            //Add tree to scrollwindow.
-            gtk_container_add (GTK_CONTAINER (scrollwindow1), treeview);
-
-            }
+#endif
+    }
 
     GtkWidget *bbox1 = gtk_hbutton_box_new ();
     gtk_box_pack_start (
 	GTK_BOX (main_vbox), bbox1, FALSE, FALSE, 0);
 
 
-     GtkWidget *button_ok = gtk_button_new_from_stock (GTK_STOCK_OK);
-     gtk_box_pack_end (GTK_BOX (bbox1), button_ok, FALSE, FALSE, 0);
-     g_signal_connect_swapped (button_ok, "clicked",
+    GtkWidget *button_ok = gtk_button_new_from_stock (GTK_STOCK_OK);
+    gtk_box_pack_end (GTK_BOX (bbox1), button_ok, FALSE, FALSE, 0);
+    g_signal_connect_swapped (button_ok, "clicked",
              G_CALLBACK(gtk_widget_destroy), window1);
 
-     gtk_widget_show_all (window1);
+    gtk_widget_show_all (window1);
 
 }
 
 
 GtkTreeModel*
 GtkGui::makeTreeModel (std::auto_ptr<InfoTree> treepointer)
-
 {
 
-     InfoTree& info = *treepointer;
+    InfoTree& info = *treepointer;
 
-     enum
-     {
-       NODENAME_COLUMN = 0,
-       STRING1_COLUMN,
-       STRING2_COLUMN,
-       NUM_COLUMNS
-     };
+    enum
+    {
+        NODENAME_COLUMN = 0,
+        STRING1_COLUMN,
+        STRING2_COLUMN,
+        NUM_COLUMNS
+    };
     
-     GtkTreeStore *model = gtk_tree_store_new (NUM_COLUMNS,
-                          G_TYPE_STRING,
-                          G_TYPE_STRING,
-                          G_TYPE_STRING);
+    GtkTreeStore *model = gtk_tree_store_new (NUM_COLUMNS,
+                         G_TYPE_STRING,
+                         G_TYPE_STRING,
+                         G_TYPE_STRING);
     
-     GtkTreeIter iter;
-     GtkTreeIter child_iter;
-     GtkTreeIter parent_iter;
+    GtkTreeIter iter;
+    GtkTreeIter child_iter;
+    GtkTreeIter parent_iter;
 
-     int depth = 0;                    // Depth within the gtk tree.    
+    int depth = 0;                    // Depth within the gtk tree.    
 
-     for (InfoTree::iterator i=info.begin_leaf(), e=info.end_leaf(); i!=e; ++i)
-     {
-          StringPair& p = *i;
+    for (InfoTree::iterator i=info.begin_leaf(), e=info.end_leaf(); i!=e; ++i)
+    {
+         StringPair& p = *i;
 
-          int infotreedepth = info.depth(i);  
-          char buf[8];
-          sprintf(buf, "%d", infotreedepth);
-          buf[7] = '\0';                     
+         int infotreedepth = info.depth(i);  
+         char buf[8];
+         sprintf(buf, "%d", infotreedepth);
+         buf[7] = '\0';                     
 
-          if (info.depth(i) > depth) {          // Align Gtk tree depth.
-               depth++;                   
-               iter=child_iter;                  
-          }
+         if (info.depth(i) > depth) {          // Align Gtk tree depth.
+              depth++;                   
+              iter=child_iter;                  
+         }
 
-          if (info.depth(i) < depth) {        // Align Gtk tree depth.
-               depth = info.depth(i);
-               gtk_tree_model_iter_parent (GTK_TREE_MODEL(model), &parent_iter, &iter);  // Get parent iter.
-               iter = parent_iter;
-          }
+         if (info.depth(i) < depth) {        // Align Gtk tree depth.
+              depth = info.depth(i);
+              gtk_tree_model_iter_parent (GTK_TREE_MODEL(model), &parent_iter, &iter);  // Get parent iter.
+              iter = parent_iter;
+         }
 
-          //Read in data from present node
-          if (depth == 0) gtk_tree_store_append (model, &child_iter, NULL);
-          else gtk_tree_store_append (model, &child_iter, &iter);
+         //Read in data from present node
+         if (depth == 0) gtk_tree_store_append (model, &child_iter, NULL);
+         else gtk_tree_store_append (model, &child_iter, &iter);
 
-          gtk_tree_store_set (model, &child_iter,
-                            NODENAME_COLUMN, buf,   //infotree
-                            STRING1_COLUMN, p.first.c_str(),     //infotree
-    		            STRING2_COLUMN, p.second.c_str(),     //infotree
-			    -1);
+         gtk_tree_store_set (model, &child_iter,
+                           NODENAME_COLUMN, buf,   //infotree
+                           STRING1_COLUMN, p.first.c_str(),     //infotree
+    		           STRING2_COLUMN, p.second.c_str(),     //infotree
+			   -1);
 
-     }
+    }
 
-     return GTK_TREE_MODEL(model);
+    return GTK_TREE_MODEL(model);
 
 }
 
@@ -1413,15 +1414,14 @@ GtkGui::expose_event(GtkWidget *const /*widget*/,
 {
 //	GNASH_REPORT_FUNCTION;
 
-	GtkGui* gui = static_cast<GtkGui*>(data);
+    GtkGui* gui = static_cast<GtkGui*>(data);
 
-
-	int xmin = event->area.x, xmax = event->area.x + event->area.width,
-	    ymin = event->area.y, ymax = event->area.y + event->area.height;
+    int xmin = event->area.x, xmax = event->area.x + event->area.width,
+    ymin = event->area.y, ymax = event->area.y + event->area.height;
           
-  gui->rerenderPixels(xmin, ymin, xmax, ymax);
+    gui->rerenderPixels(xmin, ymin, xmax, ymax);
 
-	return TRUE;
+    return TRUE;
 }
 
 // These event handlers are never used.
