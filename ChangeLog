@@ -1,5 +1,7 @@
 2008-01-05 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/TextField.as: check that a textfield
+	  object is a listener of itself.
 	* server/as_value.cpp: make soft references verbosity a compile-time
 	  option.
 
