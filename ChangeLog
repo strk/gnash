@@ -1,5 +1,8 @@
 2008-01-05  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* testsuite/libamf.all/test_lc.cpp: New test for LocalConnection
+	base class.
+	
 	* testsuite/libamf.all/Makefile.am: Remove the old bogus AMF
 	tests. Things are too different now for these to work without a
 	lot of effort, and their functionality is covered by the other
