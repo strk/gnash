@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.39 2008/01/04 13:35:12 strk Exp $
+# $Id: Makefile.am,v 1.40 2008/01/05 00:37:42 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -61,10 +61,11 @@ klash_part.moc: $(srcdir)/klash_part.h
 	fi
 
 install-data: $(dist_kde_services_DATA)
-	$(INSTALL) $(dist_kde_services_DATA) $(kde_servicesdir)
+	test -d $(DESTDIR)$(kde_servicesdir) || $(mkinstalldirs) $(DESTDIR)$(kde_servicesdir)
+	$(INSTALL) $(dist_kde_services_DATA) $(DESTDIR)$(kde_servicesdir)
 
 install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-	test -d "$(DESTDIR)$(plugindir)" || $(mkinstalldirs) "$(DESTDIR)$(plugindir)"
+	test -d $(DESTDIR)$(plugindir) || $(mkinstalldirs) $(DESTDIR)$(plugindir)
 #	cp .libs/libklashpart.so $(DESTDIR)$(plugindir)/libklashpart.so
 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(plugin_LTLIBRARIES) $(DESTDIR)$(plugindir)
 #	$(RM) libklashpart.*a $(DESTDIR)$(plugindir)/libklashpart.so.0

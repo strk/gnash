@@ -1,5 +1,11 @@
 2008-01-04 Sandro Santilli <strk@keybit.net>
 
+	* plugin/klash/Makefile.am: don't quote installation paths, or
+	  ~ would not be interpreted by mkdir_p as $HOME. Use DESTDIR
+	  for the kde service too, and create the dir if non existing.
+
+2008-01-04 Sandro Santilli <strk@keybit.net>
+
 	* server/URLAccessManager.cpp (local_check): don't use base url
 	  (-U) to tell apart local movies from remote ones, as base url
 	  is web-author-forgeable ('base' attribute).
