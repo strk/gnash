@@ -323,7 +323,7 @@ SOL::readFile(std::string &filespec)
         ptr += 10;
 
 	// consistency check
-        if ((buf[1] == 0) && (buf[0] == 0xbf)) {
+        if ((buf[0] == 0) && (buf[1] == 0xbf)) {
             if (bodysize == length) {
                 log_debug("%s is an SOL file", filespec.c_str());
             } else {

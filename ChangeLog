@@ -1,5 +1,11 @@
 2008-01-05 Sandro Santilli <strk@keybit.net>
 
+	* libamf/sol.cpp (SOL::readFile): revert the fix to magic number
+	  consistency, it really seems it's us failign to swap bytes
+	  when writing it.
+
+2008-01-05 Sandro Santilli <strk@keybit.net>
+
 	* libamf/sol.cpp (SOL::readFile): fix magic number consistency
 	  check.
 	* testsuite/: Makefile.am, gnashrc.in: allow read-write access
