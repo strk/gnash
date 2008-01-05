@@ -77,7 +77,7 @@ public:
 		_framecount(1),
 		_playlist(_framecount),
 		_framerate(12),
-		_url()
+		_url("http://www.gnu.org/software/gnash")
 	{
 	}
 
@@ -94,7 +94,7 @@ public:
 		_framecount(1),
 		_playlist(_framecount),
 		_framerate(12),
-		_url()
+		_url("http://www.gnu.org/software/gnash")
 	{
 	}
 
