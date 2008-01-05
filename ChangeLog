@@ -1,5 +1,10 @@
 2008-01-05 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.cpp: make soft references verbosity a compile-time
+	  option.
+
+2008-01-05 Sandro Santilli <strk@keybit.net>
+
 	* server/as_object.cpp (setPropFlags): fix infinite loop while setting
 	  flags to comma-separated prop strings.
 	* server/asobj/LoadVars.cpp: cleanup VM accesses to not rely on the

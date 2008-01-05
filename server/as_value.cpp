@@ -55,6 +55,9 @@ using namespace std;
 // Define the macro below to make to_primitive verbose
 //#define GNASH_DEBUG_CONVERSION_TO_PRIMITIVE 1
 
+// Define this macro to make soft references activity verbose
+//#define GNASH_DEBUG_SOFT_REFERENCES
+
 namespace {
 
 struct invalidHexDigit {};
@@ -1531,8 +1534,10 @@ as_value::CharacterProxy::find_character_by_target(const std::string& tgtstr)
 		string part(tgtstr, from, to-from);
 		o = o->get_path_element(st.find(part));
 		if ( ! o ) {
+#ifdef GNASH_DEBUG_SOFT_REFERENCES
 			log_debug("Evaluating target path for soft ref rebinding: element '%s' of path '%s' not found",
 				part.c_str(), tgtstr.c_str());
+#endif
 			return NULL;
 		}
 		if ( to == string::npos ) break;
@@ -1547,8 +1552,10 @@ as_value::CharacterProxy::checkDangling() const
 	if ( _ptr && _ptr->isDestroyed() ) 
 	{
 		_tgt = _ptr->getOrigTarget();
+#ifdef GNASH_DEBUG_SOFT_REFERENCES
 		log_debug("char %s (%s) was destroyed, stored it's orig target (%s) for later rebinding", _ptr->getTarget().c_str(),
 			typeName(*_ptr).c_str(), _tgt.c_str());
+#endif
 		_ptr = 0;
 	}
 }
