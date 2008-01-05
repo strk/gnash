@@ -298,7 +298,7 @@ SOL::readFile(std::string &filespec)
 {
 //    GNASH_REPORT_FUNCTION;
     struct stat st;
-    boost::uint16_t magic, size;
+    boost::uint16_t size;
     boost::uint8_t *buf, *ptr;
     int bodysize;
 
@@ -311,9 +311,7 @@ SOL::readFile(std::string &filespec)
         ptr = buf = new boost::uint8_t[_filesize+1];
         ifs.read(reinterpret_cast<char *>(buf), _filesize);
 
-        // extract the magic number
-        memcpy(&magic, buf, 2);
-//        magic = ntohl(magic);
+        // skip the magic number (will check later)
         ptr += 2;
 
         // extract the file size
@@ -321,10 +319,11 @@ SOL::readFile(std::string &filespec)
         length = ntohl(length);
         ptr += 4;
 
-        // extract the file marker field
-//        char *marker = ptr;
+        // skip the file marker field
         ptr += 10;
-        if ((buf[0] == 0) && (buf[1] == 0xbf)) {
+
+	// consistency check
+        if ((buf[1] == 0) && (buf[0] == 0xbf)) {
             if (bodysize == length) {
                 log_debug("%s is an SOL file", filespec.c_str());
             } else {

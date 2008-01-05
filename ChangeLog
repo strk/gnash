@@ -1,5 +1,7 @@
 2008-01-05 Sandro Santilli <strk@keybit.net>
 
+	* libamf/sol.cpp (SOL::readFile): fix magic number consistency
+	  check.
 	* testsuite/: Makefile.am, gnashrc.in: allow read-write access
 	  to SOL under the testsuite directory.
 	* testsuite/libbase/: TCXXRc.cpp, gnashrc.in: test set SOLSafeDir
