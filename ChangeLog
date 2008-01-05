@@ -1,5 +1,7 @@
 2008-01-05 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/LoadVars.cpp: cleanup VM accesses to not rely on the
+	  singleton.
 	* testsuite/Makefile.am: remove tmpSharedObject on make clean.
 	* libamf/sol.cpp (SOL::readFile): revert the fix to magic number
 	  consistency, it really seems it's us failign to swap bytes

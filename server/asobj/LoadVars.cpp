@@ -302,7 +302,7 @@ LoadVars::checkLoads()
 		}
 		else
 		{
-			VM::get().getRoot().clear_interval_timer(_loadCheckerTimer);
+			getVM().getRoot().clear_interval_timer(_loadCheckerTimer);
 		}
 	}
 }
@@ -378,11 +378,13 @@ LoadVars::processLoaded(LoadVariablesThread& lr)
 	typedef LoadVariablesThread::ValuesMap ValuesMap;
 	using std::string;
 
+	string_table& st = getVM().getStringTable();
+
 	ValuesMap& vals = lr.getValues();
 	for  (ValuesMap::iterator it=vals.begin(), itEnd=vals.end();
 			it != itEnd; ++it)
 	{
-		set_member(VM::get().getStringTable().find(it->first), as_value(it->second.c_str()));
+		set_member(st.find(it->first), as_value(it->second.c_str()));
 		//log_msg("Setting %s == %s", it->first.c_str(), it->second.c_str());
 	}
 
@@ -407,7 +409,7 @@ LoadVars::addLoadVariablesThread(const std::string& urlstr, const char* postdata
 			&LoadVars::checkLoads_wrapper, NULL);
 		std::auto_ptr<Timer> timer(new Timer);
 		timer->setInterval(*loadsChecker, 50, this);
-		_loadCheckerTimer = VM::get().getRoot().add_interval_timer(timer, true);
+		_loadCheckerTimer = getVM().getRoot().add_interval_timer(timer, true);
 	}
 
 	URL url(urlstr, get_base_url());
