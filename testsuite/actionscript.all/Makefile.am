@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.83 2007/12/11 12:41:30 bwy Exp $
+# $Id: Makefile.am,v 1.84 2008/01/05 03:55:00 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -56,8 +56,12 @@ dist_noinst_SCRIPTS = gen-test.sh gen-index.sh
 AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)		\
         -I$(top_srcdir)/libbase \
+        -I$(top_srcdir)/libamf  \
         -I$(top_srcdir)/server  \
+        -I$(top_srcdir)/server/vm  \
+        -I$(top_srcdir)/server/asobj \
         -I$(top_srcdir)/libgeometry \
+	-I$(top_srcdir)/testsuite \
 	$(LIBXML_CFLAGS)        \
 	$(OPENGL_CFLAGS)	\
 	$(DMALLOC_CFLAGS)	\

@@ -1,5 +1,12 @@
 2008-01-04  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* testsuite/actionscript.all/SharedObject.as: Use a multi level
+	path.
+	* testsuite/actionscript.all/NetConnection.as: Use check.a
+	sinstead of dejagnu.as.
+	* testsuite/actionscript.all/Makefile.am: Add libamf to the
+	include paths.
+
 	* server/asobj/SharedObject.cpp: Use Element::init() instead of
 	constructing, as it appears to have problems with some gcc
 	versions. This fixes the SharedObject.as test case.

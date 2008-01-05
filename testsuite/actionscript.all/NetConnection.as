@@ -20,11 +20,14 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-#if OUTPUT_VERSION < 7
+#include "check.as"
+#include "dejagnu.as"
 
-check_equals(NetConnection, undefined);
+// #if OUTPUT_VERSION < 7
 
-#else // OUTPUT_VERSION >= 7
+// // check_equals(NetConnection, undefined);
+
+// #else // OUTPUT_VERSION >= 7
 
 check_equals(typeof(NetConnection), 'function');
 check_equals(typeof(NetConnection.prototype), 'object');
@@ -53,5 +56,5 @@ else
 }
 
 
-#endif // OUTPUT_VERSION >= 7
+//#endif // OUTPUT_VERSION >= 7
 totals();

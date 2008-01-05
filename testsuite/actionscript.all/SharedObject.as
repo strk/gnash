@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: SharedObject.as,v 1.16 2007/12/25 05:57:26 zoulunkai Exp $";
+rcsid="$Id: SharedObject.as,v 1.17 2008/01/05 03:55:00 rsavoye Exp $";
 
 #include "check.as"
 
@@ -54,7 +54,7 @@ check_equals (typeof(sharedobjectObj.getSize), 'function');
 
 
 // FIXME: Test code that will soon be a formal test case.
-so = SharedObject.getLocal("settings");
+so = SharedObject.getLocal("level1/level2/settings", "/");
 
 // Private data
 so.name = "Joe";
@@ -78,13 +78,14 @@ so.data.localSecPathTime = 1.19751160683e+12;
 so.flush();
 
 
-newso = SharedObject.getLocal("settings");
+newso = SharedObject.getLocal("level1/level2/settings", "/");
 check_equals (typeof(newso), 'object');
 trace(newso.getSize());
 xcheck_equals (newso.getSize(), 283);
 
 if (typeof(newso.data) != 'undefined') {
     trace("New Shared Object, checking data...");
+    trace(typeof(newso.data.gain));
     check_equals (typeof(newso.data.gain), 'number');
     check_equals (newso.data.gain, so.data.gain);
     check_equals (typeof(newso.data.echosuppression), 'boolean');
