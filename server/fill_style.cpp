@@ -524,10 +524,12 @@ fill_style::get_color_stop(int index) const
   return m_gradients[index];
 }
 
-fill_style::fill_style(bitmap_character_def* bitmap)
+fill_style::fill_style(bitmap_character_def* bitmap, const matrix& mat)
+	:
+	m_type(SWF::FILL_CLIPPED_BITMAP),
+	m_bitmap_character(bitmap),
+	m_bitmap_matrix(mat)
 {
-	m_bitmap_character = bitmap;
-	m_type = SWF::FILL_CLIPPED_BITMAP;
 }
 
 void

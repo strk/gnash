@@ -50,7 +50,10 @@ BitmapMovieDefinition::getShapeDef()
 
 	// Add the bitmap fill style (fill style 0)
 
-	fill_style bmFill(_bitmap.get());
+	matrix mat;
+	//mat.concatenate_scale(1.0/20.0);
+	mat.set_scale(1.0/20.0, 1.0/20.0); // bitmap fills get matrix reversed
+	fill_style bmFill(_bitmap.get(), mat);
 	size_t fillLeft = _shapedef->add_fill_style(bmFill);
 
 	// Define a rectangle filled with the bitmap style
@@ -58,8 +61,8 @@ BitmapMovieDefinition::getShapeDef()
 	// We use one twip for each pixel in the image
 	// The character will be scaled * 20
 	// when placed in BitmapMovieInstance's DisplayList
-	float w = _framesize.width()/20;
-	float h = _framesize.height()/20;
+	float w = _framesize.width(); // /20;
+	float h = _framesize.height(); // /20;
 
 	log_msg(_("Creating a shape_definition wrapping a %g x %g bitmap"), w, h);
 

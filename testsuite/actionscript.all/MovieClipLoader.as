@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClipLoader.as,v 1.12 2008/01/07 15:21:21 strk Exp $";
+rcsid="$Id: MovieClipLoader.as,v 1.13 2008/01/07 16:47:25 strk Exp $";
 
 #include "check.as"
 
@@ -254,8 +254,8 @@ mcl.onLoadInit = function(target)
 		}
 		// NOTE: these two tests show the bug preventing
 		//       YouTube active_sharing.swf movie from working
-		xcheck_equals(target._width, 170); 
-		xcheck_equals(target._height, 170);
+		check_equals(target._width, 170); 
+		check_equals(target._height, 170);
 	}
 
 	//note("target.var1: "+target.var1);

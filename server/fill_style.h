@@ -17,7 +17,7 @@
 
 // Based on work of Thatcher Ulrich <tu@tulrich.com> 2003
 
-/* $Id: fill_style.h,v 1.14 2008/01/02 19:08:31 strk Exp $ */
+/* $Id: fill_style.h,v 1.15 2008/01/07 16:47:25 strk Exp $ */
 
 #ifndef GNASH_FILL_STYLE_H
 #define GNASH_FILL_STYLE_H
@@ -72,8 +72,15 @@ public:
 	/// use by bitmap shape character.
 	///
 	/// TODO: use a subclass for this
+	/// TODO: provide a setBitmap, for consisteny with other setType() methods
 	///
-	fill_style(bitmap_character_def* bitmap);
+	/// @param bitmap
+	///	The bitmap character definition to use with this bitmap fill.
+	///
+	/// @param mat
+	///	The matrix to apply to the bitmap.
+	///
+	fill_style(bitmap_character_def* bitmap, const matrix& mat);
 
 	void setSolid(const rgba& color);
 

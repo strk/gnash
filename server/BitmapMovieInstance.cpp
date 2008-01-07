@@ -34,8 +34,8 @@ BitmapMovieInstance::BitmapMovieInstance(BitmapMovieDefinition* def)
 	:
 	movie_instance(def, NULL)
 {
-  matrix mat;
-  mat.concatenate_scale(20.0);
+	matrix mat;
+	//mat.concatenate_scale(20.0);
   
 	// We need to assign a character id to the instance, or an assertion
 	// will fail in character.cpp (parent==NULL || id != -1)

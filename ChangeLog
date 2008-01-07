@@ -1,3 +1,16 @@
+2008-01-07 Sandro Santilli <strk@keybit.net>
+
+	* server/fill_style.{cpp,h}: add a matrix argument
+	  to the constructor taking a bitmap definition.
+	* server/parser/BitmapMovieDefinition.cpp: appropriately
+	  scale bitmap fill rather then the drawn shape.
+	* server/BitmapMovieInstance.cpp: don't scale the character,
+	  it's the fill that needed scaling.
+	* testsuite/swfdec/PASSING: moviecliploader-known-image-size-{7,8}.swf
+	  succeed.
+	* testsuite/actionscript.all/MovieClipLoader.as: checks for jpeg size
+	  succeed.
+
 2008-01-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gnash.cpp, gui/Player.h: drop -b option.
