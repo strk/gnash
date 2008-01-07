@@ -1,4 +1,4 @@
-2008-01-07 Anonymous
+2008-01-07 Matthias Berndt <berndt.matthias@gmx.de>
 
 	* macros/boost.m4: construct proper ac_cv_path_boost_lib and
 	  ac_cv_path_boost_extra_lib even if the paths contain dots.
