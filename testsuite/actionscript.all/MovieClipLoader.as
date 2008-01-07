@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClipLoader.as,v 1.11 2007/12/26 12:35:14 strk Exp $";
+rcsid="$Id: MovieClipLoader.as,v 1.12 2008/01/07 15:21:21 strk Exp $";
 
 #include "check.as"
 
@@ -130,7 +130,7 @@ totalProgressCalls=0;
 
 nextTestOrEnd = function()
 {
-	note("nextTestOrEnd");
+	//note("nextTestOrEnd");
 	if ( state.nextFunction == undefined )
 	{
 		// we don't know how many times onLoadProgress will be called
@@ -230,20 +230,32 @@ mcl.onLoadInit = function(target)
 	check_equals(state.onLoadCompleteCalls, 1);
 	state.onLoadInitCalls++;
 
-	if ( target._url = MEDIA(green.jpg) )
+	// At onLoadInit time the _url parameter is the url of
+	// old target with appended url of new target (?)
+	// So we test if it ends with it instead
+	var indexOfGreenJpeg = target._url.indexOf('green.jpg');
+	var isGreenJpeg = ( (target._url.length - indexOfGreenJpeg) == 9 );
+	if ( isGreenJpeg )
 	{
+		//trace("It's the jpeg go !");
 		with (target)
 		{
 			note("_lockroot: "+_lockroot);
 			note("---- Target's root is "+_root);
 			check_equals(_root, _level0);
 			_lockroot = true;
-			xcheck_equals(_root, _level0.loadtarget); // no idea why this fails, could be due to the assignment above doing unexpected things (assigning to pre-rebound dangling char ref?)..
+			// no idea why this fails, could be due to the assignment above doing unexpected things
+			// (assigning to pre-rebound dangling char ref?)..
+			xcheck_equals(_root, _level0.loadtarget);
 			note("---- After setting _lockroot to true, target's root is "+_root);
 			_lockroot = false;
 			check_equals(_root, _level0);
 			note("---- After setting _lockroot to false, target's root is "+_root);
 		}
+		// NOTE: these two tests show the bug preventing
+		//       YouTube active_sharing.swf movie from working
+		xcheck_equals(target._width, 170); 
+		xcheck_equals(target._height, 170);
 	}
 
 	//note("target.var1: "+target.var1);
@@ -289,7 +301,7 @@ function test3()
 	// subtract the number of progress callback runs reported when playing from the totals to get the correct number
 	// BUT MAKE SURE nextTestOrEnd CONTAINS THE CORRECT testsPerProgressCallback INFO !!
 	//
-	expected.totals = 65;
+	expected.totals = 64;
 	// gnash doesn't call onLoadInit if the data at the url is not an SWF or JPG
 	// (or whatever else can become a movie_instance), while the PP does.
 	// So in this testcase, the attempt to load vars.txt is invalid for Gnash

@@ -1,3 +1,9 @@
+2008-01-07 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/MovieClipLoader.as: fix the test, and add
+	  a new test showing _width/_height of loaded bitmap is wrong (the
+	  active_sharing.swf youtube bug).
+
 2008-01-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gtk.cpp: realize _overlay window before reparenting the
