@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.130 2008/01/07 12:04:18 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.131 2008/01/07 15:16:30 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -256,7 +256,8 @@ GtkGui::setFullscreen()
         gtk_window_fullscreen(GTK_WINDOW(_overlay));
         log_msg (_("Created fullscreen window"));
         
-        // Reparent drawing area from GtkPlug to fullscreen window         
+        // Reparent drawing area from GtkPlug to fullscreen window
+        gtk_widget_realize(_overlay);      
         gtk_widget_reparent(_drawing_area, _overlay);
         gtk_widget_show(_overlay);
     }

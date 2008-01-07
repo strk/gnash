@@ -1,3 +1,8 @@
+2008-01-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/gtk.cpp: realize _overlay window before reparenting the
+	  drawing area (stops OGL flipping the movie upside-down).
+	  
 2008-01-07 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/xml.cpp: make verbosity a compile-time option.
