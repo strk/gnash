@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.61 2007/12/21 01:36:48 strk Exp $ */
+/* $Id: xml.cpp,v 1.62 2008/01/07 11:59:30 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -60,6 +60,9 @@ using namespace std;
 namespace gnash {
   
 //#define DEBUG_MEMORY_ALLOCATION 1
+
+// Define this to enable verbosity of XML loads
+//#define DEBUG_XML_LOADS 1
 
 static as_object* getXMLInterface();
 static void attachXMLInterface(as_object& o);
@@ -156,7 +159,7 @@ XML::set_member(string_table::key name, const as_value& val,
         else if (name == NSV::PROP_LOADED)
         {
                 bool b = val.to_bool();
-		log_msg(_("set_member 'loaded' (%s) became boolean %d"), val.to_debug_string().c_str(), b);
+		//log_debug(_("set_member 'loaded' (%s) became boolean %d"), val.to_debug_string().c_str(), b);
                 if ( b ) _loaded = 1;
                 else _loaded = 0;
                 return;
@@ -393,7 +396,7 @@ XML::parseXML(const std::string& xml_in)
 void
 XML::queueLoad(std::auto_ptr<tu_file> str)
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
 
     // Set the "loaded" parameter to false
     VM& vm = getVM();
@@ -413,7 +416,9 @@ XML::queueLoad(std::auto_ptr<tu_file> str)
     // request immediately
     // 
     _loadThreads.push_front(lt.get());
+#ifdef DEBUG_XML_LOADS
     log_debug("Pushed thread %p to _loadThreads, number of XML load threads now: " SIZET_FMT, (void*)lt.get(),  _loadThreads.size());
+#endif
     lt.release();
 
 
@@ -424,7 +429,9 @@ XML::queueLoad(std::auto_ptr<tu_file> str)
         std::auto_ptr<Timer> timer(new Timer);
         timer->setInterval(*loadsChecker, 50, this);
         _loadCheckerTimer = getVM().getRoot().add_interval_timer(timer, true);
+#ifdef DEBUG_XML_LOADS
         log_debug("Registered XML loads interval %d", _loadCheckerTimer);
+#endif
     }
 
 }
@@ -450,7 +457,9 @@ void
 XML::checkLoads()
 {
     static int call=0;
+#ifdef DEBUG_XML_LOADS
     log_debug("XML %p checkLoads call %d, _loadThreads: %d", (void *)this, _loadThreads.size(), ++call);
+#endif
 
     if ( _loadThreads.empty() ) return; // nothing to do
 
@@ -465,7 +474,9 @@ XML::checkLoads()
 
         // TODO: notify progress 
 
+#ifdef DEBUG_XML_LOADS
         log_debug("XML loads thread %p got %ld/%ld bytes", (void*)lt, lt->getBytesLoaded(), lt->getBytesTotal() );
+#endif
         if ( lt->completed() )
         {
             size_t xmlsize = lt->getBytesTotal();
@@ -476,8 +487,10 @@ XML::checkLoads()
 				// This would be either a bug of LoadThread or an expected
 				// possibility which lacks documentation (thus a bug in documentation)
 				//
+#ifdef DEBUG_XML_LOADS
 				log_debug("LoadThread::getBytesTotal() returned %d but ::read(%d) returned %d",
 					xmlsize, xmlsize, actuallyRead);
+#endif
 			}
             buf[actuallyRead] = '\0';
             as_value dataVal(buf.get()); // memory copy here (optimize?)
@@ -488,7 +501,9 @@ XML::checkLoads()
             // might push_front on the list..
             callMethod(onDataKey, dataVal);
 
+#ifdef DEBUG_XML_LOADS
             log_debug("Completed load, _loadThreads have now " SIZET_FMT " elements", _loadThreads.size());
+#endif
         }
         else
         {
@@ -498,7 +513,9 @@ XML::checkLoads()
 
     if ( _loadThreads.empty() ) 
     {
+#ifdef DEBUG_XML_LOADS
         log_debug("Clearing XML load checker interval timer");
+#endif
         vm.getRoot().clear_interval_timer(_loadCheckerTimer);
         _loadCheckerTimer=0;
     }
@@ -508,7 +525,9 @@ XML::checkLoads()
 as_value
 XML::checkLoads_wrapper(const fn_call& fn)
 {
+#ifdef DEBUG_XML_LOADS
     log_debug("checkLoads_wrapper called");
+#endif
 
 	boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
 	ptr->checkLoads();

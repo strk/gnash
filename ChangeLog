@@ -1,5 +1,6 @@
 2008-01-07 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xml.cpp: make verbosity a compile-time option.
 	* server/sprite_instance.cpp (sprite_setMask): allow MovieClip.setMask
 	  to be called on any character, not just sprites. Fixes
 	  swfdec's image/mask-textfield-6.swf test (not automated).
