@@ -123,7 +123,7 @@ usage()
         "                3 enables both rendering & sound (default)\n"
 		), _(
         "  -t <sec>      Timeout and exit after the specified number of seconds\n"
-        "  -b <bits>     Bit depth of output window (16 or 32, default is 16)\n"
+        //"  -b <bits>     Bit depth of output window (16 or 32, default is 16)\n"
         "  -u <url>      Set \"real\" url of the movie\n"
 	"                (useful for downloaded movies)\n"
         "  -U <url>      Set \"base\" url for this run\n"
@@ -325,9 +325,9 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
           case 't':
               player.setExitTimeout( (float) atof(optarg) );
               break;
-          case 'b':
-	      player.setBitDepth(atoi(optarg));
-	      break;
+//          case 'b':
+//	      player.setBitDepth(atoi(optarg));
+//	      break;
           case 'f':
 #ifdef GNASH_FPS_DEBUG
 		player.setFpsPrintTime((float)strtod(optarg, NULL));

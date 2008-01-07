@@ -125,11 +125,11 @@ public:
 		return old_timeout;
 	}
 
-	int setBitDepth(int depth) {
-		int old=bit_depth;
-		bit_depth=depth;
-		return old;
-	}
+//	int setBitDepth(int depth) {
+//		int old=bit_depth;
+//		bit_depth=depth;
+//		return old;
+//	}
 
 	void setParam(std::string& name, std::string& value) {
 		params[name] = value;
