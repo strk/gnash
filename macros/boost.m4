@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.72 2007/11/29 05:36:01 nihilus Exp $
+dnl $Id: boost.m4,v 1.73 2008/01/07 21:30:38 strk Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -129,7 +129,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
       for j in ${boost_libs}; do
         dirs="`ls -dr $i/libboost_${j}*.${shlibext} $i/libboost_${j}*.a 2>/dev/null`"
         if test -n "${dirs}"; then
-          libname="`echo ${dirs} | sed -e 's:\..*$::' -e 's:^.*/lib::'`"
+          libname="`echo ${dirs} | sed -e 's:^.*/lib::' -e 's:\..*$::'`"
           if test x$dirname = x; then
             dirname="`echo ${dirs} | sed -e 's:/libboost.*$::'`"
            if test x"${dirname}" != "x/usr/lib"; then
@@ -145,7 +145,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
     for j in ${extra_boost_libs}; do
       dirs="`ls -dr ${dirname}/libboost_${j}*.${shlibext} ${dirname}/libboost_${j}*.a 2>/dev/null`"
       if test -n "${dirs}"; then
-        libname="`echo ${dirs} | sed -e 's:\..*$::' -e 's:^.*/lib::'`"
+        libname="`echo ${dirs} | sed -e 's:^.*/lib::' -e 's:\..*$::'`"
         ac_cv_path_boost_extra_lib="${ac_cv_path_boost_extra_lib} -l${libname}"
       else
         extra_missing_libs="${extra_missing_libs} $j"

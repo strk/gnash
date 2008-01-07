@@ -1,3 +1,9 @@
+2008-01-07 Anonymous
+
+	* macros/boost.m4: construct proper ac_cv_path_boost_lib and
+	  ac_cv_path_boost_extra_lib even if the paths contain dots.
+	  See bug #21977.
+
 2008-01-07 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (get_root): use VM version, not
