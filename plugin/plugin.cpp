@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.90 2007/12/17 16:06:45 bwy Exp $ */
+/* $Id: plugin.cpp,v 1.91 2008/01/07 09:47:28 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -36,7 +36,7 @@
 
 #define PLUGIN_DESCRIPTION \
   "Shockwave Flash "FLASH_VERSION" Gnash "VERSION", the GNU Flash Player. \
-  Copyright &copy; 2006, 2007 <a href=\"http://www.fsf.org\">Free Software \
+  Copyright &copy; 2006, 2007, 2008 <a href=\"http://www.fsf.org\">Free Software \
   Foundation</a>, Inc. <br> \
   Gnash comes with NO WARRANTY, to the extent permitted by law. \
   You may redistribute copies of Gnash under the terms of the \

@@ -1,6 +1,6 @@
 // gtk.cpp: Gnome ToolKit graphical user interface, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.127 2008/01/05 16:22:37 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.128 2008/01/07 09:47:28 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -83,7 +83,6 @@ GtkGui::GtkGui(unsigned long xid, float scale, bool loop, unsigned int depth)
 {
 }
 
-
 bool
 GtkGui::init(int argc, char **argv[])
 {
@@ -123,11 +122,8 @@ GtkGui::init(int argc, char **argv[])
     // XXXbjacques: why do we need this?
     gtk_container_set_reallocate_redraws(GTK_CONTAINER (_window), TRUE);
 
-    _window_icon_pixbuf = create_pixbuf ("GnashG.png");
-    if (_window_icon_pixbuf) {
-        gtk_window_set_icon (GTK_WINDOW (_window), _window_icon_pixbuf);
-	gdk_pixbuf_unref (_window_icon_pixbuf);
-    }
+    addGnashIcon(GTK_WINDOW(_window));
+
     _drawing_area = gtk_drawing_area_new();
 
     // IF we don't set this flag we won't be able to grab focus
@@ -135,26 +131,33 @@ GtkGui::init(int argc, char **argv[])
     GTK_WIDGET_SET_FLAGS (GTK_WIDGET(_drawing_area), GTK_CAN_FOCUS);
 
     createMenu();
+
 #ifdef RENDERER_OPENGL
     // OpenGL _glue needs to prepare the drawing area for OpenGL rendering before
     // widgets are realized and before the configure event is fired.
     // TODO: find a way to make '_glue' use independent from actual renderer in use
     _glue->prepDrawingArea(_drawing_area);
 #endif
+
     setupEvents();
 
+    // Plugin
     if (_xid) {
      	gtk_container_add(GTK_CONTAINER(_window), _drawing_area);
-    } else {
+    }
+    
+    // Stand-alone
+    else {
 
         // A vertical box is used to allow display of the menu bar
-    
         _vbox = gtk_vbox_new(FALSE, 0);
         gtk_widget_show(_vbox);
         gtk_container_add(GTK_CONTAINER(_window), _vbox);
+
 #if defined(USE_MENUS) && !defined(GUI_HILDON)
         createMenuBar();
 #endif
+
         gtk_box_pack_start(GTK_BOX(_vbox), _drawing_area, TRUE, TRUE, 0);
     }
 
@@ -183,6 +186,153 @@ GtkGui::init(int argc, char **argv[])
     return true;
 }
 
+bool
+GtkGui::run()
+{
+    //GNASH_REPORT_FUNCTION;
+
+    // Kick-start before setting the interval timeout
+    advance_movie(this);
+    
+    // From http://www.idt.mdh.se/kurser/cd5040/ht02/gtk/glib/glib-the-main-event-loop.html#G-TIMEOUT-ADD-FULL
+    //
+    // Note that timeout functions may be delayed, due to the
+    // processing of other event sources. Thus they should not be
+    // relied on for precise timing. After each call to the timeout
+    // function, the time of the next timeout is recalculated based
+    // on the current time and the given interval (it does not try to
+    // 'catch up' time lost in delays).
+    //
+    // TODO: this is not what we need here, we want instead to 'catch up' !!
+    //
+    g_timeout_add_full (G_PRIORITY_LOW, _interval, (GSourceFunc)advance_movie,
+                        this, NULL);
+
+    gtk_main();
+    return true;
+}
+
+void
+GtkGui::setTimeout(unsigned int timeout)
+{
+    g_timeout_add(timeout, (GSourceFunc)gtk_main_quit, NULL);
+}
+
+bool
+GtkGui::addFDListener(int fd, callback_t callback, void* data)
+{
+    // NOTE: "The default encoding for GIOChannel is UTF-8. If your application
+    // is reading output from a command using via pipe, you may need to set the
+    // encoding to the encoding of the current locale (see g_get_charset())
+    // with the g_io_channel_set_encoding() function."
+
+    GIOChannel* gio_read = g_io_channel_unix_new(fd);
+    
+    if (!gio_read) {
+        return false;
+    }
+    
+    if (!g_io_add_watch (gio_read, GIOCondition(G_IO_IN | G_IO_HUP),
+                         GIOFunc (callback), data)) {
+        g_io_channel_unref(gio_read);
+        return false;    
+    }
+    
+    return true;    
+}
+
+void
+GtkGui::setFullscreen()
+{
+
+    if (_fullscreen) return;
+
+    // Plugin
+    if (_xid) {
+    
+        // Create new window and make fullscreen
+        _overlay = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+        addGnashIcon(GTK_WINDOW(_overlay));
+        gtk_window_fullscreen(GTK_WINDOW(_overlay));
+        log_msg (_("Created fullscreen window"));
+        
+        // Reparent drawing area from GtkPlug to fullscreen window         
+        gtk_widget_reparent(_drawing_area, _overlay);
+        gtk_widget_show(_overlay);
+    }
+    
+    // Stand-alone
+    else {
+    
+        // This is a hack to fix another hack (see createWindow). If the minimum
+        // size (size request) is larger than the screen, fullscreen messes up.
+        // This way allows the drawing area to be shrunk, which is what we really want,
+        // but not only after we've gone fullscreen.
+        // It could be a good hack if it were done earlier.
+        // There really doesn't seem to be a proper way of setting the starting size
+        // of a widget but allowing it to be shrunk.
+        gtk_widget_set_size_request(_drawing_area, -1, -1);
+    	gtk_window_fullscreen(GTK_WINDOW(_window));
+
+	if (_menubar) {
+	    gtk_widget_hide(_menubar);
+	}
+    }
+    
+    _fullscreen = true;
+}
+
+void
+GtkGui::unsetFullscreen()
+{
+    if (!_fullscreen) return;
+    
+    // Plugin
+    if (_xid) {
+        gtk_widget_reparent (_drawing_area, _window);
+        if (_overlay) {
+            gtk_widget_destroy(_overlay);
+            log_msg (_("Destroyed fullscreen window"));
+        }        
+    }
+    
+    // Stand-alone
+    else {
+	gtk_window_unfullscreen(GTK_WINDOW(_window));
+	if (_menubar) {
+	    gtk_widget_show(_menubar);
+	}
+    }
+    
+    _fullscreen = false;
+}
+
+void
+GtkGui::grabFocus()
+{
+    gtk_widget_grab_focus(GTK_WIDGET(_drawing_area));
+}
+
+void
+GtkGui::quit()
+{
+    gtk_main_quit();
+}
+
+void
+GtkGui::setInterval(unsigned int interval)
+{
+    _interval = interval;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///                                                                         ///
+///                             Widget functions                            ///
+///                                                                         ///
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
 // Setup the menu bar for the top of the window frame.
 bool
 GtkGui::createMenuBar()
@@ -206,7 +356,6 @@ GtkGui::createMenuBar()
     return true;   
 }
 
-
 bool
 GtkGui::createMenu()
 {
@@ -223,11 +372,6 @@ GtkGui::createMenu()
     createControlMenu(GTK_WIDGET(_popup_menu));
 #endif
     createHelpMenu(GTK_WIDGET(_popup_menu));
-    
-//     GtkMenuItem *menuitem_prefs =
-//  	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Preferences..."));
-//     gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_prefs));
-//     gtk_widget_show(GTK_WIDGET(menuitem_prefs));
 
     if (get_sound_handler()) {
         GtkMenuItem *menuitem_sound =
@@ -266,22 +410,21 @@ GtkGui::createMenu()
 bool
 GtkGui::createWindow(const char *title, int width, int height)
 {
-//First call the old createWindow function and then set the title.
-//In case there's some need to not setting the title.
+// First call the old createWindow function and then set the title.
+// In case there's some need to not setting the title.
     bool ret = createWindow(width, height);
     gtk_window_set_title(GTK_WINDOW(_window), title);
 
     if (!_xid) {
     
-       // This sets the *minimum* size for the drawing area and thus will
-       // also resize the window. 
-       // Advantage: The window is sized correctly, no matter what other
-       // widgets are visible
-       // Disadvantage: The window cannot be shrinked, which is bad.   
-    
+        // This sets the *minimum* size for the drawing area and thus will
+        // also resize the window. 
+        // Advantage: The window is sized correctly, no matter what other
+        // widgets are visible
+        // Disadvantage: The window cannot be shrinked, which is bad.   
         gtk_widget_set_size_request(_drawing_area, width, height);
-    }
 
+    }
     return ret;
 }
 
@@ -315,10 +458,9 @@ GtkGui::find_pixmap_file                       (const gchar     *filename)
 }
 
 
-
 /* This is an internally used function to create pixmaps. */
 GdkPixbuf*
-GtkGui::create_pixbuf                          (const gchar     *filename)
+GtkGui::createPixbuf (const gchar *filename)
 {
     gchar *pathname = NULL;
     GdkPixbuf *pixbuf;
@@ -344,6 +486,86 @@ GtkGui::create_pixbuf                          (const gchar     *filename)
     return pixbuf;
 }
 
+// This creates a GtkTree model for displaying movie info.
+GtkTreeModel*
+GtkGui::makeTreeModel (std::auto_ptr<InfoTree> treepointer)
+{
+
+    InfoTree& info = *treepointer;
+
+    enum
+    {
+        NODENAME_COLUMN = 0,
+        STRING1_COLUMN,
+        STRING2_COLUMN,
+        NUM_COLUMNS
+    };
+    
+    GtkTreeStore *model = gtk_tree_store_new (NUM_COLUMNS,
+                         G_TYPE_STRING,
+                         G_TYPE_STRING,
+                         G_TYPE_STRING);
+    
+    GtkTreeIter iter;
+    GtkTreeIter child_iter;
+    GtkTreeIter parent_iter;
+
+    int depth = 0;                    // Depth within the gtk tree.    
+
+    for (InfoTree::iterator i=info.begin_leaf(), e=info.end_leaf(); i!=e; ++i)
+    {
+         StringPair& p = *i;
+
+         int infotreedepth = info.depth(i);  
+         char buf[8];
+         sprintf(buf, "%d", infotreedepth);
+         buf[7] = '\0';                     
+
+         if (info.depth(i) > depth) {          // Align Gtk tree depth.
+              depth++;                   
+              iter=child_iter;                  
+         }
+
+         if (info.depth(i) < depth) {        // Align Gtk tree depth.
+              depth = info.depth(i);
+              gtk_tree_model_iter_parent (GTK_TREE_MODEL(model), &parent_iter, &iter);  // Get parent iter.
+              iter = parent_iter;
+         }
+
+         //Read in data from present node
+         if (depth == 0) gtk_tree_store_append (model, &child_iter, NULL);
+         else gtk_tree_store_append (model, &child_iter, &iter);
+
+         gtk_tree_store_set (model, &child_iter,
+                           NODENAME_COLUMN, buf,   //infotree
+                           STRING1_COLUMN, p.first.c_str(),     //infotree
+    		           STRING2_COLUMN, p.second.c_str(),     //infotree
+			   -1);
+
+    }
+
+    return GTK_TREE_MODEL(model);
+
+}
+
+// Adds the Gnash icon to a window.
+void
+GtkGui::addGnashIcon(GtkWindow* window)
+{
+    GdkPixbuf *window_icon_pixbuf = createPixbuf ("GnashG.png");
+    if (window_icon_pixbuf) {
+        gtk_window_set_icon (GTK_WINDOW (window), window_icon_pixbuf);
+	gdk_pixbuf_unref (window_icon_pixbuf);
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///                                                                         ///
+///                             Rendering stuff                             ///
+///                                                                         ///
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 bool
 GtkGui::createWindow(int width, int height)
@@ -444,124 +666,6 @@ GtkGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
     
 }
 
-void
-GtkGui::setTimeout(unsigned int timeout)
-{
-    g_timeout_add(timeout, (GSourceFunc)gtk_main_quit, NULL);
-}
-
-bool
-GtkGui::addFDListener(int fd, callback_t callback, void* data)
-{
-    // NOTE: "The default encoding for GIOChannel is UTF-8. If your application
-    // is reading output from a command using via pipe, you may need to set the
-    // encoding to the encoding of the current locale (see g_get_charset())
-    // with the g_io_channel_set_encoding() function."
-
-    GIOChannel* gio_read = g_io_channel_unix_new(fd);
-    
-    if (!gio_read) {
-        return false;
-    }
-    
-    if (!g_io_add_watch (gio_read, GIOCondition(G_IO_IN | G_IO_HUP),
-                         GIOFunc (callback), data)) {
-        g_io_channel_unref(gio_read);
-        return false;    
-    }
-    
-    return true;    
-}
-
-void
-GtkGui::setFullscreen()
-{
-
-    if (_fullscreen) return;
-    // Plugin
-    if (_xid) {
-    
-        // Create new window
-        _overlay = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-                
-        gtk_widget_reparent (_drawing_area, _overlay);
-        gtk_window_fullscreen(GTK_WINDOW(_overlay));
-        gtk_widget_show_all(_overlay);
-    }
-    
-    // Stand-alone
-    else {
-    	gtk_window_fullscreen(GTK_WINDOW(_window));
-    	gtk_widget_hide(_menubar);
-    }
-    
-    _fullscreen = true;
-}
-
-void
-GtkGui::unsetFullscreen()
-{
-    if (!_fullscreen) return;
-    
-    // Plugin
-    if (_xid) {
-        gtk_widget_reparent (_drawing_area, _window);
-        gtk_widget_destroy(_overlay);
-    }
-    
-    // Stand-alone
-    else {
-	gtk_window_unfullscreen(GTK_WINDOW(_window));
-	gtk_widget_show(_menubar);
-    }
-    
-    _fullscreen = false;
-}
-
-void
-GtkGui::grabFocus()
-{
-    gtk_widget_grab_focus(GTK_WIDGET(_drawing_area));
-}
-
-void
-GtkGui::quit()
-{
-    gtk_main_quit();
-}
-
-void
-GtkGui::setInterval(unsigned int interval)
-{
-    _interval = interval;
-}
-
-bool
-GtkGui::run()
-{
-    //GNASH_REPORT_FUNCTION;
-
-    // Kick-start before setting the interval timeout
-    advance_movie(this);
-    
-    // From http://www.idt.mdh.se/kurser/cd5040/ht02/gtk/glib/glib-the-main-event-loop.html#G-TIMEOUT-ADD-FULL
-    //
-    // Note that timeout functions may be delayed, due to the
-    // processing of other event sources. Thus they should not be
-    // relied on for precise timing. After each call to the timeout
-    // function, the time of the next timeout is recalculated based
-    // on the current time and the given interval (it does not try to
-    // 'catch up' time lost in delays).
-    //
-    // TODO: this is not what we need here, we want instead to 'catch up' !!
-    //
-    g_timeout_add_full (G_PRIORITY_LOW, _interval, (GSourceFunc)advance_movie,
-                        this, NULL);
-
-    gtk_main();
-    return true;
-}
-
 /// This method is called when the "OK" button is clicked in the open file
 /// dialog. For GTK <= 2.4.0, this is a callback called by GTK itself.
 void GtkGui::open_file (GtkWidget *widget, gpointer /* user_data */)
@@ -570,7 +674,6 @@ void GtkGui::open_file (GtkWidget *widget, gpointer /* user_data */)
     // We'll need this when implementing file opening.
     GtkGui* gui = static_cast<GtkGui*>(user_data);
 #endif
-
    
 #if GTK_CHECK_VERSION(2,4,0)
     char* filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (widget));
@@ -595,53 +698,23 @@ void GtkGui::open_file (GtkWidget *widget, gpointer /* user_data */)
 #endif
 }
 
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///                                                                         ///
+///                             Dialogues                                   ///
+///                                                                         ///
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
 void
-GtkGui::menuitem_openfile_callback(GtkMenuItem* /*menuitem*/, gpointer data)
+GtkGui::showPreferencesDialog()
 {
-    GtkWidget* dialog;
-    GtkGui* gui = static_cast<GtkGui*>(data);
-
-#if GTK_CHECK_VERSION(2,4,0)
-    dialog = gtk_file_chooser_dialog_new ("Open file",
-                                          NULL,
-                                          GTK_FILE_CHOOSER_ACTION_OPEN,
-                                          GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                                          GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-                                          NULL);
-    
-    if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) {
-        open_file(dialog, gui);
-    }
-    
-    gtk_widget_destroy (dialog);
-#else
-    dialog = gtk_file_selection_new ("Open file");
-
-    GtkFileSelection* selector = GTK_FILE_SELECTION(dialog);
-
-    g_signal_connect (selector->ok_button, "clicked", G_CALLBACK (open_file),
-                      gui);
-
-    g_signal_connect_swapped (selector->ok_button, "clicked", 
-                              G_CALLBACK (gtk_widget_destroy), dialog);
-
-    g_signal_connect_swapped (selector->cancel_button, "clicked",
-                              G_CALLBACK (gtk_widget_destroy), dialog); 
-   
-    gtk_widget_show (dialog);
-#endif // GTK_CHECK_VERSION(2,4,0)
-}
-
-/// \brief Show gnash preferences window
-void
-GtkGui::menuitem_preferences_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
-{
-//    GNASH_REPORT_FUNCTION;
-    
     RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
     GtkWidget *window1 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (window1), _("Gnash preferences"));
+    
+    addGnashIcon(GTK_WINDOW(window1));
 
     GtkWidget *notebook1 = gtk_notebook_new ();
     gtk_widget_show (notebook1);
@@ -909,34 +982,33 @@ GtkGui::setCursor(gnash_cursor_type newcursor)
 {
   //GNASH_REPORT_FUNCTION;
 
-  GdkCursorType cursortype;
+    GdkCursorType cursortype;
 
-  switch(newcursor) {
-    case CURSOR_HAND:
-      cursortype = GDK_HAND2;
-      break;
-    case CURSOR_INPUT:
-      cursortype = GDK_XTERM;
-      break;
-    default:
-      cursortype = GDK_LAST_CURSOR;
-  }
+    switch(newcursor) {
+        case CURSOR_HAND:
+            cursortype = GDK_HAND2;
+            break;
+        case CURSOR_INPUT:
+            cursortype = GDK_XTERM;
+            break;
+        default:
+            cursortype = GDK_LAST_CURSOR;
+    }
   
-  GdkCursor* gdkcursor = NULL;
+    GdkCursor* gdkcursor = NULL;
   
-  if (cursortype != GDK_LAST_CURSOR) {
-    gdkcursor = gdk_cursor_new(cursortype);
-  }
+    if (cursortype != GDK_LAST_CURSOR) {
+         gdkcursor = gdk_cursor_new(cursortype);
+    }
 
-  // The parent of _drawing_area is different for the plugin in fullscreen
-  gdk_window_set_cursor (gtk_widget_get_parent_window(_drawing_area),
+    // The parent of _drawing_area is different for the plugin in fullscreen
+    gdk_window_set_cursor (gtk_widget_get_parent_window(_drawing_area),
   		gdkcursor);
   
-  if (gdkcursor) {
-    gdk_cursor_unref(gdkcursor);
-  }
+    if (gdkcursor) {
+        gdk_cursor_unref(gdkcursor);
+    }
 }
-
 
 bool
 GtkGui::setupEvents()
@@ -975,86 +1047,21 @@ GtkGui::setupEvents()
                    G_CALLBACK (configure_event), this);
     g_signal_connect(G_OBJECT (_drawing_area), "expose_event",
                     G_CALLBACK (expose_event), this);
-//   g_signal_connect(G_OBJECT (_drawing_area), "unrealize",
-//                           G_CALLBACK (unrealize_event), NULL);
 
-  return true;
+    return true;
 }
 
-/// \brief show info about gnash
 void
-GtkGui::menuitem_about_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
+GtkGui::showPropertiesDialog()
 {
-//    GNASH_REPORT_FUNCTION;
-    const gchar *documentors[] = { 
-        "Rob Savoye", 
-        "Sandro Santilli",
-	"Ann Barcomb",
-        NULL 
-    };
-
-    const gchar *artists[] = { 
-	"Jason Savoye",
-        NULL 
-    };
-
-    const gchar *authors[] = { 
-        "Rob Savoye", 
-        "Sandro Santilli", 
-        "Bastiaan Jacques", 
-        "Tomas Groth", 
-        "Udo Giacomozzi", 
-        "Hannes Mayr", 
-        "Markus Gothe", 
-        "Vitaly Alexeev",
-	"John Gilmore",
-        NULL 
-    };
-
-    string comments = "Gnash is the GNU Flash movie player based on GameSWF.";
-
-    comments += "\nRenderer: ";
-    comments += RENDERER_CONFIG;
-    comments += "   GUI: ";
-    comments += "GTK2"; // gtk of course!
-    comments += "   Media: ";
-    comments += MEDIA_CONFIG;
-    comments += ".";
-
-    gtk_about_dialog_set_url_hook(NULL, NULL, NULL);
-    GdkPixbuf *logo_pixbuf = gdk_pixbuf_new_from_file("GnashG.png", NULL);
-    //GtkWidget *about = (GtkWidget*) g_object_new (GTK_TYPE_ABOUT_DIALOG,
-    gtk_show_about_dialog (
-    		   NULL,
-                   "name", "GNASH flash movie player", 
-                   "version", VERSION,
-                   "copyright", "Copyright (C) 2005, 2006, 2007 The Free Software Foundation",
-	           "comments", comments.c_str(),
-                   "authors", authors,
-                   "documenters", documentors,
-		   "artists", artists,
-//                   "translator-credits", "translator-credits",
-                   "logo", logo_pixbuf,
-		   "license", 
-		   "This program is free software; you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation; either version 3 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\nYou should have received a copy of the GNU General Public License\nalong with this program; if not, write to the Free Software\nFoundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA",
-		   "website", "http://www.gnu.org/software/gnash/",
-                   NULL);
-}
-
-//Movie Properties dialogue
-void
-GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
-{
-//    GNASH_REPORT_FUNCTION;
-
-    Gui* gui = static_cast<Gui*>(data);
-    assert(gui);
 
     GtkWidget* label;
 
     GtkWidget* window1 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (window1), _("Movie Properties"));
-
+    
+    addGnashIcon(GTK_WINDOW(window1));
+    
     GtkWidget *main_vbox = gtk_vbox_new(FALSE, 2);
     gtk_container_add (GTK_CONTAINER (window1), main_vbox);
 
@@ -1088,7 +1095,7 @@ GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
     gtk_box_pack_start (
 	 GTK_BOX (vbox3), scrollwindow1, TRUE, TRUE, 0);
 
-    std::auto_ptr<InfoTree> infoptr = gui->getMovieInfo();
+    std::auto_ptr<InfoTree> infoptr = getMovieInfo();
 
     if ( ! infoptr.get() )
     {
@@ -1101,8 +1108,8 @@ GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
     else {
 
 #if 1
-            // Table display
-            // This left in while tree information isn't selectable
+        // Table display
+        // This left in while tree information isn't selectable
 
         InfoTree& info = *infoptr;
 
@@ -1209,66 +1216,133 @@ GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 
 }
 
-
-GtkTreeModel*
-GtkGui::makeTreeModel (std::auto_ptr<InfoTree> treepointer)
+// \brief Show info about gnash
+void
+GtkGui::showAboutDialog()
 {
-
-    InfoTree& info = *treepointer;
-
-    enum
-    {
-        NODENAME_COLUMN = 0,
-        STRING1_COLUMN,
-        STRING2_COLUMN,
-        NUM_COLUMNS
+    const gchar *documentors[] = { 
+        "Rob Savoye", 
+        "Sandro Santilli",
+	"Ann Barcomb",
+        NULL 
     };
+
+    const gchar *artists[] = { 
+	"Jason Savoye",
+        NULL 
+    };
+
+    const gchar *authors[] = { 
+        "Rob Savoye", 
+        "Sandro Santilli", 
+        "Bastiaan Jacques", 
+        "Tomas Groth", 
+        "Udo Giacomozzi", 
+        "Hannes Mayr", 
+        "Markus Gothe", 
+        "Vitaly Alexeev",
+	"John Gilmore",
+        NULL 
+    };
+
+    string comments = "Gnash is the GNU Flash movie player based on GameSWF.";
+
+    comments += "\nRenderer: ";
+    comments += RENDERER_CONFIG;
+    comments += "   GUI: ";
+    comments += "GTK2"; // gtk of course!
+    comments += "   Media: ";
+    comments += MEDIA_CONFIG;
+    comments += ".";
+
+    gtk_about_dialog_set_url_hook(NULL, NULL, NULL);
+    GdkPixbuf *logo_pixbuf = createPixbuf("GnashG.png");
+
+    gtk_show_about_dialog (
+    		   NULL,
+                   "name", "GNASH flash movie player", 
+                   "version", VERSION,
+                   "copyright", "Copyright (C) 2005, 2006, 2007, 2008 The Free Software Foundation",
+	           "comments", comments.c_str(),
+                   "authors", authors,
+                   "documenters", documentors,
+		   "artists", artists,
+//                   "translator-credits", "translator-credits",
+                   "logo", logo_pixbuf,
+		   "license", 
+		   "This program is free software; you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation; either version 3 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\nYou should have received a copy of the GNU General Public License\nalong with this program; if not, write to the Free Software\nFoundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA",
+		   "website", "http://www.gnu.org/software/gnash/",
+                   NULL);
+}
+
+void
+GtkGui::menuitem_openfile_callback(GtkMenuItem* /*menuitem*/, gpointer data)
+{
+    GtkWidget* dialog;
+    GtkGui* gui = static_cast<GtkGui*>(data);
+
+#if GTK_CHECK_VERSION(2,4,0)
+    dialog = gtk_file_chooser_dialog_new ("Open file",
+                                          NULL,
+                                          GTK_FILE_CHOOSER_ACTION_OPEN,
+                                          GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                          GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+                                          NULL);
     
-    GtkTreeStore *model = gtk_tree_store_new (NUM_COLUMNS,
-                         G_TYPE_STRING,
-                         G_TYPE_STRING,
-                         G_TYPE_STRING);
-    
-    GtkTreeIter iter;
-    GtkTreeIter child_iter;
-    GtkTreeIter parent_iter;
-
-    int depth = 0;                    // Depth within the gtk tree.    
-
-    for (InfoTree::iterator i=info.begin_leaf(), e=info.end_leaf(); i!=e; ++i)
-    {
-         StringPair& p = *i;
-
-         int infotreedepth = info.depth(i);  
-         char buf[8];
-         sprintf(buf, "%d", infotreedepth);
-         buf[7] = '\0';                     
-
-         if (info.depth(i) > depth) {          // Align Gtk tree depth.
-              depth++;                   
-              iter=child_iter;                  
-         }
-
-         if (info.depth(i) < depth) {        // Align Gtk tree depth.
-              depth = info.depth(i);
-              gtk_tree_model_iter_parent (GTK_TREE_MODEL(model), &parent_iter, &iter);  // Get parent iter.
-              iter = parent_iter;
-         }
-
-         //Read in data from present node
-         if (depth == 0) gtk_tree_store_append (model, &child_iter, NULL);
-         else gtk_tree_store_append (model, &child_iter, &iter);
-
-         gtk_tree_store_set (model, &child_iter,
-                           NODENAME_COLUMN, buf,   //infotree
-                           STRING1_COLUMN, p.first.c_str(),     //infotree
-    		           STRING2_COLUMN, p.second.c_str(),     //infotree
-			   -1);
-
+    if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) {
+        open_file(dialog, gui);
     }
+    
+    gtk_widget_destroy (dialog);
+#else
+    dialog = gtk_file_selection_new ("Open file");
 
-    return GTK_TREE_MODEL(model);
+    GtkFileSelection* selector = GTK_FILE_SELECTION(dialog);
 
+    g_signal_connect (selector->ok_button, "clicked", G_CALLBACK (open_file),
+                      gui);
+
+    g_signal_connect_swapped (selector->ok_button, "clicked", 
+                              G_CALLBACK (gtk_widget_destroy), dialog);
+
+    g_signal_connect_swapped (selector->cancel_button, "clicked",
+                              G_CALLBACK (gtk_widget_destroy), dialog); 
+   
+    gtk_widget_show (dialog);
+#endif // GTK_CHECK_VERSION(2,4,0)
+}
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///                                                                         ///
+///                             Callbacks                                   ///
+///                                                                         ///
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+/// 'About' callback
+void
+GtkGui::menuitem_about_callback(GtkMenuItem* /*menuitem*/, gpointer data)
+{
+    GtkGui* gui = static_cast<GtkGui*>(data);
+    gui->showAboutDialog();
+}
+
+/// Preferences callback
+void
+GtkGui::menuitem_preferences_callback(GtkMenuItem* /*menuitem*/, gpointer data)
+{
+    
+    GtkGui* gui = static_cast<GtkGui*>(data);
+    gui->showPreferencesDialog();
+}
+
+// Properties Callback
+void
+GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
+{
+    GtkGui* gui = static_cast<GtkGui*>(data);
+    gui->showPropertiesDialog();
 }
 
 // This pops up the menu when the right mouse button is clicked
@@ -1403,9 +1477,13 @@ GtkGui::menuitem_refresh_view_callback(GtkMenuItem* /*menuitem*/,
     gui->refreshView();
 }
 
-//
-// Event handlers
-//
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///                                                                         ///
+///                             Event Handlers                              ///
+///                                                                         ///
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 gboolean
 GtkGui::expose_event(GtkWidget *const /*widget*/,
@@ -1423,18 +1501,6 @@ GtkGui::expose_event(GtkWidget *const /*widget*/,
 
     return TRUE;
 }
-
-// These event handlers are never used.
-#if 0
-gboolean
-GtkGui::unrealize_event(GtkWidget *widget, GdkEvent *event, gpointer data)
-{
-    GNASH_REPORT_FUNCTION;
-    
-    return TRUE;
-}
-
-#endif
 
 gboolean
 GtkGui::configure_event(GtkWidget *const widget,
@@ -1473,97 +1539,6 @@ GtkGui::delete_event(GtkWidget* /*widget*/, GdkEvent* /*event*/,
     return TRUE;
 }
 
-gnash::key::code
-GtkGui::gdk_to_gnash_key(guint key)
-{
-    gnash::key::code  c(gnash::key::INVALID);
-
-    // ascii 32-126 in one range:    
-    if (key >= GDK_space && key <= GDK_asciitilde) {
-        c = (gnash::key::code) ((key - GDK_space) + gnash::key::SPACE);
-    }
-
-    // Function keys:
-    else if (key >= GDK_F1 && key <= GDK_F15)	{
-        c = (gnash::key::code) ((key - GDK_F1) + gnash::key::F1);
-    }
-
-    // Keypad:
-    else if (key >= GDK_KP_0 && key <= GDK_KP_9) {
-        c = (gnash::key::code) ((key - GDK_KP_0) + gnash::key::KP_0);
-    }
-
-    // Extended ascii:
-    else if (key >= GDK_nobreakspace && key <= GDK_ydiaeresis) {
-        c = (gnash::key::code) ((key - GDK_nobreakspace) + gnash::key::NOBREAKSPACE);
-    }
-
-    // non-character keys don't correlate, so use a look-up table.
-    else {
-        struct {
-            guint             gdk;
-            gnash::key::code  gs;
-        } table[] = {
-            { GDK_BackSpace, gnash::key::BACKSPACE },
-            { GDK_Tab, gnash::key::TAB },
-            { GDK_Clear, gnash::key::CLEAR },
-            { GDK_Return, gnash::key::ENTER },
-            
-            { GDK_Shift_L, gnash::key::SHIFT },
-            { GDK_Shift_R, gnash::key::SHIFT },
-            { GDK_Control_L, gnash::key::CONTROL },
-            { GDK_Control_R, gnash::key::CONTROL },
-            { GDK_Alt_L, gnash::key::ALT },
-            { GDK_Alt_R, gnash::key::ALT },
-            { GDK_Caps_Lock, gnash::key::CAPSLOCK },
-            
-            { GDK_Escape, gnash::key::ESCAPE },
-            
-            { GDK_Page_Down, gnash::key::PGDN },
-            { GDK_Page_Up, gnash::key::PGUP },
-            { GDK_Home, gnash::key::HOME },
-            { GDK_End, gnash::key::END },
-            { GDK_Left, gnash::key::LEFT },
-            { GDK_Up, gnash::key::UP },
-            { GDK_Right, gnash::key::RIGHT },
-            { GDK_Down, gnash::key::DOWN },
-            { GDK_Insert, gnash::key::INSERT },
-            { GDK_Delete, gnash::key::DELETEKEY },
-            
-            { GDK_Help, gnash::key::HELP },
-            { GDK_Num_Lock, gnash::key::NUM_LOCK },
-
-            { GDK_VoidSymbol, gnash::key::INVALID }
-        };
-        
-        for (int i = 0; table[i].gdk != GDK_VoidSymbol; i++) {
-            if (key == table[i].gdk) {
-                c = table[i].gs;
-                break;
-            }
-        }
-    }
-    
-    return c;
-}
-
-int
-GtkGui::gdk_to_gnash_modifier(int state)
-{
-    int modifier = gnash::key::MOD_NONE;
-
-    if (state & GDK_SHIFT_MASK) {
-      modifier = modifier | gnash::key::MOD_SHIFT;
-    }
-    if (state & GDK_CONTROL_MASK) {
-      modifier = modifier | gnash::key::MOD_CONTROL;
-    }
-    if (state & GDK_MOD1_MASK) {
-      modifier = modifier | gnash::key::MOD_ALT;
-    }
-
-    return modifier;
-}
 
 gboolean
 GtkGui::key_press_event(GtkWidget *const /*widget*/,
@@ -1585,7 +1560,6 @@ GtkGui::key_press_event(GtkWidget *const /*widget*/,
     return true;
 }
 
-
 gboolean
 GtkGui::key_release_event(GtkWidget *const /*widget*/,
                 GdkEventKey *const event,
@@ -1605,7 +1579,6 @@ GtkGui::key_release_event(GtkWidget *const /*widget*/,
     
     return true;
 }
-
 
 gboolean
 GtkGui::button_press_event(GtkWidget *const /*widget*/,
@@ -1648,6 +1621,15 @@ GtkGui::motion_notify_event(GtkWidget *const /*widget*/,
     obj->notify_mouse_moved(int(event->x / xscale), int(event->y / yscale));
     return true;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///                                                                         ///
+///                                Menus                                    ///
+///                                                                         ///
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
 
 // Create a File menu that can be used from the menu bar or the popup.
 void
@@ -1899,6 +1881,106 @@ GtkGui::createControlMenu(GtkWidget *obj)
 
 #endif
 
+}
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///                                                                         ///
+///                             Other stuff                                 ///
+///                                                                         ///
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+gnash::key::code
+GtkGui::gdk_to_gnash_key(guint key)
+{
+    gnash::key::code  c(gnash::key::INVALID);
+
+    // ascii 32-126 in one range:    
+    if (key >= GDK_space && key <= GDK_asciitilde) {
+        c = (gnash::key::code) ((key - GDK_space) + gnash::key::SPACE);
+    }
+
+    // Function keys:
+    else if (key >= GDK_F1 && key <= GDK_F15)	{
+        c = (gnash::key::code) ((key - GDK_F1) + gnash::key::F1);
+    }
+
+    // Keypad:
+    else if (key >= GDK_KP_0 && key <= GDK_KP_9) {
+        c = (gnash::key::code) ((key - GDK_KP_0) + gnash::key::KP_0);
+    }
+
+    // Extended ascii:
+    else if (key >= GDK_nobreakspace && key <= GDK_ydiaeresis) {
+        c = (gnash::key::code) ((key - GDK_nobreakspace) + gnash::key::NOBREAKSPACE);
+    }
+
+    // non-character keys don't correlate, so use a look-up table.
+    else {
+        struct {
+            guint             gdk;
+            gnash::key::code  gs;
+        } table[] = {
+            { GDK_BackSpace, gnash::key::BACKSPACE },
+            { GDK_Tab, gnash::key::TAB },
+            { GDK_Clear, gnash::key::CLEAR },
+            { GDK_Return, gnash::key::ENTER },
+            
+            { GDK_Shift_L, gnash::key::SHIFT },
+            { GDK_Shift_R, gnash::key::SHIFT },
+            { GDK_Control_L, gnash::key::CONTROL },
+            { GDK_Control_R, gnash::key::CONTROL },
+            { GDK_Alt_L, gnash::key::ALT },
+            { GDK_Alt_R, gnash::key::ALT },
+            { GDK_Caps_Lock, gnash::key::CAPSLOCK },
+            
+            { GDK_Escape, gnash::key::ESCAPE },
+            
+            { GDK_Page_Down, gnash::key::PGDN },
+            { GDK_Page_Up, gnash::key::PGUP },
+            { GDK_Home, gnash::key::HOME },
+            { GDK_End, gnash::key::END },
+            { GDK_Left, gnash::key::LEFT },
+            { GDK_Up, gnash::key::UP },
+            { GDK_Right, gnash::key::RIGHT },
+            { GDK_Down, gnash::key::DOWN },
+            { GDK_Insert, gnash::key::INSERT },
+            { GDK_Delete, gnash::key::DELETEKEY },
+            
+            { GDK_Help, gnash::key::HELP },
+            { GDK_Num_Lock, gnash::key::NUM_LOCK },
+
+            { GDK_VoidSymbol, gnash::key::INVALID }
+        };
+        
+        for (int i = 0; table[i].gdk != GDK_VoidSymbol; i++) {
+            if (key == table[i].gdk) {
+                c = table[i].gs;
+                break;
+            }
+        }
+    }
+    
+    return c;
+}
+
+int
+GtkGui::gdk_to_gnash_modifier(int state)
+{
+    int modifier = gnash::key::MOD_NONE;
+
+    if (state & GDK_SHIFT_MASK) {
+      modifier = modifier | gnash::key::MOD_SHIFT;
+    }
+    if (state & GDK_CONTROL_MASK) {
+      modifier = modifier | gnash::key::MOD_CONTROL;
+    }
+    if (state & GDK_MOD1_MASK) {
+      modifier = modifier | gnash::key::MOD_ALT;
+    }
+
+    return modifier;
 }
 
 bool

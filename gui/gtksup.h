@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -64,6 +64,9 @@ class DSOEXPORT GtkGui : public Gui
     virtual void setInterval(unsigned int interval);
     virtual void setTimeout(unsigned int timeout);
     
+    virtual void setFullscreen();
+    virtual void unsetFullscreen();
+    
     /// Add a listener with default priority that listens for IN and HUP
     /// events on a file descriptor.
     //
@@ -77,9 +80,6 @@ class DSOEXPORT GtkGui : public Gui
     /// @param data A pointer to a user-defined data structure.
     /// @return true on success, false on failure.
     bool addFDListener(int fd, callback_t callback, void* data);
-
-    void setFullscreen();
-    void unsetFullscreen();
 
     /// Grab focus so to receive all key events
     //
@@ -95,9 +95,17 @@ class DSOEXPORT GtkGui : public Gui
     void createViewMenu(GtkWidget *obj);
     void createHelpMenu(GtkWidget *obj);
     void createControlMenu(GtkWidget *obj);
+    
+    // Display a properties dialogue
+    void showPropertiesDialog();
+    
+    // Display a preferences dialogue
+    void showPreferencesDialog();
+    
+    // Display an About dialogue
+    void showAboutDialog();
 
     // Menu Item callbacks
-
     static void menuitem_sound_callback(GtkMenuItem *menuitem,
                                    gpointer instance);
     static void menuitem_fullscreen_callback(GtkMenuItem *menuitem,
@@ -126,8 +134,6 @@ class DSOEXPORT GtkGui : public Gui
                                            gpointer instance);
     static void menuitem_preferences_callback(GtkMenuItem *menuitem,
                                               gpointer instance);
-
-    /// Show info about the movie currently being played
     static void menuitem_movieinfo_callback(GtkMenuItem *menuitem,
                                               gpointer instance);
 
@@ -136,8 +142,6 @@ class DSOEXPORT GtkGui : public Gui
                                    gpointer instance);
  
     // GTK Event handlers
-    static gboolean unrealize_event(GtkWidget *widget, GdkEvent *event,
-                                    gpointer data);
     static gboolean realize_event(GtkWidget *widget, GdkEvent *event,
                                   gpointer data);
     static gboolean delete_event(GtkWidget *widget, GdkEvent *event,
@@ -161,8 +165,6 @@ class DSOEXPORT GtkGui : public Gui
     void add_pixmap_directory(const gchar *directory);
 
     gchar* find_pixmap_file(const gchar *filename);
-
-    GdkPixbuf* create_pixbuf(const gchar *filename);
     
     void rerenderPixels(int xmin, int ymin, int xmax, int ymax);
     
@@ -171,7 +173,6 @@ class DSOEXPORT GtkGui : public Gui
     bool want_multiple_regions() { return true; }
 
     virtual void setCursor(gnash_cursor_type newcursor);
-    GtkWidget *getWindow() { return _window; };
 
  private:
 #ifdef GUI_HILDON
@@ -181,23 +182,29 @@ class DSOEXPORT GtkGui : public Gui
     
     // A window only for rendering the plugin as fullscreen.
     GtkWidget	*_overlay;
-    GdkPixbuf 	*_window_icon_pixbuf;
     GtkWidget   *_drawing_area;    
     GtkMenu     *_popup_menu;
     GtkWidget   *_menubar;
     GtkWidget   *_vbox;
+
     std::vector< geometry::Range2d<int> > _drawbounds;
+
+    // Adds the gnash icon to a window.
+    void addGnashIcon(GtkWindow* window);
+    
+    GdkPixbuf* createPixbuf(const gchar *filename);
+    
+    // Create a tree model for displaying movie info (not yet properly
+    // implemented).
+    GtkTreeModel* makeTreeModel (std::auto_ptr<InfoTree> treepointer);
 
     std::auto_ptr<GtkGlue>     _glue;
 
     static gnash::key::code gdk_to_gnash_key(guint key);
     static int gdk_to_gnash_modifier(int state);
-    static void             open_file(GtkWidget* dialog, gpointer data);
-
-    static GtkTreeModel* makeTreeModel (std::auto_ptr<InfoTree> treepointer);
+    static void open_file(GtkWidget* dialog, gpointer data);
 
 };
-
 
 // end of namespace gnash 
 }

@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -159,19 +159,19 @@ public:
     /// called with the coordinates of the complete screen. 
     virtual bool want_redraw();
 
-
     /// Sets the current mouse cursor for the Gui window.
     virtual void setCursor(gnash_cursor_type newcursor);
 
     /// @return The value to which the movie width should be scaled.
     float getXScale();
 
-    /// @return The value to which the movie height shold be scaled.
+    /// @return The value to which the movie height should be scaled.
     float getYScale();
 
     /// @return Whether or not the movie should be looped indefinitely.
     bool loops();
-    
+
+    /// @return Whether the movie is running fullscreen or not.    
     bool isFullscreen() { return _fullscreen; }
 
     /// Mouse notification callback to be called when the mouse is moved.
@@ -219,11 +219,16 @@ public:
     ///
     void refreshView();
 
-    /// Run fullscreen
-    ///
+    /// Attempt to run in a fullscreen window both for plugin and
+    /// standalone player.
+    //
+    /// Use gui::isFullscreen() to see if gnash thinks
+    /// it's running in fullscreen or not. The switch to fullscreen may
+    /// fail if, for instance, the window manager refuses to allow it, but
+    /// the flag will be set anyway.
     virtual void setFullscreen();
 
-    /// Exit fullscreen
+    /// Return from fullscreen to normal mode.
     ///
     virtual void unsetFullscreen();
     
@@ -359,7 +364,6 @@ protected:
     /// Signals that the next frame must be re-rendered completely because the
     /// window size did change.
     bool            _redraw_flag;
-    
     // True if Gnash is running in fullscreen
     bool	    _fullscreen;
 
