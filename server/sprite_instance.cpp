@@ -1076,12 +1076,15 @@ sprite_localToGlobal(const fn_call& fn)
 static as_value
 sprite_setMask(const fn_call& fn)
 {
-	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
+	// swfdec/test/image/mask-textfield-6.swf shows that setMask should also
+	// work against TextFields, we have no tests for other character types so
+	// we generalize it for any character.
+	boost::intrusive_ptr<character> maskee = ensureType<character>(fn.this_ptr);
 
 	if ( ! fn.nargs )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("%s.setMask() : needs an argument"), sprite->getTarget().c_str());
+		log_aserror(_("%s.setMask() : needs an argument"), maskee->getTarget().c_str());
 		);
 		return as_value();
 	}
@@ -1090,24 +1093,24 @@ sprite_setMask(const fn_call& fn)
 	if ( arg.is_null() || arg.is_undefined() )
 	{
 		// disable mask
-		sprite->setMask(NULL);
+		maskee->setMask(NULL);
 	}
 	else
 	{
 
 		boost::intrusive_ptr<as_object> obj ( arg.to_object() );
-		character* ch = dynamic_cast<character*>(obj.get());
-		if ( ! ch )
+		character* mask = dynamic_cast<character*>(obj.get());
+		if ( ! mask )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("%s.setMask(%s) : first argument is not a character"),
-				sprite->getTarget().c_str(), arg.to_debug_string().c_str());
+				maskee->getTarget().c_str(), arg.to_debug_string().c_str());
 			);
 			return as_value();
 		}
 
 		// ch is possibly NULL, which is intended
-		sprite->setMask(ch); 
+		maskee->setMask(mask);
 	}
 
 	//log_debug("MovieClip.setMask() TESTING");
