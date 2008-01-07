@@ -1,5 +1,10 @@
 2008-01-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* gui/gtk.cpp: move fullscreen to View menu and give it a pretty icon,
+	  plus some reorganization that got missed last time.
+
+2008-01-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* gui/gtk{sup.h,.cpp}: cleanup, reorganize, add convenience functions
 	  for widget and dialogue display. Add the Gnash icon to most windows.
 	  Fix fullscreen display for movies that are initially larger than the

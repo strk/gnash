@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.128 2008/01/07 09:47:28 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.129 2008/01/07 11:37:40 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -307,6 +307,80 @@ GtkGui::unsetFullscreen()
     _fullscreen = false;
 }
 
+void 
+GtkGui::setCursor(gnash_cursor_type newcursor)
+{
+  //GNASH_REPORT_FUNCTION;
+
+    GdkCursorType cursortype;
+
+    switch(newcursor) {
+        case CURSOR_HAND:
+            cursortype = GDK_HAND2;
+            break;
+        case CURSOR_INPUT:
+            cursortype = GDK_XTERM;
+            break;
+        default:
+            cursortype = GDK_LAST_CURSOR;
+    }
+  
+    GdkCursor* gdkcursor = NULL;
+  
+    if (cursortype != GDK_LAST_CURSOR) {
+         gdkcursor = gdk_cursor_new(cursortype);
+    }
+
+    // The parent of _drawing_area is different for the plugin in fullscreen
+    gdk_window_set_cursor (gtk_widget_get_parent_window(_drawing_area),
+  		gdkcursor);
+  
+    if (gdkcursor) {
+        gdk_cursor_unref(gdkcursor);
+    }
+}
+
+bool
+GtkGui::setupEvents()
+{
+  //GNASH_REPORT_FUNCTION;
+
+    g_signal_connect(G_OBJECT(_window), "delete_event",
+                   G_CALLBACK(delete_event), this);
+    g_signal_connect(G_OBJECT(_window), "key_press_event",
+                   G_CALLBACK(key_press_event), this);
+    g_signal_connect(G_OBJECT(_window), "key_release_event",
+                   G_CALLBACK(key_release_event), this);
+
+    gtk_widget_add_events(_drawing_area, GDK_EXPOSURE_MASK
+                        | GDK_BUTTON_PRESS_MASK
+                        | GDK_BUTTON_RELEASE_MASK
+                        | GDK_KEY_RELEASE_MASK
+                        | GDK_KEY_PRESS_MASK        
+                        | GDK_POINTER_MOTION_MASK);
+  
+    g_signal_connect_swapped(G_OBJECT(_drawing_area),
+                            "button_press_event",
+                            G_CALLBACK(popup_handler),
+                            GTK_OBJECT(_popup_menu));
+  
+    g_signal_connect(G_OBJECT(_drawing_area), "button_press_event",
+                   G_CALLBACK(button_press_event), this);
+    g_signal_connect(G_OBJECT(_drawing_area), "button_release_event",
+                   G_CALLBACK(button_release_event), this);
+    g_signal_connect(G_OBJECT(_drawing_area), "motion_notify_event",
+                   G_CALLBACK(motion_notify_event), this);
+  
+    g_signal_connect_after(G_OBJECT (_drawing_area), "realize",
+                         G_CALLBACK (realize_event), NULL);
+    g_signal_connect(G_OBJECT (_drawing_area), "configure_event",
+                   G_CALLBACK (configure_event), this);
+    g_signal_connect(G_OBJECT (_drawing_area), "expose_event",
+                    G_CALLBACK (expose_event), this);
+
+    return true;
+}
+
 void
 GtkGui::grabFocus()
 {
@@ -362,8 +436,6 @@ GtkGui::createMenu()
     //GNASH_REPORT_FUNCTION;
 
     _popup_menu = GTK_MENU(gtk_menu_new());
-//    GtkAccelGroup *accel_group = gtk_accel_group_new();;
-//    gtk_window_add_accel_group (GTK_WINDOW (_popup_menu), accel_group);
     
 #ifdef USE_MENUS
     createFileMenu(GTK_WIDGET(_popup_menu));
@@ -383,13 +455,6 @@ GtkGui::createMenu()
         g_signal_connect(GTK_OBJECT(menuitem_sound), "activate",
                          G_CALLBACK(&menuitem_sound_callback), this);
     }
-
-    GtkMenuItem *menuitem_fsc =
-        GTK_MENU_ITEM(gtk_menu_item_new_with_label("Toggle Fullscreen"));
-    gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_fsc));
-    gtk_widget_show(GTK_WIDGET(menuitem_fsc));
-    g_signal_connect(GTK_OBJECT(menuitem_fsc), "activate",
-                         G_CALLBACK(&menuitem_fullscreen_callback), this);
 
     GtkMenuItem *menuitem_quit =
  	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Quit Gnash"));
@@ -977,80 +1042,6 @@ GtkGui::showPreferencesDialog()
     gtk_widget_show (window1);    
 }
 
-void 
-GtkGui::setCursor(gnash_cursor_type newcursor)
-{
-  //GNASH_REPORT_FUNCTION;
-
-    GdkCursorType cursortype;
-
-    switch(newcursor) {
-        case CURSOR_HAND:
-            cursortype = GDK_HAND2;
-            break;
-        case CURSOR_INPUT:
-            cursortype = GDK_XTERM;
-            break;
-        default:
-            cursortype = GDK_LAST_CURSOR;
-    }
-  
-    GdkCursor* gdkcursor = NULL;
-  
-    if (cursortype != GDK_LAST_CURSOR) {
-         gdkcursor = gdk_cursor_new(cursortype);
-    }
-
-    // The parent of _drawing_area is different for the plugin in fullscreen
-    gdk_window_set_cursor (gtk_widget_get_parent_window(_drawing_area),
-  		gdkcursor);
-  
-    if (gdkcursor) {
-        gdk_cursor_unref(gdkcursor);
-    }
-}
-
-bool
-GtkGui::setupEvents()
-{
-  //GNASH_REPORT_FUNCTION;
-
-    g_signal_connect(G_OBJECT(_window), "delete_event",
-                   G_CALLBACK(delete_event), this);
-    g_signal_connect(G_OBJECT(_window), "key_press_event",
-                   G_CALLBACK(key_press_event), this);
-    g_signal_connect(G_OBJECT(_window), "key_release_event",
-                   G_CALLBACK(key_release_event), this);
-
-    gtk_widget_add_events(_drawing_area, GDK_EXPOSURE_MASK
-                        | GDK_BUTTON_PRESS_MASK
-                        | GDK_BUTTON_RELEASE_MASK
-                        | GDK_KEY_RELEASE_MASK
-                        | GDK_KEY_PRESS_MASK        
-                        | GDK_POINTER_MOTION_MASK);
-  
-    g_signal_connect_swapped(G_OBJECT(_drawing_area),
-                            "button_press_event",
-                            G_CALLBACK(popup_handler),
-                            GTK_OBJECT(_popup_menu));
-  
-    g_signal_connect(G_OBJECT(_drawing_area), "button_press_event",
-                   G_CALLBACK(button_press_event), this);
-    g_signal_connect(G_OBJECT(_drawing_area), "button_release_event",
-                   G_CALLBACK(button_release_event), this);
-    g_signal_connect(G_OBJECT(_drawing_area), "motion_notify_event",
-                   G_CALLBACK(motion_notify_event), this);
-  
-    g_signal_connect_after(G_OBJECT (_drawing_area), "realize",
-                         G_CALLBACK (realize_event), NULL);
-    g_signal_connect(G_OBJECT (_drawing_area), "configure_event",
-                   G_CALLBACK (configure_event), this);
-    g_signal_connect(G_OBJECT (_drawing_area), "expose_event",
-                    G_CALLBACK (expose_event), this);
-
-    return true;
-}
-
 void
 GtkGui::showPropertiesDialog()
 {
@@ -1409,7 +1400,7 @@ GtkGui::menuitem_play_callback(GtkMenuItem* /*menuitem*/, gpointer data)
     gui->menu_play();
 }
 
-/// \brief toggle that's playing or paused.
+/// \brief toggle between playing or paused.
 void
 GtkGui::menuitem_pause_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
@@ -1750,7 +1741,7 @@ GtkGui::createViewMenu(GtkWidget *obj)
     GtkWidget *menu = gtk_menu_new ();
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), menu);
 
-// Refresh
+    // Refresh
     GtkImageMenuItem *menuitem_refresh =
  	GTK_IMAGE_MENU_ITEM(
 	    gtk_image_menu_item_new_with_label(_("Redraw")));
@@ -1761,6 +1752,23 @@ GtkGui::createViewMenu(GtkWidget *obj)
     gtk_widget_show(GTK_WIDGET(menuitem_refresh));
     g_signal_connect ((gpointer) menuitem_refresh, "activate",
         G_CALLBACK (&menuitem_refresh_view_callback), this);
+
+    // Fullscreen
+#if GTK_CHECK_VERSION(2,8,0)
+    GtkImageMenuItem *menuitem_fullscreen =
+ 	GTK_IMAGE_MENU_ITEM(
+	    gtk_image_menu_item_new_with_label(_("Toggle fullscreen")));
+    gtk_image_menu_item_set_image (menuitem_refresh,
+				   gtk_image_new_from_stock("gtk-fullscreen",
+						 	     GTK_ICON_SIZE_MENU));
+#else
+    GtkMenuItem *menuitem_fullscreen =
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Toggle fullscreen")));
+#endif
+    gtk_menu_append(menu, GTK_WIDGET(menuitem_fullscreen));
+    gtk_widget_show(GTK_WIDGET(menuitem_fullscreen));
+    g_signal_connect(GTK_OBJECT(menuitem_fullscreen), "activate",
+                         G_CALLBACK(&menuitem_fullscreen_callback), this);
 }
 
 // Create a Control menu that can be used from the menu bar or the popup.
