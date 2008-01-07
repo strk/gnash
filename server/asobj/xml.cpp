@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.62 2008/01/07 11:59:30 strk Exp $ */
+/* $Id: xml.cpp,v 1.63 2008/01/07 12:02:07 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -553,7 +553,7 @@ XML::load(const URL& url)
         //callMethod(VM::get().getStringTable().find(PROPNAME("onData")), nullValue);
     }
 
-    log_msg(_("Loading XML file from url: '%s'"), url.str().c_str());
+    log_security(_("Loading XML file from url: '%s'"), url.str().c_str());
     queueLoad(str);
 
     return true;
