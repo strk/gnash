@@ -1,3 +1,15 @@
+2008-01-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/gtk{sup.h,.cpp}: cleanup, reorganize, add convenience functions
+	  for widget and dialogue display. Add the Gnash icon to most windows.
+	  Fix fullscreen display for movies that are initially larger than the
+	  screen size in the stand-alone player. The icon in the 'About'
+	  dialogue also works now.
+	* plugin/plugin.cpp: add 2008 to copyright declaration in the plugin
+	  description.
+	* gui/gui.{h,cpp}: add comments.
+	* all modified files: add 2008 to copyright year.
+
 2008-01-07 Sandro Santilli <strk@keybit.net>
 
 	* AUTHORS: add Zou Lunkai and Benjamin Wolsey.
