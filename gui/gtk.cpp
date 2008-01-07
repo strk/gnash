@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.129 2008/01/07 11:37:40 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.130 2008/01/07 12:04:18 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1755,10 +1755,9 @@ GtkGui::createViewMenu(GtkWidget *obj)
 
     // Fullscreen
 #if GTK_CHECK_VERSION(2,8,0)
-    GtkImageMenuItem *menuitem_fullscreen =
- 	GTK_IMAGE_MENU_ITEM(
+    GtkImageMenuItem *menuitem_fullscreen = GTK_IMAGE_MENU_ITEM(
 	    gtk_image_menu_item_new_with_label(_("Toggle fullscreen")));
-    gtk_image_menu_item_set_image (menuitem_refresh,
+    gtk_image_menu_item_set_image (menuitem_fullscreen,
 				   gtk_image_new_from_stock("gtk-fullscreen",
 						 	     GTK_ICON_SIZE_MENU));
 #else
