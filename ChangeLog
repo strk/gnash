@@ -1,5 +1,11 @@
 2008-01-07 Sandro Santilli <strk@keybit.net>
 
+	* server/array.cpp: in Array constructor take negative
+	  length as zero. Not correct yet, but at least saves some
+	  memory and makes Gnash a bit more robust (fixes bug #21975).
+
+2008-01-07 Sandro Santilli <strk@keybit.net>
+
 	* server/fill_style.{cpp,h}: add a matrix argument
 	  to the constructor taking a bitmap definition.
 	* server/parser/BitmapMovieDefinition.cpp: appropriately

@@ -1411,23 +1411,9 @@ array_new(const fn_call& fn)
 	else if (fn.nargs == 1 && fn.arg(0).is_number() )
 	{
 		// TODO: limit max size !!
-		unsigned int newSize = fn.arg(0).to_number();
-		ao->resize(newSize);
-#if 0
-		// Create an empty array with the given number of undefined elements.
-		//
-		as_value index_number, undef_value;
-		VM& vm = VM::get();
-		int sv = vm.getSWFVersion();
-		string_table& st = vm.getStringTable();
-
-		undef_value.set_undefined();
-		for (int i = 0; i < int(fn.arg(0).to_number()); i++)
-		{
-			index_number.set_int(i);
-			ao->set_member(st.find(index_number.to_string_versioned(sv)), undef_value);
-		}
-#endif
+		int newSize = fn.arg(0).to_number();
+		if ( newSize < 0 ) newSize = 0;
+		else ao->resize(newSize);
 	}
 	else
 	{
