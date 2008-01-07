@@ -1,4 +1,4 @@
-/* $Id: AUTHORS,v 1.5 2007/05/14 10:03:37 jgilmore Exp $ */
+/* $Id: AUTHORS,v 1.6 2008/01/07 09:12:21 strk Exp $ */
 
 The maintainer of Gnash is:
 --------------------------
@@ -15,6 +15,8 @@ Udo Giacomozzi <udo.gnu@nova-sys.net>
 Markus Gothe <nietzsche@lysator.liu.se>
 Hannes Mayr <hannes.mayr@indunet.it>
 John Gilmore <gnu@toad.com>
+Zou Lunkai <zoulunkai@gmail.com>
+Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 Plus a host of other contributors (see ChangeLog).
 
