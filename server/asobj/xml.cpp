@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.63 2008/01/07 12:02:07 strk Exp $ */
+/* $Id: xml.cpp,v 1.64 2008/01/07 20:37:31 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -456,8 +456,8 @@ XML::getBytesTotal() const
 void
 XML::checkLoads()
 {
-    static int call=0;
 #ifdef DEBUG_XML_LOADS
+    static int call=0;
     log_debug("XML %p checkLoads call %d, _loadThreads: %d", (void *)this, _loadThreads.size(), ++call);
 #endif
 
