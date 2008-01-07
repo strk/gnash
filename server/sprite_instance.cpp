@@ -4167,7 +4167,8 @@ sprite_instance::get_root() const
 		// if the relative root has a parent we descend
 		// to it unless SWF version of relRoot is >= 7
 		// AND _lockroot is true
-		if ( relRoot->getSWFVersion() >= 7 )
+		//if ( relRoot->getSWFVersion() >= 7 )
+		if ( getVM().getSWFVersion() >= 7 )
 		{
 			//string_table& st = _vm.getStringTable();
 			//as_value lockRoot = relRoot->getMember(st.find("_lockroot"));

@@ -1,5 +1,13 @@
 2008-01-07 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (get_root): use VM version, not
+	  relative movie one, to determine whether or not to use
+	  _lockroot.
+	* testsuite/actionscript.all/MovieClipLoader.as: _lockroot use
+	  success.
+
+2008-01-07 Sandro Santilli <strk@keybit.net>
+
 	* server/array.cpp: in Array constructor take negative
 	  length as zero. Not correct yet, but at least saves some
 	  memory and makes Gnash a bit more robust (fixes bug #21975).

@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClipLoader.as,v 1.13 2008/01/07 16:47:25 strk Exp $";
+rcsid="$Id: MovieClipLoader.as,v 1.14 2008/01/07 20:31:11 strk Exp $";
 
 #include "check.as"
 
@@ -145,6 +145,8 @@ nextTestOrEnd = function()
 		progCallbackTests = totalProgressCalls*testsPerProgressCallback;
 		note("Number of onLoadProgress runs: "+totalProgressCalls+" - tests: "+progCallbackTests);
 		if ( expected.failtotals ) {
+			// this is failing due to vars.txt not being loaded
+			// (how could it?)
 			xcheck_totals(expected.totals + progCallbackTests);
 		} else {
 			check_totals(expected.totals + progCallbackTests);
@@ -244,9 +246,7 @@ mcl.onLoadInit = function(target)
 			note("---- Target's root is "+_root);
 			check_equals(_root, _level0);
 			_lockroot = true;
-			// no idea why this fails, could be due to the assignment above doing unexpected things
-			// (assigning to pre-rebound dangling char ref?)..
-			xcheck_equals(_root, _level0.loadtarget);
+			check_equals(_root, _level0.loadtarget);
 			note("---- After setting _lockroot to true, target's root is "+_root);
 			_lockroot = false;
 			check_equals(_root, _level0);
