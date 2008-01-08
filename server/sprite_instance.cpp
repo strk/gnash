@@ -877,6 +877,25 @@ sprite_getSWFVersion(const fn_call& fn)
 	return as_value(sprite->getSWFVersion());
 }
 
+// MovieClip.meth(<string>) : Number
+//
+// Parses case-insensitive "get" and "post" into 1 and 2, 0 anything else
+// 
+static as_value
+sprite_meth(const fn_call& fn)
+{
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
+
+	if ( ! fn.nargs ) return as_value(0);
+	as_value& v = fn.arg(0);
+	if ( ! v.is_string() ) return as_value(0);
+	std::string s = v.to_string();
+	boost::to_lower(s);
+	if ( s == "get" ) return as_value(1);
+	if ( s == "post" )  return as_value(2);
+	return as_value(0);
+}
+
 // getTextSnapshot() : TextSnapshot
 static as_value
 sprite_getTextSnapshot(const fn_call& fn)
@@ -1783,6 +1802,7 @@ attachMovieClipInterface(as_object& o)
 	o.init_member("globalToLocal", new builtin_function(sprite_globalToLocal));
 	o.init_member("localToGlobal", new builtin_function(sprite_localToGlobal));
 	o.init_member("getSWFVersion", new builtin_function(sprite_getSWFVersion));
+	o.init_member("meth", new builtin_function(sprite_meth));
 	o.init_member("enabled", true); // see MovieClip.as testcase
 
 	gettersetter = new builtin_function(&sprite_instance::lockroot_getset, NULL);

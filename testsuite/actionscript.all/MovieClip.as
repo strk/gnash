@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.111 2007/12/26 12:35:13 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.112 2008/01/08 10:36:57 strk Exp $";
 
 #include "check.as"
 
@@ -78,6 +78,7 @@ check_equals(typeof(mc.getBounds), 'function');
 check_equals(typeof(mc.globalToLocal), 'function');
 check_equals(typeof(mc.localToGlobal), 'function');
 check_equals(typeof(mc.unloadMovie), 'function');
+check_equals(typeof(mc.meth), 'function');
 check_equals(typeof(mc.getSWFVersion), 'function');
 check_equals(mc.getSWFVersion(), OUTPUT_VERSION);
 
@@ -87,6 +88,7 @@ check(MovieClip.prototype.hasOwnProperty('_lockroot'));
 check(!MovieClip.prototype.hasOwnProperty('loadMovieNum'));
 check(!MovieClip.prototype.hasOwnProperty('valueOf')); 
 check(!MovieClip.prototype.hasOwnProperty('toString')); 
+check(MovieClip.prototype.hasOwnProperty('meth')); 
 #endif
 check_equals(typeof(mc.valueOf), 'function');
 check_equals(typeof(mc.toString), 'function');
@@ -1294,16 +1296,58 @@ check_equals(getInstanceAtDepth(-6.2), tt2);
 
 #endif // OUTPUT_VERSION >= 7
 
+//---------------------------------------------------------------------
+// Test the MovieClip.prototype.meth function
+//---------------------------------------------------------------------
+
+ret = _root.meth();
+check_equals(typeof(ret), 'number');
+check_equals(ret, 0);
+
+ret = _root.meth(1);
+check_equals(typeof(ret), 'number');
+check_equals(ret, 0);
+
+ret = _root.meth('post');
+check_equals(typeof(ret), 'number');
+check_equals(ret, 2);
+
+ret = _root.meth('POSt');
+check_equals(typeof(ret), 'number');
+check_equals(ret, 2);
+
+ret = _root.meth('pOStIcipate');
+check_equals(typeof(ret), 'number');
+check_equals(ret, 0);
+
+ret = _root.meth('G');
+check_equals(typeof(ret), 'number');
+check_equals(ret, 0);
+
+ret = _root.meth('geT');
+check_equals(typeof(ret), 'number');
+check_equals(ret, 1);
+
+ret = _root.meth('geTty');
+check_equals(typeof(ret), 'number');
+check_equals(ret, 0);
+
+o = {}; o.toString = function() { return "post"; };
+ret = _root.meth(o);
+check_equals(typeof(ret), 'number');
+check_equals(ret, 0);
+
+
 #if OUTPUT_VERSION < 6
- check_totals(166); // SWF5
+ check_totals(185); // SWF5
 #else
 #if OUTPUT_VERSION < 7
- check_totals(561); // SWF6
+ check_totals(581); // SWF6
 #else
 #if OUTPUT_VERSION < 8
- check_totals(578); // SWF7
+ check_totals(598); // SWF7
 #else
- check_totals(579); // SWF8+
+ check_totals(599); // SWF8+
 #endif
 #endif
 #endif

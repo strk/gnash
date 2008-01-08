@@ -1,5 +1,7 @@
 2008-01-08 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp: implement MovieClip.meth() function.
+	* testsuite/actionscript.all/MovieClip.as: tests for MovieClip.meth().
 	* testsuite/misc-mtasc.all/level99.as: add tests for _levelX._name
 	  being undefined.
 
