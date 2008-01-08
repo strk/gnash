@@ -37,6 +37,11 @@ class LevelsMain
 
                 // The ""+ is there to force conversion to a string
                 check_equals(""+mc, "_level0");
+
+		mc.onEnterFrame = function ()
+		{
+			this.frameno++;
+		}
 	}
 
         function run() {

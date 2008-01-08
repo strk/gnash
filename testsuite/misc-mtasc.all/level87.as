@@ -45,8 +45,6 @@ class Level87
 
                 check_equals(mc._currentframe, 1);
 
-                check_equals(_level0._currentframe, 1);
-
                 // Check our depth
 		check_equals(mc.getDepth(), -16297);
 
@@ -55,11 +53,15 @@ class Level87
 
 		if (_level0.level87loaded )
 		{
+                	xcheck_equals(_level0.frameno, 3);
+
                 	check_equals(typeof(_level5), 'undefined');
 			return;
 		}
 
 		_level0.level87loaded = true;
+
+               	xcheck_equals(_level0.frameno, 2);
 
 		// This one fails because gnash is executing code
 		// in level99 before code in the first load of level87,

@@ -1,5 +1,11 @@
 2008-01-08 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-mtasc.all/: level5.as, level87.as,
+	  level99.as, levels.as: add tests to check when do
+	  actions in first frame of loaded levels get executed.
+
+2008-01-08 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: DrawingApiTest.as,
 	  DrawingApiTestRunner.cpp: fix test, now the
 	  beginFill alpha is correct (couldn't belive we

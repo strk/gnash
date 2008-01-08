@@ -45,6 +45,8 @@ class Level99
 
                 check_equals(mc._currentframe, 1);
 
+               	xcheck_equals(_level0.frameno, 2);
+
                 // Check our depth
 		check_equals(mc.getDepth(), -16285);
 
@@ -129,7 +131,7 @@ class Level99
 				//  - sane swapping between to levels,
 				//  - swapping & removing _level0 
 				//  
-				check_totals(59);
+				check_totals(61);
 				Dejagnu.done();
 				delete this.onEnterFrame;
 			}
