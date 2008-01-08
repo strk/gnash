@@ -114,6 +114,9 @@ class Level99
 				check_equals(this.l5ref._target, '_level16394');
 				check_equals(this.l99ref._target, '_level16414');
 
+				_level16394.onUnload = function() {
+					check(false); // should not be executed
+				}
 				_level16394.removeMovieClip();
 
 				check_equals(typeof(this.l5ref), 'movieclip');

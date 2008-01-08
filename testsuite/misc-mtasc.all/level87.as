@@ -26,6 +26,22 @@ class Level87
 {
 	static function main(mc)
 	{
+		mc.createEmptyMovieClip("ch", 1);
+		with(mc.ch)
+		{
+			lineStyle(1, 0x00000);
+			beginFill(0xFFFF00, 80);
+			var x=220;
+			var y=170;
+			var width=100;
+			var height=100;
+			moveTo(x, y);
+			lineTo(x+width, y);
+			lineTo(x+width, y+height);
+			lineTo(x, y+height);
+			lineTo(x, y);
+			endFill();
+		};
 
                 check_equals(mc._currentframe, 1);
 
