@@ -23,6 +23,10 @@ and-or-5.swf:a734facbc191156759ad278e25c3f308
 and-or-6.swf:a3a02811b62c07c4d2dd6d6d547f1d2f
 and-or-7.swf:b4c3eb73aa8e0403e8d141516b25c9c6
 array-new-override-5.swf:5016b51c60e30ee262b3cb022ba4c58f
+array-sort-on-5.swf:3c7eaa57454c8a65971d7765bbf3f495
+array-sort-on-6.swf:158e931ebd968351b6a4d3d8ca30b516
+array-sort-on-7.swf:d2ad844a1b5ebe6c65aae075a8273370
+array-sort-on-8.swf:1bed1adba459d3808c64115664767ed3
 array.swf:805c6ee758493ac4c677f44caffa6623
 asbroadcaster-broadcastMessage-retval-5.swf:b492c5b704d58a2ba553f68a1c2f5a37
 asbroadcaster-broadcastMessage-retval-6.swf:fc7e7fb99c1fc91272f5600e61bcaafb
@@ -111,6 +115,10 @@ crash-0.5.4-13379-catch-in-register.swf:490d8d306180cfa513800216bf2c0743
 crash-0.5.4-goto-in-constructor-5.swf:01f124ea9669b0b609a82b58a503dea3
 crash-0.5.4-huge-image-7.swf:57c1e8cbf3cc87b9ad34679c5673cf80
 crash-0.5.4-huge-image-8.swf:a77ca436fd67f4851383ab33943dafe4
+crash-0.5.5-stylesheet-update-5.swf:5e3c012a66e11b10d790ba47ac14097c
+crash-0.5.5-stylesheet-update-6.swf:ea135a06ae6032fd3cd9e2588ed1be67
+crash-0.5.5-stylesheet-update-7.swf:c112cfe1b313fb437fe45cb0c3a7b665
+crash-0.5.5-stylesheet-update-8.swf:73a61afbd582fabd2dbba360cc3763e4
 currentframe.swf:ba479d5adbece0ddafeaa75e68eff052
 dangling-compare-5.swf:7daa85d63e7bf29df6aa1668d21a28a9
 dangling-compare-6.swf:51999fa1cbc988765b5dee03717d22a5
@@ -266,6 +274,8 @@ loadmovie-case-6.swf:e5bc78b62bb2688bd99a57bfec7e4eb1
 loadmovie-case-7.swf:0ce485bdd81c872df4b7327c1d048936
 loadvars-5.swf:378a93e3fc7821a72f61332dcfa6cbf7
 local.swf:12135ef5103f1b0dcc428308511b9c07
+localToGlobal-propflags-5.swf:1c41fae7e9e502de76847c85e938d1a0
+localToGlobal-propflags-8.swf:e851b97b610167933885861048b00b11
 math-constants-5.swf:ca9d0fc66667d7c7863e699367176573
 math-constants-6.swf:cc4a6b92d473f57cb5479c97ba77c2e0
 math-constants-7.swf:53df046dd67c331c79c0c939215ac770
@@ -273,6 +283,9 @@ mouse-addProperty-relevant-5.swf:1bfc494379c8192d0b410ab431efbebd
 mouse-movie-below-movie-5.swf:c7d97de8768c341a64df75dca2686c0b
 mouse-movie-below-nonevent-movie-5.swf:9027280bdb516e12f2e4255776c079a1
 mouse-scaled-5.swf:9138b10aab35c2d4e969057b9c253b42
+movie-enumerate-5.swf:208009dbbd3fd8480fc5dceca5fcd8e3
+movie-enumerate-6.swf:4b20406a4417639d751ef6f68ec66248
+movie-enumerate-7.swf:497ca1729f29c37f5973965b3a73fc70
 movieclip-get-swf-version-5.swf:276a5f85dc4368fa3f1c79f41f50b46b
 movieclip-get-swf-version-5.swf:fe088f984b71c0e78c2335bb05bbec16
 movieclip-get-swf-version-6.swf:2fdfe7f422bf76061c258e8ea5316c4a
@@ -634,5 +647,6 @@ with-outobject-8.swf:914a0e922ae9d4b1b933b33d7abc2502
 with-prototypes-5.swf:4fbad4d181fef388e50d993d61c16917
 with-prototypes-6.swf:6b9dcb482fe520cbc9dc4a8456688905
 with-prototypes-7.swf:20f1f3b8905c8a3f3a61cb18e7e59e76
+xml-init-5.swf:2ba1da174f2b1958749fede5667a60c4
 xml-init-5.swf:bb54cac64e38396084a147266f7d9711
 xml-node-init-5.swf:12fd3762a2bfa787b01fc0b8abfaa492
