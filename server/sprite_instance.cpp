@@ -81,7 +81,7 @@ namespace gnash {
 // Defining the following macro you'll get a DEBUG lien
 // for each call to the drawing API, in a format which is
 // easily re-compilable to obtain a smaller testcase
-#define DEBUG_DRAWING_API 1
+//#define DEBUG_DRAWING_API 1
 
 // Forward declarations
 static as_object* getMovieClipInterface();
