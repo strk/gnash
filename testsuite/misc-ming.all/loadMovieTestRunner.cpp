@@ -115,6 +115,7 @@ main(int /*argc*/, char** /*argv*/)
 	check(tester->isMouseOverMouseEntity());
 	tester->pressMouseButton();
 	sleep(1); // give it some time...
+	tester->advance(); // loads (should) happen on next advance
 	coverartch = const_cast<character*>(tester->findDisplayItemByName(*root, "coverart"));
 	check(coverart != coverartch->to_movie());
 	coverart = coverartch->to_movie();
@@ -129,6 +130,7 @@ main(int /*argc*/, char** /*argv*/)
 	check(tester->isMouseOverMouseEntity());
 	tester->click();
 	sleep(1); // give it some time...
+	tester->advance(); // loads (should) happen on next advance
 	coverartch = const_cast<character*>(tester->findDisplayItemByName(*root, "coverart"));
 	coverart = coverartch->to_movie();
 	check_equals(coverart->get_movie_definition()->get_url(), greenURL.str());
@@ -143,6 +145,7 @@ main(int /*argc*/, char** /*argv*/)
 	check(tester->isMouseOverMouseEntity());
 	tester->click();
 	sleep(1); // give it some time to load
+	tester->advance(); // loads (should) happen on next advance
 	coverartch = const_cast<character*>(tester->findDisplayItemByName(*root, "coverart"));
 	coverart = coverartch->to_movie();
 	check_equals(coverart->get_movie_definition()->get_url(), offspringURL.str());
