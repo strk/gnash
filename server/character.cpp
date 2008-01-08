@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.71 2007/12/23 22:29:56 strk Exp $ */
+/* $Id: character.cpp,v 1.72 2008/01/08 11:35:02 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -115,7 +115,7 @@ character::get_path_element_character(string_table::key key)
 	}
 	else if (name == "_root")
 	{
-		// TODO: handle lockroot ? or have get_root handle it ?
+		// get_root() will handle _lockroot 
 		return get_root();
 	}
 	else if (name.compare(0, 6, "_level") == 0 && name.find_first_not_of("0123456789", 7) == string::npos )
