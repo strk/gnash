@@ -89,6 +89,7 @@ main(int /*argc*/, char** /*argv*/)
 	rgba blue(0, 0, 255, 255);
 	rgba cyan(0, 255, 255, 255);
 	rgba green(0, 255, 0, 255);
+	rgba green_alpha80(120, 248, 120, 255);
 	rgba light_green(128, 255, 128, 255); 
 	// Two greens at 50% alpha overlapping
 	rgba overlapping_light_green(64, 255, 64, 255); 
@@ -127,7 +128,7 @@ main(int /*argc*/, char** /*argv*/)
 	// Inside green counterclockwise fill
 	tester.movePointerTo(220, 112);
 	check(tester.isMouseOverMouseEntity());
-	check_pixel(220, 112, 2, green, 1);
+	check_pixel(220, 112, 2, green_alpha80, 1);
 
 	// Inside violet fill
 	tester.movePointerTo(250, 112);

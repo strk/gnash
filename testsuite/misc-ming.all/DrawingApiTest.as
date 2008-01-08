@@ -17,7 +17,7 @@
 // 'h' toggles _visible
 //
 
-rcsid="$Id: DrawingApiTest.as,v 1.31 2007/11/21 23:33:23 strk Exp $";
+rcsid="$Id: DrawingApiTest.as,v 1.32 2008/01/08 21:53:43 strk Exp $";
 
 #include "../actionscript.all/check.as"
 
@@ -169,7 +169,7 @@ with (a)
 	bnd = printBounds(a.getBounds());
 	check_equals(bnd, "18,80 410,260"); // nothing new..
 
-	// The counter-clockwise cyan-stroke, green-fill square
+	// The counter-clockwise cyan-stroke, green-fill (alpha 50) square
 	moveTo(230, 100);
 	lineStyle(1, 0x00FFFF);
 	beginFill(0x00FF00, 50);

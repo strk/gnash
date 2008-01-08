@@ -1,5 +1,13 @@
 2008-01-08 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: DrawingApiTest.as,
+	  DrawingApiTestRunner.cpp: fix test, now the
+	  beginFill alpha is correct (couldn't belive we
+	  didn't have a test for it, indeed we had but was
+	  incorrect).
+
+2008-01-08 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/MovieClipLoader.cpp: fix MovieClipLoader.getProgress()
 	* testsuite/actionscript.all/MovieClipLoader.as: test
 	  MovieClipLoader.getProgress().
