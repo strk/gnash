@@ -1,5 +1,11 @@
 2008-01-08 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/MovieClipLoader.cpp: fix MovieClipLoader.getProgress()
+	* testsuite/actionscript.all/MovieClipLoader.as: test
+	  MovieClipLoader.getProgress().
+
+2008-01-08 Sandro Santilli <strk@keybit.net>
+
 	* server/impl.cpp: have MovieLibrary read cache limit from Rc file.
 	  See bug #21825.
 	* server/sprite_instance.cpp (sprite_beginFill): don't ignore

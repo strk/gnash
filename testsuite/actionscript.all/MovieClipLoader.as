@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClipLoader.as,v 1.14 2008/01/07 20:31:11 strk Exp $";
+rcsid="$Id: MovieClipLoader.as,v 1.15 2008/01/08 21:34:38 strk Exp $";
 
 #include "check.as"
 
@@ -286,6 +286,14 @@ function test2()
 
 function test3()
 {
+	// getProgress can be called using *any* target
+	// and will return the target's actual size
+	var prog = mcl.getProgress(_level0);
+	check_equals(typeof(prog), 'object');
+	check_equals(prog.__proto__, undefined);
+	check_equals(prog.bytesLoaded, prog.bytesTotal);
+	check_equals(prog.bytesTotal, _level0.getBytesTotal());
+
 	resetState();
 	state.nextFunction = undefined;
 	expected.target = _root.loadtarget;
@@ -301,7 +309,7 @@ function test3()
 	// subtract the number of progress callback runs reported when playing from the totals to get the correct number
 	// BUT MAKE SURE nextTestOrEnd CONTAINS THE CORRECT testsPerProgressCallback INFO !!
 	//
-	expected.totals = 64;
+	expected.totals = 68;
 	// gnash doesn't call onLoadInit if the data at the url is not an SWF or JPG
 	// (or whatever else can become a movie_instance), while the PP does.
 	// So in this testcase, the attempt to load vars.txt is invalid for Gnash
@@ -316,6 +324,7 @@ function test3()
 	loadtarget._x = 200;
 	loadtarget._alpha = 20;
 	check( mcl.loadClip( MEDIA(green.jpg), 'loadtarget' ) );
+
 }
 
 // Due to a bug in Gnash we must stop() before calling test1.

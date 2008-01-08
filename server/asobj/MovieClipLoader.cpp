@@ -93,20 +93,6 @@ getMovieClipLoaderInterface()
 	return o.get();
 }
 
-
-// progress info
-struct mcl {
-	int bytes_loaded;
-	int bytes_total;
-};
-
-
-/// Progress object to use as return of MovieClipLoader.getProgress()
-struct mcl_as_object : public as_object
-{
-	struct mcl data;
-};
-
 class MovieClipLoader: public as_object
 {
 public:
@@ -114,8 +100,6 @@ public:
 	MovieClipLoader();
 
 	~MovieClipLoader();
-
-	struct mcl *getProgress(as_object *ao);
 
 	/// MovieClip
 	bool loadClip(const std::string& url, sprite_instance& target);
@@ -146,15 +130,12 @@ private:
 	std::string     _filespec;
 	int           _progress;
 	bool          _error;
-	struct mcl    _mcl;
 };
 
 MovieClipLoader::MovieClipLoader()
 	:
 	as_object(getMovieClipLoaderInterface())
 {
-	_mcl.bytes_loaded = 0;
-	_mcl.bytes_total = 0;  
 
 	as_array_object* ar = new as_array_object();
 	ar->push(this);
@@ -165,16 +146,6 @@ MovieClipLoader::~MovieClipLoader()
 {
 	GNASH_REPORT_FUNCTION;
 }
-
-// progress of the downloaded file(s).
-struct mcl *
-MovieClipLoader::getProgress(as_object* /*ao*/)
-{
-  GNASH_REPORT_FUNCTION;
-
-  return &_mcl;
-}
-
 
 bool
 MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
@@ -205,12 +176,10 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	callMethod(NSV::PROP_BROADCAST_MESSAGE, as_value("onLoadStart"), targetVal);
 
 	// Dispatch onLoadProgress
-	struct mcl *mcl_data = getProgress(&target);
-	// the callback since we're done loading the file
-	mcl_data->bytes_loaded = target.get_bytes_loaded();
-	mcl_data->bytes_total = target.get_bytes_total();
+	size_t bytesLoaded = target.get_bytes_loaded();
+	size_t bytesTotal = target.get_bytes_total();
 	callMethod(NSV::PROP_BROADCAST_MESSAGE, as_value("onLoadProgress"), targetVal,
-		mcl_data->bytes_loaded, mcl_data->bytes_total);
+		bytesLoaded, bytesTotal);
 
 	// Dispatch onLoadComplete
 	callMethod(NSV::PROP_BROADCAST_MESSAGE, as_value("onLoadComplete"), targetVal,
@@ -329,14 +298,37 @@ moviecliploader_getprogress(const fn_call& fn)
 
 	boost::intrusive_ptr<as_object> target = fn.arg(0).to_object();
   
-	struct mcl *mcl_data = ptr->getProgress(target.get());
+	if ( ! target.get() )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("MovieClipLoader.getProgress(%s): first argument is not an object"),
+			fn.arg(0).to_debug_string().c_str());
+		);
+		return as_value();
+	}
 
-	boost::intrusive_ptr<mcl_as_object> mcl_obj ( new mcl_as_object );
+	sprite_instance* sp = target->to_movie();
+	if ( ! sp )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("MovieClipLoader.getProgress(%s): first argument is not an sprite"),
+			fn.arg(0).to_debug_string().c_str());
+		);
+		return as_value();
+	}
+
+
+	boost::intrusive_ptr<as_object> mcl_obj ( new as_object() );
+
+	size_t bytesLoaded = sp->get_bytes_loaded();
+	size_t bytesTotal = sp->get_bytes_total();
+
+	string_table& st = ptr->getVM().getStringTable();
 
 	// We want these to be enumerable
-	string_table& st = ptr->getVM().getStringTable();
-	mcl_obj->set_member(st.find(PROPNAME("bytesLoaded")), mcl_data->bytes_loaded);
-	mcl_obj->set_member(st.find(PROPNAME("bytesTotal")),  mcl_data->bytes_total);
+	mcl_obj->set_member(st.find(PROPNAME("bytesLoaded")), bytesLoaded);
+	mcl_obj->set_member(st.find(PROPNAME("bytesTotal")),  bytesTotal);
+
   
 	return as_value(mcl_obj.get()); // will keep alive
 }
