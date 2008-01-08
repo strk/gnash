@@ -1,5 +1,13 @@
 2008-01-08 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (loadMovie): properly compute
+	  level number when we're the root movie.
+	* testsuite/misc-mtasc.all/: Makefile.am, level5.as, level87.as,
+	  level99.as: add test for loading a moving into an existing
+	  level.
+
+2008-01-08 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/swfdec/PASSING: synced with master git (except
 	  I had to skip movieclip-version-* tests to avoid timeouts..)
 	* testsuite/misc-ming.all/loadMovieTestRunner.cpp: advance after

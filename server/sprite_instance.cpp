@@ -3888,7 +3888,7 @@ sprite_instance::loadMovie(const URL& url)
 	else
 	{
 		movie_root& root = _vm.getRoot();
-		unsigned int level = get_depth();
+		unsigned int level = get_depth()-character::staticDepthOffset;
 		
 #ifndef GNASH_USE_GC
 		// Make sure we won't kill ourself !

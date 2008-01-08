@@ -108,7 +108,7 @@ class Level99
 		mc.ch.l99ref = level99ref;
 		mc.ch.onEnterFrame = function()
 		{
-			note(this+".enterFrame -- l5ref is "+this.l5ref+" -- l99ref is "+this.l99ref);
+			//note(this+".enterFrame -- l5ref is "+this.l5ref+" -- l99ref is "+this.l99ref);
 			if ( this.count > 4 )
 			{
 				check_equals(this.l5ref._target, '_level16394');
@@ -126,7 +126,7 @@ class Level99
 				//  - sane swapping between to levels,
 				//  - swapping & removing _level0 
 				//  
-				check_totals(49);
+				check_totals(59);
 				Dejagnu.done();
 				delete this.onEnterFrame;
 			}

@@ -77,5 +77,7 @@ class Level5
 
                 // load yet another swf
                 getURL("level99.swf","_level"+99);
+
+		getURL("level87.swf", "_level87");
 	}
 }

@@ -42,6 +42,7 @@ ASTESTS = $(SANE_ASTESTS) $(BOGUS_ASTESTS)
 AUXMOVIES = \
 	    level5.as \
 	    level99.as \
+	    level87.as \
 	    $(NULL)
 
 EXTRA_DIST = $(ASTESTS) $(AUXMOVIES) TestClass.as ../check.h Dejagnu.as check.as Derived1.as Base1.as  implementsOp/BExtendingImplementation.as  implementsOp/ImplementationA.as  implementsOp/ImplementationB.as implementsOp/SimpleInterface.as
