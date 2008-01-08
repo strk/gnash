@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.134 2008/01/02 14:13:58 strk Exp $ */
+/* $Id: impl.cpp,v 1.135 2008/01/08 21:04:25 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -670,6 +670,8 @@ public:
   MovieLibrary() : 
     _limit(8) 
   {
+	RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+	set_limit(rcfile.getMovieLibraryLimit());
   }
   
   /// Sets the maximum number of items to hold in the library. When adding new
