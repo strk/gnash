@@ -1,3 +1,8 @@
+2008-01-08 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-mtasc.all/level99.as: add tests for _levelX._name
+	  being undefined.
+
 2008-01-07 Matthias Berndt <berndt.matthias@gmx.de>
 
 	* macros/boost.m4: construct proper ac_cv_path_boost_lib and

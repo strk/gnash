@@ -89,6 +89,7 @@ class Level99
 		level5ref.swapDepths(20); // swapDepth doesn't work now because level5ref is out of the static depth zone
                 check_equals(level5ref.getDepth(), '10');
                 check_equals(level5ref._target, '_level16394');
+                check_equals(level5ref._name, '');
                 xcheck_equals(""+level5ref, '_level5');
 
 		var level99ref = _level99;
@@ -98,6 +99,7 @@ class Level99
 		level99ref.swapDepths(40); // swapDepth doesn't work now because level99ref is out of the static depth zone
                 check_equals(level99ref.getDepth(), '30');
                 check_equals(level99ref._target, '_level16414');
+                check_equals(level99ref._name, '');
                 xcheck_equals(""+level99ref, '_level99');
 
 		note("Setting up onEnterFrame for "+mc.ch);
@@ -124,7 +126,7 @@ class Level99
 				//  - sane swapping between to levels,
 				//  - swapping & removing _level0 
 				//  
-				check_totals(47);
+				check_totals(49);
 				Dejagnu.done();
 				delete this.onEnterFrame;
 			}
