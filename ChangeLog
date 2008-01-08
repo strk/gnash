@@ -1,5 +1,10 @@
 2008-01-08 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (sprite_beginFill): don't ignore
+	  second argument (we miss a test for this, incredibly).
+
+2008-01-08 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (loadMovie): properly compute
 	  level number when we're the root movie.
 	* testsuite/misc-mtasc.all/: Makefile.am, level5.as, level87.as,

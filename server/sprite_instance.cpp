@@ -81,7 +81,7 @@ namespace gnash {
 // Defining the following macro you'll get a DEBUG lien
 // for each call to the drawing API, in a format which is
 // easily re-compilable to obtain a smaller testcase
-//#define DEBUG_DRAWING_API 1
+#define DEBUG_DRAWING_API 1
 
 // Forward declarations
 static as_object* getMovieClipInterface();
@@ -1299,6 +1299,11 @@ sprite_beginFill(const fn_call& fn)
 		r = boost::uint8_t( (rgbval&0xFF0000) >> 16);
 		g = boost::uint8_t( (rgbval&0x00FF00) >> 8);
 		b = boost::uint8_t( (rgbval&0x0000FF) );
+
+		if ( fn.nargs > 1 )
+		{
+			a = 255 * iclamp(fn.arg(1).to_int(), 0, 100) / 100;
+		}
 
 	}
 
