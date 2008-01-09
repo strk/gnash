@@ -1,5 +1,16 @@
 2008-01-09 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.cpp (findCharacterByTarget): start from
+	  an arbitrary level for resolution, not necessarely the
+	  original root movie...
+	* server/vm/ASHandlers.cpp (CommonGetUrl):
+	  Don't convert target movie id to lowercase !
+	  Provide a compile-time macro to determine whether or not
+	  movie loads are postponed, being a pretty new thing...
+	  (defaults to do postpone).
+
+2008-01-09 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: loadMovieTest.c, loadMovieTestRunner.cpp:
 	  Initial work to turn loadMovieTest.swf into a
 	  self-described/contained testcase.

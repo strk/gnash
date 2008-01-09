@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.175 2008/01/09 14:53:18 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.176 2008/01/09 17:52:17 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2076,6 +2076,9 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		)
 {
 
+// It seems queuing loadMovie requests breaks the canonical wbt testcase...
+#define QUEUE_MOVIE_LOADS 1
+
 	assert(url_c);
 
 	if ( *url_c == '\0' )
@@ -2202,8 +2205,11 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 			{
 				unsigned int levelno = atoi(target_string.c_str()+6);
 				log_debug(_("Testing _level loading (level %u)"), levelno);
-				//VM::get().getRoot().loadLevel(levelno, url);
+#ifdef QUEUE_MOVIE_LOADS
 				VM::get().getRoot().loadMovie(url, s); // TODO: add third argument for the method
+#else
+				VM::get().getRoot().loadLevel(levelno, url);
+#endif
 				return;
 			}
 
@@ -2219,9 +2225,18 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 			return;
 		}
 
-		//target_movie->loadMovie(url);
-		std::string s = boost::to_lower_copy(target.to_string());
-		VM::get().getRoot().loadMovie(url, s); // TODO: add third argument for the method
+#ifdef QUEUE_MOVIE_LOADS
+		std::string s = target_movie->getTarget(); // or getOrigTarget ?
+		if ( s != target_movie->getOrigTarget() )
+		{
+			log_debug("TESTME: target of a loadMovie changed its target path");
+		}
+		movie_root& mr = VM::get().getRoot();
+		assert( mr.findCharacterByTarget(s) == target_movie );
+		mr.loadMovie(url, s); // TODO: add third argument for the method
+#else
+		target_movie->loadMovie(url);
+#endif
 
 		return;
 	}
@@ -2238,8 +2253,11 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 	{
 		unsigned int levelno = atoi(target_string.c_str()+6);
 		log_debug(_("Testing _level loading (level %u)"), levelno);
-		//VM::get().getRoot().loadLevel(levelno, url);
+#ifdef QUEUE_MOVIE_LOADS
 		VM::get().getRoot().loadMovie(url, s); // TODO: add third argument for the method
+#else
+		VM::get().getRoot().loadLevel(levelno, url);
+#endif
 		return;
 	}
 

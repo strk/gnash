@@ -43,6 +43,8 @@
 #include <boost/bind.hpp>
 
 //#define GNASH_DEBUG 1
+//#define GNASH_DEBUG_LOADMOVIE_REQUESTS_PROCESSING 1
+//#define GNASH_DEBUG_TIMERS_EXPIRATION 1
 
 using namespace std;
 
@@ -1427,7 +1429,9 @@ movie_root::pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_
 void
 movie_root::executeTimers()
 {
+#ifdef GNASH_DEBUG_TIMERS_EXPIRATION
         log_debug("Checking %d timers for expiration", _intervalTimers.size());
+#endif
 	for (TimerMap::iterator it=_intervalTimers.begin(), itEnd=_intervalTimers.end();
 			it != itEnd; )
 	{
@@ -1682,7 +1686,12 @@ movie_root::findCharacterByTarget(const std::string& tgtstr_orig) const
 
 	VM& vm = VM::get();
 	string_table& st = vm.getStringTable();
-	as_object* o = getRootMovie(); // FIXME: could have been dropped ! use _movies.front() instead
+
+	// NOTE: getRootMovie() would be problematic in case the original
+	//       root movie is replaced by a load to _level0... 
+	//       (but I guess we'd also drop loadMovie requests in that
+	//       case... just not tested)
+	as_object* o = _movies.begin()->second.get();
 
 	string::size_type from = 0;
 	while ( string::size_type to=tgtstr.find_first_of('.', from) )
@@ -1690,10 +1699,10 @@ movie_root::findCharacterByTarget(const std::string& tgtstr_orig) const
 		string part(tgtstr, from, to-from);
 		o = o->get_path_element(st.find(part));
 		if ( ! o ) {
-//#ifdef GNASH_DEBUG_TARGET_RESOLUTION
-			log_debug("Evaluating target path for soft ref rebinding: element '%s' of path '%s' not found",
+#ifdef GNASH_DEBUG_TARGET_RESOLUTION
+			log_debug("Evaluating character target path: element '%s' of path '%s' not found",
 				part.c_str(), tgtstr.c_str());
-//#endif
+#endif
 			return NULL;
 		}
 		if ( to == string::npos ) break;
@@ -1749,7 +1758,9 @@ movie_root::processLoadMovieRequest(const LoadMovieRequest& r)
 void
 movie_root::processLoadMovieRequests()
 {
+#ifdef GNASH_DEBUG_LOADMOVIE_REQUESTS_PROCESSING
     log_debug("Processing %d loadMovie requests", _loadMovieRequests.size());
+#endif
     for (LoadMovieRequests::iterator it=_loadMovieRequests.begin();
             it != _loadMovieRequests.end(); )
     {
