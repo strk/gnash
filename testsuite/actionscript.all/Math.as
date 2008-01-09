@@ -17,7 +17,7 @@
 //
 
 
-rcsid="$Id: Math.as,v 1.6 2007/09/29 16:22:57 strk Exp $";
+rcsid="$Id: Math.as,v 1.7 2008/01/09 16:21:39 strk Exp $";
 
 // Test case for Math ActionScript class
 //
@@ -34,7 +34,13 @@ rcsid="$Id: Math.as,v 1.6 2007/09/29 16:22:57 strk Exp $";
 
 #include "check.as"
 
-check (Math);
+check_equals (typeof(Math), 'object');
+check_equals (typeof(Math.__proto__), 'object');
+check_equals (Math.__proto__, Object.prototype);
+
+count = 0;
+for (m in Math) { trace(m); count++; };
+check_equals(count, 0);
 
 // test methods existance
 check_equals (typeOf(Math.abs), 'function');
@@ -463,4 +469,8 @@ check_equals (Math.pow(-2, -2), 0.25);
 //check_equals (Math.pow(-2, -.5).toString(), "NaN");
 
 // End of Math testsuite
-totals();
+#if OUTPUT_VERSION <= 6
+ check_totals(265);
+#else
+ check_totals(274);
+#endif

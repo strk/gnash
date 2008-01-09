@@ -1,5 +1,12 @@
 2008-01-09 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Math.cpp: make _global.Math inherit
+	  from Object.
+	* testsuite/actionscript.all/Math.as: test that _global.Math
+	  is instance of Object, add consistency check.
+
+2008-01-09 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.{cpp,h}: add a loadMovie method
 	  to schedule loads for next advance, using late
 	  evaluation of target path (tested, but not automated).

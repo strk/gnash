@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Math.cpp,v 1.25 2007/12/10 10:54:33 bwy Exp $ */
+/* $Id: Math.cpp,v 1.26 2008/01/09 16:21:39 strk Exp $ */
 
 //
 // This file implements methods of the ActionScript Math class.
@@ -41,6 +41,7 @@
 #include "GMath.h"
 #include "log.h"
 #include "builtin_function.h" 
+#include "Object.h" // for getObjectInterface
 
 using namespace std;
 
@@ -175,7 +176,7 @@ math_round(const fn_call& fn)
 
 math_as_object::math_as_object()
 	:
-	as_object()
+	as_object(getObjectInterface())
 {
 
 	// TODO: rely on ineritance, use init_property ?
