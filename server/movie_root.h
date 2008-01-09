@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.99 2008/01/09 08:29:36 strk Exp $ */
+/* $Id: movie_root.h,v 1.100 2008/01/09 11:41:01 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -604,6 +604,8 @@ public:
     /// TODO: be aware of infinite loops !
     ///
     void flushHigherPriorityActionQueues();
+
+    character* findCharacterByTarget(const std::string& tgtstr) const;
 
 private:
 

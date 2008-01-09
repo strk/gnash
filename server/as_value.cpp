@@ -1518,32 +1518,7 @@ as_value::CharacterProxy::find_character_by_target(const std::string& tgtstr)
 {
 	if ( tgtstr.empty() ) return NULL;
 
-	VM& vm = VM::get();
-	string_table& st = vm.getStringTable();
-	as_object* o = vm.getRoot().getRootMovie();
-
-	// TODO: for another optimization we may cache
-	//       the string_table::key for each element
-	//       as the CharacterProxy target (instead of
-	//       the full string, to be parsed everytime)
-
-	//string::size_type size = tgtstr.size();
-	string::size_type from = 0;
-	while ( string::size_type to=tgtstr.find_first_of('.', from) )
-	{
-		string part(tgtstr, from, to-from);
-		o = o->get_path_element(st.find(part));
-		if ( ! o ) {
-#ifdef GNASH_DEBUG_SOFT_REFERENCES
-			log_debug("Evaluating target path for soft ref rebinding: element '%s' of path '%s' not found",
-				part.c_str(), tgtstr.c_str());
-#endif
-			return NULL;
-		}
-		if ( to == string::npos ) break;
-		from = to+1;
-	}
-	return o->to_character();
+	return VM::get().getRoot().findCharacterByTarget(tgtstr);
 }
 
 void

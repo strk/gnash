@@ -1,5 +1,11 @@
 2008-01-09 Sandro Santilli <strk@keybit.net>
 
+	* server/: as_value.cpp, movie_root.{cpp,h}:
+	  Add a movie_root::findCharacterByTarget() and
+	  use it for soft refs.
+
+2008-01-09 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/DragDropTestRunner.cpp:
 	  advance playhead while waiting for movies to be
 	  loaded.

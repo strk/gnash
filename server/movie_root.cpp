@@ -1664,5 +1664,34 @@ movie_root::set_background_alpha(float alpha)
 	}
 }
 
+character*
+movie_root::findCharacterByTarget(const std::string& tgtstr_orig) const
+{
+	if ( tgtstr_orig.empty() ) return NULL;
+
+	std::string tgtstr = PROPNAME(tgtstr_orig);
+
+	VM& vm = VM::get();
+	string_table& st = vm.getStringTable();
+	as_object* o = getRootMovie(); // FIXME: could have been dropped ! use _movies.front() instead
+
+	string::size_type from = 0;
+	while ( string::size_type to=tgtstr.find_first_of('.', from) )
+	{
+		string part(tgtstr, from, to-from);
+		o = o->get_path_element(st.find(part));
+		if ( ! o ) {
+//#ifdef GNASH_DEBUG_TARGET_RESOLUTION
+			log_debug("Evaluating target path for soft ref rebinding: element '%s' of path '%s' not found",
+				part.c_str(), tgtstr.c_str());
+//#endif
+			return NULL;
+		}
+		if ( to == string::npos ) break;
+		from = to+1;
+	}
+	return o->to_character();
+}
+
 } // namespace gnash
 
