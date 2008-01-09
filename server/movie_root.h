@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.98 2007/12/23 22:29:56 strk Exp $ */
+/* $Id: movie_root.h,v 1.99 2008/01/09 08:29:36 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -620,6 +620,9 @@ private:
 
     /// Delete all elements on the action queue and empty it.
     void clearActionQueue();
+
+    /// Delete all elements on the timers list
+    void clearIntervalTimers();
 
     /// An element of the advanceable characters
     typedef boost::intrusive_ptr<character> AdvanceableCharacter;

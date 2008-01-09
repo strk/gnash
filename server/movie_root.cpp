@@ -120,16 +120,23 @@ movie_root::clearActionQueue()
     }
 }
 
-movie_root::~movie_root()
+void
+movie_root::clearIntervalTimers()
 {
-	clearActionQueue();
-
 	for (TimerMap::iterator it=_intervalTimers.begin(),
 			itE=_intervalTimers.end();
 			it != itE; ++it)
 	{
 		delete it->second;
 	}
+	_intervalTimers.clear();
+}
+
+movie_root::~movie_root()
+{
+	clearActionQueue();
+	clearIntervalTimers();
+
 	assert(testInvariant());
 }
 
@@ -361,6 +368,9 @@ movie_root::clear()
 
 	// wipe out all levels
 	_movies.clear();
+
+	// remove all intervals
+	clearIntervalTimers();
 
 #ifdef GNASH_USE_GC
 	// Run the garbage collector again
