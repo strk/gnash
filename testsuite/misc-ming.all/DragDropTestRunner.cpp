@@ -89,6 +89,9 @@ main(int /*argc*/, char** /*argv*/)
 	unsigned int attempts=10;
 	while (1)
 	{
+		// loads should happen on next advance...
+		tester.advance();
+
 		// if _root displaylist contains loadedTarget and loadedTarget
 		// contains target100, we've loaded it
 		const sprite_instance* loadedTarget = 0;
@@ -113,8 +116,11 @@ main(int /*argc*/, char** /*argv*/)
 			root->getDisplayList().dump();
 			exit(EXIT_FAILURE);
 		}
+
 		usleep(sleepTime);
 	}
+
+	check_equals(root->get_current_frame(), 1);
 
 
 	// 1. Click OUTSIDE of any drawing.

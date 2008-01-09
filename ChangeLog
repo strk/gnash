@@ -1,15 +1,21 @@
-2008-01-08 Sandro Santilli <strk@keybit.net>
+2008-01-09 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/DragDropTestRunner.cpp:
+	  advance playhead while waiting for movies to be
+	  loaded.
+
+2008-01-09 Sandro Santilli <strk@keybit.net>
 
 	* server/movie_root.cpp (setLevel): remove interval
 	  timers when replacing _level0. Add note about additional
 	  things to check for that case.
 
-2008-01-08 Sandro Santilli <strk@keybit.net>
+2008-01-09 Sandro Santilli <strk@keybit.net>
 
 	* server/movie_root.{cpp,h}: clear the interval timeouts
 	  on restart/reset/clear.
 
-2008-01-08 Sandro Santilli <strk@keybit.net>
+2008-01-09 Sandro Santilli <strk@keybit.net>
 
 	* server/movie_root.cpp (setLevel): properly destroy
 	  existing levels when loading into them.
