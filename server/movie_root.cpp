@@ -186,6 +186,35 @@ movie_root::setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movi
 	else
     	{
 		// don't leak overloaded levels
+
+		LevelMovie lm = it->second;
+		if ( lm == _rootMovie.get() )
+		{
+			// NOTE: this is not enough to trigger
+			//       an application reset. Was tested
+			//       but not automated. If curious
+			//       use swapDepths against _level0
+			//       and load into the new target while
+			//       a timeout/interval is active.
+			log_debug("Replacing starting movie");
+		}
+
+		if ( num == 0 )
+		{
+			log_debug("Loading into _level0");
+
+			// NOTE: this was tested but not automated, the
+			//       test sets an interval and then loads something
+			//       in _level0. The result is the interval is disabled.
+			clearIntervalTimers();
+
+
+			// TODO: check what else we should do in these cases 
+			//       (like, unregistering all childs etc...)
+			//       Tested, but not automated, is that other
+			//       levels should be maintained alive.
+		}
+
 		it->second->destroy();
 		it->second = movie;
 	}
