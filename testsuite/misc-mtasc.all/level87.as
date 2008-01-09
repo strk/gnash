@@ -61,14 +61,14 @@ class Level87
 
 		_level0.level87loaded = true;
 
-               	xcheck_equals(_level0.frameno, 2);
+               	check_equals(_level0.frameno, 2);
 
 		// This one fails because gnash is executing code
 		// in level99 before code in the first load of level87,
 		// probably because it is *loading* level99 before level87,
 		// which is in the order loads are requested rather then
 		// reverse of it as it's common...
-                xcheck_equals(_level5._currentframe, 1);
+                check_equals(_level5._currentframe, 1);
 
 		_level87.loadMovie("level87.swf");
 	}

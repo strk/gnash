@@ -1,5 +1,18 @@
 2008-01-09 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.{cpp,h}: add a loadMovie method
+	  to schedule loads for next advance, using late
+	  evaluation of target path (tested, but not automated).
+	* server/vm/ASHandlers.cpp (CommonGetUrl): delegate
+	  movie loads to movie_root.
+	* testsuite/misc-mtasc.all/: level5.as, level87.as,
+	  level99.as: frame count at loaded movie execution
+	  succeed.
+	* testsuite/swfdec/PASSING: loadvariables-5.swf
+	  succeeds (no idea why..)
+
+2008-01-09 Sandro Santilli <strk@keybit.net>
+
 	* server/: as_value.cpp, movie_root.{cpp,h}:
 	  Add a movie_root::findCharacterByTarget() and
 	  use it for soft refs.

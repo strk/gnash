@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.174 2007/12/26 18:03:47 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.175 2008/01/09 14:53:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2184,6 +2184,8 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 
 	if ( loadTargetFlag )
 	{
+		// TODO: always pass directly to movie_root::loadMovie ?
+
 		log_msg(_("getURL2 target load"));
 
 		if ( sendVarsMethod )
@@ -2195,11 +2197,13 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 
 		if ( ! target_ch )
 		{
-			if ( target_string.compare(0, 6, "_level") == 0 && target_string.find_first_not_of("0123456789", 7) == string::npos )
+			std::string s = PROPNAME(target_string);
+			if ( s.compare(0, 6, "_level") == 0 && s.find_first_not_of("0123456789", 7) == string::npos )
 			{
 				unsigned int levelno = atoi(target_string.c_str()+6);
 				log_debug(_("Testing _level loading (level %u)"), levelno);
-				VM::get().getRoot().loadLevel(levelno, url);
+				//VM::get().getRoot().loadLevel(levelno, url);
+				VM::get().getRoot().loadMovie(url, s); // TODO: add third argument for the method
 				return;
 			}
 
@@ -2215,7 +2219,9 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 			return;
 		}
 
-		target_movie->loadMovie(url);
+		//target_movie->loadMovie(url);
+		std::string s = boost::to_lower_copy(target.to_string());
+		VM::get().getRoot().loadMovie(url, s); // TODO: add third argument for the method
 
 		return;
 	}
@@ -2227,11 +2233,13 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 			sendVarsMethod);
 	}
 
-	if ( target_string.compare(0, 6, "_level") == 0 && target_string.find_first_not_of("0123456789", 7) == string::npos )
+	std::string s = PROPNAME(target_string);
+	if ( s.compare(0, 6, "_level") == 0 && s.find_first_not_of("0123456789", 7) == string::npos )
 	{
 		unsigned int levelno = atoi(target_string.c_str()+6);
 		log_debug(_("Testing _level loading (level %u)"), levelno);
-		VM::get().getRoot().loadLevel(levelno, url);
+		//VM::get().getRoot().loadLevel(levelno, url);
+		VM::get().getRoot().loadMovie(url, s); // TODO: add third argument for the method
 		return;
 	}
 

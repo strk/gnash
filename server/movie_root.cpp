@@ -219,7 +219,6 @@ movie_root::setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movi
 		it->second = movie;
 	}
 
-
 	movie->set_invalidated();
 	
 	/// Notify placement 
@@ -981,14 +980,24 @@ movie_root::advance()
 	try
 	{
 
-	// Execute expired timers
-	// NOTE: can throw ActionLimitException
-	executeTimers();
-
 	// Advance all non-unloaded characters in the LiveChars list
 	// in reverse order (last added, first advanced)
 	// NOTE: can throw ActionLimitException
 	advanceLiveChars(); 
+
+	// Process loadMovie requests
+	// 
+	// NOTE: should be done before executing timers,
+	// 	 see swfdec's test/trace/loadmovie-case-{5,6}.swf 
+	// NOTE: processing loadMovie requests after advanceLiveChars
+	//       is known to fix more tests in misc-mtasc.all/levels.swf
+	//       to be checked if it keeps the swfdec testsuite safe
+	processLoadMovieRequests();
+
+	// Execute expired timers
+	// NOTE: can throw ActionLimitException
+	executeTimers();
+
 
 	cleanupUnloadedListeners();
 
@@ -1345,7 +1354,6 @@ movie_root::processActionQueue()
 	{
 		_processingActionLevel = processActionQueue(_processingActionLevel);
 	}
-
 }
 
 void
@@ -1419,6 +1427,7 @@ movie_root::pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_
 void
 movie_root::executeTimers()
 {
+        log_debug("Checking %d timers for expiration", _intervalTimers.size());
 	for (TimerMap::iterator it=_intervalTimers.begin(), itEnd=_intervalTimers.end();
 			it != itEnd; )
 	{
@@ -1691,6 +1700,63 @@ movie_root::findCharacterByTarget(const std::string& tgtstr_orig) const
 		from = to+1;
 	}
 	return o->to_character();
+}
+
+void
+movie_root::loadMovie(const URL& url, const std::string& target, movie_root::LoadMethod method)
+{
+    log_debug("movie_root::loadMovie(%s, %s)", url.str().c_str(), target.c_str());
+    _loadMovieRequests.push_front(LoadMovieRequest(url, target, method));
+}
+
+void
+movie_root::processLoadMovieRequest(const LoadMovieRequest& r)
+{
+    const std::string& target = r.getTarget();
+    const URL& url = r.getURL();
+    LoadMethod method = r.getMethod();
+
+    if ( target.compare(0, 6, "_level") == 0 && target.find_first_not_of("0123456789", 7) == string::npos )
+    {
+        unsigned int levelno = atoi(target.c_str()+6);
+        log_debug(_("processLoadMovieRequest: Testing _level loading (level %u)"), levelno);
+        loadLevel(levelno, url);
+        return;
+    }
+
+    character* ch = findCharacterByTarget(target);
+    if ( ! ch )
+    {
+        log_debug("Target %s of a loadMovie request doesn't exist at processing time", target.c_str());
+        return;
+    }
+
+    sprite_instance* sp = ch->to_movie();
+    if ( ! sp )
+    {
+        log_unimpl("loadMovie against a %s character", typeName(*ch).c_str());
+        return;
+    }
+
+    if ( method )
+    {
+        log_unimpl("loadMovie with method %s", method == 1 ? "GET" : method == 2 ? "POST" : "UNKWNOWN");
+    }
+
+    sp->loadMovie(url);
+}
+
+void
+movie_root::processLoadMovieRequests()
+{
+    log_debug("Processing %d loadMovie requests", _loadMovieRequests.size());
+    for (LoadMovieRequests::iterator it=_loadMovieRequests.begin();
+            it != _loadMovieRequests.end(); )
+    {
+        const LoadMovieRequest& lr=*it;
+        processLoadMovieRequest(lr);
+        it = _loadMovieRequests.erase(it);
+    }
 }
 
 } // namespace gnash

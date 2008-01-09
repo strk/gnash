@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.100 2008/01/09 11:41:01 strk Exp $ */
+/* $Id: movie_root.h,v 1.101 2008/01/09 14:53:17 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -78,6 +78,7 @@
 #include "timers.h" // for composition
 #include "asobj/Key.h"
 #include "smart_ptr.h" // for memory management
+#include "URL.h" // for loadMovie
 
 #include <vector>
 #include <list>
@@ -607,7 +608,47 @@ public:
 
     character* findCharacterByTarget(const std::string& tgtstr) const;
 
+    /// URL access methods
+    enum LoadMethod {
+        NONE=0,
+        GET=1,
+        POST=2
+    };
+
+    /// Queue a request for loading a movie
+    void loadMovie(const URL& url, const std::string& target, LoadMethod method=NONE);
+
 private:
+
+    /// A load movie request
+    class LoadMovieRequest {
+    public:
+        LoadMovieRequest(const URL& u, const std::string& t, LoadMethod m)
+            :
+            _target(t),
+            _url(u),
+            _method(m)
+        {}
+
+        const std::string& getTarget() const { return _target; }
+        const URL& getURL() const { return _url; }
+        LoadMethod getMethod() const { return _method; }
+
+    private:
+        std::string _target;
+        URL _url;
+        LoadMethod _method;
+    };
+
+    /// Load movie requests
+    typedef std::list<LoadMovieRequest> LoadMovieRequests;
+    LoadMovieRequests _loadMovieRequests;
+
+    /// Process all load movie requests
+    void processLoadMovieRequests();
+
+    /// Process a single load movie request
+    void processLoadMovieRequest(const LoadMovieRequest& r);
 
     /// Listeners container
     typedef std::list< boost::intrusive_ptr<character> > CharacterList;
