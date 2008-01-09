@@ -170,12 +170,19 @@ movie_root::setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movi
 	assert(movie != NULL);
 	assert(static_cast<unsigned int>(movie->get_depth()) == num+character::staticDepthOffset);
 
-	//movie->setLevel(num)
-	//movie->set_depth(num);
-	//movie->set_name(ss.str().c_str());
 
-	//if ( _movies.size() < num+1 ) _movies.resize(num+1);
-	_movies[movie->get_depth()] = movie; // [num] = movie;
+	Levels::iterator it = _movies.find(movie->get_depth());
+	if ( it == _movies.end() )
+	{
+		_movies[movie->get_depth()] = movie; 
+	}
+	else
+    	{
+		// don't leak overloaded levels
+		it->second->destroy();
+		it->second = movie;
+	}
+
 
 	movie->set_invalidated();
 	

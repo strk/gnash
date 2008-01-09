@@ -1,5 +1,7 @@
 2008-01-08 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.cpp (setLevel): properly destroy
+	  existing levels when loading into them.
 	* testsuite/gnashrc.in: pretend we're version 
 	  Pretend we're version WIN 9,0,100,0 while running tests
 	  (to be predictable and compatible with swfdec testsuite)
