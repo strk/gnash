@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.101 2008/01/09 14:53:17 strk Exp $ */
+/* $Id: movie_root.h,v 1.102 2008/01/09 18:31:43 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -616,6 +616,16 @@ public:
     };
 
     /// Queue a request for loading a movie
+    //
+    /// @param url
+    ///		The url to load.
+    ///
+    /// @param target
+    ///	    Target to load into.
+    ///
+    /// @param method
+    ///     Load method. 
+    ///
     void loadMovie(const URL& url, const std::string& target, LoadMethod method=NONE);
 
 private:
