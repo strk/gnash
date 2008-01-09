@@ -1,3 +1,16 @@
+2008-01-09 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* pythonmodule/gnashpython.{h,cpp}: new pythonwrapper::GnashPlayer
+	  class for providing Python bindings.
+	* pythonmodule/pyGnash.cpp: the python module with interface to
+	  gnash core libs.
+	* pythonmodule/gnashPythonExample.py: example script as a substitute
+	  for proper documentation.
+	* configure.ac, Makefile.am, pythonmodule/Makefile.am: add new
+	  directories; it's not built by default, neither are there macros
+	  in configure.ac yet. To build, change ENABLE_GNASH_PYTHON_MODULE
+	  manually and specify the python headers/libs in pythonmodule/Makefile.am.
+
 2008-01-09 Sandro Santilli <strk@keybit.net>
 
 	* server/movie_root.cpp (findCharacterByTarget): start from

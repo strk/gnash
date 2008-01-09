@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.99 2008/01/04 23:57:10 strk Exp $
+# $Id: Makefile.am,v 1.100 2008/01/09 20:06:01 bwy Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -48,6 +48,7 @@ STD_DIRS = \
 	utilities \
 	gui \
 	plugin \
+	pythonmodule \
 	testsuite \
 	po \
 	$(NULL)
