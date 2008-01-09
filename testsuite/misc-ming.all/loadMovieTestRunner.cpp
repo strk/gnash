@@ -95,10 +95,10 @@ main(int /*argc*/, char** /*argv*/)
 	assert(root.get());
 
 	check_equals(root->get_frame_count(), 2);
-	check_equals(root->get_current_frame(), 1);
+	check_equals(root->get_current_frame(), 0);
 
 	tester->advance();
-	check_equals(root->get_current_frame(), 0);
+	check_equals(root->get_current_frame(), 1);
 
 	// Verify that 'coverart' exists and is empty
 	character* coverartch = const_cast<character*>(tester->findDisplayItemByName(*root, "coverart"));
@@ -114,8 +114,8 @@ main(int /*argc*/, char** /*argv*/)
 	tester->movePointerTo(80, 80);
 	check(tester->isMouseOverMouseEntity());
 	tester->pressMouseButton();
-	sleep(1); // give it some time...
 	tester->advance(); // loads (should) happen on next advance
+	usleep(500); // give it some time... TODO: drop this test and use a self-containment instead
 	coverartch = const_cast<character*>(tester->findDisplayItemByName(*root, "coverart"));
 	check(coverart != coverartch->to_movie());
 	coverart = coverartch->to_movie();
@@ -129,8 +129,8 @@ main(int /*argc*/, char** /*argv*/)
 	tester->movePointerTo(280, 80);
 	check(tester->isMouseOverMouseEntity());
 	tester->click();
-	sleep(1); // give it some time...
 	tester->advance(); // loads (should) happen on next advance
+	usleep(500); // give it some time... TODO: drop this test and use a self-containment instead
 	coverartch = const_cast<character*>(tester->findDisplayItemByName(*root, "coverart"));
 	coverart = coverartch->to_movie();
 	check_equals(coverart->get_movie_definition()->get_url(), greenURL.str());
@@ -144,8 +144,8 @@ main(int /*argc*/, char** /*argv*/)
 	tester->movePointerTo(480, 80);
 	check(tester->isMouseOverMouseEntity());
 	tester->click();
-	sleep(1); // give it some time to load
 	tester->advance(); // loads (should) happen on next advance
+	usleep(500); // give it some time... TODO: drop this test and use a self-containment instead
 	coverartch = const_cast<character*>(tester->findDisplayItemByName(*root, "coverart"));
 	coverart = coverartch->to_movie();
 	check_equals(coverart->get_movie_definition()->get_url(), offspringURL.str());
