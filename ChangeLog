@@ -1,5 +1,13 @@
 2008-01-08 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/gnashrc.in: pretend we're version 
+	  Pretend we're version WIN 9,0,100,0 while running tests
+	  (to be predictable and compatible with swfdec testsuite)
+	* testsuite/swfdec/gen_run_swfdec_testsuite.sh:
+	  Use testsuite/gnashrc
+
+2008-01-08 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-mtasc.all/: level5.as, level87.as,
 	  level99.as, levels.as: add tests to check when do
 	  actions in first frame of loaded levels get executed.

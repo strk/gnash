@@ -5,4 +5,7 @@ append localSandboxPath @@MEDIADIR@@
 set SOLSafeDir @@TMPSODIR@@
 set SOLReadOnly false
 
+# this is to be compatible with swfdec tests expectances
+set flashVersionString WIN 9,0,100,0
+
 # TODO: enable extensions ?
