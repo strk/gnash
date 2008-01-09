@@ -78,12 +78,18 @@ add_clip(SWFMovie mo, char* file, char* name,
 	SWFDisplayItem_setName(it, name);
 	SWFDisplayItem_moveTo(it, x, y);
 
+	// last portion of the url (before the slash)
+	char* fname = strrchr(url, '/');
+	if ( fname ) fname++;
+	else fname = url;
+
 	/* "Click" handler */
-	sprintf(action, " \
-%s.onPress = function () { \
-	coverart.loadMovie('%s'); \
-}; \
-", name, url);
+	snprintf(action,  1023,
+		"%s.onPress = function () { "
+		"	coverart.loadMovie('%s');"
+		"	_level0.expectLoaded = '%s';" 
+		"};"
+		,name, url, fname);
 
 	ac = compileSWFActionCode(action);
 
@@ -97,6 +103,8 @@ add_coverart(SWFMovie mo, int x, int y)
 	SWFFillStyle fstyle;
 	SWFMovieClip mc_coverart;
 	SWFDisplayItem it;
+#define BUFSIZE 1024
+	char buf[BUFSIZE];
 
 	sh_coverart = newSWFShape();
 	fstyle = SWFShape_addSolidFillStyle(sh_coverart, 0,0,0,255);
@@ -113,6 +121,29 @@ add_coverart(SWFMovie mo, int x, int y)
 	it = SWFMovie_add(mo, (SWFBlock)mc_coverart);
 	SWFDisplayItem_setName(it, "coverart"); 
 	SWFDisplayItem_moveTo(it, x, y);
+
+	snprintf(buf, BUFSIZE,
+		"_level0.coverart.onMouseDown = function() {"
+		//"  _root.note('_url is '+this._url);"
+		"  var lastUrlComponent = this._url.substring(this._url.lastIndexOf('/')+1);"
+		//"  _root.note('last component of _url is '+lastUrlComponent);"
+		"  _root.check_equals(lastUrlComponent, _level0.expectLoaded, '%s:%d');"
+		"  _root.check_equals(this.getDepth(), -16377);"
+		"  if ( Key.isDown(Key.SHIFT) ) _root.totals();"
+		"  else _root.note('2 tests run');"
+		"};"
+		, __FILE__, __LINE__);
+
+	printf("%s", buf);
+
+	SWFDisplayItem_addAction(it, compileSWFActionCode(buf),
+		SWFACTION_ROLLOVER);
+
+	SWFDisplayItem_addAction(it, compileSWFActionCode(
+		"delete _level0.coverart.onMouseDown;"
+		),
+		SWFACTION_ROLLOUT);
+
 }
 
 SWFTextField
@@ -146,6 +177,8 @@ main(int argc, char** argv)
 {
 	SWFMovie mo;
 	SWFMovieClip dejagnuclip;
+	SWFDisplayItem it;
+
 	char file_lynch[256];
 	char file_green[256];
 	char file_offspring[256];
@@ -198,9 +231,9 @@ main(int argc, char** argv)
 	 *****************************************************/
 
 	dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(mediadir), 10, 0, 0, 800, 600);
-	//it = SWFMovie_add(mo, (SWFBlock)dejagnuclip);
-	//SWFDisplayItem_moveTo(it, 0, 200);
-	//SWFMovie_nextFrame(mo); 
+	it = SWFMovie_add(mo, (SWFBlock)dejagnuclip);
+	SWFDisplayItem_moveTo(it, 0, 250);
+	SWFMovie_nextFrame(mo); 
 
 	/*****************************************************
 	 *
@@ -256,9 +289,17 @@ main(int argc, char** argv)
 
 	puts("Adding coverart");
 
-	add_coverart(mo, 500, 200);
+	add_coverart(mo, 600, 100);
 
-	add_actions(mo, "stop();");
+	add_actions(mo,
+		"note('Click on each image to load it into the container on the right.');"
+		"note('Click on the container to run tests after each load.');"
+		"note('Shift-click on the container to get results printed.');"
+		"_level0.expectLoaded = 'loadMovieTest.swf';" 
+		// TODO: add self-contained tests after each load
+		//       like for the DragAndDropTest.as movie
+		"stop();"
+	);
 	SWFMovie_nextFrame(mo); /* showFrame */
 
 	/*****************************************************

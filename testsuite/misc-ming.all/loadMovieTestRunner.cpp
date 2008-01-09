@@ -94,8 +94,8 @@ main(int /*argc*/, char** /*argv*/)
 	root = tester->getRootMovie();
 	assert(root.get());
 
-	check_equals(root->get_frame_count(), 1);
-	check_equals(root->get_current_frame(), 0);
+	check_equals(root->get_frame_count(), 2);
+	check_equals(root->get_current_frame(), 1);
 
 	tester->advance();
 	check_equals(root->get_current_frame(), 0);

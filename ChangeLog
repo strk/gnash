@@ -1,5 +1,11 @@
 2008-01-09 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: loadMovieTest.c, loadMovieTestRunner.cpp:
+	  Initial work to turn loadMovieTest.swf into a
+	  self-described/contained testcase.
+
+2008-01-09 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/Math.cpp: make _global.Math inherit
 	  from Object.
 	* testsuite/actionscript.all/Math.as: test that _global.Math
