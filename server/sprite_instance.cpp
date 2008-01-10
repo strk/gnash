@@ -2852,7 +2852,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
 
 		if ( ! m_def->ensure_frame_loaded(target_frame_number+1) )
 		{
-			log_error("Target frame of a gotoFrame(%d) was never loaded, altought frame count in header (%d) said we would have found it",
+			log_error("Target frame of a gotoFrame(%ld) was never loaded, although frame count in header (%d) said we would have found it",
 				target_frame_number+1, m_def->get_frame_count());
 			return; // ... I guess, or not ?
 		}
@@ -2897,7 +2897,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
 		);
 		if ( ! m_def->ensure_frame_loaded(target_frame_number+1) )
 		{
-			log_error("Target frame of a gotoFrame(%d) was never loaded, altought frame count in header (%d) said we would have found it",
+			log_error("Target frame of a gotoFrame(%ld) was never loaded, although frame count in header (%d) said we would have found it",
 				target_frame_number+1, m_def->get_frame_count());
 			return; // ... I guess, or not ?
 		}
