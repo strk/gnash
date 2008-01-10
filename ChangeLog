@@ -1,5 +1,6 @@
 2008-01-10 Sandro Santilli <strk@keybit.net>
 
+	* server/: drag_state.h, movie_root.cpp: use floats for drag offset.
 	* pythonmodule/Makefile.am: AUTOMAKE_OPTIONS must be outside
 	  of conditionals. Fixes bug #21994.
 

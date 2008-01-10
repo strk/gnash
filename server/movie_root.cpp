@@ -878,8 +878,8 @@ movie_root::set_drag_state(const drag_state& st)
 		point world_mouse(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
 
 		// Compute offset
-		int xoffset = world_mouse.x - world_origin.x;
-		int yoffset = world_mouse.y - world_origin.y;
+		float xoffset = int(world_mouse.x - world_origin.x);
+		float yoffset = int(world_mouse.y - world_origin.y);
 
 		m_drag_state.setOffset(xoffset, yoffset);
 	}

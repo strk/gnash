@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: drag_state.h,v 1.6 2007/11/22 22:57:18 strk Exp $ */
+/* $Id: drag_state.h,v 1.7 2008/01/10 09:37:04 strk Exp $ */
 
 
 #ifndef GNASH_DRAG_STATE_H
@@ -27,7 +27,6 @@
 
 #include "rect.h" // for composition
 #include "smart_ptr.h" // we keep character being dragged by intrusive_ptr
-//#include "character.h" // for dtor visibility by intrusive_ptr ?
 
 namespace gnash
 {
@@ -55,8 +54,8 @@ class drag_state
 	/// at time of drag start. These are used for non
 	/// lock-centered dragging.
 	/// Coordinates are in stage space (TWIPS)
-	int _xoffset;
-	int _yoffset;
+	float _xoffset;
+	float _yoffset;
 
 public:
 
@@ -72,14 +71,14 @@ public:
 	/// at time of drag start.
 	/// Coordinates are in stage space (twips)
 	///
-	void setOffset(int x, int y)
+	void setOffset(float x, float y)
 	{
 		_xoffset = x;
 		_yoffset = y;
 	}
 
-	int xOffset() const { return _xoffset; }
-	int yOffset() const { return _yoffset; }
+	float xOffset() const { return _xoffset; }
+	float yOffset() const { return _yoffset; }
 
 	bool hasBounds() const {
 		return _hasbounds;
