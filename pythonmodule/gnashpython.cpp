@@ -17,7 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-
 #include "GnashException.h"
 #include "URL.h"
 #include "noseek_fd_adapter.h"
@@ -25,25 +24,21 @@
 #include "movie_instance.h"
 #include "movie_root.h"
 #include "sprite_instance.h"
-#include "as_environment.h"
-#include "gnash.h" // for create_movie and create_library_movie and for gnash::key namespace
-#include "VM.h" // for initialization
-#include "sound_handler.h" // for creating the "test" sound handlers
-#include "render.h" // for get_render_handler
-#include "types.h" // for rgba class
+#include "gnash.h"
+#include "VM.h"
 #include "render.h"
 #include "render_handler.h"
 #include "render_handler_agg.h"
 #include "SystemClock.h"
-#include "impl.h"
 
 #include <cstdio>
 #include <string>
-#include <memory> // for auto_ptr
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include "gnashpython.h"
-#include "sound_handler.h"
+
+#define REQUIRE_MOVIE_LOADED if (!_movieDef) throw GnashException("No Movie Loaded!")
+#define REQUIRE_VM_STARTED if (!_movieDef || !_movieRoot) throw GnashException("VM not started!")
 
 namespace gnash {
 
@@ -51,6 +46,14 @@ namespace pythonwrapper {
 
 
 GnashPlayer::GnashPlayer()
+	:
+    _movieDef(NULL),
+    _movieRoot(NULL),
+    _movieInstance(NULL),
+    _handler(NULL),
+    _url(""),
+    _forceRedraw(false),
+    _fp(NULL)
 {
     init();
 }
@@ -59,14 +62,24 @@ GnashPlayer::~GnashPlayer()
 {
 }
 
+// Initialize the core libs. If this gets called twice:
+// f = gnash.Player()
+// g = gnash.Player()
+// we fail an assertion because the player can only handle
+// one movie at once.
+// TODO: Find way of checking whether gnashInit() has been called
+// Better TODO: Get Gnash to handle more than one movie.
 void
 GnashPlayer::init() {
-    gnash::gnashInit();
+        gnash::gnashInit();
 }
 
+// Set our _url member and pass this to the core.
 void
 GnashPlayer::setBaseURL(std::string url)
 {
+
+    // Don't allow empty urls
     if (url == "" || _url != "") return;
 
     _url = url;
@@ -77,9 +90,11 @@ GnashPlayer::setBaseURL(std::string url)
     gnash::set_base_url( (gnash::URL)_url );
 }
 
+// TODO: Read in movies from a python file object.
 bool
 GnashPlayer::createMovieDefinition()
 {
+    if (_movieDef) return false;
 
     // Fail if base URL not set
     if (_url == "") return false;
@@ -107,7 +122,7 @@ GnashPlayer::initVM()
 
     // If movie definition hasn't already been created, try to create it,
     // fail if that doesn't work either.
-    if (!_movieDef && !createMovieDefinition()) return false;
+    if (!_movieDef  && !createMovieDefinition()) return false;
 
     // Initialize the VM with a manual clock
     _movieRoot = &(gnash::VM::init(*_movieDef, _manualClock).getRoot());
@@ -120,37 +135,42 @@ GnashPlayer::initVM()
     _movieDef->completeLoad();
     _movieDef->ensure_frame_loaded(getSWFFrameCount());
     
-    fclose (_fp);
+    if (_fp) {
+        fclose (_fp);
+    }
 
+    // I don't know why it's done like this.
     auto_ptr<movie_instance> mi (_movieDef->create_movie_instance());
 
-    // Set _movie before calling ::render
+    // Setup Movie Instance.
     _movieInstance = mi.get();
 
-    // Finally, place the root movie on the stage ...
+    // Put the instance on stage.
     _movieRoot->setRootMovie( mi.release() ); 
    
     return true; 
 }
 
+// Whether the movie can be resized or not
 void
 GnashPlayer::allowRescale(bool allow)
 {
-    if (!_movieRoot || !_movieDef) return;
+    REQUIRE_VM_STARTED;
     _movieRoot->allowRescaling(allow);
 }
 
+// Move Gnash's sense of time along manually
 void
 GnashPlayer::advanceClock(unsigned long ms)
 {
-    if (!_movieRoot || !_movieDef) return;
+    REQUIRE_VM_STARTED;
     _manualClock.advance(ms);
 }
 
 void
 GnashPlayer::advance() {
 
-    if (!_movieRoot || !_movieDef) return;
+    REQUIRE_VM_STARTED;
 
     float fps = getSWFFrameRate();
     unsigned long clockAdvance = long(1000/fps);
@@ -159,86 +179,101 @@ GnashPlayer::advance() {
     _movieRoot->advance();
 }
 
+// Send a key event to the movie. This is matched to
+// gnash::key::code. You could even use this to 
+// implement a UI in python.
 void
 GnashPlayer::pressKey(int code)
 {
-    if (!_movieRoot) return;	
+    REQUIRE_VM_STARTED;	
     _movieRoot->notify_key_event((gnash::key::code)code, true);
 }
 
+// Start the movie from the beginning.
 void
 GnashPlayer::restart()
 {
-    if (!_movieDef || !_movieRoot) return;
+    REQUIRE_VM_STARTED;
     _movieRoot->getRootMovie()->restart();
 }
 
-
+// The number of bytes already loaded.
 int
 GnashPlayer::getSWFBytesLoaded() const
 {
-    if (!_movieDef) return 0;
+    REQUIRE_MOVIE_LOADED;
     return _movieDef->get_bytes_loaded();
 }
 
+// The number of frames reported in the movie headers.
 int
 GnashPlayer::getSWFFrameCount() const
 {
-    if (!_movieDef) return 0;
+    REQUIRE_MOVIE_LOADED;
     return _movieDef->get_frame_count();
 }
 
+// The URL of the stream.
 std::string
 GnashPlayer::getSWFURL() const
 {
-    if (!_movieDef) return "";
+    REQUIRE_MOVIE_LOADED;
     return _movieDef->get_url();
 }
 
+// The length in bytes reported in the movie headers.
 int
 GnashPlayer::getSWFBytesTotal() const
 {
-    if (!_movieDef) return 0;
+    REQUIRE_MOVIE_LOADED;
     return _movieDef->get_bytes_total();
 }
 
+// The version of the root movie.
 int
 GnashPlayer::getSWFVersion() const
 {
-    if (!_movieDef) return 0;
+    REQUIRE_MOVIE_LOADED;
     return _movieDef->get_version();
 }
 
+// The width of the movie.
 float
 GnashPlayer::getSWFWidth() const
 {
-    if (!_movieDef) return 0;
+    REQUIRE_MOVIE_LOADED;
     return _movieDef->get_width_pixels();
 }
 
+// The height of the movie.
 float
 GnashPlayer::getSWFHeight() const
 {
-    if (!_movieDef) return 0;
+    REQUIRE_MOVIE_LOADED;
     return _movieDef->get_height_pixels();
 }
 
+// The movie's frame rate.
 float
 GnashPlayer::getSWFFrameRate() const
 {
-    if (!_movieDef) return 0;
+    REQUIRE_MOVIE_LOADED;
     return _movieDef->get_frame_rate();
 }
 
+// The current position in the movie.
 int
 GnashPlayer::getCurrentFrame() const
 {
-    if (!_movieDef || !_movieRoot) return 0;
+    REQUIRE_VM_STARTED;
     return _movieRoot->getRootMovie()->get_current_frame();
 }
 
-// Rendering stuff
+//
+//    Renderer functions
+//
 
+// Initialize the named rendererm throwing exception  
 bool
 GnashPlayer::initRenderer(const std::string& r)
 {
@@ -260,16 +295,35 @@ GnashPlayer::initRenderer(const std::string& r)
     }
 #endif
 
-    if (_handler) {
-       return addRenderer(_handler); // False if it fails
+    if (!_handler) {
+        // If the handler doesn't exist or can't be opened, throw
+        // exception
+        throw GnashException("Cannot create that renderer");
     }
     else {
+        // Try adding handler, return result
+        return addRenderer(_handler);
+    }
+   
+    // Shouldn't get to here...
+    return false;
+}
+
+// Test and set the render handler, returning false if anything
+// goes wrong.
+bool
+GnashPlayer::addRenderer(gnash::render_handler* handler)
+{
+    if (!handler->initTestBuffer(getSWFWidth(), getSWFHeight())) {
         return false;
     }
-    
+
+    gnash::set_render_handler(handler);
+	
     return true;
 }
 
+// Render the frame
 void
 GnashPlayer::render()
 {
@@ -294,25 +348,14 @@ GnashPlayer::render()
 	
 }
 
-bool
-GnashPlayer::addRenderer(gnash::render_handler* handler)
-{
-    if (!handler->initTestBuffer(getSWFWidth(), getSWFHeight())) {
-        cout << "Failed to init renderer, but the renderer was okay" << "\n";
-        return false;
-    }
-
-    gnash::set_render_handler(handler);
-	
-    return true;
-}
-
-// Gnash Character
+//
+// Wrapper class for characters (doesn't work)
+//
 
 GnashCharacter*
 GnashPlayer::getCharacterById(int id)
 {
-    if (!_movieDef || !_movieRoot) return NULL;
+    REQUIRE_VM_STARTED;
 
     gnash::character* c = _movieRoot->getRootMovie()->get_character(id);
     
@@ -326,7 +369,7 @@ GnashPlayer::getCharacterById(int id)
 GnashCharacter*
 GnashPlayer::getTopmostMouseEntity()
 {
-    if (!_movieDef || !_movieRoot) return NULL;
+    REQUIRE_VM_STARTED;
 
     gnash::character* c = _movieRoot->getActiveEntityUnderPointer();
     
@@ -344,6 +387,8 @@ GnashCharacter::GnashCharacter(gnash::character* c)
 }
 
 GnashCharacter::GnashCharacter()
+    :
+    _character(NULL)
 {
 }
 

@@ -37,11 +37,8 @@ libgnashpython_la_LDFLAGS = \
 	$(CURL_LIBS) \
 	$(LIBXML_LIBS) \
 	$(INCLTDL) \
-	$(LIRC_LIBS) \
-	$(MYSQL_LIBS) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
-	$(BOOSTPYTHON_LIBS) \
 	$(NULL)
 		
 libgnashpython_la_CPPFLAGS = -I.. \

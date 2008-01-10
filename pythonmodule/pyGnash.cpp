@@ -20,6 +20,9 @@
 #include <boost/python.hpp>
 #include "gnashpython.h"
 
+// Warning! These Python bindings are not mature. They are unlikely to 
+// stay as they are. Do not rely on this interface!
+
 using namespace boost::python;
 
 namespace gnash {
@@ -28,7 +31,7 @@ BOOST_PYTHON_MODULE(gnash) {
   class_<pythonwrapper::GnashPlayer>("Player", "Allows direct control of a Gnash player.")
 
     .def("setBaseURL", &pythonwrapper::GnashPlayer::setBaseURL)  
-    .def("createMovieDefinition", &pythonwrapper::GnashPlayer::createMovieDefinition)
+    .def("loadMovie", &pythonwrapper::GnashPlayer::createMovieDefinition)
     .def("initVM", &pythonwrapper::GnashPlayer::initVM)
 
     .def("addRenderer", &pythonwrapper::GnashPlayer::initRenderer)
@@ -49,8 +52,8 @@ BOOST_PYTHON_MODULE(gnash) {
     .def("swfHeight", &pythonwrapper::GnashPlayer::getSWFHeight)
     .def("swfURL", &pythonwrapper::GnashPlayer::getSWFURL)
     .def("swfBytesTotal", &pythonwrapper::GnashPlayer::getSWFBytesTotal,
-    	"Reported length of the movie in bytes. "
-    	"There is no guarantee that this is accurate.")
+    	"Length of the loaded movie in bytes as reported in the headers."
+	)
     .def("swfBytesLoaded", &pythonwrapper::GnashPlayer::getSWFBytesLoaded,
     	"The number of bytes of the movie that have been loaded")
 
@@ -60,7 +63,8 @@ BOOST_PYTHON_MODULE(gnash) {
     		return_value_policy<manage_new_object>())
     ;
 
-  class_<pythonwrapper::GnashCharacter>("Character", "A character from the movie.")
+  class_<pythonwrapper::GnashCharacter>("Character", "A character from the movie."
+  							"This class doesn't work")
     ;
 
 }

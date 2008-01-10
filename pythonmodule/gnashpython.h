@@ -16,25 +16,22 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
-#ifndef GNASH_PYTHON_H
-#define GNASH_PYTHON_H
+#ifndef GNASHPYTHON_H
+#define GNASHPYTHON_H
 
-#include <string>
 #include "gnash.h"
 #include "ManualClock.h"
 #include "movie_root.h"
 #include "movie_definition.h"
-
-#include "Range2d.h"
-#include "sound_handler.h" // for creating the "test" sound handlers
-#include "types.h" // for rgba class
-#include "render_handler.h" // for dtor visibility by auto_ptr
+#include "render_handler.h"
 #include "movie_instance.h" 
 #include "character.h"
 
-#include <memory> // for auto_ptr
 #include <string> 
 
+// Boost 1.33 seems to dislike auto_ptrs in the class
+// declaration. Perhaps I'm not handling them correctly, perhaps
+// it's better in 1.34.
 
 // Forward declarations
 namespace gnash {
@@ -45,7 +42,6 @@ namespace pythonwrapper {
 
 }
 }
-
 
 namespace gnash {
 

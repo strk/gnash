@@ -190,7 +190,7 @@ movie_root::setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movi
 		// don't leak overloaded levels
 
 		LevelMovie lm = it->second;
-		if ( lm == _rootMovie.get() )
+		if ( lm.get() == _rootMovie.get() )
 		{
 			// NOTE: this is not enough to trigger
 			//       an application reset. Was tested
