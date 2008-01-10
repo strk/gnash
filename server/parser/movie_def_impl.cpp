@@ -889,10 +889,11 @@ movie_def_impl::incrementLoadedFrames()
 void
 movie_def_impl::export_resource(const std::string& symbol, resource* res)
 {
-	// FIXME: m_exports access should be protected by a mutex
+	// _exportedResources access should be protected by a mutex
+	boost::mutex::scoped_lock lock(_exportedResourcesMutex);
 
 	// SWF sometimes exports the same thing more than once!
-	m_exports[symbol] = res;
+	_exportedResources[symbol] = res;
 }
 
 
@@ -902,7 +903,7 @@ movie_def_impl::get_exported_resource(const std::string& symbol)
 	boost::intrusive_ptr<resource> res;
 
 #ifdef DEBUG_EXPORTS
-	log_msg(_("get_exported_resource called, frame count=%u"), m_frame_count);
+	log_debug(_("get_exported_resource called, frame count=%u"), m_frame_count);
 #endif
 
 	// Don't call get_exported_resource() from this movie loader
@@ -930,17 +931,22 @@ movie_def_impl::get_exported_resource(const std::string& symbol)
 	size_t loading_frame = (size_t)-1; // used to keep track of advancements
 	for (;;)
 	{
-		// FIXME: make m_exports access thread-safe
-        ExportMap::iterator it = m_exports.find(symbol);
-        if ( it != m_exports.end() ) return it->second;
+		// _exportedResources access is thread-safe
+		{
+			boost::mutex::scoped_lock lock(_exportedResourcesMutex);
+			ExportMap::iterator it = _exportedResources.find(symbol);
+			if ( it != _exportedResources.end() ) return it->second;
+		}
 
 		size_t new_loading_frame = get_loading_frame();
 
 		if ( new_loading_frame != loading_frame )
 		{
-			log_msg(_("frame load advancement (from "
+#ifdef DEBUG_EXPORTS
+			log_debug(_("looking for exported resource: frame load advancement (from "
 				SIZET_FMT " to " SIZET_FMT ")"),
 				loading_frame, new_loading_frame);
+#endif
 			loading_frame = new_loading_frame;
 			timeout = def_timeout;
 		}
@@ -962,22 +968,32 @@ movie_def_impl::get_exported_resource(const std::string& symbol)
 				return res;
 			}
 
-			log_error(_("no frame progress at iteration %lu"), timeout);
+#ifdef DEBUG_EXPORTS
+			log_debug(_("No frame progress at iteration %lu of get_exported_resource(%s)"),
+				timeout, symbol.c_str());
+#endif
 
 			continue; // not worth checking
 		}
 
 		if ( loading_frame >= m_frame_count )
 		{
-			log_error(_("At end of stream, still no '%s' symbol found "
-				"in m_exports (" SIZET_FMT " entries in it, "
-				"follow)"), symbol.c_str(), m_exports.size());
+#ifdef DEBUG_EXPORTS
+			boost::mutex::scoped_lock lock(_exportedResourcesMutex);
+			log_debug(_("At end of stream, still no '%s' symbol found "
+				"in _exportedResources (" SIZET_FMT " entries in it, "
+				"follow)"), symbol.c_str(), _exportedResources.size());
+			for (ExportMap::const_iterator it=_exportedResources.begin(); it!=_exportedResources.end(); ++it)
+			{
+				log_debug(" symbol %s (%s)", it->first.c_str(), typeName(*(it->second)).c_str());
+			}
+#endif
 			return res;
 		}
 
 #ifdef DEBUG_EXPORTS
-		log_msg(_("We haven't finished loading (loading frame %u), "
-			"and m_exports.get returned no entries, "
+		log_debug(_("We haven't finished loading (loading frame %u), "
+			"and _exportedResources.get returned no entries, "
 			"sleeping a bit and trying again"),
 			get_loading_frame());
 #endif
@@ -1031,9 +1047,13 @@ movie_def_impl::markReachableResources() const
 		i->second->setReachable();
 	}
 
-	for (ExportMap::const_iterator i=m_exports.begin(), e=m_exports.end(); i!=e; ++i)
+	// TODO: turn this into a markExportedResources()
 	{
-		i->second->setReachable();
+		boost::mutex::scoped_lock lock(_exportedResourcesMutex);
+		for (ExportMap::const_iterator i=_exportedResources.begin(), e=_exportedResources.end(); i!=e; ++i)
+		{
+			i->second->setReachable();
+		}
 	}
 
 	for (ImportVect::const_iterator i=m_import_source_movies.begin(), e=m_import_source_movies.end(); i!=e; ++i)

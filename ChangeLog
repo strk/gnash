@@ -1,5 +1,8 @@
 2008-01-10 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/movie_def_impl.{cpp,h}: make exported resource
+	  container access thread-safe, cleanup debug messages
+	  in get_export_resource().
 	* server/swf/tag_loaders.cpp (sound_stream_head_loader): print
 	  unimplemented messages for unsupported tag records.
 	* server/asClass.h, server/asobj/ClassHierarchy.h: comment out

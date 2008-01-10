@@ -225,7 +225,10 @@ private:
 	mutable boost::mutex _namedFramesMutex;
 
 	typedef std::map<std::string, boost::intrusive_ptr<resource>, StringNoCaseLessThen > ExportMap;
-	ExportMap m_exports;
+	ExportMap _exportedResources;
+
+	// Mutex protecting access to _exportedResources
+	mutable boost::mutex _exportedResourcesMutex;
 
 	/// Items we import.
 	std::vector<import_info> m_imports;
