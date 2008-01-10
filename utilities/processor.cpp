@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: processor.cpp,v 1.79 2007/12/29 13:02:59 strk Exp $ */
+/* $Id: processor.cpp,v 1.80 2008/01/10 17:34:46 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -45,6 +45,7 @@
 #include "VM.h"
 #include "noseek_fd_adapter.h"
 #include "ManualClock.h"
+#include "tu_timer.h"
 
 extern "C"{
 	#include <unistd.h>

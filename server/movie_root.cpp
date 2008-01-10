@@ -34,9 +34,11 @@
 #include "namedStrings.h"
 #include "GnashException.h"
 #include "sound_handler.h"
+#include "timers.h" // for Timer use
 
 #include <iostream>
 #include <string>
+#include <map>
 #include <typeinfo>
 #include <cassert>
 #include <boost/algorithm/string/case_conv.hpp>
@@ -1432,6 +1434,12 @@ movie_root::executeTimers()
 #ifdef GNASH_DEBUG_TIMERS_EXPIRATION
         log_debug("Checking %d timers for expiration", _intervalTimers.size());
 #endif
+
+	unsigned long now = VM::get().getTime();
+
+	typedef std::multimap<unsigned int, Timer*> ExpiredTimers;
+	ExpiredTimers expiredTimers;
+
 	for (TimerMap::iterator it=_intervalTimers.begin(), itEnd=_intervalTimers.end();
 			it != itEnd; )
 	{
@@ -1458,13 +1466,24 @@ movie_root::executeTimers()
 		}
 		else
 		{
-			timer->executeIfExpired();
+			unsigned long elapsed;
+			if ( timer->expired(now, elapsed) )
+			{
+				expiredTimers.insert( make_pair(elapsed, timer) );
+			}
 		}
 
 		it = nextIterator;
 	}
 
-    if( ! _intervalTimers.empty() )
+	for (ExpiredTimers::iterator it=expiredTimers.begin(),
+			itEnd=expiredTimers.end();
+		it != itEnd; ++it)
+	{
+		it->second->executeAndReset();
+	}
+
+	if ( ! expiredTimers.empty() )
 	{
 		// process actions queued when executing interval callbacks
 		processActionQueue();

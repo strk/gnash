@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.44 2007/12/11 00:14:23 strk Exp $ */
+/* $Id: timers.cpp,v 1.45 2008/01/10 17:34:46 strk Exp $ */
 
 #include "timers.h"
 #include "as_function.h" // for class as_function
@@ -102,38 +102,23 @@ namespace gnash {
   }
   
 
-void
-Timer::executeIfExpired()
+bool
+Timer::expired(unsigned long now, unsigned long& elapsed)
 {
-	if ( _start != std::numeric_limits<unsigned long>::max() )
-	{
-		unsigned long now = VM::get().getTime();
-		assert(now >= _start); // it is possible for now to be == _start 
+	if ( cleared() ) return false;
+	long unsigned expTime = _start + _interval;
+	if ( now < expTime ) return false;
+	elapsed = expTime-now;
+	return true;
+}
 
-		//cout << "Start is " << _start << " interval is " << _interval << " now is " << now << endl;
-		if (now >= _start + _interval)
-		{
-			execute();
-			if ( _runOnce )
-			{
-				clearInterval();
-			}
-			else
-			{
-				// TODO: set _start to save lost time in calling expired ?
-				_start += _interval; // reset the timer
-				//cout << " Expired, reset start to " << _start << endl;
-				//log_msg("Timer expired! \n");
-				//return true;
-			}
-		}
-	}
-	else
-	{
-		log_msg("Timer not enabled!");
-	}
-
-	//return false;
+void
+Timer::executeAndReset()
+{
+	if ( cleared() ) return;
+	execute();
+	if ( _runOnce ) clearInterval();
+	else _start += _interval; // reset the timer
 }
 
 void

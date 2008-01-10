@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.102 2007/12/12 10:23:46 zoulunkai Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.103 2008/01/10 17:34:46 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -34,6 +34,7 @@
 #include "NetConnection.h"
 #include "sound_handler.h"
 #include "VideoDecoderFfmpeg.h"
+#include "tu_timer.h" // TODO: use the VirtualClock instead ?
 
 #include <boost/scoped_array.hpp>
 

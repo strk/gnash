@@ -19,7 +19,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.53 2007/12/04 11:45:31 strk Exp $ */
+/*  $Id: NetStream.h,v 1.54 2008/01/10 17:34:46 strk Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -36,6 +36,7 @@
 #include "video_stream_instance.h"
 #include "NetConnection.h"
 #include "FLVParser.h"
+#include "as_function.h" // for visibility of destructor by intrusive_ptr
 
 #include <deque>
 

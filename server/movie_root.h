@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.102 2008/01/09 18:31:43 strk Exp $ */
+/* $Id: movie_root.h,v 1.103 2008/01/10 17:34:45 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -75,7 +75,7 @@
 #include "mouse_button_state.h" // for composition
 #include "drag_state.h" // for composition
 #include "movie_instance.h" // for inlines
-#include "timers.h" // for composition
+//#include "timers.h" // for composition
 #include "asobj/Key.h"
 #include "smart_ptr.h" // for memory management
 #include "URL.h" // for loadMovie
@@ -89,6 +89,7 @@ namespace gnash {
     class ExecutableCode; // for ActionQueue
     class Stage;
     class URL;
+    class Timer;
 }
 
 namespace gnash

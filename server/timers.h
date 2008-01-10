@@ -31,7 +31,7 @@
 #include "as_function.h" // for visibility of destructor by intrusive_ptr
 #include "smart_ptr.h"
 
-#include "tu_timer.h"
+//#include "tu_timer.h"
 
 #include <string>
 #include <vector> 
@@ -148,12 +148,18 @@ public:
       ///
       void clearInterval();
 
-      /// Execute the associated callback if timer expired.
+      /// Get expiration state
       //
-      /// If single run is requested the timer is cleared after execution,
-      /// otherwise the timer is reset after that.
+      /// @param now
+      ///    Current time, in milliseconds.
       ///
-      void executeIfExpired();
+      /// @param elapsed
+      ///    Output parameter, will be set to the amount of milliseconds
+      ///    elapsed since actual expiration, if expired.
+      ///
+      /// @return true if the timer expired, false otherwise.
+      ///
+      bool expired(unsigned long now, unsigned long& elapsed); 
 
       /// Return true if interval has been cleared.
       //
@@ -164,13 +170,17 @@ public:
             return _start == std::numeric_limits<unsigned long>::max();
       }
 
-      /// Execute associated function properly setting up context
-      void execute();
+      /// Execute associated function and reset state
+      //
+      /// After execution either the timer is cleared
+      /// (if runOnce) or start time is incremented
+      /// by the interval.
+      ///
+      /// NOTE: if the timer is cleared this call
+      ///       results in a no-op.
+      ///
+      void executeAndReset();
 
-      /// Execute associated function properly setting up context
-      void operator() () { execute(); }
-
-      
       /// Arguments list type
       typedef std::vector<as_value> ArgsContainer;
 
@@ -188,6 +198,12 @@ public:
 
 private:
 
+      /// Execute associated function properly setting up context
+      void execute();
+
+      /// Execute associated function properly setting up context
+      void operator() () { execute(); }
+      
       /// Return number of milliseconds between expirations 
       unsigned long getInterval() const { return _interval; }
 

@@ -126,9 +126,6 @@ private:
 	/// Originating URL 
 	std::string _swfurl;
 
-	/// Time when the VM get started
-	boost::uint64_t _start_time;
-
 	/// Set the _global Object for actions run by Virtual Machine
 	//
 	/// Will be called by the init() function

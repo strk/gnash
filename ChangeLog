@@ -1,5 +1,17 @@
 2008-01-10 Sandro Santilli <strk@keybit.net>
 
+	* < all over > : since I dropped timers.h inclusion from movie_root.h
+	  the remaining of the changes are adding missing include here and
+	  there.
+	* server/array.cpp: fix double-to-int cast in Array ctor.
+	* testsuite/swfdec/PASSING: settimeout-*.swf succeed.
+	* server/movie_root.cpp (executeTimers): execute timers
+	  in order of expiration.
+	* server/timers.{cpp,h}: extend interfaces to allow for
+	  less clock lookup calls and query expiration time.
+
+2008-01-10 Sandro Santilli <strk@keybit.net>
+
 	* server/swf/tag_loaders.cpp (sound_stream_head_loader,
 	  define_sound_loader): check sample rate arguments.
 

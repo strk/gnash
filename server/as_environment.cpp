@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.118 2007/12/26 08:04:59 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.119 2008/01/10 17:34:45 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -34,6 +34,7 @@
 #include "Property.h"
 #include "as_object.h"
 #include "namedStrings.h"
+#include "as_function.h" // for as_environment::CallFrame::markReachableResources
 
 #include <string>
 #include <utility> // for std::pair

@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: VM.cpp,v 1.29 2008/01/05 02:26:19 strk Exp $ */
+/* $Id: VM.cpp,v 1.30 2008/01/10 17:34:46 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -86,7 +86,6 @@ VM::VM(movie_definition& topmovie, VirtualClock& clock)
 	_root_movie(new movie_root()),
 	_swfversion(topmovie.get_version()),
 	_swfurl(topmovie.get_url()),
-	_start_time(tu_timer::get_ticks()),
 	mClassHierarchy(0),
 	mMachine(0),
 	_clock(clock)
@@ -128,7 +127,7 @@ VM::RNG&
 VM::randomNumberGenerator() const
 {
 
-	static RNG rnd(tu_timer::get_ticks());
+	static RNG rnd(_clock.elapsed());
 	return rnd;
 }
 

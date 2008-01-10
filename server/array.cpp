@@ -1411,7 +1411,7 @@ array_new(const fn_call& fn)
 	else if (fn.nargs == 1 && fn.arg(0).is_number() )
 	{
 		// TODO: limit max size !!
-		int newSize = fn.arg(0).to_number();
+		int newSize = fn.arg(0).to_int();
 		if ( newSize < 0 ) newSize = 0;
 		else ao->resize(newSize);
 	}

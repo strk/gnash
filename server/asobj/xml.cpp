@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.64 2008/01/07 20:37:31 strk Exp $ */
+/* $Id: xml.cpp,v 1.65 2008/01/10 17:34:46 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -40,6 +40,7 @@
 #include "URL.h"
 #include "VM.h"
 #include "namedStrings.h"
+#include "timers.h" // for setting up timers to check loads
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
