@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.176 2008/01/10 10:26:51 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.177 2008/01/10 11:44:04 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1159,8 +1159,19 @@ define_text_loader(stream* in, tag_type tag, movie_definition* m)
 	bool sample_16bit, bool stereo, unsigned int &sample_count,
 	unsigned char* &data, unsigned &data_bytes);
 */
+
 // Common data
+
+/// Sample rate table for DEFINESOUNDHEAD tags
+//
+/// The value found in the tag is encoded as 2 bits and
+/// represent a multiple of 5512.5.
+/// NOTE that the first element of this table lacks the .5
+/// portion of the actual value. Dunno what consequences 
+/// it could have...
+///
 static int	s_sample_rate_table[] = { 5512, 11025, 22050, 44100 };
+static unsigned int s_sample_rate_table_len = 4;
 
 // @@ There are two sets of code to decode/expand/byteswap audio here.
 // @@ There should be one (search for ADPCM).
@@ -1178,7 +1189,18 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 	boost::uint16_t	character_id = in->read_u16();
 
 	media::audioCodecType	format = static_cast<media::audioCodecType>(in->read_uint(4));
-	int	sample_rate = in->read_uint(2);	// multiples of 5512.5
+	unsigned sample_rate_in = in->read_uint(2); // see s_sample_rate_table
+    if ( sample_rate_in >= s_sample_rate_table_len ) 
+    {
+		IF_VERBOSE_MALFORMED_SWF(
+        log_swferror(_("DEFINESOUNDLOADER: sound sample rate %d (expected 0 to %u"), 
+            sample_rate_in, s_sample_rate_table_len);
+		);
+        sample_rate_in = 0;
+    }
+    int sample_rate = s_sample_rate_table[sample_rate_in];
+
+
 	bool	sample_16bit = in->read_bit(); 
 	bool	stereo = in->read_bit(); 
 
@@ -1216,14 +1238,6 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 
 	if (handler)
 	{
-	    if (! (sample_rate >= 0 && sample_rate <= 3))
-	    {
-		IF_VERBOSE_MALFORMED_SWF(
-		    log_swferror(_("Bad sound sample rate %d read from SWF header"), sample_rate);
-		);
-		return;
-	    }
-
 	    // First it is the amount of data from file,
 	    // then the amount allocated at *data (it may grow)
 	    unsigned data_bytes = in->get_tag_end_position() - in->get_position();
@@ -1233,7 +1247,7 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 
 	    // Store all the data in a SoundInfo object
 	    std::auto_ptr<media::SoundInfo> sinfo;
-	    sinfo.reset(new media::SoundInfo(format, stereo, s_sample_rate_table[sample_rate], sample_count, sample_16bit));
+	    sinfo.reset(new media::SoundInfo(format, stereo, sample_rate, sample_count, sample_16bit));
 
 	    // Stores the sounddata in the soundhandler, and the ID returned
 	    // can be used to starting, stopping and deleting that sound
@@ -1280,13 +1294,32 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 
     // These are all unused by current implementation
     int reserved = in->read_uint(4); UNUSED(reserved);
-    int playbackSoundRate = in->read_uint(2);
+
+    unsigned int pbSoundRate = in->read_uint(2);
+    if ( pbSoundRate >= s_sample_rate_table_len )
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+        log_swferror("SOUNDSTREAMHEAD: playback sound rate %d (expected 0 to %d)",
+            pbSoundRate, s_sample_rate_table_len);
+        );
+        pbSoundRate=0;
+    }
+    int playbackSoundRate = s_sample_rate_table[pbSoundRate];
     bool playbackSound16bit = in->read_bit();
     bool playbackSoundStereo = in->read_bit();
 
     // These are the used ones
     media::audioCodecType format = static_cast<media::audioCodecType>(in->read_uint(4)); // TODO: check input !
-    int streamSoundRate = in->read_uint(2);	// multiples of 5512.5
+    unsigned int stSoundRate = in->read_uint(2);
+    if ( stSoundRate >= s_sample_rate_table_len )
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+        log_swferror(_("SOUNDSTREAMHEAD: stream sample rate %d (expected 0 to %u)"),
+            stSoundRate, s_sample_rate_table_len);
+        );
+        stSoundRate=0;
+    }
+    int streamSoundRate = s_sample_rate_table[stSoundRate];
     bool streamSound16bit = in->read_bit(); 
     bool streamSoundStereo = in->read_bit(); 
 
@@ -1342,18 +1375,9 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 
     // Wot about reading the sample_count samples?
 
-    if (! (streamSoundRate >= 0 && streamSoundRate <= 3))
-    {
-        IF_VERBOSE_MALFORMED_SWF(
-	    log_swferror(_("Bad sound sample rate %d read from SWF header"),
-			 streamSoundRate);
-	    );
-        return;
-    }
-
 	// Store all the data in a SoundInfo object
 	std::auto_ptr<media::SoundInfo> sinfo;
-	sinfo.reset(new media::SoundInfo(format, streamSoundStereo, s_sample_rate_table[streamSoundRate], sampleCount, streamSound16bit));
+	sinfo.reset(new media::SoundInfo(format, streamSoundStereo, streamSoundRate, sampleCount, streamSound16bit));
 
 	// Stores the sounddata in the soundhandler, and the ID returned
 	// can be used to starting, stopping and deleting that sound
