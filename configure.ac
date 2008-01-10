@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.469 2008/01/09 20:06:01 bwy Exp $
+dnl $Id: configure.ac,v 1.470 2008/01/10 07:42:40 bwy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -881,7 +881,7 @@ dnl Check for PKG_CONFIG before any GNASH_PATH call
 PKG_PROG_PKG_CONFIG
 
 AC_PATH_PROG(PYTHON, python, ,[${pathlist}])
-AM_CONDITIONAL([ENABLE_GNASH_PYTHON_MODULE], 0)
+AM_CONDITIONAL([ENABLE_GNASH_PYTHON_MODULE], FALSE)
 
 
 dnl Look for scratchbox

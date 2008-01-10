@@ -1,5 +1,10 @@
 2008-01-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* configure.ac: hopefully make sure pythonmodule really doesn't
+	  build automatically.
+
+2008-01-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* server/movie_root.cpp: use get() method of smart pointer
 	  fix a broken build (at least with boost 1.33).
 	* pythonmodule/*: General fix up.
