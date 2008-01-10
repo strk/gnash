@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.175 2008/01/02 14:13:59 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.176 2008/01/10 10:26:51 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1201,6 +1201,7 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 		//
 		// quoted from
 		// http://www-lehre.informatik.uni-osnabrueck.de/~fbstark/diplom/docs/swf/Sounds.htm
+		if ( delay_seek ) log_unimpl("MP3 delay seek %d", delay_seek);
 	}
 
 	IF_VERBOSE_PARSE
@@ -1288,6 +1289,22 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
     int streamSoundRate = in->read_uint(2);	// multiples of 5512.5
     bool streamSound16bit = in->read_bit(); 
     bool streamSoundStereo = in->read_bit(); 
+
+    if ( playbackSoundRate != streamSoundRate )
+    {
+        log_unimpl("Different stream/playback sound rate (%d/%d)",
+            streamSoundRate,playbackSoundRate);
+    }
+    if ( playbackSound16bit != streamSound16bit )
+    {
+        log_unimpl("Different stream/playback sample size (%d/%d)",
+            streamSound16bit?16:32, playbackSound16bit?16:32 );
+    }
+    if ( playbackSoundStereo != streamSoundStereo )
+    {
+        log_unimpl("Different stream/playback channels (%s/%s)",
+            streamSoundStereo?"stereo":"mono", playbackSoundStereo?"stereo":"mono" );
+    }
 
     // checks if this is a new streams header or just one in the row
     if (format == 0 && streamSoundRate == 0 && !streamSound16bit && !streamSoundStereo) return;

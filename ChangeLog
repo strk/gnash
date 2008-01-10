@@ -1,5 +1,7 @@
 2008-01-10 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp (sound_stream_head_loader): print
+	  unimplemented messages for unsupported tag records.
 	* server/asClass.h, server/asobj/ClassHierarchy.h: comment out
 	  unused parameters (to remove compiler warnings).
 	* server/: drag_state.h, movie_root.cpp: use floats for drag offset.
