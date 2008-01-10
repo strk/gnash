@@ -1,3 +1,8 @@
+2008-01-10 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp: size_t is an unsigned int here...
+	  use SIZET_FMT for it.
+
 2008-01-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/sprite_instance.cpp: fix string format for unsigned long.  
