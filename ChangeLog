@@ -1,5 +1,10 @@
 2008-01-10 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui.cpp (resize_view): always redraw on resize.
+	  Fixes bug #21971.
+
+2008-01-10 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp: size_t is an unsigned int here...
 	  use SIZET_FMT for it.
 

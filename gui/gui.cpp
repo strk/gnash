@@ -235,7 +235,8 @@ Gui::resize_view(int width, int height)
 	}
 	
 	// trigger redraw
-	_redraw_flag |= (_width!=width) || (_height!=height);
+	//_redraw_flag |= (_width!=width) || (_height!=height);
+	_redraw_flag = true; // this fixes bug #21971
 
 	// set new size ?
 	_width = width;
