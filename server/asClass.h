@@ -349,7 +349,7 @@ public:
 	bool isNative() { return mIsNative; }
 	bool hasBody() const { return mBody != NULL; }
 
-	as_object* construct(as_object *base_scope) { /* TODO */ return NULL; }
+	as_object* construct(as_object* /*base_scope*/) { /* TODO */ return NULL; }
 
 	bool hasActivation();
 

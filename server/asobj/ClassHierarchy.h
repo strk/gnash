@@ -136,7 +136,7 @@ public:
 	asNamespace* getGlobalNs() { return mGlobalNamespace; }
 
 	// Chad: Document
-	as_object* newOfType(string_table::key whattype) { return NULL; }
+	as_object* newOfType(string_table::key /*whattype*/) { return NULL; }
 
 	/// Find a namespace with the given uri.
 	///
