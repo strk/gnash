@@ -1,5 +1,7 @@
 2008-01-10 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp: invoke onData at end of loadVariables
+	  processing.
 	* gui/gui.cpp (resize_view): always redraw on resize.
 	  Fixes bug #21971.
 

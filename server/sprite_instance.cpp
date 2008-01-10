@@ -3960,6 +3960,8 @@ sprite_instance::processCompletedLoadVariableRequest(LoadVariablesThread& reques
 		//log_msg(_("Setting variable '%s' to value '%s'"), name.c_str(), val.c_str());
 		set_member(st.find(name), val.c_str());
 	}
+
+	callMethod(st.find(PROPNAME("onData")));
 }
 
 /*private*/

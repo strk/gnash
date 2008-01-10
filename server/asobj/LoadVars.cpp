@@ -128,7 +128,7 @@ protected:
 	//
 	/// Reachable resources are:
 	///	- onLoad event handler (_onLoad)
-	///	- onData event handler (_onLoad)
+	///	- onData event handler (_onData)
 	///	- associated environment (_env)
 	///
 	virtual void markReachableResources() const
