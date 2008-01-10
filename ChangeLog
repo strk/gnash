@@ -1,3 +1,8 @@
+2008-01-10 Sandro Santilli <strk@keybit.net>
+
+	* pythonmodule/Makefile.am: AUTOMAKE_OPTIONS must be outside
+	  of conditionals. Fixes bug #21994.
+
 2008-01-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* configure.ac: hopefully make sure pythonmodule really doesn't

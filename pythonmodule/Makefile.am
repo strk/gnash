@@ -15,9 +15,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-if ENABLE_GNASH_PYTHON_MODULE
-
 AUTOMAKE_OPTIONS = 
+
+if ENABLE_GNASH_PYTHON_MODULE
 
 pkglib_LTLIBRARIES = libgnashpython.la gnash.la
 
