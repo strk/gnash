@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.177 2008/01/11 08:50:14 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.178 2008/01/11 10:51:12 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -3029,7 +3029,7 @@ SWFHandlers::ActionNewEquals(ActionExec& thread)
 	try { op1 = op1.to_primitive(); }
 	catch (ActionTypeError& e)
 	{
-                log_debug(_("to_primitive() threw an ActionTypeError %s"),
+                log_debug(_("to_primitive(%s) threw an ActionTypeError %s"),
                         op1.to_debug_string().c_str(), e.what());
 	}
 
@@ -3037,7 +3037,7 @@ SWFHandlers::ActionNewEquals(ActionExec& thread)
 	try { op2 = op2.to_primitive(); }
 	catch (ActionTypeError& e)
 	{
-                log_debug(_("to_primitive() threw an ActionTypeError %s"),
+                log_debug(_("to_primitive(%s) threw an ActionTypeError %s"),
                         op2.to_debug_string().c_str(), e.what());
 	}
 
