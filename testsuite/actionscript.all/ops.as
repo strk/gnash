@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.31 2008/01/11 08:50:15 strk Exp $";
+rcsid="$Id: ops.as,v 1.32 2008/01/11 17:25:00 strk Exp $";
 
 #include "check.as"
 
@@ -106,6 +106,7 @@ xcheck(x != z);
 check(x == x);
 check(y == y);
 check(z == z);
+check((1/0) == (1/0));
 
 // for Arrays
 ary1 = [1,2,3];
@@ -729,7 +730,7 @@ xcheck(y!=NaN);
 check(isNaN(y));
 
 #if OUTPUT_VERSION < 7
- totals(213);
+ totals(214);
 #else
- totals(215);
+ totals(216);
 #endif
