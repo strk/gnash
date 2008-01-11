@@ -23,21 +23,20 @@ dnl both the configuration and compilation processes.
 AC_DEFUN([GNASH_PATH_FIREFOX],
 [dnl 
 
-dnl !!
-dnl !! Moved to configure.ac to allow builds where plugins don't work
-dnl !!
-dnl   AC_ARG_ENABLE(plugin, [  --disable-plugin         Enable support for being a plugin],
-dnl   [case "${enableval}" in
-dnl     yes) plugin=yes ;;
-dnl     no)  plugin=no ;;
-dnl     *)   AC_MSG_ERROR([bad value ${enableval} for disable-plugin option]) ;;
-dnl   esac], plugin=yes)
-
   FIREFOX_PLUGINS=""
   if test x"${nsapi}" = x"yes"; then
 
-    AC_ARG_WITH(plugindir, AC_HELP_STRING([--with-plugindir=DIR], [Directory to install NPAPI plugin in]),
-      [FIREFOX_PLUGINS=$withval]
+dnl    AC_ARG_WITH(plugindir, AC_HELP_STRING([--with-plugindir=DIR], [Directory to install NPAPI plugin in]),
+dnl      [FIREFOX_PLUGINS=$withval]
+dnl   )
+
+    dnl For backward compatibility, won't be advertised
+    AC_ARG_WITH(plugindir, [],
+	[ AC_MSG_WARN([--with-plugindir is obsoleted, use --with-npapi-plugindir instead]); FIREFOX_PLUGINS=$withval])
+
+    AC_ARG_WITH(plugindir,
+	AC_HELP_STRING([--with-npapi-plugindir=DIR], [Directory to install NPAPI plugin in]),
+	[FIREFOX_PLUGINS=$withval]
     )
 
 dnl  GNASHEXE=""

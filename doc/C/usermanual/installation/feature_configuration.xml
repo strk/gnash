@@ -145,14 +145,6 @@ selected.  The default is FFMPEG with SDL sound.
         fixed in newer versions (summer 2005) of libMesa.</entry>
 </row>
 <row>
-  <entry><option>--disable-klash</option></entry>
-  <entry>Disable support for Konqueror plugin. If
-        <option>--disable-plugin</option> is not specified
-        and support for building KDE programs is found, Klash is
-        built by default. This option limits the plugin to only
-        the Mozilla/Firefox one.</entry>
-</row>
-<row>
   <entry><option>--enable-libsuffix</option>
 </entry>
   <entry><filename>/lib</filename> directory suffix (64,32,none=default). This is only
@@ -186,7 +178,7 @@ selected.  The default is FFMPEG with SDL sound.
   <entry>Force disable/enable building the NPAPI plugin.
          By default the Mozilla plugin is built if the GTK gui 
          is selected.  Specify the 
-         <option>--with-plugindir=</option> option to specify where the
+         <option>--with-npapi-plugindir=</option> option to specify where the
          plugin should be installed.
    </entry>
 </row>
@@ -198,10 +190,17 @@ selected.  The default is FFMPEG with SDL sound.
   <entry>Force disable/enable building the KPARTS plugin. By default the
         KDE plugin is built if the kde gui is selected. 
         Specify the <option>--with-kde-plugindir=</option> and
-        <option>--with-kde-servicesdir=</option> options to specify where the
+        <option>--with-kde-servicesdir=</option> options (or more generally
+        the <option>--with-kde-pluginprefix=</option> one) to specify where the
         plugin should be installed. The default installation dir is extracted
         from kde-config.
   </entry>
+</row>
+<row>
+  <entry>
+     <option>--disable-plugins</option>
+  </entry>
+  <entry>Disable build of both kparts and npapi plugins</entry>
 </row>
 <row>
   <entry>    <option>--enable-qtopia</option>

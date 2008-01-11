@@ -141,7 +141,7 @@
       </entry>
   </row><row>
   <entry>
-    <option>--with-plugindir</option>
+    <option>--with-npapi-plugindir</option>
     </entry>
       <entry>
         This is the directory to install the NPAPI (Mozilla) plugin in.
@@ -153,10 +153,10 @@
     </entry>
       <entry>
         This option sets the default install dir for all KPARTS (kde) files.
-	The plugin will be installed in PREFIX/lib/kde3, use -with-kde-plugindir to override.
-	The service file in PREFIX/share/services, use --with-kde-servicesdir to override.
-	The config file in PREFIX/share/config, use --with-kde-configdir to override.
-	The appdata file in PREFIX/share/apps/klash, use --with-kde-appsdatadir to override.
+	The plugin will be installed in PREFIX/lib/kde3, use <option>-with-kde-plugindir</option> to override.
+	The service file in PREFIX/share/services, use <option>--with-kde-servicesdir</option> to override.
+	The config file in PREFIX/share/config, use <option>--with-kde-configdir</option> to override.
+	The appdata file in PREFIX/share/apps/klash, use <option>--with-kde-appsdatadir</option> to override.
       </entry>
   </row><row>
   <entry>

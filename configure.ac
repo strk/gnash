@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.470 2008/01/10 07:42:40 bwy Exp $
+dnl $Id: configure.ac,v 1.471 2008/01/11 18:10:10 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -881,7 +881,7 @@ dnl Check for PKG_CONFIG before any GNASH_PATH call
 PKG_PROG_PKG_CONFIG
 
 AC_PATH_PROG(PYTHON, python, ,[${pathlist}])
-AM_CONDITIONAL([ENABLE_GNASH_PYTHON_MODULE], FALSE)
+AM_CONDITIONAL([ENABLE_GNASH_PYTHON_MODULE], false)
 
 
 dnl Look for scratchbox
@@ -1011,30 +1011,19 @@ dnl -----------------------------------------------------------------
 dnl Enable us to disable building all browser plugins in one command.
 dnl -----------------------------------------------------------------
 
-dnl AC_ARG_ENABLE(plugins,
-dnl   AC_HELP_STRING([--disable-plugins], [Disable all browser plugins from building (default=no)]),
-dnl   [case "${enableval}" in
-dnl     yes) plugins=yes ;;
-dnl     no)  plugins=no ;;
-dnl     *)   AC_MSG_ERROR([bad value ${enableval} for disable-plugins option]) ;;
-dnl   esac],
-dnl   plugins=yes
-dnl )
-dnl if test x$plugins = xno; then
-dnl   nsapi=no
-dnl   kparts=no
-dnl fi
-
-dnl if test x$build_gtk = xyes; then
-dnl   if test x$plugins = xyes; then
-dnl     nsapi=yes
-dnl   fi
-dnl fi
-dnl if test x$build_kde = xyes; then
-dnl   if test x$plugins = xyes; then
-dnl     kparts=yes
-dnl   fi
-dnl fi
+AC_ARG_ENABLE(plugins,
+  AC_HELP_STRING([--disable-plugins], [Disable all browser plugins from building (default=no)]),
+  [case "${enableval}" in
+    yes) plugins=yes ;;
+    no)  plugins=no ;;
+    *)   AC_MSG_ERROR([bad value ${enableval} for disable-plugins option]) ;;
+  esac],
+  plugins=yes
+)
+if test x$plugins = xno; then
+  nsapi=no
+  kparts=no
+fi
 
 GNASH_PATH_FIREFOX
 

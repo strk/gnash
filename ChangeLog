@@ -1,3 +1,14 @@
+2008-01-11 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: add a --disable-plugins option to disable
+	  both kparts and npapi plugins.
+	* macros/firefox.m4: obsolete --with-plugindir, use
+	  --with-npapi-plugindir instead (the old one still work
+	  for backward compatibility).
+	* doc/C/usermanual/installation/: custompath_configuration.xml,
+	  feature_configuration.xml: update info about plugin build and
+	  install dir options.
+
 2008-01-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/sprite_instance.cpp, server/loadVariablesThread.cpp: Use
