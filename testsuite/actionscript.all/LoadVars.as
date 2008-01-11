@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: LoadVars.as,v 1.17 2008/01/11 09:09:59 strk Exp $";
+rcsid="$Id: LoadVars.as,v 1.18 2008/01/11 09:24:25 strk Exp $";
 
 #include "check.as"
 
@@ -82,6 +82,10 @@ check (!LoadVars.prototype.hasOwnProperty('valueOf'));
 check_equals (loadvarsObj.valueOf, Object.prototype.valueOf);
 check_equals (typeof(loadvarsObj.valueOf), 'function');
 
+// test the LoadVars::onData method
+check (LoadVars.prototype.hasOwnProperty('onData'));
+xcheck_equals (typeof(loadvarsObj.onData), 'function');
+
 //--------------------------------------------------------------------------
 // Test LoadVars::load()
 //--------------------------------------------------------------------------
@@ -90,13 +94,17 @@ varsloaded = 0;
 datareceived = 0;
 //var1 = undefined;
 //var2 = undefined;
-loadvarsObj.onLoad = function() {
+loadvarsObj.onLoad = function(success) {
 	varsloaded++;
 	note("LoadVars.onLoad called "+varsloaded+". "
 		+"Bytes loaded: "+loadvarsObj.getBytesLoaded()
 		+"/"+loadvarsObj.getBytesTotal());
 
 	//delete loadvarsObj; // this to test robustness
+
+	xcheck_equals(arguments.length, 1);
+	xcheck_equals(typeof(success), 'boolean');
+	xcheck_equals(success, true);
 
 	check(varsloaded < 3);
 
@@ -118,26 +126,30 @@ loadvarsObj.onLoad = function() {
 		// Gnash insists in looking for an ending & char !!		
 		xcheck_equals(loadvarsObj['var3'], 'val3\n');
 
-		check_totals(33);
+		xcheck_totals(43);
 
 		play();
 	}
 };
 
-// If LoadVars.onData is defined, onLoad won't be called !
-// (at least this is what I see)
-#if 0
-loadvarsObj.onData = function() {
-	datareceived++;
+// onData is called once with full parsed content.
+loadvarsObj.onDataReal = loadvarsObj.onData;
+loadvarsObj.onData = function(src) {
+	check_equals(arguments.length, 1);
+	check_equals(typeof(src), 'string');
+	check_equals(src.substr(0, 10), 'var1=val1&');
+	check_equals(src.substr(loadvarsObj.getBytesTotal()-10), 'var3=val3\n');
+	check_equals(datareceived, 0);
+	datareceived++; // we expecte it to be called only once ?
 	note("LoadVars.onData called ("+datareceived+"), byte loaded: "
 		+loadvarsObj.getBytesLoaded()
 		+"/"+loadvarsObj.getBytesTotal());
+	this.onDataReal(src);
 	//check_equals(loadvarsObj['var1'], 'val1');
 	//check_equals(loadvarsObj['var2'], 'val2');
 	//for (var i in _root) { note("_root["+i+"] = "+_root[i]); }
 	//play();
 };
-#endif
 
 loadvarsObj.var1 = "previous val1";
 
