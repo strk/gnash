@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: LoadVars.as,v 1.23 2008/01/11 10:09:09 strk Exp $";
+rcsid="$Id: LoadVars.as,v 1.24 2008/01/11 10:58:33 strk Exp $";
 
 #include "check.as"
 
@@ -135,13 +135,14 @@ loadvarsObj.onLoad = function(success) {
 	xcheck_equals(typeof(success), 'boolean');
 	xcheck_equals(success, true);
 	xcheck_equals(this.loaded, success);
+	check_equals(typeof(this.loaded), 'boolean');
+	this.loaded = 5;
+	xcheck_equals(typeof(this.loaded), 'number');
 
 	check(varsloaded < 3);
 
 	// onLoad is called after all vars have been called
 	check_equals( loadvarsObj.getBytesLoaded(), loadvarsObj.getBytesTotal() );
-
-	check_equals( loadvarsObj.loaded, true );
 
 	//for (var i in _root) { note("_root["+i+"] = "+_root[i]); }
 
@@ -156,7 +157,7 @@ loadvarsObj.onLoad = function(success) {
 		// Gnash insists in looking for an ending & char !!		
 		xcheck_equals(loadvarsObj['var3'], 'val3\n');
 
-		xcheck_totals(65);
+		xcheck_totals(66);
 
 		play();
 	}
