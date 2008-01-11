@@ -28,7 +28,6 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "as_function.h" // for calling event handlers
-#include "as_environment.h" // for setting up a fn_call
 #include "as_value.h" // for setting up a fn_call
 #include "StreamProvider.h"
 #include "URL.h"
@@ -36,22 +35,20 @@
 #include "tu_file.h"
 #include "timers.h"
 #include "VM.h"
-#include "LoadVariablesThread.h"
 #include "Object.h" // for getObjectInterface
+#include "LoadThread.h"
 
 #include <list>
+#include <boost/algorithm/string/case_conv.hpp>
 
 namespace gnash {
 
 static as_value loadvars_addrequestheader(const fn_call& fn);
-static as_value loadvars_decode(const fn_call& fn);
 static as_value loadvars_load(const fn_call& fn);
 static as_value loadvars_send(const fn_call& fn);
 static as_value loadvars_sendandload(const fn_call& fn);
 static as_value loadvars_tostring(const fn_call& fn);
 static as_value loadvars_ctor(const fn_call& fn);
-//static as_object* getLoadVarsInterface();
-//static void attachLoadVarsInterface(as_object& o);
 
 //--------------------------------------------
 
@@ -116,29 +113,15 @@ public:
 		return _bytesTotal;
 	}
 
-	// Retur number of completed loads
-	unsigned int loaded() const {
-		return _loaded;
-	}
-
 protected:
 
 #ifdef GNASH_USE_GC
 	/// Mark all reachable resources, for the GC
 	//
-	/// Reachable resources are:
-	///	- onLoad event handler (_onLoad)
-	///	- onData event handler (_onData)
-	///	- associated environment (_env)
+	/// There are no special reachable resources here
 	///
 	virtual void markReachableResources() const
 	{
-
-		if ( _onLoad ) _onLoad->setReachable();
-
-		if ( _onData ) _onData->setReachable();
-
-		_env.markReachableResources();
 
 		// Invoke generic as_object marker
 		markAsObjectReachable();
@@ -164,15 +147,6 @@ private:
 	///
 	std::string getURLEncodedProperties();
 
-	/// Return true if a load is currently in progress.
-	//
-	/// NOTE: doesn't lock the _loadRequestsMutex !
-	///
-	bool isLoading() const
-	{
-		return _currentLoad != _loadRequests.end();
-	}
-
 	/// Check for completed loading threads, fire
 	/// new threads if needed.
 	void checkLoads();
@@ -186,36 +160,7 @@ private:
 	///
 	void addLoadVariablesThread(const std::string& urlstr, const char* postdata=NULL);
 
-	/// Process a completed load
-	size_t processLoaded(LoadVariablesThread& lr);
-
-	/// Dispatch load event, if any
-	as_value dispatchLoadEvent();
-
-	/// Dispatch data event, if any
-	as_value dispatchDataEvent();
-
-	void setLoadHandler(as_function* fn) {
-		_onLoad = fn;
-	}
-
-	as_function* getLoadHandler() {
-		return _onLoad.get();
-	}
-
-	as_function* getDataHandler() {
-		return _onData.get();
-	}
-
-	void setDataHandler(as_function* fn) {
-		_onData = fn;
-	}
-
 	static as_value checkLoads_wrapper(const fn_call& fn);
-
-	static as_value loaded_get(const fn_call& fn);
-
-	static as_value onData_getset(const fn_call& fn);
 
 	static as_value onLoad_getset(const fn_call& fn);
 
@@ -223,112 +168,133 @@ private:
 
 	static as_value getBytesTotal_method(const fn_call& fn);
 
+	static as_value decode_method(const fn_call& fn);
+
+	static as_value onData_method(const fn_call& fn);
+
+	static as_value onLoad_method(const fn_call& fn);
+
 	boost::intrusive_ptr<as_function> _onLoad;
-
-	boost::intrusive_ptr<as_function> _onData;
-
-	as_environment _env;
 
 	size_t _bytesTotal;
 
 	size_t _bytesLoaded;
 
 	/// List of load requests
-	typedef std::list<LoadVariablesThread*> LoadVariablesThreads;
-	//typedef boost::ptr_list<LoadVariablesThread> LoadVariablesThreads;
+	typedef std::list<LoadThread*> LoadThreadList;
 
 	/// Load requests queue
 	//
-	/// Scheduling loads are needed because LoadVars
-	/// exposes a getBytesLoaded() and getBytesTotal()
-	/// which prevent parallel loads to properly work
+	/// TODO: 
+	/// Is serialization of loads needed to properly 
+	/// implament getBytesLoaded() and getBytesTotal()
+	/// methods ?
 	/// (ie: values from *which* load should be reported?)
 	///
-	LoadVariablesThreads _loadRequests;
-
-	/// The load currently in progress.
-	//
-	/// When _currentLoad == _loadRequests.end()
-	/// no load is in progress.
-	///
-	LoadVariablesThreads::iterator _currentLoad;
+	LoadThreadList _loadThreads; 
 
 	unsigned int _loadCheckerTimer;
 
-	/// Number of clompleted loads
-	unsigned int _loaded;
 };
 
 LoadVars::LoadVars()
 		:
 		as_object(getLoadVarsInterface()),
-		_env(),
 		_bytesTotal(0),
 		_bytesLoaded(0),
-		_loadRequests(),
-		_currentLoad(_loadRequests.end()),
-		_loaded(0)
+		_loadThreads(),
+		_loadCheckerTimer(0)
 {
 	//log_msg("LoadVars %p created", this);
 }
 
 LoadVars::~LoadVars()
 {
-	//log_msg("Deleting LoadVars %p", this);
-	for ( LoadVariablesThreads::iterator i=_loadRequests.begin(), e=_loadRequests.end();
-			i!=e; ++i)
+	for (LoadThreadList::iterator it=_loadThreads.begin(); it != _loadThreads.end(); ++it)
 	{
-		delete *i;
+		delete *it; // supposedly joins the thread
 	}
 }
 
 void
 LoadVars::checkLoads()
 {
-	/// Process a completed load if any
-	if ( isLoading() && (*_currentLoad)->completed() )
-	{
-		processLoaded(*(*_currentLoad));
-		_loadRequests.pop_front();
-		_currentLoad = _loadRequests.end();
-	}
+#ifdef DEBUG_LOADS
+    static int call=0;
+    log_debug("LoadVars %p checkLoads call %d, _loadThreads: %d", (void *)this, _loadThreads.size(), ++call);
+#endif
 
-	if ( ! isLoading() )
-	{
-		if ( ! _loadRequests.empty() )
-		{
-			_currentLoad = _loadRequests.begin();
-			(*_currentLoad)->process();
-		}
-		else
-		{
-			getVM().getRoot().clear_interval_timer(_loadCheckerTimer);
-		}
-	}
+    if ( _loadThreads.empty() ) return; // nothing to do
+
+    VM& vm = getVM();
+    string_table& st = vm.getStringTable();
+    string_table::key onDataKey = st.find(PROPNAME("onData"));
+
+    for (LoadThreadList::iterator it=_loadThreads.begin();
+            it != _loadThreads.end(); )
+    {
+        LoadThread* lt = *it;
+
+#ifdef DEBUG_LOADS
+        log_debug("LoadVars loads thread %p got %ld/%ld bytes", (void*)lt, lt->getBytesLoaded(), lt->getBytesTotal() );
+#endif
+        if ( lt->completed() )
+        {
+            size_t xmlsize = lt->getBytesTotal();
+            boost::scoped_array<char> buf(new char[xmlsize+1]);
+            size_t actuallyRead = lt->read(buf.get(), xmlsize);
+            if ( actuallyRead != xmlsize )
+			{
+				// This would be either a bug of LoadThread or an expected
+				// possibility which lacks documentation (thus a bug in documentation)
+				//
+#ifdef DEBUG_LOADS
+				log_debug("LoadThread::getBytesTotal() returned %d but ::read(%d) returned %d",
+					xmlsize, xmlsize, actuallyRead);
+#endif
+			}
+            buf[actuallyRead] = '\0';
+            as_value dataVal(buf.get()); // memory copy here (optimize?)
+
+            it = _loadThreads.erase(it);
+            delete lt; // supposedly joins the thread...
+
+            // might push_front on the list..
+            callMethod(onDataKey, dataVal);
+
+#ifdef DEBUG_LOADS
+            log_debug("Completed load, _loadThreads have now " SIZET_FMT " elements", _loadThreads.size());
+#endif
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    if ( _loadThreads.empty() ) 
+    {
+#ifdef DEBUG_XML_LOADS
+        log_debug("Clearing XML load checker interval timer");
+#endif
+        vm.getRoot().clear_interval_timer(_loadCheckerTimer);
+        _loadCheckerTimer=0;
+    }
 }
 
 void
 LoadVars::attachLoadVarsInterface(as_object& o)
 {
 	o.init_member("addRequestHeader", new builtin_function(loadvars_addrequestheader));
-	o.init_member("decode", new builtin_function(loadvars_decode));
+	o.init_member("decode", new builtin_function(LoadVars::decode_method));
 	o.init_member("getBytesLoaded", new builtin_function(LoadVars::getBytesLoaded_method));
 	o.init_member("getBytesTotal", new builtin_function(LoadVars::getBytesTotal_method));
 	o.init_member("load", new builtin_function(loadvars_load));
 	o.init_member("send", new builtin_function(loadvars_send));
 	o.init_member("sendAndLoad", new builtin_function(loadvars_sendandload));
 	o.init_member("toString", new builtin_function(loadvars_tostring));
-
-	boost::intrusive_ptr<builtin_function> gettersetter;
-
-	gettersetter = new builtin_function(&LoadVars::onLoad_getset, NULL);
-	o.init_property("onLoad", *gettersetter, *gettersetter);
-
-	gettersetter = new builtin_function(&LoadVars::onData_getset, NULL);
-	o.init_property("onData", *gettersetter, *gettersetter);
-
-	gettersetter = new builtin_function(&LoadVars::loaded_get, NULL);
-	o.init_readonly_property("loaded", *gettersetter);
+	o.init_member("onData", new builtin_function(LoadVars::onData_method));
+	o.init_member("onLoad", new builtin_function(LoadVars::onLoad_method));
 }
 
 as_object*
@@ -343,90 +309,60 @@ LoadVars::getLoadVarsInterface()
 	return o.get();
 }
 
-/*private*/
-as_value
-LoadVars::dispatchDataEvent()
-{
-	if ( ! _onData ) return as_value();
-	
-	//log_msg("Calling _onData func");
-	// This would be the function calls "context"
-	// will likely be the same to all events
-	fn_call fn(this, &_env, 0, 0);
-
-	return _onData->call(fn);
-}
-
-/* private */
-as_value
-LoadVars::dispatchLoadEvent()
-{
-	if ( ! _onLoad ) return as_value();
-	
-	//log_msg("Calling _onLoad func");
-	// This would be the function calls "context"
-	// will likely be the same to all events
-	fn_call fn(this, &_env, 0, 0);
-
-	return _onLoad->call(fn);
-}
-
-/* private */
-size_t
-LoadVars::processLoaded(LoadVariablesThread& lr)
-{
-	typedef LoadVariablesThread::ValuesMap ValuesMap;
-	using std::string;
-
-	string_table& st = getVM().getStringTable();
-
-	ValuesMap& vals = lr.getValues();
-	for  (ValuesMap::iterator it=vals.begin(), itEnd=vals.end();
-			it != itEnd; ++it)
-	{
-		set_member(st.find(it->first), as_value(it->second.c_str()));
-		//log_msg("Setting %s == %s", it->first.c_str(), it->second.c_str());
-	}
-
-	_bytesLoaded = lr.getBytesLoaded();
-	_bytesTotal = lr.getBytesTotal();
-	++_loaded;
-
-	dispatchLoadEvent();
-
-	return vals.size();
-}
-
 void
 LoadVars::addLoadVariablesThread(const std::string& urlstr, const char* postdata)
 {
-	if ( _loadRequests.empty() )
-	{
-		//log_msg("addLoadVariablesThread(): new requests, starting timer");
-
-		using boost::intrusive_ptr;
-		intrusive_ptr<builtin_function> loadsChecker = new builtin_function(
-			&LoadVars::checkLoads_wrapper, NULL);
-		std::auto_ptr<Timer> timer(new Timer);
-		timer->setInterval(*loadsChecker, 50, this);
-		_loadCheckerTimer = getVM().getRoot().add_interval_timer(timer, true);
-	}
+	string_table& st = getVM().getStringTable();
+	string_table::key loadedKey = st.find("loaded");
+	set_member(loadedKey, false);
 
 	URL url(urlstr, get_base_url());
 
-	std::auto_ptr<LoadVariablesThread> newThread;
+	std::auto_ptr<tu_file> str;
+	if ( postdata ) str.reset ( StreamProvider::getDefaultInstance().getStream(url, std::string(postdata)) );
+	else str.reset ( StreamProvider::getDefaultInstance().getStream(url) );
 
-	try
+	if ( ! str.get() ) 
 	{
-		if ( postdata ) newThread.reset( new LoadVariablesThread(url, postdata) );
-		else newThread.reset( new LoadVariablesThread(url) );
+		log_error(_("Can't load variables from %s (security?)"), url.str().c_str());
+		return;
+		// TODO: check if this is correct
+		//as_value nullValue; nullValue.set_null();
+		//callMethod(VM::get().getStringTable().find(PROPNAME("onData")), nullValue);
+	}
 
-		_loadRequests.insert( _loadRequests.end(), newThread.release() );
-	}
-	catch (NetworkException&)
+	log_security(_("Loading XML file from url: '%s'"), url.str().c_str());
+
+	bool startTimer = _loadThreads.empty();
+
+	std::auto_ptr<LoadThread> lt ( new LoadThread );
+	lt->setStream(str);
+
+	// we push on the front to avoid invalidating
+	// iterators when queueLoad is called as effect
+	// of onData invocation.
+	// Doing so also avoids processing queued load
+	// request immediately
+	// 
+	_loadThreads.push_front(lt.get());
+#ifdef DEBUG_LOADS
+	log_debug("Pushed thread %p to _loadThreads, number of XML load threads now: " SIZET_FMT, (void*)lt.get(),  _loadThreads.size());
+#endif
+	lt.release();
+
+
+	if ( startTimer )
 	{
-		log_error(_("Could not load variables from %s"), url.str().c_str());
-	}
+		boost::intrusive_ptr<builtin_function> loadsChecker = \
+			new builtin_function(&LoadVars::checkLoads_wrapper);
+		std::auto_ptr<Timer> timer(new Timer);
+		timer->setInterval(*loadsChecker, 50, this);
+		_loadCheckerTimer = getVM().getRoot().add_interval_timer(timer, true);
+#ifdef DEBUG_LOADS
+		log_debug("Registered XML loads interval %d", _loadCheckerTimer);
+#endif
+    }
+
 }
 
 void
@@ -479,62 +415,11 @@ LoadVars::sendAndLoad(const std::string& urlstr, LoadVars& target, bool post)
 
 /* private static */
 as_value
-LoadVars::onLoad_getset(const fn_call& fn)
-{
-	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		as_function* h = ptr->getLoadHandler();
-		if ( h ) return as_value(h);
-		else return as_value();
-	}
-	else // setter
-	{
-		as_function* h = fn.arg(0).to_as_function();
-		if ( h ) ptr->setLoadHandler(h);
-	}
-	return as_value();
-}
-
-/* private static */
-as_value
 LoadVars::checkLoads_wrapper(const fn_call& fn)
 {
 	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
 	ptr->checkLoads();
 	return as_value();
-}
-
-/* private static */
-as_value
-LoadVars::onData_getset(const fn_call& fn)
-{
-
-	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		as_function* h = ptr->getDataHandler();
-		if ( h ) return as_value(h);
-		else return as_value();
-	}
-	else // setter
-	{
-		as_function* h = fn.arg(0).to_as_function();
-		if ( h ) ptr->setDataHandler(h);
-	}
-	return as_value();
-}
-
-/* private static */
-as_value
-LoadVars::loaded_get(const fn_call& fn)
-{
-
-	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
-
-	return as_value(ptr->loaded() > 0);
 }
 
 static as_value
@@ -546,12 +431,26 @@ loadvars_addrequestheader(const fn_call& fn)
 	return as_value(); 
 }
 
-static as_value
-loadvars_decode(const fn_call& fn)
+as_value
+LoadVars::decode_method(const fn_call& fn)
 {
 	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
-	UNUSED(ptr);
-	log_unimpl (__FUNCTION__);
+
+	if ( ! fn.nargs ) return as_value(false);
+
+	typedef std::map<std::string, std::string> ValuesMap;
+
+	ValuesMap vals;
+
+	URL::parse_querystring(fn.arg(0).to_string(), vals);
+
+	string_table& st = ptr->getVM().getStringTable();
+	for  (ValuesMap::iterator it=vals.begin(), itEnd=vals.end();
+			it != itEnd; ++it)
+	{
+		ptr->set_member(st.find(it->first), as_value(it->second.c_str()));
+	}
+
 	return as_value(); 
 }
 
@@ -567,6 +466,50 @@ LoadVars::getBytesTotal_method(const fn_call& fn)
 {
 	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
 	return as_value(ptr->getBytesTotal());
+}
+
+as_value
+LoadVars::onData_method(const fn_call& fn)
+{
+	GNASH_REPORT_FUNCTION;
+
+	as_object* thisPtr = fn.this_ptr.get();
+	if ( ! thisPtr ) return as_value();
+
+	VM& vm = thisPtr->getVM();
+	string_table& st = vm.getStringTable();
+	string_table::key onLoadKey = st.find(PROPNAME("onLoad"));
+	string_table::key loadedKey = st.find("loaded");
+
+
+	// See http://gitweb.freedesktop.org/?p=swfdec/swfdec.git;a=blob;f=libswfdec/swfdec_initialize.as
+
+	as_value src; src.set_null();
+	if ( fn.nargs ) src = fn.arg(0);
+
+	if ( ! src.is_null() )
+	{
+		string_table::key decodeKey = st.find("decode");
+		as_value tmp(true);
+		thisPtr->set_member(loadedKey, tmp);
+		thisPtr->callMethod(decodeKey, src);
+		thisPtr->callMethod(onLoadKey, tmp);
+	}
+	else
+	{
+		as_value tmp(true);
+		thisPtr->set_member(loadedKey, tmp);
+		thisPtr->callMethod(onLoadKey, tmp);
+	}
+
+	return as_value();
+}
+
+as_value
+LoadVars::onLoad_method(const fn_call& /*fn*/)
+{
+	GNASH_REPORT_FUNCTION;
+	return as_value();
 }
 
 static as_value
@@ -659,6 +602,13 @@ static as_value
 loadvars_ctor(const fn_call& fn)
 {
 	boost::intrusive_ptr<as_object> obj = new LoadVars();
+
+	if ( fn.nargs )
+	{
+		std::stringstream ss;
+		fn.dump_args(ss);
+		log_unimpl("new LoadVars(%s) - arguments discarded", ss.str().c_str()); // or ASERROR ?
+	}
 	
 	return as_value(obj.get()); // will keep alive
 }

@@ -1,5 +1,12 @@
 2008-01-11 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/LoadVars.cpp: rewrite the whole class.
+	* testsuite/actionscript.all/LoadVars.as: no more failures for SWF6+
+	  (the remaining ones are for availability of the LoadVars in SWF5,
+	   which is suspicious).
+
+2008-01-11 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/LoadVars.as: further improved
 	  the test. Will fix in next commit.
 
