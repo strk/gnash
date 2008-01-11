@@ -1,5 +1,10 @@
 2008-01-10 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (get_member): it seems like _global is
+	  available for sprites defined by SWF6, no matter VM version.
+
+2008-01-10 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp: invoke onData at end of loadVariables
 	  processing.
 	* gui/gui.cpp (resize_view): always redraw on resize.

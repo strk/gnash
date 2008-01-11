@@ -2133,7 +2133,12 @@ bool sprite_instance::get_member(string_table::key name_key, as_value* val,
 		return true;
 	}
 
-	if ( _vm.getSWFVersion() > 5 && name_key == NSV::PROP_uGLOBAL ) // see MovieClip.as
+	// NOTE: availability of _global doesn't depend on VM version
+	//       but on actual movie version. Example: if an SWF4 loads
+	//       an SWF6 (to, say, _level2), _global will be unavailable
+	//       to the SWF4 code but available to the SWF6 one.
+	//
+	if ( getSWFVersion() > 5 && name_key == NSV::PROP_uGLOBAL ) // see MovieClip.as
 	{
 		// The "_global" ref was added in SWF6
 		val->set_as_object( _vm.getGlobal() );
