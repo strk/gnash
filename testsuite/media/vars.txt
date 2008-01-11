@@ -32,3 +32,4 @@ third line (should be discarded)
 third line (should be discarded)
 third line (should be discarded)
 third line (should be discarded)
+&var3=val3

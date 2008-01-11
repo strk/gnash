@@ -1,5 +1,13 @@
 2008-01-11 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/media/vars.txt: add a final variable label
+	  after newlines and w/out a terminating ampersend.
+	* testsuite/actionscript.all/LoadVars.as: test that labels
+	  placed after newlines (and non ampersend-terminated) are
+	  still used !!.
+
+2008-01-11 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ASHandlers.cpp (ActionNewEquals): for SWF<=5
 	  always convert the input parameters to primitives.
 	* testsuite/actionscript.all/String.as: success in

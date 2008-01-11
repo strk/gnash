@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: LoadVars.as,v 1.16 2007/11/21 09:21:50 cmusick Exp $";
+rcsid="$Id: LoadVars.as,v 1.17 2008/01/11 09:09:59 strk Exp $";
 
 #include "check.as"
 
@@ -34,6 +34,8 @@ var loadvarsObj = new LoadVars;
 // test the LoadVars constuctor
 xcheck_equals (typeof(loadvarsObj), 'object');
 
+check_totals(2);
+
 #else // OUTPUT_VERSION >= 6
 
 check_equals(typeof(LoadVars), 'function');
@@ -44,21 +46,41 @@ var loadvarsObj = new LoadVars;
 check_equals (typeof(loadvarsObj), 'object');
 
 // test the LoadVars::addrequestheader method
+check (LoadVars.prototype.hasOwnProperty('addRequestHeader'));
 check_equals (typeof(loadvarsObj.addRequestHeader), 'function');
+
 // test the LoadVars::decode method
+check (LoadVars.prototype.hasOwnProperty('decode'));
 check_equals (typeof(loadvarsObj.decode), 'function');
+
 // test the LoadVars::getbytesloaded method
+check (LoadVars.prototype.hasOwnProperty('getBytesLoaded'));
 check_equals (typeof(loadvarsObj.getBytesLoaded), 'function');
+
 // test the LoadVars::getbytestotal method
+check (LoadVars.prototype.hasOwnProperty('getBytesTotal'));
 check_equals (typeof(loadvarsObj.getBytesTotal), 'function');
+
 // test the LoadVars::load method
+check (LoadVars.prototype.hasOwnProperty('load'));
 check_equals (typeof(loadvarsObj.load), 'function');
+
 // test the LoadVars::send method
+check (LoadVars.prototype.hasOwnProperty('send'));
 check_equals (typeof(loadvarsObj.send), 'function');
+
 // test the LoadVars::sendandload method
+check (LoadVars.prototype.hasOwnProperty('sendAndLoad'));
 check_equals (typeof(loadvarsObj.sendAndLoad), 'function');
+
 // test the LoadVars::tostring method
+check (LoadVars.prototype.hasOwnProperty('toString'));
 check_equals (typeof(loadvarsObj.toString), 'function');
+
+// test the LoadVars::tostring method
+check (!LoadVars.prototype.hasOwnProperty('valueOf'));
+check_equals (loadvarsObj.valueOf, Object.prototype.valueOf);
+check_equals (typeof(loadvarsObj.valueOf), 'function');
 
 //--------------------------------------------------------------------------
 // Test LoadVars::load()
@@ -92,6 +114,12 @@ loadvarsObj.onLoad = function() {
 		check_equals(loadvarsObj['var2'], 'val2');
 		//check_equals(loadvarsObj['v2_var1'], 'val1');
 		//check_equals(loadvarsObj['v2_var2'], 'val2');
+
+		// Gnash insists in looking for an ending & char !!		
+		xcheck_equals(loadvarsObj['var3'], 'val3\n');
+
+		check_totals(33);
+
 		play();
 	}
 };
@@ -136,4 +164,4 @@ check_equals(loadvarsObj['var2'], undefined);
 stop();
 
 #endif //  OUTPUT_VERSION >= 6
-totals();
+
