@@ -1,3 +1,8 @@
+2008-01-11 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/String.as: test String object
+	  construction.
+
 2008-01-10 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (get_member): it seems like _global is

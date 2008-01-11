@@ -16,7 +16,7 @@
 
 // Original author: Mike Carlson - June 19th, 2006
 
-rcsid="$Id: String.as,v 1.30 2007/12/11 19:23:50 strk Exp $";
+rcsid="$Id: String.as,v 1.31 2008/01/11 08:36:20 strk Exp $";
 
 #include "check.as"
 
@@ -81,6 +81,9 @@ check_equals(typeof(String()), 'string');
 
 var a;
 a = new String("wallawallawashinGTON");
+check_equals(typeof(a), 'object');
+check(a instanceof String);
+check(a instanceof Object);
 check_equals ( a.charCodeAt(0), 119 );
 check_equals ( a.charCodeAt(1), 97 );
 check_equals ( a.charCodeAt(2), 108 );
@@ -458,7 +461,7 @@ Object.prototype.toString = ObjectProtoToStringBackup;
 String.prototype.toString = StringProtoToStringBackup;
 
 #if OUTPUT_VERSION < 6
- check_totals(170);
+ check_totals(173);
 #else
- check_totals(191);
+ check_totals(194);
 #endif
