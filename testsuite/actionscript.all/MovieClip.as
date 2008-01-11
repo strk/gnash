@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.112 2008/01/08 10:36:57 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.113 2008/01/11 11:42:44 strk Exp $";
 
 #include "check.as"
 
@@ -1308,6 +1308,11 @@ ret = _root.meth(1);
 check_equals(typeof(ret), 'number');
 check_equals(ret, 0);
 
+Number.prototype.toLowerCase = function() { return "post"; };
+ret = _root.meth(1);
+check_equals(typeof(ret), 'number');
+check_equals(ret, 2);
+
 ret = _root.meth('post');
 check_equals(typeof(ret), 'number');
 check_equals(ret, 2);
@@ -1337,17 +1342,22 @@ ret = _root.meth(o);
 check_equals(typeof(ret), 'number');
 check_equals(ret, 0);
 
+o.toLowerCase = function() { return "get"; };
+ret = _root.meth(o);
+check_equals(typeof(ret), 'number');
+check_equals(ret, 1);
+
 
 #if OUTPUT_VERSION < 6
- check_totals(185); // SWF5
+ check_totals(189); // SWF5
 #else
 #if OUTPUT_VERSION < 7
- check_totals(581); // SWF6
+ check_totals(585); // SWF6
 #else
 #if OUTPUT_VERSION < 8
- check_totals(598); // SWF7
+ check_totals(602); // SWF7
 #else
- check_totals(599); // SWF8+
+ check_totals(603); // SWF8+
 #endif
 #endif
 #endif

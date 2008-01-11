@@ -886,11 +886,25 @@ sprite_meth(const fn_call& fn)
 {
 	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
-	if ( ! fn.nargs ) return as_value(0);
-	as_value& v = fn.arg(0);
-	if ( ! v.is_string() ) return as_value(0);
-	std::string s = v.to_string();
-	boost::to_lower(s);
+	if ( ! fn.nargs ) return as_value(0); // optimization ...
+
+	as_value v = fn.arg(0);
+	boost::intrusive_ptr<as_object> o = v.to_object();
+	if ( ! o )
+	{
+		log_debug("meth(%s): first argument doesn't cast to object", v.to_debug_string().c_str());
+		return as_value(0);
+	}
+
+	string_table& st = sprite->getVM().getStringTable();
+	as_value lc = o->callMethod(st.find(PROPNAME("toLowerCase")));
+
+	log_debug("after call to toLowerCase with arg %s we got %s", v.to_debug_string().c_str(), lc.to_debug_string().c_str());
+
+	//if ( ! v.is_string() ) return as_value(0);
+	std::string s = lc.to_string();
+
+	//boost::to_lower(s);
 	if ( s == "get" ) return as_value(1);
 	if ( s == "post" )  return as_value(2);
 	return as_value(0);

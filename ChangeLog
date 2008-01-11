@@ -1,5 +1,12 @@
 2008-01-11 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp: fix the MovieClip.meth() method
+	  to invoke toLowerString on first argument.
+	* testsuite/actionscript.all/MovieClip.as: test that meth()
+	  should invoke toLowerString on first argument.
+
+2008-01-11 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/LoadVars.cpp: rewrite the whole class.
 	* testsuite/actionscript.all/LoadVars.as: no more failures for SWF6+
 	  (the remaining ones are for availability of the LoadVars in SWF5,
