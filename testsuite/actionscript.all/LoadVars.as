@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: LoadVars.as,v 1.21 2008/01/11 09:53:52 strk Exp $";
+rcsid="$Id: LoadVars.as,v 1.22 2008/01/11 09:58:34 strk Exp $";
 
 #include "check.as"
 
@@ -52,9 +52,26 @@ check_equals (typeof(loadvarsObj.addRequestHeader), 'function');
 // test the LoadVars::decode method
 check (LoadVars.prototype.hasOwnProperty('decode'));
 check_equals (typeof(loadvarsObj.decode), 'function');
-loadvarsObj.decode("ud3=3&ud2=2");
+ret = loadvarsObj.decode("ud3=3&ud2=2");
+check_equals(typeof(ret), 'undefined');
 xcheck_equals (loadvarsObj.ud3, 3);
 xcheck_equals (loadvarsObj.ud2, 2);
+loadvarsObj.decode("ud4=4&ud2=20");
+xcheck_equals (loadvarsObj.ud4, 4);
+xcheck_equals (loadvarsObj.ud3, 3);
+xcheck_equals (loadvarsObj.ud2, 20);
+ret = loadvarsObj.decode();
+xcheck_equals( typeof(ret), 'boolean');
+xcheck_equals( ret, false );
+ret = loadvarsObj.decode("");
+check_equals( typeof(ret), 'undefined');
+o = {};
+ret = loadvarsObj.decode(o);
+check_equals( typeof(ret), 'undefined');
+o.toString = function() { return "ud5=5"; };
+ret = loadvarsObj.decode(o);
+check_equals( typeof(ret), 'undefined');
+xcheck_equals (loadvarsObj.ud5, 5);
 
 // test the LoadVars::getbytesloaded method
 check (LoadVars.prototype.hasOwnProperty('getBytesLoaded'));
@@ -139,7 +156,7 @@ loadvarsObj.onLoad = function(success) {
 		// Gnash insists in looking for an ending & char !!		
 		xcheck_equals(loadvarsObj['var3'], 'val3\n');
 
-		xcheck_totals(54);
+		xcheck_totals(64);
 
 		play();
 	}
