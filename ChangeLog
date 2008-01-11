@@ -1,5 +1,7 @@
 2008-01-11 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/PASSING: chartoascii-4.swf succeed
+	  now. The versions 5 to 8 stil fail...
 	* server/vm/ASHandlers.cpp (ActionOrd): make sure to
 	  return an unsigned int. Fixes load of games from
 	  http://www.ferryhalim.com/orisinal/.
