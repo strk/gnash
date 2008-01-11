@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: LoadVars.as,v 1.20 2008/01/11 09:48:58 strk Exp $";
+rcsid="$Id: LoadVars.as,v 1.21 2008/01/11 09:53:52 strk Exp $";
 
 #include "check.as"
 
@@ -52,6 +52,9 @@ check_equals (typeof(loadvarsObj.addRequestHeader), 'function');
 // test the LoadVars::decode method
 check (LoadVars.prototype.hasOwnProperty('decode'));
 check_equals (typeof(loadvarsObj.decode), 'function');
+loadvarsObj.decode("ud3=3&ud2=2");
+xcheck_equals (loadvarsObj.ud3, 3);
+xcheck_equals (loadvarsObj.ud2, 2);
 
 // test the LoadVars::getbytesloaded method
 check (LoadVars.prototype.hasOwnProperty('getBytesLoaded'));
@@ -136,7 +139,7 @@ loadvarsObj.onLoad = function(success) {
 		// Gnash insists in looking for an ending & char !!		
 		xcheck_equals(loadvarsObj['var3'], 'val3\n');
 
-		xcheck_totals(52);
+		xcheck_totals(54);
 
 		play();
 	}
