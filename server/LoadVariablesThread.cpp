@@ -86,7 +86,7 @@ LoadVariablesThread::completeLoad()
 	_bytesLoaded = _stream->get_position();
 	if ( _bytesTotal !=  _bytesLoaded )
 	{
-		log_error("Size of stream variables were loaded from advertised to be %d bytes long, while turned out to be only %d bytes long",
+		log_error("Size of stream variables were loaded from advertised to be "SIZET_FMT" bytes long, but turned out to be only "SIZET_FMT" bytes long",
 			_bytesTotal, _bytesLoaded);
 		_bytesTotal = _bytesLoaded;
 	}

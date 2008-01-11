@@ -17,6 +17,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "GnashException.h"
 #include "URL.h"
 #include "noseek_fd_adapter.h"
@@ -30,6 +34,7 @@
 #include "render_handler.h"
 #include "render_handler_agg.h"
 #include "SystemClock.h"
+#include "log.h"
 
 #include <cstdio>
 #include <string>
@@ -49,10 +54,11 @@ GnashPlayer::GnashPlayer()
 	:
     _movieDef(NULL),
     _movieRoot(NULL),
-    _movieInstance(NULL),
-    _handler(NULL),
+    _renderer(NULL),
+    _logFile(gnash::LogFile::getDefaultInstance()),
+    _xpos(0),
+    _ypos(0),
     _url(""),
-    _forceRedraw(false),
     _fp(NULL)
 {
     init();
@@ -60,6 +66,7 @@ GnashPlayer::GnashPlayer()
 
 GnashPlayer::~GnashPlayer()
 {
+    close();
 }
 
 // Initialize the core libs. If this gets called twice:
@@ -70,8 +77,15 @@ GnashPlayer::~GnashPlayer()
 // TODO: Find way of checking whether gnashInit() has been called
 // Better TODO: Get Gnash to handle more than one movie.
 void
-GnashPlayer::init() {
-        gnash::gnashInit();
+GnashPlayer::init()
+{
+    gnash::gnashInit();
+}
+
+void
+GnashPlayer::close()
+{
+    gnash::clear();
 }
 
 // Set our _url member and pass this to the core.
@@ -92,9 +106,12 @@ GnashPlayer::setBaseURL(std::string url)
 
 // TODO: Read in movies from a python file object.
 bool
-GnashPlayer::createMovieDefinition()
+GnashPlayer::loadMovie(std::string url)
 {
+
     if (_movieDef) return false;
+    
+    setBaseURL(url);
 
     // Fail if base URL not set
     if (_url == "") return false;
@@ -122,7 +139,7 @@ GnashPlayer::initVM()
 
     // If movie definition hasn't already been created, try to create it,
     // fail if that doesn't work either.
-    if (!_movieDef  && !createMovieDefinition()) return false;
+    if (!_movieDef  && !loadMovie(_url)) return false;
 
     // Initialize the VM with a manual clock
     _movieRoot = &(gnash::VM::init(*_movieDef, _manualClock).getRoot());
@@ -142,9 +159,6 @@ GnashPlayer::initVM()
     // I don't know why it's done like this.
     auto_ptr<movie_instance> mi (_movieDef->create_movie_instance());
 
-    // Setup Movie Instance.
-    _movieInstance = mi.get();
-
     // Put the instance on stage.
     _movieRoot->setRootMovie( mi.release() ); 
    
@@ -159,6 +173,14 @@ GnashPlayer::allowRescale(bool allow)
     _movieRoot->allowRescaling(allow);
 }
 
+// Whether debug messages are sent to stdout
+void
+GnashPlayer::setVerbose(bool verbose)
+{
+    // Can't turn this off yet...
+    if (verbose) _logFile.setVerbosity();
+}
+
 // Move Gnash's sense of time along manually
 void
 GnashPlayer::advanceClock(unsigned long ms)
@@ -167,13 +189,15 @@ GnashPlayer::advanceClock(unsigned long ms)
     _manualClock.advance(ms);
 }
 
+// This moves the manual clock on automatically by the length of
+// time allocated to a frame by the FPS setting.
 void
 GnashPlayer::advance() {
 
     REQUIRE_VM_STARTED;
 
     float fps = getSWFFrameRate();
-    unsigned long clockAdvance = long(1000/fps);
+    unsigned long clockAdvance = long(1000 / fps);
     advanceClock(clockAdvance);
 
     _movieRoot->advance();
@@ -182,11 +206,30 @@ GnashPlayer::advance() {
 // Send a key event to the movie. This is matched to
 // gnash::key::code. You could even use this to 
 // implement a UI in python.
-void
+bool
 GnashPlayer::pressKey(int code)
 {
     REQUIRE_VM_STARTED;	
-    _movieRoot->notify_key_event((gnash::key::code)code, true);
+    return _movieRoot->notify_key_event((gnash::key::code)code, true);
+}
+
+// Move the pointer to the specified coordinates.
+bool
+GnashPlayer::movePointer(int x, int y)
+{
+    _xpos = x;
+    _ypos = y;
+    return _movieRoot->notify_mouse_moved(x, y);
+}
+
+// Click the mouse at the specified coordinates.
+bool
+GnashPlayer::mouseClick()
+{
+    return ((
+    		_movieRoot->notify_mouse_clicked(true, 1) ||
+		_movieRoot->notify_mouse_clicked(false, 1)
+    		));
 }
 
 // Start the movie from the beginning.
@@ -273,40 +316,40 @@ GnashPlayer::getCurrentFrame() const
 //    Renderer functions
 //
 
-// Initialize the named rendererm throwing exception  
+// Initialize the named renderer  
 bool
-GnashPlayer::initRenderer(const std::string& r)
+GnashPlayer::setRenderer(const std::string& r)
 {
-    if (_handler) return false;
+
+    // Set pointer to NULL in case we want to change renderer, which
+    // is entirely possible. This is necessary to check if the switch
+    // succeeded or not.
+    _renderer = NULL;
 
 #ifdef RENDERER_AGG
     if (r.substr(0,4) == "AGG_") {
-        _handler = gnash::create_render_handler_agg(r.substr(4).c_str());
+        _renderer = gnash::create_render_handler_agg(r.substr(4).c_str());
     }
 #endif
 #ifdef RENDERER_CAIRO
     else if (r == "Cairo") {
-        _handler = (gnash::renderer::cairo::create_handler(); 
+        _renderer = (gnash::renderer::cairo::create_renderer(); 
     }
 #endif 
 #ifdef RENDERER_OPENGL
     else if (r == "OpenGL") {
-        _handler = gnash::create_render_handler_ogl(false);
+        _renderer = gnash::create_render_handler_ogl(false);
     }
 #endif
 
-    if (!_handler) {
-        // If the handler doesn't exist or can't be opened, throw
-        // exception
-        throw GnashException("Cannot create that renderer");
+    if (!_renderer) {
+        // If the handler doesn't exist or can't be opened, return false.
+        return false;
     }
-    else {
-        // Try adding handler, return result
-        return addRenderer(_handler);
-    }
-   
-    // Shouldn't get to here...
-    return false;
+
+    // Try to add the renderer.
+    return addRenderer(_renderer);
+
 }
 
 // Test and set the render handler, returning false if anything
@@ -314,6 +357,7 @@ GnashPlayer::initRenderer(const std::string& r)
 bool
 GnashPlayer::addRenderer(gnash::render_handler* handler)
 {
+    // A brief test to see if the renderer works.
     if (!handler->initTestBuffer(getSWFWidth(), getSWFHeight())) {
         return false;
     }
@@ -325,25 +369,24 @@ GnashPlayer::addRenderer(gnash::render_handler* handler)
 
 // Render the frame
 void
-GnashPlayer::render()
+GnashPlayer::render(bool forceRedraw)
 {
 
-    if (!_handler) return;
+    if (!_renderer) return;
 
     _invalidatedBounds.setNull();
 
     _movieRoot->add_invalidated_bounds(_invalidatedBounds, false);
 
-    // Force full redraw by using a WORLD invalidated ranges
     gnash::InvalidatedRanges ranges = _invalidatedBounds; 
-    if ( _forceRedraw ) {
-        ranges.setWorld(); // set to world if asked a full redraw
-        _forceRedraw = false; // reset to no forced redraw
-    }
-    
-    gnash::set_render_handler(_handler);
 
-    _handler->set_invalidated_regions(ranges);
+    if (forceRedraw) {
+        // Change invalidated regions to cover entire movie
+        // if the caller asked for a full redraw
+        ranges.setWorld();
+    }
+
+    _renderer->set_invalidated_regions(ranges);
     _movieRoot->display();
 	
 }

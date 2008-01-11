@@ -17,6 +17,11 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 //
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <boost/python.hpp>
 #include "gnashpython.h"
 
@@ -28,13 +33,16 @@ using namespace boost::python;
 namespace gnash {
 
 BOOST_PYTHON_MODULE(gnash) {
-  class_<pythonwrapper::GnashPlayer>("Player", "Allows direct control of a Gnash player.")
-
-    .def("setBaseURL", &pythonwrapper::GnashPlayer::setBaseURL)  
-    .def("loadMovie", &pythonwrapper::GnashPlayer::createMovieDefinition)
+  class_<pythonwrapper::GnashPlayer>("Player", "Wrapper round Gnash player functions.")
+ 
+    .def("loadMovie", &pythonwrapper::GnashPlayer::loadMovie)
     .def("initVM", &pythonwrapper::GnashPlayer::initVM)
 
-    .def("addRenderer", &pythonwrapper::GnashPlayer::initRenderer)
+    .def("setRenderer", &pythonwrapper::GnashPlayer::setRenderer,
+    			"Pass a string naming the renderer to use. Valid renderers are: "
+    			"AGG_RGB555, AGG_RGB565, AGG_RGBA16, AGG_RGB24, AGG_BGR24, "
+    			"AGG_RGBA32, AGG_BGRA32, AGG_ARGB32, AGG_ABGR32, OpenGL, "
+    			"Cairo.")
 
     .def("currentFrame", &pythonwrapper::GnashPlayer::getCurrentFrame)
 
@@ -43,7 +51,12 @@ BOOST_PYTHON_MODULE(gnash) {
     .def("restart", &pythonwrapper::GnashPlayer::restart)
     .def("pressKey", &pythonwrapper::GnashPlayer::pressKey)
     .def("allowRescale", &pythonwrapper::GnashPlayer::allowRescale)
+    .def("setVerbose", &pythonwrapper::GnashPlayer::setVerbose)
     .def("render", &pythonwrapper::GnashPlayer::render)
+    .def("movePointer", &pythonwrapper::GnashPlayer::movePointer,
+    			"Move pointer to specified coordinates. Returns true "
+    			"if the move triggered an action requiring a redraw.")
+    .def("mouseClick", &pythonwrapper::GnashPlayer::mouseClick)
         
     .def("swfFrameRate", &pythonwrapper::GnashPlayer::getSWFFrameRate)
     .def("swfFrameCount", &pythonwrapper::GnashPlayer::getSWFFrameCount)
@@ -65,6 +78,7 @@ BOOST_PYTHON_MODULE(gnash) {
 
   class_<pythonwrapper::GnashCharacter>("Character", "A character from the movie."
   							"This class doesn't work")
+    .def("name", &pythonwrapper::GnashCharacter::name)
     ;
 
 }

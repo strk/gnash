@@ -41,12 +41,9 @@ import sys
 # Functions are accessed through the Player() class
 player = gnash.Player()
 
-# The initialization of the player is split into three stages. First,
-# set the base URL:
-player.setBaseURL("../../testsuite/movies.all/gravity.swf")
-
-# Then instruct Gnash to load the movie from the URL:
-if player.loadMovie():
+# The initialization of the player is split into two stages.
+# First, load the movie from the URL (currently only local files):
+if player.loadMovie("../../testsuite/movies.all/gravity.swf"):
     print "Movie successfully created."
 else:
     print "Load of movie failed."
@@ -55,13 +52,13 @@ else:
 # At this stage, you can query movie properties like so:
 print "The frame rate of this movie is " + str(player.swfFrameRate()) + " FPS."
 print "It has " + str(player.swfFrameCount()) + " frames altogether."
-print "Loaded " +  str(player.swfBytesLoaded()) + " of " + str(player.swfBytesTotal()) + "reported bytes."
+print "Loaded " +  str(player.swfBytesLoaded()) + " of " + str(player.swfBytesTotal()) + " reported bytes."
 print "It is version " + str(player.swfVersion()) +"."
 print "It is " + str(player.swfWidth()) + "x" + str(player.swfWidth()) + " pixels."
 print "URL: " + player.swfURL() + "."
 
 
-# The third stage completes initialization.
+# The second stage completes loading and initialization.
 if player.initVM():
     print "VM initialized."
 else:
@@ -72,9 +69,9 @@ else:
 print "Loaded " +  str(player.swfBytesLoaded()) + " of " + str(player.swfBytesTotal()) + " bytes reported."
 
 # This initializes the named renderer. "Cairo", "OpenGL" and various
-# AGG types are possible. Asking for a non-existent renderer results
-# in a runtime exception.
-if player.addRenderer("AGG_RGB565"):
+# AGG types are possible. Returns False if the renderer does not exist
+# or otherwise fails.
+if player.setRenderer("AGG_RGB565"):
     print "Renderer added."
 
 # Once the movie is loaded, you can advance to the next frame of the movie.
@@ -85,12 +82,19 @@ print "We start at frame " + str(player.currentFrame()) + "."
 # Advance 10 times.
 for i in range(0,10):
     player.advance()
-    print player.currentFrame()
+    print "Frame: " + str(player.currentFrame())
 
 print "After 10 advances we are at frame " + str(player.currentFrame()) + " (You don't necessarily move to the next frame when you advance)."
 
-# Render like this (don't expect to see anything...)
-player.render()
+# Render like this (don't expect to see anything):
+player.render(True)
+# By passing 'True', you can force the renderer to redraw
+# the entire window. False redraws only the invalidated bounds 
+# calculated by Gnash.
+
+# Turn verbosity on to send debug messages to stdout and the logfile.
+player.setVerbose(True)
+# This can't be turned off at the moment.
 
 # You can also make time pass in an instant:
 player.advanceClock(199)
@@ -98,8 +102,15 @@ player.advanceClock(199)
 # or press a key
 player.pressKey(65)
 
+# Move the pointer to the specified co-ordinates. Returns true if the
+# action requires a redraw.
+if player.movePointer(x,y):
+    render(False)
 
-
+# Click the mouse at the current pointer position. True if the action
+# requires a redraw.
+if player.clickMouse():
+    render(False)
 
 
 

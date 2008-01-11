@@ -1544,7 +1544,7 @@ sprite_beginGradientFill(const fn_call& fn)
 	{
 		std::stringstream ss; fn.dump_args(ss);
 		log_debug("%s.beginGradientFill(%s) : too many array elements"
-			" for colors and ratios (%d), trim to 8", 
+			" for colors and ratios ("SIZET_FMT"), trim to 8", 
 			sprite->getTarget().c_str(), ss.str().c_str(), ngradients); 
 		ngradients = 8;
 	}
@@ -1554,7 +1554,7 @@ sprite_beginGradientFill(const fn_call& fn)
 	for (size_t i=0; i<ngradients; ++i)
 	{
 		char buf[32];
-		sprintf(buf, "%d", i);
+		sprintf(buf, SIZET_FMT, i);
 		string_table::key key = st.find(buf);
 
 		as_value colVal = colors->getMember(key);
@@ -2871,7 +2871,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
 
 		if ( ! m_def->ensure_frame_loaded(target_frame_number+1) )
 		{
-			log_error("Target frame of a gotoFrame("SIZET_FMT") was never loaded, although frame count in header (%d) said we would have found it",
+			log_error("Target frame of a gotoFrame("SIZET_FMT") was never loaded, although frame count in header ("SIZET_FMT") said we would have found it",
 				target_frame_number+1, m_def->get_frame_count());
 			return; // ... I guess, or not ?
 		}
@@ -2916,7 +2916,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
 		);
 		if ( ! m_def->ensure_frame_loaded(target_frame_number+1) )
 		{
-			log_error("Target frame of a gotoFrame("SIZET_FMT") was never loaded, although frame count in header (%d) said we would have found it",
+			log_error("Target frame of a gotoFrame("SIZET_FMT") was never loaded, although frame count in header ("SIZET_FMT") said we would have found it",
 				target_frame_number+1, m_def->get_frame_count());
 			return; // ... I guess, or not ?
 		}

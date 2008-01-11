@@ -1,3 +1,11 @@
+2008-01-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/sprite_instance.cpp, server/loadVariablesThread.cpp: Use
+	  SIZET_FMT for size_t format string.
+	* pythonmodule/gnashpython.cpp: more methods in Player class.
+	* pythonmodule/pyGnash.cpp: update bindings.
+	* pythonmodule/gnashPythonExample.py: update examples.
+	
 2008-01-11 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/swfdec/PASSING: chartoascii-4.swf succeed

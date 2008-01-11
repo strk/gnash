@@ -16,18 +16,27 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
+
 #ifndef GNASHPYTHON_H
 #define GNASHPYTHON_H
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
 #include "gnash.h"
 #include "ManualClock.h"
 #include "movie_root.h"
 #include "movie_definition.h"
 #include "render_handler.h"
-#include "movie_instance.h" 
 #include "character.h"
+#include "log.h"
 
 #include <string> 
+
+// Because the Python bindings are there to allow flexible access
+// to Gnash in an interpreted language, there need to be many
+// checks on initialization order to avoid memory errors.
 
 // Boost 1.33 seems to dislike auto_ptrs in the class
 // declaration. Perhaps I'm not handling them correctly, perhaps
@@ -36,10 +45,8 @@
 // Forward declarations
 namespace gnash {
 namespace pythonwrapper {
-
-    class GnashCharacter;
-    class GnashPlayer;
-
+        class GnashCharacter;
+        class GnashPlayer;
 }
 }
 
@@ -55,13 +62,15 @@ public:
     GnashPlayer();
     ~GnashPlayer();
 
+    // For exiting
+    void close();
+
     // Movie creation
-    bool createMovieDefinition();
+    bool loadMovie(std::string url);
     bool initVM();
-    void setBaseURL(std::string url);
-    
-    bool initRenderer(const std::string& r);
-    bool addRenderer(gnash::render_handler* handler);
+
+    // Renderer
+    bool setRenderer(const std::string& r);
 
     // Movie information
     float getSWFFrameRate() const;
@@ -72,36 +81,55 @@ public:
     int getSWFBytesTotal() const;
     int getSWFBytesLoaded() const;
     std::string getSWFURL() const;
-    
+
+    // Player state
     int getCurrentFrame() const;
     
     // Sprites
-    
     GnashCharacter* getCharacterById(int id);    
     GnashCharacter* getTopmostMouseEntity();
 
     // Interaction
     void advanceClock(unsigned long ms);
     void advance();
-    void pressKey(int code);
     void allowRescale(bool allow);
-    void render();
+    void render(bool forceRedraw);
     void restart();
+    void setVerbose(bool verbose);
+    
+    // Move the pointer to position x, y.
+    // @ return whether the move triggered an event needing a redraw. Use this
+    // to decide whether to rerender.
+    bool movePointer(int x, int y);
+    
+    // Send a mouse click event at the current position of the pointer.
+    // @ return whether the move triggered an event needing a redraw. Use this
+    // to decide whether to rerender.
+    bool mouseClick();
+
+    // @ return whether the keypress triggered an event needing a redraw. Use this
+    // to decide whether to rerender.
+    bool pressKey(int code);
     
 private:
     void init();
+    void setBaseURL(std::string url);
+    bool addRenderer(gnash::render_handler* handler);
 
     gnash::movie_definition* _movieDef;
     gnash::movie_root* _movieRoot;
-    gnash::movie_instance* _movieInstance;
     gnash::ManualClock _manualClock;
+    gnash::render_handler* _renderer;
 
-    gnash::render_handler* _handler;
+    gnash::InvalidatedRanges _invalidatedBounds;
+ 
+    gnash::LogFile& _logFile ;
+    
+    // The position of our pointer
+    int _xpos, _ypos;
 
     // The base URL of the movie;
     std::string _url;
-    bool _forceRedraw;
-    gnash::InvalidatedRanges _invalidatedBounds;
 
     // File to open (a bit primitive...)    
     FILE* _fp;
@@ -114,12 +142,11 @@ public:
     GnashCharacter(gnash::character* c);
     ~GnashCharacter();
 
-    const std::string name() { return _character->get_name(); }
+    const std::string name() { return _character->getTarget(); }
     const float ratio() { return _character->get_ratio(); }
     
 private:
     gnash::character*  _character;
-    
 };
 
 }
