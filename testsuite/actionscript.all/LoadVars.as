@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: LoadVars.as,v 1.18 2008/01/11 09:24:25 strk Exp $";
+rcsid="$Id: LoadVars.as,v 1.19 2008/01/11 09:37:06 strk Exp $";
 
 #include "check.as"
 
@@ -86,6 +86,10 @@ check_equals (typeof(loadvarsObj.valueOf), 'function');
 check (LoadVars.prototype.hasOwnProperty('onData'));
 xcheck_equals (typeof(loadvarsObj.onData), 'function');
 
+// test the LoadVars::loaded member
+xcheck (!LoadVars.prototype.hasOwnProperty('loaded'));
+xcheck_equals (typeof(loadvarsObj.loaded), 'undefined');
+
 //--------------------------------------------------------------------------
 // Test LoadVars::load()
 //--------------------------------------------------------------------------
@@ -102,9 +106,11 @@ loadvarsObj.onLoad = function(success) {
 
 	//delete loadvarsObj; // this to test robustness
 
+	check_equals (this, loadvarsObj);
 	xcheck_equals(arguments.length, 1);
 	xcheck_equals(typeof(success), 'boolean');
 	xcheck_equals(success, true);
+	xcheck_equals(this.loaded, success);
 
 	check(varsloaded < 3);
 
@@ -126,7 +132,7 @@ loadvarsObj.onLoad = function(success) {
 		// Gnash insists in looking for an ending & char !!		
 		xcheck_equals(loadvarsObj['var3'], 'val3\n');
 
-		xcheck_totals(43);
+		xcheck_totals(50);
 
 		play();
 	}
@@ -135,6 +141,9 @@ loadvarsObj.onLoad = function(success) {
 // onData is called once with full parsed content.
 loadvarsObj.onDataReal = loadvarsObj.onData;
 loadvarsObj.onData = function(src) {
+	check_equals (this, loadvarsObj);
+	check_equals(typeof(this.loaded), 'boolean');
+	check_equals(this.loaded, false);
 	check_equals(arguments.length, 1);
 	check_equals(typeof(src), 'string');
 	check_equals(src.substr(0, 10), 'var1=val1&');
