@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: LoadVars.as,v 1.22 2008/01/11 09:58:34 strk Exp $";
+rcsid="$Id: LoadVars.as,v 1.23 2008/01/11 10:09:09 strk Exp $";
 
 #include "check.as"
 
@@ -156,7 +156,7 @@ loadvarsObj.onLoad = function(success) {
 		// Gnash insists in looking for an ending & char !!		
 		xcheck_equals(loadvarsObj['var3'], 'val3\n');
 
-		xcheck_totals(64);
+		xcheck_totals(65);
 
 		play();
 	}
@@ -196,6 +196,7 @@ loadvarsObj.var1 = "previous val1";
 check( loadvarsObj instanceOf LoadVars );
 //check( loadvarsObj.sendAndLoad( 'http://localhost/vars.php', loadvarsObj ) );
 check( loadvarsObj.load( MEDIA(vars.txt) ) );
+check_equals(typeof(this.loaded), 'undefined');
 //loadvarsObj.load( 'vars.cgi' );
 
 check_equals( loadvarsObj.loaded, false );
