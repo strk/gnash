@@ -1,5 +1,11 @@
 2008-01-11 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/generic-testrunner.sh: sleep a tenth (1/10)
+	  of a second between advances. Makes loading data in
+	  the testsuite more stabily succeed.
+
+2008-01-11 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: add a --disable-plugins option to disable
 	  both kparts and npapi plugins.
 	* macros/firefox.m4: obsolete --with-plugindir, use

@@ -60,7 +60,7 @@ for t in ${testfiles}; do
 	echo "NOTE: Running test \${t}"
 	( 
 		exec > \${outlog}
-		${top_builddir}/utilities/gprocessor -r${runs} -f${advances} -v \${t} || echo "FAILED: gprocessor returned an error while playing '\${t}'"
+		${top_builddir}/utilities/gprocessor -d100 -r${runs} -f${advances} -v \${t} || echo "FAILED: gprocessor returned an error while playing '\${t}'"
 	)
 	cat \${outlog}
 	if test "x${endtagpat}" != x; then
