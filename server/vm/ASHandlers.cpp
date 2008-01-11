@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.178 2008/01/11 10:51:12 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.179 2008/01/11 16:06:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1633,13 +1633,16 @@ SWFHandlers::ActionOrd(ActionExec& thread)
     as_environment& env = thread.env;
     thread.ensureStack(1);
     string str = env.top(0).to_string();
+
+    // TODO: what charcode here ?
+
     if ( str.empty() )
     {
-    	env.top(0).set_undefined();
+    	env.top(0).set_int(0);
     }
     else
     {
-    	env.top(0).set_int(str.c_str()[0]);
+    	env.top(0).set_int((unsigned char)str.c_str()[0]);
     }
 }
 

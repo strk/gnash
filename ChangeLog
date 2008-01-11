@@ -1,5 +1,11 @@
 2008-01-11 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionOrd): make sure to
+	  return an unsigned int. Fixes load of games from
+	  http://www.ferryhalim.com/orisinal/.
+
+2008-01-11 Sandro Santilli <strk@keybit.net>
+
 	* server/LoadVariablesThread.cpp: don't handle newlines
 	  in any special way...
 	* testsuite/actionscript.all/MovieClip.as: test loadVariables
