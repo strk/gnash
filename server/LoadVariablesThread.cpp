@@ -88,6 +88,7 @@ LoadVariablesThread::completeLoad()
 	{
 		log_error("Size of stream variables were loaded from advertised to be %d bytes long, while turned out to be only %d bytes long",
 			_bytesTotal, _bytesLoaded);
+		_bytesTotal = _bytesLoaded;
 	}
 
 	//dispatchLoadEvent();
