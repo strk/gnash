@@ -1,5 +1,12 @@
 2008-01-11 Sandro Santilli <strk@keybit.net>
 
+	* server/LoadVariablesThread.cpp: don't handle newlines
+	  in any special way...
+	* testsuite/actionscript.all/MovieClip.as: test loadVariables
+	  method and tag (GETURL).
+
+2008-01-11 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp: fix the MovieClip.meth() method
 	  to invoke toLowerString on first argument.
 	* testsuite/actionscript.all/MovieClip.as: test that meth()

@@ -41,6 +41,7 @@ LoadVariablesThread::completeLoad()
 	// this is going to override any previous setting,
 	// better do this inside a subclass (in a separate thread)
 	_bytesLoaded = 0;
+	_bytesTotal = _stream->get_size();
 
 	string toparse;
 
@@ -50,18 +51,6 @@ LoadVariablesThread::completeLoad()
 	while ( size_t read = _stream->read_bytes(buf, CHUNK_SIZE) )
 	{
 		//log_msg("Read %u bytes", read);
-
-		bool newlineFound = false;
-
-		// found newline, discard anything before that
-		for (size_t t=0; t<read; ++t)
-		{
-			if ( buf[t] == '\n' )
-			{
-				newlineFound = true;
-				buf[t] = '\0';
-			}
-		}
 
 		// TODO: use read_string ?
 		string chunk(buf, read);
@@ -84,13 +73,6 @@ LoadVariablesThread::completeLoad()
 		_bytesLoaded += read;
 		//dispatchDataEvent();
 
-		// found newline, discard anything before that
-		if ( newlineFound )
-		{
-			if ( parsedLines ) break;
-			else toparse.clear();
-		}
-
 		// eof, get out !
 		if ( _stream->get_eof() ) break;
 	}
@@ -102,7 +84,11 @@ LoadVariablesThread::completeLoad()
 
 	_stream->go_to_end();
 	_bytesLoaded = _stream->get_position();
-	_bytesTotal = _bytesLoaded;
+	if ( _bytesTotal !=  _bytesLoaded )
+	{
+		log_error("Size of stream variables were loaded from advertised to be %d bytes long, while turned out to be only %d bytes long",
+			_bytesTotal, _bytesLoaded);
+	}
 
 	//dispatchLoadEvent();
 	delete[] buf;

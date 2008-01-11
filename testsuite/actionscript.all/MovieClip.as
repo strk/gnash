@@ -20,9 +20,31 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.113 2008/01/11 11:42:44 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.114 2008/01/11 13:18:21 strk Exp $";
 
 #include "check.as"
+
+// To be called at end of test
+endOfTest = function() 
+{
+#if OUTPUT_VERSION <= 5
+	check_totals(197); // SWF5
+#endif
+
+#if OUTPUT_VERSION == 6
+	check_totals(594); // SWF6
+#endif
+
+#if OUTPUT_VERSION == 7
+	check_totals(611); // SWF7
+#endif
+
+#if OUTPUT_VERSION >= 8
+	check_totals(612); // SWF8+
+#endif
+
+	play();
+};
 
 #if OUTPUT_VERSION < 6
 note("WARNING: it has been reported that adobe flash player version 9 fails a few tests here.");
@@ -1347,17 +1369,49 @@ ret = _root.meth(o);
 check_equals(typeof(ret), 'number');
 check_equals(ret, 1);
 
+//---------------------------------------------------------------------
+// Test the MovieClip.loadVariables function
+//---------------------------------------------------------------------
 
-#if OUTPUT_VERSION < 6
- check_totals(189); // SWF5
-#else
-#if OUTPUT_VERSION < 7
- check_totals(585); // SWF6
-#else
-#if OUTPUT_VERSION < 8
- check_totals(602); // SWF7
-#else
- check_totals(603); // SWF8+
+dataLoaded = 0;
+
+onData = function()
+{
+	note("onData called, dataLoaded: "+dataLoaded);
+	check_equals(arguments.length, 0);
+	check_equals(_root.var1, 'val1');
+	check_equals(_root.var3, 'val3\n');
+	_root.var1 = 'val1custom';
+	_root.var2 = 'val2custom';
+
+	if ( dataLoaded++ )
+	{
+		//note("Clearing data load interval "+dataLoadInterval);
+		clearInterval(dataLoadInterval);
+		endOfTest();
+	}
+	else
+	{
+		// This should use GetURL
+		loadVariables(MEDIA(vars.txt), "_root");
+	}
+};
+
+stop();
+
+ret = _root.loadVariables(MEDIA(vars.txt), "GET");
+check_equals(dataLoaded, 0);
+check_equals(typeof(ret), 'undefined');
+
+#if OUTPUT_VERSION <= 5
+	// It seems for SWF5 onData isn't invoked,
+	// neighter does onEnterFrame work..
+	dataLoadInterval = setInterval(onData, 1000);
 #endif
-#endif
-#endif
+
+
+//_root.loadVariables(MEDIA(vars.txt), "GET");
+
+// Can't rely on this to call onData!
+
+//endOfTest();
