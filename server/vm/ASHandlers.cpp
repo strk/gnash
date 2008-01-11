@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.176 2008/01/09 17:52:17 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.177 2008/01/11 08:50:14 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -3022,8 +3022,32 @@ SWFHandlers::ActionNewEquals(ActionExec& thread)
 
     thread.ensureStack(2);
 
-    /// ECMA-262 abstract equality comparison (sect 11.9.3)
-    env.top(1).set_bool(env.top(1).equals(env.top(0)));
+    int swfVersion = VM::get().getSWFVersion();
+    if ( swfVersion <= 5 )
+    {
+        as_value op1 = env.top(0);
+	try { op1 = op1.to_primitive(); }
+	catch (ActionTypeError& e)
+	{
+                log_debug(_("to_primitive() threw an ActionTypeError %s"),
+                        op1.to_debug_string().c_str(), e.what());
+	}
+
+        as_value op2 = env.top(1);
+	try { op2 = op2.to_primitive(); }
+	catch (ActionTypeError& e)
+	{
+                log_debug(_("to_primitive() threw an ActionTypeError %s"),
+                        op2.to_debug_string().c_str(), e.what());
+	}
+
+        env.top(1).set_bool(op1.equals(op2));
+    }
+    else
+    {
+        /// ECMA-262 abstract equality comparison (sect 11.9.3)
+        env.top(1).set_bool(env.top(1).equals(env.top(0)));
+    }
     env.drop(1);
 }
 

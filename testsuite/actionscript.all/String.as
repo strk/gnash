@@ -16,7 +16,7 @@
 
 // Original author: Mike Carlson - June 19th, 2006
 
-rcsid="$Id: String.as,v 1.31 2008/01/11 08:36:20 strk Exp $";
+rcsid="$Id: String.as,v 1.32 2008/01/11 08:50:15 strk Exp $";
 
 #include "check.as"
 
@@ -435,7 +435,7 @@ numberObject = new Number(1234);
 #if OUTPUT_VERSION >= 6
 check(stringObject != numberObject);
 #else
-xcheck_equals(stringObject, numberObject); // SWF5 always converts to string !!
+check_equals(stringObject, numberObject); // SWF5 always converts to primitive before comparison !!
 #endif
 check_equals(numberObject.toString(), stringObject);
 check_equals(numberObject.toString(), stringObject.toString());

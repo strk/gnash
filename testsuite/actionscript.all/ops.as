@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.30 2007/12/02 09:15:55 strk Exp $";
+rcsid="$Id: ops.as,v 1.31 2008/01/11 08:50:15 strk Exp $";
 
 #include "check.as"
 
@@ -131,7 +131,7 @@ check( ! (str1 == NaN) ); // str1 (object) is NOT converted to a number (due to 
 #if OUTPUT_VERSION > 5
   check( ! (str1 == str2) ); // they are not the same object
 #else // OUTPUT_VERSION <= 5
-  xcheck( str1 == str2 );  // SWF5 automatically converts to a string for comparison !
+  check( str1 == str2 );  // SWF5 automatically converts to primitive before comparison !
 #endif // OUTPUT_VERSION <= 5
 
 // for MovieClip

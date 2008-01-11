@@ -1,5 +1,14 @@
 2008-01-11 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionNewEquals): for SWF<=5
+	  always convert the input parameters to primitives.
+	* testsuite/actionscript.all/String.as: success in
+	  number to string object comparison.
+	* testsuite/actionscript.all/ops.as: success in comparison
+	  between different string objects with same primitive value.
+
+2008-01-11 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/String.as: test String object
 	  construction.
 
