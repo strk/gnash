@@ -674,9 +674,9 @@ static as_value sprite_load_variables(const fn_call& fn)
 	short method = 0;
 
 	if (fn.nargs > 1)
-	{
+	{	 
 		const std::string& methodstring = fn.arg(1).to_string();
-		// Should we be case-insensitive in comparing these ?
+		// Should we be case-insensitive in comparing these ? Anwer: YES! [TODO]
 		if ( methodstring == "GET" ) method = 1;
 		else if ( methodstring == "POST" ) method = 2;
 	}
@@ -3939,9 +3939,23 @@ sprite_instance::loadVariables(const URL& url, short sendVarsMethod)
 	// Check host security
 	// will be done by LoadVariablesThread (down by getStream, that is)
 	//if ( ! URLAccessManager::allow(url) ) return;
-
+	
+	printf("sendVarsMethod=%d\n",sendVarsMethod);
 	if ( sendVarsMethod )
 	{
+	
+    typedef std::map<std::string, as_value> PropMap;
+    PropMap props;
+    dump_members(props);
+    
+    printf("dumping:\n");
+    for (PropMap::iterator i=props.begin(), e=props.end(); i!=e; ++i)
+    {
+      printf("-- %s\n", i->first);
+      
+      //out << i->first << "==" << i->second.to_debug_string();
+    }
+	
 		log_unimpl(_("MovieClip.loadVariables() with GET/POST won't append vars for now"));
 	}
 
