@@ -1,6 +1,12 @@
 2008-01-12 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* libbase/URL.h: add set method for querystring
+	* server/sprite_instance.cpp: case-insensitive check for GET/POST;
+	  fix double "?"	
+
+2008-01-12 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* libbase/URL.h: add set method for querystring
 	* server/sprite_instance.{cpp,h}: implement GET and POST for 
 	  loadVariables()	
 
