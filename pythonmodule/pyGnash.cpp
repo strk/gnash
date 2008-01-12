@@ -39,20 +39,27 @@ BOOST_PYTHON_MODULE(gnash) {
     .def("initVM", &pythonwrapper::GnashPlayer::initVM)
 
     .def("setRenderer", &pythonwrapper::GnashPlayer::setRenderer,
-    			"Pass a string naming the renderer to use. Valid renderers are: "
+    			"Sets the renderer to use. Pass a string naming the "
+    			"desired renderer. Valid renderers are: "
     			"AGG_RGB555, AGG_RGB565, AGG_RGBA16, AGG_RGB24, AGG_BGR24, "
     			"AGG_RGBA32, AGG_BGRA32, AGG_ARGB32, AGG_ABGR32, OpenGL, "
     			"Cairo.")
 
-    .def("currentFrame", &pythonwrapper::GnashPlayer::getCurrentFrame)
+    .def("currentFrame", &pythonwrapper::GnashPlayer::getCurrentFrame,
+    			"Get the frame of the movie that the player has reached.")
 
     .def("advanceClock", &pythonwrapper::GnashPlayer::advanceClock)
     .def("advance", &pythonwrapper::GnashPlayer::advance)
-    .def("restart", &pythonwrapper::GnashPlayer::restart)
-    .def("pressKey", &pythonwrapper::GnashPlayer::pressKey)
+    .def("restart", &pythonwrapper::GnashPlayer::restart,
+    			"Restart the movie.")
+    .def("pressKey", &pythonwrapper::GnashPlayer::pressKey,
+    			"Send a key press event to the player.")
     .def("allowRescale", &pythonwrapper::GnashPlayer::allowRescale)
     .def("setVerbose", &pythonwrapper::GnashPlayer::setVerbose)
-    .def("render", &pythonwrapper::GnashPlayer::render)
+    .def("render", &pythonwrapper::GnashPlayer::render,
+    			"Instruct the renderer to draw the current frame. "
+    			"Pass 'True' to enforce a full redraw, 'False' to redraw "
+    			"only invalidated bounds.")
     .def("movePointer", &pythonwrapper::GnashPlayer::movePointer,
     			"Move pointer to specified coordinates. Returns true "
     			"if the move triggered an action requiring a redraw.")
@@ -65,20 +72,36 @@ BOOST_PYTHON_MODULE(gnash) {
     .def("swfHeight", &pythonwrapper::GnashPlayer::getSWFHeight)
     .def("swfURL", &pythonwrapper::GnashPlayer::getSWFURL)
     .def("swfBytesTotal", &pythonwrapper::GnashPlayer::getSWFBytesTotal,
-    	"Length of the loaded movie in bytes as reported in the headers."
+    			"Length of the loaded movie in bytes, as reported in "
+    			"the headers."
 	)
     .def("swfBytesLoaded", &pythonwrapper::GnashPlayer::getSWFBytesLoaded,
-    	"The number of bytes of the movie that have been loaded")
+    			"The number of bytes of the movie that have been loaded.")
 
-    .def("getCharacterById", &pythonwrapper::GnashPlayer::getCharacterById,
-    		return_value_policy<manage_new_object>())
     .def("getTopmostMouseEntity", &pythonwrapper::GnashPlayer::getTopmostMouseEntity,
-    		return_value_policy<manage_new_object>())
+    		return_value_policy<manage_new_object>(),
+    			"The active gnash.Character() under the pointer.")
     ;
 
-  class_<pythonwrapper::GnashCharacter>("Character", "A character from the movie."
-  							"This class doesn't work")
+  class_<pythonwrapper::GnashCharacter>("Character", "Wrapper round a Gnash character.")
     .def("name", &pythonwrapper::GnashCharacter::name)
+    .def("target", &pythonwrapper::GnashCharacter::target)
+    .def("ratio", &pythonwrapper::GnashCharacter::ratio)
+
+    .def("id", &pythonwrapper::GnashCharacter::id)
+    .def("depth", &pythonwrapper::GnashCharacter::depth)
+    .def("textName", &pythonwrapper::GnashCharacter::textName)
+    .def("clipDepth", &pythonwrapper::GnashCharacter::clipDepth)
+    .def("height", &pythonwrapper::GnashCharacter::height)
+    .def("width", &pythonwrapper::GnashCharacter::height)    
+    .def("visible", &pythonwrapper::GnashCharacter::visible)
+    
+    .def("advance", &pythonwrapper::GnashCharacter::visible)
+    
+    .def("getParent", &pythonwrapper::GnashCharacter::getParent,
+    		return_value_policy<manage_new_object>(),
+    			"The parent gnash.Character() of the present character, "
+    			"NULL if there is no parent.")
     ;
 
 }

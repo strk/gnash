@@ -1,3 +1,10 @@
+2008-01-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/asobj/{SharedObject.cpp,string.cpp}, server/vm/ActionExec.cpp:
+	  fix size_t format warnings.
+	* pythonmodule/gnashpython.{cpp,h}: extend gnash::character wrapper.
+	* pythonmodule/pyGnash.cpp: add character bindings.
+
 2008-01-12 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* libbase/URL.h: add set method for querystring

@@ -142,8 +142,30 @@ public:
     GnashCharacter(gnash::character* c);
     ~GnashCharacter();
 
-    const std::string name() { return _character->getTarget(); }
-    const float ratio() { return _character->get_ratio(); }
+    // The only constant aspect of a character?
+    const int id() { return _character->get_id(); }
+
+    std::string name() { return _character->get_name(); }
+
+    const char* textName() { return _character->get_text_name(); }
+
+    std::string target() { return _character->getTarget(); }
+
+    float ratio() { return _character->get_ratio(); }
+
+    int depth() { return _character->get_depth(); }
+    
+    int clipDepth() { return _character->get_clip_depth(); }
+    
+    float height() { return _character->get_height(); }
+    
+    float width() { return _character->get_width(); }
+
+    bool visible() { return _character->get_visible(); }
+    
+    void advance() { _character->advance(); }
+    
+    GnashCharacter* getParent();
     
 private:
     gnash::character*  _character;

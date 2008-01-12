@@ -437,6 +437,20 @@ GnashCharacter::GnashCharacter()
 
 GnashCharacter::~GnashCharacter()
 {
+    _character = NULL;
+    delete _character;
+}
+
+GnashCharacter*
+GnashCharacter::getParent()
+{
+    gnash::character* c = _character->get_parent();
+
+    if (!c) return NULL;
+    
+    GnashCharacter* chr(new GnashCharacter(c));
+
+    return chr;
 }
 
 } // end pythonwrapper

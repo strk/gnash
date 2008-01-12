@@ -1,6 +1,6 @@
 // SharedObject.cpp:  ActionScript "SharedObject" class, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -366,7 +366,7 @@ sharedobject_getlocal(const fn_call& fn)
     
     vector<Element *>::iterator it;
     vector<Element *> els = sol.getElements();
-    log_msg("Read %d AMF objects from %s", els.size(), newspec.c_str());
+    log_msg("Read "SIZET_FMT" AMF objects from %s", els.size(), newspec.c_str());
 
     string_table& st = obj->getVM().getStringTable();
     string_table::key dataKey =  obj->getVM().getStringTable().find("data");

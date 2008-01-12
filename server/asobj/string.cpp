@@ -1,6 +1,6 @@
 // string.cpp:  ActionScript "String" class, for Gnash.
 //
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.48 2007/12/11 11:38:40 strk Exp $ */
+/* $Id: string.cpp,v 1.49 2008/01/12 15:05:55 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -256,7 +256,7 @@ string_slice(const fn_call& fn)
 
     size_t retlen = end-start;
 
-    log_msg("start:%d, end:%d, retlen:%d", start, end, retlen);
+    log_msg("start: "SIZET_FMT", end: "SIZET_FMT", retlen: "SIZET_FMT, start, end, retlen);
 
     return as_value(str.substr(start, retlen));
 }

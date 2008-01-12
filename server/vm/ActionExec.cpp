@@ -1,6 +1,6 @@
 // ActionExec.cpp:  ActionScript execution, for Gnash.
 //
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.61 2007/12/12 10:23:47 zoulunkai Exp $ */
+/* $Id: ActionExec.cpp,v 1.62 2008/01/12 15:05:56 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -412,7 +412,7 @@ ActionExec::operator() ()
 		if ( ++branchCount > maxBranchCount )
 		{
 			char buf[256];
-			snprintf(buf, 255, _("Loop iterations count exceeded limit of " SIZET_FMT ". Last branch was from pc %d to %d."),
+			snprintf(buf, 255, _("Loop iterations count exceeded limit of "SIZET_FMT". Last branch was from pc "SIZET_FMT" to "SIZET_FMT"."),
 				maxBranchCount, oldPc, pc);
 			throw ActionLimitException(buf);
 		}
