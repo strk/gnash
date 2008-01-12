@@ -594,7 +594,7 @@ public:
 	///	If 1, GET will be used.
 	///	If 2, POST will be used.
 	///
-	void loadVariables(const URL& url, short sendVarsMethod=0);
+	void loadVariables(URL url, short sendVarsMethod=0);
 
 	//
 	// ActionScript support

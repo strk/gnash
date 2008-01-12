@@ -1,3 +1,9 @@
+2008-01-12 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* libbase/URL.h: add set method for querystring
+	* server/sprite_instance.{cpp,h}: implement GET and POST for 
+	  loadVariables()	
+
 2008-01-11 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/generic-testrunner.sh: sleep a tenth (1/10)

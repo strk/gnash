@@ -85,6 +85,10 @@ public:
 	/// The query is the string after the '?' character
 	///
 	std::string querystring() const { return _querystring; }
+	
+	/// Set the 'querystring' member of this URL to a new value
+  ///
+  void set_querystring(std::string value) { _querystring = value; } 
 
 	/// Return the full absolute URL as a string.
 	//

@@ -3934,20 +3934,58 @@ sprite_instance::has_mouse_event()
 }
 
 void 
-sprite_instance::loadVariables(const URL& url, short sendVarsMethod)
+sprite_instance::loadVariables(URL url, short sendVarsMethod)
 {
 	// Check host security
 	// will be done by LoadVariablesThread (down by getStream, that is)
 	//if ( ! URLAccessManager::allow(url) ) return;
 	
-	if ( sendVarsMethod )
+	std::string postdata = "";
+	
+	if ( sendVarsMethod )    // 1=GET, 2=POST
 	{
-		log_unimpl(_("MovieClip.loadVariables() with GET/POST won't append vars for now"));
+	
+    typedef std::map<std::string, as_value> PropMap;
+    PropMap props;
+    dump_members(props);
+
+    std::string del = "";
+    std::string data = "";
+    
+    if ( sendVarsMethod == 1 ) {  // GET
+      if (url.querystring() != "")
+        del = "&";
+      else 
+        del = "?";
+    }
+    
+    for (PropMap::iterator i=props.begin(), e=props.end(); i!=e; ++i)
+    {
+      std::string name = i->first;
+      std::string value = url.encode(i->second.to_string());      
+            
+      // This is to filter movieclip properties from local variables. I am 
+      // sure there is a better way to do it [TODO]
+      if (name[0] == '_') continue;
+      if (name == "$version") continue;
+      
+      data += del + name + "=" + value;
+      
+      del = "&";
+        
+    }
+    
+    if ( sendVarsMethod == 1 )  // GET 
+      url.set_querystring(url.querystring() + data);
+    else
+    if ( sendVarsMethod == 2 )  // POST
+      postdata = data;
+	
 	}
 
 	try 
 	{
-		_loadVariableRequests.push_back(new LoadVariablesThread(url));
+		_loadVariableRequests.push_back(new LoadVariablesThread(url, postdata));
 		_loadVariableRequests.back()->process();
 	}
 	catch (NetworkException& ex)
