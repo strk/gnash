@@ -1,3 +1,8 @@
+2008-01-12 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (loadVariables): don't force
+	  POST method always. Fixes orisinal games again.
+
 2008-01-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/asobj/{SharedObject.cpp,string.cpp}, server/vm/ActionExec.cpp:

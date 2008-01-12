@@ -3950,7 +3950,6 @@ sprite_instance::loadVariables(URL url, short sendVarsMethod)
   
   if ( sendVarsMethod )    // 1=GET, 2=POST
   {
-  
     typedef std::map<std::string, as_value> PropMap;
     PropMap props;
     dump_members(props);
@@ -3987,7 +3986,16 @@ sprite_instance::loadVariables(URL url, short sendVarsMethod)
 
   try 
   {
-    _loadVariableRequests.push_back(new LoadVariablesThread(url, postdata));
+    if ( sendVarsMethod == 2 )
+    {
+        // use POST method
+        _loadVariableRequests.push_back(new LoadVariablesThread(url, postdata));
+    }
+    else
+    {
+        // use GET method
+    	_loadVariableRequests.push_back(new LoadVariablesThread(url));
+    }
     _loadVariableRequests.back()->process();
   }
   catch (NetworkException& ex)
