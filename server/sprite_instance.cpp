@@ -3940,22 +3940,8 @@ sprite_instance::loadVariables(const URL& url, short sendVarsMethod)
 	// will be done by LoadVariablesThread (down by getStream, that is)
 	//if ( ! URLAccessManager::allow(url) ) return;
 	
-	printf("sendVarsMethod=%d\n",sendVarsMethod);
 	if ( sendVarsMethod )
 	{
-	
-    typedef std::map<std::string, as_value> PropMap;
-    PropMap props;
-    dump_members(props);
-    
-    printf("dumping:\n");
-    for (PropMap::iterator i=props.begin(), e=props.end(); i!=e; ++i)
-    {
-      printf("-- %s\n", i->first);
-      
-      //out << i->first << "==" << i->second.to_debug_string();
-    }
-	
 		log_unimpl(_("MovieClip.loadVariables() with GET/POST won't append vars for now"));
 	}
 
