@@ -33,14 +33,28 @@ gmofiles := $(patsubst %,%.gmo,$(translations))
 
 dirs =  $(top_srcdir)/libbase \
 	$(top_srcdir)/backend \
+	$(top_srcdir)/libamf \
+	$(top_srcdir)/libmedia \
+	$(top_srcdir)/libmedia/sdl \
+	$(top_srcdir)/libmedia/gst \
 	$(top_srcdir)/server \
 	$(top_srcdir)/server/vm \
 	$(top_srcdir)/server/swf \
 	$(top_srcdir)/server/parser \
-	$(top_srcdir)/server/asobjs \
+	$(top_srcdir)/server/asobj \
 	$(top_srcdir)/libgeometry \
 	$(top_srcdir)/utilities \
-	$(top_srcdir)/gui 
+	$(top_srcdir)/plugin \
+	$(top_srcdir)/gui \
+	$(top_srcdir)/extensions \
+	$(top_srcdir)/extensions/dbus \
+	$(top_srcdir)/extensions/dejagnu \
+	$(top_srcdir)/extensions/fileio \
+	$(top_srcdir)/extensions/lirc \
+	$(top_srcdir)/extensions/gtk2 \
+	$(top_srcdir)/extensions/metome \
+	$(top_srcdir)/extensions/mysql
+	
 srcfiles := $(foreach dir,$(dirs),$(wildcard $(dir)/*.cpp))
 
 EXTRA_DIST = $(gmofiles)

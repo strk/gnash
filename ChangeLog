@@ -1,3 +1,11 @@
+2008-01-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* po/POTFILES.in: remove left-over file (as far as I can tell).
+	* po/Makefile.am: add libmedia, extensions, plugin directories
+	  for internationalization (you can see how long it hasn't been
+	  updated...).
+	* po/gnash.pot: updated gnash.pot.
+
 2008-01-12 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (loadVariables): don't force
