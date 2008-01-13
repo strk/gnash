@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-01-13 11:22+0100\n"
+"POT-Creation-Date: 2008-01-13 14:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4827,185 +4827,207 @@ msgstr ""
 msgid "Destroyed fullscreen window"
 msgstr ""
 
-#: ../gui/gtk.cpp:541 ../gui/gtk.cpp:542
+#: ../gui/gtk.cpp:457 ../gui/gtk.cpp:1046
+msgid "Sound"
+msgstr ""
+
+#: ../gui/gtk.cpp:468 ../gui/kde.cpp:434
+msgid "Quit Gnash"
+msgstr ""
+
+#: ../gui/gtk.cpp:548 ../gui/gtk.cpp:549
 #, c-format
 msgid "Couldn't find pixmap file: %s"
 msgstr ""
 
-#: ../gui/gtk.cpp:548
+#: ../gui/gtk.cpp:555
 #, c-format
 msgid "Failed to load pixbuf file: %s: %s"
 msgstr ""
 
-#: ../gui/gtk.cpp:758
+#: ../gui/gtk.cpp:765
 #, c-format
 msgid ""
 "Attempting to open file %s.\n"
 "NOTE: the file open functionality is not yet implemented!"
 msgstr ""
 
-#: ../gui/gtk.cpp:781
+#: ../gui/gtk.cpp:788
 msgid "Gnash preferences"
 msgstr ""
 
-#: ../gui/gtk.cpp:803
+#: ../gui/gtk.cpp:810
 msgid "Verbosity"
 msgstr ""
 
-#: ../gui/gtk.cpp:818
+#: ../gui/gtk.cpp:825
 msgid "Log to file"
 msgstr ""
 
-#: ../gui/gtk.cpp:836
+#: ../gui/gtk.cpp:843
 msgid "Log File name"
 msgstr ""
 
-#: ../gui/gtk.cpp:850
+#: ../gui/gtk.cpp:857
 #, c-format
 msgid "Debug log filename: %s"
 msgstr ""
 
-#: ../gui/gtk.cpp:857
+#: ../gui/gtk.cpp:864
 msgid "Parser output"
 msgstr ""
 
-#: ../gui/gtk.cpp:875
+#: ../gui/gtk.cpp:882
 msgid "Debug ActionScript"
 msgstr ""
 
-#: ../gui/gtk.cpp:894
+#: ../gui/gtk.cpp:901
 msgid "Debugger"
 msgstr ""
 
-#: ../gui/gtk.cpp:913
+#: ../gui/gtk.cpp:920
 msgid "<b>Logging preferences</b>"
 msgstr ""
 
-#: ../gui/gtk.cpp:918
+#: ../gui/gtk.cpp:925
 msgid "Logging"
 msgstr ""
 
-#: ../gui/gtk.cpp:936
+#: ../gui/gtk.cpp:943
 msgid "Allow remote access from: "
 msgstr ""
 
-#: ../gui/gtk.cpp:943
+#: ../gui/gtk.cpp:950
 msgid "Whitelist"
 msgstr ""
 
-#: ../gui/gtk.cpp:950
+#: ../gui/gtk.cpp:957
 msgid "Blacklist"
 msgstr ""
 
-#: ../gui/gtk.cpp:969
+#: ../gui/gtk.cpp:976
 msgid "local host only"
 msgstr ""
 
-#: ../gui/gtk.cpp:981
+#: ../gui/gtk.cpp:988
 msgid "local domain only"
 msgstr ""
 
-#: ../gui/gtk.cpp:993
+#: ../gui/gtk.cpp:1000
 msgid "<b>Security preferences</b>"
 msgstr ""
 
-#: ../gui/gtk.cpp:998
+#: ../gui/gtk.cpp:1005
 msgid "Security"
 msgstr ""
 
-#: ../gui/gtk.cpp:1016
+#: ../gui/gtk.cpp:1023
 msgid "Enable sound"
 msgstr ""
 
-#: ../gui/gtk.cpp:1034
+#: ../gui/gtk.cpp:1041
 msgid "<b>Sound preferences</b>"
 msgstr ""
 
-#: ../gui/gtk.cpp:1039
-msgid "Sound"
-msgstr ""
-
-#: ../gui/gtk.cpp:1053 ../gui/gtk.cpp:1060
+#: ../gui/gtk.cpp:1060 ../gui/gtk.cpp:1067
 msgid "Movie Properties"
 msgstr ""
 
-#: ../gui/gtk.cpp:1069
+#: ../gui/gtk.cpp:1076
 msgid "VM Properties"
 msgstr ""
 
-#: ../gui/gtk.cpp:1094
+#: ../gui/gtk.cpp:1101
 msgid "VM not initialized yet"
 msgstr ""
 
-#: ../gui/gtk.cpp:1163
+#: ../gui/gtk.cpp:1170
 msgid "Depth"
 msgstr ""
 
-#: ../gui/gtk.cpp:1174
+#: ../gui/gtk.cpp:1181
 msgid "Variable"
 msgstr ""
 
-#: ../gui/gtk.cpp:1185
+#: ../gui/gtk.cpp:1192
 msgid "Value"
 msgstr ""
 
-#: ../gui/gtk.cpp:1631
+#: ../gui/gtk.cpp:1247
+msgid "Gnash is the GNU Flash movie player based on GameSWF."
+msgstr ""
+
+#: ../gui/gtk.cpp:1249
+msgid ""
+"\n"
+"Renderer: "
+msgstr ""
+
+#: ../gui/gtk.cpp:1262
+msgid "GNASH flash movie player"
+msgstr ""
+
+#: ../gui/gtk.cpp:1284 ../gui/gtk.cpp:1297
+msgid "Open file"
+msgstr ""
+
+#: ../gui/gtk.cpp:1638
 msgid "File"
 msgstr ""
 
-#: ../gui/gtk.cpp:1695
+#: ../gui/gtk.cpp:1702
 msgid "Edit"
 msgstr ""
 
-#: ../gui/gtk.cpp:1717
+#: ../gui/gtk.cpp:1724
 msgid "Help"
 msgstr ""
 
-#: ../gui/gtk.cpp:1738
+#: ../gui/gtk.cpp:1745
 msgid "View"
 msgstr ""
 
-#: ../gui/gtk.cpp:1748
+#: ../gui/gtk.cpp:1755
 msgid "Redraw"
 msgstr ""
 
-#: ../gui/gtk.cpp:1760 ../gui/gtk.cpp:1766
+#: ../gui/gtk.cpp:1767 ../gui/gtk.cpp:1773
 msgid "Toggle fullscreen"
 msgstr ""
 
-#: ../gui/gtk.cpp:1782
+#: ../gui/gtk.cpp:1789
 msgid "Movie Control"
 msgstr ""
 
-#: ../gui/gtk.cpp:1795
+#: ../gui/gtk.cpp:1802
 msgid "Play"
 msgstr ""
 
-#: ../gui/gtk.cpp:1808
+#: ../gui/gtk.cpp:1815
 msgid "Pause"
 msgstr ""
 
-#: ../gui/gtk.cpp:1821
+#: ../gui/gtk.cpp:1828
 msgid "Stop"
 msgstr ""
 
-#: ../gui/gtk.cpp:1832 ../gui/kde.cpp:429
+#: ../gui/gtk.cpp:1843 ../gui/kde.cpp:429
 msgid "Restart Movie"
 msgstr ""
 
-#: ../gui/gtk.cpp:1848
+#: ../gui/gtk.cpp:1859
 msgid "Step Forward Frame"
 msgstr ""
 
-#: ../gui/gtk.cpp:1860
+#: ../gui/gtk.cpp:1871
 msgid "Step Backward Frame"
 msgstr ""
 
-#: ../gui/gtk.cpp:1873
+#: ../gui/gtk.cpp:1884
 msgid "Jump Forward 10 Frames"
 msgstr ""
 
-#: ../gui/gtk.cpp:1883
+#: ../gui/gtk.cpp:1894
 msgid "Jump Backward 10 Frames"
 msgstr ""
 
@@ -5068,10 +5090,6 @@ msgstr ""
 
 #: ../gui/kde.cpp:433
 msgid "Jump Backward"
-msgstr ""
-
-#: ../gui/kde.cpp:434
-msgid "Quit Gnash"
 msgstr ""
 
 #: ../gui/Player.cpp:149

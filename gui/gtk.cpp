@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.131 2008/01/07 15:16:30 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.132 2008/01/13 14:00:26 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -434,11 +434,13 @@ GtkGui::createMenuBar()
 bool
 GtkGui::createMenu()
 {
-    //GNASH_REPORT_FUNCTION;
+    // A menu that pops up (normally) on a right-mouse click.
 
     _popup_menu = GTK_MENU(gtk_menu_new());
     
 #ifdef USE_MENUS
+    // If menus are disabled, these are not added to the popup menu
+    // either.
     createFileMenu(GTK_WIDGET(_popup_menu));
     createEditMenu(GTK_WIDGET(_popup_menu));
     createViewMenu(GTK_WIDGET(_popup_menu));
@@ -446,11 +448,16 @@ GtkGui::createMenu()
 #endif
     createHelpMenu(GTK_WIDGET(_popup_menu));
 
-    if (get_sound_handler()) {
-        GtkMenuItem *menuitem_sound =
-            GTK_MENU_ITEM(gtk_menu_item_new_with_label("Toggle Sound"));
-//         gtk_widget_add_accelerator (GTK_WIDGET(menuitem_sound), "activate", accel_group,
-//                                 GDK_s, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+    GtkWidget *separator1 = gtk_separator_menu_item_new ();
+    gtk_widget_show (separator1);
+    gtk_container_add (GTK_CONTAINER (_popup_menu), separator1);
+
+    if (media::sound_handler *s = get_sound_handler()) {
+        GtkCheckMenuItem *menuitem_sound =
+            GTK_CHECK_MENU_ITEM(gtk_check_menu_item_new_with_label(_("Sound")));
+        // Set toggle inactive if an active sound handler is muted at start (can't
+        // happen at the moment, but might in the future).
+        gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menuitem_sound), (!s->is_muted()) );
         gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_sound));
         gtk_widget_show(GTK_WIDGET(menuitem_sound));
         g_signal_connect(GTK_OBJECT(menuitem_sound), "activate",
@@ -458,7 +465,7 @@ GtkGui::createMenu()
     }
 
     GtkMenuItem *menuitem_quit =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Quit Gnash"));
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Quit Gnash")));
     gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_quit));
     gtk_widget_show(GTK_WIDGET(menuitem_quit));
     g_signal_connect(GTK_OBJECT(menuitem_quit), "activate",
@@ -1237,9 +1244,9 @@ GtkGui::showAboutDialog()
         NULL 
     };
 
-    string comments = "Gnash is the GNU Flash movie player based on GameSWF.";
+    string comments = _("Gnash is the GNU Flash movie player based on GameSWF.");
 
-    comments += "\nRenderer: ";
+    comments += _("\nRenderer: ");
     comments += RENDERER_CONFIG;
     comments += "   GUI: ";
     comments += "GTK2"; // gtk of course!
@@ -1252,7 +1259,7 @@ GtkGui::showAboutDialog()
 
     gtk_show_about_dialog (
     		   NULL,
-                   "name", "GNASH flash movie player", 
+                   "name", _("GNASH flash movie player"), 
                    "version", VERSION,
                    "copyright", "Copyright (C) 2005, 2006, 2007, 2008 The Free Software Foundation",
 	           "comments", comments.c_str(),
@@ -1274,7 +1281,7 @@ GtkGui::menuitem_openfile_callback(GtkMenuItem* /*menuitem*/, gpointer data)
     GtkGui* gui = static_cast<GtkGui*>(data);
 
 #if GTK_CHECK_VERSION(2,4,0)
-    dialog = gtk_file_chooser_dialog_new ("Open file",
+    dialog = gtk_file_chooser_dialog_new (_("Open file"),
                                           NULL,
                                           GTK_FILE_CHOOSER_ACTION_OPEN,
                                           GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
@@ -1287,7 +1294,7 @@ GtkGui::menuitem_openfile_callback(GtkMenuItem* /*menuitem*/, gpointer data)
     
     gtk_widget_destroy (dialog);
 #else
-    dialog = gtk_file_selection_new ("Open file");
+    dialog = gtk_file_selection_new (_("Open file"));
 
     GtkFileSelection* selector = GTK_FILE_SELECTION(dialog);
 
@@ -1825,6 +1832,10 @@ GtkGui::createControlMenu(GtkWidget *obj)
     g_signal_connect ((gpointer) menuitem_stop, "activate",
         G_CALLBACK (&menuitem_stop_callback), this);
 
+    GtkWidget *separator1 = gtk_separator_menu_item_new ();
+    gtk_widget_show (separator1);
+    gtk_container_add (GTK_CONTAINER (menu), separator1);
+
 // Restart
 // 
     GtkImageMenuItem *menuitem_restart =
@@ -1838,9 +1849,9 @@ GtkGui::createControlMenu(GtkWidget *obj)
 
 #if 0 // Presently disabled
 
-    GtkWidget *separator1 = gtk_separator_menu_item_new ();
+    GtkWidget *separator2 = gtk_separator_menu_item_new ();
     gtk_widget_show (separator1);
-    gtk_container_add (GTK_CONTAINER (menu), separator1);
+    gtk_container_add (GTK_CONTAINER (menu), separator2);
 
 // Step Forward
     GtkImageMenuItem *menuitem_step_forward =

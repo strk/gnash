@@ -1,5 +1,7 @@
 2008-01-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* gui/gtk.cpp: i18n, add checkbox to sound toggle.
+	* po/de.po: updated translation.
 	* po/POTFILES.in: remove left-over file (as far as I can tell).
 	* po/Makefile.am: add libmedia, extensions, plugin directories
 	  for internationalization (you can see how long it hasn't been
