@@ -1,3 +1,7 @@
+2008-01-13 Sandro Santilli <strk@keybit.net>
+
+	* libbase/URL.h: reduce string copies (not only in set_querystring).
+
 2008-01-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gtk.cpp: i18n, add checkbox to sound toggle.

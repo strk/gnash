@@ -63,32 +63,32 @@ public:
 	URL(const std::string& relative_url, const URL& baseurl);
 
 	/// Return the 'protocol' member of this URL, as a string
-	std::string protocol() const { return _proto; }
+	const std::string& protocol() const { return _proto; }
 
 	/// Return the 'hostname' member of this URL, as a string
 	//
 	/// NOTE: return the empty string if protocol() is "file"
 	///
-	std::string hostname() const { return _host; }
+	const std::string& hostname() const { return _host; }
 
 	/// Return the 'path' member of this URL, as a string
-	std::string path() const { return _path; }
+	const std::string& path() const { return _path; }
 
 	/// Return the 'anchor' member of this URL, as a string
 	//
 	/// The anchor is the string after the '#' character
 	///
-	std::string anchor() const { return _anchor; }
+	const std::string& anchor() const { return _anchor; }
 
 	/// Return the 'querystring' member of this URL, as a string
 	//
 	/// The query is the string after the '?' character
 	///
-	std::string querystring() const { return _querystring; }
+	const std::string& querystring() const { return _querystring; }
 	
 	/// Set the 'querystring' member of this URL to a new value
-  ///
-  void set_querystring(std::string value) { _querystring = value; } 
+	//
+	void set_querystring(const std::string& value) { _querystring = value; } 
 
 	/// Return the full absolute URL as a string.
 	//
