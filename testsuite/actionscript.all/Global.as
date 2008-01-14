@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Global.as,v 1.38 2007/12/12 14:05:25 strk Exp $";
+rcsid="$Id: Global.as,v 1.39 2008/01/14 20:50:46 strk Exp $";
 
 #include "check.as"
 
@@ -56,6 +56,11 @@ check_equals(typeof(isNaN), 'function');
 #if OUTPUT_VERSION > 5
 check(!_global.hasOwnProperty('isNaN'));
 #endif
+
+check_equals(typeof(ASnative), 'function');
+check_equals(typeof(ASconstructor), 'function');
+check_equals(typeof(ASSetNative), 'function');
+check_equals(typeof(ASSetNativeAccessor), 'function');
 
 // Test parseInt
 check ( parseInt('45b') == 45 );
@@ -264,15 +269,15 @@ function set2() { this.s2++; }
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 5
-	check_totals(46); // SWF5
+	check_totals(50); // SWF5
 #else
 # if OUTPUT_VERSION == 6
-	check_totals(80); // SWF6
+	check_totals(84); // SWF6
 # else
 #  if OUTPUT_VERSION == 7
-	check_totals(62); // SWF7
+	check_totals(66); // SWF7
 #  else
-	check_totals(49); // SWF8+
+	check_totals(53); // SWF8+
 #  endif
 # endif
 #endif

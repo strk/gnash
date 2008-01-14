@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.85 2007/12/13 09:18:18 strk Exp $ */
+/* $Id: Global.cpp,v 1.86 2008/01/14 20:50:46 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -408,6 +408,33 @@ as_global_asnative(const fn_call& fn)
 		
 }
 
+// ASSetNative function
+// TODO: find dox 
+static as_value
+as_global_assetnative(const fn_call& /*fn*/)
+{
+	log_unimpl("ASSetNative");
+	return as_value();
+}
+
+// ASSetNativeAccessor function
+// TODO: find dox 
+static as_value
+as_global_assetnativeaccessor(const fn_call& /*fn*/)
+{
+	log_unimpl("ASSetNativeAccessor");
+	return as_value();
+}
+
+// ASconstructor function
+// TODO: find dox 
+static as_value
+as_global_asconstructor(const fn_call& /*fn*/)
+{
+	log_unimpl("ASconstructor");
+	return as_value();
+}
+
 // updateAfterEvent function
 static as_value
 as_global_updateAfterEvent(const fn_call& /*fn*/)
@@ -442,6 +469,9 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 	// ASSetPropFlags
 	init_member("ASSetPropFlags", new builtin_function(as_global_assetpropflags));
 	init_member("ASnative", new builtin_function(as_global_asnative));
+	init_member("ASSetNative", new builtin_function(as_global_assetnative));
+	init_member("ASSetNativeAccessor", new builtin_function(as_global_assetnativeaccessor));
+	init_member("ASconstructor", new builtin_function(as_global_asconstructor));
 	init_member("updateAfterEvent", new builtin_function(as_global_updateAfterEvent));
 
 	// Defined in timers.h
