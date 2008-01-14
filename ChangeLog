@@ -1,5 +1,10 @@
 2008-01-14 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (loadVariables): don't skip the $version
+	  property, if it's there, and only add enumeratable properties.
+
+2008-01-14 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/: movie_definition.h, BitmapMovieDefinition.h,
 	  movie_def_impl.{cpp,h}:
 	  Drop unused create_instance,

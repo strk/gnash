@@ -3952,9 +3952,9 @@ sprite_instance::loadVariables(URL url, short sendVarsMethod)
   
   if ( sendVarsMethod )    // 1=GET, 2=POST
   {
-    typedef std::map<std::string, as_value> PropMap;
+    typedef std::map<std::string, std::string> PropMap;
     PropMap props;
-    dump_members(props);
+    enumerateProperties(props);
 
     std::string del = "";
     std::string data = "";
@@ -3965,12 +3965,8 @@ sprite_instance::loadVariables(URL url, short sendVarsMethod)
     for (PropMap::iterator i=props.begin(), e=props.end(); i!=e; ++i)
     {
       std::string name = i->first;
-      std::string value = url.encode(i->second.to_string());      
-            
-      // This is to filter movieclip properties from local variables. I am 
-      // sure there is a better way to do it [TODO]
-      if (name[0] == '_') continue;
-      if (name == "$version") continue;
+      std::string value = i->second;
+      url.encode(value);
       
       data += del + name + "=" + value;
       
@@ -3980,8 +3976,7 @@ sprite_instance::loadVariables(URL url, short sendVarsMethod)
     
     if ( sendVarsMethod == 1 )  // GET 
       url.set_querystring(url.querystring() + data);
-    else
-    if ( sendVarsMethod == 2 )  // POST
+    else if ( sendVarsMethod == 2 )  // POST
       postdata = data;
   
   }
