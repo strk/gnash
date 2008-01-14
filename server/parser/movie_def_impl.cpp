@@ -23,7 +23,7 @@
 
 #include "movie_def_impl.h"
 #include "movie_definition.h" // for inheritance
-#include "sprite_instance.h" // for create_instance()
+#include "sprite_instance.h" // for ??
 #include "tu_file.h"
 #include "zlib_adapter.h"
 #include "stream.h"
@@ -606,20 +606,10 @@ void movie_def_impl::get_owned_fonts(std::vector<font*>* fonts)
 }
 
 
-sprite_instance*
-movie_def_impl::create_instance()
-{
-	return create_movie_instance();
-}
-
 movie_instance*
-movie_def_impl::create_movie_instance()
+movie_def_impl::create_movie_instance(character* parent)
 {
-
-	// @@ Shouldn't we return a movie_instance instead ?
-	// @@ and leave movie_root creation to the caller ..
-
-	return new movie_instance(this, NULL);
+	return new movie_instance(this, parent);
 }
 
 

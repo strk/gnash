@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.114 2008/01/11 13:18:21 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.115 2008/01/14 20:05:14 strk Exp $";
 
 #include "check.as"
 
@@ -32,15 +32,15 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(594); // SWF6
+	check_totals(596); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(611); // SWF7
+	check_totals(613); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(612); // SWF8+
+	check_totals(614); // SWF8+
 #endif
 
 	play();
@@ -951,6 +951,8 @@ else
 #if OUTPUT_VERSION >= 6
 
 createEmptyMovieClip("container", 5);
+check(!container.hasOwnProperty("$version"));
+check_equals(typeof(container['$version']), 'undefined');
 container.createEmptyMovieClip("draw", 5);
 draw = container.draw;
 

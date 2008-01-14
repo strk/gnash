@@ -188,7 +188,7 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	/// This event must be dispatched when actions
 	/// in first frame of loaded clip have been executed.
 	///
-	/// Since movie_def_impl::create_instance takes
+	/// Since movie_def_impl::create_movie_instance takes
 	/// care of this, this should be the correct place
 	/// to invoke such an event.
 	///

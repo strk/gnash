@@ -39,7 +39,7 @@ namespace gnash {
 
 movie_instance::movie_instance(movie_definition* def, character* parent)
 	:
-	sprite_instance(def, this, parent, -1),
+	sprite_instance(def, this, parent, parent ? 0 : -1),
 	_def(def)
 {
 }

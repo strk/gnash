@@ -30,9 +30,9 @@ using namespace std;
 
 namespace gnash {
 
-BitmapMovieInstance::BitmapMovieInstance(BitmapMovieDefinition* def)
+BitmapMovieInstance::BitmapMovieInstance(BitmapMovieDefinition* def, character* parent)
 	:
-	movie_instance(def, NULL)
+	movie_instance(def, parent)
 {
 	matrix mat;
 	//mat.concatenate_scale(20.0);

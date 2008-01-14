@@ -1,5 +1,28 @@
 2008-01-14 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/: movie_definition.h, BitmapMovieDefinition.h,
+	  movie_def_impl.{cpp,h}:
+	  Drop unused create_instance,
+	  add a 'parent' argument to create_movie_instance.
+	* server/BitmapMovieInstance.{cpp,h}: add 'parent' argument to
+	  constructor.
+	* testsuite/DummyMovieDefinition.h: Drop unused create_instance. 
+	* server/impl.{cpp,h}: drop unused create_library_movie_inst function.
+	* server/movie_instance.cpp (ctor): pass the character id in
+	  accordance with the assertion checking in character ctor
+	  (TODO: drop the id from character instances!)
+	* server/sprite_instance.cpp:
+	  (loadMovie): update call to create_movie_instance;
+	  (attachMovieClipProperties) don't register a $version variable
+	  if the sprite has a parent: fixes bug #22006.
+	* server/asobj/MovieClipLoader.cpp: comment update
+	* testsuite/actionscript.all/MovieClip.as: add test for availability
+	  of the $version property.
+	* testsuite/swfdec/PASSING: movieclip-version-{6,7,8}.swf and
+	  movie-enumerate-8.swf (completes the series) succeed.
+
+2008-01-14 Sandro Santilli <strk@keybit.net>
+
 	* plugin/plugin.cpp: fix perror() usage, check that the pipe is
 	  initialized before attempting to write to it.
 

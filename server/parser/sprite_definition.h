@@ -279,12 +279,6 @@ private:
 		);
 	}
 
-
-	virtual sprite_instance* create_instance()
-	{
-	    return NULL;
-	}
-
 	// Create a (mutable) instance of our definition.  The
 	// instance is created to live (temporarily) on some level on
 	// the parent movie's display list.

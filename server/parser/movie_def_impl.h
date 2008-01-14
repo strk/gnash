@@ -188,7 +188,7 @@ private:
 /// Immutable definition of a movie's contents.
 //
 /// It cannot be played directly, and does not hold
-/// current state; for that you need to call create_instance()
+/// current state; for that you need to call create_movie_instance()
 /// to get a movie instance 
 ///
 class movie_def_impl : public movie_definition
@@ -553,23 +553,17 @@ public:
 	/// Fill up *fonts with fonts that we own.
 	void get_owned_fonts(std::vector<font*>* fonts);
 
-	/// \brief
-	/// Create a playable movie_root instance from a def.
+	/// Create an instance of this movie.
 	//
+	/// TOCHECK:
 	/// Make sure you called completeLoad() before this
 	/// function is invoked (calling read() will do that for you).
 	///
+	/// TOCHECK:
 	/// The _root reference of the newly created movie_root
 	/// will be set to a newly created movie_instance.
 	///
-	/// WARNING: the actions in the first frame of the
-	///	     movie will be executed by this function.
-	///         
-	///
-	sprite_instance* create_instance();
-
-	/// Instanc of this definition is a valid movie_instance
-	movie_instance* create_movie_instance();
+	movie_instance* create_movie_instance(character* parent=0);
 
 	virtual const std::string& get_url() const { return _url; }
 	

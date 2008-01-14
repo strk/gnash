@@ -120,20 +120,13 @@ public:
 	/// the returned value should likely match the file size.
 	///
 	virtual size_t get_bytes_total() const = 0;
-	
-	/// Create a playable sprite_instance from a def.
-	//
-	/// This calls add_ref() on the movie_interface internally.
-	/// Call drop_ref() on the movie_interface when you're done with it.
-	/// Or use boost::intrusive_ptr<T> from base/smart_ptr.h if you want.
-	///
-	virtual sprite_instance* create_instance() = 0;
 
 	/// Create a movie instance from a def.
 	//
 	/// Not all movie definitions allow creation of
 	/// movie_instance. In particular, sprite_definition
-	/// can only create sprite_instance (see create_instance)
+	/// can only create sprite_instance, so will return NULL
+	/// from this method.
 	///
 	/// The default implementation returns NULL.
 	///
@@ -142,7 +135,8 @@ public:
 	/// movie_def_impl is one such example, future examples
 	/// should include jpeg_movie_def and similar..
 	///
-	virtual movie_instance* create_movie_instance() {
+	virtual movie_instance* create_movie_instance(character* parent=0)
+	{
 		return NULL;
 	}
 	

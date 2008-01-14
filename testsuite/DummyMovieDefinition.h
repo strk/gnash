@@ -43,7 +43,7 @@ namespace gnash
 /// methods of movie_definition by returning user-defined
 /// values for version/size/frame rate etc..
 ///
-/// The create_instance function will return the same
+/// The create_movie_instance function will return the same
 /// object created by createEmptyMovieClip() calls
 /// (an empty movieclip... still to be designed)
 ///
@@ -134,16 +134,10 @@ public:
 		return 0;
 	}
 	
-	/// Create a playable sprite instance from a def.
-	virtual sprite_instance* create_instance()
-	{
-		return create_movie_instance();
-	}
-
 	/// Create a playable movie instance from a def.
-	virtual movie_instance* create_movie_instance()
+	virtual movie_instance* create_movie_instance(character* parent=NULL)
 	{
-		return new movie_instance(this, NULL);
+		return new movie_instance(this, parent);
 	}
 	
 	virtual const PlayList& get_playlist(size_t frame_number) const

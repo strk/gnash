@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: BitmapMovieInstance.h,v 1.5 2007/07/01 10:54:18 bjacques Exp $ */
+/* $Id: BitmapMovieInstance.h,v 1.6 2008/01/14 20:05:13 strk Exp $ */
 
 #ifndef GNASH_BITMAPMOVIEINSTANCE_H
 #define GNASH_BITMAPMOVIEINSTANCE_H
@@ -45,7 +45,7 @@ class BitmapMovieInstance : public movie_instance
 
 public:
 
-	BitmapMovieInstance(BitmapMovieDefinition* def); 
+	BitmapMovieInstance(BitmapMovieDefinition* def, character* parent=0); 
 
 	virtual ~BitmapMovieInstance() {}
 

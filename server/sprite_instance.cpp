@@ -86,7 +86,7 @@ namespace gnash {
 // Forward declarations
 static as_object* getMovieClipInterface();
 static void attachMovieClipInterface(as_object& o);
-static void attachMovieClipProperties(as_object& o);
+static void attachMovieClipProperties(character& o);
 
 /// Anonymous namespace for module-private definitions
 namespace
@@ -1863,14 +1863,16 @@ attachMovieClipInterface(as_object& o)
 
 /// Properties (and/or methods) attached to every *instance* of a MovieClip 
 static void
-attachMovieClipProperties(as_object& o)
+attachMovieClipProperties(character& o)
 {
   //int target_version = o.getVM().getSWFVersion();
 
   boost::intrusive_ptr<builtin_function> gettersetter;
 
   // This is a normal property, can be overridden, deleted and enumerated
-  o.init_member( "$version", VM::get().getPlayerVersion(), 0); 
+  // See swfdec/test/trace/movieclip-version-#.swf for why we only initialize this
+  // if we don't have a parent
+  if ( ! o.get_parent() ) o.init_member( "$version", VM::get().getPlayerVersion(), 0); 
 
   //
   // Properties (TODO: move to appropriate SWF version section)
@@ -3875,7 +3877,7 @@ sprite_instance::loadMovie(const URL& url)
     }
 
     boost::intrusive_ptr<movie_instance> extern_movie;
-    extern_movie = md->create_movie_instance();
+    extern_movie = md->create_movie_instance(parent);
     if (extern_movie == NULL)
     {
       log_error(_("can't create extern movie_instance "
@@ -3902,7 +3904,7 @@ sprite_instance::loadMovie(const URL& url)
     int ratio = get_ratio();
     int clip_depth = get_clip_depth();
 
-    extern_movie->set_parent(parent);
+    assert ( parent == extern_movie->get_parent() );
 
     sprite_instance* parent_sp = parent->to_movie();
     assert(parent_sp);

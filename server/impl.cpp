@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.135 2008/01/08 21:04:25 strk Exp $ */
+/* $Id: impl.cpp,v 1.136 2008/01/14 20:05:13 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -854,37 +854,6 @@ movie_definition* create_library_movie(const URL& url, const char* real_url, boo
   //log_msg(_("create_library_movie(%s, %s, startLoaderThread=%d) about to return %p"), url.str().c_str(), real_url, startLoaderThread, mov);
   return mov;
 }
-
-sprite_instance* create_library_movie_inst(movie_definition* md)
-{
-    // Is the movie instance already in the library?
-    {
-  library_container_t::const_iterator i = s_movie_library_inst.find(md);
-  if (i != s_movie_library_inst.end())
-      {
-    // Return cached movie instance.
-    boost::intrusive_ptr<sprite_instance>   m((*i).second);
-    return m.get();
-      }
-    }
-
-    // Try to create movie interface
-    sprite_instance* mov = md->create_instance();
-
-    if (mov == NULL)
-  {
-      log_error(_("%s: couldn't create instance"), __FUNCTION__);
-
-      return NULL;
-  }
-    else
-  {
-      s_movie_library_inst[md] = mov;
-  }
-
-    return mov;
-}
-
 
 #ifdef GNASH_USE_GC
 /// A GC root used to mark all reachable collectable pointers
