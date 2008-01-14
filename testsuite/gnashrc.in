@@ -8,4 +8,10 @@ set SOLReadOnly false
 # this is to be compatible with swfdec tests expectances
 set flashVersionString WIN 9,0,100,0
 
+# Don't bother printing SWF errors during automated testing
+set MalformedSWFVerbosity false
+
+# Don't bother printing AS errors during automated testing
+set ASCodingErrorsVerbosity false
+
 # TODO: enable extensions ?
