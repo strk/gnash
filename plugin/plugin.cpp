@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.91 2008/01/07 09:47:28 bwy Exp $ */
+/* $Id: plugin.cpp,v 1.92 2008/01/14 14:23:45 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -283,7 +283,9 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
 	_window(0),
 	_width(0),
 	_height(0),
-	_childpid(0)
+	_streamfd(-1),
+	_childpid(0),
+	_filefd(-1)
 {
 	for (size_t i=0, n=data->argc; i<n; ++i)
 	{
@@ -482,7 +484,7 @@ nsPluginInstance::DestroyStream(NPStream * /* stream */, NPError /* reason */)
     {
         if (close(_streamfd) == -1)
         {
-            perror(strerror(errno));
+            perror("closing _streamfd");
         }
         else
         {
@@ -495,7 +497,7 @@ nsPluginInstance::DestroyStream(NPStream * /* stream */, NPError /* reason */)
     {
         if (close(_filefd) == -1)
         {
-            perror(strerror(errno));
+            perror("closing _filefd");
         }
         else
         {
@@ -514,7 +516,8 @@ nsPluginInstance::WriteReady(NPStream * /* stream */ )
 #if 0
 	cout << "Stream for " << stream->url << " is ready" << endl;
 #endif
-	return 1024;
+	if ( _streamfd != -1 ) return 1024;
+	else return 0;
 }
 
 /// \brief Read the data stream from Mozilla/Firefox
@@ -561,7 +564,7 @@ nsPluginInstance::startProc(Window win)
 	// See if the file actually exists, otherwise we can't spawn it
 	if (stat(procname.c_str(), &procstats) == -1)
 	{
-		cout << "Invalid filename: " << procname << endl;
+		cout << "Invalid path to standalone executable: " << procname << endl;
 		return;
 	}
 
@@ -763,7 +766,7 @@ nsPluginInstance::startProc(Window win)
 	execv(argv[0], const_cast<char**>(argv));
 
 	// if execv returns, an error has occurred.
-	perror(strerror(errno));
+        perror("executing standalone gnash");
 
 	delete[] argv;
 
