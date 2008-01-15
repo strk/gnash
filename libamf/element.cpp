@@ -417,10 +417,10 @@ Element::makeStrictArray(boost::uint8_t *indata, int size)
 void
 Element::dump()
 {
-    log_debug("AMF Type is: ", astype_str[_type]);
-    log_debug("AMF Length is: ", _length);
+    log_debug("AMF Type is: %s", astype_str[_type]);
+    log_debug("AMF Length is: %d", _length);
     if (_name.size()) {
-	log_debug("AMF Name is: ", _name.c_str());
+	log_debug("AMF Name is: %s", _name.c_str());
     }
 #if 0
     boost::uint8_t *hexint;

@@ -74,21 +74,23 @@ SOL::~SOL()
 
     vector<amf::Element *>::iterator it;
     for (it = _amfobjs.begin(); it != _amfobjs.end(); it++) {
-	amf::Element *el = (*(it));
+	//amf::Element *el = (*(it));
 //	delete el;
     }
 }
 
 bool
-SOL::extractHeader(std::string &filespec)
+SOL::extractHeader(const std::string & /*filespec*/)
 {
 //    GNASH_REPORT_FUNCTION;
+      return false;
 }
 
 bool
-SOL::extractHeader(vector<unsigned char> &data)
+SOL::extractHeader(const vector<unsigned char> & /*data*/)
 {
 //    GNASH_REPORT_FUNCTION;
+      return false;
 }
 
 void
@@ -100,9 +102,10 @@ SOL::addObj(amf::Element *el)
 }
 
 bool
-SOL::formatHeader(vector<unsigned char> &data)
+SOL::formatHeader(vector<unsigned char> & /*data*/)
 {
 //    GNASH_REPORT_FUNCTION;
+      return false;
 }
 
 // name is the object name
@@ -187,6 +190,7 @@ SOL::formatHeader(std::string &name, int filesize)
     delete hexint;
 #endif    
     
+    return true;
 }    
 
 // write the data to disk as a .sol file
@@ -290,6 +294,8 @@ SOL::writeFile(string &filespec, string &name)
 //    ofs.write(body, (ptr - body));
     ofs.write(body, _filesize);
     ofs.close();
+
+    return true;
 }
 
 // read the .sol file from disk

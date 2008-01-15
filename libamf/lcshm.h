@@ -75,7 +75,7 @@ public:
     ~LcShm();
     bool connect(std::string &name);
     void close(void);
-    void send(std::string &name, std::string &dataname, amf::Element *data);
+    void send(const std::string &name, const std::string &dataname, amf::Element *data);
     void recv(std::string &name, std::string &dataname, amf::Element *data);
     std::vector<amf::Element *> parseBody(boost::uint8_t *data);
     boost::uint8_t *parseHeader(boost::uint8_t *data);

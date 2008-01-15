@@ -1,5 +1,12 @@
 2008-01-15 Sandro Santilli <strk@keybit.net>
 
+	* libamf/: element.{cpp,h}, lcshm.{cpp,h}, sol.{cpp,h},
+	  utilities/soldumper.cpp: fix a bunch of compiler warnings.
+	  The code isn't any better, but error stream is less
+	  polluted...
+
+2008-01-15 Sandro Santilli <strk@keybit.net>
+
 	* server/edit_text_character.cpp: initialize TextField as an
 	  AsBroadcaster, broadcast onChanged events (it seems onKillFocus
 	  and onSetFocus should not... no idea why).

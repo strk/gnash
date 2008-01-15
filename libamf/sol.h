@@ -48,8 +48,8 @@ public:
     size_t size() { return _amfobjs.size(); };
     
     // extract the header
-    bool extractHeader(std::vector<boost::uint8_t> &data);
-    bool extractHeader(std::string &filespec);
+    bool extractHeader(const std::vector<boost::uint8_t> &data);
+    bool extractHeader(const std::string &filespec);
 
     // Create the header
     bool formatHeader(std::vector<boost::uint8_t> &data);

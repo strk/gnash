@@ -213,12 +213,12 @@ LcShm::parseElement(amf::Element *el, boost::uint8_t *data)
 #endif
 
 vector<amf::Element *> 
-LcShm::parseBody(boost::uint8_t *data)
+LcShm::parseBody(boost::uint8_t * /*data*/)
 {
     GNASH_REPORT_FUNCTION;
 
-    boost::uint8_t *ptr = reinterpret_cast<uint8_t *>(data);
-    Element::astype_e type = (Element::astype_e)*ptr;
+    //boost::uint8_t *ptr = reinterpret_cast<uint8_t *>(data);
+    //Element::astype_e type = (Element::astype_e)*ptr;
 //    log_msg(_("Type is %s"), astype_str[type]);
     amf::Element el;
     AMF amf;
@@ -297,9 +297,10 @@ LcShm::parseHeader(boost::uint8_t *data)
 }
 
 boost::uint8_t *
-LcShm::formatHeader(boost::uint8_t *data)
+LcShm::formatHeader(boost::uint8_t * /*data*/)
 {
     GNASH_REPORT_FUNCTION;
+    return NULL;
 }
 
 /// \brief Prepares the LcShm object to receive commands from a
@@ -333,12 +334,14 @@ bool
 LcShm::addObject(amf::Element * /* el */)
 {
     GNASH_REPORT_FUNCTION;
-    
+
+    return false;
+
 }
 
 /// \brief Invokes a method on a specified LcShm object.
 void
-LcShm::send(std::string &name, std::string &dataname, amf::Element *data)
+LcShm::send(const std::string & /*name*/, const std::string & /*dataname*/, amf::Element * /*data*/)
 {
     
     log_unimpl (__FUNCTION__);

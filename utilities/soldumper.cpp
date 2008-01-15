@@ -58,7 +58,7 @@ main(int argc, char *argv[])
     int                   c;
     bool                  localdir = false;
     bool                  listdir = false;
-    int                   size  = 0;
+    //int                   size  = 0;
     string                filespec, realname, tmpname;
     struct dirent         *entry;
     vector<const char *>  dirlist;
@@ -136,7 +136,7 @@ main(int argc, char *argv[])
             for (i=0; entry>0; i++) {
                 entry = readdir(library_dir);
                 if (entry != NULL) {
-                    string::size_type pos;
+                    //string::size_type pos;
                     if (strstr(entry->d_name, ".sol")) {
                         cout << "Found SOL: " << entry->d_name << endl;
                     }

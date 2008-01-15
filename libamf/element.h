@@ -95,8 +95,8 @@ public:
     
     Element &operator=(Element &);
 
-    bool operator==(bool x) { if (_data) return _data[0] == x; };
-    uint8_t operator[](int x) { if (_data) return _data[x]; };
+    bool operator==(bool x) { if (_data) return _data[0] == x; return false; };
+    uint8_t operator[](int x) { if (_data) return _data[x]; return 0; };
     
     // These are all accessors for the various output formats
     astype_e getType() { return _type; };
