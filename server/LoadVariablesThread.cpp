@@ -75,6 +75,12 @@ LoadVariablesThread::completeLoad()
 
 		// eof, get out !
 		if ( _stream->get_eof() ) break;
+
+		if ( cancelRequested() )
+		{
+			log_debug("Cancelling LoadVariables download thread...");
+			break;
+		}
 	}
 
 	if ( ! toparse.empty() )
@@ -99,7 +105,8 @@ LoadVariablesThread::completeLoad()
 LoadVariablesThread::LoadVariablesThread(const URL& url, const std::string& postdata)
 	:
 	_stream(StreamProvider::getDefaultInstance().getStream(url, postdata)),
-	_completed(false)
+	_completed(false),
+	_canceled(false)
 {
 	if ( ! _stream.get() )
 	{
@@ -110,12 +117,38 @@ LoadVariablesThread::LoadVariablesThread(const URL& url, const std::string& post
 LoadVariablesThread::LoadVariablesThread(const URL& url)
 	:
 	_stream(StreamProvider::getDefaultInstance().getStream(url)),
-	_completed(false)
+	_completed(false),
+	_canceled(false)
 {
 	if ( ! _stream.get() )
 	{
 		throw NetworkException();
 	}
 }
+
+void
+LoadVariablesThread::cancel()
+{
+	boost::mutex::scoped_lock lock(_mutex);
+	_canceled = true;
+}
+
+bool
+LoadVariablesThread::cancelRequested()
+{
+	boost::mutex::scoped_lock lock(_mutex);
+	return _canceled;
+}
+
+LoadVariablesThread::~LoadVariablesThread()
+{
+	if ( _thread.get() )
+	{
+		cancel();
+		_thread->join();
+		_thread.reset();
+	}
+}
+
 
 } // namespace gnash 

@@ -1,5 +1,11 @@
 2008-01-15 Sandro Santilli <strk@keybit.net>
 
+	* server/LoadVariablesThread.{cpp,h}: implement download canceling
+	  and proper destructor (cancels&joins). Fixes segfault reported
+	  in bug #21675 (comment #6).
+
+2008-01-15 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/swfdec/PASSING: shift-{5,6,7}.swf succeed
 	* server/vm/ASHandlers.cpp: fix ActionShift* opcodes.
 	* testsuite/actionscript.all/ops.as: add tests for ActionShiftRight2

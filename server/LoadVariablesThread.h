@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: LoadVariablesThread.h,v 1.3 2007/10/10 17:49:45 strk Exp $ */
+/* $Id: LoadVariablesThread.h,v 1.4 2008/01/15 10:26:40 strk Exp $ */
 
 #ifndef GNASH_LOADVARIABLESTHREAD_H
 #define GNASH_LOADVARIABLESTHREAD_H
@@ -80,6 +80,9 @@ public:
 	///
 	LoadVariablesThread(const URL& url, const std::string& postdata);
 
+	/// Destroy the LoadVariablesThread, joining the thread if spawned
+	~LoadVariablesThread();
+
 	/// Return the name,value map parsed out of the loaded stream
 	ValuesMap& getValues()
 	{
@@ -93,6 +96,12 @@ public:
 		assert(_stream.get());
 		_thread.reset( new boost::thread(boost::bind(LoadVariablesThread::execLoadingThread, this)) );
 	}
+
+	/// Cancel a download in progress
+	//
+	/// Locks _mutex
+	///
+	void cancel();
 
 	/// Return true if loading/parsing is in progress
 	bool inProgress()
@@ -181,6 +190,12 @@ private:
 		return _vals.size();
 	}
 
+	/// Check if download cancel was requested
+	//
+	/// Locks _mutex
+	///
+	bool cancelRequested();
+
 	size_t _bytesLoaded;
 
 	size_t _bytesTotal;
@@ -192,6 +207,8 @@ private:
 	ValuesMap _vals;
 
 	bool _completed;
+
+	bool _canceled;
 
 	boost::mutex _mutex;
 };
