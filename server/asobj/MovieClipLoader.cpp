@@ -106,24 +106,7 @@ public:
 
 	void unloadClip(void *);
 
-protected:
-
-#if 0
-#ifdef GNASH_USE_GC
-	/// Mark MovieClipLoader-specific reachable resources and invoke
-	/// the parent's class version (markAsObjectReachable)
-	//
-	/// MovieClipLoader-specific reachable resources are:
-	/// 	- The listeners (_listeners)
-	///
-	virtual void markReachableResources() const;
-#endif // GNASH_USE_GC
-#endif
-
 private:
-
-	//typedef std::set< boost::intrusive_ptr<as_object> > Listeners;
-	//Listeners _listeners;
 
 	bool          _started;
 	bool          _completed;
