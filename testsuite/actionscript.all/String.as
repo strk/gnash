@@ -16,7 +16,7 @@
 
 // Original author: Mike Carlson - June 19th, 2006
 
-rcsid="$Id: String.as,v 1.33 2008/01/15 11:15:15 strk Exp $";
+rcsid="$Id: String.as,v 1.34 2008/01/15 11:35:49 strk Exp $";
 
 #include "check.as"
 
@@ -468,8 +468,12 @@ s = new String("hello");
 r = "s:"+s;
 check_equals(r, "s:hello");
 
+s = new String("");
+r = "s:"+s;
+check_equals(r, "s:");
+
 #if OUTPUT_VERSION < 6
- check_totals(174);
+ check_totals(175);
 #else
- check_totals(195);
+ check_totals(196);
 #endif
