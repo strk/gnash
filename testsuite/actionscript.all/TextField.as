@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.40 2008/01/05 15:40:14 strk Exp $";
+rcsid="$Id: TextField.as,v 1.41 2008/01/15 14:17:43 strk Exp $";
 
 #include "check.as"
 
@@ -41,11 +41,11 @@ check_equals(typeof(TextField.prototype.replaceSel), 'function');
  // See http://www.senocular.com/flash/tutorials/listenersasbroadcaster/?page=2
  check_equals(typeof(TextField.prototype.addListener), 'function');
  check_equals(typeof(TextField.prototype.removeListener), 'function');
- xcheck_equals(typeof(TextField.prototype.broadcastMessage), 'function');
- xcheck(TextField.prototype.hasOwnProperty("_listeners"));
- xcheck_equals(typeof(TextField.prototype._listeners), 'object');
- xcheck(TextField.prototype._listeners instanceof Array);
- xcheck_equals(TextField.prototype._listeners.length, 0);
+ check_equals(typeof(TextField.prototype.broadcastMessage), 'function');
+ check(TextField.prototype.hasOwnProperty("_listeners"));
+ check_equals(typeof(TextField.prototype._listeners), 'object');
+ check(TextField.prototype._listeners instanceof Array);
+ check_equals(TextField.prototype._listeners.length, 0);
 
 // NOTE: the following will be true after a call to createTextField ! Seek forward to see..
 xcheck( !TextField.prototype.hasOwnProperty('background'));
@@ -115,9 +115,12 @@ check_equals(ret, _root.tf);
 #endif
 
 check_equals(typeof(tf), 'object');
-xcheck(tf.hasOwnProperty('_listeners'));
-xcheck_equals(tf._listeners.length, 1); // adds self to the listeners
-xcheck_equals(tf._listeners[0], tf); // adds self to the listeners set
+check(tf.hasOwnProperty('_listeners'));
+check_equals(tf._listeners.length, 1); // adds self to the listeners
+check_equals(tf._listeners[0], tf); // adds self to the listeners set
+check(!tf.hasOwnProperty('broadcastMessage'));
+check(!tf.hasOwnProperty('addListener'));
+check(!tf.hasOwnProperty('removeListener'));
 
 // NOTE: the following were false before the call to createTextField ! Seek backward to see..
 check( TextField.prototype.hasOwnProperty('background'));
@@ -812,9 +815,9 @@ check_equals(typeof(tf6), 'undefined');
 
 
 #if OUTPUT_VERSION < 8
- check_totals(387);
+ check_totals(390);
 #else
- check_totals(388);
+ check_totals(391);
 #endif
 
 #else // OUTPUT_VERSION <= 5

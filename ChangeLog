@@ -1,5 +1,14 @@
 2008-01-15 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.cpp: initialize TextField as an
+	  AsBroadcaster, broadcast onChanged events (it seems onKillFocus
+	  and onSetFocus should not... no idea why).
+	* testsuite/actionscript.all/TextField.as: test existance of
+	  AsBroadcaster interface in TextField instance, updated expected
+	  results.
+
+2008-01-15 Sandro Santilli <strk@keybit.net>
+
 	* server/as_object.cpp (tostring_method): don't check size of string
 	  returned by get_string_value, just return it as is.
 	  Fixes bug #22024.

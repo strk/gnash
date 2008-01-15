@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.140 2007/12/26 15:52:34 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.141 2008/01/15 14:17:43 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -38,6 +38,8 @@
 #include "font.h" // for using the _font member
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
+#include "array.h" // for _listeners construction
+#include "AsBroadcaster.h" // for initializing self as a broadcaster
 
 #include <algorithm>
 #include <string>
@@ -67,8 +69,6 @@ static as_value textfield_setTextFormat(const fn_call& fn);
 static as_value textfield_getTextFormat(const fn_call& fn);
 static as_value textfield_setNewTextFormat(const fn_call& fn);
 static as_value textfield_getNewTextFormat(const fn_call& fn);
-static as_value textfield_addListener(const fn_call& fn);
-static as_value textfield_removeListener(const fn_call& fn);
 
 static as_value textfield_getDepth(const fn_call& fn);
 static as_value textfield_getFontList(const fn_call& fn);
@@ -129,36 +129,6 @@ textfield_setTextFormat(const fn_call& fn)
 
 	return as_value();
 
-}
-
-static as_value
-textfield_addListener(const fn_call& fn)
-{
-	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
-	UNUSED(text);
-
-	static bool warned = false;
-	if ( ! warned ) {
-		log_unimpl("TextField.addListener()");
-		warned = true;
-	}
-
-	return as_value();
-}
-
-static as_value
-textfield_removeListener(const fn_call& fn)
-{
-	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
-	UNUSED(text);
-
-	static bool warned = false;
-	if ( ! warned ) {
-		log_unimpl("TextField.removeListener()");
-		warned = true;
-	}
-
-	return as_value();
 }
 
 static as_value
@@ -297,6 +267,9 @@ attachTextFieldInterface(as_object& o)
 {
 	int target_version = o.getVM().getSWFVersion();
 
+	// TextField is an AsBroadcaster
+        AsBroadcaster::initialize(o);
+
 	// SWF5 or higher
 	if ( target_version  < 6 ) return;
 
@@ -307,10 +280,6 @@ attachTextFieldInterface(as_object& o)
 	o.init_property("variable", *variable_getter, *variable_setter);
 	o.init_member("setTextFormat", new builtin_function(textfield_setTextFormat));
 	o.init_member("getTextFormat", new builtin_function(textfield_getTextFormat));
-
-	// TODO: make a normal AsBroadcaster ?
-	o.init_member("addListener", new builtin_function(textfield_addListener));
-	o.init_member("removeListener", new builtin_function(textfield_removeListener));
 
 	o.init_member("setNewTextFormat", new builtin_function(textfield_setNewTextFormat));
 	o.init_member("getNewTextFormat", new builtin_function(textfield_getNewTextFormat));
@@ -428,6 +397,10 @@ edit_text_character::edit_text_character(character* parent,
 	assert(m_def);
 
 	set_prototype(getTextFieldInterface());
+
+	as_array_object* ar = new as_array_object();
+	ar->push(this);
+	set_member(NSV::PROP_uLISTENERS, ar);
 
 	// WARNING! remember to set the font *before* setting text value!
 	set_font( m_def->get_font() );
@@ -2087,9 +2060,9 @@ edit_text_character::getTextAlignment()
 void
 edit_text_character::onChanged()
 {
-	string_table& st = _vm.getStringTable();
-	string_table::key key = st.find(PROPNAME("onChanged"));
-	callMethod(key);
+	as_value met(PROPNAME("onChanged"));
+	as_value targetVal(this);
+	callMethod(NSV::PROP_BROADCAST_MESSAGE, met, targetVal);
 }
 
 void
