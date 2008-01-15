@@ -1,5 +1,7 @@
 2008-01-15 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (loadVariables): skip sending variables
+	  starting with a dollar sign. See bug #22006.
 	* server/LoadVariablesThread.{cpp,h}: implement download canceling
 	  and proper destructor (cancels&joins). Fixes segfault reported
 	  in bug #21675 (comment #6).
