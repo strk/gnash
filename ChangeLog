@@ -1,5 +1,6 @@
 2008-01-15 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/movie_definition.h: comment out unused parameter.
 	* server/sprite_instance.cpp (loadVariables): skip sending variables
 	  starting with a dollar sign. See bug #22006.
 	* server/LoadVariablesThread.{cpp,h}: implement download canceling

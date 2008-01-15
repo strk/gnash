@@ -135,7 +135,7 @@ public:
 	/// movie_def_impl is one such example, future examples
 	/// should include jpeg_movie_def and similar..
 	///
-	virtual movie_instance* create_movie_instance(character* parent=0)
+	virtual movie_instance* create_movie_instance(character* /*parent*/=0)
 	{
 		return NULL;
 	}
