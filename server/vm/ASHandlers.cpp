@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.179 2008/01/11 16:06:54 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.180 2008/01/15 09:35:11 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -3555,17 +3555,16 @@ SWFHandlers::ActionBitwiseXor(ActionExec& thread)
 void
 SWFHandlers::ActionShiftLeft(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-
-	// env.top(1).asr(env.top(0));
 
 	as_environment& env = thread.env;
 	thread.ensureStack(2);
 
-	boost::int16_t operand1 = env.top(1).to_int();
-	boost::int16_t operand2 = env.top(0).to_int();
+	boost::uint32_t amount = env.top(0).to_int();
+	boost::int32_t value = env.top(1).to_int();
 
-	env.top(1) = operand1 << operand2;
+	value = value << amount;
+
+	env.top(1) = value;
 	env.drop(1);
 }
 
@@ -3576,30 +3575,30 @@ SWFHandlers::ActionShiftRight(ActionExec& thread)
 	as_environment& env = thread.env;
 	thread.ensureStack(2);
 
-	boost::int32_t operand1 = env.top(1).to_int();
-	boost::int32_t operand2 = env.top(0).to_int();
+	boost::uint32_t amount = env.top(0).to_int();
+	boost::int32_t value = env.top(1).to_int();
 
-	boost::int32_t res = operand1 >> operand2;
+	value = value >> amount;
 
-	//log_debug("%d >> %d == %d", operand1, operand2, res);
+	//log_debug("%d >> %d == %d", value, amount, res);
 
-	env.top(1) = res;
+	env.top(1) = value;
 	env.drop(1);
 }
 
 void
 SWFHandlers::ActionShiftRight2(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-	// env.top(1).lsr(env.top(0));
 
 	as_environment& env = thread.env;
 	thread.ensureStack(2);
 
-	boost::uint32_t operand1 = env.top(1).to_int();
-	boost::int32_t operand2 = env.top(0).to_int(); // TODO: check this !
+	boost::uint32_t amount = env.top(0).to_int(); 
+	boost::int32_t value = env.top(1).to_int();
 
-	env.top(1) = boost::uint32_t( operand1 >> operand2 );
+	value = boost::uint32_t(value) >> amount;
+
+	env.top(1) = value;
 	env.drop(1);
 }
 

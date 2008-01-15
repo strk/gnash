@@ -1,3 +1,10 @@
+2008-01-15 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/swfdec/PASSING: shift-{5,6,7}.swf succeed
+	* server/vm/ASHandlers.cpp: fix ActionShift* opcodes.
+	* testsuite/actionscript.all/ops.as: add tests for ActionShiftRight2
+	  and formerly failing tests for ActionShiftLeft.
+
 2008-01-14 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/gnashrc.in: avoid printing malformed swf and actionscript

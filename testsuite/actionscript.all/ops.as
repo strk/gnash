@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.32 2008/01/11 17:25:00 strk Exp $";
+rcsid="$Id: ops.as,v 1.33 2008/01/15 09:35:11 strk Exp $";
 
 #include "check.as"
 
@@ -590,6 +590,12 @@ x = new String("3");
 y = x << 1;
 check_equals(y, 6); 
 
+y = 2147483647 << Infinity;
+check_equals(y,  2147483647);
+
+y = 2147483647 << 0;
+check_equals(y, 2147483647);
+
 //------------------------------------------------
 // Shift right operator (ACTION_SHIFTRIGHT : 0x64)
 //------------------------------------------------
@@ -664,7 +670,41 @@ check_equals(y, 0);
 // Shift right2 operator (ACTION_SHIFTRIGHT2 : 0x65)
 //-------------------------------------------------
 
-// TODO ... 
+y = 1 >>> 3;
+check_equals(y, 0);
+
+y = 32 >>> 4;
+check_equals(y, 2);
+
+y = -1 >>> Infinity;
+check_equals(y, -1);
+
+y = -1 >>> -Infinity;
+check_equals(y, -1);
+
+y = -1 >>> 0;
+check_equals(y, -1);
+
+y = -1 >>> NaN;
+check_equals(y, -1);
+
+y = -1 >>> 32;
+check_equals(y, -1);
+
+y = -1 >>> -32;
+check_equals(y, -1);
+
+y = -1 >>> 2147483648;
+check_equals(y, -1);
+
+y = -1 >>> 4294967296;
+check_equals(y, -1);
+
+y = -2 >>> Infinity;
+check_equals(y, -2);
+
+y = -2 >>> 32;
+check_equals(y, -2);
 
 //-------------------------------------------------
 // Strict equality operator (ACTION_STRICTEQ : 0x66)
@@ -730,7 +770,7 @@ xcheck(y!=NaN);
 check(isNaN(y));
 
 #if OUTPUT_VERSION < 7
- totals(214);
+ totals(228);
 #else
- totals(216);
+ totals(230);
 #endif
