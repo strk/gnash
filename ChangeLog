@@ -1,5 +1,8 @@
 2008-01-15 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.cpp (tostring_method): don't check size of string
+	  returned by get_string_value, just return it as is.
+	  Fixes bug #22024.
 	* testsuite/actionscript.all/String.as: test string concatenation
 	  between a primitive string and a string object.
 
