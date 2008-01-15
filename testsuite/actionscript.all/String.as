@@ -16,7 +16,7 @@
 
 // Original author: Mike Carlson - June 19th, 2006
 
-rcsid="$Id: String.as,v 1.32 2008/01/11 08:50:15 strk Exp $";
+rcsid="$Id: String.as,v 1.33 2008/01/15 11:15:15 strk Exp $";
 
 #include "check.as"
 
@@ -460,8 +460,16 @@ check_equals(typeof(s.toString), 'undefined');
 Object.prototype.toString = ObjectProtoToStringBackup;
 String.prototype.toString = StringProtoToStringBackup;
 
+//----------------------------------------------------------------------
+// Test concatenation of string objects
+//----------------------------------------------------------------------
+
+s = new String("hello");
+r = "s:"+s;
+check_equals(r, "s:hello");
+
 #if OUTPUT_VERSION < 6
- check_totals(173);
+ check_totals(174);
 #else
- check_totals(194);
+ check_totals(195);
 #endif

@@ -1,5 +1,10 @@
 2008-01-15 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/String.as: test string concatenation
+	  between a primitive string and a string object.
+
+2008-01-15 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/movie_definition.h: comment out unused parameter.
 	* server/sprite_instance.cpp (loadVariables): skip sending variables
 	  starting with a dollar sign. See bug #22006.
