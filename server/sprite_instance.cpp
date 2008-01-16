@@ -3085,7 +3085,7 @@ sprite_instance::add_display_object(
         {
             ch->set_name(name);
         }
-        else if(!name && ch->wantsInstanceName())
+        else if(ch->wantsInstanceName())
         {
             std::string instance_name = getNextUnnamedInstanceName();
             ch->set_name(instance_name.c_str());
