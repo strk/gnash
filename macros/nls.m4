@@ -33,7 +33,7 @@ AC_DEFUN([AM_NLS],
 AC_DEFUN([AM_MKINSTALLDIRS],
 [
   dnl Tell automake >= 1.10 to complain if mkinstalldirs is missing.
-  AC_PATH_PROG(MKINSTALLDIRS, mkinstalldirs, ,[${pathlist}])
+  AC_PATH_PROG(MKINSTALLDIRS, mkinstalldirs, [])
   dnl If the AC_CONFIG_AUX_DIR macro for autoconf is used we possibly
   dnl find the mkinstalldirs script in another subdir but $(top_srcdir).
   dnl Try to locate it.

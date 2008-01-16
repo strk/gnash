@@ -95,7 +95,7 @@ dnl libext, shlibext, hardcode_libdir_flag_spec, hardcode_libdir_separator,
 dnl hardcode_direct, hardcode_minus_L.
 AC_DEFUN([AC_LIB_RPATH],
 [
-  AC_PATH_PROG(CONFIG_RPATH, config.rpath)
+  AC_PATH_PROG(CONFIG_RPATH, config.rpath, config.rpath, [])
   AC_REQUIRE([AC_PROG_CC])                dnl we use $CC, $GCC, $LDFLAGS
   AC_REQUIRE([AC_PROG_LD])                dnl we use $LD, $with_gnu_ld
   AC_REQUIRE([AC_CANONICAL_HOST])         dnl we use $host
