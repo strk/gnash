@@ -103,7 +103,7 @@ RcInitFile::RcInitFile() : _delay(0),
     _urlOpenerFormat = PrfQueryProfileString( HINI_USER, (PSZ) "WPURLDEFAULTSETTINGS",
 			(PSZ) "DefaultBrowserExe", NULL,
 			(PVOID) browserExe, (LONG)sizeof(browserExe) );
-	_urlOPenerFormat += " -remote 'openurl(%u)'";
+    _urlOpenerFormat += " -remote 'openurl(%u)'";
 #endif
 
     // TODO: fetch GNASH_URLOPENER_FORMAT from the environment
@@ -535,6 +535,7 @@ RcInitFile::showASCodingErrors(bool value)
 //    GNASH_REPORT_FUNCTION;
     
     _verboseASCodingErrors = value;
+    
     if (value) {
         _verbosity++;
     }
