@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.471 2008/01/11 18:10:10 strk Exp $
+dnl $Id: configure.ac,v 1.472 2008/01/16 15:11:01 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -2568,7 +2568,7 @@ else
   else
     echo "        WARNING: You need to have the 'swfmill' tool installed"
     echo "                 to run some of the tests in Gnash testsuite."
-    echo "                 You can install it from http://iterative.org/swfmill/"
+    echo "                 You can install it from http://swfmill.org/"
   fi
 
   if test x"$SWFC" != x; then
