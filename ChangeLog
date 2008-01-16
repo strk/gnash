@@ -1,5 +1,8 @@
 2008-01-16 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.cpp (fire_mouse_event): for _droptarget, register
+	  closest AS-referenceable ancestor, not topmost character.
+	  Makes some progress in the movie 1.swf from comment 6 of bug #20911.
 	* testsuite/misc-ming.all/shape_test.c: test that clip events
 	  are not invoked for shape placements.
 

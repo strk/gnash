@@ -817,7 +817,8 @@ movie_root::fire_mouse_event()
         const character* dropChar = findDropTarget(x, y, dragging);
         if ( dropChar )
         {
-            // TODO: use target of closest script character containing this
+            // Use target of closest script character containing this
+	    dropChar = dropChar->getClosestASReferenceableAncestor();
             dragging->setDropTarget(dropChar->getTargetPath());
         }
 	else dragging->setDropTarget("");
