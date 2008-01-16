@@ -490,12 +490,8 @@
 
 	* server/asobj/LocalConnection.{cpp,h}:  Use boost::uint8_t
 	instead of char *.
-<<<<<<< ChangeLog
-	
 	* po/Makefile.am: Make the directories before trying to install in
-=======
 	* po/Makefile.am: Make the dircetories before trying to install in
->>>>>>> 1.5396
 	them.
 	* testsuite/libamf.all/test_lc.cpp: New test for LocalConnection
 	base class.
