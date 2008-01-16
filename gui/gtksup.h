@@ -202,6 +202,31 @@ class DSOEXPORT GtkGui : public Gui
 
     static gnash::key::code gdk_to_gnash_key(guint key);
     static int gdk_to_gnash_modifier(int state);
+
+    // A struct containing widgets for passing preference 
+    // data from the dialogue   
+    typedef struct _prefData {
+        GtkWidget *soundToggle;
+        GtkWidget *actionDumpToggle;
+        GtkWidget *parserDumpToggle;
+        GtkWidget *malformedSWFToggle;
+        GtkWidget *ASCodingErrorToggle;
+        GtkWidget *logfileName;
+        GtkWidget *writeLogToggle;
+        GtkWidget *verbosityScale;
+        GtkWidget *localDomainToggle;
+        GtkWidget *localHostToggle;
+        GtkWidget *solReadOnlyToggle;
+        GtkWidget *solLocalDomainToggle;
+        GtkWidget *localConnectionToggle;
+        GtkWidget *lcTraceToggle;
+        GtkWidget *solSandbox;
+#ifdef USE_DEBUGGER
+        GtkWidget *DebuggerToggle;
+#endif
+    } prefData;
+    
+    static void updateRC(GtkWidget* widget, gint response, gpointer data);
     static void open_file(GtkWidget* dialog, gpointer data);
 
 };

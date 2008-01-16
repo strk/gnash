@@ -1,3 +1,9 @@
+2008-01-16 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/gtk{sup.h,.cpp}: redesign preferences dialogue; send changes
+	  to rcfile (nothing gets saved yet, but some changes work without a
+	  restart).
+
 2008-01-16 Sandro Santilli <strk@keybit.net>
 
 	* gui/gui.cpp (getMovieInfo): add class info of hit character.
