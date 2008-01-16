@@ -1,5 +1,10 @@
 2008-01-16 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/shape_test.c: test that clip events
+	  are not invoked for shape placements.
+
+2008-01-16 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-swfc.all/: Makefile.am, button_test1.sc:
 	  initial test for button interaction
 	* server/button_character_instance.{cpp,h}: allow

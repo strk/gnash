@@ -125,7 +125,7 @@ main(int argc, char** argv)
    *
    */
   { /*  using left fill, non-closed paths */
-	SWFDisplayItem it;
+	SWFDisplayItem it1, it2;
 	SWFShape sh = newSWFShape();
 	SWFMovieClip mc = newSWFMovieClip();
 	SWFShape_setLineStyle(sh, 1, 0, 0, 0, 255);
@@ -140,11 +140,38 @@ main(int argc, char** argv)
 	SWFShape_drawLineTo(sh, 30, 20);	/* 7 */
 	SWFShape_drawLineTo(sh, 30, 30);	/* 8 */
 	SWFShape_drawLineTo(sh, 20, 30);	/* 9 */
-	it = SWFMovieClip_add(mc, (SWFBlock)sh);
-	SWFDisplayItem_moveTo(it, 80, 120);
-	SWFDisplayItem_scale(it, 2, 2);
+	it1 = SWFMovieClip_add(mc, (SWFBlock)sh);
+
+	// Test that clip events are not invoked for shapes
+#if 0 // current Ming HEAD chokes if we add an onClipConstruct event... 
+	SWFDisplayItem_addAction(it1, newSWFAction( 
+		"_root.check(false && 'clip event for shape should not be executed');"
+		SWFACTION_CONSTRUCT);
+#endif
+	SWFDisplayItem_addAction(it1, newSWFAction( 
+		"_root.check(false && 'clip event for shape should not be executed');"
+		), SWFACTION_ENTERFRAME);
+	SWFDisplayItem_addAction(it1, newSWFAction( 
+		"_root.check(false && 'clip event for shape should not be executed');"
+		), SWFACTION_ONLOAD);
+	SWFDisplayItem_addAction(it1, newSWFAction( 
+		"_root.check(false && 'clip event for shape should not be executed');"
+		), SWFACTION_UNLOAD);
+	SWFDisplayItem_addAction(it1, newSWFAction( 
+		"_root.check(false && 'clip event for shape should not be executed');"
+		), SWFACTION_MOUSEMOVE);
+	SWFDisplayItem_addAction(it1, newSWFAction( 
+		"_root.check(false && 'clip event for shape should not be executed');"
+		), SWFACTION_MOUSEDOWN);
+	// None of these should be executed
+	SWFDisplayItem_addAction(it1, newSWFAction(
+		"_root.check(false && 'clip event for shape should not be executed');"
+		), SWFACTION_ONLOAD);
+
+	SWFDisplayItem_moveTo(it1, 80, 120);
+	SWFDisplayItem_scale(it1, 2, 2);
 	SWFMovieClip_nextFrame(mc);
-	it = SWFMovie_add(mo, (SWFBlock)mc);
+	it2 = SWFMovie_add(mo, (SWFBlock)mc);
   }
   { /*  using right fill, non-closed paths */
 	SWFDisplayItem it;
