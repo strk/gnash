@@ -21,7 +21,7 @@
 
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
-/* $Id: button_character_instance.h,v 1.29 2008/01/16 10:20:29 strk Exp $ */
+/* $Id: button_character_instance.h,v 1.30 2008/01/16 11:31:07 strk Exp $ */
 
 #ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
 #define GNASH_BUTTON_CHARACTER_INSTANCE_H
@@ -84,6 +84,10 @@ public:
 			character* parent, int id);
 
 	~button_character_instance();
+
+	// See dox in as_object.h
+	bool get_member(string_table::key name, as_value* val, 
+		string_table::key nsname = 0);
 
 	bool can_handle_mouse_event() const { return true; }
 
@@ -171,6 +175,23 @@ protected:
 #endif // GNASH_USE_GC
 
 private:
+
+
+	/// Return any state character whose name matches the given string
+	//
+	/// NOTE: both active and inactive childs are scanned for
+	///
+	/// @param name
+	///	Name to match, search is case sensitive for SWF7 and higher,
+	///     case insensitive up to SWF6.
+	///
+	character * getChildByName(const std::string& name) const;
+
+	/// \brief
+	/// Return version of the SWF containing
+	/// the button definition this is an instance of.
+        int getSWFVersion() const;
+
 	bool m_enabled;
 
 };

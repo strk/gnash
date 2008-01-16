@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.177 2008/01/10 11:44:04 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.178 2008/01/16 11:31:08 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -944,7 +944,7 @@ void	button_character_loader(stream* in, tag_type tag, movie_definition* m)
 	log_parse(_("  button character loader: char_id = %d"), character_id);
     );
 
-    button_character_definition*	ch = new button_character_definition;
+    button_character_definition* ch = new button_character_definition(m);
     ch->read(in, tag, m);
 
     m->add_character(character_id, ch);

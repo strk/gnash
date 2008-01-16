@@ -26,6 +26,7 @@
 // Forward declarations
 namespace gnash {
 	class sprite_instance;
+	class movie_definition;
 }
 
 namespace gnash {
@@ -201,7 +202,11 @@ public:
 
 	boost::scoped_ptr<button_sound_def> m_sound;
 
-	button_character_definition();
+	/// \brief
+	/// Construct a character definition as read from
+	/// the given movie_definition (SWF)
+	button_character_definition(movie_definition* m);
+
 	virtual ~button_character_definition();
 
 	/// Create a mutable instance of our definition.
@@ -236,6 +241,11 @@ public:
     UNUSED(id);
     abort(); // not implemented
   }
+
+	/// \brief
+	/// Return version of the SWF containing
+	/// this button definition.
+	int getSWFVersion() const;
 	
 protected:
 
@@ -257,6 +267,10 @@ protected:
 		if ( m_sound ) m_sound->markReachableResources();
 	}
 #endif // GNASH_USE_GC
+private:
+
+	/// The movie definition containing definition of this button
+	movie_definition* _movieDef;
 };
 
 }	// end namespace gnash

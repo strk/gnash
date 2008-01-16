@@ -1,5 +1,17 @@
 2008-01-16 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfc.all/: Makefile.am, button_test1.sc:
+	  initial test for button interaction
+	* server/button_character_instance.{cpp,h}: allow
+	  accessing button childs (state characters) by name.
+	* server/swf/tag_loaders.cpp (button_character_loader):
+	  properly construct button characters
+	* server/parser/button_character_def.{cpp,h}:
+	  Keep a pointer to the movie_definition containing
+	  Button definitions, expose a getSWFVersion.
+
+2008-01-16 Sandro Santilli <strk@keybit.net>
+
 	* server/: character.h, button_character_instance.h,
 	  edit_text_character.h, sprite_instance.h, video_stream_instance.h:
 	  const-correct wantsInstanceName() and isActionScriptReferenceable()

@@ -35,6 +35,7 @@
 #include "fn_call.h" // for shared ActionScript getter-setters
 #include "GnashException.h" // for shared ActionScript getter-setters
 #include "ExecutableCode.h"
+#include "namedStrings.h"
 
 /** \page buttons Buttons and mouse behaviour
 
@@ -773,24 +774,33 @@ as_object*
 button_character_instance::get_path_element(string_table::key key)
 {
 	as_object* ch = get_path_element_character(key);
+	if ( ch ) return ch;
 
-	if ( ! ch )
+	string name = _vm.getStringTable().value(key);
+	return getChildByName(name); // possibly NULL
+}
+
+character *
+button_character_instance::getChildByName(const std::string& name) const
+{
+	// See if we have a match on the button records list
+	for (size_t i=0, n=m_record_character.size(); i<n; ++i)
 	{
-		string name = _vm.getStringTable().value(key);
-		size_t size = m_record_character.size();
-		
-		// See if we have a match on the button records list
-		// TODO: Should we scan only currently visible characters 
-		// (get_active_characters) ?? 
-		for (size_t i=0; i<size; i++)
+		character* child = m_record_character[i].get();
+		const char* pat_c = child->get_name().c_str();
+		const char* nam_c = name.c_str();
+
+  		if ( _vm.getSWFVersion() >= 7 )
 		{
-			character* child = m_record_character[i].get();
-			if (child->get_name() == name)
-				return child;
+			if (! strcmp(pat_c, nam_c) ) return child;
+		}
+		else
+		{
+			if ( ! strcasecmp(pat_c, nam_c) ) return child;
 		}
 	}
 
-	return ch; // possibly NULL
+	return NULL;
 }
 
 void
@@ -871,6 +881,112 @@ button_character_instance::unload()
 	bool hasUnloadEvent = character::unload();
 
 	return hasUnloadEvent || childsHaveUnload;
+}
+
+bool
+button_character_instance::get_member(string_table::key name_key, as_value* val,
+  string_table::key nsname)
+{
+  // FIXME: use addProperty interface for these !!
+  // TODO: or at least have a character:: protected method take
+  //       care of these ?
+  //       Duplicates code in character::get_path_element_character too..
+  //
+  if (name_key == NSV::PROP_uROOT)
+  {
+
+    // Let ::get_root() take care of _lockroot
+    movie_instance* relRoot = get_root();
+    val->set_as_object( relRoot );
+    return true;
+  }
+
+  // NOTE: availability of _global doesn't depend on VM version
+  //       but on actual movie version. Example: if an SWF4 loads
+  //       an SWF6 (to, say, _level2), _global will be unavailable
+  //       to the SWF4 code but available to the SWF6 one.
+  //
+  if ( getSWFVersion() > 5 && name_key == NSV::PROP_uGLOBAL ) // see MovieClip.as
+  {
+    // The "_global" ref was added in SWF6
+    val->set_as_object( _vm.getGlobal() );
+    return true;
+  }
+
+  const std::string& name = _vm.getStringTable().value(name_key);
+
+  if (name.compare(0, 6, "_level") == 0 && name.find_first_not_of("0123456789", 7) == string::npos )
+  {
+    unsigned int levelno = atoi(name.c_str()+6); // getting 0 here for "_level" is intentional
+    movie_instance* mo = _vm.getRoot().getLevel(levelno).get();
+    if ( mo )
+    {
+      val->set_as_object(mo);
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  // TOCHECK : Try object members, BEFORE display list items
+  //
+  if (get_member_default(name_key, val, nsname))
+  {
+
+// ... trying to be useful to Flash coders ...
+// The check should actually be performed before any return
+// prior to the one due to a match in the DisplayList.
+// It's off by default anyway, so not a big deal.
+// See bug #18457
+#define CHECK_FOR_NAME_CLASHES 1
+#ifdef CHECK_FOR_NAME_CLASHES
+    IF_VERBOSE_ASCODING_ERRORS(
+    if ( getChildByName(name) )
+    {
+      log_aserror(_("A button member (%s) clashes with "
+          "the name of an existing character "
+          "in its display list.  "
+          "The member will hide the "
+          "character"), name.c_str());
+    }
+    );
+#endif
+
+    return true;
+  }
+
+
+  // Try items on our display list.
+  character* ch = getChildByName(name);
+
+  if (ch)
+  {
+      // Found object.
+
+      // If the object is an ActionScript referenciable one we
+      // return it, otherwise we return ourselves
+      if ( ch->isActionScriptReferenceable() )
+      {
+        val->set_as_object(ch);
+      }
+      else
+      {
+        val->set_as_object(this);
+      }
+
+      return true;
+  }
+
+  return false;
+
+}
+
+int
+button_character_instance::getSWFVersion() const
+{
+	return m_def->getSWFVersion();
 }
 
 } // end of namespace gnash

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: button_character_def.cpp,v 1.24 2007/12/29 20:15:25 strk Exp $ */
+/* $Id: button_character_def.cpp,v 1.25 2008/01/16 11:31:07 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -157,11 +157,12 @@ button_record::read(stream* in, int tag_type,
 // button_character_definition
 //
 
-button_character_definition::button_character_definition()
+button_character_definition::button_character_definition(movie_definition* m)
 	:
 	m_min_layer(0),
 	m_max_layer(0),
-	m_sound(NULL)
+	m_sound(NULL),
+	_movieDef(m)
 
 // Constructor.
 {
@@ -446,6 +447,12 @@ button_character_definition::button_sound_info::markReachableResources() const
 	if ( m_sam ) m_sam->setReachable();
 }
 #endif // GNASH_USE_GC
+
+int
+button_character_definition::getSWFVersion() const
+{
+	return _movieDef->get_version();
+}
 
 } // namespace gnash
 
