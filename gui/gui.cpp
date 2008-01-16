@@ -872,7 +872,13 @@ Gui::getMovieInfo() const
     ret->insert(ret->begin(), StringPair("Stage scripts", stage.scriptsDisabled() ? " disabled" : "enabled"));
 
     character* ch = stage.getActiveEntityUnderPointer();
-    ret->insert(ret->begin(), StringPair("Topmost mouse entity", ch ? ch->getTarget() : "NONE" ));
+    std::stringstream ss;
+    if ( ! ch ) ss << "NONE";
+    else
+    {
+        ss << ch->getTarget() << " (" << typeName(*ch) << ")";
+    }
+    ret->insert(ret->begin(), StringPair("Topmost mouse entity", ss.str()));
 
     return ret;
 }
