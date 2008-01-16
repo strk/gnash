@@ -82,12 +82,20 @@
 		check_equals(button3['_root'], _level0);
 		check_equals(button3['_global'], _global);
 		check_equals(button3['_level0'], _root);
+		check_equals(button3['_target'], "/button3");
+		check_equals(button3['_parent'], _root);
 		check_equals(typeof(button3.instance1), 'movieclip');
 		check_equals(typeof(button3.instANce1), 'movieclip'); // case-insensitive
 		check_equals(typeof(button3.instance1.button1), 'object');
 		check_equals(typeof(button3.instance1.button2), 'object');
+		check_equals(button3.instance1['_target'], "/button3/instance1");
+		check_equals(button3.instance1['_parent'], _level0.button3);
 		check_equals(button3.instance1.button1._height, 300);
+		check_equals(button3.instance1.button1['_target'], "/button3/instance1/button1");
+		check_equals(button3.instance1.button1['_parent'], _level0.button3.instance1);
 		check_equals(button3.instance1.button2._height, 200);
+		check_equals(button3.instance1.button2['_target'], "/button3/instance1/button2");
+		check_equals(button3.instance1.button2['_parent'], _level0.button3.instance1);
 
 		endOfTest(); // comment out this line and uncomment the following ones
 		             // when MovieTester-based runners are available, or you 
@@ -115,7 +123,7 @@
 
 	endOfTest = function()
 	{
-		totals(10);
+		totals(18);
 	};
 
 	_global.runNextTest = function()
