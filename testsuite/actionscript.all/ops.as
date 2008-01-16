@@ -20,10 +20,9 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.33 2008/01/15 09:35:11 strk Exp $";
+rcsid="$Id: ops.as,v 1.34 2008/01/16 19:31:48 strk Exp $";
 
 #include "check.as"
-
 
 //--------------------------------------------
 // Equality operator (ACTION_NEWEQUALS : 0x49)
@@ -200,6 +199,9 @@ r = null > undefined;
 //------------------------------------------------
 // Logical AND operator (ACTION_LOGICALAND : 0x10)
 //------------------------------------------------
+
+#ifndef MING_LOGICAL_ANDOR_BROKEN
+
 x = true;
 y = true;
 z = x && y;
@@ -223,7 +225,7 @@ check_equals(z, y);
 x = true;
 y = String("1.999");
 z=x && y;
-check_equals(z, x); 
+check_equals(z, "1.999"); 
 
 x=String("1.999");
 y=true;
@@ -234,7 +236,7 @@ x=String("adcd");
 y=true;
 z=x && y;
 #if OUTPUT_VERSION < 7
-	check_equals(z, false);
+	check_equals(z, "adcd");
 #else
 	check_equals(z, true);
 #endif 
@@ -242,11 +244,7 @@ z=x && y;
 x=true;
 y=String("adcd");
 z=x && y;
-#if OUTPUT_VERSION < 7
-	check_equals(z, false);
-#else
-	check_equals(z, true);
-#endif
+check_equals(z, "adcd");
 
 x=0;
 y=true;
@@ -270,11 +268,19 @@ check_equals(z, y);
 x=String("adcd");
 y=false;
 z=x && y;
-check_equals(z, y); 
+#if OUTPUT_VERSION < 7
+	check_equals(z, "adcd"); 
+#else
+	check_equals(z, false);
+#endif
+
+#endif // ndef MING_LOGICAL_ANDOR_BROKEN
 
 //------------------------------------------------
 // Logical OR operator (ACTION_LOGICALOR : 0x11)
 //------------------------------------------------
+
+#ifndef MING_LOGICAL_ANDOR_BROKEN
 
 x = 0;
 y = 0;
@@ -289,8 +295,7 @@ check_equals(z, y);
 x = 0;
 y = 0.0001;
 z = x || y;
-check(z!=y); 
-check_equals(z, true); 
+check_equals(z, y); 
 
 x = 0;
 y = "abcd";
@@ -307,49 +312,42 @@ x = 0;
 y = String("abcd");
 z = x || y;
 #if OUTPUT_VERSION < 7
-	check_equals(z, false); 
+	check_equals(z, "abcd"); 
 #else
-	check_equals(z, true);
+	check_equals(z, "abcd");
 #endif
 
 x = 0;
 y = new String("abcd");
 z = x || y;
-check_equals(z, true);
+check_equals(z, "abcd");
 
 x = 0;
 y = Object();
 z = x || y;
-check_equals(z, true);
+check_equals(z, y);
 
 x = 0;
 y = new Object();
 z = x || y;
-check_equals(z, true);
+check_equals(z, y);
 
 x = 0;
 y = "0";
 z = x || y;
-#if OUTPUT_VERSION < 7
-	check_equals(z, false);
-#else
-	check_equals(z, true);
-#endif
+check_equals(typeof(z), 'string');
 
 x = 0;
 y = String("0");
 z = x || y;
-#if OUTPUT_VERSION < 7
-	check_equals(z, false);
-#else
-	check_equals(z, true);
-#endif
+check_equals(typeof(z), 'string');
 
 x = 0;
 y = new String("0");
 z = x || y;
-check(z!=y);
-check_equals(z, true);
+check_equals(z, y);
+
+#endif // ndef MING_LOGICAL_ANDOR_BROKEN
 
 //------------------------------------------------
 // String comparison (ACTION_STRINGCOMPARE : 0x29)
@@ -770,7 +768,15 @@ xcheck(y!=NaN);
 check(isNaN(y));
 
 #if OUTPUT_VERSION < 7
- totals(228);
+# ifndef MING_LOGICAL_ANDOR_BROKEN
+ totals(226);
+# else
+ totals(203);
+# endif
 #else
- totals(230);
+# ifndef MING_LOGICAL_ANDOR_BROKEN
+ totals(228);
+# else
+ totals(205);
+# endif
 #endif

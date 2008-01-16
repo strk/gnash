@@ -29,6 +29,9 @@
 #  define MING_SUPPORTS_ASM_TOSTRING
 #  if MING_VERSION_CODE >= 00040005
 #   define MING_SUPPORTS_ASM_TARGETPATH
+#   if MING_VERSION_CODE < 00040006
+#     define MING_LOGICAL_ANDOR_BROKEN
+#   endif
 #  endif
 # endif
 #endif

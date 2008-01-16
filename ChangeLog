@@ -1,3 +1,11 @@
+2008-01-16 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/check.as: add a MING_LOGICAL_ANDOR_BROKEN
+	  macro.
+	* testsuite/actionscript.all/ops.as: don't run logical and/or tests
+	  if the installed Ming version is broken there... Fix expected
+	  results with a sane Ming version.
+
 2008-01-16 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/parser/video_stream_def.cpp: fix size_t format warning.
