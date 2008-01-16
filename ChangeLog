@@ -1,5 +1,10 @@
 2008-01-16 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (processCompletedLoadVariableRequest):
+	  Appropriately case variable names.
+
+2008-01-16 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (loadVariables): oops, skil variables
 	  with *name* starting with dollar sign, not value...
 

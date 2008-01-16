@@ -4020,7 +4020,7 @@ sprite_instance::processCompletedLoadVariableRequest(LoadVariablesThread& reques
       itEnd=vals.end();
     it != itEnd; ++it)
   {
-    const string& name = it->first;
+    const string name = PROPNAME(it->first);
     const string& val = it->second;
     //log_msg(_("Setting variable '%s' to value '%s'"), name.c_str(), val.c_str());
     set_member(st.find(name), val.c_str());
