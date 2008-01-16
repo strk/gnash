@@ -1,5 +1,8 @@
 2008-01-16 Sandro Santilli <strk@keybit.net>
 
+	* gui/Player.cpp: fix confusing SECURITY message about sandbox
+	  appending.
+	* server/impl.cpp: remove dead code.
 	* server/sprite_instance.cpp (processCompletedLoadVariableRequest):
 	  Appropriately case variable names.
 
