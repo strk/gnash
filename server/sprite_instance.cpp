@@ -3966,7 +3966,7 @@ sprite_instance::loadVariables(URL url, short sendVarsMethod)
     {
       std::string name = i->first;
       std::string value = i->second;
-      if ( ! value.empty() && value[0] == '$' ) continue; // see bug #22006
+      if ( ! name.empty() && name[0] == '$' ) continue; // see bug #22006
       url.encode(value);
       
       data += del + name + "=" + value;

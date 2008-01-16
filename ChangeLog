@@ -1,3 +1,8 @@
+2008-01-16 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (loadVariables): oops, skil variables
+	  with *name* starting with dollar sign, not value...
+
 2008-01-15  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* plugin/Makefile.am: Add install-plugin target. Don't do
