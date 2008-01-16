@@ -102,7 +102,7 @@ install: build
 	install -d $(CURDIR)/debian/tmp/usr/lib
 	install -d $(CURDIR)/debian/tmp/usr/lib/mozilla/plugins/
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash
-	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
+	$(MAKE) install install-plugin DESTDIR=$(CURDIR)/debian/tmp
 
 # CREATE PACKAGES
 

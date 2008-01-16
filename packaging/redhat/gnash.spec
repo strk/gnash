@@ -1,4 +1,4 @@
-%define version 20070328
+%define version 20080104
 Name:           gnash
 Version:        cvs%{version}
 Release:        1%{?dist}
@@ -96,16 +96,6 @@ Cygnal is a streaming media server that's Flash aware.
 %ifarch arm
 RPM_TARGET=%{_target}
 %endif
-# Build rpms for an OLPC, which although it's geode based, our
-# toolchain treat this as a stock i386. Our toolchain has geode
-# specific optimizations added, which was properly handled by setting
-# the vendor field of the config triplet to olpc. Since rpm has no
-# concept of a vendor other than Redhat, we force it to use the proper
-# config triplet so configure uses the correct cross compiler.
-%if %{olpc}
-%define _target_platform %{_build_cpu}-%{_build_os}-linux
-RPM_TARGET=i386-olpc-linux
-%endif
 
 %if %{cross_compile}
 # cross building an RPM. This works as long as you have a good cross
@@ -115,7 +105,7 @@ RPM_TARGET=i386-olpc-linux
   CROSS_OPTS="--build=%{_host} --host=$RPM_TARGET --target=$RPM_TARGET"
   RENDERER="--enable-renderer=agg"		# could be opengl
   %ifarch arm
-    SOUND="--disable-media --disable-plugin --disable-klash"
+    SOUND="--enable-media=none --disable-nsapi --disable-kparts"
   %else
     SOUND="--enable-media=gst"			# could also be sdl
   %endif
@@ -123,8 +113,9 @@ RPM_TARGET=i386-olpc-linux
 # targeted towards Fedora Core 6. The machine itself is too limited to
 # build RPMs on, so we do it this way.
   %if olpc
-    CROSS_OPTS="$CROSS_OPTS --disable-klash --disable-menus"
-    SOUND="--enable-media=mad --disable-static"
+    CROSS_OPTS="$CROSS_OPTS --disable-kparts --disable-menus"
+    SOUND="--enable-media=ffmpeg"
+    GUI="--enable-gui=gtk"
     RENDERER="$RENDERER --with-pixelformat=RGB565"
   %endif
 %else
@@ -139,33 +130,35 @@ RPM_TARGET=i386-olpc-linux
 # export CONFIG_SHELL="sh -x"
 # sh -x ./configure \
 %if %{cross_compile}
-%configure --disable-static --with-plugindir=%{_libdir}/mozilla/plugins \
+%configure --enable-static \
 	$CROSS_OPTS \
-	$SOUND \
+	$SOUND $GUI \
 	$RENDERER \
 	--disable-dependency-tracking --disable-rpath \
 	--with-plugindir=%{_libdir}/mozilla/plugins
  
-make %{?_smp_mflags} CXXFLAGS="-g" dumpconfig all
+make %{?_smp_mflags} dumpconfig all
 %else
 ./configure \
 	--with-qtdir=$QTDIR \
 	$CROSS_OPTS \
 	$SOUND \
 	$RENDERER \
-	--disable-static \
+	--enable-static \
+	--enable-shared \
 	--disable-dependency-tracking \
 	--disable-rpath \
-	--enable-extensions \
+	--disable-cygnal \
         --prefix=%{_prefix} \
 	--with-plugindir=%{_libdir}/mozilla/plugins
 
-make CXXFLAGS="-g" dumpconfig all
+make dumpconfig all
 %endif
 
 %install
+strip gui/.libs/*-gnash utilities/.libs/dumpshm  utilities/.libs/g*  utilities/.libs/soldumper
 rm -rf $RPM_BUILD_ROOT
-make install DESTDIR=$RPM_BUILD_ROOT
+make install install-plugin DESTDIR=$RPM_BUILD_ROOT
 rm $RPM_BUILD_ROOT%{_libdir}/*.la
 %if !%{cross_compile}
 rm -rf $RPM_BUILD_ROOT%{_localstatedir}/scrollkeeper
@@ -200,6 +193,8 @@ scrollkeeper-update -q || :
 %{_bindir}/gnash
 %{_bindir}/gparser
 %{_bindir}/gprocessor
+%{_bindir}/soldumper
+%{_bindir}/dumpshm
 %{_libdir}/libgnash*.so
 %{_libdir}/mozilla/plugins/*.so
 %{_libdir}/libltdl*

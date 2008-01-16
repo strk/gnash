@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.65 2008/01/05 01:27:01 strk Exp $
+# $Id: Makefile.am,v 1.66 2008/01/16 00:42:55 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -91,5 +91,21 @@ libgnashplugin_la_LDFLAGS = -avoid-version -L$(plugindir)
 else
 libgnashplugin_la_LDFLAGS = -module -avoid-version -L$(plugindir)
 endif
-
 endif
+
+install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
+	@echo "Nothing to install here now."
+	@echo "Use \"make install-plugin\" to install the Firefox plugin to $(DESTDIR)$(plugindir)."
+
+install-plugin: $(plugin_LTLIBRARIES)
+	@test -d "$(DESTDIR)$(plugindir)" || $(mkinstalldirs) "$(DESTDIR)$(plugindir)"
+	@echo "Installing plugin to $(DESTDIR)$(plugindir)"
+	@if test -d .libs; then \
+	  cp -f .libs/libgnashplugin.so $(DESTDIR)$(plugindir)/libgnashplugin.so; \
+	else \
+	  cp -f libgnashplugin.so $(DESTDIR)$(plugindir)/libgnashplugin.so; \
+	fi
+
+uninstall-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
+	$(RM) -f $(DESTDIR)$(plugindir)/libgnashplugin.so
+

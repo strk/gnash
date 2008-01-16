@@ -1,3 +1,14 @@
+2008-01-15  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* plugin/Makefile.am: Add install-plugin target. Don't do
+	anything for just the install target.
+	* packaging/debian/rules: Add install-plugin.
+	* packaging/redhat/gnash.spec: Add install-plugin.
+	* macros/boost.m4: Change the sed pattern to always remove the
+	suffix correctly. Fixes #21977.
+	* macros/lib-link.m4, nls.m4: Remove usages of AC_CONFIG_AUX_DIR
+	macro, as we don't use an aux dir.
+
 2008-01-15 Sandro Santilli <strk@keybit.net>
 
 	* libamf/: element.{cpp,h}, lcshm.{cpp,h}, sol.{cpp,h},
@@ -474,7 +485,12 @@
 
 	* server/asobj/LocalConnection.{cpp,h}:  Use boost::uint8_t
 	instead of char *.
+<<<<<<< ChangeLog
+	
+	* po/Makefile.am: Make the directories before trying to install in
+=======
 	* po/Makefile.am: Make the dircetories before trying to install in
+>>>>>>> 1.5396
 	them.
 	* testsuite/libamf.all/test_lc.cpp: New test for LocalConnection
 	base class.
