@@ -21,7 +21,7 @@
 
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
-/* $Id: button_character_instance.h,v 1.28 2007/12/10 20:17:16 strk Exp $ */
+/* $Id: button_character_instance.h,v 1.29 2008/01/16 10:20:29 strk Exp $ */
 
 #ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
 #define GNASH_BUTTON_CHARACTER_INSTANCE_H
@@ -120,7 +120,7 @@ public:
 	///
 	virtual character* get_topmost_mouse_entity(float x, float y);
 	
-	virtual bool wantsInstanceName()
+	virtual bool wantsInstanceName() const
 	{
 		return true; // buttons can be referenced 
 	}

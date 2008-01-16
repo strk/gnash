@@ -75,7 +75,7 @@ public:
 
 	character* get_topmost_mouse_entity(float x, float y);
 	
-	bool wantsInstanceName()
+	bool wantsInstanceName() const
 	{
 		return true; // text fields can be referenced 
 	}	

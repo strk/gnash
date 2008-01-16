@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_instance.h,v 1.24 2007/12/10 20:17:18 strk Exp $
+// $Id: video_stream_instance.h,v 1.25 2008/01/16 10:20:29 strk Exp $
 
 #ifndef GNASH_VIDEO_STREAM_INSTANCE_H
 #define GNASH_VIDEO_STREAM_INSTANCE_H
@@ -67,7 +67,7 @@ public:
 	void	display();
 
 	// For sure isActionScriptReferenceable...
-	bool wantsInstanceName()
+	bool wantsInstanceName() const
 	{
 		return true; // text fields can be referenced 
 	}	

@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.119 2007/12/26 12:35:13 strk Exp $ */
+/* $Id: character.h,v 1.120 2008/01/16 10:20:29 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -974,18 +974,32 @@ public:
 
 	/// Returns true when the object (type) should get a instance name even 
 	/// if none is provided manually.
-	virtual bool wantsInstanceName()
+	virtual bool wantsInstanceName() const
 	{
 		return false; 
 	}
 
 	/// Returns true when the object (type) can be referenced by ActionScipt
-	bool isActionScriptReferenceable()
+	bool isActionScriptReferenceable() const
 	{
 		// The way around
 		// [ wantsInstanceName() returning isActionScriptReferenceable() ]
 		// would be cleaner, but I wouldn't want to touch all files now.
 		return wantsInstanceName();
+	}
+
+	/// Returns the closest as-referenceable ancestor
+	character* getClosestASReferenceableAncestor() 
+	{
+		if ( isActionScriptReferenceable() ) return this;
+		assert(m_parent);
+		return m_parent->getClosestASReferenceableAncestor();
+	}
+
+	const character* getClosestASReferenceableAncestor() const
+	{
+		character* nonconst_this = const_cast<character*>(this);
+		return nonconst_this->getClosestASReferenceableAncestor();
 	}
 
 	/// @}

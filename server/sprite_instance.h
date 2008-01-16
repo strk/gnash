@@ -254,7 +254,7 @@ public:
         return _droptarget;
     }
 	
-	virtual bool wantsInstanceName()
+	virtual bool wantsInstanceName() const
 	{
 		return true; // sprites can be referenced 
 	}

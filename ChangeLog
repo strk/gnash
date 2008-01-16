@@ -1,5 +1,12 @@
 2008-01-16 Sandro Santilli <strk@keybit.net>
 
+	* server/: character.h, button_character_instance.h,
+	  edit_text_character.h, sprite_instance.h, video_stream_instance.h:
+	  const-correct wantsInstanceName() and isActionScriptReferenceable()
+	  virtual methods. Added a getClosestASReferenceableAncestor() method.
+
+2008-01-16 Sandro Santilli <strk@keybit.net>
+
 	* gui/Player.cpp: fix confusing SECURITY message about sandbox
 	  appending.
 	* server/impl.cpp: remove dead code.
