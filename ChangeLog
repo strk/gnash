@@ -9,7 +9,7 @@
 2008-01-16 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/parser/video_stream_def.cpp: fix size_t format warning.
-	* libbase/rc.cpp: fix variable name for OSX.
+	* libbase/rc.cpp: fix variable name for OS2.
 	* gui/gtk{sup.h,.cpp}: redesign preferences dialogue; send changes
 	  to rcfile (nothing gets saved yet, but some changes work without a
 	  restart).
