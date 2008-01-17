@@ -34,7 +34,7 @@ dnl   )
     AC_ARG_WITH(plugindir, [],
 	[ AC_MSG_WARN([--with-plugindir is obsoleted, use --with-npapi-plugindir instead]); FIREFOX_PLUGINS=$withval])
 
-    AC_ARG_WITH(plugindir,
+    AC_ARG_WITH(npapi-plugindir,
 	AC_HELP_STRING([--with-npapi-plugindir=DIR], [Directory to install NPAPI plugin in]),
 	[FIREFOX_PLUGINS=$withval]
     )
