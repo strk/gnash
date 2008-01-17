@@ -442,13 +442,13 @@ button_character_instance::get_topmost_mouse_entity(float x, float y)
 {
 	if ( (!get_visible()) || (!get_enabled()))
 	{
-		return false;
+		return 0;
 	}
 
 	// Find hit characters
 	std::vector<character*> hitChars;
 	get_active_characters(hitChars, HIT);
-	if ( hitChars.empty() ) return false;
+	if ( hitChars.empty() ) return 0;
 
 	// point is in parent's space,
 	// we need to convert it in world space
@@ -461,8 +461,7 @@ button_character_instance::get_topmost_mouse_entity(float x, float y)
 
 	for (size_t i=0, e=hitChars.size(); i<e; ++i)
 	{
-		character* ch = m_record_character[i].get();
-		if ( ! ch ) continue;
+		character* ch = hitChars[i];
 
 		if ( ch->pointInVisibleShape(wp.x, wp.y) )
 		{
