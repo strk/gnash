@@ -151,7 +151,7 @@ main(int argc, char** argv)
   check_equals(mo, "_root.x5", "1");
   check_equals(mo, "_root.x6", "_root.mc1");
   check_equals(mo, "_root.x7", "1");
-  xcheck_equals(mo, "_root.x8", "1");
+  check_equals(mo, "_root.x8", "1");
   
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); 

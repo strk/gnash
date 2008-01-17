@@ -226,6 +226,7 @@ getsetproperty-target-5.swf:03e0f34befd1de66083128dd7810d211
 getsetproperty-target-6.swf:cd70c0eac0ac31400859178f7d877fe1
 getsetproperty-target-7.swf:d7d730794e6318c1b69a7e946cb2fedd
 getsetproperty-target-8.swf:b558d97e246e9ed2b90969d96f3e0fcc
+getvariable-delimiters-5.swf:4d0d118364bf68f0cb3b24848b6eaff7
 getvariable-dotdot-5.swf:68529abcc9f149593f50dfacb3f8656e
 getvariable-dotdot-6.swf:becc7079e65bcf47fe2ab0293bbc2c29
 getvariable-dotdot-7.swf:efa5597fe3e61764b6ee937f87d8cf1b
@@ -236,6 +237,10 @@ getvariable-slashpath-6.swf:17d6ee6ddb15296e887944d7c7c45432
 getvariable-slashpath-7.swf:499213312255eba3746c4ff6b7b4782d
 getvariable-slashpath-8.swf:19df043ceda9c1db9efbd185bb5ae2cb
 getvariable-special-5.swf:4baac55533a4cc67a3419dafb97cc888
+getvariable-various-5.swf:a79d72c6daacf8d745aba5c194edf998
+getvariable-various-6.swf:1488b4d8e200bcad7027ae618a6c08d2
+getvariable-various-7.swf:d8a5c5449de5bcc427877c655033811e
+getvariable-various-8.swf:7211050a012850e666db0fa4032abc72
 glow-filter-properties-5.swf:10d87d4cbd9c1f4c41a817f67cf3f530
 glow-filter-properties-5.swf:b3d05908aaa98c7115ec1727d695a16a
 goto1.swf:6f35a27cb3aee7f282eccb3b16290c70
@@ -329,6 +334,9 @@ netstream-fscommand-6.swf:7151ee0808f01d502171c4813d38d3fa
 netstream-fscommand-7.swf:ec9312835ba2e8a7347252bcaef7db0b
 netstream-fscommand-8.swf:38f05e4f8d3a4e2faae0ef9e18e7754b
 newobject-paths-5.swf:7fe3f8dd1f89838358ba5e92417ac888
+newobject-paths-6.swf:e2e207b7b6966fdffd3a0017cdbf2f1c
+newobject-paths-7.swf:e8af4c2cd51e1b3c5e7ab3121386d0ba
+newobject-paths-8.swf:fc8407413a00bf2e41e27db7e7ec8c9f
 object-ispropertyenumerable-5.swf:775ef8e8b0ec09d72adec0bdf64b282e
 object-math-5.swf:2d509f7b6e94776a2208fcbec80b7a67
 object-math-6.swf:bdf73b4bfb144113a80ff78a282558d7

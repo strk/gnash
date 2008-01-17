@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: getvariable.as,v 1.22 2008/01/17 18:34:36 strk Exp $";
+rcsid="$Id: getvariable.as,v 1.23 2008/01/17 22:09:12 strk Exp $";
 
 #include "check.as"
 
@@ -315,7 +315,7 @@ asm {
         push 'yes4'
         setvariable
 };
-xcheck_equals(obj.variable_in_object, 'yes4');
+check_equals(obj.variable_in_object, 'yes4');
 
 // NOTE: 'obj:::variable_in_object' is invalid, while
 //       'obj::variable_in_object' is valid - AARagagag
@@ -324,7 +324,7 @@ asm {
         push 'yes5'
         setvariable
 };
-xcheck_equals(obj.variable_in_object, 'yes4');
+check_equals(obj.variable_in_object, 'yes4');
 
 //---------------------------------------------------------------------
 // Check 'mc1:variable_in_object' access 
@@ -532,7 +532,7 @@ asm {
 	getvariable
         setvariable
 };
-xcheck_equals(objmemb, 4);
+check_equals(objmemb, 4);
 
 //-----------------------------------------------------------------------
 // Check '::obj::member' access 
@@ -545,7 +545,7 @@ asm {
 	getvariable
         setvariable
 };
-xcheck_equals(objmemb, 4.4);
+check_equals(objmemb, 4.4);
 
 //-----------------------------------------------------------------------
 // Check '::obj.member' access 
@@ -558,7 +558,7 @@ asm {
 	getvariable
         setvariable
 };
-xcheck_equals(objmemb, 4);
+check_equals(objmemb, 4);
 
 //-----------------------------------------------------------------------
 // Check 'this/:member' access  (and deletion)

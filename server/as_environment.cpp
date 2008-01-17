@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.119 2008/01/10 17:34:45 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.120 2008/01/17 22:09:12 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -97,7 +97,7 @@ as_environment::get_variable(const std::string& varname,
     else
     {
 	// TODO: have this checked by parse_path as an optimization 
-	if ( varname.find_first_of('/') != string::npos )
+	if ( varname.find_first_of('/') != string::npos && varname.find_first_of(':') == string::npos )
 	{
 		// Consider it all a path ...
         	as_object* target = find_object(varname, &scopeStack); 
@@ -119,13 +119,42 @@ as_environment::get_variable(const std::string& varname) const
 	return get_variable(varname, empty_scopeStack);
 }
 
+static bool validRawVariableName(const std::string& varname)
+{
+	// check raw variable name validity
+	const char* ptr = varname.c_str();
+	for (;;)
+	{
+		ptr = strchr(ptr, ':');
+		if ( ! ptr ) break;
+
+		int num=1;
+		while (*(++ptr) == ':') ++num;
+		if (num>2) 
+		{
+			//log_debug("Invalid raw variable name...");
+			return false;
+		}
+	} 
+
+	return true;
+}
+
 as_value
 as_environment::get_variable_raw(
     const std::string& varname,
     const ScopeStack& scopeStack, as_object** retTarget) const
     // varname must be a plain variable name; no path parsing.
 {
-    assert(strchr(varname.c_str(), ':') == NULL);
+    //assert(strchr(varname.c_str(), ':') == NULL);
+
+	if ( ! validRawVariableName(varname) )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("Won't get invalid raw variable name: %s"), varname.c_str());
+		);
+		return as_value();
+	}
 
     as_value    val;
 
@@ -305,6 +334,14 @@ as_environment::set_variable_raw(
     const ScopeStack& scopeStack)
 {
 
+	if ( ! validRawVariableName(varname) )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("Won't set invalid raw variable name: %s"), varname.c_str());
+		);
+		return;
+	}
+
     VM& vm = VM::get();
     int swfVersion = vm.getSWFVersion();
     string_table& st = vm.getStringTable();
@@ -322,15 +359,6 @@ as_environment::set_variable_raw(
             if (obj && obj->update_member(varkey, val).first )
             {
 		return;
-#if 0
-		Property* prop = obj->findUpdatableProperty(varkey);
-		if ( prop )
-		{
-			//prop->setValue(*obj, val);
-			obj->set_member(varkey, val);
-			return;
-		}
-#endif
             }
         }
 
@@ -350,15 +378,6 @@ as_environment::set_variable_raw(
             if (obj && obj->update_member(varkey, val).first )
             {
 		return;
-#if 0
-		Property* prop = obj->findUpdatableProperty(varkey);
-		if ( prop )
-		{
-			//prop->setValue(*obj, val);
-			obj->set_member(varkey, val);
-			return;
-		}
-#endif
             }
         }
 
@@ -420,47 +439,52 @@ as_environment::declare_local(const std::string& varname)
 
 /* public static */
 bool
-as_environment::parse_path(const std::string& var_path,
+as_environment::parse_path(const std::string& var_path_in,
 		std::string& path, std::string& var)
 {
-//log_msg(_("parse_path(%s)"), var_path.c_str());
-    // Search for colon.
-    int	colon_index = 0;
-    int	var_path_length = var_path.length();
-    for ( ; colon_index < var_path_length; colon_index++) {
-	if (var_path[colon_index] == ':') {
-	    // Found it.
-	    break;
-	}
-    }
-    
-    if (colon_index >= var_path_length)	{
-//log_debug(_(" no colon in path"));
-	// No colon.  Is there a '.'?  Find the last
-	// one, if any.
-	for (colon_index = var_path_length - 1; colon_index >= 0; colon_index--) {
-	    if (var_path[colon_index] == '.') {
-		// Found it.
-		break;
-	    }
-	}
-	if (colon_index < 0) {
-//log_debug(_(" no dot in path"));
-	    return false;
-	}
-    }
-    
-    // Make the subparts.
-    
-    // Var
-    var = &var_path[colon_index + 1];
-    
-    // Path
-    path.assign(var_path, 0, colon_index);
-    
-//log_debug(_(" path=%s var=%s"), path.c_str(), var.c_str());
+#ifdef DEBUG_TARGET_FINDING 
+	log_debug("parse_path(%s)", var_path_in.c_str());
+#endif
 
-    return true;
+	size_t lastDotOrColon = var_path_in.find_last_of(":.");
+	if ( lastDotOrColon == string::npos ) return false;
+
+	string thePath, theVar;
+
+	thePath.assign(var_path_in, 0, lastDotOrColon);
+	theVar.assign(var_path_in, lastDotOrColon+1, var_path_in.length());
+
+#ifdef DEBUG_TARGET_FINDING 
+	log_debug("path: %s, var: %s", thePath.c_str(), theVar.c_str());
+#endif
+
+	if ( thePath.empty() ) return false;
+
+	// this check should be performed by callers (getvariable/setvariable in particular)
+	size_t pathlen = thePath.length();
+	size_t i = pathlen-1;
+	size_t contiguoscommas = 0;
+	while ( i && thePath[i--] == ':' )
+	{
+		if ( ++contiguoscommas > 1 )
+		{
+#ifdef DEBUG_TARGET_FINDING 
+			log_debug("path '%s' ends with too many colon chars, not considering a path", thePath.c_str());
+#endif
+			return false;
+		}
+	}
+
+#ifdef DEBUG_TARGET_FINDING 
+	log_debug("contiguoscommas: %d", contiguoscommas);
+#endif
+
+	//if ( var.empty() ) return false;
+
+	path = thePath;
+	var = theVar;
+
+	return true;
 }
 
 bool
