@@ -27,6 +27,7 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 #include <sys/shm.h>		// for key_t
 
 namespace gnash {
@@ -81,6 +82,7 @@ public:
     
     void setDebugLog(std::string &x) { _log = x; }
     const std::string& getDebugLog() const { return _log; }
+
     void setDocumentRoot(std::string &x) { _wwwroot = x; }
     std::string getDocumentRoot() { return _wwwroot; }
     
@@ -140,9 +142,6 @@ public:
         _localSandboxPath = path;
     }
 
-    // Get the location of the sandbox for .sol files
-    const std::string &getSOLSafeDir() const { return _solsandbox; }
-
     /// Get the URL opener command format
     //
     /// The %u label will need to be substituted by the actual url
@@ -152,6 +151,9 @@ public:
     {
         return _urlOpenerFormat;
     }
+
+    // Get the location of the sandbox for .sol files
+    const std::string &getSOLSafeDir() const { return _solsandbox; }
 
     // Set the location of the sandbox for .sol files
     void setSOLSafeDir(std::string &x) { _solsandbox = x; }
@@ -251,6 +253,10 @@ private:
     bool _lcdisabled;
     bool _lctrace;
     key_t _lcshmkey;
+
+    // A function only for writing lists to an outstream.
+    void writeList(std::vector<std::string>& list, std::ostream& o);
+
 protected:
     
     /// Construct only by getDefaultInstance()

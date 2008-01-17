@@ -1,3 +1,10 @@
+2008-01-17 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/rc.{h,cpp}: enable writing of rcfiles (updateFile). Add function
+	  to set malformedSWF verbosity (already declared in rc.h). Add convenience
+	  function for writing path lists to a stream. Make sure strings consisting
+	  entirely of spaces are emptied when reading from the rcfile.
+
 2008-01-17 Sandro Santilli <strk@keybit.net>
 
 	* server/button_character_instance.cpp (get_topmost_mouse_entity):

@@ -67,14 +67,15 @@ RcInitFile::RcInitFile() : _delay(0),
                            _debug(false),
                            _debugger(false),
                            _verbosity(-1),
-                           // will be reset to something else if __OS2__x is defined
+                           // will be reset to something else if __OS2__x is defined:
                            _urlOpenerFormat("firefox -remote 'openurl(%u)'"),
                            _flashVersionString(
 				DEFAULT_FLASH_PLATFORM_ID" "\
 				DEFAULT_FLASH_MAJOR_VERSION","\
 				DEFAULT_FLASH_MINOR_VERSION","\
 				DEFAULT_FLASH_REV_NUMBER ",0"),
-                           _flashSystemOS(), 
+		           // An empty string leaves detection to VM.cpp:
+                           _flashSystemOS(""),
                            _flashSystemManufacturer("Gnash "DEFAULT_FLASH_SYSTEM_OS),
                            _actionDump(false),
                            _parserDump(false),
@@ -326,6 +327,16 @@ RcInitFile::expandPath (std::string& path)
 
 }
 
+void
+RcInitFile::writeList (std::vector<std::string>& list, std::ostream& o)
+{
+    for (std::vector<std::string>::const_iterator it = list.begin();
+    	it != list.end(); ++it) {
+    	    o << *it << " ";
+    	}
+    o << endl;
+}
+
 // Parse the config file and set the variables.
 bool
 RcInitFile::parseFile(const std::string& filespec)
@@ -337,7 +348,7 @@ RcInitFile::parseFile(const std::string& filespec)
     string value;
     ifstream in;
 
-	StringNoCaseEqual noCaseCompare;
+    StringNoCaseEqual noCaseCompare;
     
 //  log_msg ("Seeing if %s exists", filespec);
     if (filespec.size() == 0) {
@@ -381,8 +392,10 @@ RcInitFile::parseFile(const std::string& filespec)
             getline(in, value);
 
 	    // Erase leading spaces.
-            string::size_type position = value.find_first_not_of(' ');
-            if(position != string::npos) value.erase(0, position);
+            // If there are nothing but spaces in the value,
+            // e.g. "set writelog ", value should be an empty string,
+            // so value.erase(0, string::npos) is correct.
+            value.erase(0, value.find_first_not_of(' '));
 
             if (noCaseCompare(action, "set") || noCaseCompare(action, "append") ) {
 
@@ -495,10 +508,116 @@ RcInitFile::parseFile(const std::string& filespec)
 
 // Write the changed settings to the config file
 bool
-RcInitFile::updateFile(const std::string& /* filespec */)
+RcInitFile::updateFile(const std::string& filespec)
 {
-    cerr << __PRETTY_FUNCTION__ << "ERROR: unimplemented!" << endl;
-    return false;
+
+    if (filespec == "") {
+        return false;
+    }
+
+    ofstream out;
+    
+    out.open(filespec.c_str());
+        
+    if (!out) {
+        log_error(_("Couldn't open file %s for writing"), filespec.c_str());
+        return false;
+    }
+
+    std::string cmd = "set ";
+
+    // Bools and numbers. We want boolean values written as words.
+    out << boolalpha <<
+    cmd << "splash_screen " << _splashScreen << endl <<
+    cmd << "localHost " << _localhostOnly << endl <<
+    cmd << "localDomain " << _localdomainOnly << endl <<
+    cmd << "insecureSSL " << _insecureSSL << endl <<
+    cmd << "debugger " << _debugger << endl <<
+    cmd << "actionDump " << _actionDump << endl <<
+    cmd << "parserDump " << _parserDump << endl <<
+    cmd << "writeLog " << _writeLog << endl <<
+    cmd << "sound " << _sound << endl <<
+    cmd << "pluginSound " << _pluginSound << endl <<
+    cmd << "ASCodingErrorsVerbosity " << _verboseASCodingErrors << endl <<
+    cmd << "malformedSWFVerbosity " << _verboseMalformedSWF << endl <<
+    cmd << "enableExtensions " << _extensionsEnabled << endl <<
+    cmd << "startStopped " << _startStopped << endl <<
+    cmd << "streamsTimeout " << _streamsTimeout << endl <<
+    cmd << "movieLibraryLimit " << _movieLibraryLimit << endl <<
+    cmd << "delay " << _delay << endl <<
+    cmd << "verbosity " << _verbosity << endl <<
+    cmd << "solReadOnly " << _solreadonly << endl <<
+    cmd << "localConnection " << _lcdisabled << endl <<
+    cmd << "LCTrace " << _lctrace << endl <<
+    cmd << "LCShmkey " << _lcshmkey << endl;
+   
+    // Strings.
+    // VM.cpp checks whether flashSystemOS is set in order to decide
+    // whether to send the detected value, so it's best not to write
+    // them at all if they are set to "". Gnash then defaults to the
+    // values set in the constructor.
+    
+    // This might be irritating for users who, for instance, set
+    // debuglog to nothing, only to find it returns to "gnash-debug.log"
+    // at the next run (even though that's not the way to use it...)
+    
+    if (_log != "") {
+        out << cmd << "debuglog " << _log << endl;
+    }
+
+    if (_wwwroot != "") {
+        out << cmd << "documentroot " << _wwwroot << endl;
+    }
+    
+    if (_flashSystemOS != "") {
+        out << cmd << "flashSystemOS " << _flashSystemOS << endl;
+    }
+
+    if (_flashVersionString != "") {
+        out << cmd << "flashVersionString " << _flashVersionString << endl;
+    }
+
+    if (_urlOpenerFormat != "") {
+        out << cmd << "urlOpenerFormat " << _urlOpenerFormat << endl;
+    }
+
+    if (_solsandbox != "") {
+        out << cmd << "SOLSafeDir " << _solsandbox << endl;
+    }
+
+    // Lists. These can't be handled very well at the moment. The main
+    // inconvenience would be that disabling a list makes it an empty
+    // array in the rc class, and writing that to a file would lose that
+    // blacklist you'd spent ages collecting.
+    //
+    // For now we'll just make sure lists that gnashrc finds are written.
+    // Commented out lists in gnashrc will be deleted!
+    //
+    // The difference between append and set also can't be used without
+    // a bit of trickery. It would be possible, for instance, to pass a
+    // special character (e.g. '+') as the first element of an array from
+    // the gui. However, this is possibly not all that useful anyway,
+    // as lists in other parsed rcfiles would be taken over and written
+    // as part of the new file.
+    //
+    // It might be necessary to have a 'useWhitelist' flag as well
+    // as a whitelist. This would allow rcfile to keep a whitelist and write
+    // it to disk, but not have to use it.
+    
+    out << cmd << "whitelist ";
+    writeList (_whitelist, out);
+
+    out << cmd << "blacklist ";
+    writeList (_blacklist, out);
+    
+    // This also adds the base URL of the current SWF, as that gets
+    // added to the path automatically...
+    //out << cmd << "localSandboxPath ";
+    //writeList (_localSandboxPath, out);
+
+    out.close();
+    
+    return true;
 }
 
 void
@@ -535,6 +654,18 @@ RcInitFile::showASCodingErrors(bool value)
 //    GNASH_REPORT_FUNCTION;
     
     _verboseASCodingErrors = value;
+    
+    if (value) {
+        _verbosity++;
+    }
+}
+
+void
+RcInitFile::showMalformedSWFErrors(bool value)
+{
+//    GNASH_REPORT_FUNCTION;
+    
+    _verboseMalformedSWF = value;
     
     if (value) {
         _verbosity++;
@@ -598,9 +729,14 @@ RcInitFile::dump()
     if (_flashVersionString.size()) {
         cerr << "\tFlash Version String is: " << _flashVersionString << endl;
     }
+    cerr << "\tWhitelist: ";
+    writeList (_whitelist, cerr);
     
-//     std::vector<std::string> _whitelist;
-//     std::vector<std::string> _blacklist;
+    cerr << "\tBlacklist: ";
+    writeList (_blacklist, cerr);
+    
+    cerr << "\tSandbox: ";
+    writeList (_localSandboxPath, cerr);
 }
 
 
