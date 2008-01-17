@@ -1,5 +1,14 @@
 2008-01-17 Sandro Santilli <strk@keybit.net>
 
+	* server/button_character_instance.cpp (get_topmost_mouse_entity):
+	  topmost entity is a child, if it's a mouse entity, not necessarely
+	  us.
+	* testsuite/misc-swfc.all/: Makefile.am, button_test1.sc,
+	  button_test1runner.cpp: turn button_test1.swf into a self-contained
+	  interactive test.
+
+2008-01-17 Sandro Santilli <strk@keybit.net>
+
 	* server/button_character_instance.{cpp,h}: drop the :advance()
 	  method, no more needed; reduce ::display() to a few lines.
 

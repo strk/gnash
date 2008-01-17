@@ -398,8 +398,37 @@ button_character_instance::get_topmost_mouse_entity(float x, float y)
 		return 0;
 	}
 
+	//-------------------------------------------------
+	// Check our active and visible childrens first
+	//-------------------------------------------------
+
+	typedef std::vector<character*> Chars;
+	Chars actChars;
+	get_active_characters(actChars);
+
+	if ( ! actChars.empty() )
+	{
+		std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
+
+		matrix  m = get_matrix();
+		point p;
+		m.transform_by_inverse(&p, point(x, y));
+
+		for (Chars::reverse_iterator it=actChars.rbegin(), itE=actChars.rend(); it!=itE; ++it)
+		{
+			character* ch = *it;
+			if ( ! ch->get_visible() ) continue;
+			character *hit = ch->get_topmost_mouse_entity(p.x, p.y);
+			if ( hit ) return hit;
+		}
+	}
+
+	//-------------------------------------------------
+	// If that failed, check our hit area
+	//-------------------------------------------------
+
 	// Find hit characters
-	std::vector<character*> hitChars;
+	Chars hitChars;
 	get_active_characters(hitChars, HIT);
 	if ( hitChars.empty() ) return 0;
 

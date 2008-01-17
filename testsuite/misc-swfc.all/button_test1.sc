@@ -25,12 +25,13 @@
     .end
 
 .box rbox width=200 height=300 fill=#FF0000 color=#000000
+.box ybox_small width=100 height=150 fill=#FFFF00 color=#000000
 .box gbox width=200 height=200 fill=#00FF00 color=#000000
 
 .button button1
 	.show rbox as=idle
-	.show rbox as=area
-	.show rbox as=hover
+	.show ybox_small as=area
+	.show ybox_small as=hover
 	.show rbox as=pressed
 	.on_press:
 		trace("red box");	
@@ -55,7 +56,7 @@
 
 .sprite buttonContainer
 	.put button2 pin=center x=0 y=0 scalex=100% scaley=100% 
-	.put button1 pin=center x=20 y=20 scalex=100% scaley=100% alpha=50
+	.put button1 pin=center x=20 y=20 scalex=100% scaley=100% alpha=100%
 .end
 
 .button button3
@@ -70,7 +71,7 @@
 .end
 
 //.put buttonContainer pin=center x=200 y=200 scalex=100% scaley=100% 
-.put button3 pin=center x=200 y=300 scalex=100% scaley=50% alpha=50%
+.put button3 pin=center x=200 y=300 scalex=100% scaley=50% alpha=100%
 
 .frame 1
 .action:
@@ -97,18 +98,22 @@
 		check_equals(button3.instance1.button2['_target'], "/button3/instance1/button2");
 		check_equals(button3.instance1.button2['_parent'], _level0.button3.instance1);
 
-		endOfTest(); // comment out this line and uncomment the following ones
-		             // when MovieTester-based runners are available, or you 
-		             // intend to run the test manually
-		//note("1. Press on the green box.");
-		//nexttest = test2;
+// Define this when MovieTester-based runners are available, or you 
+// intend to run the test manually
+#define MOVIETESTER_BASED
+#ifndef MOVIETESTER_BASED
+		endOfTest();
+#else
+		note("1. Click on the visible part of the green box.");
+		nexttest = test2;
+#endif
 	};
 
 	test2 = function()
 	{
 		check_equals(button3.instance1.button1._height, 300);
 		check_equals(button3.instance1.button2._height, 400);
-		note("2. Press on the red box, where it overlaps with the green one.");
+		note("2. Now move your mouse on the top-left area of the red box (the box will become yellow), and click where it overlaps with the green one.");
 		nexttest = test3;
 	};
 
@@ -123,7 +128,8 @@
 
 	endOfTest = function()
 	{
-		totals(18);
+		_root.testcompleted = true;
+		totals(22);
 	};
 
 	_global.runNextTest = function()

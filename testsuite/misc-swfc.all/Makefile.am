@@ -37,11 +37,39 @@ SANE_SCTESTS = \
 	gotoFrameFromInterval.sc \
 	gotoFrameFromInterval2.sc \
 	gotoFrameLabelAsFunction.sc \
-	button_test1.sc \
 	$(NULL)
 
 # These ones are the ones for which consistency check fail 
 BOGO_SCTESTS = \
+	$(NULL)
+
+# These ones are the ones for which a MovieTester-based runner exists
+INTERACTIVE_SCTESTS = \
+	button_test1.sc \
+	$(NULL)
+
+check_PROGRAMS = \
+	button_test1runner \
+	$(NULL)
+
+AM_CPPFLAGS = -I.. \
+        -I$(top_srcdir)		\
+        -I$(top_srcdir)/libbase \
+        -I$(top_srcdir)/libmedia \
+        -I$(top_srcdir)/backend \
+        -I$(top_srcdir)/server  \
+        -I$(top_srcdir)/server/vm  \
+        -I$(top_srcdir)/server/parser  \
+        -I$(top_srcdir)/libgeometry \
+        -I$(top_srcdir)/testsuite \
+	$(BOOST_CFLAGS) \
+	$(NULL)
+
+GNASH_LIBS = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(top_builddir)/libamf/libgnashamf.la \
 	$(NULL)
 
 # These will get compiled to SWFs just as above, but will not be executed as a test
@@ -50,7 +78,7 @@ AUXMOVIES = \
 	    $(NULL)
 
 
-EXTRA_DIST = $(SCTESTS) $(AUXMOVIES) check.sc Dejagnu.sc hello.sc
+EXTRA_DIST = $(SCTESTS) $(AUXMOVIES) $(INTERACTIVE_SCTESTS) check.sc Dejagnu.sc hello.sc
 
 if ENABLE_SWFC
 
@@ -69,7 +97,8 @@ AUXMOVIES_OUT = $(AUXMOVIES:.sc=.swf)
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
 	sanetests-runner \
-	bogustests-runner
+	bogustests-runner \
+	$(check_PROGRAMS)
 
 sanetests-runner: $(srcdir)/../generic-testrunner.sh $(SANE_SCTESTS_OUT) $(AUXMOVIES_OUT) Makefile
 	sh $< -c __END_OF_TEST__ -f 50 -r 50 $(top_builddir) $(SANE_SCTESTS_OUT) > $@
@@ -85,6 +114,20 @@ SUFFIXES = .sc .swf
 .sc.swf:
 	$(SWFC_CPP) $< > $(@:%.swf=pp_%.sc) 
 	$(SWFC) $(SWFC_FLAGS) -o $@ $(@:%.swf=pp_%.sc)
+
+button_test1runner_SOURCES = \
+	button_test1runner.cpp \
+	$(NULL)
+button_test1runner_LDADD = \
+	$(GNASH_LIBS) \
+	$(NULL)
+button_test1runner_CXXFLAGS = \
+	-DBUILDDIR='"$(top_builddir)/testsuite/misc-swfc.all"' \
+	$(NULL)
+button_test1runner_DEPENDENCIES = \
+	button_test1.swf \
+	$(GNASH_LIBS) \
+	$(NULL)
 
 CLEANFILES =  \
 	$(TEST_CASES) \
