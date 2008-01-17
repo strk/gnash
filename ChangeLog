@@ -1,5 +1,13 @@
 2008-01-17 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.cpp (find_object): don't allow dots
+	  after a slash was seen. Completes fixing the getvariable-delimiter
+	  swfdec tests (see bug #21883).
+	* testsuite/swfdec/PASSING: getvariable-delimiter-{6,7,8}.swf
+	  succeed now, completing the serie.
+
+2008-01-17 Sandro Santilli <strk@keybit.net>
+
 	* server/as_environment.cpp: add more corner case handlign 
 	  for get_variable and find_object. The code keeps getting
 	  uglier, but this change gets no unexpected failure while

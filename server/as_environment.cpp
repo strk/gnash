@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.120 2008/01/17 22:09:12 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.121 2008/01/17 23:34:38 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -616,8 +616,23 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
 	}
 	else if (next_slash)
 	{
-	    // Cut off the slash and everything after it.
-	    subpart.resize(next_slash - p);
+		if ( *next_slash == '.' )
+		{
+			if ( ! dot_allowed )
+			{
+				IF_VERBOSE_ASCODING_ERRORS(
+				log_aserror(_("invalid path '%s' (dot not allowed after having seen a slash)"), path.c_str());
+				);
+				return NULL;
+			}
+		}
+		else if ( *next_slash == '/' )
+		{
+			dot_allowed = false;
+		}
+
+		// Cut off the slash and everything after it.
+		subpart.resize(next_slash - p);
 	}
 	
 	assert(subpart[0] != ':');
