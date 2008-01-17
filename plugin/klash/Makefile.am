@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.41 2008/01/05 01:04:11 strk Exp $
+# $Id: Makefile.am,v 1.42 2008/01/17 00:18:51 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -64,15 +64,39 @@ klash_part.moc: $(srcdir)/klash_part.h
 # 	test -d $(DESTDIR)$(kde_servicesdir) || $(mkinstalldirs) $(DESTDIR)$(kde_servicesdir)
 # 	$(INSTALL) $(dist_kde_services_DATA) $(DESTDIR)$(kde_servicesdir)
 # 
-# install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-# 	test -d $(DESTDIR)$(plugindir) || $(mkinstalldirs) $(DESTDIR)$(plugindir)
-# 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(plugin_LTLIBRARIES) $(DESTDIR)$(plugindir)
-# 
-# uninstall-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
-# 	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.so
-# 	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.la
-# 	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.a
+test_perms:
+	@if test ! -w $(DESTDIR)$(kde_appsdatadir) -o ! -w $(DESTDIR)$(kde_servicesdir); then \
+	  echo "WARNING: Improper permissions for $(DESTDIR)$(kde_appsdatadir) and $(DESTDIR)$(kde_servicesdir)!"; \
+	  echo "You probably need to be root"; \
+	  echo "Or configure with --with-kde-pluginprefix= set to a writable directory"; \
+	exit 1; \
+	fi
+
+install-data-am: $(dist_kde_services_DATA)
+	@echo "No data to install now."
+
+install-plugin-data:
+	test -d $(DESTDIR)$(kde_servicesdir) || $(mkinstalldirs) $(DESTDIR)$(kde_servicesdir)
+	if test 
+	$(INSTALL) $(dist_kde_services_DATA) $(DESTDIR)$(kde_servicesdir)
+
+install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
+	@echo "Nothing to install here now."
+	@echo "Use \"make install-plugin\" to install the KDE plugin to $(DESTDIR)$(plugindir)."
+
+install-plugin install-plugins: test_perms $(plugin_LTLIBRARIES) $(dist_kde_services_DATA) \
+	install-dist_kde_appsdataDATA install-dist_kde_rcDATA \
+	install-dist_kde_servicesDATA
+	test -d $(DESTDIR)$(plugindir) || $(mkinstalldirs) $(DESTDIR)$(plugindir)
+	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(plugin_LTLIBRARIES) $(DESTDIR)$(plugindir)
+
+uninstall-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
+	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.so
+	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.la
+	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.a
 
 endif
 
 force:
+
+.PHONY : install-plugins install-plugin test_perms

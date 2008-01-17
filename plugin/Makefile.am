@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.66 2008/01/16 00:42:55 rsavoye Exp $
+# $Id: Makefile.am,v 1.67 2008/01/17 00:18:51 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -93,6 +93,14 @@ libgnashplugin_la_LDFLAGS = -module -avoid-version -L$(plugindir)
 endif
 endif
 
+test_perms:
+	@if test ! -w $(DESTDIR)$(plugindir); then \
+	  echo "WARNING: Improper permissions for $(DESTDIR)$(plugindir)!"; \
+	  echo "You probably need to be root"; \
+	  echo "Or configure with --with-plugindir= set to a writable directory"; \
+	exit 1; \
+	fi
+
 install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 	@echo "Nothing to install here now."
 	@echo "Use \"make install-plugin\" to install the Firefox plugin to $(DESTDIR)$(plugindir)."
@@ -106,6 +114,10 @@ install-plugin: $(plugin_LTLIBRARIES)
 	  cp -f libgnashplugin.so $(DESTDIR)$(plugindir)/libgnashplugin.so; \
 	fi
 
+install-plugins: install-plugin
+	$(MAKE) -C klash install-plugins
+
 uninstall-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 	$(RM) -f $(DESTDIR)$(plugindir)/libgnashplugin.so
 
+.PHONY : install-plugins install-plugin test_perms

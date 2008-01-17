@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.100 2008/01/09 20:06:01 bwy Exp $
+# $Id: Makefile.am,v 1.101 2008/01/17 00:18:50 rsavoye Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -31,12 +31,17 @@ noinst_SCRIPT = autogen.sh
 ## permission problems and unexpected unistalls
 ## from home dir. Ideally we should put them somewhere
 ## under ${prefix} to make the uninstall check effective
-## (and I belive it should actually be the default when
+## (and I believe it should actually be the default when
 ## --prefix is given, but that's another story --strk)
 ##
+## We also want to build everything possible, since we're
+## testing builds.
 DISTCHECK_CONFIGURE_FLAGS = \
-	--with-kde-pluginprefix=/tmp/gnash-distcheck/kparts \
-	--with-plugindir=/tmp/gnash-distcheck/npapi 
+	--with-kde-pluginprefix=/tmp/gnash-distcheck-$$/kparts \
+	--with-plugindir=/tmp/gnash-distcheck-$$/npapi \
+	--enable-extensions=all \
+	--enable-gui=all \
+	--enable-cygnal
 
 STD_DIRS = \
 	libbase \
@@ -95,8 +100,10 @@ deb debian: dist-bzip2 $(srcdir)/packaging/debian/rules
 	cp -fr $(srcdir)/packaging/debian gnash-${VERSION}/
 	(cd gnash-${VERSION}; dpkg-buildpackage)
 
+#
 # Build a Debian Familiar .ipk GNU/Linux package. These are always
 # cross compiled, typically for the ARM or XScale.
+#
 
 # this is where the output of "make install" goes, which is what
 # we use to build the package.
@@ -116,7 +123,7 @@ ipkg-configure: ipkg-unpack $(IPKG_BUILD)
 	  --with-plugindir=/usr/lib/mozilla/plugins \
 	  --enable-static --disable-shared --disable-kparts \
 	  --enable-gui=qtopia --enable-media=none
-	@touch  ipkg-configure
+	@touch ipkg-configure
 
 ipkg-unpack: $(top_builddir)/config.status
 	-@rm -f ipkg-*		# nuke everything, we're starting over
@@ -132,11 +139,18 @@ ipkg-build: ipkg-configure
 
 ipkg-install: ipkg-build Makefile
 	-@rm -f ipkg-install
-	@echo "FIXME:	$@"
 	$(MAKE) -C $(IPKG_BUILD) install DESTDIR=$(IPKG_TMP)
 	@touch ipkg-install
 
-ipk ipkg: ipkg-install
+ipkg-depend: 
+	-@rm -f ipkg-depend
+	rsync -avc $(libdir)/libcurl* $(IPKG_TMP)/usr/lib
+	rsync -avc $(libdir)/libagg* $(IPKG_TMP)/usr/lib
+	rsync -avc $(libdir)/libboost_thread* $(IPKG_TMP)/usr/lib
+	rsync -avc $(libdir)/libboost_serialization* $(IPKG_TMP)/usr/lib
+	@touch ipkg-depend
+
+ipk ipkg ipkg-bundle: ipkg-install # ipkg-depend
 	if ! test -d $(IPKG_TMP)/CONTROL ; then \
 	  mkdir $(IPKG_TMP)/CONTROL; \
 	fi
@@ -150,7 +164,19 @@ ipk ipkg: ipkg-install
 	ipkg-build $(IPKG_TMP)
 
 ipkg-clean:
-	rm -fr ipkg-* $(IPKG_BUILD)
+	rm -fr ipkg-* $(IPKG_BUILD) $(IPKG_TMP) gnash*$(VERSION)*.ipk
+
+#
+# OpenBSD package building
+#
+
+bsd-pkg:
+	$(MAKE) checksum
+	$(MAKE) extract
+	$(MAKE) build
+	$(MAKE) fake
+	$(MAKE) plist
+	$(MAKE) package
 
 # build a snapshot
 snapshot: distdir
@@ -300,10 +326,6 @@ if BUILD_AGG_RENDERER
 	@echo "	AGG_CFLAGS is $(AGG_CFLAGS)"
 	@echo "	AGG_LIBS is $(AGG_LIBS)"
 endif
-if BUILD_ALP_GUI
-        @echo " ALP_CFLAGS is $(ALP_CFLAGS)"
-        @echo " ALP_LIBS is $(ALP_LIBS)"
-endif
 	@echo ""
 	@echo "A blank value for CFLAGS means the header is installed in the"
 	@echo "default system header location. All the LIBS should have a"
@@ -342,6 +364,12 @@ if BUILD_FB_GUI
 	@echo "	Supported GUI: FB"
 endif
 
+	@if test -n "$(EXTENSIONS_LIST)" ; then \
+	  echo "	Extensions added are: $(EXTENSIONS_LIST)"; \
+	fi
+	@if test -n "$(SECURITY_LIST)" ; then \
+	  echo "	Security features enables are: $(SECURITY_LIST)"; \
+	fi
 if KPARTS
 	@echo "	KPARTS (KDE) plugin enabled"
 	@echo "	  KPARTS plugin install dir: $(KDE_PLUGINDIR)"
@@ -358,14 +386,13 @@ if NSAPI
 else
 	@echo "	NPAPI (Mozilla) plugin disabled"
 endif
-	@if test -n "$(EXTENSIONS_LIST)" ; then \
-	  echo "	Extensions added are: $(EXTENSIONS_LIST)"; \
-	fi
 
 check: check-recursive anal
 
 anal testreport checksum:
 	$(srcdir)/testsuite/anaylse-results.sh
 
-.PHONY : dumpconfig anal testreport checksum check mudflap mudflap-check snapshot deb debian rpm redhat ipkg ipk
+.PHONY : dumpconfig anal testreport checksum check mudflap mudflap-check snapshot deb debian rpm redhat ipkg ipk ipkg-bundle alp alp-bundle alp-ip install-plugins install-plugin
 
+install-plugins install-plugin:
+	$(MAKE) -C plugin $@

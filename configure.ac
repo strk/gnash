@@ -1,4 +1,4 @@
-hednl  
+dnl  
 dnl    Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.472 2008/01/16 15:11:01 strk Exp $
+dnl $Id: configure.ac,v 1.473 2008/01/17 00:18:50 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -240,7 +240,7 @@ dnl   $CXXFLAGS="$CXXFLAGS -march=${with_cpu}"
 fi
 
 AC_ARG_WITH(shm,
-  AC_HELP_STRING([--with-shm],[specify a cpu when cross compiling.]),
+  AC_HELP_STRING([--with-shm],[specify a shared memory type.]),
   [case "${withval}" in
     sysv) with_shm=sysv
           ;;
@@ -883,6 +883,7 @@ PKG_PROG_PKG_CONFIG
 AC_PATH_PROG(PYTHON, python, ,[${pathlist}])
 AM_CONDITIONAL([ENABLE_GNASH_PYTHON_MODULE], false)
 
+AC_PATH_PROG(MKINSTALLDIRS, mkinstalldirs, ,[${pathlist}])
 
 dnl Look for scratchbox
 sbox=no
@@ -1656,7 +1657,7 @@ if test x"$pthreads" = x"yes"; then
 fi
 
 GNASH_PATH_BOOST
-AX_GCC_ARCHFLAG(no)
+dnl AX_GCC_ARCHFLAG(no)
 
 AC_ARG_ENABLE([strict],
   AC_HELP_STRING([--enable-strict],[Accept only standards compliant code (GCC only)]),

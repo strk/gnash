@@ -1,3 +1,14 @@
+2008-01-16  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* configure.ac: Don't use AX_GCC_ARCHFLAG anymore.
+	* Makefile.am: Make a seperate install-plugins target. Build all
+	extensions, guis, and cygnal for distcheck. Fix ipkg
+	packaging. Add OpenBSD packaging.
+	* plugin/Makefile.am: Make seperate install-plugin and
+	install-plugins targets.
+	* plugin/klash/Makefile.am: Make install-plugin target with
+	install-plugins alias.
+
 2008-01-16 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/check.as: add a MING_LOGICAL_ANDOR_BROKEN
