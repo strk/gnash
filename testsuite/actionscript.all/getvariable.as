@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: getvariable.as,v 1.21 2007/11/22 21:45:41 strk Exp $";
+rcsid="$Id: getvariable.as,v 1.22 2008/01/17 18:34:36 strk Exp $";
 
 #include "check.as"
 
@@ -303,6 +303,29 @@ asm {
 check_equals(obj.variable_in_object, 'yes');
 check_equals(typeof(_root['obj::::variable_in_object']), 'undefined');
 
+asm {
+	push 'obj:variable_in_object'
+        push 'yes3'
+        setvariable
+};
+check_equals(obj.variable_in_object, 'yes3');
+
+asm {
+	push 'obj::variable_in_object'
+        push 'yes4'
+        setvariable
+};
+xcheck_equals(obj.variable_in_object, 'yes4');
+
+// NOTE: 'obj:::variable_in_object' is invalid, while
+//       'obj::variable_in_object' is valid - AARagagag
+asm {
+	push 'obj:::variable_in_object'
+        push 'yes5'
+        setvariable
+};
+xcheck_equals(obj.variable_in_object, 'yes4');
+
 //---------------------------------------------------------------------
 // Check 'mc1:variable_in_object' access 
 //---------------------------------------------------------------------
@@ -439,6 +462,21 @@ asm {
 check_equals(checkpoint, 4);
 
 //---------------------------------------------------------------------
+// Check 'obj1..obj2.member' access 
+// (expect to fail)
+//---------------------------------------------------------------------
+
+var o2 = { memb:4 };
+var o = { obj2:o2 };
+asm {
+        push 'checkpoint'
+	push 'o..obj2.memb'
+	getvariable
+        setvariable
+};
+check_equals(typeof(checkpoint), 'undefined');
+
+//---------------------------------------------------------------------
 // Check 'obj1.globalvar'
 // (expect to fail)
 //---------------------------------------------------------------------
@@ -482,6 +520,45 @@ asm {
         setvariable
 };
 check_equals(objmemb, 3);
+
+//-----------------------------------------------------------------------
+// Check '::obj:member' access 
+//-----------------------------------------------------------------------
+
+var obj = { memb:4 };
+asm {
+        push 'objmemb'
+	push '::obj:memb'
+	getvariable
+        setvariable
+};
+xcheck_equals(objmemb, 4);
+
+//-----------------------------------------------------------------------
+// Check '::obj::member' access 
+//-----------------------------------------------------------------------
+
+var obj = { memb:4.4 };
+asm {
+        push 'objmemb'
+	push '::obj::memb'
+	getvariable
+        setvariable
+};
+xcheck_equals(objmemb, 4.4);
+
+//-----------------------------------------------------------------------
+// Check '::obj.member' access 
+//-----------------------------------------------------------------------
+
+var obj = { memb:4 };
+asm {
+        push 'objmemb'
+	push '::obj.memb'
+	getvariable
+        setvariable
+};
+xcheck_equals(objmemb, 4);
 
 //-----------------------------------------------------------------------
 // Check 'this/:member' access  (and deletion)
@@ -610,9 +687,9 @@ check_equals(checkpoint, 4);
 //-----------------------------------------------------------------------
 
 #if OUTPUT_VERSION < 6
- xcheck_totals(45); // gnash runs +2 tests ?!
+ xcheck_totals(52); // gnash runs +2 tests ?!
 #else
- xcheck_totals(50); // gnash runs +2 tests ?!
+ xcheck_totals(57); // gnash runs +2 tests ?!
 #endif
 
 #else // ndef MING_SUPPORT_ASM
