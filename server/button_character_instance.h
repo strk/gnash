@@ -21,7 +21,7 @@
 
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
-/* $Id: button_character_instance.h,v 1.30 2008/01/16 11:31:07 strk Exp $ */
+/* $Id: button_character_instance.h,v 1.31 2008/01/17 08:56:57 strk Exp $ */
 
 #ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
 #define GNASH_BUTTON_CHARACTER_INSTANCE_H
@@ -39,13 +39,6 @@ namespace gnash {
 //
 // button characters
 //
-
-enum mouse_state
-{
-	MOUSE_UP,
-	MOUSE_DOWN,
-	MOUSE_OVER
-};
 
 //
 // button_character_instance
@@ -76,7 +69,8 @@ public:
 	{
 		UP = 0,
 		DOWN,
-		OVER
+		OVER,
+		HIT
 	};
 	e_mouse_state m_mouse_state;
 
@@ -102,9 +96,25 @@ public:
 	
 	void set_current_state(e_mouse_state new_state);
 	
-	/// Returns all characters that are currently visible based on the
-	/// current button state. The "_visible" property does not matter here. 
+	/// Returns all characters that are active based on the current state.
+	//
+	/// The "_visible" property does not matter here. 
+	///
+	/// @param list
+	///	The vector to push active characters into
+	///
 	void get_active_characters(std::vector<character*>& list);
+
+	/// Returns all characters that should be active on the given state.
+	//
+	/// The "_visible" property does not matter here. 
+	///
+	/// @param list
+	///	The vector to push active characters into
+	///
+	/// @param state
+	///	The state we're interested in
+	///
 	void get_active_characters(std::vector<character*>& list, e_mouse_state state);
 	
 

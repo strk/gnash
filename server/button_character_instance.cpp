@@ -440,34 +440,36 @@ button_character_instance::get_topmost_mouse_entity(float x, float y)
 // Return the topmost entity that the given point covers.  NULL if none.
 // I.e. check against ourself.
 {
-	if ((get_visible() == false) || (get_enabled() == false)) {
+	if ( (!get_visible()) || (!get_enabled()))
+	{
 		return false;
 	}
 
-	matrix	m = get_matrix();
-	point	p;
-	m.transform_by_inverse(&p, point(x, y));
+	// Find hit characters
+	std::vector<character*> hitChars;
+	get_active_characters(hitChars, HIT);
+	if ( hitChars.empty() ) return false;
 
-	{for (size_t i = 0; i < m_def->m_button_records.size(); i++)
+	// point is in parent's space,
+	// we need to convert it in world space
+	point wp(x,y);
+	character* parent = get_parent();
+	if ( parent )
 	{
-		button_record&	rec = m_def->m_button_records[i];
-		if (rec.m_character_id < 0 || rec.m_hit_test == false)
-		{
-			continue;
-		}
+		parent->get_world_matrix().transform(wp);
+	}
 
-		// Find the mouse position in button-record space.
-		point	sub_p;
-		rec.m_button_matrix.transform_by_inverse(&sub_p, p);
+	for (size_t i=0, e=hitChars.size(); i<e; ++i)
+	{
+		character* ch = m_record_character[i].get();
+		if ( ! ch ) continue;
 
-		if (rec.m_character_def->point_test_local(sub_p.x, sub_p.y))
+		if ( ch->pointInVisibleShape(wp.x, wp.y) )
 		{
 			// The mouse is inside the shape.
 			return this;
-			// @@ Are there any circumstances where this is correct:
-			//return m_record_character[i].get();
 		}
-	}}
+	}
 
 	return NULL;
 }
@@ -637,7 +639,8 @@ button_character_instance::get_active_characters(std::vector<character*>& list,
 		}
 		if ((state == UP && rec.m_up)
 		    || (state == DOWN && rec.m_down)
-		    || (state == OVER && rec.m_over))
+		    || (state == OVER && rec.m_over)
+		    || (state == HIT && rec.m_hit_test))
 		{
 			list.push_back(m_record_character[i].get());
 		}
