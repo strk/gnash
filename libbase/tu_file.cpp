@@ -425,7 +425,7 @@ tu_file::tu_file(const char * name, const char * mode)
 tu_file::tu_file(memory_buffer_enum /* m */)
 // Create a read/write memory buffer.
 {
-    m_data = new membuf;
+    m_data = new filebuf;
     
     m_read = mem_read_func;
     m_write = mem_write_func;
@@ -442,7 +442,7 @@ tu_file::tu_file(memory_buffer_enum /* m */)
 tu_file::tu_file(memory_buffer_enum /* m */, int size, void* data)
 // Create a read-only memory buffer, using the given data.
 {
-    m_data = new membuf(data, size);
+    m_data = new filebuf(size, data);
     
     m_read = mem_read_func;
     m_write = mem_write_func;
