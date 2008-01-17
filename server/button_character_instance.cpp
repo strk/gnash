@@ -171,6 +171,11 @@ namespace gnash {
 typedef button_character_instance Button;
 typedef boost::intrusive_ptr<Button> ButtonPtr;
 
+static bool charDepthLessThen(const character* ch1, const character* ch2) 
+{
+	return ch1->get_depth() < ch2->get_depth();
+}
+
 static void
 attachButtonInterface(as_object& o)
 {
@@ -368,67 +373,15 @@ button_character_instance::restart()
 }
 
 void
-button_character_instance::advance()
-{
-//			printf("%s:\n", __PRETTY_FUNCTION__); // FIXME:
-
-	matrix	mat = get_world_matrix();
-
-	// Advance our relevant characters.
-	{for (size_t i = 0; i < m_def->m_button_records.size(); i++)
-	{
-		button_record&	rec = m_def->m_button_records[i];
-		assert(m_record_character.size() > i);
-		if (m_record_character[i] == NULL)
-		{
-			continue;
-		}
-
-		// Matrix
-		matrix sub_matrix = mat;
-		sub_matrix.concatenate(rec.m_button_matrix);
-
-		// Advance characters that are activated by the new mouse state
-		if (((m_mouse_state == UP) && (rec.m_up)) ||
-		    ((m_mouse_state == DOWN) && (rec.m_down)) ||
-		    ((m_mouse_state == OVER) && (rec.m_over)))
-		{
-			m_record_character[i]->advance();
-		}
-	}}
-}
-
-
-void
 button_character_instance::display()
 {
-// 		        GNASH_REPORT_FUNCTION;
+//	GNASH_REPORT_FUNCTION;
 
-  // repeat for each layer to ensure correct depths
-  for (int layer=m_def->m_min_layer; layer<=m_def->m_max_layer; layer++) 
-  {   
+	std::vector<character*> actChars;
+	get_active_characters(actChars);
+	std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
 
-  	for (size_t i = 0; i < m_def->m_button_records.size(); i++)
-  	{
-  		button_record&	rec = m_def->m_button_records[i];
-		assert(m_record_character.size() > i);
-  		if (m_record_character[i] == NULL)
-  		{
-  			continue;
-  		}
-  		if (m_def->m_button_records[i].m_button_layer != layer)
-  		{
-  			continue;
-  		}
-  		if ((m_mouse_state == UP && rec.m_up)
-  		    || (m_mouse_state == DOWN && rec.m_down)
-  		    || (m_mouse_state == OVER && rec.m_over))
-  		{
-				matrix	mat = get_world_matrix();
-				m_record_character[i]->display();
-  		}
-  	} // for button record
-  } // for layer
+	std::for_each(actChars.begin(), actChars.end(), std::mem_fun(&character::display)); 
 
 	clear_invalidated();
 	do_display_callback();
@@ -812,7 +765,7 @@ button_character_instance::stagePlacementCallback()
 
 	// Register this button instance as a live character
 	// do we need this???
-	_vm.getRoot().addLiveChar(this);
+	//_vm.getRoot().addLiveChar(this);
 
 	size_t r, r_num =  m_def->m_button_records.size();
 	m_record_character.resize(r_num);

@@ -21,7 +21,7 @@
 
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
-/* $Id: button_character_instance.h,v 1.31 2008/01/17 08:56:57 strk Exp $ */
+/* $Id: button_character_instance.h,v 1.32 2008/01/17 11:09:58 strk Exp $ */
 
 #ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
 #define GNASH_BUTTON_CHARACTER_INSTANCE_H
@@ -89,8 +89,6 @@ public:
 	bool on_event(const event_id& id);
 
 	void	restart();
-
-	virtual void	advance();
 
 	void	display();
 	
