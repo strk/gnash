@@ -760,7 +760,7 @@ button_character_instance::get_path_element(string_table::key key)
 	as_object* ch = get_path_element_character(key);
 	if ( ch ) return ch;
 
-	string name = _vm.getStringTable().value(key);
+	std::string name = _vm.getStringTable().value(key);
 	return getChildByName(name); // possibly NULL
 }
 
@@ -899,7 +899,7 @@ button_character_instance::get_member(string_table::key name_key, as_value* val,
 
   const std::string& name = _vm.getStringTable().value(name_key);
 
-  if (name.compare(0, 6, "_level") == 0 && name.find_first_not_of("0123456789", 7) == string::npos )
+  if (name.compare(0, 6, "_level") == 0 && name.find_first_not_of("0123456789", 7) == std::string::npos )
   {
     unsigned int levelno = atoi(name.c_str()+6); // getting 0 here for "_level" is intentional
     movie_instance* mo = _vm.getRoot().getLevel(levelno).get();

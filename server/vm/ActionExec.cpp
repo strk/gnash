@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.62 2008/01/12 15:05:56 bwy Exp $ */
+/* $Id: ActionExec.cpp,v 1.63 2008/01/18 17:48:27 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -705,7 +705,7 @@ ActionExec::pushReturn(const as_value& t)
 }
 
 void
-ActionExec::dumpActions(size_t from, size_t to, ostream& os)
+ActionExec::dumpActions(size_t from, size_t to, std::ostream& os)
 {
 	size_t lpc = from;
 	while (lpc < to)

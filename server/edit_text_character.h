@@ -215,7 +215,7 @@ public:
 	///
 	/// @return an AutoSizeValue identifier. autoSizeNone if invalid
 	///
-	static AutoSizeValue parseAutoSizeValue(const string& val);
+	static AutoSizeValue parseAutoSizeValue(const std::string& val);
 
 	/// Return autoSize value as a string
 	//

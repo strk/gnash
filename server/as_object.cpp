@@ -401,13 +401,13 @@ as_object::update_member(string_table::key key, const as_value& val,
 			IF_VERBOSE_ASCODING_ERRORS(log_aserror(_(""
 				"Attempt to set read-only property '%s'"),
 				_vm.getStringTable().value(key).c_str()););
-			return make_pair(true, false);
+			return std::make_pair(true, false);
 		}
 
 		try
 		{
 			prop->setValue(*this, val);
-			return make_pair(true, true);
+			return std::make_pair(true, true);
 		}
 		catch (ActionException& exc)
 		{
@@ -415,10 +415,10 @@ as_object::update_member(string_table::key key, const as_value& val,
 				_vm.getStringTable().value(key).c_str(), exc.what());
 		}
 
-		return make_pair(true, false);
+		return std::make_pair(true, false);
 	}
 
-	return make_pair(false, false);
+	return std::make_pair(false, false);
 
 }
 

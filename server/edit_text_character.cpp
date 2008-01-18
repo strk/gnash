@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.141 2008/01/15 14:17:43 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.142 2008/01/18 17:48:26 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -789,7 +789,7 @@ edit_text_character::set_member(string_table::key name,
 		//else if (name == "_x")
 	{
 		matrix	m = get_matrix();
-		m.m_[0][2] = infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));	
+		m.m_[0][2] = std::infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));	
 		set_matrix(m);
 
 		// m_accept_anim_moves = false;
@@ -800,7 +800,7 @@ edit_text_character::set_member(string_table::key name,
 		//else if (name == "_y")
 	{
 		matrix	m = get_matrix();
-		m.m_[1][2] = infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));
+		m.m_[1][2] = std::infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));
 		set_matrix(m);
 
 		// m_accept_anim_moves = false;
@@ -837,7 +837,7 @@ edit_text_character::set_member(string_table::key name,
 		if ( ! _bounds.isFinite() )
 		{
 #ifdef GNASH_DEBUG_TEXTFIELDS
-			stringstream ss; ss<<_bounds;
+			std::stringstream ss; ss<<_bounds;
 			log_debug("Non-finite TextField bounds : %s", ss.str().c_str());
 #endif
 			return;
@@ -896,7 +896,7 @@ edit_text_character::set_member(string_table::key name,
 		if ( ! _bounds.isFinite() )
 		{
 #ifdef GNASH_DEBUG_TEXTFIELDS
-			stringstream ss; ss<<_bounds;
+			std::stringstream ss; ss<<_bounds;
 			log_debug("Non-finite TextField bounds : %s", ss.str().c_str());
 #endif // GNASH_DEBUG_TEXTFIELDS
 			return;
@@ -935,7 +935,7 @@ edit_text_character::set_member(string_table::key name,
 		// @@ TODO this should be generic to class character!
 		// Arg is in percent.
 		cxform	cx = get_cxform();
-		cx.m_[3][0] = fclamp(infinite_to_fzero(val.to_number()) / 100.f, 0, 1);
+		cx.m_[3][0] = fclamp(std::infinite_to_fzero(val.to_number()) / 100.f, 0, 1);
 		set_cxform(cx);
 		return;
 	}
@@ -1996,7 +1996,7 @@ textfield_autoSize_getset(const fn_call& fn)
 
 /* public static */
 edit_text_character::AutoSizeValue
-edit_text_character::parseAutoSizeValue(const string& val)
+edit_text_character::parseAutoSizeValue(const std::string& val)
 {
 	if ( val == "left" )
 	{

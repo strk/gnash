@@ -262,7 +262,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md,
     }
     else
     {
-	stringstream ss;
+	std::stringstream ss;
 	ss << "Unknown fill style type " << m_type;
         //log_unimpl("Unsupported fill style type: 0x%X", m_type);
         // This is a fatal error, we'll be leaving the stream

@@ -122,7 +122,7 @@ MovieTester::MovieTester(const std::string& url)
 	dbglogfile.setVerbosity(1);
 
 	
-	auto_ptr<movie_instance> mi ( _movie_def->create_movie_instance() );
+	std::auto_ptr<movie_instance> mi ( _movie_def->create_movie_instance() );
 
 	// Set _movie before calling ::render
 	_movie = mi.get();
@@ -177,7 +177,7 @@ MovieTester::render()
 	_movie_root->add_invalidated_bounds(_invalidatedBounds, false);
 
 #ifdef SHOW_INVALIDATED_BOUNDS_ON_ADVANCE
-	cout << "frame " << _movie->get_current_frame() << ") Invalidated bounds " << _invalidatedBounds << endl;
+	std::cout << "frame " << _movie->get_current_frame() << ") Invalidated bounds " << _invalidatedBounds << std::endl;
 #endif
 
 	// Force full redraw by using a WORLD invalidated ranges
@@ -278,7 +278,7 @@ MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 	const char* X="";
 	if ( expectFailure ) X="X";
 
-	//cout <<"chekPixel(" << color << ") called" << endl;
+	//std::cout <<"chekPixel(" << color << ") called" << std::endl;
 
 	for (TRenderers::const_iterator it=_testingRenderers.begin(), itE=_testingRenderers.end();
 				it != itE; ++it)
@@ -440,18 +440,18 @@ MovieTester::initTestingRenderers()
 	for (unsigned i=0; i<sizeof(aggPixelFormats)/sizeof(*aggPixelFormats); ++i)
 	{
 		const char* pixelFormat = aggPixelFormats[i];
-		std::string name = "AGG_"+string(pixelFormat);
+		std::string name = "AGG_" + std::string(pixelFormat);
 
 		handler.reset( create_render_handler_agg(pixelFormat) );
 		if ( handler.get() )
 		{
 			//log_msg("Renderer %s initialized", name.c_str());
-			cout << "Renderer " << name << " initialized" << endl;
+			std::cout << "Renderer " << name << " initialized" << std::endl;
 			addTestingRenderer(handler, name); 
 		}
 		else
 		{
-			cout << "Renderer " << name << " not supported" << endl;
+			std::cout << "Renderer " << name << " not supported" << std::endl;
 		}
 	}
 #endif // RENDERER_AGG
@@ -475,21 +475,21 @@ MovieTester::addTestingRenderer(std::auto_ptr<render_handler> h, const std::stri
 {
 	if ( ! h->initTestBuffer(_width, _height) )
 	{
-		cout << "UNTESTED: render handler " << name
+		std::cout << "UNTESTED: render handler " << name
 			<< " doesn't support in-memory rendering "
-			<< endl;
+			<< std::endl;
 		return;
 	}
 
 	// TODO: make the core lib support this
 	if ( ! _testingRenderers.empty() )
 	{
-		cout << "UNTESTED: can't test render handler " << name
+		std::cout << "UNTESTED: can't test render handler " << name
 			<< " because gnash core lib is unable to support testing of "
 			<< "multiple renderers from a single process "
 			<< "and we're already testing render handler "
 			<< _testingRenderers.front()->getName()
-			<< endl;
+			<< std::endl;
 		return;
 	}
 
@@ -518,13 +518,13 @@ MovieTester::initTestingSoundHandlers()
 {
 
 #ifdef SOUND_SDL
-	cout << "Creating SDL sound handler" << endl;
+	std::cout << "Creating SDL sound handler" << std::endl;
         _sound_handler.reset( gnash::media::create_sound_handler_sdl() );
 #elif defined(SOUND_GST)
-	cout << "Creating GST sound handler" << endl;
+	std::cout << "Creating GST sound handler" << std::endl;
         _sound_handler.reset( gnash::media::create_sound_handler_gst() );
 #else
-	cerr << "Neigher SOUND_SDL nor SOUND_GST defined" << endl;
+	std::cerr << "Neigher SOUND_SDL nor SOUND_GST defined" << std::endl;
 	return;
 	//exit(1);
 #endif

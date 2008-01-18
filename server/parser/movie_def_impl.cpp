@@ -142,7 +142,7 @@ MovieLoader::start()
 //
 
 /// Log the contents of the current tag, in hex to the output strream
-static void	dump_tag_bytes(stream* in, ostream& os)
+static void	dump_tag_bytes(stream* in, std::ostream& os)
 {
     static const int	ROW_BYTES = 16;
     char	row_buf[ROW_BYTES];
@@ -150,7 +150,7 @@ static void	dump_tag_bytes(stream* in, ostream& os)
 
     row_buf[ROW_BYTES-1] = '\0';
 
-    os << endl;
+    os << std::endl;
     while(in->get_position() < in->get_tag_end_position())
     {
             int	c = in->read_u8();
@@ -162,7 +162,7 @@ static void	dump_tag_bytes(stream* in, ostream& os)
             row_count++;
             if (row_count >= ROW_BYTES)
             {
-                    os << row_buf << endl;
+                    os << row_buf << std::endl;
                     row_count = 0;
             }
    }
@@ -170,7 +170,7 @@ static void	dump_tag_bytes(stream* in, ostream& os)
    {
             row_buf[row_count] = '\0';
             while (row_count++ < ROW_BYTES ) os << "   ";
-            os << row_buf << endl;
+            os << row_buf << std::endl;
    }
 }
 
@@ -339,7 +339,7 @@ movie_def_impl::get_character_def(int character_id)
 void movie_def_impl::add_font(int font_id, font* f)
 {
     assert(f);
-    m_fonts.insert(make_pair(font_id, boost::intrusive_ptr<font>(f)));
+    m_fonts.insert(std::make_pair(font_id, boost::intrusive_ptr<font>(f)));
 }
 
 font* movie_def_impl::get_font(int font_id) const
@@ -374,7 +374,7 @@ movie_def_impl::add_bitmap_character_def(int character_id,
     assert(ch);
     //log_msg(_("Add bitmap character %d"), character_id);
     //m_bitmap_characters.add(character_id, ch);
-    m_bitmap_characters.insert(make_pair(character_id, boost::intrusive_ptr<bitmap_character_def>(ch)));
+    m_bitmap_characters.insert(std::make_pair(character_id, boost::intrusive_ptr<bitmap_character_def>(ch)));
 
 	// we can *NOT* generate bitmap_info until
 	// a renderer is present
@@ -401,7 +401,7 @@ void movie_def_impl::add_sound_sample(int character_id, sound_sample* sam)
     log_parse(_("Add sound sample %d assigning id %d"),
 		character_id, sam->m_sound_handler_id);
     );
-    m_sound_samples.insert(make_pair(character_id,
+    m_sound_samples.insert(std::make_pair(character_id,
 			    boost::intrusive_ptr<sound_sample>(sam)));
 }
 
@@ -785,7 +785,7 @@ parse_tag:
 			log_error(_("*** no tag loader for type %d (movie)"),
 				tag_type);
 			IF_VERBOSE_PARSE(
-				stringstream ss;
+				std::stringstream ss;
 				dump_tag_bytes(&str, ss);
 				log_error("tag dump follows: %s", ss.str().c_str());
 			);

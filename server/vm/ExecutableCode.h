@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ExecutableCode.h,v 1.11 2007/11/30 09:59:04 zoulunkai Exp $ */
+/* $Id: ExecutableCode.h,v 1.12 2008/01/18 17:48:27 bwy Exp $ */
 
 #ifndef GNASH_EXECUTABLECODE_H
 #define GNASH_EXECUTABLECODE_H
@@ -106,7 +106,7 @@ class EventCode: public ExecutableCode {
 
 public:
 
-    typedef vector<const action_buffer*> BufferList;
+    typedef std::vector<const action_buffer*> BufferList;
 
     EventCode(boost::intrusive_ptr<character> nTarget)
         :

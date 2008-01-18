@@ -45,6 +45,8 @@
 #include "URL.h"
 #include "rc.h" // for use of rcfile
 
+using namespace std;
+
 namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();

@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BevelFilter_as.cpp,v 1.6 2007/12/12 10:23:45 zoulunkai Exp $ */
+/* $Id: BevelFilter_as.cpp,v 1.7 2008/01/18 17:48:26 bwy Exp $ */
 
 #include "as_object.h"
 #include "BevelFilter.h"
@@ -110,7 +110,7 @@ BevelFilter_as::type_gs(const fn_call& fn)
         }
     }
     // setter
-    string type = fn.arg(0).to_string();
+    std::string type = fn.arg(0).to_string();
     if (type == "outer")
         ptr->m_type = BevelFilter::OUTER_BEVEL;
     if (type == "inner")

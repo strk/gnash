@@ -20,7 +20,7 @@
 //
 
 
-/* $Id: Range2d.h,v 1.18 2007/11/06 15:43:41 udog Exp $ */
+/* $Id: Range2d.h,v 1.19 2008/01/18 17:48:27 bwy Exp $ */
 
 #ifndef GNASH_RANGE2D_H
 #define GNASH_RANGE2D_H
@@ -35,8 +35,6 @@
 #include <cassert> // for inlines
 #include <iostream> // temporary include for debugging
 #include <cmath> // for floor / ceil
-
-using namespace std;
 
 namespace gnash {
 

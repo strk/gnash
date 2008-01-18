@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.121 2008/01/17 23:34:38 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.122 2008/01/18 17:48:26 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -97,7 +97,7 @@ as_environment::get_variable(const std::string& varname,
     else
     {
 	// TODO: have this checked by parse_path as an optimization 
-	if ( varname.find_first_of('/') != string::npos && varname.find_first_of(':') == string::npos )
+	if ( varname.find_first_of('/') != std::string::npos && varname.find_first_of(':') == std::string::npos )
 	{
 		// Consider it all a path ...
         	as_object* target = find_object(varname, &scopeStack); 
@@ -447,9 +447,9 @@ as_environment::parse_path(const std::string& var_path_in,
 #endif
 
 	size_t lastDotOrColon = var_path_in.find_last_of(":.");
-	if ( lastDotOrColon == string::npos ) return false;
+	if ( lastDotOrColon == std::string::npos ) return false;
 
-	string thePath, theVar;
+	std::string thePath, theVar;
 
 	thePath.assign(var_path_in, 0, lastDotOrColon);
 	theVar.assign(var_path_in, lastDotOrColon+1, var_path_in.length());
@@ -491,8 +491,8 @@ bool
 as_environment::parse_path(const std::string& var_path,
 		as_object** target, as_value& val)
 {
-	string path;
-	string var;
+	std::string path;
+	std::string var;
 	if ( ! parse_path(var_path, path, var) ) return false;
         as_object* target_ptr = find_object(path); 
 	if ( ! target_ptr ) return false;
@@ -545,7 +545,7 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
 	return m_target; // or should we return the *original* path ?
     }
     
-    string path = path_in;
+    std::string path = path_in;
     VM& vm = VM::get();
     string_table& st = vm.getStringTable();
     int swfVersion = vm.getSWFVersion(); 

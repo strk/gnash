@@ -582,7 +582,7 @@ as_array_object::end()
 int
 as_array_object::index_requested(string_table::key name)
 {
-	string name_str = VM::get().getStringTable().value(name);
+	std::string name_str = VM::get().getStringTable().value(name);
 
 	as_value temp;
 	temp.set_string(name_str);

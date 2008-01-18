@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.72 2008/01/08 11:35:02 strk Exp $ */
+/* $Id: character.cpp,v 1.73 2008/01/18 17:48:26 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -118,7 +118,7 @@ character::get_path_element_character(string_table::key key)
 		// get_root() will handle _lockroot 
 		return get_root();
 	}
-	else if (name.compare(0, 6, "_level") == 0 && name.find_first_not_of("0123456789", 7) == string::npos )
+	else if (name.compare(0, 6, "_level") == 0 && name.find_first_not_of("0123456789", 7) == std::string::npos )
 	{
 		unsigned int levelno = atoi(name.c_str()+6);
 		return _vm.getRoot().getLevel(levelno).get();
@@ -207,7 +207,7 @@ character::x_getset(const fn_call& fn)
 	{
 		double newx = fn.arg(0).to_number();
 		matrix m = ptr->get_matrix();
-		m.set_x_translation(infinite_to_fzero(PIXELS_TO_TWIPS(newx)));
+		m.set_x_translation(std::infinite_to_fzero(PIXELS_TO_TWIPS(newx)));
 		ptr->set_matrix(m);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
@@ -230,7 +230,7 @@ character::y_getset(const fn_call& fn)
 	{
 		double newy = fn.arg(0).to_number();
 		matrix m = ptr->get_matrix();
-		m.set_y_translation(infinite_to_fzero(PIXELS_TO_TWIPS(newy)));
+		m.set_y_translation(std::infinite_to_fzero(PIXELS_TO_TWIPS(newy)));
 		ptr->set_matrix(m);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
@@ -362,7 +362,7 @@ character::alpha_getset(const fn_call& fn)
 	{
 		// Set alpha modulate, in percent.
 		cxform	cx = ptr->get_cxform();
-		cx.m_[3][0] = infinite_to_fzero(fn.arg(0).to_number()) / 100.f;
+		cx.m_[3][0] = std::infinite_to_fzero(fn.arg(0).to_number()) / 100.f;
 		ptr->set_cxform(cx);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}

@@ -39,8 +39,6 @@
 
 //#define DEBUG_MEMORY_ALLOCATION 1
 
-using namespace std;
-
 namespace gnash {
 
 // Forward declarations

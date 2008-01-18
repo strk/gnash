@@ -21,7 +21,7 @@
 //
 
 
-/* $Id: Point2d.h,v 1.3 2007/11/20 17:17:10 bjacques Exp $ */
+/* $Id: Point2d.h,v 1.4 2008/01/18 17:48:27 bwy Exp $ */
 
 #ifndef GNASH_POINT2DH
 #define GNASH_POINT2DH
@@ -36,8 +36,6 @@
 #include <cassert> // for inlines
 #include <iostream> // temporary include for debugging
 #include <cmath> // for floor / ceil
-
-using namespace std;
 
 namespace gnash {
 

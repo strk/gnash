@@ -157,7 +157,7 @@ GnashPlayer::initVM()
     }
 
     // I don't know why it's done like this.
-    auto_ptr<movie_instance> mi (_movieDef->create_movie_instance());
+    std::auto_ptr<movie_instance> mi (_movieDef->create_movie_instance());
 
     // Put the instance on stage.
     _movieRoot->setRootMovie( mi.release() ); 
