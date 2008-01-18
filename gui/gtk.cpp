@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.133 2008/01/16 17:14:04 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.134 2008/01/18 12:19:47 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -778,9 +778,9 @@ void
 GtkGui::updateRC (GtkWidget* dialog, gint response, gpointer data)
 {
 
-    if (response == GTK_RESPONSE_ACCEPT) {
+    if (response == GTK_RESPONSE_APPLY) {
 
-        // If 'OK' was clicked, set all the values in rcfile
+        // If 'Save' was clicked, set all the values in rcfile
         prefData *prefs = static_cast<prefData*>(data);
         RcInitFile& rcfile = RcInitFile::getDefaultInstance();
         // For getting from const gchar* to std::string&
@@ -805,8 +805,8 @@ GtkGui::updateRC (GtkWidget* dialog, gint response, gpointer data)
         rcfile.showASCodingErrors(
         	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->ASCodingErrorToggle)));
 
-        //rcfile.showMalformedSWFErrors(
-        //	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->malformedSWFToggle)));
+        rcfile.showMalformedSWFErrors(
+        	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->malformedSWFToggle)));
 
         rcfile.useLocalHost(
         	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->localHostToggle)));
@@ -829,10 +829,31 @@ GtkGui::updateRC (GtkWidget* dialog, gint response, gpointer data)
         tmp = gtk_entry_get_text(GTK_ENTRY(prefs->solSandbox));
     	rcfile.setSOLSafeDir(tmp);
 
+        tmp = gtk_entry_get_text(GTK_ENTRY(prefs->osText));
+    	rcfile.setFlashSystemOS(tmp);
+    	
+        tmp = gtk_entry_get_text(GTK_ENTRY(prefs->versionText));
+    	rcfile.setFlashVersionString(tmp);    	
+
+        rcfile.setMovieLibraryLimit(
+        	gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(prefs->librarySize)));
+
+        rcfile.startStopped(
+        	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->startStoppedToggle)));
+    	
+    	// Let rcfile decide which file to update: generally the file being used if
+    	// specified in GNASHRC environment variable, or in the user's home directory
+    	// if that can be found.
+    	// TODO: We can also specify here which file should be written by passing
+    	// that instead. How might that best be done?
+    	rcfile.updateFile();
+
     }
 
-    // Make sure the dialogue is destroyed, whatever button is clicked.
-    gtk_widget_destroy(dialog);
+    else if (response == GTK_RESPONSE_CLOSE) {
+        // Close the window only when 'close' is clicked
+        gtk_widget_destroy(dialog);
+    }
 
 }
 
@@ -853,12 +874,17 @@ GtkGui::showPreferencesDialog()
     RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
     // Create top-level window
-    GtkWidget *prefsDialog = gtk_dialog_new_with_buttons(_("Gnash preferences"),
-    							GTK_WINDOW(_window),
-    							GTK_DIALOG_DESTROY_WITH_PARENT,
-    							GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
-    							GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
-    							NULL);
+    GtkWidget *prefsDialog = gtk_dialog_new_with_buttons(
+    				_("Gnash preferences"),
+    				GTK_WINDOW(_window),
+    				// Needs an explicit cast in C++
+    				GtkDialogFlags(
+    				GTK_DIALOG_DESTROY_WITH_PARENT |
+    				GTK_DIALOG_NO_SEPARATOR),
+    				// The buttons and their response codes:
+    				GTK_STOCK_SAVE, GTK_RESPONSE_APPLY,
+    				GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+    				NULL);
     // Add Gnash icon
     addGnashIcon(GTK_WINDOW(prefsDialog));
 
@@ -931,6 +957,12 @@ GtkGui::showPreferencesDialog()
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (prefs->ASCodingErrorToggle),
     			rcfile.showASCodingErrors());
 
+    prefs->lcTraceToggle = gtk_check_button_new_with_mnemonic (
+    				_("Log _Local Connection activity"));
+    gtk_box_pack_start (GTK_BOX(loggingvbox), prefs->lcTraceToggle, FALSE, FALSE, 0);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (prefs->lcTraceToggle),
+    			rcfile.getLCTrace()); 
+
 #ifdef USE_DEBUGGER
 
     prefs->DebuggerToggle = gtk_check_button_new_with_mnemonic ("Enable _debugger");
@@ -989,7 +1021,7 @@ GtkGui::showPreferencesDialog()
     gtk_box_pack_start (GTK_BOX(securityvbox), prefs->solSandbox, FALSE, FALSE, 0);
 
     prefs->solReadOnlyToggle = gtk_check_button_new_with_mnemonic ( 
-    				_("Do not _write Shared Object files"));
+    				_("Do _not write Shared Object files"));
     gtk_box_pack_start (GTK_BOX(securityvbox), prefs->solReadOnlyToggle, FALSE, FALSE, 0);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (prefs->solReadOnlyToggle),
     			rcfile.getSOLReadOnly());
@@ -1004,20 +1036,14 @@ GtkGui::showPreferencesDialog()
     				_("Disable Local _Connection object"));
     gtk_box_pack_start (GTK_BOX(securityvbox), prefs->localConnectionToggle, FALSE, FALSE, 0);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (prefs->localConnectionToggle),
-    			rcfile.getLocalConnection());
-
-    prefs->lcTraceToggle = gtk_check_button_new_with_mnemonic (
-    				_("_Trace local connection activity"));
-    gtk_box_pack_start (GTK_BOX(securityvbox), prefs->lcTraceToggle, FALSE, FALSE, 0);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (prefs->lcTraceToggle),
-    			rcfile.getLCTrace());  
+    			rcfile.getLocalConnection()); 
     
     // Sound Tab
 
-    // Security Tab
+    // Media Tab
     GtkWidget *mediavbox = gtk_vbox_new (FALSE, 2);
 
-    // Security tab title
+    // Media tab title
     GtkWidget *mediatablabel = gtk_label_new_with_mnemonic (_("_Media"));
     
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook1), GTK_WIDGET(mediavbox), mediatablabel); 
@@ -1029,8 +1055,77 @@ GtkGui::showPreferencesDialog()
    
     prefs->soundToggle = gtk_check_button_new_with_mnemonic ("Use sound _handler");
     gtk_box_pack_start (GTK_BOX(mediavbox), prefs->soundToggle, FALSE, FALSE, 0);
-
+    // Align button state with rcfile
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (prefs->soundToggle), rcfile.useSound());
+
+    // Player Tab
+    GtkWidget *playervbox = gtk_vbox_new (FALSE, 14);
+
+    // Player tab title
+    GtkWidget *playertablabel = gtk_label_new_with_mnemonic (_("_Player"));
+    
+    gtk_notebook_append_page(GTK_NOTEBOOK(notebook1), GTK_WIDGET(playervbox), playertablabel); 
+
+    // Player description
+    GtkWidget *descriptionlabel = gtk_label_new (_("<b>Player description</b>"));
+    gtk_label_set_use_markup (GTK_LABEL (descriptionlabel), TRUE);
+    gtk_box_pack_start(GTK_BOX(playervbox), descriptionlabel, FALSE, FALSE, 0);
+
+    // Version string
+    GtkWidget *versionhbox = gtk_hbox_new (FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(playervbox), versionhbox, FALSE, FALSE, 0);
+
+    GtkWidget *versionlabel = gtk_label_new (_("Player version:"));
+    gtk_misc_set_alignment (GTK_MISC (versionlabel), 0, 0.5);
+    gtk_box_pack_start(GTK_BOX(versionhbox), versionlabel, FALSE, FALSE, 0);
+
+    prefs->versionText = gtk_entry_new ();
+    gtk_box_pack_start(GTK_BOX(versionhbox), prefs->versionText, FALSE, FALSE, 0);
+    // Put text in the entry box      
+    gtk_entry_set_text(GTK_ENTRY(prefs->versionText), rcfile.getFlashVersionString().c_str());
+
+    // OS label
+    GtkWidget *oshbox = gtk_hbox_new (FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(playervbox), oshbox, FALSE, FALSE, 0);
+    
+    GtkWidget *OSlabel = gtk_label_new (_("Operating system:"));
+    gtk_misc_set_alignment (GTK_MISC (OSlabel), 0, 0.5);
+    gtk_box_pack_start(GTK_BOX(oshbox), OSlabel, FALSE, FALSE, 0);
+    
+    prefs->osText = gtk_entry_new ();
+    gtk_box_pack_start(GTK_BOX(oshbox), prefs->osText, FALSE, FALSE, 0);
+    // Put text in the entry box      
+    gtk_entry_set_text(GTK_ENTRY(prefs->osText), rcfile.getFlashSystemOS().c_str());
+    
+    GtkWidget *OSadvicelabel = gtk_label_new (_("<i>If blank, Gnash will "
+    					   "detect your OS</i>"));
+    gtk_label_set_use_markup (GTK_LABEL (OSadvicelabel), TRUE);
+    gtk_misc_set_alignment (GTK_MISC (OSadvicelabel), 0, 0.5);
+    gtk_box_pack_start(GTK_BOX(playervbox), OSadvicelabel, FALSE, FALSE, 0);     
+
+    // Performance
+    GtkWidget *performancelabel = gtk_label_new (_("<b>Performance</b>"));
+    gtk_label_set_use_markup (GTK_LABEL (performancelabel), TRUE);
+    gtk_box_pack_start(GTK_BOX(playervbox), performancelabel, FALSE, FALSE, 0);
+
+    // Library size
+    GtkWidget *libraryhbox = gtk_hbox_new (FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(playervbox), libraryhbox, FALSE, FALSE, 0);
+
+    GtkWidget *librarylabel = gtk_label_new (_("Max size of movie library:"));
+    gtk_misc_set_alignment (GTK_MISC (librarylabel), 0, 0.5);
+    gtk_box_pack_start(GTK_BOX(libraryhbox), librarylabel, FALSE, FALSE, 0);
+
+    prefs->librarySize = gtk_spin_button_new_with_range(0, 100, 1);
+    gtk_box_pack_start(GTK_BOX(libraryhbox), prefs->librarySize, FALSE, FALSE, 0);
+    // Align to rcfile value:
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(prefs->librarySize), rcfile.getMovieLibraryLimit());
+
+    prefs->startStoppedToggle = gtk_check_button_new_with_mnemonic (
+    				_("Start _Gnash in pause mode"));
+    gtk_box_pack_start (GTK_BOX(playervbox), prefs->startStoppedToggle, FALSE, FALSE, 0);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (prefs->startStoppedToggle),
+    			rcfile.startStopped());
 
     gtk_widget_show_all (prefsDialog);    
 }
@@ -1039,51 +1134,38 @@ void
 GtkGui::showPropertiesDialog()
 {
 
-    GtkWidget* label;
+    GtkWidget *propsDialog = gtk_dialog_new_with_buttons(
+    					_("Movie properties"),
+    					GTK_WINDOW(_window),
+   					// The cast is necessary if there is more
+   					// than one option.
+    					GtkDialogFlags(
+    					GTK_DIALOG_DESTROY_WITH_PARENT),
+    					// Just a 'close' button
+    					GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+    					NULL);
 
-    GtkWidget* window1 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title (GTK_WINDOW (window1), _("Movie Properties"));
-    
-    addGnashIcon(GTK_WINDOW(window1));
-    
-    GtkWidget *main_vbox = gtk_vbox_new(FALSE, 2);
-    gtk_container_add (GTK_CONTAINER (window1), main_vbox);
+    addGnashIcon(GTK_WINDOW(propsDialog));
 
-    GtkWidget *frame1 = gtk_frame_new(_("Movie Properties"));
-    gtk_box_pack_start (GTK_BOX (main_vbox), frame1, TRUE, TRUE, 0);
+    // Destroy the window when a button is clicked.
+    g_signal_connect (propsDialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
 
-    GtkWidget *vbox1 = gtk_vbox_new (FALSE, 3);
-    gtk_container_add (GTK_CONTAINER (frame1), vbox1);
+    // 2 rows: 1 for the title, 1 for the display widget (table or treeview)
+    GtkWidget *propsvbox = gtk_vbox_new (FALSE, 2);
+    gtk_container_add (GTK_CONTAINER (GTK_DIALOG(propsDialog)->vbox), propsvbox);
 
-    GtkWidget *vbox2 = gtk_vbox_new (FALSE, 2);
-    gtk_box_pack_start (GTK_BOX (vbox1), vbox2, FALSE, FALSE, 0);
-
-    GtkWidget *label_vbox2 = gtk_label_new(_("VM Properties"));
-    gtk_box_pack_start (GTK_BOX (vbox2), label_vbox2, FALSE, FALSE, 0);
+    GtkWidget *propslabel = gtk_label_new(_("<b>VM Properties</b>"));
+    gtk_label_set_use_markup (GTK_LABEL (propslabel), TRUE);
+    gtk_box_pack_start (GTK_BOX (propsvbox), propslabel, FALSE, FALSE, 0);
 
     GtkWidget *table1 = gtk_table_new(4, 2, FALSE);
-    gtk_box_pack_start (GTK_BOX (vbox2), table1, FALSE, FALSE, 0);
-
-
-    gtk_box_pack_start (
-	GTK_BOX (vbox1), gtk_hseparator_new (), FALSE, FALSE, 0);
-
-    GtkWidget *vbox3 = gtk_vbox_new (FALSE, 3);
-    gtk_box_pack_start (
-	GTK_BOX (vbox1), vbox3, TRUE, TRUE, 0);
-
-    GtkWidget *scrollwindow1 = gtk_scrolled_window_new (NULL, NULL);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrollwindow1),
-				      GTK_POLICY_AUTOMATIC,
-				      GTK_POLICY_AUTOMATIC);
-    gtk_box_pack_start (
-	 GTK_BOX (vbox3), scrollwindow1, TRUE, TRUE, 0);
+    gtk_box_pack_start (GTK_BOX (propsvbox), table1, FALSE, FALSE, 0);
 
     std::auto_ptr<InfoTree> infoptr = getMovieInfo();
 
     if ( ! infoptr.get() )
     {
-        label = gtk_label_new (_("VM not initialized yet"));
+        GtkWidget *label = gtk_label_new (_("VM not initialized yet"));
         gtk_widget_show (label);
         gtk_table_attach_defaults (GTK_TABLE (table1), label, 0, 1, 0, 1);
         return;
@@ -1128,13 +1210,18 @@ GtkGui::showPropertiesDialog()
         // Should replace table display when proper
         // InfoTrees are available 
 
+    GtkWidget *scrollwindow1 = gtk_scrolled_window_new (NULL, NULL);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrollwindow1),
+				      GTK_POLICY_AUTOMATIC,
+				      GTK_POLICY_AUTOMATIC);
+    gtk_box_pack_start (
+	 GTK_BOX (propsvbox), scrollwindow1, TRUE, TRUE, 0);
+
         enum
         {
             NODENAME_COLUMN = 0,
             STRING1_COLUMN,
-            STRING2_COLUMN,
-            COMMENT_COLUMN,
-            NUM_COLUMNS
+            STRING2_COLUMN
         };
 
         GtkTreeModel *model = makeTreeModel(infoptr);
@@ -1148,7 +1235,9 @@ GtkGui::showPropertiesDialog()
         GtkTreeViewColumn *column;
 
         //Add columns:
-        //First column:
+        
+#if 0     
+        //  Depth column (for debugging)
         renderer = gtk_cell_renderer_text_new ();
         g_object_set (renderer, "xalign", 0.0, NULL);
         col_offset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
@@ -1157,8 +1246,9 @@ GtkGui::showPropertiesDialog()
 						       NODENAME_COLUMN,
 						       NULL);
         column = gtk_tree_view_get_column (GTK_TREE_VIEW(treeview), col_offset - 1);
+#endif
 
-        //Second column:
+        // 'Variable' column:
 
         renderer = gtk_cell_renderer_text_new ();
         g_object_set (renderer, "xalign", 0.0, NULL);
@@ -1169,7 +1259,7 @@ GtkGui::showPropertiesDialog()
 						       NULL);
         column = gtk_tree_view_get_column (GTK_TREE_VIEW (treeview), col_offset - 1);
 
-        //Third column:
+        // 'Value' column:
 
         renderer = gtk_cell_renderer_text_new ();
         g_object_set (renderer, "xalign", 0.0, NULL);
@@ -1186,17 +1276,7 @@ GtkGui::showPropertiesDialog()
 #endif
     }
 
-    GtkWidget *bbox1 = gtk_hbutton_box_new ();
-    gtk_box_pack_start (
-	GTK_BOX (main_vbox), bbox1, FALSE, FALSE, 0);
-
-
-    GtkWidget *button_ok = gtk_button_new_from_stock (GTK_STOCK_OK);
-    gtk_box_pack_end (GTK_BOX (bbox1), button_ok, FALSE, FALSE, 0);
-    g_signal_connect_swapped (button_ok, "clicked",
-             G_CALLBACK(gtk_widget_destroy), window1);
-
-    gtk_widget_show_all (window1);
+    gtk_widget_show_all (propsDialog);
 
 }
 

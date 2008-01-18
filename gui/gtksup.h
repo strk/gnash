@@ -221,6 +221,10 @@ class DSOEXPORT GtkGui : public Gui
         GtkWidget *localConnectionToggle;
         GtkWidget *lcTraceToggle;
         GtkWidget *solSandbox;
+        GtkWidget *osText;
+        GtkWidget *versionText;
+        GtkWidget *librarySize;
+        GtkWidget *startStoppedToggle;
 #ifdef USE_DEBUGGER
         GtkWidget *DebuggerToggle;
 #endif

@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -42,7 +42,18 @@ public:
     bool loadFiles();
 
     bool parseFile(const std::string& filespec);
+    
+    /// Writes a valid gnashrc file. If the file already exists,
+    /// is is overwritten.
+    /// @param filespec the file to write
+    /// @return whether the file was successfully written.
     bool updateFile(const std::string& filespec);
+    
+    /// Writes a gnashrc file to the file specified in the
+    /// GNASHRC environment variable OR to the user's home
+    /// directory.
+    /// @return whether the file was successfully written.
+    bool updateFile();
     
     bool useSplashScreen() const { return _splashScreen; }
     void useSplashScreen(bool value);
@@ -59,13 +70,14 @@ public:
     int getTimerDelay() const { return _delay; }
     void setTimerDelay(int x) { _delay = x; }
 
-    int getMovieLibraryLimit() const { return _movieLibraryLimit; }
-
     bool showASCodingErrors() const { return _verboseASCodingErrors; }
     void showASCodingErrors(bool value);
 
     bool showMalformedSWFErrors() const { return _verboseMalformedSWF; }
     void showMalformedSWFErrors(bool value);
+
+    int getMovieLibraryLimit() const { return _movieLibraryLimit; }
+    void setMovieLibraryLimit(int value) { _movieLibraryLimit = value; }
 
     bool enableExtensions() const { return _extensionsEnabled; }
 
@@ -74,8 +86,10 @@ public:
     /// defaults to false.
     ///
     bool startStopped() const { return _startStopped; }
+    void startStopped(bool value) { _startStopped = value; }
 
     bool insecureSSL() const { return _insecureSSL; }
+    void insecureSSL(bool value) { _insecureSSL = value; }
     
     int verbosityLevel() const { return _verbosity; }
     void verbosityLevel(int value) { _verbosity = value; }
@@ -99,29 +113,30 @@ public:
 
     bool useLocalDomain() const { return _localdomainOnly; }
     void useLocalDomain(bool value);
-    
+ 
+    /// Whether to restrict access to the local host   
     bool useLocalHost() const { return _localhostOnly; }
+
+    /// Set whether to restrict access to the local host
     void useLocalHost(bool value);
 
-    const std::vector<std::string>& getWhiteList() const { return _whitelist; }
-    const std::vector<std::string>& getBlackList() const { return _blacklist; }
-
-    const std::string& getFlashVersionString() const { return _flashVersionString; }
-
-    const std::string& getFlashSystemOS() const { return _flashSystemOS; }
-
-    const std::string& getFlashSystemManufacturer() const { return _flashSystemManufacturer; }
-
-    int getRetries() const { return _retries; }
-    void setRetries(int x) { _retries = x; }
-
-    /// Return the number of seconds of inactivity before timing out streams downloads
-    double getStreamsTimeout() const { return _streamsTimeout; }
-
-    /// Set the number of seconds of inactivity before timing out streams downloads
-    void setStreamsTimeout(double x) { _streamsTimeout = x; }
-
     typedef std::vector<std::string> PathList;
+
+    /// Get the current RcInitFile whitelist of domains to allow
+    /// @return a std::vector of strings containing allowed domains 
+    const PathList& getWhiteList() const { return _whitelist; }
+
+    /// Sets the RcInitFile whitelist of domains to allow
+    /// @param list a std::vector of strings containing domains without protocol
+    void setWhitelist (std::vector<std::string>& list) { _whitelist = list; }
+
+    /// Get the current RcInitFile blacklist of domains to block
+    /// @return a std::vector of strings containing blocked domains    
+    const PathList& getBlackList() const { return _blacklist; }
+    
+    /// Sets the RcInitFile blacklist of domains to block
+    /// @param list a std::vector of strings containing domains without protocol
+    void setBlacklist (std::vector<std::string>& list) { _blacklist = list; }
 
     /// Return the list of directories to be used as the 'local' sandbox
     //
@@ -136,11 +151,31 @@ public:
         _localSandboxPath.push_back(dir);
     }
 
-    /// Set the local sandbox list
+    /// Sets a list of sandbox paths. Gnash will only allow movies access
+    /// to files in these paths. The path of the movie playing is automatically
+    /// added.
+    /// @param list a std::vector of strings containing paths to allow
     void setLocalSandboxPath(const PathList& path)
     {
         _localSandboxPath = path;
     }
+
+    const std::string& getFlashVersionString() const { return _flashVersionString; }
+    void setFlashVersionString(std::string& value) { _flashVersionString = value; }
+
+    const std::string& getFlashSystemOS() const { return _flashSystemOS; }
+    void setFlashSystemOS(std::string& value) { _flashSystemOS = value; }
+
+    const std::string& getFlashSystemManufacturer() const { return _flashSystemManufacturer; }
+    void setFlashSystemManufacturer(std::string& value) { _flashSystemManufacturer = value; }
+
+    int getRetries() const { return _retries; }
+    void setRetries(int x) { _retries = x; }
+
+    /// Return the number of seconds of inactivity before timing out streams downloads
+    double getStreamsTimeout() const { return _streamsTimeout; }
+    /// Set the number of seconds of inactivity before timing out streams downloads
+    void setStreamsTimeout(double x) { _streamsTimeout = x; }
 
     /// Get the URL opener command format
     //
@@ -175,10 +210,20 @@ public:
     void dump();    
 
 private:
-    uint32_t  _delay;                // the timer delay
-    uint32_t  _movieLibraryLimit;    // max number of movie clips to store in the library
-    bool _debug;                // enable debugging of this class
-    bool _debugger;             // enable the Flash movie debugger
+
+    /// The timer delay
+    uint32_t  _delay;
+
+    /// Max number of movie clips to store in the library      
+    uint32_t  _movieLibraryLimit;   
+
+    /// Enable debugging of this class
+    bool _debug;
+
+    /// Enable the Flash movie debugger
+    bool _debugger;
+
+    // Level of debugging output
     uint32_t  _verbosity;
 
     /// Command format to use to open urls
@@ -201,10 +246,10 @@ private:
     /// in Actionscript
     std::string  _flashSystemManufacturer;
 
-    /// enable dumping actionscript classes
+    /// Enable dumping actionscript classes
     bool _actionDump;
 
-    /// enable dumping parser data
+    /// Enable dumping parser data
     bool _parserDump;
 
     /// Enable ActionScript errors verbosity
@@ -212,30 +257,48 @@ private:
 
     /// Enable Malformed SWF verbosity
     bool _verboseMalformedSWF;
+
+    /// Display a splash screen when loading a movie
+    bool _splashScreen;
+
+    /// Only access network resources in the local domain
+    bool _localdomainOnly;
     
+    /// Only access network resources on the local host
+    bool _localhostOnly;
     
-    /// End user Features
-    bool _splashScreen;        // display a splash screen when
-                                // loading a movie
-    /// Security Features
-    bool _localdomainOnly;     // only access network resources for
-                                // the local domain
-    bool _localhostOnly;       // only access network resources 
-    std::vector<std::string> _whitelist; // domains we allow
-    std::vector<std::string> _blacklist; // domains we don't allow
-    std::string _log;           // the name of the debug log
-    bool _writeLog;             // enable writing the debug log to disk
-    std::string _wwwroot;       // the root path for the streaming server
-    int _retries;               // the number of retries for a thread
-    bool _sound;		// whether sound is enable or not
-    bool _pluginSound;		// whether sound is desired for the plugin
+    /// Allowed domains
+    PathList _whitelist;
+    
+    /// Blocked Domains 
+    PathList _blacklist;
+    
+    /// The name of the debug log
+    std::string _log;
+    
+    /// Enable writing the debug log to disk
+    bool _writeLog;
+    
+    /// The root path for the streaming server        
+    std::string _wwwroot;
+    
+    /// the number of retries for a thread 
+    int _retries;
+    
+    /// Enable the sound handler at startup         
+    bool _sound;
+    
+    /// Enable sound for the plugin
+    bool _pluginSound;		
 
-    bool _extensionsEnabled;	// whether to scan plugin path for extensions
+    /// Enable scanning plugin path for extensions
+    bool _extensionsEnabled;	
 
-    bool _startStopped;		// whether to start the gui in "stop" mode
+    /// Start the gui in "stop" mode
+    bool _startStopped;		
 
-    bool _insecureSSL;		// When TRUE, does not verify SSL certificates
-				// so is INSECURE.
+    /// Allow SSL connections without verifying the certificate
+    bool _insecureSSL;		
 
     /// The number of seconds of inactivity triggering download timeout
     double _streamsTimeout;
@@ -248,14 +311,22 @@ private:
     // or read from.
     std::string _solsandbox;
 
+    /// Whether SOL files can be written
     bool _solreadonly;
     bool _sollocaldomain;
+    
+    // Disable local connection
     bool _lcdisabled;
+    
+    /// Trace local connection activity (in log)
     bool _lctrace;
+    
+    /// Shared memory segment key (can be set for
+    /// compatibility with other players.
     key_t _lcshmkey;
 
-    // A function only for writing lists to an outstream.
-    void writeList(std::vector<std::string>& list, std::ostream& o);
+    // A function only for writing path lists to an outstream.
+    void writeList(PathList& list, std::ostream& o);
 
 protected:
     
@@ -265,7 +336,8 @@ protected:
     /// Never destroy (TODO: add a destroyDefaultInstance)
     ~RcInitFile();
 
-    void expandPath(std::string& path); //path string operations
+    /// Performs substitution on a path string (~) 
+    void expandPath(std::string& path);
 
     static bool extractSetting(bool *var, const char *pattern,
                         std::string &variable, std::string &value);

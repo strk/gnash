@@ -1,3 +1,14 @@
+2008-01-18 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/rc.{h,cpp}: add methods to set whitelist, blacklist, 
+	  flashVersionString, flashSystemOS, flashSystemManufacturer,
+	  startStopped, insecureSSL. Add updateFile() that decides where
+	  to write a gnashrc file (either to GNASHRC or to ~/.gnashrc, fail
+	  if neither can be found). Document more functions.
+	* gui/gtk{sup.h,.cpp}: clean up movie properties dialogue, add more
+	  options to preferences dialogue. Allow saving to disk by clicking
+	  'save'.
+
 2008-01-17 Sandro Santilli <strk@keybit.net>
 
 	* server/as_environment.cpp (find_object): don't allow dots
