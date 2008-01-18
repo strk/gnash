@@ -42,12 +42,12 @@ INCLUDES = -I.. \
 
 check_PROGRAMS = test_http test_crc
 
-test_http_SOURCES = test_http.cpp ../../http.o
-test_http_LDADD = $(AM_LDFLAGS) ../../http.o
+test_http_SOURCES = test_http.cpp $(top_srcdir)/cygnal/http.cpp
+test_http_LDADD = $(AM_LDFLAGS) 
 test_http_DEPENDENCIES = site-update
 
-test_crc_SOURCES = test_crc.cpp ../../crc.o
-test_crc_LDADD = $(AM_LDFLAGS) ../../crc.o
+test_crc_SOURCES = test_crc.cpp $(top_srcdir)/cygnal/crc.cpp
+test_crc_LDADD = $(AM_LDFLAGS) 
 test_crc_DEPENDENCIES = site-update
 
 
@@ -57,6 +57,10 @@ mudflap:
 	$(MAKE) CXXFLAGS="$(CXXFLAGS) $(MUDFLAP_OPT)" LIBS="$(LIBS) $(MUDFLAP_LIB)"
 
 TEST_DRIVERS = ../simple.exp
+
+CLEANFILES =  \
+	site.exp.bak \
+	testrun.* 
 
 check-DEJAGNU: site-update
 	@runtest=$(RUNTEST); \

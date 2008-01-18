@@ -82,7 +82,7 @@ bogustests-runner: $(srcdir)/../generic-testrunner.sh $(BOGUS_ASTESTS_OUT) $(AUX
 CLEANFILES =  \
 	gnash-dbg.log \
 	site.exp.bak \
-	alltests-runner \
+	*-runner \
 	testrun.* \
 	*.swf \
 	*.pp \

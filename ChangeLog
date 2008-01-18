@@ -1,3 +1,9 @@
+2008-01-18 Sandro Santilli <strk@keybit.net>
+
+	* cygnal/testsuite/cygnal.all/Makefile.am: don't build http.o
+	  and crc.o in source dir; clean all generated files.
+	* testsuite/misc-mtasc.all/Makefile.am: clean generated files.
+
 2008-01-18 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/asobj/xml.h, libgeometry/{Range,Point}2d.h,
