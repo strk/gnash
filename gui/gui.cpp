@@ -867,7 +867,7 @@ Gui::getMovieInfo() const
     movie_definition* def0 = level0->get_movie_definition();
     assert(def0);
     snprintf(buf, 16, "SWF%d", def0->get_version()); buf[15] = '\0';
-    ret->insert(ret->begin(), StringPair("_level0 SWFVersion", string(buf)));
+    ret->insert(ret->begin(), StringPair("_level0 SWFVersion", std::string(buf)));
     ret->insert(ret->begin(), StringPair("_level0 URL", def0->get_url()));
     ret->insert(ret->begin(), StringPair("Stage scripts", stage.scriptsDisabled() ? " disabled" : "enabled"));
 
