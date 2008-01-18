@@ -1,3 +1,7 @@
+2008-01-18 Sandro Santilli <strk@keybit.net>
+
+	* cygnal/http.cpp: fix extra semicolon error.
+
 2008-01-18 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/rc.{h,cpp}: add methods to set whitelist, blacklist, 

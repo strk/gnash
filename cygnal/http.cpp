@@ -71,7 +71,7 @@ HTTP::clearHeader()
     _te.clear();
     _accept.clear();
     _filesize = 0;
-};
+}
 
 HTTP &
 HTTP::operator = (HTTP& /*obj*/)
