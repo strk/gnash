@@ -51,7 +51,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	// FRAME 1 (start)
 
-	check_equals(root->get_frame_count(), 6);
+	check_equals(root->get_frame_count(), 5);
 	check_equals(root->get_play_state(), sprite_instance::PLAY);
 	check_equals(root->get_current_frame(), 0);
 	check_equals(root->getDisplayList().size(), 1);  // dejagnu clip
