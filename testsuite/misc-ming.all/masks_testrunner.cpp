@@ -51,7 +51,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	// FRAME 1 (start)
 
-	check_equals(root->get_frame_count(), 4);
+	check_equals(root->get_frame_count(), 6);
 	check_equals(root->get_play_state(), sprite_instance::PLAY);
 	check_equals(root->get_current_frame(), 0);
 	check_equals(root->getDisplayList().size(), 1);  // dejagnu clip
@@ -214,6 +214,11 @@ main(int /*argc*/, char** /*argv*/)
 	// 276,331 = white (light_blue not covered by its dark_green mask)
 	check( invalidated.contains(276, 331) );
 	check_pixel(276,331, 2, white, 2);
+
+	// FRAME 4
+	tester.advance();
+
+	// TODO: test setMask effects after swapping mask/maskee
 
 }
 
