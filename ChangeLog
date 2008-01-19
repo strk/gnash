@@ -1,5 +1,11 @@
 2008-01-19 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/masks_test.c: move the dejagnu
+	  window to the right, so that pixel checking isn't confused
+	  by color of text...
+
+2008-01-19 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/masks_test.c: test hitTest effects
 	  on dynamic masks and maskees. See bug #21923.
 

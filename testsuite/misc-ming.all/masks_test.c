@@ -121,12 +121,13 @@ main(int argc, char** argv)
 
 	Ming_init();
 	mo = newSWFMovieWithVersion(OUTPUT_VERSION);
-	SWFMovie_setDimension(mo, 800, 600);
+	SWFMovie_setDimension(mo, 1200, 600);
 	SWFMovie_setRate (mo, 1);
 
 	dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
 	it = SWFMovie_add(mo, (SWFBlock)dejagnuclip);
 	SWFDisplayItem_setDepth(it, 1000);
+	SWFDisplayItem_moveTo(it, 300, 0);
 	SWFMovie_nextFrame(mo);  // FRAME 2 starts here
 
 	add_actions(mo, "note('Test masks and dynamic masks at different depth ranges.');");
