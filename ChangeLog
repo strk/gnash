@@ -1,3 +1,7 @@
+2008-01-19 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/gtksup.h: get rid of C crap.
+
 2008-01-19 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/masks_test.c: move the dejagnu

@@ -205,7 +205,7 @@ class DSOEXPORT GtkGui : public Gui
 
     // A struct containing widgets for passing preference 
     // data from the dialogue   
-    typedef struct _prefData {
+    struct prefData {
         GtkWidget *soundToggle;
         GtkWidget *actionDumpToggle;
         GtkWidget *parserDumpToggle;
@@ -228,7 +228,7 @@ class DSOEXPORT GtkGui : public Gui
 #ifdef USE_DEBUGGER
         GtkWidget *DebuggerToggle;
 #endif
-    } prefData;
+    };
     
     static void updateRC(GtkWidget* widget, gint response, gpointer data);
     static void open_file(GtkWidget* dialog, gpointer data);
