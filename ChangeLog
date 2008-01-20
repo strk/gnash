@@ -1,3 +1,17 @@
+2008-01-20 Sandro Santilli <strk@keybit.net>
+
+	* server/character.{cpp,h}: keep a pointer from the mask to
+	  the maskee, as every character can dynamically mask at most
+	  a single maskee, so need to get an handle of old maskees
+	  when new are registered; have pointInVisibleShape return
+	  false for dynamic masks.
+	* server/sprite_instance.cpp: (pointInVisibleShape): if a character
+	  is a mask return false, if it's dynamically masked check hit test
+	  against the mask too; (setMask): return a boolean value.
+	* testsuite/misc-ming.all/masks_test.c: update expected results, most
+	  tests pass now, except a couple in which I'd thing Gnash is correct
+	  despite the official results...
+
 2008-01-20  Rob Savoye  <rob@ute.welcomehome.org>
 
 	* cygnal/Makefile.am: Build a library of dependant files, instead

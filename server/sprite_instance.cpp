@@ -1154,7 +1154,7 @@ sprite_setMask(const fn_call& fn)
 
   //log_debug("MovieClip.setMask() TESTING");
 
-  return as_value();
+  return as_value(true);
 }
 
 static as_value
@@ -3313,7 +3313,7 @@ public:
 
   bool operator() (character* ch)
   {
-    if ( ch->get_visible() && ch->pointInShape(_x, _y) )
+    if ( ch->pointInVisibleShape(_x, _y) )
     {
       _found = true;
       return false;
@@ -3337,6 +3337,18 @@ sprite_instance::pointInShape(float x, float y) const
 bool
 sprite_instance::pointInVisibleShape(float x, float y) const
 {
+  if ( ! get_visible() ) return false;
+  if ( isMask() )
+  {
+    log_debug("%s is a mask, no point will hit it", getTarget().c_str());
+    return false;
+  }
+  character* mask = getMask();
+  if ( mask && mask->get_visible() && ! mask->pointInShape(x, y) )
+  {
+    log_debug("%s is masked by %s, which doesn't hit point %g,%g", getTarget().c_str(), mask->getTarget().c_str(), x, y);
+    return false;
+  }
   VisibleShapeContainerFinder finder(x, y);
   const_cast<DisplayList&>(m_display_list).visitBackward(finder);
   if ( finder.hitFound() ) return true;

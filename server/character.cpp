@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.73 2008/01/18 17:48:26 bwy Exp $ */
+/* $Id: character.cpp,v 1.74 2008/01/20 19:38:04 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -852,6 +852,108 @@ character::destroy()
 	/// We don't destroy ourself twice, right ?
 	assert(!_destroyed);
 	_destroyed = true;
+}
+
+void
+character::markCharacterReachable() const
+{
+	if ( m_parent ) m_parent->setReachable();
+	if ( _mask )
+	{
+		// Stop being masked if the mask was unloaded
+		if ( _mask->isUnloaded() )
+		{
+			const_cast<character*>(this)->setMask(0);
+		}
+		else _mask->setReachable();
+	}
+	if ( _maskee )
+	{
+		// Stop masking if the masked character was unloaded
+		if ( _maskee->isUnloaded() )
+		{
+			const_cast<character*>(this)->setMaskee(0);
+		}
+		else _maskee->setReachable();
+	}
+	markAsObjectReachable();
+}
+
+void
+character::setMask(character* mask)
+{
+	if ( _mask != mask )
+	{
+		set_invalidated();
+	}
+
+	// Backup these before messing up
+	character* prevMask = _mask;
+	character* prevMaskee = _maskee;
+
+	// If we had a previous mask unregister with it
+	if ( _mask && _mask != mask )
+	{
+		// the mask will call setMask(NULL) 
+		// on any previously registered maskee
+		// so we make sure to set our _mask to 
+		// NULL before getting called again
+		_mask->setMaskee(NULL);
+	}
+
+	// if we had a maskee, notify it to stop using
+	// us as a mask
+	if ( prevMaskee )
+	{
+		prevMaskee->setMask(0); 
+	}
+
+	// TODO: should we reset any original clip depth
+	//       specified by PlaceObject tag ?
+	set_clip_depth(noClipDepthValue); // this will set _mask !!
+	_mask = mask;
+	_maskee = 0;
+
+	if ( _mask )
+	{
+		log_debug(" %s.setMask(%s): registering with new mask %s",
+			getTarget().c_str(),
+			mask ? mask->getTarget().c_str() : "null",
+			_mask->getTarget().c_str());
+		/// Register as as masked by the mask
+		_mask->setMaskee(this);
+	}
+}
+
+/*private*/
+void
+character::setMaskee(character* maskee)
+{
+	if ( _maskee == maskee )
+	{
+		return;
+	}
+	if ( _maskee )
+	{
+		// We don't want the maskee to call setMaskee(null)
+		// on us again
+		log_debug(" %s.setMaskee(%s) : previously masked char %s being set as non-masked",
+			getTarget().c_str(), maskee ? maskee->getTarget().c_str() : "null", _maskee->getTarget().c_str());
+		_maskee->_mask = NULL;
+	}
+
+	_maskee = maskee;
+
+	if ( maskee )
+	{
+		set_clip_depth(dynClipDepthValue);
+	}
+	else
+	{
+		// TODO: should we reset any original clip depth
+		//       specified by PlaceObject tag ?
+		set_clip_depth(noClipDepthValue);
+	}
 }
 
 

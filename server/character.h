@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.120 2008/01/16 10:20:29 strk Exp $ */
+/* $Id: character.h,v 1.121 2008/01/20 19:38:04 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -100,8 +100,14 @@ private:
 	/// The character masking this instance (if any)
 	character* _mask;
 
+	/// The character masked by this instance (if any)
+	character* _maskee;
+
 	/// Original target, as at construction time
 	std::string _origTarget;
+
+	/// Register a character masked by this instance
+	void setMaskee(character* maskee);
 
 protected:
 
@@ -132,19 +138,10 @@ protected:
 
 	/// Mark character-specific reachable resources
 	//
-	/// These are: the character's parent, mask and the default
+	/// These are: the character's parent, mask, maskee and the default
 	///             as_object reachable stuff.
 	///
-	void markCharacterReachable() const
-	{
-		if ( m_parent ) m_parent->setReachable();
-		if ( _mask )
-		{
-			// TODO: check if we should drop when isUnloaded() or isDestroyed()
-			_mask->setReachable();
-		}
-		markAsObjectReachable();
-	}
+	void markCharacterReachable() const;
 #endif // GNASH_USE_GC
 
 	const Events& get_event_handlers() const
@@ -370,6 +367,7 @@ public:
 	_unloaded(false),
 	_destroyed(false),
 	_mask(0),
+	_maskee(0),
 	_origTarget(),
 	m_visible(true),
 	m_parent(parent),
@@ -479,7 +477,6 @@ public:
 	void set_clip_depth(int d)
 	{
 		m_clip_depth = d;
-		_mask = 0; // in case we're masked by some other char
 	}
     
 	/// Returns true when the character (and it's childs) is used as a mask
@@ -501,7 +498,7 @@ public:
 	///
 	/// NOTE: there's no way to obtain the maskee from a dynamic mask
 	///
-	/// See also isMaskLeyer() and isMask()
+	/// See also isMaskLayer() and isMask()
 	///   
 	bool isDynamicMask() const
 	{
@@ -510,36 +507,27 @@ public:
 
 	character* to_character() { return this; }
 
-	/// Return the character masked by this instance (if any)
+	/// Return the character masking this instance (if any)
 	character* getMask() const
 	{
+		if ( ! _mask ) return NULL;
+		if ( _mask->_maskee != this )
+		{
+			// TODO: fix this !
+			log_error("Our mask maskee is not us");
+			return NULL; // for correctness;
+		}
 		return _mask;
 	}
 
 	/// Register a character as a mask for this instance.
 	///
 	/// @param mask The character to use as a mask, possibly NULL.
+	///	A reference to us will be registered with the mask, if
+	///	not null, so it'll know it's a mask for us, and would stop
+	///	being a mask for anything else.
 	///
-	void setMask(character* mask)
-	{
-		if ( _mask == mask ) return;
-
-		set_invalidated();
-
-		if ( _mask )
-		{
-			// TODO: should we reset any original clip depth
-			//       specified by PlaceObject tag ?
-			_mask->set_clip_depth(noClipDepthValue);
-		}
-		_mask = mask;
-		if ( mask )
-		{
-			/// Mark the mask as a dynamic one
-			mask->set_clip_depth(dynClipDepthValue); 
-		}
-	}
-
+	void setMask(character* mask);
 
 	/// Returns true if this character is a mask (either layer or dynamic mask)
 	bool isMask() const
@@ -719,8 +707,9 @@ public:
 	///
 	virtual bool pointInVisibleShape(float x, float y) const
 	{
-		if ( get_visible() ) return pointInShape(x, y);
-		else return false;
+		if ( ! get_visible() ) return false;
+		if ( isMask() ) return false;
+		return pointInShape(x, y);
 	}
 
 	/// Return the relative or absolute root of this character
