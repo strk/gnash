@@ -25,6 +25,7 @@ AM_CPPFLAGS = # -Wall
 AM_LDFLAGS = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la \
+	$(top_builddir)/cygnal/libcygnal.la \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS)
 
@@ -42,11 +43,11 @@ INCLUDES = -I.. \
 
 check_PROGRAMS = test_http test_crc
 
-test_http_SOURCES = test_http.cpp $(top_srcdir)/cygnal/http.cpp
+test_http_SOURCES = test_http.cpp
 test_http_LDADD = $(AM_LDFLAGS) 
 test_http_DEPENDENCIES = site-update
 
-test_crc_SOURCES = test_crc.cpp $(top_srcdir)/cygnal/crc.cpp
+test_crc_SOURCES = test_crc.cpp
 test_crc_LDADD = $(AM_LDFLAGS) 
 test_crc_DEPENDENCIES = site-update
 

@@ -24,6 +24,7 @@ SUBDIRS = \
 	. \
 	testsuite
 
+# we don't want these anymore
 #DIST_SUBDIRS  = ACT IO HTTP Net unit_tests 
 
 AM_CPPFLAGS = # -Wall
@@ -32,6 +33,7 @@ AM_CPPFLAGS = # -Wall
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_LDFLAGS = \
 	../libbase/libgnashbase.la \
+	../server/libgnashserver.la \
 	../libamf/libgnashamf.la \
 	$(LIBLTDL) \
 	$(GLIB_LIBS) \
@@ -54,18 +56,9 @@ INCLUDES = -I.. \
 	$(BOOST_CFLAGS) \
 	$(PTHREAD_CFLAGS)
 
-bin_PROGRAMS = cygnal
+noinst_LTLIBRARIES = libcygnal.la
 
-cygnal_SOURCES = \
-	cygnal.cpp \
-	http.cpp \
-	alloc.cpp \
-	netstats.cpp \
-	stream.cpp \
-	statistics.cpp \
-	crc.cpp
-#	transcode.cpp
-#	flash.cpp
+libcygnal_la_LIBADD = $(AM_LDFLAGS)
 
 noinst_HEADERS = \
 	http.h \
@@ -76,8 +69,19 @@ noinst_HEADERS = \
 #	transcode.h
 #	flash.h
 
-#	protocol.cpp protocol.h
-cygnal_LDADD = $(AM_LDFLAGS)
+
+libcygnal_la_SOURCES = \
+	http.cpp \
+	alloc.cpp \
+	netstats.cpp \
+	stream.cpp \
+	statistics.cpp \
+	crc.cpp
+
+bin_PROGRAMS = cygnal
+
+cygnal_SOURCES = cygnal.cpp
+cygnal_LDADD = $(AM_LDFLAGS) libcygnal.la
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

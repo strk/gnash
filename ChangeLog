@@ -1,3 +1,11 @@
+2008-01-20  Rob Savoye  <rob@ute.welcomehome.org>
+
+	* cygnal/Makefile.am: Build a library of dependant files, instead
+	of linking them directly into the executable.
+	* cygnal/testsuite/cygnal.all/Makefile.am: Link the library, not
+	the objects. This fixes the distcheck problem of object files
+	being left over after make check.
+
 2008-01-19 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gtksup.h: get rid of C crap.
