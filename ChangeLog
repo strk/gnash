@@ -1,5 +1,10 @@
 2008-01-21 Bastiaan Jacques <bastiaan@bjacques.org>
 
+	* libmedia/gst/gstflvdemux.c: Add a new #define so that this file will
+	compile against older Gstreamer.
+
+2008-01-21 Bastiaan Jacques <bastiaan@bjacques.org>
+
 	* server/asobj/NetStream.cpp: return undefined for currentFPS if a
 	nonsensical number results.
 	* server/asobj/NetStreamGst.cpp: whitespace fixes.

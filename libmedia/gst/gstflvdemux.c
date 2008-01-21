@@ -26,6 +26,10 @@
 
 #include <string.h>
 
+#ifndef GST_SEGMENT_FORMAT
+#define GST_SEGMENT_FORMAT "Q"
+#endif
+
 static GstStaticPadTemplate flv_sink_template = GST_STATIC_PAD_TEMPLATE ("sink",
     GST_PAD_SINK,
     GST_PAD_ALWAYS,
