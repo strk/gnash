@@ -1,3 +1,31 @@
+2008-01-20 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* configure.ac: Disable the use of mad and ffmpeg, because they
+	are no longer maintained media backends.
+	* libmedia/Makefile.am: Compile the newly added gstflvdemux.{h,cpp}
+	and gstflvparse.{h,cpp}. These files are Gstreamer's new FLV demuxer,
+	which will be loaded on-the-fly if it not available on the system.
+	* server/namedStrings.{h,cpp}: Add a symbol for onMetaData.
+	* server/asobj/NetConnection.cpp: Replace openConnection with
+	validateURL, since that name more accurately reflects its current
+	purpose. Media handlers will now be in charge of starting their own
+	network connections. Remove (now) unused methods.
+	* server/asobj/NetStream.{cpp,h}: Use symbolic names for pause modes.
+	Implement onMetaData through processMetaData.
+	* server/asobj/NetStreamGst.{h,cpp}: Reimplement the Gstreamer
+	NetStream handler. Gstreamer now takes care of URL resolving,
+	downloading, buffering, FLV decoding and all grocery shopping and
+	house cleaning. Because Gstreamer abstracts much of the threading
+	code, we rarely need to lock the main execution thread. The new
+	handler has been tested to work with YouTube, Lulu.tv, streaming
+	ogg-theora-vorbis etc. However, seeking HTTP streams does not
+	currently work.
+	* server/asobj/Sound.cpp: Don't try to start a NetConnection, as it
+	makes no sense in the base class.
+	* server/asobj/SoundGst.cpp: Like NetStreamGst, SoundGst now lets
+	Gstreamer handle downloading URLs and buffering data. SoundGst has
+	received a general cleanup.
+
 2008-01-20 Sandro Santilli <strk@keybit.net>
 
 	* server/character.{cpp,h}: keep a pointer from the mask to

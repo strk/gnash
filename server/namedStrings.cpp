@@ -60,6 +60,7 @@ static string_table::svt preload_names[] =
 	{ "onRollOver", NSV::PROP_ON_ROLL_OVER },
 	{ "onSelect", NSV::PROP_ON_SELECT },
 	{ "onStatus", NSV::PROP_ON_STATUS },
+	{ "onMetaData", NSV::PROP_ON_META_DATA },
 	{ "_parent", NSV::PROP_uPARENT },
 	{ "_root", NSV::PROP_uROOT },
 	{ "_global", NSV::PROP_uGLOBAL },

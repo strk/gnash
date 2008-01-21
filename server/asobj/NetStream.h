@@ -19,7 +19,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.54 2008/01/10 17:34:46 strk Exp $ */
+/*  $Id: NetStream.h,v 1.55 2008/01/21 07:07:28 bjacques Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -87,6 +87,7 @@ protected:
 		/// NetStream.Seek.InvalidTime (level: error)
 		invalidTime
 	};
+	
 
 	boost::intrusive_ptr<NetConnection> _netCon;
 
@@ -121,6 +122,9 @@ protected:
 	/// possibly trying to obtain the lock again (::play, ::pause, ...)
 	///
 	void processStatusNotifications();
+	
+	
+	void processMetaData(boost::intrusive_ptr<as_object>& metadata_obj);
 
 	/// The actionscript enviroment for the AS callbacks
 	//
@@ -187,6 +191,12 @@ protected:
 
 public:
 
+	enum PauseMode {
+	  pauseModeToggle = -1,
+	  pauseModePause = 0,
+	  pauseModeUnPause = 1	
+	};
+
 	NetStream();
 
 #if !defined(sgi) || defined(__GNUC__)
@@ -199,12 +209,8 @@ public:
 	/// Pauses/starts the playback of the media played by the current instance
 	//
 	/// @param mode
-	///	Defines what mode to put the instance in. 
-	/// -1 : toogle mode
-	/// 0 : switch to pause
-	/// 1 : switch to play
-	///
-	virtual void pause(int /*mode*/){}
+	///	Defines what mode to put the instance in.
+	virtual void pause(PauseMode /*mode*/){}
 
 	/// Starts the playback of the media
 	//
@@ -230,6 +236,10 @@ public:
 	/// and (re)start after a buffering pause. In NetStreamFfmpeg it is also
 	/// used to find the next video frame to be shown, though this might change.
 	virtual void advance(){}
+	
+	/// Returns the current framerate in frames per second.
+	virtual double getCurrentFPS() { return 0; }
+	
 
 	/// Sets the NetConnection needed to access external files
 	//
@@ -264,17 +274,14 @@ public:
 	///
 	boost::uint32_t bufferTime() { return m_bufferTime; }
 
-	/// Returns the number of bytes loaded of the media file
-	//
-	/// @return the number of bytes loaded of the media file
-	///
-	long bytesLoaded();
+	/// Returns the number of bytes of the media file that have been buffered.
+	virtual long bytesLoaded() { return 0; }
 
 	/// Returns the total number of bytes (size) of the media file
 	//
 	/// @return the total number of bytes (size) of the media file
 	///
-	long bytesTotal();
+	virtual long bytesTotal() { return 0;}
 
 	/// Returns the number of millisecond of the media file that is buffered and 
 	/// yet to be played
@@ -294,6 +301,8 @@ public:
 	/// @return a image containing the video frame, a NULL auto_ptr if none were ready
 	///
 	std::auto_ptr<image::image_base> get_video();
+	
+
 
 private:
 

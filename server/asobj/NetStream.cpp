@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.78 2007/12/17 22:24:59 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.79 2008/01/21 07:07:27 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -131,10 +131,11 @@ static as_value netstream_pause(const fn_call& fn)
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 	
 	// mode: -1 ==> toogle, 0==> pause, 1==> play
-	int mode = -1;
+	NetStream::PauseMode mode = NetStream::pauseModeToggle;
 	if (fn.nargs > 0)
 	{
-		mode = fn.arg(0).to_bool() ? 0 : 1;
+		mode = fn.arg(0).to_bool() ? NetStream::pauseModePause :
+		                             NetStream::pauseModeUnPause;
 	}
 	ns->pause(mode);	// toggle mode
 	return as_value();
@@ -310,23 +311,11 @@ static as_value
 netstream_currentFPS(const fn_call& fn)
 {
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
-
-	bool warned = false;
-	if ( ! warned ) {
-		log_unimpl("NetStream.currentFPS getter/setter");
-		warned = true;
-	}
-	if ( fn.nargs == 0 ) // getter
-	{
-		return as_value();
-	}
-	else // setter
-	{
-		return as_value();
-	}
+	
+	return as_value(ns->getCurrentFPS());
 }
 
-// Both a getter and a (do-nothing) setter for bufferLength
+// read-only property bufferLength: amount of time buffered before playback
 static as_value
 netstream_bufferLength(const fn_call& fn)
 {
@@ -451,6 +440,42 @@ void netstream_class_init(as_object& global)
 
 }
 
+
+void
+NetStream::processMetaData(boost::intrusive_ptr<as_object>& metadata_obj)
+{
+	// TODO: check for System.onStatus too ! use a private getStatusHandler() method for this.
+	as_value handler;
+	if (!get_member(NSV::PROP_ON_META_DATA, &handler) || ! handler.is_function())
+	{
+#ifdef GNASH_DEBUG_METADATA
+	  log_debug("No onMetaData handler");
+#endif
+		return;
+	}
+
+	size_t initialStackSize = m_env->stack_size();
+	if ( initialStackSize > 0 )
+	{
+		log_debug("NetStream environment stack not empty at start of processMetaData");
+	}
+
+#ifdef GNASH_DEBUG_METADATA
+  log_debug(" Invoking onMetaData");
+#endif
+
+  m_env->push(as_value(metadata_obj.get()));
+  call_method(handler, m_env, this, 1, m_env->get_top_index() );
+
+	// clear the stack after method execution
+	if ( m_env->stack_size() > initialStackSize )
+	{
+		log_debug("NetStream environment stack not empty at end of processMetaData. Fixing.");
+		m_env->drop(m_env->stack_size() - initialStackSize);
+	}
+}
+
+
 void
 NetStream::processStatusNotifications()
 {
@@ -517,20 +542,6 @@ NetStream::setBufferTime(boost::uint32_t time)
 }
 
 long
-NetStream::bytesLoaded()
-{
-	if (_netCon == NULL) return 0;
-	return _netCon->getBytesLoaded();
-}
-
-long
-NetStream::bytesTotal()
-{
-	if (_netCon == NULL) return 0;
-	return _netCon->getBytesTotal();
-}
-
-long
 NetStream::bufferLength()
 {
 	if (m_parser.get() == NULL) return 0;
@@ -559,7 +570,7 @@ NetStream::get_video()
 	if (!m_imageframe) return std::auto_ptr<image::image_base>(0);
 
 	// TODO: inspect if we could return m_imageframe directly...
-	return m_imageframe->clone();
+	return m_imageframe->clone();	
 }
 
 std::pair<const char*, const char*>

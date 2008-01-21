@@ -42,17 +42,15 @@ class SoundGst : public Sound {
 public:
 	SoundGst()
 		:
-		pipeline(NULL),
-		audiosink(NULL),
-		source(NULL),
-		decoder(NULL),
-		volume(NULL),
-		audioconv(NULL),
-		setupThread(NULL),
-		lock(NULL), 
-		inputPos(0),
-		isAttached(false),
-		remainingLoops(0)
+		_pipeline(NULL),
+		_audiosink(NULL),
+		_source(NULL),
+		_decoder(NULL),
+		_volume(NULL),
+		_audioconv(NULL),
+		_inputPos(0),
+		_isAttached(false),
+		_remainingLoops(0)
 	{}
 	~SoundGst();
 
@@ -62,34 +60,25 @@ public:
 	unsigned int getDuration();
 	unsigned int getPosition();
 
-	// Used for ffmpeg data read and seek callbacks
-	static int readPacket(void* opaque, char* buf, int buf_size);
-	static int seekMedia(void *opaque, int offset, int whence);
-
-	static void setupDecoder(SoundGst* so);
-	static bool getAudio(void *owner, boost::uint8_t *stream, int len);
+	void setupDecoder(const std::string& url);
 
 	static void callback_newpad (GstElement *decodebin, GstPad *pad, gboolean last, gpointer data);
 private:
 
 	// gstreamer pipeline objects
-	GstElement *pipeline;
-	GstElement *audiosink;
-	GstElement *source;
-	GstElement *decoder;
-	GstElement *volume;
-	GstElement *audioconv;
+	GstElement* _pipeline;
+	GstElement* _audiosink;
+	GstElement* _source;
+	GstElement* _decoder;
+	GstElement* _volume;
+	GstElement* _audioconv;
 
-	boost::thread *setupThread;
-	boost::mutex setupMutex;
-	boost::mutex::scoped_lock *lock;
+	long _inputPos;
 
-	long inputPos;
+	// Is this sound attached to the soundhandler?
+	bool _isAttached;
 
-	// Are this sound attached to the soundhandler?
-	bool isAttached;
-
-	int remainingLoops;
+	int _remainingLoops;
 };
 
 

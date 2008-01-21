@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.473 2008/01/17 00:18:50 rsavoye Exp $
+dnl $Id: configure.ac,v 1.474 2008/01/21 07:07:26 bjacques Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -565,18 +565,10 @@ dnl --------------------------------------------------------
 
 media_handler_specified=false
 AC_ARG_ENABLE(media,
- AC_HELP_STRING([--enable-media=handler], [Enable media handling support using the specified handler: ffmpeg, mad, GST (Gstreamer) or none (no sound) [[ffmpeg]] ]),
+ AC_HELP_STRING([--enable-media=handler], [Enable media handling support using the specified handler: gst or none (no sound) [[none]] ]),
  [case "${enableval}" in
    GST|gst)
      media_handler=gst
-     media_handler_specified=true
-     ;;
-   ffmpeg|FFMPEG)
-     media_handler=ffmpeg 
-     media_handler_specified=true
-     ;;
-   mad|MAD)
-     media_handler=mad 
      media_handler_specified=true
      ;;
    no|NO|none)
@@ -585,7 +577,7 @@ AC_ARG_ENABLE(media,
      ;;
    *) AC_MSG_ERROR([bad value ${enableval} for --enable-media option]) ;;
   esac],
- [media_handler=ffmpeg]
+ [media_handler=gst]
 )
 
 AC_ARG_ENABLE(lirc, AC_HELP_STRING([--enable-lirc], [Disable support for Lirc]),
@@ -1574,14 +1566,6 @@ dnl AM_CONDITIONAL(HAVE_FFMPEG, [test x"${FFMPEG_LIBS}" != x])
 
 case "${media_handler}" in
   gst) AC_DEFINE([SOUND_GST],  [1], [Use GSTREAMER for media handling]) ;;
-  ffmpeg) AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound handing]) ;;
-  mad) AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound handling]) ;;
-  *)
-esac
-
-case "${media_handler}" in
-  ffmpeg)  AC_DEFINE([USE_FFMPEG],  [1], [Use FFMPEG for media decoding]) ;;
-  mad)  AC_DEFINE([USE_MAD],  [1], [Use MAD for media decoding]) ;;
   *)
 esac
 

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetConnection.cpp,v 1.52 2007/12/26 20:30:14 strk Exp $ */
+/* $Id: NetConnection.cpp,v 1.53 2008/01/21 07:07:27 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -52,8 +52,7 @@ static as_value netconnection_new(const fn_call& fn);
 
 NetConnection::NetConnection()
 	:
-	as_object(getNetConnectionInterface()),
-	_loader()
+	as_object(getNetConnectionInterface())
 {
 	attachProperties();
 }
@@ -63,30 +62,17 @@ NetConnection::~NetConnection()
 }
 
 /*public*/
-bool NetConnection::openConnection(const std::string& url)
+std::string NetConnection::validateURL(const std::string& url)
 {
 
-	// if already running there is no need to setup things again
-	if (_loader.get())
-	{
-		log_debug("NetConnection::openConnection() called when already connected to a stream. Checking if the existing connection can be used.");
-		std::string newurl;
-		if (_prefixUrl.size() > 0) {
-			newurl += _prefixUrl + "/" + url;
-		} else {
-			newurl += url;
-		}
-		if (newurl.compare(_completeUrl) == 0) return true;
-		else return false;
-	}
-
+	std::string completeUrl;
 	if (_prefixUrl.size() > 0) {
-		_completeUrl += _prefixUrl + "/" + url;
+		completeUrl += _prefixUrl + "/" + url;
 	} else {
-		_completeUrl += url;
+		completeUrl += url;
 	}
 
-	URL uri(_completeUrl, get_base_url());
+	URL uri(completeUrl, get_base_url());
 
 	std::string uriStr(uri.str());
 	assert(uriStr.find("://")!=string::npos);
@@ -94,22 +80,14 @@ bool NetConnection::openConnection(const std::string& url)
 	// Check if we're allowed to open url
 	if (!URLAccessManager::allow(uri)) {
 		log_security(_("Gnash is not allowed to open this url: %s"), uriStr.c_str());
-		return false;
+		return "";
 	}
 
 	log_msg(_("Connecting to movie: %s"), uriStr.c_str());
 
-	_loader.reset( new LoadThread() );
-	
-	if (!_loader->setStream(std::auto_ptr<tu_file>(StreamProvider::getDefaultInstance().getStream(uri)))) {
-		log_error(_("Gnash could not open this url: %s"), uriStr.c_str());
-		_loader.reset();
-		return false;
-	}
-
 	log_msg(_("Connection etablished to movie: %s"), uriStr.c_str());
 
-	return true;
+	return uriStr;
 }
 
 /*public*/
@@ -126,75 +104,6 @@ NetConnection::addToURL(const std::string& url)
 	_prefixUrl += url;
 }
 
-/*public*/
-bool
-NetConnection::eof()
-{
-	if (!_loader.get()) return true; // @@ correct ?
-	return _loader->eof();
-}
-
-/*public*/
-size_t
-NetConnection::read(void *dst, size_t bytes)
-{
-	if (!_loader.get()) return 0; // @@ correct ?
-	return _loader->read(dst, bytes);
-}
-
-/*public*/
-bool
-NetConnection::seek(size_t pos)
-{
-	if (!_loader.get()) return false; // @@ correct ?
-	return _loader->seek(pos);
-}
-
-/*public*/
-size_t
-NetConnection::tell()
-{
-	if (!_loader.get()) return 0; // @@ correct ?
-	return _loader->tell();
-}
-
-/*public*/
-long
-NetConnection::getBytesLoaded()
-{
-	if (!_loader.get()) return 0; // @@ correct ?
-	return _loader->getBytesLoaded();
-}
-
-
-/*public*/
-long
-NetConnection::getBytesTotal()
-{
-	if (!_loader.get()) return 0; // @@ correct ?
-	return _loader->getBytesTotal();
-}
-
-/*public*/
-bool
-NetConnection::loadCompleted()
-{
-	if ( !_loader.get() ) return false; // @@ correct ?
-	return _loader->completed();
-}
-
-std::auto_ptr<FLVParser>
-NetConnection::getConnectedParser() const
-{
-	std::auto_ptr<FLVParser> ret;
-
-	if ( _loader.get() )
-	{
-		ret.reset(new FLVParser(*_loader));
-	}
-
-	return ret;
-}
 
 /// \brief callback to instantiate a new NetConnection object.
 /// \param fn the parameters from the Flash movie
@@ -213,6 +122,13 @@ netconnection_new(const fn_call& /* fn */)
 as_value
 NetConnection::connect_method(const fn_call& fn)
 {
+	// NOTE:
+	//
+	// NetConnection::connect() is *documented*, I repeat, *documented*, to require the
+	// "url" argument to be NULL in AS <= 2. This is *legal* and *required*. Anything
+	// other than NULL is undocumented behaviour, and I would like to know if there
+	// are any movies out there relying on it. --bjacques.
+
 	GNASH_REPORT_FUNCTION;
 
 	boost::intrusive_ptr<NetConnection> ptr = ensureType<NetConnection>(fn.this_ptr); 
@@ -228,14 +144,24 @@ NetConnection::connect_method(const fn_call& fn)
 	as_value& url_val = fn.arg(0);
 
 	// Check first arg for validity 
-	if ( url_val.is_null() || url_val.is_undefined() )
+	if ( url_val.is_null())
 	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		std::stringstream ss; fn.dump_args(ss);
-		log_aserror(_("NetConnection.connect(%s): invalid first arg"), ss.str().c_str());
-		);
+		// Null URL was passed. This is expected. Of course, it also makes this
+		// function (and, this class) rather useless. We return true, even though
+		// returning true has no meaning.
+		
+		return as_value(true);
+	}
+
+	// The remainder of this function is undocumented.
+	
+	if (url_val.is_undefined()) {
+                IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror(_("NetConnection.connect(): first argument shouldn't be undefined"));
+                );
 		return as_value(false);
 	}
+
 
 	/// .. TODO: checkme ... addToURL ?? shoudnl't we attempt a connection ??
 	ptr->addToURL(url_val.to_string());
@@ -289,10 +215,8 @@ NetConnection::isConnected_getset(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		// TODO: define a NetConnection::isConnected method
-		return as_value((bool)ptr->_loader.get());
-		//log_unimpl("NetConnection.isConnected get");
-		//return as_value();
+		log_unimpl("NetConnection.isConnected get");
+	  return as_value();
 	}
 	else // setter
 	{

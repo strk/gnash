@@ -29,89 +29,29 @@
 #include "fn_call.h"
 #include "GnashException.h"
 #include "builtin_function.h"
-
-#include "gstgnashsrc.h"
+#include "URL.h"
 
 #include <string>
 
+// TODO: implement loops
+//       seeking
+
 namespace gnash {
 
-static gboolean
-register_elements (GstPlugin *plugin)
-{
-	return gst_element_register (plugin, "gnashsrc", GST_RANK_NONE, GST_TYPE_GNASH_SRC);
-}
-
-static GstPluginDesc gnash_plugin_desc = {
-	0, // GST_VERSION_MAJOR
-	10, // GST_VERSION_MINOR
-	"gnashsrc",
-	"Use gnash as source via callbacks",
-	register_elements,
-	"0.0.1",
-	"LGPL",
-	"gnash",
-	"gnash",
-	"http://www.gnu.org/software/gnash/",
-	GST_PADDING_INIT
-};
-
-// Gstreamer callback function
-int 
-SoundGst::readPacket(void* opaque, char* buf, int buf_size)
-{
-
-	SoundGst* so = static_cast<SoundGst*>(opaque);
-	boost::intrusive_ptr<NetConnection> nc = so->connection;
-
-	size_t ret = nc->read(static_cast<void*>(buf), buf_size);
-	so->inputPos += ret;
-	return ret;
-
-}
-
-// Gstreamer callback function
-int 
-SoundGst::seekMedia(void *opaque, int offset, int whence){
-
-	SoundGst* so = static_cast<SoundGst*>(opaque);
-	boost::intrusive_ptr<NetConnection> nc = so->connection;
-
-
-	// Offset is absolute new position in the file
-	if (whence == SEEK_SET) {
-		nc->seek(offset);
-		so->inputPos = offset;
-
-	// New position is offset + old position
-	} else if (whence == SEEK_CUR) {
-		nc->seek(so->inputPos + offset);
-		so->inputPos = so->inputPos + offset;
-
-	// 	// New position is offset + end of file
-	} else if (whence == SEEK_END) {
-		// This is (most likely) a streamed file, so we can't seek to the end!
-		// Instead we seek to 50.000 bytes... seems to work fine...
-		nc->seek(50000);
-		so->inputPos = 50000;
-		
-	}
-
-	return so->inputPos;
-}
-
-// Callback function used by Gstreamer to to attached audio and video streams
-// detected by decoderbin to either the video out or audio out elements.
+// Callback function used by Gstreamer to attach audio and video streams
+// detected by decodebin to either the video out or audio out elements.
 void
 SoundGst::callback_newpad (GstElement* /*decodebin*/, GstPad *pad, gboolean /*last*/, gpointer data)
 {
+#if 0
 	log_msg(_("%s: new pad found"), __FUNCTION__);
+#endif
 	SoundGst* so = static_cast<SoundGst*>(data);
 	GstCaps *caps;
 	GstStructure *str;
 	GstPad *audiopad;
 
-	audiopad = gst_element_get_pad (so->audioconv, "sink");
+	audiopad = gst_element_get_static_pad (so->_audioconv, "sink");
 
 	// check media type
 	caps = gst_pad_get_caps (pad);
@@ -122,178 +62,155 @@ SoundGst::callback_newpad (GstElement* /*decodebin*/, GstPad *pad, gboolean /*la
 		log_msg(_("%s: new pad connected"), __FUNCTION__);
 	} else {
 		gst_object_unref (audiopad);
-		log_error(_("%s: Non-audio data found in file %s"), __FUNCTION__,
-				so->externalURL.c_str());
+		log_msg(_("%s: Non-audio data found in Sound url"), __FUNCTION__);
 	}
 	gst_caps_unref (caps);
-	return;
+	gst_object_unref(GST_OBJECT(audiopad));
 }
 
 void
-SoundGst::setupDecoder(SoundGst* so)
+SoundGst::setupDecoder(const std::string& url)
 {
-
-	boost::intrusive_ptr<NetConnection> nc = so->connection;
-	assert(nc);
-
-	// Pass stuff from/to the NetConnection object.
-	assert(so);
-	if ( !nc->openConnection(so->externalURL) ) {
-		log_error(_("could not open audio url: %s"), so->externalURL.c_str());
-		delete so->lock;
-		return;
-	}
-
-	so->inputPos = 0;
+	_inputPos = 0;
 
 	// init GStreamer
 	gst_init (NULL, NULL);
 
-	// setup the GnashNC plugin
-	_gst_plugin_register_static (&gnash_plugin_desc);
-
 	// setup the pipeline
-	so->pipeline = gst_pipeline_new (NULL);
+	_pipeline = gst_pipeline_new (NULL);
 
-	// create an audio sink - use oss, alsa or...? make a commandline option?
-	// we first try atudetect, then alsa, then oss, then esd, then...?
-	// If the gstreamer adder ever gets fixed this should be connected to the
-	// adder in the soundhandler.
+	if (!_pipeline) {
+		log_error(_("Could not create gstreamer pipeline element"));
+		return;
+	}
+
 #if !defined(__NetBSD__)
-	so->audiosink = gst_element_factory_make ("autoaudiosink", NULL);
-	if (!so->audiosink) so->audiosink = gst_element_factory_make ("alsasink", NULL);
-	if (!so->audiosink) so->audiosink = gst_element_factory_make ("osssink", NULL);
+	_audiosink = gst_element_factory_make ("autoaudiosink", NULL);
+	if (!_audiosink) _audiosink = gst_element_factory_make ("alsasink", NULL);
+	if (!_audiosink) _audiosink = gst_element_factory_make ("osssink", NULL);
 #endif
-	if (!so->audiosink) so->audiosink = gst_element_factory_make ("esdsink", NULL);
+	if (!_audiosink) _audiosink = gst_element_factory_make ("esdsink", NULL);
 
-	// Check if the creation of the gstreamer pipeline and audiosink was a succes
-	if (!so->pipeline) {
-		gnash::log_error(_("Could not create gstreamer pipeline element"));
+	if (!_audiosink) {
+		log_error(_("Could not create gstreamer audiosink element"));
+                gst_object_unref(GST_OBJECT(_pipeline));
 		return;
 	}
-	if (!so->audiosink) {
-		gnash::log_error(_("Could not create gstreamer audiosink element"));
-		return;
-	}
-
-	// setup gnashnc source (our homegrown source element)
-	so->source = gst_element_factory_make ("gnashsrc", NULL);
-	gnashsrc_callback* gc = new gnashsrc_callback;
-	gc->read = SoundGst::readPacket;
-	gc->seek = SoundGst::seekMedia;
-	g_object_set (G_OBJECT (so->source), "data", so, "callbacks", gc, NULL);
 
 	// setup the audio converter
-	so->audioconv = gst_element_factory_make ("audioconvert", NULL);
+	_audioconv = gst_element_factory_make ("audioconvert", NULL);
 
 	// setup the volume controller
-	so->volume = gst_element_factory_make ("volume", NULL);
+	_volume = gst_element_factory_make ("volume", NULL);
 
 	// setup the decoder with callback
-	so->decoder = gst_element_factory_make ("decodebin", NULL);
-	g_signal_connect (so->decoder, "new-decoded-pad", G_CALLBACK (SoundGst::callback_newpad), so);
+	_decoder = gst_element_factory_make ("decodebin", NULL);
+	g_signal_connect (_decoder, "new-decoded-pad", G_CALLBACK (SoundGst::callback_newpad), this);
 
 
-	if (!so->source || !so->audioconv || !so->volume || !so->decoder) {
+	if (!_audioconv || !_volume || !_decoder) {
 		gnash::log_error(_("Could not create Gstreamer element(s) for movie handling"));
 		return;
 	}
 
+	GstElement* downloader = gst_element_make_from_uri(GST_URI_SRC, url.c_str(),
+							   "gnash_audiodownloader");
+
+	GstElement* queue = gst_element_factory_make ("queue", "gnash_audioqueue");
+
+
 	// put it all in the pipeline
-	gst_bin_add_many (GST_BIN (so->pipeline), so->source, so->decoder, so->audiosink, so->audioconv, so->volume, NULL);
+	gst_bin_add_many (GST_BIN (_pipeline), downloader, queue, _decoder,
+			  _audiosink, _audioconv, _volume, NULL);
 
 	// link the elements
-	gst_element_link(so->source, so->decoder);
-	gst_element_link_many(so->audioconv, so->volume, so->audiosink, NULL);
+	gst_element_link_many(_audioconv, _volume, _audiosink, NULL);
+  gst_element_link_many(downloader, queue, _decoder, NULL);
 	
-	// By deleting this lock we allow start() to start playback
-	delete so->lock;
 	return;
 }
 
-SoundGst::~SoundGst() {
+SoundGst::~SoundGst()
+{
 
-	if (externalSound && pipeline) {
-		gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
-		gst_object_unref (GST_OBJECT (pipeline));
+	if (externalSound && _pipeline) {
+		gst_element_set_state (_pipeline, GST_STATE_NULL);
+		gst_object_unref (GST_OBJECT (_pipeline));
 	}
 }
 
 void
-SoundGst::loadSound(const std::string& file, bool streaming)
+SoundGst::loadSound(const std::string& url, bool streaming)
 {
-	pipeline = NULL;
-	remainingLoops = 0;
+  connection = new NetConnection;
 
-	if (connection) {
-		log_error(_("%s: This sound already has a connection?  (We try to handle this by overriding the old one...)"), __FUNCTION__);
+  std::string valid_url = connection->validateURL(url);
+
+	log_msg("%s: loading URL %s", __FUNCTION__, valid_url.c_str());
+
+	_remainingLoops = 0;
+
+	if (_pipeline) {
+		log_msg(_("%s: This sound already has a pipeline. Resetting for new URL connection. (%s)"), __FUNCTION__, valid_url.c_str());
+	        gst_element_set_state (_pipeline, GST_STATE_NULL); // FIXME: wait for state?
+
+		GstElement* downloader = gst_bin_get_by_name(GST_BIN(_pipeline), "gnash_audiodownloader");
+		gst_bin_remove(GST_BIN(_pipeline), downloader); 
+		gst_object_unref(GST_OBJECT(downloader));
+
+		downloader = gst_element_make_from_uri(GST_URI_SRC, valid_url.c_str(),
+                                                       "gnash_audiodownloader");
+
+		gst_bin_add(GST_BIN(_pipeline), downloader);
+
+		GstElement* queue = gst_bin_get_by_name(GST_BIN(_pipeline), "gnash_audioqueue");
+
+		gst_element_link(downloader, queue);
+		gst_object_unref(GST_OBJECT(queue));
+	} else {
+		setupDecoder(valid_url);
 	}
-	externalURL = file;
-
-	connection = new NetConnection();
 
 	externalSound = true;
-	isStreaming = streaming;
 
-	lock = new boost::mutex::scoped_lock(setupMutex);
-
-	// To avoid blocking while connecting, we use a thread.
-	setupThread = new boost::thread(boost::bind(SoundGst::setupDecoder, this));
-
+	start(0, 0);
 }
 
 void
 SoundGst::start(int offset, int loops)
 {
-	boost::mutex::scoped_lock lock(setupMutex);
-
-	if (externalSound) {
-		if (offset > 0) {
-			// Seek to offset position
-			if (!gst_element_seek (pipeline, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
-				GST_SEEK_TYPE_SET, GST_SECOND * static_cast<long>(offset),
-				GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
-				log_error(_("%s: seeking to offset failed"), 
-					__FUNCTION__);
-			}
-
-		}
-		// Save how many loops to do
-		if (loops > 0) {
-			remainingLoops = loops;
-		}
-		// start playing	
-		gst_element_set_state (pipeline, GST_STATE_PLAYING);
-
+	if (!externalSound) {
+		Sound::start(offset, loops);
+		return;
 	}
 
+	if (offset > 0) {
+		// Seek to offset position
+		if (!gst_element_seek (_pipeline, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
+			GST_SEEK_TYPE_SET, GST_SECOND * static_cast<long>(offset),
+			GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
+			log_error(_("%s: seeking to offset failed"), 
+				__FUNCTION__);
+		}
 
-	// Start sound
-	media::sound_handler* s = get_sound_handler();
-	if (s) {
-		if (!externalSound) {
-	    	s->play_sound(soundId, loops, offset, 0, NULL);
-	    }
 	}
+	// Save how many loops to do
+	if (loops > 0) {
+		_remainingLoops = loops;
+	}
+	// start playing	
+	gst_element_set_state (_pipeline, GST_STATE_PLAYING);
 }
 
 void
 SoundGst::stop(int si)
 {
-	// stop the sound
-	media::sound_handler* s = get_sound_handler();
-	if (s != NULL)
-	{
-	    if (si < 0) {
-	    	if (externalSound) {
-				gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
-	    	} else {
-				s->stop_sound(soundId);
-			}
-		} else {
-			s->stop_sound(si);
-		}
+	if (!externalSound) {
+		Sound::stop(si);
+		return;
 	}
+
+	gst_element_set_state (GST_ELEMENT (_pipeline), GST_STATE_NULL);
 }
 
 unsigned int
@@ -301,20 +218,14 @@ SoundGst::getDuration()
 {
 	// Return the duration of the file in milliseconds
 	
-	// If this is a event sound get the info from the soundhandler
 	if (!externalSound) {
-		media::sound_handler* s = get_sound_handler();
-		if (s) {		
-	    	return (s->get_duration(soundId));
-	    } else {
-	    	return 0; // just in case
-		}
+		return Sound::getDuration();
 	}
 	
 	GstFormat fmt = GST_FORMAT_TIME;
 	boost::int64_t len;
 
-	if (pipeline && gst_element_query_duration (pipeline, &fmt, &len)) {
+	if (_pipeline && gst_element_query_duration (_pipeline, &fmt, &len)) {
 		return static_cast<unsigned int>(len / GST_MSECOND);
 	} else {
 		return 0;
@@ -326,26 +237,20 @@ SoundGst::getPosition()
 {
 	// Return the position in the file in milliseconds
 	
-	// If this is a event sound get the info from the soundhandler
 	if (!externalSound) {
-		media::sound_handler* s = get_sound_handler();
-		if (s) {
-			return s->get_position(soundId);	
-	    } else {
-	    	return 0; // just in case
-		}
+	    	return Sound::getPosition();
 	}
 	
-	if (!pipeline) return 0;
+	if (!_pipeline) return 0;
 
 	GstFormat fmt = GST_FORMAT_TIME;
 	boost::int64_t pos;
 	GstStateChangeReturn ret;
 	GstState current, pending;
 
-	ret = gst_element_get_state (GST_ELEMENT (pipeline), &current, &pending, 0);
+	ret = gst_element_get_state (GST_ELEMENT (_pipeline), &current, &pending, 0);
 
-	if (current != GST_STATE_NULL && gst_element_query_position (pipeline, &fmt, &pos)) {
+	if (current != GST_STATE_NULL && gst_element_query_position (_pipeline, &fmt, &pos)) {
 		return static_cast<unsigned int>(pos / GST_MSECOND);
 	} else {
 		return 0;
