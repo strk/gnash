@@ -15,10 +15,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.92 2008/01/14 14:23:45 strk Exp $ */
+/* $Id: plugin.cpp,v 1.93 2008/01/21 23:28:02 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #define MIME_TYPES_HANDLED  "application/x-shockwave-flash"
