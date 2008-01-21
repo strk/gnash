@@ -1,6 +1,6 @@
 // FLVParser.h:  Flash Video file format parser, for Gnash.
 //
-//   Copyright (C) 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.h,v 1.21 2007/12/12 10:06:59 zoulunkai Exp $
+// $Id: FLVParser.h,v 1.22 2008/01/21 20:55:43 rsavoye Exp $
 
 // Information about the FLV format can be found at http://osflash.org/flv
 
@@ -29,8 +29,6 @@
 #include <boost/thread/mutex.hpp>
 
 namespace gnash {
-
-
 
 /// \brief
 /// The FLVFrame class contains a video or audio frame, its size, its

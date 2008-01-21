@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,13 +16,13 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: Key.h,v 1.32 2007/12/12 10:23:46 zoulunkai Exp $ */
+/* $Id: Key.h,v 1.33 2008/01/21 20:55:55 rsavoye Exp $ */
 
 #ifndef __KEY_H__
 #define __KEY_H__
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include "tu_config.h"

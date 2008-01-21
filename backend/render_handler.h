@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.55 2008/01/02 11:45:20 strk Exp $ */
+/* $Id: render_handler.h,v 1.56 2008/01/21 20:56:04 rsavoye Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -146,7 +146,7 @@
 
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include "tu_config.h" // for DSOEXPORT

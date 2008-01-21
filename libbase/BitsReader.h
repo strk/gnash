@@ -1,6 +1,6 @@
 // BitsReader.h:  bits reader, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,13 +17,13 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: BitsReader.h,v 1.8 2007/12/12 10:06:59 zoulunkai Exp $
+// $Id: BitsReader.h,v 1.9 2008/01/21 20:55:43 rsavoye Exp $
 
 #ifndef BITSREADER_H
 #define BITSREADER_H
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include "swf.h"

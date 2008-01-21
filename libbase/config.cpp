@@ -9,7 +9,7 @@
 #if 0
 
 
-#include "config.h"
+#include "gnashconfig.h"
 extern "C" {
 #include <lualib.h>
 }

@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Math.cpp,v 1.26 2008/01/09 16:21:39 strk Exp $ */
+/* $Id: Math.cpp,v 1.27 2008/01/21 20:55:56 rsavoye Exp $ */
 
 //
 // This file implements methods of the ActionScript Math class.
@@ -30,7 +30,7 @@
 
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 #include <cmath>
 #include <string>

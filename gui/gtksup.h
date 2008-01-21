@@ -19,7 +19,7 @@
 #define __GTKSUP_H__
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include "gnash.h"
@@ -29,7 +29,7 @@
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
 
-#ifdef USE_HILDON
+#ifdef GUI_HILDON
 extern "C" {
 # include <hildon/hildon.h>
 }

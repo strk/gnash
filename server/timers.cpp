@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.45 2008/01/10 17:34:46 strk Exp $ */
+/* $Id: timers.cpp,v 1.46 2008/01/21 20:55:53 rsavoye Exp $ */
 
 #include "timers.h"
 #include "as_function.h" // for class as_function

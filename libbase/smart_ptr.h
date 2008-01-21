@@ -1,5 +1,5 @@
 //
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 // although the nice thing about templates is that no particular
 // ref-counted class is mandated.
 
-/* $Id: smart_ptr.h,v 1.24 2007/10/03 21:20:06 strk Exp $ */
+/* $Id: smart_ptr.h,v 1.25 2008/01/21 20:55:45 rsavoye Exp $ */
 
 #ifndef SMART_PTR_H
 #define SMART_PTR_H

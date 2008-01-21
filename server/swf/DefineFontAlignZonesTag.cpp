@@ -1,6 +1,6 @@
 // DefineFontAlignZonesTag.cpp:  for Gnash.
 //
-//   Copyright (C) 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,10 +17,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: DefineFontAlignZonesTag.cpp,v 1.5 2007/07/01 10:54:35 bjacques Exp $ */
+/* $Id: DefineFontAlignZonesTag.cpp,v 1.6 2008/01/21 20:56:02 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include "font.h"

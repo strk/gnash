@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,13 +17,13 @@
 
 // Based on work of Thatcher Ulrich <tu@tulrich.com> 2003
 
-/* $Id: fill_style.h,v 1.15 2008/01/07 16:47:25 strk Exp $ */
+/* $Id: fill_style.h,v 1.16 2008/01/21 20:55:50 rsavoye Exp $ */
 
 #ifndef GNASH_FILL_STYLE_H
 #define GNASH_FILL_STYLE_H
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include "types.h"

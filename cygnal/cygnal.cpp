@@ -1,6 +1,6 @@
 // cygnal.cpp:  GNU streaming Flash media server, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include <iostream>
@@ -278,6 +278,7 @@ http_thread(struct thread_params *conndata)
     }
 }
 
+#if 0
 static void
 rtmp_thread(struct thread_params *conndata)
 {
@@ -338,6 +339,7 @@ ssl_thread(struct thread_params *conndata)
 	sendthr.join();
     }
 }
+#endif
 
 static void
 stream_thread(struct  thread_params *params)

@@ -1,8 +1,28 @@
+# 
+#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+# 
+
 #
 # Build the GTK gui
 #
 if BUILD_GTK_GUI
 bin_PROGRAMS += gtk-gnash
+if BUILD_ALP_GUI
+GTK_CFLAGS += -DALP_BUILD=ALP_BUILD_DEBUG
+endif
 gtk_gnash_SOURCES = $(GUI_SRCS) gui_gtk.cpp
 gtk_gnash_CPPFLAGS = -DGUI_GTK -DGUI_CONFIG=\"GTK\" \
 	$(AM_CPPFLAGS) $(GTK_CFLAGS)
@@ -21,7 +41,7 @@ gtk_gnash_CPPFLAGS += $(AGG_CFLAGS)
 gtk_gnash_SOURCES += gtk_glue_agg.cpp gtk_glue_agg.h \
 		gtk.cpp gtksup.h gtk_glue.h
 gtk_gnash_LDADD = $(top_builddir)/backend/libgnashagg.la \
-		$(GNASH_LIBS) $(GTK_LIBS) $(AGG_LIBS)
+		$(GNASH_LIBS) $(GTK_LIBS) $(AGG_LIBS) $(CAIRO_LIBS)
 endif				# BUILD_AGG_RENDERER
 if BUILD_CAIRO_RENDERER
 gtk_gnash_CPPFLAGS += $(CAIRO_CFLAGS)

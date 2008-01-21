@@ -1,6 +1,6 @@
 // DisplayListTag.h: DisplayList tag, for Gnash.
 // 
-//   Copyright (C) 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,17 +16,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-//
-
-/* $Id: DisplayListTag.h,v 1.8 2007/12/11 15:13:28 strk Exp $ */
+/* $Id: DisplayListTag.h,v 1.9 2008/01/21 20:56:02 rsavoye Exp $ */
 
 #ifndef GNASH_SWF_DISPLAYLISTTAG_H
 #define GNASH_SWF_DISPLAYLISTTAG_H
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include "ControlTag.h" // for inheritance

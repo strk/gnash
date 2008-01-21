@@ -1,5 +1,5 @@
 //
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@
 ///   TSCALIB=491,1635,1581,639 gnash yourmovie.swf    
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include <sys/types.h>
@@ -338,7 +338,7 @@ bool FBGui::initialize_renderer() {
     var_screeninfo.blue.offset, var_screeninfo.blue.length,
     _bpp
   );
-  
+
   if (pixelformat) {    
     agg_handler = create_render_handler_agg(pixelformat);      
   } else {

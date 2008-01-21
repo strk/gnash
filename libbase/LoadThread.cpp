@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: LoadThread.cpp,v 1.18 2007/12/20 22:31:31 strk Exp $
+// $Id: LoadThread.cpp,v 1.19 2008/01/21 20:55:43 rsavoye Exp $
 
 #include "LoadThread.h"
 

@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,10 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-
-/* $Id: render_handler_cairo.h,v 1.7 2007/10/18 09:05:40 bjacques Exp $ */
+/* $Id: render_handler_cairo.h,v 1.8 2008/01/21 20:56:05 rsavoye Exp $ */
 
 #ifndef BACKEND_RENDER_HANDLER_CAIRO_H
 #define BACKEND_RENDER_HANDLER_CAIRO_H

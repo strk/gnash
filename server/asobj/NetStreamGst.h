@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,13 +15,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamGst.h,v 1.30 2008/01/21 07:07:28 bjacques Exp $ */
+/* $Id: NetStreamGst.h,v 1.31 2008/01/21 20:55:57 rsavoye Exp $ */
 
 #ifndef __NETSTREAMGST_H__
 #define __NETSTREAMGST_H__
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #ifdef SOUND_GST

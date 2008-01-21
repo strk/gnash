@@ -1,6 +1,6 @@
 // morph2_character_def.cpp:   Load and render morphing shapes, for Gnash.
 //
-//   Copyright (C) 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2006, 2007, 2008 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: morph2_character_def.cpp,v 1.20 2007/12/04 11:45:32 strk Exp $ */
+/* $Id: morph2_character_def.cpp,v 1.21 2008/01/21 20:56:00 rsavoye Exp $ */
 
 // Based on the public domain morph2.cpp of:
 // Thatcher Ulrich <tu@tulrich.com>, Mike Shaver <shaver@off.net> 2003,

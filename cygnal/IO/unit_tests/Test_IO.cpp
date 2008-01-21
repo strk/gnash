@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -100,3 +100,4 @@ BOOST_AUTO_TEST_CASE( Null_Device_Basic_Write_First )
 	BOOST_CHECK( r.length == 0 ) ;
 	BOOST_CHECK( device.known_eof() ) ;
 }
+

@@ -1,5 +1,5 @@
 # 
-#   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-# $Id: Makefile.am,v 1.67 2007/11/24 04:58:13 bjacques Exp $
+# $Id: Makefile.am,v 1.68 2008/01/21 20:56:04 rsavoye Exp $
 
 ## Process this file with automake to generate Makefile.in
 

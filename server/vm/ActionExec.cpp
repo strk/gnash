@@ -17,10 +17,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.63 2008/01/18 17:48:27 bwy Exp $ */
+/* $Id: ActionExec.cpp,v 1.64 2008/01/21 20:56:03 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include "ActionExec.h"

@@ -1,6 +1,6 @@
 // as_value.cpp:  ActionScript values, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 //
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include "as_value.h"
@@ -682,6 +682,13 @@ as_value::to_as_function() const
     } else {
 	return NULL;
     }
+}
+
+// Force type to number.
+void
+as_value::convert_to_boolean()
+{
+    set_bool(to_bool());
 }
 
 // Force type to number.

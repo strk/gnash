@@ -1,3 +1,23 @@
+2008-01-21  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libbase/network.cpp: Use _debug instead of an ifdef. Comment out
+	trace messages in each method. Add hexdumps for network traffic.
+	* gui/gnash.cpp: Add ALP includes.
+	* gui/kde_glue_agg.cpp: Include qicon.h and agg headers.
+	* gui/am-frag/gtk.am: Add ALP, which is a GTK derived GUI.
+	* gui/am-frag/kde.am: Also build under Qtopia.
+	* libamf/sol.cpp: always use boost:: with numeric data typedefs.
+	* macros/ffmpeg.m4: Add better OpenBSD support, but maybe a moot
+	point now since Gnash doesn't link directly against ffmpeg now.
+	* macros/gettext.m4: OpenBSD defines INTLLIBS differently.
+	* macros/glib.m4: We don't want -L/usr in the link path either.
+	* configure.ac: Use gnashconfig.h instead of just config.h.
+	* All GPL'd files: Update copyright years.
+	* Most files: Include gnashconfig.h instead of config.h to avoid
+	any name collisions.
+	* autogen.sh: Fix the files generated form templates to include
+	gnashconfig.h, not config.h, which isn't a unique name.
+
 2008-01-21 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* libmedia/gst/gstflvdemux.c: Add a new #define so that this file will

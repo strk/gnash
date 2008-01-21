@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 # 
-#   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.35 2007/12/01 23:29:44 strk Exp $
+# $Id: Makefile.am,v 1.36 2008/01/21 20:56:11 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 

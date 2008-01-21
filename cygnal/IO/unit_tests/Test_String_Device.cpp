@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -69,3 +69,4 @@ BOOST_AUTO_TEST_CASE( String_Device_Write )
 	BOOST_CHECK( device.Sink::completed() ) ;
 	BOOST_CHECK( device.n_written() == 5 ) ;
 }
+

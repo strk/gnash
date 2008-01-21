@@ -1,6 +1,6 @@
 // network.cpp:  TCP/IP support, for Gnash.
 //
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 //
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include "utility.h"
@@ -230,9 +230,9 @@ Network::newConnection(bool block)
 
     alen = sizeof(struct sockaddr_in);
 
-#ifdef NET_DEBUG
-    log_msg(_("Trying to accept net traffic on fd %d"), _sockfd);
-#endif
+    if (_debug) {
+	log_msg(_("Trying to accept net traffic on fd %d"), _sockfd);
+    }
 
     if (_listenfd <= 2) {
         return false;
@@ -260,7 +260,9 @@ Network::newConnection(bool block)
         }
 
         if (FD_ISSET(0, &fdset)) {
-            log_msg(_("There is data at the console for stdin"));
+	    if (_debug) {
+		log_msg(_("There is data at the console for stdin"));
+	    }
             return true;
         }
 
@@ -304,7 +306,7 @@ Network::newConnection(bool block)
 bool
 Network::connectSocket(const char *sockname)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     struct sockaddr_un  addr;
     fd_set              fdset;
@@ -396,14 +398,14 @@ Network::connectSocket(const char *sockname)
 bool
 Network::createClient(void)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     return createClient("localhost", RTMP);
 }
 bool
 Network::createClient(short /* port */)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     return false;
 }
@@ -411,7 +413,7 @@ Network::createClient(short /* port */)
 bool
 Network::createClient(const char *hostname)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     return createClient(hostname, RTMP);
 }
@@ -419,7 +421,7 @@ Network::createClient(const char *hostname)
 bool
 Network::createClient(const char *hostname, short port)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     struct sockaddr_in  sock_in;
     fd_set              fdset;
@@ -593,7 +595,7 @@ Network::closeNet(int sockfd)
                 }
             }
 #endif
-            if (close(sockfd) < 0) {
+            if (::close(sockfd) < 0) {
                 log_error(_("Unable to close the socket for fd %d: %s"),
                         sockfd, strerror(errno));
 #ifndef HAVE_WINSOCK_H
@@ -601,7 +603,7 @@ Network::closeNet(int sockfd)
 #endif
                 retries++;
             } else {
-                log_msg(_("Closed the socket on fd %d"), sockfd);
+		log_msg(_("Closed the socket on fd %d"), sockfd);
                 return true;
             }
         }
@@ -612,7 +614,7 @@ Network::closeNet(int sockfd)
 bool
 Network::closeConnection(void)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     closeConnection(_sockfd);
     _sockfd = 0;
@@ -625,10 +627,11 @@ Network::closeConnection(void)
 bool
 Network::closeConnection(int fd)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     if (fd > 0) {
         ::close(fd);
+	log_msg("%s: Closed fd %d", __FUNCTION__, fd);
 //        closeNet(fd);
     }
 
@@ -702,6 +705,17 @@ Network::readNet(int fd, char *buffer, int nbytes, int timeout)
 	}
     }
 
+#if 0
+    unsigned char *hexint;
+    hexint = new unsigned char[(nbytes + 3) *3];    
+    
+    hexify(hexint, (unsigned char *)buffer, ret, true);
+    log_msg (_("%s: Read packet data from fd %d: \n%s"),
+	     __FUNCTION__, fd, (char *)hexint);
+//     hexify(hexint,  (unsigned char *)buffer, ret, false);
+//     log_msg (_("%s: The packet data is: 0x%s"), __FUNCTION__, (char *)hexint);
+    delete hexint;
+#endif    
     return ret;
 
 }
@@ -803,13 +817,12 @@ Network::writeNet(int fd, char const *buffer, int nbytes, int timeout)
 		    log_msg (_("wrote %d bytes to fd %d, expected %d"),
 			       ret, fd, nbytes);
 		}
-//                retries++;
             } else {
 		if (_debug) {
 		    log_msg (_("wrote %d bytes to fd %d"),
 			       ret, fd);
 		}
-                return ret;
+//                return ret;
             }
         }
     }
@@ -827,6 +840,19 @@ Network::writeNet(int fd, char const *buffer, int nbytes, int timeout)
         }
     }
 #endif
+
+#if 0
+    unsigned char *hexint;
+    hexint = new unsigned char[(nbytes + 3) *3];
+    
+    hexify(hexint, (unsigned char *)buffer, nbytes, true);
+    log_msg (_("%s: Wrote packet data to fd %d: \n%s"),
+	     __FUNCTION__, fd, (char *)hexint);
+//     hexify(hexint,  (unsigned char *)buffer, ret, false);
+//     log_msg (_("%s: Read packet data from fd %d: 0x%s"),
+// 	      __FUNCTION__, fd, (char *)hexint);
+     delete hexint;
+#endif    
 
     return ret;
 }

@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,16 +15,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-
-/* $Id: rect.h,v 1.22 2007/11/10 11:51:43 strk Exp $ */
+/* $Id: rect.h,v 1.23 2008/01/21 20:55:51 rsavoye Exp $ */
 
 #ifndef GNASH_RECT_H
 #define GNASH_RECT_H
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include "tu_config.h"

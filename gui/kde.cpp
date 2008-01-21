@@ -1,6 +1,6 @@
 // kde.cpp:  K Development Environment top level window, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,16 +18,16 @@
 //
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 
 #include <qwidget.h>
 #include <qmessagebox.h>
 #include <qcursor.h>
-//#ifdef HAVE_KDE
+#ifdef HAVE_KDE
 #include <qxembed.h>
-//#endif
+#endif
 #include <qnamespace.h>
 #include <qtimer.h>
 #include <qcursor.h>

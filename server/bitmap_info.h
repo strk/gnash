@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,14 +15,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
-/* $Id: bitmap_info.h,v 1.5 2007/09/10 16:53:29 strk Exp $ */
+/* $Id: bitmap_info.h,v 1.6 2008/01/21 20:55:49 rsavoye Exp $ */
 
 #ifndef GNASH_BITMAP_INFO_H
 #define GNASH_BITMAP_INFO_H
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include "ref_counted.h" // for inheritance

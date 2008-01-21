@@ -1,5 +1,5 @@
 dnl  
-dnl    Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+dnl  Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
@@ -15,12 +15,10 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.474 2008/01/21 07:07:26 bjacques Exp $
-
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
 AC_CONFIG_SRCDIR(server/gnash.h)
-AM_CONFIG_HEADER(config.h)
+AM_CONFIG_HEADER(gnashconfig.h)
 
 dnl AC_CANONICAL_TARGET
 AC_CANONICAL_BUILD
@@ -1804,6 +1802,7 @@ MEDIA_CONFIG=${media_handler}
 AC_SUBST(MEDIA_CONFIG)
 
 dnl AC_CONFIG_LINKS(doc/C/images)
+dnl AC_CONFIG_LINKS(gnashconfig.h,libltdl/config.h)
 AC_CONFIG_LINKS(cygnal/testsuite/cygnal.all/cygnalrc:cygnal/testsuite/cygnal.all/cygnalrc.in)
 AC_CONFIG_LINKS(testsuite/libbase/gnashrc:testsuite/libbase/gnashrc.in)
 AC_CONFIG_LINKS(testsuite/libbase/gnashrc-local:testsuite/libbase/gnashrc-local.in)

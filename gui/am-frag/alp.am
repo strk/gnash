@@ -1,3 +1,20 @@
+# 
+#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+# 
+
 # if ALP				# Access Linux Platform
 # gtk_gnash_LDFLAGS += "-shared -Xlinker -z -Xlinker defs $(GTK2_LIBS)"
 # gtk_gnash_LDADD += $(ALP_LIBS)
@@ -5,44 +22,41 @@
 #
 # Build the GTK/ALP gui
 #
-if BUILD_ALP_GUI
-bin_PROGRAMS += alp-gnash
-alp_gnash_SOURCES = $(GUI_SRCS) gui_gtk.cpp
-alp_gnash_CPPFLAGS = -DGUI_GTK -DGUI_ALP -DGUI_CONFIG=\"ALP\" \
-	$(AM_CPPFLAGS) $(GTK_CFLAGS) $(ALP_CFLAGS)
-alp_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
-#gtk_gnash_DEPENDENCIES = .configline
 
+if BUILD_ALP_GUI
+pkglib_LTLIBRARIES = libgnashalp.la
+libgnashalp_la_SOURCES =  $(GUI_SRCS) gui_gtk.cpp
+libgnashalp_la_CPPFLAGS =  $(gtk_gnash_CPPFLAGS)\
+	 $(ALP_CFLAGS) -DGUI_ALP -DGUI_CONFIG=\"ALP\" \
+	 -DALP_BUILD=ALP_BUILD_DEBUG
+libgnashalp_la_LDFLAGS = -module -avoid-version
+libgnashalp_la_LIBADD = $(gtk_gnash_LDADD) $(ALP_LIBS)
 if BUILD_OGL_RENDERER
-alp_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
-alp_gnash_SOURCES += gtk_glue_gtkglext.cpp gtk_glue_gtkglext.h \
+libgnashalp_la_CPPFLAGS += $(OPENGL_CFLAGS)
+libgnashalp_la_SOURCES += gtk_glue_gtkglext.cpp gtk_glue_gtkglext.h \
 		gtk.cpp gtksup.h gtk_glue.h
-alp_gnash_LDADD = $(top_builddir)/backend/libgnashogl.la \
-		$(GNASH_LIBS) $(GTK_LIBS) $(OPENGL_LIBS) $(ALP_LIBS)
+libgnashalp_la_LIBADD += $(OPENGL_LIBS)
 endif				# BUILD_OGL_RENDERER
 if BUILD_AGG_RENDERER
-alp_gnash_CPPFLAGS += $(AGG_CFLAGS)
-alp_gnash_SOURCES += gtk_glue_agg.cpp gtk_glue_agg.h \
+libgnashalp_la_CPPFLAGS += $(AGG_CFLAGS)
+libgnashalp_la_SOURCES += gtk_glue_agg.cpp gtk_glue_agg.h \
 		gtk.cpp gtksup.h gtk_glue.h
-alp_gnash_LDADD = $(top_builddir)/backend/libgnashagg.la \
-		$(GNASH_LIBS) $(GTK_LIBS) $(AGG_LIBS) $(ALP_LIBS)
-
+libgnashalp_la_LIBADD += $(AGG_LIBS)
 endif				# BUILD_AGG_RENDERER
 if BUILD_CAIRO_RENDERER
-alp_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
-alp_gnash_SOURCES += gtk_glue_cairo.cpp gtk_glue_cairo.h \
+libgnashalp_la_CPPFLAGS += $(CAIRO_CFLAGS)
+libgnashalp_la_SOURCES += gtk_glue_cairo.cpp gtk_glue_cairo.h \
 		gtk.cpp gtksup.h gtk_glue.h
-alp_gnash_LDADD = $(top_builddir)/backend/libgnashcairo.la \
-		$(GNASH_LIBS) $(GTK_LIBS) $(CAIRO_LIBS) $(ALP_LIBS)
+libgnashalp_la_LIBADD += $(CAIRO_LIBS)
 endif				# BUILD_CAIRO_RENDERER
 
 # networking related info
-NETCAT_REMOTE   = netcat -q 10 `cat /tmp/alp.ip` 5038
-NETCAT_REMOTE_Q = netcat -q 8 `cat /tmp/alp.ip` 5038
-UML_IP          = 192.168.3.101
-REMOTE_IP	= 192.168.1.101
-ALP_NAMESPACE   = org.gnu.gnash
-ALP_BUNDLE_DIR  = /opt/alp/bundles/
+# NETCAT_REMOTE   = netcat -q 10 `cat /tmp/alp.ip` 5038
+# NETCAT_REMOTE_Q = netcat -q 8 `cat /tmp/alp.ip` 5038
+# UML_IP          = 192.168.3.101
+# REMOTE_IP	= 192.168.1.101
+# ALP_NAMESPACE   = org.gnu.gnash
+# ALP_BUNDLE_DIR  = /opt/alp/bundles/
 
 # ALP_SECURITY  - For building signed bundles you need to set this
 # 	variable to 1. The default is set to 0 
@@ -87,49 +101,49 @@ $(SIGN_TARGET): $(CERTIFICATE) $(KEY)
 	$(DO_ECHO)$(SIGN) $(SRC_BND_DIR) $^ $(PASS) $(TARGET_NAME)
 #endif
 
-alp-ip:
-	if test ! -f /tmp/alp.ip; then \
-	  if test "`uname -m`" = "i486" -a "`uname -m`" = "i686" ; then \
-	    echo "$(UML_IP)" | cut -d ' ' -f1 > /tmp/alp.ip ; \
-	  else \
-	    echo "$(REMOTE_IP)" | cut -d ' ' -f1 > /tmp/alp.ip ; \
-	  fi ; \
-	fi
+# alp-ip:
+# 	if test ! -f /tmp/alp.ip; then \
+# 	  if test "`uname -m`" = "i486" -a "`uname -m`" = "i686" ; then \
+# 	    echo "$(UML_IP)" | cut -d ' ' -f1 > /tmp/alp.ip ; \
+# 	  else \
+# 	    echo "$(REMOTE_IP)" | cut -d ' ' -f1 > /tmp/alp.ip ; \
+# 	  fi ; \
+# 	fi
 
-alp-bundle: libgnashalp.la
-	$(mkinstalldirs) $(ALP_NAMESPACE)/rsc
-	echo  $(srcdir)/Manifest.xml $(ALP_NAMESPACE)/
-	cp -f $(srcdir)/Manifest.xml $(ALP_NAMESPACE)/
-	@if test -f libgnash.so; then \
-	  cp -vf libgnashalp.so $(ALP_NAMESPACE)/; \
-	else \
-	  cp -vf .libs/libgnashalp.so $(ALP_NAMESPACE)/; \
-	fi
-	cp -f $(top_srcdir)/gui/images/GnashGTiny.png $(ALP_NAMESPACE)/rsc/
-	cp -f $(top_srcdir)/gui/images/gravity.swf $(ALP_NAMESPACE)/rsc/
+# alp-bundle: libgnashalp.la
+# 	$(mkinstalldirs) $(ALP_NAMESPACE)/rsc
+# 	echo  $(srcdir)/Manifest.xml $(ALP_NAMESPACE)/
+# 	cp -f $(srcdir)/Manifest.xml $(ALP_NAMESPACE)/
+# 	@if test -f libgnash.so; then \
+# 	  cp -vf libgnashalp.so $(ALP_NAMESPACE)/; \
+# 	else \
+# 	  cp -vf .libs/libgnashalp.so $(ALP_NAMESPACE)/; \
+# 	fi
+# 	cp -f $(top_srcdir)/gui/images/GnashGTiny.png $(ALP_NAMESPACE)/rsc/
+# 	cp -f $(top_srcdir)/gui/images/gravity.swf $(ALP_NAMESPACE)/rsc/
 
-bar: alp-bundle # signed $(BUNDLE_TARGETS) $(SIGN_TARGET) 
-	$(BARTENDER) pack $(ALP_NAMESPACE) $(ALP_NAMESPACE).bar
-#	cp $(BAR_TARGET) $(BAR_DIR)
+# bar: alp-bundle # signed $(BUNDLE_TARGETS) $(SIGN_TARGET) 
+# 	$(BARTENDER) pack $(ALP_NAMESPACE) $(ALP_NAMESPACE).bar
+# #	cp $(BAR_TARGET) $(BAR_DIR)
 
-# install-alp: alp-ip alp-bundle install-files
-# 	echo "I think I'm installing"
-# 	(echo "install $(ALP_NAMESPACE).hello.bar `ls -la $(ALP_NAMESPACE).hello.bar | cut -d ' ' -f 6,6` 0 0 0755" ; cat $(ALP_NAMESPACE).bar ) | $(NETCAT_REMOTE)
+# # install-alp: alp-ip alp-bundle install-files
+# # 	echo "I think I'm installing"
+# # 	(echo "install $(ALP_NAMESPACE).hello.bar `ls -la $(ALP_NAMESPACE).hello.bar | cut -d ' ' -f 6,6` 0 0 0755" ; cat $(ALP_NAMESPACE).bar ) | $(NETCAT_REMOTE)
+# # 	@echo; echo "Registering new bar file with target..."
+# # 	@echo 'package install $(ALP_NAMESPACE).bar' | $(NETCAT_REMOTE)
+# # 	@echo " "
+
+# # (echo "install /tmp/$(ALP_NAMESPACE).hello.bar `/scratchbox/tools/bin/ls -la buil
+# # d/alp-simulator/$(ALP_NAMESPACE).hello.bar | /scratchbox/tools/bin/cut --delim=' 
+# # ' --fields=6,6` 0 0 0755" ; /scratchbox/tools/bin/cat build/alp-simulator/com.ac
+# # cess.apps.hello.bar ) | netcat -q 10 `cat /tmp/alp.ip` 5038
+# install-alp: bar install-files # launcher uninstall
+# 	@echo "Installing new bar file..."
+# 	size=`ls -la $(ALP_NAMESPACE).bar | cut --delim=' ' --fields=6,6`; \
+# 	(echo "install $(ALP_NAMESPACE).bar $$size 0 0 0755" ; cat $(ALP_NAMESPACE).bar ) | $(NETCAT_REMOTE)
 # 	@echo; echo "Registering new bar file with target..."
-# 	@echo 'package install $(ALP_NAMESPACE).bar' | $(NETCAT_REMOTE)
+# 	@echo 'package install /tmp/$(ALP_NAMESPACE).bar' | $(NETCAT_REMOTE)
 # 	@echo " "
-
-# (echo "install /tmp/$(ALP_NAMESPACE).hello.bar `/scratchbox/tools/bin/ls -la buil
-# d/alp-simulator/$(ALP_NAMESPACE).hello.bar | /scratchbox/tools/bin/cut --delim=' 
-# ' --fields=6,6` 0 0 0755" ; /scratchbox/tools/bin/cat build/alp-simulator/com.ac
-# cess.apps.hello.bar ) | netcat -q 10 `cat /tmp/alp.ip` 5038
-install-alp: bar install-files # launcher uninstall
-	@echo "Installing new bar file..."
-	size=`ls -la $(ALP_NAMESPACE).bar | cut --delim=' ' --fields=6,6`; \
-	(echo "install $(ALP_NAMESPACE).bar $$size 0 0 0755" ; cat $(ALP_NAMESPACE).bar ) | $(NETCAT_REMOTE)
-	@echo; echo "Registering new bar file with target..."
-	@echo 'package install /tmp/$(ALP_NAMESPACE).bar' | $(NETCAT_REMOTE)
-	@echo " "
 
 launch: 
 	@echo 'package run bar:$(ALP_NAMESPACE)' | $(NETCAT_REMOTE)
@@ -145,47 +159,47 @@ launch:
 #           (DO NOT USE if target is running; does not interact with target)
 #############
 
-install-files: alp-bundle
-	$(mkinstalldirs) $(DEST_BND_ROOT)/$(ALP_NAMESPACE)
+# install-files: alp-bundle
+# 	$(mkinstalldirs) $(DEST_BND_ROOT)/$(ALP_NAMESPACE)
+# # 	-if [ -e $(DEST_BND_DIR)/Manifest.xml ] ; then \
+# # 	  echo " " ; \
+# # 	  echo "Bundle already exists! Removing old bundle..." ; \
+# # 	  rm -Rf $(DEST_BND_DIR) ; \
+# # 	fi
+# 	@echo "Installing new bundle files..."
+# 	cp -Rf $(ALP_NAMESPACE) $(DEST_BND_ROOT)
+
+# #############
+# # uninstall-files - Uninstall built files from current rootfs
+# #           (DO NOT USE if target is running; does not interact with target)
+# #############
+
+# uninstall-files:
+# 	@echo " "
 # 	-if [ -e $(DEST_BND_DIR)/Manifest.xml ] ; then \
-# 	  echo " " ; \
-# 	  echo "Bundle already exists! Removing old bundle..." ; \
+# 	  echo "Removing old bundle... (NOTE: target should NOT be running!)" ; \
 # 	  rm -Rf $(DEST_BND_DIR) ; \
+# 	else \
+# 	  echo "Manifest.xml not found in $(DEST_BND_DIR)" ; \
+# 	  echo "If the directory exists, you'll need to remove it manually." ; \
 # 	fi
-	@echo "Installing new bundle files..."
-	cp -Rf $(ALP_NAMESPACE) $(DEST_BND_ROOT)
+# 	@echo " "
 
-#############
-# uninstall-files - Uninstall built files from current rootfs
-#           (DO NOT USE if target is running; does not interact with target)
-#############
+# ###########
+# # uninstall - uninstall app from remote target (using "bundle delete")
+# #           (depends on netcat instead of rdbgd since it works w/o target)
+# ###########
 
-uninstall-files:
-	@echo " "
-	-if [ -e $(DEST_BND_DIR)/Manifest.xml ] ; then \
-	  echo "Removing old bundle... (NOTE: target should NOT be running!)" ; \
-	  rm -Rf $(DEST_BND_DIR) ; \
-	else \
-	  echo "Manifest.xml not found in $(DEST_BND_DIR)" ; \
-	  echo "If the directory exists, you'll need to remove it manually." ; \
-	fi
-	@echo " "
-
-###########
-# uninstall - uninstall app from remote target (using "bundle delete")
-#           (depends on netcat instead of rdbgd since it works w/o target)
-###########
-
-uninstall-alp: uninstall-files
-	@# Note: bundle delete requires rdbgd version 11
-	@echo " "
-	@echo "Removing old bundle..."
-	@echo "(If this returns an error, the target is probably not running.)"
-	@echo "(In that case, the bundle should be gone when you next boot the target.)"
-	@echo " "
-	-@echo 'package delete bar:$(ALP_NAMESPACE)' | $(NETCAT_REMOTE)
-	@echo " "
-	@# explicitly remove the bundle directory in case the rdbgd command fails.
+# uninstall-alp: uninstall-files
+# 	@# Note: bundle delete requires rdbgd version 11
+# 	@echo " "
+# 	@echo "Removing old bundle..."
+# 	@echo "(If this returns an error, the target is probably not running.)"
+# 	@echo "(In that case, the bundle should be gone when you next boot the target.)"
+# 	@echo " "
+# 	-@echo 'package delete bar:$(ALP_NAMESPACE)' | $(NETCAT_REMOTE)
+# 	@echo " "
+# 	@# explicitly remove the bundle directory in case the rdbgd command fails.
 
 endif
 

@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 #define GNASH_H
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include "tu_config.h"
@@ -34,7 +34,6 @@
 #include <cstdarg>  // for va_list arg to sprite_instance::call_method_args()
 #include <string>   // for movie_definition* create_movie(std::auto_ptr<tu_file> in, const std::string& url);
 
-
 // FIXME: The local usage of these constants should probably be renamed in this
 // file because they conflict with definitions in the system header files. Luckily
 // they are used in files we don't need, so we should be able to safely redefine
@@ -43,14 +42,15 @@
 #undef ESCAPE
 
 class tu_file; // for file_opener_callback typedef
+
 namespace gnash {
 	class sprite_instance; // for fscommand_callback typedef
 	class movie_definition; // for create_movie
 	class render_handler; // for set_render_handler 
 	class URL; // for set_base_url
-	namespace media {
-		class sound_handler; // for set_sound_handler
-	}
+ 	namespace media {
+ 		class sound_handler; // for set_sound_handler
+ 	}
 }
 // @@ forward decl to avoid including base/image.h; TODO change the
 // render_handler interface to not depend on these classes at all.

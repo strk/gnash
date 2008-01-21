@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,13 +15,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: Property.h,v 1.17 2007/12/13 21:33:41 strk Exp $ */ 
+/* $Id: Property.h,v 1.18 2008/01/21 20:55:47 rsavoye Exp $ */ 
 
 #ifndef GNASH_PROPERTY_H
 #define GNASH_PROPERTY_H
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include <boost/variant.hpp>

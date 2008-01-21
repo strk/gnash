@@ -17,10 +17,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.134 2008/01/18 12:19:47 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.135 2008/01/21 20:55:40 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include "log.h"

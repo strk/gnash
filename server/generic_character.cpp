@@ -1,6 +1,6 @@
 // generic_character.cpp:  Mouse/Character handling, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,10 +17,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: generic_character.cpp,v 1.10 2007/11/10 11:51:43 strk Exp $ */
+/* $Id: generic_character.cpp,v 1.11 2008/01/21 20:55:50 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include "generic_character.h"

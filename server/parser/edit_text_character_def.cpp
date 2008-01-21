@@ -1,6 +1,6 @@
 // edit_text_character_def.cpp:  Text tags, for Gnash.
 //
-//   Copyright (C) 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2006, 2007, 2008 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character_def.cpp,v 1.15 2007/12/01 00:15:00 strk Exp $ */
+/* $Id: edit_text_character_def.cpp,v 1.16 2008/01/21 20:56:00 rsavoye Exp $ */
 
 // Based on the public domain text.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 

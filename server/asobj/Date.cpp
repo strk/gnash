@@ -1,6 +1,6 @@
 // Date.cpp:  ActionScript class for date and time, for Gnash.
 // 
-//  Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//  Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@
 // and get someone to open test.swf for you in the commercial Flash Player.
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include "log.h"

@@ -1,6 +1,6 @@
 // log.cpp:  Message logging functions, for gnash.
 //
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,10 +17,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: log.cpp,v 1.58 2007/12/10 17:45:32 rsavoye Exp $ */
+/* $Id: log.cpp,v 1.59 2008/01/21 20:55:44 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include <cstdio>

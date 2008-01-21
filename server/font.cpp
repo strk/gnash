@@ -1,6 +1,6 @@
 // font.cpp:  ActionScript font handling, for Gnash.
 // 
-//   Copyright (C) 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.54 2008/01/02 14:13:58 strk Exp $ */
+/* $Id: font.cpp,v 1.55 2008/01/21 20:55:50 rsavoye Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 

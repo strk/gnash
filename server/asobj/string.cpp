@@ -16,10 +16,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.49 2008/01/12 15:05:55 bwy Exp $ */
+/* $Id: string.cpp,v 1.50 2008/01/21 20:55:58 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include "tu_config.h"

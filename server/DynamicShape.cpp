@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 
 
-/* $Id: DynamicShape.cpp,v 1.15 2008/01/02 19:08:31 strk Exp $ */
+/* $Id: DynamicShape.cpp,v 1.16 2008/01/21 20:55:46 rsavoye Exp $ */
 
 #include "DynamicShape.h"
 

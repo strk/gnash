@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,13 +15,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ColorMatrixFilter.h,v 1.4 2007/12/29 20:15:25 strk Exp $ */
+/* $Id: ColorMatrixFilter.h,v 1.5 2008/01/21 20:55:46 rsavoye Exp $ */
 
 #ifndef GNASH_COLORMATRIXFILTER_H
 #define GNASH_COLORMATRIXFILTER_H
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include "BitmapFilter.h"

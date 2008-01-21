@@ -1,6 +1,6 @@
 // extension.cpp:  Read and enable plug-in extensions to Flash, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,10 +16,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: extension.cpp,v 1.15 2007/09/27 00:29:30 rsavoye Exp $ */
+/* $Id: extension.cpp,v 1.16 2008/01/21 20:55:44 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 // #if defined(_WIN32) || defined(WIN32)

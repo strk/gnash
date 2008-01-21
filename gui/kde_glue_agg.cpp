@@ -1,5 +1,5 @@
 //
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,21 +17,22 @@
 
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 
-#include "kde_glue_agg.h"
-#include "render_handler.h"
-#include "render_handler_agg.h"
 #if GNASH_QT_VERSION == 4
 #include <Qt/qpixmap.h>
 #include <Qt/qcolor.h>
+#include <Qt/qicon.h>
 #include <Qt/Qt3Support>
 #else
 #include <qpixmap.h>
 #include <qcolor.h>
 #endif
+#include "kde_glue_agg.h"
+#include "render_handler.h"
+#include "render_handler_agg.h"
 
 namespace gnash
 {
@@ -40,7 +41,7 @@ KdeAggGlue::KdeAggGlue()
 :
   _width(0),
   _height(0),
-  _renderer(0)
+   _renderer(0)
 {
 }
 
@@ -104,9 +105,9 @@ KdeAggGlue::render()
 {
     // In order to use our buffer in QT, we must copy it into a pixmap. This is
     // an expensive operation, but, as far as I can see, the only way to do it.
-//#if HAVE_QTOPIA > 2
+#if HAVE_QTOPIA > 2
     QPixmap qpixmap(*_qimage);
-//#endif
+#endif
     for (unsigned bno=0; bno < _drawbounds.size(); bno++) {
        geometry::Range2d<int>& bounds = _drawbounds[bno];
 
@@ -116,10 +117,10 @@ KdeAggGlue::render()
        QRect src_rect(bounds.getMinX(), bounds.getMinY(), bounds.width(),
                       bounds.height());
        
-//#if HAVE_QTOPIA > 2
+#if HAVE_QTOPIA > 2
        bitBlt (_drawing_area, dest_point, &qpixmap, src_rect, Qt::CopyROP,
                true /* ignore mask */ );
-//#endif
+#endif
     }
 }
 

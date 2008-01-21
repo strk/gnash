@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BevelFilter_as.cpp,v 1.7 2008/01/18 17:48:26 bwy Exp $ */
+/* $Id: BevelFilter_as.cpp,v 1.8 2008/01/21 20:55:53 rsavoye Exp $ */
 
 #include "as_object.h"
 #include "BevelFilter.h"

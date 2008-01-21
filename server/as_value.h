@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,13 +15,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.81 2007/12/24 05:33:44 zoulunkai Exp $ */
+/* $Id: as_value.h,v 1.82 2008/01/21 20:55:49 rsavoye Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include "tu_config.h"
@@ -435,6 +435,9 @@ public:
 
 	/// Force type to string.
 	void	convert_to_string();
+    
+	/// Force type to bool.
+	void	convert_to_boolean();
     
 	/// Force type to string.
 	//

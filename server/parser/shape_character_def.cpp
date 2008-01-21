@@ -1,6 +1,6 @@
 // shape_character_def.cpp:  Quadratic bezier outline shapes, for Gnash.
 //
-//   Copyright (C) 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2006, 2007, 2008 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.60 2007/12/14 22:21:21 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.61 2008/01/21 20:56:01 rsavoye Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 

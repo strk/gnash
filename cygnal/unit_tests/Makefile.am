@@ -1,5 +1,5 @@
 # 
-#   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 #   along with this program; if not, write to the Free Software
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
-# $Id: Makefile.am,v 1.2 2007/10/21 20:24:00 eh9 Exp $
+# $Id: Makefile.am,v 1.3 2008/01/21 20:56:10 rsavoye Exp $
 
 #----------------------------------------
 # Makefile.am for Cygnal/unit_tests 
