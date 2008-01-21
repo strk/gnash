@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.121 2008/01/20 19:38:04 strk Exp $ */
+/* $Id: character.h,v 1.122 2008/01/21 16:02:50 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -161,6 +161,17 @@ protected:
 	///	casts to an as_function. A NULL pointer otherwise.
 	///
 	boost::intrusive_ptr<as_function> getUserDefinedEventHandler(const std::string& name) const;
+
+	/// Return a user defined event handler, if any
+	//
+	/// @param key
+	/// 	Function key to fetch. 
+	///
+	/// @return
+	///	A function if a member with the given key exists and
+	///	casts to an as_function. A NULL pointer otherwise.
+	///
+	boost::intrusive_ptr<as_function> getUserDefinedEventHandler(string_table::key key) const;
 
 	void set_event_handlers(const Events& copyfrom);
 

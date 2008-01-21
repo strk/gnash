@@ -1,3 +1,17 @@
+2008-01-21 Sandro Santilli <strk@keybit.net>
+
+	* server/as_object.cpp, server/button_character_instance.cpp,
+	  server/sprite_instance.cpp, server/asobj/xml.cpp: use new
+	  named strings. This should be particularely effective for
+	  sprite_instance::can_handle_mouse_event, which is called
+	  on every mouse movement.
+	* server/character.{cpp,h}: add a getUserDefinedMethod() interface
+	  taking a string_table::key.
+	* server/event_id.h, vm/action.cpp: add event_id::get_funtion_key
+	  method.
+	* server/namedStrings.{cpp,h}: add more named strings
+	  for core properties.
+
 2008-01-21 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/asobj/System.cpp: correct typo in server string, clean up.

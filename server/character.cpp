@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.74 2008/01/20 19:38:04 strk Exp $ */
+/* $Id: character.cpp,v 1.75 2008/01/21 16:02:50 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -658,7 +658,7 @@ character::hasEventHandler(const event_id& id) const
 	Events::const_iterator it = _event_handlers.find(id);
 	if ( it != _event_handlers.end() ) return true;
 
-	boost::intrusive_ptr<as_function> method = getUserDefinedEventHandler(id.get_function_name());
+	boost::intrusive_ptr<as_function> method = getUserDefinedEventHandler(id.get_function_key());
 	if (method) return true;
 
 	return false;
@@ -667,19 +667,20 @@ character::hasEventHandler(const event_id& id) const
 boost::intrusive_ptr<as_function>
 character::getUserDefinedEventHandler(const std::string& name) const
 {
-	std::string method_name = name;
-	if ( _vm.getSWFVersion() < 7 )
-	{
-		boost::to_lower(method_name, _vm.getLocale());
-	}
+	string_table::key key = _vm.getStringTable().find(PROPNAME(name));
+	return getUserDefinedEventHandler(key);
+}
 
+boost::intrusive_ptr<as_function>
+character::getUserDefinedEventHandler(string_table::key key) const 
+{
 	as_value tmp;
 
 	boost::intrusive_ptr<as_function> func;
 
 	// const cast is needed due to getter/setter members possibly
 	// modifying this object even when only get !
-	if ( const_cast<character*>(this)->get_member(_vm.getStringTable().find(method_name), &tmp) )
+	if ( const_cast<character*>(this)->get_member(key, &tmp) )
 	{
 		func = tmp.to_as_function();
 	}
@@ -887,8 +888,7 @@ character::setMask(character* mask)
 		set_invalidated();
 	}
 
-	// Backup these before messing up
-	character* prevMask = _mask;
+	// Backup this before setMaskee has a chance to change it..
 	character* prevMaskee = _maskee;
 
 	// If we had a previous mask unregister with it

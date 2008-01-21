@@ -24,6 +24,7 @@
 #include "config.h"
 #endif
 
+#include "string_table.h"
 #include "tu_config.h"
 
 #include "gnash.h" // for gnash::key namespace
@@ -132,6 +133,10 @@ public:
 	/// Return the name of a method-handler function
 	/// corresponding to this event.
 	const std::string& get_function_name() const;
+
+	/// Return the string_table key of a method-handler function
+	/// corresponding to this event.
+	string_table::key get_function_key() const;
 
 	/// \brief
 	/// Return true if this is a mouse event

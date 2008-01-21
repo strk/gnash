@@ -863,14 +863,7 @@ as_object::on_event(const event_id& id )
 {
 	as_value event_handler;
 
-	std::string handler_name = id.get_function_name();
-
-	if ( _vm.getSWFVersion() < 7 )
-	{
-		boost::to_lower(handler_name, _vm.getLocale());
-	}
-
-	if (get_member(_vm.getStringTable().find(handler_name), &event_handler) )
+	if (get_member(id.get_function_key(), &event_handler) )
 	{
 		call_method(event_handler, NULL, this, 0, 0);
 		return true;

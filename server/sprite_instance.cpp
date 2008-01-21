@@ -2530,7 +2530,7 @@ sprite_instance::on_event(const event_id& id)
   if( ! id.is_key_event ())
   {
     boost::intrusive_ptr<as_function> method = 
-      getUserDefinedEventHandler(id.get_function_name());
+      getUserDefinedEventHandler(id.get_function_key());
 
     if ( method )
     {
@@ -3495,7 +3495,7 @@ sprite_instance::can_handle_mouse_event() const
     }
 
     // Check user-defined event handlers
-    if ( getUserDefinedEventHandler(event.get_function_name()) )
+    if ( getUserDefinedEventHandler(event.get_function_key()) )
     {
       return true;
     }

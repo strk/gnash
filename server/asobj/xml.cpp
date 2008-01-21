@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.65 2008/01/10 17:34:46 strk Exp $ */
+/* $Id: xml.cpp,v 1.66 2008/01/21 16:02:51 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -192,18 +192,8 @@ XML::onLoadEvent(bool success, as_environment& env)
     // before advance() is called).  Then the onLoad event
     // is triggered.
 
-    // In ActionScript 2.0, event method names are CASE SENSITIVE.
-    // In ActionScript 1.0, event method names are CASE INSENSITIVE.
-    // TODO: move to get_function_name directly ?
-    std::string method_name1 = "onLoad";
-    if ( _vm.getSWFVersion() < 7 )
-        boost::to_lower(method_name1, _vm.getLocale());
-
-    if ( method_name1.empty() ) return;
-
-	string_table::key method_name = _vm.getStringTable().find(method_name1);
     as_value	method;
-    if (!get_member(method_name, &method) ) return;
+    if (!get_member(NSV::PROP_ON_LOAD, &method) ) return;
     if ( method.is_undefined() ) return;
     if ( ! method.is_function() ) return;
 
@@ -226,18 +216,8 @@ XML::onCloseEvent(as_environment& env)
     // before advance() is called).  Then the onLoad event
     // is triggered.
 
-    // In ActionScript 2.0, event method names are CASE SENSITIVE.
-    // In ActionScript 1.0, event method names are CASE INSENSITIVE.
-    // TODO: move to get_function_name directly ?
-    std::string method_name1 = "onClose";
-    if ( _vm.getSWFVersion() < 7 )
-        boost::to_lower(method_name1, _vm.getLocale());
-
-    if ( method_name1.empty() ) return;
-
-	string_table::key method_name = _vm.getStringTable().find(method_name1);
     as_value	method;
-    if (! get_member(method_name, &method) ) return;
+    if (! get_member(NSV::PROP_ON_CLOSE, &method) ) return;
     if ( method.is_undefined() ) return;
     if ( ! method.is_function() ) return;
 
@@ -464,9 +444,7 @@ XML::checkLoads()
 
     if ( _loadThreads.empty() ) return; // nothing to do
 
-    VM& vm = getVM();
-    string_table& st = vm.getStringTable();
-    string_table::key onDataKey = st.find(PROPNAME("onData"));
+    string_table::key onDataKey = NSV::PROP_ON_DATA;
 
     for (LoadThreadList::iterator it=_loadThreads.begin();
             it != _loadThreads.end(); )
@@ -517,6 +495,7 @@ XML::checkLoads()
 #ifdef DEBUG_XML_LOADS
         log_debug("Clearing XML load checker interval timer");
 #endif
+    	VM& vm = getVM();
         vm.getRoot().clear_interval_timer(_loadCheckerTimer);
         _loadCheckerTimer=0;
     }
@@ -551,7 +530,7 @@ XML::load(const URL& url)
         return false;
         // TODO: this is still not correct.. we should still send onData later...
         //as_value nullValue; nullValue.set_null();
-        //callMethod(VM::get().getStringTable().find(PROPNAME("onData")), nullValue);
+        //callMethod(NSV::PROP_ON_DATA, nullValue);
     }
 
     log_security(_("Loading XML file from url: '%s'"), url.str().c_str());
@@ -886,10 +865,8 @@ xml_ondata(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
 
-    VM& vm = VM::get();
-    string_table& st = vm.getStringTable();
-    string_table::key onLoadKey = st.find(PROPNAME("onLoad"));
-    string_table::key loadedKey = st.find("loaded");
+    string_table::key onLoadKey = NSV::PROP_ON_LOAD;
+    string_table::key loadedKey = NSV::PROP_LOADED; 
 
     as_object* thisPtr = fn.this_ptr.get();
     assert(thisPtr);
@@ -901,7 +878,7 @@ xml_ondata(const fn_call& fn)
 
     if ( ! src.is_null() )
     {
-        string_table::key parseXMLKey = st.find(PROPNAME("parseXML"));
+        string_table::key parseXMLKey = NSV::PROP_PARSE_XML;
         as_value tmp(true);
         thisPtr->set_member(loadedKey, tmp);
         thisPtr->callMethod(parseXMLKey, src);

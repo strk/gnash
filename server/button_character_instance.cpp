@@ -591,7 +591,7 @@ button_character_instance::on_button_event(const event_id& event)
 
 
 	// Call conventional attached method.
-	boost::intrusive_ptr<as_function> method = getUserDefinedEventHandler(event.get_function_name());
+	boost::intrusive_ptr<as_function> method = getUserDefinedEventHandler(event.get_function_key());
 	if ( method )
 	{
 		call_method0(as_value(method.get()), &(get_environment()), this);

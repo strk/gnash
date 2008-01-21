@@ -45,6 +45,7 @@
 #include "StringPredicates.h"
 #include "xml.h"
 #include "xmlsocket.h"
+#include "namedStrings.h"
 
 
 #include <typeinfo>
@@ -372,6 +373,56 @@ event_id::get_function_name() const
 
 	assert(m_id > INVALID && m_id < EVENT_COUNT);
 	return s_function_names[m_id];
+}
+
+string_table::key
+event_id::get_function_key() const
+{
+	// TODO: use a case-insensitive matching
+	static string_table::key function_keys[EVENT_COUNT] =
+	{
+		0,				// INVALID
+		NSV::PROP_ON_PRESS,		// PRESS
+		NSV::PROP_ON_RELEASE,		// RELEASE
+		NSV::PROP_ON_RELEASE_OUTSIDE,	// RELEASE_OUTSIDE
+		NSV::PROP_ON_ROLL_OVER,		// ROLL_OVER
+		NSV::PROP_ON_ROLL_OUT,		// ROLL_OUT
+		NSV::PROP_ON_DRAG_OVER,		// DRAG_OVER
+		NSV::PROP_ON_DRAG_OUT,		// DRAG_OUT
+		NSV::PROP_ON_KEY_PRESS,		// KEY_PRESS
+		NSV::PROP_ON_INITIALIZE,	// INITIALIZE
+
+		NSV::PROP_ON_LOAD,		// LOAD
+		NSV::PROP_ON_UNLOAD,		// UNLOAD
+		NSV::PROP_ON_ENTER_FRAME,	// ENTER_FRAME
+		NSV::PROP_ON_MOUSE_DOWN,	// MOUSE_DOWN
+		NSV::PROP_ON_MOUSE_UP,		// MOUSE_UP
+		NSV::PROP_ON_MOUSE_MOVE,	//  MOUSE_MOVE
+		NSV::PROP_ON_KEY_DOWN,		// KEY_DOWN
+		NSV::PROP_ON_KEY_UP,		// KEY_UP
+		NSV::PROP_ON_DATA,		// DATA
+		// These are for the MoveClipLoader ActionScript only
+		NSV::PROP_ON_LOAD_START,	// LOAD_START
+		NSV::PROP_ON_LOAD_ERROR,	// LOAD_ERROR
+		NSV::PROP_ON_LOAD_PROGRESS,	// LOAD_PROGRESS
+		NSV::PROP_ON_LOAD_INIT,		// LOAD_INIT
+		// These are for the XMLSocket ActionScript only
+		NSV::PROP_ON_SOCK_CLOSE,	// CLOSE
+		NSV::PROP_ON_SOCK_CONNECT,	// CONNECT
+		NSV::PROP_ON_SOCK_DATA,		// Data
+		NSV::PROP_ON_SOCK_XML,		// XML
+		// These are for the XML ActionScript only
+		NSV::PROP_ON_XML_LOAD,		// XML_LOAD
+		NSV::PROP_ON_XML_DATA,		// XML_DATA
+		NSV::PROP_ON_TIMER,		// setInterval Timer expired
+
+		NSV::PROP_ON_CONSTRUCT,		// onConstruct
+		NSV::PROP_ON_SET_FOCUS, 	// onSetFocus
+		NSV::PROP_ON_KILL_FOCUS 	// onKillFocus
+	};
+
+	assert(m_id > INVALID && m_id < EVENT_COUNT);
+	return function_keys[m_id];
 }
 
 bool
