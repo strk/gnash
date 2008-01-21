@@ -60,24 +60,23 @@ getSystemSecurityInterface()
 static as_object*
 getSystemCapabilitiesInterface()
 {
-	static RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+	RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
 	// "LNX 9,0,22,0", "MAC 8,0,99,0"
 	// Override in gnashrc
-	static const std::string version = VM::get().getPlayerVersion();
+	const std::string version = VM::get().getPlayerVersion();
 
 	// Flash 7: "StandAlone", "External", "PlugIn", "ActiveX"
 	// TODO: Implement properly
-	static const std::string playerType = "StandAlone";
+	const std::string playerType = "StandAlone";
 
 	// "Windows XP", "Windows 2000", "Windows NT", "Windows 98/ME", "Windows 95", "Windows CE", "Linux", "MacOS"
 	// Override in gnashrc
-	static const std::string os = VM::get().getOSName();
+	const std::string os = VM::get().getOSName();
 
 	// "Macromedia Windows", "Macromedia Linux", "Macromedia MacOS"
 	// Override in gnashrc
-	static const std::string manufacturer = rcfile.getFlashSystemManufacturer();
-
+	const std::string manufacturer = rcfile.getFlashSystemManufacturer();
 
 	/* Human Interface */
 	
@@ -85,14 +84,12 @@ getSystemCapabilitiesInterface()
 	// TODO: Chinese should be either zh-CN or zh-TW
 	// TODO: Are there more than the 20 officially documented? 
 	// TODO: Other / unknown should return 'xu'. 
-	static const std::string language = VM::get().getSystemLanguage();
-
+	const std::string language = VM::get().getSystemLanguage();
 
 	/* Media */
 		
 	// Is audio available?
-	static const bool hasAudio = (get_sound_handler() != NULL);
-
+	const bool hasAudio = (get_sound_handler() != NULL);
 
 	/* A URL-encoded string to send system info to a server.*/
 	/* Boolean values are represented as t or f.		*/
@@ -100,7 +97,7 @@ getSystemCapabilitiesInterface()
 	/* allowing this string to be sent or not; individual	*/
 	/* values that might affect privacy can be overridden	*/
 	/* in gnashrc.						*/
-		
+
 	std::string serverString =
 		 	+ "OS=" + URL::encode(os) 
 			+ "&A=" + TF(hasAudio)
@@ -108,7 +105,7 @@ getSystemCapabilitiesInterface()
 			+ "&PT=" + playerType
 			+ "&L=" + language
 			+ "&AVD="	// avHardwareDisable (bool)
-			+ "&ACC"	// hasAccessibility (bool)
+			+ "&ACC="	// hasAccessibility (bool)
 			+ "&AE="	// hasAudioEncoder (bool)
 			+ "&EV="	// hasEmbeddedVideo (bool)
 			+ "&IME="	// hasIME (bool)

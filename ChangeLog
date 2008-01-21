@@ -1,3 +1,9 @@
+2008-01-21 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/asobj/System.cpp: correct typo in server string, clean up.
+	* server/as_value.cpp: Drop check for infinity after boost::lexical_cast
+	  from string to double (it can't happen), clean up.
+
 2008-01-21 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (pointInVisibleShape): even if we're a

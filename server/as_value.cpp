@@ -42,9 +42,6 @@
 #include <sstream>
 #include <iomanip>
 
-
-using namespace std;
-
 #ifdef WIN32
 #	define snprintf _snprintf
 #endif
@@ -169,7 +166,9 @@ as_value::to_string() const
 				// specification, but seems required for compatibility with the
 				// reference player.
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-				log_debug(" %s.to_primitive(STRING) returned %s", to_debug_string().c_str(), ret.to_debug_string().c_str());
+				log_debug(" %s.to_primitive(STRING) returned %s", 
+						to_debug_string().c_str(),
+						ret.to_debug_string().c_str());
 #endif
 				if ( ret.is_string() ) return ret.to_string();
 			}
@@ -402,23 +401,16 @@ as_value::to_number() const
             try 
             { 
                 double d = boost::lexical_cast<double>(getStr());
-
-                if ( isinf(d) ) 
-                {
-                    if(swfversion <= 4)  
-                        return (double)0.0;
-                    else    
-                        return (double)NAN;
-                }
-
                 return d;
             } 
             catch (boost::bad_lexical_cast &) 
+            // There is no standard textual representation of infinity in the
+            // C++ standard, so boost throws a bad_lexical_cast for 'inf',
+            // just like for any other non-numerical text. This is correct
+            // behaviour.
             {
-                if(swfversion <= 4)  
-                    return (double)0.0;
-                else    
-                    return (double)NAN;
+            	if(swfversion <= 4) return (double)0.0;
+            	else return (double)NAN;
             }
         }
 
@@ -1195,7 +1187,7 @@ as_value::as_value(boost::intrusive_ptr<as_object> obj)
 
 // Convert numeric value to string value, following ECMA-262 specification
 std::string
-as_value::doubleToString(double _val)
+as_value::doubleToString(double val)
 {
 	// Printing formats:
 	//
@@ -1271,57 +1263,57 @@ as_value::doubleToString(double _val)
 
 	// Handle non-numeric values.
 	// "printf" gives "nan", "inf", "-inf", so we check explicitly
-	if(isnan(_val))
+	if(isnan(val))
 	{
 		return "NaN";
 	}
-	else if(isinf(_val))
+	else if(isinf(val))
 	{
-		return _val < 0 ? "-Infinity" : "Infinity";
+		return val < 0 ? "-Infinity" : "Infinity";
 	}
-	else if(_val == 0.0 || _val == -0.0)
+	else if(val == 0.0 || val == -0.0)
 	{
 		return "0";
 	}
 
-	ostringstream _ostr;
-	std::string _str;
+	std::ostringstream ostr;
+	std::string str;
 	
 	// ActionScript always expects dot as decimal point?
-	_ostr.imbue(std::locale("C")); 
+	ostr.imbue(std::locale("C")); 
 	
 	// force to decimal notation for this range (because the reference player does)
-	if (fabs(_val) < 0.0001 && fabs(_val) >= 0.00001)
+	if (fabs(val) < 0.0001 && fabs(val) >= 0.00001)
 	{
 		// All nineteen digits (4 zeros + up to 15 significant digits)
-		_ostr << fixed << std::setprecision(19) << _val;
+		ostr << std::fixed << std::setprecision(19) << val;
 		
-		_str = _ostr.str();
+		str = ostr.str();
 		
 		// Because 'fixed' also adds trailing zeros, remove them.
-		std::string::size_type pos = _str.find_last_not_of('0');
+		std::string::size_type pos = str.find_last_not_of('0');
 		if (pos != std::string::npos) {
-			_str.erase(pos + 1);
+			str.erase(pos + 1);
 		}
 		
 	}
 	
 	else
 	{
-		_ostr << std::setprecision(15) << _val;
+		ostr << std::setprecision(15) << val;
 		
-		_str = _ostr.str();
+		str = ostr.str();
 		
 		// Remove a leading zero from 2-digit exponent if any
-		std::string::size_type pos = _str.find("e", 0);
+		std::string::size_type pos = str.find("e", 0);
 
-		if (pos != std::string::npos && _str.at(pos + 2) == '0') {
-			_str.erase(pos + 2, 1);
+		if (pos != std::string::npos && str.at(pos + 2) == '0') {
+			str.erase(pos + 2, 1);
 		}
 		
 	}
 
-	return _str;
+	return str;
 	
 }
 
