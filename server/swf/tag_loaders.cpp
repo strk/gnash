@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.178 2008/01/16 11:31:08 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.179 2008/01/21 17:34:28 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1325,18 +1325,36 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 
     if ( playbackSoundRate != streamSoundRate )
     {
-        log_unimpl("Different stream/playback sound rate (%d/%d)",
-            streamSoundRate,playbackSoundRate);
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_unimpl("Different stream/playback sound rate (%d/%d)."
+			" This seems common in SWF files, so we'll warn only once.",
+			streamSoundRate,playbackSoundRate);
+		warned=true;
+	}
     }
     if ( playbackSound16bit != streamSound16bit )
     {
-        log_unimpl("Different stream/playback sample size (%d/%d)",
-            streamSound16bit?16:32, playbackSound16bit?16:32 );
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_unimpl("Different stream/playback sample size (%d/%d)."
+			" This seems common in SWF files, so we'll warn only once.",
+			streamSound16bit?16:32, playbackSound16bit?16:32 );
+		warned=true;
+	}
     }
     if ( playbackSoundStereo != streamSoundStereo )
     {
-        log_unimpl("Different stream/playback channels (%s/%s)",
-            streamSoundStereo?"stereo":"mono", playbackSoundStereo?"stereo":"mono" );
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_unimpl("Different stream/playback channels (%s/%s)."
+			" This seems common in SWF files, so we'll warn only once.",
+			streamSoundStereo?"stereo":"mono", playbackSoundStereo?"stereo":"mono" );
+		warned=true;
+	}
     }
 
     // checks if this is a new streams header or just one in the row
@@ -1347,6 +1365,8 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 
     if ( ! sampleCount )
     {
+	// this seems common too, we'd need to reproduce with a custom
+	// testcase to really tell if it's a problem or not...
         log_error("No samples advertised for sound stream");
     }
 
