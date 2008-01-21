@@ -181,7 +181,9 @@ void
 NetStreamGst::play(const std::string& url)
 {
   std::string valid_url = _netCon->validateURL(url);
-  
+#if 0
+  log_msg("%s: connecting to %s\n", __FUNCTION__, valid_url);
+#endif
   if (valid_url.empty()) {
     // error; TODO: nofiy user
     return;
@@ -419,6 +421,7 @@ NetStreamGst::handleMessage (GstMessage *message)
     }
     case GST_MESSAGE_EOS:
       log_msg(_("NetStream has reached the end of the stream."));
+      setStatus(playStop);
       break;
     case GST_MESSAGE_TAG:
     {
@@ -437,12 +440,16 @@ NetStreamGst::handleMessage (GstMessage *message)
     }    
     case GST_MESSAGE_BUFFERING:
     {
+#if 0
+      // This is most likely not necessary since we have a signal handler
+      // that achieves the same functionality.
       gint percent_buffered;
       gst_message_parse_buffering(message, &percent_buffered);
       
       if (percent_buffered == 100) {
         setStatus(bufferFull);      
       }
+#endif
       break;
     }
     case GST_MESSAGE_STATE_CHANGED:
@@ -528,7 +535,6 @@ NetStreamGst::decodebin_newpad_cb(GstElement* /*decodebin*/, GstPad* pad,
   gst_caps_unref (caps);
 
   if (g_strrstr (structure_name, "audio")) {
-
     if (GST_PAD_IS_LINKED (ns->_audiopad)) {
       return;
     }

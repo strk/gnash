@@ -1,3 +1,15 @@
+2008-01-21 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/asobj/NetStreamGst.cpp: Disable parsing code for
+	buffering messages, as the same is achived through signal 
+	handlers and older gstreamer doesn't have this function. Emit
+	the playStop message when the end of the stream has been
+	reached (allows NetStream-SquareTest to run).
+	* testsuite/actionscript.all/NetConnection.as: We currently don't
+	implement the isConnected property, so xcheck it for now.
+	* testsuite/actionscript.all/NetStream.as: We now implement
+	currentFPS.
+
 2008-01-21 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/tag_loaders.cpp: warn only once about different
