@@ -268,14 +268,14 @@ NetStreamGst::getCurrentFPS()
   
   gst_object_unref(GST_OBJECT(colorspace));
   
-	GstCaps* caps = gst_pad_get_negotiated_caps (videopad);
+  GstCaps* caps = gst_pad_get_negotiated_caps (videopad);
   if (!caps) {
     return 0;
   }
   
   gst_object_unref(GST_OBJECT(videopad));
 	
-	// must not be freed
+  // must not be freed
   GstStructure* structure = gst_caps_get_structure (caps, 0);
   
   gst_caps_unref(caps);

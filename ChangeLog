@@ -1,3 +1,12 @@
+2008-01-21 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/asobj/NetStream.cpp: return undefined for currentFPS if a
+	nonsensical number results.
+	* server/asobj/NetStreamGst.cpp: whitespace fixes.
+	* testsuite/actionscript.all/NetStream.as: revert my previous change,
+	because the test accurately reflected PP behaviour, so we should mimic
+	it.
+
 2008-01-21 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/masks_testrunner.cpp: add tests for effect

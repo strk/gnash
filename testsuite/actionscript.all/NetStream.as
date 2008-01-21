@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: NetStream.as,v 1.17 2008/01/21 18:16:16 bjacques Exp $";
+rcsid="$Id: NetStream.as,v 1.18 2008/01/21 18:57:28 bjacques Exp $";
 
 #include "check.as"
 
@@ -150,7 +150,7 @@ check_equals(typeof(netstreamObj.onMetaData), 'string');
 /* Properties */
 
 // currentFps (read-only)
-check_equals ( typeof(netstreamObj.currentFps), 'number' );
+check_equals ( typeof(netstreamObj.currentFps), 'undefined' );
 netstreamObj.currentFps = 'string';
 xcheck_equals ( typeof(netstreamObj.currentFps), 'string' );
 netstreamObj.currentFps = false;

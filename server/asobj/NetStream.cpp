@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.79 2008/01/21 07:07:27 bjacques Exp $ */
+/* $Id: NetStream.cpp,v 1.80 2008/01/21 18:57:28 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -311,7 +311,13 @@ static as_value
 netstream_currentFPS(const fn_call& fn)
 {
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
-	
+
+	double fps = ns->getCurrentFPS();
+
+	if (fps <= 0) {
+		return as_value(); // undef
+	}
+
 	return as_value(ns->getCurrentFPS());
 }
 
