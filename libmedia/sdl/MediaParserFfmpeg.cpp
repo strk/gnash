@@ -1,6 +1,6 @@
 // MediaParserFfmpeg.cpp: Media parser using ffmpeg
 // 
-//   Copyright (C) 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaParserFfmpeg.cpp,v 1.10 2007/12/12 10:23:06 zoulunkai Exp $
+// $Id: MediaParserFfmpeg.cpp,v 1.11 2008/01/21 23:10:16 rsavoye Exp $
 
 #include "MediaParserFfmpeg.h"
 #include "log.h"

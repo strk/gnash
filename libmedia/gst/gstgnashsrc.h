@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 // Based on the filesrc and fdsrc element in Gstreamer-core
 //
 
-/* $Id: gstgnashsrc.h,v 1.1 2007/09/27 23:59:54 tgc Exp $ */
+/* $Id: gstgnashsrc.h,v 1.2 2008/01/21 23:10:15 rsavoye Exp $ */
 
 #ifndef __GST_GNASH_SRC_H__
 #define __GST_GNASH_SRC_H__

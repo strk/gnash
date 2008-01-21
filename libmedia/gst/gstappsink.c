@@ -17,10 +17,10 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* $Id: gstappsink.c,v 1.3 2007/10/04 09:37:50 tgc Exp $ */
+/* $Id: gstappsink.c,v 1.4 2008/01/21 23:10:15 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include <gst/gst.h>

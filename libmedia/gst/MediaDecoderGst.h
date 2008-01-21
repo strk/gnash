@@ -1,6 +1,6 @@
 // MediaDecoderGst.h: Media decoding using Gstreamer
 // 
-//   Copyright (C) 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,13 +16,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaDecoderGst.h,v 1.2 2007/12/04 11:45:26 strk Exp $
+// $Id: MediaDecoderGst.h,v 1.3 2008/01/21 23:10:15 rsavoye Exp $
 
 #ifndef __MEDIADECODERGST_H__
 #define __MEDIADECODERGST_H__
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include "MediaDecoder.h"

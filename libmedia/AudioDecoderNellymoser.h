@@ -1,6 +1,6 @@
 // AudioDecoderNellymoser.h: Nellymoser decoding
 // 
-//   Copyright (C) 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: AudioDecoderNellymoser.h,v 1.6 2007/12/12 10:06:59 zoulunkai Exp $
+// $Id: AudioDecoderNellymoser.h,v 1.7 2008/01/21 23:10:13 rsavoye Exp $
 
 // This file incorporates work covered by the following copyright and permission
 // notice:

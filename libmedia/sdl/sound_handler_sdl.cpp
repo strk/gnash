@@ -1,6 +1,6 @@
 // sound_handler_sdl.cpp: Sound handling using standard SDL
 //
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,10 +20,10 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.10 2007/12/12 18:56:37 strk Exp $
+// $Id: sound_handler_sdl.cpp,v 1.11 2008/01/21 23:10:16 rsavoye Exp $
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include "sound_handler_sdl.h"

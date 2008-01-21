@@ -1,6 +1,6 @@
 // AudioDecoderSimple.cpp: Audio decoding using "simple" internal decoders.
 // 
-//   Copyright (C) 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderSimple.cpp,v 1.12 2007/12/12 10:06:59 zoulunkai Exp $
+// $Id: AudioDecoderSimple.cpp,v 1.13 2008/01/21 23:10:13 rsavoye Exp $
 
 #include "AudioDecoderSimple.h"
 #include "utility.h"

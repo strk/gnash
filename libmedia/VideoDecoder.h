@@ -1,6 +1,6 @@
 // VideoDecoder.h: Video decoding base class.
 // 
-//   Copyright (C) 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoder.h,v 1.10 2007/12/12 10:07:00 zoulunkai Exp $
+// $Id: VideoDecoder.h,v 1.11 2008/01/21 23:10:14 rsavoye Exp $
 
 #ifndef __VIDEODECODER_H__
 #define __VIDEODECODER_H__

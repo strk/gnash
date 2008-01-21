@@ -1,6 +1,6 @@
 // MediaDecoderSdl.cpp: Media decoding using libs, used with sdl soundhandler.
 // 
-//   Copyright (C) 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaDecoderSdl.cpp,v 1.7 2007/12/04 11:45:27 strk Exp $
+// $Id: MediaDecoderSdl.cpp,v 1.8 2008/01/21 23:10:16 rsavoye Exp $
 
 #include "MediaDecoderSdl.h"
 #include "AudioDecoderNellymoser.h"

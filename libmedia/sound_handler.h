@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,10 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-
-/* $Id: sound_handler.h,v 1.7 2007/12/12 18:56:36 strk Exp $ */
+/* $Id: sound_handler.h,v 1.8 2008/01/21 23:10:14 rsavoye Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -29,7 +26,7 @@
 #define SOUND_HANDLER_H
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include "tu_config.h" // for DSOEXPORT

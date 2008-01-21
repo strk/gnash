@@ -1,6 +1,6 @@
 // sound_handler_sdl.h: Sound handling using standard SDL
 //
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_sdl.h,v 1.9 2007/12/12 18:56:37 strk Exp $
+// $Id: sound_handler_sdl.h,v 1.10 2008/01/21 23:10:16 rsavoye Exp $
 
 #ifndef SOUND_HANDLER_SDL_H
 #define SOUND_HANDLER_SDL_H

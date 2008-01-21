@@ -1,6 +1,6 @@
 // MediaParser.h: Base class for media parsers
 // 
-//   Copyright (C) 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,13 +16,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaParser.h,v 1.12 2007/12/12 10:07:00 zoulunkai Exp $
+// $Id: MediaParser.h,v 1.13 2008/01/21 23:10:14 rsavoye Exp $
 
 #ifndef __MEDIAPARSER_H__
 #define __MEDIAPARSER_H__
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include <boost/shared_ptr.hpp>

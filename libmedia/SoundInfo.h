@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 // 
 //
 
-// $Id: SoundInfo.h,v 1.4 2007/12/04 11:45:26 strk Exp $
+// $Id: SoundInfo.h,v 1.5 2008/01/21 23:10:14 rsavoye Exp $
 
 #ifndef __SOUNDINFO_H__
 #define __SOUNDINFO_H__
