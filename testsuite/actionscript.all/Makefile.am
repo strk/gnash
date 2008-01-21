@@ -1,6 +1,6 @@
 ## Process this fill with automake to generate Makefile.in
 # 
-# Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+# Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.84 2008/01/05 03:55:00 rsavoye Exp $
+# $Id: Makefile.am,v 1.85 2008/01/21 23:26:49 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 

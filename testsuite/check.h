@@ -2,7 +2,7 @@
 #define _CHECK_H_
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include <sstream>
