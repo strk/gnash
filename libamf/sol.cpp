@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "gnashconfig.h"
 #endif
 
 #include <boost/cstdint.hpp>
@@ -119,14 +119,14 @@ bool
 SOL::formatHeader(std::string &name, int filesize)
 {
 //    GNASH_REPORT_FUNCTION;
-    uint32_t i;
+    boost::uint32_t i;
 
     // First we add the magic number. All SOL data is in big-endian format,
     // so we swap it first.
-    uint16_t swapped = SOL_MAGIC;
+    boost::uint16_t swapped = SOL_MAGIC;
 //    swapped = ntohs(swapped);
-    uint8_t *ptr = reinterpret_cast<uint8_t *>(&swapped);
-    for (i=0; i<sizeof(uint16_t); i++) {
+    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(&swapped);
+    for (i=0; i<sizeof(boost::uint16_t); i++) {
         _header.push_back(ptr[i]);
     }
 
@@ -134,10 +134,10 @@ SOL::formatHeader(std::string &name, int filesize)
     // includes the padding in the header, the mystery bytes, and the
     // padding, plus the length of the name itself.
     filesize += name.size() + 16;
-    uint32_t len = filesize;
+    boost::uint32_t len = filesize;
     len = htonl(len);
-    ptr = reinterpret_cast<uint8_t *>(&len);
-    for (i=0; i<sizeof(uint32_t); i++) {
+    ptr = reinterpret_cast<boost::uint8_t *>(&len);
+    for (i=0; i<sizeof(boost::uint32_t); i++) {
         _header.push_back(ptr[i]);
     }
 
@@ -146,18 +146,18 @@ SOL::formatHeader(std::string &name, int filesize)
     // first is the TCSO, we have no idea what this stands for.
 //    ptr = reinterpret_cast<uint8_t *>(const_cast<uint8_t *>("TCSO");
     ptr = (uint8_t *)"TCSO";
-    for (i=0; i<sizeof(uint32_t); i++) {
+    for (i=0; i<sizeof(boost::uint32_t); i++) {
         _header.push_back(ptr[i]);
     }
     // then the 0x0004 bytes, also a mystery
     swapped = SOL_BLOCK_MARK;
     swapped = htons(swapped);
-    ptr = reinterpret_cast<uint8_t *>(&swapped);
-    for (i=0; i<sizeof(uint16_t); i++) {
+    ptr = reinterpret_cast<boost::uint8_t *>(&swapped);
+    for (i=0; i<sizeof(boost::uint16_t); i++) {
         _header.push_back(ptr[i]);
     }
     // finally a bunch of zeros to pad things for this field
-    for (i=0; i<sizeof(uint32_t); i++) {
+    for (i=0; i<sizeof(boost::uint32_t); i++) {
         _header.push_back('\0');
     }
 
@@ -166,18 +166,18 @@ SOL::formatHeader(std::string &name, int filesize)
     //  First the length in two bytes
     swapped = name.size();
     swapped = htons(swapped);
-    ptr = reinterpret_cast<uint8_t *>(&swapped);
-    for (i=0; i<sizeof(uint16_t); i++) {
+    ptr = reinterpret_cast<boost::uint8_t *>(&swapped);
+    for (i=0; i<sizeof(boost::uint16_t); i++) {
         _header.push_back(ptr[i]);
     }
     // then the string itself
-    ptr = (uint8_t *)name.c_str();
+    ptr = (boost::uint8_t *)name.c_str();
     for (i=0; i<name.size(); i++) {
         _header.push_back(ptr[i]);
     }
     
     // finally a bunch of zeros to pad things at the end of the header
-    for (i=0; i<sizeof(uint32_t); i++) {
+    for (i=0; i<sizeof(boost::uint32_t); i++) {
         _header.push_back('\0');
     }
 
@@ -217,7 +217,7 @@ SOL::writeFile(string &filespec, string &name)
 {
 //    GNASH_REPORT_FUNCTION;
     ofstream ofs(filespec.c_str(), ios::binary);
-    vector<uint8_t>::iterator it;
+    vector<boost::uint8_t>::iterator it;
     vector<amf::Element *>::iterator ita; 
     AMF amf_obj;
     char *ptr;
@@ -240,7 +240,7 @@ SOL::writeFile(string &filespec, string &name)
     for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
         amf::Element *el = (*(ita));
         int outsize = el->getName().size() + el->getLength() + 5;
-        uint8_t *foo = amf_obj.encodeVariable(el); 
+        boost::uint8_t *foo = amf_obj.encodeVariable(el); 
         switch (el->getType()) {
 	  case Element::BOOLEAN:
 	      outsize = el->getName().size() + 5;
