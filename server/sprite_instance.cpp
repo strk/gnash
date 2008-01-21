@@ -3340,8 +3340,12 @@ sprite_instance::pointInVisibleShape(float x, float y) const
   if ( ! get_visible() ) return false;
   if ( isMask() )
   {
-    log_debug("%s is a mask, no point will hit it", getTarget().c_str());
-    return false;
+    if ( ! can_handle_mouse_event() )
+    {
+      // see testsuite/misc-ming.all/masks_test.swf
+      log_debug("%s is a mask and can't handle mouse events, no point will hit it", getTarget().c_str());
+      return false;
+    }
   }
   character* mask = getMask();
   if ( mask && mask->get_visible() && ! mask->pointInShape(x, y) )

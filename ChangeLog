@@ -1,3 +1,10 @@
+2008-01-21 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (pointInVisibleShape): even if we're a
+	  mask still run the hitTest if we can handle mouse events.
+	* testsuite/misc-ming.all/masks_test.c: success in masks with mouse
+	  events and hitTest results.
+
 2008-01-21 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/asobj/SoundGst.cpp: don't start playing sound in loadSound(),

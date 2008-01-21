@@ -481,8 +481,8 @@ main(int argc, char** argv)
 	);
 
 	// Red rect is a mask, but has mouse events !
-	xcheck(mo, "staticmc2.hitTest(10, 210, true)"); 
-	xcheck(mo, "staticmc2.hitTest(50, 250, true)"); 
+	check(mo, "staticmc2.hitTest(10, 210, true)"); 
+	check(mo, "staticmc2.hitTest(50, 250, true)"); 
 
 	// Yellow rect is now masked by Red rect
 	// Yellow rect (staticmc3) is at 30,200-90,260
@@ -501,12 +501,12 @@ main(int argc, char** argv)
 	check(mo, "staticmc4.hitTest(210, 210, false)");
 
 	// Cyan rect is a mask but has mouse events !
-	xcheck(mo, "staticmc5.hitTest(240, 210, true)");
-	xcheck(mo, "staticmc5.hitTest(280, 250, true)");
+	check(mo, "staticmc5.hitTest(240, 210, true)");
+	check(mo, "staticmc5.hitTest(280, 250, true)");
 
 	// Blue rect is a mask but has mouse events !
-	xcheck(mo, "dynamicmc2.hitTest(10, 310, true)");
-	xcheck(mo, "dynamicmc2.hitTest(50, 350, true)");
+	check(mo, "dynamicmc2.hitTest(10, 310, true)");
+	check(mo, "dynamicmc2.hitTest(50, 350, true)");
 
 	// Violet rect is now masked by Blue rect
 	check(mo, "dynamicmc3.hitTest(40, 310, true)"); 
@@ -519,8 +519,8 @@ main(int argc, char** argv)
 	check(mo, "dynamicmc4.hitTest(250, 350, true)"); 
 
 	// Light blue is a mask but has mouse events !
-	xcheck(mo, "dynamicmc5.hitTest(240, 310, true)");
-	xcheck(mo, "dynamicmc5.hitTest(280, 350, true)");
+	check(mo, "dynamicmc5.hitTest(240, 310, true)");
+	check(mo, "dynamicmc5.hitTest(280, 350, true)");
 
 	add_actions(mo, "_root.totals(154); stop();");
 
