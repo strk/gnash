@@ -543,7 +543,7 @@ NetStreamGst::decodebin_newpad_cb(GstElement* /*decodebin*/, GstPad* pad,
 
   } else if (g_strrstr (structure_name, "video")) {
 
-    if (GST_PAD_IS_LINKED (ns->_audiopad)) {
+    if (GST_PAD_IS_LINKED (ns->_videopad)) {
       return;
     }
 
