@@ -1,5 +1,11 @@
 2008-01-21 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/NetStream-SquareTest.c: altought the test
+	  shows gst is unable to load the FLV, we seem to support the
+	  'currentFps' property now..
+
+2008-01-21 Sandro Santilli <strk@keybit.net>
+
 	* server/as_object.cpp, server/button_character_instance.cpp,
 	  server/sprite_instance.cpp, server/asobj/xml.cpp: use new
 	  named strings. This should be particularely effective for
