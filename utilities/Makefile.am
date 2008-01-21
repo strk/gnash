@@ -1,5 +1,5 @@
 # 
-#   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -25,9 +25,9 @@ AUTOMAKE_OPTIONS = # dejagnu
 
 GNASH_LIBS = \
 	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/libmedia/libgnashmedia.la \
-	$(top_builddir)/libamf/libgnashamf.la
+	$(top_builddir)/libmedia/libgnashmedia.la
 
 ## WARNING: make sure GLIB_LIBS appears first
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
@@ -51,6 +51,7 @@ AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/server \
+        -I$(top_srcdir)/server/asobj \
         -I$(top_srcdir)/server/parser \
         -I$(top_srcdir)/server/vm \
         -I$(top_srcdir)/libmedia \
@@ -76,8 +77,7 @@ endif
  GNASH_LIBS += $(GLIB_LIBS) $(GSTREAMER_LIBS)
 #endif
 
-bin_PROGRAMS = gprocessor soldumper
-noinst_PROGRAMS = dumpshm
+bin_PROGRAMS = gprocessor soldumper dumpshm
 #check_PROGRAMS = gdebug.swf
 
 gprocessor_SOURCES = processor.cpp
