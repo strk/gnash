@@ -1,3 +1,8 @@
+2008-01-21 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/masks_testrunner.cpp: add tests for effect
+	  of dynamic masks on mouse events.
+
 2008-01-21 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/asobj/NetStreamGst.cpp: Disable parsing code for

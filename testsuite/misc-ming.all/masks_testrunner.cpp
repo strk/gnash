@@ -78,11 +78,13 @@ main(int /*argc*/, char** /*argv*/)
 	rgba white(255,255,255,255);
 	rgba red(255,0,0,255);
 	rgba green(0,255,0,255);
+	rgba green_trans(120,248,120,255);
 	rgba blue(0,0,255,255);
 	rgba yellow(255,255,0,255);
 	rgba cyan(0,255,255,255);
 	rgba violet(255,0,255,255);
 	rgba dark_green(0,128,0,255);
+	rgba dark_green_trans(120,184,120,255);
 	rgba light_blue(0,128,255,255);
 
 	// 14,232 = red
@@ -273,7 +275,11 @@ main(int /*argc*/, char** /*argv*/)
 	tester.advance();
 	check_equals(root->get_current_frame(), 5); // 0-based
 
-	// 14,232 = white (yellow not covered by its red mask)
+	//----------------------------------------------
+	// Red-Yellow couple
+	//----------------------------------------------
+
+	// 14,232 = white (on the red mask)
 	check( invalidated.contains(14, 232) );
 	check_pixel(14,232, 2, white, 2);
 	// 48,232 = yellow (visible in the red mask)
@@ -282,6 +288,22 @@ main(int /*argc*/, char** /*argv*/)
 	// 80,232 = white (yellow not covered by its red mask)
 	check( invalidated.contains(80, 232) );
 	check_pixel(80,232, 2, white, 2);
+
+	tester.movePointerTo(14,232); // on the red mask
+	check( tester.isMouseOverMouseEntity() ) // the mask is still sensible to mouse
+	check_pixel(48,232, 2, yellow, 2); // it's the red alpha changing, not the yellow one
+
+	tester.movePointerTo(48,232); // on the yellow exposed area
+	check( tester.isMouseOverMouseEntity() ) // sensible to mouse
+	check_pixel(48,232, 2, yellow, 2); // it's the red alpha changing, not the yellow one
+
+	tester.movePointerTo(80,232); // yellow not covered by its red mask
+	check( ! tester.isMouseOverMouseEntity() ) // not covered area is not sensible to mouse
+	check_pixel(48,232, 2, yellow, 2); // it's the red alpha changing, not the yellow one
+
+	//----------------------------------------------
+	// Green-Cyan couple
+	//----------------------------------------------
 
 	// 214,232 = white (green not covered by its cyan mask)
 	check( invalidated.contains(214, 232) );
@@ -293,6 +315,23 @@ main(int /*argc*/, char** /*argv*/)
 	check( invalidated.contains(276, 232) );
 	check_pixel(276,232, 2, white, 2);
 
+	tester.movePointerTo(214,232); // green not covered by cyan mask
+	check( ! tester.isMouseOverMouseEntity() ) // not covered area is not sensible to mouse
+
+	tester.movePointerTo(248,232); // green exposed by cyan mask
+	check( tester.isMouseOverMouseEntity() ) // not covered area is not sensible to mouse
+	check( invalidated.contains(248, 232) );
+	check_pixel(248,232, 2, green_trans, 2);
+
+	tester.movePointerTo(276,232); // on the cyan mask, out of green
+	check( invalidated.contains(248, 232) );
+	check_pixel(248,232, 2, green, 2);
+	check( tester.isMouseOverMouseEntity() ) // mask still sensible to mouse
+
+	//----------------------------------------------
+	// Blue-Violet couple
+	//----------------------------------------------
+
 	// 14,331 = white (violet not covered by its blue mask)
 	check( invalidated.contains(14, 331) );
 	check_pixel(14,331, 2, white, 2);
@@ -302,6 +341,22 @@ main(int /*argc*/, char** /*argv*/)
 	// 80,331 = white (violet not covered by its blue mask)
 	check( invalidated.contains(80, 331) );
 	check_pixel(80,331, 2, white, 2);
+
+	tester.movePointerTo(14,331); // on the blue mask
+	check( tester.isMouseOverMouseEntity() ) // the mask is still sensible to mouse
+	check_pixel(48,331, 2, violet, 2); // it's the blue alpha changing, not violet
+
+	tester.movePointerTo(48,331); // on the violet exposed area
+	check( tester.isMouseOverMouseEntity() ) // sensible to mouse
+	check_pixel(48,331, 2, violet, 2); // it's the blue alpha changing, not violet
+
+	tester.movePointerTo(80,331); // violet not covered by its blue mask
+	check( ! tester.isMouseOverMouseEntity() ) // not covered area is not sensible to mouse
+	check_pixel(48,331, 2, violet, 2); // it's the red alpha changing, not the yellow one
+
+	//----------------------------------------------
+	// DarkGreen-LightBlue couple
+	//----------------------------------------------
 
 	// 214,331 = white (dark_green not covered by its light_blue  mask)
 	check( invalidated.contains(214, 331) );
@@ -313,6 +368,17 @@ main(int /*argc*/, char** /*argv*/)
 	check( invalidated.contains(276, 331) );
 	check_pixel(276,331, 2, white, 2);
 
-	// TODO: test effects of rollOver/rollOut events here
+	tester.movePointerTo(214,331); // DarkGreen not covered by LightBlue mask
+	check( ! tester.isMouseOverMouseEntity() ) // not covered area is not sensible to mouse
+
+	tester.movePointerTo(248,331); // DarkGreen exposed by LightBlue mask
+	check( tester.isMouseOverMouseEntity() ) // not covered area is not sensible to mouse
+	check( invalidated.contains(248, 331) );
+	check_pixel(248,331, 2, dark_green_trans, 2);
+
+	tester.movePointerTo(276,331); // on the LightBlue mask, out of DarkGreen
+	check( invalidated.contains(248, 331) );
+	check_pixel(248,331, 2, dark_green, 2);
+	check( tester.isMouseOverMouseEntity() ) // mask still sensible to mouse
 }
 
