@@ -464,9 +464,68 @@ main(int argc, char** argv)
 	check(mo, "!dynamicmc5.hitTest(240, 310, true)");
 	check(mo, "!dynamicmc5.hitTest(280, 350, true)");
 
-	add_actions(mo, "_root.totals(134); stop();");
+	add_actions(mo,
+		"note(' - Press any key to continue -');"
+    		"stop();"
+	);
 
 	SWFMovie_nextFrame(mo);        
+
+	add_actions(mo,
+		"var clips = [staticmc2, staticmc3, staticmc4, staticmc5, dynamicmc2, dynamicmc3, dynamicmc4, dynamicmc5];"
+		"for (i=0; i<clips.length; ++i) {"
+		" clips[i].onRollOver = function() { this._alpha = 50; };"
+		" clips[i].onRollOut = function() { this._alpha = 100; };"
+		"}"
+		"note('Made all characters mouse-sensitive');"
+	);
+
+	// Red rect is a mask, but has mouse events !
+	xcheck(mo, "staticmc2.hitTest(10, 210, true)"); 
+	xcheck(mo, "staticmc2.hitTest(50, 250, true)"); 
+
+	// Yellow rect is now masked by Red rect
+	// Yellow rect (staticmc3) is at 30,200-90,260
+	// Red rect (staticmc2) is at 0,200-60,260
+	// Intersection is 30,200-60,260
+	check(mo, "staticmc3.hitTest(40, 210, true)"); 
+	check(mo, "!staticmc3.hitTest(80, 250, true)"); // out of masked area
+	check(mo, "staticmc3.hitTest(80, 250, false)");
+
+	// Green rect is now masked by Cyan
+	// Green rect (staticmc4) is at 200,200-260,260
+	// Cyan rect (staticmc5) is at 230,200-290,260
+	// Intersection is 230,200-260,260
+	check(mo, "!staticmc4.hitTest(210, 210, true)");   // out of masked area
+	check(mo, "staticmc4.hitTest(250, 250, true)");  
+	check(mo, "staticmc4.hitTest(210, 210, false)");
+
+	// Cyan rect is a mask but has mouse events !
+	xcheck(mo, "staticmc5.hitTest(240, 210, true)");
+	xcheck(mo, "staticmc5.hitTest(280, 250, true)");
+
+	// Blue rect is a mask but has mouse events !
+	xcheck(mo, "dynamicmc2.hitTest(10, 310, true)");
+	xcheck(mo, "dynamicmc2.hitTest(50, 350, true)");
+
+	// Violet rect is now masked by Blue rect
+	check(mo, "dynamicmc3.hitTest(40, 310, true)"); 
+	check(mo, "!dynamicmc3.hitTest(80, 350, true)");
+	check(mo, "dynamicmc3.hitTest(80, 350, false)");
+
+	// Dark green rect is masked by Light blue
+	check(mo, "!dynamicmc4.hitTest(210, 310, true)");
+	check(mo, "dynamicmc4.hitTest(210, 310, false)");
+	check(mo, "dynamicmc4.hitTest(250, 350, true)"); 
+
+	// Light blue is a mask but has mouse events !
+	xcheck(mo, "dynamicmc5.hitTest(240, 310, true)");
+	xcheck(mo, "dynamicmc5.hitTest(280, 350, true)");
+
+	add_actions(mo, "_root.totals(154); stop();");
+
+	SWFMovie_nextFrame(mo);        
+
 
 	// TODO:
 	// - test mask layers !!

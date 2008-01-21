@@ -51,7 +51,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	// FRAME 1 (start)
 
-	check_equals(root->get_frame_count(), 5);
+	check_equals(root->get_frame_count(), 6);
 	check_equals(root->get_play_state(), sprite_instance::PLAY);
 	check_equals(root->get_current_frame(), 0);
 	check_equals(root->getDisplayList().size(), 1);  // dejagnu clip
@@ -227,7 +227,51 @@ main(int /*argc*/, char** /*argv*/)
 	tester.advance();
 	check_equals(root->get_current_frame(), 4); // 0-based
 
-	// TODO: test setMask effects after swapping mask/maskee
+	// 14,232 = white (yellow not covered by its red mask)
+	check( invalidated.contains(14, 232) );
+	check_pixel(14,232, 2, white, 2);
+	// 48,232 = yellow (visible in the red mask)
+	check( invalidated.contains(48, 232) );
+	check_pixel(48,232, 2, yellow, 2);
+	// 80,232 = white (yellow not covered by its red mask)
+	check( invalidated.contains(80, 232) );
+	check_pixel(80,232, 2, white, 2);
+
+	// 214,232 = white (green not covered by its cyan mask)
+	check( invalidated.contains(214, 232) );
+	check_pixel(214,232, 2, white, 2);
+	// 248,232 = green (visible in its cyan mask)
+	check( invalidated.contains(248, 232) );
+	check_pixel(248,232, 2, green, 2);
+	// 276,232 = white (green not covered by its cyan mask)
+	check( invalidated.contains(276, 232) );
+	check_pixel(276,232, 2, white, 2);
+
+	// 14,331 = white (violet not covered by its blue mask)
+	check( invalidated.contains(14, 331) );
+	check_pixel(14,331, 2, white, 2);
+	// 48,331 = violet (visible in its blue mask)
+	check( invalidated.contains(48, 331) );
+	check_pixel(48,331, 2, violet, 2);
+	// 80,331 = white (violet not covered by its blue mask)
+	check( invalidated.contains(80, 331) );
+	check_pixel(80,331, 2, white, 2);
+
+	// 214,331 = white (dark_green not covered by its light_blue  mask)
+	check( invalidated.contains(214, 331) );
+	check_pixel(214,331, 2, white, 2);
+	// 248,331 = dark_green (visible in its light_blue mask)
+	check( invalidated.contains(248, 331) );
+	check_pixel(248,331, 2, dark_green, 2);
+	// 276,331 = white (dark_green not covered by its light_blue mask)
+	check( invalidated.contains(276, 331) );
+	check_pixel(276,331, 2, white, 2);
+
+	// FRAME 6
+	tester.pressKey(gnash::key::ENTER);
+	tester.releaseKey(gnash::key::ENTER);
+	tester.advance();
+	check_equals(root->get_current_frame(), 5); // 0-based
 
 	// 14,232 = white (yellow not covered by its red mask)
 	check( invalidated.contains(14, 232) );
@@ -269,5 +313,6 @@ main(int /*argc*/, char** /*argv*/)
 	check( invalidated.contains(276, 331) );
 	check_pixel(276,331, 2, white, 2);
 
+	// TODO: test effects of rollOver/rollOut events here
 }
 
