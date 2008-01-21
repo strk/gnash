@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 # 
-#   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ INCLUDES = -I$(srcdir)  \
             -I$(top_srcdir)/server \
             -I$(top_srcdir)/server/vm \
 	    -I$(top_srcdir)/asobjs \
+	    $(BOOST_CFLAGS) \
 	    $(INCLTDL)
 
 lirc_la_SOURCES = lirc_ext.cpp lirc_ext.h
