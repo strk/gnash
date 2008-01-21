@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # 
-#   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -106,10 +106,19 @@ xlc )
   am_opt=--include-deps;;
 esac
 
+# Rather than have libltdl run it's own configure, the few tests libltdl needed
+# were added to the main configure.ac. As we need to look at config.h in header
+# files, which may conflict with other versions of config.h, this has been
+# renamed to gnashconfig,h to be unique. As the files libtoolize copies insist
+# on using config.h, we just edit the name, rather than adding a fixed copy to
+# Gnash.
 if grep "^AC_PROG_LIBTOOL" configure.ac >/dev/null; then
 	if test -z "$NO_LIBTOOLIZE" ; then 
 	  echo "Running libtoolize --force --ltdl --copy ..."
 	  if ${LIBTOOLIZE:-libtoolize} --force --ltdl --copy; then
+	    mv libltdl/ltdl.c libltdl/ltdl.c.orig
+	    sed -e 's/include <config.h>/include <gnashconfig.h>/' libltdl/ltdl.c.orig > libltdl/ltdl.c
+	    #rm libltdl/ltdl.c.orig
 	    chmod a+w libltdl/config-h.in # Darwin needs this
           else
             echo
