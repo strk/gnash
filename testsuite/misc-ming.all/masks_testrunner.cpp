@@ -61,7 +61,7 @@ main(int /*argc*/, char** /*argv*/)
 	// FRAME 2 -- masks at different depth ranges
 	tester.advance();
 	
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), sprite_instance::STOP);
 	check_equals(root->get_current_frame(), 1); // 0-based
 	check_equals(root->getDisplayList().size(), 9);
 	root->getDisplayList().dump();
@@ -126,7 +126,10 @@ main(int /*argc*/, char** /*argv*/)
 	check_pixel(276,331, 2, light_blue, 2);
 
 	// FRAME 3
+	tester.pressKey(gnash::key::ENTER);
+	tester.releaseKey(gnash::key::ENTER);
 	tester.advance();
+	check_equals(root->get_current_frame(), 2); // 0-based
 
 	// test effects of setMask here
 
@@ -170,8 +173,11 @@ main(int /*argc*/, char** /*argv*/)
 	check( invalidated.contains(276, 331) );
 	check_pixel(276,331, 2, white, 2);
 
-	// FRAME 3
+	// FRAME 4
+	tester.pressKey(gnash::key::ENTER);
+	tester.releaseKey(gnash::key::ENTER);
 	tester.advance();
+	check_equals(root->get_current_frame(), 3); // 0-based
 
 	// test effects of swapDepth (should be none)
 
@@ -215,8 +221,11 @@ main(int /*argc*/, char** /*argv*/)
 	check( invalidated.contains(276, 331) );
 	check_pixel(276,331, 2, white, 2);
 
-	// FRAME 4
+	// FRAME 5
+	tester.pressKey(gnash::key::ENTER);
+	tester.releaseKey(gnash::key::ENTER);
 	tester.advance();
+	check_equals(root->get_current_frame(), 4); // 0-based
 
 	// TODO: test setMask effects after swapping mask/maskee
 

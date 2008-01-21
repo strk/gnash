@@ -67,7 +67,7 @@ void
 add_static_mc(SWFMovie mo, const char* name, int depth, int x, int y, int width, int height, int r, int g, int b)
 {
 	SWFShape sh;
-	SWFMovieClip mc, mc2;
+	SWFMovieClip mc;
 	SWFDisplayItem it;
 
 	sh = make_fill_square (0, 0, width, height, r, g, b, r, g, b);
@@ -86,7 +86,7 @@ void
 add_static_mask(SWFMovie mo, const char* name, int depth, int x, int y, int width, int height, int masklevel)
 {
 	SWFShape sh;
-	SWFMovieClip mc, mc2;
+	SWFMovieClip mc;
 	SWFDisplayItem it;
 
 	sh = make_fill_square (-(width/2), -(height/2), width, height, 255, 0, 0, 255, 0, 0);
@@ -200,9 +200,17 @@ main(int argc, char** argv)
 	check(mo, "dynamicmc5.hitTest(240, 310, true)");
 	check(mo, "dynamicmc5.hitTest(280, 350, true)");
 
-	SWFMovie_nextFrame(mo);  // FRAME 3 starts here
+	add_actions(mo,
+		"note('Placed staticmc2 (red), staticmc3 (yellow), staticmc4 (green), staticmc5 (cyan) characters');"
+		"note('Placed dynamicmc2 (blue), dynamicmc3 (violet), dynamicmc4 (dark green), dynamicmc5 (light blue) characters');"
+		"note(' - Press any key to continue -');"
+		"stop();"
+		"l = new Object();"
+		"l.onKeyUp = function() { nextFrame(); };"
+		"Key.addListener(l);"
+	);
 
-	add_actions(mo, "note('Using setMask on chars in the static depth range 2.mask(3) and 5.mask(4)');");
+	SWFMovie_nextFrame(mo);  // FRAME 3 starts here
 
 	add_actions(mo, 
 		"sm23 = staticmc2.setMask(staticmc3);" // red masked by yellow
@@ -210,6 +218,13 @@ main(int argc, char** argv)
 		"dm23 = dynamicmc2.setMask(dynamicmc3);" // blue masked by violet
 		"dm54 = dynamicmc5.setMask(dynamicmc4);" // light blue masked by dark green 
 		);
+
+	add_actions(mo,
+		"note('staticmc2.setMask(staticmc3) [red masked by yellow]');"
+		"note('staticmc5.setMask(staticmc4) [cyan masked by green]');"
+		"note('dynamicmc2.setMask(dynamicmc3) [blue masked by violet');"
+		"note('dynamicmc5.setMask(dynamicmc4) [light blue masked by dark green');"
+	);
 
 	check_equals(mo, "typeof(sm23)", "'boolean'");
 	check_equals(mo, "sm23", "true");
@@ -278,9 +293,12 @@ main(int argc, char** argv)
 	check(mo, "!dynamicmc5.hitTest(280, 350, true)");
 	check(mo, "dynamicmc5.hitTest(280, 350, false)");
 
-	SWFMovie_nextFrame(mo);  // FRAME 4 starts here
+	add_actions(mo,
+		"note(' - Press any key to continue -');"
+    		"stop();"
+	);
 
-	add_actions(mo, "note('Swapping chars 2/3 and 4/5 to see if masks are still in effect');");
+	SWFMovie_nextFrame(mo);  // FRAME 4 starts here
 
 	add_actions(mo,
 		"staticmc2.swapDepths(staticmc3);"
@@ -288,6 +306,13 @@ main(int argc, char** argv)
 		"dynamicmc2.swapDepths(dynamicmc3);"
 		"dynamicmc4.swapDepths(dynamicmc5);"
 		);
+
+	add_actions(mo,
+		"note('Swapped depths of chars 2/3 and 4/5 to see if masks are still in effect');"
+		"note(' - Press any key to continue -');"
+    		"stop();"
+	);
+
 
 	check_equals(mo, "staticmc2.getDepth()", "-16381");
 	check_equals(mo, "staticmc3.getDepth()", "-16382");
@@ -360,7 +385,6 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo);  // FRAME 5 starts here
 
-	add_actions(mo, "note('Making 3.mask(2) and 4.mask(5)');");
 
 	add_actions(mo,
 		"sm32 = staticmc3.setMask(staticmc2);" // yellow masked by red 
@@ -368,6 +392,14 @@ main(int argc, char** argv)
 		"dm32 = dynamicmc3.setMask(dynamicmc2);" // violet masked by blue
 		"dm45 = dynamicmc4.setMask(dynamicmc5);" // dark green masked by light blue 
 		);
+
+	add_actions(mo,
+		"note('Swapped mask/maskee:');"
+		"note(' staticmc3.setMask(staticmc2) [yellow masked by red]');"
+		"note(' staticmc4.setMask(staticmc5) [green masked by cyan]');"
+		"note(' dynamicmc3.setMask(dynamicmc4) [violet masked by blue');"
+		"note(' dynamicmc4.setMask(dynamicmc5) [dark green masked by light blue');"
+	);
 
 	check_equals(mo, "typeof(sm32)", "'boolean'");
 	check_equals(mo, "sm32", "true");

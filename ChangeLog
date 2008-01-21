@@ -1,5 +1,11 @@
 2008-01-21 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: masks_test.c, masks_testrunner.cpp:
+	  Improved self-containment: print instructions on how
+	  to manually run and verify.
+
+2008-01-21 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/masks_testrunner.cpp: pixel checking and
 	  invalidated bounds testing after mask/maskee swapping.
 
