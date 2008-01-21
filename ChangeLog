@@ -1,3 +1,8 @@
+2008-01-21 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/asobj/SoundGst.cpp: don't start playing sound in loadSound(),
+	  always seek (allows replay of the same sound)	
+
 2008-01-21 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/: masks_test.c, masks_testrunner.cpp:
