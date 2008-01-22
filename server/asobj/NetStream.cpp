@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.81 2008/01/21 20:55:56 rsavoye Exp $ */
+/* $Id: NetStream.cpp,v 1.82 2008/01/22 08:25:32 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -35,7 +35,6 @@
 #include "builtin_function.h"
 #include "GnashException.h"
 #include "NetConnection.h"
-#include "action.h" // for call_method
 #include "render.h"	// for gnash::render::videoFrameFormat()
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
@@ -451,34 +450,12 @@ void
 NetStream::processMetaData(boost::intrusive_ptr<as_object>& metadata_obj)
 {
 	// TODO: check for System.onStatus too ! use a private getStatusHandler() method for this.
-	as_value handler;
-	if (!get_member(NSV::PROP_ON_META_DATA, &handler) || ! handler.is_function())
-	{
-#ifdef GNASH_DEBUG_METADATA
-	  log_debug("No onMetaData handler");
-#endif
-		return;
-	}
-
-	size_t initialStackSize = m_env->stack_size();
-	if ( initialStackSize > 0 )
-	{
-		log_debug("NetStream environment stack not empty at start of processMetaData");
-	}
 
 #ifdef GNASH_DEBUG_METADATA
   log_debug(" Invoking onMetaData");
 #endif
 
-  m_env->push(as_value(metadata_obj.get()));
-  call_method(handler, m_env, this, 1, m_env->get_top_index() );
-
-	// clear the stack after method execution
-	if ( m_env->stack_size() > initialStackSize )
-	{
-		log_debug("NetStream environment stack not empty at end of processMetaData. Fixing.");
-		m_env->drop(m_env->stack_size() - initialStackSize);
-	}
+	callMethod(NSV::PROP_ON_META_DATA, as_value(metadata_obj.get()));
 }
 
 
@@ -486,18 +463,6 @@ void
 NetStream::processStatusNotifications()
 {
 	// TODO: check for System.onStatus too ! use a private getStatusHandler() method for this.
-	as_value status;
-	if (!get_member(NSV::PROP_ON_STATUS, &status) || ! status.is_function())
-	{
-		clearStatusQueue();
-		return;
-	}
-
-	size_t initialStackSize = m_env->stack_size();
-	if ( initialStackSize > 0 )
-	{
-		log_debug("NetStream environment stack not empty at start of processStatusNotifications");
-	}
 
 	StatusCode code;
 	while (1)
@@ -512,19 +477,8 @@ NetStream::processStatusNotifications()
 		// TODO: optimize by reusing the same as_object ?
 		boost::intrusive_ptr<as_object> o = getStatusObject(code);
 
-		m_env->push(as_value(o.get()));
-		call_method(status, m_env, this, 1, m_env->get_top_index() );
-
+		callMethod(NSV::PROP_ON_STATUS, as_value(o.get()));
 	}
-
-	// clear the stack after method execution
-	if ( m_env->stack_size() > initialStackSize )
-	{
-		log_debug("NetStream environment stack not empty at end of processStatusNotifications");
-		m_env->drop(m_env->stack_size() - initialStackSize);
-	}
-
-
 }
 
 void
