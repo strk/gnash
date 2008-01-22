@@ -1,5 +1,11 @@
 2008-01-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/NetStream-SquareTest.c: expect the failures
+	  in currentFps, till bjacques fixes it. Add test for metadata object
+	  being an Object instance.
+
+2008-01-22 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetStreamGst.cpp: make metadata object properties
 	  enumerable, deletable and overridable, fix bool properties
 	  and the 'duration' unit.
