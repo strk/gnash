@@ -1,5 +1,7 @@
 2008-01-22 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (sprite_swap_depth): ignore the call when
+	  target and source characters have the same depth.
 	* server/asobj/SharedObject.cpp (sharedobject_getlocal): register the
 	  static GcResource with the VM. Fixes bug #22039, but not the
 	  correctness bugs as tested in the SharedObject.as case.

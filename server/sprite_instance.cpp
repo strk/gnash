@@ -400,6 +400,22 @@ static as_value sprite_swap_depths(const fn_call& fn)
     }
 
     target_depth = target_sprite->get_depth();
+
+    // Check we're not swapping the our own depth so
+    // to avoid unecessary bounds invalidation and immunizing
+    // the instance from subsequent PlaceObjec tags attempting
+    // to transform it.
+    if ( sprite->get_depth() == target_depth )
+    {
+      IF_VERBOSE_ASCODING_ERRORS(
+      stringstream ss; fn.dump_args(ss);
+      log_aserror(_("%s.swapDepths(%s): ignored, source and target characters have the same depth %d"),
+        sprite->getTarget().c_str(),
+        ss.str().c_str(), target_depth);
+      );
+      return rv;
+    }
+
     //target = boost::dynamic_pointer_cast<character>(target_sprite);
   }
 
