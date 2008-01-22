@@ -1,5 +1,13 @@
 2008-01-22 Sandro Santilli <strk@keybit.net>
 
+	* server/impl.cpp (clear):
+	  unregister the render handler, and do so *after* the GC collect
+	  runs, clear the movie root before that.
+	  This seems to fix both bug #21311 and bug #21310 (segfaults
+	  on exit).
+
+2008-01-22 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.cpp (markReachableResources): don't assume
 	  the root movie was registered. Fixes bug #22079.
 

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.138 2008/01/21 20:55:51 rsavoye Exp $ */
+/* $Id: impl.cpp,v 1.139 2008/01/22 21:04:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -600,15 +600,24 @@ void  clear()
     clear_library();
     fontlib::clear();
 
-    // By setting the soundhandler to NULL we avoid it being used
-    // after it's been de-referenced
-    set_sound_handler(NULL);
+    if ( VM::isInitialized() )
+    {
+        VM::get().getRoot().clear();
+    }
 
 #ifdef GNASH_USE_GC 
     GC::get().collect();
 
     GC::cleanup();
 #endif
+
+    // By setting the soundhandler to NULL we avoid it being used
+    // after it's been de-referenced
+    set_sound_handler(NULL);
+
+    // By setting the render handler to NULL we avoid it being used
+    // after it's been de-referenced (fixes bug #21310)
+    set_render_handler(NULL);
 }
 
 //
