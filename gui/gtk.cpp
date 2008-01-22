@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.136 2008/01/22 03:26:16 rsavoye Exp $ */
+/* $Id: gtk.cpp,v 1.137 2008/01/22 14:53:19 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -57,8 +57,6 @@
 #ifdef GUI_HILDON
 # include <hildon/hildon.h>
 #endif
-
-using namespace std;
 
 namespace gnash 
 {
@@ -743,7 +741,7 @@ GtkGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 
 /// This method is called when the "OK" button is clicked in the open file
 /// dialog. For GTK <= 2.4.0, this is a callback called by GTK itself.
-void GtkGui::open_file (GtkWidget *widget, gpointer /* user_data */)
+void GtkGui::openFile (GtkWidget *widget, gpointer /* user_data */)
 {
 #if 0
     // We'll need this when implementing file opening.
@@ -777,13 +775,14 @@ void GtkGui::open_file (GtkWidget *widget, gpointer /* user_data */)
 // Callback to read values from the preferences dialogue and set rcfile
 // values accordingly.
 void
-GtkGui::updateRC (GtkWidget* dialog, gint response, gpointer data)
+GtkGui::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
 {
+
+    prefData *prefs = static_cast<prefData*>(data);
 
     if (response == GTK_RESPONSE_APPLY) {
 
         // If 'Save' was clicked, set all the values in rcfile
-        prefData *prefs = static_cast<prefData*>(data);
         RcInitFile& rcfile = RcInitFile::getDefaultInstance();
         // For getting from const gchar* to std::string&
         std::string tmp;
@@ -842,6 +841,9 @@ GtkGui::updateRC (GtkWidget* dialog, gint response, gpointer data)
 
         rcfile.startStopped(
         	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->startStoppedToggle)));
+
+        tmp = gtk_entry_get_text(GTK_ENTRY(prefs->urlOpenerText));        	
+        rcfile.setURLOpenerFormat(tmp);
     	
     	// Let rcfile decide which file to update: generally the file being used if
     	// specified in GNASHRC environment variable, or in the user's home directory
@@ -855,8 +857,12 @@ GtkGui::updateRC (GtkWidget* dialog, gint response, gpointer data)
     else if (response == GTK_RESPONSE_CLOSE) {
         // Close the window only when 'close' is clicked
         gtk_widget_destroy(dialog);
+        if (prefs) delete prefs;
     }
-
+    
+    else if (response == GTK_RESPONSE_DELETE_EVENT) {
+        if (prefs) delete prefs;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -871,7 +877,7 @@ void
 GtkGui::showPreferencesDialog()
 {
     
-    prefData *prefs(new prefData);
+    prefData *prefs = new prefData;
 
     RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
@@ -896,8 +902,8 @@ GtkGui::showPreferencesDialog()
     		GTK_CONTAINER(GTK_DIALOG(prefsDialog)->vbox), notebook1);
 
     // Pass the widgets containing settings to the callback function
-    // when any button is clicked.
-    g_signal_connect (prefsDialog, "response", G_CALLBACK(&updateRC), prefs);
+    // when any button is clicked or when the dialogue is destroyed.
+    g_signal_connect (prefsDialog, "response", G_CALLBACK(&handlePrefs), prefs);
 
     // Logging Tab
     GtkWidget *loggingvbox = gtk_vbox_new (FALSE, 10);
@@ -1105,6 +1111,19 @@ GtkGui::showPreferencesDialog()
     gtk_misc_set_alignment (GTK_MISC (OSadvicelabel), 0, 0.5);
     gtk_box_pack_start(GTK_BOX(playervbox), OSadvicelabel, FALSE, FALSE, 0);     
 
+    // URL opener
+    GtkWidget *urlopenerbox = gtk_hbox_new (FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(playervbox), urlopenerbox, FALSE, FALSE, 0);
+    
+    GtkWidget *urlopenerlabel = gtk_label_new (_("URL opener:"));
+    gtk_misc_set_alignment (GTK_MISC (urlopenerlabel), 0, 0.5);
+    gtk_box_pack_start(GTK_BOX(urlopenerbox), urlopenerlabel, FALSE, FALSE, 0);
+    
+    prefs->urlOpenerText = gtk_entry_new ();
+    gtk_box_pack_start(GTK_BOX(urlopenerbox), prefs->urlOpenerText, FALSE, FALSE, 0);
+    // Put text in the entry box      
+    gtk_entry_set_text(GTK_ENTRY(prefs->urlOpenerText), rcfile.getURLOpenerFormat().c_str());
+
     // Performance
     GtkWidget *performancelabel = gtk_label_new (_("<b>Performance</b>"));
     gtk_label_set_use_markup (GTK_LABEL (performancelabel), TRUE);
@@ -1311,7 +1330,7 @@ GtkGui::showAboutDialog()
         NULL 
     };
 
-    string comments = _("Gnash is the GNU Flash movie player based on GameSWF.");
+    std::string comments = _("Gnash is the GNU Flash movie player based on GameSWF.");
 
     comments += _("\nRenderer: ");
     comments += RENDERER_CONFIG;
@@ -1356,7 +1375,7 @@ GtkGui::menuitem_openfile_callback(GtkMenuItem* /*menuitem*/, gpointer data)
                                           NULL);
     
     if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) {
-        open_file(dialog, gui);
+        openFile(dialog, gui);
     }
     
     gtk_widget_destroy (dialog);
@@ -1365,7 +1384,7 @@ GtkGui::menuitem_openfile_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 
     GtkFileSelection* selector = GTK_FILE_SELECTION(dialog);
 
-    g_signal_connect (selector->ok_button, "clicked", G_CALLBACK (open_file),
+    g_signal_connect (selector->ok_button, "clicked", G_CALLBACK (openFile),
                       gui);
 
     g_signal_connect_swapped (selector->ok_button, "clicked", 

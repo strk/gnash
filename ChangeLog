@@ -1,3 +1,9 @@
+2008-01-22 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/rc.h: Add method to set url opener format.
+	* gui/gtk{sup.h,.cpp}: option to set url opener format, tidy up,
+	  don't leak prefsData struct when the dialogue is closed.
+
 2008-01-22 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/NetStream.{h,cpp}: add an isConnected

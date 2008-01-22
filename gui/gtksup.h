@@ -203,7 +203,7 @@ class DSOEXPORT GtkGui : public Gui
     static gnash::key::code gdk_to_gnash_key(guint key);
     static int gdk_to_gnash_modifier(int state);
 
-    // A struct containing widgets for passing preference 
+    // A struct containing pointers to widgets for passing preference 
     // data from the dialogue   
     struct prefData {
         GtkWidget *soundToggle;
@@ -223,6 +223,7 @@ class DSOEXPORT GtkGui : public Gui
         GtkWidget *solSandbox;
         GtkWidget *osText;
         GtkWidget *versionText;
+        GtkWidget *urlOpenerText;
         GtkWidget *librarySize;
         GtkWidget *startStoppedToggle;
 #ifdef USE_DEBUGGER
@@ -230,8 +231,8 @@ class DSOEXPORT GtkGui : public Gui
 #endif
     };
     
-    static void updateRC(GtkWidget* widget, gint response, gpointer data);
-    static void open_file(GtkWidget* dialog, gpointer data);
+    static void handlePrefs(GtkWidget* widget, gint response, gpointer data);
+    static void openFile(GtkWidget* dialog, gpointer data);
 
 };
 

@@ -180,11 +180,16 @@ public:
     /// Get the URL opener command format
     //
     /// The %u label will need to be substituted by the actual url
-    /// properly excaped.
+    /// properly escaped.
     ///
     const std::string &getURLOpenerFormat() const
     {
         return _urlOpenerFormat;
+    }
+    
+    void setURLOpenerFormat(const std::string& value)
+    {
+        _urlOpenerFormat = value;
     }
 
     // Get the location of the sandbox for .sol files
