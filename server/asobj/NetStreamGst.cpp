@@ -198,7 +198,8 @@ NetStreamGst::play(const std::string& url)
   log_msg("%s: connecting to %s\n", __FUNCTION__, valid_url);
 #endif
   if (valid_url.empty()) {
-    // error; TODO: nofiy user
+    log_error(_("%s: The provided URL could not be resolved (url: %s)"), 
+              __FUNCTION__, valid_url.c_str());
     return;
   }
   
@@ -213,11 +214,31 @@ NetStreamGst::play(const std::string& url)
  
   _downloader = gst_element_make_from_uri(GST_URI_SRC, valid_url.c_str(),
                                           "gnash_uridownloader");
+  if (!_downloader) {
+    log_error(_("%s: No URI handler was found for the provided URL. NetStream "
+              "playback will not be possible! (url: %s). Please make sure you "
+              " have a URL handling gstreamer plugin, such as gnomevfssrc, "
+              "neonhttpsrc or souphttpsrc."), __FUNCTION__,
+              valid_url.c_str());
+    return;  
+  }
                                                          
   bool success = gst_bin_add(GST_BIN(_pipeline), _downloader);
-  assert(success);
+  if (!success) {
+    log_error(_("gst_bin_add failed. Aborting NetStream.play()."));
+    gst_object_unref(GST_OBJECT(_downloader));
+    _downloader = NULL;
+    return;
+  }
 
-  gst_element_link(_downloader, _dataqueue);  
+  success = gst_element_link(_downloader, _dataqueue);  
+  if (!success) {
+    log_error(_("gst_element_link failed. Aborting NetStream.play()."));
+    gst_object_unref(GST_OBJECT(_downloader));
+    _downloader = NULL;
+    return;
+  }
+
 
 
   // Pause the pipeline. This will give decodebin a chance to detect streams.
@@ -589,7 +610,7 @@ NetStreamGst::decodebin_newpad_cb(GstElement* /*decodebin*/, GstPad* pad,
     return;
   }
   
-  log_msg("%s: linking %s stream.", structure_name, __FUNCTION__);
+  log_msg("%s: linking %s stream.",  __FUNCTION__, structure_name);
   
   gst_caps_unref (caps);
   
