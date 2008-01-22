@@ -1,3 +1,8 @@
+2008-01-21 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/asobj/NetStreamGst.cpp: pause(): set a default state to hush
+	Sandro's compiler.
+
 2008-01-22 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/rc.h: Add method to set url opener format.

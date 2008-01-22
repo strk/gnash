@@ -155,7 +155,7 @@ NetStreamGst::close()
 void 
 NetStreamGst::pause(PauseMode mode)
 {
-  GstState newstate;
+  GstState newstate = GST_STATE_VOID_PENDING;
   switch(mode) {
     case pauseModeToggle:
     {
