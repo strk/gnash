@@ -2,7 +2,7 @@
 
 	* testsuite/actionscript.all/SharedObject.as: test that multiple calls
 	  to SharedObject.getLocal using same key return the same in-memory
-	  object.
+	  object, while changing the key returns a different object.
 
 2008-01-22 Sandro Santilli <strk@keybit.net>
 
