@@ -53,60 +53,6 @@ check_SCRIPTS = \
 	GotoAndPlayTestRunner \
 	$(NULL)
 
-if  BUILD_OGL_RENDERER
-if   BUILD_GTK_GUI
-      GNASH_LIBS += $(top_builddir)/gui/libgnashgtk_gl.la $(GTK_LIBS) $(OPENGL_LIBS)
-endif # BUILD_GTK_GUI
-if   BUILD_AQUA_GUI
-      GNASH_LIBS += $(top_builddir)/gui/libgnashaqua_gl.la $(AQUA_LIBS) $(OPENGL_LIBS)
-endif # BUILD_AQUA_GUI
-if   BUILD_SDL_GUI
-      GNASH_LIBS += $(top_builddir)/gui/libgnashsdl_gl.la $(SDL_LIBS) $(OPENGL_LIBS)
-endif # BUILD_SDL_GUI
-if BUILD_KDE_GUI
-     GNASH_LIBS += $(top_builddir)/gui/libgnashkde_gl.la $(KDE_LIBS) $(QT_LIBS) $(OPENGL_LIBS)
-endif # BUILD_KDE_GUI
-endif # BUILD_OPENGL_RENDERER
-
-#
-# Setup the GUIs that have Cairo support
-#
-if  BUILD_CAIRO_RENDERER
-if   BUILD_GTK_GUI
-      GNASH_LIBS += libgnashgtk_cairo.la $(GTK_LIBS) $(CAIRO_LIBS)
-endif # BUILD_GTK_GUI
-if   BUILD_SDL_GUI
-      GNASH_LIBS += libgnashsdl_cairo.la $(SDL_LIBS) $(CAIRO_LIBS)
-endif # BUILD_SDL
-if   BUILD_FLTK_GUI
-      GNASH_LIBS += libgnashfltk_cairo.la $(FLTK2_LIBS) $(CAIRO_LIBS) $(XFT_LIBS) $(X11_LIBS)
-endif # BUILD_FLTK_GUI
-endif # BUILD_CAIRO_RENDERER
-
-#
-# Setup the GUIs that have AntiGrain (AGG) support
-#
-if  BUILD_AGG_RENDERER
-if   BUILD_GTK_GUI
-      GNASH_LIBS += $(AGG_LIBS) $(GTK_LIBS)
-endif # BUILD_GTK_GUI
-if  BUILD_AQUA_GUI
-     GNASH_LIBS += $(AQUA_LIBS) $(AGG_LIBS)
-endif # BUILD_AQUA_GUI
-if  BUILD_SDL_GUI
-     GNASH_LIBS += $(SDL_LIBS) $(AGG_LIBS)
-endif # BUILD_SDL_GUI
-if  BUILD_FLTK_GUI
-     GNASH_LIBS += $(FLTK2_LIBS) $(AGG_LIBS) $(XFT_LIBS) $(X11_LIBS)
-endif # BUILD_FLTK_GUI
-if  BUILD_KDE_GUI
-     GNASH_LIBS += $(top_builddir)/gui/libgnashkde_agg.la $(KDE_LIBS) $(QT_LIBS) $(AGG_LIBS)
-endif # BUILD_KDE_GUI
-if  BUILD_RISCOS_GUI
-     GNASH_LIBS += $(top_builddir)/gui/libgnashriscos_agg.la $(RISCOS_LIBS) $(AGG_LIBS) -lOSLib32
-endif # BUILD_RISCOS_GUI
-endif # BUILD_AGG_RENDERER
-
 clip_as_button2_TestRunner_SOURCES = \
 	clip_as_button2-TestRunner.cpp \
 	$(NULL)

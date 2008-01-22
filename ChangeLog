@@ -1,4 +1,9 @@
-2008-01-21 Bastiaan Jacques <bastiaan@bjacques.org>
+2008-01-22 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/samples/Makefile.am: drop extraneous block of code, most
+	  likely ended in there due to a copy&paste error.
+
+2008-01-22 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/asobj/NetStreamGst.cpp: pause(): set a default state to hush
 	Sandro's compiler.
