@@ -84,6 +84,9 @@ main(int argc, char** argv)
 	"nc.connect(null);"
 	"check(!NetStream.prototype.hasOwnProperty('currentFPS'));" // version 7 here
 	"xcheck(!NetStream.prototype.hasOwnProperty('currentFps'));"
+	"stream = new NetStream();"
+	"check_equals ( typeof(stream.bytesTotal), 'undefined' );" // not connected..
+	"stream.play('fake');" // just test not to segfault..
 	"stream = new NetStream(nc);"
 	"check_equals ( typeof(stream.bytesTotal), 'number' );"
 	"stream.bytesTotal = 'string';"
@@ -364,7 +367,7 @@ main(int argc, char** argv)
 
   SWFMovie_nextFrame(mo);
 
-  SWFMovie_add(mo, (SWFBlock)newSWFAction("totals(100); stop();"));
+  SWFMovie_add(mo, (SWFBlock)newSWFAction("totals(101); stop();"));
 
   SWFMovie_nextFrame(mo);
 
