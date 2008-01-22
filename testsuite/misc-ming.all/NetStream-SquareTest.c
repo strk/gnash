@@ -191,7 +191,7 @@ main(int argc, char** argv)
   if(b == NULL) return -1;
   SWFMovie_add(mo, (SWFBlock)b);
  
-  check_equals (mo, "stream.currentFps", "0" );
+  xcheck_equals (mo, "stream.currentFps", "0" );
  
   /* Publisher Methods */
 
