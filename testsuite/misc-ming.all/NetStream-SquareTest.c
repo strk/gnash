@@ -267,13 +267,103 @@ main(int argc, char** argv)
 		" _root.note('onCuePoint('+info+') called'); "
 		"};"
 		"stream.onMetaData = function(info) {"
-		" _root.note('onMetaData('+info+') called'); "
+
+		// debugging
+		" var s='';"
+		" for (e in info) { "
+		"  s += e+':'+info[e]+' ';"
+		" }"
+		" _root.note('onMetaData: '+s);"
+
+		" check_equals(arguments.length, 1, 'single argument');"
+
+		// Test enumeration
+		" var enu = new Array;"
+		" for (e in info) { "
+		"  enu.push(e);"
+		" }"
+		" xcheck_equals(enu.length, 11);" // gnash contains 2 more 
+
+		// Test composision
+
+		" check(info.hasOwnProperty('filesize'), 'metadata has filesize');"
+		" check_equals(typeof(info.filesize), 'number', 'filesize is a number');"
+		" check_equals(info.filesize, '21482', 'actual filesize');"
+		" info.filesize = 'changed';"
+		" check_equals(info.filesize, 'changed');" // can be overridden
+		" delete info.filesize;"
+		" check(!info.hasOwnProperty('filesize'), 'metadata filesize can be deleted');"
+
+		" check(info.hasOwnProperty('audiocodecid'), 'metadata has audiocodecid');"
+		" check_equals(typeof(info.audiocodecid), 'number', 'audiocodecid is a number');"
+		" check_equals(info.audiocodecid, 2, 'actual audiocodecid');"
+		" info.audiocodecid = 'changed';"
+		" check_equals(info.audiocodecid, 'changed');" // can be overridden
+		" delete info.audiocodecid;"
+		" check(!info.hasOwnProperty('audiocodecid'), 'metadata audiocodecid can be deleted');"
+
+		" check(info.hasOwnProperty('stereo'), 'metadata has stereo');"
+		" check_equals(typeof(info.stereo), 'boolean', 'stereo is boolean');" 
+		" check_equals(info.stereo, false, 'actual stereo');"
+		" info.stereo = 'changed';"
+		" check_equals(info.stereo, 'changed');" // can be overridden
+		" delete info.stereo;"
+		" check(!info.hasOwnProperty('stereo'), 'metadata stereo can be deleted');"
+
+		" check(info.hasOwnProperty('audiosamplesize'), 'metadata has audiosamplesize');"
+		" check_equals(typeof(info.audiosamplesize), 'number', 'audiosamplesize is a number');"
+		" check_equals(info.audiosamplesize, 16, 'actual audiosamplesize');"
+		" info.audiosamplesize = 'changed';"
+		" check_equals(info.audiosamplesize, 'changed');" // can be overridden
+		" delete info.audiosamplesize;"
+		" check(!info.hasOwnProperty('audiosamplesize'), 'metadata audiosamplesize can be deleted');"
+
+		" check(info.hasOwnProperty('audiosamplerate'), 'metadata has audiosamplerate');"
+		" check_equals(typeof(info.audiosamplerate), 'number', 'audiosamplerate is a number');"
+		" check_equals(info.audiosamplerate, 44100, 'actual audiosamplerate');"
+		" info.audiosamplerate = 'changed';"
+		" check_equals(info.audiosamplerate, 'changed');" // can be overridden
+		" delete info.audiosamplerate;"
+		" check(!info.hasOwnProperty('audiosamplerate'), 'metadata audiosamplerate can be deleted');"
+
+		" check(info.hasOwnProperty('videocodecid'), 'metadata has videocodecid');"
+		" check_equals(typeof(info.videocodecid), 'number', 'videocodecid is a number');"
+		" check_equals(info.videocodecid, 2, 'actual videocodecid');"
+		" info.videocodecid = 'changed';"
+		" check_equals(info.videocodecid, 'changed');" // can be overridden
+		" delete info.videocodecid;"
+		" check(!info.hasOwnProperty('videocodecid'), 'metadata videocodecid can be deleted');"
+
+		" check(info.hasOwnProperty('height'), 'metadata has height');"
+		" check_equals(typeof(info.height), 'number', 'height is a number');"
+		" check_equals(info.height, 96, 'actual height');"
+		" info.height = 'changed';"
+		" check_equals(info.height, 'changed');" // can be overridden
+		" delete info.height;"
+		" check(!info.hasOwnProperty('height'), 'metadata height can be deleted');"
+
+		" check(info.hasOwnProperty('width'), 'metadata has width');"
+		" check_equals(typeof(info.width), 'number', 'width is a number');"
+		" check_equals(info.width, 128, 'actual width');"
+		" info.width = 'changed';"
+		" check_equals(info.width, 'changed');" // can be overridden
+		" delete info.width;"
+		" check(!info.hasOwnProperty('width'), 'metadata width can be deleted');"
+
+		" check(info.hasOwnProperty('duration'), 'metadata has duration');"
+		" check_equals(typeof(info.duration), 'number', 'duration is a number');"
+		" check_equals(info.duration, 2.299, 'actual duration');" // seconds, rounded to milliseconds
+		" info.duration = 'changed';"
+		" check_equals(info.duration, 'changed');" // can be overridden
+		" delete info.duration;"
+		" check(!info.hasOwnProperty('duration'), 'metadata duration can be deleted');"
+
 		"};"
 		));
 
   SWFMovie_nextFrame(mo);
 
-  SWFMovie_add(mo, (SWFBlock)newSWFAction("totals(); stop();"));
+  SWFMovie_add(mo, (SWFBlock)newSWFAction("totals(99); stop();"));
 
   SWFMovie_nextFrame(mo);
 

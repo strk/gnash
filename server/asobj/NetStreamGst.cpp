@@ -21,6 +21,9 @@
 #endif
 
 #include "NetStreamGst.h"
+#include "VM.h" 
+#include "string_table.h"
+#include <boost/algorithm/string/case_conv.hpp> // for PROPNAME (shouldn't this include be in the header actualy defining PROPNAME, btw?)
 
 #include "gstgnashsrc.h"
 #include "Object.h"
@@ -359,6 +362,20 @@ metadata(const GstTagList *list, const gchar *tag, gpointer user_data)
   g_print("tag name: %s,description: %s, type: %s.\n", nick, descr, g_type_name(gst_tag_get_type(tag)));
 #endif
 
+  // NOTE: gst provides more metadata elements then those provided by
+  //       the reference player, we might want to pick only the standard ones.
+  //       Won't do for now.
+
+  // We want props of the metadata object to be:
+  // 	- enumerable
+  // 	- overridable
+  // 	- deletable
+  // This is tested in misc-ming.all/NetStream-SquareTest.{c,swf}
+  //
+
+  VM& vm = o->getVM();
+  string_table& st = vm.getStringTable();
+  string_table::key key = st.find(PROPNAME(nick));
 
   switch(gst_tag_get_type(tag)) {
     case G_TYPE_STRING:
@@ -367,7 +384,7 @@ metadata(const GstTagList *list, const gchar *tag, gpointer user_data)
 
       gst_tag_list_get_string(list, tag, &value);
       
-      o->init_member(nick, value);
+      o->set_member(key, value);
       
       g_free(value);
 
@@ -377,7 +394,7 @@ metadata(const GstTagList *list, const gchar *tag, gpointer user_data)
     {
       gdouble value;
       gst_tag_list_get_double(list, tag, &value);
-      o->init_member(nick, value);
+      o->set_member(key, (double)value);
       
       break;
     }
@@ -385,21 +402,32 @@ metadata(const GstTagList *list, const gchar *tag, gpointer user_data)
     {
       gboolean value;
       gst_tag_list_get_boolean(list, tag, &value);
-      o->init_member(nick, value);
+      o->set_member(key, (bool)value);
       break;
     }
     case G_TYPE_UINT64:
     {
       guint64 value;
       gst_tag_list_get_uint64(list, tag, &value);
-      o->init_member(nick, (unsigned long) value); // FIXME: actually, fix as_value().
+      as_value val;
+      if ( ! strcmp(nick, "duration") )
+      {
+         // duration is given in nanoseconds, we want that in seconds,
+         // and rounded to the millisecond 
+         val.set_double(rint(value/1000000.0)/1000.0);
+      }
+      else
+      {
+         val.set_double(value);
+      }
+      o->set_member(key, val); 
       break;
     }
     case G_TYPE_UINT:
     {
       guint value;
       gst_tag_list_get_uint(list, tag, &value);
-      o->init_member(nick, value);
+      o->set_member(key, value);
       break;
     }
     default:

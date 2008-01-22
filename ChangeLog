@@ -1,3 +1,11 @@
+2008-01-22 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/NetStreamGst.cpp: make metadata object properties
+	  enumerable, deletable and overridable, fix bool properties
+	  and the 'duration' unit.
+	* testsuite/misc-ming.all/NetStream-SquareTest.c: test metadata
+	  object composition.
+
 2008-01-21 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/asobj/NetConnection.cpp: Remove duplicate URL announcement
