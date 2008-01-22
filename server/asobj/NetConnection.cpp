@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetConnection.cpp,v 1.54 2008/01/21 20:55:56 rsavoye Exp $ */
+/* $Id: NetConnection.cpp,v 1.55 2008/01/22 08:39:08 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -64,7 +64,6 @@ NetConnection::~NetConnection()
 /*public*/
 std::string NetConnection::validateURL(const std::string& url)
 {
-
 	std::string completeUrl;
 	if (_prefixUrl.size() > 0) {
 		completeUrl += _prefixUrl + "/" + url;
@@ -83,9 +82,7 @@ std::string NetConnection::validateURL(const std::string& url)
 		return "";
 	}
 
-	log_msg(_("Connecting to movie: %s"), uriStr.c_str());
-
-	log_msg(_("Connection etablished to movie: %s"), uriStr.c_str());
+	log_msg(_("Connection to movie: %s"), uriStr.c_str());
 
 	return uriStr;
 }

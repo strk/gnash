@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamGst.h,v 1.31 2008/01/21 20:55:57 rsavoye Exp $ */
+/* $Id: NetStreamGst.h,v 1.32 2008/01/22 08:39:08 bjacques Exp $ */
 
 #ifndef __NETSTREAMGST_H__
 #define __NETSTREAMGST_H__
@@ -77,8 +77,8 @@ private:
   GstElement* _pipeline;
   GstElement* _dataqueue;
   GstElement* _downloader;
-  GstPad*     _videopad;
-  GstPad*     _audiopad;
+  GstElement* _audiobin;
+  GstElement* _videobin;
   gint64      _duration;
 };
 

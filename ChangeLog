@@ -1,3 +1,14 @@
+2008-01-21 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/asobj/NetConnection.cpp: Remove duplicate URL announcement
+	message.
+	* server/asobj/NetStreamGst.{cpp,h}: Separate the video and audio
+	decoding modules into bins and dynamically plug them when
+	corresponding streams are encountered. This allows NetStream to play
+	video-only or audio-only streams. Also, only play audio if a sound
+	handler exists (in other words, if sound was enabled). Emit the
+	playStop onStatus signal when an error is encountered.
+
 2008-01-22 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/NetStream.cpp: use as_object::callMethod to dispatch

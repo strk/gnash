@@ -33,7 +33,6 @@
 //                                       |
 //                                        audio -> audioconvert -> autoaudiosink
 
-
 namespace gnash {
 
 NetStreamGst::NetStreamGst()
@@ -43,6 +42,9 @@ NetStreamGst::NetStreamGst()
   gst_init(NULL, NULL);
 
   _pipeline = gst_pipeline_new ("gnash_pipeline");
+  _audiobin = gst_bin_new(NULL);
+  _videobin = gst_bin_new(NULL);
+
 
   // Figure out if flvdemux is present on the system. If not load the one from
   // the Gnash tree.
@@ -56,6 +58,7 @@ NetStreamGst::NetStreamGst()
   } else {
     gst_object_unref(GST_OBJECT(factory));
   }
+
 
   // Setup general decoders
   _dataqueue = gst_element_factory_make ("queue", "gnash_dataqueue");
@@ -95,19 +98,30 @@ NetStreamGst::NetStreamGst()
 
   // Create the video pipeline and link the elements. The pipeline will
   // dereference the elements when they are destroyed.
-  gst_bin_add_many (GST_BIN (_pipeline), colorspace, videoscale, videocaps, videosink, NULL);
+  gst_bin_add_many (GST_BIN (_videobin), colorspace, videoscale, videocaps, videosink, NULL);
   gst_element_link_many(colorspace, videoscale, videocaps, videosink, NULL);	
 
   // Setup audio sink
   GstElement* audioconvert = gst_element_factory_make ("audioconvert", NULL);	
+  
+  GstElement* audiosink;
+  if (get_sound_handler()) {
+    audiosink = gst_element_factory_make ("autoaudiosink", NULL);
+  } else {
+    audiosink = gst_element_factory_make ("fakesink", NULL);
+  }
 
-  GstElement* audiosink = gst_element_factory_make ("autoaudiosink", NULL);
-
-  gst_bin_add_many(GST_BIN(_pipeline), audioconvert, audiosink, NULL);
+  gst_bin_add_many(GST_BIN(_audiobin), audioconvert, audiosink, NULL);
   gst_element_link(audioconvert, audiosink);
 
-  _audiopad = gst_element_get_static_pad (audioconvert, "sink");
-  _videopad = gst_element_get_static_pad (colorspace, "sink");
+  GstPad* target_audiopad = gst_element_get_static_pad (audioconvert, "sink");
+  GstPad* target_videopad = gst_element_get_static_pad (colorspace, "sink");
+  
+  gst_element_add_pad(_videobin, gst_ghost_pad_new ("sink", target_videopad));
+  gst_element_add_pad(_audiobin, gst_ghost_pad_new ("sink", target_audiopad));
+  
+  gst_object_unref(GST_OBJECT(target_videopad));
+  gst_object_unref(GST_OBJECT(target_audiopad));
 }
 
 NetStreamGst::~NetStreamGst()
@@ -118,9 +132,6 @@ NetStreamGst::~NetStreamGst()
   gst_element_get_state(_pipeline, NULL, NULL, 0); // wait for a response
 
   gst_object_unref(GST_OBJECT(_pipeline));
-  
-  gst_object_unref(GST_OBJECT(_videopad));
-  gst_object_unref(GST_OBJECT(_audiopad));
 }
 
 void
@@ -147,17 +158,16 @@ NetStreamGst::pause(PauseMode mode)
     {
       GstState cur_state;
       
-      GstStateChangeReturn statereturn = gst_element_get_state(_pipeline,
-                                          &cur_state, NULL,
-                                          1000000 /* wait 1 ms */);
-      if (statereturn != GST_STATE_CHANGE_SUCCESS) {
+      GstStateChangeReturn statereturn
+        = gst_element_get_state(_pipeline, &cur_state, NULL, 1 * GST_MSECOND);
+
+      if (statereturn == GST_STATE_CHANGE_ASYNC) {
         return;
       }
       
       if (cur_state == GST_STATE_PLAYING) {
         newstate = GST_STATE_PAUSED;
       } else {
-        gst_element_set_base_time(_pipeline, 0);
         newstate = GST_STATE_PLAYING;
       }
       
@@ -193,6 +203,9 @@ NetStreamGst::play(const std::string& url)
     gst_element_set_state (_pipeline, GST_STATE_NULL);
     
     gst_bin_remove(GST_BIN(_pipeline), _downloader); // will also unref
+    
+    // FIXME: we should probably disconnect the currently connected pads
+    // and remove the video and audio bins from the pipeline.
   }
  
   _downloader = gst_element_make_from_uri(GST_URI_SRC, valid_url.c_str(),
@@ -204,9 +217,14 @@ NetStreamGst::play(const std::string& url)
   gst_element_link(_downloader, _dataqueue);  
 
 
-  // if everything went well, start playback
+  // Pause the pipeline. This will give decodebin a chance to detect streams.
+  gst_element_set_state (_pipeline, GST_STATE_PAUSED);
+  
+  // Wait for pause return; by this time, decodebin should be about finished.
+  gst_element_get_state (_pipeline, NULL, NULL, 0);
+  
+  // Commence playback.
   gst_element_set_state (_pipeline, GST_STATE_PLAYING);
-
 }
 
 
@@ -262,7 +280,7 @@ NetStreamGst::advance()
 double
 NetStreamGst::getCurrentFPS()
 {
-  GstElement*  colorspace = gst_bin_get_by_name (GST_BIN(_pipeline), "gnash_colorspace");
+  GstElement*  colorspace = gst_bin_get_by_name (GST_BIN(_videobin), "gnash_colorspace");
     
   GstPad* videopad = gst_element_get_static_pad (colorspace, "src");
   
@@ -413,6 +431,7 @@ NetStreamGst::handleMessage (GstMessage *message)
       g_free (debug);
       
       setStatus(streamNotFound);
+      setStatus(playStop);
       
       // Clear any buffers.
       gst_element_set_state (_pipeline, GST_STATE_NULL);
@@ -491,7 +510,7 @@ NetStreamGst::video_data_cb(GstElement* /*c*/, GstBuffer *buffer,
 {
   NetStreamGst* ns = reinterpret_cast<NetStreamGst*>(user_data);
 
-  GstElement*  colorspace = gst_bin_get_by_name (GST_BIN(ns->_pipeline),
+  GstElement*  colorspace = gst_bin_get_by_name (GST_BIN(ns->_videobin),
                                                  "gnash_colorspace");
   
   GstPad* videopad = gst_element_get_static_pad (colorspace, "src");
@@ -521,7 +540,6 @@ NetStreamGst::video_data_cb(GstElement* /*c*/, GstBuffer *buffer,
   gst_caps_unref(caps);
 }
 
-
 void
 NetStreamGst::decodebin_newpad_cb(GstElement* /*decodebin*/, GstPad* pad,
                                   gboolean /*last*/, gpointer user_data)
@@ -532,26 +550,36 @@ NetStreamGst::decodebin_newpad_cb(GstElement* /*decodebin*/, GstPad* pad,
   GstStructure* str = gst_caps_get_structure (caps, 0);
   const gchar* structure_name = gst_structure_get_name (str);
 
-  gst_caps_unref (caps);
-
+  GstElement* sink;
+  
   if (g_strrstr (structure_name, "audio")) {
-    if (GST_PAD_IS_LINKED (ns->_audiopad)) {
-      return;
-    }
-
-    gst_pad_link (pad, ns->_audiopad);
-
+    sink = ns->_audiobin;
   } else if (g_strrstr (structure_name, "video")) {
-
-    if (GST_PAD_IS_LINKED (ns->_videopad)) {
-      return;
-    }
-
-    gst_pad_link (pad, ns->_videopad);
-	
+    sink = ns->_videobin;
   } else {
-    log_unimpl(_("Streams of type %s are not expected!"), structure_name);
+    log_unimpl(_("Streams of type %s are not supported!"), structure_name);
+    return;
   }
+  
+  log_msg("%s: linking %s stream.", structure_name, __FUNCTION__);
+  
+  gst_caps_unref (caps);
+  
+  gst_bin_add (GST_BIN(ns->_pipeline), sink);
+  
+  gst_element_set_state (sink, GST_STATE_PAUSED);
+  
+  GstPad* sinkpad = gst_element_get_pad (sink, "sink");
+  
+  if (GST_PAD_IS_LINKED(sinkpad)) {
+    // already linked
+    gst_object_unref(G_OBJECT(sinkpad));
+    return;
+  }
+  
+  gst_pad_link(pad, sinkpad);
+    
+  gst_object_unref(G_OBJECT(sinkpad));  
 }
 
 void
