@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.82 2008/01/22 08:25:32 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.83 2008/01/22 14:37:10 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -148,6 +148,14 @@ static as_value netstream_play(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("NetStream play needs args"));
+		);
+		return as_value();
+	}
+
+	if ( ! ns->isConnected() )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("NetStream.play(%s): stream is not connected"), fn.arg(0).to_debug_string().c_str());
 		);
 		return as_value();
 	}
@@ -291,6 +299,10 @@ netstream_bytesloaded(const fn_call& fn)
 {
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
+	if ( ! ns->isConnected() )
+	{
+		return as_value();
+	}
 	long ret = ns->bytesLoaded();
 	return as_value(ret);
 }
@@ -301,6 +313,10 @@ netstream_bytestotal(const fn_call& fn)
 {
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
+	if ( ! ns->isConnected() )
+	{
+		return as_value();
+	}
 	long ret = ns->bytesTotal();
 	return as_value(ret);
 }
@@ -311,13 +327,20 @@ netstream_currentFPS(const fn_call& fn)
 {
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
+	if ( ! ns->isConnected() )
+	{
+		return as_value();
+	}
+
 	double fps = ns->getCurrentFPS();
 
+#if 0
 	if (fps <= 0) {
 		return as_value(); // undef
 	}
+#endif
 
-	return as_value(ns->getCurrentFPS());
+	return as_value(fps);
 }
 
 // read-only property bufferLength: amount of time buffered before playback

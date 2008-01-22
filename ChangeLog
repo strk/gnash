@@ -1,5 +1,16 @@
 2008-01-22 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStream.{h,cpp}: add an isConnected
+	  method and use it from AS methods.
+	* testsuite/actionscript.all/NetStream.as: bytesLoaded/bytesTotal
+	  are undefined if the NetStream doesn't have an associated
+	  NetConnection (fixed).
+	* testsuite/misc-ming.all/NetStream-SquareTest.c: currentFPS is
+	  undefined if the NetStream doesn't have an associated NetConnection,
+	  a number otherwise (fixed).
+
+2008-01-22 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/NetStream-SquareTest.c: add a test
 	  segfaulting Gnash. See bug #22039.
 

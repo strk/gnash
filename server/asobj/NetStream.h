@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/*  $Id: NetStream.h,v 1.56 2008/01/21 20:55:57 rsavoye Exp $ */
+/*  $Id: NetStream.h,v 1.57 2008/01/22 14:37:10 strk Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -245,6 +245,9 @@ public:
 	{
 		_netCon = nc;
 	}
+
+	/// Return true if the NetStream has an associated NetConnection
+	bool isConnected() const { return _netCon != 0; }
 
 	/// Sets the AS Enviroment needed for eventhandlers
 	//

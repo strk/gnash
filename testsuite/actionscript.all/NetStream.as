@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: NetStream.as,v 1.18 2008/01/21 18:57:28 bjacques Exp $";
+rcsid="$Id: NetStream.as,v 1.19 2008/01/22 14:37:10 strk Exp $";
 
 #include "check.as"
 
@@ -192,9 +192,9 @@ xcheck_equals ( typeof(netstreamObj.time), 'string' );
 /* Two properties added in SWF7 */
 
 // bytesLoaded (read-only)
-xcheck_equals ( typeof(netstreamObj.bytesLoaded), 'undefined' );
+check_equals ( typeof(netstreamObj.bytesLoaded), 'undefined' );
 // bytesLoaded (read-only)
-xcheck_equals ( typeof(netstreamObj.bytesTotal), 'undefined' );
+check_equals ( typeof(netstreamObj.bytesTotal), 'undefined' );
 
 #endif // OUTPUT_VERSION >= 6
 

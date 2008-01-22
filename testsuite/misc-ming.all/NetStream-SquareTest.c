@@ -142,11 +142,11 @@ main(int argc, char** argv)
   add_actions(mo, "video.attachVideo(stream);"); 
   
   // currentFps (read-only)
-  xcheck_equals (mo, "typeof(stream.currentFps)", "'number'" );
+  check_equals (mo, "typeof(stream.currentFps)", "'number'" );
   add_actions(mo, "stream.currentFps = 'string';");
-  xcheck_equals (mo, "typeof(stream.currentFps)", "'number'" );
+  check_equals (mo, "typeof(stream.currentFps)", "'number'" );
   add_actions(mo, "stream.currentFps = false;");
-  xcheck_equals (mo, "typeof(stream.currentFps)", "'number'" );
+  check_equals (mo, "typeof(stream.currentFps)", "'number'" );
 
   // bufferLength (read-only)
   check_equals (mo, "typeof(stream.bufferLength)", "'number'" );
@@ -187,14 +187,14 @@ main(int argc, char** argv)
   add_actions(mo, "stream.bytesLoaded = 'string';");
   check_equals (mo, "typeof(stream.bytesLoaded)", "'number'" ); 
 
-  xcheck_equals (mo, "stream.currentFps", "0" );
+  check_equals (mo, "stream.currentFps", "0" );
 
   /* Play video */
   b = newSWFAction(buffer_b);
   if(b == NULL) return -1;
   SWFMovie_add(mo, (SWFBlock)b);
  
-  xcheck_equals (mo, "stream.currentFps", "0" );
+  check_equals (mo, "stream.currentFps", "0" );
  
   /* Publisher Methods */
 
