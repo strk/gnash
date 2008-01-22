@@ -19,7 +19,7 @@
 //
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+# include "gnashconfig.h"
 #endif
 
 #include <boost/python.hpp>

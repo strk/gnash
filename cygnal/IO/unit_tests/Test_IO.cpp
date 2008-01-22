@@ -17,7 +17,7 @@
 
 /// \file Test_IO.cpp
 
-#include "config.h"
+#include "gnashconfig.h"
 #include <boost/test/auto_unit_test.hpp>
 
 #include "../IO_Device.hpp"

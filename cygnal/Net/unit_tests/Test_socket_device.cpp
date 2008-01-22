@@ -17,7 +17,7 @@
 
 /// \file Test_socket_device.cpp
 
-#include "config.h"
+#include "gnashconfig.h"
 
 #include <boost/test/auto_unit_test.hpp>
 #include <boost/iostreams/stream.hpp>
