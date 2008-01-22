@@ -1,5 +1,7 @@
 2008-01-21  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* gui/gtk.cpp: Only initialize LIRC if lirc is enabled.
+
 	* libamf/sol.cpp: Swap from host to network for the magic number,
 	not network to host. Fixes #22013.
 

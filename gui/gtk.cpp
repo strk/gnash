@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.135 2008/01/21 20:55:40 rsavoye Exp $ */
+/* $Id: gtk.cpp,v 1.136 2008/01/22 03:26:16 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -170,7 +170,8 @@ GtkGui::init(int argc, char **argv[])
     // TODO: find a way to make '_glue' use independent from actual renderer in use
     _glue->prepDrawingArea(_drawing_area);
 #endif
-
+    
+#ifdef USE_LIRC
     lirc = new Lirc();
     if (lirc->init("/dev/lircd")) {
         int fd = lirc->getFileFd();
@@ -178,6 +179,7 @@ GtkGui::init(int argc, char **argv[])
     } else {
         log_msg("LIRC daemon not running");
     }
+#endif
     
     _renderer = _glue->createRenderHandler();
     if ( ! _renderer ) return false;
