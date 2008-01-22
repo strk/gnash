@@ -1,3 +1,10 @@
+2008-01-21 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libmedia/gst/gstflvdemux.c: statically load the FLV demuxer.
+	Dynamically loading it resulted in consisted crashing on Fedora 7. The
+	static load method is deprecated by gstreamer, but we don't have a
+	better solution right now.
+
 2008-01-21  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* gui/gtk.cpp: Only initialize LIRC if lirc is enabled.

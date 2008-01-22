@@ -1199,6 +1199,6 @@ plugin_init (GstPlugin * plugin)
   return TRUE;
 }
 
-GST_PLUGIN_DEFINE (GST_VERSION_MAJOR, GST_VERSION_MINOR,
+GST_PLUGIN_DEFINE_STATIC (GST_VERSION_MAJOR, GST_VERSION_MINOR,
     "flvdemux", "Element demuxing FLV stream",
     plugin_init, VERSION, "LGPL", "Gnash's internal copy of flvdemux", "Gnash")
