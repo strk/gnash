@@ -55,7 +55,8 @@ using namespace gnash;
 // Object Name  - variable (the name of the object as an AMF encoded string)
 // Padding      - 4 bytes
 // After this is a series of AMF objects
-const short SOL_MAGIC = 0x00bf;	// this is in big-endian format already
+const short SOL_MAGIC = 0x00bf;	// is in big-endian format, this is the first
+				// two bytes. of the .sol file.
 //char *SOL_FILETYPE = "TCSO";
 const short SOL_BLOCK_MARK = 0x0004;
 
@@ -124,7 +125,7 @@ SOL::formatHeader(std::string &name, int filesize)
     // First we add the magic number. All SOL data is in big-endian format,
     // so we swap it first.
     boost::uint16_t swapped = SOL_MAGIC;
-//    swapped = ntohs(swapped);
+    swapped = htons(swapped);
     boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(&swapped);
     for (i=0; i<sizeof(boost::uint16_t); i++) {
         _header.push_back(ptr[i]);
