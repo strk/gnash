@@ -241,8 +241,22 @@ sharedobject_getlocal(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     // This should return a SharedObject, and it's a static function
     
-//    static boost::intrusive_ptr<as_object> obj = new as_object(getSharedObjectInterface());
-    static boost::intrusive_ptr<SharedObject> obj = new SharedObject();
+    // FIXME:
+    //    We shouldn't have a single SharedObject static, but one for
+    //    each key the user code asks for. These might be maintained
+    //    in a static "library" member of the SharedObject class
+    //    exposing methods to get one element by name, which would be
+    //    either created or reused, taking care about registering
+    //    the static with the VM. There will likely be a need to
+    //    be signaled restarts as unflushed objects should not be
+    //    accessible with their state on restart..
+    //
+    static boost::intrusive_ptr<SharedObject> obj;
+    if ( ! obj )
+    { 
+        obj = new SharedObject();
+        obj->getVM().addStatic(obj.get());
+    }
     
     string::size_type pos;
     string rootdir;

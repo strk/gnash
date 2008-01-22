@@ -1,5 +1,8 @@
 2008-01-22 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/SharedObject.cpp (sharedobject_getlocal): register the
+	  static GcResource with the VM. Fixes bug #22039, but not the
+	  correctness bugs as tested in the SharedObject.as case.
 	* testsuite/actionscript.all/SharedObject.as: test that multiple calls
 	  to SharedObject.getLocal using same key return the same in-memory
 	  object, while changing the key returns a different object.
