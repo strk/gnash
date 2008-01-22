@@ -117,6 +117,8 @@ dejagnu_pass(const fn_call& fn)
 	string text = fn.arg(0).to_string();
 	return as_value(ptr->obj.pass(text.c_str()));
     }
+
+    return as_value();
 }
 
 as_value
@@ -129,6 +131,8 @@ dejagnu_fail(const fn_call& fn)
 	string text = fn.arg(0).to_string();
 	return as_value(ptr->obj.fail(text.c_str()));
     }
+
+    return as_value();
 }
 
 as_value

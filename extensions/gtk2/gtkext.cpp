@@ -81,7 +81,7 @@ void dump_callbacks(map<string, as_value> &calls)
 }
 
 static void
-generic_callback(GtkWidget *widget, gpointer data)
+generic_callback(GtkWidget * /*widget*/, gpointer data)
 {
 //    GNASH_REPORT_FUNCTION;
 //    g_print ("Hello World - %d\n", *(int *)data;
@@ -120,14 +120,14 @@ attachInterface(as_object *obj)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    obj->init_member("window_new", &gtkext_window_new);
-    obj->init_member("signal_connect", &gtkext_signal_connect);
-    obj->init_member("container_set_border_width", &gtkext_container_set_border_width);
-    obj->init_member("button_new_with_label", &gtkext_button_new_with_label);
-    obj->init_member("signal_connect_swapped", &gtkext_signal_connect_swapped);
-    obj->init_member("container_add", &gtkext_container_add);
-    obj->init_member("widget_show", &gtkext_widget_show);
-    obj->init_member("main", &gtkext_main);
+    obj->init_member("window_new", new builtin_function(gtkext_window_new));
+    obj->init_member("signal_connect", new builtin_function(gtkext_signal_connect));
+    obj->init_member("container_set_border_width", new builtin_function(gtkext_container_set_border_width));
+    obj->init_member("button_new_with_label", new builtin_function(gtkext_button_new_with_label));
+    obj->init_member("signal_connect_swapped", new builtin_function(gtkext_signal_connect_swapped));
+    obj->init_member("container_add", new builtin_function(gtkext_container_add));
+    obj->init_member("widget_show", new builtin_function(gtkext_widget_show));
+    obj->init_member("main", new builtin_function(gtkext_main));
 }
 
 static as_object*
@@ -142,7 +142,7 @@ getInterface()
 }
 
 static as_value
-gtkext_ctor(const fn_call& fn)
+gtkext_ctor(const fn_call& /*fn*/)
 {
 //    GNASH_REPORT_FUNCTION;
     GtkExt *obj = new GtkExt();
@@ -228,7 +228,7 @@ as_value gtkext_signal_connect(const fn_call& fn)
 	GtkExt *window = dynamic_cast<GtkExt *>(fn.arg(0).to_object().get());
 	string name = fn.arg(1).to_string();
 	as_value func = fn.arg(2).to_as_function();
-	int data = fn.arg(3).to_number();
+	//int data = fn.arg(3).to_int();
 
 	dbglogfile << "Adding callback " << func.to_string()
 		   << " for event \"" << name << "\"" << endl;
@@ -249,7 +249,7 @@ as_value gtkext_container_set_border_width(const fn_call& fn)
     
     if (fn.nargs > 0) {
 	GtkExt *window = dynamic_cast<GtkExt *>(fn.arg(0).to_object().get());
-	int width = fn.arg(1).to_number();
+	int width = fn.arg(1).to_int();
 	window->container_set_border_width(width);
 	dbglogfile << "set container border width to " << width << " !" << endl;
     }
