@@ -1,5 +1,11 @@
 2008-01-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/SharedObject.as: test that multiple calls
+	  to SharedObject.getLocal using same key return the same in-memory
+	  object.
+
+2008-01-22 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/NetStream-SquareTest.c: expect the failures
 	  in currentFps, till bjacques fixes it. Add test for metadata object
 	  being an Object instance.

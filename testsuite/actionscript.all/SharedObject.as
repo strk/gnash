@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: SharedObject.as,v 1.18 2008/01/05 10:13:09 strk Exp $";
+rcsid="$Id: SharedObject.as,v 1.19 2008/01/22 10:31:46 strk Exp $";
 
 #include "check.as"
 
@@ -76,6 +76,15 @@ so.data.allowThirdPartyLSOAccess = true;
 so.data.localSecPath = "";
 so.data.localSecPathTime = 1.19751160683e+12;
 
+// Verify that a new getLocal call using
+// the same "id" returns the same in-memory object.
+so.data.tmp = "custom value";
+so2 = SharedObject.getLocal("level1/level2/settings", "/");
+check_equals(so2.data.tmp, "custom value");
+check_equals(so, so2);
+delete so.data.tmp;
+
+
 // trace(so.getSize());
 so.flush();
 
@@ -117,6 +126,6 @@ if (typeof(newso.data) != 'undefined') {
     trace("New Shared Object doesn't exist!");
 }
 
-check_totals(30);
+check_totals(32);
 
 #endif // OUTPUT_VERSION >= 6
