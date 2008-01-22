@@ -1,6 +1,8 @@
 Makefile
 Makefile.in
-alltests-runner
+.deps
+.libs
+*runner
 *.swf
 *.sc
 site.exp

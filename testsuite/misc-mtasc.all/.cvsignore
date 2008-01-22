@@ -7,6 +7,6 @@ site.exp
 *.swf
 *.pp
 testrun.*
-alltests-runner
+*-runner
 gmon.out
 pp_*.as
