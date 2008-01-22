@@ -1504,7 +1504,7 @@ movie_root::markReachableResources() const
 
     // Mark original top-level movie
     // This should always be in _movies, but better make sure
-    _rootMovie->setReachable();
+    if ( _rootMovie ) _rootMovie->setReachable();
 
     // Mark mouse entities 
     m_mouse_button_state.markReachableResources();
