@@ -37,6 +37,7 @@
 #include "VM.h"
 #include "Object.h" // for getObjectInterface
 #include "LoadThread.h"
+#include "namedStrings.h"
 
 #include <list>
 #include <boost/algorithm/string/case_conv.hpp>
@@ -226,10 +227,6 @@ LoadVars::checkLoads()
 
     if ( _loadThreads.empty() ) return; // nothing to do
 
-    VM& vm = getVM();
-    string_table& st = vm.getStringTable();
-    string_table::key onDataKey = st.find(PROPNAME("onData"));
-
     for (LoadThreadList::iterator it=_loadThreads.begin();
             it != _loadThreads.end(); )
     {
@@ -260,7 +257,7 @@ LoadVars::checkLoads()
             delete lt; // supposedly joins the thread...
 
             // might push_front on the list..
-            callMethod(onDataKey, dataVal);
+            callMethod(NSV::PROP_ON_DATA, dataVal);
 
 #ifdef DEBUG_LOADS
             log_debug("Completed load, _loadThreads have now " SIZET_FMT " elements", _loadThreads.size());
@@ -277,6 +274,7 @@ LoadVars::checkLoads()
 #ifdef DEBUG_XML_LOADS
         log_debug("Clearing XML load checker interval timer");
 #endif
+	VM& vm = getVM();
         vm.getRoot().clear_interval_timer(_loadCheckerTimer);
         _loadCheckerTimer=0;
     }
@@ -312,9 +310,7 @@ LoadVars::getLoadVarsInterface()
 void
 LoadVars::addLoadVariablesThread(const std::string& urlstr, const char* postdata)
 {
-	string_table& st = getVM().getStringTable();
-	string_table::key loadedKey = st.find("loaded");
-	set_member(loadedKey, false);
+	set_member(NSV::PROP_LOADED, false);
 
 	URL url(urlstr, get_base_url());
 
@@ -476,12 +472,6 @@ LoadVars::onData_method(const fn_call& fn)
 	as_object* thisPtr = fn.this_ptr.get();
 	if ( ! thisPtr ) return as_value();
 
-	VM& vm = thisPtr->getVM();
-	string_table& st = vm.getStringTable();
-	string_table::key onLoadKey = st.find(PROPNAME("onLoad"));
-	string_table::key loadedKey = st.find("loaded");
-
-
 	// See http://gitweb.freedesktop.org/?p=swfdec/swfdec.git;a=blob;f=libswfdec/swfdec_initialize.as
 
 	as_value src; src.set_null();
@@ -489,17 +479,20 @@ LoadVars::onData_method(const fn_call& fn)
 
 	if ( ! src.is_null() )
 	{
-		string_table::key decodeKey = st.find("decode");
+		VM& vm = thisPtr->getVM();
+		string_table& st = vm.getStringTable();
+		string_table::key decodeKey = st.find("decode"); // add to namedStrings ?
+
 		as_value tmp(true);
-		thisPtr->set_member(loadedKey, tmp);
+		thisPtr->set_member(NSV::PROP_LOADED, tmp);
 		thisPtr->callMethod(decodeKey, src);
-		thisPtr->callMethod(onLoadKey, tmp);
+		thisPtr->callMethod(NSV::PROP_ON_LOAD, tmp);
 	}
 	else
 	{
 		as_value tmp(true);
-		thisPtr->set_member(loadedKey, tmp);
-		thisPtr->callMethod(onLoadKey, tmp);
+		thisPtr->set_member(NSV::PROP_LOADED, tmp);
+		thisPtr->callMethod(NSV::PROP_ON_LOAD, tmp);
 	}
 
 	return as_value();

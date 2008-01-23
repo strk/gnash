@@ -1,3 +1,7 @@
+2008-01-23 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/LoadVars.cpp: use named strings when available.
+
 2008-01-22 Sandro Santilli <strk@keybit.net>
 
 	* extensions/dejagnu/dejagnu.cpp, extensions/gtk2/gtkext.cpp:
