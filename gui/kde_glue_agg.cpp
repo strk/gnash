@@ -105,9 +105,8 @@ KdeAggGlue::render()
 {
     // In order to use our buffer in QT, we must copy it into a pixmap. This is
     // an expensive operation, but, as far as I can see, the only way to do it.
-#if HAVE_QTOPIA > 2
     QPixmap qpixmap(*_qimage);
-#endif
+
     for (unsigned bno=0; bno < _drawbounds.size(); bno++) {
        geometry::Range2d<int>& bounds = _drawbounds[bno];
 
@@ -117,10 +116,8 @@ KdeAggGlue::render()
        QRect src_rect(bounds.getMinX(), bounds.getMinY(), bounds.width(),
                       bounds.height());
        
-#if HAVE_QTOPIA > 2
        bitBlt (_drawing_area, dest_point, &qpixmap, src_rect, Qt::CopyROP,
                true /* ignore mask */ );
-#endif
     }
 }
 

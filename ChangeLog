@@ -1,3 +1,10 @@
+2008-01-23 Sandro Santilli <strk@keybit.net>
+
+	* gui/kde_glue_agg.cpp: keep rendering no matter what HAVE_QTOPIA says
+	  (or rendering would be disabled for normal kde-gnash)
+	  [ this is a dejavu.. see ChangeLog entry of 2007-11-30 ]
+	  Fixes bug #22093.
+
 2008-01-23 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/asobj/SoundGst.cpp: loadSound: if this is a streaming sound,
