@@ -146,7 +146,8 @@ SoundGst::loadSound(const std::string& url, bool streaming)
 
   std::string valid_url = connection->validateURL(url);
 
-  log_msg("%s: loading URL %s", __FUNCTION__, valid_url.c_str());
+  log_msg("%s: loading URL %s from %s", __FUNCTION__, valid_url.c_str(),
+          url.c_str());
 
   _remainingLoops = 0;
 
@@ -173,7 +174,9 @@ SoundGst::loadSound(const std::string& url, bool streaming)
 
   externalSound = true;
 
-  //start(0, 0);
+  if (streaming) {
+    start(0, 0);
+  }
 }
 
 void
@@ -183,7 +186,7 @@ SoundGst::start(int offset, int loops)
     Sound::start(offset, loops);
     return;
   }
-
+  
   // Seek to offset position if necessary (Note: GST seems to report an error 
   // when trying to seek to the current position)
   gint64 oldcur = -1;

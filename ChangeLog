@@ -1,3 +1,8 @@
+2008-01-23 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/asobj/SoundGst.cpp: loadSound: if this is a streaming sound,
+	start it ASAP.
+
 2008-01-23 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/: Video-EmbedSquareTest.c,
