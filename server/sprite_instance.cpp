@@ -83,6 +83,11 @@ namespace gnash {
 // easily re-compilable to obtain a smaller testcase
 //#define DEBUG_DRAWING_API 1
 
+// Define this to make mouse entity finding verbose
+// This includes get_topmost_mouse_entity and findDropTarget
+//
+//#define DEBUG_MOUSE_ENTITY_FINDING 1
+
 // Forward declarations
 static as_object* getMovieClipInterface();
 static void attachMovieClipInterface(as_object& o);
@@ -1721,18 +1726,6 @@ sprite_droptarget_getset(const fn_call& fn)
   boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
 
   return ptr->getDropTarget();
-  UNUSED(ptr);
-
-  static bool warned = false;
-  if ( ! warned )
-  {
-    log_unimpl("MovieClip._droptarget");
-    warned=true;
-  }
-
-  //VM& vm = VM::get();
-  // NOTE: _droptarget should be set after startDrag() and stopDrag() calls
-  return as_value("");
 }
 
 static as_value
@@ -3240,38 +3233,126 @@ void sprite_instance::increment_frame_and_check_for_loop()
 }
 
 /// Find a character hit by the given coordinates.
+//
+/// This class takes care about taking masks layers into
+/// account, but nested masks aren't properly tested yet.
+///
 class MouseEntityFinder {
+
+  /// Highest depth hidden by a mask
+  //
+  /// This will be -1 initially, and set
+  /// the the depth of a mask when the mask
+  /// doesn't contain the query point, while
+  /// scanning a DisplayList bottom-up
+  ///
+  int _highestHiddenDepth;
 
   character* _m;
 
-  float _x;
+  typedef std::vector<character*> Candidates;
+  Candidates _candidates;
 
-  float _y;
+  /// Query point in world coordinate space
+  point _wp;
+
+  /// Query point in parent coordinate space
+  point _pp;
+
+  bool _checked;
 
 public:
 
-  MouseEntityFinder(float x, float y)
+  /// @param wp
+  ///   Query point in world coordinate space
+  ///
+  /// @param pp
+  ///   Query point in parent coordinate space
+  ///
+  MouseEntityFinder(point wp, point pp)
     :
+    _highestHiddenDepth(std::numeric_limits<int>::min()),
     _m(NULL),
-    _x(x),
-    _y(y)
+    _candidates(),
+    _wp(wp),
+    _pp(pp),
+    _checked(false)
   {}
 
-  bool operator() (character* ch)
+  void operator() (character* ch)
   {
-    if ( ! ch->get_visible() ) return true;
-
-    character* te = ch->get_topmost_mouse_entity(_x, _y);
-    if ( te )
+    assert(!_checked);
+    if ( ch->get_depth() <= _highestHiddenDepth )
     {
-      _m = te;
-      return false; // done
+      if ( ch->isMaskLayer() )
+      {
+        log_debug("CHECKME: nested mask in MouseEntityFinder. This mask is %s at depth %d outer mask masked up to depth %d.",
+          ch->getTarget().c_str(), ch->get_depth(), _highestHiddenDepth);
+        // Hiding mask still in effect...
+      }
+      return;
     }
 
-    return true; // haven't found it yet
+    if ( ch->isMaskLayer() )
+    {
+      if ( ! ch->get_visible() )
+      {
+        log_debug("FIXME: invisible mask in MouseEntityFinder.");
+      }
+      if ( ! ch->pointInShape(_wp.x, _wp.y) )
+      {
+#ifdef DEBUG_MOUSE_ENTITY_FINDING
+        log_debug("Character %s at depth %d is a mask not hitting the query point %g,%g and masking up to depth %d",
+          ch->getTarget().c_str(), ch->get_depth(), _wp.x, _wp.y, ch->get_clip_depth());
+#endif // DEBUG_MOUSE_ENTITY_FINDING
+        _highestHiddenDepth = ch->get_clip_depth();
+      }
+      else
+      {
+#ifdef DEBUG_MOUSE_ENTITY_FINDING
+        log_debug("Character %s at depth %d is a mask hitting the query point %g,%g",
+          ch->getTarget().c_str(), ch->get_depth(), _wp.x, _wp.y);
+#endif // DEBUG_MOUSE_ENTITY_FINDING
+      }
+
+      return;
+    }
+
+    if ( ! ch->get_visible() ) return;
+
+    _candidates.push_back(ch);
+
   }
 
-  character* getEntity() { return _m; }
+  void checkCandidates()
+  {
+    if ( _checked ) return;
+    for (Candidates::reverse_iterator i=_candidates.rbegin(),
+            e=_candidates.rend(); i!=e; ++i)
+    {
+      character* ch = *i;
+      character* te = ch->get_topmost_mouse_entity(_pp.x, _pp.y);
+      if ( te )
+      {
+        _m = te;
+        break;
+      }
+    }
+    _checked = true;
+  }
+
+  character* getEntity()
+  {
+    checkCandidates();
+#ifdef DEBUG_MOUSE_ENTITY_FINDING
+    if ( _m ) 
+    {
+      log_debug("MouseEntityFinder found character %s (depth %d) hitting point %g,%g",
+        _m->getTarget().c_str(), _m->get_depth(), _wp.x, _wp.y);
+    }
+#endif // DEBUG_MOUSE_ENTITY_FINDING
+    return _m;
+  }
     
 };
 
@@ -3382,35 +3463,36 @@ sprite_instance::get_topmost_mouse_entity(float x, float y)
     return NULL;
   }
 
+  // point is in parent's space,
+  // we need to convert it in world space
+  point wp(x,y);
+  character* parent = get_parent();
+  if ( parent ) parent->get_world_matrix().transform(wp);
+  // WARNING: if we have NO parent, our parent it the Stage (movie_root)
+  //          so, in case we'll add a "stage" matrix, we'll need to take
+  //          it into account here.
+  // TODO: actually, why are we insisting in using parent's coordinates for
+  //       this method at all ?
+  //
+
   if ( can_handle_mouse_event() )
   {
-    // point is in parent's space,
-    // we need to convert it in world space
-    character* parent = get_parent();
-    // WARNING: if we have NO parent, our parent it the Stage (movie_root)
-    //          so, in case we'll add a "stage" matrix, we'll need to take
-    //          it into account here.
-    // TODO: actually, why are we insisting in using parent's coordinates for
-    //       this method at all ?
-    //
-    matrix parent_world_matrix = parent ? parent->get_world_matrix() : matrix::identity;
-    point wp(x,y);
-    parent_world_matrix.transform(wp);
     if ( pointInVisibleShape(wp.x, wp.y) ) return this;
     else return NULL;
   }
 
 
   matrix  m = get_matrix();
-  point p;
-  m.transform_by_inverse(&p, point(x, y));
+  point pp;
+  m.transform_by_inverse(&pp, point(x, y));
 
-  MouseEntityFinder finder(p.x, p.y);
-  m_display_list.visitBackward(finder);
+  MouseEntityFinder finder(wp, pp);
+  //m_display_list.visitBackward(finder);
+  m_display_list.visitAll(finder);
   character* ch = finder.getEntity();
   if ( ! ch ) 
   {
-    ch = _drawable_inst->get_topmost_mouse_entity(p.x, p.y);
+    ch = _drawable_inst->get_topmost_mouse_entity(pp.x, pp.y);
   }
 
   return ch; // might be NULL
@@ -3423,33 +3505,103 @@ sprite_instance::get_topmost_mouse_entity(float x, float y)
 ///
 class DropTargetFinder {
 
+  /// Highest depth hidden by a mask
+  //
+  /// This will be -1 initially, and set
+  /// the the depth of a mask when the mask
+  /// doesn't contain the query point, while
+  /// scanning a DisplayList bottom-up
+  ///
+  int _highestHiddenDepth;
+
   float _x;
   float _y;
   character* _dragging;
-  const character* _dropch;
+  mutable const character* _dropch;
+
+  typedef std::vector<const character*> Candidates;
+  Candidates _candidates;
+
+  mutable bool _checked;
 
 public:
 
   DropTargetFinder(float x, float y, character* dragging)
     :
+    _highestHiddenDepth(std::numeric_limits<int>::min()),
     _x(x),
     _y(y),
     _dragging(dragging),
-    _dropch(0)
+    _dropch(0),
+		_candidates(),
+		_checked(false)
   {}
 
-  bool operator() (const character* ch)
+  void operator() (const character* ch)
   {
-    const character* dropChar = ch->findDropTarget(_x, _y, _dragging);
-    if ( dropChar )
+		assert(!_checked);
+    if ( ch->get_depth() <= _highestHiddenDepth )
     {
-      _dropch = dropChar;
-      return false;
+      if ( ch->isMaskLayer() )
+      {
+        log_debug("CHECKME: nested mask in DropTargetFinder. This mask is %s at depth %d outer mask masked up to depth %d.",
+          ch->getTarget().c_str(), ch->get_depth(), _highestHiddenDepth);
+        // Hiding mask still in effect...
+      }
+      return;
     }
-    else return true;
+
+    if ( ch->isMaskLayer() )
+    {
+      if ( ! ch->get_visible() )
+      {
+        log_debug("FIXME: invisible mask in MouseEntityFinder.");
+      }
+      if ( ! ch->pointInShape(_x, _y) )
+      {
+#ifdef DEBUG_MOUSE_ENTITY_FINDING
+        log_debug("Character %s at depth %d is a mask not hitting the query point %g,%g and masking up to depth %d",
+          ch->getTarget().c_str(), ch->get_depth(), _x, _y, ch->get_clip_depth());
+#endif // DEBUG_MOUSE_ENTITY_FINDING
+        _highestHiddenDepth = ch->get_clip_depth();
+      }
+      else
+      {
+#ifdef DEBUG_MOUSE_ENTITY_FINDING
+        log_debug("Character %s at depth %d is a mask hitting the query point %g,%g",
+          ch->getTarget().c_str(), ch->get_depth(), _x, _y);
+#endif // DEBUG_MOUSE_ENTITY_FINDING
+      }
+
+      return;
+    }
+
+    _candidates.push_back(ch);
+
   }
 
-  const character* getDropChar() const { return _dropch; }
+  void checkCandidates() const
+  {
+    if ( _checked ) return;
+    for (Candidates::const_reverse_iterator i=_candidates.rbegin(),
+            e=_candidates.rend(); i!=e; ++i)
+    {
+      const character* ch = *i;
+			const character* dropChar = ch->findDropTarget(_x, _y, _dragging);
+			if ( dropChar )
+			{
+				_dropch = dropChar;
+				break;
+			}
+    }
+    _checked = true;
+  }
+
+  const character* getDropChar() const
+	{
+		checkCandidates();
+		return _dropch;
+	}
 };
 
 const character*
@@ -3462,7 +3614,7 @@ sprite_instance::findDropTarget(float x, float y, character* dragging) const
   if ( ! get_visible() ) return 0; // isn't me !
 
   DropTargetFinder finder(x, y, dragging);
-  m_display_list.visitBackward(finder);
+  m_display_list.visitAll(finder);
 
   // does it hit any child ?
   const character* ch = finder.getDropChar();

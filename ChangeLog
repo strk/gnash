@@ -1,3 +1,15 @@
+2008-01-23 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/masks_test2runner.cpp: successes.
+	* server/character.h (isMaskLayer): dynamic masks are not mask
+	  layers.
+	* server/dlist.cpp (add_invalidated_bounds): use isMaskLayer rather
+	  then comparing about the noClipDepthValue.
+	* server/sprite_instance.cpp (get_topmost_mouse_entity,
+	  findDropTarget): rewrite mouse entity and drop target finders
+	  to take layer (static) masks into account.
+	  This fixes bug #21923 and movie in comment #7 of bug #20911.
+
 2008-01-23 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/rc.cpp: Don't increment verbosity automatically when some

@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: character.h,v 1.123 2008/01/21 20:55:49 rsavoye Exp $ */
+/* $Id: character.h,v 1.124 2008/01/23 12:39:37 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -495,7 +495,9 @@ public:
 	///   
 	bool isMaskLayer() const
 	{
-		return (m_clip_depth!=noClipDepthValue);
+		// TODO: is dynClipDepthValue still needed ?
+		//       since we have a _maskee member now, we may use that instead..
+		return (m_clip_depth!=noClipDepthValue && m_clip_depth!=dynClipDepthValue);
 	}
 
 	/// Returns true when the character (and it's childs) is used as a mask

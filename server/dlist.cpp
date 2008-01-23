@@ -698,10 +698,10 @@ DisplayList::display()
             render::disable_mask();
         }
 
-        int clipDepth = ch->get_clip_depth();
         // Push a new mask to the masks stack
-        if(clipDepth != character::noClipDepthValue)
+    	if ( ch->isMaskLayer() ) // clipDepth != character::noClipDepthValue
         {
+            int clipDepth = ch->get_clip_depth();
             clipDepthStack.push(clipDepth);
             render::begin_submit_mask();
         }
@@ -800,10 +800,10 @@ DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
       
     }
     
-    int clipDepth = dobj->get_clip_depth();
     // Push a new mask to the masks stack
-    if (clipDepth != character::noClipDepthValue) 
+    if ( dobj->isMaskLayer() ) // clipDepth != character::noClipDepthValue
     {
+      int clipDepth = dobj->get_clip_depth();
       clipDepthStack.push(clipDepth);
       
       drawing_mask = true; // begin_submit_mask equivalent

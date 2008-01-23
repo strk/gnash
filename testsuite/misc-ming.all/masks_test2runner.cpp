@@ -61,9 +61,9 @@ main(int /*argc*/, char** /*argv*/)
   xcheck_pixel(40, 40, 10, white, 3); 
 
   tester.movePointerTo(118, 118);
-  xcheck( ! tester.isMouseOverMouseEntity() ); // not visible in its mask
+  check( ! tester.isMouseOverMouseEntity() ); // not visible in its mask
   tester.movePointerTo(50, 50);
-  xcheck( ! tester.isMouseOverMouseEntity() ); // hits mc2 mask, but not mc1 mask 
+  check( ! tester.isMouseOverMouseEntity() ); // hits mc2 mask, but not mc1 mask 
   tester.movePointerTo(10, 10);
   check( tester.isMouseOverMouseEntity() ); // hits both mc2 and mc1 mask, and mc4 mouse entity
   
