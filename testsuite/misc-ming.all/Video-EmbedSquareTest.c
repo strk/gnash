@@ -71,6 +71,13 @@ main(int argc, char** argv)
   stream = newSWFVideoStream_fromFile(flv);
   item = SWFMovie_add(mo, (SWFBlock)stream);
 
+  // Mouse clicks toggle play/stop
+  add_actions(mo,
+	"_root.onMouseDown = function() {"
+	"  if (stopped) { play(); stopped=false; }"
+	"  else { stop(); stopped=true; }"
+	"};");
+
   // TODO: dynamic frame rate adjust
   frames = SWFVideoStream_getNumFrames(stream);
   for(; frames > 0; frames--)

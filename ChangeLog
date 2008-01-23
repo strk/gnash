@@ -1,5 +1,12 @@
 2008-01-23 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: Video-EmbedSquareTest.c,
+	  Video-EmbedSquareTestRunner.cpp: have mouse clicks change
+	  play state, check that play state of the root drives
+	  play state of the video.
+
+2008-01-23 Sandro Santilli <strk@keybit.net>
+
 	* libbase/log.{cpp,h}: append to the log instead of truncating.
 	  This is so a web page containing multiple SWF movies doesn't
 	  trigger writes to truncated logs.

@@ -57,6 +57,9 @@ main(int /*argc*/, char** /*argv*/)
 	// TODO: change the scaling of the window/canvas
 	int scale_x = 1;
 	int scale_y = 1;
+
+	size_t framecount = root->get_frame_count();
+	check_equals(framecount, 11);
 	
 	// Just loop twice, so to catch crashes...
 	for (int j = 0; j < 2; ++j) {
@@ -70,6 +73,8 @@ main(int /*argc*/, char** /*argv*/)
 		
 		// Frame 1
 
+		check_equals(root->get_current_frame(), 0); // 0-based
+
 		// Check the color in (1,1) - should be red
 		check_pixel(1, 1, 1, red, 5);
 
@@ -79,12 +84,14 @@ main(int /*argc*/, char** /*argv*/)
 		// Check the color in (1,30) - should be yellow
 		check_pixel(1, 35*scale_y, 1, yellow, 5);
 
-		size_t framecount = root->get_frame_count();
-		int frame = 1;
-		int i = 0;
-		while (frame++ < framecount) {
+		while (true)
+		{
 			// Frame X
 			tester.advance();
+			int framenum = root->get_current_frame();
+			cout << "---- Pixel checking in frame " << framenum+1 << " play state " << root->get_play_state() << endl;
+			
+			int i = (framenum-1)*10;
 
 			// Check the color in (9+i,1) - should be yellow
 			check_pixel((5 + i)*scale_x, 1, 1, yellow, 5);
@@ -101,7 +108,14 @@ main(int /*argc*/, char** /*argv*/)
 				check_pixel((45 + i)*scale_x, 1, 1, yellow, 5);
 			}
 
-			i += 10;
+			if ( framenum == framecount-1 )
+			{
+				// check we're playing, or we'll never get to next loop...
+				check_equals(root->get_play_state(), sprite_instance::PLAY);
+				break;
+			}
+
+			tester.click();
 		}
 
 		tester.advance();
