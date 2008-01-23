@@ -71,7 +71,7 @@ main(int argc, char** argv)
   
   mc1 = defineMovieclip(0, 0, 30, 30);   // placed at depth 1, masking up to level 4
   mc2 = defineMovieclip(0, 0, 60, 60);   // placed at depth 2, masking up to level 5
-  mc3 = defineMovieclip(0, 0, 90, 90);   // placed at depth 3
+  mc3 = defineMovieclip(0, 0, 90, 90);   // placed at depth 3, masking up to level 6
   mc4 = defineMovieclip(0, 0, 120, 120); // placed at depth 4
   mc5 = defineMovieclip(0, 0, 150, 150); // placed at depth 5
   mc6 = defineMovieclip(0, 0, 180, 180); // placed at depth 6
