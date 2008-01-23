@@ -644,7 +644,7 @@ DisplayList::display()
     //GNASH_REPORT_FUNCTION;
     std::stack<int> clipDepthStack;
     
-    // We only advance characters which are out of the "removed" zone (or should we check isUnloaded?)
+    // We only display characters which are out of the "removed" zone (or should we check isUnloaded?)
     iterator it = beginNonRemoved(_charsByDepth);
     for(iterator endIt = _charsByDepth.end(); it != endIt; ++it)
     {
