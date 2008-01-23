@@ -1,5 +1,12 @@
 2008-01-23 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/shape_character_def.cpp (read): only 
+	  skip parsing shapes with 0 line/fill bits if the tag
+	  is a DEFINEFONT*. Fixes bug #22000 and a secondary
+	  bug #21923.
+
+2008-01-23 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/masks_test2runner.cpp: successes.
 	* server/character.h (isMaskLayer): dynamic masks are not mask
 	  layers.

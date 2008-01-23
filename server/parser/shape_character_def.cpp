@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.61 2008/01/21 20:56:01 rsavoye Exp $ */
+/* $Id: shape_character_def.cpp,v 1.62 2008/01/23 14:21:59 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -223,24 +223,31 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
     IF_VERBOSE_PARSE
     (
     log_parse(_("  shape_character_def read: nfillbits = %d, nlinebits = %d"), num_fill_bits, num_line_bits);
-        );
+    );
 
     if ( !num_fill_bits && !num_line_bits )
     {
         /// When reading font glyphs it happens to read 1 byte
         /// past end boundary of a glyph due to fill/line bits being
+        /// zero.
         ///
-        /// Returning here seems to break morphs
-        /// See https://savannah.gnu.org/bugs/?21747
+        /// Generally returning here seems to break morphs:
+        ///  http://savannah.gnu.org/bugs/?21747
+        /// And other normal shapes:
+        ///  http://savannah.gnu.org/bugs/?21923
+        ///  http://savannah.gnu.org/bugs/?22000
         ///
         /// So for now we only return if NOT reading a morph shape.
         /// Pretty ugly... till next bug report.
         /// 
         ///
-	if (tag_type != SWF::DEFINEMORPHSHAPE
-			&& tag_type != SWF::DEFINEMORPHSHAPE2
-			&& tag_type != SWF::DEFINEMORPHSHAPE2_)
+        if (tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2 || tag_type == SWF::DEFINEFONT3)
+	{
+		// better log something, so we have an hint
+		// if something is broken
+		log_debug("Skipping glyph read, being fill and line bits zero. SWF tag is %d.", tag_type);
 		return;
+	}
     }
 
     // These are state variables that keep the
