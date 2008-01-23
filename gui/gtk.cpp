@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.137 2008/01/22 14:53:19 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.138 2008/01/23 12:10:22 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -1345,7 +1345,7 @@ GtkGui::showAboutDialog()
 
     gtk_show_about_dialog (
     		   NULL,
-                   "name", _("GNASH flash movie player"), 
+                   "program-name", _("GNASH flash movie player"), 
                    "version", VERSION,
                    "copyright", "Copyright (C) 2005, 2006, 2007, 2008 The Free Software Foundation",
 	           "comments", comments.c_str(),

@@ -674,46 +674,25 @@ RcInitFile::useLocalHost(bool value)
 void
 RcInitFile::useActionDump(bool value)
 {
-//    GNASH_REPORT_FUNCTION;
     _actionDump = value;
-    if (value) {
-        _verbosity++;
-    }
 }
 
 void
 RcInitFile::showASCodingErrors(bool value)
 {
-//    GNASH_REPORT_FUNCTION;
-    
     _verboseASCodingErrors = value;
-    
-    if (value) {
-        _verbosity++;
-    }
 }
 
 void
 RcInitFile::showMalformedSWFErrors(bool value)
 {
-//    GNASH_REPORT_FUNCTION;
-    
     _verboseMalformedSWF = value;
-    
-    if (value) {
-        _verbosity++;
-    }
 }
 
 void
 RcInitFile::useParserDump(bool value)
 {
-//    GNASH_REPORT_FUNCTION;
-    
     _parserDump = value;
-    if (value) {
-        _verbosity++;
-    }
 }
 
 void
@@ -727,49 +706,52 @@ RcInitFile::useWriteLog(bool value)
 void
 RcInitFile::dump()
 {
-    std::cerr << endl << "Dump RcInitFile:" << endl;
-    std::cerr << "\tTimer interupt delay value: " << _delay << endl;
-    std::cerr << "\tFlash debugger: "
+
+    using std::cerr;
+    
+    cerr << endl << "Dump RcInitFile:" << endl;
+    cerr << "\tTimer interupt delay value: " << _delay << endl;
+    cerr << "\tFlash debugger: "
          << ((_debugger)?"enabled":"disabled") << endl;
-    std::cerr << "\tVerbosity Level: " << _verbosity << endl;
-    std::cerr << "\tDump ActionScript processing: "
+    cerr << "\tVerbosity Level: " << _verbosity << endl;
+    cerr << "\tDump ActionScript processing: "
          << ((_actionDump)?"enabled":"disabled") << endl;
-    std::cerr << "\tDump parser info: "
+    cerr << "\tDump parser info: "
          << ((_parserDump)?"enabled":"disabled") << endl;
-    std::cerr << "\tActionScript coding errors verbosity: "
+    cerr << "\tActionScript coding errors verbosity: "
          << ((_verboseASCodingErrors)?"enabled":"disabled") << endl;
-    std::cerr << "\tMalformed SWF verbosity: "
+    cerr << "\tMalformed SWF verbosity: "
          << ((_verboseASCodingErrors)?"enabled":"disabled") << endl;
-    std::cerr << "\tUse Splash Screen: "
+    cerr << "\tUse Splash Screen: "
          << ((_splashScreen)?"enabled":"disabled") << endl;
-    std::cerr << "\tUse Local Domain Only: "
+    cerr << "\tUse Local Domain Only: "
          << ((_localdomainOnly)?"enabled":"disabled") << endl;
-    std::cerr << "\tUse Localhost Only: "
+    cerr << "\tUse Localhost Only: "
          << ((_localhostOnly)?"enabled":"disabled") << endl;
-    std::cerr << "\tWrite Debug Log To Disk: "
+    cerr << "\tWrite Debug Log To Disk: "
          << ((_writeLog)?"enabled":"disabled") << endl;
-    std::cerr << "\tAllow insecure SSL connections: "
+    cerr << "\tAllow insecure SSL connections: "
          << ((_insecureSSL)?"yes":"no") << endl;
-    std::cerr << "\tEnable sound: "
+    cerr << "\tEnable sound: "
          << ((_sound)?"enabled":"disabled") << endl;
-    std::cerr << "\tEnable Plugin sound: "
+    cerr << "\tEnable Plugin sound: "
          << ((_pluginSound)?"enabled":"disabled") << endl;
-    std::cerr << "\tEnable Extensions: "
+    cerr << "\tEnable Extensions: "
          << ((_extensionsEnabled)?"enabled":"disabled") << endl;
     if (_log.size()) {
-        std::cerr << "\tDebug Log name is: " << _log << endl;
+        cerr << "\tDebug Log name is: " << _log << endl;
     }
     if (_flashVersionString.size()) {
-        std::cerr << "\tFlash Version String is: " << _flashVersionString << endl;
+        cerr << "\tFlash Version String is: " << _flashVersionString << endl;
     }
-    std::cerr << "\tWhitelist: ";
-    writeList (_whitelist, std::cerr);
+    cerr << "\tWhitelist: ";
+    writeList (_whitelist, cerr);
     
-    std::cerr << "\tBlacklist: ";
-    writeList (_blacklist, std::cerr);
+    cerr << "\tBlacklist: ";
+    writeList (_blacklist, cerr);
     
-    std::cerr << "\tSandbox: ";
-    writeList (_localSandboxPath, std::cerr);
+    cerr << "\tSandbox: ";
+    writeList (_localSandboxPath, cerr);
 }
 
 

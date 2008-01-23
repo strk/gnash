@@ -1,3 +1,9 @@
+2008-01-23 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/rc.cpp: Don't increment verbosity automatically when some
+	  debugging output is enabled.
+	* gui/gtk.cpp: Use 'program-name' in about dialogue.
+
 2008-01-23 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (pointInVisibleShape): static masks
