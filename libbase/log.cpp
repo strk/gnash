@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: log.cpp,v 1.59 2008/01/21 20:55:44 rsavoye Exp $ */
+/* $Id: log.cpp,v 1.60 2008/01/23 16:33:45 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -385,47 +385,18 @@ LogFile::LogFile (void)
 {
     string loadfile;
 
-// Flip this ifdef to have the default files be stored in /tmp instead
-// of in the users home directory.
-#if 0
-    char *home = getenv("HOME");
-    if (home) {
-	loadfile = home;
-	loadfile += DEFAULT_LOGFILE;
-	return parse_file(loadfile);
-    }
-#else
-  // Flip this ifdef to have the default files go to /tmp, instead of
-  // the current directory. For the plugin, this creates the debug
-  // file in the users home directory when running from a desktop menu.
-# if 0
-    loadfile = "/tmp/";
-    loadfile += DEFAULT_LOGFILE;
-# else
 
     RcInitFile& rcfile = RcInitFile::getDefaultInstance();
     loadfile = rcfile.getDebugLog();
     if ( loadfile.empty() ) loadfile = DEFAULT_LOGFILE;
-
-# endif
-#endif
 
     // TODO: expand ~ to getenv("HOME") !!
 
     openLog(loadfile);
 }
 
-LogFile::LogFile (const char *filespec)
-	:
-	_state(CLOSED),
-	_stamp(true),
-	_write(true)
-{
-    openLog(filespec);
-}
-
 bool
-LogFile::openLog (const char *filespec)
+LogFile::openLog (const std::string& filespec)
 {
     boost::mutex::scoped_lock lock(_ioMutex);
     if (_state == OPEN) {
@@ -433,10 +404,11 @@ LogFile::openLog (const char *filespec)
 	_state = CLOSED;
     }
 
-    _outstream.open (filespec, ios::out);
+    // Append, don't truncate, the log file
+    _outstream.open (filespec.c_str(), ios::app); // ios::out
     if( ! _outstream ) {
 	// Can't use log_error here...
-        std::cerr << "ERROR: can't open debug log file " << filespec << " for writing." << std::endl;
+        std::cerr << "ERROR: can't open debug log file " << filespec << " for appending." << std::endl;
         return false;
     }       
 

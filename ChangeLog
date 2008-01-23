@@ -1,5 +1,11 @@
 2008-01-23 Sandro Santilli <strk@keybit.net>
 
+	* libbase/log.{cpp,h}: append to the log instead of truncating.
+	  This is so a web page containing multiple SWF movies doesn't
+	  trigger writes to truncated logs.
+
+2008-01-23 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/shape_character_def.cpp (read): only 
 	  skip parsing shapes with 0 line/fill bits if the tag
 	  is a DEFINEFONT*. Fixes bug #22000 and a secondary

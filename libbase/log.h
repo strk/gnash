@@ -105,13 +105,7 @@ public:
     ///
     /// @return true on success, false on failure
     ///
-    bool openLog(const std::string& filespec)
-    {
-        return openLog(filespec.c_str());
-    }
-
-    /// See openLog(const std::string&) 
-    bool openLog(const char *filespec);
+    bool openLog(const std::string& filespec);
 
     /// Remove the log file
     //
@@ -167,9 +161,6 @@ private:
 
     // Use getDefaultInstance for getting the singleton
     LogFile (void);
-
-    // Use getDefaultInstance for getting the singleton
-    LogFile (const char *);
 
     boost::mutex _ioMutex;
 
