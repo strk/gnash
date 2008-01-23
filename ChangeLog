@@ -1,5 +1,15 @@
 2008-01-23 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (pointInVisibleShape): static masks
+	  don't depend on having mouse handlers in checking hitTest.
+	* testsuite/misc-ming.all/masks_test2.c: add some self-contained
+	  tests, make a statically-masked instance mouse-sensitive.
+	* testsuite/misc-ming.all/masks_test2runner.cpp: check that
+	  the mouse-sensitive character shouldn't grab mouse pointer
+	  if hit out of it's static mask.
+
+2008-01-23 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/LoadVars.cpp: use named strings when available.
 
 2008-01-22 Sandro Santilli <strk@keybit.net>

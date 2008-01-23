@@ -3354,19 +3354,16 @@ bool
 sprite_instance::pointInVisibleShape(float x, float y) const
 {
   if ( ! get_visible() ) return false;
-  if ( isMask() )
+  if ( isDynamicMask() && ! can_handle_mouse_event() )
   {
-    if ( ! can_handle_mouse_event() )
-    {
       // see testsuite/misc-ming.all/masks_test.swf
-      log_debug("%s is a mask and can't handle mouse events, no point will hit it", getTarget().c_str());
+      log_debug("%s is a dynamic mask and can't handle mouse events, no point will hit it", getTarget().c_str());
       return false;
-    }
   }
-  character* mask = getMask();
+  character* mask = getMask(); // dynamic one
   if ( mask && mask->get_visible() && ! mask->pointInShape(x, y) )
   {
-    log_debug("%s is masked by %s, which doesn't hit point %g,%g", getTarget().c_str(), mask->getTarget().c_str(), x, y);
+    log_debug("%s is dynamically masked by %s, which doesn't hit point %g,%g", getTarget().c_str(), mask->getTarget().c_str(), x, y);
     return false;
   }
   VisibleShapeContainerFinder finder(x, y);

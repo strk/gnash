@@ -49,15 +49,23 @@ main(int /*argc*/, char** /*argv*/)
 
   sprite_instance* root = tester.getRootMovie();
   assert(root);
-  check_equals(root->get_frame_count(), 2);
-  // FRAME 1
+  check_equals(root->get_frame_count(), 3);
+
+  // FRAME 2
+  tester.advance(); 
+
   check_pixel(15, 15, 30, red, 2); 
   // visual check succeeds with AGG pixel format RGB24
   // don't know why this check fails with AGG pixel format AGG_RGB555
   // it works with cairo.
   xcheck_pixel(40, 40, 10, white, 3); 
+
+  tester.movePointerTo(118, 118);
+  xcheck( ! tester.isMouseOverMouseEntity() ); // not visible in its mask
+  tester.movePointerTo(10, 10);
+  check( tester.isMouseOverMouseEntity() ); // visible in its mask
   
-  // FRAME 2 
+  // FRAME 3 
   tester.advance(); 
   check_pixel(105, 105, 210, red, 2); 
   check_pixel(220, 220, 10, white, 2); 
