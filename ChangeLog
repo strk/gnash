@@ -1,3 +1,10 @@
+2008-01-24 Chad Musick <chadmusick@msbx.net>
+
+	* libbase/string_table.cpp,.h: Add a case insensitive option to
+	  find and value
+	* server/asClass.h,.cpp: Change code to compile with new string
+	  table key type (keys cannot be converted in one step to as_value)
+
 2008-01-23 Sandro Santilli <strk@keybit.net>
 
 	* gui/kde_glue_agg.cpp: keep rendering no matter what HAVE_QTOPIA says

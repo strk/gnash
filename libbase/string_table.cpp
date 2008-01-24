@@ -24,11 +24,23 @@ using namespace gnash;
 std::string string_table::mEmpty = "";
 
 string_table::key
-string_table::find(const std::string& to_find, bool insert_unfound)
+string_table::find(const std::string& to_find, bool insert_unfound,
+	bool case_insensitive)
 {
+	std::size_t ckey = 0;
+
 	// Empty strings all map to 0
 	if (to_find.empty())
 		return 0;
+
+	if (case_insensitive)
+	{
+		std::string caseless = boost::to_lower_copy(to_find);
+		if (caseless != to_find) // Only do this if cased/caseless differs.
+		{
+			ckey = find(caseless, insert_unfound, false).caseless;
+		}
+	}
 
 	table::nth_index<0>::type::iterator i = mTable.get<0>().find(to_find);
 
@@ -44,17 +56,18 @@ string_table::find(const std::string& to_find, bool insert_unfound)
 			i = mTable.get<0>().find(to_find);
 			// If they did, use that value.
 			if (i != mTable.end())
-				return i->mId;
+				return case_key(i->mId, &i->mValue); 
 			// Otherwise, insert it.
 			theSvt.mValue = to_find;
 			theSvt.mId = ++mHighestKey;
-			return mTable.insert(theSvt).first->mId;
+			mTable.insert(theSvt);
+			return case_key(ckey ? ckey : theSvt.mId, &(theSvt.mValue));
 		}
 		else
 			return 0;
 	}
 
-	return i->mId;
+	return case_key(ckey ? ckey : i->mId, &(i->mValue));
 }
 
 string_table::key

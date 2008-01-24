@@ -47,9 +47,10 @@ asMethod::addValue(string_table::key name, asNamespace *ns, boost::uint32_t slot
 	asClass *type, as_value& val, bool isconst)
 {
 	if (val.is_object())
-		val.to_object()->set_member(NSV::INTERNAL_TYPE, type->getName());
+		val.to_object()->set_member(string_table::key(NSV::INTERNAL_TYPE), 
+			std::size_t(type->getName()));
 
-	string_table::key nsname = ns ? ns->getURI() : 0;
+	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 
 	int flags = as_prop_flags::dontDelete;
 
@@ -65,9 +66,10 @@ asClass::addValue(string_table::key name, asNamespace *ns, boost::uint32_t slotI
 	asClass *type, as_value& val, bool isconst, bool isstatic)
 {
 	if (val.is_object())
-		val.to_object()->set_member(NSV::INTERNAL_TYPE, type->getName());
+		val.to_object()->set_member(NSV::INTERNAL_TYPE, 
+			std::size_t(type->getName()));
 
-	string_table::key nsname = ns ? ns->getURI() : 0;
+	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 
 	int flags = as_prop_flags::dontDelete;
 	if (isconst)
@@ -97,7 +99,7 @@ bool
 asMethod::addSlot(string_table::key name, asNamespace* ns, boost::uint32_t slotId,
 	asClass */*type*/)
 {
-	string_table::key nsname = ns ? ns->getURI() : 0;
+	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 	int flags = as_prop_flags::dontDelete;
 
 	mPrototype->init_member(name, as_value(), flags, nsname, slotId);
@@ -128,7 +130,7 @@ bool
 asClass::addSlot(string_table::key name, asNamespace* ns, boost::uint32_t slotId,
 	asClass */*type*/, bool isstatic)
 {
-	string_table::key nsname = ns ? ns->getURI() : 0;
+	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 	int flags = as_prop_flags::dontDelete;
 	if (isstatic)
 		flags |= as_prop_flags::staticProp;
@@ -140,7 +142,7 @@ asClass::addSlot(string_table::key name, asNamespace* ns, boost::uint32_t slotId
 bool
 asMethod::addMethod(string_table::key name, asNamespace* ns, asMethod* method)
 {
-	string_table::key nsname = ns ? ns->getURI() : 0;
+	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 	as_value val(method->getPrototype());
 
 	mPrototype->init_member(name, val, as_prop_flags::readOnly |
@@ -152,7 +154,7 @@ bool
 asClass::addMethod(string_table::key name, asNamespace* ns, asMethod* method,
 	bool isstatic)
 {
-	string_table::key nsname = ns ? ns->getURI() : 0;
+	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 	as_value val(method->getPrototype());
 	int flags = as_prop_flags::readOnly | as_prop_flags::dontDelete
 		| as_prop_flags::dontEnum;
@@ -167,7 +169,7 @@ bool
 asClass::addGetter(string_table::key name, asNamespace *ns, asMethod *method,
 	bool isstatic)
 {
-	string_table::key nsname = ns ? ns->getURI() : 0;
+	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 
 	Property *getset = mPrototype->getOwnProperty(name, nsname);
 
@@ -188,7 +190,7 @@ bool
 asClass::addSetter(string_table::key name, asNamespace *ns, asMethod *method,
 	bool isstatic)
 {
-	string_table::key nsname = ns ? ns->getURI() : 0;
+	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 
 	Property *getset = mPrototype->getOwnProperty(name, nsname);
 
@@ -208,7 +210,7 @@ asClass::addSetter(string_table::key name, asNamespace *ns, asMethod *method,
 bool
 asMethod::addGetter(string_table::key name, asNamespace *ns, asMethod *method)
 {
-	string_table::key nsname = ns ? ns->getURI() : 0;
+	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 
 	Property *getset = mPrototype->getOwnProperty(name, nsname);
 
@@ -226,7 +228,7 @@ asMethod::addGetter(string_table::key name, asNamespace *ns, asMethod *method)
 bool
 asMethod::addSetter(string_table::key name, asNamespace *ns, asMethod *method)
 {
-	string_table::key nsname = ns ? ns->getURI() : 0;
+	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 
 	Property *getset = mPrototype->getOwnProperty(name, nsname);
 

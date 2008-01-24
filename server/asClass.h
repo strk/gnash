@@ -217,7 +217,7 @@ public:
 	{
 		if (getClassInternal(name))
 			return false;
-		mClasses[name] = a;
+		mClasses[static_cast<std::size_t>(name)] = a;
 		return true;
 	}
 
