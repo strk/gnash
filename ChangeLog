@@ -1,3 +1,8 @@
+2008-01-24 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ActionExec.cpp: use PROPNAME rather then manually 
+	  convert to lowercase (propedeutic to fix props case).
+
 2008-01-24 Chad Musick <chadmusick@msbx.net>
 
 	* libbase/string_table.cpp,.h: Add a case insensitive option to

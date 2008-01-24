@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.64 2008/01/21 20:56:03 rsavoye Exp $ */
+/* $Id: ActionExec.cpp,v 1.65 2008/01/24 11:12:27 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -538,116 +538,60 @@ ActionExec::pushWithEntry(const with_stack_entry& entry)
 bool
 ActionExec::delVariable(const std::string& name)
 {
-	VM& vm = VM::get(); // cache this ?
-	std::string namei = name;
-	if ( vm.getSWFVersion() < 7 ) {
-	    boost::to_lower(namei, vm.getLocale());
-	}
-	
-	return env.del_variable_raw(namei, getScopeStack());
+	return env.del_variable_raw(PROPNAME(name), getScopeStack());
 }
 
 bool
 ActionExec::delObjectMember(as_object& obj, const std::string& name)
 {
-	VM& vm = VM::get();
-
-	std::string namei = name;
-
-	if ( vm.getSWFVersion() < 7 ) {
-	    boost::to_lower(namei, vm.getLocale());
-	} 
-
-	std::pair<bool,bool> ret = obj.delProperty(vm.getStringTable().find(namei));
+	string_table& st = VM::get().getStringTable();
+	std::pair<bool,bool> ret = obj.delProperty(st.find(PROPNAME(name)));
 	return ret.second;
 }
 
 void
 ActionExec::setVariable(const std::string& name, const as_value& val)
 {
-	VM& vm = VM::get(); // cache this ?
-	std::string namei = name;
-	if ( vm.getSWFVersion() < 7 ) {
-	    boost::to_lower(namei, vm.getLocale());
-	}
-	
-	return env.set_variable(namei, val, getScopeStack());
+	return env.set_variable(PROPNAME(name), val, getScopeStack());
 }
 
 as_value
 ActionExec::getVariable(const std::string& name)
 {
-	VM& vm = VM::get();
-
-	std::string namei = name;
-	if ( vm.getSWFVersion() < 7 ) {
-	    boost::to_lower(namei, vm.getLocale());
-	}
-	
-	return env.get_variable(namei, getScopeStack());
+	return env.get_variable(PROPNAME(name), getScopeStack());
 }
 
 as_value
 ActionExec::getVariable(const std::string& name, as_object** target)
 {
-	VM& vm = VM::get();
-
-	std::string namei = name;
-	if ( vm.getSWFVersion() < 7 ) {
-	    boost::to_lower(namei, vm.getLocale());
-	}
-	
-	return env.get_variable(namei, getScopeStack(), target);
+	return env.get_variable(PROPNAME(name), getScopeStack(), target);
 }
 
 void
-ActionExec::setLocalVariable(const std::string& name_, const as_value& val)
+ActionExec::setLocalVariable(const std::string& name, const as_value& val)
 {
-	VM& vm = VM::get(); // cache this ?
-
-	std::string name = name_;
-	if ( vm.getSWFVersion() < 7 ) {
-	    boost::to_lower(name, vm.getLocale());
-	}
-
 	if ( isFunction() ) {
 	    // TODO: set local in the function object?
-	    env.set_local(name, val);
+	    env.set_local(PROPNAME(name), val);
 	} else {
 	    // TODO: set target member  ?
 	    //       what about 'with' stack ?
-	    env.set_variable(name, val);
+	    env.set_variable(PROPNAME(name), val);
 	}
 }
 
 void
 ActionExec::setObjectMember(as_object& obj, const std::string& var, const as_value& val)
 {
-	VM& vm = VM::get();
-
-	if ( vm.getSWFVersion() < 7 ) {
-	    std::string vari = var;
-	    boost::to_lower(vari, vm.getLocale());
-	    obj.set_member(vm.getStringTable().find(vari), val);
-	} else {
-	    obj.set_member(vm.getStringTable().find(var), val);
-	}
-	
+	string_table& st = VM::get().getStringTable();
+	obj.set_member(st.find(PROPNAME(var)), val);
 }
 
 bool
 ActionExec::getObjectMember(as_object& obj, const std::string& var, as_value& val)
 {
-	VM& vm = VM::get();
-
-	if ( vm.getSWFVersion() < 7 ) {
-	    std::string vari = var;
-	    boost::to_lower(vari, vm.getLocale());
-	    return obj.get_member(vm.getStringTable().find(vari), &val);
-	} else {
-	    return obj.get_member(vm.getStringTable().find(var), &val);
-	}
-
+	string_table& st = VM::get().getStringTable();
+	return obj.get_member(st.find(PROPNAME(var)), &val);
 }
 
 /*private*/
