@@ -34,7 +34,7 @@ SUBDIRS = \
 	actionscript.all \
 	$(NULL)
 
-EXTRA_DIST = check.h DummyMovieDefinition.h DummyCharacter.h media gnashrc.in
+EXTRA_DIST = check.h DummyMovieDefinition.h DummyCharacter.h media gnashrc.in simple.exp
 
 dist_noinst_SCRIPTS = anaylse-results.sh generic-testrunner.sh
 

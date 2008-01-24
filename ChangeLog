@@ -1,5 +1,6 @@
 2008-01-24 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/Makefile.am: distribute simple.exp
 	* server/as_object.cpp: use PROPNAME where appropriate.
 	* server/as_environment.cpp (find_object): use PROPNAME where
 	  appropriate.
