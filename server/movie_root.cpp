@@ -481,15 +481,12 @@ movie_root::getKeyObject()
 		// This isn't very performant... 
 		// it will keep trying to find it even if impossible
 		// to find.
+		// TODO: use a named string...
 
 		as_value kval;
 		as_object* global = VM::get().getGlobal();
 
-		std::string objName = "Key";
-		if ( vm.getSWFVersion() < 7 )
-		{
-			boost::to_lower(objName, vm.getLocale());
-		}
+		std::string objName = PROPNAME("Key");
 		if (global->get_member(vm.getStringTable().find(objName), &kval) )
 		{
 			//log_msg("Found member 'Key' in _global: %s", kval.to_string());

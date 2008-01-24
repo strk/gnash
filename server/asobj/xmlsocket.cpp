@@ -626,16 +626,13 @@ void xmlsocket_class_init(as_object& global)
 boost::intrusive_ptr<as_function>
 xmlsocket_as_object::getEventHandler(const std::string& name)
 {
-		boost::intrusive_ptr<as_function> ret;
+	boost::intrusive_ptr<as_function> ret;
 
-		std::string key=name;
-		VM& vm = VM::get();
-		if ( vm.getSWFVersion() < 7 ) boost::to_lower(key, vm.getLocale());
-
-		as_value tmp;
-		if (!get_member(vm.getStringTable().find(key), &tmp) ) return ret;
-		ret = tmp.to_as_function();
-		return ret;
+	as_value tmp;
+	string_table& st = getVM().getStringTable();
+	if (!get_member(st.find(PROPNAME(name)), &tmp) ) return ret;
+	ret = tmp.to_as_function();
+	return ret;
 }
 
 void

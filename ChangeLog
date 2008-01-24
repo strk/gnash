@@ -1,5 +1,8 @@
 2008-01-24 Sandro Santilli <strk@keybit.net>
 
+	* server/debugger.cpp: use PROPNAME when appropriate
+	* server/movie_root.cpp (getKeyObject): use PROPNAME
+	* server/asobj/xmlsocket.cpp (getEventHandler): use PROPNAME.
 	* extensions/fileio/fileio.cpp, extensions/gtk2/gtkext.cpp:
 	  Don't convert strings passed to init_member, isn't needed.
 	* server/vm/ActionExec.cpp: use PROPNAME rather then manually 
