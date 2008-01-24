@@ -359,12 +359,7 @@ extern "C" {
  	    attachInterface(cl.get());
 	}
 	
-	VM& vm = VM::get(); // cache this ?
-	std::string name = "GtkExt";
-	if ( vm.getSWFVersion() < 7 ) {
-	    boost::to_lower(name, vm.getLocale());
-	}
-	obj.init_member(name, cl.get());
+	obj.init_member("GtkExt", cl.get());
     }
 } // end of extern C
 

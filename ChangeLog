@@ -1,5 +1,7 @@
 2008-01-24 Sandro Santilli <strk@keybit.net>
 
+	* extensions/fileio/fileio.cpp, extensions/gtk2/gtkext.cpp:
+	  Don't convert strings passed to init_member, isn't needed.
 	* server/vm/ActionExec.cpp: use PROPNAME rather then manually 
 	  convert to lowercase (propedeutic to fix props case).
 
