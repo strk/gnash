@@ -931,7 +931,6 @@ sprite_meth(const fn_call& fn)
   //if ( ! v.is_string() ) return as_value(0);
   std::string s = lc.to_string();
 
-  //boost::to_lower(s);
   if ( s == "get" ) return as_value(1);
   if ( s == "post" )  return as_value(2);
   return as_value(0);
