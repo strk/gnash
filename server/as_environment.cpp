@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.123 2008/01/21 20:55:48 rsavoye Exp $ */
+/* $Id: as_environment.cpp,v 1.124 2008/01/24 13:30:56 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -545,13 +545,10 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
 	return m_target; // or should we return the *original* path ?
     }
     
-    std::string path = path_in;
+    std::string path = PROPNAME(path_in);
     VM& vm = VM::get();
     string_table& st = vm.getStringTable();
     int swfVersion = vm.getSWFVersion(); 
-
-    // Convert to lower case if needed
-    if ( swfVersion < 7 ) boost::to_lower(path);
 
     as_object* env = m_target; 
     assert(env);
