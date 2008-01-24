@@ -1,5 +1,6 @@
 2008-01-24 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.cpp: use PROPNAME where appropriate.
 	* server/as_environment.cpp (find_object): use PROPNAME where
 	  appropriate.
 	* server/debugger.cpp: use PROPNAME when appropriate

@@ -78,20 +78,11 @@ public:
 namespace gnash {
 
 bool
-as_object::add_property(const std::string& key, as_function& getter,
+as_object::add_property(const std::string& name, as_function& getter,
 		as_function& setter)
 {
-	string_table &stringTable = _vm.getStringTable();
-	if ( _vm.getSWFVersion() < 7 )
-	{
-		std::string name = key;
-		boost::to_lower(name, _vm.getLocale());
-		return _members.addGetterSetter(stringTable.find(name), getter, setter);
-	}
-	else
-	{
-		return _members.addGetterSetter(stringTable.find(key), getter, setter);
-	}
+	string_table &st = _vm.getStringTable();
+	return _members.addGetterSetter(st.find(PROPNAME(name)), getter, setter);
 }
 
 /*protected*/
@@ -426,18 +417,7 @@ void
 as_object::init_member(const std::string& key1, const as_value& val, int flags,
 	string_table::key nsname)
 {
-	if ( _vm.getSWFVersion() < 7 )
-	{
-		std::string keylower = key1;
-		boost::to_lower(keylower, _vm.getLocale());
-
-		init_member(_vm.getStringTable().find(keylower), val, flags, nsname);
-
-	}
-	else
-	{
-		init_member(_vm.getStringTable().find(key1), val, flags, nsname);
-	}
+	init_member(_vm.getStringTable().find(PROPNAME(key1)), val, flags, nsname);
 }
 
 void
@@ -471,18 +451,8 @@ void
 as_object::init_property(const std::string& key, as_function& getter,
 		as_function& setter, int flags, string_table::key nsname)
 {
-	if ( _vm.getSWFVersion() < 7 )
-	{
-		std::string name = key;
-		boost::to_lower(name, _vm.getLocale());
-		string_table::key k = _vm.getStringTable().find(name);
-		init_property(k, getter, setter, flags, nsname);
-	}
-	else
-	{
-		string_table::key k = _vm.getStringTable().find(key);
-		init_property(k, getter, setter, flags, nsname);
-	}
+	string_table::key k = _vm.getStringTable().find(PROPNAME(key));
+	init_property(k, getter, setter, flags, nsname);
 
 }
 
@@ -519,17 +489,8 @@ void
 as_object::init_readonly_property(const std::string& key, as_function& getter,
 	int initflags, string_table::key nsname)
 {
-	string_table::key k;
-	if ( _vm.getSWFVersion() < 7 )
-	{
-		std::string name = key;
-		boost::to_lower(name, _vm.getLocale());
-		k = _vm.getStringTable().find(name);
-	}
-	else
-	{
-		k = _vm.getStringTable().find(key);
-	}
+	string_table::key k = _vm.getStringTable().find(PROPNAME(key));
+
 	init_property(k, getter, getter, initflags | as_prop_flags::readOnly
 		| as_prop_flags::isProtected, nsname);
 	assert(_members.getProperty(k, nsname));
@@ -539,12 +500,8 @@ std::string
 as_object::asPropName(string_table::key name)
 {
 	std::string orig = _vm.getStringTable().value(name);
-	if ( _vm.getSWFVersion() < 7 )
-	{
-		boost::to_lower(orig, _vm.getLocale());
-	}
 
-	return orig;
+	return PROPNAME(orig); // why is PROPNAME needed here ?
 }
 
 
@@ -626,11 +583,7 @@ as_object::setPropFlags(as_value& props_val, int set_false, int set_true)
 {
 	if (props_val.is_string())
 	{
-		std::string propstr = props_val.to_string(); // no need for calling toString here..
-		if ( _vm.getSWFVersion() < 7 ) // convert to lower case if required
-		{
-			boost::to_lower(propstr);
-		}
+		std::string propstr = PROPNAME(props_val.to_string()); 
 
 		for(;;)
 		{
@@ -796,31 +749,19 @@ as_object::as_object(const as_object& other)
 std::pair<bool,bool>
 as_object::delProperty(string_table::key name, string_table::key nsname)
 {
-	if ( _vm.getSWFVersion() < 7 )
-	{
-       	std::string key = _vm.getStringTable().value(name);
-		boost::to_lower(key, _vm.getLocale());
-		return _members.delProperty(_vm.getStringTable().find(key), nsname);
-	}
-	else
-	{
-		return _members.delProperty(name, nsname);
-	}
+	return _members.delProperty(name, nsname);
 }
 
 Property*
-as_object::getOwnProperty(string_table::key name, string_table::key nsname)
+as_object::getOwnProperty(string_table::key key, string_table::key nsname)
 {
-	if ( _vm.getSWFVersion() < 7 )
-	{
-       	std::string key = _vm.getStringTable().value(name);
-		boost::to_lower(key, _vm.getLocale());
-		return _members.getProperty(_vm.getStringTable().find(key), nsname);
-	}
-	else
-	{
-		return _members.getProperty(name, nsname);
-	}
+	// TODO:
+	// Removing this absurd round-trip from key to name to key
+	// breaks toString_valueOf (why? fix me!!)
+	//
+	string_table& st = _vm.getStringTable();
+       	std::string name = st.value(key);
+	return _members.getProperty(st.find(PROPNAME(name)), nsname);
 }
 
 as_value
