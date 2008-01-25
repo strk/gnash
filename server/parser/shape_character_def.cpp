@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.62 2008/01/23 14:21:59 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.63 2008/01/25 12:10:27 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -195,6 +195,12 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
     rect tbound;
     tbound.read(in);
     /*boost::uint8_t scales =*/static_cast<void>(in->read_u8());
+    static bool warned = false;
+    if ( ! warned )
+    {
+       log_unimpl("DEFINESHAPE4 edge boundaries and scales");
+       warned = true;
+    }
   }
 
   read_fill_styles(m_fill_styles, in, tag_type, m);

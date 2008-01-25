@@ -1,5 +1,8 @@
 2008-01-25 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/shape_character_def.cpp (read): 
+	  add warning about unimplemented DEFINESHAPE4 edge
+	  boundaries and scales.
 	* gui/gui.cpp (getMovieInfo): add dragging character
 	  and character under the pointer.
 	* server/movie_root.{cpp,h}: expose a method to query 
