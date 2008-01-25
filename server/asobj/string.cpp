@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.50 2008/01/21 20:55:58 rsavoye Exp $ */
+/* $Id: string.cpp,v 1.51 2008/01/25 20:42:40 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -317,10 +317,9 @@ string_split(const fn_call& fn)
     }
 
 
-    //if (delim == "") {
     if ( delim.empty() ) {
         for (unsigned i=0; i <max; i++) {
-            val.set_std_string(str.substr(i, i+1));
+            val.set_std_string(str.substr(i, 1));
             array->push(val);
         }
 

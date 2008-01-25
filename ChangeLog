@@ -1,5 +1,14 @@
 2008-01-25 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/String.as: add better test
+	  for split(''), as the available ones weren't catching
+	  the bug just fixed.
+	* server/asobj/string.cpp: fix String.split('') to return
+	  an array in which *each* element is a character from the
+	  input. This fixes http://www.gazbming.com/sokoban2.swf.
+
+2008-01-25 Sandro Santilli <strk@keybit.net>
+
 	* gui/Makefile.am: generate klash.moc onlhy if KDE gui is enabled.
 	  Fixes bug #21019.
 	* libamf/lcshm.{cpp,h}, server/asobj/LocalConnection.cpp,

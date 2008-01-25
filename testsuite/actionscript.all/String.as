@@ -16,7 +16,7 @@
 
 // Original author: Mike Carlson - June 19th, 2006
 
-rcsid="$Id: String.as,v 1.34 2008/01/15 11:35:49 strk Exp $";
+rcsid="$Id: String.as,v 1.35 2008/01/25 20:42:40 strk Exp $";
 
 #include "check.as"
 
@@ -146,8 +146,17 @@ check_equals ( a.split("w").length, 4);
 check_equals ( a.split("  w").length, 1);
 
 #if OUTPUT_VERSION > 5
-check_equals ( a.split("")[0], "w" );
-check_equals ( a.split("")[19], "N" );
+// TODO: check more of split(''), it seems to be bogus !
+ret = a.split('');
+check_equals(typeof(ret), 'object');
+check(ret instanceof Array);
+check_equals( ret.length, 20 );
+check_equals ( ret[0], "w" );
+check_equals ( ret[1], "a" );
+check_equals ( ret[2], "l" );
+check_equals ( ret[3], "l" );
+check_equals ( ret[18], "O" );
+check_equals ( ret[19], "N" );
 check_equals ( a.split("la")[0], "wal" );
 check_equals ( a.split("la")[1], "wal" );
 check_equals ( a.split("la")[2], "washinGTON" );
@@ -475,5 +484,5 @@ check_equals(r, "s:");
 #if OUTPUT_VERSION < 6
  check_totals(175);
 #else
- check_totals(196);
+ check_totals(203);
 #endif
