@@ -861,7 +861,7 @@ Gui::getMovieInfo() const
     snprintf(buf, 16, "SWF%d", vmSWFVersion); buf[15] = '\0';
     ret->insert(ret->begin(), StringPair("VM", buf));
 
-    // Print info about levels (only level0 for now, then will be extended)
+    // Print info about levels (only originating movie for now, then will be extended)
     movie_root& stage = vm.getRoot();
     boost::intrusive_ptr<movie_instance> level0 = stage.getRootMovie();
     movie_definition* def0 = level0->get_movie_definition();
@@ -869,16 +869,38 @@ Gui::getMovieInfo() const
     snprintf(buf, 16, "SWF%d", def0->get_version()); buf[15] = '\0';
     ret->insert(ret->begin(), StringPair("_level0 SWFVersion", std::string(buf)));
     ret->insert(ret->begin(), StringPair("_level0 URL", def0->get_url()));
+
+    // Print info about scripts state (enabled/disabled)
     ret->insert(ret->begin(), StringPair("Stage scripts", stage.scriptsDisabled() ? " disabled" : "enabled"));
 
-    character* ch = stage.getActiveEntityUnderPointer();
-    std::stringstream ss;
-    if ( ! ch ) ss << "NONE";
-    else
+    // Print info about mouse entities
+
+    using std::string;
+    const character* ch;
+
+    ch = stage.getActiveEntityUnderPointer();
+    if ( ch )
     {
-        ss << ch->getTarget() << " (" << typeName(*ch) << ")";
+	std::stringstream ss;
+	ss << ch->getTarget() << " (" + typeName(*ch) << " - id:" << ch->get_id() << " depth:" << ch->get_depth();
+    	ret->insert(ret->begin(), StringPair("Active mouse entity: ", ss.str()));
     }
-    ret->insert(ret->begin(), StringPair("Topmost mouse entity: ", ss.str()));
+
+    ch = stage.getEntityUnderPointer();
+    if ( ch )
+    {
+	std::stringstream ss;
+	ss << ch->getTarget() << " (" + typeName(*ch) << " - id:" << ch->get_id() << " depth:" << ch->get_depth();
+    	ret->insert(ret->begin(), StringPair("Topmost mouse entity: ", ss.str()));
+    }
+
+    ch = stage.getDraggingCharacter();
+    if ( ch ) 
+    {
+	std::stringstream ss;
+	ss << ch->getTarget() << " (" + typeName(*ch) << " - id:" << ch->get_id() << " depth:" << ch->get_depth();
+    	ret->insert(ret->begin(), StringPair("Dragging character: ", ss.str()));
+    }
 
     return ret;
 }

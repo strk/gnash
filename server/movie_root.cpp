@@ -805,7 +805,7 @@ movie_root::fire_mouse_event()
 
     // Set _droptarget if dragging a sprite
     sprite_instance* dragging = 0;
-    character* draggingChar = m_drag_state.getCharacter();
+    character* draggingChar = getDraggingCharacter();
     if ( draggingChar ) dragging = draggingChar->to_movie();
     if ( dragging )
     {
@@ -889,7 +889,7 @@ movie_root::set_drag_state(const drag_state& st)
 void
 movie_root::doMouseDrag()
 {
-	character* dragChar = m_drag_state.getCharacter();
+	character* dragChar = getDraggingCharacter(); 
 	if ( ! dragChar ) return; // nothing to do
 
 	if ( dragChar->isUnloaded() )
@@ -1220,6 +1220,21 @@ character*
 movie_root::getActiveEntityUnderPointer() const
 {
 	return m_mouse_button_state.m_active_entity.get();
+}
+
+character*
+movie_root::getDraggingCharacter() const
+{
+	return m_drag_state.getCharacter();
+}
+
+const character*
+movie_root::getEntityUnderPointer() const
+{
+	float x = PIXELS_TO_TWIPS(m_mouse_x);
+	float y = PIXELS_TO_TWIPS(m_mouse_y);
+        const character* dropChar = findDropTarget(x, y, getDraggingCharacter()); 
+	return dropChar;
 }
 
 bool

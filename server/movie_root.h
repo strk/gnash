@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.104 2008/01/21 20:55:51 rsavoye Exp $ */
+/* $Id: movie_root.h,v 1.105 2008/01/25 11:33:36 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -305,7 +305,7 @@ public:
 
     void set_drag_state(const drag_state& st);
 
-    /// @return current top-level root sprite (_level0)
+    /// @return the originating root movie (not necessarely _level0)
     movie_instance* getRootMovie() const
     {
 	return _rootMovie.get();
@@ -316,9 +316,9 @@ public:
         m_drag_state.reset();
     }
 
-    /// Return definition of _level0 
+    /// Return definition of originating root movie 
     //
-    /// TODO: drop this function ?
+    /// TODO: rename to getOriginatingDefinition ?
     ///
     movie_definition* get_movie_definition() const
     {
@@ -345,21 +345,15 @@ public:
     ///
     bool clear_interval_timer(unsigned int x);
 
-    /// Return 0-based frame index of _level0
+    /// Return 0-based frame index of originating root movie
     //
     /// TODO: drop this function (currently used by gprocessor)
+    ///       or change it to to delegate to _level0 ?
     ///
     size_t get_current_frame() const
     {
 	return getRootMovie()->get_current_frame();
     }
-
-#if 0
-    // @@ should this be in movie_instance ?
-    float get_frame_rate() const {
-        return get_movie_definition()->get_frame_rate();
-    }
-#endif
 
     /// \brief
     /// Return the size of a logical movie pixel as
@@ -369,16 +363,6 @@ public:
     {
         return m_pixel_scale;
     }
-
-#if 0
-    // @@ Is this one necessary?
-    //
-    // TODO: drop this
-    character* get_character(int character_id)
-    {
-	return getRootMovie()->get_character(character_id);
-    }
-#endif
 
     void set_background_color(const rgba& color);
 
@@ -402,7 +386,7 @@ public:
     ///
     void advance();
 
-    /// 0-based!! delegates to _level0
+    /// 0-based!! delegates to originating root movie
     //
     /// TODO: drop this method. currently used by gprocessor.
     ///
@@ -413,7 +397,7 @@ public:
 
     void display();
 
-    /// Delegate to _level0
+    /// Delegate to originating root movie
     //
     /// TODO: drop ?
     ///
@@ -501,6 +485,17 @@ public:
     /// @return the topmost active entity under pointer or NULL if none.
     ///
     character* getActiveEntityUnderPointer() const;
+
+    /// Return the topmost non-dragging entity under the pointer
+    //
+    /// This method triggers a displaylist scan
+    ///
+    /// @return the topmost non-dragging entity under pointer or NULL if none
+    ///
+    const character* getEntityUnderPointer() const;
+
+    /// Return the character currently being dragged, if any
+    character* getDraggingCharacter() const;
 
     /// Return true if the mouse pointer is over an active entity
     bool isMouseOverActiveEntity() const;
