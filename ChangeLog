@@ -1,3 +1,8 @@
+2008-01-25  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* configure.ac: Add test to use gst-inspect to look for installed
+	codecs for Gstreamer.
+
 2008-01-25 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/asobj/NetStreamGst.cpp: print the element name when reporting

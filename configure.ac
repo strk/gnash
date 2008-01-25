@@ -1493,7 +1493,19 @@ if test x"$media_handler" = x"ffmpeg"; then
   fi
 fi
 
+missing_codecs=""
 if test "$media_handler" = "gst"; then
+  AC_PATH_PROG(GST_INSPECT, gst-inspect, ,[${pathlist}])
+  if test "x$GST_INSPECT" != "x" -a x"${darwin}" = xno ; then
+    codecs="ffdemux_flv ffdemux_mp3 vorbisdec ffdec_vp6"
+    for i in $codecs; do
+       hits="`$GST_INSPECT $i | grep -c 'Long name'`"
+       if test $hits -eq 0; then
+         missing_codecs="$missing_codecs $i"
+         AC_MSG_WARN([Missing codec: $i])
+       fi
+    done
+  fi
   GNASH_PKG_FIND(gstreamer, [gst/gst.h], [gstreamer library], gst_init, [0.10])
   if test x"${media_handler_specified}" = xfalse; then
     # If the library is not found, or its version is not ok, we'll try mad
@@ -2229,6 +2241,10 @@ dnl    nogo=true
 fi
 
 if test "$media_handler" = "gst"; then
+  if test x"$missing_codecs" != x; then   
+      echo "        Your Gstreamer installtion is missing these codecs: $missing_codecs"
+      echo "        Please install the gstreamer-ffmpeg for Gstreamer"
+  fi  
   if test x"$GSTREAMER_LIBS" != x; then
     if test x"$GSTREAMER_CFLAGS" != x; then
       echo "        Gstreamer flags are: $GSTREAMER_CFLAGS"
@@ -2239,7 +2255,6 @@ if test "$media_handler" = "gst"; then
   else
     echo "        ERROR: GST media handling requested but gstreamer-0.10+ not found"
     echo "               Install it from http://www.gstreamer.net"
-    echo "               or reconfigure using --enable-media=ffmpeg or =mad"
     echo "               or .deb users: apt-get install libgstreamer0.10-dev"
     echo "               or .rpm users: yum install gstreamer-devel"
     nogo=true
