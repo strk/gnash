@@ -63,14 +63,14 @@ main(int argc, char** argv)
 	Ming_init();
 	mo = newSWFMovie();
 	SWFMovie_setDimension(mo, 800, 600);
-	//SWFMovie_setRate (mo, 1.0);
+	SWFMovie_setRate (mo, 1.0);
 
 	dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
 	SWFMovie_add(mo, (SWFBlock)dejagnuclip);
 	SWFMovie_nextFrame(mo); 
 
-	sh1 = make_fill_square (250, 300, 60, 60, 255, 0, 0, 255, 0, 0);
-	sh2 = make_fill_square (300, 300, 60, 60, 255, 0, 0, 0, 0, 0);
+	sh1 = make_fill_square (0, 220, 60, 60, 255, 0, 0, 255, 0, 0);
+	sh2 = make_fill_square (30, 250, 60, 60, 255, 0, 0, 0, 0, 0);
 	
 	it = SWFMovie_add(mo, (SWFBlock)sh1);  
 	SWFDisplayItem_setName(it, "sh1"); 
@@ -80,11 +80,46 @@ main(int argc, char** argv)
 	SWFDisplayItem_setName(it, "sh2"); 
 	SWFDisplayItem_setDepth(it, 3); //place the sh2 character at depth 3 again!
 
-	check(mo, "sh1 != undefined");
-	xcheck(mo, "sh2 != undefined");
+	add_actions(mo, "note('Placed red shape sh1 and black shape sh2 at the same depth 3. Should both be visible, red on top.');");
 
-	// we need to allow 2 runs as the first one won't play (correct?)
-	add_actions(mo, "_root.totals(); stop();");
+	xcheck_equals(mo, "sh1", "sh2");
+	check_equals(mo, "typeof(sh1)", "'movieclip'");
+	xcheck_equals(mo, "typeof(sh2)", "'movieclip'");
+
+	SWFMovie_nextFrame(mo); 
+
+	mc1 = newSWFMovieClip();
+	it = SWFMovieClip_add(mc1, (SWFBlock)sh1);
+	SWFDisplayItem_setName(it, "sh1");
+	SWFDisplayItem_moveTo(it, 100, 0);
+	SWFMovieClip_nextFrame(mc1);
+
+	mc2 = newSWFMovieClip();
+	it = SWFMovieClip_add(mc2, (SWFBlock)sh2);
+	SWFDisplayItem_setName(it, "sh1");
+	SWFDisplayItem_moveTo(it, 100, 0);
+	SWFMovieClip_nextFrame(mc2);
+
+	it = SWFMovie_add(mo, (SWFBlock)mc2);  
+	SWFDisplayItem_setName(it, "mc2"); 
+	SWFDisplayItem_setDepth(it, 4); //place the mc2 sprite at depth 3 again!
+
+	it = SWFMovie_add(mo, (SWFBlock)mc1);  
+	SWFDisplayItem_setName(it, "mc1"); 
+	SWFDisplayItem_setDepth(it, 4); //place the mc1 sprite at depth 3
+
+	add_actions(mo, "note('Placed red sprite mc1 and black sprite mc2 at the same depth 4. Should both be visible, black on top.');");
+
+	xcheck_equals(mo, "typeof(mc1)", "'movieclip'");
+	check_equals(mo, "typeof(mc2)", "'movieclip'");
+	check(mo, "mc1._name != mc2._name");
+	check_equals(mo, "mc1.getDepth()", "mc2.getDepth()");
+
+	// TODO: use SWFMovie_replace and see if it would replace
+	//       only one or both characters at target depth
+	//       (not that we can trust Ming stability here..)
+
+	add_actions(mo, "_root.totals(7); stop();");
 
 	SWFMovie_nextFrame(mo); 
 

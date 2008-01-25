@@ -1,5 +1,8 @@
 2008-01-25 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/place_object_test.c: add more tests (and 
+	  more to be added - gnash fails not allowing characters in a
+	  DisplayList to share a depth).
 	* server/DynamicShape.cpp (clear): reset _currfill and _currline
 	  or they might point to released memory (line/fill styles were
 	  cleared). Fixes illegal vector access in
