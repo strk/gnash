@@ -266,6 +266,8 @@ main(int argc, char** argv)
 
 		"};"
 
+		"\n"
+
 		"stream.onCuePoint = function(info) {"
 		" _root.note('onCuePoint('+info+') called'); "
 		"};"
@@ -288,6 +290,9 @@ main(int argc, char** argv)
 		" }"
 		" xcheck_equals(enu.length, 11);" // gnash contains 2 more 
 
+		"\n"
+
+
 		// Test composision
 
 		" check(info.hasOwnProperty('filesize'), 'metadata has filesize');"
@@ -306,6 +311,8 @@ main(int argc, char** argv)
 		" delete info.audiocodecid;"
 		" check(!info.hasOwnProperty('audiocodecid'), 'metadata audiocodecid can be deleted');"
 
+		"\n"
+
 		" check(info.hasOwnProperty('stereo'), 'metadata has stereo');"
 		" check_equals(typeof(info.stereo), 'boolean', 'stereo is boolean');" 
 		" check_equals(info.stereo, false, 'actual stereo');"
@@ -321,6 +328,8 @@ main(int argc, char** argv)
 		" check_equals(info.audiosamplesize, 'changed');" // can be overridden
 		" delete info.audiosamplesize;"
 		" check(!info.hasOwnProperty('audiosamplesize'), 'metadata audiosamplesize can be deleted');"
+
+		"\n"
 
 		" check(info.hasOwnProperty('audiosamplerate'), 'metadata has audiosamplerate');"
 		" check_equals(typeof(info.audiosamplerate), 'number', 'audiosamplerate is a number');"
@@ -338,6 +347,8 @@ main(int argc, char** argv)
 		" delete info.videocodecid;"
 		" check(!info.hasOwnProperty('videocodecid'), 'metadata videocodecid can be deleted');"
 
+		"\n"
+
 		" check(info.hasOwnProperty('height'), 'metadata has height');"
 		" check_equals(typeof(info.height), 'number', 'height is a number');"
 		" check_equals(info.height, 96, 'actual height');"
@@ -353,6 +364,8 @@ main(int argc, char** argv)
 		" check_equals(info.width, 'changed');" // can be overridden
 		" delete info.width;"
 		" check(!info.hasOwnProperty('width'), 'metadata width can be deleted');"
+
+		"\n"
 
 		" check(info.hasOwnProperty('duration'), 'metadata has duration');"
 		" check_equals(typeof(info.duration), 'number', 'duration is a number');"

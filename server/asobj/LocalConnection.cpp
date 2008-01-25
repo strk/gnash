@@ -154,14 +154,14 @@ Listener::removeListener(std::string &name)
     return false;
 }
 
-std::vector<std::string> *
+auto_ptr< vector<string> >
 Listener::listListeners()
 {
     GNASH_REPORT_FUNCTION;
 
     boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
 
-    vector<string> *listeners = new vector<string>;
+    auto_ptr< vector<string> > listeners ( new vector<string> );
     const char *item = reinterpret_cast<char *>(addr);
     while (*item != 0) {
         listeners->push_back(item);
@@ -217,7 +217,7 @@ LocalConnection::connect(const std::string& name)
     addListener(str1);
     
     vector<string>::const_iterator it;
-    vector<string> *listeners = listListeners();
+    auto_ptr< vector<string> > listeners ( listListeners() );
     if (listeners->size() == 0) {
         log_msg("Nobody is listening");
     } else {
@@ -228,8 +228,6 @@ LocalConnection::connect(const std::string& name)
         }
     }
 
-    delete listeners;
-    
     str1 = "HelloWorld";
     removeListener(str1);
     listeners = listListeners();  
@@ -239,7 +237,6 @@ LocalConnection::connect(const std::string& name)
         log_debug("Listeners: %s", str.c_str());
     }
     
-    delete listeners;
 #endif // }
     
     return true;

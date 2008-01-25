@@ -43,7 +43,7 @@ public:
     bool addListener(std::string &name);
     bool findListener(std::string &name);
     bool removeListener(std::string &name);
-    std::vector<std::string> *listListeners();
+    std::auto_ptr< std::vector<std::string> > listListeners();
     void setBaseAddress(boost::uint8_t *addr) { _baseaddr = addr; };
     boost::uint8_t *getBaseAddress() { return _baseaddr; };
 protected:

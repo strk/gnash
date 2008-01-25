@@ -186,11 +186,11 @@ Listener::removeListener(std::string &name)
     return false;
 }
 
-vector<string> *
+auto_ptr< vector<string> >
 Listener::listListeners()
 {
 //    GNASH_REPORT_FUNCTION;    
-    vector<string> *listeners = new vector<string>;
+    auto_ptr< vector<string> > listeners ( new vector<string> );
     if (_baseaddr != 0) {
         boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
         
@@ -409,7 +409,7 @@ LcShm::dump()
     }
 
     vector<string>::const_iterator lit;
-    vector<string> *listeners = listListeners();
+    auto_ptr< vector<string> > listeners ( listListeners() );
     for (lit=listeners->begin(); lit!=listeners->end(); lit++) {
         string str = *lit;
         if (str[0] != ':') {
@@ -417,7 +417,6 @@ LcShm::dump()
 // 		total++;
         }
     }
-    delete listeners;
 }
 
 } // end of gnash namespace

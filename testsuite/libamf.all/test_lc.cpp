@@ -134,7 +134,7 @@ test_read(std::string &filespec)
     
     Listener list(reinterpret_cast<uint8_t *>(shmaddr));
     vector<string>::const_iterator it;
-    vector<string> *listeners = list.listListeners();
+    auto_ptr< vector<string> > listeners ( list.listListeners() );
     if (listeners->size() == 0) {
         cout << "Nobody is listening" << endl;
     } else {
@@ -156,8 +156,8 @@ test_read(std::string &filespec)
     
     
 //    list.addListener(filespec);
-    listeners = list.listListeners();
-    if (listeners->size() == 0) {
+    listeners.reset( list.listListeners() );
+    if (listeners->empty()) {
         cout << "Nobody is listening" << endl;
     } else {
         for (it=listeners->begin(); it!=listeners->end(); it++) {
@@ -399,8 +399,8 @@ main(int /*argc*/, char /* *argv[]*/)
     addListener(str1);
     
     vector<string>::const_iterator it;
-    vector<string> *listeners = listListeners();
-    if (listeners->size() == 0) {
+    auto_ptr< vector<string> > listeners ( listListeners() );
+    if (listeners->empty()) {
         log_msg("Nobody is listening");
     } else {
         log_msg("There are %d", listeners->size());
@@ -410,17 +410,14 @@ main(int /*argc*/, char /* *argv[]*/)
         }
     }
 
-    delete listeners;
-    
     str1 = "HelloWorld";
     removeListener(str1);
-    listeners = listListeners();  
+    listeners.reset( listListeners() );
     log_msg("There are %d", listeners->size());
     for (it=listeners->begin(); it != listeners->end(); it++) {
         string str = *it;
         log_debug("Listeners: %s", str.c_str());
     }
     
-    delete listeners;
 #endif // }
 

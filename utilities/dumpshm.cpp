@@ -344,7 +344,7 @@ dump_shm(bool convert)
     
     LcShm lc;
     lc.connect(key);
-    vector<string> *listeners = lc.listListeners();
+    auto_ptr< vector<string> > listeners ( lc.listListeners() );
     cout << "There are " << listeners->size() << " Listeners listening" << endl; 
     lc.dump();
     
@@ -360,7 +360,6 @@ dump_shm(bool convert)
 	close(fd);
     }
     
-    delete listeners;
     exit (0);
 }
 

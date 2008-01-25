@@ -1,3 +1,12 @@
+2008-01-25 Sandro Santilli <strk@keybit.net>
+
+	* libamf/lcshm.{cpp,h}, server/asobj/LocalConnection.cpp,
+	  testsuite/libamf.all/test_lc.cpp, utilities/dumpshm.cpp:
+	  Use std::auto_ptr for returning newly allocated stuff
+	  while transferring ownerhips to caller.
+	* testsuite/misc-ming.all/NetStream-SquareTest.c: add some newlines
+	  to workaround some bug in Ming head.
+
 2008-01-25  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* libamf/amf.cpp: Make extractElement() only process a single
