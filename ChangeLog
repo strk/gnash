@@ -1,5 +1,9 @@
 2008-01-25 Sandro Santilli <strk@keybit.net>
 
+	* server/DynamicShape.cpp (clear): reset _currfill and _currline
+	  or they might point to released memory (line/fill styles were
+	  cleared). Fixes illegal vector access in
+	  http://www.gazbming.com/embed.php?id=sketchpad
 	* server/swf/DefineFontAlignZonesTag.cpp: warn only
 	  once about not being implemented.
 	* server/parser/shape_character_def.cpp (read): 
