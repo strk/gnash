@@ -1,3 +1,8 @@
+2008-01-25 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/asobj/NetStreamGst.cpp: print the element name when reporting
+	about an error message coming from the pipeline.
+
 2008-01-25 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/String.as: add better test

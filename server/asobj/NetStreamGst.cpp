@@ -28,6 +28,7 @@
 #include "gstgnashsrc.h"
 #include "Object.h"
 #include "gstflvdemux.h"
+#include <gst/gstelement.h>
 
 
 //                                        video -> ffmpegcolorspace -> capsfilter -> fakesink
@@ -474,7 +475,8 @@ NetStreamGst::handleMessage (GstMessage *message)
       gchar *debug;
       gst_message_parse_error (message, &err, &debug);
       
-      log_error(_("NetStream playback halted because: %s\n"), err->message);
+      log_error(_("NetStream playback halted; module %s reported: %s\n"),
+                gst_element_get_name(GST_MESSAGE_SRC (message)), err->message);
       
       g_error_free (err);
       g_free (debug);
