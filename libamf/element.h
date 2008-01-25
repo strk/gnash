@@ -76,6 +76,9 @@ public:
     Element &init(bool data);
 
     // These create the other "special" AMF types.
+    Element &makeString(boost::uint8_t *data, int size); 
+    Element &makeNumber(boost::uint8_t *data); 
+    Element &makeBoolean(boost::uint8_t *data); 
     Element &makeUndefined();
     Element &makeUndefined(const std::string &name);
     Element &makeNull();
@@ -105,10 +108,10 @@ public:
     void setData(boost::uint8_t *x) { _data = x; };
 
     // These accessors convert the raw data to a standard data type we can use.
-    double to_number() { return *(reinterpret_cast<double *>(_data)); };
-    const char *to_string() { return reinterpret_cast<const char *>(_data); };
-    bool to_bool() { return *(reinterpret_cast<bool *>(_data)); };
-    void *to_reference() { return reinterpret_cast<void *>(_data); };
+    double to_number();
+    const char *to_string();
+    bool to_bool();
+    void *to_reference();
     
     boost::uint16_t getLength() { return _length; };
     void setLength(boost::uint16_t x) { _length = x; };

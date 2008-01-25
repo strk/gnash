@@ -22,11 +22,15 @@
 
 #include <unistd.h>
 #include <cerrno>
+#include <vector>
+#include <string>
 #include <cstring>
 #include <boost/cstdint.hpp>
 
 #include "log.h"
 #include "amf.h"
+#include "shm.h"
+#include "element.h"
 #include "lcshm.h"
 
 using namespace std;
@@ -54,44 +58,60 @@ const int LC_LISTENERS_START  = MAX_LC_HEADER_SIZE +  LC_HEADER_SIZE;
 /// \brief Open a connection between two SWF movies so they can send
 /// each other Flash Objects to be executed.
 ///
-LcShm::LcShm()
+LcShm::LcShm() 
+    : _baseaddr(0)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
+}
+
+LcShm::LcShm(boost::uint8_t *addr)
+{
+//    GNASH_REPORT_FUNCTION;
+    _baseaddr = addr;
+}
+
+LcShm::LcShm(key_t key)
+{
+//    GNASH_REPORT_FUNCTION;
+    _shmkey = key;
 }
 
 LcShm::~LcShm()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     vector<amf::Element *>::iterator it;
     for (it = _amfobjs.begin(); it != _amfobjs.end(); it++) {
 	amf::Element *el = (*(it));
-	delete el;
+         if (el) {
+//             el->dump();
+             delete el;
+         }
     }
 }
 
 Listener::Listener()
     : _baseaddr(0)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 }
 
 Listener::Listener(boost::uint8_t *x)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     _baseaddr = x;
 }
 
 Listener::~Listener()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 }
 
 // see if a connection name exists in our list of listeners
 bool
 Listener::findListener(std::string &name)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
     char *item = reinterpret_cast<char *>(addr);
@@ -166,19 +186,22 @@ Listener::removeListener(std::string &name)
     return false;
 }
 
-std::vector<std::string> *
+vector<string> *
 Listener::listListeners()
 {
-    GNASH_REPORT_FUNCTION;
-
-    boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
-
+//    GNASH_REPORT_FUNCTION;    
     vector<string> *listeners = new vector<string>;
-    const char *item = reinterpret_cast<const char *>(addr);
-    while (*item != 0) {
-        listeners->push_back(item);
-        item += strlen(item) + 1;
-    }    
+    if (_baseaddr != 0) {
+        boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
+        
+        const char *item = reinterpret_cast<const char *>(addr);
+        while (*item != 0) {
+            if (item[0] != ':') {
+                listeners->push_back(item);
+            }
+            item += strlen(item) + 1;
+        }
+    }
 
     return listeners;
 }
@@ -213,35 +236,23 @@ LcShm::parseElement(amf::Element *el, boost::uint8_t *data)
 #endif
 
 vector<amf::Element *> 
-LcShm::parseBody(boost::uint8_t * /*data*/)
+LcShm::parseBody(boost::uint8_t *data)
 {
-    GNASH_REPORT_FUNCTION;
-
-    //boost::uint8_t *ptr = reinterpret_cast<uint8_t *>(data);
-    //Element::astype_e type = (Element::astype_e)*ptr;
-//    log_msg(_("Type is %s"), astype_str[type]);
-    amf::Element el;
+//    GNASH_REPORT_FUNCTION;
+    boost::uint8_t *ptr = reinterpret_cast<uint8_t *>(data);
     AMF amf;
 
-#if 0
-    while ((*(ptr) != 0) || (*(ptr) != 0) || (*(ptr) != 0)) {
-        switch (type) {
-          case AMF::NUMBER:
-              double dub = 50.0;
-              amf_obj.createElement(&el, "gain", dub);
-              break;
-          case AMF::STRING:
-              amf_obj.createElement(&el, name, data);
-              break;
-          default:
-              break;
-        };
-        
+    while (ptr) {
+        amf::Element *el = new Element;
+        ptr = amf.extractElement(el, ptr);
+        if (el->getType() == Element::NUMBER) {
+            if (el->to_number() == 0.0) {
+                ptr = 0;
+                continue;
+            }
+        }
         addObject(el);
-//        ptr = amf.readElement(ptr);
-        printf("FIXME:");
     };
-#endif
     
     return _amfobjs;
 }
@@ -265,41 +276,59 @@ LcShm::parseBody(boost::uint8_t * /*data*/)
 boost::uint8_t *
 LcShm::parseHeader(boost::uint8_t *data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     boost::uint8_t *ptr = data;
     
     memcpy(&_header, ptr, LC_HEADER_SIZE);
 //     memcpy(&_object, data + LC_HEADER_SIZE, _header.length);
-    log_debug("Timestamp: %ud", _header.timestamp);
-    log_debug("Length: %ud", _header.length);
+//    log_debug("Timestamp: %d", _header.timestamp);
+//    log_debug("Length: %d", _header.length);
 //     log_debug("Connection: %s", _object.connection_name);
 //     log_debug("name: %s", _object.hostname);
     ptr += LC_HEADER_SIZE;
+
+    
+    Element *el = new amf::Element;
     AMF amf;
-#if 0
-    _object.connection_name = amf.extractString(ptr);
-    ptr += _object.connection_name.size() + 3;
-    _object.hostname = amf.extractString(ptr);
-    ptr += _object.hostname.size() + 3;
-    _object.domain = ptr + 2;
-    ptr += 3;
-    _object.unknown_num1 = amf.extractNumber(ptr);
-    ptr += AMF_NUMBER_SIZE + 1;
-    _object.unknown_num1 = amf.extractNumber(ptr);
-    ptr += AMF_NUMBER_SIZE + 2;
-#endif
+    ptr = amf.extractElement(el, ptr);
+    _object.connection_name = el->to_string();
+    delete el;
+    
+    el = new amf::Element;
+    ptr = amf.extractElement(el, ptr);
+    _object.hostname = el->to_string();
+    delete el;
+    
+//     el = new amf::Element;
+//     ptr = amf.extractElement(el, ptr);
+//     _object.domain = el->to_bool();
+//     delete el;
+    
+//     el = new amf::Element;
+//     ptr = amf.extractElement(el, ptr);
+//     _object.unknown_num1 = el->to_number();
+//     delete el;
+    
+//     el = new amf::Element;
+//     ptr = amf.extractElement(el, ptr);
+//     _object.unknown_num2 = el->to_number();
+//     delete el;
     
 //    memcpy(&_object, data + LC_HEADER_SIZE, _header.length);
-    log_debug("Connection: %s", _object.connection_name.c_str());
-    log_debug("name: %s", _object.hostname.c_str());
-
+//     log_debug("Connection: %s", _object.connection_name.c_str());
+//     log_debug("name: %s", _object.hostname.c_str());
+//     log_debug("domain: %s", (_object.domain) ? "true" : "false");
+//     log_debug("unknown_num1: %f", _object.unknown_num1);
+//     log_debug("unknown_num2: %f", _object.unknown_num2);
+    
+//    ptr += 3;                   // skip past the NULL terminator
     return ptr;
 }
 
 boost::uint8_t *
 LcShm::formatHeader(boost::uint8_t * /*data*/)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     return NULL;
 }
 
@@ -312,7 +341,7 @@ LcShm::formatHeader(boost::uint8_t * /*data*/)
 bool
 LcShm::connect(string &name)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     _name = name;
     
@@ -326,17 +355,31 @@ LcShm::connect(string &name)
     }
     
     Listener::setBaseAddress(reinterpret_cast<uint8_t *>(Shm::getAddr()));
+    boost::uint8_t *ptr = parseHeader(Listener::getBaseAddress());
+    vector<amf::Element *> ellist = parseBody(ptr);
     
     return true;
 }
 
 bool
-LcShm::addObject(amf::Element * /* el */)
+LcShm::connect(key_t key)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
+    
+    if (Shm::attach(key, true) == false) {
+        return false;
+    }
 
-    return false;
-
+    if (Shm::getAddr() <= 0) {
+        log_error("Failed to open shared memory segment: 0x%x", key);
+        return false; 
+    }
+    
+    Listener::setBaseAddress(reinterpret_cast<uint8_t *>(Shm::getAddr()));
+    boost::uint8_t *ptr = parseHeader(Listener::getBaseAddress());
+    vector<amf::Element *> ellist = parseBody(ptr);
+    
+    return true;
 }
 
 /// \brief Invokes a method on a specified LcShm object.
@@ -345,6 +388,36 @@ LcShm::send(const std::string & /*name*/, const std::string & /*dataname*/, amf:
 {
     
     log_unimpl (__FUNCTION__);
+}
+
+void
+LcShm::dump()
+{
+//    GNASH_REPORT_FUNCTION;
+
+//     cerr <<"Timestamp: " << _header.timestamp << endl;
+//     cerr << "Length: " << _header.length << endl;
+
+    cerr << "Connection Name:\t" << _object.connection_name << endl;
+    cerr << "Hostname Name:\t\t" << _object.hostname << endl;
+    cerr << "Domain Allowed:\t\t" << ((_object.domain) ? "true" : "false") << endl;
+    vector<amf::Element *>::iterator ait;
+//    cerr << "# of Elements in file: " << _amfobjs.size() << endl;
+    for (ait = _amfobjs.begin(); ait != _amfobjs.end(); ait++) {
+	amf::Element *el = (*(ait));
+        el->dump();
+    }
+
+    vector<string>::const_iterator lit;
+    vector<string> *listeners = listListeners();
+    for (lit=listeners->begin(); lit!=listeners->end(); lit++) {
+        string str = *lit;
+        if (str[0] != ':') {
+            cerr << "Listeners:\t" << str << endl;
+// 		total++;
+        }
+    }
+    delete listeners;
 }
 
 } // end of gnash namespace

@@ -45,9 +45,11 @@ public:
     bool removeListener(std::string &name);
     std::vector<std::string> *listListeners();
     void setBaseAddress(boost::uint8_t *addr) { _baseaddr = addr; };
+    boost::uint8_t *getBaseAddress() { return _baseaddr; };
 protected:
     std::string _name;
     boost::uint8_t *_baseaddr;
+//    std::vector<std::string> _listeners;
 };
 
 class LcShm : public Listener, public Shm {
@@ -72,19 +74,25 @@ public:
         double unknown_num2;
     } lc_object_t;
     LcShm();
+    LcShm(boost::uint8_t *baseaddr);
+    LcShm(key_t key);
     ~LcShm();
     bool connect(std::string &name);
+    bool connect(key_t key);
     void close(void);
     void send(const std::string &name, const std::string &dataname, amf::Element *data);
     void recv(std::string &name, std::string &dataname, amf::Element *data);
     std::vector<amf::Element *> parseBody(boost::uint8_t *data);
     boost::uint8_t *parseHeader(boost::uint8_t *data);
     boost::uint8_t *formatHeader(boost::uint8_t *data);
-    bool addObject(amf::Element *el);
+    void addObject(amf::Element *el) { _amfobjs.push_back(el); };
     size_t size() { return _amfobjs.size(); };
     std::vector<amf::Element *> getElements() { return _amfobjs; };
+
+    void setBaseAddr(boost::uint8_t *x) { _baseaddr = x; };
+    void dump();
 private:
-    uint8_t *_baseaddr;
+    boost::uint8_t *_baseaddr;
     lc_header_t _header;
     lc_object_t _object;
     std::vector<amf::Element *> _amfobjs;

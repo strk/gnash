@@ -1368,8 +1368,9 @@ AMF::parseBody()
 
 //    return parseBody(_amf_data, _total_size);
 }
+#endif
 
-uint8_t *
+boost::uint8_t *
 AMF::extractElement(Element *el, boost::uint8_t *in)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -1394,6 +1395,7 @@ AMF::extractElement(Element *el, boost::uint8_t *in)
     hexint =  (boost::uint8_t*) malloc((bytes * 3) + 12);
     hexify((boost::uint8_t *)hexint, (boost::uint8_t *)in, bytes, true);
     log_msg(_("The packet body is: 0x%s"), hexint);
+    free(hexint);
 #endif
 
     tmpptr = in;
@@ -1404,61 +1406,59 @@ AMF::extractElement(Element *el, boost::uint8_t *in)
 // After the element name there is a type byte. If it's a Number type, then 8 bytes are read
 // If it's a String type, then there is a count of characters, then the string value    
     
-    while (tmpptr  <= (in + bytes)) {
-        memset(buffer, 0, sizeof(buffer));	//FIXME, slow
-        // Check the type of the element data
-        char type = *(Element::astype_e *)tmpptr;
-        tmpptr++;                        // skip the header byte
-
-        switch ((Element::astype_e)type) {
-          case Element::NUMBER:
-//              memcpy(buffer, tmpptr, 8);
-              tmpptr += 8;
-              continue;
-              break;
-          case Element::BOOLEAN:
-          case Element::STRING:
-              // get the length of the name
-              length = ntohs((*(short *)tmpptr) & 0xffff);
-              tmpptr += 2;
-              log_msg(_("AMF String length is: %d"), length);
-              // get the name of the element
-              if (length) {
-                  memcpy(buffer, tmpptr, length);
-              }
-              tmpptr += length;
-              log_msg(_("AMF String is: %s"), buffer);              
-              el.name = buffer;
-              break;
-          case Element::OBJECT:
-              do {
-                  tmpptr = extractVariable(&el, tmpptr);
-              } while (el.type != Element::OBJECT_END);
-              break;
-          case Element::MOVIECLIP:
-          case Element::NULL_VALUE: 
-          case Element::UNDEFINED:
-          case Element::REFERENCE:
-          case Element::ECMA_ARRAY:
-          case Element::OBJECT_END:
-          case Element::STRICT_ARRAY:
-          case Element::DATE:
-          case Element::LONG_STRING:
-          case Element::UNSUPPORTED:
-          case Element::RECORD_SET:
-          case Element::XML_OBJECT:
-          case Element::TYPED_OBJECT:
-          default:
-	    log_unimpl("%s: type %d", __PRETTY_FUNCTION__, (int)type);
-              return 0;
-        }
+    // Check the type of the element data
+    char type = *(Element::astype_e *)tmpptr;
+    tmpptr++;                        // skip the header byte
+    
+    switch ((Element::astype_e)type) {
+      case Element::NUMBER:
+	  el->makeNumber(tmpptr);
+	  tmpptr += 8;
+	  break;
+      case Element::BOOLEAN:
+	  el->makeBoolean(tmpptr);
+	  tmpptr += 2;
+	  break;
+      case Element::STRING:
+	  // get the length of the name
+	  length = ntohs((*(short *)tmpptr) & 0xffff);
+	  tmpptr += 2;
+//	  log_msg(_("AMF String length is: %d"), length);
+	  if (length > 0) {
+	      // get the name of the element
+	      el->makeString(tmpptr, length);
+//	      log_msg(_("AMF String is: %s"), el->to_string());
+	      tmpptr += length;
+	  } else {
+	      el->setType(Element::STRING);
+	      el->setData(0);
+	  };
+	  break;
+      case Element::OBJECT:
+	  do {
+	      tmpptr = extractVariable(el, tmpptr);
+	  } while (el->getType() != Element::OBJECT_END);
+	  break;
+      case Element::MOVIECLIP:
+      case Element::NULL_VALUE: 
+      case Element::UNDEFINED:
+      case Element::REFERENCE:
+      case Element::ECMA_ARRAY:
+      case Element::OBJECT_END:
+      case Element::STRICT_ARRAY:
+      case Element::DATE:
+      case Element::LONG_STRING:
+      case Element::UNSUPPORTED:
+      case Element::RECORD_SET:
+      case Element::XML_OBJECT:
+      case Element::TYPED_OBJECT:
+      default:
+	  log_unimpl("%s: type %d", __PRETTY_FUNCTION__, (int)type);
+	  return 0;
     }
-
-    free(hexint);
-
-    return 0;
+    
+    return tmpptr;
 }
-#endif
 
 boost::uint8_t *
 AMF::extractVariable(Element *el, boost::uint8_t *in)

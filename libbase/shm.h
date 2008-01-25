@@ -61,7 +61,9 @@ public:
     DSOEXPORT ~Shm();
     
     // Initialize the shared memory segment
+    bool attach();
     bool attach(char const *filespec, bool nuke);
+    bool attach(key_t key, bool nuke);
     
     // Resize the allocated memory segment
     bool resize(int bytes);

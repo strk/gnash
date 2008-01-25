@@ -67,19 +67,69 @@ const int DEFAULT_SHM_SIZE = 64528;
 
   Shm::Shm() :_addr(0), _alloced(0), _size(0), _shmkey(0), _shmfd(0)
 {
+//    GNASH_REPORT_FUNCTION;
     memset(_filespec, 0, MAX_SHM_NAME_SIZE);
 }
 
 Shm::~Shm()
 {
+//    GNASH_REPORT_FUNCTION;
 }
+
+bool
+Shm::attach()
+{
+//    GNASH_REPORT_FUNCTION;
+    return attach(0, false);
+}
+
+bool
+Shm::attach(key_t key, bool nuke)
+{
+//    GNASH_REPORT_FUNCTION;
     
-/// \brief Initialize the shared memory segment
+#if defined(USE_SYSV_SHM) && defined(HAVE_SHMGET)
+    const int shmflg = 0660 | IPC_CREAT;
+    // this is the magic size of shared memory segments used by the other flash player;
+    _size = 64528;
+    // this is the magic shared memory key used by the other player.
+    if (key != 0) {
+	_shmkey = key;
+    }
+    
+    // If there is no SYSV style shared memory key in the users ~/.gnashrc file, warn them
+    // that compatibility will be broken, and then just pick our own key so things still work
+    // finer when using just Gnash.
+    if (_shmkey == 0) {
+	log_error("No Shared Memory key specified in ~/.gnashrc! Please run \"dumpshm -i\" to find your key if you want to be conpatible with the other swf player.");
+	_shmkey = 0xdd3adabd;
+    }
+    
+    _shmfd = shmget(_shmkey, _size, shmflg);
+    if (_shmfd < 0 && errno == EEXIST) {
+	// Get the shared memory id for this segment
+	_shmfd = shmget(_shmkey, _size, 0);
+    }
+    _addr = (char *)shmat(_shmfd, 0, 0);
+    if (_addr <= 0) {
+	log_msg("WARNING: shmat() failed: %s\n", strerror(errno));
+	return false;
+    }
+
+    return true;
+#else
+#error "You need SYSV Shared memory support to use this option"
+#endif	 // end of USE_SYSV_SHM
+}	
+
+// \brief Initialize the shared memory segment
 ///
 /// This creates or attaches to an existing shared memory segment.
 bool
 Shm::attach(char const *filespec, bool nuke)
 {
+//    GNASH_REPORT_FUNCTION;
+    
     bool exists = false;
     long addr;
     // #ifdef FLAT_ADDR_SPACE
@@ -352,6 +402,7 @@ Shm::attach(char const *filespec, bool nuke)
 Shm *
 Shm::cloneSelf(void)
 {
+//    GNASH_REPORT_FUNCTION;
 
     if (_addr > 0) {
 //         log_msg("Cloning ShmControl, %d bytes to %p\n",
@@ -372,6 +423,7 @@ Shm::cloneSelf(void)
 bool
 Shm::resize()
 {
+//    GNASH_REPORT_FUNCTION;
     // Increase the size by 10 %
     return resize(DEFAULT_SHM_SIZE + (DEFAULT_SHM_SIZE/10)); 
 }
@@ -380,6 +432,7 @@ bool
 Shm::resize(int bytes)
     
 {
+//    GNASH_REPORT_FUNCTION;
 #ifdef HAVE_MREMAP
     _addr = mremap(_shmAddr, _shmSize, _shmSize + bytes, MREMAP_MAYMOVE);
     if (_addr != 0) {
@@ -398,6 +451,7 @@ Shm::resize(int bytes)
 void *
 Shm::brk(int bytes)
 {
+//    GNASH_REPORT_FUNCTION;
     int wordsize = sizeof(long);
     
     // Adjust the allocated amount of memory to be on a word boundary.
@@ -444,6 +498,7 @@ Shm::brk(int bytes)
 bool
 Shm::closeMem()
 {
+//    GNASH_REPORT_FUNCTION;
     // Only nuke the shared memory segement if we're the last one.
 #ifdef USE_POSIX_SHM
 #ifdef HAVE_SHM_UNLINK
@@ -478,6 +533,7 @@ Shm::closeMem()
 bool
 Shm::exists()
 {
+//    GNASH_REPORT_FUNCTION;
     struct stat           stats;
     struct dirent         *entry;
     vector<const char *>  dirlist;

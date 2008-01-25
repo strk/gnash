@@ -123,11 +123,13 @@ test_read(std::string &filespec)
     srcdir += "/segment.raw";
     int fd = ::open(srcdir.c_str(), O_RDONLY);
     void *dataptr = static_cast<unsigned char *>(mmap(0, 64528, PROT_READ, MAP_SHARED, fd, 0));
+#if 0
     if (dataptr != (void *)0xffffffff) {
         memcpy(shmaddr, dataptr, 64528);
     } else {
         cerr << "ERROR: couldn't map input file!" << endl;
     }
+#endif
     ::close(fd);
     
     Listener list(reinterpret_cast<uint8_t *>(shmaddr));
@@ -153,7 +155,7 @@ test_read(std::string &filespec)
     }
     
     
-    list.addListener(filespec);
+//    list.addListener(filespec);
     listeners = list.listListeners();
     if (listeners->size() == 0) {
         cout << "Nobody is listening" << endl;
@@ -168,7 +170,9 @@ test_read(std::string &filespec)
     }
 
     boost::uint8_t *ptr = lc.parseHeader(reinterpret_cast<boost::uint8_t *>(shmaddr));
-    lc.parseBody(ptr);
+    vector<amf::Element *> ellist = lc.parseBody(ptr);
+//    cout << "# of AMF Elements in file: " << ellist.size() << endl;
+//    lc.dump();
 }
 
 bool
@@ -382,3 +386,41 @@ main(int /*argc*/, char /* *argv[]*/)
 }
 
 #endif
+
+#if 0 // { // what are these Listeners ?
+
+    Listener::setBaseAddress(Shm::getAddr());
+        
+    string str1 = "HelloWorld";
+    addListener(str1);
+    str1 = "GutenTag";
+    addListener(str1);
+    str1 = "Aloha";
+    addListener(str1);
+    
+    vector<string>::const_iterator it;
+    vector<string> *listeners = listListeners();
+    if (listeners->size() == 0) {
+        log_msg("Nobody is listening");
+    } else {
+        log_msg("There are %d", listeners->size());
+        for (it=listeners->begin(); it!=listeners->end(); it++) {
+            string str = *it;
+            log_debug("Listeners: %s", str.c_str());
+        }
+    }
+
+    delete listeners;
+    
+    str1 = "HelloWorld";
+    removeListener(str1);
+    listeners = listListeners();  
+    log_msg("There are %d", listeners->size());
+    for (it=listeners->begin(); it != listeners->end(); it++) {
+        string str = *it;
+        log_debug("Listeners: %s", str.c_str());
+    }
+    
+    delete listeners;
+#endif // }
+

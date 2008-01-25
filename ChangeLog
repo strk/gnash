@@ -1,3 +1,19 @@
+2008-01-25  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libamf/amf.cpp: Make extractElement() only process a single
+	element instead of looping.
+	* libamf/element.{h,cpp}: Convert the element in common data
+	types. Add methods for creating special AMF objects.
+	* libamf/lcshm.{cpp,h}: Add better support for SYSV style memory
+	segments. Tweak parseHeader() to only grab the header, and not
+	any of the AMF elements in the body. Also parse the header and the
+	body of the memory segment when connecting. Add dump() method.
+	* libbase/shm.{cpp,h}: Move SYSV style memory support to it's own
+	method to reduce ifdef spagetti.
+	* utilities/dumpshm.cpp: Use rewritten LcShm class instead of
+	handling the segment directly.
+	* testsuite/libamf.all/test_lc.cpp: 
+
 2008-01-25 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/place_object_test.c: add more tests (and 

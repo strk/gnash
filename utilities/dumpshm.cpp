@@ -336,54 +336,32 @@ dump_shm(bool convert)
 	cerr << "No shared memory segments found!" << endl;
 	return;
     }
-    log_msg("SHM Key 0x%x", key);
-  
+//    log_msg("SHM Key 0x%x", key);
+    
     int size = 64528;			// 1007 bytes less than unsigned
     int flags = 0660 | IPC_CREAT;
     int total = 0;
     
-    id = shmget(key, size, flags);
-    if (id < 0) {
- 	cerr << "shmget() failed!: " <<  strerror(errno) << endl;
-	return;
-    }
-
-    shmaddr = (char *)shmat (id, 0, SHM_RDONLY); // attach segment for reading
-    if (shmaddr == (char *)-1) {
- 	cerr << "shmat() failed!: " <<  strerror(errno) << endl;
-	return;
-    }
-
-    Listener list(reinterpret_cast<boost::uint8_t *>(shmaddr));
-    vector<string>::const_iterator it;
-    vector<string> *listeners = list.listListeners();
-    if (listeners->size() == 0) {
-        cout << "Nobody is listening" << endl;
-    } else {
-        for (it=listeners->begin(); it!=listeners->end(); it++) {
-            string str = *it;
-	    if ((str[0] != ':') || (verbosity > 0)) {
-		cout << " Listeners: " << str << endl;
-		total++;
-	    }
-        }
-    }
+    LcShm lc;
+    lc.connect(key);
+    vector<string> *listeners = lc.listListeners();
+    cout << "There are " << listeners->size() << " Listeners listening" << endl; 
+    lc.dump();
     
-    cout << "There are " << total << " Listeners listening" << endl; 
     // If the -c convert options was specified, dump the memory segment to disk.
     // This makes it easy to store them as well as to examine them in great detail.
     if (convert) {
-	//char buf[size+1];
 	int fd = open("segment.raw",O_WRONLY|O_CREAT, S_IRWXU);
 	if (fd == -1) {
 	    perror("open");
 	}
+	cout << "Writing memory segment to disk: \"segment.raw\"" << endl;
 	write(fd, shmaddr, size);
 	close(fd);
     }
     
-    shmdt (shmaddr);		// detach segment
-    exit (0);			// quit leaving resource allocated
+    delete listeners;
+    exit (0);
 }
 
 key_t

@@ -191,6 +191,36 @@ Element::clear()
     
 }
 
+double
+Element::to_number()
+{
+    if (_data) {
+	return *(reinterpret_cast<double *>(_data));
+    }
+    return nan("NaN");
+}
+
+const char *
+Element::to_string()
+{
+    return reinterpret_cast<const char *>(_data);
+};
+
+bool
+Element::to_bool()
+{
+    if (_data) {
+	return *(reinterpret_cast<bool *>(_data));
+    }
+    return false;
+};
+
+void *
+Element::to_reference()
+{
+    return reinterpret_cast<void *>(_data);
+};
+
 Element &
 Element::operator=(Element &el)
 {
@@ -229,6 +259,44 @@ Element::init(boost::uint8_t *indata)
     memcpy(_data, &indata, AMF_NUMBER_SIZE);
 
     return indata + AMF_NUMBER_SIZE;
+}
+
+Element &
+Element::makeString(boost::uint8_t *data, int size)
+{
+//    GNASH_REPORT_FUNCTION;
+    
+    _type = Element::STRING;
+    _length = size;
+    _data = new boost::uint8_t[size+1];
+    memset(_data, 0, size+1);
+    memcpy(_data, data, size);
+    return *this;
+}
+
+Element &
+Element::makeNumber(boost::uint8_t *data)
+{
+//    GNASH_REPORT_FUNCTION;
+    
+    _type = Element::NUMBER;
+    _length = amf::AMF_NUMBER_SIZE;
+    _data = new boost::uint8_t[amf::AMF_NUMBER_SIZE];
+    memcpy(_data, data, amf::AMF_NUMBER_SIZE);
+    return *this;
+}
+
+Element &
+Element::makeBoolean(boost::uint8_t *data)
+{
+//    GNASH_REPORT_FUNCTION;
+    
+    _type = Element::BOOLEAN;
+    _length = 1;
+    _data = new boost::uint8_t[2];
+    memset(_data, 0, 2);
+    memcpy(_data, data+1, 1);
+    return *this;
 }
 
 Element &
@@ -417,17 +485,53 @@ Element::makeStrictArray(boost::uint8_t *indata, int size)
 void
 Element::dump()
 {
-    log_debug("AMF Type is: %s", astype_str[_type]);
-    log_debug("AMF Length is: %d", _length);
+//    GNASH_REPORT_FUNCTION;
+    
     if (_name.size()) {
-	log_debug("AMF Name is: %s", _name.c_str());
+	cerr << "Dumping AMF Varible: " << _name << endl;
     }
-#if 0
-    boost::uint8_t *hexint;
-    hexint = new boost::uint8_t[(_length + 3) * 3];
-    hexify((boost::uint8_t *)hexint, _data, _length, false);
-    log_debug("AMF data is: 0x%s", hexint);
-#endif
+
+    cerr << astype_str[_type] << ": ";
+
+    switch (_type) {
+      case Element::NUMBER:
+	  cerr << "AMF Numeric value: " << to_number() << endl;
+	  break;
+      case Element::BOOLEAN:
+	  cerr << "AMF Boolean value: " << (to_bool() ? "true" : "false") << endl;
+	  break;
+      case Element::STRING:
+	  cerr << "(" << _length << " bytes): ";
+	  if (_length > 0) {
+	      cerr << "\t\"" << to_string() << "\"" << endl;
+	  } else {
+	      cerr << endl;
+	  }
+	  break;
+      case Element::OBJECT:
+	  break;
+      case Element::MOVIECLIP:
+      case Element::NULL_VALUE: 
+      case Element::UNDEFINED:
+      case Element::REFERENCE:
+      case Element::ECMA_ARRAY:
+      case Element::OBJECT_END:
+      case Element::STRICT_ARRAY:
+      case Element::DATE:
+      case Element::LONG_STRING:
+      case Element::UNSUPPORTED:
+      case Element::RECORD_SET:
+      case Element::XML_OBJECT:
+      case Element::TYPED_OBJECT:
+	  boost::uint8_t *hexint;
+	  hexint = new boost::uint8_t[(_length + 3) * 3];
+	  hexify((boost::uint8_t *)hexint, _data, _length, false);
+	  cerr << "AMF data is: 0x%s" << hexint << endl;
+	  break;
+      default:
+	  log_unimpl("%s: type %d", __PRETTY_FUNCTION__, (int)_type);
+    }
+    
 }
 
 } // end of amf namespace
