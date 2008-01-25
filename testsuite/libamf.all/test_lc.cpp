@@ -156,7 +156,7 @@ test_read(std::string &filespec)
     
     
 //    list.addListener(filespec);
-    listeners.reset( list.listListeners() );
+    listeners = list.listListeners(); // will delete former listener list
     if (listeners->empty()) {
         cout << "Nobody is listening" << endl;
     } else {
