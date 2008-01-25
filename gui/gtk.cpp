@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.138 2008/01/23 12:10:22 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.139 2008/01/25 13:13:19 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -1327,6 +1327,8 @@ GtkGui::showAboutDialog()
         "Markus Gothe", 
         "Vitaly Alexeev",
 	"John Gilmore",
+	"Zou Lunkai",
+	"Benjamin Wolsey",
         NULL 
     };
 
