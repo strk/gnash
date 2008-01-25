@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: DefineFontAlignZonesTag.cpp,v 1.6 2008/01/21 20:56:02 rsavoye Exp $ */
+/* $Id: DefineFontAlignZonesTag.cpp,v 1.7 2008/01/25 12:17:32 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -67,7 +67,11 @@ DefineFontAlignZonesTag::loader(stream* in, tag_type tag, movie_definition* m)
 	);
 
 	in->skip_to_tag_end();
-	log_error(_("FIXME: DefineFontAlignZoneTag unfinished"));
+	static bool warned=false;
+	if ( ! warned ) {
+		log_unimpl(_("DefineFontAlignZoneTag"));
+		warned = true;
+	}
 
 
 }

@@ -1,5 +1,7 @@
 2008-01-25 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/DefineFontAlignZonesTag.cpp: warn only
+	  once about not being implemented.
 	* server/parser/shape_character_def.cpp (read): 
 	  add warning about unimplemented DEFINESHAPE4 edge
 	  boundaries and scales.
