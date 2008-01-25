@@ -27,7 +27,7 @@ localedir = $(datadir)/locale
 pluginsdir = $(libdir)/gnash/plugins
 
 # noinst_LTLIBRARIES = libgnashgui.la
-BUILT_SOURCES = klash.moc .configline
+BUILT_SOURCES = .configline
 
 EXTRA_DIST = gnash.in
 
@@ -184,6 +184,7 @@ endif
 
 # Build the KDE gui
 if BUILD_KDE_GUI
+BUILT_SOURCES += klash.moc 
 include $(srcdir)/am-frag/kde.am
 endif
 

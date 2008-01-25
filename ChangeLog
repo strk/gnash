@@ -1,5 +1,7 @@
 2008-01-25 Sandro Santilli <strk@keybit.net>
 
+	* gui/Makefile.am: generate klash.moc onlhy if KDE gui is enabled.
+	  Fixes bug #21019.
 	* libamf/lcshm.{cpp,h}, server/asobj/LocalConnection.cpp,
 	  testsuite/libamf.all/test_lc.cpp, utilities/dumpshm.cpp:
 	  Use std::auto_ptr for returning newly allocated stuff
