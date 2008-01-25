@@ -878,7 +878,7 @@ Gui::getMovieInfo() const
     {
         ss << ch->getTarget() << " (" << typeName(*ch) << ")";
     }
-    ret->insert(ret->begin(), StringPair("Topmost mouse entity", ss.str()));
+    ret->insert(ret->begin(), StringPair("Topmost mouse entity: ", ss.str()));
 
     return ret;
 }
