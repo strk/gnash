@@ -22,7 +22,7 @@
 //
 // execute the movie by passing:
 //	QueryString="?a=a_in_qstring&q=q_in_qstring&MixCaseQstr=mixQstr&dejagnu.nested=chFvars&_root.fqv=fqQstr"
-//	FlashVars="&a=a_in_fvars&v=v_in_fvars&MixCaseFvars=mixFvars&dejagnu.nested=chFVars&_root.fqv=fqFVars"
+//	FlashVars="&a=a_in_fvars&v=v_in_fvars&MixCaseFvars=mixFvars&dejagnu.nested=chFVars&_root.fqv=fqFVars&complex={a:'1',b:2}"
 //
 // QueryString is what appears embedded in the url,
 // FlashVars can be given as an attribute of the <embed> tag
@@ -30,16 +30,10 @@
 //
 // Example:
 //
-// gnash -P FlashVars="&a=a_in_fvars&v=v_in_fvars&MixCaseFvars=mixFvars&dejagnu.nested=chFVars&_root.fqv=fqFVars"
+// gnash -P FlashVars="&a=a_in_fvars&v=v_in_fvars&MixCaseFvars=mixFvars&dejagnu.nested=chFVars&_root.fqv=fqFVars&complex={a:'1',b:2}"
 //	"FlashParamTest.swf?a=a_in_qstring&q=q_in_qstring&MixCaseQstr=mixQst&dejagnu.nested=chQstr&_root.fqv=fqFVars"
 //
-// NOTE: the construct above won't work with current Gnash, as query string will be considered part of
-//       the filename (fix ?)
-//
 // See FlashVarsTest.html for a way to test with a plugin
-//
-// TODO: test complex FlashVars as in 'complex={a:1, b:2}'
-//       see http://flowplayer.org/documentation/quick+start
 //
 
 note("a="+a);
@@ -70,6 +64,8 @@ note("_root.dejagnu.nested="+_root.dejagnu.nested);
 note("_root['dejagnu.nested']="+_root['dejagnu.nested']);
 check_equals(typeof(_root.dejagnu.nested), "undefined");
 check_equals(_root['dejagnu.nested'], "chFVars");
+
+check_equals(typeof(_root['complex']), "string");
 
 #if OUTPUT_VERSION < 7
 	// The following tests assume target SWF version is < 7

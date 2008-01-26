@@ -1,3 +1,9 @@
+2008-01-26 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/: FlashVarsTest.as, FlashVarsTest.html,
+	  Makefile.am: test that any variable passed trough FlashVars
+	  is a string, never an object.
+
 2008-01-25 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp: send the DATA event, don't just
