@@ -6,6 +6,9 @@
 
 2008-01-25  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* macros/qt.m4: Ubuntu hardy puts QT headers in different
+	location, breaking using QTDIR to find them.
+
 	* configure.ac: Add test to use gst-inspect to look for installed
 	codecs for Gstreamer.
 

@@ -51,13 +51,20 @@ AC_DEFUN([GNASH_PATH_QT],
       else
         if test x`basename $QTDIR` = "qt3"; then
           gnash_qt_version=3
- 	else
+ 	      else
           gnash_qt_version=2
         fi
       fi
     else
-      qt_pkg="QtCore"
-      gnash_qt_version=4
+      dnl Look for qt4 first, if qt3 exists, we prefer that, so override this
+      if test -f /usr/include/qt4/qobject.h; then
+        qt_pkg="QtCore"
+        gnash_qt_version=4
+      fi
+      if test -f /usr/include/qt3/qobject.h; then
+        qt_pkg="qt-mt"       
+        gnash_qt_version=3
+      fi
     fi
   fi
 
@@ -81,18 +88,18 @@ AC_DEFUN([GNASH_PATH_QT],
       for j in $QTDIR `ls -dr $i/qt[[0-9]] 2>/dev/null`; do
         if test -f $j/include/qobject.h; then
           gnash_qt_topdir="$j"
-	  if test "${gnash_qt_version} " -eq 0; then
+          if test "${gnash_qt_version} " -eq 0; then
             gnash_qt_version=2
-	  fi
+	        fi
           ac_cv_path_qt_incl="-I$j/include"
           break
-	else
+	      else
           if test -f $j/Qt/qobject.h; then
-          gnash_qt_topdir="$j"
-	  if test "${gnash_qt_version} " -eq 0; then
-            gnash_qt_version=4
-	  fi
-          ac_cv_path_qt_incl="-I$j/Qt"
+            gnash_qt_topdir="$j"
+	    if test "${gnash_qt_version} " -eq 0; then
+              gnash_qt_version=4
+	    fi
+            ac_cv_path_qt_incl="-I$j -I$j/Qt"
 	  fi
         fi
       done
@@ -110,7 +117,7 @@ dnl incllist is inherited from configure.ac.
       for j in  $QTDIR `ls -dr $i/qt[[0-9]] 2>/dev/null`; do
         if test -f $j/qobject.h -o -f $j/Qt/qobject.h; then
 dnl          gnash_qt_version=`echo "$j" | sed "s:$i/qt::"`
-          ac_cv_path_qt_incl="-I$j"
+          ac_cv_path_qt_incl="-I$j -I$j/Qt"
           break
         fi
       done
@@ -141,15 +148,15 @@ dnl          gnash_qt_version=`echo "$j" | sed "s:$i/qt::"`
     dnl a case statement to set the QT version.
     case $gnash_qt_version in
       2)
-	AC_DEFINE([GNASH_QT_VERSION], 2, [The Qtopia version])
-	;;
+	      AC_DEFINE([GNASH_QT_VERSION], 2, [The Qtopia version])
+	      ;;
       3)
-	AC_DEFINE([GNASH_QT_VERSION], 3, [The Qtopia version])
-	;;
+	      AC_DEFINE([GNASH_QT_VERSION], 3, [The Qtopia version])
+	      ;;
       4)
-	AC_DEFINE([GNASH_QT_VERSION], 4, [The Qtopia version])
-	qt3support="-lqt3support"
-	;;
+	      AC_DEFINE([GNASH_QT_VERSION], 4, [The Qtopia version])
+	      qt3support="-lqt3support"
+	      ;;
     esac
   fi
 
@@ -161,7 +168,7 @@ dnl   # QT_LIBS =  -lqtui -lqtcore -lqtprint -L/usr/lib/qt-3.3/lib -lqt-mt
       if test `ls -C1 ${gnash_qt_topdir}/lib/libqt*-mt.*| wc -l` -gt 0 ; then
        ac_cv_path_qt_lib="-L`(cd ${with_qt_lib}; pwd)` ${qt3support} -lqt-mt"
       else
-	AC_MSG_ERROR([${with_qt_lib} directory doesn't contain qt libraries.])
+	      AC_MSG_ERROR([${with_qt_lib} directory doesn't contain qt libraries.])
       fi
     fi
   ])
