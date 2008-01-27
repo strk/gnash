@@ -98,7 +98,7 @@ namespace image
 		void update(const image_base& from);
 
 		/// Return a pointer to the underlying data
-		boost::uint8_t* data() { return m_data.get(); }
+		virtual boost::uint8_t* data() { return m_data.get(); }
 
 		/// Return a pointer to first byte of given line
 		DSOEXPORT boost::uint8_t* scanline(size_t y);
@@ -158,6 +158,10 @@ namespace image
 		rgb(const rgb& o)
 			:
 			image_base(o)
+		{}
+
+		rgb(uint8_t* data, int width, int height, int stride)
+			: image_base(data, width, height, stride, RGB)
 		{}
 
 		std::auto_ptr<image_base> clone() const

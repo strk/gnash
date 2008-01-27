@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/*  $Id: NetStream.h,v 1.57 2008/01/22 14:37:10 strk Exp $ */
+/*  $Id: NetStream.h,v 1.58 2008/01/27 07:18:19 bjacques Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -218,7 +218,7 @@ public:
 	/// Seek in the media played by the current instance
 	//
 	/// @param position
-	///	Defines in milliseconds where to seek to
+	///	Defines in seconds where to seek to
 	///
 	virtual void seek(boost::uint32_t /*pos*/){}
 

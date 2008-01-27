@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.83 2008/01/22 14:37:10 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.84 2008/01/27 07:18:19 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -173,7 +173,7 @@ static as_value netstream_seek(const fn_call& fn) {
 	{
 		time = fn.arg(0).to_number<boost::uint32_t>();
 	}
-	ns->seek(static_cast<boost::uint32_t>(time*1000.0));
+	ns->seek(time);
 
 	return as_value();
 }

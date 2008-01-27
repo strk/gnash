@@ -671,8 +671,6 @@ public:
   
   virtual void reallyDrawVideoFrame(image::image_base* baseframe, const matrix* m, const rect* bounds)
   {
-    GNASH_REPORT_FUNCTION;
-    
     image::rgb* frame = static_cast<image::rgb*>(baseframe);
 
     glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT);

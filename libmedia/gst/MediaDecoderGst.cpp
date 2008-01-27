@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaDecoderGst.cpp,v 1.3 2008/01/21 23:10:15 rsavoye Exp $
+// $Id: MediaDecoderGst.cpp,v 1.4 2008/01/27 07:18:18 bjacques Exp $
 
 #include "MediaDecoderGst.h"
 #include "AudioDecoderNellymoser.h"
@@ -81,6 +81,7 @@ bool MediaDecoderGst::setupParser()
 
 bool MediaDecoderGst::setupDecoding()
 {
+#if 0
 	std::auto_ptr<VideoInfo> vInfo = _parser->getVideoInfo();
 	if (vInfo.get() != NULL) {
 
@@ -96,7 +97,7 @@ bool MediaDecoderGst::setupDecoding()
 			log_error("No video decoder could be created, since no decoder is enabled.");
 		}
 	}
-
+#endif
 	std::auto_ptr<AudioInfo> aInfo = _parser->getAudioInfo();
 	if (get_sound_handler() && aInfo.get() != NULL) {
 

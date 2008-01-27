@@ -55,7 +55,7 @@ namespace image
 		assert(from.m_pitch == m_pitch);
 		assert(m_size <= from.m_size);
 		assert(m_type == from.m_type);
-		memcpy(m_data.get(), from.m_data.get(), m_size);
+		memcpy(m_data.get(), const_cast<image_base&>(from).data(), m_size);
 	}
 
 	boost::uint8_t* image_base::scanline(size_t y)

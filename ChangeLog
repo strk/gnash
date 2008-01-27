@@ -1,3 +1,27 @@
+2008-01-26 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* configure.ac: Add some required gstreamer modules to detect.
+	* libbase/image.cpp: Call the data() member function of the "source"
+	image when update() is called.
+	* libbase/image.h: Make data() virtual. Add an explicit constructor
+	for rgb similar to the one in image_base.
+	* libmedia/gst/MediaDecoderGst.cpp: Exclude some code relying on old
+	VideoDecoderGst behaviour.
+	* libmedia/gst/VideoDecoderGst.{cpp,h}: Reimplement VideoDecoderGst
+	with a simple push/pop interface. Add a class gnashGstBuffer which
+	wraps the reference counted GstBuffer as a subclass of image::rgb.
+	This fixes bug #22067.
+	* libmedia/gst/gstappsink.{c,h}: Statically load this gstreamer
+	module. Add a non-blocking method for peeking the queue.
+	* libmedia/gst/gstappsrc.c: Statically load the appsrc module.
+	* server/asobj/NetStream.{cpp,h}: Change the argument to seek() from
+	milliseconds to seconds, because that's what is received from
+	ActionScript.
+	* server/asobj/NetStreamGst.cpp: Add a missing break in the message
+	parsing switch.
+	* server/parser/video_stream_def.{cpp,h}: Use the new VideoStreamGst
+	implementation.
+
 2008-01-26 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/: FlashVarsTest.as, FlashVarsTest.html,

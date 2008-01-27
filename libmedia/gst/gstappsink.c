@@ -17,7 +17,7 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* $Id: gstappsink.c,v 1.4 2008/01/21 23:10:15 rsavoye Exp $ */
+/* $Id: gstappsink.c,v 1.5 2008/01/27 07:18:18 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -414,6 +414,26 @@ gst_app_sink_getcaps (GstBaseSink * psink)
   return caps;
 }
 
+
+static gboolean
+plugin_init (GstPlugin * plugin)
+{
+  GST_DEBUG_CATEGORY_INIT (app_sink_debug, "appsink", 0, "Application sink");
+
+  if (!gst_element_register (plugin, "appsink", GST_RANK_PRIMARY,
+          gst_app_sink_get_type ()))
+    return FALSE;
+
+  return TRUE;
+}
+
+GST_PLUGIN_DEFINE_STATIC (GST_VERSION_MAJOR, GST_VERSION_MINOR,
+    "appsink", "Element application sink",
+    plugin_init, VERSION, "LGPL", "Gnash's internal copy of gstappsink", "Gnash")
+
+
+
+
 /* external API */
 
 /**
@@ -645,4 +665,28 @@ not_started:
     g_mutex_unlock (appsink->mutex);
     return NULL;
   }
+}
+
+
+/**
+ * gst_app_sink_peek_buffer:
+ * @appsink: a #GstAppSink
+ *
+ * This function peeks the queue to see if at least one buffer is in the queue.
+ *
+ * Returns: TRUE if there is a buffer in the queue.
+ */
+gboolean
+gst_app_sink_peek_buffer (GstAppSink * appsink)
+{
+  g_return_val_if_fail (appsink != NULL, NULL);
+  g_return_val_if_fail (GST_IS_APP_SINK (appsink), NULL);
+
+  g_mutex_lock (appsink->mutex);
+
+  gboolean got_data = !g_queue_is_empty(appsink->queue);
+
+  g_mutex_unlock (appsink->mutex);
+
+  return got_data;
 }

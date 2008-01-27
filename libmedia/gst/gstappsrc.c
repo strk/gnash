@@ -17,7 +17,7 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* $Id: gstappsrc.c,v 1.4 2008/01/21 23:10:15 rsavoye Exp $ */
+/* $Id: gstappsrc.c,v 1.5 2008/01/27 07:18:19 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -235,6 +235,22 @@ gst_app_src_create (GstPushSrc * psrc, GstBuffer ** buf)
 
   return ret;
 }
+
+static gboolean
+plugin_init (GstPlugin * plugin)
+{
+  GST_DEBUG_CATEGORY_INIT (app_src_debug, "appsrc", 0, "Application source");
+
+  if (!gst_element_register (plugin, "appsrc", GST_RANK_PRIMARY,
+          gst_app_src_get_type ()))
+    return FALSE;
+
+  return TRUE;
+}
+
+GST_PLUGIN_DEFINE_STATIC (GST_VERSION_MAJOR, GST_VERSION_MINOR,
+    "appsrc", "Element application source",
+    plugin_init, VERSION, "LGPL", "Gnash's internal copy of gstappsrc", "Gnash")
 
 
 /* external API */

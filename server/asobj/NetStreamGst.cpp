@@ -541,6 +541,7 @@ NetStreamGst::handleMessage (GstMessage *message)
       // Sometimes the pipeline fails to use this number in queries.
       GstFormat format = GST_FORMAT_BYTES;
       gst_message_parse_duration(message, &format, &_duration);
+      break;
     }
     
     default:

@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.h,v 1.21 2008/01/21 20:56:01 rsavoye Exp $
+// $Id: video_stream_def.h,v 1.22 2008/01/27 07:18:20 bjacques Exp $
 
 #ifndef GNASH_VIDEO_STREAM_DEF_H
 #define GNASH_VIDEO_STREAM_DEF_H
@@ -31,7 +31,7 @@
 #include "swf.h"
 #include "rect.h" // for composition
 #include "ControlTag.h"
-#include "VideoDecoder.h"
+#include "VideoDecoderGst.h"
 #include "image.h"
 
 #include <map>
@@ -154,30 +154,14 @@ private:
 
 	/// The undecoded video frames and its size, using the swf-frame number as key
 	//
-	/// Elements of this map are owned by this instance, and will be deleted 
+	/// Elements of this vector are owned by this instance, and will be deleted 
 	/// at instance destruction time.
 	///
-	typedef std::map<boost::uint32_t, boost::shared_ptr<VideoData> > EmbedFrameMap;
-	EmbedFrameMap m_video_frames;
+	typedef std::vector<GstBuffer*> EmbedFrameVec;
+	EmbedFrameVec _video_frames;
 
 	/// Last decoded frame number
-	boost::int32_t m_last_decoded_frame;
-
-	/// Set data for the given frame
-	//
-	/// If a frame image is already known for the given frame number
-	/// it will NOT be replaced, and an SWF error will be printed.
-	/// The 'img' parameter will be deleted.
-	///
-	/// See get_frame_data to extract it.
-	///
-	/// @param frameNum
-	///	Frame number.
-	///
-	/// @param img
-	///	Frame data. Ownership is transferred. 
-	///
-	void setFrameData(boost::uint32_t frameNum, boost::shared_array<boost::uint8_t> data, boost::uint32_t size, media::videoFrameType ft);
+	boost::int32_t _last_decoded_frame;
 
 	/// Width of the video
 	boost::uint32_t _width;
@@ -186,7 +170,7 @@ private:
 	boost::uint32_t _height;
 
 	/// The decoder used to decode the video frames
-	boost::scoped_ptr<media::VideoDecoder> _decoder;
+	boost::scoped_ptr<media::VideoDecoderGst> _decoder;
 };
 
 }	// end namespace gnash

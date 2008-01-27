@@ -1497,7 +1497,9 @@ missing_codecs=""
 if test "$media_handler" = "gst"; then
   AC_PATH_PROG(GST_INSPECT, gst-inspect, ,[${pathlist}])
   if test "x$GST_INSPECT" != "x" -a x"${darwin}" = xno ; then
-    codecs="ffdemux_flv ffdemux_mp3 vorbisdec ffdec_vp6"
+    dnl FIXME: there may be multiple acceptable plugins that are acceptable for
+    dnl our use. For example, mad or ffmpeg will play mp3.
+    codecs="ffdec_flv ffdec_flashsv ffdec_vp6f ffdec_flashsv mad vorbisdec ffdec_vp6"
     for i in $codecs; do
        hits="`$GST_INSPECT $i | grep -c 'Long name'`"
        if test $hits -eq 0; then
