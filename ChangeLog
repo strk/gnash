@@ -1,3 +1,7 @@
+2008-01-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/vm/ASHandlers.cpp (CommonGetUrl): Escape newline, tab etc.
+
 2008-01-28 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ASHandlers.cpp (CommonGetUrl): escape url before passing
