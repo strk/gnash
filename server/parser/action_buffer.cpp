@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: action_buffer.cpp,v 1.33 2008/01/21 20:56:00 rsavoye Exp $ */
+/* $Id: action_buffer.cpp,v 1.34 2008/01/28 19:42:22 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -61,9 +61,16 @@ void
 action_buffer::read(stream& in, unsigned long endPos)
 {
 	unsigned long startPos = in.get_position();
-	assert(endPos > startPos); // caller should check this
 	assert(endPos <= in.get_tag_end_position());
 	unsigned size = endPos-startPos;
+
+	if ( ! size )
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+		log_swferror(_("Empty action buffer starting at offset %lu"), startPos);
+		);
+		return;
+	}
 
 	// Allocate the buffer
 	// 

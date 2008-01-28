@@ -1,5 +1,8 @@
 2008-01-28 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/action_buffer.cpp (read): just log an swf error
+	  and return if the action buffer is 0 bytes long.
+	  Fixes bug #22148.
 	* server/text.cpp (text_glyph_record::read): robustness improvements.
 	  Fixes bug #22149.
 
