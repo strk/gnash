@@ -1,5 +1,7 @@
 2008-01-28 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp (button_sound_loader): robustness
+	  improvements. Fix bug #22152.
 	* server/parser/action_buffer.cpp (read): just log an swf error
 	  and return if the action buffer is 0 bytes long.
 	  Fixes bug #22148.

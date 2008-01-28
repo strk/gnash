@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.180 2008/01/21 20:56:03 rsavoye Exp $ */
+/* $Id: tag_loaders.cpp,v 1.181 2008/01/28 20:36:29 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -923,10 +923,25 @@ void	button_sound_loader(stream* in, tag_type tag, movie_definition* m)
 
     int	button_character_id = in->read_u16();
     character_def* chdef = m->get_character_def(button_character_id);
+    if ( ! chdef )
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+        log_swferror(_("DEFINEBUTTONSOUND refers to an unknown character def %d"), button_character_id);
+        );
+        return;
+    }
 
-    assert ( dynamic_cast<button_character_definition*> (chdef) );
-    button_character_definition* ch = static_cast<button_character_definition*> (chdef);
-    assert(ch != NULL);
+    button_character_definition* ch = dynamic_cast<button_character_definition*> (chdef);
+    if ( ! ch )
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+        log_swferror(_("DEFINEBUTTONSOUND refers to character id %d, "
+            "being a %s (expected a button definition)"),
+            button_character_id,
+            typeName(*chdef).c_str());
+        );
+        return;
+    }
 
     ch->read(in, tag, m);
 }
