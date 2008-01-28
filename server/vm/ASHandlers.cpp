@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.182 2008/01/28 11:04:47 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.183 2008/01/28 11:09:32 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -2288,6 +2288,13 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 	boost::replace_all(safeurl, ">", "\\>");	// output redirection
 	boost::replace_all(safeurl, "<", "\\<");	// input redirection
 	boost::replace_all(safeurl, "&", "\\&");	// background (sic)
+
+	boost::replace_all(safeurl, "(", "\\(");	// subshell :'(
+	boost::replace_all(safeurl, ")", "\\)");	// 
+	boost::replace_all(safeurl, "}", "\\}");	// 
+	boost::replace_all(safeurl, "{", "\\{");	// 
+
+	boost::replace_all(safeurl, "$", "\\$");	// variable expansions
 
 	boost::replace_all(command, "%u", safeurl);
 
