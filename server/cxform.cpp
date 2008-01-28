@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: cxform.cpp,v 1.9 2008/01/21 20:55:49 rsavoye Exp $ 
+// $Id: cxform.cpp,v 1.10 2008/01/28 15:16:50 strk Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -88,9 +88,13 @@ void	cxform::read_rgb(stream& in)
 {
 	in.align();
 
+	in.ensureBits(6);
 	bool	has_add = in.read_bit();
 	bool	has_mult = in.read_bit();
 	int	nbits = in.read_uint(4);
+
+	int reads = has_mult + has_add; // 0, 1 or 2
+	if ( reads ) in.ensureBits(nbits*reads*3);
 
 	if (has_mult) {
 		m_[0][0] = in.read_sint(nbits) / 255.0f;
@@ -116,9 +120,13 @@ void	cxform::read_rgba(stream& in)
 {
 	in.align();
 
+	in.ensureBits(6);
 	bool	has_add = in.read_bit();
 	bool	has_mult = in.read_bit();
 	int	nbits = in.read_uint(4);
+
+	int reads = has_mult + has_add; // 0, 1 or 2
+	if ( reads ) in.ensureBits(nbits*reads*4);
 
 	if (has_mult) {
 		m_[0][0] = in.read_sint(nbits) / 256.0f;

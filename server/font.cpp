@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.55 2008/01/21 20:55:50 rsavoye Exp $ */
+/* $Id: font.cpp,v 1.56 2008/01/28 15:16:50 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -162,6 +162,7 @@ GlyphInfo::markReachableResources() const
 		// are measured from the start of the
 		// offset table.
 		std::vector<unsigned>	offsets;
+		in->ensureBytes(2);
 		offsets.push_back(in->read_u16());
 
 		IF_VERBOSE_PARSE (
@@ -169,13 +170,21 @@ GlyphInfo::markReachableResources() const
 		);
 
 		int	count = offsets[0] >> 1;
-		for (int i = 1; i < count; i++)
+		if ( count > 0 )
 		{
-			offsets.push_back(in->read_u16());
+			in->ensureBytes(count*2);
+			for (int i = 1; i < count; i++)
+			{
+				offsets.push_back(in->read_u16());
 
-			IF_VERBOSE_PARSE (
-			log_parse("offset[%d] = %d", i, offsets[i]);
-			);
+				IF_VERBOSE_PARSE (
+				log_parse("offset[%d] = %d", i, offsets[i]);
+				);
+			}
+		}
+		else
+		{
+			log_error("Negative embedded glyph table size: %d", count);
 		}
 
 		_embedGlyphTable.resize(count);
@@ -206,6 +215,8 @@ GlyphInfo::markReachableResources() const
 		log_parse(_("reading DefineFont2 or DefineFont3"));
 		);
 
+		// TODO: should this be aligned ?
+		in->ensureBytes(2); // 1 for the flags, 1 reserved
 		bool	has_layout = in->read_bit();
 		m_shift_jis_chars = in->read_bit();
 		m_unicode_chars = in->read_bit();
@@ -237,6 +248,7 @@ GlyphInfo::markReachableResources() const
 			delete [] name;
 		}
 
+		in->ensureBytes(2); 
 		boost::uint16_t glyph_count = in->read_u16();
 		
 		unsigned long table_base = in->get_position();
@@ -249,6 +261,7 @@ GlyphInfo::markReachableResources() const
 		if (wide_offsets)
 		{
 			// 32-bit offsets.
+			in->ensureBytes(4*glyph_count + 4); 
 			for (unsigned int i = 0; i < glyph_count; i++)
 			{
 				boost::uint32_t off = in->read_u32();	
@@ -264,6 +277,7 @@ GlyphInfo::markReachableResources() const
 		else
 		{
 			// 16-bit offsets.
+			in->ensureBytes(2*glyph_count + 2); 
 			for (unsigned int i = 0; i < glyph_count; i++)
 			{
 				boost::uint16_t off = in->read_u16();	
@@ -316,27 +330,38 @@ GlyphInfo::markReachableResources() const
 		// Read layout info for the glyphs.
 		if (has_layout)
 		{
+			in->ensureBytes(6);
 			m_ascent = (float) in->read_s16();
 			m_descent = (float) in->read_s16();
 			m_leading = (float) in->read_s16();
 			
 			// Advance table; i.e. how wide each character is.
-			for (int i = 0, n = _embedGlyphTable.size(); i < n; i++)
+			size_t nGlyphs = _embedGlyphTable.size();
+			in->ensureBytes(nGlyphs*2);
+			for (int i = 0; i < nGlyphs; i++)
 			{
 				_embedGlyphTable[i].advance = (float) in->read_s16();
 			}
 
 			// Bounds table.
-			//m_bounds_table.resize(m_glyphs.size());	// kill
-			rect	dummy_rect;
-			{for (size_t i = 0, n = _embedGlyphTable.size(); i < n; i++)
 			{
-				//m_bounds_table[i].read(in);	// kill
-				dummy_rect.read(in);
-			}}
+				rect	dummy_rect;
+				// TODO: shouldn't we log_unimpl here ??
+				for (size_t i = 0; i < nGlyphs; i++) dummy_rect.read(in);
+			}
 
 			// Kerning pairs.
+			in->ensureBytes(2);
 			int	kerning_count = in->read_u16();
+			if ( m_wide_codes )
+			{
+				in->ensureBytes(6*kerning_count); // includes the adjustment 
+			}
+			else
+			{
+				in->ensureBytes(4*kerning_count); // includes the adjustment 
+			}
+
 			for (int i = 0; i < kerning_count; i++)
 			{
 				boost::uint16_t	char0, char1;
@@ -412,6 +437,7 @@ GlyphInfo::markReachableResources() const
 			m_name.clear();
 		}
 
+		in->ensureBytes(1);
 		unsigned char	flags = in->read_u8();
 
 		// The following 3 flags are reserved
@@ -437,10 +463,12 @@ GlyphInfo::markReachableResources() const
 
 		assert(_embedded_code_table.empty());
 
+		size_t nGlyphs = _embedGlyphTable.size();
 		if (m_wide_codes)
 		{
+			in->ensureBytes(2*nGlyphs);
 			// Code table is made of boost::uint16_t's.
-			for (size_t i=0, n=_embedGlyphTable.size(); i<n; ++i)
+			for (size_t i=0; i<nGlyphs; ++i)
 			{
 				boost::uint16_t code = in->read_u16();
 				_embedded_code_table.insert(std::make_pair(code, i));
@@ -449,7 +477,8 @@ GlyphInfo::markReachableResources() const
 		else
 		{
 			// Code table is made of bytes.
-			for (int i=0, n=_embedGlyphTable.size(); i<n; ++i)
+			in->ensureBytes(1*nGlyphs);
+			for (size_t i=0; i<nGlyphs; ++i)
 			{
 				boost::uint8_t code = in->read_u8();
 				_embedded_code_table.insert(std::make_pair(code, i));

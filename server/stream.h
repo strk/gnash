@@ -251,6 +251,8 @@ public:
 	///
 	/// aligned read
 	///
+	/// Will throw ParserException if no terminating null is found within tag boundaries
+	///
 	char*	read_string();	
 
 	/// \brief
@@ -259,6 +261,8 @@ public:
 	/// previous value of it.
 	///
 	/// aligned read
+	///
+	/// Will throw ParserException if no terminating null is found within tag boundaries
 	///
 	void	read_string(std::string& to);
 
@@ -270,6 +274,8 @@ public:
 	///
 	/// aligned read
 	///
+	/// Will throw ParserException if advertised length crosses tag boundaries
+	///
 	char*	read_string_with_length();
 
 	/// Reads a sized string into a provided std::string.
@@ -280,6 +286,8 @@ public:
 	/// 	Output argument. Any previous value will be overriden.
 	///
 	/// aligned read
+	///
+	/// Will throw ParserException if advertised length crosses tag boundaries
 	///
 	void	read_string_with_length(std::string& to);
 
@@ -294,16 +302,18 @@ public:
 	///
 	/// aligned read
 	///
+	/// Will throw ParserException if len crosses tag boundaries
+	///
 	void	read_string_with_length(unsigned len, std::string& to);
 
 	/// Return our current (byte) position in the input stream.
 	//
 	/// NOTE:
 	/// This is not necessarely the byte you'll read on next read.
-	/// - For bit reads the byte will be used only if not
+	/// - For bitwise reads the currenty byte will be used only if not
 	///   completely consumed. See align().
-	/// - For aligned reads the byte will be used only if not
-	///   consumed at all.
+	/// - For aligned reads the current byte will not be used
+	///   (already used)
 	///
 	unsigned long get_position();
 
@@ -362,8 +372,8 @@ public:
 	}
 
 	/// \brief
-	/// Ensure the requested number of bytes are available in the
-	/// currently opened tag.
+	/// Ensure the requested number of bytes are available for an aligned read
+	/// in the currently opened tag.
 	//
 	/// Throws a ParserException on a short count.
 	/// This method should be called before any attempt to read
@@ -371,18 +381,40 @@ public:
 	///
 	/// NOTE: if GNASH_TRUST_SWF_INPUT is defined this function is a no-op 
 	///
-	/// WARNING: this function is BOGUS as it will consider the current
-	///          byte as available no matter if bits have been read from
-	/// 	     it or not. TODO: consider consumed bits and see what happens.
-	///
 	void ensureBytes(unsigned long needed)
 	{
 #ifndef GNASH_TRUST_SWF_INPUT
+		if ( _tagBoundsStack.empty() ) return; // not in a tag (should we check file length ?)
 		unsigned long int left = get_tag_end_position() - get_position();
 		if ( left < needed )
 		{
 			std::stringstream ss;
 			ss << "premature end of tag: need to read " << needed << " bytes, but only " << left << " left in this tag";
+			throw ParserException(ss.str());
+		}
+#endif
+	}
+
+	/// \brief
+	/// Ensure the requested number of bits are available for a bitwise read
+	/// in currently opened tag.
+	//
+	/// Throws a ParserException on a short count.
+	/// This method should be called before any attempt to read
+	/// bits from the SWF.
+	///
+	/// NOTE: if GNASH_TRUST_SWF_INPUT is defined this function is a no-op 
+	///
+	void ensureBits(unsigned long needed)
+	{
+#ifndef GNASH_TRUST_SWF_INPUT
+		if ( _tagBoundsStack.empty() ) return; // not in a tag (should we check file length ?)
+		unsigned long int bytesLeft = get_tag_end_position() - get_position();
+		unsigned long int bitsLeft = (bytesLeft*8)+m_unused_bits;
+		if ( bitsLeft < needed )
+		{
+			std::stringstream ss;
+			ss << "premature end of tag: need to read " << needed << " bytes, but only " << bitsLeft << " left in this tag";
 			throw ParserException(ss.str());
 		}
 #endif

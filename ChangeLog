@@ -1,3 +1,12 @@
+2008-01-28 Sandro Santilli <strk@keybit.net>
+
+	* server/stream.{cpp,h}: fix comments about get_position and
+	  ensureBytes, add an ensureBits, make string reading functions
+	  fail safe.
+	* server/: cxform.cpp, font.cpp, matrix.cpp, rect.cpp,
+	  styles.cpp, parser/filter_factory.cpp, swf/StartSoundTag.cpp:
+	  Robustness fixes.
+
 2008-01-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* pythonmodule/gnashpython.h: config.h -> gnashconfig.h.

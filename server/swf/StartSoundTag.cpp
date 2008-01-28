@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: StartSoundTag.cpp,v 1.7 2008/01/21 20:56:02 rsavoye Exp $ */
+/* $Id: StartSoundTag.cpp,v 1.8 2008/01/28 15:16:52 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -78,6 +78,7 @@ StartSoundTag::loader(stream* in, tag_type tag, movie_definition* m)
 void
 StartSoundTag::read(stream& in)
 {
+	in.align();
 	in.ensureBytes(1); // header
 
 	in.read_uint(2);	// skip reserved bits.

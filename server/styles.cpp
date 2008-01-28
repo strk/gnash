@@ -35,6 +35,7 @@ line_style::read_morph(stream* in, int tag_type, movie_definition *md,
 {
 	if (tag_type == SWF::DEFINEMORPHSHAPE)
 	{
+		in->ensureBytes(2 + 2);
 		m_width = in->read_u16();
 		pOther->m_width = in->read_u16();
 		m_color.read(in, tag_type);
@@ -43,9 +44,11 @@ line_style::read_morph(stream* in, int tag_type, movie_definition *md,
 	}
 
 	// MorphShape 2 from here down.
-	in->ensureBytes(4);
+	in->ensureBytes(4 + 2);
+
 	m_width = in->read_u16();
 	pOther->m_width = in->read_u16();
+
 	// TODO: Same as in read(...), use these.
 	// 0 -- Round caps, 1 -- No caps, 2 -- square caps
 	boost::uint8_t caps = in->read_uint(2);
@@ -55,11 +58,14 @@ line_style::read_morph(stream* in, int tag_type, movie_definition *md,
 	bool no_hscale = in->read_uint(1);
 	bool no_vscale = in->read_uint(1);
 	bool pixel_hinting = in->read_uint(1);
+
 	static_cast<void> (in->read_uint(5));
 	bool no_close = in->read_uint(1);
 	bool end_cap_style = in->read_uint(2); // As caps above.
+
 	if (joins == 2)
 	{
+		in->ensureBytes(2);
 		float f_miter = in->read_short_ufixed();
 	}
 	if (has_fill)
@@ -84,7 +90,7 @@ line_style::read(stream* in, int tag_type, movie_definition *md)
 {
     if (!(tag_type == SWF::DEFINESHAPE4 || tag_type == SWF::DEFINESHAPE4_))
 	{
-	    in->ensureBytes(2);
+		in->ensureBytes(2);
 		m_width = in->read_u16();
 		m_color.read(in, tag_type);
 		return;
@@ -92,21 +98,24 @@ line_style::read(stream* in, int tag_type, movie_definition *md)
 
 	// TODO: Unfinished. Temporary to allow define shape 4 to work in many
 	// cases, but does not work correctly in all cases.
-	in->ensureBytes(2);
+	in->ensureBytes(2+2);
 	m_width = in->read_u16();
+
 	// 0 -- Round caps, 1 -- No caps, 2 -- square caps
 	boost::uint8_t caps = in->read_uint(2);
 	// 0 -- Round join, 1 -- Bevel join, 2 -- Miter join
 	boost::uint8_t joins = in->read_uint(2);
-	bool has_fill = in->read_uint(1);
-	bool no_hscale = in->read_uint(1);
-	bool no_vscale = in->read_uint(1);
-	bool pixel_hinting = in->read_uint(1);
+	bool has_fill = in->read_bit();
+	bool no_hscale = in->read_bit();
+	bool no_vscale = in->read_bit();
+	bool pixel_hinting = in->read_bit();
 	static_cast<void> (in->read_uint(5));
-	bool no_close = in->read_uint(1);
+	bool no_close = in->read_bit();
 	bool end_cap_style = in->read_uint(2); // As caps above.
+
 	if (joins == 2)
 	{
+		in->ensureBytes(2);
 		/*float f_miter =*/static_cast<void>(in->read_short_ufixed());
 	}
 	if (has_fill)

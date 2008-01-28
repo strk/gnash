@@ -19,7 +19,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.cpp,v 1.23 2008/01/21 20:55:51 rsavoye Exp $ 
+// $Id: matrix.cpp,v 1.24 2008/01/28 15:16:51 strk Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -207,31 +207,39 @@ void
 matrix::read(stream& in)
 // Initialize from the stream.
 {
-	// TODO: compute number of bytes needed to read the matrix
-	//       and ensure their availability using stream::ensureBytes
-
 	in.align();
 
 	set_identity();
 
+	in.ensureBits(1);
 	bool	has_scale = in.read_bit(); 
 	if (has_scale)
 	{
+		in.ensureBits(5);
 		int	scale_nbits = in.read_uint(5);
+
+		in.ensureBits(scale_nbits*2);
 		m_[0][0] = in.read_sint(scale_nbits) / 65536.0f;
 		m_[1][1] = in.read_sint(scale_nbits) / 65536.0f;
 	}
+
+	in.ensureBits(1);
 	bool	has_rotate = in.read_bit();
 	if (has_rotate)
 	{
+		in.ensureBits(5);
 		int	rotate_nbits = in.read_uint(5);
+
+		in.ensureBits(rotate_nbits*2);
 		m_[1][0] = in.read_sint(rotate_nbits) / 65536.0f;
 		m_[0][1] = in.read_sint(rotate_nbits) / 65536.0f;
 	}
 
+	in.ensureBits(5);
 	int	translate_nbits = in.read_uint(5);
 	if (translate_nbits > 0)
 	{
+		in.ensureBits(translate_nbits*2);
 		m_[0][2] = (float) in.read_sint(translate_nbits);
 		m_[1][2] = (float) in.read_sint(translate_nbits);
 	}

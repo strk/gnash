@@ -301,23 +301,13 @@ boost::int32_t	stream::read_s32()
 
 char*	stream::read_string()
 {
-	align();
+	std::string to;
+	read_string(to); // throws ParserException
 
-	std::vector<char>	buffer;
-	char	c;
-	while ((c = read_u8()) != 0)
-	{
-		buffer.push_back(c);
-	}
-	buffer.push_back(0);
+	if (to.empty()) return NULL;
 
-	if (buffer.size() == 0)
-	{
-		return NULL;
-	}
-
-	char*	retval = new char[buffer.size()];
-	strcpy(retval, &buffer[0]);
+	char*	retval = new char[to.length()+1];
+	strcpy(retval, to.c_str());
 
 	return retval;
 }
@@ -329,45 +319,37 @@ stream::read_string(std::string& to)
 
 	to.clear();
 
-	char	c;
-	while ((c = read_u8()) != 0)
+	do
 	{
-		to += c; 
-	}
+		ensureBytes(1);
+		char c = read_u8();
+		if ( c == 0 ) break; // don't store a NULL in the string..
+		to += c;
+	} while(1);
 
 }
 
 
 char*	stream::read_string_with_length()
 {
-	align();
+	std::string to;
+	read_string_with_length(to);
 
-	int	len = read_u8();
-	//log_msg("String length: %d", len);
-	if (len <= 0)
-	{
-		return NULL;
-	}
-	else
-	{
-		char*	buffer = new char[len + 1];
-		int	i;
-		for (i = 0; i < len; i++)
-		{
-			buffer[i] = read_u8();
-		}
-		buffer[i] = '\0';	// terminate.
+	if (to.empty()) return NULL;
 
-		return buffer;
-	}
+	char*	buffer = new char[to.length() + 1];
+	strcpy(buffer, to.c_str());
+
+	return buffer;
 }
 
 void stream::read_string_with_length(std::string& to)
 {
 	align();
 
+	ensureBytes(1);
 	unsigned int	len = read_u8();
-	read_string_with_length(len, to);
+	read_string_with_length(len, to); // will check 'len'
 }
 
 void stream::read_string_with_length(unsigned len, std::string& to)
@@ -376,6 +358,7 @@ void stream::read_string_with_length(unsigned len, std::string& to)
 
 	to.resize(len);
 
+	ensureBytes(len);
 	for (unsigned int i = 0; i < len; ++i)
 	{
 		to[i] = read_u8();

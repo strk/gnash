@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: filter_factory.cpp,v 1.8 2008/01/21 20:56:00 rsavoye Exp $ */
+/* $Id: filter_factory.cpp,v 1.9 2008/01/28 15:16:51 strk Exp $ */
 
 #include "filter_factory.h"
 #include "BitmapFilter.h"
@@ -60,6 +60,7 @@ int const filter_factory::read(stream& in,
     {
         BitmapFilter *the_filter = NULL;
 
+        in.ensureBytes(1);
         filter_types filter_type = static_cast<filter_types> (in.read_u8());
 
         switch (filter_type)
@@ -112,6 +113,8 @@ int const filter_factory::read(stream& in,
 
 bool DropShadowFilter::read(stream& in)
 {
+    in.ensureBytes(4 + 8 + 8 + 2 + 1);
+
     m_color = in.read_u8() << 16 + in.read_u8() << 8 + in.read_u8();
     m_alpha = in.read_u8();
 
@@ -134,6 +137,8 @@ bool DropShadowFilter::read(stream& in)
 
 bool BlurFilter::read(stream& in)
 {
+    in.ensureBytes(4 + 4 + 1);
+
     m_blurX = in.read_ufixed();
     m_blurY = in.read_ufixed();
 
@@ -146,6 +151,8 @@ bool BlurFilter::read(stream& in)
 
 bool GlowFilter::read(stream& in)
 {
+    in.ensureBytes(4 + 8 + 2 + 1);
+
     m_color = in.read_u8() << 16 + in.read_u8() << 8 + in.read_u8();
     m_alpha = in.read_u8();
 
@@ -164,6 +171,8 @@ bool GlowFilter::read(stream& in)
 
 bool BevelFilter::read(stream& in)
 {
+    in.ensureBytes(4 + 4 + 8 + 8 + 2 + 1);
+
     // TODO: It is possible that the order of these two should be reversed.
     // highlight might come first. Find out for sure and then fix and remove
     // this comment.
@@ -196,11 +205,16 @@ bool BevelFilter::read(stream& in)
 
 bool GradientGlowFilter::read(stream& in)
 {
+    in.ensureBytes(1);
+
     boost::uint8_t count = in.read_u8(); // How many colorings.
 
     m_colors.reserve(count);
     m_alphas.reserve(count);
     m_ratios.reserve(count);
+
+    in.ensureBytes(count*5 + 8 + 8 + 2 + 1); 
+
     for (int i = 0; i < count; ++i)
     {
         m_colors.push_back(in.read_u8() << 16 + in.read_u8() << 8 + in.read_u8());
@@ -234,14 +248,20 @@ bool GradientGlowFilter::read(stream& in)
 
 bool ConvolutionFilter::read(stream& in)
 {
+    in.ensureBytes(2 + 8);
+
     m_matrixX = in.read_u8();
     m_matrixY = in.read_u8();
 
     m_divisor = in.read_float();
     m_bias = in.read_float();
 
-    m_matrix.reserve(m_matrixX * m_matrixY);
-    for (int i = 0; i < m_matrixX * m_matrixY; ++i)
+    size_t matrixCount = m_matrixX * m_matrixY;
+
+    in.ensureBytes(matrixCount*4 + 4 + 1);
+
+    m_matrix.reserve(matrixCount);
+    for (size_t i = 0; i < matrixCount; ++i)
     {
         m_matrix.push_back(in.read_float());
     }
@@ -259,6 +279,8 @@ bool ConvolutionFilter::read(stream& in)
 
 bool ColorMatrixFilter::read(stream& in)
 {
+    in.ensureBytes(20 * 4); 
+
     m_matrix.reserve(20);
     for (int i = 0; i < 20; ++i)
     {
@@ -270,7 +292,10 @@ bool ColorMatrixFilter::read(stream& in)
 
 bool GradientBevelFilter::read(stream& in)
 {
+    in.ensureBytes(1);
     boost::uint8_t count = in.read_u8(); // How many colorings.
+
+    in.ensureBytes(count*5 + 8 + 8 + 2 + 1);
 
     m_colors.reserve(count);
     m_alphas.reserve(count);
