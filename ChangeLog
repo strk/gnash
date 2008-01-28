@@ -1,5 +1,9 @@
 2008-01-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* pythonmodule/gnashpython.h: config.h -> gnashconfig.h.
+
+2008-01-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* server/vm/ASHandlers.cpp (CommonGetUrl): Escape newline, tab etc.
 	  Escape pipe and backtick.
 

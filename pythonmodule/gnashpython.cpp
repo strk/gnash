@@ -43,7 +43,7 @@
 #include "gnashpython.h"
 
 #define REQUIRE_MOVIE_LOADED if (!_movieDef) throw GnashException("No Movie Loaded!")
-#define REQUIRE_VM_STARTED if (!_movieDef || !_movieRoot) throw GnashException("VM not started!")
+#define REQUIRE_VM_STARTED if (!_movieRoot) throw GnashException("VM not started!")
 
 namespace gnash {
 
@@ -254,6 +254,23 @@ GnashPlayer::getSWFFrameCount() const
 {
     REQUIRE_MOVIE_LOADED;
     return _movieDef->get_frame_count();
+}
+
+geometry::SnappingRanges2d<int>
+GnashPlayer::getInvalidatedRanges() const
+{
+	using namespace gnash::geometry;
+
+	SnappingRanges2d<float> ranges = _invalidatedBounds;
+
+	// scale by 1/20 (twips to pixels)
+	ranges.scale(1.0/20);
+
+	// Convert to integer range.
+	SnappingRanges2d<int> pixranges(ranges);
+
+	return pixranges;
+
 }
 
 // The URL of the stream.

@@ -21,9 +21,10 @@
 #define GNASHPYTHON_H
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+# include "gnashconfig.h"
 #endif
 
+#include "Range2d.h"
 #include "gnash.h"
 #include "ManualClock.h"
 #include "movie_root.h"
@@ -96,6 +97,8 @@ public:
     void render(bool forceRedraw);
     void restart();
     void setVerbose(bool verbose);
+    
+    geometry::SnappingRanges2d<int> getInvalidatedRanges() const;
     
     // Move the pointer to position x, y.
     // @ return whether the move triggered an event needing a redraw. Use this
