@@ -1,3 +1,8 @@
+2008-01-28 Sandro Santilli <strk@keybit.net>
+
+	* server/text.cpp (text_glyph_record::read): robustness improvements.
+	  Fixes bug #22149.
+
 2008-01-28 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/parser/video_stream_def.cpp: Make sure ffmpeg doesn't read

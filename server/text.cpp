@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: text.cpp,v 1.42 2008/01/21 20:55:52 rsavoye Exp $ */
+/* $Id: text.cpp,v 1.43 2008/01/28 18:44:38 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -70,7 +70,9 @@ namespace gnash {
 	void text_glyph_record::read(stream* in, int glyph_count,
 			int glyph_bits, int advance_bits)
 	{
+		// TODO: shouldn't we take unsigned for *_bits ?
 		m_glyphs.resize(glyph_count);
+		in->ensureBits(glyph_count * (glyph_bits+advance_bits));
 		for (int i = 0; i < glyph_count; i++)
 		{
 			m_glyphs[i].m_glyph_index = in->read_uint(glyph_bits);
