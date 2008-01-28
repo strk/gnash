@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.181 2008/01/21 20:56:03 rsavoye Exp $ */
+/* $Id: ASHandlers.cpp,v 1.182 2008/01/28 11:04:47 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -2266,7 +2266,30 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 
 	gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 	string command  = rcfile.getURLOpenerFormat();
-	boost::replace_all(command, "%u", url.str());
+
+	/// Try to avoid letting flash movies execute
+	/// arbitrary commands (sic)
+	///
+	/// Maybe we should exec here, but if we do we might have problems
+	/// with complex urlOpenerFormats like:
+	///	firefox -remote 'openurl(%u)'
+	///
+	///
+	/// NOTE: this escaping implementation is far from optimal, but
+	///       I felt pretty in rush to fix the arbitrary command
+	///	  execution... we'll optimize if needed
+	///
+	string safeurl = url.str(); 
+	boost::replace_all(safeurl, "\\", "\\\\");	// escape backslashes first
+	boost::replace_all(safeurl, "'", "\\'");	// then single quotes
+	boost::replace_all(safeurl, "\"", "\\\"");	// double quotes
+	boost::replace_all(safeurl, ";", "\\;");	// colons
+	boost::replace_all(safeurl, " ", "\\ ");	// spaces
+	boost::replace_all(safeurl, ">", "\\>");	// output redirection
+	boost::replace_all(safeurl, "<", "\\<");	// input redirection
+	boost::replace_all(safeurl, "&", "\\&");	// background (sic)
+
+	boost::replace_all(command, "%u", safeurl);
 
 	log_msg (_("Launching URL... %s"), command.c_str());
 	system(command.c_str());

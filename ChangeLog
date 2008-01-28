@@ -1,3 +1,9 @@
+2008-01-28 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ASHandlers.cpp (CommonGetUrl): escape url before passing
+	  the the user-defined url opener. This hopefully fixes a critical
+	  bug allowing arbitrary command execution.
+
 2008-01-26 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* configure.ac: Add some required gstreamer modules to detect.
