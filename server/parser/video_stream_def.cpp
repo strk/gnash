@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.34 2008/01/27 07:18:20 bjacques Exp $
+// $Id: video_stream_def.cpp,v 1.35 2008/01/28 17:20:03 bjacques Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -102,7 +102,8 @@ video_stream_definition::readDefineVideoFrame(stream* in, SWF::tag_type tag, mov
 
 	unsigned int dataSize = in->get_tag_end_position() - in->get_position();
 
-	GstBuffer* buffer = gst_buffer_new_and_alloc(dataSize);
+	GstBuffer* buffer = gst_buffer_new_and_alloc(dataSize+8);
+	memset(GST_BUFFER_DATA(buffer)+dataSize, 0, 8);
 
 	if (!buffer) {
 		log_error(_("Failed to allocate a buffer of size %d advertised by SWF."),

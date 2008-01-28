@@ -1,3 +1,8 @@
+2008-01-28 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/parser/video_stream_def.cpp: Make sure ffmpeg doesn't read
+	past the end of the buffer by appending 8 zero bytes.
+
 2008-01-28 Sandro Santilli <strk@keybit.net>
 
 	* server/stream.{cpp,h}: fix comments about get_position and
