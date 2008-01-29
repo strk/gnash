@@ -1,5 +1,8 @@
 2008-01-29 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfc.all/Makefile.am: don't attempt to
+	  build the button test runner if you can't build the
+	  actual swf (missing SWFC).
 	* server/vm/ActionExec.cpp (call operator): interrupt
 	  execution if an opcode is advertised to cross the code
 	  segment boundaries. Fixes bug #22150.

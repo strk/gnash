@@ -48,10 +48,6 @@ INTERACTIVE_SCTESTS = \
 	button_test1.sc \
 	$(NULL)
 
-check_PROGRAMS = \
-	button_test1runner \
-	$(NULL)
-
 AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)		\
         -I$(top_srcdir)/libbase \
@@ -81,6 +77,10 @@ AUXMOVIES = \
 EXTRA_DIST = $(SCTESTS) $(AUXMOVIES) $(INTERACTIVE_SCTESTS) check.sc Dejagnu.sc hello.sc
 
 if ENABLE_SWFC
+
+check_PROGRAMS = \
+	button_test1runner \
+	$(NULL)
 
 abs_mediadir = `cd $(srcdir)/../media; pwd`
 
