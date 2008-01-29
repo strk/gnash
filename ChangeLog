@@ -1,5 +1,10 @@
 2008-01-29 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/LocalConnection.cpp: remove duplicated
+	  implementation of gnash::Listener class methods.
+
+2008-01-29 Sandro Santilli <strk@keybit.net>
+
 	* server/as_value.h: make PROPNAME a noop
 	* server/movie_root.{cpp,h}: provide a isLevelTarget
 	  method to take care of case-insensitively matching

@@ -98,79 +98,6 @@ LocalConnection::~LocalConnection()
     GNASH_REPORT_FUNCTION;
 }
 
-Listener::Listener()
-    : _baseaddr(0)
-{
-    GNASH_REPORT_FUNCTION;
-}
-
-Listener::Listener(boost::uint8_t *x)
-{
-    GNASH_REPORT_FUNCTION;
-    _baseaddr = x;
-}
-
-Listener::~Listener()
-{
-    GNASH_REPORT_FUNCTION;
-}
-
-bool
-Listener::addListener(std::string &name)
-{
-    GNASH_REPORT_FUNCTION;
-
-    boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
-    boost::uint8_t *item = addr;
-    // Walk to the end of the list
-    while (*item != 0) {
-        item += strlen(reinterpret_cast<char *>(item))+1;
-    }
-    // Add ourselves to the list
-    if (memcpy(item, name.c_str(), name.size()) == 0) {
-        return false;
-    }
-    return true;
-}
-
-bool
-Listener::removeListener(std::string &name)
-{
-    GNASH_REPORT_FUNCTION;
-
-    boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
-    boost::uint8_t *item = addr;
-    while (*item != 0) {
-        if (name.c_str() == reinterpret_cast<char *>(item)) {
-            int len = strlen(reinterpret_cast<char *>(item)) + 1;
-            while (*item != 0) {
-                memcpy(item, item + len, len);
-                item += len + 1;
-            }
-            return true;
-        }
-        item += strlen(reinterpret_cast<char *>(item)) + 1;
-    }
-    return false;
-}
-
-auto_ptr< vector<string> >
-Listener::listListeners()
-{
-    GNASH_REPORT_FUNCTION;
-
-    boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
-
-    auto_ptr< vector<string> > listeners ( new vector<string> );
-    const char *item = reinterpret_cast<char *>(addr);
-    while (*item != 0) {
-        listeners->push_back(item);
-        item += strlen(item) + 1;
-    }    
-
-    return listeners;
-}
-
 /// \brief Closes (disconnects) the LocalConnection object.
 void
 LocalConnection::close()
@@ -204,40 +131,6 @@ LocalConnection::connect(const std::string& name)
         log_error("Failed to open shared memory segment: \"%s\"", name.c_str());
         return false; 
     }
-    
-#if 0 // { // what are these Listeners ?
-
-    Listener::setBaseAddress(Shm::getAddr());
-        
-    string str1 = "HelloWorld";
-    addListener(str1);
-    str1 = "GutenTag";
-    addListener(str1);
-    str1 = "Aloha";
-    addListener(str1);
-    
-    vector<string>::const_iterator it;
-    auto_ptr< vector<string> > listeners ( listListeners() );
-    if (listeners->size() == 0) {
-        log_msg("Nobody is listening");
-    } else {
-        log_msg("There are %d", listeners->size());
-        for (it=listeners->begin(); it!=listeners->end(); it++) {
-            string str = *it;
-            log_debug("Listeners: %s", str.c_str());
-        }
-    }
-
-    str1 = "HelloWorld";
-    removeListener(str1);
-    listeners = listListeners();  
-    log_msg("There are %d", listeners->size());
-    for (it=listeners->begin(); it != listeners->end(); it++) {
-        string str = *it;
-        log_debug("Listeners: %s", str.c_str());
-    }
-    
-#endif // }
     
     return true;
 }
