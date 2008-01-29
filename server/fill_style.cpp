@@ -435,7 +435,7 @@ fill_style::create_gradient_bitmap() const
 			for (size_t i = 0; i < im->width(); i++)
 			{
 				float radiusy = (im->height() - 1) / 2.0f;
-				float radiusx = radiusy + abs(radiusy * m_focal_point);
+				float radiusx = radiusy + std::abs(radiusy * m_focal_point);
 				float y = (j - radiusy) / radiusy;
 				float x = (i - radiusx) / radiusx;
 				int ratio = (int) floorf(255.5f * sqrt(x*x + y*y));
