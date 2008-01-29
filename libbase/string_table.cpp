@@ -24,25 +24,26 @@ using namespace gnash;
 std::string string_table::mEmpty = "";
 
 string_table::key
-string_table::find(const std::string& to_find, bool insert_unfound,
-	bool case_insensitive)
+string_table::find(const std::string& t_f, bool insert_unfound)
 {
-	std::size_t ckey = 0;
+	std::string t_fcase;
+	const std::string *to_find = NULL;
 
+	if (mCaseInsensitive)
+	{
+		t_fcase = t_f;
+		boost::to_lower(t_fcase);
+		to_find = &t_fcase;
+	}
+	else
+		to_find = &t_f;
+		
 	// Empty strings all map to 0
-	if (to_find.empty())
+	if (to_find->empty())
 		return 0;
 
-	if (case_insensitive)
-	{
-		std::string caseless = boost::to_lower_copy(to_find);
-		if (caseless != to_find) // Only do this if cased/caseless differs.
-		{
-			ckey = find(caseless, insert_unfound, false).caseless;
-		}
-	}
-
-	table::nth_index<0>::type::iterator i = mTable.get<0>().find(to_find);
+	table::nth_index<0>::type::iterator i =
+		mTable.get<0>().find(*to_find);
 
 	if (i == mTable.end() && insert_unfound)
 	{
@@ -53,21 +54,23 @@ string_table::find(const std::string& to_find, bool insert_unfound,
 			// First we lock.
 			boost::mutex::scoped_lock aLock(mLock);
 			// Then we see if someone else managed to sneak past us.
-			i = mTable.get<0>().find(to_find);
+			i = mTable.get<0>().find(*to_find);
 			// If they did, use that value.
 			if (i != mTable.end())
-				return case_key(i->mId, &i->mValue); 
+				return i->mId;
+
 			// Otherwise, insert it.
-			theSvt.mValue = to_find;
+			theSvt.mValue = t_f;
+			theSvt.mComp = *to_find;
 			theSvt.mId = ++mHighestKey;
 			mTable.insert(theSvt);
-			return case_key(ckey ? ckey : theSvt.mId, &(theSvt.mValue));
+			return theSvt.mId;
 		}
 		else
 			return 0;
 	}
 
-	return case_key(ckey ? ckey : i->mId, &(i->mValue));
+	return i->mId;
 }
 
 string_table::key
@@ -85,9 +88,7 @@ string_table::key
 string_table::insert(const std::string& to_insert)
 {
 	boost::mutex::scoped_lock aLock(mLock);
-	svt theSvt;
-	theSvt.mValue = to_insert;
-	theSvt.mId = ++mHighestKey;
+	svt theSvt(to_insert, ++mHighestKey);
 
 	return mTable.insert(theSvt).first->mId;
 }
@@ -100,7 +101,11 @@ string_table::insert_group(svt* pList, std::size_t size)
 	for (std::size_t i = 0; i < size; ++i)
 	{
 		if (mSetToLower)
+		{
 			boost::to_lower(pList[i].mValue);
+			boost::to_lower(pList[i].mComp);
+		}
+
 		// The keys don't have to be consecutive, so any time we find a key
 		// that is too big, jump a few keys to avoid rewriting this on every item.
 		if (pList[i].mId > mHighestKey)
@@ -113,9 +118,9 @@ string_table::insert_group(svt* pList, std::size_t size)
 string_table::key
 string_table::already_locked_insert(const std::string& to_insert, boost::mutex&)
 {
-	svt theSvt;
-	theSvt.mValue = to_insert;
-	theSvt.mId = ++mHighestKey;
+	svt theSvt (to_insert, ++mHighestKey);
+	if (mCaseInsensitive)
+		boost::to_lower(theSvt.mComp);
 	return mTable.insert(theSvt).first->mId;
 }
 

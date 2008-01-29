@@ -41,37 +41,30 @@ class string_table;
 /// A general use string table.
 class string_table
 {
-private:
-	struct case_key
-	{
-		std::size_t caseless;
-		const std::string *cased;
-		case_key() : caseless(0), cased(NULL) {}
-		case_key(std::size_t k) : caseless(k), cased(NULL) {}
-		case_key(std::size_t k, const std::string *c) :
-			caseless(k), cased(c) {}
-		operator std::size_t() const { return caseless; }
-		bool operator<(const case_key &o) { return caseless < o.caseless; }
-	};
-
 public:
 	/// A little helper for indexing.
 	struct svt
 	{
 		std::string mValue;
 		std::size_t mId;
+		std::string mComp;
+
+		svt() : mValue(""), mId(0), mComp("") {/**/}
+
+		svt(const std::string &val, std::size_t id) :
+			mValue(val), mId(id), mComp(val) {/**/}
 	};
 
 public:
 	typedef boost::multi_index_container<svt,
 		boost::multi_index::indexed_by<
 			boost::multi_index::hashed_non_unique<
-				boost::multi_index::member<svt, std::string, &svt::mValue> >,
+				boost::multi_index::member<svt, std::string, &svt::mComp> >,
 			boost::multi_index::hashed_non_unique< // caseless
 				boost::multi_index::member<svt, std::size_t, &svt::mId> > 
 	> > table;
 
-	typedef case_key key;
+	typedef std::size_t key;
 
 	/// \brief
 	/// Find a string. If insert_unfound is true, the string will
@@ -83,37 +76,16 @@ public:
 	/// If this is set to false, a search is performed, but no update.
 	/// By update, any unfound string is added to the table.
 	///
-	/// @param case_insensitive
-	/// If true, find a case-insensitive match to this.
-	/// N.B.: Will not necessarily match a string which was not inserted
-	/// as case_insensitive.
-	///
 	/// @return
 	/// A key which can be used in value or 0 if the string is
 	/// not yet in the table and insert_unfound was false.
-	key find(const std::string& to_find, bool insert_unfound = true,
-		bool case_insensitive = false);
+	key find(const std::string& to_find, bool insert_unfound = true);
 
 	/// \brief
 	/// Find a string which is the concatentation of two known strings
 	/// with a dot between them. (Used for namespaces.)
 	/// Otherwise, just like find.
 	key find_dot_pair(key left, key right, bool insert_unfound = true);
-
-	/// Find a string by its key, exactly.
-	///
-	/// @param to_find
-	/// The string key whose value should be found.
-	///
-	/// @param (unnamed)
-	/// Used to distinguish from value(key to_find)
-	const std::string& value(key &to_find, bool)
-	{
-		if (to_find.cased != NULL)
-			return *to_find.cased;
-		to_find.cased = &(value(to_find));
-		return *to_find.cased;
-	}
 
 	/// Find a string by its key.
 	///
@@ -124,7 +96,7 @@ public:
 		if (mTable.empty() || !to_find)
 			return mEmpty;
 		table::nth_index<1>::type::iterator r = 
-			mTable.get<1>().find(to_find.caseless);
+			mTable.get<1>().find(to_find);
 		return (r == mTable.get<1>().end()) ? mEmpty : r->mValue;
 	}
 
@@ -164,12 +136,16 @@ public:
 	/// @return A mutex which can be used to lock the string table to inserts.
 	boost::mutex& lock_mutex() { return mLock; }
 
+	/// Make the comparisons case-insensitive.
+	void set_insensitive() { mCaseInsensitive = true; }
+
 	/// Construct the empty string_table
 	string_table() :
 		mTable(),
 		mLock(),
 		mHighestKey(0),
-		mSetToLower(false)
+		mSetToLower(false),
+		mCaseInsensitive(false)
 	{/**/}
 
 private:
@@ -178,6 +154,7 @@ private:
 	boost::mutex mLock;
 	std::size_t mHighestKey;
 	bool mSetToLower; // If true, affects the next group addition.
+	bool mCaseInsensitive;
 };
 
 } /* namespace gnash */

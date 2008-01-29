@@ -68,6 +68,8 @@ main(int /*argc*/, char** /*argv*/)
 
 	string_table& st = vm.getStringTable();
 
+	if (vm.getSWFVersion() > 6) // Below 7 is not case sensitive.
+	{
 	check_equals(props.size(), 0);
 	check ( props.setValue(st.find("Var0"), val, obj) );
 	check_equals(props.size(), 1);
@@ -121,6 +123,6 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals( vals["var0"], "value3" );
 	check_equals( vals["Var0"], "value2" );
 	check_equals( vals["var1"], "value" );
-
+	} // end version specific
 }
 

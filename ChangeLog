@@ -1,3 +1,10 @@
+2008-01-29 Chad Musick <chadmusick@msbx.net>
+
+	* libbase/string_table.h,cpp: Change string_table to be case
+	  insensitive for strings in SWF versions less than 7.
+	* testsuite/server/PropertyListTest.cpp: Amend Test to not
+	  test case-sensitivity when it shouldn't be case sensitive.
+
 2008-01-28 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* libmedia/gst/VideoDecoderGst.{cpp,h}: Tell the decoder about the
