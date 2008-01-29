@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.82 2008/01/21 20:55:49 rsavoye Exp $ */
+/* $Id: as_value.h,v 1.83 2008/01/29 12:31:09 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -84,7 +84,8 @@ static inline int isnan_ld (long double x) { return x != x; }
 /// The methods will convert the name to lowercase if the current VM target
 /// is SWF6 or lower
 ///
-#define PROPNAME(x) ( VM::get().getSWFVersion() < 7 ? boost::to_lower_copy(std::string(x)) : (x) )
+//#define PROPNAME(x) ( VM::get().getSWFVersion() < 7 ? boost::to_lower_copy(std::string(x)) : (x) )
+#define PROPNAME(x) ( x )
 
 /// These are the primitive types, see the ECMAScript reference.
 enum primitive_types

@@ -1802,5 +1802,23 @@ movie_root::processLoadMovieRequests()
     }
 }
 
+bool
+movie_root::isLevelTarget(const std::string& name, unsigned int& levelno)
+{
+  if ( VM::get().getSWFVersion() > 6 )
+  {
+    if ( name.compare(0, 6, "_level") ) return false;
+  }
+  else
+  {
+    if ( strncasecmp(name.c_str(), "_level", 6) ) return false;
+  }
+
+  if ( name.find_first_not_of("0123456789", 7) != std::string::npos ) return false;
+  levelno = atoi(name.c_str()+6); // getting 0 here for "_level" is intentional
+  return true;
+
+}
+
 } // namespace gnash
 

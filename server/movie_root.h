@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.105 2008/01/25 11:33:36 strk Exp $ */
+/* $Id: movie_root.h,v 1.106 2008/01/29 12:31:10 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -623,6 +623,17 @@ public:
     ///     Load method. 
     ///
     void loadMovie(const URL& url, const std::string& target, LoadMethod method=NONE);
+
+    /// Return true if the given string can be interpreted as a _level name
+    //
+    /// @param name
+    ///   The target string.
+    ///   Will be considered case-insensitive if VM version is < 7.
+    ///
+    /// @param levelno
+    ///   Output parameter, will be set to the level number, if true is returned
+    ///
+    bool isLevelTarget(const std::string& name, unsigned int& levelno);
 
 private:
 

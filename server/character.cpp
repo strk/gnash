@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.76 2008/01/21 20:55:49 rsavoye Exp $ */
+/* $Id: character.cpp,v 1.77 2008/01/29 12:31:10 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -30,6 +30,7 @@
 #include "fn_call.h" // for shared ActionScript getter-setters
 #include "GnashException.h" // for shared ActionScript getter-setters (ensure_character)
 #include "ExecutableCode.h"
+#include "namedStrings.h"
 
 #include <boost/algorithm/string/case_conv.hpp>
 
@@ -90,12 +91,15 @@ character::get_mouse_state(int& x, int& y, int& buttons)
 as_object*
 character::get_path_element_character(string_table::key key)
 {
-	std::string name = _vm.getStringTable().value(key);
-	if (name == "." || name == "this")
+	if (key == NSV::PROP_uROOT)
 	{
-	    return this;
+		// get_root() will handle _lockroot 
+		return get_root();
 	}
-	else if (name == ".." || name == "_parent")
+
+	const std::string& name = _vm.getStringTable().value(key);
+
+	if (name == ".." || key == NSV::PROP_uPARENT )
 	{
 		// Never NULL
 		character* parent = get_parent();
@@ -113,15 +117,23 @@ character::get_path_element_character(string_table::key key)
 		}
 		return parent;
 	}
-	else if (name == "_root")
+
+	// TODO: is it correct to check for _level here ?
+	//       would it be valid at all if not the very first element
+	//       in a path ?
+	unsigned int levelno;
+	if ( _vm.getRoot().isLevelTarget(name, levelno) )
 	{
-		// get_root() will handle _lockroot 
-		return get_root();
-	}
-	else if (name.compare(0, 6, "_level") == 0 && name.find_first_not_of("0123456789", 7) == std::string::npos )
-	{
-		unsigned int levelno = atoi(name.c_str()+6);
 		return _vm.getRoot().getLevel(levelno).get();
+	}
+
+
+	std::string namei = name;
+	if ( _vm.getSWFVersion() < 7 ) boost::to_lower(namei);
+
+	if (name == "." || namei == "this") 
+	{
+	    return this;
 	}
 
 	return NULL;

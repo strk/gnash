@@ -1,3 +1,15 @@
+2008-01-29 Sandro Santilli <strk@keybit.net>
+
+	* server/as_value.h: make PROPNAME a noop
+	* server/movie_root.{cpp,h}: provide a isLevelTarget
+	  method to take care of case-insensitively matching
+	  a path element with "_level" in SWF<7.
+	* server/button_character_instance.cpp,
+	  server/character.cpp, server/sprite_instance.cpp,
+	  server/vm/ASHandlers.cpp: update "_level" handling.
+	* testsuite/actionscript.all/case.as: success in property
+	  names.
+
 2008-01-29 Chad Musick <chadmusick@msbx.net>
 
 	* libbase/string_table.h,cpp: Change string_table to be case

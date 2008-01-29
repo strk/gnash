@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.185 2008/01/28 12:26:47 bwy Exp $ */
+/* $Id: ASHandlers.cpp,v 1.186 2008/01/29 12:31:10 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -2188,6 +2188,8 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		return;
 	}
 
+	movie_root& mr = VM::get().getRoot();
+
 	if ( loadTargetFlag )
 	{
 		// TODO: always pass directly to movie_root::loadMovie ?
@@ -2203,15 +2205,14 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 
 		if ( ! target_ch )
 		{
-			std::string s = PROPNAME(target_string);
-			if ( s.compare(0, 6, "_level") == 0 && s.find_first_not_of("0123456789", 7) == string::npos )
+			unsigned int levelno;
+			if ( mr.isLevelTarget(target_string, levelno) )
 			{
-				unsigned int levelno = atoi(target_string.c_str()+6);
 				log_debug(_("Testing _level loading (level %u)"), levelno);
 #ifdef QUEUE_MOVIE_LOADS
-				VM::get().getRoot().loadMovie(url, s); // TODO: add third argument for the method
+				mr.loadMovie(url, target_string); // TODO: add third argument for the method
 #else
-				VM::get().getRoot().loadLevel(levelno, url);
+				mr.loadLevel(levelno, url);
 #endif
 				return;
 			}
@@ -2251,15 +2252,14 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 			sendVarsMethod);
 	}
 
-	std::string s = PROPNAME(target_string);
-	if ( s.compare(0, 6, "_level") == 0 && s.find_first_not_of("0123456789", 7) == string::npos )
+	unsigned int levelno;
+	if ( mr.isLevelTarget(target_string, levelno) )
 	{
-		unsigned int levelno = atoi(target_string.c_str()+6);
 		log_debug(_("Testing _level loading (level %u)"), levelno);
 #ifdef QUEUE_MOVIE_LOADS
-		VM::get().getRoot().loadMovie(url, s); // TODO: add third argument for the method
+		mr.loadMovie(url, target_string); // TODO: add third argument for the method
 #else
-		VM::get().getRoot().loadLevel(levelno, url);
+		mr.loadLevel(levelno, url);
 #endif
 		return;
 	}
