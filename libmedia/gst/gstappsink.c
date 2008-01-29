@@ -17,7 +17,7 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* $Id: gstappsink.c,v 1.5 2008/01/27 07:18:18 bjacques Exp $ */
+/* $Id: gstappsink.c,v 1.6 2008/01/29 05:18:33 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -644,7 +644,7 @@ gst_app_sink_pull_buffer (GstAppSink * appsink)
 
     /* nothing to return, wait */
     GST_DEBUG_OBJECT (appsink, "waiting for a buffer");
-    g_cond_wait (appsink->cond, appsink->mutex);
+    g_cond_wait (appsink->cond, appsink->mutex);    
   }
   buf = g_queue_pop_head (appsink->queue);
   GST_DEBUG_OBJECT (appsink, "we have a buffer %p", buf);
@@ -666,6 +666,85 @@ not_started:
     return NULL;
   }
 }
+
+
+/**
+ * gst_app_sink_pull_buffer_timed:
+ * @appsink: a #GstAppSink
+ *
+ * This function blocks until a buffer or EOS becomes available or the appsink
+ * element is set to the READY/NULL state, or if one second elapses. 
+ *
+ * This function will only return buffers when the appsink is in the PLAYING
+ * state. All rendered buffers will be put in a queue so that the application
+ * can pull buffers at its own rate.
+ *
+ * If an EOS event was received before any buffers, or if one second passes and
+ * no data arrives, this function returns * %NULL. Use gst_app_sink_is_eos ()
+ * to check for the EOS condition. 
+ *
+ * Returns: a #GstBuffer or NULL when the appsink is stopped or EOS, or one
+ *   second elapses.
+ */
+GstBuffer *
+gst_app_sink_pull_buffer_timed (GstAppSink * appsink)
+{
+  GstBuffer *buf = NULL;
+
+  g_return_val_if_fail (appsink != NULL, NULL);
+  g_return_val_if_fail (GST_IS_APP_SINK (appsink), NULL);
+
+  g_mutex_lock (appsink->mutex);
+
+  while (TRUE) {
+    GST_DEBUG_OBJECT (appsink, "trying to grab a buffer");
+    if (!appsink->started)
+      goto not_started;
+
+    if (!g_queue_is_empty (appsink->queue))
+      break;
+
+    if (appsink->is_eos)
+      goto eos;
+
+    /* nothing to return, wait */
+    GST_DEBUG_OBJECT (appsink, "waiting for a buffer");    
+    
+    GTimeVal cur_time;
+    g_get_current_time(&cur_time);
+    cur_time.tv_sec++; // Add one second
+
+    if (!g_cond_timed_wait(appsink->cond, appsink->mutex, &cur_time))
+      goto timeout;
+    
+  }
+  buf = g_queue_pop_head (appsink->queue);
+  GST_DEBUG_OBJECT (appsink, "we have a buffer %p", buf);
+  g_mutex_unlock (appsink->mutex);
+
+  return buf;
+
+  /* special conditions */
+timeout:
+  {
+    GST_DEBUG_OBJECT (appsink, "we timed out, return NULL");
+    g_mutex_unlock (appsink->mutex);
+    return NULL;
+  }
+eos:
+  {
+    GST_DEBUG_OBJECT (appsink, "we are EOS, return NULL");
+    g_mutex_unlock (appsink->mutex);
+    return NULL;
+  }
+not_started:
+  {
+    GST_DEBUG_OBJECT (appsink, "we are stopped, return NULL");
+    g_mutex_unlock (appsink->mutex);
+    return NULL;
+  }
+}
+
 
 
 /**

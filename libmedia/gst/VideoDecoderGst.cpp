@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderGst.cpp,v 1.10 2008/01/27 07:18:18 bjacques Exp $
+// $Id: VideoDecoderGst.cpp,v 1.11 2008/01/29 05:18:33 bjacques Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -34,10 +34,9 @@ namespace media {
 
 // TODO: implement proper seeking.
 
-VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type)
- :  _appsink(NULL),
+VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type, int width, int height)
+ : _appsink(NULL),
    _colorspace(NULL)
-  
 {
   gst_init (NULL, NULL);
   
@@ -46,22 +45,31 @@ VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type)
   _appsrc = gst_element_factory_make ("appsrc", NULL);
   
   GstElement* decoder = NULL;
-  GstCaps* caps = NULL;
   
+  GstCaps* caps;  
   switch (codec_type) {
     case VIDEO_CODEC_H263:
       decoder = gst_element_factory_make ("ffdec_flv", NULL);
-      caps = gst_caps_new_simple ("video/x-flash-video", NULL);
+      caps = gst_caps_new_simple ("video/x-flash-video",
+                                      "width", G_TYPE_INT, width,
+                                      "height", G_TYPE_INT, height,   
+                                      NULL);
       break;
     case VIDEO_CODEC_VP6:
     case VIDEO_CODEC_VP6A:
       decoder = gst_element_factory_make ("ffdec_vp6f", NULL);
-      caps = gst_caps_new_simple ("video/x-vp6-flash", NULL);
+      caps = gst_caps_new_simple ("video/x-vp6-flash",
+                                      "width", G_TYPE_INT, width,
+                                      "height", G_TYPE_INT, height,     
+                                      NULL);
       break;      
     case VIDEO_CODEC_SCREENVIDEO:
     case VIDEO_CODEC_SCREENVIDEO2:
-      decoder = gst_element_factory_make ("ffdec_flashsv", NULL);
-      caps = gst_caps_new_simple ("video/x-flash-screen", NULL);
+      decoder = gst_element_factory_make ("ffdec_flv", NULL);
+      caps = gst_caps_new_simple ("video/x-flash-screen",
+                                      "width", G_TYPE_INT, width,
+                                      "height", G_TYPE_INT, height,
+                                      NULL);
       break;
     default:
       log_error("No support for this video codec. %d", codec_type);
@@ -73,7 +81,6 @@ VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type)
   if (!decoder) {
     log_error(_("failed to initialize the video decoder. Bailing out."));
     gst_object_unref (GST_OBJECT (_pipeline));
-    gst_caps_unref(caps);
     _pipeline = NULL;
     return;
   }
@@ -117,6 +124,8 @@ VideoDecoderGst::pushRawFrame(GstBuffer* buffer)
     return;
   }
   gst_app_src_push_buffer (GST_APP_SRC(_appsrc), buffer);
+  
+  checkMessages();
 }
   
 
@@ -129,7 +138,12 @@ VideoDecoderGst::popDecodedFrame()
 
   checkMessages();
   
-  GstBuffer* buffer = gst_app_sink_pull_buffer (GST_APP_SINK(_appsink));
+  GstBuffer* buffer = gst_app_sink_pull_buffer_timed (GST_APP_SINK(_appsink));
+  
+  if (!buffer) {
+    return std::auto_ptr<gnashGstBuffer>();
+  }
+  
   GstCaps* caps = gst_buffer_get_caps(buffer);
 
   assert(gst_caps_get_size(caps) == 1);

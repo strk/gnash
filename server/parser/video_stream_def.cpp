@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.35 2008/01/28 17:20:03 bjacques Exp $
+// $Id: video_stream_def.cpp,v 1.36 2008/01/29 05:18:33 bjacques Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -79,7 +79,7 @@ video_stream_definition::readDefineVideoStream(stream* in, SWF::tag_type tag, mo
 
 	m_codec_id = static_cast<media::videoCodecType>(in->read_u8());
 
-	_decoder.reset( new media::VideoDecoderGst(m_codec_id) );
+	_decoder.reset( new media::VideoDecoderGst(m_codec_id, _width, _height) );
 
 }
 
@@ -104,24 +104,21 @@ video_stream_definition::readDefineVideoFrame(stream* in, SWF::tag_type tag, mov
 
 	GstBuffer* buffer = gst_buffer_new_and_alloc(dataSize+8);
 	memset(GST_BUFFER_DATA(buffer)+dataSize, 0, 8);
+	GST_BUFFER_SIZE (buffer) = dataSize;
 
 	if (!buffer) {
 		log_error(_("Failed to allocate a buffer of size %d advertised by SWF."),
 		dataSize);
 		return;
 	}
-  
+	
 	GST_BUFFER_OFFSET(buffer) = frameNum;
-  
+	GST_BUFFER_TIMESTAMP(buffer) = GST_CLOCK_TIME_NONE;
+	GST_BUFFER_DURATION(buffer) = GST_CLOCK_TIME_NONE;
+
 	in->read((char*)GST_BUFFER_DATA(buffer), dataSize);
 
 	_video_frames.push_back(buffer);
-	
-	if (frameNum == 0) {
-	  gst_buffer_ref(buffer); // make sure gstreamer doesn't delete the buffer.
-
-	  _decoder->pushRawFrame(buffer);
-	}
 }
 
 
@@ -143,18 +140,49 @@ video_stream_definition::get_frame_data(boost::uint32_t frameNum)
 {
 	// Check if the requested frame holds any video data.
 	EmbedFrameVec::iterator it = std::find_if(_video_frames.begin(),
-	  _video_frames.end(), boost::bind(has_frame_number, _1, frameNum+1));
-  
-	if( it == _video_frames.end() )
-	{
-	  return std::auto_ptr<image::image_base>();
+	  _video_frames.end(), boost::bind(has_frame_number, _1, frameNum));
+	
+	// FIXME: although we return nothing here, we should return the
+	// previously decoded frame.
+	if( it == _video_frames.end() )	{
+		return std::auto_ptr<image::image_base>();
 	}
-  
-	gst_buffer_ref(*it); // make sure gstreamer doesn't delete the buffer.
 
-	_decoder->pushRawFrame(*it);
+	// We are going backwards, so start from the beginning.	
+	if (_last_decoded_frame > boost::int32_t(frameNum)) {
+		_last_decoded_frame = -1;
+	}
+	
+	// Push all the frames after the previously decoded frame, until the
+	// target frame has been reached.
+	while (_last_decoded_frame != boost::int32_t(frameNum)) {
+		it = std::find_if(_video_frames.begin(),
+			_video_frames.end(), boost::bind(has_frame_number, _1,
+			_last_decoded_frame));
+  	       
+		if (it == _video_frames.end()) {
+			it = _video_frames.begin();
+		} else {
+			++it;
+		}
+		
+		if (it == _video_frames.end()) {
+			return std::auto_ptr<image::image_base>();
+		}
 
-	return std::auto_ptr<image::image_base>(_decoder->popDecodedFrame());
+		gst_buffer_ref(*it); // make sure gstreamer doesn't delete the buffer.
+		_last_decoded_frame = GST_BUFFER_OFFSET(*it);
+		_decoder->pushRawFrame(*it);	  
+	}
+
+	std::auto_ptr<media::gnashGstBuffer> buffer = _decoder->popDecodedFrame();
+
+	// If more data has arrived, replace the buffer with the next frame.
+	while (_decoder->peek()) {
+		buffer = _decoder->popDecodedFrame();
+	}
+
+	return std::auto_ptr<image::image_base>(buffer.release());
 }
 
 

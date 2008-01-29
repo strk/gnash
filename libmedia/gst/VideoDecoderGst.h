@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderGst.h,v 1.12 2008/01/27 07:18:18 bjacques Exp $
+// $Id: VideoDecoderGst.h,v 1.13 2008/01/29 05:18:33 bjacques Exp $
 
 #ifndef __VIDEODECODERGST_H__
 #define __VIDEODECODERGST_H__
@@ -68,7 +68,7 @@ class VideoDecoderGst
 {
 public:
 
-  VideoDecoderGst(videoCodecType codec_type);
+  VideoDecoderGst(videoCodecType codec_type, int width, int height);
   ~VideoDecoderGst();
   
   void pushRawFrame(GstBuffer* buffer);

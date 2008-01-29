@@ -17,7 +17,7 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* $Id: gstappsink.h,v 1.4 2008/01/27 07:18:18 bjacques Exp $ */
+/* $Id: gstappsink.h,v 1.5 2008/01/29 05:18:33 bjacques Exp $ */
 
 #ifndef _GST_APP_SINK_H_
 #define _GST_APP_SINK_H_
@@ -82,6 +82,7 @@ gboolean        gst_app_sink_is_eos         (GstAppSink *appsink);
 GstBuffer *     gst_app_sink_pull_preroll   (GstAppSink *appsink);
 GstBuffer *     gst_app_sink_pull_buffer    (GstAppSink *appsink);
 gboolean        gst_app_sink_peek_buffer    (GstAppSink *appsink);
+GstBuffer *     gst_app_sink_pull_buffer_timed (GstAppSink * appsink);
 
 G_END_DECLS
 

@@ -1,3 +1,16 @@
+2008-01-28 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libmedia/gst/VideoDecoderGst.{cpp,h}: Tell the decoder about the
+	expected video width and height. Check for error conditions more
+	frequently.
+	* libmedia/gst/gstappsink.{c,h}: Add
+	gst_app_sink_pull_buffer_timed(), which waits up to one second
+	before returning if the expected buffer does not make its way
+	to the output queue.
+	* server/parser/video_stream_def.cpp: Make sure the decoder parses
+	intermedia frames if certain frames are skipped. Don't assume that
+	frame 0 is a "spin-up" frame. Fixes Video-EmbedSquareTest.
+
 2008-01-28 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/tag_loaders.cpp (button_sound_loader): robustness
