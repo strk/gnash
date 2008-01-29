@@ -1,5 +1,7 @@
 2008-01-29 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfmill.all/Makefile.am: distribute swfmill
+	  sources, even if swfmill isn't available.
 	* testsuite/misc-swfc.all/Makefile.am: don't attempt to
 	  build the button test runner if you can't build the
 	  actual swf (missing SWFC).

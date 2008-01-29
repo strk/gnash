@@ -20,8 +20,6 @@ AUTOMAKE_OPTIONS = dejagnu -Wno-portability
 
 abs_topbuilddir=$(shell cd $(top_builddir); pwd)
 
-if ENABLE_SWFMILL
-
 ## Self-contained XML tests
 SC_XMLTESTS =			\
 	hello.xml		\
@@ -29,6 +27,10 @@ SC_XMLTESTS =			\
 	dict_override.xml	\
 	initaction_in_definesprite.xml \
 	$(NULL)
+
+EXTRA_DIST = $(SC_XMLTESTS)
+
+if ENABLE_SWFMILL
 
 ## Path to Dejagnu.swf file
 DEJAGNU_SO_PATH = ../misc-ming.all/Dejagnu.swf
