@@ -325,8 +325,7 @@ namespace tu_file_wrappers
 		enum SWF_DEFINE_BITS_JPEG2_HEADER_ONLY { SWF_JPEG2_HEADER_ONLY };
 
 		/// \brief
-		/// Constructor.  Read the header data from in, and
-		/// prepare to read data.
+		/// Constructor.  
 		//
 		/// @param in
 		/// 	The stream to read from. Ownership specified by
@@ -343,61 +342,24 @@ namespace tu_file_wrappers
 			m_cinfo.err = &m_jerr;
 			m_cinfo.client_data = this;
 
-			if ( setjmp(_jmpBuf) )
-			{
-				std::stringstream ss;
-				ss << "Internal jpeg error: " << _errorOccurred;
-				throw gnash::ParserException(ss.str());
-			}
-
 			// Initialize decompression object.
 			jpeg_create_decompress(&m_cinfo);
 
 			rw_source_tu_file::setup(&m_cinfo, in, takeOwnership);
 
-			start_image();
 		}
 
-
-		// The SWF file format stores JPEG images with the
-		// encoding tables separate from the image data.  This
-		// constructor reads the encoding table only and keeps
-		// them in this object.  You need to call
-		// start_image() and finish_image() around any calls
-		// to get_width/height/components and read_scanline.
-		//
-		/// @param in
-		/// 	The stream to read from. Ownership specified by
-		///	last argument.
-		///
-		/// @param takeOwnership
-		///	If true, we take ownership of the input stream. 
-		///
-		input_tu_file(SWF_DEFINE_BITS_JPEG2_HEADER_ONLY /* e */, tu_file* in,
-				unsigned int maxHeaderBytes, bool takeOwnership=false)
-			:
-			m_compressor_opened(false)
+		void readHeader(unsigned int maxHeaderBytes)
 		{
-			setup_jpeg_err(&m_jerr);
-			m_cinfo.err = &m_jerr;
-			m_cinfo.client_data = this;
-
 			if ( setjmp(_jmpBuf) )
 			{
 				std::stringstream ss;
 				ss << "Internal jpeg error: " << _errorOccurred;
 				throw gnash::ParserException(ss.str());
 			}
-
-			// Initialize decompression object.
-			jpeg_create_decompress(&m_cinfo);
-
-			rw_source_tu_file::setup(&m_cinfo, in, takeOwnership);
 
 			if ( maxHeaderBytes )
 			{
-				unsigned long startPos = in->get_position();
-
 				// Read the encoding tables.
 				// TODO: how to limit reads ?
 				int ret = jpeg_read_header(&m_cinfo, FALSE);
@@ -425,11 +387,6 @@ namespace tu_file_wrappers
 					throw gnash::ParserException(ss.str());
 				}
 
-				unsigned long endPos = in->get_position();
-				if ( endPos - startPos > maxHeaderBytes )
-				{
-					gnash::log_error("Reading of jpeg headers went past requested maxHeaderBytes");
-				}
 			}
 
 			// Don't start reading any image data!
@@ -473,6 +430,14 @@ namespace tu_file_wrappers
 		void	start_image()
 		{
 			assert(m_compressor_opened == false);
+
+			if ( setjmp(_jmpBuf) )
+			{
+				std::stringstream ss;
+				ss << "Internal jpeg error: " << _errorOccurred;
+				throw gnash::ParserException(ss.str());
+			}
+
 
 			// hack, FIXME
 			static const int stateReady = 202;	/* found SOS, ready for start_decompress */
@@ -674,8 +639,10 @@ input::errorOccurred(const char* msg)
 input*
 input::create(tu_file* in, bool takeOwnership)
 {
-	input* ret = new tu_file_wrappers::input_tu_file(in, takeOwnership);
-	return ret;
+	using tu_file_wrappers::input_tu_file;
+	std::auto_ptr<input_tu_file> ret ( new input_tu_file(in, takeOwnership) );
+	if ( ret.get() ) ret->start_image(); // might throw an exception (I guess)
+	return ret.release();
 }
 
 /*static*/
@@ -683,8 +650,9 @@ input*
 input::create_swf_jpeg2_header_only(tu_file* in, unsigned int maxHeaderBytes, bool takeOwnership)
 {
 	using tu_file_wrappers::input_tu_file;
-	input* ret = new input_tu_file(input_tu_file::SWF_JPEG2_HEADER_ONLY, in, maxHeaderBytes, takeOwnership);
-	return ret;
+	std::auto_ptr<input_tu_file> ret ( new input_tu_file(in, takeOwnership) );
+	if ( ret.get() ) ret->readHeader(maxHeaderBytes); // might throw an exception
+	return ret.release();
 }
 
 
