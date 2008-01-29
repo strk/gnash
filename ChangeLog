@@ -1,5 +1,8 @@
 2008-01-29 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ActionExec.cpp (call operator): interrupt
+	  execution if an opcode is advertised to cross the code
+	  segment boundaries. Fixes bug #22150.
 	* libbase/jpeg.cpp: don't long jump in the constructor.
 	  Fixes bug #22147.
 	* server/fill_style.cpp (create_gradient_bitmap): fix a probably

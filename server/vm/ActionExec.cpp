@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.65 2008/01/24 11:12:27 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.66 2008/01/29 22:14:12 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -94,6 +94,8 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_valu
 	env(newEnv),
 	retval(nRetVal)
 {
+	assert(stop_pc < code.size());
+
 	//GNASH_REPORT_FUNCTION;
 
 	// See comment in header
@@ -326,6 +328,7 @@ ActionExec::operator() ()
 			  length, (int)length, (unsigned)action_id, pc,
 			  stop_pc);
 			);
+			break; // no way to recover from this actually..
 			//throw ActionException(ss.str());;
 			// Give this action handler a chance anyway.
 			// Maybe it will be able to do something about
