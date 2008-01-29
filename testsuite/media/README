@@ -31,3 +31,13 @@ default.orc
 majorscale.sco
 
 	Csound score file for a major scale execution
+
+square.flv
+
+	H263 video in an FLV
+	It's a red square moving horizontally (left to right)
+	over a yellow background.
+
+square.ogg
+
+	Theora video version of square.flv.
