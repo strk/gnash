@@ -19,6 +19,19 @@
 /*
  * Plays video stored internal in the SWF.
  * Should be used with the MovieTester to test if the video decoder works.
+ *
+ * TODO:
+ *
+ * Test all codecs:
+ *
+ *   - VIDEO_CODEC_H263     (id: 2) [ in square.flv ]
+ *   - VIDEO_CODEC_SCREEN   (id: 3)
+ *   - VIDEO_CODEC_VP6      (id: 4)
+ *   - VIDEO_CODEC_VP6A     (id: 5)
+ *   - VIDEO_CODEC_SCREEN2  (id: 6)
+ * 
+ *
+ *
  */
 
 #include <stdlib.h>
