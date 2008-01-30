@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.h,v 1.35 2008/01/21 23:28:02 rsavoye Exp $ */
+/* $Id: plugin.h,v 1.36 2008/01/30 21:39:18 strk Exp $ */
 
 #ifndef __PLUGIN_H__
 #define __PLUGIN_H__
@@ -93,6 +93,10 @@ public:
 
 private:
 
+    static bool handlePlayerRequestsWrapper(GIOChannel* iochan, GIOCondition cond, nsPluginInstance* plugin);
+
+    bool handlePlayerRequests(GIOChannel* iochan, GIOCondition cond);
+
     // EMBED or OBJECT attributes / parameters
     // @@ this should likely replace the _options element below
     std::map<std::string, std::string> _params;
@@ -105,6 +109,8 @@ private:
     unsigned int                       _height;
     std::map<std::string, std::string> _options;
     int                                _streamfd;
+    GIOChannel*                        _ichan;
+    int                                _ichanWatchId;
     pid_t                              _childpid;
     int                                _filefd;
 

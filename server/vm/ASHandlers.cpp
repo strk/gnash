@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.187 2008/01/30 14:51:48 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.188 2008/01/30 21:39:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -2320,16 +2320,18 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		size_t len = requestString.length();
 		// TODO: should mutex-protect this ?
 		// NOTE: we assuming the hostfd is set in blocking mode here..
+		log_debug("Attempt to write geturl requests fd %d", hostfd);
 		int ret = write(hostfd, cmd, len);
 		if ( ret == -1 )
 		{
 			log_error("Could not write to user-provided host requests fd %d: %s", hostfd, strerror(errno));
 		}
-		if ( ret < len )
+		if ( (size_t)ret < len )
 		{
-			log_error("Could only write %d bytes over %d required to user-provided host requests fd %d: %s",
+			log_error("Could only write %d bytes over "SIZET_FMT" required to user-provided host requests fd %d",
 				ret, len, hostfd);
 		}
+		log_debug("Wrote %d bytes of geturl requests (all needed)", ret);
 	}
 
 }

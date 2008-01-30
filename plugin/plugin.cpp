@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.93 2008/01/21 23:28:02 rsavoye Exp $ */
+/* $Id: plugin.cpp,v 1.94 2008/01/30 21:39:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -284,6 +284,8 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
 	_width(0),
 	_height(0),
 	_streamfd(-1),
+	_ichan(0),
+	_ichanWatchId(0),
 	_childpid(0),
 	_filefd(-1)
 {
@@ -308,6 +310,18 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
 /// \brief Destructor
 nsPluginInstance::~nsPluginInstance()
 {
+	cout << "plugin instance destruction" << endl;
+	if ( _ichan )
+	{
+		cout << "shutting down input chan " << _ichan << endl;
+		GError *error = NULL;
+		g_io_channel_shutdown (_ichan, TRUE, &error);
+		g_io_channel_unref (_ichan);
+	}
+	if ( _ichanWatchId )
+	{
+		g_source_remove(_ichanWatchId);
+	}
 }
 
 /// \brief Initialize an instance of the plugin object
@@ -355,6 +369,8 @@ nsPluginInstance::init(NPWindow* aWindow)
 void
 nsPluginInstance::shut()
 {
+	cout << "Shutting down" << endl;
+
 	if (_childpid > 0)
 	{
 		// it seems that waiting after a SIGINT hangs firefox
@@ -539,6 +555,69 @@ nsPluginInstance::Write(NPStream * /* stream */, int32_t /* offset */, int32_t l
 	return write(_streamfd, buffer, len);
 }
 
+bool
+nsPluginInstance::handlePlayerRequestsWrapper(GIOChannel* iochan, GIOCondition cond, nsPluginInstance* plugin)
+{
+	return plugin->handlePlayerRequests(iochan, cond);
+}
+
+bool
+nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
+{
+	if ( cond == G_IO_HUP )
+	{
+		cout << "Player request channel hang up" << endl;
+		g_source_remove(_ichanWatchId);
+		return false;
+	}
+
+	assert(cond == G_IO_IN);
+	int inputfd = g_io_channel_unix_get_fd(iochan);
+
+	cout << "Checking player requests on fd " << inputfd << endl;
+	cout.flush();
+
+#define MAXLINE 256
+	char buf[MAXLINE];
+
+	int ret = read(inputfd, buf, MAXLINE-1);
+	if ( ret == -1 )
+	{
+		cout << " player request channel " << inputfd << " read error " << strerror(errno) << endl;
+		return false;
+	}
+	if ( ! ret )
+	{
+		cout << " no bytes read from player requests channel " << inputfd << endl;
+		return false; // correct ?
+	}
+	buf[ret] = '\0';
+
+	cout << " read " << ret << " bytes from fd " << inputfd << ": " << endl
+		<< buf << endl;
+
+	size_t linelen = ret;
+	if ( linelen < 4 )
+	{
+		cout << "Invalid player request (too short): " << buf << endl;
+		return true;
+	}
+
+	if ( strncmp(buf, "GET ", 4) )
+	{
+		cout << "Unknown player request: " << buf << endl;
+		return true;
+	}
+
+	char* url = buf+4;
+	char* target = "_top"; // todo: fix
+
+	cout << "Asked to get URL '" << url << "'" << endl;
+	NPN_GetURL(_instance, url, target);
+
+	return true;
+}
+
 void
 nsPluginInstance::startProc(Window win)
 {
@@ -569,15 +648,21 @@ nsPluginInstance::startProc(Window win)
 	}
 
 	// 0 For reading, 1 for writing.
-	int pipefd[2];
+	int p2c_pipe[2];
+	int c2p_pipe[2];
 	
-	int ret = pipe(pipefd);
+	int ret = pipe(p2c_pipe);
 	if (ret == -1)
 	{
-		cout << "ERROR: pipe() failed: " << strerror(errno) << endl;
+		cout << "ERROR: parent to child pipe() failed: " << strerror(errno) << endl;
 	}
+	_streamfd = p2c_pipe[1];
 
-	_streamfd = pipefd[1];
+	ret = pipe(c2p_pipe);
+	if (ret == -1)
+	{
+		cout << "ERROR: child to parent pipe() failed: " << strerror(errno) << endl;
+	}
 
 	_childpid = fork();
 
@@ -592,33 +677,45 @@ nsPluginInstance::startProc(Window win)
 	if (_childpid > 0)
 	{
 
-		// we want to write, so close read-fd0
-		ret = close (pipefd[0]);
-	
+		// we want to write to p2c pipe, so close read-fd0
+		ret = close (p2c_pipe[0]);
 		if (ret == -1)
 		{
-			cout << "ERROR: close() failed: " << strerror(errno)
+			cout << "ERROR: p2c_pipe[0] close() failed: " << strerror(errno)
 								<< endl;
 		}
+
+		// we want to read from c2p pipe, so close read-fd1
+		ret = close (c2p_pipe[1]);
+		if (ret == -1)
+		{
+			cout << "ERROR: c2p_pipe[1] close() failed: " << strerror(errno)
+								<< endl;
+		}
+	
 
 		cout << "Forked successfully, child process PID is " 
 								<< _childpid
 								<< endl;
+
+		_ichan = g_io_channel_unix_new(c2p_pipe[0]);
+		g_io_channel_set_close_on_unref(_ichan, true);
+		_ichanWatchId = g_io_add_watch(_ichan, (GIOCondition)(G_IO_IN|G_IO_HUP), (GIOFunc)handlePlayerRequestsWrapper, this);
 
 		return;
 	}
 
 	// This is the child scope.
 
-	// We want to read, so close write-fd1
-	ret = close (pipefd[1]); 
+	// We want to read parent to child, so close write-fd1
+	ret = close (p2c_pipe[1]); 
 	if (ret == -1)
 	{
 		cout << "ERROR: close() failed: " << strerror(errno) << endl;
 	}
 
 	// close standard input and direct read-fd1 to standard input
-	ret = dup2 (pipefd[0], fileno(stdin));
+	ret = dup2 (p2c_pipe[0], fileno(stdin));
 	
 	if (ret == -1)
 	{
@@ -626,7 +723,7 @@ nsPluginInstance::startProc(Window win)
 	}
 
 	// Close all of the browser's file descriptors that we just 
-	// inherited (including pipefd[0] that we just dup'd to fd 0).
+	// inherited (including p2c_pipe[0] that we just dup'd to fd 0).
 	// Experiments show seventy or eighty file descriptors open in
 	// typical cases.  Rather than close all the thousands of possible file
 	// descriptors, we start after stderr and keep closing higher numbers
@@ -636,6 +733,8 @@ nsPluginInstance::startProc(Window win)
 	int anfd = fileno(stderr)+1;
 	for ( ; numfailed < 10; anfd++)
 	{
+		if ( anfd == c2p_pipe[1] ) continue; // don't close this
+		if ( anfd == c2p_pipe[0] ) continue; // don't close this either (correct?)
 		ret = close (anfd);
 		if (ret < 0) numfailed++;
 		else
@@ -645,7 +744,7 @@ nsPluginInstance::startProc(Window win)
 		}
 	}
 
-	cout << "Closed " << closed << "files." << endl;
+	cout << "Closed " << closed << " files." << endl;
 
 	/*
 	Setup the command line for starting Gnash
@@ -653,10 +752,11 @@ nsPluginInstance::startProc(Window win)
 
 	// Prepare width, height and window ID variables
 	const size_t buf_size = 30;
-	char xid[buf_size], width[buf_size], height[buf_size];
+	char xid[buf_size], width[buf_size], height[buf_size], hostfd[buf_size];
 	snprintf(xid, buf_size, "%ld", win);
 	snprintf(width, buf_size, "%d", _width);
 	snprintf(height, buf_size, "%d", _height);
+	snprintf(hostfd, buf_size, "%d", c2p_pipe[1]);
 
 	// Prepare Actionscript variables (e.g. Flashvars).
 	vector<string> paramvalues;
@@ -685,7 +785,7 @@ nsPluginInstance::startProc(Window win)
 	ADD NEW ARGUMENTS
 	*/ 
 
-	const size_t maxargc = 16 + paramvalues.size() * 2;
+	const size_t maxargc = 18 + paramvalues.size() * 2;
 	const char **argv = new const char *[maxargc];
 
 	size_t argc = 0;
@@ -704,8 +804,13 @@ nsPluginInstance::startProc(Window win)
 	argv[argc++] = "-k";
 	argv[argc++] = height;
 	
+	// Url of the root movie
 	argv[argc++] = "-u";
 	argv[argc++] = _swf_url.c_str();
+
+	// Host FD
+	argv[argc++] = "-F";
+	argv[argc++] = hostfd;
 
 	// Base URL is the page that the SWF is embedded in. It is 
 	// by Gnash for resolving relative URLs in the movie. If the

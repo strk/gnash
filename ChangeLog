@@ -1,3 +1,11 @@
+2008-01-30 Sandro Santilli <strk@keybit.net>
+
+	* plugin/plugin.{cpp,h}: create a pipe for standalone to plugin
+	  communication and handle "GET" requests by loading the url
+	  in the _top window.
+	* server/vm/ASHandlers.cpp (CommonGetUrl): more error handling
+	  and debugging info on host geturl request.
+
 2008-01-30 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gtk.cpp: gettext macros.
