@@ -1,5 +1,12 @@
 2008-01-30 Sandro Santilli <strk@keybit.net>
 
+	* gui/Player.cpp (load_movie): use the pseudo root url
+	  for appending to the locale sendboxes. Fixes running
+	  multi-file applications from the filesystem in the 
+	  plugin (or generally, loading first movie from stdin).
+
+2008-01-30 Sandro Santilli <strk@keybit.net>
+
 	* gui/Player.{cpp,h}: add a setHostFD method.
 	* server/movie_root.{cpp,h}: add hostFD getter and setter.
 	* server/vm/ASHandlers.cpp (CommonGetUrl): use host fd
