@@ -70,7 +70,8 @@ NetStreamGst::NetStreamGst()
   g_signal_connect (_dataqueue, "running", G_CALLBACK (NetStreamGst::queue_running_cb), this);
     
   GstElement* decoder = gst_element_factory_make ("decodebin", NULL);  
-  g_signal_connect (decoder, "new-decoded-pad", G_CALLBACK (NetStreamGst::decodebin_newpad_cb), this);   
+  g_signal_connect (decoder, "new-decoded-pad", G_CALLBACK (NetStreamGst::decodebin_newpad_cb), this);
+  g_signal_connect (decoder, "unknown-type", G_CALLBACK (NetStreamGst::decodebin_unknown_cb), this);   
 
   gst_bin_add_many (GST_BIN (_pipeline), _dataqueue, decoder, NULL);
   gst_element_link(_dataqueue, decoder);
@@ -633,6 +634,17 @@ NetStreamGst::decodebin_newpad_cb(GstElement* /*decodebin*/, GstPad* pad,
     
   gst_object_unref(G_OBJECT(sinkpad));  
 }
+
+void
+NetStreamGst::decodebin_unknown_cb(GstElement* /*decodebin*/, GstPad* pad,
+                                  GstCaps *caps, gpointer user_data)
+{
+  GstStructure* str = gst_caps_get_structure (caps, 0);
+  const gchar* structure_name = gst_structure_get_name (str);
+  
+  log_error(_("Couldn't find a decoder for stream type %s!"), structure_name);
+}
+
 
 void
 NetStreamGst::queue_underrun_cb(GstElement* /*queue*/, gpointer user_data)

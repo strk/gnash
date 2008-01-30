@@ -1,3 +1,8 @@
+2008-01-29 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/asobj/NetStreamGst.{cpp,h}: Warn if decodebin can't find a
+	decoder for the requested stream.
+
 2008-01-29 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-swfmill.all/Makefile.am: distribute swfmill

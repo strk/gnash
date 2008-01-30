@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamGst.h,v 1.32 2008/01/22 08:39:08 bjacques Exp $ */
+/* $Id: NetStreamGst.h,v 1.33 2008/01/30 06:10:10 bjacques Exp $ */
 
 #ifndef __NETSTREAMGST_H__
 #define __NETSTREAMGST_H__
@@ -65,6 +65,9 @@ public:
   static void
   decodebin_newpad_cb(GstElement* decodebin, GstPad* pad, gboolean last,
                       gpointer user_data);
+  static void
+  decodebin_unknown_cb(GstElement* decodebin, GstPad* pad, GstCaps* caps,
+                       gpointer user_data);
                       
   static void queue_underrun_cb(GstElement *queue, gpointer  user_data);
   
