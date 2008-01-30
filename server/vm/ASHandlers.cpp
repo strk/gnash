@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.188 2008/01/30 21:39:18 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.189 2008/01/30 22:42:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -2314,7 +2314,20 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 	{
 		log_debug("user-provided host requests fd is %d", hostfd);
 		std::stringstream request;
-		request << "GET " << url << " " << target_string << endl;
+
+		// TODO: define a format for othe requests, we'll either need
+		//       to use separators and escaping or header specified size
+		//
+		// for now will just omit the target and let the handler consider
+		// all as an url
+		//
+		//request << "GET " << url << " " << target_string << endl;
+		log_unimpl("target window %s load (we'll load in _top) always", target_string.c_str());
+
+		// use the original url, non parsed (the browser will know better how to resolve relative urls and handle hactionscript)
+		//request << "GET " << url << endl;
+		request << "GET " << url_c << endl;
+
 		string requestString = request.str();
 		const char* cmd = requestString.c_str();
 		size_t len = requestString.length();

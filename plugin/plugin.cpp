@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.94 2008/01/30 21:39:18 strk Exp $ */
+/* $Id: plugin.cpp,v 1.95 2008/01/30 22:42:41 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -575,38 +575,58 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 	int inputfd = g_io_channel_unix_get_fd(iochan);
 
 	cout << "Checking player requests on fd " << inputfd << endl;
-	cout.flush();
 
-#define MAXLINE 256
-	char buf[MAXLINE];
-
-	int ret = read(inputfd, buf, MAXLINE-1);
-	if ( ret == -1 )
+	do
 	{
-		cout << " player request channel " << inputfd << " read error " << strerror(errno) << endl;
-		return false;
-	}
-	if ( ! ret )
-	{
-		cout << " no bytes read from player requests channel " << inputfd << endl;
-		return false; // correct ?
-	}
-	buf[ret] = '\0';
+		GError* error=NULL;
+		gchar* request;
+		gsize requestSize=0;
+		GIOStatus status = g_io_channel_read_line(iochan, &request, &requestSize, NULL, &error);
+		switch ( status )
+		{
+			case G_IO_STATUS_ERROR:
+				cout << "Error reading request line: " << error->message << endl; 
+				g_error_free(error);
+				return false;
+			case G_IO_STATUS_EOF:
+				cout << "EOF (error:" << error << ")" << endl;
+				return false;
+			case G_IO_STATUS_AGAIN:
+				cout << "Read again (error:" << error << ")" << endl;
+				break;
+			case G_IO_STATUS_NORMAL:
+				// process request
+				cout << "Normal read: " << request << " (error:" << error << ")" << endl;
+				break;
+			default:
+				cout << "Abnormal status " << status << "  (error:" << error << ")" << endl;
+				return false;
+			
+		}
 
-	cout << " read " << ret << " bytes from fd " << inputfd << ": " << endl
-		<< buf << endl;
+		// process request..
+		processPlayerRequest(request, requestSize);
+		g_free(request);
 
-	size_t linelen = ret;
+	} while (g_io_channel_get_buffer_condition(iochan) & G_IO_IN);
+
+	return true;
+
+}
+
+bool
+nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
+{
 	if ( linelen < 4 )
 	{
 		cout << "Invalid player request (too short): " << buf << endl;
-		return true;
+		return false;
 	}
 
 	if ( strncmp(buf, "GET ", 4) )
 	{
 		cout << "Unknown player request: " << buf << endl;
-		return true;
+		return false;
 	}
 
 	char* url = buf+4;
@@ -614,7 +634,6 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 
 	cout << "Asked to get URL '" << url << "'" << endl;
 	NPN_GetURL(_instance, url, target);
-
 	return true;
 }
 

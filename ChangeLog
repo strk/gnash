@@ -1,5 +1,14 @@
 2008-01-30 Sandro Santilli <strk@keybit.net>
 
+	* plugin/plugin.{cpp,h}: make player request handling line-based
+	  (each line is one request).
+	* server/vm/ASHandlers.cpp (CommonGetUrl): pass the original url to
+	  the host, not the gnash::URL mangled one (this fixes javascript
+	  calls); don't pass the target as it'll just confuse the url for
+	  now (we still need to define a good format for the target).
+
+2008-01-30 Sandro Santilli <strk@keybit.net>
+
 	* plugin/plugin.{cpp,h}: create a pipe for standalone to plugin
 	  communication and handle "GET" requests by loading the url
 	  in the _top window.

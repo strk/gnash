@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.h,v 1.36 2008/01/30 21:39:18 strk Exp $ */
+/* $Id: plugin.h,v 1.37 2008/01/30 22:42:41 strk Exp $ */
 
 #ifndef __PLUGIN_H__
 #define __PLUGIN_H__
@@ -96,6 +96,20 @@ private:
     static bool handlePlayerRequestsWrapper(GIOChannel* iochan, GIOCondition cond, nsPluginInstance* plugin);
 
     bool handlePlayerRequests(GIOChannel* iochan, GIOCondition cond);
+
+    /// Process a null-terminated request line
+    //
+    /// @param buf
+    ///	  The single request.
+    ///   Caller is responsible for memory management, but give us
+    ///   permission to modify the string.
+    ///
+    /// @param len
+    ///	  Lenght of buffer.
+    ///
+    /// @return true if the request was processed, false otherwise (bogus request..)
+    ///
+    bool processPlayerRequest(gchar* buf, gsize len);
 
     // EMBED or OBJECT attributes / parameters
     // @@ this should likely replace the _options element below
