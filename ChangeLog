@@ -1,3 +1,11 @@
+2008-01-30 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* testsuite/actionscript.all/Global.as: add tests showing fussy
+	  behaviour with parseInt and octal numbers.
+	* server/asobj/Global.cpp: use string::iterator instead of copying
+	  strings, remove dead or inactive code, parse octal numbers
+	  properly (compatibly, anyway). 
+
 2008-01-30 Sandro Santilli <strk@keybit.net>
 
 	* gui/Player.cpp (load_movie): use the pseudo root url
@@ -14,6 +22,12 @@
 	* gui/gnash.cpp: add -F switch to specify a filedescriptor
 	  to use for communicating with the hosting application.
 
+2008-01-30 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/asobj/System.cpp: consts
+	* server/asobj: (various) drop 'using namespace std;' where it's not	  
+	  even used.
+	
 2008-01-30 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/vm/VM.cpp: let System.cpp decide what to do with the system

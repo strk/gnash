@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Global.as,v 1.39 2008/01/14 20:50:46 strk Exp $";
+rcsid="$Id: Global.as,v 1.40 2008/01/30 17:21:29 bwy Exp $";
 
 #include "check.as"
 
@@ -69,10 +69,18 @@ check ( parseInt('-1234') == -1234 );
 check ( parseInt('-1.234') == -1 );
 // Test parseint with hex
 check ( parseInt('0x111') == 273 );
+check ( isNaN(parseInt('0xw')));
 // Test parseint with octal
-xcheck_equals (parseInt('   0352'), 352 );
-// a '0' prefix turns the number into an octal one ?
-xcheck (parseInt('   0352') != 0352 );
+check_equals (parseInt('0352'), 234 );
+check_equals (parseInt('-0352'), -234);
+// Evidently only numbers with no whitespace in front and
+// no digits higher than 7 are octal. These all decimal:
+check_equals (parseInt('07658'), 7658);
+check_equals (parseInt('   0352'), 352 );
+check_equals (parseInt('        -0352'), -352);
+check_equals (parseInt('03529A'), 3529);
+check_equals (parseInt('0352A'), 352);
+check_equals (parseInt('0352 '), 352);
 // Test parseint with 36 base
 check ( parseInt('2GA',36) == (10+16*36+2*36*36) );
 // Test parseint with base 17 - the 'H' is not part of base 17, only the first two digits are valid
@@ -269,15 +277,15 @@ function set2() { this.s2++; }
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 5
-	check_totals(50); // SWF5
+	check_totals(57); // SWF5
 #else
 # if OUTPUT_VERSION == 6
-	check_totals(84); // SWF6
+	check_totals(91); // SWF6
 # else
 #  if OUTPUT_VERSION == 7
-	check_totals(66); // SWF7
+	check_totals(73); // SWF7
 #  else
-	check_totals(53); // SWF8+
+	check_totals(60); // SWF8+
 #  endif
 # endif
 #endif

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.87 2008/01/21 20:55:55 rsavoye Exp $ */
+/* $Id: Global.cpp,v 1.88 2008/01/30 17:21:29 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -201,104 +201,106 @@ as_global_parseint(const fn_call& fn)
             log_aserror(_("%s has more than two arguments"), __FUNCTION__);
     )
 
-#if 0 // seems useless, will be done later
-    // Make sure our argument is the correct type
-    if (fn.nargs > 1)
-    {
-	fn.arg(1).convert_to_number(env);
-    }
-#endif
-
     const std::string& expr = fn.arg(0).to_string();
-
-    int base = 10; // the default base
     
-    // Set up some variables
-    const string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-    // TODO: does all this copying make any sense ?
-    //       Use a std::string::iterator instead ?
-    boost::scoped_array<char> input_buffer ( new char[expr.size()+1] );
-    char *input = input_buffer.get();
-    strcpy(input, expr.c_str());
-    bool bNegative;
+    int base = 10;
+    const std::string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    bool bNegative = false;
+  
+    std::string::const_iterator it = expr.begin();
 
     // Skip leading whitespace
-    while( input[0] == ' ' || input[0] == '\n' || input[0] == '\t' || input[0] == '\r' )
+    while(*it == ' ' || *it == '\n' || *it == '\t' || *it == '\r')
     {
-        input++;
+        ++it;
     }
 
-    if (input[0] == '-')
-	{
-	    bNegative = true;
-	    input++;
-	}
-    else
-	bNegative = false;
-
-    // Convert the string to uppercase
-    for (int i=strlen(input)-1; i >= 0; i--)
-	input[i] = toupper(input[i]);
+    // Is the first non-whitespace character a minus?
+    if (*it == '-')
+    {
+        bNegative = true;
+	++it;
+    }
 
     // if we were sent a second argument, that's our base
     if (fn.nargs > 1)
-	{
-	    // to_number returns a double. atoi() would be better
-	    base = (int)(fn.arg(1).to_number());
-	}
-    // if the string starts with "0x" then a hex digit
-    else if (strlen(input) > 2 && input[0] == '0' && input[1] == 'X'
-	     && (isdigit(input[2]) || (input[2] >= 'A' && input[2] <= 'F')))
-	{
-	    base = 16;	// the base is 16
-	    input = input + 2; // skip the leading "0x"
-	}
-    // if the string starts with "0" then an octal digit
-    else if (strlen(input) > 1 && input[0] == '0' &&
-	     (input[1] >= '0' && input[1] <= '7'))
-	{
-	    base = 8;
-	    input++; // skip the leading '0'
-	}
-    else
-	// default base is 10
-	assert(base == 10);
-
-    if (base < 2 || base > 36)
-	{
+    {
+	// to_number returns a double. atoi() would be better
+	base = (int)(fn.arg(1).to_number());
+	
+	// Bases from 2 to 36 are valid, otherwise return NaN
+        if (base < 2 || base > 36)
+        {
 	    as_value rv;
 	    rv.set_nan();
 	    return rv;
-	}
+        }	
 
-    int numdigits = 0;
+    }
 
-    // Start at the beginning, see how many valid digits we have
-    // in the base we're dealing with
-    while (numdigits < int(strlen(input)) 
-	   && int(digits.find(input[numdigits])) < base
-	   && digits.find(input[numdigits]) != std::string::npos)
-	numdigits++;
+    // If the string starts with '0x':
+    else if (expr.end() - it >= 2 &&
+    		(*it == '0' && toupper(*(it + 1)) == 'X' ))
+    {
+        // the base is 16
+	base = 16;
+        // Move to the digit after the 'x'
+	it += 2; 
+    }
 
-    // If we didn't get any digits, we should return NaN
-    if (numdigits == 0)
-	{
+    // Octal if the string starts with "0" then an octal digit, but
+    // *only* if there is no whitespace before it; in that case decimal.
+    else if (it - expr.begin() == (bNegative ? 1 : 0))
+    {
+        if (expr.end() - it >= 2 && 
+    		*it == '0' && isdigit(*(it + 1)))
+        {
+            // And if there are any chars other than 0-7, it's *still* a
+            // base 10 number...
+            // At least we know where we are in the string, so can use
+            // string methods.
+	    if (expr.find_first_not_of("01234567", (bNegative ? 1 : 0)) !=
+	    	std::string::npos)
+	    {
+	        base = 10;
+	    }
+	    else base = 8;
+
+	    // Point the iterator to the first digit after the '0'.
+	    ++it;
+
+        }
+    }
+
+    // Check to see if the first digit is valid, otherwise 
+    // return NaN.
+    int digit = digits.find(toupper(*it));
+
+    if (digit >= base)
+    {
 	    as_value rv;
 	    rv.set_nan();
 	    return rv;
-	}
+    }
 
-    int result = 0;
-    for (int i=0;i<numdigits;i++)
-	{
-	    result = result * base + digits.find(input[i]);
-	}
+    // The first digit was valid, so continue from the present position
+    // until we reach the end of the string or an invalid character,
+    // adding valid characters to our result.
+    // Which characters are invalid depends on the base. 
+    int result = digit;
+    ++it;
+    
+    while (it != expr.end() && (digit = digits.find(toupper(*it))) < base
+    		&& digit >= 0)
+    {
+	    result = result * base + digit;
+	    ++it;
+    }
 
     if (bNegative)
 	result = -result;
     
-    // Now return the parsed string
+    // Now return the parsed string as an integer.
     return as_value(result);
 }
 
