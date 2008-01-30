@@ -1,3 +1,11 @@
+2008-01-30 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/vm/VM.cpp: let System.cpp decide what to do with the system
+	  language string.
+	* server/asobj/System.cpp: restrict System.capabilites.language codes
+	  to the 20 officially specified. This is compatible with scripts
+	  that rely on there only being twenty. 
+
 2008-01-29 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/asobj/NetStreamGst.{cpp,h}: Warn if decodebin can't find a

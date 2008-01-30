@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: VM.cpp,v 1.31 2008/01/21 20:56:04 rsavoye Exp $ */
+/* $Id: VM.cpp,v 1.32 2008/01/30 09:41:50 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -174,35 +174,26 @@ VM::getOSName()
 const std::string
 VM::getSystemLanguage()
 {
-	std::string lang;
+
 	char *loc;
 	
 	// Try various environment variables. These should
 	// be in the standard form "de", "de_DE" or "de_DE.utf8"
-	// We'll return the first two characters anyway.
 	// This should work on most UNIX-like systems.
+	// Callers should work out what to do with it.
 	// TODO: Other OSs.
-	if ((loc = getenv("LANG")))
+	if ((loc = getenv("LANG")) ||
+		(loc = getenv("LANGUAGE")) ||
+		(loc = getenv("LC_MESSAGES"))
+		)
 	{
-		lang = loc;
-	}
-	else if ((loc = getenv("LANGUAGE")))
-	{
-		lang = loc;
-	}
-	else if ((loc = getenv("LC_MESSAGES")))
-	{
-		lang = loc;
+		std::string lang = loc;
+		return lang;
 	}
 	
-	if (lang.length() >= 2)
-	{
-		return lang.substr(0,2);
-	}
 	else
 	{
-		// TODO: what should be returned if we fail to
-		// find a language string?
+		// No string found
 		return "";
 	}
 }

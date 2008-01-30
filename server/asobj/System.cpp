@@ -33,6 +33,8 @@
 
 namespace gnash {
 
+std::string& systemLanguage();
+
 static as_value system_security_allowdomain(const fn_call& fn);
 static as_value system_security_allowinsecuredomain(const fn_call& fn);
 static as_value system_security_loadpolicyfile(const fn_call& fn);
@@ -79,12 +81,7 @@ getSystemCapabilitiesInterface()
 	const std::string manufacturer = rcfile.getFlashSystemManufacturer();
 
 	/* Human Interface */
-	
-	// Two-letter language code ('en', 'de') corresponding to ISO 639-1
-	// TODO: Chinese should be either zh-CN or zh-TW
-	// TODO: Are there more than the 20 officially documented? 
-	// TODO: Other / unknown should return 'xu'. 
-	const std::string language = VM::get().getSystemLanguage();
+	const std::string language = systemLanguage();
 
 	/* Media */
 		
@@ -207,6 +204,54 @@ system_class_init(as_object& global)
 	static boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
 	attachSystemInterface(*obj);
 	global.init_member("System", obj.get());
+}
+
+std::string& systemLanguage()
+{
+	// Two-letter language code ('en', 'de') corresponding to ISO 639-1
+	// Chinese can be either zh-CN or zh-TW. English used to have a 
+	// country (GB, US) qualifier, but that was dropped in version 7 of the player.
+ 	// This method relies on getting a POSIX-style language code of the form
+	// "zh_TW.utf8", "zh_CN" or "it" from the VM.
+	// It is obviously very easy to extend support to all language codes, but
+	// some scripts rely on there being only 20 possible languages. It could
+	// be a run time option if it's important enough to care.
+
+	static std::string lang = VM::get().getSystemLanguage();
+	
+	const char* languages[] = {"en", "fr", "ko", "ja", "sv",
+				"de", "es", "it", "zh", "pt",
+				"pl", "hu", "cs", "tr", "fi",
+				"da", "nl", "no", "ru"};
+	
+	const unsigned int size = sizeof (languages) / sizeof (*languages);
+	
+	if (std::find(languages, languages + size, lang.substr(0,2)) != languages + size)
+	{
+		if (lang.substr(0,2) == "zh")
+		{
+			// Chinese is the only language since the pp version 7
+			// to need an additional qualifier.
+			if (lang.substr(2, 3) == "_TW") lang = "zh-TW";
+			else if (lang.substr(2, 3) == "_CN") lang = "zh-CN";
+			else lang = "xu";
+		}
+		else
+		{
+			// All other matching cases: retain just the first
+			// two characters.
+			lang.erase(2);
+		}
+	}
+	else
+	{
+		// Unknown language. We also return this if
+		// getSystemLanguage() returns something unexpected. 
+		lang = "xu";
+	}
+
+	return lang;
+
 }
 
 } // end of gnash namespace
