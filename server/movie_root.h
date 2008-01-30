@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.106 2008/01/29 12:31:10 strk Exp $ */
+/* $Id: movie_root.h,v 1.107 2008/01/30 14:51:48 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -635,6 +635,24 @@ public:
     ///
     bool isLevelTarget(const std::string& name, unsigned int& levelno);
 
+
+    /// Set a filedescriptor to use for host application requests
+    /// (for browser communication mostly)
+    void setHostFD(int fd)
+    {
+        assert(fd > 0);
+        _hostfd = fd;
+    }
+
+    /// Get the filedescriptor to use for host application requests
+    /// (for browser communication mostly)
+    ///
+    /// @return -1 if no filedescriptor is provided by host app.
+    int getHostFD()
+    {
+        return _hostfd;
+    }
+
 private:
 
     /// A load movie request
@@ -911,6 +929,11 @@ private:
 
     const character* findDropTarget(float x, float y, character* dragging) const;
 
+    /// filedescriptor to write to for host application requests
+    //
+    /// -1 if none
+    ///
+    int _hostfd;
 };
 
 

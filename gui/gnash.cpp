@@ -120,6 +120,9 @@ usage()
 		  _(
         "  -m <bias>     Specify the texture LOD bias (float, default is -1.0)\n"
         "  -x <ID>       X11 Window ID for display\n"
+        "  -v            Produce verbose output\n"
+        "  -vp           Be (very) verbose about parsing\n"
+        "  -va           Be (very) verbose about action execution\n"
         "  -w            Produce the disk based debug log\n"
 	"  -j <width >   Set window width\n"
 	"  -k <height>   Set window height\n"
@@ -140,6 +143,7 @@ usage()
 	"                (used to resolve relative urls, defaults to movie url)\n"
         "  -P <param>    Set parameter (ie. \"FlashVars=A=1&b=2\")\n"
         "  -V, --version Print gnash's version number and exit\n"
+        "  -F <fd>       Set filedescriptor to use for external communications\n"
 		), _(
 #ifdef GNASH_FPS_DEBUG
 	"  -f num        Print FPS every num seconds (float)."
@@ -224,7 +228,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         }
     }
     
-    while ((c = getopt (argc, argv, "hvaps:cd:x:r:t:b:1wj:k:u:P:U:gVf:")) != -1)
+    while ((c = getopt (argc, argv, "hvaps:cd:x:r:t:b:1wj:k:u:P:U:gVf:F:")) != -1)
     {
 	switch (c) {
     	  // case 'c' (Disable SDL core dumps) is decoded in sdl.cpp:init()
@@ -275,6 +279,17 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
 	      player.setBaseUrl(optarg);
 	      log_msg (_("Setting base URL to %s"), optarg);
 	      break;
+	  case 'F':
+          {
+              int fd = strtol(optarg, NULL, 0);
+              if ( fd < 1 )
+              {
+		printf(_("Invalid host communication filedescriptor %d\n"), fd);
+		exit(EXIT_FAILURE);
+              }
+              player.setHostFD ( fd );
+	      break;
+          }
           case 'j':
               width_given = true;
               player.setWidth ( strtol(optarg, NULL, 0) );

@@ -91,7 +91,8 @@ movie_root::movie_root()
 	_allowRescale(true),
 	_invalidated(true),
 	_disableScripts(false),
-	_processingActionLevel(movie_root::apSIZE)
+	_processingActionLevel(movie_root::apSIZE),
+	_hostfd(-1)
 {
 }
 

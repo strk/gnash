@@ -87,6 +87,7 @@ Player::Player()
 #ifdef GNASH_FPS_DEBUG
 	,_fpsDebugTime(0.0)
 #endif
+	,_hostfd(-1)
 {
 	init();
 }
@@ -357,6 +358,10 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 
     SystemClock clock; // use system clock here...
     movie_root& root = VM::init(*_movie_def, clock).getRoot();
+
+    // Set host requests fd (if any)
+    if ( _hostfd != -1 ) root.setHostFD(_hostfd);
+
 
     _gui->setStage(&root);
 

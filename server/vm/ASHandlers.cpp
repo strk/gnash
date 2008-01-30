@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.186 2008/01/29 12:31:10 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.187 2008/01/30 14:51:48 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -56,6 +56,7 @@
 #include <vector>
 #include <utility> // for std::pair
 #include <locale.h>
+#include <cerrno>
 #include <boost/scoped_array.hpp>
 #include <boost/random.hpp>
 #include <boost/algorithm/string/replace.hpp>
@@ -2264,47 +2265,72 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		return;
 	}
 
-	gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
-	string command  = rcfile.getURLOpenerFormat();
+	int hostfd = VM::get().getRoot().getHostFD();
+	if ( hostfd == -1 )
+	{
+		gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+		string command  = rcfile.getURLOpenerFormat();
 
-	/// Try to avoid letting flash movies execute
-	/// arbitrary commands (sic)
-	///
-	/// Maybe we should exec here, but if we do we might have problems
-	/// with complex urlOpenerFormats like:
-	///	firefox -remote 'openurl(%u)'
-	///
-	///
-	/// NOTE: this escaping implementation is far from optimal, but
-	///       I felt pretty in rush to fix the arbitrary command
-	///	  execution... we'll optimize if needed
-	///
-	string safeurl = url.str(); 
-	boost::replace_all(safeurl, "\\", "\\\\");	// escape backslashes first
-	boost::replace_all(safeurl, "'", "\\'");	// then single quotes
-	boost::replace_all(safeurl, "\"", "\\\"");	// double quotes
-	boost::replace_all(safeurl, ";", "\\;");	// colons
-	boost::replace_all(safeurl, " ", "\\ ");	// spaces
-	boost::replace_all(safeurl, ">", "\\>");	// output redirection
-	boost::replace_all(safeurl, "<", "\\<");	// input redirection
-	boost::replace_all(safeurl, "&", "\\&");	// background (sic)
-	boost::replace_all(safeurl, "\n", "\\n");	// newline
-	boost::replace_all(safeurl, "\r", "\\r");	// return
-	boost::replace_all(safeurl, "\t", "\\t");	// tab
-	boost::replace_all(safeurl, "|", "\\|");	// pipe
-	boost::replace_all(safeurl, "`", "\\`");	// backtick
+		/// Try to avoid letting flash movies execute
+		/// arbitrary commands (sic)
+		///
+		/// Maybe we should exec here, but if we do we might have problems
+		/// with complex urlOpenerFormats like:
+		///	firefox -remote 'openurl(%u)'
+		///
+		///
+		/// NOTE: this escaping implementation is far from optimal, but
+		///       I felt pretty in rush to fix the arbitrary command
+		///	  execution... we'll optimize if needed
+		///
+		string safeurl = url.str(); 
+		boost::replace_all(safeurl, "\\", "\\\\");	// escape backslashes first
+		boost::replace_all(safeurl, "'", "\\'");	// then single quotes
+		boost::replace_all(safeurl, "\"", "\\\"");	// double quotes
+		boost::replace_all(safeurl, ";", "\\;");	// colons
+		boost::replace_all(safeurl, " ", "\\ ");	// spaces
+		boost::replace_all(safeurl, ">", "\\>");	// output redirection
+		boost::replace_all(safeurl, "<", "\\<");	// input redirection
+		boost::replace_all(safeurl, "&", "\\&");	// background (sic)
+		boost::replace_all(safeurl, "\n", "\\n");	// newline
+		boost::replace_all(safeurl, "\r", "\\r");	// return
+		boost::replace_all(safeurl, "\t", "\\t");	// tab
+		boost::replace_all(safeurl, "|", "\\|");	// pipe
+		boost::replace_all(safeurl, "`", "\\`");	// backtick
 
-	boost::replace_all(safeurl, "(", "\\(");	// subshell :'(
-	boost::replace_all(safeurl, ")", "\\)");	// 
-	boost::replace_all(safeurl, "}", "\\}");	// 
-	boost::replace_all(safeurl, "{", "\\{");	// 
+		boost::replace_all(safeurl, "(", "\\(");	// subshell :'(
+		boost::replace_all(safeurl, ")", "\\)");	// 
+		boost::replace_all(safeurl, "}", "\\}");	// 
+		boost::replace_all(safeurl, "{", "\\{");	// 
 
-	boost::replace_all(safeurl, "$", "\\$");	// variable expansions
+		boost::replace_all(safeurl, "$", "\\$");	// variable expansions
 
-	boost::replace_all(command, "%u", safeurl);
+		boost::replace_all(command, "%u", safeurl);
 
-	log_msg (_("Launching URL... %s"), command.c_str());
-	system(command.c_str());
+		log_msg (_("Launching URL... %s"), command.c_str());
+		system(command.c_str());
+	}
+	else
+	{
+		log_debug("user-provided host requests fd is %d", hostfd);
+		std::stringstream request;
+		request << "GET " << url << " " << target_string << endl;
+		string requestString = request.str();
+		const char* cmd = requestString.c_str();
+		size_t len = requestString.length();
+		// TODO: should mutex-protect this ?
+		// NOTE: we assuming the hostfd is set in blocking mode here..
+		int ret = write(hostfd, cmd, len);
+		if ( ret == -1 )
+		{
+			log_error("Could not write to user-provided host requests fd %d: %s", hostfd, strerror(errno));
+		}
+		if ( ret < len )
+		{
+			log_error("Could only write %d bytes over %d required to user-provided host requests fd %d: %s",
+				ret, len, hostfd);
+		}
+	}
 
 }
 

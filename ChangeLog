@@ -1,3 +1,12 @@
+2008-01-30 Sandro Santilli <strk@keybit.net>
+
+	* gui/Player.{cpp,h}: add a setHostFD method.
+	* server/movie_root.{cpp,h}: add hostFD getter and setter.
+	* server/vm/ASHandlers.cpp (CommonGetUrl): use host fd
+	  to request load of an url, if given.
+	* gui/gnash.cpp: add -F switch to specify a filedescriptor
+	  to use for communicating with the hosting application.
+
 2008-01-30 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/vm/VM.cpp: let System.cpp decide what to do with the system

@@ -133,6 +133,11 @@ public:
 	void setParam(std::string& name, std::string& value) {
 		params[name] = value;
 	}
+
+	void setHostFD(int fd)
+	{
+		_hostfd = fd;
+	}
 	
 private:
 
@@ -202,6 +207,9 @@ private:
 #ifdef GNASH_FPS_DEBUG
 	float _fpsDebugTime;
 #endif
+
+	// Filedescriptor to use for host application requests, -1 if none
+	int _hostfd;
 
 };
 
