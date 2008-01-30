@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.44 2008/01/21 20:55:59 rsavoye Exp $ */
+/* $Id: xmlnode.cpp,v 1.45 2008/01/30 10:09:36 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -46,9 +46,6 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <libxml/xmlreader.h>
-
-
-using namespace std;
 
 //#define DEBUG_MEMORY_ALLOCATION 1
 

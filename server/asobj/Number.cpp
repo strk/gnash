@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Number.cpp,v 1.35 2008/01/21 20:55:57 rsavoye Exp $ */
+/* $Id: Number.cpp,v 1.36 2008/01/30 10:09:35 bwy Exp $ */
 
 #include "log.h"
 #include "tu_config.h"
@@ -49,8 +49,6 @@
 #define FP_INFINITE      8
 #undef FP_NAN
 #define FP_NAN           16 
-
-using namespace std;
 
 namespace gnash {
 

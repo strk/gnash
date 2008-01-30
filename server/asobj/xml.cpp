@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.67 2008/01/21 20:55:59 rsavoye Exp $ */
+/* $Id: xml.cpp,v 1.68 2008/01/30 10:09:36 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -55,8 +55,6 @@
 //#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <memory>
-
-using namespace std;
 
 namespace gnash {
   

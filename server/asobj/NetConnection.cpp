@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetConnection.cpp,v 1.55 2008/01/22 08:39:08 bjacques Exp $ */
+/* $Id: NetConnection.cpp,v 1.56 2008/01/30 10:09:35 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -36,8 +36,6 @@
 #include "StreamProvider.h"
 #include "URLAccessManager.h"
 #include "URL.h"
-
-using namespace std;
 
 namespace gnash {
 
@@ -74,7 +72,7 @@ std::string NetConnection::validateURL(const std::string& url)
 	URL uri(completeUrl, get_base_url());
 
 	std::string uriStr(uri.str());
-	assert(uriStr.find("://")!=string::npos);
+	assert(uriStr.find("://") != std::string::npos);
 
 	// Check if we're allowed to open url
 	if (!URLAccessManager::allow(uri)) {

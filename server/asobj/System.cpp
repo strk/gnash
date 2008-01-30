@@ -33,7 +33,7 @@
 
 namespace gnash {
 
-std::string& systemLanguage();
+const std::string& systemLanguage();
 
 static as_value system_security_allowdomain(const fn_call& fn);
 static as_value system_security_allowinsecuredomain(const fn_call& fn);
@@ -206,7 +206,7 @@ system_class_init(as_object& global)
 	global.init_member("System", obj.get());
 }
 
-std::string& systemLanguage()
+const std::string& systemLanguage()
 {
 	// Two-letter language code ('en', 'de') corresponding to ISO 639-1
 	// Chinese can be either zh-CN or zh-TW. English used to have a 
