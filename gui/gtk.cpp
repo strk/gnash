@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.139 2008/01/25 13:13:19 strk Exp $ */
+/* $Id: gtk.cpp,v 1.140 2008/01/30 20:24:30 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -175,7 +175,7 @@ GtkGui::init(int argc, char **argv[])
         int fd = lirc->getFileFd();
         addFDListener(fd, lirc_handler, &fd);
     } else {
-        log_msg("LIRC daemon not running");
+        log_msg(_("LIRC daemon not running"));
     }
 #endif
     
@@ -939,27 +939,27 @@ GtkGui::showPreferencesDialog()
     // Put debug filename in the entry box      
     gtk_entry_set_text(GTK_ENTRY(prefs->logfileName), rcfile.getDebugLog().c_str());
     
-    prefs->parserDumpToggle = gtk_check_button_new_with_mnemonic ("Log _parser output");
+    prefs->parserDumpToggle = gtk_check_button_new_with_mnemonic (_("Log _parser output"));
     gtk_box_pack_start(GTK_BOX(loggingvbox), prefs->parserDumpToggle, FALSE, FALSE, 0);
     // Align button state with rcfile
     gtk_toggle_button_set_active (
     		GTK_TOGGLE_BUTTON (prefs->parserDumpToggle),
     		rcfile.useParserDump());
 
-    prefs->actionDumpToggle = gtk_check_button_new_with_mnemonic ("Log SWF _actions");
+    prefs->actionDumpToggle = gtk_check_button_new_with_mnemonic (_("Log SWF _actions"));
     gtk_box_pack_start(GTK_BOX(loggingvbox), prefs->actionDumpToggle, FALSE, FALSE, 0);
     // Align button state with rcfile
     gtk_toggle_button_set_active (
     		GTK_TOGGLE_BUTTON (prefs->actionDumpToggle),
     		rcfile.useActionDump());
 
-    prefs->malformedSWFToggle = gtk_check_button_new_with_mnemonic ("Log malformed SWF _errors");
+    prefs->malformedSWFToggle = gtk_check_button_new_with_mnemonic (_("Log malformed SWF _errors"));
     gtk_box_pack_start(GTK_BOX(loggingvbox), prefs->malformedSWFToggle, FALSE, FALSE, 0);
     // Align button state with rcfile
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (prefs->malformedSWFToggle),
     			rcfile.showMalformedSWFErrors());
 
-    prefs->ASCodingErrorToggle = gtk_check_button_new_with_mnemonic ("Log ActionScript _coding errors");
+    prefs->ASCodingErrorToggle = gtk_check_button_new_with_mnemonic (_("Log ActionScript _coding errors"));
     gtk_box_pack_start(GTK_BOX(loggingvbox), prefs->ASCodingErrorToggle, FALSE, FALSE, 0);
     // Align button state with rcfile
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (prefs->ASCodingErrorToggle),
@@ -973,7 +973,7 @@ GtkGui::showPreferencesDialog()
 
 #ifdef USE_DEBUGGER
 
-    prefs->DebuggerToggle = gtk_check_button_new_with_mnemonic ("Enable _debugger");
+    prefs->DebuggerToggle = gtk_check_button_new_with_mnemonic (_("Enable _debugger"));
     gtk_box_pack_start(GTK_BOX(loggingvbox), prefs->DebuggerToggle, FALSE, FALSE, 0);
     // Align button state with rcfile
     gtk_toggle_button_set_active (
@@ -1061,7 +1061,7 @@ GtkGui::showPreferencesDialog()
     gtk_label_set_use_markup (GTK_LABEL (soundlabel), TRUE);
     gtk_box_pack_start(GTK_BOX(mediavbox), soundlabel, FALSE, FALSE, 0);
    
-    prefs->soundToggle = gtk_check_button_new_with_mnemonic ("Use sound _handler");
+    prefs->soundToggle = gtk_check_button_new_with_mnemonic (_("Use sound _handler"));
     gtk_box_pack_start (GTK_BOX(mediavbox), prefs->soundToggle, FALSE, FALSE, 0);
     // Align button state with rcfile
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (prefs->soundToggle), rcfile.useSound());

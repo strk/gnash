@@ -1,5 +1,9 @@
 2008-01-30 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* gui/gtk.cpp: gettext macros.
+
+2008-01-30 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* testsuite/actionscript.all/Global.as: add tests showing fussy
 	  behaviour with parseInt and octal numbers.
 	* server/asobj/Global.cpp: use string::iterator instead of copying
