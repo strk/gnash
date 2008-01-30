@@ -1,5 +1,12 @@
 2008-01-30 Sandro Santilli <strk@keybit.net>
 
+	* plugin/plugin.cpp, server/vm/ASHandlers.cpp:
+	  Encode target string in the GETURL request line.
+	  Is acceptable as long as neither target string nor url
+	  contain newline.
+
+2008-01-30 Sandro Santilli <strk@keybit.net>
+
 	* plugin/plugin.{cpp,h}: make player request handling line-based
 	  (each line is one request).
 	* server/vm/ASHandlers.cpp (CommonGetUrl): pass the original url to

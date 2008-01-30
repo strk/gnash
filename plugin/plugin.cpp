@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.95 2008/01/30 22:42:41 strk Exp $ */
+/* $Id: plugin.cpp,v 1.96 2008/01/30 23:32:58 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -629,10 +629,26 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
 		return false;
 	}
 
-	char* url = buf+4;
-	char* target = "_top"; // todo: fix
+	char* target = buf+4;
+	if ( ! *target )
+	{
+		cout << "No target found after GET request" << endl;
+		return false;
+	}
+	char* url = target;
+	while (*url && *url != ':') ++url;
+	if ( *url )
+	{
+		*url='\0';
+		++url;
+	}
+	else
+	{
+		cout << "No colon found after target string" << endl;
+		return false;
+	}
 
-	cout << "Asked to get URL '" << url << "'" << endl;
+	cout << "Asked to get URL '" << url << "' in target '" << target << "'" << endl;
 	NPN_GetURL(_instance, url, target);
 	return true;
 }
