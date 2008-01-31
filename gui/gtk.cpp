@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.140 2008/01/30 20:24:30 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.141 2008/01/31 11:08:56 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -824,6 +824,9 @@ GtkGui::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
         rcfile.setLocalConnection(
     		gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->localConnectionToggle)));
 
+        rcfile.insecureSSL(
+    		gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->insecureSSLToggle)));
+
         rcfile.setLCTrace(
     		gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->lcTraceToggle)));
     		
@@ -1002,6 +1005,10 @@ GtkGui::showPreferencesDialog()
     prefs->localDomainToggle = gtk_check_button_new_with_mnemonic (_("Connect only to local _domain"));
     gtk_box_pack_start (GTK_BOX(securityvbox), prefs->localDomainToggle, FALSE, FALSE, 0);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (prefs->localDomainToggle), rcfile.useLocalDomain());
+
+    prefs->insecureSSLToggle = gtk_check_button_new_with_mnemonic (_("Disable SSL _verification"));
+    gtk_box_pack_start (GTK_BOX(securityvbox), prefs->insecureSSLToggle, FALSE, FALSE, 0);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (prefs->insecureSSLToggle), rcfile.insecureSSL());
     
     GtkWidget *whitelistexpander = gtk_expander_new_with_mnemonic (_("_Whitelist"));
     gtk_box_pack_start (GTK_BOX (securityvbox), whitelistexpander, FALSE, FALSE, 0);

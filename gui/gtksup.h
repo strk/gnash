@@ -219,6 +219,7 @@ class DSOEXPORT GtkGui : public Gui
         GtkWidget *solReadOnlyToggle;
         GtkWidget *solLocalDomainToggle;
         GtkWidget *localConnectionToggle;
+        GtkWidget *insecureSSLToggle; 
         GtkWidget *lcTraceToggle;
         GtkWidget *solSandbox;
         GtkWidget *osText;

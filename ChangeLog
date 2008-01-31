@@ -1,3 +1,7 @@
+2008-01-31 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/gtk{sup.h,.cpp}: add another rcfile option (insecureSSL).
+
 2008-01-31 Sandro Santilli <strk@keybit.net>
 
 	* libamf/element.cpp, libamf/sol.{cpp,h}: 
