@@ -1,5 +1,13 @@
 2008-01-31 Sandro Santilli <strk@keybit.net>
 
+	* libbase/URL.cpp: don't threat ".swf" strings as any special.
+	  Fixes parsing of urls with ".swf" in the query string.
+	* testsuite/libbase/URLTest.cpp: add test for query strings
+	  containing an ".swf" component, like many from
+	  http://foo.keybit.net/~strk/mapview/.
+
+2008-01-31 Sandro Santilli <strk@keybit.net>
+
 	* gui/Player.cpp (load_movie): still add the acutual filename, if
 	  given, in the list of local sandboxes, or "gnash -u http://remote
 	  ./local.swf" won't work (the konqueror plugin uses that format,

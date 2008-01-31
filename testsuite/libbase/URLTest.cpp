@@ -143,18 +143,16 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals (u16.querystring(), "option1=23&option2=65");
 	check_equals (u16.anchor(), "anchor");
 	check_equals (u16.str(), "file:///my/path/?option1=23&option2=65#anchor");
-	
 	URL u17("/test?.swf");
 	check_equals (u17.protocol() , "file" );
 	check_equals (u17.hostname() , "" );
-	check_equals (u17.path() , "/test?.swf" );
+	check_equals (u17.path() , "/test" );
 	check_equals (u17.str() , "file:///test?.swf" );
-	check_equals (u17.querystring() , "" );
+	check_equals (u17.querystring() , ".swf" );
 
 	// Test that this doesn't crash.
 	URL u18("file:///loadMovieTest.swf");
 	URL u19("file://../../test.swf", u18);
-
 
 	// Test query_string parsing
 	map<string, string> qs;
@@ -167,6 +165,28 @@ main(int /*argc*/, char** /*argv*/)
 	URL::parse_querystring(u16.querystring(), qs);
 	check_equals (qs["option1"], "23");
 	check_equals (qs["option2"], "65");
+
+	// Test query string with embedded path to an .swf 
+	// Broken by:
+	// htp://cvs.savannah.gnu.org/viewvc/gnash/libbase/URL.cpp?root=gnash&r1=1.26&r2=1.27
+	//
+	URL u20("http://www.gnu.org/~gnash/movie.swf?arg1=600&arg2=path/to/file.swf&arg3=320x200");
+	check_equals(u20.protocol(), "http");
+	check_equals(u20.hostname(), "www.gnu.org");
+	check_equals(u20.path(), "/~gnash/movie.swf");
+	check_equals(u20.querystring(), "arg1=600&arg2=path/to/file.swf&arg3=320x200");
+	qs.clear();
+	URL::parse_querystring(u20.querystring(), qs);
+	check_equals(qs["arg1"], "600");
+	check_equals(qs["arg2"], "path/to/file.swf");
+	check_equals(qs["arg3"], "320x200");
+
+	// Test relative resolution when query string contains slashes
+	URL u21("movie2.swf", u20);
+	check_equals (u21.protocol(), "http");
+	check_equals (u21.querystring(), "");
+	check_equals (u21.path(), "/~gnash/movie2.swf");
+	check_equals (u21.hostname(), "www.gnu.org");
 
 
 	// TODO: Samba paths
