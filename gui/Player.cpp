@@ -230,6 +230,19 @@ Player::load_movie()
 	else
 	{
 		URL url(_infile);
+		if ( url.protocol() == "file" )
+		{
+			std::string path = url.path();
+			// We'll need to allow load of the file, no matter virtual url
+			// specified...
+			// This is kind of hackish, cleaner would be adding an argument
+			// to create_library_movie to skip the security checking phase.
+			// NOTE that if we fail to allow this load, the konqueror plugin
+			// would not be able to load anything
+			//
+			rcfile.addLocalSandboxPath(path);
+			log_debug(_("%s appended to local sandboxes"), path.c_str());
+		}
 
 		// _url should be always set at this point...
 		md = gnash::create_library_movie(url, _url.c_str(), false);
