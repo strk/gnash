@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.88 2008/01/30 17:21:29 bwy Exp $ */
+/* $Id: Global.cpp,v 1.89 2008/01/31 15:19:06 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -75,7 +75,6 @@
 #include "xmlsocket.h"
 
 #include <limits> // for numeric_limits<double>::quiet_NaN
-#include <boost/scoped_array.hpp>
 
 // Common code to warn and return if a required single arg is not present
 // and to warn if there are extra args.

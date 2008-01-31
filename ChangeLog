@@ -1,6 +1,7 @@
 2008-01-31 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/rc.cpp: fix write of LCShmKey.
+	* server/asobj/Global.cpp: drop unused header.
 
 2008-01-31 Sandro Santilli <strk@keybit.net>
 
