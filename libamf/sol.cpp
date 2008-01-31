@@ -106,7 +106,7 @@ SOL::addObj(amf::Element *el)
 }
 
 bool
-SOL::formatHeader(vector<unsigned char> & /*data*/)
+SOL::formatHeader(const vector<unsigned char> & /*data*/)
 {
 //    GNASH_REPORT_FUNCTION;
       return false;
@@ -114,13 +114,13 @@ SOL::formatHeader(vector<unsigned char> & /*data*/)
 
 // name is the object name
 bool
-SOL::formatHeader(std::string &name)
+SOL::formatHeader(const std::string &name)
 {
     return formatHeader(name, _filesize);
 }
 
 bool
-SOL::formatHeader(std::string &name, int filesize)
+SOL::formatHeader(const std::string &name, int filesize)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::uint32_t i;
@@ -200,24 +200,7 @@ SOL::formatHeader(std::string &name, int filesize)
 // write the data to disk as a .sol file
 
 bool
-SOL::writeFile(string &filespec, const char *name)
-{
-//    GNASH_REPORT_FUNCTION;
-    string str = name;
-    return writeFile(filespec, str);
-}
-
-bool
-SOL::writeFile(const char *filespec, const char *name)
-{
-//    GNASH_REPORT_FUNCTION;
-    string str1 = filespec;
-    string str2 = name;
-    return writeFile(str1, str2);
-}
-
-bool
-SOL::writeFile(string &filespec, string &name)
+SOL::writeFile(const string &filespec, const string &name)
 {
 //    GNASH_REPORT_FUNCTION;
     ofstream ofs(filespec.c_str(), ios::binary);
@@ -227,7 +210,7 @@ SOL::writeFile(string &filespec, string &name)
     char *ptr;
     int size = 0;
     
-    if (filespec.size() == 0) {
+    if (filespec.empty()) {
 	return false;
     }
 
@@ -240,26 +223,35 @@ SOL::writeFile(string &filespec, string &name)
     boost::scoped_array<char> body ( new char[size + 20] );
     memset(body.get(), 0, size);
     ptr = body.get();
+    char* endPtr = ptr+size+20; // that's the amount we allocated..
 
     for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
         amf::Element *el = (*(ita));
-        int outsize = el->getName().size() + el->getLength() + 5;
-        boost::uint8_t *foo = amf_obj.encodeVariable(el); 
+        size_t outsize;
+        boost::uint8_t *foo = amf_obj.encodeVariable(el, outsize); 
+        if ( ! foo )
+        {
+             continue;
+        }
+        assert(outsize);
         switch (el->getType()) {
 	  case Element::BOOLEAN:
-	      outsize = el->getName().size() + 5;
+	      //outsize = el->getName().size() + 5;
+              assert(ptr+outsize < endPtr);
 	      memcpy(ptr, foo, outsize);
 	      ptr += outsize;
 	      break;
 	  case Element::OBJECT:
-	      outsize = el->getName().size() + 5;
+	      //outsize = el->getName().size() + 5;
+              assert(ptr+outsize < endPtr);
 	      memcpy(ptr, foo, outsize);
 	      ptr += outsize;
 	      *ptr++ = Element::OBJECT_END;
 	      *ptr++ = 0;	// objects are terminated too!
 	      break;
 	  case Element::NUMBER:
-	      outsize = el->getName().size() + AMF_NUMBER_SIZE + 2;
+	      //outsize = el->getName().size() + AMF_NUMBER_SIZE + 2;
+              assert(ptr+outsize < endPtr);
 	      memcpy(ptr, foo, outsize);
 	      ptr += outsize;
 	      *ptr++ = 0;	// doubles are terminated too!
@@ -267,21 +259,22 @@ SOL::writeFile(string &filespec, string &name)
 	      break;
 	  case Element::STRING:
 	      if (el->getLength() == 0) {
+              	  assert(ptr+outsize+1 < endPtr);
 		  memcpy(ptr, foo, outsize+1);
 		  ptr += outsize+1;
 	      } else {		// null terminate the string
+                  assert(ptr+outsize < endPtr);
 		  memcpy(ptr, foo, outsize);
 		  ptr += outsize;
 		  *ptr++ = 0;
 	      }
 	      break;
 	  default:
+              assert(ptr+outsize < endPtr);
 	      memcpy(ptr, foo, outsize);
 	      ptr += outsize;
 	}
-	if (foo) {
-	    delete[] foo;
-	}
+	delete[] foo;
     }
     
     _filesize = ptr - body.get();

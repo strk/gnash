@@ -52,15 +52,13 @@ public:
     bool extractHeader(const std::string &filespec);
 
     // Create the header
-    bool formatHeader(std::vector<boost::uint8_t> &data);
-    bool formatHeader(std::string &name);
-    bool formatHeader(std::string &name, int filesize);
+    bool formatHeader(const std::vector<boost::uint8_t> &data);
+    bool formatHeader(const std::string &name);
+    bool formatHeader(const std::string &name, int filesize);
 
     // write the data to disk as a .sol file
     bool writeFile();
-    bool writeFile(std::string &filespec, std::string &objname);
-    bool writeFile(std::string &filespec, const char *objname);
-    bool writeFile(const char *filespec, const char *objname);
+    bool writeFile(const std::string &filespec, const std::string &objname);
     
     // read the .sol file from disk
     bool readFile(std::string &filespec);

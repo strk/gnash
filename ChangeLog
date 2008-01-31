@@ -1,3 +1,12 @@
+2008-01-31 Sandro Santilli <strk@keybit.net>
+
+	* libamf/amf.{cpp,h}: have encodeVariable take an output parameter
+	  to return size of the serialized buffer; perform boundary checking
+	  before any memcpy.
+	* libamf/sol.{cpp,h}: drop unneeded write interfaces, const-correct
+	  the others; perform boundary checking before memcopies.
+	  Turns the memory corruption in bug #22188 to an assertion failure.
+
 2008-01-31 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gtk{sup.h,.cpp}: add another rcfile option (insecureSSL).

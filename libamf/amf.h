@@ -246,13 +246,16 @@ public:
     boost::uint8_t *encodeElement(amf::Element *el);
 
     /// Encode a variable. 
+    //
+    /// @param el The element to encode, ownership retained by caller
     ///
+    /// @param size Output parameter: size of the encoded byte array.
+    /// 
     /// @return a binary AMF packet in big endian format (header,data)
-
-    /// @return a newly allocated byte array.
-    /// to be deleted by caller using delete [] operator, or NULL
+    ///         in form of a newly allocated byte array.
+    ///         to be deleted by caller using delete [] operator, or NULL
     ///
-    boost::uint8_t *encodeVariable(amf::Element *el);
+    boost::uint8_t *encodeVariable(amf::Element *el, size_t& outsize);
 
 #if 0
     /// Encode an element

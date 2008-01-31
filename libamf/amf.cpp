@@ -1073,22 +1073,27 @@ AMF::createElement(AMF::amf_element_t *el, const std::string &name, bool data)
 #endif
 
 uint8_t *
-AMF::encodeVariable(amf::Element *el)
+AMF::encodeVariable(amf::Element *el, size_t& outsize)
 {
     GNASH_REPORT_FUNCTION;
-    int outsize = el->getName().size() + el->getLength() + 5;
-    boost::uint8_t *out = new boost::uint8_t[outsize + 4];
-    memset(out, 0, outsize + 2);
+    outsize = el->getName().size() + el->getLength() + 5; // why +5 here ?
+
+    boost::uint8_t *out = new boost::uint8_t[outsize + 4]; // why +4 here ?
+    boost::uint8_t *end = out + outsize+4; // why +4 ?
+
+    memset(out, 0, outsize + 2); // why +2 here ?
     boost::uint8_t *tmpptr = out;
 
     // Add the length of the string for the name of the variable
     size_t length = el->getName().size();
     boost::uint16_t enclength = length;
     swapBytes(&enclength, 2);
+    assert(tmpptr+2 < end);
     memcpy(tmpptr, &enclength, 2);
 
     // Add the actual name
     tmpptr += sizeof(uint16_t);
+    assert(tmpptr+length < end);
     memcpy(tmpptr, el->getName().c_str(), length);
     tmpptr += length;
     // Add the type of the variable's data
@@ -1098,21 +1103,25 @@ AMF::encodeVariable(amf::Element *el)
     switch (el->getType()) {
       case Element::BOOLEAN:
 	  enclength = el->to_bool();
+          assert(tmpptr+2 < end);
 	  memcpy(tmpptr, &enclength, 2);
 	  tmpptr += sizeof(uint16_t);
 	  break;
       case Element::NUMBER:
 	  if (el->getData()) {
 	      swapBytes(el->getData(), AMF_NUMBER_SIZE);
+              assert(tmpptr+AMF_NUMBER_SIZE < end);
 	      memcpy(tmpptr, el->getData(), AMF_NUMBER_SIZE);
 	  }
 	  break;
       default:
 	  enclength = el->getLength();
 	  swapBytes(&enclength, 2);
+          assert(tmpptr+2 < end);
 	  memcpy(tmpptr, &enclength, 2);
 	  tmpptr += sizeof(uint16_t);
 	  // Now the data for the variable
+          assert(tmpptr+el->getLength() < end);
 	  memcpy(tmpptr, el->getData(), el->getLength());
     }
     
