@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.56 2008/01/28 15:16:50 strk Exp $ */
+/* $Id: font.cpp,v 1.57 2008/01/31 14:26:19 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -241,12 +241,7 @@ GlyphInfo::markReachableResources() const
 		// Inhibit compiler warning.
 		reserved = reserved;
 
-		char* name = in->read_string_with_length();
-		if ( name )
-		{
-			m_name = name;
-			delete [] name;
-		}
+		in->read_string_with_length(m_name);
 
 		in->ensureBytes(2); 
 		boost::uint16_t glyph_count = in->read_u16();
@@ -399,12 +394,8 @@ GlyphInfo::markReachableResources() const
             movie_definition* /*m*/) 
         {
             assert(tag == SWF::DEFINEFONTNAME);
-            char* disp_name = in->read_string();
-            char* copy_name = in->read_string();
-            m_display_name = disp_name;
-            delete [] disp_name;
-            m_copyright_name = copy_name;
-            delete [] copy_name;
+            in->read_string(m_display_name);
+            in->read_string(m_copyright_name);
         }
 
 	// Read additional information about this font, from a
@@ -426,16 +417,7 @@ GlyphInfo::markReachableResources() const
 			}
 		}
 
-		char* name = in->read_string_with_length();
-		if ( name )
-		{
-			m_name = name;
-			delete [] name;
-		}
-		else
-		{
-			m_name.clear();
-		}
+		in->read_string_with_length(m_name);
 
 		in->ensureBytes(1);
 		unsigned char	flags = in->read_u8();
