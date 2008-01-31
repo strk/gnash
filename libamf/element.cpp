@@ -70,7 +70,7 @@ Element::~Element()
 {
 //    GNASH_REPORT_FUNCTION;
     if (_data) {
-        delete _data;
+        delete [] _data;
     }
 }
 
@@ -126,7 +126,7 @@ Element::init(const string &name, double indata)
         _name = name;
     }
     _length = AMF_NUMBER_SIZE;
-    _data = reinterpret_cast<boost::uint8_t *>(new double);
+    _data = reinterpret_cast<boost::uint8_t *>(new char[sizeof(double)]);
     memcpy(_data, &indata, _length);
     return *this;
 }

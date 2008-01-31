@@ -41,6 +41,8 @@
 #include <arpa/inet.h>
 #endif
 
+#include <boost/scoped_array.hpp>
+
 using namespace std;
 using namespace gnash;
 
@@ -74,9 +76,10 @@ SOL::~SOL()
 //    GNASH_REPORT_FUNCTION;
 
     vector<amf::Element *>::iterator it;
-    for (it = _amfobjs.begin(); it != _amfobjs.end(); it++) {
-	//amf::Element *el = (*(it));
-//	delete el;
+    for (it = _amfobjs.begin(); it != _amfobjs.end(); it++)
+    {
+	amf::Element *el = (*(it));
+	delete el;
     }
 }
 
@@ -234,9 +237,9 @@ SOL::writeFile(string &filespec, string &name)
     }
     _filesize = size;
     
-    char *body = new char[size + 20];
-    memset(body, 0, size);
-    ptr = body;
+    boost::scoped_array<char> body ( new char[size + 20] );
+    memset(body.get(), 0, size);
+    ptr = body.get();
 
     for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
         amf::Element *el = (*(ita));
@@ -281,19 +284,19 @@ SOL::writeFile(string &filespec, string &name)
 	}
     }
     
-    _filesize = ptr - body;
+    _filesize = ptr - body.get();
     int len = name.size() + sizeof(uint16_t) + 16;
-    char *head = new char[len + 4];
-    memset(head, 0, len);
-    ptr = head;
+    boost::scoped_array<char> head ( new char[len + 4] );
+    memset(head.get(), 0, len);
+    ptr = head.get();
     formatHeader(name);
     for (it = _header.begin(); it != _header.end(); it++) {
         *ptr++ = (*(it));
     }
     
-    ofs.write(head, _header.size());
+    ofs.write(head.get(), _header.size());
 //    ofs.write(body, (ptr - body));
-    ofs.write(body, _filesize);
+    ofs.write(body.get(), _filesize);
     ofs.close();
 
     return true;
@@ -306,7 +309,8 @@ SOL::readFile(std::string &filespec)
 //    GNASH_REPORT_FUNCTION;
     struct stat st;
     boost::uint16_t size;
-    boost::uint8_t *buf, *ptr;
+    boost::scoped_array<boost::uint8_t> buf;
+    boost::uint8_t *ptr;
     int bodysize;
 
     // Make sure it's an SOL file
@@ -315,8 +319,9 @@ SOL::readFile(std::string &filespec)
         _filesize = st.st_size;
 	bodysize = st.st_size - 6;
         _filespec = filespec;
-        ptr = buf = new boost::uint8_t[_filesize+1];
-        ifs.read(reinterpret_cast<char *>(buf), _filesize);
+        buf.reset( new boost::uint8_t[_filesize+1] );
+        ptr = buf.get(); 
+        ifs.read(reinterpret_cast<char *>(buf.get()), _filesize);
 
         // skip the magic number (will check later)
         ptr += 2;
@@ -353,7 +358,7 @@ SOL::readFile(std::string &filespec)
         ptr += 4;
 
         AMF amf_obj;
-        while ((ptr - buf) < bodysize) {
+        while ((ptr - buf.get()) < bodysize) {
 	    amf::Element *el = new amf::Element;
 	    ptr = amf_obj.extractVariable(el, ptr);
             if (ptr != 0) {

@@ -67,13 +67,35 @@ public:
     
     std::vector<boost::uint8_t> getHeader() { return _header; };
 
-    // Add the AMF objects that are the data of the file
+    /// Add the AMF objects that are the data of the file
+    //
+    /// @param x
+    ///  The element to add, ownership transferred
+    ///  TODO: take an auto_ptr
+    ///
     void addObj(amf::Element *x);
-    std::vector<amf::Element *> getElements() { return _amfobjs; };
-    Element *getElement(int x) { return _amfobjs[x]; };
+
+    /// Return a reference to the elements in this object
+    std::vector<amf::Element *>& getElements()
+    {
+        return _amfobjs;
+    }
+
+    /// Get an element by index
+    //
+    /// @return the element, or abort if index is wrong (eh..)
+    ///         ownership of the element is retained by this object.
+    ///
+    Element *getElement(size_t x)
+    {
+        assert(x<_amfobjs.size());
+        return _amfobjs[x];
+    }
 
     void dump();
+
 //protected:
+
     void setFilespec(std::string &x) { _filespec = x; };
     std::string &getFilespec() { return _filespec; };
 
@@ -85,7 +107,10 @@ public:
     std::vector<boost::uint8_t> _data;
     std::string      _objname;
     std::string      _filespec;
+
+    /// The elements in this SharedObject, owned by it
     std::vector<amf::Element *> _amfobjs;
+
     int              _filesize;
   };
 
