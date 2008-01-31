@@ -1036,10 +1036,17 @@ movie_root::display()
 
 	assert(testInvariant());
 
-	// should we cache this ? it's immutable after all !
-	const rect& frame_size = getRootMovie()->get_frame_size();
-
 	clearInvalidated();
+
+	// TODO: should we consider the union of all levels bounds ?
+	const rect& frame_size = getRootMovie()->get_frame_size();
+	if ( frame_size.is_null() )
+	{
+		// TODO: check what we should do if other levels
+		//       have valid bounds
+		log_debug("original root movie had null bounds, not displaying");
+		return;
+	}
 
 	render::begin_display(
 		m_background_color,

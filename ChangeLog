@@ -1,5 +1,10 @@
 2008-01-31 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.cpp (display): do nothing if the movie frame
+	  is null. Fixes bug #22189.
+
+2008-01-31 Sandro Santilli <strk@keybit.net>
+
 	* libamf/amf.{cpp,h}: have encodeVariable take an output parameter
 	  to return size of the serialized buffer; perform boundary checking
 	  before any memcpy.
