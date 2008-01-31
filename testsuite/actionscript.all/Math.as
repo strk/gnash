@@ -17,7 +17,7 @@
 //
 
 
-rcsid="$Id: Math.as,v 1.7 2008/01/09 16:21:39 strk Exp $";
+rcsid="$Id: Math.as,v 1.8 2008/01/31 15:23:41 bwy Exp $";
 
 // Test case for Math ActionScript class
 //
@@ -456,8 +456,8 @@ check_equals (Math.pow(1,-10), 1);
 check_equals (Math.pow(-10,1), -10);
 check_equals (Math.pow(2, 10), 1024);
 // These lines make makeswf bomb out.
-//check_equals (Math.pow(2, .5).toString(), Math.SQRT2.toString());
-//check_equals (Math.pow(2, -.5).toString(), Math.SQRT1_2.toString());
+check_equals (Math.pow(2, 0.5).toString(), Math.SQRT2.toString());
+check_equals (Math.pow(2, -0.5).toString(), Math.SQRT1_2.toString());
 check_equals (Math.pow(-2, 0), 1);
 check_equals (Math.pow(-2, 1), -2);
 check_equals (Math.pow(-2, 2), 4);
@@ -465,12 +465,12 @@ check_equals (Math.pow(-2, 3), -8);
 check_equals (Math.pow(-2, -1), -0.5);
 check_equals (Math.pow(-2, -2), 0.25);
 // These lines make makeswf bomb out.
-//check_equals (Math.pow(-2, .5).toString(), "NaN");
-//check_equals (Math.pow(-2, -.5).toString(), "NaN");
+check_equals (Math.pow(-2, 0.5).toString(), "NaN");
+check_equals (Math.pow(-2, -0.5).toString(), "NaN");
 
 // End of Math testsuite
 #if OUTPUT_VERSION <= 6
- check_totals(265);
+ check_totals(269);
 #else
- check_totals(274);
+ check_totals(278);
 #endif

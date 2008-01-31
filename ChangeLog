@@ -2,6 +2,7 @@
 
 	* libbase/rc.cpp: fix write of LCShmKey.
 	* server/asobj/Global.cpp: drop unused header.
+	* testsuite/actionscript.all/Math.as: restore some tests.
 
 2008-01-31 Sandro Santilli <strk@keybit.net>
 
