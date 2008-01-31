@@ -17,59 +17,65 @@
 //
 
 /*
- *  Test targetPath tags (0x45)
+ *  Test TARGETPATH tags (0x45)
  */
 
-rcsid="$Id: targetPath.as,v 1.11 2007/12/25 05:43:59 zoulunkai Exp $";
+rcsid="$Id: targetPath.as,v 1.12 2008/01/31 16:25:32 strk Exp $";
 
 #include "check.as"
 
-check_equals(targetPath(_root), "_level0");
+#if MING_VERSION_CODE > 00040005
+# define TARGETPATH targetpath
+#else
+# define TARGETPATH targetPath
+#endif
+
+check_equals(TARGETPATH(_root), "_level0");
 
 #ifdef MING_SUPPORTS_ASM_TARGETPATH
 
-// targetPath(null)
+// TARGETPATH(null)
 asm {
 push "a"
 push null
-targetPath
+TARGETPATH
 setvariable
 };
 check_equals(typeof(a), 'undefined');
 
-// targetPath(undefined)
+// TARGETPATH(undefined)
 asm {
 push "a"
 push undefined
-targetPath
+TARGETPATH
 setvariable
 };
 check_equals(typeof(a), 'undefined');
 
-// targetPath("str")
+// TARGETPATH("str")
 asm {
 push "a"
 push "str"
-targetPath
+TARGETPATH
 setvariable
 };
 check_equals(typeof(a), 'undefined');
 
-// targetPath(9)
+// TARGETPATH(9)
 asm {
 push "a"
 push 9
-targetPath
+TARGETPATH
 setvariable
 };
 check_equals(typeof(a), 'undefined');
 
 
-// targetPath("_root")
+// TARGETPATH("_root")
 asm {
 push "a"
 push "_root"
-targetPath
+TARGETPATH
 setvariable
 };
 check_equals(typeof(a), 'undefined');
