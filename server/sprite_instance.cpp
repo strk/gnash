@@ -77,6 +77,7 @@ namespace gnash {
 //#define GNASH_DEBUG_TIMELINE 1
 //#define GNASH_DEBUG_REPLACE 1
 //#define  DEBUG_DYNTEXT_VARIABLES 1
+//#define GNASH_DEBUG_HITTEST 1
 
 // Defining the following macro you'll get a DEBUG lien
 // for each call to the drawing API, in a format which is
@@ -3438,13 +3439,17 @@ sprite_instance::pointInVisibleShape(float x, float y) const
   if ( isDynamicMask() && ! can_handle_mouse_event() )
   {
       // see testsuite/misc-ming.all/masks_test.swf
+#ifdef GNASH_DEBUG_HITTEST
       log_debug("%s is a dynamic mask and can't handle mouse events, no point will hit it", getTarget().c_str());
+#endif
       return false;
   }
   character* mask = getMask(); // dynamic one
   if ( mask && mask->get_visible() && ! mask->pointInShape(x, y) )
   {
+#ifdef GNASH_DEBUG_HITTEST
     log_debug("%s is dynamically masked by %s, which doesn't hit point %g,%g", getTarget().c_str(), mask->getTarget().c_str(), x, y);
+#endif
     return false;
   }
   VisibleShapeContainerFinder finder(x, y);
