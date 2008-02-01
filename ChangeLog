@@ -1,3 +1,7 @@
+2008-02-01 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/xmlsocket.cpp (send): fix assertion. Fixes bug #22199.
+
 2008-01-31  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* macros/qt.m4: Set the topdir if pkg-config exists, so it can be

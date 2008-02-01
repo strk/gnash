@@ -332,7 +332,7 @@ XMLSocket::send(std::string str)
     if ( ! connected() )
     {
         log_error(_("%s: socket not initialized"), __FUNCTION__);
-	assert(!_sockfd);
+	assert(_sockfd <= 0);
 	return false;
     }
     
