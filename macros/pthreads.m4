@@ -15,14 +15,13 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 dnl Copyright (C) 2006 Steven G. Johnson <stevenj@alum.mit.edu>.
-dnl $Id: pthreads.m4,v 1.33 2007/10/29 16:38:08 eh9 Exp $
+dnl $Id: pthreads.m4,v 1.34 2008/02/01 05:48:34 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_PTHREADS],
 [
 AC_REQUIRE([AC_CANONICAL_HOST])
 AC_LANG_SAVE
 AC_LANG_C
-pthreads=no
 PTHREAD_LIBS=""
 PTHREAD_CFLAGS=""
 
@@ -81,7 +80,7 @@ dnl pthread:	Linux, etcetera
 dnl --thread-safe: KAI C++
 dnl pth(read)-config: use pthread-config program (for GNU Pth library)
 
-case "${host_cpu}-${host_os}" in
+case "${host_os}" in
   *linux* | *openbsd*)
     pthread_flags="-pthread"
     ;;
@@ -105,9 +104,7 @@ case "${host_cpu}-${host_os}" in
     ;;
 esac
 
-if test x"$pthreads" = xno; then
-  for flag in $pthread_flags; do
-
+for flag in $pthread_flags; do\
     case $flag in
       none)
         AC_MSG_CHECKING([whether pthreads work without any flags])
@@ -115,7 +112,8 @@ if test x"$pthreads" = xno; then
       -*)
         AC_MSG_CHECKING([whether pthreads work with $flag])
         PTHREAD_CFLAGS="$flag"
-	PTHREAD_LIBS=""
+        CXXFLAGS="$CXXFLAGS $flag"
+	      PTHREAD_LIBS=""
         ;;
 
       pth-config)
@@ -170,9 +168,7 @@ if test x"$pthreads" = xno; then
     if test "x$pthreads" = xyes; then
        break;
     fi
-
-  done
-fi
+done
 
 dnl Try a manual search, useful for cross-compiling
 if test x"${PTHREAD_LIBS}" = "x"; then
@@ -256,7 +252,6 @@ if test "${PTHREAD_CXX}x" = "x"; then
   PTHREAD_CXX="$CXX"
 fi
 
-  
 AC_SUBST(PTHREAD_LIBS)
 AC_SUBST(PTHREAD_CFLAGS)
 AC_SUBST(PTHREAD_CC)

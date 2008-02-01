@@ -1,5 +1,12 @@
 2008-01-31  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* macros/qt.m4: Set the topdir if pkg-config exists, so it can be
+	used later.
+	* macros/pthreads.m4: Don't use host_cpu to match a platform. Look
+	for pthreads, it turns out the check has been disabled by accident
+	for quite a while... but BSD needs the -pthread flag.
+	* utilities/Makefile.am: Add PTHREAD_CFLAGS.
+
 	* libamf/amf.cpp: Oops, return original pointer as returned by
 	new, not the incremented pointer. Use :encodeElement() for
 	strings. Encode an array of AMF objects.

@@ -107,6 +107,8 @@ AC_DEFUN([GNASH_PATH_QT],
         break;
       fi
     done
+  else
+    gnash_qt_topdir="`echo ${ac_cv_path_qt_incl} | sed -e 's:-I::' -e 's:/lib/qt.*::'`"
   fi
 dnl On Debian the dir is /usr/include/qt3 with /usr/lib/libqt-mt.*
 dnl so we set topdir to /usr so that $topdir/lib/libqt-mt.* works below,
@@ -165,7 +167,7 @@ dnl   # QT_LIBS =  -lqtui -lqtcore -lqtprint -L/usr/lib/qt-3.3/lib -lqt-mt
   AC_ARG_WITH(qt_lib, AC_HELP_STRING([--with-qt-lib], [directory where qt libraries are]), with_qt_lib=${withval})
   AC_CACHE_VAL(ac_cv_path_qt_lib, [
     if test x"${with_qt_lib}" != x ; then
-      if test `ls -C1 ${gnash_qt_topdir}/lib/libqt*-mt.*| wc -l` -gt 0 ; then
+      if test `ls -C1 ${gnash_qt_topdir}/lib/libqt*-mt.* | wc -l` -gt 0 ; then
        ac_cv_path_qt_lib="-L`(cd ${with_qt_lib}; pwd)` ${qt3support} -lqt-mt"
       else
 	      AC_MSG_ERROR([${with_qt_lib} directory doesn't contain qt libraries.])
@@ -175,7 +177,7 @@ dnl   # QT_LIBS =  -lqtui -lqtcore -lqtprint -L/usr/lib/qt-3.3/lib -lqt-mt
 
   if test x$cross_compiling = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_qt_lib}" = x; then
-      $PKG_CONFIG --exists $qt_pkg && ac_cv_path_qt_lib="`$PKG_CONFIG --libs-only-l $qt_pkg | cut -d ' ' -f 1`"
+         $PKG_CONFIG --exists $qt_pkg && ac_cv_path_qt_lib="`$PKG_CONFIG --libs-only-l $qt_pkg | cut -d ' ' -f 1`"
     fi
   fi
 

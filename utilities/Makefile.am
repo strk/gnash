@@ -58,6 +58,7 @@ AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)/libmedia/sdl \
         -I$(top_srcdir)/libmedia/gst \
         -DLOCALEDIR=\"$(localedir)\" \
+	$(PTHREAD_CFLAGS) \
 	$(BOOST_CFLAGS) \
         $(LIBXML_CFLAGS) \
         $(MYSQL_CFLAGS) \
@@ -81,6 +82,7 @@ bin_PROGRAMS = gprocessor soldumper dumpshm
 #check_PROGRAMS = gdebug.swf
 
 gprocessor_SOURCES = processor.cpp
+gprocessor_CPPFLAGS = $(AM_CPPFLAGS)
 # export our symbols so they can be used by Gnash plugins
 gprocessor_LDFLAGS = -export-dynamic $(LIBLTDL)
 gprocessor_LDADD = $(GNASH_LIBS) 
