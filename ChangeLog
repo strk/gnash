@@ -1,5 +1,7 @@
 2008-02-01 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/button_character_def.cpp (read): robustness
+	  improvement, fixes bug #22200.
 	* server/asobj/xmlsocket.cpp (send): fix assertion. Fixes bug #22199.
 
 2008-01-31  Rob Savoye  <rob@ripple.welcomehome.org>

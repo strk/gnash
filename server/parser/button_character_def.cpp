@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: button_character_def.cpp,v 1.26 2008/01/21 20:56:00 rsavoye Exp $ */
+/* $Id: button_character_def.cpp,v 1.27 2008/02/01 13:09:38 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -82,7 +82,14 @@ button_record::read(stream* in, int tag_type,
 		movie_definition* m, unsigned long endPos)
 {
 	// caller should check this
-	assert(in->get_position() < endPos);
+	if (in->get_position()+1 > endPos)
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+		log_swferror(_("   premature end of button record input stream, can't read flags"));
+		);
+		return false;
+	}
+
 	int	flags = in->read_u8();
 	if (flags == 0)
 	{
