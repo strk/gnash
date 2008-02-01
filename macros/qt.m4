@@ -205,7 +205,7 @@ dnl   # QT_LIBS =  -lqtui -lqtcore -lqtprint -L/usr/lib/qt-3.3/lib -lqt-mt
     has_qt="no"
   fi
 
-  AC_PATH_PROG(MOC, moc, ,[${gnash_qt_topdir}/bin ${pathlist}])
+  AC_PATH_PROG(MOC, moc, ,[${QTDIR}/bin ${gnash_qt_topdir}/bin ${pathlist}])
 
   AC_SUBST(MOC)
 

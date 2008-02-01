@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: ffmpeg.m4,v 1.52 2007/10/13 23:24:07 rsavoye Exp $
+dnl $Id: ffmpeg.m4,v 1.53 2008/02/01 01:30:30 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -375,14 +375,18 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
     else
       libgsm=""
     fi
-    if test x"${libgsm}" = x; then
-      if test -f ${topdir}/libgsm.a -o -f ${topdir}/libgsm.${shlibext}; then
-        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lgsm"
-        AC_MSG_RESULT(${topdir}/libgsm)
-      else
-        AC_MSG_RESULT(no)
-        if test x${cross_compiling} = xno; then
-          AC_CHECK_LIB(gsm, gsm_destroy, [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lgsm"])
+
+    dnl OpenBSD seems to have a problem with libgsm.
+    if test x$openbsd_os != xopenbsd; then
+      if test x"${libgsm}" = x; then
+        if test -f ${topdir}/libgsm.a -o -f ${topdir}/libgsm.${shlibext}; then
+          ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lgsm"
+          AC_MSG_RESULT(${topdir}/libgsm)
+        else
+          AC_MSG_RESULT(no)
+          if test x${cross_compiling} = xno; then
+            AC_CHECK_LIB(gsm, gsm_destroy, [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lgsm"])
+          fi
         fi
       fi
     else

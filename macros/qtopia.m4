@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: qtopia.m4,v 1.7 2007/11/29 05:14:55 rsavoye Exp $
+dnl $Id: qtopia.m4,v 1.8 2008/02/01 01:30:30 rsavoye Exp $
 
 dnl ~{rob@ute} pts/8> QtCore  QtSvg Qtnetwork QtXml 
 dnl QtCore: Command not found.
@@ -26,6 +26,7 @@ AC_DEFUN([GNASH_PATH_QTOPIA],
 
   has_qtopia=no
   gnash_qtopia_version=0
+
   dnl the list of Qtopia headers we need
   dnl Look for the header
   AC_ARG_WITH(qtopia, AC_HELP_STRING([--with-qtopia], [directory where Qtopia is installed]), with_qtopia=${withval})

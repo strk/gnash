@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.190 2008/01/30 23:32:58 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.191 2008/02/01 01:30:29 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -50,6 +50,7 @@
 #include "sound_handler.h"
 #include "namedStrings.h"
 
+#include <unistd.h>
 #include <string>
 #include <map>
 #include <set>

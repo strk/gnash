@@ -74,11 +74,6 @@ gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 
 namespace gnash {
 
-// The maximum 
-const int LC_HEADER_SIZE = 16;
-const int MAX_LC_HEADER_SIZE = 40960;
-const int LC_LISTENERS_START  = MAX_LC_HEADER_SIZE +  LC_HEADER_SIZE;
-
 // This doesn't exist on all systems, but here's the vaue used on Unix.
 #ifndef MAXHOSTNAMELEN
 # define MAXHOSTNAMELEN 64
@@ -89,6 +84,7 @@ const int LC_LISTENERS_START  = MAX_LC_HEADER_SIZE +  LC_HEADER_SIZE;
 /// each other Flash Objects to be executed.
 ///
 LocalConnection::LocalConnection()
+    : _connected(false)
 {
     GNASH_REPORT_FUNCTION;
 }
@@ -115,22 +111,34 @@ LocalConnection::close()
 /// send() command to signify which local connection to send the
 /// object to.
 bool
+LocalConnection::connect()
+{
+    return connect("");
+}
+
+bool
 LocalConnection::connect(const std::string& name)
 {
     GNASH_REPORT_FUNCTION;
-    
-    _name = name;
 
-    log_debug("trying to open shared memory segment: \"%s\"", name.c_str());
+    if (name.empty()) {
+        _name = "none, sysv segment type";
+    } else {
+        _name = name;
+    }
     
-    if (Shm::attach(name.c_str(), true) == false) {
+    log_debug("trying to open shared memory segment: \"%s\"", _name.c_str());
+    
+    if (Shm::attach(_name.c_str(), true) == false) {
         return false;
     }
 
     if (Shm::getAddr() <= 0) {
-        log_error("Failed to open shared memory segment: \"%s\"", name.c_str());
+        log_error("Failed to open shared memory segment: \"%s\"", _name.c_str());
         return false; 
     }
+    
+    _connected = true;
     
     return true;
 }
@@ -188,7 +196,7 @@ LocalConnection::domain(int version)
 as_value
 localconnection_new(const fn_call& /* fn */)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     LocalConnection *localconnection_obj = new LocalConnection;
 
     localconnection_obj->init_member("close", new builtin_function(localconnection_close));
@@ -247,12 +255,19 @@ localconnection_domain(const fn_call& fn)
 as_value
 localconnection_send(const fn_call& fn)
 {
-    boost::intrusive_ptr<LocalConnection> obj = ensureType<LocalConnection>(fn.this_ptr);
+    GNASH_REPORT_FUNCTION;
+    boost::intrusive_ptr<LocalConnection> ptr = ensureType<LocalConnection>(fn.this_ptr);
+
+    if (!ptr->connected()) {
+        ptr->connect();
+    }
+    
     if (rcfile.getLocalConnection() ) {
         log_security("Attempting to write to disabled LocalConnection!");
         return as_value(false);
     }
-    
+
+    // FIXME: send something
     return as_value();
 }
 

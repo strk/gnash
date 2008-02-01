@@ -73,9 +73,11 @@ extern char *optarg;
 using namespace std;
 using namespace gnash;
 
+// #error "No supported shared memory type for this platform"
+
 static void usage (void);
 void dump_ctrl(void *ptr);
-void dump_shm(bool convert);
+void dump_shm(bool convert, bool out);
 key_t list_lcs();
 
 const int PIDSTART = 20000;
@@ -180,26 +182,41 @@ main(int argc, char *argv[])
         exit(0);
     }
     
+#if defined(USE_SYSV_SHM) && defined(HAVE_IPC_INFO)
     // Just list the shared memory segments
     if (listfiles && sysv) {
 	list_lcs();
         exit(0);
     }
-
+#endif
+    
+    if (optind <= argc - 1) {
+	if (*argv[optind] == '-') {
+	    filespec = '-';
+	}
+    }
+    
     if (sysv) {
-	dump_shm(convert);
-	exit(0);
+	if (filespec == "-") {
+	    dump_shm(convert, true);
+	} else {
+	    dump_shm(convert, false);
+	}
+	
+	    exit(0);
     }    
     
     if (size == 0) {
         size = DEFAULT_SHM_SIZE;
     }
-    
+
     // get the file name from the command line
     if (optind < argc) {
         filespec = argv[optind];
-        cout << "Will use \"" << filespec << "\" for memory segment file"
-             << endl;
+	if (!convert) {
+	    cout << "Will use \"" << filespec << "\" for memory segment file"
+		 << endl;
+	}
     }
 
     DIR *library_dir = NULL;
@@ -319,7 +336,7 @@ main(int argc, char *argv[])
 
 // Dump the older style SYS V shared memory segments
 void
-dump_shm(bool convert)
+dump_shm(bool convert, bool out)
 {
 // These are here for debugging purposes. It
     int id; 
@@ -329,7 +346,9 @@ dump_shm(bool convert)
 
     if (key == 0) {
 	cerr << "No LcShmKey set in ~/.gnashrc, trying to find it ourselves" << endl;
+#if defined(USE_SYSV_SHM) && defined(HAVE_IPC_INFO)
 	key = list_lcs();
+#endif
     }
     
     if (key == 0) {
@@ -344,8 +363,6 @@ dump_shm(bool convert)
     
     LcShm lc;
     lc.connect(key);
-    auto_ptr< vector<string> > listeners ( lc.listListeners() );
-    cout << "There are " << listeners->size() << " Listeners listening" << endl; 
     lc.dump();
     
     // If the -c convert options was specified, dump the memory segment to disk.
@@ -356,49 +373,59 @@ dump_shm(bool convert)
 	    perror("open");
 	}
 	cout << "Writing memory segment to disk: \"segment.raw\"" << endl;
+	shmaddr = lc.getAddr();
 	write(fd, shmaddr, size);
+	if (out) {
+#if 0
+	    boost::uint8_t *hexint;
+	    hexint = new boost::uint8_t[(size + 3) *3];
+	    hexify((boost::uint8_t *)hexint, (uint8_t *)shmaddr, size, false);
+	    log_msg(_("The data is: 0x%s"), hexint);
+#endif
+	}
+	
 	close(fd);
     }
     
     exit (0);
 }
 
+#if defined(USE_SYSV_SHM) && defined(HAVE_IPC_INFO)
 key_t
 list_lcs()
 {
     int maxid, shmid, id;
     struct shmid_ds shmseg;
-    struct shm_info shm_info;
     struct shminfo shminfo;
 
-#ifdef USE_POSIX_SHM
-    if (library_dir != NULL) {
-	for (i=0; entry>0; i++) {
-	    entry = readdir(library_dir);
-	    if (entry != NULL) {
-                    cout << "Found segment: " << entry->d_name << endl;
-                }
-            }
-        } else {
-	cout << _("Sorry, we can only list the files on systems with"
-		  " disk based shared memory") << endl;
-    }
-#else
+// #ifdef USE_POSIX_SHM
+//     if (library_dir != NULL) {
+// 	for (i=0; entry>0; i++) {
+// 	    entry = readdir(library_dir);
+// 	    if (entry != NULL) {
+//                     cout << "Found segment: " << entry->d_name << endl;
+//                 }
+//             }
+//         } else {
+// 	cout << _("Sorry, we can only list the files on systems with"
+// 		  " disk based shared memory") << endl;
+//     }
+// #eendif
+    
     // If we're using SYSV shared memory, we can get a list of shared memory segments.
     // By examing the size of each one, we can make a reasonable guess if it's one
     // used for flash. As permissions apply, this will only list the segments created
     // by the user running dumpshm.
-#ifdef USE_SYSV_SHM
+    struct shm_info shm_info;
     maxid = shmctl(0, SHM_INFO, (struct shmid_ds *) (void *) &shm_info);
     if (maxid < 0) {
 	cerr << "kernel not configured for shared memory";
 	return 0;
     }
-
+    
     if ((shmctl(0, IPC_INFO, (struct shmid_ds *) (void *) &shminfo)) < 0) {
 	return 0;
     }
-
     for (id = 0; id <= maxid; id++) {
 	shmid = shmctl(id, SHM_STAT, &shmseg);
 	if (shmid < 0) {
@@ -414,15 +441,16 @@ list_lcs()
 	    cout << "Last detached on: " << ctime(&shmseg.shm_dtime);
 	    return shmseg.shm_perm.__key;
 	}
-#endif
+#endif	// end of IPC_PERM_KEY
     }
-#else
-#error "No supported shared memory type for this platform"
-#endif
-#endif
+// #else
+// # error "No supported shared memory type for this platform"
+//#endif	// end of USE_POSIX_SHM
+
     // Didn't find any segments of the right size
-    return 0;
+    return reinterpret_cast<key_t>(0);
 }
+#endif	// end of USE_SYSV_SHM & HAVE_IPC_INFO
 
 /// \brief  Display the command line arguments
 static void

@@ -80,7 +80,7 @@ bool
 Shm::attach()
 {
 //    GNASH_REPORT_FUNCTION;
-    return attach(0, false);
+    return attach(static_cast<key_t>(0), false);
 }
 
 bool

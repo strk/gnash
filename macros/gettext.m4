@@ -342,8 +342,13 @@ return * gettext ("")]ifelse([$2], [need-ngettext], [ + * ngettext ("", "", 0)],
     AC_SUBST(INTL_LIBTOOL_SUFFIX_PREFIX)
   ])
 
-  dnl For backward compatibility. Some Makefiles may be using this.
-  INTLLIBS="$LIBINTL"
+  dnl For backward compatibility. Some Makefiles may be using this. OpenBSD
+  dnl appears to use $LTLIBINTL instead of "$LIBINTL".
+  if test x$LTLIBINTL != x; then
+    INTLLIBS="$LIBINTL $LTLIBINTL"
+  else
+    INTLLIBS="$LIBINTL"
+  fi
   AC_SUBST(INTLLIBS)
 
   dnl Make all documented variables known to autoconf.

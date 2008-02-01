@@ -250,6 +250,11 @@ AC_ARG_WITH(shm,
 
 if test x"${with_shm}" = x"sysv"; then
   AC_DEFINE([USE_SYSV_SHM], [1], [Use SYSV shared memory for compatability])
+  dnl IPC_INFO isn't portable, and doesn't exist on BSD
+  AC_TRY_COMPILE([#include <sys/ipc.h> #include <sys/shm.h>], [
+    int flag = IPC_INFO; ],
+    AC_DEFINE([HAVE_IPC_INFO], [1], [Use shm_info])
+  )
 else
   AC_DEFINE([USE_POSIX_SHM], [1], [Use POSIX shared memory])
 fi

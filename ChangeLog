@@ -1,3 +1,21 @@
+2008-01-31  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* configure.ac: Add test for IPC_INFO, which isn't portable to
+	BSD.
+	* server/asobj/LocalConnection.cpp: Don;t define any LC constants
+	here, they're in libamf.lcshm.cpp now instead. Add flag for
+	whether we are connected or not.
+	* server/asobj/LocalConnection.h: Use LcShm class instead of Shm
+	as a base class for shared memory.
+	* server/vm/ASHandlers.cpp: Include unistd.h so write() is defined
+	on BSD.
+	* libbase/shm.cpp: BSD wants 0 cast to key_t.
+	* utilities/dumpshm.cpp: Only look for the key if IPC_INFO exists,
+	as we can't find the key without if for now. Optionally write the
+	output to stdout.
+	* macros/qt.m4: Also look in ${QTDIR}/bin.
+	* macros/incllist: Look inm /usr/pkg on BSD, not /pkg/.
+
 2008-01-31 Sandro Santilli <strk@keybit.net>
 
 	* libbase/URL.cpp: don't threat ".swf" strings as any special.

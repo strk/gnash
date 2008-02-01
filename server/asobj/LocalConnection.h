@@ -28,34 +28,31 @@
 
 #include "as_object.h" // for inheritance
 #include "fn_call.h"
-#include "shm.h"
+#include "lcshm.h"
 
 namespace gnash {
   
-class LocalConnection : public as_object, Shm {
+class LocalConnection : public as_object, LcShm {
 public:
     LocalConnection();
     ~LocalConnection();
     void close(void);
+    bool connect();
     bool connect(const std::string& name);
     std::string domain(int version);
     void send();
+    std::string &getName() { return _name; };
+    bool connected() { return _connected; };
+    
 // FIXME: these should be callbacks
 //     bool        _allowDomain;
 //     bool        _allowInsecureDomain;
 //     bool        _onStatus;
 private:
+    bool _connected;
     std::string _name;
     std::map<const char *, short> _allocated;
 };
-
-#if 0
-class localconnection_as_object : public as_object
-{
-public:
-    LocalConnection obj;
-};
-#endif
 
 as_value localconnection_new(const fn_call& fn);
 as_value localconnection_close(const fn_call& fn);
