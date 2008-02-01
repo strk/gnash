@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.64 2008/02/01 15:49:59 strk Exp $";
+rcsid="$Id: Function.as,v 1.65 2008/02/01 16:28:37 strk Exp $";
 
 #include "check.as"
 
@@ -908,7 +908,7 @@ function inc(a,b)
 a={count:1}; b={count:1};
 inc(a);
 check_equals(a.count, 2);
-xcheck_equals(b.count, 1); // See bug #22203
+check_equals(b.count, 1); // See bug #22203
 
 #if OUTPUT_VERSION == 5
  check_totals(146); // SWF5

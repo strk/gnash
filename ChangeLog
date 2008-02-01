@@ -1,5 +1,7 @@
 2008-02-01 Sandro Santilli <strk@keybit.net>
 
+	* server/swf_function.cpp (call operator): still declare named
+	  arguments as locals no matter if they were passed or not.
 	* testsuite/actionscript.all/Function.as: add test for bug #22203.
 	* server/parser/button_character_def.cpp (read): robustness
 	  improvement, fixes bug #22200.

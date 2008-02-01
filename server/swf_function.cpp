@@ -126,11 +126,20 @@ swf_function::operator()(const fn_call& fn)
 		// Conventional function.
 
 		// Push the arguments onto the local frame.
-		int	args_to_pass = imin(fn.nargs, m_args.size());
-		for (int i = 0; i < args_to_pass; i++)
+		for (size_t i=0, n=m_args.size(); i<n; ++i)
 		{
 			assert(m_args[i].m_register == 0);
-			our_env->add_local(m_args[i].m_name, fn.arg(i));
+			if ( i < fn.nargs )
+			{
+				our_env->add_local(m_args[i].m_name, fn.arg(i));
+			}
+			else
+			{
+				// Still declare named arguments, even if
+				// they are not passed from caller
+				// See bug #22203
+				our_env->declare_local(m_args[i].m_name);
+			}
 		}
 
 		// Add 'this'
@@ -154,19 +163,36 @@ swf_function::operator()(const fn_call& fn)
 		our_env->add_local_registers(m_local_register_count);
 
 		// Handle the explicit args.
-		int	args_to_pass = imin(fn.nargs, m_args.size());
-		for (int i = 0; i < args_to_pass; i++)
+		for (size_t i=0, n=m_args.size(); i<n; ++i)
 		{
-			if (m_args[i].m_register == 0)
+			if ( ! m_args[i].m_register ) // not a register, declare as local
 			{
-				// Conventional arg passing: create a local var.
-				our_env->add_local(m_args[i].m_name, fn.arg(i));
+				if ( i < fn.nargs )
+				{
+					// Conventional arg passing: create a local var.
+					our_env->add_local(m_args[i].m_name, fn.arg(i));
+				}
+				else
+				{
+					// Still declare named arguments, even if
+					// they are not passed from caller
+					// See bug #22203
+					our_env->declare_local(m_args[i].m_name);
+				}
 			}
 			else
 			{
-				// Pass argument into a register.
-				int	reg = m_args[i].m_register;
-				our_env->local_register(reg) = fn.arg(i);
+				if ( i < fn.nargs )
+				{
+					// Pass argument into a register.
+					int	reg = m_args[i].m_register;
+					our_env->local_register(reg) = fn.arg(i);
+				}
+				else
+				{
+					// The argument was not passed, no
+					// need to setup a register I guess..
+				}
 			}
 		}
 
