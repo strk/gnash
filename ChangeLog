@@ -1,5 +1,17 @@
 2008-01-31  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* libamf/amf.cpp: Oops, return original pointer as returned by
+	new, not the incremented pointer. Use :encodeElement() for
+	strings. Encode an array of AMF objects.
+	* libamf/amf.h: Make all the encoding methods static.
+	* libamf/element.{cpp,h}: Add function and variable data types,
+	internal to Gnash. Initialize with an array of AMF objects. Create
+	a new function block object in memory. Don't return nan, BSD
+	doesn't support it.
+	* libamf/lcshm.cpp: Correctly remove Listeners. Format a memory
+	segment header. Send now works, and puts AMF objects into the
+	memory segment.
+	
 	* configure.ac: Add test for IPC_INFO, which isn't portable to
 	BSD.
 	* server/asobj/LocalConnection.cpp: Don;t define any LC constants

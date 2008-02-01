@@ -23,6 +23,8 @@
 
 #include <string>
 #include <vector>
+#include <cmath>
+#include <climits>
 
 #include "log.h"
 #include "amf.h"
@@ -54,7 +56,9 @@ const char *astype_str[] = {
     "Unsupported",
     "Recordset",
     "XMLObject",
-    "TypedObject"
+    "TypedObject",
+    "Varible (gnash)",
+    "Function (gnash)"
 };
 
 Element::Element()
@@ -72,42 +76,89 @@ Element::~Element()
     if (_data) {
         delete [] _data;
     }
+    for (size_t i=0; i< _children.size(); i++) {
+	delete _children[i];
+    }
 }
 
 Element::Element(boost::uint8_t *indata)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     init(indata);
 }
 
 Element::Element(double indata)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     init(indata);
 }
 
+// Element(vector<double> &indata)
+// {
+//     GNASH_REPORT_FUNCTION;
+//     init(indata);
+// }
+
 Element::Element(const string &indata)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     init(indata);
 }
 
 Element::Element(const string &name, const string &indata)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     init(name, indata);
 }
 
 Element::Element(const string &name, bool indata)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     init(name, indata);
 }
 
 Element::Element(bool indata)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     init(indata);
+}
+
+// Create a function block for AMF
+Element::Element(bool flag, double unknown1, double unknown2,
+		 const string &methodname)
+{
+    GNASH_REPORT_FUNCTION;
+    init(flag, unknown1, unknown2, methodname);
+}
+
+Element &
+Element::init(bool flag, double unknown1, double unknown2,
+		 const string &methodname)
+{
+    GNASH_REPORT_FUNCTION;
+    _type = Element::FUNCTION;
+    if (methodname.size()) {
+	_name = methodname;
+    }
+
+    // Build up the children for the function block
+    Element *el = new Element(flag);
+    _children.push_back(el);
+    
+    el = new Element(unknown1);
+    _children.push_back(el);
+    
+    el = new Element(unknown2);
+    _children.push_back(el);
+    
+    el = new Element(methodname);
+    _children.push_back(el);
+    
+    _length = 3
+	+ ((AMF_HEADER_SIZE + AMF_NUMBER_SIZE) * 2)
+	+ methodname.size() + AMF_HEADER_SIZE;
+//     memcpy(_data, &indata, _length);
+    return *this;
 }
 
 Element &
@@ -197,7 +248,8 @@ Element::to_number()
     if (_data) {
 	return *(reinterpret_cast<double *>(_data));
     }
-    return nan("NaN");
+//    return ::nan("NaN");
+    return -1.0;
 }
 
 const char *
@@ -283,6 +335,19 @@ Element::makeNumber(boost::uint8_t *data)
     _length = amf::AMF_NUMBER_SIZE;
     _data = new boost::uint8_t[amf::AMF_NUMBER_SIZE];
     memcpy(_data, data, amf::AMF_NUMBER_SIZE);
+    return *this;
+}
+
+Element &
+Element::makeBoolean(bool &data)
+{
+//    GNASH_REPORT_FUNCTION;
+    
+    _type = Element::BOOLEAN;
+    _length = 1;
+    _data = new boost::uint8_t[2];
+    memset(_data, 0, 2);
+    _data[1]= data;
     return *this;
 }
 
@@ -488,17 +553,19 @@ Element::dump()
 //    GNASH_REPORT_FUNCTION;
     
     if (_name.size()) {
-	cerr << "Dumping AMF Varible: " << _name << endl;
+	cerr << "AMF object name: " << _name << endl;
     }
 
     cerr << astype_str[_type] << ": ";
 
     switch (_type) {
+      case Element::NOTYPE:
+	  break;
       case Element::NUMBER:
-	  cerr << "AMF Numeric value: " << to_number() << endl;
+	  cerr << to_number() << endl;
 	  break;
       case Element::BOOLEAN:
-	  cerr << "AMF Boolean value: " << (to_bool() ? "true" : "false") << endl;
+	  cerr << (to_bool() ? "true" : "false") << endl;
 	  break;
       case Element::STRING:
 	  cerr << "(" << _length << " bytes): ";
@@ -528,10 +595,17 @@ Element::dump()
 	  hexify((boost::uint8_t *)hexint, _data, _length, false);
 	  cerr << "AMF data is: 0x%s" << hexint << endl;
 	  break;
+      case Element::VARIABLE:
+      case Element::FUNCTION:
+ 	  cerr << "# of children in object: " << _children.size() << endl;
+	  for (size_t i=0; i< _children.size(); i++) {
+	      _children[i]->dump();
+	  }
+	  break;
       default:
-	  log_unimpl("%s: type %d", __PRETTY_FUNCTION__, (int)_type);
+//	  log_unimpl("%s: type %d", __PRETTY_FUNCTION__, (int)_type);
+	  break;
     }
-    
 }
 
 } // end of amf namespace

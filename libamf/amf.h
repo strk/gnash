@@ -144,97 +144,97 @@ public:
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    boost::uint8_t *encodeString(const char *str);
+    static boost::uint8_t *encodeElement(const char *str);
 
     /// Encode a Boolean object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    boost::uint8_t *encodeBoolean(bool flag);
+    static boost::uint8_t *encodeBoolean(bool flag);
 
     /// Encode an "Undefined" object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    boost::uint8_t *encodeUndefined();
+    static boost::uint8_t *encodeUndefined();
 
     /// Encode a "NULL" object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    boost::uint8_t *encodeNull();
+    static boost::uint8_t *encodeNull();
 
     /// Encode a "Unsupported" object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    boost::uint8_t *encodeUnsupported();
+    static  boost::uint8_t *encodeUnsupported();
 
     /// Encode an XML object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    boost::uint8_t *encodeXMLObject(boost::uint8_t *data, int size);
+    static boost::uint8_t *encodeXMLObject(boost::uint8_t *data, int size);
 
     /// Encode a Typed Object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    boost::uint8_t *encodeTypedObject(boost::uint8_t *data, int size);
+    static boost::uint8_t *encodeTypedObject(boost::uint8_t *data, int size);
 
     /// Encode a Reference to an object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    boost::uint8_t *encodeReference(boost::uint8_t *data, int size);
+    static boost::uint8_t *encodeReference(boost::uint8_t *data, int size);
 
     /// Encode a Movie Clip
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    boost::uint8_t *encodeMovieClip(boost::uint8_t *data, int size);
+    static boost::uint8_t *encodeMovieClip(boost::uint8_t *data, int size);
 
     /// Encode an ECMA Array
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    boost::uint8_t *encodeECMAArray(boost::uint8_t *data, int size);
+    static boost::uint8_t *encodeECMAArray(boost::uint8_t *data, int size);
 
     /// Encode a long string
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    boost::uint8_t *encodeLongString(boost::uint8_t *data, int size);
+    static boost::uint8_t *encodeLongString(boost::uint8_t *data, int size);
 
     /// Encode a Record Set
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    boost::uint8_t *encodeRecordSet(boost::uint8_t *data, int size);
+    static boost::uint8_t *encodeRecordSet(boost::uint8_t *data, int size);
 
     /// Encode a Date
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    boost::uint8_t *encodeDate(boost::uint8_t *data);
+    static boost::uint8_t *encodeDate(boost::uint8_t *data);
 
     /// Encode a Strict Array
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    boost::uint8_t *encodeStrictArray(boost::uint8_t *data, int size);
+    static boost::uint8_t *encodeStrictArray(boost::uint8_t *data, int size);
     
     /// Encode an object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    boost::uint8_t *encodeObject(const boost::uint8_t *data, int size);
+    static boost::uint8_t *encodeObject(const boost::uint8_t *data, int size);
 
     /// Encode a 64 bit number
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    boost::uint8_t *encodeNumber(double num);
+    static boost::uint8_t *encodeNumber(double num);
     
     /// Encode a element. 
     ///
@@ -243,7 +243,16 @@ public:
     /// @return a newly allocated byte array.
     /// to be deleted by caller using delete [] operator, or NULL
     ///
-    boost::uint8_t *encodeElement(amf::Element *el);
+    static boost::uint8_t *encodeElement(amf::Element *el);
+
+    /// Encode an array of elements. 
+    ///
+    /// @return a binary AMF packet in big endian format (header,data)
+
+    /// @return a newly allocated byte array.
+    /// to be deleted by caller using delete [] operator, or NULL
+    ///
+    static std::vector<boost::uint8_t> *encodeElement(std::vector<amf::Element *> &els);
 
     /// Encode a variable. 
     //
@@ -271,40 +280,40 @@ public:
     ///
     /// @return an amf packet (header,data)
     ///
-    boost::uint8_t* encodeElement(Element::astype_e type, const void *in, int nbytes);
+    static boost::uint8_t* encodeElement(Element::astype_e type, const void *in, int nbytes);
 
     /// @return a newly allocated byte array,
     /// to be deleted by caller using delete [] operator, or NULL
     ///
-    boost::uint8_t* encodeVariable(const char *name);
+    static boost::uint8_t* encodeVariable(const char *name);
 
     /// Encode a boolean variable. This is a name followed by a boolean value.
     //
     /// @return a newly allocated byte array,
     /// to be deleted by caller using delete [] operator, or NULL
     ///
-    boost::uint8_t* encodeVariable(const char *name, bool flag);
+    static boost::uint8_t* encodeVariable(const char *name, bool flag);
 
     /// Encode a variable. 
     //
     /// @return a newly allocated byte array,
     /// to be deleted by caller using delete [] operator, or NULL
     ///
-    boost::uint8_t* encodeVariable(const char *name, double num);
+    static boost::uint8_t* encodeVariable(const char *name, double num);
 
     /// Encode a variable. 
     //
     /// @return a newly allocated byte array,
     /// to be deleted by caller using delete [] operator, or NULL
     ///
-    boost::uint8_t* encodeVariable(std::string &name, std::string &val);
+    static boost::uint8_t* encodeVariable(std::string &name, std::string &val);
 
     /// Encode a variable. 
     //
     /// @return a newly allocated byte array,
     /// to be deleted by caller using delete [] operator, or NULL
     ///
-    boost::uint8_t* encodeVariable(const char *name, const char *val);
+    static boost::uint8_t* encodeVariable(const char *name, const char *val);
 
     void *encodeRTMPHeader(int amf_index, amf_headersize_e head_size, int total_size,
                            content_types_e type, amfsource_e routing);
@@ -331,6 +340,7 @@ public:
     
     boost::uint8_t *extractElement(amf::Element *el, boost::uint8_t *in);
     boost::uint8_t *extractVariable(amf::Element *el, boost::uint8_t *in);
+    
 #if 0
     // FIXME: these should return an Element, and then use to_*() to convert.
     char *extractString(const boost::uint8_t* in);

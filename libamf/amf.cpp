@@ -162,8 +162,7 @@ vector<AMF::amf_element_t *> *
 AMF::readElements(boost::uint8_t *in)
 {
     GNASH_REPORT_FUNCTION;
-
-    boost::uint8_t *x = in;
+boost::uint8_t *x = in;
     astype_e type = (astype_e)*x;
     bool boolshift;
     const char *mstr = NULL;
@@ -265,33 +264,6 @@ AMF::readElements(boost::uint8_t *in)
 // Methods for encoding data into big endian formatted raw AMF data.
 //
 
-/// Encode a string object
-///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
-///
-boost::uint8_t *
-AMF::encodeString(const char *str)
-{
-//    GNASH_REPORT_FUNCTION;
-    boost::uint16_t length;
-    
-    int pktsize = strlen(str) + AMF_HEADER_SIZE;
-    // Encode a string value. The data follows a 2 byte length
-    // field. (which must be big-endian)
-    boost::uint8_t* x = new boost::uint8_t[pktsize + 1];
-    memset(x, 0, pktsize);
-    *x++ = Element::STRING;
-    log_debug("Encoded data size is going to be %d", length);
-    swapBytes(&length, 2);
-    memcpy(x, &length, 2);
-    x += 2;
-    memcpy(x, str, pktsize - AMF_HEADER_SIZE);
-    x += pktsize - AMF_HEADER_SIZE;
-    
-    return x;
-}
-
 /// Encode a 64 bit number
 ///
 /// @return a binary AMF packet in big endian format (header,data) which
@@ -304,15 +276,16 @@ AMF::encodeNumber(double indata)
     int pktsize = AMF_NUMBER_SIZE + AMF_HEADER_SIZE;
     double num;
     // Encode the data as a 64 bit, big-endian, numeric value
-    boost::uint8_t* x = new boost::uint8_t[pktsize + 1];
+    boost::uint8_t *ptr = new boost::uint8_t[pktsize + 1];
+    boost::uint8_t *x = ptr;
     memset(x, 0, pktsize);
     *x++ = (char)Element::NUMBER;
     memcpy(&num, &indata, AMF_NUMBER_SIZE);
     swapBytes(&num, AMF_NUMBER_SIZE);
     memcpy(x, &num, AMF_NUMBER_SIZE);
-    x += pktsize - AMF_HEADER_SIZE;
+//    x += pktsize - AMF_HEADER_SIZE;
     
-    return x;
+    return ptr;
 }
 
 /// Encode a Boolean object
@@ -328,15 +301,17 @@ AMF::encodeBoolean(bool flag)
 //    GNASH_REPORT_FUNCTION;
     int pktsize = AMF_HEADER_SIZE;
 
-    boost::uint8_t* x = new boost::uint8_t[pktsize + 1];
+    boost::uint8_t*ptr = new boost::uint8_t[pktsize + 1];
+    boost::uint8_t* x = ptr;
     memset(x, 0, pktsize);
     // Encode a boolean value. 0 for false, 1 for true
     *x++ = (char)Element::BOOLEAN;
+    x++;
     *x = flag;
-    swapBytes(x, 2);
-    x += sizeof(boost::uint16_t);
+//    swapBytes(x, 2);
+//    x += sizeof(boost::uint16_t);
     
-    return x;
+    return ptr;
 }
 
 /// Encode an object
@@ -545,6 +520,35 @@ AMF::encodeStrictArray(boost::uint8_t * /* data */, int /* size */)
     return 0;
 }
 
+/// Encode a string object
+///
+/// @return a binary AMF packet in big endian format (header,data) which
+/// needs to be deleted[] after being used.
+///
+boost::uint8_t *
+AMF::encodeElement(const char *str)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::uint16_t length;
+    
+    int pktsize = strlen(str) + AMF_HEADER_SIZE;
+    // Encode a string value. The data follows a 2 byte length
+    // field. (which must be big-endian)
+    boost::uint8_t *ptr = new boost::uint8_t[pktsize + 1];
+    boost::uint8_t *x = ptr;
+    memset(x, 0, pktsize);
+    *x++ = Element::STRING;
+    length = strlen(str);
+    log_debug("Encoded data size is going to be %d", length);
+    swapBytes(&length, 2);
+    memcpy(x, &length, 2);
+    x += 2;
+    memcpy(x, str, pktsize - AMF_HEADER_SIZE);
+    x += pktsize - AMF_HEADER_SIZE;
+    
+    return ptr;
+}
+
 /// \brief Write an AMF element
 ///
 /// This encodes the data supplied to an AMF formatted one. As the
@@ -572,13 +576,13 @@ AMF::encodeElement(Element *el)
 	  return 0;
 	  break;
       case Element::NUMBER:
-	  return encodeNumber(*(reinterpret_cast<double *>(el->getData())));
+	  return encodeNumber(el->to_number());
           break;
       case Element::BOOLEAN:
-	  return encodeBoolean(*(reinterpret_cast<bool *>(el->getData())));
+	  return encodeBoolean(el->to_bool());
           break;
       case Element::STRING:
-	  return encodeBoolean(*(reinterpret_cast<const char *>(el->getData())));
+	  return encodeElement(el->to_string());
           break;
       case Element::OBJECT:
 	  return encodeObject(el->getData(), el->getLength());
@@ -633,6 +637,85 @@ AMF::encodeElement(Element *el)
     // you should never get here
     return 0;
 }
+
+/// Encode an array of elements. 
+///
+/// @return a binary AMF packet in big endian format (header,data)
+
+/// @return a newly allocated byte array.
+/// to be deleted by caller using delete [] operator, or NULL
+///
+vector<boost::uint8_t> *
+AMF::encodeElement(vector<amf::Element *> &data)
+{
+    GNASH_REPORT_FUNCTION;
+
+    int size = 0;
+    bool pad = false;
+
+    // Calculate how large the buffer has to be.
+    vector<amf::Element *>::iterator ait;
+    cerr << "# of Elements in file: " << data.size() << endl;
+    for (ait = data.begin(); ait != data.end(); ait++) {
+	amf::Element *el = (*(ait));
+	size += el->getLength() + AMF_HEADER_SIZE;
+//        el->dump();
+    }
+    vector<boost::uint8_t> *vec = new vector<boost::uint8_t>;
+    boost::uint8_t* ptr = new boost::uint8_t[size + 1];
+    memset(ptr, 0, size + 1);
+    
+    boost::uint8_t *x = ptr;
+    size = 0;
+    for (ait = data.begin(); ait != data.end(); ait++) {
+	amf::Element *el = (*(ait));
+//	el->dump();
+	boost::uint8_t *tmp = encodeElement(el);
+	boost::uint8_t *y = tmp;
+#if 0
+	boost::uint8_t *hexint;
+	hexint = new boost::uint8_t[(el->getLength() + 4) *3];
+	hexify((boost::uint8_t *)hexint, (boost::uint8_t *)tmp,
+	       el->getLength() + AMF_HEADER_SIZE, true);
+	log_msg(_("The packet head is: 0x%s"), hexint);
+#endif
+	// The 'pad' in this case is a serious hack. I think it
+	// may be an artifact, but one guess is it's a 16bit word
+	// aligned memory segment due to some ancient heritage in
+	// the other player, so after a 3 byte bool, and two 9 byte
+	// numbers, another byte is needed for padding.
+	// My guess is the pattern of boolean->number->number->methodname
+	// is a function block ID. I need to dp more testing with a
+	// wider variety of sef movies that use LocalConnection to
+	// really tell.
+	if (el->getType() == Element::NUMBER) {
+	    size = AMF_NUMBER_SIZE + 1;
+	    pad = true;
+	}
+	if (el->getType() == Element::STRING) {
+	    if (pad) {
+		vec->push_back('\0');
+		pad = false;
+	    }
+	    size = el->getLength() + AMF_HEADER_SIZE;
+	}
+	if (el->getType() == Element::FUNCTION) {
+	    // _children
+	}
+	if (el->getType() == Element::BOOLEAN) {
+	    size = 3;
+	}
+ 	for (int i=0; i<size; i++) {
+	    boost::uint8_t c = *y;
+	    y++;
+//	    printf("0x%x(%c) ", c, (isalpha(c)) ? c : '.');
+	    vec->push_back(c);
+	}
+//	delete[] tmp;
+    }
+    return vec;
+}
+
 
 #if 0
 /// \brief \ Each RTMP header consists of the following:
@@ -1387,8 +1470,6 @@ AMF::extractElement(Element *el, boost::uint8_t *in)
     boost::uint8_t *tmpptr;
 
 //    uint8_t hexint[(bytes*2)+1];
-    boost::uint8_t* hexint;
-
     short length;
 
     if (in == 0) {
@@ -1401,6 +1482,7 @@ AMF::extractElement(Element *el, boost::uint8_t *in)
 //     }
 
 #if 0
+    boost::uint8_t* hexint;
     hexint =  (boost::uint8_t*) malloc((bytes * 3) + 12);
     hexify((boost::uint8_t *)hexint, (boost::uint8_t *)in, bytes, true);
     log_msg(_("The packet body is: 0x%s"), hexint);
@@ -1462,7 +1544,7 @@ AMF::extractElement(Element *el, boost::uint8_t *in)
       case Element::XML_OBJECT:
       case Element::TYPED_OBJECT:
       default:
-	  log_unimpl("%s: type %d", __PRETTY_FUNCTION__, (int)type);
+//	  log_unimpl("%s: type %d", __PRETTY_FUNCTION__, (int)type);
 	  return 0;
     }
     

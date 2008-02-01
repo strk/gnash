@@ -56,29 +56,38 @@ public:
         RECORD_SET=0x0e,
         XML_OBJECT=0x0f,
         TYPED_OBJECT=0x10,
-	VARIABLE=0x11		// this isn't part of the AMF spec, it's used internally
+	// these aren't part of the AMF spec, they're used internally
+	VARIABLE=0x11,
+	FUNCTION=0x12
     } astype_e;
     Element();
     Element(boost::uint8_t *data);
     Element(double data);
+    Element(std::vector<double> &data);
     Element(const std::string &data);
     Element(const std::string &name, const std::string &data);
     Element(bool data);
     Element(const std::string &name, bool data);
+    // Create a function block for AMF
+    Element(bool, double, double, const std::string &str);
     ~Element();
     void clear();
     boost::uint8_t *init(boost::uint8_t *data);
     Element &init(const std::string &name, double data);
     Element &init(double data);
+    Element &init(std::vector<double> &data);
     Element &init(const std::string &name, const std::string &data);
     Element &init(const std::string &data);
     Element &init(const std::string &name, bool data);
     Element &init(bool data);
+    // Create a function block for AMF
+    Element &init(bool, double, double, const std::string &str);
 
     // These create the other "special" AMF types.
     Element &makeString(boost::uint8_t *data, int size); 
     Element &makeNumber(boost::uint8_t *data); 
     Element &makeBoolean(boost::uint8_t *data); 
+    Element &makeBoolean(bool &data); 
     Element &makeUndefined();
     Element &makeUndefined(const std::string &name);
     Element &makeNull();
@@ -122,10 +131,11 @@ public:
     void dump();
     
 private:
-    astype_e  _type;
+    astype_e	_type;
     boost::int16_t _length;
     std::string    _name;
     boost::uint8_t *_data;
+    std::vector<Element	*> _children;
 };                              // end of class definition
 
 

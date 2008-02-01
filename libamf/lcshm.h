@@ -33,16 +33,16 @@
 namespace gnash {
 
 // Manipulate the list of LocalConnection Listeners. We've made this a separate
-// class from LocalConnection as it's used standalone for the dumpshm utility to
-// dump the Listener lists.
+// class from LocalConnection as it's used standalone for the
+// dumpshm utility to dump the Listener lists.
 class Listener {
 public:
     Listener();
     Listener(boost::uint8_t *baseaddr);
     ~Listener();
-    bool addListener(std::string &name);
-    bool findListener(std::string &name);
-    bool removeListener(std::string &name);
+    bool addListener(const std::string &name);
+    bool findListener(const std::string &name);
+    bool removeListener(const std::string &name);
     std::auto_ptr< std::vector<std::string> > listListeners();
     void setBaseAddress(boost::uint8_t *addr) { _baseaddr = addr; };
     boost::uint8_t *getBaseAddress() { return _baseaddr; };
@@ -57,7 +57,8 @@ public:
     typedef struct {
         uint32_t unknown1;
         uint32_t unknown2;
-        uint32_t timestamp; // number of milliseconds that have elapsed since the system was started
+        uint32_t timestamp;	// number of milliseconds that have
+				// elapsed since the system was started
         uint32_t length;
     } lc_header_t;
     typedef struct {
@@ -77,14 +78,17 @@ public:
     LcShm(boost::uint8_t *baseaddr);
     LcShm(key_t key);
     ~LcShm();
-    bool connect(std::string &name);
+    bool connect(const std::string &name);
     bool connect(key_t key);
     void close(void);
-    void send(const std::string &name, const std::string &dataname, amf::Element *data);
+    void send(const std::string &name, const std::string &dataname,
+	      std::vector<amf::Element *> &data);
     void recv(std::string &name, std::string &dataname, amf::Element *data);
     std::vector<amf::Element *> parseBody(boost::uint8_t *data);
     boost::uint8_t *parseHeader(boost::uint8_t *data);
-    boost::uint8_t *formatHeader(boost::uint8_t *data);
+    boost::uint8_t *formatHeader(const std::string &con, const std::string &host, bool domain);
+    void addConnectionName(std::string &name);
+    void addHostname(std::string &name);
     void addObject(amf::Element *el) { _amfobjs.push_back(el); };
     size_t size() { return _amfobjs.size(); };
     std::vector<amf::Element *> getElements() { return _amfobjs; };

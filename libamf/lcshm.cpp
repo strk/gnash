@@ -45,6 +45,9 @@ using namespace amf;
 namespace gnash {
 
 // The maximum 
+// although a bool is one byte, it appears to be a short in AMF,
+// plus the type byte.
+const int AMF_BOOLEAN_SIZE = 3;
 const int LC_HEADER_SIZE = 16;
 const int MAX_LC_HEADER_SIZE = 40960;
 const int LC_LISTENERS_START  = MAX_LC_HEADER_SIZE +  LC_HEADER_SIZE;
@@ -109,7 +112,7 @@ Listener::~Listener()
 
 // see if a connection name exists in our list of listeners
 bool
-Listener::findListener(std::string &name)
+Listener::findListener(const string &name)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -127,7 +130,7 @@ Listener::findListener(std::string &name)
 }
 
 bool
-Listener::addListener(std::string &name)
+Listener::addListener(const string &name)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -156,7 +159,7 @@ Listener::addListener(std::string &name)
         return false;
     }
     item += 4;
-    const char *x2 = "::4";
+    const char *x2 = "::2";
     if (!memcpy(item, x2, 4)) {
         return false;
     }
@@ -164,28 +167,36 @@ Listener::addListener(std::string &name)
     return true;
 }
 
+// I don't believe this function is support by other swf players,
+// but we do, as it's nice to remove oneself from the listeners
+// list so nobody knows we were here listening.
 bool
-Listener::removeListener(std::string &name)
+Listener::removeListener(const string &name)
 {
     GNASH_REPORT_FUNCTION;
 
     boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
 
+    int len;
     char *item = reinterpret_cast<char *>(addr);
     while (*item != 0) {
         if (name == item) {
-            int len = strlen(item) + 1;
             while (*item != 0) {
+                len = strlen(item) + 8 + 1;
                 strcpy(item, item + len);
-                item += len + 1;
+                item += len + strlen(item + len);
             }
+            
+            memset(item - len, 0, len);
             return true;
         }
         item += strlen(item) + 1;
     }
+    
     return false;
 }
 
+// Get a list of alll the listeners waiting on this channel
 auto_ptr< vector<string> >
 Listener::listListeners()
 {
@@ -251,7 +262,9 @@ LcShm::parseBody(boost::uint8_t *data)
                 continue;
             }
         }
-        addObject(el);
+        if (el->getType() != Element::NOTYPE) {
+            addObject(el);
+        }
     };
     
     return _amfobjs;
@@ -291,12 +304,19 @@ LcShm::parseHeader(boost::uint8_t *data)
     Element *el = new amf::Element;
     AMF amf;
     ptr = amf.extractElement(el, ptr);
+    if (ptr == 0) {
+        log_error("Didn't extract element from byte stream!");
+        return 0;
+    }
+    
     _object.connection_name = el->to_string();
     delete el;
     
     el = new amf::Element;
     ptr = amf.extractElement(el, ptr);
-    _object.hostname = el->to_string();
+    if (ptr != 0) {
+        _object.hostname = el->to_string();
+    }
     delete el;
     
 //     el = new amf::Element;
@@ -326,10 +346,35 @@ LcShm::parseHeader(boost::uint8_t *data)
 }
 
 boost::uint8_t *
-LcShm::formatHeader(boost::uint8_t * /*data*/)
+LcShm::formatHeader(const std::string &con, const std::string &host, bool domain)
 {
-//    GNASH_REPORT_FUNCTION;
-    return NULL;
+    GNASH_REPORT_FUNCTION;
+//    boost::uint8_t *ptr = data + LC_HEADER_SIZE;
+    int size = con.size() + host.size() + 9;
+    
+    boost::uint8_t *header = new boost::uint8_t[size + 1];
+    boost::uint8_t *ptr = header;
+
+    // This is the initial 16 bytes of the header
+    memset(ptr, 0, size + 1);
+    *ptr = 1;
+    ptr += 3;
+    *ptr = 1;
+    ptr = header + LC_HEADER_SIZE;
+
+    // Which is then always followed by 3 AMF objects.
+    boost::uint8_t *tmp = AMF::encodeElement(con.c_str());
+    memcpy(ptr, tmp, con.size());
+    ptr +=  con.size();
+    delete[] tmp;
+
+    tmp = AMF::encodeElement(host.c_str());
+    memcpy(ptr, tmp, host.size());
+    ptr +=  host.size();
+    
+    delete[] ptr;
+    
+//     return ptr;
 }
 
 /// \brief Prepares the LcShm object to receive commands from a
@@ -339,12 +384,16 @@ LcShm::formatHeader(boost::uint8_t * /*data*/)
 /// send() command to signify which local connection to send the
 /// object to.
 bool
-LcShm::connect(string &name)
+LcShm::connect(const string &name)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     
     _name = name;
-    
+
+    // the name here is optional, Gnash will pick a good default.
+    // When using sysv shared memory segments in compatibility mode,
+    // the name is ignored, and the SHMkey is specified in the user's
+    // ~/.gnashrc file.
     if (Shm::attach(name.c_str(), true) == false) {
         return false;
     }
@@ -355,16 +404,21 @@ LcShm::connect(string &name)
     }
     
     Listener::setBaseAddress(reinterpret_cast<uint8_t *>(Shm::getAddr()));
+    _baseaddr = reinterpret_cast<uint8_t *>(Shm::getAddr());
     boost::uint8_t *ptr = parseHeader(Listener::getBaseAddress());
-    vector<amf::Element *> ellist = parseBody(ptr);
-    
+//    vector<amf::Element *> ellist = parseBody(ptr);
+//     log_debug("Base address is: 0x%x, 0x%x",
+//               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
+
+    addListener(name);
+
     return true;
 }
 
 bool
 LcShm::connect(key_t key)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     
     if (Shm::attach(key, true) == false) {
         return false;
@@ -376,18 +430,92 @@ LcShm::connect(key_t key)
     }
     
     Listener::setBaseAddress(reinterpret_cast<uint8_t *>(Shm::getAddr()));
+    _baseaddr = reinterpret_cast<uint8_t *>(Shm::getAddr());
     boost::uint8_t *ptr = parseHeader(Listener::getBaseAddress());
-    vector<amf::Element *> ellist = parseBody(ptr);
+//    vector<amf::Element *> ellist = parseBody(ptr);
+//     log_debug("Base address is: 0x%x, 0x%x",
+//               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
     
     return true;
 }
 
 /// \brief Invokes a method on a specified LcShm object.
 void
-LcShm::send(const std::string & /*name*/, const std::string & /*dataname*/, amf::Element * /*data*/)
+LcShm::send(const string &name, const string &domainname,
+            vector<amf::Element *> &data)
 {
+    GNASH_REPORT_FUNCTION;
+
+//     log_debug("Base address is: 0x%x, 0x%x",
+//               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
+
+//    formatHeader(name, domainname, _object.domain);
+
+    // Update the connection name
+    boost::uint8_t *ptr = Listener::getBaseAddress();
+    if (ptr == reinterpret_cast<boost::uint8_t *>(0)) {
+        log_error("base address not set!");
+    }
+
+//    boost::uint8_t *tmp = AMF::encodeElement(name.c_str());
+//     memcpy(ptr, tmp, name.size());
+//     ptr +=  name.size() + AMF_HEADER_SIZE;
+//     delete[] tmp;
+
+//     tmp = AMF::encodeElement(domainname.c_str());
+//     memcpy(ptr, tmp, domainname.size());
+//     ptr +=  domainname.size() + AMF_HEADER_SIZE;
+
+//    ptr += LC_HEADER_SIZE;
+    boost::uint8_t *x = ptr;    // just for debugging from gdb. temporary
+
+    // This is the initial 16 bytes of the header
+    memset(ptr, 0, LC_HEADER_SIZE + 200);
+    *ptr = 1;
+    ptr += 4;
+    *ptr = 1;
+    ptr += LC_HEADER_SIZE - 4;
+
+    // Which is then always followed by 3 AMF objects.
     
-    log_unimpl (__FUNCTION__);
+    boost::uint8_t *tmp = AMF::encodeElement(name.c_str());
+    memcpy(ptr, tmp, name.size() + AMF_HEADER_SIZE);
+    delete[] tmp;
+
+    ptr += name.size() + AMF_HEADER_SIZE;
+
+    // Update the host on the other end of the connection.
+    tmp = AMF::encodeElement(domainname.c_str());
+    memcpy(ptr, tmp, domainname.size() + AMF_HEADER_SIZE );
+    delete[] tmp;
+
+    ptr += domainname.size() + AMF_HEADER_SIZE;
+
+//     // Set the domain flag to whatever it's current value is.
+// //    Element domain(_object.domain);
+//     tmp = AMF::encodeBoolean(_object.domain);
+//     memcpy(ptr, tmp, AMF_BOOLEAN_SIZE);
+// //    delete[] tmp;
+    
+//     ptr += AMF_BOOLEAN_SIZE;
+    
+    vector<boost::uint8_t> *vec = AMF::encodeElement(data);
+    vector<boost::uint8_t>::iterator vit;
+    // Can't do a memcpy with a std::vector
+//    log_debug("Number of bytes in the vector: %x", vec->size());
+    for (vit = vec->begin(); vit != vec->end(); vit++) {
+	*ptr = *vit;
+#if 0                           // debugging crapola
+        if (isalpha(*ptr))
+            printf("%c ", *ptr);
+        else
+            printf("0x%x ", *ptr);
+#endif
+        ptr++;
+    }
+    
+//    delete[] tmp;
+
 }
 
 void
@@ -402,7 +530,7 @@ LcShm::dump()
     cerr << "Hostname Name:\t\t" << _object.hostname << endl;
     cerr << "Domain Allowed:\t\t" << ((_object.domain) ? "true" : "false") << endl;
     vector<amf::Element *>::iterator ait;
-//    cerr << "# of Elements in file: " << _amfobjs.size() << endl;
+    cerr << "# of Elements in file: " << _amfobjs.size() << endl;
     for (ait = _amfobjs.begin(); ait != _amfobjs.end(); ait++) {
 	amf::Element *el = (*(ait));
         el->dump();
@@ -410,11 +538,11 @@ LcShm::dump()
 
     vector<string>::const_iterator lit;
     auto_ptr< vector<string> > listeners ( listListeners() );
+    cerr << "# of Listeners in file: " << listeners->size() << endl;
     for (lit=listeners->begin(); lit!=listeners->end(); lit++) {
         string str = *lit;
         if (str[0] != ':') {
             cerr << "Listeners:\t" << str << endl;
-// 		total++;
         }
     }
 }
