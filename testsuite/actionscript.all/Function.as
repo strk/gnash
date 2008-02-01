@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.63 2007/12/27 02:42:16 zoulunkai Exp $";
+rcsid="$Id: Function.as,v 1.64 2008/02/01 15:49:59 strk Exp $";
 
 #include "check.as"
 
@@ -896,4 +896,26 @@ xcheck_equals(testvar3, 7);
 
 #endif //MING_SUPPORTS_ASM
 
-totals();
+//-----------------------------------------------------------------------------
+// Test that local var names are still declared, even if not passed by caller
+//-----------------------------------------------------------------------------
+
+function inc(a,b)
+{
+	a.count++;
+	b.count++;
+}
+a={count:1}; b={count:1};
+inc(a);
+check_equals(a.count, 2);
+xcheck_equals(b.count, 1); // See bug #22203
+
+#if OUTPUT_VERSION == 5
+ check_totals(146); // SWF5
+#endif
+#if OUTPUT_VERSION == 6
+ check_totals(202); // SWF6
+#endif
+#if OUTPUT_VERSION >= 7
+ check_totals(204); // SWF7,SWF8
+#endif

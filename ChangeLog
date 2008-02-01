@@ -1,5 +1,6 @@
 2008-02-01 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Function.as: add test for bug #22203.
 	* server/parser/button_character_def.cpp (read): robustness
 	  improvement, fixes bug #22200.
 	* server/asobj/xmlsocket.cpp (send): fix assertion. Fixes bug #22199.
