@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.43 2008/02/02 08:51:53 strk Exp $";
+rcsid="$Id: TextField.as,v 1.44 2008/02/02 10:58:11 strk Exp $";
 
 #include "check.as"
 
@@ -763,6 +763,12 @@ xcheck(tf.textWidth < origTextWidth);  // this can fail depending on the font us
 tf._width = 10;
 check_equals(tf._width, 10);
 
+#if OUTPUT_VERSION < 8
+ xcheck_equals(origTextWidth, tf.textWidth); // textWidth isn't influenced by wordWrap
+#else
+ check(origTextWidth > tf.textWidth); 
+#endif
+
 // test that adding a newline doesn't change the bounds width
 // see bug #22216
 tf.autoSize = 'center';
@@ -770,12 +776,6 @@ tf.text = "single line";
 linewidth = tf._width;
 tf.text = "single line\n";
 check_equals(tf._width, linewidth); 
-
-#if OUTPUT_VERSION < 8
- xcheck_equals(origTextWidth, tf.textWidth); // textWidth isn't influenced by wordWrap
-#else
- check(origTextWidth > tf.textWidth); 
-#endif
 
 
 //------------------------------------------------------------
