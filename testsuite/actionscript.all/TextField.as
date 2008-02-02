@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.42 2008/02/02 08:49:54 strk Exp $";
+rcsid="$Id: TextField.as,v 1.43 2008/02/02 08:51:53 strk Exp $";
 
 #include "check.as"
 
@@ -769,7 +769,7 @@ tf.autoSize = 'center';
 tf.text = "single line";
 linewidth = tf._width;
 tf.text = "single line\n";
-xcheck_equals(tf._width, linewidth); 
+check_equals(tf._width, linewidth); 
 
 #if OUTPUT_VERSION < 8
  xcheck_equals(origTextWidth, tf.textWidth); // textWidth isn't influenced by wordWrap

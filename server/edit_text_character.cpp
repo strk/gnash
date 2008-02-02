@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.143 2008/01/21 20:55:50 rsavoye Exp $ */
+/* $Id: edit_text_character.cpp,v 1.144 2008/02/02 08:51:52 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -1197,6 +1197,9 @@ edit_text_character::format_text()
 			// Close out this stretch of glyphs.
 			m_text_glyph_records.push_back(rec);
 			align_line(textAlignment, last_line_start_record, x);
+
+			// Expand bounding box to include last column of text ...
+			if ( _autoSize != autoSizeNone ) _bounds.expandTo(x+PADDING_TWIPS, y+PADDING_TWIPS);
 
 			// new paragraphs get the indent.
 			x = std::max(0, leftMargin + indent) + PADDING_TWIPS;

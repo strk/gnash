@@ -1,5 +1,13 @@
 2008-02-02 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/TextField.as: success for the just-added
+	  test.
+	* server/edit_text_character.cpp (format_text): expand bounding box
+	  at every line, not just at the end (when autoSize is true).
+	  Fixes bug #22216.
+
+2008-02-02 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/TextField.as: add test for bug #22216.
 
 2008-02-01 Sandro Santilli <strk@keybit.net>.
