@@ -74,7 +74,21 @@ NetStreamGst::NetStreamGst()
   g_signal_connect (decoder, "unknown-type", G_CALLBACK (NetStreamGst::decodebin_unknown_cb), this);   
 
   gst_bin_add_many (GST_BIN (_pipeline), _dataqueue, decoder, NULL);
-  gst_element_link(_dataqueue, decoder);
+
+  if (!_dataqueue || !decoder) {
+    log_error(_("Couldn't create the \"queue\" and/or \"decoder\" elements. "
+                "Please make sure Gstreamer and gstreamer-plugins-base are "
+                "correctly installed. NetStream playback halted."));
+    return;
+  }
+
+  bool rv = gst_element_link(_dataqueue, decoder);
+
+  if (!rv) {
+    log_error("Couldn't link \"queue\" and \"decoder\" elements. NetStream "
+              "playback halted.");
+    return;
+  }
 
   // Setup video conversion and sink
 
@@ -104,7 +118,18 @@ NetStreamGst::NetStreamGst()
   // Create the video pipeline and link the elements. The pipeline will
   // dereference the elements when they are destroyed.
   gst_bin_add_many (GST_BIN (_videobin), colorspace, videoscale, videocaps, videosink, NULL);
-  gst_element_link_many(colorspace, videoscale, videocaps, videosink, NULL);	
+  
+  if (!colorspace || !videoscale || !videocaps || !videosink) {
+    log_error(_("Couldn't create the Gstreamer video conversion elements. "
+                "Please make sure Gstreamer and gstreamer-plugins-base are "
+                "correctly installed. Video playback will not be possible."));
+  }
+  
+  rv = gst_element_link_many(colorspace, videoscale, videocaps, videosink, NULL);
+  if (!rv) {
+    log_error(_("Failed to link video conversion elements. Video playback will"
+                " not be possible"));
+  }
 
   // Setup audio sink
   GstElement* audioconvert = gst_element_factory_make ("audioconvert", NULL);	
@@ -117,7 +142,15 @@ NetStreamGst::NetStreamGst()
   }
 
   gst_bin_add_many(GST_BIN(_audiobin), audioconvert, audiosink, NULL);
-  gst_element_link(audioconvert, audiosink);
+
+  if (!audioconvert || !audiosink) {
+    log_error("Couldn't create Gstreamer audio elements. Audio playback will "
+              "not be possible");
+  }
+  rv = gst_element_link(audioconvert, audiosink);
+  if (!rv) {
+    log_error("Couldn't link audio elements. There will be no audio playback.");
+  }
 
   GstPad* target_audiopad = gst_element_get_static_pad (audioconvert, "sink");
   GstPad* target_videopad = gst_element_get_static_pad (colorspace, "sink");
@@ -127,6 +160,8 @@ NetStreamGst::NetStreamGst()
   
   gst_object_unref(GST_OBJECT(target_videopad));
   gst_object_unref(GST_OBJECT(target_audiopad));
+
+
 }
 
 NetStreamGst::~NetStreamGst()
@@ -224,6 +259,13 @@ NetStreamGst::play(const std::string& url)
               valid_url.c_str());
     return;  
   }
+
+  GstElementFactory* urifactory = gst_element_get_factory(_downloader);
+  const gchar* urifactoryname = gst_element_factory_get_longname(urifactory);
+
+  log_debug(_("URI handler \"%s\" found for URI %s"), urifactoryname, 
+            valid_url.c_str());
+
                                                          
   bool success = gst_bin_add(GST_BIN(_pipeline), _downloader);
   if (!success) {

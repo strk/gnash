@@ -1,3 +1,8 @@
+2008-02-03 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/asobj/NetStreamGst.cpp: Add some more error handling and
+	verbosity.
+
 2008-02-02 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/TextField.as: success for the just-added
