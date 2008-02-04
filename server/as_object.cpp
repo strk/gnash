@@ -789,13 +789,7 @@ as_object::delProperty(string_table::key name, string_table::key nsname)
 Property*
 as_object::getOwnProperty(string_table::key key, string_table::key nsname)
 {
-	// TODO:
-	// Removing this absurd round-trip from key to name to key
-	// breaks toString_valueOf (why? fix me!!)
-	//
-	string_table& st = _vm.getStringTable();
-       	std::string name = st.value(key);
-	return _members.getProperty(st.find(PROPNAME(name)), nsname);
+	return _members.getProperty(key, nsname);
 }
 
 as_value

@@ -1,5 +1,7 @@
 2008-02-04 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.cpp (getOwnProperty): remove useless round
+	  trip (key->name->key).
 	* server/as_object.cpp (setPropFlags): fix handling of second
 	  argument (null, array or invalid).
 	* testsuite/actionscript.all/Global.as: add more tests for
