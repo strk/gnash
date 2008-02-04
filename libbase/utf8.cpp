@@ -10,11 +10,9 @@
 
 #include "utf8.h"
 
-
-boost::uint32_t	utf8::decode_next_unicode_character(const char** utf8_buffer)
+boost::uint32_t	utf8::decodeNextUnicodeCharacter(std::string::const_iterator& it)
 {
 	boost::uint32_t	uc;
-	char	c;
 
 	// Security considerations:
 	//
@@ -35,23 +33,23 @@ boost::uint32_t	utf8::decode_next_unicode_character(const char** utf8_buffer)
 #define INVALID 0x0FFFD
 
 #define FIRST_BYTE(mask, shift)		\
-	uc = (c & (mask)) << (shift);
+	/* Post-increment iterator */ \
+	uc = (*it++ & (mask)) << (shift);
 
 #define NEXT_BYTE(shift)						\
-	c = **utf8_buffer;						\
-	if (c == 0) return 0; /* end of buffer, do not advance */	\
-	if ((c & 0xC0) != 0x80) return INVALID; /* standard check */	\
-	(*utf8_buffer)++;						\
-	uc |= (c & 0x3F) << shift;
+					\
+	if (*it == 0) return 0; /* end of buffer, do not advance */	\
+	if ((*it & 0xC0) != 0x80) return INVALID; /* standard check */	\
+	/* Post-increment iterator: */		\
+	uc |= (*it++ & 0x3F) << shift;
 
-	c = **utf8_buffer;
-	if (c == 0) return 0;	// End of buffer.  Do not advance.
+	if (*it == 0) return 0;	// End of buffer.  Do not advance.
 
-	(*utf8_buffer)++;
-	if ((c & 0x80) == 0) return (boost::uint32_t) c;	// Conventional 7-bit ASCII.
+	// Conventional 7-bit ASCII; return and increment iterator:
+	if ((*it & 0x80) == 0) return (boost::uint32_t) *it++;
 
-	// Multi-byte sequences.
-	if ((c & 0xE0) == 0xC0)
+	// Multi-byte sequences
+	if ((*it & 0xE0) == 0xC0)
 	{
 		// Two-byte sequence.
 		FIRST_BYTE(0x1F, 6);
@@ -59,7 +57,7 @@ boost::uint32_t	utf8::decode_next_unicode_character(const char** utf8_buffer)
 		if (uc < 0x80) return INVALID;	// overlong
 		return uc;
 	}
-	else if ((c & 0xF0) == 0xE0)
+	else if ((*it & 0xF0) == 0xE0)
 	{
 		// Three-byte sequence.
 		FIRST_BYTE(0x0F, 12);
@@ -70,7 +68,7 @@ boost::uint32_t	utf8::decode_next_unicode_character(const char** utf8_buffer)
 		if (uc == 0x0FFFE || uc == 0x0FFFF) return INVALID;	// not valid ISO 10646
 		return uc;
 	}
-	else if ((c & 0xF8) == 0xF0)
+	else if ((*it & 0xF8) == 0xF0)
 	{
 		// Four-byte sequence.
 		FIRST_BYTE(0x07, 18);
@@ -80,7 +78,7 @@ boost::uint32_t	utf8::decode_next_unicode_character(const char** utf8_buffer)
 		if (uc < 0x010000) return INVALID;	// overlong
 		return uc;
 	}
-	else if ((c & 0xFC) == 0xF8)
+	else if ((*it & 0xFC) == 0xF8)
 	{
 		// Five-byte sequence.
 		FIRST_BYTE(0x03, 24);
@@ -91,7 +89,7 @@ boost::uint32_t	utf8::decode_next_unicode_character(const char** utf8_buffer)
 		if (uc < 0x0200000) return INVALID;	// overlong
 		return uc;
 	}
-	else if ((c & 0xFE) == 0xFC)
+	else if ((*it & 0xFE) == 0xFC)
 	{
 		// Six-byte sequence.
 		FIRST_BYTE(0x01, 30);
@@ -110,58 +108,65 @@ boost::uint32_t	utf8::decode_next_unicode_character(const char** utf8_buffer)
 	}
 }
 
+// TODO: buffer as std::string; index (iterator); 
 
-void	utf8::encode_unicode_character(char* buffer, int* index, boost::uint32_t ucs_character)
+std::string
+utf8::encodeUnicodeCharacter(boost::uint32_t ucs_character)
 {
+
+	std::string text = "";
+
 	if (ucs_character <= 0x7F)
 	{
 		// Plain single-byte ASCII.
-		buffer[(*index)++] = (char) ucs_character;
+		text += (char) ucs_character;
 	}
 	else if (ucs_character <= 0x7FF)
 	{
 		// Two bytes.
-		buffer[(*index)++] = 0xC0 | (ucs_character >> 6);
-		buffer[(*index)++] = 0x80 | ((ucs_character >> 0) & 0x3F);
+		text += 0xC0 | (ucs_character >> 6);
+		text += 0x80 | ((ucs_character >> 0) & 0x3F);
 	}
 	else if (ucs_character <= 0xFFFF)
 	{
 		// Three bytes.
-		buffer[(*index)++] = 0xE0 | (ucs_character >> 12);
-		buffer[(*index)++] = 0x80 | ((ucs_character >> 6) & 0x3F);
-		buffer[(*index)++] = 0x80 | ((ucs_character >> 0) & 0x3F);
+		text += 0xE0 | (ucs_character >> 12);
+		text += 0x80 | ((ucs_character >> 6) & 0x3F);
+		text += 0x80 | ((ucs_character >> 0) & 0x3F);
 	}
 	else if (ucs_character <= 0x1FFFFF)
 	{
 		// Four bytes.
-		buffer[(*index)++] = 0xF0 | (ucs_character >> 18);
-		buffer[(*index)++] = 0x80 | ((ucs_character >> 12) & 0x3F);
-		buffer[(*index)++] = 0x80 | ((ucs_character >> 6) & 0x3F);
-		buffer[(*index)++] = 0x80 | ((ucs_character >> 0) & 0x3F);
+		text += 0xF0 | (ucs_character >> 18);
+		text += 0x80 | ((ucs_character >> 12) & 0x3F);
+		text += 0x80 | ((ucs_character >> 6) & 0x3F);
+		text += 0x80 | ((ucs_character >> 0) & 0x3F);
 	}
 	else if (ucs_character <= 0x3FFFFFF)
 	{
 		// Five bytes.
-		buffer[(*index)++] = 0xF8 | (ucs_character >> 24);
-		buffer[(*index)++] = 0x80 | ((ucs_character >> 18) & 0x3F);
-		buffer[(*index)++] = 0x80 | ((ucs_character >> 12) & 0x3F);
-		buffer[(*index)++] = 0x80 | ((ucs_character >> 6) & 0x3F);
-		buffer[(*index)++] = 0x80 | ((ucs_character >> 0) & 0x3F);
+		text += 0xF8 | (ucs_character >> 24);
+		text += 0x80 | ((ucs_character >> 18) & 0x3F);
+		text += 0x80 | ((ucs_character >> 12) & 0x3F);
+		text += 0x80 | ((ucs_character >> 6) & 0x3F);
+		text += 0x80 | ((ucs_character >> 0) & 0x3F);
 	}
 	else if (ucs_character <= 0x7FFFFFFF)
 	{
 		// Six bytes.
-		buffer[(*index)++] = 0xFC | (ucs_character >> 30);
-		buffer[(*index)++] = 0x80 | ((ucs_character >> 24) & 0x3F);
-		buffer[(*index)++] = 0x80 | ((ucs_character >> 18) & 0x3F);
-		buffer[(*index)++] = 0x80 | ((ucs_character >> 12) & 0x3F);
-		buffer[(*index)++] = 0x80 | ((ucs_character >> 6) & 0x3F);
-		buffer[(*index)++] = 0x80 | ((ucs_character >> 0) & 0x3F);
+		text += 0xFC | (ucs_character >> 30);
+		text += 0x80 | ((ucs_character >> 24) & 0x3F);
+		text += 0x80 | ((ucs_character >> 18) & 0x3F);
+		text += 0x80 | ((ucs_character >> 12) & 0x3F);
+		text += 0x80 | ((ucs_character >> 6) & 0x3F);
+		text += 0x80 | ((ucs_character >> 0) & 0x3F);
 	}
 	else
 	{
 		// Invalid char; don't encode anything.
 	}
+	
+	return text;
 }
 
 

@@ -1,3 +1,10 @@
+2008-02-04 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/utf8.{h,cpp}: make decodeNextUnicodeCharacter take a 
+	  std::string::const_iterator by ref, encodeUnicodeCharacter
+	  (presently unused) return a std::string.
+	* server/edit_text_character.cpp: use decodeNextUnicodeCharacter.
+
 2008-02-04 Sandro Santilli <strk@keybit.net>
 
 	* server/as_object.cpp (getOwnProperty): remove useless round

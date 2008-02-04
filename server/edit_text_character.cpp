@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.144 2008/02/02 08:51:52 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.145 2008/02/04 15:16:54 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -1104,7 +1104,6 @@ edit_text_character::format_text()
 	// nothing more to do if text is empty
 	if ( _text.empty() ) return;
 
-
 	AutoSizeValue autoSize = getAutoSize();
 	if ( autoSize != autoSizeNone )
 	{
@@ -1172,8 +1171,13 @@ edit_text_character::format_text()
 	m_ycursor = y;
 
 	assert(! _text.empty() );
-	const char*	text = &_text[0]; 
-	while (boost::uint32_t code = utf8::decode_next_unicode_character(&text))
+
+	std::string::const_iterator it = _text.begin();
+	
+	// decodeNextUnicodeCharacter(std::string::const_iterator &it) works,
+	// but unfortunately nothing is encoded in utf8.
+	
+	while (boost::uint32_t code = utf8::decodeNextUnicodeCharacter(it))
 	{
 		if ( _embedFonts )
 		{
@@ -1258,7 +1262,7 @@ edit_text_character::format_text()
 
 			// HTML tag, just skip it...
 			bool closingTagFound = false;
-			while ( (code = utf8::decode_next_unicode_character(&text)) )
+			while ( (code = utf8::decodeNextUnicodeCharacter(it)) )
 			{
 				if (code == '>')
 				{
@@ -1365,7 +1369,7 @@ after_x_advance:
 					//log_debug(" autoSize=NONE!");
 					// truncate long line, but keep expanding text box
 					bool newlinefound = false;
-					while ( (code = utf8::decode_next_unicode_character(&text)) )
+					while ( (code = utf8::decodeNextUnicodeCharacter(it)) )
 					{
 						if ( _embedFonts )
 						{

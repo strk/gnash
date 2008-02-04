@@ -10,6 +10,7 @@
 #define UTF8_H
 
 #include "tu_config.h" // needed ?
+#include <string>
 
 #include <boost/cstdint.hpp> // for boost::?int??_t
 
@@ -17,11 +18,11 @@
 namespace utf8
 {
 	// Return the next Unicode character in the UTF-8 encoded
-	// buffer.  Invalid UTF-8 sequences produce a U+FFFD character
-	// as output.  Advances *utf8_buffer past the character
+	// string.  Invalid UTF-8 sequences produce a U+FFFD character
+	// as output.  Advances string iterator past the character
 	// returned, unless the returned character is '\0', in which
-	// case the buffer does not advance.
-	DSOEXPORT boost::uint32_t	decode_next_unicode_character(const char** utf8_buffer);
+	// case the iterator does not advance.
+	DSOEXPORT boost::uint32_t decodeNextUnicodeCharacter(std::string::const_iterator& it);
 
 	// Encodes the given UCS character into the given UTF-8
 	// buffer.  Writes the data starting at buffer[offset], and
@@ -29,7 +30,7 @@ namespace utf8
 	//
 	// May write up to 6 bytes, so make sure there's room in the
 	// buffer!
-	DSOEXPORT void	encode_unicode_character(char* buffer, int* offset, boost::uint32_t ucs_character);
+	DSOEXPORT std::string encodeUnicodeCharacter(boost::uint32_t ucs_character);
 }
 
 
