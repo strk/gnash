@@ -31,6 +31,8 @@
 #include "fn_call.h" // for generic methods
 #include "Object.h" // for getObjectInterface
 #include "action.h" // for call_method
+#include "array.h" // for setPropFlags
+
 #include <set>
 #include <string>
 #include <boost/algorithm/string/case_conv.hpp>
@@ -578,6 +580,27 @@ as_object::dump_members(std::map<std::string, as_value>& to)
 	_members.dump(*this, to);
 }
 
+class FlagsSetterVisitor {
+	string_table& _st;
+	PropertyList& _pl;
+	int _setTrue;
+	int _setFalse;
+public:
+	FlagsSetterVisitor(string_table& st, PropertyList& pl, int setTrue, int setFalse)
+		:
+		_st(st),
+		_pl(pl),
+		_setTrue(setTrue),
+		_setFalse(setFalse)
+	{}
+
+	void visit(as_value& v)
+	{
+		string_table::key key = _st.find(v.to_string());
+		_pl.setFlags(key, _setTrue, _setFalse);
+	}
+};
+
 void
 as_object::setPropFlags(as_value& props_val, int set_false, int set_true)
 {
@@ -618,23 +641,19 @@ as_object::setPropFlags(as_value& props_val, int set_false, int set_true)
 		return;
 	}
 
-	boost::intrusive_ptr<as_object> props = props_val.to_object();
-
 	// Evan: it seems that if set_true == 0 and set_false == 0,
 	// this function acts as if the parameters were (object, null, 0x1, 0)
+#if 0 // bullshit, see actionscript.all/Global.as
 	if (set_false == 0 && set_true == 0)
 	{
-	    props = NULL;
+	    props_val.set_null();
 	    set_false = 0;
 	    set_true = 0x1;
 	}
+#endif
 
-	if (props == NULL)
+	if (props_val.is_null())
 	{
-		// TODO: this might be a comma-separated list
-		//       of props as a string !!
-		//
-
 		// Take all the members of the object
 		//std::pair<size_t, size_t> result = 
 		_members.setFlagsAll(set_true, set_false);
@@ -647,12 +666,27 @@ as_object::setPropFlags(as_value& props_val, int set_false, int set_true)
 			m_prototype->_members.setFlagsAll(set_true, set_false);
 		}
 #endif
+		return;
 	}
-	else
+
+	boost::intrusive_ptr<as_object> props = props_val.to_object();
+	as_array_object* ary = dynamic_cast<as_array_object*>(props.get());
+	if ( ! ary )
 	{
-		//std::pair<size_t, size_t> result = 
-		_members.setFlagsAll(props->_members, set_true, set_false);
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("Invalid call to AsSetPropFlags: "
+			"invalid second argument %s "
+			"(expected string, null or an array)"),
+			props_val.to_debug_string().c_str());
+		);
+		return;
 	}
+
+	// The passed argument has to be considered an array
+	//std::pair<size_t, size_t> result = 
+	FlagsSetterVisitor visitor(getVM().getStringTable(), _members, set_true, set_false);
+	ary->visitAll(visitor);
+	//_members.setFlagsAll(props->_members, set_true, set_false);
 }
 
 

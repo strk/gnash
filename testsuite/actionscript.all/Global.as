@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Global.as,v 1.40 2008/01/30 17:21:29 bwy Exp $";
+rcsid="$Id: Global.as,v 1.41 2008/02/04 09:47:50 strk Exp $";
 
 #include "check.as"
 
@@ -272,20 +272,101 @@ function set2() { this.s2++; }
 #endif // OUTPUT_VERSION == 7
 
 
+o = {};
+var tmp = new Array;
+for (var i in o) tmp.push(i);
+check_equals(tmp.length, 0);
+
+o.a = 1;
+o.b = 2;
+o.c = 3;
+tmp = new Array;
+for (var i in o) tmp.push(i);
+check_equals(tmp.length, 3);
+
+// ASSetPropFlags passing an array of property names
+
+ret = ASSetPropFlags(o, ["b"], 1); // an array of prop names
+check_equals(typeof(ret), 'undefined');
+tmp = new Array;
+for (var i in o) tmp.push(i);
+check_equals(tmp.length, 2);
+tmp.sort();
+check_equals(tmp[0], 'a');
+check_equals(tmp[1], 'c');
+
+// ASSetPropFlags passing an non-array object for property names 
+// (invalid)
+
+ret = ASSetPropFlags(o, {c:2}, 1); // an object is not valid, must be an array
+check_equals(typeof(ret), 'undefined');
+tmp = new Array;
+for (var i in o) tmp.push(i);
+check_equals(tmp.length, 2);
+tmp.sort();
+check_equals(tmp[0], 'a');
+check_equals(tmp[1], 'c');
+
+// ASSetPropFlags passing an array-like object for property names 
+// (still invalid)
+
+p = {};
+p.length = 1;
+p['0'] = 'c';
+ret = ASSetPropFlags(o, p, 1); 
+check_equals(typeof(ret), 'undefined');
+tmp = new Array;
+for (var i in o) tmp.push(i);
+check_equals(tmp.length, 2);
+tmp.sort();
+check_equals(tmp[0], 'a');
+check_equals(tmp[1], 'c');
+
+// ASSetPropFlags passing undefined for property names 
+// (still invalid)
+
+ret = ASSetPropFlags(o, undefined, 1); 
+check_equals(typeof(ret), 'undefined');
+tmp = new Array;
+for (var i in o) tmp.push(i);
+check_equals(tmp.length, 2);
+
+// ASSetPropFlags passing null for property names 
+// (still invalid)
+
+ret = ASSetPropFlags(o, null, 1); 
+check_equals(typeof(ret), 'undefined');
+tmp = new Array;
+for (var i in o) tmp.push(i);
+check_equals(tmp.length, 0);
+
+// ASSetPropFlags passing a string and 0,0 true/false sets
+
+o = {a:1, b:2, c:3};
+ASSetPropFlags(o, "b", 1, 0); 
+tmp = new Array; for (var i in o) tmp.push(i);
+check_equals(tmp.length, 2);
+
+ASSetPropFlags(o, ['c'], 0, 0);  // 0,0 has no special meaning
+tmp = new Array; for (var i in o) tmp.push(i);
+check_equals(tmp.length, 2);
+
+
+
 //------------------------------------------------------------
 // END OF TEST
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 5
-	check_totals(57); // SWF5
+	check_totals(77); // SWF5
 #else
 # if OUTPUT_VERSION == 6
-	check_totals(91); // SWF6
+	check_totals(111); // SWF6
 # else
 #  if OUTPUT_VERSION == 7
-	check_totals(73); // SWF7
+	check_totals(93); // SWF7
 #  else
-	check_totals(60); // SWF8+
+	check_totals(80); // SWF8+
 #  endif
 # endif
 #endif
