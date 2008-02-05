@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.191 2008/02/01 01:30:29 rsavoye Exp $ */
+/* $Id: ASHandlers.cpp,v 1.192 2008/02/05 15:34:41 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -49,6 +49,7 @@
 #include "debugger.h"
 #include "sound_handler.h"
 #include "namedStrings.h"
+#include "utf8.h"
 
 #include <unistd.h>
 #include <string>
@@ -1634,17 +1635,17 @@ SWFHandlers::ActionOrd(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     thread.ensureStack(1);
-    string str = env.top(0).to_string();
+    const std::wstring& wstr = utf8::decodeCanonicalString(env.top(0).to_string());
 
     // TODO: what charcode here ?
 
-    if ( str.empty() )
+    if ( wstr.empty() )
     {
     	env.top(0).set_int(0);
     }
     else
     {
-    	env.top(0).set_int((unsigned char)str.c_str()[0]);
+    	env.top(0).set_int(wstr[0]);
     }
 }
 
@@ -1654,10 +1655,12 @@ SWFHandlers::ActionChr(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     thread.ensureStack(1);
-    char	buf[2];
-    buf[0] = int(env.top(0).to_number()); // TODO: use to_int() ?
-    buf[1] = 0;
-    env.top(0).set_string(buf);
+    
+    std::wstring ret = L"";
+    wchar_t t(env.top(0).to_int());
+    ret.push_back(t);
+
+    env.top(0).set_string(utf8::encodeCanonicalString(ret));
 }
 
 void

@@ -1,3 +1,10 @@
+2008-02-05 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/asobj/string.cpp, server/vm/ASHandlers.cpp: convert strings
+	  to wstring for string operations (length, slice, split, substr,
+	  indexOf, fromCharCode, charCodeAt, charAt, ord, chr). Fixes
+	  bug #21400.
+
 2008-02-05 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-swfc.all/Makefile.am: distribute test sources.
@@ -7,6 +14,10 @@
 
 	* testsuite/actionscript.all/String.as: add failing tests for
 	  string methods on multi-byte characters.
+	* server/asobj/string.cpp, server/vm/ASHandlers.cpp: convert strings
+	  to wstring for string operations (length, slice, split, substr,
+	  indexOf, fromCharCode, charCodeAt, charAt, ord, chr). Fixes
+	  bug #21400.
 
 2008-02-05 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 

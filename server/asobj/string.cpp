@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.51 2008/01/25 20:42:40 strk Exp $ */
+/* $Id: string.cpp,v 1.52 2008/02/05 15:34:41 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -34,6 +34,7 @@
 #include "VM.h" // for registering static GcResources (constructor and prototype)
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
+#include "utf8.h"
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <algorithm>
@@ -193,7 +194,9 @@ string_get_length(const fn_call& fn)
 {
     boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
-    return as_value(obj->str().size());
+    std::wstring wstr = utf8::decodeCanonicalString(obj->str());
+
+    return as_value(wstr.size());
 }
 
 // all the arguments will be converted to string and concatenated
@@ -214,7 +217,7 @@ string_concat(const fn_call& fn)
 
 
 static size_t
-valid_index(const std::string& subject, int index)
+valid_index(const std::wstring& subject, int index)
 {
     int myIndex = index;
 
@@ -234,18 +237,18 @@ string_slice(const fn_call& fn)
     boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
     // Make a copy.
-    std::string str = obj->str();
+    std::wstring wstr = utf8::decodeCanonicalString(obj->str());
 
     ENSURE_FN_ARGS(1, 2, as_value());
 
-    size_t start = valid_index(str, fn.arg(0).to_int());
+    size_t start = valid_index(wstr, fn.arg(0).to_int());
 
-    size_t len = str.length();
+    size_t len = wstr.length();
 
     size_t end = len;
     if (fn.nargs >= 2)
     {
-    	end = valid_index(str, fn.arg(1).to_int());
+    	end = valid_index(wstr, fn.arg(1).to_int());
 
     } 
 
@@ -258,7 +261,7 @@ string_slice(const fn_call& fn)
 
     log_msg("start: "SIZET_FMT", end: "SIZET_FMT", retlen: "SIZET_FMT, start, end, retlen);
 
-    return as_value(str.substr(start, retlen));
+    return as_value(utf8::encodeCanonicalString(wstr.substr(start, retlen)));
 }
 
 static as_value
@@ -267,7 +270,7 @@ string_split(const fn_call& fn)
     boost::intrusive_ptr<string_as_object> obj =
         ensureType<string_as_object>(fn.this_ptr);
 
-    std::string str = obj->str();
+    std::wstring wstr = utf8::decodeCanonicalString(obj->str());
 
     as_value val;
 
@@ -277,26 +280,26 @@ string_split(const fn_call& fn)
 
     if (fn.nargs == 0)
     {
-        val.set_std_string(str);
+        val.set_std_string(obj->str());
         array->push(val);
 
         return as_value(array.get());
     }
 
-    const std::string& delim = fn.arg(0).to_string();
+    const std::wstring& delim = utf8::decodeCanonicalString(fn.arg(0).to_string());
 
     // SWF5 didn't support multichar or empty delimiter
     if ( SWFVersion < 6 )
     {
 	    if ( delim.size() != 1 )
 	    {
-		    val.set_std_string(str);
+		    val.set_std_string(obj->str());
 		    array->push(val);
 		    return as_value(array.get());
 	    }
     }
 
-    size_t max = str.size();
+    size_t max = wstr.size();
 
     if (fn.nargs >= 2)
     {
@@ -305,12 +308,12 @@ string_split(const fn_call& fn)
 	{
 		return as_value(array.get());
 	}
-        max = iclamp((size_t)max_in, 0, str.size());
+        max = iclamp((size_t)max_in, 0, wstr.size());
     }
 
-    if ( str.empty() )
+    if ( wstr.empty() )
     {
-        val.set_std_string(str);
+        val.set_std_string(obj->str());
         array->push(val);
 
         return as_value(array.get());
@@ -319,7 +322,7 @@ string_split(const fn_call& fn)
 
     if ( delim.empty() ) {
         for (unsigned i=0; i <max; i++) {
-            val.set_std_string(str.substr(i, 1));
+            val.set_std_string(utf8::encodeCanonicalString(wstr.substr(i, 1)));
             array->push(val);
         }
 
@@ -331,16 +334,16 @@ string_split(const fn_call& fn)
     size_t num = 0;
 
     while (num < max) {
-        pos = str.find(delim, pos);
+        pos = wstr.find(delim, pos);
 
-        if (pos != std::string::npos) {
-            val.set_std_string(str.substr(prevpos, pos - prevpos));
+        if (pos != std::wstring::npos) {
+            val.set_std_string(utf8::encodeCanonicalString(wstr.substr(prevpos, pos - prevpos)));
             array->push(val);
             num++;
             prevpos = pos + delim.size();
             pos++;
         } else {
-            val.set_std_string(str.substr(prevpos));
+            val.set_std_string(utf8::encodeCanonicalString(wstr.substr(prevpos)));
             array->push(val);
             break;
         }
@@ -382,13 +385,13 @@ string_sub_str(const fn_call& fn)
     boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
     // Make a copy.
-    std::string str = obj->str();
+    std::wstring wstr = utf8::decodeCanonicalString(obj->str());
 
-    ENSURE_FN_ARGS(1, 2, str);
+    ENSURE_FN_ARGS(1, 2, obj->str());
 
-    int start = valid_index(str, fn.arg(0).to_int());
+    int start = valid_index(wstr, fn.arg(0).to_int());
 
-    int num = str.size();
+    int num = wstr.size();
 
     if (fn.nargs >= 2)
     {
@@ -398,13 +401,13 @@ string_sub_str(const fn_call& fn)
 		if ( -num <= start ) num = 0;
 		else
 		{
-			num = str.size()+num;
+			num = wstr.size() + num;
 			if ( num < 0 ) return as_value("");
 		}
 	}
     }
 
-    return as_value(str.substr(start, num));
+    return as_value(utf8::encodeCanonicalString(wstr.substr(start, num)));
 }
 
 // 1st param: start_index, 2nd param: end_index
@@ -414,9 +417,9 @@ string_sub_string(const fn_call& fn)
 {
     boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
-    const std::string& str = obj->str();
+    const std::wstring& wstr = utf8::decodeCanonicalString(obj->str());
 
-    ENSURE_FN_ARGS(1, 2, str);
+    ENSURE_FN_ARGS(1, 2, obj->str());
 
     int start = fn.arg(0).to_number<int>();
 
@@ -424,11 +427,11 @@ string_sub_string(const fn_call& fn)
         start = 0;
     }
 
-    if (static_cast<unsigned>(start) > str.size()) {
+    if (static_cast<unsigned>(start) > wstr.size()) {
         return as_value("");
     }
 
-    int end = str.size();
+    int end = wstr.size();
 
     if (fn.nargs >= 2) {
         int num = fn.arg(1).to_number<int>();
@@ -437,7 +440,7 @@ string_sub_string(const fn_call& fn)
             return as_value("");
         }
 
-        if (num >= 1 && static_cast<unsigned>(num) < str.size()) {
+        if (num >= 1 && static_cast<unsigned>(num) < wstr.size()) {
             end = num;
 
             if (end < start) {
@@ -454,7 +457,7 @@ string_sub_string(const fn_call& fn)
 
     //log_debug("Start: %d, End: %d", start, end);
 
-    return as_value(str.substr(start, end));
+    return as_value(utf8::encodeCanonicalString(wstr.substr(start, end)));
 }
 
 static as_value
@@ -462,12 +465,12 @@ string_index_of(const fn_call& fn)
 {
     boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
-    const std::string& str = obj->str();
+    const std::wstring& wstr = utf8::decodeCanonicalString(obj->str());
 
     ENSURE_FN_ARGS(1, 2, -1);
 
     as_value& tfarg = fn.arg(0); // to find arg
-    const std::string& toFind = tfarg.to_string();
+    const std::wstring& toFind = utf8::decodeCanonicalString(tfarg.to_string());
 
     size_t start = 0;
 
@@ -489,9 +492,9 @@ string_index_of(const fn_call& fn)
 	}
     }
 
-    size_t pos = str.find(toFind, start);
+    size_t pos = wstr.find(toFind, start);
 
-    if (pos == std::string::npos) {
+    if (pos == std::wstring::npos) {
         return as_value(-1);
     }
 
@@ -501,7 +504,7 @@ string_index_of(const fn_call& fn)
 static as_value
 string_from_char_code(const fn_call& fn)
 {
-    std::string result;
+    std::wstring result;
 
     // isn't this function supposed to take one argument?
 
@@ -510,7 +513,7 @@ string_from_char_code(const fn_call& fn)
         result += c;
     }
 
-    return as_value(result);
+    return as_value(utf8::encodeCanonicalString(result));
 }
 
 static as_value
@@ -518,7 +521,7 @@ string_char_code_at(const fn_call& fn)
 {
     boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
-    const std::string& str = obj->str();
+    const std::wstring& wstr = utf8::decodeCanonicalString(obj->str());
 
     if (fn.nargs == 0) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -537,26 +540,26 @@ string_char_code_at(const fn_call& fn)
 
     size_t index = fn.arg(0).to_number<size_t>();
 
-    if (index > str.size()) {
+    if (index > wstr.size()) {
         as_value rv;
         rv.set_nan();
         return rv;
     }
 
-    return as_value(str[index]);
+    return as_value(wstr[index]);
 }
 
 static as_value
 string_char_at(const fn_call& fn)
 {
     boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
-    std::string& str = obj->str();
+    const std::wstring& wstr = utf8::decodeCanonicalString(obj->str());
 
     ENSURE_FN_ARGS(1, 1, "");
 
     size_t index = fn.arg(0).to_number<size_t>();
 
-    if (index > str.size()) {
+    if (index > wstr.size()) {
         as_value rv;
         rv.set_nan();
         return rv;
@@ -564,7 +567,7 @@ string_char_at(const fn_call& fn)
 
     std::string rv;
 
-    rv.push_back(str[index]);
+    rv.append(utf8::encodeCanonicalString(wstr.substr(index, 1)));
 
     return as_value(rv);
 }
