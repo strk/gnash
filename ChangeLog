@@ -1,5 +1,7 @@
 2008-02-05 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/server/PropertyListTest.cpp: re-enable the tests,
+	  testing case-insensitive operations.
 	* testsuite/generic-testrunner.sh: don't write a logfile in the
 	  same dir of the testcase, use the builddir instead.
 
