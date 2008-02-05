@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderGst.cpp,v 1.11 2008/01/29 05:18:33 bjacques Exp $
+// $Id: VideoDecoderGst.cpp,v 1.12 2008/02/05 10:50:15 bjacques Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -65,7 +65,7 @@ VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type, int width, int heigh
       break;      
     case VIDEO_CODEC_SCREENVIDEO:
     case VIDEO_CODEC_SCREENVIDEO2:
-      decoder = gst_element_factory_make ("ffdec_flv", NULL);
+      decoder = gst_element_factory_make ("ffdec_flashsv", NULL);
       caps = gst_caps_new_simple ("video/x-flash-screen",
                                       "width", G_TYPE_INT, width,
                                       "height", G_TYPE_INT, height,

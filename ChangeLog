@@ -1,3 +1,9 @@
+2008-02-05 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libmedia/gst/VideoDecoderGst.cpp: Use a different ffdec
+	element specific for screenvideo so that older gst-ffmpeg
+	installations can play it.
+
 2008-02-05 Sandro Santilli <strk@keybit.net>
 
 	* cygnal/testsuite/.cvsignore,
