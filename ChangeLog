@@ -1,5 +1,10 @@
 2008-02-05 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* testsuite/actionscript.all/String.as: add failing tests for
+	  string methods on multi-byte characters.
+
+2008-02-05 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* server/movie_root.cpp: send unique gnash::key::code not SWFCode
 	  to event_id; edit_text_character relies on this code to work out
 	  which character was passed and SWFcode is bogus.

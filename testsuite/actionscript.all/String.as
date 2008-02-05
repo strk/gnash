@@ -16,7 +16,7 @@
 
 // Original author: Mike Carlson - June 19th, 2006
 
-rcsid="$Id: String.as,v 1.35 2008/01/25 20:42:40 strk Exp $";
+rcsid="$Id: String.as,v 1.36 2008/02/05 14:21:55 bwy Exp $";
 
 #include "check.as"
 
@@ -281,6 +281,18 @@ check_equals ( a.concat("sir ","william",15), "abcdefghijklmnopqrstuvwxyzsir wil
 var b = new String("1234");
 check_equals ( b.substring(3, 6), "4");
 
+//-------------------------------------------
+// Check multi-byte chars with all functions
+//-------------------------------------------
+
+var a = new String("Längere Wörter");
+xcheck_equals (a.length, 14);
+xcheck_equals (a.substring(2,4), "ng");
+xcheck_equals (a.charAt(1), "ä");
+xcheck_equals (a.charAt(2), "n");
+xcheck_equals (a.slice(3,5), "ge");
+xcheck_equals (a.charCodeAt(9), 246);
+
 // see check.as
 #ifdef MING_SUPPORTS_ASM
 
@@ -482,7 +494,7 @@ r = "s:"+s;
 check_equals(r, "s:");
 
 #if OUTPUT_VERSION < 6
- check_totals(175);
+ check_totals(181);
 #else
- check_totals(203);
+ check_totals(209);
 #endif
