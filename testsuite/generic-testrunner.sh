@@ -56,7 +56,8 @@ done
 cat << EOF
 
 for t in ${testfiles}; do
-	outlog=\${t}.output.\$$
+	#outlog=\${t}.output.\$$
+	outlog=${top_builddir}/testoutlog.\$$
 	echo "NOTE: Running test \${t}"
 	( 
 		exec > \${outlog}
