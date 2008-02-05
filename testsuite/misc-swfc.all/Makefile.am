@@ -74,7 +74,7 @@ AUXMOVIES = \
 	    $(NULL)
 
 
-EXTRA_DIST = $(SCTESTS) $(AUXMOVIES) $(INTERACTIVE_SCTESTS) check.sc Dejagnu.sc hello.sc
+EXTRA_DIST = $(SANE_SCTESTS) $(BOGO_SCTESTS) $(AUXMOVIES) $(INTERACTIVE_SCTESTS) check.sc Dejagnu.sc hello.sc
 
 if ENABLE_SWFC
 

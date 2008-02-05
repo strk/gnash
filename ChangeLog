@@ -1,5 +1,6 @@
 2008-02-05 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfc.all/Makefile.am: distribute test sources.
 	* testsuite/swfdec/PASSING: sync'd with master git
 
 2008-02-05 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
