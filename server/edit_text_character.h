@@ -89,18 +89,11 @@ public:
 	/// setting for the variable name.
 	/// 
 	void set_variable_name(const std::string& newname);
-
-	/// Set our text to the given string.
-	//
-	/// This function will also update any registered variable
-	///
-	void	set_text_value(const char* new_text);
-
+	
 	/// Set our text to the given string by effect of an update of a registered variable name
 	//
 	/// This cal only updates the text and is only meant to be called by ourselves
 	/// or by sprite_instance when a registered TextVariable is updated.
-	///
 	void updateText(const std::string& s);
 
  	/// Return value of our text.
@@ -285,6 +278,19 @@ public:
 
 private:
 
+	/// Set our text to the given string.
+	//
+	/// This function will also update any registered variable
+	///
+	void	setTextValue(const std::wstring& wstr);
+
+	/// Set our text to the given string by effect of an update of a registered variable name
+	//
+	/// This cal only updates the text and is only meant to be called by ourselves
+	/// or by sprite_instance when a registered TextVariable is updated.
+	///
+	void updateText(const std::wstring& s);
+
 	/// Set focus 
 	void setFocus();
 
@@ -300,8 +306,10 @@ private:
 	/// Call this function when willing to invoke the onKillFocus event handler
 	void onKillFocus();
 
-	/// The actual text
-	std::string _text;
+	/// The actual text. Because we have to deal with non-ascii characters (129-255)
+	/// this is a wide string; the cursor position and the position within the string
+	/// are then the same, which makes manipulating the string much easier.
+	std::wstring _text;
 
 	/// immutable definition of this object, as read
 	/// from the SWF stream. Assured to be not-NULL

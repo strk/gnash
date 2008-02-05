@@ -29,10 +29,7 @@
 
 #include "gnash.h" // for gnash::key namespace
 
-#include <cwchar>
-
 namespace gnash {
-
 
 /// For keyDown and stuff like that.
 //
@@ -95,30 +92,48 @@ public:
 	};
 
 	id_code	m_id;
-	unsigned char	m_key_code;
+	
+	// keyCode must be the unique gnash key identifier
+	// gnash::key::code.
+	// edit_text_character has to be able to work out the
+	// ASCII value from keyCode, while other users need 
+	// the SWF code or the Flash key code.
+	key::code keyCode;
 
-	event_id() : m_id(INVALID), m_key_code(key::INVALID) {}
+	event_id() : m_id(INVALID), keyCode(key::INVALID) {}
 
-	event_id(id_code id, unsigned char c = key::INVALID)
+	event_id(id_code id, key::code c = key::INVALID)
 		:
 		m_id(id),
-		m_key_code(c)
+		keyCode(c)
 	{
 		// you must supply a key code for KEY_PRESS event
 		// 
-		// we do have a testcase with m_id == KEY_PRESS, and m_key_code==0(KEY_INVALID)
+		// we do have a testcase with m_id == KEY_PRESS, and keyCode==0(KEY_INVALID)
 		// see key_event_test.swf(produced by Ming)
 		// 
-		//assert((m_key_code == key::INVALID && (m_id != KEY_PRESS))
-		//	|| (m_key_code != key::INVALID && (m_id == KEY_PRESS)));
+		//assert((keyCode == key::INVALID && (m_id != KEY_PRESS))
+		//	|| (keyCode != key::INVALID && (m_id == KEY_PRESS)));
 	}
 
-	void setKeyCode(unsigned char key)
+	///
+	/// @param SWFKey The SWF code matched to the event. This
+	/// must be converted to a unique gnash::key::code.
+	void setKeyCode(boost::uint8_t SWFkey)
 	{
-		m_key_code = key;
+		// Lookup the SWFcode in the gnash::key::code table.
+		// Some are not unique (keypad numbers are the
+		// same as normal numbers), so we take the first match.
+		// As long as we can work out the SWFCode from the
+		// gnash::key::code it's all right.
+		int i = 0;
+		while (key::codeMap[i][key::SWF] != SWFkey && i < key::KEYCOUNT) i++;
+
+		if (i == key::KEYCOUNT) keyCode = key::INVALID;
+		else keyCode = (key::code)i;
 	}
 
-	bool	operator==(const event_id& id) const { return m_id == id.m_id && m_key_code == id.m_key_code; }
+	bool	operator==(const event_id& id) const { return m_id == id.m_id && keyCode == id.keyCode; }
 
 	bool operator< (const event_id& id) const
 	{
@@ -126,7 +141,7 @@ public:
 		if ( m_id > id.m_id ) return false;
 
 		// m_id are equal, check key code
-		if ( m_key_code < id.m_key_code ) return true;
+		if ( keyCode < id.keyCode ) return true;
 		return false;
 	}
 

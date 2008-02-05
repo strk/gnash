@@ -637,7 +637,15 @@ enum code
   KEYCOUNT
 };
 
-const unsigned char codeMap[KEYCOUNT][3] = {
+enum type
+{
+	SWF,
+	KEY,
+	ASCII,
+	TYPES
+};
+
+const unsigned char codeMap[KEYCOUNT][TYPES] = {
 //{swfKeyCode, keycode, asciiKeyCode}
   {0,   0,   0}, // INVALID = 0
   {0,   0,   0}, // UNKNOWN1

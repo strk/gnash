@@ -1133,7 +1133,8 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 			{
 				// KEY_UP and KEY_DOWN events are unrelated to any key!
 				ch->on_event(event_id(event_id::KEY_DOWN, key::INVALID)); 
-				ch->on_event(event_id(event_id::KEY_PRESS, key::codeMap[k][0]));
+				// Pass the unique Gnash key code!
+				ch->on_event(event_id(event_id::KEY_PRESS, k));
 			}
 			else
 			{

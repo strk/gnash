@@ -1,3 +1,24 @@
+2008-02-05 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/movie_root.cpp: send unique gnash::key::code not SWFCode
+	  to event_id; edit_text_character relies on this code to work out
+	  which character was passed and SWFcode is bogus.
+	* server/event_id.h: store gnash::key::code not SWFCode; setKeyCode
+	  converts SWFCode to a corresponding gnash::key::code.
+	* server/gnash.h: add enum for different key code types.
+	* server/button_character_instance.cpp: lookup SWFCode from
+	  gnash::key::code.
+	* libbase/utf8.{cpp,h}: add {decode,encode}CanonicalString methods
+	  for converting between UTF-8 encoded std::string and std::wstring.
+	  Fix some bugs in character decoding.
+	* server/edit_text_character.{cpp.h}: use std::wstring internally,
+	  as once we receive multi-byte characters the cursor position and
+	  std::string position are different. Wide characters mean string
+	  manipulation can stay as before. Interfaces still use std::string
+	  with conversions when necessary. Make wstring methods private. 
+	  set_text_value(const char*) -> setTextValue(const wstring&).
+	  Handles characters like ö or ¶.
+
 2008-02-05 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* libmedia/gst/VideoDecoderGst.cpp: Use a different ffdec

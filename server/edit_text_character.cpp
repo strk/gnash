@@ -17,8 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.145 2008/02/04 15:16:54 bwy Exp $ */
-
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
@@ -373,6 +371,7 @@ edit_text_character::edit_text_character(character* parent,
 		edit_text_character_def* def, int id)
 	:
 	character(parent, id),
+	_text(L""),
 	m_def(def),
 	_font(0),
 	m_has_focus(false),
@@ -408,7 +407,8 @@ edit_text_character::edit_text_character(character* parent,
 	// set default text *before* calling registerTextVariable
 	// (if the textvariable already exist and has a value
 	//  the text will be replaced with it)
-	set_text_value(m_def->get_default_text().c_str());
+	
+	setTextValue(utf8::decodeCanonicalString(m_def->get_default_text()));
 
 	m_dummy_style.push_back(fill_style());
 
@@ -590,21 +590,22 @@ edit_text_character::on_event(const event_id& id)
 
 		case event_id::KEY_PRESS:
 		{
-			std::string s(_text);
-			std::string c;
-			c = (char) id.m_key_code;
+			std::wstring s = _text;
 
-			// may be _text is changed in ActionScript
+			// id.keyCode is the unique gnash::key::code for a character
+			uint32_t c = (uint32_t) id.keyCode;
+
+			// maybe _text is changed in ActionScript
 			m_cursor = imin(m_cursor, _text.size());
 
-			switch (c[0])
+			switch (c)
 			{
 				case key::BACKSPACE:
 					if (m_cursor > 0)
 					{
 						s.erase(m_cursor - 1, 1);
 						m_cursor--;
-						set_text_value(s.c_str());
+						setTextValue(s);
 					}
 					break;
 
@@ -612,7 +613,7 @@ edit_text_character::on_event(const event_id& id)
 					if (s.size() > m_cursor)
 					{
 						s.erase(m_cursor, 1);
-						set_text_value(s.c_str());
+						setTextValue(s);
 					}
 					break;
 
@@ -644,12 +645,14 @@ edit_text_character::on_event(const event_id& id)
 					break;
 
 				default:
-				{
-					s.insert(m_cursor, c);
-					m_cursor++;
-					set_text_value(s.c_str());
+					wchar_t t = (wchar_t) gnash::key::codeMap[c][key::ASCII];
+					if (t != 0)
+					{
+				  		s.insert(m_cursor, 1, t);
+						m_cursor++;
+					}
+					setTextValue(s);
 					break;
-				}
 			}
 			onChanged();
 		}
@@ -692,11 +695,19 @@ edit_text_character::get_topmost_mouse_entity(float x, float y)
 }
 
 void
-edit_text_character::updateText(const std::string& new_text)
+edit_text_character::updateText(const std::string& str)
+{
+	std::wstring wstr = utf8::decodeCanonicalString(str);
+	updateText(wstr);
+}
+
+
+void
+edit_text_character::updateText(const std::wstring& wstr)
 {
 	unsigned int maxLen = m_def->get_max_length();
 
-	std::string newText = new_text; // copy needed for eventual resize
+	std::wstring newText = wstr; // copy needed for eventual resize
 	if (maxLen && newText.length() > maxLen )
 	{
 		newText.resize(maxLen);
@@ -718,12 +729,10 @@ edit_text_character::updateText(const std::string& new_text)
 }
 
 void
-edit_text_character::set_text_value(const char* new_text_cstr)
+edit_text_character::setTextValue(const std::wstring& wstr)
 {
-	std::string newText;
-	if ( new_text_cstr ) newText = new_text_cstr;
 
-	updateText(newText);
+	updateText(wstr);
 
 	if ( ! _variable_name.empty() && _text_variable_registered )
 	{
@@ -732,12 +741,12 @@ edit_text_character::set_text_value(const char* new_text_cstr)
 		as_object* tgt = ref.first;
 		if ( tgt )
 		{
-			tgt->set_member(ref.second, newText); // we shouldn't truncate, right ?
+			tgt->set_member(ref.second, utf8::encodeCanonicalString(wstr)); // we shouldn't truncate, right ?
 		}
 		else	
 		{
 			// nothing to do (too early ?)
-			log_debug("set_text_value: variable name %s points to an unexisting target, I guess we would not be registered in this was true, or the sprite we've registered our variable name has been unloaded", _variable_name.c_str());
+			log_debug("setTextValue: variable name %s points to an unexisting target, I guess we would not be registered in this was true, or the sprite we've registered our variable name has been unloaded", _variable_name.c_str());
 		}
 	}
 }
@@ -747,13 +756,13 @@ edit_text_character::get_text_value() const
 {
 	// we need the const_cast here because registerTextVariable
 	// *might* change our text value, calling the non-const
-	// set_text_value().
+	// setTextValue().
 	// This happens if the TextVariable has not been already registered
 	// and during registration comes out to name an existing variable
 	// with a pre-existing value.
 	const_cast<edit_text_character*>(this)->registerTextVariable();
 
-	return _text;
+	return utf8::encodeCanonicalString(_text);
 }
 
 void
@@ -774,14 +783,14 @@ edit_text_character::set_member(string_table::key name,
 		//if (name == "text")
 	{
 		int version = get_parent()->get_movie_definition()->get_version();
-		set_text_value(val.to_string_versioned(version).c_str());
+		setTextValue(utf8::decodeCanonicalString(val.to_string_versioned(version)));
 		return;
 	}
 	case NSV::PROP_HTML_TEXT:
 		//if (name == "htmlText")
 	{
 		int version = get_parent()->get_movie_definition()->get_version();
-		set_text_value(val.to_string_versioned(version).c_str());
+		setTextValue(utf8::decodeCanonicalString(val.to_string_versioned(version)));
 		format_text();
 		return;
 	}
@@ -1172,12 +1181,12 @@ edit_text_character::format_text()
 
 	assert(! _text.empty() );
 
-	std::string::const_iterator it = _text.begin();
+	std::wstring::const_iterator it = _text.begin();
 	
 	// decodeNextUnicodeCharacter(std::string::const_iterator &it) works,
 	// but unfortunately nothing is encoded in utf8.
 	
-	while (boost::uint32_t code = utf8::decodeNextUnicodeCharacter(it))
+	while (boost::uint32_t code = *it++)
 	{
 		if ( _embedFonts )
 		{
@@ -1262,7 +1271,7 @@ edit_text_character::format_text()
 
 			// HTML tag, just skip it...
 			bool closingTagFound = false;
-			while ( (code = utf8::decodeNextUnicodeCharacter(it)) )
+			while ( (code = *it++) )
 			{
 				if (code == '>')
 				{
@@ -1369,7 +1378,7 @@ after_x_advance:
 					//log_debug(" autoSize=NONE!");
 					// truncate long line, but keep expanding text box
 					bool newlinefound = false;
-					while ( (code = utf8::decodeNextUnicodeCharacter(it)) )
+					while ( (code = *it++ ) )
 					{
 						if ( _embedFonts )
 						{
@@ -1585,14 +1594,14 @@ edit_text_character::registerTextVariable()
 #endif
 		// TODO: pass environment to to_string ?
 		// as_environment& env = get_environment();
-		set_text_value(val.to_string().c_str());
+		setTextValue(utf8::decodeCanonicalString(val.to_string()));
 	}
 	else
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
 		log_msg(_("target sprite (%p) does NOT have a member named %s (no problem, we'll add it)"), (void*)sprite, _vm.getStringTable().value(key).c_str());
 #endif
-		target->set_member(key, as_value(_text));
+		target->set_member(key, as_value(utf8::encodeCanonicalString(_text)));
 	}
 
 	sprite_instance* sprite = target->to_movie();
@@ -1618,7 +1627,7 @@ edit_text_character::set_variable_name(const std::string& newname)
 	{
 		_variable_name = newname;
 		_text_variable_registered = false;
-		//set_text_value(m_def->get_default_text().c_str());
+		//setTextValue(m_def->get_default_text());
 #ifdef DEBUG_DYNTEXT_VARIABLES
 		log_debug("Calling updateText after change of variable name");
 #endif

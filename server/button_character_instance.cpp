@@ -331,7 +331,7 @@ bool
 button_character_instance::on_event(const event_id& id)
 {
 
-	if( (id.m_id==event_id::KEY_PRESS) && (id.m_key_code == key::INVALID) )
+	if( (id.m_id==event_id::KEY_PRESS) && (id.keyCode == key::INVALID) )
 	{
 		// onKeypress only responds to valid key code
 		return false;
@@ -346,8 +346,10 @@ button_character_instance::on_event(const event_id& id)
 		button_action& ba = *(m_def->m_button_actions[i]);
 
 		int keycode = (ba.m_conditions & 0xFE00) >> 9;
-		event_id key_event(event_id::KEY_PRESS, (key::code) keycode);
-		if (key_event == id)
+		
+		// Test match between button action conditions and the SWF code
+		// that maps to id.keyCode (the gnash unique key code). 
+		if (id.m_id == event_id::KEY_PRESS && gnash::key::codeMap[id.keyCode][key::SWF] == keycode)
 		{
 			// Matching action.
 			VM::get().getRoot().pushAction(ba.m_actions, boost::intrusive_ptr<character>(this));
