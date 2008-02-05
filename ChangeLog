@@ -1,3 +1,9 @@
+2008-02-05 Sandro Santilli <strk@keybit.net>
+
+	* cygnal/testsuite/.cvsignore,
+	  cygnal/testsuite/cygnal.all/.cvsignore:
+	  standard ignores..
+
 2008-02-04 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/utf8.{h,cpp}: make decodeNextUnicodeCharacter take a 
