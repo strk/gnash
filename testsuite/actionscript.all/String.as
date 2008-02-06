@@ -16,7 +16,7 @@
 
 // Original author: Mike Carlson - June 19th, 2006
 
-rcsid="$Id: String.as,v 1.37 2008/02/05 15:58:48 bwy Exp $";
+rcsid="$Id: String.as,v 1.38 2008/02/06 11:27:33 bwy Exp $";
 
 #include "check.as"
 
@@ -281,10 +281,39 @@ check_equals ( a.concat("sir ","william",15), "abcdefghijklmnopqrstuvwxyzsir wil
 var b = new String("1234");
 check_equals ( b.substring(3, 6), "4");
 
+
+//-------------------------------------------
+// Chr and ord
+//-------------------------------------------
+
+check_equals (chr(0), "");
+check_equals (chr(65), "A");
+check_equals (ord("A"), 65);
+check_equals (ord(""), 0);
+
+// Chars greater than 128
+#if OUTPUT_VERSION > 5
+xcheck_equals (chr(246), "ö");
+xcheck_equals (chr(486), "Ǧ");
+trace ("Ǧ");
+trace(chr(486));
+xcheck_equals (chr(998), "Ϧ");
+xcheck_equals (ord("ö"), 246);
+xcheck_equals (ord("Ϧ"), 998);
+#else // version <= 5
+xcheck_equals (chr(486), "æ");
+xcheck_equals (chr(865), "a");
+xcheck_equals (ord("ö"), 195);
+xcheck_equals (ord("Ö"), 195);
+xcheck_equals (ord("ǵ"), 199);
+xcheck_equals (ord("Ϧ"), 207);
+#endif
+
 #if OUTPUT_VERSION > 5
 
 //-------------------------------------------
-// Check multi-byte chars with all functions
+// Check multi-byte chars with all string
+// functions
 //-------------------------------------------
 
 // These tests are only correct with SWF6 and above.
@@ -500,7 +529,7 @@ r = "s:"+s;
 check_equals(r, "s:");
 
 #if OUTPUT_VERSION < 6
- check_totals(175);
+ check_totals(185);
 #else
- check_totals(209);
+ check_totals(218);
 #endif
