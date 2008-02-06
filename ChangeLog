@@ -1,3 +1,8 @@
+2008-02-06 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/swfdec/PASSING: string-indexof and stringlength
+	  tests now succeed for swf > 5
+
 2008-02-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/actionscript.all/String.as: new failing tests for 
