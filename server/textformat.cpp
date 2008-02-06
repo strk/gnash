@@ -17,13 +17,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-// $Id: textformat.cpp,v 1.32 2008/01/21 20:55:53 rsavoye Exp $
+// $Id: textformat.cpp,v 1.33 2008/02/06 10:18:31 strk Exp $
 
 #include "log.h"
 #include "textformat.h"
 #include "fn_call.h"
 #include "builtin_function.h" // for getter/setter properties
 #include "namedStrings.h"
+#include "VM.h"
 
 namespace gnash {  
 
@@ -144,6 +145,8 @@ as_value textformat_setformat(const fn_call& fn)
   boost::intrusive_ptr<textformat_as_object> ptr = ensureType<textformat_as_object>(fn.this_ptr);
   //double start = fn.arg(0).to_number();
   //double end = fn.arg(1).to_number();
+  VM& vm = ptr->getVM();
+  string_table& st = vm.getStringTable();
 
   if ( fn.nargs < 3 )
   {
@@ -186,7 +189,10 @@ as_value textformat_setformat(const fn_call& fn)
     obj->obj.bulletSet(method.to_bool());
   }
 
-  if (obj->get_member(NSV::PROP_COLOR, &method)) {
+  // Can't use a named string here with current model, as a "color"
+  // named string would clash with the "Color" class in SWF6 and below
+  // (but not in SWF7 and above)
+  if (obj->get_member(st.find("color"), &method)) {
     //log_msg(_("Color exists and is set to %f", method.to_number());
     obj->obj.colorSet((boost::uint32_t)method.to_number());
   }

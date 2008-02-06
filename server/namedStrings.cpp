@@ -35,7 +35,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "broadcastMessage", NSV::PROP_BROADCAST_MESSAGE ),
 	string_table::svt( "bullet", NSV::PROP_BULLET ),
 	string_table::svt( "callee", NSV::PROP_CALLEE ),
-	string_table::svt( "color", NSV::PROP_COLOR ),
+	//string_table::svt( "color", NSV::PROP_COLOR ), // clashes with CLASS_COLOR in case-insensitive mode
 	string_table::svt( "constructor", NSV::PROP_CONSTRUCTOR ),
 	string_table::svt( "__constructor__", NSV::PROP_uuCONSTRUCTORuu ),
 	string_table::svt( "_currentframe", NSV::PROP_uCURRENTFRAME ),
@@ -181,7 +181,7 @@ void load_strings(string_table *table, int version)
 {
 	if (version < 7)
 	{
-		table->lower_next_group();
+		//table->lower_next_group();
 		table->set_insensitive();
 	}
 

@@ -57,7 +57,7 @@ typedef enum {
 		PROP_BROADCAST_MESSAGE,
 		PROP_BULLET,
 		PROP_CALLEE,
-		PROP_COLOR,
+		//PROP_COLOR, // clashes with CLASS_COLOR in case-insensitive mode
 		PROP_CONSTRUCTOR,
 		PROP_uuCONSTRUCTORuu,
 		PROP_uCURRENTFRAME,

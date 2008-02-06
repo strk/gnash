@@ -105,6 +105,10 @@ string_table::insert_group(svt* pList, std::size_t size)
 			boost::to_lower(pList[i].mValue);
 			boost::to_lower(pList[i].mComp);
 		}
+		else if (mCaseInsensitive)
+		{
+			boost::to_lower(pList[i].mComp);
+		}
 
 		// The keys don't have to be consecutive, so any time we find a key
 		// that is too big, jump a few keys to avoid rewriting this on every item.

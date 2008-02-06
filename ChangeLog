@@ -1,5 +1,14 @@
 2008-02-06 Sandro Santilli <strk@keybit.net>
 
+	* libbase/string_table.cpp (insert_group): only lowercase
+	  the comparison key if case-insensitive.
+	* server/namedStrings.{cpp,h}: drop PROP_COLOR named string
+	  as it would clash with the CLASS_COLOR one in case-insensitive
+	  runs. Fixes unstable evaluation of "color" labels.
+	* server/textformat.cpp: don't use PROP_COLOR anymore (was dropped).
+
+2008-02-06 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/case.as: add tests showing that
 	  the current case-insensitive string_table comparison is
 	  conceptually bogus (and probably the whole global string_table
