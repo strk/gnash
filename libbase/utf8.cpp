@@ -24,14 +24,28 @@
 #include "utf8.h"
 
 std::wstring
-utf8::decodeCanonicalString(const std::string& str)
+utf8::decodeCanonicalString(const std::string& str, int version)
 {
+	
 	std::wstring wstr = L"";
 	
 	std::string::const_iterator it = str.begin();
-	while (boost::uint32_t code = utf8::decodeNextUnicodeCharacter(it))
+	
+	if (version > 5)
 	{
-		wstr.push_back((wchar_t) code);
+		while (boost::uint32_t code = decodeNextUnicodeCharacter(it))
+		{
+			wstr.push_back(static_cast<wchar_t>(code));
+		}
+	}
+	else
+	{
+		while (it != str.end())
+		{
+			// This mangles UTF-8 (UCS4) strings, but is what is
+			// wanted for SWF5.
+			wstr.push_back(static_cast<unsigned char>(*it++));
+		}
 	}
 	
 	return wstr;
@@ -39,21 +53,33 @@ utf8::decodeCanonicalString(const std::string& str)
 }
 
 std::string
-utf8::encodeCanonicalString(const std::wstring& wstr)
+utf8::encodeCanonicalString(const std::wstring& wstr, int version)
 {
+
 	std::string str = "";
 	
 	std::wstring::const_iterator it = wstr.begin();
 	while ( it != wstr.end())
 	{
-		str.append(utf8::encodeUnicodeCharacter(*it++));
+		if (version > 5) str.append(encodeUnicodeCharacter(*it++));
+		else str.append(encodeLatin1Character(*it++));
 	}
 	
 	return str;
 
 }
 
-boost::uint32_t	utf8::decodeNextUnicodeCharacter(std::string::const_iterator& it)
+std::string
+utf8::encodeLatin1Character(boost::uint32_t ucsCharacter)
+{
+	std::string text = "";
+	text.push_back(static_cast<unsigned char>(ucsCharacter));
+	return text;
+}
+
+
+boost::uint32_t
+utf8::decodeNextUnicodeCharacter(std::string::const_iterator& it)
 {
 	boost::uint32_t	uc;
 

@@ -30,10 +30,10 @@ namespace utf8
 {
 	// Converts a UTF-8 encoded std::string with multibyte characters into
 	// a std::wstring.
-	DSOEXPORT std::wstring decodeCanonicalString(const std::string& str);
+	DSOEXPORT std::wstring decodeCanonicalString(const std::string& str, int version);
 
 	// Converts a std::wstring into a UTF-8 encoded std::string.
-	DSOEXPORT std::string encodeCanonicalString(const std::wstring& wstr);
+	DSOEXPORT std::string encodeCanonicalString(const std::wstring& wstr, int version);
 
 	// Return the next Unicode character in the UTF-8 encoded
 	// string.  Invalid UTF-8 sequences produce a U+FFFD character
@@ -49,6 +49,8 @@ namespace utf8
 	// May write up to 6 bytes, so make sure there's room in the
 	// buffer!
 	std::string encodeUnicodeCharacter(boost::uint32_t ucs_character);
+	
+	std::string encodeLatin1Character(boost::uint32_t ucsCharacter);
 }
 
 
