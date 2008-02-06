@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.52 2008/02/05 15:34:41 bwy Exp $ */
+/* $Id: string.cpp,v 1.53 2008/02/06 15:20:58 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -194,7 +194,9 @@ string_get_length(const fn_call& fn)
 {
     boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
-    std::wstring wstr = utf8::decodeCanonicalString(obj->str());
+    int version = VM::get().getSWFVersion();
+
+    std::wstring wstr = utf8::decodeCanonicalString(obj->str(), version);
 
     return as_value(wstr.size());
 }
@@ -236,8 +238,10 @@ string_slice(const fn_call& fn)
 {
     boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
+    int version = VM::get().getSWFVersion();
+
     // Make a copy.
-    std::wstring wstr = utf8::decodeCanonicalString(obj->str());
+    std::wstring wstr = utf8::decodeCanonicalString(obj->str(), version);
 
     ENSURE_FN_ARGS(1, 2, as_value());
 
@@ -261,7 +265,7 @@ string_slice(const fn_call& fn)
 
     log_msg("start: "SIZET_FMT", end: "SIZET_FMT", retlen: "SIZET_FMT, start, end, retlen);
 
-    return as_value(utf8::encodeCanonicalString(wstr.substr(start, retlen)));
+    return as_value(utf8::encodeCanonicalString(wstr.substr(start, retlen), version));
 }
 
 static as_value
@@ -270,7 +274,9 @@ string_split(const fn_call& fn)
     boost::intrusive_ptr<string_as_object> obj =
         ensureType<string_as_object>(fn.this_ptr);
 
-    std::wstring wstr = utf8::decodeCanonicalString(obj->str());
+    int version = VM::get().getSWFVersion();
+
+    std::wstring wstr = utf8::decodeCanonicalString(obj->str(), version);
 
     as_value val;
 
@@ -286,7 +292,7 @@ string_split(const fn_call& fn)
         return as_value(array.get());
     }
 
-    const std::wstring& delim = utf8::decodeCanonicalString(fn.arg(0).to_string());
+    const std::wstring& delim = utf8::decodeCanonicalString(fn.arg(0).to_string(), version);
 
     // SWF5 didn't support multichar or empty delimiter
     if ( SWFVersion < 6 )
@@ -322,7 +328,7 @@ string_split(const fn_call& fn)
 
     if ( delim.empty() ) {
         for (unsigned i=0; i <max; i++) {
-            val.set_std_string(utf8::encodeCanonicalString(wstr.substr(i, 1)));
+            val.set_std_string(utf8::encodeCanonicalString(wstr.substr(i, 1), version));
             array->push(val);
         }
 
@@ -337,13 +343,17 @@ string_split(const fn_call& fn)
         pos = wstr.find(delim, pos);
 
         if (pos != std::wstring::npos) {
-            val.set_std_string(utf8::encodeCanonicalString(wstr.substr(prevpos, pos - prevpos)));
+            val.set_std_string(utf8::encodeCanonicalString(
+            		wstr.substr(prevpos, pos - prevpos),
+            		version));
             array->push(val);
             num++;
             prevpos = pos + delim.size();
             pos++;
         } else {
-            val.set_std_string(utf8::encodeCanonicalString(wstr.substr(prevpos)));
+            val.set_std_string(utf8::encodeCanonicalString(
+            		wstr.substr(prevpos),
+            		version));
             array->push(val);
             break;
         }
@@ -384,8 +394,9 @@ string_sub_str(const fn_call& fn)
 {
     boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
+    int version = VM::get().getSWFVersion();
     // Make a copy.
-    std::wstring wstr = utf8::decodeCanonicalString(obj->str());
+    std::wstring wstr = utf8::decodeCanonicalString(obj->str(), version);
 
     ENSURE_FN_ARGS(1, 2, obj->str());
 
@@ -407,7 +418,7 @@ string_sub_str(const fn_call& fn)
 	}
     }
 
-    return as_value(utf8::encodeCanonicalString(wstr.substr(start, num)));
+    return as_value(utf8::encodeCanonicalString(wstr.substr(start, num), version));
 }
 
 // 1st param: start_index, 2nd param: end_index
@@ -417,7 +428,9 @@ string_sub_string(const fn_call& fn)
 {
     boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
-    const std::wstring& wstr = utf8::decodeCanonicalString(obj->str());
+    int version = VM::get().getSWFVersion();
+
+    const std::wstring& wstr = utf8::decodeCanonicalString(obj->str(), version);
 
     ENSURE_FN_ARGS(1, 2, obj->str());
 
@@ -457,7 +470,7 @@ string_sub_string(const fn_call& fn)
 
     //log_debug("Start: %d, End: %d", start, end);
 
-    return as_value(utf8::encodeCanonicalString(wstr.substr(start, end)));
+    return as_value(utf8::encodeCanonicalString(wstr.substr(start, end), version));
 }
 
 static as_value
@@ -465,12 +478,14 @@ string_index_of(const fn_call& fn)
 {
     boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
-    const std::wstring& wstr = utf8::decodeCanonicalString(obj->str());
+    int version = VM::get().getSWFVersion();
+
+    const std::wstring& wstr = utf8::decodeCanonicalString(obj->str(), version);
 
     ENSURE_FN_ARGS(1, 2, -1);
 
     as_value& tfarg = fn.arg(0); // to find arg
-    const std::wstring& toFind = utf8::decodeCanonicalString(tfarg.to_string());
+    const std::wstring& toFind = utf8::decodeCanonicalString(tfarg.to_string(), version);
 
     size_t start = 0;
 
@@ -513,7 +528,9 @@ string_from_char_code(const fn_call& fn)
         result += c;
     }
 
-    return as_value(utf8::encodeCanonicalString(result));
+    int version = VM::get().getSWFVersion();
+
+    return as_value(utf8::encodeCanonicalString(result, version));
 }
 
 static as_value
@@ -521,7 +538,9 @@ string_char_code_at(const fn_call& fn)
 {
     boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
-    const std::wstring& wstr = utf8::decodeCanonicalString(obj->str());
+    int version = VM::get().getSWFVersion();
+
+    const std::wstring& wstr = utf8::decodeCanonicalString(obj->str(), version);
 
     if (fn.nargs == 0) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -553,7 +572,10 @@ static as_value
 string_char_at(const fn_call& fn)
 {
     boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
-    const std::wstring& wstr = utf8::decodeCanonicalString(obj->str());
+
+    int version = VM::get().getSWFVersion();
+
+    const std::wstring& wstr = utf8::decodeCanonicalString(obj->str(), version);
 
     ENSURE_FN_ARGS(1, 1, "");
 
@@ -567,7 +589,7 @@ string_char_at(const fn_call& fn)
 
     std::string rv;
 
-    rv.append(utf8::encodeCanonicalString(wstr.substr(index, 1)));
+    rv.append(utf8::encodeCanonicalString(wstr.substr(index, 1), version));
 
     return as_value(rv);
 }

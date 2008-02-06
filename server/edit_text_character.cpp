@@ -407,8 +407,10 @@ edit_text_character::edit_text_character(character* parent,
 	// set default text *before* calling registerTextVariable
 	// (if the textvariable already exist and has a value
 	//  the text will be replaced with it)
+
+	int version = VM::get().getSWFVersion();
 	
-	setTextValue(utf8::decodeCanonicalString(m_def->get_default_text()));
+	setTextValue(utf8::decodeCanonicalString(m_def->get_default_text(), version));
 
 	m_dummy_style.push_back(fill_style());
 
@@ -697,7 +699,8 @@ edit_text_character::get_topmost_mouse_entity(float x, float y)
 void
 edit_text_character::updateText(const std::string& str)
 {
-	const std::wstring& wstr = utf8::decodeCanonicalString(str);
+	int version = VM::get().getSWFVersion();
+	const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
 	updateText(wstr);
 }
 
@@ -740,7 +743,9 @@ edit_text_character::setTextValue(const std::wstring& wstr)
 		as_object* tgt = ref.first;
 		if ( tgt )
 		{
-			tgt->set_member(ref.second, utf8::encodeCanonicalString(wstr)); // we shouldn't truncate, right ?
+			int version = VM::get().getSWFVersion();
+			// we shouldn't truncate, right?
+			tgt->set_member(ref.second, utf8::encodeCanonicalString(wstr, version)); 
 		}
 		else	
 		{
@@ -761,7 +766,9 @@ edit_text_character::get_text_value() const
 	// with a pre-existing value.
 	const_cast<edit_text_character*>(this)->registerTextVariable();
 
-	return utf8::encodeCanonicalString(_text);
+	int version = VM::get().getSWFVersion();
+
+	return utf8::encodeCanonicalString(_text, version);
 }
 
 void
@@ -782,14 +789,14 @@ edit_text_character::set_member(string_table::key name,
 		//if (name == "text")
 	{
 		int version = get_parent()->get_movie_definition()->get_version();
-		setTextValue(utf8::decodeCanonicalString(val.to_string_versioned(version)));
+		setTextValue(utf8::decodeCanonicalString(val.to_string_versioned(version), version));
 		return;
 	}
 	case NSV::PROP_HTML_TEXT:
 		//if (name == "htmlText")
 	{
 		int version = get_parent()->get_movie_definition()->get_version();
-		setTextValue(utf8::decodeCanonicalString(val.to_string_versioned(version)));
+		setTextValue(utf8::decodeCanonicalString(val.to_string_versioned(version), version));
 		format_text();
 		return;
 	}
@@ -1583,6 +1590,9 @@ edit_text_character::registerTextVariable()
 	// check if the VariableName already has a value,
 	// in that case update text value
 	as_value val;
+	
+	int version = VM::get().getSWFVersion();
+	
 	if (target->get_member(key, &val) )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
@@ -1590,14 +1600,14 @@ edit_text_character::registerTextVariable()
 #endif
 		// TODO: pass environment to to_string ?
 		// as_environment& env = get_environment();
-		setTextValue(utf8::decodeCanonicalString(val.to_string()));
+		setTextValue(utf8::decodeCanonicalString(val.to_string(), version));
 	}
 	else
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
 		log_msg(_("target sprite (%p) does NOT have a member named %s (no problem, we'll add it)"), (void*)sprite, _vm.getStringTable().value(key).c_str());
 #endif
-		target->set_member(key, as_value(utf8::encodeCanonicalString(_text)));
+		target->set_member(key, as_value(utf8::encodeCanonicalString(_text, version)));
 	}
 
 	sprite_instance* sprite = target->to_movie();
