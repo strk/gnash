@@ -22,7 +22,7 @@
  *  Test case sensitivity 
  */
 
-rcsid="$Id: case.as,v 1.16 2008/02/06 10:04:55 strk Exp $";
+rcsid="$Id: case.as,v 1.17 2008/02/06 10:15:07 strk Exp $";
 
 #include "check.as"
 
@@ -265,4 +265,44 @@ propRecorder.sort(); //case sensitive sort
     check_equals(propRecorder[2], 'b')
 #endif 
 
-totals();
+// Now create a new object, with lowercase A and uppercase B
+// Gnash will fail as long as it uses a single string_table
+// for the whole objects set
+obj = { a: 1, B: 2 };
+#if OUTPUT_VERSION > 5
+ check(obj.hasOwnProperty('a'));
+ #if OUTPUT_VERSION == 6
+  check(obj.hasOwnProperty('A')); 
+ #else
+  check(!obj.hasOwnProperty('A')); 
+ #endif
+#endif
+propRecorder = new Array();
+for(var prop in obj)
+{
+   propRecorder.push(prop);
+}
+propRecorder.sort();
+check_equals(propRecorder.length, 2);
+#if OUTPUT_VERSION < 7
+ // gnash fails here because 'B' will point to a previously used 'b'
+ // and 'a' will point to a previously used 'A'
+ // in the global string_table
+ xcheck_equals(propRecorder[0], 'B');
+ xcheck_equals(propRecorder[1], 'a');
+#else
+ // The problem above is a non-issue in SWF7 or higher, as 'b' and
+ // 'B' will be separate entries in the string_table
+ check_equals(propRecorder[0], 'B');
+ check_equals(propRecorder[1], 'a');
+#endif
+
+#if OUTPUT_VERSION <= 5
+ check_totals(23);
+#endif
+#if OUTPUT_VERSION == 6
+ check_totals(48);
+#endif
+#if OUTPUT_VERSION >= 7
+ check_totals(44);
+#endif

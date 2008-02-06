@@ -1,5 +1,12 @@
 2008-02-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/case.as: add tests showing that
+	  the current case-insensitive string_table comparison is
+	  conceptually bogus (and probably the whole global string_table
+	  is).
+
+2008-02-06 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/case.as: use case-sensitive sorting
 	  for predictable results (case-insensitive depends on unspecified
 	  order of properties).
