@@ -218,7 +218,11 @@ public:
 	template <class AVCMP>
 	void sort(AVCMP avc)
 	{
-		std::sort(elements.begin(), elements.end(), avc);
+		std::deque<as_value> nelem = std::deque<as_value>(elements);
+
+		std::sort(nelem.begin(), nelem.end(), avc);
+
+		elements = nelem;
 	}
 
 	/// \brief
