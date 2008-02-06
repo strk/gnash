@@ -18,7 +18,7 @@
 
 // Initial test written by Mike Carlson
 
-rcsid="$Id: array.as,v 1.36 2007/12/03 18:05:07 strk Exp $";
+rcsid="$Id: array.as,v 1.37 2008/02/06 14:41:57 strk Exp $";
 
 #include "check.as"
 
@@ -196,7 +196,10 @@ trysortarray.sort();
 check_equals ( trysortarray.toString() , "But,Different,alphabet,capitalization" );
 // TODO - test sort(Array.RETURNINDEXEDARRAY)
 
+//-----------------------------------------------------
 // Test sorting using a custom comparison function
+//-----------------------------------------------------
+
 function testCmp (x,y)
 {
 	// Gnash fails here by *requiring* a not-null 'this_ptr' in fn_call
@@ -210,6 +213,23 @@ function testCmp (x,y)
 check_equals ( trysortarray.toString() , "But,Different,alphabet,capitalization" );
 trysortarray.sort( testCmp );
 check_equals ( trysortarray.toString() , "But,alphabet,Different,capitalization" );
+
+function testCmpBogus1 (x,y) { return -1; }
+function testCmpBogus2 (x,y) { return 1; }
+function testCmpBogus3 (x,y) { return 0; }
+
+trysortarray.sort( testCmpBogus1 );
+check_equals ( trysortarray.toString() , "But,alphabet,Different,capitalization" );
+
+trysortarray.sort( testCmpBogus2 );
+xcheck_equals ( trysortarray.toString() , "alphabet,Different,capitalization,But" );
+
+trysortarray.sort( testCmpBogus3 );
+xcheck_equals ( trysortarray.toString() , "alphabet,Different,capitalization,But" );
+
+//-----------------------------------------------------
+// Test Array.pop()
+//-----------------------------------------------------
 
 popped=b.pop();
 check ( popped == 12 );
@@ -983,11 +1003,11 @@ check_equals(out[0], 1);
 
 
 #if OUTPUT_VERSION < 6
- check_totals(363);
+ check_totals(366);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(391);
+  check_totals(394);
 # else
-  check_totals(398);
+  check_totals(401);
 # endif
 #endif
