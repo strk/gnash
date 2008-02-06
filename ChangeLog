@@ -1,3 +1,9 @@
+2008-02-06 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/case.as: use case-sensitive sorting
+	  for predictable results (case-insensitive depends on unspecified
+	  order of properties).
+
 2008-02-05 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/server/PropertyListTest.cpp: re-enable the tests,

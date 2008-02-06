@@ -22,7 +22,7 @@
  *  Test case sensitivity 
  */
 
-rcsid="$Id: case.as,v 1.15 2008/01/29 12:31:10 strk Exp $";
+rcsid="$Id: case.as,v 1.16 2008/02/06 10:04:55 strk Exp $";
 
 #include "check.as"
 
@@ -206,7 +206,7 @@ for(var prop in obj)
 {
    propRecorder.push(prop);
 }
-propRecorder.sort(1); //caseinsensitive sort
+propRecorder.sort(); // case sensitive sort
 check_equals(propRecorder.length, 2);
 check_equals(propRecorder[0], 'A')
 check_equals(propRecorder[1], 'b')
@@ -217,15 +217,15 @@ for(var prop in obj)
 {
    propRecorder.push(prop);
 }
-propRecorder.sort(1); //caseinsensitive sort
+propRecorder.sort(); //case sensitive sort
 #if OUTPUT_VERSION < 7
     check_equals(propRecorder.length, 2);
     check_equals(propRecorder[0], 'A')
     check_equals(propRecorder[1], 'b')
 #else
     check_equals(propRecorder.length, 3);
-    check_equals(propRecorder[0], 'a')
-    check_equals(propRecorder[1], 'A')
+    check_equals(propRecorder[0], 'A')
+    check_equals(propRecorder[1], 'a')
     check_equals(propRecorder[2], 'b')
 #endif
 
@@ -235,16 +235,16 @@ for(var prop in obj)
 {
    propRecorder.push(prop);
 }
-propRecorder.sort(1); //caseinsensitive sort
+propRecorder.sort(); //case sensitive sort
 #if OUTPUT_VERSION < 7
     check_equals(propRecorder.length, 2);
     check_equals(propRecorder[0], 'A')
     check_equals(propRecorder[1], 'b')
 #else
     check_equals(propRecorder.length, 4);
-    xcheck_equals(propRecorder[0], 'A') // gnash has 'a' before 'A' (bug in Array.sort ?)
-    xcheck_equals(propRecorder[1], 'a') // bug in Array.sort ?
-    check_equals(propRecorder[2], 'B')
+    check_equals(propRecorder[0], 'A') 
+    check_equals(propRecorder[1], 'B') 
+    check_equals(propRecorder[2], 'a')
     check_equals(propRecorder[3], 'b')
 #endif
 
@@ -254,7 +254,7 @@ for(var prop in obj)
 {
    propRecorder.push(prop);
 }
-propRecorder.sort(1); //caseinsensitive sort
+propRecorder.sort(); //case sensitive sort
 #if OUTPUT_VERSION < 7
     check_equals(propRecorder.length, 1);
     check_equals(propRecorder[0], 'b')
