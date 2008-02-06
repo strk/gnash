@@ -1,5 +1,11 @@
 2008-02-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/array.as: add more crazy calls, in
+	  particular one matching the problem reported on bug #22239
+	  (blocker - working to fix this).
+
+2008-02-06 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/array.as: add a couple of additional 
 	  tests for sorting an array using a bogus custom function.
 	* gui/kde.cpp, gui/kdesup.h: disable no-op movie control menu items

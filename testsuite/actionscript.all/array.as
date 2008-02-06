@@ -18,7 +18,7 @@
 
 // Initial test written by Mike Carlson
 
-rcsid="$Id: array.as,v 1.37 2008/02/06 14:41:57 strk Exp $";
+rcsid="$Id: array.as,v 1.38 2008/02/06 15:08:21 strk Exp $";
 
 #include "check.as"
 
@@ -215,17 +215,26 @@ trysortarray.sort( testCmp );
 check_equals ( trysortarray.toString() , "But,alphabet,Different,capitalization" );
 
 function testCmpBogus1 (x,y) { return -1; }
-function testCmpBogus2 (x,y) { return 1; }
-function testCmpBogus3 (x,y) { return 0; }
-
 trysortarray.sort( testCmpBogus1 );
 check_equals ( trysortarray.toString() , "But,alphabet,Different,capitalization" );
 
+function testCmpBogus2 (x,y) { return 1; }
 trysortarray.sort( testCmpBogus2 );
 xcheck_equals ( trysortarray.toString() , "alphabet,Different,capitalization,But" );
 
+function testCmpBogus3 (x,y) { return 0; }
 trysortarray.sort( testCmpBogus3 );
 xcheck_equals ( trysortarray.toString() , "alphabet,Different,capitalization,But" );
+
+function testCmpBogus4 (x,y) { return tmp++%2; }
+trysortarray.sort( testCmpBogus4 );
+xcheck_equals ( trysortarray.toString() , "alphabet,Different,capitalization,But" );
+
+function testCmpBogus5 (x,y) { trysortarray.pop(); return -1; }
+trysortarray.sort( testCmpBogus5 );
+xcheck_equals ( trysortarray.length , 0 );
+
+
 
 //-----------------------------------------------------
 // Test Array.pop()
@@ -1003,11 +1012,11 @@ check_equals(out[0], 1);
 
 
 #if OUTPUT_VERSION < 6
- check_totals(366);
+ check_totals(368);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(394);
+  check_totals(396);
 # else
-  check_totals(401);
+  check_totals(403);
 # endif
 #endif
