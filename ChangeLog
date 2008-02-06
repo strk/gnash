@@ -1,5 +1,9 @@
 2008-02-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/array.as: another insane test..
+
+2008-02-06 Sandro Santilli <strk@keybit.net>
+
 	* server/array.h (sort): sort a copy of elements when using a custom
 	  function, to avoid the custom function invocations to mess with
 	  the container being scanned. Fixes a memory corruption that was

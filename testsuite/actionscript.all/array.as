@@ -18,7 +18,7 @@
 
 // Initial test written by Mike Carlson
 
-rcsid="$Id: array.as,v 1.38 2008/02/06 15:08:21 strk Exp $";
+rcsid="$Id: array.as,v 1.39 2008/02/06 17:00:00 strk Exp $";
 
 #include "check.as"
 
@@ -234,6 +234,11 @@ function testCmpBogus5 (x,y) { trysortarray.pop(); return -1; }
 trysortarray.sort( testCmpBogus5 );
 xcheck_equals ( trysortarray.length , 0 );
 
+function testCmpBogus6 (x,y) { trysortarray.pop(); return 1; }
+trysortarray = new Array(1,2,3,4);
+trysortarray.sort( testCmpBogus6 );
+check_equals ( trysortarray.length, 4 );
+xcheck_equals ( trysortarray.toString(), "2,3,4,1" );
 
 
 //-----------------------------------------------------
@@ -1012,11 +1017,11 @@ check_equals(out[0], 1);
 
 
 #if OUTPUT_VERSION < 6
- check_totals(368);
+ check_totals(370);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(396);
+  check_totals(398);
 # else
-  check_totals(403);
+  check_totals(405);
 # endif
 #endif
