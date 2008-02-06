@@ -32,8 +32,8 @@ namespace gnash
 SdlAggGlue::SdlAggGlue()
 	:
 _sdl_surface(NULL),
-_screen(NULL),
 _offscreenbuf(NULL),
+_screen(NULL),
 _agg_renderer(NULL)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -48,7 +48,7 @@ SdlAggGlue::~SdlAggGlue()
 }
 
 bool
-SdlAggGlue::init(int argc, char** argv[])
+SdlAggGlue::init(int /*argc*/, char*** /*argv*/)
 {
 //    GNASH_REPORT_FUNCTION;
 

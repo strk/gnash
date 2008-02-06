@@ -1,5 +1,6 @@
 2008-02-06 Sandro Santilli <strk@keybit.net>
 
+	* gui/sdl_agg_glue.cpp: fix compiler warnings
 	* testsuite/swfdec/PASSING: string-indexof and stringlength
 	  tests now succeed for swf > 5
 
