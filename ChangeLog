@@ -12,6 +12,8 @@
 	  encoding for SWF5 and below.
 	* server/asobj/string.cpp: pass version information to utf encoding
 	  functions.
+	* server/edit_text_character.cpp: pass version information to encoding
+	  functions.
 	* server/vm/ASHandlers.cpp: pass version information, use ISO-8859
 	  encoding for SWF5 and below. Restores SWF5's inability to cope with
 	  UTF-8, passes swfdec testsuite again.
