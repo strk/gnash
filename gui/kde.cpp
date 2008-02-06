@@ -338,6 +338,14 @@ qwidget::menuitem_restart_callback()
     _godfather->menu_restart();
 }
 
+/// \brief force redraw of current frame
+void
+qwidget::menuitem_refresh_callback()
+{
+//    GNASH_REPORT_FUNCTION;
+    _godfather->refreshView();
+}
+
 /// \brief quit complete, and close the application
 void
 qwidget::menuitem_quit_callback()
@@ -427,10 +435,13 @@ qwidget::qwidget(KdeGui* godfather)
     _qmenu.insertItem(_("Pause Movie"), this, SLOT(menuitem_pause_callback()));
     _qmenu.insertItem(_("Stop Movie"), this, SLOT(menuitem_stop_callback()));
     _qmenu.insertItem(_("Restart Movie"), this, SLOT(menuitem_restart_callback()));
+#if 0 // Presently disabled
     _qmenu.insertItem(_("Step Forward"), this, SLOT(menuitem_step_forward_callback()));
     _qmenu.insertItem(_("Step Backward"), this, SLOT( menuitem_step_backward_callback()));
     _qmenu.insertItem(_("Jump Forward"), this, SLOT(menuitem_jump_forward_callback()));
     _qmenu.insertItem(_("Jump Backward"), this, SLOT(menuitem_jump_backward_callback()));
+#endif
+    _qmenu.insertItem(_("Refresh"), this, SLOT(menuitem_refresh_callback()));
     _qmenu.insertItem(_("Quit Gnash"), this, SLOT(menuitem_quit_callback()));
 
     _godfather = godfather;

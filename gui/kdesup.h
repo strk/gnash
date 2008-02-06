@@ -70,6 +70,7 @@ protected:
     void paintEvent (QPaintEvent *event);
 public slots:
     void menuitem_restart_callback();
+    void menuitem_refresh_callback();
     void menuitem_quit_callback();
     void menuitem_play_callback();
     void menuitem_pause_callback();

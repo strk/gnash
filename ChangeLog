@@ -1,5 +1,7 @@
 2008-02-06 Sandro Santilli <strk@keybit.net>
 
+	* gui/kde.cpp, gui/kdesup.h: disable no-op movie control menu items
+	  (jump,step forward,back); add Refresh menu item.
 	* gui/sdl_agg_glue.cpp: fix compiler warnings
 	* testsuite/swfdec/PASSING: string-indexof and stringlength
 	  tests now succeed for swf > 5
