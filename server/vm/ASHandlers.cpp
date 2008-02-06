@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.192 2008/02/05 15:34:41 bwy Exp $ */
+/* $Id: ASHandlers.cpp,v 1.193 2008/02/06 12:00:38 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -1635,16 +1635,20 @@ SWFHandlers::ActionOrd(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     thread.ensureStack(1);
-    const std::wstring& wstr = utf8::decodeCanonicalString(env.top(0).to_string());
+    
+    // Should return 0 
 
-    // TODO: what charcode here ?
-
-    if ( wstr.empty() )
+    if (env.get_version() <= 5)
     {
-    	env.top(0).set_int(0);
+    	// SWF4-5 return the unsigned value of the first char of a 
+    	// multi-byte character.
+        const std::string& str = env.top(0).to_string();
+    	env.top(0).set_int(static_cast<unsigned char>(str[0]));
     }
     else
     {
+	// SWF6+ handles multi-byte unicode characters.
+        const std::wstring& wstr = utf8::decodeCanonicalString(env.top(0).to_string());
     	env.top(0).set_int(wstr[0]);
     }
 }
@@ -1656,11 +1660,32 @@ SWFHandlers::ActionChr(ActionExec& thread)
     as_environment& env = thread.env;
     thread.ensureStack(1);
     
-    std::wstring ret = L"";
-    wchar_t t(env.top(0).to_int());
-    ret.push_back(t);
+    boost::uint32_t c = env.top(0).to_int();
 
-    env.top(0).set_string(utf8::encodeCanonicalString(ret));
+    // If the argument to chr() is '0', we return
+    // nothing, not NULL
+    if (c == 0) env.top(0).set_string("");
+    
+    else
+    {
+        // SWF5 returns the unsigned value of the last byte.
+        if (env.get_version() <= 5)
+        {
+	    std::string ret = "";
+	    // This adds an unsigned char to a string, giving
+	    // IS0-8859 8-bit characters.
+	    // Values above 256 evaluate to value % 256, 
+	    // which is expected behaviour.
+	    ret.push_back(static_cast<unsigned char>(c));
+            env.top(0).set_string(ret);
+        }
+        else
+        {
+            std::wstring ret = L"";    
+            ret.push_back(static_cast<wchar_t>(c));
+            env.top(0).set_string(utf8::encodeCanonicalString(ret));
+        }
+    }
 }
 
 void

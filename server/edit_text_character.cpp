@@ -697,10 +697,9 @@ edit_text_character::get_topmost_mouse_entity(float x, float y)
 void
 edit_text_character::updateText(const std::string& str)
 {
-	std::wstring wstr = utf8::decodeCanonicalString(str);
+	const std::wstring& wstr = utf8::decodeCanonicalString(str);
 	updateText(wstr);
 }
-
 
 void
 edit_text_character::updateText(const std::wstring& wstr)
@@ -1182,10 +1181,7 @@ edit_text_character::format_text()
 	assert(! _text.empty() );
 
 	std::wstring::const_iterator it = _text.begin();
-	
-	// decodeNextUnicodeCharacter(std::string::const_iterator &it) works,
-	// but unfortunately nothing is encoded in utf8.
-	
+		
 	while (boost::uint32_t code = *it++)
 	{
 		if ( _embedFonts )

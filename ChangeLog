@@ -1,5 +1,13 @@
 2008-02-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* testsuite/actionscript.all/String.as: new failing tests for 
+	  SWF5 string methods. Some chr() and ord() tests now pass.
+	* server/vm/ASHandlers.cpp: SWF4 and 5 handle multi-byte characters
+	  differently.
+	* server/edit_text_character.cpp: use const reference.
+
+2008-02-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* testsuite/actionscript.all/String.as: tests for chr() and
 	  ord().
 

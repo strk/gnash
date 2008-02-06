@@ -16,8 +16,6 @@
 
 // Original author: Mike Carlson - June 19th, 2006
 
-rcsid="$Id: String.as,v 1.38 2008/02/06 11:27:33 bwy Exp $";
-
 #include "check.as"
 
 check_equals(typeof(String), 'function');
@@ -293,23 +291,21 @@ check_equals (ord(""), 0);
 
 // Chars greater than 128
 #if OUTPUT_VERSION > 5
-xcheck_equals (chr(246), "ö");
-xcheck_equals (chr(486), "Ǧ");
-trace ("Ǧ");
-trace(chr(486));
-xcheck_equals (chr(998), "Ϧ");
-xcheck_equals (ord("ö"), 246);
-xcheck_equals (ord("Ϧ"), 998);
+check_equals (chr(246), "ö");
+check_equals (chr(486), "Ǧ");
+check_equals (chr(998), "Ϧ");
+check_equals (ord("ö"), 246);
+check_equals (ord("Ϧ"), 998);
 #else // version <= 5
-xcheck_equals (chr(486), "æ");
-xcheck_equals (chr(865), "a");
-xcheck_equals (ord("ö"), 195);
-xcheck_equals (ord("Ö"), 195);
-xcheck_equals (ord("ǵ"), 199);
-xcheck_equals (ord("Ϧ"), 207);
+xcheck_equals (typeof(chr(486)), string);
+check_equals (chr(865), "a");
+check_equals (ord("ö"), 195);
+check_equals (ord("Ö"), 195);
+check_equals (ord("ǵ"), 199);
+check_equals (ord("Ϧ"), 207);
 #endif
 
-#if OUTPUT_VERSION > 5
+
 
 //-------------------------------------------
 // Check multi-byte chars with all string
@@ -319,13 +315,18 @@ xcheck_equals (ord("Ϧ"), 207);
 // These tests are only correct with SWF6 and above.
 
 var a = new String("Längere Wörter");
+
+#if OUTPUT_VERSION > 5
 check_equals (a.length, 14);
 check_equals (a.substring(2,4), "ng");
 check_equals (a.charAt(1), "ä");
 check_equals (a.charAt(2), "n");
 check_equals (a.slice(3,5), "ge");
 check_equals (a.charCodeAt(9), 246);
-
+#else
+xcheck_equals (a.length, 16);
+xcheck_equals (a.slice(3,5), "ng");
+xcheck_equals (a.charCodeAt(10), 195);
 #endif
 
 // see check.as
@@ -529,7 +530,7 @@ r = "s:"+s;
 check_equals(r, "s:");
 
 #if OUTPUT_VERSION < 6
- check_totals(185);
+ check_totals(188);
 #else
  check_totals(218);
 #endif
