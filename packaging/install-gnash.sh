@@ -20,6 +20,11 @@
 # install script for Gnash binary tarballs.
 #
 
+if [ x${BASH} = x ]; then
+  echo "Sorry, you need a more modern shell like bash to run this script"
+  exit
+fi
+
 # set to any command to execute to make the shell commands not
 # make any actual changes on disk. 'echo' is the usual value here
 # for this, as it just displays the commands to the screen.
@@ -70,6 +75,10 @@ gpl ()
 
 checkdirs ()
 {
+  # unfortunately the field used for the user name varies depending
+  # on the system.
+  field=0
+
   # Root directory used to look for pre existing installations,
   # as well as were these files get installed to.
   rootdir="@prefix@"
@@ -83,10 +92,19 @@ checkdirs ()
   # support NSAPI, but your mileage may vary...
   nsapidir="@FIREFOX_PLUGINS@"
   if [ x"${nsapidir}" = x"@FIREFOX_PLUGINS@" ]; then
-    nsapidir="/usr/lib/mozilla/plugins"	# 
+    # OpenBSD 4.2, at the least. uses this path for the plugin
+    if [ -d /usr/local/mozilla-firefox/plugins ]; then
+      nsapidir="/usr/local/mozilla-firefox/plugins"
+      field=4
+    fi
+    # this is the standard defalt path, common on most GNU/Linux distros
+    if [ -d /usr/lib/mozilla/plugins ]; then
+      nsapidir="/usr/lib/mozilla/plugins"
+      field=3
+    fi
   fi
   if [ ! -w ${nsapidir} ]; then
-    needstobe="`ls -ld ${nsapidir} | cut -f 3 -d ' ' 2>&1`"
+    needstobe="`ls -ld ${nsapidir} | cut -f ${field} -d ' ' 2>&1`"
     echo "Sorry, you need to be have write permissions to \"${nsapidir}\" to install the Gnash NSAPI plugin"
     echo "Or be the user \"${needstobe}\""
     $debug exit
@@ -98,7 +116,7 @@ checkdirs ()
     kpartsplugindir="/usr/lib/kde3"
   fi
   if [ -d ${kpartsplugindir} -a ! -w ${kpartsplugindir} ]; then
-    needstobe="`ls -ld ${kpartsplugindir} | cut -f 3 -d ' ' 2>&1`"
+    needstobe="`ls -ld ${kpartsplugindir} | cut -f ${field} -d ' ' 2>&1`"
     echo "Sorry, you need to be have write permissions to \"${kpartsplugindir}\" to install the Gnash Kparts plugin"
     echo "Or be the user \"${needstobe}\""
     $debug exit
@@ -110,7 +128,7 @@ checkdirs ()
     kpartsservicesdir="/usr/share/services"
   fi
   if [ -d ${kpartsservicesdir} -a ! -w ${kpartsservicesdir} ]; then
-    needstobe="`ls -ld ${kpartsservicesdir} | cut -f 3 -d ' ' 2>&1`"
+    needstobe="`ls -ld ${kpartsservicesdir} | cut -f ${field} -d ' ' 2>&1`"
     echo "Sorry, you need to be have write permissions to \"${kpartsservicesdir}\" to install the Gnash Kparts services"
     echo "Or be the user \"${needstobe}\""
     $debug exit
@@ -122,7 +140,7 @@ checkdirs ()
     kpartsconfigdir="/etc/kde3"
   fi
   if [ -d ${kpartsconfigdir} -a ! -w ${kpartsconfigdir} ]; then
-    needstobe="`ls -ld ${kpartsconfigdir} | cut -f 3 -d ' ' 2>&1`"
+    needstobe="`ls -ld ${kpartsconfigdir} | cut -f ${field} -d ' ' 2>&1`"
     echo "Sorry, you need to be have write permissions to \"${kpartsconfigdir}\" to install the Gnash Kparts Config Data"
     echo "Or be the user \"${needstobe}\""
     $debug exit
@@ -134,7 +152,7 @@ checkdirs ()
     kpartappsdir="/usr/share/apps/klash"
   fi
   if [ -d ${kpartappsdir} -a ! -w ${kpartappsdir} ]; then
-    needstobe="`ls -ld ${kpartappsdir} | cut -f 3 -d ' ' 2>&1`"
+    needstobe="`ls -ld ${kpartappsdir} | cut -f ${field} -d ' ' 2>&1`"
     echo "Sorry, you need to be have write permissions to \"${kpartappsdir}\" to install the Gnash Kparts Application Data"
     echo "Or be the user \"${needstobe}\""
     $debug exit
@@ -145,7 +163,7 @@ checkdirs ()
   fi
   
   if [ ! -w ${rootdir} ]; then
-    needstobe="`ls -ld ${rootdir} | cut -f 3 -d ' ' 2>&1`"
+    needstobe="`ls -ld ${rootdir} | cut -f ${field} -d ' ' 2>&1`"
     if [ x`whoami` != xroot ]; then
       echo "Sorry dude, you need to be have write permissions to \"${rootdir}\" to install Gnash"
       echo "Or be the user \"${needstobe}\""
@@ -157,7 +175,7 @@ checkdirs ()
   docdir="/usr/share/doc"
 
   if [ ! -w ${docdir} ]; then
-    needstobe="`ls -ld ${docdir} | cut -f 3 -d ' ' 2>&1`"
+    needstobe="`ls -ld ${docdir} | cut -f ${field} -d ' ' 2>&1`"
     if [ x`whoami` != xroot ]; then
       echo "Sorry dude, you need to be have write permissions to \"${docdir}\" to install Gnash"
       echo "Or be the user \"${needstobe}\""
@@ -173,7 +191,7 @@ checkdirs ()
 preexisting ()
 {
   if [ -d ${rootdir}/lib/gnash ]; then
-    existing=`ls -d ${rootdir}/lib/gnash/libgnashbase-*.so 2> /dev/null`
+    existing=`ls -d ${rootdir}/lib/gnash/libgnashbase-*.so* 2> /dev/null`
     if [ -n "${existing}" ]; then
       echo ""
       echo "You have previous installations of Gnash"
@@ -290,7 +308,7 @@ install ()
 
   # install the documentation
   if [ -e gnash.pdf -o x$yes = xyes ]; then
-    mkdir -p /usr/share/doc/gnash
+    $debug mkdir -p /usr/share/doc/gnash
     ${COPY} gnash.pdf /usr/share/doc/gnash
   fi
 }
@@ -304,7 +322,7 @@ install ()
 #
 checkdeps()
 {
-  genericdeps="boost gstreamer libpng libjpeg libxml2 libstdc++ curl agg fixme"
+  genericdeps="boost gstreamer libpng libjpeg libxml2 libstdc++ curl agg"
   gtkdeps="gtk2 gtkglext pango atk"
   kdedeps="kdebase qt"
   missing=""
@@ -316,15 +334,18 @@ checkdeps()
   # have entries into the package DB.
   pkginfo="rpm dpkg ipkg pkg_info"
   for i in $pkginfo; do
-    if [ `which $i`  ]; then
+    ret=`which $i | grep -c 'not found'`
+    if [ $ret -eq 0 ]; then
       pkginfo=$i
       echo "Yes, found $i, so we'll use that for listing packages"
       break
       fi
   done
 
-  # BSD needs PKG_PATH set to load anything over the net.
+  # tweaka few package names if we're on a BSD system
   if [ ${pkginfo} = "pkg_info" ]; then
+    genericdeps="boost gstreamer png jpeg libxml-2 libstdc++ curl agg"
+    # BSD needs PKG_PATH set to load anything over the net.
     if [ x${PKG_PATH} = x ]; then
       echo "Pleaase set the environment variable PKG_PATH and try again."
       exit 1
@@ -334,7 +355,8 @@ checkdeps()
   # that we can use to check the packaging DB.
   pkgnet="yum apt-get ipkg pkg_add"
   for i in ${pkgnet}; do
-    if [ `which $i`  ]; then
+    ret=`which $i | grep -c 'not found'`
+    if [ $ret -eq 0 ]; then
       pkgnet=$i
       echo "Yes, found $i, so we'll use that to install packages"
       break
@@ -352,10 +374,10 @@ checkdeps()
 	deps="`rpm -q "$i"`"
         ;;
       pkg_info)
-	 deps="fixme"
+	 deps="`pkg_info | grep "$i" | sed -e 's: .*$::'`"
 	 ;;
-       ipkg)
-	 deps="fixme"
+      ipkg)
+	 deps="todo"
          ;;
        *)
          echo "ERROR: No package manager found!"
@@ -433,7 +455,7 @@ while [ ! -z $1 ]; do
       exit 1
       ;;
     *)
-      echo "Usage: $0 [rootdir=path]"
+      echo "Usage: $0 [rootdir=path dump deps]"
       echo "	\"$1\" isn't a supported option"
       exit 1
       ;;
