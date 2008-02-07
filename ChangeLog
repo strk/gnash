@@ -1,3 +1,8 @@
+2008-02-07  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* packaging/install-gnash.sh: Add file finding function, so we
+	work correctly with the bug in Ubuntu's bash shell.
+
 2008-02-07 Sandro Santilli <strk@keybit.net>
 
 	* server/edit_text_character.cpp: get default type (input/dynamic)
@@ -45,6 +50,12 @@
 	  xcheck->check now succeeding tests, add the rcsid string.
 
 2008-02-06  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* packaging/install-gnash.sh: Add OpenBSD support, and hopefully
+	other BSDs too.
+
+	* configure.ac: Don't look for mkinstalldirs on our own, it's
+	found by autoconf.
 
 	* packaging/snapshot.am, alp.am, bsd.am, deb.am, ipkg.am, rpm.am:
 	Makefile fragments moved out of the top level where it was getting

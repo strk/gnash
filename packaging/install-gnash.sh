@@ -20,10 +20,26 @@
 # install script for Gnash binary tarballs.
 #
 
-if [ x${BASH} = x ]; then
-  echo "Sorry, you need a more modern shell like bash to run this script"
-  exit
-fi
+genericdeps="boost gstreamer libpng libjpeg libxml2 libstdc++ curl agg"
+gtkdeps="gtk2 gtkglext pango atk"
+kdedeps="kdebase qt"
+missing=""
+
+os=`config.guess`
+
+case $os in
+  *i*86-*-linux*)
+    ;;
+  *64-*-openbsd*|i*86-*-openbsd*)
+    if [ x${BASH} = x ]; then
+      echo "Sorry, you need a more modern shell like bash to run this script"
+      exit
+    fi
+    genericdeps="boost gstreamer png jpeg libxml-2 libstdc++ curl agg"
+    ;;
+  *)
+    ;;
+esac
 
 # set to any command to execute to make the shell commands not
 # make any actual changes on disk. 'echo' is the usual value here
@@ -64,6 +80,25 @@ gpl ()
   fi
 }
 
+#
+# Find an executable file that needs to be in our shell PATH.
+#
+findbin ()
+{
+    ret=0
+
+    newpath=`echo $PATH | tr : ' '`
+    for i in ${newpath}; do
+      if [ -x $i/$1 ]; then
+	ret=1
+	break
+      fi
+    done
+
+    echo $ret
+    return 
+}
+
 # This script has a split personality in that it works in an
 # unconfigured tree, as well as a version with the paths munged
 # by the normal Gnash configuration process. This way we can
@@ -72,7 +107,6 @@ gpl ()
 # a good idea. Running this unconfigured is mostly a maintainer
 # feature, it's much faster to be avbke to rerun this script than
 # constantely reconfiguring gnash, which isn't real fast...
-
 checkdirs ()
 {
   # unfortunately the field used for the user name varies depending
@@ -322,10 +356,6 @@ install ()
 #
 checkdeps()
 {
-  genericdeps="boost gstreamer libpng libjpeg libxml2 libstdc++ curl agg"
-  gtkdeps="gtk2 gtkglext pango atk"
-  kdedeps="kdebase qt"
-  missing=""
   # first see which packaging system we have to deal with.
   # First we go through and see what program we can use to
   # check for installed packages. Note that this does not
@@ -334,17 +364,15 @@ checkdeps()
   # have entries into the package DB.
   pkginfo="rpm dpkg ipkg pkg_info"
   for i in $pkginfo; do
-    ret=`which $i | grep -c 'not found'`
-    if [ $ret -eq 0 ]; then
+    ret=`findbin $i`
+    if [ $ret -eq 1 ]; then
       pkginfo=$i
       echo "Yes, found $i, so we'll use that for listing packages"
       break
       fi
   done
 
-  # tweaka few package names if we're on a BSD system
   if [ ${pkginfo} = "pkg_info" ]; then
-    genericdeps="boost gstreamer png jpeg libxml-2 libstdc++ curl agg"
     # BSD needs PKG_PATH set to load anything over the net.
     if [ x${PKG_PATH} = x ]; then
       echo "Pleaase set the environment variable PKG_PATH and try again."
@@ -355,8 +383,8 @@ checkdeps()
   # that we can use to check the packaging DB.
   pkgnet="yum apt-get ipkg pkg_add"
   for i in ${pkgnet}; do
-    ret=`which $i | grep -c 'not found'`
-    if [ $ret -eq 0 ]; then
+    ret=`findbin $i`
+    if [ $ret -eq 1 ]; then
       pkgnet=$i
       echo "Yes, found $i, so we'll use that to install packages"
       break
@@ -371,7 +399,7 @@ checkdeps()
         deps="`dpkg -l "*$i*" | grep -- "^ii" | cut -d ' ' -f 3`"
         ;;
       rpm)
-	deps="`rpm -q "$i"`"
+	deps="`rpm -q $i`"
         ;;
       pkg_info)
 	 deps="`pkg_info | grep "$i" | sed -e 's: .*$::'`"
