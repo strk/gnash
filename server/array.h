@@ -218,11 +218,28 @@ public:
 	template <class AVCMP>
 	void sort(AVCMP avc)
 	{
-		std::deque<as_value> nelem = std::deque<as_value>(elements);
+		// IMPORTANT NOTE
+		//
+		// As for ISO/IEC 14882:2003 - 23.2.2.4.29 
+		// the sort algorithm relies on the assumption
+		// that the comparator function implements
+		// a Strict Weak Ordering operator:
+		// http://www.sgi.com/tech/stl/StrictWeakOrdering.html
+		//
+		// Invalid comparator can lead to undefined behaviour,
+		// including invalid memory access and infinite loops.
+		//
+		// Pragmatically, it seems that std::list::sort is
+		// more robust in this reguard, so we'll sort a list
+		// instead of the queue. We want to sort a copy anyway
+		// to avoid the comparator changing the original container.
+		//
 
-		std::sort(nelem.begin(), nelem.end(), avc);
+		std::list<as_value> nelem(elements.begin(), elements.end());
 
-		elements = nelem;
+		nelem.sort(avc);
+
+		elements.assign(nelem.begin(), nelem.end());
 	}
 
 	/// \brief
@@ -242,13 +259,32 @@ public:
 	template <class AVCMP, class AVEQ>
 	as_value sort(AVCMP avc, AVEQ ave)
 	{
-		std::deque<as_value> nelem = std::deque<as_value>(elements);
+		// IMPORTANT NOTE
+		//
+		// As for ISO/IEC 14882:2003 - 23.2.2.4.29 
+		// the sort algorithm relies on the assumption
+		// that the comparator function implements
+		// a Strict Weak Ordering operator:
+		// http://www.sgi.com/tech/stl/StrictWeakOrdering.html
+		//
+		// Invalid comparator can lead to undefined behaviour,
+		// including invalid memory access and infinite loops.
+		//
+		// Pragmatically, it seems that std::list::sort is
+		// more robust in this reguard, so we'll sort a list
+		// instead of the queue. We want to sort a copy anyway
+		// to avoid the comparator changing the original container.
+		//
 
-		std::sort(nelem.begin(), nelem.end(), avc);
+		std::list<as_value> nelem(elements.begin(), elements.end());
+
+		nelem.sort(avc);
+
 		if (adjacent_find(nelem.begin(), nelem.end(), ave) != nelem.end() )
 			return as_value(0);
 
-		elements = nelem;
+		elements.assign(nelem.begin(), nelem.end());
+
 		return as_value(this);
 	}
 
