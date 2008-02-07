@@ -1,3 +1,10 @@
+2008-02-07 Sandro Santilli <strk@keybit.net>
+
+	* server/edit_text_character.{cpp,h}: add support for
+	  TextField.type
+	* testsuite/actionscript.all/TextField.as: additional test
+	  for TextField.type, fix a test for textWidth.
+
 2008-02-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/utf8.h: document utf8 code.

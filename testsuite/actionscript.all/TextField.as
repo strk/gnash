@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.44 2008/02/02 10:58:11 strk Exp $";
+rcsid="$Id: TextField.as,v 1.45 2008/02/07 18:48:03 strk Exp $";
 
 #include "check.as"
 
@@ -71,7 +71,7 @@ check( !TextField.prototype.hasOwnProperty('text') );
 xcheck( !TextField.prototype.hasOwnProperty('textColor') );
 check( !TextField.prototype.hasOwnProperty('textHeight') );
 check( !TextField.prototype.hasOwnProperty('textWidth') );
-check( !TextField.prototype.hasOwnProperty('type') );
+xcheck( !TextField.prototype.hasOwnProperty('type') ); // should be available on first instantiation
 xcheck( !TextField.prototype.hasOwnProperty('variable') );
 xcheck( !TextField.prototype.hasOwnProperty('wordWrap') );
 
@@ -146,7 +146,7 @@ xcheck( TextField.prototype.hasOwnProperty('text') );
 check( TextField.prototype.hasOwnProperty('textColor') );
 xcheck( TextField.prototype.hasOwnProperty('textHeight') );
 xcheck( TextField.prototype.hasOwnProperty('textWidth') );
-xcheck( TextField.prototype.hasOwnProperty('type') );
+check( TextField.prototype.hasOwnProperty('type') );
 check( TextField.prototype.hasOwnProperty('variable') );
 check( TextField.prototype.hasOwnProperty('wordWrap') );
 
@@ -524,18 +524,21 @@ check_equals(tf.textWidth, currentWidth); // was read-only (I think)
 
 // Check TextField.type (input or dynamic)
 
-xcheck_equals(typeof(tf.type), 'string');
+check_equals(typeof(tf.type), 'string');
 check( ! tf.hasOwnProperty('type') ); 
-xcheck_equals(tf.type, 'dynamic'); 
+check_equals(tf.type, 'dynamic'); 
 tf.type = "input";
 check_equals(tf.type, 'input'); 
 tf.type = new Array();
-xcheck_equals(typeof(tf.type), 'string');  // invalid assignment
-xcheck_equals(tf.type, 'input');  // keeps previous value
+check_equals(typeof(tf.type), 'string');  // invalid assignment
+check_equals(tf.type, 'input');  // keeps previous value
 tf.type = "dynamic";
 check_equals(tf.type, 'dynamic');  
 tf.type = new Array();
-xcheck_equals(tf.type, 'dynamic'); // keeps previous value 
+check_equals(tf.type, 'dynamic'); // keeps previous value 
+o = {}; o.toString = function() { return 'Input'; };
+tf.type = o;
+check_equals(tf.type, 'input');
 
 // Check TextField._url (url of the SWF that created the textfield)
 
@@ -759,7 +762,8 @@ check(tf._width > 10);
 check_equals(tf.textWidth, origTextWidth); // textWidth isn't influenced by autoSize 
 tf.autoSize = 'none';
 tf.wordWrap = true;
-xcheck(tf.textWidth < origTextWidth);  // this can fail depending on the font used !
+note("textWidth: "+tf.textWidth+" origTextWidth:"+origTextWidth);
+check_equals(tf.textWidth, origTextWidth);  
 tf._width = 10;
 check_equals(tf._width, 10);
 
@@ -823,9 +827,9 @@ check_equals(typeof(tf6), 'undefined');
 
 
 #if OUTPUT_VERSION < 8
- check_totals(391);
-#else
  check_totals(392);
+#else
+ check_totals(393);
 #endif
 
 #else // OUTPUT_VERSION <= 5

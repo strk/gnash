@@ -38,6 +38,7 @@
 #include "namedStrings.h"
 #include "array.h" // for _listeners construction
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
+#include "StringPredicates.h"
 
 #include <algorithm>
 #include <string>
@@ -82,6 +83,7 @@ static as_value textfield_borderColor_getset(const fn_call& fn);
 static as_value textfield_textColor_getset(const fn_call& fn);
 static as_value textfield_embedFonts_getset(const fn_call& fn);
 static as_value textfield_autoSize_getset(const fn_call& fn);
+static as_value textfield_type_getset(const fn_call& fn);
 static as_value textfield_wordWrap_getset(const fn_call& fn);
 static as_value textfield_html_getset(const fn_call& fn);
 static as_value textfield_selectable_getset(const fn_call& fn);
@@ -304,6 +306,8 @@ attachTextFieldInterface(as_object& o)
 	o.init_property("embedFonts", *getset, *getset);
 	getset = new builtin_function(textfield_autoSize_getset);
 	o.init_property("autoSize", *getset, *getset);
+	getset = new builtin_function(textfield_type_getset);
+	o.init_property("type", *getset, *getset);
 	getset = new builtin_function(textfield_wordWrap_getset);
 	o.init_property("wordWrap", *getset, *getset);
 	getset = new builtin_function(textfield_html_getset);
@@ -390,6 +394,7 @@ edit_text_character::edit_text_character(character* parent,
 	_html(m_def->htmlAllowed()),
 	_selectable(!m_def->get_no_select()),
 	_autoSize(autoSizeNone),
+	_type(typeDynamic),
 	_bounds(m_def->get_bounds().getRange())
 {
 	assert(parent);
@@ -592,6 +597,7 @@ edit_text_character::on_event(const event_id& id)
 
 		case event_id::KEY_PRESS:
 		{
+			if ( getType() != typeInput ) break; // not an input field
 			std::wstring s = _text;
 
 			// id.keyCode is the unique gnash::key::code for a character/key.
@@ -2033,6 +2039,31 @@ textfield_autoSize_getset(const fn_call& fn)
 	return as_value();
 }
 
+static as_value
+textfield_type_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<edit_text_character> ptr = ensureType<edit_text_character>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		return ptr->typeValueName(ptr->getType());
+	}
+
+	// setter
+	as_value& arg = fn.arg(0);
+	std::string strval = arg.to_string();
+	edit_text_character::TypeValue val = ptr->parseTypeValue(strval);
+	//log_debug("%s (toString->%s) => %d", arg.to_debug_string().c_str(), strval.c_str(), val);
+	IF_VERBOSE_ASCODING_ERRORS(
+	if ( val == edit_text_character::typeInvalid )
+	{
+		log_aserror(_("Invalid value given to TextField.type: %s"), strval.c_str());
+	}
+	);
+	ptr->setType(val);
+	return as_value();
+}
+
 /* public static */
 edit_text_character::AutoSizeValue
 edit_text_character::parseAutoSizeValue(const std::string& val)
@@ -2068,6 +2099,46 @@ edit_text_character::autoSizeValueName(AutoSizeValue val)
 		case autoSizeNone:
 		default:
 			return "none";
+	}
+
+}
+
+/* public static */
+edit_text_character::TypeValue
+edit_text_character::parseTypeValue(const std::string& val)
+{
+	StringNoCaseLessThen cmp;
+
+	if ( ! cmp(val, "input") )
+	{
+		//log_debug("parsing type value %s: typeInput", val.c_str());
+		return typeInput;
+	}
+	if ( ! cmp(val, "dynamic") )
+	{
+		//log_debug("parsing type value %s: typeDynamic", val.c_str());
+		return typeDynamic;
+	}
+	//log_debug("parsing type value %s: typeInvalid", val.c_str());
+	return typeInvalid;
+
+}
+
+/* public static */
+const char*
+edit_text_character::typeValueName(TypeValue val)
+{
+	switch (val)
+	{
+		case typeInput:
+			//log_debug("typeInput returned as 'input'");
+			return "input";
+		case typeDynamic:
+			//log_debug("typeDynamic returned as 'dynamic'");
+			return "dynamic";
+		default:
+			//log_debug("invalid type %d returned as 'invalid'", (int)val);
+			return "invalid";
 	}
 
 }

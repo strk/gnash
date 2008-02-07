@@ -58,6 +58,20 @@ public:
 		autoSizeRight
 	};
 
+	/// Possible type values
+	enum TypeValue {
+
+		/// Invalid value
+		typeInvalid,
+
+		/// Do not accept input, text is only changed by variable name
+		/// or assigning to the .text member
+		typeDynamic,
+
+		/// Accept user input
+		typeInput
+	};
+
 	edit_text_character(
 			character* parent,
 			edit_text_character_def* def,
@@ -214,6 +228,38 @@ public:
 	///	The returns is *never* NULL.
 	///
 	static const char* autoSizeValueName(AutoSizeValue val);
+
+	/// Set type (input or dynamic)
+	//
+	/// @param val
+	/// 	The TypeValue to use, no-op if typeInvalid.
+	///
+	void setType(TypeValue val) { if (val != typeInvalid) _type=val; }
+
+	/// Get type (input, dynamic or invalid)
+	TypeValue getType() const
+	{
+		return _type;
+	}
+
+	/// Parse type string value
+	//
+	/// @param val
+	/// 	Type value as a string (one of input or dynamic)
+	///
+	/// @return an TypeValue identifier. typeInvalid if invalid.
+	///
+	static TypeValue parseTypeValue(const std::string& val);
+
+	/// Return type value as a string
+	//
+	/// @param val
+	/// 	Type value  (enum)
+	///
+	/// @return a C-string representation of the type value.
+	///	The returns is *never* NULL.
+	///
+	static const char* typeValueName(TypeValue val);
 
 	/// \brief
 	/// Return true if text should continue to next available line
@@ -420,6 +466,8 @@ private:
 	bool _selectable;
 
 	AutoSizeValue _autoSize;
+
+	TypeValue _type;
 
 	/// Area in which the text is drawn. 
 	//
