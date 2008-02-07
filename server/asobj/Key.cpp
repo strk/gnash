@@ -44,93 +44,78 @@ namespace gnash {
 key_as_object::key_as_object()
     :
     as_object(getObjectInterface()),
-    m_last_key_event(0)
+    _unreleasedKeys(0),
+    _lastKeyEvent(0)
 {
-	memset(m_unreleased_keys, 0, sizeof(m_unreleased_keys));
-
-	// Key is a broadcaster only in SWF6 and up (correct?)
-	int swfversion = _vm.getSWFVersion();
-	if ( swfversion > 5 )
-	{
-		AsBroadcaster::initialize(*this);
-	}
+    // Key is a broadcaster only in SWF6 and up (correct?)
+    int swfversion = _vm.getSWFVersion();
+    if ( swfversion > 5 )
+    {
+        AsBroadcaster::initialize(*this);
+    }
 }
 
 bool
 key_as_object::is_key_down(int keycode)
 {
     if (keycode < 0 || keycode >= key::KEYCOUNT) return false;
-
-    // Select the relevant byte of the bit array:
-    int byte_index = keycode >> 3;
-    // Find bit within the byte:
-    int bit_index = keycode - (byte_index << 3);
-
-    boost::uint8_t mask = 1 << bit_index;
-
-    if ((m_unreleased_keys[byte_index] & mask) != 0 ) return true;
-
+    if (_unreleasedKeys.test(keycode)) return true;
     return false;
 }
 
 void
-    key_as_object::set_key_down(int code)
+key_as_object::set_key_down(key::code code)
 {
-    if (code < 0 || code >= key::KEYCOUNT) return;
+    if (code >= key::KEYCOUNT) return;
 
-    // This is used for getAscii() of the last key event, so we use gnash's
-    // internal code.
-    m_last_key_event = code;
+    // This is used for getAscii() of the last key event, so we store
+    // the unique gnash::key::code.
+    _lastKeyEvent = code;
 
     // Key.isDown() only cares about flash keycode, not character, so
-    // we lookup keycode to add to m_unreleased_keys.   
+    // we lookup keycode to add to _unreleasedKeys.   
+    size_t keycode = key::codeMap[code][key::KEY];
 
-    int byte_index = key::codeMap[code][1] >> 3;
-    int bit_index = key::codeMap[code][1] - (byte_index << 3);
-    int mask = 1 << bit_index;
+    assert(keycode < _unreleasedKeys.size());
 
-    assert(byte_index >= 0 && byte_index < int(sizeof(m_unreleased_keys)/sizeof(m_unreleased_keys[0])));
-
-    m_unreleased_keys[byte_index] |= mask;
+    _unreleasedKeys.set(keycode, 1);
 }
 
 void
-key_as_object::set_key_up(int code)
+key_as_object::set_key_up(key::code code)
 {
-    if (code < 0 || code >= key::KEYCOUNT) return;
+    if (code >= key::KEYCOUNT) return;
 
-    // This is used for getAscii() of the last key event, so we use gnash's
-    // internal code.    
-    m_last_key_event = code;
+    // This is used for getAscii() of the last key event, so we store
+    // the unique gnash::key::code.    
+    _lastKeyEvent = code;
 
     // Key.isDown() only cares about flash keycode, not character, so
-    // we lookup keycode to add to m_unreleased_keys.
-    int byte_index = key::codeMap[code][1] >> 3;
-    int bit_index = key::codeMap[code][1] - (byte_index << 3);
-    int mask = 1 << bit_index;
+    // we lookup keycode to add to _unreleasedKeys.
+    size_t keycode = key::codeMap[code][key::KEY];
 
-    assert(byte_index >= 0 && byte_index < int(sizeof(m_unreleased_keys)/sizeof(m_unreleased_keys[0])));
+    assert(keycode < _unreleasedKeys.size());
 
-    m_unreleased_keys[byte_index] &= ~mask;
+    _unreleasedKeys.set(keycode, 0);
 }
 
 
 void 
 key_as_object::notify_listeners(const event_id& key_event)
 {  
-	// There is no user defined "onKeyPress" event handler
-	if( (key_event.m_id != event_id::KEY_DOWN) && (key_event.m_id != event_id::KEY_UP) ) return;
+    // There is no user defined "onKeyPress" event handler
+    if( (key_event.m_id != event_id::KEY_DOWN) && (key_event.m_id != event_id::KEY_UP) ) return;
 
-	as_value ev(key_event.get_function_name());
+    as_value ev(key_event.get_function_name());
 
-	//log_debug("notify_listeners calling broadcastMessage with arg %s", ev.to_debug_string().c_str());
-	callMethod(NSV::PROP_BROADCAST_MESSAGE, ev);
+    //log_debug("notify_listeners calling broadcastMessage with arg %s", ev.to_debug_string().c_str());
+    callMethod(NSV::PROP_BROADCAST_MESSAGE, ev);
 }
 
 int
 key_as_object::get_last_key() const
 {
-    return m_last_key_event;
+    return _lastKeyEvent;
 }
 
 
@@ -142,18 +127,18 @@ key_get_ascii(const fn_call& fn)
 
     int code = ko->get_last_key();
 
-    return as_value(gnash::key::codeMap[code][2]);
+    return as_value(gnash::key::codeMap[code][key::ASCII]);
 }
 
 /// Returns the keycode of the last key pressed.
 static as_value   
-    key_get_code(const fn_call& fn)
+key_get_code(const fn_call& fn)
 {
     boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr);
 
     int code = ko->get_last_key();
 
-    return as_value(key::codeMap[code][1]);
+    return as_value(key::codeMap[code][key::KEY]);
 }
 
 /// Return true if the specified (first arg keycode) key is pressed.
@@ -198,7 +183,7 @@ void key_class_init(as_object& global)
     as_object*  key_obj = new key_as_object;
 
     // constants
-#define KEY_CONST(k) key_obj->init_member(#k, key::codeMap[key::k][1])
+#define KEY_CONST(k) key_obj->init_member(#k, key::codeMap[key::k][key::KEY])
     KEY_CONST(BACKSPACE);
     KEY_CONST(CAPSLOCK);
     KEY_CONST(CONTROL);
@@ -242,7 +227,7 @@ void
 key_as_object::markReachableResources() const
 {
     markAsObjectReachable();
-    for (Listeners::const_iterator i=m_listeners.begin(), e=m_listeners.end();
+    for (Listeners::const_iterator i=_listeners.begin(), e=_listeners.end();
                 i != e; ++i)
     {
         (*i)->setReachable();

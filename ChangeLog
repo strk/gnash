@@ -1,3 +1,9 @@
+2008-02-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/asobj/Key.{cpp,h}: clean up code. Take gnash::key::code when
+	  that's what's meant; drop unnecessary assertions; use std::bitset
+	  instead of custom bit array (this is C++, after all).	  
+
 2008-02-07 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/array.as: make the test nicer with

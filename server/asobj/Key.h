@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: Key.h,v 1.33 2008/01/21 20:55:55 rsavoye Exp $ */
+/* $Id: Key.h,v 1.34 2008/02/07 10:07:58 bwy Exp $ */
 
 #ifndef __KEY_H__
 #define __KEY_H__
@@ -30,6 +30,7 @@
 #include "fn_call.h"
 #include "event_id.h"
 #include "gnash.h" // for gnash::key namespace
+#include <bitset>
 
 #ifdef WIN32
 #   undef _CONTROL
@@ -49,15 +50,6 @@ namespace gnash {
 class DSOEXPORT key_as_object : public as_object
 {
 
-private:
-    /// bit-array for recording the unreleased keys
-    boost::uint8_t m_unreleased_keys[key::KEYCOUNT / 8 + 1];   
-
-    typedef std::list<boost::intrusive_ptr<as_object> > Listeners;
-    Listeners m_listeners;
-
-    int m_last_key_event;
-
 protected:
 
 #ifdef GNASH_USE_GC
@@ -74,13 +66,13 @@ public:
 
     // Pass gnash::key::code. Changes m_last_key_event
     // and adds appropriate SWF keycode to bit array of keys
-    // pressed (m_unreleased_keys)
-    void set_key_down(int code);
+    // pressed (_unreleasedKeys)
+    void set_key_down(key::code code);
 
     // Pass gnash::key::code. Changes m_last_key_event
     // and removes appropriate SWF keycode from bit array of keys
-    // pressed (m_unreleased_keys)
-    void set_key_up(int code);
+    // pressed (_unreleasedKeys)
+    void set_key_up(key::code code);
     
     int get_last_key() const;
 
@@ -88,6 +80,14 @@ public:
     /// take over both characters and non-characters object.
     void notify_listeners(const event_id& key_event_type);
 
+private:
+    /// bit-array for recording the unreleased keys
+    std::bitset<key::KEYCOUNT> _unreleasedKeys;   
+
+    typedef std::list<boost::intrusive_ptr<as_object> > Listeners;
+    Listeners _listeners;
+
+    int _lastKeyEvent;
 };
 
 void key_class_init(as_object& global);
