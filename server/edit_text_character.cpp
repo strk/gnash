@@ -594,8 +594,15 @@ edit_text_character::on_event(const event_id& id)
 		{
 			std::wstring s = _text;
 
-			// id.keyCode is the unique gnash::key::code for a character
-			uint32_t c = (uint32_t) id.keyCode;
+			// id.keyCode is the unique gnash::key::code for a character/key.
+			// The maximum value is about 265, including function keys.
+			// It seems that typing in characters outside the Latin-1 set
+			// (256 character codes, identical to the first 256 of UTF-8)
+			// is not supported, though a much greater number UTF-8 codes can be
+			// stored and displayed. See utf.h for more information.
+			// This is a limit on the number of key codes, not on the
+			// capacity of strings.
+			gnash::key::code c = id.keyCode;
 
 			// maybe _text is changed in ActionScript
 			m_cursor = imin(m_cursor, _text.size());
@@ -647,9 +654,11 @@ edit_text_character::on_event(const event_id& id)
 					break;
 
 				default:
-					wchar_t t = (wchar_t) gnash::key::codeMap[c][key::ASCII];
+					wchar_t t = static_cast<wchar_t>(gnash::key::codeMap[c][key::ASCII]);
 					if (t != 0)
 					{
+						// Insert one copy of the character
+						// at the cursor position.
 				  		s.insert(m_cursor, 1, t);
 						m_cursor++;
 					}
@@ -1318,9 +1327,17 @@ edit_text_character::format_text()
 			last_space_glyph = rec.m_glyphs.size();
 		}
 
-		{ // need a sub-scope to avoid the 'goto' in TAB handling to cross
-		  // initialization of the 'index' variable
-		int index = _font->get_glyph_index((boost::uint16_t) code, _embedFonts);
+		{
+		// need a sub-scope to avoid the 'goto' in TAB handling to cross
+		// initialization of the 'index' variable
+
+		// The font table holds up to 65535 glyphs. Casting from uint32_t
+		// would, in the event that the code is higher than 65535, result
+		// in the wrong character being chosen. It isn't clear whether this
+		// would ever happen, but UTF-8 conversion code can deal with codes
+		// up to 2^32; if they are valid, the code table will have to be
+		// enlarged.
+		int index = _font->get_glyph_index(static_cast<boost::uint16_t>(code), _embedFonts);
 
 		IF_VERBOSE_MALFORMED_SWF (
 		    if (index == -1)
