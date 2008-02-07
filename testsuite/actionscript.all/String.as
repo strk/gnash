@@ -16,6 +16,8 @@
 
 // Original author: Mike Carlson - June 19th, 2006
 
+rcsid="$Id: String.as,v 1.40 2008/02/07 08:15:07 strk Exp $";
+
 #include "check.as"
 
 check_equals(typeof(String), 'function');
@@ -297,7 +299,7 @@ check_equals (chr(998), "Ϧ");
 check_equals (ord("ö"), 246);
 check_equals (ord("Ϧ"), 998);
 #else // version <= 5
-xcheck_equals (typeof(chr(486)), string);
+check_equals (typeof(chr(486)), 'string');
 check_equals (chr(865), "a");
 check_equals (ord("ö"), 195);
 check_equals (ord("Ö"), 195);
@@ -324,9 +326,9 @@ check_equals (a.charAt(2), "n");
 check_equals (a.slice(3,5), "ge");
 check_equals (a.charCodeAt(9), 246);
 #else
-xcheck_equals (a.length, 16);
-xcheck_equals (a.slice(3,5), "ng");
-xcheck_equals (a.charCodeAt(10), 195);
+check_equals (a.length, 16);
+check_equals (a.slice(3,5), "ng");
+check_equals (a.charCodeAt(10), 195);
 #endif
 
 // see check.as

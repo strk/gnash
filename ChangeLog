@@ -1,3 +1,8 @@
+2008-02-07 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/String.as: fix a bogus test line,
+	  xcheck->check now succeeding tests, add the rcsid string.
+
 2008-02-06  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* packaging/snapshot.am, alp.am, bsd.am, deb.am, ipkg.am, rpm.am:
