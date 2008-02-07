@@ -1,3 +1,17 @@
+2008-02-06  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* packaging/install-gnash.sh: Install script for installting
+	binary tarballs.
+	* extensions/launcher: New extension for launching application
+	from a swf file. Very handy for a swf basd UI for mobile devices
+	that use graphical menus.
+	* extensions/launcher/launcher.cpp: Launcher support, which uses
+	an MD5 checksum to make sure it only launches the application
+	that's compiled in.
+	* extensions/launcher/launcher_ext.{cpp,h}: Wrappers for the
+	Launcher AS class.
+	* extensions/launcher/md5.{cpp,h}: md5 calculations.
+
 2008-02-06 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/array.as: another insane test..
