@@ -1,0 +1,92 @@
+# 
+#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+# 
+
+NOW = `date -u "+%Y%m%d"`
+
+# these is the directories where the snapshot gets built. Sources are
+# in the top level, the build goes in a _build subdirectory
+SNAPSHOT_DIR = gnash-${NOW}
+SNAPSHOT_BUILD = gnash-${NOW}/_build
+
+#
+# build a binary snapshot from of Gnash for systems we don't have
+# packaging support for.
+#
+
+# start by creating the initial tarball using the dist-bzip2 target.
+# This uses the default version for Gnash. which is 'cvs'. So we
+# rename it to the dir we want to stay clear. Then we change the default
+# version from 'cvs' to a date stamped version of cvs, like '20080202cvs'
+snapshot: distdir
+	now=`date -u "+%Y%m%d"`; \
+	snapshot_dir="gnash-$${now}"; \
+	snapshot_build="$${snapshot_dir}/_build"; \
+	if test -d $${snapshot_dir} ; then \
+	  rm -fr $${snapshot_dir};\
+	fi ; \
+	mv -f gnash-cvs $${snapshot_dir}; \
+	mv -f $${snapshot_dir}/configure.ac $${snapshot_dir}/configure.ac.orig; \
+	sed -e "s/AC_INIT(gnash, cvs)/AC_INIT(gnash, $${now}cvs)/" \
+	  $${snapshot_dir}/configure.ac.orig > $${snapshot_dir}/configure.ac; \
+	cd $${snapshot_dir} ; ./autogen.sh
+#	tardir=$${snapshot_dir} && $(am__tar) | bzip2 -9 -c > $${snapshot_dir}.tar.bz2;
+#	$(RM) -fr $${snapshot_dir}
+
+
+snapshot-configure: snapshot-unpack $(SNAPSHOT_BUILD)
+	$(MKINSTALLDIRS) $(SNAPSHOT_BUILD)
+	-@rm -f snapshot-configure
+	cd $(SNAPSHOT_BUILD); ./configure \
+	  --prefix=/usr \
+	  --mandir=/usr/share/man \
+	  --infodir=/usr/share/info \
+	  --with-plugindir=/usr/lib/mozilla/plugins \
+	  --with-extension=all
+	  --enable-gui=all
+	@touch snapshot-configure
+
+snapshot-unpack: $(top_builddir)/config.status
+	-@rm -f snapshot-*		# nuke everything, we're starting over
+	-@rm -f snapshot-unpack
+	rm -rf $(SNAPSHOT_BUILD)
+	tar jxf $(SNAPSHOT_BUILD).tar.bz2
+	@touch snapshot-unpack
+
+snapshot-build: snapshot-configure
+	-@rm -f snapshot-build
+	$(MAKE) -C $(SNAPSHOT_BUILD) all
+	@touch snapshot-build
+
+snapshot-install: snapshot-build Makefile
+	-@rm -f snapshot-install
+	$(MAKE) -C $(SNAPSHOT_BUILD) install DESTDIR=$(SNAPSHOT_TMP)
+	@touch snapshot-install
+
+snapshot-depend: 
+	-@rm -f snapshot-depend
+	rsync -avc $(libdir)/libcurl* $(SNAPSHOT_TMP)/usr/lib
+	rsync -avc $(libdir)/libagg* $(SNAPSHOT_TMP)/usr/lib
+	rsync -avc $(libdir)/libboost_thread* $(SNAPSHOT_TMP)/usr/lib
+	rsync -avc $(libdir)/libboost_serialization* $(SNAPSHOT_TMP)/usr/lib
+	@touch snapshot-depend
+
+snapshot-clean:
+	rm -fr snapshot-* $(SNAPSHOT_BUILD) $(SNAPSHOT_TMP) gnash*$(VERSION)*.ipk
+
+
+.PHONY : snapshot
+

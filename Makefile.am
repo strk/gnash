@@ -1,5 +1,5 @@
 # 
-#   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,8 +14,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
-
-# $Id: Makefile.am,v 1.101 2008/01/17 00:18:50 rsavoye Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -76,114 +74,43 @@ man_MANS = doc/gnash.1
 
 DIST_SUBDIRS = $(STD_DIRS) cygnal doc extensions
 
-EXTRA_DIST = config.rpath $(man_MANS) macros/incllist macros/libslist ChangeLog-0.8.0 ChangeLog-0.8.1
+EXTRA_DIST =  autogen.sh \
+	packaging \
+	config.rpath \
+	$(man_MANS) \
+	macros/incllist macros/libslist \
+	ChangeLog-0.8.0 ChangeLog-0.8.1
 
 noinst_HEADERS = compatibility_include.h
 
-# # Build an RPM package targeted to the OLPC http://www.laptop.org.
-# olpc: dist-gzip $(srcdir)/packaging/redhat/gnash.spec
-# 	cp -f $(srcdir)/packaging/redhat/gnash.spec /usr/src/redhat/SPECS/
-# 	cp -f gnash-$(VERSION).tar.gz /usr/src/redhat/SOURCES/
-# 	rpmbuild -rcfile=$(srcdir)/packaging/redhat/rpmrc:/usr/lib/rpm/rpmrc \
-# 	         -ba --target=geode-olpc /usr/src/redhat/SPECS/gnash.spec
-
-# Build an Redhat/Fedora .rpm package
-rpm redhat: dist-gzip $(srcdir)/packaging/redhat/gnash.spec
-	cp -f $(srcdir)/packaging/redhat/gnash.spec /usr/src/redhat/SPECS/
-	cp -f gnash-$(VERSION).tar.gz /usr/src/redhat/SOURCES/
-	rpmbuild -ba /usr/src/redhat/SPECS/gnash.spec
+#
+# Build an RPM package
+#
+include $(srcdir)/packaging/rpm.am
 
 # Build a Debian/Ubuntu .deb GNU/Linux package
-deb debian: dist-bzip2 $(srcdir)/packaging/debian/rules
-	rm -rf gnash-${VERSION}
-	tar jxf gnash-${VERSION}.tar.bz2
-	cp -fr $(srcdir)/packaging/debian gnash-${VERSION}/
-	(cd gnash-${VERSION}; dpkg-buildpackage)
+include $(srcdir)/packaging/deb.am
 
 #
 # Build a Debian Familiar .ipk GNU/Linux package. These are always
 # cross compiled, typically for the ARM or XScale.
 #
-
-# this is where the output of "make install" goes, which is what
-# we use to build the package.
-IPKG_TMP=/tmp/$(host_alias)-gnash
-
-# this is where the gnash gets compiled
-IPKG_BUILD=gnash-${VERSION}
-
-CLEANFILES = ipkg-*
-
-ipkg-configure: ipkg-unpack $(IPKG_BUILD)
-	-@rm -f ipkg-configure
-	cd $(IPKG_BUILD); ./configure --host=$(host_alias) \
-	  --build=$(build_triplet) --prefix=/usr \
-	  --mandir=/usr/share/man \
-	  --infodir=/usr/share/info \
-	  --with-plugindir=/usr/lib/mozilla/plugins \
-	  --enable-static --disable-shared --disable-kparts \
-	  --enable-gui=qtopia --enable-media=none
-	@touch ipkg-configure
-
-ipkg-unpack: $(top_builddir)/config.status
-	-@rm -f ipkg-*		# nuke everything, we're starting over
-	-@rm -f ipkg-unpack
-	rm -rf $(IPKG_BUILD)
-	tar jxf $(IPKG_BUILD).tar.bz2
-	@touch ipkg-unpack
-
-ipkg-build: ipkg-configure
-	-@rm -f ipkg-build
-	$(MAKE) -C $(IPKG_BUILD) all
-	@touch ipkg-build
-
-ipkg-install: ipkg-build Makefile
-	-@rm -f ipkg-install
-	$(MAKE) -C $(IPKG_BUILD) install DESTDIR=$(IPKG_TMP)
-	@touch ipkg-install
-
-ipkg-depend: 
-	-@rm -f ipkg-depend
-	rsync -avc $(libdir)/libcurl* $(IPKG_TMP)/usr/lib
-	rsync -avc $(libdir)/libagg* $(IPKG_TMP)/usr/lib
-	rsync -avc $(libdir)/libboost_thread* $(IPKG_TMP)/usr/lib
-	rsync -avc $(libdir)/libboost_serialization* $(IPKG_TMP)/usr/lib
-	@touch ipkg-depend
-
-ipk ipkg ipkg-bundle: ipkg-install # ipkg-depend
-	if ! test -d $(IPKG_TMP)/CONTROL ; then \
-	  mkdir $(IPKG_TMP)/CONTROL; \
-	fi
-	topdir=`cd ${top_srcdir}; pwd`; \
-	for i in control postinst; do \
-	  cp -f $${topdir}/packaging/ipkg/$$i $(IPKG_TMP)/CONTROL; \
-	done; \
-	for i in rules Gnash.desktop; do \
-	  cp -f $${topdir}/packaging/ipkg/$$i $(IPKG_TMP)/ ; \
-	done;
-	ipkg-build $(IPKG_TMP)
-
-ipkg-clean:
-	rm -fr ipkg-* $(IPKG_BUILD) $(IPKG_TMP) gnash*$(VERSION)*.ipk
+include $(srcdir)/packaging/ipkg.am
 
 #
-# OpenBSD package building
+# Access Linux Platform support.
 #
+include $(srcdir)/packaging/alp.am
 
-bsd-pkg:
-	$(MAKE) checksum
-	$(MAKE) extract
-	$(MAKE) build
-	$(MAKE) fake
-	$(MAKE) plist
-	$(MAKE) package
+#
+# BSD package building
+#
+include $(srcdir)/packaging/bsd.am
 
-# build a snapshot
-snapshot: distdir
-	now=`date -u "+%Y%m%d"`; \
-	mv gnash-${VERSION} gnash-$${now}; \
-	tardir=gnash-$${now} && $(am__tar) | bzip2 -9 -c > gnash-$${now}.tar.bz2; \
-	$(RM) -fr gnash-$${now}
+#
+# Binary tarball packaging
+#
+include $(srcdir)/packaging/snapshot.am
 
 mudflap:
 	@echo "Rebuilding with GCC Mudflap support"
@@ -392,7 +319,15 @@ check: check-recursive anal
 anal testreport checksum:
 	$(srcdir)/testsuite/anaylse-results.sh
 
-.PHONY : dumpconfig anal testreport checksum check mudflap mudflap-check snapshot deb debian rpm redhat ipkg ipk ipkg-bundle alp alp-bundle alp-ip install-plugins install-plugin
+.PHONY : dumpconfig \
+	anal \
+	testreport \
+	checksum \
+	check \
+	mudflap \
+	mudflap-check \
+	install-plugins \
+	install-plugin
 
 install-plugins install-plugin:
 	$(MAKE) -C plugin $@

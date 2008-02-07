@@ -1,5 +1,11 @@
 2008-02-06  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* packaging/snapshot.am, alp.am, bsd.am, deb.am, ipkg.am, rpm.am:
+	Makefile fragments moved out of the top level where it was getting
+	too clutters with install abd packaging targets.
+	* Makefile.am: Move all the packaging support to the .am files
+	packaging. Include packaging in EXTRA_DIST.
+
 	* packaging/install-gnash.sh: Install script for installting
 	binary tarballs.
 	* extensions/launcher: New extension for launching application

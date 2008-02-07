@@ -1,0 +1,94 @@
+# 
+#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+# 
+
+#
+# Access Linux Platform support. ALP use netcat to install files,
+# as well as a simple remote command set for the phone
+#
+NETCAT_REMOTE   = $(NETCAT) -q 10 `cat /tmp/alp.ip` 5038
+NETCAT_REMOTE_Q = $(NETCAT) -q 8  `cat /tmp/alp.ip` 5038
+ALP_UML_IP      = 192.168.3.101
+ALP_REMOTE_IP	= 192.168.1.101
+ALP_NAMESPACE   = org.gnu.gnash
+ALP_BAR         = $(ALP_NAMESPACE).bar
+ALP_BUNDLE_DIR  = /opt/alp/bundles/
+
+ALP_TMP=/tmp/$(host_alias)-gnash
+
+# this is where the gnash gets compiled
+ALP_BUILD=gnash-${VERSION}
+
+CLEANFILES += alp-* $(ALP_NAMESPACE)
+
+alp-ip: 
+	@if test ! -f /tmp/alp.ip; then \
+	  if test "`uname -m`" = "i486" -o "`uname -m`" = "i686" ; then \
+	    echo "$(ALP_UML_IP)" | cut -d ' ' -f1 > /tmp/alp.ip ; \
+	  else \
+	    echo "$(ALP_REMOTE_IP)" | cut -d ' ' -f1 > /tmp/alp.ip ; \
+	  fi ; \
+	fi	
+
+alp alp-bundle: alp-install
+	rm -f alp-bundle
+	$(mkinstalldirs) $(ALP_NAMESPACE)/rsc
+	cp -f $(top_srcdir)/packaging/alp/Manifest.xml $(ALP_NAMESPACE)/
+	cp -vf $(ALP_TMP)/usr/local/lib/* $(ALP_NAMESPACE)/
+	cp -f $(top_srcdir)/gui/images/GnashGTiny.png $(ALP_NAMESPACE)/rsc/
+	cp -f $(top_srcdir)/testsuite/movies.all/gravity.swf $(ALP_NAMESPACE)/rsc/
+	@touch alp-bundle
+
+alp-install: 
+	-@rm -f alp-install
+	$(MAKE) install DESTDIR=$(ALP_TMP)
+	@touch alp-install
+
+# Don't ask me why, but you have to register with bartender
+# to get a bar file.
+alp-bar: #alp-bundle
+	rm -f alp-bar
+	$(BARTENDER) pack $(ALP_NAMESPACE) $(ALP_NAMESPACE).bar
+	@touch alp-bar
+
+alp-install-device: # alp-bar alp-install-files
+	@echo "Installing new bar file..."
+	size=`ls -la $(ALP_BAR) | cut --delim=' ' --fields=6,6`; \
+	(echo "install $(ALP_BAR) $$size 0 0 0755" ; cat $(ALP_BAR) ) | $(NETCAT_REMOTE)
+	@echo; echo "Registering new bar file with target..."
+	@echo 'package install /tmp/$(ALP_BAR)' | $(NETCAT_REMOTE)
+	@echo " "
+
+alp-install-bundle: alp-bundle
+	$(mkinstalldirs) $(DEST_BND_ROOT)/$(ALP_NAMESPACE)
+	@echo "Installing new bundle files..."
+	cp -Rf $(ALP_NAMESPACE) $(DEST_BND_ROOT)
+
+alp-uninstall-bundle: 
+	@# Note: bundle delete requires rdbgd version 11
+	@echo " "
+	@echo "Removing old bundle..."
+	@echo "(If this returns an error, the target is probably not running.)"
+	@echo "(In that case, the bundle should be gone when you next boot the target.)"
+	@echo " "
+	-@echo 'package delete bar:$(ALP_NAMESPACE)' | $(NETCAT_REMOTE)
+	@echo " "
+
+alp-clean:
+	rm -fr alp-* $(ALP_NAMESPACE)
+
+.PHONY : alp alp-bundle alp-ip
+

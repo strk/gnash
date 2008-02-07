@@ -1,0 +1,86 @@
+# 
+#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+# 
+
+#
+# Build a Debian Familiar .ipk GNU/Linux package. These are always
+# cross compiled, typically for the ARM or XScale.
+#
+
+# this is where the output of "make install" goes, which is what
+# we use to build the package.
+IPKG_TMP=/tmp/$(host_alias)-gnash
+
+# this is where the gnash gets compiled
+IPKG_BUILD=gnash-${VERSION}
+
+CLEANFILES = ipkg-*
+
+ipkg-configure: ipkg-unpack $(IPKG_BUILD)
+	-@rm -f ipkg-configure
+	cd $(IPKG_BUILD); ./configure --host=$(host_alias) \
+	  --build=$(build_triplet) --prefix=/usr \
+	  --mandir=/usr/share/man \
+	  --infodir=/usr/share/info \
+	  --with-plugindir=/usr/lib/mozilla/plugins \
+	  --enable-static --disable-shared --disable-kparts \
+	  --enable-gui=qtopia --enable-media=none
+	@touch ipkg-configure
+
+ipkg-unpack: $(top_builddir)/config.status
+	-@rm -f ipkg-*		# nuke everything, we're starting over
+	-@rm -f ipkg-unpack
+	rm -rf $(IPKG_BUILD)
+	tar jxf $(IPKG_BUILD).tar.bz2
+	@touch ipkg-unpack
+
+ipkg-build: ipkg-configure
+	-@rm -f ipkg-build
+	$(MAKE) -C $(IPKG_BUILD) all
+	@touch ipkg-build
+
+ipkg-install: ipkg-build Makefile
+	-@rm -f ipkg-install
+	$(MAKE) -C $(IPKG_BUILD) install DESTDIR=$(IPKG_TMP)
+	@touch ipkg-install
+
+ipkg-depend: 
+	-@rm -f ipkg-depend
+	rsync -avc $(libdir)/libcurl* $(IPKG_TMP)/usr/lib
+	rsync -avc $(libdir)/libagg* $(IPKG_TMP)/usr/lib
+	rsync -avc $(libdir)/libboost_thread* $(IPKG_TMP)/usr/lib
+	rsync -avc $(libdir)/libboost_serialization* $(IPKG_TMP)/usr/lib
+	@touch ipkg-depend
+
+ipk ipkg ipkg-bundle: ipkg-install # ipkg-depend
+	if ! test -d $(IPKG_TMP)/CONTROL ; then \
+	  mkdir $(IPKG_TMP)/CONTROL; \
+	fi
+	topdir=`cd ${top_srcdir}; pwd`; \
+	for i in control postinst; do \
+	  cp -f $${topdir}/packaging/ipkg/$$i $(IPKG_TMP)/CONTROL; \
+	done; \
+	for i in rules Gnash.desktop; do \
+	  cp -f $${topdir}/packaging/ipkg/$$i $(IPKG_TMP)/ ; \
+	done;
+	ipkg-build $(IPKG_TMP)
+
+ipkg-clean:
+	rm -fr ipkg-* $(IPKG_BUILD) $(IPKG_TMP) gnash*$(VERSION)*.ipk
+
+.PHONY : ipkg ipk ipkg-bundle
+
+
