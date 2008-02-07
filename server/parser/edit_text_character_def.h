@@ -53,7 +53,7 @@ public:
 		m_word_wrap(false),
 		m_multiline(false),
 		m_password(false),
-		m_readonly(false),
+		m_readonly(true),
 		m_auto_size(false),
 		m_no_select(false),
 		m_border(false),
@@ -221,7 +221,7 @@ public:
 	{
 		return m_readonly;
 	}
-	
+
 	bool get_no_select() const 
 	{
 	  return m_no_select;

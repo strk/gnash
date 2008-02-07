@@ -1,5 +1,14 @@
 2008-02-07 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.cpp: get default type (input/dynamic)
+	  from definition (readonly flag).
+	* server/parser/edit_text_character_def.h: be readonly by default,
+	  statically defined textfield will always set this flag explicitly.
+	* testsuite/misc-ming.all/DefineEditTextTest.c: test the 'type'
+	  parameter of statically defined textfields.
+
+2008-02-07 Sandro Santilli <strk@keybit.net>
+
 	* server/edit_text_character.{cpp,h}: add support for
 	  TextField.type
 	* testsuite/actionscript.all/TextField.as: additional test

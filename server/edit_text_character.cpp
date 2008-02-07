@@ -394,7 +394,7 @@ edit_text_character::edit_text_character(character* parent,
 	_html(m_def->htmlAllowed()),
 	_selectable(!m_def->get_no_select()),
 	_autoSize(autoSizeNone),
-	_type(typeDynamic),
+	_type(m_def->get_readonly() ? typeDynamic : typeInput),
 	_bounds(m_def->get_bounds().getRange())
 {
 	assert(parent);

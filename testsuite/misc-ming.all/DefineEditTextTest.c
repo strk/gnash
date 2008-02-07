@@ -173,6 +173,8 @@ main(int argc, char** argv)
   check_equals(mo, "typeof(dtext1.backgroundColor)", "'number'");
   check_equals(mo, "typeof(dtext1.textColor)", "'number'");
   check_equals(mo, "typeof(dtext1._alpha)", "'number'");
+  check_equals(mo, "typeof(dtext1.type)", "'string'");
+  check_equals(mo, "dtext1.type", "'input'");
   
   check_equals(mo, "typeof(dtext1.__proto__.text)", "'undefined'");
   check_equals(mo, "typeof(dtext1.__proto__.background)", "'undefined'");
