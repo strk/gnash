@@ -18,7 +18,7 @@
 
 // Initial test written by Mike Carlson
 
-rcsid="$Id: array.as,v 1.39 2008/02/06 17:00:00 strk Exp $";
+rcsid="$Id: array.as,v 1.40 2008/02/07 09:46:36 strk Exp $";
 
 #include "check.as"
 
@@ -200,10 +200,14 @@ check_equals ( trysortarray.toString() , "But,Different,alphabet,capitalization"
 // Test sorting using a custom comparison function
 //-----------------------------------------------------
 
+testCmpCalls=0;
+testCmpThis="not set";
 function testCmp (x,y)
 {
 	// Gnash fails here by *requiring* a not-null 'this_ptr' in fn_call
-	xcheck_equals(typeof(this), 'undefined');
+	// NOTE: we can't rely on the number of calls to this function,
+	//       which is implementation-defined
+	if ( testCmpCalls++ ) testCmpThis=this;
 
 	if (x.length < y.length) { return -1; }
 	if (x.length > y.length) { return 1; }
@@ -213,6 +217,8 @@ function testCmp (x,y)
 check_equals ( trysortarray.toString() , "But,Different,alphabet,capitalization" );
 trysortarray.sort( testCmp );
 check_equals ( trysortarray.toString() , "But,alphabet,Different,capitalization" );
+check_equals(typeof(testCmpThis), 'undefined');
+check_equals(testCmpCalls, 7); // I don't think this matters much..
 
 function testCmpBogus1 (x,y) { return -1; }
 trysortarray.sort( testCmpBogus1 );
@@ -1017,11 +1023,11 @@ check_equals(out[0], 1);
 
 
 #if OUTPUT_VERSION < 6
- check_totals(370);
+ check_totals(365);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(398);
+  check_totals(393);
 # else
-  check_totals(405);
+  check_totals(400);
 # endif
 #endif

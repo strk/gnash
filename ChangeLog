@@ -1,5 +1,9 @@
 2008-02-07 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/array.as: make the test nicer with
+	  differnent sort() implementation (ie: don't change number of
+	  run tests based on number of calls to the custom comparator
+	  function)
 	* testsuite/actionscript.all/String.as: fix a bogus test line,
 	  xcheck->check now succeeding tests, add the rcsid string.
 
