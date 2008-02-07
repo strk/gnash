@@ -327,7 +327,7 @@ LoadVars::addLoadVariablesThread(const std::string& urlstr, const char* postdata
 		//callMethod(VM::get().getStringTable().find(PROPNAME("onData")), nullValue);
 	}
 
-	log_security(_("Loading XML file from url: '%s'"), url.str().c_str());
+	log_security(_("Loading variables file from url: '%s'"), url.str().c_str());
 
 	bool startTimer = _loadThreads.empty();
 

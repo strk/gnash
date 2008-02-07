@@ -1,5 +1,6 @@
 2008-02-07 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/LoadVars.cpp: fix confusing message (loading XML..)
 	* server/array.h: sort a list, not a deque. this makes
 	  invalid custom comparators less likely to invalidate
 	  iterators, fixing bug #22239.
