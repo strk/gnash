@@ -279,10 +279,10 @@ static as_value sprite_attach_movie(const fn_call& fn)
       // the documented behaviour is to just NOT
       // initializing the properties in this
       // case.
-      IF_VERBOSE_MALFORMED_SWF(
+      IF_VERBOSE_ASCODING_ERRORS(
       log_aserror(_("Fourth argument of attachMovie "
-        "doesn't cast to an object (%s)"),
-        fn.arg(3).to_string().c_str());
+        "doesn't cast to an object (%s), we'll act as if it wasn't given"),
+        fn.arg(3).to_debug_string().c_str());
       );
     }
   }
