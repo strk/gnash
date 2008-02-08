@@ -1,3 +1,8 @@
+2008-02-08 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libmedia/gst/SoundGst.cpp: Disable the seeking assistant
+	mp3parse module for now. Add a small amount of error output.
+
 2008-02-09 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/loadMovieTest.c: check that

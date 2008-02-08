@@ -395,15 +395,18 @@ SoundGst::gstBuildPipeline()
   GstElement* decoder = NULL;
   
   if (needDecoder()) {
+#if 0
     if (_info->getFormat() != AUDIO_CODEC_MP3) {
+#endif
       decoder = gstFindDecoder(src_caps, NULL);
+#if 0
     } else {
       decoder = gst_bin_new(NULL);
       
       GstElement* audioparse = gst_element_factory_make ("mp3parse", NULL);
       GstElement* actual_decoder = gstFindDecoder(src_caps, NULL);
       gst_bin_add_many(GST_BIN(decoder), audioparse, actual_decoder, NULL);
-      gst_element_link(audioparse, actual_decoder);
+      assert(gst_element_link(audioparse, actual_decoder));
       
       GstPad* srcpad = gst_element_get_static_pad (audioparse, "src");
       GstPad* sinkpad = gst_element_get_static_pad (actual_decoder, "sink");
@@ -414,7 +417,7 @@ SoundGst::gstBuildPipeline()
       gst_object_unref (GST_OBJECT (srcpad));
       gst_object_unref (GST_OBJECT (sinkpad));
     }
-     
+#endif
     
     // FIXME: if we fail to find a decoder, should we stop here?
   }
@@ -427,22 +430,26 @@ SoundGst::gstBuildPipeline()
 
   GstElement* audiosink = gst_element_factory_make ("autoaudiosink", NULL);
   
-
+  gboolean success;
   if (decoder) {
   
     gst_bin_add_many(GST_BIN(_pipeline), _buffersrc, decoder, _volume,
                      audioconvert, audioresample, audiosink, NULL);
 
-    gst_element_link_many(_buffersrc, decoder, _volume, audioconvert,
-                          audioresample, audiosink, NULL);
+    success = gst_element_link_many(_buffersrc, decoder, _volume, audioconvert,
+                                    audioresample, audiosink, NULL);
   } else {    
     gst_bin_add_many(GST_BIN(_pipeline), _buffersrc,
                      audioconvert, audioresample, _volume, audiosink, NULL);
 
-    gst_element_link_many(_buffersrc, audioconvert, audioresample,
-                          _volume, audiosink, NULL);
-  
+    success = gst_element_link_many(_buffersrc, audioconvert, audioresample,
+                                    _volume, audiosink, NULL);
+
   }
+  
+  if (!success) {
+    log_error(_("Failed to link Gstreamer elements."));
+  }  
   
   gst_caps_unref(src_caps);
   
