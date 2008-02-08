@@ -1,5 +1,7 @@
 2008-02-08 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.cpp (setRootMovie): cleanup display list
+	  after actions processing. Fixes bug #22258.
 	* server/swf/tag_loaders.cpp (import_loader): read strings into
 	  a std::string rather then a temp newly allocated char[].
 	  (fixes attempts to construct a string from a null).

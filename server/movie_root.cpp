@@ -173,6 +173,15 @@ movie_root::setRootMovie(movie_instance* movie)
 		disableScripts();
 		clearActionQueue();
 	}
+
+	// Delete characters removed from the stage
+	// from the display lists
+	cleanupDisplayList();
+
+#ifdef GNASH_USE_GC
+	// Run the garbage collector (step back !!)
+	GC::get().collect();
+#endif
 }
 
 /* private */
