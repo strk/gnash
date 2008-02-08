@@ -52,7 +52,7 @@ SoundHandlerGst::~SoundHandlerGst()
   
   _sounds.clear();
   
-  if ( VM::initialized() ) VM::get().getRoot().clear_interval_timer(_timer_id);
+  if ( VM::isInitialized() ) VM::get().getRoot().clear_interval_timer(_timer_id);
 }
 
 void
