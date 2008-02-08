@@ -203,6 +203,7 @@ libgnashserver_la_LIBADD = \
 
 if USE_SOUND_GST
 AM_CPPFLAGS += $(GSTREAMER_CFLAGS)
+libgnashserver_la_LIBADD += $(GSTREAMER_LIBS)
 endif
 
 

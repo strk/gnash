@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: AudioDecoderNellymoser.h,v 1.7 2008/01/21 23:10:13 rsavoye Exp $
+// $Id: AudioDecoderNellymoser.h,v 1.8 2008/02/08 15:27:30 bjacques Exp $
 
 // This file incorporates work covered by the following copyright and permission
 // notice:
@@ -80,6 +80,9 @@ public:
 	bool setup(SoundInfo* info);
 
 	boost::uint8_t* decode(boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool parse);
+	
+	/// @return a new[]-allocated pointer to decoded data in floats.
+	float* decode(boost::uint8_t* in_buf, boost::uint32_t inputSize, boost::uint32_t* outputSize);
 
 private:
 

@@ -1,3 +1,20 @@
+2008-02-08 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libmedia/gst/SoundHandlerGst.{h,cpp}: New Gstreamer sound_handler
+	implementation. Manages SoundGst objects.
+	* libmedia/gst/SoundGst{h,cpp}: Sound class representing a single
+	sound.
+	* libmedia/gst/gstbuffersrc.{c,h}: Home-grown element derived from
+	gstappsrc; it is a random-access element. Used for SoundGsts.
+	* libmedia/AudioDecoderNellymoser.{cpp,h}: Add another decode()
+	that returns floats, since Gstreamer can handle them.
+	* libmedia/Makefile.am: Compile new files; stop compiling removed
+	files.
+	* libmedia/sound_handler.h: Drop unused (and evil)
+	{att,de}tach_aux_streamer methods.
+	* server/Makefile.am: Link in Gstreamer libs if requested.
+	* server/asobj/NetStreamGst.cpp: Remove unused include.
+
 2008-02-08 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-mtasc.all/level87.as, testsuite/swfdec/PASSING:

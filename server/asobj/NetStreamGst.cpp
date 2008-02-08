@@ -25,7 +25,6 @@
 #include "string_table.h"
 #include <boost/algorithm/string/case_conv.hpp> // for PROPNAME (shouldn't this include be in the header actualy defining PROPNAME, btw?)
 
-#include "gstgnashsrc.h"
 #include "Object.h"
 #include "gstflvdemux.h"
 #include <gst/gstelement.h>

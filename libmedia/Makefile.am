@@ -38,6 +38,9 @@ libgnashmedia_la_CPPFLAGS = \
 	-I$(top_srcdir)/backend	\
 	-I$(top_srcdir)/libbase	\
 	-I$(top_srcdir)/server	\
+	-I$(top_srcdir)/server/vm \
+	-I$(top_srcdir)/server/parser \
+	-I$(top_srcdir)/libgeometry \
 	$(PTHREAD_CFLAGS) \
 	$(OPENGL_CFLAGS) \
 	$(LIBXML_CFLAGS) \
@@ -95,28 +98,30 @@ noinst_HEADERS = \
 
 if USE_SOUND_GST
    libgnashmedia_la_SOURCES += \
-		gst/gstgnashsrc.c \
 		gst/VideoDecoderGst.cpp \
 		gst/AudioDecoderGst.cpp \
 		gst/gstappbuffer.c \
 		gst/gstappsink.c \
 		gst/gstappsrc.c \
-		gst/sound_handler_gst.cpp \
+		gst/SoundHandlerGst.cpp \
+		gst/SoundGst.cpp \
 		gst/MediaDecoderGst.cpp \
 		gst/gstflvdemux.c \
-		gst/gstflvparse.c 
+		gst/gstflvparse.c \
+		gst/gstbuffersrc.c
 	
    noinst_HEADERS += \
-		gst/gstgnashsrc.h \
 		gst/gstappbuffer.h \
 		gst/AudioDecoderGst.h \
 		gst/VideoDecoderGst.h \
 		gst/gstappsink.h \
 		gst/gstappsrc.h \
-		gst/sound_handler_gst.h \
+		gst/SoundHandlerGst.h \
+		gst/SoundGst.h \
 		gst/MediaDecoderGst.h \
 		gst/gstflvdemux.h \
-		gst/gstflvparse.h
+		gst/gstflvparse.h \
+		gst/gstbuffersrc.h
 
    libgnashmedia_la_CPPFLAGS += \
 		$(GSTREAMER_CFLAGS)
