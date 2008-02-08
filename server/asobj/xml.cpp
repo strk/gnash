@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.68 2008/01/30 10:09:36 bwy Exp $ */
+/* $Id: xml.cpp,v 1.69 2008/02/08 11:58:56 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -174,6 +174,12 @@ XML::~XML()
     for (LoadThreadList::iterator it=_loadThreads.begin(); it != _loadThreads.end(); ++it)
     {
         delete *it; // supposedly joins the thread
+    }
+
+    if ( _loadCheckerTimer )
+    {
+        VM& vm = getVM();
+        vm.getRoot().clear_interval_timer(_loadCheckerTimer);
     }
     
 #ifdef DEBUG_MEMORY_ALLOCATION

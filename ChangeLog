@@ -1,5 +1,15 @@
 2008-02-08 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.h: add TODO item in loadMovie method.
+	* server/sprite_instance.cpp (sprite_load_movie): queue the
+	  load request using movie_root::loadMovie. Fixes a bug
+	  loading in removed or aliased sprites (expected behaviour
+	  is we load to a string target, with late evaluation of it).
+	* server/asobj/: LoadVars.cpp, xml.cpp: don't forget to clear
+	  the internal timer on destruction.
+
+2008-02-08 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (on_event): skip seeking for user-defined
 	  onLoad handler only if all all clip events (not just the onLoad one)
 	  are undefined.

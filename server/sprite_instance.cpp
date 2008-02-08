@@ -653,7 +653,13 @@ static as_value sprite_load_movie(const fn_call& fn)
     //return;
   }
 
-  sprite->loadMovie(url);
+  movie_root& mr = sprite->getVM().getRoot();
+  std::string target = sprite->getTarget();
+  // TODO: if GET/SET should send variables of *this* movie,
+  // no matter if the target will be replaced by another movie !!
+  mr.loadMovie(url, target); // ADD GET/SET !!
+
+  //sprite->loadMovie(url);
   //log_msg("MovieClip.loadMovie(%s) - TESTING ", url.str().c_str());
 
 

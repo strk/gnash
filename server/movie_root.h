@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.107 2008/01/30 14:51:48 strk Exp $ */
+/* $Id: movie_root.h,v 1.108 2008/02/08 11:58:55 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -621,6 +621,13 @@ public:
     ///
     /// @param method
     ///     Load method. 
+    ///	
+    /// TODO: add an additional parameter containing the actual variables
+    ///       to send if method is POST or GET as tests show that if you
+    ///       queue a load request for a target which is unloaded at time
+    ///       of processing, you still get the original target variables
+    ///       posted, not the new ones !
+    ///	      See http://savannah.gnu.org/bugs/index.php?22257
     ///
     void loadMovie(const URL& url, const std::string& target, LoadMethod method=NONE);
 

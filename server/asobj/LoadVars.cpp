@@ -215,6 +215,12 @@ LoadVars::~LoadVars()
 	{
 		delete *it; // supposedly joins the thread
 	}
+
+	if ( _loadCheckerTimer )
+	{
+		VM& vm = getVM();
+        	vm.getRoot().clear_interval_timer(_loadCheckerTimer);
+	}
 }
 
 void
