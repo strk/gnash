@@ -53,7 +53,7 @@ class Level87
 
 		if (_level0.level87loaded )
 		{
-                	xcheck_equals(_level0.frameno, 3);
+                	check_equals(_level0.frameno, 3);
 
                 	check_equals(typeof(_level5), 'undefined');
 			return;

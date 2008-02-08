@@ -1,5 +1,10 @@
 2008-02-08 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-mtasc.all/level87.as, testsuite/swfdec/PASSING:
+	  Successes after the MovieClip.loadMovie fixes.
+
+2008-02-08 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.h: add TODO item in loadMovie method.
 	* server/sprite_instance.cpp (sprite_load_movie): queue the
 	  load request using movie_root::loadMovie. Fixes a bug
