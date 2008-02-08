@@ -1,5 +1,9 @@
 2008-02-08 Bastiaan Jacques <bastiaan@bjacques.org>
 
+	* libmedia/gst/SoundGst.cpp: Fix typo.
+
+2008-02-08 Bastiaan Jacques <bastiaan@bjacques.org>
+
 	* libmedia/gst/SoundHandlerGst.{h,cpp}: New Gstreamer sound_handler
 	implementation. Manages SoundGst objects.
 	* libmedia/gst/SoundGst{h,cpp}: Sound class representing a single

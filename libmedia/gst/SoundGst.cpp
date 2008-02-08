@@ -395,7 +395,7 @@ SoundGst::gstBuildPipeline()
   GstElement* decoder = NULL;
   
   if (needDecoder()) {
-    if (_info->getFormat() == AUDIO_CODEC_MP3) {
+    if (_info->getFormat() != AUDIO_CODEC_MP3) {
       decoder = gstFindDecoder(src_caps, NULL);
     } else {
       decoder = gst_bin_new(NULL);
