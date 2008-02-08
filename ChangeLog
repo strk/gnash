@@ -1,5 +1,8 @@
 2008-02-09 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/loadMovieTest.c: check that
+	  getBytesLoaded/Total for static sprites should not proxy
+	  to the root movie def.
 	* libmedia/gst/SoundHandlerGst.cpp (dtor): don't abort
 	  if destructed before the VM is initialized (gnash nonexistent
 	  will trigger that behaviour).

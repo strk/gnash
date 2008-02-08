@@ -36,6 +36,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <ming.h>
 
 // In version 7 loadMovie doesn't work !!
@@ -117,7 +118,12 @@ add_coverart(SWFMovie mo, int x, int y)
 
 	mc_coverart = newSWFMovieClip();
 	SWFMovieClip_add(mc_coverart, (SWFBlock)sh_coverart);
+	SWFMovieClip_add(mc_coverart, (SWFBlock)newSWFAction(
+		"_root.xcheck(getBytesLoaded() < _root.getBytesLoaded());"
+		"_root.xcheck(getBytesTotal() < _root.getBytesTotal());"
+	));
 	SWFMovieClip_nextFrame(mc_coverart); /* showFrame */
+
 	it = SWFMovie_add(mo, (SWFBlock)mc_coverart);
 	SWFDisplayItem_setName(it, "coverart"); 
 	SWFDisplayItem_moveTo(it, x, y);
@@ -134,7 +140,7 @@ add_coverart(SWFMovie mo, int x, int y)
 		"};"
 		, __FILE__, __LINE__);
 
-	printf("%s", buf);
+	/*printf("%s", buf);*/
 
 	SWFDisplayItem_addAction(it, compileSWFActionCode(buf),
 		SWFACTION_ROLLOVER);
