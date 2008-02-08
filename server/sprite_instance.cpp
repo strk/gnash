@@ -2525,14 +2525,14 @@ sprite_instance::on_event(const event_id& id)
   //
   if ( id.m_id == event_id::LOAD )
   {
-    if ( get_parent() && ! called )
+    if ( get_parent() && get_event_handlers().empty() )
     {
 #ifdef GNASH_DEBUG
-      log_debug("Sprite %s won't check for user-defined LOAD event (didn't have a clipLoad event defined)", getTarget().c_str());
+      log_debug("Sprite %s won't check for user-defined LOAD event (had no clip events defined)", getTarget().c_str());
       testInvariant();
 #endif
-      // FIXME: shouldn't we return 'called' ?
-      return false;
+      
+      return called;
     }
   }
 

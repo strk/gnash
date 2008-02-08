@@ -1,3 +1,9 @@
+2008-02-08 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (on_event): skip seeking for user-defined
+	  onLoad handler only if all all clip events (not just the onLoad one)
+	  are undefined.
+
 2008-02-07  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* packaging/install-gnash.sh: Add file finding function, so we
