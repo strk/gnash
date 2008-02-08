@@ -277,8 +277,8 @@ LoadVars::checkLoads()
 
     if ( _loadThreads.empty() ) 
     {
-#ifdef DEBUG_XML_LOADS
-        log_debug("Clearing XML load checker interval timer");
+#ifdef DEBUG_LOADS
+        log_debug("Clearing LoadVars load checker interval timer");
 #endif
 	VM& vm = getVM();
         vm.getRoot().clear_interval_timer(_loadCheckerTimer);
@@ -348,7 +348,7 @@ LoadVars::addLoadVariablesThread(const std::string& urlstr, const char* postdata
 	// 
 	_loadThreads.push_front(lt.get());
 #ifdef DEBUG_LOADS
-	log_debug("Pushed thread %p to _loadThreads, number of XML load threads now: " SIZET_FMT, (void*)lt.get(),  _loadThreads.size());
+	log_debug("Pushed thread %p to _loadThreads, number of LoadVars load threads now: " SIZET_FMT, (void*)lt.get(),  _loadThreads.size());
 #endif
 	lt.release();
 
@@ -361,7 +361,7 @@ LoadVars::addLoadVariablesThread(const std::string& urlstr, const char* postdata
 		timer->setInterval(*loadsChecker, 50, this);
 		_loadCheckerTimer = getVM().getRoot().add_interval_timer(timer, true);
 #ifdef DEBUG_LOADS
-		log_debug("Registered XML loads interval %d", _loadCheckerTimer);
+		log_debug("Registered LoadVars loads interval %d", _loadCheckerTimer);
 #endif
     }
 
