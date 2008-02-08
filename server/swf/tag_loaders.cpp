@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.181 2008/01/28 20:36:29 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.182 2008/02/08 18:38:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -1028,7 +1028,8 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::IMPORTASSETS || tag == SWF::IMPORTASSETS2);
 
-    char* source_url = in->read_string();
+    std::string source_url;
+    in->read_string(source_url);
 
     // Resolve relative urls against baseurl
     URL abs_url(source_url, get_base_url());
@@ -1046,7 +1047,7 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 
     IF_VERBOSE_PARSE
     (
-	log_parse(_("  import: version = %u, source_url = %s (%s), count = %d"), import_version, abs_url.str().c_str(), source_url, count);
+	log_parse(_("  import: version = %u, source_url = %s (%s), count = %d"), import_version, abs_url.str().c_str(), source_url.c_str(), count);
     );
 
 
@@ -1083,15 +1084,16 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
     for (int i = 0; i < count; i++)
     {
 	boost::uint16_t	id = in->read_u16();
-	char*	symbol_name = in->read_string();
+	std::string symbol_name;
+	in->read_string(symbol_name);
 	IF_VERBOSE_PARSE
 	(
-	    log_parse(_("  import: id = %d, name = %s"), id, symbol_name);
+	    log_parse(_("  import: id = %d, name = %s"), id, symbol_name.c_str());
 	);
 
 	if (s_no_recurse_while_loading)
 	{
-	    m->add_import(source_url, id, symbol_name);
+	    m->add_import(source_url, id, symbol_name.c_str()); // TODO: pass the const ref of string instead
 	}
 	else
 	{
@@ -1099,11 +1101,11 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 	    // s_no_recurse_while_loading, change
 	    // create_movie().
 
-	    boost::intrusive_ptr<resource> res = source_movie->get_exported_resource(symbol_name);
+	    boost::intrusive_ptr<resource> res = source_movie->get_exported_resource(symbol_name.c_str()); // TODO: pass const string&
 	    if (res == NULL)
 	    {
 		log_error(_("import error: could not find resource '%s' in movie '%s'"),
-			  symbol_name, source_url);
+			  symbol_name.c_str(), source_url.c_str());
 	    }
 	    else if (font* f = res->cast_to_font())
 	    {
@@ -1118,14 +1120,12 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 	    else
 	    {
 		log_error(_("import error: resource '%s' from movie '%s' has unknown type"),
-			  symbol_name, source_url);
+			  symbol_name.c_str(), source_url.c_str());
 	    }
 	}
 
-	delete [] symbol_name;
     }
 
-    delete [] source_url;
 }
 
 // Read a DefineText tag.
