@@ -1,5 +1,10 @@
 2008-02-08 Bastiaan Jacques <bastiaan@bjacques.org>
 
+	* libmedia/gst/SoundGst.cpp: Shuffle linking order so that
+	volume will happen after conversion.
+
+2008-02-08 Bastiaan Jacques <bastiaan@bjacques.org>
+
 	* libmedia/gst/SoundGst.cpp: Disable the seeking assistant
 	mp3parse module for now. Add a small amount of error output.
 

@@ -433,11 +433,11 @@ SoundGst::gstBuildPipeline()
   gboolean success;
   if (decoder) {
   
-    gst_bin_add_many(GST_BIN(_pipeline), _buffersrc, decoder, _volume,
-                     audioconvert, audioresample, audiosink, NULL);
+    gst_bin_add_many(GST_BIN(_pipeline), _buffersrc, decoder,
+                     audioconvert, audioresample, _volume, audiosink, NULL);
 
-    success = gst_element_link_many(_buffersrc, decoder, _volume, audioconvert,
-                                    audioresample, audiosink, NULL);
+    success = gst_element_link_many(_buffersrc, decoder, audioconvert,
+                                    audioresample, _volume, audiosink, NULL);
   } else {    
     gst_bin_add_many(GST_BIN(_pipeline), _buffersrc,
                      audioconvert, audioresample, _volume, audiosink, NULL);
