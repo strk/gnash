@@ -395,11 +395,9 @@ SoundGst::gstBuildPipeline()
   GstElement* decoder = NULL;
   
   if (needDecoder()) {
-#if 0
     if (_info->getFormat() != AUDIO_CODEC_MP3) {
-#endif
       decoder = gstFindDecoder(src_caps, NULL);
-#if 0
+
     } else {
       decoder = gst_bin_new(NULL);
       
@@ -408,8 +406,8 @@ SoundGst::gstBuildPipeline()
       gst_bin_add_many(GST_BIN(decoder), audioparse, actual_decoder, NULL);
       assert(gst_element_link(audioparse, actual_decoder));
       
-      GstPad* srcpad = gst_element_get_static_pad (audioparse, "src");
-      GstPad* sinkpad = gst_element_get_static_pad (actual_decoder, "sink");
+      GstPad* sinkpad = gst_element_get_static_pad (audioparse, "sink");
+      GstPad* srcpad = gst_element_get_static_pad (actual_decoder, "src");
       
       gst_element_add_pad (decoder, gst_ghost_pad_new ("sink", sinkpad));
       gst_element_add_pad (decoder, gst_ghost_pad_new ("src", srcpad));
@@ -417,7 +415,7 @@ SoundGst::gstBuildPipeline()
       gst_object_unref (GST_OBJECT (srcpad));
       gst_object_unref (GST_OBJECT (sinkpad));
     }
-#endif
+
     
     // FIXME: if we fail to find a decoder, should we stop here?
   }
