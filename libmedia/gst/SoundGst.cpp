@@ -395,25 +395,31 @@ SoundGst::gstBuildPipeline()
   GstElement* decoder = NULL;
   
   if (needDecoder()) {
-    if (_info->getFormat() != AUDIO_CODEC_MP3) {
-      decoder = gstFindDecoder(src_caps, NULL);
-
-    } else {
-      decoder = gst_bin_new(NULL);
-      
+    if (_info->getFormat() == AUDIO_CODEC_MP3) {
       GstElement* audioparse = gst_element_factory_make ("mp3parse", NULL);
-      GstElement* actual_decoder = gstFindDecoder(src_caps, NULL);
-      gst_bin_add_many(GST_BIN(decoder), audioparse, actual_decoder, NULL);
-      assert(gst_element_link(audioparse, actual_decoder));
+      if (audioparse) {
+    
+        decoder = gst_bin_new(NULL); 
       
-      GstPad* sinkpad = gst_element_get_static_pad (audioparse, "sink");
-      GstPad* srcpad = gst_element_get_static_pad (actual_decoder, "src");
+        GstElement* actual_decoder = gstFindDecoder(src_caps, NULL);
+        gst_bin_add_many(GST_BIN(decoder), audioparse, actual_decoder, NULL);
+        assert(gst_element_link(audioparse, actual_decoder));
+        
+        GstPad* sinkpad = gst_element_get_static_pad (audioparse, "sink");
+        GstPad* srcpad = gst_element_get_static_pad (actual_decoder, "src");
+        
+        gst_element_add_pad (decoder, gst_ghost_pad_new ("sink", sinkpad));
+        gst_element_add_pad (decoder, gst_ghost_pad_new ("src", srcpad));
+        
+        gst_object_unref (GST_OBJECT (srcpad));
+        gst_object_unref (GST_OBJECT (sinkpad));
       
-      gst_element_add_pad (decoder, gst_ghost_pad_new ("sink", sinkpad));
-      gst_element_add_pad (decoder, gst_ghost_pad_new ("src", srcpad));
-      
-      gst_object_unref (GST_OBJECT (srcpad));
-      gst_object_unref (GST_OBJECT (sinkpad));
+      } else {
+        decoder = gstFindDecoder(src_caps, NULL);
+      }
+    } else {
+    
+      decoder = gstFindDecoder(src_caps, NULL);
     }
 
     

@@ -1,5 +1,10 @@
 2008-02-08 Bastiaan Jacques <bastiaan@bjacques.org>
 
+	* libmedia/gst/SoundGst.cpp: Use mp3parse only if it's available,
+	for instance in the absence of plugins-ugly.
+
+2008-02-08 Bastiaan Jacques <bastiaan@bjacques.org>
+
 	* libmedia/gst/SoundGst.cpp: Make sure source and sink pad
 	actually reflect their names on the bin used for mp3parse.
 
