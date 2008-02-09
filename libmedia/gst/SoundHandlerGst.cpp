@@ -27,27 +27,20 @@
 namespace gnash {
 namespace media {
 
-#define RETURN_IF_BAD_HANDLE(handle)                                          \
-  if (handle < 0 || handle > int(_sounds.size()) - 1) {                       \
-    return;                                                                   \
-  }
-
-#define RV_IF_BAD_HANDLE(handle, value)                                       \
-  if (handle < 0 || handle > int(_sounds.size()) - 1) {                       \
-    return value;                                                             \
-  }
+  
+using boost::bind;
 
 
 SoundHandlerGst::SoundHandlerGst()
   : _timer_id(0)
 {
   gst_init(NULL, NULL);
-  GNASH_REPORT_FUNCTION;
 }
-
 
 SoundHandlerGst::~SoundHandlerGst()
 {
+  boost::mutex::scoped_lock lock(_sounds_mutex); // Just in case...
+
   std::for_each(_sounds.begin(), _sounds.end(), boost::checked_deleter<SoundGst>());
   
   _sounds.clear();
@@ -55,14 +48,6 @@ SoundHandlerGst::~SoundHandlerGst()
   if ( VM::isInitialized() ) VM::get().getRoot().clear_interval_timer(_timer_id);
 }
 
-void
-SoundHandlerGst::poll_sounds()
-{
-  std::for_each(_sounds.begin(), _sounds.end(),
-    boost::mem_fn(&SoundGst::poll));
-}
-
-  
 void
 SoundHandlerGst::start_timer()
 {
@@ -88,6 +73,8 @@ int
 SoundHandlerGst::create_sound(void* data, unsigned int data_bytes,
                               std::auto_ptr<SoundInfo> sinfo)
 {
+  boost::mutex::scoped_lock lock(_sounds_mutex);
+
   if (!data) {
     _sounds.push_back(new SoundGst(sinfo));
   } else {
@@ -104,61 +91,45 @@ long
 SoundHandlerGst::fill_stream_data(unsigned char* data, unsigned int bytes,
                                   unsigned int sample_count, int handle)
 {
-  RV_IF_BAD_HANDLE(handle, 0);
-  
-  return _sounds[handle]->pushData(data, bytes, sample_count);
+  return ts_call(handle,
+                 bind(&SoundGst::pushData, _1, data, bytes, sample_count), 0);
 }
 
 SoundInfo*
 SoundHandlerGst::get_sound_info(int handle)
 {
-  RV_IF_BAD_HANDLE(handle, NULL);
-  
-  return _sounds[handle]->getSoundInfo();
+  return ts_call(handle, bind(&SoundGst::getSoundInfo, _1),
+                 static_cast<SoundInfo*>(NULL));
 }
 
 void
 SoundHandlerGst::play_sound(int handle, int loop_count, int offset,
            long start, const std::vector<sound_envelope>* envelopes)
 {
-  RETURN_IF_BAD_HANDLE(handle);
-    
+  ts_call(handle,
+          bind(&SoundGst::play, _1, loop_count, offset, start, envelopes));
+  
   start_timer();
-
-  _sounds[handle]->play(loop_count, offset, start, envelopes);
   
   _soundsStarted++;
 }
 
-void
-SoundHandlerGst::stop_all_sounds()
-{
-  std::for_each(_sounds.begin(), _sounds.end(), boost::mem_fn(&SoundGst::stop));
-}
-
-
 int
 SoundHandlerGst::get_volume(int handle)
 {
-  RV_IF_BAD_HANDLE(handle, 0);
-
-  return _sounds[handle]->getVolume();
+  return ts_call(handle, bind(&SoundGst::getVolume, _1), 0);
 }
 	
 void
 SoundHandlerGst::set_volume(int handle, int volume)
 {
-  RETURN_IF_BAD_HANDLE(handle);
-  
-  _sounds[handle]->setVolume(volume);
+  ts_call(handle, bind(&SoundGst::setVolume, _1, volume));  
 }
 		
 void
 SoundHandlerGst::stop_sound(int handle)
 {
-  RETURN_IF_BAD_HANDLE(handle);
-  
-  _sounds[handle]->stop();
+  ts_call(handle, bind(&SoundGst::stop, _1));
   
   _soundsStopped++;
 }
@@ -166,7 +137,11 @@ SoundHandlerGst::stop_sound(int handle)
 void
 SoundHandlerGst::delete_sound(int handle)
 {
-  RETURN_IF_BAD_HANDLE(handle);
+  boost::mutex::scoped_lock lock(_sounds_mutex);
+
+  if (handle < 0 || handle > int(_sounds.size()) - 1) {
+    return;
+  }
   
   std::vector<SoundGst*>::iterator it =
     std::find(_sounds.begin(), _sounds.end(), _sounds[handle]);
@@ -181,18 +156,14 @@ SoundHandlerGst::delete_sound(int handle)
 unsigned int
 SoundHandlerGst::get_duration(int handle)
 {
-  RV_IF_BAD_HANDLE(handle, 0);
-  
-  return _sounds[handle]->duration();
 
+  return ts_call(handle, bind(&SoundGst::duration, _1), 0);
 }
 
 unsigned int
 SoundHandlerGst::get_position(int handle)
 {
-  RV_IF_BAD_HANDLE(handle, 0);
-  
-  return _sounds[handle]->position();
+  return ts_call(handle, bind(&SoundGst::position, _1), 0);
 }
 
 
@@ -205,22 +176,20 @@ SoundHandlerGst::reset()
 void
 SoundHandlerGst::mute()
 {
-  std::for_each(_sounds.begin(), _sounds.end(),
-                boost::mem_fn(&SoundGst::mute));
+  ts_foreach(boost::mem_fn(&SoundGst::mute));
 }
 
 void
 SoundHandlerGst::unmute()
 {
-  std::for_each(_sounds.begin(), _sounds.end(),
-                boost::mem_fn(&SoundGst::unmute));
+  ts_foreach(boost::mem_fn(&SoundGst::unmute));
 }
 
 
 bool
 SoundHandlerGst::is_muted()
 {
-  using namespace boost;
+  boost::mutex::scoped_lock lock(_sounds_mutex);
 
   std::vector<SoundGst*>::iterator it = std::find_if(_sounds.begin(),
     _sounds.end(), bind( std::logical_not<bool>(), 
@@ -229,8 +198,17 @@ SoundHandlerGst::is_muted()
   return (it == _sounds.end());
 }
 
-#undef RETURN_IF_BAD_HANDLE
-#undef RV_IF_BAD_HANDLE
+void
+SoundHandlerGst::poll_sounds()
+{
+  ts_foreach(boost::mem_fn(&SoundGst::poll));
+}
+
+void
+SoundHandlerGst::stop_all_sounds()
+{
+  ts_foreach(boost::mem_fn(&SoundGst::stop));
+}
 
 /* static */ as_value
 SoundHandlerGst::poll_cb(const fn_call& /*fn*/)

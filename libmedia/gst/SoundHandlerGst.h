@@ -20,6 +20,7 @@
 #include "SoundGst.h"
 #include "timers.h"
 #include "as_value.h"
+#include <boost/thread/mutex.hpp>
 
 namespace gnash {
 namespace media {
@@ -65,13 +66,79 @@ public:
 
   unsigned int get_position(int sound_handle);
   
-  void start_timer();
+  void start_timer();  
   
   static as_value poll_cb(const fn_call& fn);
 
 private:
+  
+  /// Thread safe version of for_each which is applied to the _sounds vector.
+  ///
+  /// @param functor Function object of which operator() will be called; akin
+  ///                the third argument of std::for_each.
+  template <typename T>
+  void
+  ts_foreach(T functor)
+  {
+    boost::mutex::scoped_lock lock(_sounds_mutex);
+
+    std::for_each(_sounds.begin(), _sounds.end(), functor);
+  }
+  
+  /// Calls operator() on a function object which takes a SoundGst pointer
+  /// as its sole argument. The pointer is taken from the _sounds object,
+  /// as indicated by the first argument to this template method. The access
+  /// to _sounds is thread safe.
+  /// 
+  /// @param handle the _sounds index to _sounds with which the SoundGst
+  ///               pointer is to be retrieved.
+  /// @param functor the function object to call operator(SoundGst*) on, so that
+  ///        the expression functor(SoundGst*) is valid.  
+  template<typename T>
+  void ts_call(int handle, T functor)
+  {
+    boost::mutex::scoped_lock lock(_sounds_mutex);
+
+    if (handle < 0 || handle > int(_sounds.size()) - 1) {
+      return;
+    }
+    
+    functor(_sounds[handle]);
+  }
+  
+  /// This member is like the previous template member, but returns a value
+  /// indicated by its third argument, *if the handle indicated in the first
+  /// argument is invalid*. Otherwise, it returns functor(SoundGst*). Of
+  /// course, the return value of functor() must be equal to the type of 
+  /// bad_handle_rv (the third argument).
+  ///
+  /// @param bad_handle_rv the value to return if the passed handle is invalid.
+  /// @return functor(SoundGst*).  
+  template<typename T, typename R>
+  R ts_call(int handle, T functor, R bad_handle_rv)
+  {
+    boost::mutex::scoped_lock lock(_sounds_mutex);
+
+    if (handle < 0 || handle > int(_sounds.size()) - 1) {
+      return bad_handle_rv;
+    }
+    
+    return functor(_sounds[handle]);
+  }
+
+
+
+
+
+private:
+
+  /// Mutex for access to the _sounds object.
+  boost::mutex _sounds_mutex;
+  
   std::vector<SoundGst*> _sounds;
-  unsigned int _timer_id;  
+  
+  unsigned int _timer_id;
+
 }; // SoundHandlerGst
 
 } // namespace media

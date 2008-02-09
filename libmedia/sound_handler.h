@@ -15,11 +15,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: sound_handler.h,v 1.9 2008/02/08 15:27:31 bjacques Exp $ */
+/* $Id: sound_handler.h,v 1.10 2008/02/09 15:06:01 bjacques Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
-/// This page must be written, volunteers ? :)
+/// The implementation of this class *must* be thread safe!
 ///
 
 #ifndef SOUND_HANDLER_H
@@ -287,7 +287,7 @@ public:
 	///
 	/// @param start
 	/// When starting a soundstream from a random frame, this tells where in the
-	/// data the decoding should start.
+	/// data the decoding should start, in samples.
 	///
 	/// @param envelopes
 	/// Some eventsounds have some volume control mechanism called envelopes.

@@ -1,5 +1,15 @@
 2008-02-08 Bastiaan Jacques <bastiaan@bjacques.org>
 
+	* libmedia/sound_handler.h: Add a few notes.
+	* libmedia/gst/SoundHandlerGst.{h,cpp}: Make SoundHandlerGst thread
+	safe, because the "loading thread" will call at least create_sound.
+	Since most methods in the class merely call a SoundGst method,
+	introduce a set of member template functions that will a) make these
+	operations thread safe, b) replace the RV_IF_BAD_HANDLE-style macros
+	and c) save typing. Fixes bug #22264.
+
+2008-02-08 Bastiaan Jacques <bastiaan@bjacques.org>
+
 	* libmedia/gst/SoundGst.cpp: Use mp3parse only if it's available,
 	for instance in the absence of plugins-ugly.
 
