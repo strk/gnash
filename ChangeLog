@@ -1,3 +1,9 @@
+2008-02-08 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libamf/sol.cpp: in writeFile, allocate enough space to account
+	for two padding bytes, which are written depending on the AMF element
+	type. Fixes bug #22188.
+
 2008-02-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/sprite_instance.cpp, server/movie_root.cpp: const correct

@@ -216,7 +216,7 @@ SOL::writeFile(const string &filespec, const string &name)
 
     for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
         amf::Element *el = (*(ita));
-	size += el->getName().size() + el->getLength() + 5;
+	size += el->getName().size() + el->getLength() + 7;
     }
     _filesize = size;
     
