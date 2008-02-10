@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.143 2008/02/10 18:34:52 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.144 2008/02/10 18:42:28 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -461,6 +461,8 @@ GtkGui::createMenu()
         // The is_muted() function appears to have changed, and this doesn't work at the
         // moment:
         // gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menuitem_sound), (!s->is_muted()) );
+        
+        gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menuitem_sound), TRUE);
         gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_sound));
         gtk_widget_show(GTK_WIDGET(menuitem_sound));
         g_signal_connect(GTK_OBJECT(menuitem_sound), "activate",
