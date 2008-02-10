@@ -313,7 +313,7 @@ install ()
 {
   # install the NSAPI (Mozilla/Firefox) plugin
   if [ -e plugins/libgnashplugin.so -o x$yes = xyes ]; then
-    ${COPY} plugins/ibgnashplugin.so ${nsapidir}
+    ${COPY} plugins/libgnashplugin.so ${nsapidir}
   else
     echo "You don't have the NSAPI plugin, installation can't continue"
     exit
