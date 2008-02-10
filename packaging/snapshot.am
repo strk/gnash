@@ -95,6 +95,7 @@ snapshot-bundle: #snapshot-install
 	if test ! -d $${snapshot_tmp}; then \
 	  $(MKINSTALLDIRS) $${snapshot_tmp}; \
 	fi; \
+	rm -f $${snapshot_dest}/usr/lib/*.la; \
 	cp @srcdir@/COPYING $${snapshot_tmp}; \
 	cp @srcdir@/config.guess $${snapshot_tmp}; \
 	cp @srcdir@/packaging/install-gnash.sh $${snapshot_tmp}; \

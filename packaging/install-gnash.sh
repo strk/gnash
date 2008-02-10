@@ -44,7 +44,7 @@ esac
 # set to any command to execute to make the shell commands not
 # make any actual changes on disk. 'echo' is the usual value here
 # for this, as it just displays the commands to the screen.
-debug=echo
+debug=
 
 # set 'yes' to 'yes', and you don't get asked for prompts.
 # Use with care!!! Note that setting this to yes obligates the user
@@ -128,7 +128,7 @@ checkdirs ()
   if [ x"${nsapidir}" = x"@FIREFOX_PLUGINS@" ]; then
     # OpenBSD 4.2, at the least. uses this path for the plugin
     if [ -d /usr/local/mozilla-firefox/plugins ]; then
-      nsapidir="/usr/local/mozilla-firefox/plugins"
+      nsapidir="/usr/local/mozilla-firefox/plugin"s
       field=4
     fi
     # this is the standard defalt path, common on most GNU/Linux distros
@@ -205,7 +205,17 @@ checkdirs ()
     fi
   fi
 
-  # dopcumentation gets installed here
+#   sodir=/etc/ld.so.conf.d
+#   if [ ! -w ${sodir} ]; then
+#     needstobe="`ls -ld ${sodir} | cut -f ${field} -d ' ' 2>&1`"
+#     if [ x`whoami` != xroot ]; then
+#       echo "Sorry dude, you need to be have write permissions to \"${sodir}\" to install Gnash"
+#       echo "Or be the user \"${needstobe}\""
+#       $debug exit
+#     fi
+#   fi
+
+  # documentation gets installed here
   docdir="/usr/share/doc"
 
   if [ ! -w ${docdir} ]; then
@@ -289,7 +299,7 @@ preexisting ()
       fi
     fi
   else
-      echo "Cool, you don't have any preexisting installations of Gnash"
+      echo "Cool, you don\'t have any preexisting installations of Gnash"
   fi
 
   return `true`
@@ -303,23 +313,31 @@ install ()
 {
   # install the NSAPI (Mozilla/Firefox) plugin
   if [ -e plugins/libgnashplugin.so -o x$yes = xyes ]; then
-    ${COPY} libgnashplugin.so ${nsapidir}
+    ${COPY} lplugins/ibgnashplugin.so ${nsapidir}
   else
     echo "You don't have the NSAPI plugin, installation can't continue"
     exit
   fi
 
   # install the Kparts (KDE/Konqueror) plugin
-  if [ -e plugins/libklashpart.so -o x$yes = xyes ]; then
-    ${COPY} plugins/libklashpart.so ${kpartsplugindir}
+  if [ -e lib/kde3/libklashpart.so -o x$yes = xyes ]; then
+    ${COPY} lib/kde3/libklashpart.so ${kpartsplugindir}
   else
     echo "You don't have the Kparts plugin, installation can't continue"
     exit
   fi
 
   # install the libraries
-  if [ -e lib/libgnashbase.so -o x$yes = xyes ]; then
-    ${COPY} lib/libgnash*.so /usr/lib/
+  if [ -e lib/gnash/libgnashbase.so -o x$yes = xyes ]; then
+    for i in lib/gnash/libgnash*cvs.so; do
+      ${COPY} $i /usr/lib/
+      linkname=`echo $i | sed -e 's:\-.*.so:.so:' -e 's:\.3.*::'`
+      linkname=`basename ${linkname}`
+      ln -fs /usr/lib/`basename $i` /usr/lib/${linkname}
+    done
+    ${COPY} lib/gnash/libltdl.so.3.* /usr/lib/
+    ln -fs /usr/lib/libltdl.so.3.1.4 /usr/lib/libltdl.so.3
+    ln -fs /usr/lib/libltdl.so.3.1.4 /usr/lib/libltdl.so
   else
     echo "You don't have the Gnash libraries, installation can't continue"
     exit
@@ -333,18 +351,19 @@ install ()
     exit
   fi
 
-  if [ -e dumpshm -o x$yes = xyes ]; then
-    ${COPY} gprocessor dumpshm soldumper /usr/bin/
-  else
-    echo "You don't have the Gnsh utilities, installation can't continue"
-    exit
-  fi
-
   # install the documentation
   if [ -e gnash.pdf -o x$yes = xyes ]; then
     $debug mkdir -p /usr/share/doc/gnash
     ${COPY} gnash.pdf /usr/share/doc/gnash
   fi
+
+  # copy the ld.so.conf file
+#   if [ ! -f /etc/ld.so.conf.d/gnash.conf ]; then
+#     echo " /usr/lib/gnash" > /etc/ld.so.conf.d/gnash.conf
+#   fi
+
+#   # run ldconfig so the shared libraries can be found.
+#   ldconfig
 }
 
 #
