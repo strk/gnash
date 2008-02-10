@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.141 2008/01/31 11:08:56 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.142 2008/02/10 18:28:20 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -457,7 +457,10 @@ GtkGui::createMenu()
             GTK_CHECK_MENU_ITEM(gtk_check_menu_item_new_with_label(_("Sound")));
         // Set toggle inactive if an active sound handler is muted at start (can't
         // happen at the moment, but might in the future).
-        gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menuitem_sound), (!s->is_muted()) );
+        
+        // The is_muted() function appears to have changed, and this doesn't work at the
+        // moment:
+        // gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menuitem_sound), (!s->is_muted()) );
         gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_sound));
         gtk_widget_show(GTK_WIDGET(menuitem_sound));
         g_signal_connect(GTK_OBJECT(menuitem_sound), "activate",

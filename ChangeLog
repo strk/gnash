@@ -1,4 +1,9 @@
-2008-02-08 Bastiaan Jacques <bastiaan@bjacques.org>
+2008-02-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/gtk.cpp: Don't use is_muted() to set the 'Sound' menu toggle,
+	  as the function seems to have changed.
+
+2008-02-10 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* libamf/sol.cpp: in writeFile, allocate enough space to account
 	for two padding bytes, which are written depending on the AMF element
