@@ -1,22 +1,22 @@
 %define version 20080104
 Name:           gnash
-Version:        cvs%{version}
+Version:        %{version}cvs
 Release:        1%{?dist}
 Summary:        GNU flash movie player
 
 Group:          Applications/Multimedia
 Vendor:		Gnash Project
 Packager:	Rob Savoye <rob@welcomehome.org>
-License:        GPL
+License:        GPLv3
 URL:            http://www.gnu.org/software/gnash/
 Source0:        http://www.gnu.org/software/gnash/releases/%{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%{_target_cpu}
 
 #AutoReqProv: no
 
-BuildRequires:  libxml2-devel libpng-devel libjpeg-devel libogg-devel
-BuildRequires:  gtk2-devel libX11-devel agg-devel
-BuildRequires:  boost-devel curl-devel libXt-devel
+BuildRequires:  libpng-devel libjpeg-devel libogg-devel
+BuildRequires:  gtk2-devel libX11-devel libXt-devel
+BuildRequires:  agg-devel libxml2-devel boost-devel curl-devel libXt-devel
 # the opengl devel packages are required by gtkglext-devel
 # monolithic Xorg
 #BuildRequires:  xorg-x11-devel
@@ -28,6 +28,9 @@ BuildRequires:  SDL-devel
 BuildRequires:  kdelibs-devel
 BuildRequires:  docbook2X
 BuildRequires:  gstreamer >= 0.10
+# Installation requirements
+Requires: gstreamer >= 0.10
+Requires: gstreamer-plugins-base, gstreamer-plugins-ugly, gstreamer-plugins-bad
 # BuildRequires:  scrollkeeper
 
 #Requires(post): scrollkeeper
@@ -88,8 +91,8 @@ Cygnal is a streaming media server that's Flash aware.
 # FIXME: this ia a bad hack! Although all this does work correctly and
 # build an RPM, it's set for an geode-olpc, so the actual hardware
 # won't let us install it.
-%define cross_compile 1
-%define olpc 1
+%define cross_compile 0
+%define olpc 0
 
 # Build rpms for an ARM based processor, in our case the Nokia 770/800
 # tablet. 
@@ -114,14 +117,14 @@ RPM_TARGET=%{_target}
 # build RPMs on, so we do it this way.
   %if olpc
     CROSS_OPTS="$CROSS_OPTS --disable-kparts --disable-menus"
-    SOUND="--enable-media=ffmpeg"
+    SOUND="--enable-media=gst"
     GUI="--enable-gui=gtk"
     RENDERER="$RENDERER --with-pixelformat=RGB565"
   %endif
 %else
 # Native RPM build
   CROSS_OPTS="--enable-ghelp --enable-docbook"
-  SOUND="--enable-media=ffmpeg"
+  SOUND="--enable-media=gst"
   RENDERER=""
 %endif
 
@@ -140,12 +143,9 @@ RPM_TARGET=%{_target}
 make %{?_smp_mflags} dumpconfig all
 %else
 ./configure \
-	--with-qtdir=$QTDIR \
 	$CROSS_OPTS \
 	$SOUND \
 	$RENDERER \
-	--enable-static \
-	--enable-shared \
 	--disable-dependency-tracking \
 	--disable-rpath \
 	--disable-cygnal \
@@ -156,11 +156,14 @@ make dumpconfig all
 %endif
 
 %install
-strip gui/.libs/*-gnash utilities/.libs/dumpshm  utilities/.libs/g*  utilities/.libs/soldumper
+strip gui/.libs/*-gnash
+strip utilities/.libs/dumpshm  utilities/.libs/g*  utilities/.libs/soldumper
 rm -rf $RPM_BUILD_ROOT
-make install install-plugin DESTDIR=$RPM_BUILD_ROOT
-rm $RPM_BUILD_ROOT%{_libdir}/*.la
+make install install-plugins DESTDIR=$RPM_BUILD_ROOT
+rm $RPM_BUILD_ROOT%{_libdir}/gnash/*.la
+rm $RPM_BUILD_ROOT%{_libdir}/gnash/*.a
 %if !%{cross_compile}
+
 rm -rf $RPM_BUILD_ROOT%{_localstatedir}/scrollkeeper
 rm -f $RPM_BUILD_ROOT%{_infodir}/dir
 %endif
@@ -191,23 +194,26 @@ scrollkeeper-update -q || :
 %dump
 %doc README AUTHORS COPYING NEWS 
 %{_bindir}/gnash
-%{_bindir}/gparser
+%{_bindir}/*-gnash
 %{_bindir}/gprocessor
 %{_bindir}/soldumper
 %{_bindir}/dumpshm
-%{_libdir}/libgnash*.so
+%{_libdir}/gnash/*.so*
 %{_libdir}/mozilla/plugins/*.so
-%{_libdir}/libltdl*
 %{_prefix}/include/ltdl.h
 %{_prefix}/share/gnash/GnashG.png
 %{_prefix}/share/gnash/gnash_128_96.ico
 %if !%{cross_compile}
-%{_prefix}/man/man1/gnash.1*
+%{_datadir}/man/man1/gnash.1*
+%{_datadir}/locale/*/LC_MESSAGES/gnash.mo
 %doc doc/C/gnash.html 
 %doc %{_prefix}/share/gnash/doc/gnash/C/images
 %{_datadir}/omf/gnash/gnash-C.omf
-%{_infodir}/gnash.info*.gz
+%{_datadir}/omf/gnash/asspec-C.omf
+%{_infodir}/*.info.gz
 %{_prefix}/share/gnash/doc/gnash/C/*.xml
+%{_prefix}/share/gnash/doc/asspec/C/*.xml
+%{_prefix}/share/gnash/doc/asspec/images/*.png
 %endif
 
 %files plugin
@@ -223,11 +229,14 @@ scrollkeeper-update -q || :
 %{_datadir}/services/klash_part.desktop
 %endif
 
-%files cygnal
-%defattr(-,root,root,-)
-%{_bindir}/cygnal
+# %files cygnal
+# %defattr(-,root,root,-)
+# %{_bindir}/cygnal
 
 %changelog
+* Sat Feb  9 2008 Rob Savoye <rob@welcomehome.org> - %{version}-%{release}
+- Adjust dependencies for current cvs HEAD
+
 * Sat Mar  6 2007 Rob Savoye <rob@welcomehome.org> - %{version}-%{release}
 - merge in patch from John @ Redhat.
 

@@ -1,3 +1,10 @@
+2008-02-09  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* packaging/snapshot.am: Fix rules to build binary tarballs
+	correctly. Add snapshot-rpm target that builds an rpm which is
+	properly cvs date stamped.
+	* packaging/redhat/gnash.spec: Update to work with cvs HEAD.
+
 2008-02-08 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* libmedia/sound_handler.h: Add a few notes.
