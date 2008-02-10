@@ -2,6 +2,8 @@
 
 	* gui/gtk.cpp: Don't use is_muted() to set the 'Sound' menu toggle,
 	  as the function seems to have changed.
+	* libbase/rc.cpp: Fix a nice buffer overrun arising from long
+	  comments in the rcfile.
 
 2008-02-10 Bastiaan Jacques <bastiaan@bjacques.org>
 

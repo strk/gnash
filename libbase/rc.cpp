@@ -364,7 +364,7 @@ RcInitFile::parseFile(const std::string& filespec)
         }
         
         // Read in each line and parse it
-        do {
+        while (!in.eof()) {
 
 	    // Make sure action is empty, otherwise the last loop (with no new
 	    // data) keeps action, variable and value from the previous loop. This
@@ -378,8 +378,8 @@ RcInitFile::parseFile(const std::string& filespec)
             // Ignore comment lines
             if (action[0] == '#') {
                 // suck up the rest of the line
-                char name[128];
-                in.getline(name, 128);
+                std::string discard;
+                getline(in, discard);
                 continue;
             } 
             
@@ -490,7 +490,7 @@ RcInitFile::parseFile(const std::string& filespec)
                      extractNumber((boost::uint32_t *)&_lcshmkey, "LCShmkey", variable, value);
 		}
             }
-        } while (!in.eof());
+        }
 
     } else {
         if (in) {
