@@ -447,7 +447,7 @@ LoadVars::decode_method(const fn_call& fn)
 	URL::parse_querystring(fn.arg(0).to_string(), vals);
 
 	string_table& st = ptr->getVM().getStringTable();
-	for  (ValuesMap::iterator it=vals.begin(), itEnd=vals.end();
+	for  (ValuesMap::const_iterator it=vals.begin(), itEnd=vals.end();
 			it != itEnd; ++it)
 	{
 		ptr->set_member(st.find(it->first), as_value(it->second.c_str()));

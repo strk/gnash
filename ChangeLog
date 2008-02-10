@@ -1,3 +1,10 @@
+2008-02-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/sprite_instance.cpp, server/movie_root.cpp: const correct
+	  some iterators.
+	* server/asobj/LoadVars.cpp: ditto.
+	* libbase/utf8.h: make comments more Doxygen-friendly.
+
 2008-02-09  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* packaging/snapshot.am: Fix rules to build binary tarballs

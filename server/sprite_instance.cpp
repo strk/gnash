@@ -2258,7 +2258,7 @@ bool sprite_instance::get_member(string_table::key name_key, as_value* val,
   TextFieldPtrVect* etc = get_textfield_variable(name);
   if ( etc )
   {
-    for (TextFieldPtrVect::iterator i=etc->begin(), e=etc->end(); i!=e; ++i)
+    for (TextFieldPtrVect::const_iterator i=etc->begin(), e=etc->end(); i!=e; ++i)
     {
       TextFieldPtr tf = *i;
           val->set_string(tf->get_text_value());
@@ -2462,7 +2462,7 @@ sprite_instance::queueAction(const action_buffer& action)
 void
 sprite_instance::queueActions(ActionList& actions)
 {
-  for(ActionList::iterator it=actions.begin(), itEnd=actions.end();
+  for(ActionList::const_iterator it=actions.begin(), itEnd=actions.end();
            it != itEnd; ++it)
   {
     const action_buffer* buf = *it;
@@ -4154,7 +4154,7 @@ sprite_instance::loadVariables(URL url, short sendVarsMethod)
     if ( (sendVarsMethod == 1) && (url.querystring() != "") )  // GET
       del = "&";
     
-    for (PropMap::iterator i=props.begin(), e=props.end(); i!=e; ++i)
+    for (PropMap::const_iterator i=props.begin(), e=props.end(); i!=e; ++i)
     {
       std::string name = i->first;
       std::string value = i->second;

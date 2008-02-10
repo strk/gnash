@@ -252,7 +252,7 @@ movie_root::swapLevels(boost::intrusive_ptr<sprite_instance> movie, int depth)
 
 #ifdef GNASH_DEBUG_LEVELS_SWAPPING
 	log_debug("Before swapLevels (source depth %d, target depth %d) levels are: ", oldDepth, depth);
-	for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
+	for (Levels::const_iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
 	{
 		log_debug(" %d: %p (%s @ depth %d)", i->first, (void*)(i->second.get()), i->second->getTarget().c_str(), i->second->get_depth());
 	}
@@ -303,7 +303,7 @@ movie_root::swapLevels(boost::intrusive_ptr<sprite_instance> movie, int depth)
 	
 #ifdef GNASH_DEBUG_LEVELS_SWAPPING
 	log_debug("After swapLevels levels are: ");
-	for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
+	for (Levels::const_iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
 	{
 		log_debug(" %d: %p (%s @ depth %d)", i->first, (void*)(i->second.get()), i->second->getTarget().c_str(), i->second->get_depth());
 	}
@@ -1165,7 +1165,7 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 void movie_root::add_listener(CharacterList& ll, character* listener)
 {
 	assert(listener);
-	for(CharacterList::iterator i = ll.begin(), e = ll.end(); i != e; ++i)
+	for(CharacterList::const_iterator i = ll.begin(), e = ll.end(); i != e; ++i)
 	{
 		// Conceptually, we don't need to add the same character twice.
 		// but see edit_text_character::setFocus()...
