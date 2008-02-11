@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: character.h,v 1.124 2008/01/23 12:39:37 strk Exp $ */
+/* $Id: character.h,v 1.125 2008/02/11 10:24:57 udog Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -1119,6 +1119,14 @@ public:
 	/// See destroy() for more info.
 	///
 	bool isDestroyed() const { return _destroyed; }
+	
+	/// Returns true when the character bounds intersect with the current  
+  /// rendering clipping area.
+  ///
+  /// There is no need to do any rendering for this character when this 
+  /// function returns false because the renderer will not change any pixels
+  /// in the area where this character is placed.  
+	bool boundsInClippingArea() const; 
 
 public: // istn't this 'public' reduntant ?
 

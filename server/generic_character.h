@@ -78,13 +78,7 @@ public:
 		//return m_parent->can_handle_mouse_event();
 	}
 
-	virtual void	display()
-	{
-//			GNASH_REPORT_FUNCTION;
-	    m_def->display(this);	// pass in transform info
-	    clear_invalidated();
-	    do_display_callback();
-	}
+	virtual void	display();
 
 	geometry::Range2d<float> getBounds() const
 	{

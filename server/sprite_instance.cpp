@@ -3014,22 +3014,19 @@ void sprite_instance::display()
   // Note: 
   // DisplayList::Display() will take care of the visibility checking.
   //
-  // Whether a character should be rendered or not is dependent on its paraent.
+  // Whether a character should be rendered or not is dependent on its parent.
   // i.e. if its parent is a mask, this character should be rendered to the mask
   // buffer even it is invisible.
   //
-  
-  // check if the sprite (and it's childs) needs to be drawn
-  InvalidatedRanges ranges;
-  m_display_list.add_invalidated_bounds(ranges, true);
-  
-  // expand to bounds of _drawable
-  rect drawable_bounds; 
-  drawable_bounds.expand_to_transformed_rect(get_world_matrix(), _drawable->get_bound());
-  ranges.add(drawable_bounds.getRange());
-  
-  if (gnash::render::bounds_in_clipping_area(ranges))
-  {
+
+  // check if either the drawable or the display list intersect with the 
+  // rendering clipping area. Note that we just want to do a simple bounds check
+  // (which does not guarantee that rendering is really necessary) because it's
+  // much simpler than a check using add_invalidated_ranges().  
+  if (boundsInClippingArea()) {
+    
+    // render drawable (ActionScript generated graphics)
+    
     _drawable->finalize();
     // TODO: I'd like to draw the definition directly..
     //       but it seems that the backend insists in
@@ -3040,9 +3037,13 @@ void sprite_instance::display()
     //       Thus, this drawable_instance is basically just
     //       a container for a parent :(
     _drawable_inst->display();
-
-    m_display_list.display();   
+    
+    
+    // descend the display list
+    m_display_list.display();
+    
   }
+   
   clear_invalidated();
     
   do_display_callback();

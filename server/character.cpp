@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.77 2008/01/29 12:31:10 strk Exp $ */
+/* $Id: character.cpp,v 1.78 2008/02/11 10:24:57 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -29,6 +29,7 @@
 #include "VM.h" // for do_mouse_drag (to be moved in movie_root)
 #include "fn_call.h" // for shared ActionScript getter-setters
 #include "GnashException.h" // for shared ActionScript getter-setters (ensure_character)
+#include "render.h"  // for bounds_in_clipping_area()
 #include "ExecutableCode.h"
 #include "namedStrings.h"
 
@@ -966,6 +967,16 @@ character::setMaskee(character* maskee)
 		//       specified by PlaceObject tag ?
 		set_clip_depth(noClipDepthValue);
 	}
+}
+
+
+bool 
+character::boundsInClippingArea() const 
+{
+  geometry::Range2d<float> mybounds = getBounds();
+  get_world_matrix().transform(mybounds);
+  
+  return gnash::render::bounds_in_clipping_area(mybounds);  
 }
 
 

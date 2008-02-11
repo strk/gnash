@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: generic_character.cpp,v 1.11 2008/01/21 20:55:50 rsavoye Exp $ */
+/* $Id: generic_character.cpp,v 1.12 2008/02/11 10:24:57 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -30,32 +30,44 @@ namespace gnash
 
 void
 generic_character::add_invalidated_bounds(InvalidatedRanges& ranges, 
-	bool force)
+  bool force)
 {
-	ranges.add(m_old_invalidated_ranges);
-	if (m_visible && (m_invalidated||force))
-	{
-		rect bounds;		
-		bounds.expand_to_transformed_rect(get_world_matrix(), 
-			m_def->get_bound());
-		ranges.add(bounds.getRange());            
-	}    
+  ranges.add(m_old_invalidated_ranges);
+  if (m_visible && (m_invalidated||force))
+  {
+    rect bounds;    
+    bounds.expand_to_transformed_rect(get_world_matrix(), 
+      m_def->get_bound());
+    ranges.add(bounds.getRange());            
+  }    
 }
 
 void
 generic_character::enclose_own_bounds(rect *) const
 {
-	log_unimpl("generic_character::enclose_own_bounds");
-	abort(); // TO BE IMPLEMENTED!!!!!
+  log_unimpl("generic_character::enclose_own_bounds");
+  abort(); // TO BE IMPLEMENTED!!!!!
 }
 
 bool
 generic_character::pointInShape(float x, float y) const
 {
-	matrix wm = get_world_matrix();
-	point lp(x, y);
-	wm.transform_by_inverse(lp);
-	return m_def->point_test_local(lp.x, lp.y);
+  matrix wm = get_world_matrix();
+  point lp(x, y);
+  wm.transform_by_inverse(lp);
+  return m_def->point_test_local(lp.x, lp.y);
+}
+
+
+void  
+generic_character::display()
+{
+
+  if (boundsInClippingArea())
+    m_def->display(this); // pass in transform info
+  
+  clear_invalidated();
+  do_display_callback();
 }
 
 } // namespace gnash
