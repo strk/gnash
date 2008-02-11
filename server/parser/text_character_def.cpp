@@ -23,14 +23,15 @@ void text_character_def::read(stream* in, int tag_type,
 	m_rect.read(in);
 	m_matrix.read(in);
 
-	int	glyph_bits = in->read_u8();
-	int	advance_bits = in->read_u8();
+	in->ensureBytes(2); // glyph_bits + advance_bits
+	int glyph_bits = in->read_u8();
+	int advance_bits = in->read_u8();
 
 	IF_VERBOSE_PARSE(
 	log_parse(_("begin text records for text_character_def %p"), (void*)this);
 	);
 
-	bool	last_record_was_style_change = false;
+	bool last_record_was_style_change = false;
 
 	text_style	style;
 	for (;;)
@@ -65,6 +66,7 @@ void text_character_def::read(stream* in, int tag_type,
 
 			if (has_font)
 			{
+				in->ensureBytes(2);
 				boost::uint16_t	font_id = in->read_u16();
 				if ( ! style.setFont(font_id, *m) )
 				{
@@ -93,6 +95,8 @@ void text_character_def::read(stream* in, int tag_type,
 			if (has_x_offset)
 			{
 				style.m_has_x_offset = true;
+				
+				in->ensureBytes(2);
 				style.m_x_offset = in->read_s16();
 				IF_VERBOSE_PARSE(
 				log_parse(_("  has_x_offset = %g"), style.m_x_offset);
@@ -106,6 +110,8 @@ void text_character_def::read(stream* in, int tag_type,
 			if (has_y_offset)
 			{
 				style.m_has_y_offset = true;
+				
+				in->ensureBytes(2);
 				style.m_y_offset = in->read_s16();
 				IF_VERBOSE_PARSE(
 				log_parse(_("  has_y_offset = %g"), style.m_y_offset);
@@ -118,6 +124,7 @@ void text_character_def::read(stream* in, int tag_type,
 			}
 			if (has_font)
 			{
+				in->ensureBytes(2);
 				style.m_text_height = in->read_u16();
 				IF_VERBOSE_PARSE(
 				log_parse(_("  text_height = %g"), style.m_text_height);

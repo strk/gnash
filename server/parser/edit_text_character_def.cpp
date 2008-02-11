@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character_def.cpp,v 1.16 2008/01/21 20:56:00 rsavoye Exp $ */
+/* $Id: edit_text_character_def.cpp,v 1.17 2008/02/11 16:32:52 bwy Exp $ */
 
 // Based on the public domain text.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -44,6 +44,7 @@ edit_text_character_def::read(stream* in, int tag_type,
 	m_rect.read(in);
 
 	in->align();
+	in->ensureBytes(1);
 	bool	has_text = in->read_bit();
 	m_word_wrap = in->read_bit();
 	m_multiline = in->read_bit();
@@ -53,6 +54,7 @@ edit_text_character_def::read(stream* in, int tag_type,
 	bool	has_max_length = in->read_bit(); 
 	bool	has_font = in->read_bit(); 
 
+	in->ensureBytes(1);
 	in->read_bit();	// reserved
 	m_auto_size = in->read_bit(); 
 	bool	has_layout = in->read_bit(); 
@@ -64,6 +66,7 @@ edit_text_character_def::read(stream* in, int tag_type,
 
 	if (has_font)
 	{
+		in->ensureBytes(4);
 		m_font_id = in->read_u16();
 		m_text_height = in->read_u16();
 	}
@@ -75,16 +78,16 @@ edit_text_character_def::read(stream* in, int tag_type,
 
 	if (has_max_length)
 	{
+		in->ensureBytes(2);
 		m_max_length = in->read_u16();
 	}
 
 	if (has_layout)
 	{
-		m_alignment = (alignment) in->read_u8();
-		//m_left_margin = (float) in->read_u16();
-		m_left_margin = in->read_u16();
-		//m_right_margin = (float) in->read_u16();
-		m_right_margin = in->read_u16();
+		in->ensureBytes(9); //1 + 2 + 2 + 2 + 2
+		m_alignment = static_cast<alignment>(in->read_u8());
+		m_left_margin = in->read_u16(); // used to be cast to float
+		m_right_margin = in->read_u16(); // used to be cast to float
 		m_indent = in->read_s16();
 		m_leading = in->read_s16();
 	}
