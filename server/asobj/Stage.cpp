@@ -226,12 +226,20 @@ stage_align_getset(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		log_unimpl("Stage.align getter");
+		static bool warned=false;
+		if ( ! warned ) {
+			log_unimpl("Stage.align getter");
+			warned=true;
+		}
 		return as_value();
 	}
 	else // setter
 	{
-		log_unimpl("Stage.align setter");
+		static bool warned=false;
+		if ( ! warned ) {
+			log_unimpl("Stage.align setter");
+			warned=true;
+		}
 		return as_value();
 	}
 }
@@ -243,12 +251,20 @@ stage_showMenu_getset(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		log_unimpl("Stage.showMenu getter");
+		static bool warned=false;
+		if ( ! warned ) {
+			log_unimpl("Stage.showMenu getter");
+			warned=true;
+		}
 		return as_value();
 	}
 	else // setter
 	{
-		log_unimpl("Stage.showMenu setter");
+		static bool warned=false;
+		if ( ! warned ) {
+			log_unimpl("Stage.showMenu setter");
+			warned=true;
+		}
 		return as_value();
 	}
 }

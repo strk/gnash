@@ -1,3 +1,7 @@
+2008-02-11 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/Stage.cpp: warn only once about unimplemented calls.
+
 2008-02-11 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/character.{cpp,h}: new boundsInClippingArea() function
