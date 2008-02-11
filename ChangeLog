@@ -1,3 +1,8 @@
+2008-02-11 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/MovieClipLoader.as: test 'this' in
+	  onLoadInit callback.
+
 2008-02-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/rc.{h,cpp}: use boost/cstdint for uint32_t. Cast SHM key 

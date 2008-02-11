@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClipLoader.as,v 1.15 2008/01/08 21:34:38 strk Exp $";
+rcsid="$Id: MovieClipLoader.as,v 1.16 2008/02/11 08:33:38 strk Exp $";
 
 #include "check.as"
 
@@ -232,6 +232,8 @@ mcl.onLoadInit = function(target)
 	check_equals(state.onLoadCompleteCalls, 1);
 	state.onLoadInitCalls++;
 
+	check_equals(this, mcl);
+
 	// At onLoadInit time the _url parameter is the url of
 	// old target with appended url of new target (?)
 	// So we test if it ends with it instead
@@ -309,7 +311,7 @@ function test3()
 	// subtract the number of progress callback runs reported when playing from the totals to get the correct number
 	// BUT MAKE SURE nextTestOrEnd CONTAINS THE CORRECT testsPerProgressCallback INFO !!
 	//
-	expected.totals = 68;
+	expected.totals = 70;
 	// gnash doesn't call onLoadInit if the data at the url is not an SWF or JPG
 	// (or whatever else can become a movie_instance), while the PP does.
 	// So in this testcase, the attempt to load vars.txt is invalid for Gnash
