@@ -23,7 +23,6 @@
 
 #include "log.h" 
 #include "action.h" // for call_method_parsed (call_method_args)
-#include "render.h"  // for bounds_in_clipping_area()
 #include "sprite_instance.h"
 #include "movie_definition.h"
 #include "MovieClipLoader.h" // @@ temp hack for loading tests
