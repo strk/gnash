@@ -386,7 +386,6 @@ button_character_instance::display()
 	std::for_each(actChars.begin(), actChars.end(), std::mem_fun(&character::display)); 
 
 	clear_invalidated();
-	do_display_callback();
 }
 
 

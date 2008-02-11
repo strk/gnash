@@ -1,3 +1,14 @@
+2008-02-11 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/button_character_instance.cpp, server/edit_text_character.cpp,
+	  server/sprite_instance.cpp, server/video_stream_instance.cpp,
+	  server/character.h: drop XXX_display_callback methods
+	* server/dlist.cpp: generally check characters bounds before calling it's
+	  display() method
+	* server/generic_character.cpp, server/edit_text_character.cpp, 
+	  server/sprite_instance.cpp: don't check boundsInClippingArea() as it is
+	  done in DisplayList now 
+
 2008-02-11 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/Stage.cpp: warn only once about unimplemented calls.

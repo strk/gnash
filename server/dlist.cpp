@@ -654,10 +654,17 @@ DisplayList::display()
         if ( mask && ch->get_visible() && ! mask->isUnloaded() )
         {
             render::begin_submit_mask();
-            mask->display();
+            
+            if (mask->boundsInClippingArea())
+              mask->display();
+              
             render::end_submit_mask();
-            ch->display();
+            
+            if (ch->boundsInClippingArea())
+              ch->display();
+              
             render::disable_mask();
+            
             continue;
         }
 
@@ -706,7 +713,8 @@ DisplayList::display()
             render::begin_submit_mask();
         }
         
-        ch->display();
+        if (ch->boundsInClippingArea())
+          ch->display();
         
         // Notify the renderer that mask drawing has finished.
         if (ch->isMaskLayer())

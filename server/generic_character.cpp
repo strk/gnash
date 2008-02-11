@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: generic_character.cpp,v 1.12 2008/02/11 10:24:57 udog Exp $ */
+/* $Id: generic_character.cpp,v 1.13 2008/02/11 12:55:22 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -62,12 +62,9 @@ generic_character::pointInShape(float x, float y) const
 void  
 generic_character::display()
 {
-
-  if (boundsInClippingArea())
-    m_def->display(this); // pass in transform info
+  m_def->display(this); // pass in transform info
   
   clear_invalidated();
-  do_display_callback();
 }
 
 } // namespace gnash

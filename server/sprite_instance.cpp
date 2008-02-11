@@ -3018,34 +3018,27 @@ void sprite_instance::display()
   // buffer even it is invisible.
   //
 
-  // check if either the drawable or the display list intersect with the 
-  // rendering clipping area. Note that we just want to do a simple bounds check
-  // (which does not guarantee that rendering is really necessary) because it's
-  // much simpler than a check using add_invalidated_ranges().  
-  if (boundsInClippingArea()) {
+  
+  // render drawable (ActionScript generated graphics)
+  
+  _drawable->finalize();
+  // TODO: I'd like to draw the definition directly..
+  //       but it seems that the backend insists in
+  //       accessing the *parent* of the character
+  //       passed as "instance" for the drawing.
+  //       When displaying top-level movie this will
+  //       be NULL and gnash will segfault
+  //       Thus, this drawable_instance is basically just
+  //       a container for a parent :(
+  _drawable_inst->display();
+  
+  
+  // descend the display list
+  m_display_list.display();
     
-    // render drawable (ActionScript generated graphics)
-    
-    _drawable->finalize();
-    // TODO: I'd like to draw the definition directly..
-    //       but it seems that the backend insists in
-    //       accessing the *parent* of the character
-    //       passed as "instance" for the drawing.
-    //       When displaying top-level movie this will
-    //       be NULL and gnash will segfault
-    //       Thus, this drawable_instance is basically just
-    //       a container for a parent :(
-    _drawable_inst->display();
-    
-    
-    // descend the display list
-    m_display_list.display();
-    
-  }
    
   clear_invalidated();
     
-  do_display_callback();
 }
 
 bool

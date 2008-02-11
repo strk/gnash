@@ -493,71 +493,66 @@ edit_text_character::display()
 
 	//rect def_bounds = m_def->get_bounds();
 	
-	if (boundsInClippingArea()) {
+	bool drawBorder = getDrawBorder();
+	bool drawBackground = getDrawBackground();
 
-  	bool drawBorder = getDrawBorder();
-  	bool drawBackground = getDrawBackground();
-  
-  	if ( (drawBorder || drawBackground) && _bounds.isFinite() )
-  	{
-  		matrix	mat = get_world_matrix();
-  
-  		point	coords[4];
-  		float xmin = _bounds.getMinX();
-  		float xmax = _bounds.getMaxX();
-  		float ymin = _bounds.getMinY();
-  		float ymax = _bounds.getMaxY();
-  
-  		coords[0].setTo(xmin, ymin); 
-  		coords[1].setTo(xmax, ymin); 
-  		coords[2].setTo(xmax, ymax); 
-  		coords[3].setTo(xmin, ymax); 
-  
-  		rgba borderColor = drawBorder ? getBorderColor() : rgba(0,0,0,0);
-  		rgba backgroundColor = drawBackground ? getBackgroundColor() : rgba(0,0,0,0);
-  
-  		cxform	cx = get_world_cxform();
-  			
-  		if (drawBorder)
-  			borderColor = cx.transform(borderColor);
-  		 
-  		if (drawBackground)
-  			backgroundColor = cx.transform(backgroundColor);
-  		
+	if ( (drawBorder || drawBackground) && _bounds.isFinite() )
+	{
+		matrix	mat = get_world_matrix();
+
+		point	coords[4];
+		float xmin = _bounds.getMinX();
+		float xmax = _bounds.getMaxX();
+		float ymin = _bounds.getMinY();
+		float ymax = _bounds.getMaxY();
+
+		coords[0].setTo(xmin, ymin); 
+		coords[1].setTo(xmax, ymin); 
+		coords[2].setTo(xmax, ymax); 
+		coords[3].setTo(xmin, ymax); 
+
+		rgba borderColor = drawBorder ? getBorderColor() : rgba(0,0,0,0);
+		rgba backgroundColor = drawBackground ? getBackgroundColor() : rgba(0,0,0,0);
+
+		cxform	cx = get_world_cxform();
+			
+		if (drawBorder)
+			borderColor = cx.transform(borderColor);
+		 
+		if (drawBackground)
+			backgroundColor = cx.transform(backgroundColor);
+		
 #ifdef GNASH_DEBUG_TEXTFIELDS
-  	std::stringstream ss; ss << _bounds;
-  	log_debug("rendering a Pol composed by corners %s", ss.str().c_str());
+	std::stringstream ss; ss << _bounds;
+	log_debug("rendering a Pol composed by corners %s", ss.str().c_str());
 #endif
 
-  		render::draw_poly( &coords[0], 4, backgroundColor, borderColor, mat, true);
-  		
-  	}
-  
-  	// Draw our actual text.
-  	// Using a matrix to translate to def bounds seems an hack to me.
-  	// A cleaner implementation is likely correctly setting the
-  	// m_x_offset and m_y_offset memebers in glyph records.
-  	// Anyway, see bug #17954 for a testcase.
-  	matrix m;
-  
-  	if ( _bounds.isFinite() ) // ! def_bounds.is_null() && ! def_bounds.is_world() 
-  	{
-  		m.concatenate_translation(_bounds.getMinX(), _bounds.getMinY()); // def_bounds.get_x_min(), def_bounds.get_y_min()
-  	}
-  	
-  	
-  	display_glyph_records(m, this, m_text_glyph_records,
-  			      m_def->get_root_def(), _embedFonts);
-  
-  	if (m_has_focus)
-  	{
-  		show_cursor(m);
-  	}
-  	
-  } //if boundsInClippingArea
+		render::draw_poly( &coords[0], 4, backgroundColor, borderColor, mat, true);
+		
+	}
 
+	// Draw our actual text.
+	// Using a matrix to translate to def bounds seems an hack to me.
+	// A cleaner implementation is likely correctly setting the
+	// m_x_offset and m_y_offset memebers in glyph records.
+	// Anyway, see bug #17954 for a testcase.
+	matrix m;
+
+	if ( _bounds.isFinite() ) // ! def_bounds.is_null() && ! def_bounds.is_world() 
+	{
+		m.concatenate_translation(_bounds.getMinX(), _bounds.getMinY()); // def_bounds.get_x_min(), def_bounds.get_y_min()
+	}
+	
+	
+	display_glyph_records(m, this, m_text_glyph_records,
+			      m_def->get_root_def(), _embedFonts);
+
+	if (m_has_focus)
+	{
+		show_cursor(m);
+	}
+	
 	clear_invalidated();
-	do_display_callback();
 }
 
 

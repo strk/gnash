@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: character.h,v 1.125 2008/02/11 10:24:57 udog Exp $ */
+/* $Id: character.h,v 1.126 2008/02/11 12:55:22 udog Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -78,8 +78,6 @@ private:
 	int 	m_ratio;
 	int	m_clip_depth;
 	Events  _event_handlers;
-	void	(*m_display_callback)(void*);
-	void*	m_display_callback_user_ptr;
 
 	/// Used to assign a name to unnamed instances
 	static unsigned int _lastUnnamedInstanceNum;
@@ -369,8 +367,6 @@ public:
 	m_depth(0),
 	m_ratio(0),
 	m_clip_depth(noClipDepthValue),
-	m_display_callback(NULL),
-	m_display_callback_user_ptr(NULL),
 	_unloaded(false),
 	_destroyed(false),
 	_mask(0),
@@ -851,22 +847,6 @@ public:
 
 	// Return true if this character should be rendered
 	bool get_visible() const { return m_visible; }
-
-	virtual void	set_display_callback(void (*callback)(void*), void* user_ptr)
-	{
-	    m_display_callback = callback;
-	    m_display_callback_user_ptr = user_ptr;
-	}
-
-	virtual void	do_display_callback()
-	{
-//		GNASH_REPORT_FUNCTION;
-			
-		if (m_display_callback)
-		{
-		    (*m_display_callback)(m_display_callback_user_ptr);
-		}
-	}
 
 	/// Return mouse state in given variables
 	//
