@@ -29,6 +29,7 @@
 #include <vector>
 #include <iostream>
 #include <sys/shm.h>		// for key_t
+#include <boost/cstdint.hpp>
 
 namespace gnash {
   
@@ -209,7 +210,7 @@ public:
     void setLCTrace(bool x) { _lctrace = x; }
 
     // 
-    key_t getLCShmKey() const { return _lcshmkey; }
+    key_t getLCShmKey() const { return static_cast<key_t>(_lcshmkey); }
     void setLCShmKey(bool x) { _lcshmkey = x; }
     
     void dump();    
@@ -217,10 +218,10 @@ public:
 private:
 
     /// The timer delay
-    uint32_t  _delay;
+    boost::uint32_t  _delay;
 
     /// Max number of movie clips to store in the library      
-    uint32_t  _movieLibraryLimit;   
+    boost::uint32_t  _movieLibraryLimit;   
 
     /// Enable debugging of this class
     bool _debug;
@@ -229,7 +230,7 @@ private:
     bool _debugger;
 
     // Level of debugging output
-    uint32_t  _verbosity;
+    boost::uint32_t  _verbosity;
 
     /// Command format to use to open urls
     //
@@ -328,7 +329,7 @@ private:
     
     /// Shared memory segment key (can be set for
     /// compatibility with other players.
-    key_t _lcshmkey;
+    boost::uint32_t _lcshmkey;
 
     // A function only for writing path lists to an outstream.
     void writeList(PathList& list, std::ostream& o);
@@ -347,7 +348,7 @@ protected:
     static bool extractSetting(bool *var, const char *pattern,
                         std::string &variable, std::string &value);
     
-    static uint32_t extractNumber(uint32_t *num, const char *pattern,
+    static boost::uint32_t extractNumber(boost::uint32_t *num, const char *pattern,
                         std::string &variable, std::string &value);
 
     static void extractDouble(double& out, const char *pattern,

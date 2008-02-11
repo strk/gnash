@@ -452,7 +452,7 @@ RcInitFile::parseFile(const std::string& filespec)
                 }
 
 		if (noCaseCompare(action , "set") ) {
-                     extractSetting(&_splashScreen, "splash_screen", variable,
+                     extractSetting(&_splashScreen, "splashScreen", variable,
                                value);
                      extractSetting(&_localhostOnly, "localhost", variable,
                                value);
@@ -487,7 +487,7 @@ RcInitFile::parseFile(const std::string& filespec)
                                value);
                      extractSetting(&_lctrace, "LCTrace", variable,
                                value);
-                     extractNumber((boost::uint32_t *)&_lcshmkey, "LCShmkey", variable, value);
+                     extractNumber(&_lcshmkey, "LCShmkey", variable, value);
 		}
             }
         }

@@ -1,3 +1,11 @@
+2008-02-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/rc.{h,cpp}: use boost/cstdint for uint32_t. Cast SHM key 
+	  to key_t only at return. Use 'splashScreen', not splash_screen in
+	  the rcfile for naming consistency. It's as yet unused, so shouldn't
+	  cause any problems.
+	* testsuite/libbase/gnashrc.in: change test to use splashScreen.	  
+
 2008-02-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gtk.cpp: Don't use is_muted() to set the 'Sound' menu toggle,

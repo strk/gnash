@@ -1,5 +1,5 @@
 # Display a splash screen when starting
-set splash_screen on
+set splashScreen on
 
 # Only access remote content from our local domain
 set localdomain on
