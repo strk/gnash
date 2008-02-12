@@ -3295,10 +3295,7 @@ public:
 
     if ( ch->isMaskLayer() )
     {
-      if ( ! ch->get_visible() )
-      {
-        log_debug("FIXME: invisible mask in MouseEntityFinder.");
-      }
+      //if ( ! ch->get_visible() ) log_debug("invisible mask in MouseEntityFinder.");
       if ( ! ch->pointInShape(_wp.x, _wp.y) )
       {
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
