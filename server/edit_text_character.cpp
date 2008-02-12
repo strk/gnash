@@ -496,9 +496,10 @@ edit_text_character::display()
 	bool drawBorder = getDrawBorder();
 	bool drawBackground = getDrawBackground();
 
+	matrix	wmat = get_world_matrix();
+
 	if ( (drawBorder || drawBackground) && _bounds.isFinite() )
 	{
-		matrix	mat = get_world_matrix();
 
 		point	coords[4];
 		float xmin = _bounds.getMinX();
@@ -527,7 +528,7 @@ edit_text_character::display()
 	log_debug("rendering a Pol composed by corners %s", ss.str().c_str());
 #endif
 
-		render::draw_poly( &coords[0], 4, backgroundColor, borderColor, mat, true);
+		render::draw_poly( &coords[0], 4, backgroundColor, borderColor, wmat, true);
 		
 	}
 
@@ -549,7 +550,7 @@ edit_text_character::display()
 
 	if (m_has_focus)
 	{
-		show_cursor(m);
+		show_cursor(wmat);
 	}
 	
 	clear_invalidated();
