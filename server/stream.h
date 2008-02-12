@@ -1,4 +1,4 @@
-// stream.h - SWF stream reading clas, for Gnash
+// stream.h - SWF stream reading class, for Gnash
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -245,17 +245,6 @@ public:
 	};
 
 	/// \brief
-	/// Reads *and new[]'s* the string from the given file.
-	/// Ownership passes to the caller; caller must delete[] the
-	/// string when it is done with it.
-	///
-	/// aligned read
-	///
-	/// Will throw ParserException if no terminating null is found within tag boundaries
-	///
-	char*	read_string();	
-
-	/// \brief
 	/// Reads a null-terminated string from the given file and
 	/// assigns it to the given std::string, overriding any
 	/// previous value of it.
@@ -265,18 +254,6 @@ public:
 	/// Will throw ParserException if no terminating null is found within tag boundaries
 	///
 	void	read_string(std::string& to);
-
-	/// \brief
-	/// Reads *and new[]'s* the string from the given file.
-	/// Ownership passes to the caller; caller must delete[] the
-	/// string when it is done with it.
-	/// Length of string is read from the first byte.
-	///
-	/// aligned read
-	///
-	/// Will throw ParserException if advertised length crosses tag boundaries
-	///
-	char*	read_string_with_length();
 
 	/// Reads a sized string into a provided std::string.
 	//

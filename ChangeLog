@@ -1,3 +1,17 @@
+2008-02-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/stream.{cpp,h}: drop buggy char* read_string()
+	  and (unused) char* read_string_with_length(...), which sometimes
+	  returned NULL causing a parser exception. Fixes parsing of 
+	  http://www.e4.com/reaper/games/soulslapper/flas/main.swf (SWF9)
+	  (to an extent).	  
+	* server/swf/tag_loaders.cpp: use read_string (std::string& to)
+	  everywhere.
+	* server/swf/PlaceObject2Tag.{cpp,h}: use std::string, not char* for
+	  m_name.
+        * server/parser/shape_character_def.cpp: bring indentation into
+          some sort of shape.
+
 2008-02-12 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/MovieClipLoader.cpp: send the onLoadInit event

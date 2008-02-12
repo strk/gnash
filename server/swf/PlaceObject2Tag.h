@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: PlaceObject2Tag.h,v 1.17 2008/01/21 20:56:02 rsavoye Exp $ */
+/* $Id: PlaceObject2Tag.h,v 1.18 2008/02/12 16:48:38 bwy Exp $ */
 
 #ifndef GNASH_SWF_PLACEOBJECT2TAG_H
 #define GNASH_SWF_PLACEOBJECT2TAG_H
@@ -65,7 +65,7 @@ public:
 		:
 		DisplayListTag(0), // why is it 0 here and -1 for RemoveObjectTag ??
 		m_tag_type(0),
-		m_name(NULL),
+		m_name(""),
 		m_ratio(0),
 		m_has_matrix(false),
 		m_has_cxform(false),
@@ -104,7 +104,7 @@ public:
 private:
 
 	int	m_tag_type;
-	char*	m_name;
+	std::string	m_name;
 	int 	m_ratio;
 	cxform	m_color_transform;
 	matrix	m_matrix;

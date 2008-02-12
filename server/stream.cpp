@@ -1,4 +1,4 @@
-// stream.cpp - SWF stream reading clas, for Gnash
+// stream.cpp - SWF stream reading class, for Gnash
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -298,20 +298,6 @@ boost::int32_t	stream::read_s32()
 	return read_u32();
 }
 
-
-char*	stream::read_string()
-{
-	std::string to;
-	read_string(to); // throws ParserException
-
-	if (to.empty()) return NULL;
-
-	char*	retval = new char[to.length()+1];
-	strcpy(retval, to.c_str());
-
-	return retval;
-}
-
 void
 stream::read_string(std::string& to)
 {
@@ -327,20 +313,6 @@ stream::read_string(std::string& to)
 		to += c;
 	} while(1);
 
-}
-
-
-char*	stream::read_string_with_length()
-{
-	std::string to;
-	read_string_with_length(to);
-
-	if (to.empty()) return NULL;
-
-	char*	buffer = new char[to.length() + 1];
-	strcpy(buffer, to.c_str());
-
-	return buffer;
 }
 
 void stream::read_string_with_length(std::string& to)

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.30 2008/01/21 20:56:02 rsavoye Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.31 2008/02/12 16:48:38 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -221,7 +221,7 @@ PlaceObject2Tag::readPlaceObject2(stream& in)
     else
         m_ratio = character::noRatioValue;
 
-    if (has_name) m_name = in.read_string();
+    if (has_name) in.read_string(m_name);
 
     if (has_clip_depth)
         m_clip_depth = in.read_u16()+character::staticDepthOffset;
@@ -267,7 +267,7 @@ PlaceObject2Tag::readPlaceObject2(stream& in)
             m_color_transform.print();
         }
         if ( has_ratio ) log_parse(_("  ratio: %d"), m_ratio);
-        if ( has_name ) log_parse(_("  name = %s"), m_name ? m_name : "<null>");
+        if ( has_name ) log_parse(_("  name = %s"), m_name.empty() ? "<null>" : m_name.c_str());
         if ( has_clip_depth ) log_parse(_("  clip_depth = %d (%d)"), m_clip_depth, m_clip_depth-character::staticDepthOffset);
         log_parse(_(" m_place_type: %d"), m_place_type);
     );
@@ -336,7 +336,7 @@ PlaceObject2Tag::readPlaceObject3(stream& in)
     else
         m_ratio = character::noRatioValue;
 
-    if (has_name) m_name = in.read_string();
+    if (has_name) in.read_string(m_name);
 
     if (has_clip_depth)
         m_clip_depth = in.read_u16()+character::staticDepthOffset;
@@ -400,7 +400,7 @@ PlaceObject2Tag::readPlaceObject3(stream& in)
             m_color_transform.print();
         }
         if ( has_ratio ) log_parse(_("  ratio: %d"), m_ratio);
-        if ( has_name ) log_parse(_("  name = %s"), m_name ? m_name : "<null>");
+        if ( has_name ) log_parse(_("  name = %s"), m_name.empty() ? "<null>": m_name.c_str());
         if ( hasClassName ) log_parse(_("  class name = %s"), className.c_str());
         if ( has_clip_depth ) log_parse(_("  clip_depth = %d (%d)"), m_clip_depth, m_clip_depth-character::staticDepthOffset);
         log_parse(_(" m_place_type: %d"), m_place_type);
@@ -438,7 +438,7 @@ PlaceObject2Tag::execute(sprite_instance* m) const
       case PLACE:
           m->add_display_object(
 	      m_character_id,
-	      m_name,
+	      m_name.c_str(),
 	      m_event_handlers,
 	      m_depth,
 	      m_color_transform,
@@ -459,7 +459,7 @@ PlaceObject2Tag::execute(sprite_instance* m) const
       case REPLACE:
 	  m->replace_display_object(
 	      m_character_id,
-	      m_name,
+	      m_name.c_str(),
 	      m_depth,
 	      m_has_cxform ? &m_color_transform : NULL,
 	      m_has_matrix ? &m_matrix : NULL,
@@ -474,9 +474,6 @@ PlaceObject2Tag::execute(sprite_instance* m) const
 
 PlaceObject2Tag::~PlaceObject2Tag()
 {
-	delete [] m_name;
-
-	m_name = NULL;
 
 	for(size_t i=0; i<m_event_handlers.size(); ++i)
 	{

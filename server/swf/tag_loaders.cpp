@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.182 2008/02/08 18:38:34 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.183 2008/02/12 16:48:38 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -187,8 +187,10 @@ frame_label_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::FRAMELABEL); // 43
 
-    char*	n = in->read_string();
-    m->add_frame_name(n);
+    std::string name;
+    in->read_string(name);
+
+    m->add_frame_name(name);
 
     // FIXME: support SWF6 "named anchors"
     //
@@ -219,8 +221,6 @@ frame_label_loader(stream* in, tag_type tag, movie_definition* m)
 	    );
 	}
     }
-
-    delete [] n;
 }
 
 // Load JPEG compression tables that can be used to load
@@ -987,34 +987,34 @@ void	export_loader(stream* in, tag_type tag, movie_definition* m)
     for (int i = 0; i < count; i++)
     {
 	boost::uint16_t	id = in->read_u16();
-	char*	symbol_name = in->read_string();
+	std::string symbolName;
+	in->read_string(symbolName);
 
 	IF_VERBOSE_PARSE (
-	    log_parse(_("  export: id = %d, name = %s"), id, symbol_name);
+	    log_parse(_("  export: id = %d, name = %s"), id, symbolName.c_str());
 	);
 
 	if (font* f = m->get_font(id))
 	{
 	    // Expose this font for export.
-	    m->export_resource(symbol_name, f);
+	    m->export_resource(symbolName.c_str(), f);
 	}
 	else if (character_def* ch = m->get_character_def(id))
 	{
 	    // Expose this movie/button/whatever for export.
-	    m->export_resource(symbol_name, ch);
+	    m->export_resource(symbolName.c_str(), ch);
 	}
 	else if (sound_sample* ch = m->get_sound_sample(id))
 	{
-	    m->export_resource(symbol_name, ch);
+	    m->export_resource(symbolName.c_str(), ch);
 	}
 	else
 	{
 	    log_error(_("don't know how to export resource '%s' "
 			"with id %d (can't find that id)"),
-		      symbol_name, id);
+		      symbolName.c_str(), id);
 	}
 
-	delete [] symbol_name;
     }
 }
 
@@ -1084,16 +1084,16 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
     for (int i = 0; i < count; i++)
     {
 	boost::uint16_t	id = in->read_u16();
-	std::string symbol_name;
-	in->read_string(symbol_name);
+	std::string symbolName;
+	in->read_string(symbolName);
 	IF_VERBOSE_PARSE
 	(
-	    log_parse(_("  import: id = %d, name = %s"), id, symbol_name.c_str());
+	    log_parse(_("  import: id = %d, name = %s"), id, symbolName.c_str());
 	);
 
 	if (s_no_recurse_while_loading)
 	{
-	    m->add_import(source_url, id, symbol_name.c_str()); // TODO: pass the const ref of string instead
+	    m->add_import(source_url, id, symbolName.c_str()); // TODO: pass the const ref of string instead
 	}
 	else
 	{
@@ -1101,11 +1101,11 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 	    // s_no_recurse_while_loading, change
 	    // create_movie().
 
-	    boost::intrusive_ptr<resource> res = source_movie->get_exported_resource(symbol_name.c_str()); // TODO: pass const string&
+	    boost::intrusive_ptr<resource> res = source_movie->get_exported_resource(symbolName.c_str()); // TODO: pass const string&
 	    if (res == NULL)
 	    {
 		log_error(_("import error: could not find resource '%s' in movie '%s'"),
-			  symbol_name.c_str(), source_url.c_str());
+			  symbolName.c_str(), source_url.c_str());
 	    }
 	    else if (font* f = res->cast_to_font())
 	    {
@@ -1120,7 +1120,7 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 	    else
 	    {
 		log_error(_("import error: resource '%s' from movie '%s' has unknown type"),
-			  symbol_name.c_str(), source_url.c_str());
+			  symbolName.c_str(), source_url.c_str());
 	    }
 	}
 
@@ -1571,18 +1571,17 @@ metadata_loader(stream* in, tag_type tag, movie_definition* /*m*/)
     assert(tag == SWF::METADATA); // 77
 
     // this is supposed to be an XML string
-    char* metadata = in->read_string();
+    std::string metadata;
+    in->read_string(metadata);
 
     IF_VERBOSE_PARSE (
-	log_parse(_("  metadata = [[\n%s\n]]"), metadata);
+	log_parse(_("  metadata = [[\n%s\n]]"), metadata.c_str());
     );
 
-    log_unimpl(_("METADATA tag unused: %s"), metadata);
+    log_unimpl(_("METADATA tag unused: %s"), metadata.c_str());
 
     // TODO: attach to movie_definition instead
     //       (should we parse the XML maybe?)
-
-    delete [] metadata;
 
 }
 
@@ -1645,9 +1644,11 @@ abc_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 
 	if (tag == SWF::DOABCDEFINE)
 	{
+
 		// Skip the 'flags' until they are actually used.
 		static_cast<void> (in->read_u32());
-		std::string name = in->read_string();
+		std::string name;
+		in->read_string(name);
 		name.c_str();
 	}
 
