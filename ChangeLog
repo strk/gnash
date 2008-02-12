@@ -1,3 +1,9 @@
+2008-02-12 Sandro Santilli <strk@keybit.net>
+
+	* server/edit_text_character.{cpp,h}: use instance setting for
+	  "readonly", not definition one. Allows dynamically-created
+	  TextFields to be used as input ones.
+
 2008-02-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/parser/edit_text_character_def.cpp: use ensureBytes checking,

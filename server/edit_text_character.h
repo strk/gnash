@@ -242,6 +242,9 @@ public:
 		return _type;
 	}
 
+	/// Return true if this TextField is read-only
+	bool isReadOnly() const { return _type != typeInput; }
+
 	/// Parse type string value
 	//
 	/// @param val

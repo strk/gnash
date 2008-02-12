@@ -575,7 +575,7 @@ edit_text_character::add_invalidated_bounds(InvalidatedRanges& ranges,
 bool
 edit_text_character::on_event(const event_id& id)
 {
-	if (m_def->get_readonly() == true)
+	if ( isReadOnly() ) 
 	{
 		return false;
 	}
@@ -2052,7 +2052,7 @@ textfield_type_getset(const fn_call& fn)
 	as_value& arg = fn.arg(0);
 	std::string strval = arg.to_string();
 	edit_text_character::TypeValue val = ptr->parseTypeValue(strval);
-	//log_debug("%s (toString->%s) => %d", arg.to_debug_string().c_str(), strval.c_str(), val);
+	log_debug("setting %s.type : %s (toString->%s) => %d", ptr->getTarget().c_str(), arg.to_debug_string().c_str(), strval.c_str(), val);
 	IF_VERBOSE_ASCODING_ERRORS(
 	if ( val == edit_text_character::typeInvalid )
 	{
