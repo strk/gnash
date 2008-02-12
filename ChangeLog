@@ -1,5 +1,7 @@
 2008-02-12 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/Makefile.am: enable the new 
+	  instanceNameTestRunner test.
 	* server/sprite_instance.{cpp,h}: take a pointer to string in
 	  add_display_object and replace_display_object, so that NULL gets
 	  back to having a meaning.

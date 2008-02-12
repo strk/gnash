@@ -1751,6 +1751,7 @@ TEST_CASES = \
 	registerClassTest2runner \
 	opcode_guard_testrunner \
 	runtime_vm_stack_testrunner \
+	instanceNameTestRunner \
 	$(NULL)
 
 if MING_VERSION_0_4
