@@ -1,3 +1,8 @@
+2008-02-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/parser/shape_character_def.cpp: add ensureBytes/Bits checking
+	  to fix assertion failures with malformed SWFs. Fixes bug #22288.
+
 2008-02-12 Sandro Santilli <strk@keybit.net>
 
 	* server/edit_text_character.{cpp,h}: use instance setting for
@@ -7,7 +12,7 @@
 2008-02-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/parser/edit_text_character_def.cpp: use ensureBytes checking,
-	  fixes some zzuf crashers.
+	  fixes some zzuf assertion failures.
 	* server/parser/text_character_def.cpp: use ensureBytes checking.
 
 2008-02-11 Udo Giacomozzi <udo.gnu@nova-sys.net>

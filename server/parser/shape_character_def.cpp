@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.63 2008/01/25 12:10:27 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.64 2008/02/12 08:49:25 bwy Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -222,6 +222,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
     //log_msg("Read %u fill styles, %u line styles", m_fill_styles.size(), m_line_styles.size());
 
   // Use read_u8 to force alignment.
+  in->ensureBytes(1);
   boost::uint8_t num_bits = in->read_u8();
   int num_fill_bits = (num_bits & 0xF0) >> 4;
   int num_line_bits = (num_bits & 0x0F);
@@ -272,9 +273,11 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 
     // SHAPERECORDS
     for (;;) {
+  in->ensureBits(1);
   bool isEdgeRecord = in->read_bit();
   if (!isEdgeRecord) {
       // Parse the record.
+      in->ensureBits(5);
       int flags = in->read_uint(5);
       if (flags == flagEnd) {
     // End of shape records.
@@ -296,7 +299,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
         m_paths.push_back(current_path);
         current_path.m_edges.resize(0);
     }
-
+    in->ensureBits(5);
     int num_move_bits = in->read_uint(5);
     int move_x = in->read_sint(num_move_bits);
     int move_y = in->read_sint(num_move_bits);
@@ -324,6 +327,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
         current_path.ap.x = x;
         current_path.ap.y = y;
     }
+    in->ensureBits(num_fill_bits);
     unsigned style = in->read_uint(num_fill_bits);
     if (style > 0) {
         style += fill_base;
@@ -367,6 +371,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
         current_path.ap.x = x;
         current_path.ap.y = y;
     }
+    in->ensureBits(num_fill_bits);
     unsigned style = in->read_uint(num_fill_bits);
     if (style > 0) {
         style += fill_base;
@@ -408,6 +413,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
         current_path.ap.x = x;
         current_path.ap.y = y;
     }
+    in->ensureBits(num_line_bits);
     unsigned style = in->read_uint(num_line_bits);
     if (style > 0) {
         style += line_base;
@@ -471,15 +477,20 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
     line_base = m_line_styles.size();
     read_fill_styles(m_fill_styles, in, tag_type, m);
     read_line_styles(m_line_styles, in, tag_type, m);
+
+    in->ensureBits(8);
     num_fill_bits = in->read_uint(4);
     num_line_bits = in->read_uint(4);
       }
   } else {
       // EDGERECORD
+      in->ensureBits(1);
       bool edge_flag = in->read_bit();
       if (edge_flag == 0) {
+    in->ensureBits(4);
     int num_bits = 2 + in->read_uint(4);
     // curved edge
+    in->ensureBits(4 * num_bits);
     int cx = x + in->read_sint(num_bits);
     int cy = y + in->read_sint(num_bits);
     int ax = cx + in->read_sint(num_bits);
@@ -497,20 +508,26 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
     y = ay;
       } else {
     // straight edge
+    in->ensureBits(4);
     int num_bits = 2 + in->read_uint(4);
+    in->ensureBits(1);
     bool  line_flag = in->read_bit();
     int dx = 0, dy = 0;
     if (line_flag) {
         // General line.
+        in->ensureBits(2 * num_bits);
         dx = in->read_sint(num_bits);
         dy = in->read_sint(num_bits);
     } else {
+        in->ensureBits(1);
         bool vert_flag = in->read_bit();
         if (vert_flag == 0) {
       // Horizontal line.
+      in->ensureBits(num_bits);
       dx = in->read_sint(num_bits);
         } else {
       // Vertical line.
+      in->ensureBits(num_bits);
       dy = in->read_sint(num_bits);
         }
     }
