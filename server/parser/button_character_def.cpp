@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: button_character_def.cpp,v 1.27 2008/02/01 13:09:38 strk Exp $ */
+/* $Id: button_character_def.cpp,v 1.28 2008/02/12 12:03:10 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -77,6 +77,17 @@ button_record::is_valid()
 	return (m_character_def != NULL);
 }
 
+static std::string
+computeButtonStatesString(int flags)
+{
+	std::string ret;
+	if ( flags & (1<<3) ) ret += "hit";
+	if ( flags & (1<<2) ) { if ( ! ret.empty() ) ret += ","; ret += "down"; }
+	if ( flags & (1<<1) ) { if ( ! ret.empty() ) ret += ","; ret += "over"; }
+	if ( flags & (1<<0) ) { if ( ! ret.empty() ) ret += ","; ret += "up"; }
+	return ret;
+}
+
 bool
 button_record::read(stream* in, int tag_type,
 		movie_definition* m, unsigned long endPos)
@@ -124,16 +135,16 @@ button_record::read(stream* in, int tag_type,
 	if ( ! m_character_def )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_("   button record refer to "
+		log_swferror(_("   button record for states [%s] refer to "
 			"character with id %d, which is not found "
-			"in the chars dictionary"), m_character_id);
+			"in the chars dictionary"), computeButtonStatesString(flags).c_str(), m_character_id);
 		);
 	}
 	else
 	{
 		IF_VERBOSE_PARSE(
-		log_parse(_("   button record for states %x contain "
-			"character %d (%s)"), (m_hit_test<<4)+(m_down<<2)+(m_over<<1)+(m_up), m_character_id,
+		log_parse(_("   button record for states [%s] contain "
+			"character %d (%s)"), computeButtonStatesString(flags).c_str(), m_character_id,
 		        typeName(*m_character_def).c_str());
 		);
 	}
