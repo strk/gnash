@@ -14,4 +14,7 @@ set MalformedSWFVerbosity false
 # Don't bother printing AS errors during automated testing
 set ASCodingErrorsVerbosity false
 
+# Enable sound (for testcases using it..)
+set sound true
+
 # TODO: enable extensions ?

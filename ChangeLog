@@ -1,3 +1,7 @@
+2008-02-12 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/gnashrc.in: force sound enabled.
+
 2008-02-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/character.h: take const std::string& for set_name. 
