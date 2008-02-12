@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: button_character_def.cpp,v 1.28 2008/02/12 12:03:10 strk Exp $ */
+/* $Id: button_character_def.cpp,v 1.29 2008/02/12 12:28:08 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -27,6 +27,7 @@
 #include "stream.h" // for read()
 #include "movie_definition.h"
 #include "action_buffer.h"
+#include "filter_factory.h"
 
 
 namespace gnash {
@@ -110,9 +111,8 @@ button_record::read(stream* in, int tag_type,
 	// Upper 4 bits are:
 	//
 	//   ButtonReserved = readBits (f, 2);
-	//   ButtonHasBlendMode = readBits(f, 1);
-	//   ButtonHasFilterList = readBits(f, 1);
-	//
+	bool buttonHasBlendMode = flags & (1<<5); 
+	bool buttonHasFilterList = flags & (1<<4);
 	m_hit_test = flags & (1<<3); // 8 ? true : false;
 	m_down     = flags & (1<<2); // 4 ? true : false;
 	m_over     = flags & (1<<1); // 2 ? true : false;
@@ -165,6 +165,28 @@ button_record::read(stream* in, int tag_type,
 	{
 		// TODO: pass available range to button cxform read
 		m_button_cxform.read_rgba(in);
+	}
+
+	if ( buttonHasFilterList )
+	{
+		filter_factory::read(*in, true, &_filters);
+		static bool warned=false;
+		if ( ! warned )
+		{
+			log_unimpl("Button filters"); 
+			warned=true;
+		}
+	}
+
+	if ( buttonHasBlendMode )
+	{
+        	_blendMode = in->read_u8();
+		static bool warned=false;
+		if ( ! warned )
+		{
+			log_unimpl("Button blend mode");
+			warned=true;
+		}
 	}
 
 	return true;

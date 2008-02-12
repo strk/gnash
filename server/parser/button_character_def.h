@@ -16,8 +16,10 @@
 #include "matrix.h" // for composition
 #include "cxform.h" // for composition
 #include "action_buffer.h" // for composition of button_action
+#include "filter_factory.h" // for Filters (composition of button_record)
 
 #include <boost/scoped_ptr.hpp>
+#include <boost/cstdint.hpp> // for boost::uint64_t typedef
 
 #ifndef UNUSED
 #define UNUSED(x) ((x) = (x))
@@ -33,6 +35,22 @@ namespace gnash {
 
 class button_record
 {
+
+private:
+
+	/// SWF8 and above can have a number of filters
+	/// associated with button records
+	//
+	/// Currently unused by Gnash.
+	///
+	Filters _filters;
+
+	/// SWF8 and above can have a blend mode
+	/// associated with button records.
+	//
+	/// Currently unused by Gnash.
+	///
+	boost::uint8_t _blendMode;
 
 // TODO: make private, provide accessors 
 public:
@@ -65,6 +83,8 @@ public:
 	///
 	/// @param endPos
 	///	Last stream offset available for a valid read
+	///
+	/// TODO: take the stream by ref, not pointer
 	///
 	bool	read(stream* in, int tag_type, movie_definition* m, unsigned long endPos);
 
