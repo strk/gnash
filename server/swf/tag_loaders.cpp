@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.183 2008/02/12 16:48:38 bwy Exp $ */
+/* $Id: tag_loaders.cpp,v 1.184 2008/02/12 18:52:32 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -997,16 +997,16 @@ void	export_loader(stream* in, tag_type tag, movie_definition* m)
 	if (font* f = m->get_font(id))
 	{
 	    // Expose this font for export.
-	    m->export_resource(symbolName.c_str(), f);
+	    m->export_resource(symbolName, f);
 	}
 	else if (character_def* ch = m->get_character_def(id))
 	{
 	    // Expose this movie/button/whatever for export.
-	    m->export_resource(symbolName.c_str(), ch);
+	    m->export_resource(symbolName, ch);
 	}
 	else if (sound_sample* ch = m->get_sound_sample(id))
 	{
-	    m->export_resource(symbolName.c_str(), ch);
+	    m->export_resource(symbolName, ch);
 	}
 	else
 	{
@@ -1101,7 +1101,7 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 	    // s_no_recurse_while_loading, change
 	    // create_movie().
 
-	    boost::intrusive_ptr<resource> res = source_movie->get_exported_resource(symbolName.c_str()); // TODO: pass const string&
+	    boost::intrusive_ptr<resource> res = source_movie->get_exported_resource(symbolName);
 	    if (res == NULL)
 	    {
 		log_error(_("import error: could not find resource '%s' in movie '%s'"),

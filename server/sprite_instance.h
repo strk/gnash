@@ -394,7 +394,7 @@ public:
 	///       
 	character* add_display_object(
 		boost::uint16_t character_id,
-		const char* name,
+		const std::string& name,
 		const SWFEventsVector& event_handlers,
 		int depth,
 		const cxform& color_transform,
@@ -486,7 +486,7 @@ public:
 	///
 	void	replace_display_object(
 			boost::uint16_t character_id,
-			const char* name,
+			const std::string& name,
 			int depth,
 			const cxform* color_xform,
 			const matrix* mat,
@@ -505,7 +505,7 @@ public:
 	///
 	void	replace_display_object(
 			character* ch,
-			const char* name,
+			const std::string& name,
 			int depth,
 			const cxform* color_xform,
 			const matrix* mat,

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.31 2008/02/12 16:48:38 bwy Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.32 2008/02/12 18:52:32 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -459,7 +459,7 @@ PlaceObject2Tag::execute(sprite_instance* m) const
       case REPLACE:
 	  m->replace_display_object(
 	      m_character_id,
-	      m_name.c_str(),
+	      m_name,
 	      m_depth,
 	      m_has_cxform ? &m_color_transform : NULL,
 	      m_has_matrix ? &m_matrix : NULL,

@@ -256,7 +256,7 @@ static as_value sprite_attach_movie(const fn_call& fn)
   assert(newch->get_ref_count() > 0);
 #endif // ndef GNASH_USE_GC
 
-  newch->set_name(newname.c_str());
+  newch->set_name(newname);
   newch->setDynamic();
 
   // place_character() will set depth on newch
@@ -2385,7 +2385,7 @@ sprite_instance::add_textfield(const std::string& name, int depth, float x, floa
   boost::intrusive_ptr<character> txt_char = txt->create_character_instance(this, 0);
 
   // Give name and mark as dynamic
-  txt_char->set_name(name.c_str());
+  txt_char->set_name(name);
   txt_char->setDynamic();
 
   // Set _x and _y
@@ -2424,7 +2424,7 @@ sprite_instance::duplicateMovieClip(const std::string& newname, int depth,
 
   boost::intrusive_ptr<sprite_instance> newsprite = new sprite_instance(m_def.get(),
       m_root, parent, get_id());
-  newsprite->set_name(newname.c_str());
+  newsprite->set_name(newname);
 
   newsprite->setDynamic();
 
@@ -3060,7 +3060,7 @@ sprite_instance::attachCharacter(character& newch, int depth)
 character*
 sprite_instance::add_display_object(
     boost::uint16_t character_id,
-    const char* name,
+    const std::string& name,
     const std::vector<swf_event*>& event_handlers,
     int depth, 
     const cxform& color_transform, const matrix& mat,
@@ -3090,14 +3090,14 @@ sprite_instance::add_display_object(
   {
     boost::intrusive_ptr<character> ch = cdef->create_character_instance(this, character_id);
     
-    if(name)
+    if(!name.empty())
         {
             ch->set_name(name);
         }
-        else if(ch->wantsInstanceName())
+    else if(ch->wantsInstanceName())
         {
             std::string instance_name = getNextUnnamedInstanceName();
-            ch->set_name(instance_name.c_str());
+            ch->set_name(instance_name);
         }
       
     // Attach event handlers (if any).
@@ -3122,7 +3122,7 @@ sprite_instance::add_display_object(
 void
 sprite_instance::replace_display_object(
         boost::uint16_t character_id,
-        const char* name,
+        const std::string& name,
         int depth,
         const cxform* color_transform,
         const matrix* mat,
@@ -3157,8 +3157,8 @@ sprite_instance::replace_display_object(
    
             replace_display_object(
                 ch.get(), 
-        name, 
-        depth,
+        	name, 
+        	depth,
                 color_transform,
                 mat,
                 ratio, 
@@ -3173,7 +3173,7 @@ sprite_instance::replace_display_object(
 
 void sprite_instance::replace_display_object(
         character* ch,
-        const char* name,
+        const std::string& name,
         int depth,
         const cxform* color_transform,
         const matrix* mat,
@@ -3184,7 +3184,7 @@ void sprite_instance::replace_display_object(
 
     assert(ch != NULL);
 
-    if (name != NULL && name[0] != 0)
+    if (!name.empty())
     {
         ch->set_name(name);
     }

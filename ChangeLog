@@ -1,8 +1,26 @@
+2008-02-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/character.h: take const std::string& for set_name. 
+	* server/sprite_instance.{cpp,h}: use const std::string& instead of
+	  const char* for display_object functions.
+	* server/swf/tag_loaders.cpp: already no need to pass c strings to
+	  export.
+	* server/swf/PlaceObject2Tag.cpp: don't use c_str().
+
 2008-02-12 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/: Makefile.am, instanceNameTest.c:
 	  Add a test showing that NO name is different then EMPTY name
 	  in a PlaceObject tag (previous Ben's patch broke this).
+
+2008-02-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/character.h: take const std::string& for set_name. 
+	* server/sprite_instance.{cpp,h}: use const std::string& instead of
+	  const char* for display_object functions.
+	* server/swf/tag_loaders.cpp: already no need to pass c strings to
+	  export.
+	* server/swf/PlaceObject2Tag.cpp: don't use c_str().
 
 2008-02-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
