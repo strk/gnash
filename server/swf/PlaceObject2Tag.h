@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: PlaceObject2Tag.h,v 1.18 2008/02/12 16:48:38 bwy Exp $ */
+/* $Id: PlaceObject2Tag.h,v 1.19 2008/02/12 20:56:30 strk Exp $ */
 
 #ifndef GNASH_SWF_PLACEOBJECT2TAG_H
 #define GNASH_SWF_PLACEOBJECT2TAG_H
@@ -110,6 +110,7 @@ private:
 	matrix	m_matrix;
 	bool	m_has_matrix;
 	bool	m_has_cxform;
+	bool    m_has_name;
 	boost::uint16_t	m_character_id;
 	int 	m_clip_depth;
 	boost::uint32_t all_event_flags; 

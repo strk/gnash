@@ -394,7 +394,7 @@ public:
 	///       
 	character* add_display_object(
 		boost::uint16_t character_id,
-		const std::string& name,
+		const std::string* name,
 		const SWFEventsVector& event_handlers,
 		int depth,
 		const cxform& color_transform,
@@ -480,13 +480,19 @@ public:
 	///	The color tranform to assign to the new character.
 	///	If NULL the default color transform will be kept.
 	///
+	/// @param name
+	///	The name to give to the newly created instance.
+	///	If NULL, the new instance will be assigned a sequential
+	///	name in the form 'instanceN', where N is incremented
+	///	at each call, starting from 1.
+	///
 	/// @param mat
 	///	The matrix tranform to assign to the new character.
 	///	If NULL the default matrix will be kept.
 	///
 	void	replace_display_object(
 			boost::uint16_t character_id,
-			const std::string& name,
+			const std::string* name,
 			int depth,
 			const cxform* color_xform,
 			const matrix* mat,
@@ -498,14 +504,23 @@ public:
 	/// @param color_xform
 	///	The color tranform to assign to the new character.
 	///	If NULL the default color transform will be kept.
-	//
+	///
+	/// @param ch
+	///	The character instance that should replace the old one.
+	///
+	/// @param name
+	///	The name to give to the new character (ch).
+	///	If NULL, the new instance will be assigned a sequential
+	///	name in the form 'instanceN', where N is incremented
+	///	at each call, starting from 1.
+	///
 	/// @param mat
 	///	The matrix tranform to assign to the new character.
 	///	If NULL the default matrix will be kept.
 	///
 	void	replace_display_object(
 			character* ch,
-			const std::string& name,
+			const std::string* name,
 			int depth,
 			const cxform* color_xform,
 			const matrix* mat,

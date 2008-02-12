@@ -1,5 +1,13 @@
 2008-02-12 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.{cpp,h}: take a pointer to string in
+	  add_display_object and replace_display_object, so that NULL gets
+	  back to having a meaning.
+	* server/swf/PlaceObject2Tag.{cpp,h}: pass NULL to add_display_object
+	  and replace_display_object if a name wasn't specified by user.
+
+2008-02-12 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/gnashrc.in: force sound enabled.
 
 2008-02-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>

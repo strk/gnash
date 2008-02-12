@@ -3060,7 +3060,7 @@ sprite_instance::attachCharacter(character& newch, int depth)
 character*
 sprite_instance::add_display_object(
     boost::uint16_t character_id,
-    const std::string& name,
+    const std::string* name,
     const std::vector<swf_event*>& event_handlers,
     int depth, 
     const cxform& color_transform, const matrix& mat,
@@ -3090,9 +3090,9 @@ sprite_instance::add_display_object(
   {
     boost::intrusive_ptr<character> ch = cdef->create_character_instance(this, character_id);
     
-    if(!name.empty())
+    if(name)
         {
-            ch->set_name(name);
+            ch->set_name(*name);
         }
     else if(ch->wantsInstanceName())
         {
@@ -3122,7 +3122,7 @@ sprite_instance::add_display_object(
 void
 sprite_instance::replace_display_object(
         boost::uint16_t character_id,
-        const std::string& name,
+        const std::string* name,
         int depth,
         const cxform* color_transform,
         const matrix* mat,
@@ -3173,7 +3173,7 @@ sprite_instance::replace_display_object(
 
 void sprite_instance::replace_display_object(
         character* ch,
-        const std::string& name,
+        const std::string* name,
         int depth,
         const cxform* color_transform,
         const matrix* mat,
@@ -3184,9 +3184,14 @@ void sprite_instance::replace_display_object(
 
     assert(ch != NULL);
 
-    if (!name.empty())
+    if (name)
     {
-        ch->set_name(name);
+	ch->set_name(*name);
+    }
+    else if(ch->wantsInstanceName())
+    {
+	std::string instance_name = getNextUnnamedInstanceName();
+	ch->set_name(instance_name);
     }
 
   DisplayList& dlist = const_cast<DisplayList &>( getDisplayList() );
@@ -4077,7 +4082,7 @@ sprite_instance::loadMovie(const URL& url)
 
     save_extern_movie(extern_movie.get());
 
-    const char* name = get_name().c_str();
+    const std::string& name = get_name();
     int depth = get_depth();
     bool use_cxform = false;
     cxform color_transform = get_cxform();
@@ -4092,7 +4097,7 @@ sprite_instance::loadMovie(const URL& url)
     assert(parent_sp);
     parent_sp->replace_display_object(
            extern_movie.get(),
-           name,
+           name.empty() ? NULL : &name, // TODO: check empty != none...
            depth,
            use_cxform ? &color_transform : NULL,
            use_matrix ? &mat : NULL,
