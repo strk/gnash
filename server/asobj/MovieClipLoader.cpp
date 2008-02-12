@@ -40,13 +40,72 @@
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "namedStrings.h"
 #include "array.h" // for _listeners construction
+#include "ExecutableCode.h"
 
 #include <typeinfo> 
 #include <string>
 #include <set>
 #include <boost/algorithm/string/case_conv.hpp> // for PROPNAME 
 
+//#define GNASH_DEBUG 1
+
 namespace gnash {
+
+  /// This class is used to queue a function call action
+  //
+  /// Exact use is to queue onLoadInit, which should be invoked
+  /// after actions of in first frame of a loaded movie are executed.
+  /// Since those actions are queued the only way to execute something
+  /// after them is to queue the function call as well.
+  ///
+  /// The class might be made more general and accessible outside
+  /// of the MovieClipLoader class. For now it only works for
+  /// calling a function with a two argument.
+  ///
+  class DelayedFunctionCall: public ExecutableCode {
+
+  public:
+
+    DelayedFunctionCall(as_object* target, string_table::key name, const as_value& arg1, const as_value& arg2)
+      :
+      _target(target),
+      _name(name),
+      _arg1(arg1),
+      _arg2(arg2)
+    {}
+
+
+    ExecutableCode* clone() const
+    {
+      return new DelayedFunctionCall(*this);
+    }
+
+    virtual void execute()
+    {
+      _target->callMethod(_name, _arg1, _arg2);
+    }
+
+  #ifdef GNASH_USE_GC
+    /// Mark reachable resources (for the GC)
+    //
+    /// Reachable resources are:
+    ///  - the action target (_target)
+    ///
+    virtual void markReachableResources() const
+    {
+      _target->setReachable();
+      _arg1.setReachable();
+      _arg2.setReachable();
+    }
+  #endif // GNASH_USE_GC
+
+  private:
+
+    as_object* _target;
+    string_table::key _name;
+    as_value _arg1, _arg2;
+
+  };
 
 // Forward declarations
 static as_value moviecliploader_loadclip(const fn_call& fn);
@@ -171,14 +230,13 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	/// This event must be dispatched when actions
 	/// in first frame of loaded clip have been executed.
 	///
-	/// Since movie_def_impl::create_movie_instance takes
-	/// care of this, this should be the correct place
-	/// to invoke such an event.
+	/// Since sprite_instance::loadMovie above will invoke stagePlacementCallback
+	/// and thus queue all actions in first frame, we'll queue the
+	/// onLoadInit call next, so it happens after the former.
 	///
-	/// TODO: check if we need to place it before calling
-	///       this function though...
-	///
-	callMethod(NSV::PROP_BROADCAST_MESSAGE, as_value("onLoadInit"), targetVal);
+	//callMethod(NSV::PROP_BROADCAST_MESSAGE, as_value("onLoadInit"), targetVal);
+	std::auto_ptr<ExecutableCode> code ( new DelayedFunctionCall(this, NSV::PROP_BROADCAST_MESSAGE, as_value("onLoadInit"), targetVal) );
+	_vm.getRoot().pushAction(code, movie_root::apDOACTION);
 
 	return true;
 }

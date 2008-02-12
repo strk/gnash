@@ -1,5 +1,11 @@
 2008-02-12 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/MovieClipLoader.cpp: send the onLoadInit event
+	  at the correct time (after actions in first frame of loaded resource
+	  were executed).
+
+2008-02-12 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/button_character_def.{cpp,h}: properly parse button
 	  records with filters and blend mode. Fixes bug #22094.
 
