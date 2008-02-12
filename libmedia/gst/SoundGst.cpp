@@ -175,15 +175,20 @@ SoundGst::stop()
 unsigned int
 SoundGst::getVolume()
 {
-  gdouble volume = 10;
+  // Gstreamer's volume element scales like:
+  // 0 - silent
+  // 1 - passthrough
+  // 10 - amplified 10 times
+
+  gdouble volume = 1;
   g_object_get(G_OBJECT(_volume), "volume", &volume, NULL);
-  return unsigned(volume * 10);
+  return static_cast<unsigned> (volume * 100);
 }
 
 void
 SoundGst::setVolume(unsigned int new_volume)
 {
-  gdouble volume = new_volume / 10;
+  gdouble volume = new_volume / 100.0;
   g_object_set(G_OBJECT(_volume), "volume", volume, NULL);
 }
   
