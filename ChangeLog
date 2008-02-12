@@ -1,5 +1,10 @@
 2008-02-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* server/parser/shape_character_def.cpp: add some checks I missed last
+	  time.
+
+2008-02-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* server/parser/shape_character_def.cpp: add ensureBytes/Bits checking
 	  to fix assertion failures with malformed SWFs. Fixes bug #22288.
 

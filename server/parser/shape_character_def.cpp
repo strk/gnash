@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.64 2008/02/12 08:49:25 bwy Exp $ */
+/* $Id: shape_character_def.cpp,v 1.65 2008/02/12 09:38:37 bwy Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -194,6 +194,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
   {
     rect tbound;
     tbound.read(in);
+    in->ensureBytes(1);
     /*boost::uint8_t scales =*/static_cast<void>(in->read_u8());
     static bool warned = false;
     if ( ! warned )
@@ -301,6 +302,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
     }
     in->ensureBits(5);
     int num_move_bits = in->read_uint(5);
+    in->ensureBits(2 * num_move_bits);
     int move_x = in->read_sint(num_move_bits);
     int move_y = in->read_sint(num_move_bits);
 
@@ -508,9 +510,8 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
     y = ay;
       } else {
     // straight edge
-    in->ensureBits(4);
+    in->ensureBits(5);
     int num_bits = 2 + in->read_uint(4);
-    in->ensureBits(1);
     bool  line_flag = in->read_bit();
     int dx = 0, dy = 0;
     if (line_flag) {
