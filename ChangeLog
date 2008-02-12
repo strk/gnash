@@ -1,3 +1,9 @@
+2008-02-12 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/: Makefile.am, instanceNameTest.c:
+	  Add a test showing that NO name is different then EMPTY name
+	  in a PlaceObject tag (previous Ben's patch broke this).
+
 2008-02-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/stream.{cpp,h}: drop buggy char* read_string()

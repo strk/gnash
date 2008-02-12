@@ -163,6 +163,8 @@ check_PROGRAMS = \
 	opcode_guard_test \
 	runtime_vm_stack_test \
 	new_child_in_unload_test \
+	instanceNameTest \
+	instanceNameTestRunner \
 	$(NULL)
 
 if MING_VERSION_0_4
@@ -1643,6 +1645,18 @@ Video_EmbedSquareTestRunner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	Video-EmbedSquareTest.swf	\
 	$(NULL)
+
+instanceNameTest_SOURCES =	\
+	instanceNameTest.c	\
+	$(NULL)
+instanceNameTest_LDADD = libgnashmingutils.la
+
+instanceNameTest.swf: instanceNameTest
+	./instanceNameTest $(top_srcdir)/testsuite/media
+
+instanceNameTestRunner: $(srcdir)/../generic-testrunner.sh instanceNameTest.swf
+	sh $< $(top_builddir) instanceNameTest.swf > $@
+	chmod 755 $@
 
 Dejagnu_SOURCES =	\
 	Dejagnu.c	\
