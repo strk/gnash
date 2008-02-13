@@ -1,5 +1,10 @@
 2008-02-13 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/Makefile.am: enable test
+	  PrototypeEventListenersTestRunner
+
+2008-02-13 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/with.as: use ASM for setTarget in
 	  with() blocks, or Ming 0.4.0.beta6 would consider it a function
 	  call (as done by the official ide, so "correctly").

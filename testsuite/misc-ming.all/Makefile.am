@@ -1772,6 +1772,7 @@ TEST_CASES = \
 	opcode_guard_testrunner \
 	runtime_vm_stack_testrunner \
 	instanceNameTestRunner \
+	PrototypeEventListenersTestRunner \
 	$(NULL)
 
 if MING_VERSION_0_4
