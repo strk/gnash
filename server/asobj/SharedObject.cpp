@@ -227,7 +227,12 @@ sharedobject_flush(const fn_call& fn)
     // We only want to access files in this directory
     string newspec; 
     newspec += obj->getFilespec();
-    sol.writeFile(newspec, obj->getObjectName().c_str());
+    bool ret = sol.writeFile(newspec, obj->getObjectName().c_str());
+    if ( ! ret )
+    {
+        log_error("writing SharedObject file to %s", newspec.c_str());
+        return as_value(false);
+    }
     return as_value(true); // TODO: check expected return type from SharedObject.flush
 #else
     return as_value(false);
@@ -342,11 +347,12 @@ sharedobject_getlocal(const fn_call& fn)
         typedef tokenizer<char_separator<char> > Tok;
         char_separator<char> sep("/");
         Tok t(obj->getFilespec(), sep);
-        tokenizer<char_separator <char> >::iterator tit;
+        Tok::iterator tit;
         string newdir = newspec;
         for(tit=t.begin(); tit!=t.end();++tit){
             cout << *tit << "\n";
             newdir += *tit;
+            cout << "Dir: " << newdir << " to be created" << endl;
             if (newdir.find("..", 0) != string::npos) {
                 return as_value(false);
             }
@@ -361,7 +367,7 @@ sharedobject_getlocal(const fn_call& fn)
             }
             newdir += "/";
         }
-    }
+    } else log_debug("no slash in filespec %s", obj->getFilespec().c_str());
     
 //     int ret = mkdir(newspec.c_str(), S_IRUSR|S_IWUSR|S_IXUSR);
 //     if ((errno != EEXIST) && (ret != 0)) {
@@ -376,7 +382,7 @@ sharedobject_getlocal(const fn_call& fn)
 
     SOL sol;
     if (sol.readFile(newspec) == false) {
-        log_security("empty SOL file, \"%s\", created", newspec.c_str());
+        log_security("empty or non-existing SOL file \"%s\", will be created on flush/exit", newspec.c_str());
         return as_value(obj.get());
     }
     

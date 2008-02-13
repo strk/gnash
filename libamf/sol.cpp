@@ -203,7 +203,14 @@ bool
 SOL::writeFile(const string &filespec, const string &name)
 {
 //    GNASH_REPORT_FUNCTION;
+	log_debug("Opening file %s in binary mode (for writing?reading?what?)", filespec.c_str());
     ofstream ofs(filespec.c_str(), ios::binary);
+    if ( ! ofs )
+    {
+        log_error("Failed opening file '%s' in binary mode", filespec.c_str());
+        return false;
+    }
+
     vector<boost::uint8_t>::iterator it;
     vector<amf::Element *>::iterator ita; 
     AMF amf_obj;
@@ -287,9 +294,18 @@ SOL::writeFile(const string &filespec, const string &name)
         *ptr++ = (*(it));
     }
     
-    ofs.write(head.get(), _header.size());
+    if ( ofs.write(head.get(), _header.size()).fail() )
+    {
+        log_error("Error writing %d bytes of header to output file %s", _header.size(), filespec.c_str());
+        return false;
+    }
+
 //    ofs.write(body, (ptr - body));
-    ofs.write(body.get(), _filesize);
+    if ( ofs.write(body.get(), _filesize).fail() )
+    {
+        log_error("Error writing %d bytes of body to output file %s", _filesize, filespec.c_str());
+        return false;
+    }
     ofs.close();
 
     return true;

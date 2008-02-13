@@ -1,5 +1,8 @@
 2008-02-13 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/SharedObject.cpp (flush): check return code from
+	  sol::writeFile.
+	* libamf/sol.cpp (writeFile): check ostream operations.
 	* testsuite/actionscript.all/SharedObject.as: add a few more tests
 	  and expect the current failures.
 
