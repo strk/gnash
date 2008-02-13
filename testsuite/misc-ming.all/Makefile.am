@@ -164,7 +164,6 @@ check_PROGRAMS = \
 	runtime_vm_stack_test \
 	new_child_in_unload_test \
 	instanceNameTest \
-	instanceNameTestRunner \
 	$(NULL)
 
 if MING_VERSION_0_4
@@ -252,6 +251,7 @@ check_SCRIPTS = \
 	opcode_guard_testrunner \
 	runtime_vm_stack_testrunner \
 	new_child_in_unload_testrunner \
+	instanceNameTestRunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
