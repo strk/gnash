@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.42 2008/01/17 00:18:51 rsavoye Exp $
+# $Id: Makefile.am,v 1.43 2008/02/13 03:14:20 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -60,25 +60,33 @@ klash_part.moc: $(srcdir)/klash_part.h
 	  ln -s $(srcdir)/klash_part.moc.in klash_part.moc; \
 	fi
 
-# install-data: $(dist_kde_services_DATA)
-# 	test -d $(DESTDIR)$(kde_servicesdir) || $(mkinstalldirs) $(DESTDIR)$(kde_servicesdir)
-# 	$(INSTALL) $(dist_kde_services_DATA) $(DESTDIR)$(kde_servicesdir)
-# 
+install-data: $(dist_kde_services_DATA)
+	test -d $(DESTDIR)$(kde_servicesdir) || $(mkinstalldirs) $(DESTDIR)$(kde_servicesdir)
+	$(INSTALL) $(dist_kde_services_DATA) $(DESTDIR)$(kde_servicesdir)
+
 test_perms:
 	@if test ! -w $(DESTDIR)$(kde_appsdatadir) -o ! -w $(DESTDIR)$(kde_servicesdir); then \
-	  echo "WARNING: Improper permissions for $(DESTDIR)$(kde_appsdatadir) and $(DESTDIR)$(kde_servicesdir)!"; \
-	  echo "You probably need to be root"; \
-	  echo "Or configure with --with-kde-pluginprefix= set to a writable directory"; \
-	exit 1; \
+	  if test -d $(DESTDIR)$(kde_appsdatadir); then \
+	    echo "WARNING: Improper permissions for $(DESTDIR)$(kde_appsdatadir)!"; \
+	    echo "You probably need to be root"; \
+	    echo "Or configure with --with-kde-pluginprefix= set to a writable directory"; \
+	    exit 1; \
+          fi; \
+	  if test -d $(DESTDIR)$(kde_servicesdir); then \
+	    echo "WARNING: Improper permissions for $(DESTDIR)$(kde_appsdatadir) and $(DESTDIR)$(kde_servicesdir)!"; \
+	    echo "You probably need to be root"; \
+	    echo "Or configure with --with-kde-pluginprefix= set to a writable directory"; \
+	    exit 1; \
+	  fi; \
 	fi
 
 install-data-am: $(dist_kde_services_DATA)
-	@echo "No data to install now."
-
-install-plugin-data:
 	test -d $(DESTDIR)$(kde_servicesdir) || $(mkinstalldirs) $(DESTDIR)$(kde_servicesdir)
-	if test 
-	$(INSTALL) $(dist_kde_services_DATA) $(DESTDIR)$(kde_servicesdir)
+	$(INSTALL) $(srcdir)/$(dist_kde_services_DATA) $(DESTDIR)$(kde_servicesdir)
+
+# install-plugin-data:
+# 	test -d $(DESTDIR)$(kde_servicesdir) || $(mkinstalldirs) $(DESTDIR)$(kde_servicesdir)
+# 	$(INSTALL) $(dist_kde_services_DATA) $(DESTDIR)$(kde_servicesdir)
 
 install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 	@echo "Nothing to install here now."
