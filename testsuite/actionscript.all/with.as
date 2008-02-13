@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.38 2007/11/14 22:16:05 strk Exp $";
+rcsid="$Id: with.as,v 1.39 2008/02/13 15:42:50 strk Exp $";
 
 #include "check.as"
 
@@ -383,13 +383,19 @@ setTarget("");
 
 with (o2)
 {
-	setTarget('o:t'); 
+	// NOTE: AS setTarget() used SETTARGET opcode while
+	// ASM settargetexpr uses the setTArgetExpression one.
+	// Problem is that Ming 0.4.0.beta6 correctly compiles
+	// a setTarget() call inside a 'with' block as a function
+	// call rather then as the SETTARGET opcode, so we
+	// *need* to use ASM here, but 'settarget' is not available yet.
+	asm { push 'o:t' settargetexpr }; //setTarget("o:t");
 	check_equals(_target, "/clip1");
-	setTarget("");
+	asm { push '' settargetexpr }; //setTarget("");
 }
 
 // 
-// TODO: add tests for setTargetExpression 
+// TODO: add tests for setTarget
 //
 
 #endif  //OUTPUT_VERSION > 5
