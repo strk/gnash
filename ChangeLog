@@ -1,3 +1,9 @@
+2008-02-13 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/SharedObject.cpp: fix intermediate directories
+	  creation, while still failing if the SOLSafeDir doesn't exist.
+	  Fixes one of the bugs in #22013.
+
 2008-02-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/misc-ming.all/PrototypeEventListeners.as: test mouse

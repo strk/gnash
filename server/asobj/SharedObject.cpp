@@ -233,6 +233,7 @@ sharedobject_flush(const fn_call& fn)
         log_error("writing SharedObject file to %s", newspec.c_str());
         return as_value(false);
     }
+    log_security("SharedObject '%s' written to filesystem.", newspec.c_str());
     return as_value(true); // TODO: check expected return type from SharedObject.flush
 #else
     return as_value(false);
@@ -286,6 +287,14 @@ sharedobject_getlocal(const fn_call& fn)
     if (newspec.size() == 0) {
         newspec = "/tmp/";
     }
+
+    // TODO: check if the base dir exists here, or skip the flush
+    struct stat statbuf;
+    if ( -1 == stat(newspec.c_str(), &statbuf) )
+    {
+       log_error("Invalid SOL safe dir %s: %s", newspec.c_str(), strerror(errno));
+        return as_value(false);
+    }
     
     // Which URL we should use here is under research.
     // The reference player uses the URL from which definition
@@ -318,6 +327,8 @@ sharedobject_getlocal(const fn_call& fn)
     
     // Get the path part
     string swfile = url.path();
+	// TODO: if the original url was a relative one, the pp uses just
+	// the relative portion rather then the resolved absolute path !
     
     if ( rcfile.getSOLLocalDomain() && domain != "localhost") 
     {
@@ -342,45 +353,41 @@ sharedobject_getlocal(const fn_call& fn)
         newspec += swfile;
         newspec += "/";
     }
+    
+    //log_debug("newspec before adding obj's filespec: %s", newspec.c_str());
+    newspec += obj->getFilespec();
+    obj->setFilespec(newspec);
         
-    if (obj->getFilespec().find("/", 0) != string::npos) {
+    if (newspec.find("/", 0) != string::npos) {
         typedef tokenizer<char_separator<char> > Tok;
         char_separator<char> sep("/");
-        Tok t(obj->getFilespec(), sep);
+        Tok t(newspec, sep);
         Tok::iterator tit;
-        string newdir = newspec;
+        string newdir = "/";
         for(tit=t.begin(); tit!=t.end();++tit){
-            cout << *tit << "\n";
+            //cout << *tit << "\n";
             newdir += *tit;
-            cout << "Dir: " << newdir << " to be created" << endl;
             if (newdir.find("..", 0) != string::npos) {
+		log_error("Invalid SharedObject path (contains '..'): %s", newspec.c_str());
                 return as_value(false);
             }
             // Don't try to create a directory of the .sol file name!
-            if (newdir.rfind(".sol", newdir.size()) == string::npos) {
+            // TODO: don't fail if the movie url has a component ending with .sol (eh...)
+            //
+            if (newdir.rfind(".sol") != (newdir.size()-4)) {
                 int ret = mkdir(newdir.c_str(), S_IRUSR|S_IWUSR|S_IXUSR);
                 if ((errno != EEXIST) && (ret != 0)) {
                     log_error("Couldn't create directory for .sol files: %s\n\t%s",
                               newdir.c_str(), strerror(errno));
                     return as_value(false);
                 }
-            }
+            } // else log_debug("newdir %s ends with .sol", newdir.c_str());
             newdir += "/";
         }
-    } else log_debug("no slash in filespec %s", obj->getFilespec().c_str());
-    
-//     int ret = mkdir(newspec.c_str(), S_IRUSR|S_IWUSR|S_IXUSR);
-//     if ((errno != EEXIST) && (ret != 0)) {
-//         log_error("Couldn't create directory for .sol files: %s\n\t%s",
-//                   newspec.c_str(), strerror(errno));
-//         return as_value(false);
-//     }
-    
-    newspec += obj->getFilespec();
-    obj->setFilespec(newspec);
-    log_security("Opening SharedObject file: %s", newspec.c_str());
+    } // else log_debug("no slash in filespec %s", obj->getFilespec().c_str());
 
     SOL sol;
+    log_security("Opening SharedObject file: %s", newspec.c_str());
     if (sol.readFile(newspec) == false) {
         log_security("empty or non-existing SOL file \"%s\", will be created on flush/exit", newspec.c_str());
         return as_value(obj.get());

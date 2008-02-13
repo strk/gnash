@@ -203,7 +203,6 @@ bool
 SOL::writeFile(const string &filespec, const string &name)
 {
 //    GNASH_REPORT_FUNCTION;
-	log_debug("Opening file %s in binary mode (for writing?reading?what?)", filespec.c_str());
     ofstream ofs(filespec.c_str(), ios::binary);
     if ( ! ofs )
     {
