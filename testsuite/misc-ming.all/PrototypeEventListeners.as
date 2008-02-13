@@ -12,7 +12,7 @@
 #define xfail_check _root.xfail
 #define xpass_check _root.xpass
 
-rcsid="$Id: PrototypeEventListeners.as,v 1.2 2008/02/13 14:44:14 bwy Exp $";
+rcsid="$Id: PrototypeEventListeners.as,v 1.3 2008/02/13 15:07:46 bwy Exp $";
 
 
 var countMC;
@@ -60,7 +60,7 @@ Dejagnu._y = 100;
 test1 = function()
 {
 	countMC = 0;
-	note("1. Click!");
+	note("1. Click the mouse anywhere!");
 	_root.onMouseDown = function()
 	{
 		// clip1, clip2, and 2 Dejagnu clips.
@@ -73,19 +73,52 @@ test2 = function()
 {
 	countMC = 0;
 	clip1.removeMovieClip();
-	note("2. Click!");
+	note("2. Click the mouse anywhere!");
 	
 	_root.onMouseDown = function()
 	{
 		// clip2 and 2 Dejagnu clips.
 		check_equals(countMC, 3);
-		endOfTest();
+		test3();
 	};
+};
+
+test3 = function()
+{
+
+	advancer = new Object;
+	Key.addListener(advancer);
+
+	countMC = 0;
+	countOtherFunctions = 0;
+	
+	clip1.removeMovieClip();
+	note("3. Press a key!");
+	
+	_root.onKeyDown = function()
+	{
+		// clip2 and 2 Dejagnu clips.
+		countOtherFunctions++;
+	};
+	
+	clip2.onKeyDown = function()
+	{
+		// clip2 and 2 Dejagnu clips.
+		countOtherFunctions++;
+	};
+	
+	advancer.onKeyDown = function()
+	{
+		check_equals(countMC, 0);
+		check_equals(countOtherFunctions, 0);
+		endofTest();
+	};
+
 };
 
 endOfTest = function()
 {
-	check_totals(9);
+	check_totals(11);
 	_root.ENDOFTEST = true;
 	note("END OF TEST");
 };

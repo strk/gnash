@@ -25,9 +25,9 @@
 #include "character.h"
 #include "dlist.h"
 #include "log.h"
-#include "Point2d.h"
 #include "VM.h"
 #include "string_table.h"
+#include "gnash.h" // gnash::key::code
 
 #include "check.h"
 #include <string>
@@ -53,8 +53,6 @@ main(int /*argc*/, char** /*argv*/)
 	// for variables lookup (consistency checking)
 	string_table& st = root->getVM().getStringTable();
 
-	typedef geometry::Point2d<int> IntPoint;
-
 	check_equals(root->get_frame_count(), 1);
 	check_equals(root->get_current_frame(), 0);
 
@@ -63,9 +61,13 @@ main(int /*argc*/, char** /*argv*/)
 
 	check_equals(root->get_current_frame(), 1);
 
+	tester.pressKey(gnash::key::A); // Should do nothing.
+
 	tester.click();
 
-	tester.click(); 
+	tester.click();
+	
+	tester.pressKey(gnash::key::A);
 
 	// Consistency check !!
 	as_value eot;
