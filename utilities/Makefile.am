@@ -38,6 +38,7 @@ AM_LDFLAGS = \
 	$(LIBXML_LIBS) \
 	$(FFMPEG_LIBS) \
 	$(CURL_LIBS) \
+	$(INTLLIBS) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)
@@ -85,14 +86,14 @@ gprocessor_SOURCES = processor.cpp
 gprocessor_CPPFLAGS = $(AM_CPPFLAGS)
 # export our symbols so they can be used by Gnash plugins
 gprocessor_LDFLAGS = -export-dynamic $(LIBLTDL)
-gprocessor_LDADD = $(GNASH_LIBS) 
+gprocessor_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
 #gprocessor_DEPENDENCIES = 
 
 dumpshm_SOURCES = dumpshm.cpp
-dumpshm_LDADD = $(GNASH_LIBS)
+dumpshm_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
 
 soldumper_SOURCES = soldumper.cpp
-soldumper_LDADD = $(GNASH_LIBS)
+soldumper_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

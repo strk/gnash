@@ -1,5 +1,18 @@
 2008-02-12  Rob Savoye  <rob@ute.welcomehome.org>
 
+	* utilities/Makefile.am: Add INTLLIB, and actually use
+	AM_LDFLAGS.
+	* utilities/dumpshm.cpp: Drop unused support for accessing POSIX
+	memory as raw files. Normalize output so some things work without
+	-v. Add --version option. Re move unused options left from prior
+	project.
+	* utilities/processor.cpp: Use printf instead of log_msg for
+	--version so we can always see it.
+	* utilities/soldumper.cpp: Add support for --help and --version
+	per GNU standards. Use printf instead of log_msg for --version so
+	we can always see it. Use cout instead of log_msg for all outout
+	so we don't contaminate the main log file.
+	
 	* doc/C/dumpshm-man.xml, gprocessor-man.xml, soldumper-man.xml:
 	New man pages for utilities.
 	* doc/C/asspec/asspec.xml:  Update contact info and version.

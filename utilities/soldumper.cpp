@@ -49,8 +49,10 @@ gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 }
 
-static void usage (void);
+const char *SOLDUMPER_VERSION = "0.5";
+static void usage ();
 void dump_ctrl(void *ptr);
+
 int
 main(int argc, char *argv[])
 {
@@ -69,6 +71,19 @@ main(int argc, char *argv[])
     bindtextdomain (PACKAGE, LOCALEDIR);
     textdomain (PACKAGE);
 #endif
+    // scan for the two main standard GNU options
+    for (c = 0; c < argc; c++) {
+      if (strcmp("--help", argv[c]) == 0) {
+        usage();
+        exit(0);
+      }
+      if (strcmp("--version", argv[c]) == 0) {
+        printf (_("Gnash soldumper version: %s, Gnash version: %s\n"),
+		   SOLDUMPER_VERSION, VERSION);
+        exit(0);
+      }
+    }
+ 
     /* This initializes the DBG_MSG macros */ 
     while ((c = getopt (argc, argv, "hvfl")) != -1) {
         switch (c) {
@@ -78,16 +93,16 @@ main(int argc, char *argv[])
             
 	  case 'v':
               dbglogfile.setVerbosity();
-	      log_msg (_("Verbose output turned on"));
+	      cout << _("Verbose output turned on") << endl;
 	      break;
               
 	  case 'f':
-	      log_msg (_("forcing local directory access only"));
+	      cout << _("forcing local directory access only") << endl;
               localdir = true;
 	      break;
 
 	  case 'l':
-	      log_msg (_("List .sol files in the default directory"));
+	      cout << _("List .sol files in the default directory") << endl;
               listdir = true;
 	      break;
 
@@ -108,7 +123,7 @@ main(int argc, char *argv[])
     // get the file name from the command line
     if (optind < argc) {
         filespec = argv[optind];
-        log_msg("Will use \"%s\" for sol files location", filespec.c_str());
+        cout << "Will use \"" << filespec << "\" for sol files location" << endl;
     }
     
     // List the .sol files in the default directory
@@ -158,9 +173,9 @@ main(int argc, char *argv[])
     amf::SOL sol;
     
     if (sol.readFile(newspec)) {
-        log_msg("SOL file \"%s\" read in", newspec.c_str());
+        cout << "SOL file \"" << newspec << "\" read in" << endl;
     } else {
-        log_error("SOL file \"%s\" does not exist!", newspec.c_str());
+	cerr << "SOL file \"" << newspec << "\" does not exist!" << endl;
     }
 
     sol.dump();
@@ -168,7 +183,7 @@ main(int argc, char *argv[])
 
 /// \brief  Display the command line arguments
 static void
-usage (void)
+usage ()
 {
     cerr << _("This program dumps the internal data of a .sol file")
          << endl;

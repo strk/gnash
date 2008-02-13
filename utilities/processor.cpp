@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: processor.cpp,v 1.81 2008/01/21 23:29:46 rsavoye Exp $ */
+/* $Id: processor.cpp,v 1.82 2008/02/13 02:36:34 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -153,13 +153,11 @@ main(int argc, char *argv[])
     for (c = 0; c < argc; c++) {
       if (strcmp("--help", argv[c]) == 0) {
         usage(argv[0]);
-	dbglogfile.removeLog();
         exit(0);
       }
       if (strcmp("--version", argv[c]) == 0) {
-        log_msg (_("Gnash gprocessor version: %s, Gnash version: %s"),
+        printf (_("Gnash gprocessor version: %s, Gnash version: %s\n"),
 		   GPROC_VERSION, VERSION);
-        dbglogfile.removeLog();
         exit(0);
       }
     }
