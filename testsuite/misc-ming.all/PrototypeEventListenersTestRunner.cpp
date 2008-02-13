@@ -53,7 +53,7 @@ main(int /*argc*/, char** /*argv*/)
 	// for variables lookup (consistency checking)
 	string_table& st = root->getVM().getStringTable();
 
-	check_equals(root->get_frame_count(), 1);
+	check_equals(root->get_frame_count(), 2);
 	check_equals(root->get_current_frame(), 0);
 
 	// first frame is just Dejagnu clip...

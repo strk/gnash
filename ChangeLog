@@ -1,5 +1,13 @@
 2008-02-13 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.{cpp,h}: always register as a key and mouse
+	  listener, not relying on equipment of a known handler (as that would
+	  miss prototype assignments).
+	* testsuite/misc-ming.all/PrototypeEventListenersTestRunner.cpp: fix
+	  bogus check.
+
+2008-02-13 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/Makefile.am: enable test
 	  PrototypeEventListenersTestRunner
 

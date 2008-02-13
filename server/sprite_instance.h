@@ -103,12 +103,6 @@ public:
 		TAG_DLIST  = 1<<1
 	};
 
-	virtual void has_key_event() {
-		m_has_key_event = true;
-	}
-
-	virtual void has_mouse_event();
-
 	/// \brief
 	/// Return this sprite's root as
 	/// specified at contruction time
@@ -908,17 +902,6 @@ private:
 	/// Forbid assignment
 	sprite_instance& operator=(const sprite_instance&) { abort(); return *this; }
 
-	/// \brief
-	/// Call has_key_event() or has_mouse_event()
-	/// if the given string correspond to an event handler
-	/// for which registering as a listener of Mouse or Key is needed
-	//
-	///
-	/// @param name
-	///	Member name. 
-	///
-	void checkForKeyOrMouseEvent(const std::string& name);
-
 	/// Advance to a previous frame.
 	//
 	/// This function will basically restore the DisplayList as it supposedly
@@ -1018,11 +1001,6 @@ private:
 
 	/// Increment m_current_frame, and take care of looping.
 	void increment_frame_and_check_for_loop();
-
-	/// key events are: KEY_DOWN, KEY_PRESS, KEY_UP
-	bool m_has_key_event;
-
-	bool m_has_mouse_event;
 
 	typedef boost::intrusive_ptr< edit_text_character > TextFieldPtr;
 	typedef std::vector< TextFieldPtr > TextFieldPtrVect;

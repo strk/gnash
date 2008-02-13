@@ -2098,8 +2098,6 @@ sprite_instance::sprite_instance(
   is_jumping_back(false),
   _callingFrameActions(false),
   m_as_environment(),
-  m_has_key_event(false),
-  m_has_mouse_event(false),
   _text_variables(),
   m_sound_stream_id(-1),
   _userCxform(),
@@ -2125,17 +2123,8 @@ sprite_instance::~sprite_instance()
   // We might have been deleted by Quit... 
   //assert(isDestroyed());
 
-  if (m_has_key_event)
-  {
-    _vm.getRoot().remove_key_listener(this);
-  }
-
-  if (m_has_mouse_event)
-  {
-    _vm.getRoot().remove_mouse_listener(this);
-  }
-
-  //m_display_list.clear();
+  _vm.getRoot().remove_key_listener(this);
+  _vm.getRoot().remove_mouse_listener(this);
 
   for (LoadVariablesThreads::iterator it=_loadVariableRequests.begin();
       it != _loadVariableRequests.end(); ++it)
@@ -2622,10 +2611,10 @@ void sprite_instance::set_member(string_table::key name,
   //log_debug(_("sprite[%p]::set_member(%s, %s)"), (void*)this, VM::get().getStringTable().value(name), val.to_debug_string().c_str());
 #endif
 
-  if ( val.is_function() )
-  {
-    checkForKeyOrMouseEvent(VM::get().getStringTable().value(name));
-  }
+  //if ( val.is_function() )
+  //{
+  //  checkForKeyOrMouseEvent(VM::get().getStringTable().value(name));
+  //}
 
   // Try textfield variables
   //
@@ -3821,19 +3810,8 @@ sprite_instance::call_method_args(const char* method_name,
 void
 sprite_instance::registerAsListener()
 {
-  if (m_has_key_event)
-  {
     _vm.getRoot().add_key_listener(this);
-  }
-  // Mouse events listening is done in has_mouse_event directly.
-  // This shows to work better for attachMovieTest.swf,
-  // but might actually be a completely unrelated issue.
-  // In particular, copying event handlers in attachMovie should
-  // be more closely inspected (and need more ad-hoc testcases)
-  //if (m_has_mouse_event)
-  //{
-    //_vm.getRoot().add_mouse_listener(this);
-  //}
+    _vm.getRoot().add_mouse_listener(this);
 }
   
 
@@ -4121,13 +4099,6 @@ sprite_instance::loadMovie(const URL& url)
   return true;
 }
 
-void
-sprite_instance::has_mouse_event()
-{
-  m_has_mouse_event = true;
-  _vm.getRoot().add_mouse_listener(this);
-}
-
 void 
 sprite_instance::loadVariables(URL url, short sendVarsMethod)
 {
@@ -4280,35 +4251,6 @@ sprite_instance::removeMovieClip()
     _vm.getRoot().dropLevel(depth);
     // I guess this can only happen if someone uses _root.swapDepth([0..1048575])
     //log_error(_("Can't remove sprite %s as it has no parent"), getTarget().c_str());
-  }
-
-}
-
-void
-sprite_instance::checkForKeyOrMouseEvent(const std::string& name)
-{
-  // short-cut
-  if ( name.size() < 9 ) return;
-
-  // TODO: don't use strcmp/strcasecmp, we're a C++ application after all !
-
-  typedef int (*cmp_t) (const char*, const char*);
-  cmp_t cmp = strcmp;
-  if ( _vm.getSWFVersion() < 7 ) cmp = strcasecmp;
-
-  const char* ptr = name.c_str();
-  
-  // AFAIK, there is no user defined "onKeyPress" event handler!
-  if ( ! cmp(ptr, "onKeyDown") 
-    || ! cmp(ptr, "onKeyUp"))
-  {
-    has_key_event();
-  }
-  else if ( ! cmp(ptr, "onMouseDown")
-    || ! cmp(ptr, "onMouseUp") 
-    || ! cmp(ptr, "onMouseMove") )
-  {
-    has_mouse_event();
   }
 
 }
