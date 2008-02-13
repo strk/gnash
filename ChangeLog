@@ -1,3 +1,7 @@
+2008-02-13 Sandro Santilli <strk@keybit.net>
+
+	* doc/C/usermanual/usage.xml: document the new -F switch of gnash.
+
 2008-02-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/misc-ming.all/PrototypeEventListeners.as: a few more

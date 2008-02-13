@@ -301,6 +301,18 @@ Note that this will not work with every website; some embedded Flash files are d
                 (ie: -P "FlashVars=home=http://www.gnu.org").
 	    </entry>
 	  </row>
+	<row>
+	<entry>
+	  <option>-F filedescriptor</option>
+	  </entry>
+	    <entry>
+		Use the given filedescriptor to send requests to the host
+		application. This is currently only used for GETURL requests.
+		The protocol is not documented yet, and also needs improvement.
+		Primary use for this switch is for the NPAPI plugin to properly
+		support javascript and target windows in geturl requests.
+	    </entry>
+	  </row>
 </tbody>
 </tgroup>
 	</table>
