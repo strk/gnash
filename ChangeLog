@@ -1,3 +1,8 @@
+2008-02-13 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/targetPath.as: AS targetPath doesn't
+	  change in Ming 0.4.0.beta6, just the ASM label.
+
 2008-02-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/misc-ming.all/PrototypeEventListeners.as: more tests.

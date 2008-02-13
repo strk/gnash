@@ -20,7 +20,7 @@
  *  Test TARGETPATH tags (0x45)
  */
 
-rcsid="$Id: targetPath.as,v 1.12 2008/01/31 16:25:32 strk Exp $";
+rcsid="$Id: targetPath.as,v 1.13 2008/02/13 15:18:00 strk Exp $";
 
 #include "check.as"
 
@@ -30,7 +30,9 @@ rcsid="$Id: targetPath.as,v 1.12 2008/01/31 16:25:32 strk Exp $";
 # define TARGETPATH targetPath
 #endif
 
-check_equals(TARGETPATH(_root), "_level0");
+// The AS version is always targetPath, just
+// the ASM label changes in case before 0.4.0.beta6
+check_equals(targetPath(_root), "_level0");
 
 #ifdef MING_SUPPORTS_ASM_TARGETPATH
 
