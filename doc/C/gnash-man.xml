@@ -2,12 +2,12 @@
                    "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd"
 [
   <!ENTITY legal SYSTEM "legal.xml">
-  <!ENTITY appversion "0.7">
-  <!ENTITY manrevision "0.3">
-  <!ENTITY date "April 2006">
+  <!ENTITY appversion "0.8">
+  <!ENTITY manrevision "0.4">
+  <!ENTITY date "Feb 2008">
   <!ENTITY app "<application>Gnash</application>">
   <!ENTITY appname "Gnash">
-  <!ENTITY version "0.7">
+  <!ENTITY version "0.8">
 ]
 >
 
@@ -20,7 +20,7 @@
 <!-- the refname becomes the output name of the man page -->
 <refnamediv>
 <refname>gnash</refname>
-<refpurpose>GNU Flash Player</refpurpose>
+<refpurpose>GNU Flash (SWF) Player</refpurpose>
 </refnamediv>
 
 
@@ -32,7 +32,7 @@ gnash (options)... (file)...
 
 <refsect1><title>Description</title>
 <para>
-  Run the Flash movie player.
+  Run the SWF movie player.
 </para>
 
 <variablelist>
@@ -221,10 +221,50 @@ gnash (options)... (file)...
   </varlistentry>
 
   <varlistentry>
-    <term>-b bits</term>
+    <term>-u</term>
     <listitem>
       <para>
-	Bit depth of output window (16 or 32, default is 16).
+	Set "real" url of the movie (useful for downloaded movies).
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-U</term>
+    <listitem>
+      <para>
+	Set "base" url for this run (used to resolve relative urls,
+	defaults to movie url)
+
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-P</term>
+    <listitem>
+      <para>
+	Set parameter (ie. "FlashVars=A=1&amp;b=2")
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-F</term>
+    <listitem>
+      <para>
+	Set filedescriptor to use for external communications.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>--version</term>
+    <listitem>
+      <para>
+	Print the version number, and the configuration of the
+	Gnash player. Please use this info when submitting bug
+	reports.
       </para>
     </listitem>
   </varlistentry>
@@ -344,6 +384,10 @@ gnash (options)... (file)...
     </listitem>
   </varlistentry>
   </variablelist>
+
+<para>
+  Flash is Trademarked by Adobe Corporation.
+</para>
 
 </refsect2>
 </refsect1>

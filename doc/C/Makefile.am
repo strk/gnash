@@ -1,6 +1,6 @@
 ## Process this fillocatee with automake to generate Makefile.in
 # 
-#   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -113,7 +113,7 @@ dist_man_MANS = gnash.1
 
 html: gnash.html actionscript.html
 pdf:  gnash.pdf actionscript.pdf
-man:  gnash.1 
+man:  gnash.1 gprocessor.1 dumpshm.1 soldumper.1
 texi: gnash.texi actionscript.texi
 info: gnash.info actionscript.info
 gnash.pdf gnash.html gnash.texi: $(xml_files) $(entities)
@@ -128,11 +128,17 @@ EXTRA_DIST = \
 	gnash.texi \
 	actionscript.texi \
 	gnash-man.xml \
+	gprocessor-man.xml \
+	dumpshm-man.xml \
+	soldumper-man.xml \
 	actionscript.info \
 	gnash.info \
 	actionscript.html \
 	gnash.html \
-	gnash.1
+	gnash.1 \
+	gprocessor.1 \
+	dumpshm.1 \
+	soldumper.1
 
 if ENABLE_FOP
 .xml.pdf:
@@ -165,7 +171,7 @@ if ENABLE_TEXI
 	$(DB2X_XSLTPROC) -s texi $< --output $${basefile}.txml; \
 	if test x"$(DB2X_VERSION)" = x"0.8.5" -o x"$(DB2X_VERSION)" = x"0.8.7"; then \
 	  $(DB2X_TEXIXML) --encoding=us-ascii//TRANSLIT $${basefile}.txml; \
-	  sed -e "s/setfilename $${basefile}_manual_v.*\.info/setfilename $${basefile}.info/" $${basefile}_manual_v*.texi > $${basefile}.texi ; \
+	  sed -e "s/setfilename $${basefile}_.*\.info/setfilename $${basefile}.info/" $${basefile}_*.texi > $${basefile}.texi ; \
 	  $(RM) $${basefile}_manual_v*.texi; \
 	else \
 	  $(DB2X_TEXIXML) --encoding=us-ascii//TRANSLIT --to-stdout $${basefile}.txml > $${basefile}.texi ; \
@@ -187,6 +193,33 @@ else
 	touch gnash.1
 endif
 
+gprocessor.1: gprocessor-man.xml
+if ENABLE_MAN
+	$(DB2X_XSLTPROC) -s man $(srcdir)/gprocessor-man.xml -o gprocessor.mxml
+	$(DB2X_MANXML) gprocessor.mxml
+	$(RM) gprocessor.mxml
+else
+	touch gprocessor.1
+endif
+
+dumpshm.1: dumpshm-man.xml
+if ENABLE_MAN
+	$(DB2X_XSLTPROC) -s man $(srcdir)/dumpshm-man.xml -o dumpshm.mxml
+	$(DB2X_MANXML) dumpshm.mxml
+	$(RM) dumpshm.mxml
+else
+	touch dumpshm.1
+endif
+
+soldumper.1: soldumper-man.xml
+if ENABLE_MAN
+	$(DB2X_XSLTPROC) -s man $(srcdir)/soldumper-man.xml -o soldumper.mxml
+	$(DB2X_MANXML) soldumper.mxml
+	$(RM) soldumper.mxml
+else
+	touch soldumper.1
+endif
+
 alldocs: html pdf man info
 
 lint:
@@ -206,9 +239,12 @@ CLEANFILES = \
 	omf_timestamp
 
 MAINTAINERCLEANFILES = \
-        gnash.pdf       \
-        gnash.1         \
-        gnash.info      \
+        gnash.pdf \
+        gnash.1 \
+        gprocessor.1 \
+	dumpshm.1 \
+	soldumper.1 \
+        gnash.info \
         gnash.html
 
 install-info-hook: gnash.info

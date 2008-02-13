@@ -1,5 +1,18 @@
   <revhistory>
 
+      <revision> 
+          <revnumber>&appname; Manual version 0.3.0</revnumber> 
+          <date>Oct 2006</date>
+          <revdescription> 
+              <para role="author">Rob Savoye
+              <email>rob@welcomehome.org</email>
+              Updated for the alpha release.
+              </para>
+
+              <para role="publisher">Free Software Foundation</para>
+          </revdescription> 
+      </revision> 
+
       <revision>
           <revnumber>&appname; Manual version 0.4.0</revnumber> 
           <date>June 2007</date>
@@ -14,12 +27,12 @@
       </revision>
 
       <revision> 
-          <revnumber>&appname; Manual version 0.3.0</revnumber> 
-          <date>Oct 2006</date>
+          <revnumber>&appname; Manual version 0.4.1</revnumber> 
+          <date>Feb 2008</date>
           <revdescription> 
               <para role="author">Rob Savoye
-              <email>rob@senecass.com</email>
-              Updated for the alpha release.
+              <email>rob@welcomehome.org</email>
+              Updated for the 0.8.2 release.
               </para>
 
               <para role="publisher">Free Software Foundation</para>

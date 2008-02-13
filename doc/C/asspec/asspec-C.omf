@@ -2,18 +2,18 @@
 <omf>
   <resource>
     <creator>
-     rob@senecass.com (Rob Savoye)
+     rob@welcomehome.org (Rob Savoye)
     </creator>
     <maintainer>
-     rob@senecass.com (Rob Savoye)
+     rob@welcomehome.org (Rob Savoye)
     </maintainer>
     <title>
      Free Flash Specification
     </title>
     <date>
-     2006-02-06
+     2008-02-12
     </date>
-    <version identifier="0.1.1" date="2006-02-06" description="First release."/>
+    <version identifier="0.1.2" date="2008-02-12" description="First release."/>
     <subject category="GNOME|Applications|Sound and Video"/>
     <description>
         This is a community produced specification of Flash and ActionScript.

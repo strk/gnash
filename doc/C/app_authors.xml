@@ -2,27 +2,19 @@
     <title>Authors</title>
 
     <para>
-        &app; is maintained by Rob Savoye <email>rob@senecass.com</email>.  
+        &app; is maintained by Rob Savoye <email>rob@welcomehome.org</email>.  
         Other active developers are: Sandro Santilli, Bastiaan Jacques, 
         and Tomas Groth.  Please send all comments and suggestions to
         <email>gnash-dev@gnu.org</email>. 
     </para>
 
     <para>
-        Rob Savoye is available for consulting on a variety of renewable
-        energy and open source technologies.  Please refer to
-        <ulink type="http" 
-        url="http://www.senecass.com">http://www.senecass.com</ulink>
-        for more information.
-    </para>
-    
-    <para>
         &app; was initially derived from <application>GameSWF</application>.
         <application>GameSWF</application> is maintained by
         Thatcher Ulrich <email>tu@tulrich.com</email>.  The following
         people contributed to <application>GameSWF</application>:
         Mike Shaver, Thierry Berger-Perrin,
-        Ignacio Castaño, Willem Kokke, Vitaly Alexeev, Alexander Streit, 
+        Ignacio CastaÃ±o, Willem Kokke, Vitaly Alexeev, Alexander Streit, 
         and Rob Savoye.
     </para>
 

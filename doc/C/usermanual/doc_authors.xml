@@ -4,21 +4,10 @@
           <surname>Savoye</surname> 
           <affiliation> 
 	      <address>
-	          <email>rob@senecass.com</email>
+	          <email>rob@welcomehome.org</email>
 	      </address> 
           </affiliation> 
       </author> 
-
-      <othercredit role="maintainer">
-        <firstname>Melissa</firstname>
-        <surname>Goldin</surname>
-        <affiliation>
-          <address> 
-              <email>mgoldin@lulu.com</email>
-          </address>
-        </affiliation>
-        <contrib>Document maintainer</contrib>
-      </othercredit>
 
       <!-- TRANSLATOR NOTE: add yourself to this section
       <othercredit role="translator">

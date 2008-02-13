@@ -3,9 +3,9 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
  "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
     
-    <!ENTITY appversion "0.8.1">
-    <!ENTITY manrevision "0.4.1">
-    <!ENTITY date "August 2007">
+    <!ENTITY appversion "0.8.2">
+    <!ENTITY manrevision "0.4.3">
+    <!ENTITY date "feb 2008">
     <!ENTITY app "<application>Gnash</application>">
     <!ENTITY appname "Gnash">
     <!ENTITY AS "ActionScript">
@@ -35,6 +35,8 @@
     <!ENTITY building         SYSTEM "usermanual/installation/building.xml">
     <!ENTITY install          SYSTEM "usermanual/installation/install.xml">
     <!ENTITY gnashrc          SYSTEM "usermanual/usage/gnashrc.xml">
+    <!ENTITY amf              SYSTEM "amf.xml">
+    <!ENTITY rtmp             SYSTEM "rtmp.xml">
  ]
 >
 
@@ -47,14 +49,14 @@
   <bookinfo>
       <title>&app; Developer's Guide version &manrevision;</title>
       <copyright>
-         <year>2005, 2006, 2007</year>
+         <year>2005, 2006, 2007, 2008</year>
          <holder>Free Software Foundation</holder>
       </copyright>
 
   <!-- TRANSLATOR NOTE: uncomment this section
 
       <copyright>
-         <year>2007</year>
+         <year>2008</year>
          <holder>ME-THE-TRANSLATOR (Latin translation)</holder>
       </copyright>
 
@@ -85,6 +87,9 @@
   &usage;
   &bugreport;
   &glossary;
+
+  &amf;
+  &rtmp;
 
 <!-- ============= Authors =================================== -->
   &programmers;

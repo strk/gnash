@@ -3,8 +3,8 @@
     "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
   <!ENTITY legal SYSTEM "legal.xml">
   <!ENTITY fdl-app SYSTEM "fdl-appendix.xml">
-  <!ENTITY manrevision "0.2">
-  <!ENTITY date "March 2007">
+  <!ENTITY manrevision "0.3">
+  <!ENTITY date "Feb 2008">
   <!ENTITY app "<application>Free ActionScript Specification</application>">
   <!ENTITY appname "Free ActionScript Specification">
   <!ENTITY asaccessibility SYSTEM "accessibility.xml">
@@ -53,13 +53,13 @@
    <articleinfo>
      <title>&app; V&manrevision;</title>
      <copyright>
-       <year>2005, 2006, 2007</year>
+       <year>2005, 2006, 2007, 2008</year>
        <holder>Free Software Foundation</holder>
      </copyright>
 <!-- translators: uncomment this:
 
   <copyright>
-   <year>2005, 2006, 2007</year>
+   <year>2005, 2006, 2007, 2008</year>
    <holder>ME-THE-TRANSLATOR (Latin translation)</holder>
   </copyright>
 
