@@ -12,14 +12,22 @@
 #define xfail_check _root.xfail
 #define xpass_check _root.xpass
 
-rcsid="$Id: PrototypeEventListeners.as,v 1.1 2008/02/13 13:55:02 bwy Exp $";
+rcsid="$Id: PrototypeEventListeners.as,v 1.2 2008/02/13 14:44:14 bwy Exp $";
 
 
 var countMC;
-var countTF;
+
+// Should remain 0;
+var countTF = 0;
 
 MovieClip.prototype.onMouseDown = function() { 
               note(this+".onMouseDown");
+              check_equals(typeof(this), "movieclip");
+              countMC++;
+};
+
+MovieClip.prototype.onKeyUp = function() { 
+              note(this+".onKeyDown");
               note(typeof(this));
               countMC++;
 };
@@ -55,6 +63,7 @@ test1 = function()
 	note("1. Click!");
 	_root.onMouseDown = function()
 	{
+		// clip1, clip2, and 2 Dejagnu clips.
 		check_equals(countMC, 4);
 		test2();
 	};
@@ -68,6 +77,7 @@ test2 = function()
 	
 	_root.onMouseDown = function()
 	{
+		// clip2 and 2 Dejagnu clips.
 		check_equals(countMC, 3);
 		endOfTest();
 	};
@@ -75,10 +85,9 @@ test2 = function()
 
 endOfTest = function()
 {
+	check_totals(9);
 	_root.ENDOFTEST = true;
 	note("END OF TEST");
-	check_totals(2);
-	_root.onMouseDown = undefined;
 };
 
 test1();

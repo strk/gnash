@@ -1,3 +1,11 @@
+2008-02-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* testsuite/misc-ming.all/PrototypeEventListeners.as: a few more
+	  tests.
+	* testsuite/misc-ming.all/PrototypeEventListenersTestRunner.cpp:
+	  automatic test runner.
+	* testsuite/misc-ming.all/Makefile.am: enable tests.
+
 2008-02-13 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/SharedObject.cpp: fix intermediate directories

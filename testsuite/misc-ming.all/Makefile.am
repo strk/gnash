@@ -30,6 +30,7 @@ CLEANFILES =  \
 	testrun.log
 
 EXTRA_DIST = VarAndCharClashTest.as \
+	PrototypeEventListeners.as \
 	DragDropTest.as \
 	gotoFrame2Test.as \
 	DrawingApiTest.as \
@@ -140,6 +141,7 @@ check_PROGRAMS = \
 	eventSoundTest1 \
 	eventSoundTest1-Runner \
 	DrawingApiTestRunner \
+	PrototypeEventListenersTestRunner \
 	DragDropTestRunner   \
 	frame_label_test \
 	path_format_test \
@@ -1527,6 +1529,24 @@ DrawingApiTestRunner_LDADD = \
 DrawingApiTestRunner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	DrawingApiTest.swf	\
+	$(NULL)
+
+PrototypeEventListeners.swf: $(srcdir)/PrototypeEventListeners.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
+	$(MAKESWF) -r12 -o $@ -v6 -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 Dejagnu.swf $(srcdir)/PrototypeEventListeners.as
+
+PrototypeEventListenersTestRunner_SOURCES = \
+	PrototypeEventListenersTestRunner.cpp \
+	$(NULL)
+PrototypeEventListenersTestRunner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+PrototypeEventListenersTestRunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+PrototypeEventListenersTestRunner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	PrototypeEventListeners.swf	\
 	$(NULL)
 
 DragDropTest.swf: $(srcdir)/DragDropTest.as Dejagnu.swf DragDropTestLoaded.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
