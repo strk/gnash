@@ -1,0 +1,8 @@
+# Watch control file for uscan
+# See uscan(1) for format
+
+# Compulsory line, this is a version 3 file
+version=3
+
+# Examine an FTP server
+ftp://ftp.gnu.org/pub/gnu/gnash/(.*)/gnash-(.*)\.tar\.gz debian uupdate
