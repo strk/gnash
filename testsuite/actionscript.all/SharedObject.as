@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: SharedObject.as,v 1.20 2008/01/22 10:35:18 strk Exp $";
+rcsid="$Id: SharedObject.as,v 1.21 2008/02/13 10:47:36 strk Exp $";
 
 #include "check.as"
 
@@ -87,11 +87,13 @@ delete so.data.tmp;
 // But a getLocal call using a *different* "id" returns
 // a different SharedObject...
 so3 = SharedObject.getLocal("level1/level2/settings3", "/");
-check(so3 != so);
+xcheck(so3 != so);
 
 
 // trace(so.getSize());
-so.flush();
+ret = so.flush();
+check_equals(typeof(ret), 'boolean');
+check_equals(ret, true);
 
 
 newso = SharedObject.getLocal("level1/level2/settings", "/");
@@ -131,6 +133,12 @@ if (typeof(newso.data) != 'undefined') {
     trace("New Shared Object doesn't exist!");
 }
 
-check_totals(33);
+so4 = SharedObject.getLocal("Another one", "/subdir");
+xcheck(so4 != so3);
+xcheck_equals(typeof(so4.data), 'undefined');
+ret = so4.flush();
+xcheck_equals(typeof(ret), 'undefined');
+
+check_totals(38);
 
 #endif // OUTPUT_VERSION >= 6
