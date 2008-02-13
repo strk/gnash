@@ -1,27 +1,20 @@
 Source: gnash
 Priority: optional
 Maintainer: Miriam Ruiz <little_miry@yahoo.es>
-Build-Depends: debhelper (>= 4.0.0), autoconf, automake, libxmu-dev, dejagnu, autotools-dev, libxml2-dev, libjpeg-dev, libpng-dev, libsdl1.2-dev, libsdl-mixer1.2-dev, libgl1-mesa-dev | xlibmesa-gl-dev, libglu1-mesa-dev | libglu1-xorg-dev, libgtkglext1-dev, libmad0-dev, mozilla-dev
+Build-Depends: debhelper (>= 4.0.0), autoconf, automake, libxmu-dev,
+ dejagnu, autotools-dev, libxml2-dev, libjpeg-dev, libpng-dev
+# libsdl1.2-dev libgtkglext1-dev
 Standards-Version: 3.6.2
 Section: utils
-
-Package: gnash-dev
-Section: libdevel
-Architecture: any
-Depends: libgnash0 (= ${Source-Version})
-Description: free Flash movie player - development files
- Gnash is a Free Flash movie player, which works either standalone, or as a
- Firefox/Mozilla plugin. This package includes the development files.
- .
-  Homepage: http://www.gnu.org/software/gnash/
 
 Package: libgnash0
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: free Flash movie player - shared libraries
- Gnash is a Free Flash movie player, which works either standalone, or as a
- Firefox/Mozilla plugin. This package includes the shared libraries.
+ Gnash is a Free Flash movie player, which works either standalone, or
+ as a Firefox/Mozilla plugin. This package includes the shared
+ libraries. 
  .
   Homepage: http://www.gnu.org/software/gnash/
 
@@ -33,16 +26,18 @@ Description: free Flash movie player
  Gnash is a Free Flash movie player, which works either standalone, or as a
  Firefox/Mozilla plugin.
  .
- Gnash supports the current Shockwave format, version 7. While all the
- ActionScript classes exist, not all of the methods defined by the SWF format
- documentation are implemented however, so not all flash movies work 100% if
- they utilize any of the unimplemented methods. This is one of the areas to
- work on to achieve full version 7 compliance.
+ Gnash supports the current Shockwave format, version 7 reasonably well,
+ and some version 8 and 9 files. Support for v8/9 is under development.
+ While all the ActionScript 2 classes exist, not all of the methods
+ defined by the SWF format documentation are implemented however, so
+ not all flash movies work 100% if they utilize any of the
+ unimplemented methods. This is one of the areas to work on to achieve
+ full version 9 compliance. 
  .
-  Included in the Gnash is an XML based messaging system, as specified in
- the Flash specification. This lets a flash movie communicate over a TCP/IP
- socket, and parse the incoming XML message. This lets a movie be a remote
- control for other devices or applications.
+  Included in the Gnash is an XML based messaging system, as specified
+ in the Flash specification. This lets a flash movie communicate over
+ a TCP/IP socket, and parse the incoming XML message. This lets a
+ movie be a remote control for other devices or applications.
  .
   Homepage: http://www.gnu.org/software/gnash/
 
@@ -51,9 +46,9 @@ Section: utils
 Architecture: any
 Depends: libgnash0 (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: free Flash movie player - Plugin
- Gnash is a Free Flash movie player, which works either standalone, or as a
- Firefox/Mozilla plugin. This package includes the plugin for Mozilla Web
- Browser.
+ Gnash is a Free Flash movie player, which works either standalone, or
+ as a Firefox/Mozilla plugin. This package includes the plugin for
+ Mozilla Web Browser.
  .
   Homepage: http://www.gnu.org/software/gnash/
 
@@ -62,8 +57,8 @@ Section: utils
 Architecture: any
 Depends: libgnash0 (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: free Flash movie player - Plugin
- Gnash is a Free Flash movie player, which works either standalone, or as a
- Firefox/Mozilla plugin. This package includes the plugin for the Konqueror
- Web Browser.
+ Gnash is a Free Flash movie player, which works either standalone, or
+ as a Firefox/Mozilla plugin. This package includes the plugin for the
+ Konqueror Web Browser.
  .
   Homepage: http://www.gnu.org/software/gnash/

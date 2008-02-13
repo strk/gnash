@@ -1,5 +1,9 @@
-gnash (0.7-1) unstable; urgency=low
+gnash (20080112cvs) unstable; urgency=low
 	
+  * klash is now called kde-gnash. Configure options have changed also.
+	
+ -- Rob Savoye <rob@welcomehome.org>  Fri, 25 Apr 2006 4:20:00 +0600
+
   * Initial release Closes: #347352
 	
  -- Rob Savoye <rob@welcomehome.org>  Fri, 25 Apr 2006 4:20:00 +0600
