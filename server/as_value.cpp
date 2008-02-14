@@ -118,7 +118,7 @@ as_value::to_string() const
 		case MOVIECLIP:
 		{
 			const CharacterProxy& sp = getCharacterProxy();
-			if ( sp.isDangling() )
+			if ( ! sp.get() )
 			{
 				return "";
 			}

@@ -1,5 +1,12 @@
 2008-02-14 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.cpp (to_string): movieclips oughta evaluate
+	  to the empty string only if dangling and not rebound.
+	* testsuite/actionscript.all/MovieClipLoader.as: test that rebound
+	  soft refs convert to non-empty string.
+
+2008-02-14 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/BitmapMovieDefinition.h: advertise one frame loaded,
 	  fixes last failure in loadMovieTest.swf.
 	* server/sprite_instance.cpp (loadMovie): copy clip-events to loaded

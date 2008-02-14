@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClipLoader.as,v 1.16 2008/02/11 08:33:38 strk Exp $";
+rcsid="$Id: MovieClipLoader.as,v 1.17 2008/02/14 21:10:18 strk Exp $";
 
 #include "check.as"
 
@@ -171,6 +171,10 @@ mcl.onLoadError = function(target, msg, n)
 mcl.onLoadStart = function(target)
 {
 	check_equals(arguments.length, 1);
+	// a bug in Gnash made softrefs always convert
+	// to the empty string when not pointing to
+	// their original target...
+	check(target+"" != "");
 	check_equals(target, expected.target);
 	state.onLoadStartCalls++;
 	note("onLoadStart("+target+", "+target._url+") called");
@@ -311,7 +315,7 @@ function test3()
 	// subtract the number of progress callback runs reported when playing from the totals to get the correct number
 	// BUT MAKE SURE nextTestOrEnd CONTAINS THE CORRECT testsPerProgressCallback INFO !!
 	//
-	expected.totals = 70;
+	expected.totals = 72;
 	// gnash doesn't call onLoadInit if the data at the url is not an SWF or JPG
 	// (or whatever else can become a movie_instance), while the PP does.
 	// So in this testcase, the attempt to load vars.txt is invalid for Gnash
