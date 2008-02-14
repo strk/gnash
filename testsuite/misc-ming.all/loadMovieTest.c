@@ -129,12 +129,18 @@ add_coverart(SWFMovie mo, int x, int y)
 	SWFDisplayItem_moveTo(it, x, y);
 
 	snprintf(buf, BUFSIZE,
+		"_level0.coverart.onUnload = function() {"
+		"	_root.note(this+'.onUnload called');"
+		"};"
 		"_level0.coverart.onMouseDown = function() {"
 		//"  _root.note('_url is '+this._url);"
 		"  var lastUrlComponent = this._url.substring(this._url.lastIndexOf('/')+1);"
 		//"  _root.note('last component of _url is '+lastUrlComponent);"
 		"  _root.check_equals(lastUrlComponent, _level0.expectLoaded, '%s:%d');"
 		"  _root.check_equals(this.getDepth(), -16377);"
+		"  _root.check_equals(this.getBytesLoaded(), this.getBytesTotal());"
+		"  _root.check(this.getBytesLoaded() > 0);" /* assuming something was loaded here */
+		"  _root.note('bytesLoaded: '+this.getBytesLoaded());"
 		"  if ( Key.isDown(Key.SHIFT) ) _root.totals();"
 		"  else _root.note('2 tests run');"
 		"};"
