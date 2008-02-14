@@ -16,7 +16,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%{_target_cpu}
 
 BuildRequires:  libpng-devel libjpeg-devel libogg-devel
 BuildRequires:  gtk2-devel libX11-devel libXt-devel
-BuildRequires:  agg-devel libxml2-devel boost-devel curl-devel libXt-devel
+# BuildRequires:  agg-devel libxml2-devel boost-devel curl-devel libXt-devel
 # the opengl devel packages are required by gtkglext-devel
 # monolithic Xorg
 #BuildRequires:  xorg-x11-devel
@@ -123,7 +123,7 @@ RPM_TARGET=%{_target}
   %endif
 %else
 # Native RPM build
-  CROSS_OPTS="--enable-ghelp --enable-docbook"
+  CROSS_OPTS="" # "--enable-ghelp --enable-docbook"
   SOUND="--enable-media=gst"
   RENDERER=""
 %endif
@@ -207,13 +207,13 @@ scrollkeeper-update -q || :
 %{_datadir}/man/man1/gnash.1*
 %{_datadir}/locale/*/LC_MESSAGES/gnash.mo
 %doc doc/C/gnash.html 
-%doc %{_prefix}/share/gnash/doc/gnash/C/images
-%{_datadir}/omf/gnash/gnash-C.omf
-%{_datadir}/omf/gnash/asspec-C.omf
-%{_infodir}/*.info.gz
-%{_prefix}/share/gnash/doc/gnash/C/*.xml
-%{_prefix}/share/gnash/doc/asspec/C/*.xml
-%{_prefix}/share/gnash/doc/asspec/images/*.png
+# %doc %{_prefix}/share/gnash/doc/gnash/C/images
+# %{_datadir}/omf/gnash/gnash-C.omf
+# %{_datadir}/omf/gnash/asspec-C.omf
+# %{_infodir}/*.info.gz
+# %{_prefix}/share/gnash/doc/gnash/C/*.xml
+# %{_prefix}/share/gnash/doc/asspec/C/*.xml
+# %{_prefix}/share/gnash/doc/asspec/images/*.png
 %endif
 
 %files plugin
