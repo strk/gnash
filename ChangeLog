@@ -1,5 +1,9 @@
 2008-02-14 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (on_event): still look for a user-defined
+	  onLoad handler if the sprite is dynamic. Fixes latest testcase, but
+	  not FlowPlayer yet (which was the inspiration for the previous
+	  test).
 	* testsuite/misc-ming.all/registerClassTest.c: test that used-defined
 	  onLoad should be called when available for dynamic clips placed
 	  by attachMovie (even when 'clip' event flags are all zero..).

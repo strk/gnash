@@ -2510,21 +2510,23 @@ sprite_instance::on_event(const event_id& id)
   }
 
 
-  // NOTE: user-defined onLoad is not invoked if the corresponding
-  //       clip-defined onLoad is not present (zou mentions if
-  //       NO clip-defined events are instead)
+  // NOTE: user-defined onLoad is not invoked for static
+  //       clips on which no clip-events are defined.
+  //       see testsuite/misc-ming.all/action_execution_order_extend_test.swf
   //
   //   Note that this can't be true for sprites
-  //   not placed by PlaceObject
+  //   not placed by PlaceObject, see
+  //   testsuite/misc-ming.all/registerClassTest.swf
   //
   if ( id.m_id == event_id::LOAD )
   {
-    if ( get_parent() && get_event_handlers().empty() )
+    if ( (!isDynamic()) && get_parent() && get_event_handlers().empty() )
     {
-#ifdef GNASH_DEBUG
-      log_debug("Sprite %s won't check for user-defined LOAD event (had no clip events defined)", getTarget().c_str());
-      testInvariant();
-#endif
+//#ifdef GNASH_DEBUG
+      log_debug("Sprite %s (depth %d) won't check for user-defined LOAD event (is not dynamic, has a parent and had no clip events defined)",
+		getTarget().c_str(), get_depth());
+      //testInvariant();
+//#endif
       
       return called;
     }
