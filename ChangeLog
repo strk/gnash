@@ -1,5 +1,7 @@
 2008-02-14 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/MovieClipLoader.cpp (loadClip): fetch bytes
+	  loaded/total from the loaded clip, not the replaced one.
 	* server/as_value.cpp (to_string): movieclips oughta evaluate
 	  to the empty string only if dangling and not rebound.
 	* testsuite/actionscript.all/MovieClipLoader.as: test that rebound

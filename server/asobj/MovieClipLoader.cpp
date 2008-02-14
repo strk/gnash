@@ -214,12 +214,20 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 		return false;
 	}
 
+	sprite_instance* newChar = targetVal.to_sprite(); // this is to resolve the soft ref
+	if ( ! newChar )
+	{
+		// We could assert, but let's try to be nicer...
+		log_error("sprite_instance::loadMovie destroyed self w/out replacing ?");
+		return false;
+	}
+
 	// Dispatch onLoadStart
 	callMethod(NSV::PROP_BROADCAST_MESSAGE, as_value("onLoadStart"), targetVal);
 
 	// Dispatch onLoadProgress
-	size_t bytesLoaded = target.get_bytes_loaded();
-	size_t bytesTotal = target.get_bytes_total();
+	size_t bytesLoaded = newChar->get_bytes_loaded();
+	size_t bytesTotal = newChar->get_bytes_total();
 	callMethod(NSV::PROP_BROADCAST_MESSAGE, as_value("onLoadProgress"), targetVal,
 		bytesLoaded, bytesTotal);
 
