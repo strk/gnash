@@ -106,7 +106,7 @@ main(int argc, char** argv)
 	/* (maybe it's related to loop-back handling ?) */
 	SWFMovie_nextFrame(mo);  /* end of frame1 */
 
-	add_actions(mo, "counter = 1;");
+	add_actions(mo, "counter = 1; onLoadCalled = new Array();");
 
 	add_actions(mo,
 		"var name1 = 'square'+counter;"
@@ -119,6 +119,7 @@ main(int argc, char** argv)
 
 	add_actions(mo,
 		"function CustomClass() { this._x = 80; }"
+		"CustomClass.prototype.onLoad = function() { note(this+'.onLoad called'); _root.onLoadCalled.push(this); };"
 		"registerClassRet = Object.registerClass('redsquare', CustomClass);"
 		);
 
@@ -141,6 +142,8 @@ main(int argc, char** argv)
 		"registerClassRet = Object.registerClass('redsquare', CustomClass2);"
 		);
 
+	check_equals(mo, "_root.onLoadCalled.length", "1");
+	check_equals(mo, "_root.onLoadCalled[0]", "_level0.square2");
 	check_equals(mo, "typeof(registerClassRet)", "'boolean'");
 	check_equals(mo, "registerClassRet", "true");
 
@@ -191,7 +194,7 @@ main(int argc, char** argv)
 	check(mo, "clip4 instanceOf MovieClip");
 
 	add_actions(mo,
-		"totals(22);"
+		"totals(24);"
 		"stop();"
 		);
 
