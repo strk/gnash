@@ -1,5 +1,15 @@
 2008-02-14 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (on_event): reword the onLoad handling so
+	  that sprites with a registered class won't skip the user-defined
+	  handler. Fixes the new tests in registerClassTest2.c and one of the
+	  bugs exposed by FlowPlayer.
+	* testsuite/misc-ming.all/registerClassTest2.c: expect failures in
+	  order of execution of the onLoad handlers (this might be the reason
+	  for the overly complex handling of onLoad handler in current gnash).
+
+2008-02-14 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/registerClassTest2.c: test that user-defined
 	  onLoad handler is still invoked if no clip events are defined and
 	  the object is not dynamic (placed by onClipEvent).

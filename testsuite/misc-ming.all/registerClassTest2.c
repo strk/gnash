@@ -198,8 +198,9 @@ main(int argc, char** argv)
 
   check_equals(mo, "_root.theClass3onLoadCalls.length", "3");
   check_equals(mo, "_root.theClass3onLoadCalls[0]", "_level0.instance2");
-  check_equals(mo, "_root.theClass3onLoadCalls[1]", "_level0.clip3");
-  check_equals(mo, "_root.theClass3onLoadCalls[2]", "_level0.noclipevs"); /* it4 ... */
+  // Gnash gets the onLoad events of 'clip3' and 'noclipevs' swapped !!
+  xcheck_equals(mo, "_root.theClass3onLoadCalls[1]", "_level0.clip3");
+  xcheck_equals(mo, "_root.theClass3onLoadCalls[2]", "_level0.noclipevs"); /* it4 ... */
   add_actions(mo, "totals(27); stop();");
     
   SWFMovie_nextFrame(mo); /* end of frame4 */

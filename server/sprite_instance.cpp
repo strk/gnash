@@ -2518,18 +2518,36 @@ sprite_instance::on_event(const event_id& id)
   //   not placed by PlaceObject, see
   //   testsuite/misc-ming.all/registerClassTest.swf
   //
+  //   Note that this is also not true for sprites which have
+  //   a registered class on them, see
+  //   testsuite/misc-ming.all/registerClassTest2.swf
+  //
+  //   TODO: test the case in which it's MovieClip.prototype.onLoad defined !
+  //
   if ( id.m_id == event_id::LOAD )
   {
-    if ( (!isDynamic()) && get_parent() && get_event_handlers().empty() )
+    // TODO: we're likely making too much noise for nothing here,
+    // there must be some action-execution-order related problem instead....
+    // See testsuite/misc-ming.all/registerClassTest2.swf for an onLoad execution
+    // order related problem ...
+    do
     {
+        if ( ! get_parent() ) break; // we don't skip calling user-defined onLoad for top-level movies
+        if ( ! get_event_handlers().empty() ) break; // nor if there are clip-defined handler
+        if ( isDynamic() ) break; // nor if it's dynamic
+        sprite_definition* def = dynamic_cast<sprite_definition*>(m_def.get());
+        if ( ! def ) break; // must be a loaded movie (loadMovie doesn't mark it as "dynamic" - should it? no, or getBytesLoaded will always return 0)
+        if ( def->getRegisteredClass() ) break; // if it has a registered class it can have an onLoad in prototype...
+
 //#ifdef GNASH_DEBUG
-      log_debug("Sprite %s (depth %d) won't check for user-defined LOAD event (is not dynamic, has a parent and had no clip events defined)",
+        log_debug("Sprite %s (depth %d) won't check for user-defined LOAD event (is not dynamic, has a parent, "
+		"no registered class and no clip events defined)",
 		getTarget().c_str(), get_depth());
-      //testInvariant();
+        testInvariant();
 //#endif
+        return called;
+    } while (0);
       
-      return called;
-    }
   }
 
   // Check for member function.
