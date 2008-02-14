@@ -269,7 +269,6 @@ list_lcs()
 {
     int maxid, shmid, id;
     struct shmid_ds shmseg;
-    struct shminfo shminfo;
 
 // #ifdef USE_POSIX_SHM
 //     if (library_dir != NULL) {
@@ -289,14 +288,17 @@ list_lcs()
     // By examing the size of each one, we can make a reasonable guess if it's one
     // used for flash. As permissions apply, this will only list the segments created
     // by the user running dumpshm.
-    struct shm_info shm_info;
-    maxid = shmctl(0, SHM_INFO, (struct shmid_ds *) (void *) &shm_info);
+//    struct shm_info shm_info;
+//    maxid = shmctl(0, SHM_INFO, (struct shmid_ds *) (void *) &shm_info);
+    struct shmid_ds shm_info;
+    maxid = shmctl(0, SHM_INFO, &shm_info);
     if (maxid < 0) {
 	cerr << "kernel not configured for shared memory";
 	return 0;
     }
     
-    if ((shmctl(0, IPC_INFO, (struct shmid_ds *) (void *) &shminfo)) < 0) {
+//    struct shminfo shminfo;
+    if ((shmctl(0, IPC_INFO, &shm_info)) < 0) {
 	return 0;
     }
     for (id = 0; id <= maxid; id++) {
@@ -312,7 +314,7 @@ list_lcs()
 	    cout << "Last changed on: " << ctime(&shmseg.shm_ctime);
 	    cout << "Last attached on: " << ctime(&shmseg.shm_atime);
 	    cout << "Last detached on: " << ctime(&shmseg.shm_dtime);
-	    return shmseg.shm_perm.__key;
+	    return shmseg.shm_perm.IPC_PERM_KEY;
 	}
 #endif	// end of IPC_PERM_KEY
     }
@@ -321,7 +323,7 @@ list_lcs()
 //#endif	// end of USE_POSIX_SHM
 
     // Didn't find any segments of the right size
-    return reinterpret_cast<key_t>(0);
+    return static_cast<key_t>(0);
 }
 #endif	// end of USE_SYSV_SHM & HAVE_IPC_INFO
 

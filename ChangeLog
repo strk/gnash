@@ -1,3 +1,8 @@
+2008-02-14  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* utilities/dumpshm.cpp: Use struct shmid_ds instead of the
+	depreciated shminfo, so this works on *BSD.
+
 2008-02-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gtk{sup.h,.cpp}: set up key event callbacks on the toplevel
@@ -279,6 +284,18 @@
 
 2008-02-09  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* configure.ac: Add a --enable-allstatic option to produced a
+	dynamically linked Gnash, but with dependant librairies statically
+	linked in. This reduces dependancy problems for binary tarballs,
+	plus the plugins still build as shared libs still.
+	* utilities/Makefile.am: Wrap our dependant libraries with
+	--static and -shared to force static linking if --enable-allstatic
+	is specified.
+	* gui/Makefile.am: Wrap our dependant libraries with --static and
+	-shared to force static linking if --enable-allstatic is
+	specified.
+
+	* packaging/install-gnash.sh: Install everything correctly.
 	* packaging/snapshot.am: Fix rules to build binary tarballs
 	correctly. Add snapshot-rpm target that builds an rpm which is
 	properly cvs date stamped.
