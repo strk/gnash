@@ -1,3 +1,12 @@
+2008-02-14 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/: loadMovieTest.c, loadMovieTestRunner.cpp:
+	  Test that clip event handlers defined for a clip are copied to
+	  movies loaded into them. Improve the test runner to follow
+	  instructions of the self-contained one and add consistency checking
+	  (failing with Gnash, I'm working to fix it).
+
+
 2008-02-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/stream.cpp: also check for overflow of a signed int to keep

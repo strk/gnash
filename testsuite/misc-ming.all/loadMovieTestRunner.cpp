@@ -26,6 +26,8 @@
 #include "dlist.h"
 #include "log.h"
 #include "URL.h"
+#include "VM.h"
+#include "string_table.h"
 
 #include "check.h"
 #include <string>
@@ -125,6 +127,10 @@ main(int /*argc*/, char** /*argv*/)
 	// Check scribbling on the lynch
 	checkScribbling();
 
+	// Run 'coverart' tests..
+	tester->movePointerTo(640,180);
+	tester->click(); tester->advance();
+
 	// Click on the second (green)
 	tester->movePointerTo(280, 80);
 	check(tester->isMouseOverMouseEntity());
@@ -140,6 +146,10 @@ main(int /*argc*/, char** /*argv*/)
 	// Check scribbling on the jpeg
 	checkScribbling();
 
+	// Run 'coverart' tests..
+	tester->movePointerTo(640,180);
+	tester->click(); tester->advance();
+
 	// Click on the third (offspring)
 	tester->movePointerTo(480, 80);
 	check(tester->isMouseOverMouseEntity());
@@ -152,5 +162,27 @@ main(int /*argc*/, char** /*argv*/)
 
 	// Check scribbling on the offspring
 	checkScribbling();
+
+	// Run 'coverart' tests..
+	tester->movePointerTo(640,180);
+	tester->click(); tester->advance();
+
+	// Get summary ...
+	tester->pressKey(key::SHIFT);
+	tester->click(); tester->advance();
+	tester->releaseKey(key::SHIFT);
+
+	// Consistency checking
+	string_table& st = root->getVM().getStringTable();
+	as_value eot;
+	// It's an swf6, so lowercase 'END_OF_TEST'
+	bool endOfTestFound = root->get_member(st.find("end_of_test"), &eot);
+	check(endOfTestFound);
+	if ( endOfTestFound )
+	{
+		//cerr << eot.to_debug_string() << endl;
+		check_equals(eot.to_bool(), true);
+	}
+
 }
 

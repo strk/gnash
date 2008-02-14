@@ -129,9 +129,10 @@ add_coverart(SWFMovie mo, int x, int y)
 	SWFDisplayItem_moveTo(it, x, y);
 
 	snprintf(buf, BUFSIZE,
-		"_level0.coverart.onUnload = function() {"
-		"	_root.note(this+'.onUnload called');"
-		"};"
+		//"_root.note(this+'.on(RollOver) ... ');"
+		//"_level0.coverart.onUnload = function() {"
+		//"	_root.note(this+'.onUnload called');"
+		//"};"
 		"_level0.coverart.onMouseDown = function() {"
 		//"  _root.note('_url is '+this._url);"
 		"  var lastUrlComponent = this._url.substring(this._url.lastIndexOf('/')+1);"
@@ -141,7 +142,12 @@ add_coverart(SWFMovie mo, int x, int y)
 		"  _root.check_equals(this.getBytesLoaded(), this.getBytesTotal());"
 		"  _root.check(this.getBytesLoaded() > 0);" /* assuming something was loaded here */
 		"  _root.note('bytesLoaded: '+this.getBytesLoaded());"
-		"  if ( Key.isDown(Key.SHIFT) ) _root.totals();"
+		"  if ( Key.isDown(Key.SHIFT) ) { "
+		"	trace('SHIFT-click on coverart...');"
+		//"	_root.note('SHIFT-click on coverart...');"
+		"	_root.totals(18, '"__FILE__"');"
+		"	_root.END_OF_TEST = true;"
+		" }"
 		"  else _root.note('2 tests run');"
 		"};"
 		, __FILE__, __LINE__);
@@ -305,8 +311,8 @@ main(int argc, char** argv)
 
 	add_actions(mo,
 		"note('Click on each image to load it into the container on the right.');"
-		"note('Click on the container to run tests after each load.');"
-		"note('Shift-click on the container to get results printed.');"
+		"note('After each load, click on the container.');"
+		"note('Finally, shift-click on the container to get results printed.');"
 		"_level0.expectLoaded = 'loadMovieTest.swf';" 
 		// TODO: add self-contained tests after each load
 		//       like for the DragAndDropTest.as movie
