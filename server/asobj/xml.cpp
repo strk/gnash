@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.69 2008/02/08 11:58:56 strk Exp $ */
+/* $Id: xml.cpp,v 1.70 2008/02/14 13:27:56 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -46,13 +46,12 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <libxml/xmlreader.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+//#include <unistd.h>
+//#include <sys/types.h>
+//#include <sys/stat.h>
 #include <string>
 #include <sstream>
 #include <vector>
-//#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <memory>
 
@@ -245,8 +244,13 @@ XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
     {
         //log_msg(_("extractNode %s has property %s, value is %s"),
         //          node->name, attr->name, attr->children->content);
-        XMLAttr attrib(reinterpret_cast<const char*>(attr->name),
-			reinterpret_cast<const char*>(attr->children->content));
+        
+        std::ostringstream name, content;
+
+        name << attr->name;
+        content << attr->children->content;
+        
+        XMLAttr attrib(name.str(), content.str());
 
         //log_msg(_("\tPushing attribute %s for element %s has value %s"),
         //        attr->name, node->name, attr->children->content);
@@ -264,8 +268,9 @@ XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
     {
             element.nodeTypeSet(tElement);
 
-            std::string name(reinterpret_cast<const char*>(node->name));
-            element.nodeNameSet(name);
+            std::ostringstream name;
+            name << node->name;
+            element.nodeNameSet(name.str());
     }
     else if ( node->type == XML_TEXT_NODE )
     {
@@ -275,19 +280,20 @@ XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
             if (ptr == NULL) return false;
 	    if (node->content)
 	    {
-		const char* in = reinterpret_cast<const char*>(ptr);
+		std::ostringstream in;
+		in << ptr;
 		// XML_PARSE_NOBLANKS seems not to be working, so here's
 		// a custom implementation of it.
 		if ( ignoreWhite() )
 		{
-			if ( strspn(in, " \n\t\r") == strlen(in) )
+			if ( in.str().find_first_not_of(" \n\t\r") == std::string::npos )
 			{
 				log_msg("Text node value consists in blanks only, discarding");
+				xmlFree(ptr);
 				return false;
 			}
 		}
-		std::string val(in);
-		element.nodeValueSet(val);
+		element.nodeValueSet(in.str());
 	    }
             xmlFree(ptr);
     }

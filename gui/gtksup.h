@@ -58,6 +58,12 @@ class DSOEXPORT GtkGui : public Gui
     void quit();
 
     virtual bool createMenu();
+    
+    /// Set up callbacks for key, mouse and other GTK events.
+    //
+    /// Must be called after the drawing area has been added to
+    /// a top level window, as it calls setupWindowEvents() to
+    /// add key event callbacks to the top level window.
     virtual bool setupEvents();
     virtual void beforeRendering();
     virtual void renderBuffer();
@@ -182,7 +188,7 @@ class DSOEXPORT GtkGui : public Gui
     
     // A window only for rendering the plugin as fullscreen.
     GtkWidget	*_overlay;
-    GtkWidget   *_drawing_area;    
+    GtkWidget   *_drawingArea;    
     GtkMenu     *_popup_menu;
     GtkWidget   *_menubar;
     GtkWidget   *_vbox;
@@ -191,6 +197,13 @@ class DSOEXPORT GtkGui : public Gui
 
     // Adds the gnash icon to a window.
     void addGnashIcon(GtkWindow* window);
+
+    /// Add key press events to the toplevel window.
+    //
+    /// The plugin fullscreen creates a new top level
+    /// window, so this function must be called every time
+    /// the drawing area is reparented.
+    void setupWindowEvents();
     
     GdkPixbuf* createPixbuf(const gchar *filename);
     

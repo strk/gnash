@@ -1,3 +1,14 @@
+2008-02-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/gtk{sup.h,.cpp}: set up key event callbacks on the toplevel
+	  window after drawing area has been reparented. The new
+	  setupWindowEvents() function splits off those functions to save
+	  resetting other callbacks unnecessarily. Makes key events
+	  work in the fullscreen plugin.
+	* server/asobj/xml.{cpp,h}: fix small leak of xmlChar when the node
+	  is empty. Replace reinterpret_cast<>s with nice, safe, null-terminated
+	  stringstreams. Comment out some questionable headers.
+
 2008-02-14 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (on_event): reword the onLoad handling so

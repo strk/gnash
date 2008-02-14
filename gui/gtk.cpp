@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.144 2008/02/10 18:42:28 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.145 2008/02/14 13:27:56 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -118,15 +118,15 @@ GtkGui::init(int argc, char **argv[])
     }
     
     // XXXbjacques: why do we need this?
-    gtk_container_set_reallocate_redraws(GTK_CONTAINER (_window), TRUE);
+    //gtk_container_set_reallocate_redraws(GTK_CONTAINER (_window), TRUE);
 
     addGnashIcon(GTK_WINDOW(_window));
 
-    _drawing_area = gtk_drawing_area_new();
+    _drawingArea = gtk_drawing_area_new();
 
     // IF we don't set this flag we won't be able to grab focus
     // ( grabFocus() would be a no-op )
-    GTK_WIDGET_SET_FLAGS (GTK_WIDGET(_drawing_area), GTK_CAN_FOCUS);
+    GTK_WIDGET_SET_FLAGS (GTK_WIDGET(_drawingArea), GTK_CAN_FOCUS);
 
     createMenu();
 
@@ -134,14 +134,12 @@ GtkGui::init(int argc, char **argv[])
     // OpenGL _glue needs to prepare the drawing area for OpenGL rendering before
     // widgets are realized and before the configure event is fired.
     // TODO: find a way to make '_glue' use independent from actual renderer in use
-    _glue->prepDrawingArea(_drawing_area);
+    gtk_container_set_reallocate_redraws(GTK_CONTAINER (_window), TRUE);
 #endif
-
-    setupEvents();
 
     // Plugin
     if (_xid) {
-     	gtk_container_add(GTK_CONTAINER(_window), _drawing_area);
+     	gtk_container_add(GTK_CONTAINER(_window), _drawingArea);
     }
     
     // Stand-alone
@@ -156,17 +154,19 @@ GtkGui::init(int argc, char **argv[])
         createMenuBar();
 #endif
 
-        gtk_box_pack_start(GTK_BOX(_vbox), _drawing_area, TRUE, TRUE, 0);
+        gtk_box_pack_start(GTK_BOX(_vbox), _drawingArea, TRUE, TRUE, 0);
     }
 
+    setupEvents();
+
     gtk_widget_realize(_window);
-    gtk_widget_show(_drawing_area);
+    gtk_widget_show(_drawingArea);
     gtk_widget_show(_window);
 
 #if defined(RENDERER_CAIRO) || defined(RENDERER_AGG)
-    // cairo needs the _drawing_area.window to prepare it ..
+    // cairo needs the _drawingArea.window to prepare it ..
     // TODO: find a way to make '_glue' use independent from actual renderer in use
-    _glue->prepDrawingArea(_drawing_area);
+    _glue->prepDrawingArea(_drawingArea);
 #endif
     
 #ifdef USE_LIRC
@@ -258,7 +258,11 @@ GtkGui::setFullscreen()
         
         // Reparent drawing area from GtkPlug to fullscreen window
         gtk_widget_realize(_overlay);      
-        gtk_widget_reparent(_drawing_area, _overlay);
+        gtk_widget_reparent(_drawingArea, _overlay);
+        
+        // Apply key event callbacks to the new window.
+        setupWindowEvents();
+
         gtk_widget_show(_overlay);
     }
     
@@ -272,7 +276,7 @@ GtkGui::setFullscreen()
         // It could be a good hack if it were done earlier.
         // There really doesn't seem to be a proper way of setting the starting size
         // of a widget but allowing it to be shrunk.
-        gtk_widget_set_size_request(_drawing_area, -1, -1);
+        gtk_widget_set_size_request(_drawingArea, -1, -1);
     	gtk_window_fullscreen(GTK_WINDOW(_window));
 
 	if (_menubar) {
@@ -290,7 +294,10 @@ GtkGui::unsetFullscreen()
     
     // Plugin
     if (_xid) {
-        gtk_widget_reparent (_drawing_area, _window);
+        gtk_widget_reparent (_drawingArea, _window);
+        
+        // Apply key event callbacks to the plugin instance.
+        setupWindowEvents();
         if (_overlay) {
             gtk_widget_destroy(_overlay);
             log_msg (_("Destroyed fullscreen window"));
@@ -332,8 +339,8 @@ GtkGui::setCursor(gnash_cursor_type newcursor)
          gdkcursor = gdk_cursor_new(cursortype);
     }
 
-    // The parent of _drawing_area is different for the plugin in fullscreen
-    gdk_window_set_cursor (gtk_widget_get_parent_window(_drawing_area),
+    // The parent of _drawingArea is different for the plugin in fullscreen
+    gdk_window_set_cursor (gtk_widget_get_parent_window(_drawingArea),
   		gdkcursor);
   
     if (gdkcursor) {
@@ -341,42 +348,50 @@ GtkGui::setCursor(gnash_cursor_type newcursor)
     }
 }
 
+// private
+void
+GtkGui::setupWindowEvents()
+{
+    g_signal_connect(G_OBJECT(gtk_widget_get_toplevel(_drawingArea)), "delete_event",
+                   G_CALLBACK(delete_event), this);
+    g_signal_connect(G_OBJECT(gtk_widget_get_toplevel(_drawingArea)), "key_press_event",
+                   G_CALLBACK(key_press_event), this);
+    g_signal_connect(G_OBJECT(gtk_widget_get_toplevel(_drawingArea)), "key_release_event",
+                   G_CALLBACK(key_release_event), this);
+}
+
+// public virtual
 bool
 GtkGui::setupEvents()
 {
   //GNASH_REPORT_FUNCTION;
 
-    g_signal_connect(G_OBJECT(_window), "delete_event",
-                   G_CALLBACK(delete_event), this);
-    g_signal_connect(G_OBJECT(_window), "key_press_event",
-                   G_CALLBACK(key_press_event), this);
-    g_signal_connect(G_OBJECT(_window), "key_release_event",
-                   G_CALLBACK(key_release_event), this);
+    setupWindowEvents();
 
-    gtk_widget_add_events(_drawing_area, GDK_EXPOSURE_MASK
+    gtk_widget_add_events(_drawingArea, GDK_EXPOSURE_MASK
                         | GDK_BUTTON_PRESS_MASK
                         | GDK_BUTTON_RELEASE_MASK
                         | GDK_KEY_RELEASE_MASK
                         | GDK_KEY_PRESS_MASK        
                         | GDK_POINTER_MOTION_MASK);
   
-    g_signal_connect_swapped(G_OBJECT(_drawing_area),
+    g_signal_connect_swapped(G_OBJECT(_drawingArea),
                             "button_press_event",
                             G_CALLBACK(popup_handler),
                             GTK_OBJECT(_popup_menu));
   
-    g_signal_connect(G_OBJECT(_drawing_area), "button_press_event",
+    g_signal_connect(G_OBJECT(_drawingArea), "button_press_event",
                    G_CALLBACK(button_press_event), this);
-    g_signal_connect(G_OBJECT(_drawing_area), "button_release_event",
+    g_signal_connect(G_OBJECT(_drawingArea), "button_release_event",
                    G_CALLBACK(button_release_event), this);
-    g_signal_connect(G_OBJECT(_drawing_area), "motion_notify_event",
+    g_signal_connect(G_OBJECT(_drawingArea), "motion_notify_event",
                    G_CALLBACK(motion_notify_event), this);
   
-    g_signal_connect_after(G_OBJECT (_drawing_area), "realize",
+    g_signal_connect_after(G_OBJECT (_drawingArea), "realize",
                          G_CALLBACK (realize_event), NULL);
-    g_signal_connect(G_OBJECT (_drawing_area), "configure_event",
+    g_signal_connect(G_OBJECT (_drawingArea), "configure_event",
                    G_CALLBACK (configure_event), this);
-    g_signal_connect(G_OBJECT (_drawing_area), "expose_event",
+    g_signal_connect(G_OBJECT (_drawingArea), "expose_event",
                     G_CALLBACK (expose_event), this);
 
     return true;
@@ -385,7 +400,7 @@ GtkGui::setupEvents()
 void
 GtkGui::grabFocus()
 {
-    gtk_widget_grab_focus(GTK_WIDGET(_drawing_area));
+    gtk_widget_grab_focus(GTK_WIDGET(_drawingArea));
 }
 
 void
@@ -500,7 +515,7 @@ GtkGui::createWindow(const char *title, int width, int height)
         // Advantage: The window is sized correctly, no matter what other
         // widgets are visible
         // Disadvantage: The window cannot be shrinked, which is bad.   
-        gtk_widget_set_size_request(_drawing_area, width, height);
+        gtk_widget_set_size_request(_drawingArea, width, height);
 
     }
     return ret;
@@ -1369,7 +1384,17 @@ GtkGui::showAboutDialog()
 //                   "translator-credits", "translator-credits",
                    "logo", logo_pixbuf,
 		   "license", 
-		   "This program is free software; you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation; either version 3 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\nYou should have received a copy of the GNU General Public License\nalong with this program; if not, write to the Free Software\nFoundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA",
+		   "This program is free software; you can redistribute it and/or modify\n"
+		   "it under the terms of the GNU General Public License as published by\n"
+		   "the Free Software Foundation; either version 3 of the License, or\n"
+		   "(at your option) any later version.\n\n"
+		   "This program is distributed in the hope that it will be useful,\n"
+		   "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+		   "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+		   "GNU General Public License for more details.\n"
+		   "You should have received a copy of the GNU General Public License\n"
+		   "along with this program; if not, write to the Free Software\n"
+		   "Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA",
 		   "website", "http://www.gnu.org/software/gnash/",
                    NULL);
 }
