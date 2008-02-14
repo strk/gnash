@@ -1,5 +1,11 @@
 2008-02-14 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/registerClassTest2.c: test that user-defined
+	  onLoad handler is still invoked if no clip events are defined and
+	  the object is not dynamic (placed by onClipEvent).
+
+2008-02-14 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (on_event): still look for a user-defined
 	  onLoad handler if the sprite is dynamic. Fixes latest testcase, but
 	  not FlowPlayer yet (which was the inspiration for the previous

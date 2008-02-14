@@ -69,7 +69,7 @@ main(int argc, char** argv)
   SWFMovie mo;
   SWFMovieClip  mc1, mc2, mc3, dejagnuclip;
   SWFShape  sh1, sh2, sh3;
-  SWFDisplayItem it1, it2, it3;
+  SWFDisplayItem it1, it2, it3, it4;
   const char *srcdir=".";
 
   if ( argc>1 ) srcdir=argv[1];
@@ -90,6 +90,12 @@ main(int argc, char** argv)
   // add the dejagnuclip for testing
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 80, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
+
+  add_actions(mo,
+		"_root.theClass1onLoadCalls = new Array();"
+		"_root.theClass2onLoadCalls = new Array();"
+		"_root.theClass3onLoadCalls = new Array();"
+	);
   
   // define two movieClips
   
@@ -110,9 +116,10 @@ main(int argc, char** argv)
   
 
   add_actions(mo,
-    "theClass1 = function() { this.x = 60;};"
+    "theClass1 = function() { this.x = 60; this._alpha=20; };"
     "theClass1.prototype = new MovieClip();"
-    "theClass2 = function() { this.x = 600; this._x = 200;}; "
+    "theClass1.prototype.onLoad = function() { trace('theClass1 proto onLoad'); _root.theClass1onLoadCalls.push(this); };"
+    "theClass2 = function() { this.x = 600; this._x = 200; this._alpha=20;}; "
     "Object.registerClass('libItem1', theClass1);"
     "Object.registerClass('libItem2', theClass2);"
     "_root.attachMovie('libItem1', 'clip1', 10);"
@@ -154,12 +161,14 @@ main(int argc, char** argv)
   // Export mc3
   addExport(mo, mc3, "libItem3");  
   
-  add_actions(mo, "totals(21); stop();");
+  check_equals(mo, "_root.theClass1onLoadCalls.length", "1");
+  check_equals(mo, "_root.theClass1onLoadCalls[0]", "_level0.clip1");
    
   // add init actions for mc3
   add_clip_init_actions(mc3, " _root.note('mc3.initactions'); "
                              " theClass3 = function () {}; "
                              " theClass3.prototype = new MovieClip(); "
+                             " theClass3.prototype.onLoad = function() { trace('theClass3 proto onLoad'); _root.theClass3onLoadCalls.push(this); };"
                              " Object.registerClass('libItem3', theClass3); "
                              " _root.attachMovie('libItem3', 'clip3', 30); "
                              // clip3.__proto__ is initialized before executing onClipConstruct
@@ -180,8 +189,20 @@ main(int argc, char** argv)
                  " _root.check_equals(_root.clip3.__proto__, _root.theClass3.prototype);"
                 ),
     SWFACTION_CONSTRUCT);
-    
+
+  /* Place it again, no clip events this time */
+  it4 = SWFMovie_add(mo, mc3);
+  SWFDisplayItem_setName(it4, "noclipevs");
+
   SWFMovie_nextFrame(mo); /* end of frame3 */
+
+  check_equals(mo, "_root.theClass3onLoadCalls.length", "3");
+  check_equals(mo, "_root.theClass3onLoadCalls[0]", "_level0.instance2");
+  check_equals(mo, "_root.theClass3onLoadCalls[1]", "_level0.clip3");
+  check_equals(mo, "_root.theClass3onLoadCalls[2]", "_level0.noclipevs"); /* it4 ... */
+  add_actions(mo, "totals(27); stop();");
+    
+  SWFMovie_nextFrame(mo); /* end of frame4 */
      
  /*****************************************************
   *
