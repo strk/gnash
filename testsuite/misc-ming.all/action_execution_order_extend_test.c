@@ -76,8 +76,17 @@ main(int argc, char** argv)
   SWFMovieClip_add(mc_red, (SWFBlock)sh_red);  
   /* Add mc_blu to mc_red and name it as "mc_blu" */
   it_blu = SWFMovieClip_add(mc_red, (SWFBlock)mc_blu);  
-  SWFDisplayItem_setDepth(it_blu, 10); 
+#if 0 // adding *any* clip-event handler makes user-defined onLoad execute !
+  SWFDisplayItem_addAction(it_blu,
+		compileSWFActionCode("_root.note('mc_blu clip unload executed'); "
+		), SWFACTION_UNLOAD);
+#endif
+  SWFDisplayItem_setDepth(it_blu, 1000); 
   SWFDisplayItem_setName(it_blu, "mc_blu");
+#if 1 /* setting ratio doesn't change the fact we won't execute user-defined onLoad event handler
+       * if no clip handlers are defined */
+  SWFDisplayItem_setRatio(it_blu, 0);
+#endif
   add_clip_actions(mc_red, "_root.note('as in frame1 of mc_red'); _root.x1 = \"as_in_mc_red\"; ");
   add_clip_actions(mc_red, " func = function() {}; ");
   SWFMovieClip_nextFrame(mc_red); /* 1st frame */
@@ -124,7 +133,7 @@ main(int argc, char** argv)
                    }; \
                    _root.mc_red.mc_blu.onUnload = function () \
                    { \
-                       note('mc_blu unload executed'); \
+                       note('mc_blu user-defined UNLOAD executed'); \
                        _root.y6 = 'mc_blu onUnload called'; \
                    };");
 
