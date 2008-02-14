@@ -150,11 +150,13 @@ public:
 		return _url;
 	}
 
-	// Inheritance from movie_definition requires this
-	// TODO: provide a default implementation in movie_definition instead ?
+	// Inheritance from movie_definition requires this.
+	// we always return 1 so sprite_instance::stagePlacementCallback
+	// doesn't skip our handling (TODO: check if it's correct to
+	// skip handling of 0-frames movies..).
 	size_t  get_loading_frame() const 
 	{
-		return 0;
+		return 1;
 	}
 };
 

@@ -1,5 +1,7 @@
 2008-02-14 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/BitmapMovieDefinition.h: advertise one frame loaded,
+	  fixes last failure in loadMovieTest.swf.
 	* server/sprite_instance.cpp (loadMovie): copy clip-events to loaded
 	  movie. Fixes loadMovieTest.swf.
 	* testsuite/misc-ming.all/: loadMovieTest.c, loadMovieTestRunner.cpp:
