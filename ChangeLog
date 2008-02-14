@@ -1,3 +1,8 @@
+2008-02-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/stream.cpp: also check for overflow of a signed int to keep
+	  tu_file happy.
+
 2008-02-14 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/BitmapMovieDefinition.{cpp,h}:

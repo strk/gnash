@@ -24,8 +24,8 @@
 #include "tu_file.h"
 #include "swf.h"
 #include "Property.h"
-
 #include <cstring>
+#include <climits>
 //#include <iostream> // debugging only
 
 //#define USE_TU_FILE_BYTESWAPPING 1
@@ -397,20 +397,21 @@ SWF::tag_type stream::open_tag()
 {
 	align();
 
-	unsigned long tagStart=get_position();
+	unsigned long tagStart = get_position();
 
 	int	tagHeader = read_u16();
 	int	tagType = tagHeader >> 6;
 	int	tagLength = tagHeader & 0x3F;
 	assert(m_unused_bits == 0);
 		
-	if (tagLength == 0x3F) {
+	if (tagLength == 0x3F)
+	{
 		tagLength = read_u32();
 	}
 
 	if (tagLength < 0)
 	{
-		throw ParserException(_("Negative tag length reported."));
+		throw ParserException("Negative tag length advertised.");
 	}
 
 	if ( tagLength > 1024*64 )
@@ -419,6 +420,19 @@ SWF::tag_type stream::open_tag()
 	}
 
 	unsigned long tagEnd = get_position() + tagLength;
+	
+	// Check end position doesn't overflow a signed int - that makes
+	// zlib adapter's inflate_seek(int pos, void* appdata) unhappy.
+	// The cast stops compiler warnings. We know it's a positive number.
+	// TODO: make tu_file take a long instead of an int.
+	// TODO: check against stream length.
+	if (tagEnd > static_cast<unsigned int>(std::numeric_limits<signed int>::max()))
+	{
+		std::stringstream ss;
+		ss << "Invalid tag end position " << tagEnd << " advertised (tag length "
+			<< tagLength << ").";
+		throw ParserException(ss.str().c_str());
+	}	
 
 	if ( ! _tagBoundsStack.empty() )
 	{
