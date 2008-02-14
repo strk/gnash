@@ -399,20 +399,26 @@ SWF::tag_type stream::open_tag()
 
 	unsigned long tagStart=get_position();
 
-	int	tag_header = read_u16();
-	int	tag_type = tag_header >> 6;
-	int	tag_length = tag_header & 0x3F;
+	int	tagHeader = read_u16();
+	int	tagType = tagHeader >> 6;
+	int	tagLength = tagHeader & 0x3F;
 	assert(m_unused_bits == 0);
-	if (tag_length == 0x3F) {
-		tag_length = read_u32();
+		
+	if (tagLength == 0x3F) {
+		tagLength = read_u32();
 	}
 
-	if ( tag_length > 1024*64 )
+	if (tagLength < 0)
 	{
-		log_debug("Tag %d has a size of %d bytes !!", tag_type, tag_length);
+		throw ParserException(_("Negative tag length reported."));
 	}
 
-	unsigned long tagEnd = get_position()+tag_length;
+	if ( tagLength > 1024*64 )
+	{
+		log_debug("Tag %d has a size of %d bytes !!", tagType, tagLength);
+	}
+
+	unsigned long tagEnd = get_position() + tagLength;
 
 	if ( ! _tagBoundsStack.empty() )
 	{
@@ -422,7 +428,7 @@ SWF::tag_type stream::open_tag()
 		{
 			unsigned long containerTagStart = _tagBoundsStack.back().first;
 			std::stringstream ss;
-			ss << "Tag " << tag_type << " starting at offset " << tagStart
+			ss << "Tag " << tagType << " starting at offset " << tagStart
 			   << " is advertised to end at offset " << tagEnd
 			   << " which is after end of previously opened tag starting "
 			   << " at offset " << containerTagStart
@@ -442,10 +448,10 @@ SWF::tag_type stream::open_tag()
 
 	IF_VERBOSE_PARSE (
 		log_parse("SWF[%lu]: tag type = %d, tag length = %d, end tag = %lu",
-		tagStart, tag_type, tag_length, tagEnd);
+		tagStart, tagType, tagLength, tagEnd);
 	);
 
-	return static_cast<SWF::tag_type>(tag_type);
+	return static_cast<SWF::tag_type>(tagType);
 }
 
 

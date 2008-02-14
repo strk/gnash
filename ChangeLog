@@ -1,3 +1,9 @@
+2008-02-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/stream.cpp: throw parser exception in stream::open_tag() if
+	  reported tag length is negative. Fixes assertion failures in
+	  zlib adapter.
+
 2008-02-14  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* utilities/dumpshm.cpp: Use struct shmid_ds instead of the
