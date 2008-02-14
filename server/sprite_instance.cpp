@@ -4078,6 +4078,13 @@ sprite_instance::loadMovie(const URL& url)
     // Set lockroot to our value of it
     extern_movie->setLockRoot( getLockRoot() );
 
+    // Copy event handlers
+    // see testsuite/misc-ming.all/loadMovieTest.swf
+    const Events& clipEvs = get_event_handlers();
+    // top-level movies can't have clip events, right ?
+    assert ( extern_movie->get_event_handlers().empty() );
+    extern_movie->set_event_handlers(clipEvs);
+
     save_extern_movie(extern_movie.get());
 
     const std::string& name = get_name();

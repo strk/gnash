@@ -1,5 +1,7 @@
 2008-02-14 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (loadMovie): copy clip-events to loaded
+	  movie. Fixes loadMovieTest.swf.
 	* testsuite/misc-ming.all/: loadMovieTest.c, loadMovieTestRunner.cpp:
 	  Test that clip event handlers defined for a clip are copied to
 	  movies loaded into them. Improve the test runner to follow
