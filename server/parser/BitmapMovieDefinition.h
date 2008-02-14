@@ -59,6 +59,8 @@ class BitmapMovieDefinition : public movie_definition
 	///
 	shape_character_def* getShapeDef();
 
+	size_t _bytesTotal;
+
 protected:
 
 #ifdef GNASH_USE_GC
@@ -82,7 +84,7 @@ public:
 	///  - Framesize extracted from image 
 	///  - Single frame (unlabeled)
 	///  - 12 FPS
-	///  - 0 bytes (for get_bytes_loaded()/get_bytes_total())
+	///  - image->size() bytes (for get_bytes_loaded()/get_bytes_total())
 	///  - provided url
 	///
 	BitmapMovieDefinition(std::auto_ptr<image::rgb> image, const std::string& url);
@@ -121,12 +123,21 @@ public:
 		return _framesize;
 	}
 
+	/// Return number of bytes loaded
+	//
+	/// Since no progressive load is implemented yet
+	/// we'll always return total bytes here..
+	///
 	virtual size_t get_bytes_loaded() const {
-		return 0;
+		return get_bytes_total();
 	}
 
+	/// Return total number of bytes which composed this movie
+	//
+	/// We actually cheat, and return the image size here...
+	///
 	virtual size_t get_bytes_total() const {
-		return 0;
+		return _bytesTotal;
 	}
 	
 	/// Create a playable movie_instance from this def.

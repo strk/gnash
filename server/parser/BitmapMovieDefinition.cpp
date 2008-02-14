@@ -89,7 +89,8 @@ BitmapMovieDefinition::BitmapMovieDefinition(
 	_framecount(1),
 	_framerate(12),
 	_url(url),
-	_image(image)
+	_image(image),
+	_bytesTotal(_image->size())
 {
 	// Do not create shape_character_def now (why?)
 }

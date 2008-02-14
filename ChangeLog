@@ -1,3 +1,11 @@
+2008-02-14 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/BitmapMovieDefinition.{cpp,h}:
+	  Implement getBytesLoaded/getBytesTotal for loaded bitmaps
+	  (not 100% correct but fixing real-world movies).
+	  Fixes:
+	  http://www.veritaserum.com/flashgames/jp/puzzledharry/puzzled-harry.swf
+
 2008-02-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/stream.cpp: throw parser exception in stream::open_tag() if
