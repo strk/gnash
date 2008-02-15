@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.184 2008/02/12 18:52:32 bwy Exp $ */
+/* $Id: tag_loaders.cpp,v 1.185 2008/02/15 09:17:34 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -529,6 +529,14 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 		    "fmt = %d, w = %d, h = %d"),
 		  tag, character_id, bitmap_format, width, height);
     );
+
+    if (width == 0 || height == 0)
+    {
+     	IF_VERBOSE_MALFORMED_SWF(
+    	    log_swferror(_("Bitmap character %d has a height or width of 0."), character_id);
+    	);   
+        return;  
+    }
 
     // TODO: there's a lot of duplicated code in this function, we should clean it up
 

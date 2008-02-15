@@ -1,3 +1,9 @@
+2008-02-15 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/swf/tag_loaders.cpp: (define_bits_lossless_2_loader) log
+	  malformed SWF error and return if height or width is 0 (prevents
+	  assertion failure in image.cpp (rgba).
+
 2008-02-15 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/sprite_definition.cpp: handle END tags before
