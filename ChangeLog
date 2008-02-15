@@ -1,3 +1,9 @@
+2008-02-15 Sandro Santilli <strk@keybit.net>
+
+	* libbase/URL.cpp: rewrite parse_querystring using
+	  boost::tokenizer, fixing the new test.
+	* testsuite/libbase/URLTest.cpp: new tests fixed.
+
 2008-02-15  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* macros/glib.m4: Add extra glib for include path, and drop the

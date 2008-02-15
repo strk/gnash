@@ -48,6 +48,7 @@
 #endif
 
 #include <climits>
+#include <boost/tokenizer.hpp>
 
 using namespace std;
 
@@ -365,33 +366,43 @@ void
 URL::parse_querystring(const std::string& query_string,
 		 std::map<std::string, std::string>& target_map)
 {
-	size_t start = 0;
-	if ( query_string[0] == '?' ) start = 1;
 
-	size_t end = query_string.size();
-	while ( start < end )
+	if ( query_string.empty() ) return; // nothing to do
+
+	std::string qstring=query_string;;
+
+	if ( qstring[0] == '?' )
 	{
-		size_t eq = query_string.find("=", start);
+		qstring=qstring.substr(1);
+	}
+
+	typedef boost::char_separator<char> Sep;
+	typedef boost::tokenizer< Sep > Tok;
+	Tok t1(qstring, Sep("&"));
+        for(Tok::iterator tit=t1.begin(); tit!=t1.end(); ++tit)
+	{
+		const std::string& nameval = *tit;
+
+		string name;
+		string value;
+
+		size_t eq = nameval.find("=");
 		if ( eq == string::npos )
 		{
-			break; // no point of keepign a var
+			name = nameval;
+		}
+		else
+		{
+			name = nameval.substr(0, eq);
+			value = nameval.substr(eq+1);
 		}
 
-		size_t amp=query_string.find("&", start);
-		if ( amp == string::npos ) {
-			amp = end;
-		}
-
-		string name = query_string.substr(start, eq-start);
-		string value = query_string.substr(eq+1, amp-(eq+1));
 		decode(name);
 		decode(value);
 
 		target_map[name] = value;
-
-		start = amp+1;
-
 	}
+	
 }
 
 /* public static */

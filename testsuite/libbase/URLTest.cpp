@@ -170,8 +170,8 @@ main(int /*argc*/, char** /*argv*/)
 	URL::parse_querystring("\n&inurl_check=3", qs);
 	check_equals(qs.size(), 2);
 	check_equals(qs["inurl_check"], "3");
-	xcheck(qs.find("") != qs.end());
-	xcheck(qs.find("\n&inurl_check") == qs.end());
+	check(qs.find("\n") != qs.end());
+	check(qs.find("\n&inurl_check") == qs.end());
 
 	// Test query string with embedded path to an .swf 
 	// Broken by:
