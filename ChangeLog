@@ -1,5 +1,6 @@
 2008-02-15 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/libbase/URLTest.cpp: failing test for url-decoding.
 	* server/as_object.{cpp,h}: add getURLEncodedVariables method.
 	* server/sprite_instance.cpp (loadVariables): delegate vars
 	  url-encoding to the new specialized method.

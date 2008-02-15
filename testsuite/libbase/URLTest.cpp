@@ -166,6 +166,13 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals (qs["option1"], "23");
 	check_equals (qs["option2"], "65");
 
+	qs.clear();
+	URL::parse_querystring("\n&inurl_check=3", qs);
+	check_equals(qs.size(), 2);
+	check_equals(qs["inurl_check"], "3");
+	xcheck(qs.find("") != qs.end());
+	xcheck(qs.find("\n&inurl_check") == qs.end());
+
 	// Test query string with embedded path to an .swf 
 	// Broken by:
 	// htp://cvs.savannah.gnu.org/viewvc/gnash/libbase/URL.cpp?root=gnash&r1=1.26&r2=1.27
