@@ -1,5 +1,10 @@
 2008-02-15 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/sprite_definition.cpp: handle END tags before
+	  advertised end offset of a DEFINESPRITE tag.
+
+2008-02-15 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/swfdec/swfdec_gnash_tester: accept a second argument
 	  to specify additional flags. Currently unused by might get
 	  handy to augment sleep time for some load to be more likely

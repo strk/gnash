@@ -68,7 +68,7 @@ sprite_definition::~sprite_definition()
 void
 sprite_definition::read(stream* in)
 {
-	int tag_end = in->get_tag_end_position();
+	unsigned long tag_end = in->get_tag_end_position();
 
 	m_frame_count = in->read_u16();
 
@@ -78,7 +78,7 @@ sprite_definition::read(stream* in)
 
 	m_loading_frame = 0;
 
-	while ((boost::uint32_t) in->get_position() < (boost::uint32_t) tag_end)
+	while ( in->get_position() < tag_end )
 	{
 		SWF::tag_type tag_type = in->open_tag();
 
@@ -92,7 +92,22 @@ sprite_definition::read(stream* in)
 		}
 		);
 
-		if (tag_type == SWF::SHOWFRAME)
+		if (tag_type == SWF::END)
+                {
+			if (in->get_position() != tag_end)
+                        {
+		    		IF_VERBOSE_MALFORMED_SWF(
+				// Safety break, so we don't read past
+				// the end of the  movie.
+				log_swferror(_("Hit end tag, "
+					"before the advertised DEFINESPRITE end; "
+					"stopping for safety."));
+		    		)
+				in->close_tag();
+		    		break;
+			}
+		}
+		else if (tag_type == SWF::SHOWFRAME)
 		{
 			// show frame tag -- advance to the next frame.
 		    	++m_loading_frame;
