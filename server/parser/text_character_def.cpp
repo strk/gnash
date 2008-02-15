@@ -36,6 +36,7 @@ void text_character_def::read(stream* in, int tag_type,
 	text_style	style;
 	for (;;)
 	{
+		in->ensureBytes(1);
 		unsigned int first_byte = in->read_u8();
 		
 		if (first_byte == 0)

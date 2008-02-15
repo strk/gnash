@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.33 2008/02/12 20:56:30 strk Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.34 2008/02/15 10:05:26 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -38,6 +38,7 @@ void
 PlaceObject2Tag::readPlaceObject(stream& in)
 {
 	// Original place_object tag; very simple.
+	in.ensureBytes(2 + 2);
 	m_character_id = in.read_u16();
 	m_depth = in.read_u16()+character::staticDepthOffset;
 	m_matrix.read(in);
@@ -188,6 +189,8 @@ PlaceObject2Tag::readPlaceObject2(stream& in)
 {
     in.align();
 
+    in.ensureBytes(1 + 2); // PlaceObject2, depth
+
     // PlaceObject2 specific flags
     boost::uint8_t has_flags2 = in.read_u8();
 
@@ -202,7 +205,11 @@ PlaceObject2Tag::readPlaceObject2(stream& in)
 
     m_depth = in.read_u16()+character::staticDepthOffset;
 
-    if (has_char) m_character_id = in.read_u16();
+    if (has_char)
+    {
+        in.ensureBytes(2);
+        m_character_id = in.read_u16();
+    }
 
     if (has_matrix)
     {
@@ -216,17 +223,27 @@ PlaceObject2Tag::readPlaceObject2(stream& in)
         m_color_transform.read_rgba(in);
     }
 
-    if (has_ratio) 
+    if (has_ratio)
+    {
+        in.ensureBytes(2);
         m_ratio = in.read_u16();
+    }
     else
+    {
         m_ratio = character::noRatioValue;
+    }
 
     if (m_has_name) in.read_string(m_name);
 
     if (has_clip_depth)
-        m_clip_depth = in.read_u16()+character::staticDepthOffset;
+    {
+        in.ensureBytes(2);
+        m_clip_depth = in.read_u16() + character::staticDepthOffset;
+    }
     else
+    {
         m_clip_depth = character::noClipDepthValue;
+    }
 
     if (has_actions)
     {
@@ -281,6 +298,8 @@ PlaceObject2Tag::readPlaceObject3(stream& in)
 {
     in.align();
 
+    in.ensureBytes(1 + 1 + 2); // PlaceObject2, PlaceObject3, depth
+
     // PlaceObject2 specific flags
     boost::uint8_t has_flags2 = in.read_u8();
 
@@ -306,10 +325,11 @@ PlaceObject2Tag::readPlaceObject3(stream& in)
     boost::uint8_t bitmask = 0;
     std::string className;
 
-    m_depth = in.read_u16()+character::staticDepthOffset;
+    m_depth = in.read_u16() + character::staticDepthOffset;
 
     if (has_char)
     {
+        in.ensureBytes(2);
         m_character_id = in.read_u16();
     }
 
@@ -332,16 +352,26 @@ PlaceObject2Tag::readPlaceObject3(stream& in)
     }
 
     if (has_ratio) 
+    {
+        in.ensureBytes(2);
         m_ratio = in.read_u16();
+    }
     else
+    {
         m_ratio = character::noRatioValue;
-
+    }
+    
     if (m_has_name) in.read_string(m_name);
 
     if (has_clip_depth)
+    {
+        in.ensureBytes(2);
         m_clip_depth = in.read_u16()+character::staticDepthOffset;
+    }
     else
+    {
         m_clip_depth = character::noClipDepthValue;
+    }
 
     if (has_filters)
     {
@@ -351,6 +381,7 @@ PlaceObject2Tag::readPlaceObject3(stream& in)
 
     if (has_blend_mode)
     {
+        in.ensureBytes(1);
         blend_mode = in.read_u8();
     }
 
@@ -358,6 +389,7 @@ PlaceObject2Tag::readPlaceObject3(stream& in)
     {
         // It is not certain that this actually exists, so if this reader
         // is broken, it is probably here!
+        in.ensureBytes(1);
         bitmask = in.read_u8();
     }
 
