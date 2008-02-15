@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: processor.cpp,v 1.82 2008/02/13 02:36:34 rsavoye Exp $ */
+/* $Id: processor.cpp,v 1.83 2008/02/15 08:31:04 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -363,6 +363,9 @@ play_movie(const char* filename)
         quitrequested = false;
         return md;
     }
+
+    printf("iteration, timer: %lu, localDelay: %ld\n", cl.elapsed(), localDelay);
+    usleep(localDelay);
     
     resetLastAdvanceTimer();
     int	kick_count = 0;

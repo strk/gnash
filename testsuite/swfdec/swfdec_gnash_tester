@@ -6,12 +6,20 @@
 #
 GPROCESSOR=${GPROCESSOR:=../../utilities/gprocessor}
 
+# NOTE: We're supposed to advance 10 frames.
+#	We allow 11 loop-backs (just for fun, we probably can support more)
+#
+FLAGS="-r11 -f10 -v"
+
 if [ -z "$1" ]; then
-	echo "Usage: `basename $0` <swffile>" >&2
+	echo "Usage: `basename $0` <swffile> [<flags>]" >&2
 	exit 1
 fi
 
-echo "Using gprocessor ${GPROCESSOR}"
+if [ -n "$2" ]; then
+	FLAGS="$FLAGS $2"
+fi
+
 
 in="$1"
 out=`basename "${in}"`.trace-gnash
@@ -22,10 +30,8 @@ if [ -e "${in}.trace.org" ]; then
 	use_orig=1
 fi
 
-# NOTE: We're supposed to advance 10 frames.
-#	We allow 11 loop-backs (just for fun, we probably can support more)
-#
-${GPROCESSOR} -r11 -f10 -v "$in"  | grep TRACE | sed 's/.*TRACE: //' | fromdos > $out
+echo "Running ${GPROCESSOR} ${FLAGS} ${in}"
+${GPROCESSOR} ${FLAGS} "$in"  | grep TRACE | sed 's/.*TRACE: //' | fromdos > $out
 if test "$?" != 0; then
 	echo "gprocessor returned an error"
 	exit 1
