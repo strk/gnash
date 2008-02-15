@@ -1015,4 +1015,30 @@ as_object::get_path_element(string_table::key key)
 	return tmp.to_object().get();
 }
 
+void
+as_object::getURLEncodedVars(std::string& data)
+{
+    typedef std::map<std::string, std::string> PropMap;
+    PropMap props;
+    enumerateProperties(props);
+
+    std::string del;
+    data.clear();
+    
+    for (PropMap::const_iterator i=props.begin(), e=props.end(); i!=e; ++i)
+    {
+      std::string name = i->first;
+      std::string value = i->second;
+      if ( ! name.empty() && name[0] == '$' ) continue; // see bug #22006
+      URL::encode(value);
+      
+      data += del + name + "=" + value;
+      
+      del = "&";
+        
+    }
+    
+}
+
+
 } // end of gnash namespace

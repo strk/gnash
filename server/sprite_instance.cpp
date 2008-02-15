@@ -4133,38 +4133,11 @@ sprite_instance::loadVariables(URL url, short sendVarsMethod)
   // will be done by LoadVariablesThread (down by getStream, that is)
   //if ( ! URLAccessManager::allow(url) ) return;
   
-  std::string postdata = "";
+  std::string postdata;
   
   if ( sendVarsMethod )    // 1=GET, 2=POST
   {
-    typedef std::map<std::string, std::string> PropMap;
-    PropMap props;
-    enumerateProperties(props);
-
-    std::string del = "";
-    std::string data = "";
-    
-    if ( (sendVarsMethod == 1) && (url.querystring() != "") )  // GET
-      del = "&";
-    
-    for (PropMap::const_iterator i=props.begin(), e=props.end(); i!=e; ++i)
-    {
-      std::string name = i->first;
-      std::string value = i->second;
-      if ( ! name.empty() && name[0] == '$' ) continue; // see bug #22006
-      url.encode(value);
-      
-      data += del + name + "=" + value;
-      
-      del = "&";
-        
-    }
-    
-    if ( sendVarsMethod == 1 )  // GET 
-      url.set_querystring(url.querystring() + data);
-    else if ( sendVarsMethod == 2 )  // POST
-      postdata = data;
-  
+	getURLEncodedVars(postdata);
   }
 
   try 
@@ -4177,6 +4150,13 @@ sprite_instance::loadVariables(URL url, short sendVarsMethod)
     else
     {
         // use GET method
+        if ( sendVarsMethod == 1 )
+	{
+		// Append variables
+		string qs = url.querystring();
+		if ( qs.empty() ) url.set_querystring(postdata);
+		else url.set_querystring(qs + std::string("&") + postdata);
+	}
     	_loadVariableRequests.push_back(new LoadVariablesThread(url));
     }
     _loadVariableRequests.back()->process();
