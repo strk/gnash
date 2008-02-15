@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: button_character_def.cpp,v 1.29 2008/02/12 12:28:08 strk Exp $ */
+/* $Id: button_character_def.cpp,v 1.30 2008/02/15 11:28:14 bwy Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -57,6 +57,7 @@ button_action::button_action(stream& in, int tag_type, unsigned long endPos, mov
 			);
 			return;
 		}
+		in.ensureBytes(2);
 		m_conditions = in.read_u16();
 	}
 
@@ -102,6 +103,7 @@ button_record::read(stream* in, int tag_type,
 		return false;
 	}
 
+	in->ensureBytes(1);
 	int	flags = in->read_u8();
 	if (flags == 0)
 	{
@@ -125,6 +127,7 @@ button_record::read(stream* in, int tag_type,
 		);
 		return false;
 	}
+	in->ensureBytes(2);
 	m_character_id = in->read_u16();
 
 	// Get character definition now (safer)
@@ -156,6 +159,7 @@ button_record::read(stream* in, int tag_type,
 		);
 		return false;
 	}
+	in->ensureBytes(2);
 	m_button_layer = in->read_u16();
 
 	// TODO: pass available range to button matrix read
@@ -180,6 +184,7 @@ button_record::read(stream* in, int tag_type,
 
 	if ( buttonHasBlendMode )
 	{
+		in->ensureBytes(1);
         	_blendMode = in->read_u8();
 		static bool warned=false;
 		if ( ! warned )
@@ -221,6 +226,7 @@ button_character_definition::~button_character_definition()
 
 void button_character_definition::sound_info::read(stream* in)
 {
+	in->ensureBytes(1);
 	m_in_point = m_out_point = m_loop_count = 0;
 	in->read_uint(2);	// skip reserved bits.
 	m_stop_playback = in->read_bit(); 
@@ -229,14 +235,27 @@ void button_character_definition::sound_info::read(stream* in)
 	m_has_loops = in->read_bit(); 
 	m_has_out_point = in->read_bit();
 	m_has_in_point = in->read_bit(); 
-	if (m_has_in_point) m_in_point = in->read_u32();
-	if (m_has_out_point) m_out_point = in->read_u32();
-	if (m_has_loops) m_loop_count = in->read_u16();
-
+	if (m_has_in_point)
+	{
+		in->ensureBytes(4);
+		m_in_point = in->read_u32();
+	}
+	if (m_has_out_point)
+	{
+		in->ensureBytes(4);
+		m_out_point = in->read_u32();
+	}
+	if (m_has_loops)
+	{
+		in->ensureBytes(2);
+		m_loop_count = in->read_u16();
+	}
 	if (m_has_envelope)
 	{
+		in->ensureBytes(1);
 		int nPoints = in->read_u8();
 		m_envelopes.resize(nPoints);
+		in->ensureBytes(8 * nPoints);
 		for (int i=0; i < nPoints; i++)
 		{
 			m_envelopes[i].m_mark44 = in->read_u32();
@@ -322,9 +341,11 @@ button_character_definition::readDefineButton2(stream* in, movie_definition* m)
 
 	// Read the menu flag
 	// (this is a single bit, the other 7 bits are reserved)
-	m_menu = in->read_u8() != 0;
+	in->ensureBytes(1 + 2);
 
+	m_menu = in->read_u8() != 0;
 	unsigned button_2_action_offset = in->read_u16();
+
 	unsigned long tagEndPosition = in->get_tag_end_position();
 	unsigned next_action_pos = in->get_position() + button_2_action_offset - 2;
 
@@ -368,6 +389,7 @@ button_character_definition::readDefineButton2(stream* in, movie_definition* m)
 		// Don't read past tag end
 		while ( in->get_position() < tagEndPosition ) 
 		{
+			in->ensureBytes(2);
 			unsigned next_action_offset = in->read_u16();
 			next_action_pos = in->get_position() + next_action_offset - 2;
 
@@ -430,6 +452,7 @@ button_character_definition::readDefineButtonSound(stream* in, movie_definition*
 	for (int i = 0; i < 4; i++)
 	{
 		button_sound_info& bs = m_sound->m_button_sounds[i];
+		in->ensureBytes(2);
 		bs.m_sound_id = in->read_u16();
 		if (bs.m_sound_id)
 		{

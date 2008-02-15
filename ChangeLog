@@ -1,3 +1,8 @@
+2008-02-15 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/parser/button_character_def.cpp: use ensureBytes, fix more
+	  assertion failures.
+
 2008-02-15 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/libbase/URLTest.cpp: failing test for url-decoding.
