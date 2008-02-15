@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: glib.m4,v 1.32 2008/02/01 01:30:30 rsavoye Exp $
+dnl $Id: glib.m4,v 1.33 2008/02/15 20:50:43 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_GLIB],
 [
@@ -41,17 +41,17 @@ AC_DEFUN([GNASH_PATH_GLIB],
   dnl Attempt to find the top level directory, which unfortunately has a
   dnl version number attached. At least on Debain based systems, this
   dnl doesn't seem to get a directory that is unversioned.
-  AC_MSG_CHECKING([for libglib header])  
+  AC_MSG_CHECKING([for Glib header])  
   if test x"${gnash_glib_version}" = x; then
     gnash_glib_topdir=""
     gnash_glib_version=""
     for i in $incllist; do
-      for j in `ls -dr $i/glib-[[0-9]].[[0-9]] 2>/dev/null`; do
+      for j in `ls -dr $i/glib-[[0-9]].[[0-9]] $i/glib/glib-[[0-9]].[[0-9]] 2>/dev/null`; do
         if test -f $j/glib.h; then
           gnash_glib_topdir=`basename $j`
           gnash_glib_version=`echo ${gnash_glib_topdir} | sed -e 's:glib-::'`
           ac_cv_path_glib_incl="-I$j"
-          gnash_glib_config=`echo $j | sed -e 's:include:lib:'`
+          gnash_glib_config=`echo $j | sed -e 's:include:lib:' -e 's:lib/glib/:lib/:'`
           if test -f ${gnash_glib_config}/include/glibconfig.h; then
             ac_cv_path_glib_incl="${ac_cv_path_glib_incl} -I${gnash_glib_config}/include"
           fi

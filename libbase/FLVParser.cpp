@@ -17,11 +17,15 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.26 2008/01/21 20:55:43 rsavoye Exp $
+// $Id: FLVParser.cpp,v 1.27 2008/02/15 20:50:43 rsavoye Exp $
 
+#include <string>
+#include <iosfwd>
 #include "FLVParser.h"
 #include "amf.h"
 #include "log.h"
+
+using namespace std;
 
 #define PADDING_BYTES 8
 

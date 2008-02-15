@@ -36,6 +36,7 @@
 #include "utility.h" // for typeName()
 #include "namedStrings.h"
 
+#include <cmath>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/lexical_cast.hpp>
 #include <locale>
@@ -44,6 +45,10 @@
 
 #ifdef WIN32
 #	define snprintf _snprintf
+#endif
+
+#ifdef HAVE_FINITE
+#define isfinite finite
 #endif
 
 // Define the macro below to make abstract equality operator verbose

@@ -1,3 +1,13 @@
+2008-02-15  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* macros/glib.m4: Add extra glib for include path, and drop the
+	extra glib for the glibconfig.h include path. This let's Gnash
+	build on NetBSD 4.0.
+	* server/as_value.cpp: Use finite if isfinite doesn't exist. Fixes
+	FreeBSD build problem.
+	* libbase/FLVParser.cpp:  Include string and iofwd, and add std
+	namespace to fix generic BSD build problem.
+
 2008-02-15 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/parser/button_character_def.cpp: use ensureBytes, fix more
