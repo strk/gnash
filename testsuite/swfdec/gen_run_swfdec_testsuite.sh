@@ -66,8 +66,10 @@ for test in \`ls ${SWFDECTRACEDIR}/[$STARTPATTERN]*.swf\`; do
 	flags=
 	if grep -q "^\${testname}\$" \${REALTIME}; then
 		flags="-d -1"
+		echo "NOTE: running \${testname} (realtime - expect pass: \${expectpass})"
+	else
+		echo "NOTE: running \${testname} (expect pass: \${expectpass})"
 	fi
-	echo "NOTE: running \${testname} (expect pass: \${expectpass})"
 	if ${SWFDEC_GNASH_TESTER} \${test} ${flags} > \${testname}.log; then
 		if [ "\${expectpass}" = "yes" ]; then
 			echo "PASSED: \${testid}"
