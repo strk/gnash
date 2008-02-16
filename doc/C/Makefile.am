@@ -128,12 +128,6 @@ EXTRA_DIST = \
 	$(xml_files) \
 	$(entities) \
 	$(omffile) \
-	gnash.texi \
-	actionscript.texi \
-	gnash-man.xml \
-	gprocessor-man.xml \
-	dumpshm-man.xml \
-	soldumper-man.xml \
 	actionscript.info \
 	gnash.info \
 	actionscript.html \
