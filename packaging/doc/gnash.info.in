@@ -1,0 +1,1966 @@
+START-INFO-DIR-ENTRY
+This is gnash.info, produced by makeinfo version 4.11 from gnash.texi.
+
+* Gnash Developer's Guide version 0.4.3: (gnash_developer's_guide_version_0.4.3).
+                                                  [MISSING TEXT]
+END-INFO-DIR-ENTRY
+
+
+File: gnash.info,  Node: Top,  Next: Introduction,  Up: (dir)
+
+Gnash Developer's Guide version 0.4.3
+*************************************
+
+* Menu:
+
+* Introduction::
+* Technical Specifications::
+* Installing and Configuring Gnash::
+* Using Gnash::
+* Reporting Bugs::
+* Glossary::
+* AMF Format: AMF Format <1>.
+* RTMP Protocol::
+* Authors::
+* GNU Free Documentation License::
+
+--- The Detailed Node Listing ---
+
+Introduction
+
+* What does Gnash run on?::
+* What Versions of Flash are Supported?::
+* Audience::
+* Guide Conventions::
+* Acknowledgments::
+
+Technical Specifications
+
+* ActionScript::
+* Memory Management::
+* Security::
+
+Installing and Configuring Gnash
+
+* Requirements::
+* Downloading Gnash::
+* Pre-Compile Configuration::
+* Building from Source::
+* Installation::
+
+Using Gnash
+
+* Gnash Command Line Options::
+* Gnash Interactive Control Keys::
+* User Configuration File::
+
+Reporting Bugs
+
+* Compile the latest Gnash build::
+* Determine if the bug was previously reported::
+* Review the bug writing guidelines::
+* Filing a bug report::
+
+RTMP Protocol
+
+* AMF Format: AMF Format <1>.
+
+GNU Free Documentation License
+
+* 0. PREAMBLE: 0_ PREAMBLE.
+* 1. APPLICABILITY AND DEFINITIONS: 1_ APPLICABILITY AND DEFINITIONS.
+* 2. VERBATIM COPYING: 2_ VERBATIM COPYING.
+* 3. COPYING IN QUANTITY: 3_ COPYING IN QUANTITY.
+* 4. MODIFICATIONS: 4_ MODIFICATIONS.
+* 5. COMBINING DOCUMENTS: 5_ COMBINING DOCUMENTS.
+* 6. COLLECTIONS OF DOCUMENTS: 6_ COLLECTIONS OF DOCUMENTS.
+* 7. AGGREGATION WITH INDEPENDENT WORKS: 7_ AGGREGATION WITH INDEPENDENT WORKS.
+* 8. TRANSLATION: 8_ TRANSLATION.
+* 9. TERMINATION: 9_ TERMINATION.
+* 10. FUTURE REVISIONS OF THIS LICENSE: 10_ FUTURE REVISIONS OF THIS LICENSE.
+* Addendum::
+
+
+File: gnash.info,  Node: Introduction,  Next: Technical Specifications,  Prev: Top,  Up: Top
+
+1 Introduction
+**************
+
+Gnash is a free Flash movie player.  It is available as a stand-alone
+application or as a plugin for several popular browsers.
+
+   Gnash is based on the excellent work done on the public domain
+program GameSWF, which is a graphics library for games that contains
+the heart of a Flash interpreter.  In December 2005, Gnash was forked
+from GameSWF and repackaged in the GNU project style.  The objective of
+Gnash is to create an enterprise-quality Flash movie player that can be
+widely deployed.
+
+* Menu:
+
+* What does Gnash run on?::
+* What Versions of Flash are Supported?::
+* Audience::
+* Guide Conventions::
+* Acknowledgments::
+
+
+File: gnash.info,  Node: What does Gnash run on?,  Next: What Versions of Flash are Supported?,  Up: Introduction
+
+1.1 What does Gnash run on?
+===========================
+
+The list of successful Gnash deployments grows every day.  At this
+time, Gnash has been found to run on several different UNIX and Linux
+distributions.  The plugin currently works with any browser that uses
+the NSAPI. This includes:
+
+   * Mozilla `http://www.mozilla.org'
+
+   * Firefox `http://www.mozilla.com/en-US/firefox'
+
+   * Galeon `galeon.sourceforge.net'
+
+   * Epiphany `gnome.org/projects/epiphany'
+
+   * Konqueror `http://www.konqueror.org'
+
+   * Opera `http://www.opera.com'
+
+   * OLPC Web Activity `http://www.laptop.org'
+
+
+File: gnash.info,  Node: What Versions of Flash are Supported?,  Next: Audience,  Prev: What does Gnash run on?,  Up: Introduction
+
+1.2 What Versions of Flash are Supported?
+=========================================
+
+Gnash supports the majority of Flash opcodes up to SWF version 7, and a
+wide sampling of ActionScript classes for SWF version 7.   There are
+plans to work towards greater support for SWF 8 and beyond.  AMF
+support is minimal.
+
+
+File: gnash.info,  Node: Audience,  Next: Guide Conventions,  Prev: What Versions of Flash are Supported?,  Up: Introduction
+
+1.3 Audience
+============
+
+This manual is primarily focused on developers interested in
+contributing to or building from the Gnash project.  It serves as a
+detailed reference guide, including a catalog and explanation of all
+options and features.  This level of detail may make this guide
+cumbersome for the average user, although advanced users may find it
+helpful.
+
+   Those who are new to Gnash will find the Gnash User's Guide,
+currently under development, to be more useful when learning to use
+Gnash.
+
+
+File: gnash.info,  Node: Guide Conventions,  Next: Acknowledgments,  Prev: Audience,  Up: Introduction
+
+1.4 Guide Conventions
+=====================
+
+This guide makes use of the following fairly standard typefaces,
+highlighting, and language usage:
+
+application
+     The typeface above will be used whenever an application, such as
+     Firefox or OpenOffice.org, is mentioned.
+
+`command'
+     The typeface above will be used whenever the text instructs a user
+     to enter a command at a shell prompt in UNIX/Linux, such as `ls'.
+
+`computeroutput'
+     This is the typeface used to indicate information produced on
+     `stdout' by the computer.  This include error messages and prompts.
+
+`filename'
+     This typeface indicates that the text is the name (and possibly
+     the path) of a specific file on the system in question.  For
+     example, `/etc/hosts' would appear in this typeface.
+
+guibutton
+     This formatting indicates a button on a Graphical User Interface
+     (GUI).  If this formatting appears, look for a button with the
+     same text on the GUI of the Gnash player; the button itself may
+     look slightly different.
+
+guimenu
+     This typeface indicates the topmost menu item in a GUI.  For
+     example, in many applications the File menu item is a top=level
+     menu item.
+
+guimenuitem
+     This typeface indicates a sub-menu item in a GUI.  For example, in
+     many applications the Save As menu item is a sub-menu item.
+
+guitext
+     This typeface indicates a text string on the GUI.  This is
+     generally a text string that appears on the GUI that is not a
+     button or menuitem.
+
+<key>
+     This typeface indicates a specific key on the keyboard.  For
+     example, the <Ctrl> key appears in this typeface.
+
+<key><combination>
+     This formatting indicates a set of keys to be pressed at the same
+     time.  A familiar key combination is <Ctrl><Alt><Delete>.
+
+<REPLACEABLE>
+     Whenever a general term is included in an example as a
+     placeholder, it will be signaled by this formatting.  This
+     formatting will usually appear inside other formatting.  For
+     example, `/home/<USERNAME>' indicates the home directory of a
+     user, whose actual username would be substituted in for <USERNAME>.
+
+`User input'
+     This typeface indicates anything that the user must enter, whether
+     that is at a shell prompt or in response to a GUI prompt.
+
+
+File: gnash.info,  Node: Acknowledgments,  Prev: Guide Conventions,  Up: Introduction
+
+1.5 Acknowledgments
+===================
+
+The first version of this guide was written by Rob Savoye.  If not for
+his tireless efforts, this book - and this project - would never have
+come this far.
+
+   John Steinhart has also been dedicated to the project from the
+beginning. I have shamelessly plagiarized one of his early announcement
+emails in the early part of this chapter.
+
+   Ann Barcomb was instrumental in taking this guide from the 0.3.0 to
+the 0.4.0 version, incorporating the many changes that came with Gnash
+version 0.8.0.
+
+   Finally, thanks to all of the Gnash developers I haven't mentioned
+for all their hard work, and for answering my unending questions.
+
+
+File: gnash.info,  Node: Technical Specifications,  Next: Installing and Configuring Gnash,  Prev: Introduction,  Up: Top
+
+2 Technical Specifications
+**************************
+
+The information in this chapter may change quickly.  For the most
+current information about the following subjects, be sure the check the
+Developer's Wiki at `http://www.gnashdev.org/wiki/index.php/Main_Page'.
+
+* Menu:
+
+* ActionScript::
+* Memory Management::
+* Security::
+
+
+File: gnash.info,  Node: ActionScript,  Next: Memory Management,  Up: Technical Specifications
+
+2.1 ActionScript
+================
+
+As stated in the section *note What Versions of Flash are Supported?::,
+Gnash has implemented about 80% of ActionScript v. 2.0, and has begun
+implementing ActionScript v. 3.0.  Gnash supports the majority of Flash
+opcodes up to SWF version 7, and a wide sampling of ActionScript
+classes for SWF version 7.
+
+   The following table indicates how fully various ActionScript classes
+have been implemented:
+
+   *ActionScript Classes*
+
+Class                                Status
+Actionscript/Date                    Implemented
+Actionscript/Function                Implemented
+Actionscript/MovieClip               Implemented
+Actionscript/MovieClipLoader         Implemented
+Actionscript/Object                  Implemented
+Actionscript/Sound                   Implemented
+Actionscript/String                  Implemented
+Actionscript/XMLNode                 Implemented
+Actionscript/XMLSocket               Implemented
+Actionscript/_global                 Partially Implemented
+Actionscript/Array                   Partially Implemented
+Actionscript/LocalConnection         Partially Implemented
+Actionscript/NetConnection           Partially Implemented
+Actionscript/NetStream               Partially Implemented
+Actionscript/TextField               Partially Implemented
+Actionscript/XML                     Partially Implemented
+Actionscript/Boolean                 Unimplemented
+Actionscript/Error                   Unimplemented
+Actionscript/LoadVars                Unimplemented
+Actionscript/Number                  Unimplemented
+Actionscript/Selection               Unimplemented
+Actionscript/TextFormat              Unimplemented
+Actionscript/Unknown                 Unimplemented
+
+   The next table indicates which opcodes have been implemented:
+
+   *Opcodes*
+
+Opcode                               Status
+0x43 declare_obj                     Implemented
+0x2B cast                            Implemented
+0x3B delete2 - SWF::ACTION_DELETE    Implemented
+0x53 new_method                      Implemented
+0x55 enum_object                     Implemented
+0x3A delete - SWF::ACTION_DELETEVAR  Implemented
+0x69 Extends - SWF::ACTION_EXTENDS   Implemented
+0x54 instance_of                     Partially Implemented
+0x2A Throw                           Unimplemented
+0x2C Implements                      Unimplemented
+0x8F Try                             Unimplemented
+0x31 md length                       Unimplemented
+0x35 md substring                    Unimplemented
+0x37 md chr                          Unimplemented
+0x45 get target                      Unimplemented
+
+
+File: gnash.info,  Node: Memory Management,  Next: Security,  Prev: ActionScript,  Up: Technical Specifications
+
+2.2 Memory Management
+=====================
+
+One of the new features of Gnash 0.8.2 is the garbage collector.  The
+garbage collector manages complex ActionScript variables, which are the
+only ones that are shared by references.  In Gnash, these are
+`as_object' class instances created by ActionScript (i.e. not those
+created by playhead control: `placeobject'/`removeobject').
+
+   Collected objects are those allocated due to ActionScript explicit
+or implicit calls.  Explicit all are any user-defined statements that
+allocate new objects, such as arrays, Objects, or script-created
+movieclips.  Implicit calls are the built-in functions that can be
+deleted by arbitrary user calls.
+
+   Any object that is a candidate for garbage collecting is stored in a
+list owned by the collector.  This list is filled by an executing
+action context whenever a collectible object is allocated on the heap.
+
+   The garbage collector starts at the very end of an execution
+context, rather than using a threshold to trigger it.  At this point,
+the virtual machine is in a "stable" state; any still-reachable object
+has its roots in one of the currently live character instances (stage
+characters).
+
+   The collector is a conservative collector.  Any object on the
+collectibles list is marked as UNREACHABLE, an iterative scan starting
+from the roots marks any still-reachable object, and a final purge
+releases all still-UNREACHABLE resources.
+
+   This garbage collector has reduced the memory footprint of Gnash.
+However, the most current, available test data indicated the following
+runtime memory footprint:
+
+   *Memory Footprint*
+
+Render GUI         Virtual Memory     Resident Set Size  Shared Memory
+                                      (physical RAM      (code size)
+agg-gtk            33372 KB           14 MB              8948 KB
+agg-sdl            26564 KB           9396 KB            5124 KB
+agg-fltk           24556 KB           8992 KB            4220 KB
+cairo-fltk         184 MB             128 MB             4284 KB
+cairo-gtk          192 MB             133 MB             8000 KB
+cairo-sdl          187 MB             129 MB             5256 KB
+opengl-gtk         62620 KB           15 MB              9336 KB
+opengl-sdl         54932 KB           10 MB              5324 KB
+
+
+File: gnash.info,  Node: Security,  Prev: Memory Management,  Up: Technical Specifications
+
+2.3 Security
+============
+
+Many Flash implementations contain potential security exploits that
+could compromise a viewer's system.  With Gnash, an end-user has the
+ability to see "what's going on" -- what types of data the application
+accesses, where it is found, and how it is used.  Many known Flash
+exploits are included in the Gnash test suite that is used to check
+whether a release is ready for the public.  The Gnash developers are
+also in the process of a security review, developing a security layer
+that will protect an end-user, no matter what operating system they use.
+
+   One early security feature is the blacklist/whitelist.  Flash movies
+running in a browser can make outgoing network connections. This can be
+used, for example, to compromise a network device inside a company
+firewall via a Flash movie running on an employee's browser. Gnash
+allows you to blacklist hosts that you know are insecure, or to
+whitelist hosts you know are secure, by editing a configuration file.
+
+
+File: gnash.info,  Node: Installing and Configuring Gnash,  Next: Using Gnash,  Prev: Technical Specifications,  Up: Top
+
+3 Installing and Configuring Gnash
+**********************************
+
+There are two ways of installing Gnash: using a package manager (*note
+Using a Package Manager::) or installing from source (*note Getting the
+Source::).
+
+* Menu:
+
+* Requirements::
+* Downloading Gnash::
+* Pre-Compile Configuration::
+* Building from Source::
+* Installation::
+
+
+File: gnash.info,  Node: Requirements,  Next: Downloading Gnash,  Up: Installing and Configuring Gnash
+
+3.1 Requirements
+================
+
+Before downloading and installing Gnash, check that your hardware and
+software meet the following requirements.
+
+* Menu:
+
+* Hardware Requirements::
+* Software Requirements::
+
+
+File: gnash.info,  Node: Hardware Requirements,  Next: Software Requirements,  Up: Requirements
+
+3.1.1 Hardware Requirements
+---------------------------
+
+One of the goals of Gnash is to make it portable enough to install on
+small devices.  As a result, the hardware requirements are minimal.
+Gnash has even run on an ARM9 at 200 MHz with 64 MB of RAM! (It ran
+without video support in this case.)   While firm minimums have not
+been established, Gnash has been shown to run successfully with the
+following:
+
+   * 336 MHz processor
+
+   * 256 MB RAM
+
+   * Video -- Gnash will run on anything from a raw frame buffer up to
+     an OpenGL-supporting graphics card.
+
+   The following table provides a list of the Operating System/CPU
+combinations on which Gnash has been shown to run.
+
+*Build Matrix*
+
+Render GUI                           Virtual Memory
+FreeBSD                              Alpha AXP, AMD64, i386, Itanium,
+                                     PC-98, PowerPC, SPARC64
+GNU/Linux                            CRIS
+GNU/Linux [OLPC]                     Geode GX
+GNU/Linux ALTLinux                   i586
+GNU/Linux Arklinux                   i586
+GNU/Linux Debian                     Alpha AXP, AMD64, ARM, hppa, i386,
+                                     Itanium, MIPS, PowerPC, IBM zSeries
+                                     (s390), SPARC
+GNU/Linux Fedora core                x86-32, x86-64
+GNU/Linux Gentoo                     AMD64, PowerPC, SPARC, x86
+GNU/Linux Gentoo                     AMD64, PowerPC, SPARC, x86
+GNU/Linux Maemo 2.1                  ARMv5t
+GNU/Linux Mandriva 2007              
+GNU/Linux Open Zaurus                ARM
+GNU/Linux OpenSuSE 10                i586, x86-64
+GNU/Linux Red Hat                    x86-32, x86-64
+GNU/Linux Ubuntu                     x86-64 reported working, also
+                                     x86-32 and UltraSPARC
+Haiku                                
+Irix 6.5                             MIPS R10K
+MacOS X                              PowerPC and x86-32
+NetBSD                               many, including VAX
+OpenBSD                              many, including VAX, OS/2 and
+                                     eComstation
+Windows                              x86-32
+
+
+File: gnash.info,  Node: Software Requirements,  Prev: Hardware Requirements,  Up: Requirements
+
+3.1.2 Software Requirements
+---------------------------
+
+The 0.8.2 release of Gnash has been designed to run on UNIX/Linux
+variants, and has been run on most of the free ones.  However, Gnash
+has successfully run on Windows, Darwin (Mac OS X), Irix, Solaris,
+BeOs, OS/2, and Haiku.  Gnash has also run on the following 64-bit
+systems: PowerPC, Itanium, UltraSparc, and AMD64.   For now, it is
+important to be sure that the following code, testing, and
+documentation dependencies are met before installing Gnash.  If you
+will be downloading Gnash with a package manager, these dependencies
+may be solved by the package manager.  Otherwise, you must first verify
+that each of these dependencies are installed on the target system.
+
+* Menu:
+
+* Code Dependencies::
+* Testing Dependencies::
+* Documentation Dependencies::
+
+
+File: gnash.info,  Node: Code Dependencies,  Next: Testing Dependencies,  Up: Software Requirements
+
+3.1.2.1 Code Dependencies
+.........................
+
+Gnash has a number of dependencies on other packages.  If you install
+the dependencies using a package manager, be certain to install the
+development versions of the packages.  The normal versions are often
+missing the headers Gnash needs to compile.
+
+     *Note*
+
+     If you want to install the Gnash plugin for one of the browsers
+     listed in the *note Introduction::, be sure to install the
+     development package for that browser before configuring.  The
+     Gnash `configure' script searches for the devel packages before
+     building the plugin.
+
+   *Code Dependency Table*
+
+Name       Level      Version    DescriptionExplanationapt-get    RPM/Yum
+                                                       package    package
+Boost      Required   1.32 or     Boost is  In Gnash,  `libboost-thread-dev'`liboost-thread-dev'
+                      higher     a library  Boost                 
+                                 of         libraries             
+                                 portable   are used              
+                                 C++        extensively.           
+                                 classes                          
+                                 and                              
+                                 templates.                       
+libxml2    Required               Libxml2   This       `libxml2-dev'`libxml2-devel'
+                                 is the     library               
+                                 GNOME XML  is used               
+                                 parser     to parse              
+                                 library    messages              
+                                 and is     in the                
+                                 available  XML or                
+                                 at         XMLSocket             
+                                 http://xmlsoft.orgActionScript           
+                                 (http://xmlsoft.org).classes.              
+AGG        Possibly   2.4 or      AGG is    Gnash      `libagg-dev'`agg-devel'
+           Required   higher     the        requires              
+                                 AntiGrain  the                   
+                                 low-level  installation           
+                                 2D         of at                 
+                                 graphics   least one             
+                                 library.   renderer.             
+                                            AGG is                
+                                            considered            
+                                            the _best             
+                                            supported_            
+                                            renderer              
+                                            for Gnash.            
+OpenGL     Possibly               OpenGL    Gnash      `libgl1-mesa-dev'`libmesa-devel'
+           Required              is a       requires              
+                                 standard   the                   
+                                 specificationinstallation           
+                                 defining a of at                 
+                                 cross-languageleast one             
+                                 cross-platformrenderer.             
+                                 API for                          
+                                 writing                          
+                                 applications                      
+                                 which                            
+                                 produce                          
+                                 3D and 2D                        
+                                 graphics.                        
+                                 It                               
+                                 supports                         
+                                 hardware                         
+                                 acceleration.                      
+                                 You can                          
+                                 download                         
+                                 a free                           
+                                 implementation                      
+                                 from                             
+                                 http://www.mesa3d.org                      
+                                 (http://www.mesa3d.org).                      
+Cairo      Possibly               Cairo is  Gnash      `libcairo2-dev'`cairo-devel'
+           Required              a 2D       requires              
+                                 graphics   the                   
+                                 library    installation           
+                                 with       of at                 
+                                 support    least one             
+                                 for        renderer.             
+                                 multiple   Cairo is              
+                                 output     considered            
+                                 devices.   the                   
+                                 It will    _least                
+                                 automaticallysupported_            
+                                 use        renderer              
+                                 graphic    for Gnash.            
+                                 card                             
+                                 acceleration                      
+                                 when                             
+                                 available,                       
+                                 and has                          
+                                 an                               
+                                 experimental                      
+                                 OpenGL                           
+                                 backend.                         
+GTK        Possibly   2.2 or      GTK is    Gnash      `libgtk2.0-dev'`gtk-devel'
+           Required   higher     the GIMP   requires              
+                                 Toolkit    the                   
+                                 GUI        installation           
+                                 library.   of at                 
+                                 It uses    least one             
+                                 Cairo      GUI                   
+                                 internally.library.              
+                                            GTK is                
+                                            considered            
+                                            to be the             
+                                            _best                 
+                                            supported_            
+                                            GUI                   
+                                            library               
+                                            option                
+                                            for Gnash.            
+GtkGlExt   Possibly               GtkGlExt  This       `libgtkglext1-dev'`gtkglext-devel'
+           Required              integrates library               
+                                 OpenGL     is                    
+                                 into GTK.  required              
+                                            in order              
+                                            to use                
+                                            the GTK               
+                                            GUI                   
+                                            library               
+                                            in                    
+                                            conjunction           
+                                            with the              
+                                            OpenGL                
+                                            renderer.             
+SDL        Possibly               The       Gnash      `libsdl1.2-dev'`SDL-devel'
+           Required              Simple     requires              
+                                 DirectMediathe                   
+                                 Layer is   installation           
+                                 a          of at                 
+                                 cross-platformleast one             
+                                 multimedia GUI                   
+                                 library    library.              
+                                 which      SDL may               
+                                 provides   also be               
+                                 abstractionused as a             
+                                 for        sound                 
+                                 audio,     handler               
+                                 graphics,  regardless            
+                                 sound and  of                    
+                                 input      whether               
+                                 APIs.      it is                 
+                                 SDL is     employed              
+                                 available  as a GUI              
+                                 from       library.              
+                                 http://www.libsdl.orgThe GUI               
+                                 (http://www.libsdl.org).library               
+                                            is                    
+                                            _poorly               
+                                            supported_            
+                                            in Gnash,             
+                                            but the               
+                                            sound                 
+                                            handler               
+                                            is the                
+                                            _best                 
+                                            supported_            
+                                            in Gnash.             
+FLTK       Possibly   2.0 or      The Fast  Gnash      No         No
+           Required   higher     Light      requires   distributiondistribution
+                                 ToolKit    the        packages   packages
+                                 is a       installationare        are
+                                 portable   of at      available. available.
+                                 GUI        least one             
+                                 library    GUI                   
+                                 which is   library.              
+                                 intended   FLTK may              
+                                 as a       be used               
+                                 replacementin                    
+                                 for the    conjunction           
+                                 SDL GUI.   with the              
+                                            Cairo and             
+                                            AGG                   
+                                            renderers.            
+KDE        Possibly               Kdelibs   Gnash      `kdelibs4-dev'`kdelibs-devel'
+           Required              is a       requires              
+                                 collection the                   
+                                 of         installation           
+                                 libraries  of at                 
+                                 needed to  least one             
+                                 compile    GUI                   
+                                 KDE        library.              
+                                 applications.Kdelibs               
+                                            is also               
+                                            required              
+                                            for the               
+                                            Kpart                 
+                                            plugin                
+                                            for                   
+                                            Konqueror.            
+libMAD     Optional               libMAD    libMAD is  `libmad0-dev'`libmad-devel'
+                                 is MPEG    one of                
+                                 audio      the                   
+                                 decoder.   available             
+                                            options               
+                                            for sound             
+                                            handling.             
+Gstreamer  Optional               Gstreamer If you     `libgstreamer0.8-dev'`gstreamer-devel'
+                                 is a       would                 
+                                 video      like                  
+                                 handler.   video                 
+                                            playback,             
+                                            you must              
+                                            install               
+                                            one of                
+                                            the video             
+                                            handlers.             
+gst-ffmpeg Possibly               gst-ffmpegThis       `gstreamer0.8-ffmpeg-dev'`gstreamer-ffmpeg-devel'
+           Required              allows     package               
+                                 you to     is                    
+                                 use the    required              
+                                 FFMPEG     if you                
+                                 decoder    would                 
+                                 with       like to               
+                                 Gstreamer. use                   
+                                            Gstreamer             
+                                            as a                  
+                                            video                 
+                                            handler.              
+FFMPEG     Possibly               FFMPEG    If you     `ffmpeg-dev'`ffmpeg-devel'
+           Required              is a       would                 
+                                 video      like                  
+                                 handler.   video                 
+                                            playback,             
+                                            you must              
+                                            install               
+                                            one of                
+                                            the video             
+                                            handlers.             
+                                            It is also            
+                                            a                     
+                                            dependency            
+                                            of                    
+                                            gst-ffmpeg.           
+JPEG       Optional              JPEG       This       `libjpeg62-dev'`libjpeg'
+                                 (http://www.ijg.org/)library               
+                                 is a       is used               
+                                 lossy      for                   
+                                 image      rendering             
+                                 format     JPEGs.                
+                                 which is                         
+                                 heavily                          
+                                 used for                         
+                                 images.                          
+PNG        Optional              PNG        This       `libpng12-dev'`libpng'
+                                 (http://www.libpng.org/pub/png/)library               
+                                 is a       is used               
+                                 patent-freefor                   
+                                 image      rendering             
+                                 format     PNGs.                 
+                                 which is                         
+                                 comparable                       
+                                 to _GIF_.                        
+libcurl    Optional               libcurl   This       `libcurl4-gnutls'`libcurl'
+                                 is the     library               
+                                 multiprotocalis used               
+                                 file       for URL               
+                                 transfer   downloading.           
+                                 library.                         
+automake   Possibly   1.6.0       Automake  This       `automake' `automake'
+           Required              is a tool  package               
+                                 for        is                    
+                                 generating required              
+                                 _Makefile.in_to run                
+                                 files.     _autogen.sh_,           
+                                            which is              
+                                            a                     
+                                            requirement           
+                                            if you                
+                                            are using             
+                                            the                   
+                                            development           
+                                            source                
+                                            from CVS.             
+autoconf   Possibly   2.59        Autoconf  This       `autoconf' `autoconf'
+           Required              is a       package               
+                                 package    is                    
+                                 for        required              
+                                 generating to run                
+                                 configure  _autogen.sh_,           
+                                 scripts.   which is              
+                                            a                     
+                                            requirement           
+                                            if you                
+                                            are using             
+                                            the                   
+                                            development           
+                                            source                
+                                            from CVS.             
+gettext    Possibly   0.14.6      Gettext   This       `gettext'  `gettext'
+           Required              is part    package               
+                                 of the     is                    
+                                 GNU        required              
+                                 Translationto run                
+                                 Project.   _autogen.sh_,           
+                                            which is              
+                                            a                     
+                                            requirement           
+                                            if you                
+                                            are using             
+                                            the                   
+                                            development           
+                                            source                
+                                            from CVS.             
+libtool    Possibly   1.5.22      This is   This       `libltdl3-dev'`libtool'
+           Required              a generic  package               
+                                 library    is                    
+                                 support    required              
+                                 script.    to run                
+                                            _autogen.sh_,           
+                                            which is              
+                                            a                     
+                                            requirement           
+                                            if you                
+                                            are using             
+                                            the                   
+                                            development           
+                                            source                
+                                            from CVS.             
+
+
+File: gnash.info,  Node: Testing Dependencies,  Next: Documentation Dependencies,  Prev: Code Dependencies,  Up: Software Requirements
+
+3.1.2.2 Testing Dependencies
+............................
+
+Gnash tries to run as many tests as possible, but will simply skip
+tests if the tools to run them are unavailable.
+
+   *Testing Dependency Table*
+
+Name       Level      Version    DescriptionExplanationapt-get    RPM/Yum
+                                                       package    package
+Ming       Optional   0.4.0_beta4 Ming is   Ming is    No         No
+                      or higher  an         the        distributiondistribution
+                                 ActionScriptprimary    packages   packages
+                                 compiler.  compiler   are        are
+                                            for        available. available.
+                                            ActionScript           
+                                            testcases.            
+Mtasc      Optional               Mtasc is  Mtasc is   `mtasc'    No
+                                 an         used in               distribution
+                                 ActionScriptsome                  packages
+                                 compiler.  tests.                are
+                                                                  available.
+swfdec     Optional               Swfdec    Swfdec is  No         Unofficial
+                                 is a       used in    distributionpackage
+                                 Flash      some       packages   `swfdec'
+                                 player.    testcases. are        
+                                                       available. 
+DejaGnu    Optional               DejaGnu   DejaGnu    `dejagnu'  `dejagnu'
+                                 is a       is used               
+                                 testing    to run                
+                                 framework. multiple              
+                                            tests in              
+                                            an                    
+                                            automated             
+                                            fashion.              
+
+
+File: gnash.info,  Node: Documentation Dependencies,  Prev: Testing Dependencies,  Up: Software Requirements
+
+3.1.2.3 Documentation Dependencies
+..................................
+
+The following packages are used to build Gnash's documentation.
+
+   *Documentation Dependency Table*
+
+Name       Level      Version    DescriptionExplanationapt-get    RPM/Yum
+                                                       package    package
+Docbook    Required              Docbook    Gnash      `docbook-utils'`docbook-dtd41-sgml'
+                                 (http://http://docbook.sourceforge.net/)documentationand        and
+                                 is is an   is         `docbook-dsssl'`docbook-style-dsssl'
+                                 industry-standardwritten               
+                                 XML        in                    
+                                 format     Docbook.              
+                                 for                              
+                                 technical                        
+                                 documentation.                      
+                                 You can                          
+                                 download                         
+                                 it from                          
+                                 http://sourceforge.net/project/showfiles.php?group_id=21935#files                      
+                                 (http://sourceforge.net/project/showfiles.php?group_id=21935#files).                      
+DocBook2X  Optional               This      DocBook2X  `docbook2x'`docbook2x'
+                                 software   is                    
+                                 package    required              
+                                 converts   to                    
+                                 Docbook    produce               
+                                 documents  HTML and              
+                                 to the     Texinfo               
+                                 traditionalformats.              
+                                 man page                         
+                                 format,                          
+                                 GNU                              
+                                 Texinfo                          
+                                 format,                          
+                                 and HTML                         
+                                 (via                             
+                                 Texinfo)                         
+                                 format.                          
+                                 It is                            
+                                 available                        
+                                 at                               
+                                 http://docbook2x.sourceforge.net/                      
+                                 (http://docbook2x.sourceforge.net/).                      
+Texinfo    Possibly               Texinfo   Texinfo    `texinfo'  `texinfo'
+           Required              can be     is                    
+                                 used to    required              
+                                 convert    if you                
+                                 DocBook2X  wish to               
+                                 output     product               
+                                 into GNU   GNU info              
+                                 info       pages.                
+                                 pages.                           
+                                 You can                          
+                                 download                         
+                                 it from                          
+                                 http://ftp.gnu.org/gnu/texinfo/                      
+                                 (http://ftp.gnu.org/gnu/texinfo/).                      
+FOP        Optional   0.20.5      FormattingFOP is     `fop'      `fop'
+                                 Objects    required              
+                                 Processor  for PDF               
+                                 is a       output.               
+                                 print                            
+                                 formatter                        
+                                 driven by                        
+                                 XSL                              
+                                 formatting                       
+                                 objects.                         
+                                 It is a                          
+                                 Java                             
+                                 application                      
+                                 which can                        
+                                 output                           
+                                 PDF, PCL,                        
+                                 PS, SVG,                         
+                                 XML,                             
+                                 Print,                           
+                                 AWT, MIF,                        
+                                 and Text.                        
+                                 It is                            
+                                 available                        
+                                 at                               
+                                 http://xmlgraphics.apache.org/fop/                      
+                                 (http://xmlgraphics.apache.org/fop/).                      
+Java       Possibly               FOP       Sun's      Download   Download
+(j2re)     Required              requires   Java       the        the
+                                 Sun's      runtime    package    package
+                                 Java       (j2re) is  from Sun   from Sun
+                                 runtime    required   (http://java.sun.com).(http://java.sun.com).
+                                 (GCJ does  to use                
+                                 not work   FOP.                  
+                                 with                             
+                                 FOP).                            
+                                 You can                          
+                                 download                         
+                                 it from                          
+                                 http://java.sun.com                      
+                                 (http://java.sun.com).                      
+JAI        Possibly               Sun's     JAI is     Download   Download
+           Required              Java       required   the        the
+                                 Advanced   if you     package    package
+                                 Imaging    wish to    from Sun   from Sun
+                                 API can    include    (http://java.sun.com/products/java-media/jai/iio.html).(http://java.sun.com/products/java-media/jai/iio.html).
+                                 be         graphics              
+                                 downloaded in a PDF              
+                                 from       file being            
+                                 http://java.sun.com/products/java-media/jai/iio.htmlgenerated             
+                                 (http://java.sun.com/products/java-media/jai/iio.html).with FOP.             
+
+   If you install j2re, set the _JAVA_HOME_ environment variable to the
+top directory of the j2re installation.  If you encounter problems with
+the Java installation, you may also need to add this path to the
+_CLASSPATH_ environment variable.
+
+
+File: gnash.info,  Node: Downloading Gnash,  Next: Pre-Compile Configuration,  Prev: Requirements,  Up: Installing and Configuring Gnash
+
+3.2 Downloading Gnash
+=====================
+
+There are two ways to download Gnash: using a package manager or by
+downloading the source code and building it on your system. If
+possible, it is advisable to use a package manager to download Gnash,
+as it will resolve dependencies for you.  However, if you want the very
+latest features, or a Gnash package is not available for your operating
+system, it is better to download the source code and build Gnash
+locally.
+
+* Menu:
+
+* Using a Package Manager::
+* Getting the Source::
+
+
+File: gnash.info,  Node: Using a Package Manager,  Next: Getting the Source,  Up: Downloading Gnash
+
+3.2.1 Using a Package Manager
+-----------------------------
+
+Gnash is available as a package for a number of Linux and BSD
+distributions, such as Ubuntu
+(http://packages.ubuntu.com/feisty/utils/gnash), Debian
+(http://packages.debian.org/unstable/utils/gnash), FreeBSD
+(http://www.freshports.org/graphics/gnash/), and OpenBSD
+(http://ports.openbsd.nu/www/gnash).  There is also an unofficial
+Fedora RPM.  This is not an extensive list, and you are advised to
+search if you wish to use a package manager on a different system.
+
+
+File: gnash.info,  Node: Getting the Source,  Prev: Using a Package Manager,  Up: Downloading Gnash
+
+3.2.2 Getting the Source
+------------------------
+
+Gnash is available as a release tarball (*note Releases::), a
+development checkout (*note Repository::), or a development snapshot
+(*note Snapshot::).
+
+* Menu:
+
+* Releases::
+* Repository::
+* Snapshot::
+
+
+File: gnash.info,  Node: Releases,  Next: Repository,  Up: Getting the Source
+
+3.2.2.1 Releases
+................
+
+The source can be acquired from a GNU FTP Mirror
+(http://www.gnu.org/prep/ftp.html).  The release version is intended to
+be stable, and is probably your best choice if the release took place
+recently.  If you need features or fixes which were introduced after
+the release, consider a CVS checkout (*note Repository::) or the daily
+snapshot (*note Snapshot::).
+
+   To download, select a mirror near you, then choose the `gnash'
+directory.
+
+
+File: gnash.info,  Node: Repository,  Next: Snapshot,  Prev: Releases,  Up: Getting the Source
+
+3.2.2.2 Repository
+..................
+
+The latest development sources are available via anonymous CVS.  This
+is recommended if you need features or bug fixes which were introduced
+after the last release (*note Releases::).  Look at the daily snapshot
+(*note Snapshot::) if you experience difficulty accessing the
+repository.
+
+   To download via anonymous CVS, first set the environment variable
+`CVS_RSH' to `ssh', then check out the source code.  The example below
+uses the GNU Bourne-Again shell (bash):
+
+
+     export CVS_RSH="ssh"
+     cvs -z3 -d:pserver:anonymous@cvs.sv.gnu.org:/sources/gnash co gnash
+
+   It is also possible to browse the repository
+`http://cvs.savannah.gnu.org/viewcvs/gnash/?root=gnash' on the web.
+
+
+File: gnash.info,  Node: Snapshot,  Prev: Repository,  Up: Getting the Source
+
+3.2.2.3 Snapshot
+................
+
+The daily development snapshot can be downloaded from
+http://www.gnashdev.org/dev_snapshots/
+(http://www.gnashdev.org/dev_snapshots/).  This is the best option if
+you need changes which were introduced after the last release (*note
+Releases::) of Gnash, but are unable to download directly from the
+repository. (*note Repository::)
+
+
+File: gnash.info,  Node: Pre-Compile Configuration,  Next: Building from Source,  Prev: Downloading Gnash,  Up: Installing and Configuring Gnash
+
+3.3 Pre-Compile Configuration
+=============================
+
+Gnash, like most GNU projects, allows a user to select various options
+before compiling its source code. These options include selecting from
+the available features, specifying custom paths for installation, and
+cross compiling.  Gnash uses GNU Autoconf
+(http://www.gnu.org/software/autoconf/) for configuration.
+
+   If you opted to download the development checkout (*note
+Repository::) of Gnash, the _configure_ script will not be included.
+It can be created by running _autogen.sh_ from the source root
+directory:
+
+
+       ./autogen.sh
+
+Note that there are some dependencies (*note Code Dependencies::) for
+autogen.
+
+   All the standard `configure' options are available.  In addition,
+Gnash has two types of options: those that enable or disable features
+(*note Features::), and those that specify custom paths for development
+packages (*note Specifying Custom Paths::) which are not found during
+the default search.  A complete list of _all_ configuration options,
+including standard ones, can be seen by typing:
+
+
+       ./configure --help |less
+
+Read further for a more detailed explanation of Gnash-specific options.
+
+   The syntax for running _configure_ is as follows:
+
+
+       configure <options>
+
+The example below shows the `configure' options which create the
+smallest working standalone version of Gnash.  In this example,
+`configure' is being run from the source root directory:
+
+
+     ./configure --disable-debugger --disable-cygnal --disable-docbook \
+     --disable-plugin --enable-media=mad --enable-gui=sdl
+
+* Menu:
+
+* Features::
+* Specifying Custom Paths::
+* Cross Compiling::
+
+
+File: gnash.info,  Node: Features,  Next: Specifying Custom Paths,  Up: Pre-Compile Configuration
+
+3.3.1 Features
+--------------
+
+Some switches can be used during configuration to enable or disable
+features of Gnash. Some of the most important configuration options are:
+
+   * `--enable-gui' lets you specify your GUI of choice.  The default
+     option is GTK.
+
+   * `--enable-renderer' allows a renderer to be chosen.  The default
+     renderer is OpenGL.
+
+   * `--enable-media' permits a media handler to be selected.  The
+     default is FFMPEG with SDL sound.
+
+   A complete list of available features follows.
+
+*Configuration Options - Features*
+
+Option                               Function
+`--enable-debugger'                  Enable support for the Flash
+                                     debugger. The debugger is mainly of
+                                     interest to Flash developers.
+`--enable-dmalloc'                   Enable support for the DMalloc
+                                     memory debugging tool.
+`--enable-docbook'                   Enable the generation of HTML and
+                                     PDF versions of the documentation
+                                     from the XML. You will then be able
+                                     to use `make html' and `make pdf'.
+`--enable-embedded'                  Link to Qt-embedded, do not use X.
+                                     This is only used by Klash
+`--disable-fork'                     Disable the plugin from forking the
+                                     standalone player, and using a
+                                     thread for the player instead.
+                                     Currently forking the standalone
+                                     player gives you the best results.
+`--enable-ghelp'                     Enable support for the GNOME help
+                                     system.
+`--disable-glext'                    Disable using GtkGlExt, which
+                                     forces the use of SDL instead. By
+                                     default if the GtkGL extension for
+                                     Gtk is found by the configure
+                                     script, the GTK-enabled GUI is
+                                     built.
+`--enable-gui=gtk|sdl|kde|fltk|fb'   Select the Graphic User Interface
+                                     to use (choose one).?
+                                     [undisplayable block object]
+`--enable-i810-lod-bias'             Enable fix for Intel 810 LOD bias
+                                     problem. Older versions of libMesa
+                                     on the Intel i810 or i815 graphics
+                                     processor need this flag or Gnash
+                                     will core dump. This has been fixed
+                                     in newer versions (summer 2005) of
+                                     libMesa.
+`--enable-libsuffix'                 `/lib' directory suffix
+                                     (64,32,none=default). This is only
+                                     used by Klash.
+`--enable-mac'                       Link to Qt/Mac (don't use X). This
+                                     is only used by Klash.
+`--enable-media=ffmpeg|mad|gst'       Select the specified media decoder
+                                     and sound engine.  FFMPEG and MAD
+                                     use the SDL sound engine; GST uses
+                                     its own.  MAD only decodes MP3
+                                     sounds and uses integer arithmetic
+                                     while the others also decode video
+                                     files and use floating point.
+                                     `FFMPEG' is the default decoder.  ?
+                                     [undisplayable block object] You
+                                     should only select one media
+                                     decoder.
+`--disable-nsapi'`--enable-nsapi'    Force disable/enable building the
+                                     NPAPI plugin.  By default the
+                                     Mozilla plugin is built if the GTK
+                                     gui is selected.  Specify the
+                                     `--with-npapi-plugindir=' option to
+                                     specify where the plugin should be
+                                     installed.
+`--disable-kparts'`--enable-kparts'  Force disable/enable building the
+                                     KPARTS plugin. By default the KDE
+                                     plugin is built if the kde gui is
+                                     selected.  Specify the
+                                     `--with-kde-plugindir=' and
+                                     `--with-kde-servicesdir=' options
+                                     (or more generally the
+                                     `--with-kde-pluginprefix=' one) to
+                                     specify where the plugin should be
+                                     installed. The default installation
+                                     dir is extracted from kde-config.
+`--disable-plugins'                  Disable build of both kparts and
+                                     npapi plugins
+`--enable-qtopia'                    Link to Qt-embedded, link to the
+                                     Qtopia Environment. This is only
+                                     used by Klash.
+`--enable-renderer=opengl|cairo|agg' Enable support for the a graphics
+                                     backend. Currently only `opengl' and
+                                     `agg' work sufficiently. OpenGL is
+                                     used when you have hardware
+                                     accelerated graphics. AGG i used
+                                     when you do not have hardware
+                                     accelerated graphics. Typically
+                                     most desktop machines have OpenGL
+                                     support, and most embedded systems
+                                     do not. OpenGl is the default when
+                                     building Gnash, although the
+                                     quality of AGG's rendering is
+                                     currently superior to OpenGL.
+`--enable-sdk-install'               Enable installing the libraries and
+                                     headers as an SDK.
+`--disable-shared'                   Enable installing the shared
+                                     libraries and headers.  Note that
+                                     the extensions mechanism may not
+                                     work if shared libraries are
+                                     disabled.
+`--enable-strict'                    Turn verbose GCC compiler warnings.
+                                     By default only `-Wall' is used
+                                     with GCC.
+`--enable-fps-debug'                 Enable FPS debugging code. When
+                                     this feature is compiled in you can
+                                     use the -f switch of Gnash to have
+                                     FPS printed at regular intervals.
+`--enable-write'                     Makes the Mozilla plugin write the
+                                     currently playing SWF movie to
+                                     `/tmp'.
+`--disable-mit-shm'                  Disable support for the MIT-SHM X
+                                     extensions.  Currently support is
+                                     only available using GTK gui and
+                                     AGG renderer.  Keeping it enabled
+                                     is not a problem as it will not be
+                                     used if not available in the
+                                     current X session.
+
+
+File: gnash.info,  Node: Specifying Custom Paths,  Next: Cross Compiling,  Prev: Features,  Up: Pre-Compile Configuration
+
+3.3.2 Specifying Custom Paths
+-----------------------------
+
+By default, none of these options should be required unless you want
+Gnash to use a specific version of a development package, or if the
+configure test fails to find a component.  Please report the problem
+(*note Reporting Bugs::) if a configure test fails.
+
+   The following custom path options are available:
+
+*Custom Path Options*
+
+Option                               Function
+`--x-includes=DIR'                    X include files are in DIR.
+`--x-libraries=DIR'                   X library files are in DIR.
+`--with-libxml=PFX'                   Prefix to where libxml is
+                                     installed.
+`--with-libxml-libraries=DIR'         Directory where libxml library is
+                                     installed.
+`--with-libxml-includes=DIR'          Directory where libxml header
+                                     files are installed.
+`--with-docbook=DIR'                  Directory where the DocBook
+                                     style-sheets are installed.
+`--with-sdl-prefix=PFX'               Prefix where SDL is installed.
+`--with-zlib-incl'                    Directory where zlib header is
+                                     installed.
+`--with-zlib-lib'                     Directory where zlib library is
+                                     installed.
+`--with-jpeg-incl'                    Directory where jpeg header is
+                                     installed.
+`--with-jpeg-lib'                     Directory where jpeg library is
+                                     installed.
+`--with-png-incl'                     Directory where png header is
+                                     installed.
+`--with-png-lib'                      Directory where png library is
+                                     installed.
+`--with-qt-dir'                       Directory where QT is installed.
+                                     This is only used by the Klash
+                                     plugin.
+`--with-qt-includes'                  Directory where the QT header
+                                     files are installed. This is only
+                                     used by the Klash plugin.
+`--with-qt-libraries'                 Directory where the QT libraries
+                                     are installed. This is only used by
+                                     the Klash plugin.
+`--with-npapi-plugindir'              This is the directory to install
+                                     the NPAPI (Mozilla) plugin in.  By
+                                     default it goes to
+                                     ~/.mozilla/plugins.
+`--with-kde-pluginprefix'             This option sets the default
+                                     install dir for all KPARTS (kde)
+                                     files.  The plugin will be
+                                     installed in PREFIX/lib/kde3, use
+                                     `-with-kde-plugindir' to override.
+                                     The service file in
+                                     PREFIX/share/services, use
+                                     `--with-kde-servicesdir' to
+                                     override.  The config file in
+                                     PREFIX/share/config, use
+                                     `--with-kde-configdir' to override.
+                                     The appdata file in
+                                     PREFIX/share/apps/klash, use
+                                     `--with-kde-appsdatadir' to
+                                     override.
+`--with-kde-plugindir'                This is the directory to install
+                                     the KPARTS (kde) plugin in.  By
+                                     default it is what's set by
+                                     -with-kde-pluginprefix or what's
+                                     returned by kde-config -install
+                                     module -expandvars, or
+                                     $(prefix)/share/services if
+                                     kde-config is not found.
+`--with-kde-servicesdir'              This is the directory to install
+                                     the KPARTS (kde) service in.  By
+                                     default it is what's set by
+                                     -with-kde-pluginprefix or what's
+                                     returned by kde-config -install
+                                     services -expandvars, or
+                                     $(libdir)/kde3 if kde-config is not
+                                     found.
+`--with-kde-configdir'                This is the directory to install
+                                     the KPARTS (kde) config files in.
+                                     By default it is what's set by
+                                     -with-kde-pluginprefix or what's
+                                     returned by kde-config -install
+                                     config -expandvars, or
+                                     $(prefix)/share/config if
+                                     kde-config is not found.
+`--with-kde-appsdatadir'              This is the directory to install
+                                     the KPARTS (kde) application data
+                                     files in.  By default it is what's
+                                     set by -with-kde-pluginprefix or
+                                     what's returned by kde-config
+                                     -install data -expandvars, or
+                                     $(prefix)/share/apps if kde-config
+                                     is not found.
+`--with-ming'                         Ming is used to build test cases,
+                                     but not by the Gnash player itself.
+`--with-mad_incl'                     Directory where libmad header is
+                                     installed.
+`--with-mad_lib'                      Directory where libmad library is
+                                     installed.
+`--with-ogg_incl'                     Directory where the libogg headers
+                                     are installed.
+`--with-ogg_lib'                      Directory where the libogg library
+                                     is installed.
+`--with-gstreamer-incl'               Directory where the Gstreamer
+                                     headers are installed. Gstreamer
+                                     version 0.10 or greater must be
+                                     used.
+`--with-gstreamer-lib'                Directory where the Gstreamer
+                                     library is installed. Gstreamer
+                                     version 0.10 or greater must be
+                                     used.
+`--with-opengl-includes'              Directory where OpenGL (libMesa)
+                                     headers are installed.
+`--with-opengl-lib'                   Directory where the OpenGL
+                                     (libMesa) library is installed.
+`--with-glext-incl'                   Directory where GtkGlExt headers
+                                     are installed.
+`--with-glext-lib'                    Directory where the GtkGlExt
+                                     library is installed.
+`--with-gtk2-incl'                    Directory where the Gtk2 headers
+                                     are installed.
+`--with-gtk2-lib'                     Directory where the Gtk2 library
+                                     is installed.
+`--with-cairo_incl'                   Directory where the Cairo headers
+                                     are installed.
+`--with-cairo-lib'                    Directory where the Cairo library
+                                     is installed.
+`--with-glib-incl'                    Directory where the Glib headers
+                                     are installed.
+`--with-glib-lib'                     Directory where the Glib library
+                                     is installed.
+`--with-pango-incl'                   Directory where the Pango headers
+                                     are installed.
+`--with-pango-lib'                    Directory where the Pango library
+                                     is installed.
+`--with-atk-incl'                     Directory where the ATK headers
+                                     are installed.
+`--with-atk-lib'                      Directory where the ATK library is
+                                     installed.
+`--with-pthread-incl'                 Directory where the Pthread
+                                     headers are installed.
+`--with-pthread-lib'                  Directory where the Pthread
+                                     library is installed.
+`--with-agg-incl'                     Directory where the AGG
+                                     (Antigrain) headers are installed.
+`--with-agg-lib'                      Directory where the AGG
+                                     (Antigrain) library is installed.
+`--with-ffmpeg-incl'                  Directory where the FFMPEG headers
+                                     are installed.
+`--with-ffmpeg-lib'                   Directory where the FFMPEG library
+                                     is installed.
+`--with-boost-incl'                   Directory where the Boost headers
+                                     are installed.
+`--with-boost-lib'                    Directory where the Boost library
+                                     is installed.
+`--with-curl-incl'                    Directory where the libCurl
+                                     headers are installed.
+`--with-curl-lib'                     Directory where the libCurl
+                                     library is installed.
+
+
+File: gnash.info,  Node: Cross Compiling,  Prev: Specifying Custom Paths,  Up: Pre-Compile Configuration
+
+3.3.3 Cross Compiling
+---------------------
+
+To cross configure and compile Gnash, begin by building a target system
+on your workstation.  This includes cross compilers for the target
+architecture, and some system headers.  You will also need the
+following packages to be built for the target system: _libxml2_,
+_libpng_ (if used), _libjpeg_ (if used), your GUI library, your
+renderer, and your video handler (if used).  The page
+http://frank.harvard.edu/~coldwell/toolchain/
+(http://frank.harvard.edu/~coldwell/toolchain/) has instructions on
+building a target system from scratch and offers a shell script to make
+the process easier.
+
+   Note that you may have some difficulties getting libMesa (opengl) to
+cross compile.
+
+   The important configuration options are the ones which specify the
+architecture for the build:
+
+-target
+     The target architecture, where the final executables are expected
+     to run.
+
+-host
+     The host architecture, where the executables are expected to run.
+     Usually this is the same as the _-target_, except when building a
+     compiler as a Canadian Cross.  In this case, you might build a
+     cross compiler on a UNIX system which runs on a win32 machine,
+     producing code for a third architecture, such as ARM.  In this
+     example, _-target_ would be 'arm-unknown-linux-gnu', while _-host_
+     would be 'win32'.
+
+-build
+     This is the system the build is running on.
+
+   The following example of _configure_ builds for an ARM system on an
+x86 system.  It was run after an ARM system was built in `/usr/arm' and
+other required libraries were cross compiled.
+
+
+     ./configure -target=arm-unknown-linux-gnu --prefix=/usr/arm \
+     --host=arm-unknown-linux-gnu --build=i686-pc-linux-gnu --disable-plugin
+
+
+File: gnash.info,  Node: Building from Source,  Next: Installation,  Prev: Pre-Compile Configuration,  Up: Installing and Configuring Gnash
+
+3.4 Building from Source
+========================
+
+Once you have configured (*note Pre-Compile Configuration::) Gnash, you
+are ready to build the code.  Gnash is built using _GNU make_.
+
+* Menu:
+
+* Compiling the Code::
+* Creating the Documentation::
+* Running the Tests::
+
+
+File: gnash.info,  Node: Compiling the Code,  Next: Creating the Documentation,  Up: Building from Source
+
+3.4.1 Compiling the Code
+------------------------
+
+The most basic way to compile code is simply:
+
+
+       make
+
+If the compilation ends with an error, check the output of _configure_
+and ensure that you are not missing any required prerequisites.  The
+output of `make' can be verbose; you may wish to pipe the output to a
+file.
+
+   The variables used by _make_ can be redefined when the program is
+invoked, if you desire it.   The most interesting flags are _CFLAGS_
+and _CXXFLAGS_, which are often used to enable debugging or turn of
+optimization.  The default value for both of these variables is _-O2
+-g_.  A list of influential environment variables can be seen in the
+configuration help:
+
+     ./configure --help
+
+   In the following example, debugging is enabled and optimization is
+disabled:
+
+     make CFLAGS=-g CXXFLAGS=-g
+
+
+File: gnash.info,  Node: Creating the Documentation,  Next: Running the Tests,  Prev: Compiling the Code,  Up: Building from Source
+
+3.4.2 Creating the Documentation
+--------------------------------
+
+By default, documentation is not built when you install (*note
+Installation::) Gnash.  This is because there are a number of
+dependencies for the documentation (*note Documentation
+Dependencies::).  Documentation is built when it is specified with a
+specific target in the generated `Makefile' in the `doc/C'
+sub-directory.  If you type `make install' in this directory, all
+documents will be built.
+
+   You must specify a target output format when you wish to create
+documentation.  The available output formats are: `html', `pdf', `info',
+`man', and `alldocs'.  It is also possible to output `GNOME help' if
+the configure option (*note Features::) `--enable-ghelp' was used.  The
+`alldocs' target will build all output formats except _GNOME help_.
+For example, to create HTML output, type:
+
+
+       make html
+
+   Gnash also uses Doxygen
+(http://www.stack.nl/~dimitri/doxygen/index.html) to produce _HTML_
+documentation of Gnash internals.  You must have Doxygen installed to
+produce this documentation, which is built from the `doc' directory
+with the command (documents will be placed in the subdirectory
+`apidoc/html'):
+
+
+       make apidoc
+
+
+File: gnash.info,  Node: Running the Tests,  Prev: Creating the Documentation,  Up: Building from Source
+
+3.4.3 Running the Tests
+-----------------------
+
+Before beginning the potentially lengthy install, it is wise to test
+the installation.  If a test fails, please report it by following the
+instructions for reporting a bug (*note Reporting Bugs::).
+
+* Menu:
+
+* Using DejaGnu::
+* Running The Tests Manually::
+
+
+File: gnash.info,  Node: Using DejaGnu,  Next: Running The Tests Manually,  Up: Running the Tests
+
+3.4.3.1 Using DejaGnu
+.....................
+
+The easiest way to run Gnash's test suite is to install _DejaGnu
+(http://www.gnu.org/software/dejagnu)_.  After installing DejaGnu, run:
+
+
+             make check
+
+* Menu:
+
+* Increasing Verbosity::
+* Running Some Tests::
+
+
+File: gnash.info,  Node: Increasing Verbosity,  Next: Running Some Tests,  Up: Using DejaGnu
+
+Increasing Verbosity
+....................
+
+If you encounter a problem with a test, increasing the verbosity may
+make the issue easier to spot.  Additional details are visible when
+_RUNTESTFLAGS_ are used to add the _verbose_ and _all_ options.  The
+`verbose' option prints more information about the testing process,
+while the `all' option includes details on passing tests.
+
+
+       make check RUNTESTFLAGS="-v -a"
+
+
+File: gnash.info,  Node: Running Some Tests,  Prev: Increasing Verbosity,  Up: Using DejaGnu
+
+Running Some Tests
+..................
+
+It is possible to run just a single test, or a subdirectory of tests,
+by specifying the directory or compiled test file.
+
+   Some tests rely on _testsuite/Dejagnu.swf_, which in turn relies on
+_Ming_.  This file is created when you run `make check' for the entire
+testsuite, and can also be created on demand:
+
+
+       make -C testsuite Dejagnu.swf
+
+   In this example, the `clip_as_button2' test is compiled and run:
+
+
+       make -C testsuite/samples clip_as_button2-TestRunner
+       cd testsuite/samples && ./clip_as_button2-TestRunner
+
+This creates and runs all the tests in the directory `movies.all':
+
+
+       make -C testsuite/movies.all check
+
+
+File: gnash.info,  Node: Running The Tests Manually,  Prev: Using DejaGnu,  Up: Running the Tests
+
+3.4.3.2 Running The Tests Manually
+..................................
+
+You may also run test cases by hand, which can be useful if you want to
+see all the debugging output from the test case.  Often the messages
+which come from deep within Gnash are most useful for development.
+
+   The first step is to compile the test case, which can be done with
+`make XML-v#.swf' where the '#' is replaced with the _target_ SWF
+version or versions.  For example:
+
+
+       make XML-v{5,6,7,8}.swf
+
+* Menu:
+
+* Movie tests::
+* ActionScript Unit Tests::
+
+
+File: gnash.info,  Node: Movie tests,  Next: ActionScript Unit Tests,  Up: Running The Tests Manually
+
+Movie tests
+...........
+
+This creates a Flash movie version of the test case, which can be run
+with a standalone Flash player.  For instance, the target for SWF
+version 6 could be run with Gnash:
+
+
+        gnash -v XML-v6.swf
+
+
+File: gnash.info,  Node: ActionScript Unit Tests,  Prev: Movie tests,  Up: Running The Tests Manually
+
+ActionScript Unit Tests
+.......................
+
+Unit tests for ActionScript classes in `testsuite/actionscript.all' are
+run without a graphical display:
+
+
+       gprocessor -v XML-v6.swf
+
+
+File: gnash.info,  Node: Installation,  Prev: Building from Source,  Up: Installing and Configuring Gnash
+
+3.5 Installation
+================
+
+Now that Gnash has been compiled and tested, use the following command
+to install it:
+
+
+       make install
+
+The above command installs the standalone player.  If the correct files
+were found by `configure' and if the `--disable-plugin' option was not
+specified, the Gnash browser plugin is also installed.
+
+   Gnash installs a number of libraries (*note Libraries::), namely:
+_libbase_, _libgeometry_, _libbackend_, _libserver_, and _libmozsdk_.
+Executables (*note Executables::) consist of the (optional) plugin,
+`gprocessor', `cygnal',  and `gnash'.  Documentation (*note
+Documentation::) may also be installed.  The installation location is
+controlled with the _-prefix_ configure option (*note Specifying Custom
+Paths::), except for plugins, which are explicitly set with
+_-plugin-dir_.
+
+   Note that if you are using a single file-system _NFS_ mounted to
+multiple platforms, the configuration option (*note Specifying Custom
+Paths::) _-exec-prefix_ may be used to specify where platform-dependent
+executables and libraries are installed.
+
+* Menu:
+
+* Libraries::
+* Executables::
+* Documentation::
+
+
+File: gnash.info,  Node: Libraries,  Next: Executables,  Up: Installation
+
+3.5.1 Libraries
+---------------
+
+Installed libraries are located in `/usr/local/lib' by default.  If the
+_-prefix_ option was used in configuration (*note Pre-Compile
+Configuration::), the libraries will be installed in the directory
+`lib' inside the path you specified.  If the libraries are stored in a
+non-standard location, you must identify the path in one of two ways.
+
+   The traditional way to do this on UNIX platforms is to set the
+_LD_LIBRARY_PATH_ variable to the path plus `/lib'.  For example, if you
+installed in `/home/gnash', the _LD_LIBRARY_PATH_ path would be
+`/home/gnash/lib'.  Multiple paths are delimited with a colon (':').
+
+   GNU/Linux allows the custom path to be added to `/etc/ld.so.conf'.
+After adding the path, run _ldconfig_ as root to update the runtime
+cache.
+
+
+File: gnash.info,  Node: Executables,  Next: Documentation,  Prev: Libraries,  Up: Installation
+
+3.5.2 Executables
+-----------------
+
+The Mozilla plugin is built from headers (the Mozilla SDK) provided
+with Gnash and does not need extra development packages to be
+installed. By default, the plugin is installed to
+`~/.mozilla/plugins/'. To enable the plugin for other users, copy the
+file `libgnashplugin.so' to `.mozilla/plugins/' in their home directory.
+You may also specify the plugin installation directory by using the
+`--with-plugindir' option at configuration time (*note Specifying
+Custom Paths::).
+
+   These defaults are likely to change in future versions of Gnash.
+
+   The remaining executables are installed in the `bin' subdirectory of
+the directory specified by during configuration.  If no path was
+specified, the default is `/usr/local/bin'.
+
+
+File: gnash.info,  Node: Documentation,  Prev: Executables,  Up: Installation
+
+3.5.3 Documentation
+-------------------
+
+Documentation is not built by default; please refer to the section on
+documentation (*note Creating the Documentation::) for more information
+on building documentation.
+
+   `man' and `info' are installed in `/usr/local/share/man' and
+`/usr/local/share/info' respectively, unless the `--mandif' or
+`--infodir' configuration options (*note Specifying Custom Paths::) are
+used.
+
+   _GNOME help_ documentation uses the directory
+`/usr/local/share/gnash/doc/gnash/C/' by default.  A configuration file
+in the Gnash source tree, `doc/C/gnash.omf' is used to specify under
+which menu item Gnash appears in the _GNOME help_ system.
+
+
+File: gnash.info,  Node: Using Gnash,  Next: Reporting Bugs,  Prev: Installing and Configuring Gnash,  Up: Top
+
+4 Using Gnash
+*************
+
+When used as a standalone player, you can play any Flash file from the
+command line by entering a command of the format:
+
+
+     gnash <option> <flashfile.swf>
+
+The only required argument is the name (and location)of the file to be
+played.
+
+   The available options are listed in the following section, or you
+may view them in the terminal window by executing the following at the
+command line:
+
+
+     gnash --help |less
+
+   The source code download of Gnash includes several example .SWF
+files.  They are located in the `testsuite/samples/' directory of the
+Gnash source directory.  If you have installed Gnash correctly, issuing
+the a command similar to the following plays a short animation of a car
+swerving and crashing:
+
+
+     gnash /home/<username>/gnash/testsuite/car_smash.swf
+
+   The above is useful for playing Flash files downloaded to your local
+system.  It is also possible to play Flash files directly from the web.
+To do so, use the `-u' option along with the URL of the desired file.
+
+
+     gnash -u http://example.domain.com/flashfile.swf
+
+Note that this will not work with every website; some embedded Flash
+files are difficult to play.
+
+* Menu:
+
+* Gnash Command Line Options::
+* Gnash Interactive Control Keys::
+* User Configuration File::
+
+
+File: gnash.info,  Node: Gnash Command Line Options,  Next: Gnash Interactive Control Keys,  Up: Using Gnash
+
+4.1 Gnash Command Line Options
+==============================
+
+No options are required for  Gnash's default behavior.  However, there
+are many options that can be used to that behavior.
+
+
+     	gnash <options> filename.swf
+
+*Gnash Command Line Options*
+
+Option                               Function
+`-h'                                  Print usage information.
+`-s factor'                           Scale the movie up/down by the
+                                     specified factor.
+`-c'                                  Produce a core file instead of
+                                     letting SDL trap it. By default,
+                                     SDL traps all signals, but
+                                     sometimes a core file is desired to
+                                     assist with debugging.
+`-d num'                              Number of milliseconds to delay in
+                                     main loop. The main loop polls
+                                     continuously with a delay to adjust
+                                     how long _Gnash_ sleeps between
+                                     iterations of the loop. The smaller
+                                     the number, the higher the CPU load
+                                     gets, and of course, the more
+                                     iterations of the main command loop.
+`-p'                                  Run full speed (no sleep) and log
+                                     frame rate.
+`-a'                                  Enable Actionscript debugging.
+`-v'                                  Be verbose; i.e. print debug
+                                     messages to stdout.
+`-va'                                 Be verbose about movie Actions.
+`-vp'                                 Be verbose about parsing the
+                                     movie. Warning: this can generate a
+                                     lot of text, and can affect the
+                                     performance of the movie you are
+                                     playing.
+`-ml bias'                            Specify the texture LOD bias
+                                     (float, default is -1) This affects
+                                     the fuzziness of small objects,
+                                     especially small text.
+`-w'                                  Write a debug log called
+                                     gnash-dbg.log. This will record of
+                                     all the debug messages whether they
+                                     are printed to the screen or not.
+`-j'                                  Specify the width of the window.
+                                     This is mostly used only by the
+                                     plugin.
+`-k'                                  Specify the height of the window.
+                                     This is mostly used only by the
+                                     plugin.
+`-1'                                  Play once; exit when/if movie
+                                     reaches the last frame. This is the
+                                     default.
+`-r [0|1|2|3]'                       ? [undisplayable block object]
+`-t sec'                              Timeout and exit after the
+                                     specified number of seconds. This
+                                     is useful for movies which repeat
+                                     themselves.
+`-g'                                  Start Gnash with a Flash debugger
+                                     console so one can set break points
+                                     or watchpoints.
+`-x id'                               This specifies the X11 window ID
+                                     to display in; this is mainly used
+                                     by plugins.
+`-b bits'                             Bit depth of output window (for
+                                     example, 16 or 32). Appropriate bit
+                                     depths depend on the renderer and
+                                     GUI library used.
+`-u url'                              Set the _url member of the root
+                                     movie. This is useful when you
+                                     download a movie and play it from a
+                                     different location. See also the -U
+                                     switch.
+`-U baseurl'                          Set base URL for this run. URLs
+                                     are resolved relative to this base.
+                                     If omitted defaults to the _url
+                                     member of the top-level movie (see
+                                     the -u switch).
+`-P entrymeter'                       Parameters are given in
+                                     ParamName=Value syntax and are
+                                     mostly useful to the plugin to
+                                     honour EMBED tags attributes or
+                                     explicit OBJECT PARAM tags. A
+                                     common use for -P is to provide
+                                     FlashVars (ie: -P
+                                     "FlashVars=home=http://www.gnu.org").
+`-F filedescriptor'                   Use the given filedescriptor to
+                                     send requests to the host
+                                     application. This is currently only
+                                     used for GETURL requests.  The
+                                     protocol is not documented yet, and
+                                     also needs improvement.  Primary
+                                     use for this switch is for the
+                                     NPAPI plugin to properly support
+                                     javascript and target windows in
+                                     geturl requests.
+
+
+File: gnash.info,  Node: Gnash Interactive Control Keys,  Next: User Configuration File,  Prev: Gnash Command Line Options,  Up: Using Gnash
+
+4.2 Gnash Interactive Control Keys
+==================================
+
+While a movie is playing, there are several control keys. These can be
+used to step through frames, pause the playing, and control other
+actions.
+
+*Gnash Interactive Control Keys*
+
+Key Combination                      Function
+`CTRL-Q'                              Quit/Exit.
+`CTRL-W'                              Quit/Exit.
+`ESC'                                 Quit/Exit.
+`CTRL-P'                              Toggle Pause.
+`CTRL-R   '                           Restart the movie.
+`CTRL-[ or kp-'                       Step back one frame.
+`CTRL-] or kp+'                       Step forward one frame.
+
+
+
+Local Variables:
+coding: US-ASCII
+End:

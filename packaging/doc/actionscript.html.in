@@ -1,0 +1,618 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>ActionScript Manual V0.2</title><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="article" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="index"></a>ActionScript Manual V0.2</h2></div><div><div class="authorgroup"><div class="author"><h3 class="author"><span class="firstname">Rob</span> <span class="surname">Savoye</span></h3><div class="affiliation"><div class="address"><p><br>
+	    <code class="email">&lt;<a class="email" href="mailto:rob@welcomehome.org">rob@welcomehome.org</a>&gt;</code><br>
+	  </p></div></div></div><div class="author"><h3 class="author"><span class="firstname">Ann</span> <span class="surname">Barcomb</span></h3></div></div></div><div><p class="releaseinfo">This manual describes how Gnash ActionScript classes
+    are written.
+    </p></div><div><p class="copyright">Copyright © 2007, 2008 Free Software Foundation</p></div><div><div class="legalnotice"><a name="legalnotice"></a><p>
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the <a class="link" href="#fdl" title="A. GNU Free Documentation License"><em class="citetitle">GNU
+    Free Documentation License</em></a>, Version 1.1 or any later
+    version published by the Free Software Foundation with no Invariant
+    Sections, no Front-Cover Texts, and no Back-Cover Texts. You can find
+    a copy of the GFDL at this 
+    <a class="link" href="#fdl" title="A. GNU Free Documentation License">link</a> or in the file COPYING-DOCS
+    distributed with this manual.
+   </p></div></div><div><div class="revhistory"><table border="1" width="100%" summary="Revision history"><tr><th align="left" valign="top" colspan="2"><b>Revision History</b></th></tr><tr><td align="left">Revision ActionScript Manual V0.2</td><td align="left">Feb 2008</td></tr><tr><td align="left" colspan="2"> 
+	  <p class="author">Rob Savoye
+	    <code class="email">&lt;<a class="email" href="mailto:rob@welcomehome.org">rob@welcomehome.org</a>&gt;</code>
+	  </p>
+	  <p class="author">Ann Barcomb
+	  </p>
+	  <p class="publisher">Free Software Foundation</p>
+	</td></tr></table></div></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#introduction">Introduction</a></span></dt><dd><dl><dt><span class="sect2"><a href="#overview">Object Creation Overview</a></span></dt></dl></dd><dt><span class="sect1"><a href="#newclass">Adding New ActionScript Class</a></span></dt><dd><dl><dt><span class="sect2"><a href="#prototype">Prototype</a></span></dt><dt><span class="sect2"><a href="#declaration">Declaration</a></span></dt><dt><span class="sect2"><a href="#instantiation">Instantiation</a></span></dt><dt><span class="sect2"><a href="#methods">Methods</a></span></dt><dt><span class="sect2"><a href="#properties">Dynamic Properties</a></span></dt></dl></dd><dt><span class="sect1"><a href="#as_value">The <span class="emphasis"><em>as_value</em></span> Object Type</a></span></dt><dd><dl><dt><span class="sect2"><a href="#data_types">Data Types</a></span></dt><dt><span class="sect2"><a href="#is_methods">Determining the Type</a></span></dt><dt><span class="sect2"><a href="#to_methods">Fetching the Value</a></span></dt><dt><span class="sect2"><a href="#set_methods">Setting the Value and Type</a></span></dt><dt><span class="sect2"><a href="#further_as_value_reading">Further Reading</a></span></dt></dl></dd><dt><span class="appendix"><a href="#fdl">A. GNU Free Documentation License</a></span></dt><dd><dl><dt><span class="sect1"><a href="#fdl-preamble">0. PREAMBLE</a></span></dt><dt><span class="sect1"><a href="#fdl-section1">1. APPLICABILITY AND DEFINITIONS</a></span></dt><dt><span class="sect1"><a href="#fdl-section2">2. VERBATIM COPYING</a></span></dt><dt><span class="sect1"><a href="#fdl-section3">3. COPYING IN QUANTITY</a></span></dt><dt><span class="sect1"><a href="#fdl-section4">4. MODIFICATIONS</a></span></dt><dt><span class="sect1"><a href="#fdl-section5">5. COMBINING DOCUMENTS</a></span></dt><dt><span class="sect1"><a href="#fdl-section6">6. COLLECTIONS OF DOCUMENTS</a></span></dt><dt><span class="sect1"><a href="#fdl-section7">7. AGGREGATION WITH INDEPENDENT WORKS</a></span></dt><dt><span class="sect1"><a href="#fdl-section8">8. TRANSLATION</a></span></dt><dt><span class="sect1"><a href="#fdl-section9">9. TERMINATION</a></span></dt><dt><span class="sect1"><a href="#fdl-section10">10. FUTURE REVISIONS OF THIS LICENSE</a></span></dt><dt><span class="sect1"><a href="#fdl-using">Addendum</a></span></dt></dl></dd></dl></div><a class="indexterm" name="id2596580"></a><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="introduction"></a>Introduction</h2></div></div></div><p>
+        In this document, the term 'ActionScript class' refers to the
+        C++ class which is instantiated by Gnash when some ActionScript
+        code instantiates a corresponding class.  The C++ class
+        stores instance data and implements the methods which are 
+        called on the object in the ActionScript code.
+      </p><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="overview"></a>Object Creation Overview</h3></div></div></div><p>
+            When Gnash starts, the <span class="emphasis"><em>class_init()</em></span> method 
+            for each ActionScript class (listed in Global.cpp) is called.
+            This method constructs a prototype, which is implemented as an
+            <span class="emphasis"><em>as_object</em></span>.  In addition, the method
+            registers the constructor to be used for future object creation,
+            and attaches methods and properties to the prototype.
+          </p><p>
+            When a new object is needed, instance data is added to
+            the methods and properties inherited from the prototype.
+          </p></div></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="newclass"></a>Adding New ActionScript Class</h2></div></div></div><p>
+        Adding a new ActionScript class is relatively simple, but the
+        process is complicated by the fact that the interface has evolved
+        over time and the current code base represents several different
+        formats.  This document describes the current interface.  The
+        Boolean class should be considered the authoritative example of
+        a modern ActionScript class.
+      </p><p>
+        ActionScript classes contain a header file and a C++
+        implementation.  The name is usually the name of the
+        class as it is called in the ActionScript specifications;
+        for instance <span class="emphasis"><em>Boolean.cpp</em></span> for the Boolean class.
+      </p><p> 
+        In the CVS source tree, there is a utility file named
+        <span class="emphasis"><em>gen-asclass.sh</em></span> which can be used to
+        create the header file and a C++ source file stub for
+        an ActionScript class.  
+      </p><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="prototype"></a>Prototype</h3></div></div></div><p>
+          In ActionScript, a prototype is a base object which contains
+          all the methods that an instantiated object will contain.
+          In short, it contains every part of the class except for
+          the portions dealing with the storage of instance data.
+	</p><p>
+          In Gnash, the prototype of an ActionScript object is 
+          implemented as an <span class="emphasis"><em>as_object</em></span>.
+          At startup, the methods and properties of the ActionScript class
+          are attached to the <span class="emphasis"><em>as_object</em></span>.  The
+          following example demonstrates how methods can be attached:
+	  </p><pre class="programlisting">
+            static void
+            attachBooleanInterface(as_object&amp; o) 
+            {
+                o.init_member("toString", new builtin_function(boolean_tostring));
+                o.init_member("valueOf", new builtin_function(boolean_valueof));
+            }
+	  </pre><p>
+          This code was generated using <span class="emphasis"><em>gen-asclass.sh</em></span>.
+          Typically, you will need to customize the attach method to include
+          any new methods you add to the class.
+	</p><p>
+          Static properties can also be added to the ActionScript prototype
+          (<a class="link" href="#properties" title="Dynamic Properties">dynamic properties</a> 
+          are addressed later).  They are attached in a similar way:
+          </p><pre class="programlisting">
+	    o.init_member("myProperty", as_value("HelloWorld"));
+	  </pre><p>
+	</p><p>
+          Properties which have been added in this manner can be
+          directly accessed in ActionScript code without a function
+          call, as this piece of ActionScript code compiled by Ming's
+          <span class="emphasis"><em>makeswf</em></span> compiler demonstrates:
+	    </p><pre class="programlisting">
+	      // Get the value of the myProperty property
+	      if (node.myProperty == "HelloWorld") {
+	          trace("MATCHED");
+	      }
+	    </pre><p>
+	</p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="declaration"></a>Declaration</h3></div></div></div><p>
+          A new class should derive from <span class="emphasis"><em>as_object</em></span>,
+          which is the base class of every ActionScript object in Gnash.
+          The class declaration will also be generated when you use
+          <span class="emphasis"><em>gen-asclass.sh</em></span>.
+	</p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="instantiation"></a>Instantiation</h3></div></div></div><p>
+          The class should contain an init method; this is included
+          in the stub when <span class="emphasis"><em>gen-asclass.sh</em></span> is
+          used.
+	</p><p>
+          The init method should be called in the constructor in
+          <span class="emphasis"><em>Global.cpp</em></span>, where all other ActionScript
+          classes are similarly referenced.
+	</p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="methods"></a>Methods</h3></div></div></div><p>
+          Every method you implement and 
+          <a class="link" href="#prototype" title="Prototype">attach</a> will receive an
+          <span class="emphasis"><em>fn_call</em></span> data structure as an argument when it is called.
+        </p><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="arguments"></a>Accessing Arguments</h4></div></div></div><p>
+            The arguments stored in <span class="emphasis"><em>fn_call</em></span>
+            should be accessed using <span class="emphasis"><em>arg()</em></span>.  For
+            instance, the first element can be popped with
+            <span class="emphasis"><em>fn.arg(0)</em></span>.
+	  </p><p>
+            The element popped off the stack is an 
+            <a class="link" href="#as_value" title="The as_value Object Type"><span class="emphasis"><em>as_value</em></span>
+            object</a>.
+          </p></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="return"></a>Returning a Value to ActionScript</h4></div></div></div><p>
+            The return value should be an
+            <a class="link" href="#as_value" title="The as_value Object Type"><span class="emphasis"><em>as_value</em></span> 
+            object</a>.  For example:
+            </p><pre class="programlisting">
+              return as_value('Goodbye, cruel world.');
+            </pre><p>
+          </p></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="additional_fn_call"></a>Additional <span class="emphasis"><em>fn_call</em></span> Members</h4></div></div></div><p>
+            There are two other useful members of the <span class="emphasis"><em>fn_call</em></span>
+            structure, namely <span class="emphasis"><em>this_ptr</em></span> and
+            <span class="emphasis"><em>nargs</em></span>.  The former points to the
+            class which is invoking this method, while the latter
+            is a count of the number of 
+            <a class="link" href="#arguments" title="Accessing Arguments">arguments in the stack</a>.
+	  </p><p>
+            You may also see instances of the <span class="emphasis"><em>env</em></span>
+            pointer being used.   This is being deprecated.  Instances
+            which could be replaced with
+            <a class="link" href="#arguments" title="Accessing Arguments"><span class="emphasis"><em>arg()</em></span></a>
+            are already deprecated; other uses will be deprecated
+            in the near future.
+	  </p><p>
+            Beyond the <span class="emphasis"><em><a class="link" href="#arguments" title="Accessing Arguments">arg()</a></em></span> method, there
+            is one method of note.  <span class="emphasis"><em>dump_args()</em></span>
+            can be used in debugging to output the entire argument
+            stack.
+	  </p></div></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="properties"></a>Dynamic Properties</h3></div></div></div><p>
+          This section describes accessors to dynamic properties.
+          Read-only properties are described
+          in the <a class="link" href="#prototype" title="Prototype">prototype</a> section.
+        </p><p>
+          Dynamic properties are not created by the <span class="emphasis"><em>gen-asclass.sh</em></span> 
+          script.  Accessors should be written as
+          a single get/set method.  Previously this was done by
+          overriding <span class="emphasis"><em>get_member()</em></span> and
+          <span class="emphasis"><em>set_member()</em></span>, but this practice
+          is deprecated.  
+        </p><p> 
+          The accessor is written so that it sets the property
+          if it is called with an argument, and puts the property in
+          the <a class="link" href="#methods" title="Methods"><span class="emphasis"><em>fn_call</em></span></a>
+          <a class="link" href="#return" title="Returning a Value to ActionScript">result pointer</a>.  For instance:
+          </p><pre class="programlisting">
+            void
+            MyClass::myProperty_getset(const fn_call&amp; fn)
+            {
+
+                boost::intrusive_ptr&lt;MyClass&gt; ptr = ensureType&lt;MyClass&gt;(fn.this_ptr);
+
+                // setter
+                if ( fn.nargs &gt; 0 )
+                {
+                    bool h = fn.arg(0).to_bool();
+                    ptr-&gt;MyMethod(h);
+                    return;
+                }
+
+                // getter
+                bool h = ptr-&gt;MyMethod();
+                fn.result-&gt;set_bool(h);
+            }
+          </pre><p>
+        </p><p> 
+          It has not yet been decided whether properties should be set
+          in the <a class="link" href="#prototype" title="Prototype">exported interface</a> 
+          or attached to instances of the class.  A property is attached
+          in the following manner:
+          </p><pre class="programlisting">
+            boost::intrusive_ptr&lt;builtin_function&gt; gettersetter;
+            gettersetter = new builtin_function(&amp;MyClass::myProperty_getset, NULL);
+            o.init_property("myProperty", *gettersetter, *gettersetter);
+          </pre><p>
+        </p></div></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="as_value"></a>The <span class="emphasis"><em>as_value</em></span> Object Type</h2></div></div></div><p>
+        The <span class="emphasis"><em>as_value</em></span> class is used throughout
+        the interpreter to create generic objects to hold data.
+      </p><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="data_types"></a>Data Types</h3></div></div></div><p>
+          The following data types are supported:
+          <span class="emphasis"><em>NULLTYPE</em></span>,
+          <span class="emphasis"><em>BOOLEAN</em></span>, <span class="emphasis"><em>STRING</em></span>,
+          <span class="emphasis"><em>NUMBER</em></span>, <span class="emphasis"><em>OBJECT</em></span>,
+          <span class="emphasis"><em>AS_FUNCTION</em></span>, and 
+          <span class="emphasis"><em>MOVIECLIP</em></span> (sprite).  
+          The type <span class="emphasis"><em>C_FUNCTION</em></span> is being deprecated.
+        </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="is_methods"></a>Determining the Type</h3></div></div></div><p>
+          Several methods allow you to determine if a value stored in
+          <span class="emphasis"><em>as_value</em></span> is of a specific type.  These
+          follow the form of <span class="emphasis"><em>is_TYPE</em></span>, for example
+          <span class="emphasis"><em>is_as_function()</em></span> and 
+          <span class="emphasis"><em>is_number()</em></span>.  In general, the type names
+          match the <a class="link" href="#data_types" title="Data Types">data types</a> listed
+          above, with the exception of the type <span class="emphasis"><em>MOVIECLIP</em></span>
+          which has a method <span class="emphasis"><em>is_sprite()</em></span>.
+        </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="to_methods"></a>Fetching the Value</h3></div></div></div><p>
+          Another set of methods will return a representation of
+          the value as a particular type.  They follow the
+          <span class="emphasis"><em>to_TYPE</em></span> naming convention.  Examples
+          are <span class="emphasis"><em>to_number()</em></span> and
+          <span class="emphasis"><em>to_bool()</em></span>.  The type names are as 
+          <a class="link" href="#data_types" title="Data Types">listed</a> earlier, except for
+          <span class="emphasis"><em>MOVIECLIP</em></span>, which uses 
+          <span class="emphasis"><em>to_sprite()</em></span>.
+        </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="set_methods"></a>Setting the Value and Type</h3></div></div></div><p>
+          Finally, there is the <span class="emphasis"><em>set_TYPE</em></span> series
+          of methods.  They change the type to the type specified in
+          the method name, and set the value to the one given as an
+          argument.  It is also possible to accomplish the same thing
+          with the <span class="emphasis"><em>=</em></span> operator.  Again, type names
+          match those <a class="link" href="#data_types" title="Data Types">named earlier</a>,
+          except in the case of <span class="emphasis"><em>MOVIECLASS</em></span>.  Its
+          method is called <span class="emphasis"><em>set_sprite()</em></span>.
+        </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="further_as_value_reading"></a>Further Reading</h3></div></div></div><p>
+          Please refer to <span class="emphasis"><em>as_value.h</em></span> or the
+          Doxygen documentation (see 'Processing The Documentation'
+          in the Gnash manual for instructions on generating
+          documents with Doxygen) for more information
+          about which methods are available for the
+          <span class="emphasis"><em>as_value</em></span> object.
+        </p></div></div><div class="appendix" lang="en"><h2 class="title" style="clear: both"><a name="fdl"></a>A. GNU Free Documentation License</h2><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-preamble"></a>0. PREAMBLE</h2></div></div></div><p>
+      The purpose of this License is to make a manual, textbook, or
+      other written document "free" in the sense of
+      freedom: to assure everyone the effective freedom to copy and
+      redistribute it, with or without modifying it, either
+      commercially or non-commercially. Secondarily, this License
+      preserves for the author and publisher a way to get credit for
+      their work, while not being considered responsible for
+      modifications made by others.
+    </p><p>
+      This License is a kind of "copyleft", which means
+      that derivative works of the document must themselves be free in
+      the same sense. It complements the GNU General Public License,
+      which is a copyleft license designed for free software.
+    </p><p>
+      We have designed this License in order to use it for manuals for
+      free software, because free software needs free documentation: a
+      free program should come with manuals providing the same
+      freedoms that the software does. But this License is not limited
+      to software manuals; it can be used for any textual work,
+      regardless of subject matter or whether it is published as a
+      printed book. We recommend this License principally for works
+      whose purpose is instruction or reference.
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section1"></a>1. APPLICABILITY AND DEFINITIONS</h2></div></div></div><p><a name="fdl-document"></a>
+      This License applies to any manual or other work that contains a
+      notice placed by the copyright holder saying it can be
+      distributed under the terms of this License. The
+      "Document", below, refers to any such manual or
+      work. Any member of the public is a licensee, and is addressed
+      as "you".
+    </p><p><a name="fdl-modified"></a>
+      A "Modified Version" of the Document means any work
+      containing the Document or a portion of it, either copied
+      verbatim, or with modifications and/or translated into another
+      language.
+    </p><p><a name="fdl-secondary"></a>
+      A "Secondary Section" is a named appendix or a
+      front-matter section of the <a class="link" href="#fdl-document">Document</a> that deals exclusively
+      with the relationship of the publishers or authors of the
+      Document to the Document's overall subject (or to related
+      matters) and contains nothing that could fall directly within
+      that overall subject. (For example, if the Document is in part a
+      textbook of mathematics, a Secondary Section may not explain any
+      mathematics.)  The relationship could be a matter of historical
+      connection with the subject or with related matters, or of
+      legal, commercial, philosophical, ethical or political position
+      regarding them.
+    </p><p><a name="fdl-invariant"></a>
+      The "Invariant Sections" are certain <a class="link" href="#fdl-secondary"> Secondary Sections</a> whose titles
+      are designated, as being those of Invariant Sections, in the
+      notice that says that the <a class="link" href="#fdl-document">Document</a> is released under this
+      License.
+    </p><p><a name="fdl-cover-texts"></a>
+      The "Cover Texts" are certain short passages of
+      text that are listed, as Front-Cover Texts or Back-Cover Texts,
+      in the notice that says that the <a class="link" href="#fdl-document">Document</a> is released under this
+      License.
+    </p><p><a name="fdl-transparent"></a>
+      A "Transparent" copy of the <a class="link" href="#fdl-document"> Document</a> means a machine-readable
+      copy, represented in a format whose specification is available
+      to the general public, whose contents can be viewed and edited
+      directly and straightforwardly with generic text editors or (for
+      images composed of pixels) generic paint programs or (for
+      drawings) some widely available drawing editor, and that is
+      suitable for input to text formatters or for automatic
+      translation to a variety of formats suitable for input to text
+      formatters. A copy made in an otherwise Transparent file format
+      whose markup has been designed to thwart or discourage
+      subsequent modification by readers is not Transparent.  A copy
+      that is not "Transparent" is called "Opaque".
+    </p><p>
+      Examples of suitable formats for Transparent copies include
+      plain ASCII without markup, Texinfo input format, LaTeX input
+      format, SGML or XML using a publicly available DTD, and
+      standard-conforming simple HTML designed for human
+      modification. Opaque formats include PostScript, PDF,
+      proprietary formats that can be read and edited only by
+      proprietary word processors, SGML or XML for which the DTD
+      and/or processing tools are not generally available, and the
+      machine-generated HTML produced by some word processors for
+      output purposes only.
+    </p><p><a name="fdl-title-page"></a>
+      The "Title Page" means, for a printed book, the
+      title page itself, plus such following pages as are needed to
+      hold, legibly, the material this License requires to appear in
+      the title page. For works in formats which do not have any title
+      page as such, "Title Page" means the text near the
+      most prominent appearance of the work's title, preceding the
+      beginning of the body of the text.
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section2"></a>2. VERBATIM COPYING</h2></div></div></div><p>
+      You may copy and distribute the <a class="link" href="#fdl-document">Document</a> in any medium, either
+      commercially or noncommercially, provided that this License, the
+      copyright notices, and the license notice saying this License
+      applies to the Document are reproduced in all copies, and that
+      you add no other conditions whatsoever to those of this
+      License. You may not use technical measures to obstruct or
+      control the reading or further copying of the copies you make or
+      distribute. However, you may accept compensation in exchange for
+      copies. If you distribute a large enough number of copies you
+      must also follow the conditions in <a class="link" href="#fdl-section3" title="3. COPYING IN QUANTITY">section 3</a>.
+    </p><p>
+      You may also lend copies, under the same conditions stated
+      above, and you may publicly display copies.
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section3"></a>3. COPYING IN QUANTITY</h2></div></div></div><p>
+      If you publish printed copies of the <a class="link" href="#fdl-document">Document</a> numbering more than 100,
+      and the Document's license notice requires <a class="link" href="#fdl-cover-texts">Cover Texts</a>, you must enclose
+      the copies in covers that carry, clearly and legibly, all these
+      Cover Texts: Front-Cover Texts on the front cover, and
+      Back-Cover Texts on the back cover. Both covers must also
+      clearly and legibly identify you as the publisher of these
+      copies. The front cover must present the full title with all
+      words of the title equally prominent and visible. You may add
+      other material on the covers in addition. Copying with changes
+      limited to the covers, as long as they preserve the title of the
+      <a class="link" href="#fdl-document">Document</a> and satisfy these
+      conditions, can be treated as verbatim copying in other
+      respects.
+    </p><p>
+      If the required texts for either cover are too voluminous to fit
+      legibly, you should put the first ones listed (as many as fit
+      reasonably) on the actual cover, and continue the rest onto
+      adjacent pages.
+    </p><p>
+      If you publish or distribute <a class="link" href="#fdl-transparent">Opaque</a> copies of the <a class="link" href="#fdl-document">Document</a> numbering more than 100,
+      you must either include a machine-readable <a class="link" href="#fdl-transparent">Transparent</a> copy along with
+      each Opaque copy, or state in or with each Opaque copy a
+      publicly-accessible computer-network location containing a
+      complete Transparent copy of the Document, free of added
+      material, which the general network-using public has access to
+      download anonymously at no charge using public-standard network
+      protocols. If you use the latter option, you must take
+      reasonably prudent steps, when you begin distribution of Opaque
+      copies in quantity, to ensure that this Transparent copy will
+      remain thus accessible at the stated location until at least one
+      year after the last time you distribute an Opaque copy (directly
+      or through your agents or retailers) of that edition to the
+      public.
+    </p><p>
+      It is requested, but not required, that you contact the authors
+      of the <a class="link" href="#fdl-document">Document</a> well before
+      redistributing any large number of copies, to give them a chance
+      to provide you with an updated version of the Document.
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section4"></a>4. MODIFICATIONS</h2></div></div></div><p>
+      You may copy and distribute a <a class="link" href="#fdl-modified">Modified Version</a> of the <a class="link" href="#fdl-document">Document</a> under the conditions of
+      sections <a class="link" href="#fdl-section2" title="2. VERBATIM COPYING">2</a> and <a class="link" href="#fdl-section3" title="3. COPYING IN QUANTITY">3</a> above, provided that you release
+      the Modified Version under precisely this License, with the
+      Modified Version filling the role of the Document, thus
+      licensing distribution and modification of the Modified Version
+      to whoever possesses a copy of it. In addition, you must do
+      these things in the Modified Version:
+    </p><div class="itemizedlist"><ul type="opencircle"><li style="list-style-type: circle"><p><b>A. </b>
+	    Use in the <a class="link" href="#fdl-title-page">Title
+	    Page</a> (and on the covers, if any) a title distinct
+	    from that of the <a class="link" href="#fdl-document">Document</a>, and from those of
+	    previous versions (which should, if there were any, be
+	    listed in the History section of the Document). You may
+	    use the same title as a previous version if the original
+	    publisher of that version gives permission.
+	  </p></li><li style="list-style-type: circle"><p><b>B. </b>
+	    List on the <a class="link" href="#fdl-title-page">Title
+	    Page</a>, as authors, one or more persons or entities
+	    responsible for authorship of the modifications in the
+	    <a class="link" href="#fdl-modified">Modified Version</a>,
+	    together with at least five of the principal authors of
+	    the <a class="link" href="#fdl-document">Document</a> (all of
+	    its principal authors, if it has less than five).
+	  </p></li><li style="list-style-type: circle"><p><b>C. </b>
+	    State on the <a class="link" href="#fdl-title-page">Title
+	    Page</a> the name of the publisher of the <a class="link" href="#fdl-modified">Modified Version</a>, as the
+	    publisher.
+	  </p></li><li style="list-style-type: circle"><p><b>D. </b>
+	    Preserve all the copyright notices of the <a class="link" href="#fdl-document">Document</a>.
+	  </p></li><li style="list-style-type: circle"><p><b>E. </b>
+	    Add an appropriate copyright notice for your modifications
+	    adjacent to the other copyright notices.
+	  </p></li><li style="list-style-type: circle"><p><b>F. </b>
+	    Include, immediately after the copyright notices, a
+	    license notice giving the public permission to use the
+	    <a class="link" href="#fdl-modified">Modified Version</a> under
+	    the terms of this License, in the form shown in the
+	    Addendum below.
+	  </p></li><li style="list-style-type: circle"><p><b>G. </b>
+	    Preserve in that license notice the full lists of <a class="link" href="#fdl-invariant"> Invariant Sections</a> and
+	    required <a class="link" href="#fdl-cover-texts">Cover
+	    Texts</a> given in the <a class="link" href="#fdl-document">Document's</a> license notice.
+	  </p></li><li style="list-style-type: circle"><p><b>H. </b>
+	    Include an unaltered copy of this License.
+	  </p></li><li style="list-style-type: circle"><p><b>I. </b>
+	    Preserve the section entitled "History", and
+	    its title, and add to it an item stating at least the
+	    title, year, new authors, and publisher of the <a class="link" href="#fdl-modified">Modified Version </a>as given on
+	    the <a class="link" href="#fdl-title-page">Title Page</a>.  If
+	    there is no section entitled "History" in the
+	    <a class="link" href="#fdl-document">Document</a>, create one
+	    stating the title, year, authors, and publisher of the
+	    Document as given on its Title Page, then add an item
+	    describing the Modified Version as stated in the previous
+	    sentence.
+	  </p></li><li style="list-style-type: circle"><p><b>J. </b>
+	    Preserve the network location, if any, given in the <a class="link" href="#fdl-document">Document</a> for public access
+	    to a <a class="link" href="#fdl-transparent">Transparent</a>
+	    copy of the Document, and likewise the network locations
+	    given in the Document for previous versions it was based
+	    on. These may be placed in the "History"
+	    section.  You may omit a network location for a work that
+	    was published at least four years before the Document
+	    itself, or if the original publisher of the version it
+	    refers to gives permission.
+	  </p></li><li style="list-style-type: circle"><p><b>K. </b>
+	    In any section entitled "Acknowledgements" or
+	    "Dedications", preserve the section's title,
+	    and preserve in the section all the substance and tone of
+	    each of the contributor acknowledgements and/or
+	    dedications given therein.
+	  </p></li><li style="list-style-type: circle"><p><b>L. </b>
+	    Preserve all the <a class="link" href="#fdl-invariant">Invariant
+	    Sections</a> of the <a class="link" href="#fdl-document">Document</a>, unaltered in their
+	    text and in their titles.  Section numbers or the
+	    equivalent are not considered part of the section titles.
+	  </p></li><li style="list-style-type: circle"><p><b>M. </b>
+	    Delete any section entitled
+	    "Endorsements". Such a section may not be
+	    included in the <a class="link" href="#fdl-modified">Modified
+	    Version</a>.
+	  </p></li><li style="list-style-type: circle"><p><b>N. </b>
+	    Do not retitle any existing section as
+	    "Endorsements" or to conflict in title with
+	    any <a class="link" href="#fdl-invariant">Invariant
+	    Section</a>.
+	  </p></li></ul></div><p>
+      If the <a class="link" href="#fdl-modified">Modified Version</a>
+      includes new front-matter sections or appendices that qualify as
+      <a class="link" href="#fdl-secondary">Secondary Sections</a> and
+      contain no material copied from the Document, you may at your
+      option designate some or all of these sections as invariant. To
+      do this, add their titles to the list of <a class="link" href="#fdl-invariant">Invariant Sections</a> in the
+      Modified Version's license notice.  These titles must be
+      distinct from any other section titles.
+    </p><p>
+      You may add a section entitled "Endorsements",
+      provided it contains nothing but endorsements of your <a class="link" href="#fdl-modified">Modified Version</a> by various
+      parties--for example, statements of peer review or that the text
+      has been approved by an organization as the authoritative
+      definition of a standard.
+    </p><p>
+      You may add a passage of up to five words as a <a class="link" href="#fdl-cover-texts">Front-Cover Text</a>, and a passage
+      of up to 25 words as a <a class="link" href="#fdl-cover-texts">Back-Cover Text</a>, to the end of
+      the list of <a class="link" href="#fdl-cover-texts">Cover Texts</a>
+      in the <a class="link" href="#fdl-modified">Modified Version</a>.
+      Only one passage of Front-Cover Text and one of Back-Cover Text
+      may be added by (or through arrangements made by) any one
+      entity. If the <a class="link" href="#fdl-document">Document</a>
+      already includes a cover text for the same cover, previously
+      added by you or by arrangement made by the same entity you are
+      acting on behalf of, you may not add another; but you may
+      replace the old one, on explicit permission from the previous
+      publisher that added the old one.
+    </p><p>
+      The author(s) and publisher(s) of the <a class="link" href="#fdl-document">Document</a> do not by this License
+      give permission to use their names for publicity for or to
+      assert or imply endorsement of any <a class="link" href="#fdl-modified">Modified Version </a>.
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section5"></a>5. COMBINING DOCUMENTS</h2></div></div></div><p>
+      You may combine the <a class="link" href="#fdl-document">Document</a>
+      with other documents released under this License, under the
+      terms defined in <a class="link" href="#fdl-section4" title="4. MODIFICATIONS">section 4</a>
+      above for modified versions, provided that you include in the
+      combination all of the <a class="link" href="#fdl-invariant">Invariant
+      Sections</a> of all of the original documents, unmodified,
+      and list them all as Invariant Sections of your combined work in
+      its license notice.
+    </p><p>
+      The combined work need only contain one copy of this License,
+      and multiple identical <a class="link" href="#fdl-invariant">Invariant
+      Sections</a> may be replaced with a single copy. If there are
+      multiple Invariant Sections with the same name but different
+      contents, make the title of each such section unique by adding
+      at the end of it, in parentheses, the name of the original
+      author or publisher of that section if known, or else a unique
+      number. Make the same adjustment to the section titles in the
+      list of Invariant Sections in the license notice of the combined
+      work.
+    </p><p>
+      In the combination, you must combine any sections entitled
+      "History" in the various original documents,
+      forming one section entitled "History"; likewise
+      combine any sections entitled "Acknowledgements",
+      and any sections entitled "Dedications".  You must
+      delete all sections entitled "Endorsements."
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section6"></a>6. COLLECTIONS OF DOCUMENTS</h2></div></div></div><p>
+      You may make a collection consisting of the <a class="link" href="#fdl-document">Document</a> and other documents
+      released under this License, and replace the individual copies
+      of this License in the various documents with a single copy that
+      is included in the collection, provided that you follow the
+      rules of this License for verbatim copying of each of the
+      documents in all other respects.
+    </p><p>
+      You may extract a single document from such a collection, and
+      distribute it individually under this License, provided you
+      insert a copy of this License into the extracted document, and
+      follow this License in all other respects regarding verbatim
+      copying of that document.
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section7"></a>7. AGGREGATION WITH INDEPENDENT WORKS</h2></div></div></div><p>
+      A compilation of the <a class="link" href="#fdl-document">Document</a> or its derivatives with
+      other separate and independent documents or works, in or on a
+      volume of a storage or distribution medium, does not as a whole
+      count as a <a class="link" href="#fdl-modified">Modified Version</a>
+      of the Document, provided no compilation copyright is claimed
+      for the compilation.  Such a compilation is called an
+      "aggregate", and this License does not apply to the
+      other self-contained works thus compiled with the Document , on
+      account of their being thus compiled, if they are not themselves
+      derivative works of the Document.  If the <a class="link" href="#fdl-cover-texts">Cover Text</a> requirement of <a class="link" href="#fdl-section3" title="3. COPYING IN QUANTITY">section 3</a> is applicable to these
+      copies of the Document, then if the Document is less than one
+      quarter of the entire aggregate, the Document's Cover Texts may
+      be placed on covers that surround only the Document within the
+      aggregate. Otherwise they must appear on covers around the whole
+      aggregate.
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section8"></a>8. TRANSLATION</h2></div></div></div><p>
+      Translation is considered a kind of modification, so you may
+      distribute translations of the <a class="link" href="#fdl-document">Document</a> under the terms of <a class="link" href="#fdl-section4" title="4. MODIFICATIONS">section 4</a>. Replacing <a class="link" href="#fdl-invariant"> Invariant Sections</a> with
+      translations requires special permission from their copyright
+      holders, but you may include translations of some or all
+      Invariant Sections in addition to the original versions of these
+      Invariant Sections. You may include a translation of this
+      License provided that you also include the original English
+      version of this License. In case of a disagreement between the
+      translation and the original English version of this License,
+      the original English version will prevail.
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section9"></a>9. TERMINATION</h2></div></div></div><p>
+      You may not copy, modify, sublicense, or distribute the <a class="link" href="#fdl-document">Document</a> except as expressly
+      provided for under this License. Any other attempt to copy,
+      modify, sublicense or distribute the Document is void, and will
+      automatically terminate your rights under this License. However,
+      parties who have received copies, or rights, from you under this
+      License will not have their licenses terminated so long as such
+      parties remain in full compliance.
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section10"></a>10. FUTURE REVISIONS OF THIS LICENSE</h2></div></div></div><p>
+      The <a class="ulink" href="http://www.gnu.org/fsf/fsf.html" target="_top">Free Software
+      Foundation</a> may publish new, revised versions of the GNU
+      Free Documentation License from time to time. Such new versions
+      will be similar in spirit to the present version, but may differ
+      in detail to address new problems or concerns. See <a class="ulink" href="http://www.gnu.org/copyleft" target="_top">http://www.gnu.org/copyleft/</a>.
+    </p><p>
+      Each version of the License is given a distinguishing version
+      number. If the <a class="link" href="#fdl-document">Document</a>
+      specifies that a particular numbered version of this License
+      "or any later version" applies to it, you have the
+      option of following the terms and conditions either of that
+      specified version or of any later version that has been
+      published (not as a draft) by the Free Software Foundation. If
+      the Document does not specify a version number of this License,
+      you may choose any version ever published (not as a draft) by
+      the Free Software Foundation.
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-using"></a>Addendum</h2></div></div></div><p>
+      To use this License in a document you have written, include a copy of
+      the License in the document and put the following copyright and
+      license notices just after the title page:
+    </p><div class="blockquote"><blockquote class="blockquote"><p>
+	Copyright  YEAR YOUR NAME.
+      </p><p>
+	Permission is granted to copy, distribute and/or modify this
+	document under the terms of the GNU Free Documentation
+	License, Version 1.1 or any later version published by the
+	Free Software Foundation; with the <a class="link" href="#fdl-invariant">Invariant Sections</a> being LIST
+	THEIR TITLES, with the <a class="link" href="#fdl-cover-texts">Front-Cover Texts</a> being LIST,
+	and with the <a class="link" href="#fdl-cover-texts">Back-Cover
+	Texts</a> being LIST.  A copy of the license is included in
+	the section entitled "GNU Free Documentation
+	License".
+      </p></blockquote></div><p>
+      If you have no <a class="link" href="#fdl-invariant">Invariant
+      Sections</a>, write "with no Invariant Sections"
+      instead of saying which ones are invariant.  If you have no
+      <a class="link" href="#fdl-cover-texts">Front-Cover Texts</a>, write
+      "no Front-Cover Texts" instead of
+      "Front-Cover Texts being LIST"; likewise for <a class="link" href="#fdl-cover-texts">Back-Cover Texts</a>.
+    </p><p>
+      If your document contains nontrivial examples of program code,
+      we recommend releasing these examples in parallel under your
+      choice of free software license, such as the <a class="ulink" href="http://www.gnu.org/copyleft/gpl.html" target="_top"> GNU General Public
+      License</a>, to permit their use in free software.
+    </p></div></div></div></body></html>

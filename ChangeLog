@@ -1,3 +1,18 @@
+2008-02-16  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* doc/C/dumpshm-man.xml, gprocessor-man.xml, soldumper-man.xml,
+	gnash-man.xml: Rename all man page source to *.man-xml so we can
+	use a SUFFIX rule for transformations.
+	* doc/C/Makefile.am: Build manpages using a SUFFIX rule. Cleanup
+	how manpages get installed so it works when building packages.
+	* packaging/doc: New directory to hold prebuilt docs for packaging
+	on braindead systems without a working Docbook2X.
+	actionscript.html.in
+	* packaging/doc/actionscript.info.in, dumpshm.1.in, gnash.1.in,
+	gnash.html.in, gnash.info.in, gprocessor.1.in, soldumper.1.in:
+	Prebuilt docs, only used for building binary packages on systems
+	without Docbook2X support.
+
 2008-02-16 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ASHandlers.cpp (ActionInitArray): use as_value::to_int
@@ -17,6 +32,16 @@
 	* testsuite/libbase/URLTest.cpp: new tests fixed.
 
 2008-02-15  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* doc/C/Makefile.am: If the docbook tools don't exist.use a stored
+	copy of the final output file. While this is a bit tacky, it helps
+	when building binary packages on systems where the DocBook tools
+	don't work correctly. Potentially old docs are better than none.
+	* doc/C/{dumpshm.1,gnash.info, soldumper.1, actionscript.html,
+	gnash.1, gnash.texi, actionscript.texi, gnash.html.in
+	gprocessor.1: Copies of prebuilt documentation. This gives one
+	working documentaion regalrdless of whether they have the Docbook
+	tools installs. Useful for building binary packages.
 
 	* macros/glib.m4: Add extra glib for include path, and drop the
 	extra glib for the glibconfig.h include path. This let's Gnash

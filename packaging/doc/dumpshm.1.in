@@ -1,0 +1,35 @@
+.\" -*- coding: us-ascii -*-
+.if \n(.g .ds T< \\FC
+.if \n(.g .ds T> \\F[\n[.fam]]
+.de URL
+\\$2 \(la\\$1\(ra\\$3
+..
+.if \n(.g .mso www.tmac
+.TH dumpshm 1 "13 February 2008"  
+.SH NAME
+dumpshm \- Gnash LocalConnection memory Dumper
+.SH Synopsis
+.nf
+
+dumpshm (options)... (file)...
+.fi
+.SH DESCRIPTION
+Dump information about the shared memory segment used by the
+LocalConnection ActionScript class. This memory segment is comprised
+of a header, and a collection of SWF AMF Objects, normally not
+viewable by the user.
+.TP 
+-h
+Print usage info.
+.TP 
+-i
+Find the key for an existing memory segment.
+.TP 
+-r
+Dump memory segment to the terminal.
+.TP 
+-c
+Dump memory segment to a disk file, segment.raw.
+.TP 
+-v
+Verbose output.

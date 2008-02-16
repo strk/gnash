@@ -42,84 +42,87 @@ entities = \
 	actionscript/main.xml \
 	actionscript/as_value.xml \
 	actionscript/new_as_class.xml \
-	asspec/accessibility.xml	\
-	asspec/array.xml	\
-	asspec/asspec.xml	\
-	asspec/boolean.xml	\
-	asspec/button.xml	\
-	asspec/camera.xml	\
-	asspec/color.xml	\
+	asspec/accessibility.xml \
+	asspec/array.xml \
+	asspec/asspec.xml \
+	asspec/boolean.xml \
+	asspec/button.xml \
+	asspec/camera.xml \
+	asspec/color.xml \
 	asspec/contextmenu.xml	\
-	asspec/customactions.xml	\
+	asspec/customactions.xml \
 	asspec/date.xml	\
-	asspec/error.xml	\
+	asspec/error.xml \
 	asspec/fdl-appendix.xml	\
-	asspec/function.xml	\
-	asspec/key.xml	\
-	asspec/legal.xml	\
-	asspec/loadvars.xml	\
-	asspec/localconnection.xml	\
+	asspec/function.xml \
+	asspec/key.xml \
+	asspec/legal.xml \
+	asspec/loadvars.xml \
+	asspec/localconnection.xml \
 	asspec/math.xml	\
-	asspec/microphone.xml	\
-	asspec/mouse.xml	\
-	asspec/movieclip.xml	\
-	asspec/moviecliploader.xml	\
-	asspec/netconnection.xml	\
-	asspec/netstream.xml	\
-	asspec/number.xml	\
-	asspec/selection.xml	\
+	asspec/microphone.xml \
+	asspec/mouse.xml \
+	asspec/movieclip.xml \
+	asspec/moviecliploader.xml \
+	asspec/netconnection.xml \
+	asspec/netstream.xml \
+	asspec/number.xml \
+	asspec/selection.xml \
 	asspec/sharedobject.xml	\
-	asspec/sound.xml	\
-	asspec/stage.xml	\
-	asspec/string.xml	\
-	asspec/system.xml	\
-	asspec/textfield.xml	\
+	asspec/sound.xml \
+	asspec/stage.xml \
+	asspec/string.xml \
+	asspec/system.xml \
+	asspec/textfield.xml \
 	asspec/textformat.xml	\
 	asspec/textsnapshot.xml	\
-	asspec/video.xml	\
-	asspec/xml.xml	\
-	asspec/xmlnode.xml	\
+	asspec/video.xml \
+	asspec/xml.xml \
+	asspec/xmlnode.xml \
 	asspec/xmlsocket.xml	\
 	conformance.xml	\
-	usermanual/installation/code_dependencies.xml	\
-	usermanual/installation/configuration.xml	\
-	usermanual/installation/custompath_configuration.xml	\
+	usermanual/installation/code_dependencies.xml \
+	usermanual/installation/configuration.xml \
+	usermanual/installation/custompath_configuration.xml \
 	usermanual/installation/documentation_dependencies.xml	\
-	usermanual/installation/feature_configuration.xml	\
-	usermanual/installation/packagemanager.xml	\
-	usermanual/installation/sources.xml	\
-	usermanual/installation/testing_dependencies.xml	\
+	usermanual/installation/feature_configuration.xml \
+	usermanual/installation/packagemanager.xml \
+	usermanual/installation/sources.xml \
+	usermanual/installation/testing_dependencies.xml \
 	usermanual/installation/cross_compiling.xml	\
-	usermanual/installation/building.xml	\
-	usermanual/installation/install.xml	\
-	usermanual/doc_authors.xml	\
-	usermanual/installation.xml	\
-	usermanual/introduction.xml	\
-	usermanual/revisions.xml	\
-	usermanual/usage.xml	\
-	usermanual/usage/gnashrc.xml	\
-	usermanual/bugreport.xml	\
+	usermanual/installation/building.xml \
+	usermanual/installation/install.xml \
+	usermanual/doc_authors.xml \
+	usermanual/installation.xml \
+	usermanual/introduction.xml \
+	usermanual/revisions.xml \
+	usermanual/usage.xml \
+	usermanual/usage/gnashrc.xml \
+	usermanual/bugreport.xml \
 	usermanual/glossary.xml	\
 	app_authors.xml	\
-	gpl-appendix.xml	\
-	legal.xml	\
-	logging.xml	\
+	gpl-appendix.xml \
+	legal.xml \
+	logging.xml \
 	$(NULL)
 
 xml_files = $(docname).xml actionscript.xml
 
 #noinst_SCRIPT = gen-doc.sh
-dist_man_MANS = gnash.1
+dist_man_MANS = gnash.1 gprocessor.1 dumpshm.1 soldumper.1
 
-html: gnash.html actionscript.html
-pdf:  gnash.pdf actionscript.pdf
+# dist_html_DATA = gnash.html actionscript.html
+# dist_info_DATA = gnash.info actionscript.info
+
+html: images gnash.html actionscript.html
+pdf:  images gnash.pdf actionscript.pdf
 man:  gnash.1 gprocessor.1 dumpshm.1 soldumper.1
 texi: gnash.texi actionscript.texi
-info: gnash.info actionscript.info
-gnash.pdf gnash.html gnash.texi: $(xml_files) $(entities)
+info: images gnash.info actionscript.info
+gnash.pdf gnash.html gnash.texi: images $(xml_files) $(entities)
 actionscript.pdf actionscript.html actionscript.texi: actionscript.xml actionscript/main.xml actionscript/as_value.xml actionscript/new_as_class.xml
 
-SUFFIXES = .xml .html .texi .pdf .info .1 .fo
+SUFFIXES = .xml .html .texi .pdf .info .1 .fo .man-xml
 
 EXTRA_DIST = \
 	$(xml_files) \
@@ -160,8 +163,9 @@ endif
 .xml.html:
 if ENABLE_HTML
 	$(XSLTPROC) --output $@ --nonet $(docbook_styles)/html/docbook.xsl $<
+	$(RM) $*.txml
 else
-	touch $@
+	$(LN_S) -f $$? $@
 endif
 
 #	basefile=$(notdir $(basename $<));
@@ -172,55 +176,39 @@ if ENABLE_TEXI
 	if test x"$(DB2X_VERSION)" = x"0.8.5" -o x"$(DB2X_VERSION)" = x"0.8.7"; then \
 	  $(DB2X_TEXIXML) --encoding=us-ascii//TRANSLIT $${basefile}.txml; \
 	  sed -e "s/setfilename $${basefile}_.*\.info/setfilename $${basefile}.info/" $${basefile}_*.texi > $${basefile}.texi ; \
-	  $(RM) $${basefile}_manual_v*.texi; \
 	else \
 	  $(DB2X_TEXIXML) --encoding=us-ascii//TRANSLIT --to-stdout $${basefile}.txml > $${basefile}.texi ; \
-	  $(RM) $${basefile}_manual_v*.texi; \
 	fi
-else
-	touch $@
 endif
 
 .texi.info:
+if ENABLE_TEXI
 	-$(MAKEINFO) --force $<
-
-gnash.1: gnash-man.xml
-if ENABLE_MAN
-	$(DB2X_XSLTPROC) -s man $(srcdir)/gnash-man.xml -o gnash.mxml
-	$(DB2X_MANXML) gnash.mxml
-	$(RM) gnash.mxml
+	$(RM) *.texi
 else
-	touch gnash.1
+	$(LN_S) -f $$? $@
 endif
 
-gprocessor.1: gprocessor-man.xml
+.man-xml.1:
 if ENABLE_MAN
-	$(DB2X_XSLTPROC) -s man $(srcdir)/gprocessor-man.xml -o gprocessor.mxml
-	$(DB2X_MANXML) gprocessor.mxml
-	$(RM) gprocessor.mxml
+	echo "\"$?\", \"$*\", \"$<\""
+	$(DB2X_XSLTPROC) -s man $? -o $*.mxml
+	$(DB2X_MANXML) $*.mxml
+	$(RM) $*.mxml
 else
-	touch gprocessor.1
+	@if test -d $(top_srcdir)/packaging; then \
+	  $(LN_S) -f $(top_srcdir)/packaging/doc/$@.in $@; \
+	else \
+	  touch $@; \
+	fi
 endif
 
-dumpshm.1: dumpshm-man.xml
-if ENABLE_MAN
-	$(DB2X_XSLTPROC) -s man $(srcdir)/dumpshm-man.xml -o dumpshm.mxml
-	$(DB2X_MANXML) dumpshm.mxml
-	$(RM) dumpshm.mxml
-else
-	touch dumpshm.1
-endif
+alldocs: images html pdf man info
 
-soldumper.1: soldumper-man.xml
-if ENABLE_MAN
-	$(DB2X_XSLTPROC) -s man $(srcdir)/soldumper-man.xml -o soldumper.mxml
-	$(DB2X_MANXML) soldumper.mxml
-	$(RM) soldumper.mxml
-else
-	touch soldumper.1
-endif
-
-alldocs: html pdf man info
+images:
+	@if test ! -d images; then \
+	   $(LN_S) -f $(srcdir)/images images; \
+	fi
 
 lint:
 	@xmllint $(srcdir)/gnash.xml
@@ -232,10 +220,9 @@ CLEANFILES = \
 	gnash.tex  \
 	gnash.fo  \
 	gnash.log  \
-        gnash.texi \
-	gnash_manual_*.texi \
-	gnash.txml \
-	gnash.mxml \
+        *.texi \
+	*.txml \
+	*.mxml \
 	omf_timestamp
 
 MAINTAINERCLEANFILES = \
@@ -245,10 +232,20 @@ MAINTAINERCLEANFILES = \
 	dumpshm.1 \
 	soldumper.1 \
         gnash.info \
-        gnash.html
+        gnash.html \
+	actionscript.html \
+	actionscript.info
+
+# Man pages are installed as data
+install-data-hook:
+	@if test -d $(top_srcdir)/packaging/doc; then \
+	  for i in "$(MANS)"; do \
+	    $(INSTALL_DATA) $$i $(DESTDIR)$(man1dir)/; \
+	  done; \
+	fi
 
 install-info-hook: gnash.info
-	test -d "$(DESTDIR)$(infodir)" || $(mkinstalldirs) "$(DESTDIR)$(infodir)"
+	@test -d "$(DESTDIR)$(infodir)" || $(mkinstalldirs) "$(DESTDIR)$(infodir)"
 	$(INSTALL_DATA) $< $(DESTDIR)$(infodir)/gnash.info 
 	-if (install-info --version) >/dev/null 2>&1; then \
 	  version=`install-info --version | grep -c 'GNU texinfo'`; \
@@ -262,6 +259,4 @@ install-info-hook: gnash.info
 uninstall-info-hook:
 	$(RM) $(DESTDIR)$(infodir)/gnash.info
 
-#app-dist-hook:
-
-#dist-hook: app-dist-hook
+.PHONY: images
