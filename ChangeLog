@@ -1,5 +1,9 @@
 2008-02-16  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* packaging/snapshot.am: Set the name higher up so we don't have
+	to add "cvs" everywhere for the snapshot version. Build the
+	tarball with the correct path.
+
 	* doc/C/dumpshm-man.xml, gprocessor-man.xml, soldumper-man.xml,
 	gnash-man.xml: Rename all man page source to *.man-xml so we can
 	use a SUFFIX rule for transformations.
