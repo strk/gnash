@@ -46,6 +46,7 @@ cat<<EOF
 export GNASHRC=${GNASHRC}
 export GPROCESSOR=${GPROCESSOR}
 EXPECTPASS=${SRCDIR}/PASSING
+REALTIME=${SRCDIR}/REALTIME
 
 for test in \`ls ${SWFDECTRACEDIR}/[$STARTPATTERN]*.swf\`; do
 	testname=\`basename \${test}\`
@@ -62,8 +63,12 @@ for test in \`ls ${SWFDECTRACEDIR}/[$STARTPATTERN]*.swf\`; do
 	if grep -q "^\${testid}\$" \${EXPECTPASS}; then
 		expectpass="yes"
 	fi
+	flags=
+	if grep -q "^\${testname}\$" \${REALTIME}; then
+		flags="-d -1"
+	fi
 	echo "NOTE: running \${testname} (expect pass: \${expectpass})"
-	if ${SWFDEC_GNASH_TESTER} \${test} > \${testname}.log; then
+	if ${SWFDEC_GNASH_TESTER} \${test} ${flags} > \${testname}.log; then
 		if [ "\${expectpass}" = "yes" ]; then
 			echo "PASSED: \${testid}"
 		else

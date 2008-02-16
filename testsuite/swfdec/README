@@ -8,6 +8,10 @@ When new tests are, or existing tests are updated, they'll be expected to fail b
 If you see an unexpected success you can add the name and md5 of the file to PASSING.
 Please keep the file sorted by name.
 
+The REALTIME file is a list of SWF files that load external resources. 
+These files are run with the nominal FPS to give the loading threads
+more chances to load the resource within the expected frame number.
+
 You'll need to pass the --with-swfdec-testsuite switch to configure in order
 for swfdec tests to be run as part of the 'make check' rule.
 
