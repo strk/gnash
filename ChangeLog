@@ -1,5 +1,13 @@
 2008-02-16  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* doc/C/Makefile.am: Fix typo, one $ not two for make
+	variables. Link to directories if we're in a build tree so
+	including images and other xml pages actually works. Link to
+	default output files if the Docbook tools aren't installed.
+	* doc/C/dumpshm-man.xml, gnash-man.xml, gprocessor-man.xml,
+	soldumper-man.xml: Remove old names, they suffix has changed to
+	.man-xml.
+
 	* server/edit_text_character.h, character.h: Put virtual before
 	the return type to eliminate a warning,
 	* packaging/install-gnash.sh: Drop GPL part, make uninstall work

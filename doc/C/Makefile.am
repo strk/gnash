@@ -19,7 +19,7 @@
 # Building a PDF using Apache FOP only works with fop-0.20.5 for now.
 include $(top_srcdir)/doc/xmldocs.make
 
-SUBDIRS = asspec
+SUBDIRS = # asspec
 infodir = ${prefix}/share/info
 figdir = images
 docname = gnash
@@ -110,16 +110,17 @@ xml_files = $(docname).xml actionscript.xml
 
 #noinst_SCRIPT = gen-doc.sh
 dist_man_MANS = gnash.1 gprocessor.1 dumpshm.1 soldumper.1
+MANSRC = $(dist_man_MANS:.1=.man-xml)
 
 # dist_html_DATA = gnash.html actionscript.html
 # dist_info_DATA = gnash.info actionscript.info
 
-html: images gnash.html actionscript.html
-pdf:  images gnash.pdf actionscript.pdf
+html: links gnash.html actionscript.html
+pdf:  links gnash.pdf actionscript.pdf
 man:  gnash.1 gprocessor.1 dumpshm.1 soldumper.1
 texi: gnash.texi actionscript.texi
-info: images gnash.info actionscript.info
-gnash.pdf gnash.html gnash.texi: images $(xml_files) $(entities)
+info: links gnash.info actionscript.info
+gnash.pdf gnash.html gnash.texi: links $(xml_files) $(entities)
 actionscript.pdf actionscript.html actionscript.texi: actionscript.xml actionscript/main.xml actionscript/as_value.xml actionscript/new_as_class.xml
 
 SUFFIXES = .xml .html .texi .pdf .info .1 .fo .man-xml
@@ -128,14 +129,12 @@ EXTRA_DIST = \
 	$(xml_files) \
 	$(entities) \
 	$(omffile) \
+	$(dist_man_MANS) \
+	$(MANSRC) \
 	actionscript.info \
 	gnash.info \
 	actionscript.html \
-	gnash.html \
-	gnash.1 \
-	gprocessor.1 \
-	dumpshm.1 \
-	soldumper.1
+	gnash.html
 
 if ENABLE_FOP
 .xml.pdf:
@@ -159,7 +158,11 @@ if ENABLE_HTML
 	$(XSLTPROC) --output $@ --nonet $(docbook_styles)/html/docbook.xsl $<
 	$(RM) $*.txml
 else
-	$(LN_S) -f $$? $@
+	@if test -d $(top_srcdir)/packaging/doc; then \
+	  $(LN_S) -f $(top_srcdir)/packaging/doc/$@.in ./$@; \
+	else \
+	  touch $@; \
+	fi
 endif
 
 #	basefile=$(notdir $(basename $<));
@@ -180,7 +183,11 @@ if ENABLE_TEXI
 	-$(MAKEINFO) --force $<
 	$(RM) *.texi
 else
-	$(LN_S) -f $$? $@
+	@if test -d $(top_srcdir)/packaging/doc; then \
+	  $(LN_S) -f $(top_srcdir)/packaging/doc/$@.in ./$@; \
+	else \
+	  touch $@; \
+	fi
 endif
 
 .man-xml.1:
@@ -191,17 +198,33 @@ if ENABLE_MAN
 	$(RM) $*.mxml
 else
 	@if test -d $(top_srcdir)/packaging/doc; then \
-	  $(LN_S) -f $(top_srcdir)/packaging/doc/$@.in $@; \
+	  $(LN_S) -f $(top_srcdir)/packaging/doc/$@.in ./$@; \
 	else \
 	  touch $@; \
 	fi
 endif
 
-alldocs: images html pdf man info
+alldocs: links html pdf man info
 
+# When we build in a seperate build tree, we need links to the images
+# subdirectory to have them be included in the final output.
 images:
 	@if test ! -d images; then \
 	   $(LN_S) -f $(srcdir)/images images; \
+	fi
+
+# When we build in a seperate build tree, we need links to these
+# additional Docbook source subdirectoriers to have them be included
+# in the final output without error.
+links: images
+	@if test ! -d asspec; then \
+	   $(LN_S) -f $(srcdir)/asspec; \
+	fi
+	@if test ! -d usermanual; then \
+	   $(LN_S) -f $(srcdir)/usermanual; \
+	fi
+	@if test ! -d actionscript; then \
+	   $(LN_S) -f $(srcdir)/actionscript; \
 	fi
 
 lint:
@@ -221,22 +244,11 @@ CLEANFILES = \
 
 MAINTAINERCLEANFILES = \
         gnash.pdf \
-        gnash.1 \
-        gprocessor.1 \
-	dumpshm.1 \
-	soldumper.1 \
+	$(MANS) \
         gnash.info \
         gnash.html \
 	actionscript.html \
 	actionscript.info
-
-# Man pages are installed as data
-install-data-hook:
-	@if test -d $(top_srcdir)/packaging/doc; then \
-	  for i in "$(MANS)"; do \
-	    $(INSTALL_DATA) $$i $(DESTDIR)$(man1dir)/; \
-	  done; \
-	fi
 
 install-info-hook: gnash.info
 	@test -d "$(DESTDIR)$(infodir)" || $(mkinstalldirs) "$(DESTDIR)$(infodir)"
