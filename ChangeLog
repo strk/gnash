@@ -1,8 +1,15 @@
 2008-02-16  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* server/edit_text_character.h, character.h: Put virtual before
+	the return type to eliminate a warning,
+	* packaging/install-gnash.sh: Drop GPL part, make uninstall work
+	correctly. Fix install path to use /usr/lib so we don't have to
+	hack ld.so.conf.
+
 	* packaging/snapshot.am: Set the name higher up so we don't have
 	to add "cvs" everywhere for the snapshot version. Build the
-	tarball with the correct path.
+	tarball with the correct path. Don't bail om some errors, they're
+	normal on some platforms. Add host_os to the tarball name.
 
 	* doc/C/dumpshm-man.xml, gprocessor-man.xml, soldumper-man.xml,
 	gnash-man.xml: Rename all man page source to *.man-xml so we can

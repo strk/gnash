@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: character.h,v 1.127 2008/02/12 18:52:32 bwy Exp $ */
+/* $Id: character.h,v 1.128 2008/02/16 23:12:58 rsavoye Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -1142,7 +1142,7 @@ public: // istn't this 'public' reduntant ?
 	/// This method is used by Gui to set up an appropriate cursor
 	/// for input textfields.
 	///
-	bool virtual isSelectableTextField() const { return false; }
+	virtual bool isSelectableTextField() const { return false; }
 };
 
 

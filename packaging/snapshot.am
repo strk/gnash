@@ -33,7 +33,7 @@ SNAPSHOT_TMP = /tmp/gnash-$(NOW)
 # rename it to the dir we want to stay clear. Then we change the default
 # version from 'cvs' to a date stamped version of cvs, like '20080202cvs'
 snapshot: distdir
-	now=`date "+%Y%m%d"`; \
+	-@now=`date "+%Y%m%d"`; \
 	pkgname="gnash-$${now}cvs"; \
 	snapshot_dir="$${pkgname}"; \
 	snapshot_tar="$${pkgname}.tar.gz"; \
@@ -52,7 +52,7 @@ snapshot: distdir
 #	$(RM) -fr $${snapshot_dir}
 
 snapshot-configure: snapshot
-	@now=`date "+%Y%m%d"`; \
+	-@now=`date "+%Y%m%d"`; \
 	pkgname="gnash-$${now}cvs"; \
 	snapshot_dir="$${pkgname}"; \
 	snapshot_build="$${snapshot_dir}/_build"; \
@@ -71,17 +71,19 @@ snapshot-configure: snapshot
 	  --infodir=/usr/share/info \
 	  --with-plugindir=$${plugindir} \
 	  --disable-static
-#	  --enable-docbook
 #	  --with-extensions=all 
 #	  --enable-gui=all 
 
 snapshot-build: snapshot-configure
-	@now=`date "+%Y%m%d"`; \
+	-@now=`date "+%Y%m%d"`; \
 	pkgname="gnash-$${now}cvs"; \
 	snapshot_dir="$${pkgname}"; \
 	snapshot_build="$${snapshot_dir}/_build"; \
+	$(LN_S) -f $${snapshot_build}/packaging/doc $${snapshot_build}/packaging/; \
 	$(MAKE) $(AM_MAKEFLAGS) -C $${snapshot_build} all
 
+# Install a package. Afterwards we link to the prebuilt man pages incase
+# DocBook and DocBook2X aren't installed on this machine.
 snapshot-install: #snapshot-build
 	now=`date "+%Y%m%d"`; \
 	snapshot_dir="gnash-$${now}cvs"; \
@@ -92,11 +94,11 @@ snapshot-install: #snapshot-build
 # We only want to bundle an installed gnash, so all the linker paths are
 # correct
 snapshot-bundle: #snapshot-install
-	now=`date "+%Y%m%d"`; \
+	-@now=`date "+%Y%m%d"`; \
 	pkgname="gnash-$${now}cvs"; \
 	snapshot_dest="/tmp/$${pkgname}-tmp"; \
 	snapshot_tmp="/tmp/$${pkgname}"; \
-	snapshot_tar="$${snapshot_tmp}-$(host_cpu).tar.gz"; \
+	snapshot_tar="$${snapshot_tmp}-$(host_cpu)-$(host_os).tar.gz"; \
 	if test ! -d $${snapshot_tmp}; then \
 	  $(MKINSTALLDIRS) $${snapshot_tmp}; \
 	fi; \
@@ -116,7 +118,7 @@ snapshot-bundle: #snapshot-install
 	tar zcvCf /tmp $${snapshot_tar} $${pkgname}
 
 snapshot-rpm: snapshot $(srcdir)/packaging/redhat/gnash.spec
-	rm -f /usr/src/redhat/SPECS/gnash.spec
+	-@rm -f /usr/src/redhat/SPECS/gnash.spec
 	now=`date "+%Y%m%d"`; \
 	pkgname="gnash-$${now}cvs"; \
 	snapshot_tar="$${pkgname}.tar.gz"; \
@@ -125,7 +127,7 @@ snapshot-rpm: snapshot $(srcdir)/packaging/redhat/gnash.spec
 	rpmbuild -ba --clean --rmsource --rmspec /usr/src/redhat/SPECS/gnash.spec
 
 snapshot-clean:
-	rm -fr snapshot-* $(SNAPSHOT_BUILD) $(SNAPSHOT_TMP) gnash*$(VERSION)*.ipk
+	-@rm -fr snapshot-* $(SNAPSHOT_BUILD) $(SNAPSHOT_TMP) gnash*$(VERSION)*.ipk
 
 # .PHONY : snapshot
 

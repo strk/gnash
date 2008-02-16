@@ -310,7 +310,7 @@ public:
 	}
 
 	// See character::isActiveTextField
-	bool virtual isSelectableTextField() const
+	virtual bool isSelectableTextField() const
 	{
 		return isSelectable();
 	}

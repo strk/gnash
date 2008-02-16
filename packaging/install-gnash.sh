@@ -25,7 +25,7 @@ gtkdeps="gtk2 gtkglext pango atk"
 kdedeps="kdebase qt"
 missing=""
 
-os=`config.guess`
+os=`./config.guess`
 
 case $os in
   *i*86-*-linux*)
@@ -46,39 +46,16 @@ esac
 # for this, as it just displays the commands to the screen.
 debug=
 
-# set 'yes' to 'yes', and you don't get asked for prompts.
-# Use with care!!! Note that setting this to yes obligates the user
-# to having agreed to the GPLv3 license when executing this script.
-yes=yes
+# set 'yes' to 'yes', and you don't get asked for prompts. Set to 'no'
+# for the default behaviour. Use with care!!!
+yes=no
+
 
 # aliases for a few commands to force debug mode while still leaving
 # the rest of this code readable.
 COPY="$debug cp -f"
 REMOVE="$debug rm -f"
 MOVE="$debug mv -f"
-
-#
-# Display the GPLv3, and get the users agreement before proceeding
-#
-gpl ()
-{
-  # display the GPLv3
-  cat COPYING
-
-  # make sure the user agrees
-  if [ x$yes = xno ]; then
-    read -p "Do you agree to the terms of this license? (yes or no) " answer
-  else
-    answer="$yes"
-  echo "NOTE: You have the install script set to \"yes always\" mode"
-    echo "NOTE: This means by default you have agree to the terms of the GPLv3"
-  fi
-
-  if [ x$answer != xyes ] ; then
-    echo "Sorry, then you can't install Gnash..."
-    exit
-  fi
-}
 
 #
 # Find an executable file that needs to be in our shell PATH.
@@ -99,6 +76,44 @@ findbin ()
     return 
 }
 
+#
+# See if we can figure out which GNU/Linux or BSD distribution we are running
+#
+findrelease ()
+{
+    # Ubuntu uses /etc/lsb-release
+    if [ -f /etc/lsb-release ]; then
+	release_name="`grep DISTRIB_ID /etc/lsb-release`"
+	release_version="`grep DISTRIB_RELEASE /etc/lsb-release`"
+	return
+    fi
+
+    # Redhat, Fedora, and Centos all use /etc/redhat-release
+    if [ -f /etc/redhat-release ]; then
+	release_name="`cat /etc/redhat-release | cut -d ' ' -f 1`"
+	release_version="`cat /etc/redhat-release | cut -d ' ' -f 3`"
+	return
+    fi
+
+    # Debian uses /etc/issue. Fedora uses /etc/issue too, but we
+    # don't need it now.
+    if [ -f /etc/issue ]; then
+	release_name="`cat /etc/issue | cut -d ' ' -f 1`"
+	release_version="`cat /etc/issue | cut -d ' ' -f 3`"
+	return
+    fi
+
+    # OpenBSD doesn't appear to use anything, but by default motd does
+    # have the distro name and version, so we try that as most people
+    # never bother to change their motd message anyway.
+    if [ -f /etc/motd ]; then
+	release_name="`cat /etc/motd | head -1 | cut -d ' ' -f 1`"
+	release_version="`cat /etc/motd | head -1 | cut -d ' ' -f 2`"
+	return
+    fi
+
+}
+
 # This script has a split personality in that it works in an
 # unconfigured tree, as well as a version with the paths munged
 # by the normal Gnash configuration process. This way we can
@@ -117,7 +132,7 @@ checkdirs ()
   # as well as were these files get installed to.
   rootdir="@prefix@"
   if [ x"${rootdir}" = x"@prefix@" ]; then
-    rootdir="/usr/local"
+    rootdir="/usr"
   fi
 
   # This is where the NSAPI (any Geeko based browser like Mozilla,
@@ -234,8 +249,8 @@ checkdirs ()
 # of them to return to a stable state.
 preexisting ()
 {
-  if [ -d ${rootdir}/lib/gnash ]; then
-    existing=`ls -d ${rootdir}/lib/gnash/libgnashbase-*.so* 2> /dev/null`
+  if [ -d ${rootdir}/lib/gnash -o -d ${rootdir}/lib ]; then
+    existing=`ls -d ${rootdir}/lib/gnash/libgnashbase*.so* ${rootdir}/lib/libgnashbase*.so 2> /dev/null`
     if [ -n "${existing}" ]; then
       echo ""
       echo "You have previous installations of Gnash"
@@ -245,23 +260,19 @@ preexisting ()
       done
       echo "version: $files"
       echo "These should to be removed for the best stability of Gnash"
-      if [ x$yes = xno ]; then
-        read -p "Do you wish to remove these old versions ? " answer
-      else
-	answer="$yes"
+      if [ x$yes != xyes ]; then
+        read -p "Do you wish to remove these old versions ?  [yes] " answer
       fi
-        if [ x$answer = xyes ]; then
-          for i in $files; do
-            if [ x$yes = xno ]; then
-	      read -p "Remove Gnash version \"$i\"? " answer
-	    else
-	      answer="$yes"
-            fi
-            if [ x$answer = xyes ]; then
-              ${REMOVE} $rootdir/lib/gnash/libgnash*-$i.*
-	    fi
-          done
-        fi
+      if [ x$answer = xyes  -o x$answer = xy ]; then
+        for i in $files; do
+          if [ x$yes != xyes ]; then
+	    read -p "Remove Gnash version \"$i\"? [yes] " answer
+          fi
+          if [ x$answer = xyes -o x$answer = xy ]; then
+            ${REMOVE} $rootdir/lib/libgnash*
+	  fi
+        done
+      fi
     fi
     existing=`ls -d ${rootdir}/bin/*-gnash 2> /dev/null`
     if [ -n "${existing}" ]; then
@@ -272,30 +283,24 @@ preexisting ()
       done
       echo "GUIS: $files"
       echo "These should to be removed for the best stability of Gnash"
-      if [ x$yes = xno ]; then
-        read -p "Do you wish to remove these old versions ? " answer
-      else
-	answer="$yes"
+      if [ x$yes != xyes ]; then
+        read -p "Do you wish to remove these old versions ? [yes] " answer
       fi
-      if [ x$answer = xyes ]; then
+      if [ x$answer = xyes  -o x$answer = xy ]; then
         for i in $files; do
-          if [ x$yes = xno ]; then
-	    read -p "Remove Gnash GUI \"$i\"? " answer
-	  else
-	    answer="$yes"
+          if [ x$yes != xyes ]; then
+	    read -p "Remove Gnash GUI \"$i\"? [yes] " answer
 	  fi
-          if [ x$answer = xyes ]; then
-            ${REMOVE} $rootdir/bin/gnash/$i-gnash
+          if [ x$answer = xyes  -o x$answer = xy ]; then
+            ${REMOVE} $rootdir/bin/$i-gnash
 	  fi
         done
       fi
-      if [ x$yes = xno ]; then
-        read -p "Do you wish to remove the gnash shell script too ? " answer
-      else
-	answer="$yes"
+      if [ x$yes != xyes ]; then
+        read -p "Do you wish to remove the gnash shell script too ? [yes] " answer
       fi
-      if [ x$answer = xyes ]; then
-	  ${REMOVE} $rootdir/bin/gnash/gnash
+      if [ x$answer = xyes  -o x$answer = xy ]; then
+	  ${REMOVE} $rootdir/bin/gnash
       fi
     fi
   else
@@ -351,19 +356,13 @@ install ()
     exit
   fi
 
-  # install the documentation
-  if [ -e gnash.pdf -o x$yes = xyes ]; then
-    $debug mkdir -p /usr/share/doc/gnash
-    ${COPY} gnash.pdf /usr/share/doc/gnash
-  fi
-
   # copy the ld.so.conf file
 #   if [ ! -f /etc/ld.so.conf.d/gnash.conf ]; then
 #     echo " /usr/lib/gnash" > /etc/ld.so.conf.d/gnash.conf
 #   fi
 
 #   # run ldconfig so the shared libraries can be found.
-#   ldconfig
+  ldconfig
 }
 
 #
@@ -478,8 +477,16 @@ while [ ! -z $1 ]; do
         echo "ERROR: You need to specify an argument for rootdir="
       fi
       ;;
+    uninstall)
+      checkdirs
+      preexisting
+      exit 0
+      ;;
     dump)
       yes=yes
+      findrelease
+      echo "Release name is: ${release_name}"
+      echo "Release version is: ${release_version}"
       checkdirs
       echo ""
       echo "Default paths are: "
@@ -512,8 +519,6 @@ done
 #
 # Here's where everything actually gets executed
 #
-# Go through the license agreement
-gpl
 
 # Check the directory permissions first
 checkdirs
