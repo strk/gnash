@@ -196,7 +196,7 @@ if ENABLE_MAN
 	$(DB2X_MANXML) $*.mxml
 	$(RM) $*.mxml
 else
-	@if test -d $(top_srcdir)/packaging; then \
+	@if test -d $(top_srcdir)/packaging/doc; then \
 	  $(LN_S) -f $(top_srcdir)/packaging/doc/$@.in $@; \
 	else \
 	  touch $@; \
