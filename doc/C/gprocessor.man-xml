@@ -1,0 +1,116 @@
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+                   "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd"
+[
+  <!ENTITY legal SYSTEM "legal.xml">
+  <!ENTITY appversion "0.8">
+  <!ENTITY manrevision "0.1">
+  <!ENTITY date "Feb 2008">
+  <!ENTITY app "<application>Gprocessor</application>">
+  <!ENTITY appname "Gprocessor">
+  <!ENTITY version "0.8">
+]
+>
+
+<refentry id="gprocessor">
+<refmeta>
+<refentrytitle>gprocessor</refentrytitle>
+<manvolnum>1</manvolnum>
+</refmeta>
+
+<!-- the refname becomes the output name of the man page -->
+<refnamediv>
+<refname>gprocessor</refname>
+<refpurpose>Gnash SWF Processor</refpurpose>
+</refnamediv>
+
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+gprocessor (options)... (file)...
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+<para>
+  Gprocessor is an debugging tool for SWF files, that is a companion to
+  Gnash. This is most often used for debugging and running testcases,
+  as this tool is equivalant to running Gnash with no graphic
+  output. This tool is primarily used by Gnash developers, or anyone
+  that wishes to run the Gnash test cases.
+</para>
+
+<variablelist>
+  <varlistentry>
+    <term>-h</term>
+    <listitem>
+      <para>
+	Print usage info.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-w</term>
+    <listitem>
+      <para>
+	Write a .gsc file with preprocessed info, for each input file.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-vp</term>
+    <listitem>
+      <para>
+	Be verbose about movie parsing.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-va</term>
+    <listitem>
+      <para>
+	Be verbose about ActionScript.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-d [ms]</term>
+    <listitem>
+      <para>
+	Milliseconds delay between advances (0 by default). If '-1'
+	the delay will be computed from the FPS.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-f [frames]</term>
+    <listitem>
+      <para>
+	Allow the given number of frame advancements. Keep advancing
+	untill any other stop condition is encountered if set to 0
+	(default).
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-r [times]</term>
+    <listitem>
+      <para>
+	 Allow the given number of complete runs. Keep looping
+	 undefinitely if set to 0. Default is 1 (end as soon as the
+	 last frame is reached).
+      </para>
+    </listitem>
+  </varlistentry>
+
+
+</variablelist>
+
+</refsect1>
+</refentry>
+

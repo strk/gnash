@@ -1,0 +1,92 @@
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+                   "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd"
+[
+  <!ENTITY legal SYSTEM "legal.xml">
+  <!ENTITY appversion "0.8">
+  <!ENTITY manrevision "0.1">
+  <!ENTITY date "Feb 2008">
+  <!ENTITY app "<application>Dumpshm</application>">
+  <!ENTITY appname "Dumpshm">
+  <!ENTITY version "0.8">
+]
+>
+
+<refentry id="dumpshm">
+<refmeta>
+<refentrytitle>dumpshm</refentrytitle>
+<manvolnum>1</manvolnum>
+</refmeta>
+
+<!-- the refname becomes the output name of the man page -->
+<refnamediv>
+<refname>dumpshm</refname>
+<refpurpose>Gnash LocalConnection memory Dumper</refpurpose>
+</refnamediv>
+
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+dumpshm (options)... (file)...
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+<para>
+  Dump information about the shared memory segment used by the
+  LocalConnection ActionScript class. This memory segment is comprised
+  of a header, and a collection of SWF AMF Objects, normally not
+  viewable by the user.
+</para>
+
+<variablelist>
+  <varlistentry>
+    <term>-h</term>
+    <listitem>
+      <para>
+	Print usage info.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-i</term>
+    <listitem>
+      <para>
+	Find the key for an existing memory segment.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-r</term>
+    <listitem>
+      <para>
+	Dump memory segment to the terminal.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-c</term>
+    <listitem>
+      <para>
+	Dump memory segment to a disk file, segment.raw.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-v</term>
+    <listitem>
+      <para>
+	Verbose output.
+      </para>
+    </listitem>
+  </varlistentry>
+
+
+</variablelist>
+
+</refsect1>
+</refentry>
+

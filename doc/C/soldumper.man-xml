@@ -1,0 +1,83 @@
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+                   "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd"
+[
+  <!ENTITY legal SYSTEM "legal.xml">
+  <!ENTITY appversion "0.8">
+  <!ENTITY manrevision "0.1">
+  <!ENTITY date "Feb 2008">
+  <!ENTITY app "<application>Soldumper</application>">
+  <!ENTITY appname "Soldumper">
+  <!ENTITY version "0.8">
+]
+>
+
+<refentry id="soldumper">
+<refmeta>
+<refentrytitle>soldumper</refentrytitle>
+<manvolnum>1</manvolnum>
+</refmeta>
+
+<!-- the refname becomes the output name of the man page -->
+<refnamediv>
+<refname>soldumper</refname>
+<refpurpose>Gnash Local Shared Object file Dumper</refpurpose>
+</refnamediv>
+
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+soldumper (options)... (file)...
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+<para>
+  Dump information about the .sol files used by the SharedObject
+  ActionScript class. These files are comprised of a header, and a
+  collection of SWF AMF Objects, normally not viewable by the user.
+</para>
+
+<variablelist>
+  <varlistentry>
+    <term>-h</term>
+    <listitem>
+      <para>
+	Print usage info.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-l</term>
+    <listitem>
+      <para>
+	List all the .sol files in the default path.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-f</term>
+    <listitem>
+      <para>
+	Ignore the global setting, use the current directory for files.
+      </para>
+    </listitem>
+  </varlistentry>
+
+
+  <varlistentry>
+    <term>-v</term>
+    <listitem>
+      <para>
+	Verbose output.
+      </para>
+    </listitem>
+  </varlistentry>
+
+
+</variablelist>
+
+</refsect1>
+</refentry>
+
