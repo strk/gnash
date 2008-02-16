@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.194 2008/02/06 15:20:58 bwy Exp $ */
+/* $Id: ASHandlers.cpp,v 1.195 2008/02/16 09:20:22 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -2854,7 +2854,7 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
 
     thread.ensureStack(1); // array size name
 
-    int	array_size = (int) env.pop().to_number();
+    int	array_size = env.pop().to_int();
     assert(array_size >= 0);
 
     thread.ensureStack((unsigned int)array_size); // array elements
