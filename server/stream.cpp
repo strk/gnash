@@ -81,9 +81,16 @@ bool stream::read_bit()
 
 unsigned stream::read_uint(unsigned short bitcount)
 {
-	//assert(bitcount <= 24);
-	// should be 24, check why htf_sweet.swf fails this assertion
-	assert(bitcount <= 32);
+	// htf_sweet.swf fails when this is set to 24. There seems to
+	// be no reason why this should be limited to 32 other than
+	// that it is higher than a movie is likely to need.
+	if (bitcount > 32)
+	{
+	    // This might overflow a uint32_t or attempt to read outside
+	    // the byte cache (relies on there being only 4 bytes after
+        // possible unused bits.)
+	    throw ParserException("Unexpectedly long value advertised.");
+	}
 
 	// Optimization for multibyte read
 	if ( bitcount > m_unused_bits )
@@ -104,6 +111,7 @@ unsigned stream::read_uint(unsigned short bitcount)
 
 		//std::cerr << "BytesToRead: " << bytesToRead << " spareBits: " << spareBits << " unusedBits: " << (int)m_unused_bits << std::endl;
 
+        assert (bytesToRead <= 4);
 		byte cache[4]; // at most 4 bytes in the cache
 
 		if ( spareBits ) m_input->read_bytes(&cache, bytesToRead+1);

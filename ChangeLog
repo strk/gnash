@@ -1,3 +1,8 @@
+2008-02-16 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/stream.cpp: throw parser exception if asked to read more than
+	  32 bits, assert only to prevent buffer overflow. Fixes bug #22319.
+
 2008-02-16  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* gui/Makefile.am: Add GLIB_CFLAGS. Install shell with
