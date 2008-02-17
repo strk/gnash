@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.74 2008/01/16 00:42:55 rsavoye Exp $
+dnl $Id: boost.m4,v 1.75 2008/02/17 01:21:59 rsavoye Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -37,10 +37,11 @@ AC_DEFUN([GNASH_PATH_BOOST],
   boost_headers="detail/lightweight_mutex.hpp thread/thread.hpp multi_index_container.hpp multi_index/key_extractors.hpp thread/mutex.hpp"
   dnl this is a list of *required* libraries. If any of these are missing, this
   dnl test will return a failure, and Gnash won't build.
-  boost_libs="thread date_time serialization"
+  boost_libs="thread date_time"
   dnl this is a list of *recommended* libraries. If any of these are missing, this
   dnl test will return a warning, and Gnash will build, but testing won't work.
-  extra_boost_libs="unit_test_framework"
+  extra_boost_libs="serialization"
+#  extra_boost_libs="unit_test_framework"
 
   dnl this is the default list for paths to search. This gets
   dnl redefined if --with-boost-incl= is specified.
@@ -163,7 +164,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   fi
 
   if test x"${ac_cv_path_boost_lib}" != x; then
-    BOOST_LIBS="$ac_cv_path_boost_lib" 
+    BOOST_LIBS="$ac_cv_path_boost_lib"
   fi
 
   if test x"${ac_cv_path_boost_extra_lib}" != x; then

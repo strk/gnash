@@ -1,5 +1,8 @@
 2008-02-16  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* macros/boost.m4: The serialization is optional, not required. 
+	* macros/pthread.m4: Match all BSD hosts when setting flags.
+
 	* Makefile.am: Always recurse into doc.
 
 	* doc/C/Makefile.am: Fix typo, one $ not two for make
@@ -7,7 +10,7 @@
 	including images and other xml pages actually works. Link to
 	default output files if the Docbook tools aren't installed.
 	* doc/C/dumpshm-man.xml, gnash-man.xml, gprocessor-man.xml,
-	soldumper-man.xml: Remove old names, they suffix has changed to
+	soldumper-man.xml: Remove old names, their suffix has changed to
 	.man-xml.
 
 	* server/edit_text_character.h, character.h: Put virtual before

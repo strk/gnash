@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 dnl Copyright (C) 2006 Steven G. Johnson <stevenj@alum.mit.edu>.
-dnl $Id: pthreads.m4,v 1.34 2008/02/01 05:48:34 rsavoye Exp $
+dnl $Id: pthreads.m4,v 1.35 2008/02/17 01:21:59 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_PTHREADS],
 [
@@ -81,7 +81,7 @@ dnl --thread-safe: KAI C++
 dnl pth(read)-config: use pthread-config program (for GNU Pth library)
 
 case "${host_os}" in
-  *linux* | *openbsd*)
+  *linux* | *bsd*)
     pthread_flags="-pthread"
     ;;
   *darwin*)
