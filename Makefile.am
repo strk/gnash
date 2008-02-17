@@ -53,6 +53,7 @@ STD_DIRS = \
 	plugin \
 	pythonmodule \
 	testsuite \
+	doc \
 	po \
 	$(NULL)
 
@@ -60,9 +61,9 @@ if CYGNAL
 CYGNAL_DIRS = cygnal
 endif
 
-if DOCBOOK
-DOC_DIRS = doc
-endif
+# if DOCBOOK
+# DOC_DIRS = doc
+# endif
 
 SUBDIRS      = $(STD_DIRS) $(CYGNAL_DIRS) $(DOC_DIRS)
 
@@ -70,14 +71,13 @@ if BUILD_EXTENSIONS
 SUBDIRS += extensions
 endif
 
-man_MANS = doc/gnash.1
+# man_MANS = doc/gnash.1 doc/gprocessor.1 doc/dumpshm.1 soldumper.1
 
 DIST_SUBDIRS = $(STD_DIRS) cygnal doc extensions
 
 EXTRA_DIST =  autogen.sh \
 	packaging \
 	config.rpath \
-	$(man_MANS) \
 	macros/incllist macros/libslist \
 	ChangeLog-0.8.0 ChangeLog-0.8.1
 

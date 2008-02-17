@@ -1,5 +1,7 @@
 2008-02-16  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* Makefile.am: Always recurse into doc.
+
 	* doc/C/Makefile.am: Fix typo, one $ not two for make
 	variables. Link to directories if we're in a build tree so
 	including images and other xml pages actually works. Link to
