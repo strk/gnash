@@ -1,3 +1,8 @@
+2008-02-17 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/xml.{cpp,h}: implement XML.sendAndLoad (untested).
+	  See bug #22334.
+
 2008-02-16 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gtk.cpp: add mnemonics to menu bar for accessibility.

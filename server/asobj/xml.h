@@ -154,7 +154,7 @@ public:
 
     void send();
 
-    void sendAndLoad();
+    bool sendAndLoad(const URL& url);
 
     size_t getBytesLoaded() const;
     size_t getBytesTotal() const;

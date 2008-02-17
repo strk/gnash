@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.70 2008/02/14 13:27:56 bwy Exp $ */
+/* $Id: xml.cpp,v 1.71 2008/02/17 14:03:57 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -599,10 +599,40 @@ XML::send()
     log_unimpl (__FUNCTION__);
 }
 
-void
-XML::sendAndLoad()
+bool
+XML::sendAndLoad(const URL& url)
 {
-    log_unimpl (__FUNCTION__);
+    //GNASH_REPORT_FUNCTION;
+
+    std::stringstream ss;
+    toString(ss);
+    const std::string& data = ss.str();
+
+    VM& vm = getVM();
+    string_table& st = vm.getStringTable();
+    string_table::key ctypeKey = st.find("contentType");
+    as_value ctypeVal;
+    if ( get_member(ctypeKey, &ctypeVal) )
+    {
+       log_unimpl ("Custom ContentType (%s) in XML.sendAndLoad", ctypeVal.to_debug_string().c_str());
+    }
+  
+    //log_msg(_("%s: mem is %d"), __FUNCTION__, mem);
+
+    std::auto_ptr<tu_file> str ( StreamProvider::getDefaultInstance().getStream(url, data) );
+    if ( ! str.get() ) 
+    {
+        log_error(_("Can't load XML file: %s (security?)"), url.str().c_str());
+        return false;
+        // TODO: this is still not correct.. we should still send onData later...
+        //as_value nullValue; nullValue.set_null();
+        //callMethod(NSV::PROP_ON_DATA, nullValue);
+    }
+
+    log_security(_("Loading XML file from url: '%s'"), url.str().c_str());
+    queueLoad(str);
+
+    return true;
 }
 
 
@@ -865,9 +895,22 @@ xml_sendandload(const fn_call& fn)
     GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
     
+    if ( ! fn.nargs )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("XML.sendAndLoad(): missing argument"));
+        );
+        return as_value();
+    }
+
+    const std::string& filespec = fn.arg(0).to_string();
+
+    URL url(filespec, get_base_url());
+
 //    return as_value(ptr->getAllocated());
-    ptr->sendAndLoad();
-    return as_value();
+    bool ret = ptr->sendAndLoad(url);
+
+    return ret; // TODO: check expected return values
 }
 
 static as_value
