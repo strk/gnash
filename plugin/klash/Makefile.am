@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 # 
-#   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,12 +15,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.43 2008/02/13 03:14:20 rsavoye Exp $
-
 AUTOMAKE_OPTIONS = 
 
 if KPARTS
-AM_CPPFLAGS= $(KDE_CFLAGS) $(QT_CFLAGS) -DGNASHBINDIR=\"${bindir}\"
+AM_CPPFLAGS = \
+	$(KDE_CFLAGS) \
+	$(QT_CFLAGS) \
+	$(X11_CFLAGS) \
+	-DGNASHBINDIR=\"${bindir}\"
 
 plugindir   = $(KDE_PLUGINDIR)
 kde_servicesdir = $(KDE_SERVICESDIR)
@@ -80,13 +82,11 @@ test_perms:
 	  fi; \
 	fi
 
-install-data-am: $(dist_kde_services_DATA)
+install-data-am: $(dist_kde_services_DATA) $(dist_kde_appsdata_DATA)
 	test -d $(DESTDIR)$(kde_servicesdir) || $(mkinstalldirs) $(DESTDIR)$(kde_servicesdir)
 	$(INSTALL) $(srcdir)/$(dist_kde_services_DATA) $(DESTDIR)$(kde_servicesdir)
-
-# install-plugin-data:
-# 	test -d $(DESTDIR)$(kde_servicesdir) || $(mkinstalldirs) $(DESTDIR)$(kde_servicesdir)
-# 	$(INSTALL) $(dist_kde_services_DATA) $(DESTDIR)$(kde_servicesdir)
+	test -d $(DESTDIR)$(kde_appsdatadir) || $(mkinstalldirs) $(DESTDIR)$(kde_appsdatadir)
+	$(INSTALL) $(srcdir)/$(dist_kde_appsdata_DATA) $(DESTDIR)$(kde_appsdatadir)
 
 install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 	@echo "Nothing to install here now."

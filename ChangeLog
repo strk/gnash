@@ -1,5 +1,13 @@
 2008-02-16  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* gui/Makefile.am: Add GLIB_CFLAGS. Install shell with
+	INSTALL_DATA.
+	* gui/am-frag/gtk.am: Include X11_CFLAGS to keep NetBSD happy.
+	* pugin/Makefile.am: Include X11_CFLAGS to keep NetBSD happy.
+	* plugin/klash/Makefile.am: Include X11_CFLAGS to keep NetBSD
+	happy.
+	* gui/gnash.in: Update copyright.
+	
 	* macros/boost.m4: The serialization is optional, not required. 
 	* macros/pthread.m4: Match all BSD hosts when setting flags.
 

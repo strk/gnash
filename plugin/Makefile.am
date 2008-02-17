@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.68 2008/01/21 23:28:02 rsavoye Exp $
+# $Id: Makefile.am,v 1.69 2008/02/17 02:04:27 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -41,6 +41,7 @@ AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11 -DGNASHBINDIR=\"${bindir}\" \
 	-I$(srcdir)/mozilla-sdk \
 	-I$(srcdir)/mozilla-sdk/include \
 	$(GLIB_CFLAGS) \
+	$(X11_CFLAGS) \
 	$(GTK2_CFLAGS) \
         $(CAIRO_CFLAGS) \
         $(GLIB_CFLAGS) \

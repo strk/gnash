@@ -46,6 +46,7 @@ AM_CPPFLAGS = -I.. \
 	 	-I$(top_srcdir)/libmedia/gst \
        -DLOCALEDIR=\"$(localedir)\" \
 	-DPLUGINSDIR=\"$(pluginsdir)\" \
+	$(GLIB_CFLAGS) \
         $(LIBXML_CFLAGS) \
         $(DMALLOC_CFLAGS) \
 	$(LIRC_CFLAGS) \
@@ -164,8 +165,8 @@ bin_SCRIPTS = gnash
 bin_PROGRAMS = 
 
 gnash: gnash.in
-	cp $< $@
-	chmod +x $@
+	$(INSTALL_DATA) $? gnash
+	chmod a+x gnash
 
 GUI_SRCS = gnash.cpp \
 	gui.cpp gui.h \

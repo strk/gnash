@@ -25,7 +25,7 @@ GTK_CFLAGS += -DALP_BUILD=ALP_BUILD_DEBUG
 endif
 gtk_gnash_SOURCES = $(GUI_SRCS) gui_gtk.cpp
 gtk_gnash_CPPFLAGS = -DGUI_GTK -DGUI_CONFIG=\"GTK\" \
-	$(AM_CPPFLAGS) $(GTK_CFLAGS)
+	$(AM_CPPFLAGS) $(GTK_CFLAGS) $(X11_CFLAGS)
 gtk_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
 #gtk_gnash_DEPENDENCIES = .configline
 
