@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.145 2008/02/14 13:27:56 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.146 2008/02/17 10:01:14 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -1760,7 +1760,7 @@ void
 GtkGui::createFileMenu(GtkWidget *obj)
 {
 //    GNASH_REPORT_FUNCTION;
-    GtkWidget *menuitem = gtk_menu_item_new_with_label (_("File"));
+    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic (_("_File"));
     gtk_widget_show (menuitem);
     gtk_container_add (GTK_CONTAINER (obj), menuitem);
     
@@ -1824,7 +1824,7 @@ GtkGui::createEditMenu(GtkWidget *obj)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    GtkWidget *menuitem = gtk_menu_item_new_with_label (_("Edit"));
+    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic (_("_Edit"));
     gtk_widget_show (menuitem);
     gtk_container_add (GTK_CONTAINER (obj), menuitem);
     
@@ -1846,7 +1846,7 @@ void
 GtkGui::createHelpMenu(GtkWidget *obj)
 {
 //    GNASH_REPORT_FUNCTION;
-    GtkWidget *menuitem = gtk_menu_item_new_with_label (_("Help"));
+    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic (_("_Help"));
     gtk_widget_show (menuitem);
     gtk_container_add (GTK_CONTAINER (obj), menuitem);
     
@@ -1867,7 +1867,7 @@ void
 GtkGui::createViewMenu(GtkWidget *obj)
 {
 //    GNASH_REPORT_FUNCTION;
-    GtkWidget *menuitem = gtk_menu_item_new_with_label (_("View"));
+    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic (_("_View"));
     gtk_widget_show (menuitem);
     gtk_container_add (GTK_CONTAINER (obj), menuitem);
     
@@ -1911,7 +1911,7 @@ GtkGui::createControlMenu(GtkWidget *obj)
 
 // Movie Control Menu
     GtkWidget *menuitem_control =
-	gtk_menu_item_new_with_label (_("Movie Control"));
+	gtk_menu_item_new_with_mnemonic (_("Movie _Control"));
     gtk_widget_show (menuitem_control);
     gtk_container_add (GTK_CONTAINER (obj), menuitem_control);
     

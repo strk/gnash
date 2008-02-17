@@ -1,5 +1,11 @@
 2008-02-16 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* gui/gtk.cpp: add mnemonics to menu bar for accessibility.
+	* po/gnash.pot: updated pot file.
+	* po/de.po: updated translation.
+
+2008-02-16 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* server/stream.cpp: throw parser exception if asked to read more than
 	  32 bits, assert only to prevent buffer overflow. Fixes bug #22319.
 
