@@ -148,13 +148,9 @@ public:
 
     XMLNode *createTextNode(const char *name);
 
-    void load();
-
-    void parseXML();
-
     void send();
 
-    bool sendAndLoad(const URL& url);
+    bool sendAndLoad(const URL& url, XML& target);
 
     size_t getBytesLoaded() const;
     size_t getBytesTotal() const;

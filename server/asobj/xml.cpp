@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.71 2008/02/17 14:03:57 strk Exp $ */
+/* $Id: xml.cpp,v 1.72 2008/02/18 18:13:14 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -582,25 +582,13 @@ XML::addRequestHeader(const char * /* name */, const char * /* value */)
 
 
 void
-XML::load()
-{
-    log_unimpl (__FUNCTION__);
-}
-
-void
-XML::parseXML()
-{
-    log_unimpl (__FUNCTION__);
-}
-
-void
 XML::send()
 {
     log_unimpl (__FUNCTION__);
 }
 
 bool
-XML::sendAndLoad(const URL& url)
+XML::sendAndLoad(const URL& url, XML& target)
 {
     //GNASH_REPORT_FUNCTION;
 
@@ -630,7 +618,7 @@ XML::sendAndLoad(const URL& url)
     }
 
     log_security(_("Loading XML file from url: '%s'"), url.str().c_str());
-    queueLoad(str);
+    target.queueLoad(str);
 
     return true;
 }
@@ -895,20 +883,46 @@ xml_sendandload(const fn_call& fn)
     GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
     
-    if ( ! fn.nargs )
+    if ( fn.nargs < 2 )
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("XML.sendAndLoad(): missing argument"));
+        std::stringstream ss;
+        fn.dump_args(ss);
+        log_aserror(_("XML.sendAndLoad(%s): missing arguments"),
+		ss.str().c_str());
         );
-        return as_value();
+        return as_value(false);
     }
 
     const std::string& filespec = fn.arg(0).to_string();
 
+    boost::intrusive_ptr<as_object> targetObj = fn.arg(1).to_object();
+    if ( ! targetObj )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        std::stringstream ss;
+        fn.dump_args(ss);
+        log_aserror(_("XML.sendAndLoad(%s): second argument doesn't cast to an object"),
+		ss.str().c_str());
+        );
+        return as_value(false);
+    }
+    XML* target = dynamic_cast<XML*>(targetObj.get());
+    if ( ! target )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        std::stringstream ss;
+        fn.dump_args(ss);
+        log_aserror(_("XML.sendAndLoad(%s): second argument is not an XML object"),
+		ss.str().c_str());
+        );
+        return as_value(false);
+    }
+
     URL url(filespec, get_base_url());
 
 //    return as_value(ptr->getAllocated());
-    bool ret = ptr->sendAndLoad(url);
+    bool ret = ptr->sendAndLoad(url, *target);
 
     return ret; // TODO: check expected return values
 }
