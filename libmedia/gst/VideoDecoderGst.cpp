@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderGst.cpp,v 1.13 2008/02/18 19:26:23 nelsonrn Exp $
+// $Id: VideoDecoderGst.cpp,v 1.14 2008/02/18 19:36:00 nelsonrn Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -72,7 +72,9 @@ VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type, int width, int heigh
                                       NULL);
       break;
     case 0:
-      log_msg("Video codec unspecified.  Streaming video expected later.");
+      log_debug("Video codec is zero.  Streaming video expected later.");
+      gst_object_unref (GST_OBJECT (_pipeline));
+      _pipeline = NULL;
       break;
     default:
       log_error("No support for this video codec. %d", codec_type);
