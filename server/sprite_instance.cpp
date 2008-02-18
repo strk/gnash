@@ -2539,12 +2539,12 @@ sprite_instance::on_event(const event_id& id)
         if ( ! def ) break; // must be a loaded movie (loadMovie doesn't mark it as "dynamic" - should it? no, or getBytesLoaded will always return 0)
         if ( def->getRegisteredClass() ) break; // if it has a registered class it can have an onLoad in prototype...
 
-//#ifdef GNASH_DEBUG
+#ifdef GNASH_DEBUG
         log_debug("Sprite %s (depth %d) won't check for user-defined LOAD event (is not dynamic, has a parent, "
 		"no registered class and no clip events defined)",
 		getTarget().c_str(), get_depth());
         testInvariant();
-//#endif
+#endif
         return called;
     } while (0);
       
