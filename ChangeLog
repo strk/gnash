@@ -1,3 +1,13 @@
+2008-02-18 Russ Nelson <nelson@crynwr.com>
+
+        * libmedia/gst/VideoDecoderGst.cpp
+	* When a movie is going to stream video, it creates DEFINEVIDEOSTREAM
+	  with a codec id of zero.  That currently generates an ERROR when it
+	  only means that the real video will be streamed later.  Instead, 
+	  we'll just log it.
+	* Change the wording to make it clear that it's codec #0, send it
+          to log_debug(), and nuke the pipeline.
+
 2008-02-18 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/video_stream_def.cpp (readDefineVideoStream): fix
