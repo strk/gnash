@@ -15,7 +15,7 @@ set MalformedSWFVerbosity false
 set ASCodingErrorsVerbosity false
 
 # Don't NOT write to the logfile
-set wroteLog false
+set writeLog false
 
 # Enable sound (for testcases using it..)
 set sound true
