@@ -1,3 +1,8 @@
+2008-02-18 Sandro Santilli <strk@keybit.net>
+
+	* libbase/LoadThread.cpp: update _streamSize on eof, as the
+	  http-advertised stream size can't be relied upon.
+
 2008-02-18 Russ Nelson <nelson@crynwr.com>
 
         * libmedia/gst/VideoDecoderGst.cpp

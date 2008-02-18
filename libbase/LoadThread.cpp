@@ -16,9 +16,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: LoadThread.cpp,v 1.19 2008/01/21 20:55:43 rsavoye Exp $
+// $Id: LoadThread.cpp,v 1.20 2008/02/18 22:35:31 strk Exp $
 
 #include "LoadThread.h"
+#include "log.h"
 
 #if defined(_WIN32) || defined(WIN32)
 # include <windows.h>	// for sleep()
@@ -295,14 +296,18 @@ void LoadThread::setupCache()
 	_loadPosition = ret;
 	_streamSize = _stream->get_size();
 
-    if ( ret < setupSize ) _completed = true;
+	if ( ret < setupSize )
+	{
+		_completed = true;
+		if ( _streamSize < _loadPosition ) _streamSize = _loadPosition;
+	}
 }
 
 void LoadThread::downloadThread(LoadThread* lt)
 {
 	// Until the download is completed keep downloading
 	while ( (!lt->_completed) && (!lt->cancelRequested()) )
-    {
+	{
 		// If the cache is full just "warm up" the data using download(),
 		// else put data directly into the cache using fillCache().
 		if (lt->_chunkSize + lt->_loadPosition > lt->_cacheStart + lt->_cacheSize) lt->download();
@@ -317,8 +322,12 @@ void LoadThread::downloadThread(LoadThread* lt)
 
 void LoadThread::fillCache()
 {
+	// TODO: is this needed ? Should it be an assertion ?
 	if (_loadPosition >= _streamSize) {
 		_completed = true;
+		_streamSize = _loadPosition;
+		// I don't see how should this happen...
+		gnash::log_error("LoadThread::fillCache: _loadPosition:%ld, _streamSize:%ld", _loadPosition, _streamSize);
 		return;
 	}
 
@@ -357,15 +366,19 @@ void LoadThread::fillCache()
 	}
 
 	_loadPosition = _loadPosition + ret;
+	if ( _streamSize < _loadPosition ) _streamSize = _loadPosition;
 	_actualPosition = _loadPosition;
 
 }
 
 void LoadThread::download()
 {
+	// TODO: is this needed ? Should it be an assertion ?
 	if (_loadPosition >= _streamSize) {
 		_loadPosition = _streamSize;
 		_completed = true;
+		_streamSize = _loadPosition;
+		gnash::log_error("LoadThread::download: _loadPosition:%ld, _streamSize:%ld", _loadPosition, _streamSize);
 		return;
 	}
 
@@ -386,7 +399,8 @@ void LoadThread::download()
 	}
 
 	_loadPosition = pos;
-	assert(_loadPosition <= _streamSize);
+	// _streamSize can't be relied upon
+	if ( _streamSize < _loadPosition ) _streamSize = _loadPosition;
 	_actualPosition = pos;
 
 }
