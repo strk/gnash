@@ -1,5 +1,7 @@
 2008-02-18 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/video_stream_def.cpp (readDefineVideoStream): fix
+	  ensureBytes call [was 1 byte short].
 	* server/asobj/xml.{cpp,h}: second attempt at XML.sendAndLoad.
 	  This time is a bit more tested.
 
