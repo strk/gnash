@@ -101,7 +101,7 @@ Shm::attach(key_t key, bool nuke)
     // that compatibility will be broken, and then just pick our own key so things still work
     // finer when using just Gnash.
     if (_shmkey == 0) {
-	log_error("No Shared Memory key specified in ~/.gnashrc! Please run \"dumpshm -i\" to find your key if you want to be conpatible with the other swf player.");
+	log_error("No Shared Memory key specified in ~/.gnashrc! Please run \"dumpshm -i\" to find your key if you want to be compatible with the other swf player.");
 	_shmkey = 0xdd3adabd;
     }
     
@@ -190,7 +190,7 @@ Shm::attach(char const *filespec, bool nuke)
     // that compatibility will be broken, and then just pick our own key so things still work
     // finer when using just Gnash.
     if (_shmkey == 0) {
-	log_error("No Shared Memory key specified in ~/.gnashrc! Please run \"dumpshm -i\" to find your key if you want to be conpatible with the other swf player.");
+	log_error("No Shared Memory key specified in ~/.gnashrc! Please run \"dumpshm -i\" to find your key if you want to be compatible with the other swf player.");
 	_shmkey = 0xdd3adabd;
     }
     
