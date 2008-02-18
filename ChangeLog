@@ -1,5 +1,6 @@
 2008-02-18 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/gnashrc.in: disable writing to the logfile..
 	* server/asobj/xml.{cpp,h}: better compatibility:
 	  return undefined from XML.getBytesTotal() when not
 	  loading, return last-load info when load ends.
