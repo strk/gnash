@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.72 2008/02/18 18:13:14 strk Exp $ */
+/* $Id: xml.cpp,v 1.73 2008/02/18 23:13:52 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -90,7 +90,9 @@ XML::XML()
     _loaded(-1), 
     _status(sOK),
     _loadThreads(),
-    _loadCheckerTimer(0)
+    _loadCheckerTimer(0),
+    _bytesTotal(0),
+    _bytesLoaded(0)
 {
     //GNASH_REPORT_FUNCTION;
 #ifdef DEBUG_MEMORY_ALLOCATION
@@ -110,7 +112,9 @@ XML::XML(const std::string& xml_in)
     _loaded(-1), 
     _status(sOK),
     _loadThreads(),
-    _loadCheckerTimer(0)
+    _loadCheckerTimer(0),
+    _bytesTotal(0),
+    _bytesLoaded(0)
 {
     //GNASH_REPORT_FUNCTION;
 #ifdef DEBUG_MEMORY_ALLOCATION
@@ -425,12 +429,18 @@ XML::queueLoad(std::auto_ptr<tu_file> str)
 #endif
     }
 
+    _bytesLoaded = _bytesTotal = 0;
+
 }
 
 size_t
 XML::getBytesLoaded() const
 {
-    if ( _loadThreads.empty() ) return 0;
+    if ( _loadThreads.empty() )
+    {
+        return _bytesLoaded;
+        return 0;
+    }
     LoadThread* lt = _loadThreads.front();
     return lt->getBytesLoaded();
 }
@@ -438,7 +448,10 @@ XML::getBytesLoaded() const
 size_t
 XML::getBytesTotal() const
 {
-    if ( _loadThreads.empty() ) return 0;
+    if ( _loadThreads.empty() ) 
+    {
+        return _bytesTotal;
+    }
     LoadThread* lt = _loadThreads.front();
     return lt->getBytesTotal();
 }
@@ -468,7 +481,7 @@ XML::checkLoads()
 #endif
         if ( lt->completed() )
         {
-            size_t xmlsize = lt->getBytesTotal();
+            size_t xmlsize = lt->getBytesLoaded();
             boost::scoped_array<char> buf(new char[xmlsize+1]);
             size_t actuallyRead = lt->read(buf.get(), xmlsize);
             if ( actuallyRead != xmlsize )
@@ -477,13 +490,15 @@ XML::checkLoads()
 				// possibility which lacks documentation (thus a bug in documentation)
 				//
 #ifdef DEBUG_XML_LOADS
-				log_debug("LoadThread::getBytesTotal() returned %d but ::read(%d) returned %d",
+				log_debug("LoadThread::getBytesLoaded() returned %d but ::read(%d) returned %d",
 					xmlsize, xmlsize, actuallyRead);
 #endif
 			}
             buf[actuallyRead] = '\0';
             as_value dataVal(buf.get()); // memory copy here (optimize?)
 
+            _bytesTotal = lt->getBytesTotal();
+            _bytesLoaded = lt->getBytesLoaded();
             it = _loadThreads.erase(it);
             delete lt; // supposedly joins the thread...
 
@@ -826,7 +841,7 @@ as_value xml_getbytesloaded(const fn_call& fn)
     }
 	else
 	{
-		return as_value();
+		return as_value(0);
     }
 }
 

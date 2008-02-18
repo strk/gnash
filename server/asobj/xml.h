@@ -231,6 +231,9 @@ private:
     /// Scan the LoadThread queue (_loadThreads) to see if any of
     /// them completed. If any did, invoke the onData event
     void checkLoads();
+
+    size_t _bytesTotal;
+    size_t _bytesLoaded;
 };
 
 
