@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.37 2008/02/18 19:52:37 strk Exp $
+// $Id: video_stream_def.cpp,v 1.38 2008/02/18 22:25:19 strk Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -63,7 +63,7 @@ video_stream_definition::readDefineVideoStream(stream* in, SWF::tag_type tag, mo
 	m_start_frame = m->get_loading_frame();
 
 	// numFrames:2 width:2 height:2 flags:1 codec:1
-	in->ensureBytes(9);
+	in->ensureBytes(8);
 
 	m_num_frames = in->read_u16();
 
