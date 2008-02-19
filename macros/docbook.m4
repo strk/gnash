@@ -92,13 +92,28 @@ dnl    	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
     	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
 
     AC_PATH_PROG(DB2X_XSLTPROC, db2x_xsltproc, [],
-    	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+     [$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+
+    if test x$DB2X_XSLTPROC = x; then
+      AC_PATH_PROG(DB2X_XSLTPROC, db2x_xsltproc.pl, [],
+    	  [$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+    fi
 
     AC_PATH_PROG(DB2X_TEXIXML, db2x_texixml, [],
     	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
 
+    if test x$$DB2X_TEXIXML = x; then
+      AC_PATH_PROG(DB2X_TEXIXML, db2x_texixml.pl, [],
+    	  [$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+    fi
+
     AC_PATH_PROG(DB2X_MANXML, db2x_manxml, [],
     	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+
+    if test x$$DB2X_MANXML = x; then
+      AC_PATH_PROG(DB2X_MANXML, db2x_manxml.pl, [],
+    	  [$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+    fi
 
     AC_PATH_PROG(MAKEINFO, makeinfo, [],
     	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
