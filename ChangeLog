@@ -1,5 +1,15 @@
 2008-02-19 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/gen_run_swfdec_testsuite.sh: fix sending of
+	  custom flags to swfdec_gnash_tester.
+	* testsuite/swfdec/swfdec_gnash_tester: print actual command
+	  invocation to stderr.
+	* testsuite/simple.exp: reset the timeout on parsing NOTE or
+	  swfdec testsuite will run longer then 600 seconds..
+	* testsuite/swfdec/REALTIME: add netstream-onmetadata.swf
+
+2008-02-19 Sandro Santilli <strk@keybit.net>
+
 	* server/as_value.{cpp,h}: add optional second argument
 	  to doubleToString static method, to specify a base
 	  (defaults to 10).

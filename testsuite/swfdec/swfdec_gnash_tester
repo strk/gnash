@@ -28,7 +28,7 @@ if [ -e "${in}.trace.org" ]; then
 	use_orig=1
 fi
 
-echo "Running ${GPROCESSOR} ${FLAGS} ${in}"
+echo "Running ${GPROCESSOR} ${FLAGS} ${in}" >&2
 ${GPROCESSOR} ${FLAGS} "$in"  | grep TRACE | sed 's/.*TRACE: //' | fromdos > $out
 if test "$?" != 0; then
 	echo "gprocessor returned an error"

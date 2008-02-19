@@ -70,7 +70,7 @@ for test in \`ls ${SWFDECTRACEDIR}/[$STARTPATTERN]*.swf\`; do
 	else
 		echo "NOTE: running \${testname} (expect pass: \${expectpass})"
 	fi
-	if ${SWFDEC_GNASH_TESTER} \${test} ${flags} > \${testname}.log; then
+	if ${SWFDEC_GNASH_TESTER} \${test} \${flags} > \${testname}.log; then
 		if [ "\${expectpass}" = "yes" ]; then
 			echo "PASSED: \${testid}"
 		else
