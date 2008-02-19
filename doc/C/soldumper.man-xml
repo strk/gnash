@@ -20,7 +20,7 @@
 <!-- the refname becomes the output name of the man page -->
 <refnamediv>
 <refname>soldumper</refname>
-<refpurpose>Gnash Local Shared Object file Dumper</refpurpose>
+<refpurpose>Gnash Local Shared Object (LSO) File Dumper</refpurpose>
 </refnamediv>
 
 

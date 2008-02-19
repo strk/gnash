@@ -20,7 +20,7 @@
 <!-- the refname becomes the output name of the man page -->
 <refnamediv>
 <refname>dumpshm</refname>
-<refpurpose>Gnash LocalConnection memory Dumper</refpurpose>
+<refpurpose>Gnash LocalConnection Memory Dumper</refpurpose>
 </refnamediv>
 
 
