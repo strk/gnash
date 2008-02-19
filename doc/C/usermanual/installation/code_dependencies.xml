@@ -9,10 +9,14 @@
 </para>
 
 <note>
-<title>Note</title>
-<para>
-If you want to install the &app; plugin for one of the browsers listed in the <xref linkend="intro" />, be sure to install the development package for that browser before configuring.  The &app; <command>configure</command> script searches for the devel packages before building the plugin.
-</para>
+  <title>Note</title>
+  <para>
+    If you want to install the &app; plugin for one of the browsers
+    listed in the <xref linkend="intro" />, be sure to install the
+    development package for that browser before configuring.  The
+    &app; <command>configure</command> script searches for the devel
+    packages before building the plugin. 
+  </para>
 </note>
 
 <table frame='all'>
@@ -25,16 +29,16 @@ If you want to install the &app; plugin for one of the browsers listed in the <x
     <colspec colname='explanation'/>
     <colspec colname='apt'/>
     <colspec colname='rpm'/>
-
+    
     <thead>
       <row>
         <entry>Name</entry>
-        <entry>Level</entry>
-        <entry>Version</entry>
+	<entry>Level</entry>
+	<entry>Version</entry>
         <entry>Description</entry>
-        <entry>Explanation</entry>
-        <entry>apt-get package</entry>
-        <entry>RPM/Yum package</entry>
+	<entry>Explanation</entry>
+	<entry>apt-get package</entry>
+	<entry>RPM/Yum package</entry>
       </row>
     </thead>
 
@@ -48,10 +52,17 @@ If you want to install the &app; plugin for one of the browsers listed in the <x
           templates.
         </entry>
         <entry>
-          In &app;, Boost libraries are used extensively.
+          In &app;, Boost libraries are used extensively, primarily
+	  boost-gthread and boost-date-time.
         </entry>
-        <entry><filename>libboost-thread-dev</filename></entry>
-        <entry><filename>liboost-thread-dev</filename></entry>
+        <entry>
+	  <filename>libboost-thread-dev, libboost-date-time-dev
+	</filename>
+	</entry>
+	<entry>
+	<filename>
+	  liboost-thread-dev, libboost-date-time
+	</filename></entry>
       </row>
 
       <row>
@@ -117,11 +128,11 @@ If you want to install the &app; plugin for one of the browsers listed in the <x
           Cairo is a 2D graphics library with support for
           multiple output devices.  It will automatically use
           graphic card acceleration when available, and has
-          an experimental OpenGL backend.  
-        </entry>
-        <entry>
-          &app; requires the installation of at least one
-          renderer.  Cairo is considered
+	  an experimental OpenGL backend.  
+	</entry>
+	<entry>
+	  &app; requires the installation of at least one
+	  renderer.  Cairo is considered
           the <emphasis>least supported</emphasis> renderer
           for &app;.
         </entry>
@@ -220,21 +231,6 @@ If you want to install the &app; plugin for one of the browsers listed in the <x
         </entry>
         <entry><filename>kdelibs4-dev</filename></entry>
         <entry><filename>kdelibs-devel</filename></entry>
-      </row>
-
-      <row>
-        <entry>libMAD</entry>
-        <entry>Optional</entry>
-        <entry></entry>
-        <entry>
-          libMAD is MPEG audio decoder.
-        </entry>
-        <entry>
-          libMAD is one of the available options for sound
-          handling.
-        </entry>
-        <entry><filename>libmad0-dev</filename></entry>
-        <entry><filename>libmad-devel</filename></entry>
       </row>
 
       <row>
