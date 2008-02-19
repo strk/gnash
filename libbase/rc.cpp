@@ -168,11 +168,12 @@ RcInitFile::extractSetting(bool *var, const char *pattern,
             //cout <<  variable << ": disabled" << endl;
             *var = false;
         }
+	return true;
     }
-    return *var;
+    else return false;
 }
 
-boost::uint32_t
+bool
 RcInitFile::extractNumber(boost::uint32_t *num, const char *pattern, std::string &variable,
                            std::string &value)
 {      
@@ -188,8 +189,9 @@ RcInitFile::extractNumber(boost::uint32_t *num, const char *pattern, std::string
             cerr << "RcInitFile::extractNumber: conversion overflow!: " << foo << endl;
             
         }
+	return true;
     }
-    return *num;
+    else return false;
 }
 
 /// Takes references to action ('set' or 'append'), items
@@ -249,7 +251,7 @@ RcInitFile::parseList(PathList &list, std::string &action,
 
 }
 
-void
+bool
 RcInitFile::extractDouble(double& out, const char *pattern, std::string &variable,
                            std::string &value)
 {
@@ -261,8 +263,10 @@ RcInitFile::extractDouble(double& out, const char *pattern, std::string &variabl
 
     if ( noCaseCompare(variable, pattern) ) {
         out = strtod(value.c_str(), 0);
+	return true;
 	//printf("strtod returned %g\n", out);
     }
+    else return false;
 }
 
 void
@@ -457,41 +461,59 @@ RcInitFile::parseFile(const std::string& filespec)
 
 		if (noCaseCompare(action , "set") ) {
                      extractSetting(&_splashScreen, "splashScreen", variable,
-                               value);
+                               value)
+				|| 
                      extractSetting(&_localhostOnly, "localhost", variable,
-                               value);
+                               value)
+				|| 
                      extractSetting(&_localdomainOnly, "localdomain", variable,
-                               value);
+                               value)
+				||
                      extractSetting(&_insecureSSL, "InsecureSSL", variable,
-                               value);
-                     extractSetting(&_debugger, "debugger", variable, value);
-                     extractSetting(&_actionDump, "actionDump", variable, value);
-                     extractSetting(&_parserDump, "parserDump", variable, value);
-                     extractSetting(&_writeLog, "writelog", variable, value);
-                     extractSetting(&_sound, "sound", variable, value);
-                     extractSetting(&_pluginSound, "pluginsound", variable, value);
+                               value)
+				||
+                     extractSetting(&_debugger, "debugger", variable, value)
+				||
+                     extractSetting(&_actionDump, "actionDump", variable, value)
+				||
+                     extractSetting(&_parserDump, "parserDump", variable, value)
+				||
+                     extractSetting(&_writeLog, "writelog", variable, value)
+				||
+                     extractSetting(&_sound, "sound", variable, value)
+				||
+                     extractSetting(&_pluginSound, "pluginsound", variable, value)
+				||
                      extractSetting(&_verboseASCodingErrors,
-                               "ASCodingErrorsVerbosity", variable, value);
+                               "ASCodingErrorsVerbosity", variable, value)
+				||
                      extractSetting(&_verboseMalformedSWF, "MalformedSWFVerbosity",
-                               variable, value);
+                               variable, value)
+				||
                      extractSetting(&_extensionsEnabled, "EnableExtensions",
-                               variable, value);
-                     extractSetting(&_startStopped, "StartStopped", variable, value);
-
+                               variable, value)
+				||
+                     extractSetting(&_startStopped, "StartStopped", variable, value)
+				||
+                     extractSetting(&_solreadonly, "SOLReadOnly", variable,
+                               value)
+				||
+                     extractSetting(&_lcdisabled, "LocalConnection", variable,
+                               value)
+				||
+                     extractSetting(&_lctrace, "LCTrace", variable,
+                               value)
+				||
+                     extractNumber(&_movieLibraryLimit, "movieLibraryLimit", variable, value)
+				||
+                     extractNumber(&_delay, "delay", variable, value)
+				||
+                     extractNumber(&_verbosity, "verbosity", variable, value)
+				||
+                     extractNumber(&_lcshmkey, "LCShmkey", variable, value)
+				||
                      extractDouble(_streamsTimeout, "StreamsTimeout", variable, value);
 
-                     extractNumber(&_movieLibraryLimit, "movieLibraryLimit", variable, value);                
-                     extractNumber(&_delay, "delay", variable, value);
-                     extractNumber(&_verbosity, "verbosity", variable, value);
-
-
-                     extractSetting(&_solreadonly, "SOLReadOnly", variable,
-                               value);
-                     extractSetting(&_lcdisabled, "LocalConnection", variable,
-                               value);
-                     extractSetting(&_lctrace, "LCTrace", variable,
-                               value);
-                     extractNumber(&_lcshmkey, "LCShmkey", variable, value);
 		}
             }
         }

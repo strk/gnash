@@ -345,13 +345,31 @@ protected:
     /// Performs substitution on a path string (~) 
     void expandPath(std::string& path);
 
+    /// \brief
+    /// If variable matches pattern (case-insensitive)
+    /// set *var according to value
+    //
+    /// @return true if variable matches patter, false otherwise
+    ///
     static bool extractSetting(bool *var, const char *pattern,
                         std::string &variable, std::string &value);
-    
-    static boost::uint32_t extractNumber(boost::uint32_t *num, const char *pattern,
+
+    /// \brief
+    /// If variable matches pattern (case-insensitive)
+    /// set *num according to value
+    //
+    /// @return true if variable matches patter, false otherwise
+    ///
+    static bool extractNumber(boost::uint32_t *num, const char *pattern,
                         std::string &variable, std::string &value);
 
-    static void extractDouble(double& out, const char *pattern,
+    /// \brief
+    /// If variable matches pattern (case-insensitive)
+    /// set out according to value
+    //
+    /// @return true if variable matches patter, false otherwise
+    ///
+    static bool extractDouble(double& out, const char *pattern,
                         std::string &variable, std::string &value);
 
     void parseList(std::vector<std::string>& list, std::string &action,
