@@ -1,5 +1,8 @@
 2008-02-19 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xml.{cpp,h}: fix getBytesLoaded/Total to return
+	  undefined when nothing was loaded (reguardless of the .loaded
+	  property setting).
 	* libbase/rc.{cpp,h}: return as soon as directive matches
 	  pattern while parsing 'set' lines.
 	* testsuite/libamf.all/Makefile.am: set GNASHRC to use

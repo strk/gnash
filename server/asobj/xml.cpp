@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.73 2008/02/18 23:13:52 strk Exp $ */
+/* $Id: xml.cpp,v 1.74 2008/02/19 08:51:02 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -91,8 +91,8 @@ XML::XML()
     _status(sOK),
     _loadThreads(),
     _loadCheckerTimer(0),
-    _bytesTotal(0),
-    _bytesLoaded(0)
+    _bytesTotal(-1),
+    _bytesLoaded(-1)
 {
     //GNASH_REPORT_FUNCTION;
 #ifdef DEBUG_MEMORY_ALLOCATION
@@ -113,8 +113,8 @@ XML::XML(const std::string& xml_in)
     _status(sOK),
     _loadThreads(),
     _loadCheckerTimer(0),
-    _bytesTotal(0),
-    _bytesLoaded(0)
+    _bytesTotal(-1),
+    _bytesLoaded(-1)
 {
     //GNASH_REPORT_FUNCTION;
 #ifdef DEBUG_MEMORY_ALLOCATION
@@ -429,31 +429,21 @@ XML::queueLoad(std::auto_ptr<tu_file> str)
 #endif
     }
 
-    _bytesLoaded = _bytesTotal = 0;
+    _bytesLoaded = 0;
+    _bytesTotal = -1;
 
 }
 
-size_t
+long int
 XML::getBytesLoaded() const
 {
-    if ( _loadThreads.empty() )
-    {
-        return _bytesLoaded;
-        return 0;
-    }
-    LoadThread* lt = _loadThreads.front();
-    return lt->getBytesLoaded();
+    return _bytesLoaded;
 }
 
-size_t
+long int
 XML::getBytesTotal() const
 {
-    if ( _loadThreads.empty() ) 
-    {
-        return _bytesTotal;
-    }
-    LoadThread* lt = _loadThreads.front();
-    return lt->getBytesTotal();
+    return _bytesTotal;
 }
 
 /* private */
@@ -476,6 +466,9 @@ XML::checkLoads()
 
         // TODO: notify progress 
 
+	_bytesLoaded = lt->getBytesLoaded();
+        _bytesTotal = lt->getBytesTotal();
+
 #ifdef DEBUG_XML_LOADS
         log_debug("XML loads thread %p got %ld/%ld bytes", (void*)lt, lt->getBytesLoaded(), lt->getBytesTotal() );
 #endif
@@ -497,8 +490,6 @@ XML::checkLoads()
             buf[actuallyRead] = '\0';
             as_value dataVal(buf.get()); // memory copy here (optimize?)
 
-            _bytesTotal = lt->getBytesTotal();
-            _bytesLoaded = lt->getBytesLoaded();
             it = _loadThreads.erase(it);
             delete lt; // supposedly joins the thread...
 
@@ -834,28 +825,18 @@ xml_createtextnode(const fn_call& fn)
 
 as_value xml_getbytesloaded(const fn_call& fn)
 {
-    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
-    if ( ptr->loaded() )
-	{
-		return as_value(ptr->getBytesLoaded());
-    }
-	else
-	{
-		return as_value(0);
-    }
+	boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
+	long int ret = ptr->getBytesLoaded();
+	if ( ret < 0 ) return as_value();
+	else return as_value(ret);
 }
 
 as_value xml_getbytestotal(const fn_call& fn)
 {
-    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
-    if ( ptr->loaded() )
-	{
-		return as_value(ptr->getBytesTotal());
-	}
-	else
-	{
-		return as_value();
-	}
+	boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
+	long int ret = ptr->getBytesTotal();
+	if ( ret < 0 ) return as_value();
+	else return as_value(ret);
 }
 
 as_value xml_parsexml(const fn_call& fn)

@@ -152,8 +152,11 @@ public:
 
     bool sendAndLoad(const URL& url, XML& target);
 
-    size_t getBytesLoaded() const;
-    size_t getBytesTotal() const;
+    /// @return -1 if no loaded was started yet
+    long int getBytesLoaded() const;
+
+    /// @return -1 if no loaded was started yet
+    long int getBytesTotal() const;
 
 private:
 
@@ -232,8 +235,8 @@ private:
     /// them completed. If any did, invoke the onData event
     void checkLoads();
 
-    size_t _bytesTotal;
-    size_t _bytesLoaded;
+    long int _bytesTotal;
+    long int _bytesLoaded;
 };
 
 
