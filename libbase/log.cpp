@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: log.cpp,v 1.60 2008/01/23 16:33:45 strk Exp $ */
+/* $Id: log.cpp,v 1.61 2008/02/19 00:47:17 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -387,6 +387,8 @@ LogFile::LogFile (void)
 
 
     RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+    //rcfile.dump();
+    _write = rcfile.useWriteLog();
     loadfile = rcfile.getDebugLog();
     if ( loadfile.empty() ) loadfile = DEFAULT_LOGFILE;
 

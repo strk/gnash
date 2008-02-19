@@ -248,7 +248,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
               build_options();
 	      exit(EXIT_SUCCESS);	      
 	  case 'w':
-              dbglogfile.setWriteDisk(true);
+              rcfile.useWriteLog(true); // dbglogfile.setWriteDisk(true);
 	      log_msg (_("Logging to disk enabled"));
 	      break;
 	  case 'a':
@@ -428,7 +428,7 @@ gnash_main(int argc, char *argv[])
 	bindtextdomain (PACKAGE, LOCALEDIR);
 	textdomain (PACKAGE);
 #endif
-	rcfile.loadFiles();
+	//rcfile.loadFiles();
 
 	try { parseCommandLine(argc, argv, player); }
 	catch (const std::exception& ex)

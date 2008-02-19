@@ -1,3 +1,15 @@
+2008-02-19 Sandro Santilli <strk@keybit.net>
+
+	* gui/Player.cpp: don't remove the logfile if not enabled.
+	* gui/gnash.cpp: set write log to rcfile, not directly on the
+	  LogFile (handling of -w). This is to cope with Player class
+	  way of initializing log file.
+	* libbase/rc.cpp: don't use log_XXX during construction, as
+	  those will need a constructed RcInitFile to work properly.
+	* libbase/log.cpp: get "write log" option from RcFile.
+	  Fixes forced logfile writing from gprocessor, and should
+	  make Player handling of the flag obsoleted.
+
 2008-02-18 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/gnashrc.in: disable writing to the logfile..

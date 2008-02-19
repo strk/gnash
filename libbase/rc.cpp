@@ -49,6 +49,8 @@
 #endif
 
 using std::endl;
+using std::cout;
+using std::cerr;
 
 namespace gnash {
 
@@ -152,18 +154,18 @@ RcInitFile::extractSetting(bool *var, const char *pattern,
                            std::string &variable, std::string &value)
 {
 //    GNASH_REPORT_FUNCTION;
-    //log_msg ("%s: %s", variable, value);
+    //cout <<  variable << ": " << value << endl;
     
 	StringNoCaseEqual noCaseCompare;
     if ( noCaseCompare(variable, pattern) ) {
         if ( noCaseCompare(value, "on") || noCaseCompare(value, "yes") ||
              noCaseCompare(value, "true")) {
-            //log_msg ("%s: Enabled", variable);
+            //cout <<  variable << ": enabled" << endl;
             *var = true;
         }
         if (noCaseCompare(value, "off") || noCaseCompare(value, "no") ||
             noCaseCompare(value, "false")) {
-            //log_msg ("%s: Disabled", variable);
+            //cout <<  variable << ": disabled" << endl;
             *var = false;
         }
     }
@@ -178,12 +180,12 @@ RcInitFile::extractNumber(boost::uint32_t *num, const char *pattern, std::string
 
     StringNoCaseEqual noCaseCompare;
 
-//        log_msg ("%s: %s", variable.c_str(), value.c_str());
+//        cout << variable << ": " << value << endl;
     if ( noCaseCompare(variable, pattern) ) {
         *num = strtoul(value.c_str(), NULL, 0);
         if (*num == LONG_MAX) {
             long long foo = strtoll(value.c_str(), NULL, 0);
-            log_error("Conversion overflow!: %lld", foo);
+            cerr << "RcInitFile::extractNumber: conversion overflow!: " << foo << endl;
             
         }
     }
@@ -350,8 +352,8 @@ RcInitFile::parseFile(const std::string& filespec)
 
     StringNoCaseEqual noCaseCompare;
     
-//  log_msg ("Seeing if %s exists", filespec);
-    if (filespec.size() == 0) {
+    if (filespec.empty()) {
+        cout << "RcInitFile::parseFile: empty filespec" << endl;
         return false;
     }
     
@@ -359,9 +361,11 @@ RcInitFile::parseFile(const std::string& filespec)
         in.open(filespec.c_str());
         
         if (!in) {
-            log_error(_("Couldn't open file: %s"), filespec.c_str());
+            cerr << "Couldn't open file: " << filespec << endl;
             return false;
         }
+
+        cout << "RcInitFile: parsing " << filespec << endl;
         
         // Read in each line and parse it
         while (!in.eof()) {
@@ -493,6 +497,7 @@ RcInitFile::parseFile(const std::string& filespec)
         }
 
     } else {
+        //cout << filespec << ": no such file or directory" << endl;
         if (in) {
             in.close();
         }
@@ -552,7 +557,7 @@ RcInitFile::updateFile(const std::string& filespec)
     out.open(filespec.c_str());
         
     if (!out) {
-        log_error(_("Couldn't open file %s for writing"), filespec.c_str());
+        cerr << "Couldn't open file " << filespec << " for writing" << endl;
         return false;
     }
 

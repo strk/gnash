@@ -116,8 +116,6 @@ void
 Player::init_logfile()
 {
     dbglogfile.setWriteDisk(false);
-//    rcfile.loadFiles();
-//    rcfile.dump();
 
     RcInitFile& rcfile = RcInitFile::getDefaultInstance();
     if (rcfile.useWriteLog()) {
@@ -149,12 +147,6 @@ Player::init_logfile()
         delay = rcfile.getTimerDelay();
         log_msg (_("Timer delay set to %d milliseconds"), delay);
     }    
-
-    // Remove the logfile that's created by default, since leaving a short
-    // file is confusing.
-    if (dbglogfile.getWriteDisk() == false) {
-        dbglogfile.removeLog();
-    }
 
 }
 
