@@ -27,7 +27,7 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.37 2007/12/02 09:15:55 strk Exp $";
+rcsid="$Id: Number.as,v 1.38 2008/02/19 09:55:35 strk Exp $";
 
 #include "check.as"
 
@@ -50,7 +50,10 @@ check ( ! (n1 === Number(268)) );
 check_equals (n1 , 268 );
 check_equals (268 , n1 );
 
+//------------------------------------
 // Test Number.toString 
+//------------------------------------
+
 check_equals(typeof(n1.toString), "function");
 check_equals(typeof(n1.toString()), "string"); 
 check_equals(n1.toString(), "268");
@@ -59,6 +62,25 @@ var backup = Object.prototype.toString;
 Object.prototype.toString = function() { return "fake_string"; };
 check_equals(n1.toString(), "268"); // doesn't inherit from Object
 Object.prototype.toString = backup;
+
+#if OUTPUT_VERSION >= 6
+check(Number.prototype.hasOwnProperty('toString'));
+#endif
+
+tmp = new Number(10);
+xcheck_equals(tmp.toString(2), '1010'); 
+tmp = 6;
+xcheck_equals(tmp.toString(2), '110'); 
+xcheck_equals(tmp.toString(3), '20'); 
+check_equals(tmp.toString(8), '6'); 
+check_equals(tmp.toString(-2), '6'); // invalid, returns 10 ?
+check_equals(tmp.toString(0), '6'); // invalid, returns 10 ?
+xcheck_equals(tmp.toString(5), '11'); 
+tmp = -5;
+xcheck_equals(tmp.toString(2), '-101'); 
+check_equals(tmp.toString(16), '-5'); 
+tmp = -11;
+xcheck_equals(tmp.toString(16), '-b'); 
 
 //------------------------------------
 // Test Number.valueOf 
@@ -454,11 +476,11 @@ check( isNaN(0/0) );
 // END OF TEST
 
 #if OUTPUT_VERSION < 6
- check_totals(147);
+ check_totals(157);
 #else
 #if OUTPUT_VERSION < 7
- check_totals(159);
+ check_totals(170);
 #else
- check_totals(157);
+ check_totals(168);
 #endif
 #endif

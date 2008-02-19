@@ -1,5 +1,9 @@
 2008-02-19 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Number.as: add test for toString(<radix>)
+
+2008-02-19 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/Number.cpp: log UNIMPLEMENTED for
 	  Number.toString(<radix>)
 	* server/asobj/xml.{cpp,h}: fix getBytesLoaded/Total to return
