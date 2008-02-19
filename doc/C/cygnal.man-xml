@@ -1,0 +1,85 @@
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+                   "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd"
+[
+  <!ENTITY legal SYSTEM "legal.xml">
+  <!ENTITY appversion "0.8">
+  <!ENTITY manrevision "0.1">
+  <!ENTITY date "Feb 2008">
+  <!ENTITY app "<application>Cygnal</application>">
+  <!ENTITY appname "Cygnal">
+  <!ENTITY version "0.8">
+]
+>
+
+<refentry id="cygnal">
+<refmeta>
+<refentrytitle>cygnal</refentrytitle>
+<manvolnum>1</manvolnum>
+</refmeta>
+
+<!-- the refname becomes the output name of the man page -->
+<refnamediv>
+<refname>cygnal</refname>
+<refpurpose>Cygnal</refpurpose>
+</refnamediv>
+
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+cygnal (options)...
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+<para>
+  Cygnal is a multimedia media server for streaming audio, video, and
+  video conferencing. Cygnal supports several protocols used by SWF
+  file players, including RTMP, RTMPTS, and RTMPT, while encouring the
+  use of patent free codecs.
+</para>
+
+<variablelist>
+  <varlistentry>
+    <term>(-h) --help</term>
+    <listitem>
+      <para>
+	Print usage info.
+      </para>
+    </listitem>
+  </varlistentry>
+  
+  <varlistentry>
+    <term>--version</term>
+    <listitem>
+      <para>
+	Print version information.
+      </para>
+    </listitem>
+  </varlistentry>
+  
+  <varlistentry>
+    <term>(-v) --verbose</term>
+    <listitem>
+      <para>
+	Verbose output.
+      </para>
+    </listitem>
+  </varlistentry>
+  
+  <varlistentry>
+    <term>(-p) --port-offset</term>
+    <listitem>
+      <para>
+	Port offset. This number gets added to the default
+	ports for RTMPS and RTMPS. This is only used by
+	developers. 
+      </para>
+    </listitem>
+  </varlistentry>
+  
+
+</variablelist>
+
+</refsect1>
+</refentry>
+

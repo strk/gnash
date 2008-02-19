@@ -39,6 +39,11 @@ entities = \
 	opcodes.xml \
 	plugin.xml \
 	rtmp.xml \
+	app_authors.xml	\
+	conformance.xml	\
+	gpl-appendix.xml \
+	legal.xml \
+	logging.xml \
 	actionscript/main.xml \
 	actionscript/as_value.xml \
 	actionscript/new_as_class.xml \
@@ -80,7 +85,6 @@ entities = \
 	asspec/xml.xml \
 	asspec/xmlnode.xml \
 	asspec/xmlsocket.xml	\
-	conformance.xml	\
 	usermanual/installation/code_dependencies.xml \
 	usermanual/installation/configuration.xml \
 	usermanual/installation/custompath_configuration.xml \
@@ -100,16 +104,12 @@ entities = \
 	usermanual/usage/gnashrc.xml \
 	usermanual/bugreport.xml \
 	usermanual/glossary.xml	\
-	app_authors.xml	\
-	gpl-appendix.xml \
-	legal.xml \
-	logging.xml \
 	$(NULL)
 
 xml_files = $(docname).xml actionscript.xml
 
 #noinst_SCRIPT = gen-doc.sh
-dist_man_MANS = gnash.1 gprocessor.1 dumpshm.1 soldumper.1
+dist_man_MANS = gnash.1 gprocessor.1 dumpshm.1 soldumper.1 cygnal.1
 MANSRC = $(dist_man_MANS:.1=.man-xml)
 
 # dist_html_DATA = gnash.html actionscript.html

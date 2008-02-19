@@ -1,3 +1,8 @@
+2008-02-18  Rob Savoye  <rob@ute.welcomehome.org>
+
+	* doc/C/cygnal-man.xml: New manpage for Cygnal.
+	* doc/C/Makefile.am: Build Cygnal manpage too.
+
 2008-02-19 Sandro Santilli <strk@keybit.net>
 
 	* gui/Player.cpp: don't remove the logfile if not enabled.
@@ -324,6 +329,16 @@
 
 2008-02-12  Rob Savoye  <rob@ute.welcomehome.org>
 
+	* plugin/klash/Makefile.am: Test permissions before trying to
+	install. Install services from srcdir.
+
+	*  packaging/debian/gnash-dev.dirs, gnash-dev.install: Don't build
+	dev packages, Gnash's internal APIs change to fast.
+	* packaging/debian/gnash-klash.install: Install kde-gnash, not
+	klash.
+	* packaging/debian/changelog: Update.
+	* packaging/debian/control: Drop gnash-dev. 
+	
 	* utilities/Makefile.am: Add INTLLIB, and actually use
 	AM_LDFLAGS.
 	* utilities/dumpshm.cpp: Drop unused support for accessing POSIX
