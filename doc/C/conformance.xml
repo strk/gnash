@@ -2,16 +2,53 @@
       <title>Level of Conformance</title>
 
       <para>
-	Gnash is a capable of reading SWF v7 files and opcodes. Not
-	all ActionScript classes are implemented yet, but all of the
-	most heavily used ones are. Many ActionScript classes are
+	Gnash is a capable of reading up to SWF v9 files and opcodes,
+	but primarily supports SWF v7, with better SWF v8 and v9
+	support under heavy developement. With the 0.8.2 release,
+	Gnash includes initial parser support for SWF v8 and v9.
+	Not all ActionScript 2 classes are implemented yet, but all of the
+	most heavily used ones are. Many ActionScript 2 classes are
 	partially implemented; there is support for all of the
 	commonly used methods of each class.
       </para>
 
       <para>
+	As ActionsScript 3 is a more developed version of
+	ActionScript 2, many of the same classes work for
+	both. Support has been added to Gnash's ActionScript library
+	to support the new ActionScript 3 filters, which get applied
+	to every class. Implementing ActionScript clases is often the
+	easiest way for new Gnash developers to make a contribution
+	without a deep internal knpowledge of Gnash.
+      </para>
+
+      <para>
+	Gnash has included video support since early 2007, but this is
+	an every changing field of reverse engineering. Many of the
+	popular video sharing sites use SWF v8 or v9, which Gnash
+	still has imperfect support for. This is improving all the
+	time, so often builds from a development snapshot will work
+	when using the older release packaged in your distribution
+	doesn't. You can find daily snapshots of the latest CVS tree
+	at: <ulink type="http" url="http://www.gnashdev.org/dev_snapshots/">
+	http://www.gnashdev.org/dev_snapshots</ulink>.
+      </para>
+
+      <para>
+	Gnash uses ffmpeg for codecs, so any file suppored by Mplayer
+	should work with Gnash. Gnash supports the loading of patent
+	free codecs like Ogg Vorbis or Theora from disk based files,
+	while work is being done to support these codecs when embedded
+	in a SWF file. Ffmpeg contains the codecs used by the current
+	SWF defintion, FLV, VP6 (ON2), H.263, H.264, and MP3.
+      </para>
+
+      <para>
+      </para>
+
+      <para>
 	This is a quick list of what is currently implemented in Gnash
-	as of January, 2006.
+	as of February, 2008.
 
 	<informaltable frame="all">
 	  <?dbhtml table-width="75%" ?>
@@ -73,7 +110,7 @@
 		</entry>
 		<entry valign="top" align="center">
 		  <para>
-		    Partially Implemented.
+		    Fully Implemented.
 		  </para>
 		</entry>
 	      </row>
@@ -136,7 +173,7 @@
 		</entry>
 		<entry valign="top"  align="center">
 		  <para>
-		    Unknown status.
+		    Partially Implemented.
 		  </para>
 		</entry>
 	      </row>
@@ -183,7 +220,7 @@
 		</entry>
 		<entry valign="top"  align="center">
 		  <para>
-		    Partially implemented.
+		    Fully implemented.
 		  </para>
 		</entry>
 	      </row>
@@ -215,7 +252,7 @@
 		</entry>
 		<entry valign="top"  align="center">
 		  <para>
-		    Unimplemented.
+		    Fully implemented..
 		  </para>
 		</entry>
 	      </row>
@@ -247,7 +284,7 @@
 		</entry>
 		<entry valign="top"  align="center">
 		  <para>
-		    Unimplemented.
+		    Fully implemented.
 		  </para>
 		</entry>
 	      </row>
@@ -359,7 +396,7 @@
 		</entry>
 		<entry valign="top"  align="center">
 		  <para>
-		    Partially implemented.
+		    Fully implemented.
 		  </para>
 		</entry>
 	      </row>
@@ -375,7 +412,7 @@
 		</entry>
 		<entry valign="top"  align="center">
 		  <para>
-		    Unimplemented.
+		    Partially implemented.
 		  </para>
 		</entry>
 	      </row>
@@ -391,7 +428,7 @@
 		</entry>
 		<entry valign="top"  align="center">
 		  <para>
-		    Partially implemented.
+		    Fully implemented.
 		  </para>
 		</entry>
 	      </row>
@@ -407,7 +444,7 @@
 		</entry>
 		<entry valign="top"  align="center">
 		  <para>
-		    Partially implemented.
+		    Fully implemented.
 		  </para>
 		</entry>
 	      </row>
@@ -439,7 +476,7 @@
 		</entry>
 		<entry valign="top"  align="center">
 		  <para>
-		    Unimplemented.
+		    Fully implemented.
 		  </para>
 		</entry>
 	      </row>
@@ -471,7 +508,7 @@
 		</entry>
 		<entry valign="top"  align="center">
 		  <para>
-		    Unimplemented.
+		    Partially implemented.
 		  </para>
 		</entry>
 	      </row>
@@ -503,7 +540,7 @@
 		</entry>
 		<entry valign="top"  align="center">
 		  <para>
-		    Unimplemented.
+		    Partially implemented.
 		  </para>
 		</entry>
 	      </row>
@@ -551,7 +588,7 @@
 		</entry>
 		<entry valign="top"  align="center">
 		  <para>
-		    Unimplemented.
+		    Partially implemented.
 		  </para>
 		</entry>
 	      </row>
@@ -567,7 +604,7 @@
 		</entry>
 		<entry valign="top"  align="center">
 		  <para>
-		    Almost fully implemented.
+		    Fully implemented.
 		  </para>
 		</entry>
 	      </row>
@@ -583,7 +620,7 @@
 		</entry>
 		<entry valign="top"  align="center">
 		  <para>
-		    Almost fully implemented.
+		    Fully implemented.
 		  </para>
 		</entry>
 	      </row>
@@ -599,7 +636,7 @@
 		</entry>
 		<entry valign="top"  align="center">
 		  <para>
-		    Almost fully implemented.
+		    Fully implemented.
 		  </para>
 		</entry>
 	      </row>

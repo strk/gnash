@@ -5,23 +5,26 @@
     
     <!ENTITY appversion "0.8.2">
     <!ENTITY manrevision "0.4.3">
-    <!ENTITY date "feb 2008">
+    <!ENTITY date "Feb 2008">
     <!ENTITY app "<application>Gnash</application>">
     <!ENTITY appname "Gnash">
     <!ENTITY AS "ActionScript">
 
-    <!ENTITY legal           SYSTEM "legal.xml">
-    <!ENTITY fdl-app         SYSTEM "fdl-appendix.xml"> 
+    <!ENTITY legal            SYSTEM "legal.xml">
+    <!ENTITY fdl-app          SYSTEM "fdl-appendix.xml"> 
+    <!ENTITY amf              SYSTEM "amf.xml">
+    <!ENTITY rtmp             SYSTEM "rtmp.xml">
+    <!ENTITY programmers      SYSTEM "app_authors.xml">
 
-    <!ENTITY programmers     SYSTEM "app_authors.xml">
-    <!ENTITY writers         SYSTEM "usermanual/doc_authors.xml">
-    <!ENTITY revisionhistory SYSTEM "usermanual/revisions.xml">
-    <!ENTITY introduction    SYSTEM "usermanual/introduction.xml">
-    <!ENTITY specification   SYSTEM "usermanual/specification.xml">
-    <!ENTITY installation    SYSTEM "usermanual/installation.xml">
-    <!ENTITY usage           SYSTEM "usermanual/usage.xml">
-    <!ENTITY glossary        SYSTEM "usermanual/glossary.xml">
-    <!ENTITY bugreport       SYSTEM "usermanual/bugreport.xml">
+    <!ENTITY writers          SYSTEM "usermanual/doc_authors.xml">
+    <!ENTITY revisionhistory  SYSTEM "usermanual/revisions.xml">
+    <!ENTITY introduction     SYSTEM "usermanual/introduction.xml">
+    <!ENTITY specification    SYSTEM "usermanual/specification.xml">
+    <!ENTITY installation     SYSTEM "usermanual/installation.xml">
+    <!ENTITY usage            SYSTEM "usermanual/usage.xml">
+    <!ENTITY gnashrc          SYSTEM "usermanual/usage/gnashrc.xml">
+    <!ENTITY glossary         SYSTEM "usermanual/glossary.xml">
+    <!ENTITY bugreport        SYSTEM "usermanual/bugreport.xml">
 
     <!ENTITY custompath       SYSTEM "usermanual/installation/custompath_configuration.xml">
     <!ENTITY featureoptions   SYSTEM "usermanual/installation/feature_configuration.xml">
@@ -34,9 +37,6 @@
     <!ENTITY cross_compiling  SYSTEM "usermanual/installation/cross_compiling.xml">
     <!ENTITY building         SYSTEM "usermanual/installation/building.xml">
     <!ENTITY install          SYSTEM "usermanual/installation/install.xml">
-    <!ENTITY gnashrc          SYSTEM "usermanual/usage/gnashrc.xml">
-    <!ENTITY amf              SYSTEM "amf.xml">
-    <!ENTITY rtmp             SYSTEM "rtmp.xml">
  ]
 >
 
