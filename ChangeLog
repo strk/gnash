@@ -1,3 +1,8 @@
+2008-02-19 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/libamf.all/Makefile.am: set GNASHRC to use
+	  testsuite-specific configuration.
+
 2008-02-18  Rob Savoye  <rob@ute.welcomehome.org>
 
 	* doc/C/cygnal-man.xml: New manpage for Cygnal.

@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.15 2008/01/21 23:26:49 rsavoye Exp $
+# $Id: Makefile.am,v 1.16 2008/02/19 07:50:07 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -129,12 +129,14 @@ SUFFIXES = .sol .xml
 	$(PYTHON) $(srcdir)/s2x.py -s $(srcdir)/xmlfiles/$< $@
 
 check-DEJAGNU: site-update $(TEST_CASES)
-	@runtest=$(RUNTEST); \
+	runtest=$(RUNTEST); \
 	if $(SHELL) -c "$$runtest --version" > /dev/null 2>&1; then \
+	    GNASHRC="$(top_builddir)/testsuite/gnashrc" \
 	    $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); true; \
 	else \
 	  echo "WARNING: could not find \`runtest'" 1>&2; \
           for i in "$(check_PROGRAMS)"; do \
+	    GNASHRC="$(top_builddir)/testsuite/gnashrc" \
 	    $(SHELL) $$i; \
 	  done; \
 	fi
