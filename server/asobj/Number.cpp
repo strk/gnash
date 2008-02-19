@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Number.cpp,v 1.36 2008/01/30 10:09:35 bwy Exp $ */
+/* $Id: Number.cpp,v 1.37 2008/02/19 08:51:44 strk Exp $ */
 
 #include "log.h"
 #include "tu_config.h"
@@ -55,23 +55,7 @@ namespace gnash {
 // Forward declarations
 //static void number_val_to_str(double val, char *str);
 //static as_value number_to_string(const fn_call& fn);
-
-static void
-attachNumberInterface(as_object& o)
-{
-	// FIXME: add Number interface here:
-	// Number.MAX_VALUE
-	// Number.MIN_VALUE
-	// Number.NaN
-	// Number.NEGATIVE_INFINITY
-	// Number.POSITIVE_INFINITY
-
-	// Number.toString()
-	o.init_member("toString", new builtin_function(as_object::tostring_method));
-
-	// Number.valueOf()
-	o.init_member("valueOf", new builtin_function(as_object::valueof_method));
-}
+static void attachNumberInterface(as_object& o);
 
 static as_object*
 getNumberInterface()
@@ -123,7 +107,26 @@ public:
 		return _val;
 	}
 
+	static as_value toString_method(const fn_call& fn);
 };
+
+static void
+attachNumberInterface(as_object& o)
+{
+	// FIXME: add Number interface here:
+	// Number.MAX_VALUE
+	// Number.MIN_VALUE
+	// Number.NaN
+	// Number.NEGATIVE_INFINITY
+	// Number.POSITIVE_INFINITY
+
+	// Number.toString()
+	o.init_member("toString", new builtin_function(number_as_object::toString_method));
+
+	// Number.valueOf()
+	o.init_member("valueOf", new builtin_function(as_object::valueof_method));
+}
+
 
 static as_value
 number_ctor(const fn_call& fn)
@@ -181,6 +184,20 @@ init_number_instance(double val)
 	as_environment env;
 	env.push(val);
 	return cl->constructInstance(env, 1, 0);
+}
+
+as_value
+number_as_object::toString_method(const fn_call& fn)
+{
+	boost::intrusive_ptr<as_object> obj = fn.this_ptr;
+
+	if ( fn.nargs ) 
+	{
+		// See https://savannah.gnu.org/bugs/index.php?22360
+		log_unimpl("Number.toString(<radix>)");
+	}
+	std::string text_val = obj->get_text_value();
+	return as_value(text_val);
 }
   
 } // namespace gnash
