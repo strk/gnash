@@ -1,5 +1,14 @@
 2008-02-19 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.{cpp,h}: add optional second argument
+	  to doubleToString static method, to specify a base
+	  (defaults to 10).
+	* server/asobj/Number.cpp: implement Number.toString(<radix>).
+	* testsuite/actionscript.all/Number.as: successes.
+	* testsuite/swfdec/PASSING: successes.
+
+2008-02-19 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Number.as: add test for toString(<radix>)
 
 2008-02-19 Sandro Santilli <strk@keybit.net>

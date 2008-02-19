@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.83 2008/01/29 12:31:09 strk Exp $ */
+/* $Id: as_value.h,v 1.84 2008/02/19 12:06:07 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -198,7 +198,7 @@ public:
 	//
 	/// TODO: move here some of the good comments found in the function definition.
 	///
-	static std::string doubleToString(double val);
+	static std::string doubleToString(double val, int radix=10);
 
 	/// Drop any ref counts we have.
 	//

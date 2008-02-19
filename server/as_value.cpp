@@ -1199,7 +1199,7 @@ as_value::as_value(boost::intrusive_ptr<as_object> obj)
 
 // Convert numeric value to string value, following ECMA-262 specification
 std::string
-as_value::doubleToString(double val)
+as_value::doubleToString(double val, int radix)
 {
 	// Printing formats:
 	//
@@ -1290,39 +1290,59 @@ as_value::doubleToString(double val)
 
 	std::ostringstream ostr;
 	std::string str;
-	
-	// ActionScript always expects dot as decimal point?
-	ostr.imbue(std::locale("C")); 
-	
-	// force to decimal notation for this range (because the reference player does)
-	if (fabs(val) < 0.0001 && fabs(val) >= 0.00001)
+
+	if ( radix == 10 )
 	{
-		// All nineteen digits (4 zeros + up to 15 significant digits)
-		ostr << std::fixed << std::setprecision(19) << val;
+		// ActionScript always expects dot as decimal point?
+		ostr.imbue(std::locale("C")); 
 		
-		str = ostr.str();
-		
-		// Because 'fixed' also adds trailing zeros, remove them.
-		std::string::size_type pos = str.find_last_not_of('0');
-		if (pos != std::string::npos) {
-			str.erase(pos + 1);
+		// force to decimal notation for this range (because the reference player does)
+		if (fabs(val) < 0.0001 && fabs(val) >= 0.00001)
+		{
+			// All nineteen digits (4 zeros + up to 15 significant digits)
+			ostr << std::fixed << std::setprecision(19) << val;
+			
+			str = ostr.str();
+			
+			// Because 'fixed' also adds trailing zeros, remove them.
+			std::string::size_type pos = str.find_last_not_of('0');
+			if (pos != std::string::npos) {
+				str.erase(pos + 1);
+			}
+			
 		}
 		
+		else
+		{
+			ostr << std::setprecision(15) << val;
+			
+			str = ostr.str();
+			
+			// Remove a leading zero from 2-digit exponent if any
+			std::string::size_type pos = str.find("e", 0);
+
+			if (pos != std::string::npos && str.at(pos + 2) == '0') {
+				str.erase(pos + 2, 1);
+			}
+			
+		}
 	}
-	
 	else
 	{
-		ostr << std::setprecision(15) << val;
-		
-		str = ostr.str();
-		
-		// Remove a leading zero from 2-digit exponent if any
-		std::string::size_type pos = str.find("e", 0);
+		bool negative = (val < 0);
+		if ( negative ) val = -val;
 
-		if (pos != std::string::npos && str.at(pos + 2) == '0') {
-			str.erase(pos + 2, 1);
+		double left = floor(val);
+		if ( left < 1 ) return "0";
+		while ( left != 0 )
+		{
+			double n = left;
+			left = floor(left/radix);
+			n -= (left*radix);
+			//str = std::string(n < 10 ? ((int)n+'0') : ((int)n+('a'-10))) + str;
+			str.insert(0, 1, (n < 10 ? ((int)n+'0') : ((int)n+('a'-10))));
 		}
-		
+		if ( negative ) str.insert(0, 1, '-'); 
 	}
 
 	return str;

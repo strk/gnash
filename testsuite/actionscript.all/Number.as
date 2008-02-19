@@ -27,7 +27,7 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.39 2008/02/19 09:58:42 strk Exp $";
+rcsid="$Id: Number.as,v 1.40 2008/02/19 12:06:07 strk Exp $";
 
 #include "check.as"
 
@@ -68,19 +68,19 @@ check(Number.prototype.hasOwnProperty('toString'));
 #endif
 
 tmp = new Number(10);
-xcheck_equals(tmp.toString(2), '1010'); 
+check_equals(tmp.toString(2), '1010'); 
 tmp = 6;
-xcheck_equals(tmp.toString(2), '110'); 
-xcheck_equals(tmp.toString(3), '20'); 
+check_equals(tmp.toString(2), '110'); 
+check_equals(tmp.toString(3), '20'); 
 check_equals(tmp.toString(8), '6'); 
 check_equals(tmp.toString(-2), '6'); // invalid, returns 10 ?
 check_equals(tmp.toString(0), '6'); // invalid, returns 10 ?
-xcheck_equals(tmp.toString(5), '11'); 
+check_equals(tmp.toString(5), '11'); 
 tmp = -5;
-xcheck_equals(tmp.toString(2), '-101'); 
+check_equals(tmp.toString(2), '-101'); 
 check_equals(tmp.toString(16), '-5'); 
 tmp = -11;
-xcheck_equals(tmp.toString(16), '-b'); 
+check_equals(tmp.toString(16), '-b'); 
 
 //------------------------------------
 // Test Number.valueOf 

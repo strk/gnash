@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Number.cpp,v 1.37 2008/02/19 08:51:44 strk Exp $ */
+/* $Id: Number.cpp,v 1.38 2008/02/19 12:06:07 strk Exp $ */
 
 #include "log.h"
 #include "tu_config.h"
@@ -191,13 +191,24 @@ number_as_object::toString_method(const fn_call& fn)
 {
 	boost::intrusive_ptr<as_object> obj = fn.this_ptr;
 
+	double val = obj->get_numeric_value();
+	unsigned radix=10;
+
 	if ( fn.nargs ) 
 	{
-		// See https://savannah.gnu.org/bugs/index.php?22360
-		log_unimpl("Number.toString(<radix>)");
+		int userRadix = fn.arg(0).to_int();
+		if ( userRadix >= 2 && userRadix <= 36 ) radix=userRadix;
+		else
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Number.toString(%s): "
+				"radix must be in the 2..36 range (%d is invalid)"),
+				fn.arg(0).to_debug_string().c_str(), userRadix)
+			)
+		}
+
 	}
-	std::string text_val = obj->get_text_value();
-	return as_value(text_val);
+	return as_value::doubleToString(val, radix); 
 }
   
 } // namespace gnash

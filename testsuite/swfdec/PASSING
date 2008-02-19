@@ -129,6 +129,7 @@ crash-0.5.5-stylesheet-update-5.swf:5e3c012a66e11b10d790ba47ac14097c
 crash-0.5.5-stylesheet-update-6.swf:ea135a06ae6032fd3cd9e2588ed1be67
 crash-0.5.5-stylesheet-update-7.swf:c112cfe1b313fb437fe45cb0c3a7b665
 crash-0.5.5-stylesheet-update-8.swf:73a61afbd582fabd2dbba360cc3763e4
+crash-0.5.90-empty-action.swf:c564ca09c4bc71fb89b042bc07d247eb
 currentframe.swf:ba479d5adbece0ddafeaa75e68eff052
 dangling-compare-5.swf:7daa85d63e7bf29df6aa1668d21a28a9
 dangling-compare-6.swf:51999fa1cbc988765b5dee03717d22a5
@@ -372,6 +373,10 @@ newobject-paths-5.swf:7fe3f8dd1f89838358ba5e92417ac888
 newobject-paths-6.swf:e2e207b7b6966fdffd3a0017cdbf2f1c
 newobject-paths-7.swf:e8af4c2cd51e1b3c5e7ab3121386d0ba
 newobject-paths-8.swf:fc8407413a00bf2e41e27db7e7ec8c9f
+number-tostring-radix-5.swf:9c620b9523efbfc2cd30832d38c3d403
+number-tostring-radix-6.swf:82b91ba51d982a8c27dddffd129051df
+number-tostring-radix-7.swf:c6870eb97ffb4af5f99c3a18498de2f5
+number-tostring-radix-8.swf:93317f3088c690df93f8cdb9d314263d
 object-hasownproperty-6.swf:45e9d8d671d900b1331bff8df052b02c
 object-hasownproperty-7.swf:417475e7c38fe61d2ab1d6b153a3eee1
 object-hasownproperty-8.swf:6cee106e21a390e63533f0f397bc69d4
