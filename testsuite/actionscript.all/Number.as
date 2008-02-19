@@ -27,7 +27,7 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.38 2008/02/19 09:55:35 strk Exp $";
+rcsid="$Id: Number.as,v 1.39 2008/02/19 09:58:42 strk Exp $";
 
 #include "check.as"
 
@@ -425,8 +425,8 @@ check_equals(450 - undefined, 450);
 #endif
 
 //-----------------------------------------------------------
-// Check number formatting as documented in as_value.cpp. Not
-// verified with the proprietary player. Rules are:
+// Check number formatting as documented in as_value.cpp. 
+// Rules are:
 // Numbers should be rounded to 15 significant digits.
 // Numbers above 10e+15 are expressed with exponent.
 // Numbers below 0 with more than 4 leading zeros expressed
@@ -470,17 +470,18 @@ check_equals(a.toString(), "0.000054");
 
 a=new Number(5.4 / 1000000);
 check_equals(a.toString(), "5.4e-6");
+check_equals(a.toString(10), "5.4e-6");
 
 check( isNaN(0/0) );
 
 // END OF TEST
 
 #if OUTPUT_VERSION < 6
- check_totals(157);
+ check_totals(158);
 #else
 #if OUTPUT_VERSION < 7
- check_totals(170);
+ check_totals(171);
 #else
- check_totals(168);
+ check_totals(169);
 #endif
 #endif
