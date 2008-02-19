@@ -271,7 +271,7 @@ static as_value sprite_attach_movie(const fn_call& fn)
   if (fn.nargs > 3 ) {
     boost::intrusive_ptr<as_object> initObject = fn.arg(3).to_object();
     if ( initObject ) {
-      //log_msg(_("Initializing properties from object"));
+      //log_debug(_("Initializing properties from object"));
       newch->copyProperties(*initObject);
     } else {
       // This is actually a valid thing to do,
@@ -659,7 +659,7 @@ static as_value sprite_load_movie(const fn_call& fn)
   mr.loadMovie(url, target); // ADD GET/SET !!
 
   //sprite->loadMovie(url);
-  //log_msg("MovieClip.loadMovie(%s) - TESTING ", url.str().c_str());
+  //log_debug("MovieClip.loadMovie(%s) - TESTING ", url.str().c_str());
 
 
   //log_unimp("%s", __PRETTY_FUNCTION__);
@@ -1279,7 +1279,7 @@ sprite_lineStyle(const fn_call& fn)
 
 
   rgba color(r, g, b, a);
-  //log_msg("Color: %s", color.toString().c_str());
+  //log_debug("Color: %s", color.toString().c_str());
 
 #ifdef DEBUG_DRAWING_API
   log_debug("%s.lineStyle(%d,%d,%d,%d);", sprite->getTarget().c_str(), thickness, r, g, b);
@@ -4166,7 +4166,7 @@ sprite_instance::loadVariables(URL url, short sendVarsMethod)
     log_error(_("Could not load variables from %s"), url.str().c_str());
   }
 
-  //log_msg(_(SIZET_FMT " loadVariables requests pending"), _loadVariableRequests.size());
+  //log_debug(_(SIZET_FMT " loadVariables requests pending"), _loadVariableRequests.size());
 
 }
 
@@ -4187,7 +4187,7 @@ sprite_instance::processCompletedLoadVariableRequest(LoadVariablesThread& reques
   {
     const string name = PROPNAME(it->first);
     const string& val = it->second;
-    //log_msg(_("Setting variable '%s' to value '%s'"), name.c_str(), val.c_str());
+    //log_debug(_("Setting variable '%s' to value '%s'"), name.c_str(), val.c_str());
     set_member(st.find(name), val.c_str());
   }
 

@@ -326,7 +326,7 @@ private:
 		// TODO: return false on timeout
 		while ( m_loading_frame < framenum )
 		{
-			log_msg(_("sprite_definition: "
+			log_debug(_("sprite_definition: "
 				"loading of frame " SIZET_FMT " requested "
 				"(we are at " SIZET_FMT "/" SIZET_FMT ")"),
 				framenum, m_loading_frame, m_frame_count);

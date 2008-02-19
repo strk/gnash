@@ -206,7 +206,7 @@ LoadVars::LoadVars()
 		_loadThreads(),
 		_loadCheckerTimer(0)
 {
-	//log_msg("LoadVars %p created", this);
+	//log_debug("LoadVars %p created", this);
 }
 
 LoadVars::~LoadVars()
@@ -582,7 +582,7 @@ loadvars_sendandload(const fn_call& fn)
 	bool post = true;
 	if ( fn.nargs > 2 && fn.arg(2).to_string() == "GET" ) post = false;
 
-	//log_msg("LoadVars.sendAndLoad(%s, %p) called, and returning TRUE", urlstr.c_str(), target.get());
+	//log_debug("LoadVars.sendAndLoad(%s, %p) called, and returning TRUE", urlstr.c_str(), target.get());
 
 	ptr->sendAndLoad(urlstr, *target, post);
 	return as_value(true);

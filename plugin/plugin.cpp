@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.96 2008/01/30 23:32:58 strk Exp $ */
+/* $Id: plugin.cpp,v 1.97 2008/02/19 19:20:51 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -302,7 +302,7 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
 		{
 			val = data->argv[i];
 		}
-		//log_msg("PARAM: %s = %s", name.c_str(), val.c_str());
+		//log_debug("PARAM: %s = %s", name.c_str(), val.c_str());
 		_params[name] = val;
 	}
 }
@@ -403,7 +403,7 @@ nsPluginInstance::SetWindow(NPWindow* aWindow)
 	}
 	else
 	{
-		log_msg("%s: X origin = %d, Y Origin = %d, Width = %d,"
+		log_debug("%s: X origin = %d, Y Origin = %d, Width = %d,"
  	       " Height = %d, WindowID = %p, this = %p",
  	       __FUNCTION__,
  	       aWindow->x, aWindow->y, aWindow->width, aWindow->height,
@@ -492,7 +492,7 @@ nsPluginInstance::DestroyStream(NPStream * /* stream */, NPError /* reason */)
 
 #if 0
     nsPluginInstance *arg = (nsPluginInstance *)this;
-    log_msg("%s: this = %p, URL is %s", __PRETTY_FUNCTION__,
+    log_debug("%s: this = %p, URL is %s", __PRETTY_FUNCTION__,
       (void *)arg, stream->url);
 #endif
 
@@ -545,7 +545,7 @@ nsPluginInstance::Write(NPStream * /* stream */, int32_t /* offset */, int32_t l
 {
 
 #if 0
-	log_msg("Reading Stream %s, offset is %d, length = %d",
+	log_debug("Reading Stream %s, offset is %d, length = %d",
 	stream->url, offset, len);
 #endif
 

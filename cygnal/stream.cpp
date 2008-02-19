@@ -64,7 +64,7 @@ sendfile_thread()
     if (stat(loadfile.filespec, &stats) == 0) {
 
 	fd = open(loadfile.filespec, O_RDONLY);
-// 	log_msg ("File %s is %lld bytes in size",
+// 	log_debug ("File %s is %lld bytes in size",
 //		 loadfile.filespec, (long long int)(stats.st_size));
 	if (fd) {
 	    fdptr = static_cast<char *>(mmap(0, stats.st_size,
@@ -78,7 +78,7 @@ sendfile_thread()
 	    log_error (_("Couldn't map file %s into memory: %s"),
 		       loadfile.filespec, strerror(errno));
 	} else {	    
-	    log_msg (_("File %s mapped to: %p"), loadfile.filespec,
+	    log_debug (_("File %s mapped to: %p"), loadfile.filespec,
 		       (void *)fdptr);
 	}
 
@@ -112,7 +112,7 @@ sendfile_thread()
 	}
 	
 	if (nbytes <= 0) {
-	    log_msg (_("Done..."));
+	    log_debug (_("Done..."));
 	    return &nbytes;
 	}
     }
@@ -178,7 +178,7 @@ Stream::open(const char *filespec, int netfd, Statistics *statistics) {
 	_filesize = st.st_size;
 	boost::mutex::scoped_lock lock(io_mutex);
 	_filefd = ::open(filespec, O_RDONLY);
-	log_msg (_("File %s is %lld bytes in size."), filespec,
+	log_debug (_("File %s is %lld bytes in size."), filespec,
 		 (long long int) _filesize);
 	if (_filefd) {
 	    _dataptr = static_cast<unsigned char *>(mmap(0, _filesize,
@@ -193,7 +193,7 @@ Stream::open(const char *filespec, int netfd, Statistics *statistics) {
 		       filespec, strerror(errno));
 	    return false;
 	} else {	    
-	    log_msg (_("File %s mapped to: %p"), filespec,
+	    log_debug (_("File %s mapped to: %p"), filespec,
 		     (void *)_dataptr);
 	    _seekptr = _dataptr;
 	    _state = OPEN;

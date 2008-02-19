@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderGst.cpp,v 1.14 2008/02/18 19:36:00 nelsonrn Exp $
+// $Id: VideoDecoderGst.cpp,v 1.15 2008/02/19 19:20:51 bwy Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -234,7 +234,7 @@ VideoDecoderGst::handleMessage (GstMessage *message)
       break;
     }
     case GST_MESSAGE_EOS:
-      log_msg(_("NetStream has reached the end of the stream."));
+      log_debug(_("NetStream has reached the end of the stream."));
 
       break;
     

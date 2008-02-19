@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.57 2008/01/31 14:26:19 strk Exp $ */
+/* $Id: font.cpp,v 1.58 2008/02/19 19:20:53 bwy Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -478,7 +478,7 @@ GlyphInfo::markReachableResources() const
 		{
 			glyph_index = it->second;
 #if 0
-			log_msg(_("get_glyph_index(%u) returning %d"),
+			log_debug(_("get_glyph_index(%u) returning %d"),
 				code, glyph_index);
 #endif
 			return glyph_index;
@@ -490,7 +490,7 @@ GlyphInfo::markReachableResources() const
 			glyph_index = const_cast<font*>(this)->add_os_glyph(code);
 		}
 #if 0
-		log_msg(_("get_glyph_index(%u) returning -1"), code);
+		log_debug(_("get_glyph_index(%u) returning -1"), code);
 #endif
 		return glyph_index;
 	}

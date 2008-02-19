@@ -69,7 +69,7 @@ public:
 	void operator() (string_table::key name, const as_value& val)
 	{
 		if (name == NSV::PROP_uuPROTOuu) return;
-		//log_msg(_("Setting member '%s' to value '%s'"), name.c_str(), val.to_debug_string().c_str());
+		//log_debug(_("Setting member '%s' to value '%s'"), name.c_str(), val.to_debug_string().c_str());
 		_tgt.set_member(name, val);
 	}
 };
@@ -340,7 +340,7 @@ void
 as_object::set_member_default(string_table::key key, const as_value& val,
 	string_table::key nsname)
 {
-	//log_msg(_("set_member_default(%s)"), key.c_str());
+	//log_debug(_("set_member_default(%s)"), key.c_str());
 	Property* prop = findUpdatableProperty(key, nsname);
 	if (prop)
 	{
@@ -360,7 +360,7 @@ as_object::set_member_default(string_table::key key, const as_value& val,
 		}
 		catch (ActionException& exc)
 		{
-			log_msg(_("%s: Exception %s. Will create a new member"),
+			log_aserror(_("%s: Exception %s. Will create a new member"),
 				_vm.getStringTable().value(key).c_str(), exc.what());
 		}
 
@@ -385,7 +385,7 @@ as_object::update_member(string_table::key key, const as_value& val,
 {
 	std::pair<bool,bool> ret; // first is found, second is updated
 
-	//log_msg(_("set_member_default(%s)"), key.c_str());
+	//log_debug(_("set_member_default(%s)"), key.c_str());
 	Property* prop = findUpdatableProperty(key, nsname);
 	if (prop)
 	{
@@ -404,7 +404,7 @@ as_object::update_member(string_table::key key, const as_value& val,
 		}
 		catch (ActionException& exc)
 		{
-			log_msg(_("%s: Exception %s. Will create a new member"),
+			log_debug(_("%s: Exception %s. Will create a new member"),
 				_vm.getStringTable().value(key).c_str(), exc.what());
 		}
 
@@ -468,7 +468,7 @@ as_object::init_property(string_table::key key, as_function& getter,
 	// We shouldn't attempt to initialize a property twice, should we ?
 	assert(success);
 
-	//log_msg(_("Initialized property '%s'"), name.c_str());
+	//log_debug(_("Initialized property '%s'"), name.c_str());
 
 	// TODO: optimize this, don't scan again !
 	_members.setFlags(key, flags, nsname);
@@ -569,7 +569,7 @@ as_object::prototypeOf(as_object& instance)
 void
 as_object::dump_members() 
 {
-	log_msg(_(SIZET_FMT " members of object %p follow"),
+	log_debug(_(SIZET_FMT " members of object %p follow"),
 		_members.size(), (const void*)this);
 	_members.dump(*this);
 }

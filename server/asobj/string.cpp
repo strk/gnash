@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.53 2008/02/06 15:20:58 bwy Exp $ */
+/* $Id: string.cpp,v 1.54 2008/02/19 19:20:55 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -263,7 +263,7 @@ string_slice(const fn_call& fn)
 
     size_t retlen = end-start;
 
-    log_msg("start: "SIZET_FMT", end: "SIZET_FMT", retlen: "SIZET_FMT, start, end, retlen);
+    log_debug("start: "SIZET_FMT", end: "SIZET_FMT", retlen: "SIZET_FMT, start, end, retlen);
 
     return as_value(utf8::encodeCanonicalString(wstr.substr(start, retlen), version));
 }

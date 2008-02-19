@@ -140,7 +140,7 @@ Sound::getVolume()
 void
 Sound::loadSound(const std::string& file, bool /*streaming*/)
 {
-	log_msg(_("%s is still testing!"), __FUNCTION__);
+	log_debug(_("%s is still testing!"), __FUNCTION__);
 
 	if (connection) {
 		log_error(_("%s: This sound already has a connection?  (We try to handle this by overriding the old one...)"), __FUNCTION__);

@@ -194,7 +194,7 @@ const char*	call_method_parsed(
     const char* method_arg_fmt,
     va_list args)
 {
-    log_msg(_("FIXME(%d): %s"), __LINE__, __FUNCTION__);
+    log_debug(_("FIXME(%d): %s"), __LINE__, __FUNCTION__);
 
     // Parse va_list args
     int	starting_index = env->get_top_index();
@@ -310,7 +310,7 @@ movie_load()
 as_value
 event_test(const fn_call& /*fn*/)
 {
-    log_msg(_("FIXME: %s"), __FUNCTION__);
+    log_debug(_("FIXME: %s"), __FUNCTION__);
     return as_value();
 }
 

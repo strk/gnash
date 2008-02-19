@@ -174,18 +174,18 @@ boost::uint8_t *x = in;
     AMF::amf_element_t el;
     
     
-    log_msg(_("Type is %s"), astype_str[type]);
+    log_debug(_("Type is %s"), astype_str[type]);
 
 //    x++;                        // skip the type byte
     switch (type) {
       case Element::NUMBER:
 	  // AMF numbers are 64-bit big-endian integers.
 	  num = extractNumber(x);
-//	  log_msg(_("Number is " AMFNUM_F), num));
+//	  log_debug(_("Number is " AMFNUM_F), num));
           break;
       case Element::BOOLEAN:
           boolshift = *x;
-          log_msg(_("Boolean is %d"), boolshift);
+          log_debug(_("Boolean is %d"), boolshift);
           break;
       case Element::STRING:
           string str = extractString(x);
@@ -199,7 +199,7 @@ boost::uint8_t *x = in;
           // *src to a sequence of wide characters as if by repeated
           // calls of the form:
 //          mbsrtowcs
-		  log_msg(_("String is %s"), mstr);
+		  log_debug(_("String is %s"), mstr);
           break;
       case Element::OBJECT:
 //          return reinterpret_cast<uint8_t *>(extractObject(x));
@@ -216,7 +216,7 @@ boost::uint8_t *x = in;
           log_unimpl("Null AMF decoder");
           break;
       case Element::UNDEFINED:
-          log_msg(_("Undefined element"));
+          log_debug(_("Undefined element"));
           break;
       case Element::REFERENCE:
           log_unimpl("Reference AMF decoder");
@@ -232,14 +232,14 @@ boost::uint8_t *x = in;
           break;
       case Element::DATE:
           nanosecs = *(double *)swapBytes(x+1, 8);
-//          log_msg(_("Date is " AMFNUM_F " nanoseconds"), nanosecs);
+//          log_debug(_("Date is " AMFNUM_F " nanoseconds"), nanosecs);
           break;
       case Element::LONG_STRING:
 //          int length = *(short *)swapBytes(x, 4);
           x+=4;                  // skip the length bytes
 //        mstr = new char[length+1];
 //          memcpy(mstr, x, length);
-//          log_msg(_("String is %s"), mstr);
+//          log_debug(_("String is %s"), mstr);
           break;
       case Element::RECORD_SET:
           log_unimpl("Recordset AMF decoder");
@@ -677,7 +677,7 @@ AMF::encodeElement(vector<amf::Element *> &data)
 	hexint = new boost::uint8_t[(el->getLength() + 4) *3];
 	hexify((boost::uint8_t *)hexint, (boost::uint8_t *)tmp,
 	       el->getLength() + AMF_HEADER_SIZE, true);
-	log_msg(_("The packet head is: 0x%s"), hexint);
+	log_debug(_("The packet head is: 0x%s"), hexint);
 #endif
 	// The 'pad' in this case is a serious hack. I think it
 	// may be an artifact, but one guess is it's a 16bit word
@@ -1373,26 +1373,26 @@ AMF::parseHeader(boost::uint8_t *in)
 
     boost::uint8_t *tmpptr = in;
     
-    log_msg (_("AMF header byte is: 0x%X"), *in);
+    log_debug (_("AMF header byte is: 0x%X"), *in);
 
     _amf_index = *tmpptr & AMF_INDEX_MASK;
-    log_msg (_("The AMF channel index is %d"), _amf_index);
+    log_debug (_("The AMF channel index is %d"), _amf_index);
     
     _header_size = headerSize(*tmpptr++);
-    log_msg (_("The header size is %d"), _header_size);
+    log_debug (_("The header size is %d"), _header_size);
 
 #if 1
     boost::uint8_t *hexint;
     hexint = new boost::uint8_t[(_header_size + 3) *3];
     hexify((boost::uint8_t *)hexint, (uint8_t *)in, _header_size, false);
-    log_msg(_("The packet head is: 0x%s"), hexint);
+    log_debug(_("The packet head is: 0x%s"), hexint);
 #endif
     if (_header_size >= 4) {
         hexify((boost::uint8_t *)hexint, (boost::uint8_t *)tmpptr, 3, false);
         _mystery_word = *tmpptr++;
         _mystery_word = (_mystery_word << 12) + *tmpptr++;
         _mystery_word = (_mystery_word << 8) + *tmpptr++;
-        log_msg(_("The mystery word is: %d or 0x%s"), _mystery_word, hexint);
+        log_debug(_("The mystery word is: %d or 0x%s"), _mystery_word, hexint);
     }
 
     if (_header_size >= 8) {
@@ -1401,7 +1401,7 @@ AMF::parseHeader(boost::uint8_t *in)
         _total_size = (_total_size << 12) + *tmpptr++;
         _total_size = (_total_size << 8) + *tmpptr++;
         _total_size = _total_size & 0xffffff;
-        log_msg(_("The body size is: %d, or 0x%s"), _total_size, hexint);
+        log_debug(_("The body size is: %d, or 0x%s"), _total_size, hexint);
         _amf_data = new uint8_t(_total_size+1);
         _seekptr = _amf_data;
 //        memset(_amf_data, 0, _total_size+1);
@@ -1411,7 +1411,7 @@ AMF::parseHeader(boost::uint8_t *in)
         hexify((boost::uint8_t *)hexint, (boost::uint8_t *)tmpptr, 1, false);
         _type = *(content_types_e *)tmpptr;
         tmpptr++;
-        log_msg(_("The type is: %d, or 0x%s"), _type, hexint);
+        log_debug(_("The type is: %d, or 0x%s"), _type, hexint);
     }
 
     switch(_type) {
@@ -1438,7 +1438,7 @@ AMF::parseHeader(boost::uint8_t *in)
         hexify((boost::uint8_t *)hexint, (boost::uint8_t *)tmpptr, 3, false);
         _src_dest = *(reinterpret_cast<amfsource_e *>(tmpptr));
         tmpptr += sizeof(unsigned int);
-        log_msg(_("The source/destination is: %d, or 0x%s"), _src_dest, hexint);
+        log_debug(_("The source/destination is: %d, or 0x%s"), _src_dest, hexint);
     }
 
     return _packet_size;
@@ -1485,7 +1485,7 @@ AMF::extractElement(Element *el, boost::uint8_t *in)
     boost::uint8_t* hexint;
     hexint =  (boost::uint8_t*) malloc((bytes * 3) + 12);
     hexify((boost::uint8_t *)hexint, (boost::uint8_t *)in, bytes, true);
-    log_msg(_("The packet body is: 0x%s"), hexint);
+    log_debug(_("The packet body is: 0x%s"), hexint);
     free(hexint);
 #endif
 
@@ -1514,11 +1514,11 @@ AMF::extractElement(Element *el, boost::uint8_t *in)
 	  // get the length of the name
 	  length = ntohs((*(short *)tmpptr) & 0xffff);
 	  tmpptr += 2;
-//	  log_msg(_("AMF String length is: %d"), length);
+//	  log_debug(_("AMF String length is: %d"), length);
 	  if (length > 0) {
 	      // get the name of the element
 	      el->makeString(tmpptr, length);
-//	      log_msg(_("AMF String is: %s"), el->to_string());
+//	      log_debug(_("AMF String is: %s"), el->to_string());
 	      tmpptr += length;
 	  } else {
 	      el->setType(Element::STRING);
@@ -1575,7 +1575,7 @@ AMF::extractVariable(Element *el, boost::uint8_t *in)
     el->setLength(length);
     if (length == 0) {
         if (*(tmpptr+2) == Element::OBJECT_END) {
-//            log_msg(_("End of Object definition"));
+//            log_debug(_("End of Object definition"));
             el->setLength(0);
             el->setType(Element::OBJECT_END);
             tmpptr+=3;
@@ -1587,7 +1587,7 @@ AMF::extractVariable(Element *el, boost::uint8_t *in)
 #if 0
     uint8_t hexint[AMF_PACKET_SIZE];
     hexify((uint8_t *)hexint, (uint8_t *)tmpptr, length*3, true);
-    log_msg(_("The element is: 0x%s"), hexint);
+    log_debug(_("The element is: 0x%s"), hexint);
 #endif
     tmpptr += 2;
     // get the name of the element
@@ -1597,17 +1597,17 @@ AMF::extractVariable(Element *el, boost::uint8_t *in)
 	    return 0;
 	}
 	
-//        log_msg(_("AMF element length is: %d"), length);
+//        log_debug(_("AMF element length is: %d"), length);
         memcpy(buffer, tmpptr, length);
         el->setName(buffer);
         tmpptr += length;
     }
     
-//    log_msg(_("AMF element name is: %s"), buffer);
+//    log_debug(_("AMF element name is: %s"), buffer);
     Element::astype_e type = (Element::astype_e)((*tmpptr++) & 0xff);
 
     if (type <= Element::TYPED_OBJECT) {
-//        log_msg(_("AMF type is: %s"), Element::astype_str[(int)type]);
+//        log_debug(_("AMF type is: %s"), Element::astype_str[(int)type]);
 	el->setType(type);
     }
     
@@ -1624,7 +1624,7 @@ AMF::extractVariable(Element *el, boost::uint8_t *in)
           uint8_t hexint[AMF_NUMBER_SIZE*3];
           hexify((uint8_t *)hexint, (uint8_t *)buffer,
 		 AMF_NUMBER_SIZE, false);
-          log_msg(_("Number \"%s\" is: 0x%s"), el->getName().c_str(), hexint);
+          log_debug(_("Number \"%s\" is: 0x%s"), el->getName().c_str(), hexint);
 //          double *num = extractNumber(tmpptr);
 #endif
           tmpptr += 8;
@@ -1649,12 +1649,12 @@ AMF::extractVariable(Element *el, boost::uint8_t *in)
  	  memcpy(str, tmpptr, length);
 	  el->setData(str);
 // 	  string v(reinterpret_cast<const char *>(str) + 3, (int)length);
-// 	  log_msg(_("Variable \"%s\" is: %s"), el->getName().c_str(), v.c_str());
+// 	  log_debug(_("Variable \"%s\" is: %s"), el->getName().c_str(), v.c_str());
           tmpptr += length;
           break;
       case Element::OBJECT:
   	  while (*(tmpptr++) != Element::OBJECT_END) {
-	      log_msg("Look for end of object...");
+	      log_debug("Look for end of object...");
   	  }
 	  
 	  break;
@@ -1669,7 +1669,7 @@ AMF::extractVariable(Element *el, boost::uint8_t *in)
       case Element::ECMA_ARRAY:
 			// FIXME this shouldn't fall thru
       case Element::OBJECT_END:
-//          log_msg(_("End of Object definition"));
+//          log_debug(_("End of Object definition"));
 	  el->makeObjectEnd();
           break;
       case Element::TYPED_OBJECT:

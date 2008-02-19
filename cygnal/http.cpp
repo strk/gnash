@@ -97,7 +97,7 @@ HTTP::waitForGetRequest()
     char buffer[readsize+1];
     memset(buffer, 0, readsize+1);
     if (readNet(buffer, readsize) > 0) {
-        log_msg (_("Read initial GET Request"));
+        log_debug (_("Read initial GET Request"));
     } else {
         log_error (_("Couldn't read initial GET Request"));
     }
@@ -117,7 +117,7 @@ HTTP::waitForGetRequest()
 
     // See if we got a legit GET request
     if (strncmp(buffer, "GET ", 4) == 0) {
-        log_msg (_("Got legit GET request"));
+        log_debug (_("Got legit GET request"));
     } else {
         log_error (_("Got bogus GET request"));
     }
@@ -343,11 +343,11 @@ HTTP::sendGetReply(http_status_e code)
     }
 
     if (ret >= 0) {
-        log_msg (_("Sent GET Reply"));
-//        log_msg (_("Sent GET Reply: %s"), _header.str().c_str());
+        log_debug (_("Sent GET Reply"));
+//        log_debug (_("Sent GET Reply: %s"), _header.str().c_str());
 	clearHeader();
     } else {
-        log_msg (_("Couldn't send GET Reply, writeNet returned %d"), ret);
+        log_debug (_("Couldn't send GET Reply, writeNet returned %d"), ret);
 	return false;
     }
 //    cout << "GET Header is:" << endl << _header.str() << endl;
@@ -763,7 +763,7 @@ HTTP::getFileStats(std::string &filespec)
 	    // does, which is to load the index.html file in that
 	    // directry if it exists.
 	    if (S_ISDIR(st.st_mode)) {
-		log_msg("%s is a directory\n", actual_filespec.c_str());
+		log_debug("%s is a directory\n", actual_filespec.c_str());
 		if (actual_filespec[actual_filespec.size()-1] != '/') {
 		    actual_filespec += '/';
 		}
@@ -771,26 +771,26 @@ HTTP::getFileStats(std::string &filespec)
 		try_again = true;
 		continue;
 	    } else { 		// not a directory
-		log_msg("%s is not a directory\n", actual_filespec.c_str());
+		log_debug("%s is not a directory\n", actual_filespec.c_str());
 		string::size_type pos;
 		pos = filespec.rfind(".");
 		if (pos != string::npos) {
 		    string suffix = filespec.substr(pos, filespec.size());
 		    if (suffix == "html") {
 			_filetype = HTML;
-			log_msg("HTML content found");
+			log_debug("HTML content found");
 		    }
 		    if (suffix == "swf") {
 			_filetype = SWF;
-			log_msg("SWF content found");
+			log_debug("SWF content found");
 		    }
 		    if (suffix == "flv") {
 			_filetype = VIDEO;
-			log_msg("FLV content found");
+			log_debug("FLV content found");
 		    }
 		    if (suffix == "mp3") {
 			_filetype = AUDIO;
-			log_msg("MP3 content found");
+			log_debug("MP3 content found");
 		    }
 		}
 	    }
@@ -810,34 +810,34 @@ HTTP::dump() {
     boost::mutex::scoped_lock lock(stl_mutex);
     vector<string>::iterator it;
     
-    log_msg (_("==== The HTTP header breaks down as follows: ===="));
-    log_msg (_("Filespec: %s"), _filespec.c_str());
-    log_msg (_("URL: %s"), _url.c_str());
-    log_msg (_("Version: %s"), _version.c_str());
+    log_debug (_("==== The HTTP header breaks down as follows: ===="));
+    log_debug (_("Filespec: %s"), _filespec.c_str());
+    log_debug (_("URL: %s"), _url.c_str());
+    log_debug (_("Version: %s"), _version.c_str());
     for (it = _accept.begin(); it != _accept.end(); it++) {
-        log_msg("Accept param: \"%s\"", (*(it)).c_str());
+        log_debug("Accept param: \"%s\"", (*(it)).c_str());
     }
-    log_msg (_("Method: %s"), _method.c_str());
-    log_msg (_("Referer: %s"), _referer.c_str());
-    log_msg (_("Connections:"));
+    log_debug (_("Method: %s"), _method.c_str());
+    log_debug (_("Referer: %s"), _referer.c_str());
+    log_debug (_("Connections:"));
     for (it = _connections.begin(); it != _connections.end(); it++) {
-        log_msg("Connection param is: \"%s\"", (*(it)).c_str());
+        log_debug("Connection param is: \"%s\"", (*(it)).c_str());
     }
-    log_msg (_("Host: %s"), _host.c_str());
-    log_msg (_("User Agent: %s"), _agent.c_str());
+    log_debug (_("Host: %s"), _host.c_str());
+    log_debug (_("User Agent: %s"), _agent.c_str());
     for (it = _language.begin(); it != _language.end(); it++) {
-        log_msg("Language param: \"%s\"", (*(it)).c_str());
+        log_debug("Language param: \"%s\"", (*(it)).c_str());
     }
     for (it = _charset.begin(); it != _charset.end(); it++) {
-        log_msg("Charset param: \"%s\"", (*(it)).c_str());
+        log_debug("Charset param: \"%s\"", (*(it)).c_str());
     }
     for (it = _encoding.begin(); it != _encoding.end(); it++) {
-        log_msg("Encodings param: \"%s\"", (*(it)).c_str());
+        log_debug("Encodings param: \"%s\"", (*(it)).c_str());
     }
     for (it = _te.begin(); it != _te.end(); it++) {
-        log_msg("TE param: \"%s\"", (*(it)).c_str());
+        log_debug("TE param: \"%s\"", (*(it)).c_str());
     }
-    log_msg (_("==== ==== ===="));
+    log_debug (_("==== ==== ===="));
 }
 
 } // end of cygnal namespace

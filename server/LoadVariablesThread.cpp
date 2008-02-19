@@ -32,7 +32,7 @@ namespace gnash {
 void
 LoadVariablesThread::completeLoad()
 {
-	//log_msg("completeLoad called");
+	//log_debug("completeLoad called");
 
 	using std::string;
 
@@ -50,23 +50,23 @@ LoadVariablesThread::completeLoad()
 	unsigned int parsedLines = 0;
 	while ( size_t read = _stream->read_bytes(buf, CHUNK_SIZE) )
 	{
-		//log_msg("Read %u bytes", read);
+		//log_debug("Read %u bytes", read);
 
 		// TODO: use read_string ?
 		string chunk(buf, read);
 		toparse += chunk;
 
-		//log_msg("toparse: %s", toparse.c_str());
+		//log_debug("toparse: %s", toparse.c_str());
 
 		// parse remainder
 		size_t lastamp = toparse.rfind('&');
 		if ( lastamp != string::npos )
 		{
 			string parseable = toparse.substr(0, lastamp);
-			//log_msg("parseable: %s", parseable.c_str());
+			//log_debug("parseable: %s", parseable.c_str());
 			parse(parseable);
 			toparse = toparse.substr(lastamp+1);
-			//log_msg("toparse nextline: %s", toparse.c_str());
+			//log_debug("toparse nextline: %s", toparse.c_str());
 			++parsedLines;
 		}
 

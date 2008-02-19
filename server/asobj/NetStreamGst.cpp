@@ -231,7 +231,7 @@ NetStreamGst::play(const std::string& url)
 {
   std::string valid_url = _netCon->validateURL(url);
 #if 0
-  log_msg("%s: connecting to %s\n", __FUNCTION__, valid_url);
+  log_debug("%s: connecting to %s\n", __FUNCTION__, valid_url);
 #endif
   if (valid_url.empty()) {
     log_error(_("%s: The provided URL could not be resolved (url: %s)"), 
@@ -306,7 +306,7 @@ NetStreamGst::seek(boost::uint32_t pos)
   if (success) {
     setStatus(seekNotify);
   } else {
-    log_msg(_("Seek failed. This is expected, but we tried it anyway."));
+    log_debug(_("Seek failed. This is expected, but we tried it anyway."));
     setStatus(invalidTime);
   }
 }
@@ -532,7 +532,7 @@ NetStreamGst::handleMessage (GstMessage *message)
       break;
     }
     case GST_MESSAGE_EOS:
-      log_msg(_("NetStream has reached the end of the stream."));
+      log_debug(_("NetStream has reached the end of the stream."));
       setStatus(playStop);
       break;
     case GST_MESSAGE_TAG:
@@ -655,7 +655,7 @@ NetStreamGst::decodebin_newpad_cb(GstElement* /*decodebin*/, GstPad* pad,
     return;
   }
   
-  log_msg("%s: linking %s stream.",  __FUNCTION__, structure_name);
+  log_debug("%s: linking %s stream.",  __FUNCTION__, structure_name);
   
   gst_caps_unref (caps);
   

@@ -128,7 +128,7 @@ SdlAggGlue::prepDrawingArea(int width, int height, boost::uint32_t sdl_flags)
 
     _offscreenbuf = new unsigned char[bufsize];
 
-    log_msg (_("SDL-AGG: %i byte offscreen buffer allocated"), bufsize);
+    log_debug (_("SDL-AGG: %i byte offscreen buffer allocated"), bufsize);
 
 
     // Only the AGG renderer has the function init_buffer, which is *not* part of

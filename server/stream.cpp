@@ -178,7 +178,7 @@ int	stream::read_sint(unsigned short bitcount)
 		value |= -1 << bitcount;
 	}
 
-//		IF_DEBUG(log_msg("stream::read_sint(%d) == %d\n", bitcount, value));
+//		IF_DEBUG(log_debug("stream::read_sint(%d) == %d\n", bitcount, value));
 
 	return value;
 }

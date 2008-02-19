@@ -112,7 +112,7 @@ Shm::attach(key_t key, bool nuke)
     }
     _addr = (char *)shmat(_shmfd, 0, 0);
     if (_addr <= 0) {
-	log_msg("WARNING: shmat() failed: %s\n", strerror(errno));
+	log_debug("WARNING: shmat() failed: %s\n", strerror(errno));
 	return false;
     }
 
@@ -154,7 +154,7 @@ Shm::attach(char const *filespec, bool nuke)
 		  absfilespec.size() - MAX_SHM_NAME_SIZE);
     }    
     
-    //     log_msg("%s: Initializing %d bytes of memory for \"%s\"\n",
+    //     log_debug("%s: Initializing %d bytes of memory for \"%s\"\n",
     //             __PRETTY_FUNCTION__, DEFAULT_SHM_SIZE, absfilespec.c_str());
 
     // Adjust the allocated amount of memory to be on a page boundary.
@@ -164,7 +164,7 @@ Shm::attach(char const *filespec, bool nuke)
     long pageSize = sysconf(_SC_PAGESIZE);
     if (_size % pageSize) {
 	_size += pageSize - _size % pageSize;
-//	log_msg("Adjusting segment size to %d to be page aligned.\n", _size);
+//	log_debug("Adjusting segment size to %d to be page aligned.\n", _size);
     }
 #endif
 
@@ -213,7 +213,7 @@ Shm::attach(char const *filespec, bool nuke)
 	{
     // If it already exists, then just attach to it.
 	exists = true;
-	log_msg("Shared Memory segment \"%s\" already exists\n",
+	log_debug("Shared Memory segment \"%s\" already exists\n",
 		filespec);
 #ifdef USE_POSIX_SHM
 //	shm_unlink(filespec);
@@ -247,14 +247,14 @@ Shm::attach(char const *filespec, bool nuke)
 #endif
 	{
 	exists = true;
-	log_msg(
+	log_error(
 #ifdef USE_POSIX_SHM
-	    "WARNING: shm_open() failed, retrying: %s\n",
+	    "shm_open() failed, retrying: %s\n",
 #else
 # ifdef USE_SYSV_SHM
-	    "WARNING: shmget() failed, retrying: %s\n",
+	    "shmget() failed, retrying: %s\n",
 # else
-	    "WARNING: CreateFileMapping() failed, retrying: %s\n",
+	    "CreateFileMapping() failed, retrying: %s\n",
 # endif
 #endif
 	    strerror(errno));
@@ -283,21 +283,21 @@ Shm::attach(char const *filespec, bool nuke)
 					 MAP_SHARED|MAP_INHERIT|MAP_HASSEMAPHORE,
 				 _shmfd, 0));
 	if (_addr == MAP_FAILED) {
-	    log_msg("WARNING: mmap() failed: %s\n", strerror(errno));
+	    log_error("mmap() failed: %s\n", strerror(errno));
 	    return false;
 	}
 #else  // else of HAVE_SHM_OPEN
 # ifdef HAVE_SHMAT
 	_addr = (char *)shmat(_shmfd, 0, 0);
 	if (_addr <= 0) {
-	    log_msg("WARNING: shmat() failed: %s\n", strerror(errno));
+	    log_error("shmat() failed: %s\n", strerror(errno));
 	    return false;
 	}
 # else
 #  ifdef __riscos__
         _addr = (char *)malloc(_size);
         if (_addr == 0) {
-            log_msg("WARNING: malloc() failed\n");
+            log_error("malloc() failed\n");
             return false;
         }
 #  else
@@ -306,7 +306,7 @@ Shm::attach(char const *filespec, bool nuke)
 # endif
 #endif
 #endif
-//	log_msg("The address to the shared memory segment is: %p", _addr);
+//	log_debug("The address to the shared memory segment is: %p", _addr);
         if (exists && !nuke) {
 	    // If there is an existing memory segment that we don't
 	    // want to trash, we just want to attach to it. We know
@@ -322,14 +322,14 @@ Shm::attach(char const *filespec, bool nuke)
 	    // allocator for STL containers will work.
 	    addr = *(reinterpret_cast<long *>(_addr));
 	    if (addr == 0) {
-		log_msg("WARNING: No address found in memory segment!\n");
+		log_error("No address found in memory segment!\n");
 		nuke = true;
 	    } else {
 #ifdef FLAT_ADDR_SPACE
-	    log_msg("Adjusting address to 0x%lx\n", addr);
+	    log_debug("Adjusting address to 0x%lx\n", addr);
 #ifdef USE_POSIX_SHM
 	    munmap(_addr, _size);
-	    log_msg("Unmapped address %p\n", _addr);
+	    log_debug("Unmapped address %p\n", _addr);
 #ifdef darwin
 	    _addr = static_cast<char *>(mmap(reinterpret_cast<char *>(addr),
 					     _size, PROT_READ,
@@ -342,7 +342,7 @@ Shm::attach(char const *filespec, bool nuke)
 					     MAP_FIXED|MAP_SHARED, _shmfd, 0));
 #endif
 	    if (_addr == MAP_FAILED) {
-		log_msg("WARNING: MMAP failed: %s\n", strerror(errno));
+		log_error("MMAP failed: %s\n", strerror(errno));
 		return static_cast<Shm *>(0);
 	    }
         }
@@ -364,13 +364,13 @@ Shm::attach(char const *filespec, bool nuke)
 #else // else of FLAT_ADDR_SPACE
 #endif // end of FLAT_ADDR_SPACE
     
-	log_msg("Opened Shared Memory segment \"%s\": " SIZET_FMT " bytes at %p.\n",
+	log_debug("Opened Shared Memory segment \"%s\": " SIZET_FMT " bytes at %p.\n",
 		filespec, _size, _addr);
 	}
 
 #ifdef USE_POSIX_SHM
 	if (nuke) {
-	    log_msg("Zeroing %d bytes at %p.\n", _size, _addr);
+	    log_debug("Zeroing %d bytes at %p.\n", _size, _addr);
 	    // Nuke all the segment, so we don't have any problems
 	    // with leftover data.
  	    memset(_addr, 0, _size);
@@ -382,7 +382,7 @@ Shm::attach(char const *filespec, bool nuke)
 	    sc = reinterpret_cast<Shm *>(_addr);
 #endif
     } else {
-	log_msg("ERROR: Couldn't open the Shared Memory segment \"%s\"! %s\n",
+	log_error("Couldn't open the Shared Memory segment \"%s\"! %s\n",
 		filespec, strerror(errno));
 	return false;
     }
@@ -405,7 +405,7 @@ Shm::cloneSelf(void)
 //    GNASH_REPORT_FUNCTION;
 
     if (_addr > 0) {
-//         log_msg("Cloning ShmControl, %d bytes to %p\n",
+//         log_debug("Cloning ShmControl, %d bytes to %p\n",
 //                 sizeof(Shm), _addr);
         // set the allocated bytes before we copy so the value is
         // correct in both instantiations of this object.
@@ -414,7 +414,7 @@ Shm::cloneSelf(void)
         return reinterpret_cast<Shm *>(_addr);
     }
     
-    log_msg("WARNING: Can't clone Self, address 0x0\n");
+    log_error("Can't clone Self, address 0x0\n");
 
     return static_cast<Shm *>(0);
 }
@@ -465,7 +465,7 @@ Shm::brk(int bytes)
         
         void *addr = (static_cast<char *>(_addr)) + _alloced;
         
-        log_msg("%s: Allocating %d bytes at %p\n",
+        log_debug("%s: Allocating %d bytes at %p\n",
                 __PRETTY_FUNCTION__, bytes, addr);
         // Zero out the block before returning it
         memset(addr, 0, bytes);
@@ -480,7 +480,7 @@ Shm::brk(int bytes)
     
     void *addr = (static_cast<char *>(_addr)) + _alloced;
     
-    log_msg("%s: Allocating %d bytes at %p\n",
+    log_debug("%s: Allocating %d bytes at %p\n",
             __PRETTY_FUNCTION__, bytes, addr);
 
     // Zero out the block before returning it

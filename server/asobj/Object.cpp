@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Object.cpp,v 1.40 2008/01/21 20:55:57 rsavoye Exp $ */
+/* $Id: Object.cpp,v 1.41 2008/02/19 19:20:55 bwy Exp $ */
 
 #include "tu_config.h"
 #include "Object.h"
@@ -240,7 +240,7 @@ object_addproperty(const fn_call& fn)
 	
 	bool result = obj->add_property(propname, *getter, *setter);
 
-	//log_msg("Object.addProperty(): testing");
+	//log_debug("Object.addProperty(): testing");
 	return as_value(result);
 }
 

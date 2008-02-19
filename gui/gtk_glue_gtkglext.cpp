@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk_glue_gtkglext.cpp,v 1.15 2008/01/21 20:55:40 rsavoye Exp $ */
+/* $Id: gtk_glue_gtkglext.cpp,v 1.16 2008/02/19 19:20:49 bwy Exp $ */
 
 #include "gtk_glue_gtkglext.h"
 #include "log.h"
@@ -65,7 +65,7 @@ GtkGlExtGlue::init(int argc, char** argv[])
 
     gint major, minor;
     gdk_gl_query_version (&major, &minor);
-    log_msg (_("OpenGL extension version - %d.%d"),
+    log_debug (_("OpenGL extension version - %d.%d"),
               (int)major, (int)minor);
 
     GdkGLConfigMode glcmode = (GdkGLConfigMode)(GDK_GL_MODE_RGB |
@@ -84,10 +84,10 @@ GtkGlExtGlue::init(int argc, char** argv[])
         log_error (_("No appropriate OpenGL-capable visual found."));
         gtk_main_quit(); // XXX
       } else {
-        log_msg (_("Got single-buffered visual."));
+        log_debug (_("Got single-buffered visual."));
       }
     } else {
-      log_msg (_("Got double-buffered visual."));
+      log_debug (_("Got double-buffered visual."));
     }
     
     return true;

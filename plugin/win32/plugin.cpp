@@ -259,7 +259,7 @@ void nsPluginInstance::main_loop()
 		log_error (_("can't get info about %s"), getFilename());
     return;
 	}
-	log_msg(_("Movie %s: width is %d, height is %d, version is %d\n"), getFilename(),
+	log_debug(_("Movie %s: width is %d, height is %d, version is %d\n"), getFilename(),
 	movie_width, movie_height, movie_version);
 
 	// new thread must have own movie instance
@@ -344,7 +344,7 @@ void nsPluginInstance::main_loop()
 		// nsPluginInstance::shut() has been called for this instance.
 		if (getShutdown())
 		{
-			log_msg (_("player: Shutting down as requested..."));
+			log_debug (_("player: Shutting down as requested..."));
 		        break;
 		}
 	

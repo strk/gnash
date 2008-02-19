@@ -145,7 +145,7 @@ Player::init_logfile()
     //
     if (!delay && rcfile.getTimerDelay() > 0) {
         delay = rcfile.getTimerDelay();
-        log_msg (_("Timer delay set to %d milliseconds"), delay);
+        log_debug (_("Timer delay set to %d milliseconds"), delay);
     }    
 
 }
@@ -392,7 +392,7 @@ void
 Player::fs_callback(gnash::sprite_instance* movie, const char* command, const char* args)
 // For handling notification callbacks from ActionScript.
 {
-    log_msg(_("fs_callback(%p): %s %s"), (void*)movie, command, args);
+    log_debug(_("fs_callback(%p): %s %s"), (void*)movie, command, args);
 }
 
 /* private */

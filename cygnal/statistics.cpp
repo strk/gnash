@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: statistics.cpp,v 1.5 2008/01/21 20:56:06 rsavoye Exp $ */
+/* $Id: statistics.cpp,v 1.6 2008/02/19 19:20:48 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -113,13 +113,13 @@ Statistics::dump() {
     for (it = _netstats.begin(); it != _netstats.end(); it++) {
         NetStats *stats = (*it);
         if (stats->getFileType() <= VIDEO) {
-            log_msg (_("Stream type is: %s"), filetype_names[stats->getFileType()]);
+            log_debug (_("Stream type is: %s"), filetype_names[stats->getFileType()]);
         }
         if (((stats->getFileType() == VIDEO) || (stats->getFileType() == AUDIO)) &&
             stats->getCodec() <= VP7) {
-            log_msg (_("Stream codec is: %s"), codec_names[stats->getCodec()]);
+            log_debug (_("Stream codec is: %s"), codec_names[stats->getCodec()]);
         }
-        log_msg (_("%d bytes were transfered in %s seconds"),
+        log_debug (_("%d bytes were transfered in %s seconds"),
 		 stats->getBytes(),
                  to_simple_string(stats->getTimeSpan()).c_str());
     }

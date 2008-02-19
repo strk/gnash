@@ -19,7 +19,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.cpp,v 1.24 2008/01/28 15:16:51 strk Exp $ 
+// $Id: matrix.cpp,v 1.25 2008/02/19 19:20:53 bwy Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -244,7 +244,7 @@ matrix::read(stream& in)
 		m_[1][2] = (float) in.read_sint(translate_nbits);
 	}
 
-	//IF_VERBOSE_PARSE(log_msg("  mat: has_scale = %d, has_rotate = %d\n", has_scale, has_rotate));
+	//IF_VERBOSE_PARSE(log_parse("  mat: has_scale = %d, has_rotate = %d\n", has_scale, has_rotate));
 }
 
 

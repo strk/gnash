@@ -733,7 +733,7 @@ as_array_object::slice(unsigned int start, unsigned int one_past_end)
 	std::auto_ptr<as_array_object> newarray(new as_array_object);
 
 #ifdef GNASH_DEBUG
-	log_msg(_("Array.slice(%u, %u) called"), start, one_past_end);
+	log_debug(_("Array.slice(%u, %u) called"), start, one_past_end);
 #endif
 
 	size_t newsize = one_past_end - start;
@@ -762,8 +762,8 @@ as_array_object::splice(unsigned start, unsigned len,
 	std::ostream_iterator<as_value> ostrIter(ss, "," ) ;
 	std::copy(replace.begin(), replace.end(), ostrIter);
         ss << ") called";
-	log_msg("%s", ss.str().c_str());
-	log_msg(_("Current array is %s"), toString().c_str());
+	log_debug("%s", ss.str().c_str());
+	log_debug(_("Current array is %s"), toString().c_str());
 #endif
 
 	container::iterator itStart = elements.begin()+start;
@@ -887,7 +887,7 @@ array_splice(const fn_call& fn)
 #ifdef GNASH_DEBUG
 	std::stringstream ss;
 	fn.dump_args(ss);
-	log_msg(_("Array(%s).splice(%s) called"), array->toString().c_str(), ss.str().c_str());
+	log_debug(_("Array(%s).splice(%s) called"), array->toString().c_str(), ss.str().c_str());
 #endif
 
 	if (fn.nargs < 1)
@@ -909,7 +909,7 @@ array_splice(const fn_call& fn)
 	startoffset = iclamp(start, 0, origlen);
 #ifdef GNASH_DEBUG
 	if ( startoffset != start )
-		log_msg(_("Array.splice: start:%d became %u"), start, startoffset);
+		log_debug(_("Array.splice: start:%d became %u"), start, startoffset);
 #endif
 
 	//----------------

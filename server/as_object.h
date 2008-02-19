@@ -125,7 +125,7 @@ public:
 	}
 
 
-	/// Dump all properties using log_msg
+	/// Dump all properties using log_debug
 	//
 	/// Note that this method is non-const
 	/// as some properties might be getter/setter

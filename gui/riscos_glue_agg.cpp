@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: riscos_glue_agg.cpp,v 1.7 2008/01/21 20:55:41 rsavoye Exp $ */
+/* $Id: riscos_glue_agg.cpp,v 1.8 2008/02/19 19:20:49 bwy Exp $ */
 
 #include <cstdio>
 #include <cerrno>
@@ -91,12 +91,12 @@ RiscosAggGlue::setRenderHandlerSize(int width, int height)
     _offscreenbuf = static_cast<unsigned char *>( realloc(_offscreenbuf, new_bufsize) );
 
     if (!_offscreenbuf) {
-      log_msg("Could not allocate %i bytes for offscreen buffer: %s\n",
+      log_debug("Could not allocate %i bytes for offscreen buffer: %s\n",
                new_bufsize, strerror(errno) );
       return;
     }
 
-    log_msg("RISC OS-AGG: %i bytes offscreen buffer allocated\n", new_bufsize);
+    log_debug("RISC OS-AGG: %i bytes offscreen buffer allocated\n", new_bufsize);
 
     _offscreenbuf_size = new_bufsize;
     memset(_offscreenbuf, 0, new_bufsize);

@@ -241,7 +241,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
               exit(EXIT_SUCCESS);
 	  case 'v':
               dbglogfile.setVerbosity();
-	      log_msg (_("Verbose output turned on"));
+	      log_debug (_("Verbose output turned on"));
 	      break;
 	  case 'V':
               version_and_copyright();
@@ -249,7 +249,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
 	      exit(EXIT_SUCCESS);	      
 	  case 'w':
               rcfile.useWriteLog(true); // dbglogfile.setWriteDisk(true);
-	      log_msg (_("Logging to disk enabled"));
+	      log_debug (_("Logging to disk enabled"));
 	      break;
 	  case 'a':
 #if VERBOSE_ACTION
@@ -273,11 +273,11 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
               break;
           case 'u':
               url = optarg;
-              log_msg (_("Setting root URL to %s"), url);
+              log_debug (_("Setting root URL to %s"), url);
               break;
           case 'U':	// Set base URL
 	      player.setBaseUrl(optarg);
-	      log_msg (_("Setting base URL to %s"), optarg);
+	      log_debug (_("Setting base URL to %s"), optarg);
 	      break;
 	  case 'F':
           {
@@ -293,11 +293,11 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
           case 'j':
               width_given = true;
               player.setWidth ( strtol(optarg, NULL, 0) );
-              log_msg (_("Setting width to " SIZET_FMT), player.getWidth());
+              log_debug (_("Setting width to " SIZET_FMT), player.getWidth());
               break;
           case 'g':
 #ifdef USE_DEBUGGER
-              log_msg (_("Setting debugger ON"));
+              log_debug (_("Setting debugger ON"));
               debugger.enabled(true);
 //              debugger.startServer(&debugger);
               debugger.console();
@@ -309,7 +309,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
           case 'k':
               height_given = true;
               player.setHeight ( strtol(optarg, NULL, 0) );
-              log_msg (_("Setting height to " SIZET_FMT), player.getHeight());
+              log_debug (_("Setting height to " SIZET_FMT), player.getHeight());
               break;
           case 'x':
               called_by_plugin = true;
@@ -382,7 +382,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
     }
 
     if ( ! specified_rendering_flag ) {
-	log_msg (_("No rendering flags specified, using rcfile"));
+	log_debug (_("No rendering flags specified, using rcfile"));
         if ( called_by_plugin ) {
             player.setDoSound( rcfile.usePluginSound() );
         } else {

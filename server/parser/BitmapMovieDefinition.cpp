@@ -64,7 +64,7 @@ BitmapMovieDefinition::getShapeDef()
 	float w = _framesize.width(); // /20;
 	float h = _framesize.height(); // /20;
 
-	log_msg(_("Creating a shape_definition wrapping a %g x %g bitmap"), w, h);
+	log_parse(_("Creating a shape_definition wrapping a %g x %g bitmap"), w, h);
 
 	path bmPath(w, h, fillLeft, 0, 0);
 	bmPath.drawLineTo(w, 0);

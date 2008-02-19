@@ -253,7 +253,7 @@ dump_shm(bool convert, bool out)
 	    boost::uint8_t *hexint;
 	    hexint = new boost::uint8_t[(size + 3) *3];
 	    hexify((boost::uint8_t *)hexint, (uint8_t *)shmaddr, size, false);
-	    log_msg(_("The data is: 0x%s"), hexint);
+	    log_debug(_("The data is: 0x%s"), hexint);
 #endif
 	}
 	

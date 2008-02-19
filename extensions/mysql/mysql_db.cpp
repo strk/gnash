@@ -266,14 +266,14 @@ MySQL::getData(const char *sql, query_t &qresult)
 #if 0
     for (size_t i=0; i<mysql_num_fields(_result); i++) {
 	MYSQL_FIELD *fields = mysql_fetch_fields(_result);
-	log_msg(_("Field name is: %s: "), fields->name);
+	log_debug(_("Field name is: %s: "), fields->name);
     }
 #endif
     
     while((_row = mysql_fetch_row(_result))) {
 	vector<const char *> row_vec;
 	for (size_t i=0; i<mysql_num_fields(_result); i++) {
-//	    log_msg("Column[%d] is: \"%s\"", i, row[i]);
+//	    log_debug("Column[%d] is: \"%s\"", i, row[i]);
 	    row_vec.push_back(_row[i]);
         }
 	qresult.push_back(row_vec);

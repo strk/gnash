@@ -93,7 +93,7 @@ DejaGnu::pass (const char *msg)
 //    GNASH_REPORT_FUNCTION;
 
     passed++;
-    log_msg("PASSED: %s\n", msg);
+    log_debug("PASSED: %s\n", msg);
     return NULL;
 }
 
@@ -103,7 +103,7 @@ DejaGnu::fail (const char *msg)
 //    GNASH_REPORT_FUNCTION;
 
     failed++;
-    log_msg("FAILED: %s\n", msg);
+    log_debug("FAILED: %s\n", msg);
     return NULL;
 }
 

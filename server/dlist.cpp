@@ -183,9 +183,9 @@ DisplayList::place_character(
   int clip_depth)
 {
 //  GNASH_REPORT_FUNCTION;
-  //log_msg(_("dl::add(%d, '%s')"), depth, ch->get_name());
+  //log_debug(_("dl::add(%d, '%s')"), depth, ch->get_name());
 
-  //log_msg(_("Before adding, list is:"));
+  //log_debug(_("Before adding, list is:"));
   //dump();
 
   assert(!ch->isUnloaded());
@@ -202,14 +202,14 @@ DisplayList::place_character(
 
   if ( it == _charsByDepth.end() || (*it)->get_depth() != depth )
   {
-    //log_msg(_("place_character: new character at depth %d"), depth);
+    //log_debug(_("place_character: new character at depth %d"), depth);
     
     // add the new char
     _charsByDepth.insert(it, DisplayItem(ch));
   }
   else
   {
-    //log_msg(_("place_character: replacing existing character at depth %d"), depth);
+    //log_debug(_("place_character: replacing existing character at depth %d"), depth);
     
     // remember bounds of old char
     InvalidatedRanges old_ranges; 
@@ -316,7 +316,7 @@ DisplayList::replace_character(
 
     // Error, no existing object found at depth.
 //    IF_VERBOSE_DEBUG(
-//      log_msg(_("dl::replace_display_object()"
+//      log_debug(_("dl::replace_display_object()"
 //        " no obj at depth %d"), depth)
 //    );
 
@@ -391,7 +391,7 @@ DisplayList::move_display_object(
   testInvariant();
 
   //GNASH_REPORT_FUNCTION;
-  //IF_VERBOSE_DEBUG(log_msg(_("dl::move(%d)"), depth));
+  //IF_VERBOSE_DEBUG(log_debug(_("dl::move(%d)"), depth));
 
   character* ch = get_character_at_depth(depth);
   if ( ! ch )
@@ -444,7 +444,7 @@ DisplayList::remove_display_object(int depth)
 
   testInvariant();
 
-  //log_msg(_("Before removing, list is:"));
+  //log_debug(_("Before removing, list is:"));
   //dump();
 
 #ifndef NDEBUG
@@ -486,7 +486,7 @@ DisplayList::remove_display_object(int depth)
 
   testInvariant();
 
-  //log_msg(_("Done removing, list is:"));
+  //log_debug(_("Done removing, list is:"));
   //dump();
 }
 
@@ -743,7 +743,7 @@ DisplayList::dump() const
     it != endIt; ++it)
   {
     const DisplayItem& dobj = *it;
-    log_msg(_("Item %d at depth %d (char id %d, name %s, type %s)"),
+    log_debug(_("Item %d at depth %d (char id %d, name %s, type %s)"),
       num, dobj->get_depth(), dobj->get_id(),
       dobj->get_name().c_str(), typeName(*dobj).c_str());
     num++;

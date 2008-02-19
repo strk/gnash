@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: sdl.cpp,v 1.62 2008/01/21 20:55:41 rsavoye Exp $ */
+/* $Id: sdl.cpp,v 1.63 2008/02/19 19:20:49 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -325,7 +325,7 @@ void SDLGui::key_event(SDL_KeyboardEvent* key, bool down)
 void
 SDLGui::resize_event()
 {
-    log_msg("got resize_event ");
+    log_debug("got resize_event ");
 }
 
 void

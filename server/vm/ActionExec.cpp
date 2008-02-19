@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.66 2008/01/29 22:14:12 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.67 2008/02/19 19:20:57 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -339,7 +339,7 @@ ActionExec::operator() ()
 	// Do we still need this ?
 	if ( action_id == SWF::ACTION_END ) {
 		// this would turn into an assertion (next_pc==stop_pc)
-		//		log_msg(_("At ACTION_END next_pc=" SIZET_FMT
+		//		log_debug(_("At ACTION_END next_pc=" SIZET_FMT
 		//		  ", stop_pc=" SIZET_FMT), next_pc, stop_pc);
 		break;
 	}

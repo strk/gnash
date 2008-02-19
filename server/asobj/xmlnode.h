@@ -144,7 +144,7 @@ public:
     AttribList& attributes() { return _attributes; }
     
     XMLNode& operator = (XMLNode &node) {
-        gnash::log_msg("%s: \n", __PRETTY_FUNCTION__);
+        gnash::log_debug("%s: \n", __PRETTY_FUNCTION__);
         if (this == &node) return *this;
         _name = node._name;
         _value = node._value;

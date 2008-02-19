@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: gtk_glue_agg.cpp,v 1.31 2008/01/21 20:55:40 rsavoye Exp $ */
+/* $Id: gtk_glue_agg.cpp,v 1.32 2008/02/19 19:20:49 bwy Exp $ */
 
 
 /// \page gtk_shm_support GTK shared memory extension support
@@ -106,7 +106,7 @@ GtkAggGlue::init(int /*argc*/, char **/*argv*/[])
       return false;
     }
     
-    log_msg("Your X server expects %s pixmap data for standard mode.", _pixelformat);
+    log_debug("Your X server expects %s pixmap data for standard mode.", _pixelformat);
     
     return true;
 }
@@ -118,23 +118,23 @@ GtkAggGlue::check_mit_shm(Display *display)
   int major, minor, dummy;
   Bool pixmaps;
   
-  log_msg("Checking support for MIT-SHM...");
+  log_debug("Checking support for MIT-SHM...");
   
   if (!XQueryExtension(display, "MIT-SHM", &dummy, &dummy, &dummy)) 
   {
-    log_msg("WARNING: No MIT-SHM extension available, using standard XLib "
+    log_debug("WARNING: No MIT-SHM extension available, using standard XLib "
       "calls (slower)");
     return false;
   }
   
   if (XShmQueryVersion(display, &major, &minor, &pixmaps )!=True)
 	{
-    log_msg("WARNING: MIT-SHM not ready (network link?), using standard XLib "
+    log_debug("WARNING: MIT-SHM not ready (network link?), using standard XLib "
       "calls (slower)");
     return false;
 	}
 	
-	log_msg("NOTICE: MIT-SHM available (version %d.%d)!", major, minor);
+	log_debug("NOTICE: MIT-SHM available (version %d.%d)!", major, minor);
 	
 	return true;
 	
@@ -165,7 +165,7 @@ GtkAggGlue::create_shm_image(unsigned int width, unsigned int height)
     ZPixmap, NULL, _shm_info, width, height);
     
   if (!_shm_image) {
-    log_msg("Failed creating the shared memory XImage!");
+    log_debug("Failed creating the shared memory XImage!");
     destroy_shm_image();
     return;
   }
@@ -175,7 +175,7 @@ GtkAggGlue::create_shm_image(unsigned int width, unsigned int height)
     _shm_image->bytes_per_line * _shm_image->height, IPC_CREAT|0777);
     
   if (_shm_info->shmid == -1) {
-    log_msg("Failed requesting shared memory segment (%s). Perhaps the "
+    log_debug("Failed requesting shared memory segment (%s). Perhaps the "
       "required memory size is bigger than the limit set by the kernel.",
       strerror(errno));
     destroy_shm_image();
@@ -186,7 +186,7 @@ GtkAggGlue::create_shm_image(unsigned int width, unsigned int height)
   _shm_info->shmaddr = _shm_image->data = (char*) shmat(_shm_info->shmid, 0, 0);
   
   if (_shm_info->shmaddr == (char*) -1) {
-    log_msg("Failed attaching to shared memory segment: %s", strerror(errno));
+    log_debug("Failed attaching to shared memory segment: %s", strerror(errno));
     destroy_shm_image();
     return;
   }
@@ -198,7 +198,7 @@ GtkAggGlue::create_shm_image(unsigned int width, unsigned int height)
   
   // Finally, tell the server to attach to our shared memory segment  
   if (!XShmAttach(gdk_display, _shm_info)) {
-    log_msg("Server failed attaching to the shared memory segment");
+    log_debug("Server failed attaching to the shared memory segment");
     destroy_shm_image();
     return;
   }
@@ -206,7 +206,7 @@ GtkAggGlue::create_shm_image(unsigned int width, unsigned int height)
   // Disable double buffering, otherwise gtk tries to update widget
   // contents from offscreen buffer at the end of expose event
   gtk_widget_set_double_buffered(_drawing_area, FALSE);
-  //log_msg("create_shm_image() OK"); // <-- remove this
+  //log_debug("create_shm_image() OK"); // <-- remove this
 #endif // ENABLE_MIT_SHM
    
 }
@@ -297,7 +297,7 @@ GtkAggGlue::create_shm_handler()
   decode_mask(_shm_image->blue_mask,  &blue_shift,  &blue_prec);
   
   
-  log_msg("X server pixel format is (R%d:%d, G%d:%d, B%d:%d, %d bpp)",
+  log_debug("X server pixel format is (R%d:%d, G%d:%d, B%d:%d, %d bpp)",
     red_shift, red_prec,
     green_shift, green_prec,
     blue_shift, blue_prec,
@@ -313,7 +313,7 @@ GtkAggGlue::create_shm_handler()
   destroy_shm_image();
 
   if (!pixelformat) {
-    log_msg("Pixel format of X server not recognized!");
+    log_debug("Pixel format of X server not recognized!");
     
     // disable use of shared memory pixmaps
     _have_shm = false;
@@ -321,12 +321,12 @@ GtkAggGlue::create_shm_handler()
     return NULL; 
   }
 
-  log_msg("X server is using %s pixel format", pixelformat);
+  log_debug("X server is using %s pixel format", pixelformat);
   
   render_handler* res = create_render_handler_agg(pixelformat);
   
   if (!res) {
-    log_msg("Failed creating a renderer instance for this pixel format. "
+    log_debug("Failed creating a renderer instance for this pixel format. "
       "Most probably Gnash has not compiled in (configured) support "
       "for this pixel format - using standard pixmaps instead");
       
@@ -381,7 +381,7 @@ GtkAggGlue::setRenderHandlerSize(int width, int height)
 	
 	  // ==> use shared memory image (faster)
 	  
-	  log_msg("GTK-AGG: Using shared memory image");
+	  log_debug("GTK-AGG: Using shared memory image");
     
     if (_offscreenbuf) {  
       free(_offscreenbuf);
@@ -411,13 +411,13 @@ GtkAggGlue::setRenderHandlerSize(int width, int height)
   		_offscreenbuf	= static_cast<unsigned char *>( realloc(_offscreenbuf, new_bufsize) );
   
   		if (!_offscreenbuf) {
-  		  log_msg("Could not allocate %i bytes for offscreen buffer: %s\n",
+  		  log_debug("Could not allocate %i bytes for offscreen buffer: %s\n",
   				new_bufsize, strerror(errno)
   			);
   			return;
   		}
   
-  		log_msg("GTK-AGG: %i bytes offscreen buffer allocated\n", new_bufsize);
+  		log_debug("GTK-AGG: %i bytes offscreen buffer allocated\n", new_bufsize);
   
   		_offscreenbuf_size = new_bufsize;
   		memset(_offscreenbuf, 0, new_bufsize);

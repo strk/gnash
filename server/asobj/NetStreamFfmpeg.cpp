@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.104 2008/01/21 20:55:57 rsavoye Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.105 2008/02/19 19:20:55 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -450,13 +450,13 @@ NetStreamFfmpeg::startPlayback()
 		m_VCodecCtx = initFlvVideo(m_parser.get());
 		if (!m_VCodecCtx)
 		{
-			log_msg(_("Failed to initialize FLV video codec"));
+			log_error(_("Failed to initialize FLV video codec"));
 		}
 
 		m_ACodecCtx = initFlvAudio(m_parser.get());
 		if (!m_ACodecCtx)
 		{
-			log_msg(_("Failed to initialize FLV audio codec"));
+			log_error(_("Failed to initialize FLV audio codec"));
 		}
 
 		if (!m_ACodecCtx && !m_VCodecCtx)

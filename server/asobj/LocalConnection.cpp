@@ -187,7 +187,7 @@ LocalConnection::domain(int version)
         _name =  "localhost";
     }
     
-    log_msg("The domain for this host is: %s", _name.c_str());
+    log_debug("The domain for this host is: %s", _name.c_str());
 
     return _name;
 }
@@ -224,7 +224,7 @@ as_value
 localconnection_connect(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-//    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
+//    log_debug("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
     bool ret;
     boost::intrusive_ptr<LocalConnection> ptr = ensureType<LocalConnection>(fn.this_ptr);
     string name = fn.arg(0).to_string().c_str();

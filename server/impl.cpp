@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.139 2008/01/22 21:04:54 strk Exp $ */
+/* $Id: impl.cpp,v 1.140 2008/02/19 19:20:53 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -289,7 +289,7 @@ void  get_movie_info(
     // Put extracted info in the given vars.
     // Sets *version to 0 if info can't be extracted.
 {
-    //log_msg(_("%s: url is %s"),  __PRETTY_FUNCTION__, url.str().c_str());
+    //log_debug(_("%s: url is %s"),  __PRETTY_FUNCTION__, url.str().c_str());
 
     tu_file*  in = globals::streamProvider.getStream(url);
     if (in == NULL || in->get_error() != TU_FILE_NO_ERROR) {
@@ -384,7 +384,7 @@ create_jpeg_movie(std::auto_ptr<tu_file> in, const std::string& url)
   } 
 
   BitmapMovieDefinition* mdef = new BitmapMovieDefinition(im, url);
-  //log_msg(_("BitmapMovieDefinition %p created"), mdef);
+  //log_debug(_("BitmapMovieDefinition %p created"), mdef);
   return mdef;
 
 }
@@ -407,7 +407,7 @@ create_png_movie(std::auto_ptr<tu_file> /*in*/, const std::string& /*url*/)
   } 
 
   BitmapMovieDefinition* mdef = new BitmapMovieDefinition(im, url);
-  //log_msg(_("BitmapMovieDefinition %p created"), mdef);
+  //log_debug(_("BitmapMovieDefinition %p created"), mdef);
   return mdef;
 #endif
 
@@ -545,7 +545,7 @@ create_movie(const URL& url, const char* reset_url, bool startLoaderThread)
   std::string url_str = url.str();
   const char* c_url = url_str.c_str();
 
-//  log_msg(_("%s: url is %s"),  __PRETTY_FUNCTION__, c_url);
+//  log_debug(_("%s: url is %s"),  __PRETTY_FUNCTION__, c_url);
 
   std::auto_ptr<tu_file> in ( globals::streamProvider.getStream(url) );
   if ( ! in.get() )
@@ -787,7 +787,7 @@ static void clear_library()
 //
 movie_definition* create_library_movie(const URL& url, const char* real_url, bool startLoaderThread)
 {
-//    log_msg(_("%s: url is %s"), __PRETTY_FUNCTION__, url.str().c_str());
+//    log_debug(_("%s: url is %s"), __PRETTY_FUNCTION__, url.str().c_str());
 
     // Use real_url as label for cache if available 
     std::string cache_label = real_url ? URL(real_url).str() : url.str();
@@ -797,7 +797,7 @@ movie_definition* create_library_movie(const URL& url, const char* real_url, boo
   boost::intrusive_ptr<movie_definition>  m;
   if ( s_movie_library.get(cache_label, &m) )
       {
-        log_msg(_("Movie %s already in library"), cache_label.c_str());
+        log_debug(_("Movie %s already in library"), cache_label.c_str());
     return m.get();
       }
     }
@@ -807,7 +807,7 @@ movie_definition* create_library_movie(const URL& url, const char* real_url, boo
   // calling create_library_movie() again and NOT finding
   // the just-created movie.
   movie_definition* mov = create_movie(url, real_url, false);
-  //log_msg(_("create_movie(%s, %s, false) returned %p"), url.str().c_str(), real_url, mov);
+  //log_debug(_("create_movie(%s, %s, false) returned %p"), url.str().c_str(), real_url, mov);
 
   if (mov == NULL)
   {
@@ -818,7 +818,7 @@ movie_definition* create_library_movie(const URL& url, const char* real_url, boo
 
   // Movie is good, add to the library 
   s_movie_library.add(cache_label, mov);
-      log_msg(_("Movie %s (SWF%d) added to library"), cache_label.c_str(), mov->get_version());
+      log_debug(_("Movie %s (SWF%d) added to library"), cache_label.c_str(), mov->get_version());
 
   // Now complete the load if the movie is an SWF movie
   // 
@@ -834,7 +834,7 @@ movie_definition* create_library_movie(const URL& url, const char* real_url, boo
     }
   }
 
-  //log_msg(_("create_library_movie(%s, %s, startLoaderThread=%d) about to return %p"), url.str().c_str(), real_url, startLoaderThread, mov);
+  //log_debug(_("create_library_movie(%s, %s, startLoaderThread=%d) about to return %p"), url.str().c_str(), real_url, startLoaderThread, mov);
   return mov;
 }
 

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.89 2008/01/31 15:19:06 bwy Exp $ */
+/* $Id: Global.cpp,v 1.90 2008/02/19 19:20:54 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -309,7 +309,7 @@ as_global_assetpropflags(const fn_call& fn)
 {
     int version = VM::get().getSWFVersion();
 
-    //log_msg(_("ASSetPropFlags called with %d args"), fn.nargs);
+    //log_debug(_("ASSetPropFlags called with %d args"), fn.nargs);
 
     // Check the arguments
     // assert(fn.nargs == 3 || fn.nargs == 4);

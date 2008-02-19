@@ -148,7 +148,7 @@ int	gnash::tools::process_swf(tu_file* swf_out, tu_file* in, const process_optio
 	}
 	bool	compressed = (header & 255) == 'C';
 
-	IF_VERBOSE_PARSE(log_msg("version = %d, file_length = %d\n", version, file_length));
+	IF_VERBOSE_PARSE(log_parse("version = %d, file_length = %d\n", version, file_length));
 
 	tu_file*	original_in = NULL;
 	if (compressed)
@@ -157,7 +157,7 @@ int	gnash::tools::process_swf(tu_file* swf_out, tu_file* in, const process_optio
 		log_error("gnash can't read zipped SWF data; TU_CONFIG_LINK_TO_ZLIB is 0!\n");
 		return -1;
 #else
-		IF_VERBOSE_PARSE(log_msg("file is compressed."));
+		IF_VERBOSE_PARSE(log_parse("file is compressed."));
 		original_in = in;
 
 		// Uncompress the input as we read it.
@@ -213,7 +213,7 @@ int	gnash::tools::process_swf(tu_file* swf_out, tu_file* in, const process_optio
 //	m_playlist.resize(m_frame_count);
 
 //	IF_VERBOSE_PARSE(m_frame_size.print());
-	IF_VERBOSE_PARSE(log_msg("frame rate = %f, frames = %d\n", frame_rate, frame_count));
+	IF_VERBOSE_PARSE(log_parse("frame rate = %f, frames = %d\n", frame_rate, frame_count));
 
 	while ((boost::uint32_t) str.get_position() < file_end_pos)
 	{
@@ -262,7 +262,7 @@ int	gnash::tools::process_swf(tu_file* swf_out, tu_file* in, const process_optio
 			{
 				// Safety break, so we don't read past the end of the
 				// movie.
-				log_msg("warning: process_swf() hit stream-end tag, but not at the "
+				log_debug("warning: process_swf() hit stream-end tag, but not at the "
 					"end of the file yet; stopping for safety\n");
 				break;
 			}

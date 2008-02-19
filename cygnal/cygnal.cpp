@@ -65,7 +65,7 @@ extern "C"{
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp>
 
-using gnash::log_msg;
+using gnash::log_debug;
 using namespace std;
 using namespace cygnal;
 using namespace gnash;
@@ -152,7 +152,7 @@ main(int argc, char *argv[])
     
     if (crcfile.getDocumentRoot().size() > 0) {
 	docroot = crcfile.getDocumentRoot().c_str();
-	log_msg (_("Document Root for media files is: %s"),
+	log_debug (_("Document Root for media files is: %s"),
 		   docroot);
     } else {
 	docroot = "/var/www/html/software/gnash/tests/";
@@ -165,7 +165,7 @@ main(int argc, char *argv[])
               exit(0);
 	  case 'v':
               dbglogfile.setVerbosity();
-	      log_msg (_("Verbose output turned on"));
+	      log_debug (_("Verbose output turned on"));
 	      break;
 	  case 'p':
 	      port_offset = strtol(optarg, NULL, 0);
@@ -211,7 +211,7 @@ main(int argc, char *argv[])
     http_port.join();
 //    ssl_port.join();
 
-    log_msg (_("All done I think..."));
+    log_debug (_("All done I think..."));
     
     return(0);
 }
@@ -233,7 +233,7 @@ http_thread(struct thread_params *conndata)
     
     www.createServer(port);
     while (retries++ < thread_retries) {
-	log_msg(_("%s: Thread for port %d looping..."), __PRETTY_FUNCTION__, port);
+	log_debug(_("%s: Thread for port %d looping..."), __PRETTY_FUNCTION__, port);
 	www.newConnection(true);
 
 	conndata->statistics->setFileType(NetStats::RTMPT);
@@ -255,16 +255,16 @@ http_thread(struct thread_params *conndata)
 	
 	// Keep track of the network statistics
 	conndata->statistics->stopClock();
-// 	log_msg (_("Bytes read: %d"), www.getBytesIn());
-// 	log_msg (_("Bytes written: %d"), www.getBytesOut());
+// 	log_debug (_("Bytes read: %d"), www.getBytesIn());
+// 	log_debug (_("Bytes written: %d"), www.getBytesOut());
 //	st.setBytes(www.getBytesIn() + www.getBytesOut());
 	conndata->statistics->addStats();
 //	www.resetBytesIn();
 //	www.resetBytesOut();
 	
 	if (url != docroot) {
-	    log_msg (_("File to load is: %s"), filespec.c_str());
-	    log_msg (_("Parameters are: %s"), parameters.c_str());
+	    log_debug (_("File to load is: %s"), filespec.c_str());
+	    log_debug (_("Parameters are: %s"), parameters.c_str());
 	    memset(conndata->filespec, 0, 256);
 	    memcpy(conndata->filespec, filespec.c_str(), filespec.size());
 	    boost::thread sendthr(boost::bind(&stream_thread, conndata));
@@ -289,11 +289,11 @@ rtmp_thread(struct thread_params *conndata)
     Statistics st;
     st.setFileType(NetStats::RTMP);
 
-    log_msg("Param port is: %d", conndata->port);
+    log_debug("Param port is: %d", conndata->port);
     
     proto.createServer(RTMP);
     while (retries++ < thread_retries) {
-	log_msg(_("%s: Thread for RTMP port looping..."), __PRETTY_FUNCTION__);
+	log_debug(_("%s: Thread for RTMP port looping..."), __PRETTY_FUNCTION__);
 	proto.newConnection(true);
 	st.startClock();
 	proto.handShakeWait();
@@ -302,8 +302,8 @@ rtmp_thread(struct thread_params *conndata)
 	
 	// Keep track of the network statistics
 	st.stopClock();
- 	log_msg (_("Bytes read: %d"), proto.getBytesIn());
- 	log_msg (_("Bytes written: %d"), proto.getBytesOut());
+ 	log_debug (_("Bytes read: %d"), proto.getBytesIn());
+ 	log_debug (_("Bytes written: %d"), proto.getBytesOut());
 	st.setBytes(proto.getBytesIn() + proto.getBytesOut());
 	st.addStats();
 	proto.resetBytesIn();
@@ -329,9 +329,9 @@ ssl_thread(struct thread_params *conndata)
     
     www.createServer(port);
     
-    log_msg("Param port is: %d", conndata->port);
+    log_debug("Param port is: %d", conndata->port);
     while (retries++ < thread_retries) {
-	log_msg (_("%s: Thread for port %d looping..."), __PRETTY_FUNCTION__, port);
+	log_debug (_("%s: Thread for port %d looping..."), __PRETTY_FUNCTION__, port);
 	www.newConnection(true);
 	loadfile.netfd = www.getFileFd();
 	strcpy(loadfile.filespec, "Hello World");
@@ -349,7 +349,7 @@ stream_thread(struct  thread_params *params)
     //struct stat stats;
     //struct thread_params loadfile;
     
-    log_msg ("%s: %s", __PRETTY_FUNCTION__, params->filespec);
+    log_debug ("%s: %s", __PRETTY_FUNCTION__, params->filespec);
     
     Stream str;
     str.open(params->filespec, params->netfd, params->statistics);
@@ -362,7 +362,7 @@ stream_thread(struct  thread_params *params)
 static void
 cntrlc_handler (int /*sig*/)
 {
-    log_msg(_("Got an interrupt"));
+    log_debug(_("Got an interrupt"));
 
     exit(-1);
 }

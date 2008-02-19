@@ -445,7 +445,7 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
 
     	if ( _allowRescale ) // Recompute pixel scale.
 	{
-		//log_msg("Rescaling allowed");
+		//log_debug("Rescaling allowed");
 
 		// should we cache this ? it's immutable after all !
 		// WARNING: don't allow swapping depth of the root movie !!
@@ -458,7 +458,7 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
 	}
 	else // rescale not allowed, notify Stage (if any)
 	{
-		//log_msg("Rescaling disabled");
+		//log_debug("Rescaling disabled");
 		boost::intrusive_ptr<Stage> stage = getStageObject();
 		if ( stage ) stage->onResize();
 	}
@@ -499,9 +499,9 @@ movie_root::getKeyObject()
 		std::string objName = PROPNAME("Key");
 		if (global->get_member(vm.getStringTable().find(objName), &kval) )
 		{
-			//log_msg("Found member 'Key' in _global: %s", kval.to_string());
+			//log_debug("Found member 'Key' in _global: %s", kval.to_string());
 			boost::intrusive_ptr<as_object> obj = kval.to_object();
-			//log_msg("_global.Key to_object() : %s @ %p", typeid(*obj).name(), obj);
+			//log_debug("_global.Key to_object() : %s @ %p", typeid(*obj).name(), obj);
 			_keyobject = boost::dynamic_pointer_cast<key_as_object>( obj );
 		}
 	}
@@ -592,7 +592,7 @@ movie_root::notify_mouse_clicked(bool mouse_pressed, int button_mask)
 {
 	assert(testInvariant());
 
-	//log_msg("Mouse click notification");
+	//log_debug("Mouse click notification");
 	if (mouse_pressed)
 	{
 		m_mouse_buttons |= button_mask;
@@ -794,7 +794,7 @@ generate_mouse_button_events(mouse_button_state* ms)
 	ms->m_active_entity = active_entity;
 	ms->m_topmost_entity = topmost_entity;
 
-	//if ( ! need_redisplay ) log_msg("Hurray, an event didnt' trigger redisplay!");
+	//if ( ! need_redisplay ) log_debug("Hurray, an event didn't trigger redisplay!");
 	return need_redisplay;
 }
 
@@ -847,7 +847,7 @@ movie_root::get_mouse_state(int& x, int& y, int& buttons)
 {
 //	    GNASH_REPORT_FUNCTION;
 
-//             log_msg ("X is %d, Y is %d, Button is %d", m_mouse_x,
+//             log_debug ("X is %d, Y is %d, Button is %d", m_mouse_x,
 //			 m_mouse_y, m_mouse_buttons);
 
 	assert(testInvariant());
@@ -1127,7 +1127,7 @@ void movie_root::cleanupUnloadedListeners(CharacterList& ll)
 
 void movie_root::notify_key_listeners(key::code k, bool down)
 {
-	// log_msg("Notifying " SIZET_FMT " character Key listeners", 
+	// log_debug("Notifying " SIZET_FMT " character Key listeners", 
 	//  m_key_listeners.size());
 
 	KeyListeners copy = m_key_listeners;
@@ -1189,7 +1189,7 @@ void movie_root::remove_listener(CharacterList& ll, character* listener)
 void
 movie_root::notify_mouse_listeners(const event_id& event)
 {
-	//log_msg("Notifying " SIZET_FMT " listeners about %s",
+	//log_debug("Notifying " SIZET_FMT " listeners about %s",
 	//		m_mouse_listeners.size(), event.get_function_name().c_str());
 
 	CharacterList copy = m_mouse_listeners;
@@ -1264,7 +1264,7 @@ movie_root::isMouseOverActiveEntity() const
 	if ( ! entity.get() ) return false;
 
 #if 0 // debugging...
-	log_msg("The active entity under the pointer is a %s",
+	log_debug("The active entity under the pointer is a %s",
 		typeid(*entity).name());
 #endif
 
@@ -1415,7 +1415,7 @@ movie_root::pushAction(const action_buffer& buf, boost::intrusive_ptr<character>
 {
 	assert(lvl >= 0 && lvl < apSIZE);
 #ifdef GNASH_DEBUG
-	log_msg("Pushed action buffer for target %s", target->getTargetPath().c_str());
+	log_debug("Pushed action buffer for target %s", target->getTargetPath().c_str());
 #endif
 
 	std::auto_ptr<ExecutableCode> code ( new GlobalCode(buf, target) );
@@ -1439,7 +1439,7 @@ movie_root::pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_
 {
 	assert(lvl >= 0 && lvl < apSIZE);
 #ifdef GNASH_DEBUG
-	log_msg("Pushed function (event hanlder?) with target %s", target->getTargetPath().c_str());
+	log_debug("Pushed function (event hanlder?) with target %s", target->getTargetPath().c_str());
 #endif
 
 	std::auto_ptr<ExecutableCode> code ( new FunctionCode(func, target) );

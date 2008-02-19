@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: action_buffer.cpp,v 1.34 2008/01/28 19:42:22 strk Exp $ */
+/* $Id: action_buffer.cpp,v 1.35 2008/02/19 19:20:56 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -138,7 +138,7 @@ action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
     boost::uint16_t count = boost::uint16_t(read_int16(i+3)); 
     i += 2;
     
-//log_msg(_("Start at %d, stop at %d, length read was %d, count read was %d"), start_pc, stop_pc, length, count);
+//log_debug(_("Start at %d, stop at %d, length read was %d, count read was %d"), start_pc, stop_pc, length, count);
 
     assert(start_pc + 3 + length == stop_pc);
     

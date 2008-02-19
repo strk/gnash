@@ -401,9 +401,9 @@ main(int /*argc*/, char /* *argv[]*/)
     vector<string>::const_iterator it;
     auto_ptr< vector<string> > listeners ( listListeners() );
     if (listeners->empty()) {
-        log_msg("Nobody is listening");
+        log_debug("Nobody is listening");
     } else {
-        log_msg("There are %d", listeners->size());
+        log_debug("There are %d", listeners->size());
         for (it=listeners->begin(); it!=listeners->end(); it++) {
             string str = *it;
             log_debug("Listeners: %s", str.c_str());
@@ -413,7 +413,7 @@ main(int /*argc*/, char /* *argv[]*/)
     str1 = "HelloWorld";
     removeListener(str1);
     listeners.reset( listListeners() );
-    log_msg("There are %d", listeners->size());
+    log_debug("There are %d", listeners->size());
     for (it=listeners->begin(); it != listeners->end(); it++) {
         string str = *it;
         log_debug("Listeners: %s", str.c_str());

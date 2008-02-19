@@ -92,7 +92,7 @@ static as_value
 function_ctor(const fn_call& /* fn */)
 {
 	boost::intrusive_ptr<as_object> func = new as_object(getFunctionPrototype());
-	//log_msg(_("User tried to invoke new Function()"));
+	//log_debug(_("User tried to invoke new Function()"));
 	return as_value(func.get());
 }
 
@@ -302,7 +302,7 @@ function_call(const fn_call& fn)
 
 	if ( ! fn.nargs )
 	{
-                log_msg (_("Function.call() with no args"));
+                log_debug (_("Function.call() with no args"));
 		new_fn_call.nargs=0;
 	}
 	else
@@ -338,9 +338,9 @@ function_call(const fn_call& fn)
 	// Call the function 
 	return (*function_obj)(new_fn_call);
 
-	//log_msg(_("at function_call exit, stack: \n")); fn.env->dump_stack();
+	//log_debug(_("at function_call exit, stack: \n")); fn.env->dump_stack();
 
-	//log_msg(_("%s: tocheck \n"), __FUNCTION__);
+	//log_debug(_("%s: tocheck \n"), __FUNCTION__);
 }
 
 boost::intrusive_ptr<as_object>

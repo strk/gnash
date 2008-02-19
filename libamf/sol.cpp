@@ -190,7 +190,7 @@ SOL::formatHeader(const std::string &name, int filesize)
     hexint = new unsigned char[(_header.size() + 3) *3];
     
     hexify(hexint, (unsigned char *)_header, _header.size(), true);
-    log_msg (_("%s: SOL file header is: \n%s"), __FUNCTION__, (char *)hexint);
+    log_debug (_("%s: SOL file header is: \n%s"), __FUNCTION__, (char *)hexint);
     delete hexint;
 #endif    
     

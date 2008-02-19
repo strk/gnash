@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.66 2008/02/12 16:48:38 bwy Exp $ */
+/* $Id: shape_character_def.cpp,v 1.67 2008/02/19 19:20:56 bwy Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -215,7 +215,7 @@ namespace gnash
             //m_fill_styles.push_back(fill_style());
         }
 
-        //log_msg("Read %u fill styles, %u line styles", m_fill_styles.size(), m_line_styles.size());
+        //log_debug("Read %u fill styles, %u line styles", m_fill_styles.size(), m_line_styles.size());
 
         // Use read_u8 to force alignment.
         in->ensureBytes(1);

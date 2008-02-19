@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.124 2008/01/24 13:30:56 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.125 2008/02/19 19:20:52 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -295,10 +295,10 @@ as_environment::set_variable(
     as_object* target = m_target;
     std::string	path;
     std::string	var;
-    //log_msg(_("set_variable(%s, %s)"), varname.c_str(), val.to_debug_string().c_str());
+    //log_debug(_("set_variable(%s, %s)"), varname.c_str(), val.to_debug_string().c_str());
     if ( parse_path(varname, path, var) )
     {
-    	//log_msg(_("Variable '%s' parsed into path='%s', var='%s'"), varname.c_str(), path.c_str(), var.c_str());
+    	//log_debug(_("Variable '%s' parsed into path='%s', var='%s'"), varname.c_str(), path.c_str(), var.c_str());
 	//target = find_target(path);
         target = find_object(path, &scopeStack); 
 	if (target)
@@ -534,13 +534,13 @@ as_object*
 as_environment::find_object(const std::string& path_in, const ScopeStack* scopeStack) const
 {
 #ifdef DEBUG_TARGET_FINDING 
-	log_msg(_("find_object(%s) called"), path_in.c_str());
+	log_debug(_("find_object(%s) called"), path_in.c_str());
 #endif
 
     if (path_in.empty())
     {
 #ifdef DEBUG_TARGET_FINDING 
-	log_msg(_("Returning m_target (empty path)"));
+	log_debug(_("Returning m_target (empty path)"));
 #endif
 	return m_target; // or should we return the *original* path ?
     }
@@ -564,7 +564,7 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
 	if ( ! *(++p) )
 	{
 #ifdef DEBUG_TARGET_FINDING 
-		log_msg(_("Path is '/', return the root (%p)"), (void*)root);
+		log_debug(_("Path is '/', return the root (%p)"), (void*)root);
 #endif
 		return root; // that's all folks.. 
 	}
@@ -574,14 +574,14 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
 	dot_allowed = false;
 
 #ifdef DEBUG_TARGET_FINDING 
-	log_msg(_("Absolute path, start at the root (%p)"), (void*)env);
+	log_debug(_("Absolute path, start at the root (%p)"), (void*)env);
 #endif
 
     }
 #ifdef DEBUG_TARGET_FINDING 
     else
     {
-	log_msg(_("Relative path, start at (%s)"), m_target->getTarget().c_str());
+	log_debug(_("Relative path, start at (%s)"), m_target->getTarget().c_str());
     }
 #endif
     
@@ -596,7 +596,7 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
 	if ( ! *p )
 	{
 #ifdef DEBUG_TARGET_FINDING 
-		log_msg(_("Path is %s, returning the root"), path.c_str());
+		log_debug(_("Path is %s, returning the root"), path.c_str());
 #endif
 		return env;
 	}
@@ -638,7 +638,7 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
 	if ( subpart.empty() )
 	{
 #ifdef DEBUG_TARGET_FINDING 
-		log_msg(_("No more subparts, env is %p"), (void*)env);
+		log_debug(_("No more subparts, env is %p"), (void*)env);
 #endif
 		break;
 	}
@@ -698,14 +698,14 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
 	{
 
 #ifdef DEBUG_TARGET_FINDING 
-		log_msg(_("Invoking get_path_element(%s) on object %p (%s)"), subpart.c_str(), (void *)env, env->get_text_value().c_str());
+		log_debug(_("Invoking get_path_element(%s) on object %p (%s)"), subpart.c_str(), (void *)env, env->get_text_value().c_str());
 #endif
 
 		as_object* element = env->get_path_element(subpartKey);
 		if ( ! element )
 		{
 #ifdef DEBUG_TARGET_FINDING 
-			log_msg(_("Path element %s not found in object %p"), subpart.c_str(), (void *)env);
+			log_debug(_("Path element %s not found in object %p"), subpart.c_str(), (void *)env);
 #endif
 			return NULL;
 		}
@@ -760,7 +760,7 @@ dump(const as_environment::LocalVars& locals, std::ostream& out)
 	PropMap props;
 	const_cast<as_object*>(locals.get())->dump_members(props);
 	
-	//log_msg("FIXME: implement dumper for local variables now that they are simple objects");
+	//log_debug("FIXME: implement dumper for local variables now that they are simple objects");
 	int count = 0;
 	for (PropMap::iterator i=props.begin(), e=props.end(); i!=e; ++i)
 	{

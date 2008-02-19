@@ -1,3 +1,9 @@
+2008-02-19 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/log.{h,cpp}: drop log_msg.
+	* everywhere: replace unspecific log_msg with appropriate log call; mainly
+	  log_debug but occasionally error, parse or security.
+
 2008-02-19  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* macros/docbook.m4: Look for the scripts with a .pl extension if

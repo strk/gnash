@@ -147,16 +147,16 @@ Stage::setScaleMode(ScaleMode mode)
 	if ( _scaleMode == mode ) return; // nothing to do
 
 	_scaleMode = mode;
-	//log_msg("Scale mode set to %s", getScaleModeString());
+	//log_debug("Scale mode set to %s", getScaleModeString());
 
 	if ( _scaleMode == noScale )
 	{
-		//log_msg("Setting rescaling allowance to false");
+		//log_debug("Setting rescaling allowance to false");
 		VM::get().getRoot().allowRescaling(false);
 	}
 	else
 	{
-		//log_msg("Setting rescaling allowance to true");
+		//log_debug("Setting rescaling allowance to true");
 		VM::get().getRoot().allowRescaling(true);
 	}
 }

@@ -406,7 +406,7 @@ public:
 		return _props.size();
 	}
 
-	/// Dump all members (using log_msg)
+	/// Dump all members (using log_debug)
 	//
 	/// @param this_ptr
 	/// 	The as_object used to set the 'this' pointer

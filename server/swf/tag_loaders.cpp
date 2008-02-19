@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.185 2008/02/15 09:17:34 bwy Exp $ */
+/* $Id: tag_loaders.cpp,v 1.186 2008/02/19 19:20:56 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -1619,7 +1619,7 @@ serialnumber_loader(stream* in, tag_type tag, movie_definition* /*m*/)
     ss << " - Build " << build;
     ss << " - Timestamp " << timestamp;
 
-    log_msg("%s", ss.str().c_str());
+    log_debug("%s", ss.str().c_str());
 
     // attach to movie_definition ?
 }

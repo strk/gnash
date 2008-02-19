@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.78 2008/02/11 10:24:57 udog Exp $ */
+/* $Id: character.cpp,v 1.79 2008/02/19 19:20:53 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -594,7 +594,7 @@ character::add_event_handler(const event_id& id, const action_buffer& code)
 {
 	_event_handlers[id].push_back(&code);
 
-	//log_msg(_("Setting handler for event %s"), id.get_function_name().c_str());
+	//log_debug(_("Setting handler for event %s"), id.get_function_name().c_str());
 
 	// Set the character as a listener iff the
 	// kind of event is a KEY or MOUSE one 
@@ -608,7 +608,7 @@ character::add_event_handler(const event_id& id, const action_buffer& code)
 		case event_id::MOUSE_UP:
 		case event_id::MOUSE_DOWN:
 		case event_id::MOUSE_MOVE:
-			//log_msg(_("Registering character as having mouse events"));
+			//log_debug(_("Registering character as having mouse events"));
 			has_mouse_event();
 			break;
 		default:

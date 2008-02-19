@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.126 2008/01/21 20:56:05 rsavoye Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.127 2008/02/19 19:20:47 bwy Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -620,7 +620,7 @@ public:
     // by default allow drawing everywhere
     set_invalidated_region_world();
     
-    log_msg("initialized AGG buffer <%p>, %d bytes, %dx%d, rowsize is %d bytes", 
+    log_debug("initialized AGG buffer <%p>, %d bytes, %dx%d, rowsize is %d bytes", 
       mem, size, x, y, rowstride);
   }
   
@@ -690,10 +690,10 @@ public:
   {
   
     if (m_drawing_mask) 
-      log_msg("warning: rendering ended while drawing a mask");
+      log_debug("warning: rendering ended while drawing a mask");
       
     while (! m_alpha_mask.empty()) {
-      log_msg("warning: rendering ended while masks were still active");
+      log_debug("warning: rendering ended while masks were still active");
       disable_mask();      
     }
   
@@ -890,7 +890,7 @@ public:
     rect ch_bounds = def->get_bound();
 
     if (ch_bounds.is_null()) {
-      log_msg("warning: select_clipbounds encountered a character definition "
+      log_debug("warning: select_clipbounds encountered a character definition "
         "with null bounds");
       return;
     }   
@@ -979,7 +979,7 @@ public:
       select_clipbounds(def, mat);
       
       if (_clipbounds_selected.empty()) {
-        log_msg("warning: AGG renderer skipping a whole character");
+        log_debug("warning: AGG renderer skipping a whole character");
         return; // nothing to draw!?
       }
     
@@ -1549,7 +1549,7 @@ public:
         rasc.add_path(curve);
       
       }
-      //log_msg("%d edges\n", edge_count);
+      //log_debug("%d edges\n", edge_count);
       
               
       agg::render_scanlines_compound_layered(rasc, sl, rbase, alloc, sh);
@@ -2000,7 +2000,7 @@ public:
       
       count++;
     }
-    //log_msg("%d inv. bounds in frame", count);
+    //log_debug("%d inv. bounds in frame", count);
     
   }
   
@@ -2111,9 +2111,9 @@ DSOEXPORT render_handler_agg_base*  create_render_handler_agg(const char *pixelf
   if (!pixelformat) return NULL;
 
   if (is_little_endian_host())
-    log_msg("framebuffer pixel format is %s (little-endian host)", pixelformat);
+    log_debug("framebuffer pixel format is %s (little-endian host)", pixelformat);
   else
-    log_msg("framebuffer pixel format is %s (big-endian host)", pixelformat);
+    log_debug("framebuffer pixel format is %s (big-endian host)", pixelformat);
   
 #ifdef PIXELFORMAT_RGB555  
   if (!strcmp(pixelformat, "RGB555"))

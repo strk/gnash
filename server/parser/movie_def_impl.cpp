@@ -372,7 +372,7 @@ movie_def_impl::add_bitmap_character_def(int character_id,
 		bitmap_character_def* ch)
 {
     assert(ch);
-    //log_msg(_("Add bitmap character %d"), character_id);
+    //log_debug(_("Add bitmap character %d"), character_id);
     //m_bitmap_characters.add(character_id, ch);
     m_bitmap_characters.insert(std::make_pair(character_id, boost::intrusive_ptr<bitmap_character_def>(ch)));
 
@@ -559,12 +559,12 @@ movie_def_impl::ensure_frame_loaded(size_t framenum)
 	if ( framenum <= _frames_loaded ) return true;
 
 	_waiting_for_frame = framenum;
-        //log_msg(_("Waiting for frame %u to be loaded"), framenum);
+        //log_debug(_("Waiting for frame %u to be loaded"), framenum);
 
 	// TODO: return false on timeout
 	_frame_reached_condition.wait(lock);
 
-        //log_msg(_("Condition reached (_frames_loaded=%u)"), _frames_loaded);
+        //log_debug(_("Condition reached (_frames_loaded=%u)"), _frames_loaded);
 
 	return ( framenum <= _frames_loaded );
 }
@@ -623,7 +623,7 @@ CharacterDictionary::dump_chars() const
 	for ( const_iterator it=begin(), endIt=end();
 		it != endIt; ++it )
 	{
-		log_msg(_("Character %d @ %p"), it->first, static_cast<void*>(it->second.get()));
+		log_debug(_("Character %d @ %p"), it->first, static_cast<void*>(it->second.get()));
 		//character_def* cdef = it->second;
 	}
 }
@@ -646,7 +646,7 @@ CharacterDictionary::get_character(int id)
 void
 CharacterDictionary::add_character(int id, boost::intrusive_ptr<character_def> c)
 {
-	//log_msg(_("CharacterDictionary: add char %d"), id);
+	//log_debug(_("CharacterDictionary: add char %d"), id);
 	_map[id] = c;
 	//dump_chars();
 }
@@ -669,11 +669,11 @@ movie_def_impl::load_next_frame_chunk()
 	nextframe += FRAMELOAD_CHUNK; // load in chunks of 10 frames
 	if ( nextframe > framecount ) nextframe = framecount;
 #endif
-	//log_msg(_("Framecount: %u, Lastloaded: %u"), framecount, lastloaded);
+	//log_debug(_("Framecount: %u, Lastloaded: %u"), framecount, lastloaded);
 	if ( nextframe <= framecount )
 	{
 #ifdef DEBUG_FRAMES_LOAD // debugging
-		log_msg(_("Ensure load of frame %u/%u (last loaded is: %u)"),
+		log_debug(_("Ensure load of frame %u/%u (last loaded is: %u)"),
 			nextframe, framecount, lastloaded);
 #endif
 		if ( ! ensure_frame_loaded(nextframe) )
@@ -687,7 +687,7 @@ movie_def_impl::load_next_frame_chunk()
 #ifdef DEBUG_FRAMES_LOAD
 	else
 	{
-		log_msg(_("No more frames to load. Framecount: %u, Lastloaded: %u, next to load: %u"), framecount, lastloaded, nextframe);
+		log_debug(_("No more frames to load. Framecount: %u, Lastloaded: %u, next to load: %u"), framecount, lastloaded, nextframe);
 	}
 #endif
 }
@@ -718,7 +718,7 @@ movie_def_impl::read_all_swf()
 			return;
 		}
 
-		//log_msg(_("Loading thread iteration %u"), it++);
+		//log_debug(_("Loading thread iteration %u"), it++);
 
 		SWF::tag_type tag_type = str.open_tag();
 
@@ -860,7 +860,7 @@ movie_def_impl::incrementLoadedFrames()
 	}
 
 #ifdef DEBUG_FRAMES_LOAD
-	log_msg(_("Loaded frame %u/%u"),
+	log_debug(_("Loaded frame %u/%u"),
 		_frames_loaded, m_frame_count);
 #endif
 

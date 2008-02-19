@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-// $Id: textformat.cpp,v 1.33 2008/02/06 10:18:31 strk Exp $
+// $Id: textformat.cpp,v 1.34 2008/02/19 19:20:54 bwy Exp $
 
 #include "log.h"
 #include "textformat.h"
@@ -43,7 +43,7 @@ namespace gnash {
       _tab_stops(-1),
       _target(-1)
 {
-  //log_msg("%s:", __FUNCTION__);
+  //log_debug("%s:", __FUNCTION__);
 }
 
 text_format::~text_format()
@@ -120,7 +120,7 @@ text_format::getTextFormat (int start, int end)
 as_value textformat_new(const fn_call& /* fn */)
 {
   //GNASH_REPORT_FUNCTION;
-  //log_msg(_("%s: args=%d"), __FUNCTION__, nargs);
+  //log_debug(_("%s: args=%d"), __FUNCTION__, nargs);
 
   boost::intrusive_ptr<textformat_as_object> text_obj = new textformat_as_object;
   log_unimpl(_("Created New TextFormat object at %p.  Not fully implemented yet"), (void*)text_obj.get());
@@ -140,7 +140,7 @@ as_value textformat_new(const fn_call& /* fn */)
 as_value textformat_setformat(const fn_call& fn)
 {
   as_value	method;
-  //log_msg(_("%s: args=%d at %p"), __FUNCTION__, nargs, this_ptr);
+  //log_debug(_("%s: args=%d at %p"), __FUNCTION__, nargs, this_ptr);
 
   boost::intrusive_ptr<textformat_as_object> ptr = ensureType<textformat_as_object>(fn.this_ptr);
   //double start = fn.arg(0).to_number();
@@ -166,26 +166,26 @@ as_value textformat_setformat(const fn_call& fn)
   }
   assert(obj);
 
-  //log_msg(_("Change from %f for %f characters for object at %p"), start, end, obj);
+  //log_debug(_("Change from %f for %f characters for object at %p"), start, end, obj);
 
   // Check for the flags that could be set
   if (obj->get_member(NSV::PROP_UNDERLINE, &method)) {
-    //log_msg(_("Underline exists and is set to %d"), method.to_bool());
+    //log_debug(_("Underline exists and is set to %d"), method.to_bool());
     obj->obj.underlinedSet(method.to_bool());
   }
   
   if (obj->get_member(NSV::PROP_ITALIC, &method)) {
-    //log_msg(_("Italic exists and is set to %d"), method.to_bool());
+    //log_debug(_("Italic exists and is set to %d"), method.to_bool());
     obj->obj.italicedSet(method.to_bool());
   }
   
   if (obj->get_member(NSV::PROP_BOLD, &method)) {
-    //log_msg(_("Bold exists and is set to %d"), method.to_bool());
+    //log_debug(_("Bold exists and is set to %d"), method.to_bool());
     obj->obj.boldSet(method.to_bool());
   }
   
   if (obj->get_member(NSV::PROP_BULLET, &method)) {
-    //log_msg(_("Bullet exists and is set to %d"), method.to_bool());
+    //log_debug(_("Bullet exists and is set to %d"), method.to_bool());
     obj->obj.bulletSet(method.to_bool());
   }
 
@@ -193,43 +193,43 @@ as_value textformat_setformat(const fn_call& fn)
   // named string would clash with the "Color" class in SWF6 and below
   // (but not in SWF7 and above)
   if (obj->get_member(st.find("color"), &method)) {
-    //log_msg(_("Color exists and is set to %f", method.to_number());
+    //log_debug(_("Color exists and is set to %f", method.to_number());
     obj->obj.colorSet((boost::uint32_t)method.to_number());
   }
 
   if (obj->get_member(NSV::PROP_INDENT, &method)) {
-    //log_msg(_("Indent exists and is set to %f"), method.to_number());
+    //log_debug(_("Indent exists and is set to %f"), method.to_number());
     obj->obj.indentSet(float(method.to_number()));
   }
 
   if (obj->get_member(NSV::PROP_ALIGN, &method)) {
-    //log_msg(_("Align exists and is set to %s"), method.to_string());
+    //log_debug(_("Align exists and is set to %s"), method.to_string());
     const char* align = method.to_string().c_str();
     if ( align ) obj->obj.alignSet(align);
   }
 
   if (obj->get_member(NSV::PROP_BLOCK_INDENT, &method)) {
-    //log_msg(_("BlockIndent exists and is set to %f"), method.to_number());
+    //log_debug(_("BlockIndent exists and is set to %f"), method.to_number());
     obj->obj.blockIndentSet(float(method.to_number()));
   }
   
   if (obj->get_member(NSV::PROP_LEADING, &method)) {
-    //log_msg(_("Leading exists and is set to %f"), method.to_number());
+    //log_debug(_("Leading exists and is set to %f"), method.to_number());
     obj->obj.leadingSet(float(method.to_number()));
   }
   
   if (obj->get_member(NSV::PROP_LEFT_MARGIN, &method)) {
-    //log_msg(_("LeftMargin exists and is set to %f"), method.to_number());
+    //log_debug(_("LeftMargin exists and is set to %f"), method.to_number());
     obj->obj.leftMarginSet(float(method.to_number()));
   }
   
   if (obj->get_member(NSV::PROP_RIGHT_MARGIN, &method)) {
-    //log_msg(_("RightMargin exists and is set to %f"), method.to_number());
+    //log_debug(_("RightMargin exists and is set to %f"), method.to_number());
     obj->obj.rightMarginSet(float(method.to_number()));
   }
   
   if (obj->get_member(NSV::PROP_SIZE, &method)) {
-    //log_msg(_("Size exists and is set to %f"), method.to_number());
+    //log_debug(_("Size exists and is set to %f"), method.to_number());
     obj->obj.sizeSet(float(method.to_number()));
   }
   

@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: extension.cpp,v 1.16 2008/01/21 20:55:44 rsavoye Exp $ */
+/* $Id: extension.cpp,v 1.17 2008/02/19 19:20:50 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -78,7 +78,7 @@ Extension::Extension()
         _pluginsdir = env;
     }
 
-    log_msg("Plugins path: %s", _pluginsdir);
+    log_debug("Plugins path: %s", _pluginsdir);
     lt_dlsetsearchpath(_pluginsdir);
 }
 
@@ -122,7 +122,7 @@ Extension::scanAndLoad(as_object &obj)
     vector<string>::iterator it;
     for (it = _modules.begin(); it != _modules.end(); it++) {
         mod = *(it);
-        log_msg(_("Loading module: %s"), mod.c_str());
+        log_security(_("Loading module: %s"), mod.c_str());
         SharedLib sl;
         initModule(mod.c_str(), obj);
     }   
@@ -138,7 +138,7 @@ Extension::initModule(const char *module, as_object &obj)
     SharedLib *sl;
     string symbol;
 
-    log_msg(_("Initializing module: \"%s\""), module);
+    log_security(_("Initializing module: \"%s\""), module);
     
     symbol = module;
     if (_plugins[module] == 0) {
@@ -168,7 +168,7 @@ Extension::initModuleWithFunc(const char *module, const char *func,
 	SharedLib::initentry *symptr;
 	SharedLib *sl;
 
-	log_msg(_("Initializing module: \"%s\""), module);
+	log_security(_("Initializing module: \"%s\""), module);
 
 	if (_plugins[module] == 0) {
 		sl = new SharedLib(module);
@@ -220,7 +220,7 @@ Extension::scanDir(const char *dirlist)
 
             
     while (dir) {
-        log_msg(_("Scanning directory \"%s\" for plugins"), dir);
+        log_debug(_("Scanning directory \"%s\" for plugins"), dir);
         DIR *library_dir = opendir(dir);
 
         if (library_dir == NULL) {
@@ -247,11 +247,11 @@ Extension::scanDir(const char *dirlist)
                 continue;
             }
 
-            log_msg(_("Gnash Plugin name: %s"), entry->d_name);
+            log_debug(_("Gnash Plugin name: %s"), entry->d_name);
             
             if (strcmp(suffix, ".so") == 0) {
                 *suffix = 0;
-                log_msg(_("Gnash Plugin name: %s"), entry->d_name);
+                log_debug(_("Gnash Plugin name: %s"), entry->d_name);
                 _modules.push_back(entry->d_name);
             } else {
                 continue;

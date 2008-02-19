@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.195 2008/02/16 09:20:22 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.196 2008/02/19 19:20:57 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -675,12 +675,12 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
 	size_t lastloaded = target_sprite->get_loaded_frames();
 	if ( lastloaded < framenum )
 	{
-		//log_msg(_("%s: frame %u not reached yet (loaded %u), skipping next %u actions"), __FUNCTION__, framenum, lastloaded, skip);
+		//log_debug(_("%s: frame %u not reached yet (loaded %u), skipping next %u actions"), __FUNCTION__, framenum, lastloaded, skip);
 		// better delegate this to ActionExec
 		thread.skip_actions(skip);
 	}
 
-	//log_msg(_("%s: testing"), __PRETTY_FUNCTION__);
+	//log_debug(_("%s: testing"), __PRETTY_FUNCTION__);
 }
 
 void
@@ -952,7 +952,7 @@ SWFHandlers::ActionSubString(ActionExec& thread)
     assert(unsigned(base) < str.length() );
     assert(size >= 0);
 
-    //log_msg(_("string: %s, size: %d, base: %d"), str.c_str(), size, base);
+    //log_debug(_("string: %s, size: %d, base: %d"), str.c_str(), size, base);
 
     // Keep base within range.
     //base = iclamp(base, 0, str.length());
@@ -1090,7 +1090,7 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
 	{
 		as_object* obj = thread.getTarget();
 
-		//log_msg(_("ActionGetProperty(<empty>) called, target is %p"), (void*)obj);
+		//log_debug(_("ActionGetProperty(<empty>) called, target is %p"), (void*)obj);
 
 		target = dynamic_cast<character*>(obj);
 		if ( ! target )
@@ -1426,13 +1426,13 @@ SWFHandlers::ActionImplementsOp(ActionExec& thread)
 
 	if (!obj)
 	{
-		log_msg(_("In ImplementsOp, not an object.\n"));
+		log_debug(_("In ImplementsOp, not an object.\n"));
 		return;
 	}
 	obj = obj->get_prototype().get();
 	if (!obj)
 	{
-		log_msg(_("In ImplementsOp, object had no prototype.\n"));
+		log_debug(_("In ImplementsOp, object had no prototype.\n"));
 		return;
 	}
 
@@ -1853,12 +1853,12 @@ SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
 	size_t lastloaded = target_sprite->get_loaded_frames();
 	if ( lastloaded < framenum )
 	{
-		//log_msg(_("ActionWaitForFrameExpression: frame %u not reached yet (loaded %u), skipping next %u actions"), framenum, lastloaded, skip);
+		//log_debug(_("ActionWaitForFrameExpression: frame %u not reached yet (loaded %u), skipping next %u actions"), framenum, lastloaded, skip);
 		// better delegate this to ActionExec
 		thread.skip_actions(skip);
 	}
 
-	//log_msg(_("%s: testing"), __PRETTY_FUNCTION__);
+	//log_debug(_("%s: testing"), __PRETTY_FUNCTION__);
 }
 
 void
@@ -2188,7 +2188,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 	const URL& baseurl = get_base_url();
 	URL url(url_s, baseurl);
 
-	log_msg(_("get url: target=%s, url=%s (%s), method=%x (sendVars:%X, loadTarget:%d, loadVariable:%d)"), target_string.c_str(),
+	log_debug(_("get url: target=%s, url=%s (%s), method=%x (sendVars:%X, loadTarget:%d, loadVariable:%d)"), target_string.c_str(),
 		url.str().c_str(), url_c, method, sendVarsMethod, loadTargetFlag, loadVariableFlag);
 
 	if ( ! URLAccessManager::allow(url) )
@@ -2201,7 +2201,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 
 	if ( loadVariableFlag )
 	{
-		log_msg(_("getURL2 loadVariable"));
+		log_debug(_("getURL2 loadVariable"));
 
 		if ( ! target_ch )
 		{
@@ -2228,7 +2228,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 	{
 		// TODO: always pass directly to movie_root::loadMovie ?
 
-		log_msg(_("getURL2 target load"));
+		log_debug(_("getURL2 target load"));
 
 		if ( sendVarsMethod )
 		{
@@ -2340,7 +2340,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 
 		boost::replace_all(command, "%u", safeurl);
 
-		log_msg (_("Launching URL... %s"), command.c_str());
+		log_debug (_("Launching URL... %s"), command.c_str());
 		system(command.c_str());
 	}
 	else
@@ -2699,7 +2699,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
         nargs = available_args;
     }
 
-    //log_msg(_("Function's nargs: %d"), nargs);
+    //log_debug(_("Function's nargs: %d"), nargs);
 
 #ifdef USE_DEBUGGER
 //        cerr << "entering function: " << function_name << endl;
@@ -2709,7 +2709,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
     as_value result = call_method(function, &env, this_ptr,
                   nargs, env.get_top_index() - 2);
 
-    //log_msg(_("Function's result: %s"), result.to_string();
+    //log_debug(_("Function's result: %s"), result.to_string();
 
     env.drop(nargs + 1);
     env.top(0) = result;
@@ -2730,7 +2730,7 @@ SWFHandlers::ActionReturn(ActionExec& thread)
 //        GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
 
-	//log_msg(_("Before top/drop (retval=%p)"), (void*)retval);
+	//log_debug(_("Before top/drop (retval=%p)"), (void*)retval);
 	//env.dump_stack();
 
 	thread.ensureStack(1); // ret value
@@ -2745,7 +2745,7 @@ SWFHandlers::ActionReturn(ActionExec& thread)
         debugger.callStackPop();
 #endif
 
-	//log_msg(_("After top/drop"));
+	//log_debug(_("After top/drop"));
 	//env.dump_stack();
 
 	// Skip the rest of this buffer (return from this action_buffer).
@@ -2859,7 +2859,7 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
 
     thread.ensureStack((unsigned int)array_size); // array elements
 
-    //log_msg(_("xxx init array: size = %d, top of stack = %d"), array_size, env.get_top_index());//xxxxx
+    //log_debug(_("xxx init array: size = %d, top of stack = %d"), array_size, env.get_top_index());//xxxxx
 
     // Call the array constructor, to create an empty array.
     as_value	result;
@@ -2880,7 +2880,7 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
 
     env.push(result);
 
-    //log_msg(_("xxx init array end: top of stack = %d, trace(top(0)) ="), env.get_top_index());//xxxxxxx
+    //log_debug(_("xxx init array end: top of stack = %d, trace(top(0)) ="), env.get_top_index());//xxxxxxx
 
     //as_global_trace(fn_call(NULL, NULL, env, 1, env.get_top_index()));	//xxxx
 
@@ -3054,9 +3054,9 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
 	{
 		// use numeric semantic
 		double v2num = v2.to_number();
-		//log_msg(_("v2 num = %g"), v2num);
+		//log_debug(_("v2 num = %g"), v2num);
 		double v1num = v1.to_number();
-		//log_msg(_("v1 num = %g"), v1num);
+		//log_debug(_("v1 num = %g"), v1num);
 
 		v2.set_double(v2num + v1num); 
 
@@ -3425,7 +3425,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 	}
 
 #ifdef USE_DEBUGGER
-//	log_msg (_("FIXME: method name is: %s"), method_namexxx);
+//	log_debug (_("FIXME: method name is: %s"), method_namexxx);
 //	// IT IS NOT GUARANTEE WE DO HAVE A METHOD NAME HERE !
 	if ( ! method_name.is_undefined() )
 	{
@@ -3454,7 +3454,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 		thread.next_pc = thread.stop_pc;
 	}
 	// This is to check stack status after call method
-	//log_msg(_("at doActionCallMethod() end, stack: ")); env.dump_stack();
+	//log_debug(_("at doActionCallMethod() end, stack: ")); env.dump_stack();
 
 }
 
@@ -3535,7 +3535,7 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
 	boost::intrusive_ptr<as_object> new_obj = construct_object(method.get(),
 			env, nargs, env.get_top_index());
 
-	//log_msg(_("%s( [%d args] ) returned %s"), method_val.to_string(),
+	//log_debug(_("%s( [%d args] ) returned %s"), method_val.to_string(),
 	//	nargs, new_obj.to_string();
 
 
@@ -3789,7 +3789,7 @@ SWFHandlers::ActionExtends(ActionExec& thread)
 
 	sub->extends(*super);
 
-	//log_msg(_("%s: testing"), __PRETTY_FUNCTION__);
+	//log_debug(_("%s: testing"), __PRETTY_FUNCTION__);
 }
 
 void
@@ -3853,7 +3853,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 		// @@ security: watch out for possible missing terminator here!
 		const char* arg = code.read_string(i);
 
-		//log_msg(_("Setting register %d/%d to %s"), arg_register, nargs, arg);
+		//log_debug(_("Setting register %d/%d to %s"), arg_register, nargs, arg);
 
 		func->add_arg(arg_register, arg);
 		i += strlen(arg)+1;

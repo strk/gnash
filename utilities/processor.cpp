@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: processor.cpp,v 1.83 2008/02/15 08:31:04 strk Exp $ */
+/* $Id: processor.cpp,v 1.84 2008/02/19 19:20:58 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -130,7 +130,7 @@ static int quitrequested = false;
 
 void execFsCommand(sprite_instance* movie, const char* command, const char* args)
 {
-    log_msg(_("fs_callback(%p): %s %s"), (void*)movie, command, args);
+    log_debug(_("fs_callback(%p): %s %s"), (void*)movie, command, args);
 
     if ( ! strcasecmp(command, "quit") ) quitrequested=true;
 }
@@ -192,13 +192,13 @@ main(int argc, char *argv[])
 	      break;
 	  case 'v':
 	      dbglogfile.setVerbosity();
-	      log_msg (_("Verbose output turned on"));
+	      log_debug (_("Verbose output turned on"));
 	      break;
           case 'g':
 #ifdef USE_DEBUGGER
               debugger.enabled(true);
               debugger.console();
-              log_msg (_("Setting debugger ON"));
+              log_debug (_("Setting debugger ON"));
 #else
               log_error (_("The debugger has been disabled at configuration time"));
 #endif

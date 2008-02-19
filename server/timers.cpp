@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.46 2008/01/21 20:55:53 rsavoye Exp $ */
+/* $Id: timers.cpp,v 1.47 2008/02/19 19:20:54 bwy Exp $ */
 
 #include "timers.h"
 #include "as_function.h" // for class as_function
@@ -47,7 +47,7 @@ namespace gnash {
   
   Timer::~Timer()
   {
-    //log_msg("%s: \n", __FUNCTION__);
+    //log_debug("%s: \n", __FUNCTION__);
   }
 
   void
@@ -56,7 +56,7 @@ namespace gnash {
   {
     _function = &method;
     _interval = ms; // keep as milliseconds
-    //log_msg("_interval milliseconds: %llu", _interval);
+    //log_debug("_interval milliseconds: %llu", _interval);
     _object = this_ptr;
     _args = args;
     _runOnce = runOnce;
@@ -68,7 +68,7 @@ namespace gnash {
   {
     _function = &method;
     _interval = ms; // keep as milliseconds
-    //log_msg("_interval milliseconds: %llu", _interval);
+    //log_debug("_interval milliseconds: %llu", _interval);
     _object = this_ptr;
     _runOnce = runOnce;
     start();
@@ -81,7 +81,7 @@ namespace gnash {
     _object = this_ptr;
     _methodName = methodName;
     _interval = ms; // keep as milliseconds
-    //log_msg("_interval milliseconds: %llu", _interval);
+    //log_debug("_interval milliseconds: %llu", _interval);
     _args = args;
     _runOnce = runOnce;
     start();
@@ -98,7 +98,7 @@ namespace gnash {
   Timer::start()
   {
 	_start = VM::get().getTime();
-	//log_msg("_start at seconds %lu", _start);
+	//log_debug("_start at seconds %lu", _start);
   }
   
 
@@ -125,7 +125,7 @@ void
 Timer::execute()
 {
     //printf("FIXME: %s:\n", __FUNCTION__);
-    //log_msg("INTERVAL ID is %d\n", getIntervalID());
+    //log_debug("INTERVAL ID is %d\n", getIntervalID());
 
     as_value timer_method;
 
@@ -157,7 +157,7 @@ Timer::execute()
     for ( ArgsContainer::reverse_iterator it=_args.rbegin(), itEnd=_args.rend();
 		    it != itEnd; ++it )
     {
-	    //log_msg("Env-pushing %s", it->to_debug_string().c_str());
+	    //log_debug("Env-pushing %s", it->to_debug_string().c_str());
 	    env.push(*it);
     }
 
@@ -190,7 +190,7 @@ timer_setinterval(const fn_call& fn)
 	//std::stringstream ss; fn.dump_args(ss);
 	//log_debug("setInterval(%s)", ss.str().c_str());
 
-	//log_msg("%s: args=%d", __FUNCTION__, fn.nargs);
+	//log_debug("%s: args=%d", __FUNCTION__, fn.nargs);
     
 	if ( fn.nargs < 2 )
 	{
@@ -274,7 +274,7 @@ timer_settimeout(const fn_call& fn)
 	//std::stringstream ss; fn.dump_args(ss);
 	//log_debug("setTimeout(%s)", ss.str().c_str());
 
-	//log_msg("%s: args=%d", __FUNCTION__, fn.nargs);
+	//log_debug("%s: args=%d", __FUNCTION__, fn.nargs);
     
 	if ( fn.nargs < 2 )
 	{
@@ -356,7 +356,7 @@ timer_settimeout(const fn_call& fn)
 as_value
 timer_clearinterval(const fn_call& fn)
 {
-	//log_msg("%s: nargs = %d", __FUNCTION__, fn.nargs);
+	//log_debug("%s: nargs = %d", __FUNCTION__, fn.nargs);
 
 	int id = int(fn.arg(0).to_number());
 

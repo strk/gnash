@@ -44,7 +44,7 @@ void
 SoundGst::callback_newpad (GstElement* /*decodebin*/, GstPad *pad, gboolean /*last*/, gpointer data)
 {
 #if 0
-  log_msg(_("%s: new pad found"), __FUNCTION__);
+  log_debug(_("%s: new pad found"), __FUNCTION__);
 #endif
   SoundGst* so = static_cast<SoundGst*>(data);
   GstCaps *caps;
@@ -59,10 +59,10 @@ SoundGst::callback_newpad (GstElement* /*decodebin*/, GstPad *pad, gboolean /*la
   if (g_strrstr (gst_structure_get_name (str), "audio")) {
     // link'n'play
     gst_pad_link (pad, audiopad);
-    log_msg(_("%s: new pad connected"), __FUNCTION__);
+    log_debug(_("%s: new pad connected"), __FUNCTION__);
   } else {
     gst_object_unref (audiopad);
-    log_msg(_("%s: Non-audio data found in Sound url"), __FUNCTION__);
+    log_debug(_("%s: Non-audio data found in Sound url"), __FUNCTION__);
   }
   gst_caps_unref (caps);
   gst_object_unref(GST_OBJECT(audiopad));
@@ -146,13 +146,13 @@ SoundGst::loadSound(const std::string& url, bool streaming)
 
   std::string valid_url = connection->validateURL(url);
 
-  log_msg("%s: loading URL %s from %s", __FUNCTION__, valid_url.c_str(),
+  log_debug("%s: loading URL %s from %s", __FUNCTION__, valid_url.c_str(),
           url.c_str());
 
   _remainingLoops = 0;
 
   if (_pipeline) {
-    log_msg(_("%s: This sound already has a pipeline. Resetting for new URL connection. (%s)"), __FUNCTION__, valid_url.c_str());
+    log_debug(_("%s: This sound already has a pipeline. Resetting for new URL connection. (%s)"), __FUNCTION__, valid_url.c_str());
           gst_element_set_state (_pipeline, GST_STATE_NULL); // FIXME: wait for state?
 
     GstElement* downloader = gst_bin_get_by_name(GST_BIN(_pipeline), "gnash_audiodownloader");

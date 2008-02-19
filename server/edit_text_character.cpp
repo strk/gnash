@@ -683,7 +683,7 @@ edit_text_character::on_event(const event_id& id)
 character*
 edit_text_character::get_topmost_mouse_entity(float x, float y)
 {
-	//log_msg("get_topmost_mouse_entity called on edit_text_character %p, labeled '%s'", (void*)this, get_text_value().c_str());
+	//log_debug("get_topmost_mouse_entity called on edit_text_character %p, labeled '%s'", (void*)this, get_text_value().c_str());
 
 	if (get_visible() == false)
 	{
@@ -741,7 +741,7 @@ edit_text_character::updateText(const std::wstring& wstr)
 
 	format_text();
 
-	//log_msg(_("Text set to %s"), new_text.c_str());
+	//log_debug(_("Text set to %s"), new_text.c_str());
 
 }
 
@@ -790,7 +790,7 @@ void
 edit_text_character::set_member(string_table::key name,
 		const as_value& val, string_table::key nsname)
 {
-	//log_msg("edit_text_character.set_member(%s, %s)", name.c_str(), val.to_string());
+	//log_debug("edit_text_character.set_member(%s, %s)", name.c_str(), val.to_string());
 
 	// FIXME: Turn all standard members into getter/setter properties
 	//        of the TextField class. See attachTextFieldInterface()
@@ -980,7 +980,7 @@ bool
 edit_text_character::get_member(string_table::key name, as_value* val,
 	string_table::key nsname)
 {
-	//log_msg("edit_text_character.get_member(%s)", name.c_str());
+	//log_debug("edit_text_character.get_member(%s)", name.c_str());
 
 	// FIXME: Turn all standard members into getter/setter properties
 	//        of the TextField class. See attachTextFieldInterface()
@@ -1532,7 +1532,7 @@ edit_text_character::parseTextVariableRef(const std::string& variableName) const
 	const char* varname = var_str.c_str();
 
 #ifdef DEBUG_DYNTEXT_VARIABLES
-	log_msg(_("VariableName: %s"), var_str.c_str());
+	log_debug(_("VariableName: %s"), var_str.c_str());
 #endif
 
 	/// Why isn't get_environment const again ?
@@ -1548,7 +1548,7 @@ edit_text_character::parseTextVariableRef(const std::string& variableName) const
 	if ( as_environment::parse_path(varname, path, var) )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
-		log_msg(_("Variable text Path: %s, Var: %s"), path.c_str(), var.c_str());
+		log_debug(_("Variable text Path: %s, Var: %s"), path.c_str(), var.c_str());
 #endif
 		// find target for the path component
 		// we use our parent's environment for this
@@ -1584,7 +1584,7 @@ edit_text_character::registerTextVariable()
 	if ( _text_variable_registered )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
-		log_msg(_("registerTextVariable() no-op call (already registered)"));
+		log_debug(_("registerTextVariable() no-op call (already registered)"));
 #endif
 		return;
 	}
@@ -1592,7 +1592,7 @@ edit_text_character::registerTextVariable()
 	if ( _variable_name.empty() )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
-		log_msg(_("string is empty, consider as registered"));
+		log_debug(_("string is empty, consider as registered"));
 #endif
 		_text_variable_registered=true;
 		return;
@@ -1619,7 +1619,7 @@ edit_text_character::registerTextVariable()
 	if (target->get_member(key, &val) )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
-		log_msg(_("target sprite (%p) does have a member named %s"), (void*)sprite, _vm.getStringTable().value(key).c_str());
+		log_debug(_("target sprite (%p) does have a member named %s"), (void*)sprite, _vm.getStringTable().value(key).c_str());
 #endif
 		// TODO: pass environment to to_string ?
 		// as_environment& env = get_environment();
@@ -1628,7 +1628,7 @@ edit_text_character::registerTextVariable()
 	else
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
-		log_msg(_("target sprite (%p) does NOT have a member named %s (no problem, we'll add it)"), (void*)sprite, _vm.getStringTable().value(key).c_str());
+		log_debug(_("target sprite (%p) does NOT have a member named %s (no problem, we'll add it)"), (void*)sprite, _vm.getStringTable().value(key).c_str());
 #endif
 		target->set_member(key, as_value(utf8::encodeCanonicalString(_text, version)));
 	}

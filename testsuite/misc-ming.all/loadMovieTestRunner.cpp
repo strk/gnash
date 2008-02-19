@@ -46,7 +46,7 @@ getCoverArt()
 	character* coverartch = const_cast<character*>(tester->findDisplayItemByName(*root, "coverart"));
 	sprite_instance* coverart = coverartch->to_movie();
 
-	//log_msg("Coverart is %p, displaylist is:", coverart);
+	//log_debug("Coverart is %p, displaylist is:", coverart);
 	//coverart->getDisplayList().dump();
 
 	return coverart;

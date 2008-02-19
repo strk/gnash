@@ -109,8 +109,8 @@ swf_function::operator()(const fn_call& fn)
 	assert(our_env);
 
 #if 0
-	log_msg("swf_function() stack:\n"); fn.env().dump_stack();
-	log_msg("  first_arg_bottom_index: %d\n", fn.first_arg_bottom_index);
+	log_debug("swf_function() stack:\n"); fn.env().dump_stack();
+	log_debug("  first_arg_bottom_index: %d\n", fn.first_arg_bottom_index);
 #endif
 	// Some features are version-dependant.
 	unsigned swfversion = VM::get().getSWFVersion();

@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.56 2008/01/21 20:56:04 rsavoye Exp $ */
+/* $Id: render_handler.h,v 1.57 2008/02/19 19:20:47 bwy Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -495,7 +495,7 @@ public:
   virtual bool getPixel(rgba& /*color_return*/, int /*x*/, int /*y*/)
   {
 
-    log_msg("getPixel() not implemented for this renderer");
+    log_debug("getPixel() not implemented for this renderer");
     abort();    
     return false; // avoid compiler warning    
   }

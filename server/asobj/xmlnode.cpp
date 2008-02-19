@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.45 2008/01/30 10:09:36 bwy Exp $ */
+/* $Id: xmlnode.cpp,v 1.46 2008/02/19 19:20:55 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -81,9 +81,9 @@ XMLNode::XMLNode()
     _parent(0),
     _type(tElement)
 {
-    //log_msg("%s: %p", __PRETTY_FUNCTION__, this);
+    //log_debug("%s: %p", __PRETTY_FUNCTION__, this);
 #ifdef DEBUG_MEMORY_ALLOCATION
-    log_msg(_("\tCreating XMLNode data at %p"), this);
+    log_debug(_("\tCreating XMLNode data at %p"), this);
 #endif
 }
 
@@ -93,9 +93,9 @@ XMLNode::XMLNode(as_object* overridden_interface)
     _parent(0),
     _type(tElement)
 {
-    //log_msg("%s: %p", __PRETTY_FUNCTION__, this);
+    //log_debug("%s: %p", __PRETTY_FUNCTION__, this);
 #ifdef DEBUG_MEMORY_ALLOCATION
-    log_msg(_("\tCreating XMLNode data at %p"), this);
+    log_debug(_("\tCreating XMLNode data at %p"), this);
 #endif
 }
 
@@ -121,9 +121,9 @@ XMLNode::XMLNode(const XMLNode& tpl, bool deep)
 
 XMLNode::~XMLNode()
 {
-    //log_msg("%s: %p", __PRETTY_FUNCTION__, this);
+    //log_debug("%s: %p", __PRETTY_FUNCTION__, this);
 #ifdef DEBUG_MEMORY_ALLOCATION
-    log_msg(_("\tDeleting XMLNode data %s with value %s at %p"), this->_name.c_str(), this->_value.c_str(), this);
+    log_debug(_("\tDeleting XMLNode data %s with value %s at %p"), this->_name.c_str(), this->_value.c_str(), this);
 #endif
 }
 
@@ -151,7 +151,7 @@ XMLNode::lastChild()
 	//GNASH_REPORT_FUNCTION;
 	if ( _children.empty() )
 	{
-			log_msg(_("XMLNode %p has no children"), (void*)this);
+			log_debug(_("XMLNode %p has no children"), (void*)this);
 			return NULL;
 	}
 	return _children.back();
@@ -177,7 +177,7 @@ boost::intrusive_ptr<XMLNode>
 XMLNode::cloneNode(bool deep)
 {
     //GNASH_REPORT_FUNCTION;
-    //log_msg(_("%s: deep is %d"), __PRETTY_FUNCTION__, deep);
+    //log_debug(_("%s: deep is %d"), __PRETTY_FUNCTION__, deep);
 
     boost::intrusive_ptr<XMLNode> newnode = new XMLNode(*this, deep);
 
@@ -239,7 +239,7 @@ XMLNode::previousSibling()
     {
         if (itx->get() == this)
         {
-            // log_msg("Found the previous XMLNode child !!!! %s <%p>", (*itx)->nodeName(), (void*)*itx);
+            // log_debug("Found the previous XMLNode child !!!! %s <%p>", (*itx)->nodeName(), (void*)*itx);
 		    return previous_node;
 		}
 		previous_node = itx->get();
@@ -255,12 +255,12 @@ XMLNode::nextSibling()
 
     if ( ! _parent)
     {
-            //log_msg("Node %p has no parent, returning NULL", this);
+            //log_debug("Node %p has no parent, returning NULL", this);
             return NULL;
     }
     if (_parent->_children.size() <= 1)
     {
-            //log_msg("Node %p parent has only this node, returning NULL", this);
+            //log_debug("Node %p parent has only this node, returning NULL", this);
             return NULL;
     }
 
@@ -270,7 +270,7 @@ XMLNode::nextSibling()
     {
         if (itx->get() == this)
         {
-            //log_msg("Found the next XMLNode child !!!! %s <%p>", (*itx)->nodeName().c_str(), (void*)itx->get());
+            //log_debug("Found the next XMLNode child !!!! %s <%p>", (*itx)->nodeName().c_str(), (void*)itx->get());
 		    return previous_node;
 		}
 		previous_node = itx->get();
@@ -296,10 +296,10 @@ XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout)
     NodeType type = xml.nodeType();
 
 
-//    log_msg("%s: processing for object %s <%p>", __PRETTY_FUNCTION__, nodename, xml);
+//    log_debug("%s: processing for object %s <%p>", __PRETTY_FUNCTION__, nodename, xml);
 
 #ifdef GNASH_DEBUG
-    log_msg(_("Stringifying node %p with name %s, value %s, %u attributes and %u children"),
+    log_debug(_("Stringifying node %p with name %s, value %s, %u attributes and %u children"),
                     (void*)&xml, nodename, nodevalue, xml._attributes.size(), xml._children.size());
 #endif
 
@@ -341,7 +341,7 @@ XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout)
     ChildList::const_iterator itx;
     for (itx = xml._children.begin(); itx != xml._children.end(); itx++)
     {
-//      log_msg(_("Found One XMLNode child.  %s <%p>"), (*itx)->nodeName().c_str(), (void*)*itx);
+//      log_debug(_("Found One XMLNode child.  %s <%p>"), (*itx)->nodeName().c_str(), (void*)*itx);
 //      cerr << "<" << (*it)->nodeName() << ">" << endl;
         (*itx)->toString(xmlout);
     }
@@ -481,7 +481,7 @@ static as_value
 xmlnode_clonenode(const fn_call& fn)
 {
     //GNASH_REPORT_FUNCTION;
-//    log_msg("%s: %d args", __PRETTY_FUNCTION__, fn.nargs);
+//    log_debug("%s: %d args", __PRETTY_FUNCTION__, fn.nargs);
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
 
     bool deep = false;
@@ -557,7 +557,7 @@ xmlnode_tostring(const fn_call& fn)
     
     std::stringstream ss;
     ptr->toString(ss);
-    //log_msg("Stringstream: %s", ss.str().c_str());
+    //log_debug("Stringstream: %s", ss.str().c_str());
 
     return as_value(ss.str());
 }
@@ -580,10 +580,10 @@ xmlnode_nodevalue(const fn_call& fn)
     as_value rv;
     rv.set_null();
     
-    //log_msg("xmlnode_nodevalue called with %d args against 'this' = %p", fn.nargs, ptr);
+    //log_debug("xmlnode_nodevalue called with %d args against 'this' = %p", fn.nargs, ptr);
     if ( fn.nargs == 0 )
     {
-	    //log_msg("  nodeValue() returns '%s'", ptr->nodeValue().c_str());
+	    //log_debug("  nodeValue() returns '%s'", ptr->nodeValue().c_str());
         const std::string& val = ptr->nodeValue();
         if ( ! val.empty() ) rv = val;
     }

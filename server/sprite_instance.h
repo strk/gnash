@@ -666,7 +666,7 @@ public:
 	/// FIXME: unimplemented
 	virtual void	on_event_xmlsocket_onxml()
 	{
-	    log_msg("FIXME: %s: unimplemented\n", __FUNCTION__);
+	    log_debug("FIXME: %s: unimplemented\n", __FUNCTION__);
 	    on_event(event_id::SOCK_XML);
 	}
 		
@@ -674,14 +674,14 @@ public:
 	/// specified interval.
 	virtual void	on_event_interval_timer()
 	{
-	    log_msg("FIXME: %s: unimplemented\n", __FUNCTION__);
+	    log_debug("FIXME: %s: unimplemented\n", __FUNCTION__);
 	    on_event(event_id::TIMER);
 	}
 
 	/// Do the events that happen as a MovieClip (swf 7 only) loads.
 	virtual void	on_event_load_progress()
 	{
-	    log_msg("FIXME: %s: unimplemented\n", __FUNCTION__);
+	    log_debug("FIXME: %s: unimplemented\n", __FUNCTION__);
 	    on_event(event_id::LOAD_PROGRESS);
 	}
 

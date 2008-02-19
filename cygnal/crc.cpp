@@ -113,7 +113,7 @@ CRcInitFile::parseFile(const std::string& filespec)
 
 	StringNoCaseEqual noCaseCompare;
     
-//  log_msg ("Seeing if %s exists", filespec);
+//  log_debug ("Seeing if %s exists", filespec);
     if (filespec.size() == 0) {
         return false;
     }

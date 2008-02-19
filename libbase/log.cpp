@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: log.cpp,v 1.61 2008/02/19 00:47:17 strk Exp $ */
+/* $Id: log.cpp,v 1.62 2008/02/19 19:20:50 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -188,22 +188,6 @@ LogFile::getDefaultInstance()
 
 namespace {
     LogFile& dbglogfile = LogFile::getDefaultInstance();
-}
-
-// Printf-style log for debugging info.
-void
-log_msg(const char* fmt, ...)
-{
-    va_list ap;
-    char tmp[BUFFER_SIZE];
-
-    va_start (ap, fmt);
-    vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
-    tmp[BUFFER_SIZE-1] = '\0';
-
-    dbglogfile.log(tmp);
-
-    va_end (ap);
 }
 
 void

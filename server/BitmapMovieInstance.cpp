@@ -42,7 +42,7 @@ BitmapMovieInstance::BitmapMovieInstance(BitmapMovieDefinition* def, character* 
 	character_def* chdef = def->get_character_def(1); 
 	assert(chdef);
 	boost::intrusive_ptr<character> ch = chdef->create_character_instance(this, 1);
-	//log_msg("Created char in BitmapMovieInstance is a %s", typeid(*ch).name());
+	//log_debug("Created char in BitmapMovieInstance is a %s", typeid(*ch).name());
 	int depth = 1+character::staticDepthOffset;
 	int clip_depth = character::noClipDepthValue;
 	place_character(ch.get(), depth, cxform(), mat, 1, clip_depth);

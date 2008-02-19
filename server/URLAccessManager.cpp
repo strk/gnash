@@ -102,7 +102,7 @@ allow(std::string& url)
 	AccessPolicyCache::iterator it = policyCache.find(url);
 	if ( it != policyCache.end() )
 	{
-		log_msg("%s access to %s (cached).\n",
+		log_security("%s access to %s (cached).\n",
 			accessPolicyString(it->second),
 			url.c_str());
 
@@ -111,7 +111,7 @@ allow(std::string& url)
 
 	if ( ! isatty(fileno(stdin)) )
 	{
-		log_msg("%s access to %s (input is not a terminal).\n",
+		log_security("%s access to %s (input is not a terminal).\n",
 			accessPolicyString(defaultAccessPolicy),
 			url.c_str());
 
@@ -139,7 +139,7 @@ allow(std::string& url)
 	// cache for next time
 	policyCache[url] = userChoice;
 	
-	log_msg("%s access to %s (user choice).\n",
+	log_security("%s access to %s (user choice).\n",
 		accessPolicyString(userChoice),
 		url.c_str());
 
@@ -269,7 +269,7 @@ host_check(const std::string& host)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    //log_msg("Checking security of host: %s", host.c_str());
+    //log_security("Checking security of host: %s", host.c_str());
     
     assert( ! host.empty() );
 

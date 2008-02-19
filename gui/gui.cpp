@@ -230,7 +230,7 @@ Gui::resize_view(int width, int height)
 	}
 	else
 	{
-		//log_msg(_("Resize request received while there's still"
+		//log_debug(_("Resize request received while there's still"
 		//	" no movie loaded, can't correctly set movie scale"));
 	}
 	
@@ -242,7 +242,7 @@ Gui::resize_view(int width, int height)
 	_width = width;
 	_height = height;
 	_validbounds.setTo(0, 0, _width-1, _height-1);
-	//log_msg(_("new size (in twips) is: %dx%d"), _width*20, _height*20); 
+	//log_debug(_("new size (in twips) is: %dx%d"), _width*20, _height*20); 
 }
 
 void
@@ -345,7 +345,7 @@ Gui::notify_mouse_moved(int x, int y)
     if ( _stopped ) return;
 
 #ifdef DEBUG_MOUSE_COORDINATES
-	log_msg(_("mouse @ %d,%d"), x, y);
+	log_debug(_("mouse @ %d,%d"), x, y);
 #endif
 	if ( m->notify_mouse_moved(x, y) )
 	{
@@ -732,7 +732,7 @@ Gui::advanceMovie()
 	m->get_movie_definition()->ensure_frame_loaded(tot_frames);
 	m->goto_frame(cur_frame+1);
     	m->set_play_state(gnash::sprite_instance::PLAY);
-	log_msg(_("Frame %d"), m->get_current_frame());
+	log_debug(_("Frame %d"), m->get_current_frame());
 #endif
 
 
@@ -964,7 +964,7 @@ Gui::fpsCounterTick()
     
     float avg = fps_counter_total / secs_total; 
   
-    //log_msg("Effective frame rate: %0.2f fps", (float)(fps_counter/secs));
+    //log_debug("Effective frame rate: %0.2f fps", (float)(fps_counter/secs));
     printf("Effective frame rate: %0.2f fps (min %0.2f, avg %0.2f, max %0.2f, "
       "%u frames in %0.1f secs total)\n", rate, fps_rate_min, avg, fps_rate_max,
       fps_counter_total, secs_total);

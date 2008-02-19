@@ -188,7 +188,7 @@ Network::createServer(short port)
 //		char  ascip[INET_ADDRSTRLEN];
 //		inet_ntop(sock_in.sin_family, &_ipaddr, ascip, INET_ADDRSTRLEN);
 		char *ascip = ::inet_ntoa(sock_in.sin_addr);
-		log_msg(_("Server bound to service on %s, port %hd, using fd %d"),
+		log_debug(_("Server bound to service on %s, port %hd, using fd %d"),
 		    ascip, ntohs(sock_in.sin_port),
 		    _listenfd);
 	}
@@ -231,7 +231,7 @@ Network::newConnection(bool block)
     alen = sizeof(struct sockaddr_in);
 
     if (_debug) {
-	log_msg(_("Trying to accept net traffic on fd %d"), _sockfd);
+	log_debug(_("Trying to accept net traffic on fd %d"), _sockfd);
     }
 
     if (_listenfd <= 2) {
@@ -261,25 +261,25 @@ Network::newConnection(bool block)
 
         if (FD_ISSET(0, &fdset)) {
 	    if (_debug) {
-		log_msg(_("There is data at the console for stdin"));
+		log_debug(_("There is data at the console for stdin"));
 	    }
             return true;
         }
 
         // If interupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
-            log_msg(_("The accept() socket for fd %d was interupted by a system call"), _listenfd);
+            log_debug(_("The accept() socket for fd %d was interupted by a system call"), _listenfd);
         }
 
         if (ret == -1) {
-            log_msg(_("The accept() socket for fd %d never was available for writing"),
+            log_debug(_("The accept() socket for fd %d never was available for writing"),
                     _listenfd);
             return false;
         }
 
         if (ret == 0) {
             if (_debug) {
-                log_msg(_("The accept() socket for fd %d timed out waiting to write"),
+                log_debug(_("The accept() socket for fd %d timed out waiting to write"),
                         _listenfd);
             }
         }
@@ -296,7 +296,7 @@ Network::newConnection(bool block)
     }
 
     if (_debug) {
-	log_msg(_("Accepting tcp/ip connection on fd %d"), _sockfd);
+	log_debug(_("Accepting tcp/ip connection on fd %d"), _sockfd);
     }
 
     return true;
@@ -343,14 +343,14 @@ Network::connectSocket(const char *sockname)
         // If interupted by a system call, try again
         if (ret == -1 && errno == EINTR)
             {
-                log_msg(_("The connect() socket for fd %d was interupted by a system call"),
+                log_debug(_("The connect() socket for fd %d was interupted by a system call"),
                         _sockfd);
                 continue;
             }
 
         if (ret == -1)
             {
-                log_msg(_("The connect() socket for fd %d never was available for writing"),
+                log_debug(_("The connect() socket for fd %d never was available for writing"),
                         _sockfd);
 #ifdef HAVE_WINSOCK_H
                 ::shutdown(_sockfd, 0); // FIXME: was SHUT_BOTH
@@ -369,7 +369,7 @@ Network::connectSocket(const char *sockname)
         if (ret > 0) {
             ret = ::connect(_sockfd, reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr));
             if (ret == 0) {
-                log_msg(_("\tsocket name %s for fd %d"), sockname, _sockfd);
+                log_debug(_("\tsocket name %s for fd %d"), sockname, _sockfd);
                 _connected = true;
                 assert(_sockfd > 0);
                 return true;
@@ -439,15 +439,15 @@ Network::createClient(const char *hostname, short port)
         return false;
     }
 
-    log_msg(_("%s: to host %s at port %d"), __FUNCTION__, hostname, port);
+    log_debug(_("%s: to host %s at port %d"), __FUNCTION__, hostname, port);
 
     memset(&sock_in, 0, sizeof(struct sockaddr_in));
     memset(&thishostname, 0, MAXHOSTNAMELEN);
     if (strlen(hostname) == 0) {
         if (gethostname(thishostname, MAXHOSTNAMELEN) == 0) {
-            log_msg(_("The hostname for this machine is %s"), thishostname);
+            log_debug(_("The hostname for this machine is %s"), thishostname);
         } else {
-            log_msg(_("Couldn't get the hostname for this machine"));
+            log_debug(_("Couldn't get the hostname for this machine"));
             return false;
         }
     }
@@ -461,7 +461,7 @@ Network::createClient(const char *hostname, short port)
 #if 0
     char ascip[INET_ADDRSTRLEN];
     inet_ntop(sock_in.sin_family, &sock_in.sin_addr.s_addr, ascip, INET_ADDRSTRLEN);
-    log_msg(_("The IP address for this client socket is %s"), ascip);
+    log_debug(_("The IP address for this client socket is %s"), ascip);
 #endif
 
     proto = ::getprotobyname("TCP");
@@ -491,14 +491,14 @@ Network::createClient(const char *hostname, short port)
         // If interupted by a system call, try again
         if (ret == -1 && errno == EINTR)
             {
-                log_msg(_("The connect() socket for fd %d was interupted by a system call"),
+                log_debug(_("The connect() socket for fd %d was interupted by a system call"),
                         _sockfd);
                 continue;
             }
 
         if (ret == -1)
             {
-                log_msg(_("The connect() socket for fd %d never was available for writing"),
+                log_debug(_("The connect() socket for fd %d never was available for writing"),
                         _sockfd);
 #ifdef HAVE_WINSOCK_H
                 ::shutdown(_sockfd, 0); // FIXME: was SHUT_BOTH
@@ -520,7 +520,7 @@ Network::createClient(const char *hostname, short port)
 		char *ascip = ::inet_ntoa(sock_in.sin_addr);
 // 		char ascip[INET_ADDRSTRLEN];
 // 		inet_ntop(sock_in.sin_family, &sock_in.sin_addr.s_addr, ascip, INET_ADDRSTRLEN);
-                log_msg(_("\tport %d at IP %s for fd %d"), port,
+                log_debug(_("\tport %d at IP %s for fd %d"), port,
                         ascip, _sockfd);
                 _connected = true;
                 assert(_sockfd > 0);
@@ -603,7 +603,7 @@ Network::closeNet(int sockfd)
 #endif
                 retries++;
             } else {
-		log_msg(_("Closed the socket on fd %d"), sockfd);
+		log_debug(_("Closed the socket on fd %d"), sockfd);
                 return true;
             }
         }
@@ -631,7 +631,7 @@ Network::closeConnection(int fd)
 
     if (fd > 0) {
         ::close(fd);
-	log_msg("%s: Closed fd %d", __FUNCTION__, fd);
+	log_debug("%s: Closed fd %d", __FUNCTION__, fd);
 //        closeNet(fd);
     }
 
@@ -701,7 +701,7 @@ Network::readNet(int fd, char *buffer, int nbytes, int timeout)
 
         ret = read(fd, buffer, nbytes);
 	if (_debug) {
-	    log_msg (_("read %d bytes from fd %d"), ret, fd);
+	    log_debug (_("read %d bytes from fd %d"), ret, fd);
 	}
     }
 
@@ -710,10 +710,10 @@ Network::readNet(int fd, char *buffer, int nbytes, int timeout)
     hexint = new unsigned char[(nbytes + 3) *3];    
     
     hexify(hexint, (unsigned char *)buffer, ret, true);
-    log_msg (_("%s: Read packet data from fd %d: \n%s"),
+    log_debug (_("%s: Read packet data from fd %d: \n%s"),
 	     __FUNCTION__, fd, (char *)hexint);
 //     hexify(hexint,  (unsigned char *)buffer, ret, false);
-//     log_msg (_("%s: The packet data is: 0x%s"), __FUNCTION__, (char *)hexint);
+//     log_debug (_("%s: The packet data is: 0x%s"), __FUNCTION__, (char *)hexint);
     delete hexint;
 #endif    
     return ret;
@@ -814,12 +814,12 @@ Network::writeNet(int fd, char const *buffer, int nbytes, int timeout)
             bufptr += ret;
             if (ret != nbytes) {
 		if (_debug) {
-		    log_msg (_("wrote %d bytes to fd %d, expected %d"),
+		    log_debug (_("wrote %d bytes to fd %d, expected %d"),
 			       ret, fd, nbytes);
 		}
             } else {
 		if (_debug) {
-		    log_msg (_("wrote %d bytes to fd %d"),
+		    log_debug (_("wrote %d bytes to fd %d"),
 			       ret, fd);
 		}
 //                return ret;
@@ -835,7 +835,7 @@ Network::writeNet(int fd, char const *buffer, int nbytes, int timeout)
         if ((endtime.tv_sec - starttime.tv_sec) &&
             endtime.tv_usec - starttime.tv_usec)
         {
-            log_msg (_("took %d usec to write (%d bytes)"),
+            log_debug (_("took %d usec to write (%d bytes)"),
 		endtime.tv_usec - starttime.tv_usec, bytes_written);
         }
     }
@@ -846,10 +846,10 @@ Network::writeNet(int fd, char const *buffer, int nbytes, int timeout)
     hexint = new unsigned char[(nbytes + 3) *3];
     
     hexify(hexint, (unsigned char *)buffer, nbytes, true);
-    log_msg (_("%s: Wrote packet data to fd %d: \n%s"),
+    log_debug (_("%s: Wrote packet data to fd %d: \n%s"),
 	     __FUNCTION__, fd, (char *)hexint);
 //     hexify(hexint,  (unsigned char *)buffer, ret, false);
-//     log_msg (_("%s: Read packet data from fd %d: 0x%s"),
+//     log_debug (_("%s: Read packet data from fd %d: 0x%s"),
 // 	      __FUNCTION__, fd, (char *)hexint);
      delete hexint;
 #endif    

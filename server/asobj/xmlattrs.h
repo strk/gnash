@@ -87,10 +87,10 @@ public:
     int   padding;
 #ifdef DEBUG_MEMORY_ALLOCATION
     xmlattr_as_object() {
-        log_msg("\t\tCreating xmlattr_as_object at %p\n", this);
+        log_debug("\t\tCreating xmlattr_as_object at %p\n", this);
     };
     ~xmlattr_as_object() {
-        log_msg("\tDeleting xmlattr_as_object at %p \n", this);
+        log_debug("\tDeleting xmlattr_as_object at %p \n", this);
     };
 #endif
 };

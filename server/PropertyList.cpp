@@ -307,7 +307,7 @@ PropertyList::dump(as_object& this_ptr)
 	string_table& st = VM::get().getStringTable();
 	for (container::const_iterator it=_props.begin(), itEnd=_props.end(); it != itEnd; ++it )
 	{
-		log_msg("  %s: %s", st.value(it->mName).c_str(),
+		log_debug("  %s: %s", st.value(it->mName).c_str(),
 			it->getValue(this_ptr).to_string().c_str());
 	}
 }

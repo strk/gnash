@@ -219,14 +219,6 @@ DSOEXPORT unsigned char *hexify(unsigned char *p, const unsigned char *s, int le
 #define GNUC_LOG_ATTRS
 #endif
 
-/// Log a generic message
-//
-/// This is usually used for debugging, so most
-/// such calls should be in comments, unless you're actively debugging
-/// that piece of code right now.
-///
-DSOEXPORT void log_msg(const char* fmt, ...) GNUC_LOG_ATTRS;
-
 /// Log a runtime error
 //
 /// Runtime errors, such as un-openable files, un-allocatable memory,

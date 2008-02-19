@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: riscos.cpp,v 1.7 2008/01/21 20:55:41 rsavoye Exp $ */
+/* $Id: riscos.cpp,v 1.8 2008/02/19 19:20:49 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -65,7 +65,7 @@ RiscosGui::init(int argc, char **argv[])
                              (wimp_message_list *)0/*&messages*/,
                              0, &_task);
     if (error) {
-      log_msg("%s\n", error->errmess);
+      log_debug("%s\n", error->errmess);
       return false;
     }
 
@@ -79,7 +79,7 @@ RiscosGui::init(int argc, char **argv[])
     error = xos_read_vdu_variables((const os_vdu_var_list *)&vduvars,
                                    vduvals);
     if (error) {
-      log_msg("%s\n", error->errmess);
+      log_debug("%s\n", error->errmess);
       return false;
     }
 
@@ -89,7 +89,7 @@ RiscosGui::init(int argc, char **argv[])
     /* read current screenmode details */
     error = xosscreenmode_current(&mode);
     if (error) {
-      log_msg("%s", error->errmess);
+      log_debug("%s", error->errmess);
       return false;
     }
 
@@ -101,8 +101,8 @@ RiscosGui::init(int argc, char **argv[])
 
     /** \todo Mode specifiers */
 
-    log_msg("Framebuffer address: %p\n", (void *)vduvals[0]);
-    log_msg("Screen Res: %d x %d\n", _screen_width, _screen_height);
+    log_debug("Framebuffer address: %p\n", (void *)vduvals[0]);
+    log_debug("Screen Res: %d x %d\n", _screen_width, _screen_height);
 
     glue.prepFramebuffer((void *)vduvals[0], _screen_width, _screen_height);
 #endif
@@ -130,7 +130,7 @@ RiscosGui::createWindow(const char *title, int width, int height)
     state.w = _window;
     error = xwimp_get_window_state(&state);
     if (error) {
-      log_msg("%s\n", error->errmess);
+      log_debug("%s\n", error->errmess);
       return false;
     }
 
@@ -139,7 +139,7 @@ RiscosGui::createWindow(const char *title, int width, int height)
 
     error = xwimp_open_window((wimp_open *)&state);
     if (error) {
-      log_msg("%s\n", error->errmess);
+      log_debug("%s\n", error->errmess);
       return false;
     }
 
@@ -168,7 +168,7 @@ RiscosGui::renderBuffer()
     state.w = _window;
     error = xwimp_get_window_state(&state);
     if (error) {
-      log_msg("%s\n", error->errmess);
+      log_debug("%s\n", error->errmess);
     }
 
     glue.render(state.visible.x0 / 2,
@@ -219,7 +219,7 @@ RiscosGui::setInvalidatedRegion(const rect& bounds)
       m_draw_maxy = valid_coord(m_draw_maxy + 2, _height);
     }
 
-//    log_msg("DrawRect: (%i, %i), (%i, %i)\n",
+//    log_debug("DrawRect: (%i, %i), (%i, %i)\n",
 //            m_draw_minx, m_draw_miny, m_draw_maxx, m_draw_maxy);
 #endif
 }
@@ -240,7 +240,7 @@ RiscosGui::run()
     while (!_quit) {
       error = xwimp_poll_idle(wimp_SAVE_FP, &block, t, NULL, &event);
       if (error) {
-        log_msg("%s\n", error->errmess);
+        log_debug("%s\n", error->errmess);
         return false;
       }
 
@@ -263,13 +263,13 @@ RiscosGui::run()
       case wimp_REDRAW_WINDOW_REQUEST:
         error = xwimp_redraw_window(&block.redraw, &more);
         if (error) {
-          log_msg("%s\n", error->errmess);
+          log_debug("%s\n", error->errmess);
           return false;
         }
         while (more) {
 //          rect bounds(block.redraw.clip.x0 / 2, block.redraw.clip.y0 / 2,
 //                      block.redraw.clip.x1 / 2, block.redraw.clip.y1 / 2);
-//          log_msg("Clip rect: (%d, %d)(%d, %d)\n",
+//          log_debug("Clip rect: (%d, %d)(%d, %d)\n",
 //                  block.redraw.clip.x0 / 2, block.redraw.clip.y0 / 2,
 //                  block.redraw.clip.x1 / 2, block.redraw.clip.y1 / 2);
           // TODO: Make this use the clipping rectangle (convert to TWIPS)
@@ -280,7 +280,7 @@ RiscosGui::run()
           renderBuffer();
           error = xwimp_get_rectangle(&block.redraw, &more);
           if (error) {
-            log_msg("%s\n", error->errmess);
+            log_debug("%s\n", error->errmess);
             return false;
           }
         }
@@ -288,7 +288,7 @@ RiscosGui::run()
       case wimp_OPEN_WINDOW_REQUEST:
         error = xwimp_open_window(&block.open);
         if (error)
-          log_msg("%s\n", error->errmess);
+          log_debug("%s\n", error->errmess);
         break;
       case wimp_CLOSE_WINDOW_REQUEST:
         _quit = true;
@@ -376,7 +376,7 @@ bool RiscosGui::create_window()
 
     error = xwimp_create_window((wimp_window *)&window, &_window);
     if (error) {
-      log_msg("%s\n", error->errmess);
+      log_debug("%s\n", error->errmess);
       return false;
     }
 

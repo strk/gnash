@@ -328,7 +328,7 @@ public:
       if (bi==NULL) {
         // See server/styles.h comments about when NULL return is possible.
         // Don't warn here, we already warn at parse-time
-        //log_msg("WARNING: add_bitmap called with bi=NULL");
+        //log_debug("WARNING: add_bitmap called with bi=NULL");
         add_color(agg::rgba8_pre(0,0,0,0));
         return;
       }

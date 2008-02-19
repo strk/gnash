@@ -199,7 +199,7 @@ sharedobject_flush(const fn_call& fn)
     
     boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
 
-//    log_msg("Flushing to file %s", obj->getFilespec().c_str());        
+//    log_debug("Flushing to file %s", obj->getFilespec().c_str());        
     VM& vm = obj->getVM();
 
 #ifndef USE_SOL_READONLY
@@ -395,7 +395,7 @@ sharedobject_getlocal(const fn_call& fn)
     
     vector<Element *>::iterator it;
     vector<Element *> els = sol.getElements();
-    log_msg("Read "SIZET_FMT" AMF objects from %s", els.size(), newspec.c_str());
+    log_debug("Read "SIZET_FMT" AMF objects from %s", els.size(), newspec.c_str());
 
     string_table& st = obj->getVM().getStringTable();
     string_table::key dataKey =  obj->getVM().getStringTable().find("data");

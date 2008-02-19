@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.146 2008/02/17 10:01:14 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.147 2008/02/19 19:20:49 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -106,7 +106,7 @@ GtkGui::init(int argc, char **argv[])
 
     if (_xid) {
         _window = gtk_plug_new(_xid);
-        log_msg (_("Created XEmbedded window"));
+        log_debug (_("Created XEmbedded window"));
     } else {
 #ifdef GUI_HILDON
         _window = hildon_window_new();
@@ -114,7 +114,7 @@ GtkGui::init(int argc, char **argv[])
 #else
         _window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 #endif
-        log_msg (_("Created top level window"));
+        log_debug (_("Created top level window"));
     }
     
     // XXXbjacques: why do we need this?
@@ -175,7 +175,7 @@ GtkGui::init(int argc, char **argv[])
         int fd = lirc->getFileFd();
         addFDListener(fd, lirc_handler, &fd);
     } else {
-        log_msg(_("LIRC daemon not running"));
+        log_debug(_("LIRC daemon not running"));
     }
 #endif
     
@@ -254,7 +254,7 @@ GtkGui::setFullscreen()
         _overlay = gtk_window_new (GTK_WINDOW_TOPLEVEL);
         addGnashIcon(GTK_WINDOW(_overlay));
         gtk_window_fullscreen(GTK_WINDOW(_overlay));
-        log_msg (_("Created fullscreen window"));
+        log_debug (_("Created fullscreen window"));
         
         // Reparent drawing area from GtkPlug to fullscreen window
         gtk_widget_realize(_overlay);      
@@ -300,7 +300,7 @@ GtkGui::unsetFullscreen()
         setupWindowEvents();
         if (_overlay) {
             gtk_widget_destroy(_overlay);
-            log_msg (_("Destroyed fullscreen window"));
+            log_debug (_("Destroyed fullscreen window"));
         }        
     }
     
@@ -2134,7 +2134,7 @@ lirc_handler(void*, int, void* /*data*/)
 //    int* fd = static_cast<int*>(data);
     
     // want to remove this handler. You may want to close fd.
-    log_msg("%s\n", lirc->getButton());
+    log_debug("%s\n", lirc->getButton());
   
     // Want to keep this handler
     return true;

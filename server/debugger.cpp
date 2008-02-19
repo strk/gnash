@@ -139,7 +139,7 @@ Debugger::console(as_environment &env)
     Debugger::watch_state_e wstate;
     bool keep_going = true;
 
-    log_msg (_("Debugger enabled >> "));
+    log_debug (_("Debugger enabled >> "));
     while (keep_going) {
 	cerr << "gnashdbg> ";
 	cin >> action;
@@ -452,11 +452,11 @@ Debugger::matchBreakPoint(const std::string &func, bool state)
     std::map<std::string, bool>::const_iterator it;
     it =_breakpoints.find(func);
     if (it == _breakpoints.end()) {
-//	log_msg ("No Match for variable \"%s\"", var);
+//	log_debug ("No Match for variable \"%s\"", var);
  	return false;
     } else {
 	if (state == _breakpoints[func]) {
-//	    log_msg ("Matched for Function \"%s\"", func);
+//	    log_debug ("Matched for Function \"%s\"", func);
 	    this->console();
 	    return true;
 	}
@@ -469,7 +469,7 @@ Debugger::setWatchPoint(const std::string &var, watch_state_e state)
 {
 //    GNASH_REPORT_FUNCTION;
     _watchpoints[var] = state;
-    log_msg (_("Setting watchpoint for variable: \"%s\""), var.c_str());
+    log_debug (_("Setting watchpoint for variable: \"%s\""), var.c_str());
 }
 
 void
@@ -512,11 +512,11 @@ Debugger::matchWatchPoint(const std::string &var, watch_state_e state)
     std::map<std::string, watch_state_e>::const_iterator it;
     it =_watchpoints.find(var);
     if (it == _watchpoints.end()) {
-//	log_msg ("No Match for variable \"%s\"", var);
+//	log_debug ("No Match for variable \"%s\"", var);
  	return false;
     } else {
 	if (state == _watchpoints[var]) {
-	    log_msg (_("Matched for variable \"%s\": \"%s\""), var.c_str(),
+	    log_debug (_("Matched for variable \"%s\": \"%s\""), var.c_str(),
 		       state_strs[state]);
 	    this->console();
 	    return true;
@@ -567,7 +567,7 @@ Debugger::dumpStackFrame(as_environment &env)
 	return;
     }
     if (env.stack_size()) {
-        log_msg (_("Stack Dump of: %p"), (void *)&env);
+        log_debug (_("Stack Dump of: %p"), (void *)&env);
         for (unsigned int i=0, n=env.stack_size(); i<n; i++) {    
 	    // FIXME, shouldn't these go to the log as well as to cerr?
             cerr << "\t" << i << ": ";
@@ -595,7 +595,7 @@ Debugger::dumpStackFrame(as_environment &env)
 	}
     }
     else {
-	log_msg (_("Stack Dump of 0x%p: empty"), (void *)&env);
+	log_debug (_("Stack Dump of 0x%p: empty"), (void *)&env);
     }
 }
 
@@ -630,7 +630,7 @@ Debugger::dumpGlobalRegisters(as_environment &env)
     }
     std::string registers;
     stringstream ss;
-    log_msg (_("Global Registers Dump:"));
+    log_debug (_("Global Registers Dump:"));
     for (unsigned int i=0; i<4; ++i) {
 	ss << "\treg #" << i << ": \"";
 	ss << env.global_register(i).to_debug_string() << "\"" << endl;
@@ -707,7 +707,7 @@ Debugger::lookupSymbol(std::string &name)
 	std::map<void *, std::string>::const_iterator it;
 	for (it=_symbols.begin(); it != _symbols.end(); it++) {
 	    if (it->second == namei) {
-//		log_msg ("Found symbol %s at address %p", namei.c_str(),
+//		log_debug ("Found symbol %s at address %p", namei.c_str(),
 //			   it->first);
 		return it->first;
 	    }
@@ -724,7 +724,7 @@ Debugger::addSymbol(void *ptr, std::string name)
     std::string namei = PROPNAME(name);
     if (namei.size() > 1)
     {
-//	log_msg ("Adding symbol %s at address: %p", namei, ptr);
+//	log_debug ("Adding symbol %s at address: %p", namei, ptr);
 	_symbols[ptr] = namei;
     }
     
@@ -742,10 +742,10 @@ Debugger::lookupSymbol(void *ptr)
 	it = _symbols.find(ptr);
 //	dbglogfile.setStamp(false);
 	if (it != _symbols.end()) {
-//	    log_msg ("Found symbol %s at address: %p", it->second.c_str(), ptr);
+//	    log_debug ("Found symbol %s at address: %p", it->second.c_str(), ptr);
 	    str = it->second;
 // 	} else {
-// 	    log_msg ("No symbol found for address %p", ptr);
+// 	    log_debug ("No symbol found for address %p", ptr);
 	}
     }
 //    dbglogfile.setStamp(false);

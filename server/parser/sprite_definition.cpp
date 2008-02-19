@@ -42,7 +42,7 @@ sprite_definition::create_character_instance(character* parent,
 		int id)
 {
 #ifdef DEBUG_REGISTER_CLASS
-	log_msg(_("Instantiating sprite_def %p"), (void*)this);
+	log_debug(_("Instantiating sprite_def %p"), (void*)this);
 #endif
 	sprite_instance* si = new sprite_instance(this,
 		parent->get_root(), parent, id);
@@ -168,7 +168,7 @@ sprite_definition::read(stream* in)
 void
 sprite_definition::add_frame_name(const std::string& name)
 {
-	//log_msg(_("labelframe: frame %d, name %s"), m_loading_frame, name);
+	//log_debug(_("labelframe: frame %d, name %s"), m_loading_frame, name);
 	assert(m_loading_frame < m_frame_count);
     m_named_frames[name] = m_loading_frame;
 }
@@ -215,9 +215,9 @@ sprite_definition::registerClass(as_function* the_class)
 {
 	registeredClass = the_class;
 #ifdef DEBUG_REGISTER_CLASS
-	log_msg(_("Registered class %p for sprite_def %p"), (void*)registeredClass.get(), (void*)this);
+	log_debug(_("Registered class %p for sprite_def %p"), (void*)registeredClass.get(), (void*)this);
 	as_object* proto = registeredClass->getPrototype().get();
-	log_msg(_(" Exported interface: "));
+	log_debug(_(" Exported interface: "));
 	proto->dump_members();
 #endif
 }

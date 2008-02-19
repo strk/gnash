@@ -146,7 +146,7 @@ getMovieClipLoaderInterface()
 	if ( o == NULL )
 	{
 		o = new as_object(getObjectInterface());
-		//log_msg(_("MovieClipLoader interface @ %p"), o.get());
+		//log_debug(_("MovieClipLoader interface @ %p"), o.get());
 		attachMovieClipLoaderInterface(*o);
 	}
 	return o.get();
@@ -196,7 +196,7 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	URL url(url_str.c_str(), get_base_url());
 	
 #if GNASH_DEBUG
-	log_msg(_(" resolved url: %s"), url.str().c_str());
+	log_debug(_(" resolved url: %s"), url.str().c_str());
 #endif
 			 
 	as_value targetVal(&target);
@@ -260,7 +260,7 @@ moviecliploader_loadclip(const fn_call& fn)
 {
 	as_value	val, method;
 
-	//log_msg(_("%s: nargs = %d"), __FUNCTION__, fn.nargs);
+	//log_debug(_("%s: nargs = %d"), __FUNCTION__, fn.nargs);
 
 	boost::intrusive_ptr<MovieClipLoader> ptr = ensureType<MovieClipLoader>(fn.this_ptr);
   
@@ -299,7 +299,7 @@ moviecliploader_loadclip(const fn_call& fn)
 	}
 
 #if GNASH_DEBUG
-	log_msg(_("load clip: %s, target is: %p\n"),
+	log_debug(_("load clip: %s, target is: %p\n"),
 		str_url.c_str(), (void*)sprite);
 #endif
 
@@ -323,7 +323,7 @@ moviecliploader_new(const fn_call& /* fn */)
 {
 
   as_object*	mov_obj = new MovieClipLoader;
-  //log_msg(_("MovieClipLoader instance @ %p"), mov_obj);
+  //log_debug(_("MovieClipLoader instance @ %p"), mov_obj);
 
   return as_value(mov_obj); // will store in a boost::intrusive_ptr
 }
@@ -393,7 +393,7 @@ moviecliploader_class_init(as_object& global)
 		cl=new builtin_function(&moviecliploader_new, getMovieClipLoaderInterface());
 	}
 	global.init_member("MovieClipLoader", cl.get()); //as_value(moviecliploader_new));
-	//log_msg(_("MovieClipLoader class @ %p"), cl.get());
+	//log_debug(_("MovieClipLoader class @ %p"), cl.get());
 }
 
 } // end of gnash namespace

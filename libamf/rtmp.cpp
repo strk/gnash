@@ -84,7 +84,7 @@ RTMPproto::handShakeWait()
     memset(buffer, 0, RTMP_BODY_SIZE+16);
     
     if (readNet(buffer, 1) == 1) {
-        log_msg (_("Read initial Handshake Request"));
+        log_debug (_("Read initial Handshake Request"));
     } else {
         log_error (_("Couldn't read initial Handshake Request"));
         return false;
@@ -92,7 +92,7 @@ RTMPproto::handShakeWait()
     _inbytes += 1;
     
     if (*buffer == 0x3) {
-        log_msg (_("Handshake is correct"));
+        log_debug (_("Handshake is correct"));
     } else {
         log_error (_("Handshake isn't correct; "
         	     "Data read is: 0x%x"), *buffer);
@@ -101,7 +101,7 @@ RTMPproto::handShakeWait()
     
     if (readNet(buffer, RTMP_BODY_SIZE) == RTMP_BODY_SIZE) {        
         _inbytes += RTMP_BODY_SIZE;
-        log_msg (_("Read Handshake Data"));
+        log_debug (_("Read Handshake Data"));
 //        _body = new char(RTMP_BODY_SIZE+1);
         memcpy(_body, buffer, RTMP_BODY_SIZE);        
     } else {
@@ -173,14 +173,14 @@ RTMPproto::clientFinish()
     memset(buffer, 0, RTMP_BODY_SIZE+1);
 
     if (readNet(buffer, RTMP_BODY_SIZE) == RTMP_BODY_SIZE) {        
-        log_msg (_("Read first data block in handshake"));
+        log_debug (_("Read first data block in handshake"));
     } else {
         log_error (_("Couldn't read first data block in handshake"));
         return false;
     }
     _inbytes += RTMP_BODY_SIZE;
     if (readNet(buffer, RTMP_BODY_SIZE) == RTMP_BODY_SIZE) {        
-        log_msg (_("Read second data block in handshake"));
+        log_debug (_("Read second data block in handshake"));
 //         _body = new char(RTMP_BODY_SIZE+1);
 //         memcpy(_body, buffer, RTMP_BODY_SIZE);
     } else {
@@ -205,7 +205,7 @@ RTMPproto::serverFinish()
      memset(buffer, 0, RTMP_BODY_SIZE+1);
     
     if (readNet(buffer, RTMP_BODY_SIZE) == RTMP_BODY_SIZE) {
-        log_msg (_("Read Handshake Finish Data"));
+        log_debug (_("Read Handshake Finish Data"));
     } else {
         log_error (_("Couldn't read Handshake Finish Data"));
         return false;
@@ -215,7 +215,7 @@ RTMPproto::serverFinish()
 // FIXME: These should match, and appear to in GDB, but this triggers
 // an error of some kind.    
 //     if (memcmp(buffer, _body, 10) == 0) {
-//         log_msg (_("Handshake Finish Data matches"));
+//         log_debug (_("Handshake Finish Data matches"));
 //     } else {
 //         log_error (_("Handshake Finish Data doesn't match"));
 //         return false;
@@ -264,7 +264,7 @@ RTMPproto::packetRead()
 //    \003\000\000\017\000\000%G￿%@\024\000\000\000\000\002\000\aconnect\000?%G￿%@\000\000\000\000\000\000\003\000\003app\002\000#software/gnash/tests/1153948634.flv\000\bflashVer\002\000\fLNX 6,0,82,0\000\006swfUrl\002\000\035file:///file|%2Ftmp%2Fout.swf%G￿%@\000\005tcUrl\002\0004rtmp://localhost/software/gnash/tests/1153948634
 
     if ((ret = readNet(reinterpret_cast<char *>(buffer), 1)) > 0) {
-        log_msg (_("Read first RTMP header byte"));
+        log_debug (_("Read first RTMP header byte"));
     } else {
         log_error (_("Couldn't read first RTMP header byte"));
         return false;
@@ -272,12 +272,12 @@ RTMPproto::packetRead()
     
     amf_index = *tmpptr & AMF_INDEX_MASK;
     headersize = AMF::headerSize(*tmpptr++);
-    log_msg (_("The Header size is: %d"), headersize);
-    log_msg (_("The AMF index is: 0x%x"), amf_index);
+    log_debug (_("The Header size is: %d"), headersize);
+    log_debug (_("The AMF index is: 0x%x"), amf_index);
 
     if (headersize > 1) {
         if ((ret = readNet(reinterpret_cast<char *>(tmpptr), headersize-1)) > 0) {
-            log_msg (_("Read first RTMP packet header of header size %d"),
+            log_debug (_("Read first RTMP packet header of header size %d"),
                        ret);
             _inbytes += ret;
         } else {
@@ -294,19 +294,19 @@ RTMPproto::packetRead()
     tmpptr = buffer;
     
     while ((ret = readNet(reinterpret_cast<char *>(buffer), packetsize, 1)) > 0) {
-        log_msg (_("Reading AMF packets till we're done..."));
+        log_debug (_("Reading AMF packets till we're done..."));
         amf->addPacketData(tmpptr, ret);
         tmpptr = buffer + ret;
         _inbytes += ret;
 #if 1
 	hexify(hexint, buffer, packetsize, true);
-	log_msg (_("The packet data is: 0x%s"), (char *)hexint);
+	log_debug (_("The packet data is: 0x%s"), (char *)hexint);
 	hexify(hexint, buffer, packetsize, false);
-	log_msg (_("The packet data is: 0x%s"), (char *)hexint);
+	log_debug (_("The packet data is: 0x%s"), (char *)hexint);
 #endif    
     }
     
-    log_msg (_("Done reading packet"));
+    log_debug (_("Done reading packet"));
     amf->parseBody();
     
     return true;

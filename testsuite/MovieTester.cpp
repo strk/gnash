@@ -271,7 +271,7 @@ MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 	{
 		std::stringstream ss;
 	        ss << "exp:" << color.toShortString() << " ";
-		log_msg("UNTESTED: NORENDERER: pix:%d,%d %s %s", x,  y, ss.str().c_str(), label.c_str());
+		log_debug("UNTESTED: NORENDERER: pix:%d,%d %s %s", x,  y, ss.str().c_str(), label.c_str());
 	}
 
 	FuzzyPixel exp(color, tolerance);
@@ -296,7 +296,7 @@ MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 	        if ( ! handler.getAveragePixel(obt_col, x, y, radius) )
 		{
 			ss << " is out of rendering buffer";
-			log_msg("%sFAILED: %s (%s)", X,
+			log_debug("%sFAILED: %s (%s)", X,
 					ss.str().c_str(),
 					label.c_str()
 					);
@@ -323,14 +323,14 @@ MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 		FuzzyPixel obt(obt_col, tol);
 		if (exp ==  obt) // equality operator would use tolerance of most tolerating FuzzyPixel
 		{
-			log_msg("%sPASSED: %s %s", X,
+			log_debug("%sPASSED: %s %s", X,
 					ss.str().c_str(),
 					label.c_str()
 					);
 		}
 		else
 		{
-			log_msg("%sFAILED: %s %s", X,
+			log_debug("%sFAILED: %s %s", X,
 					ss.str().c_str(),
 					label.c_str()
 					);
@@ -445,7 +445,7 @@ MovieTester::initTestingRenderers()
 		handler.reset( create_render_handler_agg(pixelFormat) );
 		if ( handler.get() )
 		{
-			//log_msg("Renderer %s initialized", name.c_str());
+			//log_debug("Renderer %s initialized", name.c_str());
 			std::cout << "Renderer " << name << " initialized" << std::endl;
 			addTestingRenderer(handler, name); 
 		}

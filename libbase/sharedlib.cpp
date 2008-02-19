@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: sharedlib.cpp,v 1.19 2008/01/21 20:55:45 rsavoye Exp $ */
+/* $Id: sharedlib.cpp,v 1.20 2008/02/19 19:20:50 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -106,7 +106,7 @@ SharedLib::SharedLib(const char *filespec)
     if (errors) {
         log_error (_("Couldn't initialize ltdl: %s"), lt_dlerror());
 //     } else {
-//         log_msg ("Initialized ltdl");
+//         log_debug ("Initialized ltdl");
     }
     char *pluginsdir;
     char *env = getenv ("GNASH_PLUGINS");
@@ -166,7 +166,7 @@ SharedLib::openLib (const char *filespec)
 //     cerr << "Searching in " << lt_dlgetsearchpath()
 //          << "for database drivers" << endl;
 
-//    log_msg ("Trying to open shared library \"%s\"", filespec);
+//    log_debug ("Trying to open shared library \"%s\"", filespec);
     _dlhandle = lt_dlopenext (filespec);
     
     if (_dlhandle == NULL) {
@@ -177,7 +177,7 @@ SharedLib::openLib (const char *filespec)
     // Make this module unloadable
     lt_dlmakeresident(_dlhandle);
     
-    log_msg (_("Opened dynamic library \"%s\""), filespec);
+    log_debug (_("Opened dynamic library \"%s\""), filespec);
 
     _filespec = filespec;
     
@@ -215,7 +215,7 @@ SharedLib::getInitEntry (const char *symbol)
         log_error (_("Couldn't find symbol: %s"), symbol);
         return NULL;
     } else {
-        log_msg (_("Found symbol %s @ %p"), symbol, (void *)run);
+        log_debug (_("Found symbol %s @ %p"), symbol, (void *)run);
     }
     
     return (initentry *)run;
@@ -240,7 +240,7 @@ SharedLib::getDllSymbol(const char *symbol)
         log_error (_("Couldn't find symbol: %s"), symbol);
         return NULL;
     } else {
-        log_msg (_("Found symbol %s @ %p"), symbol, (void *)run);
+        log_debug (_("Found symbol %s @ %p"), symbol, (void *)run);
     }
     
     return (entrypoint *)run;
