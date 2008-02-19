@@ -1,294 +1,314 @@
 <chapter id="build">
   <title>Installing and Configuring &app;</title>
-
+  
   <para>
     There are two ways of installing &app;:
     <link linkend="packagemanager">using a package manager</link>
     or <link linkend="gettingsource">installing from source</link>.
   </para>
-
-<sect1 id="requirements">
-<title>Requirements</title>
-
-<para>
-Before downloading and installing &app;, check that your hardware and software meet the following requirements.
-</para>
-
-<sect2 id="hardware">
-<title>Hardware Requirements</title>
-
-<para>
-One of the goals of &app; is to make it portable enough to install on small devices.  As a result, the hardware requirements are minimal. &app; has even run on an ARM9 at 200 MHz with 64 MB of RAM! (It ran without video support in this case.)   While firm minimums have not been established, &app; has been shown to run successfully with the following:
-</para>
-
-<itemizedlist>
-<listitem>
-<para>
-336 MHz processor
-</para>
-</listitem>
-<listitem>
-<para>
-256 MB RAM
-</para>
-</listitem>
-<listitem>
-<para>
-Video &mdash; &app; will run on anything from a raw frame buffer up to an OpenGL-supporting graphics card.
-</para>
-</listitem>
-</itemizedlist>
-
-<para>
-The following table provides a list of the Operating System/CPU combinations on which &app; has been shown to run.
-</para>
-
-<table id="tb-os-cpu">
-<title>Build Matrix</title>
-<tgroup cols='2' align='left' colsep='1' rowsep='1'>
-<colspec colname='Operating System' />
-<colspec colname='CPU' />
-<thead>
-<row>
-  <entry>Render GUI</entry>
-  <entry>Virtual Memory</entry>
-</row>
-</thead>
-<tbody>
-<row>
-<entry>FreeBSD</entry>
-<entry>Alpha AXP, AMD64, i386, Itanium, PC-98, PowerPC, SPARC64 
-</entry>
-</row>
-<row>
-<entry>GNU/Linux 
-</entry>
-<entry>CRIS</entry>
-</row>
-<row>
-<entry>GNU/Linux [OLPC] 
-</entry>
-<entry>Geode GX 
-</entry>
-</row>
-<row>
-<entry>GNU/Linux ALTLinux 
-</entry>
-<entry>i586</entry>
-</row>
-<row>
-<entry>GNU/Linux Arklinux 
-</entry>
-<entry>i586</entry>
-</row>
-<row>
-<entry>GNU/Linux Debian 
-</entry>
-<entry>Alpha AXP, AMD64, ARM, hppa, i386, Itanium, MIPS, PowerPC, IBM zSeries (s390), SPARC 
-</entry>
-</row>
-<row>
-<entry>GNU/Linux Fedora core 
-</entry>
-<entry>x86-32, x86-64 
-</entry>
-</row>
-<row>
-<entry>GNU/Linux Gentoo 
-</entry>
-<entry>AMD64, PowerPC, SPARC, x86 
-</entry>
-</row>
-<row>
-<entry>GNU/Linux Gentoo 
-</entry>
-<entry>AMD64, PowerPC, SPARC, x86 
-</entry>
-</row>
-<row>
-<entry>GNU/Linux Maemo 2.1 
-</entry>
-<entry>ARMv5t</entry>
-</row>
-<row>
-<entry>GNU/Linux Mandriva 2007 
-</entry>
-<entry></entry>
-</row>
-<row>
-<entry>GNU/Linux Open Zaurus 
-</entry>
-<entry>ARM 
-</entry>
-</row>
-<row>
-<entry>GNU/Linux OpenSuSE 10 
-</entry>
-<entry>i586, x86-64 
-</entry>
-</row>
-<row>
-<entry>GNU/Linux Red Hat 
-</entry>
-<entry>x86-32, x86-64 
-</entry>
-</row>
-<row>
-<entry>GNU/Linux Ubuntu 
-</entry>
-<entry>x86-64 reported working, also x86-32 and UltraSPARC 
-</entry>
-</row>
-<row>
-<entry>Haiku</entry>
-<entry></entry>
-</row>
-<row>
-<entry>Irix 6.5 
-</entry>
-<entry>MIPS R10K 
-</entry>
-</row>
-<row>
-<entry>MacOS X 
-</entry>
-<entry>PowerPC and x86-32 
-</entry>
-</row>
-<row>
-<entry>NetBSD</entry>
-<entry>many, including VAX
-</entry>
-</row>
-<row>
-<entry>OpenBSD</entry>
-<entry>many, including VAX, OS/2 and eComstation</entry>
-</row>
-<row>
-<entry>Windows</entry>
-<entry>x86-32</entry>
-</row>
-</tbody>
-</tgroup>
-</table>
-
-</sect2>
-
-<sect2 id="software">
-<title>Software Requirements</title>
-
-<para>
-The &appversion; release of &app; has been designed to run on UNIX/Linux variants, and has been run on most of the free ones.  However, &app; has successfully run on Windows, Darwin (Mac OS X), Irix, Solaris, BeOs, OS/2, and Haiku.  &app; has also run on the following 64-bit systems: PowerPC, Itanium, UltraSparc, and AMD64.   For now, it is important to be sure that the following code, testing, and documentation dependencies are met before installing &app;.  If you will be downloading &app; with a package manager, these dependencies may be solved by the package manager.  Otherwise, you must first verify that each of these dependencies are installed on the target system.
-</para>
-
- <sect3 id="codedepend">
-       &codedependencies;
-    </sect3>
-
- <sect3 id="testdepend">
-       &testdependencies;
-    </sect3>
-
-<sect3 id="docdepend">
-       &docdependencies;
-    </sect3>
-</sect2>
-
-</sect1>
-
-<sect1 id="downloading">
-<title>Downloading &app;</title>
-
-<para>
-There are two ways to download &app;: using a package manager or by downloading the source code and building it on your system. If possible, it is advisable to use a package manager to download &app;, as it will resolve dependencies for you.  However, if you want the very latest features, or a &app; package is not available for your operating system, it is better to download the source code and build &app; locally.
-</para>
-
-  <sect2 id="packagemanager">
-    &pkgmanager;
-  </sect2>
-
- <sect2 id="gettingsource">
-  <title>Getting the Source</title>
-
-  <para>
-    &app; is available as a <link linkend="sourcereleases">release
-    tarball</link>, a <link linkend="sourcerepo">development 
-    checkout</link>, or a <link linkend="sourcesnapshot">development
-    snapshot</link>.
-  </para>
-
-  <sect3 id="sourcereleases">
-    <title>Releases</title>
-
+  
+  <sect1 id="requirements">
+    <title>Requirements</title>
+    
     <para>
-      The source can be acquired from a
-      <ulink type="http" 
-      url="http://www.gnu.org/prep/ftp.html">GNU FTP
-      Mirror</ulink>.  The release version is intended to be
-      stable, and is probably your best choice if the release took
-      place recently.  If you need features or fixes which were
-      introduced after the release, consider a 
-      <link linkend="sourcerepo">CVS checkout</link> or the
-      <link linkend="sourcesnapshot">daily snapshot</link>.
+      Before downloading and installing &app;, check that your
+      hardware and software meet the following requirements.
     </para>
-    <para>
-      To download, select a mirror near you, then choose the
-      <filename>gnash</filename> directory.
-    </para>
-  </sect3>
-
-  <sect3 id="sourcerepo">
-    <title>Repository</title>
-
-    <para>
-      The latest development sources are available via
-      anonymous CVS.  This is recommended
-      if you need features or bug fixes which were introduced after
-      the <link linkend="sourcereleases">last release</link>.  Look at
-      the <link linkend="sourcesnapshot">daily snapshot</link> if you
-      experience difficulty accessing the repository.
-    </para>
-    <para>
-To download via anonymous CVS, first set the
-      environment variable <command>CVS_RSH</command> to <command>ssh</command>, then check out the source code.  The example below uses the GNU Bourne-Again shell (bash):
-</para>
-
-<screen>
-export CVS_RSH="ssh"
-cvs -z3 -d:pserver:anonymous@cvs.sv.gnu.org:/sources/gnash co gnash
-</screen>
-
-<para>
-      It is also possible to browse the repository
-      <ulink url="http://cvs.savannah.gnu.org/viewcvs/gnash/?root=gnash"
-      type="http" /> on the web.
-    </para>
-  </sect3>
-
-  <sect3 id="sourcesnapshot">
-    <title>Snapshot</title>
-
-    <para>
-      The daily development snapshot can be downloaded from
-      <ulink url="http://www.gnashdev.org/dev_snapshots/"
-      type="http">http://www.gnashdev.org/dev_snapshots/</ulink>.
-      This is the best option if you need changes which were introduced
-      after the <link linkend="sourcereleases">last release</link> of
-      &app;, but are unable to <link linkend="sourcerepo">download
-      directly from the repository.</link>
-    </para>
-  </sect3>
-
-</sect2>
+    
+    <sect2 id="hardware">
+      <title>Hardware Requirements</title>
+      
+      <para>
+	One of the goals of &app; is to make it portable enough to install on
+	small devices.  As a result, the hardware requirements are
+	minimal. &app; has even run on an ARM9 at 200 MHz with 64 MB of RAM!
+	(It ran without video support in this case.)   While firm minimums
+	have not been established, &app; has been shown to run successfully
+	with the following:
+      </para>
+      
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    336 MHz processor
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    256 MB RAM
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Video &mdash; &app; will run on anything from a raw frame buffer up to
+	    an OpenGL-supporting graphics card.
+	  </para>
+	</listitem>
+      </itemizedlist>
+      
+      <para>
+	The following table provides a list of the Operating System/CPU
+	combinations on which &app; has been shown to run. 
+      </para>
+      
+      <table id="tb-os-cpu">
+	<title>Build Matrix</title>
+	<tgroup cols='2' align='left' colsep='1' rowsep='1'>
+	  <colspec colname='Operating System' />
+	  <colspec colname='CPU' />
+	  <thead>
+	    <row>
+	      <entry>Render GUI</entry>
+	      <entry>Virtual Memory</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry>OpenBSD, FreeBSD, NetBSD</entry>
+	      <entry>Alpha AXP, AMD64, i386, Itanium, PC-98, PowerPC, SPARC64 
+	      </entry>
+	    </row>
+	    <row>
+	      <entry>ALTLinux</entry>
+	      <entry>i586</entry>
+	    </row>
+	    <row>
+	      <entry>Arklinux</entry>
+	      <entry>i586</entry>
+	    </row>
+	    <row>
+	      <entry>Debian</entry>
+	      <entry>Alpha AXP, AMD64, ARM, hppa, i386, Itanium, MIPS,
+	      PowerPC, IBM zSeries (s390), SPARC  
+	      </entry>
+	    </row>
+	    <row>
+	      <entry>Fedora</entry>
+	      <entry>x86-32, x86-64, Geode GX, Geode LX
+	      </entry>
+	    </row>
+	    <row>
+	      <entry>Gentoo</entry>
+	      <entry>AMD64, PowerPC, SPARC, x86 
+	      </entry>
+	    </row>
+	    <row>
+	      <entry>Maemo 2.1</entry>
+	      <entry>i385, ARMv5t</entry>
+	    </row>
+	    <row>
+	      <entry>Scratchbox</entry>
+	      <entry>i386, ARMv5t</entry>
+	    </row>
+	    <row>
+	      <entry>Access Linux Platform
+	      </entry>
+	      <entry>i386, ARMv5t</entry>
+	    </row>
+	    <row>
+	      <entry>Mandriva
+	      </entry>
+	      <entry>i386</entry>
+	    </row>
+	    <row>
+	      <entry>Open Embedded
+	      </entry>
+	      <entry>ARM
+	      </entry>
+	    </row>
+	    <row>
+	      <entry>YellowDog Linux 6
+	      </entry>
+	      <entry>PowerPC, PS3
+	      </entry>
+	    </row>
+	    <row>
+	      <entry>OpenSuSE 10 
+	      </entry>
+	      <entry>i586, x86-64 
+	      </entry>
+	    </row>
+	    <row>
+	      <entry>Red Hat Enterprise and CentOS
+	      </entry>
+	      <entry>x86-32, x86-64 
+	      </entry>
+	    </row>
+	    <row>
+	      <entry>Ubuntu 
+	      </entry>
+	      <entry>x86-64, x86-32, PowerPC, UltraSPARC 
+	      </entry>
+	    </row>
+	    <row>
+	      <entry>Haiku</entry>
+	      <entry>i386</entry>
+	    </row>
+	    <row>
+	      <entry>Irix 6.5 
+	      </entry>
+	      <entry>MIPS R10K 
+	      </entry>
+	    </row>
+	    <row>
+	      <entry>Darwin (MacOS X)
+	      </entry>
+	      <entry>PowerPC and x86-32 
+	      </entry>
+	    </row>
+	    <row>
+	      <entry>NetBSD</entry>
+	      <entry>many, including VAX
+	      </entry>
+	    </row>
+	    <row>
+	      <entry>OpenBSD</entry>
+	      <entry>many, including VAX, OS/2 and eComstation</entry>
+	    </row>
+	    <row>
+	      <entry>Windows</entry>
+	      <entry>x86-32</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </table>
+      
+    </sect2>
+    
+    <sect2 id="software">
+      <title>Software Requirements</title>
+      
+      <para>
+	The &appversion; release of &app; has been designed to run on
+	UNIX/Linux variants, and has been run on most of the free ones.
+	However, &app; has successfully run on Windows, Darwin (Mac OS X),
+	Irix, Solaris, BeOs, OS/2, and Haiku.  &app; has also run on the
+	following 64-bit systems: PowerPC, Itanium, UltraSparc, and AMD64.
+	For now, it is important to be sure that the following code, testing,
+	and documentation dependencies are met before installing &app;.  If
+	you will be downloading &app; with a package manager, these
+	dependencies may be solved by the package manager.  Otherwise, you
+	must first verify that each of these dependencies are installed on the
+	target system.
+      </para>
+      
+      <sect3 id="codedepend">
+	&codedependencies;
+      </sect3>
+      
+      <sect3 id="testdepend">
+	&testdependencies;
+      </sect3>
+	
+      <sect3 id="docdepend">
+	&docdependencies;
+      </sect3>
+      
+    </sect2>
+    
+  </sect1>
+  
+    <sect1 id="downloading">
+      <title>Downloading &app;</title>
+      
+      <para>
+	There are two ways to download &app;: using a package manager or by
+	downloading the source code and building it on your system. If
+	possible, it is advisable to use a package manager to download &app;,
+	as it will resolve dependencies for you.  However, if you want the
+	very latest features, or a &app; package is not available for your
+	operating system, it is better to download the source code and build
+	&app; locally. 
+      </para>
+      
+      <sect2 id="packagemanager">
+	&pkgmanager;
+      </sect2>
+      
+      <sect2 id="gettingsource">
+	<title>Getting the Source</title>
+	
+	<para>
+	  &app; is available as a <link linkend="sourcereleases">release
+	  tarball</link>, a <link linkend="sourcerepo">development 
+	  checkout</link>, or a <link linkend="sourcesnapshot">development
+	  snapshot</link>.
+	</para>
+	
+	<sect3 id="sourcereleases">
+	  <title>Releases</title>
+	  
+	  <para>
+	    The source can be acquired from a
+	    <ulink type="http" 
+		   url="http://www.gnu.org/prep/ftp.html">GNU FTP
+	    Mirror</ulink>.  The release version is intended to be
+	    stable, and is probably your best choice if the release took
+	    place recently.  If you need features or fixes which were
+	    introduced after the release, consider a 
+	    <link linkend="sourcerepo">CVS checkout</link> or the
+	    <link linkend="sourcesnapshot">daily snapshot</link>.
+	  </para>
+	  <para>
+	    To download, select a mirror near you, then choose the
+	    <filename>gnash</filename> directory.
+	  </para>
+	</sect3>
+	
+	<sect3 id="sourcerepo">
+	  <title>Repository</title>
+	  
+	  <para>
+	    The latest development sources are available via
+	    anonymous CVS.  This is recommended
+	    if you need features or bug fixes which were introduced after
+	    the <link linkend="sourcereleases">last release</link>.  Look at
+	    the <link linkend="sourcesnapshot">daily snapshot</link> if you
+	    experience difficulty accessing the repository.
+	  </para>
+	  <para>
+	    To download via anonymous CVS, first set the
+	    environment variable <command>CVS_RSH</command> to
+	    <command>ssh</command>, then check out the source code.
+	    The example below uses the GNU Bourne-Again shell (bash): 
+	  </para>
+	  
+	  <screen>
+	    export CVS_RSH="ssh"
+	    cvs -z3 -d:pserver:anonymous@cvs.sv.gnu.org:/sources/gnash co gnash
+	  </screen>
+	  
+	  <para>
+	    It is also possible to browse the repository
+	    <ulink url="http://cvs.savannah.gnu.org/viewcvs/gnash/?root=gnash"
+		   type="http" /> on the web.
+	  </para>
+	</sect3>
+	
+	<sect3 id="sourcesnapshot">
+	  <title>Snapshot</title>
+	  
+	  <para>
+	    The daily development snapshot can be downloaded from
+	    <ulink url="http://www.gnashdev.org/dev_snapshots/"
+		   type="http">http://www.gnashdev.org/dev_snapshots/</ulink>.
+	    This is the best option if you need changes which were introduced
+	    after the <link linkend="sourcereleases">last release</link> of
+	    &app;, but are unable to <link linkend="sourcerepo">download
+	    directly from the repository.</link>
+	  </para>
+	</sect3>
+	
+      </sect2>
    
-</sect1>
-
-<sect1 id="pre-configuration">
-<title>Pre-Compile Configuration</title>
-
-&configuration;
-
-</sect1>
+    </sect1>
+    
+    <sect1 id="pre-configuration">
+      <title>Pre-Compile Configuration</title>
+      
+      &configuration;
+      
+    </sect1>
     
     <sect1 id="compiling">
       &building; 
@@ -297,6 +317,6 @@ cvs -z3 -d:pserver:anonymous@cvs.sv.gnu.org:/sources/gnash co gnash
     <sect1 id="install">
       &install; 
     </sect1>
-
+    
 </chapter>
 

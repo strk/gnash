@@ -1,319 +1,444 @@
 <chapter id="specification">
-<title>Technical Specifications</title>
-
-<para>
-The information in this chapter may change quickly.  For the most current information about the following subjects, be sure the check the Developer's Wiki at <ulink url="http://www.gnashdev.org/wiki/index.php/Main_Page" />.
-</para>
-
-<sect1 id="spec-actionscript">
-<title>&AS;</title>
-
-<para>
-As stated in the section <xref linkend="flashsupport" />, &app; has implemented about 80% of &AS; v. 2.0, and has begun implementing &AS; v. 3.0.  &app; supports the majority of Flash opcodes up to SWF version 7, and a wide sampling of &AS; classes for SWF version 7.
-</para>
-
-<para>
-The following table indicates how fully various &AS; classes have been implemented:
-</para>
-
-<table frame='all'>
-<title>&AS; Classes</title>
-<tgroup cols='2' align='left' colsep='1' rowsep='1'>
-<colspec colname='Class'/>
-<colspec colname='Status'/>
-<thead>
-<row>
-  <entry>Class</entry>
-  <entry>Status</entry>
-</row>
-</thead>
-<tbody>
-<row>
-<entry>Actionscript/Date</entry>
-<entry>Implemented</entry>
-</row>
-<row>
-<entry>Actionscript/Function</entry>
-<entry>Implemented</entry>
-</row>
-<row>
-<entry>Actionscript/MovieClip</entry>
-<entry>Implemented</entry>
-</row>
-<row>
-<entry>Actionscript/MovieClipLoader</entry>
-<entry>Implemented</entry>
-</row>
-<row>
-<entry>Actionscript/Object</entry>
-<entry>Implemented</entry>
-</row>
-<row>
-<entry>Actionscript/Sound</entry>
-<entry>Implemented</entry>
-</row>
-<row>
-<entry>Actionscript/String</entry>
-<entry>Implemented</entry>
-</row>
-<row>
-<entry>Actionscript/XMLNode</entry>
-<entry>Implemented</entry>
-</row>
-<row>
-<entry>Actionscript/XMLSocket</entry>
-<entry>Implemented</entry>
-</row>
-<row>
-<entry>Actionscript/_global</entry>
-<entry>Partially Implemented</entry>
-</row>
-<row>
-<entry>Actionscript/Array</entry>
-<entry>Partially Implemented</entry>
-</row>
-<row>
-<entry>Actionscript/LocalConnection</entry>
-<entry>Partially Implemented</entry>
-</row>
-<row>
-<entry>Actionscript/NetConnection</entry>
-<entry>Partially Implemented</entry>
-</row>
-<row>
-<entry>Actionscript/NetStream</entry>
-<entry>Partially Implemented</entry>
-</row>
-<row>
-<entry>Actionscript/TextField</entry>
-<entry>Partially Implemented</entry>
-</row>
-<row>
-<entry>Actionscript/XML</entry>
-<entry>Partially Implemented</entry>
-</row>
-<row>
-<entry>Actionscript/Boolean</entry>
-<entry>Unimplemented</entry>
-</row>
-<row>
-<entry>Actionscript/Error</entry>
-<entry>Unimplemented</entry>
-</row>
-<row>
-<entry>Actionscript/LoadVars</entry>
-<entry>Unimplemented</entry>
-</row>
-<row>
-<entry>Actionscript/Number</entry>
-<entry>Unimplemented</entry>
-</row>
-<row>
-<entry>Actionscript/Selection</entry>
-<entry>Unimplemented</entry>
-</row>
-<row>
-<entry>Actionscript/TextFormat</entry>
-<entry>Unimplemented</entry>
-</row>
-<row>
-<entry>Actionscript/Unknown</entry>
-<entry>Unimplemented</entry>
-</row>
-</tbody>
-</tgroup>
-</table>
-
-<para>
-The next table indicates which opcodes have been implemented:
-</para>
-
-<table frame='all'>
-<title>Opcodes</title>
-<tgroup cols='2' align='left' colsep='1' rowsep='1'>
-<colspec colname='Opcode'/>
-<colspec colname='Status'/>
-<thead>
-<row>
-  <entry>Opcode</entry>
-  <entry>Status</entry>
-</row>
-</thead>
-<tbody>
-<row>
-<entry>0x43 declare_obj</entry>
-<entry>Implemented</entry>
-</row>
-<row>
-<entry>0x2B cast</entry>
-<entry>Implemented</entry>
-</row>
-<row>
-<entry>0x3B delete2 - SWF::ACTION_DELETE</entry>
-<entry>Implemented</entry>
-</row>
-<row>
-<entry>0x53 new_method</entry>
-<entry>Implemented</entry>
-</row>
-<row>
-<entry>0x55 enum_object</entry>
-<entry>Implemented</entry>
-</row>
-<row>
-<entry>0x3A delete - SWF::ACTION_DELETEVAR</entry>
-<entry>Implemented</entry>
-</row>
-<row>
-<entry>0x69 Extends - SWF::ACTION_EXTENDS</entry>
-<entry>Implemented</entry>
-</row>
-<row>
-<entry>0x54 instance_of</entry>
-<entry>Partially Implemented</entry>
-</row>
-<row>
-<entry>0x2A Throw</entry>
-<entry>Unimplemented</entry>
-</row>
-<row>
-<entry>0x2C Implements</entry>
-<entry>Unimplemented</entry>
-</row>
-<row>
-<entry>0x8F Try</entry>
-<entry>Unimplemented</entry>
-</row>
-<row>
-<entry>0x31 md length</entry>
-<entry>Unimplemented</entry>
-</row>
-<row>
-<entry>0x35 md substring</entry>
-<entry>Unimplemented</entry>
-</row>
-<row>
-<entry>0x37 md chr</entry>
-<entry>Unimplemented</entry>
-</row>
-<row>
-<entry>0x45 get target</entry>
-<entry>Unimplemented</entry>
-</row>
-</tbody>
-</tgroup>
-</table>
-
-</sect1>
-
-<sect1 id="spec-memory">
-<title>Memory Management</title>
-
-<para>
-One of the new features of &app; &appversion; is the garbage collector.  The garbage collector manages complex &AS; variables, which are the only ones that are shared by references.  In &app;, these are <command>as_object</command> class instances created by &AS; (i.e. not those created by playhead control: <command>placeobject</command>/<command>removeobject</command>).
-</para>
-
-<para>
-Collected objects are those allocated due to &AS; explicit or implicit calls.  Explicit all are any user-defined statements that allocate new objects, such as arrays, Objects, or script-created movieclips.  Implicit calls are the built-in functions that can be deleted by arbitrary user calls.
-</para>
-
-<para>
-Any object that is a candidate for garbage collecting is stored in a list owned by the collector.  This list is filled by an executing action context whenever a collectible object is allocated on the heap.
-</para>
-
-<para>
-The garbage collector starts at the very end of an execution context, rather than using a threshold to trigger it.  At this point, the virtual machine is in a "stable" state; any still-reachable object has its roots in one of the currently live character instances (stage characters).
-</para>
-
-<para>
-The collector is a conservative collector.  Any object on the collectibles list is marked as <guilabel>UNREACHABLE</guilabel>, an iterative scan starting from the roots marks any still-reachable object, and a final purge releases all still-<guilabel>UNREACHABLE</guilabel> resources.
-</para>
-
-<para>
-This garbage collector has reduced the memory footprint of &app;.  However, the most current, available test data indicated the following runtime memory footprint:
-</para>
-
-<table frame='all'>
-<title>Memory Footprint</title>
-<tgroup cols='4' align='left' colsep='1' rowsep='1'>
-<colspec colname='Render GUI' />
-<colspec colname='Virtual Memory' />
-<colspec colname='Resident Set Size (physical RAM' />
-<colspec colname='Shared Memory (code size)' />
-<thead>
-<row>
-  <entry>Render GUI</entry>
-  <entry>Virtual Memory</entry>
-  <entry>Resident Set Size (physical RAM</entry>
-  <entry>Shared Memory (code size)</entry>
-</row>
-</thead>
-<tbody>
-<row>
-  <entry>agg-gtk</entry>
-  <entry>33372 KB</entry>
-  <entry>14 MB</entry>
-  <entry>8948 KB</entry>
-</row>
-<row>
-  <entry>agg-sdl</entry>
-  <entry>26564 KB</entry>
-  <entry>9396 KB</entry>
-  <entry>5124 KB</entry>
-</row>
-<row>
-  <entry>agg-fltk</entry>
-  <entry>24556 KB</entry>
-  <entry>8992 KB</entry>
-  <entry>4220 KB</entry>
-</row>
-<row>
-  <entry>cairo-fltk</entry>
-  <entry>184 MB</entry>
-  <entry>128 MB</entry>
-  <entry>4284 KB</entry>
-</row>
-<row>
-  <entry>cairo-gtk</entry>
-  <entry>192 MB</entry>
-  <entry>133 MB</entry>
-  <entry>8000 KB</entry>
-</row>
-<row>
-  <entry>cairo-sdl</entry>
-  <entry>187 MB</entry>
-  <entry>129 MB </entry>
-  <entry>5256 KB</entry>
-</row>
-<row>
-  <entry>opengl-gtk </entry>
-  <entry>62620 KB</entry>
-  <entry>15 MB</entry>
-  <entry>9336 KB</entry>
-</row>
-<row>
-  <entry>opengl-sdl </entry>
-  <entry>54932 KB</entry>
-  <entry>10 MB</entry>
-  <entry>5324 KB</entry>
-</row>
-</tbody>
-</tgroup>
-</table>
-
-</sect1>
-
-<sect1 id="spec-security">
-<title>Security</title>
-
-<para>
-Many Flash implementations contain potential security exploits that could compromise a viewer's system.  With &app;, an end-user has the ability to see "what's going on" &mdash; what types of data the application accesses, where it is found, and how it is used.  Many known Flash exploits are included in the &app; test suite that is used to check whether a release is ready for the public.  The &app; developers are also in the process of a security review, developing a security layer that will protect an end-user, no matter what operating system they use.
-</para>
-
-<para>
-One early security feature is the blacklist/whitelist.  Flash movies running in a browser can make outgoing network connections. This can be used, for example, to compromise a network device inside a company firewall via a Flash movie running on an employee's browser. &app; allows you to blacklist hosts that you know are insecure, or to whitelist hosts you know are secure, by editing a configuration file.
-</para>
-
+  <title>Technical Specifications</title>
+  
+  <para>
+    The information in this chapter may change quickly.  For the most
+    current information about the following subjects, be sure the check
+    the Developer's Wiki at <ulink
+    url="http://www.gnashdev.org/wiki/index.php/Main_Page" />. 
+  </para>
+  
+  <sect1 id="spec-actionscript">
+    <title>&AS;</title>
+    
+    <para>
+      As stated in the section <xref linkend="flashsupport" />, &app; has
+      implemented about 80% of &AS; v. 2.0, and has begun implementing &AS;
+      v. 3.0.  &app; supports the majority of Flash opcodes up to SWF
+      version 9, and a wide sampling of &AS; classes for SWF version 8. 
+    </para>
+    
+    <para>
+      The following table indicates how fully various &AS; classes have been
+      implemented: 
+    </para>
+    
+    <table frame='all'>
+      <title>&AS; Classes</title>
+      <tgroup cols='2' align='left' colsep='1' rowsep='1'>
+	<colspec colname='Class'/>
+	<colspec colname='Status'/>
+	<thead>
+	  <row>
+	    <entry>Class</entry>
+	    <entry>Status</entry>
+	  </row>
+	</thead>
+	<tbody>
+	  <row>
+	    <entry>Actionscript/Date</entry>
+	    <entry>Implemented</entry>
+	  </row>
+	  <row>
+	    <entry>Actionscript/Function</entry>
+	    <entry>Implemented</entry>
+	  </row>
+	  <row>
+	    <entry>Actionscript/MovieClip</entry>
+	    <entry>Implemented</entry>
+	  </row>
+	  <row>
+	    <entry>Actionscript/MovieClipLoader</entry>
+	    <entry>Implemented</entry>
+	  </row>
+	  <row>
+	    <entry>Actionscript/Object</entry>
+	    <entry>Implemented</entry>
+	  </row>
+	  <row>
+	    <entry>Actionscript/Sound</entry>
+	    <entry>Implemented</entry>
+	  </row>
+	  <row>
+	    <entry>Actionscript/String</entry>
+	    <entry>Implemented</entry>
+	  </row>
+	  <row>
+	    <entry>Actionscript/XMLNode</entry>
+	    <entry>Implemented</entry>
+	  </row>
+	  <row>
+	    <entry>Actionscript/XMLSocket</entry>
+	    <entry>Implemented</entry>
+	  </row>
+	  <row>
+	    <entry>Actionscript/_global</entry>
+	    <entry>Partially Implemented</entry>
+	  </row>
+	  <row>
+	    <entry>Actionscript/Array</entry>
+	    <entry>Partially Implemented</entry>
+	  </row>
+	  <row>
+	    <entry>Actionscript/LocalConnection</entry>
+	    <entry>Partially Implemented</entry>
+	  </row>
+	  <row>
+	    <entry>Actionscript/NetConnection</entry>
+	    <entry>Partially Implemented</entry>
+	  </row>
+	  <row>
+	    <entry>Actionscript/NetStream</entry>
+	    <entry>Partially Implemented</entry>
+	  </row>
+	  <row>
+	    <entry>Actionscript/TextField</entry>
+	    <entry>Partially Implemented</entry>
+	  </row>
+	  <row>
+	    <entry>Actionscript/XML</entry>
+	    <entry>Partially Implemented</entry>
+	  </row>
+	  <row>
+	    <entry>Actionscript/Boolean</entry>
+	    <entry>Unimplemented</entry>
+	  </row>
+	  <row>
+	    <entry>Actionscript/Error</entry>
+	    <entry>Unimplemented</entry>
+	  </row>
+	  <row>
+	    <entry>Actionscript/LoadVars</entry>
+	    <entry>Unimplemented</entry>
+	  </row>
+	  <row>
+	    <entry>Actionscript/Number</entry>
+	    <entry>Unimplemented</entry>
+	  </row>
+	  <row>
+	    <entry>Actionscript/Selection</entry>
+	    <entry>Unimplemented</entry>
+	  </row>
+	  <row>
+	    <entry>Actionscript/TextFormat</entry>
+	    <entry>Unimplemented</entry>
+	  </row>
+	  <row>
+	    <entry>Actionscript/Unknown</entry>
+	    <entry>Unimplemented</entry>
+	  </row>
+	</tbody>
+      </tgroup>
+    </table>
+    
+    <para>
+      The next table indicates which opcodes have been implemented:
+    </para>
+    
+    <table frame='all'>
+      <title>Opcodes</title>
+      <tgroup cols='2' align='left' colsep='1' rowsep='1'>
+	<colspec colname='Opcode'/>
+	<colspec colname='Status'/>
+	<thead>
+	  <row>
+	    <entry>Opcode</entry>
+	    <entry>Status</entry>
+	  </row>
+	</thead>
+	<tbody>
+	  <row>
+	    <entry>0x43 declare_obj</entry>
+	    <entry>Implemented</entry>
+	  </row>
+	  <row>
+	    <entry>0x2B cast</entry>
+	    <entry>Implemented</entry>
+	  </row>
+	  <row>
+	    <entry>0x3B delete2 - SWF::ACTION_DELETE</entry>
+	    <entry>Implemented</entry>
+	  </row>
+	  <row>
+	    <entry>0x53 new_method</entry>
+	    <entry>Implemented</entry>
+	  </row>
+	  <row>
+	    <entry>0x55 enum_object</entry>
+	    <entry>Implemented</entry>
+	  </row>
+	  <row>
+	    <entry>0x3A delete - SWF::ACTION_DELETEVAR</entry>
+	    <entry>Implemented</entry>
+	  </row>
+	  <row>
+	    <entry>0x69 Extends - SWF::ACTION_EXTENDS</entry>
+	    <entry>Implemented</entry>
+	  </row>
+	  <row>
+	    <entry>0x54 instance_of</entry>
+	    <entry>Partially Implemented</entry>
+	  </row>
+	  <row>
+	    <entry>0x2A Throw</entry>
+	    <entry>Unimplemented</entry>
+	  </row>
+	  <row>
+	    <entry>0x2C Implements</entry>
+	    <entry>Unimplemented</entry>
+	  </row>
+	  <row>
+	    <entry>0x8F Try</entry>
+	    <entry>Unimplemented</entry>
+	  </row>
+	  <row>
+	    <entry>0x31 md length</entry>
+	    <entry>Unimplemented</entry>
+	  </row>
+	  <row>
+	    <entry>0x35 md substring</entry>
+	    <entry>Unimplemented</entry>
+	  </row>
+	  <row>
+	    <entry>0x37 md chr</entry>
+	    <entry>Unimplemented</entry>
+	  </row>
+	  <row>
+	    <entry>0x45 get target</entry>
+	    <entry>Unimplemented</entry>
+	  </row>
+	</tbody>
+      </tgroup>
+    </table>
+    
+  </sect1>
+  
+  <sect1 id="spec-memory">
+    <title>Memory Management</title>
+    
+    <para>
+      One of the new features of &app; &appversion; is the garbage
+      collector.  The garbage collector manages complex &AS; variables,
+      which are the only ones that are shared by references.  In &app;,
+      these are <command>as_object</command> class instances created by &AS;
+      (i.e. not those created by playhead control:
+      <command>placeobject</command>/<command>removeobject</command>). 
+    </para>
+    
+    <para>
+      Collected objects are those allocated due to &AS; explicit or implicit
+      calls.  Explicit all are any user-defined statements that allocate new
+      objects, such as arrays, Objects, or script-created movieclips.
+      Implicit calls are the built-in functions that can be deleted by
+      arbitrary user calls. 
+    </para>
+    
+    <para>
+      Any object that is a candidate for garbage collecting is stored in a
+      list owned by the collector.  This list is filled by an executing
+      action context whenever a collectible object is allocated on the
+      heap. 
+    </para>
+    
+    <para>
+      The garbage collector starts at the very end of an execution context,
+      rather than using a threshold to trigger it.  At this point, the
+      virtual machine is in a "stable" state; any still-reachable object has
+      its roots in one of the currently live character instances (stage
+      characters). 
+    </para>
+    
+    <para>
+      The collector is a conservative collector.  Any object on the
+      collectibles list is marked as <guilabel>UNREACHABLE</guilabel>, an
+      iterative scan starting from the roots marks any still-reachable
+      object, and a final purge releases all
+      still-<guilabel>UNREACHABLE</guilabel> resources. 
+    </para>
+    
+    <para>
+      This garbage collector has reduced the memory footprint of &app;.
+      However, the most current, available test data indicated the following
+      runtime memory footprint: 
+    </para>
+    
+    <!--
+	<table frame='all'>
+	<title>Memory Footprint</title>
+	<tgroup cols='4' align='left' colsep='1' rowsep='1'>
+	<colspec colname='Render GUI' />
+	<colspec colname='Virtual Memory' />
+	<colspec colname='Resident Set Size (physical RAM' />
+	<colspec colname='Shared Memory (code size)' />
+	<thead>
+	<row>
+	<entry>Render GUI</entry>
+	<entry>Virtual Memory</entry>
+	<entry>Resident Set Size (physical RAM</entry>
+	<entry>Shared Memory (code size)</entry>
+	</row>
+	</thead>
+	<tbody>
+	<row>
+	<entry>agg-gtk</entry>
+	<entry>33372 KB</entry>
+	<entry>14 MB</entry>
+	<entry>8948 KB</entry>
+	</row>
+	<row>
+	<entry>agg-sdl</entry>
+	<entry>26564 KB</entry>
+	<entry>9396 KB</entry>
+	<entry>5124 KB</entry>
+	</row>
+	<row>
+	<entry>agg-fltk</entry>
+	<entry>24556 KB</entry>
+	<entry>8992 KB</entry>
+	<entry>4220 KB</entry>
+	</row>
+	<row>
+	<entry>cairo-fltk</entry>
+	<entry>184 MB</entry>
+	<entry>128 MB</entry>
+	<entry>4284 KB</entry>
+	</row>
+	<row>
+	<entry>cairo-gtk</entry>
+	<entry>192 MB</entry>
+	<entry>133 MB</entry>
+	<entry>8000 KB</entry>
+	</row>
+	<row>
+	<entry>cairo-sdl</entry>
+	<entry>187 MB</entry>
+	<entry>129 MB </entry>
+	<entry>5256 KB</entry>
+	</row>
+	<row>
+	<entry>opengl-gtk </entry>
+	<entry>62620 KB</entry>
+	<entry>15 MB</entry>
+	<entry>9336 KB</entry>
+	</row>
+	<row>
+	<entry>opengl-sdl </entry>
+	<entry>54932 KB</entry>
+	<entry>10 MB</entry>
+	<entry>5324 KB</entry>
+	</row>
+	</tbody>
+	</tgroup>
+	</table>
+    -->
+    
+  </sect1>
+  
+  <sect1 id="spec-security">
+    <title>Security</title>
+    
+    <para>
+      Many Flash implementations contain potential security exploits that
+      could compromise a viewer's system.  With &app;, an end-user has the
+      ability to see "what's going on" &mdash; what types of data the
+      application accesses, where it is found, and how it is used. Many
+      known Flash exploits are included in the &app; test suite that is
+      used to check whether a release is ready for the public. The &app;
+      developers are also in the process of a security review, developing a
+      security layer that will protect an end-user, no matter what operating
+      system they use. 
+    </para>
+    
+    <para>
+      One early security feature is the blacklist/whitelist.  Flash movies
+      running in a browser can make outgoing network connections. This can
+      be used, for example, to compromise a network device inside a
+      company firewall via a Flash movie running on an employee's
+      browser. &app; allows you to blacklist hosts that you know are
+      insecure, or to whitelist hosts you know are secure, by editing a
+      configuration file.
+    </para>
+    
+    <sect2 id="lso">
+      <title>Local Shared Objects</title>
+      
+      <para>
+	SWF movies support a form of persistant storage called Local
+	Shared Objects. These are stored in the subdirectories of one's
+	<emphasis>~/.macromedia</emphasis> configuration. These files
+	are comonly called &quot;Flash Cookies&quot;, as they don't get
+	deleted when the SWF movie that created or writes data to them
+	stops executing. These files often store things like game
+	scores. 
+      </para>
+      
+      <para>
+	Till recently, what was contained in these files wasn't widely
+	known. There are several LSO file utilities floating around on
+	the Web. Gnash has it's own <emphasis>soldumper</emphasis>
+	program that lets one find and dump the contents of these
+	files. As of yet, I haven't discovered any nasty privacy issues
+	yet, but as Gnash's SharedObject support is new, I may have just
+	been lucky.
+      </para>
+      
+      <para>
+	An LSO file uses a <emphasis>.sol</emphasis>suffix, and is
+	stored in binary, big endian format. While one can look at the
+	data in any binary editor or hex dumper, it's easier to use
+	soldumper, which knows how to decode all the objects. The data
+	is stored in AMF format, a simple data interhange formats used
+	in several other places in SWF.
+      </para>
+      
+      <para>
+	The one security setting Gnash supports is the
+	<emphasis>SOLReadOnly</emphasis> setting for your $HOME/.gnashrc
+	file. This makes Gnash never write to a .sol file, it only reads
+	them. You can also set <emphasis>SOLSafeDir</emphasis> to a safe
+	subdirectory,or even remove it later, although most people
+	willwant to set this path to the default one created bythe other
+	SWF player.
+      </para>
+      
+    </sect2>
+    
+    <sect2 id="lc">
+      <title>Local Connections</title>
+      
+      <para>
+	SWF movies support a form of data interchange between running
+	SWF movies called LocalConnection. This uses a shared memory
+	segment to exchange AMF objects. While the specification claim
+	an application has to register as a Listener, it turns out in
+	reality this isn't required. Even YouTube violates this
+	requirement. While one would think that data written to this
+	memory segment would go away when the SWF movies are done
+	playing, but they are persistant, and on some systems, the data
+	even survives a reboot. Thank you Solaris...
+      </para>
+      
+      <para>
+	The Gnash utility <emphasis>dumpshm</emphasis> can be used to do
+	several things with these shared memory segments. This utility
+	can find the shared memory segment left by using other SWF
+	players to see what has been left. it can then dump the contents
+	of the shared mempory segment either by decoding the AMF objects
+	and printing the values, or by dumping the raw file to disk
+	where you can analysze it with any other program you wish. If
+	you run dumpshm repeatedly, you can even do a crude packet
+	sniffing between two SWF movies playing.
+      </para>
+      
+      <para>
+	The only current security related option for this is
+	<emphasis>LocalConnection</emphasis>. This just disables all
+	communication with other SWF movies. Work is in progress on
+	adding a tracing ability to Gnash.
+      </para>
+      
+    </sect2>
+ 
 </sect1>
 
 </chapter>
