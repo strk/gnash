@@ -1,590 +1,674 @@
 <glossary id="glossary">
-<title>Glossary</title>
-
-
-<glossdiv><title>A</title>
-
- <glossentry>
+  <title>Glossary</title>
+  
+  <glossdiv id="A">
+    <title>A</title>
+    
+    <glossentry>
       <glossterm>
-        ActionScript
+	ActionScript
       </glossterm>
       <glossdef>
-        <para>
-          <emphasis>ActionScript</emphasis>, or "AS", is the scripting 
-          language for <emphasis>Flash</emphasis>
-          applications. It is compiled to bytecode, which is a subset of
-          the <emphasis>SWF</emphasis> format.
+	<para>
+	  <emphasis>ActionScript</emphasis>, or "AS", is the scripting 
+	  language for <emphasis>Flash</emphasis>
+	  applications. It is compiled to bytecode, which is a subset of
+	  the <emphasis>SWF</emphasis> format.
+	</para>
+      </glossdef>
+    </glossentry>
+    
+    <glossentry>
+      <glossterm>
+	AGG
+      </glossterm>
+      <glossdef>
+	<para>
+	  AGG is the AntiGrain 2D graphics library, which can be used
+	  as a renderer in Gnash. It is faster than OpenGL on systems
+	  without hardware graphics acceleration. As of Gnash version
+	  0.8.1 it is the more feature complete renderer. 
+	</para>
+      </glossdef>
+    </glossentry>
+    
+    <glossentry>
+      <glossterm>
+	AMF
+      </glossterm>
+      <glossdef>
+	<para>
+	  <emphasis>AMF</emphasis> 
+	  is the object format used by <emphasis>Flash</emphasis> 
+	  for shared objects and streaming video.
+	</para>
+      </glossdef>
+    </glossentry>
+    
+    <glossentry>
+      <glossterm>
+	as_environment
+      </glossterm>
+      <glossdef>
+	<para>
+	  In Gnash terms, the as_environment, or ActionScript
+	  execution environment, contains a stack of objects,
+	  characters and values which are in the immediate environment
+	  of the current fn_call. Please refer to the Gnash
+	  ActionScript manual for more information. 
         </para>
       </glossdef>
     </glossentry>
-
-<glossentry>
+    
+  </glossdiv>
+  
+  <glossdiv id="C">
+    <title>C</title>
+  
+    <glossentry>
       <glossterm>
-      AGG
+	Cairo
       </glossterm>
       <glossdef>
-        <para>
-          AGG is the AntiGrain 2D graphics library, which can be used as a renderer in Gnash. It is faster than OpenGL on systems without hardware graphics acceleration. As of Gnash version 0.7.2 it is the more feature complete renderer.
-        </para>
+	<para>
+	  Cairo is a 2D graphics library with support for multiple
+	  output devices. Can be used as a renderer in Gnash. A useful
+	  feature of Cairo is that it will automatically use graphic
+	  card acceleration when available. Cairo has an experimental
+	  OpenGL backend. 
+	</para>
+      </glossdef>
+  </glossentry>
+  
+  </glossdiv>
+  
+  <glossdiv id="D">
+    <title>D</title>
+    
+    <glossentry>
+      <glossterm>
+	DejaGNU
+      </glossterm>
+      <glossdef>
+	<para>
+	  DejaGNU is a framework for testing software.
+	</para>
       </glossdef>
     </glossentry>
-
+    
+    <glossentry>
+      <glossterm>
+	DocBook
+      </glossterm>
+      <glossdef>
+	<para>
+	  <emphasis>DocBook</emphasis>
+	  is a markup language for presentation-neutral 
+	  documentation, such as manuals.
+	</para>
+      </glossdef>
+    </glossentry>
+    
+    <glossentry>
+      <glossterm>
+	Doxygen
+      </glossterm>
+      <glossdef>
+	<para>
+	  <emphasis>Doxygen</emphasis> 
+	is a documentation generator for for multiple languages 
+	which uses comments in the source code to create stand-alone 
+	documentation. 
+	</para>
+      </glossdef>
+    </glossentry>
+    
+    <glossentry>
+      <glossterm>
+	Drupal
+      </glossterm>
+      <glossdef>
+	<para>
+	  Drupal is a CMS/blog system used for the main Gnash website.
+	</para>
+      </glossdef>
+    </glossentry>
+  
+    
+  </glossdiv>
+  
+  <glossdiv id="E">
+    <title>E</title>
+    
+    <glossentry>
+      <glossterm>
+	extensions
+      </glossterm>
+      <glossdef>
+	<para>
+	  A &app; <emphasis>extension</emphasis> is a plugin (not
+	  a browser plugin) which
+	  implements additional 
+	  functionality beyond what is covered by 
+	<emphasis>Flash</emphasis> specification. 
+	These are shared libraries which are loaded at runtime.
+	</para>
+      </glossdef>
+    </glossentry>
+    
+    
+  </glossdiv>
+  
+  <glossdiv id="F">
+    <title>F</title>
+    
+    <glossentry>
+      <glossterm>
+	ffmpeg
+      </glossterm>
+      <glossdef>
+	<para>
+	  ffmpeg is an audio and video decoding library which can be
+	  used by Gnash to decode mp3, FLV and other media types.  
+	</para>
+      </glossdef>
+    </glossentry>
+    
+    <glossentry>
+      <glossterm>
+	Flash
+      </glossterm>
+      <glossdef>
+	<para>
+	  The term <emphasis>Flash</emphasis> is used to describe both the 
+	  Adobe IDE for creating <emphasis>SWF</emphasis>
+	  files, and the technology itself.  
+	  &app; documentation uses the latter definition.
+	</para>
+      </glossdef>
+    </glossentry>
+    
+    <glossentry>
+      <glossterm>
+	FLV
+      </glossterm>
+      <glossdef>
+	<para>
+	  FLV is a proprietary file format used to deliver Flash
+	  video. It is used by YouTube, among others.  
+	</para>
+      </glossdef>
+    </glossentry>
+    
+    <glossentry>
+      <glossterm>
+	FLTK
+      </glossterm>
+      <glossdef>
+	<para>
+	  FLTK, or the 'Fast Light ToolKit', is a portable GUI library
+	  which is intended to replace the SDL GUI. Currently in Gnash,
+	  FLTK may be used with the Cairo and AGG renderers. FLTK has an
+	  experimental Cairo backend. 
+	</para>
+      </glossdef>
+    </glossentry>
+    
+    <glossentry>
+      <glossterm>
+	FrameBuffer
+      </glossterm>
+      <glossdef>
+	<para>
+	  In Gnash, this is a GUI library that outputs directly to the
+	  Linux Frame Buffer and so does not need a window system to
+	  run. This makes it particularly suitable for use on small
+	  devices. 
+	</para>
+      </glossdef>
+    </glossentry>
+    
+  </glossdiv>
+  
+  <glossdiv id="G">
+    <title>G</title>
+    
+    <glossentry>
+      <glossterm>
+	Gnash
+      </glossterm>
+      <glossdef>
+	<para>
+	  Gnash is the GNU Flash movie player.
+	</para>
+      </glossdef>
+    </glossentry>
+  
+    <glossentry>
+      <glossterm>
+	Gstreamer
+      </glossterm>
+      <glossdef>
+	<para>
+	  Gstreamer is a multimedia framework which Gnash can use for
+	  decoding audio and video. Gstreamer itself cannot decode
+	  anything, so it needs some appropriate decoding-plugins to do
+	  the work for it. Remember to install them if you use Gnash
+	  with Gstreamer enabled. To get the best out of Gnashs
+	  gstreamer-parts, it is recommended to install the
+	  gst-plugins-good, gst-plugins-good and gst-ffmpeg plugins
+	  packages.  
+	</para>
+      </glossdef>
+    </glossentry>
+    
+    <glossentry>
+      <glossterm>
+	GTK
+      </glossterm>
+      <glossdef>
+	<para>
+	  GTK is the GIMP Toolkit GUI library. It is one of the GUI
+	  options for Gnash. As of Gnash 0.7.2, this is the more
+	  performant and feature-rich choice. GTK uses Cairo
+	  internally. 
+	</para>
+      </glossdef>
+    </glossentry>
+    
   <glossentry>
+    <glossterm>
+      GUI
+    </glossterm>
+    <glossdef>
+      <para>
+	A <emphasis>GUI</emphasis> is a 
+	"graphical user interface". In &app;, the GUI 
+	library provides a wrapper for mouse and keyboard events, 
+	menus, windowing (where available) and a drawing area. 
+	You must choose a GUI library during the
+	<link linkend="pre-configuration">configuration</link> stage.
+      </para>
+    </glossdef>
+  </glossentry>
+  
+  </glossdiv>
+  
+  <glossdiv id="K">
+    <title>K</title>
+    
+    <glossentry>
       <glossterm>
-        AMF
+	Klash
       </glossterm>
       <glossdef>
-        <para>
-          <emphasis>AMF</emphasis> 
-          is the object format used by <emphasis>Flash</emphasis> 
-          for shared objects and streaming video.
-        </para>
+	<para>
+	  <emphasis>Klash</emphasis> was the name given to the stand-alone 
+	  instance of &app; which used the KDE GUI.  It has been replaced with 
+	  an implementation using Qt.  Some documentation may incorrectly
+	  refer to the Konqueror plugin as <emphasis>Klash</emphasis>.
+	  The plugin was renamed <emphasis>Kpart</emphasis>.
+	</para>
       </glossdef>
     </glossentry>
-
- <glossentry>
+    <glossentry>
       <glossterm>
-      as_environment
+	Kpart
       </glossterm>
       <glossdef>
-        <para>
-          In Gnash terms, the as_environment, or ActionScript execution environment, contains a stack of objects, characters and values which are in the immediate environment of the current fn_call. Please refer to the Gnash ActionScript manual for more information.
-        </para>
+	<para>
+	  <emphasis>Kpart</emphasis> is a plugin for Konqueror which is
+	  enabled with the <link linkend="features">configuration option</link>
+	  <emphasis>--enable-klash</emphasis>.
+	</para>
       </glossdef>
     </glossentry>
-
-</glossdiv>
-
-<glossdiv><title>C</title>
-
- <glossentry>
+    
+  </glossdiv>
+  
+  <glossdiv id="L">
+    <title>L</title>
+  
+    <glossentry>
       <glossterm>
-      Cairo
+	libmad
       </glossterm>
       <glossdef>
-        <para>
-          Cairo is a 2D graphics library with support for multiple output devices. Can be used as a renderer in Gnash. A useful feature of Cairo is that it will automatically use graphic card acceleration when available. Cairo has an experimental OpenGL backend.
-        </para>
+	<para>
+	  libmad is a mp3-decoding library, which can be used by Gnash's
+	  sound handler to decode mp3-audio.  
+	</para>
       </glossdef>
     </glossentry>
-
-</glossdiv>
-
-<glossdiv><title>D</title>
-
- <glossentry>
+    
+  </glossdiv>
+  
+  <glossdiv id="M">
+    <title>M</title>
+    
+    <glossentry>
       <glossterm>
-      DejaGNU
+	Mesa
       </glossterm>
       <glossdef>
-        <para>
-          DejaGNU is a framework for testing software.
-        </para>
+	<para>
+	  <emphasis>Mesa</emphasis> is the free software OpenGL 
+	  implementation.  &app; documentation will sometimes use the
+	  glossterms 'OpenGL' and 'Mesa' interchangeably.
+	</para>
       </glossdef>
     </glossentry>
-
- <glossentry>
+    
+    <glossentry>
       <glossterm>
-        DocBook
+	Ming
       </glossterm>
       <glossdef>
-        <para>
-          <emphasis>DocBook</emphasis>
-           is a markup language for presentation-neutral 
-          documentation, such as manuals.
-        </para>
+	<para>
+	  Ming is a C library for generating SWF ("Flash") format
+	  movies, plus a set of wrappers for using the library. It is
+	  used by the Gnash project for generating testcases.  
+	</para>
       </glossdef>
     </glossentry>
-
- <glossentry>
+    
+  </glossdiv>
+  
+  <glossdiv id="N">
+    <title>N</title>
+    
+    <glossentry>
       <glossterm>
-        Doxygen
+	Nellymoser
       </glossterm>
       <glossdef>
-        <para>
-          <emphasis>Doxygen</emphasis> 
-          is a documentation generator for for multiple languages 
-          which uses comments in the source code to create stand-alone 
-          documentation. 
-        </para>
+	<para>
+	  Nellymoser is a proprietary audio codec introduced in the
+	  Flash Player in version 6. For more information, please see
+	  Wikipedia. 
+	</para>
       </glossdef>
-    </glossentry>
-
- <glossentry>
+  </glossentry>
+  
+  </glossdiv>
+  
+  <glossdiv id="O">
+    <title>O</title>
+    
+    <glossentry>
       <glossterm>
-      Drupal
+	OpenGL
       </glossterm>
       <glossdef>
-        <para>
-          Drupal is a CMS/blog system used for the main Gnash website.
-        </para>
+	<para>
+	  OpenGL (Open Graphics Library) is a standard specification
+	  defining a cross-language cross-platform API for writing
+	  applications that produce 3D and 2D computer
+	  graphics. Accelerated graphic cards usually provide OpenGL at
+	  the hardware level. Please refer to Wikipedia for availability
+	  of free software OpenGL hardware drivers. A free software
+	  implementation of the API is available (Mesa). OpenGL can be
+	  used as a renderer in Gnash. 
+	</para>
       </glossdef>
     </glossentry>
-
-
-</glossdiv>
-
-<glossdiv><title>E</title>
-
-<glossentry>
+    
+    <glossentry>
       <glossterm>
-        extensions
+	ORM
       </glossterm>
       <glossdef>
-        <para>
-          A &app; <emphasis>extension</emphasis> is a plugin (not
-          a browser plugin) which
-          implements additional 
-          functionality beyond what is covered by 
-          <emphasis>Flash</emphasis> specification. 
-          These are shared libraries which are loaded at runtime.
-        </para>
+	<para>
+	  ORM is a system for ensuring the rights of the creator over a piece of digital content. It is more passive than DRM.
+	</para>
       </glossdef>
     </glossentry>
-
-
-</glossdiv>
-
-<glossdiv><title>F</title>
-
- <glossentry>
+    
+  </glossdiv>
+  
+  <glossdiv id="P">
+    <title>P</title>
+    
+    <glossentry>
       <glossterm>
-      ffmpeg
+	plugin
       </glossterm>
       <glossdef>
-        <para>
-          ffmpeg is an audio and video decoding library which can be used by Gnash to decode mp3, FLV and other media types. 
-        </para>
+	<para>
+	  The glossterm <emphasis>plugin</emphasis> is used in &app; to
+	  refer to both any &app; browser plugin, as well as the Firefox
+	  plugin specifically.  The Konqueror plugin is called
+	  <emphasis>Kpart</emphasis>.  Sometimes, the term is used in
+	  an even more generic sense to refer to 
+	  <emphasis>extensions</emphasis>.
+	</para>
       </glossdef>
     </glossentry>
-
- <glossentry>
+    
+  </glossdiv>
+  
+  <glossdiv id="Q">
+    <title>Q</title>
+    
+    <glossentry>
       <glossterm>
-        Flash
+	Qt
       </glossterm>
       <glossdef>
-        <para>
-          The glossterm <emphasis>Flash</emphasis> is used to describe both the 
-          Adobe IDE for creating <emphasis>SWF</emphasis>
-           files, and the technology itself.  
-          &app; documentation uses the latter definition.
-        </para>
+	<para>
+	  Qt is a GUI library which is used by KDE. The plugin version
+	  of Gnash using this GUI library is Kpart. The standalone
+	  version is enabled with --enable-gui=kde. 
+	</para>
       </glossdef>
     </glossentry>
-
- <glossentry>
+    
+  </glossdiv>
+  
+  <glossdiv id="R">
+    <title>R</title>
+    
+    <glossentry>
       <glossterm>
-      FLV
+	renderer
       </glossterm>
       <glossdef>
-        <para>
-          FLV is a proprietary file format used to deliver Flash video. It is used by YouTube, among others. 
-        </para>
+	<para>
+	  The <emphasis>renderer</emphasis> is the subsystem of &app;
+	  which renders content.  Only one renderer may be used; it is
+	  chosen during <link linkend="pre-configuration">configuration</link>.
+	</para>
+	<para>
+	  Available renderers are: AGG, OpenGL, and Cairo. In terms of 
+	  feature completeness, AGG comes first; followed by OpenGL and 
+	  then Cairo. In most cases, AGG is preferred for performance, 
+	  except cases where it is beneficial to have hardware accelerated 
+	  rendering (for example, when you have a very slow CPU but a very 
+	  fast graphics card). In this case OpenGL should be used.
+	</para>
       </glossdef>
     </glossentry>
-
- <glossentry>
+    
+    <glossentry>
       <glossterm>
-      FLTK
+	RTMP
+    </glossterm>
+    <glossdef>
+      <para>
+	RTMP is the Real Time Messaging Protocol primarily used with
+	to stream audio and video over the internet to the Flash
+	Player client. 
+      </para>
+    </glossdef>
+    </glossentry>
+    
+    <glossentry>
+      <glossterm>
+	RTMPT
       </glossterm>
       <glossdef>
-        <para>
-          FLTK, or the 'Fast Light ToolKit', is a portable GUI library which is intended to replace the SDL GUI. Currently in Gnash, FLTK may be used with the Cairo and AGG renderers. FLTK has an experimental Cairo backend.
-        </para>
+	<para>
+	  RTMPT is basically a HTTP wrapper around the RTMP protocol
+	  that is sent using POST requests from the client to the
+	  server. Because of the non-persistent nature of HTTP
+	  connections, RTMPT requires the clients to poll for updates
+	  periodically in order to get notified about events that are
+	  generated by the server or other clients.  
+	</para>
       </glossdef>
     </glossentry>
-
- <glossentry>
+    
+    <glossentry>
       <glossterm>
-      FrameBuffer
+	RTMPTS
       </glossterm>
       <glossdef>
-        <para>
-          In Gnash, this is a GUI library that outputs directly to the Linux Frame Buffer and so does not need a window system to run. This makes it particularly suitable for use on small devices.
-        </para>
+	<para>
+	  RTMPTS is the same as RTMPT, but instead of being a HTTP
+	  wrapper, it is a HTTP SSL wrapper (HTTP secure connection). 
+	</para>
       </glossdef>
     </glossentry>
-
-</glossdiv>
-
-<glossdiv><title>G</title>
-
- <glossentry>
+    
+  </glossdiv>
+  
+  <glossdiv id="S">
+    <title>S</title>
+    
+    <glossentry>
       <glossterm>
-      Gnash
+	SDL
       </glossterm>
       <glossdef>
-        <para>
-          Gnash is the GNU Flash movie player.
-        </para>
+	<para>
+	  Simple DirectMedia Layer is a cross-platform multimedia free
+	  software library that creates an abstraction over various
+	  platforms' graphics, sound, and input APIs. Gnash can use it
+	  as a GUI and/or as a sound handler. Note that the two usages
+	  are independent of each other: you can use it for a task and
+	  not for the other if you wish. At time or writing (2007-01-11)
+	  the SDL GUI lacks menus and a performant input event
+	  architecture; the SDL sound handler is the most feature rich,
+	  supporting Video through ffmpeg. 
+	</para>
       </glossdef>
     </glossentry>
-
- <glossentry>
+    
+    
+    <glossentry>
       <glossterm>
-      Gstreamer
+	sound handler
       </glossterm>
       <glossdef>
-        <para>
-          Gstreamer is a multimedia framework which Gnash can use for decoding audio and video. Gstreamer itself cannot decode anything, so it needs some appropriate decoding-plugins to do the work for it. Remember to install them if you use Gnash with Gstreamer enabled. To get the best out of Gnashs gstreamer-parts, it is recommended to install the gst-plugins-good, gst-plugins-good and gst-ffmpeg plugins packages. 
-        </para>
+	<para>
+	  The <emphasis>sound handler</emphasis> is the part of &app;
+	  which handles both event sounds and streaming sound.  Audio
+	  from external sources are also handled through the sound handler
+	  when SDL is used.  The sound handler must be selected during
+	  <link linkend="pre-configuration">configuration</link>.
+	</para>
+	<para>
+	  There are currently two sound handlers available in &app;:
+	  SDL and Gstreamer.  The SDL sound handler uses ffmpeg or 
+	  libmad for decoding mp3-audio, although it can be built without 
+	  mp3-support. The Gstreamer-sound handler uses the available 
+	  plugins to decode the audio, so it might not work if some 
+	  important plugins are missing.  The SDL sound handler is 
+	  recommended.  
+	</para>
       </glossdef>
     </glossentry>
-
- <glossentry>
+    
+    <glossentry>
       <glossterm>
-      GTK
+	sprite
       </glossterm>
       <glossdef>
-        <para>
-          GTK is the GIMP Toolkit GUI library. It is one of the GUI options for Gnash. As of Gnash 0.7.2, this is the more performant and feature-rich choice. GTK uses Cairo internally.
-        </para>
+	<para>
+	  A sprite is an element of an Flash Movie. It's basically a
+	  Movie inside another, having its own timeline. 
+	</para>
       </glossdef>
     </glossentry>
-
- <glossentry>
+    
+    <glossentry>
       <glossterm>
-        GUI
+	Stage
       </glossterm>
       <glossdef>
-        <para>
-          A <emphasis>GUI</emphasis> is a 
-          "graphical user interface". In &app;, the GUI 
-          library provides a wrapper for mouse and keyboard events, 
-          menus, windowing (where available) and a drawing area. 
-          You must choose a GUI library during the
-          <link linkend="pre-configuration">configuration</link> stage.
-        </para>
+	<para>
+	  The visible area of a Flash movie. The name derives from a
+	  theater analogy. Graphical elements are referred to as
+	  characters.  
+	</para>
       </glossdef>
     </glossentry>
-
-</glossdiv>
-
-<glossdiv><title>K</title>
-
- <glossentry>
+    
+    <glossentry>
       <glossterm>
-        Klash
+	SWF
       </glossterm>
       <glossdef>
-        <para>
-          <emphasis>Klash</emphasis> was the name given to the stand-alone 
-          instance of &app; which used the KDE GUI.  It has been replaced with 
-          an implementation using Qt.  Some documentation may incorrectly
-          refer to the Konqueror plugin as <emphasis>Klash</emphasis>.
-          The plugin was renamed <emphasis>Kpart</emphasis>.
-        </para>
+	<para>
+	  <emphasis>SWF</emphasis> is the file format for 
+	  <emphasis>Flash</emphasis> movies.
+	</para>
       </glossdef>
     </glossentry>
- <glossentry>
+    
+  </glossdiv>
+  
+  <glossdiv id="T">
+    <title>T</title>
+    
+    <glossentry>
       <glossterm>
-        Kpart
+	Tamarin
       </glossterm>
       <glossdef>
-        <para>
-          <emphasis>Kpart</emphasis> is a plugin for Konqueror which is
-          enabled with the <link linkend="features">configuration option</link>
-          <emphasis>--enable-klash</emphasis>.
-        </para>
+	<para>
+	  The Tamarin project seeks to create an open source
+	  implementation of the ECMAScript 4th edition language
+	  specification. The code is used by Adobe as part of the
+	  ActionScript Virtual Machine within the Adobe Flash
+	  Player. Gnash does not use Tamarin; it already has a working
+	  virtual server and most ActionScript classes are implemented. 
+	</para>
       </glossdef>
     </glossentry>
-
-</glossdiv>
-
-<glossdiv><title>L</title>
-
- <glossentry>
+    
+    <glossentry>
       <glossterm>
-      libmad
+	timeline
       </glossterm>
       <glossdef>
-        <para>
-          libmad is a mp3-decoding library, which can be used by Gnash's sound handler to decode mp3-audio. 
-        </para>
+	<para>
+	  In Flash technology, a timeline is a sequence of "frames". A
+	  single Flash movie can contain multiple timelines, each
+	  independently controlled (STOP or PLAY). At regular intervals
+	  (FPS) the player advances all timelines in PLAY mode to the
+	  next frame, looping back when last frame is reached. 
+	</para>
       </glossdef>
     </glossentry>
-
-</glossdiv>
-
-
-<glossdiv><title>M</title>
-
- <glossentry>
+    
+  </glossdiv>
+  
+  <glossdiv id="X">
+    <title>X</title>
+  
+    <glossentry>
       <glossterm>
-        Mesa
+	X.org
       </glossterm>
       <glossdef>
-        <para>
-          <emphasis>Mesa</emphasis> is the free software OpenGL 
-          implementation.  &app; documentation will sometimes use the
-          glossterms 'OpenGL' and 'Mesa' interchangeably.
-        </para>
+	<para>
+	  X.org is the most commonly used X server; it was forked from
+	  XFree86. 
+	</para>
       </glossdef>
     </glossentry>
-
- <glossentry>
-      <glossterm>
-      Ming
-      </glossterm>
-      <glossdef>
-        <para>
-          Ming is a C library for generating SWF ("Flash") format movies, plus a set of wrappers for using the library. It is used by the Gnash project for generating testcases. 
-        </para>
-      </glossdef>
-    </glossentry>
-
-</glossdiv>
-
-<glossdiv><title>N</title>
-
-
- <glossentry>
-      <glossterm>
-      Nellymoser
-      </glossterm>
-      <glossdef>
-        <para>
-          Nellymoser is a proprietary audio codec introduced in the Flash Player in version 6. For more information, please see Wikipedia.
-        </para>
-      </glossdef>
-    </glossentry>
-
-</glossdiv>
-
-<glossdiv><title>O</title>
-
- <glossentry>
-      <glossterm>
-      OpenGL
-      </glossterm>
-      <glossdef>
-        <para>
-          OpenGL (Open Graphics Library) is a standard specification defining a cross-language cross-platform API for writing applications that produce 3D and 2D computer graphics. Accelerated graphic cards usually provide OpenGL at the hardware level. Please refer to Wikipedia for availability of free software OpenGL hardware drivers. A free software implementation of the API is available (Mesa). OpenGL can be used as a renderer in Gnash.
-        </para>
-      </glossdef>
-    </glossentry>
-
- <glossentry>
-      <glossterm>
-      ORM
-      </glossterm>
-      <glossdef>
-        <para>
-          ORM is a system for ensuring the rights of the creator over a piece of digital content. It is more passive than DRM.
-        </para>
-      </glossdef>
-    </glossentry>
-
-</glossdiv>
-
-<glossdiv><title>P</title>
-
- <glossentry>
-      <glossterm>
-        plugin
-      </glossterm>
-      <glossdef>
-        <para>
-          The glossterm <emphasis>plugin</emphasis> is used in &app; to
-          refer to both any &app; browser plugin, as well as the Firefox
-          plugin specifically.  The Konqueror plugin is called
-          <emphasis>Kpart</emphasis>.  Sometimes, the term is used in
-          an even more generic sense to refer to 
-          <emphasis>extensions</emphasis>.
-        </para>
-      </glossdef>
-    </glossentry>
-
-
-</glossdiv>
-
-<glossdiv><title>Q</title>
-
- <glossentry>
-      <glossterm>
-      Qt
-      </glossterm>
-      <glossdef>
-        <para>
-          Qt is a GUI library which is used by KDE. The plugin version of Gnash using this GUI library is Kpart. The standalone version is enabled with --enable-gui=kde.
-        </para>
-      </glossdef>
-    </glossentry>
-
-</glossdiv>
-
-<glossdiv><title>R</title>
-
-  <glossentry>
-      <glossterm>
-        renderer
-      </glossterm>
-      <glossdef>
-        <para>
-          The <emphasis>renderer</emphasis> is the subsystem of &app;
-          which renders content.  Only one renderer may be used; it is
-          chosen during <link linkend="pre-configuration">configuration</link>.
-        </para>
-        <para>
-          Available renderers are: AGG, OpenGL, and Cairo. In terms of 
-          feature completeness, AGG comes first; followed by OpenGL and 
-          then Cairo. In most cases, AGG is preferred for performance, 
-          except cases where it is beneficial to have hardware accelerated 
-          rendering (for example, when you have a very slow CPU but a very 
-          fast graphics card). In this case OpenGL should be used.
-        </para>
-      </glossdef>
-    </glossentry>
-
- <glossentry>
-      <glossterm>
-      RTMP
-      </glossterm>
-      <glossdef>
-        <para>
-          RTMP is the Real Time Messaging Protocol primarily used with to stream audio and video over the internet to the Flash Player client.
-        </para>
-      </glossdef>
-    </glossentry>
-
-
- <glossentry>
-      <glossterm>
-      RTMPT
-      </glossterm>
-      <glossdef>
-        <para>
-          RTMPT is basically a HTTP wrapper around the RTMP protocol that is sent using POST requests from the client to the server. Because of the non-persistent nature of HTTP connections, RTMPT requires the clients to poll for updates periodically in order to get notified about events that are generated by the server or other clients. 
-        </para>
-      </glossdef>
-    </glossentry>
-
- <glossentry>
-      <glossterm>
-      RTMPTS
-      </glossterm>
-      <glossdef>
-        <para>
-          RTMPTS is the same as RTMPT, but instead of being a HTTP wrapper, it is a HTTPSSL wrapper (HTTP secure connection).
-        </para>
-      </glossdef>
-    </glossentry>
-
-</glossdiv>
-
-<glossdiv><title>S</title>
-
- <glossentry>
-      <glossterm>
-      SDL
-      </glossterm>
-      <glossdef>
-        <para>
-          Simple DirectMedia Layer is a cross-platform multimedia free software library that creates an abstraction over various platforms' graphics, sound, and input APIs. Gnash can use it as a GUI and/or as a sound handler. Note that the two usages are independent of each other: you can use it for a task and not for the other if you wish. At time or writing (2007-01-11) the SDL GUI lacks menus and a performant input event architecture; the SDL sound handler is the most feature rich, supporting Video through ffmpeg.
-        </para>
-      </glossdef>
-    </glossentry>
-
-
- <glossentry>
-      <glossterm>
-        sound handler
-      </glossterm>
-      <glossdef>
-        <para>
-          The <emphasis>sound handler</emphasis> is the part of &app;
-          which handles both event sounds and streaming sound.  Audio
-          from external sources are also handled through the sound handler
-          when SDL is used.  The sound handler must be selected during
-          <link linkend="pre-configuration">configuration</link>.
-        </para>
-        <para>
-          There are currently two sound handlers available in &app;:
-          SDL and Gstreamer.  The SDL sound handler uses ffmpeg or 
-          libmad for decoding mp3-audio, although it can be built without 
-          mp3-support. The Gstreamer-sound handler uses the available 
-          plugins to decode the audio, so it might not work if some 
-          important plugins are missing.  The SDL sound handler is 
-          recommended.  
-        </para>
-      </glossdef>
-    </glossentry>
-
- <glossentry>
-      <glossterm>
-      sprite
-      </glossterm>
-      <glossdef>
-        <para>
-          A sprite is an element of an Flash Movie. It's basically a Movie inside another, having its own timeline.
-        </para>
-      </glossdef>
-    </glossentry>
-
- <glossentry>
-      <glossterm>
-      Stage
-      </glossterm>
-      <glossdef>
-        <para>
-          The visible area of a Flash movie. The name derives from a theater analogy. Graphical elements are referred to as characters. 
-        </para>
-      </glossdef>
-    </glossentry>
-
- <glossentry>
-      <glossterm>
-        SWF
-      </glossterm>
-      <glossdef>
-        <para>
-          <emphasis>SWF</emphasis> is the file format for 
-          <emphasis>Flash</emphasis> movies.
-        </para>
-      </glossdef>
-    </glossentry>
-
-</glossdiv>
-
-<glossdiv><title>T</title>
-
- <glossentry>
-      <glossterm>
-      Tamarin
-      </glossterm>
-      <glossdef>
-        <para>
-          The Tamarin project seeks to create an open source implementation of the ECMAScript 4th edition language specification. The code is used by Adobe as part of the ActionScript Virtual Machine within the Adobe Flash Player. Gnash does not use Tamarin; it already has a working virtual server and most ActionScript classes are implemented.
-        </para>
-      </glossdef>
-    </glossentry>
-
- <glossentry>
-      <glossterm>
-      timeline
-      </glossterm>
-      <glossdef>
-        <para>
-          In Flash technology, a timeline is a sequence of "frames". A single Flash movie can contain multiple timelines, each independently controlled (STOP or PLAY). At regular intervals (FPS) the player advances all timelines in PLAY mode to the next frame, looping back when last frame is reached.
-        </para>
-      </glossdef>
-    </glossentry>
-
-</glossdiv>
-
-<glossdiv><title>X</title>
-
- <glossentry>
-      <glossterm>
-      X.org
-      </glossterm>
-      <glossdef>
-        <para>
-          X.org is the most commonly used X server; it was forked from XFree86.
-        </para>
-      </glossdef>
-    </glossentry>
-
-</glossdiv>
-
+    
+  </glossdiv>
+  
 </glossary>
