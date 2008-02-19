@@ -1,0 +1,34 @@
+.\" -*- coding: us-ascii -*-
+.if \n(.g .ds T< \\FC
+.if \n(.g .ds T> \\F[\n[.fam]]
+.de URL
+\\$2 \(la\\$1\(ra\\$3
+..
+.if \n(.g .mso www.tmac
+.TH cygnal 1 "19 February 2008"  
+.SH NAME
+cygnal \- Cygnal
+.SH Synopsis
+.nf
+
+cygnal (options)...
+.fi
+.SH DESCRIPTION
+Cygnal is a multimedia media server for streaming audio, video, and
+video conferencing. Cygnal supports several protocols used by SWF
+file players, including RTMP, RTMPTS, and RTMPT, while encouring the
+use of patent free codecs.
+.TP 
+(-h) --help
+Print usage info.
+.TP 
+--version
+Print version information.
+.TP 
+(-v) --verbose
+Verbose output.
+.TP 
+(-p) --port-offset
+Port offset. This number gets added to the default
+ports for RTMPS and RTMPS. This is only used by
+developers. 
