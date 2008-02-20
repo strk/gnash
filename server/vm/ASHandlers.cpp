@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.197 2008/02/20 15:59:44 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.198 2008/02/20 17:00:43 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -1420,19 +1420,33 @@ SWFHandlers::ActionImplementsOp(ActionExec& thread)
 
 	thread.ensureStack(2);
 
-	as_object *obj = env.pop().to_object().get();
+	as_value objval = env.pop();
+	as_object *obj = objval.to_object().get();
 	int count = static_cast<int>(env.pop().to_number());
 	as_value a(1);
 
 	if (!obj)
 	{
-		log_debug(_("In ImplementsOp, not an object.\n"));
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("Stack value on IMPLEMENTSOP is not an object: %s."),
+			objval.to_debug_string().c_str());
+		);
 		return;
 	}
 	obj = obj->get_prototype().get();
 	if (!obj)
 	{
-		log_debug(_("In ImplementsOp, object had no prototype.\n"));
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("Target object for IMPLEMENTSOP has no prototype."));
+		);
+		return;
+	}
+
+	if ( count <= 0 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("Invalid interfaces count (%d) on IMPLEMENTSOP"), count);
+		);
 		return;
 	}
 

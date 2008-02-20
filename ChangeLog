@@ -1,5 +1,7 @@
 2008-02-20 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionImplementsOp): better logging,
+	  catch bogus opcodes.
 	* server/vm/ASHandlers.cpp (CommonGetUrl): only loadVariables if
 	  targetLoad flag is set (tested). Log an SWF error if loadVariables
 	  is set but targtLoad is clear.
