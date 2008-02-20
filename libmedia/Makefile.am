@@ -100,10 +100,10 @@ if USE_SOUND_GST
    libgnashmedia_la_SOURCES += \
 		gst/VideoDecoderGst.cpp \
 		gst/AudioDecoderGst.cpp \
-		gst/gstappbuffer.c \
 		gst/gstappsink.c \
 		gst/gstappsrc.c \
 		gst/SoundHandlerGst.cpp \
+		gst/GstUtil.cpp \
 		gst/SoundGst.cpp \
 		gst/MediaDecoderGst.cpp \
 		gst/gstflvdemux.c \
@@ -111,17 +111,18 @@ if USE_SOUND_GST
 		gst/gstbuffersrc.c
 	
    noinst_HEADERS += \
-		gst/gstappbuffer.h \
 		gst/AudioDecoderGst.h \
 		gst/VideoDecoderGst.h \
 		gst/gstappsink.h \
 		gst/gstappsrc.h \
 		gst/SoundHandlerGst.h \
+		gst/GstUtil.h \
 		gst/SoundGst.h \
 		gst/MediaDecoderGst.h \
 		gst/gstflvdemux.h \
 		gst/gstflvparse.h \
-		gst/gstbuffersrc.h
+		gst/gstbuffersrc.h \
+		gst/gnash_gst_version.h
 
    libgnashmedia_la_CPPFLAGS += \
 		$(GSTREAMER_CFLAGS)

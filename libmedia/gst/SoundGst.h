@@ -74,8 +74,6 @@ private: // methods
   
   void handleMessage (GstMessage *message);
 
-
-
   bool needDecoder();
   
   void setLoopCount(int count);

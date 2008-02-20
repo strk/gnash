@@ -1,3 +1,19 @@
+2008-02-20 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libbase/rc.{cpp,h}: Add a configuration item for the gstreamer
+	audiosink. It is possible to use a pipeline in the configuration
+	option similar to gst-launch. Implementation by Sean McNamara
+	<smcnam@gmail.com> (committed with some small modifications).
+	* libmedia/gst/GstUtil.{cpp,h}: Static Gstreamer utility class.
+	* libmedia/gst/SoundGst.cpp: Use the configuration audio output
+	pipeline.
+	* server/asobj/NetStreamGst.cpp: Likewise, and don't attempt to load
+	the flvdemux element, since it's loaded statically.
+	* libmedia/gst/gstflvdemux.c: Make sure that the element name doesn't
+	conflict with an existing flvdemux.
+	* libmedia/gst/gnash_gst_version.h: Utility macros for dealing with
+	Gstreamer versions. Unused for now.
+
 2008-02-20 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ASHandlers.cpp (CommonGetUrl): revert the

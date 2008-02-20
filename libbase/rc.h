@@ -169,6 +169,9 @@ public:
 
     const std::string& getFlashSystemManufacturer() const { return _flashSystemManufacturer; }
     void setFlashSystemManufacturer(std::string& value) { _flashSystemManufacturer = value; }
+    
+    const std::string& getGstAudioSink() const { return _gstaudiosink; }
+    void setGstAudioSink(const std::string& value) { _gstaudiosink = value; }
 
     int getRetries() const { return _retries; }
     void setRetries(int x) { _retries = x; }
@@ -241,6 +244,9 @@ private:
 
     /// String to pass as $version in Actionscript
     std::string  _flashVersionString;
+    
+    /// String representing the first GStreamer audio output pipeline to try
+    std::string _gstaudiosink;
 
     /// String to pass as System.capabilities.os
     /// in Actionscript. If empty, leaves detection

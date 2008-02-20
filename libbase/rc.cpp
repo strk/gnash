@@ -417,6 +417,11 @@ RcInitFile::parseFile(const std::string& filespec)
                     continue;
                 }
                 
+                if(noCaseCompare(variable, "GSTAudioSink")) {
+                    _gstaudiosink = value;
+                    continue;
+                }
+                
                 if (noCaseCompare(variable, "flashSystemOS")) {
                     _flashSystemOS = value;
                     continue;
@@ -626,6 +631,7 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "flashSystemOS " << _flashSystemOS << endl <<
     cmd << "flashVersionString " << _flashVersionString << endl <<
     cmd << "urlOpenerFormat " << _urlOpenerFormat << endl <<
+    cmd << "GSTAudioSink "     << _gstaudiosink    << endl <<
     cmd << "SOLSafeDir " << _solsandbox << endl;
 
     // Lists. These can't be handled very well at the moment. The main
@@ -754,6 +760,11 @@ RcInitFile::dump()
     if (_flashVersionString.size()) {
         cerr << "\tFlash Version String is: " << _flashVersionString << endl;
     }
+    
+    if(!_gstaudiosink.empty()) {
+        cerr << "\tGST Audio Sink is: " << _gstaudiosink << endl;
+    }
+    
     cerr << "\tWhitelist: ";
     writeList (_whitelist, cerr);
     

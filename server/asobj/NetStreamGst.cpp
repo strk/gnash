@@ -28,6 +28,7 @@
 #include "Object.h"
 #include "gstflvdemux.h"
 #include <gst/gstelement.h>
+#include <GstUtil.h>
 
 
 //                                        video -> ffmpegcolorspace -> capsfilter -> fakesink
@@ -47,20 +48,6 @@ NetStreamGst::NetStreamGst()
   _pipeline = gst_pipeline_new ("gnash_pipeline");
   _audiobin = gst_bin_new(NULL);
   _videobin = gst_bin_new(NULL);
-
-
-  // Figure out if flvdemux is present on the system. If not load the one from
-  // the Gnash tree.
-  GstElementFactory* factory = gst_element_factory_find ("flvdemux");
-  if (!factory) {
-    if (!gst_element_register (NULL, "flvdemux", GST_RANK_PRIMARY,
-          gst_flv_demux_get_type ())) {
-      log_error("Failed to register our own FLV demuxer. FLV playback may not "
-                "work.");            
-    }    
-  } else {
-    gst_object_unref(GST_OBJECT(factory));
-  }
 
 
   // Setup general decoders
@@ -134,8 +121,14 @@ NetStreamGst::NetStreamGst()
   GstElement* audioconvert = gst_element_factory_make ("audioconvert", NULL);	
   
   GstElement* audiosink;
+  
   if (get_sound_handler()) {
-    audiosink = gst_element_factory_make ("autoaudiosink", NULL);
+    
+    audiosink = gnash::media::GstUtil::get_audiosink_element();
+  
+    if(!audiosink) {
+      log_error(_("Failed to make a valid audio sink."));
+    }
   } else {
     audiosink = gst_element_factory_make ("fakesink", NULL);
   }

@@ -46,6 +46,7 @@
 // * Implement "envelopes" (not so easy)
 
 #include "SoundGst.h"
+#include "GstUtil.h"
 #include <iostream>
 #include "log.h"
 #include "AudioDecoderNellymoser.h"
@@ -436,8 +437,12 @@ SoundGst::gstBuildPipeline()
   GstElement* audioresample = gst_element_factory_make ("audioresample", NULL);
 
   _volume = gst_element_factory_make ("volume", NULL);
-
-  GstElement* audiosink = gst_element_factory_make ("autoaudiosink", NULL);
+  
+  GstElement* audiosink = GstUtil::get_audiosink_element();
+  
+  if(!audiosink) {
+    log_error(_("Failed to make a valid audio sink."));
+  }
   
   gboolean success;
   if (decoder) {
@@ -545,8 +550,6 @@ SoundGst::handleMessage (GstMessage *message)
   }
 
 }
-
-
 
 } // namespace media
 } // namespace gnash

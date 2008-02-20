@@ -1190,9 +1190,9 @@ gst_flv_demux_init (GstFLVDemux * demux, GstFLVDemuxClass * g_class)
 static gboolean
 plugin_init (GstPlugin * plugin)
 {
-  GST_DEBUG_CATEGORY_INIT (flvdemux_debug, "flvdemux", 0, "FLV demuxer");
+  GST_DEBUG_CATEGORY_INIT (flvdemux_debug, "gnash_flvdemux", 0, "FLV demuxer");
 
-  if (!gst_element_register (plugin, "flvdemux", GST_RANK_PRIMARY,
+  if (!gst_element_register (plugin, "gnash_flvdemux", GST_RANK_PRIMARY+1,
           gst_flv_demux_get_type ()))
     return FALSE;
 
@@ -1200,5 +1200,5 @@ plugin_init (GstPlugin * plugin)
 }
 
 GST_PLUGIN_DEFINE_STATIC (GST_VERSION_MAJOR, GST_VERSION_MINOR,
-    "flvdemux", "Element demuxing FLV stream",
+    "gnash_flvdemux", "Element demuxing FLV stream",
     plugin_init, VERSION, "LGPL", "Gnash's internal copy of flvdemux", "Gnash")
