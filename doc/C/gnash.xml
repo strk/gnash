@@ -46,7 +46,7 @@
     <!ENTITY sources          SYSTEM "usermanual/installation/sources.xml">
     <!ENTITY pkgmanager       SYSTEM "usermanual/installation/packagemanager.xml">
     <!ENTITY configuration    SYSTEM "usermanual/installation/configuration.xml">
-    <!ENTITY cross_compiling  SYSTEM "usermanual/installation/cross_compiling.xml">
+    <!ENTITY crosscompiling  SYSTEM "usermanual/installation/cross_compiling.xml">
     <!ENTITY building         SYSTEM "usermanual/installation/building.xml">
     <!ENTITY install          SYSTEM "usermanual/installation/install.xml">
  ]

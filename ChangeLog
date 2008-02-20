@@ -1,5 +1,11 @@
 2008-02-20 Sandro Santilli <strk@keybit.net>
 
+	* doc/C/gnash.xml, doc/C/usermanual/installation/configuration.xml:
+	  docbook2texi complained about an underscore in an entity name,
+	  so renamed 'cross_compiling' to 'crosscompiling'.
+
+2008-02-20 Sandro Santilli <strk@keybit.net>
+
 	* doc/C/fdl-appendix.xml: in DocBook 4.0, docinfo tag was
 	  replaced with appendixinfo (in an appendix context).
 	  See
