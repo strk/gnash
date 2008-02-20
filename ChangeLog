@@ -1,5 +1,9 @@
 2008-02-20 Sandro Santilli <strk@keybit.net>
 
+	* doc/C/fdl-appendix.xml: in DocBook 4.0, docinfo tag was
+	  replaced with appendixinfo (in an appendix context).
+	  See
+	  http://www.museum.state.il.us/ismdepts/library/linuxguides/docbook/docinfo.html.
 	* doc/C/app_authors.xml: copy 'Ignacio Casta�o' name from
 	  gameswf sources (seems to be better accepted by docbook2pdf). 
 	* doc/C/amf.xml, doc/C/rtmp.xml: use appropriate sect levels

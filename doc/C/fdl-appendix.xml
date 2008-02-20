@@ -8,7 +8,7 @@
 -->
 
 <appendix id="fdl">
-  <docinfo>
+  <appendixinfo>
     <releaseinfo>
       Version 1.1, March 2000
     </releaseinfo>
@@ -24,7 +24,7 @@
         license document, but changing it is not allowed.
       </para>
     </legalnotice>
-  </docinfo>
+  </appendixinfo>
   <title>GNU Free Documentation License</title>
 
   <sect1 id="fdl-preamble">
