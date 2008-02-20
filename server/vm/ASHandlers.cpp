@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.198 2008/02/20 17:00:43 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.199 2008/02/20 17:43:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -2213,33 +2213,36 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 	character* target_ch = env.find_target(target.to_string());
 	sprite_instance* target_movie = target_ch ? target_ch->to_movie() : 0;
 
+	if ( loadVariableFlag )
+	{
+		log_debug(_("getURL2 loadVariable"));
+
+		if ( ! target_ch )
+		{
+			log_error(_("get url: target %s not found"),
+				target_string.c_str());
+			// might want to invoke the external url opener here...
+			return;
+		}
+
+		if ( ! target_movie )
+		{
+			log_error(_("get url: target %s is not a sprite"),
+				target_string.c_str());
+			// might want to invoke the external url opener here...
+			return;
+		}
+
+		target_movie->loadVariables(url, sendVarsMethod);
+
+		return;
+	}
+
+
 	movie_root& mr = VM::get().getRoot();
 
 	if ( loadTargetFlag )
 	{
-		if ( loadVariableFlag )
-		{
-			log_debug(_("getURL2 loadVariable"));
-
-			if ( ! target_ch )
-			{
-				log_error(_("get url: target %s not found"),
-					target_string.c_str());
-				return;
-			}
-
-			if ( ! target_movie )
-			{
-				log_error(_("get url: target %s is not a sprite"),
-					target_string.c_str());
-				return;
-			}
-
-			target_movie->loadVariables(url, sendVarsMethod);
-
-			return;
-		}
-
 		// TODO: always pass directly to movie_root::loadMovie ?
 
 		log_debug(_("getURL2 target load"));
@@ -2291,13 +2294,6 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 #endif
 
 		return;
-	}
-
-	if ( loadVariableFlag )
-	{
-		IF_VERBOSE_MALFORMED_SWF (
-			log_swferror("loadVariables flag of a GETURL2 opcode is set, but loadTarget is clear");
-		);
 	}
 
 	if ( sendVarsMethod )

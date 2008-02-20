@@ -1,5 +1,11 @@
 2008-02-20 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (CommonGetUrl): revert the
+	  loadVariables/targetLoad flags handling, as it broke
+	  uptoten.com. Will do better research after release..
+
+2008-02-20 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ASHandlers.cpp (ActionImplementsOp): better logging,
 	  catch bogus opcodes.
 	* server/vm/ASHandlers.cpp (CommonGetUrl): only loadVariables if
