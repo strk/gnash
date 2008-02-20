@@ -32,15 +32,15 @@
       configured and requires a total of about 25 megabytes to compile
       it. 
     </para>
-    <para>
-      Gnash is known to compile for most any POSIX and ANSI C++
-      conforming system if you have all the dependent libraries
-      installed. Systems we test on, and which Gnash is know to
-      run on are Ubuntu, Fedora, Debian, OpenBSD, NetBSD, FreeBSD,
-      Win32, and Darwin (OSX) primarily. Occasionally other platforms
-      are built, primarily by those distribution maintainers. This
-      includes BeOS, Haiku, Syllable, OS/2, Solaris, Slackware, Gentoo.
-    </para>
+<!--     <para> -->
+<!--       Gnash is known to compile for most any POSIX and ANSI C++ -->
+<!--       conforming system if you have all the dependent libraries -->
+<!--       installed. Systems we test on, and which Gnash is know to -->
+<!--       run on are Ubuntu, Fedora, Debian, OpenBSD, NetBSD, FreeBSD, -->
+<!--       Win32, and Darwin (OSX) primarily. Occasionally other platforms -->
+<!--       are built, primarily by those distribution maintainers. This -->
+<!--       includes BeOS, Haiku, Syllable, OS/2, Solaris, Slackware, Gentoo. -->
+<!--     </para> -->
     <para>
       Continue reading for detailed step-by-step instructions of the
       entire procedure. For Win32 users, you will need to install
@@ -1484,7 +1484,7 @@
 
       <para>
 	There is also up to date information on the Gnash Developers
-	weeb site at: <ulink type="http" url="http://www.gnashdev.org">
+	web site at: <ulink type="http" url="http://www.gnashdev.org">
 	http://www.gnashdev.org</ulink>. This is the best place for
 	detailed informatin on various systems.
       </para>
@@ -1564,15 +1564,16 @@
       <title>Compiling The Code</title>
 
       <para>
-	After configuring, typing <emphasis>make</emphasis> will compile the
-	code. No options are necessary. If desired, you can redefine
-	the variables used by <emphasis>make</emphasis> on the command line
-	when invoking the program. The few flags of interest are
-	<emphasis>CFLAGS</emphasis> and	<emphasis>CXXFLAGS</emphasis>, often used to
-	turn on debugging or turn off optimizing. Invoking make as in
-	this example would build all the code with debugging turned
-	on, and optimizing turned off. The default values for both of
-	these variables is <emphasis>-O2 -g</emphasis>.
+	After configuring, typing <emphasis>make</emphasis> will
+	compile the code. No options are necessary. If desired, you
+	can redefine the variables used by <emphasis>make</emphasis>
+	on the command line when invoking the program. The few flags
+	of interest are <emphasis>CFLAGS</emphasis> and
+	<emphasis>CXXFLAGS</emphasis>, often used to turn on debugging
+	or turn off optimizing. Invoking make as in this example would
+	build all the code with debugging turned on, and optimizing
+	turned off. The default values for both of these variables is 
+	<emphasis>-O2 -g</emphasis>. 
 
 	<programlisting>
 	  make CFLAGS=-g CXXFLAGS=-g
@@ -1591,11 +1592,13 @@
       
       <para>
 	By default, the documentation isn't built at all. It isn't
-	even built when typing <emphasis>make install</emphasis> from the top
-	level build directory. It's only built when specified with a
-	specific target in the generated <emphasis>Makefile</emphasis> in the
-	<emphasis>doc/C/</emphasis> sub-directory. All the documents are built in
-	this directory when executing a <emphasis>make install</emphasis>.
+	even built when typing <emphasis>make install</emphasis> from
+	the top level build directory. It's only built when specified
+	with a specific target in the generated
+	<emphasis>Makefile</emphasis> in the
+	<emphasis>doc/C/</emphasis> sub-directory. All the documents
+	are built in this directory when executing a <emphasis>make
+	install</emphasis>. 
       </para>
       
       <para>

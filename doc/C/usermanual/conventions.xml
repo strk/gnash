@@ -1,0 +1,133 @@
+  <sect1 id="guide-conventions">
+    <title>Guide Conventions</title>
+    
+    <para>
+      This guide makes use of the following fairly standard typefaces,
+      highlighting, and language usage: 
+    </para>
+    
+    <variablelist>
+      <varlistentry>
+	<term><application>application</application></term>
+	<listitem>
+	  <para>
+	    The typeface above will be used whenever an application, such as
+	    <application>Firefox</application> or
+	    <application>OpenOffice.org</application>, is mentioned. 
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term><command>command</command></term>
+	<listitem>
+	  <para>
+	    The typeface above will be used whenever the text instructs a user to
+	    enter a command at a shell prompt in UNIX/Linux, such as
+	    <command>ls</command>. 
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term><computeroutput>computeroutput</computeroutput></term>
+	<listitem>
+	  <para>
+	    This is the typeface used to indicate information produced on
+	    <computeroutput>stdout</computeroutput> by the computer.  This include
+	    error messages and prompts. 
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term><filename>filename</filename></term>
+	<listitem>
+	  <para>
+	    This typeface indicates that the text is the name (and possibly the
+	    path) of a specific file on the system in question.  For example,
+	    <filename>/etc/hosts</filename> would appear in this typeface. 
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term><guibutton>guibutton</guibutton></term>
+	<listitem>
+	  <para>
+	    This formatting indicates a button on a Graphical User Interface
+	    (GUI).  If this formatting appears, look for a button with the same
+	    text on the GUI of the &app; player; the button itself may look
+	    slightly different. 
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term><guimenu>guimenu</guimenu></term>
+	<listitem>
+	  <para>
+	    This typeface indicates the topmost menu item in a GUI.  For example,
+	    in many applications the <guimenu>File</guimenu> menu item is a
+	    top=level menu item. 
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term><guimenuitem>guimenuitem</guimenuitem></term>
+	<listitem>
+	  <para>
+	    This typeface indicates a sub-menu item in a GUI.  For example, in
+	    many applications the <guimenuitem>Save As</guimenuitem> menu item is
+	    a sub-menu item. 
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term><guilabel>guitext</guilabel></term>
+	<listitem>
+	  <para>
+	    This typeface indicates a text string on the GUI.  This is generally a
+	    text string that appears on the GUI that is not a button or menuitem. 
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term><keycap>key</keycap></term>
+	<listitem>
+	  <para>
+	    This typeface indicates a specific key on the keyboard.  For example,
+	    the <keycap>Ctrl</keycap> key appears in this typeface. 
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term><keycombo><keycap>key</keycap><keycap>combination</keycap></keycombo></term>
+	<listitem>
+	  <para>
+	    This formatting indicates a set of keys to be pressed at the same
+	    time.  A familiar key combination is
+	    <keycombo><keycap>Ctrl</keycap><keycap>Alt</keycap><keycap>Delete</keycap></keycombo>. 
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term><replaceable>&lt;replaceable&gt;</replaceable></term>
+	<listitem>
+	  <para>
+	    Whenever a general term is included in an example as a placeholder, it
+	    will be signaled by this formatting.  This formatting will usually
+	    appear inside other formatting.  For example,
+	    <filename>/home/<replaceable>&lt;username&gt;</replaceable></filename>
+	    indicates the home directory of a user, whose actual username would be
+	    substituted in for <replaceable>&lt;username&gt;</replaceable>. 
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term><userinput>User input</userinput></term>
+	<listitem>
+	  <para>
+	    This typeface indicates anything that the user must enter, whether
+	    that is at a shell prompt or in response to a GUI prompt.  
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+    
+  </sect1>

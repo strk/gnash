@@ -103,7 +103,8 @@ entities = \
 	usermanual/usage.xml \
 	usermanual/usage/gnashrc.xml \
 	usermanual/bugreport.xml \
-	usermanual/glossary.xml	\
+	usermanual/acknowledgments.xml \
+	usermanual/conventions.xml \
 	$(NULL)
 
 xml_files = $(docname).xml actionscript.xml

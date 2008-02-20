@@ -6,17 +6,48 @@
   architecture, and some system headers. 
   You will also need the following packages to be built for the target
   system: <emphasis>libxml2</emphasis>, <emphasis>libpng</emphasis> 
-  (if used), <emphasis>libjpeg</emphasis> (if used), your
+  (if used), <emphasis>libjpeg</emphasis>,oost  <emphasis>b</emphasis>, your
   GUI library, your renderer, and your video handler (if used).  The page
   <ulink url="http://frank.harvard.edu/~coldwell/toolchain/"
-  type="http">http://frank.harvard.edu/~coldwell/toolchain/</ulink>
+	 type="http">http://frank.harvard.edu/~coldwell/toolchain/</ulink>
   has instructions on building a target system from scratch and
   offers a shell script to make the process easier.
 </para>
+
 <para>
-  Note that you may have some difficulties getting libMesa (opengl)
-  to cross compile.
+  If you need to build up a target system from scratch, there is
+  a good document and shell script at this web site: <ulink
+  type="http"
+  url="http://frank.harvard.edu/~coldwell/toolchain/">
+  http://frank.harvard.edu/~coldwell/toolchain/</ulink>.
 </para>
+
+<para>
+  There is also up to date information on the Gnash Developers
+  web site at: <ulink type="http" url="http://www.gnashdev.org">
+  http://www.gnashdev.org</ulink>. This is the best place for
+  detailed informatin on various systems.
+</para>
+
+<para>
+  After I built up an ARM system in /usr/arm using the shell
+  script from this web site, I then cross compiled all the
+  other libraries I needed. The fun part is trying to get
+  libMesa and boost to cross compile, because they're not really set
+  up for it.
+</para>
+
+<para>
+  So to build for an ARM based system on an x86 based systems,
+  configure like this: 
+</para>
+
+<programlisting>
+  ../../gnash/configure --build=i686-pc-linux-gnu
+  --host=arm-linux --prefix=/usr/local/arm/oe --disable-nsapi
+  --disable-kparts --enable-gui=fb --enable-renderer=agg --disable-shared
+</programlisting>
+
 <para>
   The important configuration options are the ones which specify the
   architecture for the build:

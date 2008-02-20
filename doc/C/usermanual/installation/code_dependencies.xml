@@ -19,7 +19,7 @@
   </para>
 </note>
 
-<table frame='all'>
+<table frame='all' id="codedeps">
   <title>Code Dependency Table</title>
   <tgroup cols='7' align='left' colsep='1' rowsep='1'>
     <colspec colname='name'/>

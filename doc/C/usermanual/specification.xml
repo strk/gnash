@@ -7,7 +7,8 @@
     the Developer's Wiki at <ulink
     url="http://www.gnashdev.org/wiki/index.php/Main_Page" />. 
   </para>
-  
+
+<!--  
   <sect1 id="spec-actionscript">
     <title>&AS;</title>
     
@@ -23,8 +24,8 @@
       implemented: 
     </para>
     
-    <table frame='all'>
-      <title>&AS; Classes</title>
+    <table frame='all' id="asclasses">
+      <title>ActionScript Classes</title>
       <tgroup cols='2' align='left' colsep='1' rowsep='1'>
 	<colspec colname='Class'/>
 	<colspec colname='Status'/>
@@ -135,7 +136,7 @@
       The next table indicates which opcodes have been implemented:
     </para>
     
-    <table frame='all'>
+    <table frame='all' id="opcodes">
       <title>Opcodes</title>
       <tgroup cols='2' align='left' colsep='1' rowsep='1'>
 	<colspec colname='Opcode'/>
@@ -212,7 +213,8 @@
     </table>
     
   </sect1>
-  
+-->
+
   <sect1 id="spec-memory">
     <title>Memory Management</title>
     

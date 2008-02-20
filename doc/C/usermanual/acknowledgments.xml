@@ -1,0 +1,35 @@
+  <sect1 id="Acknowledgments">
+    <title>Acknowledgments</title>
+    
+    <para>
+      The first version of this guide was written by Rob Savoye.  If not for
+      his tireless efforts, this book - and this project - would never have
+      come this far. 
+    </para>
+    
+    <para>
+      John Steinhart has also been supportive of the project from the
+      beginning. I have shamelessly plagiarized one of his early
+      announcement emails in the early part of this chapter. 
+    </para>
+    
+    <para>
+      Ann Barcomb was instrumental in taking this guide from the 0.3.0 to
+      the 0.4.0 version, incorporating the many changes that came with &app;
+      version 0.8.0. 
+    </para>
+    
+    <para>
+      &app; is based on the public domain program
+      <application>GameSWF</application>, which is a graphics library
+      for games that contains the heart of a SWF interpreter.  In December
+      2005, &app; was forked from <application>GameSWF</application> and
+      repackaged in the GNU project style, and a major recoding started.
+    </para>
+  
+    <para>
+      Finally, thanks to all of the &app; developers I haven't mentioned for
+      all their hard work, and for answering my unending questions. 
+    </para>
+  </sect1>
+  
