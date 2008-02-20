@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.38 2008/02/18 22:25:19 strk Exp $
+// $Id: video_stream_def.cpp,v 1.39 2008/02/20 15:54:59 bjacques Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -79,6 +79,16 @@ video_stream_definition::readDefineVideoStream(stream* in, SWF::tag_type tag, mo
 
 	m_codec_id = static_cast<media::videoCodecType>(in->read_u8());
 
+	if (!m_codec_id) {
+		IF_VERBOSE_PARSE(
+		log_debug("An embedded video stream was created with a 0 Codec "
+			  "ID. This probably means the embedded video serves "
+			  "to place a NetStream video on the stage. Embedded "
+			  "video decoding will thus not take place.");
+		);
+		return;
+	}
+
 	_decoder.reset( new media::VideoDecoderGst(m_codec_id, _width, _height) );
 
 }
@@ -138,6 +148,9 @@ has_frame_number(GstBuffer* buf, boost::uint32_t frameNumber)
 std::auto_ptr<image::image_base>
 video_stream_definition::get_frame_data(boost::uint32_t frameNum)
 {
+	if (_video_frames.empty()) {
+		return std::auto_ptr<image::image_base>();
+	}
 	// Check if the requested frame holds any video data.
 	EmbedFrameVec::iterator it = std::find_if(_video_frames.begin(),
 	  _video_frames.end(), boost::bind(has_frame_number, _1, frameNum));

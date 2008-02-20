@@ -1,3 +1,10 @@
+2008-02-20 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/parser/video_stream_def.cpp: Don't make a fuss about embedded
+	video definitions without a real codec or video data, because they are
+	frequently (or perhaps always) used as to place NetStream videos on 
+	the stage.
+
 2008-02-20 Sandro Santilli <strk@keybit.net>
 
 	* server/: gnash.h, impl.cpp: add an additional optional
