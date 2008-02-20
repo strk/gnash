@@ -64,12 +64,19 @@ using namespace amf;
 using namespace gnash;
 using namespace std;
 
+const int LC_HEADER_SIZE = 16;
+const int MAX_LC_HEADER_SIZE = 40960;
+const int LC_LISTENERS_START  = MAX_LC_HEADER_SIZE +  LC_HEADER_SIZE;
+
 static void usage (void);
 
 static TestState runtest;
 
-bool test_read(std::string &filespec);
-bool test_write(std::string &filespec);
+bool test_read();
+bool test_write();
+bool test_listen();
+bool test_data();
+bool load_data();
 
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 
@@ -95,35 +102,193 @@ main(int argc, char *argv[])
     }
 
     // Read a premade .sol file
-    string filespec = "localhost:test_lc"; 
-    test_read(filespec);
-
+//    string filespec = "localhost:test_lc"; 
+    load_data();
+    test_read();
+    test_data();
+    test_listen();
+    
 //     // Write a .sol file
 //     filespec = "lc_name1";
 //     test_write(filespec);
 }
 
 bool
-test_read(std::string &filespec)
+test_listen()
 {
 
-    int total;
+    LcShm lc;
+    char *shmaddr;
+    
+    string con1 = "localhost:lc_reply";
+    if (lc.connect("lc_reply")) {
+        runtest.pass("LcShm::connect()");
+    } else {
+        runtest.fail("LcShm::connect()");
+    }
+    
+    //
+    shmaddr = lc.getAddr();
+    char *addr = shmaddr + LC_LISTENERS_START;
+    memset(addr, 0, 1024);
+    
+    lc.close();
+
+    // Now reconnect to the memory segment, and see if our name
+    // is set.
+    if (lc.connect(con1)) {
+        runtest.pass("LcShm::connect()");
+    } else {
+        runtest.fail("LcShm::connect()");
+    }
+    
+    if (strcmp(addr, "localhost:lc_reply") == 0) {
+        runtest.pass("LcShm::addListener(lc_reply)");
+    } else {
+        runtest.fail("LcShm::addListener(lc_reply)");
+    }
+    
+    string con2 = "localhost:lc_name1";
+    if (lc.connect(con2)) {
+        runtest.pass("LcShm::connect(lc_name1)");
+    } else {
+        runtest.fail("LcShm::connect(lc_name1)");
+    }
+
+    if (strcmp(addr, "localhost:lc_reply") == 0) {
+        runtest.pass("LcShm::addListener(lc_reply)");
+    } else {
+        runtest.fail("LcShm::addListener(lc_reply)");
+    }
+
+    // Aftyer removing a listener, everything gets moved up
+    // in the table. The last element gets zero'd out, so
+    // we don't have duplicate entries.
+    lc.removeListener(con1);
+    if ((strcmp(addr, "localhost:lc_name1") == 0)
+    && (addr[con1.size() + 1] == 0)
+    && (addr[con1.size() + 2] == 0)
+    && (addr[con1.size() + 3] == 0)) {
+        runtest.pass("LcShm::removeListener(lc_reply)");
+    } else {
+        runtest.fail("LcShm::removeListener(lc_reply)");
+    }
+    
+    Listener list(reinterpret_cast<uint8_t *>(shmaddr));
+    vector<string>::const_iterator it;
+    auto_ptr< vector<string> > listeners ( list.listListeners() );
+    if (listeners->size() == 0) {
+        cout << "Nobody is listening" << endl;
+    } else {
+        for (it=listeners->begin(); it!=listeners->end(); it++) {
+            string str = *it;
+	    if ((str[0] != ':') || (dbglogfile.getVerbosity() > 0)) {
+		cout << " Listeners: " << str << endl;
+	    }
+        }
+    }
+    
+}
+
+bool
+test_data()
+{
     LcShm lc;
     char *shmaddr;
 
-    if (lc.connect(filespec)) {
+    string con1 = "localhost:lc_reply";
+    if (lc.connect(con1)) {
+        runtest.pass("LcShm::connect(localhost:lc_reply)");
+    } else {
+        runtest.fail("LcShm::connect(localhost:lc_reply)");
+    }
+
+    shmaddr = lc.getAddr();     // for gdb
+
+    Element *el;
+    vector<amf::Element *> els;
+
+    el = new Element(true, 123.456, 987.654, "IAmReplyingNow");
+    el->dump();
+    els.push_back(el);
+
+#if 0
+    // 
+    el = new Element(true);
+    els.push_back(el);
+
+    el = new Element(12.34);
+    els.push_back(el);
+
+    el = new Element(12.34);
+    els.push_back(el);
+
+    string str = "IAmReplyingNow";
+    el = new Element(str);
+    els.push_back(el);
+#endif
+    
+    string str = "Volume Level 10 ";
+    el = new Element(str);
+    els.push_back(el);
+
+    // Send the AMF objects
+    lc.send(con1, "localhost", els);
+}
+
+bool
+load_data()
+{
+
+    LcShm lc;
+    char *shmaddr;
+
+    string con1 = "lc_reply";
+    if (lc.connect(con1)) {
         runtest.pass("LcShm::connect()");
     } else {
         runtest.fail("LcShm::connect()");
     }
 
     shmaddr = lc.getAddr();
+//    if (memcmp(shmaddr, con1.c_str():
     // Since this is a test case, populate the memory with known good data
     string srcdir = SRCDIR;
     srcdir += "/segment.raw";
     int fd = ::open(srcdir.c_str(), O_RDONLY);
     void *dataptr = static_cast<unsigned char *>(mmap(0, 64528, PROT_READ, MAP_SHARED, fd, 0));
-#if 0
+
+    if (dataptr != (void *)0xffffffff) {
+        memcpy(shmaddr, dataptr, 64528);
+    } else {
+        cerr << "ERROR: couldn't map input file!" << endl;
+    }
+
+    ::close(fd);
+}
+
+bool
+test_read()
+{
+
+    LcShm lc;
+    char *shmaddr;
+
+    string con1 = "lc_reply";
+    if (lc.connect(con1)) {
+        runtest.pass("LcShm::connect()");
+    } else {
+        runtest.fail("LcShm::connect()");
+    }
+
+    shmaddr = lc.getAddr();
+//    if (memcmp(shmaddr, con1.c_str():
+    // Since this is a test case, populate the memory with known good data
+    string srcdir = SRCDIR;
+    srcdir += "/segment.raw";
+    int fd = ::open(srcdir.c_str(), O_RDONLY);
+    void *dataptr = static_cast<unsigned char *>(mmap(0, 64528, PROT_READ, MAP_SHARED, fd, 0));
+#if 1
     if (dataptr != (void *)0xffffffff) {
         memcpy(shmaddr, dataptr, 64528);
     } else {
@@ -142,18 +307,18 @@ test_read(std::string &filespec)
             string str = *it;
 	    if ((str[0] != ':') || (dbglogfile.getVerbosity() > 0)) {
 		cout << " Listeners: " << str << endl;
-		total++;
 	    }
         }
     }
 
-    string str = "localhost:lc_reply";
+#if 0
+    string str = "localhost:lc_name1";
     if (list.findListener(str)) {
         runtest.pass("LcShm::findListener()");
     } else {
         runtest.fail("LcShm::findListener()");
     }
-    
+#endif
     
 //    list.addListener(filespec);
     listeners = list.listListeners(); // will delete former listener list
@@ -164,7 +329,6 @@ test_read(std::string &filespec)
             string str = *it;
 	    if ((str[0] != ':') || (dbglogfile.getVerbosity() > 0)) {
 		cout << " Listeners: " << str << endl;
-		total++;
 	    }
         }
     }
@@ -173,10 +337,11 @@ test_read(std::string &filespec)
     vector<amf::Element *> ellist = lc.parseBody(ptr);
 //    cout << "# of AMF Elements in file: " << ellist.size() << endl;
 //    lc.dump();
+    lc.close();
 }
 
 bool
-test_write(std::string &filespec)
+test_write()
 {
 #if 0
     AMF amf_obj;

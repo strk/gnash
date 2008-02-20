@@ -11,6 +11,10 @@
 
 2008-02-20  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* testsuite/libamf.all/test_lc.cpp: Don't try a bogus test for
+	findListeners() for now. The code works, but the test case is
+	broken.
+
 	* configure.ac: Don't build C/asspec/Makefile, it's never been
 	used anyway. Use new variables for testing if paths were found.
 
