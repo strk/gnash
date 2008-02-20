@@ -23,6 +23,7 @@ AC_DEFUN([GNASH_DOCBOOK], [
     *)   AC_MSG_ERROR([bad value ${enableval} for enable-docbook option]) ;;
   esac], docbook=no)
 
+  DB2X_VERSION=
   if test x"$docbook" = x"yes"; then
     docbook_styles=
     AC_ARG_WITH(docbook_styles, AC_HELP_STRING([--with-docbook-styles], [directory where Docbook stylesheets are]), with_docbook_styles=${withval})
@@ -99,24 +100,49 @@ dnl    	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
     	  [$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
     fi
 
-    AC_PATH_PROG(DB2X_TEXIXML, db2x_texixml, [],
-    	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+    dnl Find the programs we need to convert docbook into Texi for making
+    dnl info pages. The first catagory are the wrapper utilities included
+    dnl in most docbook2x packages.
+    scripts="db2x_docbook2texi docbook2texi docbook2texi.pl"
+    for i in $scripts; do
+      AC_PATH_PROG(DB2X_TEXI, $i, [], [$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+      if test x$DB2X_TEXI != x; then
+        break
+      fi
+    done
 
-    if test x$$DB2X_TEXIXML = x; then
-      AC_PATH_PROG(DB2X_TEXIXML, db2x_texixml.pl, [],
-    	  [$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+    dnl These look for the sepearte utilities used by the wrapper scripts. If we don't find
+    dnl the wrappers, then we use the lower level utilities directly.
+    if test x$DB2X_TEXI = x; then
+      scripts="db2x_texixml db2x_texixml.pl"
+      for i in $scripts; do
+        AC_PATH_PROG(DB2X_TEXIXML, $i, [], [$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+        if test x$DB2X_TEXIXML != x; then
+          break
+        fi
+      done
     fi
 
-    AC_PATH_PROG(DB2X_MANXML, db2x_manxml, [],
-    	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+    dnl Find the programs we need to convert docbook into man pages.
+    scripts="db2x_docbook2man docbook2man docbook2man.pl"
+    for i in $scripts; do
+      AC_PATH_PROG(DB2X_MAN, $i, [], [$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+      if test x$DB2X_MAN != x; then
+        break
+      fi
+    done
 
-    if test x$$DB2X_MANXML = x; then
-      AC_PATH_PROG(DB2X_MANXML, db2x_manxml.pl, [],
-    	  [$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+    if test x$DB2X_MANXML != x; then
+      scripts="db2x_manxml db2x_manxml.pl"
+      for i in $scripts; do
+        AC_PATH_PROG(DB2X_MANXML, $i, [], [$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+        if test x$DB2X_MANXML != x; then
+          break
+        fi
+      done
     fi
 
-    AC_PATH_PROG(MAKEINFO, makeinfo, [],
-    	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+    AC_PATH_PROG(MAKEINFO, makeinfo, [], [$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
 
     if test x"$XSLTPROC" = x -o x"$docbook_styles" = x ; then
       AC_MSG_WARN([You need to install xsltproc and docbook style sheets before HTML output can be generated])
@@ -124,6 +150,10 @@ dnl    	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
     if test x"$DB2X_XSLTPROC" = x -o x"$DB2X_TEXIXML" = x  -o x"$DB2X_MANXML" = x -o x"$MAKEINFO" = x ; then
       AC_MSG_WARN([You need to install the docbook2X package before Texi output can be generated])
     fi
+
+    AC_PATH_PROG(DB2X_PDF, docbook2pdf, [], [$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+
+
     if test x"$FOP" != x -a x"$docbook_styles" != x ; then :
     elif test x"$PDFXMLTEX" != x -a x"$XSLTPROC" != x -a x"$docbook_styles" != x ; then :
     else
@@ -132,12 +162,13 @@ dnl    	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
   fi
 
 dnl  AM_CONDITIONAL(HAVE_JAVA, [test x$JAVA != x])
-  AM_CONDITIONAL(ENABLE_TEXI, [ test x"$DB2X_XSLTPROC" != x -a x"$DB2X_TEXIXML" != x -a x"$MAKEINFO" != x ])
+  AM_CONDITIONAL(ENABLE_TEXI, [ test x"$DB2X_TEXI" != x -o x"$DB2X_TEXIXML" != x ])
+  AM_CONDITIONAL(ENABLE_PDF, [ test x"$DB2X_PDF" ])
   AM_CONDITIONAL(ENABLE_HTML, [ test x"$XSLTPROC" != x -a x"$docbook_styles" != x ])
   AM_CONDITIONAL(ENABLE_FOP, [ test x"$FOP" != x -a x"$docbook_styles" != x ])
   AM_CONDITIONAL(ENABLE_XMLTEX, [ test x"$PDFXMLTEX" != x -a x"$XSLTPROC" != x -a x"$docbook_styles" != x ])
 dnl  AM_CONDITIONAL(ENABLE_DBLATEX, [ test x"$DBLATEX" != x ])
-  AM_CONDITIONAL(ENABLE_MAN, [ test x"$DB2X_XSLTPROC" != x -a x"$DB2X_MANXML" != x ])
+  AM_CONDITIONAL(ENABLE_MAN, [ test x"$DB2X_MAN" != x -o x"$DB2X_MANXML" != x ])
   AC_SUBST(JAVA)
 
 dnl See which version of the DocBook2x tools we have, because it
@@ -145,9 +176,9 @@ dnl forces a command line change in the Makefile.
 
 dnl db2x_texixml (part of docbook2X 0.8.3)
 dnl db2x_texixml (part of docbook2X 0.8.5)
-  DB2X_VERSION=
+dnl docbook2texi (part of docbook2X 0.8.8)
   if test x"${DB2X_TEXIXML}" != x; then
-    db2x_version=`${DB2X_TEXIXML} --version | head -1 | sed -e 's/^.*docbook2X //' -e 's/).*$//'`
+    db2x_version=`${DB2X_TEXIXML} --version | head -1 | sed -e 's/^.*docbook2X //' -e 's/).*$//' 2>&1`
     DB2X_VERSION="${db2x_version}"
     AC_SUBST(DB2X_VERSION)
   fi

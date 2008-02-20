@@ -6,6 +6,13 @@
 
 2008-02-19  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* doc/C/Makefile.am: Use newer wrappers for docbook2x tools
+	instead of the old two step process.
+	* macros/docbook.m4: Look for alternate names fo rdocbook
+	utlities. Find docbook2pdf. Fix automake conditionals.
+
+2008-02-19  Rob Savoye  <rob@ripple.welcomehome.org>
+
 	* macros/docbook.m4: Look for the scripts with a .pl extension if
 	they aren't found, as Gentoo renamed these programs.
 
