@@ -117,7 +117,7 @@ MANSRC = $(dist_man_MANS:.1=.man-xml)
 
 html: links gnash.html actionscript.html
 pdf:  links gnash.pdf actionscript.pdf
-man:  gnash.1 gprocessor.1 dumpshm.1 soldumper.1
+man:  $(dist_man_MANS)
 texi: gnash.texi actionscript.texi
 info: links gnash.info actionscript.info
 gnash.pdf gnash.html gnash.texi: links $(xml_files) $(entities)
@@ -156,7 +156,7 @@ endif
 .xml.html:
 if ENABLE_HTML
 	$(XSLTPROC) --output $@ --nonet $(docbook_styles)/html/docbook.xsl $<
-	$(RM) $*.txml
+	@$(RM) $*.txml
 else
 	@if test -d $(top_srcdir)/packaging/doc; then \
 	  $(LN_S) -f $(top_srcdir)/packaging/doc/$@.in ./$@; \
@@ -168,13 +168,17 @@ endif
 #	basefile=$(notdir $(basename $<));
 .xml.texi:
 if ENABLE_TEXI
-	basefile=`echo $< | sed -e  's,^.*/,,' -e 's,\.xml$$,,'`; \
-	$(DB2X_XSLTPROC) -s texi $< --output $${basefile}.txml; \
-	if test x"$(DB2X_VERSION)" = x"0.8.5" -o x"$(DB2X_VERSION)" = x"0.8.7"; then \
-	  $(DB2X_TEXIXML) --encoding=us-ascii//TRANSLIT $${basefile}.txml; \
-	  sed -e "s/setfilename $${basefile}_.*\.info/setfilename $${basefile}.info/" $${basefile}_*.texi > $${basefile}.texi ; \
+	-if test x$(DB2X_TEXI) != x; then \
+	  $(DB2X_TEXI) --encoding=us-ascii//TRANSLIT $< ; \
 	else \
-	  $(DB2X_TEXIXML) --encoding=us-ascii//TRANSLIT --to-stdout $${basefile}.txml > $${basefile}.texi ; \
+	  basefile="$*"; \
+          $(DB2X_XSLTPROC) -s texi $< --output $${basefile}.txml; \
+	  if test x"$(DB2X_VERSION)" = x"0.8.5" -o x"$(DB2X_VERSION)" = x"0.8.7"; then \
+	    $(DB2X_TEXIXML) --encoding=us-ascii//TRANSLIT $${basefile}.txml; \
+	    sed -e "s/setfilename $${basefile}_.*\.info/setfilename $${basefile}.info/" $${basefile}_*.texi > $${basefile}.texi ; \
+	  else \
+	    $(DB2X_TEXIXML) --encoding=us-ascii//TRANSLIT --to-stdout $${basefile}.txml > $${basefile}.texi ; \
+	  fi; \
 	fi
 endif
 
@@ -192,10 +196,13 @@ endif
 
 .man-xml.1:
 if ENABLE_MAN
-	echo "\"$?\", \"$*\", \"$<\""
-	$(DB2X_XSLTPROC) -s man $? -o $*.mxml
-	$(DB2X_MANXML) $*.mxml
-	$(RM) $*.mxml
+	-@if test x$(DB2X_MAN) != x; then \
+	  $(DB2X_MAN) $?; \
+        else \
+	  $(DB2X_XSLTPROC) -s man $? -o $*.mxml; \
+	  $(DB2X_MANXML) $*.mxml; \
+	  $(RM) $*.mxml; \
+	fi
 else
 	@if test -d $(top_srcdir)/packaging/doc; then \
 	  $(LN_S) -f $(top_srcdir)/packaging/doc/$@.in ./$@; \
