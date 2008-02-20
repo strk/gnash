@@ -1762,10 +1762,10 @@ movie_root::findCharacterByTarget(const std::string& tgtstr_orig) const
 }
 
 void
-movie_root::loadMovie(const URL& url, const std::string& target, movie_root::LoadMethod method)
+movie_root::loadMovie(const URL& url, const std::string& target, const std::string* postdata)
 {
     log_debug("movie_root::loadMovie(%s, %s)", url.str().c_str(), target.c_str());
-    _loadMovieRequests.push_front(LoadMovieRequest(url, target, method));
+    _loadMovieRequests.push_front(LoadMovieRequest(url, target, postdata));
 }
 
 void
@@ -1773,7 +1773,8 @@ movie_root::processLoadMovieRequest(const LoadMovieRequest& r)
 {
     const std::string& target = r.getTarget();
     const URL& url = r.getURL();
-    LoadMethod method = r.getMethod();
+    bool usePost = r.usePost();
+    const std::string& postData = r.getPostData();
 
     if ( target.compare(0, 6, "_level") == 0 && target.find_first_not_of("0123456789", 7) == string::npos )
     {
@@ -1797,12 +1798,14 @@ movie_root::processLoadMovieRequest(const LoadMovieRequest& r)
         return;
     }
 
-    if ( method )
+    if ( usePost )
     {
-        log_unimpl("loadMovie with method %s", method == 1 ? "GET" : method == 2 ? "POST" : "UNKWNOWN");
+    	sp->loadMovie(url, &postData);
     }
-
-    sp->loadMovie(url);
+    else
+    {
+        sp->loadMovie(url);
+    }
 }
 
 void

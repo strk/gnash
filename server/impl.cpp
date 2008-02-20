@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.140 2008/02/19 19:20:53 bwy Exp $ */
+/* $Id: impl.cpp,v 1.141 2008/02/20 14:46:27 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -539,7 +539,7 @@ create_movie(std::auto_ptr<tu_file> in, const std::string& url, bool startLoader
 }
 
 movie_definition*
-create_movie(const URL& url, const char* reset_url, bool startLoaderThread)
+create_movie(const URL& url, const char* reset_url, bool startLoaderThread, const std::string* postdata)
 {
   // URL::str() returns by value, save it to a local string
   std::string url_str = url.str();
@@ -547,7 +547,9 @@ create_movie(const URL& url, const char* reset_url, bool startLoaderThread)
 
 //  log_debug(_("%s: url is %s"),  __PRETTY_FUNCTION__, c_url);
 
-  std::auto_ptr<tu_file> in ( globals::streamProvider.getStream(url) );
+  std::auto_ptr<tu_file> in;
+  if ( postdata ) in.reset( globals::streamProvider.getStream(url, *postdata) );
+  else in.reset( globals::streamProvider.getStream(url) );
   if ( ! in.get() )
   {
       log_error(_("failed to open '%s'; can't create movie"), c_url);
@@ -785,14 +787,15 @@ static void clear_library()
 // loaded it already.  Add it to our library on success, and
 // return a pointer to it.
 //
-movie_definition* create_library_movie(const URL& url, const char* real_url, bool startLoaderThread)
+movie_definition* create_library_movie(const URL& url, const char* real_url, bool startLoaderThread, const std::string* postdata)
 {
 //    log_debug(_("%s: url is %s"), __PRETTY_FUNCTION__, url.str().c_str());
 
     // Use real_url as label for cache if available 
     std::string cache_label = real_url ? URL(real_url).str() : url.str();
 
-    // Is the movie already in the library?
+    // Is the movie already in the library? (don't check if we have post data!)
+    if ( ! postdata )
     {
   boost::intrusive_ptr<movie_definition>  m;
   if ( s_movie_library.get(cache_label, &m) )
@@ -806,7 +809,7 @@ movie_definition* create_library_movie(const URL& url, const char* real_url, boo
   // the loader thread now to avoid IMPORT tag loaders from 
   // calling create_library_movie() again and NOT finding
   // the just-created movie.
-  movie_definition* mov = create_movie(url, real_url, false);
+  movie_definition* mov = create_movie(url, real_url, false, postdata);
   //log_debug(_("create_movie(%s, %s, false) returned %p"), url.str().c_str(), real_url, mov);
 
   if (mov == NULL)
@@ -817,8 +820,15 @@ movie_definition* create_library_movie(const URL& url, const char* real_url, boo
   }
 
   // Movie is good, add to the library 
-  s_movie_library.add(cache_label, mov);
-      log_debug(_("Movie %s (SWF%d) added to library"), cache_label.c_str(), mov->get_version());
+  if ( ! postdata ) // don't add if we POSTed
+  {
+  	s_movie_library.add(cache_label, mov);
+        log_debug(_("Movie %s (SWF%d) added to library"), cache_label.c_str(), mov->get_version());
+  }
+  else
+  {
+        log_debug(_("Movie %s (SWF%d) NOT added to library (resulted from a POST)"), cache_label.c_str(), mov->get_version());
+  }
 
   // Now complete the load if the movie is an SWF movie
   // 

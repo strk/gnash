@@ -574,9 +574,15 @@ public:
 
 	/// Load a movie in this sprite, replacing it
 	//
+	/// @param url
+	///  The url to load the movie from. Can be a bitmap or an SWF.
+	///
+	/// @param postdata
+	///  IF not NULL, use as the POST body for HTTP requests
+	///
 	/// Return: true if it succeeded, false otherwise
 	///
-	bool loadMovie(const URL& url);
+	bool loadMovie(const URL& url, const std::string* postdata=NULL);
 
 	/// \brief
 	/// Load url-encoded variables from the given url, optionally

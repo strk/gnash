@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.108 2008/02/08 11:58:55 strk Exp $ */
+/* $Id: movie_root.h,v 1.109 2008/02/20 14:46:28 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -619,17 +619,14 @@ public:
     /// @param target
     ///	    Target to load into.
     ///
-    /// @param method
-    ///     Load method. 
-    ///	
-    /// TODO: add an additional parameter containing the actual variables
-    ///       to send if method is POST or GET as tests show that if you
-    ///       queue a load request for a target which is unloaded at time
-    ///       of processing, you still get the original target variables
-    ///       posted, not the new ones !
-    ///	      See http://savannah.gnu.org/bugs/index.php?22257
+    /// @param postdata
+    ///     If not null, the data to POST in an HTTP request.
+    ///     Tests show that if you queue a load request for a target which
+    ///     is unloaded at time of processing, you still get the original
+    ///     target variables posted, not the new ones !
+    ///	    See http://savannah.gnu.org/bugs/index.php?22257
     ///
-    void loadMovie(const URL& url, const std::string& target, LoadMethod method=NONE);
+    void loadMovie(const URL& url, const std::string& target, const std::string* postdata=NULL);
 
     /// Return true if the given string can be interpreted as a _level name
     //
@@ -665,21 +662,32 @@ private:
     /// A load movie request
     class LoadMovieRequest {
     public:
-        LoadMovieRequest(const URL& u, const std::string& t, LoadMethod m)
+	/// @param postdata
+	///   If not null POST method will be used for HTTP.
+	///
+        LoadMovieRequest(const URL& u, const std::string& t, const std::string* postdata)
             :
             _target(t),
             _url(u),
-            _method(m)
-        {}
+	    _usePost(false)
+        {
+		if ( postdata )
+		{
+			_postData = *postdata;
+			_usePost = true;
+		}
+	}
 
         const std::string& getTarget() const { return _target; }
         const URL& getURL() const { return _url; }
-        LoadMethod getMethod() const { return _method; }
+        const std::string& getPostData() const { return _postData; }
+        bool usePost() const { return _usePost; }
 
     private:
         std::string _target;
         URL _url;
-        LoadMethod _method;
+        bool _usePost;
+	std::string _postData;
     };
 
     /// Load movie requests

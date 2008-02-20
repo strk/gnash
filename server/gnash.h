@@ -205,7 +205,10 @@ DSOEXPORT void  set_use_cache_files(bool use_cache);
 /// Initializing the VirtualMachine requires a target SWF version, which can
 /// be found in the SWF header.
 ///
-movie_definition* create_movie(const URL& url, const char* real_url=NULL, bool startLoaderThread=true);
+/// @param postdata
+/// If not NULL, use POST method (only valid for HTTP)
+///
+movie_definition* create_movie(const URL& url, const char* real_url=NULL, bool startLoaderThread=true, const std::string* postdata=NULL);
 
 /// Load a movie from an already opened stream.
 //
@@ -300,7 +303,13 @@ enum create_font_shapes_flag
 /// Initializing the VirtualMachine requires a target SWF version, which can
 /// be found in the SWF header.
 ///
-DSOEXPORT movie_definition* create_library_movie(const URL& url, const char* real_url=NULL, bool startLoaderThread=true);
+/// @param postdata
+/// If not NULL, use POST method (only valid for HTTP).
+/// NOTE: when POSTing, the movies library won't be used.
+///
+DSOEXPORT movie_definition* create_library_movie(const URL& url,
+	const char* real_url=NULL, bool startLoaderThread=true,
+	const std::string* postdata=NULL);
     
 
 /// Helper to pregenerate cached data (basically, shape tesselations). 

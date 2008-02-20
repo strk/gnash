@@ -1,3 +1,14 @@
+2008-02-20 Sandro Santilli <strk@keybit.net>
+
+	* server/: gnash.h, impl.cpp: add an additional optional
+	  argument to create_movie and create_library_movie to
+	  post data.
+	* server/movie_root.{cpp,h}: change loadMovie interface to
+	  take an optional POST data string.
+	* server/sprite_instance.{cpp,h}: extend ::loadMovie to 
+	  take an aptional POST data string, fix MovieClip.loadMovie
+	  to honour second argument [GET/POST].
+
 2008-02-20  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* configure.ac: Don't build C/asspec/Makefile, it's never been

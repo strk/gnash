@@ -644,26 +644,65 @@ static as_value sprite_load_movie(const fn_call& fn)
   const URL& baseurl = get_base_url();
   URL url(urlstr, baseurl);
 
-  if (fn.nargs > 1)
-  {
-    // TODO: implement support for second argument
-    log_unimpl(_("second argument of MovieClip.loadMovie(%s, <variables>) "
-      "will be discarded"), urlstr.c_str());
-    //return;
-  }
-
   movie_root& mr = sprite->getVM().getRoot();
   std::string target = sprite->getTarget();
-  // TODO: if GET/SET should send variables of *this* movie,
+
+
+  // TODO: if GET/POST should send variables of *this* movie,
   // no matter if the target will be replaced by another movie !!
-  mr.loadMovie(url, target); // ADD GET/SET !!
+  bool usePost = false;
+  bool sendVars = false;
+  if (fn.nargs > 1)
+  {
+	as_value arg = fn.arg(1);
+	std::string methodString = arg.to_string();
+	boost::to_lower(methodString);
+	if ( methodString == "post" ) 
+	{
+		usePost = true;
+		sendVars = true;
+	}
+	else if ( methodString == "get" ) 
+	{
+		sendVars = true;
+	}
+	else
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss;
+		fn.dump_args(ss);
+		log_aserror(_("MovieClip.loadMovie(%s): second argument (if any) must be 'post' or 'get' [got %s]"),
+			ss.str().c_str(), methodString.c_str());
+		);
+	}
+  }
 
-  //sprite->loadMovie(url);
-  //log_debug("MovieClip.loadMovie(%s) - TESTING ", url.str().c_str());
+  if ( ! sendVars )
+  {
+	log_debug("Not sending vars");
+  	mr.loadMovie(url, target); 
+  }
+  else
+  {
+  	std::string data;
+	sprite->getURLEncodedVars(data);
+ 
+	if ( usePost )
+	{
+		log_debug("Posting: %s", data.c_str());
+		mr.loadMovie(url, target, &data);
+	}
+	else
+	{
+		std::string qs = url.querystring();
+		if ( qs.empty() ) data.insert(0, 1, '?');
+		else data.insert(0, 1, '&');
+		url.set_querystring(qs+data);
+		log_debug("GETTIN: %s", url.str().c_str());
+		mr.loadMovie(url, target); 
+	}
+  }
 
-
-  //log_unimp("%s", __PRETTY_FUNCTION__);
-  //moviecliploader_loadclip(fn);
   return as_value();
 }
 
@@ -4047,13 +4086,14 @@ sprite_instance::unload()
 }
 
 bool
-sprite_instance::loadMovie(const URL& url)
+sprite_instance::loadMovie(const URL& url, const std::string* postdata)
 {
   // Get a pointer to our own parent 
   character* parent = get_parent();
   if ( parent )
   {
-    boost::intrusive_ptr<movie_definition> md ( create_library_movie(url) );
+	if ( postdata ) log_debug("Posting data '%s' to url '%s'", postdata->c_str(), url.str().c_str());
+    boost::intrusive_ptr<movie_definition> md ( create_library_movie(url, NULL, true, postdata) );
     if (md == NULL)
     {
       log_error(_("can't create movie_definition for %s"),
