@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.148 2008/02/20 19:49:49 bjacques Exp $ */
+/* $Id: gtk.cpp,v 1.149 2008/02/20 21:39:44 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -116,6 +116,7 @@ GtkGui::init(int argc, char **argv[])
 #endif
         log_debug (_("Created top level window"));
     }
+
     
     // XXXbjacques: why do we need this?
     //gtk_container_set_reallocate_redraws(GTK_CONTAINER (_window), TRUE);
@@ -161,6 +162,14 @@ GtkGui::init(int argc, char **argv[])
     setupEvents();
 
     gtk_widget_realize(_window);
+    gdk_window_set_events(_window->window, 
+      GdkEventMask(GDK_EXPOSURE_MASK | GDK_VISIBILITY_NOTIFY_MASK));
+
+    GdkWindow* parent = gdk_window_get_parent(_window->window);
+    gdk_window_set_events(parent, 
+      GdkEventMask(GDK_EXPOSURE_MASK | GDK_VISIBILITY_NOTIFY_MASK));
+    
+
     gtk_widget_show(_drawingArea);
     gtk_widget_show(_window);
 
@@ -392,7 +401,7 @@ GtkGui::setupEvents()
                          G_CALLBACK (realize_event), NULL);
     g_signal_connect(G_OBJECT (_drawingArea), "configure_event",
                    G_CALLBACK (configure_event), this);
-    g_signal_connect(G_OBJECT (_drawingArea), "expose_event",
+    g_signal_connect(G_OBJECT (_window), "expose_event",
                     G_CALLBACK (expose_event), this);
 
     return true;
@@ -1615,7 +1624,7 @@ GtkGui::expose_event(GtkWidget *const /*widget*/,
              GdkEventExpose *const event,
              const gpointer data)
 {
-//	GNASH_REPORT_FUNCTION;
+	GNASH_REPORT_FUNCTION;
 
     GtkGui* gui = static_cast<GtkGui*>(data);
 
