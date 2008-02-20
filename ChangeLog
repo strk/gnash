@@ -1,3 +1,8 @@
+2008-02-20  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* configure.ac: Don't build C/asspec/Makefile, it's never been
+	used anyway. Use new variables for testing if paths were found.
+
 2008-02-20 Sandro Santilli <strk@keybit.net>
 
 	* doc/C/gnash.xml, doc/C/usermanual/installation/configuration.xml:
@@ -32,7 +37,6 @@
 	* doc/C/gnash.xml: Beat back into a semblance of shape. Still
 	needs massive work, but at least the chapters are in order.
 
-
 2008-02-19 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/log.{h,cpp}: drop log_msg.
@@ -43,7 +47,7 @@
 
 	* doc/C/Makefile.am: Use newer wrappers for docbook2x tools
 	instead of the old two step process.
-	* macros/docbook.m4: Look for alternate names fo rdocbook
+	* macros/docbook.m4: Look for alternate names for docbook
 	utlities. Find docbook2pdf. Fix automake conditionals.
 
 2008-02-19  Rob Savoye  <rob@ripple.welcomehome.org>

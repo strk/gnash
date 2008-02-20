@@ -225,6 +225,18 @@ AC_ARG_ENABLE(fps-debug,
   yes) AC_DEFINE([GNASH_FPS_DEBUG], [1], [Enable FPS debugging code])
 esac])
 
+dnl When we're making binary releases, it's often nice to just statically link
+dnl the final executables so we don't worry about what's installed, or which
+dnl version it is.
+AC_ARG_ENABLE(allstatic,
+  AC_HELP_STRING([--enable-allstatic],[Enable using static libraries when possible for dependencies]),
+[case "${enableval}" in
+  yes) allstatic=yes ;;
+  no)  allstatic=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-allstatic option]) ;;
+esac],allstatic=no)
+AM_CONDITIONAL(ALLSTATIC, test x$allstatic = xyes)
+
 AC_ARG_WITH(cpu,
   AC_HELP_STRING([--with-cpu],[specify a cpu when cross compiling.]),
   [case "${withval}" in
@@ -878,8 +890,6 @@ PKG_PROG_PKG_CONFIG
 AC_PATH_PROG(PYTHON, python, ,[${pathlist}])
 AM_CONDITIONAL([ENABLE_GNASH_PYTHON_MODULE], false)
 
-AC_PATH_PROG(MKINSTALLDIRS, mkinstalldirs, ,[${pathlist}])
-
 dnl Look for scratchbox
 sbox=no
 if test x"${SBOX_REDIRECT_FROM_DIRS}" != x; then
@@ -1502,6 +1512,9 @@ missing_codecs=""
 if test "$media_handler" = "gst"; then
   AC_PATH_PROG(GST_INSPECT, gst-inspect, ,[${pathlist}])
   if test "x$GST_INSPECT" != "x" -a x"${darwin}" = xno ; then
+    AC_PATH_PROG(GST_INSPECT, gst-inspect-0.10, ,[${pathlist}])
+  fi
+  if test "x$GST_INSPECT" != "x" -a x"${darwin}" = xno ; then
     dnl FIXME: there may be multiple acceptable plugins that are acceptable for
     dnl our use. For example, mad or ffmpeg will play mp3.
     codecs="ffdec_flv ffdec_flashsv ffdec_vp6f ffdec_flashsv mad vorbisdec ffdec_vp6"
@@ -1840,7 +1853,6 @@ backend/Makefile
 utilities/Makefile
 doc/Makefile
 doc/C/Makefile
-doc/C/asspec/Makefile
 doc/Doxyfile
 pythonmodule/Makefile
 testsuite/Makefile
@@ -2425,7 +2437,7 @@ if test x"$pthreads" = x"yes"; then
 fi
 
 if test x"$docbook" = x"yes"; then
-  if test x"$DB2X_XSLTPROC" = x -o x"$DB2X_TEXIXML" = x -o x"$MAKEINFO" = x -o x"$XSLTPROC" = x; then
+  if test x"$DB2X_TEXI" = x -o x"$MAKEINFO" = x -o x"$DB2X_MAN" = x; then
     echo "        ERROR: No DocBook2X tools installed!"
     echo "               Either install it from http://docbook2x.sourceforge.net"
     echo "               or .deb users: apt-get install docbook docbook2x docbook-utils"
