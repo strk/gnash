@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="iso-8859-1"?>
 
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
  "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
@@ -11,7 +11,7 @@
     <!ENTITY AS "ActionScript">
 
     <!ENTITY legal            SYSTEM "legal.xml">
-    <!ENTITY fdl-app          SYSTEM "fdl-appendix.xml"> 
+    <!ENTITY fdl-app          SYSTEM "fdl.xml"> 
     <!ENTITY amf              SYSTEM "amf.xml">
     <!ENTITY rtmp             SYSTEM "rtmp.xml">
     <!ENTITY programmers      SYSTEM "app_authors.xml">
@@ -42,12 +42,14 @@
 
 
 <!-- TRANSLATOR NOTE: do not change the id, just the lang -->
-<book id="index" lang="en">
+<book lang="en" id="index" status="draft">
+<title>Gnash Manual</title>
+<titleabbrev>Gnash</titleabbrev>
 
 <!-- =============Document Header ============================ -->
 
   <bookinfo>
-      <title>&app; Developer's Guide version &manrevision;</title>
+      <title>&app;</title>
       <copyright>
          <year>2005, 2006, 2007, 2008</year>
          <holder>Free Software Foundation</holder>
@@ -88,7 +90,6 @@
   &bugreport;
   &glossary;
 
-  &amf;
   &rtmp;
 
 <!-- ============= Authors =================================== -->
