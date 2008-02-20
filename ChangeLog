@@ -1,5 +1,10 @@
 2008-02-20 Bastiaan Jacques <bastiaan@bjacques.org>
 
+	* gui/gtk.cpp: Reinstate a call to prepDrawingArea that was removed by
+	accident.
+
+2008-02-20 Bastiaan Jacques <bastiaan@bjacques.org>
+
 	* libbase/rc.{cpp,h}: Add a configuration item for the gstreamer
 	audiosink. It is possible to use a pipeline in the configuration
 	option similar to gst-launch. Implementation by Sean McNamara

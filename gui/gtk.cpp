@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.147 2008/02/19 19:20:49 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.148 2008/02/20 19:49:49 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -134,6 +134,7 @@ GtkGui::init(int argc, char **argv[])
     // OpenGL _glue needs to prepare the drawing area for OpenGL rendering before
     // widgets are realized and before the configure event is fired.
     // TODO: find a way to make '_glue' use independent from actual renderer in use
+    _glue->prepDrawingArea(_drawingArea);
     gtk_container_set_reallocate_redraws(GTK_CONTAINER (_window), TRUE);
 #endif
 
