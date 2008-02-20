@@ -1,3 +1,9 @@
+2008-02-19  Rob Savoye  <rob@ute.welcomehome.org>
+
+	* doc/C/gnash.xml: Beat back into a semblance of shape. Still
+	needs massive work, but at least the chapters are in order.
+
+
 2008-02-19 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/log.{h,cpp}: drop log_msg.
@@ -55,6 +61,8 @@
 
 2008-02-18  Rob Savoye  <rob@ute.welcomehome.org>
 
+	* doc/glossary.xml: Add id tags to all glossdivs.
+	
 	* doc/C/cygnal-man.xml: New manpage for Cygnal.
 	* doc/C/Makefile.am: Build Cygnal manpage too.
 
