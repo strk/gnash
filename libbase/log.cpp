@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: log.cpp,v 1.62 2008/02/19 19:20:50 bwy Exp $ */
+/* $Id: log.cpp,v 1.63 2008/02/20 09:38:54 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -29,6 +29,7 @@
 #include <fstream>
 #include <string>
 #include <cstring>
+//#include <boost/format.hpp>
 
 #if defined(_WIN32) && defined(WIN32)
 // Required for SYSTEMTIME definitions
@@ -39,24 +40,17 @@
 # include <unistd.h>
 #endif
 
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
-#include <libxml/xmlreader.h>
 #include <ctime>
-/* #define BOOST_HAS_THREADS 1
-   This should be set by boost itself.
-*/
-
 
 #include "log.h"
 
-using namespace std;
-
+using std::cout;
+using std::endl;
 
 namespace gnash {
 
 // static data to be shared amongst all classes.
-ofstream LogFile::_console;
+//ofstream LogFile::_console;
 int LogFile::_verbose = 0;
 bool LogFile::_actiondump = false;
 bool LogFile::_parserdump = false;
@@ -132,8 +126,8 @@ hexify(unsigned char *p, const unsigned char *s, int length, bool ascii) {
 }
 
 // FIXME: localize these, so they print local regional timestamps.
-ostream&
-timestamp(ostream& x) {
+std::ostream&
+timestamp(std::ostream& x) {
     time_t t;
     char buf[10];
 
@@ -145,7 +139,7 @@ timestamp(ostream& x) {
 }
 
 
-string
+std::string
 timestamp() {
 
     time_t t;
@@ -158,11 +152,9 @@ timestamp() {
     std::stringstream ss;
     ss << getpid() << "] " << buf;
     return ss.str();
-    //string sbuf = buf;
-    //return sbuf;
 }
 
-ostream& datetimestamp(ostream& x) {
+std::ostream& datetimestamp(std::ostream& x) {
     time_t t;
     char buf[20];
 
@@ -206,9 +198,17 @@ log_trace(const char* fmt, ...)
     va_end (ap);
 }
 
+//void
+//logTrace(const boost::format& fmt)
+//{
+//    dbglogfile.log(N_("TRACE"), fmt.str());
+//}
+
 void
 log_debug(const char* fmt, ...)
 {
+
+    if (dbglogfile.getVerbosity() < DEBUGLEVEL) return;
 
     va_list ap;
     char tmp[BUFFER_SIZE];
@@ -227,6 +227,13 @@ log_debug(const char* fmt, ...)
     va_end (ap);
 }
 
+//void
+//logDebug(const boost::format& fmt)
+//{
+//    if (dbglogfile.getVerbosity() < DEBUGLEVEL) return;
+//    dbglogfile.log(N_("DEBUG"), fmt.str());
+//}
+
 void
 log_action(const char* fmt, ...)
 {
@@ -242,6 +249,15 @@ log_action(const char* fmt, ...)
     dbglogfile.log(tmp);
     dbglogfile.setStamp(stamp);
 }
+
+//void
+//logAction(const boost::format& fmt)
+//{
+//    bool stamp = dbglogfile.getStamp();
+//    dbglogfile.setStamp(false);
+//    dbglogfile.log(fmt.str());
+//    dbglogfile.setStamp(stamp);
+//}
 
 void
 log_parse(const char* fmt, ...)
@@ -259,6 +275,12 @@ log_parse(const char* fmt, ...)
     va_end (ap);
 }
 
+//void
+//logParse(const boost::format& fmt)
+//{
+//    dbglogfile.log(fmt.str());
+//}
+
 // Printf-style error log.
 void
 log_error(const char* fmt, ...)
@@ -275,6 +297,12 @@ log_error(const char* fmt, ...)
     va_end (ap);
 }
 
+//void
+//logError(const boost::format& fmt)
+//{
+//    dbglogfile.log(N_("ERROR"), fmt.str());
+//}
+
 void
 log_unimpl(const char* fmt, ...)
 {
@@ -289,6 +317,12 @@ log_unimpl(const char* fmt, ...)
 
     va_end (ap);
 }
+
+//void
+//logUnimpl(const boost::format& fmt)
+//{
+//    dbglogfile.log(N_("UNIMPLEMENTED"), fmt.str());
+//}
 
 void
 log_security(const char* fmt, ...)
@@ -305,6 +339,12 @@ log_security(const char* fmt, ...)
     va_end (ap);
 }
 
+//void
+//logSecurity(const boost::format& fmt)
+//{
+//    dbglogfile.log(N_("SECURITY"), fmt.str());
+//}
+
 void
 log_swferror(const char* fmt, ...)
 {
@@ -319,6 +359,12 @@ log_swferror(const char* fmt, ...)
 
     va_end (ap);
 }
+
+//void
+//logSWFError(const boost::format& fmt)
+//{
+//    dbglogfile.log(N_("MALFORMED SWF"), fmt.str());
+//}
 
 void
 log_aserror(const char* fmt, ...)
@@ -335,14 +381,14 @@ log_aserror(const char* fmt, ...)
     va_end (ap);
 }
 
-const char *
-LogFile::getEntry(void)
-{
-    return _logentry.c_str();
-}
+//void
+//logASError(const boost::format& fmt)
+//{
+//    dbglogfile.log(N_("ACTIONSCRIPT ERROR"), fmt.str());
+//}
 
 void
-LogFile::log(const char* msg)
+LogFile::log(const std::string& msg)
 {
     boost::mutex::scoped_lock lock(_ioMutex);
 
@@ -351,7 +397,7 @@ LogFile::log(const char* msg)
 }
 
 void
-LogFile::log(const char* label, const char* msg)
+LogFile::log(const std::string& label, const std::string& msg)
 {
     boost::mutex::scoped_lock lock(_ioMutex);
 
@@ -360,14 +406,13 @@ LogFile::log(const char* label, const char* msg)
 }
 
 // Default constructor
-LogFile::LogFile (void)
+LogFile::LogFile ()
 	:
 	_state(CLOSED),
 	_stamp(true),
-	_write(true),
-	_trace(false)
+	_write(true)
 {
-    string loadfile;
+    std::string loadfile;
 
 
     RcInitFile& rcfile = RcInitFile::getDefaultInstance();
@@ -381,17 +426,23 @@ LogFile::LogFile (void)
     openLog(loadfile);
 }
 
+LogFile::~LogFile()
+{
+	if (_state == OPEN) closeLog();
+}
+
+
 bool
 LogFile::openLog (const std::string& filespec)
 {
     boost::mutex::scoped_lock lock(_ioMutex);
     if (_state == OPEN) {
-	_outstream.close ();
-	_state = CLOSED;
+        _outstream.close ();
+        _state = CLOSED;
     }
 
     // Append, don't truncate, the log file
-    _outstream.open (filespec.c_str(), ios::app); // ios::out
+    _outstream.open (filespec.c_str(), std::ios::app); // ios::out
     if( ! _outstream ) {
 	// Can't use log_error here...
         std::cerr << "ERROR: can't open debug log file " << filespec << " for appending." << std::endl;
@@ -411,7 +462,7 @@ LogFile::closeLog (void)
 {
     boost::mutex::scoped_lock lock(_ioMutex);
     if (_state == OPEN) {
-	_outstream.flush();
+           _outstream.flush();
         _outstream.close();
     }
     _state = CLOSED;
@@ -423,7 +474,7 @@ bool
 LogFile::removeLog (void)
 {
     if (_state == OPEN) {
-	_outstream.close ();
+        _outstream.close ();
     }
 
     // Ignore the error, we don't care
@@ -434,242 +485,30 @@ LogFile::removeLog (void)
     return true;
 }
 
-/// \brief print a char
-LogFile&
-LogFile::operator << (char x)
-{
-    if (_verbose) {
-	cout << x;
-    }
+/// \brief print a string
+///
 
-    if (_write) {
-	_outstream << x;
-    }
 
-    _state = INPROGRESS;
-
-  return *this;
-}
-
-/// \brief print a long
-LogFile&
-LogFile::operator << (long x)
-{
-    if (_verbose) {
-	cout << x;
-    }
-
-    if (_write) {
-	_outstream << x;
-    }
-
-    _state = INPROGRESS;
-
-  return *this;
-}
-
-/// \brief print an unsigned integer
-LogFile&
-LogFile::operator << (unsigned int x)
-{
-    if (_verbose) {
-	cout << x;
-    }
-
-    if (_write) {
-	_outstream << x;
-    }
-
-    _state = INPROGRESS;
-
-    return *this;
-}
-
-/// \brief print an unsigned long
-LogFile&
-LogFile::operator << (unsigned long x)
-{
-    if (_verbose) {
-	cout << x;
-    }
-
-    if (_write) {
-	_outstream << x;
-    }
-
-    _state = INPROGRESS;
-
-    return *this;
-}
-
-/// \brief print a float
-LogFile&
-LogFile::operator << (float x)
-{
-    if (_verbose > 0) {
-	cout << x;
-    }
-
-    if (_write) {
-	_outstream << x;
-    }
-
-    _state = INPROGRESS;
-
-  return *this;
-}
-
-/// \brief print a double
-LogFile&
-LogFile::operator << (double &x)
-{
-    if (_verbose) {
-	cout << x;
-    }
-
-    if (_write) {
-	_outstream << x;
-    }
-    _state = INPROGRESS;
-
-    return *this;
-}
-
-/// \brief print an integer
-LogFile&
-LogFile::operator << (int x)
-{
-
-    if (_verbose) {
-	cout << x;
-    }
-
-    if (_write) {
-	_outstream << x;
-    }
-
-    _state = INPROGRESS;
-
-    return *this;
-}
-
-/// \brief print a pointer
-LogFile&
-LogFile::operator << (void *ptr)
-{
-    if (_verbose) {
-	cout << ptr;
-    }
-
-    if (_write) {
-	_outstream << ptr;
-    }
-
-    _state = INPROGRESS;
-
-    return *this;
-}
-
-/// \brief print an STL string
 LogFile&
 LogFile::operator << (const std::string &s)
 {
-    if (_verbose) {
-	cout << s;
-    }
-
-    if (_write) {
-	_outstream << s;
-    }
-
-    _state = INPROGRESS;
-
-    return *this;
-}
-
-/// \brief print a const char * string
-///
-/// This function is more complex than the other logging functions
-/// because it has hooks to look for the TRACE: keyword for logging
-/// function calls. We always want these to be logged to the disk
-/// file, but optionally printed to the terminal window.
-///
-/// Since the tracing functions use varargs, they always become a
-/// const char * string after processing the arguments. That means we
-/// can look for the keyword to determine what to do.
-LogFile&
-LogFile::operator << (const char *str)
-{
-    string c(str);
 
     _logentry = timestamp();
     _logentry += ": ";
 
-    // See if we have the TRACE keyword
-    if (strstr(str, N_("DEBUG: "))) {
-	_trace = true;
+    if (_stamp == true && (_state == IDLE || _state == OPEN))
+    {
+        _state = INPROGRESS;
+        if (_verbose) cout << _logentry  << s;
+        if (_write) _outstream << _logentry << s;
+    }
+    else
+    {
+        if (_verbose) cout  << s;
+        if (_write) _outstream << s;   
     }
 
-    if (_stamp == true && (_state == IDLE || _state == OPEN)) {
-	_state = INPROGRESS;
-	if (_trace) {
-	    if (_verbose >= TRACELEVEL) {
-		cout << _logentry  << c;
-	    }
-	} else {
-	    if (_verbose) {
-		cout << _logentry  << c;
-	    }
-	}
-	if (_write) {
-	    _outstream << _logentry << c;
-	}
-    } else {
-	if (_trace) {
-	    if (_verbose >= TRACELEVEL) {
-		cout << c;
-	    }
-	} else {
-	    if (_verbose) {
-		cout << c;
-	    }
-	}
-	if (_write) {
-	    _outstream << c;
-	}
-    }
-    _logentry += c;
-
-    return *this;
-}
-
-LogFile&
-LogFile::operator << (unsigned char const *c)
-{
-    _logentry = timestamp();
-    _logentry += ": ";
-
-    if (c == -0) {
-      return *this;
-    }
-
-    if (_stamp == true && (_state == IDLE || _state == OPEN)) {
-	_state = INPROGRESS;
-	if (_verbose) {
-	    cout << _logentry  << c;
-	}
-	if (_write) {
-	    _outstream << _logentry << c;
-	}
-    } else {
-	if (_verbose) {
-	    cout << c;
-	}
-	if (_write) {
-	    _outstream << c;
-	}
-    }
-    _logentry += (const char*)c;
+    _logentry.append(s);
 
     return *this;
 }
@@ -678,23 +517,16 @@ LogFile::operator << (unsigned char const *c)
 LogFile&
 LogFile::operator << (std::ostream & (&)(std::ostream &))
 {
-    if (_trace) {
-	if (_verbose) {
-	    cout << endl;
-	}
-    } else {
-	if (_verbose) {
-	    cout << endl;
-	}
-    }
 
-    if (_write) {
-	_outstream << endl;;
-	_outstream.flush();
+    if (_verbose) cout << endl;
+
+    if (_write)
+    {
+        _outstream << endl;;
+        _outstream.flush();
     }
 
     _state = IDLE;
-    _trace = false;
 
     return *this;
 }

@@ -1,3 +1,14 @@
+2008-02-20 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/log.{cpp,h}: General cleanup: pass strings by const
+	  reference. Drop overloaded operators for LogFile class in favour
+	  of the template that was already there. Remove unused Verbose class.
+	  Comment out apparently unused but possible useful methods 
+	  getEntry() and getState(). Drop unused variables. Write the same
+	  to stdout as to logfile; move filtering of debug messages to the
+	  logging functions. Add but comment out new boost::format logging
+	  functions.
+
 2008-02-19  Rob Savoye  <rob@ute.welcomehome.org>
 
 	* doc/C/gnash.xml: Beat back into a semblance of shape. Still
@@ -7,8 +18,8 @@
 2008-02-19 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/log.{h,cpp}: drop log_msg.
-	* everywhere: replace unspecific log_msg with appropriate log call; mainly
-	  log_debug but occasionally error, parse or security.
+	* everywhere: replace unspecific log_msg with appropriate log call;
+	  mainly log_debug but occasionally error, parse or security.
 
 2008-02-19  Rob Savoye  <rob@ripple.welcomehome.org>
 

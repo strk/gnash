@@ -32,12 +32,12 @@
 #define N_(String) gettext_noop (String)
 
 #include "rc.h" // for IF_VERBOSE_* implementation
-//#include "tu_config.h"
 
 #include <fstream>
 #include <sstream>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
+//#include <boost/format.hpp>
 
 // the default name for the debug log
 #define DEFAULT_LOGFILE "gnash-dbg.log"
@@ -50,14 +50,7 @@ extern std::ostream& stampon(std::ostream& x);
 extern std::ostream& stampoff(std::ostream& x);
 extern std::ostream& timestamp(std::ostream& x);
 extern std::ostream& datetimestamp(std::ostream& x);
-#define TRACELEVEL 2
-
-class DSOLOCAL Verbose {
-    int level;
-public:
-    Verbose(int l) { level = l; }
-    friend std::ostream& operator<<(std::ostream&, Verbose&);
-};
+#define DEBUGLEVEL 2
 
 // This is a basic file logging class
 class DSOEXPORT LogFile {
@@ -65,18 +58,14 @@ public:
 
     static LogFile& getDefaultInstance();
 
-    ~LogFile(void) {
-	if (_state == OPEN) {
-	    closeLog();
-	}
-    }
+    ~LogFile();
 
-    enum file_state {
-	CLOSED,
-	OPEN,
-	INPROGRESS,
-	IDLE
-    } _state;
+    enum fileState {
+        CLOSED,
+        OPEN,
+        INPROGRESS,
+        IDLE
+    };
 
     /// Intended for use by log_*(). Thread-safe (locks _ioMutex)
     //
@@ -86,18 +75,18 @@ public:
     /// @param msg
     ///		The message string ie: "bah" for "ERROR: bah"
     ///
-    void log(const char* label, const char* msg);
+    void log(const std::string& msg, const std::string& msg);
 
     /// Intended for use by log_*(). Thread-safe (locks _ioMutex)
     //
     /// @param msg
     ///		The message to print
     ///
-    void log(const char* msg);
+    void log(const std::string& msg);
     
-    file_state GetState (void) { return _state; }
+    //fileState getState () { return _state; }
 
-    const char *getEntry(void);
+    //const std::string& getEntry() { return _logentry; }
     
     /// Open the specified file to write logs on disk
     //
@@ -111,87 +100,95 @@ public:
     //
     /// Does NOT lock _ioMutex (should it?)
     ///
-    bool removeLog(void);
+    bool removeLog();
 
     /// Close the log file
     //
     /// Locks _ioMutex to prevent race conditions accessing _outstream
     ///
-    bool closeLog(void);
+    bool closeLog();
 
     // accessors for the verbose level
-    void setVerbosity (void) {
-	_verbose++;
+    void setVerbosity () {
+        _verbose++;
     }
+
     void setVerbosity (int x) {
-	_verbose = x;
+        _verbose = x;
     }
-    int getVerbosity (void) {
-	return _verbose;
+
+    int getVerbosity () {
+        return _verbose;
     }
     
     void setActionDump (int x) {
-	_actiondump = x;
+        _actiondump = x;
     }
-    int getActionDump (void) {
-	return _actiondump;
+
+    int getActionDump () {
+        return _actiondump;
     }
     
     void setParserDump (int x) {
-	_parserdump = x;
+        _parserdump = x;
     }
-    int getParserDump (void) {
-	return _parserdump;
+
+    int getParserDump () {
+        return _parserdump;
     }
     
     void setStamp (bool b) {
 	_stamp = b;
     }
-    bool getStamp (void) {
-	return _stamp;
+
+    bool getStamp () {
+        return _stamp;
     }
+
     void setWriteDisk (bool b) {
 	_write = b;
     }
-    bool getWriteDisk (void) {
+
+    bool getWriteDisk () {
 	return _write;
     }
     
 private:
 
     // Use getDefaultInstance for getting the singleton
-    LogFile (void);
+    LogFile ();
 
+    /// Mutex for locking I/O during logfile access.
     boost::mutex _ioMutex;
 
-    static std::ofstream _console;
+    /// Stream to write to stdout.
     std::ofstream	 _outstream;
+
+    /// How much output is required: 2 or more gives debug output.
     static int		 _verbose;
+
+    /// Whether to dump all SWF actions
     static bool		 _actiondump;
+
+    /// Whether to dump parser output
     static bool		 _parserdump;
+
+    /// The state of the log file.
+    fileState _state;
+
     bool		 _stamp;
+
+    /// Whether to write the log file to disk.
     bool		 _write;
-    bool		 _trace;
+
     std::string		 _filespec;
+
     std::string		 _logentry;
+
+    /// For the ostream << operator
     friend std::ostream & operator << (std::ostream &os, LogFile& e);
 
-    LogFile& operator << (char x);
-    LogFile& operator << (int x);
-    LogFile& operator << (long x);
-    LogFile& operator << (unsigned int x);
-    LogFile& operator << (unsigned long x);
-    // These both resolve to an unsigned int.
-    // LogFile& operator << (size_t x);
-    // LogFile& operator << (time_t x);
-    LogFile& operator << (float x);
-    LogFile& operator << (double &x);
-    LogFile& operator << (bool x);
-    LogFile& operator << (void *);
-    LogFile& operator << (const char *);
-    LogFile& operator << (unsigned char const *);
     LogFile& operator << (const std::string &s);
-//     LogFile& operator << (const xmlChar *c);
     LogFile& operator << (std::ostream & (&)(std::ostream &));
 
     /// Print anything that can be printed on a stringstream
@@ -227,6 +224,7 @@ DSOEXPORT unsigned char *hexify(unsigned char *p, const unsigned char *s, int le
 /// or log_swferror for that.
 ///
 DSOEXPORT void log_error(const char* fmt, ...) GNUC_LOG_ATTRS;
+//DSOEXPORT void logError(const boost::format& fmt);
 
 /// Log a message about unimplemented features.
 //
@@ -235,6 +233,7 @@ DSOEXPORT void log_error(const char* fmt, ...) GNUC_LOG_ATTRS;
 /// implement those features of Flash.
 ///
 DSOEXPORT void log_unimpl(const char* fmt, ...) GNUC_LOG_ATTRS;
+//DSOEXPORT void logUnimpl(const boost::format& fmt);
 
 /// Use only for explicit user traces
 //
@@ -242,12 +241,14 @@ DSOEXPORT void log_unimpl(const char* fmt, ...) GNUC_LOG_ATTRS;
 /// ASHandlers.cpp for ActionTrace
 ///
 DSOEXPORT void log_trace(const char* fmt, ...) GNUC_LOG_ATTRS;
+//DSOEXPORT void logTrace(const boost::format& fmt);
 
 /// Log debug info
 //
 /// Used for function entry/exit tracing.
 ///
 DSOEXPORT void log_debug(const char* fmt, ...) GNUC_LOG_ATTRS;
+//DSOEXPORT void logDebug(const boost::format& fmt);
 
 /// Log action execution info
 //
@@ -257,6 +258,7 @@ DSOEXPORT void log_debug(const char* fmt, ...) GNUC_LOG_ATTRS;
 /// at runtime.
 ///
 DSOEXPORT void log_action(const char* fmt, ...) GNUC_LOG_ATTRS;
+//DSOEXPORT void logAction(const boost::format& fmt);
 
 /// Log parsing information
 //
@@ -266,9 +268,11 @@ DSOEXPORT void log_action(const char* fmt, ...) GNUC_LOG_ATTRS;
 /// at runtime.
 ///
 DSOEXPORT void log_parse(const char* fmt, ...) GNUC_LOG_ATTRS;
+//DSOEXPORT void logParse(const boost::format& fmt);
 
 /// Log security information
 DSOEXPORT void log_security(const char* fmt, ...) GNUC_LOG_ATTRS;
+//DSOEXPORT void logSecurity(const boost::format& fmt);
 
 /// Log a malformed SWF error
 //
@@ -281,6 +285,7 @@ DSOEXPORT void log_security(const char* fmt, ...) GNUC_LOG_ATTRS;
 /// at runtime.
 ///
 DSOEXPORT void log_swferror(const char* fmt, ...) GNUC_LOG_ATTRS;
+//DSOEXPORT void logSWFError(const boost::format& fmt);
 
 /// Log an ActionScript error
 //
@@ -293,7 +298,7 @@ DSOEXPORT void log_swferror(const char* fmt, ...) GNUC_LOG_ATTRS;
 /// at runtime.
 ///
 DSOEXPORT void log_aserror(const char* fmt, ...) GNUC_LOG_ATTRS;
-
+//DSOEXPORT void logASError(const boost::format& fmt);
 
 
 // Define to 0 to completely remove parse debugging at compile-time
@@ -364,7 +369,7 @@ public:
     }
 
     ~__Host_Function_Report__(void) {
-	if (LogFile::getDefaultInstance().getVerbosity() >= TRACELEVEL+1) {
+	if (LogFile::getDefaultInstance().getVerbosity() >= DEBUGLEVEL+1) {
 	    log_debug("returning");
 	}
     }
