@@ -1,3 +1,9 @@
+2008-02-20 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ASHandlers.cpp (CommonGetUrl): only loadVariables if
+	  targetLoad flag is set (tested). Log an SWF error if loadVariables
+	  is set but targtLoad is clear.
+
 2008-02-20 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/parser/video_stream_def.cpp: Don't make a fuss about embedded
