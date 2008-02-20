@@ -1,3 +1,9 @@
+2008-02-20 Sandro Santilli <strk@keybit.net>
+
+	* doc/C/amf.xml, doc/C/rtmp.xml: use appropriate sect levels
+	  matching with inclusion of entities.
+	* doc/C/usermanual/usage.xml: fix mismatch in <row> tag nesting.
+
 2008-02-20 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/log.{cpp,h}: General cleanup: pass strings by const

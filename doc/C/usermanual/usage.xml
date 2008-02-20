@@ -413,14 +413,13 @@
 	    </entry>
 	  </row>
 	  <row>
-	    <row>
 	      <entry>
 		<option>CTRL-L</option>
 	      </entry>
 	      <entry>
 		Force immediate redraw.
 	      </entry>
-	    </row>
+	  </row>
 	    
 	    <!--
 		<entry>
@@ -432,6 +431,7 @@
 		</row>
 		<row>
 	    -->
+          <row>
 	    <entry>
 	      <option>CTRL-T</option>
 	    </entry>
