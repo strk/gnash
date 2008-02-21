@@ -141,7 +141,6 @@ check_PROGRAMS = \
 	eventSoundTest1 \
 	eventSoundTest1-Runner \
 	DrawingApiTestRunner \
-	PrototypeEventListenersTestRunner \
 	DragDropTestRunner   \
 	frame_label_test \
 	path_format_test \
@@ -174,7 +173,10 @@ check_PROGRAMS += \
 endif
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
-check_PROGRAMS += intervalTestRunner 
+check_PROGRAMS += \
+	intervalTestRunner \
+	PrototypeEventListenersTestRunner \
+	$(NULL)
 endif
 
 if MING_SUPPORTS_INIT_ACTIONS
