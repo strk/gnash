@@ -75,7 +75,7 @@ public:
     /// @param msg
     ///		The message string ie: "bah" for "ERROR: bah"
     ///
-    void log(const std::string& msg1, const std::string& msg2);
+    void log(const std::string& label, const std::string& msg);
 
     /// Intended for use by log_*(). Thread-safe (locks _ioMutex)
     //
