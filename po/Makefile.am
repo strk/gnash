@@ -26,7 +26,7 @@ CLEANFILES = \
 	POTFILES \
 	update-po
 
-translations = es fr de it cs
+translations = es fr de it cs sv
 
 pofiles := $(patsubst %,%.po,$(translations))
 gmofiles := $(patsubst %,%.gmo,$(translations))

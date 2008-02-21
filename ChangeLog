@@ -1,3 +1,7 @@
+2008-02-21 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* po/Makefile.am: add Swedish translation.
+	  
 2008-02-20 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui/gtk.cpp: Reinstate a call to prepDrawingArea that was removed by
