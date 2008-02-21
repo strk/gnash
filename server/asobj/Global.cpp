@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.90 2008/02/19 19:20:54 bwy Exp $ */
+/* $Id: Global.cpp,v 1.91 2008/02/21 16:48:02 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -571,13 +571,13 @@ extscan:
 
 	if ( RcInitFile::getDefaultInstance().enableExtensions() )
 	{
-		log_security("Extensions enabled, scanning plugin dir for load");
+		log_security(_("Extensions enabled, scanning plugin dir for load"));
 		//et.scanDir("/usr/local/lib/gnash/plugins");
 		et.scanAndLoad(*this);
 	}
 	else
 	{
-		log_security("Extensions disabled");
+		log_security(_("Extensions disabled"));
 	}
 #else
 	return;

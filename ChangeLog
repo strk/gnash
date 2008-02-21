@@ -1,3 +1,9 @@
+2008-02-21 Sandro Santilli <strk@keybit.net>
+
+	* po/: cs.po, de.po, es.po, fr.po, it.po: update-po, add
+	  some more italian ...
+	* server/asobj/Global.cpp: gettextize a few messages.
+
 2008-02-21 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* po/Makefile.am: add Swedish translation.
