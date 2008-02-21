@@ -1883,6 +1883,11 @@ plugin/klash/Makefile
 cygnal/Makefile
 cygnal/testsuite/Makefile
 cygnal/testsuite/cygnal.all/Makefile
+packaging/Makefile
+packaging/debian/Makefile
+packaging/redhat/Makefile
+packaging/ipkg/Makefile
+packaging/doc/Makefile
 )
 
 ###
