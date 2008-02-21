@@ -32,16 +32,10 @@ EXTRA_DIST = $(SC_XMLTESTS)
 
 if ENABLE_SWFMILL
 
-## Path to Dejagnu.swf file
-DEJAGNU_SO_PATH = ../misc-ming.all/Dejagnu.swf
-
 SC_XMLTESTS_OUT = $(SC_XMLTESTS:.xml=.swf)
 
 # Dependencies for all self-contained SWF tests
-$(SC_XMLTESTS_OUT) : Dejagnu.swf
-
-Dejagnu.swf: $(DEJAGNU_SO_PATH)
-	cp ../misc-ming.all/Dejagnu.swf .
+$(SC_XMLTESTS_OUT) : 
 
 check_SCRIPTS = \
 	jump_after_end-runner	\
@@ -68,7 +62,7 @@ clean-local:
 	rm -f $(check_SCRIPTS) $(SC_XMLTESTS_OUT) \
 		*.log *.trace-gnash \
 		site.bak site.exp site.exp.bak testrun.sum \
-		gnash.sum Dejagnu.swf 
+		gnash.sum 
 
 
 TEST_DRIVERS = ../simple.exp

@@ -1,5 +1,6 @@
 2008-02-21 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfmill.all/Makefile.am: drop unneeded references
 	* Makefile.am, configure.ac, packaging/Makefile.am,
 	  packaging/debian/Makefile.am, packaging/doc/Makefile.am,
 	  packaging/ipkg/Makefile.am, packaging/redhat/Makefile.am:
