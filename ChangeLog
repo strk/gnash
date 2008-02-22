@@ -1,13 +1,19 @@
+2008-02-22 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/character.{cpp,h}: static data members may not be defined
+	  in a class declaration.
+	* libbase/rc.cpp: use <limits> and numeric_limits<>::max().
+
 2008-02-22 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* gui/gnash.cpp: Changed 2007 -> 2008.
 
-2008-02-20 Bastiaan Jacques <bastiaan@bjacques.org>
+2008-02-22 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* libmedia/gst/VideoDecoderGst.cpp: Be more verbose about a missing
 	gstreamer-ffmpeg.
 
-2008-02-20 Bastiaan Jacques <bastiaan@bjacques.org>
+2008-02-22 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* configure.ac: Check for gst_install_plugins_async, since that's the
 	function we really need.

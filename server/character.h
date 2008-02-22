@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: character.h,v 1.128 2008/02/16 23:12:58 rsavoye Exp $ */
+/* $Id: character.h,v 1.129 2008/02/22 20:08:51 bwy Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -308,7 +308,7 @@ public:
     ///
     /// See: http://www.senocular.com/flash/tutorials/depths/?page=2
     ///
-    static const int staticDepthOffset = -16384;
+    static const int staticDepthOffset;
 
     /// This is the offset at which character's depth is
     /// shifted when a character is removed from stage but
@@ -326,7 +326,7 @@ public:
     ///	(all of the above correct?)
     ///
     ///
-    static const int removedDepthOffset = -32769; 
+    static const int removedDepthOffset; 
 
     /// Return true if the given depth is in the removed zone
     static bool depthInRemovedZone(int depth)

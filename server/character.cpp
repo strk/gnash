@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.79 2008/02/19 19:20:53 bwy Exp $ */
+/* $Id: character.cpp,v 1.80 2008/02/22 20:08:51 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -42,6 +42,9 @@ namespace gnash
 
 // Initialize unnamed instance count
 unsigned int character::_lastUnnamedInstanceNum=0;
+
+const int character::staticDepthOffset = -16384;
+const int character::removedDepthOffset = -32769; 
 
 /*protected static*/
 std::string
