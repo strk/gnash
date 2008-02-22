@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderGst.cpp,v 1.15 2008/02/19 19:20:51 bwy Exp $
+// $Id: VideoDecoderGst.cpp,v 1.16 2008/02/22 18:28:31 bjacques Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -84,7 +84,9 @@ VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type, int width, int heigh
   }
   
   if (!decoder) {
-    log_error(_("failed to initialize the video decoder. Bailing out."));
+    log_error(_("failed to initialize the video decoder. Embedded video "
+                "playback will not be available; consider installing "
+                "gstreamer-ffmpeg."));
     gst_object_unref (GST_OBJECT (_pipeline));
     _pipeline = NULL;
     return;

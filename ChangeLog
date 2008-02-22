@@ -4,6 +4,11 @@
 
 2008-02-20 Bastiaan Jacques <bastiaan@bjacques.org>
 
+	* libmedia/gst/VideoDecoderGst.cpp: Be more verbose about a missing
+	gstreamer-ffmpeg.
+
+2008-02-20 Bastiaan Jacques <bastiaan@bjacques.org>
+
 	* configure.ac: Check for gst_install_plugins_async, since that's the
 	function we really need.
 	* server/asobj/NetStreamGst.cpp: Only use
