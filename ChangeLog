@@ -1,3 +1,10 @@
+2008-02-21  Rob Savoye  <rob@ute.welcomehome.org>
+
+	* macros/docbook.m4: Don't use the POSIX shell wrappers for the
+	Docbook2X utilities, only use the perl versions. If we can't find
+	usable wrappers, then drop back to using the lower level tools
+	like we used to.
+
 2008-02-22 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac: look for gst_install_plugins_supported to check if

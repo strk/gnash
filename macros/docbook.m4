@@ -1,5 +1,5 @@
 dnl  
-dnl    Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+dnl    Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
@@ -100,47 +100,72 @@ dnl    	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
     	  [$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
     fi
 
-    dnl Find the programs we need to convert docbook into Texi for making
-    dnl info pages. The first catagory are the wrapper utilities included
-    dnl in most docbook2x packages.
+    dnl Find the programs we need to convert docbook into Texi for
+    dnl making info pages. The first catagory are the wrapper
+    dnl utilities included in most docbook2x packages.
+    dnl It turns out there are two sets of wrapper functions, the good
+    dnl ones from the newer DocBook2X tools are written in perl, and
+    dnl actually work correctly. There are other versions of the same
+    dnl tools ,but they are merely a 1 line wrapper for the OpenJade
+    dnl tools. These versions have big problems, namely they don't
+    dnl support the encoding of entities, so we get massive warnings
+    dnl about entities in included files we never heard about.
     scripts="db2x_docbook2texi docbook2texi docbook2texi.pl"
     for i in $scripts; do
       AC_PATH_PROG(DB2X_TEXI, $i, [], [$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
       if test x$DB2X_TEXI != x; then
-        break
+        type="`file $DB2X_TEXI  | grep -ic " perl " 2>&1`"
+        if test $type -gt 0; then
+          break
+        else
+          DB2X_TEXI=
+        fi
       fi
     done
 
-    dnl These look for the sepearte utilities used by the wrapper scripts. If we don't find
-    dnl the wrappers, then we use the lower level utilities directly.
-    if test x$DB2X_TEXI = x; then
-      scripts="db2x_texixml db2x_texixml.pl"
-      for i in $scripts; do
-        AC_PATH_PROG(DB2X_TEXIXML, $i, [], [$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
-        if test x$DB2X_TEXIXML != x; then
-          break
-        fi
-      done
-    fi
+    dnl These look for the seperate utilities used by the wrapper
+    dnl scripts. If we don't find the wrappers, then we use the lower
+    dnl level utilities directly. 
+
+    scripts="db2x_texixml db2x_texixml.pl"
+    for i in $scripts; do
+      AC_PATH_PROG(DB2X_TEXIXML, $i, [], [$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+      if test x$DB2X_TEXIXML != x; then
+        break
+      fi
+    done
 
     dnl Find the programs we need to convert docbook into man pages.
     scripts="db2x_docbook2man docbook2man docbook2man.pl"
     for i in $scripts; do
       AC_PATH_PROG(DB2X_MAN, $i, [], [$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
-      if test x$DB2X_MAN != x; then
-        break
+      if test x$DB2X_MAN != x; then 
+        type="`file $DB2X_MAN  | grep -ic " perl " 2>&1`"
+        if test $type -gt 0; then
+          break
+        else
+          DB2X_MAN=
+        fi
       fi
     done
 
-    if test x$DB2X_MANXML != x; then
-      scripts="db2x_manxml db2x_manxml.pl"
-      for i in $scripts; do
-        AC_PATH_PROG(DB2X_MANXML, $i, [], [$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
-        if test x$DB2X_MANXML != x; then
-          break
-        fi
-      done
-    fi
+# file /usr/bin/db2x_docbook2man
+# /usr/bin/db2x_docbook2man: perl script text executable
+# /usr/bin/db2x_docbook2man
+#/usr/bin/db2x_xsltproc: you must specify exactly one source document
+# Unable to recognise encoding of this document at /usr/lib/perl5/site_perl/5.8.8/XML/SAX/PurePerl/EncodingDetect.pm line 100.
+# Document requires an element [Ln: 1, Col: 0]
+
+# file /usr/bin/docbook2man
+# /usr/bin/docbook2man: POSIX shell script text executable
+
+    scripts="db2x_manxml db2x_manxml.pl"
+    for i in $scripts; do
+      AC_PATH_PROG(DB2X_MANXML, $i, [], [$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
+      if test x$DB2X_MANXML != x; then
+        break
+      fi
+    done
 
     AC_PATH_PROG(MAKEINFO, makeinfo, [], [$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
 
