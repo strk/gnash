@@ -1,3 +1,7 @@
+2008-02-22 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* gui/gnash.cpp: Changed 2007 -> 2008.
+
 2008-02-20 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* configure.ac: Check for gst_install_plugins_async, since that's the
