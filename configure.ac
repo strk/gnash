@@ -1533,22 +1533,25 @@ if test "$media_handler" = "gst"; then
        AC_MSG_WARN([No appropriate gstreamer library found, will try using mad.])
        media_handler=mad
     fi
-  else
-    AC_MSG_CHECKING([for modern pbutils])
-    save_cflags=$CFLAGS
-    CFLAGS=$GSTREAMER_CFLAGS
-    AC_TRY_COMPILE([#include <gst/pbutils/install-plugins.h>],[void* pointer = &gst_install_plugins_sync],
-      GSTREAMER_LIBS="$GSTREAMER_LIBS -lgstpbutils-0.10",
-      has_modern_gstpbutils='no')]
-      CFLAGS=$save_cflags
-    if test x$has_modern_gstpbutils = xno; then
-      AC_MSG_RESULT([no {GSTREAMER_CFLAGS=$GSTREAMER_CFLAGS}])
-    else
-      AC_DEFINE([GST_HAS_MODERN_PBUTILS], [], [GStreamer has pbutils with missing codec install routines installed])
-      AC_MSG_RESULT([ok])
-    fi
   fi
 fi
+
+if test x"$media_handler" = x"gst"; then
+  AC_MSG_CHECKING([for modern pbutils])
+  save_cflags=$CFLAGS
+  CFLAGS=$GSTREAMER_CFLAGS
+  AC_TRY_COMPILE([#include <gst/pbutils/install-plugins.h>],[void* pointer = &gst_install_plugins_sync],
+    GSTREAMER_LIBS="$GSTREAMER_LIBS -lgstpbutils-0.10",
+    has_modern_gstpbutils='no')]
+    CFLAGS=$save_cflags
+  if test x$has_modern_gstpbutils = xno; then
+    AC_MSG_RESULT([no {GSTREAMER_CFLAGS=$GSTREAMER_CFLAGS}])
+  else
+    AC_DEFINE([GST_HAS_MODERN_PBUTILS], [], [GStreamer has pbutils with missing codec install routines installed])
+    AC_MSG_RESULT([ok])
+  fi
+fi
+
 
 if test x"$media_handler" = x"mad"; then
   dnl Will set MAD_LIBS and MAD_CFLAGS.

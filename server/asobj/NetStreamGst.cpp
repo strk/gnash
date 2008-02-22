@@ -30,6 +30,12 @@
 #include <gst/gstelement.h>
 #include <GstUtil.h>
 
+#ifdef GST_HAS_MODERN_PBUTILS
+#include <gst/pbutils/pbutils.h>
+#include <gst/pbutils/missing-plugins.h>
+#include <gst/pbutils/install-plugins.h>
+#endif // GST_HAS_MODERN_PBUTILS
+
 
 //                                        video -> ffmpegcolorspace -> capsfilter -> fakesink
 //                                       /
@@ -164,6 +170,10 @@ NetStreamGst::~NetStreamGst()
   gst_element_get_state(_pipeline, NULL, NULL, 0); // wait for a response
 
   gst_object_unref(GST_OBJECT(_pipeline));
+  
+#ifdef GST_HAS_MODERN_PBUTILS
+  std::for_each(_missing_plugins.begin(), _missing_plugins.end(), g_free);
+#endif
 }
 
 void
@@ -334,7 +344,11 @@ NetStreamGst::advance()
   
   gst_object_unref(GST_OBJECT(bus));
   
+  handleMissingPlugins();
+  
   processStatusNotifications();
+  
+  g_main_context_iteration (NULL, FALSE);
 }
 
 double
@@ -586,8 +600,88 @@ NetStreamGst::handleMessage (GstMessage *message)
 #endif
     }
   }
-
+  
+  missingPluginMsg(message);
 }
+
+void
+NetStreamGst::missingPluginMsg(GstMessage* message)
+{
+#ifdef GST_HAS_MODERN_PBUTILS
+  if (!gst_is_missing_plugin_message(message)) {
+    return;
+  }  
+  
+  gchar* plugin_name = gst_missing_plugin_message_get_description (message);
+
+  if (!gst_install_plugins_supported()) {
+    log_error(_("Missing Gstreamer plugin: %s. Please consider installing it."),
+      plugin_name);
+    g_free(plugin_name);
+    return;
+  }
+      
+  gchar* detail = gst_missing_plugin_message_get_installer_detail (message);
+  
+  _missing_plugins.push_back(detail);
+  
+  log_debug(_("Missing plugin: %s. Will attempt to start system installer"),
+    plugin_name);
+
+  g_free(plugin_name);
+#endif
+}
+
+#ifdef GST_HAS_MODERN_PBUTILS
+static void
+install_plugins_cb(GstInstallPluginsReturn result, gpointer /*user_data*/)
+{
+  switch(result) {
+    case GST_INSTALL_PLUGINS_SUCCESS:
+    case GST_INSTALL_PLUGINS_PARTIAL_SUCCESS:
+      log_debug(_("Gstreamer plugin installation was at least partially "
+                "successful. Will try to restart the pipeline."));
+      break;    
+    default:
+      log_error(_("The request for system installation of missing plugins "
+                  "has failed. Full playback will not be possible."));
+  }
+}
+#endif
+
+void
+NetStreamGst::handleMissingPlugins()
+{
+#ifdef GST_HAS_MODERN_PBUTILS
+  if (_missing_plugins.empty()) {
+    return;
+  }
+
+  boost::scoped_array<gchar*> details( new char*[_missing_plugins.size()+1] );
+
+  for (size_t i = 0; i < _missing_plugins.size(); ++i) {
+    details[i] = _missing_plugins[i];
+  }
+
+  details[_missing_plugins.size()] = NULL;
+
+  GstInstallPluginsReturn ret = gst_install_plugins_async(details.get(), NULL,
+    install_plugins_cb, NULL);
+  
+  std::for_each(_missing_plugins.begin(), _missing_plugins.end(), g_free);
+  _missing_plugins.clear();
+  
+  switch(ret) {
+    case GST_INSTALL_PLUGINS_STARTED_OK:
+    case GST_INSTALL_PLUGINS_INSTALL_IN_PROGRESS:
+      break;
+    default:
+      log_error(_("Failed to start the system Gstreamer plugin installer."
+                "Media playback will not work (fully)."));      
+  }
+#endif
+}
+
 
 // NOTE: callbacks will be called from the streaming thread!
 

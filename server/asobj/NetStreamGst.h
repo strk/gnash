@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamGst.h,v 1.33 2008/01/30 06:10:10 bjacques Exp $ */
+/* $Id: NetStreamGst.h,v 1.34 2008/02/22 00:02:24 bjacques Exp $ */
 
 #ifndef __NETSTREAMGST_H__
 #define __NETSTREAMGST_H__
@@ -76,6 +76,8 @@ public:
 
 private:
   void handleMessage (GstMessage *message);
+  void missingPluginMsg(GstMessage* message);
+  void handleMissingPlugins();
 
   GstElement* _pipeline;
   GstElement* _dataqueue;
@@ -83,6 +85,9 @@ private:
   GstElement* _audiobin;
   GstElement* _videobin;
   gint64      _duration;
+#ifdef GST_HAS_MODERN_PBUTILS
+  std::vector<gchar*> _missing_plugins;
+#endif
 };
 
 } // gnash namespace
