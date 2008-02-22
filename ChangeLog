@@ -1,5 +1,7 @@
 2008-02-22 Sandro Santilli <strk@keybit.net>
 
+	* extensions/fileio/Makefile.am: don't try to build the
+	  test if deps are not met (Ming).
 	* libmedia/Makefile.am: we don't support libmad anymore.
 
 2008-02-22 Hong Yu <hongyu@emsoftltd.com>

@@ -46,7 +46,12 @@ fileio_la_LDFLAGS = -module -avoid-version -no-undefined
 fileio_la_LIBDADD = $(LIBADD_DL) $(LIBLTDL) $(AM_LDFLAGS)
 
 
-check_SCRIPTS = test
+check_SCRIPTS =
+
+if ENABLE_MING
+ check_SCRIPTS += test
+endif
+
 CLEANFILES = \
 	gnash-dbg.log \
 	test.swf.frame0.pp \
