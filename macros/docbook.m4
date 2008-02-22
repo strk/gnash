@@ -149,16 +149,6 @@ dnl    	[$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
       fi
     done
 
-# file /usr/bin/db2x_docbook2man
-# /usr/bin/db2x_docbook2man: perl script text executable
-# /usr/bin/db2x_docbook2man
-#/usr/bin/db2x_xsltproc: you must specify exactly one source document
-# Unable to recognise encoding of this document at /usr/lib/perl5/site_perl/5.8.8/XML/SAX/PurePerl/EncodingDetect.pm line 100.
-# Document requires an element [Ln: 1, Col: 0]
-
-# file /usr/bin/docbook2man
-# /usr/bin/docbook2man: POSIX shell script text executable
-
     scripts="db2x_manxml db2x_manxml.pl"
     for i in $scripts; do
       AC_PATH_PROG(DB2X_MANXML, $i, [], [$PATH:/usr/bin:/usr/bin/X11:/usr/local/X11/bin])
