@@ -346,7 +346,7 @@ LcShm::parseHeader(boost::uint8_t *data)
 }
 
 boost::uint8_t *
-LcShm::formatHeader(const std::string &con, const std::string &host, bool domain)
+LcShm::formatHeader(const std::string &con, const std::string &host, bool /* domain */ )
 {
     GNASH_REPORT_FUNCTION;
 //    boost::uint8_t *ptr = data + LC_HEADER_SIZE;
@@ -372,9 +372,9 @@ LcShm::formatHeader(const std::string &con, const std::string &host, bool domain
     memcpy(ptr, tmp, host.size());
     ptr +=  host.size();
     
-    delete[] ptr;
+    delete[] tmp;
     
-//     return ptr;
+    return ptr;
 }
 
 /// \brief Prepares the LcShm object to receive commands from a
@@ -405,7 +405,7 @@ LcShm::connect(const string &name)
     
     Listener::setBaseAddress(reinterpret_cast<uint8_t *>(Shm::getAddr()));
     _baseaddr = reinterpret_cast<uint8_t *>(Shm::getAddr());
-    boost::uint8_t *ptr = parseHeader(Listener::getBaseAddress());
+    parseHeader(Listener::getBaseAddress());
 //    vector<amf::Element *> ellist = parseBody(ptr);
 //     log_debug("Base address is: 0x%x, 0x%x",
 //               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
@@ -431,7 +431,7 @@ LcShm::connect(key_t key)
     
     Listener::setBaseAddress(reinterpret_cast<uint8_t *>(Shm::getAddr()));
     _baseaddr = reinterpret_cast<uint8_t *>(Shm::getAddr());
-    boost::uint8_t *ptr = parseHeader(Listener::getBaseAddress());
+    parseHeader(Listener::getBaseAddress());
 //    vector<amf::Element *> ellist = parseBody(ptr);
 //     log_debug("Base address is: 0x%x, 0x%x",
 //               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);

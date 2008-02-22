@@ -1,3 +1,8 @@
+2008-02-22  Rob Savoye  <rob@ute.welcomehome.org>
+
+	* libamf/amf.cpp: Eliminate warnings.
+	* libamf/lcshm.cpp: Delete[] tmp, not ptr. Return ptr.
+
 2008-02-21  Rob Savoye  <rob@ute.welcomehome.org>
 
 	* macros/docbook.m4: Don't use the POSIX shell wrappers for the
@@ -57,12 +62,12 @@
 	* libmedia/gst/GstUtil.{cpp,h}: Static Gstreamer utility class.
 	* libmedia/gst/SoundGst.cpp: Use the configuration audio output
 	pipeline.
-	* server/asobj/NetStreamGst.cpp: Likewise, and don't attempt to load
-	the flvdemux element, since it's loaded statically.
-	* libmedia/gst/gstflvdemux.c: Make sure that the element name doesn't
-	conflict with an existing flvdemux.
-	* libmedia/gst/gnash_gst_version.h: Utility macros for dealing with
-	Gstreamer versions. Unused for now.
+	* server/asobj/NetStreamGst.cpp: Likewise, and don't attempt to
+	load the flvdemux element, since it's loaded statically.
+	* libmedia/gst/gstflvdemux.c: Make sure that the element name
+	doesn't conflict with an existing flvdemux.
+	* libmedia/gst/gnash_gst_version.h: Utility macros for dealing
+	with Gstreamer versions. Unused for now.
 
 2008-02-20 Sandro Santilli <strk@keybit.net>
 
@@ -75,15 +80,15 @@
 	* server/vm/ASHandlers.cpp (ActionImplementsOp): better logging,
 	  catch bogus opcodes.
 	* server/vm/ASHandlers.cpp (CommonGetUrl): only loadVariables if
-	  targetLoad flag is set (tested). Log an SWF error if loadVariables
-	  is set but targtLoad is clear.
+	  targetLoad flag is set (tested). Log an SWF error if
+	  loadVariables is set but targtLoad is clear.
 
 2008-02-20 Bastiaan Jacques <bastiaan@bjacques.org>
 
-	* server/parser/video_stream_def.cpp: Don't make a fuss about embedded
-	video definitions without a real codec or video data, because they are
-	frequently (or perhaps always) used as to place NetStream videos on 
-	the stage.
+	* server/parser/video_stream_def.cpp: Don't make a fuss about
+	embedded video definitions without a real codec or video data,
+	because they are frequently (or perhaps always) used as to
+	place NetStream videos on  the stage.
 
 2008-02-20 Sandro Santilli <strk@keybit.net>
 

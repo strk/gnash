@@ -162,7 +162,7 @@ vector<AMF::amf_element_t *> *
 AMF::readElements(boost::uint8_t *in)
 {
     GNASH_REPORT_FUNCTION;
-boost::uint8_t *x = in;
+    boost::uint8_t *x = in;
     astype_e type = (astype_e)*x;
     bool boolshift;
     const char *mstr = NULL;
@@ -632,6 +632,9 @@ AMF::encodeElement(Element *el)
       case Element::VARIABLE:
 	  return 0;
           break;
+      case Element::FUNCTION:
+	  return 0;
+          break;
     };
 
     // you should never get here
@@ -665,7 +668,7 @@ AMF::encodeElement(vector<amf::Element *> &data)
     boost::uint8_t* ptr = new boost::uint8_t[size + 1];
     memset(ptr, 0, size + 1);
     
-    boost::uint8_t *x = ptr;
+//    boost::uint8_t *x = ptr;
     size = 0;
     for (ait = data.begin(); ait != data.end(); ait++) {
 	amf::Element *el = (*(ait));
