@@ -1544,7 +1544,7 @@ if test x"$media_handler" = x"gst"; then
   AC_MSG_CHECKING([for modern pbutils])
   save_cflags=$CFLAGS
   CFLAGS=$GSTREAMER_CFLAGS
-  AC_TRY_COMPILE([#include <gst/pbutils/install-plugins.h>],[void* pointer = &gst_install_plugins_supported],
+  AC_TRY_COMPILE([#include <gst/pbutils/install-plugins.h>],[void* pointer = &gst_install_plugins_async],
     GSTREAMER_LIBS="$GSTREAMER_LIBS -lgstpbutils-0.10",
     has_modern_gstpbutils='no')]
     CFLAGS=$save_cflags

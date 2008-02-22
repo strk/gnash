@@ -30,6 +30,8 @@
 #include <gst/gstelement.h>
 #include <GstUtil.h>
 
+#include "gnash_gst_version.h"
+
 #ifdef GST_HAS_MODERN_PBUTILS
 #include <gst/pbutils/pbutils.h>
 #include <gst/pbutils/missing-plugins.h>
@@ -614,12 +616,14 @@ NetStreamGst::missingPluginMsg(GstMessage* message)
   
   gchar* plugin_name = gst_missing_plugin_message_get_description (message);
 
+#if GST_CHECK_VERSION(0,10,15)
   if (!gst_install_plugins_supported()) {
     log_error(_("Missing Gstreamer plugin: %s. Please consider installing it."),
       plugin_name);
     g_free(plugin_name);
     return;
   }
+#endif
       
   gchar* detail = gst_missing_plugin_message_get_installer_detail (message);
   
