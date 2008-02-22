@@ -48,7 +48,11 @@ typedef enum
 
     STOPSOUND             = 16, // SWF 9
     DEFINEBUTTONSOUND     = 17,
+
+    /// SWF2
+    /// See http://sswf.sourceforge.net/SWFalexref.html#tag_soundstreamhead
     SOUNDSTREAMHEAD       = 18,
+
     SOUNDSTREAMBLOCK      = 19,
     DEFINELOSSLESS        = 20,
     DEFINEBITSJPEG2       = 21,
@@ -76,7 +80,11 @@ typedef enum
     DEFINETEXTFORMAT	  = 42,
     FRAMELABEL            = 43,
     DEFINEBEHAVIOR        = 44, // SWF 9
+
+    /// SWF3
+    /// See http://sswf.sourceforge.net/SWFalexref.html#tag_soundstreamhead2
     SOUNDSTREAMHEAD2      = 45,
+
     DEFINEMORPHSHAPE      = 46,
     FRAMETAG		  = 47,
     DEFINEFONT2           = 48,
