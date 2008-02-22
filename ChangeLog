@@ -1,5 +1,7 @@
 2008-02-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/libamf.all/test_sol.cpp: use getSOLSafeDir for writing
+	  SOL files.
 	* Makefile.am: don't list 'doc' subdir twice in DIST_SUBDIRS.
 
 2008-02-20 Bastiaan Jacques <bastiaan@bjacques.org>

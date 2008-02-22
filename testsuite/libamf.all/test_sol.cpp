@@ -69,6 +69,8 @@ main(int argc, char *argv[])
 {
     int c;
 
+    RcInitFile& rc = RcInitFile::getDefaultInstance();
+
     while ((c = getopt (argc, argv, "hdvsm:")) != -1) {
         switch (c) {
           case 'h':
@@ -91,7 +93,7 @@ main(int argc, char *argv[])
     test_read(filespec);
 
     // Write a .sol file
-    filespec = "test.sol";
+    filespec = rc.getSOLSafeDir() + std::string("/test.sol");
     test_write(filespec);
 //    test_read(filespec);
     
