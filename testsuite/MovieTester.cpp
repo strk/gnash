@@ -45,6 +45,7 @@
 #include <string>
 #include <memory> // for auto_ptr
 #include <cmath> // for ceil and exp2
+#include <iostream>
 
 #define SHOW_INVALIDATED_BOUNDS_ON_ADVANCE 1
 
@@ -52,6 +53,9 @@
 #include <sstream>
 #endif
 
+
+using std::cout;
+using std::endl;
 
 namespace gnash {
 
@@ -271,7 +275,7 @@ MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 	{
 		std::stringstream ss;
 	        ss << "exp:" << color.toShortString() << " ";
-		log_debug("UNTESTED: NORENDERER: pix:%d,%d %s %s", x,  y, ss.str().c_str(), label.c_str());
+		cout << "UNTESTED: NORENDERER: pix:" << x << "," << y << " exp:" << color.toShortString() << " " << label << endl;
 	}
 
 	FuzzyPixel exp(color, tolerance);
@@ -296,10 +300,7 @@ MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 	        if ( ! handler.getAveragePixel(obt_col, x, y, radius) )
 		{
 			ss << " is out of rendering buffer";
-			log_debug("%sFAILED: %s (%s)", X,
-					ss.str().c_str(),
-					label.c_str()
-					);
+			cout << X << "FAILED: " << ss.str() << " (" << label << ")" << endl;
 			continue;
 		}
 
@@ -323,17 +324,11 @@ MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 		FuzzyPixel obt(obt_col, tol);
 		if (exp ==  obt) // equality operator would use tolerance of most tolerating FuzzyPixel
 		{
-			log_debug("%sPASSED: %s %s", X,
-					ss.str().c_str(),
-					label.c_str()
-					);
+			cout << X << "PASSED: " << ss.str() << " (" << label << ")" << endl;
 		}
 		else
 		{
-			log_debug("%sFAILED: %s %s", X,
-					ss.str().c_str(),
-					label.c_str()
-					);
+			cout << X << "FAILED: " << ss.str() << " (" << label << ")" << endl;
 		}
 	}
 }
