@@ -34,6 +34,7 @@ libgnashpython_la_LDFLAGS = \
 	$(GLIB_LIBS) \
 	$(LIBLTDL) \
 	$(FFMPEG_LIBS) \
+	$(GSTREAMER_LIBS) \
 	$(CURL_LIBS) \
 	$(LIBXML_LIBS) \
 	$(INCLTDL) \
@@ -51,7 +52,7 @@ libgnashpython_la_CPPFLAGS = -I.. \
         -I$(top_srcdir)/backend \
         -I$(top_srcdir)/libgeometry \
 	 	-I$(top_srcdir)/libmedia \
-	 	-I$(top_srcdir)/libmedia/sdl \
+	 	-I$(top_srcdir)/libmedia/ffmpeg \
 	 	-I$(top_srcdir)/libmedia/gst \
 	-DLOCALEDIR=\"$(localedir)\" \
 	$(BOOSTPYTHON_CFLAGS) \
@@ -84,7 +85,7 @@ gnash_la_CPPFLAGS = -I.. \
         -I$(top_srcdir)/backend \
         -I$(top_srcdir)/libgeometry \
 	 	-I$(top_srcdir)/libmedia \
-	 	-I$(top_srcdir)/libmedia/sdl \
+	 	-I$(top_srcdir)/libmedia/ffmpeg \
 	 	-I$(top_srcdir)/libmedia/gst \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DBOOST_PYTHON_DYNAMIC_LIB \

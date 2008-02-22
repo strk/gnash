@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.105 2008/02/19 19:20:55 bwy Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.106 2008/02/22 14:20:48 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -31,7 +31,6 @@
 #include "NetStream.h"
 #include "render.h"	
 #include "movie_root.h"
-#include "NetConnection.h"
 #include "sound_handler.h"
 #include "VideoDecoderFfmpeg.h"
 #include "tu_timer.h" // TODO: use the VirtualClock instead ?
@@ -88,26 +87,33 @@ NetStreamFfmpeg::~NetStreamFfmpeg()
 	close();
 }
 
-void NetStreamFfmpeg::pause(int mode)
+
+void NetStreamFfmpeg::pause( PauseMode mode )
 {
+  switch ( mode ) {
+    case pauseModeToggle:
+			if ( m_pause ) {
+			  unpausePlayback();
+			} else {
+			  pausePlayback();
+			}
+			break;
+    case pauseModePause:
+			pausePlayback();
+			break;
+    case pauseModeUnPause:
+			unpausePlayback();
+			break;
+    default:
+			break;
+  }
 
-	if (mode == -1)
-	{
-		if (m_pause) unpausePlayback();
-		else pausePlayback();
-	}
-	else
-	{
-		if (mode == 0) pausePlayback();
-		else unpausePlayback();
-	}
-	if (!m_pause && !m_go)
-	{ 
-		setStatus(playStart);
-		m_go = true;
-		_decodeThread = new boost::thread(boost::bind(NetStreamFfmpeg::av_streamer, this)); 
-	}
+  if ( !m_pause && !m_go ) {
+    setStatus( playStart );
+    m_go = true;
 
+    _decodeThread = new boost::thread( boost::bind(NetStreamFfmpeg::av_streamer, this) );
+  }
 }
 
 void NetStreamFfmpeg::close()
@@ -136,25 +142,15 @@ void NetStreamFfmpeg::close()
 	if (m_Frame) av_free(m_Frame);
 	m_Frame = NULL;
 
-	if (m_VCodecCtx)
-	{
-		avcodec_close(m_VCodecCtx);
-		if (m_isFLV)
-		{
-			av_free(m_VCodecCtx);
-		}
-	}
-	m_VCodecCtx = NULL;
+  if ( m_VCodecCtx ) {
+    avcodec_close( m_VCodecCtx );
+  }
+  m_VCodecCtx = NULL;
 
-	if (m_ACodecCtx)
-	{
-		avcodec_close(m_ACodecCtx);
-		if (m_isFLV)
-		{
-			av_free(m_ACodecCtx);
-		}
-	}
-	m_ACodecCtx = NULL;
+  if ( m_ACodecCtx ) {
+    avcodec_close( m_ACodecCtx );
+  }
+  m_ACodecCtx = NULL;
 
 	if (m_FormatCtx)
 	{
@@ -209,7 +205,7 @@ NetStreamFfmpeg::seekMedia(void *opaque, offset_t offset, int whence)
 
 	// Offset is absolute new position in the file
 	if (whence == SEEK_SET)
-	{
+	{	
 		nc->seek(offset);
 		ns->inputPos = offset;
 
@@ -228,7 +224,7 @@ NetStreamFfmpeg::seekMedia(void *opaque, offset_t offset, int whence)
 		// Instead we seek to 50.000 bytes... seems to work fine...
 		nc->seek(50000);
 		ns->inputPos = 50000;
-		
+
 	}
 
 	return ns->inputPos;
@@ -451,16 +447,13 @@ NetStreamFfmpeg::startPlayback()
 		if (!m_VCodecCtx)
 		{
 			log_error(_("Failed to initialize FLV video codec"));
+			return false;
 		}
 
 		m_ACodecCtx = initFlvAudio(m_parser.get());
 		if (!m_ACodecCtx)
 		{
 			log_error(_("Failed to initialize FLV audio codec"));
-		}
-
-		if (!m_ACodecCtx && !m_VCodecCtx)
-		{
 			return false;
 		}
 
@@ -625,24 +618,20 @@ NetStreamFfmpeg::startPlayback()
 ///            of this structure must be initialized.
 /// @param width the width, in bytes, of a row of video data.
 static void
-rgbcopy(image::rgb* dst, raw_mediadata_t* src, int width)
+rgbcopy(image::rgb* dst, media::raw_mediadata_t* src, int width)
 {
-	assert( dst->size() >= src->m_size ); 
-	assert( dst->pitch() >= width );
-	dst->update(src->m_data);
+  assert( src->m_size <= static_cast<boost::uint32_t>(dst->width() * dst->height() * 3) ); 
 
-#if 0
-	boost::uint8_t* dstptr = dst->m_data;
+  boost::uint8_t* dstptr = dst->data();
 
-	boost::uint8_t* srcptr = src->m_data;
-	boost::uint8_t* srcend = src->m_data + src->m_size;
+  boost::uint8_t* srcptr = src->m_data;
+  boost::uint8_t* srcend = src->m_data + src->m_size;
 
-	while (srcptr < srcend) {
-		memcpy(dstptr, srcptr, width);
-		dstptr += dst->m_pitch;
-		srcptr += width;
-	}
-#endif
+  while (srcptr < srcend) {
+    memcpy(dstptr, srcptr, width);
+    dstptr += dst->pitch();
+    srcptr += width;
+  }
 }
 
 // decoder thread
@@ -695,7 +684,7 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 		if (ns->m_isFLV)
 		{
 			// If queues are full then don't bother filling it
-			if ((ns->m_VCodecCtx && ns->m_qvideo.size() < 20) || (ns->m_ACodecCtx && ns->m_qaudio.size() < 20))
+      			if ( ns->m_qvideo.size() < 20 || ns->m_qaudio.size() < 20 ) 
 			{
 
 				// If we have problems with decoding - break
@@ -747,7 +736,7 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, boost::uint8_t *stream, int le
 
 	while (len > 0 && ns->m_qaudio.size() > 0)
 	{
-		raw_mediadata_t* samples = ns->m_qaudio.front();
+    		media::raw_mediadata_t* samples = ns->m_qaudio.front();
 
 		int n = imin(samples->m_size, len);
 		memcpy(stream, samples->m_ptr, n);
@@ -771,14 +760,12 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, boost::uint8_t *stream, int le
 bool NetStreamFfmpeg::decodeFLVFrame()
 {
 	FLVFrame* frame = NULL;
-	if (m_qvideo.size() < m_qaudio.size() && m_VCodecCtx)
+  	if ( m_qvideo.size() < m_qaudio.size() ) 
 	{
-		frame = m_parser->nextVideoFrame();
-	}
-	else if (m_ACodecCtx)
-	{
-		frame = m_parser->nextAudioFrame();
-	}
+    		frame = m_parser->nextVideoFrame();
+  	} else {
+    		frame = m_parser->nextAudioFrame();
+  	}
 
 	if (frame == NULL)
 	{
@@ -788,7 +775,7 @@ bool NetStreamFfmpeg::decodeFLVFrame()
 			log_debug("decodeFLVFrame: load completed, stopping");
 #endif
 			// Stop!
-			//m_go = false;
+			this->m_go = false;
 		}
 		else
 		{
@@ -799,28 +786,29 @@ bool NetStreamFfmpeg::decodeFLVFrame()
 		return false;
 	}
 
-	AvPkt packet;
-	// TODO: move this logic in AvPkt itself  ?
-	packet->destruct = avpacket_destruct;
-	packet->size = frame->dataSize;
-	packet->data = frame->data;
-	// FIXME: is this the right value for packet.dts?
-	packet->pts = packet->dts = static_cast<boost::int64_t>(frame->timestamp);
+  	AVPacket packet;
+
+  	packet.destruct = avpacket_destruct;
+  	packet.size = frame->dataSize;
+  	packet.data = frame->data;
+  	// FIXME: is this the right value for packet.dts?
+  	packet.pts = packet.dts = static_cast<boost::int64_t>(frame->timestamp);
 
 	if (frame->tag == 9)
 	{
-		packet->stream_index = 0;
-		return decodeVideo(packet);
+    		packet.stream_index = 0;
+    		return decodeVideo(&packet);
 	}
 	else
 	{
-		packet->stream_index = 1;
-		return decodeAudio(packet);
+    		packet.stream_index = 1;
+    		return decodeAudio(&packet);
 	}
 
 }
 
-bool NetStreamFfmpeg::decodeAudio(AvPkt& packet)
+
+bool NetStreamFfmpeg::decodeAudio( AVPacket* packet )
 {
 	if (!m_ACodecCtx) return false;
 
@@ -852,7 +840,7 @@ bool NetStreamFfmpeg::decodeAudio(AvPkt& packet)
 			ptr = reinterpret_cast<boost::uint8_t*>(output);
 		}
 		
-	  	raw_mediadata_t* raw = new raw_mediadata_t();
+    		media::raw_mediadata_t* raw = new media::raw_mediadata_t();
 		
 		raw->m_data = ptr;
 		raw->m_ptr = raw->m_data;
@@ -895,7 +883,8 @@ bool NetStreamFfmpeg::decodeAudio(AvPkt& packet)
 	return true;
 }
 
-bool NetStreamFfmpeg::decodeVideo(AvPkt& packet)
+
+bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 {
 	if (!m_VCodecCtx) return false;
 
@@ -925,7 +914,7 @@ bool NetStreamFfmpeg::decodeVideo(AvPkt& packet)
 		}
 		else if (m_videoFrameFormat == render::YUV && m_VCodecCtx->pix_fmt != PIX_FMT_YUV420P)
 		{
-			abort();	// TODO
+      			assert( 0 );	// TODO
 			//img_convert((AVPicture*) pFrameYUV, PIX_FMT_YUV420P, (AVPicture*) pFrame, pCodecCtx->pix_fmt, pCodecCtx->width, pCodecCtx->height);
 			// Don't use depreceted img_convert, use sws_scale
 
@@ -935,7 +924,7 @@ bool NetStreamFfmpeg::decodeVideo(AvPkt& packet)
 			buffer.reset(media::VideoDecoderFfmpeg::convertRGB24(m_VCodecCtx, m_Frame));
 		}
 
-		raw_mediadata_t* video = new raw_mediadata_t;
+    		media::raw_mediadata_t* video = new media::raw_mediadata_t();
 
 		if (m_videoFrameFormat == render::YUV)
 		{
@@ -944,7 +933,7 @@ bool NetStreamFfmpeg::decodeVideo(AvPkt& packet)
 		else if (m_videoFrameFormat == render::RGB)
 		{
 			image::rgb* tmp = static_cast<image::rgb*>(m_imageframe);
-			video->m_data = new boost::uint8_t[m_imageframe->size()]; // tmp->m_pitch * tmp->m_height];
+      			video->m_data = new boost::uint8_t[tmp->pitch() * tmp->height()];
 		}
 
 		video->m_ptr = video->m_data;
@@ -1052,29 +1041,30 @@ bool NetStreamFfmpeg::decodeMediaFrame()
 		return true;
 	}
 
-	AvPkt packet;
+  	AVPacket packet;
 	
-	int rc = av_read_frame(m_FormatCtx, packet.get());
+  	int rc = av_read_frame(m_FormatCtx, &packet);
 
 	if (rc >= 0)
 	{
-		if (packet->stream_index == m_audio_index && get_sound_handler())
+		if (packet.stream_index == m_audio_index && get_sound_handler())
 		{
-			if (!decodeAudio(packet))
+      			if (!decodeAudio(&packet)) 
 			{
 				log_error(_("Problems decoding audio frame"));
 				return false;
 			}
 		}
 		else
-		if (packet->stream_index == m_video_index)
+		if (packet.stream_index == m_video_index)
 		{
-			if (!decodeVideo(packet))
+      			if (!decodeVideo(&packet)) 
 			{
 				log_error(_("Problems decoding video frame"));
 				return false;
 			}
 		}
+		av_free_packet(&packet);
 	}
 	else
 	{
@@ -1107,7 +1097,7 @@ NetStreamFfmpeg::seek(boost::uint32_t pos)
 	{
 
 		AVStream* videostream = m_FormatCtx->streams[m_video_index];
-		timebase = as_double(videostream->time_base);
+    		timebase = static_cast<double>(videostream->time_base.num / videostream->time_base.den);
 		newpos = static_cast<long>(pos / timebase);
 		
 		if (av_seek_frame(m_FormatCtx, m_video_index, newpos, 0) < 0)
@@ -1144,18 +1134,22 @@ NetStreamFfmpeg::seek(boost::uint32_t pos)
 	}
 	else
 	{
-		AvPkt packet;
+    		AVPacket Packet;
+    		av_init_packet(&Packet);
 		double newtime = 0;
 		while (newtime == 0)
 		{
-			if ( av_read_frame(m_FormatCtx, packet.get()) < 0)
+      			if (av_read_frame(m_FormatCtx, &Packet) < 0) 
 			{
 				av_seek_frame(m_FormatCtx, -1, 0, AVSEEK_FLAG_BACKWARD);
+				av_free_packet( &Packet );
 				return;
 			}
 
 			newtime = timebase * (double)m_FormatCtx->streams[m_video_index]->cur_dts;
 		}
+
+    		av_free_packet( &Packet );
 
 		av_seek_frame(m_FormatCtx, m_video_index, newpos, 0);
 		boost::uint32_t newtime_ms = static_cast<boost::int32_t>(newtime / 1000.0);
@@ -1167,8 +1161,16 @@ NetStreamFfmpeg::seek(boost::uint32_t pos)
 	}
 	
 	// Flush the queues
-	m_qvideo.clear();
-	m_qaudio.clear();
+  	while ( m_qvideo.size() > 0 ) 
+	{
+    		delete m_qvideo.front();
+    		m_qvideo.pop();
+  	}
+  	while ( m_qaudio.size() > 0 ) 
+	{
+    		delete m_qaudio.front();
+    		m_qaudio.pop();
+  	}
 
 }
 
@@ -1183,7 +1185,7 @@ NetStreamFfmpeg::refreshVideoFrame()
 	{
 		// Get video frame from queue, will have the lowest timestamp
 		// will return NULL if empty(). See multithread_queue::front
-		raw_mediadata_t* video = m_qvideo.front();
+    		media::raw_mediadata_t* video = m_qvideo.front();
 
 		// If the queue is empty we have nothing to do
 		if (!video)
@@ -1279,7 +1281,7 @@ NetStreamFfmpeg::time()
 
 	if (m_FormatCtx && m_FormatCtx->nb_streams > 0)
 	{
-		double time = as_double(m_FormatCtx->streams[0]->time_base) * (double)m_FormatCtx->streams[0]->cur_dts;
+    		double time = (double)m_FormatCtx->streams[0]->time_base.num / (double)m_FormatCtx->streams[0]->time_base.den * (double)m_FormatCtx->streams[0]->cur_dts;
 		return static_cast<boost::int32_t>(time);
 	}
 	else if
@@ -1328,10 +1330,39 @@ void NetStreamFfmpeg::unpausePlayback()
 	// Re-connect to the soundhandler.
 	// It was disconnected to avoid to keep playing sound while paused
 	media::sound_handler* s = get_sound_handler();
-	if (s && m_ACodecCtx) s->attach_aux_streamer(audio_streamer, (void*) this);
+	if ( s )     s->attach_aux_streamer(audio_streamer, (void*) this);
+}
+
+
+long
+NetStreamFfmpeg::bytesLoaded ()
+{
+  	long ret_val = 0;
+
+  	if ( _netCon ) 
+	{
+    		ret_val = _netCon->getBytesLoaded();
+  	}
+
+  	return ret_val;
+}
+
+
+long
+NetStreamFfmpeg::bytesTotal ()
+{
+  	long ret_val = 0;
+
+  	if ( _netCon ) 
+	{
+    		ret_val = _netCon->getBytesTotal();
+  	}
+
+  	return ret_val;
 }
 
 
 } // gnash namespcae
 
 #endif // USE_FFMPEG
+

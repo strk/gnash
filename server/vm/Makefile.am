@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.17 2008/01/21 20:56:04 rsavoye Exp $
+# $Id: Makefile.am,v 1.18 2008/02/22 14:20:50 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -31,12 +31,8 @@ AM_CPPFLAGS = \
         -I$(top_srcdir)/libgeometry \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/libmedia \
-        -I$(top_srcdir)/libmedia/sdl \
-        -I$(top_srcdir)/libmedia/gst \
         -I$(top_srcdir)	\
 	$(GLIB_CFLAGS) \
-	$(FFMPEG_CFLAGS) \
-	$(GSTREAMER_CFLAGS) \
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
 	$(BOOST_CFLAGS) \

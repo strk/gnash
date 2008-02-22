@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.42 2008/01/21 20:55:59 rsavoye Exp $
+# $Id: Makefile.am,v 1.43 2008/02/22 14:20:49 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -36,8 +36,6 @@ AM_CPPFLAGS = \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libgeometry \
         -I$(top_srcdir)/libmedia \
-        -I$(top_srcdir)/libmedia/sdl \
-        -I$(top_srcdir)/libmedia/gst \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)	\
 	$(LIBXML_CFLAGS) \
@@ -91,11 +89,13 @@ libgnashparser_la_LIBADD = \
 libgnashparser_la_LDFLAGS = $(BOOST_LIBS) -export-dynamic # -release $(VERSION) -no-undefined 
 
 if USE_SOUND_GST
-AM_CPPFLAGS += $(GSTREAMER_CFLAGS)
+AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
+		-I$(top_srcdir)/libmedia/gst
 endif
 
 if USE_FFMPEG_ENGINE
-AM_CPPFLAGS += $(FFMPEG_CFLAGS)
+AM_CPPFLAGS += $(FFMPEG_CFLAGS) \
+		-I$(top_srcdir)/libmedia/ffmpeg
 endif
 
 # Rebuild with GCC 4.x Mudflap support

@@ -580,10 +580,14 @@ dnl --------------------------------------------------------
 
 media_handler_specified=false
 AC_ARG_ENABLE(media,
- AC_HELP_STRING([--enable-media=handler], [Enable media handling support using the specified handler: gst or none (no sound) [[none]] ]),
+ AC_HELP_STRING([--enable-media=handler], [Enable media handling support using the specified handler: gst, ffmpeg or none (no sound) [[gst]] ]),
  [case "${enableval}" in
    GST|gst)
      media_handler=gst
+     media_handler_specified=true
+     ;;
+   ffmpeg|FFMPEG)
+     media_handler=ffmpeg
      media_handler_specified=true
      ;;
    no|NO|none)
@@ -1599,9 +1603,14 @@ dnl AM_CONDITIONAL(HAVE_FFMPEG, [test x"${FFMPEG_LIBS}" != x])
 
 case "${media_handler}" in
   gst) AC_DEFINE([SOUND_GST],  [1], [Use GSTREAMER for media handling]) ;;
+  ffmpeg) AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound handling]) ;;
   *)
 esac
 
+case "${media_handler}" in
+  ffmpeg)  AC_DEFINE([USE_FFMPEG],  [1], [Use FFMPEG for media decoding]) ;;
+  *)
+esac
 dnl I'm kinda lazy, get rid of this later... //Markus
 AM_CONDITIONAL(HAVE_GST, test x$media_handler = xgst)
 

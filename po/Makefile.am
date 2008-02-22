@@ -35,7 +35,7 @@ dirs =  $(top_srcdir)/libbase \
 	$(top_srcdir)/backend \
 	$(top_srcdir)/libamf \
 	$(top_srcdir)/libmedia \
-	$(top_srcdir)/libmedia/sdl \
+	$(top_srcdir)/libmedia/ffmpeg \
 	$(top_srcdir)/libmedia/gst \
 	$(top_srcdir)/server \
 	$(top_srcdir)/server/vm \

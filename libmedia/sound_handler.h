@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: sound_handler.h,v 1.10 2008/02/09 15:06:01 bjacques Exp $ */
+/* $Id: sound_handler.h,v 1.11 2008/02/22 14:20:44 strk Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -355,7 +355,41 @@ public:
 	///
 	virtual bool	is_muted() = 0;
 
+#ifdef USE_FFMPEG
+	/// This is called by AS classes NetStream or Sound to attach callback, so
+	/// that audio from the classes will be played through the soundhandler.
+	//
+	/// This is actually only used by the SDL sound_handler. It uses these "auxiliary"
+	/// streamers to fetch decoded audio data to mix and send to the output channel.
+	///
+	/// The "aux streamer" will be called with the 'udata' pointer as first argument,
+	/// then will be passed a buffer pointer as second argument and it's length
+	/// as third. The callbacks should fill the given buffer if possible.
+	/// The callback should return true if wants to remain attached, false if wants
+	/// to be detached. 
+	///
+	/// @param ptr
+	///	The pointer to the callback function
+	///
+	/// @param udata
+	///	User data pointer, passed as first argument to the registered callback.
+	/// 	WARNING: this is currently also used to *identify* the callback for later
+	///	removal, see detach_aux_streamer. TODO: stop using the data pointer for 
+	///	identification purposes and use the callback pointer directly instead.
+	///
+	virtual void	attach_aux_streamer(aux_streamer_ptr ptr, void* owner) = 0;
 
+	/// This is called by AS classes NetStream or Sound to dettach callback, so
+	/// that audio from the classes no longer will be played through the 
+	/// soundhandler.
+	//
+	/// @param udata
+	/// 	The key identifying the auxiliary streamer.
+	/// 	WARNING: this need currently be the 'udata' pointer passed to attach_aux_streamer.
+	///	TODO: get the aux_streamer_ptr as key !!
+	///
+	virtual void	detach_aux_streamer(void* udata) = 0;
+#endif
 
 	virtual ~sound_handler() {};
 	

@@ -1,3 +1,23 @@
+2008-02-22 Hong Yu <hongyu@emsoftltd.com>
+
+	* configure.ac, gui/Makefile.am, libmedia/Makefile.am,
+	  libmedia/sound_handler.h, libmedia/ffmpeg/AudioDecoderFfmpeg.cpp,
+	  libmedia/ffmpeg/AudioDecoderFfmpeg.h,
+	  libmedia/ffmpeg/VideoDecoderFfmpeg.cpp,
+	  libmedia/ffmpeg/VideoDecoderFfmpeg.h,
+	  libmedia/ffmpeg/ffmpegNetStreamUtil.cpp,
+	  libmedia/ffmpeg/ffmpegNetStreamUtil.h,
+	  libmedia/ffmpeg/sound_handler_sdl.cpp,
+	  libmedia/ffmpeg/sound_handler_sdl.h,
+	  po/Makefile.am, pythonmodule/Makefile.am,
+	  server/Makefile.am, server/asobj/Makefile.am,
+	  server/asobj/NetConnection.cpp, server/asobj/NetConnection.h,
+	  server/asobj/NetStreamFfmpeg.cpp, server/asobj/NetStreamFfmpeg.h,
+	  server/parser/Makefile.am, server/parser/video_stream_def.cpp,
+	  server/parser/video_stream_def.h, server/vm/Makefile.am,
+	  utilities/Makefile.am:
+	  Re-enable ffmpeg backend option.
+
 2008-02-22 Sandro Santilli <strk@keybit.net>
 
 	* cygnal/cygnal.cpp: don't call LogFile::openLog explicitly,

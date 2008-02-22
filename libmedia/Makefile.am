@@ -42,12 +42,11 @@ libgnashmedia_la_CPPFLAGS = \
 	-I$(top_srcdir)/server/parser \
 	-I$(top_srcdir)/libgeometry \
 	$(PTHREAD_CFLAGS) \
+	$(DMALLOC_CFLAGS) \
 	$(OPENGL_CFLAGS) \
 	$(LIBXML_CFLAGS) \
 	$(PNG_CFLAGS) \
-	$(SDL_CFLAGS) \
 	$(GLIB_CFLAGS) \
-	$(GSTREAMER_CFLAGS) \
 	$(CURL_CFLAGS) \
 	$(Z_CFLAGS) \
 	$(JPEG_CFLAGS) \
@@ -72,7 +71,6 @@ libgnashmedia_la_LIBADD = \
 	$(LIBLTDLHEAD) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
-	$(SDL_LIBS) \
 	$(NULL)
 
 libgnashmedia_la_SOURCES = \
@@ -134,39 +132,39 @@ endif
 
 if USE_FFMPEG_ENGINE
    libgnashmedia_la_SOURCES += \
-		sdl/MediaDecoderSdl.cpp \
-		sdl/AudioDecoderFfmpeg.cpp \
-		sdl/VideoDecoderFfmpeg.cpp \
-		sdl/MediaParserFfmpeg.cpp \
-		sdl/sound_handler_sdl.cpp
+		ffmpeg/AudioDecoderFfmpeg.cpp \
+		ffmpeg/VideoDecoderFfmpeg.cpp \
+		ffmpeg/sound_handler_sdl.cpp \
+		ffmpeg/ffmpegNetStreamUtil.cpp 
 
    noinst_HEADERS += \
-		sdl/AudioDecoderFfmpeg.h \
-		sdl/VideoDecoderFfmpeg.h \
-		sdl/sound_handler_sdl.h \
-		sdl/MediaDecoderSdl.h \
-		sdl/MediaParserFfmpeg.h
+		ffmpeg/AudioDecoderFfmpeg.h \
+		ffmpeg/VideoDecoderFfmpeg.h \
+		ffmpeg/sound_handler_sdl.h \
+		ffmpeg/ffmpegNetStreamUtil.h 
 
    libgnashmedia_la_LIBADD += \
-		$(FFMPEG_LIBS)
+		$(FFMPEG_LIBS) \
+		$(SDL_LIBS)
 
    libgnashmedia_la_CPPFLAGS += \
-		$(FFMPEG_CFLAGS)
+		$(FFMPEG_CFLAGS) \
+		$(SDL_CFLAGS)
 endif
 
 if USE_MAD_ENGINE
    libgnashmedia_la_SOURCES += \
-		sdl/MediaDecoderSdl.cpp \
-		sdl/AudioDecoderMad.cpp \
-		sdl/sound_handler_sdl.cpp
+		ffmpeg/MediaDecoderSdl.cpp \
+		ffmpeg/AudioDecoderMad.cpp \
+		ffmpeg/sound_handler_sdl.cpp
 
    noinst_HEADERS += \
-		sdl/MediaDecoderSdl.h \
-		sdl/AudioDecoderMad.h \
-		sdl/sound_handler_sdl.h
+		ffmpeg/MediaDecoderSdl.h \
+		ffmpeg/AudioDecoderMad.h \
+		ffmpeg/sound_handler_sdl.h
 
    libgnashmedia_la_LIBADD += \
-		$(MAD_LIBS)
+		$(MAD_LIBS) 
 
    libgnashmedia_la_CPPFLAGS += \
 		$(MAD_CFLAGS)

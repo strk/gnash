@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.h,v 1.22 2008/01/27 07:18:20 bjacques Exp $
+// $Id: video_stream_def.h,v 1.23 2008/02/22 14:20:49 strk Exp $
 
 #ifndef GNASH_VIDEO_STREAM_DEF_H
 #define GNASH_VIDEO_STREAM_DEF_H
@@ -31,7 +31,13 @@
 #include "swf.h"
 #include "rect.h" // for composition
 #include "ControlTag.h"
-#include "VideoDecoderGst.h"
+
+#ifdef SOUND_GST
+# include "VideoDecoderGst.h"
+#elif defined(USE_FFMPEG)
+# include "VideoDecoderFfmpeg.h"
+#endif
+
 #include "image.h"
 
 #include <map>
@@ -157,7 +163,12 @@ private:
 	/// Elements of this vector are owned by this instance, and will be deleted 
 	/// at instance destruction time.
 	///
+#ifdef SOUND_GST
 	typedef std::vector<GstBuffer*> EmbedFrameVec;
+#elif defined(USE_FFMPEG)
+	typedef std::vector<uint8_t*> EmbedFrameVec;
+#endif
+
 	EmbedFrameVec _video_frames;
 
 	/// Last decoded frame number
@@ -170,7 +181,11 @@ private:
 	boost::uint32_t _height;
 
 	/// The decoder used to decode the video frames
+#ifdef SOUND_GST
 	boost::scoped_ptr<media::VideoDecoderGst> _decoder;
+#elif defined(USE_FFMPEG)
+	boost::scoped_ptr<media::VideoDecoderFfmpeg> _decoder;
+#endif
 };
 
 }	// end namespace gnash

@@ -42,11 +42,10 @@ AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)/backend \
         -I$(top_srcdir)/libgeometry \
 	 	-I$(top_srcdir)/libmedia \
-	 	-I$(top_srcdir)/libmedia/sdl \
-	 	-I$(top_srcdir)/libmedia/gst \
+		-I$(top_srcdir)/libmedia/ffmpeg \
+		-I$(top_srcdir)/libmedia/gst \
        -DLOCALEDIR=\"$(localedir)\" \
 	-DPLUGINSDIR=\"$(pluginsdir)\" \
-	$(GLIB_CFLAGS) \
         $(LIBXML_CFLAGS) \
         $(DMALLOC_CFLAGS) \
 	$(LIRC_CFLAGS) \
@@ -79,7 +78,6 @@ GUI_CPPFLAGS =
 AM_LDFLAGS =  \
 	$(GLIB_LIBS) \
 	$(LIBLTDL) \
-	$(FFMPEG_LIBS) \
 	$(CURL_LIBS) \
 	$(LIBXML_LIBS) \
 	$(INCLTDL) \
@@ -127,19 +125,19 @@ libgnashaqua_ogl_la_LIBADD = \
 endif # HAVE_OPENGL
 endif # BUILD_AQUA_GUI
 
-if USE_SOUND_SDL
 if USE_FFMPEG_ENGINE
 AM_LDFLAGS += $(FFMPEG_LIBS)
-AM_CPPFLAGS += $(FFMPEG_CFLAGS)
+AM_CPPFLAGS += $(FFMPEG_CFLAGS) 
 endif
+
 if USE_MAD_ENGINE
 AM_LDFLAGS += $(MAD_LIBS)
 AM_CPPFLAGS += $(MAD_CFLAGS)
 endif
-endif
 
 if USE_SOUND_GST
 AM_CPPFLAGS += $(GSTREAMER_CFLAGS)
+AM_LDFLAGS += $(GSTREAMER_LIBS) 
 endif
 
 # if USE_GUI_FLTK
@@ -165,8 +163,8 @@ bin_SCRIPTS = gnash
 bin_PROGRAMS = 
 
 gnash: gnash.in
-	$(INSTALL_DATA) $? gnash
-	chmod a+x gnash
+	cp $< $@
+	chmod +x $@
 
 GUI_SRCS = gnash.cpp \
 	gui.cpp gui.h \

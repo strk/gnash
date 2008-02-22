@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.48 2008/01/21 20:55:56 rsavoye Exp $
+# $Id: Makefile.am,v 1.49 2008/02/22 14:20:48 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -32,14 +32,10 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libamf \
 	-I$(top_srcdir)/libltdl \
 	-I$(top_srcdir)/libmedia \
-	-I$(top_srcdir)/libmedia/gst \
-	-I$(top_srcdir)/libmedia/sdl \
 	-I$(top_srcdir)	\
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
 	$(GLIB_CFLAGS) \
-	$(FFMPEG_CFLAGS) \
-	$(GSTREAMER_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(LIBXML_CFLAGS) \
 	$(NULL)
@@ -71,7 +67,7 @@ libgnashasobjs_la_SOURCES = \
 	Math.cpp	\
 	Microphone.cpp	\
 	Mouse.cpp	\
-	NetConnection.cpp\
+	NetConnection.cpp \
 	NetStream.cpp	\
 	Number.cpp	\
 	Object.cpp	\
@@ -145,14 +141,19 @@ libgnashasobjs_la_LIBADD = \
 	$(LIBXML_LIBS)
 
 if USE_FFMPEG_ENGINE
-libgnashasobjs_la_SOURCES += NetStreamFfmpeg.cpp SoundFfmpeg.cpp
-AM_CPPFLAGS += $(FFMPEG_CFLAGS)
-# libgnashasobjs_la_LIBADD += $(FFMPEG_LIBS)
+libgnashasobjs_la_SOURCES += NetStreamFfmpeg.cpp \
+				SoundFfmpeg.cpp
+AM_CPPFLAGS += $(FFMPEG_CFLAGS) \
+		$(SDL_CFLAGS) \
+		-I$(top_srcdir)/libmedia/ffmpeg
+libgnashasobjs_la_LIBADD += $(FFMPEG_LIBS) \
+				$(SDL_LIBS)
 endif
 
 if USE_SOUND_GST
 libgnashasobjs_la_SOURCES += NetStreamGst.cpp SoundGst.cpp
-AM_CPPFLAGS += $(GSTREAMER_CFLAGS)
+AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
+		-I$(top_srcdir)/libmedia/gst
 libgnashasobjs_la_LIBADD += $(GSTREAMER_LIBS)
 endif
 

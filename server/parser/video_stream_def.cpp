@@ -16,14 +16,19 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.39 2008/02/20 15:54:59 bjacques Exp $
+// $Id: video_stream_def.cpp,v 1.40 2008/02/22 14:20:49 strk Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
 #include "render.h"
 #include "BitsReader.h"
 
-#include "VideoDecoderGst.h"
+#ifdef SOUND_GST
+# include "VideoDecoderGst.h"
+#elif defined(USE_FFMPEG)
+# include "VideoDecoderFfmpeg.h"
+#endif
+
 #include <boost/bind.hpp>
 
 
@@ -39,22 +44,31 @@ video_stream_definition::video_stream_definition(boost::uint16_t char_id)
 {
 }
 
+
+#ifdef SOUND_GST
 void myunref(GstBuffer* buf)
 {
 	gst_buffer_unref(buf);
 }
+#endif
 
 
 video_stream_definition::~video_stream_definition()
 {
+#ifdef SOUND_GST
 	std::for_each(_video_frames.begin(), _video_frames.end(), myunref);
+#elif defined(USE_FFMPEG)
+	for ( int32_t size = _video_frames.size()-1; size >= 0; size-- ) {
+	  	delete _video_frames[size];
+	}
+	_video_frames.clear();
+#endif
 }
 
 
 void
 video_stream_definition::readDefineVideoStream(stream* in, SWF::tag_type tag, movie_definition* m)
 {
-
 	// Character ID has been read already, and was loaded in the constructor
 
 	assert(tag == SWF::DEFINEVIDEOSTREAM);
@@ -62,7 +76,7 @@ video_stream_definition::readDefineVideoStream(stream* in, SWF::tag_type tag, mo
 
 	m_start_frame = m->get_loading_frame();
 
-	// numFrames:2 width:2 height:2 flags:1 codec:1
+	// numFrames:2 width:2 height:2 flags:1
 	in->ensureBytes(8);
 
 	m_num_frames = in->read_u16();
@@ -89,13 +103,18 @@ video_stream_definition::readDefineVideoStream(stream* in, SWF::tag_type tag, mo
 		return;
 	}
 
+#ifdef SOUND_GST
 	_decoder.reset( new media::VideoDecoderGst(m_codec_id, _width, _height) );
-
+#elif defined(USE_FFMPEG)
+	_decoder.reset( new media::VideoDecoderFfmpeg() );
+#endif
 }
 
 void
 video_stream_definition::readDefineVideoFrame(stream* in, SWF::tag_type tag, movie_definition* m)
 {
+#ifdef SOUND_GST
+
 	// Character ID has been read already, and was loaded in the constructor
 
 	assert(tag == SWF::VIDEOFRAME);
@@ -129,6 +148,8 @@ video_stream_definition::readDefineVideoFrame(stream* in, SWF::tag_type tag, mov
 	in->read((char*)GST_BUFFER_DATA(buffer), dataSize);
 
 	_video_frames.push_back(buffer);
+
+#endif
 }
 
 
@@ -139,15 +160,21 @@ video_stream_definition::create_character_instance(character* parent, int id)
 	return ch;
 }
 
+#ifdef SOUND_GST
+
 bool
 has_frame_number(GstBuffer* buf, boost::uint32_t frameNumber)
 {
 	return GST_BUFFER_OFFSET(buf) == frameNumber;
 }
 
+#endif
+
 std::auto_ptr<image::image_base>
 video_stream_definition::get_frame_data(boost::uint32_t frameNum)
 {
+#ifdef SOUND_GST
+
 	if (_video_frames.empty()) {
 		return std::auto_ptr<image::image_base>();
 	}
@@ -196,6 +223,12 @@ video_stream_definition::get_frame_data(boost::uint32_t frameNum)
 	}
 
 	return std::auto_ptr<image::image_base>(buffer.release());
+
+#elif defined(USE_FFMPEG)
+
+	return std::auto_ptr<image::image_base>( NULL );
+
+#endif
 }
 
 

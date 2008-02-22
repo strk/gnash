@@ -36,9 +36,7 @@ AM_LDFLAGS = \
 	$(LIBLTDL) \
         $(MYSQL_LIBS) \
 	$(LIBXML_LIBS) \
-	$(FFMPEG_LIBS) \
 	$(CURL_LIBS) \
-	$(INTLLIBS) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)
@@ -56,8 +54,6 @@ AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)/server/parser \
         -I$(top_srcdir)/server/vm \
         -I$(top_srcdir)/libmedia \
-        -I$(top_srcdir)/libmedia/sdl \
-        -I$(top_srcdir)/libmedia/gst \
         -DLOCALEDIR=\"$(localedir)\" \
 	$(PTHREAD_CFLAGS) \
 	$(BOOST_CFLAGS) \
@@ -66,7 +62,8 @@ AM_CPPFLAGS = -I.. \
 	$(NULL)
 
 if USE_FFMPEG_ENGINE
- AM_CPPFLAGS += $(FFMPEG_INCLS) 
+ AM_CPPFLAGS += $(FFMPEG_CFLAGS) \
+		-I$(top_srcdir)/libmedia/ffmpeg 
  GNASH_LIBS += $(FFMPEG_LIBS)
 endif
 
@@ -76,6 +73,8 @@ if USE_MAD_ENGINE
 endif
 
 #if USE_SOUND_GST
+ AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
+		-I$(top_srcdir)/libmedia/gst
  GNASH_LIBS += $(GLIB_LIBS) $(GSTREAMER_LIBS)
 #endif
 
@@ -86,14 +85,14 @@ gprocessor_SOURCES = processor.cpp
 gprocessor_CPPFLAGS = $(AM_CPPFLAGS)
 # export our symbols so they can be used by Gnash plugins
 gprocessor_LDFLAGS = -export-dynamic $(LIBLTDL)
-gprocessor_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
+gprocessor_LDADD = $(GNASH_LIBS) 
 #gprocessor_DEPENDENCIES = 
 
 dumpshm_SOURCES = dumpshm.cpp
-dumpshm_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
+dumpshm_LDADD = $(GNASH_LIBS)
 
 soldumper_SOURCES = soldumper.cpp
-soldumper_LDADD = $(GNASH_LIBS) $(AM_LDFLAGS)
+soldumper_LDADD = $(GNASH_LIBS)
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

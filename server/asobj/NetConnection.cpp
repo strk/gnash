@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetConnection.cpp,v 1.57 2008/02/19 19:20:54 bwy Exp $ */
+/* $Id: NetConnection.cpp,v 1.58 2008/02/22 14:20:48 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -50,14 +50,79 @@ static as_value netconnection_new(const fn_call& fn);
 
 NetConnection::NetConnection()
 	:
-	as_object(getNetConnectionInterface())
+	as_object(getNetConnectionInterface()),
+	_loader()
 {
 	attachProperties();
 }
 
+
 NetConnection::~NetConnection()
 {
 }
+
+
+/*public*/
+bool NetConnection::openConnection(const std::string& url)
+{
+  // if already running there is no need to setup things again
+  if ( _loader.get() ) {
+    log_debug("NetConnection::openConnection() called when already connected to a stream. Checking if the existing connection can be used.");
+    std::string newurl;
+    if (_prefixUrl.size() > 0) {
+      newurl += _prefixUrl + "/" + url;
+    } else {
+      newurl += url;
+    }
+    if (newurl.compare(_completeUrl) == 0) {
+      return true;
+    } else { 
+      return false;
+    }
+  }
+
+  if ( _prefixUrl.size() > 0 ) {
+    _completeUrl += _prefixUrl + "/" + url;
+  } else {
+    _completeUrl += url;
+  }
+
+  URL uri( _completeUrl, get_base_url() );
+
+  std::string uriStr( uri.str() );
+  assert( uriStr.find( "://" ) != std::string::npos );
+
+  // Check if we're allowed to open url
+  if ( ! URLAccessManager::allow( uri ) ) {
+    log_security( _("Gnash is not allowed to open this url: %s"), uriStr.c_str() );
+    return false;
+  }
+
+  log_security( _("Connecting to movie: %s"), uriStr.c_str() );
+
+  _loader.reset( new LoadThread() );
+
+  if ( ! _loader->setStream( std::auto_ptr<tu_file>(StreamProvider::getDefaultInstance().getStream( uri ) ) ) ) {
+    log_error( _("Gnash could not open this url: %s"), uriStr.c_str() );
+    _loader.reset();
+
+    return false;
+  }
+
+  log_debug( _("Connection established to movie: %s"), uriStr.c_str() );
+
+  return true;
+}
+
+
+/*public*/
+bool
+NetConnection::eof()
+{
+	if (!_loader.get()) return true; // @@ correct ?
+	return _loader->eof();
+}
+
 
 /*public*/
 std::string NetConnection::validateURL(const std::string& url)
@@ -85,7 +150,7 @@ std::string NetConnection::validateURL(const std::string& url)
 	return uriStr;
 }
 
-/*public*/
+/*private*/
 void
 NetConnection::addToURL(const std::string& url)
 {
@@ -97,6 +162,82 @@ NetConnection::addToURL(const std::string& url)
 	if (_prefixUrl.size() > 0) return;
 
 	_prefixUrl += url;
+}
+
+
+/*public*/
+size_t
+NetConnection::read( void *dst, size_t bytes )
+{
+  if ( ! _loader.get() ) {
+    return 0;
+  }
+
+  return _loader->read( dst, bytes );
+}
+
+
+/*public*/
+bool
+NetConnection::seek( size_t pos )
+{
+  if ( ! _loader.get() ) {
+    return false;
+  }
+
+  return _loader->seek( pos );
+}
+
+
+/*public*/
+size_t
+NetConnection::tell()
+{
+	if (!_loader.get()) return 0; // @@ correct ?
+	return _loader->tell();
+}
+
+
+/*public*/
+long
+NetConnection::getBytesLoaded()
+{
+	if (!_loader.get()) return 0; // @@ correct ?
+	return _loader->getBytesLoaded();
+}
+
+
+/*public*/
+long
+NetConnection::getBytesTotal()
+{
+	if (!_loader.get()) return 0; // @@ correct ?
+	return _loader->getBytesTotal();
+}
+
+
+/*public*/
+bool
+NetConnection::loadCompleted()
+{
+  if ( ! _loader.get() ) {
+    return false;
+  }
+
+  return _loader->completed();
+}
+
+
+std::auto_ptr<FLVParser>
+NetConnection::getConnectedParser() const
+{
+  std::auto_ptr<FLVParser> ret;
+
+  if ( _loader.get() ) {
+    ret.reset( new FLVParser(*_loader) );
+  }
+
+  return ret;
 }
 
 

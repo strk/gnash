@@ -37,13 +37,10 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libgeometry \
 	-I$(top_srcdir)/libmedia \
-	-I$(top_srcdir)/libmedia/sdl \
-	-I$(top_srcdir)/libmedia/gst \
 	-I$(top_srcdir)	\
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
 	$(GLIB_CFLAGS) \
-	$(GSTREAMER_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(LIBXML_CFLAGS) \
 	$(FREETYPE2_CFLAGS) \
@@ -202,10 +199,15 @@ libgnashserver_la_LIBADD = \
 	$(NULL)
 
 if USE_SOUND_GST
-AM_CPPFLAGS += $(GSTREAMER_CFLAGS)
+AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
+		-I$(top_srcdir)/libmedia/gst
 libgnashserver_la_LIBADD += $(GSTREAMER_LIBS)
 endif
 
+if USE_FFMPEG_ENGINE
+AM_CPPFLAGS += $(FFMPEG_CFLAGS) \
+		-I$(top_srcdir)/libmedia/ffmpeg
+endif
 
 # Enable building the Flash debugger
 if DEBUGGER

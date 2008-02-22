@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.h,v 1.38 2008/01/21 20:55:56 rsavoye Exp $ */
+/* $Id: NetConnection.h,v 1.39 2008/02/22 14:20:48 strk Exp $ */
 
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__
@@ -80,6 +80,83 @@ public:
 	/// Register the "NetConnection" constructor to the given global object
 	static void registerConstructor(as_object& global);
 
+	/// Open a connection to stream FLV files.
+	//
+	/// If already connected an error is raised and false
+	/// is returned. Otherwise, a connection is attempted
+	/// using a separate thread that starts loading data
+	/// caching it.
+	///
+	/// @param url
+	///	An url portion to append to the base url (???)
+	///
+	/// @return true on success, false on error.
+	///
+	/// @note Older Flash movies can only take a NULL value as
+	/// the parameter, which therefor only connects to the localhost using
+	/// RTMP. Newer Flash movies have a parameter to connect which is a
+	/// URL string like rtmp://foobar.com/videos/bar.flv
+	///
+	bool openConnection(const std::string& url);
+
+	/// Put read pointer at given position
+	//
+	/// If the position has not been loaded yet
+	/// this call blocks. If not connected false
+	/// is returned w/out blocking.
+	///
+	bool seek(size_t pos);
+
+	/// Read 'bytes' bytes into the given buffer.
+	//
+	/// If not enough bytes have been loaded yet
+	/// this call blocks. If not connected false
+	/// is returned w/out blocking.
+	///
+	/// Return number of actually read bytes
+	///
+	size_t read(void *dst, size_t bytes);
+
+	/// Return true if EOF has been reached
+	//
+	/// This call never blocks.
+	/// If not connected, true is returned (is this correct behaviour?)
+	///
+	bool eof();
+
+	/// Report global position within the file
+	//
+	/// This call never blocks.
+	/// If not connected, 0 is returned (is this correct behaviour?)
+	///
+	size_t tell();
+
+	/// Returns the number of bytes cached
+	//
+	/// This call never blocks.
+	/// If not connected, 0 is returned (is this correct behaviour?)
+	///
+	long getBytesLoaded();
+
+	/// Returns the total size of the file
+	//
+	/// This call never blocks.
+	/// If not connected, 0 is returned (is this correct behaviour?)
+	///
+	long getBytesTotal();
+
+	/// Return an FLVParser using our LoadThread for input
+	//
+	/// If not connected, a NULL auto_ptr is returned.
+	///
+	std::auto_ptr<FLVParser> getConnectedParser() const;
+
+	/// Returns whether the load is complete
+	//
+	/// This call never blocks.
+	///
+	bool loadCompleted();
+
 private:
 
 	/// Extend the URL to be used for playing
@@ -87,6 +164,12 @@ private:
 
 	/// the url prefix optionally passed to connect()
 	std::string _prefixUrl;
+
+	/// the complete url of the file
+	std::string _completeUrl;
+
+	/// The file/stream loader thread and interface
+	std::auto_ptr<LoadThread> _loader;
 
 	/// Attach ActionScript instance properties
 	void attachProperties();
