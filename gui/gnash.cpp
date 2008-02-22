@@ -1,3 +1,4 @@
+
 // gnash.cpp:  Main routine for top-level flash player, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
@@ -177,7 +178,7 @@ static void version_and_copyright()
 {
     printf (_(
 "Gnash " VERSION "\n"
-"Copyright (C) 2005-2007 Free Software Foundation, Inc.\n"
+"Copyright (C) 2005-2008 Free Software Foundation, Inc.\n"
 "Gnash comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute copies of Gnash under the terms of the GNU General\n"
 "Public License.  For more information, see the file named COPYING.\n"
