@@ -1,5 +1,8 @@
 2008-02-22 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: look for gst_install_plugins_supported to check if
+	  automatic install of missing plugins is supported.
+	  See bug http://savannah.gnu.org/bugs/?22386
 	* testsuite/libamf.all/test_sol.cpp: use getSOLSafeDir for writing
 	  SOL files.
 	* Makefile.am: don't list 'doc' subdir twice in DIST_SUBDIRS.
