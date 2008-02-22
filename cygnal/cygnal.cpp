@@ -140,11 +140,13 @@ main(int argc, char *argv[])
 
     crcfile.loadFiles();
 
+#if 0 // this should be automatic
     if (crcfile.getDebugLog().size()) {
 	dbglogfile.openLog(crcfile.getDebugLog());
     } else {
 	dbglogfile.openLog("/tmp/cygnal-dbg.log");
     }
+#endif
     
     if (crcfile.verbosityLevel() > 0) {
         dbglogfile.setVerbosity(crcfile.verbosityLevel());

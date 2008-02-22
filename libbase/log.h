@@ -84,18 +84,6 @@ public:
     ///
     void log(const std::string& msg);
     
-    //fileState getState () { return _state; }
-
-    //const std::string& getEntry() { return _logentry; }
-    
-    /// Open the specified file to write logs on disk
-    //
-    /// Locks _ioMutex to prevent race conditions accessing _outstream
-    ///
-    /// @return true on success, false on failure
-    ///
-    bool openLog(const std::string& filespec);
-
     /// Remove the log file
     //
     /// Does NOT lock _ioMutex (should it?)
@@ -154,6 +142,26 @@ public:
     }
     
 private:
+    
+    /// Open the specified file to write logs on disk
+    //
+    /// Locks _ioMutex to prevent race conditions accessing _outstream
+    ///
+    /// @return true on success, false on failure
+    ///
+    bool openLog(const std::string& filespec);
+
+    /// \brief
+    /// Open the RcInitFile-specified log file if log write
+    /// is requested. 
+    //
+    /// This method is called before any attempt to write is made.
+    /// It will return true if the file was opened, false if wasn't
+    /// (either not requested or error).
+    ///
+    /// On error, will print a message on stderr
+    ///
+    bool openLogIfNeeded();
 
     // Use getDefaultInstance for getting the singleton
     LogFile ();
@@ -182,8 +190,6 @@ private:
     bool		 _write;
 
     std::string		 _filespec;
-
-    std::string		 _logentry;
 
     /// For the ostream << operator
     friend std::ostream & operator << (std::ostream &os, LogFile& e);

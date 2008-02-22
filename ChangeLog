@@ -1,3 +1,10 @@
+2008-02-22 Sandro Santilli <strk@keybit.net>
+
+	* cygnal/cygnal.cpp: don't call LogFile::openLog explicitly,
+	  it should be done automatically now.
+	* libbase/log.{cpp,h}: don't open a log file if not needed
+	  (open on demand).
+
 2008-02-22  Rob Savoye  <rob@ute.welcomehome.org>
 
 	* libamf/amf.cpp: Eliminate warnings.

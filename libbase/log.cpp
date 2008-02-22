@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: log.cpp,v 1.63 2008/02/20 09:38:54 bwy Exp $ */
+/* $Id: log.cpp,v 1.64 2008/02/22 11:24:37 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -410,20 +410,11 @@ LogFile::LogFile ()
 	:
 	_state(CLOSED),
 	_stamp(true),
-	_write(true)
+	_write(false)
 {
-    std::string loadfile;
-
-
     RcInitFile& rcfile = RcInitFile::getDefaultInstance();
-    //rcfile.dump();
     _write = rcfile.useWriteLog();
-    loadfile = rcfile.getDebugLog();
-    if ( loadfile.empty() ) loadfile = DEFAULT_LOGFILE;
 
-    // TODO: expand ~ to getenv("HOME") !!
-
-    openLog(loadfile);
 }
 
 LogFile::~LogFile()
@@ -431,21 +422,42 @@ LogFile::~LogFile()
 	if (_state == OPEN) closeLog();
 }
 
+bool
+LogFile::openLogIfNeeded ()
+{
+    if (_state != CLOSED) return true;
+    if (!_write) return false;
+
+    RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+
+    std::string loadfile = rcfile.getDebugLog();
+    if ( loadfile.empty() ) loadfile = DEFAULT_LOGFILE;
+
+    // TODO: expand ~ to getenv("HOME") !!
+
+    return openLog(loadfile);
+}
 
 bool
 LogFile::openLog (const std::string& filespec)
 {
-    boost::mutex::scoped_lock lock(_ioMutex);
-    if (_state == OPEN) {
+    // NOTE:
+    // don't need to lock the mutex here, as this method
+    // is intended to be called only by openLogIfNeeded,
+    // which in turn is called by operator<< which is called
+    // by the public log_xxx functions that log themselves
+
+    if (_state != CLOSED) {
+	cout << "Closing previously opened stream" << endl;
         _outstream.close ();
         _state = CLOSED;
     }
 
     // Append, don't truncate, the log file
-    _outstream.open (filespec.c_str(), std::ios::app); // ios::out
-    if( ! _outstream ) {
+    _outstream.open (filespec.c_str(), std::ios::app|std::ios::out); // ios::out
+    if( _outstream.fail() ) {
 	// Can't use log_error here...
-        std::cerr << "ERROR: can't open debug log file " << filespec << " for appending." << std::endl;
+        cout << "ERROR: can't open debug log file " << filespec << " for appending." << endl;
         return false;
     }       
 
@@ -480,7 +492,6 @@ LogFile::removeLog (void)
     // Ignore the error, we don't care
     unlink(_filespec.c_str());
     _filespec.clear();
-    _logentry.clear();
 
     return true;
 }
@@ -492,23 +503,26 @@ LogFile::removeLog (void)
 LogFile&
 LogFile::operator << (const std::string &s)
 {
+    // NOTE: _state will be == INPROGRESS right
 
-    _logentry = timestamp();
-    _logentry += ": ";
-
-    if (_stamp == true && (_state == IDLE || _state == OPEN))
+    if (_stamp == true && (_state != INPROGRESS) )
     {
+	std::string ts = timestamp();
+
+        if (_verbose) cout << ts << ": " << s;
+        if (openLogIfNeeded())
+        {
+		_outstream << ts << ": " << s;
+	}
         _state = INPROGRESS;
-        if (_verbose) cout << _logentry  << s;
-        if (_write) _outstream << _logentry << s;
     }
     else
     {
-        if (_verbose) cout  << s;
-        if (_write) _outstream << s;   
+        if (_verbose) cout << s;
+        if (openLogIfNeeded()) {
+		_outstream << s;   
+	}
     }
-
-    _logentry.append(s);
 
     return *this;
 }
@@ -520,7 +534,7 @@ LogFile::operator << (std::ostream & (&)(std::ostream &))
 
     if (_verbose) cout << endl;
 
-    if (_write)
+    if (openLogIfNeeded())
     {
         _outstream << endl;;
         _outstream.flush();
