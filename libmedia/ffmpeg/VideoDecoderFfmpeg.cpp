@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: VideoDecoderFfmpeg.cpp,v 1.2 2008/02/22 14:20:45 strk Exp $
+// $Id: VideoDecoderFfmpeg.cpp,v 1.3 2008/02/23 18:12:51 bjacques Exp $
 
 #include "VideoDecoderFfmpeg.h"
 
@@ -27,32 +27,15 @@ extern "C" {
 }
 #endif
 #include <boost/scoped_array.hpp>
+#include <boost/foreach.hpp>
 
 namespace gnash {
 namespace media {
 	
-VideoDecoderFfmpeg::VideoDecoderFfmpeg ()
+VideoDecoderFfmpeg::VideoDecoderFfmpeg(videoCodecType format, int width,int height)
 	:
 	_videoCodec(NULL),
 	_videoCodecCtx(NULL)
-{}
-
-VideoDecoderFfmpeg::~VideoDecoderFfmpeg()
-{
-	if (_videoCodecCtx)
-	{
-		avcodec_close(_videoCodecCtx);
-		av_free(_videoCodecCtx);
-	}
-}
-
-bool VideoDecoderFfmpeg::setup(
-		int width,
-		int height,
-		int /*deblocking*/,
-		bool /*smoothing*/,
-		videoCodecType format, // should this argument be of codecType type ?
-		int /*outputFormat*/)
 {
 	// Init the avdecoder-decoder
 	avcodec_init();
@@ -76,34 +59,44 @@ bool VideoDecoderFfmpeg::setup(
 		default:
 			log_error(_("Unsupported video codec %d"),
 						static_cast<int>(format));
-			return false;
+			return;
 	}
 
-	_videoCodec = avcodec_find_decoder(static_cast<CodecID>(codec_id));
+	_videoCodec = avcodec_find_decoder(static_cast<CodecID>(codec_id)); // WTF?
 
 	if (!_videoCodec) {
 		log_error(_("libavcodec can't decode the current video format"));
-		return false;
+		return;
 	}
 
 	_videoCodecCtx = avcodec_alloc_context();
 	if (!_videoCodecCtx) {
 		log_error(_("libavcodec couldn't allocate context"));
-		return false;
+		return;
 	}
 
 	int ret = avcodec_open(_videoCodecCtx, _videoCodec);
 	if (ret < 0) {
 		log_error(_("libavcodec failed to initialize codec"));
-		return false;
+		return;
 	}
 	_videoCodecCtx->width = width;
 	_videoCodecCtx->height = height;
 
 	assert(_videoCodecCtx->width > 0);
 	assert(_videoCodecCtx->height > 0);
-	return true;
+	return;
 }
+
+VideoDecoderFfmpeg::~VideoDecoderFfmpeg()
+{
+	if (_videoCodecCtx)
+	{
+		avcodec_close(_videoCodecCtx);
+		av_free(_videoCodecCtx);
+	}
+}
+
 
 bool VideoDecoderFfmpeg::setup(VideoInfo* info)
 {
@@ -368,6 +361,45 @@ VideoDecoderFfmpeg::decodeToImage(boost::uint8_t* input, boost::uint32_t inputSi
 	delete [] decodedData;
 	return ret;
 	
+}
+
+
+void
+VideoDecoderFfmpeg::push(const EncodedVideoFrame& buffer)
+{
+  _video_frames.push_back(&buffer);
+
+}
+
+std::auto_ptr<image::rgb>
+VideoDecoderFfmpeg::pop()
+{
+  std::auto_ptr<image::rgb> ret;
+  
+  BOOST_FOREACH(const EncodedVideoFrame* frame, _video_frames) {    
+    size_t output_size = 0;
+    boost::uint8_t* decoded_data = decode(frame->data(), frame->dataSize(),
+                                          output_size);
+    if (!decoded_data || !output_size) {
+      assert(!output_size && !decoded_data);
+      continue; 
+    }
+    
+    image::rgb* newimg = new image::rgb(decoded_data, _videoCodecCtx->width,
+      _videoCodecCtx->height, (_videoCodecCtx->width * 3 + 3) & ~3);
+
+    ret.reset(newimg);
+  }
+  
+  _video_frames.clear();
+
+  return ret;
+}
+  
+bool
+VideoDecoderFfmpeg::peek()
+{
+  return (!_video_frames.empty());
 }
 
 } // gnash.media namespace 

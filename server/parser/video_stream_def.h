@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.h,v 1.23 2008/02/22 14:20:49 strk Exp $
+// $Id: video_stream_def.h,v 1.24 2008/02/23 18:12:52 bjacques Exp $
 
 #ifndef GNASH_VIDEO_STREAM_DEF_H
 #define GNASH_VIDEO_STREAM_DEF_H
@@ -31,6 +31,7 @@
 #include "swf.h"
 #include "rect.h" // for composition
 #include "ControlTag.h"
+#include "VideoDecoder.h"
 
 #ifdef SOUND_GST
 # include "VideoDecoderGst.h"
@@ -163,11 +164,7 @@ private:
 	/// Elements of this vector are owned by this instance, and will be deleted 
 	/// at instance destruction time.
 	///
-#ifdef SOUND_GST
-	typedef std::vector<GstBuffer*> EmbedFrameVec;
-#elif defined(USE_FFMPEG)
-	typedef std::vector<uint8_t*> EmbedFrameVec;
-#endif
+	typedef std::vector<media::EncodedVideoFrame*> EmbedFrameVec;
 
 	EmbedFrameVec _video_frames;
 

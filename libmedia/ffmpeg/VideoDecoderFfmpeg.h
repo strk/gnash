@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderFfmpeg.h,v 1.2 2008/02/22 14:20:45 strk Exp $
+// $Id: VideoDecoderFfmpeg.h,v 1.3 2008/02/23 18:12:51 bjacques Exp $
 
 #ifndef __VIDEODECODERFFMPEG_H__
 #define __VIDEODECODERFFMPEG_H__
@@ -40,31 +40,32 @@ namespace media {
 class VideoDecoderFfmpeg : public VideoDecoder {
 	
 public:
-	VideoDecoderFfmpeg();
+	VideoDecoderFfmpeg(videoCodecType format, int width, int height);
 	~VideoDecoderFfmpeg();
 
 	virtual unsigned getPaddingBytes() const { return FF_INPUT_BUFFER_PADDING_SIZE; }
 
 	bool setup(VideoInfo* info);
 
-	bool setup(
-		int /*width*/,
-		int /*height*/,
-		int /*deblocking*/,
-		bool /*smoothing*/,
-		videoCodecType /*format*/,
-		int /*outputFormat*/);
 
 	boost::uint8_t* decode(boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize);
 
 	std::auto_ptr<image::image_base> decodeToImage(boost::uint8_t* /*input*/, boost::uint32_t /*inputSize*/);
 
 	static boost::uint8_t* convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame);
+	
+	
+  void push(const EncodedVideoFrame& buffer);
+
+  std::auto_ptr<image::rgb> pop();
+  
+  bool peek();
 
 private:
 
 	AVCodec* _videoCodec;
 	AVCodecContext* _videoCodecCtx;
+	std::vector<const EncodedVideoFrame*> _video_frames;
 
 };
 	

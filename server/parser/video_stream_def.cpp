@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.40 2008/02/22 14:20:49 strk Exp $
+// $Id: video_stream_def.cpp,v 1.41 2008/02/23 18:12:52 bjacques Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -44,25 +44,10 @@ video_stream_definition::video_stream_definition(boost::uint16_t char_id)
 {
 }
 
-
-#ifdef SOUND_GST
-void myunref(GstBuffer* buf)
-{
-	gst_buffer_unref(buf);
-}
-#endif
-
-
 video_stream_definition::~video_stream_definition()
 {
-#ifdef SOUND_GST
-	std::for_each(_video_frames.begin(), _video_frames.end(), myunref);
-#elif defined(USE_FFMPEG)
-	for ( int32_t size = _video_frames.size()-1; size >= 0; size-- ) {
-	  	delete _video_frames[size];
-	}
-	_video_frames.clear();
-#endif
+	std::for_each(_video_frames.begin(), _video_frames.end(),
+	  boost::checked_deleter<media::EncodedVideoFrame>());
 }
 
 
@@ -104,17 +89,17 @@ video_stream_definition::readDefineVideoStream(stream* in, SWF::tag_type tag, mo
 	}
 
 #ifdef SOUND_GST
-	_decoder.reset( new media::VideoDecoderGst(m_codec_id, _width, _height) );
+# define VIDEO_DECODER_NAME VideoDecoderGst
 #elif defined(USE_FFMPEG)
-	_decoder.reset( new media::VideoDecoderFfmpeg() );
+# define VIDEO_DECODER_NAME VideoDecoderFfmpeg
 #endif
+	_decoder.reset( new media::VIDEO_DECODER_NAME(m_codec_id, _width, _height) );
+#undef VIDEO_DECODER_NAME
 }
 
 void
 video_stream_definition::readDefineVideoFrame(stream* in, SWF::tag_type tag, movie_definition* m)
 {
-#ifdef SOUND_GST
-
 	// Character ID has been read already, and was loaded in the constructor
 
 	assert(tag == SWF::VIDEOFRAME);
@@ -130,26 +115,17 @@ video_stream_definition::readDefineVideoFrame(stream* in, SWF::tag_type tag, mov
 	}
 
 	unsigned int dataSize = in->get_tag_end_position() - in->get_position();
-
-	GstBuffer* buffer = gst_buffer_new_and_alloc(dataSize+8);
-	memset(GST_BUFFER_DATA(buffer)+dataSize, 0, 8);
-	GST_BUFFER_SIZE (buffer) = dataSize;
-
-	if (!buffer) {
-		log_error(_("Failed to allocate a buffer of size %d advertised by SWF."),
-		dataSize);
-		return;
-	}
 	
-	GST_BUFFER_OFFSET(buffer) = frameNum;
-	GST_BUFFER_TIMESTAMP(buffer) = GST_CLOCK_TIME_NONE;
-	GST_BUFFER_DURATION(buffer) = GST_CLOCK_TIME_NONE;
+  uint8_t* buffer = new uint8_t[dataSize + 8]; // FIXME: catch bad_alloc
+  
+  size_t bytesread = in->read((char*)buffer, dataSize);
+  memset(buffer+bytesread, 0, 8);
+  
+  using namespace media;
+  
+  EncodedVideoFrame* frame = new EncodedVideoFrame(buffer, dataSize, frameNum);
 
-	in->read((char*)GST_BUFFER_DATA(buffer), dataSize);
-
-	_video_frames.push_back(buffer);
-
-#endif
+	_video_frames.push_back(frame);
 }
 
 
@@ -160,21 +136,15 @@ video_stream_definition::create_character_instance(character* parent, int id)
 	return ch;
 }
 
-#ifdef SOUND_GST
-
 bool
-has_frame_number(GstBuffer* buf, boost::uint32_t frameNumber)
+has_frame_number(media::EncodedVideoFrame* frame, boost::uint32_t frameNumber)
 {
-	return GST_BUFFER_OFFSET(buf) == frameNumber;
+	return frame->frameNum() == frameNumber;
 }
-
-#endif
 
 std::auto_ptr<image::image_base>
 video_stream_definition::get_frame_data(boost::uint32_t frameNum)
 {
-#ifdef SOUND_GST
-
 	if (_video_frames.empty()) {
 		return std::auto_ptr<image::image_base>();
 	}
@@ -210,25 +180,18 @@ video_stream_definition::get_frame_data(boost::uint32_t frameNum)
 			return std::auto_ptr<image::image_base>();
 		}
 
-		gst_buffer_ref(*it); // make sure gstreamer doesn't delete the buffer.
-		_last_decoded_frame = GST_BUFFER_OFFSET(*it);
-		_decoder->pushRawFrame(*it);	  
+		_last_decoded_frame = (*it)->frameNum();
+		_decoder->push(*(*it));	  
 	}
 
-	std::auto_ptr<media::gnashGstBuffer> buffer = _decoder->popDecodedFrame();
+	std::auto_ptr<image::rgb> buffer = _decoder->pop();
 
 	// If more data has arrived, replace the buffer with the next frame.
 	while (_decoder->peek()) {
-		buffer = _decoder->popDecodedFrame();
+		buffer = _decoder->pop();
 	}
 
 	return std::auto_ptr<image::image_base>(buffer.release());
-
-#elif defined(USE_FFMPEG)
-
-	return std::auto_ptr<image::image_base>( NULL );
-
-#endif
 }
 
 

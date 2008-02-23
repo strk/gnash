@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderGst.h,v 1.13 2008/01/29 05:18:33 bjacques Exp $
+// $Id: VideoDecoderGst.h,v 1.14 2008/02/23 18:12:51 bjacques Exp $
 
 #ifndef __VIDEODECODERGST_H__
 #define __VIDEODECODERGST_H__
@@ -30,6 +30,7 @@
 #include <gst/gst.h>
 #include "log.h"
 #include "MediaParser.h"
+#include "VideoDecoder.h"
 
 
 namespace gnash {
@@ -64,35 +65,22 @@ private:
 };
 
 
-class VideoDecoderGst
+class VideoDecoderGst : public VideoDecoder
 {
 public:
-
   VideoDecoderGst(videoCodecType codec_type, int width, int height);
   ~VideoDecoderGst();
+
+  void push(const EncodedVideoFrame& buffer);
+
+  std::auto_ptr<image::rgb> pop();
   
-  void pushRawFrame(GstBuffer* buffer);
-  
-  /// Will block
-  std::auto_ptr<gnashGstBuffer> popDecodedFrame();
-  
-  /// Returns true if there is a decoded frame ready to be popped.
   bool peek();
-  
-  /// Clears the pipeline so that the stream can start from scratch.
-  void reset();
-  
+
+private:  
   void checkMessages();
-  
-  static void
-  decodebin_newpad_cb(GstElement* decodebin, GstPad* pad,
-                      gboolean last, gpointer user_data);
-  static void
-  decodebin_unknown_cb(GstElement* decodebin, GstPad* pad,
-                      gboolean last, gpointer user_data);
-  
   void handleMessage(GstMessage* message);
-private:
+
   VideoDecoderGst();
   VideoDecoderGst(const gnash::media::VideoDecoderGst&);
 

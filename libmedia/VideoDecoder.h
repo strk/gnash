@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoder.h,v 1.11 2008/01/21 23:10:14 rsavoye Exp $
+// $Id: VideoDecoder.h,v 1.12 2008/02/23 18:12:51 bjacques Exp $
 
 #ifndef __VIDEODECODER_H__
 #define __VIDEODECODER_H__
@@ -27,91 +27,77 @@
 namespace gnash {
 namespace media {
 
-/// Video decoding base class.
-class VideoDecoder {
-	
+class EncodedVideoFrame;
+
+/// \brief Abstract base class for embedded video decoders.
+///
+/// This very simple design allows, but does not require does not require,
+/// the use of threads in an implementation. A user of this class push a frame
+/// into the decoder and can subsequently pop a decoded frame. Since the pop()
+/// call may block, it is advisable to first call peek() to see if there is a
+/// frame ready to be popped.
+class VideoDecoder : public boost::noncopyable {
+
 public:
-	VideoDecoder() {}
-
-	// virtual classes need a virtual destructor !
-	virtual ~VideoDecoder() {}
-
-	/// Return the number of bytes input frame data is expected
-	/// to be padded with zeroes. Make sure to provide such
-	/// padding to avoid illegal reads.
-	///
-	virtual unsigned getPaddingBytes() const { return 8; }
-
-	/// Sets up the decoder.
-	//
-	/// @param info
-	/// 	VideoInfo class with all the info needed to decode
-	///     the video correctly.
-	///
-	/// @return true if succesfull else false
-	///
-	virtual bool setup(VideoInfo* /*info*/) { return false; }
-
-	/// Sets up the decoder.
-	//
-	/// @param width
-	/// 	The width of the video
-	///
-	/// @param height
-	/// 	The height of the video
-	///
-	/// @param deblocking
-	/// 	Should a deblocking filter be used? 1 = off, 2 = on
-	///
-	/// @param smoothing
-	/// 	Should the video be smoothed?
-	///
-	/// @param format
-	/// 	The codec of the video, see codecType
-	///
-	/// @param outputFormat
-	/// 	The outputFormat of the video, see videoOutputFormat
-	///
-	/// @return true if succesfull else false
-	///
-	virtual bool setup(
-		int /*width*/,
-		int /*height*/,
-		int /*deblocking*/,
-		bool /*smoothing*/,
-		videoCodecType /*format*/,
-		int /*outputFormat*/) /* should this argument be of VideoOutputFormat type ?*/ { return false; }
-
-	/// Decodes a frame and returns a pointer to the data
-	//
-	/// @param input
-	/// 	The video data
-	///
-	/// @param inputSize
-	/// 	The size of the video data
-	///
-	/// @param outputSize
-	/// 	The output size of the video data, is passed by reference.
-	///
-	/// @return a pointer to the decoded data, or NULL if decoding fails.
-	///     The caller owns the decoded data.
-	///	
-	virtual boost::uint8_t* decode(boost::uint8_t* /*input*/, boost::uint32_t /*inputSize*/, boost::uint32_t& /*outputSize*/) { return NULL; }
-
-	/// Decodes a frame and returns an image::base containing it
-	//
-	/// @param input
-	/// 	The video data
-	///
-	/// @param inputSize
-	/// 	The size of the video data
-	///
-	/// @return a pointer to the image with the decoded data, or NULL if decoding fails.
-	///     The caller owns the decoded data.
-	///
-	virtual std::auto_ptr<image::image_base> decodeToImage(boost::uint8_t* /*input*/, boost::uint32_t /*inputSize*/) { return std::auto_ptr<image::image_base>(NULL); }
-
+  virtual ~VideoDecoder()
+  {
+  }
+  
+  /// Push an encoded video frame into the decoder
+  ///
+  /// @param the video frame to decode
+  virtual void push(const EncodedVideoFrame& buffer) = 0;
+  
+  /// Pop a decoded frame from the decoder. THIS METHOD MAY BLOCK.
+  ///
+  /// @return The decoded video frame.
+  virtual std::auto_ptr<image::rgb> pop() = 0;
+  
+  /// Check whether a decoded frame is ready to be popped. This method will
+  /// never block.
+  ///
+  /// @return true if there is a frame ready to be popped.
+  virtual bool peek() = 0;
 };
+
+
+/// This class represents a video frame that has not yet been decoded.
+class EncodedVideoFrame : public boost::noncopyable
+{
+public:
+  /// @param buffer Pointer to the video data corresponding to this frame. This
+  ///               class takes ownership of the pointer.
+  /// @param buf_size The size, in bytes, of the data pointed to in the buffer
+  ///                 argument
+  /// @param frame_number The number of the frame in the video stream.
+  EncodedVideoFrame(boost::uint8_t* buffer, size_t buf_size, size_t frame_num)
+    : _buffer(buffer),
+      _buffer_size(buf_size),
+      _frame_number(frame_num)
+  {}
+  
+  uint8_t* data() const
+  {
+    return _buffer.get();
+  }
+  
+  size_t dataSize() const
+  {
+    return _buffer_size;
+  }
+  
+  size_t frameNum() const
+  {
+    return _frame_number;
+  }
+
+private:
+  boost::scoped_array<uint8_t> _buffer;
+  size_t _buffer_size;
+  size_t _frame_number;
+};
+
+
 	
 } // gnash.media namespace 
 } // gnash namespace

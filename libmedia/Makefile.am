@@ -77,13 +77,11 @@ libgnashmedia_la_SOURCES = \
 	FLVParser.cpp \
 	AudioDecoderNellymoser.cpp \
 	AudioDecoderSimple.cpp \
-	MediaDecoder.cpp \
 	$(NULL)
 
 noinst_HEADERS = \
 	FLVParser.h \
 	MediaBuffer.h \
-	MediaDecoder.h \
 	AudioDecoder.h \
 	VideoDecoder.h \
 	MediaParser.h \
@@ -103,7 +101,6 @@ if USE_SOUND_GST
 		gst/SoundHandlerGst.cpp \
 		gst/GstUtil.cpp \
 		gst/SoundGst.cpp \
-		gst/MediaDecoderGst.cpp \
 		gst/gstflvdemux.c \
 		gst/gstflvparse.c \
 		gst/gstbuffersrc.c
@@ -116,7 +113,6 @@ if USE_SOUND_GST
 		gst/SoundHandlerGst.h \
 		gst/GstUtil.h \
 		gst/SoundGst.h \
-		gst/MediaDecoderGst.h \
 		gst/gstflvdemux.h \
 		gst/gstflvparse.h \
 		gst/gstbuffersrc.h \

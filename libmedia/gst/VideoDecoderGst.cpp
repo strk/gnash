@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderGst.cpp,v 1.16 2008/02/22 18:28:31 bjacques Exp $
+// $Id: VideoDecoderGst.cpp,v 1.17 2008/02/23 18:12:51 bjacques Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -124,23 +124,32 @@ VideoDecoderGst::~VideoDecoderGst()
   }
 }
 
-void 
-VideoDecoderGst::pushRawFrame(GstBuffer* buffer)
+void
+VideoDecoderGst::push(const EncodedVideoFrame& frame)
 {
   if (!_pipeline) {
     return;
   }
+  
+  GstBuffer* buffer = gst_buffer_new();
+  
+  GST_BUFFER_DATA(buffer) = frame.data();
+	GST_BUFFER_SIZE(buffer) = frame.dataSize();	
+	GST_BUFFER_OFFSET(buffer) = frame.frameNum();
+	GST_BUFFER_TIMESTAMP(buffer) = GST_CLOCK_TIME_NONE;
+	GST_BUFFER_DURATION(buffer) = GST_CLOCK_TIME_NONE;
+  
   gst_app_src_push_buffer (GST_APP_SRC(_appsrc), buffer);
   
   checkMessages();
 }
   
 
-std::auto_ptr<gnashGstBuffer>
-VideoDecoderGst::popDecodedFrame()
+std::auto_ptr<image::rgb>
+VideoDecoderGst::pop()
 {
   if (!_pipeline) {
-    return std::auto_ptr<gnashGstBuffer>();
+    return std::auto_ptr<image::rgb>();
   }
 
   checkMessages();
@@ -148,7 +157,7 @@ VideoDecoderGst::popDecodedFrame()
   GstBuffer* buffer = gst_app_sink_pull_buffer_timed (GST_APP_SINK(_appsink));
   
   if (!buffer) {
-    return std::auto_ptr<gnashGstBuffer>();
+    return std::auto_ptr<image::rgb>();
   }
   
   GstCaps* caps = gst_buffer_get_caps(buffer);
@@ -164,7 +173,7 @@ VideoDecoderGst::popDecodedFrame()
   
   gst_caps_unref(caps);
   
-  std::auto_ptr<gnashGstBuffer> ret(new gnashGstBuffer(buffer, width, height));
+  std::auto_ptr<image::rgb> ret(new gnashGstBuffer(buffer, width, height));
   
   return ret;
 }
@@ -178,17 +187,6 @@ VideoDecoderGst::peek()
   }
 
   return gst_app_sink_peek_buffer (GST_APP_SINK(_appsink));
-}
-
-void
-VideoDecoderGst::reset()
-{
-  if (!_pipeline) {
-    return;
-  }
-
-  gst_element_set_state (GST_ELEMENT (_pipeline), GST_STATE_NULL); // Flushes
-  gst_element_set_state (GST_ELEMENT (_pipeline), GST_STATE_PLAYING);
 }
 
 void

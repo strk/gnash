@@ -1,3 +1,16 @@
+2008-02-22 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libmedia/Makefile.am: Remove MediaDecoder* from the build, since
+	they are unused and unmaintained.
+	* libmedia/VideoDecoder.h: Revise the VideoDecoder interface, closely
+	modeled after that of VideoDecoderGst.
+	* libmedia/ffmpeg/VideoDecoderFfmpeg.{cpp,h}: Implement the new
+	VideoDecoder interface. This fixes embedded video.
+	* libmedia/gst/VideoDecoderGst.{cpp,h}: Update VideoDecoderGst to
+	match the new VideoDecoder interface.
+	* server/parser/video_stream_def.{cpp,h}: Remove Gstreamer-specific
+	calls and get rid of #ifdefs.
+
 2008-02-23 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/swfdec/PASSING: new tests passing.
