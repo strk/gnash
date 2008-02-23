@@ -1,5 +1,9 @@
 2008-02-23 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* testsuite/swfdec/PASSING: new tests passing.
+
+2008-02-23 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* backend/render_handler_agg.cpp: cast unsigned char* to void* before
 	  passing to printf.
 
