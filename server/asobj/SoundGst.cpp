@@ -30,6 +30,7 @@
 #include "GnashException.h"
 #include "builtin_function.h"
 #include "URL.h"
+#include "GstUtil.h"
 
 #include <string>
 
@@ -84,12 +85,7 @@ SoundGst::setupDecoder(const std::string& url)
     return;
   }
 
-#if !defined(__NetBSD__)
-  _audiosink = gst_element_factory_make ("autoaudiosink", NULL);
-  if (!_audiosink) _audiosink = gst_element_factory_make ("alsasink", NULL);
-  if (!_audiosink) _audiosink = gst_element_factory_make ("osssink", NULL);
-#endif
-  if (!_audiosink) _audiosink = gst_element_factory_make ("esdsink", NULL);
+  _audiosink = gnash::media::GstUtil::get_audiosink_element();
 
   if (!_audiosink) {
     log_error(_("Could not create gstreamer audiosink element"));

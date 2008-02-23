@@ -1,4 +1,9 @@
-2008-02-22 Bastiaan Jacques <bastiaan@bjacques.org>
+2008-02-23 Sean McNamara <smcnam@gmail.com>
+
+	* server/asobj/NetStreamGst.cpp: Use the new GstUtil for obtaining an
+	audio sink.
+
+2008-02-23 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* libmedia/Makefile.am: Remove MediaDecoder* from the build, since
 	they are unused and unmaintained.
