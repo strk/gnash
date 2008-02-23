@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.127 2008/02/19 19:20:47 bwy Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.128 2008/02/23 13:06:54 bwy Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -621,7 +621,7 @@ public:
     set_invalidated_region_world();
     
     log_debug("initialized AGG buffer <%p>, %d bytes, %dx%d, rowsize is %d bytes", 
-      mem, size, x, y, rowstride);
+      (void*)mem, size, x, y, rowstride);
   }
   
 

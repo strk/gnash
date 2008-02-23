@@ -1,3 +1,8 @@
+2008-02-23 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* backend/render_handler_agg.cpp: cast unsigned char* to void* before
+	  passing to printf.
+
 2008-02-22 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/character.{cpp,h}: static data members may not be defined
