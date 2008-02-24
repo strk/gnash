@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.41 2008/02/23 18:12:52 bjacques Exp $
+// $Id: video_stream_def.cpp,v 1.42 2008/02/24 19:21:12 bjacques Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -47,7 +47,7 @@ video_stream_definition::video_stream_definition(boost::uint16_t char_id)
 video_stream_definition::~video_stream_definition()
 {
 	std::for_each(_video_frames.begin(), _video_frames.end(),
-	  boost::checked_deleter<media::EncodedVideoFrame>());
+		      boost::checked_deleter<media::EncodedVideoFrame>());
 }
 
 
@@ -116,14 +116,16 @@ video_stream_definition::readDefineVideoFrame(stream* in, SWF::tag_type tag, mov
 
 	unsigned int dataSize = in->get_tag_end_position() - in->get_position();
 	
-  uint8_t* buffer = new uint8_t[dataSize + 8]; // FIXME: catch bad_alloc
-  
-  size_t bytesread = in->read((char*)buffer, dataSize);
-  memset(buffer+bytesread, 0, 8);
-  
-  using namespace media;
-  
-  EncodedVideoFrame* frame = new EncodedVideoFrame(buffer, dataSize, frameNum);
+	uint8_t* buffer = new uint8_t[dataSize + 8]; // FIXME: catch bad_alloc
+
+	size_t bytesread = in->read((char*)buffer, dataSize);
+	memset(buffer+bytesread, 0, 8);
+
+	using namespace media;
+
+	EncodedVideoFrame* frame = new EncodedVideoFrame(buffer, dataSize, frameNum);
+
+	boost::mutex::scoped_lock lock(_video_mutex);
 
 	_video_frames.push_back(frame);
 }
@@ -145,6 +147,8 @@ has_frame_number(media::EncodedVideoFrame* frame, boost::uint32_t frameNumber)
 std::auto_ptr<image::image_base>
 video_stream_definition::get_frame_data(boost::uint32_t frameNum)
 {
+	boost::mutex::scoped_lock lock(_video_mutex);
+
 	if (_video_frames.empty()) {
 		return std::auto_ptr<image::image_base>();
 	}
@@ -168,8 +172,8 @@ video_stream_definition::get_frame_data(boost::uint32_t frameNum)
 	while (_last_decoded_frame != boost::int32_t(frameNum)) {
 		it = std::find_if(_video_frames.begin(),
 			_video_frames.end(), boost::bind(has_frame_number, _1,
-			_last_decoded_frame));
-  	       
+							 _last_decoded_frame));
+
 		if (it == _video_frames.end()) {
 			it = _video_frames.begin();
 		} else {
@@ -181,7 +185,7 @@ video_stream_definition::get_frame_data(boost::uint32_t frameNum)
 		}
 
 		_last_decoded_frame = (*it)->frameNum();
-		_decoder->push(*(*it));	  
+		_decoder->push(*(*it));
 	}
 
 	std::auto_ptr<image::rgb> buffer = _decoder->pop();

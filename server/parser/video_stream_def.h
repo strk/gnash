@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.h,v 1.24 2008/02/23 18:12:52 bjacques Exp $
+// $Id: video_stream_def.h,v 1.25 2008/02/24 19:21:12 bjacques Exp $
 
 #ifndef GNASH_VIDEO_STREAM_DEF_H
 #define GNASH_VIDEO_STREAM_DEF_H
@@ -41,10 +41,11 @@
 
 #include "image.h"
 
-#include <map>
 #include <boost/shared_array.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/scoped_ptr.hpp> 
+#include <boost/scoped_ptr.hpp>
+ 
+#include <boost/thread/mutex.hpp>
 
 namespace gnash {
 
@@ -165,6 +166,9 @@ private:
 	/// at instance destruction time.
 	///
 	typedef std::vector<media::EncodedVideoFrame*> EmbedFrameVec;
+	
+	boost::mutex _video_mutex;
+	
 
 	EmbedFrameVec _video_frames;
 

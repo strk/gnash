@@ -1,3 +1,12 @@
+2008-02-24 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libmedia/ffmpeg/VideoDecoderFfmpeg.{cpp,h}: Cleanup; remove unused
+	methods and code. Avoid unnecessary memcpy calls. Tabs to spaces.
+	* server/parser/video_stream_def.{cpp,h}: Mutex-protect the video
+	frames vector, because video_stream_def's methods are called from
+	both the "loading thread" (parser) and the main execution thread
+	(rendering).
+
 2008-02-24 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/character.{h,cpp}: define all static const data members outside
