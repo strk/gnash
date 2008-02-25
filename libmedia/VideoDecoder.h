@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoder.h,v 1.13 2008/02/25 07:41:32 strk Exp $
+// $Id: VideoDecoder.h,v 1.14 2008/02/25 17:24:47 bjacques Exp $
 
 #ifndef __VIDEODECODER_H__
 #define __VIDEODECODER_H__
@@ -52,9 +52,8 @@ public:
   
   /// Pop a decoded frame from the decoder. THIS METHOD MAY BLOCK.
   //
-  /// @return The decoded video frame.
-  ///         Q: or the NULL auto_ptr if ?
-  ///
+  /// @return The decoded video frame, or a NULL-containing auto_ptr if an
+  ///         error occurred.
   virtual std::auto_ptr<image::rgb> pop() = 0;
   
   /// \brief
