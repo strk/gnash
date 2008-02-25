@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.106 2008/02/22 14:20:48 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.107 2008/02/25 00:06:07 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -892,8 +892,6 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 	avcodec_decode_video(m_VCodecCtx, m_Frame, &got, packet->data, packet->size);
 	if (got)
 	{
-		boost::scoped_array<boost::uint8_t> buffer;
-
 		if (m_imageframe == NULL)
 		{
 			if (m_videoFrameFormat == render::YUV)
@@ -905,6 +903,8 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 				m_imageframe = new image::rgb(m_VCodecCtx->width, m_VCodecCtx->height);
 			}
 		}
+
+		AVPicture rgbpicture;
 
 		if (m_videoFrameFormat == render::NONE)
 		{
@@ -921,7 +921,10 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 		}
 		else if (m_videoFrameFormat == render::RGB && m_VCodecCtx->pix_fmt != PIX_FMT_RGB24)
 		{
-			buffer.reset(media::VideoDecoderFfmpeg::convertRGB24(m_VCodecCtx, m_Frame));
+			rgbpicture = media::VideoDecoderFfmpeg::convertRGB24(m_VCodecCtx, *m_Frame);
+			if (!rgbpicture.data[0]) {
+				return false;
+			}
 		}
 
     		media::raw_mediadata_t* video = new media::raw_mediadata_t();
@@ -991,9 +994,17 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 		}
 		else if (m_videoFrameFormat == render::RGB)
 		{
-
-			boost::uint8_t* srcptr = m_Frame->data[0];
-			boost::uint8_t* srcend = m_Frame->data[0] + m_Frame->linesize[0] * m_VCodecCtx->height;
+			AVPicture* src;
+			if (m_VCodecCtx->pix_fmt != PIX_FMT_RGB24)
+			{
+				src = &rgbpicture;
+			} else
+			{
+				src = (AVPicture*) m_Frame;
+			}
+		
+			boost::uint8_t* srcptr = src->data[0];		  
+			boost::uint8_t* srcend = srcptr + rgbpicture.linesize[0] * m_VCodecCtx->height;
 			boost::uint8_t* dstptr = video->m_data;
 			unsigned int srcwidth = m_VCodecCtx->width * 3;
 
@@ -1001,9 +1012,13 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 
 			while (srcptr < srcend) {
 				memcpy(dstptr, srcptr, srcwidth);
-				srcptr += m_Frame->linesize[0];
+				srcptr += src->linesize[0];
 				dstptr += srcwidth;
 				video->m_size += srcwidth;
+			}
+			
+			if (m_VCodecCtx->pix_fmt != PIX_FMT_RGB24) {
+				delete [] rgbpicture.data[0];
 			}
 
 		}

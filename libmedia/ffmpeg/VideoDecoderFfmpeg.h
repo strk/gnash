@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderFfmpeg.h,v 1.4 2008/02/24 19:21:12 bjacques Exp $
+// $Id: VideoDecoderFfmpeg.h,v 1.5 2008/02/25 00:06:07 bjacques Exp $
 
 #ifndef __VIDEODECODERFFMPEG_H__
 #define __VIDEODECODERFFMPEG_H__
@@ -49,7 +49,17 @@ public:
   
   bool peek();
   
-  static boost::uint8_t* convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame);
+  
+  /// \brief converts an video frame from (almost) any type to RGB24.
+  ///
+  /// @param srcCtx The source context that was used to decode srcFrame.
+  /// @param srcFrame the source frame to be converted.
+  /// @return an AVPicture containing the converted image. Please be advised
+  ///         that the RGB data pointer is stored in AVPicture::data[0]. The
+  ///         caller owns that pointer, which must be freed with delete [].
+  ///         It is advised to wrap the pointer in a boost::scoped_array.
+  ///         If conversion fails, AVPicture::data[0] will be NULL.
+  static AVPicture convertRGB24(AVCodecContext* srcCtx, const AVFrame& srcFrame);
 
 private:
 

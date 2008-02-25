@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: VideoDecoderFfmpeg.cpp,v 1.4 2008/02/24 19:21:12 bjacques Exp $
+// $Id: VideoDecoderFfmpeg.cpp,v 1.5 2008/02/25 00:06:07 bjacques Exp $
 
 #include "VideoDecoderFfmpeg.h"
 
@@ -97,35 +97,32 @@ VideoDecoderFfmpeg::~VideoDecoderFfmpeg()
   }
 }
 
-
-// FIXME: this method modifies srcFrame, which is a big nono for a method
-//        that's supposed to return a new buffer. the second argument should
-//        be const and this method should return AVPicture.
-boost::uint8_t*
-VideoDecoderFfmpeg::convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame)
+AVPicture /*static*/
+VideoDecoderFfmpeg::convertRGB24(AVCodecContext* srcCtx,
+                                 const AVFrame& srcFrame)
 {
+  AVPicture picture;
   int width = srcCtx->width, height = srcCtx->height;
-
+  
+  picture.data[0] = NULL;
+  
   int bufsize = avpicture_get_size(PIX_FMT_RGB24, width, height);
   if (bufsize == -1) {
-    return NULL;
+    return picture;
   }
 
   boost::uint8_t* buffer = new boost::uint8_t[bufsize];
 
-  AVPicture picture;
-
   avpicture_fill(&picture, buffer, PIX_FMT_RGB24, width, height);
 
 #ifndef HAVE_SWSCALE_H
-  img_convert(&picture, PIX_FMT_RGB24, (AVPicture*) srcFrame,
+  img_convert(&picture, PIX_FMT_RGB24, (AVPicture*) &srcFrame,
       srcCtx->pix_fmt, width, height);
 #else
   // FIXME: this will live forever ...
   static struct SwsContext* context = NULL;
 
-  if (!context)
-  {
+  if (!context) {
     // FIXME: this leads to wrong results (read: segfaults) if this method
     //        is called from two unrelated video contexts, for example from
     //        a NetStreamFfmpeg and an embedded video context. Or two
@@ -134,30 +131,22 @@ VideoDecoderFfmpeg::convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame)
            width, height, PIX_FMT_RGB24,
            SWS_FAST_BILINEAR, NULL, NULL, NULL);
     
-    if (!context)
-    {
+    if (!context) {
       delete [] buffer;
-      return NULL;
+      return picture;
     }
   }
 
-  int rv = sws_scale( 
-    context, srcFrame->data, srcFrame->linesize, 0, height, 
-    picture.data, picture.linesize 
-  );
+  int rv = sws_scale(context, const_cast<uint8_t**>(srcFrame.data),
+    const_cast<int*>(srcFrame.linesize), 0, height, picture.data,
+    picture.linesize);
 
-  if (rv == -1)
-  {
+  if (rv == -1) {
     delete [] buffer;
-    return NULL;
   }
 
 #endif // HAVE_SWSCALE_H
-
-  srcFrame->linesize[0] = picture.linesize[0];
-  srcFrame->data[0] = picture.data[0];
-
-  return buffer;
+  return picture;
 }
 
 std::auto_ptr<image::rgb>
@@ -180,12 +169,10 @@ VideoDecoderFfmpeg::decode(boost::uint8_t* input, boost::uint32_t input_size)
     return ret;
   }
 
-  boost::uint8_t* decodedData = convertRGB24(_videoCodecCtx, frame);
+  AVPicture rgbpicture = convertRGB24(_videoCodecCtx, *frame);
   
-  ret.reset(new image::rgb(decodedData, _videoCodecCtx->width,
-                           _videoCodecCtx->height, frame->linesize[0]));
-
-  frame->data[0] = NULL;
+  ret.reset(new image::rgb(rgbpicture.data[0], _videoCodecCtx->width,
+                           _videoCodecCtx->height, rgbpicture.linesize[0]));
 
   // FIXME: av_free doesn't free frame->data!
   av_free(frame);

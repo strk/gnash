@@ -1,5 +1,13 @@
 2008-02-24 Bastiaan Jacques <bastiaan@bjacques.org>
 
+	* libmedia/ffmpeg/VideoDecoderFfmpeg.{cpp,h}: Fix up convertRGB24 so
+	that it no longer touches the source frame and enforce that with
+	constness.
+	* server/asobj/NetStreamFfmpeg.cpp: Update to match the changes to
+	convertRGB24.
+
+2008-02-24 Bastiaan Jacques <bastiaan@bjacques.org>
+
 	* libmedia/ffmpeg/VideoDecoderFfmpeg.{cpp,h}: Cleanup; remove unused
 	methods and code. Avoid unnecessary memcpy calls. Tabs to spaces.
 	* server/parser/video_stream_def.{cpp,h}: Mutex-protect the video
