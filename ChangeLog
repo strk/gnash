@@ -1,5 +1,8 @@
 2008-02-25 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: don't complain if high-level scripts for doc
+	  generations aren't available as long as lower-level ones are.
+	  Fixes bug reported in comment #12 of bug #22343.
 	* testsuite/libamf.all/test_lc.cpp: don't assume (void*) is 32-bit,
 	  remove unneeded casts, fix missing return warnings. Should fix bug
 	  #22378.

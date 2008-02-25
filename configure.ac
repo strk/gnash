@@ -2454,13 +2454,24 @@ if test x"$pthreads" = x"yes"; then
 fi
 
 if test x"$docbook" = x"yes"; then
-  if test x"$DB2X_TEXI" = x -o x"$MAKEINFO" = x -o x"$DB2X_MAN" = x; then
-    echo "        ERROR: No DocBook2X tools installed!"
-    echo "               Either install it from http://docbook2x.sourceforge.net"
-    echo "               or .deb users: apt-get install docbook docbook2x docbook-utils"
-    echo "                              docbook-xml docbook-xsl texinfo xsltproc"
+  if test x"$MAKEINFO" = x; then
+    echo "        ERROR: no makeinfo tools installed!"
+    echo "               Either install it from http://www.gnu.org/software/texinfo/"
+    echo "               or .deb users: apt-get install texinfo"
     echo "               or configure without --enable-docbook"
     nogo=true
+  fi
+  dnl low-level tools
+  if test x"$DB2X_TEXIXML" = x -o x"$DB2X_MANXML" = x -o x"$DB2X_XSLTPROC" = x; then
+    dnl high-level tools
+    if test x"${DB2X_TEXI}" = x -o x"${DB2X_MAN}" = x; then
+      echo "        ERROR: No DocBook2X tools installed!"
+      echo "               Either install it from http://docbook2x.sourceforge.net"
+      echo "               or .deb users: apt-get install docbook docbook2x docbook-utils"
+      echo "                              docbook-xml docbook-xsl texinfo xsltproc"
+      echo "               or configure without --enable-docbook"
+      nogo=true
+    fi
   else
     echo "        You have version $db2x_version of the DocBook2X tools."
   fi
