@@ -72,11 +72,11 @@ static void usage (void);
 
 static TestState runtest;
 
-bool test_read();
-bool test_write();
-bool test_listen();
-bool test_data();
-bool load_data();
+void test_read();
+void test_write();
+void test_listen();
+void test_data();
+void load_data();
 
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 
@@ -113,7 +113,7 @@ main(int argc, char *argv[])
 //     test_write(filespec);
 }
 
-bool
+void
 test_listen()
 {
 
@@ -190,7 +190,7 @@ test_listen()
     
 }
 
-bool
+void
 test_data()
 {
     LcShm lc;
@@ -236,7 +236,7 @@ test_data()
     lc.send(con1, "localhost", els);
 }
 
-bool
+void
 load_data()
 {
 
@@ -256,9 +256,9 @@ load_data()
     string srcdir = SRCDIR;
     srcdir += "/segment.raw";
     int fd = ::open(srcdir.c_str(), O_RDONLY);
-    void *dataptr = static_cast<unsigned char *>(mmap(0, 64528, PROT_READ, MAP_SHARED, fd, 0));
+    void *dataptr = mmap(0, 64528, PROT_READ, MAP_SHARED, fd, 0);
 
-    if (dataptr != (void *)0xffffffff) {
+    if (dataptr != (void*)-1) {
         memcpy(shmaddr, dataptr, 64528);
     } else {
         cerr << "ERROR: couldn't map input file!" << endl;
@@ -267,7 +267,7 @@ load_data()
     ::close(fd);
 }
 
-bool
+void
 test_read()
 {
 
@@ -287,9 +287,9 @@ test_read()
     string srcdir = SRCDIR;
     srcdir += "/segment.raw";
     int fd = ::open(srcdir.c_str(), O_RDONLY);
-    void *dataptr = static_cast<unsigned char *>(mmap(0, 64528, PROT_READ, MAP_SHARED, fd, 0));
+    void *dataptr = mmap(0, 64528, PROT_READ, MAP_SHARED, fd, 0);
 #if 1
-    if (dataptr != (void *)0xffffffff) {
+    if (dataptr != (void*)-1) {
         memcpy(shmaddr, dataptr, 64528);
     } else {
         cerr << "ERROR: couldn't map input file!" << endl;
@@ -340,7 +340,7 @@ test_read()
     lc.close();
 }
 
-bool
+void
 test_write()
 {
 #if 0

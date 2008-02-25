@@ -1,5 +1,8 @@
 2008-02-25 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/libamf.all/test_lc.cpp: don't assume (void*) is 32-bit,
+	  remove unneeded casts, fix missing return warnings. Should fix bug
+	  #22378.
 	* libmedia/VideoDecoder.h: typo, doc styles and a request for
 	  more info about pop().
 	* libmedia/sdl: drop unused code.
