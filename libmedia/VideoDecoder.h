@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoder.h,v 1.12 2008/02/23 18:12:51 bjacques Exp $
+// $Id: VideoDecoder.h,v 1.13 2008/02/25 07:41:32 strk Exp $
 
 #ifndef __VIDEODECODER_H__
 #define __VIDEODECODER_H__
@@ -29,13 +29,14 @@ namespace media {
 
 class EncodedVideoFrame;
 
-/// \brief Abstract base class for embedded video decoders.
-///
-/// This very simple design allows, but does not require does not require,
+/// Abstract base class for embedded video decoders.
+//
+/// This very simple design allows, but does not require,
 /// the use of threads in an implementation. A user of this class push a frame
 /// into the decoder and can subsequently pop a decoded frame. Since the pop()
 /// call may block, it is advisable to first call peek() to see if there is a
 /// frame ready to be popped.
+///
 class VideoDecoder : public boost::noncopyable {
 
 public:
@@ -44,19 +45,25 @@ public:
   }
   
   /// Push an encoded video frame into the decoder
-  ///
+  //
   /// @param the video frame to decode
+  ///
   virtual void push(const EncodedVideoFrame& buffer) = 0;
   
   /// Pop a decoded frame from the decoder. THIS METHOD MAY BLOCK.
-  ///
+  //
   /// @return The decoded video frame.
+  ///         Q: or the NULL auto_ptr if ?
+  ///
   virtual std::auto_ptr<image::rgb> pop() = 0;
   
-  /// Check whether a decoded frame is ready to be popped. This method will
-  /// never block.
+  /// \brief
+  /// Check whether a decoded frame is ready to be popped.
+  //
+  /// This method will never block.
   ///
   /// @return true if there is a frame ready to be popped.
+  ///
   virtual bool peek() = 0;
 };
 

@@ -1,5 +1,7 @@
 2008-02-25 Sandro Santilli <strk@keybit.net>
 
+	* libmedia/VideoDecoder.h: typo, doc styles and a request for
+	  more info about pop().
 	* libmedia/sdl: drop unused code.
 
 2008-02-24 Bastiaan Jacques <bastiaan@bjacques.org>
