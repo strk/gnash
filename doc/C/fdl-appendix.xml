@@ -626,33 +626,21 @@
     
     <blockquote>
       <para>
-	Copyright  YEAR YOUR NAME.
+	Copyright 2008, Free Software Foundation.
       </para>
       <para>
 	Permission is granted to copy, distribute and/or modify this
 	document under the terms of the GNU Free Documentation
 	License, Version 1.1 or any later version published by the
-	Free Software Foundation; with the <link
-	linkend="fdl-invariant">Invariant Sections</link> being LIST
-	THEIR TITLES, with the <link
-	linkend="fdl-cover-texts">Front-Cover Texts</link> being LIST,
-	and with the <link linkend="fdl-cover-texts">Back-Cover
-	Texts</link> being LIST.  A copy of the license is included in
-	the section entitled "GNU Free Documentation
-	License".
+	Free Software Foundation; with no<link
+	linkend="fdl-invariant">Invariant Sections</link>, with no <link
+	linkend="fdl-cover-texts">Front-Cover Texts</link>,
+	and with no <link linkend="fdl-cover-texts">Back-Cover
+	Texts</link>. A copy of the license is included in
+	the section entitled "GNU Free Documentation License".
       </para>
     </blockquote>
       
-    <para>
-      If you have no <link linkend="fdl-invariant">Invariant
-      Sections</link>, write "with no Invariant Sections"
-      instead of saying which ones are invariant.  If you have no
-      <link linkend="fdl-cover-texts">Front-Cover Texts</link>, write
-      "no Front-Cover Texts" instead of
-      "Front-Cover Texts being LIST"; likewise for <link
-      linkend="fdl-cover-texts">Back-Cover Texts</link>.
-    </para>
-    
     <para>
       If your document contains nontrivial examples of program code,
       we recommend releasing these examples in parallel under your
