@@ -1,3 +1,7 @@
+2008-02-26 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/jpeg.h: use standard C++ header csetjmp.
+
 2008-02-26 Sandro Santilli <strk@keybit.net>
 
 	* libmedia/VideoDecoder.h: include boost/noncopyable.hpp

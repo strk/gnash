@@ -9,15 +9,13 @@
 #ifndef JPEG_H
 #define JPEG_H
 
-
 #include "tu_config.h"
 
 struct jpeg_decompress_struct;
 struct jpeg_compress_struct;
 class tu_file;
 
-#include <setjmp.h> // for jmp_buf
-
+#include <csetjmp> // for jmp_buf
 
 /// Wrapper for jpeg file operations. 
 //
