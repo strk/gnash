@@ -116,9 +116,9 @@
       <glossdef>
 	<para>
 	  <emphasis>Doxygen</emphasis> 
-	is a documentation generator for for multiple languages 
-	which uses comments in the source code to create stand-alone 
-	documentation. 
+	  is a documentation generator for for multiple languages 
+	  which uses comments in the source code to create stand-alone
+	  documentation. 
 	</para>
       </glossdef>
     </glossentry>
@@ -146,12 +146,11 @@
       </glossterm>
       <glossdef>
 	<para>
-	  A &app; <emphasis>extension</emphasis> is a plugin (not
-	  a browser plugin) which
-	  implements additional 
-	  functionality beyond what is covered by 
-	<emphasis>Flash</emphasis> specification. 
-	These are shared libraries which are loaded at runtime.
+	  A &app; <emphasis>extension</emphasis> is a plugin (not a
+	  browser plugin) which implements additional functionality
+	  beyond what is covered by <emphasis>Flash</emphasis>
+	  specification. These are shared libraries which are loaded
+	  at runtime. 
 	</para>
       </glossdef>
     </glossentry>
@@ -168,7 +167,7 @@
       </glossterm>
       <glossdef>
 	<para>
-	  ffmpeg is an audio and video decoding library which can be
+	  ffmpeg is an audio and video decoding library which can be 
 	  used by Gnash to decode mp3, FLV and other media types.  
 	</para>
       </glossdef>
@@ -182,8 +181,9 @@
 	<para>
 	  The term <emphasis>Flash</emphasis> is used to describe both the 
 	  Adobe IDE for creating <emphasis>SWF</emphasis>
-	  files, and the technology itself.  
-	  &app; documentation uses the latter definition.
+	  files, and the technology itself. Flash is a trademarked
+	  term of Adobe's, we prfer to use SWF to refer to the files
+	  themselves, as well as the format, instead of flash(tm).
 	</para>
       </glossdef>
     </glossentry>
@@ -287,7 +287,7 @@
 	library provides a wrapper for mouse and keyboard events, 
 	menus, windowing (where available) and a drawing area. 
 	You must choose a GUI library during the
-	<link linkend="pre-configuration">configuration</link> stage.
+	configuration stage of building Gnash.
       </para>
     </glossdef>
   </glossentry>
@@ -476,7 +476,7 @@
 	<para>
 	  The <emphasis>renderer</emphasis> is the subsystem of &app;
 	  which renders content.  Only one renderer may be used; it is
-	  chosen during <link linkend="pre-configuration">configuration</link>.
+	  selected at configuration time if building from source.
 	</para>
 	<para>
 	  Available renderers are: AGG, OpenGL, and Cairo. In terms of 
@@ -565,7 +565,7 @@
 	  which handles both event sounds and streaming sound.  Audio
 	  from external sources are also handled through the sound handler
 	  when SDL is used.  The sound handler must be selected during
-	  <link linkend="pre-configuration">configuration</link>.
+	  configuration of Gnash when compiling.
 	</para>
 	<para>
 	  There are currently two sound handlers available in &app;:
@@ -597,8 +597,7 @@
       </glossterm>
       <glossdef>
 	<para>
-	  The visible area of a Flash movie. The name derives from a
-	  theater analogy. Graphical elements are referred to as
+	  The visible area of a Flash movie. The name derives from a	  theater analogy. Graphical elements are referred to as
 	  characters.  
 	</para>
       </glossdef>

@@ -1,74 +1,50 @@
 <chapter id="bugreport">
   <title>Reporting Bugs</title>
+  
+  <para>
+    The Gnash project relies on the community of Gnash users to test
+    the player, feedback is critical to any successful project.  Not
+    only does it let us know that people use Gnash, but it helps us  
+    understand the community's needs. Gnash uses a bug tracker on
+    <ulink url="http://savannah.gnu.org" /> to manage these reports.
+  </para>
+  
+  <para>
+    When filing a report, please follow the guidelines below. The better
+    your bug report is, the easier it will be for the developers to
+    address the issue. Bug reports without enough information will
+    initially be asked to provide this information anyway. Adding
+    critical details, like the Operating System you are on, it's
+    version, and any relevant error messages from Gnash that you get.
+  </para>
 
-<para>
-  The &app; project relies on the community to use and test the
-  player; feedback is critical to any successful project.  Not only
-  does it let us know that people use &app;, but it helps us
-  understand the community's needs.  &app; uses a bug tracker on
-  <ulink url="http://savannah.gnu.org" /> to manage these reports.
-</para>
-
-<para>
-  When filing a report, please follow the guidelines below. The better
-  your bug report is, the easier it will be for the developers to
-  address the issue. 
-</para>
-    <orderedlist>
-      <listitem><para>
-        <link linkend="bugstep_newcheckout">Compile the latest
-        &app; build.</link>
-      </para></listitem>
-      <listitem><para>
-        <link linkend="bugstep_search">Determine if the bug was
-        previously reported.</link>
-      </para></listitem>
-      <listitem><para>
-        <link linkend="bugstep_guidelines">Review the bug writing 
-        guidelines.</link>
-      </para></listitem>
-    </orderedlist>
-
-
-  <sect1 id="bugstep_newcheckout">
-    <title>Compile the latest &app; build</title>
+  <sect1 id="bugstep_package">
+    <title>Get a Fresh Binary Package</title>
     <para>
-      Obtain a copy of the latest <link linkend="sourcerepo">development
-      checkout</link> or <link linkend="sourcesnapshot">development
-      snapshot</link>.  Put the source in an empty directory, then
-      <link linkend="pre-configuration">configure</link> and 
-      <link linkend="compile">compile</link> &app;.
+      For starters, it's a good idea to obtain a copy of the latest
+      snapshot. Although Gnash is primarily released as source, the
+      Gnash build infrastructure allows the automated building of
+      binary packages. Often the version of Gnash as packaged by a
+      GNU/Linux or BSD distribution is based on the last official
+      release, which could be months out of date. It is helpful if
+      this is the case to try a newer packaged build of Gnash. 
     </para>
 
     <para>
-      If you are able to replicate the bug in the latest version, 
-      <link linkend="bugstep_search">proceed to the next step</link>.
-      If you cannot replicate the bug with the newer version, the
-      problem may have been solved, or the issue may involve your
-      environment 
-    </para>
-
-    <para>
-      To check this, create a fresh build of the version in which you
-      encountered the bug.  If you can reproduce the bug with the
-      fresh copy of the original version, but cannot with the latest
-      version, this is most likely a resolved bug.  
-</para>
-
-<para>
-  If you cannot reproduce the bug, it may still be unclear whether the
-  bug is related to your environment or a &app; bug.  Try to determine
-  the source of the problem.  &app; offers several helpful debugging
-  options in the configure stage, and many verbosity options at the
-  command line to help. 
-</para>
+      You can get a fresh binary package of Gnash, as well as recent 
+      source packages from
+      <ulink type="http"
+	     url="http://www.getgnash.org/packages/">
+	http://www.getgnash.org/packages
+      </ulink>. 
+    </para>    
   </sect1>
 
   <sect1 id="bugstep_search">
     <title>Determine if the bug was previously reported</title>
     <para>
       Search the <ulink type="https"
-      url="https://savannah.gnu.org/bugs/?group=gnash">&app;
+      url="https://savannah.gnu.org/bugs/?group=gnash">Gnash
       bug tracker</ulink> to see if the bug has already been identified.
     </para>
     <para>
@@ -109,20 +85,19 @@
       <listitem>
 	<para>
 	  Your system information: operating system name and version, as
-	  well as the versions of major <link 
-	  linkend="codedepend">dependencies</link>;
+	  well as the versions of major development dependencies;
 	</para>
       </listitem> 
       <listitem>
 	<para>
-	  The release number or checkout timestamp for the version of &app;
+	  The release number or checkout timestamp for the version of Gnash
 	  where you observe the problem;
 	</para>
       </listitem> 
       <listitem>
 	<para>
 	  The file <filename>config.log</filename>, which should be
-	  attached as a file; and
+	  attached as a file;
 	</para>
       </listitem> 
       <listitem>

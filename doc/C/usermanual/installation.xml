@@ -1,8 +1,8 @@
 <chapter id="build">
-  <title>Installing and Configuring &app;</title>
+  <title>Installing and Configuring Gnash</title>
   
   <para>
-    There are two ways of installing &app;:
+    There are two ways of installing Gnash:
     <link linkend="packagemanager">using a package manager</link>
     or <link linkend="gettingsource">installing from source</link>.
   </para>
@@ -11,7 +11,7 @@
     <title>Requirements</title>
     
     <para>
-      Before downloading and installing &app;, check that your
+      Before downloading and installing Gnash, check that your
       hardware and software meet the following requirements.
     </para>
     
@@ -19,12 +19,12 @@
       <title>Hardware Requirements</title>
       
       <para>
-	One of the goals of &app; is to make it portable enough to install on
-	small devices.  As a result, the hardware requirements are
-	minimal. &app; has even run on an ARM9 at 200 MHz with 64 MB of RAM!
-	(It ran without video support in this case.)   While firm minimums
-	have not been established, &app; has been shown to run successfully
-	with the following:
+	One of the goals of Gnash is to make it portable enough to
+	install on small devices.  As a result, the hardware
+	requirements are minimal. Gnash has even run on an ARM9 at 200
+	MHz with 32 MB of RAM! (It ran without video support in this
+	case.) While firm minimums have not been established, Gnash
+	has been shown to run successfully with the following:
       </para>
       
       <itemizedlist>
@@ -35,20 +35,20 @@
 	</listitem>
 	<listitem>
 	  <para>
-	    256 MB RAM
+	    128 MB RAM
 	  </para>
 	</listitem>
 	<listitem>
 	  <para>
-	    Video &mdash; &app; will run on anything from a raw frame buffer up to
-	    an OpenGL-supporting graphics card.
+	    Video &mdash; Gnash will run on anything from a raw frame
+	    buffer up to an OpenGL-supporting graphics card.
 	  </para>
 	</listitem>
       </itemizedlist>
       
       <para>
 	The following table provides a list of the Operating System/CPU
-	combinations on which &app; has been shown to run. 
+	combinations on which Gnash has been shown to run. 
       </para>
       
       <table id="tb-os-cpu">
@@ -58,8 +58,8 @@
 	  <colspec colname='CPU' />
 	  <thead>
 	    <row>
-	      <entry>Render GUI</entry>
-	      <entry>Virtual Memory</entry>
+	      <entry>Operating System</entry>
+	      <entry>Processor</entry>
 	    </row>
 	  </thead>
 	  <tbody>
@@ -67,14 +67,6 @@
 	      <entry>OpenBSD, FreeBSD, NetBSD</entry>
 	      <entry>Alpha AXP, AMD64, i386, Itanium, PC-98, PowerPC, SPARC64 
 	      </entry>
-	    </row>
-	    <row>
-	      <entry>ALTLinux</entry>
-	      <entry>i586</entry>
-	    </row>
-	    <row>
-	      <entry>Arklinux</entry>
-	      <entry>i586</entry>
 	    </row>
 	    <row>
 	      <entry>Debian</entry>
@@ -108,10 +100,10 @@
 	    <row>
 	      <entry>Mandriva
 	      </entry>
-	      <entry>i386</entry>
+	      <entry>i386, MIPS</entry>
 	    </row>
 	    <row>
-	      <entry>Open Embedded
+	      <entry>Open Embedded, OpenMoko, Poky
 	      </entry>
 	      <entry>ARM
 	      </entry>
@@ -129,7 +121,7 @@
 	      </entry>
 	    </row>
 	    <row>
-	      <entry>Red Hat Enterprise and CentOS
+	      <entry>Red Hat Enterprise, CentOS
 	      </entry>
 	      <entry>x86-32, x86-64 
 	      </entry>
@@ -145,6 +137,10 @@
 	      <entry>i386</entry>
 	    </row>
 	    <row>
+	      <entry>Syllable</entry>
+	      <entry>i386</entry>
+	    </row>
+	    <row>
 	      <entry>Irix 6.5 
 	      </entry>
 	      <entry>MIPS R10K 
@@ -157,16 +153,7 @@
 	      </entry>
 	    </row>
 	    <row>
-	      <entry>NetBSD</entry>
-	      <entry>many, including VAX
-	      </entry>
-	    </row>
-	    <row>
-	      <entry>OpenBSD</entry>
-	      <entry>many, including VAX, OS/2 and eComstation</entry>
-	    </row>
-	    <row>
-	      <entry>Windows</entry>
+	      <entry>Windows XP, Windows Vista</entry>
 	      <entry>x86-32</entry>
 	    </row>
 	  </tbody>
@@ -179,57 +166,45 @@
       <title>Software Requirements</title>
       
       <para>
-	The &appversion; release of &app; has been designed to run on
+	The &appversion; release of Gnash has been designed to run on
 	UNIX/Linux variants, and has been run on most of the free ones.
-	However, &app; has successfully run on Windows, Darwin (Mac OS X),
-	Irix, Solaris, BeOs, OS/2, and Haiku.  &app; has also run on the
+	However, Gnash has successfully run on Windows, Darwin (Mac OS X),
+	Irix, Solaris, BeOs, OS/2, and Haiku.  Gnash has also run on the
 	following 64-bit systems: PowerPC, Itanium, UltraSparc, and AMD64.
 	For now, it is important to be sure that the following code, testing,
-	and documentation dependencies are met before installing &app;.  If
-	you will be downloading &app; with a package manager, these
+	and documentation dependencies are met before installing Gnash.  If
+	you will be downloading Gnash with a package manager, these
 	dependencies may be solved by the package manager.  Otherwise, you
 	must first verify that each of these dependencies are installed on the
 	target system.
       </para>
-      
-      <sect3 id="codedepend">
-	&codedependencies;
-      </sect3>
-      
-      <sect3 id="testdepend">
-	&testdependencies;
-      </sect3>
-	
-      <sect3 id="docdepend">
-	&docdependencies;
-      </sect3>
-      
+            
     </sect2>
     
   </sect1>
   
     <sect1 id="downloading">
-      <title>Downloading &app;</title>
+      <title>Downloading Gnash</title>
       
       <para>
-	There are two ways to download &app;: using a package manager or by
+	There are two ways to download Gnash: using a package manager or by
 	downloading the source code and building it on your system. If
-	possible, it is advisable to use a package manager to download &app;,
+	possible, it is advisable to use a package manager to download Gnash,
 	as it will resolve dependencies for you.  However, if you want the
-	very latest features, or a &app; package is not available for your
+	very latest features, or a Gnash package is not available for your
 	operating system, it is better to download the source code and build
-	&app; locally. 
+	Gnash locally. 
       </para>
       
-      <sect2 id="packagemanager">
-	&pkgmanager;
-      </sect2>
+<!--       <sect2 id="packagemanager"> -->
+<!-- 	&pkgmanager; -->
+<!--       </sect2> -->
       
       <sect2 id="gettingsource">
 	<title>Getting the Source</title>
 	
 	<para>
-	  &app; is available as a <link linkend="sourcereleases">release
+	  Gnash is available as a <link linkend="sourcereleases">release
 	  tarball</link>, a <link linkend="sourcerepo">development 
 	  checkout</link>, or a <link linkend="sourcesnapshot">development
 	  snapshot</link>.
@@ -255,6 +230,19 @@
 	  </para>
 	</sect3>
 	
+	<sect3 id="sourcesnapshot">
+	  <title>Snapshot</title>
+	  
+	  <para>
+	    The daily development snapshot can be downloaded from
+	    <ulink url="http://www.gnashdev.org/dev_snapshots/"
+		   type="http">http://www.gnashdev.org/dev_snapshots/</ulink>.
+	    This is the best option if you need changes which were introduced
+	    after the <link linkend="sourcereleases">last release</link> of
+	    Gnash, but are unable to <link linkend="sourcerepo">download
+	    directly from the repository.</link>
+	  </para>
+	</sect3>
 	<sect3 id="sourcerepo">
 	  <title>Repository</title>
 	  
@@ -283,40 +271,26 @@
 	    <ulink url="http://cvs.savannah.gnu.org/viewcvs/gnash/?root=gnash"
 		   type="http" /> on the web.
 	  </para>
-	</sect3>
-	
-	<sect3 id="sourcesnapshot">
-	  <title>Snapshot</title>
-	  
-	  <para>
-	    The daily development snapshot can be downloaded from
-	    <ulink url="http://www.gnashdev.org/dev_snapshots/"
-		   type="http">http://www.gnashdev.org/dev_snapshots/</ulink>.
-	    This is the best option if you need changes which were introduced
-	    after the <link linkend="sourcereleases">last release</link> of
-	    &app;, but are unable to <link linkend="sourcerepo">download
-	    directly from the repository.</link>
-	  </para>
-	</sect3>
+	</sect3>	
 	
       </sect2>
-   
+
+      <sect2 id="getcodecs">
+	<title>Getting Codec Support</title>
+
+	<para>
+	  Gnash requires codec support to handle audio and video
+	  correctly. Some platforms like Ubuntu or Fedora under the
+	  GNOME desktop will automatically notify the user that the
+	  proper codecs aren't installed, and pop up a dialog box to
+	  let the user download the codecs Gnash needs to make site
+	  like YouTube work correctly. If you have installed Gnash on
+	  any other platform, and video 
+	</para>
+	
+      </sect2>
+
     </sect1>
-    
-    <sect1 id="pre-configuration">
-      <title>Pre-Compile Configuration</title>
-      
-      &configuration;
-      
-    </sect1>
-    
-    <sect1 id="compiling">
-      &building; 
-    </sect1>
-    
-    <sect1 id="install">
-      &install; 
-    </sect1>
-    
+        
 </chapter>
 

@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sect1 id="gnashrc">
+  <title>User Configuration File</title>
+
+  <para>
+Individual user preferences may be set by editing variables with the <filename>.gnashrc</filename> file:
+<programlisting>
+~/.gnashrc
+</programlisting>
+</para>
+
+<para>
+Each line must begin with an action: either <emphasis>set</emphasis> or, in the case of lists, also
+<emphasis>append</emphasis>.
+</para>
+
+<para>
+The values in this configuration file apply only to an individual user, and become the default settings of the standalone player and the plugin.  Note that any command line options take precedence over <filename>.gnashrc</filename> settings.
+</para>
+
+<para>
+The variables in the <filename>.gnashrc</filename> file support three types of arguments: on/off, numeric values, or in the case of the
+    whitelist and blacklist, a list of hostnames as ASCII text.
+  </para>
+
+
+      <table id="tb-config-variables">
+<title>User Configuration Variables</title>
+<tgroup cols='3' align='left' colsep='1' rowsep='1'>
+<colspec colname='Variable' />
+<colspec colname='Value' />
+<colspec colname='Function' />
+<thead>
+<row>
+<entry>Variable</entry>
+<entry>Value</entry>
+<entry>Function</entry>
+</row>
+</thead>
+<tbody>
+<row>
+<entry>localdomain</entry>
+<entry>on/off</entry>
+<entry>This value can be set to either <emphasis>on</emphasis> or
+	    <emphasis>off</emphasis>, and controls the loading of
+	    external Flash movies over a network. This option
+	    tells Gnash to only load Flash movies from the existing domain.</entry>
+</row>
+<row>
+<entry>localhost</entry>
+<entry>on/off</entry>
+<entry>This value can be set to either <emphasis>on</emphasis> or
+	    <emphasis>off</emphasis>, and controls the loading of
+	    external Flash movies over a network. This is a stricter
+	    version of the <emphasis>localdomain</emphasis> setting as
+	    this allows the loading of Flash movies to the same host
+	    that is running &app;.</entry>
+</row>
+<row>
+<entry>whitelist</entry>
+<entry>hostnames</entry>
+<entry>This is a list of hostnames separated by spaces, or <emphasis>off</emphasis>
+	    to disable the whitelist. The hostname must be given
+            without a protocol (http://, https://). If this list is populated,
+	    &app; will only load external Flash movies from the specified hosts.  The
+	    whitelist takes precedence over the blacklist. Because several files can
+	    be parsed in succession, each file can override or add to
+	    lists in other files. Use <emphasis>set</emphasis> to override
+	    all other lists or <emphasis>append</emphasis> to add your blacklisted
+	    hosts to lists in previously parsed files.</entry>
+</row>
+<row>
+<entry>blacklist</entry>
+<entry>hostnames</entry>
+<entry>This is a list of hostnames separated by spaces, or <emphasis>off</emphasis>
+	    to disable the blacklist. The hostname must be given
+            without a protocol (http://, https://).
+	    External flash movies from these
+            domains are never allowed to load. If whitelist is present
+	    and not empty, blacklist is not used. Because several files can
+	    be parsed in succession, each file can override or add to
+	    lists in other files. Use <emphasis>set</emphasis> to override
+	    all other lists or <emphasis>append</emphasis> to add your blacklisted
+	    hosts to lists in previously parsed files.</entry>
+</row>
+<row>
+<entry>localSandboxPath</entry>
+<entry>dirs</entry>
+<entry>This is a list of directories separated by spaces.
+	    Only resources from these directories and from the directory
+            portion of movie filename (if loaded from filesystem) are allowed to load.
+	    Because several files can be parsed in succession, each file can override
+	    or add to lists in other files. Use <emphasis>set</emphasis> to override
+	    all other lists or <emphasis>append</emphasis> to add new sandboxes.
+	    Note that there's currently no way to *drop* the directory of base dir
+	    from the list of allowed local sandboxes.
+	    </entry>
+</row>
+<row>
+<entry>delay</entry>
+<entry>Number</entry>
+<entry>&app; uses a timer-based event mechanism to advance frames
+	    at a steady rate. This option overrides the default
+	    setting in Gnash to play a movie slower or faster.</entry>
+</row>
+<row>
+<entry>verbosity</entry>
+<entry>Number</entry>
+<entry>This is a numeric value which defines the default level of
+	    verbosity from the player.</entry>
+</row>
+<row>
+<entry>MalformedSWFVerbosity</entry>
+<entry>on/off</entry>
+<entry>This value can be set to either <emphasis>on</emphasis> or
+	    <emphasis>off</emphasis>, and controls whether malformed SWF errors should
+	    be printed. If set to true, verbosity level is automatically incremented.
+	    Set <option>verbosity</option> to 0 afterwards to hush.</entry>
+</row>
+<row>
+<entry>ASCodingErrorsVerbosity</entry>
+<entry>on/off</entry>
+<entry>This value can be set to either <emphasis>on</emphasis> or
+	    <emphasis>off</emphasis>, and controls whether ActionScript coding
+	    errors should be printed. If set to true, verbosity level is
+	    automatically incremented.  Set <option>verbosity</option> to 0 afterwards to hush.</entry>
+</row>
+<row>
+<entry>debuglog</entry>
+<entry>Absolute path</entry>
+<entry>This is the full path and name of debug logfile as
+	produced by &app;. On systems with a UNIX-type shell,
+        a tilde prefix (~) will be expanded as by Posix shell requirements
+        (see http://www.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html#tag_02_06_01).</entry>
+</row>
+<row>
+<entry>writelog</entry>
+<entry>on/off</entry>
+<entry>This value can be set to either <emphasis>on</emphasis> or
+	    <emphasis>off</emphasis>, and controls whether a debug log
+	    is always written by &app;, or not at all.</entry>
+</row>
+<row>
+<entry>sound</entry>
+<entry>on/off</entry>
+<entry>This value can be set to either <emphasis>on</emphasis> or
+	    <emphasis>off</emphasis>, and controls the sound of the
+	    standalone player. By default &app; enables playing the
+	    sound in any Flash movie.</entry>
+</row>
+<row>
+<entry>pluginsound</entry>
+<entry>on/off</entry>
+<entry>This value can be set to either <emphasis>on</emphasis> or
+	    <emphasis>off</emphasis>, and controls the sound of the
+	    player when running as a browser plugin. By default, sound
+	    is enabled when using &app; as a browser plugin.</entry>
+</row>
+<row>
+<entry>EnableExtensions</entry>
+<entry>on/off</entry>
+<entry>Set to <emphasis>on</emphasis> to enable extensions. This option is <emphasis>off</emphasis> by default</entry>
+</row>
+<row>
+<entry>StartStopped</entry>
+<entry>on/off</entry>
+<entry>Set to <emphasis>on</emphasis> to have the GUI start in "stop" mode. This is useful in particular
+	    for the plugin, so you have to explicitly start any movie on a webpage. This option is <emphasis>off</emphasis> by default.
+	  </entry>
+</row>
+<row>
+<entry>flashVersionString</entry>
+<entry>string</entry>
+<entry>Set the string returned by $version and System.capabilities.version.
+       Useful to get around some flash version detection movies.
+       Note that the version advertised by the plugin is NOT affected by this setting,
+       instead you need to set the GNASH_FLASH_VERSION environment variable for
+       the latter (which doesn't affect $version and System.capabilities.version).</entry>
+</row>
+
+<row>
+<entry>flashSystemOS</entry>
+<entry>string</entry>
+<entry>The string that Gnash should return for System.capabilities.OS</entry>
+</row>
+
+<row>
+<entry>flashSystemManufacturer</entry>
+<entry>string</entry>
+<entry>The string that Gnash should return for System.capabilities.manufacturer</entry>
+</row>
+
+<row>
+<entry>StreamsTimeout</entry>
+<entry>double</entry>
+<entry>
+Set the number of seconds after which streams download time out. Note that timeouts only occurs after the given number of seconds
+passed w/out anything was received.
+</entry>
+</row>
+
+<row>
+<entry>insecureSSL</entry>
+<entry>on/off</entry>
+<entry>If set to <emphasis>on</emphasis>, no verification of SSL connections
+is performed. This means that, although the connection is encrypted, the server
+certificate could be invalid, may not belong to the host, or both. Equivalent
+to curl --insecure. By default, this option is <emphasis>off</emphasis> and
+connections will fail when a host cannot be verified.</entry>
+</row>
+
+<row>
+<entry>SOLsafedir</entry>
+<entry>Absolute path</entry>
+<entry>The full path to a directory where &app; should store Shared Object files (&quot;flash cookies&quot;) if
+they are enabled.</entry>
+</row>
+
+<row>
+<entry>SOLreadonly</entry>
+<entry>on/off</entry>
+<entry>If set to <emphasis>on</emphasis>, &app; will not write Shared Object files.</entry>
+</row>
+
+<row>
+<entry>URLOpenerFormat</entry>
+<entry>string</entry>
+<entry>
+Set the format of an url opener command. The %u label would be substituted by the actual url to be opened.
+Examples:
+<programlisting>
+ set urlOpenerFormat firefox -remote 'openurl(%u)'
+ set urlOpenerFormat xdg-open %u
+ set urlOpenerFormat open %u
+ set urlOpenerFormat kfmclient exec %u
+</programlisting>
+</entry>
+</row>
+
+</tbody>
+</tgroup>
+</table>
+
+    
+  <para>
+The following example <filename>.gnashrc</filename> file allows a user to only play Flash files saved locally to the machine on which &app; is running.  It also specifically forbids content from doubleclick.com and mochibot.com.  &app;'s error output is set to be fairly verbose, with the debug log placed in a location convenient for the user.  Finally, sound is turned on for both the standalone player and the plugin.
+</para>
+
+  <programlisting>
+  
+    #
+    # Gnash client options
+    #
+
+    # Only access remote content from our local domain
+    set localdomain on
+
+    # Only access content from our local host
+    set localhost on
+
+    # These sites are OK
+    # uncommenting the following line will allow load of external
+    # movies *only* from the specified hosts.
+    #set whitelist www.doonesbury.com www.cnn.com www.9news.com
+
+    # Disable whitelists set in any other gnashrc files, because
+    # these could override our blacklist.
+    set whitelist off
+
+    # Don't access content from these sites
+    set blacklist www.doubleclick.com mochibot.com
+
+    # The delay between timer interrupts
+    set delay 50
+
+    # The default verbosity level
+    set verbosity 1
+
+    # Be verbose about malformed SWF
+    set MalformedSWFVerbosity true
+
+    # Be verbose about AS coding errors
+    set ASCodingErrorsVerbosity true
+
+    # The full path to the debug log
+    set debuglog ~/gnash-dbg.log
+
+    # Write a debug log to disk
+    set writelog on
+
+    # Enable or Disable sound for the standalone player
+    set sound on
+
+    # Enable or Disable sound for the standalone player
+    set pluginsound on
+
+    # Make sure SSL connections are always verified
+    set insecureSSL off
+
+    # Use firefox to open urls
+    set urlOpenerFormat firefox -remote 'openurl(%u)'
+
+  </programlisting>
+
+
+</sect1>
+  

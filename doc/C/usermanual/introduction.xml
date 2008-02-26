@@ -18,6 +18,17 @@
     player much like perl or python does.
   </para>
 
+  <sect1 id="audience">
+    <title>Audience</title>
+    
+    <para>
+      This manual is primarily focused on users interested in how to
+      get Gnash installed from a package, and basic usage as a web
+      browser plugin. For more technical details, please refer to the
+      Gnash Reference manual.
+    </para>
+    
+  </sect1>    
   
   <sect1 id="runs-on">
     <title>What Is Supported ?</title>
@@ -67,7 +78,7 @@
     </para>
     
     <para>
-      Gnash uses ffmpeg for codecs, so any file suppored by Mplayer
+      Gnash uses ffmpeg for codecs, so any file supported by Mplayer
       should work with Gnash. Gnash supports the loading of patent
       free codecs like Ogg Vorbis or Theora from disk based files,
       while work is being done to support these codecs when embedded
@@ -76,19 +87,5 @@
     </para>
   </sect1>
 
-  <sect1 id="audience">
-    <title>Audience</title>
-    
-    <para>
-      This manual is primarily focused on developers interested in
-      contributing to or building from the &app; project.  It serves as a
-      detailed reference guide, including a catalog and explanation of all
-      options and features.  This level of detail may make this guide
-      cumbersome for the average user, although advanced users may find it
-      helpful. 
-    </para>
-    
-  </sect1>  
-  
 </chapter>
 

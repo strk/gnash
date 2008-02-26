@@ -1,42 +1,18 @@
-  <revhistory>
-
-      <revision> 
-          <revnumber>&appname; Manual version 0.3.0</revnumber> 
-          <date>Oct 2006</date>
-          <revdescription> 
-              <para role="author">Rob Savoye
-              <email>rob@welcomehome.org</email>
-              Updated for the alpha release.
-              </para>
-
-              <para role="publisher">Free Software Foundation</para>
-          </revdescription> 
-      </revision> 
-
-      <revision>
-          <revnumber>&appname; Manual version 0.4.0</revnumber> 
-          <date>June 2007</date>
-          <revdescription>
-              <para role="author">Ann Barcomb
-              <email>kudra@domaintje.com</email>
-              Rewritten for software version 0.8.0.
-              </para>
-
-              <para role="publisher">Free Software Foundation</para>
-          </revdescription>
-      </revision>
-
-      <revision> 
-          <revnumber>&appname; Manual version 0.4.1</revnumber> 
-          <date>Feb 2008</date>
-          <revdescription> 
-              <para role="author">Rob Savoye
-              <email>rob@welcomehome.org</email>
-              Updated for the 0.8.2 release.
-              </para>
-
-              <para role="publisher">Free Software Foundation</para>
-          </revdescription> 
-      </revision> 
-
-    </revhistory> 
+<revhistory>
+  
+  <revision> 
+    <revnumber>Gnash User Manual version 0.1</revnumber> 
+    <date>Feb 2008</date>
+    <revdescription> 
+      <para role="author">Rob Savoye
+      <email>rob@openmedianow.org</email>
+      The end user parts of the manual have been pulled out of
+      the original version of the manual, and rewritten.
+      </para>
+      
+      <para role="publisher">Open Media Now!</para>
+    </revdescription> 
+  </revision> 
+  
+</revhistory> 
+  
