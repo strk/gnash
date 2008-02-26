@@ -1546,8 +1546,11 @@ if test x"$media_handler" = x"gst"; then
   CFLAGS=$GSTREAMER_CFLAGS
   AC_TRY_COMPILE([#include <gst/pbutils/install-plugins.h>],[void* pointer = &gst_install_plugins_async],
     GSTREAMER_LIBS="$GSTREAMER_LIBS -lgstpbutils-0.10",
-    has_modern_gstpbutils='no')]
-    CFLAGS=$save_cflags
+    has_modern_gstpbutils='no')
+  AC_TRY_COMPILE([#include <gst/pbutils/install-plugins.h>],[void* pointer = &gst_install_plugins_supported],
+    AC_DEFINE([HAVE_GST_INSTALL_PLUGINS_SUPPORTED], [], [GStreamer provides the gst_install_plugins_supported function]),
+    has_gst_install_plugins_supported='no')
+  CFLAGS=$save_cflags
   if test x$has_modern_gstpbutils = xno; then
     AC_MSG_RESULT([no {GSTREAMER_CFLAGS=$GSTREAMER_CFLAGS}])
   else
