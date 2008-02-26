@@ -16,13 +16,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoder.h,v 1.14 2008/02/25 17:24:47 bjacques Exp $
+// $Id: VideoDecoder.h,v 1.15 2008/02/26 15:37:48 strk Exp $
 
 #ifndef __VIDEODECODER_H__
 #define __VIDEODECODER_H__
 
 #include "MediaParser.h"
 #include "image.h"
+
+#include <boost/noncopyable.hpp>
 
 namespace gnash {
 namespace media {
