@@ -1,3 +1,8 @@
+2008-02-26 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/asobj/NetStreamGst.cpp: Use the new check for
+	gst_install_plugins_supported.
+
 2008-02-26 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac: check for gst_install_plugins_supported.
