@@ -25,28 +25,10 @@ figdir = images
 docname = gnash
 lang = C
 omffile = gnash-C.omf
-entities = \
-	internals.xml \
-	amf.xml	\
-	appendix.xml \
-	debugger.xml \
-	extensions.xml \
-	fdl-appendix.xml \
-	fileext.xml \
-	gtkext.xml \
-	mysqlext.xml \
-	object.xml \
-	opcodes.xml \
-	plugin.xml \
-	rtmp.xml \
-	app_authors.xml	\
-	conformance.xml	\
-	gpl-appendix.xml \
-	legal.xml \
-	logging.xml \
-	actionscript/main.xml \
-	actionscript/as_value.xml \
-	actionscript/new_as_class.xml \
+
+# These are the files needed to build the Gnash ActionScript
+# specification.
+asspec =  \
 	asspec/accessibility.xml \
 	asspec/array.xml \
 	asspec/asspec.xml \
@@ -84,30 +66,69 @@ entities = \
 	asspec/video.xml \
 	asspec/xml.xml \
 	asspec/xmlnode.xml \
-	asspec/xmlsocket.xml	\
-	usermanual/installation/code_dependencies.xml \
-	usermanual/installation/configuration.xml \
-	usermanual/installation/custompath_configuration.xml \
-	usermanual/installation/documentation_dependencies.xml	\
-	usermanual/installation/feature_configuration.xml \
-	usermanual/installation/packagemanager.xml \
-	usermanual/installation/sources.xml \
-	usermanual/installation/testing_dependencies.xml \
-	usermanual/installation/cross_compiling.xml	\
-	usermanual/installation/building.xml \
-	usermanual/installation/install.xml \
-	usermanual/doc_authors.xml \
+	asspec/xmlsocket.xml
+
+# These are the files needed to build the Gnash user
+# manual.
+userman = \
 	usermanual/installation.xml \
 	usermanual/introduction.xml \
 	usermanual/revisions.xml \
 	usermanual/usage.xml \
-	usermanual/usage/gnashrc.xml \
+	usermanual/gnashrc.xml \
 	usermanual/bugreport.xml \
 	usermanual/acknowledgments.xml \
-	usermanual/conventions.xml \
+	usermanual/conventions.xml
+
+# These are the files needed to build the Gnash reference
+# manual.
+refman = \
+	refmanual/code_dependencies.xml \
+	refmanual/configuration.xml \
+	refmanual/custompath_configuration.xml \
+	refmanual/documentation_dependencies.xml	\
+	refmanual/feature_configuration.xml \
+	refmanual/packagemanager.xml \
+	refmanual/sources.xml \
+	refmanual/testing_dependencies.xml \
+	refmanual/cross_compiling.xml	\
+	refmanual/building.xml \
+	refmanual/install.xml
+
+# This is the body of the manuals.
+entities = \
+	app_authors.xml	\
+	doc_authors.xml \
+	internals.xml \
+	amf.xml	\
+	appendix.xml \
+	debugger.xml \
+	extensions.xml \
+	fdl-appendix.xml \
+	fileext.xml \
+	gtkext.xml \
+	mysqlext.xml \
+	object.xml \
+	opcodes.xml \
+	plugin.xml \
+	rtmp.xml \
+	conformance.xml	\
+	gpl-appendix.xml \
+	legal.xml \
+	logging.xml \
+	actionscript/main.xml \
+	actionscript/as_value.xml \
+	actionscript/new_as_class.xml \
+	$(asspec) \
+	$(refman) \
+	$(userman) \
 	$(NULL)
 
-xml_files = $(docname).xml actionscript.xml
+# These are the top level files for each manual.
+xml_files = \
+	usermanual/gnashuser.xml \
+	refmanual/gnashref.xml \
+	actionscript.xml 
 
 #noinst_SCRIPT = gen-doc.sh
 dist_man_MANS = gnash.1 gprocessor.1 dumpshm.1 soldumper.1 cygnal.1
@@ -116,13 +137,13 @@ MANSRC = $(dist_man_MANS:.1=.man-xml)
 # dist_html_DATA = gnash.html actionscript.html
 # dist_info_DATA = gnash.info actionscript.info
 
-html: links gnash.html actionscript.html
-pdf:  links gnash.pdf actionscript.pdf
+gnashuser.html gnashuser.pdf gnashuser.info: gnashuser.xml $(userman)
+gnashref.html gnashref.pdf gnashref.info: gnashref.xml $(refman)
+
+html: images gnashuser.html gnashref.html actionscript.html
+pdf:  images gnashuser.pdf gnashref.pdf actionscript.pdf
 man:  $(dist_man_MANS)
-texi: gnash.texi actionscript.texi
-info: links gnash.info actionscript.info
-gnash.pdf gnash.html gnash.texi: links $(xml_files) $(entities)
-actionscript.pdf actionscript.html actionscript.texi: actionscript.xml actionscript/main.xml actionscript/as_value.xml actionscript/new_as_class.xml
+info: images gnashuser.info gnashref.info actionscript.info
 
 SUFFIXES = .xml .html .texi .pdf .info .1 .fo .man-xml
 
@@ -135,11 +156,12 @@ EXTRA_DIST = \
 	actionscript.info \
 	gnash.info \
 	actionscript.html \
-	gnash.html
+	gnashuser.html \
+	gnashref.html
 
 if ENABLE_FOP
 .xml.pdf:
-	$(FOP) -xsl $(docbook_styles)/fo/docbook.xsl -xml $< -pdf $@
+	-$(FOP) -xsl $(docbook_styles)/fo/docbook.xsl -xml $< -pdf $@
 else
 if ENABLE_XMLTEX
 .xml.fo:
@@ -156,7 +178,7 @@ endif
 
 .xml.html:
 if ENABLE_HTML
-	$(XSLTPROC) --output $@ --nonet $(docbook_styles)/html/docbook.xsl $<
+	-$(XSLTPROC) --output $@ --nonet $(docbook_styles)/html/docbook.xsl $<
 	@$(RM) $*.txml
 else
 	@if test -d $(top_srcdir)/packaging/doc; then \
@@ -221,20 +243,6 @@ images:
 	   $(LN_S) -f $(srcdir)/images images; \
 	fi
 
-# When we build in a seperate build tree, we need links to these
-# additional Docbook source subdirectoriers to have them be included
-# in the final output without error.
-links: images
-	@if test ! -d asspec; then \
-	   $(LN_S) -f $(srcdir)/asspec; \
-	fi
-	@if test ! -d usermanual; then \
-	   $(LN_S) -f $(srcdir)/usermanual; \
-	fi
-	@if test ! -d actionscript; then \
-	   $(LN_S) -f $(srcdir)/actionscript; \
-	fi
-
 lint:
 	@xmllint $(srcdir)/gnash.xml
 
@@ -254,7 +262,10 @@ MAINTAINERCLEANFILES = \
         gnash.pdf \
 	$(MANS) \
         gnash.info \
-        gnash.html \
+        gnashuser.info \
+        gnashref.info \
+        gnashuser.html \
+        gnashref.html \
 	actionscript.html \
 	actionscript.info
 
