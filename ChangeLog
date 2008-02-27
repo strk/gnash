@@ -1,5 +1,7 @@
 2008-02-27 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/PASSING: prototype-addProperty-6.swf
+	  succeeds now.
 	* server/Property.{cpp,h}: don't go into an infinite loop
 	  if a getter or setter gets or sets the member it targets.
 	  Fixes bug #22420.
