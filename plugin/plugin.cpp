@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.97 2008/02/19 19:20:51 bwy Exp $ */
+/* $Id: plugin.cpp,v 1.98 2008/02/27 07:49:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -564,14 +564,14 @@ nsPluginInstance::handlePlayerRequestsWrapper(GIOChannel* iochan, GIOCondition c
 bool
 nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 {
-	if ( cond == G_IO_HUP )
+	if ( cond & G_IO_HUP )
 	{
 		cout << "Player request channel hang up" << endl;
 		g_source_remove(_ichanWatchId);
 		return false;
 	}
 
-	assert(cond == G_IO_IN);
+	assert(cond & G_IO_IN);
 	int inputfd = g_io_channel_unix_get_fd(iochan);
 
 	cout << "Checking player requests on fd " << inputfd << endl;

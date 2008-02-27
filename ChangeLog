@@ -1,3 +1,7 @@
+2008-02-27 Marcin Cieślak <saper@saper.info>
+
+	* plugin/plugin.cpp: GIOCondition is a bitfield. Patch #6436.
+
 2008-02-26 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/asobj/NetStreamGst.cpp: Use the new check for
