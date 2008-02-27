@@ -1,3 +1,8 @@
+2008-02-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/fb.cpp, gui/sdl_agg_glue.cpp, gui/gnash.cpp:
+	* libmedia/AudioDecoderNellymoser.cpp: use standard C++ headers
+
 2008-02-27 Sandro Santilli <strk@keybit.net>
 
 	* plugin/plugin.cpp: don't force verbosity, the config file can

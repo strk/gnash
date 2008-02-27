@@ -72,14 +72,14 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <fcntl.h>
-#include <errno.h>
+#include <cerrno>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <linux/fb.h>
 #include <linux/kd.h>
 #include <linux/vt.h>
 #include <unistd.h>
-#include <signal.h>
+#include <csignal>
 
 
 #include "gnash.h"

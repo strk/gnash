@@ -1,4 +1,3 @@
-
 // gnash.cpp:  Main routine for top-level flash player, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
@@ -58,7 +57,7 @@ extern "C"{
 #include <iostream>
 
 #ifdef ENABLE_NLS
-# include <locale.h>
+# include <locale>
 #endif
 
 #ifdef GUI_ALP

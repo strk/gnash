@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderNellymoser.cpp,v 1.8 2008/02/08 15:27:30 bjacques Exp $
+// $Id: AudioDecoderNellymoser.cpp,v 1.9 2008/02/27 08:51:54 bwy Exp $
 
 // This file incorporates work covered by the following copyright and permission
 // notice:
@@ -49,9 +49,9 @@
 
 #include "AudioDecoderNellymoser.h"
 #include "utility.h"
-#include <stdlib.h>
-#include <time.h>
-#include <math.h>
+#include <cstdlib>
+#include <ctime>
+#include <cmath>
 
 namespace gnash {
 namespace media {

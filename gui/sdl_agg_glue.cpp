@@ -21,7 +21,7 @@
 #include "log.h"
 #include "render_handler.h"
 #include "render_handler_agg.h"
-#include <errno.h>
+#include <cerrno>
 #include <ostream>
 
 using namespace std;
