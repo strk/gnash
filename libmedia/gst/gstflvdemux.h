@@ -23,6 +23,9 @@
 #include <gst/gst.h>
 #include <gst/base/gstadapter.h>
 
+#define GstFLVDemux GstGnashFLVDemux
+#define GstFLVDemuxClass GstGnashFLVDemuxClass
+
 G_BEGIN_DECLS
 #define GST_TYPE_FLV_DEMUX \
   (gst_flv_demux_get_type())
