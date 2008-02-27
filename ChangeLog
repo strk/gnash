@@ -1,5 +1,7 @@
 2008-02-27 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.h: callStackDepth can be static, since
+	  the call stack is..
 	* server/vm/ASHandlers.cpp: add more logging in DefineFunction{2}.
 
 2008-02-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>

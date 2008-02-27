@@ -477,7 +477,7 @@ public:
 	}
 
 	/// Return the depth of call stack
-	size_t callStackDepth()
+	static size_t callStackDepth()
 	{
 		return _localFrames.size();
 	}
