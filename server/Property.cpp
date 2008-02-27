@@ -26,6 +26,19 @@ as_value
 Property::getDelayedValue(const as_object& this_ptr) const
 {
 	const as_accessors* a = boost::get<const as_accessors>(&mBound);
+
+	// Don't recursively invoke a getter
+	//
+	// NOTE: it seems recursion protection is handled differently
+	//       when the SWF is targetted at player 7 or higher.
+	//       See actionscript.all/Object.as
+	//
+	as_accessors::ScopedLock lock(*a);
+	if ( ! lock.obtained() )
+	{
+		return a->underlyingValue;
+	}
+
 	as_environment env;
 	fn_call fn(const_cast<as_object*>(&this_ptr), &env, 0, 0);
 	if (mDestructive)
@@ -56,11 +69,29 @@ Property::getDelayedValue(const as_object& this_ptr) const
 void
 Property::setDelayedValue(as_object& this_ptr, const as_value& value)
 {
-	const as_accessors* a = boost::get<const as_accessors>(&mBound);
+	log_debug("setDelayedValue: %s", value.to_debug_string().c_str());
+	as_accessors* a = boost::get<as_accessors>(&mBound);
+
+	// Don't recursively invoke a setter
+	//
+	// NOTE: it seems recursion protection is handled differently
+	//       when the SWF is targetted at player 7 or higher.
+	//       In particular, it is not avoided unless the setter
+	//       calls self.. See actionscript.all/Object.as
+	//
+	as_accessors::ScopedLock lock(*a);
+	if ( ! lock.obtained() )
+	{
+		a->underlyingValue = value;
+		return;
+	}
+
+
 	as_environment env;
 	env.push(value);
 	fn_call fn(&this_ptr, &env, 1, 0);
 	(*a->mSetter)(fn);
+
 	return;
 
 	// TODO: Push value
@@ -105,14 +136,21 @@ Property::setReachable() const
 	case 2: // Getter/setter
 	{
 		const as_accessors& a = boost::get<as_accessors>(mBound);
-		if (a.mGetter) a.mGetter->setReachable();
-		if (a.mSetter) a.mSetter->setReachable();
+		a.markReachableResources();
 		break;
 	}
 	default:
 		abort(); // Not here.
 		break;
 	}
+}
+
+void
+as_accessors::markReachableResources() const
+{
+	if (mGetter) mGetter->setReachable();
+	if (mSetter) mSetter->setReachable();
+	underlyingValue.setReachable();
 }
 
 } // namespace gnash

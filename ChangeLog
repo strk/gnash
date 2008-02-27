@@ -1,5 +1,15 @@
 2008-02-27 Sandro Santilli <strk@keybit.net>
 
+	* server/Property.{cpp,h}: don't go into an infinite loop
+	  if a getter or setter gets or sets the member it targets.
+	  Fixes bug #22420.
+	* testsuite/actionscript.all/Object.as: add test for recursive
+	  getter/setter. Gnash fails at NOT protecting from infinite
+	  recursion non-trival call graphs in SWF7+ (but is compatible
+	  with SWF6 in that reguard).
+
+2008-02-27 Sandro Santilli <strk@keybit.net>
+
 	* server/as_environment.h: callStackDepth can be static, since
 	  the call stack is..
 	* server/vm/ASHandlers.cpp: add more logging in DefineFunction{2}.

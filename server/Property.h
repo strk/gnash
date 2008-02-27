@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: Property.h,v 1.18 2008/01/21 20:55:47 rsavoye Exp $ */ 
+/* $Id: Property.h,v 1.19 2008/02/27 16:22:33 strk Exp $ */ 
 
 #ifndef GNASH_PROPERTY_H
 #define GNASH_PROPERTY_H
@@ -24,11 +24,13 @@
 #include "gnashconfig.h"
 #endif
 
-#include <boost/variant.hpp>
-
 #include "as_prop_flags.h"
 #include "as_value.h"
 #include "string_table.h"
+#include "log.h"
+
+#include <boost/variant.hpp>
+#include <cassert>
 
 namespace gnash {
 
@@ -39,12 +41,56 @@ class PropertyList;
 class as_accessors
 {
 public:
+
+	/// For SWF6 (not higher) a setter would not be invoked
+	/// while being set. This ScopedLock helps marking a
+	/// Getter-Setter as being invoked in an exception-safe
+	/// manner.
+	class ScopedLock {
+		const as_accessors& a;
+		bool obtainedLock;
+
+		ScopedLock(ScopedLock&);
+		ScopedLock& operator==(ScopedLock&);
+	public:
+
+		ScopedLock(const as_accessors& na) : a(na)
+		{
+			if ( a.beingAccessed ) obtainedLock=false;
+			else {
+				a.beingAccessed = true;
+				obtainedLock = true;
+			}
+		}
+
+		~ScopedLock() { if ( obtainedLock) a.beingAccessed = false; }
+
+		/// Return true if the lock was obtained
+		//
+		/// If false is returned, we're being called recursively,
+		/// which means we should set the underlyingValue instead
+		/// of calling the setter (for SWF6, again).
+		///
+		bool obtained() const { return obtainedLock; }
+	};
+
+	friend class ScopedLock;
+
 	as_function* mGetter;
 	as_function* mSetter;
 
+	as_value underlyingValue;
+
 	as_accessors(as_function* getter, as_function* setter) : mGetter(getter),
-		mSetter(setter)
+		mSetter(setter), underlyingValue(), beingAccessed(false)
 	{/**/}
+
+	void markReachableResources() const;
+
+private:
+
+	mutable bool beingAccessed;
+
 };
 
 /// An abstract property
@@ -186,6 +232,7 @@ public:
 			// Destructive are always overwritten.
 			if (mDestructive)
 			{
+	gnash::log_debug("destructive getter/setter, value %s", value.to_debug_string().c_str());
 				mDestructive = false;
 				mBound = value;
 			}

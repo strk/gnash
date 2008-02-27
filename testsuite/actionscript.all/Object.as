@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.38 2007/10/24 21:55:33 strk Exp $";
+rcsid="$Id: Object.as,v 1.39 2008/02/27 16:22:34 strk Exp $";
 
 #include "check.as"
 
@@ -307,6 +307,79 @@ var c = o.addProperty(2,5);
 check_equals(c, 7);
 check(o.addProperty != Object.prototype.addProperty );
 
+// recursive setter
+mem_setter = function(x)
+{
+	this.mem2 = x;
+	this.mem = x;
+};
+mem_getter = function()
+{
+	return this.mem;
+};
+o = {};
+o.addProperty('mem', mem_getter, mem_setter);
+check_equals(typeof(o.mem), 'undefined');
+o.mem = 3; // watch out for recursion !
+check_equals(o.mem, 3);
+check_equals(o.mem2, 3);
+
+// Test double-recursion of setter:
+//  setter1 triggers setter2
+
+mem1_getter = function() { return this.mem1; };
+mem1_setter = function(x)
+{
+	if ( this.setterCalls > 2 )
+	{
+		return;
+	}
+	++this.setterCalls;
+	o2.mem2 = x;
+	this.mem1 = x;
+};
+
+mem2_getter = function() { return this.mem2; };
+mem2_setter = function(x)
+{
+	if ( this.setterCalls > 2 )
+	{
+		return;
+	}
+	++this.setterCalls;
+	o1.mem1 = x;
+	this.mem2 = x;
+};
+
+o1 = {}; o1.addProperty('mem1', mem1_getter, mem1_setter);
+o2 = {}; o2.addProperty('mem2', mem2_getter, mem2_setter);
+
+o1.setterCalls = o2.setterCalls = 0; // reset counters
+o1.mem1 = 3;
+#if OUTPUT_VERSION == 6
+ check_equals(o1.setterCalls, 1);
+ check_equals(o2.setterCalls, 1);
+#else
+ // SWF7+ doesn't protect recursion..
+ xcheck_equals(o1.setterCalls, 3);
+ xcheck_equals(o2.setterCalls, 3);
+#endif
+check_equals(o1.mem1, 3);
+check_equals(o1.mem1, 3);
+
+o1.setterCalls = o2.setterCalls = 0; // reset counters
+o2.mem2 = 6;
+#if OUTPUT_VERSION == 6
+ check_equals(o1.setterCalls, 1);
+ check_equals(o2.setterCalls, 1);
+#else
+ // SWF7+ doesn't protect recursion..
+ xcheck_equals(o1.setterCalls, 3);
+ xcheck_equals(o2.setterCalls, 3);
+#endif
+check_equals(o1.mem1, 6);
+check_equals(o2.mem2, 6);
+
 // Object.addProperty wasn't in SWF5
 #endif // OUTPUT_VERSION > 5
 
@@ -455,8 +528,11 @@ check( obj8.prototype.isPrototypeOf(obj9) );
 #endif // OUTPUT_VERSION > 5
 
 
-#if OUTPUT_VERSION > 5
-totals(156);
-#else
+#if OUTPUT_VERSION <= 5
 totals(63);
 #endif
+
+#if OUTPUT_VERSION >= 6
+totals(167);
+#endif
+
