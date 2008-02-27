@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.199 2008/02/20 17:43:18 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.200 2008/02/27 10:25:39 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -3904,8 +3904,12 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 	// If we have a name, then save the function in this
 	// environment under that name.
 	as_value function_value(func);
-	if (name.length() > 0)
+	if (!name.empty())
 	{
+		IF_VERBOSE_ACTION(
+		log_action("DefineFunction2: named function '%s' starts at PC %d", name.c_str(), func->getStartPC());
+		);
+
 		//env.set_member(name, function_value);
 		thread.setVariable(name, function_value);
 	}
@@ -3913,6 +3917,9 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 	// Otherwise push the function literal on the stack
 	else
 	{
+		IF_VERBOSE_ACTION(
+		log_action("DefineFunction2: anonymous function starts at PC %d", func->getStartPC());
+		);
 		env.push(function_value);
 	}
 #ifdef USE_DEBUGGER
@@ -4117,8 +4124,12 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 	// If we have a name, then save the function in this
 	// environment under that name.
 	as_value	function_value(func);
-	if (name.length() > 0)
+	if (!name.empty())
 	{
+		IF_VERBOSE_ACTION(
+		log_action("DefineFunction: named function '%s' starts at PC %d", name.c_str(), func->getStartPC());
+		);
+
 		//env.set_member(name, function_value);
 		thread.setVariable(name, function_value);
 #ifdef USE_DEBUGGER
@@ -4138,6 +4149,10 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 	// Otherwise push the function literal on the stack
 	else
 	{
+		IF_VERBOSE_ACTION(
+		log_action("DefineFunction: anonymous function starts at PC %d", func->getStartPC());
+		);
+
 		env.push(function_value);
 	}
 

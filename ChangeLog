@@ -1,3 +1,7 @@
+2008-02-27 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ASHandlers.cpp: add more logging in DefineFunction{2}.
+
 2008-02-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/fb.cpp, gui/sdl_agg_glue.cpp, gui/gnash.cpp:
