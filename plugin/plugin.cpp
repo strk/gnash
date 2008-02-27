@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.98 2008/02/27 07:49:18 strk Exp $ */
+/* $Id: plugin.cpp,v 1.99 2008/02/27 08:48:14 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -826,8 +826,8 @@ nsPluginInstance::startProc(Window win)
 	size_t argc = 0;
 	argv[argc++] = procname.c_str();
 	
-	// Verbose
-	argv[argc++] = "-v";
+	// Don't force verbosity, use configuration for that
+	//argv[argc++] = "-v";
 	
 	// X window ID (necessary for gnash to function as a plugin)
 	argv[argc++] = "-x";

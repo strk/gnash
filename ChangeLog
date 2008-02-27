@@ -1,3 +1,8 @@
+2008-02-27 Sandro Santilli <strk@keybit.net>
+
+	* plugin/plugin.cpp: don't force verbosity, the config file can
+	  be used for that.
+
 2008-02-27 Marcin Cieślak <saper@saper.info>
 
 	* plugin/plugin.cpp: GIOCondition is a bitfield. Patch #6436.
