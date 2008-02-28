@@ -596,7 +596,7 @@ AC_ARG_ENABLE(media,
      ;;
    *) AC_MSG_ERROR([bad value ${enableval} for --enable-media option]) ;;
   esac],
- [media_handler=gst]
+ [media_handler=gst; media_handler_specified=true]
 )
 
 AC_ARG_ENABLE(lirc, AC_HELP_STRING([--enable-lirc], [Disable support for Lirc]),

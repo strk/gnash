@@ -1,5 +1,7 @@
 2008-02-28 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: pretend --enable-media=gst was given by default,
+	  so we don't fallback on ffmpeg, being still unstable.
  	* server/sprite_instance.cpp (stagePlacementCallback): don't queue
 	  a LOAD event for the root movie for SWF versions up to 5.
 	* testsuite/swfdec/PASSING: root-onload-5.swf succeeds.
