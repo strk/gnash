@@ -3,6 +3,7 @@ abort-really-aborts-6.swf:b932b86a10e5668e2e85d5cca0662b4f
 abort-really-aborts-7.swf:2f7ae8e5595e0dec523ea46107683025
 abort-really-aborts-8.swf:cfd60440f939844201b7bc405a75d662
 add2-different-objects-5.swf:e35553c20f435d125b6e4905cbd1ad20
+add2-different-objects-5.swf:e35553c20f435d125b6e4905cbd1ad20
 addProperty-5.swf:00e23fa4da0445805c0c4ea3f54a140d
 addProperty-delete-5.swf:27b4309647c2ef74ec4ce8caea05f4bd
 addProperty-flags-5.swf:16a729f3d956fd1287236873fb26fac4
@@ -371,8 +372,12 @@ netstream-fscommand-6.swf:7151ee0808f01d502171c4813d38d3fa
 netstream-fscommand-7.swf:ec9312835ba2e8a7347252bcaef7db0b
 netstream-fscommand-8.swf:38f05e4f8d3a4e2faae0ef9e18e7754b
 newmethod-undefined-5.swf:e01bea2bb053c7448118759dacbcbe6b
+newmethod-undefined-5.swf:e01bea2bb053c7448118759dacbcbe6b
+newmethod-undefined-6.swf:af4fc8db6114d8b4470b10a09b87e303
 newmethod-undefined-6.swf:af4fc8db6114d8b4470b10a09b87e303
 newmethod-undefined-7.swf:7e226bdd682c6efeb3054b1f77fc9487
+newmethod-undefined-7.swf:7e226bdd682c6efeb3054b1f77fc9487
+newmethod-undefined-8.swf:d577e316a72add563c2f6a7e670b7814
 newmethod-undefined-8.swf:d577e316a72add563c2f6a7e670b7814
 newobject-paths-5.swf:7fe3f8dd1f89838358ba5e92417ac888
 newobject-paths-6.swf:e2e207b7b6966fdffd3a0017cdbf2f1c
@@ -535,6 +540,9 @@ removesprite-depths-6.swf:039c217ab8233668d64bffd2e7a6ef79
 removesprite-depths-7.swf:b792dc92c63978c09f9c937a2d5a24cf
 remove-with-onUnload-5.swf:5d41fcdce5757cff3e4c9678c9c3e72b
 rewind-remove-5.swf:70780bb0428e3795f6866a1c47bb46b0
+root-onload-6.swf:0d09109c7f942e8268aa0b9661071f1d
+root-onload-7.swf:baed64fdde7c5f27344daa4268ce6202
+root-onload-8.swf:25d71869e59a04c1576efb74f5b5763f
 rotation2-5.swf:4edcd35e1076a14037d3531ec780d292
 round-direction-5.swf:3a69581d4483d995a04ab3a2aa005278
 round-direction-6.swf:2f7d7580490e0c4a3ddfb107849dc6d8
