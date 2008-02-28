@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.42 2008/02/24 19:21:12 bjacques Exp $
+// $Id: video_stream_def.cpp,v 1.43 2008/02/28 17:13:49 strk Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -89,12 +89,10 @@ video_stream_definition::readDefineVideoStream(stream* in, SWF::tag_type tag, mo
 	}
 
 #ifdef SOUND_GST
-# define VIDEO_DECODER_NAME VideoDecoderGst
+	_decoder.reset( new media::VideoDecoderGst(m_codec_id, _width, _height) );
 #elif defined(USE_FFMPEG)
-# define VIDEO_DECODER_NAME VideoDecoderFfmpeg
+	_decoder.reset( new media::VideoDecoderFfmpeg(m_codec_id, _width, _height) );
 #endif
-	_decoder.reset( new media::VIDEO_DECODER_NAME(m_codec_id, _width, _height) );
-#undef VIDEO_DECODER_NAME
 }
 
 void
@@ -103,6 +101,7 @@ video_stream_definition::readDefineVideoFrame(stream* in, SWF::tag_type tag, mov
 	// Character ID has been read already, and was loaded in the constructor
 
 	assert(tag == SWF::VIDEOFRAME);
+	if ( ! _decoder.get() ) return; // --enable-media=none - TODO: create a NullVideoDecoder ?
 	assert ( _decoder.get() ); // not allowed to be called for a dynamically-created video_stream_def
 
 	in->ensureBytes(2);

@@ -1,5 +1,10 @@
 2008-02-28 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/video_stream_def.{cpp,h}: fix build and runtime
+	  with --disable-media.
+
+2008-02-28 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: pretend --enable-media=gst was given by default,
 	  so we don't fallback on ffmpeg, being still unstable.
  	* server/sprite_instance.cpp (stagePlacementCallback): don't queue

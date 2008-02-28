@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.h,v 1.25 2008/02/24 19:21:12 bjacques Exp $
+// $Id: video_stream_def.h,v 1.26 2008/02/28 17:13:49 strk Exp $
 
 #ifndef GNASH_VIDEO_STREAM_DEF_H
 #define GNASH_VIDEO_STREAM_DEF_H
@@ -32,12 +32,6 @@
 #include "rect.h" // for composition
 #include "ControlTag.h"
 #include "VideoDecoder.h"
-
-#ifdef SOUND_GST
-# include "VideoDecoderGst.h"
-#elif defined(USE_FFMPEG)
-# include "VideoDecoderFfmpeg.h"
-#endif
 
 #include "image.h"
 
@@ -182,11 +176,7 @@ private:
 	boost::uint32_t _height;
 
 	/// The decoder used to decode the video frames
-#ifdef SOUND_GST
-	boost::scoped_ptr<media::VideoDecoderGst> _decoder;
-#elif defined(USE_FFMPEG)
-	boost::scoped_ptr<media::VideoDecoderFfmpeg> _decoder;
-#endif
+	boost::scoped_ptr<media::VideoDecoder> _decoder;
 };
 
 }	// end namespace gnash
