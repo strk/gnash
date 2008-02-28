@@ -1,5 +1,11 @@
 2008-02-28 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: never attempt to use libmad, fallback to ffmpeg if
+	  gstreamer is not supported and not explicitly requested.
+	* doc/C/usermanual/glossary.xml: update info about libmedia.
+
+2008-02-28 Sandro Santilli <strk@keybit.net>
+
 	* server/Property.{cpp,h}: drop left over debugging calls.
 
 2008-02-27 Bastiaan Jacques <bastiaan@bjacques.org>

@@ -1501,17 +1501,6 @@ if test x$glext = xno -a x$build_ogl = xyes; then
   AC_MSG_WARN([GTK2 specified for the GUI, but GtkGlExt is not present. Trying SDL instead.])
 fi
 
-if test x"$media_handler" = x"ffmpeg"; then
-  GNASH_PATH_FFMPEG
-  if test x"${media_handler_specified}" = xfalse; then
-     # If the library is not found, or its version is not ok, we'll try gst
-     if test x"${ac_cv_path_ffmpeg_lib}" = x -o x"${ffmpeg_version}" != xok; then
-       AC_MSG_WARN([No appropriate ffmpeg library found, will try using gstreamer.])
-       media_handler=gst
-     fi
-  fi
-fi
-
 missing_codecs=""
 if test "$media_handler" = "gst"; then
   AC_PATH_PROG(GST_INSPECT, gst-inspect, ,[${pathlist}])
@@ -1534,11 +1523,35 @@ if test "$media_handler" = "gst"; then
   if test x"${media_handler_specified}" = xfalse; then
     # If the library is not found, or its version is not ok, we'll try mad
     if test x"$GSTREAMER_LIBS" = x; then
-       AC_MSG_WARN([No appropriate gstreamer library found, will try using mad.])
-       media_handler=mad
+       AC_MSG_WARN([No appropriate gstreamer library found, will try using ffmpeg.])
+       media_handler=ffmpeg
     fi
   fi
 fi
+
+if test x"$media_handler" = x"ffmpeg"; then
+  GNASH_PATH_FFMPEG
+  if test x"${media_handler_specified}" = xfalse; then
+     # If the library is not found, or its version is not ok, we'll try gst
+     if test x"${ac_cv_path_ffmpeg_lib}" = x -o x"${ffmpeg_version}" != xok; then
+       AC_MSG_WARN([No appropriate ffmpeg library found, disabling media handling.])
+       media_handler=none
+     fi
+  fi
+fi
+
+#if test x"$media_handler" = x"mad"; then
+#  dnl Will set MAD_LIBS and MAD_CFLAGS.
+#  dnl Handles --with-mad-incl and --with-mad-lib
+#  GNASH_PKG_FIND(mad, [mad.h], [mad library], mad_copyright)
+#  if test x"${media_handler_specified}" = xfalse; then
+#    # If the library is not found, we'll disable media handling
+#    if test x"${ac_cv_path_mad_lib}" = x ; then
+#      AC_MSG_WARN([No libmad found, disabling media handling.])
+#      media_handler=none
+#    fi
+#  fi
+#fi
 
 if test x"$media_handler" = x"gst"; then
   AC_MSG_CHECKING([for modern pbutils])
@@ -1560,18 +1573,6 @@ if test x"$media_handler" = x"gst"; then
 fi
 
 
-if test x"$media_handler" = x"mad"; then
-  dnl Will set MAD_LIBS and MAD_CFLAGS.
-  dnl Handles --with-mad-incl and --with-mad-lib
-  GNASH_PKG_FIND(mad, [mad.h], [mad library], mad_copyright)
-  if test x"${media_handler_specified}" = xfalse; then
-    # If the library is not found, we'll disable media handling
-    if test x"${ac_cv_path_mad_lib}" = x ; then
-      AC_MSG_WARN([No libmad found, disabling media handling.])
-      media_handler=none
-    fi
-  fi
-fi
 
 if test x$build_cairo = xyes; then
   GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
@@ -2281,7 +2282,7 @@ fi
 
 if test "$media_handler" = "gst"; then
   if test x"$missing_codecs" != x; then   
-      echo "        Your Gstreamer installtion is missing these codecs: $missing_codecs"
+      echo "        Your Gstreamer installation is missing these codecs: $missing_codecs"
       echo "        Please install the gstreamer-ffmpeg for Gstreamer"
   fi  
   if test x"$GSTREAMER_LIBS" != x; then
@@ -2333,7 +2334,7 @@ fi
 	  echo "        ERROR: FFMPEG's libavcodec header is installed but not libavformat."
           echo "               You can install FFMPEG from http://ffmpeg.mplayerhq.hu"
           echo "               or .deb users: apt-get install libavformat-dev"
-          echo "               or reconfigure with --enable-media=mad"
+          echo "               or reconfigure with --enable-media=gst"
 	  nogo=true
 	else
           if test x"$FFMPEG_CFLAGS" != x; then
@@ -2349,7 +2350,7 @@ fi
       echo "               You can install FFMPEG from http://ffmpeg.mplayerhq.hu"
       echo "               or .deb users: apt-get install libavformat-dev"
       echo "               or .rpm users: yum install ffmpeg-devel"
-      echo "               or reconfigure with --enable-media=mad"
+      echo "               or reconfigure with --enable-media=gst"
       nogo=true
     fi
   fi

@@ -335,8 +335,8 @@
       </glossterm>
       <glossdef>
 	<para>
-	  libmad is a mp3-decoding library, which can be used by Gnash's
-	  sound handler to decode mp3-audio.  
+	  libmad is a mp3-decoding library, which used to be an option for Gnash
+	  handling of sound (dropped since 0.8.2).
 	</para>
       </glossdef>
     </glossentry>
@@ -569,12 +569,12 @@
 	</para>
 	<para>
 	  There are currently two sound handlers available in &app;:
-	  SDL and Gstreamer.  The SDL sound handler uses ffmpeg or 
-	  libmad for decoding mp3-audio, although it can be built without 
-	  mp3-support. The Gstreamer-sound handler uses the available 
+	  ffmpeg and Gstreamer.  The ffmpeg sound handler uses SDL for
+	  mixing.
+	  The Gstreamer-sound handler uses the available 
 	  plugins to decode the audio, so it might not work if some 
-	  important plugins are missing.  The SDL sound handler is 
-	  recommended.  
+	  important plugins are missing.  The GST sound handler is 
+	  recommended (the default).
 	</para>
       </glossdef>
     </glossentry>
