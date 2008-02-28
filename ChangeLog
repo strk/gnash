@@ -1,3 +1,7 @@
+2008-02-28 Sandro Santilli <strk@keybit.net>
+
+	* server/Property.{cpp,h}: drop left over debugging calls.
+
 2008-02-27 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* libmedia/gst/gstflvdemux.h: Make extra sure our own FLV demuxer is

@@ -69,7 +69,6 @@ Property::getDelayedValue(const as_object& this_ptr) const
 void
 Property::setDelayedValue(as_object& this_ptr, const as_value& value)
 {
-	log_debug("setDelayedValue: %s", value.to_debug_string().c_str());
 	as_accessors* a = boost::get<as_accessors>(&mBound);
 
 	// Don't recursively invoke a setter
