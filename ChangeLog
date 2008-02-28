@@ -1,5 +1,11 @@
 2008-02-28 Sandro Santilli <strk@keybit.net>
 
+ 	* server/sprite_instance.cpp (stagePlacementCallback): don't queue
+	  a LOAD event for the root movie for SWF versions up to 5.
+	* testsuite/swfdec/PASSING: root-onload-5.swf succeeds.
+
+2008-02-28 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/swfdec/PASSING: sync to swfdec master git.
 
 2008-02-28 Sandro Santilli <strk@keybit.net>

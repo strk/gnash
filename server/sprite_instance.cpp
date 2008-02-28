@@ -3954,16 +3954,18 @@ sprite_instance::stagePlacementCallback()
   assert(!_callingFrameActions); // or will not be queuing actions
   if ( get_parent() == 0 )
   {
-
 #ifdef GNASH_DEBUG
-    log_debug(_("Executing tags of frame0 in sprite %s"), getTarget().c_str());
+      log_debug(_("Executing tags of frame0 in sprite %s"), getTarget().c_str());
 #endif
-    execute_frame_tags(0, TAG_DLIST|TAG_ACTION);
+      execute_frame_tags(0, TAG_DLIST|TAG_ACTION);
 
+    if ( _vm.getSWFVersion() > 5 )
+    {
 #ifdef GNASH_DEBUG
-    log_debug(_("Queuing ONLOAD event for sprite %s"), getTarget().c_str());
+      log_debug(_("Queuing ONLOAD event for sprite %s"), getTarget().c_str());
 #endif
-    queueEvent(event_id::LOAD, movie_root::apDOACTION);
+      queueEvent(event_id::LOAD, movie_root::apDOACTION);
+    }
 
   }
   else
