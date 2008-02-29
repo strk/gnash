@@ -1,5 +1,6 @@
 2008-02-29 Sandro Santilli <strk@keybit.net>
 
+	* gui/klash.moc.in: added to repository.
 	* gui/Makefile.am: distribute klash.moc.in.
 
 2008-02-28 Sandro Santilli <strk@keybit.net>
