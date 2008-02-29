@@ -29,7 +29,7 @@ pluginsdir = $(libdir)/gnash/plugins
 # noinst_LTLIBRARIES = libgnashgui.la
 BUILT_SOURCES = .configline
 
-EXTRA_DIST = gnash.in
+EXTRA_DIST = gnash.in klash.moc.in
 
 noinst_LTLIBRARIES = 
 AM_CPPFLAGS = -I.. \

@@ -1,3 +1,7 @@
+2008-02-29 Sandro Santilli <strk@keybit.net>
+
+	* gui/Makefile.am: distribute klash.moc.in.
+
 2008-02-28 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/video_stream_def.{cpp,h}: fix build and runtime
