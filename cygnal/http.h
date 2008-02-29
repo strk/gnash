@@ -138,6 +138,7 @@ public:
     std::string extractAgent(const char *data);
 
     // These methods add data to the fields in the HTTP header.
+    // These return true if OK, false if error.
     bool clearHeader();
     bool formatHeader(int filesize, const short type);
     bool formatHeader(const short type);

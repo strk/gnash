@@ -46,7 +46,7 @@ namespace cygnal
 static const int readsize = 1024;
 
 HTTP::HTTP() 
-    : _port(80), _filesize(0), _keepalive(false)
+    : _filesize(0), _port(80), _keepalive(false)
 {
 //    GNASH_REPORT_FUNCTION;
 //    struct status_codes *status = new struct status_codes;
@@ -71,6 +71,7 @@ HTTP::clearHeader()
     _te.clear();
     _accept.clear();
     _filesize = 0;
+    return true;
 }
 
 HTTP &
@@ -132,6 +133,7 @@ HTTP::formatHeader(const short type)
     GNASH_REPORT_FUNCTION;
 
     formatHeader(_filesize, type);
+    return true;
 }
 
 
@@ -149,6 +151,7 @@ HTTP::formatHeader(int filesize, const short type)
     this->formatContentType();
     // All HTTP messages are followed by a blank line.
     this->terminateHeader();
+    return true;
 }
 
 bool
@@ -176,6 +179,7 @@ HTTP::formatErrorResponse(http_status_e code)
     formatContentLength(_filesize);
     formatConnection("close");
     formatContentType(HTTP::HTML);
+    return true;
 }
 
 bool
@@ -204,7 +208,7 @@ HTTP::formatDate()
     _header << " "  << d.year();
     _header << " "  << now.time_of_day();
     _header << " GMT" << endl;
-
+    return true;
 }
 
 bool
@@ -212,6 +216,7 @@ HTTP::formatServer()
 {
     GNASH_REPORT_FUNCTION;
     _header << "Server: Cygnal (GNU/Linux)" << endl;
+    return true;
 }
 
 bool
@@ -219,6 +224,7 @@ HTTP::formatServer(const char *data)
 {
     GNASH_REPORT_FUNCTION;
     _header << "Server: " << data << endl;
+    return true;
 }
 
 bool
@@ -226,6 +232,7 @@ HTTP::formatMethod(const char *data)
 {
     GNASH_REPORT_FUNCTION;
     _header << "Method: " << data << endl;
+    return true;
 }
 
 bool
@@ -233,6 +240,7 @@ HTTP::formatReferer(const char *refer)
 {
     GNASH_REPORT_FUNCTION;
     _header << "Referer: " << refer << endl;
+    return true;
 }
 
 bool
@@ -240,6 +248,7 @@ HTTP::formatConnection(const char *options)
 {
     GNASH_REPORT_FUNCTION;
     _header << "Connection: " << options << endl;
+    return true;
 }
 
 bool
@@ -270,6 +279,7 @@ HTTP::formatContentType(filetype_e filetype)
       default:
 	  _header << "Content-Type: text/html; charset=UTF-8" << endl;
     }
+    return true;
 }
 
 bool
@@ -277,6 +287,7 @@ HTTP::formatContentLength()
 {
 //    GNASH_REPORT_FUNCTION;
     _header << "Content-Length: " << _filesize << endl;
+    return true;
 }
 
 bool
@@ -284,6 +295,7 @@ HTTP::formatContentLength(int filesize)
 {
 //    GNASH_REPORT_FUNCTION;
     _header << "Content-Length: " << filesize << endl;
+    return true;
 }
 
 bool
@@ -291,6 +303,7 @@ HTTP::formatHost(const char *host)
 {
 //    GNASH_REPORT_FUNCTION;
     _header << "Host: " << host << endl;
+    return true;
 }
 
 bool
@@ -298,6 +311,7 @@ HTTP::formatAgent(const char *agent)
 {
 //    GNASH_REPORT_FUNCTION;
     _header << "User-Agent: " << agent << endl;
+    return true;
 }
 
 bool
@@ -307,6 +321,7 @@ HTTP::formatLanguage(const char *lang)
 
     // For some browsers this appears to also be Content-Language
     _header << "Accept-Language: " << lang << endl;
+    return true;
 }
 
 bool
@@ -315,6 +330,7 @@ HTTP::formatCharset(const char *set)
     GNASH_REPORT_FUNCTION;
     // For some browsers this appears to also be Content-Charset
     _header << "Accept-Charset: " << set << endl;
+    return true;
 }
 
 bool
@@ -322,6 +338,7 @@ HTTP::formatEncoding(const char *code)
 {
     GNASH_REPORT_FUNCTION;
     _header << "Accept-Encoding: " << code << endl;
+    return true;
 }
 
 bool
@@ -329,6 +346,7 @@ HTTP::formatTE(const char *te)
 {
     GNASH_REPORT_FUNCTION;
     _header << "TE: " << te << endl;
+    return true;
 }
 
 bool
@@ -373,7 +391,7 @@ HTTP::formatRequest(const char *url, http_method_e req)
 
     _header << "Connection: Keep-Alive, TE" << endl;
     _header << "TE: deflate, gzip, chunked, identity, trailers" << endl;
-    
+    return true;
 }
 // bool
 // HTTP::sendGetReply(Network &net)

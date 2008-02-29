@@ -76,11 +76,11 @@ static void version_and_copyright();
 static void cntrlc_handler(int sig);
 
 //static void start_thread();
-static void rtmp_thread(struct thread_params *conndata);
+//static void rtmp_thread(struct thread_params *conndata);
 static void http_thread(struct thread_params *conndata);
-static void ssl_thread(struct thread_params *conndata);
+//static void ssl_thread(struct thread_params *conndata);
 static void stream_thread(struct thread_params *sendfile);
-static void dispatch_thread(struct thread_params *params);
+//static void dispatch_thread(struct thread_params *params);
 
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 CRcInitFile& crcfile = CRcInitFile::getDefaultInstance();
@@ -228,8 +228,6 @@ http_thread(struct thread_params *conndata)
     string url, filespec, parameters;
     string::size_type pos;
     int port = RTMPT + port_offset;
-    int filesize;
-    struct stat filestats;
 
     www.toggleDebug(true);
     

@@ -1,3 +1,7 @@
+2008-02-29  John Gilmore  <gnu@quiet.toad.com>
+
+	* cygnal/http.cpp, cygnal/cygnal.cpp, cygnal/http.h:  Lint.
+
 2008-02-29 Sandro Santilli <strk@keybit.net>
 
 	* gui/klash.moc.in: added to repository.
