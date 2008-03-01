@@ -80,10 +80,10 @@ EXTRA_DIST = \
 #noinst_SCRIPT = gen-doc.sh
 dist_man_MANS = gnash.1 gprocessor.1 dumpshm.1 soldumper.1 cygnal.1
 MANSRC = $(dist_man_MANS:.1=.man-xml)
-INFOS  = gnash_user.info gnash_ref.info
+INFOS  = gnash_user.info gnashuser.info # gnash_ref.info
 HTMLS  = $(XML_MAIN:.xml=.html)
 PDFS   = $(XML_MAIN:.xml=.pdf)
-TEXIS  = $(XML_MAIN:.xml=.texi)
+TEXIS  = gnash_user.texi gnashuser.texi
 
 # dist_html_DATA = gnash.html actionscript.html
 # dist_info_DATA = gnash.info actionscript.info
@@ -157,6 +157,9 @@ if ENABLE_TEXI
 	  basefile="$*"; \
           $(DB2X_XSLTPROC) -s texi $< --output $${basefile}.txml; \
 	  out=`$(DB2X_TEXIXML) --encoding=us-ascii//TRANSLIT --list-files $${basefile}.txml` ; \
+	  if test ! -f $out; then \
+	   out=`echo $${out} | tr -d '_'`; \
+	  fi; \
 	  rm $${basefile}.txml; \
 	  mv $${out} $${basefile}.texi; \
 	fi
@@ -165,7 +168,6 @@ endif
 .texi.info:
 if ENABLE_TEXI
 	-$(MAKEINFO) --force $<
-	$(RM) *.texi
 else
 	@if test -d $(top_srcdir)/packaging/doc; then \
 	  $(LN_S) -f $(top_srcdir)/packaging/doc/$@.in ./$@; \
