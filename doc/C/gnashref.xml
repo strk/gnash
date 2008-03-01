@@ -1,0 +1,111 @@
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+ "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+    
+    <!ENTITY appversion "0.8.2">
+    <!ENTITY manrevision "0.4.3">
+    <!ENTITY date "Feb 2008">
+    <!ENTITY app "<application>Gnash</application>">
+    <!ENTITY appname "Gnash">
+
+    <!ENTITY legal            SYSTEM "legal.xml">
+    <!ENTITY fdl-app          SYSTEM "fdl-appendix.xml"> 
+    <!ENTITY programmers      SYSTEM "app_authors.xml">
+    <!ENTITY introduction     SYSTEM "introduction.xml">
+
+    <!ENTITY amf              SYSTEM "refmanual/amf.xml">
+    <!ENTITY rtmp             SYSTEM "refmanual/rtmp.xml">
+    <!ENTITY internals        SYSTEM "refmanual/internals.xml">
+    <!ENTITY object           SYSTEM "refmanual/object.xml">
+    <!ENTITY plugin           SYSTEM "refmanual/plugin.xml">
+    <!ENTITY memory           SYSTEM "refmanual/memory.xml">
+    <!ENTITY newasclass       SYSTEM "refmanual/new_as_class.xml">
+
+    <!ENTITY revisionhistory  SYSTEM "refmanual/revisions.xml">
+    <!ENTITY specification    SYSTEM "refmanual/specification.xml">
+    <!ENTITY installation     SYSTEM "refmanual/installation.xml">
+
+    <!ENTITY custompath       SYSTEM "refmanual/custompath_configuration.xml">
+    <!ENTITY featureoptions   SYSTEM "refmanual/feature_configuration.xml">
+    <!ENTITY docdependencies  SYSTEM "refmanual/documentation_dependencies.xml">
+    <!ENTITY codedependencies SYSTEM "refmanual/code_dependencies.xml">
+    <!ENTITY testdependencies SYSTEM "refmanual/testing_dependencies.xml">
+    <!ENTITY sources          SYSTEM "refmanual/sources.xml">
+    <!ENTITY pkgmanager       SYSTEM "refmanual/packagemanager.xml">
+    <!ENTITY configuration    SYSTEM "refmanual/configuration.xml">
+    <!ENTITY crosscompiling   SYSTEM "refmanual/cross_compiling.xml">
+    <!ENTITY install          SYSTEM "refmanual/install.xml">
+    <!ENTITY building         SYSTEM "refmanual/building.xml">
+    <!ENTITY logging          SYSTEM "refmanual/logging.xml">
+    <!ENTITY internals        SYSTEM "refmanual/internals.xml">
+    <!ENTITY building         SYSTEM "refmanual/building.xml">
+    <!ENTITY codestyle        SYSTEM "refmanual/codestyle.xml">
+    <!ENTITY fn_call "<emphasis>fn_call</emphasis>">
+
+    <!ENTITY extensions       SYSTEM "refmanual/extensions/extensions.xml">
+    <!ENTITY fileext          SYSTEM "refmanual/extensions/fileext.xml">
+    <!ENTITY gtkext           SYSTEM "refmanual/extensions/gtkext.xml">
+    <!ENTITY mysqlext         SYSTEM "refmanual/extensions/mysqlext.xml">
+
+ ]
+>
+
+
+<!-- TRANSLATOR NOTE: do not change the id, just the lang -->
+<book lang="en" id="index">
+<title>Gnash Reference Manual</title>
+<titleabbrev>Gnash Ref</titleabbrev>
+
+<!-- =============Document Header ============================ -->
+
+  <bookinfo>
+      <title>Gnash Reference Manual</title>
+      <copyright>
+         <year>2005, 2006, 2007, 2008</year>
+         <holder>Free Software Foundation</holder>
+      </copyright>
+
+  <!-- TRANSLATOR NOTE: uncomment this section
+
+      <copyright>
+         <year>2008</year>
+         <holder>ME-THE-TRANSLATOR (Latin translation)</holder>
+      </copyright>
+
+  -->
+
+  &legal;
+  &revisionhistory;
+
+    <releaseinfo>
+        This manual describes version &appversion; of &appname;.
+    </releaseinfo>
+
+  </bookinfo>
+
+  
+<!-- ============= Introduction ============================== -->
+  &introduction;
+
+<!-- ============= Document Body ============================= -->
+  &sources;
+  &install;
+  &configuration;
+  &codedependencies;
+  &testdependencies;
+  &docdependencies;
+  &newasclass;
+  &logging;
+  &internals;
+  &extensions;
+  &rtmp;
+  &plugin;
+  &codestyle;
+
+<!-- ============= Authors =================================== -->
+  &programmers;
+
+<!-- ============= Application License ======================= -->
+  &fdl-app;
+
+</book>

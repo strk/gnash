@@ -1,0 +1,1716 @@
+<sect4 id="asmovieclip">
+  <title>MovieClip ActionScript Class</title>
+
+  <para>
+    This class implements an MovieClip object.
+  </para>
+
+  <sect5 id="movieclipmethods">
+    <title>The Methods of the  Class</title>
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>attachAudio()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>attachMovie()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>beginFill([rgba])</term>
+	  <listitem>
+	    <para>
+		Set fill color for subsequent drawing. The value is interpreted as a 32bit integer composed of red (highest byte), green, blue and 
+		alpha (lowest byte). If first argument is missing the fill color will be black with alpha 255.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>beginGradientFill()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>clear()</term>
+	  <listitem>
+	    <para>
+		Clear all dynamic drawing on this MovieClip.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>createEmptyMovieClip(name, depth)</term>
+	  <listitem>
+	    <para>
+		Create an empty movieclip and place it in this clip displaylist at the given depth.
+		Return a reference to the created clip.
+		If called with less the two arguments the method returns undefined and no action is taken.
+		TOCHECK: what if a character with the given name already exist ?
+		TOCHECK: what if a character at the given depth already exist ?
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>createTextField()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>curveTo(cx, cy, ax, ay)</term>
+	  <listitem>
+	    <para>
+		Draw a quadratic bezier curve with current linestyle and current fill from current pen position to the anchor point ax,ay using control point cx, cy. If any argument is missing nothing is drawn. The function always returns undefined.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>duplicateMovieClip(newname, newdepth, [initObject])</term>
+	  <listitem>
+	    <para>
+		Make a clone of this MovieClip and place it in this MovieClip parent's DisplayList.
+		If given a third argument, it will be taken as an object to use for initializing properties
+		of the clone.
+		Return the cloned object.
+		An absolute root movieclip (_levelx) can not be duplicated, if attempted, no action is taken and undefined is returned.
+		TOCHECK: what if a character with the given name already exists in parent's display list ?
+		TOCHECK: what if a character at the given depth already exists in parent's display list ?
+		TODO: add info about what does it mean to 'clone' (what's cloned and what not).
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>endFill()</term>
+	  <listitem>
+	    <para>
+		Reset any fill information. Next drawing calls will not be filled.
+		If a fill was in effect (see beginFill and beginGradientFill) the current path is closed so that
+		last point equals the first point of the filled shape.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getBounds([target])</term>
+	  <listitem>
+	    <para>
+		Returns an object  with members 'xMin', 'yMin', 'xMax' and 'yMax' representing the bounding box of this MovieClip.
+		When called with no args the bounding box is in local coordinate space.
+		When given an character as first argument, the bounding box is in the given character's coordinate space.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getBytesLoaded()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getBytesTotal()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getDepth()</term>
+	  <listitem>
+	    <para>
+		Return the depth on this character in its parent DisplayList.
+		TOCHECK: what's returned when called against a character with no parent (_levelx) ?
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getInstanceAtDepth()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getNextHighestDepth()</term>
+	  <listitem>
+	    <para>
+		Return the next available depth for placing a new character in this MovieClip displaylist.
+		TOCHECK: if depths 1 and 3 are occupied, returns 4, not 2 , right ?
+		NOTE: this function always return a number >= 0, negative depths are never returned.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getSWFVersion()</term>
+	  <listitem>
+	    <para>
+		TOCHECK : I don't think there's such a function ... 
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getTextSnapshot()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getURL()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>globalToLocal(obj)</term>
+	  <listitem>
+		<para>
+		Take members 'x', and 'y' in the object 'obj' and transform them from global to local coordinate space.
+		If the parameter doesn't cast to an object, or the object doesn't contain both 'x' and 'y', the call is invalid 
+		and nothing is modified.
+		</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>gotoAndPlay()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>gotoAndStop()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>hitTest(target)</term>
+	  <term>hitTest(x,y)</term>
+	  <term>hitTest(x,y,shapeFlag)</term>
+	  <listitem>
+	    <para>
+		In the first form, check for the bounding boxes of this and target characters to intersect.
+		In the second and third form, check if the given point is inside the bounding box or the visible shape of this character; shapeFlag (false) in the 2 args version says wheter actual shape or just bounds has to be checked; coordinates values are in Stage coordinate space.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>lineStyle()</term>
+	  <term>lineStyle(thickness, [color])</term>
+	  <listitem>
+	    <para>
+		In the first form (no args) it will reset all line style info so that next drawing will have a transparent drawing.
+		Note that by 'transparent' is not intended 0-alpha as no color transformation will be able to augment the alpha value.
+		The line is simply always invisible instead.
+	    </para>
+	    <para>
+		In the second form, set thickness and color of strokes for subsequent drawing.
+		If color is omitted, it defaults to black with 255 alpha.
+		If thickness is zero the line will always be an 'hariline', which is always displaied with the
+		same width at any scale. Other thickness will be in pixels and scale togheter with the MovieClip itself.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>lineTo(x, y)</term>
+	  <listitem>
+	    <para>
+		Draw a straight line from current position to point x,y using current styles.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>loadMovie()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>loadVariables()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>localToGlobal(obj)</term>
+	  <listitem>
+	    <para>
+		Take members 'x', and 'y' in the object 'obj' and transform them from local to global coordinate space.
+		If the parameter doesn't cast to an object, or the object doesn't contain both 'x' and 'y', the call is invalid 
+		and nothing is modified.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>moveTo()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>nextFrame()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>play()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>prevFrame()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>removeMovieClip()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>setMask()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>startDrag()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>stop()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>stopDrag()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>swapDepths()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>unloadMovie()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+  </sect5>
+  <sect5 id="movieclipprops">
+    <title>The Properties of the MovieClip Class</title>
+    
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>_alpha</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_currentframe</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_droptarget</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>enabled</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>focusEnabled</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_focusrect</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_framesloaded</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_height</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>hitArea</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_lockroot</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>menu</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_name</term>
+	  <listitem>
+	    <para>
+		This is a read-write property of MovieClip objects.
+		Changing the _name property of a MovieClip also changes it's _target
+		and the _target of any child.
+	    </para>
+	    <para>
+		Dynamically-created clips are always created with a name, while for statically
+		defined one this is optional in the SWF, but will be syntetized by the player
+		if missing. TODO: check if _name reflects the syntetized naming (_instancex).
+		For the root movie syntetization doesn't happen and the _name property
+		is the empty string for SWF6 and higher or null for SWF5 and lower.
+	    </para>
+	    <para>
+		Valid values for _name are: ....
+	    </para>
+	    <para>
+		NOTE: mm player7 and player9 differ on typeof(_root._name) on startup.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onData</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onDragOut</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onDragOver</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onEnterFrame</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onKeyDown</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onKeyUp</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onKillFocus</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onLoad</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onMouseDown</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onMouseMove</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onMouseUp</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onPress</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onRelease</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onReleaseOutside</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onRollOut</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onRollOver</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onSetFocus</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onUnload</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_parent</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_quality</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_rotation</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_soundbuftime</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>tabChildren</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>tabEnabled</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>tabIndex</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_target</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_totalframes</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>trackAsMenu</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_url</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>useHandCursor</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_visible</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_width</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_x</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_xmouse</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_xscale</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_y</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_ymouse</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_yscale</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="movieclipconf">
+    <title>MovieClip Class Conformance</title>
+    
+    <para>
+      <informaltable frame="all">
+	<?dbhtml table-width="75%" ?>
+	<tgroup cols="2">
+	  <thead>
+	    <row>
+	      <entry valign="top">
+		<para>Class Name</para>
+	      </entry>
+	      <entry valign="top">
+		<para>Conformance</para>
+	      </entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>attachAudio()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>attachMovie()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>beginFill()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented and tested.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>beginGradientFill()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>clear()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented and tested.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>createEmptyMovieClip()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented and tested. Needs more tests for corner cases (ie: depth occupied or name existing).
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>createTextField()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>curveTo()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented and tested.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>duplicateMovieClip()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented and tested. Needs more testing.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>endFill()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented and tested.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getBounds()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented and tested.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getBytesLoaded()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getBytesTotal()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getDepth()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented and tested.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getInstanceAtDepth()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getNextHighestDepth()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented and tested. Needs more tests.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getSWFVersion()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getTextSnapshot()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getURL()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>globalToLocal()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented and tested in Gnash.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>gotoAndPlay()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>gotoAndStop()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>hitTest()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented and tested in Gnash.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>lineStyle()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented and tested.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>lineTo()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented and tested.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>loadMovie()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>loadVariables()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>localToGlobal()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented and tested in Gnash.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>moveTo()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>nextFrame()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>play()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>prevFrame()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>removeMovieClip()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>setMask()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>startDrag()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>stop()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>stopDrag()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>swapDepths()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>unloadMovie()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_alpha</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_currentframe</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_droptarget</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>enabled</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>focusEnabled</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_focusrect</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_framesloaded</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_height</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>hitArea</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_lockroot</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>menu</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_name</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onData</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onDragOut</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onDragOver</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onEnterFrame</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onKeyDown</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onKeyUp</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onKillFocus</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onLoad</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onMouseDown</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onMouseMove</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onMouseUp</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onPress</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onRelease</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onReleaseOutside</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onRollOut</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onRollOver</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onSetFocus</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onUnload</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_parent</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_quality</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_rotation</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_soundbuftime</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>tabChildren</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>tabEnabled</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>tabIndex</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_target</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_totalframes</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>trackAsMenu</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_url</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>useHandCursor</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_visible</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_width</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_x</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_xmouse</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_xscale</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_y</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_ymouse</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_yscale</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </para>
+  </sect5>  
+</sect4>

@@ -1,0 +1,100 @@
+<sect4 id="asnetconnection">
+  <title>NetConnection ActionScript Class</title>
+
+  <para>
+    This class implements an NetConnection object. The NetConnection
+    object opens a client connection to load an FLV video file from a
+    local system, or a remote one using the RTMP or RTMPT protocols.
+    RTMP connections use port 1935, and RTMPT connections use port 80.
+  </para>
+
+  <para>
+    This class was first introduced for swf v7 and the behavior has
+    recently changed slightly to allow the loading of files from
+    external systems. Prior to this, you were required to pass NULL to
+    this class. Gnash handles both cases. The older behavior is default
+    when connecting to the local filesystem for the file.
+  </para>
+
+  <para>
+    The URL that can be passed to <emphasis>connect()</emphasis> in newer
+    versions of the swf format is as follows:
+    <programlisting>
+      protocol:[//host][:port]/appname/[instanceName]
+    </programlisting>
+    For protocol, specify either <emphasis>RTMP</emphasis> or
+    <emphasis>RTMPT</emphasis>. If rtmp is specified, Flash Player will create
+    a client connection. If <emphasis>RTMPT</emphasis> is specified, Flash
+    Player will create an HTTP "tunneling" connection to the server.
+  </para>
+
+  <para>
+    You can omit the host parameter if the Flash movie is served from
+    localhost. If the instanceName parameter is omitted, Flash Player
+    connects to the application's default instance (_definst_).
+  </para>
+
+    <sect5 id="netconnectionmethods">
+	<title>The Methods of the  Class</title>
+
+	<variablelist>
+	  <varlistentry>the same host where Flash Communication Server is installed
+	  <term>NetConnection.connect(const char *)</term>
+	  <listitem>
+	    <para>
+	      Connect to a local or remote system to load a
+	      FLV file. Arg can be NULL, or a URL.
+	    </para>
+	  </listitem>
+	  </varlistentry>
+	</variablelist>
+    </sect5>
+
+<!--    
+    <sect5 id="netconnectionprops">
+      <title>The Properties of the NetConnection Class</title>
+      
+      <para>
+	<variablelist>
+	  
+	</variablelist>
+      </para>
+    </sect5>
+-->
+    
+    <sect5 id="netconnectionconf">
+      <title>NetConnection Class Conformance</title>
+      
+      <informaltable frame="all">
+	<?dbhtml table-width="75%" ?>
+	<tgroup cols="2">
+	  <thead>
+	    <row>
+	      <entry valign="top">
+		<para>Class Name</para>
+	      </entry>
+	      <entry valign="top">
+		<para>Conformance</para>
+	      </entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>NetConnection.connect()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is partially implemented. It can only be
+		  used in conjunction with the <link
+		  linkend="asnetstream">NetStream</link> and <link
+		  linkend="asvideo">Video</link> classes; it cannot
+		  load a FLV file by itself.
+		</para>
+	      </entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+  </sect5>  
+</sect4>

@@ -1,0 +1,192 @@
+<sect4 id="astextsnapshot">
+  <title>TextSnapshot ActionScript Class</title>
+
+  <para>
+    This class implements an TextSnapshot object.
+  </para>
+
+  <sect5 id="textsnapshotmethods">
+    <title>The Methods of the  Class</title>
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>findText()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getCount()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getSelected()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getSelectedText()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getText()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>hitTestTextNearPos()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>setSelectColor()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>setSelected()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+  </sect5>
+  <sect5 id="textsnapshotprops">
+    <title>The Properties of the TextSnapshot Class</title>
+    
+    <para>
+      <variablelist>
+
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="textsnapshotconf">
+    <title>TextSnapshot Class Conformance</title>
+    
+    <para>
+      <informaltable frame="all">
+	<?dbhtml table-width="75%" ?>
+	<tgroup cols="2">
+	  <thead>
+	    <row>
+	      <entry valign="top">
+		<para>Class Name</para>
+	      </entry>
+	      <entry valign="top">
+		<para>Conformance</para>
+	      </entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>findText()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getCount()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getSelected()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getSelectedText()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getText()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>hitTestTextNearPos()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>setSelectColor()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>setSelected()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </para>
+  </sect5>  
+</sect4>

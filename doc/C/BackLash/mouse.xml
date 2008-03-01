@@ -1,0 +1,192 @@
+<sect4 id="asmouse">
+  <title>Mouse ActionScript Class</title>
+
+  <para>
+    This class implements an Mouse object.
+  </para>
+
+  <sect5 id="mousemethods">
+    <title>The Methods of the  Class</title>
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>addListener()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>hide()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>removeListener()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>show()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+  </sect5>
+  <sect5 id="mouseprops">
+    <title>The Properties of the Mouse Class</title>
+    
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>onMouseDown</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onMouseMove</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onMouseUp</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onMouseWheel</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="mouseconf">
+    <title>Mouse Class Conformance</title>
+    
+    <para>
+      <informaltable frame="all">
+	<?dbhtml table-width="75%" ?>
+	<tgroup cols="2">
+	  <thead>
+	    <row>
+	      <entry valign="top">
+		<para>Class Name</para>
+	      </entry>
+	      <entry valign="top">
+		<para>Conformance</para>
+	      </entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>addListener()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>hide()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>removeListener()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>show()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onMouseDown</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onMouseMove</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onMouseUp</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onMouseWheel</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </para>
+  </sect5>  
+</sect4>

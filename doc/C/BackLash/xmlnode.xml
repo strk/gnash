@@ -1,0 +1,360 @@
+<sect4 id="asxmlnode">
+  <title>XMLNode ActionScript Class</title>
+
+  <para>
+    This class implements an XMLNode object. This is mostly only used
+    internally by Gnash for holding the data for a node. It does exist
+    within the interpreter as a valid object though, so its
+    properties and methods can be accessed by a flash movie script.
+  </para>
+
+  <para>
+    As the XML class is derived from this one, many of these methods
+    are the same as for that class.
+  </para>
+
+  <sect5 id="xmlnodemethods">
+    <title>The Methods of the  Class</title>
+    <para>
+      <variablelist>
+	<varlistentry>
+	  <term>appendChild()</term>
+	  <listitem>
+	    <para>
+	      Append a child node to this node.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>cloneNode()</term>
+	  <listitem>
+	    <para>
+	      Copy a node, returning an XMLNode *.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>hasChildNodes()</term>
+	  <listitem>
+	    <para>
+	      Return true if this node has any children.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>insertBefore()</term>
+	  <listitem>
+	    <para>
+	      Insert a node before this node.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>removeNode()</term>
+	  <listitem>
+	    <para>
+	      Remove a node from the parent's list.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>toString()</term>
+	  <listitem>
+	    <para>
+	      Convert the node and its children to a string
+	      representation.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+  </sect5>
+  <sect5 id="xmlnodeprops">
+    <title>The Properties of the XMLNode Class</title>
+    
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>attributes</term>
+	  <listitem>
+	    <para>
+	      Returns an array of the attributes of a node.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>childNodes</term>
+	  <listitem>
+	    <para>
+	      Returns an array of the children of a node.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>firstChild</term>
+	  <listitem>
+	    <para>
+	      Returns the first child node.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>lastChild</term>
+	  <listitem>
+	    Returns the last child node.
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>nextSibling</term>
+	  <listitem>
+	    <para>
+	      Returns the next child node.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>previousSibling</term>
+	  <listitem>
+	    <para>
+	      Returns the child node before this one.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>nodeName</term>
+	  <listitem>
+	    <para>
+	      Returns the name of the node.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>nodeType</term>
+	  <listitem>
+	    <para>
+	      Returns the type of a node.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>nodeValue</term>
+	  <listitem>
+	    <para>
+	      Contains the text for a text node type.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>parentNode</term>
+	  <listitem>
+	    <para>
+	      Returns this node's parent.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="xmlnodeconf">
+    <title>XMLNode Class Conformance</title>
+    
+    <para>
+      <informaltable frame="all">
+	<?dbhtml table-width="75%" ?>
+	<tgroup cols="2">
+	  <thead>
+	    <row>
+	      <entry valign="top">
+		<para>Class Name</para>
+	      </entry>
+	      <entry valign="top">
+		<para>Conformance</para>
+	      </entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>appendChild()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>cloneNode()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>hasChildNodes()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>insertBefore()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>removeNode()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>toString()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>attributes</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>childNodes</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>firstChild</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>lastChild</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>nextSibling</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>previousSibling</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>nodeName</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>nodeType</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>nodeValue</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>parentNode</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </para>
+  </sect5>  
+</sect4>

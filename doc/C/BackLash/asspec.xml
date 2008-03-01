@@ -1,0 +1,220 @@
+<?xml version="1.0"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+    "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+  <!ENTITY legal SYSTEM "legal.xml">
+  <!ENTITY fdl-app SYSTEM "fdl-appendix.xml">
+  <!ENTITY manrevision "0.3">
+  <!ENTITY date "Feb 2008">
+  <!ENTITY app "<application>Free ActionScript Specification</application>">
+  <!ENTITY appname "Free ActionScript Specification">
+  <!ENTITY asaccessibility SYSTEM "accessibility.xml">
+  <!ENTITY asarray SYSTEM "array.xml">
+  <!ENTITY asboolean SYSTEM "boolean.xml">
+  <!ENTITY asbutton SYSTEM "button.xml">
+  <!ENTITY ascamera SYSTEM "camera.xml">
+  <!ENTITY ascolor SYSTEM "color.xml">
+  <!ENTITY ascontextmenu SYSTEM "contextmenu.xml">
+  <!ENTITY ascustomactions SYSTEM "customactions.xml">
+  <!ENTITY asdate SYSTEM "date.xml">
+  <!ENTITY aserror SYSTEM "error.xml">
+  <!ENTITY asfunction SYSTEM "function.xml">
+  <!ENTITY askey SYSTEM "key.xml">
+  <!ENTITY asloadvars SYSTEM "loadvars.xml">
+  <!ENTITY aslocalconnection SYSTEM "localconnection.xml">
+  <!ENTITY asmath SYSTEM "math.xml">
+  <!ENTITY asmicrophone SYSTEM "microphone.xml">
+  <!ENTITY asmouse SYSTEM "mouse.xml">
+  <!ENTITY asmovieclip SYSTEM "movieclip.xml">
+  <!ENTITY asmoviecliploader SYSTEM "moviecliploader.xml">
+  <!ENTITY asnetconnection SYSTEM "netconnection.xml">
+  <!ENTITY asnetstream SYSTEM "netstream.xml">
+  <!ENTITY asnumber SYSTEM "number.xml">
+  <!ENTITY asobject SYSTEM "object.xml">
+  <!ENTITY asselection SYSTEM "selection.xml">
+  <!ENTITY assharedobject SYSTEM "sharedobject.xml">
+  <!ENTITY assound SYSTEM "sound.xml">
+  <!ENTITY asstage SYSTEM "stage.xml">
+  <!ENTITY asstring SYSTEM "string.xml">
+  <!ENTITY assystem SYSTEM "system.xml">
+  <!ENTITY astextfield SYSTEM "textfield.xml">
+  <!ENTITY astextformat SYSTEM "textformat.xml">
+  <!ENTITY astextsnapshot SYSTEM "textsnapshot.xml">
+  <!ENTITY asvideo SYSTEM "video.xml">
+  <!ENTITY asxmlnode SYSTEM "xmlnode.xml">
+  <!ENTITY asxml SYSTEM "xml.xml">
+  <!ENTITY asxmlsocket SYSTEM "xmlsocket.xml">
+ ]
+>
+
+ <!-- =============Document Header ============================= -->
+ <article id="index" lang="en">
+<!-- please do not change the id; for translations, change lang to -->
+<!-- appropriate code -->
+   <articleinfo>
+     <title>&app; V&manrevision;</title>
+     <copyright>
+       <year>2005, 2006, 2007, 2008</year>
+       <holder>Free Software Foundation</holder>
+     </copyright>
+<!-- translators: uncomment this:
+
+  <copyright>
+   <year>2005, 2006, 2007, 2008</year>
+   <holder>ME-THE-TRANSLATOR (Latin translation)</holder>
+  </copyright>
+
+   -->
+<!-- An address can be added to the publisher information.  If a role is 
+     not specified, the publisher/author is the same for all versions of the 
+     document.  -->
+    <publisher> 
+      <publishername> GNOME Documentation Project </publishername> 
+    </publisher> 
+
+<!-- 
+      Copyright (c)  2005, 2006, 2007, Free Software Foundation, Inc.
+      Permission is granted to copy, distribute and/or modify this document
+      under the terms of the GNU Free Documentation License, Version 1.2
+      or any later version published by the Free Software Foundation;
+      with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
+      Texts.  A copy of the license is included in the section entitled "GNU
+      Free Documentation License".
+-->
+
+   &legal;
+
+   <!-- This file  contains link to license for the documentation (GNU FDL), and 
+        other legal stuff such as "NO WARRANTY" statement. Please do not change 
+	any of this. -->
+
+    <authorgroup> 
+      <author> 
+	<firstname>Rob</firstname> 
+	<surname>Savoye</surname> 
+	<affiliation> 
+	  <address>
+	    <email>rob@welcomehome.org</email>
+	  </address> 
+	</affiliation> 
+      </author> 
+
+<!-- This is appropriate place for other contributors: translators,
+      maintainers,  etc. Commented out by default.
+       <othercredit role="translator">
+	<firstname>Latin</firstname> 
+	<surname>Translator 1</surname> 
+	<affiliation> 
+	  <orgname>Latin Translation Team</orgname> 
+	  <address> <email>translator@gnome.org</email> </address> 
+	</affiliation>
+	<contrib>Latin translation</contrib>
+      </othercredit>
+-->
+    </authorgroup>
+
+    <revhistory>
+      <revision> 
+	<revnumber>&appname; V&manrevision;</revnumber> 
+	<date>&date;</date>
+	<revdescription> 
+	  <para role="author">Rob Savoye
+	    <email>rob@welcomehome.org</email>
+	    Updated for the alpha release.
+	  </para>
+	  <para role="publisher">Free Software Foundation</para>
+	</revdescription> 
+      </revision> 
+    </revhistory> 
+
+    <releaseinfo>This specification describes version &manrevision; of
+    this document.
+    </releaseinfo>
+   </articleinfo>
+
+  <indexterm zone="index"> 
+    <primary>Free ActionScript Specification</primary> 
+  </indexterm>
+
+<!-- ============= Introduction ============================== -->
+  <sect1 id="intro">
+    <title>Introduction</title>
+
+    <para>
+      This is an Freely redistributable specifiction for Flash
+      ActionScript maintained by the open source community of Flash
+      developers.
+    </para>
+
+    <para>
+      ActionScript, like JavaScript, is based on the 
+      <ulink type="http"
+	     url="http://www.ecma-international.org/publications/standards/Ecma-262.htm">ECMA 262 Specification</ulink>. The current version that fully 
+      supports this is ActionScript, and is implemented in the current
+      Adobe Flash player version 9. Prior versions of the Flash player
+      used ActionScript 2, which implemented a subset of the fully
+      specification, plus differed some.
+      
+
+    </para>
+
+
+  </sect1>
+
+<!-- ============= Document Body ============================= -->
+  <sect1 id="spec">
+    <title>Specification</title>
+
+    &asaccessibility;
+    &asarray;
+    &asboolean;
+    &asbutton;
+    &ascamera;
+    &ascolor;
+    &ascontextmenu;
+    &asmath;
+    &asnetconnection;
+    &asnumber;
+    &asstring;
+    &ascustomactions;
+    &asdate;
+    &aserror;
+    &asfunction;
+    &askey;
+    &asloadvars;
+    &aslocalconnection;
+    &asmicrophone;
+    &asmouse;
+    &asmovieclip;
+    &asmoviecliploader;
+    &asnetstream;
+    &asselection;
+    &assharedobject;
+    &assound;
+    &asstage;
+    &assystem;
+    &astextfield;
+    &astextformat;
+    &astextsnapshot;
+    &asvideo;
+    &asxmlnode;
+    &asxml;
+    &asxmlsocket;
+  </sect1>
+
+<!-- ============= Authors ================================ -->
+
+  <sect1 id="authors">
+    <title>Authors</title>
+    <para>
+      <application>This Free ActionScript Specification</application> is
+      maintained by the Gnash team and others. Please send all
+      comments to <email>gnash-dev@gnu.org</email>.
+    </para>
+    
+  </sect1>
+
+  <!-- ============= Application License ============================= -->
+
+  &fdl-app;
+
+</article>

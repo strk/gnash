@@ -1,0 +1,302 @@
+<sect4 id="asarray">
+  <title>Array ActionScript Class</title>
+
+  <para>
+    This class implements an array container.
+  </para>
+
+  <sect5 id="arraymethods">
+    <title>The Methods of the Array Class</title>
+	 
+    <para>
+      <variablelist>
+	<varlistentry>
+	  <term>concat()</term>
+	  <listitem>
+	    <para>
+	      Concatenates two objects and returns a new array.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>join()</term>
+	  <listitem>
+	    <para>
+	      Join all the array elements into a string.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>pop()</term>
+	  <listitem>
+	    <para>
+	      Return the last element in the array by removing if from
+	      the array.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>push()</term>
+	  <listitem>
+	    <para>
+	      Push an element onto the end of the array.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>reverse()</term>
+	  <listitem>
+	    <para>
+	      Reverse the order of the elements in an array.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>shift()</term>
+	  <listitem>
+	    <para>
+	      Return the first element in the array by removing if from
+	      the array.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>sort()</term>
+	  <listitem>
+	    <para>
+	      Sort the elements in the array.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>sortOn()</term>
+	  <listitem>
+	    <para>
+	      Sort the elements in the array based on one field.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>Splice()</term>
+	  <listitem>
+	    <para>
+	      Return a subset of the array elements as a new array.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>toString()</term>
+	  <listitem>
+	    <para>
+	      Return the elements in an array as a string.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>unshift()</term>
+	  <listitem>
+	    <para>
+	      Place an element on the front of the array.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="arrayprops">
+    <title>The Properties of the Array Class</title>
+    
+    <para>
+      <variablelist>
+	<varlistentry>
+	  <term>length</term>
+	  <listitem>
+	    <para>
+	      The number of objects in the array.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="arrayconf">
+    <title>Array Class Conformance</title>
+    
+    <para>
+      <informaltable frame="all">
+	<?dbhtml table-width="75%" ?>
+	<tgroup cols="2">
+	  <thead>
+	    <row>
+	      <entry valign="top">
+		<para>Class Name</para>
+	      </entry>
+	      <entry valign="top">
+		<para>Conformance</para>
+	      </entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>concat()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>join()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>pop()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>push()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>reverse()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>shift()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>slice()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>sort()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>sortOn()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>splice()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>toString()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>unshift()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>length</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </para>
+  </sect5>
+  
+</sect4>

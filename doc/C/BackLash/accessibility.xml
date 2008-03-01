@@ -1,0 +1,77 @@
+<sect4 id="asaccessibility">
+  <title>Accessibility ActionScript Class</title>
+
+  <para>
+    This class implements an Accessibility object.
+  </para>
+
+  <sect5 id="accessibilitymethods">
+    <title>The Methods of the  Class</title>
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>isActive()</term>
+	  <listitem>
+	    <para>
+	      Return whether a screen reader is in use.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>updateProperties()</term>
+	  <listitem>
+	    <para>
+	      Change the display to use a screen reader.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="accessibilityconf">
+    <title>Accessibility Class Conformance</title>
+    
+    <para>
+      <informaltable frame="all">
+	<?dbhtml table-width="75%" ?>
+	<tgroup cols="2">
+	  <thead>
+	    <row>
+	      <entry valign="top">
+		<para>Class Name</para>
+	      </entry>
+	      <entry valign="top">
+		<para>Conformance.</para>
+	      </entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>isActive()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>updateProperties()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </para>
+  </sect5>  
+</sect4>

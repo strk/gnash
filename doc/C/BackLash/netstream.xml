@@ -1,0 +1,264 @@
+<sect4 id="asnetstream">
+  <title>NetStream ActionScript Class</title>
+
+  <para>
+    This class implements an NetStream object.
+  </para>
+
+  <sect5 id="netstreammethods">
+    <title>The Methods of the  Class</title>
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>close()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>pause()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>play()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>seek()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>setBufferTime()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+  </sect5>
+  <sect5 id="netstreamprops">
+    <title>The Properties of the NetStream Class</title>
+    
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>bufferLength</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>bufferTime</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>bytesLoaded</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>bytesTotal</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>currentFps</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onStatus</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>time</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="netstreamconf">
+    <title>NetStream Class Conformance</title>
+    
+    <para>
+      <informaltable frame="all">
+	<?dbhtml table-width="75%" ?>
+	<tgroup cols="2">
+	  <thead>
+	    <row>
+	      <entry valign="top">
+		<para>Class Name</para>
+	      </entry>
+	      <entry valign="top">
+		<para>Conformance</para>
+	      </entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>close()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>pause()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>play()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>seek()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>setBufferTime()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>bufferLength</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>bufferTime</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>bytesLoaded</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>bytesTotal</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>currentFps</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onStatus</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>time</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </para>
+  </sect5>  
+</sect4>

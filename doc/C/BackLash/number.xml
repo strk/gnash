@@ -1,0 +1,180 @@
+<sect4 id="asnumber">
+  <title>Number ActionScript Class</title>
+
+  <para>
+    This class implements an Number object.
+  </para>
+
+  <sect5 id="numbermethods">
+    <title>The Methods of the Number Class</title>
+	 
+    <para>
+      <variablelist>
+	<varlistentry>
+	  <term>toString()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>valueOf()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="numberprops">
+    <title>The Properties of the Number Class</title>
+    
+    <para>
+      <variablelist>
+	<varlistentry>
+	  <term>MAX_VALUE</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>MIN_VALUE</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>NaN</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>NEGATIVE_INFINITY</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>POSITIVE_INFINITY</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="numberconf">
+    <title>Number Class Conformance</title>
+    
+    <para>
+      <informaltable frame="all">
+	<?dbhtml table-width="75%" ?>
+	<tgroup cols="2">
+	  <thead>
+	    <row>
+	      <entry valign="top">
+		<para>Class Name</para>
+	      </entry>
+	      <entry valign="top">
+		<para>Conformance</para>
+	      </entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>MAX_VALUE</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Unimplemented.
+		</para>
+	      </entry>
+	    </row>
+
+	    <row>
+	      <entry valign="top" align="left">
+		<para>MIN_VALUE</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Unimplemented.
+		</para>
+	      </entry>
+	    </row>
+
+	    <row>
+	      <entry valign="top" align="left">
+		<para>NaN</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+
+	    <row>
+	      <entry valign="top" align="left">
+		<para>NEGATIVE_INFINITY</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+
+	    <row>
+	      <entry valign="top" align="left">
+		<para>POSITIVE_INFINITY</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+
+	    <row>
+	      <entry valign="top" align="left">
+		<para>toString()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+
+	    <row>
+	      <entry valign="top" align="left">
+		<para>valueOf()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </para>
+  </sect5>  
+</sect4>

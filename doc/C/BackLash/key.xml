@@ -1,0 +1,545 @@
+<sect4 id="askey">
+  <title>Key ActionScript Class</title>
+
+  <para>
+    This class implements an Key object.
+  </para>
+
+  <sect5 id="keymethods">
+    <title>The Methods of the  Class</title>
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>addListener()</term>
+	  <listitem>
+	    <para>
+	      Add a callback for key up and down events.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getAscii()</term>
+	  <listitem>
+	    <para>
+	      Return the ASCII value of the key.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getCode()</term>
+	  <listitem>
+	    <para>
+	      Return the key code of the key.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>isDown()</term>
+	  <listitem>
+	    <para>
+	      Returns true if the specified key is down.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>isToggled()</term>
+	  <listitem>
+	    <para>
+	      Returns true if the Num Lock key is on.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>removeListener()</term>
+	  <listitem>
+	    <para>
+	      Remove the event handler.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+  </sect5>
+  <sect5 id="keyprops">
+    <title>The Properties of the Key Class</title>
+    
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>BACKSPACE</term>
+	  <listitem>
+	    <para>
+	      A constant representing the backspace key.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>CAPSLOCK</term>
+	  <listitem>
+	    <para>
+	      A constant representing the Caps Lock key.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>CONTROL</term>
+	  <listitem>
+	    <para>
+	      A constant representing the Control key.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>DELETEKEY</term>
+	  <listitem>
+	    <para>
+	      A constant representing the Delete key.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>DOWN</term>
+	  <listitem>
+	    <para>
+	      A constant representing the Down arrow key.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>END</term>
+	  <listitem>
+	    <para>
+	      A constant representing the End key.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>ENTER</term>
+	  <listitem>
+	    <para>
+	      A constant representing the Enter key.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>ESCAPE</term>
+	  <listitem>
+	    <para>
+	      A constant representing the Escape key.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>HOME</term>
+	  <listitem>
+	    <para>
+	      A constant representing the Home key.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>INSERT</term>
+	  <listitem>
+	    <para>
+	      A constant representing the Insert key.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>LEFT</term>
+	  <listitem>
+	    <para>
+	      A constant representing the left arrow key.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>PGDN</term>
+	  <listitem>
+	    <para>
+	      A constant representing the Page Down key.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>PGUP</term>
+	  <listitem>
+	    <para>
+	      A constant representing the Page Up key.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>RIGHT</term>
+	  <listitem>
+	    <para>
+	      A constant representing the right arrow key.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>SHIFT</term>
+	  <listitem>
+	    <para>
+	      A constant representing the shift key.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>SPACE</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>TAB</term>
+	  <listitem>
+	    <para>
+	      A constant representing the space bar.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>UP</term>
+	  <listitem>
+	    <para>
+	      A constant representing the up arrow key.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="keyevents">
+    <title>Key Class Event Handlers</title>
+    
+    <variablelist>
+      <varlistentry>
+	<term>onKeyDown</term>
+	<listitem>
+	  <para>
+	  </para>
+	</listitem>
+      </varlistentry>
+      
+      <varlistentry>
+	<term>onKeyUp</term>
+	<listitem>
+	  <para>
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+  </sect5>
+      
+  <sect5 id="keyconf">
+    <title>Key Class Conformance</title>
+    
+    <para>
+      <informaltable frame="all">
+	<?dbhtml table-width="75%" ?>
+	<tgroup cols="2">
+	  <thead>
+	    <row>
+	      <entry valign="top">
+		<para>Class Name</para>
+	      </entry>
+	      <entry valign="top">
+		<para>Conformance</para>
+	      </entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>addListener()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getAscii()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getCode()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>isDown()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>isToggled()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>removeListener()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>BACKSPACE</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This constant is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>CAPSLOCK</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This constant is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>CONTROL</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This constant is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>DELETEKEY</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This constant is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>DOWN</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This constant is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>END</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This constant is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>ENTER</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This constant is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>ESCAPE</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This constant is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>HOME</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This constant is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>INSERT</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This constant is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>LEFT</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This constant is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onKeyDown</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This constant is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onKeyUp</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This constant is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>PGDN</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This constant is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>PGUP</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This constant is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>RIGHT</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This constant is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>SHIFT</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This constant is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>SPACE</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This constant is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>TAB</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This constant is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>UP</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This constant is implemented.
+		</para>
+	      </entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </para>
+  </sect5>  
+</sect4>

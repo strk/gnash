@@ -1,0 +1,674 @@
+<sect4 id="asxml">
+  <title>XML ActionScript Class</title>
+
+  <para>
+    This class implements an XML object.
+  </para>
+
+    <sect5 id="xmlmethods">
+	<title>The Methods of the  Class</title>
+	<para>
+	    <variablelist>
+
+		<varlistentry>
+		    <term>addRequestHeader()</term>
+		    <listitem>
+		    <para>
+		      Change the HTTP header.
+		    </para>
+		    </listitem>
+	    </varlistentry>
+
+		<varlistentry>
+		    <term>appendChild()</term>
+		    <listitem>
+		    <para>
+		      Append a child node to this node.
+		    </para>
+		    </listitem>
+	    </varlistentry>
+
+		<varlistentry>
+		    <term>cloneNode()</term>
+		    <listitem>
+		    <para>
+		      Copy a node.
+		    </para>
+		    </listitem>
+	    </varlistentry>
+
+		<varlistentry>
+		    <term>createElement()</term>
+		    <listitem>
+		    <para>
+		      Create an element for a node.
+		    </para>
+		    </listitem>
+	    </varlistentry>
+
+		<varlistentry>
+		    <term>createTextNode()</term>
+		    <listitem>
+		    <para>
+		      Create a text node.
+		    </para>
+		    </listitem>
+	    </varlistentry>
+
+		<varlistentry>
+		    <term>getBytesLoaded()</term>
+		    <listitem>
+		    <para>
+		    </para>
+		    </listitem>
+	    </varlistentry>
+
+		<varlistentry>
+		    <term>getBytesTotal()</term>
+		    <listitem>
+		    <para>
+		      Return the size of the XML source.
+		    </para>
+		    </listitem>
+	    </varlistentry>
+
+		<varlistentry>
+		    <term>hasChildNodes()</term>
+		    <listitem>
+		    <para>
+		      Return if this node has any children.
+		    </para>
+		    </listitem>
+	    </varlistentry>
+
+		<varlistentry>
+		    <term>insertBefore()</term>
+		    <listitem>
+		    <para>
+		      Insert a node before this node.
+		    </para>
+		    </listitem>
+	    </varlistentry>
+
+		<varlistentry>
+		    <term>load()</term>
+		    <listitem>
+		    <para>
+		      Load a XML message in memory.
+		    </para>
+		    </listitem>
+	    </varlistentry>
+
+		<varlistentry>
+		    <term>parseXML()</term>
+		    <listitem>
+		    <para>
+		      Parse an XML document.
+		    </para>
+		    </listitem>
+	    </varlistentry>
+
+		<varlistentry>
+		    <term>removeNode()</term>
+		    <listitem>
+		    <para>
+		      Remove a node.
+		    </para>
+		    </listitem>
+	    </varlistentry>
+
+		<varlistentry>
+		    <term>send()</term>
+		    <listitem>
+		    <para>
+		      Send the node through the network.
+		    </para>
+		    </listitem>
+	    </varlistentry>
+
+		<varlistentry>
+		    <term>sendAndLoad()</term>
+		    <listitem>
+		    <para>
+		      Send a node, and get the result using the network.
+		    </para>
+		    </listitem>
+	    </varlistentry>
+
+		<varlistentry>
+		    <term>toString()</term>
+		    <listitem>
+		    <para>
+		      Convert the node and its children to a string.
+		    </para>
+		    </listitem>
+	    </varlistentry>
+	</variablelist>
+	</para>
+    </sect5>
+  <sect5 id="xmlprops">
+    <title>The Properties of the XML Class</title>
+    
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>contentType</term>
+	  <listitem>
+	    <para>
+	      The MIME type.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>attributes</term>
+	  <listitem>
+	    <para>
+	      Returns an array of the attributes of a node.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>childNodes</term>
+	  <listitem>
+	    <para>
+	      Returns an array of the children of a node.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>xmlDecl</term>
+	  <listitem>
+	    <para>
+	      Specify document's declaration.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>docTypeDecl</term>
+	  <listitem>
+	    <para>
+	      Get a string version of a document's declaration.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>firstChild</term>
+	  <listitem>
+	    <para>
+	      Returns the first child node.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>ignoreWhite</term>
+	  <listitem>
+	    <para>
+	      If set, blank nodes are deleted.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>lastChild</term>
+	  <listitem>
+	    Returns the last child node.
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>loaded</term>
+	  <listitem>
+	    <para>
+	      A flag that signifies if a file was loaded.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>nextSibling</term>
+	  <listitem>
+	    <para>
+	      Returns the next child node.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>nodeName</term>
+	  <listitem>
+	    <para>
+	      Returns the name of the node.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>nodeType</term>
+	  <listitem>
+	    <para>
+	      Returns the type of a node.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>nodeValue</term>
+	  <listitem>
+	    <para>
+	      Contains the text for a text node type.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+<!--
+	<varlistentry>
+	  <term>onData</term>
+	  <listitem>
+	    <para>
+	    </para>
+	    
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onLoad</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+-->
+	<varlistentry>
+	  <term>parentNode</term>
+	  <listitem>
+	    <para>
+	      Returns this node's parent.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>status</term>
+	  <listitem>
+	    <para>
+	      Returns the status code from parsing the XML document.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>previousSibling</term>
+	  <listitem>
+	    <para>
+	      Returns the child node before this one.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="xmlconf">
+    <title>XML Class Conformance</title>
+    
+    <para>
+      <informaltable frame="all">
+	<?dbhtml table-width="75%" ?>
+	<tgroup cols="2">
+	  <thead>
+	    <row>
+	      <entry valign="top">
+		<para>Class Name</para>
+	      </entry>
+	      <entry valign="top">
+		<para>Conformance</para>
+	      </entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>addRequestHeader()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>appendChild()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>cloneNode()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>createElement()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>createTextNode()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getBytesLoaded()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getBytesTotal()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>hasChildNodes()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>insertBefore()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>load()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>parseXML()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>removeNode()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>send()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>sendAndLoad()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>toString()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>contentType</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>attributes</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>childNodes</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>xmlDecl</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>docTypeDecl</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>firstChild</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>ignoreWhite</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>lastChild</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>loaded</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>nextSibling</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>nodeName</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>nodeType</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>nodeValue</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onData</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This event handler is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onLoad</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This event handler is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>parentNode</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This event handler is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>status</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This event handler is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>previousSibling</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This event handler is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </para>
+  </sect5>  
+</sect4>

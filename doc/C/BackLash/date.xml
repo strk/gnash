@@ -1,0 +1,989 @@
+<sect4 id="asdate">
+  <title>Date ActionScript Class</title>
+
+  <para>
+    This class implements the Date object.
+  </para>
+
+  <sect5 id="datemethods">
+    <title>The Methods of the Class</title>
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>getDate()</term>
+	  <listitem>
+	    <para>
+		Returns a Date's day-of-month from 1 to 31
+		according to local time.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getDay()</term>
+	  <listitem>
+	    <para>
+		Returns the day-of-the-week for a Date,
+		according to local time,
+		in the range 0-6 where 0 means Sunday and 6 means Saturday.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getFullYear()</term>
+	  <listitem>
+	    <para>
+		Returns the Gregorian year number for a Date,
+		according to local time.
+		Since Gnash currently uses POSIX date routines internally,
+		this probably only works for dates from
+		13 Dec 1901 to 19 Jan 2038.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getHours()</term>
+	  <listitem>
+	    <para>
+		Returns the hour-of-the-day for a Date,
+		according to local time,
+		in the range 0-23.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getMilliseconds()</term>
+	  <listitem>
+	    <para>
+		Returns the milliseconds component of a Date
+		as an integer in the range 0-999.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getMinutes()</term>
+	  <listitem>
+	    <para>
+		Returns the minutes-past-the-hour for a Date,
+		according to local time,
+		in the range 0-59.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getMonth()</term>
+	  <listitem>
+	    <para>
+		Returns the month of the year for a Date,
+		according to local time,
+		in the range 0-11 where 0 means January and 11 means December.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getSeconds()</term>
+	  <listitem>
+	    <para>
+		Returns the seconds past the minute for a Date,
+		in the range 0-59.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getTime()</term>
+	  <listitem>
+	    <para>
+		Returns the number of milliseconds elapsed since 
+		1 Jan 1970 00:00:00 in Universal Coordinated Time,
+		as a floating point number: fractions of milliseconds
+		are included.
+		Negative values indicate times before 1 Jan 1970.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getTimezoneOffset()</term>
+	  <listitem>
+	    <para>
+		Returns the difference between Universal Coordinated Time
+		and the local time represented by a Date, including
+		Daylight Savings Time if it was in effect at that time
+		in the current locale.
+		The return value is in minutes; negative for timezones east of
+		Greenwich and positive for those west of Greenwich.
+	    </para>
+	    <para>
+		For example in the GMT+1 timezone, one hour east of Greenwich,
+		for a time when DST was not in effect,
+		the result would be -60.
+		In the same timezone when DST is in effect,
+		the extra hour in advance of UTC makes the value -120.
+		Positive values are returned for locales west of Greenwich.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getUTCDate()</term>
+	  <listitem>
+	    <para>
+		Returns a Date's day-of-month from 1 to 31,
+		according to Universal Coordinated Time.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getUTCDay()</term>
+	  <listitem>
+	    <para>
+		Returns the day-of-the-week for a Date,
+		according to local time,
+		in the range 0-6 where 0 means Sunday and 6 means Saturday.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getUTCFullYear()</term>
+	  <listitem>
+	    <para>
+		Returns the Gregorian year number for a Date,
+		according to Universal Coordinated Time.
+		Since Gnash currently uses POSIX date routines internally,
+		this probably only works for dates from
+		13 Dec 1901 to 19 Jan 2038.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+		<varlistentry>
+		  <term>getUTCHours()</term>
+		  <listitem>
+		    <para>
+			Returns the hour-of-the-day for a Date,
+			according to Universal Coordinated Time,
+		in the range 0-23.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getUTCMilliseconds()</term>
+	  <listitem>
+	    <para>
+		Returns the milliseconds component of a Date
+		as an integer in the range 0-999.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getUTCMinutes()</term>
+	  <listitem>
+	    <para>
+		Returns the minutes-past-the-hour for a Date,
+		according to Universal Coordinated Time,
+		in the range 0-59.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getUTCMonth()</term>
+	  <listitem>
+	    <para>
+		Returns the month of the year for a Date,
+		according to Universal Coordinated Time,
+		in the range 0-11 where 0 means January and 11 means December.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getUTCSeconds()</term>
+	  <listitem>
+	    <para>
+		Returns the seconds past the minute for a Date,
+		in the range 0-59.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getYear()</term>
+	  <listitem>
+	    <para>
+		Returns the number of Gregorian years elapsed between 1900
+		and a Date,
+		according to local time.
+	    </para>
+	    <para>
+		For dates past 1st Jan 2000 it returns values from 100 onwards;
+		for years before 1900 it returns negative values.
+	    </para>
+	    <para>
+		This function is a historical wart left over from the days when
+		nobody could believe we would still be using Flash in 2000.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>setDate(dayofmonth)</term>
+	  <listitem>
+	    <para>
+		Sets the day-of-month for a Date object,
+		in the range 1-31, leaving the year, month, and
+		time-of-day unchanged for valid values.
+	    </para>
+	    <para>
+		If dayofmonth is greater than the number of days in the
+		month in question, it wraps into the following month:
+		for example, trying to set the 35th to a date in January
+		will result in the 4th of February.
+		If it is zero or negative, this will take the Date back
+		to a previous month and possibly a previous year.
+	    </para>
+	    <para>
+		If there are no parameters to setDate,
+		if dayofmonth is not of type Number
+		(or a String that contains a decimal number
+		or the Boolean values "true" and "false",
+		which behave the same as 1 and 0)
+		is an infinity or NotANumber,
+		this sets the value of the Date object to "Not A Number",
+		which is converted to a string as "Invalid date".
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>setFullYear(year,[month[,dayofmonth]])</term>
+	  <listitem>
+	    <para>
+		If a single parameter is given, this
+		sets the Gregorian year number for a Date,
+		normally leaving the month and day-of-month unchanged.
+	    </para>
+	    <para>
+		When changing from a leap year to a non-leap year
+		when the date is set to 29th February,
+		the resulting date is 1st March of the same year.
+	    </para>
+	    <para>
+		If month, and maybe dayofmonth, are also given, they
+		simultaneously set the month (and day of month), following
+		the usual rules whereby excessively large or negative values
+		carry over to affect the month or year and still give a
+		valid date.
+	    </para>
+	    <para>
+		If any supplied value cannot be converted to a valid number,
+		the Date's value is set to NotANumber.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>setHours(hour)</term>
+	  <listitem>
+	    <para>
+		Sets the hour-of-the-day, normally in the range 0-23,
+		leaving the calendar date and minutes/seconds unchanged.
+	    </para>
+	    <para>
+		Values greater than 23 will make the date roll over to one of
+		the following days; negative values will result in previous
+		dates.
+		If no parameter is given, or if it is not of a type that can be
+		converted to a number, the resulting date value is NotANumber,
+		which prints as "Invalid date".
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>setMilliseconds()</term>
+	  <listitem>
+	    <para>
+		Sets the milliseconds with a resolution of one millisecond:
+		fractional parts of a millisecond are ignored.
+	    </para>
+	    <para>
+		The parameter is normally a value from 0-999, but values
+		outside this range will carry over into, or borrow from,
+		the seconds (and minutes, hours etc if necessary).
+	    </para>
+	    <para>
+		If no parameters are given, or if the parameter cannot
+		be converted to a number, the Date's value is set to
+		NotANumber. Any extra parameters are ignored.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>setMinutes(minutes[,seconds[,milliseconds]])</term>
+	  <listitem>
+	    <para>
+		Sets the minutes-past-the-hour normally in the range 0-59,
+		leaving the calendar date and hour/seconds unchanged.
+	    </para>
+	    <para>
+		"Minutes" greater than 59 carry over into the hours (and
+		may consequently advance the date);
+		simiarly, negative values borrow from them.
+	    </para>
+	    <para>
+		The optional second and third parameters simultaneously set
+		the seconds and millisecond components,
+		with similar carry/borrow if they are outside the ranges
+		0-59 and 0-999;
+		fractions of seconds and milliseconds are ignored.
+	    </para>
+	    <para>
+		If no parameter is given, or if it is not of a type that can be
+		converted to a number, the resulting date value is NotANumber,
+		which prints as "Invalid date".
+		Gnash differs from the commercial Flash player in this,
+		which, given a non-numeric value for "minutes",
+		returns a seemingly random date such as 9th December, 2077 BC.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>setMonth(month[,day])</term>
+	  <listitem>
+	    <para>
+		Sets the month of the year, normally in the range 0-11,
+		leaving the year and time of day (in localtime) unchanged.
+	    </para>
+	    <para>
+		Values greater than 11 will make the date roll over into a
+		following year; negative values will result in previous
+		years.
+	    </para>
+	    <para>
+		If only the month is given, the new month has less days that
+		the old, and the day-of-month is beyond the end of the new
+		month, the date wraps over into the first days of the month
+		after the specified one. Gnash differs in this from the
+		commercial player, which leaves the date set to the last day
+		of the requested month.
+	    </para>
+	    <para>
+		If no parameter is given, or if it is not of a type that can
+		be converted to a number, the month is set to January without
+		changing the year.
+	    </para>
+	    <para>
+		If the optional extra parameter "day" is given, both the
+		month and day-of-month are set. As usual, day numbers beyond
+		the last day of the selected month wrap over into the following
+		month(s), and negative values take us back to previous months
+		and possibly years.
+	    </para>
+	    <para>
+		Unlike the "month" parameter, non-numeric values for "day"
+		result in the Date's value being set to NotANumber.
+	    </para>
+	    <para>
+		Any further parameters are ignored.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>setSeconds(seconds[,milliseconds])</term>
+	  <listitem>
+	    <para>
+		Sets the seconds component of a Date.
+		If the value of "seconds" is from 0-59, the hours and
+		minutes will be unchanged.
+	    </para>
+	    <para>
+		An optional extra parameter can be used to simultanously
+		set the milliseconds, though only to a precision of
+		one millisecond: fractions of milliseconds can be given
+		but are ignored). Likewise, any fractional part of a second
+		is ignored.
+	    </para>
+	    <para>
+		As usual, values outside the range 0-999 for milliseconds
+		are (added or subtracted) from the seconds,
+		and values outside the range 0-59 for the seconds carry over
+		into the minutes, hours etc.
+	    </para>
+	    <para>
+		Non-numerical values for "seconds" or "milliseconds"
+		result in the Date's value being set to NotANumber.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>setTime()</term>
+	  <listitem>
+	    <para>
+		Sets a Date object to a specified number of milliseconds
+		since 1 Jan 1970 in Universal Coordinated Time.
+		Fractions of milliseconds are ignored;
+		the only way to set a a date to sub-millisecond accuracy
+		is to use the single-argument version of the Date constructor.
+	    </para>
+	    <para>
+		If no parameters are supplied, or if the parameter cannot be
+		converted to a number, the Date's value is set to NotANumber.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>setUTCDate()</term>
+	  <listitem>
+	    <para>
+		Is the same as setDate(),
+		but specifying the time in Universal Coordinated Time.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>setUTCFullYear()</term>
+	  <listitem>
+	    <para>
+		Is the same as setFullYear(),
+		but specifying the time in Universal Coordinated Time.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>setUTCHours()</term>
+	  <listitem>
+	    <para>
+		Is the same as setHours(),
+		but specifying the time in Universal Coordinated Time.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>setUTCMilliseconds()</term>
+	  <listitem>
+	    <para>
+		Is the same as setMilliseconds().
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>setUTCMinutes()</term>
+	  <listitem>
+	    <para>
+		Is the same as setMinutes(),
+		but specifying the time in Universal Coordinated Time.
+	    </para>
+	    <para>
+		This differs from setMinutes in countries that have
+		a time offset that is not a whole number of hours and on
+		Lord Howe Island which also has daylight savings time of
+		half an hour.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>setUTCMonth()</term>
+	  <listitem>
+	    <para>
+		Is the same as setMonth(),
+		but specifying the time in Universal Coordinated Time.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>setUTCSeconds()</term>
+	  <listitem>
+	    <para>
+		Is the same as setSeconds(),
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>setYear(year[,month[,dayofmonth]])</term>
+	  <listitem>
+	    <para>
+		Is the same as setFullYear(), except that values from
+		0 to 99 specify the years 1900 to 1999, and negative values
+		specify a year prior to 1900. Thus the only way to specify
+		the year 55AD with this method is to use -1845.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>toString()</term>
+	  <listitem>
+	    <para>
+		Converts a Date object to a printable string in the form
+		"Thu Jan 1 00:00:00 GMT+0000 1970" in local time, according to
+		the local timezone and whether Daylight Saving Time
+		was in force at the time in question.
+	    </para>
+	    <para>
+		If the Date's value is NotANumber or Infinity,
+		the string "Invalid Date" is returned.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>UTC(year,month[,dayofmonth[,hour[,minutes[,seconds[,milliseconds]]]]])</term>
+	  <listitem>
+	    <para>
+		Is a static function that converts the specified time,
+		expressed in Universal Coordinated Time,
+		to a Date value. It is most often used in conjunction with
+		the Date constructor or the setTime method, to create a
+		Date object according to UTC.
+	    </para>
+	    <para>
+		All parameters are 0-based except "month" which is 1-based,
+		and the usual carry/borrow rules apply for oversized and
+		negative values.
+	    </para>
+	    <para>
+		A missing day-of-month defaults to the first of the month;
+		the other parameters default to zero.
+	    </para>
+	    <para>
+		If less than two paramemters are supplied, or if any supplied
+		parameters cannot be converted to numeric values, the Date's
+		value is set to NotANumber.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="dateconf">
+    <title>Date Class Conformance</title>
+    
+    <para>
+      <informaltable frame="all">
+	<?dbhtml table-width="75%" ?>
+	<tgroup cols="2">
+	  <thead>
+	    <row>
+	      <entry valign="top">
+		<para>Class Name</para>
+	      </entry>
+	      <entry valign="top">
+		<para>Conformance</para>
+	      </entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getDate()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getDay()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getFullYear()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getHours()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getMilliseconds()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getMinutes()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getMonth()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getSeconds()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getTime()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getTimezoneOffset()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getUTCDate()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getUTCDay()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getUTCFullYear()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getUTCHours()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getUTCMilliseconds()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getUTCMinutes()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getUTCMonth()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getUTCSeconds()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getYear()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>setDate()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>setFullYear()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>setHours()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>setMilliseconds()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>setMinutes()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+		<para>
+		  The commercial player, given d.setMinutes(), leaves the
+		  date set to a random value such as 9th December 2077 BC.
+		  Gnash gives NotANumber, in the same way as all the
+		  other functions.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>setMonth()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>setSeconds()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>setTime()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>setUTCDate()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>setUTCFullYear()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>setUTCHours()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>setUTCMilliseconds()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>setUTCMinutes()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		  See setMinutes above.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>setUTCMonth()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>setUTCSeconds()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>setYear()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>toString()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>UTC()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  Implemented.
+		</para>
+		<para>
+		  The commercial player, given Date.UTC(Infinity, 0),
+		  returns -6.77681005679712e+19;
+		  Gnash returns NAN if any parameter is non-numeric.
+		</para>
+	      </entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </para>
+  </sect5>  
+</sect4>

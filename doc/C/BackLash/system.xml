@@ -1,0 +1,714 @@
+<sect4 id="assystem">
+  <title>System ActionScript Class</title>
+
+  <para>
+    This class implements an System object.
+  </para>
+
+  <sect5 id="systemmethods">
+    <title>The Methods of the  Class</title>
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>security.allowDomain()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>security.allowInsecureDomain()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>security.loadPolicyFile()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>setClipboard()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>showSettings()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+  </sect5>
+  <sect5 id="systemprops">
+    <title>The Properties of the System Class</title>
+    
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>capabilities</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>object</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.avHardwareDisable</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.hasAccessibility</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.hasAudio</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.hasAudioEncoder</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.hasEmbeddedVideo</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.hasMP3</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.hasPrinting</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.hasScreenBroadcast</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.hasScreenPlayback</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.hasStreamingAudio</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.hasStreamingVideo</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.hasVideoEncoder</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.isDebugger</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.language</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.localFileReadDisable</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.manufacturer</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.os</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.pixelAspectRatio</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.playerType</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.screenColor</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.screenDPI</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.screenResolutionX</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.screenResolutionY</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.serverString</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>capabilities.version</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>security</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>object</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>exactSettings</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onStatus</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>useCodepage</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="systemconf">
+    <title>System Class Conformance</title>
+    
+    <para>
+      <informaltable frame="all">
+	<?dbhtml table-width="75%" ?>
+	<tgroup cols="2">
+	  <thead>
+	    <row>
+	      <entry valign="top">
+		<para>Class Name</para>
+	      </entry>
+	      <entry valign="top">
+		<para>Conformance</para>
+	      </entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>security.allowDomain()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>security.allowInsecureDomain()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>security.loadPolicyFile()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>setClipboard()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>showSettings()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>object</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.avHardwareDisable</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.hasAccessibility</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.hasAudio</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.hasAudioEncoder</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.hasEmbeddedVideo</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.hasMP3</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.hasPrinting</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.hasScreenBroadcast</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.hasScreenPlayback</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.hasStreamingAudio</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.hasStreamingVideo</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.hasVideoEncoder</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.isDebugger</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.language</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.localFileReadDisable</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.manufacturer</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.os</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.pixelAspectRatio</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.playerType</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.screenColor</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.screenDPI</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.screenResolutionX</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.screenResolutionY</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.serverString</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>capabilities.version</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>security</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>object</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>exactSettings</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onStatus</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>useCodepage</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </para>
+  </sect5>  
+</sect4>

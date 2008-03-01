@@ -1,0 +1,744 @@
+<sect4 id="asbutton">
+  <title>Button ActionScript Class</title>
+
+  <para>
+    This class implements an Button object.
+  </para>
+
+  <sect5 id="buttonmethods">
+    <title>The Methods of the Button Class</title>
+	 
+    <para>
+      <variablelist>
+	<varlistentry>
+	  <term>getDepth()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="buttonprops">
+    <title>The Properties of the Button Class</title>
+    
+    <para>
+      <variablelist>
+	<varlistentry>
+	  <term>_alpha</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>enabled</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_focusrect</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_height</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>menu</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_name</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_parent</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_quality</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_rotation</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_soundbuftime</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>tabEnabled</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>tabIndex</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_target</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>trackAsMenu</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_url</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>useHandCursor</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_visible</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_width</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_x</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_xmouse</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_xscale</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_y</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_ymouse</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>_yscale</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="buttonevents">
+    <title>The Event Handlers of the Button Class</title>
+	 
+    <para>
+      <variablelist>
+	<varlistentry>
+	  <term>onDragOut</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onDragOver</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onKeyDown</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onKeyUp</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onKillFocus</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onPress</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onRelease</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onReleaseOutside</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onRollOut</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onRollOver</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onSetFocus</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="buttonconf">
+    <title>Button Class Conformance</title>
+    
+    <para>
+      <informaltable frame="all">
+	<?dbhtml table-width="75%" ?>
+	<tgroup cols="2">
+	  <thead>
+	    <row>
+	      <entry valign="top">
+		<para>Class Name</para>
+	      </entry>
+
+	      <entry valign="top">
+		<para>Conformance</para>
+	      </entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getDepth()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_alpha</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>enabled</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_focusrect</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_height</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_menu</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_name</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_parent</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_quality</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_rotation</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_soundbuftime</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_tabEnabled</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_tabIndex</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_target</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_trackAsMenu</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_url</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_useHandCursor</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_visible</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_width</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_x</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_xmouse</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_xscale</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_y</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_ymouse</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>_yscale</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onDragOut</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This event handler is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onDragOver</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This event handler is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onKeyDown</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This event handler is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onKeyUp</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This event handler is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onKillFocus</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This event handler is not implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onPress</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This event handler is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onRelease</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This event handler is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onReleaseOutside</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This event handler is not implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onRollOut</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This event handler is not implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onRollOver</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This event handler is not implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onSetDocus</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This event handler is not implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </para>
+  </sect5>
+
+</sect4>

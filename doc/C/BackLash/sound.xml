@@ -1,0 +1,401 @@
+<sect4 id="assound">
+  <title>Sound ActionScript Class</title>
+
+  <para>
+    This class implements an Sound object.
+  </para>
+
+  <sect5 id="soundmethods">
+    <title>The Methods of the Class</title>
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>attachSound()</term>
+	  <listitem>
+	    <para>
+	      Attach the specified sound.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getBytesLoaded()</term>
+	  <listitem>
+	    <para>
+	      Returns how many bytes of the sound have been loaded.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getBytesTotal()</term>
+	  <listitem>
+	    <para>
+	      Returns the total size of the sound.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getPan()</term>
+	  <listitem>
+	    <para>
+	      Returns the value of the previous call to setPan().
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getTransform()</term>
+	  <listitem>
+	    <para>
+	      Returns the value of the previous call to setTransform().
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getVolume()</term>
+	  <listitem>
+	    <para>
+	      Returns the value of the previous call to setVolumne().
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>loadSound()</term>
+	  <listitem>
+	    <para>
+	      Load an MP3 file.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>setPan()</term>
+	  <listitem>
+	    <para>
+	      Change the balance.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>setTransform()</term>
+	  <listitem>
+	    <para>
+	      Set the channel amounts for each speaker.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>setVolume()</term>
+	  <listitem>
+	    <para>
+	      Set the volume for playing.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>start()</term>
+	  <listitem>
+	    <para>
+	      Play the loaded sound.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>stop()</term>
+	  <listitem>
+	    <para>
+	      Stop playing the sound.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="soundprops">
+    <title>The Properties of the Sound Class</title>
+    
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>duration</term>
+	  <listitem>
+	    <para>
+	      The length in milliseconds of the sound.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>id3</term>
+	  <listitem>
+	    <para>
+	      Returns the ID3 tag of an MP3 file.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>position</term>
+	  <listitem>
+	    <para>
+	      Returns the amount of time the sound has been playing.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="soundevents">
+    <title>Event Handlers of the Sound Class</title>
+    
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>onID3</term>
+	  <listitem>
+	    <para>
+	      Called when ID3 data is available.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onLoad</term>
+	  <listitem>
+	    <para>
+	      Called when a sound is loaded.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onSoundComplete</term>
+	  <listitem>
+	    <para>
+	      Called when a sound is done playing.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="soundconf">
+    <title>Sound Class Conformance</title>
+    
+    <para>
+      <informaltable frame="all">
+	<?dbhtml table-width="75%" ?>
+	<tgroup cols="2">
+	  <thead>
+	    <row>
+	      <entry valign="top">
+		<para>Class Name</para>
+	      </entry>
+	      <entry valign="top">
+		<para>Conformance</para>
+	      </entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>attachSound()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getBytesLoaded()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getBytesTotal()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getPan()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getTransform()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getVolume()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>loadSound()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>setPan()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>setTransform()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>setVolume()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>start()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>stop()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>duration</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>id3</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onID3</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This event handler is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onLoad</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This event handler is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onSoundComplete</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This event handler is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>position</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </para>
+  </sect5>  
+</sect4>

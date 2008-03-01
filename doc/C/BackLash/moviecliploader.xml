@@ -1,0 +1,228 @@
+<sect4 id="asmoviecliploader">
+  <title>MovieClipLoader ActionScript Class</title>
+
+  <para>
+    This class implements an MovieClipLoader object.
+  </para>
+
+  <sect5 id="moviecliploadermethods">
+    <title>The Methods of the  Class</title>
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>addListener()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>getProgress()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>loadClip()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>removeListener()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>unloadClip()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+  </sect5>
+  <sect5 id="moviecliploaderprops">
+    <title>The Properties of the MovieClipLoader Class</title>
+    
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>onLoadComplete</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onLoadError</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onLoadInit</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onLoadProgress</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onLoadStart</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="moviecliploaderconf">
+    <title>MovieClipLoader Class Conformance</title>
+    
+    <para>
+      <informaltable frame="all">
+	<?dbhtml table-width="75%" ?>
+	<tgroup cols="2">
+	  <thead>
+	    <row>
+	      <entry valign="top">
+		<para>Class Name</para>
+	      </entry>
+	      <entry valign="top">
+		<para>Conformance</para>
+	      </entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>addListener()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>getProgress()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>loadClip()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>removeListener()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>unloadClip()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onLoadComplete</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onLoadError</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onLoadInit</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onLoadProgress</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onLoadStart</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property has an unknown status.
+		</para>
+	      </entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </para>
+  </sect5>  
+</sect4>

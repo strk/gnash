@@ -1,0 +1,143 @@
+<sect4 id="ascontextmenu">
+  <title>ContextMenu ActionScript Class</title>
+
+  <para>
+    This class implements an ContextMenu object.
+  </para>
+
+    <sect5 id="contextmenumethods">
+	<title>The Methods of the  Class</title>
+	<para>
+	    <variablelist>
+
+		<varlistentry>
+		    <term>copy()</term>
+		    <listitem>
+		    <para>
+		      Return a copy of the menu.
+		    </para>
+		    </listitem>
+	    </varlistentry>
+
+		<varlistentry>
+		    <term>hideBuiltInItems()</term>
+		    <listitem>
+		    <para>
+		      Hide most menu items.
+		    </para>
+		    </listitem>
+	    </varlistentry>
+	</variablelist>
+	</para>
+    </sect5>
+  <sect5 id="contextmenuprops">
+    <title>The Properties of the ContextMenu Class</title>
+    
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>builtInItems</term>
+	  <listitem>
+	    <para>
+	      Returns an array of the built-in menu items.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>customItems</term>
+	  <listitem>
+	    <para>
+	      An undefined array to contain menu item names.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onSelect</term>
+	  <listitem>
+	    <para>
+	      Called before the menu is displayed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="contextmenuconf">
+    <title>ContextMenu Class Conformance</title>
+    
+    <para>
+      <informaltable frame="all">
+	<?dbhtml table-width="75%" ?>
+	<tgroup cols="2">
+	  <thead>
+	    <row>
+	      <entry valign="top">
+		<para>Class Name</para>
+	      </entry>
+	      <entry valign="top">
+		<para>Conformance</para>
+	      </entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>copy()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>hideBuiltInItems()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>builtInItems</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>customItems</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onSelect</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </para>
+  </sect5>  
+</sect4>

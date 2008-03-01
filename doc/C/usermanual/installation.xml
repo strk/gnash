@@ -40,7 +40,7 @@
 	</listitem>
 	<listitem>
 	  <para>
-	    Video &mdash; Gnash will run on anything from a raw frame
+	    Gnash will run on anything from a raw frame
 	    buffer up to an OpenGL-supporting graphics card.
 	  </para>
 	</listitem>
@@ -285,7 +285,10 @@
 	  proper codecs aren't installed, and pop up a dialog box to
 	  let the user download the codecs Gnash needs to make site
 	  like YouTube work correctly. If you have installed Gnash on
-	  any other platform, and video 
+	  any other platform, and video doesn't work, it's highly
+	  likely you need to install the proper codecs. For most
+	  platforms, this is the Gstreamer-ffmpeg plugin, available
+	  from your distributions repository.
 	</para>
 	
       </sect2>

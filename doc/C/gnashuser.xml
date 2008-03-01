@@ -11,13 +11,14 @@
     <!ENTITY legal            SYSTEM "legal.xml">
     <!ENTITY fdl-app          SYSTEM "fdl-appendix.xml"> 
     <!ENTITY programmers      SYSTEM "app_authors.xml">
+    <!ENTITY introduction     SYSTEM "introduction.xml">
+    <!ENTITY security         SYSTEM "security.xml">
 
     <!ENTITY acknowledgments  SYSTEM "usermanual/acknowledgments.xml">
     <!ENTITY conventions      SYSTEM "usermanual/conventions.xml">
 
     <!ENTITY pkgmanager       SYSTEM "usermanual/packagemanager.xml">
     <!ENTITY revisionhistory  SYSTEM "usermanual/revisions.xml">
-    <!ENTITY introduction     SYSTEM "usermanual/introduction.xml">
     <!ENTITY specification    SYSTEM "usermanual/specification.xml">
     <!ENTITY installation     SYSTEM "usermanual/installation.xml">
     <!ENTITY usage            SYSTEM "usermanual/usage.xml">
@@ -32,7 +33,7 @@
 <!-- TRANSLATOR NOTE: do not change the id, just the lang -->
 <book lang="en" id="index">
 <title>Gnash User Manual</title>
-<titleabbrev>Gnash User Manual</titleabbrev>
+<titleabbrev>Gnash User</titleabbrev>
 
 <!-- =============Document Header ============================ -->
 

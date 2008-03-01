@@ -12,7 +12,7 @@
 
   <para>
     &app; has a better focus on security, allowing the user tight
-    control of all network or disk based I/O. &app; also supports
+    control of all network or disk based I/O. Gnash also supports
     extending ActionScript by creating your own. You can write
     wrappers for any development library, and import them into the
     player much like perl or python does.
@@ -34,9 +34,9 @@
     <title>What Is Supported ?</title>
     
     <para>
-      &app; is known to compile for most any POSIX and ANSI C++
+      Gnash is known to compile for most any POSIX and ANSI C++
       conforming system if you have all the dependent libraries
-      installed. Systems we test on, and which &app; is know to
+      installed. Systems we test on, and which Gnash is know to
       run on are Ubuntu, Fedora, Debian, OpenBSD, NetBSD, FreeBSD,
       Win32, and Darwin (OSX) primarily. Occasionally other platforms
       are built, primarily by those distribution maintainers. This
@@ -56,6 +56,12 @@
     </para>
     
     <para>
+      Gnash has implemented about 80% of ActionScript v. 2.0, and has
+      begun implementing ActionScript v. 3.0. Gnash supports the
+      majority of Flash opcodes up to SWF version 9, and a wide
+      sampling of ActionScript classes for SWF version 8.
+    </para>
+     <para>
       As ActionsScript 3 is a more developed version of
       ActionScript 2, many of the same classes work for
       both. Support has been added to Gnash's ActionScript library

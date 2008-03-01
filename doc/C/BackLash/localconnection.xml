@@ -1,0 +1,199 @@
+<sect4 id="aslocalconnection">
+  <title>LocalConnection ActionScript Class</title>
+
+  <para>
+    This class implements an LocalConnection object. This is basically
+    a Flash version of the a standard RPC (Remote Procedure
+    Call). This is used to have multiple flash movies exchange data
+    without converting it to <emphasis>XML</emphasis> first. This class uses shared memory
+    to transfer the data in the <emphasis>AMF</emphasis> format.
+  </para>
+
+  <para>
+    There is some documentation of the <emphasis>AMF</emphasis> format online, but not
+    much. There appear to be a few free <emphasis>AMF</emphasis> projects, but none that I
+    could find have any code. So I'm stuck developing a C/C++ based
+    <emphasis>AMF</emphasis> library to transfer data.
+  </para>
+
+  <sect5 id="localconnectionmethods">
+    <title>The Methods of the  Class</title>
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>close()</term>
+	  <listitem>
+	    <para>
+	      Close the current open connection, and remove the shared
+	      memory segment.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>connect(const char *)</term>
+	  <listitem>
+	    <para>
+	      This establishes a connection point so other movies can
+	      remotely execute methods in this movie. The shared
+	      memory segment is created in a form that can be attached
+	      to by a client. The code that actually remotely executes a
+	      method has yet to be written for Gnash.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>domain()</term>
+	  <listitem>
+	    <para>
+	      This returns the network domain for this connection. The
+	      default is to return "localhost".
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>send()</term>
+	  <listitem>
+	    <para>
+	      Execute a method of the local object. Data is encoded in
+	      the <emphasis>AMF</emphasis> format.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+  </sect5>
+  <sect5 id="localconnectionevents">
+    <title>The Event Handlers of the LocalConnection Class</title>
+    
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>allowDomain</term>
+	  <listitem>
+	    <para>
+	      Called for every method being executed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>allowInsecureDomain</term>
+	  <listitem>
+	    <para>
+	      Called when a request is received over the network.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onStatus</term>
+	  <listitem>
+	    <para>
+	      Returns the status of the method that was executed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="localconnectionconf">
+    <title>LocalConnection Class Conformance</title>
+    
+    <para>
+      <informaltable frame="all">
+	<?dbhtml table-width="75%" ?>
+	<tgroup cols="2">
+	  <thead>
+	    <row>
+	      <entry valign="top">
+		<para>Class Name</para>
+	      </entry>
+	      <entry valign="top">
+		<para>Conformance</para>
+	      </entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>close()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>connect()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>domain()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>send()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>allowDomain</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>allowInsecureDomain</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onStatus</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </para>
+  </sect5>  
+</sect4>

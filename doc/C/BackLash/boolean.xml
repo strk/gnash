@@ -1,0 +1,79 @@
+<sect4 id="asboolean">
+  <title>Boolean ActionScript Class</title>
+
+  <para>
+    This class implements a Boolean object, the primary purpose of
+    which is to return a string representation of a Boolean value.
+  </para>
+
+  <sect5 id="booleanmethods">
+    <title>The Methods of the Boolean Class</title>
+	 
+    <para>
+      <variablelist>
+	<varlistentry>
+	  <term>toString()</term>
+	  <listitem>
+	    <para>
+	      Concatenates two objects and returns a new Boolean.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>valueOf()</term>
+	  <listitem>
+	    <para>
+	      Join all the Boolean elements into a string.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="booleanconf">
+    <title>Boolean Class Conformance</title>
+    
+    <para>
+      <informaltable frame="all">
+	<?dbhtml table-width="75%" ?>
+	<tgroup cols="2">
+	  <thead>
+	    <row>
+	      <entry valign="top">
+		<para>Class Name</para>
+	      </entry>
+	      <entry valign="top">
+		<para>Conformance</para>
+	      </entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>toString()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    
+	    <row>
+	      <entry valign="top" align="left">
+		<para>valueOf()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>	    
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </para>
+  </sect5>
+</sect4>

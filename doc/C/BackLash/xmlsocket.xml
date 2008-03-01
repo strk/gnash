@@ -1,0 +1,181 @@
+<sect4 id="asxmlsocket">
+  <title>XMLSocket ActionScript Class</title>
+
+  <para>
+    This class implements an XMLSocket object.
+  </para>
+
+  <sect5 id="xmlsocketmethods">
+    <title>The Methods of the  Class</title>
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>close()</term>
+	  <listitem>
+	    <para>
+	      Close the socket connection.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>connect()</term>
+	  <listitem>
+	    <para>
+	      Connect to a host over a network connection.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>send()</term>
+	  <listitem>
+	    <para>
+	      Send a message through a network connection.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+  </sect5>
+  <sect5 id="xmlsocketevents">
+    <title>The Event Handlers of the XMLSocket Class</title>
+    
+    <para>
+      <variablelist>
+
+	<varlistentry>
+	  <term>onClose</term>
+	  <listitem>
+	    <para>
+	      Called when a network connection is closed.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onConnect</term>
+	  <listitem>
+	    <para>
+	      Called when a network connect has connected.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onData</term>
+	  <listitem>
+	    <para>
+	      Called then there is a message from the network.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>onXML</term>
+	  <listitem>
+	    <para>
+	      Called when an XML message is received.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="xmlsocketconf">
+    <title>XMLSocket Class Conformance</title>
+    
+    <para>
+      <informaltable frame="all">
+	<?dbhtml table-width="75%" ?>
+	<tgroup cols="2">
+	  <thead>
+	    <row>
+	      <entry valign="top">
+		<para>Class Name</para>
+	      </entry>
+	      <entry valign="top">
+		<para>Conformance</para>
+	      </entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>close()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>connect()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>send()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onClose</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This event handler is unimplemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onConnect</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This event handler is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onData</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This  event handler is implemented.
+		</para>
+	      </entry>
+	    </row>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>onXML</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This  event handler is implemented.
+		</para>
+	      </entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </para>
+  </sect5>  
+</sect4>

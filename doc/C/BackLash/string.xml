@@ -1,0 +1,295 @@
+<sect4 id="asstring">
+  <title>String ActionScript Class</title>
+
+  <para>
+    This class implements an String object.
+  </para>
+
+  <sect5 id="stringmethods">
+    <title>The Methods of the String Class</title>
+	 
+    <para>
+      <variablelist>
+	<varlistentry>
+	  <term>charAt()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>charCodeAt()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>concat()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>fromCharCode()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>indexOf()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>lastIndexOf()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>slice()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>split()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>substr()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>substring()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>toLowerCase()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>toUpperCase()</term>
+	  <listitem>
+	    <para>
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="stringprops">
+    <title>The Properties of the String Class</title>
+    
+    <para>
+      <variablelist>
+	<varlistentry>
+	  <term>length</term>
+	  <listitem>
+	    <para>
+	      The length of the string.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+  </sect5>
+
+  <sect5 id="stringconf">
+    <title>String Class Conformance</title>
+    
+    <para>
+      <informaltable frame="all">
+	<?dbhtml table-width="75%" ?>
+	<tgroup cols="2">
+	  <thead>
+	    <row>
+	      <entry valign="top">
+		<para>Class Name</para>
+	      </entry>
+	      <entry valign="top">
+		<para>Conformance</para>
+	      </entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry valign="top" align="left">
+		<para>charAt()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+
+	    <row>
+	      <entry valign="top" align="left">
+		<para>charCodeAt()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+
+	    <row>
+	      <entry valign="top" align="left">
+		<para>concat()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is not implemented.
+		</para>
+	      </entry>
+	    </row>
+
+	    <row>
+	      <entry valign="top" align="left">
+		<para>fromCharCode()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+
+	    <row>
+	      <entry valign="top" align="left">
+		<para>indexOf()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+
+	    <row>
+	      <entry valign="top" align="left">
+		<para>lastIndexOf()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is not implemented.
+		</para>
+	      </entry>
+	    </row>
+
+	    <row>
+	      <entry valign="top" align="left">
+		<para>slice()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is not implemented.
+		</para>
+	      </entry>
+	    </row>
+
+	    <row>
+	      <entry valign="top" align="left">
+		<para>split()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is not implemented.
+		</para>
+	      </entry>
+	    </row>
+
+	    <row>
+	      <entry valign="top" align="left">
+		<para>substr()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is not implemented.
+		</para>
+	      </entry>
+	    </row>
+
+	    <row>
+	      <entry valign="top" align="left">
+		<para>substring()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+
+	    <row>
+	      <entry valign="top" align="left">
+		<para>toLowerCase()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  The method is implemented.
+		</para>
+	      </entry>
+	    </row>
+
+	    <row>
+	      <entry valign="top" align="left">
+		<para>toUpperCase()</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This method is implemented.
+		</para>
+	      </entry>
+	    </row>
+
+	    <row>
+	      <entry valign="top" align="left">
+		<para>length</para>
+	      </entry>
+	      <entry valign="top" align="center">
+		<para>
+		  This property is implemented.
+		</para>
+	      </entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </para>
+  </sect5>  
+</sect4>

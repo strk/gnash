@@ -1,3 +1,40 @@
+2008-03-01  Rob Savoye  <rob@ute.welcomehome.org>
+
+	* doc/C/gnashref.xml: New reference manual top level page.  This
+	contains much of what was in the old manual.
+	* asspec/*: Move to BackLash directory.
+	* doc/C/Makefile.am: don't klist asspec files. Add directory for
+	installing html file. Add separate variables for the user manual
+	and the reference manual. Get rid of the useless
+	entities. variable. Drop include xmlmake and omfmake, fix tghe
+	rules and move them to the main Makefile. Fix info target so they
+	actually build correctly, and install in the dirs file. Install
+	and uninstall all the docs produced. Comment out GNOME help
+	support for now. 
+	* doc/omf.make, xmldocs.make: Don't use anymore.
+	* doc/C/usermanual: Rewritten. 
+	* usermanual/introduction.xml, /doc_authors.xml: Moved up one
+	directory so it can be shared with the reference manual.
+	* doc/C/usermanual/gtkext.xml, internals.xml, logging.xml, 
+	mysqlext.xml, object.xml, opcodes.xml, plugin.xml, rtmp.xml,
+	sources.xml: Move to reference manual.
+	* doc/C/refmanual/amf.xml, internals.xml, memory.xml, plugin.xml,
+	sources.xml, as_value.xml, logging.xml, new_as_class.xml,
+	revisions.xml, codestyle.xml, main.xml, object.xml, rtmp.xml:
+	Moved from the user manual and top level.
+	* doc/C/asspec/*: All files moved to BackLash directory.
+	* doc/backLash/accessibility.xml, array.xml, asspec.xml,
+	boolean.xml, button.xml, camera.xml, color.xml, contextmenu.xml,
+	customactions.xml, date.xml, error.xml, fdl-appendix.xml,
+	function.xml, key.xml, legal.xml, loadvars.xml,
+	localconnection.xml, math.xml, microphone.xml, mouse.xml,
+	movieclip.xml, moviecliploader.xml, netconnection.xml,
+	netstream.xml, number.xml, selection.xml,
+	sharedobject.xml,sound.xml, stage.xml, string.xml, system.xml,
+	textfield.xml, textformat.xml, textsnapshot.xml, video.xml,
+	xml.xml, xmlnode.xml, xmlsocket.xml: Move from asspec directory.
+
+	
 2008-02-29 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* libmedia/AudioDecoderNellymoser.cpp: Boostified random. 
@@ -1238,7 +1275,7 @@
 	  manipulation can stay as before. Interfaces still use std::string
 	  with conversions when necessary. Make wstring methods private. 
 	  set_text_value(const char*) -> setTextValue(const wstring&).
-	  Handles characters like ö or ¶.
+	  Handles characters like �¶ or �¶.
 
 2008-02-05 Bastiaan Jacques <bastiaan@bjacques.org>
 
@@ -8547,7 +8584,7 @@
 	* libbase/string_table.h: Fixed compilation for non-32 bit platforms.
 	* server/parser/video_stream_def.{cpp,h}: Use CapitalCase for types.
 
-2007-09-17 Lauri Mylläri <rez>
+2007-09-17 Lauri Myll�¤ri <rez>
 
 	* server/swf/tag_loaders.cpp: Also parse DelaySeek field for MP3 
 	  in DEFINESOUND, fixes bug #21094.
