@@ -191,7 +191,7 @@ else
 	fi
 endif
 
-if !ENABLE_DOCBOOK
+if !DOCBOOK
 gnash_user.info:
 	$(LN_S) -f $(top_srcdir)/packaging/doc/gnash_user.info.in ./gnash_user.info; \
 
