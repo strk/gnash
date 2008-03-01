@@ -32,11 +32,11 @@ gprocessor (options)... (file)...
 
 <refsect1><title>Description</title>
 <para>
-  Gprocessor is an debugging tool for SWF files, that is a companion to
-  Gnash. This is most often used for debugging and running testcases,
-  as this tool is equivalant to running Gnash with no graphic
+  Gprocessor is a debugging tool for SWF files, a companion to
+  Gnash.  It is most often used for debugging and running testcases,
+  as it is equivalant to running Gnash with no graphic
   output. This tool is primarily used by Gnash developers, or anyone
-  that wishes to run the Gnash test cases.
+  who wishes to run the Gnash test cases.
 </para>
 
 <variablelist>
@@ -90,9 +90,8 @@ gprocessor (options)... (file)...
     <term>-f [frames]</term>
     <listitem>
       <para>
-	Allow the given number of frame advancements. Keep advancing
-	untill any other stop condition is encountered if set to 0
-	(default).
+	Allow the given number of frame advancements.  If 0, keep advancing
+	until some other stop condition is encountered (default).
       </para>
     </listitem>
   </varlistentry>
@@ -101,8 +100,8 @@ gprocessor (options)... (file)...
     <term>-r [times]</term>
     <listitem>
       <para>
-	 Allow the given number of complete runs. Keep looping
-	 undefinitely if set to 0. Default is 1 (end as soon as the
+	 Allow the given number of complete runs.  If 0, keep looping
+	 indefinitely.  Default is 1 (end as soon as the
 	 last frame is reached).
       </para>
     </listitem>

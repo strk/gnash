@@ -32,10 +32,18 @@ dumpshm (options)... (file)...
 
 <refsect1><title>Description</title>
 <para>
-  Dump information about the shared memory segment used by the
-  LocalConnection ActionScript class. This memory segment is comprised
-  of a header, and a collection of SWF AMF Objects, normally not
-  viewable by the user.
+  When any Flash player, including the Gnash player,
+  plays a Flash "movie", the movie can contain
+  scripts.  These scripts can call ActionScript classes.  One such class
+  is LocalConnection.  LocalConnection passes objects from one movie to
+  another, via your computer's shared memory system.
+</para>
+
+<para>
+  Dumpshm prints these shared memory segments, which are comprised of
+  a header, and a collection of SWF AMF Objects created by the movie.
+  It is used for debugging (or understanding the operation of) a Flash 
+  movie.
 </para>
 
 <variablelist>

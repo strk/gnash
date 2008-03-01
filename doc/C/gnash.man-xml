@@ -58,7 +58,7 @@ gnash (options)... (file)...
     <term>-c</term>
     <listitem>
       <para>
-	Produce a core file instead of letting SDL trap it.
+	Severe errors produce a core file instead of letting SDL trap them.
       </para>
     </listitem>
   </varlistentry>
@@ -86,7 +86,8 @@ gnash (options)... (file)...
     <listitem>
       <para>
 	The XID of the parent window Gnash should use instead of
-	creating a new one.
+	creating a new one.  This is only used when embedding the player
+	into another window.
       </para>
     </listitem>
   </varlistentry>
@@ -151,7 +152,7 @@ gnash (options)... (file)...
     <term>-p</term>
     <listitem>
       <para>
-          Run full speed (no sleep) and log frame rate.
+          Run full speed (without sleeping), and log the frame rate.
       </para>
     </listitem>
   </varlistentry>
@@ -161,7 +162,7 @@ gnash (options)... (file)...
     <listitem>
       <para>
           Start Gnash with a Flash debugger console so one can set
-	  break points or watchpoints.
+	  breakpoints or watchpoints.
       </para>
     </listitem>
   </varlistentry>
@@ -262,8 +263,8 @@ gnash (options)... (file)...
     <term>--version</term>
     <listitem>
       <para>
-	Print the version number, and the configuration of the
-	Gnash player. Please use this info when submitting bug
+	Print the version number, and the configuration, of the
+	Gnash player. Please provide this information when submitting bug
 	reports.
       </para>
     </listitem>

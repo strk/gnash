@@ -34,8 +34,8 @@ cygnal (options)...
 <para>
   Cygnal is a multimedia media server for streaming audio, video, and
   video conferencing. Cygnal supports several protocols used by SWF
-  file players, including RTMP, RTMPTS, and RTMPT, while encouring the
-  use of patent free codecs.
+  file players, including RTMP, RTMPTS, and RTMPT, while encouraging the
+  use of patent-free codecs.
 </para>
 
 <variablelist>

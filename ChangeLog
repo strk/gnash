@@ -1,5 +1,7 @@
 2008-02-29  John Gilmore  <gnu@quiet.toad.com>
 
+	* doc/C/cygnal.man-xml, doc/C/dumpshm.man-xml, doc/C/gnash.man-xml,
+	  doc/C/gprocessor.man-xml, doc/C/soldumper.man-xml:  Edit & improve.
 	* cygnal/http.cpp, cygnal/cygnal.cpp, cygnal/http.h:  Lint.
 
 2008-02-29 Sandro Santilli <strk@keybit.net>

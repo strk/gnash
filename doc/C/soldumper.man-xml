@@ -33,8 +33,24 @@ soldumper (options)... (file)...
 <refsect1><title>Description</title>
 <para>
   Dump information about the .sol files used by the SharedObject
-  ActionScript class. These files are comprised of a header, and a
-  collection of SWF AMF Objects, normally not viewable by the user.
+  ActionScript class.
+</para>
+
+<para>
+  When a Flash player, including the Gnash player, plays a Flash "movie",
+  the movie can contain
+  scripts.  These scripts can call ActionScript classes.  One such class
+  is SharedObject.  SharedObject creates shared objects, which end up
+  stored in your computer's file system.  For example, a Flash game might
+  store its score file in a SharedObject; or a privacy-invading Flash
+  movie might store "cookies" in a SharedObject.  Before soldumper was
+  written, these bits of stored information were hard for users to 
+  notice or investigate.
+
+  Soldumper prints these files,
+  which are comprised of a header, and a
+  collection of SWF AMF Objects that the movie has written in the shared
+  object file.
 </para>
 
 <variablelist>
