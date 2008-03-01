@@ -1,0 +1,51 @@
+  <sect1 id="spec-memory">
+    <title>Memory Management</title>
+    
+    <para>
+      One of the new features of &app; &appversion; is the garbage
+      collector.  The garbage collector manages complex &AS; variables,
+      which are the only ones that are shared by references.  In &app;,
+      these are <command>as_object</command> class instances created by &AS;
+      (i.e. not those created by playhead control:
+      <command>placeobject</command>/<command>removeobject</command>). 
+    </para>
+    
+    <para>
+      Collected objects are those allocated due to &AS; explicit or implicit
+      calls.  Explicit all are any user-defined statements that allocate new
+      objects, such as arrays, Objects, or script-created movieclips.
+      Implicit calls are the built-in functions that can be deleted by
+      arbitrary user calls. 
+    </para>
+    
+    <para>
+      Any object that is a candidate for garbage collecting is stored in a
+      list owned by the collector.  This list is filled by an executing
+      action context whenever a collectible object is allocated on the
+      heap. 
+    </para>
+    
+    <para>
+      The garbage collector starts at the very end of an execution context,
+      rather than using a threshold to trigger it.  At this point, the
+      virtual machine is in a "stable" state; any still-reachable object has
+      its roots in one of the currently live character instances (stage
+      characters). 
+    </para>
+    
+    <para>
+      The collector is a conservative collector.  Any object on the
+      collectibles list is marked as <guilabel>UNREACHABLE</guilabel>, an
+      iterative scan starting from the roots marks any still-reachable
+      object, and a final purge releases all
+      still-<guilabel>UNREACHABLE</guilabel> resources. 
+    </para>
+    
+    <para>
+      This garbage collector has reduced the memory footprint of &app;.
+      However, the most current, available test data indicated the following
+      runtime memory footprint: 
+    </para>
+    
+  </sect1>
+  

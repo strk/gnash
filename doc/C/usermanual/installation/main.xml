@@ -1,0 +1,29 @@
+    <sect1 id="introduction">
+      <title>Introduction</title>
+
+      <para>
+        In this document, the term 'ActionScript class' refers to the
+        C++ class which is instantiated by Gnash when some ActionScript
+        code instantiates a corresponding class.  The C++ class
+        stores instance data and implements the methods which are 
+        called on the object in the ActionScript code.
+      </para>
+
+      <sect2 id="overview">
+        <title>Object Creation Overview</title>
+          <para>
+            When Gnash starts, the <emphasis>class_init()</emphasis> method 
+            for each ActionScript class (listed in Global.cpp) is called.
+            This method constructs a prototype, which is implemented as an
+            <emphasis>as_object</emphasis>.  In addition, the method
+            registers the constructor to be used for future object creation,
+            and attaches methods and properties to the prototype.
+          </para>
+
+          <para>
+            When a new object is needed, instance data is added to
+            the methods and properties inherited from the prototype.
+          </para>
+      </sect2>
+    </sect1>
+

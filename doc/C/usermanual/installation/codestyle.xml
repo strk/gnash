@@ -1,0 +1,167 @@
+<sect1 id="appendix">
+  <title>Appendix</title>
+  
+  <sect2 id="codestyle">
+    <title>Code Style</title>
+
+    <para>
+      I know any discussion of coding styles leads to strong opinions,
+      so I'll state simply I follow the <ulink type="http"
+      url="http://www.gnu.org/prep/standards/standards.html">GNU
+      Coding Standards</ulink>. Where there is some flexibility as to
+      the location of braces, I prefer mine on the end of a line when
+      using an <emphasis>if</emphasis>, <emphasis>while</emphasis>, or <emphasis>do</emphasis>
+      statement. I find this more compact style easier to read and
+      parse by eye. I'm also a big fan of always using
+      braces around <emphasis>if</emphasis> statements, even if they're one
+      liners.
+    </para>
+
+    <para>
+      Here's my tweaked style settings for <emphasis>Emacs</emphasis>, the one
+      true editor to rule them all.
+
+      <programlisting>
+      (defconst my-style
+          '((c-tab-always-indent   . t)
+           (c-auto-newline	   . t)
+           (c-hanging-braces-alist . (
+				   (brace-list-intro)
+				   (namespace-open)
+				   (inline-open)
+				   (block-open)
+				   (brace-list-open)
+				   (brace-list-close)
+				   (brace-entry-open)
+				   (brace-else-brace)
+				   (brace-elseif-brace)
+				   (class-open after)
+				   (class-close)
+				   (defun-open after)
+				   (defun-close)
+				   (extern-lang-open)
+				   (inexpr-class-open)
+				   (statement-open)
+				   (substatement-open)
+				   (inexpr-class-close)))
+            (c-hanging-colons-alist . ((member-init-intro before)
+                                   (inher-intro)
+                                   (case-label after)
+                                   (label after)
+                                   (access-label after)))
+            (c-offsets-alist	. (
+				   (innamespace . 0)
+                                   (case-label  . 2)
+				   ))
+            (c-cleanup-list	. (
+				   (scope-operator)
+				   (empty-defun-braces)
+				   (brace-else-brace)
+				   (brace-elseif-brace)
+				   (defun-close-semi)
+				   (list-close-comma)
+				   )
+				)
+    ;; no automatic newlines after ';' if following line non-blank or inside
+    ;; one-line inline methods
+    (add-to-list 'c-hanging-semi&amp;comma-criteria
+		 'c-semi&amp;comma-no-newlines-before-nonblanks)
+    (add-to-list 'c-hanging-semi&amp;comma-criteria
+		 'c-semi&amp;comma-no-newlines-for-oneline-inliners)
+;    (knr-argdecl-intro . -)
+    (c-echo-syntactic-information-p . t)
+    )
+  "My GNU Programming Style")
+    </programlisting>
+
+    </para>
+    
+    <para>
+      Another coding consideration: comments are good!  Over
+      commenting isn't good.  Here is an over commented example:
+
+      <programlisting>
+	counter++;		// increment counter
+      </programlisting>
+      
+      Gnash also uses <ulink type="http"
+      url="http://www.doxygen.org">Doxygen</ulink> style
+      comments. These are processed by Doxygen when building a cross
+      reference of all the classes, and is a good way to help push
+      internals documentation from the depths of the code into
+      documentation where it can be seen by others.
+    </para>
+
+    <para>
+      <emphasis>Doxygen</emphasis> style comments for <emphasis>C++</emphasis> code involves
+      simply using three slashes <emphasis>///</emphasis> instead of the
+      standard two slashes <emphasis>//</emphasis> used for C++
+      comments. Here's a short comment block for the
+      <emphasis>XML::cloneNode()</emphasis> method:
+
+      <programlisting>
+	/// \brief copy a node
+	///
+	/// Method; constructs and returns a new XML node of the same type,
+	/// name, value, and attributes as the specified XML object. If deep
+	/// is set to true, all child nodes are recursively cloned, resulting
+	/// in an exact copy of the original object's document tree.
+	XMLNode &amp;
+	XML::cloneNode(XMLNode &amp;newnode, bool deep) {
+	...
+	}
+      </programlisting> 
+    </para>
+    
+    <para>
+      The <emphasis>\brief</emphasis> keyword means that the 
+      text becomes associated
+      when listing all the classes on the generated web pages. The
+      text after the blank link becomes the detailed description which
+      appears on the generated web page for that class and method.
+    </para>
+  </sect2>
+
+  &rtmp;
+
+<!--
+  <sect2 id="opcodes">
+    <title>Shockwave Movie Opcodes</title>
+
+    <sect3 id="v5">
+      <title>Version 5</title>
+      <para>
+	FIXME:
+      </para>
+    </sect3>
+    <sect3 id="v6">
+      <title>Version 6</title>
+      <para>
+	FIXME:
+      </para>
+    </sect3>
+    <sect3 id="v7">
+      <title>Version 7</title>
+      <para>
+	FIXME:
+      </para>
+    </sect3>
+    <sect3 id="v8">
+      <title>Version 8</title>
+      <para>
+	FIXME:
+      </para>
+    </sect3>
+    <sect3 id="v9">
+      <title>Version 9</title>
+      <para>
+	FIXME:
+      </para>
+    </sect3>
+
+  </sect2>
+-->
+
+</sect1>
+
+
