@@ -70,12 +70,8 @@
     overdriving &app;'s ability to do the right thing.
   </para>
 
-  <sect2 id="features">
-    &featureoptions;
-  </sect2>
+  &featureoptions;
   
-  <sect2 id="custompath">
-    &custompath;
-  </sect2>
+  &custompath;
   
 </sect1>

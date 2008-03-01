@@ -1,11 +1,11 @@
-<sect4 id="asobject">
+<sect1 id="asobject">
   <title>Object ActionScript Class</title>
 
   <para>
     This class implements an Object object.
   </para>
 
-  <sect5 id="objectmethods">
+  <sect2 id="objectmethods">
     <title>The Methods of the  Class</title>
     <para>
       <variablelist>
@@ -91,8 +91,8 @@
 	</varlistentry>
       </variablelist>
     </para>
-  </sect5>
-  <sect5 id="objectprops">
+  </sect2>
+  <sect2 id="objectprops">
     <title>The Properties of the Object Class</title>
     
     <para>
@@ -140,9 +140,9 @@
 
       </variablelist>
     </para>
-  </sect5>
+  </sect2>
 
-  <sect5 id="objectconf">
+  <sect2 id="objectconf">
     <title>Object Class Conformance</title>
     
     <para>
@@ -314,5 +314,5 @@
 	</tgroup>
       </informaltable>
     </para>
-  </sect5>  
-</sect4>
+  </sect2>  
+</sect1>

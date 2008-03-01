@@ -119,8 +119,7 @@
       <programlisting>
 	// Attach DummyClass 'func1' and 'func2' methods to the given object
 	static void
-	attachInterface(as_object&amp; obj)
-	{
+	attachInterface(as_object&amp; obj) {
             obj.init_member("func1", &amp;ext_func1);
             obj.init_member("func2", &amp;ext_func2);
 	}
@@ -222,8 +221,7 @@
       </para>
       <programlisting>
 	// Creates a new button with the label as the text.
-	as_value func1(const fn_call&amp; fn)
-	{
+	as_value func1(const fn_call&amp; fn) {
             // Following line will ensure 'func1' is called for a DummyExt instance,
             // or would throw an exception which should behave as if we returned the
             // undefined value.

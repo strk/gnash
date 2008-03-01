@@ -1,5 +1,5 @@
-<sect4 id="mozplugin">
-  <title>Mozilla/Firefox Plugin</title>
+<chapter id="nsapi">
+  <title>Mozilla/Firefox NSAPI Plugin</title>
 
   <para>
     The Mozilla SDK has two API layers for plugins. The older layer is
@@ -24,7 +24,7 @@
     typically called once for each plugin that is loaded.
   </para>
     
-  <sect5 id="plugincapi">
+  <sect1 id="plugincapi">
     <title>Plugin C API</title>
 
     <para>
@@ -113,9 +113,9 @@
 	</listitem>
       </varlistentry>      
     </variablelist>
-  </sect5>
+  </sect1>
 
-  <sect5 id="plugincppapi">
+  <sect1 id="plugincppapi">
     <title>Plugin C++ API</title>
 
     <para>
@@ -283,9 +283,9 @@
 	</listitem>
       </varlistentry>
     </variablelist> 
-  </sect5>
+  </sect1>
 
-  <sect5 id="glthread">
+  <sect1 id="glthread">
     <title>OpenGL and Threads</title>
     <para>
       Neither OpenGL nor X11 has any built-in support for threads. Most
@@ -321,9 +321,9 @@
       display must be wrapped with a mutex.
     </para>
     
-  </sect5>
+  </sect1>
   
-  <sect5 id="eventhandle">
+  <sect1 id="eventhandle">
     <title>Plugin Event Handling</title>
     <para>
       Firefox on most UNIX systems is a GTK+ application, so it is
@@ -349,5 +349,5 @@
       
     </para>
 
-  </sect5>  
-</sect4>
+  </sect1>  
+</chapter>

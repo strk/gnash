@@ -20,7 +20,7 @@
     <!ENTITY plugin           SYSTEM "refmanual/plugin.xml">
     <!ENTITY memory           SYSTEM "refmanual/memory.xml">
     <!ENTITY newasclass       SYSTEM "refmanual/new_as_class.xml">
-
+    <!ENTITY asvalue          SYSTEM "refmanual/as_value.xml">
     <!ENTITY revisionhistory  SYSTEM "refmanual/revisions.xml">
     <!ENTITY specification    SYSTEM "refmanual/specification.xml">
     <!ENTITY installation     SYSTEM "refmanual/installation.xml">
@@ -88,18 +88,26 @@
   &introduction;
 
 <!-- ============= Document Body ============================= -->
-  &sources;
-  &install;
-  &configuration;
-  &codedependencies;
-  &testdependencies;
-  &docdependencies;
-  &newasclass;
-  &logging;
+
+<!-- This chapter includes all the other sections used to document how to
+     configure and compile Gnash. -->
+  &building;
+
+<!-- This chapter includes all the other sections used to document the
+     internals of how Gnash works. -->
   &internals;
+
   &extensions;
+  
+
+<!-- This chapter includes all the other sections used to document
+     protocols and formats used by Gnash. -->
+
   &rtmp;
   &plugin;
+
+  <!-- The appendix. Nobody reads these coding style suggestions
+       anyway -->
   &codestyle;
 
 <!-- ============= Authors =================================== -->

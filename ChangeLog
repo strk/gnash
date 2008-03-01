@@ -1,8 +1,35 @@
 2008-03-01  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* doc/C/refmanual/logging.xml: Add new log_*() functions. Mark C++
+	streaming API as discouraged.
+	* doc/C/Makefile.am: Add extra dependencies for the gnash
+	reference manual, now that it's back to life.
+	* doc/C/appendix.xml: Don't include RTMP chapter here.
+	* doc/C/refmanual/codestyle.xml: Don't include RTMP chapter
+	here. Drop useless opcode section.
+	* doc/C/gnashref.xml: Rearrange top level chapters.
+	* doc/C/refmanual/configuration.xml: Don't include featureoptions
+	or custompath here anymore.
+	* doc/C/refmanual/internals.xml: Update to match reality. Add new
+	utilities.
+	* doc/C/refmanual/new_as_class.xml: Include asvaluie section here
+	too.
+	
+	* doc/C/refmanual/building.xml, code_dependencies.xml,
+	configuration.xml, cross_compiling.xml,
+	custompath_configuration.xml, documentation_dependencies.xml,
+	feature_configuration.xml, testing_dependencies.xml: Updated to
+	match reality.
+
+	* doc/C/refmanual/new_as_class.xml: changes to a chapter. Merge
+	main.xml into body. Include as_value.xml from here.
+	* doc/C/refmanual/as_value.xml: Make a sect1 for new_as_class.
+
 	* doc/C/Makefile.am: Tweak dependencies for the info files, as
 	they go through a name transformation, which is unfortunately
-	different between Ubuntu and Fedora.
+	different between Ubuntu and Fedora. Additional tweaks for Ubuntu
+	Hardy, the .texi names don't get transformed during this step for
+	this version of the docbook tools.
 
 2008-03-01  Rob Savoye  <rob@ute.welcomehome.org>
 
@@ -22,7 +49,7 @@
 	* doc/C/gnashref.xml: New reference manual top level page.  This
 	contains much of what was in the old manual.
 	* asspec/*: Move to BackLash directory.
-	* doc/C/Makefile.am: don't klist asspec files. Add directory for
+	* doc/C/Makefile.am: don't list asspec files. Add directory for
 	installing html file. Add separate variables for the user manual
 	and the reference manual. Get rid of the useless
 	entities. variable. Drop include xmlmake and omfmake, fix tghe

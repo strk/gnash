@@ -122,46 +122,6 @@
     </para>
   </sect2>
 
-  &rtmp;
-
-<!--
-  <sect2 id="opcodes">
-    <title>Shockwave Movie Opcodes</title>
-
-    <sect3 id="v5">
-      <title>Version 5</title>
-      <para>
-	FIXME:
-      </para>
-    </sect3>
-    <sect3 id="v6">
-      <title>Version 6</title>
-      <para>
-	FIXME:
-      </para>
-    </sect3>
-    <sect3 id="v7">
-      <title>Version 7</title>
-      <para>
-	FIXME:
-      </para>
-    </sect3>
-    <sect3 id="v8">
-      <title>Version 8</title>
-      <para>
-	FIXME:
-      </para>
-    </sect3>
-    <sect3 id="v9">
-      <title>Version 9</title>
-      <para>
-	FIXME:
-      </para>
-    </sect3>
-
-  </sect2>
--->
-
 </sect1>
 
 

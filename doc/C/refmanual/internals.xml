@@ -1,117 +1,117 @@
-<sect1 id="internals">
+<chapter id="internals">
   <title>Software Internals</title>
   
-  <sect2 id="tour">
+  <sect1 id="tour">
     <title>A Tour of Gnash</title>
     
     <para>
       The top level of Gnash has several libraries, <emphasis>libgnashbase</emphasis>,
       <emphasis>libgnashgeo</emphasis>, <emphasis>libgnashserver</emphasis>,
       <emphasis>libgnashasobjs</emphasis> and
-      <emphasis>libgnashbackend</emphasis>. There are two utility programs 
-      included for debug parsing and processing of Flash movie files
-      which test the Actionscript interpreter. There is also a standalone
-      flash movie player.
+      <emphasis>libgnashbackend</emphasis>. There are several utility programs 
+      included for debug parsing and processing of Flash movie files,
+      and other useful utilitis for examining local Shared Objects and
+      sniffingh LocalConnections.
     </para>
 
-    <sect3 id="The Libraries">
+    <sect2 id="The Libraries">
       <title>The Libraries</title>
       
-      <sect4 id="libbase">
+      <sect3 id="libbase">
 	<title>libgnashbase</title>
 	
 	<para>
 	  Libgnashbase contains support classes used by the rest of the
-	  code. Among these classes is a small and efficient STL library
-	  clone that uses smart pointers. A current goal is to replace
-	  this small STL clone with standard STL containers to reduce
-	  the amount of code which has to be maintained, and to add
-	  functionality not currently in the smaller
-	  implementation.
+	  code.This library has no dependencies on any of the other
+	  &app; libraries.
 	</para>
 
 	<para>
-	  Gnash makes heavy use of smart pointers, so memory allocations
-	  are freed up automatically by the interpreter.
+	  &app; makes heavy use of smart pointers, so memory allocations
+	  are freed up automatically by the interpreter. Both STL and
+	  Boost smart pointers are used.
 	</para>
 	
-      </sect4>
+      </sect3>
       
-      <sect4 id="libgnashgeo">
+      <sect3 id="libgnashgeo">
 	<title>libgnashgeo</title>
 	
 	<para>
 	  Libgnashgeo contains code for device independent graphics routines.
 	</para>
 	
-      </sect4>
+      </sect3>
 
-      <sect4 id="libgnashgui">
+      <sect3 id="libgnashgui">
 	<title>libgnashgui</title>
 	
 	<para>
 	  Libgnashgui contains code for a portable GUI class that
-	  supports using GTK2, a framebuffer, SDL, or KDE.
+	  supports using GTK2, a framebuffer, SDL, or KDE, FLTK, or Aqua.
 	</para>
 	
-      </sect4>
+      </sect3>
 
-      <sect4 id="libgnashserver">
+      <sect3 id="libgnashserver">
 	<title>libgnashserver</title>
 	<para>
 	  Libgnashserver is the guts of the interpreter itself. This is where
-	  the main code for the interpreter lives. 
+	  the main code for the interpreter lives. Includes in
+	  libserver are the two support libraries for the parser and
+	  the core of the virtual machine.
 	</para>
-      </sect4>
+      </sect3>
 
-      <sect4 id="libgnashasobjs">
+      <sect3 id="libgnashasobjs">
 	<title>libgnashasobjs</title>
 	<para>
 	  Libgnashasobjs contains all the ActionScript classes used by
 	  the interpreter.
 	</para>
-      </sect4>
+      </sect3>
 
-      <sect4 id="libgnashamf">
+      <sect3 id="libgnashamf">
 	<title>libgnashamf</title>
 	<para>
-	  AMF is the data format used internally by Flash. This is
-	  Gnash's support library to handle AMF data. This is
-	  currently unused, but when the LocalConnection class is more
-	  fully implemented, this will be used to transfer data
-	  between flash movies.
+	  AMF is the data format used internally by SWF files. This is
+	  Gnash's support library to handle AMF data. This is used by
+	  the ActionScript classes SharedObject and
+	  LocalConnection. This is also used by the NetStream class
+	  when using thre RTMP streaming network protocol.
 	</para>
-      </sect4>
+      </sect3>
       
-      <sect4 id="libgnashbackend">
+      <sect3 id="libgnashbackend">
 	<title>libgnashbackend</title>
 	
 	<para>
-	  Libgnashbackend is a small library containing OpenGL and SDL
-	  code that glues this display to the Gnash display.
+	  Libgnashbackend is a library containing the rendering
+	  code that glues this display to the Gnash. Supported
+	  rendering backends are OpenGL, Cairo, and AGG.
 	</para>
 	
-      </sect4>
-      <sect4 id="libgnashpluin">
+      </sect3>
+      <sect3 id="libgnashpluin">
 	<title>libgnashplugin</title>
 	
 	<para>
 	  Libgnashplugin is the Mozilla/Firefox plugin.
 	</para>
 	
-      </sect4>
-      <sect4 id="libklashpart">
+      </sect3>
+      <sect3 id="libklashpart">
 	<title>libklashpart</title>
 	
 	<para>
 	  Libklashpart is the Konqueror plugin.
 	</para>
 	
-      </sect4>
-    </sect3>
+      </sect3>
+    </sect2>
 
 
-    <sect3 id="apps">
+    <sect2 id="apps">
       <title>The Applications</title>
       
       <para>
@@ -120,30 +120,18 @@
         movies.
       </para>
 
-      <sect4 id="Gnash">
+      <sect3 id="Gnash">
 	<title>The Standalone Player</title>
 	
 	<para>
 	  This is the standalone OpenGL back-end used to play
 	  movies. There are several command-line options and keyboard
-	  control keys used by Gnash which <link linkend="usage"> are
-	  documented here.</link> 
+	  control keys used by Gnash.
 	</para>
 
-      </sect4>
+      </sect3>
 
-      <sect4 id="parser">
-	<title>Gparser</title>
-	
-	<para>
-	  Gparser uses the Gnash parser to disassemble the flash
-	  movie, and dumps the object types, the depth, and other
-	  information to make sure Gnash is parsing the file
-	  correctly.
-	</para>
-
-      </sect4>
-      <sect4 id="processor">
+      <sect3 id="processor">
 	<title>Gprocesser</title>
 	
 	<para>
@@ -154,29 +142,40 @@
 	  loading of files.
 	</para>
 
-      </sect4>
-    </sect3>
+      </sect3>
+      <sect3 id="soldumper">
+	<title>SOLdumper</title>
+	
+	<para>
+	  SOLDumper is a utility program used to find and dump the
+	  content of <emphasis>Local Shared Objects</emphasis>, also
+	  called &quot;Flash Cookies&quot; by some.
+	</para>
+
+      </sect3>
+      <sect3 id="dumpshm">
+	<title>Dumpshm</title>
+	
+	<para>
+	  Dumpshm is a program used to find and dump the contents of
+	  the <emphasis>LocalConnection</emphasis> shared memory segment.
+	</para>
+
+      </sect3>
+    </sect2>
     
-    <sect3 id="plugin">
+    <sect2 id="plugin">
       <title>The Plugin</title>
 
       <para>
 	The plugin is designed to work within Mozilla or Firefox,
 	although there is Konqueror support as well. The plugin uses
-	the Mozilla NSPR plugin API to be cross platform, and is
+	the Mozilla NSAPI plugin API to be cross platform, and is
 	portable, as well as being well integrated into Mozilla based
 	browsers.
       </para>
 
-      <para>
-	One future thought for the plugin is to use the new Firefox
-	1.0.5 or greater version of Firefox. This version has added a
-        GTK drawable window which supports hardware acceleration, and
-	is designed to support things like rendering directly into the
-	window without needing OpenGL. 
-      </para>
-
-      <sect4 id="pluginstatus">
+      <sect3 id="pluginstatus">
 	<title>Current Status</title>
 	<para>
 	  As of March 30, 2006, the plugin works! This works in a
@@ -187,14 +186,12 @@
 	  itself is not thread safe at this time.
 	</para>
 	<para>
-	  There are a few limitations in the current implementation,
-	  but it works well enough to be used for web surfing. The
-	  main limitations are the SDL version has no event handling,
-	  and sound doesn't work yet.
+	  As of Jan, 2007, streaming video, ala &quot;YouTube&quot;
+	  works, along with other video sharing sites.
 	</para>
-      </sect4>
+      </sect3>
 
-      <sect4 id="gui">
+      <sect3 id="gui">
 	<title>GUI Support</title>
 
 	<para>
@@ -206,11 +203,8 @@
 	</para>
 
 	<para>
-	  Gnash can use either SDL or GTK now to create the window,
-	  and to handle events for the standalone player. Work is
-	  underway to add a portable interface for more windowing
-	  toolkits to allow better embedded device support when
-	  running in framebuffer only devices.
+	  Gnash can use either several different GUI toolkits to create the window,
+	  and to handle events for the standalone player.
 	</para>
 	
 	<para>
@@ -247,9 +241,9 @@
 	  way the existing keyboard commands do.
 	</para>
 
-      </sect4>
+      </sect3>
       
-      <sect4 id="mozplugger">
+      <sect3 id="mozplugger">
 	<title>Mozplugger</title>
 
 	<para>
@@ -307,9 +301,9 @@
 	  mozplugger. You should see an entry for Gnash now.
 	</para>
 	
-      </sect4>
+      </sect3>
 
-      <sect4 id="Klash">
+      <sect3 id="Klash">
 	<title>Klash</title>
 	<para>
 	  Klash is MozPlugger type support for KDE's Konqueror web
@@ -325,38 +319,15 @@
 	  configuring. Other than installing, there is nothing else
 	  that needs to be done to install Klash.
 	</para>
-      </sect4>
+      </sect3>
 
-      &plugin;
-
-    </sect3>
+    </sect2>
 
     &logging;
 
-  </sect2>
+  </sect1>
 
-  <sect2 id="engine">
-    <title>The Interpreter Engine</title>
-    <para>
-      FIXME:
-    </para>
-    
-    <sect3 id="loop">
-      <title>The Main Loop</title>
-      <para>
-	FIXME:
-      </para>
-    </sect3>
-    
-    <sect3 id="io">
-      <title>I/O Processing</title>
-      <para>
-	FIXME:
-      </para>
-    </sect3>
-  </sect2>
-
-  <sect2 id="soundhandlers">
+  <sect1 id="soundhandlers">
     <title>Sound handling in Gnash</title>
 
     <para>
@@ -373,7 +344,7 @@
       configured, for instance to block sound from advertisements.
     </para>
 
-    <sect3 id="soundtypes">
+    <sect2 id="soundtypes">
       <title>Sound types</title>
       <para>
         Sounds can be divided into two groups: event-sounds and soundstreams.
@@ -383,9 +354,9 @@
 	gotoframe-action jumps to a frame which contains data for a soundstream,
 	playback of the stream can be picked up from there. 
       </para>
-    </sect3>
+    </sect2>
 
-     <sect3 id="soundparsing">
+     <sect2 id="soundparsing">
       <title>Sound parsing</title>
       <para>
         When Gnash parses a SWF-file, it creates a sound handler if possible
@@ -395,9 +366,9 @@
 	SWF-file has been parsed. But since the entire soundstream doesn't need
 	to be present when playback starts, it is not necessary to wait. 
       </para>
-    </sect3>
+    </sect2>
 
-    <sect3 id="soundplayback">
+    <sect2 id="soundplayback">
       <title>Sound playback</title>
       <para>
 	When a sound is about to be played Gnash calls the sound handler, which
@@ -407,9 +378,9 @@
 	means that we have to trust both the graphic backend and the audio
 	backend to play at correct speed. 
       </para>
-    </sect3>
+    </sect2>
 
-    <sect3 id="sdlsound">
+    <sect2 id="sdlsound">
       <title>The SDL sound backend</title>
       <para>
 	The current SDL sound backend has replaced the original sound 
@@ -431,9 +402,9 @@
 	while its only real disadvantage is that it has to be compiled with
 	MP3 support, which some Linux distributions will probably not like...
       </para>
-    </sect3>
+    </sect2>
  
-   <sect3 id="gstreamer">
+   <sect2 id="gstreamer">
       <title>The Gstreamer backend</title>
       <para>
 	The Gstreamer backend, though not complete, supports both soundstreams
@@ -449,9 +420,9 @@
 	it has longer "reply delay" when starting the playback of a sound, and
 	it suffers under some bugs in Gstreamer that are yet to be fixed. 
       </para>
-    </sect3>
+    </sect2>
 
-    <sect3 id="audio-future">
+    <sect2 id="audio-future">
       <title>Future audio backends</title>
       <para>
 	It would probably be desirable to make more backends in the future,
@@ -459,9 +430,9 @@
 	attention, or perhaps because an internal sound handling is better
 	suited for embedded platform with limited software installed. 
       </para>
-    </sect3>
+    </sect2>
 
-    <sect3 id="gstreamer-details">
+    <sect2 id="gstreamer-details">
       <title>Detailed description of the Gstreamer backend</title>
       <para>
 	Gstreamer uses pipelines, bins and elements. Pipelines are the
@@ -524,12 +495,12 @@
 	the adder in rapid succession, which causes to adder to "die" and stop
 	the playback. 
       </para>
-    </sect3>
+    </sect2>
 
 
-  </sect2>
+  </sect1>
 
-  <sect2 id="testing">
+  <sect1 id="testing">
     <title>Testing </title>
 
      <para>
@@ -537,7 +508,7 @@
        can be found in the section on building Gnash.
      </para>
 
-    <sect3 id="testtools">
+    <sect2 id="testtools">
       <title>Testing Tools</title>
 
       <para>
@@ -566,9 +537,9 @@
 	<ulink type="http" url="http://www.samba.org">Samba</ulink>.
       </para>
       
-    </sect3>
+    </sect2>
 
-    <sect3 id="testcases">
+    <sect2 id="testcases">
       <title>Test Cases</title>
       
       <para>
@@ -582,9 +553,9 @@
 	kind of tests.
       </para>
       
-    </sect3>
+    </sect2>
 
-    <sect3 id="writeastests">
+    <sect2 id="writeastests">
       <title>Writing ActionScript Tests</title>
 
       <para>
@@ -669,9 +640,9 @@
 	  
 	</programlisting>
       </para>
-    </sect3>
+    </sect2>
 
-    <sect3 id="writemingtests">
+    <sect2 id="writemingtests">
       <title>Writing Ming-based self-contained SWF tests</title>
 
       <para>
@@ -697,7 +668,7 @@
 	url="http://www.libming.org/">http://www.libming.org</ulink>. 
       </para>
 
-      <sect4 id="ming_testgenerator_facilities">
+      <sect3 id="ming_testgenerator_facilities">
       <title>Using Ming-based test generators facilities</title>
 
       <para>
@@ -768,11 +739,11 @@
 	</para>
 
 
-    </sect4>
-
     </sect3>
 
-    <sect3 id="writing_dejagnu_so_tests">
+    </sect2>
+
+    <sect2 id="writing_dejagnu_so_tests">
       <title>Writing self-contained SWF tests with other compilers</title>
 
 	<para>
@@ -852,9 +823,9 @@
 	for information about writing a test runners for your self-contained tests.
 	</para>
 
-    </sect3>
+    </sect2>
 
-    <sect3 id="writing_test_runners">
+    <sect2 id="writing_test_runners">
     <title>Writing Test Runners</title>
 
 	<para>
@@ -989,7 +960,7 @@
          </informaltable>
 	</para>
 
-        <sect4 id="generic_test_runner">
+        <sect3 id="generic_test_runner">
         <title>Using the generic test runner for self-contained SWF tests</title>
 
 	<para>
@@ -1041,9 +1012,9 @@ MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
 	When both -f and -r are given, the first exit condition reached will take effect.
 	</para>
 
-	</sect4>
+	</sect3>
 	
-	<sect4 id="writing_movie_testers">
+	<sect3 id="writing_movie_testers">
 	  <title>Writing Movie testers</title>
 	  
 	  <para>
@@ -1088,8 +1059,12 @@ MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
 	    to implement a Movie tester for it.  Some knowledge about the 
 	    expected behavior suffices.
 	  </para>
-	</sect4>
-    </sect3>
-  </sect2>
-</sect1>
+	</sect3>
+    </sect2>
+  </sect1>
+
+  &newasclass;
+
+
+</chapter>
 
