@@ -151,8 +151,8 @@ endif
 #	basefile=$(notdir $(basename $<));
 .xml.texi:
 if ENABLE_TEXI
-	-if test x$(DB2X_TEXI) != x; then \
-	  $(DB2X_TEXI) --encoding=us-ascii//TRANSLIT $< ; \
+	-@if test x$(DB2X_TEXI) != x; then \
+	  $(DB2X_TEXI) --encoding=us-ascii//TRANSLIT --string-param directory-description="Gnash" $< ; \
 	else \
 	  basefile="$*"; \
           $(DB2X_XSLTPROC) -s texi $< --output $${basefile}.txml; \
@@ -176,7 +176,7 @@ endif
 
 .man-xml.1:
 if ENABLE_MAN
-	-@if test x$(DB2X_MAN) != x; then \
+	@if test x$(DB2X_MAN) != x; then \
 	  $(DB2X_MAN) $?; \
         else \
 	  $(DB2X_XSLTPROC) -s man $? -o $*.mxml; \
@@ -191,13 +191,18 @@ else
 	fi
 endif
 
-if !DOCBOOK
-gnash_user.info:
+if DOCBOOK
+gnash_user.info gnashuser.info: gnashuser.texi
+gnash_ref.info gnashref.info: gnashref.texi
+gnashuser.texi gnash_user.texi: gnashuser.xml
+gnashref.texi gnash_user.texi: gnashref.xml
+else
+gnash_user.info: gnashuser.xml
 	@if test -d $(top_srcdir)/packaging/doc; then \
 	  $(LN_S) -f $(top_srcdir)/packaging/doc/gnash_user.info.in ./gnash_user.info; \
 	fi
 
-gnash_ref.info:
+gnash_ref.info: gnashref.xml
 	@if test -d $(top_srcdir)/packaging/doc; then \
 	  $(LN_S) -f $(top_srcdir)/packaging/doc/gnash_ref.info.in ./gnash_ref.info; \
 	fi
@@ -313,7 +318,9 @@ CLEANFILES = \
 	gnash-C.omf.out \
 	manpage.links  \
 	manpage.refs  \
+	gnash_ref.texi  \
 	gnashref.texi  \
+	gnash_user.texi  \
 	gnashuser.texi  \
 	gnash.fo  \
 	gnash.log  \

@@ -1,3 +1,9 @@
+2008-03-01  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* doc/C/Makefile.am: Tweak dependencies for the info files, as
+	they go through a name transformation, which is unfortunately
+	different between Ubuntu and Fedora.
+
 2008-03-01  Rob Savoye  <rob@ute.welcomehome.org>
 
 	* doc/C/Makefile.am: Link to the preformatted info file, which is
@@ -123,7 +129,7 @@
 	* plugin/plugin.cpp: don't force verbosity, the config file can
 	  be used for that.
 
-2008-02-27 Marcin Cieślak <saper@saper.info>
+2008-02-27 Marcin CieÅlak <saper@saper.info>
 
 	* plugin/plugin.cpp: GIOCondition is a bitfield. Patch #6436.
 
@@ -387,7 +393,7 @@
 	  replaced with appendixinfo (in an appendix context).
 	  See
 	  http://www.museum.state.il.us/ismdepts/library/linuxguides/docbook/docinfo.html.
-	* doc/C/app_authors.xml: copy 'Ignacio Casta�o' name from
+	* doc/C/app_authors.xml: copy 'Ignacio Castaï¿½o' name from
 	  gameswf sources (seems to be better accepted by docbook2pdf). 
 	* doc/C/amf.xml, doc/C/rtmp.xml: use appropriate sect levels
 	  matching with inclusion of entities.
@@ -1288,7 +1294,7 @@
 	  manipulation can stay as before. Interfaces still use std::string
 	  with conversions when necessary. Make wstring methods private. 
 	  set_text_value(const char*) -> setTextValue(const wstring&).
-	  Handles characters like �¶ or �¶.
+	  Handles characters like ÃÂ¶ or ÂÂ¶.
 
 2008-02-05 Bastiaan Jacques <bastiaan@bjacques.org>
 
@@ -8597,7 +8603,7 @@
 	* libbase/string_table.h: Fixed compilation for non-32 bit platforms.
 	* server/parser/video_stream_def.{cpp,h}: Use CapitalCase for types.
 
-2007-09-17 Lauri Myll�¤ri <rez>
+2007-09-17 Lauri MyllÃÂ¤ri <rez>
 
 	* server/swf/tag_loaders.cpp: Also parse DelaySeek field for MP3 
 	  in DEFINESOUND, fixes bug #21094.
