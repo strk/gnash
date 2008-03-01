@@ -193,10 +193,14 @@ endif
 
 if !DOCBOOK
 gnash_user.info:
-	$(LN_S) -f $(top_srcdir)/packaging/doc/gnash_user.info.in ./gnash_user.info; \
+	@if test -d $(top_srcdir)/packaging/doc; then \
+	  $(LN_S) -f $(top_srcdir)/packaging/doc/gnash_user.info.in ./gnash_user.info; \
+	fi
 
 gnash_ref.info:
-	$(LN_S) -f $(top_srcdir)/packaging/doc/gnash_ref.info.in ./gnash_ref.info; \
+	@if test -d $(top_srcdir)/packaging/doc; then \
+	  $(LN_S) -f $(top_srcdir)/packaging/doc/gnash_ref.info.in ./gnash_ref.info; \
+	fi
 endif
 
 # When we build in a seperate build tree, we need links to the images
