@@ -34,7 +34,6 @@ AC_EXEEXT
 AC_PROG_INSTALL
 AM_COMPILER_LIB
 
-
 dnl Set the default values for Flash Version. These are converted into
 dnl various strings to make JavaScript or ActionScript detectors
 dnl recognize Gnash as a Flash Player.
@@ -875,6 +874,14 @@ dnl options to configure.
 if test x$cross_compiling = xyes; then
   AC_MSG_NOTICE([Configuring Gnash for cross compilation])
   export pkgroot="`$CXX -print-search-dirs | grep "install:" | sed -e 's/install: //' -e 's:/lib/gcc/.*::'`"
+  dnl pkgroot only works correctly with builds of cross tools not in
+  dnl /usr, ie... installed from the distribution packages, or just
+  dnl plain installed in the system tools. This contaminates configure
+  dnl when building for variations of the same basic architecture,
+  dnl like i686-linux -> i586-mingw32.
+  if test x${pkgroot} = "/usr"; then
+    export pkgroot=""
+  fi
   export incllist="`eval echo ${with_top_level}/include ${pkgroot}/${host_alias}/include ${pkgroot}/include`"
   export libslist="`eval echo ${with_top_level}/lib ${pkgroot}/${host_alias}/lib ${pkgroot}/lib64 ${pkgroot}/lib32 ${pkgroot}/lib`"
   export pathlist="`eval echo ${pkgroot}/${host_alias}/bin:${pkgroot}/bin`"
@@ -1630,6 +1637,7 @@ if test x$build_agg = xyes; then
 fi
 
 GNASH_DOCBOOK
+AM_CONDITIONAL(ENABLE_INFO, test x${INSTALL_INFO} != x)
 AM_CONDITIONAL(DOCBOOK, test x$docbook = xyes)
 AM_CONDITIONAL(HAVE_AGG, [test x"${AGG_LIBS}" != x])
 
