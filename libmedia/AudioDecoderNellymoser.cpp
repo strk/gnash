@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderNellymoser.cpp,v 1.9 2008/02/27 08:51:54 bwy Exp $
+// $Id: AudioDecoderNellymoser.cpp,v 1.10 2008/03/01 04:47:45 bjacques Exp $
 
 // This file incorporates work covered by the following copyright and permission
 // notice:
@@ -49,9 +49,9 @@
 
 #include "AudioDecoderNellymoser.h"
 #include "utility.h"
-#include <cstdlib>
 #include <ctime>
 #include <cmath>
+#include "VM.h"
 
 namespace gnash {
 namespace media {
@@ -642,6 +642,18 @@ static unsigned char get_bits(unsigned char block[NELLY_BLOCK_LEN], int *off, in
 	return ret;
 }
 
+static int
+gimme_random()
+{
+	using namespace boost;
+	VM::RNG& rnd = VM::get().randomNumberGenerator();
+
+	uniform_int<> dist(0, std::numeric_limits<int>::max());
+	variate_generator<VM::RNG&, uniform_int<> > uni(rnd, dist);
+
+	return uni();
+}
+
 static void nelly_decode_block(nelly_handle* nh, unsigned char block[NELLY_BLOCK_LEN], float audio[256])
 {
 	int i,j;
@@ -679,7 +691,9 @@ static void nelly_decode_block(nelly_handle* nh, unsigned char block[NELLY_BLOCK
 		for (j = 0; j < NELLY_FILL_LEN; j++) {
 			if (bits[j] <= 0) {
 				buf[j] = M_SQRT1_2*pows[j];
-				if (random() % 2)
+
+        
+				if (gimme_random() % 2)
 					buf[j] *= -1.0;
 			} else {
 				v = get_bits(block, &bit_offset, bits[j]);
@@ -711,14 +725,8 @@ static void nelly_util_floats2shorts(float audio[256], short shorts[256])
 
 static nelly_handle *nelly_get_handle()
 {
-	static int first = 1;
 	int i;
 	nelly_handle *nh;
-
-	if (first) {
-		srandom(time(NULL));
-		first = 0;
-	}
 
 	nh = new nelly_handle;
 

@@ -1,3 +1,7 @@
+2008-02-29 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libmedia/AudioDecoderNellymoser.cpp: Boostified random. 
+
 2008-02-29  John Gilmore  <gnu@quiet.toad.com>
 
 	* doc/C/cygnal.man-xml, doc/C/dumpshm.man-xml, doc/C/gnash.man-xml,
