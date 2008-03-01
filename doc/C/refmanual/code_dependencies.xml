@@ -1,0 +1,398 @@
+<title>Code Dependencies</title>
+
+<para>
+  &app; has a number of dependencies on other packages.
+  If you install the dependencies using a package
+  manager, be certain to install the development versions
+  of the packages.  The normal versions are often missing
+  the headers &app; needs to compile.
+</para>
+
+<note>
+  <title>Note</title>
+  <para>
+    If you want to install the &app; plugin for one of the browsers
+    listed in the <xref linkend="intro" />, be sure to install the
+    development package for that browser before configuring.  The
+    &app; <command>configure</command> script searches for the devel
+    packages before building the plugin. 
+  </para>
+</note>
+
+<table frame='all' id="codedeps">
+  <title>Code Dependency Table</title>
+  <tgroup cols='7' align='left' colsep='1' rowsep='1'>
+    <colspec colname='name'/>
+    <colspec colname='required'/>
+    <colspec colname='version'/>
+    <colspec colname='description'/>
+    <colspec colname='explanation'/>
+    <colspec colname='apt'/>
+    <colspec colname='rpm'/>
+    
+    <thead>
+      <row>
+        <entry>Name</entry>
+	<entry>Level</entry>
+	<entry>Version</entry>
+        <entry>Description</entry>
+	<entry>Explanation</entry>
+	<entry>apt-get package</entry>
+	<entry>RPM/Yum package</entry>
+      </row>
+    </thead>
+
+    <tbody>
+      <row>
+        <entry>Boost</entry>
+        <entry>Required</entry>
+        <entry>1.32 or higher</entry>
+        <entry>
+          Boost is a library of portable C++ classes and
+          templates.
+        </entry>
+        <entry>
+          In &app;, Boost libraries are used extensively, primarily
+	  boost-gthread and boost-date-time.
+        </entry>
+        <entry>
+	  <filename>libboost-thread-dev, libboost-date-time-dev
+	</filename>
+	</entry>
+	<entry>
+	<filename>
+	  liboost-thread-dev, libboost-date-time
+	</filename></entry>
+      </row>
+
+      <row>
+        <entry>libxml2</entry>
+        <entry>Required</entry>
+        <entry></entry>
+        <entry>
+          Libxml2 is the GNOME XML parser library and
+          is available at <ulink type="http"
+          url="http://xmlsoft.org">http://xmlsoft.org</ulink>.
+        </entry>
+        <entry>
+          This library is used to parse messages in the
+          XML or XMLSocket ActionScript classes.
+        </entry>
+        <entry><filename>libxml2-dev</filename></entry>
+        <entry><filename>libxml2-devel</filename></entry>
+      </row>
+
+      <row>
+        <entry>AGG</entry>
+        <entry>Possibly Required</entry>
+        <entry>2.4 or higher</entry>
+        <entry>
+          AGG is the AntiGrain low-level 2D graphics
+          library.  
+        </entry>
+        <entry>
+          &app; requires the installation of at least one
+          renderer.  AGG is considered the <emphasis>best
+          supported</emphasis> renderer for &app;.
+        </entry>
+        <entry><filename>libagg-dev</filename></entry>
+        <entry><filename>agg-devel</filename></entry>
+      </row>
+
+      <row>
+        <entry>OpenGL</entry>
+        <entry>Possibly Required</entry>
+        <entry></entry>
+        <entry>
+          OpenGL is a standard specification defining a
+          cross-language cross-platform API for writing
+          applications which produce 3D and 2D graphics.
+          It supports hardware acceleration.
+          You can download a free implementation from
+          <ulink type="http"
+          url="http://www.mesa3d.org">http://www.mesa3d.org</ulink>.
+        </entry>
+        <entry>
+          &app; requires the installation of at least one
+          renderer.
+        </entry>
+        <entry><filename>libgl1-mesa-dev</filename></entry>
+        <entry><filename>libmesa-devel</filename></entry>
+      </row>
+
+      <row>
+        <entry>Cairo</entry>
+        <entry>Possibly Required</entry>
+        <entry />
+        <entry>
+          Cairo is a 2D graphics library with support for
+          multiple output devices.  It will automatically use
+          graphic card acceleration when available, and has
+	  an experimental OpenGL backend.  
+	</entry>
+	<entry>
+	  &app; requires the installation of at least one
+	  renderer.  Cairo is considered
+          the <emphasis>least supported</emphasis> renderer
+          for &app;.
+        </entry>
+        <entry><filename>libcairo2-dev</filename></entry>
+        <entry><filename>cairo-devel</filename></entry>
+      </row>
+
+      <row>
+        <entry>GTK</entry>
+        <entry>Possibly Required</entry>
+        <entry>2.2 or higher</entry>
+        <entry>
+          GTK is the GIMP Toolkit GUI library.
+          It uses Cairo internally.
+        </entry>
+        <entry>
+          &app; requires the installation of at least one
+          GUI library.  GTK is considered to be the
+          <emphasis>best supported</emphasis> GUI library
+          option for &app;.
+        </entry>
+        <entry><filename>libgtk2.0-dev</filename></entry>
+        <entry><filename>gtk-devel</filename></entry>
+      </row>
+
+      <row>
+        <entry>GtkGlExt</entry>
+        <entry>Possibly Required</entry>
+        <entry></entry>
+        <entry>
+          GtkGlExt integrates OpenGL into GTK.
+        </entry>
+        <entry>
+          This library is required in order to use
+          the GTK GUI library in conjunction with the
+          OpenGL renderer.
+        </entry>
+        <entry><filename>libgtkglext1-dev</filename></entry>
+        <entry><filename>gtkglext-devel</filename></entry>
+      </row>
+
+      <row>
+        <entry>SDL</entry>
+        <entry>Possibly Required</entry>
+        <entry />
+        <entry>
+          The Simple DirectMedia Layer is a cross-platform
+          multimedia library which provides abstraction for
+          audio, graphics, sound and input APIs.  
+          SDL is available from
+          <ulink type="http" url="http://www.libsdl.org">
+          http://www.libsdl.org</ulink>.  
+        </entry>
+        <entry>
+          &app; requires the installation of at least one
+          GUI library.  SDL may also be used as a sound
+          handler regardless of whether it is employed as
+          a GUI library.  The GUI
+          library is <emphasis>poorly supported</emphasis>
+          in &app;, but the sound handler is the
+          <emphasis>best supported</emphasis> in &app;.
+        </entry>
+        <entry><filename>libsdl1.2-dev</filename></entry>
+        <entry><filename>SDL-devel</filename></entry>
+      </row>
+
+      <row>
+        <entry>FLTK</entry>
+        <entry>Possibly Required</entry>
+        <entry>2.0 or higher</entry>
+        <entry>
+          The Fast Light ToolKit is a portable GUI library
+          which is intended as a replacement for the SDL GUI.
+        </entry>
+        <entry>
+          &app; requires the installation of at least one
+          GUI library.  FLTK may be used in conjunction with
+          the Cairo and AGG renderers.
+        </entry>
+        <entry>No distribution packages are available.</entry>
+        <entry>No distribution packages are available.</entry>
+      </row>
+
+      <row>
+        <entry>KDE</entry>
+        <entry>Possibly Required</entry>
+        <entry />
+        <entry>
+          Kdelibs is a collection of libraries needed to
+          compile KDE applications.
+        </entry>
+        <entry>
+          &app; requires the installation of at least one
+          GUI library.  Kdelibs is also required for the
+          Kpart plugin for Konqueror.
+        </entry>
+        <entry><filename>kdelibs4-dev</filename></entry>
+        <entry><filename>kdelibs-devel</filename></entry>
+      </row>
+
+      <row>
+        <entry>Gstreamer</entry>
+        <entry>Optional</entry>
+        <entry></entry>
+        <entry>
+          Gstreamer is a video handler.
+        </entry>
+        <entry>
+          If you would like video playback, you must
+          install one of the video handlers.
+        </entry>
+        <entry><filename>libgstreamer0.8-dev</filename></entry>
+        <entry><filename>gstreamer-devel</filename></entry>
+      </row>
+
+      <row>
+        <entry>gst-ffmpeg</entry>
+        <entry>Possibly Required</entry>
+        <entry></entry>
+        <entry>
+          gst-ffmpeg allows you to use the FFMPEG decoder
+          with Gstreamer.
+        </entry>
+        <entry>
+          This package is required if you would like to
+          use Gstreamer as a video handler.
+        </entry>
+        <entry><filename>gstreamer0.8-ffmpeg-dev</filename></entry>
+        <entry><filename>gstreamer-ffmpeg-devel</filename></entry>
+      </row>
+
+      <row>
+        <entry>FFMPEG</entry>
+        <entry>Possibly Required</entry>
+        <entry></entry>
+        <entry>
+          FFMPEG is a video handler.
+        </entry>
+        <entry>
+          If you would like video playback, you must
+          install one of the video handlers.  It is also
+          a dependency of gst-ffmpeg.
+        </entry>
+        <entry><filename>ffmpeg-dev</filename></entry>
+        <entry><filename>ffmpeg-devel</filename></entry>
+      </row>
+
+      <row>
+        <entry>JPEG</entry>
+        <entry>Optional</entry>
+        <entry></entry>
+        <entry>
+          <ulink type="http" url="http://www.ijg.org/">JPEG</ulink>
+          is a lossy image format which is heavily used for images.
+        </entry>
+        <entry>
+          This library is used for rendering JPEGs.
+        </entry>
+        <entry><filename>libjpeg62-dev</filename></entry>
+        <entry><filename>libjpeg</filename></entry>
+      </row>
+
+      <row>
+        <entry>PNG</entry>
+        <entry>Optional</entry>
+        <entry></entry>
+        <entry>
+          <ulink type="http" 
+          url="http://www.libpng.org/pub/png/">PNG</ulink> is
+          a patent-free image format which is comparable to
+          <emphasis>GIF</emphasis>.
+        </entry>
+        <entry>
+          This library is used for rendering PNGs.
+        </entry>
+        <entry><filename>libpng12-dev</filename></entry>
+        <entry><filename>libpng</filename></entry>
+      </row>
+
+      <row>
+        <entry>libcurl</entry>
+        <entry>Optional</entry>
+        <entry></entry>
+        <entry>
+          libcurl is the multiprotocal file transfer library.
+        </entry>
+        <entry>
+          This library is used for URL downloading.
+        </entry>
+        <entry><filename>libcurl4-gnutls</filename></entry>
+        <entry><filename>libcurl</filename></entry>
+
+      </row>
+
+      <row>
+        <entry>automake</entry>
+        <entry>Possibly Required</entry>
+        <entry>1.6.0</entry>
+        <entry>
+          Automake is a tool for generating
+          <emphasis>Makefile.in</emphasis> files.
+        </entry>
+        <entry>
+          This package is required to run
+          <emphasis>autogen.sh</emphasis>, which is a requirement
+          if you are using the development source from CVS.
+        </entry>
+        <entry><filename>automake</filename></entry>
+        <entry><filename>automake</filename></entry>
+      </row>
+
+      <row>
+        <entry>autoconf</entry>
+        <entry>Possibly Required</entry>
+        <entry>2.59</entry>
+        <entry>
+          Autoconf is a package for generating configure
+          scripts.
+        </entry>
+        <entry>
+          This package is required to run
+          <emphasis>autogen.sh</emphasis>, which is a requirement
+          if you are using the development source from CVS.
+        </entry>
+        <entry><filename>autoconf</filename></entry>
+        <entry><filename>autoconf</filename></entry>
+      </row>
+
+      <row>
+        <entry>gettext</entry>
+        <entry>Possibly Required</entry>
+        <entry>0.14.6</entry>
+        <entry>
+          Gettext is part of the GNU Translation Project.
+        </entry>
+        <entry>
+          This package is required to run
+          <emphasis>autogen.sh</emphasis>, which is a requirement
+          if you are using the development source from CVS.
+        </entry>
+        <entry><filename>gettext</filename></entry>
+        <entry><filename>gettext</filename></entry>
+      </row>
+
+      <row>
+        <entry>libtool</entry>
+        <entry>Possibly Required</entry>
+        <entry>1.5.22</entry>
+        <entry>
+          This is a generic library support script.
+        </entry>
+        <entry>
+          This package is required to run
+          <emphasis>autogen.sh</emphasis>, which is a requirement
+          if you are using the development source from CVS.
+        </entry>
+        <entry><filename>libltdl3-dev</filename></entry>
+        <entry><filename>libtool</filename></entry>
+      </row>
+
+    </tbody>
+  </tgroup>
+</table>

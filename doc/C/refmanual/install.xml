@@ -1,0 +1,114 @@
+<title>Installation</title>
+
+<para>
+Now that &app; has been compiled and tested, use the following command to install it:
+  <programlisting>
+  make install
+  </programlisting>
+The above command installs the standalone player.  If the correct files were found by <command>configure</command> and if the <option>--disable-plugin</option> option was not specified, the &app; browser plugin is also installed.
+</para>
+
+<para>
+  &app; installs a number of <link linkend="libinstall">libraries</link>,
+  namely: <emphasis>libbase</emphasis>,
+  <emphasis>libgeometry</emphasis>, <emphasis>libbackend</emphasis>,
+  <emphasis>libserver</emphasis>, and <emphasis>libmozsdk</emphasis>.
+  <link linkend="appinstall">Executables</link>
+  consist of the (optional) plugin, <filename>gprocessor</filename>,
+  <filename>cygnal</filename>,  and <filename>gnash</filename>.
+  <link linkend="docinstall">Documentation</link> may also be installed.
+  The installation location is controlled with the
+  <emphasis>--prefix</emphasis> <link linkend="custompath">configure
+  option</link>, except for plugins, which are explicitly set with
+  <emphasis>--plugin-dir</emphasis>.
+</para>
+
+<para>
+  Note that if you are using a single file-system <emphasis>NFS</emphasis>
+  mounted to multiple platforms, the 
+  <link linkend="custompath">configuration option</link> 
+  <emphasis>--exec-prefix</emphasis> may be used to specify where
+  platform-dependent executables and libraries are installed.
+</para>
+  
+<sect2 id="libinstall">
+  <title>Libraries</title>
+  
+  <para>
+    Installed libraries are located in 
+    <filename>/usr/local/lib</filename> by default.
+    If the <emphasis>--prefix</emphasis> option was used in
+    <link linkend="pre-configuration">configuration</link>, the libraries will
+    be installed in the directory <filename>lib</filename> inside the
+    path you specified.  If the libraries are stored in a non-standard
+    location, you must identify the path in one of two ways.
+  </para>
+
+  <para>
+    The traditional way to do this on UNIX
+    platforms is to set the <emphasis>LD_LIBRARY_PATH</emphasis> variable
+    to the path plus <filename>/lib</filename>.  For example, if you
+    installed in <filename>/home/gnash</filename>, the 
+    <emphasis>LD_LIBRARY_PATH</emphasis> path would be
+    <filename>/home/gnash/lib</filename>.  Multiple paths are delimited
+    with a colon (':').
+  </para>
+  
+  <para>
+    GNU/Linux allows the custom path to be added to
+    <filename>/etc/ld.so.conf</filename>.  After adding the path,
+    run <emphasis>ldconfig</emphasis> as root to update the runtime
+    cache.
+  </para>
+</sect2>
+
+<sect2 id="appinstall">
+  <title>Executables</title>
+
+  <para>
+   The Mozilla plugin is built from headers (the Mozilla SDK) provided with Gnash and
+	does not need extra development packages to be installed. By default, the
+	plugin is installed to <filename>~/.mozilla/plugins/</filename>. To enable
+	the plugin for other users, copy the file <filename>libgnashplugin.so</filename>
+	to <filename>.mozilla/plugins/</filename> in their home directory.
+	You may also specify the plugin installation directory by using the 
+	<option>--with-plugindir</option> <link linkend="custompath">option 
+	at configuration time</link>.
+   </para>
+   <para>
+   These defaults are likely to change in future versions of Gnash.
+   </para> 
+  <para>
+    The remaining executables are installed in the <filename>bin</filename>
+    subdirectory of the directory specified by during configuration.
+    If no path was specified, the default is 
+    <filename>/usr/local/bin</filename>.
+  </para>
+</sect2>
+
+<sect2 id="docinstall">
+  <title>Documentation</title>
+
+  <para>
+    Documentation is not built by default; please refer to the 
+    <link linkend="processdoc">section on documentation</link> for
+    more information on building documentation.
+  </para>
+
+  <para>
+    <command>man</command> and <command>info</command> 
+    are installed in <filename>/usr/local/share/man</filename>
+    and <filename>/usr/local/share/info</filename> respectively, unless
+    the <option>--mandif</option> or <option>--infodir</option>
+    <link linkend="custompath">configuration options</link> are used.
+  </para>
+
+  <para>
+    <emphasis>GNOME help</emphasis> documentation uses the directory
+    <filename>/usr/local/share/gnash/doc/gnash/C/</filename> by default.
+    A configuration file in the &app; source tree,
+    <filename>doc/C/gnash.omf</filename> is used to specify under
+    which menu item &app; appears in the <emphasis>GNOME help</emphasis>
+    system.
+  </para>
+</sect2>

@@ -1,0 +1,421 @@
+<title>Specifying Custom Paths</title>
+<para>
+  By default, none of these options should be required
+  unless you want &app; to use a specific version of a
+  development package, or if the configure test fails to
+  find a component.  Please <link
+  linkend="bugreport">report the problem</link> if a
+  configure test fails.
+</para>
+<para>
+  The following custom path options are available:
+</para>
+
+
+<table id="tb-configure-paths">
+<title>Custom Path Options</title>
+<tgroup cols='2' align='left' colsep='1' rowsep='1'>
+<colspec colname='Option' />
+<colspec colname='Function' />
+<thead>
+<row>
+  <entry>Option</entry>
+  <entry>Function</entry>
+</row>
+</thead>
+<tbody>
+<row>
+  <entry>
+    <option>--x-includes=DIR</option>
+    </entry>
+      <entry>
+        X include files are in DIR.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--x-libraries=DIR</option>
+    </entry>
+      <entry>
+        X library files are in DIR.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-libxml=PFX</option>
+    </entry>
+      <entry>
+        Prefix to where libxml is installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-libxml-libraries=DIR</option>
+    </entry>
+      <entry>
+        Directory where libxml library is installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-libxml-includes=DIR</option>
+    </entry>
+      <entry>
+        Directory where libxml header files are installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-docbook=DIR</option>
+    </entry>
+      <entry>
+        Directory where the DocBook style-sheets are installed.        
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-sdl-prefix=PFX</option>
+    </entry>
+      <entry>
+        Prefix where SDL is installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-zlib-incl</option>
+    </entry>
+      <entry>
+        Directory where zlib header is installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-zlib-lib</option>
+    </entry>
+      <entry>
+        Directory where zlib library is installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-jpeg-incl</option>
+    </entry>
+      <entry>
+        Directory where jpeg header is installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-jpeg-lib</option>
+    </entry>
+      <entry>
+        Directory where jpeg library is installed.
+     </entry>
+  </row><row>
+  <entry>
+    <option>--with-png-incl</option>
+    </entry>
+      <entry>
+        Directory where png header is installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-png-lib</option>
+    </entry>
+      <entry>
+        Directory where png library is installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-qt-dir</option>
+    </entry>
+      <entry>
+        Directory where QT is installed. This is only used by
+        the Klash plugin.
+    </entry>
+  </row><row>
+  <entry>
+    <option>--with-qt-includes</option>
+    </entry>
+      <entry>
+        Directory where the QT header files are installed. This
+        is only used by the Klash plugin.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-qt-libraries</option>
+    </entry>
+      <entry>
+        Directory where the QT libraries are installed. This is
+        only used by the Klash plugin.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-npapi-plugindir</option>
+    </entry>
+      <entry>
+        This is the directory to install the NPAPI (Mozilla) plugin in.
+        By default it goes to ~/.mozilla/plugins.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-kde-pluginprefix</option>
+    </entry>
+      <entry>
+        This option sets the default install dir for all KPARTS (kde) files.
+	The plugin will be installed in PREFIX/lib/kde3, use <option>-with-kde-plugindir</option> to override.
+	The service file in PREFIX/share/services, use <option>--with-kde-servicesdir</option> to override.
+	The config file in PREFIX/share/config, use <option>--with-kde-configdir</option> to override.
+	The appdata file in PREFIX/share/apps/klash, use <option>--with-kde-appsdatadir</option> to override.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-kde-plugindir</option>
+    </entry>
+      <entry>
+        This is the directory to install the KPARTS (kde) plugin in.
+        By default it is what's set by --with-kde-pluginprefix or what's returned by kde-config --install module --expandvars,
+        or $(prefix)/share/services if kde-config is not found.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-kde-servicesdir</option>
+    </entry>
+      <entry>
+        This is the directory to install the KPARTS (kde) service in.
+        By default it is what's set by --with-kde-pluginprefix or what's returned by kde-config --install services --expandvars,
+        or $(libdir)/kde3 if kde-config is not found.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-kde-configdir</option>
+    </entry>
+      <entry>
+        This is the directory to install the KPARTS (kde) config files in.
+        By default it is what's set by --with-kde-pluginprefix or what's returned by kde-config --install config --expandvars,
+        or $(prefix)/share/config if kde-config is not found.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-kde-appsdatadir</option>
+    </entry>
+      <entry>
+        This is the directory to install the KPARTS (kde) application data files in.
+        By default it is what's set by --with-kde-pluginprefix or what's returned by kde-config --install data --expandvars,
+        or $(prefix)/share/apps if kde-config is not found.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-ming</option>
+    </entry>
+      <entry>
+        Ming is used to build test cases, but not by the Gnash
+        player itself.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-mad_incl</option>
+    </entry>
+      <entry>
+        Directory where libmad header is installed.
+      </entry>
+ </row><row>
+  <entry>
+    <option>--with-mad_lib</option>
+    </entry>
+      <entry>
+        Directory where libmad library is installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-ogg_incl</option>
+    </entry>
+      <entry>
+        Directory where the libogg headers are installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-ogg_lib</option>
+    </entry>
+      <entry>
+        Directory where the libogg library is installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-gstreamer-incl</option>
+    </entry>
+      <entry>
+        Directory where the Gstreamer headers are
+        installed. Gstreamer version 0.10 or greater must be used.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-gstreamer-lib</option>
+    </entry>
+      <entry>
+        Directory where the Gstreamer library is
+        installed. Gstreamer version 0.10 or greater must be used.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-opengl-includes</option>
+    </entry>
+      <entry>
+        Directory where OpenGL (libMesa) headers are installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-opengl-lib</option>
+    </entry>
+      <entry>
+        Directory where the OpenGL (libMesa) library is installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-glext-incl</option>
+    </entry>
+      <entry>
+        Directory where GtkGlExt headers are installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-glext-lib</option>
+    </entry>
+      <entry>
+        Directory where the GtkGlExt library is installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-gtk2-incl</option>
+    </entry>
+      <entry>
+        Directory where the Gtk2 headers are installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-gtk2-lib</option>
+    </entry>
+      <entry>
+        Directory where the Gtk2 library is installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-cairo_incl</option>
+    </entry>
+      <entry>
+        Directory where the Cairo headers are installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-cairo-lib</option>
+    </entry>
+      <entry>
+        Directory where the Cairo library is installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-glib-incl</option>
+    </entry>
+      <entry>
+        Directory where the Glib headers are installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-glib-lib</option>
+    </entry>
+      <entry>
+        Directory where the Glib library is installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-pango-incl</option>
+    </entry>
+      <entry>
+        Directory where the Pango headers are installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-pango-lib</option>
+    </entry>
+      <entry>
+        Directory where the Pango library is installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-atk-incl</option>
+    </entry>
+      <entry>
+        Directory where the ATK headers are installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-atk-lib</option>
+    </entry>
+      <entry>
+        Directory where the ATK library is installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-pthread-incl</option>
+    </entry>
+      <entry>
+        Directory where the Pthread headers are installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-pthread-lib</option>
+    </entry>
+      <entry>
+        Directory where the Pthread library is installed.
+   </entry>
+  </row><row>
+  <entry>
+    <option>--with-agg-incl</option>
+    </entry>
+      <entry>
+        Directory where the AGG (Antigrain) headers are installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-agg-lib</option>
+    </entry>
+      <entry>
+        Directory where the AGG (Antigrain) library is installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-ffmpeg-incl</option>
+    </entry>
+      <entry>
+        Directory where the FFMPEG headers are installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-ffmpeg-lib</option>
+    </entry>
+      <entry>
+        Directory where the FFMPEG library is installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-boost-incl</option>
+    </entry>
+      <entry>
+        Directory where the Boost headers are installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-boost-lib</option>
+    </entry>
+      <entry>
+        Directory where the Boost library is installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-curl-incl</option>
+    </entry>
+      <entry>
+        Directory where the libCurl headers are installed.
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-curl-lib</option>
+    </entry>
+      <entry>
+        Directory where the libCurl library is installed.
+      </entry>
+</row>
+</tbody>
+</tgroup>
+</table>
+
