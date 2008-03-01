@@ -1,204 +1,217 @@
-    <sect1 id="newclass">
-      <title>Adding New ActionScript Class</title>
+<chapter id="newclass">
+  <title>Adding New ActionScript Class</title>
+  
+  <para>
+    In this document, the term 'ActionScript class' refers to the
+    C++ class which is instantiated by Gnash when some ActionScript
+    code instantiates a corresponding class.  The C++ class
+    stores instance data and implements the methods which are 
+    called on the object in the ActionScript code.
+  </para>
 
+  <para>
+    Adding a new ActionScript class is relatively simple, but the
+    process is complicated by the fact that the interface has evolved
+    over time and the current code base represents several different
+    formats.  This document describes the current interface.  The
+    Boolean class should be considered the authoritative example of
+    a modern ActionScript class.
+  </para>
+  
+  <para>
+    ActionScript classes contain a header file and a C++
+    implementation.  The name is usually the name of the
+    class as it is called in the ActionScript specifications;
+    for instance <emphasis>Boolean.cpp</emphasis> for the Boolean class.
+  </para>
+  
+  <sect1 id="prototype">
+    <title>Prototype</title>
+    
+    <para>
+      In ActionScript, a prototype is a base object which contains
+      all the methods that an instantiated object will contain.
+      In short, it contains every part of the class except for
+      the portions dealing with the storage of instance data.
+    </para>
+    <para>
+      In Gnash, the prototype of an ActionScript object is 
+      implemented as an <emphasis>as_object</emphasis>.
+      At startup, the methods and properties of the ActionScript class
+      are attached to the <emphasis>as_object</emphasis>.  The
+      following example demonstrates how methods can be attached:
+      <programlisting>
+	static void
+	attachBooleanInterface(as_object&amp; o) {
+	  o.init_member("toString", new builtin_function(boolean_tostring));
+	  o.init_member("valueOf", new builtin_function(boolean_valueof));
+	}
+      </programlisting>
+    </para>
+    <para>
+      Static properties can also be added to the ActionScript prototype
+      (<link linkend="properties">dynamic properties</link> 
+      are addressed later).  They are attached in a similar way:
+      <programlisting>
+	o.init_member("myProperty", as_value("HelloWorld"));
+      </programlisting>
+    </para>
+    <para>
+      Properties which have been added in this manner can be
+      directly accessed in ActionScript code without a function
+      call, as this piece of ActionScript code compiled by Ming's
+      <emphasis>makeswf</emphasis> compiler demonstrates:
+      <programlisting>
+	// Get the value of the myProperty property
+	if (node.myProperty == "HelloWorld") {
+	  trace("MATCHED");
+	}
+      </programlisting>
+    </para>
+  </sect1>
+  
+  <sect1 id="declaration">
+    <title>Declaration</title>
+    
+    <para>
+      A new class should derive from <emphasis>as_object</emphasis>,
+      which is the base class of every ActionScript object in Gnash.
+    </para>
+  </sect1>
+  
+  <sect1 id="instantiation">
+    <title>Instantiation</title>
+    
+    <para>
+      When a new object is needed, instance data is added to
+      the methods and properties inherited from the prototype.
+    </para>
+    <para>
+      The init method should be called in the constructor in
+      <emphasis>Global.cpp</emphasis>, where all other ActionScript
+      classes are similarly referenced. This method constructs a
+      prototype, which is implemented as an
+      <emphasis>as_object</emphasis>.  In addition, the method 
+      registers the constructor to be used for future object creation,
+      and attaches methods and properties to the prototype.
+    </para>
+  </sect1>
+  
+  <sect1 id="methods">
+    <title>Methods</title>
+    
+    <para>
+      Every method you implement and 
+      <link linkend="prototype">attach</link> will receive an
+      &fn_call; data structure as an argument when it is called.
+    </para>
+    
+    <sect3 id="arguments">
+      <title>Accessing Arguments</title>
       <para>
-        Adding a new ActionScript class is relatively simple, but the
-        process is complicated by the fact that the interface has evolved
-        over time and the current code base represents several different
-        formats.  This document describes the current interface.  The
-        Boolean class should be considered the authoritative example of
-        a modern ActionScript class.
+	The arguments stored in &fn_call;
+	should be accessed using <emphasis>arg()</emphasis>.  For
+	instance, the first element can be popped with
+	<emphasis>fn.arg(0)</emphasis>.
       </para>
-
       <para>
-        ActionScript classes contain a header file and a C++
-        implementation.  The name is usually the name of the
-        class as it is called in the ActionScript specifications;
-        for instance <emphasis>Boolean.cpp</emphasis> for the Boolean class.
+	The element popped off the stack is an 
+	<link linkend="as_value"><emphasis>as_value</emphasis>
+	object</link>.
       </para>
+    </sect3>
+    
+    <sect3 id="return">
+      <title>Returning a Value to ActionScript</title>
+      <para>
+	The return value should be an
+	<link linkend="as_value"><emphasis>as_value</emphasis> 
+	object</link>.  For example:
+	<programlisting>
+	  return as_value('Goodbye, cruel world.');
+	</programlisting>
+      </para>
+    </sect3>
+    
+    <sect3 id="additional_fn_call">
+      <title>Additional &fn_call; Members</title>
+      <para>
+	There are two other useful members of the &fn_call;
+	structure, namely <emphasis>this_ptr</emphasis> and
+	<emphasis>nargs</emphasis>.  The former points to the
+	class which is invoking this method, while the latter
+	is a count of the number of 
+	<link linkend="arguments">arguments in the stack</link>.
+      </para>
+      <para>
+	You may also see instances of the <emphasis>env</emphasis>
+	pointer being used.   This is being deprecated.  Instances
+	which could be replaced with
+	<link linkend="arguments"><emphasis>arg()</emphasis></link>
+	are already deprecated; other uses will be deprecated
+	in the near future.
+      </para>
+      <para>
+	Beyond the <emphasis><link 
+	linkend="arguments">arg()</link></emphasis> method, there
+	is one method of note.  <emphasis>dump_args()</emphasis>
+	can be used in debugging to output the entire argument
+	stack.
+      </para>
+    </sect3>
+  </sect1>
+  
+  <sect1 id="properties">
+    <title>Dynamic Properties</title>
+    <para>
+      This section describes accessors to dynamic properties.
+      Read-only properties are described
+      in the <link linkend="prototype">prototype</link> section.
+    </para>
+    <para>
+      Accessors should be written as a single get/set method.
+      Previously this was done by overriding
+      <emphasis>get_member()</emphasis> and 
+      <emphasis>set_member()</emphasis>, but this practice
+      is deprecated.  
+    </para>
+    <para> 
+      The accessor is written so that it sets the property
+      if it is called with an argument, and puts the property in
+      the <link linkend="methods">&fn_call;</link>
+      <link linkend="return">result pointer</link>.  For instance:
+      <programlisting>
+	void
+	MyClass::myProperty_getset(const fn_call&amp; fn) {	
+	  boost::intrusive_ptr&lt;MyClass&gt; ptr = ensureType&lt;MyClass&gt;(fn.this_ptr);
+	
+	  // setter
+	  if ( fn.nargs > 0 ) {
+	    bool h = fn.arg(0).to_bool();
+	    ptr->MyMethod(h);
+	    return;
+	   }
+	
+	  // getter
+	  bool h = ptr->MyMethod();
+	  fn.result->set_bool(h);
+	}
+      </programlisting>
+    </para>
+    <para> 
+      It has not yet been decided whether properties should be set
+      in the <link linkend="prototype">exported interface</link> 
+      or attached to instances of the class.  A property is attached
+      in the following manner:
+      <programlisting>
+	boost::intrusive_ptr&lt;builtin_function&gt; gettersetter;
+	gettersetter = new builtin_function(&amp;MyClass::myProperty_getset, NULL);
+	o.init_property("myProperty", *gettersetter, *gettersetter);
+      </programlisting>
+    </para>
+  </sect1>
 
-      <sect2 id="prototype">
-        <title>Prototype</title>
+  &asvalue;
+  
+</chapter>
 
-	<para>
-          In ActionScript, a prototype is a base object which contains
-          all the methods that an instantiated object will contain.
-          In short, it contains every part of the class except for
-          the portions dealing with the storage of instance data.
-	</para>
-	<para>
-          In Gnash, the prototype of an ActionScript object is 
-          implemented as an <emphasis>as_object</emphasis>.
-          At startup, the methods and properties of the ActionScript class
-          are attached to the <emphasis>as_object</emphasis>.  The
-          following example demonstrates how methods can be attached:
-	  <programlisting>
-            static void
-            attachBooleanInterface(as_object&amp; o) 
-            {
-                o.init_member("toString", new builtin_function(boolean_tostring));
-                o.init_member("valueOf", new builtin_function(boolean_valueof));
-            }
-	  </programlisting>
-	</para>
-	<para>
-          Static properties can also be added to the ActionScript prototype
-          (<link linkend="properties">dynamic properties</link> 
-          are addressed later).  They are attached in a similar way:
-          <programlisting>
-	    o.init_member("myProperty", as_value("HelloWorld"));
-	  </programlisting>
-	</para>
-	<para>
-          Properties which have been added in this manner can be
-          directly accessed in ActionScript code without a function
-          call, as this piece of ActionScript code compiled by Ming's
-          <emphasis>makeswf</emphasis> compiler demonstrates:
-	    <programlisting>
-	      // Get the value of the myProperty property
-	      if (node.myProperty == "HelloWorld") {
-	          trace("MATCHED");
-	      }
-	    </programlisting>
-	</para>
-      </sect2>
-
-      <sect2 id="declaration">
-	<title>Declaration</title>
-
-	<para>
-          A new class should derive from <emphasis>as_object</emphasis>,
-          which is the base class of every ActionScript object in Gnash.
-	</para>
-      </sect2>
-      
-      <sect2 id="instantiation">
-	<title>Instantiation</title>
-
-	<para>
-          The class should contain an init method.
-	</para>
-	<para>
-          The init method should be called in the constructor in
-          <emphasis>Global.cpp</emphasis>, where all other ActionScript
-          classes are similarly referenced.
-	</para>
-      </sect2>
-
-      <sect2 id="methods">
-	<title>Methods</title>
-
-        <para>
-          Every method you implement and 
-          <link linkend="prototype">attach</link> will receive an
-          &fn_call; data structure as an argument when it is called.
-        </para>
-
-        <sect3 id="arguments">
-          <title>Accessing Arguments</title>
-          <para>
-            The arguments stored in &fn_call;
-            should be accessed using <emphasis>arg()</emphasis>.  For
-            instance, the first element can be popped with
-            <emphasis>fn.arg(0)</emphasis>.
-	  </para>
-          <para>
-            The element popped off the stack is an 
-            <link linkend="as_value"><emphasis>as_value</emphasis>
-            object</link>.
-          </para>
-        </sect3>
-
-        <sect3 id="return">
-          <title>Returning a Value to ActionScript</title>
-          <para>
-            The return value should be an
-            <link linkend="as_value"><emphasis>as_value</emphasis> 
-            object</link>.  For example:
-            <programlisting>
-              return as_value('Goodbye, cruel world.');
-            </programlisting>
-          </para>
-        </sect3>
-
-        <sect3 id="additional_fn_call">
-          <title>Additional &fn_call; Members</title>
-          <para>
-            There are two other useful members of the &fn_call;
-            structure, namely <emphasis>this_ptr</emphasis> and
-            <emphasis>nargs</emphasis>.  The former points to the
-            class which is invoking this method, while the latter
-            is a count of the number of 
-            <link linkend="arguments">arguments in the stack</link>.
-	  </para>
-	  <para>
-            You may also see instances of the <emphasis>env</emphasis>
-            pointer being used.   This is being deprecated.  Instances
-            which could be replaced with
-            <link linkend="arguments"><emphasis>arg()</emphasis></link>
-            are already deprecated; other uses will be deprecated
-            in the near future.
-	  </para>
-          <para>
-            Beyond the <emphasis><link 
-            linkend="arguments">arg()</link></emphasis> method, there
-            is one method of note.  <emphasis>dump_args()</emphasis>
-            can be used in debugging to output the entire argument
-            stack.
-	  </para>
-        </sect3>
-      </sect2>
-
-      <sect2 id="properties">
-	<title>Dynamic Properties</title>
-        <para>
-          This section describes accessors to dynamic properties.
-          Read-only properties are described
-          in the <link linkend="prototype">prototype</link> section.
-        </para>
-        <para>
-          Accessors should be written as a single get/set method.
-	  Previously this was done by overriding
-	  <emphasis>get_member()</emphasis> and 
-          <emphasis>set_member()</emphasis>, but this practice
-          is deprecated.  
-        </para>
-        <para> 
-          The accessor is written so that it sets the property
-          if it is called with an argument, and puts the property in
-          the <link linkend="methods">&fn_call;</link>
-          <link linkend="return">result pointer</link>.  For instance:
-          <programlisting>
-            void
-            MyClass::myProperty_getset(const fn_call&amp; fn)
-            {
-
-                boost::intrusive_ptr&lt;MyClass&gt; ptr = ensureType&lt;MyClass&gt;(fn.this_ptr);
-
-                // setter
-                if ( fn.nargs > 0 )
-                {
-                    bool h = fn.arg(0).to_bool();
-                    ptr->MyMethod(h);
-                    return;
-                }
-
-                // getter
-                bool h = ptr->MyMethod();
-                fn.result->set_bool(h);
-            }
-          </programlisting>
-        </para>
-        <para> 
-          It has not yet been decided whether properties should be set
-          in the <link linkend="prototype">exported interface</link> 
-          or attached to instances of the class.  A property is attached
-          in the following manner:
-          <programlisting>
-            boost::intrusive_ptr&lt;builtin_function&gt; gettersetter;
-            gettersetter = new builtin_function(&amp;MyClass::myProperty_getset, NULL);
-            o.init_property("myProperty", *gettersetter, *gettersetter);
-          </programlisting>
-        </para>
-      </sect2>
-    </sect1>
