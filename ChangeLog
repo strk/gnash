@@ -1,5 +1,15 @@
 2008-03-01  Rob Savoye  <rob@ute.welcomehome.org>
 
+	* doc/C/Makefile.am: Link to the preformatted info file, which is
+	messy because of the name transformation.
+	* configure.ac: Always Define Docbook Conditionals or make fails.
+	
+	* packaging/gnash_ref.info.in, gnash_user.info.in,
+	gnashuser.html.in gnashuser.ref.in: Preformatted versions of the docs.
+	
+	* doc/C/usermanual/usage, installation, actionscript: Move to
+	reference manual. 
+	
 	* macros/docbook.m4: Look for install-info program too, which we
 	need to add entries to the system wide info 'dirs' file.
 	

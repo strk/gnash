@@ -1639,6 +1639,13 @@ fi
 GNASH_DOCBOOK
 AM_CONDITIONAL(ENABLE_INFO, test x${INSTALL_INFO} != x)
 AM_CONDITIONAL(DOCBOOK, test x$docbook = xyes)
+AM_CONDITIONAL(ENABLE_TEXI, [ test x"$DB2X_TEXI" != x -o x"$DB2X_TEXIXML" != x ])
+AM_CONDITIONAL(ENABLE_PDF, [ test x"$DB2X_PDF" ])
+AM_CONDITIONAL(ENABLE_HTML, [ test x"$XSLTPROC" != x -a x"$docbook_styles" != x ])
+AM_CONDITIONAL(ENABLE_FOP, [ test x"$FOP" != x -a x"$docbook_styles" != x ])
+AM_CONDITIONAL(ENABLE_XMLTEX, [ test x"$PDFXMLTEX" != x -a x"$XSLTPROC" != x -a x"$docbook_styles" != x ])
+dnl  AM_CONDITIONAL(ENABLE_DBLATEX, [ test x"$DBLATEX" != x ])
+AM_CONDITIONAL(ENABLE_MAN, [ test x"$DB2X_MAN" != x -o x"$DB2X_MANXML" != x ])
 AM_CONDITIONAL(HAVE_AGG, [test x"${AGG_LIBS}" != x])
 
 GNASH_PATH_CURL

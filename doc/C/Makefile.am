@@ -80,7 +80,7 @@ EXTRA_DIST = \
 #noinst_SCRIPT = gen-doc.sh
 dist_man_MANS = gnash.1 gprocessor.1 dumpshm.1 soldumper.1 cygnal.1
 MANSRC = $(dist_man_MANS:.1=.man-xml)
-INFOS  = $(XML_MAIN:.xml=.info)
+INFOS  = gnash_user.info gnash_ref.info
 HTMLS  = $(XML_MAIN:.xml=.html)
 PDFS   = $(XML_MAIN:.xml=.pdf)
 TEXIS  = $(XML_MAIN:.xml=.texi)
@@ -90,8 +90,8 @@ TEXIS  = $(XML_MAIN:.xml=.texi)
 
 all-local: images html man info
 
-gnashuser.html gnashuser.pdf gnash_user_manual.info: gnashuser.xml $(USERMAN)
-gnashref.html gnashref.pdf gnash_reference_manual.info: gnashref.xml $(REFMAN)
+gnashuser.html gnashuser.pdf gnash_user.info: gnashuser.xml $(USERMAN)
+gnashref.html gnashref.pdf gnash_ref.info: gnashref.xml $(REFMAN)
 
 # Convienience rules for developers of these manuals. By default
 # all output formats are built if the Docbook tools are installed
@@ -189,6 +189,14 @@ else
 	else \
 	  touch $@; \
 	fi
+endif
+
+if !ENABLE_DOCBOOK
+gnash_user.info:
+	$(LN_S) -f $(top_srcdir)/packaging/doc/gnash_user.info.in ./gnash_user.info; \
+
+gnash_ref.info:
+	$(LN_S) -f $(top_srcdir)/packaging/doc/gnash_ref.info.in ./gnash_ref.info; \
 endif
 
 # When we build in a seperate build tree, we need links to the images
