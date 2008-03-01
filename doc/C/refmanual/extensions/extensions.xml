@@ -1,0 +1,315 @@
+<chapter id="extensions">
+  <title>Gnash Extensions</title>
+  
+  <para>
+    Gnash supports extending the Flash specification by creating
+    custom ActionScript classes that are compiled code, as opposed to
+    the existing method of defining custom classes as
+    ActionScript. Executing compiled code has many performance
+    benefits over having to interpret the byte stream of the
+    ActionScript opcodes.
+  </para>
+  
+  <para>
+    I can already hear people complaining now about the concept of
+    extending Flash, so this in no way affects Gnash's ability to play
+    Flash movies when functioning as a browser plugin.
+    Gnash's goal is still to function in a way that is compatible
+    with the current proprietary Flash player.
+  </para>
+
+  <para>
+    But at the same time, we see Flash as the ideal scripting language
+    for a digital multi-media streaming environment. There are many
+    resources for Flash movie creators for widgets, higher level APIs,
+    all sorts of desirable things. But for those of use committed to
+    using free software tools for Flash, our options are very
+    limited. 
+  </para>
+
+  <para>
+    Rather than launching a multi-year project to duplicate all
+    classes in the commercial Flash IDE, it's much more efficient to
+    use existing development libraries much like Python or Perl
+    do. The extension mechanism in Gnash allows wrappers to be created
+    for any C or C++ development library. Unlike the proprietary Flash
+    IDE, which compiles all the extension libraries into byte codes
+    from ActionScript, the support is moved to the player side. Movies
+    with all of the goodies of the proprietary IDE in them play in
+    Gnash just fine, as it's all just byte codes by then.
+  </para>
+
+  <para>
+    This trick works because until Flash player version 9, all the
+    ActionScript class names and methods are passed as ASCII strings
+    into the Flash movie. So the Gnash Virtual Machine just loads the
+    extension file if that class name is invoked in the movie. All
+    extension files specify the class name and methods it implements
+    in an identical style as adding any new ActionScript class. The
+    advantage is the class itself is compiled code, and runs much
+    faster than the equivalent byte codes which all have to be
+    interpreted..
+  </para>
+
+  <sect1 id="newext">
+    <title>Creating A New Extension</title>
+
+    <para>
+      Each new extension should live in it's own directory. The
+      extensions included in Gnash are all in the
+      <code>gnash/extensions</code> directory. Creating an extension
+      requires a Makefile.am,
+    </para>
+
+    <para>
+      If you are adding this extension to the Gnash source tree
+      itself, then you need to make two changes to add the new
+      extension.
+    </para>
+
+    <para>
+      The first change is to add the directory to the list in
+      extensions/Makefile.am. This can be done either by adding the
+      new directory to the SUBDIRS setting, or by wrapping it in a
+      conditional test.
+    </para>
+
+    <para>
+      The other change is to add it to the AC_OUTPUT list in
+      <emphasis>configure.ac</emphasis> so the new directory will be
+      configured along with the rest of Gnash.
+    </para>
+
+    <para>
+      Each extension should have an ActionScript source file included
+      that tests the new class, and this file should be referenced in
+      the new Makefile.am in the <emphasis>check_PROGRAMS</emphasis>
+      variable so that "make check" works.
+    </para>
+
+    <para>
+      When creating an extension that is a wrapper for an existing
+      development library API, it's often better to make this a thin
+      layer, than to get carried away with creating beautiful
+      abstractions. Higher-level classes that offer a lot of new
+      functionality are fine, but is different than wrapping a library
+      so it can be used from within Gnash.
+    </para>
+
+    <sect2 id="craftext">
+      <title>Crafting an Extension</title>
+
+      <para>
+	All extensions have the same requirements, namely setting up a
+	few defined function callbacks, which the Gnash VM then uses
+	to do the right thing. The initial two function callbacks are
+	for handling the interface of the newly created object so that
+	Gnash can find and use it.
+      </para>
+
+      <para>
+	The first function is commonly called
+	<emphasis>attachInterface</emphasis>, and this sets the other
+	function callbacks for all the methods this class
+	supports. The method callbacks are attached to the parent
+	class by using <emphasis>init_member()</emphasis> to set a C
+	function pointer to the string value used in the Flash movie.
+      </para>
+
+      <programlisting>
+	// Attach DummyClass 'func1' and 'func2' methods to the given object
+	static void
+	attachInterface(as_object&amp; obj)
+	{
+            obj.init_member("func1", &amp;ext_func1);
+            obj.init_member("func2", &amp;ext_func2);
+	}
+      </programlisting>
+
+      <para>
+	The second function is commonly called
+	<emphasis>getInterface()</emphasis>, and this returns a
+	pointer to a static prototype of the class.
+        Gnash uses garbage collection for ActionScript objects
+        so you need to register the static with the VM to give it
+        a chance to be marked as reachable.
+      </para>
+      <programlisting>
+	static as_object*
+	getInterface()
+	{
+	    static boost::intrusive_ptr&lt;as_object&gt; o;
+	    if (o == NULL) {
+	        o = new as_object();
+                VM::get().addStatic(o);
+                attachInterface(*o);
+	    }
+	    return o.get();
+	}
+      </programlisting>
+
+      <para>
+	This is the callback that gets executed when constructing a
+	new object for the VM. In this example we'll assume the new
+	ActionScript class is called <emphasis>DummyExt</emphasis>,
+	and has two methods, <emphasis>func1</emphasis> and
+	<emphasis>func2</emphasis>.
+      </para>
+      <programlisting>
+	static as_value
+	dummyext_ctor(const fn_call&amp; fn)
+	{
+	    DummyExt *obj = new DummyExt(); // will setup prototypes
+
+	    return as_value(obj); 
+	}
+      </programlisting>
+
+      <para>
+	The trick for the above simple constructor to work is that
+        class appartenence is setup in the C++ DummyExt constructor
+        itself, which should derive from as_object and construct the
+        base passing it the interface (prototype) of it's class.
+      </para>
+
+      <programlisting>
+	class DummyExt : public as_object
+        {
+        public:
+	    DummyExt()
+                :
+                as_object(getInterface()) // returns the static prototype
+            {}
+
+	};
+      </programlisting>
+
+      <para>
+	Initialize the extension. This is looked for by the extension
+	handling code in each extension, and is executed when the
+	extension is loaded. This is the main entry point into the
+	extension. This function can be found because the prefix of
+	<emphasis>dummyext</emphasis>, which also matches the file
+	name of the extension. Gnash uses the name of the extension
+	file itself when looking for the init function.
+      </para>
+      <programlisting>
+        extern "C" {
+	    void
+	    dummyext_class_init(as_object &amp;obj)
+	    {
+	        static builtin_function* cl=NULL;
+	        if (!cl)
+                {
+                    // Create a builtin function using the given constructor
+                    // to instanciate objects and exporting the given interface
+	            cl = new builtin_function(&amp;dummyext_ctor, getInterface());
+	            VM::get().addStatic(cl); // will forbid to collect the class
+	        }
+	
+		obj.init_member("DummyExt", cl);
+	    }
+        } // end of extern C
+      </programlisting>
+
+      <para>
+	The callbacks are all C functions. Like all the other code
+	that implements ActionScript, parameters to the function are
+	passed in using the <emphasis>fn_call</emphasis> data
+	structure. The return code, if any, is also returned using
+	this data structure. <emphasis>this_ptr</emphasis> is the
+	object that the method is a member of.
+      </para>
+      <programlisting>
+	// Creates a new button with the label as the text.
+	as_value func1(const fn_call&amp; fn)
+	{
+            // Following line will ensure 'func1' is called for a DummyExt instance,
+            // or would throw an exception which should behave as if we returned the
+            // undefined value.
+            boost::intrusive_ptr&lt;DummyExt&gt; ptr = ensureType&lt;DummyExt&gt;(fn.this_ptr);
+	
+	    if (fn.nargs > 0) {
+	        std::string label = fn.arg(0).to_string();
+		bool ret = ptr->dummy_text_label(label);
+		return as_value(ret);
+	    }
+	}
+      </programlisting>
+
+    </sect2>
+
+  </sect1>
+
+  <sect1 id="debuext">
+    <title>Debugging An Extension</title>
+    
+    <para>
+      As extensions are loaded dynamically at runtime, debugging one
+      can be difficult. You can use GDB, but you have the problem of
+      not being able to set a breakpoint in Gnash until
+      <emphasis>after</emphasis> the extension has been loaded into
+      Gnash's VM. The easy solution is to use the Gnash debugger.
+    </para>
+
+    <para>
+      You can insert these few lines in any file that you wish to
+      manually start the debugger. Once at the console, you can attach
+      GDB to the process. Then you can set breakpoints, etc... and you
+      are at the point of execution where the console was started. To
+      then continue playing the movie, type the <emphasis>c</emphasis>
+      (for continue) command to the Gnash console.
+    </para>
+    <programlisting>
+      // Get the debugger instance
+      static Debugger&amp; debugger = Debugger::getDefaultInstance();
+
+      // Enable the debugger
+      debugger.enabled(true);
+      // Stop and drop into a console
+      debugger.console();
+    </programlisting>
+
+    <para>
+      You can also resort to the time honored technique of creating a
+      loop before the point you want to set a breakpoint for. Gnash
+      will stop playing the movie at this point, and then you can
+      externally attach GDB to the running process, or type
+      <emphasis>^C</emphasis> to drop into the GDB command console.
+    </para>
+    <programlisting>
+      bool stall = true;
+      while (stall) {
+          sleep 1;
+      }
+    </programlisting>
+
+    <para>
+      Once you have set the breakpoints you want, reset the value of
+      the <emphasis>stall</emphasis> variable to break out of the
+      loop, and the Flash movie will then continue playing.
+    </para>
+    <programlisting>
+      (gdb) set variable stall = false;
+      continue
+    </programlisting>
+
+  </sect1>
+  
+  <sect1 id="inclext">
+    <title>Included Extensions</title>
+
+    <para>
+      Gnash has some extensions included in the distribution. This is
+      mostly because they were written by the Gnash team. Extensions
+      can be external to gnash, Gnash needs no compiled in knowledge
+      to load an extension file.
+    </para>
+    
+    &gtkext;
+    &fileext;
+    &mysqlext;
+
+  </sect1>
+
+</chapter>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sect3 id="mysqlext">
+  <title>MySQL Extension</title>
+
+  <para>
+    The MySQL ActionScript class follows the same API as MySQL, even down
+    to the same arguments to the same function names. This enables a
+    Flash movie to have direct access to a MySQL
+    database. Traditionally Flash movies have had no database
+    support, they either had to use arrays, or use XML to communicate
+    to an application specific external database daemon.
+  </para>
+
+  <variablelist>
+    <varlistentry>
+      <term>connect</term>
+      <listitem>
+	<para>
+	  Connect to a MySQL database.
+	</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>qetData</term>
+      <listitem>
+	<para>
+	  Get data from the database.
+	</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>disconnect</term>
+      <listitem>
+	<para>
+	  Disconnect from a MySQL database.
+	</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>query</term>
+      <listitem>
+	<para>
+	  Execute an SQL query to the database.
+	</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>fetch_row</term>
+      <listitem>
+	<para>
+	  Fetch a row from the query results.
+	</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>num_fields</term>
+      <listitem>
+	<para>
+	</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>free_result</term>
+      <listitem>
+	<para>
+	  Free the results of a query.
+	</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>store_results</term>
+      <listitem>
+	<para>
+	  Store the results of a query.
+	</para>
+      </listitem>
+    </varlistentry>
+
+  </variablelist>
+  
+</sect3>

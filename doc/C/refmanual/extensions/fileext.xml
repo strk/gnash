@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sect3 id="fileioext">
+  <title>File I/O Extension</title>
+
+  <para>
+    Flash movies are traditionally forbidden from accessing the
+    filesystem, but this may be necessary for some embedded
+    applications. Especially in the case of a user console, currently
+    there is no way to get input into a Flash movie but through a
+    TextField.
+  </para>
+
+  <variablelist>
+    <varlistentry>
+      <term>fopen</term>
+      <listitem>
+	<para>
+	  Open the file.
+	</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>fread</term>
+      <listitem>
+	<para>
+	  Read a series of bytes from the opened file.
+	</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>fgetc</term>
+      <listitem>
+	<para>
+	  Read a single byte from the opened file.
+	</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>fgets</term>
+      <listitem>
+	<para>
+	  Read a single line until a Carriage Return from the opened file.
+	</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>gets</term>
+      <listitem>
+	<para>
+	  Read a single line from the standard in.
+	</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>getchar</term>
+      <listitem>
+	<para>
+	  Read a single character from the standard in.
+	</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>fwrite</term>
+      <listitem>
+	<para>
+	</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>fputc</term>
+      <listitem>
+	<para>
+	  Write a single character to the opened file.
+	</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>fputs</term>
+      <listitem>
+	<para>
+	  Write a single line to the opened file.
+	</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>puts</term>
+      <listitem>
+	<para>
+	  Write a single line to standard out..
+	</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>putchar</term>
+      <listitem>
+	<para>
+	  Write a single character to standard out..
+	</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>fflush</term>
+      <listitem>
+	<para>
+	  Flush the current opened file to disk.
+	</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>fseek</term>
+      <listitem>
+	<para>
+	  Seek to a location within the opened file.
+	</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>ftell</term>
+      <listitem>
+	<para>
+	  Report the current position within the opened file.
+	</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>fclose</term>
+      <listitem>
+	<para>
+	  Close the opened file.
+	</para>
+      </listitem>
+    </varlistentry>
+
+  </variablelist>
+
+</sect3>

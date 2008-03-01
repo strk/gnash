@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sect3 id="gtkext">
+  <title>Gtk Extension</title>
+
+  <para>
+    The GTK ActionScript class follows the same API as Gtk2, even down
+    to the same arguments to the same function names. This means
+    you're actually programming GTK,you're just using ActionScript
+    instead of python, perl, or C. This extension makes it possible to
+    write Flash movies that use the Gtk2 widgets for user interface
+    components.
+  </para>
+
+  <variablelist>
+    <varlistentry>
+      <term>window_new</term>
+      <listitem>
+	<para>
+	  Create a new window.
+	</para>
+      </listitem>
+    </varlistentry>
+    
+    <varlistentry>
+      <term>signal_connect</term>
+      <listitem>
+	<para>
+	  Add an event handler to a widget.
+	</para>
+      </listitem>
+    </varlistentry>
+    
+    <varlistentry>
+      <term>container_set_border_width</term>
+      <listitem>
+	<para>
+	  Set the width of the window border.
+	</para>
+      </listitem>
+    </varlistentry>
+    
+    <varlistentry>
+      <term>button_new_with_label</term>
+      <listitem>
+	<para>
+	  Create a new button and give it the specified label.
+	</para>
+      </listitem>
+    </varlistentry>
+    
+    <varlistentry>
+      <term>signal_connect_swapped</term>
+      <listitem>
+	<para>
+	  Swap signals. Commonly used for <emphasis>delete</emphasis> event handling.
+	</para>
+      </listitem>
+    </varlistentry>
+    
+    <varlistentry>
+      <term>container_add</term>
+      <listitem>
+	    <para>
+	      Add one widget to another as a child.
+	    </para>
+      </listitem>
+    </varlistentry>
+    
+    <varlistentry>
+      <term>widget_show</term>
+      <listitem>
+	<para>
+	  Display the widget on the screen.
+	</para>
+      </listitem>
+    </varlistentry>
+    
+    <varlistentry>
+      <term>main</term>
+      <listitem>
+	<para>
+	  Start the main GTK event loop. This function does not return.
+	</para>
+      </listitem>
+    </varlistentry>
+    
+  </variablelist>
+</sect3>
