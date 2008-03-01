@@ -25,6 +25,12 @@ AC_DEFUN([GNASH_DOCBOOK], [
 
   DB2X_VERSION=
   if test x"$docbook" = x"yes"; then
+    dnl install-info is used to update entries in the dirs file, used by
+    dnl info to find all of it files.
+    AC_PATH_PROG(INSTALL_INFO, install-info, $PATH:/usr/sbin)
+    AC_SUBST(INSTALL_INFO)
+    AM_CONDITIONAL(ENABLE_INFO, test x${INSTALL_INFO} != x)
+
     docbook_styles=
     AC_ARG_WITH(docbook_styles, AC_HELP_STRING([--with-docbook-styles], [directory where Docbook stylesheets are]), with_docbook_styles=${withval})
     if test x"${with_docbook_styles}" != x ; then

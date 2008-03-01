@@ -1,5 +1,8 @@
 2008-03-01  Rob Savoye  <rob@ute.welcomehome.org>
 
+	* macros/docbook.m4: Look for install-info program too, which we
+	need to add entries to the system wide info 'dirs' file.
+	
 	* doc/C/gnashref.xml: New reference manual top level page.  This
 	contains much of what was in the old manual.
 	* asspec/*: Move to BackLash directory.
