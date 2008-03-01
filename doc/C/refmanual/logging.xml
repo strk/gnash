@@ -1,0 +1,207 @@
+<sect2 id="logging">
+  <title>The Debug Logging System</title>
+
+  <para>
+    Gnash supports a debug logging system which supports both C and C++
+    natively. This means you can use both <emphasis>printf()</emphasis> style
+    debug messages and C++ <emphasis>iostreams</emphasis> style, where you can
+    print C++ objects directly as you would when using
+    <emphasis>cout</emphasis>.
+  </para>
+  
+  <para>
+    In the beginning, Gnash only supported the C API for debug
+    logging, so it is the most heavily used in Gnash. This API was used in
+    the <emphasis>log_msg()</emphasis> and <emphasis>log_error()</emphasis> functions,
+    and used a callback to set them up.
+  </para>
+  
+  <para>
+    It became apparent one day the callback was never needed, and I
+    got tired of having to use <emphasis>c_str()</emphasis> on string data
+    just to print them out.
+  </para>
+  
+  <para>
+    If a filename is not specified at object construction time, a
+    default name of <emphasis>gnash-dbg.log</emphasis> is used. If Gnash is
+    started from the command line, the debug log will be created in
+    the current directory. When executing Gnash from a launcher under
+    <emphasis>GNOME</emphasis> or <emphasis>KDE</emphasis> the debug file goes in your
+    home directory, since that's considered the current directory.
+  </para>
+
+  <para>
+    There is common functionality between using the C or C++
+    API. Optional output is based on flags that can be set or
+    unset. Multiple levels of verbosity are supported, so you can get
+    more output by supplying multiple <emphasis>-v</emphasis> options on the
+    command line. You can also disable the creation of the debug log.
+  </para>
+
+  <sect3 id="capi">
+    <title>Logging System C API</title>
+
+    <para>
+      These functions are clones of the originals as they were used
+      for Gnash. These function the same as always except output can
+      be logged to disk now as well. These currently print no
+      timestamp with the output, which is the older functionality. As
+      these functions are implemented on top of the C++ API now, they
+      can be used without corrupting the output buffers.
+    </para>
+
+    <variablelist>
+      <varlistentry>
+	<term>void log_msg(const char* fmt, ...)</term>
+	<listitem>
+	  <para>
+	    Display a message if verbose output is enabled. By default
+	    the messages are always written to the disk file, but
+	    optionally displayed in the terminal.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>log_error(const char* fmt, ...)</term>
+	<listitem>
+	  <para>
+	    Display an error message if verbose output is enabled. By
+	    default the error messages are always written to the disk
+	    file, but optionally displayed in the terminal.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>log_warning(const char* fmt, ...)</term>
+	<listitem>
+	  <para>
+	    Display a warning message if verbose output is enabled. By
+	    default the error messages are always written to the disk
+	    file, but optionally displayed in the terminal.
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+      
+  </sect3>
+
+  <sect3 id="cppapi">
+    <title>Logging System C++ API</title>
+
+    <para>
+      This is the new C++ streams based API that can be used to print
+      C++ objects natively. All output lines are timestamped.       
+    </para>
+
+    <para>
+      There are two macros used for program tracing. these can be used
+      in both C or C++ code with one little difference. Since C
+      doesn't have destructors, you must call
+      <emphasis>GNASH_REPORT_RETURN</emphasis> at the end of a function to
+      display the function returning message.
+    </para>
+
+    <variablelist>
+      <varlistentry>
+	<term>GNASH_REPORT_FUNCTION;</term>
+	<listitem>
+	  <para>
+	    When this is included in a C++ method, a message is
+	    printed when entering and exiting this method by hooking
+	    into the constructor and destructor. These are always
+	    written to the disk file, but optionally written to the
+	    screen only at the highest levels of verbosity.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>GNASH_REPORT_RETURN;</term>
+	<listitem>
+	  <para>
+	    This is used by C functions to print the returning from
+	    function debug message. For C++, this macro is executed
+	    automatically by the destructor.
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+
+    <para>
+      This is the main API for the logging system. By default
+      everything is setup to write to the default
+      <emphasis>gnash-dbg.log</emphasis> file whenever a verbose option is
+      supplied. Optionally it is possible to open a log file with a
+      specified name, allowing multiple output files.
+    </para>
+    
+    <variablelist>
+      <varlistentry>
+	<term>openLog(const char *filespec)</term>
+	<listitem>
+	  <para>
+	    Open the debug file with the name specified by
+	    <emphasis>filespec</emphasis>. This file goes in the current
+	    directory, or your home directory if using a menu based
+	    launcher.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>closeLog(void)</term>
+	<listitem>
+	  <para>
+	    Close a debug log. The disk file remains.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>removeLog(void)</term>
+	<listitem>
+	  <para>
+	    Delete the debug log file from disk.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>setVerbosity(void)</term>
+	<listitem>
+	  <para>
+	    Increment the verbosity level.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>setVerbosity(int)</term>
+	<listitem>
+	  <para>
+	    Set the verbosity level.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>setStamp(bool flag)</term>
+	<listitem>
+	  <para>
+	    If <emphasis>flag</emphasis> is <emphasis>true</emphasis>, then print a
+	    timestamp prefixed to every output line. If
+	    <emphasis>flag</emphasis> is <emphasis>false</emphasis>, then don't print
+	    a timestamp.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry>
+	<term>setWriteDisk(bool flag)</term>
+	<listitem>
+	  <para>
+	    If <emphasis>flag</emphasis> is <emphasis>true</emphasis>, then create the
+	    disk file. If <emphasis>flag</emphasis> is <emphasis>false</emphasis>,
+	    then don't create the disk file.
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+
+  </sect3>
+
+</sect2>

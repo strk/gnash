@@ -1,0 +1,353 @@
+<sect4 id="mozplugin">
+  <title>Mozilla/Firefox Plugin</title>
+
+  <para>
+    The Mozilla SDK has two API layers for plugins. The older layer is
+    documented in the <ulink type="http"
+    url="http://www.gnu.org/software/gnash/manual/plugin.pdf">
+    Geeko Plugin API Reference</ulink>, and the newer layer doesn't
+    appear to be documented. The new API is simpler, and is portable
+    across multiple versions of Mozilla or Firefox. The new API is
+    just a layer on top of the older one, so this manual still
+    applies.
+  </para>
+
+  <para>
+    Most of the programming of a plugin is filling in real emphasis for
+    the standard API functions and methods. Firefox uses these to
+    create the plugin, and to send it data.
+  </para>
+
+  <para>
+    When initializing or destroying a plugin, no matter how many
+    instances are being used, the C API is used. These functions are
+    typically called once for each plugin that is loaded.
+  </para>
+    
+  <sect5 id="plugincapi">
+    <title>Plugin C API</title>
+
+    <para>
+      The lower layer is a C based API which is used by Firefox to
+      initialize and destroy a plugin. This is so a plugin can be
+      portable across multiple systems, since C++ emphasis is not portable
+      between most C++ compilers. This is where most of the behind the
+      scenes work is done in a plugin. For Gnash, the sources this
+      lower layer are in <emphasis>plugin/mozilla-sdk</emphasis>. They were
+      added to the Gnash source tree so it wouldn't be necessary to
+      have the Mozilla development packages installed to compile the
+      Gnash plugin.
+    </para>
+
+    <para>
+      This is also the older API used for plugins, so is usually the
+      one used if you dig around for plugin examples on the web. These
+      are the main functions which have to be implemented in a plugin
+      for it to be recognized by the browser, and to be initialized
+      and destroyed.
+    </para>
+
+    <variablelist>
+      <varlistentry>
+	<term>NS_PluginInitialize</term>
+	<listitem>
+	  <para>
+	    This C function gets called once when the plugin is
+	    loaded, regardless of how many instantiations there are
+	    actually playing movies. So this is where all the one
+	    time only initialization stuff goes that is shared by all
+	    the threads.
+	  </para>
+	  
+	</listitem>
+      </varlistentry>
+      
+      <varlistentry>
+	<term>NS_NewPluginInstance</term>
+	<listitem>
+	  <para>
+	    This instantiates a new object for the browser. Returning
+	    a pointer to the C++ plugin object is what ties the C++
+	    and C emphasis parts of the API together.
+	  </para>
+	</listitem>
+      </varlistentry>
+      
+      <varlistentry>
+	<term>NS_DestroyPluginInstance</term>
+	<listitem>
+	  <para>
+	    This destroys our instantiated object when the browser is
+	    done.
+	  </para>
+	</listitem>
+      </varlistentry>
+      
+      <varlistentry>
+	<term>NS_PluginShutdown</term>
+	<listitem>
+	  <para>
+	    This is called when a plugin is shut down, so this is
+	    where all the one time only shutdown stuff goes.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>NPP_GetMIMEDescription</term>
+	<listitem>
+	  <para>
+	    This is called to get the MIME types the plugin supports.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>NS_PluginGetValue</term>
+	<listitem>
+	  <para>
+	    This is used by Firefox to query information from the
+	    plugin, like the supported MIME type, the version number,
+	    and a description.
+	  </para>
+	</listitem>
+      </varlistentry>      
+    </variablelist>
+  </sect5>
+
+  <sect5 id="plugincppapi">
+    <title>Plugin C++ API</title>
+
+    <para>
+      The higher level layer is the one we are most concerned
+      with. This is an instantiation of the
+      <emphasis>nsPluginInstanceBase</emphasis> class, as defined by the
+      Mozilla SDK, for our plugin. With this API, a plugin is mostly
+      defining the standard entry points for Firefox, and the emphasis
+      that implements the glue between the Firefox and our plugin.
+    </para>
+
+    <para>
+      These are called for each instantiation of plugin. If there are
+      three Flash movies on a web page, then three instances are
+      created. Unfortunately for plugin programmers, these functions
+      may randomly be called more than once, so it's good to use
+      initialization flags for things that should only be done one per
+      thread. For instance, <emphasis>nsPluginInstance::init()</emphasis> and
+      <emphasis>nsPluginInstance::SetWindow()</emphasis> are called more than
+      once, so the plugin must protect against actions that could be
+      destructive.
+    </para>
+
+    <variablelist>
+      <varlistentry>
+	<term>nsPluginInstance::nsPluginInstance</term>
+	<listitem>
+	  <para>
+	    Create a new plugin object.
+	  </para>
+	</listitem>
+      </varlistentry>
+    
+      <varlistentry>
+	<term>nsPluginInstance::init</term>
+	<listitem>
+	  <para>
+	    This methods initializes the plugin object, and is
+	    called for every movie which gets played. This is where
+	    the thread-specific information goes.
+	  </para>
+	</listitem>
+      </varlistentry>
+      
+      <varlistentry>
+	<term>nsPluginInstance::SetWindow</term>
+	<listitem>
+	  <para>
+	    This sets up the window the plugin is supposed to render
+	    into. This calls passes in various information used by
+	    the plugin to setup the window. This may get called
+	    multiple times by each instantiated object, so it can't
+	    do much but window specific setup here. This is where the
+	    main emphasis is that sets up the window for the plugin.
+	  </para>
+	</listitem>
+      </varlistentry>
+      
+      <varlistentry>
+	<term>nsPluginInstance::NewStream</term>
+	<listitem>
+	  <para>
+	    Opens a new incoming data stream, which is the flash
+	    movie we want to play. A URL can be pretty ugly, like in
+	    this example:
+	    http://www.sickwave.com/swf/navbar/navbar_sw.swf?atfilms=http%3a//www.atm.com/af/home/&amp;shickwave=http%3a//www.sickwave.com&amp;gblst=http%3a//gbst.sickwave.com/gb/gbHome.jsp&amp;known=0 ../flash/gui.swf?ip_addr=foobar.com&amp;ip_port=3660&amp;show_cursor=true&amp;path_prefix=../flash/&amp;trapallkeys=true"
+	    So this is where we parse the URL to get all the options
+	    passed in when invoking the plugin.
+	  </para>
+	</listitem>
+      </varlistentry>
+      
+      <varlistentry>
+	<term>nsPluginInstance::Write</term>
+	<listitem>
+	  <para>
+	    Read the data stream from Mozilla/Firefox.  For now we
+	    read the bytes and write them to a disk file.
+	  </para>
+	</listitem>
+      </varlistentry>
+      
+      <varlistentry>
+	<term>nsPluginInstance::WriteReady</term>
+	<listitem>
+	  <para>
+	    Return how many bytes we can read into the buffer.
+	  </para>
+	</listitem>
+      </varlistentry>
+      
+      <varlistentry>
+	<term>nsPluginInstance::DestroyStream</term>
+	<listitem>
+	  <para>
+	    Destroy the data stream we've been reading. For Gnash,
+	    when the stream is destroyed means we've grabbed the
+	    entire movie. So we signal the thread to start reading and
+	    playing the movie.
+	  </para>
+	</listitem>
+      </varlistentry>
+      
+      <varlistentry>
+	<term>nsPluginInstance::shut</term>
+	<listitem>
+	  <para>
+	    This is where the movie playing specific shutdown emphasis goes.
+	  </para>
+	</listitem>
+      </varlistentry>
+      
+      <varlistentry>
+	<term>nsPluginInstance::~nsPluginInstance</term>
+	<listitem>
+	  <para>
+	    This destroys our plugin object.
+	  </para>
+	</listitem>
+      </varlistentry>
+    
+      <varlistentry>
+	<term>NS_PluginInitialize::initGL</term>
+	<listitem>
+	  <para>
+	    This is a Gnash internal function that sets up OpenGL.
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>NS_PluginInitialize::destroyContext</term>
+	<listitem>
+	  <para>
+	    This is a Gnash internal function that destroys a GLX
+	    context. 
+	  </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>nsPluginInstance::getVersion</term>
+	<listitem>
+	  <para>
+	    This returns the version of Mozilla this plugin supports.
+	  </para>
+	</listitem>
+      </varlistentry>
+      
+      <varlistentry>
+	<term>nsPluginInstance::GetValue</term>
+	<listitem>
+	  <para>
+	    This returns information to the browser about the plugin's
+	    name and description.
+	  </para>
+	</listitem>
+      </varlistentry>
+      
+      <varlistentry>
+	<term>nsPluginInstance::URLNotify</term>
+	<listitem>
+	  <para>
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist> 
+  </sect5>
+
+  <sect5 id="glthread">
+    <title>OpenGL and Threads</title>
+    <para>
+      Neither OpenGL nor X11 has any built-in support for threads. Most
+      actions aren't even atomic, so care has to be made to not corrupt
+      any internal data. While it is difficult to render OpenGL from
+      multiple threads, it can be done with the proper locking. The
+      downside is the locking adds a performance hit, since all the
+      threads will have to have the access synchronized by using
+      mutexes.
+    </para>
+    
+    <para>
+      The X11 context is maintained one per instantiation of the
+      plugin. It is necessary to lock access to the X11 context when
+      using threads by using <emphasis>XLockDisplay()</emphasis> and
+      <emphasis>XUnlockDisplay()</emphasis>. A connection to the X11
+      server is opened for every instantiation of the plugin using
+      <emphasis>XOpenDisplay()</emphasis>.
+    </para>
+    
+    <para>
+      The <emphasis>GLX Context</emphasis> is maintained one per
+      instantiation of the plugin for a web page. If there are more
+      than one Flash movie, there is more than one GLX Context. A GLX
+      context can be created by using <emphasis>glXCreateContext()</emphasis>,
+      and then later destroyed by using <emphasis>glXDestroyContext()</emphasis>.
+      When swapping threads, the context is changed using
+      <emphasis>glXMakeCurrent()</emphasis>.
+    </para>
+    
+    <para>
+      All the emphasis that directly accesses a GLX context or the X11
+      display must be wrapped with a mutex.
+    </para>
+    
+  </sect5>
+  
+  <sect5 id="eventhandle">
+    <title>Plugin Event Handling</title>
+    <para>
+      Firefox on most UNIX systems is a GTK+ application, so it is
+      possible to have the plugin hook into the X11 event handling via
+      GLX or GTK. Since Firefox uses GTK, so does Gnash. This also
+      allows the addition of a right-click mouse menu for controlling
+      the player. The GTK build of Gnash offers the best browsing
+      experience as it's more functional than the SDL version.
+    </para>
+
+    <para>
+      It is also possible to disable the <emphasis>GTK</emphasis> support so
+      only the older <emphasis>SDL</emphasis> support is used. In this case 
+      Gnash can't support event handling within the browser. This
+      means that when using the SDL of the plugin, mouse clicks and
+      keys pressed get ignored. Windows also can't be resized, and
+      sometimes they overrun their boundaries as well. To disable the
+      GTK support and force SDL to be used anyway, configure with
+      <emphasis>--disable-glext</emphasis>
+    </para>
+
+    <para>
+      
+    </para>
+
+  </sect5>  
+</sect4>
