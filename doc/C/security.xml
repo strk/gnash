@@ -1,0 +1,108 @@
+  <sect1 id="spec-security">
+    <title>Security</title>
+    
+    <para>
+      Many Flash implementations contain potential security exploits that
+      could compromise a viewer's system.  With &app;, an end-user has the
+      ability to see "what's going on" &mdash; what types of data the
+      application accesses, where it is found, and how it is used. Many
+      known Flash exploits are included in the &app; test suite that is
+      used to check whether a release is ready for the public. The &app;
+      developers are also in the process of a security review, developing a
+      security layer that will protect an end-user, no matter what operating
+      system they use. 
+    </para>
+    
+    <para>
+      One early security feature is the blacklist/whitelist.  Flash movies
+      running in a browser can make outgoing network connections. This can
+      be used, for example, to compromise a network device inside a
+      company firewall via a Flash movie running on an employee's
+      browser. &app; allows you to blacklist hosts that you know are
+      insecure, or to whitelist hosts you know are secure, by editing a
+      configuration file.
+    </para>
+    
+    <sect2 id="lso">
+      <title>Local Shared Objects</title>
+      
+      <para>
+	SWF movies support a form of persistant storage called Local
+	Shared Objects. These are stored in the subdirectories of one's
+	<emphasis>~/.macromedia</emphasis> configuration. These files
+	are comonly called &quot;Flash Cookies&quot;, as they don't get
+	deleted when the SWF movie that created or writes data to them
+	stops executing. These files often store things like game
+	scores. 
+      </para>
+      
+      <para>
+	Till recently, what was contained in these files wasn't widely
+	known. There are several LSO file utilities floating around on
+	the Web. Gnash has it's own <emphasis>soldumper</emphasis>
+	program that lets one find and dump the contents of these
+	files. As of yet, I haven't discovered any nasty privacy issues
+	yet, but as Gnash's SharedObject support is new, I may have just
+	been lucky.
+      </para>
+      
+      <para>
+	An LSO file uses a <emphasis>.sol</emphasis>suffix, and is
+	stored in binary, big endian format. While one can look at the
+	data in any binary editor or hex dumper, it's easier to use
+	soldumper, which knows how to decode all the objects. The data
+	is stored in AMF format, a simple data interhange formats used
+	in several other places in SWF.
+      </para>
+      
+      <para>
+	The one security setting Gnash supports is the
+	<emphasis>SOLReadOnly</emphasis> setting for your $HOME/.gnashrc
+	file. This makes Gnash never write to a .sol file, it only reads
+	them. You can also set <emphasis>SOLSafeDir</emphasis> to a safe
+	subdirectory,or even remove it later, although most people
+	willwant to set this path to the default one created bythe other
+	SWF player.
+      </para>
+      
+    </sect2>
+    
+    <sect2 id="lc">
+      <title>Local Connections</title>
+      
+      <para>
+	SWF movies support a form of data interchange between running
+	SWF movies called LocalConnection. This uses a shared memory
+	segment to exchange AMF objects. While the specification claim
+	an application has to register as a Listener, it turns out in
+	reality this isn't required. Even YouTube violates this
+	requirement. While one would think that data written to this
+	memory segment would go away when the SWF movies are done
+	playing, but they are persistant, and on some systems, the data
+	even survives a reboot. Thank you Solaris...
+      </para>
+      
+      <para>
+	The Gnash utility <emphasis>dumpshm</emphasis> can be used to do
+	several things with these shared memory segments. This utility
+	can find the shared memory segment left by using other SWF
+	players to see what has been left. it can then dump the contents
+	of the shared mempory segment either by decoding the AMF objects
+	and printing the values, or by dumping the raw file to disk
+	where you can analysze it with any other program you wish. If
+	you run dumpshm repeatedly, you can even do a crude packet
+	sniffing between two SWF movies playing.
+      </para>
+      
+      <para>
+	The only current security related option for this is
+	<emphasis>LocalConnection</emphasis>. This just disables all
+	communication with other SWF movies. Work is in progress on
+	adding a tracing ability to Gnash.
+      </para>
+      
+    </sect2>
+ 
+</sect1>
+
+</chapter>
