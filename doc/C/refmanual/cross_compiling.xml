@@ -1,104 +1,113 @@
-<title>Cross Compiling</title>
+<sect1 id="cross">
+  <title>Cross Configuring</title>
+  
+  <para>
+    To cross configure and compile &app;, begin by building a target system
+    on your workstation.  This includes cross compilers for the target
+    architecture, and some system headers. 
+    You will also need to cross compile all the <link linkend="docdepend">dependencies  
+    </link> normally needed to build Gnash. This can on occasion be a
+    daunting process, as not libraries will cross configure and cross
+    compile. There is more information about cross compiling all the
+    dependant packages on the <ulink type="http"
+    url="http://www.gnashdev.org">http://www.gnashdev.org</ulink> web
+    site.
+  </para>
 
-<para>
-  To cross configure and compile &app;, begin by building a target system
-  on your workstation.  This includes cross compilers for the target
-  architecture, and some system headers. 
-  You will also need the following packages to be built for the target
-  system: <emphasis>libxml2</emphasis>, <emphasis>libpng</emphasis> 
-  (if used), <emphasis>libjpeg</emphasis>,oost  <emphasis>b</emphasis>, your
-  GUI library, your renderer, and your video handler (if used).  The page
-  <ulink url="http://frank.harvard.edu/~coldwell/toolchain/"
-	 type="http">http://frank.harvard.edu/~coldwell/toolchain/</ulink>
-  has instructions on building a target system from scratch and
-  offers a shell script to make the process easier.
-</para>
-
-<para>
-  If you need to build up a target system from scratch, there is
-  a good document and shell script at this web site: <ulink
-  type="http"
-  url="http://frank.harvard.edu/~coldwell/toolchain/">
-  http://frank.harvard.edu/~coldwell/toolchain/</ulink>.
-</para>
-
-<para>
-  There is also up to date information on the Gnash Developers
-  web site at: <ulink type="http" url="http://www.gnashdev.org">
-  http://www.gnashdev.org</ulink>. This is the best place for
-  detailed informatin on various systems.
-</para>
-
-<para>
-  After I built up an ARM system in /usr/arm using the shell
-  script from this web site, I then cross compiled all the
-  other libraries I needed. The fun part is trying to get
-  libMesa and boost to cross compile, because they're not really set
-  up for it.
-</para>
-
-<para>
-  So to build for an ARM based system on an x86 based systems,
-  configure like this: 
-</para>
-
-<programlisting>
-  ../../gnash/configure --build=i686-pc-linux-gnu
-  --host=arm-linux --prefix=/usr/local/arm/oe --disable-nsapi
-  --disable-kparts --enable-gui=fb --enable-renderer=agg --disable-shared
-</programlisting>
-
-<para>
-  The important configuration options are the ones which specify the
-  architecture for the build:
-</para>
-
-<variablelist>
-
-  <varlistentry>
-    <term>--target</term>
-    <listitem>
-      <para>
-        The target architecture, where the final executables are expected
-        to run.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--host</term>
-    <listitem>
-      <para>
-        The host architecture, where the executables are expected
-        to run.  Usually this is the same as the <emphasis>--target</emphasis>,
-        except when building a compiler as a Canadian Cross.  In this
-        case, you might build a cross compiler on a UNIX system which
-        runs on a win32 machine, producing code for a third architecture,
-        such as ARM.  In this example, <emphasis>--target</emphasis> would
-        be 'arm-unknown-linux-gnu', while <emphasis>--host</emphasis> would 
-        be 'win32'.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--build</term>
-    <listitem>
-      <para>
-        This is the system the build is running on.
-      </para>
-    </listitem>
-  </varlistentry>
-
-</variablelist>
-
-<para>
-  The following example of <emphasis>configure</emphasis> builds for an
-  ARM system on an x86 system.  It was run after an ARM system was built
-  in <filename>/usr/arm</filename> and other required libraries were 
-  cross compiled.
+  <para>
+    If you need to build your own tool chain, that is beyond the scope
+    of this manual. There are various resources on the web for howto's
+    on building GCC based cross toolchains. Two popular sites are
+    <ulink url="http://frank.harvard.edu/~coldwell/toolchain/"
+	   type="http">http://frank.harvard.edu/~coldwell/toolchain/</ulink>
+    and <ulink url="http://www.kegel.com/crosstool/" 
+	   type="http">http://www.kegel.com/crosstool/</ulink>. This
+    can also be a very time consuming and frustrating process, even
+    for experienced developers.
+  </para>
+  
+  <para>
+    Because the process of building your own cross tool chain can be
+    harder than one may wish, there are several other cross
+    development environments that simulate a native environment to
+    make it easier to develop. These also let you develop for both
+    native and cross builds. Several popular ones are 
+    <ulink url="http://www.access-company.com/products/linux/alp.html" type="http">
+    Access Linux Platform</ulink>, 
+    <ulink url="http://www.scratchbox.org/" type="http">
+    Scratchbox</ulink>, 
+    <ulink url="http://www.openembedded.org/" type="http">
+    Open Embedded</ulink>, 
+    <ulink url="http://maemo.org/" type="http">
+    Maemo</ulink>.
+  </para>
+  
+  <para>
+    To build for an ARM based system on an x86 based systems,
+    configure like this using the traditional style cross toolchain,
+    configure like this:
+  </para>
+  
   <programlisting>
-./configure -target=arm-unknown-linux-gnu --prefix=/usr/arm \
---host=arm-unknown-linux-gnu --build=i686-pc-linux-gnu --disable-plugin
+    ../../gnash/configure --build=i686-pc-linux-gnu
+    --host=arm-linux --prefix=/usr/local/arm/oe --disable-nsapi
+    --disable-kparts --enable-gui=fb --enable-renderer=agg
+    --disable-shared --disable-menus
+    
   </programlisting>
-</para>
+  
+  <para>
+    The important configuration options are the ones which specify the
+    architecture for the build:
+  </para>
+  
+  <variablelist>
+    
+    <varlistentry>
+      <term>--target</term>
+      <listitem>
+	<para>
+	  The target architecture, where the final executables are expected
+	  to run.
+	</para>
+      </listitem>
+    </varlistentry>
+    
+    <varlistentry>
+      <term>--host</term>
+      <listitem>
+	<para>
+	  The host architecture, where the executables are expected
+	  to run.  Usually this is the same as the <emphasis>--target</emphasis>,
+	  except when building a compiler as a Canadian Cross.  In this
+	  case, you might build a cross compiler on a UNIX system which
+	  runs on a win32 machine, producing code for a third architecture,
+	  such as ARM.  In this example, <emphasis>--target</emphasis> would
+	  be 'arm-unknown-linux-gnu', while <emphasis>--host</emphasis> would 
+	  be 'win32'.
+	</para>
+      </listitem>
+    </varlistentry>
+    
+    <varlistentry>
+      <term>--build</term>
+      <listitem>
+	<para>
+	  This is the system the build is running on.
+	</para>
+      </listitem>
+    </varlistentry>
+    
+  </variablelist>
+  
+  <para>
+    The following example of <emphasis>configure</emphasis> builds for an
+    ARM system on an x86 system.  It was run after an ARM system was built
+    in <filename>/usr/arm</filename> and other required libraries were 
+    cross compiled.
+    <programlisting>
+      ./configure -target=arm-unknown-linux-gnu --prefix=/usr/arm \
+      --host=arm-unknown-linux-gnu --build=i686-pc-linux-gnu --disable-plugin
+    </programlisting>
+  </para>
+</sect1>

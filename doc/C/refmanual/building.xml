@@ -1,201 +1,295 @@
-<title>Building from Source</title>
+<chapter id="build">
+  <title>Building from Source</title>
 
-<para>
-  Once you have <link linkend="pre-configuration">configured</link> &app;,
-  you are ready to build the code.  &app; is built using
-  <emphasis>GNU make</emphasis>.
-</para>
-
-<sect2 id="compile">
-  <title>Compiling the Code</title>
-
-  <para>
-    The most basic way to compile code is simply:
-    <programlisting>
-  make
-    </programlisting>
-    If the compilation ends with an error, check the output of 
-    <emphasis>configure</emphasis> and ensure that you are not missing 
-    any required prerequisites.  The output of <command>make</command> can be verbose; you may wish to pipe the output to a file.
-  </para>
-
-  <para>
-    The variables used by <emphasis>make</emphasis> can be redefined when
-    the program is invoked, if you desire it.   The most interesting flags
-    are <emphasis>CFLAGS</emphasis> and <emphasis>CXXFLAGS</emphasis>,
-    which are often used to enable debugging or turn of optimization.
-    The default value for both of these variables is
-    <emphasis>-O2 -g</emphasis>.  A list of influential 
-    environment variables can be seen in the configuration help:
-</para>
-<programlisting>./configure --help</programlisting>
-<para>
-    In the following example, debugging is enabled and optimization is
-    disabled:
-</para>
-<programlisting>make CFLAGS=-g CXXFLAGS=-g</programlisting>
-</sect2>
-
-<sect2 id="processdoc">
-  <title>Creating the Documentation</title>
-
-  <para>
-    By default, documentation is not built when you
-    <link linkend="install">install</link> &app;.  This is because
-    there are a number of <link linkend="docdepend">dependencies 
-    for the documentation</link>.  Documentation is built when it
-    is specified with a specific target in the generated 
-    <command>Makefile</command> in the <filename>doc/C</filename>
-    sub-directory.  If you type <command>make install</command> in
-    this directory, all documents will be built.
-  </para>
-
-  <para>
-    You must specify a target output format when you wish to create
-    documentation.  The available output formats are: <command>html</command>,
-    <command>pdf</command>, <command>info</command>, 
-    <command>man</command>, and <command>alldocs</command>.  
-    It is also possible to output <command>GNOME help</command> if
-    the <link linkend="features">configure option</link>
-    <option>--enable-ghelp</option> was used.  
-    The <command>alldocs</command> target will build all output formats
-    except <emphasis>GNOME help</emphasis>.
-    For example, to create HTML output, type:
-    <programlisting>
-  make html
-    </programlisting>
-  </para>
-
-  <para>
-    &app; also uses <ulink url="http://www.stack.nl/~dimitri/doxygen/index.html"
-    type="http">Doxygen</ulink> to produce <emphasis>HTML</emphasis>
-    documentation of &app; internals.  You must have Doxygen installed
-    to produce this documentation, which is built from the
-    <filename>doc</filename> directory with the command (documents
-    will be placed in the subdirectory <filename>apidoc/html</filename>):
-    <programlisting>
-  make apidoc
-    </programlisting>
-  </para>
-</sect2>
-
-
-<sect2 id="runtests">
-  <title>Running the Tests</title>
-
-  <para>
-    Before beginning the potentially lengthy install, it is wise to test the installation.  If a test fails, please report it by following the
-    <link linkend="bugreport">instructions for reporting a bug</link>.
-  </para>
-
-  <sect3 id="dejagnu">
-    <title>Using DejaGnu</title>
-
+  <sect1 id="building_overview">
+    <title>Overview</title>
     <para>
-  <!--
-      TODO: Add a section on running tests without DejaGnu.
-  -->
-      The easiest way to run &app;'s test suite is to install
-      <emphasis><ulink type="http" 
-      url="http://www.gnu.org/software/dejagnu">DejaGnu</ulink></emphasis>.
-      After installing DejaGnu, run:
+      The typical process of building from source will involve 
+      <link linkend="gettingsource">getting the source</link>,
+      <link linkend="dependencies">build dependencies</link>,
+      <link linkend="configure">configuration</link>, 
+      <link linkend="compile">compilation</link>,
+      <link linkend="runtests">testing</link>, and
+      <link linkend="install">installation</link>.
+      A simplified overview of the process would be:
       <programlisting>
+        ./autogen.sh
+        ./configure 
+        make
         make check
+        make install
       </programlisting>
     </para>
-  
-    <sect4 id="testing_verbosity">
-      <title>Increasing Verbosity</title>
-      <para>
-        If you encounter a problem with a test, increasing the
-        verbosity may make the issue easier to spot.
-        Additional details are visible when 
-        <emphasis>RUNTESTFLAGS</emphasis> are used to add the 
-        <emphasis>verbose</emphasis> and <emphasis>all</emphasis> options.
-        The <option>verbose</option> option prints more information about the testing process, while
-        the <option>all</option> option includes details on passing tests.  
-        <programlisting>
-  make check RUNTESTFLAGS="-v -a"
-        </programlisting>
-      </para> 
-    </sect4>
-     
-    <sect4 id="running_some_tests">
-      <title>Running Some Tests</title>
-      <para>
-        It is possible to run just a single test, or 
-        a subdirectory of tests, by specifying the directory or 
-        compiled test file.
-      </para>
-      <para>
-        Some tests rely on <emphasis>testsuite/Dejagnu.swf</emphasis>,
-        which in turn relies on <emphasis>Ming</emphasis>.
-        This file is created when you run <command>make check</command> for the entire
-        testsuite, and can also be created on demand:
-        <programlisting>
-  make -C testsuite Dejagnu.swf 
-        </programlisting>
-      </para>
-      <para>
-        In this example, the <command>clip_as_button2</command> test is compiled and
-        run:
-        <programlisting>
-  make -C testsuite/samples clip_as_button2-TestRunner 
-  cd testsuite/samples &amp;&amp; ./clip_as_button2-TestRunner
-        </programlisting>
-        This creates and runs all the tests in the directory
-        <filename>movies.all</filename>:
-        <programlisting>
-  make -C testsuite/movies.all check
-        </programlisting>
-      </para>
-    </sect4>
-     
-  </sect3>
-  <sect3 id="manually">
-    <title>Running The Tests Manually</title>
-     
+
     <para>
-      You may also run test cases by hand, which can be useful if you
-      want to see all the debugging output from the test case.  Often
-      the messages which come from deep within &app; are most useful for
-      development.
+      If you are compiling with GCC you will probably need to use a machine
+      with at least 128 megabytes of physical RAM; 64MB is not enough for a
+      couple of the files, even with swap enabled and optimisation turned off.
+    </para>
+    <para>
+      At present the Gnash source is about 30 MB to extracted and configured
+      and requires a total of about 125 megabytes to compile it.
+    </para>
+    <para>
+      Continue reading for detailed step-by-step instructions 
+      of the entire procedure.
     </para>  
-     
+
+  </sect1>
+
+  <sect1 id="gettingsource">
+    <title>Getting The Source</title>
+
+    <sect2 id="sourcereleases">
+      <title>Releases</title>
+      <para>
+	Tarballs of official releases can be found in the download area
+	of the project's GNU Savannah page at
+	<ulink type="http"
+	       url="http://savannah.gnu.org/projects/gnash">
+		    http://savannah.gnu.org/projects/gnash
+	</ulink> 
+	or under
+	<ulink type="http"
+	       url="http://ftp.gnu.org/gnu/gnash">
+		    http://ftp.gnu.org/gnu/gnash
+	</ulink> 
+      </para>
+    </sect2>
+
+    <sect2 id="sourcecvs">
+      <title>CVS Access</title>
+      <para>
+	The latest Gnash development sources are available via anonymous CVS.
+	Use the following commands to check them out
+	(just hit return when you are prompted for the password):
+	<programlisting>
+	  export CVS_RSH=ssh
+	  cvs -z3 -d:pserver:anonymous@cvs.sv.gnu.org:/sources/gnash co gnash
+	</programlisting>
+	you will then be able to update your copy from the repository using
+	<programlisting>
+	  cd gnash
+	  cvs update -d
+	</programlisting>
+      </para>
+      <para>
+	If you only have access to the internet via a web proxy,
+	you will find daily source snapshots of the latest CVS tree in
+	<ulink type="http"
+	       url="http://www.gnashdev.org/dev_snapshots/">
+		    http://www.gnashdev.org/dev_snapshots
+	</ulink> 
+      </para>
+    </sect2>
+  </sect1>
+
+  &codedependencies;
+  &testdependencies;
+  &docdependencies;
+
+  &configuration;
+
+  <para>
+    Once you have <link linkend="pre-configuration">configured</link> &app;,
+    you are ready to build the code.  &app; is built using
+    <emphasis>GNU make</emphasis>.
+  </para>
+  
+  <sect1 id="compile">
+    <title>Compiling the Code</title>
+    
     <para>
-      The first step is to compile the test case, which can be done
-      with <filename>make XML-v#.swf</filename> where the '#' is replaced
-       with the <emphasis>target</emphasis> SWF version or versions.  
-      For example:
+      The most basic way to compile code is simply:
       <programlisting>
-  make XML-v{5,6,7,8}.swf
+	make
+      </programlisting>
+      If the compilation ends with an error, check the output of 
+      <emphasis>configure</emphasis> and ensure that you are not missing 
+      any required prerequisites.  The output of <command>make</command> can be verbose; you may wish to pipe the output to a file.
+    </para>
+    
+    <para>
+      The variables used by <emphasis>make</emphasis> can be redefined when
+      the program is invoked, if you desire it.   The most interesting flags
+      are <emphasis>CFLAGS</emphasis> and <emphasis>CXXFLAGS</emphasis>,
+      which are often used to enable debugging or turn of optimization.
+      The default value for both of these variables is
+      <emphasis>-O2 -g</emphasis>.  A list of influential 
+      environment variables can be seen in the configuration help:
+    </para>
+    <programlisting>./configure --help</programlisting>
+    <para>
+      In the following example, debugging is enabled and optimization is
+      disabled:
+    </para>
+    <programlisting>make CFLAGS=-g CXXFLAGS=-g</programlisting>
+  </sect1>
+  
+  <sect1 id="processdoc">
+    <title>Creating the Documentation</title>
+    
+    <para>
+      By default, documentation is not built when you
+      <link linkend="install">install</link> &app;.  This is because
+      there are a number of <link linkend="docdepend">dependencies 
+      for the documentation</link>.  Documentation is built when it
+      is specified with a specific target in the generated 
+      <command>Makefile</command> in the <filename>doc/C</filename>
+      sub-directory.  If you type <command>make install</command> in
+      this directory, all documents will be built.
+    </para>
+    
+    <para>
+      You must specify a target output format when you wish to create
+      documentation.  The available output formats are: <command>html</command>,
+      <command>pdf</command>, <command>info</command>, 
+      <command>man</command>, and <command>alldocs</command>.  
+      It is also possible to output <command>GNOME help</command> if
+      the <link linkend="features">configure option</link>
+      <option>--enable-ghelp</option> was used.  
+      The <command>alldocs</command> target will build all output formats
+      except <emphasis>GNOME help</emphasis>.
+      For example, to create HTML output, type:
+      <programlisting>
+	make html
       </programlisting>
     </para>
+    
+    <para>
+      &app; also uses <ulink url="http://www.stack.nl/~dimitri/doxygen/index.html"
+      type="http">Doxygen</ulink> to produce <emphasis>HTML</emphasis>
+      documentation of &app; internals.  You must have Doxygen installed
+      to produce this documentation, which is built from the
+      <filename>doc</filename> directory with the command (documents
+      will be placed in the subdirectory <filename>apidoc/html</filename>):
+      <programlisting>
+	make apidoc
+      </programlisting>
+    </para>
+  </sect1>
   
-    <sect4 id="manual_compiled_tests">
-    <title>Movie tests</title>
+  <sect1 id="runtests">
+    <title>Running the Tests</title>
+    
+    <para>
+      Before beginning the potentially lengthy install, it is wise to
+      test the installation.  If a test fails, please report it by
+      following the <link linkend="bugreport">instructions for
+      reporting a bug</link>. 
+    </para>
+    
+    <sect2 id="dejagnu">
+      <title>Using DejaGnu</title>
+      
       <para>
-        This creates a Flash movie version of the test case, which
-        can be run with a standalone Flash player.  For instance,
-        the target for SWF version 6 could be run with &app;:
-        <programlisting>
-   gnash -v XML-v6.swf
-        </programlisting>
+	<!--
+	    TODO: Add a section on running tests without DejaGnu.
+	-->
+	The easiest way to run &app;'s test suite is to install
+	<emphasis><ulink type="http" 
+			 url="http://www.gnu.org/software/dejagnu">DejaGnu</ulink></emphasis>.
+	After installing DejaGnu, run:
+	<programlisting>
+	  make check
+	</programlisting>
       </para>
-    </sect4>
-  
-    <sect4 id="manual_actionscript_tests">
-      <title>ActionScript Unit Tests</title>
+      
+      <sect4 id="testing_verbosity">
+	<title>Increasing Verbosity</title>
+	<para>
+	  If you encounter a problem with a test, increasing the
+	  verbosity may make the issue easier to spot.
+	  Additional details are visible when 
+	  <emphasis>RUNTESTFLAGS</emphasis> are used to add the 
+	  <emphasis>verbose</emphasis> and <emphasis>all</emphasis> options.
+	  The <option>verbose</option> option prints more information about the testing process, while
+	  the <option>all</option> option includes details on passing tests.  
+	  <programlisting>
+	    make check RUNTESTFLAGS="-v -a"
+	  </programlisting>
+	</para> 
+      </sect4>
+      
+      <sect4 id="running_some_tests">
+	<title>Running Some Tests</title>
+	<para>
+	  It is possible to run just a single test, or 
+	  a subdirectory of tests, by specifying the directory or 
+	  compiled test file.
+	</para>
+	<para>
+	  Some tests rely on <emphasis>testsuite/Dejagnu.swf</emphasis>,
+	  which in turn relies on <emphasis>Ming</emphasis>.
+	  This file is created when you run <command>make check</command> for the entire
+	  testsuite, and can also be created on demand:
+	  <programlisting>
+	    make -C testsuite Dejagnu.swf 
+	  </programlisting>
+	</para>
+	<para>
+	  In this example, the <command>clip_as_button2</command> test is compiled and
+	  run:
+	  <programlisting>
+	    make -C testsuite/samples clip_as_button2-TestRunner 
+	    cd testsuite/samples &amp;&amp; ./clip_as_button2-TestRunner
+	  </programlisting>
+	  This creates and runs all the tests in the directory
+	  <filename>movies.all</filename>:
+	  <programlisting>
+	    make -C testsuite/movies.all check
+	  </programlisting>
+	</para>
+      </sect4>
+      
+    </sect2>
+    <sect2 id="manually">
+      <title>Running The Tests Manually</title>
+      
       <para>
-        Unit tests for ActionScript classes in <command>testsuite/actionscript.all</command>
-        are run without a graphical display:
-        <programlisting>
-  gprocessor -v XML-v6.swf
-        </programlisting>
+	You may also run test cases by hand, which can be useful if you
+	want to see all the debugging output from the test case.  Often
+	the messages which come from deep within &app; are most useful for
+	development.
+      </para>  
+      
+      <para>
+	The first step is to compile the test case, which can be done
+	with <filename>make XML-v#.swf</filename> where the '#' is replaced
+	with the <emphasis>target</emphasis> SWF version or versions.  
+	For example:
+	<programlisting>
+	  make XML-v{5,6,7,8}.swf
+	</programlisting>
       </para>
-    </sect4>
-  </sect3>
+      
+      <sect4 id="manual_compiled_tests">
+	<title>Movie tests</title>
+	<para>
+	  This creates a Flash movie version of the test case, which
+	  can be run with a standalone Flash player.  For instance,
+	  the target for SWF version 6 could be run with &app;:
+	  <programlisting>
+	    gnash -v XML-v6.swf
+	  </programlisting>
+	</para>
+      </sect4>
+      
+      <sect4 id="manual_actionscript_tests">
+	<title>ActionScript Unit Tests</title>
+	<para>
+	  Unit tests for ActionScript classes in <command>testsuite/actionscript.all</command>
+	  are run without a graphical display:
+	  <programlisting>
+	    gprocessor -v XML-v6.swf
+	  </programlisting>
+	</para>
+      </sect4>
+    </sect2>
 
+    &install;
 
-
-</sect2>
+    &crosscompiling;
+    
+  </sect1>
+</chapter>
