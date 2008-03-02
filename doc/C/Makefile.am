@@ -289,8 +289,8 @@ endif
 
 uninstall-info-hook:
 if ENABLE_INFO
-	-$(INSTALL_INFO) --remove $(DESTDIR)$(infodir)/gnash_user.info
-	-$(INSTALL_INFO) --remove $(DESTDIR)$(infodir)/gnash_ref.info
+	-$(INSTALL_INFO) --dir-file=$(DESTDIR)$(infodir)/dir --remove $(DESTDIR)$(infodir)/gnash_user.info
+	-$(INSTALL_INFO)  --dir-file=$(DESTDIR)$(infodir)/dir --remove $(DESTDIR)$(infodir)/gnash_ref.info
 endif
 	-$(RM) $(DESTDIR)$(infodir)/gnash_user.info
 	-$(RM) $(DESTDIR)$(infodir)/gnash_ref.info
