@@ -91,7 +91,7 @@ HTMLS  = $(XML_MAIN:.xml=.html)
 PDFS   = $(XML_MAIN:.xml=.pdf)
 TEXIS  = gnash_user.texi gnashuser.texi gnash_ref.texi gnashref.texi
 
-all-local: info html man
+all-local: images info html man
 
 gnashuser.html gnashuser.pdf gnash_user.info gnashuser.info: gnashuser.xml $(USERMAN)
 gnashref.html gnashref.pdf gnash_ref.info gnashref.info: gnashref.xml $(REFMAN)
