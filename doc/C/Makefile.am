@@ -158,18 +158,10 @@ if ENABLE_TEXI
 	  $(DB2X_TEXI) --encoding=us-ascii//TRANSLIT --string-param directory-description="Gnash" $< ; \
 	else \
 	  basefile="$*"; \
-          foo=`$(DB2X_XSLTPROC) -s texi $< --output $${basefile}.txml;` \
-	  out=`$(DB2X_TEXIXML) --encoding=us-ascii//TRANSLIT --list-files $${basefile}.txml` ; \
-	  out=`echo $${out} | sed -e 's: :\\\ :g'` 2>&1; \
-	  if test ! -f $${out}; then \
-	   out=`echo $${out} | tr -d '_'`; \
-	  fi; \
+          $(DB2X_XSLTPROC) -s texi $< --output $${basefile}.txml; \
+	  $(DB2X_TEXIXML) --info --encoding=us-ascii//TRANSLIT $${basefile}.txml ; \
 	  rm $${basefile}.txml; \
 	fi
-# 	  if test -f $${out}; then \
-# 	    mv $${out} $${basefile}.texi; \
-# 	  fi; \
-#	fi
 endif
 
 .texi.info:
@@ -284,6 +276,7 @@ endif
 uninstall-info-hook:
 if ENABLE_INFO
 	-$(INSTALL_INFO) --remove $(DESTDIR)$(infodir)/gnash_user.info
+	-$(INSTALL_INFO) --remove $(DESTDIR)$(infodir)/gnash_ref.info
 endif
 	-$(RM) $(DESTDIR)$(infodir)/gnash_user.info
 	-$(RM) $(DESTDIR)$(infodir)/gnash_ref.info
