@@ -270,8 +270,9 @@ install-html-hook: gnashuser.html gnashref.html
 install-info-hook: 
 if ENABLE_INFO
 	@test -d "$(DESTDIR)$(infodir)" || $(mkinstalldirs) "$(DESTDIR)$(infodir)"
-	$(INSTALL_DATA) gnash_user.info $(DESTDIR)$(infodir)/gnash_user.info 
-	$(INSTALL_DATA) gnash_ref.info $(DESTDIR)$(infodir)/gnash_ref.info 
+	for i in *.info; do \
+	  $(INSTALL_DATA) "$$i" $(DESTDIR)$(infodir)/"$$i"; \
+	done; \
 	type="`file $(INSTALL_INFO) | grep -ic " perl " 2>&1`"; \
 	if test $${type} -gt 0; then \
 	  $(INSTALL_INFO) --menuentry="\"Gnash User Manual\"" --quiet --description="\"Gnash User Manual\"" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash_user.info; \
