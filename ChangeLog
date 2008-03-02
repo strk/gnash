@@ -1,5 +1,18 @@
 2008-03-02  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* doc/C/Makefile.am: Furthur tweaking of the .xml.texi rule so it
+	works with versions to correctly produce both info files. On
+	Fedora, it kept only creating gnash_user.info
+	* doc/C/refmanual/internals.xml: Use <emphasis> instead of <code>,
+	as <code> doesn't appear to be supported on Fedora.
+	* doc/C/refmanual/extensions/extensions.xml: Use <emphasis>
+	instead of <code>, as <code> doesn't appear to be supported on
+	Fedora.
+	
+	* doc/C/Makefile.am: For the perl based version of the docbook
+	tools, pipe directly through makeinfo to avoid file name
+	transformation problems.
+	
 	* doc/C/Makefile.am: Print warning when linking to preformatted
 	versions that they may be out of date. Change path to preformatted
 	versions.

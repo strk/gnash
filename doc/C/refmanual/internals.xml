@@ -13,7 +13,7 @@
       and other useful utilitis for examining local Shared Objects and
       sniffingh LocalConnections.
     </para>
-
+    
     <sect2 id="The Libraries">
       <title>The Libraries</title>
       
@@ -30,8 +30,7 @@
 	  &app; makes heavy use of smart pointers, so memory allocations
 	  are freed up automatically by the interpreter. Both STL and
 	  Boost smart pointers are used.
-	</para>
-	
+	</para>	
       </sect3>
       
       <sect3 id="libgnashgeo">
@@ -40,7 +39,6 @@
 	<para>
 	  Libgnashgeo contains code for device independent graphics routines.
 	</para>
-	
       </sect3>
 
       <sect3 id="libgnashgui">
@@ -50,7 +48,6 @@
 	  Libgnashgui contains code for a portable GUI class that
 	  supports using GTK2, a framebuffer, SDL, or KDE, FLTK, or Aqua.
 	</para>
-	
       </sect3>
 
       <sect3 id="libgnashserver">
@@ -90,23 +87,22 @@
 	  code that glues this display to the Gnash. Supported
 	  rendering backends are OpenGL, Cairo, and AGG.
 	</para>
-	
       </sect3>
+
       <sect3 id="libgnashpluin">
 	<title>libgnashplugin</title>
 	
 	<para>
 	  Libgnashplugin is the Mozilla/Firefox plugin.
-	</para>
-	
+	</para>	
       </sect3>
+
       <sect3 id="libklashpart">
 	<title>libklashpart</title>
 	
 	<para>
 	  Libklashpart is the Konqueror plugin.
-	</para>
-	
+	</para>	
       </sect3>
     </sect2>
 
@@ -717,12 +713,11 @@
 
                 This will print a summary of tests run, and should be
 		called as the last step in your SWF generator.
-
 	</programlisting>
 	
       </para>
       
-	<para>
+      <para>
 	Test cases generated using Ming and the provided
 	<link linkend="ming_testgenerator_facilities">facilities</link>
 	will be self-contained, which means they can be used as tests
@@ -730,340 +725,339 @@
 	Any 'check' or 'check_equals' result will be both traced and
 	printed in a textfield. You can use 'gprocessor -v' to have
 	Gnash use them as tests.
-	</para>
-
-	<para>
+      </para>
+      
+      <para>
 	See section <link linkend="writing_test_runners">Writing Test Runners</link>
 	for information about writing SWF test runners.
-	</para>
-
-
-    </sect3>
-
+      </para>
+      </sect3>
     </sect2>
-
+    
     <sect2 id="writing_dejagnu_so_tests">
       <title>Writing self-contained SWF tests with other compilers</title>
-
-	<para>
+      
+      <para>
 	If you want/need to use a different compiler for your test cases (there's
 	plenty of open source tools for generating SWF out there), you can still
 	make use of a loadable SWF utility provided as part of the Gnash testsuite
 	to let your test consistent with the rest of the suite.
-	</para>
-
-	<para>
-	The loadable module is called <code>Dejagnu.swf</code> and is built during
-	<code>make check</code> under testsuite/misc-ming.all. In order to use it
+      </para>
+      
+      <para>
+	The loadable module is called <emphasis>Dejagnu.swf</emphasis> and is built during
+	<emphasis>make check</emphasis> under testsuite/misc-ming.all. In order to use it
 	you will need to load it into your SWF. We currently load it with an IMPORT
 	tag for our ActionScript based test cases, but you can probably also use
 	loadMovie or whatever works in the target SWF you're generating. Just make
 	sure that the module is initialized before using it. You can check this by
-	inspecting the <code>dejagnu_module_initialized</code> variable, which will
+	inspecting the <emphasis>dejagnu_module_initialized</emphasis> variable, which will
 	be set to 'true' when all initialization actions contained in the
-	<code>Dejagnu.swf</code> file are executed. 
-	</para>
-
-	<para>
+	<emphasis>Dejagnu.swf</emphasis> file are executed. 
+      </para>
+      
+      <para>
 	Once the module is loaded you will be able to invoke the following functions,
-	all registered against the <code>_root</code> sprite (effects of <code>_lockroot</code>
+	all registered against the <emphasis>_root</emphasis> sprite (effects of <emphasis>_lockroot</emphasis>
 	untested):
 	<programlisting>
-
-	check(expression, [message]);
-
-		Evaluate the expression.
-		Trace result (PASSED: expression / FAILED: expression).
-		If fails, *visually* trace the failure.
-		If second argument is given, it will be used instead of
-		'expression' for printing results.
-
-	check_equals(obtained, expected)
-
-		Evaluate an expression against an expected output.
-		Trace result (PASSED: obtained == expected / FAILED: expected X, obtained Y)
-		If fails, *visually* trace the failure.
-
-	xcheck(expression, [message]);
-
-		Evaluate the expression.
-		Trace result (XPASSED: expression / XFAILED: expression).
-		If fails, *visually* trace the failure.
-		If second argument is given, it will be used instead of
-		'expression' for printing results.
-
-	xcheck_equals(obtained, expected)
-
-		Evaluate an expression against an expected output.
-		Trace result (XPASSED: obtained == expected / XFAILED: expected X, obtained Y)
-		If fails, *visually* trace the failure.
-
-	note(string)
-
-		Print string, both as debugging and *visual* trace.
-
-	totals()
-
-                Print a summary of tests run, both as debugging and *visual* traces.
-
+	  
+	  check(expression, [message]);
+	  
+	  Evaluate the expression.
+	  Trace result (PASSED: expression / FAILED: expression).
+	  If fails, *visually* trace the failure.
+	  If second argument is given, it will be used instead of
+	  'expression' for printing results.
+	  
+	  check_equals(obtained, expected)
+	  
+	  Evaluate an expression against an expected output.
+	  Trace result (PASSED: obtained == expected / FAILED: expected X, obtained Y)
+	  If fails, *visually* trace the failure.
+	  
+	  xcheck(expression, [message]);
+	  
+	  Evaluate the expression.
+	  Trace result (XPASSED: expression / XFAILED: expression).
+	  If fails, *visually* trace the failure.
+	  If second argument is given, it will be used instead of
+	  'expression' for printing results.
+	  
+	  xcheck_equals(obtained, expected)
+	  
+	  Evaluate an expression against an expected output.
+	  Trace result (XPASSED: obtained == expected / XFAILED: expected X, obtained Y)
+	  If fails, *visually* trace the failure.
+	  
+	  note(string)
+	  
+	  Print string, both as debugging and *visual* trace.
+	  
+	  totals()
+	  
+	  Print a summary of tests run, both as debugging and *visual* traces.
+	  
 	</programlisting>
-	</para>
-
-	<para>
-	Visual traces are lines of text pushed to a textarea defined by the <code>Dejagnu.swf</code> module.
-	The textarea is initially placed at <code>0, 50</code> and is <code>600x800</code> in size.
-	You can resize/move the clip after loading it.
-	Also, you can completely make the clip invisible if that bothers you. The important thing is the
-	<emphasis>debugging</emphasis> trace (call to the trace function). The latter will be used by the testing framework.
-	</para>
-
-	<para>
+      </para>
+      
+      <para>
+	Visual traces are lines of text pushed to a textarea defined
+	by the <emphasis>Dejagnu.swf</emphasis> module. The textarea is
+	initially placed at <emphasis>0, 50</emphasis> and is
+	<emphasis>600x800</emphasis> in size. You can resize/move the clip
+	after loading it. Also, you can completely make the clip
+	invisible if that bothers you. The important thing is the
+	<emphasis>debugging</emphasis> trace (call to the trace
+	function). The latter will be used by the testing framework. 
+      </para>
+      
+      <para>
 	See section <link linkend="writing_test_runners">Writing Test Runners</link>
 	for information about writing a test runners for your self-contained tests.
-	</para>
-
+      </para>
+      
     </sect2>
-
+    
     <sect2 id="writing_test_runners">
-    <title>Writing Test Runners</title>
-
-	<para>
+      <title>Writing Test Runners</title>
+      
+      <para>
 	Test runners are executables that run one or more tests,
 	writing results in Dejagnu form to standard output.
-	</para>
-
-	<para>
-        The Dejagnu form uses a standard set of labels when printing test 
-        results.  These are:
-        <informaltable frame="all">
-        <?dbhtml table-width="75%" ?>
-        <tgroup cols="2">
-          <thead>
-            <row>
-              <entry valign="top">
-                <para>Label</para>
-              </entry>
-              <entry valign="top">
-                <para>Meaning</para>
-              </entry>
-            </row>
-          </thead>
-          <tbody>
-            <row>
-              <entry valign="top" align="left">
-                <para>PASSED</para>
-              </entry>
-              <entry valign="top" align="left">
-                <para>The test succeeded.</para>
-              </entry>
-            </row>
-            <row>
-              <entry valign="top" align="left">
-                <para>FAILED</para>
-              </entry>
-              <entry valign="top" align="left">
-                <para>The test failed.</para>
-              </entry>
-            </row>
-            <row>
-              <entry valign="top" align="left">
-                <para>XPASSED</para>
-              </entry>
-              <entry valign="top" align="left">
-                <para>The test succeeded, but was expected to fail.</para>
-              </entry>
-            </row>
-            <row>
-              <entry valign="top" align="left">
-                <para>XFAILED</para>
-              </entry>
-              <entry valign="top" align="left">
-                <para>The test failed, and was expected to fail.</para>
-              </entry>
-            </row>
-            <row>
-              <entry valign="top" align="left">
-                <para>UNRESOLVED</para>
-              </entry>
-              <entry valign="top" align="left">
-                <para>The results of the test could not be automatically 
-                      parsed.</para>
-              </entry>
-            </row>
-            <row>
-              <entry valign="top" align="left">
-                <para>UNTESTED</para>
-              </entry>
-              <entry valign="top" align="left">
-                <para>This test case is not complete.</para>
-              </entry>
-            </row>
-            <row>
-              <entry valign="top" align="left">
-                <para>UNSUPPORTED</para>
-              </entry>
-              <entry valign="top" align="left">
-                <para>The test case relies on a conditional feature which 
-                      is not present in your environment.</para>
-              </entry>
-            </row>
-           </tbody>
-          </tgroup>
-         </informaltable>
-	</para>
-
-        <para>
-        The following labels may also appear:
-        <informaltable frame="all">
-        <?dbhtml table-width="75%" ?>
-        <tgroup cols="2">
-          <thead>
-            <row>
-              <entry valign="top">
-                <para>Label</para>
-              </entry>
-              <entry valign="top">
-                <para>Meaning</para>
-              </entry>
-            </row>
-          </thead>
-          <tbody>
-            <row>
-              <entry valign="top" align="left">
-                <para>ERROR</para>
-              </entry>
-              <entry valign="top" align="left">
-                <para>There was a serious error in running the test. </para>
-              </entry>
-            </row>
-            <row>
-              <entry valign="top" align="left">
-                <para>WARNING</para>
-              </entry>
-              <entry valign="top" align="left">
-                <para>There may have been a problem with running the
-                      test.</para>
-              </entry>
-            </row>
-            <row>
-              <entry valign="top" align="left">
-                <para>NOTE</para>
-              </entry>
-              <entry valign="top" align="left">
-                <para>There was some additional information given about
-                      the test.</para>
-              </entry>
-            </row>
-           </tbody>
-          </tgroup>
-         </informaltable>
-	</para>
-
-        <sect3 id="generic_test_runner">
-        <title>Using the generic test runner for self-contained SWF tests</title>
-
-	<para>
-	The simplest test runner is one that simply invokes Gnash
-	in verbose mode against a self-contained SWF test movie.
-	Self-contained SWF test movies are the ones that print
-	the PASSED/FAILED etc. lines using ActionScript (traces).
-	By invoking Gnash in verbose mode this movie will behave
-	as a compliant "Test Runner".
-	</para>
-
-	<para>
-	A generator for simple test runners can be found in
-	<code>testsuite/generic-testrunner.sh</code>.
-	The script can be invoked by passing it <code>$(top_builddir)</code>
-	as the first argument and the name of the SWF file (without the path)
-	as the second argument. This will create a specific runner for your
-	test in the current build directory.
-	A simple Makefile.am rule for doing this follows:
-	<programlisting>
-MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
-        sh $(srcdir)/../generic-testrunner.sh $(top_builddir) MyTest.swf > $@
-        chmod +x $@
-	</programlisting>
-	</para>
-
-	<para>
-	By default, the generated test runner will play the movie up to the
-	last frame. If you want the movie to be played more then once (maybe
-	because you're exactly testing loop features) you can use the -r switch
-	to the generic-testrunner.sh call. The following will create a runner
-	playing the movie twice:
-	<programlisting>
-MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
-        sh $(srcdir)/../generic-testrunner.sh -r2 $(top_builddir) MyTest.swf > $@
-        chmod +x $@
-	</programlisting>
-	</para>
-
-	<para>
-	In case your test movie stops before the last frame, or you want to control the
-	exact number of times to call the frame advancement routine, you can use the 
-	-f switch to control that.
-	<programlisting>
-MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
-        sh $(srcdir)/../generic-testrunner.sh -f10 $(top_builddir) MyTest.swf > $@
-        chmod +x $@
-	</programlisting>
-	When both -f and -r are given, the first exit condition reached will take effect.
-	</para>
-
-	</sect3>
+      </para>
+      
+      <para>
+	The Dejagnu form uses a standard set of labels when printing test 
+	results.  These are:
+	<informaltable frame="all">
+	  <?dbhtml table-width="75%" ?>
+	  <tgroup cols="2">
+	    <thead>
+	      <row>
+		<entry valign="top">
+		  <para>Label</para>
+		</entry>
+		<entry valign="top">
+		  <para>Meaning</para>
+		</entry>
+	      </row>
+	    </thead>
+	    <tbody>
+	      <row>
+		<entry valign="top" align="left">
+		  <para>PASSED</para>
+		</entry>
+		<entry valign="top" align="left">
+		  <para>The test succeeded.</para>
+		</entry>
+	      </row>
+	      <row>
+		<entry valign="top" align="left">
+		  <para>FAILED</para>
+		</entry>
+		<entry valign="top" align="left">
+		  <para>The test failed.</para>
+		</entry>
+	      </row>
+	      <row>
+		<entry valign="top" align="left">
+		  <para>XPASSED</para>
+		</entry>
+		<entry valign="top" align="left">
+		  <para>The test succeeded, but was expected to fail.</para>
+		</entry>
+	      </row>
+	      <row>
+		<entry valign="top" align="left">
+		  <para>XFAILED</para>
+		</entry>
+		<entry valign="top" align="left">
+		  <para>The test failed, and was expected to fail.</para>
+		</entry>
+	      </row>
+	      <row>
+		<entry valign="top" align="left">
+		  <para>UNRESOLVED</para>
+		</entry>
+		<entry valign="top" align="left">
+		  <para>The results of the test could not be automatically 
+		  parsed.</para>
+		</entry>
+	      </row>
+	      <row>
+		<entry valign="top" align="left">
+		  <para>UNTESTED</para>
+		</entry>
+		<entry valign="top" align="left">
+		  <para>This test case is not complete.</para>
+		</entry>
+	      </row>
+	      <row>
+		<entry valign="top" align="left">
+		  <para>UNSUPPORTED</para>
+		</entry>
+		<entry valign="top" align="left">
+		  <para>The test case relies on a conditional feature which 
+		  is not present in your environment.</para>
+		</entry>
+	      </row>
+	    </tbody>
+	  </tgroup>
+	</informaltable>
+      </para>
+      
+      <para>
+	The following labels may also appear:
+	<informaltable frame="all">
+	  <?dbhtml table-width="75%" ?>
+	  <tgroup cols="2">
+	    <thead>
+	      <row>
+		<entry valign="top">
+		  <para>Label</para>
+		</entry>
+		<entry valign="top">
+		  <para>Meaning</para>
+		</entry>
+	      </row>
+	    </thead>
+	    <tbody>
+	      <row>
+		<entry valign="top" align="left">
+		  <para>ERROR</para>
+		</entry>
+		<entry valign="top" align="left">
+		  <para>There was a serious error in running the test. </para>
+		</entry>
+	      </row>
+	      <row>
+		<entry valign="top" align="left">
+		  <para>WARNING</para>
+		</entry>
+		<entry valign="top" align="left">
+		  <para>There may have been a problem with running the
+		  test.</para>
+		</entry>
+	      </row>
+	      <row>
+		<entry valign="top" align="left">
+		  <para>NOTE</para>
+		</entry>
+		<entry valign="top" align="left">
+		  <para>There was some additional information given about
+		  the test.</para>
+		</entry>
+	      </row>
+	    </tbody>
+	  </tgroup>
+	</informaltable>
+      </para>
+      
+      <sect3 id="generic_test_runner">
+	<title>Using the generic test runner for self-contained SWF tests</title>
 	
-	<sect3 id="writing_movie_testers">
-	  <title>Writing Movie testers</title>
-	  
-	  <para>
-	    There are some parts of Gnash that can NOT be tested
-	    by only using ActionScript tests. Examples include: frame
-	    advancements, actual actions execution, gui events and so on.
-	  </para>
-	  
-	  <para>
-	    In this case you might want to use the MovieTester class to
-	    implement a C++ test runner. Be aware that you can <emphasis>mix</emphasis> tests in
-	    the MovieTester-based class with <emphasis>self-contained</emphasis>
-	    tests in the SWF file as long as you activate verbosity for
-	    the debug logfile. This is done, for example, for the
-	    DefineEditTextVariableNameTest.swf file. The corresponding
-	    test runner (DefineEditTextVariableNameTest-Runner) is a C++
-	    runner based on MovieTester class. If you run the runner you
-	    see two kinds of test results: the ones coming from the ActionScript
-	    engine, and the ones coming from the test runner. You can
-	    distinguish between the two because the former contains an additional
-	    timestamp and the latter does not. Also, you'll see two final
-	    summaries for the two test sets. The 'make check' rule, which uses
-	    the testsuite/simple.exp output parser as its work-horse, will
-	    count test results from both test sets.
-	  </para>
-	  
-	  
-	  <para>
-	    Movie testers are executables which load an SWF, generate events
-	    (both user or system) on it, and check its state using
-	    a standard interface.
-	  </para>
-	  
-	  <para>
-	    To help this process a MovieTester class is defined in the
-	    testsuite/MovieTester.{h,cpp} files; see Doxygen documentation
-	    for more information.
-	  </para>
-	  
-	  <para>
-	    Note that you do NOT need access to the SWF source code in order
-	    to implement a Movie tester for it.  Some knowledge about the 
-	    expected behavior suffices.
-	  </para>
-	</sect3>
+	<para>
+	  The simplest test runner is one that simply invokes Gnash
+	  in verbose mode against a self-contained SWF test movie.
+	  Self-contained SWF test movies are the ones that print
+	  the PASSED/FAILED etc. lines using ActionScript (traces).
+	  By invoking Gnash in verbose mode this movie will behave
+	  as a compliant "Test Runner".
+	</para>
+	
+	<para>
+	  A generator for simple test runners can be found in
+	  <emphasis>testsuite/generic-testrunner.sh</emphasis>.
+	  The script can be invoked by passing it <emphasis>$(top_builddir)</emphasis>
+	  as the first argument and the name of the SWF file (without the path)
+	  as the second argument. This will create a specific runner for your
+	  test in the current build directory.
+	  A simple Makefile.am rule for doing this follows:
+	  <programlisting>
+	    MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
+	    sh $(srcdir)/../generic-testrunner.sh $(top_builddir) MyTest.swf > $@
+	    chmod +x $@
+	  </programlisting>
+	</para>
+	
+	<para>
+	  By default, the generated test runner will play the movie up to the
+	  last frame. If you want the movie to be played more then once (maybe
+	  because you're exactly testing loop features) you can use the -r switch
+	  to the generic-testrunner.sh call. The following will create a runner
+	  playing the movie twice:
+	  <programlisting>
+	    MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
+	    sh $(srcdir)/../generic-testrunner.sh -r2 $(top_builddir) MyTest.swf > $@
+	    chmod +x $@
+	  </programlisting>
+	</para>
+	
+	<para>
+	  In case your test movie stops before the last frame, or you want to control the
+	  exact number of times to call the frame advancement routine, you can use the 
+	  -f switch to control that.
+	  <programlisting>
+	    MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
+	    sh $(srcdir)/../generic-testrunner.sh -f10 $(top_builddir) MyTest.swf > $@
+	    chmod +x $@
+	  </programlisting>
+	  When both -f and -r are given, the first exit condition reached will take effect.
+	</para>
+	
+      </sect3>
+      
+      <sect3 id="writing_movie_testers">
+	<title>Writing Movie testers</title>
+	
+	<para>
+	  There are some parts of Gnash that can NOT be tested
+	  by only using ActionScript tests. Examples include: frame
+	  advancements, actual actions execution, gui events and so on.
+	</para>
+	
+	<para>
+	  In this case you might want to use the MovieTester class to
+	  implement a C++ test runner. Be aware that you can <emphasis>mix</emphasis> tests in
+	  the MovieTester-based class with <emphasis>self-contained</emphasis>
+	  tests in the SWF file as long as you activate verbosity for
+	  the debug logfile. This is done, for example, for the
+	  DefineEditTextVariableNameTest.swf file. The corresponding
+	  test runner (DefineEditTextVariableNameTest-Runner) is a C++
+	  runner based on MovieTester class. If you run the runner you
+	  see two kinds of test results: the ones coming from the ActionScript
+	  engine, and the ones coming from the test runner. You can
+	  distinguish between the two because the former contains an additional
+	  timestamp and the latter does not. Also, you'll see two final
+	  summaries for the two test sets. The 'make check' rule, which uses
+	  the testsuite/simple.exp output parser as its work-horse, will
+	  count test results from both test sets.
+	</para>
+	
+	
+	<para>
+	  Movie testers are executables which load an SWF, generate events
+	  (both user or system) on it, and check its state using
+	  a standard interface.
+	</para>
+	
+	<para>
+	  To help this process a MovieTester class is defined in the
+	  testsuite/MovieTester.{h,cpp} files; see Doxygen documentation
+	  for more information.
+	</para>
+	
+	<para>
+	  Note that you do NOT need access to the SWF source code in order
+	  to implement a Movie tester for it.  Some knowledge about the 
+	  expected behavior suffices.
+	</para>
+      </sect3>
     </sect2>
   </sect1>
-
+  
   &newasclass;
-
-
+    
 </chapter>
 

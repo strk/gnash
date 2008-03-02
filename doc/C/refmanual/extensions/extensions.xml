@@ -57,7 +57,7 @@
     <para>
       Each new extension should live in it's own directory. The
       extensions included in Gnash are all in the
-      <code>gnash/extensions</code> directory. Creating an extension
+      <emphasis>gnash/extensions</emphasis> directory. Creating an extension
       requires a Makefile.am,
     </para>
 

@@ -151,11 +151,15 @@ else
 	fi
 endif
 
-#	basefile=$(notdir $(basename $<));
+# The first test seems to be the default for Fedora/Redhat/Centos based distributions,
+# which use a wrapper script for jade.
+# Ubuntu/Debian uses a real perl script that actually does the real work
 .xml.texi:
 if ENABLE_TEXI
 	-@if test x$(DB2X_TEXI) != x; then \
-	  $(DB2X_TEXI) --encoding=us-ascii//TRANSLIT --string-param directory-description="Gnash" $< ; \
+	  out=`echo $* | sed -e 's:gnash:gnash_:'`; \
+	  $(DB2X_TEXI) --encoding=us-ascii//TRANSLIT --string-param directory-description="Gnash" --string-param output-file=$${out} $<; \
+	  $(MAKEINFO) --force $${out}.texi; \
 	else \
 	  basefile="$*"; \
           $(DB2X_XSLTPROC) -s texi $< --output $${basefile}.txml; \
@@ -167,7 +171,7 @@ endif
 .texi.info:
 if ENABLE_TEXI
 	-$(MAKEINFO) --force $<
-else
+else	
 	touch $@;
 endif
 
