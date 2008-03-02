@@ -1,5 +1,13 @@
 2008-03-01  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* doc/C/Makefile.am: Tweak dependencies more to deal with all the
+	weird variations of docbook utils and docbook2X between platforms.
+
+	* packaging/deb.am: Add snapshot-deb target.
+
+	* testsuite/misc-ming.all/Makefile.am: Add BOOST_CFLAGS for older
+	compilers.
+
 	* doc/C/refmanual/logging.xml: Add new log_*() functions. Mark C++
 	streaming API as discouraged.
 	* doc/C/Makefile.am: Add extra dependencies for the gnash

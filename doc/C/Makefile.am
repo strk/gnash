@@ -84,7 +84,7 @@ EXTRA_DIST = \
 # dependency anyway.
 dist_man_MANS = gnash.1 gprocessor.1 dumpshm.1 soldumper.1 cygnal.1
 MANSRC = $(dist_man_MANS:.1=.man-xml)
-INFOS  = gnash_user.info gnashuser.info gnash_ref.info gnashref.info
+INFOS  = gnash_user.info gnash_ref.info
 HTMLS  = $(XML_MAIN:.xml=.html)
 PDFS   = $(XML_MAIN:.xml=.pdf)
 TEXIS  = gnash_user.texi gnashuser.texi gnash_ref.texi gnashref.texi
@@ -106,7 +106,6 @@ man:  $(dist_man_MANS)
 info: images $(INFOS)
 texi: images $(TEXIS)
 
-
 #
 # Gnash uses suffix rules to build all the various supported
 # output formats. This section contains all the code that does
@@ -121,7 +120,7 @@ texi: images $(TEXIS)
 # for end users because the documentation in xml, html, and info
 # formats is always available.
 #
-SUFFIXES = .xml .html .texi .pdf .info .1 .fo .man-xml
+SUFFIXES = .xml .html .texi .pdf .info .1 .fo .man-xml .in
 
 if ENABLE_FOP
 .xml.pdf:
@@ -161,11 +160,13 @@ if ENABLE_TEXI
 	  basefile="$*"; \
           $(DB2X_XSLTPROC) -s texi $< --output $${basefile}.txml; \
 	  out=`$(DB2X_TEXIXML) --encoding=us-ascii//TRANSLIT --list-files $${basefile}.txml` ; \
-	  if test ! -f $out; then \
+	  if test ! -f $${out}; then \
 	   out=`echo $${out} | tr -d '_'`; \
 	  fi; \
 	  rm $${basefile}.txml; \
-	  mv $${out} $${basefile}.texi; \
+	  if test -f $${out}; then \
+	    mv $${out} $${basefile}.texi; \
+	  fi; \
 	fi
 endif
 
@@ -173,11 +174,7 @@ endif
 if ENABLE_TEXI
 	-$(MAKEINFO) --force $<
 else
-	@if test -d $(top_srcdir)/packaging/doc; then \
-	  $(LN_S) -f $(top_srcdir)/packaging/doc/$@.in ./$@; \
-	else \
-	  touch $@; \
-	fi
+	touch $@;
 endif
 
 .man-xml.1:
@@ -197,20 +194,28 @@ else
 	fi
 endif
 
-if DOCBOOK
 gnash_user.info gnashuser.info: gnashuser.texi
 gnash_ref.info gnashref.info: gnashref.texi
 gnashuser.texi gnash_user.texi: gnashuser.xml
 gnashref.texi gnash_user.texi: gnashref.xml
-else
+if ! DOCBOOK
 gnash_user.info: gnashuser.xml
 	@if test -d $(top_srcdir)/packaging/doc; then \
 	  $(LN_S) -f $(top_srcdir)/packaging/doc/gnash_user.info.in ./gnash_user.info; \
 	fi
 
+gnashuser.info: gnashuser.xml
+	@if test -d $(top_srcdir)/packaging/doc; then \
+	  $(LN_S) -f $(top_srcdir)/packaging/doc/gnash_user.info.in ./gnashuser.info; \
+	fi
+
 gnash_ref.info: gnashref.xml
 	@if test -d $(top_srcdir)/packaging/doc; then \
 	  $(LN_S) -f $(top_srcdir)/packaging/doc/gnash_ref.info.in ./gnash_ref.info; \
+	fi
+gnashref.info: gnashref.xml
+	@if test -d $(top_srcdir)/packaging/doc; then \
+	  $(LN_S) -f $(top_srcdir)/packaging/doc/gnash_ref.info.in ./gnashref.info; \
 	fi
 endif
 
