@@ -1,5 +1,12 @@
 2008-03-02  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* doc/C/Makefile.am: Print warning when linking to preformatted
+	versions that they may be out of date. Change path to preformatted
+	versions.
+	* packaging/doc: Moved to doc/C/preformatted.
+	* doc/C/preformatted: Moved from packaging/doc, this location
+	makes more sense, and is simpler.
+	
 	* doc/C/usermanual.bugreport.xml: Move file up one directory so it
 	can be shared.
 	* doc/C/usermanual/glossary.xml, gnashrc.xml, installation.xml,

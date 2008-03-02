@@ -1,0 +1,1332 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Gnash User Manual</title><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="book" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="index"></a>Gnash User Manual</h1></div><div><p class="releaseinfo">
+        This manual describes version 0.8.2 of Gnash.
+    </p></div><div><p class="copyright">Copyright © 2005, 2006, 2007, 2008 Free Software Foundation</p></div><div><div class="legalnotice"><a name="legalnotice"></a><p>
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the <a class="link" href="#fdl" title="Appendix A. GNU Free Documentation License"><em class="citetitle">GNU
+    Free Documentation License</em></a>, Version 1.1 or any later
+    version published by the Free Software Foundation with no Invariant
+    Sections, no Front-Cover Texts, and no Back-Cover Texts. You can find
+    a copy of the GFDL at this 
+    <a class="link" href="#fdl" title="Appendix A. GNU Free Documentation License">link</a> or in the file COPYING-DOCS
+    distributed with this manual.
+   </p></div></div><div><div class="revhistory"><table border="1" width="100%" summary="Revision history"><tr><th align="left" valign="top" colspan="2"><b>Revision History</b></th></tr><tr><td align="left">Revision Gnash User Manual version 0.1</td><td align="left">Feb 2008</td></tr><tr><td align="left" colspan="2"> 
+      <p class="author">Rob Savoye
+      <code class="email">&lt;<a class="email" href="mailto:rob@openmedianow.org">rob@openmedianow.org</a>&gt;</code>
+      The end user parts of the manual have been pulled out of
+      the original version of the manual, and rewritten.
+      </p>
+      
+      <p class="publisher">Open Media Now! Foundation</p>
+    </td></tr></table></div></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="chapter"><a href="#intro">1. Introduction</a></span></dt><dd><dl><dt><span class="sect1"><a href="#audience">Audience</a></span></dt><dt><span class="sect1"><a href="#runs-on">What Is Supported ?</a></span></dt></dl></dd><dt><span class="chapter"><a href="#usage">2. Using <span class="application">Gnash</span></a></span></dt><dd><dl><dt><span class="sect1"><a href="#options"><span class="application">Gnash</span> Command Line Options</a></span></dt><dt><span class="sect1"><a href="#keys"><span class="application">Gnash</span> Interactive Control Keys</a></span></dt><dt><span class="sect1"><a href="#gnashrc">User Configuration File</a></span></dt></dl></dd><dt><span class="chapter"><a href="#build">3. Installing and Configuring Gnash</a></span></dt><dd><dl><dt><span class="sect1"><a href="#requirements">Requirements</a></span></dt><dd><dl><dt><span class="sect2"><a href="#hardware">Hardware Requirements</a></span></dt><dt><span class="sect2"><a href="#software">Software Requirements</a></span></dt></dl></dd><dt><span class="sect1"><a href="#downloading">Downloading Gnash</a></span></dt><dd><dl><dt><span class="sect2"><a href="#gettingsource">Getting the Source</a></span></dt><dt><span class="sect2"><a href="#getcodecs">Getting Codec Support</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="#bugreport">4. Reporting Bugs</a></span></dt><dd><dl><dt><span class="sect1"><a href="#bugstep_package">Get a Fresh Binary Package</a></span></dt><dt><span class="sect1"><a href="#bugstep_search">Determine if the bug was previously reported</a></span></dt><dt><span class="sect1"><a href="#bugstep_guidelines">Review the bug writing guidelines</a></span></dt><dt><span class="sect1"><a href="#bugstep_file">Filing a bug report</a></span></dt></dl></dd><dt><span class="glossary"><a href="#glossary">Glossary</a></span></dt><dt><span class="chapter"><a href="#authors">5. Authors</a></span></dt><dt><span class="appendix"><a href="#fdl">A. GNU Free Documentation License</a></span></dt><dd><dl><dt><span class="sect1"><a href="#fdl-preamble">0. PREAMBLE</a></span></dt><dt><span class="sect1"><a href="#fdl-section1">1. APPLICABILITY AND DEFINITIONS</a></span></dt><dt><span class="sect1"><a href="#fdl-section2">2. VERBATIM COPYING</a></span></dt><dt><span class="sect1"><a href="#fdl-section3">3. COPYING IN QUANTITY</a></span></dt><dt><span class="sect1"><a href="#fdl-section4">4. MODIFICATIONS</a></span></dt><dt><span class="sect1"><a href="#fdl-section5">5. COMBINING DOCUMENTS</a></span></dt><dt><span class="sect1"><a href="#fdl-section6">6. COLLECTIONS OF DOCUMENTS</a></span></dt><dt><span class="sect1"><a href="#fdl-section7">7. AGGREGATION WITH INDEPENDENT WORKS</a></span></dt><dt><span class="sect1"><a href="#fdl-section8">8. TRANSLATION</a></span></dt><dt><span class="sect1"><a href="#fdl-section9">9. TERMINATION</a></span></dt><dt><span class="sect1"><a href="#fdl-section10">10. FUTURE REVISIONS OF THIS LICENSE</a></span></dt><dt><span class="sect1"><a href="#fdl-using">Addendum</a></span></dt></dl></dd></dl></div><div class="list-of-tables"><p><b>List of Tables</b></p><dl><dt>2.1. <a href="#tb-command-line-options">Gnash Command Line Options</a></dt><dt>2.2. <a href="#tb-control-keys">Gnash Interactive Control Keys</a></dt><dt>2.3. <a href="#tb-config-variables">User Configuration Variables</a></dt><dt>3.1. <a href="#tb-os-cpu">Build Matrix</a></dt></dl></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="intro"></a>Chapter 1. Introduction</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#audience">Audience</a></span></dt><dt><span class="sect1"><a href="#runs-on">What Is Supported ?</a></span></dt></dl></div><p>
+    <span class="application">Gnash</span> is a free SWF movie player.  It is available as a
+    stand-alone application or as a plugin for several popular
+    web browsers. It supports playing media from a disk or streaming
+    over a network connection. Some popular video sharing sites like
+    YouTube are supported from a wide vaariety of devices from
+    embedded ones to modern desktops.
+  </p><p>
+    <span class="application">Gnash</span> has a better focus on security, allowing the user tight
+    control of all network or disk based I/O. Gnash also supports
+    extending ActionScript by creating your own. You can write
+    wrappers for any development library, and import them into the
+    player much like perl or python does.
+  </p><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="audience"></a>Audience</h2></div></div></div><p>
+      This manual is primarily focused on users interested in how to
+      get Gnash installed from a package, and basic usage as a web
+      browser plugin. For more technical details, please refer to the
+      Gnash Reference manual.
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="runs-on"></a>What Is Supported ?</h2></div></div></div><p>
+      Gnash is known to compile for most any POSIX and ANSI C++
+      conforming system if you have all the dependent libraries
+      installed. Systems we test on, and which Gnash is know to
+      run on are Ubuntu, Fedora, Debian, OpenBSD, NetBSD, FreeBSD,
+      Win32, and Darwin (OSX) primarily. Occasionally other platforms
+      are built, primarily by those distribution maintainers. This
+      includes BeOS, Haiku, Syllable, OS/2, Solaris, Slackware, and
+      Gentoo.
+    </p><p>
+      Gnash is a capable of reading up to SWF v9 files and opcodes,
+      but primarily supports SWF v7, with better SWF v8 and v9
+      support under heavy developement. With the 0.8.2 release,
+      Gnash includes initial parser support for SWF v8 and v9.
+      Not all ActionScript 2 classes are implemented yet, but all of the
+      most heavily used ones are. Many ActionScript 2 classes are
+      partially implemented; there is support for all of the
+      commonly used methods of each class.
+    </p><p>
+      Gnash has implemented about 80% of ActionScript v. 2.0, and has
+      begun implementing ActionScript v. 3.0. Gnash supports the
+      majority of Flash opcodes up to SWF version 9, and a wide
+      sampling of ActionScript classes for SWF version 8.
+    </p><p>
+      As ActionsScript 3 is a more developed version of
+      ActionScript 2, many of the same classes work for
+      both. Support has been added to Gnash's ActionScript library
+      to support the new ActionScript 3 filters, which get applied
+      to every class. Implementing ActionScript clases is often the
+      easiest way for new Gnash developers to make a contribution
+      without a deep internal knpowledge of Gnash.
+    </p><p>
+      Gnash has included video support since early 2007, but this is
+      an every changing field of reverse engineering. Many of the
+      popular video sharing sites use SWF v8 or v9, which Gnash
+      still has imperfect support for. This is improving all the
+      time, so often builds from a development snapshot will work
+      when using the older release packaged in your distribution
+      doesn't. You can find daily snapshots of the latest CVS tree
+      at: <a class="ulink" href="http://www.gnashdev.org/dev_snapshots/" target="_top">
+      http://www.gnashdev.org/dev_snapshots</a>.
+    </p><p>
+      Gnash uses ffmpeg for codecs, so any file supported by Mplayer
+      should work with Gnash. Gnash supports the loading of patent
+      free codecs like Ogg Vorbis or Theora from disk based files,
+      while work is being done to support these codecs when embedded
+      in a SWF file. Ffmpeg contains the codecs used by the current
+      SWF defintion, FLV, VP6 (ON2), H.263, H.264, and MP3.
+    </p></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="usage"></a>Chapter 2. Using <span class="application">Gnash</span></h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#options"><span class="application">Gnash</span> Command Line Options</a></span></dt><dt><span class="sect1"><a href="#keys"><span class="application">Gnash</span> Interactive Control Keys</a></span></dt><dt><span class="sect1"><a href="#gnashrc">User Configuration File</a></span></dt></dl></div><p>
+    When used as a standalone player, you can play any Flash file from
+    the command line by entering a command of the format: 
+    </p><pre class="programlisting">
+      gnash <em class="replaceable"><code>&lt;option&gt; &lt;flashfile.swf&gt;</code></em>
+    </pre><p>
+    The only required argument is the name (and location)of the file
+    to be played. 
+  </p><p>
+    The available options are listed in the following section, or you
+    may view them in the terminal window by executing the following at
+    the command line: 
+    </p><pre class="programlisting">
+      gnash --help |less
+    </pre><p>
+  </p><p>
+    The source code download of <span class="application">Gnash</span> includes several example .SWF
+    files.  They are located in the
+    <code class="filename">testsuite/samples/</code> directory of the <span class="application">Gnash</span>
+    source directory.  If you have installed <span class="application">Gnash</span> correctly, issuing
+    the a command similar to the following plays a short animation of
+    a car swerving and crashing: 
+    </p><pre class="programlisting">
+      gnash
+      /home/<em class="replaceable"><code>&lt;username&gt;</code></em>/gnash/testsuite/car_smash.swf 
+    </pre><p>
+    </p><div class="mediaobject" align="center"><img src="images/car_crash.png" align="middle"></div><p>
+  </p><p>
+    The above is useful for playing Flash files downloaded to your
+    local system.  It is also possible to play Flash files directly
+    from the web.  To do so, use the <code class="option">-u</code> option along
+    with the URL of the desired file. 
+    </p><pre class="programlisting">
+      gnash -u http://example.domain.com/flashfile.swf
+    </pre><p>
+    Note that this will not work with every website; some embedded
+    Flash files are difficult to play. 
+  </p><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="options"></a><span class="application">Gnash</span> Command Line Options</h2></div></div></div><p>
+      No options are required for  <span class="application">Gnash</span>'s default behavior.  However,
+      there are many options that can be used to that behavior. 
+    </p><p>
+      </p><pre class="programlisting">
+	gnash <em class="replaceable"><code>&lt;options&gt;</code></em>
+	<code class="filename">filename.swf</code> 
+      </pre><p>
+    </p><div class="table"><a name="tb-command-line-options"></a><p class="title"><b>Table 2.1. Gnash Command Line Options</b></p><div class="table-contents"><table summary="Gnash Command Line Options" border="1"><colgroup><col align="left"><col align="left"></colgroup><thead><tr><th align="left">Option</th><th align="left">Function</th></tr></thead><tbody><tr><td align="left"><code class="option">-h</code></td><td align="left">
+	      Print usage information.
+	    </td></tr><tr><td align="left">
+	      <code class="option">-s factor</code>
+	    </td><td align="left">
+	      Scale the movie up/down by the specified factor.
+	    </td></tr><tr><td align="left">
+	      <code class="option">-c</code>
+	    </td><td align="left">
+	      Produce a core file instead of letting SDL trap it. By
+	      default, SDL traps all signals, but sometimes a core file
+	      is desired to assist with debugging.
+	    </td></tr><tr><td align="left">
+	      <code class="option">-d num</code>
+	    </td><td align="left">
+	      Number of milliseconds to delay in main loop. The main
+	      loop polls continuously with a delay to adjust how long
+	      <span class="emphasis"><em><span class="application">Gnash</span></em></span> sleeps between iterations of the
+	      loop. The smaller the number, the higher the CPU load
+	      gets, and of course, the more iterations of the main
+	      command loop.
+	    </td></tr><tr><td align="left">
+	      <code class="option">-p</code>
+	    </td><td align="left">
+	      Run full speed (no sleep) and log frame rate.
+	    </td></tr><tr><td align="left">
+	      <code class="option">-a</code>
+	    </td><td align="left">
+	      Enable Actionscript debugging.
+	    </td></tr><tr><td align="left">
+	      <code class="option">-v</code>
+	    </td><td align="left">
+	      Be verbose; i.e. print debug messages to stdout.
+	    </td></tr><tr><td align="left">
+	      <code class="option">-va</code>
+	    </td><td align="left">
+	      Be verbose about movie Actions. 
+	    </td></tr><tr><td align="left">
+	      <code class="option">-vp</code>
+	    </td><td align="left">
+	      Be verbose about parsing the movie. Warning: this can
+	      generate a lot of text, and can affect the performance of
+	      the movie you are playing.
+	    </td></tr><tr><td align="left">
+	      <code class="option">-ml bias</code>
+	    </td><td align="left">
+	      Specify the texture LOD bias (float, default is -1) This
+	      affects the fuzziness of small objects, especially small
+	      text.
+	    </td></tr><tr><td align="left">
+	      <code class="option">-w</code>
+	    </td><td align="left">
+	      Write a debug log called gnash-dbg.log. This will 
+	      record of all the debug messages whether they are printed
+	      to the screen or not.
+	    </td></tr><tr><td align="left">
+	      <code class="option">-j</code>
+	    </td><td align="left">
+	      Specify the width of the window. This is mostly used
+	      only by the plugin.
+	    </td></tr><tr><td align="left">
+	      <code class="option">-k</code>
+	    </td><td align="left">
+	      Specify the height of the window. This is mostly used
+	      only by the plugin.
+	    </td></tr><tr><td align="left">
+	      <code class="option">-1</code>
+	    </td><td align="left">
+	      Play once; exit when/if movie reaches the last
+	      frame. This is the default.
+	    </td></tr><tr><td align="left">
+	      <code class="option">-r [0|1|2|3]</code>
+	    </td><td align="left">
+	      <div class="itemizedlist"><ul type="disc"><li><p>
+		    0 disables rendering and sound (good for batch tests).
+		  </p></li><li><p>
+		    1 enables rendering and disables sound (default setting).
+		  </p></li><li><p>
+		    2 enables sound and disables rendering.
+		  </p></li><li><p>
+		    3 enables rendering and sound.
+		  </p></li></ul></div>
+	    </td></tr><tr><td align="left">
+	      <code class="option">-t sec</code>
+	    </td><td align="left">
+	      Timeout and exit after the specified number of
+	      seconds. This is useful for movies which repeat
+	      themselves.
+	    </td></tr><tr><td align="left">
+	      <code class="option">-g</code>
+	    </td><td align="left">
+	      Start <span class="application">Gnash</span> with a Flash debugger console so one can set
+	      break points or watchpoints.
+	    </td></tr><tr><td align="left">
+	      <code class="option">-x id</code>
+	    </td><td align="left">
+	      This specifies the X11 window ID to display
+	      in; this is mainly used by plugins.
+	    </td></tr><tr><td align="left">
+	      <code class="option">-b bits</code>
+	    </td><td align="left">
+	      Bit depth of output window (for example, 16 or 32). Appropriate
+	      bit depths depend on the renderer and GUI library used.
+	      
+	    </td></tr><tr><td align="left">
+	      <code class="option">-u url</code>
+	    </td><td align="left">
+	      Set the _url member of the root movie. This is useful 
+	      when you download a movie and play it from a different 
+	      location. See also the -U switch.
+	    </td></tr><tr><td align="left">
+	      <code class="option">-U baseurl</code>
+	    </td><td align="left">
+	      Set base URL for this run. URLs are resolved relative to 
+	      this base. If omitted defaults to the _url member of the 
+	      top-level movie (see the -u switch).
+	    </td></tr><tr><td align="left">
+	      <code class="option">-P entrymeter</code>
+	    </td><td align="left">
+	      Parameters are given in ParamName=Value syntax and are mostly 
+	      useful to the plugin to honour EMBED tags attributes 
+	      or explicit OBJECT PARAM tags. A common use for -P 
+	      is to provide FlashVars 
+	      (ie: -P "FlashVars=home=http://www.gnu.org").
+	    </td></tr><tr><td align="left">
+	      <code class="option">-F filedescriptor</code>
+	    </td><td align="left">
+	      Use the given filedescriptor to send requests to the host
+	      application. This is currently only used for GETURL requests.
+	      The protocol is not documented yet, and also needs improvement.
+	      Primary use for this switch is for the NPAPI plugin to properly
+	      support javascript and target windows in geturl requests.
+	    </td></tr></tbody></table></div></div><br class="table-break"></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="keys"></a><span class="application">Gnash</span> Interactive Control Keys</h2></div></div></div><p>
+      While a movie is playing, there are several control
+      keys. These can be used to step through frames, pause the
+      playing, and control other actions.
+    </p><div class="table"><a name="tb-control-keys"></a><p class="title"><b>Table 2.2. Gnash Interactive Control Keys</b></p><div class="table-contents"><table summary="Gnash Interactive Control Keys" border="1"><colgroup><col align="left"><col align="left"></colgroup><thead><tr><th align="left">Key Combination</th><th align="left">Function</th></tr></thead><tbody><tr><td align="left">
+	      <code class="option">CTRL-Q</code>
+	    </td><td align="left">
+	      Quit/Exit.
+	    </td></tr><tr><td align="left">
+	      <code class="option">CTRL-W</code>
+	    </td><td align="left">
+	      Quit/Exit.
+	    </td></tr><tr><td align="left">
+	      <code class="option">ESC</code>
+	    </td><td align="left">
+	      Quit/Exit.
+	    </td></tr><tr><td align="left">
+	      <code class="option">CTRL-P</code>
+	    </td><td align="left">
+	      Toggle Pause.
+	    </td></tr><tr><td align="left">
+	      <code class="option">CTRL-R   </code>
+	    </td><td align="left">
+	      Restart the movie.
+	    </td></tr><tr><td align="left">
+	      <code class="option">CTRL-[ or kp-</code>
+	    </td><td align="left">
+	      Step back one frame.
+	    </td></tr><tr><td align="left">
+	      <code class="option">CTRL-] or kp+</code>
+	    </td><td align="left">
+	      Step forward one frame.
+	    </td></tr><tr><td align="left">
+		<code class="option">CTRL-L</code>
+	      </td><td align="left">
+		Force immediate redraw.
+	      </td></tr><tr><td align="left">
+	      <code class="option">CTRL-T</code>
+	    </td><td align="left">
+	      Debug.  Test the set_variable() function.
+	    </td></tr><tr><td align="left">
+	      <code class="option">CTRL-G</code>
+	    </td><td align="left">
+	      Debug.  Test the get_variable() function.
+	    </td></tr><tr><td align="left">
+	      <code class="option">CTRL-M</code>
+	    </td><td align="left">
+	      Debug.  Test the call_method() function.
+	    </td></tr><tr><td align="left">
+	      <code class="option">CTRL-B</code>
+	    </td><td align="left">
+	      Toggle the background color.
+	    </td></tr></tbody></table></div></div><br class="table-break"></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="gnashrc"></a>User Configuration File</h2></div></div></div><p>
+Individual user preferences may be set by editing variables with the <code class="filename">.gnashrc</code> file:
+</p><pre class="programlisting">
+~/.gnashrc
+</pre><p>
+</p><p>
+Each line must begin with an action: either <span class="emphasis"><em>set</em></span> or, in the case of lists, also
+<span class="emphasis"><em>append</em></span>.
+</p><p>
+The values in this configuration file apply only to an individual user, and become the default settings of the standalone player and the plugin.  Note that any command line options take precedence over <code class="filename">.gnashrc</code> settings.
+</p><p>
+The variables in the <code class="filename">.gnashrc</code> file support three types of arguments: on/off, numeric values, or in the case of the
+    whitelist and blacklist, a list of hostnames as ASCII text.
+  </p><div class="table"><a name="tb-config-variables"></a><p class="title"><b>Table 2.3. User Configuration Variables</b></p><div class="table-contents"><table summary="User Configuration Variables" border="1"><colgroup><col align="left"><col align="left"><col align="left"></colgroup><thead><tr><th align="left">Variable</th><th align="left">Value</th><th align="left">Function</th></tr></thead><tbody><tr><td align="left">localdomain</td><td align="left">on/off</td><td align="left">This value can be set to either <span class="emphasis"><em>on</em></span> or
+	    <span class="emphasis"><em>off</em></span>, and controls the loading of
+	    external Flash movies over a network. This option
+	    tells Gnash to only load Flash movies from the existing domain.</td></tr><tr><td align="left">localhost</td><td align="left">on/off</td><td align="left">This value can be set to either <span class="emphasis"><em>on</em></span> or
+	    <span class="emphasis"><em>off</em></span>, and controls the loading of
+	    external Flash movies over a network. This is a stricter
+	    version of the <span class="emphasis"><em>localdomain</em></span> setting as
+	    this allows the loading of Flash movies to the same host
+	    that is running <span class="application">Gnash</span>.</td></tr><tr><td align="left">whitelist</td><td align="left">hostnames</td><td align="left">This is a list of hostnames separated by spaces, or <span class="emphasis"><em>off</em></span>
+	    to disable the whitelist. The hostname must be given
+            without a protocol (http://, https://). If this list is populated,
+	    <span class="application">Gnash</span> will only load external Flash movies from the specified hosts.  The
+	    whitelist takes precedence over the blacklist. Because several files can
+	    be parsed in succession, each file can override or add to
+	    lists in other files. Use <span class="emphasis"><em>set</em></span> to override
+	    all other lists or <span class="emphasis"><em>append</em></span> to add your blacklisted
+	    hosts to lists in previously parsed files.</td></tr><tr><td align="left">blacklist</td><td align="left">hostnames</td><td align="left">This is a list of hostnames separated by spaces, or <span class="emphasis"><em>off</em></span>
+	    to disable the blacklist. The hostname must be given
+            without a protocol (http://, https://).
+	    External flash movies from these
+            domains are never allowed to load. If whitelist is present
+	    and not empty, blacklist is not used. Because several files can
+	    be parsed in succession, each file can override or add to
+	    lists in other files. Use <span class="emphasis"><em>set</em></span> to override
+	    all other lists or <span class="emphasis"><em>append</em></span> to add your blacklisted
+	    hosts to lists in previously parsed files.</td></tr><tr><td align="left">localSandboxPath</td><td align="left">dirs</td><td align="left">This is a list of directories separated by spaces.
+	    Only resources from these directories and from the directory
+            portion of movie filename (if loaded from filesystem) are allowed to load.
+	    Because several files can be parsed in succession, each file can override
+	    or add to lists in other files. Use <span class="emphasis"><em>set</em></span> to override
+	    all other lists or <span class="emphasis"><em>append</em></span> to add new sandboxes.
+	    Note that there's currently no way to *drop* the directory of base dir
+	    from the list of allowed local sandboxes.
+	    </td></tr><tr><td align="left">delay</td><td align="left">Number</td><td align="left"><span class="application">Gnash</span> uses a timer-based event mechanism to advance frames
+	    at a steady rate. This option overrides the default
+	    setting in Gnash to play a movie slower or faster.</td></tr><tr><td align="left">verbosity</td><td align="left">Number</td><td align="left">This is a numeric value which defines the default level of
+	    verbosity from the player.</td></tr><tr><td align="left">MalformedSWFVerbosity</td><td align="left">on/off</td><td align="left">This value can be set to either <span class="emphasis"><em>on</em></span> or
+	    <span class="emphasis"><em>off</em></span>, and controls whether malformed SWF errors should
+	    be printed. If set to true, verbosity level is automatically incremented.
+	    Set <code class="option">verbosity</code> to 0 afterwards to hush.</td></tr><tr><td align="left">ASCodingErrorsVerbosity</td><td align="left">on/off</td><td align="left">This value can be set to either <span class="emphasis"><em>on</em></span> or
+	    <span class="emphasis"><em>off</em></span>, and controls whether ActionScript coding
+	    errors should be printed. If set to true, verbosity level is
+	    automatically incremented.  Set <code class="option">verbosity</code> to 0 afterwards to hush.</td></tr><tr><td align="left">debuglog</td><td align="left">Absolute path</td><td align="left">This is the full path and name of debug logfile as
+	produced by <span class="application">Gnash</span>. On systems with a UNIX-type shell,
+        a tilde prefix (~) will be expanded as by Posix shell requirements
+        (see http://www.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html#tag_02_06_01).</td></tr><tr><td align="left">writelog</td><td align="left">on/off</td><td align="left">This value can be set to either <span class="emphasis"><em>on</em></span> or
+	    <span class="emphasis"><em>off</em></span>, and controls whether a debug log
+	    is always written by <span class="application">Gnash</span>, or not at all.</td></tr><tr><td align="left">sound</td><td align="left">on/off</td><td align="left">This value can be set to either <span class="emphasis"><em>on</em></span> or
+	    <span class="emphasis"><em>off</em></span>, and controls the sound of the
+	    standalone player. By default <span class="application">Gnash</span> enables playing the
+	    sound in any Flash movie.</td></tr><tr><td align="left">pluginsound</td><td align="left">on/off</td><td align="left">This value can be set to either <span class="emphasis"><em>on</em></span> or
+	    <span class="emphasis"><em>off</em></span>, and controls the sound of the
+	    player when running as a browser plugin. By default, sound
+	    is enabled when using <span class="application">Gnash</span> as a browser plugin.</td></tr><tr><td align="left">EnableExtensions</td><td align="left">on/off</td><td align="left">Set to <span class="emphasis"><em>on</em></span> to enable extensions. This option is <span class="emphasis"><em>off</em></span> by default</td></tr><tr><td align="left">StartStopped</td><td align="left">on/off</td><td align="left">Set to <span class="emphasis"><em>on</em></span> to have the GUI start in "stop" mode. This is useful in particular
+	    for the plugin, so you have to explicitly start any movie on a webpage. This option is <span class="emphasis"><em>off</em></span> by default.
+	  </td></tr><tr><td align="left">flashVersionString</td><td align="left">string</td><td align="left">Set the string returned by $version and System.capabilities.version.
+       Useful to get around some flash version detection movies.
+       Note that the version advertised by the plugin is NOT affected by this setting,
+       instead you need to set the GNASH_FLASH_VERSION environment variable for
+       the latter (which doesn't affect $version and System.capabilities.version).</td></tr><tr><td align="left">flashSystemOS</td><td align="left">string</td><td align="left">The string that Gnash should return for System.capabilities.OS</td></tr><tr><td align="left">flashSystemManufacturer</td><td align="left">string</td><td align="left">The string that Gnash should return for System.capabilities.manufacturer</td></tr><tr><td align="left">StreamsTimeout</td><td align="left">double</td><td align="left">
+Set the number of seconds after which streams download time out. Note that timeouts only occurs after the given number of seconds
+passed w/out anything was received.
+</td></tr><tr><td align="left">insecureSSL</td><td align="left">on/off</td><td align="left">If set to <span class="emphasis"><em>on</em></span>, no verification of SSL connections
+is performed. This means that, although the connection is encrypted, the server
+certificate could be invalid, may not belong to the host, or both. Equivalent
+to curl --insecure. By default, this option is <span class="emphasis"><em>off</em></span> and
+connections will fail when a host cannot be verified.</td></tr><tr><td align="left">SOLsafedir</td><td align="left">Absolute path</td><td align="left">The full path to a directory where <span class="application">Gnash</span> should store Shared Object files ("flash cookies") if
+they are enabled.</td></tr><tr><td align="left">SOLreadonly</td><td align="left">on/off</td><td align="left">If set to <span class="emphasis"><em>on</em></span>, <span class="application">Gnash</span> will not write Shared Object files.</td></tr><tr><td align="left">URLOpenerFormat</td><td align="left">string</td><td align="left">
+Set the format of an url opener command. The %u label would be substituted by the actual url to be opened.
+Examples:
+<pre class="programlisting">
+ set urlOpenerFormat firefox -remote 'openurl(%u)'
+ set urlOpenerFormat xdg-open %u
+ set urlOpenerFormat open %u
+ set urlOpenerFormat kfmclient exec %u
+</pre>
+</td></tr></tbody></table></div></div><br class="table-break"><p>
+The following example <code class="filename">.gnashrc</code> file allows a user to only play Flash files saved locally to the machine on which <span class="application">Gnash</span> is running.  It also specifically forbids content from doubleclick.com and mochibot.com.  <span class="application">Gnash</span>'s error output is set to be fairly verbose, with the debug log placed in a location convenient for the user.  Finally, sound is turned on for both the standalone player and the plugin.
+</p><pre class="programlisting">
+  
+    #
+    # Gnash client options
+    #
+
+    # Only access remote content from our local domain
+    set localdomain on
+
+    # Only access content from our local host
+    set localhost on
+
+    # These sites are OK
+    # uncommenting the following line will allow load of external
+    # movies *only* from the specified hosts.
+    #set whitelist www.doonesbury.com www.cnn.com www.9news.com
+
+    # Disable whitelists set in any other gnashrc files, because
+    # these could override our blacklist.
+    set whitelist off
+
+    # Don't access content from these sites
+    set blacklist www.doubleclick.com mochibot.com
+
+    # The delay between timer interrupts
+    set delay 50
+
+    # The default verbosity level
+    set verbosity 1
+
+    # Be verbose about malformed SWF
+    set MalformedSWFVerbosity true
+
+    # Be verbose about AS coding errors
+    set ASCodingErrorsVerbosity true
+
+    # The full path to the debug log
+    set debuglog ~/gnash-dbg.log
+
+    # Write a debug log to disk
+    set writelog on
+
+    # Enable or Disable sound for the standalone player
+    set sound on
+
+    # Enable or Disable sound for the standalone player
+    set pluginsound on
+
+    # Make sure SSL connections are always verified
+    set insecureSSL off
+
+    # Use firefox to open urls
+    set urlOpenerFormat firefox -remote 'openurl(%u)'
+
+  </pre></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="build"></a>Chapter 3. Installing and Configuring Gnash</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#requirements">Requirements</a></span></dt><dd><dl><dt><span class="sect2"><a href="#hardware">Hardware Requirements</a></span></dt><dt><span class="sect2"><a href="#software">Software Requirements</a></span></dt></dl></dd><dt><span class="sect1"><a href="#downloading">Downloading Gnash</a></span></dt><dd><dl><dt><span class="sect2"><a href="#gettingsource">Getting the Source</a></span></dt><dt><span class="sect2"><a href="#getcodecs">Getting Codec Support</a></span></dt></dl></dd></dl></div><p>
+    There are two ways of installing Gnash:
+    <a class="link" href="#">using a package manager</a>
+    or <a class="link" href="#gettingsource" title="Getting the Source">installing from source</a>.
+  </p><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="requirements"></a>Requirements</h2></div></div></div><p>
+      Before downloading and installing Gnash, check that your
+      hardware and software meet the following requirements.
+    </p><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="hardware"></a>Hardware Requirements</h3></div></div></div><p>
+	One of the goals of Gnash is to make it portable enough to
+	install on small devices.  As a result, the hardware
+	requirements are minimal. Gnash has even run on an ARM9 at 200
+	MHz with 32 MB of RAM! (It ran without video support in this
+	case.) While firm minimums have not been established, Gnash
+	has been shown to run successfully with the following:
+      </p><div class="itemizedlist"><ul type="disc"><li><p>
+	    336 MHz processor
+	  </p></li><li><p>
+	    128 MB RAM
+	  </p></li><li><p>
+	    Gnash will run on anything from a raw frame
+	    buffer up to an OpenGL-supporting graphics card.
+	  </p></li></ul></div><p>
+	The following table provides a list of the Operating System/CPU
+	combinations on which Gnash has been shown to run. 
+      </p><div class="table"><a name="tb-os-cpu"></a><p class="title"><b>Table 3.1. Build Matrix</b></p><div class="table-contents"><table summary="Build Matrix" border="1"><colgroup><col align="left"><col align="left"></colgroup><thead><tr><th align="left">Operating System</th><th align="left">Processor</th></tr></thead><tbody><tr><td align="left">OpenBSD, FreeBSD, NetBSD</td><td align="left">Alpha AXP, AMD64, i386, Itanium, PC-98, PowerPC, SPARC64 
+	      </td></tr><tr><td align="left">Debian</td><td align="left">Alpha AXP, AMD64, ARM, hppa, i386, Itanium, MIPS,
+	      PowerPC, IBM zSeries (s390), SPARC  
+	      </td></tr><tr><td align="left">Fedora</td><td align="left">x86-32, x86-64, Geode GX, Geode LX
+	      </td></tr><tr><td align="left">Gentoo</td><td align="left">AMD64, PowerPC, SPARC, x86 
+	      </td></tr><tr><td align="left">Maemo 2.1</td><td align="left">i385, ARMv5t</td></tr><tr><td align="left">Scratchbox</td><td align="left">i386, ARMv5t</td></tr><tr><td align="left">Access Linux Platform
+	      </td><td align="left">i386, ARMv5t</td></tr><tr><td align="left">Mandriva
+	      </td><td align="left">i386, MIPS</td></tr><tr><td align="left">Open Embedded, OpenMoko, Poky
+	      </td><td align="left">ARM
+	      </td></tr><tr><td align="left">YellowDog Linux 6
+	      </td><td align="left">PowerPC, PS3
+	      </td></tr><tr><td align="left">OpenSuSE 10 
+	      </td><td align="left">i586, x86-64 
+	      </td></tr><tr><td align="left">Red Hat Enterprise, CentOS
+	      </td><td align="left">x86-32, x86-64 
+	      </td></tr><tr><td align="left">Ubuntu 
+	      </td><td align="left">x86-64, x86-32, PowerPC, UltraSPARC 
+	      </td></tr><tr><td align="left">Haiku</td><td align="left">i386</td></tr><tr><td align="left">Syllable</td><td align="left">i386</td></tr><tr><td align="left">Irix 6.5 
+	      </td><td align="left">MIPS R10K 
+	      </td></tr><tr><td align="left">Darwin (MacOS X)
+	      </td><td align="left">PowerPC and x86-32 
+	      </td></tr><tr><td align="left">Windows XP, Windows Vista</td><td align="left">x86-32</td></tr></tbody></table></div></div><br class="table-break"></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="software"></a>Software Requirements</h3></div></div></div><p>
+	The 0.8.2 release of Gnash has been designed to run on
+	UNIX/Linux variants, and has been run on most of the free ones.
+	However, Gnash has successfully run on Windows, Darwin (Mac OS X),
+	Irix, Solaris, BeOs, OS/2, and Haiku.  Gnash has also run on the
+	following 64-bit systems: PowerPC, Itanium, UltraSparc, and AMD64.
+	For now, it is important to be sure that the following code, testing,
+	and documentation dependencies are met before installing Gnash.  If
+	you will be downloading Gnash with a package manager, these
+	dependencies may be solved by the package manager.  Otherwise, you
+	must first verify that each of these dependencies are installed on the
+	target system.
+      </p></div></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="downloading"></a>Downloading Gnash</h2></div></div></div><p>
+	There are two ways to download Gnash: using a package manager or by
+	downloading the source code and building it on your system. If
+	possible, it is advisable to use a package manager to download Gnash,
+	as it will resolve dependencies for you.  However, if you want the
+	very latest features, or a Gnash package is not available for your
+	operating system, it is better to download the source code and build
+	Gnash locally. 
+      </p><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="gettingsource"></a>Getting the Source</h3></div></div></div><p>
+	  Gnash is available as a <a class="link" href="#sourcereleases" title="Releases">release
+	  tarball</a>, a <a class="link" href="#sourcerepo" title="Repository">development 
+	  checkout</a>, or a <a class="link" href="#sourcesnapshot" title="Snapshot">development
+	  snapshot</a>.
+	</p><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="sourcereleases"></a>Releases</h4></div></div></div><p>
+	    The source can be acquired from a
+	    <a class="ulink" href="http://www.gnu.org/prep/ftp.html" target="_top">GNU FTP
+	    Mirror</a>.  The release version is intended to be
+	    stable, and is probably your best choice if the release took
+	    place recently.  If you need features or fixes which were
+	    introduced after the release, consider a 
+	    <a class="link" href="#sourcerepo" title="Repository">CVS checkout</a> or the
+	    <a class="link" href="#sourcesnapshot" title="Snapshot">daily snapshot</a>.
+	  </p><p>
+	    To download, select a mirror near you, then choose the
+	    <code class="filename">gnash</code> directory.
+	  </p></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="sourcesnapshot"></a>Snapshot</h4></div></div></div><p>
+	    The daily development snapshot can be downloaded from
+	    <a class="ulink" href="http://www.gnashdev.org/dev_snapshots/" target="_top">http://www.gnashdev.org/dev_snapshots/</a>.
+	    This is the best option if you need changes which were introduced
+	    after the <a class="link" href="#sourcereleases" title="Releases">last release</a> of
+	    Gnash, but are unable to <a class="link" href="#sourcerepo" title="Repository">download
+	    directly from the repository.</a>
+	  </p></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="sourcerepo"></a>Repository</h4></div></div></div><p>
+	    The latest development sources are available via
+	    anonymous CVS.  This is recommended
+	    if you need features or bug fixes which were introduced after
+	    the <a class="link" href="#sourcereleases" title="Releases">last release</a>.  Look at
+	    the <a class="link" href="#sourcesnapshot" title="Snapshot">daily snapshot</a> if you
+	    experience difficulty accessing the repository.
+	  </p><p>
+	    To download via anonymous CVS, first set the
+	    environment variable <span class="command"><strong>CVS_RSH</strong></span> to
+	    <span class="command"><strong>ssh</strong></span>, then check out the source code.
+	    The example below uses the GNU Bourne-Again shell (bash): 
+	  </p><pre class="screen">
+	    export CVS_RSH="ssh"
+	    cvs -z3 -d:pserver:anonymous@cvs.sv.gnu.org:/sources/gnash co gnash
+	  </pre><p>
+	    It is also possible to browse the repository
+	    <a class="ulink" href="http://cvs.savannah.gnu.org/viewcvs/gnash/?root=gnash" target="_top">http://cvs.savannah.gnu.org/viewcvs/gnash/?root=gnash</a> on the web.
+	  </p></div></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="getcodecs"></a>Getting Codec Support</h3></div></div></div><p>
+	  Gnash requires codec support to handle audio and video
+	  correctly. Some platforms like Ubuntu or Fedora under the
+	  GNOME desktop will automatically notify the user that the
+	  proper codecs aren't installed, and pop up a dialog box to
+	  let the user download the codecs Gnash needs to make site
+	  like YouTube work correctly. If you have installed Gnash on
+	  any other platform, and video doesn't work, it's highly
+	  likely you need to install the proper codecs. For most
+	  platforms, this is the Gstreamer-ffmpeg plugin, available
+	  from your distributions repository.
+	</p></div></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="bugreport"></a>Chapter 4. Reporting Bugs</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#bugstep_package">Get a Fresh Binary Package</a></span></dt><dt><span class="sect1"><a href="#bugstep_search">Determine if the bug was previously reported</a></span></dt><dt><span class="sect1"><a href="#bugstep_guidelines">Review the bug writing guidelines</a></span></dt><dt><span class="sect1"><a href="#bugstep_file">Filing a bug report</a></span></dt></dl></div><p>
+    The Gnash project relies on the community of Gnash users to test
+    the player, feedback is critical to any successful project.  Not
+    only does it let us know that people use Gnash, but it helps us  
+    understand the community's needs. Gnash uses a bug tracker on
+    <a class="ulink" href="http://savannah.gnu.org" target="_top">http://savannah.gnu.org</a> to manage these reports.
+  </p><p>
+    When filing a report, please follow the guidelines below. The better
+    your bug report is, the easier it will be for the developers to
+    address the issue. Bug reports without enough information will
+    initially be asked to provide this information anyway. Adding
+    critical details, like the Operating System you are on, it's
+    version, and any relevant error messages from Gnash that you get.
+  </p><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="bugstep_package"></a>Get a Fresh Binary Package</h2></div></div></div><p>
+      For starters, it's a good idea to obtain a copy of the latest
+      snapshot. Although Gnash is primarily released as source, the
+      Gnash build infrastructure allows the automated building of
+      binary packages. Often the version of Gnash as packaged by a
+      GNU/Linux or BSD distribution is based on the last official
+      release, which could be months out of date. It is helpful if
+      this is the case to try a newer packaged build of Gnash. 
+    </p><p>
+      You can get a fresh binary package of Gnash, as well as recent 
+      source packages from
+      <a class="ulink" href="http://www.getgnash.org/packages/" target="_top">
+	http://www.getgnash.org/packages
+      </a>. 
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="bugstep_search"></a>Determine if the bug was previously reported</h2></div></div></div><p>
+      Search the <a class="ulink" href="https://savannah.gnu.org/bugs/?group=gnash" target="_top">Gnash
+      bug tracker</a> to see if the bug has already been identified.
+    </p><p>
+      If the issue has already been reported, you should not file
+      a bug report.  However, you may add some additional information
+      to the ticket if you feel that it will be beneficial to the
+      developers.  For instance, if someone reported a memory issue
+      on Ubuntu GNU/Linux, and you noticed the same problem on OpenBSD,
+      your stacktrace would be useful.  Conversely, adding a "me too"
+      note to a feature request is not helpful.
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="bugstep_guidelines"></a>Review the bug writing guidelines</h2></div></div></div><p>
+      A good bug report should be precise, explicit, and discrete.
+      This means that there should be just one bug per ticket, and
+      that a ticket should contain the following information:
+    </p><div class="itemizedlist"><ul type="opencircle"><li style="list-style-type: circle"><p>
+	  An overview of the problem;
+	</p></li><li style="list-style-type: circle"><p>
+	  Instructions on how to replicate the bug;
+	</p></li><li style="list-style-type: circle"><p>
+	  A description of what happened when you performed the steps
+	  to replicate the bug, and what you expected to happen;
+	</p></li><li style="list-style-type: circle"><p>
+	  Your system information: operating system name and version, as
+	  well as the versions of major development dependencies;
+	</p></li><li style="list-style-type: circle"><p>
+	  The release number or checkout timestamp for the version of Gnash
+	  where you observe the problem;
+	</p></li><li style="list-style-type: circle"><p>
+	  The file <code class="filename">config.log</code>, which should be
+	  attached as a file;
+	</p></li><li style="list-style-type: circle"><p>
+	  A descriptive title.
+	</p></li></ul></div><p>
+      Include any additional information that you feel might be useful
+      to the developers.
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="bugstep_file"></a>Filing a bug report</h2></div></div></div><p>
+      After following the steps described above, you can file a bug report at 
+      <a class="ulink" href="https://savannah.gnu.org/bugs/?group=gnash" target="_top">https://savannah.gnu.org/bugs/?group=gnash</a>.
+    </p></div></div><div class="glossary"><div class="titlepage"><div><div><h2 class="title"><a name="glossary"></a>Glossary</h2></div></div></div><div class="glossdiv"><h3 class="title">A</h3><dl><dt>
+	ActionScript
+      </dt><dd><p>
+	  <span class="emphasis"><em>ActionScript</em></span>, or "AS", is the scripting 
+	  language for <span class="emphasis"><em>Flash</em></span>
+	  applications. It is compiled to bytecode, which is a subset of
+	  the <span class="emphasis"><em>SWF</em></span> format.
+	</p></dd><dt>
+	AGG
+      </dt><dd><p>
+	  AGG is the AntiGrain 2D graphics library, which can be used
+	  as a renderer in Gnash. It is faster than OpenGL on systems
+	  without hardware graphics acceleration. As of Gnash version
+	  0.8.1 it is the more feature complete renderer. 
+	</p></dd><dt>
+	AMF
+      </dt><dd><p>
+	  <span class="emphasis"><em>AMF</em></span> 
+	  is the object format used by <span class="emphasis"><em>Flash</em></span> 
+	  for shared objects and streaming video.
+	</p></dd><dt>
+	as_environment
+      </dt><dd><p>
+	  In Gnash terms, the as_environment, or ActionScript
+	  execution environment, contains a stack of objects,
+	  characters and values which are in the immediate environment
+	  of the current fn_call. Please refer to the Gnash
+	  ActionScript manual for more information. 
+        </p></dd></dl></div><div class="glossdiv"><h3 class="title">C</h3><dl><dt>
+	Cairo
+      </dt><dd><p>
+	  Cairo is a 2D graphics library with support for multiple
+	  output devices. Can be used as a renderer in Gnash. A useful
+	  feature of Cairo is that it will automatically use graphic
+	  card acceleration when available. Cairo has an experimental
+	  OpenGL backend. 
+	</p></dd></dl></div><div class="glossdiv"><h3 class="title">D</h3><dl><dt>
+	DejaGNU
+      </dt><dd><p>
+	  DejaGNU is a framework for testing software.
+	</p></dd><dt>
+	DocBook
+      </dt><dd><p>
+	  <span class="emphasis"><em>DocBook</em></span>
+	  is a markup language for presentation-neutral 
+	  documentation, such as manuals.
+	</p></dd><dt>
+	Doxygen
+      </dt><dd><p>
+	  <span class="emphasis"><em>Doxygen</em></span> 
+	  is a documentation generator for for multiple languages 
+	  which uses comments in the source code to create stand-alone
+	  documentation. 
+	</p></dd><dt>
+	Drupal
+      </dt><dd><p>
+	  Drupal is a CMS/blog system used for the main Gnash website.
+	</p></dd></dl></div><div class="glossdiv"><h3 class="title">E</h3><dl><dt>
+	extensions
+      </dt><dd><p>
+	  A <span class="application">Gnash</span> <span class="emphasis"><em>extension</em></span> is a plugin (not a
+	  browser plugin) which implements additional functionality
+	  beyond what is covered by <span class="emphasis"><em>Flash</em></span>
+	  specification. These are shared libraries which are loaded
+	  at runtime. 
+	</p></dd></dl></div><div class="glossdiv"><h3 class="title">F</h3><dl><dt>
+	ffmpeg
+      </dt><dd><p>
+	  ffmpeg is an audio and video decoding library which can be 
+	  used by Gnash to decode mp3, FLV and other media types.  
+	</p></dd><dt>
+	Flash
+      </dt><dd><p>
+	  The term <span class="emphasis"><em>Flash</em></span> is used to describe both the 
+	  Adobe IDE for creating <span class="emphasis"><em>SWF</em></span>
+	  files, and the technology itself. Flash is a trademarked
+	  term of Adobe's, we prfer to use SWF to refer to the files
+	  themselves, as well as the format, instead of flash(tm).
+	</p></dd><dt>
+	FLV
+      </dt><dd><p>
+	  FLV is a proprietary file format used to deliver Flash
+	  video. It is used by YouTube, among others.  
+	</p></dd><dt>
+	FLTK
+      </dt><dd><p>
+	  FLTK, or the 'Fast Light ToolKit', is a portable GUI library
+	  which is intended to replace the SDL GUI. Currently in Gnash,
+	  FLTK may be used with the Cairo and AGG renderers. FLTK has an
+	  experimental Cairo backend. 
+	</p></dd><dt>
+	FrameBuffer
+      </dt><dd><p>
+	  In Gnash, this is a GUI library that outputs directly to the
+	  Linux Frame Buffer and so does not need a window system to
+	  run. This makes it particularly suitable for use on small
+	  devices. 
+	</p></dd></dl></div><div class="glossdiv"><h3 class="title">G</h3><dl><dt>
+	Gnash
+      </dt><dd><p>
+	  Gnash is the GNU Flash movie player.
+	</p></dd><dt>
+	Gstreamer
+      </dt><dd><p>
+	  Gstreamer is a multimedia framework which Gnash can use for
+	  decoding audio and video. Gstreamer itself cannot decode
+	  anything, so it needs some appropriate decoding-plugins to do
+	  the work for it. Remember to install them if you use Gnash
+	  with Gstreamer enabled. To get the best out of Gnashs
+	  gstreamer-parts, it is recommended to install the
+	  gst-plugins-good, gst-plugins-good and gst-ffmpeg plugins
+	  packages.  
+	</p></dd><dt>
+	GTK
+      </dt><dd><p>
+	  GTK is the GIMP Toolkit GUI library. It is one of the GUI
+	  options for Gnash. As of Gnash 0.7.2, this is the more
+	  performant and feature-rich choice. GTK uses Cairo
+	  internally. 
+	</p></dd><dt>
+      GUI
+    </dt><dd><p>
+	A <span class="emphasis"><em>GUI</em></span> is a 
+	"graphical user interface". In <span class="application">Gnash</span>, the GUI 
+	library provides a wrapper for mouse and keyboard events, 
+	menus, windowing (where available) and a drawing area. 
+	You must choose a GUI library during the
+	configuration stage of building Gnash.
+      </p></dd></dl></div><div class="glossdiv"><h3 class="title">K</h3><dl><dt>
+	Klash
+      </dt><dd><p>
+	  <span class="emphasis"><em>Klash</em></span> was the name given to the stand-alone 
+	  instance of <span class="application">Gnash</span> which used the KDE GUI.  It has been replaced with 
+	  an implementation using Qt.  Some documentation may incorrectly
+	  refer to the Konqueror plugin as <span class="emphasis"><em>Klash</em></span>.
+	  The plugin was renamed <span class="emphasis"><em>Kpart</em></span>.
+	</p></dd><dt>
+	Kpart
+      </dt><dd><p>
+	  <span class="emphasis"><em>Kpart</em></span> is a plugin for Konqueror which is
+	  enabled with the <a class="link" href="#">configuration option</a>
+	  <span class="emphasis"><em>--enable-klash</em></span>.
+	</p></dd></dl></div><div class="glossdiv"><h3 class="title">L</h3><dl><dt>
+	libmad
+      </dt><dd><p>
+	  libmad is a mp3-decoding library, which used to be an option for Gnash
+	  handling of sound (dropped since 0.8.2).
+	</p></dd></dl></div><div class="glossdiv"><h3 class="title">M</h3><dl><dt>
+	Mesa
+      </dt><dd><p>
+	  <span class="emphasis"><em>Mesa</em></span> is the free software OpenGL 
+	  implementation.  <span class="application">Gnash</span> documentation will sometimes use the
+	  glossterms 'OpenGL' and 'Mesa' interchangeably.
+	</p></dd><dt>
+	Ming
+      </dt><dd><p>
+	  Ming is a C library for generating SWF ("Flash") format
+	  movies, plus a set of wrappers for using the library. It is
+	  used by the Gnash project for generating testcases.  
+	</p></dd></dl></div><div class="glossdiv"><h3 class="title">N</h3><dl><dt>
+	Nellymoser
+      </dt><dd><p>
+	  Nellymoser is a proprietary audio codec introduced in the
+	  Flash Player in version 6. For more information, please see
+	  Wikipedia. 
+	</p></dd></dl></div><div class="glossdiv"><h3 class="title">O</h3><dl><dt>
+	OpenGL
+      </dt><dd><p>
+	  OpenGL (Open Graphics Library) is a standard specification
+	  defining a cross-language cross-platform API for writing
+	  applications that produce 3D and 2D computer
+	  graphics. Accelerated graphic cards usually provide OpenGL at
+	  the hardware level. Please refer to Wikipedia for availability
+	  of free software OpenGL hardware drivers. A free software
+	  implementation of the API is available (Mesa). OpenGL can be
+	  used as a renderer in Gnash. 
+	</p></dd><dt>
+	ORM
+      </dt><dd><p>
+	  ORM is a system for ensuring the rights of the creator over a piece of digital content. It is more passive than DRM.
+	</p></dd></dl></div><div class="glossdiv"><h3 class="title">P</h3><dl><dt>
+	plugin
+      </dt><dd><p>
+	  The glossterm <span class="emphasis"><em>plugin</em></span> is used in <span class="application">Gnash</span> to
+	  refer to both any <span class="application">Gnash</span> browser plugin, as well as the Firefox
+	  plugin specifically.  The Konqueror plugin is called
+	  <span class="emphasis"><em>Kpart</em></span>.  Sometimes, the term is used in
+	  an even more generic sense to refer to 
+	  <span class="emphasis"><em>extensions</em></span>.
+	</p></dd></dl></div><div class="glossdiv"><h3 class="title">Q</h3><dl><dt>
+	Qt
+      </dt><dd><p>
+	  Qt is a GUI library which is used by KDE. The plugin version
+	  of Gnash using this GUI library is Kpart. The standalone
+	  version is enabled with --enable-gui=kde. 
+	</p></dd></dl></div><div class="glossdiv"><h3 class="title">R</h3><dl><dt>
+	renderer
+      </dt><dd><p>
+	  The <span class="emphasis"><em>renderer</em></span> is the subsystem of <span class="application">Gnash</span>
+	  which renders content.  Only one renderer may be used; it is
+	  selected at configuration time if building from source.
+	</p><p>
+	  Available renderers are: AGG, OpenGL, and Cairo. In terms of 
+	  feature completeness, AGG comes first; followed by OpenGL and 
+	  then Cairo. In most cases, AGG is preferred for performance, 
+	  except cases where it is beneficial to have hardware accelerated 
+	  rendering (for example, when you have a very slow CPU but a very 
+	  fast graphics card). In this case OpenGL should be used.
+	</p></dd><dt>
+	RTMP
+    </dt><dd><p>
+	RTMP is the Real Time Messaging Protocol primarily used with
+	to stream audio and video over the internet to the Flash
+	Player client. 
+      </p></dd><dt>
+	RTMPT
+      </dt><dd><p>
+	  RTMPT is basically a HTTP wrapper around the RTMP protocol
+	  that is sent using POST requests from the client to the
+	  server. Because of the non-persistent nature of HTTP
+	  connections, RTMPT requires the clients to poll for updates
+	  periodically in order to get notified about events that are
+	  generated by the server or other clients.  
+	</p></dd><dt>
+	RTMPTS
+      </dt><dd><p>
+	  RTMPTS is the same as RTMPT, but instead of being a HTTP
+	  wrapper, it is a HTTP SSL wrapper (HTTP secure connection). 
+	</p></dd></dl></div><div class="glossdiv"><h3 class="title">S</h3><dl><dt>
+	SDL
+      </dt><dd><p>
+	  Simple DirectMedia Layer is a cross-platform multimedia free
+	  software library that creates an abstraction over various
+	  platforms' graphics, sound, and input APIs. Gnash can use it
+	  as a GUI and/or as a sound handler. Note that the two usages
+	  are independent of each other: you can use it for a task and
+	  not for the other if you wish. At time or writing (2007-01-11)
+	  the SDL GUI lacks menus and a performant input event
+	  architecture; the SDL sound handler is the most feature rich,
+	  supporting Video through ffmpeg. 
+	</p></dd><dt>
+	sound handler
+      </dt><dd><p>
+	  The <span class="emphasis"><em>sound handler</em></span> is the part of <span class="application">Gnash</span>
+	  which handles both event sounds and streaming sound.  Audio
+	  from external sources are also handled through the sound handler
+	  when SDL is used.  The sound handler must be selected during
+	  configuration of Gnash when compiling.
+	</p><p>
+	  There are currently two sound handlers available in <span class="application">Gnash</span>:
+	  ffmpeg and Gstreamer.  The ffmpeg sound handler uses SDL for
+	  mixing.
+	  The Gstreamer-sound handler uses the available 
+	  plugins to decode the audio, so it might not work if some 
+	  important plugins are missing.  The GST sound handler is 
+	  recommended (the default).
+	</p></dd><dt>
+	sprite
+      </dt><dd><p>
+	  A sprite is an element of an Flash Movie. It's basically a
+	  Movie inside another, having its own timeline. 
+	</p></dd><dt>
+	Stage
+      </dt><dd><p>
+	  The visible area of a Flash movie. The name derives from a	  theater analogy. Graphical elements are referred to as
+	  characters.  
+	</p></dd><dt>
+	SWF
+      </dt><dd><p>
+	  <span class="emphasis"><em>SWF</em></span> is the file format for 
+	  <span class="emphasis"><em>Flash</em></span> movies.
+	</p></dd></dl></div><div class="glossdiv"><h3 class="title">T</h3><dl><dt>
+	Tamarin
+      </dt><dd><p>
+	  The Tamarin project seeks to create an open source
+	  implementation of the ECMAScript 4th edition language
+	  specification. The code is used by Adobe as part of the
+	  ActionScript Virtual Machine within the Adobe Flash
+	  Player. Gnash does not use Tamarin; it already has a working
+	  virtual server and most ActionScript classes are implemented. 
+	</p></dd><dt>
+	timeline
+      </dt><dd><p>
+	  In Flash technology, a timeline is a sequence of "frames". A
+	  single Flash movie can contain multiple timelines, each
+	  independently controlled (STOP or PLAY). At regular intervals
+	  (FPS) the player advances all timelines in PLAY mode to the
+	  next frame, looping back when last frame is reached. 
+	</p></dd></dl></div><div class="glossdiv"><h3 class="title">X</h3><dl><dt>
+	X.org
+      </dt><dd><p>
+	  X.org is the most commonly used X server; it was forked from
+	  XFree86. 
+	</p></dd></dl></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="authors"></a>Chapter 5. Authors</h2></div></div></div><p>
+        <span class="application">Gnash</span> is maintained by Rob Savoye. Other active developers
+	are: Sandro Santilli, Bastiaan Jacques, Udo Giacomozzi, Chad
+	Musick, Benjamin Wolsey, and Zou Lunkai. Please send all
+	comments and suggestions to <code class="email">&lt;<a class="email" href="mailto:gnash-dev@gnu.org%0A%09">gnash-dev@gnu.org
+	</a>&gt;</code>. Past and sometimes current developers are Tomas
+	Groth and Markus Gothe.
+    </p><p>
+        <span class="application">Gnash</span> was initially derived from <span class="application">GameSWF</span>.
+        <span class="application">GameSWF</span> is maintained by
+        Thatcher Ulrich <code class="email">&lt;<a class="email" href="mailto:tu@tulrich.com">tu@tulrich.com</a>&gt;</code>.  The following
+        people contributed to <span class="application">GameSWF</span>:
+        Mike Shaver, Thierry Berger-Perrin,
+	Ignacio Castaño, Willem Kokke, Vitaly Alexeev, Alexander Streit, 
+        and Rob Savoye.
+    </p></div><div class="appendix" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="fdl"></a>Appendix A. GNU Free Documentation License</h2></div><div><p class="releaseinfo">
+      Version 1.1, March 2000
+    </p></div><div><p class="copyright">Copyright © 2000 Free Software Foundation, Inc.</p></div><div><div class="legalnotice"><a name="fdl-legalnotice"></a><p>
+	</p><div class="address"><p>Free Software Foundation, Inc. <span class="street">59 Temple Place, <br>
+        Suite 330</span>, <span class="city">Boston</span>, <span class="state">MA</span>  <br>
+        <span class="postcode">02111-1307</span>  <span class="country">USA</span></p></div><p> 
+	Everyone is permitted to copy and distribute verbatim copies of this 
+        license document, but changing it is not allowed.
+      </p></div></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#fdl-preamble">0. PREAMBLE</a></span></dt><dt><span class="sect1"><a href="#fdl-section1">1. APPLICABILITY AND DEFINITIONS</a></span></dt><dt><span class="sect1"><a href="#fdl-section2">2. VERBATIM COPYING</a></span></dt><dt><span class="sect1"><a href="#fdl-section3">3. COPYING IN QUANTITY</a></span></dt><dt><span class="sect1"><a href="#fdl-section4">4. MODIFICATIONS</a></span></dt><dt><span class="sect1"><a href="#fdl-section5">5. COMBINING DOCUMENTS</a></span></dt><dt><span class="sect1"><a href="#fdl-section6">6. COLLECTIONS OF DOCUMENTS</a></span></dt><dt><span class="sect1"><a href="#fdl-section7">7. AGGREGATION WITH INDEPENDENT WORKS</a></span></dt><dt><span class="sect1"><a href="#fdl-section8">8. TRANSLATION</a></span></dt><dt><span class="sect1"><a href="#fdl-section9">9. TERMINATION</a></span></dt><dt><span class="sect1"><a href="#fdl-section10">10. FUTURE REVISIONS OF THIS LICENSE</a></span></dt><dt><span class="sect1"><a href="#fdl-using">Addendum</a></span></dt></dl></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-preamble"></a>0. PREAMBLE</h2></div></div></div><p>
+      The purpose of this License is to make a manual, textbook, or
+      other written document "free" in the sense of
+      freedom: to assure everyone the effective freedom to copy and
+      redistribute it, with or without modifying it, either
+      commercially or non-commercially. Secondarily, this License
+      preserves for the author and publisher a way to get credit for
+      their work, while not being considered responsible for
+      modifications made by others.
+    </p><p>
+      This License is a kind of "copyleft", which means
+      that derivative works of the document must themselves be free in
+      the same sense. It complements the GNU General Public License,
+      which is a copyleft license designed for free software.
+    </p><p>
+      We have designed this License in order to use it for manuals for
+      free software, because free software needs free documentation: a
+      free program should come with manuals providing the same
+      freedoms that the software does. But this License is not limited
+      to software manuals; it can be used for any textual work,
+      regardless of subject matter or whether it is published as a
+      printed book. We recommend this License principally for works
+      whose purpose is instruction or reference.
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section1"></a>1. APPLICABILITY AND DEFINITIONS</h2></div></div></div><p><a name="fdl-document"></a>
+      This License applies to any manual or other work that contains a
+      notice placed by the copyright holder saying it can be
+      distributed under the terms of this License. The
+      "Document", below, refers to any such manual or
+      work. Any member of the public is a licensee, and is addressed
+      as "you".
+    </p><p><a name="fdl-modified"></a>
+      A "Modified Version" of the Document means any work
+      containing the Document or a portion of it, either copied
+      verbatim, or with modifications and/or translated into another
+      language.
+    </p><p><a name="fdl-secondary"></a>
+      A "Secondary Section" is a named appendix or a
+      front-matter section of the <a class="link" href="#fdl-document">Document</a> that deals exclusively
+      with the relationship of the publishers or authors of the
+      Document to the Document's overall subject (or to related
+      matters) and contains nothing that could fall directly within
+      that overall subject. (For example, if the Document is in part a
+      textbook of mathematics, a Secondary Section may not explain any
+      mathematics.)  The relationship could be a matter of historical
+      connection with the subject or with related matters, or of
+      legal, commercial, philosophical, ethical or political position
+      regarding them.
+    </p><p><a name="fdl-invariant"></a>
+      The "Invariant Sections" are certain <a class="link" href="#fdl-secondary"> Secondary Sections</a> whose titles
+      are designated, as being those of Invariant Sections, in the
+      notice that says that the <a class="link" href="#fdl-document">Document</a> is released under this
+      License.
+    </p><p><a name="fdl-cover-texts"></a>
+      The "Cover Texts" are certain short passages of
+      text that are listed, as Front-Cover Texts or Back-Cover Texts,
+      in the notice that says that the <a class="link" href="#fdl-document">Document</a> is released under this
+      License.
+    </p><p><a name="fdl-transparent"></a>
+      A "Transparent" copy of the <a class="link" href="#fdl-document"> Document</a> means a machine-readable
+      copy, represented in a format whose specification is available
+      to the general public, whose contents can be viewed and edited
+      directly and straightforwardly with generic text editors or (for
+      images composed of pixels) generic paint programs or (for
+      drawings) some widely available drawing editor, and that is
+      suitable for input to text formatters or for automatic
+      translation to a variety of formats suitable for input to text
+      formatters. A copy made in an otherwise Transparent file format
+      whose markup has been designed to thwart or discourage
+      subsequent modification by readers is not Transparent.  A copy
+      that is not "Transparent" is called "Opaque".
+    </p><p>
+      Examples of suitable formats for Transparent copies include
+      plain ASCII without markup, Texinfo input format, LaTeX input
+      format, SGML or XML using a publicly available DTD, and
+      standard-conforming simple HTML designed for human
+      modification. Opaque formats include PostScript, PDF,
+      proprietary formats that can be read and edited only by
+      proprietary word processors, SGML or XML for which the DTD
+      and/or processing tools are not generally available, and the
+      machine-generated HTML produced by some word processors for
+      output purposes only.
+    </p><p><a name="fdl-title-page"></a>
+      The "Title Page" means, for a printed book, the
+      title page itself, plus such following pages as are needed to
+      hold, legibly, the material this License requires to appear in
+      the title page. For works in formats which do not have any title
+      page as such, "Title Page" means the text near the
+      most prominent appearance of the work's title, preceding the
+      beginning of the body of the text.
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section2"></a>2. VERBATIM COPYING</h2></div></div></div><p>
+      You may copy and distribute the <a class="link" href="#fdl-document">Document</a> in any medium, either
+      commercially or noncommercially, provided that this License, the
+      copyright notices, and the license notice saying this License
+      applies to the Document are reproduced in all copies, and that
+      you add no other conditions whatsoever to those of this
+      License. You may not use technical measures to obstruct or
+      control the reading or further copying of the copies you make or
+      distribute. However, you may accept compensation in exchange for
+      copies. If you distribute a large enough number of copies you
+      must also follow the conditions in <a class="link" href="#fdl-section3" title="3. COPYING IN QUANTITY">section 3</a>.
+    </p><p>
+      You may also lend copies, under the same conditions stated
+      above, and you may publicly display copies.
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section3"></a>3. COPYING IN QUANTITY</h2></div></div></div><p>
+      If you publish printed copies of the <a class="link" href="#fdl-document">Document</a> numbering more than 100,
+      and the Document's license notice requires <a class="link" href="#fdl-cover-texts">Cover Texts</a>, you must enclose
+      the copies in covers that carry, clearly and legibly, all these
+      Cover Texts: Front-Cover Texts on the front cover, and
+      Back-Cover Texts on the back cover. Both covers must also
+      clearly and legibly identify you as the publisher of these
+      copies. The front cover must present the full title with all
+      words of the title equally prominent and visible. You may add
+      other material on the covers in addition. Copying with changes
+      limited to the covers, as long as they preserve the title of the
+      <a class="link" href="#fdl-document">Document</a> and satisfy these
+      conditions, can be treated as verbatim copying in other
+      respects.
+    </p><p>
+      If the required texts for either cover are too voluminous to fit
+      legibly, you should put the first ones listed (as many as fit
+      reasonably) on the actual cover, and continue the rest onto
+      adjacent pages.
+    </p><p>
+      If you publish or distribute <a class="link" href="#fdl-transparent">Opaque</a> copies of the <a class="link" href="#fdl-document">Document</a> numbering more than 100,
+      you must either include a machine-readable <a class="link" href="#fdl-transparent">Transparent</a> copy along with
+      each Opaque copy, or state in or with each Opaque copy a
+      publicly-accessible computer-network location containing a
+      complete Transparent copy of the Document, free of added
+      material, which the general network-using public has access to
+      download anonymously at no charge using public-standard network
+      protocols. If you use the latter option, you must take
+      reasonably prudent steps, when you begin distribution of Opaque
+      copies in quantity, to ensure that this Transparent copy will
+      remain thus accessible at the stated location until at least one
+      year after the last time you distribute an Opaque copy (directly
+      or through your agents or retailers) of that edition to the
+      public.
+    </p><p>
+      It is requested, but not required, that you contact the authors
+      of the <a class="link" href="#fdl-document">Document</a> well before
+      redistributing any large number of copies, to give them a chance
+      to provide you with an updated version of the Document.
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section4"></a>4. MODIFICATIONS</h2></div></div></div><p>
+      You may copy and distribute a <a class="link" href="#fdl-modified">Modified Version</a> of the <a class="link" href="#fdl-document">Document</a> under the conditions of
+      sections <a class="link" href="#fdl-section2" title="2. VERBATIM COPYING">2</a> and <a class="link" href="#fdl-section3" title="3. COPYING IN QUANTITY">3</a> above, provided that you release
+      the Modified Version under precisely this License, with the
+      Modified Version filling the role of the Document, thus
+      licensing distribution and modification of the Modified Version
+      to whoever possesses a copy of it. In addition, you must do
+      these things in the Modified Version:
+    </p><div class="itemizedlist"><ul type="opencircle"><li style="list-style-type: circle"><p><b>A. </b>
+	    Use in the <a class="link" href="#fdl-title-page">Title
+	    Page</a> (and on the covers, if any) a title distinct
+	    from that of the <a class="link" href="#fdl-document">Document</a>, and from those of
+	    previous versions (which should, if there were any, be
+	    listed in the History section of the Document). You may
+	    use the same title as a previous version if the original
+	    publisher of that version gives permission.
+	  </p></li><li style="list-style-type: circle"><p><b>B. </b>
+	    List on the <a class="link" href="#fdl-title-page">Title
+	    Page</a>, as authors, one or more persons or entities
+	    responsible for authorship of the modifications in the
+	    <a class="link" href="#fdl-modified">Modified Version</a>,
+	    together with at least five of the principal authors of
+	    the <a class="link" href="#fdl-document">Document</a> (all of
+	    its principal authors, if it has less than five).
+	  </p></li><li style="list-style-type: circle"><p><b>C. </b>
+	    State on the <a class="link" href="#fdl-title-page">Title
+	    Page</a> the name of the publisher of the <a class="link" href="#fdl-modified">Modified Version</a>, as the
+	    publisher.
+	  </p></li><li style="list-style-type: circle"><p><b>D. </b>
+	    Preserve all the copyright notices of the <a class="link" href="#fdl-document">Document</a>.
+	  </p></li><li style="list-style-type: circle"><p><b>E. </b>
+	    Add an appropriate copyright notice for your modifications
+	    adjacent to the other copyright notices.
+	  </p></li><li style="list-style-type: circle"><p><b>F. </b>
+	    Include, immediately after the copyright notices, a
+	    license notice giving the public permission to use the
+	    <a class="link" href="#fdl-modified">Modified Version</a> under
+	    the terms of this License, in the form shown in the
+	    Addendum below.
+	  </p></li><li style="list-style-type: circle"><p><b>G. </b>
+	    Preserve in that license notice the full lists of <a class="link" href="#fdl-invariant"> Invariant Sections</a> and
+	    required <a class="link" href="#fdl-cover-texts">Cover
+	    Texts</a> given in the <a class="link" href="#fdl-document">Document's</a> license notice.
+	  </p></li><li style="list-style-type: circle"><p><b>H. </b>
+	    Include an unaltered copy of this License.
+	  </p></li><li style="list-style-type: circle"><p><b>I. </b>
+	    Preserve the section entitled "History", and
+	    its title, and add to it an item stating at least the
+	    title, year, new authors, and publisher of the <a class="link" href="#fdl-modified">Modified Version </a>as given on
+	    the <a class="link" href="#fdl-title-page">Title Page</a>.  If
+	    there is no section entitled "History" in the
+	    <a class="link" href="#fdl-document">Document</a>, create one
+	    stating the title, year, authors, and publisher of the
+	    Document as given on its Title Page, then add an item
+	    describing the Modified Version as stated in the previous
+	    sentence.
+	  </p></li><li style="list-style-type: circle"><p><b>J. </b>
+	    Preserve the network location, if any, given in the <a class="link" href="#fdl-document">Document</a> for public access
+	    to a <a class="link" href="#fdl-transparent">Transparent</a>
+	    copy of the Document, and likewise the network locations
+	    given in the Document for previous versions it was based
+	    on. These may be placed in the "History"
+	    section.  You may omit a network location for a work that
+	    was published at least four years before the Document
+	    itself, or if the original publisher of the version it
+	    refers to gives permission.
+	  </p></li><li style="list-style-type: circle"><p><b>K. </b>
+	    In any section entitled "Acknowledgements" or
+	    "Dedications", preserve the section's title,
+	    and preserve in the section all the substance and tone of
+	    each of the contributor acknowledgements and/or
+	    dedications given therein.
+	  </p></li><li style="list-style-type: circle"><p><b>L. </b>
+	    Preserve all the <a class="link" href="#fdl-invariant">Invariant
+	    Sections</a> of the <a class="link" href="#fdl-document">Document</a>, unaltered in their
+	    text and in their titles.  Section numbers or the
+	    equivalent are not considered part of the section titles.
+	  </p></li><li style="list-style-type: circle"><p><b>M. </b>
+	    Delete any section entitled
+	    "Endorsements". Such a section may not be
+	    included in the <a class="link" href="#fdl-modified">Modified
+	    Version</a>.
+	  </p></li><li style="list-style-type: circle"><p><b>N. </b>
+	    Do not retitle any existing section as
+	    "Endorsements" or to conflict in title with
+	    any <a class="link" href="#fdl-invariant">Invariant
+	    Section</a>.
+	  </p></li></ul></div><p>
+      If the <a class="link" href="#fdl-modified">Modified Version</a>
+      includes new front-matter sections or appendices that qualify as
+      <a class="link" href="#fdl-secondary">Secondary Sections</a> and
+      contain no material copied from the Document, you may at your
+      option designate some or all of these sections as invariant. To
+      do this, add their titles to the list of <a class="link" href="#fdl-invariant">Invariant Sections</a> in the
+      Modified Version's license notice.  These titles must be
+      distinct from any other section titles.
+    </p><p>
+      You may add a section entitled "Endorsements",
+      provided it contains nothing but endorsements of your <a class="link" href="#fdl-modified">Modified Version</a> by various
+      parties--for example, statements of peer review or that the text
+      has been approved by an organization as the authoritative
+      definition of a standard.
+    </p><p>
+      You may add a passage of up to five words as a <a class="link" href="#fdl-cover-texts">Front-Cover Text</a>, and a passage
+      of up to 25 words as a <a class="link" href="#fdl-cover-texts">Back-Cover Text</a>, to the end of
+      the list of <a class="link" href="#fdl-cover-texts">Cover Texts</a>
+      in the <a class="link" href="#fdl-modified">Modified Version</a>.
+      Only one passage of Front-Cover Text and one of Back-Cover Text
+      may be added by (or through arrangements made by) any one
+      entity. If the <a class="link" href="#fdl-document">Document</a>
+      already includes a cover text for the same cover, previously
+      added by you or by arrangement made by the same entity you are
+      acting on behalf of, you may not add another; but you may
+      replace the old one, on explicit permission from the previous
+      publisher that added the old one.
+    </p><p>
+      The author(s) and publisher(s) of the <a class="link" href="#fdl-document">Document</a> do not by this License
+      give permission to use their names for publicity for or to
+      assert or imply endorsement of any <a class="link" href="#fdl-modified">Modified Version </a>.
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section5"></a>5. COMBINING DOCUMENTS</h2></div></div></div><p>
+      You may combine the <a class="link" href="#fdl-document">Document</a>
+      with other documents released under this License, under the
+      terms defined in <a class="link" href="#fdl-section4" title="4. MODIFICATIONS">section 4</a>
+      above for modified versions, provided that you include in the
+      combination all of the <a class="link" href="#fdl-invariant">Invariant
+      Sections</a> of all of the original documents, unmodified,
+      and list them all as Invariant Sections of your combined work in
+      its license notice.
+    </p><p>
+      The combined work need only contain one copy of this License,
+      and multiple identical <a class="link" href="#fdl-invariant">Invariant
+      Sections</a> may be replaced with a single copy. If there are
+      multiple Invariant Sections with the same name but different
+      contents, make the title of each such section unique by adding
+      at the end of it, in parentheses, the name of the original
+      author or publisher of that section if known, or else a unique
+      number. Make the same adjustment to the section titles in the
+      list of Invariant Sections in the license notice of the combined
+      work.
+    </p><p>
+      In the combination, you must combine any sections entitled
+      "History" in the various original documents,
+      forming one section entitled "History"; likewise
+      combine any sections entitled "Acknowledgements",
+      and any sections entitled "Dedications".  You must
+      delete all sections entitled "Endorsements."
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section6"></a>6. COLLECTIONS OF DOCUMENTS</h2></div></div></div><p>
+      You may make a collection consisting of the <a class="link" href="#fdl-document">Document</a> and other documents
+      released under this License, and replace the individual copies
+      of this License in the various documents with a single copy that
+      is included in the collection, provided that you follow the
+      rules of this License for verbatim copying of each of the
+      documents in all other respects.
+    </p><p>
+      You may extract a single document from such a collection, and
+      distribute it individually under this License, provided you
+      insert a copy of this License into the extracted document, and
+      follow this License in all other respects regarding verbatim
+      copying of that document.
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section7"></a>7. AGGREGATION WITH INDEPENDENT WORKS</h2></div></div></div><p>
+      A compilation of the <a class="link" href="#fdl-document">Document</a> or its derivatives with
+      other separate and independent documents or works, in or on a
+      volume of a storage or distribution medium, does not as a whole
+      count as a <a class="link" href="#fdl-modified">Modified Version</a>
+      of the Document, provided no compilation copyright is claimed
+      for the compilation.  Such a compilation is called an
+      "aggregate", and this License does not apply to the
+      other self-contained works thus compiled with the Document , on
+      account of their being thus compiled, if they are not themselves
+      derivative works of the Document.  If the <a class="link" href="#fdl-cover-texts">Cover Text</a> requirement of <a class="link" href="#fdl-section3" title="3. COPYING IN QUANTITY">section 3</a> is applicable to these
+      copies of the Document, then if the Document is less than one
+      quarter of the entire aggregate, the Document's Cover Texts may
+      be placed on covers that surround only the Document within the
+      aggregate. Otherwise they must appear on covers around the whole
+      aggregate.
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section8"></a>8. TRANSLATION</h2></div></div></div><p>
+      Translation is considered a kind of modification, so you may
+      distribute translations of the <a class="link" href="#fdl-document">Document</a> under the terms of <a class="link" href="#fdl-section4" title="4. MODIFICATIONS">section 4</a>. Replacing <a class="link" href="#fdl-invariant"> Invariant Sections</a> with
+      translations requires special permission from their copyright
+      holders, but you may include translations of some or all
+      Invariant Sections in addition to the original versions of these
+      Invariant Sections. You may include a translation of this
+      License provided that you also include the original English
+      version of this License. In case of a disagreement between the
+      translation and the original English version of this License,
+      the original English version will prevail.
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section9"></a>9. TERMINATION</h2></div></div></div><p>
+      You may not copy, modify, sublicense, or distribute the <a class="link" href="#fdl-document">Document</a> except as expressly
+      provided for under this License. Any other attempt to copy,
+      modify, sublicense or distribute the Document is void, and will
+      automatically terminate your rights under this License. However,
+      parties who have received copies, or rights, from you under this
+      License will not have their licenses terminated so long as such
+      parties remain in full compliance.
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-section10"></a>10. FUTURE REVISIONS OF THIS LICENSE</h2></div></div></div><p>
+      The <a class="ulink" href="http://www.gnu.org/fsf/fsf.html" target="_top">Free Software
+      Foundation</a> may publish new, revised versions of the GNU
+      Free Documentation License from time to time. Such new versions
+      will be similar in spirit to the present version, but may differ
+      in detail to address new problems or concerns. See <a class="ulink" href="http://www.gnu.org/copyleft" target="_top">http://www.gnu.org/copyleft/</a>.
+    </p><p>
+      Each version of the License is given a distinguishing version
+      number. If the <a class="link" href="#fdl-document">Document</a>
+      specifies that a particular numbered version of this License
+      "or any later version" applies to it, you have the
+      option of following the terms and conditions either of that
+      specified version or of any later version that has been
+      published (not as a draft) by the Free Software Foundation. If
+      the Document does not specify a version number of this License,
+      you may choose any version ever published (not as a draft) by
+      the Free Software Foundation.
+    </p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fdl-using"></a>Addendum</h2></div></div></div><p>
+      To use this License in a document you have written, include a copy of
+      the License in the document and put the following copyright and
+      license notices just after the title page:
+    </p><div class="blockquote"><blockquote class="blockquote"><p>
+	Copyright 2008, Free Software Foundation.
+      </p><p>
+	Permission is granted to copy, distribute and/or modify this
+	document under the terms of the GNU Free Documentation
+	License, Version 1.1 or any later version published by the
+	Free Software Foundation; with no<a class="link" href="#fdl-invariant">Invariant Sections</a>, with no <a class="link" href="#fdl-cover-texts">Front-Cover Texts</a>,
+	and with no <a class="link" href="#fdl-cover-texts">Back-Cover
+	Texts</a>. A copy of the license is included in
+	the section entitled "GNU Free Documentation License".
+      </p></blockquote></div><p>
+      If your document contains nontrivial examples of program code,
+      we recommend releasing these examples in parallel under your
+      choice of free software license, such as the <a class="ulink" href="http://www.gnu.org/copyleft/gpl.html" target="_top"> GNU General Public
+      License</a>, to permit their use in free software.
+    </p></div></div></div></body></html>

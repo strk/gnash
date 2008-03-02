@@ -42,7 +42,8 @@ COMMON = \
 	gpl-appendix.xml \
 	app_authors.xml \
 	doc_authors.xml \
-	fdl-appendix.xml
+	fdl-appendix.xml \
+	bugreport.xml
 
 USERMAN = \
 	$(COMMON) \
@@ -50,7 +51,6 @@ USERMAN = \
 	usermanual/revisions.xml \
 	usermanual/usage.xml \
 	usermanual/gnashrc.xml \
-	usermanual/bugreport.xml \
 	usermanual/acknowledgments.xml \
 	usermanual/conventions.xml
 
@@ -71,7 +71,9 @@ REFMAN = \
 	refmanual/codestyle.xml
 #	refmanual/packagemanager.xml
 
+
 EXTRA_DIST = \
+	preformatted \
 	$(dist_man_MANS) \
 	$(MANSRC) \
 	$(XML_MAIN:.xml=.html) \
@@ -89,13 +91,10 @@ HTMLS  = $(XML_MAIN:.xml=.html)
 PDFS   = $(XML_MAIN:.xml=.pdf)
 TEXIS  = gnash_user.texi gnashuser.texi gnash_ref.texi gnashref.texi
 
-# dist_html_DATA = gnash.html actionscript.html
-# dist_info_DATA = gnash.info actionscript.info
+all-local: info html man
 
-all-local: images html man info
-
-gnashuser.html gnashuser.pdf gnash_user.info: gnashuser.xml $(USERMAN)
-gnashref.html gnashref.pdf gnash_ref.info: gnashref.xml $(REFMAN)
+gnashuser.html gnashuser.pdf gnash_user.info gnashuser.info: gnashuser.xml $(USERMAN)
+gnashref.html gnashref.pdf gnash_ref.info gnashref.info: gnashref.xml $(REFMAN)
 
 # Convienience rules for developers of these manuals. By default
 # all output formats are built if the Docbook tools are installed
@@ -144,8 +143,9 @@ if ENABLE_HTML
 	-$(XSLTPROC) --output $@ --nonet $(docbook_styles)/html/docbook.xsl $<
 	@$(RM) $*.txml
 else
-	@if test -d $(top_srcdir)/packaging/doc; then \
-	  $(LN_S) -f $(top_srcdir)/packaging/doc/$@.in ./$@; \
+	@if test -d $(srcdir)/preformatted; then \
+	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
+	  $(LN_S) -f $(srcdir)/preformatted/$@.in ./$@; \
 	else \
 	  touch $@; \
 	fi
@@ -158,16 +158,18 @@ if ENABLE_TEXI
 	  $(DB2X_TEXI) --encoding=us-ascii//TRANSLIT --string-param directory-description="Gnash" $< ; \
 	else \
 	  basefile="$*"; \
-          $(DB2X_XSLTPROC) -s texi $< --output $${basefile}.txml; \
+          foo=`$(DB2X_XSLTPROC) -s texi $< --output $${basefile}.txml;` \
 	  out=`$(DB2X_TEXIXML) --encoding=us-ascii//TRANSLIT --list-files $${basefile}.txml` ; \
+	  out=`echo $${out} | sed -e 's: :\\\ :g'` 2>&1; \
 	  if test ! -f $${out}; then \
 	   out=`echo $${out} | tr -d '_'`; \
 	  fi; \
 	  rm $${basefile}.txml; \
-	  if test -f $${out}; then \
-	    mv $${out} $${basefile}.texi; \
-	  fi; \
 	fi
+# 	  if test -f $${out}; then \
+# 	    mv $${out} $${basefile}.texi; \
+# 	  fi; \
+#	fi
 endif
 
 .texi.info:
@@ -179,7 +181,7 @@ endif
 
 .man-xml.1:
 if ENABLE_MAN
-	@if test x$(DB2X_MAN) != x; then \
+	-@if test x$(DB2X_MAN) != x; then \
 	  $(DB2X_MAN) $?; \
         else \
 	  $(DB2X_XSLTPROC) -s man $? -o $*.mxml; \
@@ -187,8 +189,9 @@ if ENABLE_MAN
 	  $(RM) $*.mxml; \
 	fi
 else
-	@if test -d $(top_srcdir)/packaging/doc; then \
-	  $(LN_S) -f $(top_srcdir)/packaging/doc/$@.in ./$@; \
+	@if test -d $(srcdir)/preformatted; then \
+	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
+	  $(LN_S) -f $(srcdir)/preformatted/$@.in ./$@; \
 	else \
 	  touch $@; \
 	fi
@@ -200,22 +203,26 @@ gnashuser.texi gnash_user.texi: gnashuser.xml
 gnashref.texi gnash_user.texi: gnashref.xml
 if ! DOCBOOK
 gnash_user.info: gnashuser.xml
-	@if test -d $(top_srcdir)/packaging/doc; then \
-	  $(LN_S) -f $(top_srcdir)/packaging/doc/gnash_user.info.in ./gnash_user.info; \
+	@if test -d $(srcdir)/preformatted; then \
+	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
+	  $(LN_S) -f $(srcdir)/preformatted/gnash_user.info.in ./gnash_user.info; \
 	fi
 
 gnashuser.info: gnashuser.xml
-	@if test -d $(top_srcdir)/packaging/doc; then \
-	  $(LN_S) -f $(top_srcdir)/packaging/doc/gnash_user.info.in ./gnashuser.info; \
+	@if test -d $(srcdir)/preformatted; then \
+	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
+	  $(LN_S) -f $(srcdir)/preformatted/gnash_user.info.in ./gnashuser.info; \
 	fi
 
 gnash_ref.info: gnashref.xml
-	@if test -d $(top_srcdir)/packaging/doc; then \
-	  $(LN_S) -f $(top_srcdir)/packaging/doc/gnash_ref.info.in ./gnash_ref.info; \
+	@if test -d $(srcdir)/preformatted; then \
+	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
+	  $(LN_S) -f $(srcdir)/preformatted/gnash_ref.info.in ./gnash_ref.info; \
 	fi
 gnashref.info: gnashref.xml
-	@if test -d $(top_srcdir)/packaging/doc; then \
-	  $(LN_S) -f $(top_srcdir)/packaging/doc/gnash_ref.info.in ./gnashref.info; \
+	@if test -d $(srcdir)/preformatted; then \
+	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
+	  $(LN_S) -f $(srcdir)/preformatted/gnash_ref.info.in ./gnashref.info; \
 	fi
 endif
 
@@ -270,8 +277,8 @@ if ENABLE_INFO
 	$(INSTALL_INFO) --menuentry="Gnash Reference Manual" --quiet --description="Gnash Reference Manual" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash_ref.info
 else
 	echo "Using preformtted output file,"
-	$(LN_S) -f $(top_srcdir)/packaging/doc/gnash_user.info.in gnash_user.info
-	$(LN_S) -f $(top_srcdir)/packaging/doc/gnash_reference.info.in gnash_ref.info
+	$(LN_S) -f $(srcdir)/preformatted/gnash_user.info.in gnash_user.info
+	$(LN_S) -f $(srcdir)/preformatted/gnash_ref.info.in gnash_ref.info
 endif
 
 uninstall-info-hook:
