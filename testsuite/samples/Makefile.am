@@ -41,6 +41,7 @@ GNASH_LIBS = \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la \
+	$(AGG_LIBS) \
 	$(NULL)
 
 check_PROGRAMS = \

@@ -1,5 +1,9 @@
 2008-03-02  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* testsuite/samples/Makefile.am: Add AGG_LIBS.
+	* doc/C/Makefile.am: Tweak how images get installed so distcheck
+	is happy.
+
 	* po/fi.po: Finish translation by Timo Jyrinki.
 	* po/Makefile.am: Build finish translation.
 	
@@ -7,7 +11,8 @@
 	* doc/C/Makefile.am: Furthur tweaking of the .xml.texi rule so it
 	works with versions to correctly produce both info files. On
 	Fedora, it kept only creating gnash_user.info. Fix install rule to
-	deal with multiple versions of install-info.
+	deal with multiple versions of install-info. Add --dir-file= when
+	removing entries.
 
 	* doc/C/refmanual/internals.xml: Use <emphasis> instead of <code>,
 	as <code> doesn't appear to be supported on Fedora.

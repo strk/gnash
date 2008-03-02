@@ -74,6 +74,10 @@ REFMAN = \
 
 EXTRA_DIST = \
 	preformatted \
+	usermanual \
+	refmanual \
+	$(COMMON) \
+	$(XML_MAIN) \
 	$(dist_man_MANS) \
 	$(MANSRC) \
 	$(XML_MAIN:.xml=.html) \
@@ -91,7 +95,7 @@ HTMLS  = $(XML_MAIN:.xml=.html)
 PDFS   = $(XML_MAIN:.xml=.pdf)
 TEXIS  = gnash_user.texi gnashuser.texi gnash_ref.texi gnashref.texi
 
-all-local: images info html man
+all-local: info html man
 
 gnashuser.html gnashuser.pdf gnash_user.info gnashuser.info: gnashuser.xml $(USERMAN)
 gnashref.html gnashref.pdf gnash_ref.info gnashref.info: gnashref.xml $(REFMAN)
@@ -99,11 +103,11 @@ gnashref.html gnashref.pdf gnash_ref.info gnashref.info: gnashref.xml $(REFMAN)
 # Convienience rules for developers of these manuals. By default
 # all output formats are built if the Docbook tools are installed
 # and working correctly.
-html: images $(HTMLS)
-pdf:  images $(PDFS)
+html: $(HTMLS)
+pdf:  $(PDFS)
 man:  $(dist_man_MANS)
-info: images $(INFOS)
-texi: images $(TEXIS)
+info: $(INFOS)
+texi: $(TEXIS)
 
 #
 # Gnash uses suffix rules to build all the various supported
@@ -224,10 +228,10 @@ endif
 
 # When we build in a seperate build tree, we need links to the images
 # subdirectory to have them be included in the final output.
-images:
-	@if test ! -d images; then \
-	   $(LN_S) -f $(srcdir)/images images; \
-	fi
+# images:
+# 	@if test ! -d images; then \
+# 	   $(LN_S) -f $(top_srcdir)/doc/C/images images; \
+# 	fi
 
 lint-user:
 	@xmllint $(srcdir)/gnashuser.xml
@@ -239,13 +243,13 @@ lint-ref:
 # produced by the dist-bzip2, dist-gzip, or snapshot targets.
 # distdir is a built in target for Automake.
 dist-hook:
-	if test "image"; then \
-	  $(mkinstalldirs) $(distdir)/image; \
-	  for file in $(srcdir)/images/*.png; do \
-	    basefile=`echo $$file | sed -e  's,^.*/,,'`; \
-	    $(INSTALL_DATA) $$file $(distdir)/images/$$basefile; \
-	  done \
-	fi
+	test -d "$(distdir)/images/images" || $(mkinstalldirs) "$(distdir)/images"
+	for file in $(srcdir)/images/*.png $(srcdir)/images/*.txt; do \
+	  basefile="`basename $${file}`"; \
+	  if test ! -e $(distdir)/images/$${basefile}; then \
+	    $(INSTALL_DATA) $$file $(distdir)/images/; \
+	  fi; \
+	done
 
 #
 # Installing documentation can be a complex process, as we build
