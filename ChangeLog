@@ -1,3 +1,8 @@
+2008-03-02 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* doc/C/refmanual: some typo and other minor corrections to refmanual
+	  only. 
+
 2008-03-01  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* doc/C/Makefile.am: Tweak dependencies more to deal with all the

@@ -132,10 +132,10 @@
       </sect3>
 
       <sect3 id="processor">
-	<title>Gprocesser</title>
+	<title>Gprocessor</title>
 	
 	<para>
-	  Gprocesser is used to print out the actions (using the -va
+	  Gprocessor is used to print out the actions (using the -va
 	  option) or the parsing (using the -vp option) of a flash
 	  movie. It is also used to produce the <emphasis>.gsc</emphasis>
 	  files that Gnash uses to cache data, thereby speeding up the
@@ -815,7 +815,7 @@
 	The textarea is initially placed at <code>0, 50</code> and is <code>600x800</code> in size.
 	You can resize/move the clip after loading it.
 	Also, you can completely make the clip invisible if that bothers you. The important thing is the
-	*debuggin* trace (call to the trace function). The latter will be used by the testing framework.
+	<emphasis>debugging</emphasis> trace (call to the trace function). The latter will be used by the testing framework.
 	</para>
 
 	<para>
@@ -1025,8 +1025,8 @@ MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
 	  
 	  <para>
 	    In this case you might want to use the MovieTester class to
-	    implement a C++ test runner. Be aware that you can *mix* tests in
-	    the MovieTester-based class with *self-contained*
+	    implement a C++ test runner. Be aware that you can <emphasis>mix</emphasis> tests in
+	    the MovieTester-based class with <emphasis>self-contained</emphasis>
 	    tests in the SWF file as long as you activate verbosity for
 	    the debug logfile. This is done, for example, for the
 	    DefineEditTextVariableNameTest.swf file. The corresponding

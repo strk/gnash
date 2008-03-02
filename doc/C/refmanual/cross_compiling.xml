@@ -7,7 +7,7 @@
     architecture, and some system headers. 
     You will also need to cross compile all the <link linkend="docdepend">dependencies  
     </link> normally needed to build Gnash. This can on occasion be a
-    daunting process, as not libraries will cross configure and cross
+    daunting process, as not all libraries will cross configure and cross
     compile. There is more information about cross compiling all the
     dependant packages on the <ulink type="http"
     url="http://www.gnashdev.org">http://www.gnashdev.org</ulink> web

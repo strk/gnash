@@ -14,12 +14,13 @@
   
   <para>
     &app; installs a number of <link linkend="libinstall">libraries</link>,
-    namely: <emphasis>libbase</emphasis>,
-    <emphasis>libgeometry</emphasis>, <emphasis>libbackend</emphasis>,
-    <emphasis>libserver</emphasis>, and <emphasis>libmozsdk</emphasis>.
+    namely: <emphasis>libgnashbase</emphasis>,
+    <emphasis>libgnashamf</emphasis>, <emphasis>libgnashmedia</emphasis>,
+    <emphasis>libserver</emphasis>, and <emphasis>libgnashplugin</emphasis>.
     <link linkend="appinstall">Executables</link>
     consist of the (optional) plugin, <filename>gprocessor</filename>,
-    <filename>cygnal</filename>,  and <filename>gnash</filename>.
+    <filename>cygnal</filename>,  <filename>dumpshm</filename>,
+    <filename>soldumper</filename>, and <filename>gnash</filename>.
     <link linkend="docinstall">Documentation</link> may also be installed.
     The installation location is controlled with the
     <emphasis>--prefix</emphasis> <link linkend="custompath">configure

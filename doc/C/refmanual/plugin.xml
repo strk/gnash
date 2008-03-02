@@ -1,5 +1,5 @@
 <chapter id="nsapi">
-  <title>Mozilla/Firefox NSAPI Plugin</title>
+  <title>Mozilla/Firefox NPAPI Plugin</title>
 
   <para>
     The Mozilla SDK has two API layers for plugins. The older layer is

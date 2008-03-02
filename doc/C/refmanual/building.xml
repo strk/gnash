@@ -27,7 +27,7 @@
       couple of the files, even with swap enabled and optimisation turned off.
     </para>
     <para>
-      At present the Gnash source is about 30 MB to extracted and configured
+      At present the Gnash source is about 30 MB extracted and configured
       and requires a total of about 125 megabytes to compile it.
     </para>
     <para>
@@ -67,7 +67,7 @@
 	  export CVS_RSH=ssh
 	  cvs -z3 -d:pserver:anonymous@cvs.sv.gnu.org:/sources/gnash co gnash
 	</programlisting>
-	you will then be able to update your copy from the repository using
+	You will then be able to update your copy from the repository using
 	<programlisting>
 	  cd gnash
 	  cvs update -d
@@ -110,7 +110,7 @@
     </para>
     
     <para>
-      The variables used by <emphasis>make</emphasis> can be redefined when
+      The variables used by <command>make</command> can be redefined when
       the program is invoked, if you desire it.   The most interesting flags
       are <emphasis>CFLAGS</emphasis> and <emphasis>CXXFLAGS</emphasis>,
       which are often used to enable debugging or turn of optimization.

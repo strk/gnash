@@ -33,7 +33,7 @@
     list of <emphasis>all</emphasis> configuration options, including
     standard ones, can be seen by typing:
     <programlisting>
-      ./configure --help |less
+      ./configure --help | less
     </programlisting>
     Read further for a more detailed explanation of &app;-specific
     options.
@@ -59,12 +59,12 @@
     configure. The configure script will attempt to determine what to
     build based on the development libraries you have installed. The
     default configuration for Gnash is both GTK and KDE GUIs, the AGG
-    renderer, and Gstreamer for mltimedia support, with no extensions
+    renderer, and Gstreamer for multimedia support, with no extensions
     built.
   </para>
 
   <para>
-    Being higher portable, &app; has many configuration options
+    Being highly portable, &app; has many configuration options
     available, and not all are supposed to work together. A common
     mistake when configuring &app; is to supply too many options,
     overdriving &app;'s ability to do the right thing.
