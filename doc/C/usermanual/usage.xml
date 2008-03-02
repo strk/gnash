@@ -68,8 +68,6 @@
     <table id="tb-command-line-options">
       <title>Gnash Command Line Options</title>
       <tgroup cols='2' align='left' colsep='1' rowsep='1'>
-	<colspec colname='Option' />
-	<colspec colname='Function' />
 	<thead>
 	  <row>
 	    <entry>Option</entry>
@@ -347,8 +345,6 @@
     <table id="tb-control-keys">
       <title>Gnash Interactive Control Keys</title>
       <tgroup cols='2' align='left' colsep='1' rowsep='1'>
-	<colspec colname='Key Combination' />
-	<colspec colname='Function' />
 	<thead>
 	  <row>
 	    <entry>Key Combination</entry>

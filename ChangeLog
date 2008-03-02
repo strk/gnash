@@ -1,3 +1,19 @@
+2008-03-02  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* doc/C/usermanual.bugreport.xml: Move file up one directory so it
+	can be shared.
+	* doc/C/usermanual/glossary.xml, gnashrc.xml, installation.xml,
+	usage.xml: Cleanup bad internal links. Drop "colspec" from tables
+	as it causes too many warnings, hiding other problems.
+	* doc/C/refmanual/building.xml, code_dependencies.xml,
+	configuration.xml, custompath_configuration.xml,
+	documentation_dependencies.xml, feature_configuration.xml,
+	install.xml, internals.xml, testing_dependencies.xml: Cleanup bad
+	internal links. Drop "colspec" from tables as it causes too many
+	warnings, hiding other problems.
+	* doc/C/gnashuser.xml: Change path to bugreport.
+	* doc/C/gnashref.xml: Include bugreport.
+
 2008-03-02 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* doc/C/refmanual: some typo and other minor corrections to refmanual

@@ -17,8 +17,6 @@
   <table id="tb-configure-paths">
     <title>Custom Path Options</title>
     <tgroup cols='2' align='left' colsep='1' rowsep='1'>
-      <colspec colname='Option' />
-      <colspec colname='Function' />
       <thead>
 	<row>
 	  <entry>Option</entry>

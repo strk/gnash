@@ -42,8 +42,8 @@
     <para>
       Installed libraries are located in 
       <filename>/usr/local/lib</filename> by default.
-      If the <emphasis>--prefix</emphasis> option was used in
-      <link linkend="pre-configuration">configuration</link>, the libraries will
+      If the <emphasis>--prefix</emphasis> option was used during the
+      configuration step, the libraries will
       be installed in the directory <filename>lib</filename> inside the
       path you specified.  If the libraries are stored in a non-standard
       location, you must identify the path in one of two ways.

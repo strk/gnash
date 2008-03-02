@@ -91,8 +91,7 @@
   &configuration;
 
   <para>
-    Once you have <link linkend="pre-configuration">configured</link> &app;,
-    you are ready to build the code.  &app; is built using
+    Once you have &app; configured, you are ready to build the code.  &app; is built using
     <emphasis>GNU make</emphasis>.
   </para>
   
@@ -146,7 +145,7 @@
       <command>pdf</command>, <command>info</command>, 
       <command>man</command>, and <command>alldocs</command>.  
       It is also possible to output <command>GNOME help</command> if
-      the <link linkend="features">configure option</link>
+      the <link linkend="configfeatures">configure option</link>
       <option>--enable-ghelp</option> was used.  
       The <command>alldocs</command> target will build all output formats
       except <emphasis>GNOME help</emphasis>.

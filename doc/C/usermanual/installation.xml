@@ -3,8 +3,8 @@
   
   <para>
     There are two ways of installing Gnash:
-    <link linkend="packagemanager">using a package manager</link>
-    or <link linkend="gettingsource">installing from source</link>.
+<!--     <link linkend="packagemanager">using a package manager</link> -->
+    using a package manager, or <link linkend="gettingsource">installing from source</link>.
   </para>
   
   <sect1 id="requirements">
@@ -54,8 +54,6 @@
       <table id="tb-os-cpu">
 	<title>Build Matrix</title>
 	<tgroup cols='2' align='left' colsep='1' rowsep='1'>
-	  <colspec colname='Operating System' />
-	  <colspec colname='CPU' />
 	  <thead>
 	    <row>
 	      <entry>Operating System</entry>

@@ -10,8 +10,7 @@
     for configuration.
   </para>
   <para>
-    If you opted to download the 
-    <link linkend="sourcerepo">development checkout</link>
+    If you opted to download the development snapshot
     of &app;, the <emphasis>configure</emphasis> script will
     not be included.  It can be created by running 
     <emphasis>autogen.sh</emphasis> from the source root directory:
@@ -25,7 +24,7 @@
   <para>
     All the standard <command>configure</command> options
     are available.  In addition, &app; has two types of
-    options: those that <link linkend="features">enable or disable 
+    options: those that <link linkend="configfeatures">enable or disable 
     features</link>, and
     those that <link linkend="custompath">specify custom paths for 
     development packages</link>

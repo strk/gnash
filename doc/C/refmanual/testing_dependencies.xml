@@ -9,15 +9,6 @@
   <table frame='all' id="testdeps">
     <title>Testing Dependency Table</title>
     <tgroup cols='7' align='left' colsep='1' rowsep='1'>
-      <colspec colname='name'/>
-      <colspec colname='required'/>
-      <colspec colname='version'/>
-      <colspec colname='description'/>
-      <colspec colname='explanation'/>
-      <colspec colname='apt'/>
-      <colspec colname='rpm'/>
-      <colspec colname='pkg'/>
-      
       <thead>
 	<row>
 	  <entry>Name</entry>

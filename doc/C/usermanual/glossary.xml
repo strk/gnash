@@ -318,8 +318,7 @@
       <glossdef>
 	<para>
 	  <emphasis>Kpart</emphasis> is a plugin for Konqueror which is
-	  enabled with the <link linkend="features">configuration option</link>
-	  <emphasis>--enable-klash</emphasis>.
+	  enabled with the configuration option --enable-kparts.
 	</para>
       </glossdef>
     </glossentry>

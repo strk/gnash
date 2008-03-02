@@ -338,8 +338,7 @@
 
     <para>
       There are two different settings related to sound support:
-      <emphasis><link linkend="pluginsound">pluginsound</link></emphasis> and 
-      <emphasis><link linkend="standalonesound">sound</link></emphasis>. 
+      <emphasis>pluginsound</emphasis> and <emphasis>sound</emphasis>. 
       This was done in order to allow the plugin to be independently 
       configured, for instance to block sound from advertisements.
     </para>
