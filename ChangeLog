@@ -1,5 +1,8 @@
 2008-03-02  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* po/fi.po: Finish translation by Timo Jyrinki.
+	* po/Makefile.am: Build finish translation.
+	
 	* doc/C/preformatted: Update.
 	* doc/C/Makefile.am: Furthur tweaking of the .xml.texi rule so it
 	works with versions to correctly produce both info files. On
