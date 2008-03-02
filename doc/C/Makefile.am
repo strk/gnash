@@ -264,13 +264,22 @@ install-html-hook: gnashuser.html gnashref.html
 	  $(INSTALL_DATA) $$file $(DESTDIR)$(htmldir)/images/$$basefile; \
 	done
 
+# There are two versions of install-info, with unfortunately different options.
+# Rather than test the version at configure time, we do it at runtime instead
+# so we can switch versions at installation time.
 install-info-hook: 
 if ENABLE_INFO
 	@test -d "$(DESTDIR)$(infodir)" || $(mkinstalldirs) "$(DESTDIR)$(infodir)"
 	$(INSTALL_DATA) gnash_user.info $(DESTDIR)$(infodir)/gnash_user.info 
-	$(INSTALL_INFO) --menuentry="Gnash User Manual" --quiet --description="Gnash User Manual" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash_user.info
 	$(INSTALL_DATA) gnash_ref.info $(DESTDIR)$(infodir)/gnash_ref.info 
-	$(INSTALL_INFO) --menuentry="Gnash Reference Manual" --quiet --description="Gnash Reference Manual" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash_ref.info
+	type="`file $(INSTALL_INFO) | grep -ic " perl " 2>&1`"; \
+	if test $${type} -gt 0; then \
+	  $(INSTALL_INFO) --menuentry="\"Gnash User Manual\"" --quiet --description="\"Gnash User Manual\"" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash_user.info; \
+	  $(INSTALL_INFO) --menuentry="\"Gnash Reference Manual\"" --quiet --description="\"Gnash Reference Manual\"" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash_ref.info; \
+        else \
+	  $(INSTALL_INFO) --entry="\"Gnash User Manual: (gnash_user)	Gnash User Manual\"" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash_user.info; \
+	  $(INSTALL_INFO) --entry="\"Gnash Reference Manual (gnash_ref)	Gnash Reference Manual\"" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash_ref.info; \
+	fi
 else
 	echo "Using preformtted output file,"
 	$(LN_S) -f $(srcdir)/preformatted/gnash_user.info.in gnash_user.info

@@ -1,8 +1,11 @@
 2008-03-02  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* doc/C/preformatted: Update.
 	* doc/C/Makefile.am: Furthur tweaking of the .xml.texi rule so it
 	works with versions to correctly produce both info files. On
-	Fedora, it kept only creating gnash_user.info
+	Fedora, it kept only creating gnash_user.info. Fix install rule to
+	deal with multiple versions of install-info.
+
 	* doc/C/refmanual/internals.xml: Use <emphasis> instead of <code>,
 	as <code> doesn't appear to be supported on Fedora.
 	* doc/C/refmanual/extensions/extensions.xml: Use <emphasis>
