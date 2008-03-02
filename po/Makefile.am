@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 # 
-#   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,8 +26,11 @@ CLEANFILES = \
 	POTFILES \
 	update-po
 
-translations = es fr de it cs sv
+translations = es fr de it cs sv fi
 
+# This is GNU make specific, so if you are building Gnash on a BSD
+# machine, you probably want to install GNU make in additional to
+# BSD make.
 pofiles := $(patsubst %,%.po,$(translations))
 gmofiles := $(patsubst %,%.gmo,$(translations))
 
