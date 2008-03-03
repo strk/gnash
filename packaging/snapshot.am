@@ -32,7 +32,7 @@ SNAPSHOT_TMP = /tmp/gnash-$(NOW)
 # This uses the default version for Gnash. which is 'cvs'. So we
 # rename it to the dir we want to stay clear. Then we change the default
 # version from 'cvs' to a date stamped version of cvs, like '20080202cvs'
-snapshot: distdir
+snapshot: distdir dist-hook
 	-@now=`date "+%Y%m%d"`; \
 	pkgname="gnash-$${now}cvs"; \
 	snapshot_dir="$${pkgname}"; \
@@ -47,7 +47,7 @@ snapshot: distdir
 	    $${snapshot_dir}/configure.ac.orig > $${snapshot_dir}/configure.ac; \
 	  cd $${snapshot_dir} ; ./autogen.sh; cd .. ;\
 	fi; \
-	tar zcvf $${snapshot_tar} --exclude=$${snapshot_dir}/autom4te.cache \
+	tar zcvf $${snapshot_tar} --exclude="*CVS" --exclude=$${snapshot_dir}/autom4te.cache \
 	  --exclude=$${snapshot_dir}/configure.ac.orig $${snapshot_dir}
 #	$(RM) -fr $${snapshot_dir}
 
@@ -65,12 +65,15 @@ snapshot-configure: snapshot
 	  plugindir=/usr/lib/mozilla/plugins; \
         fi; \
 	cd $${snapshot_build}; ../configure \
-	--disable-dependency-tracking --disable-rpath \
+	$(SNAPSHOT_CONFIGURE_FLAGS) \
+	  --disable-dependency-tracking\
+	  --disable-rpath \
 	  --prefix=/usr \
 	  --mandir=/usr/share/man \
 	  --infodir=/usr/share/info \
 	  --with-plugindir=$${plugindir} \
-	  --disable-static
+	  --disable-static \
+	  --enable-shared
 #	  --with-extensions=all 
 #	  --enable-gui=all 
 
@@ -80,7 +83,8 @@ snapshot-build: snapshot-configure
 	snapshot_dir="$${pkgname}"; \
 	snapshot_build="$${snapshot_dir}/_build"; \
 	$(LN_S) -f $${snapshot_build}/packaging/doc $${snapshot_build}/packaging/; \
-	$(MAKE) $(AM_MAKEFLAGS) -C $${snapshot_build} all
+	$(MAKE) $(AM_MAKEFLAGS) -C $${snapshot_build}; \
+	$(MAKE) $(AM_MAKEFLAGS) -C $${snapshot_build}/doc/C info man html
 
 # Install a package. Afterwards we link to the prebuilt man pages incase
 # DocBook and DocBook2X aren't installed on this machine.

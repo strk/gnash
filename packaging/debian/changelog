@@ -1,3 +1,9 @@
+gnash (0.8.2~cvs20080302t0056-0cvs) snapshot; urgency=low
+
+  * be able to make our own deb packages.
+ 
+ -- Rob Savoye <rob@welcomehome.org>  Sun, 3 March 2008 04:20:00 +0100
+
 gnash (0.8.2~cvs20080223t0056-0ubuntu1) UNRELEASED; urgency=low
 
   * package 0.8.2 preview

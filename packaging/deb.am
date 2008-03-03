@@ -29,10 +29,16 @@ deb debian: dist-bzip2 $(srcdir)/packaging/debian/rules
 snapshot-deb: # snapshot
 	now=`date "+%Y%m%d"`; \
 	snapshot_dir="gnash-$${now}cvs"; \
-	mv -f $${snapshot_dir}/packaging/debian/changelog $${snapshot_dir}/packaging/debian/changelog.orig; \
-	sed -e "s:(.*):($${now}cvs):" $${snapshot_dir}/packaging/debian/changelog.orig > $${snapshot_dir}/packaging/debian/changelog; \
-	sed -e "s:(.*):($${now}cvs):" $${snapshot_dir}/packaging/debian/changelog.orig > $${snapshot_dir}/packaging/debian/changelog; \
-	ln -s $${snapshot_dir}/packaging/debian $${snapshot_dir}/debian;\
-	(cd $${snapshot_dir}; dpkg-buildpackage)
+	if test ! -d $${snapshot_dir}/debian; then \
+	  cp -rp $(srcdir)/packaging/debian $${snapshot_dir}/; \
+	fi; \
+	if test -e $${snapshot_dir}/debian/changelog; then \
+	  mv -f $${snapshot_dir}/debian/changelog $${snapshot_dir}/debian/changelog.orig; \
+	  sed -e "s:(.*):($${now}cvs):" $${snapshot_dir}/debian/changelog.orig > $${snapshot_dir}/debian/changelog; \
+	fi; \
+	(cd $${snapshot_dir}; dpkg-buildpackage -rfakeroot \
+		-e"\"Rob Savoye <rob@welcomehome.org>\""
+		-m"\"Rob Savoye <rob@welcomehome.org>\""
+	)
 
 .PHONY : deb debian 
