@@ -27,22 +27,22 @@
       <title>Local Shared Objects</title>
       
       <para>
-	SWF movies support a form of persistant storage called Local
+	SWF movies support a form of persistent storage called Local
 	Shared Objects. These are stored in the subdirectories of one's
 	<emphasis>~/.macromedia</emphasis> configuration. These files
 	are comonly called &quot;Flash Cookies&quot;, as they don't get
 	deleted when the SWF movie that created or writes data to them
 	stops executing. These files often store things like game
-	scores. 
+	scores, but can also store a unique identifier for tracking users.
       </para>
       
       <para>
 	Till recently, what was contained in these files wasn't widely
 	known. There are several LSO file utilities floating around on
-	the Web. Gnash has it's own <emphasis>soldumper</emphasis>
+	the Web. &app; has its own <emphasis>soldumper</emphasis>
 	program that lets one find and dump the contents of these
 	files. As of yet, I haven't discovered any nasty privacy issues
-	yet, but as Gnash's SharedObject support is new, I may have just
+	yet, but as &app;'s SharedObject support is new, I may have just
 	been lucky.
       </para>
       
@@ -56,12 +56,12 @@
       </para>
       
       <para>
-	The one security setting Gnash supports is the
+	The one security setting &app; supports is the
 	<emphasis>SOLReadOnly</emphasis> setting for your $HOME/.gnashrc
-	file. This makes Gnash never write to a .sol file, it only reads
+	file. This makes &app; never write to a .sol file, it only reads
 	them. You can also set <emphasis>SOLSafeDir</emphasis> to a safe
-	subdirectory,or even remove it later, although most people
-	willwant to set this path to the default one created bythe other
+	subdirectory, or even remove it later, although most people
+	will want to set this path to the default one created by the other
 	SWF player.
       </para>
       
@@ -73,24 +73,24 @@
       <para>
 	SWF movies support a form of data interchange between running
 	SWF movies called LocalConnection. This uses a shared memory
-	segment to exchange AMF objects. While the specification claim
+	segment to exchange AMF objects. While the specification claims
 	an application has to register as a Listener, it turns out in
-	reality this isn't required. Even YouTube violates this
+	reality that this isn't required. Even YouTube violates this
 	requirement. While one would think that data written to this
 	memory segment would go away when the SWF movies are done
-	playing, but they are persistant, and on some systems, the data
+	playing, they are in fact persistent, and on some systems, the data
 	even survives a reboot. Thank you Solaris...
       </para>
       
       <para>
-	The Gnash utility <emphasis>dumpshm</emphasis> can be used to do
+	The &app; utility <emphasis>dumpshm</emphasis> can be used to do
 	several things with these shared memory segments. This utility
 	can find the shared memory segment left by using other SWF
 	players to see what has been left. it can then dump the contents
 	of the shared mempory segment either by decoding the AMF objects
 	and printing the values, or by dumping the raw file to disk
-	where you can analysze it with any other program you wish. If
-	you run dumpshm repeatedly, you can even do a crude packet
+	where you can analyze it with any other program you wish. If
+	you run dumpshm repeatedly, you can even do crude packet
 	sniffing between two SWF movies playing.
       </para>
       
@@ -98,7 +98,7 @@
 	The only current security related option for this is
 	<emphasis>LocalConnection</emphasis>. This just disables all
 	communication with other SWF movies. Work is in progress on
-	adding a tracing ability to Gnash.
+	adding a tracing ability to &app;.
       </para>
       
     </sect2>

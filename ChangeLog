@@ -4,6 +4,8 @@
 	  to usage.xml and removal of obsolete options.
 	* doc/C/usermanual/specifications.xml: more corrections.
 	* doc/C/bugreport.xml: ditto.
+	* doc/C/security.xml: ditto.
+	* doc/C/refmanual/internals.xml: ditto.
 
 2008-03-03 Timo Jyrinki <timo.jyrinki@iki.fi>
 

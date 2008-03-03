@@ -6,12 +6,12 @@
     
     <para>
       The top level of Gnash has several libraries, <emphasis>libgnashbase</emphasis>,
-      <emphasis>libgnashgeo</emphasis>, <emphasis>libgnashserver</emphasis>,
+      <emphasis>libgnashserver</emphasis>,
       <emphasis>libgnashasobjs</emphasis> and
       <emphasis>libgnashbackend</emphasis>. There are several utility programs 
       included for debug parsing and processing of Flash movie files,
-      and other useful utilitis for examining local Shared Objects and
-      sniffingh LocalConnections.
+      and other useful utilities for examining local Shared Objects and
+      sniffing LocalConnections.
     </para>
     
     <sect2 id="The Libraries">
@@ -33,14 +33,6 @@
 	</para>	
       </sect3>
       
-      <sect3 id="libgnashgeo">
-	<title>libgnashgeo</title>
-	
-	<para>
-	  Libgnashgeo contains code for device independent graphics routines.
-	</para>
-      </sect3>
-
       <sect3 id="libgnashgui">
 	<title>libgnashgui</title>
 	
@@ -111,8 +103,8 @@
       <title>The Applications</title>
       
       <para>
-	There are currently a few standalone programs in Gnash,
-        which serve to either assist with Gnash development or play flash
+	    There are currently a few standalone programs in Gnash,
+        which serve either to assist with Gnash development or to play flash
         movies.
       </para>
 
@@ -120,8 +112,8 @@
 	<title>The Standalone Player</title>
 	
 	<para>
-	  This is the standalone OpenGL back-end used to play
-	  movies. There are several command-line options and keyboard
+	  This is the standalone OpenGL backend used to play
+	  movies. There are several command line options and keyboard
 	  control keys used by Gnash.
 	</para>
 
@@ -166,7 +158,7 @@
       <para>
 	The plugin is designed to work within Mozilla or Firefox,
 	although there is Konqueror support as well. The plugin uses
-	the Mozilla NSAPI plugin API to be cross platform, and is
+	the Mozilla NPAPI plugin API to be cross platform, and is
 	portable, as well as being well integrated into Mozilla based
 	browsers.
       </para>
