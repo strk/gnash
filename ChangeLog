@@ -1,5 +1,8 @@
 2008-03-03 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.cpp (doMouseDrag): drag bounds are in local
+	  coordinate space, and non lock-centered drags must always
+	  honour it. Fixes bug #22460.
 	* server/vm/ASHandlers.cpp (CommonGetURL): implement GET/POST
 	  methods for targetted movie loads. Still missing POST using
 	  host-provided uri handler (to improve/define communication

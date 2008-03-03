@@ -913,10 +913,12 @@ movie_root::doMouseDrag()
 	get_mouse_state(x, y, buttons);
 
 	point world_mouse(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
-	if ( m_drag_state.hasBounds() )
+
+	matrix	parent_world_mat;
+	character* parent = dragChar->get_parent();
+	if (parent != NULL)
 	{
-		// Clamp mouse coords within a defined rect.
-		m_drag_state.getBounds().clamp(world_mouse);
+	    parent_world_mat = parent->get_world_matrix();
 	}
 
 	if (! m_drag_state.isLockCentered())
@@ -925,12 +927,17 @@ movie_root::doMouseDrag()
 		world_mouse.y -= m_drag_state.yOffset();
 	}
 
-	matrix	parent_world_mat;
-	character* parent = dragChar->get_parent();
-	if (parent != NULL)
+	if ( m_drag_state.hasBounds() )
 	{
-	    parent_world_mat = parent->get_world_matrix();
+		rect bounds;
+
+		// bounds are in local coordinate space
+		bounds.enclose_transformed_rect(parent_world_mat, m_drag_state.getBounds());
+
+		// Clamp mouse coords within a defined rect.
+		bounds.clamp(world_mouse);
 	}
+
 
 	point	parent_mouse;
 	parent_world_mat.transform_by_inverse(&parent_mouse, world_mouse);
