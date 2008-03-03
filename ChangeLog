@@ -1,3 +1,12 @@
+2008-03-03  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* Makefile.am: Add packaging files to EXTRA_DIST. Drop the
+	dist-hook.
+	* packaging/debian: Minor changes to start working with HEAD.
+	* packaging/deb.am: Copy the debian packaging files from the
+	source tree to the snapshot directory do dpkg-buildpackage can
+	find them.
+
 2008-03-03 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* doc/C/usermanual/ (various): some typo corrections, small additions
@@ -24,6 +33,15 @@
 
 2008-03-02  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* packaging/redhat/gnash.spec: Update for current layout.
+	* configure.ac: Add a --disable-testsuite option for package
+	builders. This spends builds up, and we already tested Gnash
+	before packaging, right ?
+	* Makefile.am: Always include testsuite directory, but don't add it
+	to SUBDIRS. Install the packaging files.
+	* doc/C/Makefile.am: Add some extra dependencies to keep distcheck
+	happy.
+	
 	* testsuite/samples/Makefile.am: Add AGG_LIBS.
 	* doc/C/Makefile.am: Tweak how images get installed so distcheck
 	is happy.

@@ -77,13 +77,19 @@ DIST_SUBDIRS = $(STD_DIRS) cygnal extensions testsuite
 EXTRA_DIST =  autogen.sh \
 	config.rpath \
 	macros/incllist macros/libslist \
-	ChangeLog-0.8.0 ChangeLog-0.8.1
+	ChangeLog-0.8.0 ChangeLog-0.8.1 \
+	packaging/deb.am \
+	packaging/snapshot.am \
+	packaging/alp.am \
+	packaging/ipkg.am
+	packaging/bsd.am \
+	packaging/rpm.am
 
 noinst_HEADERS = compatibility_include.h
 
-dist-hook:
-	@test -d "$(distdir)/packaging" || $(mkinstalldirs) "$(distdir)/packaging"
-	cp -p $(srcdir)/*.am $(top_distdir)/packaging/
+# dist-hook:
+# 	@test -d "$(distdir)/packaging" || $(mkinstalldirs) "$(distdir)/packaging"
+# 	cp -p $(srcdir)/*.am $(top_distdir)/packaging/
 
 #
 # Build an RPM package
