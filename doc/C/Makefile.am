@@ -229,7 +229,7 @@ gnashref.html: gnashref.xml
 	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
 	  $(LN_S) -f $(srcdir)/preformatted/gnash_ref.html.in ./gnashref.html; \
 	fi
-gnashref.html: gnashref.xml
+gnashuser.html: gnashref.xml
 	@if test -d $(srcdir)/preformatted; then \
 	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
 	  $(LN_S) -f $(srcdir)/preformatted/gnash_user.html.in ./gnashuser.html; \

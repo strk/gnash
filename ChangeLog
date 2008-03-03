@@ -1,5 +1,9 @@
 2008-03-03 Sandro Santilli <strk@keybit.net>
 
+	* doc/C/Makefile.am: fix typo (gnashref.html -> gnashuser.html).
+
+2008-03-03 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/sprite_definition.{cpp,h}: delegate
 	  exports and dictionary chars to containing movie
 	  definition. Fixes bug #22468.
