@@ -16,7 +16,7 @@
     may view them in the terminal window by executing the following at
     the command line: 
     <programlisting>
-      gnash --help |less
+      gnash --help | less
     </programlisting>
   </para>
   
@@ -114,26 +114,18 @@
 	  </row>
 	  <row>
 	    <entry>
-	      <option>-p</option>
-	    </entry>
-	    <entry>
-	      Run full speed (no sleep) and log frame rate.
-	    </entry>
-	  </row>
-	  <row>
-	    <entry>
-	      <option>-a</option>
-	    </entry>
-	    <entry>
-	      Enable Actionscript debugging.
-	    </entry>
-	  </row>
-	  <row>
-	    <entry>
 	      <option>-v</option>
 	    </entry>
 	    <entry>
-	      Be verbose; i.e. print debug messages to stdout.
+	      Be verbose; i.e. print important messages to stdout.
+	    </entry>
+	  </row>
+	  <row>
+	    <entry>
+	      <option>-vv</option>
+	    </entry>
+	    <entry>
+	      Be very verbose; i.e. also print debug messages to stdout.
 	    </entry>
 	  </row>
 	  <row>
@@ -141,7 +133,8 @@
 	      <option>-va</option>
 	    </entry>
 	    <entry>
-	      Be verbose about movie Actions. 
+	      Be verbose about movie actions (for ActionScript debugging). This
+	      generates very large amounts of text and will affect &app;'s performance.
 	    </entry>
 	  </row>
 	  <row>
@@ -210,7 +203,7 @@
 	    </entry>
 	    <entry>
 	      Play once; exit when/if movie reaches the last
-	      frame. This is the default.
+	      frame.
 	    </entry>
 	  </row>
 	  <row>
@@ -270,6 +263,7 @@
 	      in; this is mainly used by plugins.
 	    </entry>
 	  </row>
+<!--
 	  <row>
 	    <entry>
 	      <option>-b bits</option>
@@ -277,12 +271,9 @@
 	    <entry>
 	      Bit depth of output window (for example, 16 or 32). Appropriate
 	      bit depths depend on the renderer and GUI library used.
-	      <!--
-		  TODO: add information about which depths are suitable for each
-		  renderer.
-	      -->
 	    </entry>
 	  </row>
+-->
 	  <row>
 	    <entry>
 	      <option>-u url</option>
@@ -305,11 +296,11 @@
 	  </row>
 	  <row>
 	    <entry>
-	      <option>-P entrymeter</option>
+	      <option>-P parameter</option>
 	    </entry>
 	    <entry>
-	      Parameters are given in ParamName=Value syntax and are mostly 
-	      useful to the plugin to honour EMBED tags attributes 
+	      Parameters are given in the syntax &quot;ParamName=Value&quot; and are mostly 
+	      useful for the plugin to honour EMBED tags attributes 
 	      or explicit OBJECT PARAM tags. A common use for -P 
 	      is to provide FlashVars 
 	      (ie: -P "FlashVars=home=http://www.gnu.org").
@@ -392,6 +383,8 @@
 	      Restart the movie.
 	    </entry>
 	  </row>
+
+<!--
 	  <row>
 	    <entry>
 	      <option>CTRL-[ or kp-</option>
@@ -408,6 +401,7 @@
 	      Step forward one frame.
 	    </entry>
 	  </row>
+-->
 	  <row>
 	      <entry>
 		<option>CTRL-L</option>
@@ -451,6 +445,7 @@
 	      Debug.  Test the call_method() function.
 	    </entry>
 	  </row>
+<!--
 	  <row>
 	    <entry>
 	      <option>CTRL-B</option>
@@ -459,6 +454,7 @@
 	      Toggle the background color.
 	    </entry>
 	  </row>
+-->
 	</tbody>
       </tgroup>
     </table>

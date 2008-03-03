@@ -21,7 +21,7 @@
     
     <para>
       &app; is based on the public domain program
-      <application>GameSWF</application>, which is a graphics library
+      <application>GameSWF</application>, a graphics library
       for games that contains the heart of a SWF interpreter.  In December
       2005, &app; was forked from <application>GameSWF</application> and
       repackaged in the GNU project style, and a major recoding started.

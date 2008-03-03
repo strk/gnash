@@ -6,16 +6,16 @@
     stand-alone application or as a plugin for several popular
     web browsers. It supports playing media from a disk or streaming
     over a network connection. Some popular video sharing sites like
-    YouTube are supported from a wide vaariety of devices from
+    YouTube are supported on a wide variety of devices from
     embedded ones to modern desktops.
   </para>
 
   <para>
     &app; has a better focus on security, allowing the user tight
     control of all network or disk based I/O. Gnash also supports
-    extending ActionScript by creating your own. You can write
+    extending ActionScript by creating your own classes. You can write
     wrappers for any development library, and import them into the
-    player much like perl or python does.
+    player much like Perl or Python does.
   </para>
 
   <sect1 id="audience">
@@ -31,13 +31,13 @@
   </sect1>    
   
   <sect1 id="runs-on">
-    <title>What Is Supported ?</title>
+    <title>What Is Supported?</title>
     
     <para>
       Gnash is known to compile for most any POSIX and ANSI C++
       conforming system if you have all the dependent libraries
-      installed. Systems we test on, and which Gnash is know to
-      run on are Ubuntu, Fedora, Debian, OpenBSD, NetBSD, FreeBSD,
+      installed. Systems we test on, and which Gnash is known to
+      run on are Ubuntu, Fedora, Debian, Mandriva, OpenBSD, NetBSD, FreeBSD,
       Win32, and Darwin (OSX) primarily. Occasionally other platforms
       are built, primarily by those distribution maintainers. This
       includes BeOS, Haiku, Syllable, OS/2, Solaris, Slackware, and
@@ -45,9 +45,9 @@
     </para>
     
     <para>
-      Gnash is a capable of reading up to SWF v9 files and opcodes,
+      Gnash is capable of reading up to SWF v9 files and opcodes,
       but primarily supports SWF v7, with better SWF v8 and v9
-      support under heavy developement. With the 0.8.2 release,
+      support under heavy development. With the 0.8.2 release,
       Gnash includes initial parser support for SWF v8 and v9.
       Not all ActionScript 2 classes are implemented yet, but all of the
       most heavily used ones are. Many ActionScript 2 classes are
@@ -56,13 +56,13 @@
     </para>
     
     <para>
-      Gnash has implemented about 80% of ActionScript v. 2.0, and has
-      begun implementing ActionScript v. 3.0. Gnash supports the
-      majority of Flash opcodes up to SWF version 9, and a wide
-      sampling of ActionScript classes for SWF version 8.
+      Gnash has implemented about 80% of ActionScript v2.0, and has
+      begun implementing ActionScript v3.0. Gnash supports the
+      majority of Flash opcodes up to SWF v9, and a wide
+      sampling of ActionScript classes for SWF v8.
     </para>
      <para>
-      As ActionsScript 3 is a more developed version of
+      As ActionScript 3 is a more developed version of
       ActionScript 2, many of the same classes work for
       both. Support has been added to Gnash's ActionScript library
       to support the new ActionScript 3 filters, which get applied
@@ -73,7 +73,7 @@
     
     <para>
       Gnash has included video support since early 2007, but this is
-      an every changing field of reverse engineering. Many of the
+      an ever changing field of reverse engineering. Many of the
       popular video sharing sites use SWF v8 or v9, which Gnash
       still has imperfect support for. This is improving all the
       time, so often builds from a development snapshot will work

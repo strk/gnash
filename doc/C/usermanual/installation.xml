@@ -98,7 +98,7 @@
 	    <row>
 	      <entry>Mandriva
 	      </entry>
-	      <entry>i386, MIPS</entry>
+	      <entry>i386, x86-64, MIPS</entry>
 	    </row>
 	    <row>
 	      <entry>Open Embedded, OpenMoko, Poky
