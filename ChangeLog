@@ -1,3 +1,10 @@
+2008-03-03 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ASHandlers.cpp (CommonGetURL): implement GET/POST
+	  methods for targetted movie loads. Still missing POST using
+	  host-provided uri handler (to improve/define communication
+	  protocol for it) and POST for loadVariables.
+
 2008-03-02  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* testsuite/samples/Makefile.am: Add AGG_LIBS.

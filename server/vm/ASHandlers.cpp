@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.200 2008/02/27 10:25:39 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.201 2008/03/03 09:22:21 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -2127,9 +2127,6 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		)
 {
 
-// It seems queuing loadMovie requests breaks the canonical wbt testcase...
-#define QUEUE_MOVIE_LOADS 1
-
 	assert(url_c);
 
 	if ( *url_c == '\0' )
@@ -2150,8 +2147,8 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 	if ( sendVarsMethod == 3 )
 	{
 		log_error(_("Bogus GetUrl2 send vars method "
-			" in SWF file (both GET and POST requested), set to 0"));
-		sendVarsMethod=0;
+			" in SWF file (both GET and POST requested), use GET"));
+		sendVarsMethod=1;
 	}
 
 	string target_string;
@@ -2210,6 +2207,33 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		return;
 	}
 
+	bool usePost = false;
+	std::string varsToSend;
+	if ( sendVarsMethod )
+	{
+		if ( sendVarsMethod == 2 ) usePost = true;
+
+		// TESTED: variables sent are those in current target,
+		//         no matter the target found on stack (which
+		//         is the target to load the resource into).
+		//
+		character* curtgt = env.get_target();
+		if ( ! curtgt )
+		{
+			log_error("CommonGetUrl: current target is undefined");
+			return;
+		}
+		curtgt->getURLEncodedVars(varsToSend);
+		if ( ! usePost )
+		{
+			// we're using GET
+			std::string qs = url.querystring();
+			if ( qs.empty() ) varsToSend.insert(0, 1, '?');
+			else varsToSend.insert(0, 1, '&');
+			url.set_querystring(qs+varsToSend);
+		}
+	}
+
 	character* target_ch = env.find_target(target.to_string());
 	sprite_instance* target_movie = target_ch ? target_ch->to_movie() : 0;
 
@@ -2233,6 +2257,10 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 			return;
 		}
 
+		if ( usePost )
+		{
+			log_unimpl(_("POST with loadVariables ignored"));
+		}
 		target_movie->loadVariables(url, sendVarsMethod);
 
 		return;
@@ -2243,16 +2271,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 
 	if ( loadTargetFlag )
 	{
-		// TODO: always pass directly to movie_root::loadMovie ?
-
 		log_debug(_("getURL2 target load"));
-
-		if ( sendVarsMethod )
-		{
-			log_unimpl(_("Unhandled GetUrl2 sendVariableMethod (%d)"
-				" with loadTargetFlag and ! loadVariablesFlag"),
-				sendVarsMethod);
-		}
 
 		if ( ! target_ch )
 		{
@@ -2260,16 +2279,28 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 			if ( mr.isLevelTarget(target_string, levelno) )
 			{
 				log_debug(_("Testing _level loading (level %u)"), levelno);
-#ifdef QUEUE_MOVIE_LOADS
-				mr.loadMovie(url, target_string); // TODO: add third argument for the method
-#else
-				mr.loadLevel(levelno, url);
-#endif
+				if ( usePost )
+				{
+					mr.loadMovie(url, target_string, &varsToSend);
+				}
+				else
+				{
+					mr.loadMovie(url, target_string); // using GET
+				}
 				return;
 			}
 
-			log_error(_("get url: target %s not found"),
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Unknown loadMovie target: %s"),
 				target_string.c_str());
+			);
+
+			// TESTED: Even if the target is created right-after 
+			//         the load request, the player won't load
+			//         into it. In other words, the target MUST
+			//         exist at time of interpreting the GETURL2
+			//         tag with loadTarget flag.
+
 			return;
 		}
 
@@ -2280,7 +2311,6 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 			return;
 		}
 
-#ifdef QUEUE_MOVIE_LOADS
 		std::string s = target_movie->getTarget(); // or getOrigTarget ?
 		if ( s != target_movie->getOrigTarget() )
 		{
@@ -2288,31 +2318,36 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		}
 		movie_root& mr = VM::get().getRoot();
 		assert( mr.findCharacterByTarget(s) == target_movie );
-		mr.loadMovie(url, s); // TODO: add third argument for the method
-#else
-		target_movie->loadMovie(url);
-#endif
 
+		if ( usePost )
+		{
+			mr.loadMovie(url, s, &varsToSend); 
+		}
+		else
+		{
+			mr.loadMovie(url, s); 
+		}
 		return;
-	}
-
-	if ( sendVarsMethod )
-	{
-		log_unimpl (_("Unhandled GetUrl2 sendVariableMethod (%d)"
-			" with no loadTargetFlag"),
-			sendVarsMethod);
 	}
 
 	unsigned int levelno;
 	if ( mr.isLevelTarget(target_string, levelno) )
 	{
 		log_debug(_("Testing _level loading (level %u)"), levelno);
-#ifdef QUEUE_MOVIE_LOADS
-		mr.loadMovie(url, target_string); // TODO: add third argument for the method
-#else
-		mr.loadLevel(levelno, url);
-#endif
+		if ( usePost )
+		{
+			mr.loadMovie(url, target_string, &varsToSend);
+		}
+		else
+		{
+			mr.loadMovie(url, target_string); 
+		}
 		return;
+	}
+
+	if ( usePost )
+	{
+		log_unimpl (_("POST with host-provided uri grabber"));
 	}
 
 	int hostfd = VM::get().getRoot().getHostFD();
