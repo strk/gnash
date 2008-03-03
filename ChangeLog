@@ -1,7 +1,9 @@
 2008-03-03 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
-	* doc/C/usermanual: some typo corrections, small additions to
-	  usage.xml and removal of obsolete options.
+	* doc/C/usermanual/ (various): some typo corrections, small additions
+	  to usage.xml and removal of obsolete options.
+	* doc/C/usermanual/specifications.xml: more corrections.
+	* doc/C/bugreport.xml: ditto.
 
 2008-03-03 Timo Jyrinki <timo.jyrinki@iki.fi>
 
