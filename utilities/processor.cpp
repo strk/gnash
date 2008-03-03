@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: processor.cpp,v 1.84 2008/02/19 19:20:58 bwy Exp $ */
+/* $Id: processor.cpp,v 1.85 2008/03/03 16:52:29 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -143,7 +143,7 @@ main(int argc, char *argv[])
 
     // Enable native language support, i.e. internationalization
 #ifdef ENABLE_NLS
-    setlocale (LC_MESSAGES, "");
+    setlocale (LC_ALL, "");
     bindtextdomain (PACKAGE, LOCALEDIR);
     textdomain (PACKAGE);
 #endif

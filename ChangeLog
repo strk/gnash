@@ -1,3 +1,10 @@
+2008-03-03 Timo Jyrinki <timo.jyrinki@iki.fi>
+
+	* gui/gnash.cpp, utilities/: dumpshm.cpp,
+	  processor.cpp, soldumper.cpp:
+	  Use LC_ALL, not just LC_MESSAGES for localization.
+	  Fixes bug #22465.
+
 2008-03-03  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* Makefile.am: Add packaging files to EXTRA_DIST. Drop the
