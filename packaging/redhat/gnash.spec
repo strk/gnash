@@ -157,9 +157,8 @@ make %{?_smp_mflags} dumpconfig all
 	--with-plugindir=/usr/lib/mozilla/plugins \
  	--disable-static \
 	--enable-shared \
-	--disable-testsuite \
-	--enable-docbook \
-	CXXFLAGS=-O0
+	--disable-testsuite
+#	--enable-docbook
 
 make dumpconfig all
 %endif
