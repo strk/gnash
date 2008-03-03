@@ -84,14 +84,6 @@ sprite_definition::read(stream* in)
 
 		SWF::TagLoadersTable::loader_function lf = NULL;
 
-		IF_VERBOSE_MALFORMED_SWF(
-		if (tag_type == SWF::DEFINESPRITE)
-		{
-			log_swferror(_("DefineSprite tag inside sprite "
-				"definition"));
-		}
-		);
-
 		if (tag_type == SWF::END)
                 {
 			if (in->get_position() != tag_end)

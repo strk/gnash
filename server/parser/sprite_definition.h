@@ -241,13 +241,11 @@ private:
 	}
 
 
-	/// Overridden just for complaining  about malformed SWF
-	virtual void export_resource(const std::string& /*symbol*/,
-			resource* /*res*/)
+	/// Delegate call to associated root movie
+	virtual void export_resource(const std::string& sym,
+			resource* res)
 	{
-		IF_VERBOSE_MALFORMED_SWF (
-		log_swferror(_("Can't export from sprite"));
-		);
+		m_movie_def->export_resource(sym, res);
 	}
 
 	/// Delegate call to associated root movie
@@ -265,18 +263,10 @@ private:
 	    return m_movie_def->get_character_def(id);
 	}
 
-	/// Overridden just for complaining  about malformed SWF
-	//
-	/// Calls to this function should only be made when
-	/// an invalid SWF is being read, as it would mean
-	/// that a Definition tag is been found as part of
-	/// a Sprite definition
-	///
-	virtual void add_character(int /*id*/, character_def* /*ch*/)
+	/// Delegate call to associated root movie
+	virtual void add_character(int id, character_def* ch)
 	{
-		IF_VERBOSE_MALFORMED_SWF (
-		log_swferror(_("add_character tag appears in sprite tags"));
-		);
+		m_movie_def->add_character(id, ch);
 	}
 
 	// Create a (mutable) instance of our definition.  The

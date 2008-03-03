@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.186 2008/02/19 19:20:56 bwy Exp $ */
+/* $Id: tag_loaders.cpp,v 1.187 2008/03/03 17:45:01 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -902,13 +902,14 @@ sprite_loader(stream* in, tag_type tag, movie_definition* m)
     );
 
     // A DEFINESPRITE tag as part of a DEFINESPRITE
-    // would be a malformed SWF
+    // would be a malformed SWF, anyway to be compatible
+    // we should still allow that. See bug #22468.
+    IF_VERBOSE_MALFORMED_SWF(
     if ( ! dynamic_cast<movie_def_impl*>(m) )
     {
-	IF_VERBOSE_MALFORMED_SWF(
-	    log_swferror(_("nested DEFINESPRITE tags"));
-	);
+	    log_swferror(_("Nested DEFINESPRITE tags. Will add to top-level characters dictionary."));
     }
+    );
 
     // will automatically read the sprite
     sprite_definition* ch = new sprite_definition(m, in);
@@ -991,6 +992,17 @@ void	export_loader(stream* in, tag_type tag, movie_definition* m)
 	log_parse(_("  export: count = %d"), count);
     );
 
+    // An EXPORT tag as part of a DEFINESPRITE
+    // would be a malformed SWF, anyway to be compatible
+    // we should still allow that. See bug #22468.
+    IF_VERBOSE_MALFORMED_SWF(
+    if ( ! dynamic_cast<movie_def_impl*>(m) )
+    {
+	log_swferror(_("EXPORT tag inside DEFINESPRITE. Will export in top-level symbol table."));
+    }
+    );
+
+
     // Read the exports.
     for (int i = 0; i < count; i++)
     {
@@ -1018,9 +1030,11 @@ void	export_loader(stream* in, tag_type tag, movie_definition* m)
 	}
 	else
 	{
-	    log_error(_("don't know how to export resource '%s' "
+	    IF_VERBOSE_MALFORMED_SWF(
+	    log_swferror(_("don't know how to export resource '%s' "
 			"with id %d (can't find that id)"),
 		      symbolName.c_str(), id);
+            );
 	}
 
     }
