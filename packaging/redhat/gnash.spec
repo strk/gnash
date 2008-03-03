@@ -1,4 +1,4 @@
-%define version 20080104
+%define version 20080216
 Name:           gnash
 Version:        %{version}cvs
 Release:        1%{?dist}
@@ -15,22 +15,21 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%{_target_cpu}
 #AutoReqProv: no
 
 BuildRequires:  libpng-devel libjpeg-devel libogg-devel
-BuildRequires:  gtk2-devel libX11-devel libXt-devel
-# BuildRequires:  agg-devel libxml2-devel boost-devel curl-devel libXt-devel
-# the opengl devel packages are required by gtkglext-devel
-# monolithic Xorg
-#BuildRequires:  xorg-x11-devel
-# modular Xorg 
-#BuildRequires:  libGLU-devel libGL-devel
-#BuildRequires:  gtkglext-devel
-BuildRequires:  mysql-devel mysqlclient14-devel
+BuildRequires:  gtk2-devel libX11-devel libXt-devel glib2-devel
+BuildRequires:  cairo-devel atk-devel pango-devel
+BuildRequires:  agg-devel libxml2-devel boost-devel curl-devel libXt-devel
+# the opengl devel packages are required by monolithic Xorg
+BuildRequires:  xorg-x11-proto-devel gtkglext-devel
+BuildRequires:  libGLU-devel libGL-devel
 BuildRequires:  SDL-devel
-BuildRequires:  kdelibs-devel
-BuildRequires:  docbook2X
-BuildRequires:  gstreamer >= 0.10
+BuildRequires:  kdelibs-devel kdebase-devel qt-devel
+BuildRequires:  gstreamer >= 0.10, gstreamer-ffmpeg
+
 # Installation requirements
 Requires: gstreamer >= 0.10
 Requires: gstreamer-plugins-base, gstreamer-plugins-ugly, gstreamer-plugins-bad
+Requires: gtk2 libX11 libpng libjpeg cairo atk pango Xt
+
 # BuildRequires:  scrollkeeper
 
 #Requires(post): scrollkeeper
@@ -46,7 +45,7 @@ Gnash is a GNU Flash movie player that supports many SWF v7 features.
 %package plugin
 Summary:   Web-client flash movie player plugin 
 Requires:  %{name} = %{version}-%{release}
-Requires:  xulrunner
+Requires: gstreamer >= 0.10 gnash
 Group:     Applications/Internet
 
 %description plugin
@@ -55,6 +54,7 @@ The gnash flash movie player plugin for firefox or mozilla.
 %package klash
 Summary:   Konqueror flash movie player plugin
 Requires:  %{name} = %{version}-%{release}
+Requires:  kdelibs kdelibs qt gnash
 Group:     Applications/Multimedia
 
 %description klash
@@ -86,13 +86,14 @@ Cygnal is a streaming media server that's Flash aware.
 %else
 %define cross_compile 0
 %endif
-%{?do_cross_compile:%define cross_compile 1}
+# if not defined, assume this is a native package.
+%{?do_cross_compile:%define cross_compile 0}
 
 # FIXME: this ia a bad hack! Although all this does work correctly and
 # build an RPM, it's set for an geode-olpc, so the actual hardware
 # won't let us install it.
-%define cross_compile 0
-%define olpc 0
+# %define cross_compile 0
+# %define olpc 0
 
 # Build rpms for an ARM based processor, in our case the Nokia 770/800
 # tablet. 
@@ -137,9 +138,10 @@ RPM_TARGET=%{_target}
 	$CROSS_OPTS \
 	$SOUND $GUI \
 	$RENDERER \
-	--disable-dependency-tracking --disable-rpath \
+	--disable-dependency-tracking \
+	--disable-rpath \
 	--with-plugindir=%{_libdir}/mozilla/plugins
- 
+
 make %{?_smp_mflags} dumpconfig all
 %else
 ./configure \
@@ -149,8 +151,15 @@ make %{?_smp_mflags} dumpconfig all
 	--disable-dependency-tracking \
 	--disable-rpath \
 	--disable-cygnal \
-        --prefix=%{_prefix} \
-	--with-plugindir=%{_libdir}/mozilla/plugins
+        --prefix=/usr \
+	--mandir=/usr/share/man \
+	--infodir=/usr/share/info \
+	--with-plugindir=/usr/lib/mozilla/plugins \
+ 	--disable-static \
+	--enable-shared \
+	--disable-testsuite \
+	--enable-docbook \
+	CXXFLAGS=-O0
 
 make dumpconfig all
 %endif
@@ -160,8 +169,7 @@ strip gui/.libs/*-gnash
 strip utilities/.libs/dumpshm  utilities/.libs/g*  utilities/.libs/soldumper
 rm -rf $RPM_BUILD_ROOT
 make install install-plugins DESTDIR=$RPM_BUILD_ROOT
-rm $RPM_BUILD_ROOT%{_libdir}/gnash/*.la
-rm $RPM_BUILD_ROOT%{_libdir}/gnash/*.a
+rm $RPM_BUILD_ROOT%{_libdir}/gnash/*.*a
 %if !%{cross_compile}
 
 rm -rf $RPM_BUILD_ROOT%{_localstatedir}/scrollkeeper
@@ -194,7 +202,7 @@ scrollkeeper-update -q || :
 %dump
 %doc README AUTHORS COPYING NEWS 
 %{_bindir}/gnash
-%{_bindir}/*-gnash
+%{_bindir}/gtk-gnash
 %{_bindir}/gprocessor
 %{_bindir}/soldumper
 %{_bindir}/dumpshm
@@ -203,17 +211,18 @@ scrollkeeper-update -q || :
 %{_prefix}/include/ltdl.h
 %{_prefix}/share/gnash/GnashG.png
 %{_prefix}/share/gnash/gnash_128_96.ico
-%if !%{cross_compile}
-%{_datadir}/man/man1/gnash.1*
+%{_datadir}/man/man1/*.1*
 %{_datadir}/locale/*/LC_MESSAGES/gnash.mo
-%doc doc/C/gnash.html 
+%if !%{cross_compile}
+%{_prefix}/share/info/*.info*
+%{_prefix}/share/doc/gnash/*.html
+%{_prefix}/share/doc/gnash/images/*.png
+# %{_infodir}/*.info*
+#%doc doc/C/gnash*.html 
+#%doc doc/C/images/*.png
+#%doc doc/C/images/*.txt
 # %doc %{_prefix}/share/gnash/doc/gnash/C/images
-# %{_datadir}/omf/gnash/gnash-C.omf
-# %{_datadir}/omf/gnash/asspec-C.omf
-# %{_infodir}/*.info.gz
-# %{_prefix}/share/gnash/doc/gnash/C/*.xml
-# %{_prefix}/share/gnash/doc/asspec/C/*.xml
-# %{_prefix}/share/gnash/doc/asspec/images/*.png
+# %doc %{_prefix}/share/gnash/doc/gnash/C/*.xml
 %endif
 
 %files plugin
@@ -222,8 +231,8 @@ scrollkeeper-update -q || :
 
 %files klash
 %defattr(-,root,root,-)
-%{_bindir}/gnash
 %if !%{cross_compile}
+%{_bindir}/kde-gnash
 %{_libdir}/kde3/libklashpart.*
 %{_datadir}/apps/klash/
 %{_datadir}/services/klash_part.desktop
@@ -234,7 +243,7 @@ scrollkeeper-update -q || :
 # %{_bindir}/cygnal
 
 %changelog
-* Sat Feb  9 2008 Rob Savoye <rob@welcomehome.org> - %{version}-%{release}
+* Sat Feb  16 2008 Rob Savoye <rob@welcomehome.org> - %{version}-%{release}
 - Adjust dependencies for current cvs HEAD
 
 * Sat Mar  6 2007 Rob Savoye <rob@welcomehome.org> - %{version}-%{release}

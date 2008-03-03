@@ -224,6 +224,16 @@ gnashref.info: gnashref.xml
 	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
 	  $(LN_S) -f $(srcdir)/preformatted/gnash_ref.info.in ./gnashref.info; \
 	fi
+gnashref.html: gnashref.xml
+	@if test -d $(srcdir)/preformatted; then \
+	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
+	  $(LN_S) -f $(srcdir)/preformatted/gnash_ref.html.in ./gnashref.html; \
+	fi
+gnashref.html: gnashref.xml
+	@if test -d $(srcdir)/preformatted; then \
+	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
+	  $(LN_S) -f $(srcdir)/preformatted/gnash_user.html.in ./gnashuser.html; \
+	fi
 endif
 
 # When we build in a seperate build tree, we need links to the images
@@ -258,10 +268,10 @@ dist-hook:
 # documentation.
 #
 
-install-html-hook: gnashuser.html gnashref.html
+install-html-hook: $(HTMLS)
 	@test -d "$(DESTDIR)$(htmldir)" || $(mkinstalldirs) "$(DESTDIR)$(htmldir)"
-	$(INSTALL_DATA) gnashuser.html $(DESTDIR)$(htmldir)
-	$(INSTALL_DATA) gnashref.html $(DESTDIR)$(htmldir)
+	-$(INSTALL_DATA) gnashuser.html $(DESTDIR)$(htmldir)
+	-$(INSTALL_DATA) gnashref.html $(DESTDIR)$(htmldir)
 	@test -d "$(DESTDIR)$(htmldir)/images" || $(mkinstalldirs) "$(DESTDIR)$(htmldir)/images"
 	for file in $(srcdir)/images/*.png; do \
 	  basefile=`echo $$file | sed -e  's,^.*/,,'`; \
@@ -271,10 +281,10 @@ install-html-hook: gnashuser.html gnashref.html
 # There are two versions of install-info, with unfortunately different options.
 # Rather than test the version at configure time, we do it at runtime instead
 # so we can switch versions at installation time.
-install-info-hook: 
+install-info-hook: $(INFOS)
 if ENABLE_INFO
 	@test -d "$(DESTDIR)$(infodir)" || $(mkinstalldirs) "$(DESTDIR)$(infodir)"
-	for i in *.info; do \
+	-for i in *.info; do \
 	  $(INSTALL_DATA) "$$i" $(DESTDIR)$(infodir)/"$$i"; \
 	done; \
 	type="`file $(INSTALL_INFO) | grep -ic " perl " 2>&1`"; \
@@ -307,7 +317,7 @@ uninstall-html-hook:
 # install-data-hook: install-data-hook-omf
 # uninstall-local: uninstall-local-doc uninstall-local-omf
 
-install-data-hook: install-info-hook install-html-hook
+install-data-hook: install-info-hook install-html-hook 
 uninstall-hook: uninstall-info-hook uninstall-html-hook
 
 #

@@ -285,6 +285,24 @@ if test x"$menus" = x"yes"; then
 fi
 AM_CONDITIONAL(MENUS, test x$menus = xyes)
 
+dnl Disable running any tests for "make check". This may sound stupid, but
+dnl this option is designed to soley be used by maintainers in the 
+dnl DISTCHECK_CONFIGURE_FLAGS when building packages. Gnash's testing infrastructure
+dnl is complex, and often the the testsuites will work, but due to some obscure reason,
+dnl make distcheck fails.
+AC_ARG_ENABLE(testsuite,
+  AC_HELP_STRING([--disable-testsuite],[Disable the testsuite, maintainers option only]),
+[case "${enableval}" in
+  yes) testsuite=yes ;;
+  no)  testsuite=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --disable-testsuite option]) ;;
+esac],testsuite=yes)
+
+if test x"$testsuite" = x"yes"; then
+  AC_DEFINE([USE_TESTSUITE], [], [Testsuite support, maintainers option only])
+fi
+AM_CONDITIONAL(TESTSUITE, test x$testsuite = xyes)
+
 dnl -- dnl Enable building the gui support even when statically
 dnl -- dnl linking. Normally this is only disabled when building a statically
 dnl -- dnl linked gnash executable.
@@ -1914,11 +1932,6 @@ plugin/klash/Makefile
 cygnal/Makefile
 cygnal/testsuite/Makefile
 cygnal/testsuite/cygnal.all/Makefile
-packaging/Makefile
-packaging/debian/Makefile
-packaging/redhat/Makefile
-packaging/ipkg/Makefile
-packaging/doc/Makefile
 )
 
 ###

@@ -52,20 +52,19 @@ STD_DIRS = \
 	gui \
 	plugin \
 	pythonmodule \
-	testsuite \
 	doc \
 	po \
 	$(NULL)
 
 if CYGNAL
-CYGNAL_DIRS = cygnal
+CYGNAL_DIR = cygnal
 endif
 
-# if DOCBOOK
-# DOC_DIRS = doc
-# endif
+SUBDIRS = $(STD_DIRS) $(CYGNAL_DIR)
 
-SUBDIRS      = $(STD_DIRS) $(CYGNAL_DIRS) $(DOC_DIRS)
+if TESTSUITE
+SUBDIRS += testsuite
+endif
 
 if BUILD_EXTENSIONS
 SUBDIRS += extensions
@@ -73,15 +72,18 @@ endif
 
 # man_MANS = doc/gnash.1 doc/gprocessor.1 doc/dumpshm.1 soldumper.1
 
-DIST_SUBDIRS = $(STD_DIRS) cygnal extensions
+DIST_SUBDIRS = $(STD_DIRS) cygnal extensions testsuite
 
 EXTRA_DIST =  autogen.sh \
-	packaging \
 	config.rpath \
 	macros/incllist macros/libslist \
 	ChangeLog-0.8.0 ChangeLog-0.8.1
 
 noinst_HEADERS = compatibility_include.h
+
+dist-hook:
+	@test -d "$(distdir)/packaging" || $(mkinstalldirs) "$(distdir)/packaging"
+	cp -p $(srcdir)/*.am $(top_distdir)/packaging/
 
 #
 # Build an RPM package
@@ -314,10 +316,12 @@ else
 	@echo "	NPAPI (Mozilla) plugin disabled"
 endif
 
+if TESTSUITE
 check: check-recursive anal
 
 anal testreport checksum:
 	$(srcdir)/testsuite/anaylse-results.sh
+endif
 
 .PHONY : dumpconfig \
 	anal \
