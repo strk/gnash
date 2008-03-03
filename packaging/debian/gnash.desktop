@@ -2,6 +2,7 @@
 Type=Application
 Encoding=UTF-8
 Name=Gnash SWF Viewer
+Name[fi]=Gnash-SWF-katselin
 GenericName=
 Comment=
 Icon=/usr/share/pixmaps/gnash.xpm

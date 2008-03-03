@@ -2,6 +2,7 @@
 Type=Application
 Encoding=UTF-8
 Name=Gnash SWF Viewer for KDE
+Name[fi]=Gnash-SWF-katselin (KDE)
 GenericName=
 Comment=
 Icon=/usr/share/pixmaps/klash.xpm
