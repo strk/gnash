@@ -1,0 +1,36 @@
+#!/bin/sh
+
+set -e
+
+case "$1" in
+        remove|upgrade|deconfigure)
+                for p in iceape iceweasel mozilla firefox xulrunner midbrowser; do 
+                       update-alternatives --remove "$p-flashplugin" /usr/lib/gnash/libgnashplugin.so;
+                        [ `update-alternatives --list "$p-flashplugin" | wc -l` = 0 ]  && \
+                                update-alternatives --remove-all "$p-flashplugin"
+                done
+                ;;
+        failed-upgrade)
+		if dpkg --compare-versions "$2" ">>"  0.8.1~trunk.070802-0ubuntu3 &&
+	           dpkg --compare-versions "$2" "<<" 0.8.1~trunk.070802-0ubuntu5
+		then 
+		   for p in iceape iceweasel mozilla firefox xulrunner midbrowser; do 
+                        update-alternatives --remove "$p-flashplugin" /usr/lib/gnash/libgnashplugin.so;
+                        [ `update-alternatives --list "$p-flashplugin" | wc -l` = 0 ]  && \
+                                update-alternatives --remove-all "$p-flashplugin"
+		   done
+		else 		
+		  echo "prerm called with argument \`$1'" >&2
+                  exit 1
+		fi                
+		;;
+        *)
+                echo "prerm called with unknown argument \`$1'" >&2
+                exit 1
+                ;;
+esac
+
+#DEBHELPER#
+
+exit 0
+

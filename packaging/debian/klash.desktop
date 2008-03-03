@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Name=Gnash SWF Viewer for KDE
+GenericName=
+Comment=
+Icon=/usr/share/pixmaps/klash.xpm
+Exec=/usr/bin/klash
+Terminal=false
+Categories=Application;AudioVideo;KDE;

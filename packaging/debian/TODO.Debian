@@ -1,0 +1,4 @@
+* Add a menu file and uncomment dh_installmenu in the debian/rules.
+* Create a better icon.
+* Find a way to generate man pages without $DISPLAY.
+* Add LDFLAGS="-Wl,-z,defs" to ./configure in rules.

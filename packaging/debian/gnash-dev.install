@@ -1,0 +1,6 @@
+usr/include
+usr/lib/gnash/lib*.a
+usr/lib/gnash/lib*[a-z].so
+usr/lib/gnash/*.la
+usr/lib/pkgconfig/*
+usr/share/pkgconfig/*

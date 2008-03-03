@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Name=Gnash SWF Viewer
+GenericName=
+Comment=
+Icon=/usr/share/pixmaps/gnash.xpm
+Exec=/usr/bin/gnash
+Terminal=false
+Categories=Application;AudioVideo;
