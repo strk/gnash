@@ -14,11 +14,11 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: libXML.m4,v 1.34 2007/11/24 16:47:11 rsavoye Exp $
+dnl $Id: libXML.m4,v 1.35 2008/03/03 20:26:14 dossy Exp $
 
 AC_DEFUN([GNASH_PATH_LIBXML], [
   has_xml=no
-  dnl Lool for the header
+  dnl Look for the header
   AC_ARG_WITH(libxml-incl, AC_HELP_STRING([--with-libxml-incl], [directory where libxml2 header is]), with_libxml_incl=${withval})
   AC_CACHE_VAL(ac_cv_path_libxml_incl, [
     if test x"${with_libxml_incl}" != x ; then
@@ -29,18 +29,25 @@ AC_DEFUN([GNASH_PATH_LIBXML], [
       fi
     fi
   ])
+  dnl Look for the library
+  AC_ARG_WITH(libxml_lib, AC_HELP_STRING([--with-libxml-lib], [directory where libxml2 library is]), with_libxml_lib=${withval})
+  AC_CACHE_VAL(ac_cv_path_libxml_lib, [
+    if test x"${with_libxml_lib}" != x ; then
+      if test -f ${with_libxml_libs}/libxml2.a -o -f ${with_libxml_lib}/libxml2.${shlibext}; then
+        ac_cv_path_libxml_lib="-L`(cd ${with_libxml_lib}; pwd)` -lxml2"
+      fi
+    fi
+  ])
 
-  if test x"${ac_cv_path_libxml_incl}" = x; then
+  if test x"${ac_cv_path_libxml_incl}" = x -o x"${ac_cv_path_libxml_lib}" = x; then
     AC_PATH_PROG(XML2_CONFIG, xml2-config, ,[${pathlist}])
-    if test "x$XML2_CONFIG" != "x" -a x"${darwin}" = xno ; then
-      if test "x$XML2_CFLAGS" = "x" ; then
+    if test x"$XML2_CONFIG" != x -a x"${darwin}" = xno ; then
+      if test x"$XML2_CFLAGS" = x -a x"${ac_cv_path_libxml_incl}" = x; then
         ac_cv_path_libxml_incl=`$XML2_CONFIG --cflags`
       fi
-      if test "x$XML2_LIBS" = "x" ; then
+      if test x"$XML2_LIBS" = x -a x"${ac_cv_path_libxml_lib}" = x; then
         ac_cv_path_libxml_lib=`$XML2_CONFIG --libs | sed -e 's:-L/usr/lib::'`
       fi
-    else
-      AC_MSG_RESULT(no)
     fi
   fi
 
@@ -66,16 +73,7 @@ AC_DEFUN([GNASH_PATH_LIBXML], [
 
   AC_MSG_RESULT(${ac_cv_path_libxml_incl}) 
 
-  dnl Look for the library
-  AC_ARG_WITH(libxml_lib, AC_HELP_STRING([--with-libxml-lib], [directory where libxml2 library is]), with_libxml_lib=${withval})
-  AC_CACHE_VAL(ac_cv_path_libxml_lib, [
-    if test x"${with_libxml_lib}" != x ; then
-      if test -f ${with_libxml_libs}/libxml2.a -o -f ${with_libxml_lib}/libxml2.${shlibext}; then
-        ac_cv_path_libxml_lib="-L`(cd ${with_libxml_lib}; pwd)` -lxml2"
-      fi
-    fi
-  ])
-  dnl AC_MSG_CHECKING([for libxml library])
+  dnl AC_MSG_CHECKING([for libxml2 library])
   if test x"${ac_cv_path_libxml_lib}" = x ; then
     for i in $libslist; do
       if test -f $i/libxml2.a -o -f $i/libxml2.${shlibext}; then
@@ -91,10 +89,12 @@ AC_DEFUN([GNASH_PATH_LIBXML], [
     done
   fi
   if test x"${ac_cv_path_libxml_lib}" = x ; then
-    AC_CHECK_LIB(libxml2, libxml_Init, [ac_cv_path_libxml_lib="-lxml2"])
+    AC_CHECK_LIB(xml2, xmlInitParser, [ac_cv_path_libxml_lib="-lxml2"])
   fi  
+
   AC_MSG_CHECKING([for libxml2 library])
   AC_MSG_RESULT(${ac_cv_path_libxml_lib}) 
+
   if test x"${ac_cv_path_libxml_incl}" != x ; then
     LIBXML_CFLAGS="${ac_cv_path_libxml_incl}"
   else
