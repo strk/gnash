@@ -76,10 +76,7 @@ EXTRA_DIST = \
 	$(REFMAN) \
 	$(COMMON) \
 	$(XML_MAIN) \
-	$(dist_man_MANS) \
-	$(MANSRC) \
-	$(XML_MAIN:.xml=.html) \
-	$(XML_MAIN:.xml=.info)
+	$(MANSRC) 
 
 #noinst_SCRIPT = gen-doc.sh
 # We list the texi and info pages twice, as differing versions of the 

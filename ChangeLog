@@ -1,5 +1,11 @@
 2008-03-04 Sandro Santilli <strk@keybit.net>
 
+	* doc/C/Makefile.am: don't distribute a second copy of
+	  preformatted .info, .html and man files, all preformatted
+	  copies are already in the preformatted/ subdir.
+
+2008-03-04 Sandro Santilli <strk@keybit.net>
+
 	* doc/C/Makefile.am: Preformatted html files don't have
 	  the embedded underscore..
 
