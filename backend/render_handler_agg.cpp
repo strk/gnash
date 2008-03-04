@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.128 2008/02/23 13:06:54 bwy Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.129 2008/03/04 00:21:14 bjacques Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1066,7 +1066,7 @@ public:
     for (pno=0; pno<pcount; pno++) {
     
       path &the_path = paths_out[pno];     
-      point oldpnt(the_path.ap.x, the_path.ap.y);
+      point oldpnt((int)the_path.ap.x, (int)the_path.ap.y);
       point newpnt;
       mat.transform(&newpnt, oldpnt);
       the_path.ap.x = newpnt.x;    
@@ -1077,14 +1077,14 @@ public:
       
         edge &the_edge = the_path.m_edges[eno];
         
-        oldpnt.x = the_edge.ap.x;
-        oldpnt.y = the_edge.ap.y;
+        oldpnt.x = (int)the_edge.ap.x;
+        oldpnt.y = (int)the_edge.ap.y;
         mat.transform(&newpnt, oldpnt);
         the_edge.ap.x = newpnt.x;
         the_edge.ap.y = newpnt.y;
         
-        oldpnt.x = the_edge.cp.x;
-        oldpnt.y = the_edge.cp.y;
+        oldpnt.x = (int)the_edge.cp.x;
+        oldpnt.y = (int)the_edge.cp.y;
         mat.transform(&newpnt, oldpnt);
         the_edge.cp.x = newpnt.x;
         the_edge.cp.y = newpnt.y;

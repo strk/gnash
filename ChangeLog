@@ -1,3 +1,8 @@
+2008-03-03 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler_{ogl,cairo}.cpp: Wallpaper over bug #22462:
+	- (NaN coordinates fed to renderer).
+
 2008-03-03  Dossy Shiobara <dossy@panoptic.com>
 
 	* macros/libXML.m4 (1.35): Improve detection of libxml2, especially
