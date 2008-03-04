@@ -24,7 +24,11 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #include <OpenGL/glext.h>
+#ifdef __APPLE_CC__
+#define GLUCALLBACKTYPE GLvoid (*)()
+#else
 #define GLUCALLBACKTYPE GLvoid (*)(...)
+#endif
 #else
 # define GLUCALLBACKTYPE void (*)()
 # include <GL/gl.h>
