@@ -92,8 +92,8 @@ TEXIS  = gnash_user.texi gnashuser.texi gnash_ref.texi gnashref.texi
 
 all-local: info html man
 
-gnashuser.html gnashuser.pdf gnash_user.info gnashuser.info: gnashuser.xml $(USERMAN) $(COMMON)
-gnashref.html gnashref.pdf gnash_ref.info gnashref.info: gnashref.xml $(REFMAN) $(COMMON)
+gnashuser.html gnashuser.pdf gnash_user.info: gnashuser.xml $(USERMAN) $(COMMON)
+gnashref.html gnashref.pdf gnash_ref.info: gnashref.xml $(REFMAN) $(COMMON)
 
 # Convienience rules for developers of these manuals. By default
 # all output formats are built if the Docbook tools are installed
@@ -192,32 +192,21 @@ else
 	fi
 endif
 
-gnash_user.info gnashuser.info: gnashuser.texi
-gnash_ref.info gnashref.info: gnashref.texi
+if DOCBOOK
+gnash_user.info: gnashuser.texi
+gnash_ref.info: gnashref.texi
 gnashuser.texi gnash_user.texi: gnashuser.xml
 gnashref.texi gnash_user.texi: gnashref.xml
-if ! DOCBOOK
+else
 gnash_user.info: gnashuser.xml
 	@if test -d $(srcdir)/preformatted; then \
 	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
 	  $(LN_S) -f $(srcdir)/preformatted/gnash_user.info.in ./gnash_user.info; \
 	fi
-
-gnashuser.info: gnashuser.xml
-	@if test -d $(srcdir)/preformatted; then \
-	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
-	  $(LN_S) -f $(srcdir)/preformatted/gnash_user.info.in ./gnashuser.info; \
-	fi
-
 gnash_ref.info: gnashref.xml
 	@if test -d $(srcdir)/preformatted; then \
 	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
 	  $(LN_S) -f $(srcdir)/preformatted/gnash_ref.info.in ./gnash_ref.info; \
-	fi
-gnashref.info: gnashref.xml
-	@if test -d $(srcdir)/preformatted; then \
-	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
-	  $(LN_S) -f $(srcdir)/preformatted/gnash_ref.info.in ./gnashref.info; \
 	fi
 gnashref.html: gnashref.xml
 	@if test -d $(srcdir)/preformatted; then \
@@ -349,6 +338,10 @@ uninstall-omf-hook:
 	-$(SCROLLUPDATE) -v 
 
 CLEANFILES = \
+        $(PDFS) \
+	$(MANS) \
+	$(INFOS) \
+        $(HTMLS) \
 	gnash-C.omf.out \
 	manpage.links  \
 	manpage.refs  \
@@ -364,13 +357,6 @@ CLEANFILES = \
 	gnashref.mxml \
 	omf_timestamp
 
-MAINTAINERCLEANFILES = \
-        gnash.pdf \
-	$(MANS) \
-        gnash_user.info \
-        gnash_ref.info \
-        gnashuser.html \
-        gnashref.html
 
 # Always execute these targets as they have no real dependencies.
 .PHONY: images install-info-hook uninstall-info-hook install-html-hook uninstall-html-hook uninstall-data-hook install-data-hook

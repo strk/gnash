@@ -1,5 +1,12 @@
 2008-03-04 Sandro Santilli <strk@keybit.net>
 
+	* doc/C/Makefile.am: remove generated dox on 'make clean'
+	  (not maintainer-clean). drop references to gnashuser.info
+	  and gnashref.info (the official ones are gnash_user.info
+	  and gnash_ref.info).
+
+2008-03-04 Sandro Santilli <strk@keybit.net>
+
 	* doc/C/Makefile.am: don't distribute a second copy of
 	  preformatted .info, .html and man files, all preformatted
 	  copies are already in the preformatted/ subdir.
