@@ -1,5 +1,11 @@
 2008-03-04 Sandro Santilli <strk@keybit.net>
 
+	* doc/C/Makefile.am: explicitly list file to distribute.
+	  Adding a dir to EXTRA_DIST wasn't working, and is discouraged:
+	  http://www.delorie.com/gnu/docs/automake/automake_91.html
+
+2008-03-04 Sandro Santilli <strk@keybit.net>
+
 	* doc/C/Makefile.am: add a trailing slash on dirs added to
 	  EXTDA_DIST. Fixes 'make dist' with automake 1.96.
 	* testsuite/misc-ming.all/DrawingApiTest.as: add hitTest

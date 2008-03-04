@@ -46,7 +46,6 @@ COMMON = \
 	bugreport.xml
 
 USERMAN = \
-	$(COMMON) \
 	usermanual/installation.xml \
 	usermanual/revisions.xml \
 	usermanual/usage.xml \
@@ -57,7 +56,6 @@ USERMAN = \
 # These are the files needed to build the Gnash reference
 # manual.
 REFMAN = \
-	$(COMMON) \
 	refmanual/code_dependencies.xml \
 	refmanual/configuration.xml \
 	refmanual/custompath_configuration.xml \
@@ -74,8 +72,8 @@ REFMAN = \
 
 EXTRA_DIST = \
 	preformatted \
-	usermanual/ \
-	refmanual/ \
+	$(USERMAN) \
+	$(REFMAN) \
 	$(COMMON) \
 	$(XML_MAIN) \
 	$(dist_man_MANS) \
@@ -97,8 +95,8 @@ TEXIS  = gnash_user.texi gnashuser.texi gnash_ref.texi gnashref.texi
 
 all-local: info html man
 
-gnashuser.html gnashuser.pdf gnash_user.info gnashuser.info: gnashuser.xml $(USERMAN)
-gnashref.html gnashref.pdf gnash_ref.info gnashref.info: gnashref.xml $(REFMAN)
+gnashuser.html gnashuser.pdf gnash_user.info gnashuser.info: gnashuser.xml $(USERMAN) $(COMMON)
+gnashref.html gnashref.pdf gnash_ref.info gnashref.info: gnashref.xml $(REFMAN) $(COMMON)
 
 # Convienience rules for developers of these manuals. By default
 # all output formats are built if the Docbook tools are installed
