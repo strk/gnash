@@ -1619,7 +1619,8 @@ edit_text_character::registerTextVariable()
 	if (target->get_member(key, &val) )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
-		log_debug(_("target sprite (%p) does have a member named %s"), (void*)sprite, _vm.getStringTable().value(key).c_str());
+		log_debug(_("target object (%s @ %p) does have a member named %s"),
+			typeName(*target).c_str(), (void*)target, _vm.getStringTable().value(key).c_str());
 #endif
 		// TODO: pass environment to to_string ?
 		// as_environment& env = get_environment();
@@ -1627,10 +1628,13 @@ edit_text_character::registerTextVariable()
 	}
 	else
 	{
+		as_value newVal = as_value(utf8::encodeCanonicalString(_text, version));
 #ifdef DEBUG_DYNTEXT_VARIABLES
-		log_debug(_("target sprite (%p) does NOT have a member named %s (no problem, we'll add it)"), (void*)sprite, _vm.getStringTable().value(key).c_str());
+		log_debug(_("target sprite (%s @ %p) does NOT have a member named %s (no problem, we'll add it with value %s)"),
+			typeName(*target).c_str(), (void*)target, _vm.getStringTable().value(key).c_str(),
+			newVal.to_debug_string().c_str());
 #endif
-		target->set_member(key, as_value(utf8::encodeCanonicalString(_text, version)));
+		target->set_member(key, newVal);
 	}
 
 	sprite_instance* sprite = target->to_movie();
