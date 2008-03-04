@@ -264,12 +264,12 @@ std::vector<oglVertex> interpolate(const std::vector<edge>& edges, const float& 
         it != end; ++it) {
       const edge& the_edge = *it;
       
-      point target((int)the_edge.ap.x, (int)the_edge.ap.y);
+      point target(the_edge.ap.x, the_edge.ap.y);
 
       if (the_edge.is_straight()) {
         shape_points.push_back(oglVertex(target));
       } else {
-        point control((int)the_edge.cp.x, (int)the_edge.cp.y);
+        point control(the_edge.cp.x, the_edge.cp.y);
         
         trace_curve(anchor, control, target, shape_points);
       }

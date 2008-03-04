@@ -1,3 +1,9 @@
+2008-03-04 Sandro Santilli <strk@keybit.net>
+
+	* backend/: render_handler_agg.cpp, render_handler_ogl.cpp:
+	  Revert Bastiaan patch casting to int, the problem is in 
+	  the drawing api.
+
 2008-03-04 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/as_value.h: Use the previous implementations of isnan and
