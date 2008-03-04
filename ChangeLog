@@ -1,5 +1,7 @@
 2008-03-04 Sandro Santilli <strk@keybit.net>
 
+	* doc/C/Makefile.am: add a trailing slash on dirs added to
+	  EXTDA_DIST. Fixes 'make dist' with automake 1.96.
 	* testsuite/misc-ming.all/DrawingApiTest.as: add hitTest
 	  checking for the nan-feeded drawing.
 

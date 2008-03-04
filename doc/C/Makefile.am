@@ -74,8 +74,8 @@ REFMAN = \
 
 EXTRA_DIST = \
 	preformatted \
-	usermanual \
-	refmanual \
+	usermanual/ \
+	refmanual/ \
 	$(COMMON) \
 	$(XML_MAIN) \
 	$(dist_man_MANS) \
