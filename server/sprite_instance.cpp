@@ -1249,6 +1249,28 @@ sprite_lineTo(const fn_call& fn)
   float x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
   float y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
 
+  if ( ! isfinite(x) )
+  {
+    IF_VERBOSE_ASCODING_ERRORS(
+    std::stringstream ss; fn.dump_args(ss);
+    log_aserror("%s.lineTo(%s) : non-finite first argument (%s), "
+      "converted to zero", sprite->getTarget().c_str(),
+      ss.str().c_str(), fn.arg(0).to_debug_string().c_str());
+    );
+    x = 0;
+  }
+   
+  if ( ! isfinite(y) )
+  {
+    IF_VERBOSE_ASCODING_ERRORS(
+    std::stringstream ss; fn.dump_args(ss);
+    log_aserror("%s.lineTo(%s) : non-finite second argument (%s), "
+      "converted to zero", sprite->getTarget().c_str(),
+      ss.str().c_str(), fn.arg(1).to_debug_string().c_str());
+    );
+    y = 0;
+  }
+
 #ifdef DEBUG_DRAWING_API
   log_debug("%s.lineTo(%g,%g);", sprite->getTarget().c_str(), x, y);
 #endif
@@ -1272,6 +1294,28 @@ sprite_moveTo(const fn_call& fn)
 
   float x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
   float y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
+
+  if ( ! isfinite(x) )
+  {
+    IF_VERBOSE_ASCODING_ERRORS(
+    std::stringstream ss; fn.dump_args(ss);
+    log_aserror("%s.moveTo(%s) : non-finite first argument (%s), "
+      "converted to zero", sprite->getTarget().c_str(),
+      ss.str().c_str(), fn.arg(0).to_debug_string().c_str());
+    );
+    x = 0;
+  }
+   
+  if ( ! isfinite(y) )
+  {
+    IF_VERBOSE_ASCODING_ERRORS(
+    std::stringstream ss; fn.dump_args(ss);
+    log_aserror("%s.moveTo(%s) : non-finite second argument (%s), "
+      "converted to zero", sprite->getTarget().c_str(),
+      ss.str().c_str(), fn.arg(1).to_debug_string().c_str());
+    );
+    y = 0;
+  }
 
 #ifdef DEBUG_DRAWING_API
   log_debug("%s.moveTo(%g,%g);", sprite->getTarget().c_str(), x, y);
@@ -1345,6 +1389,50 @@ sprite_curveTo(const fn_call& fn)
   float cy = PIXELS_TO_TWIPS(fn.arg(1).to_number());
   float ax = PIXELS_TO_TWIPS(fn.arg(2).to_number());
   float ay = PIXELS_TO_TWIPS(fn.arg(3).to_number());
+
+  if ( ! isfinite(cx) )
+  {
+    IF_VERBOSE_ASCODING_ERRORS(
+    std::stringstream ss; fn.dump_args(ss);
+    log_aserror("%s.curveTo(%s) : non-finite first argument (%s), "
+      "converted to zero", sprite->getTarget().c_str(),
+      ss.str().c_str(), fn.arg(0).to_debug_string().c_str());
+    );
+    cx = 0;
+  }
+   
+  if ( ! isfinite(cy) )
+  {
+    IF_VERBOSE_ASCODING_ERRORS(
+    std::stringstream ss; fn.dump_args(ss);
+    log_aserror("%s.curveTo(%s) : non-finite second argument (%s), "
+      "converted to zero", sprite->getTarget().c_str(),
+      ss.str().c_str(), fn.arg(1).to_debug_string().c_str());
+    );
+    cy = 0;
+  }
+
+  if ( ! isfinite(ax) )
+  {
+    IF_VERBOSE_ASCODING_ERRORS(
+    std::stringstream ss; fn.dump_args(ss);
+    log_aserror("%s.curveTo(%s) : non-finite third argument (%s), "
+      "converted to zero", sprite->getTarget().c_str(),
+      ss.str().c_str(), fn.arg(0).to_debug_string().c_str());
+    );
+    ax = 0;
+  }
+   
+  if ( ! isfinite(ay) )
+  {
+    IF_VERBOSE_ASCODING_ERRORS(
+    std::stringstream ss; fn.dump_args(ss);
+    log_aserror("%s.curveTo(%s) : non-finite fourth argument (%s), "
+      "converted to zero", sprite->getTarget().c_str(),
+      ss.str().c_str(), fn.arg(1).to_debug_string().c_str());
+    );
+    ay = 0;
+  }
 
 #ifdef DEBUG_DRAWING_API
   log_debug("%s.curveTo(%g,%g,%g,%g);", sprite->getTarget().c_str(), cx, cy, ax, ay);

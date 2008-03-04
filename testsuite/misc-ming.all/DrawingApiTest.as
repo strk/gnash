@@ -17,7 +17,7 @@
 // 'h' toggles _visible
 //
 
-rcsid="$Id: DrawingApiTest.as,v 1.32 2008/01/08 21:53:43 strk Exp $";
+rcsid="$Id: DrawingApiTest.as,v 1.33 2008/03/04 11:04:35 strk Exp $";
 
 #include "../actionscript.all/check.as"
 
@@ -228,6 +228,29 @@ with (a)
 	check( zshape.hitTest((223+25), (145+20), true) ); // 3
 	check( zshape.hitTest(273, 165, true) ); // 4
 
+	createEmptyMovieClip("x", 20);
+	with (x)
+	{
+		lineStyle(6, 0xFF8800);
+		beginFill(0x888800, 100);
+		moveTo(100, 100);
+		lineTo("string", NaN); // equivalent to 0, 0
+		curveTo(100, "string", Object, 100); // equivalent to 100, 0, 0, 100
+		moteTo(undefined, 0); // equivalent to 0, 0
+		lineTo(100, null);
+		endFill();
+	}
+	x._x = 100;
+	x._y = 150;
+	x._xscale = 30;
+	x._yscale = 30;
+#if 0 // TODO: check these
+	check( x.hitTest(223, 145, true) ); 
+	check( x.hitTest((223+10), (145+0), true) ); 
+	check( x.hitTest((223+20), (145+5), true) ); 
+	check( x.hitTest((223+25), (145+20), true) ); 
+	check( x.hitTest(273, 165, true) ); 
+#endif
 }
 
 // Make the MovieClip "active" (grabbing mouse events)

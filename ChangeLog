@@ -1,3 +1,10 @@
+2008-03-04 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp: check arguments of drawing api
+	  functions for being finite.
+	* testsuite/misc-ming.all/DrawingApiTest.as: test passing
+	  non-finite parameters to the drawing api.
+
 2008-03-04 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* testsuite/server/AsValueTest.cpp: Quick test for isnan and isinf.
