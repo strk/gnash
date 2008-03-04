@@ -17,7 +17,7 @@
 //
 
 
-rcsid="$Id: Math.as,v 1.8 2008/01/31 15:23:41 bwy Exp $";
+rcsid="$Id: Math.as,v 1.9 2008/03/04 11:21:10 strk Exp $";
 
 // Test case for Math ActionScript class
 //
@@ -123,9 +123,9 @@ var notanumber = new Number(Math.acos(2));
 var delta = new Number(0.000000000000001);
 
 
-//
-// Single-argument functions
-//
+//-----------------------------------------------------------------
+// Test Math.abs
+//-----------------------------------------------------------------
 
 check_equals (Math.abs(15), 15);
 check_equals (Math.abs(-15), 15);
@@ -139,6 +139,10 @@ check_equals (Math.abs(undefined).toString(), "0");
 check_equals (Math.abs(undefined).toString(), "NaN");
 #endif
 check_equals (Math.abs().toString(), "NaN");
+
+//-----------------------------------------------------------------
+// Test Math.acos
+//-----------------------------------------------------------------
 
 check_equals (Math.acos(0).toString(), pi_2s);
 check_equals (Math.acos(1), 0);
@@ -165,6 +169,10 @@ check_equals (Math.acos(minusinf).toString(), "NaN");
 check_equals (Math.acos(notanumber).toString(), "NaN");
 check_equals (Math.acos().toString(), "NaN");
 
+//-----------------------------------------------------------------
+// Test Math.asin
+//-----------------------------------------------------------------
+
 check_equals (Math.asin(0), 0);
 check_equals (Math.asin(1).toString(), pi_2s);
 check_equals (Math.asin(-1).toString(), "-" + pi_2s);
@@ -182,6 +190,10 @@ check_equals (Math.asin(undefined).toString(), "NaN");
 #endif
 check_equals (Math.asin().toString(), "NaN");
 
+//-----------------------------------------------------------------
+// Test Math.atan
+//-----------------------------------------------------------------
+
 check_equals (Math.atan(0), 0);
 check_equals (Math.atan(0.5).toString(), "0.463647609000806");
 check_equals (Math.atan(-0.5).toString(), "-0.463647609000806");
@@ -198,6 +210,10 @@ check_equals (Math.atan(notanumber).toString(), "NaN");
  check_equals (Math.atan(undefined).toString(), "NaN");
 #endif
 check_equals (Math.atan().toString(), "NaN");
+
+//-----------------------------------------------------------------
+// Test Math.ceil
+//-----------------------------------------------------------------
 
 check_equals (Math.ceil(0), 0);
 check_equals (Math.ceil(1), 1);
@@ -217,6 +233,10 @@ check_equals (Math.ceil(minusinf), minusinf);
  check_equals (Math.ceil(undefined).toString(), "NaN");
 #endif
 check_equals (Math.ceil().toString(), "NaN");
+
+//-----------------------------------------------------------------
+// Test Math.cos
+//-----------------------------------------------------------------
 
 check_equals (Math.cos(0), 1);
 // Flash gives 6.12303176911189e-17 so check that our answer is within similar
@@ -239,6 +259,10 @@ check_equals (Math.cos(notanumber).toString(), "NaN");
 #endif
 check_equals (Math.cos().toString(), "NaN");
 
+//-----------------------------------------------------------------
+// Test Math.exp
+//-----------------------------------------------------------------
+
 check_equals (Math.exp(0), 1);
 check_equals (Math.exp(1).toString(), "2.71828182845905");
 check_equals (Math.exp(2).toString(), "7.38905609893065");
@@ -252,6 +276,10 @@ check_equals (Math.exp(notanumber).toString(), "NaN");
  check_equals (Math.exp(undefined).toString(), "NaN");
 #endif
 check_equals (Math.exp().toString(), "NaN");
+
+//-----------------------------------------------------------------
+// Test Math.floor
+//-----------------------------------------------------------------
 
 check_equals (Math.floor(0), 0);
 check_equals (Math.floor(0.1), 0);
@@ -272,6 +300,10 @@ check_equals (Math.floor(notanumber).toString(), "NaN");
 #endif
 check_equals (Math.floor().toString(), "NaN");
 
+//-----------------------------------------------------------------
+// Test Math.log
+//-----------------------------------------------------------------
+
 check_equals (Math.log(0).toString(), "-Infinity");
 check_equals (Math.log(1), 0);
 check_equals (Math.log(Math.E), 1);
@@ -287,11 +319,19 @@ check_equals (Math.log(notanumber).toString(), "NaN");
 #endif
 check_equals (Math.log().toString(), "NaN");
 
+//-----------------------------------------------------------------
+// Test Math.random
+//-----------------------------------------------------------------
+
 var math_random = new Number(Math.random());
 check (math_random >= 0.0 && math_random < 1.0)
 var math_random2 = new Number(Math.random());
 check (math_random2 >= 0.0 && math_random2 < 1.0)
 check (math_random != math_random2);		// very unlikely, anyhow!
+
+//-----------------------------------------------------------------
+// Test Math.round
+//-----------------------------------------------------------------
 
 check_equals (Math.round(0), 0);
 check_equals (Math.round(0.1), 0);
@@ -305,6 +345,8 @@ check_equals (Math.round(-0.9), -1);
 check_equals (Math.round(plusinf).toString(), "Infinity");
 check_equals (Math.round(minusinf).toString(), "-Infinity");
 check_equals (Math.round(notanumber).toString(), "NaN");
+check(isNaN(Math.round('')));
+check_equals(typeof(Math.round('')), 'number');
 #if OUTPUT_VERSION < 7
  check_equals (Math.round(undefined).toString(), "0"); 
 #else
@@ -313,6 +355,10 @@ check_equals (Math.round(notanumber).toString(), "NaN");
 check_equals (Math.round().toString(), "NaN");
 // Don't know what round() and friends do with huge numbers that cannot be
 // resolved to individual integer resolution. Don't really care either...
+
+//-----------------------------------------------------------------
+// Test Math.sin
+//-----------------------------------------------------------------
 
 check_equals (Math.sin(0), 0);
 check_equals (Math.sin(Math.PI / 2), 1);
@@ -336,6 +382,10 @@ check_equals (Math.sin(notanumber).toString(), "NaN");
 #endif
 check_equals (Math.sin().toString(), "NaN");
 
+//-----------------------------------------------------------------
+// Test Math.sqrt
+//-----------------------------------------------------------------
+
 check_equals (Math.sqrt(0), 0);
 check_equals (Math.sqrt(1), 1);
 check_equals (Math.sqrt(-1).toString(), "NaN");
@@ -351,6 +401,10 @@ check_equals (Math.sqrt(notanumber).toString(), "NaN");
  check_equals (Math.sqrt(undefined).toString(), "NaN"); 
 #endif
 check_equals (Math.sqrt().toString(), "NaN");
+
+//-----------------------------------------------------------------
+// Test Math.tan
+//-----------------------------------------------------------------
 
 check_equals (Math.tan(0), 0);
 // Should either be very large or very small, according to inaccuracy of PI
@@ -372,9 +426,9 @@ check_equals (Math.tan(notanumber).toString(), "NaN");
 #endif
 check_equals (Math.tan().toString(), "NaN");
 
-//
-// Two-argument functions
-//
+//-----------------------------------------------------------------
+// Test Math.atan2
+//-----------------------------------------------------------------
 
 check_equals (Math.atan2().toString(), "NaN");
 check_equals (Math.atan2(1).toString(), "NaN");
@@ -407,6 +461,10 @@ check_equals (Math.atan2(1,notanumber).toString(), "NaN");
  check_equals (Math.atan2(1,undefined).toString(), "NaN"); 
 #endif
 
+//-----------------------------------------------------------------
+// Test Math.max
+//-----------------------------------------------------------------
+
 xcheck_equals (Math.max().toString(), "-Infinity");  // Heaven knows why!
 check_equals (Math.max(1).toString(), "NaN");
 check_equals (Math.max(1,2), 2);
@@ -423,6 +481,10 @@ check_equals (Math.max(plusinf,minusinf).toString(), "Infinity");
  check_equals (Math.max(0,undefined).toString(), "NaN"); 
 #endif
 check_equals (Math.max(0,notanumber).toString(), "NaN");
+
+//-----------------------------------------------------------------
+// Test Math.min
+//-----------------------------------------------------------------
 
 xcheck_equals (Math.min().toString(), "Infinity");  // Heaven knows why!
 check_equals (Math.min(1).toString(), "NaN");
@@ -441,6 +503,10 @@ check_equals (Math.min(plusinf,minusinf).toString(), "-Infinity");
  check_equals (Math.min(0,undefined).toString(), "NaN"); 
 #endif
 check_equals (Math.min(0,notanumber).toString(), "NaN");
+
+//-----------------------------------------------------------------
+// Test Math.pow
+//-----------------------------------------------------------------
 
 check_equals (Math.pow().toString(), "NaN");
 check_equals (Math.pow(0).toString(), "NaN");
@@ -468,9 +534,13 @@ check_equals (Math.pow(-2, -2), 0.25);
 check_equals (Math.pow(-2, 0.5).toString(), "NaN");
 check_equals (Math.pow(-2, -0.5).toString(), "NaN");
 
+//-----------------------------------------------------------------
+// END OF TESTS
+//-----------------------------------------------------------------
+
 // End of Math testsuite
 #if OUTPUT_VERSION <= 6
- check_totals(269);
+ check_totals(271);
 #else
- check_totals(278);
+ check_totals(280);
 #endif
