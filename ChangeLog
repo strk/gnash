@@ -1,4 +1,9 @@
-2008-03-04 Markus Gothe <nietsche@lysator.liu.se>
+2008-03-03 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/as_value.h: Replace isnan and isinf macros with type safe
+	templates.
+
+2008-03-03 Markus Gothe <nietsche@lysator.liu.se>
 
 	* backend/render_handler_ogl.h: Make things compile on OS X.
 	  Ugly #ifdef but it works.

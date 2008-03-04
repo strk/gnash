@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.84 2008/02/19 12:06:07 strk Exp $ */
+/* $Id: as_value.h,v 1.85 2008/03/04 03:48:02 bjacques Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -32,6 +32,9 @@
 #include <string>
 #include <boost/variant.hpp>
 #include <ostream> // for inlined output operator
+#include <boost/type_traits/is_floating_point.hpp>
+#include <boost/utility/enable_if.hpp>
+#include <boost/static_assert.hpp>
 
 #include "string_table.h"
 
@@ -60,25 +63,31 @@ class asName;
 #endif
 
 
-#ifndef isnan
-# define isnan(x) \
-(sizeof (x) == sizeof (long double) ? isnan_ld (x) \
-: sizeof (x) == sizeof (double) ? isnan_d (x) \
-: isnan_f (x))
-static inline int isnan_f  (float       x) { return x != x; }
-static inline int isnan_d  (double      x) { return x != x; }
-static inline int isnan_ld (long double x) { return x != x; }
-#endif
-	  
-#ifndef isinf
-# define isinf(x) \
-(sizeof (x) == sizeof (long double) ? isinf_ld (x) \
-: sizeof (x) == sizeof (double) ? isinf_d (x) \
-: isinf_f (x))
-	static inline int isinf_f  (float       x) { return isnan (x - x); }
-	static inline int isinf_d  (double      x) { return isnan (x - x); }
-	static inline int isinf_ld (long double x) { return isnan (x - x); }
-#endif
+// The following two templates work just like their C counterparts, with added
+// type safety (i.e., they will only compile for floating point arguments).
+
+template <typename T>
+bool
+isnan(const T& num, typename boost::enable_if<boost::is_floating_point<T> >::type* dummy = 0)
+{
+	UNUSED(dummy);
+
+	BOOST_STATIC_ASSERT(std::numeric_limits<T>::has_quiet_NaN);
+
+	return num == std::numeric_limits<T>::quiet_NaN();
+}
+
+
+template <typename T>
+bool
+isinf(const T& num, typename boost::enable_if<boost::is_floating_point<T> >::type* dummy = 0)
+{
+	UNUSED(dummy);
+
+	BOOST_STATIC_ASSERT(std::numeric_limits<T>::has_infinity);
+
+	return num == std::numeric_limits<T>::infinity();
+}
 
 /// Use this methods to obtain a properly-formatted property name
 /// The methods will convert the name to lowercase if the current VM target
