@@ -1,5 +1,10 @@
 2008-03-04 Sandro Santilli <strk@keybit.net>
 
+	* doc/C/Makefile.am: Preformatted html files don't have
+	  the embedded underscore..
+
+2008-03-04 Sandro Santilli <strk@keybit.net>
+
 	* Makefile.am: --with-plugindir was deprecated in favor
 	  of --with-npapi-plugindir. Update distcheck flags.
 	* doc/C/Makefile.am: explicitly list file to distribute.

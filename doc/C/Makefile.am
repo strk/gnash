@@ -225,12 +225,12 @@ gnashref.info: gnashref.xml
 gnashref.html: gnashref.xml
 	@if test -d $(srcdir)/preformatted; then \
 	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
-	  $(LN_S) -f $(srcdir)/preformatted/gnash_ref.html.in ./gnashref.html; \
+	  $(LN_S) -f $(srcdir)/preformatted/gnashref.html.in ./gnashref.html; \
 	fi
 gnashuser.html: gnashref.xml
 	@if test -d $(srcdir)/preformatted; then \
 	  echo "WARNING: Linking to preformatted version of $@, it could be out of date."; \
-	  $(LN_S) -f $(srcdir)/preformatted/gnash_user.html.in ./gnashuser.html; \
+	  $(LN_S) -f $(srcdir)/preformatted/gnashuser.html.in ./gnashuser.html; \
 	fi
 endif
 
