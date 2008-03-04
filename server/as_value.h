@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.85 2008/03/04 03:48:02 bjacques Exp $ */
+/* $Id: as_value.h,v 1.86 2008/03/04 09:09:07 bjacques Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -63,31 +63,18 @@ class asName;
 #endif
 
 
-// The following two templates work just like their C counterparts, with added
+// The following template works just like its C counterpart, with added
 // type safety (i.e., they will only compile for floating point arguments).
 
 template <typename T>
-bool
+inline bool
 isnan(const T& num, typename boost::enable_if<boost::is_floating_point<T> >::type* dummy = 0)
 {
 	UNUSED(dummy);
-
-	BOOST_STATIC_ASSERT(std::numeric_limits<T>::has_quiet_NaN);
-
-	return num == std::numeric_limits<T>::quiet_NaN();
+	return num != num;
 }
 
-
-template <typename T>
-bool
-isinf(const T& num, typename boost::enable_if<boost::is_floating_point<T> >::type* dummy = 0)
-{
-	UNUSED(dummy);
-
-	BOOST_STATIC_ASSERT(std::numeric_limits<T>::has_infinity);
-
-	return num == std::numeric_limits<T>::infinity();
-}
+#define isinf(x) (isnan(x - x))
 
 /// Use this methods to obtain a properly-formatted property name
 /// The methods will convert the name to lowercase if the current VM target

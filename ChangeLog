@@ -1,3 +1,9 @@
+2008-03-04 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/as_value.h: Use the previous implementations of isnan and
+	isinf, because the current one is reported not to work in all cases.
+	isinf can now be a macro since it inherits type-safety from isnan.
+
 2008-03-03 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/as_value.h: Replace isnan and isinf macros with type safe
