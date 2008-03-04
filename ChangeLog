@@ -1,5 +1,10 @@
 2008-03-04 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/DrawingApiTest.as: add hitTest
+	  checking for the nan-feeded drawing.
+
+2008-03-04 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Math.as: test Math.round('').
 	* server/sprite_instance.cpp: check arguments of drawing api
 	  functions for being finite.

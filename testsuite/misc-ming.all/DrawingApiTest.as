@@ -17,7 +17,7 @@
 // 'h' toggles _visible
 //
 
-rcsid="$Id: DrawingApiTest.as,v 1.33 2008/03/04 11:04:35 strk Exp $";
+rcsid="$Id: DrawingApiTest.as,v 1.34 2008/03/04 11:28:09 strk Exp $";
 
 #include "../actionscript.all/check.as"
 
@@ -244,13 +244,14 @@ with (a)
 	x._y = 150;
 	x._xscale = 30;
 	x._yscale = 30;
-#if 0 // TODO: check these
-	check( x.hitTest(223, 145, true) ); 
-	check( x.hitTest((223+10), (145+0), true) ); 
-	check( x.hitTest((223+20), (145+5), true) ); 
-	check( x.hitTest((223+25), (145+20), true) ); 
-	check( x.hitTest(273, 165, true) ); 
-#endif
+
+	check( x.hitTest(126, 168, true) ); 
+	check( x.hitTest(112, 158, true) ); 
+	check( x.hitTest(122, 157, true) ); 
+	check( ! x.hitTest(120, 155, true) ); 
+	check( x.hitTest(120, 155, false) ); 
+	check( ! x.hitTest(116, 177, true) ); 
+	check( x.hitTest(116, 177, false) ); 
 }
 
 // Make the MovieClip "active" (grabbing mouse events)
