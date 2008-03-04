@@ -1,3 +1,8 @@
+2008-03-04 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* testsuite/server/AsValueTest.cpp: Quick test for isnan and isinf.
+	* testsuite/server/Makefile.am: Enable AsValueTest.
+
 2008-03-04 Sandro Santilli <strk@keybit.net>
 
 	* backend/: render_handler_agg.cpp, render_handler_ogl.cpp:

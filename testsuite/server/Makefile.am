@@ -42,6 +42,7 @@ check_PROGRAMS = \
 	PropertyListTest \
 	as_prop_flagsTest \
 	DisplayListTest \
+	AsValueTest \
 	$(NULL)
 
 CLEANFILES = \
@@ -99,6 +100,11 @@ as_prop_flagsTest_LDADD = \
 
 DisplayListTest_SOURCES = DisplayListTest.cpp
 DisplayListTest_LDADD = \
+	$(GNASH_LIBS) \
+	$(NULL)
+
+AsValueTest_SOURCES = AsValueTest.cpp
+AsValueTest_LDADD = \
 	$(GNASH_LIBS) \
 	$(NULL)
 
