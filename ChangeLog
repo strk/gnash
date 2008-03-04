@@ -1,5 +1,7 @@
 2008-03-04 Sandro Santilli <strk@keybit.net>
 
+	* Makefile.am: --with-plugindir was deprecated in favor
+	  of --with-npapi-plugindir. Update distcheck flags.
 	* doc/C/Makefile.am: explicitly list file to distribute.
 	  Adding a dir to EXTRA_DIST wasn't working, and is discouraged:
 	  http://www.delorie.com/gnu/docs/automake/automake_91.html

@@ -36,7 +36,7 @@ noinst_SCRIPT = autogen.sh
 ## testing builds.
 DISTCHECK_CONFIGURE_FLAGS = \
 	--with-kde-pluginprefix=/tmp/gnash-distcheck-$$/kparts \
-	--with-plugindir=/tmp/gnash-distcheck-$$/npapi \
+	--with-npapi-plugindir=/tmp/gnash-distcheck-$$/npapi \
 	--enable-extensions=all \
 	--enable-gui=all \
 	--enable-cygnal
