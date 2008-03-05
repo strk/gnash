@@ -170,16 +170,16 @@ CRcInitFile::parseFile(const std::string& filespec)
             }
 
             bool test;
-            extractSetting(&test, "actionDump", variable, value);
-            extractSetting(&test, "parserDump", variable, value);
-            useParserDump(test);
-            useActionDump(test);
-
             uint32_t num;
-            extractNumber(&num, "verbosity", variable, value);
-            verbosityLevel(num);
-            
-            extractNumber((uint32_t *)&_port_offset, "portOffset", variable, value);
+
+            if ( extractSetting(test, "actionDump", variable, value) )
+                useParserDump(test);
+            else if ( extractSetting(test, "parserDump", variable, value) )
+                useActionDump(test);
+            else if ( extractNumber(num, "verbosity", variable, value) )
+                verbosityLevel(num);
+            else extractNumber((uint32_t&)_port_offset, "portOffset", variable, value);
+
         } while (!in.eof());
 
     } else {

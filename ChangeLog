@@ -1,3 +1,8 @@
+2008-03-04 Sandro Santilli <strk@keybit.net>
+
+	* cygnal/crc.cpp: update to build after changes in RcInitFile
+	  interface.
+
 2008-03-04 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/log.{h,cpp}: add templates to convert from vsnprintf format
