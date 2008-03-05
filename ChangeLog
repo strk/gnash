@@ -1,3 +1,8 @@
+2008-03-04 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/log.cpp: remove silly assertion.
+	* testsuite/libamf.all/test_object.cpp: use std::string hexify.
+
 2008-03-04 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/swfdec/PASSING: added tests that only failed due to 

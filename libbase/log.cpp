@@ -58,8 +58,6 @@ static const int BUFFER_SIZE = 2048;
 std::string hexify (const unsigned char *p, size_t length, bool ascii)
 {
 
-	assert (length <= sizeof(p));
-
 	const std::vector<unsigned char> bytes (p, p + length);
 
 	std::ostringstream ss;
