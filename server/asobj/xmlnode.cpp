@@ -37,6 +37,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <algorithm>
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -187,7 +188,7 @@ void
 XMLNode::insertBefore(boost::intrusive_ptr<XMLNode> newnode, boost::intrusive_ptr<XMLNode> pos)
 {
     // find iterator for positional parameter
-    ChildList::iterator it = find(_children.begin(), _children.end(), pos);
+    ChildList::iterator it = std::find(_children.begin(), _children.end(), pos);
     if ( it == _children.end() )
     {
         IF_VERBOSE_ASCODING_ERRORS(
