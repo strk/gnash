@@ -78,7 +78,6 @@ const char *astype_str[] = {
 int
 main(int argc, char *argv[])
 {
-    cout << "hello" << endl;
 
     char buffer[300];
     int c;
