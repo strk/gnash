@@ -20,7 +20,6 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: test.as,v 1.1 2007/09/27 00:29:31 rsavoye Exp $";
 
 var bus = new Dbus();
 

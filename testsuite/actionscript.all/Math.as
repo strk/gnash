@@ -17,7 +17,6 @@
 //
 
 
-rcsid="$Id: Math.as,v 1.9 2008/03/04 11:21:10 strk Exp $";
 
 // Test case for Math ActionScript class
 //

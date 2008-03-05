@@ -15,7 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: aqua_glue.h,v 1.10 2008/01/21 20:55:41 rsavoye Exp $ */
 
 #ifndef AQUA_GLUE_H
 #define AQUA_GLUE_H

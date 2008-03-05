@@ -20,7 +20,6 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.34 2008/01/16 19:31:48 strk Exp $";
 
 #include "check.as"
 

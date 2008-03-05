@@ -15,7 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.109 2008/02/20 14:46:28 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///

@@ -16,7 +16,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: LoadVariablesThread.h,v 1.6 2008/02/19 19:20:52 bwy Exp $ */
 
 #ifndef GNASH_LOADVARIABLESTHREAD_H
 #define GNASH_LOADVARIABLESTHREAD_H

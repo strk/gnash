@@ -15,7 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: Property.h,v 1.20 2008/02/28 07:26:42 strk Exp $ */ 
 
 #ifndef GNASH_PROPERTY_H
 #define GNASH_PROPERTY_H

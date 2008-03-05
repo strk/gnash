@@ -16,7 +16,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: LoadThread.cpp,v 1.20 2008/02/18 22:35:31 strk Exp $
 
 #include "LoadThread.h"
 #include "log.h"

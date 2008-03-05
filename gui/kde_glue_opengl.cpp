@@ -15,7 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: kde_glue_opengl.cpp,v 1.13 2008/01/21 20:55:41 rsavoye Exp $ */
 
 #include "kde_glue_opengl.h"
 #include "tu_opengl_includes.h"

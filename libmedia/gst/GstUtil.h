@@ -16,7 +16,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: GstUtil.h,v 1.1 2008/02/20 19:03:58 bjacques Exp $
 
 #ifndef _GSTUTIL_H
 #define	_GSTUTIL_H

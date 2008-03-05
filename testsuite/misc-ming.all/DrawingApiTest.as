@@ -17,7 +17,6 @@
 // 'h' toggles _visible
 //
 
-rcsid="$Id: DrawingApiTest.as,v 1.34 2008/03/04 11:28:09 strk Exp $";
 
 #include "../actionscript.all/check.as"
 

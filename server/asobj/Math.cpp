@@ -16,7 +16,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Math.cpp,v 1.27 2008/01/21 20:55:56 rsavoye Exp $ */
 
 //
 // This file implements methods of the ActionScript Math class.

@@ -12,7 +12,6 @@
 #define xfail_check _root.xfail
 #define xpass_check _root.xpass
 
-rcsid="$Id: PrototypeEventListeners.as,v 1.3 2008/02/13 15:07:46 bwy Exp $";
 
 
 var countMC;

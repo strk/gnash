@@ -19,7 +19,6 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: getvariable.as,v 1.23 2008/01/17 22:09:12 strk Exp $";
 
 #include "check.as"
 

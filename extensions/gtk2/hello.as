@@ -20,7 +20,6 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: hello.as,v 1.3 2007/07/26 03:41:17 strk Exp $";
 
 #include "dejagnu.as"
 

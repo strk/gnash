@@ -15,7 +15,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.18 2008/02/22 14:20:50 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 

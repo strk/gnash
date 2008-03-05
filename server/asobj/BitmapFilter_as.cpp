@@ -15,7 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BitmapFilter_as.cpp,v 1.5 2008/01/21 20:55:53 rsavoye Exp $ */
 
 #include "as_object.h"
 #include "BitmapFilter.h"

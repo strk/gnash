@@ -16,7 +16,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: Key.h,v 1.34 2008/02/07 10:07:58 bwy Exp $ */
 
 #ifndef __KEY_H__
 #define __KEY_H__

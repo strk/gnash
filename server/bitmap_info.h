@@ -15,7 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: bitmap_info.h,v 1.6 2008/01/21 20:55:49 rsavoye Exp $ */
 
 #ifndef GNASH_BITMAP_INFO_H
 #define GNASH_BITMAP_INFO_H

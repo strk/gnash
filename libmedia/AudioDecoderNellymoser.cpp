@@ -17,7 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderNellymoser.cpp,v 1.10 2008/03/01 04:47:45 bjacques Exp $
 
 // This file incorporates work covered by the following copyright and permission
 // notice:

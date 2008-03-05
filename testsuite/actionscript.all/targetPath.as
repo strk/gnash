@@ -20,7 +20,6 @@
  *  Test TARGETPATH tags (0x45)
  */
 
-rcsid="$Id: targetPath.as,v 1.13 2008/02/13 15:18:00 strk Exp $";
 
 #include "check.as"
 

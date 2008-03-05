@@ -20,7 +20,6 @@
 //
 
 
-/* $Id: Range2d.h,v 1.20 2008/01/21 20:56:11 rsavoye Exp $ */
 
 #ifndef GNASH_RANGE2D_H
 #define GNASH_RANGE2D_H

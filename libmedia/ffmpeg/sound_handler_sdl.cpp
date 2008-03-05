@@ -20,7 +20,6 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.2 2008/02/22 14:20:46 strk Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"

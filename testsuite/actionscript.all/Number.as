@@ -27,7 +27,6 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.40 2008/02/19 12:06:07 strk Exp $";
 
 #include "check.as"
 

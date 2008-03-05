@@ -16,7 +16,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: textformat.h,v 1.21 2008/01/21 20:55:53 rsavoye Exp $
 //
 
 #ifndef __TEXTFORMAT_H__

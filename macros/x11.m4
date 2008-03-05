@@ -15,7 +15,6 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-dnl $Id: x11.m4,v 1.15 2007/11/24 16:47:11 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_X11],
 [

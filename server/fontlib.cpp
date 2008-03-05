@@ -5,7 +5,6 @@
 
 // A module to take care of all of gnash's loaded fonts.
 
-/* $Id: fontlib.cpp,v 1.40 2007/12/01 15:40:59 strk Exp $ */
 
 #include "tu_file.h"
 #include "gnash.h"

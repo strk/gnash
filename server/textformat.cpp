@@ -17,7 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-// $Id: textformat.cpp,v 1.34 2008/02/19 19:20:54 bwy Exp $
 
 #include "log.h"
 #include "textformat.h"

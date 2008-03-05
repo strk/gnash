@@ -21,7 +21,6 @@
  *  Test stack status after action "Swap"
  */
 
-rcsid="$Id: swap.as,v 1.3 2007/09/29 16:23:00 strk Exp $";
 
 #include "check.as"
 

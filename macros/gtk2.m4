@@ -15,7 +15,6 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-dnl $Id: gtk2.m4,v 1.46 2007/11/29 05:36:01 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_GTK2],
 [

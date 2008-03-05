@@ -15,7 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: riscos_glue_agg.h,v 1.6 2008/01/21 20:55:43 rsavoye Exp $ */
 
 #include "riscos_glue.h"
 

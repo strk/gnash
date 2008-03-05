@@ -17,7 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.h,v 1.22 2008/01/21 20:55:43 rsavoye Exp $
 
 // Information about the FLV format can be found at http://osflash.org/flv
 

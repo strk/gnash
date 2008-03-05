@@ -16,7 +16,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: StringPredicates.h,v 1.9 2008/01/21 20:55:48 rsavoye Exp $ */
 
 #ifndef GNASH_STRINGPREDICATES_H
 #define GNASH_STRINGPREDICATES_H

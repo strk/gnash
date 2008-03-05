@@ -18,7 +18,6 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.57 2008/02/19 19:20:47 bwy Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H

@@ -16,7 +16,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaDecoderGst.cpp,v 1.4 2008/01/27 07:18:18 bjacques Exp $
 
 #include "MediaDecoderGst.h"
 #include "AudioDecoderNellymoser.h"

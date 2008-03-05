@@ -17,7 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gui_gtk.cpp,v 1.2 2008/01/21 20:55:41 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"

@@ -15,7 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: aquasup.h,v 1.12 2008/01/21 20:55:42 rsavoye Exp $ */
 
 #ifndef __AQUASUP_H__
 #define __AQUASUP_H__

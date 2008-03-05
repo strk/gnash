@@ -31,7 +31,6 @@
 // different folks works for me as long as the standard keywords are
 // used to keep DejaGnu happy.
 
-//rcsid="$Id: dejagnu.as,v 1.10 2007/07/26 03:41:20 strk Exp $";
 
 #include "check.as"
 

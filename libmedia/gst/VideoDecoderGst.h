@@ -16,7 +16,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: VideoDecoderGst.h,v 1.14 2008/02/23 18:12:51 bjacques Exp $
 
 #ifndef __VIDEODECODERGST_H__
 #define __VIDEODECODERGST_H__

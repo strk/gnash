@@ -5,7 +5,6 @@
 
 // line style types.
 
-/* $Id: styles.h,v 1.23 2007/12/04 11:45:29 strk Exp $ */
 
 #ifndef GNASH_STYLES_H
 #define GNASH_STYLES_H

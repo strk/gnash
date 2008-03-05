@@ -17,7 +17,6 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.130 2008/03/04 10:39:58 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)

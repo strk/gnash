@@ -19,7 +19,6 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.cpp,v 1.25 2008/02/19 19:20:53 bwy Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H

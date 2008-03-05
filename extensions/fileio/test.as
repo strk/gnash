@@ -16,7 +16,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-rcsid="$Id: test.as,v 1.3 2007/07/26 03:41:17 strk Exp $";
 
 #include "dejagnu.as"
 

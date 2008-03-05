@@ -18,7 +18,6 @@
 
 // Initial test written by Mike Carlson
 
-rcsid="$Id: array.as,v 1.41 2008/02/07 11:12:58 strk Exp $";
 
 #include "check.as"
 

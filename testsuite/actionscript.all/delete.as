@@ -1,4 +1,3 @@
-rcsid="$Id: delete.as,v 1.12 2007/09/29 16:22:59 strk Exp $";
 
 #include "check.as"
 

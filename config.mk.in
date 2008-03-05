@@ -1,5 +1,4 @@
 # make configuration for the tu-testbed engine library
-# $Id: config.mk.in,v 1.4 2007/01/30 23:05:42 martinwguy Exp $
 
 CC = @CC@
 CXX = @CXX@

@@ -17,7 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: VideoDecoderFfmpeg.cpp,v 1.5 2008/02/25 00:06:07 bjacques Exp $
 
 #include "VideoDecoderFfmpeg.h"
 

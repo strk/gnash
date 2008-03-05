@@ -22,7 +22,6 @@
  *  Test case sensitivity 
  */
 
-rcsid="$Id: case.as,v 1.17 2008/02/06 10:15:07 strk Exp $";
 
 #include "check.as"
 

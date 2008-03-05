@@ -11,7 +11,6 @@
 // converted from K&R C to C-like C++, changed the interfaces a bit,
 // etc.
 
-/* $Id: image_filters.cpp,v 1.18 2007/12/12 10:06:59 zoulunkai Exp $ */
 
 #include "image.h"
 #include "utility.h"

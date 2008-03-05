@@ -16,7 +16,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: RemoveObjectTag.h,v 1.7 2008/01/21 20:56:02 rsavoye Exp $ */
 
 #ifndef GNASH_SWF_REMOVEOBJECTTAG_H
 #define GNASH_SWF_REMOVEOBJECTTAG_H

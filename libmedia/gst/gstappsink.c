@@ -17,7 +17,6 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* $Id: gstappsink.c,v 1.6 2008/01/29 05:18:33 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"

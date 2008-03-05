@@ -15,7 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: noseek_fd_adapter.h,v 1.7 2008/01/21 20:55:45 rsavoye Exp $ */
 
 #ifndef STDIN_ADAPTER_H
 #define STDIN_ADAPTER_H

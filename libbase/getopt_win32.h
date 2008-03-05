@@ -1,4 +1,3 @@
-/* $Id: getopt_win32.h,v 1.5 2006/09/27 08:45:01 alexeev Exp $ */
 
 #ifndef GETOPT_WIN32_H
 #define GETOPT_WIN32_H

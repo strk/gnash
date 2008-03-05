@@ -8,7 +8,6 @@
 //
 //
 
-rcsid="$Id: DragDropTest.as,v 1.6 2007/12/23 23:16:41 strk Exp $";
 
 #define info _root.note
 #define note _root.note

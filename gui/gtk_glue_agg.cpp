@@ -15,7 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: gtk_glue_agg.cpp,v 1.32 2008/02/19 19:20:49 bwy Exp $ */
 
 
 /// \page gtk_shm_support GTK shared memory extension support

@@ -17,7 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: AudioDecoderFfmpeg.cpp,v 1.2 2008/02/22 14:20:44 strk Exp $
 
 #include "AudioDecoderFfmpeg.h"
 

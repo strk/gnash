@@ -18,7 +18,6 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.36 2008/01/21 20:56:11 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 

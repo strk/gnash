@@ -17,7 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.27 2008/02/15 20:50:43 rsavoye Exp $
 
 #include <string>
 #include <iosfwd>

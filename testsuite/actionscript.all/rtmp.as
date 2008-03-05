@@ -17,7 +17,6 @@
 //
 
 
-rcsid='$Id: rtmp.as,v 1.8 2007/09/29 16:23:00 strk Exp $';
 
 #include "dejagnu.as"
 #include "utils.as"

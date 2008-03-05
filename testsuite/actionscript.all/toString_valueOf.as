@@ -21,7 +21,6 @@
  */
 
 
-rcsid="$Id: toString_valueOf.as,v 1.29 2007/11/01 16:14:21 strk Exp $";
 
 #include "check.as"
 

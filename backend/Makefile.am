@@ -16,7 +16,6 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-# $Id: Makefile.am,v 1.68 2008/01/21 20:56:04 rsavoye Exp $
 
 ## Process this file with automake to generate Makefile.in
 

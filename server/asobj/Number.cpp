@@ -17,7 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Number.cpp,v 1.38 2008/02/19 12:06:07 strk Exp $ */
 
 #include "log.h"
 #include "tu_config.h"

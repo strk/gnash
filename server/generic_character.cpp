@@ -17,7 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: generic_character.cpp,v 1.13 2008/02/11 12:55:22 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"

@@ -15,7 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: render_handler_agg.h,v 1.7 2006/10/15 10:10:23 nihilus Exp $ */
 
 #ifndef BACKEND_RENDER_HANDLER_AGG_H
 #define BACKEND_RENDER_HANDLER_AGG_H

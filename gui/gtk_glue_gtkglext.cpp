@@ -17,7 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk_glue_gtkglext.cpp,v 1.16 2008/02/19 19:20:49 bwy Exp $ */
 
 #include "gtk_glue_gtkglext.h"
 #include "log.h"

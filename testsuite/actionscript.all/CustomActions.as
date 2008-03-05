@@ -25,7 +25,6 @@
 // CustomActions is only intended foro use in the Flash authoring tool,
 // See http://sephiroth.it/reference.php?id=156&cat=1
 
-rcsid="$Id: CustomActions.as,v 1.11 2007/09/29 16:22:57 strk Exp $";
 
 #include "check.as"
 

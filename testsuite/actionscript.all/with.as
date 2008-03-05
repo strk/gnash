@@ -21,7 +21,6 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.39 2008/02/13 15:42:50 strk Exp $";
 
 #include "check.as"
 

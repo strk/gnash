@@ -18,7 +18,6 @@
 // 
 //
 
-// $Id: SoundInfo.h,v 1.5 2008/01/21 23:10:14 rsavoye Exp $
 
 #ifndef __SOUNDINFO_H__
 #define __SOUNDINFO_H__

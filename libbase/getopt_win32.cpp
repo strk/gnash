@@ -1,4 +1,3 @@
-/* $Id: getopt_win32.cpp,v 1.4 2006/09/27 08:45:01 alexeev Exp $ */
 
 #ifdef __cplusplus
 extern "C"

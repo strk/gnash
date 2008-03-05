@@ -16,7 +16,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: netstats.cpp,v 1.9 2008/01/21 20:56:06 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"

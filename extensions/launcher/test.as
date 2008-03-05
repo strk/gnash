@@ -20,7 +20,6 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: test.as,v 1.1 2008/02/07 02:43:57 rsavoye Exp $";
 
 var exe = new Launcher();
 

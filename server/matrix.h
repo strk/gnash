@@ -19,7 +19,6 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.h,v 1.15 2008/01/21 20:55:51 rsavoye Exp $ 
 //
 
 #ifndef GNASH_MATRIX_H

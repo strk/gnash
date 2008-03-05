@@ -16,7 +16,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: cxform.cpp,v 1.10 2008/01/28 15:16:50 strk Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H

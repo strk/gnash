@@ -14,7 +14,6 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: libXML.m4,v 1.35 2008/03/03 20:26:14 dossy Exp $
 
 AC_DEFUN([GNASH_PATH_LIBXML], [
   has_xml=no

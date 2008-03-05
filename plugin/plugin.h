@@ -15,7 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.h,v 1.37 2008/01/30 22:42:41 strk Exp $ */
 
 #ifndef __PLUGIN_H__
 #define __PLUGIN_H__

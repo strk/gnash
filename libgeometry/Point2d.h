@@ -21,7 +21,6 @@
 //
 
 
-/* $Id: Point2d.h,v 1.5 2008/01/21 20:56:11 rsavoye Exp $ */
 
 #ifndef GNASH_POINT2DH
 #define GNASH_POINT2DH

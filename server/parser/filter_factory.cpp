@@ -15,7 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: filter_factory.cpp,v 1.9 2008/01/28 15:16:51 strk Exp $ */
 
 #include "filter_factory.h"
 #include "BitmapFilter.h"

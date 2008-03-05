@@ -16,7 +16,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: MediaBuffer.h,v 1.9 2008/01/21 23:10:14 rsavoye Exp $
 
 #ifndef __MEDIABUFFER_H__
 #define __MEDIABUFFER_H__

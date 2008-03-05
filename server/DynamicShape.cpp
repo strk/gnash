@@ -17,7 +17,6 @@
 
 
 
-/* $Id: DynamicShape.cpp,v 1.17 2008/01/25 17:38:17 strk Exp $ */
 
 #include "DynamicShape.h"
 

@@ -16,7 +16,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.43 2008/02/28 17:13:49 strk Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"

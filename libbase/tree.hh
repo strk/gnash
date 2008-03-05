@@ -1,6 +1,5 @@
 /* 
 
-   $Id: tree.hh,v 1.5 2007/11/23 11:43:34 strk Exp $
 
    STL-like templated tree class.
    Copyright (C) 2001-2006  Kasper Peeters <kasper.peeters@aei.mpg.de>.

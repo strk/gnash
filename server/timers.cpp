@@ -19,7 +19,6 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.47 2008/02/19 19:20:54 bwy Exp $ */
 
 #include "timers.h"
 #include "as_function.h" // for class as_function

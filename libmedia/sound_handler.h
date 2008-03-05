@@ -15,7 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: sound_handler.h,v 1.11 2008/02/22 14:20:44 strk Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///

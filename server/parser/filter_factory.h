@@ -15,7 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: filter_factory.h,v 1.3 2008/01/21 20:56:00 rsavoye Exp $ */
 
 #ifndef GNASH_FILTER_FACTORY_H
 #define GNASH_FILTER_FACTORY_H

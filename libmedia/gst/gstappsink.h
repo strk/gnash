@@ -17,7 +17,6 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* $Id: gstappsink.h,v 1.5 2008/01/29 05:18:33 bjacques Exp $ */
 
 #ifndef _GST_APP_SINK_H_
 #define _GST_APP_SINK_H_
