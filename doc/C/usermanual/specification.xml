@@ -229,7 +229,7 @@
     
     <para>
       Collected objects are those allocated due to &AS; explicit or implicit
-      calls.  Explicit all are any user-defined statements that allocate new
+      calls.  Explicit calls are any user-defined statements that allocate new
       objects, such as arrays, Objects, or script-created movieclips.
       Implicit calls are the built-in functions that can be deleted by
       arbitrary user calls. 
@@ -283,51 +283,51 @@
 	<tbody>
 	<row>
 	<entry>agg-gtk</entry>
-	<entry>33372 KB</entry>
+	<entry>33 MB</entry>
 	<entry>14 MB</entry>
-	<entry>8948 KB</entry>
+	<entry>8.9 MB</entry>
 	</row>
 	<row>
 	<entry>agg-sdl</entry>
-	<entry>26564 KB</entry>
-	<entry>9396 KB</entry>
-	<entry>5124 KB</entry>
+	<entry>27 MB</entry>
+	<entry>9.4 MB</entry>
+	<entry>5.1 MB</entry>
 	</row>
 	<row>
 	<entry>agg-fltk</entry>
-	<entry>24556 KB</entry>
-	<entry>8992 KB</entry>
-	<entry>4220 KB</entry>
+	<entry>25 MB</entry>
+	<entry>9.0 MB</entry>
+	<entry>4.2 MB</entry>
 	</row>
 	<row>
 	<entry>cairo-fltk</entry>
 	<entry>184 MB</entry>
 	<entry>128 MB</entry>
-	<entry>4284 KB</entry>
+	<entry>4.3 MB</entry>
 	</row>
 	<row>
 	<entry>cairo-gtk</entry>
 	<entry>192 MB</entry>
 	<entry>133 MB</entry>
-	<entry>8000 KB</entry>
+	<entry>8.0 MB</entry>
 	</row>
 	<row>
 	<entry>cairo-sdl</entry>
 	<entry>187 MB</entry>
 	<entry>129 MB </entry>
-	<entry>5256 KB</entry>
+	<entry>5.3 MB</entry>
 	</row>
 	<row>
 	<entry>opengl-gtk </entry>
-	<entry>62620 KB</entry>
+	<entry>63 MB</entry>
 	<entry>15 MB</entry>
-	<entry>9336 KB</entry>
+	<entry>9.3 MB</entry>
 	</row>
 	<row>
 	<entry>opengl-sdl </entry>
-	<entry>54932 KB</entry>
+	<entry>55 MB</entry>
 	<entry>10 MB</entry>
-	<entry>5324 KB</entry>
+	<entry>5.3 MB</entry>
 	</row>
 	</tbody>
 	</tgroup>
@@ -352,7 +352,7 @@
     </para>
     
     <para>
-      One early security feature is the blacklist/whitelist.  Flash movies
+      One security feature found only in &app; is the blacklist/whitelist.  Flash movies
       running in a browser can make outgoing network connections. This can
       be used, for example, to compromise a network device inside a
       company firewall via a Flash movie running on an employee's
@@ -375,12 +375,12 @@
       </para>
       
       <para>
-	Till recently, what was contained in these files wasn't widely
+	Until recently, what was contained in these files wasn't widely
 	known. There are several LSO file utilities floating around on
 	the Web. &app; has its own <emphasis>soldumper</emphasis>
 	program that lets one find and dump the contents of these
-	files. As of yet, I haven't discovered any nasty privacy issues
-	yet, but as &app;'s SharedObject support is new, I may have just
+	files. We haven't discovered any nasty privacy issues
+	yet, but as &app;'s SharedObject support is new, we may have just
 	been lucky.
       </para>
       
@@ -394,7 +394,7 @@
       </para>
       
       <para>
-	The one security setting &app; supports is the
+	The one SOL security setting &app; supports is the
 	<emphasis>SOLReadOnly</emphasis> setting for your $HOME/.gnashrc
 	file. This prevents &app; from ever writing to a .sol file, but can still read
 	them. You can also set <emphasis>SOLSafeDir</emphasis> to a safe

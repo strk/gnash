@@ -27,7 +27,7 @@
 	  AGG is the AntiGrain 2D graphics library, which can be used
 	  as a renderer in Gnash. It is faster than OpenGL on systems
 	  without hardware graphics acceleration. As of Gnash version
-	  0.8.1 it is the more feature complete renderer. 
+	  0.8.2 it is the more feature complete renderer. 
 	</para>
       </glossdef>
     </glossentry>
@@ -181,9 +181,11 @@
 	<para>
 	  The term <emphasis>Flash</emphasis> is used to describe both the 
 	  Adobe IDE for creating <emphasis>SWF</emphasis>
-	  files, and the technology itself. Flash is a trademarked
-	  term of Adobe's, we prfer to use SWF to refer to the files
-	  themselves, as well as the format, instead of flash(tm).
+	  files, and the technology itself. Flash is a registered trademark
+	  belonging to Adobe.   Unfortunately, neither Macromedia nor
+          Adobe have done a good job creating a generic name for all
+          things having to do with Flash.  They risk
+          loss of their trademark.
 	</para>
       </glossdef>
     </glossentry>
@@ -545,10 +547,9 @@
 	  platforms' graphics, sound, and input APIs. Gnash can use it
 	  as a GUI and/or as a sound handler. Note that the two usages
 	  are independent of each other: you can use it for a task and
-	  not for the other if you wish. At time or writing (2007-01-11)
-	  the SDL GUI lacks menus and a performant input event
-	  architecture; the SDL sound handler is the most feature rich,
-	  supporting Video through ffmpeg. 
+	  not for the other if you wish.  This version of Gnash does not
+          implement menus in the SDL GUI; the SDL sound handler is the
+          most feature rich, supporting video through ffmpeg. 
 	</para>
       </glossdef>
     </glossentry>
@@ -562,7 +563,7 @@
 	<para>
 	  The <emphasis>sound handler</emphasis> is the part of &app;
 	  which handles both event sounds and streaming sound.  Audio
-	  from external sources are also handled through the sound handler
+	  from external sources is sent through the sound handler
 	  when SDL is used.  The sound handler must be selected during
 	  configuration of Gnash when compiling.
 	</para>
@@ -596,7 +597,8 @@
       </glossterm>
       <glossdef>
 	<para>
-	  The visible area of a Flash movie. The name derives from a	  theater analogy. Graphical elements are referred to as
+	  The visible area of a Flash movie. The name derives from a
+	  theater analogy. Graphical elements are referred to as
 	  characters.  
 	</para>
       </glossdef>

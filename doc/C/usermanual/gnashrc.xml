@@ -93,7 +93,7 @@
 	  Because several files can be parsed in succession, each file can override
 	  or add to lists in other files. Use <emphasis>set</emphasis> to override
 	  all other lists or <emphasis>append</emphasis> to add new sandboxes.
-	  Note that there's currently no way to *drop* the directory of base dir
+	  Note that there's currently no way to <emphasis>drop</emphasis> the directory of base dir
 	  from the list of allowed local sandboxes.
 	  </entry>
 	</row>
@@ -195,8 +195,9 @@
 	  <entry>StreamsTimeout</entry>
 	  <entry>double</entry>
 	  <entry>
-	    Set the number of seconds after which streams download time out. Note that timeouts only occurs after the given number of seconds
-	    passed w/out anything was received.
+	    Set the number of seconds after which streams download time
+            out. Timeouts only occur after the given number
+            of seconds have passed without anything being received.
 	  </entry>
 	</row>
 	

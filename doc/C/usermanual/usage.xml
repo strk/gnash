@@ -2,12 +2,12 @@
   <title>Using &app;</title>
   
   <para>
-    When used as a standalone player, you can play any Flash file from
+    When used as a standalone player, you can play any SWF file from
     the command line by entering a command of the format: 
     <programlisting>
       gnash <replaceable>&lt;option&gt; &lt;flashfile.swf&gt;</replaceable>
     </programlisting>
-    The only required argument is the name (and location)of the file
+    The only required argument is the name (and location) of the file
     to be played. 
   </para>
   
@@ -21,7 +21,7 @@
   </para>
   
   <para>
-    The source code download of &app; includes several example .SWF
+    The source code download of &app; includes several example SWF
     files.  They are located in the
     <filename>testsuite/samples/</filename> directory of the &app;
     source directory.  If you have installed &app; correctly, issuing
@@ -55,7 +55,7 @@
     
     <para>
       No options are required for  &app;'s default behavior.  However,
-      there are many options that can be used to that behavior. 
+      there are many options that can be used to change that behavior. 
     </para>
     
     <para>
