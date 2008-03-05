@@ -24,6 +24,8 @@
 #endif
 
 #include <list>
+#include <map>
+#include <string>
 #include <algorithm> //for std::find
 
 #ifndef NDEBUG
@@ -245,12 +247,17 @@ public:
 	///
 	void collect();
 
+	typedef std::map<std::string, unsigned int> CollectablesCount;
+
+	/// Count collectables
+	void countCollectables(CollectablesCount& count) const;
+
 private:
 
 	/// Number of newly registered collectable since last collection run
 	/// triggering next collection.
 	/// Should be made a parameter ?
-	static const unsigned int maxNewCollectablesCount = 10;
+	static const unsigned int maxNewCollectablesCount = 50;
 
 	/// Create a garbage collector, using the given root
 	GC(GcRoot& root)

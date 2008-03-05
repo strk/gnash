@@ -142,6 +142,17 @@ GC::collect()
 	_lastResCount = _resList.size();
 }
 
+void
+GC::countCollectables(CollectablesCount& count) const
+{
+	for (ResList::const_iterator i=_resList.begin(), e=_resList.end(); i!=e; ++i)
+	{
+		const GcResource* res = *i;
+		std::string type = typeName(*res);
+		count[type]++;
+	}
+}
+
 } // end of namespace gnash
 
 

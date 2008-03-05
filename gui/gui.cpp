@@ -902,6 +902,20 @@ Gui::getMovieInfo() const
     	ret->insert(ret->begin(), StringPair("Dragging character: ", ss.str()));
     }
 
+    GC::CollectablesCount cc;
+    GC::get().countCollectables(cc);
+    // TODO: print sorted by value
+    std::string lbl = "GC managed ";
+    for (GC::CollectablesCount::iterator i=cc.begin(), e=cc.end(); i!=e; ++i)
+    {
+        const std::string& typ = i->first;
+        unsigned int c = i->second;
+        char buf[32];
+        snprintf(buf, 31, "%u", c);
+        buf[31] = '\0';
+        ret->insert(ret->begin(), StringPair(lbl+typ, std::string(buf)));
+    }
+
     return ret;
 }
 
