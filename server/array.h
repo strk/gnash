@@ -280,7 +280,7 @@ public:
 
 		nelem.sort(avc);
 
-		if (adjacent_find(nelem.begin(), nelem.end(), ave) != nelem.end() )
+		if (std::adjacent_find(nelem.begin(), nelem.end(), ave) != nelem.end() )
 			return as_value(0);
 
 		elements.assign(nelem.begin(), nelem.end());
@@ -322,7 +322,7 @@ public:
 
 		std::sort(ielem.begin(), ielem.end(), avc);
 
-		if (adjacent_find(ielem.begin(), ielem.end(), ave) != ielem.end() )
+		if (std::adjacent_find(ielem.begin(), ielem.end(), ave) != ielem.end() )
 			return as_value(0);
 
 		return get_indices(ielem);

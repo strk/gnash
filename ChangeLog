@@ -1,5 +1,10 @@
 2008-03-04 Bastiaan Jacques <bastiaan@bjacques.org>
 
+	* server/array.h server/dlist.cpp server/URLAccessManager.cpp: More
+	proper namespacing. Fixes build with GCC 4.3.
+
+2008-03-04 Bastiaan Jacques <bastiaan@bjacques.org>
+
 	* server/asobj/xmlnode.cpp: Add a direct include and proper
 	namespacing for GCC 4.3.
 

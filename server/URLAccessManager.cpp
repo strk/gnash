@@ -165,7 +165,7 @@ host_check_blackwhite_lists(const std::string& host)
 	if ( whitelist.size() )
 	{
 		// TODO: case-insensitive matching ? 
-		it = find(whitelist.begin(), whitelist.end(), host);
+		it = std::find(whitelist.begin(), whitelist.end(), host);
 		if ( it != whitelist.end() ) {
 			log_security("Load from host %s granted (whitelisted).",
 				host.c_str());
@@ -182,7 +182,7 @@ host_check_blackwhite_lists(const std::string& host)
 
 	vector<string> blacklist = rcfile.getBlackList();
 	// TODO: case-insensitive matching ? 
-	it = find(blacklist.begin(), blacklist.end(), host);
+	it = std::find(blacklist.begin(), blacklist.end(), host);
 	if ( it != blacklist.end() )
 	{
 		log_security("Load from host %s forbidden (blacklisted).",

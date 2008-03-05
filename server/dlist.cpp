@@ -148,7 +148,7 @@ DisplayList::get_character_by_name(const std::string& name)
 {
   testInvariant();
 
-  container_type::iterator it = find_if(
+  container_type::iterator it = std::find_if(
       _charsByDepth.begin(),
       _charsByDepth.end(),
       NameEquals(name));
@@ -163,7 +163,7 @@ DisplayList::get_character_by_name_i(const std::string& name)
 {
   testInvariant();
 
-  container_type::iterator it = find_if(
+  container_type::iterator it = std::find_if(
       _charsByDepth.begin(),
       _charsByDepth.end(),
       NameEqualsNoCase(name));
@@ -196,7 +196,7 @@ DisplayList::place_character(
   ch->set_ratio(ratio);
   ch->set_clip_depth(clip_depth);
 
-  container_type::iterator it = find_if(
+  container_type::iterator it = std::find_if(
       _charsByDepth.begin(), _charsByDepth.end(),
       DepthGreaterOrEqual(depth));
 
@@ -246,7 +246,7 @@ DisplayList::add(character* ch, bool replace)
 {
   int depth = ch->get_depth();
 
-  container_type::iterator it = find_if(
+  container_type::iterator it = std::find_if(
       _charsByDepth.begin(), _charsByDepth.end(),
       DepthGreaterOrEqual(depth));
   if ( it == _charsByDepth.end() || (*it)->get_depth() != depth )
@@ -305,7 +305,7 @@ DisplayList::replace_character(
   //       I'm not sure what does this break. Udo: do you remember ? --strk;
   // ch->restart();
 
-  container_type::iterator it = find_if(
+  container_type::iterator it = std::find_if(
       _charsByDepth.begin(), _charsByDepth.end(),
       DepthGreaterOrEqual(depth));
 
@@ -454,7 +454,7 @@ DisplayList::remove_display_object(int depth)
   // TODO: would it be legal to call remove_display_object with a depth
   //       in the "removed" zone ?
   // TODO: optimize to take by-depth order into account
-  container_type::iterator it = find_if(
+  container_type::iterator it = std::find_if(
       _charsByDepth.begin(),
       _charsByDepth.end(),
       DepthEquals(depth));
@@ -513,10 +513,10 @@ DisplayList::swapDepths(character* ch1, int newdepth)
   assert(srcdepth != newdepth);
 
   // TODO: optimize this scan by taking ch1 depth into account ?
-  container_type::iterator it1 = find(_charsByDepth.begin(), _charsByDepth.end(), ch1);
+  container_type::iterator it1 = std::find(_charsByDepth.begin(), _charsByDepth.end(), ch1);
 
   // upper bound ...
-  container_type::iterator it2 = find_if(_charsByDepth.begin(), _charsByDepth.end(),
+  container_type::iterator it2 = std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
       DepthGreaterOrEqual(newdepth));
 
   if ( it1 == _charsByDepth.end() )
@@ -1033,7 +1033,7 @@ DisplayList::mergeDisplayList(DisplayList & newList)
 
         if( chNew->isUnloaded() )
         {
-            iterator it = find_if(_charsByDepth.begin(), _charsByDepth.end(),
+            iterator it = std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
                     DepthGreaterOrEqual(depthNew));
             
             _charsByDepth.insert(it, *itNew);
@@ -1078,7 +1078,7 @@ DisplayList::reinsertRemovedCharacter(boost::intrusive_ptr<character> ch)
   ch->set_depth(newDepth);
 
   // TODO: optimize this by searching from the end(lowest depth).
-  container_type::iterator it = find_if(
+  container_type::iterator it = std::find_if(
       _charsByDepth.begin(), _charsByDepth.end(),
       DepthGreaterOrEqual(newDepth));
 
