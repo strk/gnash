@@ -1,5 +1,7 @@
 2008-03-04 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/PASSING: added tests that only failed due to 
+	  traces being truncated.
 	* cygnal/crc.cpp: update to build after changes in RcInitFile
 	  interface.
 
