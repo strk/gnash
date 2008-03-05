@@ -1,3 +1,11 @@
+2008-03-04 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/rc.{h,cpp}: const correct; clean up parsing, avoiding
+	  an extra iteration at the expense of constructing
+	  a stringstream; add warning on unrecognized commands; general
+	  cleanup of other functions; drop ':' separator for lists, which
+	  has been deprecated for a while. Document functions.
+
 2008-03-04 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* all over the place: Remove $Id tags, because it has not been shown

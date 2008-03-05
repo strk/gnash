@@ -37,22 +37,27 @@ class DSOEXPORT RcInitFile
 {
 public:
 
-    // Return the default instance of RC file,
+    /// Return the default instance of RC file
     static RcInitFile& getDefaultInstance();
 
-    bool loadFiles();
+    /// Load and parse files, looking in the usual places
+    //
+    void loadFiles();
 
     bool parseFile(const std::string& filespec);
-    
+
+    /// \brief    
     /// Writes a valid gnashrc file. If the file already exists,
     /// is is overwritten.
+    //
     /// @param filespec the file to write
     /// @return whether the file was successfully written.
     bool updateFile(const std::string& filespec);
     
-    /// Writes a gnashrc file to the file specified in the
+    /// \brief Writes a gnashrc file to the file specified in the
     /// GNASHRC environment variable OR to the user's home
     /// directory.
+    //
     /// @return whether the file was successfully written.
     bool updateFile();
     
@@ -85,7 +90,6 @@ public:
     /// Return true if user is willing to start the gui in "stop" mode
     //
     /// defaults to false.
-    ///
     bool startStopped() const { return _startStopped; }
     void startStopped(bool value) { _startStopped = value; }
 
@@ -95,10 +99,10 @@ public:
     int verbosityLevel() const { return _verbosity; }
     void verbosityLevel(int value) { _verbosity = value; }
     
-    void setDebugLog(std::string &x) { _log = x; }
+    void setDebugLog(const std::string &x) { _log = x; }
     const std::string& getDebugLog() const { return _log; }
 
-    void setDocumentRoot(std::string &x) { _wwwroot = x; }
+    void setDocumentRoot(const std::string &x) { _wwwroot = x; }
     std::string getDocumentRoot() { return _wwwroot; }
     
     bool useDebugger() const { return _debugger; }
@@ -124,20 +128,24 @@ public:
     typedef std::vector<std::string> PathList;
 
     /// Get the current RcInitFile whitelist of domains to allow
+    //
     /// @return a std::vector of strings containing allowed domains 
     const PathList& getWhiteList() const { return _whitelist; }
 
     /// Sets the RcInitFile whitelist of domains to allow
+    //
     /// @param list a std::vector of strings containing domains without protocol
-    void setWhitelist (std::vector<std::string>& list) { _whitelist = list; }
+    void setWhitelist (const std::vector<std::string>& list) { _whitelist = list; }
 
     /// Get the current RcInitFile blacklist of domains to block
+    //
     /// @return a std::vector of strings containing blocked domains    
     const PathList& getBlackList() const { return _blacklist; }
     
     /// Sets the RcInitFile blacklist of domains to block
+    //
     /// @param list a std::vector of strings containing domains without protocol
-    void setBlacklist (std::vector<std::string>& list) { _blacklist = list; }
+    void setBlacklist (const std::vector<std::string>& list) { _blacklist = list; }
 
     /// Return the list of directories to be used as the 'local' sandbox
     //
@@ -155,6 +163,7 @@ public:
     /// Sets a list of sandbox paths. Gnash will only allow movies access
     /// to files in these paths. The path of the movie playing is automatically
     /// added.
+    //
     /// @param list a std::vector of strings containing paths to allow
     void setLocalSandboxPath(const PathList& path)
     {
@@ -162,13 +171,13 @@ public:
     }
 
     const std::string& getFlashVersionString() const { return _flashVersionString; }
-    void setFlashVersionString(std::string& value) { _flashVersionString = value; }
+    void setFlashVersionString(const std::string& value) { _flashVersionString = value; }
 
     const std::string& getFlashSystemOS() const { return _flashSystemOS; }
-    void setFlashSystemOS(std::string& value) { _flashSystemOS = value; }
+    void setFlashSystemOS(const std::string& value) { _flashSystemOS = value; }
 
     const std::string& getFlashSystemManufacturer() const { return _flashSystemManufacturer; }
-    void setFlashSystemManufacturer(std::string& value) { _flashSystemManufacturer = value; }
+    void setFlashSystemManufacturer(const std::string& value) { _flashSystemManufacturer = value; }
     
     const std::string& getGstAudioSink() const { return _gstaudiosink; }
     void setGstAudioSink(const std::string& value) { _gstaudiosink = value; }
@@ -179,7 +188,7 @@ public:
     /// Return the number of seconds of inactivity before timing out streams downloads
     double getStreamsTimeout() const { return _streamsTimeout; }
     /// Set the number of seconds of inactivity before timing out streams downloads
-    void setStreamsTimeout(double x) { _streamsTimeout = x; }
+    void setStreamsTimeout(const double &x) { _streamsTimeout = x; }
 
     /// Get the URL opener command format
     //
@@ -200,7 +209,7 @@ public:
     const std::string &getSOLSafeDir() const { return _solsandbox; }
 
     // Set the location of the sandbox for .sol files
-    void setSOLSafeDir(std::string &x) { _solsandbox = x; }
+    void setSOLSafeDir(const std::string &x) { _solsandbox = x; }
 
     bool getSOLLocalDomain() const { return _sollocaldomain; }
     void setSOLLocalDomain(bool x) { _sollocaldomain = x; }
@@ -232,7 +241,7 @@ private:
     /// Enable the Flash movie debugger
     bool _debugger;
 
-    // Level of debugging output
+    /// Level of debugging output
     boost::uint32_t  _verbosity;
 
     /// Command format to use to open urls
@@ -248,12 +257,12 @@ private:
     /// String representing the first GStreamer audio output pipeline to try
     std::string _gstaudiosink;
 
-    /// String to pass as System.capabilities.os
+    /// \brief String to pass as System.capabilities.os
     /// in Actionscript. If empty, leaves detection
     /// to System.cpp (default).
     std::string  _flashSystemOS;       
 
-    /// String to pass as
+    /// \brief String to pass as
     /// System.capabilities.manufacturer
     /// in Actionscript
     std::string  _flashSystemManufacturer;
@@ -315,12 +324,12 @@ private:
     /// The number of seconds of inactivity triggering download timeout
     double _streamsTimeout;
 
-    /// Local sandbox: the set of resources on the filesystem we want to
-    /// give the current movie access to.
+    /// \brief Local sandbox: the set of resources on the
+    /// filesystem we want to give the current movie access to.
     PathList _localSandboxPath;
 
-    // SOL Sandbox: This is the only dir .sol (Shared Object) files can be written in,
-    // or read from.
+    /// \brief SOL Sandbox: This is the only dir .sol (Shared Object)
+    /// files can be written in, or read from.
     std::string _solsandbox;
 
     /// Whether SOL files can be written
@@ -334,11 +343,11 @@ private:
     bool _lctrace;
     
     /// Shared memory segment key (can be set for
-    /// compatibility with other players.
+    /// compatibility with other players.)
     boost::uint32_t _lcshmkey;
 
     // A function only for writing path lists to an outstream.
-    void writeList(PathList& list, std::ostream& o);
+    void writeList(const PathList& list, std::ostream& o);
 
 protected:
     
@@ -348,38 +357,57 @@ protected:
     /// Never destroy (TODO: add a destroyDefaultInstance)
     ~RcInitFile();
 
-    /// Performs substitution on a path string (~) 
+    /// Substitutes user's home directory for ~ on a path string
+    /// according to POSIX standard.
+    ///
+    /// @param path the path to expand.
     void expandPath(std::string& path);
 
     /// \brief
     /// If variable matches pattern (case-insensitive)
-    /// set *var according to value
+    /// set var according to value
     //
-    /// @return true if variable matches patter, false otherwise
-    ///
-    static bool extractSetting(bool *var, const char *pattern,
-                        std::string &variable, std::string &value);
+    /// @return true if variable matches pattern, false otherwise
+    /// @param var the variable to change
+    /// @param pattern the pattern for matching
+    /// @variable the variable to match to pattern
+    /// @value the value to adopt if variable matches pattern.
+    static bool extractSetting(bool &var, const std::string& pattern,
+                        const std::string &variable, const std::string &value);
 
     /// \brief
     /// If variable matches pattern (case-insensitive)
-    /// set *num according to value
+    /// set num according to value
     //
-    /// @return true if variable matches patter, false otherwise
-    ///
-    static bool extractNumber(boost::uint32_t *num, const char *pattern,
-                        std::string &variable, std::string &value);
+    /// @return true if variable matches pattern, false otherwise
+    /// @param num the variable to change
+    /// @param pattern the pattern for matching
+    /// @variable the variable to match to pattern
+    /// @value the value to adopt if variable matches pattern.
+    static bool extractNumber(boost::uint32_t &num, const std::string& pattern,
+                        const std::string &variable, const std::string &value);
 
     /// \brief
     /// If variable matches pattern (case-insensitive)
     /// set out according to value
     //
-    /// @return true if variable matches patter, false otherwise
-    ///
-    static bool extractDouble(double& out, const char *pattern,
-                        std::string &variable, std::string &value);
+    /// @return true if variable matches pattern, false otherwise
+    /// @param out the variable to change
+    /// @param pattern the pattern for matching
+    /// @variable the variable to match to pattern
+    /// @value the value to adopt if variable matches pattern.
+    static bool extractDouble(double &out, const std::string& pattern,
+                        const std::string &variable, const std::string &value);
 
-    void parseList(std::vector<std::string>& list, std::string &action,
-			std::string &listname, std::string &items);
+
+    /// \brief parses a space-separated list into std::vector list 
+    //
+    /// @param list the vector to modify or generate.
+    /// @param action either 'set' or 'append': whether to add to or
+    ///         clear the vector.
+    /// @param items string of space-separated values. This gets nuked.
+    void parseList(std::vector<std::string>& list, const std::string &action,
+			        std::string &items);
 
 };
 

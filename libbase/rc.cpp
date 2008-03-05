@@ -35,7 +35,7 @@
 #include <unistd.h> // for getuid()
 #include <sys/stat.h>
 #include <cerrno>
-#include <limits.h>
+#include <limits>
 
 #include <cctype>  // for toupper
 #include <string>
@@ -100,8 +100,9 @@ RcInitFile::RcInitFile() : _delay(0),
                            _lctrace(true)
 
 {
-//    GNASH_REPORT_FUNCTION;
+
     loadFiles();
+
 #ifdef __OS2__x
     _urlOpenerFormat = PrfQueryProfileString( HINI_USER, (PSZ) "WPURLDEFAULTSETTINGS",
 			(PSZ) "DefaultBrowserExe", NULL,
@@ -113,16 +114,18 @@ RcInitFile::RcInitFile() : _delay(0),
 }
 
 RcInitFile::~RcInitFile()
-{
-//    GNASH_REPORT_FUNCTION;    
+{  
 }
 
 // Look for a config file in the likely places.
-bool
+void
 RcInitFile::loadFiles()
 {
-//    GNASH_REPORT_FUNCTION;
-    
+// Note: This used to be bool but the return value was (a) never used
+// and (b) only returned true if a gnashrc set by environment variable
+// was successfully parsed. It seems we don't care whether a file
+// actually exists or not anyway.
+
     // Check the default system location
     std::string loadfile = "/etc/gnashrc";
     parseFile(loadfile);
@@ -143,39 +146,36 @@ RcInitFile::loadFiles()
     char *gnashrc = getenv("GNASHRC");
     if (gnashrc) {
         loadfile = gnashrc;
-        return parseFile(loadfile);
+        parseFile(loadfile);
     }
-    
-    return false;
 }
 
 bool
-RcInitFile::extractSetting(bool *var, const char *pattern,
-                           std::string &variable, std::string &value)
+RcInitFile::extractSetting(bool &var, const std::string &pattern,
+                           const std::string &variable, const std::string &value)
 {
-//    GNASH_REPORT_FUNCTION;
-    //cout <<  variable << ": " << value << endl;
     
 	StringNoCaseEqual noCaseCompare;
     if ( noCaseCompare(variable, pattern) ) {
         if ( noCaseCompare(value, "on") || noCaseCompare(value, "yes") ||
              noCaseCompare(value, "true")) {
             //cout <<  variable << ": enabled" << endl;
-            *var = true;
+            var = true;
         }
         if (noCaseCompare(value, "off") || noCaseCompare(value, "no") ||
             noCaseCompare(value, "false")) {
             //cout <<  variable << ": disabled" << endl;
-            *var = false;
+            var = false;
         }
-	return true;
+        return true;
     }
-    else return false;
+
+    return false;
 }
 
 bool
-RcInitFile::extractNumber(boost::uint32_t *num, const char *pattern, std::string &variable,
-                           std::string &value)
+RcInitFile::extractNumber(boost::uint32_t &num, const std::string &pattern,
+                            const std::string &variable, const std::string &value)
 {      
 //    GNASH_REPORT_FUNCTION;
 
@@ -183,66 +183,44 @@ RcInitFile::extractNumber(boost::uint32_t *num, const char *pattern, std::string
 
 //        cout << variable << ": " << value << endl;
     if ( noCaseCompare(variable, pattern) ) {
-        *num = strtoul(value.c_str(), NULL, 0);
-        if (*num == LONG_MAX) {
+        num = strtoul(value.c_str(), NULL, 0);
+        if (num == std::numeric_limits<long>::max()) {
             long long foo = strtoll(value.c_str(), NULL, 0);
             cerr << "RcInitFile::extractNumber: conversion overflow!: " << foo << endl;
-            
         }
-	return true;
+        return true;
     }
-    else return false;
+    
+    return false;
 }
 
-/// Takes references to action ('set' or 'append'), items
-/// (list of items separated by spaces), listname (name of list)
-/// and the item array (list).
-//
-/// Returns either empty array ('set <list> off'), array with only
-/// passed items ('set <list> <items>') or array passed with items
-/// appended ('append <list> <items>').
-
 void
-RcInitFile::parseList(PathList &list, std::string &action,
-			    std::string &listname, std::string &items)
+RcInitFile::parseList(PathList &list, const std::string &action,
+                     std::string &items)
 {
 //    GNASH_REPORT_FUNCTION;
 
     if (action == "set") {
 
-	// Clear array of hosts in previously parsed
-	// rc files.
- 	list.clear();
+	    // Clear array of hosts in previously parsed
+	    // rc files.
+     	list.clear();
 
-	StringNoCaseEqual noCaseCompare;
+	    StringNoCaseEqual noCaseCompare;
 
-        if (noCaseCompare(items, "off") || noCaseCompare(items, "no") ||
-            noCaseCompare(items, "false")) {
-	    // Return empty array (allows disabling of global
-	    // whitelists in favour of a blacklist)
-	    return;
-	}
+            if (noCaseCompare(items, "off") || noCaseCompare(items, "no") ||
+                noCaseCompare(items, "false")) {
+	            // Return empty array (allows disabling of global
+	            // whitelists in favour of a blacklist)
+	            return;
+	    }
     }		
 
     std::string::size_type pos;
 
-    // This is an ugly way to avoid breaking lists
-    // Lists will work if they worked before, but
-    // combining the two separators will not.
-    // The colon way must be removed before protocols
-    // (http://, https:// can be included in lists).
-    char separator;
-    if (items.find(':') != std::string::npos) {
-	// Deprecated behaviour
-	separator = ':';
-	fprintf(stderr, _("The list '%s' in an rcfile contains a colon. This is deprecated and may result in "
-		"unexpected behaviour. Please only use spaces as a separator."), listname.c_str());
-    } else {
-	// New behaviour
-	separator = ' ';
-    }
+    const char separator = ' ';
 
-    while (items.size()) {
+    while (!items.empty()) {
 	pos = items.find(separator, 0);
     	list.push_back(items.substr(0, pos));
     	items.erase(0, pos);
@@ -252,26 +230,23 @@ RcInitFile::parseList(PathList &list, std::string &action,
 }
 
 bool
-RcInitFile::extractDouble(double& out, const char *pattern, std::string &variable,
-                           std::string &value)
+RcInitFile::extractDouble(double& out, const std::string &pattern,
+                            const std::string &variable,
+                            const std::string &value)
 {
-//    GNASH_REPORT_FUNCTION;
 
     StringNoCaseEqual noCaseCompare;
 
-    // printf("%s: %s\n", variable.c_str(), value.c_str());
-
     if ( noCaseCompare(variable, pattern) ) {
         out = strtod(value.c_str(), 0);
-	return true;
-	//printf("strtod returned %g\n", out);
+	    return true;
     }
-    else return false;
+
+    return false;
 }
 
 void
 RcInitFile::expandPath (std::string& path)
-
 {
 
 // Leaves path unchanged on systems without
@@ -280,61 +255,61 @@ RcInitFile::expandPath (std::string& path)
 #ifdef HAVE_PWD_H
 //Don't build tilde expansion on systems without pwd.h
 
-              //Only if path starts with "~"
-             if (path.substr(0,1) == "~") {
-             const char *home = getenv("HOME");
-                     if (path.substr(1,1) == "/") {
-                          // Initial "~" followed by "/"
-                          if (home) {
-                               // if HOME set in env, replace ~ with HOME
-                               path = path.replace(0,1,home);
-                          }
+    //Only if path starts with "~"
+    if (path[0] == '~') {
 
-# ifdef HAVE_GETPWNAM
-//Don't try this on systems without getpwnam
+        // Initial "~" followed by "/"
+        if (path.substr(1,1) == "/") {
+            
+            const char *home = getenv("HOME");
+            if (home) {
+                // if HOME set in env, replace ~ with HOME
+                path.replace(0, 1, home);
+            }
 
-                          //HOME not set in env: try using pwd
+# ifdef HAVE_GETPWNAM //Don't try this on systems without getpwnam
 
-                          else { 
-                               struct passwd *password = getpwuid(getuid());
-                               const char *pwdhome = password->pw_dir;
-                               if (home) {
-                                   path = path.replace(0,1,pwdhome);
-                               }
-                               //If all that fails, leave path alone
-                          }
-                     }
+            // HOME not found in env: try using pwd
+            else { 
+                struct passwd *password = getpwuid(getuid());
+                    const char *pwdhome = password->pw_dir;
+                    if (home) {
+                        path.replace(0, 1, pwdhome);
+                    }
+                   //If all that fails, leave path alone
+                }
+            }
 
-                     //Initial "~" is not followed by "/"
-                     else {
-                          const char *userhome = NULL;
-                          std::string::size_type first_slash =
-                              path.find_first_of("/");
-                          std::string user;
-                          if (first_slash != std::string::npos) {
-                              // everything between initial ~ and / 
-                              user = path.substr(1, first_slash - 1 );
-                          } else user = path.substr(1);
+        //Initial "~" is not followed by "/"
+        else {
 
-                          //find user using pwd    
-                          struct passwd *password = getpwnam(user.c_str());
-                          if (password) {
-                              //User found
-                              userhome = password->pw_dir;
-                          }
-                          if (userhome) {
-                               std::string foundhome(userhome);
-                               path = path.replace(0,first_slash,foundhome);
-                          }
+            std::string::size_type firstslash =
+                  path.find_first_of("/");
+            std::string user;
+            if (firstslash != std::string::npos) {
+                // everything between initial ~ and / 
+                user = path.substr(1, firstslash - 1 );
+            }
+            else user = path.substr(1);
+
+            // find user using pwd
+            const char *userhome = NULL;
+            struct passwd *password = getpwnam(user.c_str());
+            if (password) {
+                userhome = password->pw_dir;
+                if (userhome) {
+                    path.replace(0, firstslash, userhome);
+                }
+            }
 # endif
-                      }
-                 }
+        }
+    }
 #endif
 
 }
 
 void
-RcInitFile::writeList (PathList& list, std::ostream& o)
+RcInitFile::writeList (const PathList& list, std::ostream& o)
 {
     for (PathList::const_iterator it = list.begin();
     	it != list.end(); ++it) {
@@ -347,12 +322,13 @@ RcInitFile::writeList (PathList& list, std::ostream& o)
 bool
 RcInitFile::parseFile(const std::string& filespec)
 {
-//    GNASH_REPORT_FUNCTION;
+
     struct stat stats;
     std::string action;
     std::string variable;
     std::string value;
     std::ifstream in;
+    std::string line;
 
     StringNoCaseEqual noCaseCompare;
     
@@ -361,176 +337,160 @@ RcInitFile::parseFile(const std::string& filespec)
         return false;
     }
     
-    if (stat(filespec.c_str(), &stats) == 0) {
-        in.open(filespec.c_str());
-        
-        if (!in) {
+    if (stat(filespec.c_str(), &stats) != 0) return false;
+
+    in.open(filespec.c_str());
+    
+    if (!in) {
             cerr << "Couldn't open file: " << filespec << endl;
             return false;
-        }
+    }
 
-        cout << "RcInitFile: parsing " << filespec << endl;
+    cout << "RcInitFile: parsing " << filespec << endl;
         
-        // Read in each line and parse it
-        while (!in.eof()) {
+    // Read in each line and parse it
+    while (getline(in, line)) {
 
-	    // Make sure action is empty, otherwise the last loop (with no new
-	    // data) keeps action, variable and value from the previous loop. This
-	    // causes problems if set blacklist or set whitelist are last, because
-	    // value is erased while parsing and the lists are thus deleted.
-	    action.clear();
+        // Ignore comment lines        
+        if (line[0] == '#') continue;
+    
+        std::istringstream ss(line);
+        
+        // Get the first token
+        ss >> action;
+        
+        // Get second token
+        ss >> variable;
 
-            // Get the first token
-            in >> action;
+        // The rest of the line is the value
+        if (!getline (ss, value)) continue;
 
-            // Ignore comment lines
-            if (action[0] == '#') {
-                // suck up the rest of the line
-                std::string discard;
-                getline(in, discard);
+        // Erase leading spaces.
+        // If there are nothing but spaces in the value,
+        // e.g. "set writelog ", value should be an empty string,
+        // so value.erase(0, string::npos) is correct.
+        value.erase(0, value.find_first_not_of(' '));
+
+        if (noCaseCompare(action, "set") || noCaseCompare(action, "append") ) {
+
+            if (noCaseCompare(variable, "urlOpenerFormat")) {
+                _urlOpenerFormat = value;
                 continue;
-            } 
+            }
+
+            if (noCaseCompare(variable, "flashVersionString")) {
+                _flashVersionString = value;
+                continue;
+            }
             
-	    // Get second token
-            in >> variable;
+            if(noCaseCompare(variable, "GSTAudioSink")) {
+                _gstaudiosink = value;
+                continue;
+            }
+            
+            if (noCaseCompare(variable, "flashSystemOS")) {
+                _flashSystemOS = value;
+                continue;
+            }
 
-            // cout << "Parsing " << variable << endl;
+            if (noCaseCompare(variable, "flashSystemManufacturer")) {
+                _flashSystemManufacturer = value;
+                continue;
+            }
 
-	    // Read in rest of line for parsing.
-            getline(in, value);
+            if (noCaseCompare(variable, "debuglog")) {
+                expandPath (value);
+                _log = value;
+                continue;
+            }
 
-	    // Erase leading spaces.
-            // If there are nothing but spaces in the value,
-            // e.g. "set writelog ", value should be an empty string,
-            // so value.erase(0, string::npos) is correct.
-            value.erase(0, value.find_first_not_of(' '));
+            if (noCaseCompare(variable, "documentroot") ) {
+                _wwwroot = value;
+                continue;
+            }
+            
+            if (noCaseCompare(variable, "blacklist") ) {
+                parseList(_blacklist, action, value);
+                continue;
+            }
 
-            if (noCaseCompare(action, "set") || noCaseCompare(action, "append") ) {
+            if (noCaseCompare(variable, "whitelist")) {
+                parseList(_whitelist, action, value);
+                continue;
+            }
 
-                if (noCaseCompare(variable, "urlOpenerFormat")) {
-                    _urlOpenerFormat = value;
-                    continue;
-                }
+            if (noCaseCompare(variable, "localSandboxPath")) {
+                parseList(_localSandboxPath, action, value);
+                continue;
+            }
 
-                if (noCaseCompare(variable, "flashVersionString")) {
-                    _flashVersionString = value;
-                    continue;
-                }
-                
-                if(noCaseCompare(variable, "GSTAudioSink")) {
-                    _gstaudiosink = value;
-                    continue;
-                }
-                
-                if (noCaseCompare(variable, "flashSystemOS")) {
-                    _flashSystemOS = value;
-                    continue;
-                }
+            if (noCaseCompare(variable, "SOLSafeDir")) {
+                expandPath (value);
+                _solsandbox = value;
+                continue;
+            }
 
-                if (noCaseCompare(variable, "flashSystemManufacturer")) {
-                    _flashSystemManufacturer = value;
-                    continue;
-                }
-
-                if (noCaseCompare(variable, "debuglog")) {
-                    expandPath (value);
-                    _log = value;
-                    continue;
-                }
-
-                if (noCaseCompare(variable, "documentroot") ) {
-                    _wwwroot = value;
-                    continue;
-                }
-                
-                if (noCaseCompare(variable, "blacklist") ) {
-                    parseList(_blacklist, action, variable, value);
-                    continue;
-                }
-
-                if (noCaseCompare(variable, "whitelist")) {
-                    parseList(_whitelist, action, variable, value);
-                    continue;
-                }
-
-                if (noCaseCompare(variable, "localSandboxPath")) {
-                    parseList(_localSandboxPath, action, variable, value);
-                    continue;
-                }
-
-                if (noCaseCompare(variable, "SOLSafeDir")) {
-                    expandPath (value);
-                    _solsandbox = value;
-                    continue;
-                }
-
-		if (noCaseCompare(action , "set") ) {
-                     extractSetting(&_splashScreen, "splashScreen", variable,
-                               value)
-				|| 
-                     extractSetting(&_localhostOnly, "localhost", variable,
-                               value)
-				|| 
-                     extractSetting(&_localdomainOnly, "localdomain", variable,
-                               value)
-				||
-                     extractSetting(&_insecureSSL, "InsecureSSL", variable,
-                               value)
-				||
-                     extractSetting(&_debugger, "debugger", variable, value)
-				||
-                     extractSetting(&_actionDump, "actionDump", variable, value)
-				||
-                     extractSetting(&_parserDump, "parserDump", variable, value)
-				||
-                     extractSetting(&_writeLog, "writelog", variable, value)
-				||
-                     extractSetting(&_sound, "sound", variable, value)
-				||
-                     extractSetting(&_pluginSound, "pluginsound", variable, value)
-				||
-                     extractSetting(&_verboseASCodingErrors,
-                               "ASCodingErrorsVerbosity", variable, value)
-				||
-                     extractSetting(&_verboseMalformedSWF, "MalformedSWFVerbosity",
-                               variable, value)
-				||
-                     extractSetting(&_extensionsEnabled, "EnableExtensions",
-                               variable, value)
-				||
-                     extractSetting(&_startStopped, "StartStopped", variable, value)
-				||
-                     extractSetting(&_solreadonly, "SOLReadOnly", variable,
-                               value)
-				||
-                     extractSetting(&_lcdisabled, "LocalConnection", variable,
-                               value)
-				||
-                     extractSetting(&_lctrace, "LCTrace", variable,
-                               value)
-				||
-                     extractNumber(&_movieLibraryLimit, "movieLibraryLimit", variable, value)
-				||
-                     extractNumber(&_delay, "delay", variable, value)
-				||
-                     extractNumber(&_verbosity, "verbosity", variable, value)
-				||
-                     extractNumber(&_lcshmkey, "LCShmkey", variable, value)
-				||
-                     extractDouble(_streamsTimeout, "StreamsTimeout", variable, value);
-
-		}
+	        if (noCaseCompare(action , "set") ) {
+                 extractSetting(_splashScreen, "splashScreen", variable,
+                           value)
+			|| 
+                 extractSetting(_localhostOnly, "localhost", variable,
+                           value)
+			|| 
+                 extractSetting(_localdomainOnly, "localdomain", variable,
+                           value)
+			||
+                 extractSetting(_insecureSSL, "insecureSSL", variable,
+                           value)
+			||
+                 extractSetting(_debugger, "debugger", variable, value)
+			||
+                 extractSetting(_actionDump, "actionDump", variable, value)
+			||
+                 extractSetting(_parserDump, "parserDump", variable, value)
+			||
+                 extractSetting(_writeLog, "writelog", variable, value)
+			||
+                 extractSetting(_sound, "sound", variable, value)
+			||
+                 extractSetting(_pluginSound, "pluginsound", variable, value)
+			||
+                 extractSetting(_verboseASCodingErrors,
+                           "ASCodingErrorsVerbosity", variable, value)
+			||
+                 extractSetting(_verboseMalformedSWF, "MalformedSWFVerbosity",
+                           variable, value)
+			||
+                 extractSetting(_extensionsEnabled, "EnableExtensions",
+                           variable, value)
+			||
+                 extractSetting(_startStopped, "StartStopped", variable, value)
+			||
+                 extractSetting(_solreadonly, "SOLReadOnly", variable,
+                           value)
+			||
+                 extractSetting(_lcdisabled, "LocalConnection", variable,
+                           value)
+			||
+                 extractSetting(_lctrace, "LCTrace", variable,
+                           value)
+			||
+                 extractNumber(_movieLibraryLimit, "movieLibraryLimit", variable, value)
+			||
+                 extractNumber(_delay, "delay", variable, value)
+			||
+                 extractNumber(_verbosity, "verbosity", variable, value)
+			||
+                 extractNumber(_lcshmkey, "LCShmkey", variable, value)
+			||
+                 extractDouble(_streamsTimeout, "StreamsTimeout", variable, value)
+            ||
+                 cerr << _("Warning: unrecognized directive \"") << variable 
+                      << _("\" in rcfile.") << endl;
             }
         }
+    }
 
-    } else {
-        //cout << filespec << ": no such file or directory" << endl;
-        if (in) {
-            in.close();
-        }
-        return false;
-    }  
-    
     if (in) {
         in.close();
     }
@@ -594,7 +554,7 @@ RcInitFile::updateFile(const std::string& filespec)
     // prefixed with '0x'.
     out << std::boolalpha << std::showbase <<
     _("# Generated by Gnash. Manual changes to this file may be overridden.") << endl <<
-    cmd << "splash_screen " << _splashScreen << endl <<
+    cmd << "splashScreen " << _splashScreen << endl <<
     cmd << "localHost " << _localhostOnly << endl <<
     cmd << "localDomain " << _localdomainOnly << endl <<
     cmd << "insecureSSL " << _insecureSSL << endl <<
@@ -631,7 +591,7 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "flashSystemOS " << _flashSystemOS << endl <<
     cmd << "flashVersionString " << _flashVersionString << endl <<
     cmd << "urlOpenerFormat " << _urlOpenerFormat << endl <<
-    cmd << "GSTAudioSink "     << _gstaudiosink    << endl <<
+    cmd << "GSTAudioSink "     << _gstaudiosink << endl <<
     cmd << "SOLSafeDir " << _solsandbox << endl;
 
     // Lists. These can't be handled very well at the moment. The main
@@ -714,16 +674,12 @@ RcInitFile::useParserDump(bool value)
 void
 RcInitFile::useWriteLog(bool value)
 {
-//    GNASH_REPORT_FUNCTION;
-    
     _writeLog = value;
 }
 
 void
 RcInitFile::dump()
 {
-
-    using std::cerr;
     
     cerr << endl << "Dump RcInitFile:" << endl;
     cerr << "\tTimer interupt delay value: " << _delay << endl;
@@ -754,10 +710,12 @@ RcInitFile::dump()
          << ((_pluginSound)?"enabled":"disabled") << endl;
     cerr << "\tEnable Extensions: "
          << ((_extensionsEnabled)?"enabled":"disabled") << endl;
-    if (_log.size()) {
+
+    if (!_log.empty()) {
         cerr << "\tDebug Log name is: " << _log << endl;
     }
-    if (_flashVersionString.size()) {
+
+    if (!_flashVersionString.empty()) {
         cerr << "\tFlash Version String is: " << _flashVersionString << endl;
     }
     
