@@ -26,23 +26,42 @@
 # include <io.h>
 #endif
 
-// Support compilation with (or without) native language support
-#include "gettext.h"	// for internationalization (GNU gettext)
-#define	_(String) gettext (String)
-#define N_(String) gettext_noop (String)
-
 #include "rc.h" // for IF_VERBOSE_* implementation
 
 #include <fstream>
 #include <sstream>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
-//#include <boost/format.hpp>
+#include <boost/format.hpp>
 
 // the default name for the debug log
 #define DEFAULT_LOGFILE "gnash-dbg.log"
 #define TIMESTAMP_LENGTH 24             // timestamp length
 #define TIMESTAMP_FORMAT "%Y-%m-%d %H:%M:%S     " // timestamp format
+
+// Support compilation with (or without) native language support
+#include "gettext.h"
+#define	_(String) gettext (String)
+#define N_(String) gettext_noop (String)
+
+// This macro should be used to add both boost formatting and
+// internationalization to log messages. The po directory
+// Makefile must also look for the BF macro for gettext
+// processing, otherwise they will not appear in the
+// translation (.po) files.
+//#define BF(x) logFormat(_(x))
+
+// Define to switch between printf-style log formatting
+// and boost::format
+#define USE_BOOST_FORMAT_TEMPLATES 1
+
+#ifdef USE_BOOST_FORMAT_TEMPLATES
+# include <boost/preprocessor/arithmetic/inc.hpp>
+# include <boost/preprocessor/repetition/enum_params.hpp>
+# include <boost/preprocessor/repetition/repeat.hpp>
+# include <boost/preprocessor/repetition/repeat_from_to.hpp>
+# include <boost/preprocessor/seq/for_each.hpp>
+#endif
 
 namespace gnash {
 
@@ -60,7 +79,7 @@ public:
 
     ~LogFile();
 
-    enum fileState {
+    enum FileState {
         CLOSED,
         OPEN,
         INPROGRESS,
@@ -126,7 +145,7 @@ public:
     }
     
     void setStamp (bool b) {
-	_stamp = b;
+        _stamp = b;
     }
 
     bool getStamp () {
@@ -134,13 +153,13 @@ public:
     }
 
     void setWriteDisk (bool b) {
-	_write = b;
+        _write = b;
     }
 
     bool getWriteDisk () {
-	return _write;
+        return _write;
     }
-    
+
 private:
     
     /// Open the specified file to write logs on disk
@@ -173,16 +192,16 @@ private:
     std::ofstream	 _outstream;
 
     /// How much output is required: 2 or more gives debug output.
-    static int		 _verbose;
+    int		 _verbose;
 
     /// Whether to dump all SWF actions
-    static bool		 _actiondump;
+    bool		 _actiondump;
 
     /// Whether to dump parser output
-    static bool		 _parserdump;
+    bool		 _parserdump;
 
     /// The state of the log file.
-    fileState _state;
+    FileState _state;
 
     bool		 _stamp;
 
@@ -214,7 +233,87 @@ private:
 };
 
 
-DSOEXPORT unsigned char *hexify(unsigned char *p, const unsigned char *s, int length, bool ascii);
+#ifdef USE_BOOST_FORMAT_TEMPLATES
+/// This heap of steaming preprocessor code magically converts
+/// printf-style statements into boost::format messages using templates.
+//
+/// Macro to feed boost::format strings to the boost::format object,
+/// producing code like this: "% t1 % t2 % t3 ..."
+#define TOKENIZE_FORMAT(z, n, t) % t##n
+
+/// Macro to add a number of arguments to the templated function
+/// corresponding to the number of template arguments. Produces code
+/// like this: "const T0& t0, const T1& t1, const T2& t2 ..."
+#define TOKENIZE_ARGS(z, n, t) BOOST_PP_COMMA_IF(n) const T##n& t##n
+
+/// This is a sequence of different log message types to be used in
+/// the code. Append the name to log_ to call the function, e.g. 
+/// log_error, log_unimpl.
+#define LOG_TYPES (error) (debug) (unimpl) (aserror) (swferror) (security) (action) (parse) (trace)
+
+/// This actually creates the template functions using the TOKENIZE
+/// functions above. The templates look like this:
+//
+/// template< typename T0 , typename T1 , typename T2 , typename T3 > 
+/// void
+/// log_security (const T0& t0, const T1& t1, const T2& t2, const T3& t3)
+/// {
+///     if (_verbosity == 0) return;
+///     processLog_security(myFormat(t0) % t1 % t2 % t3);
+/// }
+//
+/// Only not as nicely indented.
+///
+/// Use "g++ -E log.h" or "gcc log.h" to check.
+#define LOG_TEMPLATES(z, n, data)\
+    template< \
+         BOOST_PP_ENUM_PARAMS(\
+         BOOST_PP_INC(n), typename T)\
+     >\
+    DSOEXPORT void log_##data (\
+        BOOST_PP_REPEAT(\
+        BOOST_PP_INC(n), \
+        TOKENIZE_ARGS, t)\
+    ) { \
+    if (LogFile::getDefaultInstance().getVerbosity() == 0) return; \
+    processLog_##data(logFormat(t0) \
+    BOOST_PP_REPEAT_FROM_TO(1, \
+        BOOST_PP_INC(n), \
+        TOKENIZE_FORMAT, t));\
+    }\
+
+/// Defines the maximum number of template arguments
+//
+/// The preprocessor generates templates with 1..ARG_NUMBER
+/// arguments.
+#define ARG_NUMBER 16
+
+/// Calls the macro LOG_TEMPLATES an ARG_NUMBER number
+/// of times, each time adding an extra typename argument to the
+/// template.
+#define GENERATE_LOG_TYPES(r, _, t) \
+    BOOST_PP_REPEAT(ARG_NUMBER, LOG_TEMPLATES, t)
+
+/// Calls the template generator for each log type in the
+/// sequence LOG_TYPES.
+BOOST_PP_SEQ_FOR_EACH(GENERATE_LOG_TYPES, _, LOG_TYPES)
+
+#undef TOKENIZE_FORMAT
+#undef GENERATE_LOG_TYPES
+#undef LOG_TEMPLATES
+#undef ARG_NUMBER
+
+DSOEXPORT void processLog_error(const boost::format& fmt);
+DSOEXPORT void processLog_unimpl(const boost::format& fmt);
+DSOEXPORT void processLog_trace(const boost::format& fmt);
+DSOEXPORT void processLog_debug(const boost::format& fmt);
+DSOEXPORT void processLog_action(const boost::format& fmt);
+DSOEXPORT void processLog_parse(const boost::format& fmt);
+DSOEXPORT void processLog_security(const boost::format& fmt);
+DSOEXPORT void processLog_swferror(const boost::format& fmt);
+DSOEXPORT void processLog_aserror(const boost::format& fmt);
+
+#else
 
 #ifdef __GNUC__
 #define GNUC_LOG_ATTRS __attribute__((format (printf, 1, 2)))
@@ -230,7 +329,6 @@ DSOEXPORT unsigned char *hexify(unsigned char *p, const unsigned char *s, int le
 /// or log_swferror for that.
 ///
 DSOEXPORT void log_error(const char* fmt, ...) GNUC_LOG_ATTRS;
-//DSOEXPORT void logError(const boost::format& fmt);
 
 /// Log a message about unimplemented features.
 //
@@ -239,7 +337,6 @@ DSOEXPORT void log_error(const char* fmt, ...) GNUC_LOG_ATTRS;
 /// implement those features of Flash.
 ///
 DSOEXPORT void log_unimpl(const char* fmt, ...) GNUC_LOG_ATTRS;
-//DSOEXPORT void logUnimpl(const boost::format& fmt);
 
 /// Use only for explicit user traces
 //
@@ -247,14 +344,12 @@ DSOEXPORT void log_unimpl(const char* fmt, ...) GNUC_LOG_ATTRS;
 /// ASHandlers.cpp for ActionTrace
 ///
 DSOEXPORT void log_trace(const char* fmt, ...) GNUC_LOG_ATTRS;
-//DSOEXPORT void logTrace(const boost::format& fmt);
 
 /// Log debug info
 //
 /// Used for function entry/exit tracing.
 ///
 DSOEXPORT void log_debug(const char* fmt, ...) GNUC_LOG_ATTRS;
-//DSOEXPORT void logDebug(const boost::format& fmt);
 
 /// Log action execution info
 //
@@ -264,7 +359,6 @@ DSOEXPORT void log_debug(const char* fmt, ...) GNUC_LOG_ATTRS;
 /// at runtime.
 ///
 DSOEXPORT void log_action(const char* fmt, ...) GNUC_LOG_ATTRS;
-//DSOEXPORT void logAction(const boost::format& fmt);
 
 /// Log parsing information
 //
@@ -274,11 +368,9 @@ DSOEXPORT void log_action(const char* fmt, ...) GNUC_LOG_ATTRS;
 /// at runtime.
 ///
 DSOEXPORT void log_parse(const char* fmt, ...) GNUC_LOG_ATTRS;
-//DSOEXPORT void logParse(const boost::format& fmt);
 
 /// Log security information
 DSOEXPORT void log_security(const char* fmt, ...) GNUC_LOG_ATTRS;
-//DSOEXPORT void logSecurity(const boost::format& fmt);
 
 /// Log a malformed SWF error
 //
@@ -291,7 +383,6 @@ DSOEXPORT void log_security(const char* fmt, ...) GNUC_LOG_ATTRS;
 /// at runtime.
 ///
 DSOEXPORT void log_swferror(const char* fmt, ...) GNUC_LOG_ATTRS;
-//DSOEXPORT void logSWFError(const boost::format& fmt);
 
 /// Log an ActionScript error
 //
@@ -304,8 +395,25 @@ DSOEXPORT void log_swferror(const char* fmt, ...) GNUC_LOG_ATTRS;
 /// at runtime.
 ///
 DSOEXPORT void log_aserror(const char* fmt, ...) GNUC_LOG_ATTRS;
-//DSOEXPORT void logASError(const boost::format& fmt);
 
+
+#endif // USE_BOOST_FORMAT_TEMPLATES
+
+/// A fault-tolerant boost::format object for logging
+//
+/// Generally to be used in the LogFile macro BF(), which will also
+/// be recognized by gettext for internationalization and is less
+/// effort to type.
+DSOEXPORT boost::format logFormat(const std::string &str);
+
+/// Convert a sequence of bytes to hex or ascii format.
+//
+/// @param bytes    the array of bytes to process
+/// @param length   the number of bytes to read. Callers are responsible
+///                 for checking that length does not exceed the array size.
+/// @param ascii    whether to return in ascii or space-separated hex format.
+/// @return         a string representation of the byte sequence.
+DSOEXPORT std::string hexify(const unsigned char *bytes, size_t length, bool ascii);
 
 // Define to 0 to completely remove parse debugging at compile-time
 #ifndef VERBOSE_PARSE
@@ -375,7 +483,7 @@ public:
     }
 
     ~__Host_Function_Report__(void) {
-	if (LogFile::getDefaultInstance().getVerbosity() >= DEBUGLEVEL+1) {
+	if (LogFile::getDefaultInstance().getVerbosity() >= DEBUGLEVEL + 1) {
 	    log_debug("returning");
 	}
     }

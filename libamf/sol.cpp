@@ -408,9 +408,8 @@ SOL::dump()
         if (el->getType() == Element::NUMBER) {
             double ddd = *((double *)el->getData());
              cerr << ddd << " ";
-            hexint = new uint8_t[(sizeof(double) *3) + 3];
-            hexify(hexint, el->getData(), 8, false);
-            cerr << "( " << hexint << ")";
+
+            cerr << "( " << hexify(el->getData(), 8, false) << ")";
         }
         if ((*(it))->getType() == Element::BOOLEAN) {
             if (el[0] == true) {

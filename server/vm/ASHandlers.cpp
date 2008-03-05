@@ -50,13 +50,13 @@
 #include "namedStrings.h"
 #include "utf8.h"
 
-#include <unistd.h>
+#include <unistd.h>  // For write() on BSD
 #include <string>
 #include <map>
 #include <set>
 #include <vector>
 #include <utility> // for std::pair
-#include <locale.h>
+#include <locale>
 #include <cerrno>
 #include <boost/scoped_array.hpp>
 #include <boost/random.hpp>

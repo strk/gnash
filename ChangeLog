@@ -1,3 +1,19 @@
+2008-03-04 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/log.{h,cpp}: add templates to convert from vsnprintf format
+	  logging calls to boost::format. These are generated with 
+	  boost.preprocessor macros. The templates 'redirect' log_* calls
+	  to logProcess_* functions. These can also be used directly.
+	  Switching between the two is possible by changing the #define
+	  USE_BOOST_FORMAT in log.h. It is enabled by default. Make static
+	  members private, as they aren't needed elsewhere. Make hexify()
+	  return a std::string and look much less scary.
+	* libamf/element.cpp, libamf/sol.cpp: use std::string hexify.
+	* server/parser/action_buffer.cpp: use std::string hexify.
+	* server/vm/ASHandlers.cpp: use C++ standard header <locale>
+	* utilities/dumpshm.cpp: use <locale>, change hexify.
+	* utilities/processor.cpp: use <locale>.
+
 2008-03-04 Sandro Santilli <strk@keybit.net>
 
 	* libbase/GC.{cpp,h}: add a countCollectables() method for stats.

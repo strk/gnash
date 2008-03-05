@@ -60,7 +60,7 @@ extern char *optarg;
 #include <cerrno>
 
 #ifdef ENABLE_NLS
-#include <locale.h>
+#include <locale>
 #endif
 
 #include "log.h"
@@ -250,10 +250,7 @@ dump_shm(bool convert, bool out)
 	write(fd, shmaddr, size);
 	if (out) {
 #if 0
-	    boost::uint8_t *hexint;
-	    hexint = new boost::uint8_t[(size + 3) *3];
-	    hexify((boost::uint8_t *)hexint, (uint8_t *)shmaddr, size, false);
-	    log_debug(_("The data is: 0x%s"), hexint);
+	    log_debug(_("The data is: 0x%s"), hexify((uint8_t *)shmaddr, size, false));
 #endif
 	}
 	

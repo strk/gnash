@@ -239,8 +239,8 @@ disasm_instruction(const unsigned char* instruction_data)
 	if (fmt == ARG_HEX)
 	{
 	    for (int i = 0; i < length; i++) {
-		hexify(num, (const unsigned char *)&instruction_data[3 + i], 1, false);
-		ss << "0x" << num << " ";
+
+		ss << "0x" << hexify((boost::uint8_t *)&instruction_data[3 + i], 1, false) << " ";
 	    }
 	}
 	else if (fmt == ARG_STR)

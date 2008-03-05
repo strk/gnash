@@ -27,7 +27,7 @@
 #include <time.h>
 
 #ifdef ENABLE_NLS
-#include <locale.h>
+#include <locale>
 #endif
 
 #include "gettext.h"

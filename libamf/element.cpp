@@ -590,10 +590,7 @@ Element::dump()
       case Element::RECORD_SET:
       case Element::XML_OBJECT:
       case Element::TYPED_OBJECT:
-	  boost::uint8_t *hexint;
-	  hexint = new boost::uint8_t[(_length + 3) * 3];
-	  hexify((boost::uint8_t *)hexint, _data, _length, false);
-	  cerr << "AMF data is: 0x%s" << hexint << endl;
+	  cerr << "AMF data is: 0x%s" << hexify(_data, _length, false) << endl;
 	  break;
       case Element::VARIABLE:
       case Element::FUNCTION:

@@ -17,18 +17,23 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
 
-#include <cstdio>
-#include <cstdarg>
+#ifndef USE_BOOST_FORMAT_TEMPLATES
+# include <cstdio>  
+# include <cstdarg> // Both for vsnprintf
+#endif
+
+#include <ctime>
+
 #include <iostream>
+#include <sstream>
+#include <iomanip>
 #include <fstream>
 #include <string>
-#include <cstring>
-//#include <boost/format.hpp>
+#include <boost/format.hpp>
 
 #if defined(_WIN32) && defined(WIN32)
 // Required for SYSTEMTIME definitions
@@ -39,8 +44,6 @@
 # include <unistd.h>
 #endif
 
-#include <ctime>
-
 #include "log.h"
 
 using std::cout;
@@ -48,120 +51,80 @@ using std::endl;
 
 namespace gnash {
 
-// static data to be shared amongst all classes.
-//ofstream LogFile::_console;
-int LogFile::_verbose = 0;
-bool LogFile::_actiondump = false;
-bool LogFile::_parserdump = false;
-
 // Workspace for vsnprintf formatting.
 static const int BUFFER_SIZE = 2048;
 
-// Convert each byte into it's hex represntation
-static const char hexchars[]="0123456789abcdef";
-unsigned char *
-hexify(unsigned char *p, const unsigned char *s, int length, bool ascii) {
+// Convert each byte into its hex representation
+std::string hexify (const unsigned char *p, size_t length, bool ascii)
+{
 
-    unsigned char *p1 = p;
+	assert (length <= sizeof(p));
 
-    // convert some characters so it'll look right in the log
-    for (int i=0 ; i<length; i++) {
-        // use the hex value
+	const std::vector<unsigned char> bytes (p, p + length);
 
-	if (ascii) {
-	    if (isprint(s[i])) {
-		*p++ = s[i];
-		continue;
-	    } else {
- 		if ((s[i] == 0xd) || (s[i] == 0xa)) {
-		    *p++ = s[i];
- 		    continue;
- 		}
-		*p++ = '^';
-	    }
-	} else {		// if not ascii outout requested
-	    *p++ = hexchars[s[i] >> 4];
-	    *p++ = hexchars[s[i] & 0xf];
-	    *p++ = ' ';		// add a space between bytes
-	}
-	    
-// 	if (isascii(s[i]) && ascii) {
-// 	    *p++ = hexchars[s[i] >> 4];
-// 	    *p++ = hexchars[s[i] & 0xf];
-// //		    *p++ = ' ';
-// 	    *p++ = '%';
-// 	    continue;
-// 	}
-// 	*p++ = s[i];
-// // 	    if (!isprint(s[i+1])) {
-// // 		*p++ = hexchars[s[i] >> 4];
-// // 		*p++ = hexchars[s[i] & 0xf];
-// // //		*p++ = ' ';
-// // 		*p++ = '$';
-// // 	    }
+	std::ostringstream ss;
+	
+	// For hex output, fill single-digit numbers with a leading 0.
+	if (!ascii) ss << std::hex << std::setfill('0');
+	
+	for (std::vector<unsigned char>::const_iterator i = bytes.begin(), e = bytes.end();
+				i != e; ++i)
+	{
+		if (ascii) {
+			if (isprint(*i) || *i == 0xd || *i == 0xa) {
+				ss << *i;
+			}
+			else ss << "^";
+		}
+		else  {
+			// Not ascii
+			ss << std::setw(2) << static_cast<int>(*i) << " ";	
+		}
+	}	
+		
+	return ss.str();
 
-//     } else {
-// 	    if (ascii) {
-// 		if (s[i] == 0xd) {
-// //		    *p++ = '\r';
-// 		    *p++ = '@';
-// 		    continue;
-// 		}
-// 		if (s[i] == 0xa) {		
-// //		    *p++ = '\n';
-// 		    *p++ = '#';
-// 		    continue;
-// 		}
-// 	    } else {
-// 		*p++ = hexchars[s[i] >> 4];
-// 		*p++ = hexchars[s[i] & 0xf];
-// 	    }
-// 	}
-    }
-
-    *p = '\0';
-
-    return p1;
 }
 
 // FIXME: localize these, so they print local regional timestamps.
 std::ostream&
-timestamp(std::ostream& x) {
-    time_t t;
-    char buf[10];
+timestamp(std::ostream& x)
+{
+	time_t t;
+	char buf[10];
 
-    memset (buf, '0', 10);        // this terminates the string
-    time (&t);                    // get the current time
-    strftime (buf, sizeof(buf), "%H:%M:%S", localtime (&t));
+	memset (buf, '0', 10);		// this terminates the string
+	time (&t);					// get the current time
+	strftime (buf, sizeof(buf), "%H:%M:%S", localtime (&t));
 
-    return x << buf << ": ";
+	return x << buf << ": ";
 }
 
 
 std::string
 timestamp() {
 
-    time_t t;
-    char buf[10];
+	time_t t;
+	char buf[10];
 
-    memset (buf, '0', 10);        // this terminates the string
-    time (&t);                    // get the current time
-    strftime (buf, sizeof(buf), "%H:%M:%S", localtime (&t));
+	memset (buf, '0', 10);		// this terminates the string
+	time (&t);					// get the current time
+	strftime (buf, sizeof(buf), "%H:%M:%S", localtime (&t));
 
-    std::stringstream ss;
-    ss << getpid() << "] " << buf;
-    return ss.str();
+	std::stringstream ss;
+	ss << getpid() << "] " << buf;
+	return ss.str();
 }
 
 std::ostream& datetimestamp(std::ostream& x) {
-    time_t t;
-    char buf[20];
+	time_t t;
+	char buf[20];
 
-    memset (buf, '0', 20);        // this terminates the string
-    time (&t);                    // get the current time
-    strftime (buf, sizeof(buf), "%Y-%m-%d %H:%M:%S ", localtime (&t));
+	memset (buf, '0', 20);		// this terminates the string
+	time (&t);					// get the current time
+	strftime (buf, sizeof(buf), "%Y-%m-%d %H:%M:%S ", localtime (&t));
 
-    return x << buf;
+	return x << buf;
 }
 
 // This is a bit of a hack. We implement wrappers for the old
@@ -178,242 +141,251 @@ LogFile::getDefaultInstance()
 }
 
 namespace {
-    LogFile& dbglogfile = LogFile::getDefaultInstance();
+	LogFile& dbglogfile = LogFile::getDefaultInstance();
 }
+
+#ifndef USE_BOOST_FORMAT_TEMPLATES
 
 void
 log_trace(const char* fmt, ...)
 {
 
-    va_list ap;
-    char tmp[BUFFER_SIZE];
+	va_list ap;
+	char tmp[BUFFER_SIZE];
 
-    va_start (ap, fmt);
-    vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
-    tmp[BUFFER_SIZE-1] = '\0';
+	va_start (ap, fmt);
+	vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
+	tmp[BUFFER_SIZE-1] = '\0';
 
-    dbglogfile.log(_("TRACE"), tmp);
+	dbglogfile.log(_("TRACE"), tmp);
 
-    va_end (ap);
+	va_end (ap);
 }
-
-//void
-//logTrace(const boost::format& fmt)
-//{
-//    dbglogfile.log(N_("TRACE"), fmt.str());
-//}
 
 void
 log_debug(const char* fmt, ...)
 {
 
-    if (dbglogfile.getVerbosity() < DEBUGLEVEL) return;
+	if (dbglogfile.getVerbosity() < DEBUGLEVEL) return;
 
-    va_list ap;
-    char tmp[BUFFER_SIZE];
+	va_list ap;
+	char tmp[BUFFER_SIZE];
 
-    va_start (ap, fmt);
-    vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
-    tmp[BUFFER_SIZE-1] = '\0';
+	va_start (ap, fmt);
+	vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
+	tmp[BUFFER_SIZE-1] = '\0';
 
-    // We don't translate DEBUG: because code below here looks for it
-    // in the output of const char strings.  If we translated it, both
-    // its type would change (to non-const char string) and the letters would
-    // change to the local language.  Could perhaps be fixed more cleanly
-    // later...
-    dbglogfile.log(N_("DEBUG"), tmp);
+	// We don't translate DEBUG: because code below here looks for it
+	// in the output of const char strings.  If we translated it, both
+	// its type would change (to non-const char string) and the letters would
+	// change to the local language.  Could perhaps be fixed more cleanly
+	// later...
+	dbglogfile.log(N_("DEBUG"), tmp);
 
-    va_end (ap);
+	va_end (ap);
 }
-
-//void
-//logDebug(const boost::format& fmt)
-//{
-//    if (dbglogfile.getVerbosity() < DEBUGLEVEL) return;
-//    dbglogfile.log(N_("DEBUG"), fmt.str());
-//}
 
 void
 log_action(const char* fmt, ...)
 {
-    va_list ap;
-    char tmp[BUFFER_SIZE];
+	va_list ap;
+	char tmp[BUFFER_SIZE];
 
-    va_start (ap, fmt);
-    vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
-    tmp[BUFFER_SIZE-1] = '\0';
+	va_start (ap, fmt);
+	vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
+	tmp[BUFFER_SIZE-1] = '\0';
 
-    bool stamp = dbglogfile.getStamp();
-    dbglogfile.setStamp(false);
-    dbglogfile.log(tmp);
-    dbglogfile.setStamp(stamp);
+	bool stamp = dbglogfile.getStamp();
+	dbglogfile.setStamp(false);
+	dbglogfile.log(tmp);
+	dbglogfile.setStamp(stamp);
 }
-
-//void
-//logAction(const boost::format& fmt)
-//{
-//    bool stamp = dbglogfile.getStamp();
-//    dbglogfile.setStamp(false);
-//    dbglogfile.log(fmt.str());
-//    dbglogfile.setStamp(stamp);
-//}
 
 void
 log_parse(const char* fmt, ...)
 {
 
-    va_list ap;
-    char tmp[BUFFER_SIZE];
+	va_list ap;
+	char tmp[BUFFER_SIZE];
 
-    va_start (ap, fmt);
-    vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
-    tmp[BUFFER_SIZE-1] = '\0';
+	va_start (ap, fmt);
+	vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
+	tmp[BUFFER_SIZE-1] = '\0';
 
-    dbglogfile.log(tmp);
+	dbglogfile.log(tmp);
 
-    va_end (ap);
+	va_end (ap);
 }
-
-//void
-//logParse(const boost::format& fmt)
-//{
-//    dbglogfile.log(fmt.str());
-//}
 
 // Printf-style error log.
 void
 log_error(const char* fmt, ...)
 {
-    va_list ap;
-    char tmp[BUFFER_SIZE];
+	va_list ap;
+	char tmp[BUFFER_SIZE];
 
-    va_start (ap, fmt);
-    vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
-    tmp[BUFFER_SIZE-1] = '\0';
+	va_start (ap, fmt);
+	vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
+	tmp[BUFFER_SIZE-1] = '\0';
 
-    dbglogfile.log(_("ERROR"), tmp);
+	dbglogfile.log(_("ERROR"), tmp);
 
-    va_end (ap);
+	va_end (ap);
 }
-
-//void
-//logError(const boost::format& fmt)
-//{
-//    dbglogfile.log(N_("ERROR"), fmt.str());
-//}
 
 void
 log_unimpl(const char* fmt, ...)
 {
-    va_list ap;
-    char tmp[BUFFER_SIZE];
+	va_list ap;
+	char tmp[BUFFER_SIZE];
 
-    va_start (ap, fmt);
-    vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
-    tmp[BUFFER_SIZE-1] = '\0';
+	va_start (ap, fmt);
+	vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
+	tmp[BUFFER_SIZE-1] = '\0';
 
-    dbglogfile.log(_("UNIMPLEMENTED"), tmp);
+	dbglogfile.log(_("UNIMPLEMENTED"), tmp);
 
-    va_end (ap);
+	va_end (ap);
 }
-
-//void
-//logUnimpl(const boost::format& fmt)
-//{
-//    dbglogfile.log(N_("UNIMPLEMENTED"), fmt.str());
-//}
 
 void
 log_security(const char* fmt, ...)
 {
-    va_list ap;
-    char tmp[BUFFER_SIZE];
+	va_list ap;
+	char tmp[BUFFER_SIZE];
 
-    va_start (ap, fmt);
-    vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
-    tmp[BUFFER_SIZE-1] = '\0';
+	va_start (ap, fmt);
+	vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
+	tmp[BUFFER_SIZE-1] = '\0';
 
-    dbglogfile.log(_("SECURITY"), tmp);
+	dbglogfile.log(_("SECURITY"), tmp);
 
-    va_end (ap);
+	va_end (ap);
 }
-
-//void
-//logSecurity(const boost::format& fmt)
-//{
-//    dbglogfile.log(N_("SECURITY"), fmt.str());
-//}
 
 void
 log_swferror(const char* fmt, ...)
 {
-    va_list ap;
-    char tmp[BUFFER_SIZE];
+	va_list ap;
+	char tmp[BUFFER_SIZE];
 
-    va_start (ap, fmt);
-    vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
-    tmp[BUFFER_SIZE-1] = '\0';
+	va_start (ap, fmt);
+	vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
+	tmp[BUFFER_SIZE-1] = '\0';
 
-    dbglogfile.log(_("MALFORMED SWF"), tmp);
+	dbglogfile.log(_("MALFORMED SWF"), tmp);
 
-    va_end (ap);
+	va_end (ap);
 }
-
-//void
-//logSWFError(const boost::format& fmt)
-//{
-//    dbglogfile.log(N_("MALFORMED SWF"), fmt.str());
-//}
 
 void
 log_aserror(const char* fmt, ...)
 {
-    va_list ap;
-    char tmp[BUFFER_SIZE];
+	va_list ap;
+	char tmp[BUFFER_SIZE];
 
-    va_start (ap, fmt);
-    vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
-    tmp[BUFFER_SIZE-1] = '\0';
+	va_start (ap, fmt);
+	vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
+	tmp[BUFFER_SIZE-1] = '\0';
 
-    dbglogfile.log(_("ACTIONSCRIPT ERROR"), tmp);
+	dbglogfile.log(_("ACTIONSCRIPT ERROR"), tmp);
 
-    va_end (ap);
+	va_end (ap);
 }
 
-//void
-//logASError(const boost::format& fmt)
-//{
-//    dbglogfile.log(N_("ACTIONSCRIPT ERROR"), fmt.str());
-//}
+#else
+// boost format functions to process the objects
+// created by our hundreds of templates 
+
+void
+processLog_trace(const boost::format& fmt)
+{
+	dbglogfile.log(N_("TRACE"), fmt.str());
+}
+
+void
+processLog_debug(const boost::format& fmt)
+{
+	if (dbglogfile.getVerbosity() < DEBUGLEVEL) return;
+	dbglogfile.log(N_("DEBUG"), fmt.str());
+}
+
+void
+processLog_parse(const boost::format& fmt)
+{
+	dbglogfile.log(fmt.str());
+}
+
+void
+processLog_error(const boost::format& fmt)
+{
+	dbglogfile.log(N_("ERROR"), fmt.str());
+}
+
+void
+processLog_unimpl(const boost::format& fmt)
+{
+	dbglogfile.log(N_("UNIMPLEMENTED"), fmt.str());
+}
+
+void
+processLog_security(const boost::format& fmt)
+{
+	dbglogfile.log(N_("SECURITY"), fmt.str());
+}
+
+void
+processLog_swferror(const boost::format& fmt)
+{
+	dbglogfile.log(N_("MALFORMED SWF"), fmt.str());
+}
+
+void
+processLog_aserror(const boost::format& fmt)
+{
+	dbglogfile.log(N_("ACTIONSCRIPT ERROR"), fmt.str());
+}
+
+void
+processLog_action(const boost::format& fmt)
+{
+	bool stamp = dbglogfile.getStamp();
+	dbglogfile.setStamp(false);
+	dbglogfile.log(fmt.str());
+	dbglogfile.setStamp(stamp);
+}
+
+#endif
 
 void
 LogFile::log(const std::string& msg)
 {
-    boost::mutex::scoped_lock lock(_ioMutex);
+	boost::mutex::scoped_lock lock(_ioMutex);
 
-    dbglogfile << msg << endl;
-
+	dbglogfile << msg << endl;
 }
 
 void
 LogFile::log(const std::string& label, const std::string& msg)
 {
-    boost::mutex::scoped_lock lock(_ioMutex);
+	boost::mutex::scoped_lock lock(_ioMutex);
 
-    dbglogfile << label << ": " << msg << endl;
+	dbglogfile << label << ": " << msg << endl;
 
 }
 
 // Default constructor
 LogFile::LogFile ()
 	:
+	_verbose(0),
+	_actiondump(false),
+	_parserdump(false),
 	_state(CLOSED),
 	_stamp(true),
 	_write(false)
 {
     RcInitFile& rcfile = RcInitFile::getDefaultInstance();
     _write = rcfile.useWriteLog();
-
 }
 
 LogFile::~LogFile()
@@ -440,6 +412,7 @@ LogFile::openLogIfNeeded ()
 bool
 LogFile::openLog (const std::string& filespec)
 {
+
     // NOTE:
     // don't need to lock the mutex here, as this method
     // is intended to be called only by openLogIfNeeded,
@@ -460,8 +433,8 @@ LogFile::openLog (const std::string& filespec)
         return false;
     }       
 
-    _filespec = filespec;
-    _state = OPEN;
+	_filespec = filespec;
+	_state = OPEN;
 
   // LogFile::outstream << "Opened " << filespec << endl;
 
@@ -471,34 +444,31 @@ LogFile::openLog (const std::string& filespec)
 bool
 LogFile::closeLog (void)
 {
-    boost::mutex::scoped_lock lock(_ioMutex);
-    if (_state == OPEN) {
-           _outstream.flush();
-        _outstream.close();
-    }
-    _state = CLOSED;
+	boost::mutex::scoped_lock lock(_ioMutex);
+	if (_state == OPEN) {
+		_outstream.flush();
+		_outstream.close();
+	}
+	_state = CLOSED;
 
-    return true;
+	return true;
 }
 
 bool
 LogFile::removeLog (void)
 {
-    if (_state == OPEN) {
-        _outstream.close ();
-    }
+	if (_state == OPEN) {
+		_outstream.close ();
+	}
 
     // Ignore the error, we don't care
     unlink(_filespec.c_str());
     _filespec.clear();
 
-    return true;
+	return true;
 }
 
-/// \brief print a string
-///
-
-
+/// log a string
 LogFile&
 LogFile::operator << (const std::string &s)
 {
@@ -506,7 +476,7 @@ LogFile::operator << (const std::string &s)
 
     if (_stamp == true && (_state != INPROGRESS) )
     {
-	std::string ts = timestamp();
+        std::string ts = timestamp();
 
         if (_verbose) cout << ts << ": " << s;
         if (openLogIfNeeded())
@@ -522,7 +492,6 @@ LogFile::operator << (const std::string &s)
 		_outstream << s;   
 	}
     }
-
     return *this;
 }
 
@@ -542,6 +511,28 @@ LogFile::operator << (std::ostream & (&)(std::ostream &))
     _state = IDLE;
 
     return *this;
+}
+
+boost::format
+logFormat (const std::string &str)
+{
+
+	using namespace boost::io;
+
+	boost::format fmt(str);
+	
+	// Don't throw exception if the wrong number of 
+	// arguments is passed or the format string is 
+	// bad. This might lead to strings being mangled,
+	// but the alternative is that a careless format
+	// string would cause Gnash to abort; and some
+	// strings don't appear very often. The same holds
+	// for translations.
+	fmt.exceptions(all_error_bits ^ (
+							too_many_args_bit |
+							too_few_args_bit |
+							bad_format_string_bit));
+	return fmt;
 }
 
 } // end of gnash namespace
