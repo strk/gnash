@@ -28,7 +28,7 @@
       optimisation turned off.
     </para>
     <para>
-      At present the Gnash source is about 500 MB to extracted and
+      At present the Gnash source is about 500 MB when extracted and
       configured and requires a total of about 25 megabytes to compile
       it. 
     </para>
@@ -771,7 +771,7 @@
 	  <listitem>
 	    <para>
 	      Disable the plugin forking the standalone player, and
-	      using a thread for the player instead. Currently forking
+	      use a thread for the player instead. Currently forking
 	      the standalone player will give you the best results.
 	    </para>
 	  </listitem>
@@ -804,7 +804,7 @@
 	      <listitem>
 		Simple DirectMedia Layer, a simple and portable GUI.
 		Its sound facilities are used when --enable-media=ffmpeg|mad
-		regoardless of whether it is also in charge of the GUI.
+		regardless of whether it is also in charge of the GUI.
 	      </listitem>
 	    </varlistentry>
 	    <varlistentry>
@@ -820,7 +820,7 @@
 	      <term>FLTK</term>
 	      <listitem>
 		Fast Light ToolKit, low on resource usage.
-		Since all build using fltk are now broken, we declare it
+		Since all builds using fltk are now broken, we declare it
 		"for developers".
 	      </listitem>
 	    </varlistentry>
@@ -885,7 +885,7 @@
 	    <para>
 	      Select the specified media decoder and sound engine.
 	      FFMPEG uses the SDL sound engine, GST uses its own.
-	      Using <emphasis>Gstreamer</emphasis> is the default decoder.
+	      The default decoder is <emphasis>gst</emphasis>.
 	    </para>
 	    <para>
 	      You should only select one media decoder.
@@ -919,15 +919,15 @@
 	  <term>--enable-renderer=opengl|cairo|agg</term>
 	  <listitem>
 	    <para>
-	      Enable support for the a graphics backend. Currently
+	      Enable support for the graphics backend. Currently
 	      only <emphasis>opengl</emphasis> and
-	      <emphasis>agg</emphasis> work sufficiently. OpenGL is
+	      <emphasis>agg</emphasis> work satisfactorily. OpenGL is
 	      used when you have hardware accelerated graphics. AGG is
 	      used when you don't have hardware accelerated
 	      graphics. Typically most desktop machines have OpenGL
-	      support, and most embedded systems don't. OpenGL is the
-	      default when building Gnash, though the quality of AGG's
-	      rendering is currently superior to OpenGL.
+	      support, and most embedded systems don't. AGG is the
+	      default when building Gnash.  AGG provides higher quality
+              rendering in this release.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -961,7 +961,7 @@
       <title>Specifying A Custom Path</title>
 
       <para>
-	This set of options typically use a <emphasis>--with-[name]</emphasis>
+	This set of options typically use an <emphasis>--with-[name]</emphasis>
 	naming convention. A Prefix can often be supplied, which is
 	the top level directory which can be used to look for the other
 	sub directories. Most options of this type have two

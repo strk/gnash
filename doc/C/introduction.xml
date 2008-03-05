@@ -66,16 +66,16 @@
       ActionScript 2, many of the same classes work for
       both. Support has been added to Gnash's ActionScript library
       to support the new ActionScript 3 filters, which get applied
-      to every class. Implementing ActionScript clases is often the
+      to every class. Implementing ActionScript classes is often the
       easiest way for new Gnash developers to make a contribution
-      without a deep internal knpowledge of Gnash.
+      without a deep internal knowledge of Gnash.
     </para>
     
     <para>
       Gnash has included video support since early 2007, but this is
       an ever changing field of reverse engineering. Many of the
       popular video sharing sites use SWF v8 or v9, which Gnash
-      still has imperfect support for. This is improving all the
+      supports imperfectly. This is improving all the
       time, so often builds from a development snapshot will work
       when using the older release packaged in your distribution
       doesn't. You can find daily snapshots of the latest CVS tree

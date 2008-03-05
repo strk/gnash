@@ -48,14 +48,14 @@
   <para>
     The client starts the RTMP connection by sending a single byte
     with a value of 0x3. This byte is followed by a data block of 1536
-    bytes. The format if this data block is unknown, but it appears to
+    bytes. The format of this data block is unknown, but it appears to
     not be actually used by the protocol except as a handshake.
   </para>
 
   <para>
     The server receives this packet, stores the 1536 byte data block,
     and then send a single byte with the value of 0x3, followed by two
-    1536 data blocks. The second data block is the full contents of
+    1536 data blocks. The second data block has the full contents of
     the original data block as sent by the client.
   </para>
 
@@ -63,7 +63,7 @@
     The client receives the 1536 byte data block, and if they match,
     the connection is established. After the handshake process is
     done, there are three other messages that the client sends to the
-    sever to start the data flowing.
+    server to start the data flowing.
   </para>
 
   <para>
@@ -108,7 +108,7 @@
     ASCII string as the message body. The following AMF packet is the
     <emphasis>NetConnection</emphasis> one, which specifies that this is coming
     from a Flash application. This also contains the file path the server
-    can use to find the file to stream. This is then followed by the
+    can use to find the file to stream. This is followed by the
     version number, which I assume is the version of the Flash player,
     so the server knows what it is talking to.
   </para>
@@ -363,7 +363,7 @@
 	<term>0x6</term>
 	<listitem>
 	  <para>
-	    This specifies the data in the AMF packet is a
+	    This specifies the data in the AMF packet is
 	    undefined. This is also used as the return code from
 	    calling Flash functions.
 	  </para>
@@ -437,7 +437,7 @@
 	<term>0xd</term>
 	<listitem>
 	  <para>
-	    This specifies the data in the AMF packet is a an
+	    This specifies the data in the AMF packet is an
 	    unsupported feature.
 	  </para>
 	</listitem>
@@ -457,7 +457,7 @@
 	<term>0xf</term>
 	<listitem>
 	  <para>
-	    This specifies the data in the AMF packet is a AML
+	    This specifies the data in the AMF packet is a XML
 	    object. XML objects are then parsed by the
 	    <emphasis>XML</emphasis> ActionScript class.
 	  </para>

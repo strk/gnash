@@ -3,7 +3,7 @@
   
   <para>
     The Gnash project relies on the community of Gnash users to test
-    the player, feedback is critical to any successful project.  Not
+    the player.  Feedback is critical to any successful project.  Not
     only does it let us know that people use Gnash, but it helps us  
     understand the community's needs. Gnash uses a bug tracker on
     <ulink url="http://savannah.gnu.org" /> to manage these reports.
@@ -13,7 +13,7 @@
     When filing a report, please follow the guidelines below. The better
     your bug report is, the easier it will be for the developers to
     address the issue. Bug reports without enough information will
-    initially be asked to provide this information anyway. Adding
+    be asked to provide this information anyway. Adding
     critical details, like the Operating System you are on, its
     version, and any relevant error messages from Gnash that you get.
   </para>
@@ -26,8 +26,8 @@
       Gnash build infrastructure allows the automated building of
       binary packages. Often the version of Gnash as packaged by a
       GNU/Linux or BSD distribution is based on the last official
-      release, which could be months out of date. It is helpful if
-      this is the case to try a newer packaged build of Gnash. 
+      release, which could be months out of date. It helps us, if
+      this is the case, for you to try a newer packaged build of Gnash. 
     </para>
 
     <para>

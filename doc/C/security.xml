@@ -30,7 +30,7 @@
 	SWF movies support a form of persistent storage called Local
 	Shared Objects. These are stored in the subdirectories of one's
 	<emphasis>~/.macromedia</emphasis> configuration. These files
-	are comonly called &quot;Flash Cookies&quot;, as they don't get
+	are commonly called &quot;Flash Cookies&quot;, as they don't get
 	deleted when the SWF movie that created or writes data to them
 	stops executing. These files often store things like game
 	scores, but can also store a unique identifier for tracking users.
@@ -51,18 +51,18 @@
 	stored in binary, big endian format. While one can look at the
 	data in any binary editor or hex dumper, it's easier to use
 	soldumper, which knows how to decode all the objects. The data
-	is stored in AMF format, a simple data interhange formats used
+	is stored in AMF format, a simple data interchange format used
 	in several other places in SWF.
       </para>
       
       <para>
 	The one security setting &app; supports is the
 	<emphasis>SOLReadOnly</emphasis> setting for your $HOME/.gnashrc
-	file. This makes &app; never write to a .sol file, it only reads
-	them. You can also set <emphasis>SOLSafeDir</emphasis> to a safe
+	file. This makes &app; only read from a .sol file, but never write.
+        You can also set <emphasis>SOLSafeDir</emphasis> to a safe
 	subdirectory, or even remove it later, although most people
-	will want to set this path to the default one created by the other
-	SWF player.
+	will want to set this path to the same one used by other
+	SWF players.
       </para>
       
     </sect2>
@@ -85,8 +85,8 @@
       <para>
 	The &app; utility <emphasis>dumpshm</emphasis> can be used to do
 	several things with these shared memory segments. This utility
-	can find the shared memory segment left by using other SWF
-	players to see what has been left. it can then dump the contents
+	can find the shared memory segment created by other SWF
+	players to see what has been left.  It can then dump the contents
 	of the shared mempory segment either by decoding the AMF objects
 	and printing the values, or by dumping the raw file to disk
 	where you can analyze it with any other program you wish. If

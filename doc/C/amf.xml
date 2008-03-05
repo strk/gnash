@@ -9,7 +9,7 @@
   </para>
   
   <para>
-    Like the RTMP messages, an AMF packet header can be of a variable
+    Like the RTMP messages, an AMF packet header varies in
     size. The size is either the same as the initial header of the
     RTMP message, or a 1 byte header, which is commonly used for
     streaming audio or video data.

@@ -17,16 +17,16 @@
 	ActionScript 2, many of the same classes work for
 	both. Support has been added to Gnash's ActionScript library
 	to support the new ActionScript 3 filters, which get applied
-	to every class. Implementing ActionScript clases is often the
+	to every class. Implementing ActionScript classes is often the
 	easiest way for new Gnash developers to make a contribution
-	without a deep internal knpowledge of Gnash.
+	without a deep internal knowledge of Gnash.
       </para>
 
       <para>
 	Gnash has included video support since early 2007, but this is
-	an every changing field of reverse engineering. Many of the
+	an ever changing field of reverse engineering. Many of the
 	popular video sharing sites use SWF v8 or v9, which Gnash
-	still has imperfect support for. This is improving all the
+	supports imperfectly. This is improving all the
 	time, so often builds from a development snapshot will work
 	when using the older release packaged in your distribution
 	doesn't. You can find daily snapshots of the latest CVS tree
@@ -35,12 +35,12 @@
       </para>
 
       <para>
-	Gnash uses ffmpeg for codecs, so any file suppored by Mplayer
+	Gnash uses ffmpeg for codecs, so any file supported by Mplayer
 	should work with Gnash. Gnash supports the loading of patent
 	free codecs like Ogg Vorbis or Theora from disk based files,
 	while work is being done to support these codecs when embedded
 	in a SWF file. Ffmpeg contains the codecs used by the current
-	SWF defintion, FLV, VP6 (ON2), H.263, H.264, and MP3.
+	SWF definition, FLV, VP6 (ON2), H.263, H.264, and MP3.
       </para>
 
       <para>
@@ -48,7 +48,7 @@
 
       <para>
 	This is a quick list of what is currently implemented in Gnash
-	as of February, 2008.
+	as of March, 2008.
 
 	<informaltable frame="all">
 	  <?dbhtml table-width="75%" ?>

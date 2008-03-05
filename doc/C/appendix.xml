@@ -117,7 +117,7 @@
       The <emphasis>\brief</emphasis> keyword means that the 
       text becomes associated
       when listing all the classes on the generated web pages. The
-      text after the blank link becomes the detailed description which
+      text after the blank line becomes the detailed description which
       appears on the generated web page for that class and method.
     </para>
   </sect2>
