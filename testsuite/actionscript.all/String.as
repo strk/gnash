@@ -306,7 +306,64 @@ check_equals (ord("ǵ"), 199);
 check_equals (ord("Ϧ"), 207);
 #endif
 
+//-------------------------------------------
+// Mbchr and mbord
+//-------------------------------------------
 
+// All versions, especially 5:
+var c;
+
+i = "Ǧ";
+
+asm {
+    push "c"   
+    push "i"   
+    getvariable
+    mbord  
+    setvariable
+};
+
+check_equals (c, 486);
+
+i = "Ϧ";
+
+asm {
+    push "c"   
+    push "i"   
+    getvariable
+    mbord  
+    setvariable
+};
+
+check_equals (c, 998);
+
+// And the reverse procedure:
+
+i = 998;
+
+asm {
+    push "c"   
+    push "i"   
+    getvariable
+    mbchr  
+    setvariable
+};
+
+check_equals (c, "Ϧ");
+
+// Should return the same as mbchr(90000 - 65536) 
+
+i = 90000;
+
+asm {
+    push "c"   
+    push "i"   
+    getvariable
+    mbchr  
+    setvariable
+};
+
+check_equals (c, "徐");
 
 //-------------------------------------------
 // Check multi-byte chars with all string
@@ -531,7 +588,7 @@ r = "s:"+s;
 check_equals(r, "s:");
 
 #if OUTPUT_VERSION < 6
- check_totals(188);
+ check_totals(192);
 #else
- check_totals(218);
+ check_totals(222);
 #endif

@@ -1,5 +1,10 @@
 2008-03-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* testsuite/actionscript.all/String.as: add tests for mbchr (should
+	  be correct) and mbord(not yet confirmed).
+
+2008-03-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* testsuite/actionscript.all/Global.as: correct test count.
 	* server/asobj/Global.cpp: forget lexical_cast, use stringstream
 	  instead. That both fixes the locale problem and doesn't mess up
