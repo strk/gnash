@@ -1249,14 +1249,6 @@ array_join(const fn_call& fn)
 	return as_value(ret.c_str());
 }
 
-static as_value
-array_size(const fn_call& fn)
-{
-	boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
-
-	return as_value(array->size());
-}
-
 // Callback to convert array to a string
 // TODO CHECKME: rely on Object.toString  ? (
 static as_value
@@ -1436,12 +1428,10 @@ array_new(const fn_call& fn)
 static void
 attachArrayProperties(as_object& proto)
 {
-	boost::intrusive_ptr<builtin_function> gettersetter;
+	as_c_function_ptr gettersetter;
 
-	gettersetter = new builtin_function(&array_length, NULL);
+	gettersetter = &array_length;
 	proto.init_property("length", *gettersetter, *gettersetter);
-
-	proto.init_member("size", new builtin_function(array_size));
 }
 
 static void

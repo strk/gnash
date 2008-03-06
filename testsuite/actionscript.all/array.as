@@ -96,6 +96,7 @@ numericRev.valueOf = function () { return (Array.NUMERIC | Array.DESCENDING); };
 var a;
 var popped;
 a=[551,"asdf",12];
+check_equals(typeof(a.size), 'undefined');
 
 check (a instanceOf Array);
 check_equals(a.length, 3);
@@ -1022,11 +1023,11 @@ check_equals(out[0], 1);
 
 
 #if OUTPUT_VERSION < 6
- check_totals(365);
+ check_totals(366);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(393);
+  check_totals(394);
 # else
-  check_totals(400);
+  check_totals(401);
 # endif
 #endif
