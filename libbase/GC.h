@@ -291,7 +291,10 @@ private:
 	}
 
 	/// Delete all unreachable objects, and mark the others unreachable again
-	void cleanUnreachable();
+	//
+	/// @return number of objects deleted
+	///
+	size_t cleanUnreachable();
 
 	ResList _resList;
 

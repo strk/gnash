@@ -23,10 +23,10 @@
 
 #include "GC.h"
 #include "builtin_function.h"
+#include "utility.h" // for typeName()
 
 #ifdef GNASH_GC_DEBUG
-# include "utility.h" // for typeName()
-# include "log.h"
+#include "log.h"
 #endif
 
 namespace gnash {
@@ -70,14 +70,13 @@ GC::~GC()
 #endif
 }
 
-void
+size_t
 GC::cleanUnreachable()
 {
-#ifdef GNASH_GC_DEBUG
 	size_t deleted = 0;
+
 #if (GNASH_GC_DEBUG > 1)
 	log_debug(_("GC %p: SWEEP SCAN"), (void*)this);
-#endif
 #endif
 
 	for (ResList::iterator i=_resList.begin(), e=_resList.end(); i!=e; )
@@ -106,6 +105,8 @@ GC::cleanUnreachable()
 			" resources marked as unreachable"),
 			(void*)this, deleted);
 #endif
+
+	return deleted;
 }
 
 void 
@@ -138,9 +139,7 @@ GC::collect()
 	markReachable();
 
 	// clean unreachable resources, and mark them others as reachable again
-	cleanUnreachable();
-
-	_lastResCount = curResSize;
+	_lastResCount = curResSize - cleanUnreachable();
 }
 
 void

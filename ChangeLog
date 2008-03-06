@@ -1,3 +1,8 @@
+2008-03-06 Sandro Santilli <strk@keybit.net>
+
+	* libbase/GC.{cpp,h}: ok not calling size() twice, but
+	  don't properly update the last managed resources count..
+
 2008-03-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/vm/ASHandlers.cpp: implement MbOrd for SWF6+ and utf-8,
