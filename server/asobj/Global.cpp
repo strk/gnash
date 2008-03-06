@@ -177,9 +177,8 @@ as_global_parsefloat(const fn_call& fn)
     
     std::istringstream s(fn.arg(0).to_string());
     
-    s >> result;
-    
-    if (s.tellg() == -1) {
+    if ( ! (s >> result)  )
+    {
         rv.set_nan();
         return rv;
     }
