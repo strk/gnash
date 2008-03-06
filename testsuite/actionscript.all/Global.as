@@ -363,15 +363,15 @@ check_equals(tmp.length, 2);
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 5
-	check_totals(79); // SWF5
+	check_totals(82); // SWF5
 #else
 # if OUTPUT_VERSION == 6
-	check_totals(113); // SWF6
+	check_totals(116); // SWF6
 # else
 #  if OUTPUT_VERSION == 7
-	check_totals(95); // SWF7
+	check_totals(98); // SWF7
 #  else
-	check_totals(82); // SWF8+
+	check_totals(85); // SWF8+
 #  endif
 # endif
 #endif
