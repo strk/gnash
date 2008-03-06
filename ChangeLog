@@ -1,5 +1,11 @@
 2008-03-06 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.cpp (markReachableResources): character mouse and
+	  key listeners also don't need to be scanned again as all left would
+	  be on stage.
+
+2008-03-06 Sandro Santilli <strk@keybit.net>
+
 	* server/fill_style.cpp: cast log arg to int, or boost::format will
 	  interpret as a character (string).
 	* server/movie_root.cpp (markReachableResources): don't mark live

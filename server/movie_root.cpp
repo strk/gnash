@@ -1017,9 +1017,6 @@ movie_root::advance()
 	// NOTE: can throw ActionLimitException
 	executeTimers();
 
-
-	cleanupUnloadedListeners();
-
 	// Process queued actions
 	// NOTE: can throw ActionLimitException
 	processActionQueue();
@@ -1035,6 +1032,9 @@ movie_root::advance()
 	// Delete characters removed from the stage
 	// from the display lists
 	cleanupDisplayList();
+
+	// Delete unloaded characters from the listeners set
+	cleanupUnloadedListeners();
 
 #ifdef GNASH_USE_GC
 	// Run the garbage collector (step back !!)
@@ -1564,11 +1564,13 @@ movie_root::markReachableResources() const
         }
     }
 
-    // Mark character key listeners
-    std::for_each(m_key_listeners.begin(), m_key_listeners.end(), boost::bind(&character::setReachable, _1));
+    // NOTE: cleanupUnloadedListeners should have cleaned up all unloaded key listeners 
+    //       the remaining ones should be marked by their parents
+    //std::for_each(m_key_listeners.begin(), m_key_listeners.end(), boost::bind(&character::setReachable, _1));
 
-    // Mark character mouse listeners
-    std::for_each(m_mouse_listeners.begin(), m_mouse_listeners.end(), boost::bind(&character::setReachable, _1));
+    // NOTE: cleanupUnloadedListeners should have cleaned up all unloaded mouse listeners 
+    //       the remaining ones should be marked by their parents
+    //std::for_each(m_mouse_listeners.begin(), m_mouse_listeners.end(), boost::bind(&character::setReachable, _1));
 
     // Mark global Key object
     if ( _keyobject ) _keyobject->setReachable();
