@@ -3,6 +3,9 @@
 	* server/vm/ASHandlers.cpp: fix mbchr to return a UTF-8 string;
 	  make sure both mbchr and chr handle characters only up to
 	  65535. Fixes behaviour for SWF6, 7, and 8.
+	* configure.ac: update version (flash compatibility) to 9,0,999 so
+	  that javascript flash detectors don't reject gnash (not helpful for
+	  implementing SWF9). 
 
 2008-03-04 Bastiaan Jacques <bastiaan@bjacques.org>
 

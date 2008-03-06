@@ -37,9 +37,9 @@ AM_COMPILER_LIB
 dnl Set the default values for Flash Version. These are converted into
 dnl various strings to make JavaScript or ActionScript detectors
 dnl recognize Gnash as a Flash Player.
-AC_DEFINE([DEFAULT_FLASH_MAJOR_VERSION], ["8"], [Default Flash major version])
+AC_DEFINE([DEFAULT_FLASH_MAJOR_VERSION], ["9"], [Default Flash major version])
 AC_DEFINE([DEFAULT_FLASH_MINOR_VERSION], ["0"], [Default Flash minor version])
-AC_DEFINE([DEFAULT_FLASH_REV_NUMBER], ["99"], [Default Flash revision number])
+AC_DEFINE([DEFAULT_FLASH_REV_NUMBER], ["999"], [Default Flash revision number])
 
 dnl TODO: use host/build/target -- whatever is more appropriate
 case "${host}" in
