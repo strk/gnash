@@ -1,3 +1,9 @@
+2008-03-06 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/String.as: fix expected results
+	  (could not handle to find a working comparison for multibyte
+	  chars in swf5).
+
 2008-03-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/actionscript.all/String.as: add tests for mbchr (should

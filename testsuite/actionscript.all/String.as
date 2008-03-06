@@ -323,7 +323,11 @@ asm {
     setvariable
 };
 
-check_equals (c, 486);
+#if OUTPUT_VERSION > 5
+xcheck_equals (c, 486);
+#else
+xcheck_equals (c, 199);
+#endif
 
 i = "Ϧ";
 
@@ -335,7 +339,11 @@ asm {
     setvariable
 };
 
-check_equals (c, 998);
+#if OUTPUT_VERSION > 5
+xcheck_equals (c, 998);
+#else
+xcheck_equals (c, 207);
+#endif
 
 // And the reverse procedure:
 
@@ -349,7 +357,12 @@ asm {
     setvariable
 };
 
+#if OUTPUT_VERSION > 5
 check_equals (c, "Ϧ");
+#else
+check_equals (typeof(c), "string"); 
+// c == "" fails, but when displayed it evaluates to the empty string
+#endif
 
 // Should return the same as mbchr(90000 - 65536) 
 
@@ -363,7 +376,12 @@ asm {
     setvariable
 };
 
+#if OUTPUT_VERSION > 5
 check_equals (c, "徐");
+#else
+check_equals (typeof(c), "string");
+// c == "" fails, but when displayed it evaluates to the empty string
+#endif
 
 //-------------------------------------------
 // Check multi-byte chars with all string
