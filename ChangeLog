@@ -1,5 +1,14 @@
 2008-03-06 Sandro Santilli <strk@keybit.net>
 
+	* server/button_character_instance.cpp, server/sprite_instance.cpp,
+	  server/video_stream_instance.cpp, server/asobj/NetConnection.cpp,
+	  server/asobj/NetStream.cpp, server/asobj/Sound.cpp,
+	  server/asobj/Stage.cpp, server/asobj/string.cpp,
+	  server/asobj/xmlnode.cpp:
+	  Further reduce builtin_function for native getter/setters.
+
+2008-03-06 Sandro Santilli <strk@keybit.net>
+
 	* server/: Property.{cpp,h}, PropertyList.{cpp,h},
 	  as_object.{cpp,h}:
 	  Add support for native getter-setters.

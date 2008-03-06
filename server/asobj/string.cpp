@@ -135,8 +135,7 @@ attachStringInterface(as_object& o)
 	o.init_member("substr", vm.getNative(251, 13));
 
 	// This isn't advertised as native, so might be a proper property ?
-	boost::intrusive_ptr<builtin_function> length_getter(new builtin_function(string_get_length));
-	o.init_readonly_property("length", *length_getter);
+	o.init_readonly_property("length", string_get_length);
 
 }
 

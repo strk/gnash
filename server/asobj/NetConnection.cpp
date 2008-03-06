@@ -394,12 +394,12 @@ NetConnection::attachNetConnectionInterface(as_object& o)
 void
 NetConnection::attachProperties()
 {
-	boost::intrusive_ptr<builtin_function> gettersetter;
+	as_c_function_ptr gettersetter;
 
-	gettersetter = new builtin_function(NetConnection::isConnected_getset, NULL);
+	gettersetter = NetConnection::isConnected_getset;
 	init_property("isConnected", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(NetConnection::uri_getset, NULL);
+	gettersetter = NetConnection::uri_getset;
 	init_property("uri", *gettersetter, *gettersetter);
 
 }

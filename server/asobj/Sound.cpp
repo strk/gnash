@@ -540,15 +540,15 @@ attachSoundInterface(as_object& o)
 
 	// Properties
 
-	boost::intrusive_ptr<builtin_function> gettersetter;
+	as_c_function_ptr gettersetter;
 
-	gettersetter = new builtin_function(&sound_duration, NULL);
+	gettersetter = &sound_duration;
 	o.init_readonly_property("duration", *gettersetter);
 
-	gettersetter = new builtin_function(&sound_ID3, NULL);
+	gettersetter = &sound_ID3;
 	o.init_property("ID3", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&sound_position, NULL);
+	gettersetter = &sound_position;
 	o.init_readonly_property("position", *gettersetter);
 
 }

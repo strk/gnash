@@ -355,6 +355,7 @@ XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout)
 void
 attachXMLNodeInterface(as_object& o)
 {
+    // These need to be full-featured AS functions (builtin_function)
     o.init_member("appendChild", new builtin_function(xmlnode_appendchild));
     o.init_member("cloneNode", new builtin_function(xmlnode_clonenode));
     o.init_member("hasChildNodes", new builtin_function(xmlnode_haschildnodes));
@@ -362,58 +363,36 @@ attachXMLNodeInterface(as_object& o)
     o.init_member("removeNode", new builtin_function(xmlnode_removenode));
     o.init_member("toString", new builtin_function(xmlnode_tostring));
 
-    // Properties - FIXME: use addProperty !
+    as_c_function_ptr gettersetter;
 
-    boost::intrusive_ptr<builtin_function> gettersetter;
-
-    gettersetter = new builtin_function(&xmlnode_nodevalue, NULL);
+    gettersetter = &xmlnode_nodevalue;
     o.init_property("nodeValue", *gettersetter, *gettersetter);
 
-    gettersetter = new builtin_function(&xmlnode_nodename, NULL);
+    gettersetter = &xmlnode_nodename;
     o.init_property("nodeName", *gettersetter, *gettersetter);
 
-    gettersetter = new builtin_function(&xmlnode_nodetype, NULL);
+    gettersetter = &xmlnode_nodetype;
     o.init_readonly_property("nodeType", *gettersetter);
 
-    gettersetter = new builtin_function(&xmlnode_attributes, NULL);
+    gettersetter = &xmlnode_attributes;
     o.init_readonly_property("attributes", *gettersetter);
 
-    // These two return an array of objects
-    gettersetter = new builtin_function(xmlnode_childNodes, NULL);
+    gettersetter = xmlnode_childNodes;
     o.init_readonly_property("childNodes", *gettersetter);
 
-    /// \fn MLNode::firstChild
-    /// \brief XMLNode::firstChild property
-    ///
-    /// Read-only property; evaluates the specified XML object and
-    /// references the first child in the parent node's child
-    /// list. This property is null if the node does not have
-    /// children. This property is undefined if the node is a text
-    /// node. This is a read-only property and cannot be used to
-    /// manipulate child nodes; use the appendChild(), insertBefore(),
-    /// and removeNode() methods to manipulate child nodes. 
-    gettersetter = new builtin_function(&xmlnode_firstchild, NULL);
+    gettersetter = &xmlnode_firstchild;
     o.init_readonly_property("firstChild", *gettersetter);
 
-    /// \fn MLNode::lastChild
-    /// \brief XMLNode::lastChild property 
-    ///
-    /// Read-only property; an XMLNode value that references the last
-    /// child in the node's child list. The XML.lastChild property
-    /// is null if the node does not have children. This property cannot
-    /// be used to manipulate child nodes; use the appendChild(),
-    /// insertBefore(), and removeNode() methods to manipulate child
-    /// nodes.
-    gettersetter = new builtin_function(&xmlnode_lastchild, NULL);
+    gettersetter = &xmlnode_lastchild;
     o.init_readonly_property("lastChild", *gettersetter);
 
-    gettersetter = new builtin_function(&xmlnode_nextsibling, NULL);
+    gettersetter = &xmlnode_nextsibling;
     o.init_readonly_property("nextSibling", *gettersetter);
 
-    gettersetter = new builtin_function(&xmlnode_previoussibling, NULL);
+    gettersetter = &xmlnode_previoussibling;
     o.init_readonly_property("previousSibling", *gettersetter);
 
-    gettersetter = new builtin_function(&xmlnode_parentNode, NULL);
+    gettersetter = &xmlnode_parentNode;
     o.init_readonly_property("parentNode", *gettersetter);
 
 }
@@ -655,7 +634,16 @@ xmlnode_attributes(const fn_call& fn)
     return as_value(ret); 
 }
 
-// Both a getter and a (do-nothing) setter for firstChild
+/// A getter and a (do-nothing) setter for XMLNode.firstChild property
+//
+/// Read-only property; evaluates the specified XML object and
+/// references the first child in the parent node's child
+/// list. This property is null if the node does not have
+/// children. This property is undefined if the node is a text
+/// node. This is a read-only property and cannot be used to
+/// manipulate child nodes; use the appendChild(), insertBefore(),
+/// and removeNode() methods to manipulate child nodes. 
+///
 static as_value
 xmlnode_firstchild(const fn_call& fn)
 {
@@ -672,7 +660,14 @@ xmlnode_firstchild(const fn_call& fn)
     return rv;
 }
 
-// Both a getter and a (do-nothing) setter for lastChild
+/// A getter and a (do-nothing) setter for XMLNode.lastChild
+//
+/// Read-only property; an XMLNode value that references the last
+/// child in the node's child list. The XML.lastChild property
+/// is null if the node does not have children. This property cannot
+/// be used to manipulate child nodes; use the appendChild(),
+/// insertBefore(), and removeNode() methods to manipulate child
+/// nodes.
 static as_value
 xmlnode_lastchild(const fn_call& fn)
 {

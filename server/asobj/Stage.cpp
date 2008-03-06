@@ -49,30 +49,37 @@ attachStageInterface(as_object& o)
 
 	if ( vm.getSWFVersion() < 6 ) return;
 
+	as_c_function_ptr getset;
+
 	// Stage.scaleMode getter-setter
-	vm.registerNative(stage_scalemode_getset, 666, 1);
-	vm.registerNative(stage_scalemode_getset, 666, 2);
-	o.init_property("scaleMode", *(vm.getNative(666,1)), *(vm.getNative(666,2)));
+	getset = stage_scalemode_getset;
+	vm.registerNative(getset, 666, 1);
+	vm.registerNative(getset, 666, 2);
+	o.init_property("scaleMode", getset, getset);
 
 	// Stage.align getter-setter
-	vm.registerNative(stage_align_getset, 666, 3);
-	vm.registerNative(stage_align_getset, 666, 4);
-	o.init_property("width", *(vm.getNative(666,3)), *(vm.getNative(666,4)));
+	getset = stage_align_getset;
+	vm.registerNative(getset, 666, 3);
+	vm.registerNative(getset, 666, 4);
+	o.init_property("width", getset, getset);
 
 	// Stage.width getter-setter
-	vm.registerNative(stage_width_getset, 666, 5);
-	vm.registerNative(stage_width_getset, 666, 6);
-	o.init_property("width", *(vm.getNative(666,5)), *(vm.getNative(666,6)));
+	getset = stage_width_getset;
+	vm.registerNative(getset, 666, 5);
+	vm.registerNative(getset, 666, 6);
+	o.init_property("width", getset, getset);
 
 	// Stage.height getter-setter
-	vm.registerNative(stage_height_getset, 666, 7);
-	vm.registerNative(stage_height_getset, 666, 8);
-	o.init_property("height", *(vm.getNative(666,7)), *(vm.getNative(666,8)));
+	getset = stage_height_getset;
+	vm.registerNative(getset, 666, 7);
+	vm.registerNative(getset, 666, 8);
+	o.init_property("height", getset, getset);
 
 	// Stage.showMenu getter-setter
-	vm.registerNative(stage_showMenu_getset, 666, 9);
-	vm.registerNative(stage_showMenu_getset, 666, 10);
-	o.init_property("showMenu", *(vm.getNative(666,9)), *(vm.getNative(666,10)));
+	getset = stage_showMenu_getset;
+	vm.registerNative(getset, 666, 9);
+	vm.registerNative(getset, 666, 10);
+	o.init_property("showMenu", getset, getset);
 
 }
 

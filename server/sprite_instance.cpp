@@ -1942,8 +1942,6 @@ attachMovieClipInterface(as_object& o)
 {
   int target_version = o.getVM().getSWFVersion();
 
-  boost::intrusive_ptr<builtin_function> gettersetter;
-
   // SWF5 or higher
   o.init_member("attachMovie", new builtin_function(sprite_attach_movie));
   o.init_member("play", new builtin_function(sprite_play));
@@ -1971,7 +1969,7 @@ attachMovieClipInterface(as_object& o)
   o.init_member("meth", new builtin_function(sprite_meth));
   o.init_member("enabled", true); // see MovieClip.as testcase
 
-  gettersetter = new builtin_function(&sprite_instance::lockroot_getset, NULL);
+  as_c_function_ptr gettersetter = &sprite_instance::lockroot_getset;
   o.init_property("_lockroot", *gettersetter, *gettersetter); // see MovieClip.as testcase
 
   if ( target_version  < 6 ) return;
@@ -2017,78 +2015,6 @@ attachMovieClipProperties(character& o)
   // Properties (TODO: move to appropriate SWF version section)
   //
   
-#if 0
-
-  boost::intrusive_ptr<builtin_function> gettersetter;
-
-  gettersetter = new builtin_function(&character::x_getset, NULL);
-  o.init_property("_x", *gettersetter, *gettersetter);
-
-  gettersetter = new builtin_function(&character::y_getset, NULL);
-  o.init_property("_y", *gettersetter, *gettersetter);
-
-  gettersetter = new builtin_function(&character::xscale_getset, NULL);
-  o.init_property("_xscale", *gettersetter, *gettersetter);
-
-  gettersetter = new builtin_function(&character::yscale_getset, NULL);
-  o.init_property("_yscale", *gettersetter, *gettersetter);
-
-  gettersetter = new builtin_function(&character::xmouse_get, NULL);
-  o.init_readonly_property("_xmouse", *gettersetter);
-
-  gettersetter = new builtin_function(&character::ymouse_get, NULL);
-  o.init_readonly_property("_ymouse", *gettersetter);
-
-  gettersetter = new builtin_function(&character::alpha_getset, NULL);
-  o.init_property("_alpha", *gettersetter, *gettersetter);
-
-  gettersetter = new builtin_function(&character::visible_getset, NULL);
-  o.init_property("_visible", *gettersetter, *gettersetter);
-
-  gettersetter = new builtin_function(&character::width_getset, NULL);
-  o.init_property("_width", *gettersetter, *gettersetter);
-
-  gettersetter = new builtin_function(&character::height_getset, NULL);
-  o.init_property("_height", *gettersetter, *gettersetter);
-
-  gettersetter = new builtin_function(&character::rotation_getset, NULL);
-  o.init_property("_rotation", *gettersetter, *gettersetter);
-
-  gettersetter = new builtin_function(&character::parent_getset, NULL);
-  o.init_property("_parent", *gettersetter, *gettersetter);
-
-  gettersetter = new builtin_function(&sprite_currentframe_get, NULL);
-  o.init_property("_currentframe", *gettersetter, *gettersetter);
-
-  gettersetter = new builtin_function(&sprite_totalframes_get, NULL);
-  o.init_property("_totalframes", *gettersetter, *gettersetter);
-
-  gettersetter = new builtin_function(&sprite_framesloaded_get, NULL);
-  o.init_property("_framesloaded", *gettersetter, *gettersetter);
-
-  gettersetter = new builtin_function(&character::target_getset, NULL);
-  o.init_property("_target", *gettersetter, *gettersetter);
-
-  gettersetter = new builtin_function(&character::name_getset, NULL);
-  o.init_property("_name", *gettersetter, *gettersetter);
-
-  gettersetter = new builtin_function(&sprite_droptarget_getset, NULL);
-  o.init_property("_droptarget", *gettersetter, *gettersetter);
-
-  gettersetter = new builtin_function(&sprite_url_getset, NULL);
-  o.init_property("_url", *gettersetter, *gettersetter);
-
-  gettersetter = new builtin_function(&sprite_highquality_getset, NULL);
-  o.init_property("_highquality", *gettersetter, *gettersetter);
-
-  gettersetter = new builtin_function(&sprite_focusrect_getset, NULL);
-  o.init_property("_focusrect", *gettersetter, *gettersetter);
-
-  gettersetter = new builtin_function(&sprite_soundbuftime_getset, NULL);
-  o.init_property("_soundbuftime", *gettersetter, *gettersetter);
-
-#else
-
   as_c_function_ptr gettersetter;
 
   gettersetter = character::x_getset;
@@ -2156,8 +2082,6 @@ attachMovieClipProperties(character& o)
 
   gettersetter = sprite_soundbuftime_getset;
   o.init_property("_soundbuftime", gettersetter, gettersetter);
-
-#endif
 
 }
 

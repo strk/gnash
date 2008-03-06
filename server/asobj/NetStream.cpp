@@ -407,27 +407,27 @@ attachNetStreamInterface(as_object& o)
 	// Properties
 	// TODO: attach to each instance rather then to the class ? check it ..
 
-	boost::intrusive_ptr<builtin_function> gettersetter;
+	as_c_function_ptr gettersetter;
 
-	gettersetter = new builtin_function(&netstream_time, NULL);
+	gettersetter = &netstream_time;
 	o.init_readonly_property("time", *gettersetter);
 
-	gettersetter = new builtin_function(&netstream_bytesloaded, NULL);
+	gettersetter = &netstream_bytesloaded;
 	o.init_readonly_property("bytesLoaded", *gettersetter);
 
-	gettersetter = new builtin_function(&netstream_bytestotal, NULL);
+	gettersetter = &netstream_bytestotal;
 	o.init_readonly_property("bytesTotal", *gettersetter);
 
-	gettersetter = new builtin_function(&netstream_currentFPS, NULL);
+	gettersetter = &netstream_currentFPS;
 	o.init_readonly_property("currentFps", *gettersetter);
 
-	gettersetter = new builtin_function(&netstream_bufferLength, NULL);
+	gettersetter = &netstream_bufferLength;
 	o.init_readonly_property("bufferLength", *gettersetter);
 
-	gettersetter = new builtin_function(&netstream_bufferTime, NULL);
+	gettersetter = &netstream_bufferTime;
 	o.init_readonly_property("bufferTime", *gettersetter);
 
-	gettersetter = new builtin_function(&netstream_liveDelay, NULL);
+	gettersetter = &netstream_liveDelay;
 	o.init_readonly_property("liveDelay", *gettersetter);
 
 }

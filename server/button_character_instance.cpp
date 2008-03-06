@@ -181,75 +181,52 @@ attachButtonInterface(as_object& o)
 {
 	//int target_version = o.getVM().getSWFVersion();
 
-	boost::intrusive_ptr<builtin_function> gettersetter;
+	as_c_function_ptr gettersetter;
 
 	//
 	// Properties (TODO: move to appropriate SWF version section)
 	//
 
-	gettersetter = new builtin_function(&character::x_getset, NULL);
+	gettersetter = &character::x_getset;
 	o.init_property("_x", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&character::y_getset, NULL);
+	gettersetter = &character::y_getset;
 	o.init_property("_y", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&character::xscale_getset, NULL);
+	gettersetter = &character::xscale_getset;
 	o.init_property("_xscale", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&character::yscale_getset, NULL);
+	gettersetter = &character::yscale_getset;
 	o.init_property("_yscale", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&character::xmouse_get, NULL);
+	gettersetter = &character::xmouse_get;
 	o.init_readonly_property("_xmouse", *gettersetter);
 
-	gettersetter = new builtin_function(&character::ymouse_get, NULL);
+	gettersetter = &character::ymouse_get;
 	o.init_readonly_property("_ymouse", *gettersetter);
 
-	gettersetter = new builtin_function(&character::alpha_getset, NULL);
+	gettersetter = &character::alpha_getset;
 	o.init_property("_alpha", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&character::visible_getset, NULL);
+	gettersetter = &character::visible_getset;
 	o.init_property("_visible", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&character::width_getset, NULL);
+	gettersetter = &character::width_getset;
 	o.init_property("_width", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&character::height_getset, NULL);
+	gettersetter = &character::height_getset;
 	o.init_property("_height", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&character::rotation_getset, NULL);
+	gettersetter = &character::rotation_getset;
 	o.init_property("_rotation", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&character::parent_getset, NULL);
+	gettersetter = &character::parent_getset;
 	o.init_property("_parent", *gettersetter, *gettersetter);
 	
-	gettersetter = new builtin_function(&character::target_getset, NULL);
+	gettersetter = &character::target_getset;
 	o.init_property("_target", *gettersetter, *gettersetter);
 	
-
-#if 0
-	gettersetter = new builtin_function(&character::onrollover_getset, NULL);
-	o.init_property("onRollOver", *gettersetter, *gettersetter);
-
-	gettersetter = new builtin_function(&character::onrollout_getset, NULL);
-	o.init_property("onRollOut", *gettersetter, *gettersetter);
-
-	gettersetter = new builtin_function(&character::onpress_getset, NULL);
-	o.init_property("onPress", *gettersetter, *gettersetter);
-
-	gettersetter = new builtin_function(&character::onrelease_getset, NULL);
-	o.init_property("onRelease", *gettersetter, *gettersetter);
-
-	gettersetter = new builtin_function(&character::onreleaseoutside_getset, NULL);
-	o.init_property("onReleaseOutside", *gettersetter, *gettersetter);
-
-	gettersetter = new builtin_function(&character::onload_getset, NULL);
-	o.init_property("onLoad", *gettersetter, *gettersetter);
-#endif
-
-	//--
-
-	gettersetter = new builtin_function(&button_character_instance::enabled_getset, NULL);
+	gettersetter = &button_character_instance::enabled_getset;
 	o.init_property("enabled", *gettersetter, *gettersetter);
 
 }
