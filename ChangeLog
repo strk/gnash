@@ -1,5 +1,13 @@
 2008-03-06 Sandro Santilli <strk@keybit.net>
 
+	* server/fill_style.cpp: cast log arg to int, or boost::format will
+	  interpret as a character (string).
+	* server/movie_root.cpp (markReachableResources): don't mark live
+	  chars as reachable, as they should be marked by their parent
+	  already (was a TODO item).
+
+2008-03-06 Sandro Santilli <strk@keybit.net>
+
 	* libbase/GC.{cpp,h}: ok not calling size() twice, but
 	  don't properly update the last managed resources count..
 

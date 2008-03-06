@@ -1579,20 +1579,10 @@ movie_root::markReachableResources() const
     // Mark character being dragged, if any
     m_drag_state.markReachableResources();
 
-    // TODO: we should theoretically NOT need to mark _liveChars here
-    //   as any element in this list should be NOT unloaded and
-    //   thus marked as reachable by it's parent or properly unloaded
-    //   and thus removed from this list by cleanupDisplayList.
-    //   Due to some bug I'm researching on, we'll mark them for now...
-    //   See http://savannah.gnu.org/bugs/index.php?21070
-    //
-    //log_debug("Marking %d live chars", _liveChars.size());
-    for (LiveChars::const_iterator i=_liveChars.begin(), e=_liveChars.end();
-            i != e; ++i)
-    {
-        (*i)->setReachable();
-    }
-    
+    // NOTE: we don't need to mark _liveChars as any elements in that list
+    //       should be NOT unloaded and thus marked as reachable by their
+    //       parent.
+    //std::for_each(_liveChars.begin(), _liveChars.end(), boost::bind(&character::setReachable, _1));
     
 }
 #endif // GNASH_USE_GC

@@ -339,7 +339,7 @@ fill_style::sample_gradient(boost::uint8_t ratio) const
 				"have position==%d (expected 0)."
 				" This seems to be common, so will"
 				" warn only once."),
-			        m_gradients[0].m_ratio);
+			        (int)m_gradients[0].m_ratio);
 			warned=true;
 			}
 		);
