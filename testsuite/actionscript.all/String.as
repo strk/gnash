@@ -324,7 +324,7 @@ asm {
 };
 
 #if OUTPUT_VERSION > 5
-xcheck_equals (c, 486);
+check_equals (c, 486);
 #else
 xcheck_equals (c, 199);
 #endif
@@ -340,7 +340,7 @@ asm {
 };
 
 #if OUTPUT_VERSION > 5
-xcheck_equals (c, 998);
+check_equals (c, 998);
 #else
 xcheck_equals (c, 207);
 #endif
