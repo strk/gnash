@@ -1,3 +1,8 @@
+2008-03-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/vm/ASHandlers.cpp: implement MbOrd for SWF6+ and utf-8,
+	  clean up the other chr and ord functions a bit.
+
 2008-03-06 Sandro Santilli <strk@keybit.net>
 
 	* libbase/GC.cpp: minor thing, don't call std::list::size() twice each

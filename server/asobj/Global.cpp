@@ -180,8 +180,8 @@ as_global_parsefloat(const fn_call& fn)
     if ( ! (s >> result)  )
     {
         rv.set_nan();
-        return rv;
-    }
+        return rv;   
+    }    
 
     rv = static_cast<double>(result);
     return rv;

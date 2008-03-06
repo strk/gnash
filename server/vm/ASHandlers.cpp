@@ -1636,7 +1636,7 @@ SWFHandlers::ActionMbLength(ActionExec& thread)
     {
         int length;
         std::vector<int> unused;
-	unused.resize(str.length()+1);
+	    unused.resize(str.length()+1);
         (void) GuessEncoding(str, length, unused);
         env.top(0).set_int(length);
     }
@@ -1672,38 +1672,32 @@ SWFHandlers::ActionChr(ActionExec& thread)
 
     // If the argument to chr() is '0', we return
     // nothing, not NULL
-    if (c == 0) env.top(0).set_string("");
-    
-    else
+    if (c == 0)
     {
+        env.top(0).set_string("");
+        return;
+    }
+    
+    if (env.get_version() > 5)
+    {
+        env.top(0).set_string(utf8::encodeUnicodeCharacter(c));
+        return;
+    }
 
-        int version = env.get_version();
-
-        std::wstring ret = L"";
-        
-        if (version > 5) ret.push_back(static_cast<wchar_t>(c));
-
+    // SWF 5 only:
 	// This casts to unsigned char to a string, giving
 	// IS0-8859-1 8-bit characters.
 	// Values above 256 evaluate to value % 256, 
-	// which is expected behaviour.
-        else
-        {
-            unsigned char uc = static_cast<unsigned char>(c);
-            if (uc == 0)
-            {
-                env.top(0).set_string("");
-                return;
-            }
-            else
-            {
-                ret.push_back(uc);
-            }
-        }
-
-        env.top(0).set_string(utf8::encodeCanonicalString(ret, version));
-
+	// through the cast, which is expected behaviour.
+    const unsigned char uc = static_cast<unsigned char>(c);
+    if (uc == 0)
+    {
+        env.top(0).set_string("");
+        return;
     }
+    std::string s;
+    s.push_back(uc);
+    env.top(0).set_string(s);
 }
 
 void
@@ -1790,11 +1784,30 @@ SWFHandlers::ActionMbSubString(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionMbOrd(ActionExec& /*thread*/)
+SWFHandlers::ActionMbOrd(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-//    as_environment& env = thread.env;
-    log_unimpl (__PRETTY_FUNCTION__);
+    /// This only deals with UTF-8 characters.
+    /// TODO: what else is possible?
+    /// TODO: fix for SWF5
+
+    as_environment& env = thread.env;
+
+    if (env.get_version() == 5)
+    {
+        log_unimpl("Not properly implemented for SWF5");
+        // No need to return - it works a bit.
+    }
+
+    thread.ensureStack(1);
+
+    const std::string s = env.top(0).to_string();
+    
+    std::string::const_iterator it = s.begin();
+    
+    boost::uint32_t out = utf8::decodeNextUnicodeCharacter(it);
+    
+    /// Always valid, or can it be undefined?
+    env.top(0).set_int(out);
 }
 
 void
@@ -1803,7 +1816,15 @@ SWFHandlers::ActionMbChr(ActionExec& thread)
     /// This only generates UTF-8 characters. No idea
     /// what difference user locale might make, but UTF-8
     /// is generally GOOD.
+    
+    /// TODO: fix for SWF5
     as_environment& env = thread.env;
+    
+    if (env.get_version() == 5)
+    {
+        log_unimpl("Not properly implemented for SWF5");
+        // No need to return.
+    }
 
     thread.ensureStack(1);
 
