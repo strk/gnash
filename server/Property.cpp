@@ -25,26 +25,13 @@ namespace gnash {
 as_value
 Property::getDelayedValue(const as_object& this_ptr) const
 {
-	const as_accessors* a = boost::get<const as_accessors>(&mBound);
-
-	// Don't recursively invoke a getter
-	//
-	// NOTE: it seems recursion protection is handled differently
-	//       when the SWF is targetted at player 7 or higher.
-	//       See actionscript.all/Object.as
-	//
-	as_accessors::ScopedLock lock(*a);
-	if ( ! lock.obtained() )
-	{
-		return a->underlyingValue;
-	}
+	const GetterSetter* a = boost::get<const GetterSetter>(&mBound);
 
 	as_environment env;
 	fn_call fn(const_cast<as_object*>(&this_ptr), &env, 0, 0);
 	if (mDestructive)
 	{
-		as_function *f = a->mGetter;
-		as_value ret = (*f)(fn);
+		as_value ret = a->get(fn);
 		// The getter might have called the setter, and we should not override.
 		if (mDestructive)
 		{
@@ -53,49 +40,20 @@ Property::getDelayedValue(const as_object& this_ptr) const
 		}
 		return ret;
 	}
-	return (*a->mGetter)(fn);
+	return a->get(fn);
 
-	as_value v;	
-	VM::get().getMachine()->immediateFunction(a->mGetter, 
-		const_cast<as_object*>(&this_ptr),	v, 0, 0);
-	if (mDestructive)
-	{
-		((boundType) mBound) = v;
-		mDestructive = false;
-	}
-	return v;
 }
 
 void
 Property::setDelayedValue(as_object& this_ptr, const as_value& value)
 {
-	as_accessors* a = boost::get<as_accessors>(&mBound);
-
-	// Don't recursively invoke a setter
-	//
-	// NOTE: it seems recursion protection is handled differently
-	//       when the SWF is targetted at player 7 or higher.
-	//       In particular, it is not avoided unless the setter
-	//       calls self.. See actionscript.all/Object.as
-	//
-	as_accessors::ScopedLock lock(*a);
-	if ( ! lock.obtained() )
-	{
-		a->underlyingValue = value;
-		return;
-	}
-
+	GetterSetter* a = boost::get<GetterSetter>(&mBound);
 
 	as_environment env;
-	env.push(value);
+	env.push(value); 
 	fn_call fn(&this_ptr, &env, 1, 0);
-	(*a->mSetter)(fn);
+	a->set(fn);
 
-	return;
-
-	// TODO: Push value
-	VM::get().getMachine()->immediateProcedure(a->mSetter,
-		const_cast<as_object*>(&this_ptr), 1, 0);
 }
 
 void
@@ -103,10 +61,11 @@ Property::setSetter(as_function* func)
 {
 	if (isGetterSetter())
 	{
-		boost::get<as_accessors>(&mBound)->mSetter = func;
+		GetterSetter* a = boost::get<GetterSetter>(&mBound);
+		a->setSetter(func);
 	}
 	else
-		mBound = as_accessors(NULL, func);
+		mBound = GetterSetter(NULL, func);
 }
 
 void
@@ -114,10 +73,11 @@ Property::setGetter(as_function* func)
 {
 	if (isGetterSetter())
 	{
-		boost::get<as_accessors>(&mBound)->mGetter = func;
+		GetterSetter* a = boost::get<GetterSetter>(&mBound);
+		a->setGetter(func);
 	}
 	else
-		mBound = as_accessors(func, NULL);
+		mBound = GetterSetter(func, NULL);
 }
 
 void
@@ -134,7 +94,7 @@ Property::setReachable() const
 	}
 	case 2: // Getter/setter
 	{
-		const as_accessors& a = boost::get<as_accessors>(mBound);
+		const GetterSetter& a = boost::get<GetterSetter>(mBound);
 		a.markReachableResources();
 		break;
 	}
@@ -145,11 +105,37 @@ Property::setReachable() const
 }
 
 void
-as_accessors::markReachableResources() const
+GetterSetter::UserDefinedGetterSetter::markReachableResources() const
 {
 	if (mGetter) mGetter->setReachable();
 	if (mSetter) mSetter->setReachable();
 	underlyingValue.setReachable();
+}
+
+as_value
+GetterSetter::UserDefinedGetterSetter::get(fn_call& fn) const
+{
+	ScopedLock lock(*this);
+	if ( ! lock.obtained() )
+	{
+		return underlyingValue;
+	}
+
+	if ( mGetter ) return (*mGetter)(fn);
+	else return as_value();
+}
+
+void
+GetterSetter::UserDefinedGetterSetter::set(fn_call& fn)
+{
+	ScopedLock lock(*this);
+	if ( ! lock.obtained() )
+	{
+		underlyingValue = fn.arg(0);
+		return;
+	}
+
+	if ( mSetter ) (*mSetter)(fn);
 }
 
 } // namespace gnash

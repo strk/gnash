@@ -1,5 +1,15 @@
 2008-03-06 Sandro Santilli <strk@keybit.net>
 
+	* server/: Property.{cpp,h}, PropertyList.{cpp,h},
+	  as_object.{cpp,h}:
+	  Add support for native getter-setters.
+	* server/sprite_instance.cpp: use native getter-setters
+	  for sprite properties.
+	* server/vm/Machine.cpp: don't assume a getter setter is
+	  always implemented using an as_function.
+
+2008-03-06 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/Global.cpp: cast istringstream to bool as a way
 	  to detect errors, tellg() == -1 was ambiguos.
 	* testsuite/actionscript.all/String.as: fix expected results

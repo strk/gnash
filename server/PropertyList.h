@@ -284,6 +284,27 @@ public:
 		as_function& setter, string_table::key ns = 0);
 
 	/// \brief
+	/// Add a getter/setter property, if not already existing
+	/// (or should we allow override ?)
+	//
+	/// @param key
+	///	Name of the property. Search is case-*sensitive*
+	///
+	/// @param getter
+	///	A function to invoke when this property value is requested.
+	///	add_ref will be called on the function.
+	///
+	/// @param setter
+	///	A function to invoke when setting this property's value.
+	///	add_ref will be called on the function.
+	///
+	/// @return true if the property was successfully added, false
+	///         otherwise (property already existent?)
+	///
+	bool addGetterSetter(string_table::key key, as_c_function_ptr getter,
+		as_c_function_ptr setter, string_table::key ns = 0);
+
+	/// \brief
 	/// Add a destructive getter/setter property, if not already extant.
 	///
 	/// @param key

@@ -339,6 +339,36 @@ public:
 		string_table::key nsname = 0);
 
 	/// \brief
+	/// Initialize a getter/setter property by name
+	//
+	/// This is just a wrapper around the other init_property method
+	/// used as a trampoline to avoid changing all classes to 
+	/// use string_table::key directly.
+	///
+	/// @param key
+	///     Name of the property.
+	///	Will be converted to lowercase if VM is initialized for SWF6 or lower.
+	///
+	/// @param getter
+	///	A function to invoke when this property value is requested.
+	///	add_ref will be called on the function.
+	///
+	/// @param setter
+	///	A function to invoke when setting this property's value.
+	///	add_ref will be called on the function.
+	///
+	/// @param flags
+	///     Flags for the new member. By default dontDelete and dontEnum.
+	///	See as_prop_flags::Flags.
+	///
+	/// @param nsname
+	/// The id of the namespace to which this member belongs. 0 is a wildcard
+	/// and will be matched by anything not asking for a specific namespace.
+	void init_property(const std::string& key, as_c_function_ptr getter,
+		as_c_function_ptr setter, int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
+		string_table::key nsname = 0);
+
+	/// \brief
 	/// Initialize a getter/setter property by key
 	//
 	/// This method has to be used by built-in classes initialization
@@ -365,6 +395,35 @@ public:
 	/// and will be matched by anything not asking for a specific namespace.
 	void init_property(string_table::key key, as_function& getter,
 		as_function& setter, int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
+		string_table::key nsname = 0);
+
+	/// \brief
+	/// Initialize a getter/setter property by key
+	//
+	/// This method has to be used by built-in classes initialization
+	/// (VM initialization in general) as will avoid to scan the
+	/// inheritance chain.
+	///
+	/// @param key
+	///     Key of the property.
+	///
+	/// @param getter
+	///	A function to invoke when this property value is requested.
+	///	add_ref will be called on the function.
+	///
+	/// @param setter
+	///	A function to invoke when setting this property's value.
+	///	add_ref will be called on the function.
+	///
+	/// @param flags
+	///     Flags for the new member. By default dontDelete and dontEnum.
+	///	See as_prop_flags::Flags.
+	///
+	/// @param nsname
+	/// The id of the namespace to which this member belongs. 0 is a wildcard
+	/// and will be matched by anything not asking for a specific namespace.
+	void init_property(string_table::key key, as_c_function_ptr getter,
+		as_c_function_ptr setter, int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
 		string_table::key nsname = 0);
 
 
@@ -415,6 +474,24 @@ public:
 	/// The id of the namespace to which this member belongs. 0 is a wildcard
 	/// and will be matched by anything not asking for a specific namespace.
 	void init_readonly_property(const std::string& key, as_function& getter,
+			int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
+			string_table::key nsname = 0);
+
+	/// \brief
+	/// Use this method for read-only properties.
+	//
+	/// This method achieves the same as the above init_property method.
+	/// Additionally, it sets the property as read-only so that a default
+	/// handler will be triggered when ActionScript attempts to set the
+	/// property.
+	/// 
+	/// The arguments are the same as the above init_property arguments,
+	/// although the setter argument is omitted.
+	///
+	/// @param nsname
+	/// The id of the namespace to which this member belongs. 0 is a wildcard
+	/// and will be matched by anything not asking for a specific namespace.
+	void init_readonly_property(const std::string& key, as_c_function_ptr getter,
 			int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
 			string_table::key nsname = 0);
 
@@ -782,6 +859,29 @@ public:
 	///
 	bool add_property(const std::string& key, as_function& getter,
 		as_function& setter);
+
+	/// \brief
+	/// Add a getter/setter property, if no member already has
+	/// that name (or should we allow override ? TODO: check this)
+	//
+	/// @param key
+	///     Name of the property.
+	///	Case insensitive up to SWF6,
+	///	case *sensitive* from SWF7 up.
+	///
+	/// @param getter
+	///	A function to invoke when this property value is requested.
+	///	add_ref will be called on the function.
+	///
+	/// @param setter
+	///	A function to invoke when setting this property's value.
+	///	add_ref will be called on the function.
+	///
+	/// @return true if the property was successfully added, false
+	///         otherwise (property already existent?)
+	///
+	bool add_property(const std::string& key, as_c_function_ptr getter,
+		as_c_function_ptr setter);
 
 	/// Return this object '__proto__' member.
 	//

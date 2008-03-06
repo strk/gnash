@@ -364,6 +364,34 @@ PropertyList::addGetterSetter(string_table::key key, as_function& getter,
 }
 
 bool
+PropertyList::addGetterSetter(string_table::key key, as_c_function_ptr getter,
+	as_c_function_ptr setter, string_table::key nsId)
+{
+	Property a(key, nsId, getter, setter);
+	a.setOrder(- ++mDefaultOrder - 1);
+
+	container::iterator found = iterator_find(_props, key, nsId);
+	if (found != _props.end())
+	{
+		// copy flags from previous member (even if it's a normal member ?)
+		as_prop_flags& f = a.getFlags();
+		f = found->getFlags();
+
+		_props.replace(found, a);
+		assert ( iterator_find(_props, key, nsId) != _props.end() );
+
+	}
+	else
+	{
+		_props.insert(a);
+        	assert ( iterator_find(_props, key, nsId) != _props.end() );
+	}
+
+
+	return true;
+}
+
+bool
 PropertyList::addDestructiveGetterSetter(string_table::key key,
 	as_function& getter, as_function& setter, string_table::key nsId)
 {

@@ -33,62 +33,187 @@
 
 namespace gnash {
 
+typedef as_value (*as_c_function_ptr)(const fn_call& fn);
+
 class as_function;
 class PropertyList;
 
-/// Simple Holder for getter/setter functions
-class as_accessors
+/// Holder for getter/setter functions
+//
+/// Getter setter can be user-defined or native ones.
+/// This class abstracts the two.
+///
+class GetterSetter
 {
 public:
 
-	/// For SWF6 (not higher) a setter would not be invoked
-	/// while being set. This ScopedLock helps marking a
-	/// Getter-Setter as being invoked in an exception-safe
-	/// manner.
-	class ScopedLock {
-		const as_accessors& a;
-		bool obtainedLock;
-
-		ScopedLock(ScopedLock&);
-		ScopedLock& operator==(ScopedLock&);
-	public:
-
-		ScopedLock(const as_accessors& na) : a(na)
-		{
-			if ( a.beingAccessed ) obtainedLock=false;
-			else {
-				a.beingAccessed = true;
-				obtainedLock = true;
-			}
-		}
-
-		~ScopedLock() { if ( obtainedLock) a.beingAccessed = false; }
-
-		/// Return true if the lock was obtained
-		//
-		/// If false is returned, we're being called recursively,
-		/// which means we should set the underlyingValue instead
-		/// of calling the setter (for SWF6, again).
-		///
-		bool obtained() const { return obtainedLock; }
-	};
-
-	friend class ScopedLock;
-
-	as_function* mGetter;
-	as_function* mSetter;
-
-	as_value underlyingValue;
-
-	as_accessors(as_function* getter, as_function* setter) : mGetter(getter),
-		mSetter(setter), underlyingValue(), beingAccessed(false)
+	/// Construct a user-defined getter-setter
+	GetterSetter(as_function* getter, as_function* setter)
+		:
+		_getset(UserDefinedGetterSetter(getter, setter))
 	{/**/}
 
-	void markReachableResources() const;
+	/// Construct a native getter-setter
+	GetterSetter(as_c_function_ptr getter, as_c_function_ptr setter)
+		:
+		_getset(NativeGetterSetter(getter, setter))
+	{/**/}
+
+	/// Invoke the getter
+	as_value get(fn_call& fn) const
+	{
+		switch ( _getset.which() )
+		{
+			case 0: // user-defined
+				return boost::get<UserDefinedGetterSetter>(_getset).get(fn);
+				break;
+			case 1: // native 
+				return boost::get<NativeGetterSetter>(_getset).get(fn);
+				break;
+		}
+		return as_value(); // not reached (TODO: log error ? assert ?)
+	}
+
+	/// Invoke the setter
+	void set(fn_call& fn)
+	{
+		switch ( _getset.which() )
+		{
+			case 0: // user-defined
+				boost::get<UserDefinedGetterSetter>(_getset).set(fn);
+				break;
+			case 1: // native 
+				boost::get<NativeGetterSetter>(_getset).set(fn);
+				break;
+		}
+	}
+
+	/// Set a user-defined getter
+	void setGetter(as_function* fun)
+	{
+		if ( _getset.which() == 0 )
+		{
+			boost::get<UserDefinedGetterSetter>(_getset).setGetter(fun);
+		}
+	}
+
+	/// Set a user-defined setter
+	void setSetter(as_function* fun)
+	{
+		if ( _getset.which() == 0 )
+		{
+			boost::get<UserDefinedGetterSetter>(_getset).setSetter(fun);
+		}
+	}
+
+	void markReachableResources() const
+	{
+		if ( _getset.which() == 0 )
+		{
+			boost::get<UserDefinedGetterSetter>(_getset).markReachableResources();
+		}
+	}
 
 private:
 
-	mutable bool beingAccessed;
+	/// User-defined getter/setter
+	class UserDefinedGetterSetter {
+	public:
+		UserDefinedGetterSetter(as_function* get, as_function* set)
+			:
+			mGetter(get),
+			mSetter(set),
+			underlyingValue(),
+			beingAccessed(false)
+		{}
+
+		/// Invoke the getter
+		as_value get(fn_call& fn) const;
+
+		/// Invoke the setter
+		void set(fn_call& fn);
+
+		/// Set the setter
+		void setSetter(as_function* setter) { mSetter = setter; }
+
+		/// Set the getter
+		void setGetter(as_function* getter) { mGetter = getter; }
+
+		void markReachableResources() const;
+
+	private:
+		as_function* mGetter;
+		as_function* mSetter;
+
+		as_value underlyingValue;
+
+		mutable bool beingAccessed;
+
+		/// For SWF6 (not higher) a user-defined getter-setter would not be invoked
+		/// while being set. This ScopedLock helps marking a
+		/// Getter-Setter as being invoked in an exception-safe
+		/// manner.
+		class ScopedLock {
+			const UserDefinedGetterSetter& a;
+			bool obtainedLock;
+
+			ScopedLock(ScopedLock&);
+			ScopedLock& operator==(ScopedLock&);
+		public:
+
+			ScopedLock(const UserDefinedGetterSetter& na) : a(na)
+			{
+				if ( a.beingAccessed ) obtainedLock=false;
+				else {
+					a.beingAccessed = true;
+					obtainedLock = true;
+				}
+			}
+
+			~ScopedLock() { if ( obtainedLock) a.beingAccessed = false; }
+
+			/// Return true if the lock was obtained
+			//
+			/// If false is returned, we're being called recursively,
+			/// which means we should set the underlyingValue instead
+			/// of calling the setter (for SWF6, again).
+			///
+			bool obtained() const { return obtainedLock; }
+		};
+
+		friend class ScopedLock;
+
+	};
+
+	/// Native GetterSetter
+	class NativeGetterSetter {
+
+	public:
+
+		NativeGetterSetter(as_c_function_ptr get, as_c_function_ptr set)
+			:
+			cGetter(get), cSetter(set) {}
+
+		/// Invoke the getter
+		as_value get(fn_call& fn) const
+		{
+			return cGetter(fn);
+		}
+
+		/// Invoke the setter
+		void set(fn_call& fn)
+		{
+			cSetter(fn);
+		}
+
+	private:
+
+		as_c_function_ptr cGetter;
+
+		as_c_function_ptr cSetter;
+	};
+
+	boost::variant<UserDefinedGetterSetter, NativeGetterSetter> _getset;
 
 };
 
@@ -102,7 +227,8 @@ private:
 	as_prop_flags _flags;
 
 	// Store the various types of things that can be held.
-	typedef boost::variant<boost::blank, as_value, as_accessors> boundType;
+	typedef boost::variant<boost::blank, as_value, GetterSetter> boundType;
+
 	// Changing this doesn't change the identity of the property, so it is
 	// mutable.
 	mutable boundType mBound;
@@ -160,17 +286,30 @@ public:
 	Property(string_table::key name, string_table::key nsId,
 		as_function *getter, as_function *setter, 
 		const as_prop_flags& flags, bool destroy = false) :
-		_flags(flags), mBound(as_accessors(getter, setter)),
+		_flags(flags), mBound(GetterSetter(getter, setter)),
 		mDestructive(destroy), mName(name), mNamespace(nsId),
 		mOrderId(0)
 	{/**/}
 
 	Property(string_table::key name, string_table::key nsId,
 		as_function *getter, as_function *setter, bool destroy = false) :
-		_flags(), mBound(as_accessors(getter, setter)), mDestructive(destroy),
+		_flags(), mBound(GetterSetter(getter, setter)), mDestructive(destroy),
 		mName(name), mNamespace(nsId),
 		mOrderId(0)
 	{/**/}
+
+	Property(string_table::key name, string_table::key nsId,
+		as_c_function_ptr getter, as_c_function_ptr setter, bool destroy = false) :
+		_flags(), mBound(GetterSetter(getter, setter)), mDestructive(destroy),
+		mName(name), mNamespace(nsId),
+		mOrderId(0)
+	{/**/}
+
+	/// Set a user-defined setter
+	void setSetter(as_function* fun);
+
+	/// Set a user-defined getter
+	void setGetter(as_function* fun);
 
 	/// accessor to the properties flags
 	const as_prop_flags& getFlags() const { return _flags; }
@@ -253,18 +392,6 @@ public:
 
 	/// Get the order id
 	int getOrder() const { return mOrderId; }
-
-	/// Set the setter
-	void setSetter(as_function*);
-	/// Get the setter, throws if not a getter/setter
-	as_function *getSetter()
-	{ return boost::get<as_accessors>(mBound).mSetter; }
-
-	/// Set the getter
-	void setGetter(as_function*);
-	/// Get the getter, throws if not a getter/setter
-	as_function *getGetter()
-	{ return boost::get<as_accessors>(mBound).mGetter; }
 
 	/// is this a read-only member ?
 	bool isReadOnly() const { return _flags.get_read_only(); }

@@ -2008,8 +2008,6 @@ attachMovieClipProperties(character& o)
 {
   //int target_version = o.getVM().getSWFVersion();
 
-  boost::intrusive_ptr<builtin_function> gettersetter;
-
   // This is a normal property, can be overridden, deleted and enumerated
   // See swfdec/test/trace/movieclip-version-#.swf for why we only initialize this
   // if we don't have a parent
@@ -2019,6 +2017,10 @@ attachMovieClipProperties(character& o)
   // Properties (TODO: move to appropriate SWF version section)
   //
   
+#if 0
+
+  boost::intrusive_ptr<builtin_function> gettersetter;
+
   gettersetter = new builtin_function(&character::x_getset, NULL);
   o.init_property("_x", *gettersetter, *gettersetter);
 
@@ -2085,24 +2087,76 @@ attachMovieClipProperties(character& o)
   gettersetter = new builtin_function(&sprite_soundbuftime_getset, NULL);
   o.init_property("_soundbuftime", *gettersetter, *gettersetter);
 
-#if 0
-  gettersetter = new builtin_function(&character::onrollover_getset, NULL);
-  o.init_property("onRollOver", *gettersetter, *gettersetter);
+#else
 
-  gettersetter = new builtin_function(&character::onrollout_getset, NULL);
-  o.init_property("onRollOut", *gettersetter, *gettersetter);
+  as_c_function_ptr gettersetter;
 
-  gettersetter = new builtin_function(&character::onload_getset, NULL);
-  o.init_property("onLoad", *gettersetter, *gettersetter);
+  gettersetter = character::x_getset;
+  o.init_property("_x", gettersetter, gettersetter);
 
-  gettersetter = new builtin_function(&character::onmouseup_getset, NULL);
-  o.init_property("onMouseUp", *gettersetter, *gettersetter);
+  gettersetter = character::y_getset;
+  o.init_property("_y", gettersetter, gettersetter);
 
-  gettersetter = new builtin_function(&character::onmousedown_getset, NULL);
-  o.init_property("onMouseDown", *gettersetter, *gettersetter);
+  gettersetter = character::xscale_getset;
+  o.init_property("_xscale", gettersetter, gettersetter);
 
-  gettersetter = new builtin_function(&character::onmousemove_getset, NULL);
-  o.init_property("onMouseMove", *gettersetter, *gettersetter);
+  gettersetter = character::yscale_getset;
+  o.init_property("_yscale", gettersetter, gettersetter);
+
+  gettersetter = character::xmouse_get;
+  o.init_readonly_property("_xmouse", gettersetter);
+
+  gettersetter = character::ymouse_get;
+  o.init_readonly_property("_ymouse", gettersetter);
+
+  gettersetter = character::alpha_getset;
+  o.init_property("_alpha", gettersetter, gettersetter);
+
+  gettersetter = character::visible_getset;
+  o.init_property("_visible", gettersetter, gettersetter);
+
+  gettersetter = character::width_getset;
+  o.init_property("_width", gettersetter, gettersetter);
+
+  gettersetter = character::height_getset;
+  o.init_property("_height", gettersetter, gettersetter);
+
+  gettersetter = character::rotation_getset;
+  o.init_property("_rotation", gettersetter, gettersetter);
+
+  gettersetter = character::parent_getset;
+  o.init_property("_parent", gettersetter, gettersetter);
+
+  gettersetter = sprite_currentframe_get;
+  o.init_property("_currentframe", gettersetter, gettersetter);
+
+  gettersetter = sprite_totalframes_get;
+  o.init_property("_totalframes", gettersetter, gettersetter);
+
+  gettersetter = sprite_framesloaded_get;
+  o.init_property("_framesloaded", gettersetter, gettersetter);
+
+  gettersetter = character::target_getset;
+  o.init_property("_target", gettersetter, gettersetter);
+
+  gettersetter = character::name_getset;
+  o.init_property("_name", gettersetter, gettersetter);
+
+  gettersetter = sprite_droptarget_getset;
+  o.init_property("_droptarget", gettersetter, gettersetter);
+
+  gettersetter = sprite_url_getset;
+  o.init_property("_url", gettersetter, gettersetter);
+
+  gettersetter = sprite_highquality_getset;
+  o.init_property("_highquality", gettersetter, gettersetter);
+
+  gettersetter = sprite_focusrect_getset;
+  o.init_property("_focusrect", gettersetter, gettersetter);
+
+  gettersetter = sprite_soundbuftime_getset;
+  o.init_property("_soundbuftime", gettersetter, gettersetter);
+
 #endif
 
 }

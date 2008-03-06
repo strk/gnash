@@ -87,6 +87,14 @@ as_object::add_property(const std::string& name, as_function& getter,
 	return _members.addGetterSetter(st.find(PROPNAME(name)), getter, setter);
 }
 
+bool
+as_object::add_property(const std::string& name, as_c_function_ptr getter,
+		as_c_function_ptr setter)
+{
+	string_table &st = _vm.getStringTable();
+	return _members.addGetterSetter(st.find(PROPNAME(name)), getter, setter);
+}
+
 /*protected*/
 bool
 as_object::get_member_default(string_table::key name, as_value* val,
@@ -455,12 +463,36 @@ as_object::init_property(const std::string& key, as_function& getter,
 {
 	string_table::key k = _vm.getStringTable().find(PROPNAME(key));
 	init_property(k, getter, setter, flags, nsname);
-
 }
 
 void
 as_object::init_property(string_table::key key, as_function& getter,
 		as_function& setter, int flags, string_table::key nsname)
+{
+	bool success;
+	success = _members.addGetterSetter(key, getter, setter, nsname);
+
+	// We shouldn't attempt to initialize a property twice, should we ?
+	assert(success);
+
+	//log_debug(_("Initialized property '%s'"), name.c_str());
+
+	// TODO: optimize this, don't scan again !
+	_members.setFlags(key, flags, nsname);
+
+}
+
+void
+as_object::init_property(const std::string& key, as_c_function_ptr getter,
+		as_c_function_ptr setter, int flags, string_table::key nsname)
+{
+	string_table::key k = _vm.getStringTable().find(PROPNAME(key));
+	init_property(k, getter, setter, flags, nsname);
+}
+
+void
+as_object::init_property(string_table::key key, as_c_function_ptr getter,
+		as_c_function_ptr setter, int flags, string_table::key nsname)
 {
 	bool success;
 	success = _members.addGetterSetter(key, getter, setter, nsname);
@@ -489,6 +521,17 @@ as_object::init_destructive_property(string_table::key key, as_function& getter,
 
 void
 as_object::init_readonly_property(const std::string& key, as_function& getter,
+	int initflags, string_table::key nsname)
+{
+	string_table::key k = _vm.getStringTable().find(PROPNAME(key));
+
+	init_property(k, getter, getter, initflags | as_prop_flags::readOnly
+		| as_prop_flags::isProtected, nsname);
+	assert(_members.getProperty(k, nsname));
+}
+
+void
+as_object::init_readonly_property(const std::string& key, as_c_function_ptr getter,
 	int initflags, string_table::key nsname)
 {
 	string_table::key k = _vm.getStringTable().find(PROPNAME(key));

@@ -1032,12 +1032,15 @@ Machine::execute()
 		as_object *obj = mStack.top(argc).to_object().get();
 		Property *f = obj->getByIndex(dispatch_id);
 		as_function* func;
+#if 0
 		if (f->isGetterSetter())
 		{
 			// Likely an error, but try to handle it.
 			func = f->getGetter();
 		}
-		else if (f->getValue(*obj).is_function())
+		else
+#endif
+		if (f->getValue(*obj).is_function())
 			func = f->getValue(*obj).to_as_function();
 		else
 		{
@@ -1090,7 +1093,7 @@ Machine::execute()
 			a.getNamespace()->getURI());
 		if (!b)
 			throw ASReferenceError();
-		as_function *f = b->isGetterSetter() ? b->getGetter() :
+		as_function *f = // b->isGetterSetter() ? b->getGetter() :
 			b->getValue(super).to_as_function();
 
 		if (opcode == SWF::ABC_ACTION_CALLSUPER)
@@ -1136,12 +1139,16 @@ Machine::execute()
 				mStack.drop(argc + shift);
 				break;
 			}
+#if 0
 			else
 			{
-				func = b->getGetter();
+				//func = b->getGetter();
+				log_error("Can't do  ABC_ACTION_CALLPROPVOID or ABC_ACTION_CALLPROPERTY")
+				break;
 			}
+#endif
 		}
-		else
+		//else
 			func = b->getValue(obj).to_as_function();
 
 		if (opcode == SWF::ABC_ACTION_CALLPROPVOID)
