@@ -4250,7 +4250,7 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
 
 		IF_VERBOSE_ACTION (
 		log_action(_("-------------- global register[%d] = '%s'"),
-			reg, env.top(0).to_debug_string().c_str() );
+			(unsigned)reg, env.top(0).to_debug_string().c_str() );
 		);
 
 	}
