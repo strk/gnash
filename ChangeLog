@@ -1,7 +1,12 @@
+2008-03-06 Sandro Santilli <strk@keybit.net>
+
+	* server/as_value.{cpp,h}: cleanup: remove the unused drop_refs
+	  and destructor (both doing nothing).
+
 2008-03-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/swfdec/PASSING: add passing Chr tests.
-    * testsuite/actionscript.all:String.as: passing tests.
+	* testsuite/actionscript.all:String.as: passing tests.
 
 2008-03-06 Sandro Santilli <strk@keybit.net>
 

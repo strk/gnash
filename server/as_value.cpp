@@ -671,7 +671,6 @@ as_value::set_sprite(sprite_instance& sprite)
 void
 as_value::set_character(character& sprite)
 {
-	drop_refs();
 	m_type = MOVIECLIP;
 	_value = CharacterProxy(&sprite);
 }
@@ -708,7 +707,6 @@ void
 as_value::convert_to_string()
 {
     std::string ns = to_string();
-    drop_refs();
     m_type = STRING;	// force type.
     _value = ns;
 }
@@ -719,7 +717,6 @@ as_value::convert_to_string_versioned(int version)
     // Force type to string.
 {
     std::string ns = to_string_versioned(version);
-    drop_refs();
     m_type = STRING;	// force type.
     _value = ns;
 }
@@ -728,7 +725,6 @@ as_value::convert_to_string_versioned(int version)
 void
 as_value::set_undefined()
 {
-	drop_refs();
 	m_type = UNDEFINED;
 	_value = boost::blank();
 }
@@ -736,7 +732,6 @@ as_value::set_undefined()
 void
 as_value::set_null()
 {
-	drop_refs();
 	m_type = NULLTYPE;
 	_value = boost::blank();
 }
@@ -763,7 +758,6 @@ as_value::set_as_object(as_object* obj)
 	}
 	if (m_type != OBJECT || getObj() != obj)
 	{
-		drop_refs();
 		m_type = OBJECT;
 		_value = boost::intrusive_ptr<as_object>(obj);
 	}
@@ -780,7 +774,6 @@ as_value::set_as_function(as_function* func)
 {
     if (m_type != AS_FUNCTION || getFun().get() != func)
     {
-	drop_refs();
 	m_type = AS_FUNCTION;
 	if (func)
 	{
@@ -1188,9 +1181,6 @@ as_value::operator=(const as_value& v)
 
 as_value::as_value(boost::intrusive_ptr<as_object> obj)
 	:
-	// Initialize to non-object type here,
-	// or set_as_object will call
-	// drop_ref on undefined memory !!
 	m_type(UNDEFINED)
 {
 	set_as_object(obj);
@@ -1419,7 +1409,6 @@ as_value::getSprite(bool allowUnloaded) const
 void
 as_value::set_string(const std::string& str)
 {
-	drop_refs();
 	m_type = STRING;
 	_value = str;
 }
@@ -1427,7 +1416,6 @@ as_value::set_string(const std::string& str)
 void
 as_value::set_double(double val)
 {
-	drop_refs();
 	m_type = NUMBER;
 	_value = val;
 }
@@ -1435,7 +1423,6 @@ as_value::set_double(double val)
 void
 as_value::set_bool(bool val)
 {
-	drop_refs();
 	m_type = BOOLEAN;
 	_value = val;
 }
@@ -1519,17 +1506,9 @@ as_value::as_value(unsigned long val)
 
 as_value::as_value(as_object* obj)
 	:
-	// Initialize to non-object type here,
-	// or set_as_object will call
-	// drop_ref on undefined memory !!
 	m_type(UNDEFINED)
 {
 	set_as_object(obj);
-}
-
-as_value::~as_value()
-{ 
-	drop_refs(); 
 }
 
 //-------------------------------------

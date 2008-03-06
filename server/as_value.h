@@ -187,20 +187,11 @@ public:
 	/// Construct a NULL or AS_FUNCTION value
 	as_value(as_function* func);
 
-	~as_value();
-
 	/// Convert numeric value to string value, following ECMA-262 specification
 	//
 	/// TODO: move here some of the good comments found in the function definition.
 	///
 	static std::string doubleToString(double val, int radix=10);
-
-	/// Drop any ref counts we have.
-	//
-	/// This happens prior to changing our value.
-	/// Useful when changing types/values.
-	///
-	void	drop_refs() {}
 
 	/// Return the primitive type of this value, as a string.
 	const char* typeOf() const;
