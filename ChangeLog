@@ -1,5 +1,10 @@
 2008-03-06 Sandro Santilli <strk@keybit.net>
 
+	* libbase/GC.cpp: minor thing, don't call std::list::size() twice each
+	  frame iteration, as it's O(n) for GNU stdc++ lib...
+
+2008-03-06 Sandro Santilli <strk@keybit.net>
+
 	* server/button_character_instance.cpp, server/sprite_instance.cpp,
 	  server/video_stream_instance.cpp, server/asobj/NetConnection.cpp,
 	  server/asobj/NetStream.cpp, server/asobj/Sound.cpp,

@@ -111,11 +111,12 @@ GC::cleanUnreachable()
 void 
 GC::collect()
 {
-	if ( (_resList.size() - _lastResCount) < maxNewCollectablesCount )
+	size_t curResSize = _resList.size(); // this is O(n) on GNU stdc++ lib !
+	if ( (curResSize - _lastResCount) < maxNewCollectablesCount )
 	{
 #if GNASH_GC_DEBUG  > 1
 		log_debug(_("Garbage collection skipped since number of collectables added since last run is too low (" SIZET_FMT ")"),
-			       _resList.size() - _lastResCount);
+			       curResSize - _lastResCount);
 #endif // GNASH_GC_DEBUG
 		return;
 	}
@@ -125,7 +126,7 @@ GC::collect()
 #endif
 
 #ifdef GNASH_GC_DEBUG 
-	log_debug(_("GC %p Starting collector: " SIZET_FMT " collectables"), (void *)this, _resList.size());
+	log_debug(_("GC %p Starting collector: " SIZET_FMT " collectables"), (void *)this, curResSize);
 #endif // GNASH_GC_DEBUG
 
 #ifndef NDEBUG
@@ -139,7 +140,7 @@ GC::collect()
 	// clean unreachable resources, and mark them others as reachable again
 	cleanUnreachable();
 
-	_lastResCount = _resList.size();
+	_lastResCount = curResSize;
 }
 
 void
