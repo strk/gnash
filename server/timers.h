@@ -58,7 +58,7 @@ namespace gnash {
 /// with properly set-up context.
 ///
 ///
-class Timer
+class DSOEXPORT Timer
 {
 
 public:

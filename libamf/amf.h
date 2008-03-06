@@ -83,7 +83,7 @@ typedef enum {
     onDebugEvents
 } amfresponse_e;
 
-class AMF {
+class DSOEXPORT AMF {
 public:
     typedef enum {
         HEADER_12 = 0x0,

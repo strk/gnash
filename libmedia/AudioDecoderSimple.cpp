@@ -406,7 +406,7 @@ boost::uint8_t* AudioDecoderSimple::decode(boost::uint8_t* input, boost::uint32_
 		int sample_count = outsize / (_stereo ? 4 : 2); // samples are of size 2
 
 		// Convert to needed samplerate - this converter only support standard flash samplerates
-		convert_raw_data(&adjusted_data, &adjusted_size, tmp_raw_buffer, sample_count, 0, 
+		Util::convert_raw_data(&adjusted_data, &adjusted_size, tmp_raw_buffer, sample_count, 0, 
 				_sampleRate, _stereo,
 				44100,  true /* stereo */);
 

@@ -1,3 +1,16 @@
+2008-03-04 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libamf/{amf.h, element.h, lcshm.h, sol.h},
+	libbase/{GC.h, WallClockTimer.h, libbase/shm.h, string_table.h}
+	libmedia/gst/{VideoDecoderGst.h, GstUtil.h}, 
+	server/{PropertyList.h, SystemClock.h, as_environment.h,
+	as_function.h, character.h, shape.h, timers.h}: Add DSOEXPORT
+	where a symbol is used outside of the DSO where it's implemented.
+	Allows compilation with -fvisibility=hidden.
+	* libbase/utility.{cpp h}, libmedia/{AudioDecoder.h,
+	AudioDecoderSimple.cpp, Makefile.am}: Move convert_raw_data to
+	libmedia.
+
 2008-03-04 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/log.cpp: remove silly assertion.

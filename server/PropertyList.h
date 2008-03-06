@@ -440,7 +440,7 @@ public:
 
 	/// Mark all simple properties, getters and setters
 	/// as being reachable (for the GC)
-	void setReachable() const;
+	void DSOEXPORT setReachable() const;
 
 private:
 	container _props;

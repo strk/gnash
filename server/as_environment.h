@@ -30,6 +30,7 @@
 #include <string> // for frame_slot name
 #include <vector>
 #include <iostream> // for dump_stack inline
+#include "tu_config.h"
 
 namespace gnash {
 
@@ -509,13 +510,13 @@ private:
 	/// @param func
 	///	The function being called
 	///
-	static void pushCallFrame(as_function* func);
+	static DSOEXPORT void pushCallFrame(as_function* func);
 
 	/// Remove current call frame from the stack
 	//
 	/// This should happen when an ActionScript function returns.
 	///
-	static void popCallFrame();
+	static DSOEXPORT void popCallFrame();
 	
 	/// Return the (possibly UNDEFINED) value of the named variable.
 	//

@@ -62,8 +62,8 @@ public:
     
     // Initialize the shared memory segment
     bool attach();
-    bool attach(char const *filespec, bool nuke);
-    bool attach(key_t key, bool nuke);
+    bool DSOEXPORT attach(char const *filespec, bool nuke);
+    bool DSOEXPORT attach(key_t key, bool nuke);
     
     // Resize the allocated memory segment
     bool resize(int bytes);
@@ -73,7 +73,7 @@ public:
     void *brk(int bytes);
     
     // Close the memory segment. This removes it from the system.
-    bool closeMem();
+    bool DSOEXPORT closeMem();
     
     Shm *cloneSelf(void);
 

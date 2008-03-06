@@ -22,6 +22,7 @@
 
 #include "MediaParser.h"
 #include "SoundInfo.h"
+#include "Util.h"
 
 namespace gnash {
 namespace media {

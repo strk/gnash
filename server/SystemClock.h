@@ -27,6 +27,7 @@
 #include "VirtualClock.h" // for inheritance
 
 #include <boost/cstdint.hpp> // for boost::uint64_t typedef
+#include "tu_config.h"
 
 namespace gnash
 {
@@ -36,7 +37,7 @@ namespace gnash
 /// This class uses the system clock for computing elapsed time.
 /// See http://en.wikipedia.org/wiki/System_time for capacity
 ///
-class SystemClock: public VirtualClock
+class DSOEXPORT SystemClock: public VirtualClock
 {
 public:
 

@@ -30,6 +30,7 @@
 #include "log.h"
 #include "MediaParser.h"
 #include "VideoDecoder.h"
+#include "tu_config.h"
 
 
 namespace gnash {
@@ -64,7 +65,7 @@ private:
 };
 
 
-class VideoDecoderGst : public VideoDecoder
+class DSOEXPORT VideoDecoderGst : public VideoDecoder
 {
 public:
   VideoDecoderGst(videoCodecType codec_type, int width, int height);

@@ -220,44 +220,6 @@ std::string typeName(const T& inst)
 	return typeName;
 }
 
-namespace gnash {
-
-/// VERY crude sample-rate and steroe conversion. Converts input data to 
-/// output format.
-//
-/// @param adjusted_data
-/// Where the converted data is placed.
-///
-/// @param adjusted_size
-/// The size of the converted data.
-///
-/// @param data
-/// Data that needs to be converted.
-///
-/// @param sample_count
-/// The datas current sample count.
-/// 
-/// @param sample_size
-/// The datas current sample size.
-///
-/// @param sample_rate
-/// The datas current sample rate.
-///
-/// @param stereo
-/// Whether the current data is in stereo
-///
-/// @param m_sample_rate
-/// The samplerate we which to convert to.
-///
-/// @param m_stereo
-/// Do we want the output data to be in stereo?
-///
-void	convert_raw_data(boost::int16_t** adjusted_data,
-		  int* adjusted_size, void* data, int sample_count,
-		  int sample_size, int sample_rate, bool stereo,
-		  int m_sample_rate, bool m_stereo);
-} // namespace gnash 
-
 #endif // UTILITY_H
 
 

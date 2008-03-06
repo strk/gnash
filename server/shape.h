@@ -99,7 +99,7 @@ namespace gnash {
 	/// \brief
 	/// A subset of a shape -- a series of edges sharing a single set
 	/// of styles.
-	class path
+	class DSOEXPORT path
 	{
 	public:
 		/// Default constructor

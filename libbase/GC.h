@@ -32,6 +32,8 @@
 # include <boost/thread.hpp>
 #endif
 
+#include "tu_config.h"
+
 // Define the following macro to enable GC verbosity 
 // Verbosity levels:
 //   1 - print stats about how many resources are registered and how many 
@@ -183,7 +185,7 @@ private:
 /// itself.
 ///
 ///
-class GC
+class DSOEXPORT GC
 {
 
 public:

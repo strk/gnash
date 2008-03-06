@@ -27,6 +27,7 @@
 #include <vector>
 #include "element.h"
 #include "amf.h"
+#include "tu_config.h"
 
 // It comprises of a magic number, followed by the file length, a
 // filetype, which appears to always be "TCSO", and what appears to be
@@ -41,7 +42,7 @@
 // After this is a series of AMF objects
 namespace amf
 {
-class SOL {
+class DSOEXPORT SOL {
 public:
     SOL();
     ~SOL();

@@ -30,11 +30,12 @@
 #include <boost/cstdint.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include "amf.h"
+#include "tu_config.h"
 
 namespace amf 
 {
 
-class Element {
+class DSOEXPORT Element {
 public:
     // The following elements are defined within AMF:
     typedef enum {
@@ -78,7 +79,7 @@ public:
     Element &init(std::vector<double> &data);
     Element &init(const std::string &name, const std::string &data);
     Element &init(const std::string &data);
-    Element &init(const std::string &name, bool data);
+    Element & init(const std::string &name, bool data);
     Element &init(bool data);
     // Create a function block for AMF
     Element &init(bool, double, double, const std::string &str);

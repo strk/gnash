@@ -1130,7 +1130,7 @@ public: // istn't this 'public' reduntant ?
 	//
 	/// e.g. "_level0.sprite1.sprite2.ourSprite"
 	///
-	std::string getTarget() const;
+	std::string DSOEXPORT getTarget() const;
 
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
 	boost::intrusive_ptr<as_function> getUserDefinedEventHandler(const std::string& name) const;

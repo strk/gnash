@@ -29,13 +29,14 @@
 
 #include <gst/gst.h>
 #include "image.h"
+#include "tu_config.h"
 
 namespace gnash {
 namespace media {
 
 /// \brief Generalized Gstreamer utilities for pipeline configuration.
 ///        WARNING: This class is not guaranteed to be thread-safe.
-class GstUtil {
+class DSOEXPORT GstUtil {
 	
 public: 
         

@@ -52,7 +52,7 @@ protected:
 //    std::vector<std::string> _listeners;
 };
 
-class LcShm : public Listener, public Shm {
+class DSOEXPORT LcShm : public Listener, public Shm {
 public:
     typedef struct {
         uint32_t unknown1;

@@ -27,7 +27,7 @@
 namespace gnash {
 
 /// General-purpose wall-clock timer.  
-class WallClockTimer
+class DSOEXPORT WallClockTimer
 {
 
 public:
@@ -38,10 +38,10 @@ public:
 	/// \brief
 	/// Return time elapsed in milliseconds since construction
 	/// or last call to ::restart()
-	DSOEXPORT boost::uint32_t elapsed() const;
+	boost::uint32_t elapsed() const;
 
 	/// Restart the timer
-	DSOEXPORT void restart();
+	void restart();
 
 private:
 

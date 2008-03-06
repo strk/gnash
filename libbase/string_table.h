@@ -30,6 +30,7 @@
 #include <boost/multi_index/member.hpp>
 #include <boost/thread.hpp>
 #include <string>
+#include "tu_config.h"
 
 namespace gnash
 {
@@ -39,7 +40,7 @@ class string_table;
 // So many strings are duplicated (such as standard property names)
 // that a string table could give significant memory savings.
 /// A general use string table.
-class string_table
+class DSOEXPORT string_table
 {
 public:
 	/// A little helper for indexing.
