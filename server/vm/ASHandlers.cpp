@@ -1667,7 +1667,8 @@ SWFHandlers::ActionChr(ActionExec& thread)
     as_environment& env = thread.env;
     thread.ensureStack(1);
     
-    boost::uint32_t c = env.top(0).to_int();
+    // Only handles values up to 65535
+    boost::uint16_t c = static_cast<boost::uint16_t>(env.top(0).to_int());
 
     // If the argument to chr() is '0', we return
     // nothing, not NULL
@@ -1799,25 +1800,21 @@ SWFHandlers::ActionMbOrd(ActionExec& /*thread*/)
 void
 SWFHandlers::ActionMbChr(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-//    The correctness of this depends on the locale being correct,
-//    which it should be far more often than not, by choosing UTF8.
+    /// This only generates UTF-8 characters. No idea
+    /// what difference user locale might make, but UTF-8
+    /// is generally GOOD.
     as_environment& env = thread.env;
 
     thread.ensureStack(1);
 
-    wchar_t i = static_cast<wchar_t> (env.top(0).to_int());
-    boost::scoped_array<char> strng(new char [MB_CUR_MAX + 1]);
-    char *str = strng.get();
-    memset(str, '\0', MB_CUR_MAX + 1);
-    if (wctomb(str, i) == -1)
-    {
-        env.top(0).set_undefined();
-    }
-    else
-    {
-        env.top(0).set_string(str);
-    }
+    // Cut to uint16, as characters above 65535 'wrap around'
+    const boost::uint16_t i = static_cast<boost::uint16_t> (env.top(0).to_int());
+    
+    std::string out = utf8::encodeUnicodeCharacter(i);
+    
+    /// Always valid, or can it be undefined?
+    env.top(0).set_string(out);
+
 }
 
 // also known as WaitForFrame2

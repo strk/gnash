@@ -1,3 +1,9 @@
+2008-03-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/vm/ASHandlers.cpp: fix mbchr to return a UTF-8 string;
+	  make sure both mbchr and chr handle characters only up to
+	  65535. Fixes behaviour for SWF6, 7, and 8.
+
 2008-03-04 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* libamf/{amf.h, element.h, lcshm.h, sol.h},
