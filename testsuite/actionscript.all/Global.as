@@ -102,6 +102,12 @@ check ( parseFloat('1.5') >= 1.499 && parseFloat('1.5') <= 1.501 );
 check ( parseFloat('   	    -2001.5') >= -2001.51 && parseFloat('   	    -2001.5') <= -2001.49 );
 check ( parseFloat('		 5.13123abc2.35387') >= 5.1312 && parseFloat('		 5.13123abc2.35387') <= 5.1313 );
 check ( isNaN(parseFloat('         x1.234')) );
+check ( isNaN(parseFloat('')) );
+
+check ( ! isNaN (parseFloat('		 5.13123abc2.35387')));
+check ( parseFloat('3.45e-5') >= 3.449e-5 && parseFloat('3.45e-5') <= 3.451e-5);
+check ( parseFloat('3.45E-5') >= 3.449e-5 && parseFloat('3.45E-5') <= 3.451e-5);
+check ( parseFloat('3.45eE-5') >= 3.449 && parseFloat('3.45eE-5') <= 3.451);
 
 // All %NN must become the corresponding ascii char
 check_equals ( unescape('%3A%2F%3F%3D%26'), ':/?=&' );
@@ -357,15 +363,15 @@ check_equals(tmp.length, 2);
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 5
-	check_totals(77); // SWF5
+	check_totals(79); // SWF5
 #else
 # if OUTPUT_VERSION == 6
-	check_totals(111); // SWF6
+	check_totals(113); // SWF6
 # else
 #  if OUTPUT_VERSION == 7
-	check_totals(93); // SWF7
+	check_totals(95); // SWF7
 #  else
-	check_totals(80); // SWF8+
+	check_totals(82); // SWF8+
 #  endif
 # endif
 #endif

@@ -1,5 +1,10 @@
 2008-03-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* testsuite/actionscript.all/Global.as: add some checks that would
+	  have caught a mistake in parseFloat.
+
+2008-03-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* server/vm/ASHandlers.cpp: fix mbchr to return a UTF-8 string;
 	  make sure both mbchr and chr handle characters only up to
 	  65535. Fixes behaviour for SWF6, 7, and 8.
