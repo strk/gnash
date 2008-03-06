@@ -5,7 +5,11 @@
 	  65535. Fixes behaviour for SWF6, 7, and 8.
 	* configure.ac: update version (flash compatibility) to 9,0,999 so
 	  that javascript flash detectors don't reject gnash (not helpful for
-	  implementing SWF9). 
+	  implementing SWF9).
+	* server/asobj/Global.cpp: use boost_lexical cast in parseFloat;
+	  sscanf looks only for the decimal separator of the locale,
+	  which since a localization change is now always the local
+	  locale; actionscript uses the 'C' locale.
 
 2008-03-04 Bastiaan Jacques <bastiaan@bjacques.org>
 

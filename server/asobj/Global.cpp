@@ -74,6 +74,7 @@
 #include "xmlsocket.h"
 
 #include <limits> // for numeric_limits<double>::quiet_NaN
+#include <boost/lexical_cast.hpp>
 
 // Common code to warn and return if a required single arg is not present
 // and to warn if there are extra args.
@@ -171,15 +172,15 @@ as_global_parsefloat(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
-    float result;
     as_value rv;
 
-    // sscanf will handle the whitespace / unneeded characters etc. automatically
-    if (1 == sscanf(fn.arg(0).to_string().c_str(), "%f", &result))
-	rv = double(result);
-    else
-	// if sscanf didn't find anything, return NaN
-	rv.set_nan();
+    try  {
+        float result = boost::lexical_cast<float>(fn.arg(0).to_string());
+        rv = static_cast<double>(result);
+    }
+    catch (boost::bad_lexical_cast& e) {
+        rv.set_nan();
+    }
 
     return rv;
 }
