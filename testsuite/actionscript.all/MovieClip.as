@@ -20,6 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
+rcsid="$Id: MovieClip.as,v 1.117 2008/03/06 13:07:33 strk Exp $";
 
 #include "check.as"
 
@@ -31,15 +32,15 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(596); // SWF6
+	check_totals(611); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(613); // SWF7
+	check_totals(628); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(614); // SWF8+
+	check_totals(629); // SWF8+
 #endif
 
 	play();
@@ -1369,6 +1370,64 @@ o.toLowerCase = function() { return "get"; };
 ret = _root.meth(o);
 check_equals(typeof(ret), 'number');
 check_equals(ret, 1);
+
+//---------------------------------------------------------------------
+// Test native properties (getter-setter?)
+//---------------------------------------------------------------------
+
+#if OUTPUT_VERSION > 5 // addProperty needs SWF6
+
+//createEmptyMovieClip('mc', 10);
+mc = _root;
+mc._x = 20;
+check_equals(mc._x, 20);
+get = function() { /*note('get called');*/ getCalls++; return 17; };
+set = function() { /*note('set called');*/ setCalls++; };
+ret = mc.addProperty('_x', get, set);
+check_equals(ret, true);
+getCalls=0; setCalls=0;
+inspect = mc._x;
+check_equals(inspect, 17); // getMember invokes the getter
+check_equals(getCalls, 1);
+check_equals(setCalls, 0);
+mc.x = 10; // sets the property, but doesn't call the setter !
+check_equals(getCalls, 1); // assignment did call the getter 
+check_equals(setCalls, 0);
+asm {
+	push 'propinspect'
+	push 'mc'
+	push 0
+	getproperty
+	setvariable
+};
+// setMember did set the prop, didn't call the setter
+xcheck_equals(propinspect, 20);
+
+createEmptyMovieClip('mc', 10);
+mc._x = 30;
+ret = mc.addProperty('_x', get, set);
+check_equals(ret, true);
+getCalls=0; setCalls=0;
+inspect = mc._x;
+check_equals(inspect, 17); // getMember invokes the getter
+check_equals(getCalls, 1);
+check_equals(setCalls, 0);
+mc.x = 10; // does NOT set the property, but doesn't call the setter !
+check_equals(getCalls, 1); // assignment did call the getter 
+check_equals(setCalls, 0);
+asm {
+	push 'propinspect'
+	push 'mc'
+	push 0
+	getproperty
+	setvariable
+};
+// setMember did NOT set the prop, didn't call the setter
+check_equals(propinspect, 0);
+
+
+#endif // OUTPUT_VERSION > 5
+
 
 //---------------------------------------------------------------------
 // Test the MovieClip.loadVariables function
