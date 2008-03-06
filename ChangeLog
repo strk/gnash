@@ -1,3 +1,7 @@
+2008-03-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/testsuite/swfdec/PASSING: add passing Chr tests.
+
 2008-03-06 Sandro Santilli <strk@keybit.net>
 
 	* server/movie_root.cpp (markReachableResources): character mouse and
