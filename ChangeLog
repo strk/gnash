@@ -1,3 +1,8 @@
+2008-03-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/gui.{h,cpp}: make data tree-shaped instead of flat.
+	* gui/gtk.cpp: update properties dialogue to use tree view.
+
 2008-03-06  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* testsuite/libbase/memtest.cpp: Figures, malloc() on Ubuntu and

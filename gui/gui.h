@@ -291,7 +291,7 @@ public:
 #endif // def GNASH_FPS_DEBUG
 
     // TODO: use a tree-like structure (tree.hh?)
-    typedef std::pair<std::string,std::string> StringPair;
+    typedef std::pair<std::string, std::string> StringPair;
     typedef tree<StringPair> InfoTree;
 
     /// \brief

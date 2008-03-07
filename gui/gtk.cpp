@@ -589,7 +589,6 @@ GtkGui::makeTreeModel (std::auto_ptr<InfoTree> treepointer)
 
     enum
     {
-        NODENAME_COLUMN = 0,
         STRING1_COLUMN,
         STRING2_COLUMN,
         NUM_COLUMNS
@@ -597,44 +596,41 @@ GtkGui::makeTreeModel (std::auto_ptr<InfoTree> treepointer)
     
     GtkTreeStore *model = gtk_tree_store_new (NUM_COLUMNS,
                          G_TYPE_STRING,
-                         G_TYPE_STRING,
                          G_TYPE_STRING);
     
     GtkTreeIter iter;
     GtkTreeIter child_iter;
     GtkTreeIter parent_iter;
 
-    int depth = 0;                    // Depth within the gtk tree.    
+    // Depth within the *GTK* tree.
+    int depth = 0;    
 
-    for (InfoTree::iterator i=info.begin_leaf(), e=info.end_leaf(); i!=e; ++i)
+    for (InfoTree::iterator i=info.begin(), e=info.end(); i!=e; ++i)
     {
-         StringPair& p = *i;
+        StringPair& p = *i;
 
-         int infotreedepth = info.depth(i);  
-         char buf[8];
-         sprintf(buf, "%d", infotreedepth);
-         buf[7] = '\0';                     
+        std::ostringstream os;
+        os << info.depth(i);  
 
-         if (info.depth(i) > depth) {          // Align Gtk tree depth.
-              depth++;                   
-              iter=child_iter;                  
-         }
+        if (info.depth(i) > depth) {
+            depth++;                   
+            iter=child_iter;                  
+        }
 
-         if (info.depth(i) < depth) {        // Align Gtk tree depth.
-              depth = info.depth(i);
-              gtk_tree_model_iter_parent (GTK_TREE_MODEL(model), &parent_iter, &iter);  // Get parent iter.
-              iter = parent_iter;
-         }
+        if (info.depth(i) < depth) {
+            depth = info.depth(i);
+            gtk_tree_model_iter_parent (GTK_TREE_MODEL(model), &parent_iter, &iter);  
+            iter = parent_iter;
+        }
 
-         //Read in data from present node
-         if (depth == 0) gtk_tree_store_append (model, &child_iter, NULL);
-         else gtk_tree_store_append (model, &child_iter, &iter);
+        //Read in data from present node
+        if (depth == 0) gtk_tree_store_append (model, &child_iter, NULL);
+        else gtk_tree_store_append (model, &child_iter, &iter);
 
-         gtk_tree_store_set (model, &child_iter,
-                           NODENAME_COLUMN, buf,   //infotree
-                           STRING1_COLUMN, p.first.c_str(),     //infotree
-    		           STRING2_COLUMN, p.second.c_str(),     //infotree
-			   -1);
+        gtk_tree_store_set (model, &child_iter,
+                           STRING1_COLUMN, p.first.c_str(),   // "Variable"
+    		               STRING2_COLUMN, p.second.c_str(),  // "Value"
+			               -1);
 
     }
 
@@ -1194,136 +1190,89 @@ GtkGui::showPropertiesDialog()
     					GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
     					NULL);
 
+    // Not too small... But I'd rather not have to specify
+    // a size in pixels.
+    gtk_window_set_default_size (GTK_WINDOW(propsDialog),
+                                 500, 300);
+    
+    // Suggest to the window manager to allow "maximize"
+    // As there can be (will be) a lot of data.
+    gtk_window_set_type_hint(GTK_WINDOW(propsDialog),
+                            GDK_WINDOW_TYPE_HINT_NORMAL);
+
     addGnashIcon(GTK_WINDOW(propsDialog));
 
     // Destroy the window when a button is clicked.
-    g_signal_connect (propsDialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
+    g_signal_connect (propsDialog, "response",
+               G_CALLBACK(gtk_widget_destroy), NULL);
 
-    // 2 rows: 1 for the title, 1 for the display widget (table or treeview)
-    GtkWidget *propsvbox = gtk_vbox_new (FALSE, 2);
-    gtk_container_add (GTK_CONTAINER (GTK_DIALOG(propsDialog)->vbox), propsvbox);
-
-    GtkWidget *propslabel = gtk_label_new(_("<b>VM Properties</b>"));
-    gtk_label_set_use_markup (GTK_LABEL (propslabel), TRUE);
-    gtk_box_pack_start (GTK_BOX (propsvbox), propslabel, FALSE, FALSE, 0);
-
-    GtkWidget *table1 = gtk_table_new(4, 2, FALSE);
-    gtk_box_pack_start (GTK_BOX (propsvbox), table1, FALSE, FALSE, 0);
+    GtkWidget *propsvbox = gtk_vbox_new (FALSE, 1);
+    gtk_container_add (GTK_CONTAINER (
+                        GTK_DIALOG(propsDialog)->vbox), propsvbox);
 
     std::auto_ptr<InfoTree> infoptr = getMovieInfo();
-
-    if ( ! infoptr.get() )
-    {
-        GtkWidget *label = gtk_label_new (_("VM not initialized yet"));
-        gtk_widget_show (label);
-        gtk_table_attach_defaults (GTK_TABLE (table1), label, 0, 1, 0, 1);
-        return;
-    }
-
-    else {
-
-#if 1
-        // Table display
-        // This left in while tree information isn't selectable
-
-        InfoTree& info = *infoptr;
-
-        size_t size = info.size();
-
-        for (InfoTree::leaf_iterator i=info.begin_leaf(), e=info.end_leaf();
-                 i!=e; ++i)
-        {
-            StringPair& p = *i;
-            guint up = size;
-            guint bot = size-1;
-
-            GtkWidget *label_table11 = gtk_label_new(p.first.c_str());
-            gtk_table_attach (GTK_TABLE (table1), label_table11, 0, 1, bot, up,
-                         (GtkAttachOptions) (GTK_FILL),
-                         (GtkAttachOptions) (0), 0, 0);
-            gtk_misc_set_alignment (GTK_MISC (label_table11), 0.0, 1.0);
-            gtk_widget_show (label_table11);
-
-            GtkWidget *label_table12 = gtk_label_new(p.second.c_str());
-            gtk_table_attach (GTK_TABLE (table1), label_table12, 1, 2, bot, up,
-                             (GtkAttachOptions) (GTK_FILL),
-                             (GtkAttachOptions) (0), 0, 0);
-            gtk_label_set_selectable (GTK_LABEL (label_table12), TRUE);
-            gtk_widget_show (label_table12);
-
-            --size;
-        }
-
-#else
-        // Tree display
-        // Should replace table display when proper
-        // InfoTrees are available 
 
     GtkWidget *scrollwindow1 = gtk_scrolled_window_new (NULL, NULL);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrollwindow1),
 				      GTK_POLICY_AUTOMATIC,
 				      GTK_POLICY_AUTOMATIC);
+
     gtk_box_pack_start (
-	 GTK_BOX (propsvbox), scrollwindow1, TRUE, TRUE, 0);
+            GTK_BOX (propsvbox), scrollwindow1, TRUE, TRUE, 0);
 
-        enum
-        {
-            NODENAME_COLUMN = 0,
-            STRING1_COLUMN,
-            STRING2_COLUMN
-        };
+    enum
+    {
+        STRING1_COLUMN,
+        STRING2_COLUMN
+    };
 
-        GtkTreeModel *model = makeTreeModel(infoptr);
+    GtkTreeModel *model = makeTreeModel(infoptr);
 
-        GtkWidget *treeview = gtk_tree_view_new_with_model (model);
+    GtkWidget *treeview = gtk_tree_view_new_with_model (model);
 
-        g_object_unref (model);
+    g_object_unref (model);
 
-        gint col_offset;
-        GtkCellRenderer *renderer;
-        GtkTreeViewColumn *column;
+    ///
+    /// Tree view behaviour.
+    
+    /// Search on "variable" column
+    gtk_tree_view_set_enable_search(GTK_TREE_VIEW(treeview), TRUE);
+    gtk_tree_view_set_search_column (GTK_TREE_VIEW(treeview), 0);
+    
+    /// Nice shading
+    gtk_tree_view_set_rules_hint(GTK_TREE_VIEW(treeview), TRUE);
+    
+    gtk_tree_view_set_headers_clickable(GTK_TREE_VIEW(treeview), TRUE);
 
-        //Add columns:
-        
-#if 0     
-        //  Depth column (for debugging)
-        renderer = gtk_cell_renderer_text_new ();
-        g_object_set (renderer, "xalign", 0.0, NULL);
-        col_offset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
-       						       -1, _("Depth"),
-						       renderer, "text",
-						       NODENAME_COLUMN,
-						       NULL);
-        column = gtk_tree_view_get_column (GTK_TREE_VIEW(treeview), col_offset - 1);
-#endif
+    gint coloffset;
+    GtkCellRenderer *renderer;
+    GtkTreeViewColumn *column;
 
-        // 'Variable' column:
+    // Add columns:
+    
+    // 'Variable' column:
+    renderer = gtk_cell_renderer_text_new ();
+    coloffset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
+					       -1, _("Variable"),
+					       renderer, "text",
+					       STRING1_COLUMN,
+					       NULL);
+    column = gtk_tree_view_get_column (GTK_TREE_VIEW (treeview), coloffset - 1);
 
-        renderer = gtk_cell_renderer_text_new ();
-        g_object_set (renderer, "xalign", 0.0, NULL);
-        col_offset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
-						       -1, _("Variable"),
-						       renderer, "text",
-						       STRING1_COLUMN,
-						       NULL);
-        column = gtk_tree_view_get_column (GTK_TREE_VIEW (treeview), col_offset - 1);
+    // 'Value' column:
+    // Set to be 'editable' so that the data can be selected and
+    // copied; it can't actually be edited, though.
+    renderer = gtk_cell_renderer_text_new ();
+    g_object_set (renderer, "xalign", 0.0, "editable", TRUE, NULL);
+    coloffset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
+					       -1, _("Value"),
+					       renderer, "text",
+					       STRING2_COLUMN,
+					       NULL);
+    column = gtk_tree_view_get_column (GTK_TREE_VIEW (treeview), coloffset - 1);
 
-        // 'Value' column:
-
-        renderer = gtk_cell_renderer_text_new ();
-        g_object_set (renderer, "xalign", 0.0, NULL);
-        col_offset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
-						       -1, _("Value"),
-						       renderer, "text",
-						       STRING2_COLUMN,
-						       NULL);
-        column = gtk_tree_view_get_column (GTK_TREE_VIEW (treeview), col_offset - 1);
-
-        //Add tree to scrollwindow.
-        gtk_container_add (GTK_CONTAINER (scrollwindow1), treeview);
-
-#endif
-    }
+    //Add tree to scrollwindow.
+    gtk_container_add (GTK_CONTAINER (scrollwindow1), treeview);
 
     gtk_widget_show_all (propsDialog);
 

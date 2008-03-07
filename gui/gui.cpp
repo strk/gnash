@@ -844,79 +844,105 @@ Gui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 std::auto_ptr<Gui::InfoTree>
 Gui::getMovieInfo() const
 {
-    std::auto_ptr<InfoTree> ret;
+    std::auto_ptr<InfoTree> tr;
 
     if ( ! VM::isInitialized() )
     {
-        return ret;
+        return tr;
     }
 
-    ret.reset(new InfoTree());
+    tr.reset(new InfoTree());
+
+    // Top nodes for the tree:
+    // 1. VM information
+    // 2. Movie information
+    // 3. ...
+
+    InfoTree::iterator_base topIter = tr->begin();
+    InfoTree::iterator_base firstLevelIter;
 
     VM& vm = VM::get();
 
-    // Print VM version
-    int vmSWFVersion = vm.getSWFVersion();
-    char buf[16];
-    snprintf(buf, 16, "SWF%d", vmSWFVersion); buf[15] = '\0';
-    ret->insert(ret->begin(), StringPair("VM", buf));
+    std::ostringstream os;
 
-    // Print info about levels (only originating movie for now, then will be extended)
+    // VM top level
+    os << "SWF" << vm.getSWFVersion();
+    topIter = tr->insert(topIter, StringPair("VM", os.str()));
+
+    // VM children
     movie_root& stage = vm.getRoot();
     boost::intrusive_ptr<movie_instance> level0 = stage.getRootMovie();
     movie_definition* def0 = level0->get_movie_definition();
     assert(def0);
-    snprintf(buf, 16, "SWF%d", def0->get_version()); buf[15] = '\0';
-    ret->insert(ret->begin(), StringPair("_level0 SWFVersion", std::string(buf)));
-    ret->insert(ret->begin(), StringPair("_level0 URL", def0->get_url()));
+
+    os.str("");
+    os << "SWF " << def0->get_version();
+    firstLevelIter = tr->append_child(topIter, StringPair("level0 SWF version", os.str()));
+    firstLevelIter = tr->append_child(topIter, StringPair("level0 URL", def0->get_url()));
+
 
     // Print info about scripts state (enabled/disabled)
-    ret->insert(ret->begin(), StringPair("Stage scripts", stage.scriptsDisabled() ? " disabled" : "enabled"));
+    topIter = tr->insert(topIter, StringPair("Stage scripts",
+                stage.scriptsDisabled() ? " disabled" : "enabled"));
 
     // Print info about mouse entities
+    topIter = tr->insert(topIter, StringPair("Mouse Entities", ""));
 
-    using std::string;
     const character* ch;
-
     ch = stage.getActiveEntityUnderPointer();
     if ( ch )
     {
-	std::stringstream ss;
-	ss << ch->getTarget() << " (" + typeName(*ch) << " - id:" << ch->get_id() << " depth:" << ch->get_depth();
-    	ret->insert(ret->begin(), StringPair("Active mouse entity: ", ss.str()));
+	    std::stringstream ss;
+	    ss << ch->getTarget() << " (" + typeName(*ch)
+            << " - id:" << ch->get_id() << " depth:"
+            << ch->get_depth();
+    	firstLevelIter = tr->append_child(topIter, StringPair("Active mouse entity", ss.str()));
     }
 
     ch = stage.getEntityUnderPointer();
     if ( ch )
     {
-	std::stringstream ss;
-	ss << ch->getTarget() << " (" + typeName(*ch) << " - id:" << ch->get_id() << " depth:" << ch->get_depth();
-    	ret->insert(ret->begin(), StringPair("Topmost mouse entity: ", ss.str()));
+	    std::stringstream ss;
+	    ss << ch->getTarget() << " (" + typeName(*ch) <<
+            " - id:" << ch->get_id() << " depth:" << ch->get_depth();
+    	firstLevelIter = tr->append_child(topIter, StringPair("Topmost mouse entity", ss.str()));
     }
 
     ch = stage.getDraggingCharacter();
     if ( ch ) 
     {
-	std::stringstream ss;
-	ss << ch->getTarget() << " (" + typeName(*ch) << " - id:" << ch->get_id() << " depth:" << ch->get_depth();
-    	ret->insert(ret->begin(), StringPair("Dragging character: ", ss.str()));
+	    std::stringstream ss;
+	    ss << ch->getTarget() << " (" + typeName(*ch) <<
+            " - id:" << ch->get_id() << " depth:" << ch->get_depth();
+    	firstLevelIter = tr->append_child(topIter, StringPair("Dragging character: ", ss.str()));
     }
 
+    // GC row
+    topIter = tr->insert(topIter, StringPair("GC Statistics", ""));
     GC::CollectablesCount cc;
     GC::get().countCollectables(cc);
-    // TODO: print sorted by value
-    std::string lbl = "GC managed ";
+    
+    const std::string lbl = "GC managed ";
     for (GC::CollectablesCount::iterator i=cc.begin(), e=cc.end(); i!=e; ++i)
     {
         const std::string& typ = i->first;
-        unsigned int c = i->second;
-        char buf[32];
-        snprintf(buf, 31, "%u", c);
-        buf[31] = '\0';
-        ret->insert(ret->begin(), StringPair(lbl+typ, std::string(buf)));
+        std::ostringstream ss;
+        ss << i->second;
+        firstLevelIter = tr->append_child(topIter,
+                            StringPair(lbl + typ, ss.str()));
     }
 
-    return ret;
+    tr->sort(firstLevelIter.begin(), firstLevelIter.end());
+
+//    for (InfoTree::pre_order_iterator it = tr->begin(); it != tr->end(); it++)
+//    {
+//        int j = 0;
+//        while (j++ < tr->depth(it)) std::cout << " ";
+//        StringPair& p = *it;
+//        std::cout << p.first << ": " << p.second << std::endl;
+//    }
+
+    return tr;
 }
 
 #ifdef GNASH_FPS_DEBUG
