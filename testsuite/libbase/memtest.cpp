@@ -24,7 +24,7 @@
 #include <string>
 
 #include "log.h"
-#include "memory.h"
+#include "gmemory.h"
 
 #ifdef HAVE_DEJAGNU_H
 #include "dejagnu.h"
