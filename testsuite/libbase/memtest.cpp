@@ -75,7 +75,6 @@ main (int /*argc*/, char** /*argv*/) {
     Memory m1;
     mem.addStats(__LINE__);             // take a sample
     diff = mem.diffStats();
-    cerr << "FIXME: diff is: " << diff << endl;
     if ((diff == 16) || (diff == 8)) {
         runtest.pass("Memory");
     } else {
@@ -84,7 +83,6 @@ main (int /*argc*/, char** /*argv*/) {
     
     char *x = new char[120];
     mem.addStats(__LINE__);             // take a sample
-    cerr << "FIXME: diff is: " << mem.diffStats() << endl;
     if ((mem.diffStats() == 104) || (mem.diffStats() == 112)) {
         runtest.pass("Buffer allocation");
     } else {
@@ -94,7 +92,6 @@ main (int /*argc*/, char** /*argv*/) {
     vector<string> sv;
     sv.push_back("Hello World");
     mem.addStats(__LINE__);             // take a sample
-    cerr << "FIXME: diff is: " << mem.diffStats() << endl;
     if (mem.diffStats() == 64) {
         runtest.pass("First string allocated");
     } else {
@@ -104,7 +101,6 @@ main (int /*argc*/, char** /*argv*/) {
     sv.push_back("Aloha");
     delete x;
     mem.addStats(__LINE__);             // take a sample
-    cerr << "FIXME: diff is: " << mem.diffStats() << endl;
     if ((mem.diffStats() == -104) || (mem.diffStats() == -96)) {
         runtest.pass("Second string allocated");
     } else {
@@ -113,7 +109,6 @@ main (int /*argc*/, char** /*argv*/) {
 
     sv.push_back("Guten Tag");
     mem.addStats(__LINE__);             // take a sample
-    cerr << "FIXME: diff is: " << mem.diffStats() << endl;
     if ((mem.diffStats() == 40) || (mem.diffStats() == 32)){
         runtest.pass("Third string allocated");
     } else {
@@ -128,7 +123,6 @@ main (int /*argc*/, char** /*argv*/) {
         runtest.pass("leak");
     }    
     mem.addStats(__LINE__);             // take a sample
-    cerr << "FIXME: diff is: " << mem.diffStats() << endl;
     if (mem.diffStats() == 40) {
         runtest.pass("test_leak");
     } else {
@@ -143,7 +137,6 @@ main (int /*argc*/, char** /*argv*/) {
     } else {
         runtest.fail("noleak");
     }
-    cerr << "FIXME: diff is: " << mem.diffStats() << endl;
     if ((mem.diffStats() == 0) || (mem.diffStats() == 8)) {
         runtest.pass("test_noleak");
     } else {
