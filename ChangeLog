@@ -1,3 +1,9 @@
+2008-03-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/asobj/string.cpp: a negative number passed as second
+	  argument to lastIndexOf always returns -1. More swfdec
+	  testsuite passes.
+
 2008-03-07 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-mtasc.all/function_test.as: add a couple

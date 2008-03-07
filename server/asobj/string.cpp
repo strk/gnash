@@ -323,7 +323,6 @@ string_split(const fn_call& fn)
         return as_value(array.get());
     }
 
-
     if ( delim.empty() ) {
         for (unsigned i=0; i <max; i++) {
             val.set_std_string(utf8::encodeCanonicalString(wstr.substr(i, 1), version));
@@ -332,7 +331,6 @@ string_split(const fn_call& fn)
 
         return as_value(array.get());
     }
-
 
     size_t pos = 0, prevpos = 0;
     size_t num = 0;
@@ -371,10 +369,14 @@ string_last_index_of(const fn_call& fn)
 
     const std::string& toFind = fn.arg(0).to_string();
 
-    size_t start = str.size();
+    int start = str.size();
 
     if (fn.nargs >= 2) {
-        start = fn.arg(1).to_number<size_t>();
+        start = fn.arg(1).to_number<int>();
+    }
+    
+    if (start < 0) {
+        return as_value(-1);
     }
 
     size_t found = str.find_last_of(toFind, start);
@@ -383,7 +385,7 @@ string_last_index_of(const fn_call& fn)
         return as_value(-1);
     }
 
-    return as_value(found-toFind.size()+1);
+    return as_value(found - toFind.size() + 1);
 }
 
 // 1st param: start_index, 2nd param: length (NOT end_index)
