@@ -28,6 +28,10 @@ class Test extends TestClass
   {
     check_equals(typeof(super), 'object');
 
+    // This should be the effect of an 'extends' op
+    check_equals(Test['prototype']['__constructor__'], TestClass);
+    check_equals(Test['prototype']['__proto__'], TestClass.prototype);
+
     // This seems to trigger an ActionCallMethod(undefined, super).
     // It is expected that the VM fetches super.constructor and calls
     // that instead.
@@ -55,7 +59,7 @@ class Test extends TestClass
     check_equals(myTest.x, 2);
     check_equals(typeof(myTest.__proto__.x), 'undefined');
 
-    check_totals(18);
+    check_totals(20);
     Dejagnu.done();
   }
 }

@@ -1,3 +1,8 @@
+2008-03-07 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-mtasc.all/function_test.as: add a couple
+	  more tests.
+
 2008-03-07  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* testsuite/libbase/memtest.cpp: Add tests for time stamps.
