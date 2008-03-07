@@ -1,5 +1,12 @@
 2008-03-07 Sandro Santilli <strk@keybit.net>
 
+	* server/swf_function.cpp: arguments.callee is not enumerable
+	  by default.
+	* testsuite/actionscript.all/Function.as: test for default
+	  enumerable properties of 'arguments' succeeds.
+
+2008-03-07 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Function.as: expect a failure on
 	  composition of the 'arguments' object. Was already broken,
 	  used to succeed due to another bug (availability of a 'size'

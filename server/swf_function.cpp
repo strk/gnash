@@ -85,7 +85,7 @@ swf_function::getArguments(swf_function& callee, const fn_call& fn)
 	{
 		arguments->push(fn.arg(i));
 	}
-	arguments->set_member(NSV::PROP_CALLEE, &callee);
+	arguments->init_member(NSV::PROP_CALLEE, &callee);
 
 	return arguments;
 

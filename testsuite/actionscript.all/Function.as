@@ -417,7 +417,7 @@ function f()
         propRecorder.push(props.toString());
     }
     // no enumerable properties in default mode.
-    xcheck_equals(propRecorder.length, 0); //? shouldn't fail here
+    check_equals(propRecorder.length, 0); 
     
     ASSetPropFlags(a, null, 6, 1 );
     for(var props in a)
