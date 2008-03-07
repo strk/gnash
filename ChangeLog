@@ -1,3 +1,8 @@
+2008-03-07 Sandro Santilli <strk@keybit.net>
+
+	* server/as_value.cpp (to_debug_string): add class name
+	  for functions too.
+
 2008-03-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/asobj/string.cpp: substring end pos is also set to

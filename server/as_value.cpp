@@ -1115,7 +1115,7 @@ as_value::to_debug_string() const
 		case AS_FUNCTION:
 		{
 			as_function* obj = getFun().get();
-			sprintf(buf, "[function:%p]", (void *)obj);
+			sprintf(buf, "[function(%s):%p]", typeName(*obj).c_str(), (void *)obj);
 			return buf;
 		}
 		case STRING:
