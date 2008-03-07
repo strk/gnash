@@ -1,5 +1,6 @@
 2008-03-06  Rob Savoye  <rob@ute.welcomehome.org>
 
+	* configure.ac: Add a test for mallinfo();
 	* testsuite/libbase/memtest.cpp: New test case for the Memory
 	debugger for use by maintainers.
 	* testsuite/libbase/Makefile.am: Add new memory testv case.

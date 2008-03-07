@@ -1112,6 +1112,12 @@ dnl AC_CHECK_LIB(gmp, _gmp_get_memory_functions)
 dnl fi
 AM_CONDITIONAL(HAVE_X11, [test x$x11 = xyes])
 
+AC_TRY_COMPILE([#include <malloc.h>], [
+  struct mallinfo x = mallinfo(); ],
+  AC_DEFINE(HAVE_MALLINFO, [1], [Has mallinfo()])
+)
+AM_CONDITIONAL(HAVE_MALLINFO, [test x$HAVE_MALLINFO = xyes])
+
 AC_CHECK_LIB(rt, shm_unlink)
 AC_CHECK_FUNCS(shm_open shm_unlink)
 AC_TRY_COMPILE([#include <strings.h>], [
