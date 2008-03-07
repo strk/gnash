@@ -425,7 +425,7 @@ function f()
         propRecorder.push(props.toString());
     }
     propRecorder.sort();
-    check_equals(propRecorder.length, 5);
+    xcheck_equals(propRecorder.length, 4);
     check_equals(propRecorder[0], '__proto__');
     check_equals(propRecorder[1], 'callee');
     xcheck_equals(propRecorder[2], 'caller');

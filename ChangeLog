@@ -1,3 +1,10 @@
+2008-03-07 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Function.as: expect a failure on
+	  composition of the 'arguments' object. Was already broken,
+	  used to succeed due to another bug (availability of a 'size'
+	  property, which wasn't supposed to be there..).
+
 2008-03-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/asobj/string.cpp: a negative number passed as second
