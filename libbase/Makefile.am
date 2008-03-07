@@ -85,6 +85,7 @@ libgnashbase_la_SOURCES = \
 	lirc.cpp	\
 	log.cpp	\
 	membuf.cpp \
+	memory.cpp \
 	network.cpp \
 	postscript.cpp \
 	rc.cpp \
@@ -118,6 +119,7 @@ noinst_HEADERS = \
 	image.h	\
 	jpeg.h \
 	membuf.h \
+	memory.h \
 	network.h \
 	lirc.h \
 	log.h \

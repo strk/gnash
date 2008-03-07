@@ -44,6 +44,7 @@ check_PROGRAMS = \
 	URLTest \
 	RcTest \
 	IntTypesTest \
+	memtest \
 	$(NULL)
 
 if CURL
@@ -71,6 +72,9 @@ RcTest_CPPFLAGS = -DSRCDIR="$(srcdir)"
 
 IntTypesTest_SOURCES = IntTypesTest.cpp
 IntTypesTest_CPPFLAGS = -DSRCDIR="$(srcdir)"
+
+# Test the Memory class
+memtest_SOURCES = memtest.cpp
 
 # LogTest_SOURCES = TCXXLog.cpp
 # LogTest_CPPFLAGS = '-DBUILDDIR="$(abs_builddir)"'

@@ -1,3 +1,12 @@
+2008-03-06  Rob Savoye  <rob@ute.welcomehome.org>
+
+	* testsuite/libbase/memtest.cpp: New test case for the Memory
+	debugger for use by maintainers.
+	* testsuite/libbase/Makefile.am: Add new memory testv case.
+	* libbase/memory.{h,cpp}: New Memory class for analysing memory
+	allocation to find leaks and bloat.
+	* libbase/makefile.am: Add memory.*.
+
 2008-03-06 Sandro Santilli <strk@keybit.net>
 
 	* server/array.cpp: there's no such thing as an Array.size member, and
