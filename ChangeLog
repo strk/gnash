@@ -1,5 +1,10 @@
 2008-03-06  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* testsuite/libbase/memtest.cpp: Figures, malloc() on Ubuntu and
+	Fedora differs in what it allocates. Ubuntu seems to like 16
+	bytes pages,. Fedoras gives us what we ask for, and aligns tje
+	memory later. Both behaviours are correct.
+
 	* libbase/gmemory.h: Renamed from memory.h to avoid name
 	collisions. 
 	* libbase/memory.h: Renamed to gmemory.h to avoid name
