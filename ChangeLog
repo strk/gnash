@@ -3,6 +3,7 @@
 	* server/asobj/string.cpp: a negative number passed as second
 	  argument to lastIndexOf always returns -1. More swfdec
 	  testsuite passes.
+	* testsuite/swfdec/PASSING: update passing tests.
 
 2008-03-07 Sandro Santilli <strk@keybit.net>
 

@@ -671,6 +671,10 @@ string-convert-6.swf:841b7cc8e58c33c38efbfe1768ef82cf
 string-convert-7.swf:b822683afd33802bdd0e7ba31df63d68
 string-indexof-6.swf:543f449c7446802524a1a3669e9597e7
 string-indexof-7.swf:7c874a31e0a74138466b1c815e90eb13
+string-lastIndexOf-5.swf:769a9db85056bc70bff2cee8f4f4ef9c
+string-lastIndexOf-6.swf:ed2fb18c1efa7788e5aaeccb21646119
+string-lastIndexOf-7.swf:d374d4b12bef72788e3947e5a2919220
+string-lastIndexOf-8.swf:824ea3c36d865d285aa9f0863592e150
 stringlength-5.swf:bf014dcc64776fb859ff878286f56b16
 stringlength-6.swf:94b4de2a590c915696b4a783338a1f05
 stringlength-7.swf:140952977abb85b966f1e5c4447854ce
@@ -692,6 +696,9 @@ stylesheet-properties-6.swf:678fd39739e2d49aa353147c66cfb6ad
 substr-5.swf:cf154038f95d1d654f2d162f16c60a5b
 substr-6.swf:d16644cf5ac2775cceb46f19c8663fcd
 substr-7.swf:5fd2eea885c31f6b5bd881addc0f11ba
+substring-5.swf:6c18cf05de76fc010fe84c7dcd622a67
+substring-6.swf:e60123de4d36fc7483045c2447fbb181
+substring-7.swf:7b3cce0a3271468e44fc943eb1ca84bf
 super-calls-5.swf:b68c3168ff4881a0cd780f6d4cb21950
 super-different-5.swf:8ab7ab25c38807751e3fb7e8bce42217
 super-equals-this-5.swf:8a903f417fdaa5a9b010f757fa6c0a45
