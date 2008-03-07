@@ -1,5 +1,11 @@
 2008-03-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* server/asobj/string.cpp: substring end pos is also set to
+	  0 if it's a negative number and, where relevant, swapped with
+	  start pos. More swfdec testsuite passes.
+	
+2008-03-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* gui/gui.{h,cpp}: make data tree-shaped instead of flat.
 	* gui/gtk.cpp: update properties dialogue to use tree view.
 

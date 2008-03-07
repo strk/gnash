@@ -419,8 +419,11 @@ string_sub_str(const fn_call& fn)
     return as_value(utf8::encodeCanonicalString(wstr.substr(start, num), version));
 }
 
-// 1st param: start_index, 2nd param: end_index
-// end_index is 1-based.
+// string.substring(start[, end])
+// If *either* value is less than 0, 0 is used.
+// The values are swapped if end is smaller than start.
+// Valid values for the start position are up to string 
+// length - 1.
 static as_value
 string_sub_string(const fn_call& fn)
 {
@@ -433,39 +436,38 @@ string_sub_string(const fn_call& fn)
     ENSURE_FN_ARGS(1, 2, obj->str());
 
     int start = fn.arg(0).to_number<int>();
+    int end = wstr.size();
 
     if (start < 0) {
         start = 0;
     }
 
-    if (static_cast<unsigned>(start) > wstr.size()) {
+    if (static_cast<unsigned>(start) >= wstr.size()) {
         return as_value("");
     }
-
-    int end = wstr.size();
 
     if (fn.nargs >= 2) {
         int num = fn.arg(1).to_number<int>();
 
         if (num < 0) {
-            return as_value("");
+            num = 0;
         }
 
-        if (num >= 1 && static_cast<unsigned>(num) < wstr.size()) {
-            end = num;
-
-            if (end < start) {
-                IF_VERBOSE_ASCODING_ERRORS(
-                    log_aserror(_("string.slice() called with end < start"));
-                )
-                std::swap(end, start);
-            }
-
-            end -= start;
+        end = num;
+        
+        if (end < start) {
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror(_("string.slice() called with end < start"));
+            )
+            std::swap (end, start);
         }
-
     }
-
+    
+    if (static_cast<unsigned>(end) > wstr.size()) {
+        end = wstr.size();
+    }
+    
+    end -= start;
     //log_debug("Start: %d, End: %d", start, end);
 
     return as_value(utf8::encodeCanonicalString(wstr.substr(start, end), version));
