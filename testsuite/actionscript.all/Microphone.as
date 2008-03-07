@@ -56,5 +56,8 @@ xcheck_equals ( typeof(microphoneObj.setSilenceLevel), 'function' );
 // test the Microphone::setUseEchoSuppression method
 xcheck_equals ( typeof(microphoneObj.setUseEchoSuppression), 'function' );
 
+// listen to the microphone.
+_root.attachAudio(microphoneObj);
+
 #endif // OUTPUT_VERSION > 5
 totals();

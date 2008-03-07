@@ -201,8 +201,7 @@
 	  Any plugin that wants to display in a browser window needs
 	  to be tied into the windowing system of the platform being
 	  used. On GNU/Linux systems, Firefox is a GTK2+ application.
-	  There is also KDE support through the use of the Klash
-	  plugin.
+	  There is also KDE support through the use of the kde-gnash.
 	</para>
 
 	<para>
@@ -309,21 +308,20 @@
 	
       </sect4>
 
-      <sect4 id="Klash">
-	<title>Klash</title>
+      <sect4 id="kparts">
+	<title>kparts</title>
 	<para>
-	  Klash is MozPlugger type support for KDE's Konqueror web
-	  browser. Klash makes Gnash a <emphasis>kpart</emphasis>, so it's
-	  integrated into KDE better than when using MozPlugger. Klash
-	  uses the standalone player, utilizing Gnash's "-x" window
-	  plugin command line option.
+	  kparts is MozPlugger type support for KDE's Konqueror web
+	  browser. kparts makes Gnash a <emphasis>kpart</emphasis>, so it's
+	  integrated into KDE better than when using MozPlugger. kparts
+	  uses kde-gnash to do its work.
 	</para>
 
 	<para>
-	  By default, Klash is not built. To enable building Klash,
+	  By default, kparts is not built. To enable building kparts,
 	  use the <emphasis>--enable-klash</emphasis> option when
 	  configuring. Other than installing, there is nothing else
-	  that needs to be done to install Klash.
+	  that needs to be done to install kparts.
 	</para>
       </sect4>
 

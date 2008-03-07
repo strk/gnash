@@ -301,25 +301,24 @@
     
     <glossentry>
       <glossterm>
-	Klash
+	kde-gnash
       </glossterm>
       <glossdef>
 	<para>
-	  <emphasis>Klash</emphasis> was the name given to the stand-alone 
+	  <emphasis>kde-gnash</emphasis> is the name given to the stand-alone 
 	  instance of &app; which used the KDE GUI.  It has been replaced with 
-	  an implementation using Qt.  Some documentation may incorrectly
-	  refer to the Konqueror plugin as <emphasis>Klash</emphasis>.
-	  The plugin was renamed <emphasis>Kpart</emphasis>.
+	  an implementation using Qt.  The Konqueror plugin runs kde-gnash
+          and is called <emphasis>Kparts</emphasis>.
 	</para>
       </glossdef>
     </glossentry>
     <glossentry>
       <glossterm>
-	Kpart
+	Kparts
       </glossterm>
       <glossdef>
 	<para>
-	  <emphasis>Kpart</emphasis> is a plugin for Konqueror which is
+	  <emphasis>Kparts</emphasis> is a plugin for Konqueror which is
 	  enabled with the configuration option --enable-kparts.
 	</para>
       </glossdef>

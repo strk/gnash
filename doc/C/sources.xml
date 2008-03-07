@@ -760,7 +760,7 @@
 	  <listitem>
 	    <para>
 	      Link to Qt-embedded, don't use X. This is only used by
-	      Klash.
+	      kde-gnash.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -812,7 +812,7 @@
 	      <listitem>
 		An interface adapted to the KDE Desktop Environment.
 		This must be selected when building the Konqueror plugin
-		"klash". Furthermore, the only renderer that currently
+		"kparts". Furthermore, the only renderer that currently
 		works with KDE is opengl.
 	      </listitem>
 	    </varlistentry>
@@ -853,7 +853,7 @@
 	    <para>
 	      Disable support for Konqueror plugin. If
 	      <emphasis>--enable--plugin</emphasis> is  specified, and
-	      support for building KDE programs is found, Klash is
+	      support for building KDE programs is found, kparts is
 	      built by default. This option limits the plugin to only
 	      the Mozilla/Firefox one.
 	    </para>
@@ -865,7 +865,7 @@
 	  <listitem>
 	    <para>
 	      /lib directory suffix (64,32,none=default). This is only
-	      used by Klash.
+	      used by kde-gnash.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -874,7 +874,7 @@
 	  <term>--enable-mac</term>
 	  <listitem>
 	    <para>
-	      Link to Qt/Mac (don't use X). This is only used by Klash. 
+	      Link to Qt/Mac (don't use X). This is only used by kde-gnash.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -910,7 +910,7 @@
 	  <listitem>
 	    <para>
 	      Link to Qt-embedded, link to the Qtopia
-	      Environment. This is only used by Klash.
+	      Environment. This is only used by kde-gnash.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -1107,7 +1107,7 @@
 	  <listitem>
 	    <para>
 	      Directory where QT is installed. This is only used by
-	      the Klash plugin.
+	      the kde-gnash.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -1117,7 +1117,7 @@
 	  <listitem>
 	    <para>
 	      Directory where the QT header files are installed. This
-	      is only used by the Klash plugin.
+	      is only used by the kde-gnash.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -1127,7 +1127,7 @@
 	  <listitem>
 	    <para>
 	      Directory where the QT libraries are installed. This is
-	      only used by the Klash plugin.
+	      only used by the kde-gnash.
 	    </para>
 	  </listitem>
 	</varlistentry>

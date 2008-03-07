@@ -1,3 +1,8 @@
+2008-03-07 Russ Nelson <nelson@crynwr.com>
+
+	* Fix typos and unwieldy grammar in doc/C/*.xml and doc/C/userman/*.xml
+	* Remove Klash, renaming to kde-gnash and kparts as needed.
+
 2008-03-07 Sandro Santilli <strk@keybit.net>
 
 	* server/swf_function.cpp: arguments.callee is not enumerable
