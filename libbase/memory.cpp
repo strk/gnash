@@ -31,7 +31,7 @@
 #include <vector>
 
 #include "log.h"
-#include "memory.h"
+#include "gmemory.h"
 
 using namespace std;
 

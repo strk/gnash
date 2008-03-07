@@ -1,3 +1,10 @@
+2008-03-06  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libbase/gmemory.h: Renamed from memory.h to avoid name
+	collisions. 
+	* libbase/memory.h: Renamed to gmemory.h to avoid name
+	collisions. 
+
 2008-03-06  Rob Savoye  <rob@ute.welcomehome.org>
 
 	* configure.ac: Add a test for mallinfo();

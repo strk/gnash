@@ -27,9 +27,9 @@
 #endif
 
 // If we don't have support for mallinfo(), this code is useless
-#if HAVE_MALLINFO
+#ifdef HAVE_MALLINFO
 
-#include <cstdlib>
+#include <stdlib.h>
 #include <malloc.h>
 
 namespace gnash {
