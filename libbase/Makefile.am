@@ -1,4 +1,3 @@
-# 
 #   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 # 
 # This program is free software; you can redistribute it and/or modify
@@ -119,7 +118,7 @@ noinst_HEADERS = \
 	image.h	\
 	jpeg.h \
 	membuf.h \
-	memory.h \
+	gmemory.h \
 	network.h \
 	lirc.h \
 	log.h \
