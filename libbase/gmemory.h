@@ -31,6 +31,7 @@
 
 #include <stdlib.h>
 #include <malloc.h>
+#include <time.h>
 
 namespace gnash {
   
@@ -40,6 +41,7 @@ public:
     // Borrowed from malloc.h and trimmed down.
     struct small_mallinfo {
         int line;     // line number of this data sample
+	struct timespec stamp;	// the time stamp of this sample
         int arena;    // non-mmapped space allocated from system
         int uordblks; // total allocated space
         int fordblks; // total free space
@@ -76,6 +78,10 @@ public:
     // Dump the differences of bytes allocated between two samples
     int diffStats();
     int diffStats(int x, int y);
+
+    // Dump the differences in the timestamp between two samples
+    int diffStamp();
+    int diffStamp(int x, int y);
     
     // Dump the vector of stored classes
     void dump(struct mallinfo *x);

@@ -136,7 +136,8 @@ Memory::addStats(struct small_mallinfo *ptr, int line)
 
 //    dump(&mal);
     if ((ptr) && (_index < DATALOG_SIZE)) {
-        ptr->line = line;
+	ptr->line = line;
+	clock_gettime (CLOCK_REALTIME, &ptr->stamp);
         ptr->arena = mal.arena;
         ptr->uordblks = mal.uordblks;
         ptr->fordblks = mal.fordblks;
@@ -177,6 +178,23 @@ Memory::diffStats(int x, int y)
     return -1;
 }
     
+// Dump the differences between two samples's timestamp
+int
+Memory::diffStamp()
+{
+//    GNASH_REPORT_FUNCTION;
+    return diffStamp(_index - 1, _index - 2);
+}
+
+int
+Memory::diffStamp(int x, int y)
+{
+//    GNASH_REPORT_FUNCTION;
+    if ((_info) && (x < DATALOG_SIZE) && (y < DATALOG_SIZE)) {
+        return (_info[x].stamp.tv_nsec - _info[y].stamp.tv_nsec);
+    }
+    return -1;
+}    
 
 // Analyze memory usage
 bool
@@ -201,17 +219,37 @@ Memory::analyze()
 
     if (_index > 1) {
         for (int i=1; i<_index; i++) {
-            // See what was allocated between samples
             struct small_mallinfo *ptr = _info + i;
+
+	    // Get the time stamp
+            int diff_stamp_sec = (ptr->stamp.tv_sec) - (ptr - 1)->stamp.tv_sec;
+            int diff_stamp_nsec = (ptr->stamp.tv_nsec) - (ptr - 1)->stamp.tv_nsec;
+//             if ((diff_stamp_sec > 0) || (diff_stamp_nsec > 0)) {
+// 		if (ptr->line && (ptr - 1)->line) {
+// 		    if (diff_stamp_sec > 0) {
+// 			cerr << "Difference in seconds is: " << diff_stamp_sec;
+// 			cerr << ", nanoseconds is: "<< diff_stamp_nsec;
+// 		    }
+// 		    else {
+// 			cerr << "Difference in nanoseconds is: "<< diff_stamp_nsec;
+// 		    }
+// 		    cerr << "\tbetween lines: " << (ptr - 1)->line
+// 			 << " and " << ptr->line << endl;
+// 		} else {
+// 		    cerr << "Difference in seconds is: " << diff_stamp_sec
+// 			 << ", nanoseconds is: "<< diff_stamp_nsec << endl;
+// 		}
+// 	    }
+	    // See what was allocated between samples
             int diff_allocated = (ptr->uordblks) - (ptr - 1)->uordblks;
             if (diff_allocated > 0) {
                 accumulate_allocated += diff_allocated;
                 if (ptr->line && (ptr - 1)->line) {
                     cerr << "Allocated " << diff_allocated
-                         << " bytes Between lines: " << (ptr - 1)->line
-                         << " and " << ptr->line << endl;
+                         << " bytes\tbetween lines: " << (ptr - 1)->line
+                         << " and " << ptr->line;
                 } else {
-                    cerr << "Allocated bytes: " << diff_allocated << endl;
+                    cerr << "Allocated bytes: " << diff_allocated;
                 }
 // same as diff_freed
 //             } else {
@@ -226,10 +264,10 @@ Memory::analyze()
                 accumulate_freed += diff_freed;
                 if (ptr->line && (ptr - 1)->line) {
                     cerr << "Freed " << diff_freed
-                         << " bytes Between lines: " << (ptr - 1)->line
-                         << " and " << ptr->line << endl;
+                         << " bytes between lines: " << (ptr - 1)->line
+                         << " and " << ptr->line;
                 } else {
-                    cerr << "Freed bytes: " << diff_freed << endl;
+                    cerr << "Freed bytes: " << diff_freed;
                 }
 // Same as diif_allocated
 //              } else {
@@ -237,6 +275,16 @@ Memory::analyze()
 //                      cerr << "\tnuked heap bytes: " << diff_freed << endl;
 //                  }
             }
+	    if (diff_freed || diff_allocated) {
+		cerr << ", and took " << diff_stamp_nsec << " nanoseconds";
+	    } else {
+		cerr << "no allocations, time difference is " << diff_stamp_nsec << " nanoseconds";
+                if (ptr->line && (ptr - 1)->line) {
+                         cerr << " between lines: " << (ptr - 1)->line
+                         << " and " << ptr->line;
+		}
+	    }
+	    cerr << endl;
         }
     } else {
         cerr << "Only have one sample" << endl;
@@ -278,6 +326,12 @@ Memory::dump(struct small_mallinfo *ptr)
 {
 //    GNASH_REPORT_FUNCTION;
     cerr << "\tLine number of sample: " << ptr->line << endl;
+    cout.fill('0');
+    cout.width(9);
+    cerr << "\tTimestamp number of sample: " << ptr->stamp.tv_sec
+	 << ":" << ptr->stamp.tv_nsec << endl;
+    cout.fill(' ');
+    cout.width(1);
     cerr << "\tNon-mmapped space allocated from system is: \""
          << ptr->arena << "\"" << endl;
     cerr << "\tTotal allocated space  is: \""
