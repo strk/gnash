@@ -1706,7 +1706,7 @@ SWFHandlers::ActionGetTimer(ActionExec& thread)
 //	GNASH_REPORT_FUNCTION;
 	
 	as_environment& env = thread.env;
-	env.push(floorf(VM::get().getTime()));
+	env.push(VM::get().getTime());
 }
 
 void

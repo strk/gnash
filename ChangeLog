@@ -1,3 +1,10 @@
+2008-03-07 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/StringPredicates.h: Use boost string algorithms instead of
+	the current home-grown ones.
+	* server/vm/ASHandlers.cpp: getTime() returns int, so there's no point
+	in rounding it to the nearest integer.
+
 2008-03-07 Russ Nelson <nelson@crynwr.com>
 
 	* Fix typos and unwieldy grammar in doc/C/*.xml and doc/C/userman/*.xml
