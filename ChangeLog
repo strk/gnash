@@ -1,3 +1,15 @@
+2008-03-09 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/gnash.h: add "interfaceEventCallback" callback for passing
+	  AS events to the gui.
+	* server/as_object.{cpp,h}: make callback a static method of as_object
+	  class, as that's where it's used.
+	* gui/Player.{h,cpp}: register Player as a listener for interface event
+	  callbacks and pass on to gui.
+	* gui/gui.{cpp,h}: make Mouse.hide and Mouse.show unimplemented in the
+	  gui, not in mouse_as_object.
+	* server/asobj/Mouse.cpp: send mouse events using callback.
+
 2008-03-07 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/StringPredicates.h: Use boost string algorithms instead of

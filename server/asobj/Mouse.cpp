@@ -89,15 +89,20 @@ public:
 
 as_value mouse_hide(const fn_call& fn)
 {
+
     boost::intrusive_ptr<mouse_as_object> obj=ensureType<mouse_as_object>(fn.this_ptr);
     UNUSED(obj);
 
-    static bool warned=false;
-    if ( ! warned )
-    {
-        log_unimpl (__FUNCTION__);
-        warned=true;
-    }
+	if (as_object::interfaceHandle)
+	{
+		(*as_object::interfaceHandle)("Mouse.hide", "");
+	}
+	else
+	{
+		log_error(_("No callback to handle Mouse.hide"));
+	}
+
+	/// Returns nothing
     return as_value();
 }
 
@@ -106,12 +111,15 @@ as_value mouse_show(const fn_call& fn)
     boost::intrusive_ptr<mouse_as_object> obj=ensureType<mouse_as_object>(fn.this_ptr);
     UNUSED(obj);
 
-    static bool warned=false;
-    if ( ! warned )
-    {
-        log_unimpl (__FUNCTION__);
-        warned=true;
-    }
+	if (as_object::interfaceHandle)
+	{
+		(*as_object::interfaceHandle)("Mouse.show", "");
+	}
+	else
+	{
+		log_error(_("No callback to handle Mouse.show"));
+	}
+	/// Returns nothing
     return as_value();
 }
 

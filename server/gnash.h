@@ -122,6 +122,14 @@ typedef void (*fscommand_callback)(sprite_instance* movie, const char* command, 
 /// script to fscommand().
 DSOEXPORT void  register_fscommand_callback(fscommand_callback handler);
 
+/// Signature of interface event callback.
+typedef void (*interfaceEventCallback)(const std::string& event, const std::string& arg);
+
+/// Use this to register listeners for as_object events that should
+/// trigger an event in the user interface (GUI or any other
+/// user of the gnash core libs.
+DSOEXPORT void registerEventCallback(interfaceEventCallback handler);
+
 /// Use this to register gnash extension
 //
 /// WARNING: does not convert name, make sure to pass a lowercase

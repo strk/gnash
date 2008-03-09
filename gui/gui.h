@@ -219,7 +219,7 @@ public:
     /// Attempt to run in a fullscreen window both for plugin and
     /// standalone player.
     //
-    /// Use gui::isFullscreen() to see if gnash thinks
+    /// Use isFullscreen() to see if gnash thinks
     /// it's running in fullscreen or not. The switch to fullscreen may
     /// fail if, for instance, the window manager refuses to allow it, but
     /// the flag will be set anyway.
@@ -228,6 +228,11 @@ public:
     /// Return from fullscreen to normal mode.
     ///
     virtual void unsetFullscreen();
+    
+    /// Sets whether the gui should show the system mouse pointer
+    //
+    /// @param show true if the mouse should be shown.
+    virtual void showMouse(bool show);
     
     // Toggle between fullscreen and normal mode
     void toggleFullscreen();

@@ -160,6 +160,9 @@ private:
 	static void fs_callback(sprite_instance* movie,
 			const char* command, const char* args);
 
+	static void interfaceEventCallback(const std::string& event,
+							const std::string& arg);
+
 	// Movie parameters (for -P)
 	std::map<std::string, std::string> params;
 
@@ -186,7 +189,7 @@ private:
 
 	std::string _baseurl;
 
-	std::auto_ptr<Gui> _gui;
+	static std::auto_ptr<Gui> _gui;
 
 	std::auto_ptr<media::sound_handler> _sound_handler;
 

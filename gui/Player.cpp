@@ -53,6 +53,7 @@ namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 }
 
+std::auto_ptr<Gui> Player::_gui(NULL);
 
 /*static private*/
 void
@@ -109,6 +110,8 @@ Player::init()
 	set_use_cache_files(false);
 
 	gnash::register_fscommand_callback(fs_callback);
+	
+	gnash::as_object::registerEventCallback(interfaceEventCallback);
 
 }
 
@@ -393,6 +396,22 @@ Player::fs_callback(gnash::sprite_instance* movie, const char* command, const ch
 // For handling notification callbacks from ActionScript.
 {
     log_debug(_("fs_callback(%p): %s %s"), (void*)movie, command, args);
+}
+
+void
+Player::interfaceEventCallback(const std::string& event, const std::string& arg)
+{
+	if (event == "Mouse.hide")
+	{
+		_gui->showMouse(false);
+		return;
+	}
+	if (event == "Mouse.show")
+	{
+		_gui->showMouse(true);
+		return;
+	}
+	log_error(_("Unhandled callback %s with arguments %s"), event, arg);
 }
 
 /* private */
