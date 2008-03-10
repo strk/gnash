@@ -1,5 +1,6 @@
 2008-03-10 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/generic-testrunner.sh: sleep less.
 	* testsuite/misc-ming.all/Makefile.am: re-enabled
 	  instanceNameTestRunner, erroneously dropped by
 	  in revision 1.184 (when adding BOOST_CFLAGS).
