@@ -1,3 +1,9 @@
+2008-03-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* doc/C/usermanual/gnashrc.xml: add information about ignoreFSCommands
+	  directive.
+	* doc/C/refmanual/internals.xml: correct typo.
+
 2008-03-10 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/generic-testrunner.sh: sleep less.

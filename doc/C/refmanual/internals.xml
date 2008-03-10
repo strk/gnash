@@ -50,7 +50,7 @@
 		Libgnashmedia handles Gnash's audio and video capabilities,
 		dealing with streamed video and sound as well as decoding
 		embedded media frames. Besides the standard Flash formats
-		FLV, MPEG4, Nellymoser, ADMCP, MP3 and RAW, &app; can 
+		FLV, MPEG4, Nellymoser, ADPCM, MP3 and RAW, &app; can 
 		decode other formats supports by gstreamer or ffmpeg, 
 		including the free OGG container and free codecs.
 	</para>

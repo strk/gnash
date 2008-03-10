@@ -223,7 +223,17 @@
 	  <entry>on/off</entry>
 	  <entry>If set to <emphasis>on</emphasis>, &app; will not write Shared Object files.</entry>
 	</row>
-	
+
+	<row>
+	  <entry>ignoreFSCommand</entry>
+	  <entry>on/off</entry>
+	  <entry>If set to on (default), &app; will ignore fscommands in standalone mode.
+	  Fscommands are requests from the playing movie to the operating system or 
+	  user interface: the most common are quit, fullscreen, showmenu and exec. &app;
+	  always ignores fscommands when running as a plugin.
+	  </entry>
+	</row>
+		
 	<row>
 	  <entry>URLOpenerFormat</entry>
 	  <entry>string</entry>
