@@ -1,3 +1,7 @@
+2008-03-10 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-mtasc.all/Dejagnu.as: quit when done.
+
 2008-03-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gtk.cpp: change cursor only over the drawing area.
