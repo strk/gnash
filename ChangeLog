@@ -1,5 +1,11 @@
 2008-03-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* gui/gtk.cpp: change cursor only over the drawing area.
+	  Prevents the mouse staying invisible over menus. Drop
+	  a line I accidentally added some time ago.
+
+2008-03-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* server/gnash.h: third time lucky: interfaceEventCallback
 	  returns a std::string to allow a range of responses.
 	* gui/Player.{h,cpp}: adapt interfaceEventCallback method

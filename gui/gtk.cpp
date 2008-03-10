@@ -135,7 +135,6 @@ GtkGui::init(int argc, char **argv[])
     // widgets are realized and before the configure event is fired.
     // TODO: find a way to make '_glue' use independent from actual renderer in use
     _glue->prepDrawingArea(_drawingArea);
-    gtk_container_set_reallocate_redraws(GTK_CONTAINER (_window), TRUE);
 #endif
 
     // Plugin
@@ -343,8 +342,7 @@ GtkGui::setCursor(gnash_cursor_type newcursor)
     }
 
     // The parent of _drawingArea is different for the plugin in fullscreen
-    gdk_window_set_cursor (gtk_widget_get_parent_window(_drawingArea),
-  		gdkcursor);
+    gdk_window_set_cursor (_drawingArea->window, gdkcursor);
   
     if (gdkcursor) {
         gdk_cursor_unref(gdkcursor);
@@ -365,9 +363,7 @@ GtkGui::showMouse(bool show)
         GdkCursor* cursor = gdk_cursor_new_from_pixmap(pixmap, pixmap,
                                                     color, color, 0, 0);
 
-
-        gdk_window_set_cursor (gtk_widget_get_parent_window(_drawingArea),
-	        cursor);
+        gdk_window_set_cursor (_drawingArea->window, cursor);
 
         g_free(color);
         g_object_unref(pixmap);	
