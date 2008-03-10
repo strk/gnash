@@ -321,6 +321,8 @@ GtkGui::setCursor(gnash_cursor_type newcursor)
 {
   //GNASH_REPORT_FUNCTION;
 
+	if (! _mouseShown) return;
+
     GdkCursorType cursortype;
 
     switch(newcursor) {
@@ -347,6 +349,38 @@ GtkGui::setCursor(gnash_cursor_type newcursor)
     if (gdkcursor) {
         gdk_cursor_unref(gdkcursor);
     }
+}
+
+void
+GtkGui::showMouse(bool show)
+{
+
+    if (!show && _mouseShown)
+    {
+        GdkPixmap *pixmap;
+        GdkColor *color;
+
+        color = g_new0(GdkColor, 1);
+        pixmap = gdk_pixmap_new(NULL, 1, 1, 1);
+        GdkCursor* cursor = gdk_cursor_new_from_pixmap(pixmap, pixmap,
+                                                    color, color, 0, 0);
+
+
+        gdk_window_set_cursor (gtk_widget_get_parent_window(_drawingArea),
+	        cursor);
+
+        g_free(color);
+        g_object_unref(pixmap);	
+        gdk_cursor_unref(cursor);
+
+        _mouseShown = false;
+
+    }
+	else if (show && !_mouseShown)
+    {
+        _mouseShown = true;	
+    } 
+
 }
 
 // private

@@ -1,5 +1,17 @@
 2008-03-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* server/gnash.h: third time lucky: interfaceEventCallback
+	  returns a std::string to allow a range of responses.
+	* gui/Player.{h,cpp}: adapt interfaceEventCallback method
+	  to return std::string. Clean up names of private member
+	  variables.
+	* gui/gui.{h,cpp}: add flag for whether mouse pointer
+	  is shown or hidden.
+	* gui/gtk{sup.h,.cpp}: implement mouse hide/show for GTK.
+	* doc/C/refmanual/internals.xml: update some docs.
+
+2008-03-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* server/gnash.h: make interfaceEventCallback return bool to
 	  allow response from the gui. Rename register_fscommand_callback
 	  to registerFSCommandCallback and make it take const std::string&

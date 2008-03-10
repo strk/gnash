@@ -179,6 +179,8 @@ class DSOEXPORT GtkGui : public Gui
     bool want_multiple_regions() { return true; }
 
     virtual void setCursor(gnash_cursor_type newcursor);
+    
+    virtual void showMouse(bool show);
 
  private:
 #ifdef GUI_HILDON

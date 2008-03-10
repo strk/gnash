@@ -71,20 +71,20 @@ Player::setFlashVars(const std::string& varstr)
 Player::Player()
 	:
 #if defined(RENDERER_CAIRO)
-	bit_depth(32),
+	_bitDepth(32),
 #else
-	bit_depth(16),
+	_bitDepth(16),
 #endif
-	scale(1.0f),
-	delay(0),
-	width(0),
-	height(0),
-	windowid(0),
-	do_loop(true),
-	do_render(true),
-	do_sound(true),
-	exit_timeout(0),
-	_movie_def(0)
+	_scale(1.0f),
+	_delay(0),
+	_width(0),
+	_height(0),
+	_windowID(0),
+	_doLoop(true),
+	_doRender(true),
+	_doSound(true),
+	_exitTimeout(0),
+	_movieDef(0)
 #ifdef GNASH_FPS_DEBUG
 	,_fpsDebugTime(0.0)
 #endif
@@ -96,8 +96,8 @@ Player::Player()
 float
 Player::setScale(float newscale)
 {
-	float oldscale=scale;
-	scale=newscale;
+	float oldscale = _scale;
+	_scale = newscale;
 	return oldscale;
 }
 
@@ -146,9 +146,9 @@ Player::init_logfile()
     // TODO: we should remove all uses of the rcfile
     //       from Player class..
     //
-    if (!delay && rcfile.getTimerDelay() > 0) {
-        delay = rcfile.getTimerDelay();
-        log_debug (_("Timer delay set to %d milliseconds"), delay);
+    if (!_delay && rcfile.getTimerDelay() > 0) {
+        _delay = rcfile.getTimerDelay();
+        log_debug (_("Timer delay set to %d milliseconds"), _delay);
     }    
 
 }
@@ -156,7 +156,7 @@ Player::init_logfile()
 void
 Player::init_sound()
 {
-    if (do_sound) {
+    if (_doSound) {
 #ifdef SOUND_SDL
         _sound_handler.reset( gnash::media::create_sound_handler_sdl() );
 #elif defined(SOUND_GST)
@@ -174,7 +174,7 @@ Player::init_sound()
 void
 Player::init_gui()
 {
-	if ( do_render )
+	if ( _doRender )
 	{
 		_gui = getGui(); 
 
@@ -187,7 +187,7 @@ Player::init_gui()
 	}
 	else
 	{
-		_gui.reset(new NullGui(do_loop));
+		_gui.reset(new NullGui(_doLoop));
 	}
 
 #ifdef GNASH_FPS_DEBUG
@@ -282,9 +282,9 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 
 	// Set _root._url (either explicit of from infile)
 	if ( url ) {
-		_url=std::string(url);
+		_url = std::string(url);
 	}  else {
-		_url=std::string(infile);
+		_url = std::string(infile);
 	}
 
 
@@ -326,39 +326,39 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 	gnash::set_base_url(URL(_baseurl));
 
 	// Load the actual movie.
-	_movie_def = load_movie();
-	if ( ! _movie_def )
+	_movieDef = load_movie();
+	if ( ! _movieDef )
 	{
 		return EXIT_FAILURE;
 	}
 
 
     // Get info about the width & height of the movie.
-    int movie_width = static_cast<int>(_movie_def->get_width_pixels());
-    int movie_height = static_cast<int>(_movie_def->get_height_pixels());
-    float movie_fps = _movie_def->get_frame_rate();
+    int movie_width = static_cast<int>(_movieDef->get_width_pixels());
+    int movie_height = static_cast<int>(_movieDef->get_height_pixels());
+    float movie_fps = _movieDef->get_frame_rate();
 
-    if (!width) {
-      width = size_t(movie_width * scale);
+    if (! _width) {
+      _width = size_t(movie_width * _scale);
     }
-    if (!height) {
-      height = size_t(movie_height * scale);
+    if (! _height) {
+      _height = size_t(movie_height * _scale);
     }
 
-    if ( ! width || ! height )
+    if ( ! _width || ! _height )
     {
         //log_error(_("Input movie has collapsed dimensions " SIZET_FMT "/" SIZET_FMT ". Giving up."), width, height);
-        log_debug(_("Input movie has collapsed dimensions " SIZET_FMT "/" SIZET_FMT ". Setting to 1/1 and going on."), width, height);
-	if ( ! width ) width = 1;
-	if ( ! height ) height = 1;
+        log_debug(_("Input movie has collapsed dimensions " SIZET_FMT "/" SIZET_FMT ". Setting to 1/1 and going on."), _width, _height);
+	if ( ! _width ) _width = 1;
+	if ( ! _height ) _height = 1;
 	//return EXIT_FAILURE;
     }
 
     // Now that we know about movie size, create gui window.
-    _gui->createWindow(_url.c_str(), width, height);
+    _gui->createWindow(_url.c_str(), _width, _height);
 
     SystemClock clock; // use system clock here...
-    movie_root& root = VM::init(*_movie_def, clock).getRoot();
+    movie_root& root = VM::init(*_movieDef, clock).getRoot();
 
     // Set host requests fd (if any)
     if ( _hostfd != -1 ) root.setHostFD(_hostfd);
@@ -367,17 +367,17 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
     _gui->setStage(&root);
 
     // Start loader thread
-    _movie_def->completeLoad();
+    _movieDef->completeLoad();
 
-    _gui->setMovieDefinition(_movie_def);
+    _gui->setMovieDefinition(_movieDef);
 
-    if (!delay) {
-      delay = (unsigned int) (1000 / movie_fps) ; // milliseconds per frame
+    if (! _delay) {
+      _delay = static_cast<unsigned int>(1000 / movie_fps) ; // milliseconds per frame
     }
-    _gui->setInterval(delay);
+    _gui->setInterval(_delay);
 
-    if (exit_timeout) {
-      _gui->setTimeout((unsigned int)(exit_timeout * 1000));
+    if (_exitTimeout) {
+      _gui->setTimeout(static_cast<unsigned int>(_exitTimeout * 1000));
     }
 
     _gui->run();
@@ -424,23 +424,23 @@ Player::fs_callback(gnash::sprite_instance* movie, const std::string& command,
 
 }
 
-bool
+std::string
 Player::interfaceEventCallback(const std::string& event, const std::string& arg)
 {
 	if (event == "Mouse.hide")
 	{
 		_gui->showMouse(false);
-		return true;
+		return "";
 	}
 
 	if (event == "Mouse.show")
 	{
 		_gui->showMouse(true);
-		return true;
+		return "";
 	}
 	
 	log_error(_("Unhandled callback %s with arguments %s"), event, arg);
-	return false;
+	return "";
 }
 
 /* private */
@@ -448,33 +448,33 @@ std::auto_ptr<Gui>
 Player::getGui()
 {
 #ifdef GUI_GTK
-	return createGTKGui(windowid, scale, do_loop, bit_depth);
+	return createGTKGui(_windowID, _scale, _doLoop, _bitDepth);
 #endif
 
 #ifdef GUI_KDE
-	return createKDEGui(windowid, scale, do_loop, bit_depth);
+	return createKDEGui(_windowID, _scale, _doLoop, _bitDepth);
 #endif
 
 #ifdef GUI_SDL
-	return createSDLGui(windowid, scale, do_loop, bit_depth);
+	return createSDLGui(_windowID, _scale, _doLoop, _bitDepth);
 #endif
 
 #ifdef GUI_AQUA
-	return createAQUAGui(windowid, scale, do_loop, bit_depth);
+	return createAQUAGui(_windowID, _scale, _doLoop, _bitDepth);
 #endif
 
 #ifdef GUI_RISCOS
-	return createRISCOSGui(windowid, scale, do_loop, bit_depth);
+	return createRISCOSGui(_windowID, _scale, _doLoop, _bitDepth);
 #endif
 
 #ifdef GUI_FLTK
-	return createFLTKGui(windowid, scale, do_loop, bit_depth);
+	return createFLTKGui(_windowID, _scale, _doLoop, _bitDepth);
 #endif
 
 #ifdef GUI_FB
-	return createFBGui(windowid, scale, do_loop, bit_depth);
+	return createFBGui(_windowID, _scale, _doLoop, _bitDepth);
 #endif
 
-	return std::auto_ptr<Gui>(new NullGui(do_loop));
+	return std::auto_ptr<Gui>(new NullGui(_doLoop));
 }
 

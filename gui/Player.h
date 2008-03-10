@@ -71,14 +71,12 @@ public:
 	///           
 	///
 	int run(int argc, char* argv[],
-		const char* infile, const char* url=NULL);
-#if 0
-        int run(const char* infile);
-#endif
+		const char* infile, const char* url = NULL);
+
 	float setScale(float s);
 
 	// milliseconds per frame
-	void setDelay(unsigned int d) { delay=d; }
+	void setDelay(unsigned int d) { _delay=d; }
 
 #ifdef GNASH_FPS_DEBUG
 	/// Set the number of seconds between FPS debugging prints
@@ -91,23 +89,23 @@ public:
 	void setFpsPrintTime(float time)
 	{
 		assert(time >= 0.0);
-		_fpsDebugTime=time;
+		_fpsDebugTime = time;
 	}
 #endif // def GNASH_FPS_DEBUG
 
-	void setWidth(size_t w) { width=w; }
-	size_t getWidth() { return width; }
+	void setWidth(size_t w) { _width = w; }
+	size_t getWidth() { return _width; }
 
-	void setHeight(size_t h) { height=h; }
-	size_t getHeight() { return height; }
+	void setHeight(size_t h) { _height = h; }
+	size_t getHeight() { return _height; }
 
-	void setWindowId(unsigned long x) { windowid=x; }
+	void setWindowId(unsigned long x) { _windowID = x; }
 
-	void setDoLoop(bool b) { do_loop=b; }
+	void setDoLoop(bool b) { _doLoop = b; }
 
-	void setDoRender(bool b) { do_render=b; }
+	void setDoRender(bool b) { _doRender = b; }
 
-	void setDoSound(bool b) { do_sound=b; }
+	void setDoSound(bool b) { _doSound = b; }
 
 	/// Set the base url for this run.
 	//
@@ -119,16 +117,10 @@ public:
 	}
 
 	float setExitTimeout(float n) {
-		float old_timeout = exit_timeout;
-		exit_timeout = n;
-		return old_timeout;
+		float oldtimeout = _exitTimeout;
+		_exitTimeout = n;
+		return oldtimeout;
 	}
-
-//	int setBitDepth(int depth) {
-//		int old=bit_depth;
-//		bit_depth=depth;
-//		return old;
-//	}
 
 	void setParam(std::string& name, std::string& value) {
 		params[name] = value;
@@ -160,32 +152,32 @@ private:
 	static void fs_callback(sprite_instance* movie,
 			const std::string& command, const std::string& args);
 
-	static bool interfaceEventCallback(const std::string& event,
+	static std::string interfaceEventCallback(const std::string& event,
 							const std::string& arg);
 
 	// Movie parameters (for -P)
 	std::map<std::string, std::string> params;
 
-	unsigned int bit_depth;
+	unsigned int _bitDepth;
 
 	// the scale at which to play 
-	float scale;
+	float _scale;
 
-	unsigned int delay;
+	unsigned int _delay;
 
-	size_t width;
+	size_t _width;
 
-	size_t height;
+	size_t _height;
 
-	unsigned long windowid;
+	unsigned long _windowID;
 
-	bool do_loop;
+	bool _doLoop;
 
-	bool do_render;
+	bool _doRender;
 
-	bool do_sound;
+	bool _doSound;
 
-	float exit_timeout;
+	float _exitTimeout;
 
 	std::string _baseurl;
 
@@ -197,7 +189,7 @@ private:
 
 	std::string _infile;
 
-	movie_definition* _movie_def;
+	movie_definition* _movieDef;
 
 	/// Load the "_infile" movie setting it's url to "_url"
 	// 

@@ -370,7 +370,9 @@ protected:
     /// window size did change.
     bool            _redraw_flag;
     // True if Gnash is running in fullscreen
-    bool	    _fullscreen;
+    bool	    	_fullscreen;
+    // True if mouse pointer is showing
+    bool	    	_mouseShown;
 
 private:
 

@@ -7,7 +7,8 @@
     <para>
       The top level of Gnash has several libraries, <emphasis>libgnashbase</emphasis>,
       <emphasis>libgnashserver</emphasis>,
-      <emphasis>libgnashasobjs</emphasis> and
+      <emphasis>libgnashmedia</emphasis>,
+      <emphasis>libgnashamf</emphasis> and
       <emphasis>libgnashbackend</emphasis>. There are several utility programs 
       included for debug parsing and processing of Flash movie files,
       and other useful utilities for examining local Shared Objects and
@@ -33,15 +34,6 @@
 	</para>	
       </sect3>
       
-      <sect3 id="libgnashgui">
-	<title>libgnashgui</title>
-	
-	<para>
-	  Libgnashgui contains code for a portable GUI class that
-	  supports using GTK2, a framebuffer, SDL, or KDE, FLTK, or Aqua.
-	</para>
-      </sect3>
-
       <sect3 id="libgnashserver">
 	<title>libgnashserver</title>
 	<para>
@@ -52,11 +44,15 @@
 	</para>
       </sect3>
 
-      <sect3 id="libgnashasobjs">
-	<title>libgnashasobjs</title>
+      <sect3 id="libgnashmedia">
+	<title>libgnashmedia</title>
 	<para>
-	  Libgnashasobjs contains all the ActionScript classes used by
-	  the interpreter.
+		Libgnashmedia handles Gnash's audio and video capabilities,
+		dealing with streamed video and sound as well as decoding
+		embedded media frames. Besides the standard Flash formats
+		FLV, MPEG4, Nellymoser, ADMCP, MP3 and RAW, &app; can 
+		decode other formats supports by gstreamer or ffmpeg, 
+		including the free OGG container and free codecs.
 	</para>
       </sect3>
 
@@ -158,16 +154,16 @@
       <para>
 	The plugin is designed to work within Mozilla or Firefox,
 	although there is Konqueror support as well. The plugin uses
-	the Mozilla NPAPI plugin API to be cross platform, and is
+	the Mozilla plugin API (NPAPI) to be cross platform, and is
 	portable, as well as being well integrated into Mozilla based
 	browsers.
       </para>
 
       <sect3 id="pluginstatus">
-	<title>Current Status</title>
+	<title>Current Implementation</title>
 	<para>
-	  As of March 30, 2006, the plugin works! This works in a
-	  fashion similar to MozPlugger in that the standalone player
+	  The plugin works in a
+	  fashion similar to MozPlugger: the standalone player
 	  is used instead of using a thread. This gets around the
 	  issue of having to maintain a separate player to support the
 	  plugin. It also gets around the other issues that Gnash

@@ -91,7 +91,8 @@ Gui::Gui() :
     _interval(0),
     _renderer(NULL),
     _redraw_flag(true),
-    _fullscreen(false)
+    _fullscreen(false),
+    _mouseShown(true)
 #ifdef GNASH_FPS_DEBUG
     ,fps_counter(0)
     ,fps_counter_total(0)

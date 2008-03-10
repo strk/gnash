@@ -125,7 +125,7 @@ typedef void (*fscommand_callback)(sprite_instance* movie,
 DSOEXPORT void registerFSCommandCallback(fscommand_callback handler);
 
 /// Signature of interface event callback.
-typedef bool (*interfaceEventCallback)(const std::string& event, const std::string& arg);
+typedef std::string (*interfaceEventCallback)(const std::string& event, const std::string& arg);
 
 /// Use this to register listeners for core events that should
 /// trigger an event in the user interface (GUI or any other
