@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.117 2008/03/06 13:07:33 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.118 2008/03/10 17:18:48 strk Exp $";
 
 #include "check.as"
 
@@ -1466,7 +1466,12 @@ check_equals(typeof(ret), 'undefined');
 #if OUTPUT_VERSION <= 5
 	// It seems for SWF5 onData isn't invoked,
 	// neighter does onEnterFrame work..
-	dataLoadInterval = setInterval(onData, 1000);
+	onDataCheck = function()
+	{
+		if ( _root.var1 != undefined ) onData();
+	};
+	//dataLoadInterval = setInterval(onData, 1000);
+	dataLoadInterval = setInterval(onDataCheck, 1000);
 #endif
 
 
