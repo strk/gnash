@@ -1,3 +1,8 @@
+2008-03-10 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/StringPredicates.h: Make case insensitive compare work with
+	old boost, take two.
+
 2008-03-10 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/fn_call.h: add a 'super' member in the function call.

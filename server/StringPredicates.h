@@ -37,8 +37,25 @@ public:
 	{
 		return std::lexicographical_compare(a.begin(), a.end(),
 						    b.begin(), b.end(),
-						    boost::is_iless());
+						    nocase_less());
 	}
+private:
+
+	class nocase_less
+	{
+	public:
+		nocase_less(const std::locale& locale = std::locale())
+			: _locale(locale)
+		{}
+
+		bool operator() (const char& a, const char& b) const
+		{
+			return std::toupper<char>(a, _locale) <
+			       std::toupper<char>(b, _locale);
+		}
+	private:
+		const std::locale& _locale;
+	};
 };
 
 
