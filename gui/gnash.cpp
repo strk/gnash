@@ -108,12 +108,12 @@ usage()
         "  -v            Be verbose; i.e. print log messages to stdout\n"
 		),
 #if VERBOSE_ACTION
-      _("  -va           Be (very) verbose about parsing\n"),
+      _("  -va           Be (very) verbose about action execution\n"),
 #else
 	"",
 #endif
 #if VERBOSE_PARSE
-      _("  -vp           Be (very) verbose about action execution\n"),
+      _("  -vp           Be (very) verbose about parsing\n"),
 #else
 	"",
 #endif
