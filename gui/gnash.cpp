@@ -108,21 +108,18 @@ usage()
         "  -v            Be verbose; i.e. print log messages to stdout\n"
 		),
 #if VERBOSE_ACTION
-      _("  -va           Be verbose about movie Actions\n"),
+      _("  -va           Be (very) verbose about parsing\n"),
 #else
 	"",
 #endif
 #if VERBOSE_PARSE
-      _("  -vp           Be verbose about parsing the movie\n"),
+      _("  -vp           Be (very) verbose about action execution\n"),
 #else
 	"",
 #endif
 		  _(
-        "  -m <bias>     Specify the texture LOD bias (float, default is -1.0)\n"
         "  -x <ID>       X11 Window ID for display\n"
         "  -v            Produce verbose output\n"
-        "  -vp           Be (very) verbose about parsing\n"
-        "  -va           Be (very) verbose about action execution\n"
         "  -w            Produce the disk based debug log\n"
 	"  -j <width >   Set window width\n"
 	"  -k <height>   Set window height\n"
@@ -136,7 +133,6 @@ usage()
         "                3 enables both rendering & sound (default)\n"
 		), _(
         "  -t <sec>      Timeout and exit after the specified number of seconds\n"
-        //"  -b <bits>     Bit depth of output window (16 or 32, default is 16)\n"
         "  -u <url>      Set \"real\" url of the movie\n"
 	"                (useful for downloaded movies)\n"
         "  -U <url>      Set \"base\" url for this run\n"
@@ -163,8 +159,6 @@ usage()
 
 	"  CTRL-L          Force immediate redraw\n"
 /*
-        "  CTRL-B          Toggle background color\n"  // No code to make this work or indication
-						       // what it's supposed to do.
         "  CTRL-A          Toggle antialiasing (doesn't work)\n"
         "  CTRL-T          Debug.  Test the set_variable() function\n"
         "  CTRL-G          Debug.  Test the get_variable() function\n"
@@ -228,7 +222,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         }
     }
     
-    while ((c = getopt (argc, argv, "hvaps:cd:x:r:t:b:1wj:k:u:P:U:gVf:F:")) != -1)
+    while ((c = getopt (argc, argv, "hvaps:m:cd:x:r:t:1wj:k:u:P:U:gVf:F:")) != -1)
     {
 	switch (c) {
     	  // case 'c' (Disable SDL core dumps) is decoded in sdl.cpp:init()
@@ -265,6 +259,9 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
               log_error (_("No verbose parsing; disabled at compile time"));
 #endif
 	      break;
+	      case 'm':
+	          player.setMaxAdvances( strtoul(optarg, NULL, 0) );
+	          break;
           case 's':
               player.setScale( fclamp((float) atof(optarg), 0.01f, 100.f) );
               break;
@@ -350,9 +347,6 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
           case 't':
               player.setExitTimeout( (float) atof(optarg) );
               break;
-//          case 'b':
-//	      player.setBitDepth(atoi(optarg));
-//	      break;
           case 'f':
 #ifdef GNASH_FPS_DEBUG
 		player.setFpsPrintTime((float)strtod(optarg, NULL));

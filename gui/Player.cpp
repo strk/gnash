@@ -84,7 +84,8 @@ Player::Player()
 	_doRender(true),
 	_doSound(true),
 	_exitTimeout(0),
-	_movieDef(0)
+	_movieDef(0),
+	_maxAdvances(0)
 #ifdef GNASH_FPS_DEBUG
 	,_fpsDebugTime(0.0)
 #endif
@@ -189,6 +190,8 @@ Player::init_gui()
 	{
 		_gui.reset(new NullGui(_doLoop));
 	}
+
+    _gui->setMaxAdvances(_maxAdvances);
 
 #ifdef GNASH_FPS_DEBUG
 	if ( _fpsDebugTime )
@@ -410,15 +413,17 @@ Player::fs_callback(gnash::sprite_instance* movie, const std::string& command,
 	
 	if (rcfile.ignoreFSCommand()) return;
 
-   	if (command == "quit")
+	StringNoCaseEqual noCaseCompare;
+
+   	if (noCaseCompare(command, "quit"))
    	{
    		_gui->quit();
    	}
 
-   	if (command == "fullscreen")
+   	if (noCaseCompare(command, "fullscreen"))
    	{
-   		if (args == "true")	_gui->setFullscreen();
-   		else if (args == "false") _gui->unsetFullscreen();
+   		if (noCaseCompare(args, "true")) _gui->setFullscreen();
+   		else if (noCaseCompare(args, "false")) _gui->unsetFullscreen();
    		return;
    	}
 

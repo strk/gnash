@@ -92,7 +92,8 @@ Gui::Gui() :
     _renderer(NULL),
     _redraw_flag(true),
     _fullscreen(false),
-    _mouseShown(true)
+    _mouseShown(true),
+    _maxAdvances(0)
 #ifdef GNASH_FPS_DEBUG
     ,fps_counter(0)
     ,fps_counter_total(0)
@@ -128,7 +129,9 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
     _interval(0),
     _renderer(NULL),
     _redraw_flag(true),
-    _fullscreen(false)
+    _fullscreen(false),
+    _mouseShown(true),
+    _maxAdvances(0)
 #ifdef GNASH_FPS_DEBUG
     ,fps_counter(0)    
     ,fps_counter_total(0)    
@@ -707,13 +710,14 @@ Gui::start()
     bool background = true; // ??
     _stage->set_background_alpha(background ? 1.0f : 0.05f);
 
-
     _started = true;
 }
 
 bool
 Gui::advanceMovie()
 {
+    static unsigned long advances = 0;
+
 	if ( isStopped() ) return true;
 
     if ( ! _started ) start();
@@ -798,6 +802,12 @@ Gui::advanceMovie()
 			quit(); 
 		}
 	}
+
+    /// Quit if we've reached the advance limit.
+    if (_maxAdvances && (advances++ > _maxAdvances))
+    {
+        quit();
+    }
 
 	return true;
 }

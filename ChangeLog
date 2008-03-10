@@ -3,6 +3,11 @@
 	* doc/C/usermanual/gnashrc.xml: add information about ignoreFSCommands
 	  directive.
 	* doc/C/refmanual/internals.xml: correct typo.
+	* gui/gui{h.cpp}: allow exiting after a set number of advances.
+	* gui/Player.{h.cpp}: same.
+	* gui/gnash.cpp: add switch (-m) for setting max advances. This
+	  will probably be changed soon to a long option. Drop unused
+	  switches and code.
 
 2008-03-10 Sandro Santilli <strk@keybit.net>
 

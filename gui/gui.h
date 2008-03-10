@@ -267,6 +267,8 @@ public:
     
     /// Whether gnash is is running as a plugin
     bool isPlugin() const { return (( _xid )); }
+    
+    void setMaxAdvances(unsigned long ul) { if (ul > 0) _maxAdvances = ul; }
 
     /** @name Menu callbacks
      *  These callbacks will be called when a menu item is clicked.
@@ -370,9 +372,11 @@ protected:
     /// window size did change.
     bool            _redraw_flag;
     // True if Gnash is running in fullscreen
-    bool	    	_fullscreen;
+    bool _fullscreen;
     // True if mouse pointer is showing
-    bool	    	_mouseShown;
+    bool _mouseShown;
+    // Maximum number of advances before exit; 0 for no limit.
+    unsigned long _maxAdvances;
 
 private:
 

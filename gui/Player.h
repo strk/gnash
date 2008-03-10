@@ -106,6 +106,8 @@ public:
 	void setDoRender(bool b) { _doRender = b; }
 
 	void setDoSound(bool b) { _doSound = b; }
+	
+	void setMaxAdvances(unsigned long ul) { if (ul > 0) _maxAdvances = ul; }
 
 	/// Set the base url for this run.
 	//
@@ -190,6 +192,8 @@ private:
 	std::string _infile;
 
 	movie_definition* _movieDef;
+	
+	unsigned long _maxAdvances;
 
 	/// Load the "_infile" movie setting it's url to "_url"
 	// 
