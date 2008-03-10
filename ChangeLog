@@ -1,3 +1,9 @@
+2008-03-09 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/StringPredicates.h: Use std::lexicographical_compare instead
+	of boost::ilexicographical_compare, because the latter is not
+	available in boost 1.33.
+
 2008-03-09 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/gnash.h: add "interfaceEventCallback" callback for passing

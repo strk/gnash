@@ -24,6 +24,8 @@
 #include "gnashconfig.h"
 #endif
 
+#include <algorithm>
+#include <boost/algorithm/string/compare.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 
 namespace gnash {
@@ -33,7 +35,9 @@ class StringNoCaseLessThen {
 public:
 	bool operator() (const std::string& a, const std::string& b) const
 	{
-		return boost::ilexicographical_compare(a, b);
+		return std::lexicographical_compare(a.begin(), a.end(),
+						    b.begin(), b.end(),
+						    boost::is_iless());
 	}
 };
 
