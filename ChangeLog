@@ -4,7 +4,7 @@
 	  directive.
 	* doc/C/refmanual/internals.xml: correct typo.
 	* gui/gui{h.cpp}: allow exiting after a set number of advances.
-	* gui/Player.{h.cpp}: same.
+	* gui/Player.{h.cpp}: same. Fscommand is case insensitive.
 	* gui/gnash.cpp: add switch (-m) for setting max advances. This
 	  will probably be changed soon to a long option. Drop unused
 	  switches and code.
