@@ -32,6 +32,7 @@
 #include "Object.h" // for getObjectInterface
 #include "action.h" // for call_method
 #include "array.h" // for setPropFlags
+#include "as_function.h" // for inheritance of as_super
 
 #include <set>
 #include <string>
@@ -45,6 +46,66 @@
 namespace {
 
 using namespace gnash;
+
+/// 'super' is a special kind of object
+//
+/// See http://wiki.gnashdev.org/wiki/index.php/ActionScriptSuper
+///
+/// We make it derive from as_function instead of as_object
+/// to avoid touching too many files (ie: an as_object is not considered
+/// something that can be called by current Gnash code). We may want
+/// to change this in the future to implement what ECMA-262 refers to
+/// as the [[Call]] property of objects.
+///
+class as_super : public as_function
+{
+public:
+
+	as_super(as_function* ctor, as_object* proto)
+		:
+		_ctor(ctor),
+		_proto(proto)
+	{
+		//set_prototype(getObjectInterface());
+	}
+
+	virtual bool isSuper() const { return true; }
+
+	// Fetching members from 'super' yelds a lookup on the associated prototype
+	virtual bool get_member(string_table::key name, as_value* val,
+		string_table::key nsname = 0)
+	{
+		//log_debug("as_super::get_member %s called - _proto is %p", getVM().getStringTable().value(name).c_str(), _proto);
+		if ( _proto ) return _proto->get_member(name, val, nsname);
+		log_debug("Super has no associated prototype");
+		return false;
+	}
+
+	// Setting members on 'super' is a no-op
+	virtual void set_member(string_table::key /*key*/, const as_value& /*val*/,
+		string_table::key /*nsname*/ = 0)
+	{
+		// can't assign to super
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Can't set members on the 'super' object");
+		);
+	}
+
+	/// Dispatch.
+	virtual as_value operator()(const fn_call& fn)
+	{
+		//log_debug("Super call operator. fn.this_ptr is %p", fn.this_ptr);
+		if ( _ctor ) return _ctor->call(fn);
+		log_debug("Super has no associated constructor");
+		return as_value();
+	}
+
+private:
+
+	as_function* _ctor;
+	as_object* _proto;
+};
+
 
 // A PropertyList visitor copying properties to an object
 class PropsCopier {
@@ -144,16 +205,89 @@ as_object::getByIndex(int index)
 as_object*
 as_object::get_super()
 {
+#if 1
+	// Assuming we're a prototype...
+
+	// __constructor__ is superCtor
+	as_function* superCtor = get_constructor();     
+
+	// __proto__ is superProto
+	// NOTE: we don't use get_prototype as it would skip the get_member 
+	// override of as_super.. A solution would likely be having as_super
+	// register the associated prototype as it's own __proto__ member
+	// so that get_prototype() returns it and can be threated exactly
+	// the same as other objects in ActionCallMethod
+	// TODO: try this, for simplification
+	//
+	as_object* superProto = NULL; // get_prototype().get();
+	as_value val;
+	if ( get_member(NSV::PROP_uuPROTOuu, &val) )
+	{
+		superProto = val.to_object().get();
+	}
+
+	as_object* super = new as_super(superCtor, superProto);
+
+	return super;
+#else
+
 	static bool getting = false;
 	as_object *owner = NULL;
 
 	Property *p = NULL;
 
 	if (getting)
+	{
+		log_debug("Already getting super, return NULL");
 		return NULL;
+	}
 
 	getting = true;
 
+#if 1
+	// Super is prototype.__constructor__
+	p = findProperty(NSV::PROP_PROTOTYPE, 0, &owner);
+	if (!p)
+	{
+		log_debug("This object (%s @ %p) has no 'prototype' get_super returns NULL", typeName(*this), (void*)this);
+		getting = false;
+		return NULL;
+	}
+
+	as_value protoval = p->getValue(*owner);
+	as_object *proto = protoval.to_object().get();
+	if (!proto)
+	{
+		log_debug("This object's (%s @ %p) 'prototype' member is not an object (%s) - get_super returns NULL", typeName(*this), (void*)this, protoval.to_debug_string());
+		getting = false;
+		return NULL;
+	}
+
+	as_function* constructor = proto->get_constructor();
+	if ( ! constructor )
+	{
+		log_debug("This object's (%s @ %p) 'prototype' has no constructor", typeName(*this), (void*)this);
+	}
+
+	// prototype of the constructor is constructor.prototype (I think)
+#if 1
+	as_object* prototype = NULL;
+	if ( constructor && constructor->get_member(NSV::PROP_PROTOTYPE, &protoval) )
+	{
+		prototype = protoval.to_object().get();
+	}
+#else
+	as_object* prototype = get_prototype().get();
+	if ( ! prototype )
+	{
+		log_debug("This object (%s @ %p) has no __proto__", typeName(*this), (void*)this);
+	}
+#endif
+
+	getting = false;
+
+	return new as_super(constructor, prototype);
+#else
 	// Super is this.__proto__.__constructor__.prototype
 	as_object *proto = get_prototype().get();
 	if (!proto)
@@ -197,13 +331,21 @@ as_object::get_super()
 	getting = false;
 
 	return super;
+#endif
+#endif
 }
 
 as_function*
 as_object::get_constructor()
 {
-	// TODO: Implement
-	return NULL;
+	as_value ctorVal;
+	if ( ! get_member(NSV::PROP_uuCONSTRUCTORuu, &ctorVal) )
+	{
+		//log_debug("Object %p has no __constructor__ member");
+		return NULL;
+	}
+	//log_debug("%p.__constructor__ is %s", ctorVal.to_debug_string().c_str());
+	return ctorVal.to_as_function();
 }
 
 int
@@ -855,6 +997,16 @@ as_object::valueof_method(const fn_call& fn)
 boost::intrusive_ptr<as_object>
 as_object::get_prototype()
 {
+#if 0
+	as_value val;
+	if ( ! get_member(NSV::PROP_uuPROTOuu, &val) )
+	{
+		//log_debug("Object %p has no __proto__ member");
+		return NULL;
+	}
+	//log_debug("%p.__proto__ is %s", val.to_debug_string().c_str());
+	return val.to_object().get();
+#else
 	static string_table::key key = NSV::PROP_uuPROTOuu;
 
 	int swfVersion = _vm.getSWFVersion();
@@ -868,6 +1020,7 @@ as_object::get_prototype()
 	as_value tmp = prop->getValue(*this);
 
 	return tmp.to_object();
+#endif
 }
 
 bool

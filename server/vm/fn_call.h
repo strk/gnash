@@ -47,23 +47,28 @@ public:
 	/// is taking place.
 	boost::intrusive_ptr<as_object> this_ptr;
 
+	/// The "super" object in this function call context
+	as_object* super;
+
 	/// Number of arguments to this ActionScript function call.
 	unsigned int nargs;
 
 public:
-	fn_call(const fn_call& fn) : this_ptr(fn.this_ptr), nargs(fn.nargs),
-		_env(fn._env), _stack_offset(fn._stack_offset)
+	fn_call(const fn_call& fn) : this_ptr(fn.this_ptr), super(fn.super),
+		nargs(fn.nargs), _env(fn._env), _stack_offset(fn._stack_offset)
 	{/**/}
 
-	fn_call(const fn_call& fn, as_object* this_in) : this_ptr(this_in),
-		nargs(fn.nargs), _env(fn._env), _stack_offset(fn._stack_offset)
+	fn_call(const fn_call& fn, as_object* this_in, as_object* sup=NULL)
+		: this_ptr(this_in), super(sup), nargs(fn.nargs),
+		_env(fn._env), _stack_offset(fn._stack_offset)
 	{/**/}
 
 	fn_call(as_object* this_in,
 			as_environment* env_in,
-			int nargs_in, int first_in)
+			int nargs_in, int first_in, as_object* sup=NULL)
 		:
 		this_ptr(this_in),
+		super(sup),
 		nargs(nargs_in),
 		_env(env_in),
 		_stack_offset(first_in)
@@ -72,9 +77,11 @@ public:
 
 	fn_call(boost::intrusive_ptr<as_object> this_in,
 			as_environment* env_in,
-			int nargs_in, int first_in)
+			int nargs_in, int first_in,
+			as_object* sup=NULL)
 		:
 		this_ptr(this_in),
+		super(sup),
 		nargs(nargs_in),
 		_env(env_in),
 		_stack_offset(first_in)
@@ -152,6 +159,7 @@ private:
 	/// The offset from the bottom of the env callstack to the first
 	/// argument to our fn_call.
 	unsigned int _stack_offset;
+
 };
 
 /// Signature of a builtin function callable from ActionScript

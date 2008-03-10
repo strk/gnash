@@ -2727,12 +2727,17 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 
     thread.ensureStack(2); // func name, nargs
 
+    //log_debug("ActionCallFunction: %s", env.top(0).to_debug_string().c_str());
+
     //cerr << "At ActionCallFunction enter:"<<endl;
     //env.dump_stack();
 
     // Let's consider it a as a string and lookup the function.
     const std::string& funcname = env.top(0).to_string();
     as_object* this_ptr = thread.getThisPointer();
+    as_object* super = NULL;
+
+    //log_debug("ActionCallFunction: thread.getThisPointer returned %s @ %p", typeName(*this_ptr), (void*)this_ptr);
 
     as_value function = thread.getVariable(funcname, &this_ptr);
 
@@ -2744,6 +2749,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
     }
     else if ( ! function.is_function() )
     {
+        log_error("ActionCallFunction: function name %s evaluated to non-function value %s", funcname, function.to_debug_string());
         // Calling super ? 
         boost::intrusive_ptr<as_object> obj = function.to_object();
             this_ptr = thread.getThisPointer();
@@ -2753,6 +2759,15 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
             log_aserror(_("Object doensn't have a constructor"));
             )
         }
+    }
+    else if ( function.to_as_function()->isSuper() )
+    {
+	this_ptr = thread.getThisPointer();
+
+	// the new 'super' will be computed from the old one
+	// NOTE: this is equivalent to oldSuper->get_super() [ looks like.. ]
+	as_function* oldSuper = function.to_as_function();
+	super = oldSuper->get_super();
     }
 
     // Get number of args, modifying it if not enough values are on the stack.
@@ -2775,8 +2790,10 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
     debugger.callStackPush(function_name);
     debugger.matchBreakPoint(function_name, true);
 #endif
+
+    //log_debug("ActionCallFunction calling call_method with %p as this_ptr", this_ptr);
     as_value result = call_method(function, &env, this_ptr,
-                  nargs, env.get_top_index() - 2);
+                  nargs, env.get_top_index() - 2, super);
 
     //log_debug(_("Function's result: %s"), result.to_string();
 
@@ -3413,16 +3430,42 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 	log_action(_(" method nargs: %d"), nargs);
 	);
 
+	// TODO:
+	// 1. if object/func is super keep current 'this' when calling the method (don't pass 'super' as 'this')
+	// 2. if object/func is super pass it over to the function being invoked or it will create a new
+	//    super thus breaking the chain (use fn_call for that ?)
+
 	string method_string = method_name.to_string();
 	as_value method_val;
 	boost::intrusive_ptr<as_object> obj = obj_value.to_object();
+
+	as_object* this_ptr = obj.get();
+	as_object* super = NULL;
+	if ( obj.get() )
+	{
+		if ( obj->isSuper() ) 
+		{
+			this_ptr = thread.getThisPointer();
+			super = obj->get_super();
+		}
+		else
+		{
+			//log_debug("%p.%s() call", obj.get(), method_string.c_str());
+			as_object* proto = obj->get_prototype().get();
+			if ( proto ) super = proto->get_super();
+			else super = obj->get_super();
+		}
+	}
+
 	if ( method_name.is_undefined() || method_string.empty() )
 	{
-
-		// Does this ever happen ?
+		// We'll be calling the super constructor here
 		method_val = obj_value;
+
 		if ( ! method_val.is_function() )
 		{
+			// TODO: log_aserror ? or try to invoke a [[Call]] method
+			//       ala ECMA262 ?
 			if ( ! obj )
 			{
 				log_error(_("ActionCallMethod invoked with "
@@ -3433,11 +3476,12 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 				return;
 			}
 
-#ifdef GNASH_DEBUG
-			log_error(_("Function object given to ActionCallMethod"
-				       " is not a function, will try to use"
-				       " its 'constructor' member"));
-#endif
+//#ifdef GNASH_DEBUG
+			log_debug(_("Function object given to ActionCallMethod"
+				       " is not a function (%s), will try to use"
+				       " its 'constructor' member (but should instead invoke it's [[Call]] method"),
+					obj_value.to_debug_string().c_str());
+//#endif
 
 			// TODO: all this crap should go into an as_object::getConstructor instead
 			as_value ctor;
@@ -3460,7 +3504,6 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 				return;
 			}
 			method_val = ctor;
-			obj = thread.getThisPointer();
 		}
 	}
 	else
@@ -3511,8 +3554,8 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 	}
 #endif
 
-	as_value result = call_method(method_val, &env, obj.get(),
-			nargs, env.get_top_index()-3);
+	as_value result = call_method(method_val, &env, this_ptr, 
+			nargs, env.get_top_index()-3, super);
 
 	env.drop(nargs + 2);
 	env.top(0) = result;

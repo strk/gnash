@@ -422,9 +422,15 @@ as_function::constructInstance( as_environment& env,
 			}
 		}
 
+		// Super is constructed from this function's prototype
+		as_object* super = NULL;
+		as_object* iface = getPrototype().get(); // this function's prototype
+		if ( iface ) super = iface->get_super();
+
 		// Call the actual constructor function; new_obj is its 'this'.
+
 		// We don't need the function result.
-		call(fn_call(newobj.get(), &env, nargs, first_arg_index));
+		call(fn_call(newobj.get(), &env, nargs, first_arg_index, super));
 	}
 
 	if (!has_proto)

@@ -138,7 +138,8 @@ call_method(
     as_environment* env,
     as_object* this_ptr, // this is ourself
     int nargs,
-    int first_arg_bottom_index)
+    int first_arg_bottom_index,
+    as_object* super)
     // first_arg_bottom_index is the stack index, from the bottom,
     // of the first argument.
     // Subsequent arguments are at *lower* indices.
@@ -146,7 +147,7 @@ call_method(
     // arg2 is at env->bottom(6), etc.
 {
 	as_value val;
-	fn_call call(this_ptr, env, nargs, first_arg_bottom_index);
+	fn_call call(this_ptr, env, nargs, first_arg_bottom_index, super);
 
 	try
 	{

@@ -28,10 +28,10 @@ SANE_ASTESTS = \
 	levels.as \
 	implementsOpTest.as \
 	TextFieldTest.as \
+	super_test1.as \
 	$(NULL)
 # These ones are the ones for which consistency check fail 
 BOGUS_ASTESTS = \
-	super_test1.as \
 	$(NULL)
 
 ASTESTS = $(SANE_ASTESTS) $(BOGUS_ASTESTS)

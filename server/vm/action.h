@@ -83,7 +83,7 @@ namespace gnash {
 	///
 	DSOEXPORT as_value call_method(const as_value& method, as_environment* env,
 		as_object* this_ptr, // this is ourself
-		int nargs, int first_arg_bottom_index);
+		int nargs, int first_arg_bottom_index, as_object* super=NULL);
 
 	const char*	call_method_parsed(
 		as_environment* env,

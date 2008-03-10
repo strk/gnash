@@ -1,3 +1,22 @@
+2008-03-10 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/fn_call.h: add a 'super' member in the function call.
+	* server/vm/action.{cpp,h}: allow passing a 'super' object to
+	  call_method.
+	* server/as_object.{cpp,h}: implement get_constructor,
+	  reimplement get_super, add isSuper virtual function,
+	  provide a special 'as_super' class.
+	* server/as_function.cpp (constructInstance): provide proper 'super'
+	  reference.
+	* server/as_value.cpp (typeOf): advertise the super object as an
+	  'object'
+	* server/swf_function.cpp: use fn_call::super as the super reference.
+	* server/vm/ASHandlers.cpp (ActionCallFunction, ActionCallMethod):
+	  properly setup a 'super' in function calls.
+	* testsuite/actionscript.all/Inheritance.as: new successes.
+	* testsuite/misc-mtasc.all/Makefile.am: super_test1.swf succeeds.
+	* testsuite/swfdec/PASSING: 8 super-related tests succeed.
+
 2008-03-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* doc/C/usermanual/gnashrc.xml: add information about ignoreFSCommands

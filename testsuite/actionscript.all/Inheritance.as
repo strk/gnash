@@ -204,7 +204,7 @@ check_equals(greeting, "Hello from BaseClass");
 
 DerivedClass.prototype.typeofSuper = function() { return typeof(super); };
 check_equals(derived.typeofSuper(), 'object');
-xcheck_equals(DerivedClass.prototype.typeofSuper(), 'object');
+check_equals(DerivedClass.prototype.typeofSuper(), 'object');
 
 DerivedClass.prototype.getSuper = function() { return super; };
 s = derived.getSuper();
@@ -216,7 +216,7 @@ check_equals(typeof(s.prototype), 'undefined');
 check_equals(typeof(s.constructor), 'function');
 check_equals(s.constructor, BaseClass); // maybe sayHello is looked for here...
 check_equals(typeof(s.__constructor__), 'undefined');
-xcheck(s != BaseClass.prototype);
+check(s != BaseClass.prototype);
 
 DerivedClass.prototype.typeofThis = function() { return typeof(this); };
 check_equals(derived.typeofThis(), 'object');
@@ -253,7 +253,7 @@ co = new C;
  xcheck_equals(co.whoami(), "A.B"); // gnash fails returning undefined.B.B
 #else
 # if OUTPUT_VERSION == 6
-   xcheck_equals(co.whoami(), "A.B.B"); // gnash fails returning .B.B
+   check_equals(co.whoami(), "A.B.B"); // gnash fails returning .B.B
 # else
    check_equals(co.whoami(), ".B");
 # endif
@@ -262,7 +262,7 @@ C.prototype.whoami = function() {
 	return super.whoami()+"."+"C";
 };
 #if OUTPUT_VERSION > 5
-  xcheck_equals(co.whoami(), "A.B.C"); // gnash fails returning .B.C (SWF6) or undefined.B.C (SWF>6)
+  check_equals(co.whoami(), "A.B.C"); // gnash fails returning .B.C (SWF6) or undefined.B.C (SWF>6)
 #else
   check_equals(co.whoami(), ".C");
 #endif

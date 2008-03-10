@@ -718,6 +718,10 @@ public:
 	///
 	virtual bool isDateObject() { return false; }
 
+	/// Return true if this is a 'super' object
+	virtual bool isSuper() const { return false; }
+
+
 	/// Add an interface to the list of interfaces.
 	/// Used by instanceOf
 	void add_interface(as_object* ctor);

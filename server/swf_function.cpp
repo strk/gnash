@@ -101,7 +101,7 @@ swf_function::operator()(const fn_call& fn)
 	as_environment*	our_env = m_env;
 	assert(our_env);
 	// if(our_env->get_original_target()->isDestroyed())
-    if (our_env == NULL)
+        if (our_env == NULL)
 	{
 		our_env = &fn.env();
 	}
@@ -118,7 +118,9 @@ swf_function::operator()(const fn_call& fn)
 	as_object *super = NULL;
 	if (swfversion > 5)
 	{
-		super = fn.this_ptr->get_super();
+		super = fn.super;
+		//if ( super ) log_debug("Super is %s @ %p", typeName(*super), (void*)super);
+		//else log_debug("Super is not available");
 	}
 
 	if (m_is_function2 == false)
@@ -147,7 +149,7 @@ swf_function::operator()(const fn_call& fn)
 		our_env->set_local("this", fn.this_ptr);
 
 		// Add 'super' (SWF6+ only)
-		if ( swfversion > 5 )
+		if ( super && swfversion > 5 )
 		{
 			our_env->set_local("super", as_value(super));
 		}
@@ -244,16 +246,20 @@ swf_function::operator()(const fn_call& fn)
 		if ( (m_function2_flags & PRELOAD_SUPER) && swfversion > 5)
 		{
 			// Put 'super' in a register (SWF6+ only).
-			our_env->local_register(current_reg).set_as_object(super);
-			current_reg++;
+			// TOCHECK: should we still set it if not available ?
+			if ( super ) {
+				our_env->local_register(current_reg).set_as_object(super);
+				current_reg++;
+			}
 		}
 
 		if (m_function2_flags & SUPPRESS_SUPER)
 		{
 			// Don't put 'super' in a local var.
 		}
-		else if ( swfversion > 5 )
+		else if ( super && swfversion > 5 )
 		{
+			// TOCHECK: should we still set it if unavailable ?
 			// Put 'super' in a local var (SWF6+ only)
 			our_env->add_local("super", as_value(super));
 		}
