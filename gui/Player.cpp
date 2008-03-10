@@ -109,9 +109,9 @@ Player::init()
 
 	set_use_cache_files(false);
 
-	gnash::register_fscommand_callback(fs_callback);
+	gnash::registerFSCommandCallback(fs_callback);
 	
-	gnash::as_object::registerEventCallback(interfaceEventCallback);
+	gnash::movie_root::registerEventCallback(&interfaceEventCallback);
 
 }
 
@@ -391,27 +391,56 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 }
 
 /*static private*/
-void
-Player::fs_callback(gnash::sprite_instance* movie, const char* command, const char* args)
 // For handling notification callbacks from ActionScript.
+void
+Player::fs_callback(gnash::sprite_instance* movie, const std::string& command,
+								const std::string& args)
 {
-    log_debug(_("fs_callback(%p): %s %s"), (void*)movie, command, args);
+	log_debug(_("fs_callback(%p): %s %s"), (void*)movie, command, args);
+
+	gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+
+	/// Fscommands can be ignored using an rcfile setting. As a 
+	/// plugin they are always ignored.
+	if (_gui->isPlugin())
+	{
+		log_debug(_("Running as plugin: ignoring fscommand %s."), command);
+		return;
+	}
+	
+	if (rcfile.ignoreFSCommand()) return;
+
+   	if (command == "quit")
+   	{
+   		_gui->quit();
+   	}
+
+   	if (command == "fullscreen")
+   	{
+   		if (args == "true")	_gui->setFullscreen();
+   		else if (args == "false") _gui->unsetFullscreen();
+   		return;
+   	}
+
 }
 
-void
+bool
 Player::interfaceEventCallback(const std::string& event, const std::string& arg)
 {
 	if (event == "Mouse.hide")
 	{
 		_gui->showMouse(false);
-		return;
+		return true;
 	}
+
 	if (event == "Mouse.show")
 	{
 		_gui->showMouse(true);
-		return;
+		return true;
 	}
+	
 	log_error(_("Unhandled callback %s with arguments %s"), event, arg);
+	return false;
 }
 
 /* private */

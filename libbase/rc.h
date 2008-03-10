@@ -224,7 +224,10 @@ public:
     // 
     key_t getLCShmKey() const { return static_cast<key_t>(_lcshmkey); }
     void setLCShmKey(bool x) { _lcshmkey = x; }
-    
+
+    bool ignoreFSCommand() const { return _ignoreFSCommand; }
+    void ignoreFSCommand(bool value) { _ignoreFSCommand = value; }
+        
     void dump();    
 
 private:
@@ -345,6 +348,10 @@ private:
     /// Shared memory segment key (can be set for
     /// compatibility with other players.)
     boost::uint32_t _lcshmkey;
+    
+    /// Whether the player should respond to fscommands
+    /// (showmenu, quit etc)
+    bool _ignoreFSCommand;
 
     // A function only for writing path lists to an outstream.
     void writeList(const PathList& list, std::ostream& o);

@@ -656,6 +656,15 @@ public:
         return _hostfd;
     }
 
+	/// A callback to the GUI for sending events and receiving
+	/// replies.
+	static gnash::interfaceEventCallback interfaceHandle;
+
+	static void registerEventCallback(interfaceEventCallback handler)
+	{
+	   	interfaceHandle = handler;
+	}
+
 private:
 
     /// A load movie request

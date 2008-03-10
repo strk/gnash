@@ -30,6 +30,7 @@
 #include "VM.h" // for registerNative
 #include "Object.h" // for getObjectInterface
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
+#include "movie_root.h" // for GUI callback
 
 namespace gnash {
 
@@ -93,9 +94,9 @@ as_value mouse_hide(const fn_call& fn)
     boost::intrusive_ptr<mouse_as_object> obj=ensureType<mouse_as_object>(fn.this_ptr);
     UNUSED(obj);
 
-	if (as_object::interfaceHandle)
+	if (movie_root::interfaceHandle)
 	{
-		(*as_object::interfaceHandle)("Mouse.hide", "");
+		(*movie_root::interfaceHandle)("Mouse.hide", "");
 	}
 	else
 	{
@@ -111,9 +112,9 @@ as_value mouse_show(const fn_call& fn)
     boost::intrusive_ptr<mouse_as_object> obj=ensureType<mouse_as_object>(fn.this_ptr);
     UNUSED(obj);
 
-	if (as_object::interfaceHandle)
+	if (movie_root::interfaceHandle)
 	{
-		(*as_object::interfaceHandle)("Mouse.show", "");
+		(*movie_root::interfaceHandle)("Mouse.show", "");
 	}
 	else
 	{

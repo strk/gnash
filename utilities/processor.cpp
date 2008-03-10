@@ -127,11 +127,11 @@ secondsSinceLastAdvance()
 //
 static int quitrequested = false;
 
-void execFsCommand(sprite_instance* movie, const char* command, const char* args)
+void execFsCommand(sprite_instance* movie, const std::string& command, const std::string& args)
 {
     log_debug(_("fs_callback(%p): %s %s"), (void*)movie, command, args);
 
-    if ( ! strcasecmp(command, "quit") ) quitrequested=true;
+    if ( command == "quit" ) quitrequested = true;
 }
 
 int
@@ -264,7 +264,7 @@ main(int argc, char *argv[])
 	exit(1);
     }
 
-    register_fscommand_callback(execFsCommand);
+    registerFSCommandCallback(execFsCommand);
 
     // Play through all the movies.
     for (int i = 0, n = infiles.size(); i < n; i++) {

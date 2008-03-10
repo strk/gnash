@@ -53,6 +53,9 @@ using namespace std;
 namespace gnash
 {
 
+gnash::interfaceEventCallback
+movie_root::interfaceHandle = NULL;
+
 inline bool
 movie_root::testInvariant() const
 {

@@ -32,7 +32,8 @@
 #include <memory> // for auto_ptr
 #include <cctype>   // for poxy wchar_t
 #include <cstdarg>  // for va_list arg to sprite_instance::call_method_args()
-#include <string>   // for movie_definition* create_movie(std::auto_ptr<tu_file> in, const std::string& url);
+#include <string>   // for movie_definition* create_movie(std::auto_ptr<tu_file>
+				 	// in, const std::string& url);
 
 // FIXME: The local usage of these constants should probably be renamed in this
 // file because they conflict with definitions in the system header files. Luckily
@@ -109,7 +110,8 @@ typedef void (*progress_callback)(unsigned int loaded_bytes, unsigned int total_
 void    register_progress_callback(progress_callback progress_handle);
 
 /// Signature of fscommand callback function
-typedef void (*fscommand_callback)(sprite_instance* movie, const char* command, const char* arg);
+typedef void (*fscommand_callback)(sprite_instance* movie,
+						const std::string& command, const std::string& arg);
 
 /// ActionScripts embedded in a movie can use the built-in
 /// fscommand() function to send data back to the host
@@ -120,14 +122,14 @@ typedef void (*fscommand_callback)(sprite_instance* movie, const char* command, 
 /// The handler gets the sprite_instance* that the script is
 /// embedded in, and the two string arguments passed by the
 /// script to fscommand().
-DSOEXPORT void  register_fscommand_callback(fscommand_callback handler);
+DSOEXPORT void registerFSCommandCallback(fscommand_callback handler);
 
 /// Signature of interface event callback.
-typedef void (*interfaceEventCallback)(const std::string& event, const std::string& arg);
+typedef bool (*interfaceEventCallback)(const std::string& event, const std::string& arg);
 
-/// Use this to register listeners for as_object events that should
+/// Use this to register listeners for core events that should
 /// trigger an event in the user interface (GUI or any other
-/// user of the gnash core libs.
+/// user of the gnash core libs).
 DSOEXPORT void registerEventCallback(interfaceEventCallback handler);
 
 /// Use this to register gnash extension

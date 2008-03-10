@@ -916,13 +916,6 @@ public:
 	static as_value valueof_method(const fn_call& fn);
 
 	/// @} Common ActionScript getter-setters for characters
-
-	static gnash::interfaceEventCallback interfaceHandle;
-
-	static void registerEventCallback(interfaceEventCallback handler)
-	{
-	   	interfaceHandle = handler;
-	}
 	
 protected:
 

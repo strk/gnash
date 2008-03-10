@@ -264,6 +264,9 @@ public:
 
     /// See stop(), play() and pause()
     bool isStopped() const { return _stopped; }
+    
+    /// Whether gnash is is running as a plugin
+    bool isPlugin() const { return (( _xid )); }
 
     /** @name Menu callbacks
      *  These callbacks will be called when a menu item is clicked.

@@ -172,7 +172,7 @@ Gui::unsetFullscreen()
 }
 
 void
-Gui::showMouse(bool show)
+Gui::showMouse(bool /* show */)
 {
 	static bool warned = false;
 	if (!warned)

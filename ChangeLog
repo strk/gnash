@@ -1,3 +1,22 @@
+2008-03-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/gnash.h: make interfaceEventCallback return bool to
+	  allow response from the gui. Rename register_fscommand_callback
+	  to registerFSCommandCallback and make it take const std::string&
+	  arguments.
+	* server/as_object.{h,cpp}: remove callback from as_object and
+	* server/movie_root.{h,cpp}: put it in movie_root for use with
+	  other events (e.g. ActionLimits hit).
+	* server/asobj/Mouse.cpp: update callback to movie_root.
+	* server/vm/ActionExec.cpp: update registerFSCommandCallback.
+	* gui/Player.{h,cpp}: adapt interfaceEventCallback methods,
+	  implement some fscommands (quit, fullscreen).
+	* gui/gui.{h,cpp}: add isPlugin() method for deciding whether to
+	  handle fscommands.
+	* libbase/rc.{cpp,h}: add ignoreFSCommands directive to allow, well,
+	  ignoring fscommands. Set to true by default.
+	* utilities/processor.cpp: update registerFSCommandCallback.
+
 2008-03-09 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/StringPredicates.h: Use std::lexicographical_compare instead

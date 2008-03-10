@@ -158,9 +158,9 @@ private:
 	void setFlashVars(const std::string& varstr);
 
 	static void fs_callback(sprite_instance* movie,
-			const char* command, const char* args);
+			const std::string& command, const std::string& args);
 
-	static void interfaceEventCallback(const std::string& event,
+	static bool interfaceEventCallback(const std::string& event,
 							const std::string& arg);
 
 	// Movie parameters (for -P)

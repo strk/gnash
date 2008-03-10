@@ -783,9 +783,6 @@ as_object::enumerateProperties(std::map<std::string, std::string>& to)
 
 }
 
-gnash::interfaceEventCallback
-as_object::interfaceHandle = NULL;
-
 as_object::as_object()
 	:
 	_members(),

@@ -97,7 +97,8 @@ RcInitFile::RcInitFile() : _delay(0),
                            _solreadonly(false),
                            _sollocaldomain(false),
                            _lcdisabled(false),
-                           _lctrace(true)
+                           _lctrace(true),
+                           _ignoreFSCommand(true)
 
 {
 
@@ -485,6 +486,8 @@ RcInitFile::parseFile(const std::string& filespec)
 			||
                  extractDouble(_streamsTimeout, "StreamsTimeout", variable, value)
             ||
+                 extractSetting(_ignoreFSCommand, "ignoreFsCommand", variable, value)
+            ||
                  cerr << _("Warning: unrecognized directive \"") << variable 
                       << _("\" in rcfile.") << endl;
             }
@@ -576,6 +579,7 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "localConnection " << _lcdisabled << endl <<
     cmd << "LCTrace " << _lctrace << endl <<
     cmd << "LCShmkey " << std::hex << (boost::uint32_t) _lcshmkey << endl <<
+    cmd << "ignoreFSCommand " << _ignoreFSCommand << endl <<    
    
     // Strings.
 
