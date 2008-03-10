@@ -45,6 +45,7 @@
 #include "noseek_fd_adapter.h"
 #include "ManualClock.h"
 #include "tu_timer.h"
+#include "StringPredicates.h"
 
 extern "C"{
 	#include <unistd.h>
@@ -131,7 +132,9 @@ void execFsCommand(sprite_instance* movie, const std::string& command, const std
 {
     log_debug(_("fs_callback(%p): %s %s"), (void*)movie, command, args);
 
-    if ( command == "quit" ) quitrequested = true;
+    StringNoCaseEqual ncasecomp;
+   
+    if ( ncasecomp(command, "quit") ) quitrequested = true;
 }
 
 int

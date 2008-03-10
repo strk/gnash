@@ -1,3 +1,7 @@
+2008-03-10 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* utilities/processor.cpp: make fscommand test case insensitive.
+
 2008-03-10 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/MovieClip.as: don't rely on
