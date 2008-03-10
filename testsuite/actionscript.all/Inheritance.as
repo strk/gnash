@@ -451,4 +451,9 @@ check(t5 instanceOf Test5);
 check(! t5 instanceOf Test4);
 check(t4 instanceOf Test4);
 check(! t4 instanceOf Test5);
-totals();
+
+#if OUTPUT_VERSION < 6
+ check_totals(89); // SWF5
+#else
+ check_totals(146); // SWF6,7,8
+#endif
