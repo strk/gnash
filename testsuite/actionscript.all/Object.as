@@ -31,13 +31,11 @@ check_equals(typeof(Object.prototype), 'object');
 check_equals(typeof(Object.registerClass), 'function');
 check_equals(typeof(Object.prototype.toString), 'function');
 xcheck_equals(typeof(Object.prototype.toLocaleString), 'function');
-#if OUTPUT_VERSION > 5
- check(Object.prototype.hasOwnProperty('toString'));
-#endif
 check_equals(typeof(Object.prototype.valueOf), 'function');
 check_equals(typeof(Object.prototype.constructor), 'function'); 
 #if OUTPUT_VERSION > 5
  check(Object.prototype.hasOwnProperty('toString'));
+ check(Object.prototype.hasOwnProperty('toLocaleString'));
  check(Object.prototype.hasOwnProperty('valueOf'));
 #endif
 check_equals(Object.prototype.prototype, undefined);

@@ -31,6 +31,48 @@ check_equals(Date.prototype.__proto__, Object.prototype);
 #if OUTPUT_VERSION > 5
  check_equals(typeof(Date.__proto__), 'object');
  check_equals(Date.__proto__, Function.prototype);
+
+ check (Date.prototype.hasOwnProperty('getDate'));
+ check (Date.prototype.hasOwnProperty('getDay'));
+ check (Date.prototype.hasOwnProperty('getFullYear'));
+ check (Date.prototype.hasOwnProperty('getHours'));
+ check (Date.prototype.hasOwnProperty('getMilliseconds'));
+ check (Date.prototype.hasOwnProperty('getMinutes'));
+ check (Date.prototype.hasOwnProperty('getMonth'));
+ check (Date.prototype.hasOwnProperty('getSeconds'));
+ check (Date.prototype.hasOwnProperty('getTime'));
+ check (Date.prototype.hasOwnProperty('getTimezoneOffset'));
+ check (Date.prototype.hasOwnProperty('getUTCDate'));
+ check (Date.prototype.hasOwnProperty('getUTCDay'));
+ check (Date.prototype.hasOwnProperty('getUTCFullYear'));
+ check (Date.prototype.hasOwnProperty('getUTCHours'));
+ check (Date.prototype.hasOwnProperty('getUTCMilliseconds'));
+ check (Date.prototype.hasOwnProperty('getUTCMinutes'));
+ check (Date.prototype.hasOwnProperty('getUTCMonth'));
+ check (Date.prototype.hasOwnProperty('getUTCSeconds'));
+ check (Date.prototype.hasOwnProperty('getYear'));
+ check (Date.prototype.hasOwnProperty('setDate'));
+ check (Date.prototype.hasOwnProperty('setFullYear'));
+ check (Date.prototype.hasOwnProperty('setHours'));
+ check (Date.prototype.hasOwnProperty('setMilliseconds'));
+ check (Date.prototype.hasOwnProperty('setMinutes'));
+ check (Date.prototype.hasOwnProperty('setMonth'));
+ check (Date.prototype.hasOwnProperty('setSeconds'));
+ check (Date.prototype.hasOwnProperty('setTime'));
+ check (Date.prototype.hasOwnProperty('setUTCDate'));
+ check (Date.prototype.hasOwnProperty('setUTCFullYear'));
+ check (Date.prototype.hasOwnProperty('setUTCHours'));
+ check (Date.prototype.hasOwnProperty('setUTCMilliseconds'));
+ check (Date.prototype.hasOwnProperty('setUTCMinutes'));
+ check (Date.prototype.hasOwnProperty('setUTCMonth'));
+ check (Date.prototype.hasOwnProperty('setUTCSeconds'));
+ check (Date.prototype.hasOwnProperty('setYear'));
+ check (Date.prototype.hasOwnProperty('toString'));
+ check (!Date.prototype.hasOwnProperty('toLocaleString'));
+
+// UTC is a static method present from v5
+check_equals (d.UTC, undefined);
+check (Date.UTC);
 #else
  xcheck_equals(typeof(Date.__proto__), 'undefined');
 #endif

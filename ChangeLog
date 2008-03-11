@@ -1,7 +1,13 @@
+2008-03-10 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/: Date.as, Object.as:
+	  Use hasOwnProperty for new 'toLocaleString' availability
+	  testing.
+
 2008-03-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
-    * testsuite/actionscript.all/Date.as: tests for toLocaleString.
-    * testsuite/actionscript.all/Object.as: tests for toLocaleString.
+	* testsuite/actionscript.all/Date.as: tests for toLocaleString.
+	* testsuite/actionscript.all/Object.as: tests for toLocaleString.
 
 2008-03-10 Sandro Santilli <strk@keybit.net>
 
