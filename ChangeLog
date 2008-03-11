@@ -1,3 +1,8 @@
+2008-03-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+    * testsuite/actionscript.all/Date.as: tests for toLocaleString.
+    * testsuite/actionscript.all/Object.as: tests for toLocaleString.
+
 2008-03-10 Sandro Santilli <strk@keybit.net>
 
 	* backend/Makefile.am: distribute ogl backend header.
@@ -6,7 +11,7 @@
 2008-03-10 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/registerClassTest.c: more tests
-	  for __constructor__ and consturctor of instances with
+	  for __constructor__ and constructor of instances with
 	  registered class.
 
 2008-03-10 Sandro Santilli <strk@keybit.net>

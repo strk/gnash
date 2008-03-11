@@ -83,6 +83,7 @@ check (d.setUTCMonth);
 check (d.setUTCSeconds);
 check (d.setYear);
 check (d.toString);
+xcheck (d.toLocaleString);
 // UTC is a static method present from v5
 check_equals (d.UTC, undefined);
 check (Date.UTC);
@@ -204,6 +205,10 @@ check (Date.utc);
 	check_equals(d.getUTCMinutes(), 0);
 	check_equals(d.getUTCSeconds(), 0);
 	check_equals(d.getUTCMilliseconds(), 0);
+	
+    /// No difference:
+    xcheck_equals (Date.toLocaleString(), Date.toString());
+
 // Check other convertible types
 // Booleans convert to 0 and 1
     var foo = true; delete d; var d = new Date(foo);
@@ -536,4 +541,8 @@ check_equals(typeof(foo), 'string');
  check_equals(foo.substring(0, 7), 'foo 950');
 #endif
 
-totals();
+#if OUTPUT_VERSION == 5
+totals(243);
+#else
+totals (246);
+#endif

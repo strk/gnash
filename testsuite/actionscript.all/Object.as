@@ -30,6 +30,7 @@ check_equals(typeof(Object.prototype), 'object');
 // registerClass is a public static function of Object
 check_equals(typeof(Object.registerClass), 'function');
 check_equals(typeof(Object.prototype.toString), 'function');
+xcheck_equals(typeof(Object.prototype.toLocaleString), 'function');
 #if OUTPUT_VERSION > 5
  check(Object.prototype.hasOwnProperty('toString'));
 #endif
@@ -528,10 +529,10 @@ check( obj8.prototype.isPrototypeOf(obj9) );
 
 
 #if OUTPUT_VERSION <= 5
-totals(63);
+totals(64);
 #endif
 
 #if OUTPUT_VERSION >= 6
-totals(167);
+totals(168);
 #endif
 
