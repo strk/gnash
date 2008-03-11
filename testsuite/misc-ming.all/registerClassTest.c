@@ -180,21 +180,39 @@ main(int argc, char** argv)
 
 	check_equals(mo, "typeof(clip2)", "'movieclip'");
 	check(mo, "clip2 instanceOf CustomClass");
+	check(mo, "clip2.hasOwnProperty('__constructor__')");
+	check(mo, "clip2.hasOwnProperty('constructor')");
+	check(mo, "clip2.hasOwnProperty('__proto__')");
+	check_equals(mo, "clip2.__proto__", "CustomClass.prototype");
+	check_equals(mo, "clip2.__constructor__", "CustomClass");
+	check_equals(mo, "clip2.constructor", "CustomClass");
 	check_equals(mo, "clip2._x", "80");
 	check_equals(mo, "typeof(clip2.lineTo)", "'undefined'");
 	check(mo, "! clip2 instanceOf MovieClip");
 
+	check(mo, "clip3.hasOwnProperty('__constructor__')");
+	check(mo, "clip3.hasOwnProperty('constructor')");
+	check(mo, "clip3.hasOwnProperty('__proto__')");
+	check_equals(mo, "clip3.__proto__", "CustomClass2.prototype");
+	check_equals(mo, "clip3.__constructor__", "CustomClass2");
+	check_equals(mo, "clip3.constructor", "CustomClass2");
 	check_equals(mo, "typeof(clip3)", "'movieclip'");
 	check_equals(mo, "clip3._x", "160");
 	check(mo, "clip3 instanceOf CustomClass2");
 	check(mo, "clip3 instanceOf MovieClip");
 
+	check(mo, "clip4.hasOwnProperty('__constructor__')");
+	check(mo, "clip4.hasOwnProperty('constructor')");
+	check(mo, "clip4.hasOwnProperty('__proto__')");
+	check_equals(mo, "clip4.__proto__", "CustomClass2.prototype");
+	check_equals(mo, "clip4.__constructor__", "CustomClass2");
+	check_equals(mo, "clip4.constructor", "CustomClass2");
 	check_equals(mo, "typeof(clip4)", "'movieclip'");
 	check_equals(mo, "clip4._x", "240");
 	check(mo, "clip4 instanceOf MovieClip");
 
 	add_actions(mo,
-		"totals(26);"
+		"totals(44);"
 		"stop();"
 		);
 

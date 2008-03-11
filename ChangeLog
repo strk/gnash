@@ -1,5 +1,11 @@
 2008-03-10 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/registerClassTest.c: more tests
+	  for __constructor__ and consturctor of instances with
+	  registered class.
+
+2008-03-10 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (constructAsInstance): compute
 	  a 'super' reference.
 	* testsuite/misc-ming.all/registerClassTest.c: test super in
