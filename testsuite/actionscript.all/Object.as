@@ -21,6 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
+rcsid="$Id: Object.as,v 1.44 2008/03/11 19:31:47 strk Exp $";
 #include "check.as"
 
 // Test existance of methods

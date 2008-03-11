@@ -20,6 +20,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
+rcsid="$Id: TextField.as,v 1.47 2008/03/11 19:31:48 strk Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION > 5

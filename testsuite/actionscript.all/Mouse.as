@@ -21,6 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
+rcsid="$Id: Mouse.as,v 1.17 2008/03/11 19:31:47 strk Exp $";
 #include "check.as"
 
 check_equals ( typeof(Mouse), 'object' );

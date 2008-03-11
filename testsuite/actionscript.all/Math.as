@@ -31,6 +31,7 @@
 // actually many different bitwise values that represent NaN.
 // Hence we string expected NaN results and compare the strings.
 
+rcsid="$Id: Math.as,v 1.11 2008/03/11 19:31:47 strk Exp $";
 #include "check.as"
 
 check_equals (typeof(Math), 'object');

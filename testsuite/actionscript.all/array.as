@@ -19,6 +19,7 @@
 // Initial test written by Mike Carlson
 
 
+rcsid="$Id: array.as,v 1.44 2008/03/11 19:31:48 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Array), 'function');

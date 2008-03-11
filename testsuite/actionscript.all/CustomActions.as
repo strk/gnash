@@ -26,6 +26,7 @@
 // See http://sephiroth.it/reference.php?id=156&cat=1
 
 
+rcsid="$Id: CustomActions.as,v 1.13 2008/03/11 19:31:47 strk Exp $";
 #include "check.as"
 
 note();

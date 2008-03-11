@@ -21,6 +21,7 @@
  */
 
 
+rcsid="$Id: targetPath.as,v 1.15 2008/03/11 19:31:49 strk Exp $";
 #include "check.as"
 
 #if MING_VERSION_CODE > 00040005

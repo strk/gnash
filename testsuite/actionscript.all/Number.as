@@ -28,6 +28,7 @@
 //	
 
 
+rcsid="$Id: Number.as,v 1.42 2008/03/11 19:31:47 strk Exp $";
 #include "check.as"
 
 var n1=new Number(268);

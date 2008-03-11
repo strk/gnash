@@ -23,6 +23,7 @@
  */
 
 
+rcsid="$Id: case.as,v 1.19 2008/03/11 19:31:48 strk Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION <= 6 // {

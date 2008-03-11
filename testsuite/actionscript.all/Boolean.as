@@ -21,6 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
+rcsid="$Id: Boolean.as,v 1.20 2008/03/11 19:31:46 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Boolean), 'function');

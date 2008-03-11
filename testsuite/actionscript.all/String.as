@@ -17,6 +17,7 @@
 // Original author: Mike Carlson - June 19th, 2006
 
 
+rcsid="$Id: String.as,v 1.45 2008/03/11 19:31:48 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(String), 'function');

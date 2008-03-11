@@ -22,6 +22,7 @@
  */
 
 
+rcsid="$Id: swap.as,v 1.5 2008/03/11 19:31:49 strk Exp $";
 #include "check.as"
 
 // see check.as

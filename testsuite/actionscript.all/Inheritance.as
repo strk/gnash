@@ -21,6 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
+rcsid="$Id: Inheritance.as,v 1.49 2008/03/11 19:31:47 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Object.prototype.constructor), 'function');

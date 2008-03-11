@@ -22,6 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
+rcsid="$Id: ContextMenu.as,v 1.14 2008/03/11 19:31:47 strk Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION < 7

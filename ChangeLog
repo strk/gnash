@@ -1,5 +1,9 @@
 2008-03-11 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/*.as: re-add rcsids.
+
+2008-03-11 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Date.as: fix test count.
 
 2008-03-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>

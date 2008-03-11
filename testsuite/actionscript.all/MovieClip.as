@@ -20,8 +20,9 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.119 2008/03/11 08:01:36 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.120 2008/03/11 19:31:47 strk Exp $";
 
+rcsid="$Id: MovieClip.as,v 1.120 2008/03/11 19:31:47 strk Exp $";
 #include "check.as"
 
 // To be called at end of test

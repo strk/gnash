@@ -20,6 +20,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
+rcsid="$Id: getvariable.as,v 1.25 2008/03/11 19:31:48 strk Exp $";
 #include "check.as"
 
 // see check.as
