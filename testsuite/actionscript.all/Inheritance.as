@@ -21,7 +21,6 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-
 #include "check.as"
 
 check_equals(typeof(Object.prototype.constructor), 'function');
@@ -250,10 +249,10 @@ function C() {}
 C.prototype = new B;
 co = new C;
 #if OUTPUT_VERSION > 6
- xcheck_equals(co.whoami(), "A.B"); // gnash fails returning undefined.B.B
+ xcheck_equals(co.whoami(), "A.B"); // gnash fails returning A.B.B
 #else
 # if OUTPUT_VERSION == 6
-   check_equals(co.whoami(), "A.B.B"); // gnash fails returning .B.B
+   check_equals(co.whoami(), "A.B.B"); 
 # else
    check_equals(co.whoami(), ".B");
 # endif
@@ -262,7 +261,7 @@ C.prototype.whoami = function() {
 	return super.whoami()+"."+"C";
 };
 #if OUTPUT_VERSION > 5
-  check_equals(co.whoami(), "A.B.C"); // gnash fails returning .B.C (SWF6) or undefined.B.C (SWF>6)
+  check_equals(co.whoami(), "A.B.C"); 
 #else
   check_equals(co.whoami(), ".C");
 #endif
