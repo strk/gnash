@@ -1,3 +1,38 @@
+2008-02-21  Sandro Santilli <strk@keybit.net>
+
+Fifth alpha release of Gnash (0.8.2).
+Improvements since 0.8.1 release are:
+
+    - Improved timeline redesign.
+    - Action execution order fixes.
+    - Keyboard handling improved [1].
+    - New classes implemented: System.capabilities (partial),
+      SharedObject, LocalConnection.
+    - New opcodes implemented: ActionImplements, Try/Throw.
+    - Movieclip.beginGradientFill completes drawing API support.
+    - MovieClip._lockroot support added.
+    - Implement GET/POST for MovieClip.loadVariables and
+      MovieClip.loadMovie
+    - Textfield support improved.
+    - Security: configurable sandbox restricts filesystem access by movies.
+    - Better support for SWF8.
+    - Streaming OGG-contained multimedia (e.g. vorbis/theora or vorbis/dirac),
+      and other free formats.
+    - OGL and Cairo renderers much improved.
+    - Improvements of the Framebuffer GUI (hide text messages, support Linux
+      events system, built-in touchscreen calibration, simple keyboard support,
+      better architecture support).
+    - SOLdumper utility for reading SOL files ('flash cookies').
+    - DumpShm utility finds and dumps Local Connection memory segments.
+    - Fullscreen display possible.
+    - Extensions for LIRC and DBus.
+    - High quality, cross-platform psuedo-randomness using boost random.
+    - NPAPI (Mozilla) plugin: keyboard events work, navigation and javascript
+      from within movies.
+    - Set and save preferences from the GUI (GTK).
+    - Improved stability and robustness with malformed SWFs.
+    - Many other bugfixes. 
+
 2007-08-29  Sandro Santilli <strk@keybit.net>
 
 Fourth alpha release of Gnash (0.8.1).
