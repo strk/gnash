@@ -279,9 +279,7 @@ GtkGui::setFullscreen()
         gtk_widget_set_size_request(_drawingArea, -1, -1);
     	gtk_window_fullscreen(GTK_WINDOW(_window));
 
-	if (_menubar) {
-	    gtk_widget_hide(_menubar);
-	}
+        showMenu(false);
     }
     
     _fullscreen = true;
@@ -377,6 +375,21 @@ GtkGui::showMouse(bool show)
         _mouseShown = true;	
     } 
 
+}
+
+void
+GtkGui::showMenu(bool show)
+{
+#ifdef USE_MENUS
+if (_menubar)
+{
+    if (show) {
+        gtk_widget_show(_menubar);
+	    return;
+	}
+    gtk_widget_hide(_menubar);
+}
+#endif
 }
 
 // private

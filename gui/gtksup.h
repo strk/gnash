@@ -182,6 +182,8 @@ class DSOEXPORT GtkGui : public Gui
     
     virtual void showMouse(bool show);
 
+    virtual void showMenu(bool show);
+
  private:
 #ifdef GUI_HILDON
     HildonProgram *_hildon_program;
@@ -190,7 +192,10 @@ class DSOEXPORT GtkGui : public Gui
     
     // A window only for rendering the plugin as fullscreen.
     GtkWidget	*_overlay;
+    
+    // The area rendered into by Gnash
     GtkWidget   *_drawingArea;    
+
     GtkMenu     *_popup_menu;
     GtkWidget   *_menubar;
     GtkWidget   *_vbox;
@@ -209,8 +214,7 @@ class DSOEXPORT GtkGui : public Gui
     
     GdkPixbuf* createPixbuf(const gchar *filename);
     
-    // Create a tree model for displaying movie info (not yet properly
-    // implemented).
+    // Create a tree model for displaying movie info
     GtkTreeModel* makeTreeModel (std::auto_ptr<InfoTree> treepointer);
 
     std::auto_ptr<GtkGlue>     _glue;

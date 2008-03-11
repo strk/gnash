@@ -233,6 +233,11 @@ public:
     //
     /// @param show true if the mouse should be shown.
     virtual void showMouse(bool show);
+
+    /// Sets whether the menus should be shown (for fscommand)
+    //
+    /// @param show true if the menu bar should be shown.
+    virtual void showMenu(bool show);
     
     // Toggle between fullscreen and normal mode
     void toggleFullscreen();

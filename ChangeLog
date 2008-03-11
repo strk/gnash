@@ -1,5 +1,13 @@
 2008-03-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* gui/Player.cpp: add stubs for all fscommand methods, implement
+	  showmenu.
+	* gui/gui.{h,cpp}: add showMenu().
+	* gui/gtk{.cpp,sup.h}: implement showMenu for gtk (mainly for 
+	  fscommand "showmenu").
+
+2008-03-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* testsuite/actionscript.all/Object.as: check that toLocaleString
 	  calls toString. Add some tests for when toLocaleString is implemented
 	  at all.

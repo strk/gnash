@@ -187,6 +187,17 @@ Gui::showMouse(bool /* show */)
 }
 
 void
+Gui::showMenu(bool /* show */)
+{
+	static bool warned = false;
+	if (!warned)
+	{
+    	log_unimpl(_("menushow not yet supported in this GUI"));
+    	warned = true;
+   	}
+}
+
+void
 Gui::toggleFullscreen()
 {
 	if (_fullscreen) {

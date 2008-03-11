@@ -366,7 +366,6 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
     // Set host requests fd (if any)
     if ( _hostfd != -1 ) root.setHostFD(_hostfd);
 
-
     _gui->setStage(&root);
 
     // Start loader thread
@@ -393,7 +392,7 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
     return EXIT_SUCCESS;
 }
 
-/*static private*/
+// static private
 // For handling notification callbacks from ActionScript.
 void
 Player::fs_callback(gnash::sprite_instance* movie, const std::string& command,
@@ -415,17 +414,53 @@ Player::fs_callback(gnash::sprite_instance* movie, const std::string& command,
 
 	StringNoCaseEqual noCaseCompare;
 
+    // FSCommand quit
    	if (noCaseCompare(command, "quit"))
    	{
    		_gui->quit();
    	}
 
+    // FSCommand fullscreen
    	if (noCaseCompare(command, "fullscreen"))
    	{
    		if (noCaseCompare(args, "true")) _gui->setFullscreen();
    		else if (noCaseCompare(args, "false")) _gui->unsetFullscreen();
    		return;
    	}
+   	
+   	// FSCommand showmenu
+   	if (noCaseCompare(command, "showmenu"))
+   	{
+   		if (noCaseCompare(args, "true")) _gui->showMenu(true);
+   		else if (noCaseCompare(args, "false")) _gui->showMenu(false);
+   		return;
+   	}
+
+   	// FSCommand exec
+   	// Note: the pp insists that the file to execute should be in 
+   	// a subdirectory 'fscommand' of the 'projector' executable's
+   	// location.
+   	// In SWF5 there were no restrictions.
+   	if (noCaseCompare(command, "exec"))
+   	{
+        log_unimpl(_("FScommand exec called with argument %s"), args);
+   	}
+
+   	// FSCommand allowscale
+   	if (noCaseCompare(command, "allowscale"))
+   	{
+        log_unimpl(_("FScommand allowscale called with argument %s"), args);
+   		return;
+   	}
+
+   	// FSCommand trapallkeys
+   	if (noCaseCompare(command, "trapallkeys"))
+   	{
+        log_unimpl(_("FScommand trapallkeys called with argument %s"), args);
+   		return;
+   	}
+   	
+   	log_error(_("Unhandled FSCommand %s (%s)"), command, args);
 
 }
 
@@ -448,7 +483,7 @@ Player::interfaceEventCallback(const std::string& event, const std::string& arg)
 	return "";
 }
 
-/* private */
+// private
 std::auto_ptr<Gui>
 Player::getGui()
 {
