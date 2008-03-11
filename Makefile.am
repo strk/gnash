@@ -77,7 +77,7 @@ DIST_SUBDIRS = $(STD_DIRS) cygnal extensions testsuite
 EXTRA_DIST =  autogen.sh \
 	config.rpath \
 	macros/incllist macros/libslist \
-	ChangeLog-0.8.0 ChangeLog-0.8.1 \
+	ChangeLog-0.8.0 ChangeLog-0.8.1 ChangeLog-0.8.2 \
 	packaging/deb.am \
 	packaging/snapshot.am \
 	packaging/alp.am \
