@@ -100,6 +100,15 @@ public:
 		return as_value();
 	}
 
+protected:
+
+	virtual void markReachableResources() const
+	{
+		if ( _ctor ) _ctor->setReachable();
+		if ( _proto ) _proto->setReachable();
+		markAsFunctionReachable();
+	}
+
 private:
 
 	as_function* _ctor;

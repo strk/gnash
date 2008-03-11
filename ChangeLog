@@ -1,3 +1,11 @@
+2008-03-10 Sandro Santilli <strk@keybit.net>
+
+	* server/as_object.cpp: mark reachable resources from 'super'
+	  (may live longer then a function call, if that's the user
+	  intention).
+	* testsuite/actionscript.all/MovieClip.as: check 'constructor'
+	  and '__constructor__' members of builtin class instances.
+
 2008-03-10 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/StringPredicates.h: Make case insensitive compare work with

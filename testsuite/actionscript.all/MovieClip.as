@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.118 2008/03/10 17:18:48 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.119 2008/03/11 08:01:36 strk Exp $";
 
 #include "check.as"
 
@@ -28,19 +28,19 @@ rcsid="$Id: MovieClip.as,v 1.118 2008/03/10 17:18:48 strk Exp $";
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(197); // SWF5
+	check_totals(199); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(611); // SWF6
+	check_totals(613); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(628); // SWF7
+	check_totals(630); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(629); // SWF8+
+	check_totals(631); // SWF8+
 #endif
 
 	play();
@@ -776,6 +776,8 @@ check_equals(_root.b, 1);
 
 var cl = new MovieClip();
 check_equals(cl.__proto__.constructor, MovieClip);
+check_equals(cl.constructor, MovieClip);
+check_equals(cl.__constructor__, MovieClip);
 check(cl instanceOf MovieClip);
 check(cl instanceOf Object);
 check_equals(typeof(cl), "object");
@@ -1404,7 +1406,7 @@ asm {
 xcheck_equals(propinspect, 20);
 
 createEmptyMovieClip('mc', 10);
-mc._x = 30;
+mc._x = 1;
 ret = mc.addProperty('_x', get, set);
 check_equals(ret, true);
 getCalls=0; setCalls=0;
