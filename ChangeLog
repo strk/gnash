@@ -1,5 +1,6 @@
 2008-03-10 Sandro Santilli <strk@keybit.net>
 
+	* backend/Makefile.am: distribute ogl backend header.
 	* ChangeLog, ChangeLog-0.8.2, Makefile.am: split ChangeLog.
 
 2008-03-10 Sandro Santilli <strk@keybit.net>
