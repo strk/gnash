@@ -210,7 +210,7 @@ DerivedClass.prototype.getSuper = function() { return super; };
 s = derived.getSuper();
 check_equals(typeof(s), 'object');
 check_equals(s.sayHello, BaseClass.prototype.sayHello);
-xcheck(!s.hasOwnProperty('sayHello')); // sayHello is not copied to 's'
+check(!s.hasOwnProperty('sayHello')); // sayHello is not copied to 's'
 check_equals(s.__proto__, Object.prototype); // nor it's found in __proto__
 check_equals(typeof(s.prototype), 'undefined');
 check_equals(typeof(s.constructor), 'function');

@@ -3445,7 +3445,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 	{
 		if ( obj->isSuper() ) 
 		{
-			this_ptr = thread.getThisPointer();
+			if ( thread.isFunction() ) this_ptr = thread.getThisPointer();
 			super = obj->get_super();
 		}
 		else

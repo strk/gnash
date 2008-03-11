@@ -1,3 +1,10 @@
+2008-03-11 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ASHandlers.cpp (ActionCallFunction): only
+	  maintain the 'this' pointer if in a function context.
+	* testsuite/actionscript.all/Inheritance.as: one xfail
+	  less.
+
 2008-03-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/Player.cpp: add stubs for all fscommand methods, implement
@@ -12,7 +19,7 @@
 	  calls toString. Add some tests for when toLocaleString is implemented
 	  at all.
 
-2008-03-10 Sandro Santilli <strk@keybit.net>
+2008-03-11 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/: Date.as, Object.as:
 	  Use hasOwnProperty for new 'toLocaleString' availability
