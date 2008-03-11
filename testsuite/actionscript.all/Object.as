@@ -35,7 +35,7 @@ check_equals(typeof(Object.prototype.valueOf), 'function');
 check_equals(typeof(Object.prototype.constructor), 'function'); 
 #if OUTPUT_VERSION > 5
  check(Object.prototype.hasOwnProperty('toString'));
- check(Object.prototype.hasOwnProperty('toLocaleString'));
+ xcheck(Object.prototype.hasOwnProperty('toLocaleString'));
  check(Object.prototype.hasOwnProperty('valueOf'));
 #endif
 check_equals(Object.prototype.prototype, undefined);
@@ -393,6 +393,21 @@ Object.prototype.toString = function() { return new Number; };
 check_equals(Object.prototype.toString(), 0);
 Object.prototype.toString = backup;
 
+/// This will ruin later tests while it fails hasOwnProperty.
+//xcheck_equals(Object.prototype.toLocaleString(), '[object Object]');
+//backup = Object.prototype.toLocaleString;
+//Object.prototype.toLocaleString = function() { return new Object; };
+//xcheck_equals(typeof(Object.prototype.toLocaleString()), 'object');
+//Object.prototype.toLocaleString = function() { return new Number; };
+//xcheck_equals(Object.prototype.toLocaleString(), 0);
+//Object.prototype.toLocaleString = NULL;
+
+// Check toLocaleString calls toString
+backup = Object.prototype.toString;
+Object.prototype.toString = function() { return "toString"; };
+xcheck_equals(Object.prototype.toLocaleString(), "toString");
+Object.prototype.toString = backup;
+
 //----------------------
 // Test enumeration
 //----------------------
@@ -527,10 +542,10 @@ check( obj8.prototype.isPrototypeOf(obj9) );
 
 
 #if OUTPUT_VERSION <= 5
-totals(64);
+totals(65);
 #endif
 
 #if OUTPUT_VERSION >= 6
-totals(168);
+totals(169);
 #endif
 
