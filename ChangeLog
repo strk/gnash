@@ -1,5 +1,9 @@
 2008-03-10 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (constructAsInstance): compute
+	  a 'super' reference.
+	* testsuite/misc-ming.all/registerClassTest.c: test super in
+	  registered-class constructor.
 	* server/as_object.cpp: mark reachable resources from 'super'
 	  (may live longer then a function call, if that's the user
 	  intention).

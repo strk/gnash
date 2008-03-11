@@ -4105,8 +4105,14 @@ sprite_instance::constructAsScriptObject()
       //
       if ( swfversion > 5 )
       {
-        //log_debug(_("Calling the user-defined constructor against this sprite_instance"));
-        fn_call call(this, &(get_environment()), 0, 0);
+        log_debug(_("Calling the user-defined constructor against this sprite_instance"));
+
+	// Provide a 'super' reference..
+	as_object* super = NULL;
+	as_object* iface = ctor->getPrototype().get(); // this function's prototype
+	if ( iface ) super = iface->get_super();
+
+        fn_call call(this, &(get_environment()), 0, 0, super);
 
         // we don't use the constructor return (should we?)
         (*ctor)(call);

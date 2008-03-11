@@ -137,7 +137,7 @@ main(int argc, char** argv)
 	SWFMovie_nextFrame(mo); /* end of frame3 */
 
 	add_actions(mo,
-		"function CustomClass2() { this._x = 160; } "
+		"function CustomClass2() { this._x = 160; check_equals(typeof(super.lineTo), 'function'); }"
 		"CustomClass2.prototype = new MovieClip;"
 		"registerClassRet = Object.registerClass('redsquare', CustomClass2);"
 		);
@@ -194,7 +194,7 @@ main(int argc, char** argv)
 	check(mo, "clip4 instanceOf MovieClip");
 
 	add_actions(mo,
-		"totals(24);"
+		"totals(26);"
 		"stop();"
 		);
 
