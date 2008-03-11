@@ -124,7 +124,7 @@ GtkGui::init(int argc, char **argv[])
 
     _drawingArea = gtk_drawing_area_new();
 
-    // IF we don't set this flag we won't be able to grab focus
+    // If we don't set this flag we won't be able to grab focus
     // ( grabFocus() would be a no-op )
     GTK_WIDGET_SET_FLAGS (GTK_WIDGET(_drawingArea), GTK_CAN_FOCUS);
 
@@ -254,7 +254,7 @@ GtkGui::setFullscreen()
         _overlay = gtk_window_new (GTK_WINDOW_TOPLEVEL);
         addGnashIcon(GTK_WINDOW(_overlay));
         gtk_window_fullscreen(GTK_WINDOW(_overlay));
-        log_debug (_("Created fullscreen window"));
+        //log_debug (_("Created fullscreen window"));
         
         // Reparent drawing area from GtkPlug to fullscreen window
         gtk_widget_realize(_overlay);      
@@ -298,16 +298,14 @@ GtkGui::unsetFullscreen()
         setupWindowEvents();
         if (_overlay) {
             gtk_widget_destroy(_overlay);
-            log_debug (_("Destroyed fullscreen window"));
+            //log_debug (_("Destroyed fullscreen window"));
         }        
     }
     
     // Stand-alone
     else {
-	gtk_window_unfullscreen(GTK_WINDOW(_window));
-	if (_menubar) {
-	    gtk_widget_show(_menubar);
-	}
+	    gtk_window_unfullscreen(GTK_WINDOW(_window));
+	    showMenu(true);
     }
     
     _fullscreen = false;
@@ -351,7 +349,9 @@ void
 GtkGui::showMouse(bool show)
 {
 
-    if (!show && _mouseShown)
+    if (show == _mouseShown) return;
+
+    if (!show)
     {
         GdkPixmap *pixmap;
         GdkColor *color;
@@ -370,7 +370,7 @@ GtkGui::showMouse(bool show)
         _mouseShown = false;
 
     }
-	else if (show && !_mouseShown)
+	else if (show)
     {
         _mouseShown = true;	
     } 

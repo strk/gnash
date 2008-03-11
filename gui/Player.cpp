@@ -205,7 +205,7 @@ Player::init_gui()
 movie_definition* 
 Player::load_movie()
 {
-	gnash::movie_definition* md=NULL;
+	gnash::movie_definition* md = NULL;
 
 	RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 	URL vurl(_url);
@@ -220,34 +220,34 @@ Player::load_movie()
 	}
 
     try {
-	if ( _infile == "-" )
-	{
-		std::auto_ptr<tu_file> in ( noseek_fd_adapter::make_stream(fileno(stdin)) );
-		md = gnash::create_movie(in, _url, false);
-	}
-	else
-	{
-		URL url(_infile);
-		if ( url.protocol() == "file" )
-		{
-			std::string path = url.path();
-			// We'll need to allow load of the file, no matter virtual url
-			// specified...
-			// This is kind of hackish, cleaner would be adding an argument
-			// to create_library_movie to skip the security checking phase.
-			// NOTE that if we fail to allow this load, the konqueror plugin
-			// would not be able to load anything
-			//
-			rcfile.addLocalSandboxPath(path);
-			log_debug(_("%s appended to local sandboxes"), path.c_str());
-		}
+	    if ( _infile == "-" )
+	    {
+		    std::auto_ptr<tu_file> in ( noseek_fd_adapter::make_stream(fileno(stdin)) );
+		    md = gnash::create_movie(in, _url, false);
+	    }
+	    else
+	    {
+		    URL url(_infile);
+		    if ( url.protocol() == "file" )
+		    {
+			    std::string path = url.path();
+			    // We'll need to allow load of the file, no matter virtual url
+			    // specified...
+			    // This is kind of hackish, cleaner would be adding an argument
+			    // to create_library_movie to skip the security checking phase.
+			    // NOTE that if we fail to allow this load, the konqueror plugin
+			    // would not be able to load anything
+			    //
+			    rcfile.addLocalSandboxPath(path);
+			    log_debug(_("%s appended to local sandboxes"), path.c_str());
+		    }
 
-		// _url should be always set at this point...
-		md = gnash::create_library_movie(url, _url.c_str(), false);
-	}
+		    // _url should be always set at this point...
+		    md = gnash::create_library_movie(url, _url.c_str(), false);
+	    }
     } catch (const GnashException& er) {
-	fprintf(stderr, "%s\n", er.what());
-	md = NULL;
+	    fprintf(stderr, "%s\n", er.what());
+	    md = NULL;
     }
 
 	if ( ! md )
@@ -350,11 +350,10 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 
     if ( ! _width || ! _height )
     {
-        //log_error(_("Input movie has collapsed dimensions " SIZET_FMT "/" SIZET_FMT ". Giving up."), width, height);
-        log_debug(_("Input movie has collapsed dimensions " SIZET_FMT "/" SIZET_FMT ". Setting to 1/1 and going on."), _width, _height);
-	if ( ! _width ) _width = 1;
-	if ( ! _height ) _height = 1;
-	//return EXIT_FAILURE;
+        log_debug(_("Input movie has collapsed dimensions " SIZET_FMT "/"
+                SIZET_FMT ". Setting to 1/1 and going on."), _width, _height);
+	    if ( ! _width ) _width = 1;
+	    if ( ! _height ) _height = 1;
     }
 
     // Now that we know about movie size, create gui window.
@@ -444,6 +443,7 @@ Player::fs_callback(gnash::sprite_instance* movie, const std::string& command,
    	if (noCaseCompare(command, "exec"))
    	{
         log_unimpl(_("FScommand exec called with argument %s"), args);
+        return;
    	}
 
    	// FSCommand allowscale
