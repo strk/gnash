@@ -586,5 +586,5 @@ check_equals(typeof(foo), 'string');
 #if OUTPUT_VERSION == 5
 totals(243);
 #else
-totals (246);
+totals (285);
 #endif
