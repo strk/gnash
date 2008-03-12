@@ -1,3 +1,8 @@
+2008-03-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* testsuite/actionscript.all: tests for Stage properties and 
+	  Stage.align values.
+
 2008-03-12 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/samples/Makefile.am: don't add LDFLAGS (AGG_LIBS)
