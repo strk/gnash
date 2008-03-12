@@ -3430,14 +3430,11 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 	log_action(_(" method nargs: %d"), nargs);
 	);
 
-	// TODO:
-	// 1. if object/func is super keep current 'this' when calling the method (don't pass 'super' as 'this')
-	// 2. if object/func is super pass it over to the function being invoked or it will create a new
-	//    super thus breaking the chain (use fn_call for that ?)
-
 	string method_string = method_name.to_string();
 	as_value method_val;
 	boost::intrusive_ptr<as_object> obj = obj_value.to_object();
+
+	bool hasMethodName = ( (!method_name.is_undefined()) && (!method_string.empty()) );
 
 	as_object* this_ptr = obj.get();
 	as_object* super = NULL;
@@ -3450,14 +3447,33 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 		}
 		else
 		{
-			//log_debug("%p.%s() call", obj.get(), method_string.c_str());
 			as_object* proto = obj->get_prototype().get();
+			as_object* owner = proto;
+			if ( hasMethodName )
+			{
+				VM& vm = VM::get();
+				if ( vm.getSWFVersion() > 6 )
+				{
+					string_table::key k = vm.getStringTable().find(method_string);
+					Property* p = obj->findProperty(k, 0, &owner);
+					if ( p )
+					{
+						assert(owner);
+						if ( owner != obj.get() )
+						{
+							proto = owner;
+						}
+					}
+				}
+			}
+
+			//log_debug("%p.%s() call", obj.get(), method_string.c_str());
 			if ( proto ) super = proto->get_super();
 			else super = obj->get_super();
 		}
 	}
 
-	if ( method_name.is_undefined() || method_string.empty() )
+	if ( ! hasMethodName )
 	{
 		// We'll be calling the super constructor here
 		method_val = obj_value;

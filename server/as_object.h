@@ -101,6 +101,8 @@ private:
 	Property* findUpdatableProperty(string_table::key name, 
 		string_table::key nsname = 0);
 
+public:
+
 	/// Find a property scanning the inheritance chain
 	///
 	/// @param name
@@ -114,8 +116,6 @@ private:
 	///
 	Property* findProperty(string_table::key name, string_table::key nsname,
 		as_object **owner = NULL);
-
-public:
 
 	/// \brief
 	/// Return a reference to the Virtual Machine that created

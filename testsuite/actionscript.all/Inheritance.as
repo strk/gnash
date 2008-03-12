@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.49 2008/03/11 19:31:47 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.50 2008/03/12 22:33:07 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Object.prototype.constructor), 'function');
@@ -250,7 +250,7 @@ function C() {}
 C.prototype = new B;
 co = new C;
 #if OUTPUT_VERSION > 6
- xcheck_equals(co.whoami(), "A.B"); // gnash fails returning A.B.B
+ check_equals(co.whoami(), "A.B"); // gnash fails returning A.B.B
 #else
 # if OUTPUT_VERSION == 6
    check_equals(co.whoami(), "A.B.B"); 

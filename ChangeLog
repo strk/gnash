@@ -1,5 +1,15 @@
 2008-03-12 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/PASSING: super-reference-{7,8} succeed.
+	* testsuite/actionscript.all/Inheritance.as: last failing test pass
+	  (we need a lot more now !!)
+	* server/as_object.h: make findProperty public.
+	* server/vm/ASHandlers.cpp (ActionCallMethod): use findProperty
+	  to find the actual object containing the named method to call,
+	  and compute super from that IFF swf > 7.
+
+2008-03-12 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/swfdec/PASSING: super-reference-6.swf succeeds.
 	* server/as_function.cpp (function_call): set super.
 	* testsuite/actionscript.all/Stage.as: successes..
