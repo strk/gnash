@@ -1834,6 +1834,9 @@ AC_DEFUN([CHECK_VISIBILITY_GCC_BUG],
     )
     if test x$gcc_visibility_bug = xno; then
       CXXFLAGS="$CXXFLAGS -fvisibility-inlines-hidden"
+      if test x"$enable_visibility" != x"no"; then
+        CXXFLAGS="$CXXFLAGS -fvisibility=hidden"
+      fi
     fi
   ]
 )

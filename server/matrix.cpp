@@ -255,6 +255,7 @@ matrix::print() const
 	log_parse("| %4.4f %4.4f %4.4f |", m_[1][0], m_[1][1], TWIPS_TO_PIXELS(m_[1][2]));
 }
 
+
 void
 matrix::transform(point* result, const point& p) const
 // Transform point 'p' by our matrix.  Put the result in
@@ -264,23 +265,6 @@ matrix::transform(point* result, const point& p) const
 
 	result->x = m_[0][0] * p.x + m_[0][1] * p.y + m_[0][2];
 	result->y = m_[1][0] * p.x + m_[1][1] * p.y + m_[1][2];
-}
-
-void
-matrix::transform(point& p) const
-// Transform point 'p' by our matrix.
-{
-	transform(p.x, p.y);
-}
-
-void
-matrix::transform(float& x, float& y) const
-// Transform point 'x,y' by our matrix.
-{
-	float nx = m_[0][0] * x + m_[0][1] * y + m_[0][2];
-	float ny = m_[1][0] * x + m_[1][1] * y + m_[1][2];
-	x = nx;
-	y = ny;
 }
 
 void

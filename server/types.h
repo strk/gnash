@@ -23,7 +23,7 @@ namespace gnash {
 
 
 #define TWIPS_TO_PIXELS(x)	((x) / 20.f)
-#define PIXELS_TO_TWIPS(x)	((x) * 20.f)
+#define PIXELS_TO_TWIPS(x)	((x) * 20)
 
 
 namespace gnash {

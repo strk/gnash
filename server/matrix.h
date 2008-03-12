@@ -157,14 +157,27 @@ public:
 	///
 	void	transform(point* result, const point& p) const;
 
-	/// Transform point 'p' by our matrix. 
-	void	transform(point& p) const;
+	// Transform point 'p' by our matrix.
+	template <typename T>
+	void transform(geometry::Point2d<T>& p) const
+	{
+		transform(p.x, p.y);
+	}
 
 	/// Transform point 'p' by the inverse of our matrix. 
 	void	transform_by_inverse(point& p) const;
 
 	/// Transform point 'x,y' by our matrix. 
-	void	transform(float& x, float& y) const;
+	template <typename T>
+	void
+	transform(T& x, T& y) const
+	// Transform point 'x,y' by our matrix.
+	{
+		float nx = m_[0][0] * x + m_[0][1] * y + m_[0][2];
+		float ny = m_[1][0] * x + m_[1][1] * y + m_[1][2];
+		x = nx;
+		y = ny;
+	}
 
 	/// Transform vector 'v' by our matrix. Doesn't apply translation.
 	//

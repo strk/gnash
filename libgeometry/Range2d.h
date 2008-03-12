@@ -255,7 +255,8 @@ public:
 	/// Note that WORLD rectangles contain every point
 	/// and NULL rectangles contain no point.
 	///
-	bool contains(T x, T y) const
+	template <typename U>
+	bool contains(U x, U y) const
 	{
 		if ( isNull() ) return false;
 		if ( isWorld() ) return true;

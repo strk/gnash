@@ -1,3 +1,25 @@
+2008-03-11 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* configure.ac: If --enable-visibility is specified, and no GCC bug
+	was detected, compile with -fvisibility=hidden.
+	* server/shape.{cpp, h}: Since SWF provides shape edges as integers,
+	there's no need to store them as floats. Some renderers can improve
+	performance here, especially when used on certain embedded platforms.
+	To this end, path and edge are now templated classes Path<> and
+	Edge<>, and the precision (int or float) can be specified with the
+	template argument.
+	* backend/render_handler_agg.cpp: The AGG renderer relies on
+	floating pointprecision in paths (after matrix conversion), so make
+	sure that precision is preserved.
+	* libgeometry/{Point2d.h, Range2d.h}: Allow easy conversion from float
+	to int templates.
+	* server/matrix.{cpp, h}: Allow transformations to take place on any
+	kind of Point2d and Range2d.
+	* server/types.h: Multiplication by 20 does not require a floating
+	point annotation.
+	* server/parser/BitmapMovieDefinition.cpp: Specify the "new subshape"
+	argument to Path's constructor.
+
 2008-03-11 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/*.as: re-add rcsids.

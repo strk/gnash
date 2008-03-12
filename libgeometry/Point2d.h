@@ -82,8 +82,8 @@ public:
 	/// @param p1 second point
 	/// @param t interpolation factor, between 0 and 1
 	///
-	//template <typename U>
-	Point2d(const Point2d<T>& p0, const Point2d<T>& p1, float t)
+	template <typename U>
+	Point2d(const Point2d<U>& p0, const Point2d<U>& p1, float t)
 		:
 		x( p0.x + (p1.x - p0.x) * t ),
 		y( p0.y + (p1.y - p0.y) * t )
@@ -118,8 +118,9 @@ public:
 	}
 
 	/// Return square distance between two points
+	template <typename U>
 	static
-	float squareDistance(const Point2d<T>& p0, const Point2d<T>& p1)
+	float squareDistance(const Point2d<T>& p0, const Point2d<U>& p1)
 	{
 		float hside = p1.x - p0.x;
 		float vside = p1.y - p0.y;
@@ -128,7 +129,8 @@ public:
 	}
 
 	/// Return square distance between this and the given point
-	float squareDistance(const Point2d<T>& p) const
+	template <typename U>
+	float squareDistance(const Point2d<U>& p) const
 	{
 		return squareDistance(*this, p);
 	}
@@ -139,9 +141,10 @@ public:
 		return sqrtf(squareDistance(p));
 	}
 
-	bool operator== (const Point2d<T>& p) const
+	template <typename U>
+	bool operator== (const Point2d<U>& p) const
 	{
-		return x == p.x && y == p.y;
+		return x == (T)p.x && y == (T)p.y;
 	}
 
 	bool operator!=(const Point2d<T>& p) const
@@ -163,6 +166,8 @@ operator<< (std::ostream& os, const Point2d<T>& p)
 
 // for backward compatibility
 typedef geometry::Point2d<float> point;
+typedef geometry::Point2d<float> float_point;
+typedef geometry::Point2d<int> int_point;
 
 } // namespace gnash
 
