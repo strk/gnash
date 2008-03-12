@@ -17,387 +17,553 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#define NO_NSPR_10_SUPPORT
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
 
+#define FLASH_MAJOR_VERSION "9"
+#define FLASH_MINOR_VERSION "0"
+#define FLASH_REV_NUMBER "82"
+
+#define MIME_TYPES_HANDLED "application/x-shockwave-flash"
+// The name must be this value to get flash movies that check the
+// plugin version to load.
+#define PLUGIN_NAME "Shockwave Flash"
+#define MIME_TYPES_DESCRIPTION MIME_TYPES_HANDLED":swf:"PLUGIN_NAME
+
+// Some javascript plugin detectors use the description
+// to decide the flash version to display. They expect the
+// form (major version).(minor version) r(revision).
+// e.g. "8.0 r99."
+#ifndef FLASH_MAJOR_VERSION
+#define FLASH_MAJOR_VERSION DEFAULT_FLASH_MAJOR_VERSION
+#endif
+#ifndef FLASH_MINOR_VERSION
+#define FLASH_MINOR_VERSION DEFAULT_FLASH_MINOR_VERSION
+#endif
+#ifndef FLASH_REV_NUMBER
+#define FLASH_REV_NUMBER DEFAULT_FLASH_REV_NUMBER
+#endif
+#define FLASH_VERSION FLASH_MAJOR_VERSION"."\
+    FLASH_MINOR_VERSION" r"FLASH_REV_NUMBER"."
+
+#define PLUGIN_DESCRIPTION \
+  "Shockwave Flash "FLASH_VERSION" Gnash "VERSION", the GNU Flash Player. \
+  Copyright &copy; 2006, 2007, 2008 \
+  <a href=\"http://www.fsf.org\">Free Software Foundation</a>, Inc.<br> \
+  Gnash comes with NO WARRANTY, to the extent permitted by law. \
+  You may redistribute copies of Gnash under the terms of the \
+  <a href=\"http://www.gnu.org/licenses/gpl.html\">GNU General Public \
+  License</a>. For more information about Gnash, see <a \
+  href=\"http://www.gnu.org/software/gnash/\"> \
+  http://www.gnu.org/software/gnash</a>. \
+  Compatible Shockwave Flash "FLASH_VERSION
+
+#define _WIN32_WINNT 0x0500
 #include <windows.h>
 #include <windowsx.h>
+#include <wingdi.h>
 
-#include "URL.h"
-
-#include "gnash.h"
-#include "ogl.h"
-#include "movie_definition.h"
+#include <stdarg.h>
+#include <stdint.h>
+#include <fstream>
 
 #include "plugin.h"
 
-using namespace std;
-using namespace gnash; 
+static PRLock* playerLock = NULL;
 
-static PRLock* s_player = NULL;
+char* NPP_GetMIMEDescription(void);
+static const char* getPluginDescription(void);
+static void playerThread(void *arg);
+static LRESULT CALLBACK PluginWinProc(HWND, UINT, WPARAM, LPARAM);
+
+#define DBG(x, ...) __DBG(x, ## __VA_ARGS__)
+inline void
+__DBG(const char *fmt, ...)
+{
+    char buf[1024];
+    va_list ap;
+    
+    va_start(ap, fmt);
+    vsnprintf(buf, sizeof(buf) - 1, fmt, ap);
+    va_end(ap);
+    OutputDebugString(buf);
+}
 
 // general initialization and shutdown
 
-NPError NS_PluginInitialize()
+NPError
+NS_PluginInitialize(void)
 {
-	s_player = PR_NewLock();
-	assert(s_player);
-//	dbglogfile << "NS_PluginInitialize " << endl;
-	return NPERR_NO_ERROR;
+    DBG("NS_PluginInitialize\n");
+    if (!playerLock) {
+        playerLock = PR_NewLock();
+    }
+    return NPERR_NO_ERROR;
 }
  
-void NS_PluginShutdown()
+void
+NS_PluginShutdown(void)
 {
-  if (s_player)
-	{
-		PR_DestroyLock(s_player);
-		s_player = NULL;
-	}
-//	dbglogfile << "NS_PluginShutdown " << endl;
+    DBG("NS_PluginShutdown\n");
+    if (playerLock) {
+		PR_DestroyLock(playerLock);
+		playerLock = NULL;
+    }
 }
- 
- // construction and destruction of our plugin instance object
 
-nsPluginInstanceBase * NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
+/// \brief Return the MIME Type description for this plugin.
+char*
+NPP_GetMIMEDescription(void)
 {
-//	dbglogfile << "NS_NewPluginInstance " << endl;
-	if (!aCreateDataStruct)
-	{
-		return NULL;
-	}
- 
-	nsPluginInstance * plugin = new nsPluginInstance(aCreateDataStruct->instance);
-	return plugin;
+    return MIME_TYPES_HANDLED;
 }
- 
-void NS_DestroyPluginInstance(nsPluginInstanceBase * aPlugin)
-{
-//	dbglogfile << "NS_DestroyPluginInstance " << endl;
-	if (aPlugin)
-	{
-		delete (nsPluginInstance *)aPlugin;
-	}
-}
- 
- // nsPluginInstance class implementation
 
-nsPluginInstance::nsPluginInstance(NPP aInstance) : nsPluginInstanceBase(),
-	mInstance(aInstance),
-	mInitialized(FALSE),
-	m_swf_file(""),
-	m_thread(NULL),
-	m_shutdown(FALSE),
-	mouse_x(0),
-	mouse_y(0),
-	mouse_buttons(0),
-	lpOldProc(NULL)
+/// \brief Retrieve values from the plugin for the Browser
+///
+/// This C++ function is called by the browser to get certain
+/// information is needs from the plugin. This information is the
+/// plugin name, a description, etc...
+NPError
+NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 {
-//	dbglogfile << "nsPluginInstance " << endl;
-	mhWnd = NULL;
+    NPError err = NPERR_NO_ERROR;
+
+    switch (aVariable) {
+        case NPPVpluginNameString:
+            *static_cast<char **> (aValue) = PLUGIN_NAME;
+            break;
+
+        // This becomes the description field you see below the opening
+        // text when you type about:plugins and in
+        // navigator.plugins["Shockwave Flash"].description, used in
+        // many flash version detection scripts.
+        case NPPVpluginDescriptionString:
+            *static_cast<const char **>(aValue) =
+                        getPluginDescription();
+            break;
+
+        case NPPVpluginNeedsXEmbed:
+#ifdef HAVE_GTK2
+            *static_cast<PRBool *>(aValue) = PR_TRUE;
+#else
+            *static_cast<PRBool *>(aValue) = PR_FALSE;
+#endif
+            break;
+
+        case NPPVpluginTimerInterval:
+
+        case NPPVpluginKeepLibraryInMemory:
+
+        default:
+            err = NPERR_INVALID_PARAM;
+            break;
+    }
+    return err;
+}
+
+static const char*
+getPluginDescription(void) 
+{
+    return PLUGIN_DESCRIPTION;
+}
+
+// construction and destruction of our plugin instance object
+
+nsPluginInstanceBase*
+NS_NewPluginInstance(nsPluginCreateData* aCreateDataStruct)
+{
+    DBG("NS_NewPluginInstance\n");
+    if (!playerLock) {
+        playerLock = PR_NewLock();
+    }
+    if (!aCreateDataStruct) {
+        return NULL;
+    }
+    return new nsPluginInstance(aCreateDataStruct);
 }
  
+void
+NS_DestroyPluginInstance(nsPluginInstanceBase* aPlugin)
+{
+    DBG("NS_DestroyPluginInstance\n");
+    if (aPlugin) {
+        delete (nsPluginInstance *) aPlugin;
+    }
+    if (playerLock) {
+		PR_DestroyLock(playerLock);
+		playerLock = NULL;
+    }
+}
+ 
+// nsPluginInstance class implementation
+
+/// \brief Constructor
+nsPluginInstance::nsPluginInstance(nsPluginCreateData* data) :
+    nsPluginInstanceBase(),
+    _instance(data->instance),
+    _window(NULL),
+    _initialized(FALSE),
+    _shutdown(FALSE),
+    _stream(NULL),
+    _url(""),
+    _thread(NULL),
+    _width(0),
+    _height(0),
+    _rowstride(0),
+    _memaddr(NULL),
+    mouse_x(0),
+    mouse_y(0),
+    mouse_buttons(0),
+    lpOldProc(NULL)
+{
+    DBG("nsPluginInstance::nsPluginInstance\n");
+}
+ 
+/// \brief Destructor
 nsPluginInstance::~nsPluginInstance()
 {
-//	dbglogfile << "~nsPluginInstance " << endl;
+    DBG("nsPluginInstance::~nsPluginInstance\n");
+    if (_memaddr) {
+        free(_memaddr);
+        _memaddr = NULL;
+    }
 }
  
- static LRESULT CALLBACK PluginWinProc(HWND, UINT, WPARAM, LPARAM);
- 
-NPBool nsPluginInstance::init(NPWindow* aWindow)
+NPBool
+nsPluginInstance::init(NPWindow* aWindow)
 {
-//	dbglogfile << "***init*** " << aWindow << endl;
+    DBG("nsPluginInstance::init\n");
 
-	if (aWindow == NULL)
-	{
-		return FALSE;
-	}
+    if (!aWindow) {
+        return FALSE;
+    }
+
+    _x = aWindow->x;
+    _y = aWindow->y;
+    _width = aWindow->width;
+    _height = aWindow->height; 
+    _window = (HWND) aWindow->window;
+    // Windows DIB row stride is always a multiple of 4 bytes.
+    _rowstride = /* 24 bits */ 3 * _width;
+    _rowstride += _rowstride % 4;
+    DBG("aWindow->type: %s (%u)\n", 
+            (aWindow->type == NPWindowTypeWindow) ? "NPWindowTypeWindow" :
+            (aWindow->type == NPWindowTypeDrawable) ? "NPWindowTypeDrawable" :
+            "unknown",
+            aWindow->type);
+
+    // subclass window so we can intercept window messages and
+    // do our drawing to it
+    lpOldProc = SubclassWindow(_window, (WNDPROC)PluginWinProc);
  
-	mX = aWindow->x;
-	mY = aWindow->y;
-	mWidth = aWindow->width;
-	mHeight = aWindow->height; 
+    // associate window with our nsPluginInstance object so we can access 
+    // it in the window procedure
+    SetWindowLong(_window, GWL_USERDATA, (LONG) this);
 
-	if (mhWnd == (HWND) aWindow->window)
-	{
-		return true;
-	}
-
-	mhWnd = (HWND) aWindow->window;
-
-  // subclass window so we can intercept window messages and
-  // do our drawing to it
-  lpOldProc = SubclassWindow(mhWnd, (WNDPROC)PluginWinProc);
- 
-  // associate window with our nsPluginInstance object so we can access 
-  // it in the window procedure
-  SetWindowLong(mhWnd, GWL_USERDATA, (LONG) this);
- 
-  mInitialized = TRUE;
-  return TRUE;
+    _initialized = TRUE;
+    return TRUE;
 }
 
-NPError nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
-                            NPBool seekable, uint16_t * stype)
+void
+nsPluginInstance::shut(void)
 {
-//	dbglogfile << "NewStream" << stream->url << endl;
-	return NPERR_NO_ERROR;
+    DBG("nsPluginInstance::shut\n");
+
+    DBG("Acquiring playerLock mutex for shutdown.\n");
+    PR_Lock(playerLock);
+    _shutdown = TRUE;
+    DBG("Releasing playerLock mutex for shutdown.\n");
+    PR_Unlock(playerLock);
+
+    if (_thread) {
+        DBG("Waiting for thread to terminate.\n");
+        PR_JoinThread(_thread);
+        _thread = NULL; 
+    }
+
+    // subclass it back
+    SubclassWindow(_window, lpOldProc);
+
+    _initialized = FALSE;
 }
 
-void playerThread(void *arg)
+NPError
+nsPluginInstance::NewStream(NPMIMEType type, NPStream *stream,
+        NPBool seekable, uint16_t *stype)
 {
-	nsPluginInstance *inst = (nsPluginInstance *)arg;    
-	inst->main_loop();
-}
+    DBG("nsPluginInstance::NewStream\n");
+    DBG("stream->url: %s\n", stream->url);
 
-NPError nsPluginInstance::DestroyStream(NPStream * stream, NPError reason)
-{
-//	dbglogfile << "DestroyStream" << stream->url << endl;
-
-	m_swf_file = stream->url;
-	int start = m_swf_file.find("file:///", 0);
-	if (start >= 0)
-	{
-		m_swf_file = stream->url + 8;
-	}
-
-	assert(m_thread == NULL);
-
-	m_thread = PR_CreateThread(PR_USER_THREAD, playerThread, this,
-			      PR_PRIORITY_NORMAL, PR_GLOBAL_THREAD,
-			      PR_JOINABLE_THREAD, 0);
-
-	return NPERR_NO_ERROR;
-}
-
-void nsPluginInstance::shut()
-{
-	if (m_thread)
-	{
-//		dbglogfile << "Waiting for the thread to terminate..." << endl;
-		m_shutdown = true;
-
-		PR_JoinThread(m_thread);
-		m_thread = NULL;
-	}
-
-	// subclass it back
-	SubclassWindow(mhWnd, lpOldProc);
-	mhWnd = NULL;
-	mInitialized = FALSE;
- }
- 
- NPBool nsPluginInstance::isInitialized()
- {
-   return mInitialized;
- }
- 
- const char * nsPluginInstance::getVersion()
- {
-   return NPN_UserAgent(mInstance);
- }
-
-// Enable OpenGL
-void nsPluginInstance::EnableOpenGL()
-{
-	PIXELFORMATDESCRIPTOR pfd;
-	int format;
-	
-	// get the device context (DC)
-	mhDC = GetDC(mhWnd);
-	
-	// set the pixel format for the DC
-	ZeroMemory( &pfd, sizeof( pfd ) );
-	pfd.nSize = sizeof( pfd );
-	pfd.nVersion = 1;
-	pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-	pfd.iPixelType = PFD_TYPE_RGBA;
-	pfd.cColorBits = 24;
-	pfd.cDepthBits = 16;
-	pfd.iLayerType = PFD_MAIN_PLANE;
-	format = ChoosePixelFormat(mhDC, &pfd );
-	SetPixelFormat(mhDC, format, &pfd );
-	
-	// create and enable the render context (RC)
-	mhRC = wglCreateContext(mhDC);
-	wglMakeCurrent(mhDC, mhRC);
-}
-
-// Disable OpenGL
-void nsPluginInstance::DisableOpenGL()
-{
-	wglMakeCurrent( NULL, NULL );
-	wglDeleteContext(mhRC);
-	ReleaseDC(mhWnd, mhDC);
-}
-
-void nsPluginInstance::main_loop()
-{
-
-	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-
-	PR_Lock(s_player);
-
-	EnableOpenGL();
-
-	gnash::render_handler *render = gnash::create_render_handler_ogl();
-	gnash::set_render_handler(render);
-
-	gnash::media::sound_handler  *sound = NULL;
-#ifdef SOUND_SDL
-	// It leads to crash
-//	sound = gnash::create_sound_handler_sdl();
-//	gnash::set_sound_handler(sound);
+    _stream = stream;
+    _url = stream->url;
+#if 0
+    if (seekable) {
+        *stype = NP_SEEK;
+    }
 #endif
 
-    // Get info about the width & height of the movie.
-	int	movie_version = 0;
-	int	movie_width = 0;
-	int	movie_height = 0;
-	float movie_fps = 30.0f;
-	gnash::get_movie_info(URL(getFilename()), &movie_version, &movie_width, &movie_height, &movie_fps, NULL, NULL);
-	if (movie_version == 0)
-	{
-		log_error (_("can't get info about %s"), getFilename());
-    return;
-	}
-	log_debug(_("Movie %s: width is %d, height is %d, version is %d\n"), getFilename(),
-	movie_width, movie_height, movie_version);
-
-	// new thread must have own movie instance
-
-	// Load the actual movie.
-//	gnash::movie_definition*	md = gnash::create_library_movie(URL(getFilename()));
-	gnash::movie_definition*	md = gnash::create_movie(URL(getFilename()));
-	if (md == NULL)
-	{
-		log_error (_("can't create a movie from %s"), getFilename());
-		return;
-	}
-
-//	gnash::movie_interface*	m = create_library_movie_inst(md);
-	gnash::movie_interface*	m = md->create_instance();
-	if (m == NULL)
-	{
-		log_error (_("can't create movie instance"));
-		return;
-	}
-
-	uint64_t	start_ticks = 0;
-	start_ticks = tu_timer::get_ticks();
-	uint64_t	last_ticks = start_ticks;
-
-	float	scale = 1.0f;
-	bool	background = true;
-
-	int delay = int(1000.0f / movie_fps);
-
-	for (;;)
-	{
-		// We cannot do get_current_root() because it can belong to other thread
-		// m = gnash::get_current_root();
-	
-		wglMakeCurrent(mhDC, mhRC);
-
-		gnash::set_current_root(m);
-	
-		uint64_t	ticks;
-		ticks = tu_timer::get_ticks();
-		int	delta_ticks = tu_timer::get_ticks() - last_ticks;
-		float	delta_t = delta_ticks / 1000.f;
-
-		// to place on the center
-		int window_width = getWidth();
-		int window_height = getHeight();
-		float xscale = (float) window_width / (float) movie_width;
-		float yscale = (float) window_height / (float) movie_height;
-		scale = min(xscale, yscale);
-    int width = int(movie_width * scale);
-    int height = int(movie_height * scale);
-	
-		int x = mouse_x - ((window_width - width) >> 1);
-		x = int(x / scale);
-		int y = mouse_y - ((window_height - height) >> 1);
-		y = int(y / scale);
-		if (x >= 0 && y >= 0)
-		{
-			m->notify_mouse_state(x, y, mouse_buttons);    
-		}
-
-		m->set_display_viewport(window_width - width >> 1, window_height - height >> 1, width, height);
-		m->set_background_alpha(background ? 1.0f : 0.05f);
-		glDisable(GL_DEPTH_TEST);	// Disable depth testing.
-		glDrawBuffer(GL_BACK);
-
-//		dbglogfile << delta_ticks << " x " << delay << endl;
-		if (delta_ticks >= delay)
-		{
-			last_ticks = ticks;
-			m->advance(delta_t);
-		}
-
-		// white background
-		glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-		glClear(GL_COLOR_BUFFER_BIT);	
-
-		m->display();
-		SwapBuffers(mhDC);
-
-		// nsPluginInstance::shut() has been called for this instance.
-		if (getShutdown())
-		{
-			log_debug (_("player: Shutting down as requested..."));
-		        break;
-		}
-	
-		PR_Unlock(s_player);
-
-		// Don't hog the CPU.
-		PR_Sleep(10);
-
-		PR_Lock(s_player);
-	}
-
-	if (m)
-	{
-		m->drop_ref();
-	}
-   
-	// shutdown OpenGL
-	DisableOpenGL();
-
-	PR_Unlock(s_player);
-	return;
+    return NPERR_NO_ERROR;
 }
 
-static LRESULT CALLBACK PluginWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+NPError
+nsPluginInstance::DestroyStream(NPStream *stream, NPError reason)
 {
-	// get our plugin instance object
-	nsPluginInstance *plugin = (nsPluginInstance *)GetWindowLong(hWnd, GWL_USERDATA);
-	if (plugin)
-	{
-		switch (msg)
-		{
-			case WM_MOUSEMOVE:
-			{
-				int x = GET_X_LPARAM(lParam); 
-				int y = GET_Y_LPARAM(lParam); 
- 				plugin->notify_mouse_state(x, y, -1);
-				break;
-			}
+    DBG("nsPluginInstance::DestroyStream\n");
+    DBG("stream->url: %s\n", stream->url);
 
-			case WM_LBUTTONDOWN:
-			case WM_LBUTTONUP:
-			{
-				int x = GET_X_LPARAM(lParam); 
-				int y = GET_Y_LPARAM(lParam); 
-				int	buttons = (msg == WM_LBUTTONDOWN) ? 1 : 0;
- 				plugin->notify_mouse_state(x, y, buttons);
-				break;
-			}
-			default:
-//				dbglogfile << "msg " << msg << endl;
-				break;
-		}
-	}
-	return DefWindowProc(hWnd, msg, wParam, lParam);
+    // N.B. We can only support one Gnash VM/thread right now. 
+    if (!_thread) {
+        _thread = PR_CreateThread(PR_USER_THREAD, playerThread, this,
+                PR_PRIORITY_NORMAL, PR_GLOBAL_THREAD, PR_JOINABLE_THREAD, 0);
+    }
+
+    return NPERR_NO_ERROR;
 }
+
+int32
+nsPluginInstance::Write(NPStream *stream, int32 offset, int32 len,
+        void *buffer)
+{
+    DBG("nsPluginInstance::Write\n");
+    DBG("stream->url: %s, offset: %ld, len: %ld\n",
+            stream->url, offset, len);
+}
+
+static void
+playerThread(void *arg)
+{
+    nsPluginInstance *plugin = (nsPluginInstance *) arg;
+
+    plugin->threadMain();
+}
+
+void
+nsPluginInstance::threadMain(void)
+{
+    DBG("nsPluginInstance::threadMain started\n");
+
+	PR_Lock(playerLock);
+
+    // Initialize Gnash core library.
+    gnash::gnashInit();
+    gnash::set_use_cache_files(false);
+    gnash::register_fscommand_callback(fs_callback);
+    DBG("Gnash core initialized.\n");
  
+    // Init logfile.
+    gnash::RcInitFile& rcinit = gnash::RcInitFile::getDefaultInstance();
+    std::string logfilename = std::string(getenv("TEMP")) +
+        std::string("\\npgnash.log");
+    rcinit.setDebugLog(logfilename);
+    gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+    dbglogfile.setWriteDisk(true);
+    dbglogfile.setVerbosity(DEBUGLEVEL);
+    DBG("Gnash logging initialized: %s\n", logfilename.c_str());
+
+    // Init sound.
+    _sound_handler.reset(gnash::media::create_sound_handler_sdl());
+    gnash::set_sound_handler(_sound_handler.get());
+    DBG("Gnash sound initialized.\n");
+
+    // Init GUI.
+    _render_handler =
+        (gnash::render_handler *) gnash::create_render_handler_agg("BGR24");
+    _memaddr = (unsigned char *) malloc(getMemSize());
+    static_cast<gnash::render_handler_agg_base *>(_render_handler)->init_buffer(
+            getMemAddr(), getMemSize(), _width, _height, _rowstride);
+    gnash::set_render_handler(_render_handler);
+    DBG("Gnash GUI initialized: %ux%u\n", _width, _height);
+
+    gnash::URL url(_url);
+
+    VariableMap vars;
+    gnash::URL::parse_querystring(url.querystring(), vars);
+    for (VariableMap::iterator i = vars.begin(), ie = vars.end(); i != ie; i++) {
+        _flashVars[i->first] = i->second;
+    }
+
+    gnash::set_base_url(url);
+
+    gnash::movie_definition* md = NULL;
+    try {
+        md = gnash::create_library_movie(url, _url.c_str(), false);
+    } catch (const gnash::GnashException& err) {
+        md = NULL;
+    }
+    if (!md) {
+        PR_Unlock(playerLock);
+
+        DBG("Clean up Gnash.\n");
+        gnash::clear();
+
+        DBG("nsPluginInstance::threadMain exiting\n");
+        return;
+    }
+    DBG("Movie created: %s\n", _url.c_str());
+
+    int movie_width = static_cast<int>(md->get_width_pixels());
+    int movie_height = static_cast<int>(md->get_height_pixels());
+    float movie_fps = md->get_frame_rate();
+    DBG("Movie dimensions: %ux%u (%.2f fps)\n",
+            movie_width, movie_height, movie_fps);
+
+    gnash::SystemClock clock; // use system clock here...
+    gnash::movie_root& root = gnash::VM::init(*md, clock).getRoot(); 
+    DBG("Gnash VM initialized.\n");
+
+    md->completeLoad();
+    DBG("Movie loaded.\n");
+
+    std::auto_ptr<gnash::movie_instance> mr(md->create_movie_instance());
+    mr->setVariables(_flashVars);
+    root.setRootMovie(mr.release());
+    root.set_display_viewport(0, 0, _width, _height);
+    root.set_background_alpha(1.0f);
+    DBG("Movie instance created.\n");
+
+    ShowWindow(_window, SW_SHOW);
+
+    for (;;) {
+        // DBG("Inside main thread loop.\n");
+
+        if (_shutdown) {
+            DBG("Main thread shutting down.\n");
+            break;
+        }
+
+        gnash::movie_instance* mi = root.getRootMovie();
+        size_t cur_frame = mi->get_current_frame();
+        // DBG("Got current frame number: %d.\n", cur_frame);
+        size_t tot_frames = mi->get_frame_count();
+        // DBG("Got total frame count: %d.\n", tot_frames);
+
+        // DBG("Advancing one frame.\n");
+        root.advance();
+        // DBG("Going to next frame.\n");
+        root.goto_frame(cur_frame + 1);
+        // DBG("Ensuring frame is loaded.\n");
+        root.get_movie_definition()->ensure_frame_loaded(tot_frames);
+        // DBG("Setting play state to PLAY.\n");
+        root.set_play_state(gnash::sprite_instance::PLAY);
+
+        root.display();
+
+        RECT rt;
+        GetClientRect(_window, &rt);
+        InvalidateRect(_window, &rt, FALSE);
+
+        // DBG("Unlocking playerLock mutex.\n");
+        PR_Unlock(playerLock);
+        // DBG("Sleeping.\n");
+        PR_Sleep(PR_INTERVAL_MIN);
+        // DBG("Acquiring playerLock mutex.\n");
+        PR_Lock(playerLock);
+    }
+
+	PR_Unlock(playerLock);
+
+    DBG("Clean up Gnash.\n");
+    gnash::clear();
+
+    DBG("nsPluginInstance::threadMain exiting\n");
+}
+
+const char*
+nsPluginInstance::getVersion()
+{
+    return NPN_UserAgent(_instance);
+}
+
+void
+nsPluginInstance::fs_callback(gnash::sprite_instance* movie, const char* command, const char* args)
+// For handling notification callbacks from ActionScript.
+{
+    gnash::log_debug(_("fs_callback(%p): %s %s"), (void*) movie, command, args);
+}
+
+static LRESULT CALLBACK
+PluginWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    // get our plugin instance object
+    nsPluginInstance *plugin =
+        (nsPluginInstance *) GetWindowLong(hWnd, GWL_USERDATA);
+
+    if (plugin) {
+        switch (msg) {
+            case WM_PAINT:
+            {
+                if (plugin->getMemAddr() == NULL) {
+                    break;
+                }
+
+                PAINTSTRUCT ps;
+                HDC hDC = BeginPaint(hWnd, &ps);
+
+                RECT rt;
+                GetClientRect(hWnd, &rt);
+                int w = rt.right - rt.left;
+                int h = rt.bottom - rt.top;
+
+                BITMAPINFO bmpInfo;
+                memset(&bmpInfo, 0, sizeof(BITMAPINFOHEADER));
+                bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+                bmpInfo.bmiHeader.biWidth = w; 
+                // Negative height means first row comes first in memory.
+                bmpInfo.bmiHeader.biHeight = -1 * h; 
+                bmpInfo.bmiHeader.biPlanes = 1; 
+                bmpInfo.bmiHeader.biBitCount = 24; 
+                bmpInfo.bmiHeader.biCompression = BI_RGB; 
+                bmpInfo.bmiHeader.biSizeImage = 0; 
+                bmpInfo.bmiHeader.biXPelsPerMeter = 0; 
+                bmpInfo.bmiHeader.biYPelsPerMeter = 0; 
+                bmpInfo.bmiHeader.biClrUsed = 0; 
+                bmpInfo.bmiHeader.biClrImportant = 0; 
+                
+                HDC hMemDC = CreateCompatibleDC(hDC);
+                void* buf = NULL;
+                HBITMAP bmp = CreateDIBSection(hMemDC, &bmpInfo,
+                        DIB_RGB_COLORS, &buf, 0, 0);
+                HBITMAP temp = (HBITMAP) SelectObject(hMemDC, bmp);
+
+                unsigned char* mem = plugin->getMemAddr();
+                int memSize = plugin->getMemSize();
+                int height = plugin->getHeight();
+ 
+                memcpy(buf, mem, memSize);
+
+                BitBlt(hDC, rt.left, rt.top, w, h, hMemDC, 0, 0,
+                        SRCCOPY);
+
+                SelectObject(hMemDC, temp);
+                DeleteObject(bmp);
+                DeleteObject(hMemDC);
+
+                EndPaint(hWnd, &ps);
+                return 0L;
+            }
+            case WM_MOUSEMOVE:
+            {
+                int x = GET_X_LPARAM(lParam); 
+                int y = GET_Y_LPARAM(lParam); 
+
+                plugin->notify_mouse_state(x, y, -1);
+                break;
+            }
+            case WM_LBUTTONDOWN:
+            case WM_LBUTTONUP:
+            {
+                int x = GET_X_LPARAM(lParam); 
+                int y = GET_Y_LPARAM(lParam); 
+                int    buttons = (msg == WM_LBUTTONDOWN) ? 1 : 0;
+
+                plugin->notify_mouse_state(x, y, buttons);
+                break;
+            }
+            default:
+//                dbglogfile << "msg " << msg << endl;
+                break;
+        }
+    }
+    return DefWindowProc(hWnd, msg, wParam, lParam);
+}

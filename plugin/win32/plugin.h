@@ -19,9 +19,7 @@
 #define __PLUGIN_H__
  
 #include "pluginbase.h"
-#include <string>
 
-// Mozilla SDK headers
 #include "prinit.h"
 #include "prlock.h"
 #include "prcvar.h"
@@ -29,67 +27,84 @@
 #include "prerror.h"
 #include "prthread.h"
 
+#include "gnash.h"
+#include "log.h"
+#include "rc.h"
+#include "Player.h"
+#include "URL.h"
+#include "sound_handler.h"
+#include "render_handler.h"
+#include "render_handler_agg.h"
+#include "sprite_instance.h"
+#include "movie_definition.h"
+#include "movie_root.h"
+#include "SystemClock.h"
+#include "VM.h"
+
 class nsPluginInstance : public nsPluginInstanceBase
 {
-	public:
-	nsPluginInstance(NPP aInstance);
-	~nsPluginInstance();
+public:
+    nsPluginInstance(nsPluginCreateData*);
+    virtual ~nsPluginInstance();
+
+    // We are required to implement these three methods.
+    NPBool init(NPWindow* aWindow);
+    void shut(void);
+    NPBool isInitialized(void) { return _initialized; }
+
+    NPError NewStream(NPMIMEType type, NPStream *stream, NPBool seekable,
+            uint16_t *stype);
+    NPError DestroyStream(NPStream *stream, NPError reason);
+    int32 Write(NPStream *stream, int32 offset, int32 len, void *buffer);
+
+    // locals
+    const char* getVersion();
+    void threadMain(void);
+
+    HWND getWindow() { return _window; }
+    int getWidth() { return _width; };
+    int getHeight() { return _height; };
+    int getRowStride() { return _rowstride; }
+    unsigned char* getMemAddr() { return _memaddr; }
+    size_t getMemSize() { return _rowstride * _height; }
+    void notify_mouse_state(int x, int y, int buttons)
+    {
+        mouse_x = x;
+        mouse_y = y;
+        if (buttons >= 0)
+        {
+            mouse_buttons = buttons;
+        }
+    }
+
+    typedef std::map<std::string, std::string> VariableMap;
+
+private:
+    NPP         _instance;
+    HWND        _window;
+    NPBool      _initialized;
+    NPBool      _shutdown;
+    WNDPROC     lpOldProc;
+
+    NPStream*   _stream;
+    std::string _url;
+    VariableMap _flashVars;
+    PRThread*   _thread;
+    uint32_t    _x;
+    uint32_t    _y;
+    uint32_t    _width;
+    uint32_t    _height;
+    uint32_t    _rowstride;
+    unsigned char* _memaddr;
+    std::auto_ptr<gnash::media::sound_handler> _sound_handler;
+    gnash::render_handler* _render_handler;
+
+    // Mouse state.
+    int mouse_x;
+    int mouse_y;
+    int mouse_buttons;
+
+    static void fs_callback(gnash::sprite_instance* movie, const char* command, const char* args);
+};
  
-	NPBool init(NPWindow* aWindow);
-	void shut();
-	NPBool isInitialized();
-	NPError SetWindow(NPP instance, NPWindow* window);
-	NPError NewStream(NPMIMEType type, NPStream * stream,
-                            NPBool seekable, uint16_t * stype);
-	NPError DestroyStream(NPStream * stream, NPError reason);
-
-	// locals
-	const char* getVersion();
-	HWND getWindow() { return mhWnd; }
-	int getWidth() { return mWidth; };
-	int getHeight() { return mHeight; };
-	const PRThread* getThread() { return m_thread; };
-	const char* getFilename() { return m_swf_file.c_str(); };
-  NPBool getShutdown() { return m_shutdown; };
-	void notify_mouse_state(int x, int y, int buttons)
-	{
-		mouse_x = x;
-		mouse_y = y;
-		if (buttons >= 0)
-		{
-			mouse_buttons = buttons;
-		}
-	}
-	void DisableOpenGL();
-	void EnableOpenGL();
-	void main_loop();
-
-
-	// Mouse state.
-	int	mouse_x;
-	int	mouse_y;
-	int	mouse_buttons;
- 
-	private:
-
-	NPP mInstance;
-	NPBool mInitialized;
-
-	HWND mhWnd;
-	HDC mhDC;
-	HGLRC mhRC;
-
-	int mX;
-	int mY;
-	unsigned int mWidth;
-	unsigned int mHeight;
-	std::string m_swf_file;
-	PRThread* m_thread;
-	NPBool m_shutdown;
-
- WNDPROC lpOldProc;
-
- };
- 
- #endif // __PLUGIN_H__
- 
+#endif // __PLUGIN_H__
