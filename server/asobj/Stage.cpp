@@ -118,23 +118,22 @@ Stage::notifyResize()
 unsigned
 Stage::getWidth() const
 {
-  //if (_scaleMode==showAll)      <-- the only mode implemented in Gnash 
-	return (unsigned int)VM::get().getRoot().get_movie_definition()->get_width_pixels();
-	/*
-	else
-	return VM::get().getRoot().getWidth();
-	*/	
+    if (_scaleMode == noScale)
+    {
+        return VM::get().getRoot().getWidth();    
+    }
+    return (unsigned int)VM::get().getRoot().get_movie_definition()->get_width_pixels();
+	
 }
 
 unsigned
 Stage::getHeight() const
 {
-  //if (_scaleMode==showAll)      <-- the only mode implemented in Gnash 
-	return (unsigned int)VM::get().getRoot().get_movie_definition()->get_height_pixels();
-	/*
-	else
-	return VM::get().getRoot().getHeight();
-	*/	
+    if (_scaleMode == noScale)
+    {
+        return VM::get().getRoot().getHeight();    
+    }
+    return (unsigned int)VM::get().getRoot().get_movie_definition()->get_height_pixels();
 }
 
 const char*

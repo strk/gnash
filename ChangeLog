@@ -1,5 +1,14 @@
 2008-03-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* server/edit_text_character.cpp: don't use == when comparing
+	  floats.
+	* server/asobj/Stage.cpp: return actual stage size when scaleMode
+	  is noScale. This allows the stage resize listeners to work
+	  out what to do (which is the point of noScale).
+	* server/movie_root.cpp: minor cast cleanup.
+
+2008-03-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* server/asobj/Stage.cpp: don't call align 'width'; implement
 	  getting and setting Stage.align, though it won't do anything.
 

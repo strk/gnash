@@ -884,10 +884,13 @@ edit_text_character::set_member(string_table::key name,
 		float xmin = _bounds.getMinX();
 		float ymin = _bounds.getMinY();
 		float ymax = _bounds.getMaxY();
-		float xmax = xmin+nw;
+		float xmax = xmin + nw;
+
 		assert(xmin <= xmax);
+
 		_bounds.setTo(xmin, ymin, xmax, ymax);
-		assert(_bounds.width() == nw);
+		
+	    assert( _bounds.width() - nw < 0.001 && _bounds.width() - nw > -0.001);
 
 		// previously truncated text might get visible now
 		// TODO: if nested masks were implemented we would 

@@ -155,8 +155,10 @@ movie_root::setRootMovie(movie_instance* movie)
 
 	m_viewport_x0 = 0;
 	m_viewport_y0 = 0;
-	m_viewport_width = (int)movie->get_movie_definition()->get_width_pixels();
-	m_viewport_height = (int)movie->get_movie_definition()->get_height_pixels();
+	m_viewport_width = static_cast<int>(
+	                movie->get_movie_definition()->get_width_pixels());
+	m_viewport_height = static_cast<int>(
+	                movie->get_movie_definition()->get_height_pixels());
 	m_pixel_scale = 1;
 
 	// assert(movie->get_depth() == 0); ?
@@ -172,7 +174,8 @@ movie_root::setRootMovie(movie_instance* movie)
 	}
 	catch (ActionLimitException& al)
 	{
-		log_error(_("ActionLimits hit during setRootMovie: %s. Disabling scripts"), al.what());
+		log_error(_("ActionLimits hit during setRootMovie: %s."
+		        		"Disabling scripts"), al.what());
 		disableScripts();
 		clearActionQueue();
 	}
@@ -192,7 +195,8 @@ void
 movie_root::setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movie)
 {
 	assert(movie != NULL);
-	assert(static_cast<unsigned int>(movie->get_depth()) == num+character::staticDepthOffset);
+	assert(static_cast<unsigned int>(movie->get_depth()) ==
+	                        num + character::staticDepthOffset);
 
 
 	Levels::iterator it = _movies.find(movie->get_depth());
