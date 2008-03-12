@@ -66,7 +66,7 @@ public:
 		_ctor(ctor),
 		_proto(proto)
 	{
-		//set_prototype(getObjectInterface());
+		set_prototype(proto);
 	}
 
 	virtual bool isSuper() const { return true; }
@@ -480,11 +480,7 @@ as_object::set_prototype(boost::intrusive_ptr<as_object> proto, int flags)
 	static string_table::key key = NSV::PROP_uuPROTOuu;
 
 	// TODO: check what happens if __proto__ is set as a user-defined getter/setter
-	if (_members.setValue(key, as_value(proto.get()), *this, 0) )
-	{
-		// TODO: optimize this, don't scan again !
-		_members.setFlags(key, flags, 0);
-	}
+	_members.setValue(key, as_value(proto.get()), *this, 0, flags);
 }
 
 void
@@ -596,7 +592,7 @@ as_object::init_member(string_table::key key, const as_value& val, int flags,
 	}
 		
 	// Set (or create) a SimpleProperty 
-	if (! _members.setValue(key, const_cast<as_value&>(val), *this, nsname) )
+	if (! _members.setValue(key, const_cast<as_value&>(val), *this, nsname, flags) )
 	{
 		log_error(_("Attempt to initialize read-only property ``%s''"
 			" on object ``%p'' twice"),
@@ -604,8 +600,6 @@ as_object::init_member(string_table::key key, const as_value& val, int flags,
 		// We shouldn't attempt to initialize a member twice, should we ?
 		abort();
 	}
-	// TODO: optimize this, don't scan again !
-	_members.setFlags(key, flags, nsname);
 }
 
 void

@@ -153,14 +153,15 @@ PropertyList::getValue(const string_table::key key, as_value& val,
 
 bool
 PropertyList::setValue(string_table::key key, as_value val,
-		as_object& this_ptr, string_table::key nsId)
+		as_object& this_ptr, string_table::key nsId,
+		const as_prop_flags& flagsIfMissing)
 {
 	container::iterator found = iterator_find(_props, key, nsId);
 	
 	if (found == _props.end())
 	{
 		// create a new member
-		Property a(key, nsId, val);
+		Property a(key, nsId, val, flagsIfMissing);
 		// Non slot properties are negative ordering in insertion order
 		a.setOrder(- ++mDefaultOrder - 1);
 		_props.insert(a);

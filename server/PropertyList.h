@@ -196,14 +196,18 @@ public:
 	///	so we can't promise constness.
 	///
 	/// @param namespaceId
-	/// The namespace in which this should be entered. If 0 is given,
-	/// this will use the first value found, if it exists.
+	///	The namespace in which this should be entered. If 0 is given,
+	///	this will use the first value found, if it exists.
+	///
+	/// @param flagsIfMissing
+	///	Flags to associate to the property if a new one is created.
 	///
 	/// @return true if the value was successfully set, false
 	///         otherwise (found a read-only property, most likely).
 	///
 	bool setValue(string_table::key key, as_value value,
-			as_object& this_ptr, string_table::key namespaceId = 0);
+			as_object& this_ptr, string_table::key namespaceId = 0,
+			const as_prop_flags& flagsIfMissing=0);
 
 	/// Reserves a slot number for a property
 	///

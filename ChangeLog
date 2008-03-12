@@ -1,3 +1,10 @@
+2008-03-12 Sandro Santilli <strk@keybit.net>
+
+	* server/PropertyList.{cpp,h} (setValue): allow passing flags to use
+	  when creating new properties.
+	* server/as_object.cpp: avoid the double scan when initializing
+	  members. Have super register a proper __proto__ member.
+
 2008-03-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/actionscript.all: tests for Stage properties and 
