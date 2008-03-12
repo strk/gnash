@@ -1,3 +1,7 @@
+2008-03-12 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler_ogl.cpp: Compliation fix.
+
 2008-03-12 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/swfdec/PASSING: super-reference-{7,8} succeed.

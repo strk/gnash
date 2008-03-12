@@ -1005,7 +1005,7 @@ public:
     float prev_cx = cur_end.cp.x;
     float prev_cy = cur_end.cp.y;        
                 
-    path newpath(cur_end.ap.x, cur_end.ap.y, cur_path.m_fill1, cur_path.m_fill0, cur_path.m_line);
+    path newpath(cur_end.ap.x, cur_end.ap.y, cur_path.m_fill1, cur_path.m_fill0, cur_path.m_line, cur_path.m_new_shape);
     
     float prev_ax = cur_end.ap.x;
     float prev_ay = cur_end.ap.y; 
