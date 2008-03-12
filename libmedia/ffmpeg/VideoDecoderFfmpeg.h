@@ -63,6 +63,11 @@ public:
 private:
 
   std::auto_ptr<image::rgb> decode(boost::uint8_t* input, boost::uint32_t input_size);
+
+  std::auto_ptr<image::rgb> decode(const EncodedVideoFrame* vf)
+  {
+  	return decode(vf->data(), vf->dataSize());
+  }
 private:
 
   AVCodec* _videoCodec;

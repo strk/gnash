@@ -1,5 +1,11 @@
 2008-03-12 Sandro Santilli <strk@keybit.net>
 
+	* backend/render_handler_agg.cpp,
+	  libmedia/ffmpeg/VideoDecoderFfmpeg.{h,cpp}
+	  boost::foreach.hpp is not available as of boost-1.33.1.
+
+2008-03-12 Sandro Santilli <strk@keybit.net>
+
 	* server/PropertyList.{cpp,h} (setValue): allow passing flags to use
 	  when creating new properties.
 	* server/as_object.cpp: avoid the double scan when initializing

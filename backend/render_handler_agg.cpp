@@ -171,7 +171,7 @@ AGG ressources
 #include "render_handler_agg_bitmap.h"
 #include "render_handler_agg_style.h"
 
-#include <boost/foreach.hpp>
+//#include <boost/foreach.hpp>
 
 #ifndef round
 #define round(x) rint(x)
@@ -1058,11 +1058,20 @@ public:
     
     paths_out.reserve(paths_in.size());
     
+    typedef std::vector<path> PathVect;
+    for (PathVect::const_iterator i=paths_in.begin(), e=paths_in.end(); i!=e; ++i)
+    {
+	Path<float> floating_path = *i;
+	floating_path.transform(mat);
+	paths_out.push_back(floating_path);
+    }
+#if 0
     BOOST_FOREACH(const path& in_path, paths_in) {
       Path<float> floating_path = in_path;
       floating_path.transform(mat);
       paths_out.push_back(floating_path);
     }
+#endif
 
   } // apply_matrix
 
