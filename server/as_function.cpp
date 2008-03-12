@@ -330,6 +330,17 @@ function_call(const fn_call& fn)
 		else
 		{
 			new_fn_call.this_ptr = this_ptr;
+			as_object* proto = this_ptr->get_prototype().get();
+			if ( proto )
+			{
+				new_fn_call.super = proto->get_super();
+			}
+			else
+			{
+				// TODO: check this !
+				log_debug("No prototype in 'this' pointer passed to Function.call");
+				new_fn_call.super = function_obj->get_super();
+			}
 		}
 		new_fn_call.nargs--;
 		new_fn_call.set_offset(new_fn_call.offset()-1);

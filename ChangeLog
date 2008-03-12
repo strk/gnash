@@ -1,5 +1,7 @@
 2008-03-12 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/PASSING: super-reference-6.swf succeeds.
+	* server/as_function.cpp (function_call): set super.
 	* testsuite/actionscript.all/Stage.as: successes..
 
 2008-03-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
