@@ -1,67 +1,17 @@
-// Microsoft Visual C++ generated resource script.
-//
-#include "npgnash_resource.h"
-
 #define APSTUDIO_READONLY_SYMBOLS
-/////////////////////////////////////////////////////////////////////////////
-//
-// Generated from the TEXTINCLUDE 2 resource.
-//
 #include "afxres.h"
-
-/////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
-/////////////////////////////////////////////////////////////////////////////
-// Russian resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
-#ifdef _WIN32
-LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
-#pragma code_page(1251)
-#endif //_WIN32
-
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-1 TEXTINCLUDE 
-BEGIN
-    "resource1.h\0"
-END
-
-2 TEXTINCLUDE 
-BEGIN
-    "#include ""afxres.h""\r\n"
-    "\0"
-END
-
-3 TEXTINCLUDE 
-BEGIN
-    "\r\n"
-    "\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Version
-//
-
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,7,1,0
- PRODUCTVERSION 0,7,1,0
+ FILEVERSION 9,0,82,0
+ PRODUCTVERSION 9,0,82,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
 #else
  FILEFLAGS 0x0L
 #endif
- FILEOS 0x40004L
+ FILEOS 0x4L
  FILETYPE 0x2L
  FILESUBTYPE 0x0L
 BEGIN
@@ -69,17 +19,25 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", " "
-            VALUE "FileDescription", "npgnash"
-            VALUE "FileExtents", "swf"
-            VALUE "FileOpenName", "npgnash"
-            VALUE "FileVersion", "0, 7, 1, 0"
-            VALUE "InternalName", "npgnash"
-            VALUE "LegalCopyright", "Copyright (C) 2005, 2006 Free Software Foundation, Inc."
-            VALUE "MIMEType", "application/x-shockwave-flash"
-            VALUE "OriginalFilename", "npgnash.dll"
-            VALUE "ProductName", "Gnash Plugin for Mozilla"
-            VALUE "ProductVersion", "0, 7, 1, 0"
+            VALUE "Comments", "\0"
+            VALUE "CompanyName", "Free Software Foundation, Inc.\0"
+// ProductName has to be the exact string "Shockwave Flash" as JS Flash
+// detect scripts tend to test for navigator.plugins["Shockwave Flash"].
+// c.f. http://www.adobe.com/support/flash/how/shock/javaplugs/javaplugs03.html
+            VALUE "ProductName", "Shockwave Flash\0"
+//            VALUE "ProductName", "Gnash Plugin for Mozilla\0"
+            VALUE "ProductVersion", "9, 0, 82, 0\0"
+            VALUE "FileVersion", "9, 0, 82, 0\0"
+// FileDescription needs to include the string "Shockwave Flash X.Y rZ"
+// as JS Flash detect scripts may use it to determine Flash player version.
+            VALUE "FileDescription", "npgnash plugin for <a href=""http://www.gnu.org/software/gnash/"">Gnash</a>, the GNU Flash player. (Shockwave Flash 9.0 r82)\0"
+            VALUE "LegalCopyright", "Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "MIMEType", "application/x-shockwave-flash\0"
+            VALUE "FileExtents", "swf\0"
+            VALUE "FileOpenName", "Gnash plugin (*.swf)\0"
+            VALUE "InternalName", "npgnash\0"
+            VALUE "OriginalFilename", "npgnash.dll\0"
         END
     END
     BLOCK "VarFileInfo"
@@ -87,19 +45,3 @@ BEGIN
         VALUE "Translation", 0x409, 1252
     END
 END
-
-#endif    // Russian resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-
-#ifndef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// Generated from the TEXTINCLUDE 3 resource.
-//
-
-
-/////////////////////////////////////////////////////////////////////////////
-#endif    // not APSTUDIO_INVOKED
-
