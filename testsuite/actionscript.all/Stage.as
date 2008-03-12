@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Stage.as,v 1.20 2008/03/12 10:19:57 bwy Exp $";
+rcsid="$Id: Stage.as,v 1.21 2008/03/12 20:51:14 strk Exp $";
 #include "check.as"
 
 check_equals (typeof(Stage), 'object');
@@ -47,9 +47,9 @@ check(Stage.hasOwnProperty("height"));
 check(Stage.hasOwnProperty("width"));
 check(Stage.hasOwnProperty("scaleMode"));
 check(Stage.hasOwnProperty("showMenu"));
-xcheck(Stage.hasOwnProperty("align"));
+check(Stage.hasOwnProperty("align"));
 
-xcheck_equals(typeof(Stage.align), "string");
+check_equals(typeof(Stage.align), "string");
 
 Stage.align = "T";
 check_equals(Stage.align, "T");
@@ -60,19 +60,19 @@ check_equals(Stage.align, "L");
 Stage.align = "R";
 check_equals(Stage.align, "R");
 Stage.align = "TL";
-xcheck_equals(Stage.align, "LT");
+check_equals(Stage.align, "LT");
 Stage.align = "TR";
 check_equals(Stage.align, "TR"); // why???
 Stage.align = "RT";
-xcheck_equals(Stage.align, "TR");
+check_equals(Stage.align, "TR");
 Stage.align = "BL";
-xcheck_equals(Stage.align, "LB");
+check_equals(Stage.align, "LB");
 Stage.align = "BR";
-xcheck_equals(Stage.align, "RB");
+check_equals(Stage.align, "RB");
 Stage.align = "LT";
 check_equals(Stage.align, "LT");
 Stage.align = "X";
-xcheck_equals(Stage.align, "");
+check_equals(Stage.align, "");
 
 listener = new Object;
 listener.onResize = function() {

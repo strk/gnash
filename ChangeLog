@@ -1,3 +1,7 @@
+2008-03-12 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Stage.as: successes..
+
 2008-03-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/edit_text_character.cpp: don't use == when comparing
