@@ -1,3 +1,23 @@
+2008-03-12  Dossy Shiobara <dossy@panoptic.com>
+
+	* plugin/win32/: plugin.cpp (1.13), plugin.h (1.9): Overhaul of
+	  Win32 npgnash.dll, implementing in-process Gnash in a player
+	  thread, using AGG renderer and SDL/ffmpeg for sound.
+
+	* plugin/win32/npgnash.rc (1.4): Cleaned up resource file and
+	  modified it to masquerade as "Shockwave Flash" so JavaScript
+	  checks on Win32 will detect Gnash as a Flash player.
+
+	* plugin/win32/npgnash.def (1.1): Explicitly export
+	  NP_GetEntryPoints, NP_Initialize and NP_Shutdown symbols in
+	  npgnash.dll.
+
+	* plugin/win32/: npgnash.c (1.1), npgnash.cpp (1.9): Renamed from
+	  .cpp to .c to avoid having to wrap the whole file in an extern
+	  "C".
+
+	* plugin/win32/npgnash_resource.h (1.2): No longer needed.
+
 2008-03-11 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* configure.ac: If --enable-visibility is specified, and no GCC bug
