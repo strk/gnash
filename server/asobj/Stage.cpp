@@ -61,7 +61,7 @@ attachStageInterface(as_object& o)
 	getset = stage_align_getset;
 	vm.registerNative(getset, 666, 3);
 	vm.registerNative(getset, 666, 4);
-	o.init_property("width", getset, getset);
+	o.init_property("align", getset, getset);
 
 	// Stage.width getter-setter
 	getset = stage_width_getset;
@@ -86,7 +86,8 @@ attachStageInterface(as_object& o)
 Stage::Stage()
 	:
 	as_object(getObjectInterface()),
-	_scaleMode(showAll)
+	_scaleMode(showAll),
+	_alignMode(ALIGN_MODE_NONE)
 {
 	attachStageInterface(*this);
 
@@ -148,6 +149,23 @@ Stage::getScaleModeString()
 	return modeName[_scaleMode];
 }
 
+const char*
+Stage::getAlignModeString()
+{
+	static const char* alignName[] = {
+		"T",
+		"B",
+		"L",
+		"R",
+		"LT",
+		"TR",
+		"LB",
+		"RB",
+		"" };
+
+	return alignName[_alignMode];
+}
+
 void
 Stage::setScaleMode(ScaleMode mode)
 {
@@ -166,6 +184,22 @@ Stage::setScaleMode(ScaleMode mode)
 		//log_debug("Setting rescaling allowance to true");
 		VM::get().getRoot().allowRescaling(true);
 	}
+}
+
+void
+Stage::setAlignMode(AlignMode mode)
+{
+	if ( _alignMode == mode ) return; // nothing to do
+
+	_alignMode = mode;
+
+	static bool warned = false;
+	if ( ! warned ) {
+		log_unimpl("Stage.align goes through "
+		            "the motions but is not implemented");
+		warned = true;
+	}
+
 }
 
 as_value stage_scalemode_getset(const fn_call& fn)
@@ -233,20 +267,26 @@ stage_align_getset(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		static bool warned=false;
-		if ( ! warned ) {
-			log_unimpl("Stage.align getter");
-			warned=true;
-		}
-		return as_value();
+	    return as_value (stage->getAlignModeString());
 	}
 	else // setter
 	{
-		static bool warned=false;
-		if ( ! warned ) {
-			log_unimpl("Stage.align setter");
-			warned=true;
-		}
+		Stage::AlignMode mode;
+
+		const std::string& str = fn.arg(0).to_string();
+
+		if ( str == "T" ) mode = Stage::T;
+		else if ( str == "B" ) mode = Stage::B;
+		else if ( str == "L" ) mode = Stage::L;
+		else if ( str == "R" ) mode = Stage::R;
+		else if ( str == "LT" || str == "TL" ) mode = Stage::LT;
+		else if ( str == "TR" || str == "RT" ) mode = Stage::TR;
+		else if ( str == "LB" || str == "BL" ) mode = Stage::LB;
+		else if ( str == "RB" || str == "BR" ) mode = Stage::RB;
+        else mode = Stage::ALIGN_MODE_NONE;
+        
+		stage->setAlignMode(mode);
+
 		return as_value();
 	}
 }

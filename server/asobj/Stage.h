@@ -46,6 +46,18 @@ public:
 		noBorder
 	} ScaleMode;
 
+    typedef enum {
+		T,
+		B,
+		L,
+		R,
+		LT,
+		TR,
+		LB,
+		RB,
+        ALIGN_MODE_NONE      
+    } AlignMode;
+
 	Stage();
 
 	// override from as_object ?
@@ -78,12 +90,19 @@ public:
 	///
 	const char* getScaleModeString();
 
+	/// Set align mode 
+	void setAlignMode(AlignMode mode);
+	
+	const char* getAlignModeString();
+
 private:
 
 	/// Notify all listeners about a resize event
 	void notifyResize();
 
 	ScaleMode _scaleMode;
+	
+	AlignMode _alignMode;
 };
 
 

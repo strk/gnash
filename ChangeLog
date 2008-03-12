@@ -1,3 +1,8 @@
+2008-03-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/asobj/Stage.cpp: don't call align 'width'; implement
+	  getting and setting Stage.align, though it won't do anything.
+
 2008-03-12 Sandro Santilli <strk@keybit.net>
 
 	* backend/render_handler_agg.cpp,
