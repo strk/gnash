@@ -16,28 +16,35 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <windows.h>
-#include <cassert>
+#ifdef _DEBUG
+#include <stdio.h>
+#endif
 
-//#include <cstdio>
-#include "gnash.h"
-//#include "log.h"
+HINSTANCE g_hInst;
 
-static void
-fs_callback(gnash::movie_interface* movie, const char* command, const char* args)
-// For handling notification callbacks from ActionScript.
+BOOL WINAPI
+DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 {
-//    dbglogfile << "fs_callback: " << command << "(" << args << ")" << endl;
-}
+#ifdef _DEBUG
+    char szReason[64];
 
-BOOL APIENTRY DllMain( HMODULE hModule,
-                       DWORD  ul_reason_for_call,
-                       LPVOID lpReserved
-					 )
-{
+    switch (dwReason) {
+        case DLL_PROCESS_ATTACH:
+            strcpy(szReason, "DLL_PROCESS_ATTACH");
+            break;
+        case DLL_THREAD_ATTACH:
+            strcpy(szReason, "DLL_THREAD_ATTACH");
+            break;
+        case DLL_THREAD_DETACH:
+            strcpy(szReason, "DLL_THREAD_DETACH");
+            break;
+        case DLL_PROCESS_DETACH:
+            strcpy(szReason, "DLL_PROCESS_DETACH");
+            break;
+    }
+    fprintf(stderr, "npgnash.dll, DllMain(): %s\n", szReason);
+#endif
 
-	assert(tu_types_validate());
-
-//	gnash::register_fscommand_callback(fs_callback);
-    
-	return TRUE;
+    g_hInst = hModule;
+    return TRUE;
 }
