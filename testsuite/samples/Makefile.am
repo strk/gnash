@@ -41,7 +41,6 @@ GNASH_LIBS = \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la \
-	$(AGG_LIBS) \
 	$(NULL)
 
 check_PROGRAMS = \
@@ -59,7 +58,6 @@ clip_as_button2_TestRunner_SOURCES = \
 	$(NULL)
 clip_as_button2_TestRunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
-	$(GNASH_LIBS) \
 	$(NULL)
 clip_as_button2_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(srcdir)\" \
@@ -73,28 +71,25 @@ subshapes_TestRunner_SOURCES = \
 	$(NULL)
 subshapes_TestRunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
-	$(GNASH_LIBS) \
 	$(NULL)
 subshapes_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(srcdir)\" \
 	$(NULL)
 subshapes_TestRunner_DEPENDENCIES = \
 	subshapes.swf \
-	$(GNASH_LIBS) \
 	$(NULL)
 
 gotoFrameOnKeyEvent_TestRunner_SOURCES = \
 	gotoFrameOnKeyEvent-TestRunner.cpp \
 	$(NULL)
 gotoFrameOnKeyEvent_TestRunner_LDADD = \
-	$(GNASH_LIBS) \
+	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 gotoFrameOnKeyEvent_TestRunner_CXXFLAGS = \
 	-DSRCDIR=\"$(srcdir)\" \
 	$(NULL)
 gotoFrameOnKeyEvent_TestRunner_DEPENDENCIES = \
 	gotoFrameOnKeyEvent.swf \
-	$(GNASH_LIBS) \
 	$(NULL)
 
 GotoAndPlayTestRunner: $(srcdir)/../generic-testrunner.sh $(srcdir)/GotoAndPlayTest.swf
