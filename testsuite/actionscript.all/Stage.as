@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Stage.as,v 1.21 2008/03/12 20:51:14 strk Exp $";
+rcsid="$Id: Stage.as,v 1.22 2008/03/13 11:23:16 bwy Exp $";
 #include "check.as"
 
 check_equals (typeof(Stage), 'object');
@@ -48,6 +48,10 @@ check(Stage.hasOwnProperty("width"));
 check(Stage.hasOwnProperty("scaleMode"));
 check(Stage.hasOwnProperty("showMenu"));
 check(Stage.hasOwnProperty("align"));
+xcheck(Stage.hasOwnProperty("displayState"));
+
+
+/// Stage.align
 
 check_equals(typeof(Stage.align), "string");
 
@@ -73,6 +77,17 @@ Stage.align = "LT";
 check_equals(Stage.align, "LT");
 Stage.align = "X";
 check_equals(Stage.align, "");
+
+/// Stage.displayState
+
+xcheck_equals(typeof(Stage.displayState), "string");
+xcheck_equals(Stage.displayState, "normal");
+Stage.displayState = "fullScreen";
+check_equals(Stage.displayState, "fullScreen");
+Stage.displayState = "X";
+xcheck_equals(Stage.displayState, "fullScreen");
+Stage.displayState = "normal";
+check_equals(Stage.displayState, "normal");
 
 listener = new Object;
 listener.onResize = function() {

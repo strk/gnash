@@ -260,6 +260,12 @@ public:
 	///
 	void restart();
 
+    /// Simulate a manually resized view.
+    //
+    /// If scaleMode != noScale, the renderers are instructed
+    /// to scale the view.
+    void resizeStage(int x, int y) ; 
+
 private:
 
 	/// Initialize testing renderers

@@ -1,3 +1,10 @@
+2008-03-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* testsuite/MovieTester.{h,cpp}: add support for resizing.
+	* gui/gui.cpp: minor cleanup.
+	* server/asobj/Stage.cpp: minor cleanups.
+	* testsuite/actionscript.all/Stage.as: tests for Stage.displayState.
+
 2008-03-13 Sandro Santilli <strk@keybit.net>
 
 	* server/as_object.cpp: implement get_text_value for as_super.

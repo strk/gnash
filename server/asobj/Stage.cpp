@@ -115,25 +115,34 @@ Stage::notifyResize()
 	callMethod(NSV::PROP_BROADCAST_MESSAGE, "onResize");
 }
 
-unsigned
+/// Expected behaviour is that the original movie size is aways returned
+/// as long as scaling is allowed.
+unsigned int
 Stage::getWidth() const
 {
+
+    movie_root& m = VM::get().getRoot();
+
     if (_scaleMode == noScale)
     {
-        return VM::get().getRoot().getWidth();    
+        return m.getWidth();    
     }
-    return (unsigned int)VM::get().getRoot().get_movie_definition()->get_width_pixels();
+    return static_cast<unsigned int>(m.get_movie_definition()->get_width_pixels());
 	
 }
 
-unsigned
+unsigned int
 Stage::getHeight() const
 {
+
+    movie_root& m = VM::get().getRoot();
+
     if (_scaleMode == noScale)
     {
-        return VM::get().getRoot().getHeight();    
+        return m.getHeight();    
     }
-    return (unsigned int)VM::get().getRoot().get_movie_definition()->get_height_pixels();
+    return static_cast<unsigned int>(m.get_movie_definition()->get_height_pixels());
+
 }
 
 const char*
@@ -171,16 +180,13 @@ Stage::setScaleMode(ScaleMode mode)
 	if ( _scaleMode == mode ) return; // nothing to do
 
 	_scaleMode = mode;
-	//log_debug("Scale mode set to %s", getScaleModeString());
 
 	if ( _scaleMode == noScale )
 	{
-		//log_debug("Setting rescaling allowance to false");
 		VM::get().getRoot().allowRescaling(false);
 	}
 	else
 	{
-		//log_debug("Setting rescaling allowance to true");
 		VM::get().getRoot().allowRescaling(true);
 	}
 }
@@ -297,7 +303,7 @@ stage_showMenu_getset(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		static bool warned=false;
+		static bool warned = false;
 		if ( ! warned ) {
 			log_unimpl("Stage.showMenu getter");
 			warned=true;
@@ -306,7 +312,7 @@ stage_showMenu_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		static bool warned=false;
+		static bool warned = false;
 		if ( ! warned ) {
 			log_unimpl("Stage.showMenu setter");
 			warned=true;

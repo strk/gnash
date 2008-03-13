@@ -232,9 +232,6 @@ Gui::resize_view(int width, int height)
 	if ( VM::isInitialized() )
 	{
 
-		float swfwidth = _movieDef->get_width_pixels();
-		float swfheight = _movieDef->get_height_pixels();
-
 		if ( _stage && _started )
 		{
 			_stage->set_display_viewport(0, 0, width, height);
@@ -242,6 +239,10 @@ Gui::resize_view(int width, int height)
 
 		if ( _stage && _stage->isRescalingAllowed() )
 		{
+
+		    float swfwidth = _movieDef->get_width_pixels();
+		    float swfheight = _movieDef->get_height_pixels();
+
 			// set new scale value
 			_xscale = width / swfwidth;
 			_yscale = height / swfheight;

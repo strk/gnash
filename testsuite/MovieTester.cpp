@@ -243,6 +243,33 @@ MovieTester::advance(bool updateClock)
 
 }
 
+void
+MovieTester::resizeStage(int x, int y)
+{
+	_movie_root->set_display_viewport(0, 0, x, y);
+
+	if (_movie_root->isRescalingAllowed() )
+	{
+
+		// set new scale value
+		float xscale = x / _movie_def->get_width_pixels();
+	    float yscale = y / _movie_def->get_height_pixels();
+		
+		if (xscale < yscale) yscale = xscale;
+		if (yscale < xscale) xscale = yscale;
+
+        // Scale for all renderers.
+        for (TRenderers::const_iterator it=_testingRenderers.begin(), itE=_testingRenderers.end();
+			        it != itE; ++it)
+        {
+            TestingRenderer& rend = *(*it);
+            render_handler& h = rend.getRenderer();
+            h.set_scale(xscale, yscale);
+        }
+	}
+
+}
+
 const character*
 MovieTester::findDisplayItemByName(const sprite_instance& mc,
 		const std::string& name) 
