@@ -71,6 +71,11 @@ public:
 
 	virtual bool isSuper() const { return true; }
 
+	std::string get_text_value() const
+	{
+		return "[object Object]";
+	}
+
 	// Fetching members from 'super' yelds a lookup on the associated prototype
 	virtual bool get_member(string_table::key name, as_value* val,
 		string_table::key nsname = 0)
