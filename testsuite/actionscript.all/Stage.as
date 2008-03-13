@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Stage.as,v 1.23 2008/03/13 12:14:30 bwy Exp $";
+rcsid="$Id: Stage.as,v 1.24 2008/03/13 12:44:50 bwy Exp $";
 #include "check.as"
 
 check_equals (typeof(Stage), 'object');
@@ -48,7 +48,7 @@ check(Stage.hasOwnProperty("width"));
 check(Stage.hasOwnProperty("scaleMode"));
 check(Stage.hasOwnProperty("showMenu"));
 check(Stage.hasOwnProperty("align"));
-xcheck(Stage.hasOwnProperty("displayState"));
+check(Stage.hasOwnProperty("displayState"));
 
 
 /// Stage.align
@@ -60,7 +60,7 @@ check_equals(Stage.align, "T");
 Stage.align = "B";
 check_equals(Stage.align, "B");
 Stage.align = "l";
-xcheck_equals(Stage.align, "L");
+check_equals(Stage.align, "L");
 Stage.align = "R";
 check_equals(Stage.align, "R");
 Stage.align = "TL";
@@ -76,7 +76,7 @@ check_equals(Stage.align, "TR"); // why???
 Stage.align = "RT";
 check_equals(Stage.align, "TR");
 Stage.align = "lb";
-xcheck_equals(Stage.align, "LB");
+check_equals(Stage.align, "LB");
 Stage.align = "BR";
 check_equals(Stage.align, "RB");
 Stage.align = "LT";
@@ -86,14 +86,14 @@ check_equals(Stage.align, "");
 
 /// Stage.displayState
 
-xcheck_equals(typeof(Stage.displayState), "string");
-xcheck_equals(Stage.displayState, "normal");
+check_equals(typeof(Stage.displayState), "string");
+check_equals(Stage.displayState, "normal");
 Stage.displayState = "fullScreen";
 check_equals(Stage.displayState, "fullScreen");
 Stage.displayState = "X";
-xcheck_equals(Stage.displayState, "fullScreen");
+check_equals(Stage.displayState, "fullScreen");
 Stage.displayState = "NORMAl";
-xcheck_equals(Stage.displayState, "normal");
+check_equals(Stage.displayState, "normal");
 
 listener = new Object;
 listener.onResize = function() {
