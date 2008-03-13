@@ -1,5 +1,14 @@
 2008-03-12 Bastiaan Jacques <bastiaan@bjacques.org>
 
+	* backend/render_handler_cairo.cpp: Store some ints as ints.
+	* gui/gtk_glue_cairo.{cpp,h}: Make the GTK window single-buffered,
+	because we provide our own double-buffering mechanism. configure():
+	Try to create a buffer that's similar to the GDK buffer. This
+	significantly improves performance. render(): Implement invalidated
+	bounds.
+
+2008-03-12 Bastiaan Jacques <bastiaan@bjacques.org>
+
 	* backend/render_handler_ogl.cpp: Compliation fix.
 
 2008-03-12 Sandro Santilli <strk@keybit.net>

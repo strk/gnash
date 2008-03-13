@@ -436,8 +436,8 @@ public:
   {  
     cairo_move_to(cr, cur_path.ap.x, cur_path.ap.y);
     
-    float prev_x = cur_path.ap.x,
-          prev_y = cur_path.ap.y;
+    int prev_x = cur_path.ap.x,
+        prev_y = cur_path.ap.y;
     
     for (std::vector<edge>::const_iterator it = cur_path.m_edges.begin(),
          end = cur_path.m_edges.end(); it != end; ++it) {
@@ -459,8 +459,8 @@ public:
         float x2 = cur_edge.cp.x + one_third * (cur_edge.ap.x - cur_edge.cp.x);
         float y2 = cur_edge.cp.y + one_third * (cur_edge.ap.y - cur_edge.cp.y);
         
-        const float& x3 = cur_edge.ap.x;
-        const float& y3 = cur_edge.ap.y;
+        const int& x3 = cur_edge.ap.x;
+        const int& y3 = cur_edge.ap.y;
     
     
         cairo_curve_to(cr, x1, y1, x2, y2, x3, y3);
