@@ -4,6 +4,7 @@
 	  It's obvious what it does now.
 	* server/asobj/Stage.{h,cpp}: make Stage.align methods work properly.
 	  It's still not really implemented. More swfdec passes.
+	* testsuite/swfdec/PASSING: passing tests.
 
 2008-03-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
