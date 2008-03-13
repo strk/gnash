@@ -479,6 +479,13 @@ Player::interfaceEventCallback(const std::string& event, const std::string& arg)
 		return "";
 	}
 	
+	if (event == "Stage.displayState")
+	{
+	    if (arg == "fullScreen") _gui->setFullscreen();
+	    else if (arg == "normal") _gui->unsetFullscreen();
+		return "";
+	}
+	
 	log_error(_("Unhandled callback %s with arguments %s"), event, arg);
 	return "";
 }
