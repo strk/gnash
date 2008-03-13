@@ -1,5 +1,10 @@
 2008-03-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* testsuite/actionscript.all/Stage.as: tests with different cases,
+	  whitespace and extra characters.
+
+2008-03-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* testsuite/MovieTester.{h,cpp}: add support for resizing.
 	* gui/gui.cpp: minor cleanup.
 	* server/asobj/Stage.cpp: minor cleanups.
