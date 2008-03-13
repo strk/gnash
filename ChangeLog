@@ -1,3 +1,11 @@
+2008-03-13  Dossy Shiobara <dossy@panoptic.com>
+
+	* plugin/win32/: plugin.cpp (1.14), plugin.h (1.10): Use the
+	  Windows GDI DIB buffer directly with AGG, eliminating an
+	  unnecessary buffer and memcpy.  Correctly prevent multiple
+	  streams from launching a player thread.  Implement mouse movement
+	  and clicking support.
+
 2008-03-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/actionscript.all/Stage.as: More tests for Stage.align.
