@@ -1,3 +1,8 @@
+2008-03-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* testsuite/actionscript.all/Microphone.as: more comprehensive tests
+	  for the Microphone class.
+
 2008-03-13  Dossy Shiobara <dossy@panoptic.com>
 
 	* plugin/win32/: plugin.cpp (1.14), plugin.h (1.10): Use the
