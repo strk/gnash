@@ -109,7 +109,7 @@ Stage::Stage()
 	:
 	as_object(getObjectInterface()),
 	_scaleMode(showAll),
-	_alignMode(ALIGN_MODE_NONE),
+	_alignMode(""),
 	_displayState(normal)
 {
 	attachStageInterface(*this);
@@ -190,23 +190,6 @@ Stage::getScaleModeString()
 	return modeName[_scaleMode];
 }
 
-const char*
-Stage::getAlignModeString()
-{
-	static const char* alignName[] = {
-		"T",
-		"B",
-		"L",
-		"R",
-		"LT",
-		"TR",
-		"LB",
-		"RB",
-		"" };
-
-	return alignName[_alignMode];
-}
-
 void
 Stage::setScaleMode(ScaleMode mode)
 {
@@ -222,22 +205,6 @@ Stage::setScaleMode(ScaleMode mode)
 	{
 		VM::get().getRoot().allowRescaling(true);
 	}
-}
-
-void
-Stage::setAlignMode(AlignMode mode)
-{
-	if ( _alignMode == mode ) return; // nothing to do
-
-	_alignMode = mode;
-
-	static bool warned = false;
-	if ( ! warned ) {
-		log_unimpl("Stage.align goes through "
-		            "the motions but is not implemented");
-		warned = true;
-	}
-
 }
 
 void
@@ -259,7 +226,6 @@ Stage::setDisplayState(DisplayState state)
 	}
 
 }
-
 
 as_value stage_scalemode_getset(const fn_call& fn)
 {
@@ -324,41 +290,41 @@ stage_align_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<Stage> stage = ensureType<Stage>(fn.this_ptr);
 
+    log_unimpl(_("Stage.alignMode goes through the motions but is not "
+            "properly implemented."));
+
 	if ( fn.nargs == 0 ) // getter
 	{
-	    return as_value (stage->getAlignModeString());
+	    return as_value (stage->getAlignMode());
 	}
 	else // setter
 	{
-		Stage::AlignMode mode;
 
 		const std::string& str = fn.arg(0).to_string();
 
-        StringNoCaseEqual noCaseCompare;
+        std::string alignMode = "";
 
-		if ( noCaseCompare(str, "T") ) mode = Stage::T;
-		else if ( noCaseCompare(str, "B") ) mode = Stage::B;
-		else if ( noCaseCompare(str, "L") ) mode = Stage::L;
-		else if ( noCaseCompare(str, "R") ) mode = Stage::R;
-		else if ( noCaseCompare(str, "LT") || noCaseCompare(str, "TL") )
-		{
-		    mode = Stage::LT;
-		}
-		else if ( noCaseCompare(str, "TR") || noCaseCompare(str, "RT") )
-		{
-		    mode = Stage::TR;
-		}
-		else if ( noCaseCompare(str, "LB") || noCaseCompare(str, "BL") )
-		{
-		    mode = Stage::LB;
-		}
-		else if ( noCaseCompare(str, "RB") || noCaseCompare(str, "BR") )
-		{
-		     mode = Stage::RB;
-		}
-        else mode = Stage::ALIGN_MODE_NONE;
-        
-		stage->setAlignMode(mode);
+        if (str.find_first_of("lL") != std::string::npos)
+        {
+            alignMode.push_back('L');
+        } 
+
+        if (str.find_first_of("tT") != std::string::npos)
+        {
+            alignMode.push_back('T');
+        } 
+
+        if (str.find_first_of("rR") != std::string::npos)
+        {
+            alignMode.push_back('R');
+        } 
+    
+        if (str.find_first_of("bB") != std::string::npos)
+        {
+            alignMode.push_back('B');
+        }
+
+        stage->setAlignMode(alignMode);
 
 		return as_value();
 	}

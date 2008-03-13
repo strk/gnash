@@ -45,18 +45,6 @@ public:
 		exactFill,
 		noBorder
 	} ScaleMode;
-
-    typedef enum {
-		T,
-		B,
-		L,
-		R,
-		LT,
-		TR,
-		LB,
-		RB,
-        ALIGN_MODE_NONE      
-    } AlignMode;
     
     typedef enum {
 		normal,
@@ -96,10 +84,11 @@ public:
 	///
 	const char* getScaleModeString();
 
-	/// Set align mode 
-	void setAlignMode(AlignMode mode);
-	
-	const char* getAlignModeString();
+    /// Get present align mode
+    const std::string& getAlignMode() const { return _alignMode; }
+
+    /// Set align mode
+    void setAlignMode(const std::string& mode) { _alignMode = mode; }
 
 	/// Set display state 
 	void setDisplayState(DisplayState state);
@@ -113,7 +102,7 @@ private:
 
 	ScaleMode _scaleMode;
 	
-	AlignMode _alignMode;
+	std::string _alignMode;
 	
 	DisplayState _displayState;
 };

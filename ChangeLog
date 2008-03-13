@@ -2,6 +2,8 @@
 
 	* testsuite/actionscript.all/Stage.as: More tests for Stage.align.
 	  It's obvious what it does now.
+	* server/asobj/Stage.{h,cpp}: make Stage.align methods work properly.
+	  It's still not really implemented. More swfdec passes.
 
 2008-03-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
