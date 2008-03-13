@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Stage.as,v 1.25 2008/03/13 15:02:32 bwy Exp $";
+rcsid="$Id: Stage.as,v 1.26 2008/03/13 16:11:35 bwy Exp $";
 #include "check.as"
 
 check_equals (typeof(Stage), 'object');
@@ -67,13 +67,13 @@ check_equals(Stage.align, "R");
 Stage.align = "TL";
 check_equals(Stage.align, "LT");
 Stage.align = "B        R";
-xcheck_equals(Stage.align, "RB");
+check_equals(Stage.align, "RB");
 Stage.align = "LThhhhh";
-xcheck_equals(Stage.align, "LT");
+check_equals(Stage.align, "LT");
 Stage.align = "B       rhhhh";
-xcheck_equals(Stage.align, "RB");
+check_equals(Stage.align, "RB");
 Stage.align = "TR";
-check_equals(Stage.align, "TR"); // why???
+check_equals(Stage.align, "TR");
 Stage.align = "RT";
 check_equals(Stage.align, "TR");
 Stage.align = "lb";
@@ -82,6 +82,20 @@ Stage.align = "BR";
 check_equals(Stage.align, "RB");
 Stage.align = "LT";
 check_equals(Stage.align, "LT");
+Stage.align = "LTR";
+check_equals(Stage.align, "LTR");
+Stage.align = "LTRB";
+check_equals(Stage.align, "LTRB");
+Stage.align = "TBR";
+check_equals(Stage.align, "TRB");
+Stage.align = "BT";
+check_equals(Stage.align, "TB");
+Stage.align = "RL";
+check_equals(Stage.align, "LR");
+Stage.align = "R mdmdmdmdmdmdmsdcmbkjaskjhasd";
+check_equals(Stage.align, "RB");
+Stage.align = "xR mdmdmdmdmdmdmsdcmbkjaskjhasd";
+check_equals(Stage.align, "RB");
 Stage.align = "X";
 check_equals(Stage.align, "");
 

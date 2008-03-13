@@ -1,5 +1,10 @@
 2008-03-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* testsuite/actionscript.all/Stage.as: More tests for Stage.align.
+	  It's obvious what it does now.
+
+2008-03-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* testsuite/actionscript.all/Stage.as: Stage methods were
 	  available in SWF5, but weren't native.
 	* server/asobj/Stage.cpp: init Stage methods for SWF5, but
