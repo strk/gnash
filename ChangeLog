@@ -2,6 +2,8 @@
 
 	* testsuite/actionscript.all/Stage.as: Stage methods were
 	  available in SWF5, but weren't native.
+	* server/asobj/Stage.cpp: init Stage methods for SWF5, but
+	  don't register them as Native (one more swfdec testsuite pass).
 
 2008-03-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
