@@ -57,6 +57,12 @@ public:
 		RB,
         ALIGN_MODE_NONE      
     } AlignMode;
+    
+    typedef enum {
+		normal,
+		fullScreen
+	} DisplayState;
+
 
 	Stage();
 
@@ -95,6 +101,11 @@ public:
 	
 	const char* getAlignModeString();
 
+	/// Set display state 
+	void setDisplayState(DisplayState state);
+	
+	const char* getDisplayStateString();	
+
 private:
 
 	/// Notify all listeners about a resize event
@@ -103,6 +114,8 @@ private:
 	ScaleMode _scaleMode;
 	
 	AlignMode _alignMode;
+	
+	DisplayState _displayState;
 };
 
 

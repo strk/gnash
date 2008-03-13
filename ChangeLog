@@ -2,6 +2,10 @@
 
 	* testsuite/actionscript.all/Stage.as: tests with different cases,
 	  whitespace and extra characters.
+	* server/asobj/Stage.{h,cpp}: add _displayState member, implement
+	  displayState getter-setter. Make checks case-insensitive, but
+	  not yet tolerant of whitespace or extra characters.
+	* gui/Player.cpp: listen for displayState. 
 
 2008-03-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 

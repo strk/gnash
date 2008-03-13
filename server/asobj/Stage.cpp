@@ -31,6 +31,7 @@
 #include "Object.h" // for getObjectInterface()
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "namedStrings.h"
+#include "StringPredicates.h"
 
 #include <string>
 
@@ -41,6 +42,7 @@ as_value stage_align_getset(const fn_call& fn);
 as_value stage_showMenu_getset(const fn_call& fn);
 as_value stage_width_getset(const fn_call& fn);
 as_value stage_height_getset(const fn_call& fn);
+as_value stage_displaystate_getset(const fn_call& fn);
 
 static void
 attachStageInterface(as_object& o)
@@ -81,13 +83,17 @@ attachStageInterface(as_object& o)
 	vm.registerNative(getset, 666, 10);
 	o.init_property("showMenu", getset, getset);
 
+	getset = stage_displaystate_getset;
+	o.init_property("displayState", getset, getset);
+
 }
 
 Stage::Stage()
 	:
 	as_object(getObjectInterface()),
 	_scaleMode(showAll),
-	_alignMode(ALIGN_MODE_NONE)
+	_alignMode(ALIGN_MODE_NONE),
+	_displayState(normal)
 {
 	attachStageInterface(*this);
 
@@ -143,6 +149,16 @@ Stage::getHeight() const
     }
     return static_cast<unsigned int>(m.get_movie_definition()->get_height_pixels());
 
+}
+
+const char*
+Stage::getDisplayStateString()
+{
+	static const char* displayStateName[] = {
+		"normal",
+		"fullScreen" };
+
+	return displayStateName[_displayState];
 }
 
 const char*
@@ -206,6 +222,27 @@ Stage::setAlignMode(AlignMode mode)
 	}
 
 }
+
+void
+Stage::setDisplayState(DisplayState state)
+{
+	if ( _displayState == state ) return; // nothing to do
+
+	_displayState = state;
+	
+	if (!movie_root::interfaceHandle) return; // No registered callback
+	
+	if (_displayState == Stage::fullScreen)
+	{
+	    (*movie_root::interfaceHandle)("Stage.displayState", "fullScreen");
+	}
+	else if (_displayState == Stage::normal)
+	{
+	    (*movie_root::interfaceHandle)("Stage.displayState", "normal");
+	}
+
+}
+
 
 as_value stage_scalemode_getset(const fn_call& fn)
 {
@@ -280,14 +317,28 @@ stage_align_getset(const fn_call& fn)
 
 		const std::string& str = fn.arg(0).to_string();
 
-		if ( str == "T" ) mode = Stage::T;
-		else if ( str == "B" ) mode = Stage::B;
-		else if ( str == "L" ) mode = Stage::L;
-		else if ( str == "R" ) mode = Stage::R;
-		else if ( str == "LT" || str == "TL" ) mode = Stage::LT;
-		else if ( str == "TR" || str == "RT" ) mode = Stage::TR;
-		else if ( str == "LB" || str == "BL" ) mode = Stage::LB;
-		else if ( str == "RB" || str == "BR" ) mode = Stage::RB;
+        StringNoCaseEqual noCaseCompare;
+
+		if ( noCaseCompare(str, "T") ) mode = Stage::T;
+		else if ( noCaseCompare(str, "B") ) mode = Stage::B;
+		else if ( noCaseCompare(str, "L") ) mode = Stage::L;
+		else if ( noCaseCompare(str, "R") ) mode = Stage::R;
+		else if ( noCaseCompare(str, "LT") || noCaseCompare(str, "TL") )
+		{
+		    mode = Stage::LT;
+		}
+		else if ( noCaseCompare(str, "TR") || noCaseCompare(str, "RT") )
+		{
+		    mode = Stage::TR;
+		}
+		else if ( noCaseCompare(str, "LB") || noCaseCompare(str, "BL") )
+		{
+		    mode = Stage::LB;
+		}
+		else if ( noCaseCompare(str, "RB") || noCaseCompare(str, "BR") )
+		{
+		     mode = Stage::RB;
+		}
         else mode = Stage::ALIGN_MODE_NONE;
         
 		stage->setAlignMode(mode);
@@ -317,6 +368,35 @@ stage_showMenu_getset(const fn_call& fn)
 			log_unimpl("Stage.showMenu setter");
 			warned=true;
 		}
+		return as_value();
+	}
+}
+
+as_value
+stage_displaystate_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Stage> stage = ensureType<Stage>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		return as_value(stage->getDisplayStateString());
+	}
+	else // setter
+	{
+
+        StringNoCaseEqual noCaseCompare;
+
+		const std::string& str = fn.arg(0).to_string();
+		if ( noCaseCompare(str, "normal") )
+		{
+		    stage->setDisplayState(Stage::normal);
+		}
+		else if ( noCaseCompare(str, "fullScreen") ) 
+		{
+		    stage->setDisplayState(Stage::fullScreen);
+        }
+
+        // If invalid, do nothing.
 		return as_value();
 	}
 }
