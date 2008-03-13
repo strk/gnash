@@ -71,6 +71,7 @@
 #include "plugin.h"
 
 static PRLock* playerLock = NULL;
+static int instances = 0;
 
 char* NPP_GetMIMEDescription(void);
 static const char* getPluginDescription(void);
@@ -174,6 +175,10 @@ nsPluginInstanceBase*
 NS_NewPluginInstance(nsPluginCreateData* aCreateDataStruct)
 {
     DBG("NS_NewPluginInstance\n");
+    if (instances > 0) {
+        return NULL;
+    }
+    instances++; // N.B. This is a threading race condition. FIXME.
     if (!playerLock) {
         playerLock = PR_NewLock();
     }
@@ -194,6 +199,7 @@ NS_DestroyPluginInstance(nsPluginInstanceBase* aPlugin)
 		PR_DestroyLock(playerLock);
 		playerLock = NULL;
     }
+    instances--;
 }
  
 // nsPluginInstance class implementation
@@ -211,11 +217,13 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data) :
     _width(0),
     _height(0),
     _rowstride(0),
+    _hMemDC(NULL),
+    _bmp(NULL),
     _memaddr(NULL),
     mouse_x(0),
     mouse_y(0),
     mouse_buttons(0),
-    lpOldProc(NULL)
+    _oldWndProc(NULL)
 {
     DBG("nsPluginInstance::nsPluginInstance\n");
 }
@@ -225,8 +233,16 @@ nsPluginInstance::~nsPluginInstance()
 {
     DBG("nsPluginInstance::~nsPluginInstance\n");
     if (_memaddr) {
-        free(_memaddr);
+        // Deleting _bmp should free this memory.
         _memaddr = NULL;
+    }
+    if (_hMemDC) {
+        DeleteObject(_hMemDC);
+        _hMemDC = NULL;
+    }
+    if (_bmp) {
+        DeleteObject(_bmp);
+        _bmp = NULL;
     }
 }
  
@@ -247,6 +263,27 @@ nsPluginInstance::init(NPWindow* aWindow)
     // Windows DIB row stride is always a multiple of 4 bytes.
     _rowstride = /* 24 bits */ 3 * _width;
     _rowstride += _rowstride % 4;
+
+    memset(&_bmpInfo, 0, sizeof(BITMAPINFOHEADER));
+    _bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    _bmpInfo.bmiHeader.biWidth = _width; 
+    // Negative height means first row comes first in memory.
+    _bmpInfo.bmiHeader.biHeight = -1 * _height; 
+    _bmpInfo.bmiHeader.biPlanes = 1; 
+    _bmpInfo.bmiHeader.biBitCount = 24; 
+    _bmpInfo.bmiHeader.biCompression = BI_RGB; 
+    _bmpInfo.bmiHeader.biSizeImage = 0; 
+    _bmpInfo.bmiHeader.biXPelsPerMeter = 0; 
+    _bmpInfo.bmiHeader.biYPelsPerMeter = 0; 
+    _bmpInfo.bmiHeader.biClrUsed = 0; 
+    _bmpInfo.bmiHeader.biClrImportant = 0; 
+
+    HDC hDC = GetDC(_window);
+    _hMemDC = CreateCompatibleDC(hDC);
+    _bmp = CreateDIBSection(_hMemDC, &_bmpInfo,
+            DIB_RGB_COLORS, (void **) &_memaddr, 0, 0);
+    SelectObject(_hMemDC, _bmp);
+
     DBG("aWindow->type: %s (%u)\n", 
             (aWindow->type == NPWindowTypeWindow) ? "NPWindowTypeWindow" :
             (aWindow->type == NPWindowTypeDrawable) ? "NPWindowTypeDrawable" :
@@ -255,7 +292,7 @@ nsPluginInstance::init(NPWindow* aWindow)
 
     // subclass window so we can intercept window messages and
     // do our drawing to it
-    lpOldProc = SubclassWindow(_window, (WNDPROC)PluginWinProc);
+    _oldWndProc = SubclassWindow(_window, (WNDPROC) PluginWinProc);
  
     // associate window with our nsPluginInstance object so we can access 
     // it in the window procedure
@@ -283,7 +320,7 @@ nsPluginInstance::shut(void)
     }
 
     // subclass it back
-    SubclassWindow(_window, lpOldProc);
+    SubclassWindow(_window, _oldWndProc);
 
     _initialized = FALSE;
 }
@@ -295,13 +332,15 @@ nsPluginInstance::NewStream(NPMIMEType type, NPStream *stream,
     DBG("nsPluginInstance::NewStream\n");
     DBG("stream->url: %s\n", stream->url);
 
-    _stream = stream;
-    _url = stream->url;
+    if (!_stream) {
+        _stream = stream;
+        _url = stream->url;
 #if 0
-    if (seekable) {
-        *stype = NP_SEEK;
-    }
+        if (seekable) {
+            *stype = NP_SEEK;
+        }
 #endif
+    }
 
     return NPERR_NO_ERROR;
 }
@@ -342,6 +381,7 @@ void
 nsPluginInstance::threadMain(void)
 {
     DBG("nsPluginInstance::threadMain started\n");
+    DBG("URL: %s\n", _url.c_str());
 
 	PR_Lock(playerLock);
 
@@ -367,9 +407,10 @@ nsPluginInstance::threadMain(void)
     DBG("Gnash sound initialized.\n");
 
     // Init GUI.
+    int old_mouse_x = 0, old_mouse_y = 0, old_mouse_buttons = 0;
     _render_handler =
         (gnash::render_handler *) gnash::create_render_handler_agg("BGR24");
-    _memaddr = (unsigned char *) malloc(getMemSize());
+    // _memaddr = (unsigned char *) malloc(getMemSize());
     static_cast<gnash::render_handler_agg_base *>(_render_handler)->init_buffer(
             getMemAddr(), getMemSize(), _width, _height, _rowstride);
     gnash::set_render_handler(_render_handler);
@@ -420,6 +461,7 @@ nsPluginInstance::threadMain(void)
     root.setRootMovie(mr.release());
     root.set_display_viewport(0, 0, _width, _height);
     root.set_background_alpha(1.0f);
+    gnash::movie_instance* mi = root.getRootMovie();
     DBG("Movie instance created.\n");
 
     ShowWindow(_window, SW_SHOW);
@@ -432,7 +474,6 @@ nsPluginInstance::threadMain(void)
             break;
         }
 
-        gnash::movie_instance* mi = root.getRootMovie();
         size_t cur_frame = mi->get_current_frame();
         // DBG("Got current frame number: %d.\n", cur_frame);
         size_t tot_frames = mi->get_frame_count();
@@ -447,11 +488,37 @@ nsPluginInstance::threadMain(void)
         // DBG("Setting play state to PLAY.\n");
         root.set_play_state(gnash::sprite_instance::PLAY);
 
+        if (old_mouse_x != mouse_x || old_mouse_y != mouse_y) {
+            old_mouse_x = mouse_x;
+            old_mouse_y = mouse_y;
+            root.notify_mouse_moved(mouse_x, mouse_y);
+        }
+        if (old_mouse_buttons != mouse_buttons) {
+            old_mouse_buttons = mouse_buttons;
+            int mask = 1;
+            root.notify_mouse_clicked(mouse_buttons > 0, mask);
+        }
+
         root.display();
 
         RECT rt;
         GetClientRect(_window, &rt);
         InvalidateRect(_window, &rt, FALSE);
+
+#if 0
+        InvalidatedRanges ranges;
+        ranges.setSnapFactor(1.3f);
+        ranges.setSingleMode(false);
+        root.add_invalidated_bounds(ranges, false);
+        ranges.growBy(40.0f);
+        ranges.combine_ranges();
+
+        if (!ranges.isNull()) {
+            InvalidateRect(_window, &rt, FALSE);
+        }
+
+        root.display();
+#endif
 
         // DBG("Unlocking playerLock mutex.\n");
         PR_Unlock(playerLock);
@@ -505,39 +572,8 @@ PluginWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 int w = rt.right - rt.left;
                 int h = rt.bottom - rt.top;
 
-                BITMAPINFO bmpInfo;
-                memset(&bmpInfo, 0, sizeof(BITMAPINFOHEADER));
-                bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-                bmpInfo.bmiHeader.biWidth = w; 
-                // Negative height means first row comes first in memory.
-                bmpInfo.bmiHeader.biHeight = -1 * h; 
-                bmpInfo.bmiHeader.biPlanes = 1; 
-                bmpInfo.bmiHeader.biBitCount = 24; 
-                bmpInfo.bmiHeader.biCompression = BI_RGB; 
-                bmpInfo.bmiHeader.biSizeImage = 0; 
-                bmpInfo.bmiHeader.biXPelsPerMeter = 0; 
-                bmpInfo.bmiHeader.biYPelsPerMeter = 0; 
-                bmpInfo.bmiHeader.biClrUsed = 0; 
-                bmpInfo.bmiHeader.biClrImportant = 0; 
-                
-                HDC hMemDC = CreateCompatibleDC(hDC);
-                void* buf = NULL;
-                HBITMAP bmp = CreateDIBSection(hMemDC, &bmpInfo,
-                        DIB_RGB_COLORS, &buf, 0, 0);
-                HBITMAP temp = (HBITMAP) SelectObject(hMemDC, bmp);
-
-                unsigned char* mem = plugin->getMemAddr();
-                int memSize = plugin->getMemSize();
-                int height = plugin->getHeight();
- 
-                memcpy(buf, mem, memSize);
-
-                BitBlt(hDC, rt.left, rt.top, w, h, hMemDC, 0, 0,
-                        SRCCOPY);
-
-                SelectObject(hMemDC, temp);
-                DeleteObject(bmp);
-                DeleteObject(hMemDC);
+                BitBlt(hDC, rt.left, rt.top, w, h,
+                        plugin->getMemDC(), 0, 0, SRCCOPY);
 
                 EndPaint(hWnd, &ps);
                 return 0L;
@@ -555,7 +591,7 @@ PluginWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             {
                 int x = GET_X_LPARAM(lParam); 
                 int y = GET_Y_LPARAM(lParam); 
-                int    buttons = (msg == WM_LBUTTONDOWN) ? 1 : 0;
+                int buttons = (msg == WM_LBUTTONDOWN) ? 1 : 0;
 
                 plugin->notify_mouse_state(x, y, buttons);
                 break;

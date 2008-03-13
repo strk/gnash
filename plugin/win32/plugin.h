@@ -58,6 +58,7 @@ public:
     int32 Write(NPStream *stream, int32 offset, int32 len, void *buffer);
 
     // locals
+    typedef std::map<std::string, std::string> VariableMap;
     const char* getVersion();
     void threadMain(void);
 
@@ -65,26 +66,25 @@ public:
     int getWidth() { return _width; };
     int getHeight() { return _height; };
     int getRowStride() { return _rowstride; }
+    HDC getMemDC() { return _hMemDC; }
+    HBITMAP getBitmap() { return _bmp; }
     unsigned char* getMemAddr() { return _memaddr; }
     size_t getMemSize() { return _rowstride * _height; }
     void notify_mouse_state(int x, int y, int buttons)
     {
         mouse_x = x;
         mouse_y = y;
-        if (buttons >= 0)
-        {
+        if (buttons >= 0) {
             mouse_buttons = buttons;
         }
     }
-
-    typedef std::map<std::string, std::string> VariableMap;
 
 private:
     NPP         _instance;
     HWND        _window;
     NPBool      _initialized;
     NPBool      _shutdown;
-    WNDPROC     lpOldProc;
+    WNDPROC     _oldWndProc;
 
     NPStream*   _stream;
     std::string _url;
@@ -95,7 +95,11 @@ private:
     uint32_t    _width;
     uint32_t    _height;
     uint32_t    _rowstride;
+    HDC         _hMemDC;
+    BITMAPINFO  _bmpInfo;
+    HBITMAP     _bmp;
     unsigned char* _memaddr;
+
     std::auto_ptr<gnash::media::sound_handler> _sound_handler;
     gnash::render_handler* _render_handler;
 
