@@ -1,5 +1,9 @@
 2008-03-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* gui/gui.cpp: Reorganize movie properties, add a few more.
+
+2008-03-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* testsuite/actionscript.all/Stage.as: some passing tests.
 
 2008-03-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>

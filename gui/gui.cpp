@@ -889,7 +889,7 @@ Gui::getMovieInfo() const
 
     // Top nodes for the tree:
     // 1. VM information
-    // 2. Movie information
+    // 2. "Stage" information
     // 3. ...
 
     InfoTree::iterator_base topIter = tr->begin();
@@ -899,27 +899,51 @@ Gui::getMovieInfo() const
 
     std::ostringstream os;
 
-    // VM top level
-    os << "SWF" << vm.getSWFVersion();
-    topIter = tr->insert(topIter, StringPair("VM", os.str()));
+    //
+    /// VM top level
+    //
+    os << "SWF " << vm.getSWFVersion();
+    topIter = tr->insert(topIter, StringPair("VM version", os.str()));
 
-    // VM children
+    //
+    /// Stage
+    //
     movie_root& stage = vm.getRoot();
     boost::intrusive_ptr<movie_instance> level0 = stage.getRootMovie();
     movie_definition* def0 = level0->get_movie_definition();
     assert(def0);
 
+    topIter = tr->insert(topIter, StringPair("Stage Properties", ""));
+
     os.str("");
     os << "SWF " << def0->get_version();
-    firstLevelIter = tr->append_child(topIter, StringPair("level0 SWF version", os.str()));
-    firstLevelIter = tr->append_child(topIter, StringPair("level0 URL", def0->get_url()));
+    firstLevelIter = tr->append_child(topIter, StringPair("SWF version", os.str()));
+    firstLevelIter = tr->append_child(topIter, StringPair("URL", def0->get_url()));
+    
+ 
+    /// Stage: real dimensions.
+    os.str("");
+    os << def0->get_width_pixels() <<
+        "x" << def0->get_height_pixels();
+    firstLevelIter = tr->append_child(topIter, StringPair("Real dimensions", os.str()));
 
+    /// Stage: real dimensions.
+    os.str("");
+    os << stage.getWidth() <<
+        "x" << stage.getHeight();
+    firstLevelIter = tr->append_child(topIter, StringPair("Rendered dimensions", os.str()));
 
-    // Print info about scripts state (enabled/disabled)
-    topIter = tr->insert(topIter, StringPair("Stage scripts",
+    /// Stage: scaling allowed.
+    firstLevelIter = tr->append_child(topIter, StringPair("Scaling allowed",
+                stage.isRescalingAllowed() ? "yes" : "no"));
+
+    // Stage: scripts state (enabled/disabled)
+    firstLevelIter = tr->append_child(topIter, StringPair("Scripts",
                 stage.scriptsDisabled() ? " disabled" : "enabled"));
 
-    // Print info about mouse entities
+    //
+    /// Mouse entities
+    //
     topIter = tr->insert(topIter, StringPair("Mouse Entities", ""));
 
     const character* ch;
@@ -951,7 +975,9 @@ Gui::getMovieInfo() const
     	firstLevelIter = tr->append_child(topIter, StringPair("Dragging character: ", ss.str()));
     }
 
-    // GC row
+    //
+    /// GC row
+    //
     topIter = tr->insert(topIter, StringPair("GC Statistics", ""));
     GC::CollectablesCount cc;
     GC::get().countCollectables(cc);
@@ -967,14 +993,6 @@ Gui::getMovieInfo() const
     }
 
     tr->sort(firstLevelIter.begin(), firstLevelIter.end());
-
-//    for (InfoTree::pre_order_iterator it = tr->begin(); it != tr->end(); it++)
-//    {
-//        int j = 0;
-//        while (j++ < tr->depth(it)) std::cout << " ";
-//        StringPair& p = *it;
-//        std::cout << p.first << ": " << p.second << std::endl;
-//    }
 
     return tr;
 }
