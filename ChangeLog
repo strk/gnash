@@ -1,3 +1,7 @@
+2008-03-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/fill_style.cpp: cast uint8_t to int before logging.
+
 2008-03-14 Sandro Santilli <strk@keybit.net>
 
 	* server/video_stream_instance.h: implement pointInShape (for the

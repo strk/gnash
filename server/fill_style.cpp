@@ -157,7 +157,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md,
         {
             // see: http://sswf.sourceforge.net/SWFalexref.html#swf_gradient
             log_error(_("Unexpected num gradients (%d), expected 1 to 8"),
-                    num_gradients);
+                    static_cast<int>(num_gradients));
         }			
 
 		if (is_morph)
