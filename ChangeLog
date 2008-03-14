@@ -1,5 +1,6 @@
 2008-03-14 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/REALTIME: run netstream-status.swf in realtime.
 	* server/movie_root.cpp (cleanDisplayList): make sure NO unloaded
 	  characters are in the live instances container after a call to
 	  this method.
