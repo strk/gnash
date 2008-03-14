@@ -1,5 +1,10 @@
 2008-03-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* libbase/tree.hh: update to version 2.51
+	* server/movie_root.cpp: tinker with the tree a bit more.
+
+2008-03-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* server/movie_root.{h,cpp}: add getMovieInfo() to fill the info tree
 	  with data. Added more data about movie stage and from public methods
 	  of gnash::character. This class will eventually get its own tree

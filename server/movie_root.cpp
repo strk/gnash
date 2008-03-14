@@ -1935,11 +1935,6 @@ movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator& it)
     os << m_pixel_scale;
     localIter = tr.append_child(it, StringPair("Pixel scale", os.str()));
 
-    /// Stage: timer
-    os.str("");
-    os << m_timer;
-    localIter = tr.append_child(it, StringPair("Timer value", os.str()));
-
     /// Stage: scaling allowed.
     localIter = tr.append_child(it, StringPair("Scaling allowed",
                 _allowRescale ? yes : no));
@@ -1964,13 +1959,23 @@ movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator& it)
         os << (*i)->get_depth();
 	    tr.append_child(charIter, StringPair(_("Depth"), os.str()));
 
-        os.str("");
-        os << (*i)->get_ratio();
-	    tr.append_child(charIter, StringPair(_("Ratio"), os.str()));	    
+        /// Don't add if the character has no ratio value
+        if ((*i)->get_ratio() >= 0)
+        {
+            os.str("");
+            os << (*i)->get_ratio();
+	        tr.append_child(charIter, StringPair(_("Ratio"), os.str()));
+	    }	    
 
-        os.str("");
-        os << (*i)->get_clip_depth();
-	    tr.append_child(charIter, StringPair(_("Clipping depth"), os.str()));	    
+        /// Don't add if it's not a real clipping depth
+        if (int cd = (*i)->get_clip_depth() != -1000000 )
+        {
+            os.str("");
+            if (cd == -2000000) os << "Dynamic mask";
+            else os << cd;
+
+	        tr.append_child(charIter, StringPair(_("Clipping depth"), os.str()));	    
+        }
 
         os.str("");
         os << (*i)->get_width() << "x" << (*i)->get_height();
