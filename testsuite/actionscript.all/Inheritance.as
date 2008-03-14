@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.50 2008/03/12 22:33:07 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.51 2008/03/14 08:19:54 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Object.prototype.constructor), 'function');
@@ -129,11 +129,7 @@ check_equals(TypeChanger.__proto__, Function.prototype);
 
 o1 = new TypeChanger(false);
 check_equals(o1.__proto__, TypeChanger.prototype);
-#if OUTPUT_VERSION > 5
 check_equals(o1.__constructor__, TypeChanger);
-#else
-check_equals(o1.__constructor__, TypeChanger);
-#endif
 check(o1 instanceof TypeChanger);
 check(o1 instanceof Object);
 o2 = new TypeChanger(true);
@@ -250,7 +246,7 @@ function C() {}
 C.prototype = new B;
 co = new C;
 #if OUTPUT_VERSION > 6
- check_equals(co.whoami(), "A.B"); // gnash fails returning A.B.B
+ check_equals(co.whoami(), "A.B"); 
 #else
 # if OUTPUT_VERSION == 6
    check_equals(co.whoami(), "A.B.B"); 
@@ -265,6 +261,19 @@ C.prototype.whoami = function() {
   check_equals(co.whoami(), "A.B.C"); 
 #else
   check_equals(co.whoami(), ".C");
+#endif
+
+// Test gaps in inheritance chain
+A.prototype.myName = function() { return super.myName()+"A"; };
+C.prototype.myName = function() { return super.myName()+"C"; };
+#if OUTPUT_VERSION < 6 
+ check_equals(co.myName(), "C"); // no super
+#endif
+#if OUTPUT_VERSION == 6 
+ check_equals(co.myName(), "AAC"); // super in C references B proto no matter where myName was found
+#endif
+#if OUTPUT_VERSION > 6
+ xcheck_equals(co.myName(), "undefinedAC"); // super in C references the proto containing myName (A's)
 #endif
 
 //------------------------------------------------
@@ -453,7 +462,7 @@ check(t4 instanceOf Test4);
 check(! t4 instanceOf Test5);
 
 #if OUTPUT_VERSION < 6
- check_totals(89); // SWF5
+ check_totals(90); // SWF5
 #else
- check_totals(146); // SWF6,7,8
+ check_totals(147); // SWF6,7,8
 #endif
