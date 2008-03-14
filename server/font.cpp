@@ -142,6 +142,7 @@ GlyphInfo::markReachableResources() const
 				m_subpixel_font = true;
 		}
 
+		// TODO: initialize the deviceFontProvider only when needed ?
 		if ( ! m_name.empty() && ! initDeviceFontProvider() )
 		{
 			log_error("Could not initialize device font face '%s'", m_name.c_str());
@@ -417,6 +418,11 @@ GlyphInfo::markReachableResources() const
 		}
 
 		in->read_string_with_length(m_name);
+		// TODO: initialize the deviceFontProvider only when needed ?
+		if ( ! m_name.empty() && ! initDeviceFontProvider() )
+		{
+			log_error(_("Could not initialize device font face '%s'"), m_name.c_str());
+		}
 
 		in->ensureBytes(1);
 		unsigned char	flags = in->read_u8();

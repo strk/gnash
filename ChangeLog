@@ -1,5 +1,7 @@
 2008-03-14 Sandro Santilli <strk@keybit.net>
 
+	* server/font.cpp (read_font_info): initialize the device font
+	  provider if a name was read. Fixes bug #22367.
 	* testsuite/swfdec/REALTIME: run netstream-status.swf in realtime.
 	* server/movie_root.cpp (cleanDisplayList): make sure NO unloaded
 	  characters are in the live instances container after a call to
