@@ -1,3 +1,8 @@
+2008-03-13 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler_cairo.cpp: Partially implement invalidated
+	bounds, improving performance by approximately 10%.
+
 2008-03-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/actionscript.all/Microphone.as: more comprehensive tests

@@ -43,6 +43,7 @@
 #include <boost/scoped_array.hpp>
 #include "render_handler.h"
 #include "image.h"
+#include <cmath>
 
 namespace gnash {
 
@@ -320,33 +321,79 @@ public:
                                 c.m_b / 255.0, c.m_a / 255.0);
   }
 
+  void set_invalidated_regions(const InvalidatedRanges& ranges)
+  {
+    _invalidated_ranges = ranges;
+  }
+
+  static void
+  snap_to_pixel(cairo_t* cr, double& x, double& y, bool up)
+  {
+    cairo_user_to_device(cr, &x, &y);
+   
+    if (up) {
+      x = std::ceil(x);
+      y = std::ceil(y);
+    } else {
+      x = std::floor(x);
+      y = std::floor(y);
+    }
+
+    cairo_device_to_user(cr, &x, &y);
+  }
+
   virtual void  begin_display(
     const rgba& bg_color,
     int viewport_x0, int viewport_y0,
     int viewport_width, int viewport_height,
     float x0, float x1, float y0, float y1)
   {
-
-  
     float display_width  = fabsf(x1 - x0);
     float display_height = fabsf(y1 - y0);
 
     cairo_identity_matrix(_cr);
-    cairo_rectangle(_cr, x0, y0, display_width, display_height);
-    cairo_clip(_cr);
+
+    cairo_save(_cr);
+
+    if (bg_color.m_a) {
+      set_color(bg_color);
+    }
+
     cairo_scale(_cr, viewport_width / display_width,
                      viewport_height / display_height);
     cairo_translate(_cr, x0, y0);
-  
-	  // Clear the background, if background color has alpha > 0.
-	  if (bg_color.m_a) {
-      set_color(bg_color);
-      cairo_paint(_cr);
+
+    for (size_t rno=0; rno < _invalidated_ranges.size(); rno++) {
+    
+      const Range2d<float>& range = _invalidated_ranges.getRange(rno);
+      if (range.isNull()) {
+        continue;
+      }
+      if (range.isWorld()) {
+        cairo_rectangle(_cr, x0, y0, display_width, display_height);
+        break;
+      }
+
+      double x = range.getMinX(),
+             y = range.getMinY(),
+             maxx = range.getMaxX(),
+             maxy = range.getMaxY();
+
+      snap_to_pixel(_cr, x, y, false);
+      snap_to_pixel(_cr, maxx, maxy, true);
+
+      cairo_rectangle(_cr, x, y, maxx - x, maxy - y);
     }
+
+    cairo_clip(_cr);
+
+    // Paint the background color over the clipped region(s).
+    cairo_paint(_cr);
   }
 
   virtual void  end_display()
   {
+    cairo_restore(_cr);
   }
     
   virtual void  draw_line_strip(const void* coords, int vertex_count,
@@ -965,6 +1012,7 @@ private:
   std::vector<PathVec> _masks;
   size_t _video_bufsize;
   bool _drawing_mask;
+  InvalidatedRanges _invalidated_ranges;
     
 }; // class render_handler_cairo
 
