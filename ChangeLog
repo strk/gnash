@@ -1,3 +1,10 @@
+2008-03-14  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* macros/kde.m4: Set plugin paths here instead of configure.ac.
+	* configure.ac: Move Kparts config code to kde.m4. Default to
+	$HOME/.kde instead of system wide, fixing all installation
+	permissions problems.
+
 2008-03-14 Sandro Santilli <strk@keybit.net>
 
 	* server/as_environment.cpp: when dumping local registers and
@@ -39,6 +46,7 @@
 	* libbase/tree.hh: update to version 2.51
 	* server/movie_root.cpp: tinker with the tree a bit more.
 
+>>>>>>> 1.5920
 2008-03-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/movie_root.{h,cpp}: add getMovieInfo() to fill the info tree

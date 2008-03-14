@@ -29,6 +29,32 @@ AC_DEFUN([GNASH_PATH_KDE],
     fi
   ])
 
+
+  AC_ARG_WITH(kde-plugindir,
+    AC_HELP_STRING([--with-kde-plugindir=DIR], [Directory to install KDE plugin in]),
+    [KDE_PLUGINDIR=${withval}
+  ])
+
+  AC_ARG_WITH(kde-servicesdir, AC_HELP_STRING([--with-kde-servicesdir=DIR],
+      [Directory to install KDE service in]),
+    [KDE_SERVICESDIR=${withval}
+  ])
+
+  AC_ARG_WITH(kde-configdir, AC_HELP_STRING([--with-kde-configdir=DIR],
+      [Directory to install KDE configfile in]),
+    [KDE_CONFIGDIR=${withval}
+  ])
+
+  AC_ARG_WITH(kde-appsdatadir, AC_HELP_STRING([--with-kde-appsdatadir=DIR],
+      [Directory to install KDE data in]),
+    [KDE_APPSDATADIR=${withval}
+  ])
+
+  AC_ARG_WITH(kde-pluginprefix, AC_HELP_STRING([--with-kde-pluginprefix=DIR],
+      [Prefix for KDE plugin, like /usr]),
+    [KDE_PLUGINPREFIX=${withval}
+  ])
+
   kde_prefix="/usr"
   has_kde=no
   if test x"${ac_cv_path_kde_incl}" = x; then
@@ -78,7 +104,6 @@ AC_DEFUN([GNASH_PATH_KDE],
     KDE_CFLAGS=""
   fi
 
-dnl   # KDE_LIBS =  -lkdeui -lkdecore -lkdeprint -L/usr/lib/qt-3.3/lib -lqt-mt
   dnl Look for the libraries
   AC_ARG_WITH(kde_lib, AC_HELP_STRING([--with-kde-lib], [directory where kde libraries are]), with_kde_lib=${withval})
   AC_CACHE_VAL(ac_cv_path_kde_lib, [
@@ -146,10 +171,25 @@ dnl   # KDE_LIBS =  -lkdeui -lkdecore -lkdeprint -L/usr/lib/qt-3.3/lib -lqt-mt
 
   KLASH_PLUGIN=
   
-
   AC_SUBST(KLASH_PLUGIN)
   AC_SUBST(KDE_CFLAGS)  
   AC_SUBST(KDE_LIBS)
+
+  dnl If building the kparts plugin, get the install paths correct.  
+  if test x$kparts = xyes; then
+    if test x$KDE_PLUGINPREFIX = x; then
+      KDE_PLUGINPREFIX=${HOME}/.kde
+    fi
+    KDE_PLUGINDIR=$KDE_PLUGINPREFIX'/lib/kde3'
+    KDE_SERVICESDIR=$KDE_PLUGINPREFIX'/share/services'
+    KDE_CONFIGDIR=$KDE_PLUGINPREFIX'/share/config'
+    KDE_APPSDATADIR=$KDE_PLUGINPREFIX'/share/apps/klash'
+  fi
+
+  AC_SUBST(KDE_PLUGINDIR)
+  AC_SUBST(KDE_SERVICESDIR)
+  AC_SUBST(KDE_CONFIGDIR)
+  AC_SUBST(KDE_APPSDATADIR)
 ])
 
 # Local Variables:
