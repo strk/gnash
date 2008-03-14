@@ -1,5 +1,6 @@
 2008-03-14 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/PlaceObject2Tag.cpp: log more about PlaceObject3
 	* server/fill_style.cpp: use an int for the temporary num_gradients.
 	* server/textformat.cpp: warn once about unimplemented TextFormat.
 	* server/asobj/LoadVars.cpp: don't trace onData and onLoad methods

@@ -44,8 +44,9 @@ PlaceObject2Tag::readPlaceObject(stream& in)
 
 	IF_VERBOSE_PARSE
 	(
-		log_parse(_("  char_id = %d"), m_character_id);
-		log_parse(_("  depth = %d (%d)"), m_depth, m_depth-character::staticDepthOffset);
+        	log_parse(_("  PLACEOBJECT: depth=%d(%d) char=%d"),
+			m_depth, m_depth-character::staticDepthOffset,
+			m_character_id);
 		m_matrix.print();
 	);
 
@@ -326,22 +327,34 @@ PlaceObject2Tag::readPlaceObject3(stream& in)
 
     m_depth = in.read_u16() + character::staticDepthOffset;
 
+    IF_VERBOSE_PARSE (
+        log_parse(_("  PLACEOBJECT3: depth = %d (%d)"), m_depth, m_depth-character::staticDepthOffset);
+	// TODO: add more info here
+    );
+
     if (has_char)
     {
         in.ensureBytes(2);
         m_character_id = in.read_u16();
+        IF_VERBOSE_PARSE (
+        log_parse("   char:%d", m_character_id);
+        );
     }
 
     if (hasClassName || (hasImage && has_char) )
     {
         log_unimpl("PLACEOBJECT3 with associated class name");
         in.read_string(className);
+        IF_VERBOSE_PARSE (
+        log_parse("   className:%s", className.c_str());
+        );
     }
 
     if (has_matrix)
     {
         m_has_matrix = true;
         m_matrix.read(in);
+
     }
 
     if (has_cxform)
@@ -371,6 +384,23 @@ PlaceObject2Tag::readPlaceObject3(stream& in)
     {
         m_clip_depth = character::noClipDepthValue;
     }
+
+    IF_VERBOSE_PARSE
+    (
+    	if (has_matrix) {
+        	log_parse("   matrix:");
+		m_matrix.print();
+	}
+    	if (has_cxform) {
+        	log_parse("   cxform:");
+        	m_color_transform.print();
+	}
+    	if (has_ratio)  log_parse("   ratio:%d", m_ratio);
+    	if (m_has_name) log_parse("   name:%s", m_name.c_str());
+
+    	if (has_clip_depth)
+		log_parse("   clip_depth:%d(%d)", m_clip_depth, m_clip_depth-character::staticDepthOffset);
+    );
 
     if (has_filters)
     {
@@ -522,11 +552,6 @@ void
 PlaceObject2Tag::loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::PLACEOBJECT || tag == SWF::PLACEOBJECT2 || tag == SWF::PLACEOBJECT3);
-
-    IF_VERBOSE_PARSE
-    (
-	log_parse(_("  place_object_2"));
-    );
 
     // TODO: who owns and is going to remove this tag ?
     PlaceObject2Tag* ch = new PlaceObject2Tag(*m);
