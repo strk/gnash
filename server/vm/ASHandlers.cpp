@@ -1407,7 +1407,11 @@ SWFHandlers::ActionCastOp(ActionExec& thread)
 		env.top(0).set_null(); // null, not undefined.
 	}
 
-	log_debug(_("ActionCastOp TESTING"));
+	static bool warned=false;
+	if ( ! warned ) {
+		log_debug(_("ActionCastOp TESTING"));
+		warned=true;
+	}
 }
 
 void
