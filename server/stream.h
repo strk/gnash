@@ -108,11 +108,17 @@ public:
 	///
 	float	read_short_sfixed();
 
-	/// Read a 16bit floating point value
+	/// Read a 16bit (1:sign 5:exp 10:mantissa) floating point value
 	//
 	/// aligned read
 	///
-	float	read_float();
+	float	read_short_float();
+
+	/// Read a 32bit (1:sign 8:exp 23:mantissa) floating point value
+	//
+	/// aligned read
+	///
+	float	read_long_float();
 
 	/// Read a 64-bit double value
 	//

@@ -1,5 +1,13 @@
 2008-03-14 Sandro Santilli <strk@keybit.net>
 
+	* server/stream.{cpp,h}: substitute the ambiguos read_float
+	  with read_short_float and read_long_float.
+	* server/parser/filter_factory.cpp: use read_long_float for
+	  bitmap filter parsing (fixes a parse error in sevenload.de
+	  player.swf); more verbose parsing.
+
+2008-03-14 Sandro Santilli <strk@keybit.net>
+
 	* server/swf/PlaceObject2Tag.cpp: log more about PlaceObject3
 	* server/fill_style.cpp: use an int for the temporary num_gradients.
 	* server/textformat.cpp: warn once about unimplemented TextFormat.

@@ -217,11 +217,22 @@ float	stream::read_short_sfixed()
 	return static_cast<float> ( read_s16() / 256.0f );
 }
 
-// Read a signed float value.
-float	stream::read_float()
+/// Read a 16bit (1:sign 5:exp 10:mantissa) floating point value
+float	stream::read_short_float()
 {
-	// align(); // read_s16 will align
+	// read_s16 will align
 	return static_cast<float> ( read_s16() );
+}
+
+/// Read a 32bit (1:sign 8:exp 23:mantissa) floating point value
+float	stream::read_long_float()
+{
+	char data[4];
+	data[0] = read_u8();
+	data[1] = read_u8();
+	data[2] = read_u8();
+	data[3] = read_u8();
+	return *((float *)data);
 }
 
 // Read a 64-bit double value

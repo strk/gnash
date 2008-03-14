@@ -55,6 +55,10 @@ int const filter_factory::read(stream& in,
         count = static_cast<int> (in.read_u8());
     }
 
+    IF_VERBOSE_PARSE(
+    log_parse("   number of filters: %d", count);
+    );
+
     for (int i = 0; i < count; ++i)
     {
         BitmapFilter *the_filter = NULL;
@@ -131,6 +135,11 @@ bool DropShadowFilter::read(stream& in)
 
     static_cast<void> (in.read_uint(5)); // Throw these away on purpose.
 
+    IF_VERBOSE_PARSE(
+    log_parse("   DropShadowFilter: blurX=%f blurY=%f",
+        m_blurX, m_blurY);
+    );
+
     return true;
 }
 
@@ -144,6 +153,11 @@ bool BlurFilter::read(stream& in)
     m_quality = static_cast<boost::uint8_t> (in.read_uint(5));
 
     static_cast<void> (in.read_uint(3)); // Throw these away.
+
+    IF_VERBOSE_PARSE(
+    log_parse("   BlurFilter: blurX=%f blurY=%f quality=%d",
+        m_blurX, m_blurY, m_quality);
+    );
 
     return true;
 }
@@ -164,6 +178,10 @@ bool GlowFilter::read(stream& in)
     m_knockout = in.read_bit(); 
 
     static_cast<void> (in.read_uint(6)); // Throw these away.
+
+    IF_VERBOSE_PARSE(
+    log_parse("   GlowFilter ");
+    );
 
     return true;
 }
@@ -198,6 +216,10 @@ bool BevelFilter::read(stream& in)
     m_type = on_top ? (inner_shadow ? FULL_BEVEL : OUTER_BEVEL) : INNER_BEVEL;
     
     static_cast<void> (in.read_uint(4)); // Throw these away.
+
+    IF_VERBOSE_PARSE(
+    log_parse("   BevelFilter ");
+    );
 
     return true;
 }
@@ -242,6 +264,10 @@ bool GradientGlowFilter::read(stream& in)
 
     m_quality = static_cast<boost::uint8_t> (in.read_uint(4));
 
+    IF_VERBOSE_PARSE(
+    log_parse("   GradientGlowFilter ");
+    );
+
     return true;
 }
 
@@ -249,11 +275,11 @@ bool ConvolutionFilter::read(stream& in)
 {
     in.ensureBytes(2 + 8);
 
-    m_matrixX = in.read_u8();
-    m_matrixY = in.read_u8();
+    m_matrixX = in.read_u8(); // 1 byte
+    m_matrixY = in.read_u8(); // 1 byte
 
-    m_divisor = in.read_float();
-    m_bias = in.read_float();
+    m_divisor = in.read_long_float(); // 4 bytes
+    m_bias = in.read_long_float(); // 4 bytes
 
     size_t matrixCount = m_matrixX * m_matrixY;
 
@@ -262,7 +288,7 @@ bool ConvolutionFilter::read(stream& in)
     m_matrix.reserve(matrixCount);
     for (size_t i = 0; i < matrixCount; ++i)
     {
-        m_matrix.push_back(in.read_float());
+        m_matrix.push_back(in.read_long_float());
     }
 
     m_color = in.read_u8() << 16 + in.read_u8() << 8 + in.read_u8();
@@ -272,6 +298,10 @@ bool ConvolutionFilter::read(stream& in)
 
     m_clamp = in.read_bit(); 
     m_preserveAlpha = in.read_bit(); 
+
+    IF_VERBOSE_PARSE(
+    log_parse("   ConvolutionFilter ");
+    );
 
     return true;
 }
@@ -283,8 +313,20 @@ bool ColorMatrixFilter::read(stream& in)
     m_matrix.reserve(20);
     for (int i = 0; i < 20; ++i)
     {
-        m_matrix.push_back(in.read_float());
+        m_matrix.push_back(in.read_long_float());
     }
+
+    IF_VERBOSE_PARSE(
+    log_parse("   ColorMatrixFilter: ");
+    log_parse("     %g, %g, %g, %g, %g",
+        m_matrix[0], m_matrix[1], m_matrix[2], m_matrix[3], m_matrix[4]);
+    log_parse("     %g, %g, %g, %g, %g",
+        m_matrix[5], m_matrix[6], m_matrix[7], m_matrix[8], m_matrix[9]);
+    log_parse("     %g, %g, %g, %g, %g",
+        m_matrix[10], m_matrix[11], m_matrix[12], m_matrix[13], m_matrix[14]);
+    log_parse("     %g, %g, %g, %g, %g",
+        m_matrix[15], m_matrix[16], m_matrix[17], m_matrix[18], m_matrix[19]);
+    );
 
     return true;
 }
@@ -326,6 +368,10 @@ bool GradientBevelFilter::read(stream& in)
     m_type = outer ? (inner ? FULL_BEVEL : OUTER_BEVEL) : INNER_BEVEL;
 
     m_quality = static_cast<boost::uint8_t> (in.read_uint(4));
+
+    IF_VERBOSE_PARSE(
+    log_parse("   GradientBevelFilter ");
+    );
 
     return true;
 }
