@@ -1,5 +1,8 @@
 2008-03-14 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.cpp (cleanDisplayList): make sure NO unloaded
+	  characters are in the live instances container after a call to
+	  this method.
 	* testsuite/actionscript.all/Inheritance.as: test gaps in the
 	  inheritance chain. Gnash fails for SWF>6.
 

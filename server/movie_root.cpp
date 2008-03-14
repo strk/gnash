@@ -1571,14 +1571,6 @@ movie_root::markReachableResources() const
         }
     }
 
-    // NOTE: cleanupUnloadedListeners should have cleaned up all unloaded key listeners 
-    //       the remaining ones should be marked by their parents
-    //std::for_each(m_key_listeners.begin(), m_key_listeners.end(), boost::bind(&character::setReachable, _1));
-
-    // NOTE: cleanupUnloadedListeners should have cleaned up all unloaded mouse listeners 
-    //       the remaining ones should be marked by their parents
-    //std::for_each(m_mouse_listeners.begin(), m_mouse_listeners.end(), boost::bind(&character::setReachable, _1));
-
     // Mark global Key object
     if ( _keyobject ) _keyobject->setReachable();
 
@@ -1593,6 +1585,14 @@ movie_root::markReachableResources() const
     //       parent.
     //std::for_each(_liveChars.begin(), _liveChars.end(), boost::bind(&character::setReachable, _1));
     
+    // NOTE: cleanupUnloadedListeners should have cleaned up all unloaded key listeners 
+    //       the remaining ones should be marked by their parents
+    //std::for_each(m_key_listeners.begin(), m_key_listeners.end(), boost::bind(&character::setReachable, _1));
+
+    // NOTE: cleanupUnloadedListeners should have cleaned up all unloaded mouse listeners 
+    //       the remaining ones should be marked by their parents
+    //std::for_each(m_mouse_listeners.begin(), m_mouse_listeners.end(), boost::bind(&character::setReachable, _1));
+
 }
 #endif // GNASH_USE_GC
 
@@ -1629,33 +1629,6 @@ movie_root::cleanupDisplayList()
 	static size_t maxLiveChars = 0;
 #endif
 
-	// Remove unloaded characters from the _liveChars list
-	for (LiveChars::iterator i=_liveChars.begin(), e=_liveChars.end(); i!=e;)
-	{
-		AdvanceableCharacter ch = *i;
-		if ( ch->isUnloaded() )
-		{
-			// the sprite might have been destroyed already
-			// by effect of an unload() call with no onUnload
-			// handlers available either in self or child
-			// characters
-			if ( ! ch->isDestroyed() ) ch->destroy();
-			i = _liveChars.erase(i);
-		}
-		else
-		{
-			++i;
-		}
-	}
-
-#ifdef GNASH_DEBUG_INSTANCE_LIST
-	if ( _liveChars.size() > maxLiveChars )
-	{
-		maxLiveChars = _liveChars.size();
-		log_debug("Global instance list grew to " SIZET_FMT " entries", maxLiveChars);
-	}
-#endif
-
 	// Let every sprite cleanup the local DisplayList
         //
         // TODO: we might skip this additinal scan by delegating
@@ -1675,6 +1648,77 @@ movie_root::cleanupDisplayList()
         {
                 i->second->cleanupDisplayList();
         }
+
+	// Now remove from the instance list any unloaded character
+	// Note that some characters may be unloaded but not yet destroyed,
+	// in this case we'll also destroy them, which in turn might unload
+	// further characters, maybe already scanned, so we keep scanning
+	// the list until no more unloaded-but-non-destroyed characters
+	// are found.
+	// Keeping unloaded-but-non-destroyed characters wouldn't really hurt
+	// in that ::advanceLiveChars would skip any unloaded characters.
+	// Still, the more we remove the less work GC has to do...
+	//
+
+	bool needScan;
+#ifdef GNASH_DEBUG_DLIST_CLEANUP
+	int scansCount = 0;
+#endif
+	do {
+#ifdef GNASH_DEBUG_DLIST_CLEANUP
+		scansCount++;
+		int cleaned =0;
+#endif
+		needScan=false;
+		// Remove unloaded characters from the _liveChars list
+		for (LiveChars::iterator i=_liveChars.begin(), e=_liveChars.end(); i!=e;)
+		{
+			AdvanceableCharacter ch = *i;
+			if ( ch->isUnloaded() )
+			{
+				// the sprite might have been destroyed already
+				// by effect of an unload() call with no onUnload
+				// handlers available either in self or child
+				// characters
+				if ( ! ch->isDestroyed() )
+				{
+#ifdef GNASH_DEBUG_DLIST_CLEANUP
+					cout << ch->getTarget() << "(" << typeName(*ch) << ") was unloaded but not destroyed, destroying now" << endl;
+#endif
+					ch->destroy();
+					needScan=true; // ->destroy() might mark already-scanned chars as unloaded
+				}
+#ifdef GNASH_DEBUG_DLIST_CLEANUP
+				else
+				{
+					cout << ch->getTarget() << "(" << typeName(*ch) << ") was unloaded and destroyed" << endl;
+				}
+#endif
+
+				i = _liveChars.erase(i);
+
+#ifdef GNASH_DEBUG_DLIST_CLEANUP
+				cleaned++;
+#endif
+			}
+			else
+			{
+				++i;
+			}
+		}
+#ifdef GNASH_DEBUG_DLIST_CLEANUP
+		cout << " Scan " << scansCount << " cleaned " << cleaned << " instances" << endl;
+#endif
+	} while (needScan);
+
+#ifdef GNASH_DEBUG_INSTANCE_LIST
+	if ( _liveChars.size() > maxLiveChars )
+	{
+		maxLiveChars = _liveChars.size();
+		log_debug("Global instance list grew to " SIZET_FMT " entries", maxLiveChars);
+	}
+#endif
+
 }
 
 /*static private*/
