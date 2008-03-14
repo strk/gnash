@@ -742,6 +742,9 @@ as_environment::dump_local_registers(std::ostream& out) const
 {
 	if ( _localFrames.empty() ) return;
 	out << "Local registers: ";
+#ifndef DUMP_LOCAL_REGISTERS_IN_ALL_CALL_FRAMES
+	dump(_localFrames.back().registers, out);
+#else
 	for (CallStack::const_iterator it=_localFrames.begin(),
 			itEnd=_localFrames.end();
 			it != itEnd; ++it)
@@ -749,6 +752,7 @@ as_environment::dump_local_registers(std::ostream& out) const
 		if ( it != _localFrames.begin() ) out << " | ";
 		dump(it->registers, out);
 	}
+#endif
 	out << std::endl;
 }
 
@@ -775,6 +779,9 @@ as_environment::dump_local_variables(std::ostream& out) const
 {
 	if ( _localFrames.empty() ) return;
 	out << "Local variables: ";
+#ifndef DUMP_LOCAL_VARIABLES_IN_ALL_CALL_FRAMES
+	dump(_localFrames.back().locals, out);
+#else
 	for (CallStack::const_iterator it=_localFrames.begin(),
 			itEnd=_localFrames.end();
 			it != itEnd; ++it)
@@ -782,6 +789,7 @@ as_environment::dump_local_variables(std::ostream& out) const
 		if ( it != _localFrames.begin() ) out << " | ";
 		dump(it->locals, out);
 	}
+#endif
 	out << std::endl;
 }
 

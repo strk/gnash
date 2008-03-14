@@ -1,5 +1,8 @@
 2008-03-14 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.cpp: when dumping local registers and
+	  variables only show the ones in current (top) call frame, not
+	  all of them.
 	* server/stream.{cpp,h}: substitute the ambiguos read_float
 	  with read_short_float and read_long_float.
 	* server/parser/filter_factory.cpp: use read_long_float for
