@@ -25,6 +25,8 @@
 #include "namedStrings.h"
 #include "VM.h"
 
+#define ONCE(x) { static bool warned=false; if (!warned) { warned=true; x; } }
+
 namespace gnash {  
 
   text_format::text_format() :
@@ -122,7 +124,7 @@ as_value textformat_new(const fn_call& /* fn */)
   //log_debug(_("%s: args=%d"), __FUNCTION__, nargs);
 
   boost::intrusive_ptr<textformat_as_object> text_obj = new textformat_as_object;
-  log_unimpl(_("Created New TextFormat object at %p.  Not fully implemented yet"), (void*)text_obj.get());
+  ONCE(log_unimpl("TextFormat"));
   
   // tulrich: this looks like it's inserting a method into our
   // caller's env.  setTextFormat is a method on TextField.  So here

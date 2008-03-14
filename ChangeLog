@@ -1,5 +1,13 @@
 2008-03-14 Sandro Santilli <strk@keybit.net>
 
+	* server/fill_style.cpp: use an int for the temporary num_gradients.
+	* server/textformat.cpp: warn once about unimplemented TextFormat.
+	* server/asobj/LoadVars.cpp: don't trace onData and onLoad methods
+	  enter.
+	* server/asobj/MovieClipLoader.cpp: don't trace MovieClip destruction.
+
+2008-03-14 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (sprite_startDrag): handle
 	  NaN args (we should probably use ints for dragging in
 	  general). Fixes bug #22592.

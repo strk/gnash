@@ -143,7 +143,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md,
 		// num_gradients is not 8 bits, it is only the last 4.
 		// at the moment, the first four are unused, so we may
 		// mask, but this needs to be changed.
-        boost::uint8_t num_gradients = in->read_u8() & 15;
+        unsigned int num_gradients = in->read_u8() & 15;
         if ( ! num_gradients )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
@@ -156,15 +156,17 @@ fill_style::read(stream* in, int tag_type, movie_definition* md,
 			tag_type == SWF::DEFINESHAPE4_) ? 7 : 0))
         {
             // see: http://sswf.sourceforge.net/SWFalexref.html#swf_gradient
-            log_error(_("Unexpected num gradients (%d), expected 1 to 8"),
-                    static_cast<int>(num_gradients));
+		IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("Unexpected num gradients (%d), expected 1 to 8"),
+                    num_gradients);
+		);
         }			
 
 		if (is_morph)
 			pOther->m_gradients.resize(num_gradients);
 
         m_gradients.resize(num_gradients);
-   	    for (int i = 0; i < num_gradients; i++)	{
+   	    for (unsigned int i = 0; i < num_gradients; i++)	{
        	    m_gradients[i].read(in, tag_type);
 			if (is_morph)
 				pOther->m_gradients[i].read(in, tag_type);

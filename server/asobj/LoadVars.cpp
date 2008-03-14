@@ -473,7 +473,7 @@ LoadVars::getBytesTotal_method(const fn_call& fn)
 as_value
 LoadVars::onData_method(const fn_call& fn)
 {
-	GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
 
 	as_object* thisPtr = fn.this_ptr.get();
 	if ( ! thisPtr ) return as_value();
@@ -507,7 +507,7 @@ LoadVars::onData_method(const fn_call& fn)
 as_value
 LoadVars::onLoad_method(const fn_call& /*fn*/)
 {
-	GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
 	return as_value();
 }
 

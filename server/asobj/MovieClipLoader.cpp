@@ -186,7 +186,7 @@ MovieClipLoader::MovieClipLoader()
 
 MovieClipLoader::~MovieClipLoader()
 {
-	GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
 }
 
 bool
