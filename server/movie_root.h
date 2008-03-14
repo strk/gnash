@@ -79,6 +79,10 @@
 #include "smart_ptr.h" // for memory management
 #include "URL.h" // for loadMovie
 
+#ifdef USE_MENUS
+# include "tree.hh"
+#endif
+
 #include <vector>
 #include <list>
 #include <set>
@@ -664,6 +668,11 @@ public:
 	{
 	   	interfaceHandle = handler;
 	}
+
+#ifdef USE_MENUS
+    typedef std::pair<std::string, std::string> StringPair;
+    void getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator& it);
+#endif
 
 private:
 

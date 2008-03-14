@@ -880,6 +880,8 @@ Gui::getMovieInfo() const
 {
     std::auto_ptr<InfoTree> tr;
 
+#ifdef USE_MENUS // This could be further expanded to avoid tree entirely.
+
     if ( ! VM::isInitialized() )
     {
         return tr;
@@ -892,8 +894,8 @@ Gui::getMovieInfo() const
     // 2. "Stage" information
     // 3. ...
 
-    InfoTree::iterator_base topIter = tr->begin();
-    InfoTree::iterator_base firstLevelIter;
+    InfoTree::iterator topIter = tr->begin();
+    InfoTree::iterator firstLevelIter;
 
     VM& vm = VM::get();
 
@@ -905,41 +907,9 @@ Gui::getMovieInfo() const
     os << "SWF " << vm.getSWFVersion();
     topIter = tr->insert(topIter, StringPair("VM version", os.str()));
 
-    //
-    /// Stage
-    //
+
     movie_root& stage = vm.getRoot();
-    boost::intrusive_ptr<movie_instance> level0 = stage.getRootMovie();
-    movie_definition* def0 = level0->get_movie_definition();
-    assert(def0);
-
-    topIter = tr->insert(topIter, StringPair("Stage Properties", ""));
-
-    os.str("");
-    os << "SWF " << def0->get_version();
-    firstLevelIter = tr->append_child(topIter, StringPair("SWF version", os.str()));
-    firstLevelIter = tr->append_child(topIter, StringPair("URL", def0->get_url()));
-    
- 
-    /// Stage: real dimensions.
-    os.str("");
-    os << def0->get_width_pixels() <<
-        "x" << def0->get_height_pixels();
-    firstLevelIter = tr->append_child(topIter, StringPair("Real dimensions", os.str()));
-
-    /// Stage: real dimensions.
-    os.str("");
-    os << stage.getWidth() <<
-        "x" << stage.getHeight();
-    firstLevelIter = tr->append_child(topIter, StringPair("Rendered dimensions", os.str()));
-
-    /// Stage: scaling allowed.
-    firstLevelIter = tr->append_child(topIter, StringPair("Scaling allowed",
-                stage.isRescalingAllowed() ? "yes" : "no"));
-
-    // Stage: scripts state (enabled/disabled)
-    firstLevelIter = tr->append_child(topIter, StringPair("Scripts",
-                stage.scriptsDisabled() ? " disabled" : "enabled"));
+    stage.getMovieInfo(*tr, topIter);
 
     //
     /// Mouse entities
@@ -993,6 +963,8 @@ Gui::getMovieInfo() const
     }
 
     tr->sort(firstLevelIter.begin(), firstLevelIter.end());
+
+#endif
 
     return tr;
 }

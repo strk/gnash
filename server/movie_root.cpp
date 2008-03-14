@@ -44,6 +44,10 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/bind.hpp>
 
+#ifdef USE_MENUS
+# include "tree.hh"
+#endif
+
 //#define GNASH_DEBUG 1
 //#define GNASH_DEBUG_LOADMOVIE_REQUESTS_PROCESSING 1
 //#define GNASH_DEBUG_TIMERS_EXPIRATION 1
@@ -1890,6 +1894,96 @@ movie_root::isLevelTarget(const std::string& name, unsigned int& levelno)
   return true;
 
 }
+
+#ifdef USE_MENUS
+void
+movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator& it)
+{
+
+    const std::string yes = _("yes");
+    const std::string no = _("no");
+
+    tree<StringPair>::iterator localIter;
+
+    //
+    /// Stage
+    //
+    movie_definition* def0 = get_movie_definition();
+    assert(def0);
+
+    it = tr.insert(it, StringPair("Stage Properties", ""));
+
+    std::ostringstream os;
+    os << "SWF " << def0->get_version();
+    localIter = tr.append_child(it, StringPair("SWF version", os.str()));
+    localIter = tr.append_child(it, StringPair("URL", def0->get_url()));
+    
+ 
+    /// Stage: real dimensions.
+    os.str("");
+    os << def0->get_width_pixels() <<
+        "x" << def0->get_height_pixels();
+    localIter = tr.append_child(it, StringPair("Real dimensions", os.str()));
+
+    /// Stage: rendered dimensions.
+    os.str("");
+    os << m_viewport_width << "x" << m_viewport_height;
+    localIter = tr.append_child(it, StringPair("Rendered dimensions", os.str()));
+
+    /// Stage: pixel scale
+    os.str("");
+    os << m_pixel_scale;
+    localIter = tr.append_child(it, StringPair("Pixel scale", os.str()));
+
+    /// Stage: timer
+    os.str("");
+    os << m_timer;
+    localIter = tr.append_child(it, StringPair("Timer value", os.str()));
+
+    /// Stage: scaling allowed.
+    localIter = tr.append_child(it, StringPair("Scaling allowed",
+                _allowRescale ? yes : no));
+
+    // Stage: scripts state (enabled/disabled)
+    localIter = tr.append_child(it, StringPair("Scripts",
+                _disableScripts ? " disabled" : "enabled"));
+                
+    /// Stage: number of live characters
+    os.str("");
+    os << _liveChars.size();
+    localIter = tr.append_child(it, StringPair(_("Live characters"), os.str()));
+
+    /// Live characters tree
+	for (LiveChars::const_iterator i=_liveChars.begin(), e=_liveChars.end();
+	                                                           i != e; ++i)
+	{
+	    tree<StringPair>::iterator charIter = tr.append_child(localIter,
+	                    StringPair((*i)->getTarget(), typeName(*(*i))));
+
+        os.str("");
+        os << (*i)->get_depth();
+	    tr.append_child(charIter, StringPair(_("Depth"), os.str()));
+
+        os.str("");
+        os << (*i)->get_ratio();
+	    tr.append_child(charIter, StringPair(_("Ratio"), os.str()));	    
+
+        os.str("");
+        os << (*i)->get_clip_depth();
+	    tr.append_child(charIter, StringPair(_("Clipping depth"), os.str()));	    
+
+        os.str("");
+        os << (*i)->get_width() << "x" << (*i)->get_height();
+	    tr.append_child(charIter, StringPair(_("Dimensions"), os.str()));	
+
+	    tr.append_child(charIter, StringPair(_("Dynamic"), (*i)->isDynamic() ? yes : no));	
+	    tr.append_child(charIter, StringPair(_("Mask"), (*i)->isMaskLayer() ? yes : no));	    
+	    tr.append_child(charIter, StringPair(_("Destroyed"), (*i)->isDestroyed() ? yes : no));
+	    tr.append_child(charIter, StringPair(_("Unloaded"), (*i)->isUnloaded() ? yes : no));
+    }
+
+}
+#endif
 
 } // namespace gnash
 

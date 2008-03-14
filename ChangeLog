@@ -1,3 +1,11 @@
+2008-03-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/movie_root.{h,cpp}: add getMovieInfo() to fill the info tree
+	  with data. Added more data about movie stage and from public methods
+	  of gnash::character. This class will eventually get its own tree
+	  filler method.
+	* gui/gui.cpp: delegate some tree filling to movie_root.
+
 2008-03-14 Sandro Santilli <strk@keybit.net>
 
 	* server/font.cpp (read_font_info): initialize the device font
