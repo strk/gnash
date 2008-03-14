@@ -1,3 +1,9 @@
+2008-03-14 Sandro Santilli <strk@keybit.net>
+
+	* server/video_stream_instance.h: implement pointInShape (for the
+	  sake of removing the error log in default implementation, but
+	  it does the same thing as the former).
+
 2008-03-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/tree.hh: update to version 2.51

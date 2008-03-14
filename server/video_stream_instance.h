@@ -50,6 +50,12 @@ public:
 
 	~video_stream_instance();
 
+	virtual bool pointInShape(float x, float y) const
+	{
+		// video character shape is always a rectangle..
+		return pointInBounds(x, y);
+	}
+
 	geometry::Range2d<float> getBounds() const
 	{
 		// TODO: return the bounds of the dynamically
