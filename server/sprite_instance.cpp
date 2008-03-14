@@ -1774,6 +1774,13 @@ sprite_startDrag(const fn_call& fn)
             float x1 = PIXELS_TO_TWIPS(fn.arg(3).to_number());
             float y1 = PIXELS_TO_TWIPS(fn.arg(4).to_number());
 
+            // check for infinite values
+            bool gotinf = false;
+            if ( ! isfinite(x0) ) { x0=0; gotinf=true; }
+            if ( ! isfinite(y0) ) { y0=0; gotinf=true; }
+            if ( ! isfinite(x1) ) { x1=0; gotinf=true; }
+            if ( ! isfinite(y1) ) { y1=0; gotinf=true; }
+
             // check for swapped values
             bool swapped = false;
             if ( y1 < y0 )
@@ -1789,9 +1796,12 @@ sprite_startDrag(const fn_call& fn)
             }
 
             IF_VERBOSE_ASCODING_ERRORS(
-            if ( swapped ) {
+            if ( gotinf || swapped ) {
                 std::stringstream ss; fn.dump_args(ss);
-                log_aserror(_("min/max bbox values in MovieClip.startDrag(%s) swapped, fixing"), ss.str().c_str());
+		if ( swapped ) 
+		  log_aserror(_("min/max bbox values in MovieClip.startDrag(%s) swapped, fixing"), ss.str().c_str());
+		if ( gotinf )
+                  log_aserror(_("non-finite bbox values in MovieClip.startDrag(%s), took as zero"), ss.str().c_str());
             }
             );
 

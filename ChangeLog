@@ -1,3 +1,9 @@
+2008-03-14 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (sprite_startDrag): handle
+	  NaN args (we should probably use ints for dragging in
+	  general). Fixes bug #22592.
+
 2008-03-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/fill_style.cpp: cast uint8_t to int before logging.
