@@ -224,15 +224,54 @@ float	stream::read_short_float()
 	return static_cast<float> ( read_s16() );
 }
 
+// Read a little-endian 32-bit float from p
+// and return it as a host-endian float.
+static float
+convert_float_little(const void *p)
+{
+	// Hairy union for endian detection and munging
+	union {
+		float	f;
+		boost::uint32_t i;
+		struct {	// for endian detection
+			boost::uint16_t s0;
+			boost::uint16_t s1;
+		} s;
+		struct {	// for byte-swapping
+			boost::uint8_t c0;
+			boost::uint8_t c1;
+			boost::uint8_t c2;
+			boost::uint8_t c3;
+		} c;
+	} u;
+
+	u.f = 1.0;
+	switch (u.s.s0) {
+	case 0x0000:	// little-endian host
+		memcpy(&u.i, p, 4);
+		break;
+	case 0x3f80:	// big-endian host
+	    {
+		const boost::uint8_t *cp = (const boost::uint8_t *) p;
+		u.c.c0 = cp[3];
+		u.c.c1 = cp[2];
+		u.c.c2 = cp[1];
+		u.c.c3 = cp[0];
+	    }
+	    break;
+	default:
+	    log_error(_("Native floating point format not recognised"));
+	    abort();
+	}
+	
+	return u.f;
+}
+
 /// Read a 32bit (1:sign 8:exp 23:mantissa) floating point value
 float	stream::read_long_float()
 {
-	char data[4];
-	data[0] = read_u8();
-	data[1] = read_u8();
-	data[2] = read_u8();
-	data[3] = read_u8();
-	return *((float *)data);
+	char data[4]; read(data, 4); // would align
+	return convert_float_little(data); 
 }
 
 // Read a 64-bit double value

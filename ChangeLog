@@ -1,3 +1,9 @@
+2008-03-15 Sandro Santilli <strk@keybit.net>
+
+	* server/stream.cpp: use the float conversion function found
+	  in action_buffer, hopefully working fine on big endian hosts
+	  (to be tested).
+
 2008-03-14  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* doc/C/Makefile.am: Install the preformatted info pages too.
