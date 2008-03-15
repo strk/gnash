@@ -113,7 +113,7 @@ cout << _("Usage: gnash [options] movie_file.swf") << endl
     << _("  -V,  --version           Print gnash's version number and exit") << endl
     << _("  -F,  --fd <fd>           Filedescriptor to use for external communications") << endl
 #ifdef GNASH_FPS_DEBUG
-    << _("  -f,  --debug-fps num     Print FPS every num seconds (float)." << endl
+    << _("  -f,  --debug-fps num     Print FPS every num seconds (float).") << endl
 #endif // def GNASH_FPS_DEBUG
     << endl
     << _("Keys:") << endl
