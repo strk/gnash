@@ -283,6 +283,8 @@ else
 	echo "Using preformtted output file,"
 	$(LN_S) -f $(srcdir)/preformatted/gnash_user.info.in gnash_user.info
 	$(LN_S) -f $(srcdir)/preformatted/gnash_ref.info.in gnash_ref.info
+        $(INSTALL_INFO) --entry="\"Gnash User Manual: (gnash_user)	Gnash User Manual\"" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash_user.info
+	$(INSTALL_INFO) --entry="\"Gnash Reference Manual (gnash_ref)	Gnash Reference Manual\"" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash_ref.info
 endif
 
 uninstall-info-hook:

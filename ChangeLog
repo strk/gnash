@@ -1,5 +1,7 @@
 2008-03-14  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* doc/C/Makefile.am: Install the preformatted info pages too.
+
 	* macros/kde.m4: Set plugin paths here instead of configure.ac.
 	* configure.ac: Move Kparts config code to kde.m4. Default to
 	$HOME/.kde instead of system wide, fixing all installation
