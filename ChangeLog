@@ -1,3 +1,8 @@
+2008-03-15 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Inheritance.as: finally some more failing 
+	  tests (equivalent to swfdec's super-missing-{7,8}.swf)
+
 2008-03-15 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gnash.cpp: change / add some long options and update help output.

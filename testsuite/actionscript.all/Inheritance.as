@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.54 2008/03/15 10:42:08 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.55 2008/03/15 13:01:31 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Object.prototype.constructor), 'function');
@@ -310,6 +310,31 @@ n = co.myName();
  check_equals(ActorCalls, 0); 
 #endif
 
+// Now test 'super' at the top of the inheritance chain
+F.prototype.myName = function() { super(); return super.myName()+"F"; };
+FctorCalls=0;
+BctorCalls=0;
+ActorCalls=0;
+n = co.myName();
+#if OUTPUT_VERSION < 6 
+ check_equals(n, "C"); // no super
+ check_equals(FctorCalls, 0); // no super
+ check_equals(BctorCalls, 0); // no super
+ check_equals(ActorCalls, 0); // no super
+#endif
+#if OUTPUT_VERSION == 6 
+ check_equals(co.myName(), "FFFC"); // super in C references F proto 
+ check_equals(FctorCalls, 2); // and all ctors are called twice ?
+ check_equals(BctorCalls, 2); 
+ check_equals(ActorCalls, 2); 
+#endif
+#if OUTPUT_VERSION > 6
+ xcheck_equals(co.myName(), "undefinedFFC");  // gnash gives undefinedFC here
+ xcheck_equals(FctorCalls, 2); // gnash gives 0 here
+ xcheck_equals(BctorCalls, 2); // gnash gives 3 here
+ check_equals(ActorCalls, 0); 
+#endif
+
 //------------------------------------------------
 //
 //------------------------------------------------
@@ -496,7 +521,7 @@ check(t4 instanceOf Test4);
 check(! t4 instanceOf Test5);
 
 #if OUTPUT_VERSION < 6
- check_totals(97); // SWF5
+ check_totals(101); // SWF5
 #else
- check_totals(154); // SWF6,7,8
+ check_totals(158); // SWF6,7,8
 #endif
