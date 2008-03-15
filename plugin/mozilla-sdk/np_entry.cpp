@@ -137,11 +137,24 @@ DSOEXPORT static NPError fillNetscapeFunctionTable(NPNetscapeFuncs* aNPNFuncs)
 
 DSOEXPORT NPError OSCALL NP_Initialize(NPNetscapeFuncs* aNPNFuncs)
 {
+  /*
+   * N.B.  On Firefox 2.0.0.12/WinXP, aNPNFuncs->size is 172 while
+   * sizeof(NPNetscapeFuncs) is 184.  However, npgnash.dll continues to
+   * work fine even though NPNFuncs isn't populated (!), and as a matter
+   * of fact, Firefox seems to ignore the NPERR_INVALID_FUNCTABLE_ERROR
+   * return from NP_Initialize and continues to load and execute
+   * npgnash.dll, anyway.  Therefore, we should continue and execute
+   * NS_PluginInitialize anyway, too.
+   */
+
   NPError rv = fillNetscapeFunctionTable(aNPNFuncs);
+#if 0
   if(rv != NPERR_NO_ERROR)
     return rv;
+#endif
+  NPError rv2 = NS_PluginInitialize();
 
-  return NS_PluginInitialize();
+  return rv2 != NPERR_NO_ERROR ? rv2 : rv;
 }
 
 DSOEXPORT NPError OSCALL NP_GetEntryPoints(NPPluginFuncs* aNPPFuncs)
