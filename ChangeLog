@@ -48,7 +48,6 @@
 	* libbase/tree.hh: update to version 2.51
 	* server/movie_root.cpp: tinker with the tree a bit more.
 
->>>>>>> 1.5920
 2008-03-14 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/movie_root.{h,cpp}: add getMovieInfo() to fill the info tree
