@@ -202,7 +202,7 @@ swf_function::operator()(const fn_call& fn)
 		// @@ why start at 1 ? Note that starting at 0 makes	
 		// intro.swf movie fail to play correctly.
 		boost::uint8_t current_reg = 1;
-		if (m_function2_flags & PRELOAD_THIS)
+		if ( (m_function2_flags & PRELOAD_THIS) && ! (m_function2_flags & SUPPRESS_THIS) )
 		{
 			// preload 'this' into a register.
 			our_env->local_register(current_reg).set_as_object(fn.this_ptr); 

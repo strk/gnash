@@ -1,5 +1,11 @@
 2008-03-15 Sandro Santilli <strk@keybit.net>
 
+	* server/swf_function.cpp: don't put 'this' into a register if
+	  the SUPPRESS_THIS flag is on.
+	* testsuite/swfdec/PASSING: definefunction2-this.swf
+
+2008-03-15 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ASHandlers.cpp (CommonGetUrl): cast uint8_t to int when
 	  printing, fixing a failure in misc-mtasc testsuite (output log
 	  considered binary).
