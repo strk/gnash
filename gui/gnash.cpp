@@ -62,7 +62,7 @@ using std::endl;
 using std::cout;
 
 std::vector<std::string> infiles;
-const char* url = NULL;
+std::string url = "";
 
 namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
@@ -270,8 +270,8 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     player.setDelay( parser.argument<long>(i) );
                     break;
                 case 'u':
-                    url = parser.argument(i).c_str();
-                    log_debug (_("Setting root URL to %s"), url);
+                    url = parser.argument(i);
+                    log_debug (_("Setting root URL to %s"), url.c_str());
                     break;
                 case 'U':	// Set base URL
                     player.setBaseUrl(parser.argument(i));
@@ -436,5 +436,5 @@ gnash_main(int argc, char *argv[])
 	    return EXIT_FAILURE;
 	}
 
-	return player.run(argc, argv, infiles.front().c_str(), url);
+	return player.run(argc, argv, infiles.front().c_str(), url.c_str());
 }

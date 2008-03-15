@@ -1,3 +1,7 @@
+2008-03-15 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/gnash.cpp: mend url. Fixes bug #22609.
+
 2008-03-15 Sandro Santilli <strk@keybit.net>
 
 	* server/swf_function.cpp: don't put 'this' into a register if
