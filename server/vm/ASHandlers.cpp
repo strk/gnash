@@ -277,7 +277,7 @@ SWFHandlers::SWFHandlers()
     handlers[ACTION_GETPROPERTY] = ActionHandler(ACTION_GETPROPERTY,
              string("ActionGetProperty"), SWFHandlers::ActionGetProperty);
     handlers[ACTION_SETPROPERTY] = ActionHandler(ACTION_SETPROPERTY,
-             string("ActionSetpProperty"), SWFHandlers::ActionSetProperty);
+             string("ActionSetProperty"), SWFHandlers::ActionSetProperty);
     handlers[ACTION_DUPLICATECLIP] = ActionHandler(ACTION_DUPLICATECLIP,
              string("ActionDuplicateClip"), SWFHandlers::ActionDuplicateClip);
     handlers[ACTION_REMOVECLIP] = ActionHandler(ACTION_REMOVECLIP,
