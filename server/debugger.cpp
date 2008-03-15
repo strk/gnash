@@ -371,12 +371,7 @@ Debugger::disassemble(const unsigned char *data)
 	      cerr << "Got string (" << length << " bytes): " << "\"" << str << "\"" << endl;
 	      break;
 	  case ARG_HEX:
-	      for (int i = 0; i < length; i++) {
-		  hexify(num, (const unsigned char *)&data[3 + i], 1, false);
-		  cerr << "0x" << num << " ";
-	      }
-	      cerr << endl;
-//	      cerr << "FIXME: Got hex: " << num << endl;
+              cerr << hexify((const unsigned char *)&data[3], length, false) << endl;
 	      break;
 	  case ARG_U8:
 	      val = data[3];

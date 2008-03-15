@@ -1,5 +1,6 @@
 2008-03-15 Sandro Santilli <strk@keybit.net>
 
+	* server/debugger.cpp: fix compilation.
 	* server/vm/ASHadlers.cpp (ActionCallMethod): for SWF7+ compute
 	  super from the actual object containing the called function
 	  (also when finding out from super).
