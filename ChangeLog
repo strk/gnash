@@ -1,5 +1,19 @@
 2008-03-15  Dossy Shiobara <dossy@panoptic.com>
 
+	* plugin/win32/: plugin.cpp (1.15), plugin.h (1.11): Track whether
+	  the module was properly initialized (i.e., NS_PluginInitialize()
+	  was called) as it seems at least Firefox 2.0.0.12 on WinXP will
+	  continue to load and run npgnash.dll even if it hasn't been.
+
+	  Eliminated the (unnecessary?) getPluginDescription().  Matter of
+	  fact, NS_PluginGetValue() isn't used on XP_WIN builds at all.
+
+	  Reflect change in function name from
+	  gnash::register_fscommand_callback to
+	  gnash::registerFSCommandCallback.
+
+2008-03-15  Dossy Shiobara <dossy@panoptic.com>
+
 	* plugin/mozilla-sdk/np_entry.cpp (1.10): On Firefox
 	  2.0.0.12/WinXP, aNPNFuncs->size is 172 while
 	  sizeof(NPNetscapeFuncs) is 184.  However, npgnash.dll continues
