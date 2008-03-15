@@ -1,3 +1,12 @@
+2008-03-15 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/arg_parser.{cpp,h}: add slightly modified version of
+	  Antonio Diaz Diaz's C++ Arg_parser class.
+	* libbase/Makefile: build arg_parser.
+	* gui/gnash.cpp: use Arg_parser to add long options. Make --help
+	  more concise (we have a manual), abolish printf where it's not
+	  useful for translation (which is almost everywhere). 
+
 2008-03-15 Sandro Santilli <strk@keybit.net>
 
 	* server/debugger.cpp: fix compilation.

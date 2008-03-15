@@ -105,6 +105,7 @@ libgnashbase_la_SOURCES = \
 	FLVParser.cpp \
 	GC.cpp \
 	BitsReader.cpp \
+	arg_parser.cpp \
 	$(NULL)
 
 noinst_HEADERS = \
@@ -147,6 +148,7 @@ noinst_HEADERS = \
 	FLVParser.h \
 	GC.h \
 	BitsReader.h \
+	arg_parser.h \
 	$(NULL)
 
 libgnashbase_la_LDFLAGS = -release $(VERSION)
