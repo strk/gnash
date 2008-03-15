@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.51 2008/03/14 08:19:54 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.52 2008/03/15 08:29:21 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Object.prototype.constructor), 'function');
@@ -226,11 +226,11 @@ check_equals(DerivedClass.prototype.getThis(), DerivedClass.prototype);
 check_equals(super, undefined);
 
 
-function A() {}
+function A() { ActorCalls++; }
 A.prototype.whoami = function() {
 	return "A";
 };
-function B() {}
+function B() { BctorCalls++; }
 B.prototype = new A;
 bo = new B;
 check_equals(bo.whoami(), "A");
@@ -264,16 +264,32 @@ C.prototype.whoami = function() {
 #endif
 
 // Test gaps in inheritance chain
-A.prototype.myName = function() { return super.myName()+"A"; };
-C.prototype.myName = function() { return super.myName()+"C"; };
+function F() { FctorCalls++; /*note("F ctor");*/ }
+F.prototype.myName = function() { return "F"; };
+A.prototype.__constructor__ = F; A.prototype.__proto__ = F.prototype;
+A.prototype.myName = function() { super(); return super.myName()+"A"; };
+C.prototype.myName = function() { super(); return super.myName()+"C"; };
+FctorCalls=0;
+BctorCalls=0;
+ActorCalls=0;
+n = co.myName();
 #if OUTPUT_VERSION < 6 
- check_equals(co.myName(), "C"); // no super
+ check_equals(n, "C"); // no super
+ check_equals(FctorCalls, 0); // no super
+ check_equals(BctorCalls, 0); // no super
+ check_equals(ActorCalls, 0); // no super
 #endif
 #if OUTPUT_VERSION == 6 
- check_equals(co.myName(), "AAC"); // super in C references B proto no matter where myName was found
+ check_equals(co.myName(), "FAAC"); // super in C references B proto and B ctor no matter where myName was found
+ check_equals(FctorCalls, 2); 
+ check_equals(BctorCalls, 2); 
+ check_equals(ActorCalls, 2); 
 #endif
 #if OUTPUT_VERSION > 6
- xcheck_equals(co.myName(), "undefinedAC"); // super in C references the proto containing myName (A's)
+ xcheck_equals(co.myName(), "FAC"); // super in C references A proto and B ctor 
+ xcheck_equals(FctorCalls, 2);
+ xcheck_equals(BctorCalls, 2);
+ xcheck_equals(ActorCalls, 0); // B.prototype calling super() calls F prototype, not A's
 #endif
 
 //------------------------------------------------
@@ -462,7 +478,7 @@ check(t4 instanceOf Test4);
 check(! t4 instanceOf Test5);
 
 #if OUTPUT_VERSION < 6
- check_totals(90); // SWF5
+ check_totals(93); // SWF5
 #else
- check_totals(147); // SWF6,7,8
+ check_totals(150); // SWF6,7,8
 #endif

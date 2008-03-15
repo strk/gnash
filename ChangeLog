@@ -1,5 +1,7 @@
 2008-03-15 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Inheritance.as: more tests for 
+	  gaps in inheritance chain (SWF7+ fails in gnash).
 	* server/stream.cpp: use the float conversion function found
 	  in action_buffer, hopefully working fine on big endian hosts
 	  (to be tested).
