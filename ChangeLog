@@ -1,3 +1,32 @@
+2008-03-15  Dossy Shiobara <dossy@panoptic.com>
+
+	* plugin/mozilla-sdk/np_entry.cpp (1.10): On Firefox
+	  2.0.0.12/WinXP, aNPNFuncs->size is 172 while
+	  sizeof(NPNetscapeFuncs) is 184.  However, npgnash.dll continues
+	  to work fine even though NPNFuncs isn't populated (!), and as a
+	  matter of fact, Firefox seems to ignore the
+	  NPERR_INVALID_FUNCTABLE_ERROR return from NP_Initialize and
+	  continues to load and execute npgnash.dll, anyway.  Therefore, we
+	  should continue and execute NS_PluginInitialize anyway, too.
+
+	  c.f. https://savannah.gnu.org/bugs/?20835
+
+2008-03-15  Dossy Shiobara <dossy@panoptic.com>
+
+	* plugin/mozilla-sdk/include/: prcpucfg-glibc.h (1.1),
+	  prcpucfg-win32.h (1.1), prcpucfg.h (1.13): NSPR's prcpucfg.h is
+	  platform-specific.  Added Win32 version to CVS as
+	  prcpucfg-win32.h, renamed old prcpucfg.h to prcpucfg-glibc.h, and
+	  replaced prcpucfg.h with a stub that tries to include the correct
+	  one.
+
+2008-03-15  Dossy Shiobara <dossy@panoptic.com>
+
+	* plugin/mozilla-sdk/include/: npapi.h (1.9), npupp.h (1.8): Update
+	  NPAPI from 0.14 to 0.19, using header files from
+	  mozilla/modules/plugin/base/public: npapi.h (3.48), npupp.h
+	  (3.26).
+
 2008-03-15 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gnash.cpp: mend url. Fixes bug #22609.
