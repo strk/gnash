@@ -1,5 +1,11 @@
 2008-03-15 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (CommonGetUrl): cast uint8_t to int when
+	  printing, fixing a failure in misc-mtasc testsuite (output log
+	  considered binary).
+
+2008-03-15 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ASHandlers.cpp (ActionMbSubString): fix the opcode, and
 	  avoid out-of-range accesses. Fixes panda.swf (bug #22437)
 	* testsuite/actionscript.all/String.as: add tests for mbsubstring.

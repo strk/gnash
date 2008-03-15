@@ -2238,7 +2238,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 	URL url(url_s, baseurl);
 
 	log_debug(_("get url: target=%s, url=%s (%s), method=%x (sendVars:%X, loadTarget:%d, loadVariable:%d)"), target_string.c_str(),
-		url.str().c_str(), url_c, method, sendVarsMethod, loadTargetFlag, loadVariableFlag);
+		url.str().c_str(), url_c, (int)method, sendVarsMethod, loadTargetFlag, loadVariableFlag);
 
 	if ( ! URLAccessManager::allow(url) )
 	{
