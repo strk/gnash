@@ -108,7 +108,7 @@ private:
     int mouse_y;
     int mouse_buttons;
 
-    static void fs_callback(gnash::sprite_instance* movie, const char* command, const char* args);
+    static void FSCommand_callback(gnash::sprite_instance* movie, const std::string& command, const std::string& args);
 };
  
 #endif // __PLUGIN_H__

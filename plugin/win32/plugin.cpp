@@ -70,11 +70,11 @@
 
 #include "plugin.h"
 
+static int module_initialized = FALSE;
 static PRLock* playerLock = NULL;
 static int instances = 0;
 
 char* NPP_GetMIMEDescription(void);
-static const char* getPluginDescription(void);
 static void playerThread(void *arg);
 static LRESULT CALLBACK PluginWinProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -100,6 +100,7 @@ NS_PluginInitialize(void)
     if (!playerLock) {
         playerLock = PR_NewLock();
     }
+    module_initialized = TRUE;
     return NPERR_NO_ERROR;
 }
  
@@ -107,6 +108,7 @@ void
 NS_PluginShutdown(void)
 {
     DBG("NS_PluginShutdown\n");
+    if (!module_initialized) return;
     if (playerLock) {
 		PR_DestroyLock(playerLock);
 		playerLock = NULL;
@@ -117,19 +119,25 @@ NS_PluginShutdown(void)
 char*
 NPP_GetMIMEDescription(void)
 {
+    if (!module_initialized) return NULL;
     return MIME_TYPES_HANDLED;
 }
 
+#if 0
 /// \brief Retrieve values from the plugin for the Browser
 ///
 /// This C++ function is called by the browser to get certain
 /// information is needs from the plugin. This information is the
 /// plugin name, a description, etc...
+///
+/// This is actually not used on Win32 (XP_WIN), only on Unix (XP_UNIX).
 NPError
 NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 {
     NPError err = NPERR_NO_ERROR;
 
+    if (!module_initialized) return NPERR_NO_ERROR;
+    DBG("aVariable = %d\n", aVariable);
     switch (aVariable) {
         case NPPVpluginNameString:
             *static_cast<char **> (aValue) = PLUGIN_NAME;
@@ -140,8 +148,7 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
         // navigator.plugins["Shockwave Flash"].description, used in
         // many flash version detection scripts.
         case NPPVpluginDescriptionString:
-            *static_cast<const char **>(aValue) =
-                        getPluginDescription();
+            *static_cast<const char **>(aValue) = PLUGIN_DESCRIPTION;
             break;
 
         case NPPVpluginNeedsXEmbed:
@@ -162,12 +169,7 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
     }
     return err;
 }
-
-static const char*
-getPluginDescription(void) 
-{
-    return PLUGIN_DESCRIPTION;
-}
+#endif
 
 // construction and destruction of our plugin instance object
 
@@ -175,6 +177,7 @@ nsPluginInstanceBase*
 NS_NewPluginInstance(nsPluginCreateData* aCreateDataStruct)
 {
     DBG("NS_NewPluginInstance\n");
+    if (!module_initialized) return NULL;
     if (instances > 0) {
         return NULL;
     }
@@ -192,6 +195,7 @@ void
 NS_DestroyPluginInstance(nsPluginInstanceBase* aPlugin)
 {
     DBG("NS_DestroyPluginInstance\n");
+    if (!module_initialized) return;
     if (aPlugin) {
         delete (nsPluginInstance *) aPlugin;
     }
@@ -252,6 +256,7 @@ nsPluginInstance::init(NPWindow* aWindow)
     DBG("nsPluginInstance::init\n");
 
     if (!aWindow) {
+        DBG("aWindow == NULL\n");
         return FALSE;
     }
 
@@ -388,7 +393,7 @@ nsPluginInstance::threadMain(void)
     // Initialize Gnash core library.
     gnash::gnashInit();
     gnash::set_use_cache_files(false);
-    gnash::register_fscommand_callback(fs_callback);
+    gnash::registerFSCommandCallback(FSCommand_callback);
     DBG("Gnash core initialized.\n");
  
     // Init logfile.
@@ -433,6 +438,14 @@ nsPluginInstance::threadMain(void)
         md = NULL;
     }
     if (!md) {
+        /*
+         * N.B. Can't use the goto here, as C++ complains about "jump to
+         * label 'done' from here crosses initialization of ..." a bunch
+         * of things.  Sigh.  So, instead, I duplicate the cleanup code
+         * here.  TODO: Remove this duplication.
+         */
+        // goto done;
+
         PR_Unlock(playerLock);
 
         DBG("Clean up Gnash.\n");
@@ -528,9 +541,20 @@ nsPluginInstance::threadMain(void)
         PR_Lock(playerLock);
     }
 
+done:
 	PR_Unlock(playerLock);
 
     DBG("Clean up Gnash.\n");
+
+    /*
+     * N.B.  As per server/impl.cpp:clear(), all of Gnash's threads aren't
+     * guaranteed to be terminated by this, yet.  Therefore, when Firefox
+     * unloads npgnash.dll after calling NS_PluginShutdown(), and there are
+     * still Gnash threads running, they will try and access memory that was
+     * freed as part of the unloading of npgnash.dll, resulting in a process
+     * abend.
+     */
+
     gnash::clear();
 
     DBG("nsPluginInstance::threadMain exiting\n");
@@ -543,10 +567,10 @@ nsPluginInstance::getVersion()
 }
 
 void
-nsPluginInstance::fs_callback(gnash::sprite_instance* movie, const char* command, const char* args)
+nsPluginInstance::FSCommand_callback(gnash::sprite_instance* movie, const std::string& command, const std::string& args)
 // For handling notification callbacks from ActionScript.
 {
-    gnash::log_debug(_("fs_callback(%p): %s %s"), (void*) movie, command, args);
+    gnash::log_debug(_("FSCommand_callback(%p): %s %s"), (void*) movie, command, args);
 }
 
 static LRESULT CALLBACK
