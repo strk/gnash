@@ -906,8 +906,10 @@ SWFHandlers::ActionSubString(ActionExec& thread)
 
     if ( size < 0 )
     {
-    	log_error(_("Negative size passed to ActionSubString, "
+	IF_VERBOSE_ASCODING_ERRORS(
+    	log_aserror(_("Negative size passed to ActionSubString, "
 		"taking as whole length"));
+	);
 	size = str.length();
     }
 
@@ -1557,7 +1559,7 @@ SWFHandlers::GuessEncoding(std::string &str, int &length, std::vector<int>& offs
             continue;
         }
         ++length;
-        offsets[length - 1] = index;
+        offsets.push_back(index); //[length - 1] = index;
 
         if ((j & 0xC0) == 0x80)
             continue; // A 1 byte character.
@@ -1570,7 +1572,7 @@ SWFHandlers::GuessEncoding(std::string &str, int &length, std::vector<int>& offs
         else if (j & 0x80)
             is_sought = false;
     }
-    offsets[length - 1] = index;
+    offsets.push_back(index); // [length - 1] = index;
     if (!width && is_sought) // No width left, so it's almost certainly UTF8.
         return ENCGUESS_UNICODE;
 
@@ -1596,7 +1598,7 @@ SWFHandlers::GuessEncoding(std::string &str, int &length, std::vector<int>& offs
         }
 
         ++length;
-        offsets[length - 1] = index;
+        offsets.push_back(index); // [length - 1] = index;
 
         if ((j == 0x80) || (j == 0xA0) || (j >= 0xF0))
         {
@@ -1612,7 +1614,7 @@ SWFHandlers::GuessEncoding(std::string &str, int &length, std::vector<int>& offs
         }
         
     }
-    offsets[length - 1] = index;
+    offsets.push_back(index); // [length - 1] = index;
     if (!width && is_sought) // No width left, so it's probably SHIFT_JIS.
         return ENCGUESS_JIS;
 
@@ -1725,6 +1727,10 @@ SWFHandlers::ActionMbSubString(ActionExec& thread)
     int start = env.top(1).to_int();
     as_value& string_val = env.top(2);
 
+    IF_VERBOSE_ACTION(
+    log_action(" ActionMbSubString(%s, %d, %d)", string_val.to_debug_string().c_str(), start, size);
+    );
+
     env.drop(2);
 
     if (string_val.is_undefined() || string_val.is_null())
@@ -1735,25 +1741,24 @@ SWFHandlers::ActionMbSubString(ActionExec& thread)
         return;
     }
 
-    if (size < 1)
-    {
-        if (size < 0)
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Length is less than 1 in ActionMbSubString, "
-                "returning empty string."));
-            );
-        }
-        env.top(0).set_string("");
-        return;
-    }
-
     string str = string_val.to_string();
     int length = 0;
     std::vector<int> offsets;
-    offsets.resize(str.length() + 1);
+    //offsets.resize(str.length() + 1);
 
     as_encoding_guess_t encoding = GuessEncoding(str, length, offsets);
+
+    //log_debug("Guessed encoding for %s: %d - len:%d, offsets.size:%d", str.c_str(), encoding, length, offsets.size());
+    //for (int i=0; i<offsets.size(); ++i) log_debug("  offsets[%d]: %d", i, offsets[i]);
+
+    if (size < 0)
+    {
+	IF_VERBOSE_ASCODING_ERRORS(
+    	log_aserror(_("Negative size passed to ActionSubString, "
+		"taking as whole length"));
+	);
+	size = length;
+    }
 
     if (start < 1)
     {
@@ -1764,6 +1769,16 @@ SWFHandlers::ActionMbSubString(ActionExec& thread)
         start = 1;
     }
 
+    else if ( unsigned(start) > length )
+    {
+	IF_VERBOSE_ASCODING_ERRORS (
+    	log_aserror(_("base goes beyond input string in ActionMbSubString, "
+		"returning the empty string."));
+	);
+    	env.top(0).set_string("");
+	return;
+    }
+
     // Adjust the start for our own use.
     --start;
 
@@ -1771,10 +1786,12 @@ SWFHandlers::ActionMbSubString(ActionExec& thread)
     {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("base+size goes beyond input string in ActionMbSubString, "
-            "adjusting size"));
+            "adjusting size based on length:%d and start:%d"), length,start);
         );
         size = length - start;
     }
+
+    //log_debug("Adjusted start:%d size:%d", start, size);
 
     if (encoding == ENCGUESS_OTHER)
     {
@@ -1782,7 +1799,7 @@ SWFHandlers::ActionMbSubString(ActionExec& thread)
     }
     else
     {
-        env.top(0).set_string(str.substr(offsets[start], offsets[size] - offsets[start] + 1));
+        env.top(0).set_string(str.substr(offsets[start], offsets[start+size] - offsets[start]));
     }
     return;
 }

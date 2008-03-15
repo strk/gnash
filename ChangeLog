@@ -1,5 +1,12 @@
 2008-03-15 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionMbSubString): fix the opcode, and
+	  avoid out-of-range accesses. Fixes panda.swf (bug #22437)
+	* testsuite/actionscript.all/String.as: add tests for mbsubstring.
+	  Gnash used to fail a lot there.
+
+2008-03-15 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Inheritance.as: finally some more failing 
 	  tests (equivalent to swfdec's super-missing-{7,8}.swf)
 

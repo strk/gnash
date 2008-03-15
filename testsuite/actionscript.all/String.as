@@ -17,7 +17,7 @@
 // Original author: Mike Carlson - June 19th, 2006
 
 
-rcsid="$Id: String.as,v 1.45 2008/03/11 19:31:48 strk Exp $";
+rcsid="$Id: String.as,v 1.46 2008/03/15 16:56:31 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(String), 'function');
@@ -406,6 +406,10 @@ check_equals (a.slice(3,5), "ng");
 check_equals (a.charCodeAt(10), 195);
 #endif
 
+//-----------------------------------------------------------
+// Test SWFACTION_SUBSTRING
+//-----------------------------------------------------------
+
 // see check.as
 #ifdef MING_SUPPORTS_ASM
 
@@ -478,10 +482,107 @@ asm {
 	setvariable
 };
 check_equals( b, "l");
+
+asm {
+	push "b"
+	push "f"
+	push "1" 
+	push "1" 
+	substring
+	setvariable
+};
+check_equals( b, "f");
 #endif
 
+//-----------------------------------------------------------
+// Test SWFACTION_MBSUBSTRING
+//-----------------------------------------------------------
 
+// see check.as
+#ifdef MING_SUPPORTS_ASM
+
+asm {
+	push "b"
+	push "ciao"
+	push "2"
+	push "10" // size is bigger then string length,
+	          // we expect the interpreter to adjust it
+	mbsubstring
+	setvariable
+};
+check_equals( b, "iao");
+asm {
+	push "b"
+	push "boowa"
+	push "2"
+	push "-1" // size is bigger then string length,
+	          // we expect the interpreter to adjust it
+	mbsubstring
+	setvariable
+};
+check_equals( b, "oowa");
+asm {
+	push "b"
+	push "ciao"
+	push "-2" // negative base should be interpreted as 1
+	push "1" 
+	mbsubstring
+	setvariable
+};
+check_equals( b, "c");
+asm {
+	push "b"
+	push "ciao"
+	push "-2" // negative base should be interpreted as 1
+	push "10" // long size reduced 
+	mbsubstring
+	setvariable
+};
+check_equals( b, "ciao");
+asm {
+	push "b"
+	push "ciao"
+	push "0" // zero base is invalid, but taken as 1
+	push "1" 
+	mbsubstring
+	setvariable
+};
+check_equals( b, "c");
+asm {
+	push "b"
+	push "ciao"
+	push "10" // too large base ...
+	push "1" 
+	mbsubstring
+	setvariable
+};
+check_equals( b, "");
+asm {
+	push "b"
+	push "all"
+	push "3" // base is 1-based!
+	push "1" 
+	mbsubstring
+	setvariable
+};
+check_equals( b, "l");
+
+asm {
+	push "b"
+	push "f"
+	push "1" 
+	push "1" 
+	mbsubstring
+	setvariable
+};
+check_equals( b, "f");
+
+#endif
+
+//-----------------------------------------------------------
 // Test inheritance with built-in functions
+//-----------------------------------------------------------
+
 var stringInstance = new String();
 check (stringInstance.__proto__ != undefined);
 check (stringInstance.__proto__ == String.prototype);
@@ -607,7 +708,7 @@ r = "s:"+s;
 check_equals(r, "s:");
 
 #if OUTPUT_VERSION < 6
- check_totals(192);
+ check_totals(201);
 #else
- check_totals(222);
+ check_totals(231);
 #endif
