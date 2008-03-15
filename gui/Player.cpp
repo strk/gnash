@@ -85,11 +85,12 @@ Player::Player()
 	_doSound(true),
 	_exitTimeout(0),
 	_movieDef(0),
-	_maxAdvances(0)
+	_maxAdvances(0),
 #ifdef GNASH_FPS_DEBUG
-	,_fpsDebugTime(0.0)
+	_fpsDebugTime(0.0),
 #endif
-	,_hostfd(-1)
+	_hostfd(-1),
+    _startFullscreen(false)
 {
 	init();
 }
@@ -381,6 +382,9 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
       _gui->setTimeout(static_cast<unsigned int>(_exitTimeout * 1000));
     }
 
+    if (!_windowID && _startFullscreen) {
+        _gui->setFullscreen();
+    }
     _gui->run();
 
     std::cerr << "Main loop ended, cleaning up" << std::endl;

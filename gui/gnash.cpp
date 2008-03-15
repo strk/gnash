@@ -109,12 +109,15 @@ cout << _("Usage: gnash [options] movie_file.swf") << endl
     << _("  -t,  --timeout <sec>     Exit after the specified number of seconds") << endl
     << _("  -u,  --real-url <url>    Set \"real\" URL of the movie") << endl
     << _("  -U,  --base-url <url>    Set \"base\" URL for resolving relative URLs") << endl
-    << _("  -P,  --pass-vars <param> Set parameter (e.g. \"FlashVars=A=1&b=2\")") << endl
+    << _("  -P,  --param <param>     Set parameter (e.g. \"FlashVars=A=1&b=2\")") << endl
     << _("  -V,  --version           Print gnash's version number and exit") << endl
     << _("  -F,  --fd <fd>           Filedescriptor to use for external communications") << endl
 #ifdef GNASH_FPS_DEBUG
     << _("  -f,  --debug-fps num     Print FPS every num seconds (float).") << endl
 #endif // def GNASH_FPS_DEBUG
+    << endl
+    << _("  --max-advances num       Exit after specified number of advances") << endl
+    << _("  --fullscreen             Start in fullscreen mode") << endl
     << endl
     << _("Keys:") << endl
     << endl
@@ -181,6 +184,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         { 'p', 0,               Arg_parser::no  },
         { 's', "scale",         Arg_parser::yes },
         { 256, "max-advances",  Arg_parser::yes },
+        { 257, "fullscreen",    Arg_parser::no },        
         { 'c', 0,               Arg_parser::no  },
         { 'd', "delay",         Arg_parser::yes },
         { 'x', "xid",           Arg_parser::yes },
@@ -191,7 +195,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         { 'j', "width",         Arg_parser::yes },
         { 'k', "height",        Arg_parser::yes },
         { 'u', "real-url",      Arg_parser::yes },
-        { 'P', "pass-vars",     Arg_parser::yes },
+        { 'P', "param",         Arg_parser::yes },
         { 'U', "base-url",      Arg_parser::yes },  
         { 'g', "debugger",      Arg_parser::no  },
         { 'V', "version",       Arg_parser::no  },        
@@ -254,6 +258,9 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                 case 256:
                     player.setMaxAdvances( parser.argument<unsigned long>(i));
                     break;
+                case 257:
+                    player.setStartFullscreen(true);
+                    break;                    
                 case 's':
                     player.setScale( fclamp(
                                     parser.argument<float>(i),

@@ -128,9 +128,12 @@ public:
 		params[name] = value;
 	}
 
-	void setHostFD(int fd)
-	{
+	void setHostFD(int fd) {
 		_hostfd = fd;
+	}
+	
+	void setStartFullscreen(bool x) {
+	    _startFullscreen = x;
 	}
 	
 private:
@@ -209,6 +212,10 @@ private:
 
 	// Filedescriptor to use for host application requests, -1 if none
 	int _hostfd;
+	
+	// Whether to start Gnash in fullscreen mode.
+	// (Or what did you think it meant?)
+	bool _startFullscreen;
 
 };
 
