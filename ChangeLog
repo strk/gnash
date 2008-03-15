@@ -1,5 +1,12 @@
 2008-03-15 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHadlers.cpp (ActionCallMethod): for SWF7+ compute
+	  super from the actual object containing the called function
+	  (also when finding out from super).
+	* testsuite/actionscript.all/Inheritance.as: successes.
+
+2008-03-15 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Inheritance.as: more tests for 
 	  gaps in inheritance chain (SWF7+ fails in gnash).
 	* server/stream.cpp: use the float conversion function found

@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.52 2008/03/15 08:29:21 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.53 2008/03/15 09:03:52 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Object.prototype.constructor), 'function');
@@ -286,10 +286,10 @@ n = co.myName();
  check_equals(ActorCalls, 2); 
 #endif
 #if OUTPUT_VERSION > 6
- xcheck_equals(co.myName(), "FAC"); // super in C references A proto and B ctor 
- xcheck_equals(FctorCalls, 2);
- xcheck_equals(BctorCalls, 2);
- xcheck_equals(ActorCalls, 0); // B.prototype calling super() calls F prototype, not A's
+ check_equals(co.myName(), "FAC"); // super in C references A proto and B ctor 
+ check_equals(FctorCalls, 2);
+ check_equals(BctorCalls, 2);
+ check_equals(ActorCalls, 0); // B.prototype calling super() calls F prototype, not A's
 #endif
 
 //------------------------------------------------

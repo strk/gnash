@@ -3447,7 +3447,27 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 		if ( obj->isSuper() ) 
 		{
 			if ( thread.isFunction() ) this_ptr = thread.getThisPointer();
-			super = obj->get_super();
+
+			as_object* proto = obj->get_prototype().get();
+			as_object* owner = proto;
+			if ( hasMethodName )
+			{
+				VM& vm = VM::get();
+				if ( vm.getSWFVersion() > 6 )
+				{
+					string_table::key k = vm.getStringTable().find(method_string);
+					Property* p = obj->findProperty(k, 0, &owner);
+					if ( p )
+					{
+						assert(owner);
+						if ( owner != obj.get() ) // I think it would be impossible for owner to be == obj (since obj is super.)
+						{
+							proto = owner;
+						}
+					}
+				}
+			}
+			super = proto->get_super();
 		}
 		else
 		{
