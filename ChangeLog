@@ -1,6 +1,12 @@
+2008-03-15 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/gnash.cpp: change / add some long options and update help output.
+	  Add --fullscreen to allow starting in fullscreen mode.
+	* gui/Player.{h,cpp}: implement starting in fullscreen mode.
+
 2008-03-15 Sandro Santilli <strk@keybit.net>
 
-	* gui/gnash.cpp: fix build with GNASH_FPS_DEBUGGIN defined.
+	* gui/gnash.cpp: fix build with GNASH_FPS_DEBUGGING defined.
 	* testsuite/actionscript.all/Inheritance.as: test double gap in
 	  inheritance chain.
 
