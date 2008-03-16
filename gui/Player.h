@@ -71,7 +71,7 @@ public:
 	///           
 	///
 	int run(int argc, char* argv[],
-		const char* infile, const char* url = NULL);
+		const std::string& infile, const std::string& url = "");
 
 	float setScale(float s);
 

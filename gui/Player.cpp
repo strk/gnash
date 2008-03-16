@@ -262,7 +262,7 @@ Player::load_movie()
 
 /* \brief Run, used to open a new flash file. Using previous initialization */
 int
-Player::run(int argc, char* argv[], const char* infile, const char* url)
+Player::run(int argc, char* argv[], const std::string& infile, const std::string& url)
 {
     
 	// Call this at run() time, so the caller has
@@ -272,23 +272,24 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 	init_sound();
 	init_gui();
    
-	// No file name was supplied
-	assert (infile);
+	// gnash.cpp should check that a filename is supplied.
+	assert (!infile.empty());
+
 	_infile = infile;
 
 	// Set base url
 	if ( _baseurl.empty() )
 	{
-		if ( url ) _baseurl = url;
-		else if ( ! strcmp(infile, "-") ) _baseurl = URL("./").str();
+		if (! url.empty() ) _baseurl = url;
+		else if ( infile == "-" ) _baseurl = URL("./").str();
 		else _baseurl = infile;
 	}
 
 	// Set _root._url (either explicit of from infile)
-	if ( url ) {
-		_url = std::string(url);
+	if (! url.empty() ) {
+		_url = url;
 	}  else {
-		_url = std::string(infile);
+		_url = infile;
 	}
 
 

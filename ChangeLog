@@ -1,3 +1,9 @@
+2008-03-16 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/Player.{h,cpp}: handle an empty url, fix misc-ming.all failures.
+	  Take std::string& instead of const char* - there seems to be no case
+	  in which distinguishing between NULL and empty is useful.
+
 2008-03-15  Dossy Shiobara <dossy@panoptic.com>
 
 	* plugin/win32/: plugin.cpp (1.15), plugin.h (1.11): Track whether
