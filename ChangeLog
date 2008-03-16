@@ -3,6 +3,8 @@
 	* gui/Player.{h,cpp}: handle an empty url, fix misc-ming.all failures.
 	  Take std::string& instead of const char* - there seems to be no case
 	  in which distinguishing between NULL and empty is useful.
+	* testsuite/actionscript.all/String.as: add test comparing substring
+	  and String.substr, showing that both are broken.
 
 2008-03-15  Dossy Shiobara <dossy@panoptic.com>
 

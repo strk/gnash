@@ -17,7 +17,7 @@
 // Original author: Mike Carlson - June 19th, 2006
 
 
-rcsid="$Id: String.as,v 1.46 2008/03/15 16:56:31 strk Exp $";
+rcsid="$Id: String.as,v 1.47 2008/03/16 15:51:49 bwy Exp $";
 #include "check.as"
 
 check_equals(typeof(String), 'function');
@@ -492,6 +492,38 @@ asm {
 	setvariable
 };
 check_equals( b, "f");
+
+teststr = "Heöllo";
+count = 0;
+
+for (i = -5; i < 10; i++)
+{
+    for (j = -5; j < 10; j++)
+    {
+        asm {
+            push "a"
+            push "teststr"
+            getvariable
+            push "i"
+            getvariable
+            push "j" // size is bigger then string length,
+            getvariable
+                      // we expect the interpreter to adjust it
+            substring
+            setvariable
+        };
+        
+        b = teststr.substr( i >= 1 ? i - 1 : 0, j >= 0 ? j: teststr.length());
+        
+        // There are ... tests
+        if (a == b) count++;
+        else note(i + " : " + j + " -- " + a + ":" + b);
+    }
+}
+
+// For SWF5 this because of substr...
+xcheck_equals (count, 225);
+
 #endif
 
 //-----------------------------------------------------------
@@ -708,7 +740,7 @@ r = "s:"+s;
 check_equals(r, "s:");
 
 #if OUTPUT_VERSION < 6
- check_totals(201);
+ check_totals(202);
 #else
- check_totals(231);
+ check_totals(232);
 #endif
