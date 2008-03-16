@@ -1,3 +1,20 @@
+2008-03-15  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* buffer.{h,cpp}: Low level class to hold blocks of memory for
+	message queues.
+	* testsuite/cygnal.all/test_buffer.cpp: Test case for the Buffer class.
+	* handler.{h,cpp}: Higher level handler for all incoming network
+	connections.
+	* testsuite/cygnal.all/test_handler.cpp: Test case for the Handler class.
+
+2008-03-14  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* buffer.{h, cpp}: New class for low-level buffer allocation.
+	* testsuite/cygnal.all/test_buffer.cpp: Test case for low level
+	buffer class.
+	* handler.{h, cpp}: New class for handling network connections.
+	* testsuite/cygnal.all/test_buffer.cpp: Test case for handler class.
+
 2009-09-05 Markus Gothe
 	* cygnal.cpp: Added a #ifdef ENABLE_NLS.
 
