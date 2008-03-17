@@ -19,7 +19,7 @@
 // Initial test written by Mike Carlson
 
 
-rcsid="$Id: array.as,v 1.45 2008/03/17 20:34:33 strk Exp $";
+rcsid="$Id: array.as,v 1.46 2008/03/17 21:41:29 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Array), 'function');
@@ -464,6 +464,17 @@ xcheck(c.hasOwnProperty('0'));
 check(!c.hasOwnProperty('1'));
 xcheck(c.hasOwnProperty('2'));
 #endif
+
+c[10] = 'ten';
+check_equals(c.length, 11);
+ASSetPropFlags(c, "2", 7, 0); // protect from deletion
+check( ! delete c[2] );
+check_equals(c[2], 30);
+c.length = 2;
+xcheck_equals(c[2], 30); // was protected !
+check_equals(typeof(c[10]), 'undefined'); // was not protected..
+c.length = 11;
+check_equals(typeof(c[10]), 'undefined'); // and won't come back
 
 //-------------------------------
 // Test sort
@@ -1037,11 +1048,11 @@ check_equals(a["Infinite"], 'inf');
 
 
 #if OUTPUT_VERSION < 6
- check_totals(371);
+ check_totals(377);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(399);
+  check_totals(405);
 # else
-  check_totals(406);
+  check_totals(412);
 # endif
 #endif
