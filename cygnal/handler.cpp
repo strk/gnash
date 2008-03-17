@@ -20,17 +20,18 @@
 #include "gnashconfig.h"
 #endif
 
+#include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/date_time/gregorian/gregorian.hpp>
-//#include <boost/date_time/local_time/local_time.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-//#include <boost/date_time/time_zone_base.hpp>
+#include <boost/bind.hpp>
 #include <string>
 #include <deque>
 
 #include "log.h"
+#include "network.h"
 #include "buffer.h"
 #include "handler.h"
+
+#include "http.h"
 
 using namespace gnash;
 using namespace std;
@@ -47,17 +48,6 @@ Handler::Handler()
 Handler::~Handler()
 {
 //    GNASH_REPORT_FUNCTION;
-#if 0
-    deque<Buffer *>::iterator it;
-    for (it = _incoming.begin(); it != _incoming.end(); it++) {
-	Buffer *ptr = *(it);
-//	delete ptr;
-    }
-    for (it = _outgoing.begin(); it != _outgoing.end(); it++) {
-	Buffer *ptr = *(it);
-	delete ptr;
-    }
-#endif
 }
 
 bool
@@ -65,11 +55,11 @@ Handler::push(Buffer *data, fifo_e direction)
 {
 //    GNASH_REPORT_FUNCTION;
     if (direction == Handler::OUTGOING) {
-	_outgoing.push_back(data);
+	_outgoing.push(data);
 	return true;
     }
     if (direction == Handler::INCOMING) {
-	_incoming.push_back(data);
+	_incoming.push(data);
 	return true;
     }
     
@@ -94,14 +84,14 @@ Handler::pop(fifo_e direction)
     
     if (direction == Handler::OUTGOING) {
 	if (_outgoing.size()) {
-	    buf = _outgoing.front();
-	    _outgoing.pop_front();
+	    buf = _outgoing.pop();
+	    return buf;	
 	}
     }
     if (direction == Handler::INCOMING) {
 	if (_incoming.size()) {
-	    buf = _incoming.front();
-	    _incoming.pop_front();
+	    buf = _incoming.pop();
+	    return buf;	
 	}
     }
 
@@ -115,14 +105,15 @@ Handler::peek(fifo_e direction)
 //    GNASH_REPORT_FUNCTION;
     if (direction == Handler::OUTGOING) {
 	if (_outgoing.size()) {
-	    return _outgoing.front();
+	    return _outgoing.peek();
 	}
     }
     if (direction == Handler::INCOMING) {
 	if (_incoming.size()) {
-	    return _incoming.front();
+	    return _incoming.peek();
 	}
     }    
+    return 0;
 }
 
 // Return the size of the queues
@@ -153,23 +144,81 @@ Handler::clear(fifo_e direction)
     }    
 }
 
+// start the two thread handlers for the queues
+bool
+Handler::start(thread_params_t *args)
+{
+//    GNASH_REPORT_FUNCTION;
+    int retries = 10;
+
+    toggleDebug(true);		// FIXME:
+    createServer(args->port);
+    while (retries-- > 0) {
+	log_debug(_("%s: Starting Handlers for port %d"), __PRETTY_FUNCTION__, args->port);
+	newConnection(true);
+	args->netfd = getFileFd();
+	args->handle = this;
+
+	log_debug("Starting thread 1");
+	boost::thread inport(boost::bind(&netin_handler, args));
+	
+	log_debug("Starting thread 2");
+	boost::thread outport(boost::bind(&netout_handler, args));
+
+	log_debug("Starting thread 3");
+	boost::thread handler(boost::bind(&httphandler, args));
+
+	inport.join();    
+//	outport.join();
+	handler.join();
+    }
+}
+    
 // Dump internal data.
 void
 Handler::dump()
 {
 //    GNASH_REPORT_FUNCTION;
-    deque<Buffer *>::iterator it;
-    cerr << "Incoming queue has "<< _incoming.size() << " buffers." << endl;
-    for (it = _incoming.begin(); it != _incoming.end(); it++) {
-	Buffer *ptr = *(it);
-        ptr->dump();
-    }
-    cerr << endl << "Outgoing queue has "<< _outgoing.size() << " buffers." << endl;
-    for (it = _outgoing.begin(); it != _outgoing.end(); it++) {
-	Buffer *ptr = *(it);
-        ptr->dump();
-    }
+    _incoming.dump();
+    _outgoing.dump();    
 }
+
+extern "C" {
+void
+netin_handler(Handler::thread_params_t *args)
+{
+    GNASH_REPORT_FUNCTION;
+
+    Handler *hand = reinterpret_cast<Handler *>(args->handle);
+
+    int retries = 3;
+    while (retries-- >  0) {
+	Buffer *buf = new Buffer;
+	int ret = hand->readNet(args->netfd, buf->reference(), buf->size());
+	if (ret) {
+	    if (ret != buf->size()) {
+		buf->resize(ret);
+	    }
+	    hand->push(buf);
+	    string str = (const char *)buf->reference();
+	    cerr << str << endl;
+//	    _incond.notify_one();
+	} else {
+	    break;
+	}
+    }
+    hand->dump();
+}
+void
+netout_handler(Handler::thread_params_t *args)
+{
+    GNASH_REPORT_FUNCTION;
+    int retries = 10;
+
+//    _outcond.wait();
+}
+
+} // end of extern C
 
 } // end of cygnal namespace
 
@@ -178,3 +227,4 @@ Handler::dump()
 // mode: C++
 // indent-tabs-mode: t
 // End:
+

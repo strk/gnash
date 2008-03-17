@@ -25,13 +25,16 @@
 #include <deque>
 
 #include "log.h"
+#include "network.h"
 #include "buffer.h"
+#include "cque.h"
 
 // _definst_ is the default instance name
 namespace cygnal
 {
 
-class Handler 
+
+class Handler : public gnash::Network
 {
 public:
     Handler();
@@ -41,6 +44,7 @@ public:
     typedef struct {
 	int netfd;
 	int port;
+	void *handle;
 	std::string filespec;
     } thread_params_t ;
     
@@ -48,42 +52,40 @@ public:
     typedef enum { INCOMING, OUTGOING } fifo_e;
     
     // Push bytes on the incoming FIFO, which is the default
-    bool push(boost::uint8_t *data, int nbytes, fifo_e direction);
-    bool push(Buffer *data, fifo_e direction);
     bool push(Buffer *data)
-	{ return push(data, INCOMING); };
+	{ return _incoming.push(data); };
+    bool push(Buffer *data, fifo_e direction);
+    bool push(uint8_t *data, int nbytes, fifo_e direction);
     bool push(boost::uint8_t *data, int nbytes)
-	{ return push(data, nbytes, INCOMING); };
+	{ return _incoming.push(data, nbytes); };
     bool pushin(boost::uint8_t *data, int nbytes)
-	{ return push(data, nbytes, INCOMING); };
+	{ return _incoming.push(data, nbytes); };
     bool pushin(Buffer *data)
-	{ return push(data, INCOMING); };
+	{ return _incoming.push(data); };
     
     // Push bytes on the incoming FIFO, which must be specified
     bool pushout(boost::uint8_t *data, int nbytes)
-	{ return push(data, nbytes, OUTGOING); };
+	{ return _outgoing.push(data, nbytes); };
     bool pushout(Buffer *data)
-	{ return push(data, OUTGOING); };
+	{ return _outgoing.push(data); };
     
     // Pop the first date element off the incoming FIFO
+    Buffer *pop() { return _incoming.pop(); };
     Buffer *pop(fifo_e direction);
-    Buffer *pop()
-    	{ return pop(INCOMING); };
     Buffer *popin()
-    	{ return pop(INCOMING); };
+    	{ return _incoming.pop(); };
     // Pop the first date element off the outgoing FIFO
     Buffer *popout()
-    	{ return pop(OUTGOING); };
+    	{ return _incoming.pop(); };
     
     // Peek at the first data element without removing it
+    Buffer *peek() { return _incoming.peek(); };
     Buffer *peek(fifo_e direction);
-    Buffer *peek()
-    	{ return peek(INCOMING); };
     Buffer *peekin()
-    	{ return peek(INCOMING); };
+    	{ return _incoming.peek(); };
     // Pop the first date element off the outgoing FIFO
     Buffer *peekout()
-    	{ return peek(OUTGOING); };    
+    	{ return _outgoing.peek(); };    
 
     // Removes all the buffers from the queues
     void clear() { _incoming.clear(); };
@@ -94,25 +96,26 @@ public:
     
     // Return the size of the queues, default to the incoming queue
     size_t size(fifo_e direction);
-    size_t size() { return size(INCOMING); };
+    size_t size() { return _incoming.size(); };
     size_t insize() { return _incoming.size(); };
     size_t outsize() { return _outgoing.size(); };
+
+    // start the two thread handlers for the queues
+    bool start(thread_params_t *args);
     
     // Dump internal data.
     void dump();
 private:
     int _netfd;
-    boost::condition _inmutex;
-    std::deque<Buffer *> _incoming;
-    
-    std::deque<Buffer *> _outgoing;
-    boost::condition _outmutex;
+    CQue _incoming;
+    CQue _outgoing;
 };
 
 // This is the thread for all incoming network connections, which
 // has to be in C.
 extern "C" {
-    void nethandler(Handler::thread_params_t *args);
+    void netin_handler(Handler::thread_params_t *args);
+    void netout_handler(Handler::thread_params_t *args);
 }
 
 } // end of cygnal namespace

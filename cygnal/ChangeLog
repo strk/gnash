@@ -1,5 +1,8 @@
 2008-03-16  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* handler.{h,cpp}: More queuing support to CQue.
+	* testsuite/cygnal.all/test_handler.cpp: Fix test case for new
+	queuing style.
 	* cque.{h,cpp}: New files for base queuing class, moved out of
 	Handler when I noticed there was code duplication for the queues.
 	* testsuite/cygnal.all/test_cque.cpp: New test case for CQue base
