@@ -41,6 +41,16 @@
 #include <gdk/gdkkeysyms.h>
 #include <string>
 
+#ifdef HAVE_FFMPEG_AVCODEC_H
+extern "C" {
+# include "ffmpeg/avcodec.h" // Only for the version number
+}
+#endif
+
+#ifdef HAVE_GST_GST_H
+# include "gst/gstversion.h" // Only for the version number
+#endif
+
 #ifdef RENDERER_OPENGL
 #include "gtk_glue_gtkglext.h"
 #endif
@@ -1354,13 +1364,22 @@ GtkGui::showAboutDialog()
 
     std::string comments = _("Gnash is the GNU Flash movie player based on GameSWF.");
 
-    comments += _("\nRenderer: ");
-    comments += RENDERER_CONFIG;
-    comments += "   GUI: ";
-    comments += "GTK2"; // gtk of course!
-    comments += "   Media: ";
-    comments += MEDIA_CONFIG;
-    comments += ".";
+    comments.append(_("\nRenderer: "));
+    comments.append(RENDERER_CONFIG);
+    comments.append(_("\nGUI: "));
+    comments.append("GTK2"); // gtk of course!
+    comments.append(_("\nMedia: "));
+    comments.append(MEDIA_CONFIG" ");
+#ifdef HAVE_GST_GST_H
+    comments.append(_("\nGstreamer version: "));
+    std::ostringstream ss;
+    ss << GST_VERSION_MAJOR << "." << GST_VERSION_MINOR << "." << GST_VERSION_MICRO;
+    comments.append(ss.str());
+#endif
+#ifdef HAVE_FFMPEG_AVCODEC_H
+    comments.append(_("\nFfmpeg version: "));
+    comments.append(LIBAVCODEC_IDENT);
+#endif
 
     gtk_about_dialog_set_url_hook(NULL, NULL, NULL);
     GdkPixbuf *logo_pixbuf = createPixbuf("GnashG.png");
