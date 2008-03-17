@@ -1,5 +1,11 @@
 2008-03-17 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* server/vm/ASHandlers.cpp: don't try to access an element of an
+	  empty string; use string.at(), which would throw an exception if
+	  we try to do so.
+
+2008-03-17 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* server/asobj/string.cpp: fix fromCharCode for SWF6+, sort
 	  of fix it for SWF5. This would get more passes in the swfdec
 	  testsuite if swfdec_gnash_tester could catch newlines in

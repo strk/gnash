@@ -1661,12 +1661,20 @@ SWFHandlers::ActionOrd(ActionExec& thread)
     // Should return 0 
 
     int version = env.get_version();
+    
+    const std::string& str = env.top(0).to_string();
+    
+    if (str.empty())
+    {
+        env.top(0).set_int(0);
+        return;
+    }
 
-    const std::wstring& wstr = utf8::decodeCanonicalString(env.top(0).to_string(), version);
+    const std::wstring& wstr = utf8::decodeCanonicalString(str, version);
 
     // decodeCanonicalString should correctly work out what the first character
     // is according to version.
-    env.top(0).set_int(wstr[0]);
+    env.top(0).set_int(wstr.at(0));
 }
 
 void
