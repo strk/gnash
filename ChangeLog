@@ -1,5 +1,13 @@
 2008-03-17 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.{cpp,h}: dump_stack: add additional
+	  optional argument to limit number of stack items printed.
+	* server/vm/ASHandlers.cpp (ActionSetRegister): use int rather
+	  then uint8_t for sake of logging...
+	* server/vm/ActionExec.cpp: limit stack dump to 32 items.
+
+2008-03-17 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.cpp (fire_mouse_event): catch ActionLimit
 	  exceptions.
 

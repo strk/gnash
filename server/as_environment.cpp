@@ -925,6 +925,28 @@ as_environment::CallFrame::CallFrame(as_function* funcPtr)
 {
 }
 
+void
+as_environment::dump_stack(std::ostream& out, unsigned int limit) const
+{
+	unsigned int si=0, n=m_stack.size();
+	if ( limit && n > limit )
+	{
+		si=n-limit;
+		out << "Stack (last " << limit << " of " << n << " items): ";
+	}
+	else
+	{
+		out << "Stack: ";
+	}
+
+	for (int i=si; i<n; i++)
+	{
+		if (i!=si) out << " | ";
+		out << '"' << m_stack[i] << '"';
+	}
+	out << std::endl;
+}
+
 #ifdef GNASH_USE_GC
 /// Mark all reachable resources
 //

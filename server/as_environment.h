@@ -346,16 +346,15 @@ public:
 	as_object* find_object(const std::string& path, const ScopeStack* scopeStack=NULL) const;
 
 	/// Dump content of the stack to a std::ostream
-	void dump_stack(std::ostream& out=std::cerr)
-	{
-		out << "Stack: ";
-		for (unsigned int i=0, n=m_stack.size(); i<n; i++)
-		{
-			if (i) out << " | ";
-			out << '"' << m_stack[i] << '"';
-		}
-		out << std::endl;
-	}
+	//
+	/// @param out
+	///	The output stream, standard error if omitted.
+	///
+	/// @param limit
+	///	If > 0, limit number of printed item by the given amount (from the top).
+	///	Unlimited by default;
+	///
+	void dump_stack(std::ostream& out=std::cerr, unsigned int limit=0) const;
 
 	/// Dump the local registers to a std::ostream
 	//

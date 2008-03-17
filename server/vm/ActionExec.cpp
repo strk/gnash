@@ -42,12 +42,17 @@
 #include <string>
 
 #ifndef DEBUG_STACK
+
 // temporarly disabled as will produce lots of output with -v
 // we'd need another switch maybe, as -va does also produce
 // too much information for my tastes. I really want just
 // to see how stack changes while executing actions...
 // --strk Fri Jun 30 02:28:46 CEST 2006
 #define DEBUG_STACK 1
+
+// Max number of stack item to dump. 0 for unlimited.
+#define STACK_DUMP_LIMIT 32
+
 #endif
 
 using namespace gnash;
@@ -171,7 +176,7 @@ ActionExec::operator() ()
 			   "."),
 			    pc, stop_pc, code.size());
 		stringstream ss;
-		env.dump_stack(ss);
+		env.dump_stack(ss, STACK_DUMP_LIMIT);
 		env.dump_global_registers(ss);
 		env.dump_local_registers(ss);
 		env.dump_local_variables(ss);
@@ -385,7 +390,7 @@ ActionExec::operator() ()
 	IF_VERBOSE_ACTION (
 		log_action(_("After execution: PC " SIZET_FMT ", next PC " SIZET_FMT ", stack follows"), pc, next_pc);
 		stringstream ss;
-		env.dump_stack(ss);
+		env.dump_stack(ss, STACK_DUMP_LIMIT);
 		env.dump_global_registers(ss);
 		env.dump_local_registers(ss);
 		env.dump_local_variables(ss);

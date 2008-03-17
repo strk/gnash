@@ -4334,7 +4334,7 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
 
 	const action_buffer& code = thread.code;
 
-	boost::uint8_t reg = code[thread.pc + 3];
+	unsigned int reg = code[thread.pc + 3];
 
 	// Save top of stack in specified register.
 	if ( thread.isFunction2() && env.num_local_registers() )
