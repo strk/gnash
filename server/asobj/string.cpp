@@ -488,14 +488,14 @@ string_index_of(const fn_call& fn)
 
     ENSURE_FN_ARGS(1, 2, -1);
 
-    as_value& tfarg = fn.arg(0); // to find arg
+    const as_value& tfarg = fn.arg(0); // to find arg
     const std::wstring& toFind = utf8::decodeCanonicalString(tfarg.to_string(), version);
 
     size_t start = 0;
 
     if (fn.nargs >= 2)
     {
-        as_value& saval = fn.arg(1); // start arg val
+        const as_value& saval = fn.arg(1); // start arg val
         int start_arg = saval.to_int();
         if ( start_arg > 0 ) start = (size_t) start_arg;
 	else
@@ -520,21 +520,48 @@ string_index_of(const fn_call& fn)
     return as_value(pos);
 }
 
+// String.fromCharCode(code1[, code2[, code3[, code4[, ...]]]])
+// Makes a string out of any number of char codes.
+// The string is always UTF8, so SWF5 mangles it.
 static as_value
 string_from_char_code(const fn_call& fn)
 {
-    std::wstring result;
-
-    // isn't this function supposed to take one argument?
-
-    for (unsigned int i = 0; i < fn.nargs; i++) {
-        boost::uint32_t c = fn.arg(i).to_number<boost::uint32_t>();
-        result += c;
-    }
 
     int version = VM::get().getSWFVersion();
 
-    return as_value(utf8::encodeCanonicalString(result, version));
+    if (version == 5)
+    {
+        std::string str;
+        for (unsigned int i = 0; i < fn.nargs; i++)
+        {
+            // Maximum 65535, as with all character codes.
+            boost::uint16_t c = static_cast<boost::uint16_t>(fn.arg(i).to_int());
+            
+            // If more than 255, push 'overflow' byte.
+            if (c > 255)
+            {
+                str.push_back(static_cast<unsigned char>(c >> 8));
+            }
+
+            // 0 terminates the string, but mustn't be pushed or it
+            // will break concatenation.
+            if (static_cast<unsigned char>(c) == 0) break;
+            str.push_back(static_cast<unsigned char>(c));
+        }    
+        return as_value(str);
+    }
+
+    std::wstring wstr;
+
+    for (unsigned int i = 0; i < fn.nargs; i++)
+    {
+        boost::uint16_t c = static_cast<boost::uint16_t>(fn.arg(i).to_int());
+        if (c == 0) break;
+        wstr.push_back(c);
+    }
+    
+    return as_value(utf8::encodeCanonicalString(wstr, version));
+
 }
 
 static as_value
