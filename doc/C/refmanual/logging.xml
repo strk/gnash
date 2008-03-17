@@ -1,128 +1,141 @@
 <sect2 id="logging">
-  <title>The Debug Logging System</title>
-
+  <title>The Message Logging System</title>
+  
   <para>
-    Gnash supports a debug logging system which supports both C and C++
-    natively. This means you can use both <emphasis>printf()</emphasis> style
-    debug messages and C++ <emphasis>iostreams</emphasis> style, where you can
-    print C++ objects directly as you would when using
-    <emphasis>cout</emphasis>.
+    &app;'s common message logging system uses a <emphasis>printf()</emphasis>
+    style format. C++ iostream logging functions were introduced alongside, but this has since
+    largely been abandoned. Despite the C-like appearance, however, &app;'s LogFile class
+    by default does not use <emphasis>printf()</emphasis> for formatting at all the
+    messages at all.
   </para>
   
   <para>
-    In the beginning, Gnash only supported the C API for debug
-    logging, so it is the most heavily used in Gnash. This API was used in
-    the <emphasis>log_msg()</emphasis> and <emphasis>log_error()</emphasis> functions,
-    and used a callback to set them up.
-  </para>
-    
+    All logging calls are converted using templated functions to use boost::format.
+    This uses a similar syntax to printf(), but additionally guarantees type-safety
+    and allows more advanced substition using positional identifiers besides the
+    traditional printf() type identifiers. The conversion templates mean that
+    the logging API remains exactly the same, regardless of which method is
+    used to format the log output.
+  </para>  
+  
+  <sect3 id="status">
+  <title>Status</title>  
   <para>
-    If a filename is not specified at object construction time, a
+    Currently, &app; is preserving the option of returning to the previous
+    <emphasis>printf()</emphasis> implementation. While it is possible to use
+    std::strings and even custom types
+    in substitutions, and <emphasis>boost::format</emphasis> style positional
+    identifiers (%1%, %2%, %1%)
+    in the format string, this is inadvisable as it would break any move back to
+    <emphasis>printf()</emphasis>.
+  </para>   
+
+  <para>
+    It is possible to switch between the different logging format functions simply by
+    changing <emphasis>#define USE_BOOST_FORMAT_TEMPLATES</emphasis> in log.h. 
+  </para>   
+
+  <para>
+    If a filename is not specified before the log file is needed, a
     default name of <emphasis>gnash-dbg.log</emphasis> is used. If Gnash is
     started from the command line, the debug log will be created in
     the current directory. When executing Gnash from a launcher under
     <emphasis>GNOME</emphasis> or <emphasis>KDE</emphasis> the debug file goes in your
-    home directory, since that's considered the current directory.
+    home directory, since that's considered the current directory. A file name
+    can be specified using either <emphasis>gnashrc</emphasis> or a 
+    call to the LogFile instance itself.
   </para>
-
-  <para>
-    There is common functionality between using the C or C++
-    API. Optional output is based on flags that can be set or
-    unset. Multiple levels of verbosity are supported, so you can get
-    more output by supplying multiple <emphasis>-v</emphasis> options on the
-    command line. You can also disable the creation of the debug log.
-  </para>
-
-  <para>
-    Currently the use of the C++ API for logging is discouraged, do to
-    performance issues.and the generic log_msg() has been replaced by
-    more spcific function calls to allow more control of what gets
-    displayed and logged.
-  </para>
-
-  <sect3 id="capi">
-    <title>Logging System C API</title>
+    </sect3>
+  <sect3 id="api">
+    <title>Logging System API</title>
 
     <para>
-      These functions are clones of the originals as they were used
-      for Gnash. These function the same as always except output can
-      be logged to disk now as well. These currently print no
-      timestamp with the output, which is the older functionality. As
-      these functions are implemented on top of the C++ API now, they
-      can be used without corrupting the output buffers.
+        &app; provides 9 specialized logging calls, each using the <emphasis>printf()</emphasis>-style
+        call similar to this:
+        <programlisting>log_error(const char* fmt, ...)</programlisting>
+        The different
+        calls and their purposes are described below. The output to stdout and to disk
+        are always identical, although writing the log to disk can be separately disabled.
     </para>
 
     <variablelist>
       <varlistentry>
-	<term>log_error(const char* fmt, ...)</term>
+	<term>log_error</term>
 	<listitem>
 	  <para>
-	    Display an error message if verbose output is enabled. By
-	    default the error messages are always written to the disk
-	    file, but optionally displayed in the terminal.
+	    Display an error message if verbose output is enabled. This is
+	    always printed at a verbosity level of 1 or more.
 	  </para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>void log_unimpl</term>
+	<term>log_unimpl</term>
 	<listitem>
 	  <para>
 	    Displays a warning to the user about missing Gnash features.
 	    We expect all calls to this function to disappear over time, as we
-	    implement those features of Flash.
+	    implement those features of Flash. This is
+	    always printed at a verbosity level of 1 or more.
 	  </para>
 	</listitem>
       </varlistentry>
+      
       <varlistentry>
-	<term>void log_trace</term>
+	<term>log_trace</term>
 	<listitem>
 	  <para>
-	    Used only for explicit user traces
+	    Used only for the output of the ActionScript <emphasis>trace()</emphasis>
+	     function. This is
+	    always printed at a verbosity level of 1 or more.
 	  </para>
 	</listitem>
       </varlistentry>
       <varlistentry>
-	<term>void log_debug</term>
+	<term>log_debug</term>
 	<listitem>
 	  <para>
-	    Logs debug information.
+	    Logs debug information. This is printed at a verbosity level of 2 or more.
 	  </para>
 	</listitem>
       </varlistentry>
       <varlistentry>
-	<term>void log_action</term>
+	<term>log_action</term>
 	<listitem>
 	  <para>
 	    Log action execution information. Wrap all calls to this
 	    function (and other related statements) into an
 	    IF_VERBOSE_ACTION macro, so to allow completely removing
 	    all the overhead at compile time and reduce it at
-	    runtime.
+	    runtime. This is printed at a verbosity level of 1 or more
+	    only if action logging is enabled.
 	  </para>
 	</listitem>
       </varlistentry>
       <varlistentry>
-	<term>void log_parse</term>
+	<term>log_parse</term>
 	<listitem>
 	  <para>
 	    Log SWF parsing  Wrap all calls to this function (and
 	    other related statements) into an IF_VERBOSE_PARSE macro,
 	    so to allow completely removing all the overhead at
-	    compile time and reduce it at runtime.
+	    compile time and reduce it at runtime. This is printed at a
+	    verbosity level of 1 or more
+	    only if parser logging is enabled.
 	  </para>
 	</listitem>
       </varlistentry>
       <varlistentry>
-	<term>void log_security</term>
+	<term>log_security</term>
 	<listitem>
 	  <para>
-	    Display a message with security related information.
+	    Display a message with security related information. This is always
+	    printed at a verbosity level of 1 or more.
 	  </para>
 	</listitem>
       </varlistentry>
       <varlistentry>
-	<term>void log_swferror</term>
+	<term>log_swferror</term>
 	<listitem>
 	  <para>
 	    This indicates an error in how the binary SWF file was
@@ -130,18 +143,26 @@
 	    the SWF file. Wrap all calls to this function (and other
 	    related statements) into an IF_VERBOSE_MALFORMED_SWF
 	    macro, so to allow completely removing all the overhead at
-	    compile time and reduce it at runtime.
+	    compile time and reduce it at runtime. This is printed at a
+	    verbosity level of 1 or more
+	    only if malformed SWF logging is enabled.
 	  </para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>log_warning(const char* fmt, ...)</term>
+	<term>void log_aserror</term>
 	<listitem>
 	  <para>
-	    Display a warning message if verbose output is enabled. By
-	    default the error messages are always written to the disk
-	    file, but optionally displayed in the terminal.
+	    This indicates an erroneous actionscript request such as
+	    an incorrect number of arguments or an invalid argument.
+	    Wrap all calls to this function (and other
+	    related statements) into an IF_VERBOSE_ASCODING_ERRORS
+	    macro, so to allow completely removing all the overhead at
+	    compile time and reduce it at runtime. 
+	    This is printed at a
+	    verbosity level of 1 or more
+	    only if AS coding error logging is enabled.
 	  </para>
 	</listitem>
       </varlistentry>
@@ -149,56 +170,40 @@
       
   </sect3>
 
-  <sect3 id="cppapi">
-    <title>Logging System C++ API</title>
+    <sect3 id="logfileinstance">
+    <title>The LogFile Instance</title>
 
     <para>
-      This is the new C++ streams based API that can be used to print
-      C++ objects natively. All output lines are timestamped.       
-    </para>
-
-    <para>
-      There are two macros used for program tracing. these can be used
-      in both C or C++ code with one little difference. Since C
-      doesn't have destructors, you must call
-      <emphasis>GNASH_REPORT_RETURN</emphasis> at the end of a function to
-      display the function returning message.
+      This is the main API for initializing and manipulating the logging output.
+      By default, the log will be written to <emphasis>gnash-dbg.log</emphasis>
+      file whenever a verbose option is
+      supplied.
     </para>
 
     <variablelist>
       <varlistentry>
-	<term>GNASH_REPORT_FUNCTION;</term>
+	<term>getDefaultInstance()</term>
 	<listitem>
 	  <para>
-	    When this is included in a C++ method, a message is
-	    printed when entering and exiting this method by hooking
-	    into the constructor and destructor. These are always
-	    written to the disk file, but optionally written to the
-	    screen only at the highest levels of verbosity.
+	    This allows the construction of a LogFile on the first call, so
+	    ensuring that it the logfile is always initialised before use.
+	    It is the only way to access a LogFile instance. The logfile
+	    itself is never opened until it is needed.
 	  </para>
 	</listitem>
       </varlistentry>
       <varlistentry>
-	<term>GNASH_REPORT_RETURN;</term>
+	<term>setLogFilename(const std::string&amp; fname)</term>
 	<listitem>
 	  <para>
-	    This is used by C functions to print the returning from
-	    function debug message. For C++, this macro is executed
-	    automatically by the destructor.
+	    Use this to set a different name for the disk-based log file.
+	    This setting can be overridden by a directive in gnashrc. If the
+	    log file is already open, a call to setLogFilename() will close it;
+	    a file with the new name will be opened when it is next needed.
 	  </para>
 	</listitem>
       </varlistentry>
-    </variablelist>
 
-    <para>
-      This is the main API for the logging system. By default
-      everything is setup to write to the default
-      <emphasis>gnash-dbg.log</emphasis> file whenever a verbose option is
-      supplied. Optionally it is possible to open a log file with a
-      specified name, allowing multiple output files.
-    </para>
-    
-    <variablelist>
       <varlistentry>
 	<term>closeLog(void)</term>
 	<listitem>
@@ -227,7 +232,7 @@
 	<term>setVerbosity(int)</term>
 	<listitem>
 	  <para>
-	    Set the verbosity level.
+	    Set the verbosity level to a specified level.
 	  </para>
 	</listitem>
       </varlistentry>

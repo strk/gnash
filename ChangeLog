@@ -1,3 +1,7 @@
+2008-03-17 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* doc/C/refmanual/logging.xml: update logging docs.
+
 2008-03-17  Dossy Shiobara <dossy@panoptic.com>
 
 	* plugin/mozilla-sdk/np_entry.cpp (1.11): Conditionally support
