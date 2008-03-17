@@ -589,14 +589,9 @@ as_array_object::index_requested(string_table::key name)
 	double value = temp.to_number();
 
 	// if we were sent a string that can't convert like "asdf", it returns as NaN. -1 means invalid index
-	if (isnan(value)) return -1;
+	if (!isfinite(value)) return -1;
 
-	// TODO / WARNING: because to_number returns a double and we're
-	// converting to an int,
-	// I want to make sure we're above any "grey area" when we we round down
-	// by adding a little to the number before we round it.
-	// We don't want to accidentally look to index-1!
-	return int(value + 0.01);
+	return int(value);
 }
 
 void
@@ -958,7 +953,7 @@ array_sort(const fn_call& fn)
 	if ( fn.nargs == 0 )
 	{
 		array->sort(as_value_lt(env));
-		return as_value((boost::intrusive_ptr<as_object>)array);
+		return as_value(array.get());
 	}
 	else if ( fn.nargs == 1 && fn.arg(0).is_number() )
 	{
@@ -982,7 +977,7 @@ array_sort(const fn_call& fn)
 		if ( (flags & as_array_object::fReturnIndexedArray) )
 			return as_value(array->sort_indexed(avc));
 		array->sort(avc);
-		return as_value((boost::intrusive_ptr<as_object>)array);
+		return as_value(array.get());
 		// note: custom AS function sorting apparently ignores the 
 		// UniqueSort flag which is why it is also ignored here
 	}
@@ -992,7 +987,7 @@ array_sort(const fn_call& fn)
 		log_aserror(_("Sort called with invalid arguments."));
 		)
 		if ( fn.arg(0).is_undefined() ) return as_value();
-		return as_value((boost::intrusive_ptr<as_object>)array);
+		return as_value(array.get());
 	}
 	bool do_unique, do_index;
 	flags = flag_preprocess(flags, &do_unique, &do_index);
@@ -1007,7 +1002,7 @@ array_sort(const fn_call& fn)
 	}
 	if (do_index) return as_value(array->sort_indexed(comp));
 	array->sort(comp);
-	return as_value((boost::intrusive_ptr<as_object>)array);
+	return as_value(array.get());
 }
 
 static as_value
@@ -1046,7 +1041,7 @@ array_sortOn(const fn_call& fn)
 		if (do_index)
 			return as_value(array->sort_indexed(avc));
 		array->sort(avc);
-		return as_value((boost::intrusive_ptr<as_object>)array);
+		return as_value(array.get());
 	}
 
 	// case: sortOn(["prop1", "prop2"] ...)
@@ -1138,7 +1133,7 @@ array_sortOn(const fn_call& fn)
 		if (do_index)
 			return as_value(array->sort_indexed(avc));
 		array->sort(avc);
-		return as_value((boost::intrusive_ptr<as_object>)array);
+		return as_value(array.get());
 
 	}
 	IF_VERBOSE_ASCODING_ERRORS(
@@ -1147,7 +1142,7 @@ array_sortOn(const fn_call& fn)
 	if (fn.nargs == 0 )
 		return as_value();
 
-	return as_value((boost::intrusive_ptr<as_object>)array);
+	return as_value(array.get());
 }
 
 // Callback to push values to the back of an array

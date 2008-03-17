@@ -1,3 +1,10 @@
+2008-03-17 Sandro Santilli <strk@keybit.net>
+
+	* server/array.cpp (index_requested): don't turn a negative number
+	  >= -1 to a valid index !!
+	* testsuite/actionscript.all/array.as: add test for negative indexed
+	  members.
+
 2008-03-17 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gtk.cpp, gui/gnash.cpp: make clear that media handler

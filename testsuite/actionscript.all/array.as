@@ -19,7 +19,7 @@
 // Initial test written by Mike Carlson
 
 
-rcsid="$Id: array.as,v 1.44 2008/03/11 19:31:48 strk Exp $";
+rcsid="$Id: array.as,v 1.45 2008/03/17 20:34:33 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Array), 'function');
@@ -1005,6 +1005,19 @@ xcheck_equals(out['len'], 2);
 check_equals(out[1], 1);
 check_equals(out[0], 1);
 
+//-------------------------------
+// Test length property
+//-------------------------------
+
+a = new Array();
+check_equals(a.length, 0);
+a[-1] = 'minusone';
+check_equals(a.length, 0);
+check_equals(a[-1], 'minusone');
+a["Infinite"] = 'inf';
+check_equals(a.length, 0);
+check_equals(a["Infinite"], 'inf');
+
 
 // TODO: test ASnative-returned functions:
 //
@@ -1024,11 +1037,11 @@ check_equals(out[0], 1);
 
 
 #if OUTPUT_VERSION < 6
- check_totals(366);
+ check_totals(371);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(394);
+  check_totals(399);
 # else
-  check_totals(401);
+  check_totals(406);
 # endif
 #endif
