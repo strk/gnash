@@ -41,7 +41,12 @@ INCLUDES = -I.. \
 	$(BOOST_CFLAGS) \
 	$(PTHREAD_CFLAGS)
 
-check_PROGRAMS = test_http test_crc
+check_PROGRAMS = \
+	test_buffer \
+	test_cque \
+	test_handler \
+	test_http \
+	test_crc
 
 test_http_SOURCES = test_http.cpp
 test_http_LDADD = $(AM_LDFLAGS) 
@@ -51,6 +56,17 @@ test_crc_SOURCES = test_crc.cpp
 test_crc_LDADD = $(AM_LDFLAGS) 
 test_crc_DEPENDENCIES = site-update
 
+test_cque_SOURCES = test_cque.cpp
+test_cque_LDADD = $(AM_LDFLAGS) 
+test_cque_DEPENDENCIES = site-update
+
+test_handler_SOURCES = test_handler.cpp
+test_handler_LDADD = $(AM_LDFLAGS) 
+test_handler_DEPENDENCIES = site-update
+
+test_buffer_SOURCES = test_buffer.cpp
+test_buffer_LDADD = $(AM_LDFLAGS) 
+test_buffer_DEPENDENCIES = site-update
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

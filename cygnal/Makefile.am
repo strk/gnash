@@ -20,9 +20,13 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
+if TESTSUITE
+TEST_DIR = testsuite
+endif
+
 SUBDIRS = \
-	. \
-	testsuite
+	$(TEST_DIR) \
+	.
 
 # we don't want these anymore
 #DIST_SUBDIRS  = ACT IO HTTP Net unit_tests 
@@ -61,6 +65,9 @@ noinst_LTLIBRARIES = libcygnal.la
 libcygnal_la_LIBADD = $(AM_LDFLAGS)
 
 noinst_HEADERS = \
+	buffer.h \
+	cque.h \
+	handler.h \
 	http.h \
 	netstats.h \
 	stream.h \
@@ -71,6 +78,9 @@ noinst_HEADERS = \
 
 
 libcygnal_la_SOURCES = \
+	buffer.cpp \
+	cque.cpp \
+	handler.cpp \
 	http.cpp \
 	alloc.cpp \
 	netstats.cpp \
