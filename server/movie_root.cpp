@@ -847,7 +847,17 @@ movie_root::fire_mouse_event()
 
     // FIXME: need_redraw might also depend on actual
     //        actions execution (consider updateAfterEvent).
-    processActionQueue();
+
+    try
+    {
+        processActionQueue();
+    }
+    catch (ActionLimitException& al)
+    {
+        log_error(_("ActionLimits hit during mouse event processing: %s. Disabling scripts"), al.what());
+        disableScripts();
+        clearActionQueue();
+    }
 
     return need_redraw;
 
