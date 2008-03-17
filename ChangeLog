@@ -1,3 +1,9 @@
+2008-03-17  Dossy Shiobara <dossy@panoptic.com>
+
+	* plugin/mozilla-sdk/np_entry.cpp (1.11): Conditionally support
+	  older NPAPI versions by using a more fine-grained approach to
+	  copying the NPNetscapeFuncs structure.
+
 2008-03-17 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/vm/ASHandlers.cpp: don't try to access an element of an
