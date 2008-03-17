@@ -126,7 +126,9 @@ Player::init_logfile()
     if (rcfile.useWriteLog()) {
         dbglogfile.setWriteDisk(true);
     }
-    
+
+    dbglogfile.setLogFilename(rcfile.getDebugLog());
+
     if (rcfile.verbosityLevel() > 0) {
         dbglogfile.setVerbosity(rcfile.verbosityLevel());
     }

@@ -372,6 +372,20 @@ LogFile::log(const std::string& label, const std::string& msg)
 
 }
 
+void
+LogFile::setLogFilename(const std::string& fname)
+{
+	closeLog();
+	_logFilename = fname;
+}
+
+void
+LogFile::setWriteDisk(bool use)
+{
+	if ( ! use ) closeLog();
+	_write = use;
+}
+
 // Default constructor
 LogFile::LogFile ()
 	:
@@ -382,8 +396,6 @@ LogFile::LogFile ()
 	_stamp(true),
 	_write(false)
 {
-    RcInitFile& rcfile = RcInitFile::getDefaultInstance();
-    _write = rcfile.useWriteLog();
 }
 
 LogFile::~LogFile()
@@ -397,14 +409,11 @@ LogFile::openLogIfNeeded ()
     if (_state != CLOSED) return true;
     if (!_write) return false;
 
-    RcInitFile& rcfile = RcInitFile::getDefaultInstance();
-
-    std::string loadfile = rcfile.getDebugLog();
-    if ( loadfile.empty() ) loadfile = DEFAULT_LOGFILE;
+    if ( _logFilename.empty() ) _logFilename = DEFAULT_LOGFILE;
 
     // TODO: expand ~ to getenv("HOME") !!
 
-    return openLog(loadfile);
+    return openLog(_logFilename);
 }
 
 bool

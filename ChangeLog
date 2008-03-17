@@ -1,3 +1,13 @@
+2008-03-17 Sandro Santilli <strk@keybit.net>
+
+	* libbase/log.{cpp,h}: decouple LogFile and RcInitFile.
+	  Add a LogFile::setLogFilename to specify a custom name
+	  for the log file.
+	* gui/Player.cpp: set LogFile filename as specified in the
+	  rc file.
+	* utilities/processor.cpp: set LogFile filename as specified
+	  in the rc file.
+
 2008-03-17 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/asobj/string.cpp: String.substr(): an undefined second

@@ -166,11 +166,17 @@ main(int argc, char *argv[])
  
     std::vector<const char*> infiles;
  
-    RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+    //RcInitFile& rcfile = RcInitFile::getDefaultInstance();
     rcfile.loadFiles();
     
     if (rcfile.verbosityLevel() > 0) {
         dbglogfile.setVerbosity(rcfile.verbosityLevel());
+    }
+
+    dbglogfile.setLogFilename(rcfile.getDebugLog());
+
+    if (rcfile.useWriteLog()) {
+        dbglogfile.setWriteDisk(true);
     }
     
     if (rcfile.useActionDump()) {

@@ -115,6 +115,14 @@ public:
     ///
     bool closeLog();
 
+    /// Set log filename 
+    //
+    /// If a log file is opened already, it will be closed
+    /// by this call, and will be reopened on next use
+    /// if needed.
+    ///
+    void setLogFilename(const std::string& fname);
+
     // accessors for the verbose level
     void setVerbosity () {
         _verbose++;
@@ -152,9 +160,8 @@ public:
         return _stamp;
     }
 
-    void setWriteDisk (bool b) {
-        _write = b;
-    }
+    /// Set whether to write logs to file
+    void setWriteDisk (bool b);
 
     bool getWriteDisk () {
         return _write;
@@ -229,6 +236,8 @@ private:
 	    ss << any;
 	    return *this << ss.str();
     }
+
+    std::string _logFilename;
 
 };
 
