@@ -3,6 +3,8 @@
 	* server/vm/ASHandlers.cpp: don't try to access an element of an
 	  empty string; use string.at(), which would throw an exception if
 	  we try to do so.
+	* doc/C/usermanual/usage.xml: add new long options, correct some
+	  descriptions.
 
 2008-03-17 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
