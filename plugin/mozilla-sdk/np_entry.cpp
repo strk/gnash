@@ -80,46 +80,75 @@ DSOEXPORT static NPError fillPluginFunctionTable(NPPluginFuncs* aNPPFuncs)
 
 DSOEXPORT static NPError fillNetscapeFunctionTable(NPNetscapeFuncs* aNPNFuncs)
 {
+  int i = 0, n;
+
   if(aNPNFuncs == NULL)
     return NPERR_INVALID_FUNCTABLE_ERROR;
 
   if(HIBYTE(aNPNFuncs->version) > NP_VERSION_MAJOR)
     return NPERR_INCOMPATIBLE_VERSION_ERROR;
 
+#if 0
   if(aNPNFuncs->size < sizeof(NPNetscapeFuncs))
     return NPERR_INVALID_FUNCTABLE_ERROR;
+#endif
+
+  // Number of function pointers in aNPNFuncs.
+  n = (aNPNFuncs->size - (2 * sizeof(uint16))) / sizeof(void *);
 
   NPNFuncs.size             = aNPNFuncs->size;
   NPNFuncs.version          = aNPNFuncs->version;
-  NPNFuncs.geturlnotify     = aNPNFuncs->geturlnotify;
-  NPNFuncs.geturl           = aNPNFuncs->geturl;
-  NPNFuncs.posturlnotify    = aNPNFuncs->posturlnotify;
-  NPNFuncs.posturl          = aNPNFuncs->posturl;
-  NPNFuncs.requestread      = aNPNFuncs->requestread;
-  NPNFuncs.newstream        = aNPNFuncs->newstream;
-  NPNFuncs.write            = aNPNFuncs->write;
-  NPNFuncs.destroystream    = aNPNFuncs->destroystream;
-  NPNFuncs.status           = aNPNFuncs->status;
-  NPNFuncs.uagent           = aNPNFuncs->uagent;
-  NPNFuncs.memalloc         = aNPNFuncs->memalloc;
-  NPNFuncs.memfree          = aNPNFuncs->memfree;
-  NPNFuncs.memflush         = aNPNFuncs->memflush;
-  NPNFuncs.reloadplugins    = aNPNFuncs->reloadplugins;
-#ifdef OJI
-  NPNFuncs.getJavaEnv       = aNPNFuncs->getJavaEnv;
-  NPNFuncs.getJavaPeer      = aNPNFuncs->getJavaPeer;
-#endif
-  NPNFuncs.getvalue         = aNPNFuncs->getvalue;
-  NPNFuncs.setvalue         = aNPNFuncs->setvalue;
-  NPNFuncs.invalidaterect   = aNPNFuncs->invalidaterect;
-  NPNFuncs.invalidateregion = aNPNFuncs->invalidateregion;
-  NPNFuncs.forceredraw      = aNPNFuncs->forceredraw;
 
-// The following has been copied from a newer version of npn_gate.cpp
+  /*
+   * BEWARE!  The following is order-sensitive and needs to be in the
+   * same order as the structure definition from npupp.h.
+   */
 
-  NPNFuncs.getstringidentifier     = aNPNFuncs->getstringidentifier;
-  NPNFuncs.getproperty             = aNPNFuncs->getproperty;
-  NPNFuncs.releaseobject           = aNPNFuncs->releaseobject;
+  if (++i <= n) NPNFuncs.geturl = aNPNFuncs->geturl;
+  if (++i <= n) NPNFuncs.posturl = aNPNFuncs->posturl;
+  if (++i <= n) NPNFuncs.requestread = aNPNFuncs->requestread;
+  if (++i <= n) NPNFuncs.newstream = aNPNFuncs->newstream;
+  if (++i <= n) NPNFuncs.write = aNPNFuncs->write;
+  if (++i <= n) NPNFuncs.destroystream = aNPNFuncs->destroystream;
+  if (++i <= n) NPNFuncs.status = aNPNFuncs->status;
+  if (++i <= n) NPNFuncs.uagent = aNPNFuncs->uagent;
+  if (++i <= n) NPNFuncs.memalloc = aNPNFuncs->memalloc;
+  if (++i <= n) NPNFuncs.memfree = aNPNFuncs->memfree;
+  if (++i <= n) NPNFuncs.memflush = aNPNFuncs->memflush;
+  if (++i <= n) NPNFuncs.reloadplugins = aNPNFuncs->reloadplugins;
+  if (++i <= n) NPNFuncs.getJavaEnv = aNPNFuncs->getJavaEnv;
+  if (++i <= n) NPNFuncs.getJavaPeer = aNPNFuncs->getJavaPeer;
+  if (++i <= n) NPNFuncs.geturlnotify = aNPNFuncs->geturlnotify;
+  if (++i <= n) NPNFuncs.posturlnotify = aNPNFuncs->posturlnotify;
+  if (++i <= n) NPNFuncs.getvalue = aNPNFuncs->getvalue;
+  if (++i <= n) NPNFuncs.setvalue = aNPNFuncs->setvalue;
+  if (++i <= n) NPNFuncs.invalidaterect = aNPNFuncs->invalidaterect;
+  if (++i <= n) NPNFuncs.invalidateregion = aNPNFuncs->invalidateregion;
+  if (++i <= n) NPNFuncs.forceredraw = aNPNFuncs->forceredraw;
+  if (++i <= n) NPNFuncs.getstringidentifier = aNPNFuncs->getstringidentifier;
+  if (++i <= n) NPNFuncs.getstringidentifiers = aNPNFuncs->getstringidentifiers;
+  if (++i <= n) NPNFuncs.getintidentifier = aNPNFuncs->getintidentifier;
+  if (++i <= n) NPNFuncs.identifierisstring = aNPNFuncs->identifierisstring;
+  if (++i <= n) NPNFuncs.utf8fromidentifier = aNPNFuncs->utf8fromidentifier;
+  if (++i <= n) NPNFuncs.intfromidentifier = aNPNFuncs->intfromidentifier;
+  if (++i <= n) NPNFuncs.createobject = aNPNFuncs->createobject;
+  if (++i <= n) NPNFuncs.retainobject = aNPNFuncs->retainobject;
+  if (++i <= n) NPNFuncs.releaseobject = aNPNFuncs->releaseobject;
+  if (++i <= n) NPNFuncs.invoke = aNPNFuncs->invoke;
+  if (++i <= n) NPNFuncs.invokeDefault = aNPNFuncs->invokeDefault;
+  if (++i <= n) NPNFuncs.evaluate = aNPNFuncs->evaluate;
+  if (++i <= n) NPNFuncs.getproperty = aNPNFuncs->getproperty;
+  if (++i <= n) NPNFuncs.setproperty = aNPNFuncs->setproperty;
+  if (++i <= n) NPNFuncs.removeproperty = aNPNFuncs->removeproperty;
+  if (++i <= n) NPNFuncs.hasproperty = aNPNFuncs->hasproperty;
+  if (++i <= n) NPNFuncs.hasmethod = aNPNFuncs->hasmethod;
+  if (++i <= n) NPNFuncs.releasevariantvalue = aNPNFuncs->releasevariantvalue;
+  if (++i <= n) NPNFuncs.setexception = aNPNFuncs->setexception;
+  if (++i <= n) NPNFuncs.pushpopupsenabledstate = aNPNFuncs->pushpopupsenabledstate;
+  if (++i <= n) NPNFuncs.poppopupsenabledstate = aNPNFuncs->poppopupsenabledstate;
+  if (++i <= n) NPNFuncs.enumerate = aNPNFuncs->enumerate;
+  if (++i <= n) NPNFuncs.pluginthreadasynccall = aNPNFuncs->pluginthreadasynccall;
+  if (++i <= n) NPNFuncs.construct = aNPNFuncs->construct;
 
   return NPERR_NO_ERROR;
 }
