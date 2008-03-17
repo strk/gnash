@@ -62,7 +62,7 @@ using std::endl;
 using std::cout;
 
 std::vector<std::string> infiles;
-std::string url = "";
+std::string url;
 
 namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
@@ -164,10 +164,10 @@ static void build_options()
         << _("   CXXFLAGS: ") << CXXFLAGS << endl;
 
 #ifdef HAVE_FFMPEG_AVCODEC_H
-    cout << _("Ffmpeg version is: ") << LIBAVCODEC_IDENT << endl;
+    cout << _("Built against ffmpeg version: ") << LIBAVCODEC_IDENT << endl;
 #endif
 #ifdef HAVE_GST_GST_H
-    cout << _("Gstreamer version is: ") << GST_VERSION_MAJOR << "."
+    cout << _("Built against gstreamer version: ") << GST_VERSION_MAJOR << "."
         << GST_VERSION_MINOR << "." << GST_VERSION_MICRO << endl;
 #endif
 }
@@ -184,7 +184,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         { 'p', 0,               Arg_parser::no  },
         { 's', "scale",         Arg_parser::yes },
         { 256, "max-advances",  Arg_parser::yes },
-        { 257, "fullscreen",    Arg_parser::no },        
+        { 257, "fullscreen",    Arg_parser::no  },        
         { 'c', 0,               Arg_parser::no  },
         { 'd', "delay",         Arg_parser::yes },
         { 'x', "xid",           Arg_parser::yes },
@@ -346,7 +346,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     }
                     break;
                 case 't':
-                    player.setExitTimeout( parser.argument<float>(i) );
+                    player.setExitTimeout(parser.argument<float>(i));
                     break;
                 case 'f':
     #ifdef GNASH_FPS_DEBUG

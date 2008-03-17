@@ -1,5 +1,10 @@
 2008-03-17 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* gui/gtk.cpp, gui/gnash.cpp: make clear that media handler
+	  version information is static.
+
+2008-03-17 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* gui/gtk.cpp: add media handler version information.
 
 2008-03-17 Sandro Santilli <strk@keybit.net>

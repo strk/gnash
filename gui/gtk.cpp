@@ -1371,13 +1371,13 @@ GtkGui::showAboutDialog()
     comments.append(_("\nMedia: "));
     comments.append(MEDIA_CONFIG" ");
 #ifdef HAVE_GST_GST_H
-    comments.append(_("\nGstreamer version: "));
+    comments.append(_("\nBuilt against gstreamer version: "));
     std::ostringstream ss;
     ss << GST_VERSION_MAJOR << "." << GST_VERSION_MINOR << "." << GST_VERSION_MICRO;
     comments.append(ss.str());
 #endif
 #ifdef HAVE_FFMPEG_AVCODEC_H
-    comments.append(_("\nFfmpeg version: "));
+    comments.append(_("\nBuilt against ffmpeg version: "));
     comments.append(LIBAVCODEC_IDENT);
 #endif
 
