@@ -1,5 +1,10 @@
 2008-03-17 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Inheritance.as: fixed bug in testcase
+	  making the business more complex then it was.
+
+2008-03-17 Sandro Santilli <strk@keybit.net>
+
 	* libbase/log.{cpp,h}: decouple LogFile and RcInitFile.
 	  Add a LogFile::setLogFilename to specify a custom name
 	  for the log file.

@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.55 2008/03/15 13:01:31 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.56 2008/03/17 11:36:46 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Object.prototype.constructor), 'function');
@@ -267,8 +267,8 @@ C.prototype.whoami = function() {
 function F() { FctorCalls++; /*note("F ctor");*/ }
 F.prototype.myName = function() { return "F"; };
 A.prototype.__constructor__ = F; A.prototype.__proto__ = F.prototype;
-A.prototype.myName = function() { super(); return super.myName()+"A"; };
-C.prototype.myName = function() { super(); return super.myName()+"C"; };
+A.prototype.myName = function() { /*note("A.prototype.myName called");*/ super(); return super.myName()+"A"; };
+C.prototype.myName = function() { /*note("C.prototype.myName called");*/ super(); return super.myName()+"C"; };
 FctorCalls=0;
 BctorCalls=0;
 ActorCalls=0;
@@ -311,11 +311,13 @@ n = co.myName();
 #endif
 
 // Now test 'super' at the top of the inheritance chain
-F.prototype.myName = function() { super(); return super.myName()+"F"; };
+F.prototype.myName = function() { /*note("F.prototype.myName called");*/ super(); return super.myName()+"F"; };
 FctorCalls=0;
 BctorCalls=0;
 ActorCalls=0;
+//note("Calling co (instanceof C) myName method");
 n = co.myName();
+//note("Done calling co (instanceof C) myName method");
 #if OUTPUT_VERSION < 6 
  check_equals(n, "C"); // no super
  check_equals(FctorCalls, 0); // no super
@@ -323,15 +325,15 @@ n = co.myName();
  check_equals(ActorCalls, 0); // no super
 #endif
 #if OUTPUT_VERSION == 6 
- check_equals(co.myName(), "FFFC"); // super in C references F proto 
- check_equals(FctorCalls, 2); // and all ctors are called twice ?
- check_equals(BctorCalls, 2); 
- check_equals(ActorCalls, 2); 
+ check_equals(n, "FFFC"); // super in C references F proto 
+ check_equals(FctorCalls, 1); 
+ check_equals(BctorCalls, 1); 
+ check_equals(ActorCalls, 1); 
 #endif
 #if OUTPUT_VERSION > 6
- xcheck_equals(co.myName(), "undefinedFFC");  // gnash gives undefinedFC here
- xcheck_equals(FctorCalls, 2); // gnash gives 0 here
- xcheck_equals(BctorCalls, 2); // gnash gives 3 here
+ xcheck_equals(n, "undefinedFFC");  // gnash gives undefinedFC here
+ xcheck_equals(FctorCalls, 1); // gnash gives 0 here
+ check_equals(BctorCalls, 1); 
  check_equals(ActorCalls, 0); 
 #endif
 
