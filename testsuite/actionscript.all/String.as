@@ -17,7 +17,7 @@
 // Original author: Mike Carlson - June 19th, 2006
 
 
-rcsid="$Id: String.as,v 1.47 2008/03/16 15:51:49 bwy Exp $";
+rcsid="$Id: String.as,v 1.48 2008/03/17 08:06:47 bwy Exp $";
 #include "check.as"
 
 check_equals(typeof(String), 'function');
@@ -494,7 +494,8 @@ asm {
 check_equals( b, "f");
 
 teststr = "Heöllo";
-count = 0;
+count1 = 0;
+count2 = 0;
 
 for (i = -5; i < 10; i++)
 {
@@ -506,23 +507,28 @@ for (i = -5; i < 10; i++)
             getvariable
             push "i"
             getvariable
-            push "j" // size is bigger then string length,
+            push "j"
             getvariable
-                      // we expect the interpreter to adjust it
             substring
             setvariable
         };
         
-        b = teststr.substr( i >= 1 ? i - 1 : 0, j >= 0 ? j: teststr.length());
+        b = teststr.substr( i >= 1 ? i - 1 : 0, j >= 0 ? j : teststr.length);
+
+        // Test for undefined.
+        c = teststr.substr( i >= 1 ? i - 1 : 0, j >= 0 ? j : teststr.undef());
         
-        // There are ... tests
-        if (a == b) count++;
+        // There are 225 tests
+        if (a == b) count1++;
         else note(i + " : " + j + " -- " + a + ":" + b);
+
+        if (b == c) count2++;
+
     }
 }
 
-// For SWF5 this because of substr...
-xcheck_equals (count, 225);
+check_equals (count1, 225); // String.substr / substring consistency
+check_equals (count2, 225); // undefined value same as no value passed (or length of string)
 
 #endif
 
@@ -740,7 +746,7 @@ r = "s:"+s;
 check_equals(r, "s:");
 
 #if OUTPUT_VERSION < 6
- check_totals(202);
+ check_totals(203);
 #else
- check_totals(232);
+ check_totals(233);
 #endif

@@ -217,17 +217,16 @@ string_concat(const fn_call& fn)
 
 
 static size_t
-valid_index(const std::wstring& subject, int index)
+validIndex(const std::wstring& subject, int index)
 {
-    int myIndex = index;
 
-    if (myIndex < 0) {
-        myIndex = subject.size() + myIndex;
+    if (index < 0) {
+        index = subject.size() + index;
     }
 
-    myIndex = iclamp(myIndex, 0, subject.size());
+    index = iclamp(index, 0, subject.size());
 
-    return myIndex;
+    return index;
 }
 
 // 1st param: start_index, 2nd param: end_index
@@ -243,14 +242,13 @@ string_slice(const fn_call& fn)
 
     ENSURE_FN_ARGS(1, 2, as_value());
 
-    size_t start = valid_index(wstr, fn.arg(0).to_int());
+    size_t start = validIndex(wstr, fn.arg(0).to_int());
 
-    size_t len = wstr.length();
+    size_t end = wstr.length();
 
-    size_t end = len;
     if (fn.nargs >= 2)
     {
-    	end = valid_index(wstr, fn.arg(1).to_int());
+    	end = validIndex(wstr, fn.arg(1).to_int());
 
     } 
 
@@ -259,7 +257,7 @@ string_slice(const fn_call& fn)
             return as_value("");
     }
 
-    size_t retlen = end-start;
+    size_t retlen = end - start;
 
     log_debug("start: "SIZET_FMT", end: "SIZET_FMT", retlen: "SIZET_FMT, start, end, retlen);
 
@@ -307,7 +305,7 @@ string_split(const fn_call& fn)
 
     if (fn.nargs >= 2)
     {
-	int max_in = fn.arg(1).to_number<int>();
+	int max_in = fn.arg(1).to_int();
 	if ( SWFVersion < 6 && max_in < 1 )
 	{
 		return as_value(array.get());
@@ -372,7 +370,7 @@ string_last_index_of(const fn_call& fn)
     int start = str.size();
 
     if (fn.nargs >= 2) {
-        start = fn.arg(1).to_number<int>();
+        start = fn.arg(1).to_int();
     }
     
     if (start < 0) {
@@ -388,34 +386,38 @@ string_last_index_of(const fn_call& fn)
     return as_value(found - toFind.size() + 1);
 }
 
-// 1st param: start_index, 2nd param: length (NOT end_index)
+// String.substr(start[, length]).
+// If the second value is absent or undefined, the remainder of the string from
+// <start> is returned.
+// If start is more than string length or length is 0, empty string is returned.
+// If length is negative, the substring is taken from the *end* of the string.
 static as_value
 string_sub_str(const fn_call& fn)
 {
     boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
     int version = VM::get().getSWFVersion();
-    // Make a copy.
+
     std::wstring wstr = utf8::decodeCanonicalString(obj->str(), version);
 
     ENSURE_FN_ARGS(1, 2, obj->str());
 
-    int start = valid_index(wstr, fn.arg(0).to_int());
+    int start = validIndex(wstr, fn.arg(0).to_int());
 
-    int num = wstr.size();
+    int num = wstr.length();
 
-    if (fn.nargs >= 2)
+    if (fn.nargs >= 2 && !fn.arg(1).is_undefined())
     {
         num = fn.arg(1).to_int();
-	if ( num < 0 )
-	{
-		if ( -num <= start ) num = 0;
-		else
-		{
-			num = wstr.size() + num;
-			if ( num < 0 ) return as_value("");
-		}
-	}
+	    if ( num < 0 )
+	    {
+		    if ( -num <= start ) num = 0;
+		    else
+		    {
+			    num = wstr.length() + num;
+			    if ( num < 0 ) return as_value("");
+		    }
+	    }
     }
 
     return as_value(utf8::encodeCanonicalString(wstr.substr(start, num), version));
@@ -423,7 +425,7 @@ string_sub_str(const fn_call& fn)
 
 // string.substring(start[, end])
 // If *either* value is less than 0, 0 is used.
-// The values are swapped if end is smaller than start.
+// The values are *then* swapped if end is before start.
 // Valid values for the start position are up to string 
 // length - 1.
 static as_value
@@ -437,7 +439,7 @@ string_sub_string(const fn_call& fn)
 
     ENSURE_FN_ARGS(1, 2, obj->str());
 
-    int start = fn.arg(0).to_number<int>();
+    int start = fn.arg(0).to_int();
     int end = wstr.size();
 
     if (start < 0) {
@@ -449,7 +451,7 @@ string_sub_string(const fn_call& fn)
     }
 
     if (fn.nargs >= 2) {
-        int num = fn.arg(1).to_number<int>();
+        int num = fn.arg(1).to_int();
 
         if (num < 0) {
             num = 0;

@@ -880,93 +880,96 @@ SWFHandlers::ActionStringLength(ActionExec& thread)
 void
 SWFHandlers::ActionSubString(ActionExec& thread)
 {
-    //GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    thread.ensureStack(3); // size, base, string
 
-    as_value& size_val = env.top(0);
-    as_value& base_val = env.top(1);
-    as_value& string_val = env.top(2);
+    // substring("string",  base,  size) 
+    // SWF4 function, deprecated in favour of String.substring.
+    // 1-based (String object methods are 0-based).
+
+    as_environment& env = thread.env;
+    thread.ensureStack(3); // string, start, size
+
+    const as_value& strval = env.top(2);
 
     // input checks
-    if ( string_val.is_undefined() || string_val.is_null() )
+    if ( strval.is_undefined() || strval.is_null() )
     {
     	log_error(_("Undefined or null string passed to ActionSubString, "
 		"returning undefined"));
     	env.drop(2);
     	env.top(0).set_undefined();
-	return;
+	    return;
     }
+    
+    int size = env.top(0).to_int();
+    int start = env.top(1).to_int();
 
-    int size = unsigned(size_val.to_number());
-
-    int	base = int(base_val.to_number()); // TODO: use to_int ?
+    // We don't need to_string_versioned because undefined values have
+    // already been dealt with.
     int version = env.get_version();
-    const std::string& str = string_val.to_string_versioned(version);
+    const std::wstring wstr = utf8::decodeCanonicalString(
+                                strval.to_string(), version);
 
     if ( size < 0 )
     {
-	IF_VERBOSE_ASCODING_ERRORS(
-    	log_aserror(_("Negative size passed to ActionSubString, "
-		"taking as whole length"));
-	);
-	size = str.length();
+	    IF_VERBOSE_ASCODING_ERRORS(
+        	log_aserror(_("Negative size passed to ActionSubString, "
+		    "taking as whole length"));
+	    );
+	    size = wstr.length();
     }
 
-    // TODO: if 'base' or 'size' do not evaluate to numbers return
+    // TODO: if 'start' or 'size' do not evaluate to numbers return
     //       the empty string (how do we check if they evaluate ??)
 
-    if ( base < 1 )
+    if ( start < 1 )
     {
-	IF_VERBOSE_ASCODING_ERRORS (
-    	log_aserror(_("Base is less then 1 in ActionSubString, "
-		"setting to 1."));
-	);
-	base=1;
+	    IF_VERBOSE_ASCODING_ERRORS (
+        	log_aserror(_("Start is less then 1 in ActionSubString, "
+		    "setting to 1."));
+	    );
+	    start = 1;
     }
 
-    else if ( unsigned(base) > str.length() )
+    // If start is longer than the string length, return empty
+    // string
+    else if (static_cast<unsigned int>(start) > wstr.length() )
     {
-	IF_VERBOSE_ASCODING_ERRORS (
-    	log_aserror(_("base goes beyond input string in ActionSubString, "
-		"returning the empty string."));
-	);
+	    IF_VERBOSE_ASCODING_ERRORS (
+        	log_aserror(_("Start goes beyond input string in ActionSubString, "
+		    "returning the empty string."));
+	    );
     	env.drop(2);
     	env.top(0).set_string("");
-	return;
+	    return;
     }
 
-    // Base is 1-based, we'll use 0-based from now on...
-    base -= 1;
-
-    if ( unsigned(base+size) > str.length() )
+    if (size == 0)
     {
-	IF_VERBOSE_ASCODING_ERRORS (
-    	log_aserror(_("base+size goes beyond input string in ActionSubString, "
-		"adjusting size"));
-	);
-	size = str.length()-base;
+        env.drop(2);
+        env.top(0).set_string("");
+        return;
+    }
+
+    // Adjust the start for our own use.
+    --start;
+
+    if (static_cast<unsigned int>(start + size) > wstr.length())
+    {
+	    IF_VERBOSE_ASCODING_ERRORS (
+        	log_aserror(_("start + size goes beyond input string in ActionSubString, "
+		    "adjusting size"));
+	    );
+	    size = wstr.length() - start;
     }
 
 
-    assert(base >= 0);
-    assert(unsigned(base) < str.length() );
+    assert(start >= 0);
+    assert(static_cast<unsigned int>(start) < wstr.length() );
     assert(size >= 0);
 
-    //log_debug(_("string: %s, size: %d, base: %d"), str.c_str(), size, base);
-
-    // Keep base within range.
-    //base = iclamp(base, 0, str.length());
-
-    // Truncate if necessary.
-    //size = imin(str.length() - base, size);
-
-    // TODO: unsafe: use string::substr instead !
-    std::string	new_string = str.c_str() + base; // XXX
-    new_string.resize(size);
-
     env.drop(2);
-    env.top(0).set_string(new_string);
+    env.top(0).set_string(utf8::encodeCanonicalString(
+                                    wstr.substr(start, size), version));
 }
 
 void
@@ -1769,7 +1772,7 @@ SWFHandlers::ActionMbSubString(ActionExec& thread)
         start = 1;
     }
 
-    else if ( unsigned(start) > length )
+    else if ( start > length )
     {
 	IF_VERBOSE_ASCODING_ERRORS (
     	log_aserror(_("base goes beyond input string in ActionMbSubString, "

@@ -1,3 +1,13 @@
+2008-03-17 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/asobj/string.cpp: String.substr(): an undefined second
+	  argument is the same as having only one argument.
+    * server/vm/ASHandlers.cpp: action substring: make variable names
+      consistent with mbsubstring; use C++ string methods and handle
+      utf-8 properly for different versions.
+    * testsuite/actionscript.all/String.as: update / add tests for substring
+      and String.substr (now passing).
+
 2008-03-16 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/Player.{h,cpp}: handle an empty url, fix misc-ming.all failures.
