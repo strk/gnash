@@ -1,5 +1,13 @@
 2008-03-18 Sandro Santilli <strk@keybit.net>
 
+	* server/array.{cpp,h}: add concept of 'holes' in arrays, don't
+	  enumerate holes.
+	* testsuite/actionscript.all/array.as: update expected results.
+	* server/character.cpp (width_getset, height_getset): don't abort
+	  if the character being worked on has collapsed dimensions.
+
+2008-03-18 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/array.as: test sorting an array with
 	  holes.
 

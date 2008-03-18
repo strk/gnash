@@ -45,13 +45,26 @@ struct indexed_as_value : public as_value
 	}
 };
 
+template <class T>
+struct ContainerFiller {
+	T& cont;
+	ContainerFiller(T& c): cont(c) {}
+	void visit(as_value& v) { cont.push_back(v); }
+};
+
+struct blank {};
+
 /// The Array ActionScript object
 class as_array_object : public as_object
 {
 
 public:
 
-	typedef std::deque<as_value> container;
+	enum { itemBlank, itemValue };
+
+	typedef boost::variant<blank, as_value> ValOrNone;
+
+	typedef std::deque<ValOrNone> container;
 
 	typedef container::const_iterator const_iterator;
 	typedef container::iterator iterator;
@@ -67,7 +80,7 @@ public:
 		container copy = elements;
 		for (iterator i=copy.begin(), ie=copy.end(); i!=ie; ++i)
 		{
-			v.visit(*i);
+			if ( i->which() == itemValue ) v.visit(boost::get<as_value>(*i));
 		}
 	}
 
@@ -235,11 +248,15 @@ public:
 		// to avoid the comparator changing the original container.
 		//
 
-		std::list<as_value> nelem(elements.begin(), elements.end());
+		typedef std::list<as_value> ValueList;
+		ValueList nelem;
+		ContainerFiller<ValueList> filler(nelem);
+		visitAll(filler);
 
+		size_t oldSize = elements.size(); // custom comparator might change input size
 		nelem.sort(avc);
-
 		elements.assign(nelem.begin(), nelem.end());
+		resize(oldSize);
 	}
 
 	/// \brief
@@ -276,7 +293,12 @@ public:
 		// to avoid the comparator changing the original container.
 		//
 
-		std::list<as_value> nelem(elements.begin(), elements.end());
+		typedef std::list<as_value> ValueList;
+		ValueList nelem;
+		ContainerFiller<ValueList> filler(nelem);
+		visitAll(filler);
+
+		size_t oldSize = elements.size(); // custom comparator might change input size
 
 		nelem.sort(avc);
 
@@ -284,6 +306,7 @@ public:
 			return as_value(0);
 
 		elements.assign(nelem.begin(), nelem.end());
+		resize(oldSize);
 
 		return as_value(this);
 	}

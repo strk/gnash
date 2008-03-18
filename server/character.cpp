@@ -438,7 +438,11 @@ character::width_getset(const fn_call& fn)
 		}
 
 		double oldwidth = bounds.width();
-		assert(oldwidth>0);
+		if ( oldwidth <= 0 )
+		{
+			log_unimpl(_("FIXME: can't set _height on character with width %d"), oldwidth);
+			return rv;
+		}
 
 		double newwidth = PIXELS_TO_TWIPS(fn.arg(0).to_number());
 		if ( newwidth <= 0 )
@@ -483,7 +487,11 @@ character::height_getset(const fn_call& fn)
 		}
 
 		double oldheight = bounds.height();
-		assert(oldheight>0);
+		if ( oldheight <= 0 )
+		{
+			log_unimpl(_("FIXME: can't set _height on character with height %d"), oldheight);
+			return rv;
+		}
 
 		double newheight = PIXELS_TO_TWIPS(fn.arg(0).to_number());
 		if ( newheight <= 0 )

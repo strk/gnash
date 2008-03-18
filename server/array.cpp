@@ -502,28 +502,34 @@ flag_preprocess(boost::uint8_t flgs, bool* douniq, bool* doindex)
 // Convenience function to process and extract flags from an as_value array
 // of flags (as passed to sortOn when sorting on multiple properties)
 std::deque<boost::uint8_t> 
-get_multi_flags(std::deque<as_value>::const_iterator itBegin, 
-	std::deque<as_value>::const_iterator itEnd, bool* uniq, bool* index)
+get_multi_flags(as_array_object::const_iterator itBegin, 
+	as_array_object::const_iterator itEnd, bool* uniq, bool* index)
 {
-	std::deque<as_value>::const_iterator it = itBegin;
+	as_array_object::const_iterator it = itBegin;
 	std::deque<boost::uint8_t> flgs;
 
 	// extract fUniqueSort and fReturnIndexedArray from first flag
 	if (it != itEnd)
 	{
-		boost::uint8_t flag = static_cast<boost::uint8_t>((*it).to_number());
-		flag = flag_preprocess(flag, uniq, index);
-		flgs.push_back(flag);
-		++it;
+		as_array_object::ValOrNone v = *it++;
+		if ( v.which() == as_array_object::itemValue )
+		{
+			boost::uint8_t flag = static_cast<boost::uint8_t>(boost::get<as_value>(v).to_number());
+			flag = flag_preprocess(flag, uniq, index);
+			flgs.push_back(flag);
+		}
 	}
 
 	while (it != itEnd)
 	{
-		boost::uint8_t flag = static_cast<boost::uint8_t>((*it).to_number());
-		flag &= ~(as_array_object::fReturnIndexedArray);
-		flag &= ~(as_array_object::fUniqueSort);
-		flgs.push_back(flag);
-		++it;
+		as_array_object::ValOrNone v = *it++;
+		if ( v.which() == as_array_object::itemValue )
+		{
+			boost::uint8_t flag = static_cast<boost::uint8_t>(boost::get<as_value>(v).to_number());
+			flag &= ~(as_array_object::fReturnIndexedArray);
+			flag &= ~(as_array_object::fUniqueSort);
+			flgs.push_back(flag);
+		}
 	}
 	return flgs;
 }
@@ -559,21 +565,24 @@ as_array_object::get_indexed_elements()
 	std::deque<indexed_as_value> indexed_elements;
 	int i = 0;
 
-	for (std::deque<as_value>::const_iterator it = elements.begin();
+	for (const_iterator it = elements.begin();
 		it != elements.end(); ++it)
 	{
-		indexed_elements.push_back(indexed_as_value(*it, i++));
+		if ( it->which() == itemValue )
+		{
+			indexed_elements.push_back(indexed_as_value(boost::get<as_value>(*it), i++));
+		}
 	}
 	return indexed_elements;
 }
 
-std::deque<as_value>::const_iterator
+as_array_object::const_iterator
 as_array_object::begin()
 {
 	return elements.begin();
 }
 
-std::deque<as_value>::const_iterator
+as_array_object::const_iterator
 as_array_object::end()
 {
 	return elements.end();
@@ -618,7 +627,10 @@ as_array_object::pop()
 		return as_value(); // undefined
 	}
 
-	as_value ret = elements.back();
+	ValOrNone last = elements.back();
+	as_value ret;
+	if ( last.which() == itemValue ) ret = boost::get<as_value>(last);
+	else log_error("Last element of Array (on pop) is not a value");
 	elements.pop_back();
 
 	return ret;
@@ -636,7 +648,9 @@ as_array_object::shift()
 		return as_value(); // undefined
 	}
 
-	as_value ret = elements.front();
+	ValOrNone first = elements.front();
+	as_value ret;
+	if ( first.which() == itemValue ) ret = boost::get<as_value>(first);
 	elements.pop_front();
 
 	return ret;
@@ -666,17 +680,19 @@ as_array_object::join(const std::string& separator, as_environment*) const
 
 	if ( ! elements.empty() ) 
 	{
-		std::deque<as_value>::const_iterator
-			it=elements.begin(),
-			itEnd=elements.end();
+		bool printed=false;
 
-		// print first element w/out separator prefix
-		temp += (*it++).to_string_versioned(swfversion);
-
-		// print subsequent elements with separator prefix
+		const_iterator it=elements.begin(), itEnd=elements.end();
+		
 		while ( it != itEnd )
 		{
-			temp += separator + (*it++).to_string_versioned(swfversion);
+			ValOrNone v = *it++;
+			if ( printed ) temp += separator;
+			if ( v.which() == itemValue )
+				temp += boost::get<as_value>(v).to_string_versioned(swfversion);
+			else
+				temp += as_value().to_string_versioned(swfversion);
+			printed=true;
 		}
 	}
 
@@ -714,7 +730,9 @@ as_array_object::at(unsigned int index)
 	}
 	else
 	{
-		return elements[index];
+		ValOrNone v = elements[index];
+		if ( v.which() != itemValue ) return as_value();
+		return boost::get<as_value>(v);
 	}
 }
 
@@ -791,7 +809,10 @@ as_array_object::removeFirst(const as_value& v)
 {
 	for (iterator it = elements.begin(); it != elements.end(); ++it)
 	{
-		if ( v.equals(*it) )
+		ValOrNone x = *it;
+		if ( x.which() != itemValue ) continue;
+		
+		if ( v.equals(boost::get<as_value>(x)) )
 		{
 			elements.erase(it);
 			return true;
@@ -809,8 +830,12 @@ as_array_object::get_member(string_table::key name, as_value *val,
 	int index = index_requested(name);
 	if ( index >= 0 && (unsigned int)index < elements.size() )
 	{
-		*val = elements[index];
-		return true;
+		ValOrNone x = elements[index];
+		if ( x.which() == itemValue )
+		{
+			*val = boost::get<as_value>(x); 
+			return true;
+		}
 	}
 
 	return get_member_default(name, val, nsname);
@@ -976,7 +1001,9 @@ array_sort(const fn_call& fn)
 
 		if ( (flags & as_array_object::fReturnIndexedArray) )
 			return as_value(array->sort_indexed(avc));
+		//log_debug("Sorting %d-sized array with custom function", array->size());
 		array->sort(avc);
+		//log_debug("After sorting, array is %d-sized", array->size());
 		return as_value(array.get());
 		// note: custom AS function sorting apparently ignores the 
 		// UniqueSort flag which is why it is also ignored here
@@ -1054,11 +1081,15 @@ array_sortOn(const fn_call& fn)
 		std::deque<as_cmp_fn> cmp;
 		std::deque<as_cmp_fn> eq;
 
-		for (std::deque<as_value>::const_iterator it = props->begin();
+		for (as_array_object::const_iterator it = props->begin();
 			it != props->end(); ++it)
 		{
-			string_table::key s = st.find(PROPNAME((*it).to_string_versioned(sv)));
-			prp.push_back(s);
+			as_array_object::ValOrNone v = *it;
+			if ( v.which() == as_array_object::itemValue )
+			{
+				string_table::key s = st.find(PROPNAME(boost::get<as_value>(v).to_string_versioned(sv)));
+				prp.push_back(s);
+			}
 		}
 		
 		// case: sortOn(["prop1", "prop2"])
@@ -1075,7 +1106,7 @@ array_sortOn(const fn_call& fn)
 				ensureType<as_array_object>(fn.arg(1).to_object());
 			if (farray->size() == optnum)
 			{
-				std::deque<as_value>::const_iterator 
+				as_array_object::const_iterator 
 					fBegin = farray->begin(),
 					fEnd = farray->end();
 
@@ -1542,8 +1573,10 @@ as_array_object::enumerateNonProperties(as_environment& env) const
 	//       and non-defined elements
 	for (unsigned int i=0; i<size(); ++i)
 	{
-		// here should be something like, if ( isDefined(i) ) ...
-		env.push(as_value(i));
+		if ( elements[i].which() == itemValue )
+		{
+			env.push(as_value(i));
+		}
 	}
 }
 
@@ -1551,9 +1584,13 @@ as_array_object::enumerateNonProperties(as_environment& env) const
 void
 as_array_object::markReachableResources() const
 {
-	for (container::const_iterator i=elements.begin(), e=elements.end(); i!=e; ++i)
+	for (const_iterator i=elements.begin(), e=elements.end(); i!=e; ++i)
 	{
-		i->setReachable();
+		ValOrNone v = *i;
+		if ( v.which() == itemValue )
+		{
+			boost::get<as_value>(v).setReachable();
+		}
 	}
 	markAsObjectReachable();
 }

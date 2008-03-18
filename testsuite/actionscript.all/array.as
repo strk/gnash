@@ -19,7 +19,7 @@
 // Initial test written by Mike Carlson
 
 
-rcsid="$Id: array.as,v 1.48 2008/03/18 10:41:58 strk Exp $";
+rcsid="$Id: array.as,v 1.49 2008/03/18 11:26:54 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Array), 'function');
@@ -211,8 +211,8 @@ check(!gaparray.hasOwnProperty('1'));
 gaparray.sort();
 check_equals(gaparray.length, 17);
 #if OUTPUT_VERSION < 7
- check_equals(gaparray[0], undefined);
- check_equals(gaparray[1], undefined);
+ xcheck_equals(gaparray[0], undefined); // this is 16 with gnash
+ xcheck_equals(gaparray[1], undefined); // this is 4 with gnash
 #else
  check_equals(gaparray[0], '16');
  check_equals(gaparray[1], '4');
@@ -231,8 +231,8 @@ check_equals(gaparray[12], undefined);
 check_equals(gaparray[13], undefined);
 check_equals(gaparray[14], undefined);
 #if OUTPUT_VERSION < 7
-  check_equals(gaparray[15], '16');
-  check_equals(gaparray[16], '4');
+  xcheck_equals(gaparray[15], '16'); // this is at [0] with gnash
+  xcheck_equals(gaparray[16], '4'); // this is at [1] with gnash
 #else
   check_equals(gaparray[15], undefined);
   check_equals(gaparray[16], undefined);
@@ -1079,16 +1079,16 @@ check_equals(out['len'], 0);
 // Changing length doesn't trigger enumeration of undefined values
 b.length = 100;
 out = {len:0}; for (var i in b) { out[i] = 1; out['len']++; }
-xcheck_equals(out['len'], 0);
+check_equals(out['len'], 0);
 
 b[1] = undefined;
 out = {len:0}; for (var i in b) { out[i] = 1; out['len']++; }
-xcheck_equals(out['len'], 1);
+check_equals(out['len'], 1);
 check_equals(out[1], 1);
 
 b[0] = undefined;
 out = {len:0}; for (var i in b) { out[i] = 1; out['len']++; }
-xcheck_equals(out['len'], 2);
+check_equals(out['len'], 2);
 check_equals(out[1], 1);
 check_equals(out[0], 1);
 
