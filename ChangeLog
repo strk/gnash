@@ -1,3 +1,14 @@
+2008-03-18 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/as_value.cpp: minor changes to to_int. It's a bit
+	  complicated but seems to replicate how the pp converts to integers.
+	  Don't need to use fmod().
+	* server/vm/ASHandlers.cpp: use to_int() for ActionInt(). This fixes
+	  handling of all negative non-integer numbers.
+	* testsuite/actionscript.all/Global.as: add regression tests for
+	  int().
+	* server/asobj/string.cpp: minor cleanups; use safer string.at().
+
 2008-03-18 Sandro Santilli <strk@keybit.net>
 
 	* server/array.{cpp,h}: add concept of 'holes' in arrays, don't

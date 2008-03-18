@@ -478,24 +478,27 @@ as_value::to_number() const
     /* NOTREACHED */
 }
 
-boost::int32_t
+// This returns an as_value as an integer. It is
+// probably used for most implicit conversions to 
+// int, for instance in the String class.
 as_value::to_int() const
 {
 	double d = to_number();
-	int i=0;
 
 	if ( ! isfinite(d) ) return 0;
 
-	if (d < 0)
-	{
-		i = - (boost::uint32_t) fmod (-d, 4294967296.0);
-	}
-	else
-	{
-		i = (boost::uint32_t) fmod (d, 4294967296.0);
-	}
+	boost::int32_t i = 0;
 
-	return i;
+    if (d < 0)
+    {   
+	    i = - static_cast<boost::uint32_t>(-d) % (1 << 32));
+    }
+    else
+    {
+	    i = static_cast<boost::uint32_t>(d) % (1 << 32));
+    }
+    
+    return i;
 }
 
 // Conversion to boolean for SWF7 and up

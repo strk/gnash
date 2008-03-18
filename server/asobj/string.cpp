@@ -596,7 +596,7 @@ string_char_code_at(const fn_call& fn)
         return rv;
     }
 
-    return as_value(wstr[index]);
+    return as_value(wstr.at(index));
 }
 
 static as_value

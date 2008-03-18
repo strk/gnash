@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Global.as,v 1.45 2008/03/11 19:31:47 strk Exp $";
+rcsid="$Id: Global.as,v 1.46 2008/03/18 14:01:00 bwy Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION > 5
@@ -358,21 +358,42 @@ tmp = new Array; for (var i in o) tmp.push(i);
 check_equals(tmp.length, 2);
 
 
+/// Tests for int
+
+check_equals (int(1.5), 1);
+check_equals (int(0), 0);
+check_equals (int(s), 0);
+check_equals (int(-1.e-15), 0);
+check_equals (int(-0.99999999999999), 0);
+check_equals (int(0.99999999999), 0);
+check_equals (int(-7.8), -7);
+check_equals (int(6.1), 6);
+
+check_equals (int(0xffffffff), -1);
+
+check_equals (int(2147483648), -2147483648);
+check_equals (int(-2147483648), -2147483648);
+
+check_equals (int(2147483649), -2147483647);
+check_equals (int(-2147483649), 2147483647);
+check_equals (int(4294967296), 0);
+check_equals (int(-4294967296), 0);
+check_equals (int(infinity), 0);
 
 //------------------------------------------------------------
 // END OF TEST
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 5
-	check_totals(82); // SWF5
+	check_totals(98); // SWF5
 #else
 # if OUTPUT_VERSION == 6
-	check_totals(116); // SWF6
+	check_totals(132); // SWF6
 # else
 #  if OUTPUT_VERSION == 7
-	check_totals(98); // SWF7
+	check_totals(114); // SWF7
 #  else
-	check_totals(85); // SWF8+
+	check_totals(101); // SWF8+
 #  endif
 # endif
 #endif

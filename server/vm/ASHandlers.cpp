@@ -988,7 +988,7 @@ SWFHandlers::ActionInt(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     thread.ensureStack(1);
-    env.top(0).set_int(int(floor(env.top(0).to_number()))); // TODO: use to_int ?
+    env.top(0).set_int((env.top(0).to_int()));
 }
 
 void
