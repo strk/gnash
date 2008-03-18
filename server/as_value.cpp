@@ -488,7 +488,7 @@ as_value::to_int() const
 
 	if ( ! isfinite(d) ) return 0;
 
-	boost::int32_t i = 0;
+	boost::uint32_t i = 0;
 
     if (d < 0)
     {   
@@ -499,7 +499,7 @@ as_value::to_int() const
 	    i = static_cast<boost::uint32_t>(d) % 4294967296;
     }
     
-    return i;
+    return static_cast<boost::int32_t>(i);
 }
 
 // Conversion to boolean for SWF7 and up
