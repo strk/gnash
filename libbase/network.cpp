@@ -1,4 +1,3 @@
-// network.cpp:  TCP/IP support, for Gnash.
 //
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 //
@@ -304,7 +303,7 @@ Network::newConnection(bool block)
 
 // Connect to a named pipe
 bool
-Network::connectSocket(const char *sockname)
+Network::connectSocket(const string &sockname)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -316,7 +315,7 @@ Network::connectSocket(const char *sockname)
 
     addr.sun_family = AF_UNIX;
     // socket names must be 108 bytes or less as specifiec in sys/un.h.
-    strncpy(addr.sun_path, sockname, 100);
+    strncpy(addr.sun_path, sockname.c_str(), 100);
 
     _sockfd = ::socket(AF_UNIX, SOCK_STREAM, 0);
     if (_sockfd < 0)
@@ -411,7 +410,7 @@ Network::createClient(short /* port */)
 }
 
 bool
-Network::createClient(const char *hostname)
+Network::createClient(const string &hostname)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -419,7 +418,7 @@ Network::createClient(const char *hostname)
 }
 
 bool
-Network::createClient(const char *hostname, short port)
+Network::createClient(const string &hostname, short port)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -443,7 +442,7 @@ Network::createClient(const char *hostname, short port)
 
     memset(&sock_in, 0, sizeof(struct sockaddr_in));
     memset(&thishostname, 0, MAXHOSTNAMELEN);
-    if (strlen(hostname) == 0) {
+    if (hostname.size() == 0) {
         if (gethostname(thishostname, MAXHOSTNAMELEN) == 0) {
             log_debug(_("The hostname for this machine is %s"), thishostname);
         } else {
@@ -451,7 +450,7 @@ Network::createClient(const char *hostname, short port)
             return false;
         }
     }
-    const struct hostent *hent = ::gethostbyname(hostname);
+    const struct hostent *hent = ::gethostbyname(hostname.c_str());
     if (hent > 0) {
         ::memcpy(&sock_in.sin_addr, hent->h_addr, hent->h_length);
     }
@@ -640,25 +639,25 @@ Network::closeConnection(int fd)
 
 // Read from the connection
 int
-Network::readNet(char *buffer, int nbytes)
+Network::readNet(byte_t *buffer, int nbytes)
 {
     return readNet(_sockfd, buffer, nbytes, _timeout);
 }
 
 int
-Network::readNet(char *buffer, int nbytes, int timeout)
+Network::readNet(byte_t *buffer, int nbytes, int timeout)
 {
     return readNet(_sockfd, buffer, nbytes, timeout);
 }
 
 int
-Network::readNet(int fd, char *buffer, int nbytes)
+Network::readNet(int fd, byte_t *buffer, int nbytes)
 {
     return readNet(fd, buffer, nbytes, _timeout);
 }
 
 int
-Network::readNet(int fd, char *buffer, int nbytes, int timeout)
+Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 {
     fd_set              fdset;
     int                 ret = -1;
@@ -672,7 +671,7 @@ Network::readNet(int fd, char *buffer, int nbytes, int timeout)
             + static_cast<double>(tp.tv_usec*1e-6);
     }
 #endif
-    if (fd > 0) {
+    if (fd > 2) {
         FD_ZERO(&fdset);
         FD_SET(fd, &fdset);
 
@@ -703,19 +702,14 @@ Network::readNet(int fd, char *buffer, int nbytes, int timeout)
 	if (_debug) {
 	    log_debug (_("read %d bytes from fd %d"), ret, fd);
 	}
+#if 1
+	if (ret) {
+	    log_debug (_("%s: Read packet data from fd %d (%d bytes): \n%s"),
+		       __FUNCTION__, fd, ret, hexify(buffer, ret, true));
+	}
+#endif    
     }
 
-#if 0
-    unsigned char *hexint;
-    hexint = new unsigned char[(nbytes + 3) *3];    
-    
-    hexify(hexint, (unsigned char *)buffer, ret, true);
-    log_debug (_("%s: Read packet data from fd %d: \n%s"),
-	     __FUNCTION__, fd, (char *)hexint);
-//     hexify(hexint,  (unsigned char *)buffer, ret, false);
-//     log_debug (_("%s: The packet data is: 0x%s"), __FUNCTION__, (char *)hexint);
-    delete hexint;
-#endif    
     return ret;
 
 }
@@ -724,47 +718,42 @@ Network::readNet(int fd, char *buffer, int nbytes, int timeout)
 int
 Network::writeNet(const std::string& buffer)
 {
-    return writeNet(buffer.c_str(), buffer.size());
+    return writeNet(reinterpret_cast<const byte_t *>(buffer.c_str()), buffer.size());
 }
 
 int
-Network::writeNet(char const *buffer)
+Network::writeNet(const byte_t *buffer, int nbytes)
 {
-    return writeNet(buffer, strlen(buffer));
+return writeNet(_sockfd, buffer, nbytes, _timeout);
 }
 
-int
-Network::writeNet(char const *buffer, int nbytes)
-{
-    return writeNet(_sockfd, buffer, nbytes, _timeout);
-}
+// int
+// Network::writeNet(const byte_t *buffer, int nbytes)
+// {
+//     return writeNet(_sockfd, buffer, nbytes, _timeout);
+// }
+
+// int
+// Network::writeNet(int fd, const byte_t *buffer)
+// {
+//     return writeNet(fd, buffer, strlen(buffer), _timeout);
+// }
 
 int
-Network::writeNet(const unsigned char *buffer, int nbytes)
-{
-    return writeNet(_sockfd, (const char*)buffer, nbytes, _timeout);
-}
-
-int
-Network::writeNet(int fd, char const *buffer)
-{
-    return writeNet(fd, buffer, strlen(buffer), _timeout);
-}
-
-int
-Network::writeNet(int fd, char const *buffer, int nbytes)
+Network::writeNet(int fd, const byte_t *buffer, int nbytes)
 {
     return writeNet(fd, buffer, nbytes, _timeout);
 }
 
 int
-Network::writeNet(int fd, char const *buffer, int nbytes, int timeout)
+Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
 {
     fd_set              fdset;
     int                 ret = -1;
     struct timeval      tval;
 
-    const char *bufptr = buffer;
+    // We need a writable, and not const point for byte arithmetic.
+    byte_t *bufptr = const_cast<byte_t *>(buffer);
 
 #ifdef NET_TIMING
     // If we are debugging the tcp/ip timings, get the initial time.
@@ -773,7 +762,7 @@ Network::writeNet(int fd, char const *buffer, int nbytes, int timeout)
         gettimeofday(&starttime, 0);
     }
 #endif
-    if (fd) {
+    if (fd > 2) {
         FD_ZERO(&fdset);
         FD_SET(fd, &fdset);
 
@@ -825,6 +814,12 @@ Network::writeNet(int fd, char const *buffer, int nbytes, int timeout)
 //                return ret;
             }
         }
+#if 1
+	if (ret) {
+	    log_debug (_("%s: Wrote packet data to fd %d: \n%s"),
+		       __FUNCTION__, fd, hexify(buffer, ret, true));
+	}
+#endif    
     }
 
 #ifdef NET_TIMING
@@ -841,18 +836,6 @@ Network::writeNet(int fd, char const *buffer, int nbytes, int timeout)
     }
 #endif
 
-#if 0
-    unsigned char *hexint;
-    hexint = new unsigned char[(nbytes + 3) *3];
-    
-    hexify(hexint, (unsigned char *)buffer, nbytes, true);
-    log_debug (_("%s: Wrote packet data to fd %d: \n%s"),
-	     __FUNCTION__, fd, (char *)hexint);
-//     hexify(hexint,  (unsigned char *)buffer, ret, false);
-//     log_debug (_("%s: Read packet data from fd %d: 0x%s"),
-// 	      __FUNCTION__, fd, (char *)hexint);
-     delete hexint;
-#endif    
 
     return ret;
 }

@@ -22,10 +22,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include "tu_config.h"
-
-#include <string>
-
 #if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
 # include <netinet/in.h>
 # include <arpa/inet.h>
@@ -37,7 +33,9 @@
 # include <io.h>
 #endif
 
+#include <boost/cstdint.hpp>
 #include <cassert>
+#include <string>
 
 namespace gnash {
 
@@ -47,18 +45,23 @@ const short RTMPT = 80;
 const short RTMPTS = 443;
 
 #ifdef __OS2__
-	typedef int    socklen_t;
-	#define SHUT_RDWR 0x2
+ typedef int    socklen_t;
+ #define SHUT_RDWR 0x2
 #endif
 
 #if defined(HAVE_WINSOCK_H) && !defined(__OS2__)
-	typedef long   in_addr_t;
-#	define inet_lnaof(x) inet_addr(inet_ntoa(x))
-	typedef int    socklen_t;
+  typedef long   in_addr_t;
+#  define inet_lnaof(x) inet_addr(inet_ntoa(x))
+  typedef int    socklen_t;
 #endif
- 
-class DSOEXPORT Network {
+
+// Adjust for the constant size
+const size_t NETBUFSIZE = 1024;
+
+class Network {
 public:
+    typedef boost::uint8_t byte_t;
+
     Network();
     ~Network();
     
@@ -72,28 +75,26 @@ public:
     bool newConnection(bool block);
 
     // Connect to a named pipe
-    bool connectSocket(const char *sock);
+    bool connectSocket(const std::string &sock);
 
     // Create a client connection to a tcp/ip server
     bool createClient(void);
     bool createClient(short port);
-    bool createClient(const char *hostname);
-    bool createClient(const char *hostname, short port);
+    bool createClient(const std::string &hostname);
+    bool createClient(const std::string &hostname, short port);
 
     // Read from the connection
-    int readNet(char *buffer, int nbytes);
-    int readNet(char *buffer, int nbytes, int timeout);
-    int readNet(int fd, char *buffer, int nbytes);
-    int readNet(int fd, char *buffer, int nbytes, int timeout);
+    int readNet(byte_t *buffer, int nbytes);
+    int readNet(byte_t *buffer, int nbytes, int timeout);
+    int readNet(int fd, byte_t *buffer, int nbytes);
+    int readNet(int fd, byte_t *buffer, int nbytes, int timeout);
     
     // Write to the connection
-    int writeNet(const std::string& buffer);
-    int writeNet(char const *buffer);
-    int writeNet(char const *buffer, int nbytes);
-    int writeNet(const unsigned char *buffer, int nbytes);
-    int writeNet(int fd, char const *buffer);
-    int writeNet(int fd, char const *buffer, int nbytes);
-    int writeNet(int fd, char const *buffer, int nbytes, int timeout);
+    int writeNet(const std::string &buffer);
+    int writeNet(const byte_t *buffer, int nbytes);
+//    int writeNet(int fd, const byte_t *buffer);
+    int writeNet(int fd, const byte_t *buffer, int nbytes);
+    int writeNet(int fd, const byte_t *buffer, int nbytes, int timeout);
     
     // Close the connection
     bool closeNet();

@@ -1,3 +1,9 @@
+2008-03-18  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libbase/network.{h,cpp}: Define NETBUFSIZE here instead of in
+	cygnal/buffer. Define "byte_t" typedef for raw data, change all
+	methods to use byte_t.
+
 2008-03-18 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/actionscript.all/array.cpp: tests for non-integer and
