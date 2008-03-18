@@ -1,5 +1,10 @@
 2008-03-18 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* server/as_value.cpp: revert most of to_int() changes until
+	  it's tested on i586.
+
+2008-03-18 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* server/as_value.cpp: (to_int() again): work with unsigned values
 	  until the return. Will hopefully fix for 32-bit platforms.
 
