@@ -8,6 +8,7 @@
 	* testsuite/actionscript.all/Global.as: add regression tests for
 	  int().
 	* server/asobj/string.cpp: minor cleanups; use safer string.at().
+	* testsuite/swfdec/PASSING: tointeger passes after the changes above.
 
 2008-03-18 Sandro Santilli <strk@keybit.net>
 
