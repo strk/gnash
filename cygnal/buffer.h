@@ -42,7 +42,9 @@ public:
     void *resize(size_t nbytes);
 
     // Put data into the buffer
-    void copy(gnash::Network::byte_t *data, int nbytes);
+    void copy(gnash::Network::byte_t *data, size_t nbytes);
+    void copy(gnash::Network::byte_t *data) { copy(data, _nbytes); };
+    void copy(std::string &str);
     
     // Accessors
     gnash::Network::byte_t *reference() { return _ptr; }

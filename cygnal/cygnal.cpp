@@ -181,7 +181,7 @@ main(int argc, char *argv[])
         }
     }
     
-    dbglogfile.setLogFilename("cygnal-dbg.log");
+//    dbglogfile.setLogFilename("cygnal-dbg.log");
 
     // get the file name from the command line
     while (optind < argc) {

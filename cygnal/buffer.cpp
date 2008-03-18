@@ -72,10 +72,17 @@ Buffer::~Buffer()
 
 // Put data into the buffer
 void
-Buffer::copy(Network::byte_t *data, int nbytes)
+Buffer::copy(Network::byte_t *data, size_t nbytes)
 {    
 //    GNASH_REPORT_FUNCTION;
     std::copy(data, data + nbytes, _ptr);
+}
+
+void
+Buffer::copy(string &str)
+{    
+//    GNASH_REPORT_FUNCTION;
+    std::copy(str.begin(), str.end(), _ptr);
 }
 
 // make ourselves be able to be copied.

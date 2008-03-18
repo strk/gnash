@@ -130,7 +130,7 @@ HTTP::waitForGetRequest()
     extractConnection(buf);
     extractEncoding(buf);
     extractTE(buf);
-    dump();
+//    dump();
 
 //     // See if we got a legit GET request
 //     if (strncmp(ptr, "GET ", 4) == 0) {
@@ -373,25 +373,23 @@ HTTP::sendGetReply(http_status_e code)
     formatHeader(_filesize, HTML);
 //    int ret = Network::writeNet(_header.str());
     Buffer *buf = new Buffer;
-    Network::byte_t *ptr = (Network::byte_t *)_body.str().c_str();
-    buf->copy(ptr, _body.str().size());
-    buf->resize(_body.str().size());
-    _handler->pushout(buf);
-    _handler->notifyout();
-//     if ( _body.str().size() > 0) {
-// 	ret += Network::writeNet(_body.str());
-//     }
-
-//    if (ret >= 0) {
+//    Network::byte_t *ptr = (Network::byte_t *)_body.str().c_str();
+//     buf->copy(ptr, _body.str().size());
+    _handler->dump();
+    if (_header.str().size()) {
+	buf->resize(_header.str().size());
+	string str = _header.str();
+	buf->copy(str);
+	_handler->pushout(buf);
+	_handler->notifyout();
         log_debug (_("Sent GET Reply"));
-//        log_debug (_("Sent GET Reply: %s"), _header.str().c_str());
+	return true; // Default to true
+    } else {
 	clearHeader();
-//     } else {
-//         log_debug (_("Couldn't send GET Reply, writeNet returned %d"), ret);
-// 	return false;
-//     }
-//    cout << "GET Header is:" << endl << _header.str() << endl;
-    return true; // Default to true
+	log_debug (_("Couldn't send GET Reply, no header data"));
+    }
+    
+    return false;
 }
 
 bool
@@ -893,7 +891,7 @@ httphandler(Handler::thread_params_t *args)
     HTTP www;
     www.setHandler(hand);
     
-//    hand->_outcond.wait();
+    hand->wait();
 
 //     www.toggleDebug(true);
     
@@ -929,8 +927,8 @@ httphandler(Handler::thread_params_t *args)
 //	conndata->statistics->addStats();
 	
 	if (url != docroot) {
-	    log_debug (_("File to load is: %s"), filespec.c_str());
-	    log_debug (_("Parameters are: %s"), parameters.c_str());
+//	    log_debug (_("File to load is: %s"), filespec.c_str());
+//	    log_debug (_("Parameters are: %s"), parameters.c_str());
 // 	    memset(args->filespec, 0, 256);
 // 	    memcpy(->filespec, filespec.c_str(), filespec.size());
 // 	    boost::thread sendthr(boost::bind(&stream_thread, args));

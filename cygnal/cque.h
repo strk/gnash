@@ -34,6 +34,7 @@ namespace cygnal
 class CQue {
 public:
     CQue();
+    CQue(const std::string &str) { _name = str; };
     ~CQue();
     // Push data onto the que
     bool push(gnash::Network::byte_t *data, int nbytes);
@@ -60,7 +61,10 @@ public:
     Buffer *merge(Buffer *begin);
     // Dump the data to the terminal
     void dump();
+    void setName(const std::string &str) { _name = str; }
 private:
+    // an optional name for the queue, only used for debugging messages to make them unique
+    std::string _name;
     // The queue itself
     std::deque<Buffer *> _que;
     // A condition variable used to signal the other thread when the que has data

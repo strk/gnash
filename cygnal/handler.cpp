@@ -151,6 +151,8 @@ Handler::start(thread_params_t *args)
 //    GNASH_REPORT_FUNCTION;
     int retries = 10;
 
+    _incoming.setName("Incoming");
+    _outgoing.setName("Outgoing");
     toggleDebug(true);		// FIXME:
     createServer(args->port);
     while (retries-- > 0) {
@@ -161,10 +163,12 @@ Handler::start(thread_params_t *args)
 
 	log_debug("Starting thread 1");
 	boost::thread inport(boost::bind(&netin_handler, args));
-	
+
+#if 1
 	log_debug("Starting thread 2");
 	boost::thread outport(boost::bind(&netout_handler, args));
-
+#endif
+	
 	log_debug("Starting thread 3");
 	boost::thread handler(boost::bind(&httphandler, args));
 
@@ -204,9 +208,11 @@ netin_handler(Handler::thread_params_t *args)
 //  	    cerr << str << endl;
 	    hand->notify();
 	} else {
+	    cerr << __PRETTY_FUNCTION__ << "exiting, no data" << endl;
 	    break;
 	}
     }
+    hand->notify();
 //    hand->dump();
 }
 void
@@ -218,8 +224,9 @@ netout_handler(Handler::thread_params_t *args)
     
     do {
 	Handler *hand = reinterpret_cast<Handler *>(args->handle);
-	hand->wait();
+	hand->waitout();
 	Buffer *buf = hand->popout();
+	buf->dump();
 	ret = hand->writeNet(buf);
     } while (ret > 0);
     

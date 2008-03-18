@@ -1,5 +1,13 @@
 2008-03-18  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* buffer.{h,cpp}: Add a few ::copy methods to put data into a
+	buffer easily.
+	* cque.{h,cpp}: Add an optional name to make debugging messages
+	clearer.
+	* handler.cpp: Add names to the ques. Cleanup typo that blocked on
+	the wrong mutex.
+	* http.cpp: Fix the output messages.
+	
 	* http.cpp: Use Network::byte_t instead of boost_uint8_t. Use a
 	Buffer too.
 

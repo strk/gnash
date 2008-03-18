@@ -38,6 +38,7 @@ namespace cygnal
 CQue::CQue()
 {
 //    GNASH_REPORT_FUNCTION;
+    _name = "default";
 }
 
 CQue::~CQue()
@@ -61,7 +62,7 @@ CQue::wait()
     GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lk(_cond_mutex);
     _cond.wait(lk);
-    log_debug("wait mutex released");
+    log_debug("wait mutex released for \"%s\"", _name);
 }
 
 // Notify a condition variable to trigger
@@ -70,7 +71,7 @@ CQue::notify()
 {
     GNASH_REPORT_FUNCTION;
     _cond.notify_one();
-    log_debug("wait mutex triggered");
+    log_debug("wait mutex triggered for \"%s\"", _name);
 }
 
 size_t
@@ -221,7 +222,7 @@ CQue::dump()
 //    GNASH_REPORT_FUNCTION;
     deque<Buffer *>::iterator it;
     boost::mutex::scoped_lock lock(_mutex);
-    cerr << endl << "CQue has "<< _que.size() << " buffers." << endl;
+    cerr << endl << "CQue \"" << _name << "\" has "<< _que.size() << " buffers." << endl;
     for (it = _que.begin(); it != _que.end(); it++) {
 	Buffer *ptr = *(it);
         ptr->dump();
