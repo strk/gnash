@@ -19,7 +19,7 @@
 // Initial test written by Mike Carlson
 
 
-rcsid="$Id: array.as,v 1.49 2008/03/18 11:26:54 strk Exp $";
+rcsid="$Id: array.as,v 1.50 2008/03/18 15:11:53 bwy Exp $";
 #include "check.as"
 
 check_equals(typeof(Array), 'function');
@@ -323,6 +323,89 @@ trysortarray.sort( testCmpBogus6 );
 check_equals ( trysortarray.length, 4 );
 xcheck_equals ( trysortarray.toString(), "2,3,4,1" );
 
+
+//-----------------------------------------------------
+// Test non-integer and insane indices.
+//-----------------------------------------------------
+
+c = ["zero", "one", "two", "three"];
+check_equals(typeof(c), "object");
+
+c[1.1] = "one point one";
+c[-3] = "minus three";
+
+check_equals (c[0], "zero");
+xcheck_equals (c[1], "one");
+check_equals (c[1.1], "one point one");
+xcheck_equals (c[1.9], undefined);
+check_equals (c[-3], "minus three");
+check_equals (c[-3.7], undefined);
+
+c[-2147483648] = "lowest int";
+check_equals (c[0], "zero");
+xcheck_equals (c[1], "one");
+
+// This appears to invalidate integer indices, but
+// not non-integer ones.
+c[-2147483649] = "too low";
+xcheck_equals (c[0], undefined);
+xcheck_equals (c[1], undefined);
+xcheck_equals (c[2], undefined);
+xcheck_equals (c[3], undefined);
+check_equals (c[1.1], "one point one");
+check_equals (c[-2147483649], "too low");
+// doesn't set the int(-2147483649) element:
+check_equals (c[int(-2147483649)], undefined); 
+
+c[2147483649] = "too high";
+check_equals (c[-2147483649], "too low");
+check_equals (c[2147483649], "too high");
+xcheck_equals (c[1], undefined);
+xcheck_equals (c[2], undefined);
+xcheck_equals (c[3], undefined);
+
+xcheck_equals (c.length, -2147483646);
+
+str = "";
+
+for (i in c)
+{
+    str += i + ": " + c[i] + "; ";
+}
+xcheck_equals(str, "2147483649: too high; -2147483649: too low; -2147483648: lowest int; -3: minus three; 1.1: one point one; ");
+
+c = ["zero", "one", "two", "three"];
+c[1.1] = "one point one";
+c[-3] = "minus three";
+
+check_equals (c[0], "zero");
+xcheck_equals (c[1], "one");
+
+// No problem...
+c[0xffffffff + 1] = "too high";
+check_equals (c[0], "zero");
+xcheck_equals (c[1], "one");
+check_equals (c[0xffffffff], undefined);
+check_equals (c[0xffffffff + 1], "too high");
+
+c[0xfffffffffffffffff] = "much too high";
+check_equals (c[0xfffffffffffffffff], "much too high");
+
+// Also no problem. Looks like a fairly crappy bug to me.
+c[-2147483650] = "still lower";
+check_equals (c[0], "zero");
+xcheck_equals (c[1], "one");
+
+xcheck_equals (c.length, 2147483647);
+
+str= "";
+
+for (i in c)
+{
+    str += i + ": " + c[i] + "; ";
+}
+
+xcheck_equals(str, "-2147483650: still lower; 2.95147905179353e+20: much too high; 4294967296: too high; -3: minus three; 1.1: one point one; 3: three; 2: two; 1: one; 0: zero; ");
 
 //-----------------------------------------------------
 // Test Array.pop()
@@ -1124,11 +1207,11 @@ check_equals(a["Infinite"], 'inf');
 
 
 #if OUTPUT_VERSION < 6
- check_totals(404);
+ check_totals(438);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(440);
+  check_totals(474);
 # else
-  check_totals(450);
+  check_totals(484);
 # endif
 #endif

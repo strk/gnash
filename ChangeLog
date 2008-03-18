@@ -1,5 +1,10 @@
 2008-03-18 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* testsuite/actionscript.all/array.cpp: tests for non-integer and
+	  extreme integer indices.
+
+2008-03-18 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* server/as_value.cpp: minor changes to to_int. It's a bit
 	  complicated but seems to replicate how the pp converts to integers.
 	  Don't need to use fmod().
