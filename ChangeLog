@@ -1,5 +1,7 @@
 2008-03-18  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* libbase/lirc.{h,cpp}: Use byte_t instead of uint8_t.
+
 	* libbase/network.{h,cpp}: Define NETBUFSIZE here instead of in
 	cygnal/buffer. Define "byte_t" typedef for raw data, change all
 	methods to use byte_t.

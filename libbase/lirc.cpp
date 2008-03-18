@@ -1,5 +1,5 @@
 //
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -82,13 +82,13 @@ Lirc::getKey()
 //    GNASH_REPORT_FUNCTION;
     key::code key;
     
-    char buf[LIRC_PACKET_SIZE];
+    byte_t buf[LIRC_PACKET_SIZE];
     memset(buf, 0, LIRC_PACKET_SIZE);
     
     // read the data if there is any
     readNet(buf, LIRC_PACKET_SIZE, TIMEOUT);
     
-    string packet = buf;
+    string packet = reinterpret_cast<char *>(buf);
     string::size_type space1 = packet.find(" ") +1;
     string::size_type space2 = packet.find(" ", space1) + 1;
     string::size_type space3 = packet.find(" ", space2) +1;
@@ -111,13 +111,13 @@ Lirc::getButton()
 {
 //    GNASH_REPORT_FUNCTION;
  
-    char buf[LIRC_PACKET_SIZE];
+    byte_t buf[LIRC_PACKET_SIZE];
     memset(buf, 0, LIRC_PACKET_SIZE);
     
     // read the data if there is any
     readNet(buf, LIRC_PACKET_SIZE, TIMEOUT);
     
-    string packet = buf;
+    string packet = reinterpret_cast<char *>(buf);
     string::size_type space1 = packet.find(" ") + 1;
     string::size_type space2 = packet.find(" ", space1) + 1;
     string::size_type space3 = packet.find(" ", space2) + 1;
