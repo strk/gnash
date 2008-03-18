@@ -1,5 +1,10 @@
 2008-03-18 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* testsuite/swfdec/swfdec_gnash_tester: don't use fromdos. It's
+	  not always available and seems to be unnecessary.
+
+2008-03-18 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* server/as_value.cpp: revert most of to_int() changes until
 	  it's tested on i586.
 
