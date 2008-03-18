@@ -31,9 +31,10 @@
 #include <cstring>
 #include <sys/types.h>
 #include <sys/stat.h>
+
 #include "http.h"
 #include "log.h"
-
+#include "network.h"
 #include "handler.h"
 
 using namespace gnash;
@@ -48,12 +49,19 @@ namespace cygnal
 static const int readsize = 1024;
 
 HTTP::HTTP() 
-    : _filesize(0), _port(80), _keepalive(false)
+    : _filesize(0), _port(80), _keepalive(false), _handler(0)
 {
 //    GNASH_REPORT_FUNCTION;
 //    struct status_codes *status = new struct status_codes;
     
 //    _status_codes(CONTINUE, status);
+}
+
+HTTP::HTTP(Handler *hand) 
+    : _filesize(0), _port(80), _keepalive(false)
+{
+//    GNASH_REPORT_FUNCTION;
+    _handler = hand;
 }
 
 HTTP::~HTTP()
@@ -97,34 +105,39 @@ HTTP::waitForGetRequest()
 {
     GNASH_REPORT_FUNCTION;
 
-    byte_t buffer[readsize+1];
-    const char *ptr = reinterpret_cast<const char *>(buffer);
-    memset(buffer, 0, readsize+1);
-    if (readNet(buffer, readsize) > 0) {
-        log_debug (_("Read initial GET Request"));
-    } else {
-        log_error (_("Couldn't read initial GET Request"));
-    }
+//     Network::byte_t buffer[readsize+1];
+//     const char *ptr = reinterpret_cast<const char *>(buffer);
+//     memset(buffer, 0, readsize+1);
+    
+//    _handler->wait();
+    Buffer *buf = _handler->pop();
+
+//    const char *ptr = reinterpret_cast<const char *>(buf->reference());
+//     if (readNet(buffer, readsize) > 0) {
+//         log_debug (_("Read initial GET Request"));
+//     } else {
+//         log_error (_("Couldn't read initial GET Request"));
+//     }
 
     clearHeader();
-    extractAccept(ptr);
-    extractMethod(ptr);
-    extractReferer(ptr);
-    extractHost(ptr);
-    extractAgent(ptr);
-    extractLanguage(ptr);
-    extractCharset(ptr);
-    extractConnection(ptr);
-    extractEncoding(ptr);
-    extractTE(ptr);
+    extractAccept(buf);
+    extractMethod(buf);
+    extractReferer(buf);
+    extractHost(buf);
+    extractAgent(buf);
+    extractLanguage(buf);
+    extractCharset(buf);
+    extractConnection(buf);
+    extractEncoding(buf);
+    extractTE(buf);
     dump();
 
-    // See if we got a legit GET request
-    if (strncmp(ptr, "GET ", 4) == 0) {
-        log_debug (_("Got legit GET request"));
-    } else {
-        log_error (_("Got bogus GET request"));
-    }
+//     // See if we got a legit GET request
+//     if (strncmp(ptr, "GET ", 4) == 0) {
+//         log_debug (_("Got legit GET request"));
+//     } else {
+//         log_error (_("Got bogus GET request"));
+//     }
 
     _filespec = _url;
     return _url;
@@ -358,19 +371,25 @@ HTTP::sendGetReply(http_status_e code)
     GNASH_REPORT_FUNCTION;
     
     formatHeader(_filesize, HTML);
-    int ret = Network::writeNet(_header.str());
-    if ( _body.str().size() > 0) {
-	ret += Network::writeNet(_body.str());
-    }
+//    int ret = Network::writeNet(_header.str());
+    Buffer *buf = new Buffer;
+    Network::byte_t *ptr = (Network::byte_t *)_body.str().c_str();
+    buf->copy(ptr, _body.str().size());
+    buf->resize(_body.str().size());
+    _handler->pushout(buf);
+    _handler->notifyout();
+//     if ( _body.str().size() > 0) {
+// 	ret += Network::writeNet(_body.str());
+//     }
 
-    if (ret >= 0) {
+//    if (ret >= 0) {
         log_debug (_("Sent GET Reply"));
 //        log_debug (_("Sent GET Reply: %s"), _header.str().c_str());
 	clearHeader();
-    } else {
-        log_debug (_("Couldn't send GET Reply, writeNet returned %d"), ret);
-	return false;
-    }
+//     } else {
+//         log_debug (_("Couldn't send GET Reply, writeNet returned %d"), ret);
+// 	return false;
+//     }
 //    cout << "GET Header is:" << endl << _header.str() << endl;
     return true; // Default to true
 }
@@ -414,10 +433,10 @@ HTTP::formatRequest(const string &url, http_method_e req)
 // Connection: Keep-Alive, TE
 // TE: deflate, gzip, chunked, identity, trailers
 int
-HTTP::extractAccept(const char *data) {
+HTTP::extractAccept(Network::byte_t *data) {
 //    GNASH_REPORT_FUNCTION;
     
-    string body = data;
+    string body = reinterpret_cast<const char *>(data);
     string::size_type start, end, length, pos;
     string pattern = "Accept: ";
     
@@ -454,11 +473,11 @@ HTTP::extractAccept(const char *data) {
 }
 
 string
-HTTP::extractMethod(const char *data) {
+HTTP::extractMethod(Network::byte_t *data) {
 //    GNASH_REPORT_FUNCTION;
     
     boost::mutex::scoped_lock lock(stl_mutex);
-    string body = data;
+    string body = reinterpret_cast<const char *>(data);
     string::size_type start, end;
     int length;
 
@@ -481,10 +500,10 @@ HTTP::extractMethod(const char *data) {
 }
 
 string 
-HTTP::extractReferer(const char *data) {
+HTTP::extractReferer(Network::byte_t *data) {
 //    GNASH_REPORT_FUNCTION;
     
-    string body = data;
+    string body = reinterpret_cast<const char *>(data);
     string::size_type start, end;
     string pattern = "Referer: ";
     
@@ -502,10 +521,10 @@ HTTP::extractReferer(const char *data) {
 }
 
 int
-HTTP::extractConnection(const char *data) {
+HTTP::extractConnection(Network::byte_t *data) {
 //    GNASH_REPORT_FUNCTION;
     
-    string body = data;
+    string body = reinterpret_cast<const char *>(data);
     string::size_type start, end, length, pos;
     string pattern = "Connection: ";
     
@@ -546,10 +565,10 @@ HTTP::extractConnection(const char *data) {
 }
 
 string
-HTTP::extractHost(const char *data) {
+HTTP::extractHost(Network::byte_t *data) {
 //    GNASH_REPORT_FUNCTION;
     
-    string body = data;
+    string body = reinterpret_cast<const char *>(data);
     string::size_type start, end;
     string pattern = "Host: ";
     
@@ -567,10 +586,10 @@ HTTP::extractHost(const char *data) {
 }
 
 string 
-HTTP::extractAgent(const char *data) {
+HTTP::extractAgent(Network::byte_t *data) {
 //    GNASH_REPORT_FUNCTION;
     
-    string body = data;
+    string body = reinterpret_cast<const char *>(data);
     string::size_type start, end;
     string pattern = "User-Agent: ";
     
@@ -588,10 +607,10 @@ HTTP::extractAgent(const char *data) {
 }
 
 int
-HTTP::extractLanguage(const char *data) {
+HTTP::extractLanguage(Network::byte_t *data) {
 //    GNASH_REPORT_FUNCTION;
     
-    string body = data;
+    string body = reinterpret_cast<const char *>(data);
     string::size_type start, end, length, pos, terminate;
     // match both Accept-Language and Content-Language
     string pattern = "-Language: ";
@@ -634,10 +653,10 @@ HTTP::extractLanguage(const char *data) {
 }
 
 int
-HTTP::extractCharset(const char *data) {
+HTTP::extractCharset(Network::byte_t *data) {
 //    GNASH_REPORT_FUNCTION;
     
-    string body = data;
+    string body = reinterpret_cast<const char *>(data);
     string::size_type start, end, length, pos, terminate;
 // match both Accept-Charset and Content-Charset
     string pattern = "-Charset: ";
@@ -680,10 +699,10 @@ HTTP::extractCharset(const char *data) {
 }
 
 int
-HTTP::extractEncoding(const char *data) {
+HTTP::extractEncoding(Network::byte_t *data) {
 //    GNASH_REPORT_FUNCTION;
     
-    string body = data;
+    string body = reinterpret_cast<const char *>(data);
     string::size_type start, end, length, pos, terminate;
     // match both Accept-Encoding and Content-Encoding
     string pattern = "-Encoding: ";
@@ -728,10 +747,10 @@ HTTP::extractEncoding(const char *data) {
 }
 
 int
-HTTP::extractTE(const char *data) {
+HTTP::extractTE(Network::byte_t *data) {
 //    GNASH_REPORT_FUNCTION;
     
-    string body = data;
+    string body = reinterpret_cast<const char *>(data);
     string::size_type start, end, length, pos;
     string pattern = "TE: ";
     
@@ -867,11 +886,13 @@ httphandler(Handler::thread_params_t *args)
 {
     GNASH_REPORT_FUNCTION;
     int retries = 10;
-    HTTP www;
 //    struct thread_params thread_data;
     string url, filespec, parameters;
     string::size_type pos;
     Handler *hand = reinterpret_cast<Handler *>(args->handle);
+    HTTP www;
+    www.setHandler(hand);
+    
 //    hand->_outcond.wait();
 
 //     www.toggleDebug(true);
@@ -885,7 +906,7 @@ httphandler(Handler::thread_params_t *args)
 	
 // 	conndata->statistics->setFileType(NetStats::RTMPT);
 // 	conndata->statistics->startClock();
-	args->netfd = www.getFileFd();
+//	args->netfd = www.getFileFd();
 	url = docroot;
 	url += www.waitForGetRequest();
 	pos = url.find("?");

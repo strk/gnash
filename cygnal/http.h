@@ -33,7 +33,7 @@
 namespace cygnal
 {
     
-class HTTP : public Handler
+class HTTP
 {
 public:
 // as defined by the W3: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
@@ -113,6 +113,7 @@ public:
 	OSCP
     } filetype_e;
     HTTP();
+    HTTP(Handler *hand);
     ~HTTP();
     std::string waitForGetRequest();
     std::string waitForGetRequest(gnash::Network &net);
@@ -126,18 +127,38 @@ public:
 
     // These methods extract the fields in the HTTP header.
     // These all return the number of items found, or 0
-    int extractAccept(const char *data);
-    int extractLanguage(const char *data);
-    int extractCharset(const char *data);
-    int extractEncoding(const char *data);
-    int extractTE(const char *data);
-    int extractConnection(const char *data);
+    int extractAccept(gnash::Network::byte_t *data);
+    int extractAccept(Buffer *data)
+	{ return extractAccept(data->reference()); };
+    int extractLanguage(gnash::Network::byte_t *data);
+    int extractLanguage(Buffer *data)
+	{ return extractLanguage(data->reference()); };
+    int extractCharset(gnash::Network::byte_t *data);
+    int extractCharset(Buffer *data)
+	{ return extractCharset(data->reference()); };
+    int extractEncoding(gnash::Network::byte_t *data);
+    int extractEncoding(Buffer *data)
+	{ return extractEncoding(data->reference()); };
+    int extractTE(gnash::Network::byte_t *data);
+    int extractTE(Buffer *data)
+	{ return extractTE(data->reference()); };
+    int extractConnection(gnash::Network::byte_t *data);
+    int extractConnection(Buffer *data)
+	{ return extractConnection(data->reference()); };
 
     // These return the string that was found for this field.
-    std::string extractMethod(const char *data);
-    std::string extractReferer(const char *data);
-    std::string extractHost(const char *data);
-    std::string extractAgent(const char *data);
+    std::string extractMethod(gnash::Network::byte_t *data);
+    std::string extractMethod(Buffer *data)
+	{ return extractMethod(data->reference()); };
+    std::string extractReferer(gnash::Network::byte_t *data);
+    std::string extractReferer(Buffer *data)
+	{ return extractReferer(data->reference()); };
+    std::string extractHost(gnash::Network::byte_t *data);
+    std::string extractHost(Buffer *data)
+	{ return extractHost(data->reference()); };
+    std::string extractAgent(gnash::Network::byte_t *data);
+    std::string extractAgent(Buffer *data)
+	{ return extractAgent(data->reference()); };
 
     // These methods add data to the fields in the HTTP header.
     // These return true if OK, false if error.
@@ -199,6 +220,7 @@ public:
     std::string getHost() { return _host; }
     std::string getUserAgent() { return _agent; }
 
+    void setHandler(Handler *hand) { _handler = hand; };
 private:
     std::stringstream _header;
     std::stringstream _body;
@@ -221,6 +243,7 @@ private:
     std::vector<std::string> _accept;
     // Connection parameters we care about
     bool	_keepalive;
+    Handler     *_handler;
 //    bool	_te;
 };  
 

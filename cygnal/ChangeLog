@@ -1,3 +1,8 @@
+2008-03-18  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* http.cpp: Use Network::byte_t instead of boost_uint8_t. Use a
+	Buffer too.
+
 2008-03-17  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* alloc.cpp: Don't use thrrad safe wrappers for now.
@@ -12,7 +17,7 @@
 	old threads. Move http_handler to http.cpp.
 	* handler.{h,cpp}: Add output thread handler. Use Network::byte_t
 	instead of boost_uint8_t directly.
-	* http.cpp:  Use Network::byte_t instead of boost_uint8_t
+	* http.cpp: Use Network::byte_t instead of boost_uint8_t
 	directly. Use const std::string & instead of const char *. Add
 	http_handler from cygnal.cpp.
 	* testsuite/cygnal.all/test_cque.cpp: Add tests for new remove and
