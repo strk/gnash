@@ -34,6 +34,8 @@
 #include "http.h"
 #include "log.h"
 
+#include "handler.h"
+
 using namespace gnash;
 using namespace std;
 
@@ -95,7 +97,8 @@ HTTP::waitForGetRequest()
 {
     GNASH_REPORT_FUNCTION;
 
-    char buffer[readsize+1];
+    byte_t buffer[readsize+1];
+    const char *ptr = reinterpret_cast<const char *>(buffer);
     memset(buffer, 0, readsize+1);
     if (readNet(buffer, readsize) > 0) {
         log_debug (_("Read initial GET Request"));
@@ -104,20 +107,20 @@ HTTP::waitForGetRequest()
     }
 
     clearHeader();
-    extractAccept(buffer);
-    extractMethod(buffer);
-    extractReferer(buffer);
-    extractHost(buffer);
-    extractAgent(buffer);
-    extractLanguage(buffer);
-    extractCharset(buffer);
-    extractConnection(buffer);
-    extractEncoding(buffer);
-    extractTE(buffer);
+    extractAccept(ptr);
+    extractMethod(ptr);
+    extractReferer(ptr);
+    extractHost(ptr);
+    extractAgent(ptr);
+    extractLanguage(ptr);
+    extractCharset(ptr);
+    extractConnection(ptr);
+    extractEncoding(ptr);
+    extractTE(ptr);
     dump();
 
     // See if we got a legit GET request
-    if (strncmp(buffer, "GET ", 4) == 0) {
+    if (strncmp(ptr, "GET ", 4) == 0) {
         log_debug (_("Got legit GET request"));
     } else {
         log_error (_("Got bogus GET request"));
@@ -220,7 +223,7 @@ HTTP::formatServer()
 }
 
 bool
-HTTP::formatServer(const char *data)
+HTTP::formatServer(const string &data)
 {
     GNASH_REPORT_FUNCTION;
     _header << "Server: " << data << endl;
@@ -228,7 +231,7 @@ HTTP::formatServer(const char *data)
 }
 
 bool
-HTTP::formatMethod(const char *data)
+HTTP::formatMethod(const string &data)
 {
     GNASH_REPORT_FUNCTION;
     _header << "Method: " << data << endl;
@@ -236,7 +239,7 @@ HTTP::formatMethod(const char *data)
 }
 
 bool
-HTTP::formatReferer(const char *refer)
+HTTP::formatReferer(const string &refer)
 {
     GNASH_REPORT_FUNCTION;
     _header << "Referer: " << refer << endl;
@@ -244,7 +247,7 @@ HTTP::formatReferer(const char *refer)
 }
 
 bool
-HTTP::formatConnection(const char *options)
+HTTP::formatConnection(const string &options)
 {
     GNASH_REPORT_FUNCTION;
     _header << "Connection: " << options << endl;
@@ -299,7 +302,7 @@ HTTP::formatContentLength(int filesize)
 }
 
 bool
-HTTP::formatHost(const char *host)
+HTTP::formatHost(const string &host)
 {
 //    GNASH_REPORT_FUNCTION;
     _header << "Host: " << host << endl;
@@ -307,7 +310,7 @@ HTTP::formatHost(const char *host)
 }
 
 bool
-HTTP::formatAgent(const char *agent)
+HTTP::formatAgent(const string &agent)
 {
 //    GNASH_REPORT_FUNCTION;
     _header << "User-Agent: " << agent << endl;
@@ -315,7 +318,7 @@ HTTP::formatAgent(const char *agent)
 }
 
 bool
-HTTP::formatLanguage(const char *lang)
+HTTP::formatLanguage(const string &lang)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -325,7 +328,7 @@ HTTP::formatLanguage(const char *lang)
 }
 
 bool
-HTTP::formatCharset(const char *set)
+HTTP::formatCharset(const string &set)
 {
     GNASH_REPORT_FUNCTION;
     // For some browsers this appears to also be Content-Charset
@@ -334,7 +337,7 @@ HTTP::formatCharset(const char *set)
 }
 
 bool
-HTTP::formatEncoding(const char *code)
+HTTP::formatEncoding(const string &code)
 {
     GNASH_REPORT_FUNCTION;
     _header << "Accept-Encoding: " << code << endl;
@@ -342,7 +345,7 @@ HTTP::formatEncoding(const char *code)
 }
 
 bool
-HTTP::formatTE(const char *te)
+HTTP::formatTE(const string &te)
 {
     GNASH_REPORT_FUNCTION;
     _header << "TE: " << te << endl;
@@ -355,9 +358,9 @@ HTTP::sendGetReply(http_status_e code)
     GNASH_REPORT_FUNCTION;
     
     formatHeader(_filesize, HTML);
-    int ret = writeNet(_header.str().c_str(), _header.str().size());
+    int ret = Network::writeNet(_header.str());
     if ( _body.str().size() > 0) {
-	ret += writeNet(_body.str().c_str(), _body.str().size());
+	ret += Network::writeNet(_body.str());
     }
 
     if (ret >= 0) {
@@ -373,7 +376,7 @@ HTTP::sendGetReply(http_status_e code)
 }
 
 bool
-HTTP::formatRequest(const char *url, http_method_e req)
+HTTP::formatRequest(const string &url, http_method_e req)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -857,6 +860,69 @@ HTTP::dump() {
     }
     log_debug (_("==== ==== ===="));
 }
+
+extern "C" {
+void
+httphandler(Handler::thread_params_t *args)
+{
+    GNASH_REPORT_FUNCTION;
+    int retries = 10;
+    HTTP www;
+//    struct thread_params thread_data;
+    string url, filespec, parameters;
+    string::size_type pos;
+    Handler *hand = reinterpret_cast<Handler *>(args->handle);
+//    hand->_outcond.wait();
+
+//     www.toggleDebug(true);
+    
+//     www.createServer(args->port);
+//     while (retries-- > 0) {
+// 	log_debug(_("%s: Thread for port %d looping..."), __PRETTY_FUNCTION__, args->port);
+// 	www.newConnection(true);
+
+	string docroot = args->filespec;
+	
+// 	conndata->statistics->setFileType(NetStats::RTMPT);
+// 	conndata->statistics->startClock();
+	args->netfd = www.getFileFd();
+	url = docroot;
+	url += www.waitForGetRequest();
+	pos = url.find("?");
+	filespec = url.substr(0, pos);
+	parameters = url.substr(pos + 1, url.size());
+	// Get the file size for the HTTP header
+	
+	if (www.getFileStats(filespec) == HTTP::ERROR) {
+	    www.formatErrorResponse(HTTP::NOT_FOUND);
+	}
+	www.sendGetReply(HTTP::LIFE_IS_GOOD);
+//	strcpy(thread_data.filespec, filespec.c_str());
+//	thread_data.statistics = conndata->statistics;
+	
+	// Keep track of the network statistics
+//	conndata->statistics->stopClock();
+// 	log_debug (_("Bytes read: %d"), www.getBytesIn());
+// 	log_debug (_("Bytes written: %d"), www.getBytesOut());
+//	st.setBytes(www.getBytesIn() + www.getBytesOut());
+//	conndata->statistics->addStats();
+	
+	if (url != docroot) {
+	    log_debug (_("File to load is: %s"), filespec.c_str());
+	    log_debug (_("Parameters are: %s"), parameters.c_str());
+// 	    memset(args->filespec, 0, 256);
+// 	    memcpy(->filespec, filespec.c_str(), filespec.size());
+// 	    boost::thread sendthr(boost::bind(&stream_thread, args));
+// 	    sendthr.join();
+	}
+	// See if this is a persistant connection
+// 	if (!www.keepAlive()) {
+// 	    www.closeConnection();
+// 	}
+//	conndata->statistics->dump();
+//    }
+}
+} // end of extern C
 
 } // end of cygnal namespace
 

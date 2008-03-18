@@ -21,6 +21,7 @@
 #endif
 
 #include <string>
+#include <vector>
 #include <deque>
 
 #include "log.h"
@@ -53,10 +54,29 @@ CQue::~CQue()
 #endif
 }
 
+// Wait for a condition variable to trigger
+void
+CQue::wait()
+{
+    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lk(_cond_mutex);
+    _cond.wait(lk);
+    log_debug("wait mutex released");
+}
+
+// Notify a condition variable to trigger
+void
+CQue::notify()
+{
+    GNASH_REPORT_FUNCTION;
+    _cond.notify_one();
+    log_debug("wait mutex triggered");
+}
+
 size_t
 CQue::size()
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_mutex);
     return _que.size();
 }
@@ -64,7 +84,7 @@ CQue::size()
 bool
 CQue::push(Buffer *data)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_mutex);
     _que.push_back(data);
     return true;
@@ -72,9 +92,9 @@ CQue::push(Buffer *data)
 
 // Push bytes on the outgoing FIFO
 bool
-CQue::push(uint8_t *data, int nbytes)
+CQue::push(gnash::Network::byte_t *data, int nbytes)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     Buffer *buf = new Buffer;
     std::copy(data, data + nbytes, buf->reference());
 }
@@ -84,7 +104,7 @@ CQue::push(uint8_t *data, int nbytes)
 Buffer *
 CQue::pop()
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     Buffer *buf;
     boost::mutex::scoped_lock lock(_mutex);
     if (_que.size()) {
@@ -98,7 +118,7 @@ CQue::pop()
 Buffer *
 CQue::peek()
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_mutex);
     if (_que.size()) {
         return _que.front();
@@ -114,7 +134,86 @@ CQue::clear()
     boost::mutex::scoped_lock lock(_mutex);
     _que.clear();
 }
-    
+
+// Remove a range of elements
+void
+CQue::remove(Buffer *begin, Buffer *end)
+{
+    GNASH_REPORT_FUNCTION;
+    deque<Buffer *>::iterator it;
+    deque<Buffer *>::iterator start;
+    deque<Buffer *>::iterator stop;
+    boost::mutex::scoped_lock lock(_mutex);
+    Buffer *ptr;
+    for (it = _que.begin(); it != _que.end(); it++) {
+	ptr = *(it);
+	if (ptr->reference() == begin->reference()) {
+	    start = it;
+	}
+	if (ptr->reference() == end->reference()) {
+	    stop = it;
+	    break;
+	}
+    }
+    _que.erase(start, stop);
+}
+
+// Remove an element
+void
+CQue::remove(Buffer *element)
+{
+    GNASH_REPORT_FUNCTION;
+    deque<Buffer *>::iterator it;
+    boost::mutex::scoped_lock lock(_mutex);
+    for (it = _que.begin(); it != _que.end(); it++) {
+	Buffer *ptr = *(it);
+	if (ptr->reference() == element->reference()) {
+	    _que.erase(it);
+	}
+    }
+}
+
+// Merge sucessive buffers into one single larger buffer. This is for some
+// protocols, than have very long headers.
+Buffer *
+CQue::merge(Buffer *begin)
+{
+    GNASH_REPORT_FUNCTION;
+    int totalsize = 0;
+    deque<Buffer *>::iterator it;
+    vector<deque<Buffer *>::iterator> elements;
+    vector<deque<Buffer *>::iterator>::iterator eit;
+    boost::mutex::scoped_lock lock(_mutex);
+    for (it = _que.begin(); it != _que.end(); it++) {
+	Buffer *ptr = *(it);
+	if (totalsize > 0) {
+	    totalsize += ptr->size();
+	    elements.push_back(it);
+	    if (ptr->size() < gnash::NETBUFSIZE) {
+		Buffer *newbuf = new Buffer(totalsize);
+		Network::byte_t *tmp = newbuf->reference();
+		Buffer *buf;
+//		_que.insert(elements.begin(), newbuf);
+		for (eit = elements.begin(); eit != elements.end(); eit++) {
+ 		    deque<Buffer *>::iterator ita = *(eit);
+		    buf = *(ita);
+		    std::copy(buf->reference(), buf->reference() + buf->size(), tmp);
+		    tmp += buf->size();
+		    _que.erase(ita);
+		}
+		_que.push_back(newbuf);
+		return newbuf;
+	    }
+	    continue;
+	}
+	if (ptr->reference() == begin->reference()) {
+	    totalsize = ptr->size();
+	    elements.push_back(it);
+	}
+    }
+    return 0;
+}
+
 // Dump internal data.
 void
 CQue::dump()
@@ -122,7 +221,7 @@ CQue::dump()
 //    GNASH_REPORT_FUNCTION;
     deque<Buffer *>::iterator it;
     boost::mutex::scoped_lock lock(_mutex);
-    cerr << endl << "Outgoing queue has "<< _que.size() << " buffers." << endl;
+    cerr << endl << "CQue has "<< _que.size() << " buffers." << endl;
     for (it = _que.begin(); it != _que.end(); it++) {
 	Buffer *ptr = *(it);
         ptr->dump();

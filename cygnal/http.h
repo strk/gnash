@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,15 +23,17 @@
 #include "gnashconfig.h"
 #endif
 
-#include "network.h"
 #include <string>
 #include <map>
 #include <vector>
 
+#include "handler.h"
+#include "network.h"
+
 namespace cygnal
 {
     
-class HTTP : public gnash::Network
+class HTTP : public Handler
 {
 public:
 // as defined by the W3: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
@@ -113,7 +115,7 @@ public:
     HTTP();
     ~HTTP();
     std::string waitForGetRequest();
-    std::string waitForGetRequest(Network &net);
+    std::string waitForGetRequest(gnash::Network &net);
     
     // Handle the GET request response
     bool sendGetReply(http_status_e code);
@@ -142,23 +144,23 @@ public:
     bool clearHeader();
     bool formatHeader(int filesize, const short type);
     bool formatHeader(const short type);
-    bool formatRequest(const char *url, http_method_e req);
-    bool formatMethod(const char *data);
+    bool formatRequest(const std::string &url, http_method_e req);
+    bool formatMethod(const std::string &data);
     bool formatDate();
     bool formatServer();
-    bool formatServer(const char *data);
-    bool formatReferer(const char *data);
-    bool formatConnection(const char *data);
+    bool formatServer(const std::string &data);
+    bool formatReferer(const std::string &data);
+    bool formatConnection(const std::string &data);
     bool formatContentLength();
     bool formatContentLength(int filesize);
     bool formatContentType();
     bool formatContentType(filetype_e type);
-    bool formatHost(const char *data);
-    bool formatAgent(const char *data);
-    bool formatLanguage(const char *data);
-    bool formatCharset(const char *data);
-    bool formatEncoding(const char *data);
-    bool formatTE(const char *data);
+    bool formatHost(const std::string &data);
+    bool formatAgent(const std::string &data);
+    bool formatLanguage(const std::string &data);
+    bool formatCharset(const std::string &data);
+    bool formatEncoding(const std::string &data);
+    bool formatTE(const std::string &data);
 
     bool formatErrorResponse(http_status_e err);
     
@@ -221,7 +223,14 @@ private:
     bool	_keepalive;
 //    bool	_te;
 };  
-    
+
+// This is the thread for all incoming HTTP connections, which
+// has to be in C.
+extern "C" {
+    void httphandler(Handler::thread_params_t *args);
+}
+
+
 } // end of cygnal namespace
 
 // end of _HTTP_H_

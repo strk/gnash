@@ -1,3 +1,23 @@
+2008-03-17  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* alloc.cpp: Don't use thrrad safe wrappers for now.
+	* buffer.cpp: Move BUFFERSIZE to network.h. Use Network::byte_t
+	instead of boost_uint8_t directly.
+	* buffer.h: Use Network::byte_t	instead of boost_uint8_t
+	directly.
+	* cque.{h,cpp}: Add remove and merge methods for manipuating
+	buffers in the que. Add support for using boost condition
+	variables as triggers for I/O in the que.
+	* cygnal.cpp: Use new Handler and Buffer classes instead of the
+	old threads. Move http_handler to http.cpp.
+	* handler.{h,cpp}: Add output thread handler. Use Network::byte_t
+	instead of boost_uint8_t directly.
+	* http.cpp:  Use Network::byte_t instead of boost_uint8_t
+	directly. Use const std::string & instead of const char *. Add
+	http_handler from cygnal.cpp.
+	* testsuite/cygnal.all/test_cque.cpp: Add tests for new remove and
+	mege methods.
+
 2008-03-16  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* handler.{h,cpp}: More queuing support to CQue.

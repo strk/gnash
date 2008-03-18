@@ -45,6 +45,7 @@
 #endif
 
 #include "log.h"
+#include "network.h"
 #include "cque.h"
 
 using namespace std;
@@ -63,6 +64,12 @@ main (int /*argc*/, char** /*argv*/) {
     CQue que;
 
     Buffer buf;
+    // populate the buffer
+    boost::uint8_t *ptr = buf.reference();
+    for (size_t i=1; i< buf.size(); i++) {
+        ptr[i] = i+' ';
+    }
+
     boost::uint8_t *test = new uint8_t[6];
     memcpy(test, "hell", 4);
 
@@ -94,12 +101,7 @@ main (int /*argc*/, char** /*argv*/) {
         runtest.fail ("CQue::clearall()");
     }
 
-    // populate the buffer
-    boost::uint8_t *ptr = buf.reference();
-    for (size_t i=1; i< buf.size(); i++) {
-        ptr[i] = i;
-    }
-
+    
     que.push(&buf);
     Buffer *buf2 = que.peek();
     if ((buf2 == &buf) && (que.size() == 1)) {
@@ -114,7 +116,47 @@ main (int /*argc*/, char** /*argv*/) {
      } else {
          runtest.fail ("CQue::pop()");
      }
+
+     que.push(&buf1);
+     que.push(&buf1);
+     size_t firstsize = que.size();
+     que.remove(&buf);
+     if (que.size() == firstsize - 1) {
+         runtest.pass ("CQue::remove()");
+     } else {
+         runtest.fail ("CQue::remove()");
+     }
+
+     // Make some test buffers
+     Buffer merge1, merge2, merge3;
+     size_t i;
+     ptr = merge1.reference();
+     for (i=0; i< gnash::NETBUFSIZE; i++) {
+         ptr[i] = i*'A';
+     }
+     que.push(&merge1);
      
+     ptr = merge2.reference();
+     for (i=0; i<gnash::NETBUFSIZE; i++) {
+         ptr[i] = i+'a';
+     }
+     que.push(&merge2);
+
+     merge3.resize(96);
+     ptr = merge3.reference();
+     for (i=0; i<96; i++) {
+         ptr[i] = i+' ';
+     }
+     que.push(&merge3);
+
+     // A merge gives us one big buffer where there were several buffers
+     Buffer *foo = que.merge(&merge1);
+     if (foo->size() == (gnash::NETBUFSIZE * 2) + 96) {
+         runtest.pass ("CQue::merge()");
+     } else {
+         runtest.fail ("CQue::merge()");
+     }
+
 //     que.dump();
 }
 

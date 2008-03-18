@@ -258,7 +258,7 @@ Stream::play(int netfd) {
     int nbytes = 0;
     Network net;
 //    while ((_seekptr - _dataptr) >= 0) {
-    nbytes = net.writeNet(_netfd, (char *)_seekptr, _filesize);
+////    nbytes = net.writeNet(_netfd, (char *)_seekptr, _filesize);
 //    if (nbytes <= 0) {
 //        break;
 //    }

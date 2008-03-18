@@ -19,21 +19,20 @@
 #include <boost/cstdint.hpp>
 #include "buffer.h"
 #include "log.h"
+#include "network.h"
 
 using namespace std;
+using namespace gnash;
 
 namespace cygnal
 {
-
-// Adjust for the constant size
-const size_t BUFFERSIZE = 128;
 
 void *
 Buffer::init(size_t nbytes)
 {
 //    GNASH_REPORT_FUNCTION;
     if (_ptr == 0) {
-        _ptr = new boost::uint8_t[nbytes];
+        _ptr = new Network::byte_t[nbytes];
         _nbytes = nbytes;
         // this could be a performance hit, but for debugging we leave it in so we get
         // easier to ready hex dumps in GDB,
@@ -47,8 +46,8 @@ Buffer::Buffer()
 {
 //    GNASH_REPORT_FUNCTION;
     _ptr = 0;
-    _nbytes = BUFFERSIZE;
-    init(BUFFERSIZE);
+    _nbytes = gnash::NETBUFSIZE;
+    init(gnash::NETBUFSIZE);
 }
     
 // Create with a size other than the default
@@ -73,7 +72,7 @@ Buffer::~Buffer()
 
 // Put data into the buffer
 void
-Buffer::copy(boost::uint8_t *data, int nbytes)
+Buffer::copy(Network::byte_t *data, int nbytes)
 {    
 //    GNASH_REPORT_FUNCTION;
     std::copy(data, data + nbytes, _ptr);
@@ -109,8 +108,9 @@ Buffer::operator=(Buffer &buf)
 // Check to see if two Buffer objects are identical
 bool
 Buffer::operator==(Buffer *buf)
-{
-    if (buf->size() == _nbytes) {
+{ 
+//    GNASH_REPORT_FUNCTION;
+   if (buf->size() == _nbytes) {
         if (memcmp(buf->reference(), _ptr, _nbytes) == 0)  {
             return true;
         }
@@ -121,6 +121,7 @@ Buffer::operator==(Buffer *buf)
 bool
 Buffer::operator==(Buffer &buf)
 {
+//    GNASH_REPORT_FUNCTION;
     if (buf.size() == _nbytes){
         if (memcmp(buf.reference(), _ptr, _nbytes) == 0)  {
             return true;
@@ -143,8 +144,9 @@ Buffer::empty()
 void *
 Buffer::resize(size_t nbytes)
 {
+    GNASH_REPORT_FUNCTION;
     // Allocate a new memory block
-    boost::uint8_t *tmp = new boost::uint8_t[nbytes];
+    Network::byte_t *tmp = new Network::byte_t[nbytes];
     // And copy ourselves into it
     if (nbytes > _nbytes) {
         std::copy(_ptr, _ptr + _nbytes, tmp);
@@ -169,6 +171,7 @@ void
 Buffer::dump()
 {
     cerr << "Buffer is " << _nbytes << " bytes at " << (void *)_ptr << endl;
+    cerr << gnash::hexify((unsigned char *)_ptr, _nbytes, true) << endl;
 }
 
 } // end of cygnal namespace

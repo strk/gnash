@@ -25,6 +25,7 @@
 #include <deque>
 
 #include "buffer.h"
+#include "network.h"
 
 // _definst_ is the default instance name
 namespace cygnal
@@ -35,7 +36,7 @@ public:
     CQue();
     ~CQue();
     // Push data onto the que
-    bool push(boost::uint8_t *data, int nbytes);
+    bool push(gnash::Network::byte_t *data, int nbytes);
     bool push(Buffer *data);
     // Pop the first date element off the que
     Buffer *pop();
@@ -49,6 +50,14 @@ public:
     void notify();
     // Empty the que of all data. 
     void clear();
+    // Remove a range of elements
+    void remove(Buffer *begin, Buffer *end);
+//     // Remove an element
+//    void remove(Buffer *it);
+    void remove(Buffer *it);
+    // Merge sucessive buffers into one single larger buffer. This is for some
+    // protocols, than have very long headers.
+    Buffer *merge(Buffer *begin);
     // Dump the data to the terminal
     void dump();
 private:

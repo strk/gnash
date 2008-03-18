@@ -68,7 +68,7 @@ Handler::push(Buffer *data, fifo_e direction)
 
 // Push bytes on the outgoing FIFO
 bool
-Handler::push(uint8_t *data, int nbytes, fifo_e direction)
+Handler::push(gnash::Network::byte_t *data, int nbytes, fifo_e direction)
 {
 //    GNASH_REPORT_FUNCTION;
     Buffer *ptr = new Buffer;
@@ -194,28 +194,35 @@ netin_handler(Handler::thread_params_t *args)
     int retries = 3;
     while (retries-- >  0) {
 	Buffer *buf = new Buffer;
-	int ret = hand->readNet(args->netfd, buf->reference(), buf->size());
-	if (ret) {
+	int ret = hand->readNet(buf->reference(), buf->size());
+	if (ret > 0) {
 	    if (ret != buf->size()) {
 		buf->resize(ret);
 	    }
 	    hand->push(buf);
-	    string str = (const char *)buf->reference();
-	    cerr << str << endl;
-//	    _incond.notify_one();
+//  	    string str = (const char *)buf->reference();
+//  	    cerr << str << endl;
+	    hand->notify();
 	} else {
 	    break;
 	}
     }
-    hand->dump();
+//    hand->dump();
 }
 void
 netout_handler(Handler::thread_params_t *args)
 {
     GNASH_REPORT_FUNCTION;
     int retries = 10;
-
-//    _outcond.wait();
+    int ret;
+    
+    do {
+	Handler *hand = reinterpret_cast<Handler *>(args->handle);
+	hand->wait();
+	Buffer *buf = hand->popout();
+	ret = hand->writeNet(buf);
+    } while (ret > 0);
+    
 }
 
 } // end of extern C

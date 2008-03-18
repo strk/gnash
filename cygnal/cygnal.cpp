@@ -22,11 +22,16 @@
 #include "gnashconfig.h"
 #endif
 
+#include <list>
 #include <iostream>
 #include <signal.h>
 #include <vector>
 #include <sys/mman.h>
 #include <cerrno>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <gettext.h>
 
 extern "C"{
 # include <unistd.h>
@@ -39,6 +44,7 @@ extern "C"{
 #endif
 }
 
+// classes internal to Gnash
 #include "network.h"
 #include "log.h"
 #include "crc.h"
@@ -48,11 +54,11 @@ extern "C"{
 #include "netstats.h"
 #include "statistics.h"
 #include "stream.h"
+#include "gmemory.h"
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include "gettext.h"
+// classes internal to Cygnal
+#include "buffer.h"
+#include "handler.h"
 
 #ifdef ENABLE_NLS
 #include <locale.h>
@@ -85,13 +91,6 @@ static void stream_thread(struct thread_params *sendfile);
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 CRcInitFile& crcfile = CRcInitFile::getDefaultInstance();
 
-struct thread_params {
-    int netfd;
-    int port;
-    char filespec[256];
-    Statistics *statistics;
-};
-
 static struct sigaction  act;
 
 // The next few global variables have to be global because Boost
@@ -110,8 +109,10 @@ int thread_retries = 10;
 // conflict with apache on the same machine.
 static int port_offset = 0;
 
-// end of globals
+// Keep a list of all active network connections
+static map<std::string, Handler *> _handlers;
 
+// end of globals
 
 int
 main(int argc, char *argv[])
@@ -139,7 +140,7 @@ main(int argc, char *argv[])
     }
 
     crcfile.loadFiles();
-
+    
 #if 0 // this should be automatic
     if (crcfile.getDebugLog().size()) {
 	dbglogfile.openLog(crcfile.getDebugLog());
@@ -180,6 +181,7 @@ main(int argc, char *argv[])
         }
     }
     
+    dbglogfile.setLogFilename("cygnal-dbg.log");
 
     // get the file name from the command line
     while (optind < argc) {
@@ -190,13 +192,21 @@ main(int argc, char *argv[])
     act.sa_handler = cntrlc_handler;
     sigaction (SIGINT, &act, NULL);
 
-    struct thread_params rtmp_data;
-    struct thread_params http_data;
-    struct thread_params ssl_data;
-    rtmp_data.port = port_offset + 1935;
-//    boost::thread rtmp_port(boost::bind(&rtmp_thread, &rtmp_data));
+    Handler::thread_params_t http_data;
+//     struct thread_params rtmp_data;
+//     struct thread_params ssl_data;
+//     rtmp_data.port = port_offset + 1935;
+//     boost::thread rtmp_port(boost::bind(&rtmp_thread, &rtmp_data));
 
+    Handler hand;
+    http_data.netfd = 0;
     http_data.port = port_offset + 80;
+    http_data.handle = &hand;
+    http_data.filespec = docroot;
+    hand.start(&http_data);
+    
+//    boost::thread http_port(boost::bind(&nethandler, &http_data));
+#if 0
     Statistics st;
     http_data.statistics = &st;
     boost::thread http_port(boost::bind(&http_thread, &http_data));
@@ -207,75 +217,16 @@ main(int argc, char *argv[])
 //    boost::thread rtmp_port(&rtmp_thread);
 //    boost::thread http_port(&http_thread);
 //    boost::thread ssl_port(&ssl_thread);
+#endif
 
     // wait for the thread to finish
 //    rtmp_port.join();
-    http_port.join();
+//    http_port.join();
 //    ssl_port.join();
-
+    
     log_debug (_("All done I think..."));
     
     return(0);
-}
-
-static void
-http_thread(struct thread_params *conndata)
-{
-    GNASH_REPORT_FUNCTION;
-    int retries = 0;
-    HTTP www;
-//    struct thread_params thread_data;
-    string url, filespec, parameters;
-    string::size_type pos;
-    int port = RTMPT + port_offset;
-
-    www.toggleDebug(true);
-    
-    www.createServer(port);
-    while (retries++ < thread_retries) {
-	log_debug(_("%s: Thread for port %d looping..."), __PRETTY_FUNCTION__, port);
-	www.newConnection(true);
-
-	conndata->statistics->setFileType(NetStats::RTMPT);
-	conndata->statistics->startClock();
-	conndata->netfd = www.getFileFd();
-	url = docroot;
-	url += www.waitForGetRequest();
-	pos = url.find("?");
-	filespec = url.substr(0, pos);
-	parameters = url.substr(pos + 1, url.size());
-	// Get the file size for the HTTP header
-	
-	if (www.getFileStats(filespec) == HTTP::ERROR) {
-	    www.formatErrorResponse(HTTP::NOT_FOUND);
-	}
-	www.sendGetReply(HTTP::LIFE_IS_GOOD);
-//	strcpy(thread_data.filespec, filespec.c_str());
-//	thread_data.statistics = conndata->statistics;
-	
-	// Keep track of the network statistics
-	conndata->statistics->stopClock();
-// 	log_debug (_("Bytes read: %d"), www.getBytesIn());
-// 	log_debug (_("Bytes written: %d"), www.getBytesOut());
-//	st.setBytes(www.getBytesIn() + www.getBytesOut());
-	conndata->statistics->addStats();
-//	www.resetBytesIn();
-//	www.resetBytesOut();
-	
-	if (url != docroot) {
-	    log_debug (_("File to load is: %s"), filespec.c_str());
-	    log_debug (_("Parameters are: %s"), parameters.c_str());
-	    memset(conndata->filespec, 0, 256);
-	    memcpy(conndata->filespec, filespec.c_str(), filespec.size());
-	    boost::thread sendthr(boost::bind(&stream_thread, conndata));
-	    sendthr.join();
-	}
-	// See if this is a persistant connection
-// 	if (!www.keepAlive()) {
-// 	    www.closeConnection();
-// 	}
-	conndata->statistics->dump();
-    }
 }
 
 #if 0
@@ -341,8 +292,9 @@ ssl_thread(struct thread_params *conndata)
 }
 #endif
 
+#if 0
 static void
-stream_thread(struct  thread_params *params)
+stream_thread(struct thread_params *params)
 {
     GNASH_REPORT_FUNCTION;
     
@@ -352,11 +304,11 @@ stream_thread(struct  thread_params *params)
     log_debug ("%s: %s", __PRETTY_FUNCTION__, params->filespec);
     
     Stream str;
-    str.open(params->filespec, params->netfd, params->statistics);
+    str.open(params->filespec, params->netfd);
     str.play();
 //    ::close(params->netfd);
 }
-
+#endif
 
 // Trap Control-C so we can cleanly exit
 static void

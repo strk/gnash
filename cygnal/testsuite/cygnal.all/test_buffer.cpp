@@ -36,6 +36,7 @@
 #endif
 
 #include "log.h"
+#include "network.h"
 #include "gmemory.h"
 #include "buffer.h"
 
@@ -46,9 +47,6 @@ using namespace boost;
 
 TestState runtest;
 LogFile& dbglogfile = LogFile::getDefaultInstance();
-
-// This must match the value in buffer.h
-const size_t BUFFERSIZE = 128;
 
 int
 main (int /*argc*/, char** /*argv*/) {
@@ -63,7 +61,7 @@ main (int /*argc*/, char** /*argv*/) {
     Buffer buf;
     mem.addStats(__LINE__);             // take a sample
     
-    if (buf.size() == BUFFERSIZE) {
+    if (buf.size() == gnash::NETBUFSIZE) {
          runtest.pass ("Buffer::size()");
      } else {
          runtest.fail ("Buffer::size()");

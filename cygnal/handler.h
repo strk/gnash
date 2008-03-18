@@ -28,6 +28,7 @@
 #include "network.h"
 #include "buffer.h"
 #include "cque.h"
+#include "network.h"
 
 // _definst_ is the default instance name
 namespace cygnal
@@ -55,16 +56,16 @@ public:
     bool push(Buffer *data)
 	{ return _incoming.push(data); };
     bool push(Buffer *data, fifo_e direction);
-    bool push(uint8_t *data, int nbytes, fifo_e direction);
-    bool push(boost::uint8_t *data, int nbytes)
+    bool push(gnash::Network::byte_t *data, int nbytes, fifo_e direction);
+    bool push(gnash::Network::byte_t *data, int nbytes)
 	{ return _incoming.push(data, nbytes); };
-    bool pushin(boost::uint8_t *data, int nbytes)
+    bool pushin(gnash::Network::byte_t *data, int nbytes)
 	{ return _incoming.push(data, nbytes); };
     bool pushin(Buffer *data)
 	{ return _incoming.push(data); };
     
     // Push bytes on the incoming FIFO, which must be specified
-    bool pushout(boost::uint8_t *data, int nbytes)
+    bool pushout(gnash::Network::byte_t *data, int nbytes)
 	{ return _outgoing.push(data, nbytes); };
     bool pushout(Buffer *data)
 	{ return _outgoing.push(data); };
@@ -76,7 +77,7 @@ public:
     	{ return _incoming.pop(); };
     // Pop the first date element off the outgoing FIFO
     Buffer *popout()
-    	{ return _incoming.pop(); };
+    	{ return _outgoing.pop(); };
     
     // Peek at the first data element without removing it
     Buffer *peek() { return _incoming.peek(); };
@@ -100,8 +101,25 @@ public:
     size_t insize() { return _incoming.size(); };
     size_t outsize() { return _outgoing.size(); };
 
+    // Notify the other thread a message is in the que
+    void notify() { _incoming.notify(); };
+    void notifyin() { _incoming.notify(); };
+    void notifyout() { _outgoing.notify(); };
+
+    // Wait for a message from the other thread
+    void wait() { _incoming.wait(); };
+    void waitin() { _incoming.wait(); };
+    void waitout() { _outgoing.wait(); };
+
     // start the two thread handlers for the queues
     bool start(thread_params_t *args);
+
+    // Take a buffer and write it to the network
+    int writeNet(int fd, Buffer *buf)
+    	{ Network::writeNet(fd, buf->reference(), buf->size()); };
+    
+    int writeNet(Buffer *buf)
+    	{ Network::writeNet(buf->reference(), buf->size()); };
     
     // Dump internal data.
     void dump();

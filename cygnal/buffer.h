@@ -20,6 +20,8 @@
 #define __BUFFER_H__ 1
 
 #include <boost/cstdint.hpp>
+#include <string>
+#include "network.h"
 
 // _definst_ is the default instance name
 namespace cygnal
@@ -40,10 +42,10 @@ public:
     void *resize(size_t nbytes);
 
     // Put data into the buffer
-    void copy(boost::uint8_t *data, int nbytes);
+    void copy(gnash::Network::byte_t *data, int nbytes);
     
     // Accessors
-    boost::uint8_t *reference() { return _ptr; }
+    gnash::Network::byte_t *reference() { return _ptr; }
     size_t size() { return _nbytes; }
     void setSize(size_t nbytes) { _nbytes = nbytes; };
     
@@ -55,13 +57,13 @@ public:
     bool operator==(Buffer *buf);
     bool operator==(Buffer &buf);
 
-    boost::uint8_t operator[](int x) { return _ptr[x]; };
+    gnash::Network::byte_t operator[](int x) { return _ptr[x]; };
     
     // debug stuff, not need for running Cygnal
     void dump();
 private:
     void *init(size_t nbytes);
-    boost::uint8_t *_ptr;
+    gnash::Network::byte_t *_ptr;
     int         _nbytes;
 };
 
