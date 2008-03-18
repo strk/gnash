@@ -64,6 +64,8 @@ noinst_HEADERS = plugin.h \
          mozilla-sdk/include/jritypes.h \
          mozilla-sdk/include/nptypes.h \
          mozilla-sdk/include/prcpucfg.h \
+         mozilla-sdk/include/prcpucfg-glibc.h \
+         mozilla-sdk/include/prcpucfg-win32.h \
          mozilla-sdk/include/prlock.h \
          mozilla-sdk/include/prcvar.h \
          mozilla-sdk/include/prthread.h \

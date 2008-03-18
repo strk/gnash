@@ -43,6 +43,8 @@ noinst_HEADERS = npplat.h \
          include/jritypes.h \
          include/nptypes.h \
          include/prcpucfg.h \
+         prcpucfg-glibc.h \
+         prcpucfg-win32.h \
          include/prlock.h \
          include/prcvar.h \
          include/prthread.h \
