@@ -19,7 +19,7 @@
 // Initial test written by Mike Carlson
 
 
-rcsid="$Id: array.as,v 1.46 2008/03/17 21:41:29 strk Exp $";
+rcsid="$Id: array.as,v 1.47 2008/03/18 08:11:33 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Array), 'function');
@@ -195,6 +195,80 @@ trysortarray.sort( Array.CASEINSENSITIVE );
 check_equals ( trysortarray.toString() , "alphabet,But,capitalization,Different");
 trysortarray.sort();
 check_equals ( trysortarray.toString() , "But,Different,alphabet,capitalization" );
+
+gaparray = [];
+gaparray[4] = '4';
+gaparray[16] = '16';
+check_equals(gaparray.length, 17);
+check_equals(gaparray[4], '4');
+check_equals(gaparray[16], '16');
+#if OUTPUT_VERSION > 5
+xcheck(gaparray.hasOwnProperty('4'));
+xcheck(gaparray.hasOwnProperty('16'));
+check(!gaparray.hasOwnProperty('0'));
+check(!gaparray.hasOwnProperty('1'));
+#endif
+gaparray.sort();
+check_equals(gaparray.length, 17);
+#if OUTPUT_VERSION < 7
+ check_equals(gaparray[0], undefined);
+ check_equals(gaparray[1], undefined);
+#else
+ check_equals(gaparray[0], '16');
+ check_equals(gaparray[1], '4');
+#endif
+check_equals(gaparray[2], undefined);
+check_equals(gaparray[3], undefined);
+check_equals(gaparray[4], undefined);
+check_equals(gaparray[5], undefined);
+check_equals(gaparray[6], undefined);
+check_equals(gaparray[7], undefined);
+check_equals(gaparray[8], undefined);
+check_equals(gaparray[9], undefined);
+check_equals(gaparray[10], undefined);
+check_equals(gaparray[11], undefined);
+check_equals(gaparray[12], undefined);
+check_equals(gaparray[13], undefined);
+check_equals(gaparray[14], undefined);
+#if OUTPUT_VERSION < 7
+  check_equals(gaparray[15], '16');
+  check_equals(gaparray[16], '4');
+#else
+  check_equals(gaparray[15], undefined);
+  check_equals(gaparray[16], undefined);
+#endif
+
+#if OUTPUT_VERSION > 5
+#if OUTPUT_VERSION < 7
+ xcheck(gaparray.hasOwnProperty('15'));
+ xcheck(gaparray.hasOwnProperty('16'));
+ xcheck(gaparray.hasOwnProperty('4')); // a-ha!
+ check(!gaparray.hasOwnProperty('0'));
+#else
+ xcheck(gaparray.hasOwnProperty('16'));
+ xcheck(gaparray.hasOwnProperty('4')); 
+ xcheck(gaparray.hasOwnProperty('1'));
+ xcheck(gaparray.hasOwnProperty('0'));
+ xcheck(gaparray.hasOwnProperty('2'));
+#endif
+#endif
+
+tmp = []; for (v in gaparray) tmp.push(v);
+tmp.sort();
+#if OUTPUT_VERSION < 7
+ xcheck_equals(tmp.length, '3'); // 4, 15 and 16
+ xcheck_equals(tmp[0], '15');
+ xcheck_equals(tmp[1], '16');
+ xcheck_equals(tmp[2], '4');
+#else
+ xcheck_equals(tmp.length, '5'); // 0, 1, 2, 4, 16 
+ check_equals(tmp[0], '0');
+ check_equals(tmp[1], '1');
+ xcheck_equals(tmp[2], '16');
+ xcheck_equals(tmp[3], '2');
+ xcheck_equals(tmp[4], '4');
+#endif
+
 // TODO - test sort(Array.RETURNINDEXEDARRAY)
 
 //-----------------------------------------------------
@@ -1048,11 +1122,11 @@ check_equals(a["Infinite"], 'inf');
 
 
 #if OUTPUT_VERSION < 6
- check_totals(377);
+ check_totals(402);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(405);
+  check_totals(438);
 # else
-  check_totals(412);
+  check_totals(448);
 # endif
 #endif
