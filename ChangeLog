@@ -1,3 +1,7 @@
+2008-03-18 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/as_value.cpp: last commit of this file was wrong.
+
 2008-03-18  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* libbase/lirc.{h,cpp}: Use byte_t instead of uint8_t.

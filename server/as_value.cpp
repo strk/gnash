@@ -481,6 +481,7 @@ as_value::to_number() const
 // This returns an as_value as an integer. It is
 // probably used for most implicit conversions to 
 // int, for instance in the String class.
+boost::int32_t
 as_value::to_int() const
 {
 	double d = to_number();
@@ -491,11 +492,11 @@ as_value::to_int() const
 
     if (d < 0)
     {   
-	    i = - static_cast<boost::uint32_t>(-d) % (1 << 32));
+	    i = - static_cast<boost::uint32_t>(-d) % 4294967296;
     }
     else
     {
-	    i = static_cast<boost::uint32_t>(d) % (1 << 32));
+	    i = static_cast<boost::uint32_t>(d) % 4294967296;
     }
     
     return i;
