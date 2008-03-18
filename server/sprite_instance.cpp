@@ -4115,7 +4115,7 @@ sprite_instance::constructAsScriptObject()
       //
       if ( swfversion > 5 )
       {
-        log_debug(_("Calling the user-defined constructor against this sprite_instance"));
+        //log_debug(_("Calling the user-defined constructor against this sprite_instance"));
 
 	// Provide a 'super' reference..
 	as_object* super = NULL;
