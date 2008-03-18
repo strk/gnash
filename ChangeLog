@@ -1,5 +1,12 @@
 2008-03-18 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* testsuite/actionscript.all/Global.as: add more parseInt tests showing
+	  some errors with hexadecimal parsing.
+	* server/asobj/Global.cpp: rewrite parseInt to deal with most of the
+	  main cases correctly.
+
+2008-03-18 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* testsuite/swfdec/swfdec_gnash_tester: don't use fromdos. It's
 	  not always available and seems to be unnecessary.
 

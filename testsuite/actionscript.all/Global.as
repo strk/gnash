@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Global.as,v 1.46 2008/03/18 14:01:00 bwy Exp $";
+rcsid="$Id: Global.as,v 1.47 2008/03/18 22:47:38 bwy Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION > 5
@@ -63,16 +63,31 @@ check_equals(typeof(ASSetNative), 'function');
 check_equals(typeof(ASSetNativeAccessor), 'function');
 
 // Test parseInt
-check ( parseInt('45b') == 45 );
-check ( parseInt('65') == 65 );
-check ( parseInt('-1234') == -1234 );
-check ( parseInt('-1.234') == -1 );
+check_equals ( parseInt('45b'), 45 );
+check_equals ( parseInt('65'), 65 );
+check_equals ( parseInt('-1234'), -1234 );
+check_equals ( parseInt('-1.234'), -1 );
+check_equals ( parseInt('        -1234'), -1234 );
+check_equals ( parseInt('          +12.34'), 12 );
+check_equals ( parseInt("           234"), 234 );
+check ( isNaN(parseInt('++3')));
+
 // Test parseint with hex
+// No whitespace allowed. Sign must come after0x
 check ( parseInt('0x111') == 273 );
 check ( isNaN(parseInt('0xw')));
+check ( isNaN(parseInt('-0x111')));
+check ( isNaN(parseInt('+0x111')));
+check ( parseInt(' 0x111') == 0 );
+check ( parseInt('0x-111') == -273 );
+check ( parseInt('0x+111') == 273 );
+check ( parseInt('0X-111') == -273 );
+check ( parseInt('0X+111') == 273 );
+
 // Test parseint with octal
 check_equals (parseInt('0352'), 234 );
 check_equals (parseInt('-0352'), -234);
+check_equals (parseInt('+0352'), 234);
 // Evidently only numbers with no whitespace in front and
 // no digits higher than 7 are octal. These all decimal:
 check_equals (parseInt('07658'), 7658);
@@ -95,6 +110,12 @@ check ( ! isNaN(1/0) );
 check_equals (parseInt(new String("10")), 10);
 o = {}; o.toString = function() { return "12"; };
 check_equals (parseInt(o), 12);
+
+check(isNaN(parseInt("8589934592", 5)));
+
+// Er...
+xcheck_equals(parseInt("8589934592", 16), 573538780562);
+xcheck_equals(parseInt("800000000", 36), 22568879259648);
 
 // It's not reliable to compare a double type with ==, so we'll give it a
 // small range using >= and <=
@@ -385,15 +406,15 @@ check_equals (int(infinity), 0);
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 5
-	check_totals(98); // SWF5
+	check_totals(113); // SWF5
 #else
 # if OUTPUT_VERSION == 6
-	check_totals(132); // SWF6
+	check_totals(147); // SWF6
 # else
 #  if OUTPUT_VERSION == 7
-	check_totals(114); // SWF7
+	check_totals(129); // SWF7
 #  else
-	check_totals(101); // SWF8+
+	check_totals(116); // SWF8+
 #  endif
 # endif
 #endif

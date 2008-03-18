@@ -187,6 +187,17 @@ as_global_parsefloat(const fn_call& fn)
     return rv;
 }
 
+// The second argument, if supplied, is the base.
+// If none is supplied, we have to work out the 
+// base from the string. Decimal, octal and hexadecimal are
+// possible, according to the following rules:
+// 1. If the string starts with 0x or 0X, the number is hex.
+// 2. The 0x or 0X may be *followed* by '-' or '+' to indicate sign. A number
+//    with no sign is positive.
+// 3. If the string starts with 0, -0 or +0 and contains only the characters
+//    0-7.
+// 4. If the string starts with *any* other sequence of characters, including
+//    whitespace, it is decimal.
 static as_value
 as_global_parseint(const fn_call& fn)
 {
@@ -202,82 +213,107 @@ as_global_parseint(const fn_call& fn)
             log_aserror(_("%s has more than two arguments"), __FUNCTION__);
     )
 
-    const std::string& expr = fn.arg(0).to_string();
-    
-    int base = 10;
     const std::string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    bool bNegative = false;
-  
+
+    const std::string& expr = fn.arg(0).to_string();
+
+    bool negative = false;
+    int base = 0;
+
     std::string::const_iterator it = expr.begin();
 
-    // Skip leading whitespace
-    while(*it == ' ' || *it == '\n' || *it == '\t' || *it == '\r')
-    {
-        ++it;
-    }
 
-    // Is the first non-whitespace character a minus?
-    if (*it == '-')
-    {
-        bNegative = true;
-	++it;
-    }
-
-    // if we were sent a second argument, that's our base
+	// if we were sent a second argument, that's our base
     if (fn.nargs > 1)
     {
-	// to_number returns a double. atoi() would be better
-	base = (int)(fn.arg(1).to_number());
+	    base = (fn.arg(1).to_int());
 	
-	// Bases from 2 to 36 are valid, otherwise return NaN
-        if (base < 2 || base > 36)
-        {
-	    as_value rv;
-	    rv.set_nan();
-	    return rv;
-        }	
-
+	    // Bases from 2 to 36 are valid, otherwise return NaN
+            if (base < 2 || base > 36)
+            {
+	            as_value rv;
+	            rv.set_nan();
+	            return rv;
+            }	
     }
-
-    // If the string starts with '0x':
-    else if (expr.end() - it >= 2 &&
-    		(*it == '0' && toupper(*(it + 1)) == 'X' ))
+    else
     {
-        // the base is 16
-	base = 16;
-        // Move to the digit after the 'x'
-	it += 2; 
-    }
-
-    // Octal if the string starts with "0" then an octal digit, but
-    // *only* if there is no whitespace before it; in that case decimal.
-    else if (it - expr.begin() == (bNegative ? 1 : 0))
-    {
-        if (expr.end() - it >= 2 && 
-    		*it == '0' && isdigit(*(it + 1)))
+        // Try hexadecimal first
+        if (expr.substr(0, 2) == "0x" || expr.substr(0, 2) == "0X")
         {
-            // And if there are any chars other than 0-7, it's *still* a
-            // base 10 number...
-            // At least we know where we are in the string, so can use
-            // string methods.
-	    if (expr.find_first_not_of("01234567", (bNegative ? 1 : 0)) !=
-	    	std::string::npos)
-	    {
-	        base = 10;
-	    }
-	    else base = 8;
-
-	    // Point the iterator to the first digit after the '0'.
-	    ++it;
-
+            base = 16;
+            it += 2;
+            
+            if (*it == '-')
+            {
+                negative = true;
+                it++;
+            }
+            else if (*it == '+') 
+            {
+                it++;
+            }
         }
-    }
+        // Either octal or decimal.
+        else if (*it == '0' || *it == '-' || *it == '+')
+        {
 
+            base = 8;
+
+            // Check for negative and move to the next digit
+            if (*it == '-')
+            {
+                negative = true;
+                it++;
+            }
+            else if (*it == '+') it++;
+            
+            if (*it != '0') base = 10;
+            
+            // Check for expectional case "-0x" or "+0x", which
+            // return NaN
+            else if (std::toupper(*(it + 1)) == 'X')
+            {
+	            as_value rv;
+	            rv.set_nan();
+	            return rv;
+            }
+            
+            // Check from the current position for non-octal characters;
+            // it's decimal in that case.
+            else if (expr.find_first_not_of("01234567", it - expr.begin()) !=
+            	std::string::npos)
+            {
+                base = 10;
+            }
+        }
+        // Everything else is decimal.
+        else
+        {
+            base = 10;
+            
+            // Skip leading whitespace
+            while(*it == ' ' || *it == '\n' || *it == '\t' || *it == '\r')
+            {
+                ++it;
+            }
+            if (*it == '-')
+            {
+                negative = true;
+                it++;
+            }
+            else if (*it == '+') it++;
+        }    
+    }
+    
+    // Now we have the base, parse the digits. The iterator should
+    // be pointing at the first digit.
+    
     // Check to see if the first digit is valid, otherwise 
     // return NaN.
     int digit = digits.find(toupper(*it));
 
-    if (digit >= base)
+    if (digit >= base || digit < 0)
     {
 	    as_value rv;
 	    rv.set_nan();
@@ -298,7 +334,7 @@ as_global_parseint(const fn_call& fn)
 	    ++it;
     }
 
-    if (bNegative)
+    if (negative)
 	result = -result;
     
     // Now return the parsed string as an integer.
