@@ -151,7 +151,7 @@ Buffer::empty()
 void *
 Buffer::resize(size_t nbytes)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     // Allocate a new memory block
     Network::byte_t *tmp = new Network::byte_t[nbytes];
     // And copy ourselves into it

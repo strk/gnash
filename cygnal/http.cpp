@@ -26,6 +26,9 @@
 //#include <boost/date_time/local_time/local_time.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 //#include <boost/date_time/time_zone_base.hpp>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <string>
 #include <iostream>
 #include <cstring>
@@ -146,7 +149,7 @@ HTTP::waitForGetRequest()
 bool
 HTTP::formatHeader(const short type)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     formatHeader(_filesize, type);
     return true;
@@ -156,7 +159,7 @@ HTTP::formatHeader(const short type)
 bool
 HTTP::formatHeader(int filesize, const short type)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     _header << "HTTP/1.1 200 OK" << endl;
     this->formatServer();
@@ -173,7 +176,7 @@ HTTP::formatHeader(int filesize, const short type)
 bool
 HTTP::formatErrorResponse(http_status_e code)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     // First build the message body, so we know how to set Content-Length
     _body << "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">" << endl;
@@ -201,7 +204,7 @@ HTTP::formatErrorResponse(http_status_e code)
 bool
 HTTP::formatDate()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
     
 //    cout <<  now.time_of_day() << endl;
@@ -230,7 +233,7 @@ HTTP::formatDate()
 bool
 HTTP::formatServer()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     _header << "Server: Cygnal (GNU/Linux)" << endl;
     return true;
 }
@@ -238,7 +241,7 @@ HTTP::formatServer()
 bool
 HTTP::formatServer(const string &data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     _header << "Server: " << data << endl;
     return true;
 }
@@ -246,7 +249,7 @@ HTTP::formatServer(const string &data)
 bool
 HTTP::formatMethod(const string &data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     _header << "Method: " << data << endl;
     return true;
 }
@@ -254,7 +257,7 @@ HTTP::formatMethod(const string &data)
 bool
 HTTP::formatReferer(const string &refer)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     _header << "Referer: " << refer << endl;
     return true;
 }
@@ -262,7 +265,7 @@ HTTP::formatReferer(const string &refer)
 bool
 HTTP::formatConnection(const string &options)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     _header << "Connection: " << options << endl;
     return true;
 }
@@ -343,7 +346,7 @@ HTTP::formatLanguage(const string &lang)
 bool
 HTTP::formatCharset(const string &set)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     // For some browsers this appears to also be Content-Charset
     _header << "Accept-Charset: " << set << endl;
     return true;
@@ -352,7 +355,7 @@ HTTP::formatCharset(const string &set)
 bool
 HTTP::formatEncoding(const string &code)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     _header << "Accept-Encoding: " << code << endl;
     return true;
 }
@@ -360,7 +363,7 @@ HTTP::formatEncoding(const string &code)
 bool
 HTTP::formatTE(const string &te)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     _header << "TE: " << te << endl;
     return true;
 }
@@ -375,7 +378,7 @@ HTTP::sendGetReply(http_status_e code)
     Buffer *buf = new Buffer;
 //    Network::byte_t *ptr = (Network::byte_t *)_body.str().c_str();
 //     buf->copy(ptr, _body.str().size());
-    _handler->dump();
+//    _handler->dump();
     if (_header.str().size()) {
 	buf->resize(_header.str().size());
 	string str = _header.str();
@@ -395,7 +398,7 @@ HTTP::sendGetReply(http_status_e code)
 bool
 HTTP::formatRequest(const string &url, http_method_e req)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     _header.str("");
 
@@ -895,10 +898,7 @@ httphandler(Handler::thread_params_t *args)
 
 //     www.toggleDebug(true);
     
-//     www.createServer(args->port);
-//     while (retries-- > 0) {
 // 	log_debug(_("%s: Thread for port %d looping..."), __PRETTY_FUNCTION__, args->port);
-// 	www.newConnection(true);
 
 	string docroot = args->filespec;
 	
@@ -927,8 +927,26 @@ httphandler(Handler::thread_params_t *args)
 //	conndata->statistics->addStats();
 	
 	if (url != docroot) {
-//	    log_debug (_("File to load is: %s"), filespec.c_str());
-//	    log_debug (_("Parameters are: %s"), parameters.c_str());
+	    log_debug (_("File to load is: %s"), filespec.c_str());
+	    log_debug (_("Parameters are: %s"), parameters.c_str());
+	    struct stat st;
+	    int filefd, ret;
+	    if (stat(filespec.c_str(), &st) == 0) {
+		filefd = ::open(filespec.c_str(), O_RDONLY);
+		log_debug (_("File \"%s\" is %lld bytes in size."), filespec,
+			   (long long int) st.st_size);
+		do {
+		    Buffer *buf = new Buffer;
+		    ret = read(filefd, buf->reference(), buf->size());
+		    if (ret == 0) { // the file is done
+			delete buf;
+			break;
+		    }
+//		    log_debug("Read %d bytes from %s.", ret, filespec);
+		    hand->pushout(buf);
+		    hand->notifyout();
+		} while(ret > 0);
+	    }
 // 	    memset(args->filespec, 0, 256);
 // 	    memcpy(->filespec, filespec.c_str(), filespec.size());
 // 	    boost::thread sendthr(boost::bind(&stream_thread, args));

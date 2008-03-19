@@ -194,18 +194,22 @@ main(int argc, char *argv[])
     act.sa_handler = cntrlc_handler;
     sigaction (SIGINT, &act, NULL);
 
-    Handler::thread_params_t http_data;
 //     struct thread_params rtmp_data;
 //     struct thread_params ssl_data;
 //     rtmp_data.port = port_offset + 1935;
 //     boost::thread rtmp_port(boost::bind(&rtmp_thread, &rtmp_data));
 
-    Handler hand;
-    http_data.netfd = 0;
-    http_data.port = port_offset + 80;
-    http_data.handle = &hand;
-    http_data.filespec = docroot;
-    hand.start(&http_data);
+    int retries = 10;
+    while (retries-- > 0) {
+	Handler::thread_params_t http_data;
+	http_data.netfd = 0;
+	http_data.port = port_offset + 80;
+	http_data.filespec = docroot;
+	Handler *hand = new Handler;
+	http_data.handle = &hand;
+	hand->start(&http_data);
+	delete hand;
+    }
     
 //    boost::thread http_port(boost::bind(&nethandler, &http_data));
 #if 0

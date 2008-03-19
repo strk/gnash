@@ -59,25 +59,25 @@ CQue::~CQue()
 void
 CQue::wait()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lk(_cond_mutex);
     _cond.wait(lk);
-    log_debug("wait mutex released for \"%s\"", _name);
+//    log_debug("wait mutex released for \"%s\"", _name);
 }
 
 // Notify a condition variable to trigger
 void
 CQue::notify()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     _cond.notify_one();
-    log_debug("wait mutex triggered for \"%s\"", _name);
+//    log_debug("wait mutex triggered for \"%s\"", _name);
 }
 
 size_t
 CQue::size()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_mutex);
     return _que.size();
 }
@@ -85,7 +85,7 @@ CQue::size()
 bool
 CQue::push(Buffer *data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_mutex);
     _que.push_back(data);
     return true;
@@ -95,7 +95,7 @@ CQue::push(Buffer *data)
 bool
 CQue::push(gnash::Network::byte_t *data, int nbytes)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     Buffer *buf = new Buffer;
     std::copy(data, data + nbytes, buf->reference());
 }
@@ -105,7 +105,7 @@ CQue::push(gnash::Network::byte_t *data, int nbytes)
 Buffer *
 CQue::pop()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     Buffer *buf;
     boost::mutex::scoped_lock lock(_mutex);
     if (_que.size()) {
@@ -119,7 +119,7 @@ CQue::pop()
 Buffer *
 CQue::peek()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_mutex);
     if (_que.size()) {
         return _que.front();

@@ -1,3 +1,16 @@
+2008-03-19  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* buffer.cpp, cque.cpp: Turn off overly verbose debug now that
+	cygnal works again.
+	* handler.cpp: Rearrange when the Handler gets created. Start the
+	process thread before the I/O threads to avoid timing problems if
+	there is data in the network buffer when starting.
+	* handler.h: Add a die method for threads so we know when we're
+	done.
+	* http.cpp: Turn off overly verbose debug now that cygnal works
+	again. Read the file specified in the GET request and stick it in
+	the output que.
+	
 2008-03-18  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* buffer.{h,cpp}: Add a few ::copy methods to put data into a

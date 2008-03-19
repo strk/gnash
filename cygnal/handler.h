@@ -123,7 +123,12 @@ public:
     
     // Dump internal data.
     void dump();
+
+    void die() { _die = true; _outgoing.notify(); };
+    bool timetodie() { return _die; };
+    
 private:
+    bool _die;
     int _netfd;
     CQue _incoming;
     CQue _outgoing;

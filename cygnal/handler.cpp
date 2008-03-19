@@ -41,13 +41,18 @@ namespace cygnal
 {
 
 Handler::Handler()
+    : _die(false), _netfd(0)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 }
 
 Handler::~Handler()
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
+    closeNet();
+    _die = true;
+    notifyout();
+    notifyin();
 }
 
 bool
@@ -153,7 +158,7 @@ Handler::start(thread_params_t *args)
 
     _incoming.setName("Incoming");
     _outgoing.setName("Outgoing");
-    toggleDebug(true);		// FIXME:
+//    toggleDebug(true);		// FIXME:
     createServer(args->port);
     while (retries-- > 0) {
 	log_debug(_("%s: Starting Handlers for port %d"), __PRETTY_FUNCTION__, args->port);
@@ -162,7 +167,7 @@ Handler::start(thread_params_t *args)
 	args->handle = this;
 
 	log_debug("Starting thread 1");
-	boost::thread inport(boost::bind(&netin_handler, args));
+	boost::thread handler(boost::bind(&httphandler, args));
 
 #if 1
 	log_debug("Starting thread 2");
@@ -170,11 +175,13 @@ Handler::start(thread_params_t *args)
 #endif
 	
 	log_debug("Starting thread 3");
-	boost::thread handler(boost::bind(&httphandler, args));
-
+	boost::thread inport(boost::bind(&netin_handler, args));
 	inport.join();    
 //	outport.join();
 	handler.join();
+	if (_die) {
+	    break;
+	}
     }
 }
     
@@ -199,7 +206,7 @@ netin_handler(Handler::thread_params_t *args)
     while (retries-- >  0) {
 	Buffer *buf = new Buffer;
 	int ret = hand->readNet(buf->reference(), buf->size());
-	if (ret > 0) {
+	if (ret >= 0) {
 	    if (ret != buf->size()) {
 		buf->resize(ret);
 	    }
@@ -208,11 +215,13 @@ netin_handler(Handler::thread_params_t *args)
 //  	    cerr << str << endl;
 	    hand->notify();
 	} else {
-	    cerr << __PRETTY_FUNCTION__ << "exiting, no data" << endl;
+	    log_debug("exiting, no data");
+	    hand->die();
 	    break;
 	}
     }
     hand->notify();
+    hand->clearall();
 //    hand->dump();
 }
 void
@@ -221,15 +230,20 @@ netout_handler(Handler::thread_params_t *args)
     GNASH_REPORT_FUNCTION;
     int retries = 10;
     int ret;
-    
+    Handler *hand = reinterpret_cast<Handler *>(args->handle);
     do {
-	Handler *hand = reinterpret_cast<Handler *>(args->handle);
 	hand->waitout();
-	Buffer *buf = hand->popout();
-	buf->dump();
-	ret = hand->writeNet(buf);
-    } while (ret > 0);
-    
+	while (hand->outsize()) {
+	    Buffer *buf = hand->popout();
+//	    log_debug("FIXME: got data in Outgoing que");
+//	    buf->dump();
+	    ret = hand->writeNet(buf);
+	    delete buf;
+	}
+	if (hand->timetodie()) {
+	    break;
+	}
+    } while (ret >= 0);    
 }
 
 } // end of extern C
