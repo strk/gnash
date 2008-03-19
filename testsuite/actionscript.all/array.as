@@ -19,7 +19,7 @@
 // Initial test written by Mike Carlson
 
 
-rcsid="$Id: array.as,v 1.53 2008/03/19 09:01:28 strk Exp $";
+rcsid="$Id: array.as,v 1.54 2008/03/19 09:04:36 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Array), 'function');
@@ -544,6 +544,10 @@ check_equals(count, 1);
 
 count=0; for (var i in csp) count++;
 xcheck_equals(count, 7); // concat filled any holes
+
+csp = sparse1.concat('onemore');
+count=0; for (var i in csp) count++;
+xcheck_equals(count, 5); // concat filled any holes
 
 //-------------------------------
 // Test Array.splice
@@ -1278,11 +1282,11 @@ check_equals(a["Infinite"], 'inf');
 
 
 #if OUTPUT_VERSION < 6
- check_totals(446);
+ check_totals(447);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(486);
+  check_totals(487);
 # else
-  check_totals(496);
+  check_totals(497);
 # endif
 #endif
