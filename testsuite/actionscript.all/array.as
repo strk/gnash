@@ -19,7 +19,7 @@
 // Initial test written by Mike Carlson
 
 
-rcsid="$Id: array.as,v 1.54 2008/03/19 09:04:36 strk Exp $";
+rcsid="$Id: array.as,v 1.55 2008/03/19 09:23:43 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Array), 'function');
@@ -640,11 +640,24 @@ check_equals ( ary.toString(), "1,2,3,4,5,6" );
 check_equals ( ary.length, 4 ); // don't be fooled by toString output !
 check_equals ( spliced.toString(), '2,a,b,10,11,12,8' );
 
-// Finally, ensure the simplest usage cases are correct!
+// Ensure the simplest usage cases are correct!
 spliced = ary.splice(1);
 check_equals ( spliced.toString(), "3,4,5,6");
 spliced = ary.splice(0);
 check_equals ( spliced.toString(), "1,2");
+
+// Splice a sparse array
+ary = new Array(); ary[2] = 1; ary[7] = 7;
+
+check_equals(ary.length, 8);
+count=0; for (var i in ary) count++;
+check_equals(count, 2);
+
+spliced = ary.splice(3, 0); // no op ?
+check_equals(ary.length, 8); // no change in length
+count=0; for (var i in ary) count++;
+xcheck_equals(count, 8); // but fills the gaps !
+
 
 //-------------------------------
 // Test single parameter constructor, and implicitly expanding array
@@ -1282,11 +1295,11 @@ check_equals(a["Infinite"], 'inf');
 
 
 #if OUTPUT_VERSION < 6
- check_totals(447);
+ check_totals(451);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(487);
+  check_totals(491);
 # else
-  check_totals(497);
+  check_totals(501);
 # endif
 #endif
