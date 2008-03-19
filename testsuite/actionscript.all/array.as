@@ -19,7 +19,7 @@
 // Initial test written by Mike Carlson
 
 
-rcsid="$Id: array.as,v 1.55 2008/03/19 09:23:43 strk Exp $";
+rcsid="$Id: array.as,v 1.56 2008/03/19 09:38:31 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Array), 'function');
@@ -647,7 +647,7 @@ spliced = ary.splice(0);
 check_equals ( spliced.toString(), "1,2");
 
 // Splice a sparse array
-ary = new Array(); ary[2] = 1; ary[7] = 7;
+ary = new Array(); ary[2] = 2; ary[7] = 7;
 
 check_equals(ary.length, 8);
 count=0; for (var i in ary) count++;
@@ -658,6 +658,20 @@ check_equals(ary.length, 8); // no change in length
 count=0; for (var i in ary) count++;
 xcheck_equals(count, 8); // but fills the gaps !
 
+ary = new Array(); ary[2] = 2; ary[7] = 7;
+spliced = ary.splice(3, 0, 3); // add 3 at index 3
+check_equals(ary.length, 9); 
+count=0; for (var i in ary) count++;
+xcheck_equals(count, 9); // fills the gaps !
+check_equals(ary[3], 3);
+check_equals(ary[2], 2);
+
+ary = new Array(); ary[2] = 2; ary[7] = 7;
+spliced = ary.splice(3, 1, 3); // replace index 3 (an hole) with a 3 value
+count=0; for (var i in ary) count++;
+xcheck_equals(count, 8); // fills the gaps 
+count=0; for (var i in spliced) count++;
+xcheck_equals(count, 1); // the returned array contains an actual value, not an hole
 
 //-------------------------------
 // Test single parameter constructor, and implicitly expanding array
@@ -1295,11 +1309,11 @@ check_equals(a["Infinite"], 'inf');
 
 
 #if OUTPUT_VERSION < 6
- check_totals(451);
+ check_totals(457);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(491);
+  check_totals(497);
 # else
-  check_totals(501);
+  check_totals(507);
 # endif
 #endif
