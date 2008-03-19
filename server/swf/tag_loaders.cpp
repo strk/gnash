@@ -1247,6 +1247,7 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 	if (format == media::AUDIO_CODEC_MP3) {
 		in->ensureBytes(2);
 		boost::int16_t	delay_seek = in->read_s16();	// FIXME - not implemented/used
+		//
 		// The DelaySeek field has the following meaning:
 		// * If this value is positive, the player seeks this number of
 		//   samples into the sound block before the sound is played.
@@ -1261,7 +1262,8 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 		//
 		// quoted from
 		// http://www-lehre.informatik.uni-osnabrueck.de/~fbstark/diplom/docs/swf/Sounds.htm
-		if ( delay_seek ) log_unimpl("MP3 delay seek %d", delay_seek);
+		//
+		ONCE ( if ( delay_seek ) log_unimpl("MP3 delay seek") );
 	}
 
 	IF_VERBOSE_PARSE
