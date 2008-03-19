@@ -355,7 +355,7 @@ play_movie(const char* filename)
     long clockAdvance = fpsDelay/1000;
     long localDelay = delay == -1 ? fpsDelay : delay; // microseconds
 
-    printf("Will sleep %ld microseconds between iterations - fps is %g, clockAdvance is %lu\n", localDelay, fps, clockAdvance);
+    log_debug("Will sleep %ld microseconds between iterations - fps is %g, clockAdvance is %lu\n", localDelay, fps, clockAdvance);
 
     // Use a clock advanced at every iteration to match exact FPS speed.
     ManualClock cl;
@@ -372,7 +372,7 @@ play_movie(const char* filename)
         return md;
     }
 
-    printf("iteration, timer: %lu, localDelay: %ld\n", cl.elapsed(), localDelay);
+    log_debug("iteration, timer: %lu, localDelay: %ld\n", cl.elapsed(), localDelay);
     usleep(localDelay);
     
     resetLastAdvanceTimer();
@@ -409,7 +409,7 @@ play_movie(const char* filename)
 	++nadvances;
 	if ( limit_advances && nadvances >= limit_advances)
 	{
-		printf("exiting after " SIZET_FMT " advances\n", nadvances);
+		log_debug("exiting after " SIZET_FMT " advances\n", nadvances);
 		break;
 	}
 
@@ -420,7 +420,7 @@ play_movie(const char* filename)
 	{
 		if ( allowed_end_hits && ++end_hitcount >= allowed_end_hits )
 		{
-			printf("exiting after " SIZET_FMT 
+			log_debug("exiting after " SIZET_FMT 
 			       " times last frame was reached\n", end_hitcount);
 	    		break;
 		}
@@ -461,7 +461,7 @@ play_movie(const char* filename)
 	    if ( last_frame > latest_frame ) latest_frame = last_frame;
 	    if ( ++loop_back_count > allowloopbacks )
 	    {
-		    printf(SIZET_FMT " loop backs; jumping one-after "
+		    log_debug(SIZET_FMT " loop backs; jumping one-after "
 				    "latest frame (" SIZET_FMT ")\n",
 				    loop_back_count, latest_frame+1);
 		    m.goto_frame(latest_frame + 1);
@@ -475,7 +475,7 @@ play_movie(const char* filename)
 	    resetLastAdvanceTimer();
 	}
 
-	printf("iteration, timer: %lu, localDelay: %ld\n", cl.elapsed(), localDelay);
+	log_debug("iteration, timer: %lu, localDelay: %ld\n", cl.elapsed(), localDelay);
 	usleep(localDelay);
     }
     

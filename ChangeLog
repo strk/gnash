@@ -1,3 +1,11 @@
+2008-03-19 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* testsuite/swfdec/swfdec_gnash_tester: use more complicated 
+	  sed matching to handle newlines in trace output (one, anyway).
+	* utilities/gprocessor: put all debugging output in log_debug
+	  calls (or it gets caught in the sed rules).
+	* testsuite/swfdec/PASSING: eight passing tests with newlines.
+
 2008-03-19  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* libbase/network.cpp: Actually use the timeout parameter to set

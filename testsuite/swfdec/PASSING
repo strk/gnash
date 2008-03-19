@@ -72,6 +72,9 @@ cast-6.swf:1777b4314b023cf1b3aed8133f932e6f
 cast-7.swf:7b72a050371d1f0c3b24ed830010ae9d
 cast-8.swf:6c6d1176b69bec237b3317c9e27f99ff
 chartoascii-4.swf:7d56a585cdf7e057833a90459b812101
+chartoascii-6.swf:1af28859b638ef462c5bfd5d3214bcd2
+chartoascii-7.swf:626ae0a893f665b77c5bbecbeac0ce01
+chartoascii-8.swf:0783b89bc1bc1d232f5e7434f0c60770
 children.swf:8e9201cc8fbe255759a0d3603e61252e
 chr-6.swf:aa734103dd25b369b4b93871f4b48b2b
 chr-7.swf:e35ddcedc8634f97e785d2dbb672fad8
@@ -208,6 +211,8 @@ extends-super.swf:d6aa7d61f452c5ee3ff64876ad70263a
 external-interface-properties-5.swf:6c1da3512318203a18e0d5c3454f4a7e
 external-interface-properties-6.swf:1042fe711f2229195781f9ea1405fe66
 external-interface-properties-7.swf:1209e63fc5cadd41f854b3686ec9984f
+externalinterface-escape-6.swf:a1e0bb4872f756050aa52aada9837599
+externalinterface-escape-7.swf:b46b59523afba95c3bf6ea03ba8052ce
 file-reference-list-properties-5.swf:47e812391ae3b295a7f85dc5ab988179
 file-reference-list-properties-5.swf:4d13076bcc6ab1cd02fea9f62d4013cf
 file-reference-properties-5.swf:238ae6d8bf7d0ee8a241f20cf1247e6e
@@ -226,6 +231,9 @@ foreach-proto-simple-8.swf:8c7522e33372029664d860e18f00bc9e
 forin-delete-5.swf:442b0518cc3500c5229a0ea3c7a4104f
 forin-delete-6.swf:56d2600ae3233cac45d2e8cd7faa5c1c
 forin-delete-7.swf:a6be6ea6d148797344b1ac186f19848b
+fromcharcode-6.swf:9bd20151628f0d0eddbe0a7211f05369
+fromcharcode-7.swf:1f617f2fa5ac68b77f9e8d751595ae17
+fromcharcode-8.swf:a31e270bb840587cc16b813d87643252
 fscommand-5.swf:3d38300eadeb192bde7b5b5afb564784
 fscommand-6.swf:7d4a7c089a9a2906f276ddee6ea5975f
 fscommand-7.swf:babef72feffd215a06cf0f233a9d9e4c
