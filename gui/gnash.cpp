@@ -84,10 +84,11 @@ cout << _("Usage: gnash [options] movie_file.swf") << endl
     << _("Options:") << endl
     << endl
     << _("  -h,  --help              Print this help and exit") << endl
+    << _("  -V,  --version           Print version information and exit") << endl
     << _("  -s,  --scale <factor>    Scale the movie by the specified factor") << endl
     << _("  -c                       Produce a core file instead of letting SDL trap it") << endl
     << _("  -d,  --delay num         Number of milliseconds to delay in main loop") << endl
-    << _("  -v,  --verbose           Be verbose") << endl
+    << _("  -v,  --verbose           Produce verbose output") << endl
 #if VERBOSE_ACTION
     << _("  -va                      Be (very) verbose about action execution") << endl
 #endif
@@ -95,7 +96,6 @@ cout << _("Usage: gnash [options] movie_file.swf") << endl
     << _("  -vp                      Be (very) verbose about parsing") << endl
 #endif
     << _("  -x,  --xid <ID>          X11 Window ID for display") << endl
-    << _("  -v,  --verbose           Produce verbose output") << endl
     << _("  -w,  --writelog          Produce the disk based debug log") << endl
     << _("  -j,  --width <width>     Set window width") << endl
     << _("  -k,  --height <height>   Set window height") << endl
@@ -110,7 +110,6 @@ cout << _("Usage: gnash [options] movie_file.swf") << endl
     << _("  -u,  --real-url <url>    Set \"real\" URL of the movie") << endl
     << _("  -U,  --base-url <url>    Set \"base\" URL for resolving relative URLs") << endl
     << _("  -P,  --param <param>     Set parameter (e.g. \"FlashVars=A=1&b=2\")") << endl
-    << _("  -V,  --version           Print gnash's version number and exit") << endl
     << _("  -F,  --fd <fd>           Filedescriptor to use for external communications") << endl
 #ifdef GNASH_FPS_DEBUG
     << _("  -f,  --debug-fps num     Print FPS every num seconds (float).") << endl
@@ -431,7 +430,7 @@ gnash_main(int argc, char *argv[])
 
 	// No file name was supplied
 	if (infiles.empty()) {
-	    cerr << "Error: no input file was specified." << endl;
+	    cerr << _("Error: no input file was specified. Exiting.") << endl;
 	    usage();
 	    return EXIT_FAILURE;
 	}

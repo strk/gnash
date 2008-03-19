@@ -1,3 +1,10 @@
+2008-03-19 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/gnash.cpp: remove duplicated --verbose in usage, add --version.
+	* po/gnash.pot: updated after changes to gnash.cpp (shorter phrases
+	  should also make translating less annoying).
+	* po/de.po: fix messages broken by changes to gnash.cpp.
+
 2008-03-18 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/array.as:
