@@ -19,7 +19,7 @@
 // Initial test written by Mike Carlson
 
 
-rcsid="$Id: array.as,v 1.51 2008/03/19 08:39:30 strk Exp $";
+rcsid="$Id: array.as,v 1.52 2008/03/19 08:53:52 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Array), 'function');
@@ -464,6 +464,21 @@ xcheck_equals(count, 6); // no more holes
  check_equals(sparse.toString(), "5,,,,,");
 #else
  check_equals(sparse.toString(), "5,undefined,undefined,undefined,undefined,undefined");
+#endif
+
+//------------------------------------------------------
+// Test Array.join
+//------------------------------------------------------
+
+// join a sparse array
+j = new Array();
+j[1] = 1;
+j[3] = 3;
+s = j.join("^");
+#if OUTPUT_VERSION < 7
+ check_equals(s, "^1^^3");
+#else
+ check_equals(s, "undefined^1^undefined^3");
 #endif
 
 //------------------------------------------------------
@@ -1242,11 +1257,11 @@ check_equals(a["Infinite"], 'inf');
 
 
 #if OUTPUT_VERSION < 6
- check_totals(442);
+ check_totals(443);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(482);
+  check_totals(483);
 # else
-  check_totals(492);
+  check_totals(493);
 # endif
 #endif

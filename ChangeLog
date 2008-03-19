@@ -1,6 +1,7 @@
 2008-03-18 Sandro Santilli <strk@keybit.net>
 
-	* testsuite/actionscript.all/array.as: test reverse() on a sparse array.
+	* testsuite/actionscript.all/array.as:
+	  test reverse() and join() on a sparse array.
 
 2008-03-18 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
