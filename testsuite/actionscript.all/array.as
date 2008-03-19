@@ -19,7 +19,7 @@
 // Initial test written by Mike Carlson
 
 
-rcsid="$Id: array.as,v 1.60 2008/03/19 14:47:18 strk Exp $";
+rcsid="$Id: array.as,v 1.61 2008/03/19 15:51:22 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Array), 'function');
@@ -1331,6 +1331,16 @@ a[2] = 2;
 check_equals(getCalls, 0);
 xcheck_equals(setCalls, 1);
 
+check_equals(a.length, 3);
+ret = a.addProperty('3', get, set);
+check_equals(a.length, 4);
+
+a.length = 3;
+getCalls=0; setCalls=0;
+a.push(2);
+check_equals(getCalls, 0);
+check_equals(setCalls, 0);
+
 #endif // OUTPUT_VERSION > 5
 
 
@@ -1355,8 +1365,8 @@ xcheck_equals(setCalls, 1);
  check_totals(459);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(509);
+  check_totals(513);
 # else
-  check_totals(519);
+  check_totals(523);
 # endif
 #endif
