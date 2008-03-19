@@ -1,5 +1,10 @@
 2008-03-19 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (restart): only stop streaming
+	  sound associated with the sprite, not *all* sounds !
+
+2008-03-19 Sandro Santilli <strk@keybit.net>
+
 	* server/swf/tag_loaders.cpp: log malformed swf if SOUNDSTREAMBLOCK
 	  is found w/out preceeding SOUNDSTREAMHEAD.
 	* testsuite/misc-ming.all/: Makefile.am,

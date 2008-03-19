@@ -3796,9 +3796,8 @@ void sprite_instance::restart()
 // It shouldn't happen anyway.
 // TODO: drop this function.
 
-  // Stop all sounds
-  media::sound_handler* sh = get_sound_handler();
-  if (sh != NULL) sh->stop_all_sounds();
+  // Stop any streaming sound associated with us
+  stopStreamSound();
 
   if( ! isUnloaded() )
   {
