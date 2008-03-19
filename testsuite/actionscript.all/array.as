@@ -19,7 +19,7 @@
 // Initial test written by Mike Carlson
 
 
-rcsid="$Id: array.as,v 1.56 2008/03/19 09:38:31 strk Exp $";
+rcsid="$Id: array.as,v 1.57 2008/03/19 10:13:38 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Array), 'function');
@@ -406,6 +406,15 @@ for (i in c)
 }
 
 xcheck_equals(str, "-2147483650: still lower; 2.95147905179353e+20: much too high; 4294967296: too high; -3: minus three; 1.1: one point one; 3: three; 2: two; 1: one; 0: zero; ");
+
+// Getting 'holes' crawls the inheritance chain !
+Array.prototype[3] = 3;
+sparse = new Array();
+sparse[2] = 2;
+check_equals(sparse[3], 3); // crawl inheritance chain !
+sparse[4] = 4;
+check_equals(sparse[3], 3); // crawl inheritance chain !
+delete Array.prototype[3];
 
 //-----------------------------------------------------
 // Test Array.pop()
@@ -1309,11 +1318,11 @@ check_equals(a["Infinite"], 'inf');
 
 
 #if OUTPUT_VERSION < 6
- check_totals(457);
+ check_totals(459);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(497);
+  check_totals(499);
 # else
-  check_totals(507);
+  check_totals(509);
 # endif
 #endif

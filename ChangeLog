@@ -1,7 +1,7 @@
 2008-03-18 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/array.as:
-	  test splice() on a sparse array.
+	  test splice() and members access on a sparse array.
 
 2008-03-19 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
