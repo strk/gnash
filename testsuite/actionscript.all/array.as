@@ -19,7 +19,7 @@
 // Initial test written by Mike Carlson
 
 
-rcsid="$Id: array.as,v 1.50 2008/03/18 15:11:53 bwy Exp $";
+rcsid="$Id: array.as,v 1.51 2008/03/19 08:39:30 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Array), 'function');
@@ -431,9 +431,44 @@ b.shift();
 b.pop();
 check_equals ( b.toString() , "" );
 
+//------------------------------------------------------
+// Test Array.reverse
+//------------------------------------------------------
+
 // check reverse for empty case
 b.reverse();
 check_equals ( b.toString() , "" );
+
+// check reverse for sparse array
+sparse = new Array();
+sparse[5] = 5;
+count=0; for (var i in sparse) count++;
+check_equals(count, 1); // a single element exists
+#if OUTPUT_VERSION > 5
+ check(!sparse.hasOwnProperty(0));
+ xcheck(sparse.hasOwnProperty(5));
+#endif
+#if OUTPUT_VERSION < 7
+ check_equals(sparse.toString(), ",,,,,5");
+#else
+ check_equals(sparse.toString(), "undefined,undefined,undefined,undefined,undefined,5");
+#endif
+sparse.reverse();
+count=0; for (var i in sparse) count++;
+xcheck_equals(count, 6); // no more holes
+#if OUTPUT_VERSION > 5
+ xcheck(sparse.hasOwnProperty(0));
+ xcheck(sparse.hasOwnProperty(5));
+#endif
+#if OUTPUT_VERSION < 7
+ check_equals(sparse.toString(), "5,,,,,");
+#else
+ check_equals(sparse.toString(), "5,undefined,undefined,undefined,undefined,undefined");
+#endif
+
+//------------------------------------------------------
+// Test Array.concat and Array.slice (TODO: split)
+//------------------------------------------------------
 
 // check concat, slice
 var bclone = b.concat();
@@ -1207,11 +1242,11 @@ check_equals(a["Infinite"], 'inf');
 
 
 #if OUTPUT_VERSION < 6
- check_totals(438);
+ check_totals(442);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(474);
+  check_totals(482);
 # else
-  check_totals(484);
+  check_totals(492);
 # endif
 #endif
