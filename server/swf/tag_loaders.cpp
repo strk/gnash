@@ -60,6 +60,8 @@
 #endif
 #include <map>
 
+#define ONCE(x) { static bool warned=false; if (!warned) { warned=true; x; } }
+
 namespace gnash {
 
 	// @@ TODO get rid of this; make it the normal mode.
@@ -1491,7 +1493,7 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
     if ( ! data_bytes )
     {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror("No data bytes left to read in SOUNDSTREAMBLOCK tag");
+        ONCE( log_swferror("Empty SOUNDSTREAMBLOCK tag, seems common waste of space") );
         );
         return;
     }
