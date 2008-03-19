@@ -19,7 +19,7 @@
 // Initial test written by Mike Carlson
 
 
-rcsid="$Id: array.as,v 1.58 2008/03/19 11:40:16 strk Exp $";
+rcsid="$Id: array.as,v 1.59 2008/03/19 14:36:22 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Array), 'function');
@@ -203,8 +203,8 @@ check_equals(gaparray.length, 17);
 check_equals(gaparray[4], '4');
 check_equals(gaparray[16], '16');
 #if OUTPUT_VERSION > 5
-xcheck(gaparray.hasOwnProperty('4'));
-xcheck(gaparray.hasOwnProperty('16'));
+check(gaparray.hasOwnProperty('4'));
+check(gaparray.hasOwnProperty('16'));
 check(!gaparray.hasOwnProperty('0'));
 check(!gaparray.hasOwnProperty('1'));
 #endif
@@ -243,12 +243,12 @@ check_equals(gaparray[14], undefined);
  xcheck(gaparray.hasOwnProperty('15'));
  xcheck(gaparray.hasOwnProperty('16'));
  xcheck(gaparray.hasOwnProperty('4')); // a-ha!
- check(!gaparray.hasOwnProperty('0'));
+ xcheck(!gaparray.hasOwnProperty('0'));
 #else
  xcheck(gaparray.hasOwnProperty('16'));
  xcheck(gaparray.hasOwnProperty('4')); 
- xcheck(gaparray.hasOwnProperty('1'));
- xcheck(gaparray.hasOwnProperty('0'));
+ check(gaparray.hasOwnProperty('1'));
+ check(gaparray.hasOwnProperty('0'));
  xcheck(gaparray.hasOwnProperty('2'));
 #endif
 #endif
@@ -455,7 +455,7 @@ count=0; for (var i in sparse) count++;
 check_equals(count, 1); // a single element exists
 #if OUTPUT_VERSION > 5
  check(!sparse.hasOwnProperty(0));
- xcheck(sparse.hasOwnProperty(5));
+ check(sparse.hasOwnProperty(5));
 #endif
 #if OUTPUT_VERSION < 7
  check_equals(sparse.toString(), ",,,,,5");
@@ -466,8 +466,8 @@ sparse.reverse();
 count=0; for (var i in sparse) count++;
 check_equals(count, 6); // no more holes
 #if OUTPUT_VERSION > 5
- xcheck(sparse.hasOwnProperty(0));
- xcheck(sparse.hasOwnProperty(5));
+ check(sparse.hasOwnProperty(0));
+ check(sparse.hasOwnProperty(5));
 #endif
 #if OUTPUT_VERSION < 7
  check_equals(sparse.toString(), "5,,,,,");
@@ -720,26 +720,26 @@ check_equals(c[0], 10);
 check_equals(c[1], 20);
 check_equals(c[2], 30);
 #if OUTPUT_VERSION > 5
-xcheck(c.hasOwnProperty('0'));
-xcheck(c.hasOwnProperty('1'));
-xcheck(c.hasOwnProperty('2'));
+check(c.hasOwnProperty('0'));
+check(c.hasOwnProperty('1'));
+check(c.hasOwnProperty('2'));
 #endif
-xcheck(delete c[1]);
+check(delete c[1]);
 check_equals ( c.length, 3 );
 check_equals(c[0], 10);
-xcheck_equals(typeof(c[1]), 'undefined');
+check_equals(typeof(c[1]), 'undefined');
 check_equals(c[2], 30);
 #if OUTPUT_VERSION > 5
-xcheck(c.hasOwnProperty('0'));
+check(c.hasOwnProperty('0'));
 check(!c.hasOwnProperty('1'));
-xcheck(c.hasOwnProperty('2'));
+check(c.hasOwnProperty('2'));
 #endif
 
 c[10] = 'ten';
 check_equals(c.length, 11);
 ASSetPropFlags(c, "2", 7, 0); // protect from deletion
-check( ! delete c[2] );
-check_equals(c[2], 30);
+xcheck( ! delete c[2] ); // gnash doesn't store prop flags here..
+xcheck_equals(c[2], 30); // so won't respect delete-protection
 c.length = 2;
 xcheck_equals(c[2], 30); // was protected !
 check_equals(typeof(c[10]), 'undefined'); // was not protected..

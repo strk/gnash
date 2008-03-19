@@ -1,3 +1,12 @@
+2008-03-19 Sandro Santilli <strk@keybit.net>
+
+	* server/as_object.{cpp,h}: enumerateNonProperProperty made protected,
+	  add a virtual hasOwnProperty, made delProperty virtual.
+	* server/array.{cpp,h}: implement hasOwnProperty and delProperty.
+	* server/asobj/Object.cpp: use as_object::hasOwnProperty to implement
+	  Object.hasOwnProperty().
+	* testsuite/actionscript.all/array.as: more successes.
+
 2008-03-19 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gnash.cpp: minor changes to 'usage' display.
@@ -8,7 +17,7 @@
 	  units for translation. Set locale for LC_ALL to avoid mangling
 	  non-ASCII characters in some log messages.
 
-2008-03-19 Sandro Santilli <strk@keybit.net>
+2008-03-18 Sandro Santilli <strk@keybit.net>
 
 	* server/array.{cpp,h}: use boost's mapped_vector for a sparse
 	  array implementation. Saves space at some cpu cycles till all

@@ -627,7 +627,7 @@ public:
 	///	- (true, false) : property protected from deletion
 	///	- (true, true) : property successfully deleted
 	///
-	std::pair<bool,bool> delProperty(string_table::key name, string_table::key nsname = 0);
+	virtual std::pair<bool,bool> delProperty(string_table::key name, string_table::key nsname = 0);
 
 	/// Get this object's own named property, if existing.
 	//
@@ -647,6 +647,22 @@ public:
 	///	contain the named property.
 	///
 	Property* getOwnProperty(string_table::key name, string_table::key nsname = 0);
+
+	/// Return true if this object has the named property
+	//
+	/// @parame name
+	///     Name of the property.
+	///	Case insensitive up to SWF6,
+	///	case *sensitive* from SWF7 up.
+	///
+	/// @param nsname
+	/// 	The id of the namespace to which this member belongs. 0 is a wildcard
+	/// 	and will be matched by anything not asking for a specific namespace.
+	///
+	/// @return
+	///	true if the object has the property, false otherwise.
+	///
+	virtual bool hasOwnProperty(string_table::key name, string_table::key nsname = 0);
 
 	/// Get a property from this object (or a prototype) by ordering index.
 	///
@@ -784,18 +800,6 @@ public:
 	///
 	void enumerateProperties(as_environment& env) const;
 
-	/// Enumerate any non-proper properties
-	//
-	/// This function is called by enumerateProperties(as_environment&) 
-	/// to allow for enumeration of properties that are not "proper"
-	/// (not contained in the as_object PropertyList).
-	///
-	/// The default implementation adds nothing
-	///
-	virtual void enumerateNonProperties(as_environment&) const
-	{
-	}
-
 	/// \brief
 	/// Enumerate all non-hidden properties inserting
 	/// their name/value pair to the given map.
@@ -922,6 +926,16 @@ public:
 	/// @} Common ActionScript getter-setters for characters
 	
 protected:
+
+	/// Enumerate any non-proper properties
+	//
+	/// This function is called by enumerateProperties(as_environment&) 
+	/// to allow for enumeration of properties that are not "proper"
+	/// (not contained in the as_object PropertyList).
+	///
+	/// The default implementation adds nothing
+	///
+	virtual void enumerateNonProperties(as_environment&) const {}
 
 	/// Get a property value by name
 	//

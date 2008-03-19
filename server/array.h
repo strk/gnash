@@ -371,6 +371,12 @@ public:
 	virtual void set_member(string_table::key name,
 		const as_value& val, string_table::key nsname = 0);
 
+	/// Overridden to deal with indexed elements
+	virtual std::pair<bool,bool> delProperty(string_table::key name, string_table::key nsname = 0);
+
+	/// Overridden to expose indexed elements
+	virtual bool hasOwnProperty(string_table::key name, string_table::key nsname = 0);
+
 	/// Enumerate elements
 	//
 	/// See as_object::enumerateNonProperties(as_environment&) for more info.

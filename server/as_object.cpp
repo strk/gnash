@@ -985,6 +985,12 @@ as_object::getOwnProperty(string_table::key key, string_table::key nsname)
 	return _members.getProperty(key, nsname);
 }
 
+bool
+as_object::hasOwnProperty(string_table::key key, string_table::key nsname)
+{
+	return getOwnProperty(key, nsname) != NULL;
+}
+
 as_value
 as_object::tostring_method(const fn_call& fn)
 {

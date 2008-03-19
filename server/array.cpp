@@ -788,6 +788,45 @@ as_array_object::get_member(string_table::key name, as_value *val,
 	return get_member_default(name, val, nsname);
 }
 
+bool
+as_array_object::hasOwnProperty(string_table::key name, string_table::key nsname)
+{
+	// an index has been requested
+	int index = index_requested(name);
+
+	if ( index >= 0 ) // a valid index was requested
+	{
+		size_t i = index;
+		const_iterator it = elements.find(i);
+		if ( it != elements.end() && it.index() == i )
+		{
+			return true;
+		}
+	}
+
+	return as_object::hasOwnProperty(name, nsname);
+}
+
+std::pair<bool,bool> 
+as_array_object::delProperty(string_table::key name, string_table::key nsname)
+{
+	// an index has been requested
+	int index = index_requested(name);
+
+	if ( index >= 0 ) // a valid index was requested
+	{
+		size_t i = index;
+		const_iterator it = elements.find(i);
+		if ( it != elements.end() && it.index() == i )
+		{
+			elements.erase_element(i);
+			return std::make_pair(true, true);
+		}
+	}
+
+	return as_object::delProperty(name, nsname);
+}
+
 void
 as_array_object::resize(unsigned int newsize)
 {

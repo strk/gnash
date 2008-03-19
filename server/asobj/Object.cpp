@@ -353,7 +353,7 @@ object_hasOwnProperty(const fn_call& fn)
 		return as_value(false);
 	}
 	//log_debug("%p.hasOwnProperty", fn.this_ptr);
-	return as_value(fn.this_ptr->getOwnProperty(VM::get().getStringTable().find(propname)) != NULL);
+	return as_value(fn.this_ptr->hasOwnProperty(VM::get().getStringTable().find(propname)));
 }
 
 as_value
