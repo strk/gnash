@@ -179,11 +179,11 @@ public:
 	}
 
 	/// Stop or play the sprite.
-	void set_play_state(play_state s)
-	{
-	    //if (m_play_state != s) m_time_remainder = 0;
-	    m_play_state = s;
-	}
+	//
+	/// If stopped, any stream sound associated with this sprite
+	/// will also be stopped.
+	///
+	void set_play_state(play_state s);
 
 	play_state get_play_state() const { return m_play_state; }
 
@@ -743,11 +743,11 @@ public:
 #endif
 	}
 
-	/// Set the current m_sound_stream_id
-	virtual void set_sound_stream_id(int id){ m_sound_stream_id = id; }
-
-	/// Get the current m_sound_stream_id
-	virtual int get_sound_stream_id() { return m_sound_stream_id;}
+	/// Set the currently playing m_sound_stream_id
+	// 
+	// TODO: rename to setStreamingSoundId
+	//
+	void setStreamSoundId(int id);
 
 	/// Remove this sprite from the stage.
 	//
@@ -876,6 +876,8 @@ public:
 	static as_value lockroot_getset(const fn_call& fn);
 
 private:
+
+	void stopStreamSound();
 
 	/// Register this sprite as a listener of core broadcasters
 	//

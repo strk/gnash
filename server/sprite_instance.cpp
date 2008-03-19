@@ -180,16 +180,6 @@ static as_value sprite_stop(const fn_call& fn)
 
   sprite->set_play_state(sprite_instance::STOP);
 
-  // Stop sound stream as well, if such exist
-  int stream_id = sprite->get_sound_stream_id();
-  if (sprite->get_sound_stream_id() != -1) {
-    media::sound_handler* sh = get_sound_handler();
-    if (sh != NULL) sh->stop_sound(stream_id);
-    sprite->set_sound_stream_id(-1);
-  }
-
-/*  media::sound_handler* sh = get_sound_handler();
-  if (sh != NULL) sh->stop_all_sounds();*/
   return as_value();
 }
 
@@ -2235,6 +2225,8 @@ sprite_instance::sprite_instance(
 
 sprite_instance::~sprite_instance()
 {
+  stopStreamSound();
+
   // We might have been deleted by Quit... 
   //assert(isDestroyed());
 
@@ -2419,10 +2411,12 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
     return;
   }
 
+#if 0 // why would we want to do this ?
   // Set the current sound_stream_id to -1, meaning that no stream are
   // active. If there are an active stream it will be updated while
   // executing the ControlTags.
   set_sound_stream_id(-1);
+#endif
 
   // Execute the ControlTag actions
   // We set _callingFrameActions to true so that add_action_buffer
@@ -3037,12 +3031,9 @@ sprite_instance::goto_frame(size_t target_frame_number)
   }
 
   // Unless the target frame is the next one, stop playback of soundstream
-  int stream_id = get_sound_stream_id();
-  if (target_frame_number != m_current_frame+1 && stream_id != -1) 
+  if (target_frame_number != m_current_frame+1 )
   {
-    media::sound_handler* sh = get_sound_handler();
-    if (sh != NULL) sh->stop_sound(stream_id);
-    set_sound_stream_id(-1);
+	stopStreamSound();
   }
 
   size_t loaded_frames = get_loaded_frames();
@@ -4152,6 +4143,9 @@ sprite_instance::unload()
   log_debug(_("Unloading sprite '%s'"), getTargetPath().c_str());
 #endif
 
+  // stop any pending streaming sounds
+  stopStreamSound();
+
   bool childHaveUnloadHandler = m_display_list.unload();
 
   // We won't be displayed again, so worth releasing
@@ -4494,6 +4488,8 @@ sprite_instance::markReachableResources() const
 void
 sprite_instance::destroy()
 {
+  stopStreamSound();
+
   m_display_list.destroy();
 
   /// We don't need these anymore
@@ -4549,6 +4545,39 @@ sprite_instance::lockroot_getset(const fn_call& fn)
   }
   return rv;
 
+}
+
+void
+sprite_instance::setStreamSoundId(int id)
+{
+	if ( id != m_sound_stream_id )
+	{
+		log_debug("Stream sound id from %d to %d, stopping old", m_sound_stream_id, id);
+		stopStreamSound();
+	}
+	m_sound_stream_id = id;
+}
+
+void
+sprite_instance::stopStreamSound()
+{
+	if ( m_sound_stream_id == -1 ) return; // nothing to do
+
+	media::sound_handler* handler = get_sound_handler(); // TODO: chache ?
+	if (handler)
+	{
+		handler->stop_sound(m_sound_stream_id);
+	}
+
+	m_sound_stream_id = -1;
+}
+
+void
+sprite_instance::set_play_state(play_state s)
+{
+	if ( s == m_play_state ) return; // nothing to do
+	if ( s == sprite_instance::STOP ) stopStreamSound();
+	m_play_state = s;
 }
 
 } // namespace gnash

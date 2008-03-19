@@ -1,3 +1,11 @@
+2008-03-19 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.{cpp,h}: always stop any streaming
+	  sound when the sprite is stopped or unloaded.
+	* server/parser/sound_definition.cpp, server/vm/ASHandlers.cpp:
+	  update calls to cleaned up streaming sound interface of
+	  sprite_instance.
+
 2008-03-19 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/swfdec/swfdec_gnash_tester: use more complicated 

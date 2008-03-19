@@ -48,7 +48,7 @@ start_stream_sound_tag::execute(sprite_instance* m) const
 	if (handler)
 	{
 		// This makes it possible to stop only the stream when framejumping.
-		m->set_sound_stream_id(m_handler_id);
+		m->setStreamSoundId(m_handler_id);
 		handler->play_sound(m_handler_id, 0, 0, m_start, NULL);
 	}
 }

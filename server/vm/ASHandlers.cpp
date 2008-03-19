@@ -534,16 +534,8 @@ SWFHandlers::ActionStop(ActionExec& thread)
     assert( code[thread.pc] == SWF::ACTION_STOP );
 #endif
 
-    media::sound_handler* s = get_sound_handler();
-
     sprite_instance* tgt = env.get_target()->to_movie();
     assert(tgt);
-    int stream_id = tgt->get_sound_stream_id();
-
-    if (s != NULL && stream_id != -1)
-    {
-        s->stop_sound(stream_id);
-    }
 
     tgt->set_play_state(sprite_instance::STOP);
 }
