@@ -71,7 +71,7 @@ Network::Network()
 	_port(0),
 	_connected(false),
 	_debug(false),
-	_timeout(5)
+	_timeout(0)
 {
     //GNASH_REPORT_FUNCTION;
 #if defined(HAVE_WINSOCK_H) && !defined(__OS2__)
@@ -675,12 +675,12 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
         FD_ZERO(&fdset);
         FD_SET(fd, &fdset);
 
-        if (timeout < 0) {
-	    tval.tv_sec = 5;
+        if (timeout == 0) {
+	    ret = select(fd+1, &fdset, NULL, NULL, NULL);
+	} else {	
+	    tval.tv_sec = timeout;
 	    tval.tv_usec = 0;
 	    ret = select(fd+1, &fdset, NULL, NULL, &tval);
-        } else {
-	    ret = select(fd+1, &fdset, NULL, NULL, NULL);
 	}
 
         // If interupted by a system call, try again
@@ -702,7 +702,7 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 	if (_debug) {
 	    log_debug (_("read %d bytes from fd %d"), ret, fd);
 	}
-#if 1
+#if 0
 	if (ret) {
 	    log_debug (_("%s: Read packet data from fd %d (%d bytes): \n%s"),
 		       __FUNCTION__, fd, ret, hexify(buffer, ret, true));
@@ -814,7 +814,7 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
 //                return ret;
             }
         }
-#if 1
+#if 0
 	if (ret) {
 	    log_debug (_("%s: Wrote packet data to fd %d: \n%s"),
 		       __FUNCTION__, fd, hexify(buffer, ret, true));
