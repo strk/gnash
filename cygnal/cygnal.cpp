@@ -55,6 +55,7 @@ extern "C"{
 #include "statistics.h"
 #include "stream.h"
 #include "gmemory.h"
+#include "arg_parser.h"
 
 // classes internal to Cygnal
 #include "buffer.h"
@@ -77,7 +78,7 @@ using namespace cygnal;
 using namespace gnash;
 using namespace amf;
 
-static void usage(const char *proc);
+static void usage();
 static void version_and_copyright();
 static void cntrlc_handler(int sig);
 
@@ -89,6 +90,8 @@ static void stream_thread(struct thread_params *sendfile);
 //static void dispatch_thread(struct thread_params *params);
 
 LogFile& dbglogfile = LogFile::getDefaultInstance();
+
+// The rcfile is loaded and parsed here:
 CRcInitFile& crcfile = CRcInitFile::getDefaultInstance();
 
 static struct sigaction  act;
@@ -119,74 +122,73 @@ main(int argc, char *argv[])
 {
     // Initialize national language support
 #ifdef ENABLE_NLS
-    setlocale (LC_MESSAGES, "");
+    setlocale (LC_ALL, "");
     bindtextdomain (PACKAGE, LOCALEDIR);
     textdomain (PACKAGE);
 #endif
-    // scan for the two main long GNU options
-    int c;
-    for (c=0; c<argc; c++) {
-        if (strcmp("--help", argv[c]) == 0) {
-            version_and_copyright();
-            printf("\n");
-            usage(argv[0]);
-            exit(0);
-        }
 
-        if (strcmp("--version", argv[c]) == 0) {
-            version_and_copyright();
-            exit(0);
-        }
+   const Arg_parser::Option opts[] =
+        {
+        { 'h', "help",          Arg_parser::no  },
+        { 'V', "version",       Arg_parser::no  },
+        { 'p', "port-offset",   Arg_parser::yes },
+        { 'v', "verbose",       Arg_parser::no  },
+        { 'd', "dump",          Arg_parser::no  }
+        };
+
+    Arg_parser parser(argc, argv, opts);
+    if( ! parser.error().empty() )	
+    {
+        cout << parser.error() << endl;
+        exit(EXIT_FAILURE);
     }
 
-    crcfile.loadFiles();
-    
-#if 0 // this should be automatic
-    if (crcfile.getDebugLog().size()) {
-	dbglogfile.openLog(crcfile.getDebugLog());
-    } else {
-	dbglogfile.openLog("/tmp/cygnal-dbg.log");
-    }
-#endif
+    // Set the log file name before trying to write to
+    // it, or we might get two.
+    dbglogfile.setLogFilename("cygnal-dbg.log");
     
     if (crcfile.verbosityLevel() > 0) {
         dbglogfile.setVerbosity(crcfile.verbosityLevel());
     }    
     
     if (crcfile.getDocumentRoot().size() > 0) {
-	docroot = crcfile.getDocumentRoot().c_str();
-	log_debug (_("Document Root for media files is: %s"),
-		   docroot);
+        docroot = crcfile.getDocumentRoot().c_str();
+        log_debug (_("Document Root for media files is: %s"),
+		       docroot);
     } else {
-	docroot = "/var/www/html/software/gnash/tests/";
+        docroot = "/var/www/html/software/gnash/tests/";
     }
-    
-    while ((c = getopt (argc, argv, "hvp:d")) != -1) {
-	switch (c) {
-	  case 'h':
-	      usage (argv[0]);
-              exit(0);
-	  case 'v':
-              dbglogfile.setVerbosity();
-	      log_debug (_("Verbose output turned on"));
-	      break;
-	  case 'p':
-	      port_offset = strtol(optarg, NULL, 0);
-	      crcfile.setPortOffset(port_offset);
-	      break;
-	  case 'd':
-	      crcfile.dump();
-	      exit(0);
-	      break;
-        }
-    }
-    
-//    dbglogfile.setLogFilename("cygnal-dbg.log");
 
-    // get the file name from the command line
-    while (optind < argc) {
-        log_error (_("Extraneous argument: %s"), argv[optind]);
-    }
+
+    // Handle command line arguments
+    for( int i = 0; i < parser.arguments(); ++i )
+    {
+        const int code = parser.code(i);
+        switch( code )
+        {
+            case 'h':
+                version_and_copyright();
+                usage();
+                exit(0);
+            case 'V':
+                 version_and_copyright();
+                 exit(0);
+            case 'v':
+                dbglogfile.setVerbosity();
+                log_debug (_("Verbose output turned on"));
+                break;
+            case 'p':
+                port_offset = parser.argument<int>(i);
+	            crcfile.setPortOffset(port_offset);
+	            break;
+            case 'd':
+                crcfile.dump();
+                exit(0);
+                break;
+            default:
+                log_error (_("Extraneous argument: %s"), parser.argument(i).c_str());
+        }
+    } 
     
     // Trap ^C (SIGINT) so we can kill all the threads
     act.sa_handler = cntrlc_handler;
@@ -322,27 +324,26 @@ cntrlc_handler (int /*sig*/)
 static void
 version_and_copyright()
 {
-    printf (_(
-"Cygnal %s\n"
-"Copyright (C) 2006, 2007 Free Software Foundation, Inc.\n"
-"Cygnal comes with NO WARRANTY, to the extent permitted by law.\n"
-"You may redistribute copies of Cygnal under the terms of the GNU General\n"
-"Public License.  For more information, see the file named COPYING.\n"),
-        VERSION);
+    cout << "Cygnal " << VERSION << endl
+        << endl
+        << _("Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.\n"
+        "Cygnal comes with NO WARRANTY, to the extent permitted by law.\n"
+        "You may redistribute copies of Cygnal under the terms of the GNU General\n"
+        "Public License.  For more information, see the file named COPYING.\n")
+    << endl;
 }
 
 static void
-usage(const char* /*proc*/)
+usage()
 {
-    printf(_(
-	"cygnal -- an streaming media server.\n"
-	"\n"
-	"usage: cygnal [options...]\n"
-	"  --help(-h)  Print this info.\n"
-	"  --version   Print the version numbers.\n"
-	"  --verbose (-v)   Output verbose debug info.\n"
-	"  --port-offset (-p)   RTMPT port offset.\n"
-	));
+	cout << _("cygnal -- a streaming media server.") << endl
+	<< endl
+	<< _("Usage: cygnal [options...]") << endl
+	<< _("  -h,  --help          Print this help and exit") << endl
+	<< _("  -V,  --version       Print version information and exit") << endl
+	<< _("  -v,  --verbose       Output verbose debug info") << endl
+	<< _("  -p   --port-offset   RTMPT port offset") << endl
+	<< endl;
 }
 
 //} // end of cygnal namespace
