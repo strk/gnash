@@ -1,5 +1,11 @@
 2008-03-19 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/array.as: test addProperty(<valid_index>) 
+	  against arrays. One more reason to use at least Property rather then
+	  simple as_values.
+
+2008-03-19 Sandro Santilli <strk@keybit.net>
+
 	* server/as_object.{cpp,h}: enumerateNonProperProperty made protected,
 	  add a virtual hasOwnProperty, made delProperty virtual.
 	* server/array.{cpp,h}: implement hasOwnProperty and delProperty.

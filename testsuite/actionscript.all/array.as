@@ -19,7 +19,7 @@
 // Initial test written by Mike Carlson
 
 
-rcsid="$Id: array.as,v 1.59 2008/03/19 14:36:22 strk Exp $";
+rcsid="$Id: array.as,v 1.60 2008/03/19 14:47:18 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Array), 'function');
@@ -789,7 +789,7 @@ d = [];
 e = ["singleton"];
 f = [id, yr, id];
 
-trace(" -- Basic Sort Tests -- ");
+//trace(" -- Basic Sort Tests -- ");
 
 r = a.sort( Array.NUMERIC );
 check_equals( r.toString(), ",Jedit,ed,emacs,nano,vi" );
@@ -862,7 +862,7 @@ check_equals( r.toString(), "0" );
 f.sort( Array.DESCENDING | Array.CASEINSENSITIVE );
 check_equals( f.toString(), "Year,Name,Name" );
 
-trace(" -- Return Indexed Array Tests -- ");
+//trace(" -- Return Indexed Array Tests -- ");
 
 r = a.sort( Array.RETURNINDEXEDARRAY );
 check_equals( r.toString(), "5,4,3,2,1,0" );
@@ -894,7 +894,7 @@ check_equals( e.toString(), "singleton" );
 r = e.sort( Array.NUMERIC | Array.RETURNINDEXEDARRAY | Array.DESCENDING );
 check_equals( r.toString(), "0" );
 
-trace(" -- Custom AS function tests -- ");
+//trace(" -- Custom AS function tests -- ");
 r = a.sort( cmp_fn, Array.UNIQUESORT );
 check_equals( r.toString(), ",vi,ed,nano,emacs,Jedit" );
 check_equals( a.toString(), ",vi,ed,nano,emacs,Jedit" );
@@ -919,7 +919,7 @@ r = e.sort( cmp_fn, Array.UNIQUESORT | Array.CASEINSENSITIVE );
 check_equals( r.toString(), "singleton" );
 check_equals( e.toString(), "singleton" );
 
-trace(" -- Custom AS function tests using an AS comparator that returns objects -- ");
+//trace(" -- Custom AS function tests using an AS comparator that returns objects -- ");
 r = a.sort( cmp_fn_obj, Array.DESCENDING );
 check_equals( tolen(r), "[5, 5, 4, 2, 2, 0]" );
 check_equals( tolen(a), "[5, 5, 4, 2, 2, 0]" );
@@ -936,7 +936,7 @@ a.push("ED");
 b.push(3.0);
 c.push(9/0);
 
-trace(" -- UNIQUESORT tests -- ");
+//trace(" -- UNIQUESORT tests -- ");
 
 r = a.sort( Array.UNIQUESORT );
 check_equals( r.toString(), ",ED,Jedit,ed,emacs,nano,vi" );
@@ -983,7 +983,7 @@ check_equals( r.toString(), "0,1,2,3,4,5,6" );
 r = a.sort( cmp_fn, Array.UNIQUESORT | Array.CASEINSENSITIVE | Array.RETURNINDEXEDARRAY | Array.DESCENDING );
 check_equals( r.toString(), "6,5,4,3,2,1,0" );
 
-trace(" -- Array with null value  -- ");
+//trace(" -- Array with null value  -- ");
 c.push(null);
 
 r = c.sort();
@@ -1006,7 +1006,7 @@ check_equals( r.toString(), "0" );
 r = c.sort( Array.UNIQUESORT | Array.NUMERIC | Array.DESCENDING | Array.RETURNINDEXEDARRAY );
 check_equals( r.toString(), "0" );
 
-trace(" -- Array with 2 null values  -- ");
+//trace(" -- Array with 2 null values  -- ");
 c = [7.2, 2.0, null, -0.5, 3/0, 0.0, null, 8.35, 0.001, -3.7];
 c.sort( Array.NUMERIC );
 check_equals( c.toString(), "-3.7,-0.5,0,0.001,2,7.2,8.35,Infinity,null,null" );
@@ -1020,14 +1020,14 @@ check_equals( r.toString(), "0" );
 r = c.sort( Array.UNIQUESORT | Array.NUMERIC );
 check_equals( r.toString(), "0" );
 
-trace(" -- Array with 2 undefined values  -- ");
+//trace(" -- Array with 2 undefined values  -- ");
 c = [7.2, 2.0, undefined, -0.5, 3/0, 0.0, undefined, 8.35, 0.001, -3.7];
 r = c.sort( Array.UNIQUESORT );
 check_equals( r.toString(), "0" );
 r = c.sort( Array.UNIQUESORT | Array.NUMERIC );
 check_equals( r.toString(), "0" );
 
-trace(" -- Array with 2 NaN values  -- ");
+//trace(" -- Array with 2 NaN values  -- ");
 c = [7.2, 2.0, NaN, -0.5, 3/0, 0.0, NaN, 8.35, 0.001, -3.7];
 r = c.sort( Array.UNIQUESORT );
 check_equals( r.toString(), "0" );
@@ -1060,7 +1060,7 @@ function tostr(x)
 	return str;
 }
 
-trace("sortOn a single property ");
+//trace("sortOn a single property ");
 r = a.sortOn( "Name" );
 check_equals( tostr(r), "Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
 check_equals( tostr(a), "Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
@@ -1100,7 +1100,7 @@ r = a.sortOn("Electronic", Array.UNIQUESORT | Array.RETURNINDEXEDARRAY );
 check_equals( r.toString(), "0" );
 check_equals( tostr(a), "Zuse Z3,1941,false | ENIAC,1944,true | Colossus,1943,true");
 
-trace("sortOn multiple properties");
+//trace("sortOn multiple properties");
 a.push({Name: "Atanasoff-Berry", Year: 1941, Electronic: true, Mass: 320});
 
 r = a.sortOn( ["Name", "Year"] );
@@ -1120,7 +1120,7 @@ r = a.sortOn( ["Electronic", "Name"], [Array.UNIQUESORT, Array.NUMERIC] );
 check_equals( tostr(r), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true" );
 
 
-trace("sortOn missing properties" );
+//trace("sortOn missing properties" );
 r = a.sortOn(["Megaflops"] );
 check_equals( tostr(r), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true" );
 check_equals( tostr(a), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true" );
@@ -1144,7 +1144,7 @@ check_equals( tostr(a), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Coloss
 r = a.sortOn(["Electronic", "Cost" ], [Array.UNIQUESORT, Array.NUMERIC] );
 check_equals( r.toString(), "0" );
 
-trace("sortOn with mismatching array lengths");
+//trace("sortOn with mismatching array lengths");
 r = a.sortOn( ["Name", "Year"], [0] );
 check_equals( tostr(r), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
 check_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
@@ -1159,7 +1159,7 @@ check_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,
 r = a.sortOn(["Name", "Year"], [Array.RETURNINDEXEDARRAY] );
 check_equals( tostr(r), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
 
-trace("sortOn, undocumented invocation");
+//trace("sortOn, undocumented invocation");
 r = a.sortOn( ["Name", "Year"], Array.DESCENDING );
 check_equals( tostr(r), "Zuse Z3,1941,false | ENIAC,1944,true | Colossus,1943,true | Atanasoff-Berry,1941,true" );
 check_equals( tostr(a), "Zuse Z3,1941,false | ENIAC,1944,true | Colossus,1943,true | Atanasoff-Berry,1941,true" );
@@ -1178,7 +1178,7 @@ r = a.sortOn(["Name", "Year"], [Array.RETURNINDEXEDARRAY]);
 check_equals( tostr(r), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
 check_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
 
-trace("sortOn using an object implementing/over-riding the toString() method as the property argument");
+//trace("sortOn using an object implementing/over-riding the toString() method as the property argument");
 
 a.sortOn( id );
 check_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
@@ -1192,7 +1192,7 @@ check_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,
 a.sortOn( [yr, id], [Array.NUMERIC, Array.DESCENDING] );
 check_equals( tostr(a), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true" );
 
-trace("sortOn with properties that are objects implementing the toString() method");
+//trace("sortOn with properties that are objects implementing the toString() method");
 
 r = b.sortOn( "Name" );
 check_equals( tostr(r), "Name,Year,Year | Year,Name,Year");
@@ -1202,7 +1202,7 @@ check_equals( tostr(b), "Year,Name,Year | Name,Year,Year");
 b.sortOn( ["Year", "Name"], [Array.NUMERIC | Array.DESCENDING, 0] );
 check_equals( tostr(b), "Name,Year,Year | Year,Name,Year");
 
-trace("sortOn invalid calls");
+//trace("sortOn invalid calls");
 r = a.sortOn();
 check( r == undefined );
 check_equals( tostr(a), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true" );
@@ -1212,12 +1212,12 @@ check_equals( typeof(r) , 'object' );
 check( r instanceof Array );
 check_equals( tostr(a), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true" );
 
-trace("sortOn with flag as an object overriding the valueOf method");
+//trace("sortOn with flag as an object overriding the valueOf method");
 a.sortOn( ["Year", "Electronic", "Name"], numeric );
 check_equals( tostr(a), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true" );
 
 #if OUTPUT_VERSION < 7
-trace("sortOn property name case-mismatch");
+//trace("sortOn property name case-mismatch");
 a.sortOn( "name" );
 check_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
 a.sortOn( ["year", "name"], Array.NUMERIC );
@@ -1225,7 +1225,7 @@ check_equals( tostr(a), "Atanasoff-Berry,1941,true | Zuse Z3,1941,false | Coloss
 #endif // OUTPUT_VERSION < 7
 
 #if OUTPUT_VERSION > 6
-trace("sortOn with some properties undefined");
+//trace("sortOn with some properties undefined");
 a.push({Name: "Harvard Mark I", Year: 1944, Mass: 4500});
 
 a.sortOn(["Electronic", "Year"], Array.DESCENDING | Array.IGNORECASE );
@@ -1299,6 +1299,40 @@ a["Infinite"] = 'inf';
 check_equals(a.length, 0);
 check_equals(a["Infinite"], 'inf');
 
+//----------------------------------------------
+// Force an indexed property to a getter/setter
+//---------------------------------------------
+
+#if OUTPUT_VERSION > 5 // addProperty was added in SWF6
+
+function get() { getCalls++; }
+function set() { setCalls++; }
+a = new Array();
+a[2] = 2;
+ret = a.addProperty('1', get, set);
+check_equals(ret, true);
+getCalls=0; setCalls=0;
+junk = a[1];
+check_equals(getCalls, 1);
+check_equals(setCalls, 0);
+getCalls=0; setCalls=0;
+a[1] = 1;
+check_equals(getCalls, 0);
+xcheck_equals(setCalls, 1);
+
+ret = a.addProperty('2', get, set);
+check_equals(ret, true);
+getCalls=0; setCalls=0;
+junk = a[2];
+xcheck_equals(getCalls, 1);
+check_equals(setCalls, 0);
+getCalls=0; setCalls=0;
+a[2] = 2;
+check_equals(getCalls, 0);
+xcheck_equals(setCalls, 1);
+
+#endif // OUTPUT_VERSION > 5
+
 
 // TODO: test ASnative-returned functions:
 //
@@ -1321,8 +1355,8 @@ check_equals(a["Infinite"], 'inf');
  check_totals(459);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(499);
-# else
   check_totals(509);
+# else
+  check_totals(519);
 # endif
 #endif
