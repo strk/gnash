@@ -19,7 +19,7 @@
 // Initial test written by Mike Carlson
 
 
-rcsid="$Id: array.as,v 1.61 2008/03/19 15:51:22 strk Exp $";
+rcsid="$Id: array.as,v 1.62 2008/03/19 16:25:55 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Array), 'function');
@@ -1333,7 +1333,7 @@ xcheck_equals(setCalls, 1);
 
 check_equals(a.length, 3);
 ret = a.addProperty('3', get, set);
-check_equals(a.length, 4);
+xcheck_equals(a.length, 4);
 
 a.length = 3;
 getCalls=0; setCalls=0;
@@ -1342,6 +1342,38 @@ check_equals(getCalls, 0);
 check_equals(setCalls, 0);
 
 #endif // OUTPUT_VERSION > 5
+
+//--------------------------------------------------------
+// pop an array with delete-protected elements
+//--------------------------------------------------------
+
+a = new Array();
+a[0] = 'zero';
+a[1] = 'one';
+ASSetPropFlags(c, "0", 7, 0); // protect 0 from deletion
+check_equals(a.length, 2);
+f = a.shift();
+check_equals(a.length, 1); 
+check_equals(f, 'zero');
+check_equals(a[0], 'one'); // 0 was replaced anyway
+check_equals(typeof(a[1]), 'undefined');
+#if OUTPUT_VERSION > 5
+ check(!a.hasOwnProperty(1)); 
+#endif
+
+a = new Array();
+a[0] = 'zero';
+a[1] = 'one';
+ASSetPropFlags(c, "1", 7, 0); // protect 1 from deletion
+check_equals(a.length, 2);
+f = a.shift();
+check_equals(a.length, 1);
+check_equals(f, 'zero');
+check_equals(a[0], 'one');
+check_equals(typeof(a[1]), 'undefined');
+#if OUTPUT_VERSION > 5
+ check(!a.hasOwnProperty(1)); 
+#endif
 
 
 // TODO: test ASnative-returned functions:
@@ -1362,11 +1394,11 @@ check_equals(setCalls, 0);
 
 
 #if OUTPUT_VERSION < 6
- check_totals(459);
+ check_totals(469);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(513);
+  check_totals(525);
 # else
-  check_totals(523);
+  check_totals(535);
 # endif
 #endif
