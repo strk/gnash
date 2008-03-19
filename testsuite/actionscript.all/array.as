@@ -19,7 +19,7 @@
 // Initial test written by Mike Carlson
 
 
-rcsid="$Id: array.as,v 1.62 2008/03/19 16:25:55 strk Exp $";
+rcsid="$Id: array.as,v 1.63 2008/03/19 16:36:42 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Array), 'function');
@@ -1350,12 +1350,12 @@ check_equals(setCalls, 0);
 a = new Array();
 a[0] = 'zero';
 a[1] = 'one';
-ASSetPropFlags(c, "0", 7, 0); // protect 0 from deletion
+ASSetPropFlags(a, "0", 7, 0); // protect 0 from deletion
 check_equals(a.length, 2);
 f = a.shift();
 check_equals(a.length, 1); 
 check_equals(f, 'zero');
-check_equals(a[0], 'one'); // 0 was replaced anyway
+xcheck_equals(a[0], 'zero'); // could not delete for override
 check_equals(typeof(a[1]), 'undefined');
 #if OUTPUT_VERSION > 5
  check(!a.hasOwnProperty(1)); 
@@ -1364,15 +1364,60 @@ check_equals(typeof(a[1]), 'undefined');
 a = new Array();
 a[0] = 'zero';
 a[1] = 'one';
-ASSetPropFlags(c, "1", 7, 0); // protect 1 from deletion
+ASSetPropFlags(a, "1", 7, 0); // protect 1 from deletion
 check_equals(a.length, 2);
 f = a.shift();
 check_equals(a.length, 1);
 check_equals(f, 'zero');
-check_equals(a[0], 'one');
+check_equals(a[0], 'one'); // could replace
+xcheck_equals(a[1], 'one'); // couldn't delete
+#if OUTPUT_VERSION > 5
+ check(a.hasOwnProperty(0)); 
+ xcheck(a.hasOwnProperty(1)); 
+#endif
+
+//--------------------------------------------------------
+// pop an array with read-only elements
+//--------------------------------------------------------
+
+a = new Array();
+a[0] = 'zero';
+a[1] = 'one';
+ASSetPropFlags(a, "0", 4, 0); // protect 0 from override
+check_equals(a.length, 2);
+a[0] = 'overridden';
+xcheck_equals(a[0], 'zero'); // was protected..
+f = a.shift();
+check_equals(a.length, 1); 
+xcheck_equals(f, 'zero');
+check_equals(a[0], 'one'); // 0 was replaced anyway, didn't care about protection
 check_equals(typeof(a[1]), 'undefined');
+a[0] = 'overridden';
+check_equals(a[0], 'overridden'); // flag was lost
 #if OUTPUT_VERSION > 5
  check(!a.hasOwnProperty(1)); 
+#endif
+
+a = new Array();
+a[0] = 'zero';
+a[1] = 'one';
+a[2] = 'two';
+ASSetPropFlags(a, "1", 4, 0); // protect 1 from override
+a[1] = 'overridden';
+xcheck_equals(a[1], 'one'); // was protected
+check_equals(a.length, 3);
+f = a.shift();
+check_equals(a.length, 2);
+check_equals(f, 'zero');
+xcheck_equals(a[0], 'one'); // 0 was replaced anyway, didn't care about protection
+check_equals(a[1], 'two');
+check_equals(typeof(a[2]), 'undefined');
+a[1] = 'overridden';
+check_equals(a[1], 'overridden'); // flag was lost
+#if OUTPUT_VERSION > 5
+ check(a.hasOwnProperty(0)); 
+ check(a.hasOwnProperty(1)); 
+ check(!a.hasOwnProperty(2)); 
 #endif
 
 
@@ -1394,11 +1439,11 @@ check_equals(typeof(a[1]), 'undefined');
 
 
 #if OUTPUT_VERSION < 6
- check_totals(469);
+ check_totals(484);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(525);
+  check_totals(545);
 # else
-  check_totals(535);
+  check_totals(555);
 # endif
 #endif
