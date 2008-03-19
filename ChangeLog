@@ -1,5 +1,14 @@
 2008-03-19 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp: log malformed swf if SOUNDSTREAMBLOCK
+	  is found w/out preceeding SOUNDSTREAMHEAD.
+	* testsuite/misc-ming.all/: Makefile.am,
+	  streamingSoundTest1-Runner.cpp, streamingSoundTest1.c:
+	  Stub test for streaming sound. Doesn't work yet, producing
+	  a malformed SWF which inspired the tag_loaders.cpp change.
+
+2008-03-19 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.{cpp,h}: always stop any streaming
 	  sound when the sprite is stopped or unloaded.
 	* server/parser/sound_definition.cpp, server/vm/ASHandlers.cpp:

@@ -141,6 +141,8 @@ check_PROGRAMS = \
 	loadMovieTestRunner \
 	eventSoundTest1 \
 	eventSoundTest1-Runner \
+	streamingSoundTest1 \
+	streamingSoundTest1-Runner \
 	DrawingApiTestRunner \
 	DragDropTestRunner   \
 	frame_label_test \
@@ -412,6 +414,27 @@ eventSoundTest1_Runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	eventSoundTest1.swf      \
 	$(NULL)
+
+streamingSoundTest1_SOURCES = streamingSoundTest1.c
+streamingSoundTest1_LDADD = libgnashmingutils.la
+
+streamingSoundTest1.swf: streamingSoundTest1
+	./streamingSoundTest1 $(srcdir)/../media/sound1.mp3
+
+streamingSoundTest1_Runner_SOURCES = \
+	streamingSoundTest1-Runner.cpp \
+	$(NULL)
+streamingSoundTest1_Runner_CXXFLAGS = \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+streamingSoundTest1_Runner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+streamingSoundTest1_Runner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	streamingSoundTest1.swf      \
+	$(NULL)
+
 
 DefineEditTextVariableNameTest_SOURCES =	\
 	DefineEditTextVariableNameTest.c	\

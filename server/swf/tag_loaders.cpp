@@ -1452,7 +1452,11 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
     media::sound_handler* handler = get_sound_handler();
 
     // If we don't have a sound_handler registered stop here
-    if (!handler) return;
+    if (!handler)
+    {
+		// log_debug ?
+        return;
+    }
 
     // Get the ID of the sound stream currently being loaded
     int handle_id = m->get_loading_sound_stream_id();
@@ -1462,7 +1466,13 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
     media::SoundInfo* sinfo = handler->get_sound_info(handle_id);
 
     // If there is no SoundInfo something is wrong...
-    if (!sinfo) return;
+    if (!sinfo)
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+		log_swferror(_("Found SOUNDSTREAMBLOCK tag w/out preceeding SOUNDSTREAMHEAD"));
+		);
+		return;
+	}
 
     media::audioCodecType format = sinfo->getFormat();
     unsigned int sample_count = sinfo->getSampleCount();
