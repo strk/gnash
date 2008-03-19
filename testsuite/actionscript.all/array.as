@@ -19,7 +19,7 @@
 // Initial test written by Mike Carlson
 
 
-rcsid="$Id: array.as,v 1.57 2008/03/19 10:13:38 strk Exp $";
+rcsid="$Id: array.as,v 1.58 2008/03/19 11:40:16 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Array), 'function');
@@ -464,7 +464,7 @@ check_equals(count, 1); // a single element exists
 #endif
 sparse.reverse();
 count=0; for (var i in sparse) count++;
-xcheck_equals(count, 6); // no more holes
+check_equals(count, 6); // no more holes
 #if OUTPUT_VERSION > 5
  xcheck(sparse.hasOwnProperty(0));
  xcheck(sparse.hasOwnProperty(5));
@@ -552,11 +552,11 @@ count=0; for (var i in sparse2) count++;
 check_equals(count, 1);
 
 count=0; for (var i in csp) count++;
-xcheck_equals(count, 7); // concat filled any holes
+check_equals(count, 7); // concat filled any holes
 
 csp = sparse1.concat('onemore');
 count=0; for (var i in csp) count++;
-xcheck_equals(count, 5); // concat filled any holes
+check_equals(count, 5); // concat filled any holes
 
 //-------------------------------
 // Test Array.splice
@@ -665,22 +665,22 @@ check_equals(count, 2);
 spliced = ary.splice(3, 0); // no op ?
 check_equals(ary.length, 8); // no change in length
 count=0; for (var i in ary) count++;
-xcheck_equals(count, 8); // but fills the gaps !
+check_equals(count, 8); // but fills the gaps !
 
 ary = new Array(); ary[2] = 2; ary[7] = 7;
 spliced = ary.splice(3, 0, 3); // add 3 at index 3
 check_equals(ary.length, 9); 
 count=0; for (var i in ary) count++;
-xcheck_equals(count, 9); // fills the gaps !
+check_equals(count, 9); // fills the gaps !
 check_equals(ary[3], 3);
 check_equals(ary[2], 2);
 
 ary = new Array(); ary[2] = 2; ary[7] = 7;
 spliced = ary.splice(3, 1, 3); // replace index 3 (an hole) with a 3 value
 count=0; for (var i in ary) count++;
-xcheck_equals(count, 8); // fills the gaps 
+check_equals(count, 8); // fills the gaps 
 count=0; for (var i in spliced) count++;
-xcheck_equals(count, 1); // the returned array contains an actual value, not an hole
+check_equals(count, 1); // the returned array contains an actual value, not an hole
 
 //-------------------------------
 // Test single parameter constructor, and implicitly expanding array

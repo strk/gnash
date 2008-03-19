@@ -511,25 +511,17 @@ get_multi_flags(as_array_object::const_iterator itBegin,
 	// extract fUniqueSort and fReturnIndexedArray from first flag
 	if (it != itEnd)
 	{
-		as_array_object::ValOrNone v = *it++;
-		if ( v.which() == as_array_object::itemValue )
-		{
-			boost::uint8_t flag = static_cast<boost::uint8_t>(boost::get<as_value>(v).to_number());
-			flag = flag_preprocess(flag, uniq, index);
-			flgs.push_back(flag);
-		}
+		boost::uint8_t flag = static_cast<boost::uint8_t>((*it++).to_number());
+		flag = flag_preprocess(flag, uniq, index);
+		flgs.push_back(flag);
 	}
 
 	while (it != itEnd)
 	{
-		as_array_object::ValOrNone v = *it++;
-		if ( v.which() == as_array_object::itemValue )
-		{
-			boost::uint8_t flag = static_cast<boost::uint8_t>(boost::get<as_value>(v).to_number());
-			flag &= ~(as_array_object::fReturnIndexedArray);
-			flag &= ~(as_array_object::fUniqueSort);
-			flgs.push_back(flag);
-		}
+		boost::uint8_t flag = static_cast<boost::uint8_t>((*it++).to_number());
+		flag &= ~(as_array_object::fReturnIndexedArray);
+		flag &= ~(as_array_object::fUniqueSort);
+		flgs.push_back(flag);
 	}
 	return flgs;
 }
@@ -568,10 +560,7 @@ as_array_object::get_indexed_elements()
 	for (const_iterator it = elements.begin();
 		it != elements.end(); ++it)
 	{
-		if ( it->which() == itemValue )
-		{
-			indexed_elements.push_back(indexed_as_value(boost::get<as_value>(*it), i++));
-		}
+		indexed_elements.push_back(indexed_as_value(*it, i++));
 	}
 	return indexed_elements;
 }
@@ -606,20 +595,25 @@ as_array_object::index_requested(string_table::key name)
 void
 as_array_object::push(const as_value& val)
 {
-	elements.push_back(val);
+        size_t s=elements.size();
+        elements.resize(s+1);
+        elements[s] = val;
 }
 
 void
 as_array_object::unshift(const as_value& val)
 {
-	elements.push_front(val);
+        shiftElementsRight(1);
+        elements[0] = val;
 }
 
 as_value
 as_array_object::pop()
 {
 	// If the array is empty, report an error and return undefined!
-	if ( elements.empty() ) 
+	size_t sz = elements.size();
+
+	if ( ! sz )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("tried to pop element from back of empty array, returning undef"));
@@ -627,11 +621,9 @@ as_array_object::pop()
 		return as_value(); // undefined
 	}
 
-	ValOrNone last = elements.back();
-	as_value ret;
-	if ( last.which() == itemValue ) ret = boost::get<as_value>(last);
-	else log_error("Last element of Array (on pop) is not a value");
-	elements.pop_back();
+	--sz;
+	as_value ret = elements[sz];
+	elements.resize(sz);
 
 	return ret;
 }
@@ -639,8 +631,10 @@ as_array_object::pop()
 as_value
 as_array_object::shift()
 {
+	size_t sz = elements.size();
+
 	// If the array is empty, report an error and return undefined!
-	if ( elements.empty() ) 
+	if ( ! sz )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("tried to shift element from front of empty array, returning undef"));
@@ -648,10 +642,8 @@ as_array_object::shift()
 		return as_value(); // undefined
 	}
 
-	ValOrNone first = elements.front();
-	as_value ret;
-	if ( first.which() == itemValue ) ret = boost::get<as_value>(first);
-	elements.pop_front();
+	as_value ret = elements[0];
+	shiftElementsLeft(1);
 
 	return ret;
 }
@@ -659,8 +651,20 @@ as_array_object::shift()
 void
 as_array_object::reverse()
 {
-	// Reverse the deque elements
-	std::reverse(elements.begin(), elements.end());
+	size_t sz = elements.size();
+	if ( sz < 2 ) return; // nothing to do (CHECKME: might be a single hole!)
+
+	// We create another container, as we want to fill the gaps
+	// There could likely be an in-place version for this, but
+	// filling the gaps would need more care
+	container newelements(sz);
+
+	for (size_t i=0, n=sz-1; i<sz; ++i, --n)
+	{
+		newelements[i] = elements[n];
+	}
+
+	elements = newelements;
 }
 
 std::string
@@ -674,25 +678,19 @@ as_array_object::join(const std::string& separator, as_environment*) const
 	// We should change output based on SWF version --strk 2006-04-28
 
 	std::string temp;
+
 	//std::string temp = "("; // SWF > 7
 
-	int swfversion = _vm.getSWFVersion();
+	size_t sz = elements.size();
 
-	if ( ! elements.empty() ) 
+	if ( sz ) 
 	{
-		bool printed=false;
+		int swfversion = _vm.getSWFVersion();
 
-		const_iterator it=elements.begin(), itEnd=elements.end();
-		
-		while ( it != itEnd )
+		for (size_t i=0; i<sz; ++i)
 		{
-			ValOrNone v = *it++;
-			if ( printed ) temp += separator;
-			if ( v.which() == itemValue )
-				temp += boost::get<as_value>(v).to_string_versioned(swfversion);
-			else
-				temp += as_value().to_string_versioned(swfversion);
-			printed=true;
+			if ( i ) temp += separator;
+			temp += elements[i].to_string_versioned(swfversion);
 		}
 	}
 
@@ -705,8 +703,8 @@ as_array_object::join(const std::string& separator, as_environment*) const
 void
 as_array_object::concat(const as_array_object& other)
 {
-	elements.insert(elements.end(), other.elements.begin(),
-		other.elements.end());
+	for (size_t i=0, e=other.size(); i<e; i++)
+		push(other.at(i));
 }
 
 std::string
@@ -722,18 +720,10 @@ as_array_object::size() const
 }
 
 as_value
-as_array_object::at(unsigned int index)
+as_array_object::at(unsigned int index) const
 {
-	if ( index > elements.size()-1 )
-	{
-		return as_value();
-	}
-	else
-	{
-		ValOrNone v = elements[index];
-		if ( v.which() != itemValue ) return as_value();
-		return boost::get<as_value>(v);
-	}
+	if ( index > elements.size()-1 ) return as_value();
+	else return elements[index];
 }
 
 std::auto_ptr<as_array_object>
@@ -762,59 +752,14 @@ as_array_object::slice(unsigned int start, unsigned int one_past_end)
 
 }
 
-std::auto_ptr<as_array_object>
-as_array_object::splice(unsigned start, unsigned len,
-		const std::vector<as_value>& replace)
-{
-	assert(len <= size()-start);
-	assert(start <= size());
-
-#ifdef GNASH_DEBUG
-	std::stringstream ss;
-	ss << "Array.splice(" << start << ", " << len << ", ";
-	std::ostream_iterator<as_value> ostrIter(ss, "," ) ;
-	std::copy(replace.begin(), replace.end(), ostrIter);
-        ss << ") called";
-	log_debug("%s", ss.str().c_str());
-	log_debug(_("Current array is %s"), toString().c_str());
-#endif
-
-	container::iterator itStart = elements.begin()+start;
-	container::iterator itEnd = itStart+len;
-
-	// This will be returned...
-	std::auto_ptr<as_array_object> ret(new as_array_object);
-	
-	// If something has to be removed do it and assign
-	// to the returned object
-	if ( itStart != itEnd )
-	{
-		ret->elements.assign(itStart, itEnd);
-
-		elements.erase(itStart, itEnd);
-	}
-
-	// Now insert the new stuff, if needed
-	if ( ! replace.empty() )
-	{
-		container::iterator itStart = elements.begin()+start;
-		elements.insert(itStart, replace.begin(), replace.end());
-	}
-
-	return ret;
-}
-
 bool
 as_array_object::removeFirst(const as_value& v)
 {
 	for (iterator it = elements.begin(); it != elements.end(); ++it)
 	{
-		ValOrNone x = *it;
-		if ( x.which() != itemValue ) continue;
-		
-		if ( v.equals(boost::get<as_value>(x)) )
+		if ( v.equals(*it) )
 		{
-			elements.erase(it);
+			splice(it.index(), 1);
 			return true;
 		}
 	}
@@ -828,12 +773,14 @@ as_array_object::get_member(string_table::key name, as_value *val,
 {
 	// an index has been requested
 	int index = index_requested(name);
-	if ( index >= 0 && (unsigned int)index < elements.size() )
+
+	if ( index >= 0 ) // a valid index was requested
 	{
-		ValOrNone x = elements[index];
-		if ( x.which() == itemValue )
+		size_t i = index;
+		const_iterator it = elements.find(i);
+		if ( it != elements.end() && it.index() == i )
 		{
-			*val = boost::get<as_value>(x); 
+			*val = *it;
 			return true;
 		}
 	}
@@ -871,7 +818,7 @@ as_array_object::set_member(string_table::key name,
 	// if we were sent a valid array index and not a normal member
 	if (index >= 0)
 	{
-		if (index >= int(elements.size()))
+		if ( size_t(index) >= elements.size() )
 		{
 			// if we're setting index (x), the vector
 			// must be size (x+1)
@@ -882,6 +829,7 @@ as_array_object::set_member(string_table::key name,
 		elements[index] = val;
 		return;
 	}
+
 
 	as_object::set_member_default(name,val, nsname);
 }
@@ -959,9 +907,8 @@ array_splice(const fn_call& fn)
 		replace.push_back(fn.arg(i));
 	}
 
-	std::auto_ptr<as_array_object> spliced ( array->splice(startoffset, len, replace) );
-
-	boost::intrusive_ptr<as_object> ret = spliced.release();
+	as_array_object* ret = new as_array_object();
+	array->splice(startoffset, len, &replace, ret);
 
 	return as_value(ret);
 }
@@ -1084,12 +1031,8 @@ array_sortOn(const fn_call& fn)
 		for (as_array_object::const_iterator it = props->begin();
 			it != props->end(); ++it)
 		{
-			as_array_object::ValOrNone v = *it;
-			if ( v.which() == as_array_object::itemValue )
-			{
-				string_table::key s = st.find(PROPNAME(boost::get<as_value>(v).to_string_versioned(sv)));
-				prp.push_back(s);
-			}
+			string_table::key s = st.find(PROPNAME((*it).to_string_versioned(sv)));
+			prp.push_back(s);
 		}
 		
 		// case: sortOn(["prop1", "prop2"])
@@ -1306,7 +1249,10 @@ array_concat(const fn_call& fn)
 	boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
 
 	// use copy ctor
-	as_array_object* newarray = new as_array_object(*array);
+	as_array_object* newarray = new as_array_object();
+
+	for (size_t i=0, e=array->size(); i<e; i++)
+		newarray->push(array->at(i));
 
 	for (unsigned int i=0; i<fn.nargs; i++)
 	{
@@ -1571,13 +1517,87 @@ as_array_object::enumerateNonProperties(as_environment& env) const
 	// TODO: only actually defined elements should be pushed on the env
 	//       but we currently have no way to distinguish between defined
 	//       and non-defined elements
-	for (unsigned int i=0; i<size(); ++i)
+	for (const_iterator it = elements.begin(),
+		itEnd = elements.end(); it != itEnd; ++it)
 	{
-		if ( elements[i].which() == itemValue )
-		{
-			env.push(as_value(i));
-		}
+			env.push(as_value(it.index()));
 	}
+}
+
+void
+as_array_object::shiftElementsLeft(unsigned int count)
+{
+	container& v = elements;
+
+	if ( count >= v.size() )
+	{
+		v.clear();
+		return;
+	}
+
+	for (unsigned int i=0; i<count; ++i) v.erase_element(i);
+
+	for (container::iterator i=v.begin(), e=v.end(); i!=e; ++i)
+	{
+		int currentIndex = i.index();
+		int newIndex = currentIndex-count;
+		v[newIndex] = *i;
+	}
+	v.resize(v.size()-count);
+}
+
+void
+as_array_object::shiftElementsRight(unsigned int count)
+{
+	container& v = elements;
+
+	v.resize(v.size()+count);
+    	for (container::reverse_iterator i=v.rbegin(), e=v.rend(); i!=e; ++i)
+	{
+		int currentIndex = i.index();
+		int newIndex = currentIndex+count;
+		v[newIndex] = *i;
+	}
+	while (count--) v.erase_element(count);
+}
+
+void
+as_array_object::splice(unsigned int start, unsigned int count, const std::vector<as_value>* replace, as_array_object* receive)
+{
+	size_t sz = elements.size();
+
+	assert ( start <= sz );
+	assert ( start+count <= sz );
+
+	size_t newsize = sz-count;
+	if ( replace ) newsize += replace->size();
+	container newelements(newsize);
+
+	size_t ni=0;
+
+	// add initial portion
+	for (size_t i=0; i<start; ++i )
+		newelements[ni++] = elements[i];
+
+	// add replacement, if any
+	if ( replace )
+	{
+		for (size_t i=0, e=replace->size(); i<e; ++i) 
+			newelements[ni++] = replace->at(i);
+	}	
+
+	// add final portion
+	for (size_t i=start+count; i<sz; ++i )
+		newelements[ni++] = elements[i];
+
+	// push trimmed data to the copy array, if any
+	if ( receive )
+	{
+		for (size_t i=start; i<start+count; ++i )
+			receive->push(elements[i]);
+	}
+
+	elements = newelements;
 }
 
 #ifdef GNASH_USE_GC
@@ -1586,11 +1606,7 @@ as_array_object::markReachableResources() const
 {
 	for (const_iterator i=elements.begin(), e=elements.end(); i!=e; ++i)
 	{
-		ValOrNone v = *i;
-		if ( v.which() == itemValue )
-		{
-			boost::get<as_value>(v).setReachable();
-		}
+		(*i).setReachable();
 	}
 	markAsObjectReachable();
 }

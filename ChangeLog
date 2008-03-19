@@ -1,5 +1,13 @@
 2008-03-18 Sandro Santilli <strk@keybit.net>
 
+	* server/array.{cpp,h}: use boost's mapped_vector for a sparse
+	  array implementation. Saves space at some cpu cycles till all
+	  gaps are filled (which happens by most modifiers, as an expected
+	  behaviour :/).
+	* testsuite/actionscript.all/array.as: successes in gaps filling.
+
+2008-03-18 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/array.as:
 	  test splice() and members access on a sparse array.
 

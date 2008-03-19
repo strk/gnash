@@ -23,6 +23,7 @@
 #include <deque>
 #include <vector>
 #include <memory> // for auto_ptr
+#include <boost/numeric/ublas/vector_sparse.hpp>
 
 #include <string>
 
@@ -62,9 +63,10 @@ public:
 
 	enum { itemBlank, itemValue };
 
-	typedef boost::variant<blank, as_value> ValOrNone;
+	//typedef boost::variant<blank, as_value> ValOrNone;
+	//typedef std::deque<ValOrNone> container;
 
-	typedef std::deque<ValOrNone> container;
+	typedef boost::numeric::ublas::mapped_vector<as_value> container;
 
 	typedef container::const_iterator const_iterator;
 	typedef container::iterator iterator;
@@ -78,10 +80,10 @@ public:
 		// NOTE: we copy the elements as the visitor might call arbitrary code
 		//       possibly modifying the container itself.
 		container copy = elements;
+
+		// iterating this way will skip holes
 		for (iterator i=copy.begin(), ie=copy.end(); i!=ie; ++i)
-		{
-			if ( i->which() == itemValue ) v.visit(boost::get<as_value>(*i));
-		}
+			v.visit(*i);
 	}
 
 	/// Sort flags
@@ -133,7 +135,7 @@ public:
 
 	as_value pop();
 
-	as_value at(unsigned int index);
+	as_value at(unsigned int index) const;
 
 	as_array_object* get_indices(std::deque<indexed_as_value> origElems);
 
@@ -191,6 +193,9 @@ public:
 	//
 	/// Return true if any element was removed, false otherwise
 	///
+	/// NOTE: if an element is removed, holes in the array will be
+	///       filled.
+	///
 	/// @param v
 	///	The value to compare elements against
 	///
@@ -200,27 +205,24 @@ public:
 	bool removeFirst(const as_value& v);
 
 	/// \brief
-	/// Substitute 'len' elements from 'start' with elements from
-	/// the given array.
+	/// Replace count elements from start with given values, optionally
+	/// returning the erased ones.
 	//
-	/// NOTE: assertions are:
-	///
-	///	assert(len <= size()-start);
-	///	assert(start <= size());
-	///
 	/// @param start
-	///	0-index based offset of first element to replace.
+	///	First element to remove. Will abort if invalid.
 	///
-	/// @param len
-	///	Number of elements to replace.
+	/// @param count
+	///	Number of elements to remove. Will abort if > then available.
 	///
-	/// @param replacement
-	///	The element to use as replacement
+	/// @param replace
+	///	If not null, use as a replacement for the cutted values
 	///
-	/// TODO: should we return by intrusive_ptr instead ?
+	/// @param copy
+	///	If not null, an array to push cutted values to.
 	///
-	std::auto_ptr<as_array_object> splice(unsigned start, unsigned len,
-			const std::vector<as_value>& replacement);
+	void splice(unsigned int start, unsigned int count, 
+			const std::vector<as_value>* replace=NULL,
+			as_array_object* copy=NULL);
 
 	/// \brief
 	/// Sort the array, using given values comparator
@@ -255,8 +257,12 @@ public:
 
 		size_t oldSize = elements.size(); // custom comparator might change input size
 		nelem.sort(avc);
-		elements.assign(nelem.begin(), nelem.end());
-		resize(oldSize);
+		elements.resize(oldSize, false);
+		size_t idx=0;
+		for (ValueList::iterator i=nelem.begin(), e=nelem.end(); i!=e; ++i)
+		{
+			elements[idx++] = *i;
+		};
 	}
 
 	/// \brief
@@ -305,8 +311,12 @@ public:
 		if (std::adjacent_find(nelem.begin(), nelem.end(), ave) != nelem.end() )
 			return as_value(0);
 
-		elements.assign(nelem.begin(), nelem.end());
-		resize(oldSize);
+		elements.resize(oldSize, false);
+		size_t idx=0;
+		for (ValueList::iterator i=nelem.begin(), e=nelem.end(); i!=e; ++i)
+		{
+			elements[idx++] = *i;
+		};
 
 		return as_value(this);
 	}
@@ -388,6 +398,19 @@ private:
 	// if the string does not refer to an index, or an appropriate int if the string does refer to an index
 	int index_requested(string_table::key name);
 
+	/// Shift all elements to the left by count positions
+	//
+	/// Pre-condition: size of the array must be >= count
+	/// Post-condition: size of the array will reduce by 'count'
+	///
+	void shiftElementsLeft(unsigned int count);
+
+	/// Shift all elements to the right by count positions
+	//
+	/// Pre-condition: none
+	/// Post-condition: size of the array will incremented by 'count'
+	///
+	void shiftElementsRight(unsigned int count);
 };
 
 
