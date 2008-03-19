@@ -19,7 +19,7 @@
 // Initial test written by Mike Carlson
 
 
-rcsid="$Id: array.as,v 1.52 2008/03/19 08:53:52 strk Exp $";
+rcsid="$Id: array.as,v 1.53 2008/03/19 09:01:28 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Array), 'function');
@@ -524,8 +524,29 @@ check_equals ( portion.toString(), "");
 portion = concatted.slice(zero, two);
 check_equals ( portion.toString(), "0,1");
 
+//------------------------------------------------------
+// Test Array.concat 
+//------------------------------------------------------
+
+sparse1 = new Array();
+sparse1[3] = 'a3';
+
+sparse2 = new Array();
+sparse2[2] = 'b2';
+
+csp = sparse1.concat(sparse2);
+
+count=0; for (var i in sparse1) count++;
+check_equals(count, 1);
+
+count=0; for (var i in sparse2) count++;
+check_equals(count, 1);
+
+count=0; for (var i in csp) count++;
+xcheck_equals(count, 7); // concat filled any holes
+
 //-------------------------------
-// Test splice
+// Test Array.splice
 //-------------------------------
 
 ary = [0,1,2,3,4,5];
@@ -1257,11 +1278,11 @@ check_equals(a["Infinite"], 'inf');
 
 
 #if OUTPUT_VERSION < 6
- check_totals(443);
+ check_totals(446);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(483);
+  check_totals(486);
 # else
-  check_totals(493);
+  check_totals(496);
 # endif
 #endif

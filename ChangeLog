@@ -1,7 +1,7 @@
 2008-03-18 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/array.as:
-	  test reverse() and join() on a sparse array.
+	  test reverse(), join() and concat() on a sparse array.
 
 2008-03-18 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
