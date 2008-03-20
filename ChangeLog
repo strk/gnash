@@ -1,5 +1,14 @@
 2008-03-20 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/sprite_definition.cpp (read):
+	  If DefineSprite contains less SHOWFRAME then advertised
+	  in header, still pretend all of the advertised frames
+	  were loaded. This should be safe, and makes FlowPlayer
+	  progress further (it exports an asset that advertise
+	  1 frame and contains NO showframe tag).
+
+2008-03-20 Sandro Santilli <strk@keybit.net>
+
 	* server/character.{cpp,h}: add a virtual getMovieInfo.
 	* server/movie_root.{cpp,h}: delegate character info gathering
 	  to the characters themselves. 
