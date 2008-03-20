@@ -671,7 +671,7 @@ public:
 
 #ifdef USE_MENUS
     typedef std::pair<std::string, std::string> StringPair;
-    void getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator& it);
+    void getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it);
 #endif
 
 private:

@@ -993,6 +993,49 @@ character::boundsInClippingArea() const
   return gnash::render::bounds_in_clipping_area(mybounds);  
 }
 
+#ifdef USE_MENUS
+void
+character::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it)
+{
+	const std::string yes = _("yes");
+	const std::string no = _("no");
+
+	it = tr.append_child(it, StringPair(getTarget(), typeName(*this)));
+
+
+	std::ostringstream os;
+	os << get_depth();
+	tr.append_child(it, StringPair(_("Depth"), os.str()));
+
+        /// Don't add if the character has no ratio value
+        if (get_ratio() >= 0)
+        {
+            os.str("");
+            os << get_ratio();
+	        tr.append_child(it, StringPair(_("Ratio"), os.str()));
+	    }	    
+
+        /// Don't add if it's not a real clipping depth
+        if (int cd = get_clip_depth() != noClipDepthValue )
+        {
+		os.str("");
+		if (cd == dynClipDepthValue) os << "Dynamic mask";
+		else os << cd;
+
+		tr.append_child(it, StringPair(_("Clipping depth"), os.str()));	    
+        }
+
+        os.str("");
+        os << get_width() << "x" << get_height();
+	tr.append_child(it, StringPair(_("Dimensions"), os.str()));	
+
+	tr.append_child(it, StringPair(_("Dynamic"), isDynamic() ? yes : no));	
+	tr.append_child(it, StringPair(_("Mask"), isMaskLayer() ? yes : no));	    
+	tr.append_child(it, StringPair(_("Destroyed"), isDestroyed() ? yes : no));
+	tr.append_child(it, StringPair(_("Unloaded"), isUnloaded() ? yes : no));
+}
+#endif
+
 
 } // namespace gnash
 

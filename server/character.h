@@ -34,6 +34,9 @@
 #include "log.h"
 #include "snappingrange.h"
 #include "Range2d.h"
+#ifdef USE_MENUS
+# include "tree.hh"
+#endif
 
 #include <map>
 #include <cstdarg>
@@ -66,6 +69,7 @@ public:
 	// action_buffer is externally owned
 	typedef std::vector<const action_buffer*> BufferList;
 	typedef std::map<event_id, BufferList> Events;
+	typedef std::pair<std::string, std::string> StringPair; // ifdef USE_MENU...
 
 private:
 
@@ -1142,6 +1146,19 @@ public: // istn't this 'public' reduntant ?
 	/// for input textfields.
 	///
 	virtual bool isSelectableTextField() const { return false; }
+
+#ifdef USE_MENUS
+	/// Append character info in the tree
+	//
+	/// @param tr
+	///	The tree to append movie to
+	///
+	/// @param it
+	///	The iterator to append info to.
+	///
+	virtual void getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it);
+#endif
+
 };
 
 
@@ -1151,6 +1168,7 @@ public: // istn't this 'public' reduntant ?
 #ifdef DEBUG_SET_INVALIDATED
 #define set_invalidated() set_invalidated(__FILE__, __LINE__)
 #endif
+
 
 #endif // GNASH_CHARACTER_H
 

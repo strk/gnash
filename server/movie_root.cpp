@@ -1907,7 +1907,7 @@ movie_root::isLevelTarget(const std::string& name, unsigned int& levelno)
 
 #ifdef USE_MENUS
 void
-movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator& it)
+movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it)
 {
 
     const std::string yes = _("yes");
@@ -1958,44 +1958,12 @@ movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator& it)
     os << _liveChars.size();
     localIter = tr.append_child(it, StringPair(_("Live characters"), os.str()));
 
-    /// Live characters tree
+	/// Live characters tree
 	for (LiveChars::const_iterator i=_liveChars.begin(), e=_liveChars.end();
 	                                                           i != e; ++i)
 	{
-	    tree<StringPair>::iterator charIter = tr.append_child(localIter,
-	                    StringPair((*i)->getTarget(), typeName(*(*i))));
-
-        os.str("");
-        os << (*i)->get_depth();
-	    tr.append_child(charIter, StringPair(_("Depth"), os.str()));
-
-        /// Don't add if the character has no ratio value
-        if ((*i)->get_ratio() >= 0)
-        {
-            os.str("");
-            os << (*i)->get_ratio();
-	        tr.append_child(charIter, StringPair(_("Ratio"), os.str()));
-	    }	    
-
-        /// Don't add if it's not a real clipping depth
-        if (int cd = (*i)->get_clip_depth() != -1000000 )
-        {
-            os.str("");
-            if (cd == -2000000) os << "Dynamic mask";
-            else os << cd;
-
-	        tr.append_child(charIter, StringPair(_("Clipping depth"), os.str()));	    
-        }
-
-        os.str("");
-        os << (*i)->get_width() << "x" << (*i)->get_height();
-	    tr.append_child(charIter, StringPair(_("Dimensions"), os.str()));	
-
-	    tr.append_child(charIter, StringPair(_("Dynamic"), (*i)->isDynamic() ? yes : no));	
-	    tr.append_child(charIter, StringPair(_("Mask"), (*i)->isMaskLayer() ? yes : no));	    
-	    tr.append_child(charIter, StringPair(_("Destroyed"), (*i)->isDestroyed() ? yes : no));
-	    tr.append_child(charIter, StringPair(_("Unloaded"), (*i)->isUnloaded() ? yes : no));
-    }
+	    (*i)->getMovieInfo(tr, localIter);
+	}
 
 }
 #endif

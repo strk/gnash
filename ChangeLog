@@ -1,3 +1,9 @@
+2008-03-20 Sandro Santilli <strk@keybit.net>
+
+	* server/character.{cpp,h}: add a virtual getMovieInfo.
+	* server/movie_root.{cpp,h}: delegate character info gathering
+	  to the characters themselves. 
+
 2008-03-19  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* libbase/network.cpp: Close the listener file descript too before
