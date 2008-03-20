@@ -1,3 +1,8 @@
+2008-03-19  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libbase/network.cpp: Close the listener file descript too before
+	restarting a connection.
+
 2008-03-19 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (restart): only stop streaming
@@ -29,6 +34,9 @@
 	* testsuite/swfdec/PASSING: eight passing tests with newlines.
 
 2008-03-19  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* configure.ac: Add --enable-statistics, to turn on performance
+	statistics gathering.
 
 	* libbase/network.cpp: Actually use the timeout parameter to set
 	the timeout. Turn off overly verbose debugging.

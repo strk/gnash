@@ -73,7 +73,7 @@ Network::Network()
 	_debug(false),
 	_timeout(0)
 {
-    //GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 #if defined(HAVE_WINSOCK_H) && !defined(__OS2__)
     WORD wVersionRequested;
     WSADATA wsaData;
@@ -88,7 +88,7 @@ Network::Network()
 
 Network::~Network()
 {
-    //GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 #if defined(HAVE_WINSOCK_H) && !defined(__OS2__)
     WSACleanup();
 #else
@@ -617,6 +617,7 @@ Network::closeConnection(void)
 
     closeConnection(_sockfd);
     _sockfd = 0;
+    closeConnection(_listenfd);
     _listenfd = 0;
     _connected = false;
 
