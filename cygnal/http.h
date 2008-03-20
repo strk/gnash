@@ -203,8 +203,8 @@ public:
     // These accessors are used mostly just for debugging.
     bool keepAlive() { return _keepalive; }
     int getFileSize() { return _filesize; }
-    std::string getFilespec() { return _filespec; }
-    std::string getURL() { return _url; }
+    std::string &getFilespec() { return _filespec; }
+    std::string &getURL() { return _url; }
     std::map<int, struct status_codes *> getStatusCodes()
 	{ return _status_codes; }
     std::string getVersion() { return _version; }

@@ -43,13 +43,13 @@ namespace cygnal
 Handler::Handler()
     : _die(false), _netfd(0)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 }
 
 Handler::~Handler()
 {
-    GNASH_REPORT_FUNCTION;
-    closeNet();
+//    GNASH_REPORT_FUNCTION;
+    closeConnection();
     _die = true;
     notifyout();
     notifyin();
@@ -159,6 +159,7 @@ Handler::start(thread_params_t *args)
     _incoming.setName("Incoming");
     _outgoing.setName("Outgoing");
 //    toggleDebug(true);		// FIXME:
+    closeNet();
     createServer(args->port);
     while (retries-- > 0) {
 	log_debug(_("%s: Starting Handlers for port %d"), __PRETTY_FUNCTION__, args->port);
@@ -166,20 +167,16 @@ Handler::start(thread_params_t *args)
 	args->netfd = getFileFd();
 	args->handle = this;
 
-	log_debug("Starting thread 1");
 	boost::thread handler(boost::bind(&httphandler, args));
 
-#if 1
-	log_debug("Starting thread 2");
 	boost::thread outport(boost::bind(&netout_handler, args));
-#endif
 	
-	log_debug("Starting thread 3");
 	boost::thread inport(boost::bind(&netin_handler, args));
 	inport.join();    
-//	outport.join();
+	outport.join();
 	handler.join();
 	if (_die) {
+	    log_debug("Handler done...");
 	    break;
 	}
     }
@@ -202,8 +199,7 @@ netin_handler(Handler::thread_params_t *args)
 
     Handler *hand = reinterpret_cast<Handler *>(args->handle);
 
-    int retries = 3;
-    while (retries-- >  0) {
+    do {
 	Buffer *buf = new Buffer;
 	int ret = hand->readNet(buf->reference(), buf->size());
 	if (ret >= 0) {
@@ -215,11 +211,12 @@ netin_handler(Handler::thread_params_t *args)
 //  	    cerr << str << endl;
 	    hand->notify();
 	} else {
-	    log_debug("exiting, no data");
+	    log_debug("no more data, exiting...");
 	    hand->die();
 	    break;
 	}
-    }
+    } while (!hand->timetodie());
+    log_debug("Net In handler done...");
     hand->notify();
     hand->clearall();
 //    hand->dump();
@@ -241,6 +238,7 @@ netout_handler(Handler::thread_params_t *args)
 	    delete buf;
 	}
 	if (hand->timetodie()) {
+	    log_debug("Net Out handler done...");
 	    break;
 	}
     } while (ret >= 0);    

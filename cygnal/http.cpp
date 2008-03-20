@@ -52,7 +52,7 @@ namespace cygnal
 static const int readsize = 1024;
 
 HTTP::HTTP() 
-    : _filesize(0), _port(80), _keepalive(false), _handler(0)
+    : _filesize(0), _port(80), _keepalive(true), _handler(0)
 {
 //    GNASH_REPORT_FUNCTION;
 //    struct status_codes *status = new struct status_codes;
@@ -115,6 +115,11 @@ HTTP::waitForGetRequest()
 //    _handler->wait();
     Buffer *buf = _handler->pop();
 
+    if (buf == 0) {
+	log_debug("Que empty, net connection dropped");
+	return "";
+    }
+    
 //    const char *ptr = reinterpret_cast<const char *>(buf->reference());
 //     if (readNet(buffer, readsize) > 0) {
 //         log_debug (_("Read initial GET Request"));
@@ -133,7 +138,7 @@ HTTP::waitForGetRequest()
     extractConnection(buf);
     extractEncoding(buf);
     extractTE(buf);
-//    dump();
+    dump();
 
 //     // See if we got a legit GET request
 //     if (strncmp(ptr, "GET ", 4) == 0) {
@@ -162,14 +167,14 @@ HTTP::formatHeader(int filesize, const short type)
 //    GNASH_REPORT_FUNCTION;
 
     _header << "HTTP/1.1 200 OK" << endl;
-    this->formatServer();
-    this->formatDate();
-    this->formatConnection("close");
+    formatServer();
+    formatDate();
+//    this->formatConnection("Keep-alive"); // this is the default for HTTP 1.1
 //     _header << "Accept-Ranges: bytes" << endl;
-    this->formatContentLength(filesize);
-    this->formatContentType();
+    formatContentLength(filesize);
+    formatContentType();
     // All HTTP messages are followed by a blank line.
-    this->terminateHeader();
+    terminateHeader();
     return true;
 }
 
@@ -813,6 +818,7 @@ HTTP::getFileStats(std::string &filespec)
 		continue;
 	    } else { 		// not a directory
 		log_debug("%s is not a directory\n", actual_filespec.c_str());
+		_filespec = actual_filespec;
 		string::size_type pos;
 		pos = filespec.rfind(".");
 		if (pos != string::npos) {
@@ -893,20 +899,28 @@ httphandler(Handler::thread_params_t *args)
     Handler *hand = reinterpret_cast<Handler *>(args->handle);
     HTTP www;
     www.setHandler(hand);
-    
-    hand->wait();
 
-//     www.toggleDebug(true);
+    string docroot = args->filespec;
     
-// 	log_debug(_("%s: Thread for port %d looping..."), __PRETTY_FUNCTION__, args->port);
-
-	string docroot = args->filespec;
+    while (!hand->timetodie()) {	
+ 	log_debug(_("Waiting for GET request..."));
+	hand->wait();
+#ifdef USE_STATISTICS
+	struct timespec start;
+	clock_gettime (CLOCK_REALTIME, &start);
+#endif
 	
 // 	conndata->statistics->setFileType(NetStats::RTMPT);
 // 	conndata->statistics->startClock();
 //	args->netfd = www.getFileFd();
 	url = docroot;
-	url += www.waitForGetRequest();
+	string str = www.waitForGetRequest();
+	if (str.size() == 0) {
+	    hand->die();
+//	    log_debug("Net HTTP done...");
+	    return;
+	}
+	url += str;
 	pos = url.find("?");
 	filespec = url.substr(0, pos);
 	parameters = url.substr(pos + 1, url.size());
@@ -926,15 +940,22 @@ httphandler(Handler::thread_params_t *args)
 //	st.setBytes(www.getBytesIn() + www.getBytesOut());
 //	conndata->statistics->addStats();
 	
+	if (filespec[filespec.size()-1] == '/') {
+	    filespec += "/index.html";
+	}
 	if (url != docroot) {
 	    log_debug (_("File to load is: %s"), filespec.c_str());
 	    log_debug (_("Parameters are: %s"), parameters.c_str());
 	    struct stat st;
 	    int filefd, ret;
+#ifdef USE_STATISTICS
+	    struct timespec start;
+	    clock_gettime (CLOCK_REALTIME, &start);
+#endif
 	    if (stat(filespec.c_str(), &st) == 0) {
 		filefd = ::open(filespec.c_str(), O_RDONLY);
 		log_debug (_("File \"%s\" is %lld bytes in size."), filespec,
-			   (long long int) st.st_size);
+			   st.st_size);
 		do {
 		    Buffer *buf = new Buffer;
 		    ret = read(filefd, buf->reference(), buf->size());
@@ -942,23 +963,53 @@ httphandler(Handler::thread_params_t *args)
 			delete buf;
 			break;
 		    }
+		    if (ret != buf->size()) {
+			buf->resize(ret);
+		    }
 //		    log_debug("Read %d bytes from %s.", ret, filespec);
+#if 0
 		    hand->pushout(buf);
 		    hand->notifyout();
+#else
+		    // Don't bother with the outgoing que
+		    if (ret > 0) {
+			ret = hand->writeNet(buf);
+		    }
+		    delete buf;
+#endif
 		} while(ret > 0);
+		// See if this is a persistant connection
+		if (!www.keepAlive()) {
+		    log_debug("Keep-Alive is off", www.keepAlive());
+// 		    hand->closeConnection();
+ 		}
+#ifdef USE_STATISTICS
+		struct timespec end;
+		clock_gettime (CLOCK_REALTIME, &end);
+		log_debug("Read %d bytes from \"%s\" in %g seconds",
+			  st.st_size, filespec,
+			  (float)((end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1000000.0)));
+#endif
 	    }
 // 	    memset(args->filespec, 0, 256);
 // 	    memcpy(->filespec, filespec.c_str(), filespec.size());
 // 	    boost::thread sendthr(boost::bind(&stream_thread, args));
 // 	    sendthr.join();
 	}
-	// See if this is a persistant connection
-// 	if (!www.keepAlive()) {
-// 	    www.closeConnection();
-// 	}
+#ifdef USE_STATISTICS
+	struct timespec end;
+	clock_gettime (CLOCK_REALTIME, &end);
+	log_debug("Processing time for GET request was %g seconds",
+		  (float)((end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1000000.0)));
+#endif
 //	conndata->statistics->dump();
 //    }
-}
+    } // end of while retries
+    
+    log_debug("Net HTTP done...");
+    
+} // end of httphandler
+    
 } // end of extern C
 
 } // end of cygnal namespace

@@ -25,12 +25,14 @@
 #include <deque>
 
 #include "log.h"
+#include "gmemory.h"
 #include "buffer.h"
 #include "cque.h"
 
 using namespace gnash;
 using namespace std;
 using namespace boost;
+
 
 namespace cygnal
 {
@@ -106,7 +108,7 @@ Buffer *
 CQue::pop()
 {
 //    GNASH_REPORT_FUNCTION;
-    Buffer *buf;
+    Buffer *buf = 0;
     boost::mutex::scoped_lock lock(_mutex);
     if (_que.size()) {
         buf = _que.front();

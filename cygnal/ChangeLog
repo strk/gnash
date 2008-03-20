@@ -1,5 +1,16 @@
+
 2008-03-19  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* buffer.{h,cpp}: Add support for optional performance testing
+	statistics 
+	* cque.cpp: Set the returned buffer to zero if the mutex has an
+	error.
+	* cygnal.cpp: Rn forever, restarting connections after the
+	disconnect.
+	* handler.cpp: Trap mutex errors.
+	* http.cpp: Tweak the handling of persistant connections.  Add
+	statistics gathering.
+	
 	* buffer.cpp, cque.cpp: Turn off overly verbose debug now that
 	cygnal works again.
 	* handler.cpp: Rearrange when the Handler gets created. Start the
@@ -10,7 +21,7 @@
 	* http.cpp: Turn off overly verbose debug now that cygnal works
 	again. Read the file specified in the GET request and stick it in
 	the output que.
-	
+
 2008-03-18  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* buffer.{h,cpp}: Add a few ::copy methods to put data into a

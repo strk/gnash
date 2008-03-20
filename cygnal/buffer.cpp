@@ -38,7 +38,10 @@ Buffer::init(size_t nbytes)
         // easier to ready hex dumps in GDB,
         empty();
     }
-    
+
+#ifdef USE_STATISTICS
+    clock_gettime (CLOCK_REALTIME, &_stamp);
+#endif
     return _ptr;
 }
 
@@ -64,6 +67,13 @@ Buffer::~Buffer()
 {
 //    GNASH_REPORT_FUNCTION;
     if (_ptr) {
+#ifdef USE_STATISTICS
+	struct timespec now;
+	clock_gettime (CLOCK_REALTIME, &now);
+	log_debug("Buffer %x (%d) stayed in queue for %g seconds",
+		  (void *)_ptr, _nbytes,
+		  (float)((now.tv_sec - _stamp.tv_sec) + ((now.tv_nsec - _stamp.tv_nsec)/1000000.0)));
+#endif
         delete[] _ptr;
         _ptr = 0;
         _nbytes = 0;

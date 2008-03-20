@@ -21,6 +21,8 @@
 
 #include <boost/cstdint.hpp>
 #include <string>
+#include <time.h>
+
 #include "network.h"
 
 // _definst_ is the default instance name
@@ -67,6 +69,9 @@ private:
     void *init(size_t nbytes);
     gnash::Network::byte_t *_ptr;
     int         _nbytes;
+#if USE_STATISTICS
+    struct timespec _stamp;	// used for timing how long data stays in the queue.
+#endif
 };
 
 
