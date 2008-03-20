@@ -99,6 +99,12 @@ public:
         TRACE,
         CONNECT
     } http_method_e;
+    typedef enum {
+	OPEN,
+	SEND,
+	IDLE,
+	CLOSE
+    } rtmpt_cmd_e;
     struct status_codes {
         const char *code;
         const char *msg;
@@ -111,6 +117,7 @@ public:
 	VIDEO,
 	AUDIO,
 	MP3,
+	FCS,
 	OSCP
     } filetype_e;
     HTTP();
@@ -121,13 +128,24 @@ public:
     
     // Handle the GET request response
     bool sendGetReply(http_status_e code);
+    bool sendPostReply(rtmpt_cmd_e code);
 //    bool sendGetReply(Network &net);
 
     // Make copies of ourself
     HTTP &operator = (HTTP &obj);
 
+    // These methods extract data from an RTMPT message. RTMP is an
+    // extension to HTTP that adds commands to manipulate the
+    // connection's persistance.
+    rtmpt_cmd_e extractRTMPT(gnash::Network::byte_t *data);
+    rtmpt_cmd_e extractRTMPT(Buffer *data)
+	{ return extractRTMPT(data->reference()); };
+
     // These methods extract the fields in the HTTP header.
     // These all return the number of items found, or 0
+    http_method_e extractCommand(gnash::Network::byte_t *data);
+    http_method_e extractCommand(Buffer *data)
+	{ return extractCommand(data->reference()); };
     int extractAccept(gnash::Network::byte_t *data);
     int extractAccept(Buffer *data)
 	{ return extractAccept(data->reference()); };
@@ -259,6 +277,9 @@ private:
     // Connection parameters we care about
     bool	_keepalive;
     Handler     *_handler;
+    // These two field hold the data from an RTMPT message
+    int	        _clientid;
+    int	        _index;
 //    bool	_te;
 };  
 

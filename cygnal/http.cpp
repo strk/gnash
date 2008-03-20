@@ -34,6 +34,7 @@
 #include <cstring>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <algorithm>
 
 #include "http.h"
 #include "log.h"
@@ -52,7 +53,12 @@ namespace cygnal
 static const int readsize = 1024;
 
 HTTP::HTTP() 
-    : _filesize(0), _port(80), _keepalive(true), _handler(0)
+    : _filesize(0),
+      _port(80),
+      _keepalive(true),
+      _handler(0),
+      _clientid(0),
+      _index(0)
 {
 //    GNASH_REPORT_FUNCTION;
 //    struct status_codes *status = new struct status_codes;
@@ -84,6 +90,8 @@ HTTP::clearHeader()
     _te.clear();
     _accept.clear();
     _filesize = 0;
+    _clientid = 0;
+    _index = 0;
     return true;
 }
 
@@ -120,14 +128,8 @@ HTTP::waitForGetRequest()
 	return "";
     }
     
-//    const char *ptr = reinterpret_cast<const char *>(buf->reference());
-//     if (readNet(buffer, readsize) > 0) {
-//         log_debug (_("Read initial GET Request"));
-//     } else {
-//         log_error (_("Couldn't read initial GET Request"));
-//     }
-
     clearHeader();
+    extractCommand(buf);    
     extractAccept(buf);
     extractMethod(buf);
     extractReferer(buf);
@@ -140,14 +142,7 @@ HTTP::waitForGetRequest()
     extractEncoding(buf);
     extractTE(buf);
 //    dump();
-
-//     // See if we got a legit GET request
-//     if (strncmp(ptr, "GET ", 4) == 0) {
-//         log_debug (_("Got legit GET request"));
-//     } else {
-//         log_error (_("Got bogus GET request"));
-//     }
-
+    
     _filespec = _url;
     return _url;
 }
@@ -317,6 +312,9 @@ HTTP::formatContentType(filetype_e filetype)
       case MP3:
 	  _header << "Content-Type: audio/mpeg" << "\r\n";
 	  break;
+      case FCS:
+	  _header << "Content-Type: application/x-fcs" << "\r\n";
+	  break;
       default:
 	  _header << "Content-Type: text/html" << "\r\n";
 //	  _header << "Content-Type: text/html; charset=UTF-8" << "\r\n";
@@ -460,6 +458,38 @@ HTTP::sendGetReply(http_status_e code)
 }
 
 bool
+HTTP::sendPostReply(rtmpt_cmd_e code)
+{
+    GNASH_REPORT_FUNCTION;
+
+    _header << "HTTP/1.1 200 OK" << "\r\n";
+    formatDate();
+    formatServer();
+    formatContentType(HTTP::FCS);
+    // All HTTP messages are followed by a blank line.
+    terminateHeader();
+    return true;
+
+#if 0
+    formatHeader(_filesize, code);
+    Buffer *buf = new Buffer;
+    if (_header.str().size()) {
+	buf->resize(_header.str().size());
+	string str = _header.str();
+	buf->copy(str);
+	_handler->pushout(buf);
+	_handler->notifyout();
+        log_debug (_("Sent GET Reply"));
+	return true; // Default to true
+    } else {
+	clearHeader();
+	log_debug (_("Couldn't send POST Reply, no header data"));
+    }
+#endif
+    return false;
+}
+
+bool
 HTTP::formatRequest(const string &url, http_method_e req)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -537,6 +567,123 @@ HTTP::extractAccept(Network::byte_t *data) {
     return _accept.size();
 }
 
+/// These methods extract data from an RTMPT message. RTMP is an
+/// extension to HTTP that adds commands to manipulate the
+/// connection's persistance.
+//
+/// The URL to be opened has the following form:
+/// http://server/<comand>/[<client>/]<index>
+/// <command>
+///    denotes the RTMPT request type, "OPEN", "SEND", "IDLE", "CLOSE")
+/// <client>
+///    specifies the id of the client that performs the requests
+///    (only sent for established sessions)
+/// <index>
+///    is a consecutive number that seems to be used to detect missing packages
+HTTP::rtmpt_cmd_e
+HTTP::extractRTMPT(gnash::Network::byte_t *data)
+{
+    GNASH_REPORT_FUNCTION;
+
+    string body = reinterpret_cast<const char *>(data);
+    string tmp, cid, indx;
+    HTTP::rtmpt_cmd_e cmd;
+
+    // force the case to make comparisons easier
+    std::transform(body.begin(), body.end(), body.begin(), 
+               (int(*)(int)) toupper);
+    string::size_type start, end;
+
+    // Extract the command first
+    start = body.find("OPEN", 0);
+    if (start != string::npos) {
+        cmd = HTTP::OPEN;
+    }
+    start = body.find("SEND", 0);
+    if (start != string::npos) {
+        cmd = HTTP::SEND;
+    }
+    start = body.find("IDLE", 0);
+    if (start != string::npos) {
+        cmd = HTTP::IDLE;
+    }
+    start = body.find("CLOSE", 0);
+    if (start != string::npos) {
+        cmd = HTTP::CLOSE;
+    }
+
+    // Extract the optional client id
+    start = body.find("/", start+1);
+    if (start != string::npos) {
+	end = body.find("/", start+1);
+	if (end != string::npos) {
+	    indx = body.substr(end, body.size());
+	    cid = body.substr(start, (end-start));
+	} else {
+	    cid = body.substr(start, body.size());
+	}
+    }
+
+    _index = strtol(indx.c_str(), NULL, 0);
+    _clientid = strtol(cid.c_str(), NULL, 0);
+    end =  body.find("\r\n", start);
+//     if (end != string::npos) {
+//         cmd = HTTP::CLOSE;
+//     }
+
+    return cmd;
+}
+
+HTTP::http_method_e
+HTTP::extractCommand(gnash::Network::byte_t *data)
+{
+    GNASH_REPORT_FUNCTION;
+
+    string body = reinterpret_cast<const char *>(data);
+    HTTP::http_method_e cmd;
+
+    // force the case to make comparisons easier
+//     std::transform(body.begin(), body.end(), body.begin(), 
+//                (int(*)(int)) toupper);
+    string::size_type start, end;
+
+    // Extract the command
+    start = body.find("GET", 0);
+    if (start != string::npos) {
+        cmd = HTTP::GET;
+    }
+    start = body.find("POST", 0);
+    if (start != string::npos) {
+        cmd = HTTP::POST;
+    }
+    start = body.find("HEAD", 0);
+    if (start != string::npos) {
+        cmd = HTTP::HEAD;
+    }
+    start = body.find("CONNECT", 0);
+    if (start != string::npos) {
+        cmd = HTTP::CONNECT;
+    }
+    start = body.find("TRACE", 0);
+    if (start != string::npos) {
+        cmd = HTTP::TRACE;
+    }
+    start = body.find("OPTIONS", 0);
+    if (start != string::npos) {
+        cmd = HTTP::OPTIONS;
+    }
+    start = body.find("PUT", 0);
+    if (start != string::npos) {
+        cmd = HTTP::PUT;
+    }
+    start = body.find("DELETE", 0);
+    if (start != string::npos) {
+        cmd = HTTP::DELETE;
+    }
+
+    return cmd;
+}
+
 string
 HTTP::extractAcceptRanges(Network::byte_t *data) {
 //    GNASH_REPORT_FUNCTION;
@@ -553,7 +700,7 @@ HTTP::extractAcceptRanges(Network::byte_t *data) {
         return "error";
     }
     
-    _referer = body.substr(start+pattern.size(), end-start-1);
+    _acceptranges = body.substr(start+pattern.size(), end-start-1);
     return _acceptranges;    
 }
 
@@ -1006,6 +1153,10 @@ HTTP::dump() {
     for (it = _te.begin(); it != _te.end(); it++) {
         log_debug("TE param: \"%s\"", (*(it)).c_str());
     }
+
+    // Dump the RTMPT fields
+    log_debug("RTMPT optional index is: ", _index);
+    log_debug("RTMPT optional client ID is: ", _clientid);
     log_debug (_("==== ==== ===="));
 }
 

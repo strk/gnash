@@ -1,5 +1,8 @@
 2008-03-20  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* http.{h.cpp}: Add support for RTMPT, which is an extension to
+	HTTP 1.0. Parse the RTMPT commands from the header.
+
 	* http.{h,cpp}: Add support for more header fields, Accept-Range,
 	Last-Modified, Keep-Alive. Use "\r\n" instead of endl for header
 	fileds, as the two byte sequence is required by HTTP.
