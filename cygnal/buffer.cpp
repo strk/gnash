@@ -70,9 +70,9 @@ Buffer::~Buffer()
 #ifdef USE_STATISTICS
 	struct timespec now;
 	clock_gettime (CLOCK_REALTIME, &now);
-	log_debug("Buffer %x (%d) stayed in queue for %g seconds",
+	log_debug("Buffer %x (%d) stayed in queue for %f seconds",
 		  (void *)_ptr, _nbytes,
-		  (float)((now.tv_sec - _stamp.tv_sec) + ((now.tv_nsec - _stamp.tv_nsec)/1000000.0)));
+		  (float)((now.tv_sec - _stamp.tv_sec) + ((now.tv_nsec - _stamp.tv_nsec)/1e9)));
 #endif
         delete[] _ptr;
         _ptr = 0;

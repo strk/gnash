@@ -86,7 +86,8 @@ public:
         SERVICE_UNAVAILABLE = 503,
         GATEWAY_TIMEOUT = 504,
         HTTP_VERSION_NOT_SUPPORTED = 505,
-	LIFE_IS_GOOD = 1234
+	LIFE_IS_GOOD = 1234,
+	CLOSEPIPE = 1235
     } http_status_e;
     typedef enum {
         OPTIONS,
@@ -130,6 +131,9 @@ public:
     int extractAccept(gnash::Network::byte_t *data);
     int extractAccept(Buffer *data)
 	{ return extractAccept(data->reference()); };
+    std::string extractAcceptRanges(gnash::Network::byte_t *data);
+    std::string extractAcceptRanges(Buffer *data)
+	{ return extractAcceptRanges(data->reference()); };
     int extractLanguage(gnash::Network::byte_t *data);
     int extractLanguage(Buffer *data)
 	{ return extractLanguage(data->reference()); };
@@ -144,6 +148,9 @@ public:
 	{ return extractTE(data->reference()); };
     int extractConnection(gnash::Network::byte_t *data);
     int extractConnection(Buffer *data)
+	{ return extractConnection(data->reference()); };
+    int extractKeepAlive(gnash::Network::byte_t *data);
+    int extractKeepAlive(Buffer *data)
 	{ return extractConnection(data->reference()); };
 
     // These return the string that was found for this field.
@@ -163,8 +170,8 @@ public:
     // These methods add data to the fields in the HTTP header.
     // These return true if OK, false if error.
     bool clearHeader();
-    bool formatHeader(int filesize, const short type);
-    bool formatHeader(const short type);
+    bool formatHeader(int filesize, http_status_e type);
+    bool formatHeader(http_status_e type);
     bool formatRequest(const std::string &url, http_method_e req);
     bool formatMethod(const std::string &data);
     bool formatDate();
@@ -172,12 +179,17 @@ public:
     bool formatServer(const std::string &data);
     bool formatReferer(const std::string &data);
     bool formatConnection(const std::string &data);
+    bool formatKeepAlive(const std::string &data);
     bool formatContentLength();
     bool formatContentLength(int filesize);
     bool formatContentType();
     bool formatContentType(filetype_e type);
     bool formatHost(const std::string &data);
     bool formatAgent(const std::string &data);
+    bool formatAcceptRanges(const std::string &data);
+    bool formatLastModified();
+    bool formatLastModified(const std::string &data);
+    bool formatEtag(const std::string &data);
     bool formatLanguage(const std::string &data);
     bool formatCharset(const std::string &data);
     bool formatEncoding(const std::string &data);
@@ -186,7 +198,7 @@ public:
     bool formatErrorResponse(http_status_e err);
     
     // All HTTP messages are terminated with a blank line
-    void terminateHeader() { _header << std::endl; };
+    void terminateHeader() { _header << "\r\n"; };
     
     // Return the header that's been built up.
     std::string getHeader() { return _header.str(); };
@@ -212,6 +224,7 @@ public:
     std::string getReferer() { return _referer; }
     std::vector<std::string> getLanguage() { return _language;  }
     std::vector<std::string> getConnection() { return _connections; }
+    std::vector<std::string> getKeepAlive() { return _kalive; }
     std::vector<std::string> getTE() { return _te; }
     std::vector<std::string> getCharset() { return _charset; }
     std::vector<std::string> getEncoding() { return _encoding; }
@@ -235,12 +248,14 @@ private:
     std::string _host;
     int         _port;
     std::string _agent;
+    std::string _acceptranges;
     std::vector<std::string> _connections;
     std::vector<std::string> _language;
     std::vector<std::string> _charset;
     std::vector<std::string> _encoding;
     std::vector<std::string> _te;
     std::vector<std::string> _accept;
+    std::vector<std::string> _kalive;
     // Connection parameters we care about
     bool	_keepalive;
     Handler     *_handler;

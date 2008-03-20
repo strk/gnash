@@ -695,8 +695,8 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
         }
 
         if (ret == 0) {
-            log_error (_("The socket for fd %d timed out waiting to read"), fd);
-            return -1;
+            log_debug (_("The socket for fd %d timed out waiting to read"), fd);
+            return 0;
         }
 
         ret = read(fd, buffer, nbytes);
@@ -785,7 +785,8 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
         }
 
         if (ret == 0) {
-            log_error (_("The socket for fd %d timed out waiting to write"), fd);
+            log_debug (_("The socket for fd %d timed out waiting to write"), fd);
+	    return 0;
         }
 
         ret = write(fd, bufptr, nbytes);

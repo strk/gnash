@@ -201,8 +201,8 @@ netin_handler(Handler::thread_params_t *args)
 
     do {
 	Buffer *buf = new Buffer;
-	int ret = hand->readNet(buf->reference(), buf->size());
-	if (ret >= 0) {
+	int ret = hand->readNet(buf->reference(), buf->size(), 15);
+	if (ret > 0) {
 	    if (ret != buf->size()) {
 		buf->resize(ret);
 	    }
@@ -234,6 +234,7 @@ netout_handler(Handler::thread_params_t *args)
 	    Buffer *buf = hand->popout();
 //	    log_debug("FIXME: got data in Outgoing que");
 //	    buf->dump();
+//	    ret = hand->writeNet(buf->reference(), buf->size(), 15);
 	    ret = hand->writeNet(buf);
 	    delete buf;
 	}
@@ -241,7 +242,8 @@ netout_handler(Handler::thread_params_t *args)
 	    log_debug("Net Out handler done...");
 	    break;
 	}
-    } while (ret >= 0);    
+    } while (ret > 0);
+    hand->closeConnection();
 }
 
 } // end of extern C

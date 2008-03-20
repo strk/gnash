@@ -136,9 +136,10 @@ HTTP::waitForGetRequest()
     extractLanguage(buf);
     extractCharset(buf);
     extractConnection(buf);
+    extractKeepAlive(buf);
     extractEncoding(buf);
     extractTE(buf);
-    dump();
+//    dump();
 
 //     // See if we got a legit GET request
 //     if (strncmp(ptr, "GET ", 4) == 0) {
@@ -152,7 +153,7 @@ HTTP::waitForGetRequest()
 }
 
 bool
-HTTP::formatHeader(const short type)
+HTTP::formatHeader(http_status_e type)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -162,16 +163,23 @@ HTTP::formatHeader(const short type)
 
 
 bool
-HTTP::formatHeader(int filesize, const short type)
+HTTP::formatHeader(int filesize, http_status_e type)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    _header << "HTTP/1.1 200 OK" << endl;
-    formatServer();
+    _header << "HTTP/1.1 200 OK" << "\r\n";
     formatDate();
-//    this->formatConnection("Keep-alive"); // this is the default for HTTP 1.1
-//     _header << "Accept-Ranges: bytes" << endl;
+    formatServer();
+//     if (type == NONE) {
+// 	formatConnection("close"); // this is the default for HTTP 1.1
+//     }
+//     _header << "Accept-Ranges: bytes" << "\r\n";
+    formatLastModified();
+    formatEtag("24103b9-1c54-ec8632c0"); // FIXME: borrowed from tcpdump
+    formatAcceptRanges("bytes");
     formatContentLength(filesize);
+    formatKeepAlive("timeout=15, max=100");
+    formatConnection("Keep-Alive");
     formatContentType();
     // All HTTP messages are followed by a blank line.
     terminateHeader();
@@ -184,19 +192,19 @@ HTTP::formatErrorResponse(http_status_e code)
 //    GNASH_REPORT_FUNCTION;
 
     // First build the message body, so we know how to set Content-Length
-    _body << "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">" << endl;
-    _body << "<html><head>" << endl;
-    _body << "<title>" << code << " Not Found</title>" << endl;
-    _body << "</head><body>" << endl;
-    _body << "<h1>Not Found</h1>" << endl;
-    _body << "<p>The requested URL " << _filespec << " was not found on this server.</p>" << endl;
-    _body << "<hr>" << endl;
-    _body << "<address>Cygnal (GNU/Linux) Server at localhost Port " << _port << " </address>" << endl;
-    _body << "</body></html>" << endl;
-    _body << endl;
+    _body << "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">" << "\r\n";
+    _body << "<html><head>" << "\r\n";
+    _body << "<title>" << code << " Not Found</title>" << "\r\n";
+    _body << "</head><body>" << "\r\n";
+    _body << "<h1>Not Found</h1>" << "\r\n";
+    _body << "<p>The requested URL " << _filespec << " was not found on this server.</p>" << "\r\n";
+    _body << "<hr>" << "\r\n";
+    _body << "<address>Cygnal (GNU/Linux) Server at localhost Port " << _port << " </address>" << "\r\n";
+    _body << "</body></html>" << "\r\n";
+    _body << "\r\n";
 
     // First build the header
-    _header << "HTTP/1.1 " << code << " Not Found" << endl;
+    _header << "HTTP/1.1 " << code << " Not Found" << "\r\n";
     formatDate();
     formatServer();
     _filesize = _body.str().size();
@@ -212,26 +220,26 @@ HTTP::formatDate()
 //    GNASH_REPORT_FUNCTION;
     boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
     
-//    cout <<  now.time_of_day() << endl;
+//    cout <<  now.time_of_day() << "\r\n";
     
     boost::gregorian::date d(now.date());
 //     boost::gregorian::date d(boost::gregorian::day_clock::local_day());
-//     cout << boost::posix_time::to_simple_string(now) << endl;
-//     cout << d.day_of_week() << endl;
-//     cout << d.day() << endl;
-//     cout << d.year() << endl;
-//     cout << d.month() << endl;
+//     cout << boost::posix_time::to_simple_string(now) << "\r\n";
+//     cout << d.day_of_week() << "\r\n";
+//     cout << d.day() << "\r\n";
+//     cout << d.year() << "\r\n";
+//     cout << d.month() << "\r\n";
     
 //    boost::date_time::time_zone_ptr zone(new posix_time_zone("MST"));
 //    boost::date_time::time_zone_base b(now "MST");
-//    cout << zone.dst_zone_abbrev() << endl;
+//    cout << zone.dst_zone_abbrev() << "\r\n";
 
     _header << "Date: " << d.day_of_week();
     _header << ", " << d.day();
     _header << " "  << d.month();
     _header << " "  << d.year();
     _header << " "  << now.time_of_day();
-    _header << " GMT" << endl;
+    _header << " GMT" << "\r\n";
     return true;
 }
 
@@ -239,7 +247,7 @@ bool
 HTTP::formatServer()
 {
 //    GNASH_REPORT_FUNCTION;
-    _header << "Server: Cygnal (GNU/Linux)" << endl;
+    _header << "Server: Cygnal (GNU/Linux)" << "\r\n";
     return true;
 }
 
@@ -247,7 +255,7 @@ bool
 HTTP::formatServer(const string &data)
 {
 //    GNASH_REPORT_FUNCTION;
-    _header << "Server: " << data << endl;
+    _header << "Server: " << data << "\r\n";
     return true;
 }
 
@@ -255,7 +263,7 @@ bool
 HTTP::formatMethod(const string &data)
 {
 //    GNASH_REPORT_FUNCTION;
-    _header << "Method: " << data << endl;
+    _header << "Method: " << data << "\r\n";
     return true;
 }
 
@@ -263,7 +271,7 @@ bool
 HTTP::formatReferer(const string &refer)
 {
 //    GNASH_REPORT_FUNCTION;
-    _header << "Referer: " << refer << endl;
+    _header << "Referer: " << refer << "\r\n";
     return true;
 }
 
@@ -271,7 +279,15 @@ bool
 HTTP::formatConnection(const string &options)
 {
 //    GNASH_REPORT_FUNCTION;
-    _header << "Connection: " << options << endl;
+    _header << "Connection: " << options << "\r\n";
+    return true;
+}
+
+bool
+HTTP::formatKeepAlive(const string &options)
+{
+//    GNASH_REPORT_FUNCTION;
+    _header << "Keep-Alive: " << options << "\r\n";
     return true;
 }
 
@@ -288,20 +304,22 @@ HTTP::formatContentType(filetype_e filetype)
     
     switch (filetype) {
       case HTML:
-	  _header << "Content-Type: text/html; charset=UTF-8" << endl;
+	  _header << "Content-Type: text/html" << "\r\n";
+//	  _header << "Content-Type: text/html; charset=UTF-8" << "\r\n";
 	  break;
       case SWF:
-	  _header << "Content-Type: application/x-shockwave-flash" << endl;
-//	  _header << "Content-Type: application/futuresplash" << endl;
+	  _header << "Content-Type: application/x-shockwave-flash" << "\r\n";
+//	  _header << "Content-Type: application/futuresplash" << "\r\n";
 	  break;
       case VIDEO:
-	  _header << "Content-Type: video/flv" << endl;
+	  _header << "Content-Type: video/flv" << "\r\n";
 	  break;
       case MP3:
-	  _header << "Content-Type: audio/mpeg" << endl;
+	  _header << "Content-Type: audio/mpeg" << "\r\n";
 	  break;
       default:
-	  _header << "Content-Type: text/html; charset=UTF-8" << endl;
+	  _header << "Content-Type: text/html" << "\r\n";
+//	  _header << "Content-Type: text/html; charset=UTF-8" << "\r\n";
     }
     return true;
 }
@@ -310,7 +328,7 @@ bool
 HTTP::formatContentLength()
 {
 //    GNASH_REPORT_FUNCTION;
-    _header << "Content-Length: " << _filesize << endl;
+    _header << "Content-Length: " << _filesize << "\r\n";
     return true;
 }
 
@@ -318,7 +336,7 @@ bool
 HTTP::formatContentLength(int filesize)
 {
 //    GNASH_REPORT_FUNCTION;
-    _header << "Content-Length: " << filesize << endl;
+    _header << "Content-Length: " << filesize << "\r\n";
     return true;
 }
 
@@ -326,7 +344,7 @@ bool
 HTTP::formatHost(const string &host)
 {
 //    GNASH_REPORT_FUNCTION;
-    _header << "Host: " << host << endl;
+    _header << "Host: " << host << "\r\n";
     return true;
 }
 
@@ -334,8 +352,49 @@ bool
 HTTP::formatAgent(const string &agent)
 {
 //    GNASH_REPORT_FUNCTION;
-    _header << "User-Agent: " << agent << endl;
+    _header << "User-Agent: " << agent << "\r\n";
     return true;
+}
+
+bool
+HTTP::formatAcceptRanges(const string &range)
+{
+//    GNASH_REPORT_FUNCTION;
+    _header << "Accept-Ranges: " << range << "\r\n";
+    return true;
+}
+
+bool
+HTTP::formatEtag(const string &tag)
+{
+//    GNASH_REPORT_FUNCTION;
+    _header << "Etag: " << tag << "\r\n";
+    return true;
+}
+
+bool
+HTTP::formatLastModified(const string &date)
+{
+    _header << "Last-Modified: " << date << "\r\n";
+}
+
+bool
+HTTP::formatLastModified()
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
+    stringstream date;
+    
+    boost::gregorian::date d(now.date());
+    
+    date << d.day_of_week();
+    date << ", " << d.day();
+    date << " "  << d.month();
+    date << " "  << d.year();
+    date << " "  << now.time_of_day();
+    date << " GMT";
+
+    return formatLastModified(date.str());
 }
 
 bool
@@ -344,7 +403,7 @@ HTTP::formatLanguage(const string &lang)
 //    GNASH_REPORT_FUNCTION;
 
     // For some browsers this appears to also be Content-Language
-    _header << "Accept-Language: " << lang << endl;
+    _header << "Accept-Language: " << lang << "\r\n";
     return true;
 }
 
@@ -353,7 +412,7 @@ HTTP::formatCharset(const string &set)
 {
 //    GNASH_REPORT_FUNCTION;
     // For some browsers this appears to also be Content-Charset
-    _header << "Accept-Charset: " << set << endl;
+    _header << "Accept-Charset: " << set << "\r\n";
     return true;
 }
 
@@ -361,7 +420,7 @@ bool
 HTTP::formatEncoding(const string &code)
 {
 //    GNASH_REPORT_FUNCTION;
-    _header << "Accept-Encoding: " << code << endl;
+    _header << "Accept-Encoding: " << code << "\r\n";
     return true;
 }
 
@@ -369,7 +428,7 @@ bool
 HTTP::formatTE(const string &te)
 {
 //    GNASH_REPORT_FUNCTION;
-    _header << "TE: " << te << endl;
+    _header << "TE: " << te << "\r\n";
     return true;
 }
 
@@ -378,7 +437,7 @@ HTTP::sendGetReply(http_status_e code)
 {
     GNASH_REPORT_FUNCTION;
     
-    formatHeader(_filesize, HTML);
+    formatHeader(_filesize, code);
 //    int ret = Network::writeNet(_header.str());
     Buffer *buf = new Buffer;
 //    Network::byte_t *ptr = (Network::byte_t *)_body.str().c_str();
@@ -407,18 +466,18 @@ HTTP::formatRequest(const string &url, http_method_e req)
 
     _header.str("");
 
-    _header << req << " " << url << "HTTP/1.1" << endl;
-    _header << "User-Agent: Opera/9.01 (X11; Linux i686; U; en)" << endl;
-    _header << "Accept: text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/jpeg, image/gif, image/x-xbitmap, */*;q=0.1" << endl;
+    _header << req << " " << url << "HTTP/1.1" << "\r\n";
+    _header << "User-Agent: Opera/9.01 (X11; Linux i686; U; en)" << "\r\n";
+    _header << "Accept: text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/jpeg, image/gif, image/x-xbitmap, */*;q=0.1" << "\r\n";
 
-    _header << "Accept-Language: en" << endl;
-    _header << "Accept-Charset: iso-8859-1, utf-8, utf-16, *;q=0.1" << endl;
+    _header << "Accept-Language: en" << "\r\n";
+    _header << "Accept-Charset: iso-8859-1, utf-8, utf-16, *;q=0.1" << "\r\n";
     
-    _header << "Accept-Encoding: deflate, gzip, x-gzip, identity, *;q=0" << endl;
-    _header << "Referer: " << url << endl;
+    _header << "Accept-Encoding: deflate, gzip, x-gzip, identity, *;q=0" << "\r\n";
+    _header << "Referer: " << url << "\r\n";
 
-    _header << "Connection: Keep-Alive, TE" << endl;
-    _header << "TE: deflate, gzip, chunked, identity, trailers" << endl;
+    _header << "Connection: Keep-Alive, TE" << "\r\n";
+    _header << "TE: deflate, gzip, chunked, identity, trailers" << "\r\n";
     return true;
 }
 // bool
@@ -476,6 +535,26 @@ HTTP::extractAccept(Network::byte_t *data) {
     }
 
     return _accept.size();
+}
+
+string
+HTTP::extractAcceptRanges(Network::byte_t *data) {
+//    GNASH_REPORT_FUNCTION;
+    
+    string body = reinterpret_cast<const char *>(data);
+    string::size_type start, end, length, pos;
+    string pattern = "Accept-Ranges: ";
+    start = body.find(pattern, 0);
+    if (start == string::npos) {
+        return "error";
+    }
+    end =  body.find("\r\n", start);
+    if (end == string::npos) {
+        return "error";
+    }
+    
+    _referer = body.substr(start+pattern.size(), end-start-1);
+    return _acceptranges;    
 }
 
 string
@@ -561,9 +640,52 @@ HTTP::extractConnection(Network::byte_t *data) {
 	string substr = body.substr(start, length);
 //	printf("FIXME: \"%s\"\n", substr.c_str());
 	_connections.push_back(substr);
-	if (substr == "Keep-Alive") {
+	// Opera uses upper case first letters, Firefox doesn't.
+	if ((substr == "Keep-Alive") || (substr == "keep-alive")) {
 	    _keepalive = true;
 	}
+	start = pos;
+    }
+
+    return _connections.size();
+}
+
+int
+HTTP::extractKeepAlive(Network::byte_t *data) {
+//    GNASH_REPORT_FUNCTION;
+    
+    string body = reinterpret_cast<const char *>(data);
+    string::size_type start, end, length, pos;
+    string pattern = "Keep-Alive: ";
+    
+    start = body.find(pattern, 0);
+    if (start == string::npos) {
+        return -1;
+    }
+    end =  body.find("\r\n", start);
+    if (end == string::npos) {
+	end = body.find("\n", start);
+//	    return "error";
+    }
+
+    length = end-start-pattern.size();
+    start = start+pattern.size();
+    string _connection = body.substr(start, length);
+    pos = start;
+    while (pos <= end) {
+	pos = (body.find(",", start) + 2);
+	if (pos <= start) {
+	    return _encoding.size();
+	}
+	if ((pos == string::npos) || (pos > end)) {
+	    length = end - start;
+	} else {
+	    length = pos - start - 2;
+	}
+	string substr = body.substr(start, length);
+//	printf("FIXME: \"%s\"\n", substr.c_str());
+	_kalive.push_back(substr);
+	_keepalive = true;	// if we get this header setting, we want to keep alive
 	start = pos;
     }
 
@@ -803,7 +925,7 @@ HTTP::getFileStats(std::string &filespec)
 
     while (try_again) {
 	try_again = false;
-//	cerr << "Trying to open " << actual_filespec << endl;
+//	cerr << "Trying to open " << actual_filespec << "\r\n";
 	if (stat(actual_filespec.c_str(), &st) == 0) {
 	    // If it's a directory, then we emulate what apache
 	    // does, which is to load the index.html file in that
@@ -967,7 +1089,7 @@ httphandler(Handler::thread_params_t *args)
 			buf->resize(ret);
 		    }
 //		    log_debug("Read %d bytes from %s.", ret, filespec);
-#if 0
+#if 1
 		    hand->pushout(buf);
 		    hand->notifyout();
 #else
@@ -986,9 +1108,9 @@ httphandler(Handler::thread_params_t *args)
 #ifdef USE_STATISTICS
 		struct timespec end;
 		clock_gettime (CLOCK_REALTIME, &end);
-		log_debug("Read %d bytes from \"%s\" in %g seconds",
+		log_debug("Read %d bytes from \"%s\" in %f seconds",
 			  st.st_size, filespec,
-			  (float)((end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1000000.0)));
+			  (float)((end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1e9)));
 #endif
 	    }
 // 	    memset(args->filespec, 0, 256);
@@ -999,8 +1121,8 @@ httphandler(Handler::thread_params_t *args)
 #ifdef USE_STATISTICS
 	struct timespec end;
 	clock_gettime (CLOCK_REALTIME, &end);
-	log_debug("Processing time for GET request was %g seconds",
-		  (float)((end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1000000.0)));
+	log_debug("Processing time for GET request was %f seconds",
+		  (float)((end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1e9)));
 #endif
 //	conndata->statistics->dump();
 //    }
