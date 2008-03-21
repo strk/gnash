@@ -40,6 +40,7 @@
 
 //#define GNASH_DEBUG 
 
+using namespace std;
 
 namespace gnash {
 
