@@ -47,10 +47,6 @@
 #	define snprintf _snprintf
 #endif
 
-#ifdef HAVE_FINITE
-#define isfinite finite
-#endif
-
 // Define the macro below to make abstract equality operator verbose
 //#define GNASH_DEBUG_EQUALITY 1
 
