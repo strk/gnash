@@ -102,6 +102,9 @@ case "${host}" in
   i*86-*-openbsd*)
     openbsd_os=openbsd
     ;;
+  *-cygwin* | *-mingw* | *-pw32*)
+    windows=yes
+    ;;
   *64-*-openbsd*)
     openbsd_os=openbsd 
     AC_DEFINE([WORDSIZE], [64], [this is a 64 platform])
@@ -109,6 +112,7 @@ case "${host}" in
 esac
 
 AM_CONDITIONAL(PLUGIN_LINK_UNDEFINED, test x$openbsd_os = xopenbsd)
+AM_CONDITIONAL(WIN32, test x$windows = xyes)
 
 dnl Get build date for helping us debugging
 BUILDDATE="`date +%Y%m%d`"
@@ -339,8 +343,22 @@ AC_ARG_ENABLE(cygnal,
   no)  cygnal=no ;;
   *)   AC_MSG_ERROR([bad value ${enableval} for enable-cygnal option]) ;;
 esac],cygnal=no)
-
 AM_CONDITIONAL(CYGNAL, test x$cygnal = xyes)
+
+dnl Build adding statistics collecting on both memory and performance.
+dnl Warning: this can be a performance hit by itself, due to the overhead
+dnl of collecting and storing the information.
+AC_ARG_ENABLE(statistics,
+  AC_HELP_STRING([--enable-statistics], [Enable statistics gathering]),
+[case "${enableval}" in
+  yes) statistics=yes
+       AC_DEFINE(USE_STATISTICS, [1], [Collect statistics on memopry and performance])
+       ;;
+  no)  statistics=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for enable-statistics option]) ;;
+esac],statistics=no)
+
+AM_CONDITIONAL(STATISTICS, test x$statistics = xyes)
 
 dnl Fix the Intel 810 LOD bias problem
 AC_ARG_ENABLE(i810-lod-bias,

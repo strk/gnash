@@ -1,3 +1,7 @@
+2008-03-21  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* configure.ac: Add conditional for win32 builds.
+
 2008-03-21 Sandro Santilli <strk@keybit.net>
 
 	* server/array.cpp, testsuite/server/AsValueTest.cpp:
@@ -7,6 +11,11 @@
 
 	* server/array.cpp: Fix compilation of isfinite.
 	* testsuite/server/AsValueTest.cpp: Fix compilation of isfinite.
+
+2008-03-20  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libbase/network.cpp: Return a 0 if the socket is never available
+	for writing.
 
 2008-03-20 Sandro Santilli <strk@keybit.net>
 
@@ -25,7 +34,7 @@
 
 2008-03-19  Rob Savoye  <rob@ripple.welcomehome.org>
 
-	* libbase/network.cpp: Close the listener file descript too before
+	* libbase/network.cpp: Close the listener file descriptor too before
 	restarting a connection.
 
 2008-03-19 Sandro Santilli <strk@keybit.net>
