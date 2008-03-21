@@ -1,3 +1,8 @@
+2008-03-21 Sandro Santilli <strk@keybit.net>
+
+	* server/array.cpp, testsuite/server/AsValueTest.cpp:
+	  Revert Markus patch (error: 'finite' is not a member of 'std').
+
 2008-03-21 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/array.cpp: Fix compilation of isfinite.
