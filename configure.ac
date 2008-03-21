@@ -83,6 +83,14 @@ case "${host}" in
     AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["SCO"], [Default 3-letter platform identifier for version string])
     AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["SCO/Unix"], [Default value for System.capabilities.os])
     ;;
+  *-irix*)
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["IRX"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["IRIX"], [Default value for System.capabilities.os])
+    ;;
+  *-hpux*)
+    AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["HPX"], [Default 3-letter platform identifier for version string])
+    AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["HPUX"], [Default value for System.capabilities.os])
+    ;;    
   *)
     AC_DEFINE([DEFAULT_FLASH_PLATFORM_ID], ["UNK"], [Default 3-letter platform identifier for version string])
     AC_DEFINE([DEFAULT_FLASH_SYSTEM_OS], ["Unknown"], [Default value for System.capabilities.os])
