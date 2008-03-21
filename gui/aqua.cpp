@@ -15,6 +15,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+<<<<<<< aqua.cpp
+// 
+//
+
+/* $Id: aqua.cpp,v 1.31 2008/03/21 04:37:54 nihilus Exp $ */
+=======
+>>>>>>> 1.30
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -40,7 +47,8 @@ extern "C"{
 
 namespace gnash {
 
-WindowRef	myWindow;
+/* Main window widget */
+WindowRef myWindow = NULL;
 
 pascal OSStatus DoWindowClose (EventHandlerCallRef  nextHandler,
                                EventRef             theEvent,
@@ -87,7 +95,7 @@ bool AquaGui::run()
     RepositionWindow(myWindow, NULL, kWindowCascadeOnMainScreen);
     SelectWindow(myWindow);
     ShowWindow(myWindow);
-    
+	SetWindowModified(myWindow, false);
     RunApplicationEventLoop();
     return true;
 }
@@ -102,7 +110,7 @@ void AquaGui::renderBuffer()
       InvalWindowRect (myWindow,  &rectPort); // force redrow
 }
 
-bool AquaGui::init(int argc, char ***argv)
+bool AquaGui::init(int argc, char **argv[]) /* Self-explainatory */
 {
 
 	OSErr err;
@@ -159,9 +167,10 @@ void AquaGui::setCursor(gnash_cursor_type newcursor)
 
 bool AquaGui::createWindow(const char* title, int width, int height)
 {
-	CFStringRef	windowTitle;
+	CFStringRef	windowTitle = NULL;
 	OSStatus	result;
-	Rect		theBounds;
+	Rect		theBounds = {0, 0, 0, 0};
+
 	EventTypeSpec     eventType;                 // Specifier for event type
 	EventHandlerUPP   handlerUPP;                // Pointer to event handler routine
  
@@ -173,10 +182,10 @@ bool AquaGui::createWindow(const char* title, int width, int height)
                        | kWindowStandardHandlerAttribute,
                     	&theBounds,
                     	&myWindow);
-                    	
+
 	windowTitle = CFStringCreateWithCString(NULL, title, NULL);
 	result = SetWindowTitleWithCFString(myWindow, windowTitle);
-	CFRelease (windowTitle);                    	
+	if(windowTitle != NULL)CFRelease(windowTitle);
 
 	createMenu();
 	
@@ -206,7 +215,6 @@ bool AquaGui::createMenu()
 	/* Enable 'About' */
 	InsertMenuItemTextWithCFString(rApplicationMenu, CFSTR("About gnash"), (short) 0, 0, kHICommandAbout);
 
-	//HIAboutBox(NULL);	
 	return true;
 }
 
