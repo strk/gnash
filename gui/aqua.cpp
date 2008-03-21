@@ -15,13 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-<<<<<<< aqua.cpp
-// 
-//
-
-/* $Id: aqua.cpp,v 1.31 2008/03/21 04:37:54 nihilus Exp $ */
-=======
->>>>>>> 1.30
+/* $Id: aqua.cpp,v 1.32 2008/03/21 04:59:51 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
