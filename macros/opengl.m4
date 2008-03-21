@@ -91,7 +91,7 @@ AC_DEFUN([GNASH_PATH_OPENGL],
       ac_cv_path_opengl_lib="-framework Carbon -framework ApplicationServices -framework OpenGL -framework AGL"
     else
       if test x"${ac_cv_path_opengl_lib}" = x; then
-        newlist="/System/Library/Frameworks/OpenGL.framework/Libraries ${libslist}"
+        newlist="/System/Library/Frameworks/OpenGL.framework/Versions/Current/Libraries /System/Library/Frameworks/OpenGL.framework/Libraries ${libslist}"
         for i in $newlist; do
           if test -f $i/libGL.${shlibext} -o -f $i/libGL.a; then
             if test ! x"$i" = x"/usr/lib" -a ! x"$i" = x"/usr/lib64"; then
@@ -129,6 +129,10 @@ AC_DEFUN([GNASH_PATH_OPENGL],
       OPENGL_LIBS="${ac_cv_path_opengl_lib}"
   else
       OPENGL_LIBS=""
+  fi
+  
+  if test x"${darwin}" = xyes; then
+	  OPENGL_LIBS="${OPENGL_LIBS} -dylib_file /System/Library/Frameworks/OpenGL.framework/Versions/Current/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/Current/Libraries/libGL.dylib"
   fi
 
   AC_SUBST(OPENGL_CFLAGS)

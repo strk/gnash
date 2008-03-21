@@ -10,6 +10,7 @@
 2008-03-21 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* configure.ac: added tags for HP-UX and IRIX.
+	* macros/opengl.m4: Fixed OGL-linking on OS X Leopard.
 	* server/array.cpp: Fix compilation of isfinite.
 	* testsuite/server/AsValueTest.cpp: Fix compilation of isfinite.
 
