@@ -47,6 +47,8 @@
 #	define snprintf _snprintf
 #endif
 
+using namespace std;
+
 // Define the macro below to make abstract equality operator verbose
 //#define GNASH_DEBUG_EQUALITY 1
 
