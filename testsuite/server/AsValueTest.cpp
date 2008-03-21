@@ -31,6 +31,10 @@
 
 using namespace gnash;
 
+#ifndef isfinite
+# define isfinite std::isfinite
+#endif
+
 int
 main(int /*argc*/, char** /*argv*/)
 {
