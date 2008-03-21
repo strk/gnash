@@ -24,6 +24,7 @@
 #include <iostream>
 #include <sstream>
 #include <cassert>
+#include <cmath>
 #include <string>
 
 #include "check.h"
@@ -40,21 +41,21 @@ main(int /*argc*/, char** /*argv*/)
 	num /= 9999999;
 
 	check(!isnan(num));
-        check(isfinite(num));
+        check(std::isfinite(num));
 
 	num = std::numeric_limits<float>::quiet_NaN();
 
 	check(isnan(num));
-	check(!isfinite(num));
+	check(!std::isfinite(num));
 
 	num = std::numeric_limits<float>::infinity();
 	
 	check(!isnan(num));
-	check(!isfinite(num));
+	check(!std::isfinite(num));
 
 	num = 1.0 / 0.0;
 
-	check(!isfinite(num));
+	check(!std::isfinite(num));
 	check(!isnan(num));
 
 	int intgr = num;
@@ -62,7 +63,7 @@ main(int /*argc*/, char** /*argv*/)
 	num = intgr;
 
 	check(!isnan(num));
-	check(isfinite(num));
+	check(std::isfinite(num));
 
 }
 
