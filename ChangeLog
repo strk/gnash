@@ -1,3 +1,7 @@
+2008-03-21 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* server/array.cpp: Fix compilation of isfinite.
+
 2008-03-20 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/sprite_definition.cpp (read):
