@@ -582,6 +582,8 @@ tu_file::read_string(char* dst, int max_length)
 
 #ifdef _WIN32
 #define vsnprintf	_vsnprintf
+// gettext 0.17 redefines printf in libintl.h which confuses cpp 3.x
+#undef printf
 #endif // _WIN32
 
 int	tu_file::printf(const char* fmt, ...)
