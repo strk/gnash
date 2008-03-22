@@ -5,7 +5,8 @@
 	* libbase/postscript{cpp, h}: Unused garbage as well as PD-
 	  licensed. On demand we'll write our own implementation.
 	
-	* libbase/utf8.h: Added DSOEXPORT to definations.
+	* libbase/utf8.h, libmedia/ffmpeg/ffmpegNetStreamUtil.h: 
+	  Added DSOEXPORT to definations.
 
 2008-03-22  Dossy Shiobara <dossy@panoptic.com>
 

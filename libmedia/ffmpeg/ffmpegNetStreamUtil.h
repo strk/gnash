@@ -26,6 +26,7 @@
 #endif
 
 #include "log.h"
+#include "tu_config.h" //For DSOEXPORT
 
 #ifdef USE_FFMPEG
 extern "C" {
@@ -49,9 +50,9 @@ namespace media {
 class raw_mediadata_t
 {
 public:
-	raw_mediadata_t();
+	DSOEXPORT raw_mediadata_t();
 
-	~raw_mediadata_t();
+	DSOEXPORT ~raw_mediadata_t();
 
 	int m_stream_index;
 	boost::uint32_t m_size;
@@ -180,9 +181,9 @@ private:
 class AudioResampler
 {
 public:
-	AudioResampler();
+	DSOEXPORT AudioResampler();
 
-	~AudioResampler();
+	DSOEXPORT ~AudioResampler();
 	
 	/// Initializes the resampler
 	//
@@ -191,7 +192,7 @@ public:
 	///
 	/// @return true if resampling is needed, if not false
 	///
-	bool init(AVCodecContext* ctx);
+	DSOEXPORT bool init(AVCodecContext* ctx);
 	
 	/// Resamples audio
 	//
@@ -206,7 +207,7 @@ public:
 	///
 	/// @return the number of samples in the output data.
 	///
-	int resample(
+	DSOEXPORT int resample(
 		boost::int16_t* input, boost::int16_t* output, int samples
 	);
 
