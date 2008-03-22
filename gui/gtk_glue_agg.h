@@ -25,6 +25,8 @@
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
 
+#undef ENABLE_MIT_SHM
+
 // Experimental support for MIT-SHM
 // see http://www.xfree86.org/current/mit-shm.html
 // currently has some problems, see https://savannah.gnu.org/bugs/?20301
@@ -61,10 +63,12 @@ class GtkAggGlue : public GtkGlue
 #ifdef ENABLE_MIT_SHM
     XImage *_shm_image;
     XShmSegmentInfo *_shm_info;
-#endif    
     
     /// Checks if the MIT-SHM extension is available (supported by the server)
     bool check_mit_shm(Display *display);
+#else
+    bool check_mit_shm(void *display);
+#endif    
     
     /// Tries to create a SHM image. 
     ///

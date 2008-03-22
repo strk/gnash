@@ -97,7 +97,11 @@ GtkAggGlue::init(int /*argc*/, char **/*argv*/[])
 {
     gdk_rgb_init();
     
+#ifdef ENABLE_MIT_SHM
     _have_shm = check_mit_shm(gdk_display);
+#else
+    _have_shm = false;
+#endif
     
     if (!detect_pixelformat()) {
       printf("FATAL: Could not detect the pixel format used by your X server.\n");
@@ -111,7 +115,11 @@ GtkAggGlue::init(int /*argc*/, char **/*argv*/[])
 }
 
 bool 
+#ifdef ENABLE_MIT_SHM
 GtkAggGlue::check_mit_shm(Display *display) 
+#else
+GtkAggGlue::check_mit_shm(void *display) 
+#endif
 {
 #ifdef ENABLE_MIT_SHM
   int major, minor, dummy;
