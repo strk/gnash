@@ -24,7 +24,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "tu_config.h" //For DSOEXPORT
+#include "dsodefs.h" //For DSOEXPORT
 #include "log.h"
 #include "VideoDecoder.h"
 
