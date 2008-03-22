@@ -49,6 +49,10 @@
 
 extern "C"{
 	#include <unistd.h>
+#ifdef _WIN32
+#include <windows.h>
+#define usleep(t) Sleep((t) / 1000)
+#endif
 #ifdef HAVE_GETOPT_H
 	#include <getopt.h>
 #endif
