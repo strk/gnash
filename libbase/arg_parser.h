@@ -43,6 +43,8 @@
 // outside the range of argument - there's no reasonable situation in which that would
 // happen. <bwy>
 
+#include "tu_config.h"
+#include "dsodefs.h"
 #include <sstream>
 
 class Arg_parser
@@ -91,11 +93,11 @@ private:
                            const Option options[], int & argind ) throw();
 
 public:
-  Arg_parser( const int argc, const char * const argv[],
+  DSOEXPORT Arg_parser( const int argc, const char * const argv[],
               const Option options[], const bool in_order = false ) throw();
 
       // Restricted constructor. Parses a single token and argument (if any)
-  Arg_parser( const char * const opt, const char * const arg,
+  DSOEXPORT Arg_parser( const char * const opt, const char * const arg,
               const Option options[] ) throw();
 
   const std::string & error() const throw() { return _error; }
