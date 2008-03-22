@@ -37,6 +37,7 @@ extern "C" {
 #include <vector>
 #include <map> // for composition
 
+#include <iconv.h>
 #include <SDL_audio.h>
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp>
