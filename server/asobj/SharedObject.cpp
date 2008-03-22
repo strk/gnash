@@ -375,7 +375,11 @@ sharedobject_getlocal(const fn_call& fn)
             // TODO: don't fail if the movie url has a component ending with .sol (eh...)
             //
             if (newdir.rfind(".sol") != (newdir.size()-4)) {
+#ifndef _WIN32
                 int ret = mkdir(newdir.c_str(), S_IRUSR|S_IWUSR|S_IXUSR);
+#else
+                int ret = mkdir(newdir.c_str());
+#endif
                 if ((errno != EEXIST) && (ret != 0)) {
                     log_error("Couldn't create directory for .sol files: %s\n\t%s",
                               newdir.c_str(), strerror(errno));
