@@ -32,7 +32,7 @@ SNAPSHOT_TMP = /tmp/gnash-$(NOW)
 # This uses the default version for Gnash. which is 'cvs'. So we
 # rename it to the dir we want to stay clear. Then we change the default
 # version from 'cvs' to a date stamped version of cvs, like '20080202cvs'
-snapshot: distdir dist-hook
+snapshot: distdir
 	-@now=`date "+%Y%m%d"`; \
 	pkgname="gnash-$${now}cvs"; \
 	snapshot_dir="$${pkgname}"; \

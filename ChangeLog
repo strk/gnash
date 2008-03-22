@@ -1,3 +1,7 @@
+2008-03-21 Russ Nelson <nelson@crynwr.com>
+
+	* packaging/snapshot.am: dist-hook not needed anymore.
+
 2008-03-22 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libbase/sharedlib.cpp: Got rid off a couples of compiler warnings.
