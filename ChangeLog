@@ -9,7 +9,7 @@
 	  for DSO{EXPORT, LOCAL} to it's own file.
 	
 	* libbase/utf8.h, libmedia/ffmpeg/ffmpegNetStreamUtil.h,
-	  libmedia/ffmpeg/VideoDecoderFfmpeg.h: 
+	  libmedia/ffmpeg/VideoDecoderFfmpeg.h, libbase/network.h: 
 	  Added DSOEXPORT to definations.
 
 2008-03-22  Dossy Shiobara <dossy@panoptic.com>

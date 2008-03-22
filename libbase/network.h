@@ -33,6 +33,7 @@
 # include <io.h>
 #endif
 
+#include "dsodefs.h" //For DSOEXPORT.
 #include <boost/cstdint.hpp>
 #include <cassert>
 #include <string>
@@ -62,8 +63,8 @@ class Network {
 public:
     typedef boost::uint8_t byte_t;
 
-    Network();
-    ~Network();
+    DSOEXPORT Network();
+    DSOEXPORT ~Network();
     
     // Create a new server. After creating it, then you have to wait
     // for an incoming connection.
@@ -81,7 +82,7 @@ public:
     bool createClient(void);
     bool createClient(short port);
     bool createClient(const std::string &hostname);
-    bool createClient(const std::string &hostname, short port);
+    DSOEXPORT bool createClient(const std::string &hostname, short port);
 
     // Read from the connection
     int readNet(byte_t *buffer, int nbytes);
@@ -97,7 +98,7 @@ public:
     int writeNet(int fd, const byte_t *buffer, int nbytes, int timeout);
     
     // Close the connection
-    bool closeNet();
+    DSOEXPORT bool closeNet();
     bool closeNet(int fd);
     bool closeConnection();
     bool closeConnection(int fd);
