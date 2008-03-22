@@ -15,7 +15,7 @@
 	
 	* libbase/utf8.h, libmedia/ffmpeg/ffmpegNetStreamUtil.h,
 	  libmedia/ffmpeg/VideoDecoderFfmpeg.h, libbase/network.h,
-	  libbase/arg_parser.h: 
+	  libbase/arg_parser.h, server/sprite_instance.h: 
 	  Added DSOEXPORT to definations.
 
 2008-03-22  Dossy Shiobara <dossy@panoptic.com>

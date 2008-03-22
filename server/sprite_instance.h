@@ -33,6 +33,7 @@
 #include "DynamicShape.h" // for composition
 //#include "LoadVariablesThread.h" // for composition
 #include "Range2d.h"
+#include "dsodefs.h" // for DSEXPORT
 
 #include <vector>
 #include <list>
@@ -183,7 +184,7 @@ public:
 	/// If stopped, any stream sound associated with this sprite
 	/// will also be stopped.
 	///
-	void set_play_state(play_state s);
+	DSOEXPORT void set_play_state(play_state s);
 
 	play_state get_play_state() const { return m_play_state; }
 

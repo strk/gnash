@@ -69,8 +69,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "tu_config.h"
-
+//#include "tu_config.h"
 #include "mouse_button_state.h" // for composition
 #include "drag_state.h" // for composition
 #include "movie_instance.h" // for inlines
