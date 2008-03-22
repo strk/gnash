@@ -61,6 +61,10 @@ AM_CPPFLAGS = -I.. \
         $(MYSQL_CFLAGS) \
 	$(NULL)
 
+if WIN32
+ GNASH_LIBS += -lintl -lz -lws2_32
+endif
+
 if USE_FFMPEG_ENGINE
  AM_CPPFLAGS += $(FFMPEG_CFLAGS) \
 		-I$(top_srcdir)/libmedia/ffmpeg 
