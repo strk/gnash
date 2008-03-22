@@ -22,6 +22,11 @@
 #include "gnashconfig.h"
 #endif
 
+#ifdef _WIN32
+#undef DLL_EXPORT
+#define LIBLTDL_DLL_IMPORT 1
+#endif
+
 #include <string>
 #include <map>
 #include <ltdl.h>
