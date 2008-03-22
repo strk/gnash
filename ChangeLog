@@ -1,3 +1,8 @@
+2008-03-22 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* libbase/sharedlib.cpp: Got rid off a couples of compiler warnings.
+							Compare getenv with NULL not 0!.
+
 2008-03-21  Dossy Shiobara <dossy@panoptic.com>
 
 	* libbase/sharedlib.h (1.9): Tweak things so that libltdl works
