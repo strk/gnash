@@ -785,6 +785,78 @@ AM_CONDITIONAL(BUILD_CAIRO_RENDERER, [ test x$build_cairo = xyes ])
 dnl AC_CHECK_LIB(ltdl, lt_dlmutex_register, AC_DEFINE(LT_DLMUTEX, 1, [Has lt_dlmutex_register]),
 dnl                                         AC_DEFINE(LT_DLMUTEX, 0, [doesn't have lt_dlmutex_register]) )
 
+dnl These options are for Cygnal, which collects optional statistics on all the network traffic
+dnl By default, we turn on statistics collecting for the incoming and outgoing queues, since
+dnl those are required to be compatiable with FMS 3, and the ActionScript server management API.
+dnl buffers are the lowest level data storage, this data is the time spent in the queue, and is
+dnl primarily only used for tuning the queueing API in Gnash. Memoryis the same, it's only used
+dnl by developers for tuning performance of memory allocations in Gnash.
+buffers=no
+que=yes
+memory=no
+AC_ARG_WITH(statistics,
+  AC_HELP_STRING([--with-statistics=], [Specify which statistics features to enable]),
+  if test -n ${withval}; then
+    if test "x${withval}" != "xno"; then
+      extlist="${withval}"
+      withval=`echo ${withval} | tr '\054' ' ' `
+    else
+      extlist=""
+      withval=""
+    fi
+  fi
+  statistics_list=""
+  nstatistics=0
+  while test -n "${withval}" ; do
+    val=`echo ${withval} | cut -d ' ' -f 1`
+    [case "${val}" in
+      buffers)
+        buffers=yes
+        nstatistics=$((nstatistics+1))
+        ;;
+      que)
+        que=yes
+        nstatistics=$((nstatistics+1))
+        ;;
+      memory)
+        memory=yes
+        nstatistics=$((nstatistics+1))
+        ;;
+      all|ALL)
+        buffers=yes
+        memory=yes
+        queu=yes
+        nstatistics=3
+        ;;
+      *) AC_MSG_ERROR([invalid statistics feature specified: ${withval} given (accept: buffers|que|memory|all)])
+        ;;
+      esac]
+    withval=`echo ${withval} | cut -d ' ' -f 2-6`
+    if test "x$val" = "x$withval"; then
+      break;
+    fi
+  done
+)
+if test x${buffers} = xyes; then
+  statistics_list="${statistics_list} buffers"
+  AC_DEFINE(USE_STATS_BUFFERS, [1], [Support statistics collecting for the queue buffers])
+  AC_MSG_WARN([This option will effect your performance])
+fi
+
+if test x${memory} = xyes; then
+  statistics_list="${statistics_list} memory"
+  AC_DEFINE(USE_STATS_MEMORY, [1], [Support statistics collecting for all memory profiling])
+  AC_MSG_WARN([This option will effect your performance])
+fi
+
+if test x${que} = xyes; then
+  statistics_list="${statistics_list} queues"
+  AC_DEFINE(USE_STATS_QUEUE, [1], [Support statistics collecting for the queues])
+fi
+dnl this is just so Makefile can print the same list
+STATISTICS_LIST="$statistics_list"
+AC_SUBST(STATISTICS_LIST)
+
 #
 # These settings are compile time options for the security
 # setting for anything that lets gnash exchange data with
@@ -2007,6 +2079,10 @@ fi
 
 if test x"$security_list" != x; then
   echo "        Enabling security features: ${security_list}"
+fi
+
+if test x"$statistics_list" != x; then
+  echo "        Enabling statistics collecting for: ${statistics_list}"
 fi
 
 if test x"${SUPPORTED_GUIS}" = x; then
