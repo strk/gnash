@@ -14,7 +14,7 @@
 #endif
 
 #include "dlmalloc.h"
-#include "dsoddefs.h"
+#include "dsodefs.h"
 
 // #define these in compatibility_include.h if you want something different.
 #ifndef tu_malloc
