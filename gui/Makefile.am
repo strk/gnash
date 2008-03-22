@@ -87,6 +87,10 @@ AM_LDFLAGS =  \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 
+if WIN32
+	AM_LDFLAGS += -lgdi32 -lole32 -luuid -lws2_32 -lmsimg32
+endif
+
 GNASH_LIBS = \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
