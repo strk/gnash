@@ -28,8 +28,13 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <sys/shm.h>		// for key_t
 #include <boost/cstdint.hpp>
+
+#ifndef _WIN32
+#include <sys/shm.h>
+#else
+typedef boost::uint32_t key_t;
+#endif // _WIN32
 
 namespace gnash {
   

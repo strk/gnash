@@ -88,8 +88,7 @@ Shm::attach(key_t key, bool nuke)
 {
 //    GNASH_REPORT_FUNCTION;
     
-#if defined(USE_SYSV_SHM) && defined(HAVE_SHMGET)
-    const int shmflg = 0660 | IPC_CREAT;
+#if (defined(USE_SYSV_SHM) && defined(HAVE_SHMGET)) || defined(_WIN32)
     // this is the magic size of shared memory segments used by the other flash player;
     _size = 64528;
     // this is the magic shared memory key used by the other player.
@@ -105,16 +104,35 @@ Shm::attach(key_t key, bool nuke)
 	_shmkey = 0xdd3adabd;
     }
     
-    _shmfd = shmget(_shmkey, _size, shmflg);
-    if (_shmfd < 0 && errno == EEXIST) {
-	// Get the shared memory id for this segment
-	_shmfd = shmget(_shmkey, _size, 0);
+#ifndef _WIN32
+    {
+	const int shmflg = 0660 | IPC_CREAT;
+
+	_shmfd = shmget(_shmkey, _size, shmflg);
+	if (_shmfd < 0 && errno == EEXIST) {
+	    // Get the shared memory id for this segment
+	    _shmfd = shmget(_shmkey, _size, 0);
+	}
+	_addr = (char *)shmat(_shmfd, 0, 0);
+	if (_addr <= 0) {
+	    log_debug("WARNING: shmat() failed: %s\n", strerror(errno));
+	    return false;
+	}
     }
-    _addr = (char *)shmat(_shmfd, 0, 0);
-    if (_addr <= 0) {
-	log_debug("WARNING: shmat() failed: %s\n", strerror(errno));
+#else
+    _shmhandle = CreateFileMapping((HANDLE) 0xFFFFFFFF, NULL,
+	    PAGE_READWRITE, 0, _size, NULL);
+    if (_shmhandle == NULL) {
+	log_debug("WARNING: CreateFileMapping failed: %ld\n", GetLastError());
+        return false;
+    }
+    _addr = (char *) MapViewOfFile(_shmhandle, FILE_MAP_ALL_ACCESS,
+            0, 0, _size);
+    if (_addr == NULL) {
+	log_debug("WARNING: MapViewOfFile() failed: %ld\n", GetLastError());
 	return false;
     }
+#endif
 
     return true;
 #else
@@ -220,17 +238,21 @@ Shm::attach(char const *filespec, bool nuke)
 	_shmfd = shm_open(filespec, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR);
 #else
 # ifdef USE_SYSV_SHM
+#  ifdef HAVE_SHMGET
 	// Get the shared memory id for this segment
 	_shmfd = shmget(_shmkey, _size, 0);
-# else
-#  ifdef __riscos__
-        // do nothing, we never get here.
 #  else
+#   ifdef __riscos__
+        // do nothing, we never get here.
+#   else
 	_shmhandle = CreateFileMapping ((HANDLE) 0xFFFFFFFF, NULL,
 					PAGE_READWRITE, 0,
 					_size, filespec);
+#   endif
+#  endif
+# else
+# error "You need SYSV Shared memory support to use this option"
 # endif
-#endif
 #endif
     }
     
