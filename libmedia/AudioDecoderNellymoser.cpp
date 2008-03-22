@@ -52,6 +52,11 @@
 #include <cmath>
 #include "VM.h"
 
+#ifdef _WIN32
+#define random rand
+#define srandom srand
+#endif
+
 namespace gnash {
 namespace media {
 
