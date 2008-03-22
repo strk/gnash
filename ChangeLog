@@ -5,6 +5,9 @@
 	* libbase/postscript{cpp, h}: Unused garbage as well as PD-
 	  licensed. On demand we'll write our own implementation.
 	
+	* libbase/dsodefs.h, libbase/tu_config.h: Moved our defines
+	  for DSO{EXPORT, LOCAL} to it's own file.
+	
 	* libbase/utf8.h, libmedia/ffmpeg/ffmpegNetStreamUtil.h,
 	  libmedia/ffmpeg/VideoDecoderFfmpeg.h: 
 	  Added DSOEXPORT to definations.

@@ -14,6 +14,7 @@
 #endif
 
 #include "dlmalloc.h"
+#include "dsoddefs.h"
 
 // #define these in compatibility_include.h if you want something different.
 #ifndef tu_malloc
@@ -46,38 +47,6 @@
 // depending on the GNOME libxml library.
 #ifndef TU_CONFIG_LINK_TO_LIBXML
 #define TU_CONFIG_LINK_TO_LIBXML 1
-#endif
-
-#ifdef _MSC_VER
-	#ifdef BUILDING_DLL
-		#define DSOEXPORT __declspec(dllexport)
-	#else
-		// Temporarily commented because of VC++ compiler problems 
-		#define DSOEXPORT // __declspec(dllimport)
-	#endif
-
-	#define DSOLOCAL
-#elif defined(__OS2__)
-	#ifdef BUILDING_DLL
-		#define DSOEXPORT __declspec(dllexport)
-	#else
-		// Temporarily commented because of VC++ compiler problems 
-		#define DSOEXPORT // __declspec(dllimport)
-	#endif
-
-	#define DSOLOCAL
-
-#else
-	#ifdef HAVE_GNUC_VISIBILITY
-		#define DSOEXPORT __attribute__ ((visibility("default")))
-		#define DSOLOCAL __attribute__ ((visibility("hidden")))
-	#elif defined(__SUNPRO_C) && (__SUNPRO_C >= 0x550) /* Sun Studio >= 8 */
-		#define DSOEXPORT __global
-		#define DSOLOCAL __hidden
-	#else
-		#define DSOEXPORT
-		#define DSOLOCAL
-	#endif
 #endif
 
 #endif // TU_CONFIG_H
