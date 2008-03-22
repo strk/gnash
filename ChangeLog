@@ -1,3 +1,43 @@
+2008-03-21  Dossy Shiobara <dossy@panoptic.com>
+
+	* libbase/sharedlib.h (1.9): Tweak things so that libltdl works
+	  correctly on Win32.
+
+	* utilities/processor.cpp (1.92): Win32 lacks a usleep(), so we
+	  fake it with Sleep().
+
+	* server/asobj/SharedObject.cpp (1.37): mkdir() on Win32 only takes
+	  one arg, apparently.
+
+	* libmedia/ffmpeg/: ffmpegNetStreamUtil.h (1.3),
+	  sound_handler_sdl.h (1.4): SDL_audio.h appears to need iconv.h on
+	  Win32.
+
+	* libmedia/AudioDecoderNellymoser.cpp (1.12): Win32 doesn't have
+	  random() and srandom() but does have rand() and srand().
+
+	* libbase/: rc.h (1.49), shm.cpp (1.7): Win32 lacks sys/shm.h, so
+	  define key_t on Win32 as boost::uint32_t.
+
+	* libbase/network.cpp (1.39): Win32 doesn't have the sa_family_t
+	  type, nor the UNIX_PATH_MAX defined, or the sockaddr_un struct.
+
+	* macros/pango.m4 (1.30): Use pangox on X11, pangowin32 on Win32.
+
+	* gui/: gtk_glue_agg.cpp (1.34), gtk_glue_agg.h (1.17): Fix build
+	  for when ENABLE_MIT_SHM is false, such as on Win32.
+
+	* gui/: gtk_cairo_create.h (1.2), gtk_glue.h (1.15),
+	  gtk_glue_cairo.h (1.16), gtk_glue_gtkglext.h (1.13), gtksup.h
+	  (1.68): gdk/gdkx.h is for X11.  Win32 only has gdk/gdk.h.
+
+	* gui/fltk.cpp (1.18), gui/gtk.cpp (1.159), gui/gui.cpp (1.143),
+	  server/gnash.h (1.119): Fix some macro redefinition issues when
+	  compiling with GCC 3.x, which does not have strongly typed enums.
+
+	* server/vm/Makefile.am (1.20): If building with ffmpeg, we need
+	  FFMPEG_CFLAGS.
+
 2008-03-21  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* configure.ac: Add conditional for win32 builds.
