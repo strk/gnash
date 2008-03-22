@@ -69,11 +69,11 @@ public:
     // Create a new server. After creating it, then you have to wait
     // for an incoming connection.
     bool createServer(void);
-    bool createServer(short port);
+    DSOEXPORT bool createServer(short port);
     
     // Accept a client connection for the current server.
     bool newConnection(void);
-    bool newConnection(bool block);
+    DSOEXPORT bool newConnection(bool block);
 
     // Connect to a named pipe
     bool connectSocket(const std::string &sock);
@@ -86,13 +86,13 @@ public:
 
     // Read from the connection
     int readNet(byte_t *buffer, int nbytes);
-    int readNet(byte_t *buffer, int nbytes, int timeout);
+    DSOEXPORT int readNet(byte_t *buffer, int nbytes, int timeout);
     int readNet(int fd, byte_t *buffer, int nbytes);
     int readNet(int fd, byte_t *buffer, int nbytes, int timeout);
     
     // Write to the connection
     int writeNet(const std::string &buffer);
-    int writeNet(const byte_t *buffer, int nbytes);
+    DSOEXPORT int writeNet(const byte_t *buffer, int nbytes);
 //    int writeNet(int fd, const byte_t *buffer);
     int writeNet(int fd, const byte_t *buffer, int nbytes);
     int writeNet(int fd, const byte_t *buffer, int nbytes, int timeout);
@@ -100,7 +100,7 @@ public:
     // Close the connection
     DSOEXPORT bool closeNet();
     bool closeNet(int fd);
-    bool closeConnection();
+    DSOEXPORT bool closeConnection();
     bool closeConnection(int fd);
 
     // Change the debug flag
