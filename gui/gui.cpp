@@ -453,7 +453,7 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 			}
 		}
 		
-		if (modifier & gnash::key::MOD_CONTROL)
+		if (modifier & gnash::key::GNASH_MOD_CONTROL)
 		{
 			switch(k)
 			{
@@ -493,7 +493,7 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 			if ( _keyboardMouseMovements )
 			{
 				int step = _keyboardMouseMovementsStep; 
-				if (modifier & gnash::key::MOD_SHIFT) step*=5; // x5 if SHIFT is pressed
+				if (modifier & gnash::key::GNASH_MOD_SHIFT) step*=5; // x5 if SHIFT is pressed
 				switch(k)
 				{
 					case gnash::key::UP:

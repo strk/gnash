@@ -362,11 +362,15 @@ namespace key {
 
 enum modifier
 {
-    MOD_NONE = 0,
-    MOD_SHIFT = 1,
-    MOD_CONTROL = 2,
-    MOD_ALT = 4
+    GNASH_MOD_NONE = 0,
+    GNASH_MOD_SHIFT = 1,
+    GNASH_MOD_CONTROL = 2,
+    GNASH_MOD_ALT = 4
 };
+
+#ifdef _WIN32
+#undef REGISTERED // conflicts with /mingw/include/nb30.h
+#endif
 
 // Gnash character codes. Each code represents a single character on the keyboard.
 // The first 128 code are ordered by their correspond ASCII value.

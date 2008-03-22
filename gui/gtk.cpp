@@ -37,7 +37,11 @@
 #include <X11/keysym.h>
 
 #include <gtk/gtk.h>
+#ifndef _WIN32
 #include <gdk/gdkx.h>
+#else
+#include <gdk/gdk.h>
+#endif
 #include <gdk/gdkkeysyms.h>
 #include <string>
 
@@ -2124,16 +2128,16 @@ GtkGui::gdk_to_gnash_key(guint key)
 int
 GtkGui::gdk_to_gnash_modifier(int state)
 {
-    int modifier = gnash::key::MOD_NONE;
+    int modifier = gnash::key::GNASH_MOD_NONE;
 
     if (state & GDK_SHIFT_MASK) {
-      modifier = modifier | gnash::key::MOD_SHIFT;
+      modifier = modifier | gnash::key::GNASH_MOD_SHIFT;
     }
     if (state & GDK_CONTROL_MASK) {
-      modifier = modifier | gnash::key::MOD_CONTROL;
+      modifier = modifier | gnash::key::GNASH_MOD_CONTROL;
     }
     if (state & GDK_MOD1_MASK) {
-      modifier = modifier | gnash::key::MOD_ALT;
+      modifier = modifier | gnash::key::GNASH_MOD_ALT;
     }
 
     return modifier;

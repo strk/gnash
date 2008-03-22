@@ -171,18 +171,18 @@ FltkGui::handleKey(unsigned key)
 #endif
     };
 
-    int modifier = gnash::key::MOD_NONE;
+    int modifier = gnash::key::GNASH_MOD_NONE;
 
     unsigned long state = event_state();
 
     if (state & SHIFT) { 
-        modifier = modifier | gnash::key::MOD_SHIFT;
+        modifier = modifier | gnash::key::GNASH_MOD_SHIFT;
     }
     if (state & CTRL) {
-        modifier = modifier | gnash::key::MOD_CONTROL;
+        modifier = modifier | gnash::key::GNASH_MOD_CONTROL;
     }
     if (state & ALT) {
-        modifier = modifier | gnash::key::MOD_ALT;
+        modifier = modifier | gnash::key::GNASH_MOD_ALT;
     }
 
     for (int i = 0; table[i].fltkKey; i++) {
