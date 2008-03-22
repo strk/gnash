@@ -30,9 +30,15 @@ AC_DEFUN([GNASH_PATH_PANGO],
     fi
   ])
 
+  if test x$windows = xyes; then
+    pango_pkg=pangowin32
+  else
+    pango_pkg=pangox
+  fi
+
   if test x$cross_compiling = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_pango_incl}" = x; then
-      $PKG_CONFIG --exists pangox && ac_cv_path_pango_incl="`$PKG_CONFIG --cflags pangox`"
+      $PKG_CONFIG --exists $pango_pkg && ac_cv_path_pango_incl="`$PKG_CONFIG --cflags $pango_pkg`"
     fi
   fi
 
@@ -44,7 +50,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
 
   if test x$cross_compiling = xno; then
     if test x"$PKG_CONFIG" != x; then
-      $PKG_CONFIG --exists pangox && gnash_pango_version=`$PKG_CONFIG --modversion pangox | cut -d "." -f 1 | awk '{print $'0'".0"}'`
+      $PKG_CONFIG --exists $pango_pkg && gnash_pango_version=`$PKG_CONFIG --modversion $pango_pkg | cut -d "." -f 1 | awk '{print $'0'".0"}'`
     fi
   fi
 
@@ -89,7 +95,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
   
   if test x$cross_compiling = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_pango_lib}" = x; then
-      $PKG_CONFIG --exists pangox && ac_cv_path_pango_lib=`$PKG_CONFIG --libs-only-l pangox`
+      $PKG_CONFIG --exists $pango_pkg && ac_cv_path_pango_lib=`$PKG_CONFIG --libs-only-l $pango_pkg`
     fi
   fi
 
