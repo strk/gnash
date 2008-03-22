@@ -36,6 +36,7 @@ AM_CPPFLAGS = \
 	$(DMALLOC_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(LIBXML_CFLAGS) \
+	$(FFMPEG_CFLAGS) \
 	$(NULL)
 
 libgnashvm_la_SOURCES = \
@@ -62,6 +63,10 @@ noinst_HEADERS =		\
 
 libgnashvm_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la 
+
+if USE_FFMPEG_ENGINE
+	libgnashvm_la_CPPFLAGS += $(FFMPEG_CFLAGS)
+endif
 
 libgnashvm_la_LDFLAGS = -export-dynamic # -release $(VERSION) -no-undefined 
 
