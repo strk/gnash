@@ -1,3 +1,8 @@
+2008-03-22  Dossy Shiobara <dossy@panoptic.com>
+
+	* gui/Makefile.am (1.121): Win32 requires extra LDFLAGS to build,
+	  for some reason.
+
 2008-03-22  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* configure.ac: Change --enable-statistics to --with-statistics
