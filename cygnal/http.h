@@ -149,8 +149,8 @@ public:
     int extractAccept(gnash::Network::byte_t *data);
     int extractAccept(Buffer *data)
 	{ return extractAccept(data->reference()); };
-    std::string extractAcceptRanges(gnash::Network::byte_t *data);
-    std::string extractAcceptRanges(Buffer *data)
+    std::string &extractAcceptRanges(gnash::Network::byte_t *data);
+    std::string &extractAcceptRanges(Buffer *data)
 	{ return extractAcceptRanges(data->reference()); };
     int extractLanguage(gnash::Network::byte_t *data);
     int extractLanguage(Buffer *data)
@@ -172,17 +172,17 @@ public:
 	{ return extractConnection(data->reference()); };
 
     // These return the string that was found for this field.
-    std::string extractMethod(gnash::Network::byte_t *data);
-    std::string extractMethod(Buffer *data)
+    std::string &extractMethod(gnash::Network::byte_t *data);
+    std::string &extractMethod(Buffer *data)
 	{ return extractMethod(data->reference()); };
-    std::string extractReferer(gnash::Network::byte_t *data);
-    std::string extractReferer(Buffer *data)
+    std::string &extractReferer(gnash::Network::byte_t *data);
+    std::string &extractReferer(Buffer *data)
 	{ return extractReferer(data->reference()); };
-    std::string extractHost(gnash::Network::byte_t *data);
-    std::string extractHost(Buffer *data)
+    std::string &extractHost(gnash::Network::byte_t *data);
+    std::string &extractHost(Buffer *data)
 	{ return extractHost(data->reference()); };
-    std::string extractAgent(gnash::Network::byte_t *data);
-    std::string extractAgent(Buffer *data)
+    std::string &extractAgent(gnash::Network::byte_t *data);
+    std::string &extractAgent(Buffer *data)
 	{ return extractAgent(data->reference()); };
 
     // These methods add data to the fields in the HTTP header.
@@ -255,6 +255,7 @@ public:
 private:
     std::stringstream _header;
     std::stringstream _body;
+    std::string _command;
     filetype_e  _filetype;
     std::string _filespec;
     int         _filesize;

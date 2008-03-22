@@ -41,6 +41,7 @@ extern int optind, getopt(int, char *const *, const char *);
 #include "log.h"
 #include "http.h"
 #include "dejagnu.h"
+#include "network.h"
 
 using namespace cygnal;
 using namespace gnash;
@@ -267,7 +268,7 @@ main(int argc, char *argv[])
 
     // Check formatHeader()
     http.clearHeader();
-    http.formatHeader(RTMP);
+    http.formatHeader(HTTP::LIFE_IS_GOOD);
 //    cerr << "FIXME: " << http.getHeader() << endl;
     regcomp (&regex_pat, "HTTP/1.1 200 OK.*Date:.*Connection:.*-Length.*-Type:.*$",
              REG_NOSUB);        // note that we do want to look for NL
@@ -304,7 +305,7 @@ main(int argc, char *argv[])
     // Decoding tests for HTTP
     //
     http.clearHeader();
-    const char *buffer = "GET /software/gnash/tests/flvplayer.swf?file=http://localhost/software/gnash/tests/Ouray_Ice_Festival_Climbing_Competition.flv HTTP/1.1\r\n"
+    Network::byte_t *buffer = (Network::byte_t *)"GET /software/gnash/tests/flvplayer.swf?file=http://localhost/software/gnash/tests/Ouray_Ice_Festival_Climbing_Competition.flv HTTP/1.1\r\n"
 "User-Agent: Gnash/0.8.1-cvs (X11; Linux i686; U; en)\r\n"
 "Host: localhost:4080\r\n"
 "Accept: text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/jpeg, image/gif, image/x-xbitmap, */*;q=0.1\r\n"
@@ -332,7 +333,7 @@ main(int argc, char *argv[])
     
 // Some browsers have a different synatax, of course, to keep things
 // interesting.
-    const char *buffer2 = "GET /software/gnash/tests/flvplayer.swf?file=http://localhost/software/gnash/tests/Ouray_Ice_Festival_Climbing_Competition.flv HTTP/1.1\r\n"
+    Network::byte_t *buffer2 = (Network::byte_t *)"GET /software/gnash/tests/flvplayer.swf?file=http://localhost/software/gnash/tests/Ouray_Ice_Festival_Climbing_Competition.flv HTTP/1.1\r\n)"
 "Content-Language: en-US,en;q=0.9\r\n"
 "Content-Charset: iso-8859-1, utf-8, utf-16, *;q=0.1\r\n"
 "Content-Encoding: deflate, gzip, x-gzip, identity, *;q=0\r\n";
@@ -378,7 +379,7 @@ main(int argc, char *argv[])
         runtest.pass ("HTTP::extractLanguage(Content-)");
     }
 
-    result = http.extractCharset(buffer);
+    result = reinterpret_cast<const char *>(http.extractCharset(buffer));
     std::vector<std::string> charsets = http.getCharset();
     if ((count == 3) &&
         (charsets[0] == "iso-8859-1") &&

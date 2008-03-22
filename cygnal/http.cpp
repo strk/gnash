@@ -681,10 +681,11 @@ HTTP::extractCommand(gnash::Network::byte_t *data)
         cmd = HTTP::DELETE;
     }
 
+    _command = cmd;
     return cmd;
 }
 
-string
+string &
 HTTP::extractAcceptRanges(Network::byte_t *data) {
 //    GNASH_REPORT_FUNCTION;
     
@@ -693,18 +694,20 @@ HTTP::extractAcceptRanges(Network::byte_t *data) {
     string pattern = "Accept-Ranges: ";
     start = body.find(pattern, 0);
     if (start == string::npos) {
-        return "error";
+        _acceptranges = "error";
+        return _acceptranges;
     }
     end =  body.find("\r\n", start);
     if (end == string::npos) {
-        return "error";
+        _acceptranges = "error";
+        return _acceptranges;
     }
     
     _acceptranges = body.substr(start+pattern.size(), end-start-1);
     return _acceptranges;    
 }
 
-string
+string &
 HTTP::extractMethod(Network::byte_t *data) {
 //    GNASH_REPORT_FUNCTION;
     
@@ -716,22 +719,24 @@ HTTP::extractMethod(Network::byte_t *data) {
     length = body.size();
     start = body.find(" ", 0);
     if (start == string::npos) {
-        return "error";
+        _method = "error";
+        return _method;
     }
     _method = body.substr(0, start);
     end = body.find(" ", start+1);
     if (end == string::npos) {
-        return "error";
+        _method = "error";
+        return _method;
     }
     _url = body.substr(start+1, end-start-1);
     _version = body.substr(end+1, length);
 
     end = _url.find("?", 0);
 //    _filespec = _url.substr(start+1, end);
-    return "error";
+    return _method;
 }
 
-string 
+string &
 HTTP::extractReferer(Network::byte_t *data) {
 //    GNASH_REPORT_FUNCTION;
     
@@ -741,11 +746,13 @@ HTTP::extractReferer(Network::byte_t *data) {
     
     start = body.find(pattern, 0);
     if (start == string::npos) {
-        return "error";
+	_referer = "error";
+	return _referer;
     }
     end =  body.find("\r\n", start);
     if (end == string::npos) {
-        return "error";
+	_referer = "error";
+        return _referer;
     }
     
     _referer = body.substr(start+pattern.size(), end-start-1);
@@ -839,7 +846,7 @@ HTTP::extractKeepAlive(Network::byte_t *data) {
     return _connections.size();
 }
 
-string
+string &
 HTTP::extractHost(Network::byte_t *data) {
 //    GNASH_REPORT_FUNCTION;
     
@@ -849,32 +856,35 @@ HTTP::extractHost(Network::byte_t *data) {
     
     start = body.find(pattern, 0);
     if (start == string::npos) {
-        return "error";
-    }
+        _host = "error"; 
+        return _host;
+   }
     end =  body.find("\r\n", start);
     if (end == string::npos) {
-        return "error";
+        _host = "error"; 
+        return _host;
     }
     
     _host = body.substr(start+pattern.size(), end-start-1);
     return _host;
 }
 
-string 
+string &
 HTTP::extractAgent(Network::byte_t *data) {
 //    GNASH_REPORT_FUNCTION;
     
     string body = reinterpret_cast<const char *>(data);
     string::size_type start, end;
     string pattern = "User-Agent: ";
+    _agent = "error";
     
     start = body.find(pattern, 0);
     if (start == string::npos) {
-        return "error";
+        return _agent;
     }
     end =  body.find("\r\n", start);
     if (end == string::npos) {
-        return "error";
+        return _agent;
     }
     
     _agent = body.substr(start+pattern.size(), end-start-1);

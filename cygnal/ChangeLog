@@ -1,3 +1,9 @@
+2008-03-21  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* testsuite/cygnal.all/test_http.cpp: Fix so it compiles
+	again. The API changed to use Network::byte_t instead of uint8_t.
+	* http.{h,cpp}: Return std::string &, not just a reference.
+
 2008-03-20  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* http.{h.cpp}: Add support for RTMPT, which is an extension to
@@ -13,7 +19,7 @@
 	statistics 
 	* cque.cpp: Set the returned buffer to zero if the mutex has an
 	error.
-	* cygnal.cpp: Rn forever, restarting connections after the
+	* cygnal.cpp: Run forever, restarting connections after the
 	disconnect.
 	* handler.cpp: Trap mutex errors.
 	* http.cpp: Tweak the handling of persistant connections.  Add
