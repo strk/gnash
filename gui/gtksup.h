@@ -26,7 +26,11 @@
 #include "tu_config.h" // for DSOEXPORT
 #include "gtk_glue.h"
 
+#ifndef _WIN32
 #include <gdk/gdkx.h>
+#else
+#include <gdk/gdk.h>
+#endif
 #include <gtk/gtk.h>
 
 #ifdef GUI_HILDON

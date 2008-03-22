@@ -21,7 +21,11 @@
 
 #include <cairo-xlib.h>
 #include <gtk/gtk.h>
+#ifndef _WIN32
 #include <gdk/gdkx.h>
+#else
+#include <gdk/gdk.h>
+#endif
 
 
 /* copied from gtk+/gdk/gdkcairo.c and gtk+/gdk/x11/gdkdrawable-x11.c
