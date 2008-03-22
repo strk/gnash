@@ -301,6 +301,20 @@ Network::newConnection(bool block)
     return true;
 }
 
+#ifdef _WIN32
+/* from sys/socket.h */
+typedef unsigned short      sa_family_t;
+
+/* from sys/un.h */
+#define UNIX_PATH_MAX   108
+
+struct sockaddr_un {
+    sa_family_t sun_family; /* AF_UNIX */
+    char sun_path[UNIX_PATH_MAX];   /* pathname */
+};
+
+#endif /* _WIN32 */
+
 // Connect to a named pipe
 bool
 Network::connectSocket(const string &sockname)
