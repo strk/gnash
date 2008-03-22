@@ -287,16 +287,16 @@ KdeGui::qtToGnashKey(QKeyEvent *event)
 int
 KdeGui::qtToGnashModifier(Qt::ButtonState state)
 {
-    int modifier = gnash::key::MOD_NONE;
+    int modifier = gnash::key::GNASH_MOD_NONE;
 
     if (state & Qt::ShiftButton) {
-        modifier = modifier | gnash::key::MOD_SHIFT;
+        modifier = modifier | gnash::key::GNASH_MOD_SHIFT;
     }
     if (state & Qt::ControlButton) {
-        modifier = modifier | gnash::key::MOD_CONTROL;
+        modifier = modifier | gnash::key::GNASH_MOD_CONTROL;
     }
     if (state & Qt::AltButton) {
-       modifier = modifier | gnash::key::MOD_ALT;
+       modifier = modifier | gnash::key::GNASH_MOD_ALT;
     }
 
     return modifier;

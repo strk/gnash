@@ -1,3 +1,8 @@
+2008-03-21  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* gui/kde.cpp: The names have changed in the enum, prefix GNASH_
+	to MOD_SHIFT, etc...
+
 2008-03-21 Russ Nelson <nelson@crynwr.com>
 
 	* packaging/snapshot.am: dist-hook not needed anymore.
