@@ -24,6 +24,7 @@
 #include "gnashconfig.h"
 #endif
 
+#include "tu_config.h" //For DSOEXPORT
 #include "log.h"
 #include "VideoDecoder.h"
 
@@ -39,8 +40,8 @@ namespace media {
 class VideoDecoderFfmpeg : public VideoDecoder {
   
 public:
-  VideoDecoderFfmpeg(videoCodecType format, int width, int height);
-  ~VideoDecoderFfmpeg();
+  DSOEXPORT VideoDecoderFfmpeg(videoCodecType format, int width, int height);
+  DSOEXPORT ~VideoDecoderFfmpeg();
   
   void push(const EncodedVideoFrame& buffer);
 
@@ -58,7 +59,7 @@ public:
   ///         caller owns that pointer, which must be freed with delete [].
   ///         It is advised to wrap the pointer in a boost::scoped_array.
   ///         If conversion fails, AVPicture::data[0] will be NULL.
-  static AVPicture convertRGB24(AVCodecContext* srcCtx, const AVFrame& srcFrame);
+    DSOEXPORT static AVPicture convertRGB24(AVCodecContext* srcCtx, const AVFrame& srcFrame);
 
 private:
 
