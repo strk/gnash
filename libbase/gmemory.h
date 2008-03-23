@@ -29,7 +29,6 @@
 // If we don't have support for mallinfo(), this code is useless
 #ifdef HAVE_MALLINFO
 
-#include "dsodefs.h"
 #include <stdlib.h>
 #include <malloc.h>
 #include <time.h>
@@ -52,42 +51,42 @@ public:
     DSOEXPORT ~Memory();
 
     // Start collecting statistics. This can effect performance
-    DSOEXPORT void startStats();
+    void startStats();
     
     // Stop collecting statistics
     void endStats() { addStats();_collecting = false; };
 
     // Erase all collected data and reset collections.
-    DSOEXPORT void reset();
+    void reset();
 
     // checkpoint()
     void startCheckpoint() { _checkpoint[0] = mallinfo(); };
-    DSOEXPORT bool endCheckpoint();
+    bool endCheckpoint();
     
     // Add or retrieve mallinfo data
-    DSOEXPORT int addStats();
-    DSOEXPORT int addStats(int line);
-    DSOEXPORT int addStats(struct small_mallinfo *x);
-    DSOEXPORT int addStats(struct small_mallinfo *x, int line);
+    int addStats();
+    int addStats(int line);
+    int addStats(struct small_mallinfo *x);
+    int addStats(struct small_mallinfo *x, int line);
     struct small_mallinfo *getStats() { return _info; };
     struct small_mallinfo *operator[](int x) { return _info + x; };
     int totalStats() { return _index; };
 
     // Analyze memory usage
-    DSOEXPORT bool analyze();
+    bool analyze();
 
     // Dump the differences of bytes allocated between two samples
-    DSOEXPORT int diffStats();
-    DSOEXPORT int diffStats(int x, int y);
+    int diffStats();
+    int diffStats(int x, int y);
 
     // Dump the differences in the timestamp between two samples
-    DSOEXPORT int diffStamp();
-    DSOEXPORT int diffStamp(int x, int y);
+    int diffStamp();
+    int diffStamp(int x, int y);
     
     // Dump the vector of stored classes
-    DSOEXPORT void dump(struct mallinfo *x);
-    DSOEXPORT void dump(struct small_mallinfo *x);
-    DSOEXPORT void dump();
+    void dump(struct mallinfo *x);
+    void dump(struct small_mallinfo *x);
+    void dump();
 private:
     bool                _collecting;
     // For data logging, we want to store as little as possible
