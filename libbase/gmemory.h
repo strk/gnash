@@ -46,9 +46,9 @@ public:
         int uordblks; // total allocated space
         int fordblks; // total free space
     };
-    DSOEXPORT Memory();
-    DSOEXPORT Memory(int size);
-    DSOEXPORT ~Memory();
+    Memory();
+    Memory(int size);
+    ~Memory();
 
     // Start collecting statistics. This can effect performance
     void startStats();
