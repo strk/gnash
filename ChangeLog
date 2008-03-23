@@ -2,7 +2,8 @@
 
 	* libamf/lcshm.cpp: Fixed warning on uninitialized integer.
 	* server/asobj/NetStreamFfmpeg.cpp: 'copied' is unsigned int.
-	* server/debugger.h: Added DSOEXPORT to definations.	
+	* server/debugger.h: Added DSOEXPORT to definations.
+	* testsuite/samples/Make.am: Added FFMPEG_CFLAGS.	
 
 2008-03-22  Dossy Shiobara <dossy@panoptic.com>
 

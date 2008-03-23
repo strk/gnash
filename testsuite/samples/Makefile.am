@@ -34,6 +34,7 @@ AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)/libgeometry \
         -I$(top_srcdir)/testsuite \
 	$(BOOST_CFLAGS) \
+	$(FFMPEG_CFLAGS) \
 	$(NULL)
 
 GNASH_LIBS = \
