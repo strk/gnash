@@ -177,7 +177,7 @@ Listener::removeListener(const string &name)
 
     boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
 
-    int len;
+    int len = 0;
     char *item = reinterpret_cast<char *>(addr);
     while (*item != 0) {
         if (name == item) {

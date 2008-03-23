@@ -1,3 +1,7 @@
+2008-03-23 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* libamf/lcshm.cpp: Fixed warning on uninitizilezed integer.
+
 2008-03-22  Dossy Shiobara <dossy@panoptic.com>
 
 	* utilities/Makefile.am (1.66): Win32 needs libintl, libz and
