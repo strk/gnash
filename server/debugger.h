@@ -28,17 +28,18 @@
 #include <string>
 #include <map>
 
+#include "dsodefs.h"
 #include "as_environment.h"
 
 namespace gnash 
 {
 
-class DSOEXPORT Debugger {
+class Debugger {
 public:
-    Debugger();
-    ~Debugger();
+    DSOEXPORT Debugger();
+    DSOEXPORT ~Debugger();
     // Return the default instance of Debugger
-    static Debugger& getDefaultInstance();
+    DSOEXPORT static Debugger& getDefaultInstance();
 
     typedef enum {NONE, BREAK, CONTINUE, STOP} debug_state_e;
     typedef enum {BOTH, WRITES, READS} watch_state_e;
@@ -85,8 +86,8 @@ public:
     void setFramePointer(const unsigned char *x) { _pc = x; };
     const unsigned char *getFramePointer() const { return _pc; };
 
-    void console(as_environment &env);
-    void console();
+    DSOEXPORT void console(as_environment &env);
+    DSOEXPORT void console();
     
     /// Are the debugger features enabled ?
     void enabled(bool x) { _enabled = x; };

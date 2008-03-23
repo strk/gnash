@@ -1,7 +1,8 @@
 2008-03-23 Markus Gothe <nietzsche@lysator.liu.se>
 
-	* libamf/lcshm.cpp: Fixed warning on uninitizilezed integer.
+	* libamf/lcshm.cpp: Fixed warning on uninitialized integer.
 	* server/asobj/NetStreamFfmpeg.cpp: 'copied' is unsigned int.
+	* server/debugger.h: Added DSOEXPORT to definations.	
 
 2008-03-22  Dossy Shiobara <dossy@panoptic.com>
 
