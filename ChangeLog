@@ -1,6 +1,7 @@
 2008-03-23 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libamf/lcshm.cpp: Fixed warning on uninitizilezed integer.
+	* server/asobj/NetStreamFfmpeg.cpp: 'copied' is unsigned int.
 
 2008-03-22  Dossy Shiobara <dossy@panoptic.com>
 

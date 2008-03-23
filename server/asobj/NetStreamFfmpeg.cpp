@@ -972,7 +972,7 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 		if (m_videoFrameFormat == render::YUV)
 		{
 			image::yuv* yuvframe = static_cast<image::yuv*>(m_imageframe);
-			int copied = 0;
+			unsigned int copied = 0;
 			boost::uint8_t* ptr = video->m_data;
 			for (int i = 0; i < 3 ; i++)
 			{
