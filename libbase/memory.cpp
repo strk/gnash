@@ -304,6 +304,7 @@ Memory::analyze()
                  ? "passed" : "failed") << endl;
         }
     }
+    return true; /* The funcion maybe should be declared as void? */
 }
     
 

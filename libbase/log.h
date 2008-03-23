@@ -27,6 +27,7 @@
 #endif
 
 #include "rc.h" // for IF_VERBOSE_* implementation
+#include "dsodefs.h" // for DSOEXPORT
 
 #include <fstream>
 #include <sstream>
