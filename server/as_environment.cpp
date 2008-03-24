@@ -939,7 +939,7 @@ as_environment::dump_stack(std::ostream& out, unsigned int limit) const
 		out << "Stack: ";
 	}
 
-	for (int i=si; i<n; i++)
+	for (unsigned int i=si; i<n; i++)
 	{
 		if (i!=si) out << " | ";
 		out << '"' << m_stack[i] << '"';
