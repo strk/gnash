@@ -107,7 +107,7 @@ SharedLib::SharedLib(const char *filespec)
 //     } else {
 //         log_debug ("Initialized ltdl");
     }
-    char *pluginsdir = PLUGINSDIR;
+    const char *pluginsdir = PLUGINSDIR;
     char *env = getenv ("GNASH_PLUGINS");
     if (env != NULL)
         pluginsdir = env;
