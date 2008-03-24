@@ -7,6 +7,7 @@
 	* libbase/memory.cpp: return true when function returns.
 	* libbase/sharedlib.cpp, plugins/plugin.cpp: declared char* as 
 	  const char*.
+	* plugins/plugin.cpp: compare result of getenv() with NULL.
 
 2008-03-22  Dossy Shiobara <dossy@panoptic.com>
 

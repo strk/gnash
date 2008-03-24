@@ -165,7 +165,7 @@ NS_PluginInitialize()
 	Check for environment variables.
 	*/
 	char* opts = getenv("GNASH_OPTIONS");
-	if ( opts )
+	if (opts != NULL)
 	{
 		cout << "GNASH_OPTIONS : " << opts << endl;
 		
@@ -965,7 +965,7 @@ static const char* getPluginDescription()
 	if (!desc)
 	{
 		desc = getenv("GNASH_PLUGIN_DESCRIPTION");
-		if (!desc) desc = PLUGIN_DESCRIPTION;
+		if (desc == NULL) desc = PLUGIN_DESCRIPTION;
 	}
 	return desc;
 }
