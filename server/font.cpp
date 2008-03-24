@@ -333,7 +333,7 @@ GlyphInfo::markReachableResources() const
 			// Advance table; i.e. how wide each character is.
 			size_t nGlyphs = _embedGlyphTable.size();
 			in->ensureBytes(nGlyphs*2);
-			for (int i = 0; i < nGlyphs; i++)
+			for (size_t i = 0; i < nGlyphs; i++)
 			{
 				_embedGlyphTable[i].advance = (float) in->read_s16();
 			}

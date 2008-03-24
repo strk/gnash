@@ -8,6 +8,7 @@
 	* libbase/sharedlib.cpp, plugins/plugin.cpp: declared char* as 
 	  const char*.
 	* plugins/plugin.cpp: compare result of getenv() with NULL.
+	* server/font.cpp: compare with same type.
 
 2008-03-22  Dossy Shiobara <dossy@panoptic.com>
 
