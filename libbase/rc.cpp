@@ -185,7 +185,7 @@ RcInitFile::extractNumber(boost::uint32_t &num, const std::string &pattern,
 //        cout << variable << ": " << value << endl;
     if ( noCaseCompare(variable, pattern) ) {
         num = strtoul(value.c_str(), NULL, 0);
-        if (num == std::numeric_limits<long>::max()) {
+        if (static_cast<long>(num) == std::numeric_limits<long>::max()) {
             long long foo = strtoll(value.c_str(), NULL, 0);
             cerr << "RcInitFile::extractNumber: conversion overflow!: " << foo << endl;
         }

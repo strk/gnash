@@ -1,6 +1,8 @@
 2008-03-24 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/as_envoronment.cpp: Fixed signedness of int.
+	* libbase/rc.cpp: Fixed comparsion.
+	* libbase/rc.h: Replaced tu_config.h.
 
 2008-03-23 Markus Gothe <nietzsche@lysator.liu.se>
 
