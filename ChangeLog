@@ -5,7 +5,8 @@
 	* server/debugger.h, libbase/log.h: Added DSOEXPORT to definations.
 	* testsuite/samples/Make.am: Added FFMPEG_CFLAGS.
 	* libbase/memory.cpp: return true when function returns.
-	* libbase/sharedlib.cpp: declared char* as const char*.
+	* libbase/sharedlib.cpp, plugins/plugin.cpp: declared char* as 
+	  const char*.
 
 2008-03-22  Dossy Shiobara <dossy@panoptic.com>
 

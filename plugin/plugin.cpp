@@ -217,7 +217,7 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 	switch (aVariable)
 	{
 		case NPPVpluginNameString:
-			*static_cast<char **> (aValue) = PLUGIN_NAME;
+			*static_cast<const char **> (aValue) = PLUGIN_NAME;
 			break;
 
 		// This becomes the description field you see below the opening
@@ -657,7 +657,7 @@ nsPluginInstance::startProc(Window win)
 {
 	string procname;
 	char *gnash_env = getenv("GNASH_PLAYER");
-	if (!gnash_env) {
+	if (gnash_env == NULL) {
 		procname = GNASHBINDIR;
 		procname += "/gtk-gnash";
 	}
