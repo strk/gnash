@@ -1,5 +1,10 @@
 2008-03-25 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* testsuite/actionscript.all/Object.as: test for
+	  Object.__proto__ = undefined; (Gnash fails). 
+
+2008-03-25 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* testsuite/actionscript.all/Global.as: more passes, some new
 	  (now passing) tests for parseint.
 	* server/asobj/global.cpp: fix parseint, pass all actionscript.all
