@@ -294,16 +294,16 @@ SDLGui::sdl_to_gnash_key(SDL_KeyboardEvent * key)
 int 
 SDLGui::sdl_to_gnash_modifier(int state)
 {
-  int modifier = gnash::key::MOD_NONE;
+  int modifier = gnash::key::GNASH_MOD_NONE;
   
-  if (state & KMOD_SHIFT) {
-      modifier = modifier | gnash::key::MOD_SHIFT;
+  if (state & KGNASH_MOD_SHIFT) {
+      modifier = modifier | gnash::key::GNASH_MOD_SHIFT;
     }
-    if (state & KMOD_CTRL) {
-      modifier = modifier | gnash::key::MOD_CONTROL;
+    if (state & KGNASH_MOD_CTRL) {
+      modifier = modifier | gnash::key::GNASH_MOD_CONTROL;
     }
-    if (state & KMOD_ALT) {
-      modifier = modifier | gnash::key::MOD_ALT;
+    if (state & KGNASH_MOD_ALT) {
+      modifier = modifier | gnash::key::GNASH_MOD_ALT;
     }
 
     return modifier;

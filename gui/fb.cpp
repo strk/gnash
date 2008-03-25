@@ -1404,16 +1404,16 @@ void FBGui::check_keyboard()
       
         // build modifier
       
-        int modifier = gnash::key::MOD_NONE;
+        int modifier = gnash::key::GNASH_MOD_NONE;
         
         if (keyb_lshift || keyb_rshift)
-          modifier = modifier | gnash::key::MOD_SHIFT;
+          modifier = modifier | gnash::key::GNASH_MOD_SHIFT;
 
         if (keyb_lctrl || keyb_rctrl)
-          modifier = modifier | gnash::key::MOD_CONTROL;
+          modifier = modifier | gnash::key::GNASH_MOD_CONTROL;
 
         if (keyb_lalt || keyb_ralt)
-          modifier = modifier | gnash::key::MOD_ALT;
+          modifier = modifier | gnash::key::GNASH_MOD_ALT;
           
           
         // send event
