@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Global.as,v 1.47 2008/03/18 22:47:38 bwy Exp $";
+rcsid="$Id: Global.as,v 1.48 2008/03/25 16:23:10 bwy Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION > 5
@@ -113,9 +113,13 @@ check_equals (parseInt(o), 12);
 
 check(isNaN(parseInt("8589934592", 5)));
 
-// Er...
-xcheck_equals(parseInt("8589934592", 16), 573538780562);
-xcheck_equals(parseInt("800000000", 36), 22568879259648);
+
+// Misc
+check_equals(parseInt("8589934592", 16), 573538780562);
+check_equals(parseInt("800000000", 36), 22568879259648);
+check_equals(parseInt(" 6 7 8", 8), 6);
+check_equals(parseInt("0x123", 8), 83);
+check_equals(parseInt(" 0x123", 8), 0);
 
 // It's not reliable to compare a double type with ==, so we'll give it a
 // small range using >= and <=
@@ -406,15 +410,15 @@ check_equals (int(infinity), 0);
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 5
-	check_totals(113); // SWF5
+	check_totals(116); // SWF5
 #else
 # if OUTPUT_VERSION == 6
-	check_totals(147); // SWF6
+	check_totals(150); // SWF6
 # else
 #  if OUTPUT_VERSION == 7
-	check_totals(129); // SWF7
+	check_totals(132); // SWF7
 #  else
-	check_totals(116); // SWF8+
+	check_totals(119); // SWF8+
 #  endif
 # endif
 #endif
