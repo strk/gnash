@@ -98,9 +98,9 @@ Network::~Network()
 
 // Description: Create a tcp/ip network server. This creates a server
 //              that listens for incoming socket connections. This
-//              support IP aliasing on the host, and will sequntially
+//              supports IP aliasing on the host, and will sequntially
 //              look for IP address to bind this port to.
-bool
+int
 Network::createServer(void)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -109,10 +109,10 @@ Network::createServer(void)
 }
 
 // FIXME: Should also support IPv6 (AF_INET6)
-bool
+int
 Network::createServer(short port)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     struct protoent *ppe;
     struct sockaddr_in sock_in;
@@ -120,11 +120,18 @@ Network::createServer(short port)
     int             retries = 0;
     in_addr_t       nodeaddr;
 
+#if 0
     if (port < 1024) {
 	log_error(_("Can't connect to privileged port #%d"), port);
-	return false;
+	return -1;
     }
-
+#endif
+    
+    if (_listenfd >= 2) {
+	log_debug("already connected to port %hd", port);
+	return _listenfd;
+    }
+    
     const struct hostent *host = gethostbyname("localhost");
     struct in_addr *thisaddr = reinterpret_cast<struct in_addr *>(host->h_addr_list[0]);
     _ipaddr = thisaddr->s_addr;
@@ -145,7 +152,7 @@ Network::createServer(short port)
     if ((ppe = getprotobyname(DEFAULTPROTO)) == 0) {
         log_error(_("unable to get protocol entry for %s"),
                 DEFAULTPROTO);
-        return false;
+        return -1;
     }
 
     // set protocol type
@@ -161,14 +168,14 @@ Network::createServer(short port)
     // error, wasn't able to create a socket
     if (_listenfd < 0) {
         log_error(_("unable to create socket: %s"), strerror(errno));
-        return true;
+        return -1;
     }
 
     on = 1;
     if (setsockopt(_listenfd, SOL_SOCKET, SO_REUSEADDR,
                    (char *)&on, sizeof(on)) < 0) {
         log_error(_("setsockopt SO_REUSEADDR failed"));
-        return false;
+        return -1;
     }
 
     retries = 0;
@@ -187,7 +194,7 @@ Network::createServer(short port)
 //		char  ascip[INET_ADDRSTRLEN];
 //		inet_ntop(sock_in.sin_family, &_ipaddr, ascip, INET_ADDRSTRLEN);
 		char *ascip = ::inet_ntoa(sock_in.sin_addr);
-		log_debug(_("Server bound to service on %s, port %hd, using fd %d"),
+		log_debug(_("Server bound to service on %s, port %hd, using fd #%d"),
 		    ascip, ntohs(sock_in.sin_port),
 		    _listenfd);
 	}
@@ -195,30 +202,47 @@ Network::createServer(short port)
         if (type == SOCK_STREAM && listen(_listenfd, 5) < 0) {
             log_error(_("unable to listen on port: %hd: %s "),
                 port, strerror(errno));
-            return false;
+            return -1;
         }
 
+	// We have a socket created
         _port = port;
-        return true;
+        return _listenfd;
     }
-    return false;
+    return -1;
 }
 
 // Description: Accept a new network connection for the port we have
 //              created a server for.
 // The default is to block.
-bool
+int
 Network::newConnection(void)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    return newConnection(true);
+    return newConnection(true, _listenfd);
 }
 
-bool
+int
+Network::newConnection(int fd)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    return newConnection(true, fd);
+}
+
+int
 Network::newConnection(bool block)
 {
 //    GNASH_REPORT_FUNCTION;
+
+    return newConnection(block, _listenfd);
+}
+
+int
+Network::newConnection(bool block, int fd)
+{
+    GNASH_REPORT_FUNCTION;
 
     struct sockaddr	newfsin;
     socklen_t		alen;
@@ -229,12 +253,12 @@ Network::newConnection(bool block)
 
     alen = sizeof(struct sockaddr_in);
 
-    if (_debug) {
-	log_debug(_("Trying to accept net traffic on fd %d"), _sockfd);
+    if (fd <= 2) {
+        return -1;
     }
-
-    if (_listenfd <= 2) {
-        return false;
+    if (_debug) {
+	log_debug(_("Trying to accept net traffic on fd #%d"),
+		  fd);
     }
 
     while (retries--) {
@@ -245,7 +269,7 @@ Network::newConnection(bool block)
 //         if (_console) {
 //             FD_SET(fileno(stdin), &fdset);
 //         }
-        FD_SET(_listenfd, &fdset);
+        FD_SET(fd, &fdset);
 
         // Reset the timeout value, since select modifies it on return. To
         // block, set the timeout to zero.
@@ -253,33 +277,33 @@ Network::newConnection(bool block)
         tval.tv_usec = 0;
 
         if (block) {
-            ret = select(_listenfd+1, &fdset, NULL, NULL, NULL);
+            ret = select(fd+1, &fdset, NULL, NULL, NULL);
         } else {
-            ret = select(_listenfd+1, &fdset, NULL, NULL, &tval);
+            ret = select(fd+1, &fdset, NULL, NULL, &tval);
         }
 
         if (FD_ISSET(0, &fdset)) {
 	    if (_debug) {
 		log_debug(_("There is data at the console for stdin"));
 	    }
-            return true;
+            return 1;
         }
 
         // If interupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
-            log_debug(_("The accept() socket for fd %d was interupted by a system call"), _listenfd);
+            log_debug(_("The accept() socket for fd #%d was interupted by a system call"), fd);
         }
 
         if (ret == -1) {
-            log_debug(_("The accept() socket for fd %d never was available for writing"),
-                    _listenfd);
-            return false;
+            log_debug(_("The accept() socket for fd #%d never was available for writing"),
+                    fd);
+            return -1;
         }
 
         if (ret == 0) {
             if (_debug) {
-                log_debug(_("The accept() socket for fd %d timed out waiting to write"),
-                        _listenfd);
+                log_debug(_("The accept() socket for fd #%d timed out waiting to write"),
+                        fd);
             }
         }
     }
@@ -287,18 +311,18 @@ Network::newConnection(bool block)
 #ifndef HAVE_WINSOCK_H
     fcntl(_listenfd, F_SETFL, O_NONBLOCK); // Don't let accept() block
 #endif
-    _sockfd = accept(_listenfd, &newfsin, &alen);
+    _sockfd = accept(fd, &newfsin, &alen);
 
     if (_sockfd < 0) {
         log_error(_("unable to accept: %s"), strerror(errno));
-        return false;
+        return -1;
     }
 
     if (_debug) {
-	log_debug(_("Accepting tcp/ip connection on fd %d"), _sockfd);
+	log_debug(_("Accepting tcp/ip connection on fd #%d"), _sockfd);
     }
 
-    return true;
+    return _sockfd;
 }
 
 #ifdef _WIN32
@@ -434,7 +458,7 @@ Network::createClient(const string &hostname)
 bool
 Network::createClient(const string &hostname, short port)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     struct sockaddr_in  sock_in;
     fd_set              fdset;
@@ -566,9 +590,9 @@ Network::createClient(const string &hostname, short port)
 bool
 Network::closeNet()
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
-    if (_sockfd > 0) {
+    if ((_sockfd > 0) && (_connected)) {
         closeNet(_sockfd);
         _sockfd = 0;
         _connected = false;
@@ -580,7 +604,7 @@ Network::closeNet()
 bool
 Network::closeNet(int sockfd)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     int retries = 0;
 
@@ -609,14 +633,19 @@ Network::closeNet(int sockfd)
             }
 #endif
             if (::close(sockfd) < 0) {
-                log_error(_("Unable to close the socket for fd %d: %s"),
-                        sockfd, strerror(errno));
+		// If we have a bad file descriptor, it's because
+		// this got closed already, usually by another
+		// thread being paranoid.
+		if (errno != EBADF) {
+		    log_error(_("Unable to close the socket for fd #%d: %s"),
+			      sockfd, strerror(errno));
+		}
 #ifndef HAVE_WINSOCK_H
                 sleep(1);
 #endif
                 retries++;
             } else {
-		log_debug(_("Closed the socket on fd %d"), sockfd);
+		log_debug(_("Closed the socket on fd #%d"), sockfd);
                 return true;
             }
         }
@@ -641,11 +670,11 @@ Network::closeConnection(void)
 bool
 Network::closeConnection(int fd)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     if (fd > 0) {
         ::close(fd);
-	log_debug("%s: Closed fd %d", __FUNCTION__, fd);
+	log_debug("%s: Closed fd #%d", __FUNCTION__, fd);
 //        closeNet(fd);
     }
 
@@ -739,7 +768,7 @@ Network::writeNet(const std::string& buffer)
 int
 Network::writeNet(const byte_t *buffer, int nbytes)
 {
-return writeNet(_sockfd, buffer, nbytes, _timeout);
+    return writeNet(_sockfd, buffer, nbytes, _timeout);
 }
 
 // int

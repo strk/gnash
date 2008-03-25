@@ -41,6 +41,7 @@
 namespace gnash {
 
 // Define the ports for the RTMP protocols
+const short ADMIN = 1111;
 const short RTMP = 1935;
 const short RTMPT = 80;
 const short RTMPTS = 443;
@@ -68,12 +69,14 @@ public:
     
     // Create a new server. After creating it, then you have to wait
     // for an incoming connection.
-    bool createServer(void);
-    DSOEXPORT bool createServer(short port);
+    int createServer(void);
+    DSOEXPORT int createServer(short port);
     
     // Accept a client connection for the current server.
-    bool newConnection(void);
-    DSOEXPORT bool newConnection(bool block);
+    int newConnection(void);
+    int newConnection(int fd);
+    int newConnection(bool block, int fd);
+    DSOEXPORT int newConnection(bool block);
 
     // Connect to a named pipe
     bool connectSocket(const std::string &sock);
@@ -115,8 +118,10 @@ public:
         return _connected;
     };
 
+    void setFileFd(int x) { _sockfd = x; };
     int getFileFd() const { return _sockfd; };
     int getListenFd() const { return _listenfd; };
+    void setListenFd(int x) { _listenfd = x; };
     short getPort() const { return _port; };
     const std::string& getURL() const { return _url; }
     const std::string& getProtocol() const  { return _protocol; }
@@ -130,8 +135,8 @@ public:
 
  protected:
     in_addr_t   _ipaddr;
-    int         _sockfd;
-    int         _listenfd;
+    int         _sockfd;	// the file descriptor used for reading and writing
+    int         _listenfd;	// the file descriptor used to listen for new connections
     short       _port;
     std::string _portstr;
     std::string _url;
