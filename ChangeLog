@@ -1,5 +1,46 @@
 2008-03-26 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* server/vm/ActionExec.h
+	* server/vm/action.h
+	* server/vm/with_stack_entry.h
+	* server/asobj/AsBroadcaster.h
+	* server/asobj/BevelFilter_as.h
+	* server/asobj/BlurFilter_as.h
+	* server/asobj/Boolean.h
+	* server/asobj/Camera.h
+	* server/asobj/Color.h
+	* server/asobj/ColorMatrixFilter_as.h
+	* server/asobj/ContextMenu.h
+	* server/asobj/ConvolutionFilter_as.h
+	* server/asobj/CustomActions.h
+	* server/asobj/Date.h
+	* server/asobj/DropShadowFilter_as.h
+	* server/asobj/Error.h
+	* server/asobj/GlowFilter_as.h
+	* server/asobj/GradientBevelFilter_as.h
+	* server/asobj/GradientGlowFilter_as.h
+	* server/asobj/Key.h
+	* server/asobj/LoadVars.h
+	* server/asobj/LocalConnection.h
+	* server/asobj/Microphone.h
+	* server/asobj/Mouse.h
+	* server/asobj/NetConnection.h
+	* server/asobj/Number.h
+	* server/asobj/Selection.h
+	* server/asobj/SharedObject.h
+	* server/asobj/SoundFfmpeg.h
+	* server/asobj/SoundGst.h
+	* server/asobj/SoundMad.h
+	* server/asobj/Stage.h
+	* server/asobj/System.h
+	* server/asobj/TextSnapshot.h
+	* server/asobj/gstring.h
+	* server/asobj/xml.h
+	* server/asobj/xmlsocket.h: drop gnashconfig includes. Also replace tu_config.h
+	  with dsodefs.h when only DSOEXPORT is required.
+
+2008-03-26 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* libbase/log.{h,cpp}: drop (unused) vsnprintf logging calls, tidy up
 	  a bit.
 	* server/sprite_instance.cpp: don't use SIZET_FMT or c_str() in logging
