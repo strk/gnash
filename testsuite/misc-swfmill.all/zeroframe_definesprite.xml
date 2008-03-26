@@ -1,0 +1,243 @@
+<?xml version="1.0"?>
+<swf version="6" compressed="1">
+
+<!--
+  |
+  | Test how a define sprite tags with no SHOWFRAME tags in them are dealt with.
+  | In particular we test that:
+  |  - onClipLoad is always invoked even if 0 frames are advertised 
+  |  - _framesloaded is never less then _totalframes
+  |  - _totalframes reflects what's advertised, no matter number of SHOWFRAME
+  |
+-->
+  <Header framerate="12" frames="1">
+    <size>
+      <Rectangle left="0" right="12800" top="0" bottom="9600"/>
+    </size>
+    <tags>
+
+      <!--
+        |  Definition of a 0-advertised frames, with NO SHOWFRAME tag
+       -->
+      <DefineSprite objectID="1" frames="0">
+        <tags>
+          <End/>
+        </tags>
+      </DefineSprite>
+
+      <!--
+        |  Definition of a 1-advertised frames, with NO SHOWFRAME tag
+       -->
+      <DefineSprite objectID="2" frames="1">
+        <tags>
+          <End/>
+        </tags>
+      </DefineSprite>
+
+      <!--
+        |  Definition of a 2-advertised frames, with NO SHOWFRAME tag
+       -->
+      <DefineSprite objectID="3" frames="2">
+        <tags>
+          <End/>
+        </tags>
+      </DefineSprite>
+
+      <!--
+        |  Place the zero-frames no-showframe sprite
+       -->
+      <PlaceObject2 replace="0" depth="1" objectID="1" name="zero_zero" allflags1="1" allflags2="0">
+        <events>
+          <Event flags1="1" flags2="0">  <!-- onClipLoad -->
+            <actions>
+              <PushData>
+                <items>
+                  <StackString value="_root"/> 
+                </items>
+              </PushData>
+              <GetVariable/> <!-- [movieclip:_root] -->
+              <PushData>
+                <items>
+                  <StackString value="summary"/> 
+                  <StackString value="a"/> 
+                  <StackString value="_framesloaded"/> 
+                </items>
+              </PushData>
+              <GetVariable/> <!-- [movieclip:_root],[string:summary],[string:a],[number:0] -->
+              <AddTyped/> <!-- [movieclip:_root],[string:summary],[string:a0] -->
+              <PushData>
+                <items>
+                  <StackString value="_totalframes"/> 
+                </items>
+              </PushData> <!-- [movieclip:_root],[string:summary],[string:a0],[string:_totalframes] -->
+              <GetVariable/> <!-- [movieclip:_root],[string:summary],[string:a0],[number:0] -->
+              <AddTyped/> <!-- [movieclip:_root],[string:summary],[string:a00] -->
+              <SetMember/> <!-- EMPTY STACK -->
+              <EndAction/>
+            </actions>
+          </Event>
+          <Event flags1="0" flags2="0"/>
+        </events>
+      </PlaceObject2>
+
+      <!--
+        |  Place the one-frames no-showframe sprite
+       -->
+      <PlaceObject2 replace="0" depth="2" objectID="2" name="one_zero" allflags1="1" allflags2="0">
+        <events>
+          <Event flags1="1" flags2="0">  <!-- onClipLoad -->
+            <actions>
+              <PushData>
+                <items>
+                  <StackString value="_root"/> 
+                </items>
+              </PushData> <!-- [string:_root] -->
+              <GetVariable/> <!-- [movieclip:_root] -->
+              <PushData>
+                <items>
+                  <StackString value="summary"/> 
+                  <StackString value="_root"/> 
+                </items>
+              </PushData> <!-- [movieclip:_root],[string:summary],[string:_root] -->
+              <GetVariable/> <!-- [movieclip:_root],[string:summary],[movieclip:_root] -->
+              <PushData>
+                <items>
+                  <StackString value="summary"/> 
+                </items>
+              </PushData> <!-- [movieclip:_root],[string:summary],[movieclip:_root],[string:summary] -->
+              <GetMember/> <!-- [movieclip:_root],[string:summary],[string:a00] -->
+              <PushData>
+                <items>
+                  <StackString value="b"/> 
+                  <StackString value="_framesloaded"/> 
+                </items>
+              </PushData> <!-- [movieclip:_root],[string:summary],[string:a00],[string:b],[string:_framesloaded] -->
+              <GetVariable/> <!-- [movieclip:_root],[string:summary],[string:a00],[string:b],[number:1] -->
+              <AddTyped/> <!-- [movieclip:_root],[string:summary],[string:a00],[string:b1] -->
+              <PushData>
+                <items>
+                  <StackString value="_totalframes"/> 
+                </items>
+              </PushData> <!-- [movieclip:_root],[string:summary],[string:a00],[string:b1],[string:_totalframes] -->
+              <GetVariable/> <!-- [movieclip:_root],[string:summary],[string:a00],[string:b1],[number:1] -->
+              <AddTyped/> <!-- [movieclip:_root],[string:summary],[string:a00],[string:b11] -->
+              <AddTyped/> <!-- [movieclip:_root],[string:summary],[string:a00b11] -->
+              <SetMember/> <!-- EMPTY STACK -->
+              <EndAction/>
+            </actions>
+          </Event>
+          <Event flags1="0" flags2="0"/>
+        </events>
+      </PlaceObject2>
+
+      <!--
+        |  Place the two-frames no-showframe sprite
+       -->
+      <PlaceObject2 replace="0" depth="3" objectID="3" name="two_zero" allflags1="1" allflags2="0">
+        <events>
+          <Event flags1="1" flags2="0">  <!-- onClipLoad -->
+            <actions>
+              <PushData>
+                <items>
+                  <StackString value="_root"/> 
+                </items>
+              </PushData> <!-- [string:_root] -->
+              <GetVariable/> <!-- [movieclip:_root] -->
+              <PushData>
+                <items>
+                  <StackString value="summary"/> 
+                  <StackString value="_root"/> 
+                </items>
+              </PushData> <!-- [movieclip:_root],[string:summary],[string:_root] -->
+              <GetVariable/> <!-- [movieclip:_root],[string:summary],[movieclip:_root] -->
+              <PushData>
+                <items>
+                  <StackString value="summary"/> 
+                </items>
+              </PushData> <!-- [movieclip:_root],[string:summary],[movieclip:_root],[string:summary] -->
+              <GetMember/> <!-- [movieclip:_root],[string:summary],[string:a00b11] -->
+              <PushData>
+                <items>
+                  <StackString value="c"/> 
+                  <StackString value="_framesloaded"/> 
+                </items>
+              </PushData> <!-- [movieclip:_root],[string:summary],[string:a00b11],[string:c],[string:_framesloaded] -->
+              <GetVariable/> <!-- [movieclip:_root],[string:summary],[string:a00b11],[string:c],[number:2] -->
+              <AddTyped/> <!-- [movieclip:_root],[string:summary],[string:a00b11],[string:c2] -->
+              <PushData>
+                <items>
+                  <StackString value="_totalframes"/> 
+                </items>
+              </PushData> <!-- [movieclip:_root],[string:summary],[string:a00b11],[string:c2],[string:_totalframes] -->
+              <GetVariable/> <!-- [movieclip:_root],[string:summary],[string:a00b11],[string:c2],[number:2] -->
+              <AddTyped/> <!-- [movieclip:_root],[string:summary],[string:a00b11],[string:c22] -->
+              <AddTyped/> <!-- [movieclip:_root],[string:summary],[string:a00b11c22] -->
+              <SetMember/> <!-- EMPTY STACK -->
+              <EndAction/>
+            </actions>
+          </Event>
+          <Event flags1="0" flags2="0"/>
+        </events>
+      </PlaceObject2>
+
+      <DoAction>
+        <actions>
+          <PushData>
+            <items>
+              <StackString value="a00b11c22"/>
+              <StackString value="summary"/>
+            </items>
+          </PushData>
+          <GetVariable/> 
+
+          <Duplicate/> <!-- .. debugging .. -->
+          <Trace/> <!-- expect a00b11c22 -->
+
+	  <EqualTyped/>
+
+	  // If true, jump to PASSED tracing
+	  <BranchIfTrue byteOffset="49"/>
+
+	  // Else, trace FAILED
+          <PushData>
+            <items>
+              <!--
+                // NOTE: the number of characters in the next string push 
+                // DOES matter in the BranchIfTrue tag above, so when we'll
+                // succeed in this, an empty space must be added to replace
+                // the 'X' character removed.
+                // Yes, is NOT fun doing actionscript with swfmill...
+                -->
+              <StackString value="XFAILED: expected a00b11c22 ...       "/>
+            </items>
+          </PushData>
+          <Trace/>
+          <BranchAlways byteOffset="27"/> // get to end 
+
+	  // PASSED tracing
+          <PushData>
+            <items>
+              <StackString value="PASSED: got a00b11c22"/>
+            </items>
+          </PushData>
+          <Trace/>
+
+	  // END OF TEST tag
+          <PushData>
+            <items>
+              <StackString value="END OF TEST"/>
+            </items>
+          </PushData>
+          <Trace/>
+
+          <EndAction/>
+        </actions>
+      </DoAction>
+
+      <ShowFrame/>
+
+      <End/>
+
+    </tags>
+  </Header>
+</swf>

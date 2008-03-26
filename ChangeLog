@@ -1,3 +1,11 @@
+2008-03-26 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-swfmill.all/: Makefile.am,
+	  zeroframe_definesprite.xml:
+	  Test that zero-framed sprites should still be
+	  placed on stage. Gnash fails in one over 3 tests,
+	  0.8.2 would fail all cases. 
+
 2008-03-26 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/asobj/Global.cpp: parseFloat should work with double

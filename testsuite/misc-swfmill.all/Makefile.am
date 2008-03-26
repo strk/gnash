@@ -26,6 +26,7 @@ SC_XMLTESTS =			\
 	jump_after_end.xml	\
 	dict_override.xml	\
 	initaction_in_definesprite.xml \
+	zeroframe_definesprite.xml \
 	$(NULL)
 
 EXTRA_DIST = $(SC_XMLTESTS)
@@ -41,6 +42,7 @@ check_SCRIPTS = \
 	jump_after_end-runner	\
 	dict_override-runner	\
 	initaction_in_definesprite-runner	\
+	zeroframe_definesprite-runner	\
 	$(NULL)
 
 jump_after_end-runner: $(srcdir)/../generic-testrunner.sh jump_after_end.swf Makefile
@@ -53,6 +55,10 @@ dict_override-runner: $(srcdir)/../generic-testrunner.sh dict_override.swf Makef
 
 initaction_in_definesprite-runner: $(srcdir)/../generic-testrunner.sh initaction_in_definesprite.swf Makefile
 	sh $< -r 50 -c "END OF TEST" $(top_builddir) initaction_in_definesprite.swf > $@
+	chmod 755 $@
+
+zeroframe_definesprite-runner: $(srcdir)/../generic-testrunner.sh zeroframe_definesprite.swf Makefile
+	sh $< -r 50 -c "END OF TEST" $(top_builddir) zeroframe_definesprite.swf > $@
 	chmod 755 $@
 
 .xml.swf: 
