@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Object.as,v 1.45 2008/03/25 21:28:23 bwy Exp $";
+rcsid="$Id: Object.as,v 1.46 2008/03/26 08:25:03 bwy Exp $";
 #include "check.as"
 
 // Test existance of methods
@@ -253,6 +253,7 @@ check_equals (obj3.len2, 'test');
 
 obj3.__proto__ = undefined;
 check_equals(typeof(obj3), "object");
+check_equals(typeof(obj3.__proto__), 'undefined');
 xcheck_equals(obj3, undefined);
 
 // TODO: try using the name of an existing property
@@ -551,6 +552,6 @@ totals(65);
 #endif
 
 #if OUTPUT_VERSION >= 6
-totals(171);
+totals(172);
 #endif
 
