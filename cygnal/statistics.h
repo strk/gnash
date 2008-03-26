@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -55,23 +55,35 @@ public:
         WIN32,
         SOLARIS
     } ostype_e;
-    void setIPaddr(in_addr_t x) { _ipaddr = x; };
-    void setBrowser(browser_e x) { _browser = x; } ;
+
+    // Add a sample
     int addStats();
+    
     // these make calculations on the collected network data.
     float getFPS();
     int getBitRate();
+    
+    // Accessors
+    void setIPaddr(in_addr_t x) { _ipaddr = x; };
+    void setBrowser(browser_e x) { _browser = x; } ;
+    void setOS(ostype_e x) { _os = x; } ;
+    in_addr_t getIPaddr() { return _ipaddr; };
+    browser_e getBrowser() { return _browser; };
+    ostype_e getOS() { return _os; };
+    
+//    void setFilespec(std::string &x) { _filespec = x; } ;
+//    std::string &getFilespec() { return _filespec; };
     // Dump the collected network statistics in a human readable form.
     void dump();
     void clear();
 private:
     in_addr_t           _ipaddr;
-    const char	        *_filespec;
     browser_e           _browser;
     ostype_e            _os;
     std::list<NetStats *> _netstats;
+    boost::uint32_t     _msg_count;
+    std::vector<std::string> _filespec;
 };
-
  
 } // end of cygnal namespace
 

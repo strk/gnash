@@ -1,3 +1,21 @@
+2008-03-25  Rob Savoye  <rob@ute.welcomehome.org>
+
+	* buffer.{h,cpp}: Use more fime grained ifdef for statistics
+	collecting. 
+	* cque.{h,cpp}: Collect que statistics. 
+	* cygnal.cpp: Use a map instead of a list for the list of
+	handlers. Add admin thread for port 1111. Add connection manager
+	thread, one for each port.
+	* handler.cpp: Tweak how connections get closed. Make sure all
+	threads die in the proper order.
+	* handler.h: Add enum for admin commands.
+	* http.cpp: Return a bool instead of a string from
+	waitForGetRequest(). CLeanup after ourselves and die when the I/O
+	threads go away.
+	* netstats.h: Add comment on statistics API. Rename ifdefs of swf
+	versions.
+	* statistics.cpp: Add more codecs to the enum.
+	
 2008-03-21  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* testsuite/cygnal.all/test_http.cpp: Fix so it compiles

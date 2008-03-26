@@ -43,8 +43,12 @@ const char *codec_names[] = {
     "NO_CODEC",
     "Ogg",
     "Theora",
+    "Dirac",
+    "Snow",
     "MP3",
     "MPEG4",
+    "H264",
+    "H263",
     "FLV",
     "VP6",
     "VP7"
@@ -55,14 +59,16 @@ const char *codec_names[] = {
 // representation here or you'll get the wrong output.
 const char *filetype_names[] = {
         "NO_FILETYPE",
+	"HTTP",
         "RTMP",
         "RTMPT",
         "RTMPTS",
-        "FLASH5",
-        "FLASH6",
-        "FLASH7",
-        "FLASH8",
-        "FLASH9",
+        "SWF",
+        "SWF5",
+        "SWF6",
+        "SWF7",
+        "SWF8",
+        "SWF9",
         "AUDIO",
         "VIDEO"
 };
@@ -95,7 +101,6 @@ Statistics::addStats() {
     st->setStartTime(getStartTime());
     st->setStopTime(getStopTime());
     st->setBytes(getBytes());
-    st->setCodec(getCodec());
     st->setFileType(getFileType());
     
     boost::mutex::scoped_lock lock(io_mutex);
@@ -114,10 +119,10 @@ Statistics::dump() {
         if (stats->getFileType() <= VIDEO) {
             log_debug (_("Stream type is: %s"), filetype_names[stats->getFileType()]);
         }
-        if (((stats->getFileType() == VIDEO) || (stats->getFileType() == AUDIO)) &&
-            stats->getCodec() <= VP7) {
-            log_debug (_("Stream codec is: %s"), codec_names[stats->getCodec()]);
-        }
+//         if (((stats->getFileType() == VIDEO) || (stats->getFileType() == AUDIO)) &&
+//             stats->getCodec() <= VP7) {
+//             log_debug (_("Stream codec is: %s"), codec_names[stats->getCodec()]);
+//         }
         log_debug (_("%d bytes were transfered in %s seconds"),
 		 stats->getBytes(),
                  to_simple_string(stats->getTimeSpan()).c_str());

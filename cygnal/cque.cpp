@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 #include <deque>
+#include <time.h>
 
 #include "log.h"
 #include "gmemory.h"
@@ -40,6 +41,10 @@ namespace cygnal
 CQue::CQue()
 {
 //    GNASH_REPORT_FUNCTION;
+    _stats.totalbytes = 0;
+    _stats.totalin = 0;
+    _stats.totalout = 0;
+    clock_gettime (CLOCK_REALTIME, &_stats.start);
     _name = "default";
 }
 
@@ -90,16 +95,21 @@ CQue::push(Buffer *data)
 //    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_mutex);
     _que.push_back(data);
+#ifdef USE_STATS_QUEUE
+    _stats.totalbytes += data->size();
+    _stats.totalin++;
+#endif
     return true;
 }
 
-// Push bytes on the outgoing FIFO
+// Push data
 bool
 CQue::push(gnash::Network::byte_t *data, int nbytes)
 {
 //    GNASH_REPORT_FUNCTION;
     Buffer *buf = new Buffer;
     std::copy(data, data + nbytes, buf->reference());
+    return push(buf);
 }
 
 
@@ -113,6 +123,9 @@ CQue::pop()
     if (_que.size()) {
         buf = _que.front();
         _que.pop_front();
+#ifdef USE_STATS_QUEUE
+	_stats.totalout++;
+#endif
     }
     return buf;
 }
@@ -229,6 +242,15 @@ CQue::dump()
 	Buffer *ptr = *(it);
         ptr->dump();
     }
+#ifdef USE_STATS_QUEUE
+    struct timespec now;
+    clock_gettime (CLOCK_REALTIME, &now);
+    cerr << "Que lifespan is " <<
+	(float)((now.tv_sec - _stats.start.tv_sec) + ((now.tv_nsec - _stats.start.tv_nsec)/1e9)) << " seconds" << endl;
+    cerr << "Total number of bytes is " << _stats.totalbytes << " bytes" << endl;
+    cerr << "Total number of packets pushed to queue is: " << _stats.totalin << endl;
+    cerr << "Total number of packets popped from queue is: " << _stats.totalout << endl;
+#endif
 }
 
 } // end of cygnal namespace

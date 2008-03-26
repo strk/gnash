@@ -39,7 +39,7 @@ Buffer::init(size_t nbytes)
         empty();
     }
 
-#ifdef USE_STATISTICS
+#ifdef USE_STATS_BUFFERS
     clock_gettime (CLOCK_REALTIME, &_stamp);
 #endif
     return _ptr;
@@ -67,7 +67,7 @@ Buffer::~Buffer()
 {
 //    GNASH_REPORT_FUNCTION;
     if (_ptr) {
-#ifdef USE_STATISTICS
+#ifdef USE_STATS_BUFFERS
 	struct timespec now;
 	clock_gettime (CLOCK_REALTIME, &now);
 	log_debug("Buffer %x (%d) stayed in queue for %f seconds",

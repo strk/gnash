@@ -20,7 +20,7 @@
 #define __HANDLER_H__ 1
 
 #include <boost/cstdint.hpp>
-#include <boost/thread/condition.hpp>
+//#include <boost/thread/condition.hpp>
 #include <string>
 #include <deque>
 
@@ -41,6 +41,14 @@ public:
     Handler();
     ~Handler();
 
+    typedef enum {
+	UNKNOWN,
+	STATUS,
+	POLL,
+	HELP,
+	INTERVAL,
+	QUIT,
+    } admin_cmd_e;
     // This is used to pass parameters to a thread using boost::bind
     typedef struct {
 	int netfd;
@@ -116,14 +124,17 @@ public:
 
     // Take a buffer and write it to the network
     int writeNet(int fd, Buffer *buf)
-    	{ Network::writeNet(fd, buf->reference(), buf->size()); };
+    	{ return Network::writeNet(fd, buf->reference(), buf->size()); };
     
     int writeNet(Buffer *buf)
-    	{ Network::writeNet(buf->reference(), buf->size()); };
+    	{ return Network::writeNet(buf->reference(), buf->size()); };
     
     // Dump internal data.
     void dump();
-
+#ifdef USE_STATS_QUEUE
+    CQue::que_stats_t *statsin()  { return _incoming.stats(); };
+    CQue::que_stats_t *statsout() { return _outgoing.stats(); };
+#endif
     void die() { _die = true; _outgoing.notify(); };
     bool timetodie() { return _die; };
     
@@ -139,6 +150,7 @@ private:
 extern "C" {
     void netin_handler(Handler::thread_params_t *args);
     void netout_handler(Handler::thread_params_t *args);
+    void start_handler(Handler::thread_params_t *args);
 }
 
 } // end of cygnal namespace

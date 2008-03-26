@@ -69,7 +69,7 @@ private:
     void *init(size_t nbytes);
     gnash::Network::byte_t *_ptr;
     int         _nbytes;
-#if USE_STATISTICS
+#ifdef USE_STATS_BUFFERS
     struct timespec _stamp;	// used for timing how long data stays in the queue.
 #endif
 };

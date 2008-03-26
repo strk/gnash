@@ -23,7 +23,9 @@
 #endif
 
 #include <list>
+#include <map>
 #include <iostream>
+#include <sstream>
 #include <signal.h>
 #include <vector>
 #include <sys/mman.h>
@@ -82,12 +84,8 @@ static void usage();
 static void version_and_copyright();
 static void cntrlc_handler(int sig);
 
-//static void start_thread();
-//static void rtmp_thread(struct thread_params *conndata);
-static void http_thread(struct thread_params *conndata);
-//static void ssl_thread(struct thread_params *conndata);
-static void stream_thread(struct thread_params *sendfile);
-//static void dispatch_thread(struct thread_params *params);
+void connection_handler(Handler::thread_params_t *args);
+void admin_handler(Handler::thread_params_t *args);
 
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 
@@ -113,7 +111,12 @@ int thread_retries = 10;
 static int port_offset = 0;
 
 // Keep a list of all active network connections
-static map<std::string, Handler *> _handlers;
+namespace cygnal {
+  map<int, Handler *> handlers;
+}
+
+// Admin commands are small
+const int ADMINPKTSIZE = 80;
 
 // end of globals
 
@@ -143,9 +146,11 @@ main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
+//    crcfile.loadFiles();
+    
     // Set the log file name before trying to write to
     // it, or we might get two.
-    dbglogfile.setLogFilename("cygnal-dbg.log");
+    dbglogfile.setLogFilename(crcfile.getDebugLog());
     
     if (crcfile.verbosityLevel() > 0) {
         dbglogfile.setVerbosity(crcfile.verbosityLevel());
@@ -156,39 +161,37 @@ main(int argc, char *argv[])
         log_debug (_("Document Root for media files is: %s"),
 		       docroot);
     } else {
-        docroot = "/var/www/html/software/gnash/tests/";
+        docroot = "/var/www/html/software/tests/";
     }
 
 
     // Handle command line arguments
-    for( int i = 0; i < parser.arguments(); ++i )
-    {
-        const int code = parser.code(i);
-        switch( code )
-        {
-            case 'h':
-                version_and_copyright();
-                usage();
-                exit(0);
-            case 'V':
-                 version_and_copyright();
-                 exit(0);
-            case 'v':
-                dbglogfile.setVerbosity();
-                log_debug (_("Verbose output turned on"));
-                break;
-            case 'p':
-                port_offset = parser.argument<int>(i);
-	            crcfile.setPortOffset(port_offset);
-	            break;
-            case 'd':
-                crcfile.dump();
-                exit(0);
-                break;
-            default:
-                log_error (_("Extraneous argument: %s"), parser.argument(i).c_str());
+    for( int i = 0; i < parser.arguments(); ++i ) {
+	const int code = parser.code(i);
+	switch( code ) {
+	  case 'h':
+	      version_and_copyright();
+	      usage();
+	      exit(0);
+	  case 'V':
+	      version_and_copyright();
+	      exit(0);
+	  case 'v':
+	      dbglogfile.setVerbosity();
+	      log_debug (_("Verbose output turned on"));
+	      break;
+	  case 'p':
+	      port_offset = parser.argument<int>(i);
+	      crcfile.setPortOffset(port_offset);
+	      break;
+	  case 'd':
+	      crcfile.dump();
+	      exit(0);
+	      break;
+	  default:
+	      log_error (_("Extraneous argument: %s"), parser.argument(i).c_str());
         }
-    } 
+    }
     
     // Trap ^C (SIGINT) so we can kill all the threads
     act.sa_handler = cntrlc_handler;
@@ -199,38 +202,45 @@ main(int argc, char *argv[])
 //     rtmp_data.port = port_offset + 1935;
 //     boost::thread rtmp_port(boost::bind(&rtmp_thread, &rtmp_data));
 
+#if 1
+    // Admin handler
+    Handler::thread_params_t admin_data;
+    admin_data.port = gnash::ADMIN;
+    boost::thread adminhandler(boost::bind(&admin_handler, &admin_data));
+#endif
+
+#if 1
+    // Incomming connection handler
+    Handler::thread_params_t conn_data;
+    conn_data.port = port_offset + gnash::RTMPT;
+    conn_data.filespec = docroot;
+//    conn_data.handle = &handlers;
+    boost::thread conn_handler(boost::bind(&connection_handler, &conn_data));
+#endif
+    
+#if 0
     int retries = 10;
     // Run forever
     while (retries > 0) {
 	Handler::thread_params_t http_data;
 	http_data.netfd = 0;
-	http_data.port = port_offset + 80;
+	http_data.port = port_offset + gnash::RTMPT;
 	http_data.filespec = docroot;
 	Handler *hand = new Handler;
 	http_data.handle = &hand;
+	cerr << "Adding handler: " << (void *)hand << endl;
+	handlers.push_back(hand);
+	hand->createServer(http_data.port);
 	hand->start(&http_data);
+	cerr << "Removing handler: " << (void *)hand << endl;
+	handlers.remove(hand);
 	delete hand;
     }
-    
-//    boost::thread http_port(boost::bind(&nethandler, &http_data));
-#if 0
-    Statistics st;
-    http_data.statistics = &st;
-    boost::thread http_port(boost::bind(&http_thread, &http_data));
-
-    ssl_data.port = port_offset + 443;
-//    boost::thread ssl_port(boost::bind(&ssl_thread, &ssl_data));
-    
-//    boost::thread rtmp_port(&rtmp_thread);
-//    boost::thread http_port(&http_thread);
-//    boost::thread ssl_port(&ssl_thread);
 #endif
-
-    // wait for the thread to finish
-//    rtmp_port.join();
-//    http_port.join();
-//    ssl_port.join();
     
+    // wait for the thread to finish
+//    adminhandler.join();    
+    conn_handler.join();    
     log_debug (_("All done I think..."));
     
     return(0);
@@ -338,6 +348,7 @@ version_and_copyright()
     << endl;
 }
 
+
 static void
 usage()
 {
@@ -350,6 +361,150 @@ usage()
 	<< _("  -p   --port-offset   RTMPT port offset") << endl
 	<< endl;
 }
+
+// FIXME: this function could be tweaked for better performance
+void
+admin_handler(Handler::thread_params_t *args)
+{
+    GNASH_REPORT_FUNCTION;
+    int retries = 10;
+    int ret;
+
+    map<int, Handler *>::iterator hit;
+    stringstream response;
+    int index = 0;
+    
+    Network net;
+    Handler::admin_cmd_e cmd = Handler::POLL;
+    net.createServer(args->port);
+    while (retries > 0) {
+	log_debug(_("Starting Admin Handler for port %d"), args->port);
+	net.newConnection(true);
+	log_debug(_("Got an incoming Admin request"));
+	do {
+	    Network::byte_t data[ADMINPKTSIZE+1];
+	    memset(data, 0, ADMINPKTSIZE+1);
+	    const char *ptr = reinterpret_cast<const char *>(data);
+	    ret = net.readNet(data, ADMINPKTSIZE, 3);
+	    // force the case to make comparisons easier. Only compare enough characters to
+	    // till each command is unique.
+	    std::transform(ptr, ptr + ret, data, (int(*)(int)) toupper);
+	    if (ret == 0) {
+		net.writeNet("no more admin data, exiting...\n");
+		if ((ret == 0) && cmd != Handler::POLL) {
+//		    retries = 0;
+		    ret = -1;
+		    break;
+		}
+	    } else {
+		if (strncmp(ptr, "QUIT", 4) == 0) { 
+		    cmd = Handler::QUIT;
+		} else if (strncmp(ptr, "STATUS", 5) == 0) {
+		    cmd = Handler::STATUS;
+		} else if (strncmp(ptr, "HELP", 2) == 0) {
+		    cmd = Handler::HELP;
+		    net.writeNet("commands: help, status, poll, interval, statistics, quit.\n");
+		} else if (strncmp(ptr, "POLL", 2) == 0) {
+		    cmd = Handler::POLL;
+		} else if (strncmp(ptr, "INTERVAL", 2) == 0) {
+		    cmd = Handler::INTERVAL;
+		}
+	    }
+	    switch (cmd) {
+		// close this connection
+	      case Handler::QUIT:
+		  ret = -1;
+		  break;
+	      case Handler::STATUS:
+		  response << handlers.size() << " handlers are currently active.";
+ 		  for (hit = handlers.begin(); hit != handlers.end(); hit++) {
+		      int fd = hit->first;
+ 		      Handler *hand = hit->second;
+		      response << fd << ","
+			       << hand->insize()
+			       << "," << hand->outsize()
+			       << "\r\n";
+		      net.writeNet(response.str());
+		      index++;
+		  }
+		  index = 0;
+		  break;
+	      case Handler::POLL:
+#ifdef USE_STATS_QUEUE
+		  index = 0;
+		  response << handlers.size() << " handlers are currently active." << "\r\n";
+ 		  for (hit = handlers.begin(); hit != handlers.end(); hit++) {
+		      int fd = hit->first;
+ 		      Handler *hand = hit->second;
+		      struct timespec now;
+		      clock_gettime (CLOCK_REALTIME, &now);
+		      // Incoming que stats
+ 		      CQue::que_stats_t *stats = hand->statsin();
+		      float diff = (float)((now.tv_sec - stats->start.tv_sec) + ((now.tv_nsec - stats->start.tv_nsec)/1e9));
+		      response << fd
+			       << "," << stats->totalbytes
+			       << "," << diff
+			       << "," << stats->totalin
+			       << "," << stats->totalout;
+		      // Outgoing que stats
+ 		      stats = hand->statsout();
+ 		      response << "," <<stats->totalbytes
+			       << "," << stats->totalin
+			       << "," << stats->totalout
+			       << "\r\n";
+ 		      net.writeNet(response.str());
+		      index++;
+		  }
+		  index = 0;
+#endif
+		  break;
+	      case Handler::INTERVAL:
+		  net.writeNet("set interval\n");
+		  break;
+	      default:
+		  break;
+	    };
+	} while (ret >= 0);
+	net.writeNet("admin_handler: Done...!\n");
+	net.closeNet();		// this shuts down this socket connection
+    }
+    net.closeConnection();		// this shuts down the server on this connection
+}
+    
+void
+connection_handler(Handler::thread_params_t *args)
+{
+    GNASH_REPORT_FUNCTION;
+    int fd = 0;
+//    list<Handler *> *handlers = reinterpret_cast<list<Handler *> *>(args->handle);
+
+    Network net;
+//	net.toggleDebug(true);
+    fd = net.createServer(args->port);
+    // Run forever
+    do {
+	Handler *hand = new Handler;
+	hand->toggleDebug(true); // FIXME: too verbose
+	args->netfd = hand->newConnection(true, fd);
+	args->handle = hand;
+ 	log_debug("Adding handler: %x for fd #%d",
+		  (void *)hand, args->netfd);
+#if 0
+	map<int, Handler *>::iterator hit = handlers.find(args->netfd);
+	if ((*hit).second) {
+	    log_debug("Removing handle %x for fd #%d: ",
+		      (void *)hand), args->netfd;
+	    handlers.erase(args->netfd);
+	}
+#endif
+	handlers[args->netfd] = hand;
+	hand->start(args);
+
+//  	handlers.remove(hand);
+// 	delete hand;
+	log_debug("Restarting loop...");
+    } while(1);
+} // end of connection_handler
 
 //} // end of cygnal namespace
 

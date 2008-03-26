@@ -49,6 +49,8 @@ static boost::mutex stl_mutex;
 namespace cygnal
 {
 
+extern map<int, Handler *> handlers;
+
 // FIXME, this seems too small to me.  --gnu
 static const int readsize = 1024;
 
@@ -104,14 +106,14 @@ HTTP::operator = (HTTP& /*obj*/)
     return *this; 
 }
 
-string
+bool
 HTTP::waitForGetRequest(Network& /*net*/)
 {
     GNASH_REPORT_FUNCTION;
-    return ""; // TODO: FIXME !
+    return false;		// FIXME: this should be finished
 }
 
-string
+bool
 HTTP::waitForGetRequest()
 {
     GNASH_REPORT_FUNCTION;
@@ -125,7 +127,7 @@ HTTP::waitForGetRequest()
 
     if (buf == 0) {
 	log_debug("Que empty, net connection dropped");
-	return "";
+	return false;
     }
     
     clearHeader();
@@ -144,7 +146,10 @@ HTTP::waitForGetRequest()
 //    dump();
     
     _filespec = _url;
-    return _url;
+    if (!_url.empty()) {
+	return true;
+    }
+    return false;
 }
 
 bool
@@ -637,7 +642,7 @@ HTTP::extractRTMPT(gnash::Network::byte_t *data)
 HTTP::http_method_e
 HTTP::extractCommand(gnash::Network::byte_t *data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     string body = reinterpret_cast<const char *>(data);
     HTTP::http_method_e cmd;
@@ -1075,7 +1080,7 @@ HTTP::extractTE(Network::byte_t *data) {
 HTTP::filetype_e
 HTTP::getFileStats(std::string &filespec)
 {
-    GNASH_REPORT_FUNCTION;    
+//    GNASH_REPORT_FUNCTION;    
     bool try_again = true;
     string actual_filespec = filespec;
     struct stat st;
@@ -1131,7 +1136,7 @@ HTTP::getFileStats(std::string &filespec)
 
 void
 HTTP::dump() {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     boost::mutex::scoped_lock lock(stl_mutex);
     vector<string>::iterator it;
@@ -1186,8 +1191,27 @@ httphandler(Handler::thread_params_t *args)
     string docroot = args->filespec;
     
     while (!hand->timetodie()) {	
- 	log_debug(_("Waiting for GET request..."));
+ 	log_debug(_("Waiting for GET request on fd #%d..."), args->netfd);
 	hand->wait();
+	// This thread is the last to wake up when the browser
+	// closes the network connection. When browsers do this
+	// varies, elinks and lynx are very forgiving to a more
+	// flexible HTTP protocol, which Firefox/Mozilla & Opera
+	// are much pickier, and will hang or fail to load if
+	// you aren't careful.
+	if (hand->timetodie()) {
+	    log_debug("Not waiting no more, no more for fd #%d...", args->netfd);
+#if 1
+    map<int, Handler *>::iterator hit = handlers.find(args->netfd);
+    if ((*hit).second) {
+	log_debug("Removing handle %x for fd #%d",
+		  (void *)hand), args->netfd;
+	handlers.erase(args->netfd);
+    }
+#endif
+
+	    return;
+	}
 #ifdef USE_STATISTICS
 	struct timespec start;
 	clock_gettime (CLOCK_REALTIME, &start);
@@ -1196,14 +1220,17 @@ httphandler(Handler::thread_params_t *args)
 // 	conndata->statistics->setFileType(NetStats::RTMPT);
 // 	conndata->statistics->startClock();
 //	args->netfd = www.getFileFd();
-	url = docroot;
-	string str = www.waitForGetRequest();
-	if (str.size() == 0) {
+	if (!www.waitForGetRequest()) {
 	    hand->die();
-//	    log_debug("Net HTTP done...");
+	    hand->notifyin();
+	    hand->clearout();
+	    hand->notifyout();
+	    log_debug("Net HTTP done for fd #%d...", args->netfd);
+// 	    hand->closeNet(args->netfd);
 	    return;
 	}
-	url += str;
+	url = docroot;
+	url += www.getURL();
 	pos = url.find("?");
 	filespec = url.substr(0, pos);
 	parameters = url.substr(pos + 1, url.size());
@@ -1237,8 +1264,8 @@ httphandler(Handler::thread_params_t *args)
 #endif
 	    if (stat(filespec.c_str(), &st) == 0) {
 		filefd = ::open(filespec.c_str(), O_RDONLY);
-		log_debug (_("File \"%s\" is %lld bytes in size."), filespec,
-			   st.st_size);
+		log_debug (_("File \"%s\" is %lld bytes in size, disk fd #%d"), filespec,
+			   st.st_size, filefd);
 		do {
 		    Buffer *buf = new Buffer;
 		    ret = read(filefd, buf->reference(), buf->size());
@@ -1248,6 +1275,7 @@ httphandler(Handler::thread_params_t *args)
 		    }
 		    if (ret != buf->size()) {
 			buf->resize(ret);
+//			log_debug("Got last data block from disk file, size %d", buf->size());
 		    }
 //		    log_debug("Read %d bytes from %s.", ret, filespec);
 #if 1
@@ -1261,11 +1289,14 @@ httphandler(Handler::thread_params_t *args)
 		    delete buf;
 #endif
 		} while(ret > 0);
+		log_debug("Done transferring %s to net fd #%d",
+			  filespec, args->netfd);
+		::close(filefd); // close the disk file
 		// See if this is a persistant connection
-		if (!www.keepAlive()) {
-		    log_debug("Keep-Alive is off", www.keepAlive());
-// 		    hand->closeConnection();
- 		}
+// 		if (!www.keepAlive()) {
+// 		    log_debug("Keep-Alive is off", www.keepAlive());
+// // 		    hand->closeConnection();
+//  		}
 #ifdef USE_STATISTICS
 		struct timespec end;
 		clock_gettime (CLOCK_REALTIME, &end);
@@ -1274,6 +1305,7 @@ httphandler(Handler::thread_params_t *args)
 			  (float)((end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1e9)));
 #endif
 	    }
+
 // 	    memset(args->filespec, 0, 256);
 // 	    memcpy(->filespec, filespec.c_str(), filespec.size());
 // 	    boost::thread sendthr(boost::bind(&stream_thread, args));
@@ -1289,7 +1321,7 @@ httphandler(Handler::thread_params_t *args)
 //    }
     } // end of while retries
     
-    log_debug("Net HTTP done...");
+    log_debug("httphandler all done now finally...");
     
 } // end of httphandler
     

@@ -23,13 +23,15 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/bind.hpp>
+#include <algorithm>
 #include <string>
 #include <deque>
+#include <list>
+#include <map>
 
 #include "log.h"
 #include "network.h"
 #include "buffer.h"
-#include "handler.h"
 
 #include "http.h"
 
@@ -39,6 +41,8 @@ using namespace boost;
 
 namespace cygnal
 {
+
+extern map<int, Handler *> handlers;
 
 Handler::Handler()
     : _die(false), _netfd(0)
@@ -77,6 +81,7 @@ Handler::push(gnash::Network::byte_t *data, int nbytes, fifo_e direction)
 {
 //    GNASH_REPORT_FUNCTION;
     Buffer *ptr = new Buffer;
+    ptr->copy(data, nbytes);
     return push(ptr, direction);
 }
 
@@ -149,39 +154,6 @@ Handler::clear(fifo_e direction)
     }    
 }
 
-// start the two thread handlers for the queues
-bool
-Handler::start(thread_params_t *args)
-{
-//    GNASH_REPORT_FUNCTION;
-    int retries = 10;
-
-    _incoming.setName("Incoming");
-    _outgoing.setName("Outgoing");
-//    toggleDebug(true);		// FIXME:
-    closeNet();
-    createServer(args->port);
-    while (retries-- > 0) {
-	log_debug(_("%s: Starting Handlers for port %d"), __PRETTY_FUNCTION__, args->port);
-	newConnection(true);
-	args->netfd = getFileFd();
-	args->handle = this;
-
-	boost::thread handler(boost::bind(&httphandler, args));
-
-	boost::thread outport(boost::bind(&netout_handler, args));
-	
-	boost::thread inport(boost::bind(&netin_handler, args));
-	inport.join();    
-	outport.join();
-	handler.join();
-	if (_die) {
-	    log_debug("Handler done...");
-	    break;
-	}
-    }
-}
-    
 // Dump internal data.
 void
 Handler::dump()
@@ -191,61 +163,107 @@ Handler::dump()
     _outgoing.dump();    
 }
 
+// start the two thread handlers for the queues
+bool
+Handler::start(thread_params_t *args)
+{
+    GNASH_REPORT_FUNCTION;
+//    Handler *hand = reinterpret_cast<Handler *>(args->handle);
+    
+    _incoming.setName("Incoming");
+    _outgoing.setName("Outgoing");
+    
+    log_debug(_("Starting Handlers for port %d, pid %d"),
+	      args->port, getpid());
+//	newConnection(true);
+    
+    boost::thread handler(boost::bind(&httphandler, args));
+    boost::thread outport(boost::bind(&netout_handler, args));
+    boost::thread inport(boost::bind(&netin_handler, args));
+// We don't want to wait for the threads to complete, we
+// want to return to the main program so it can spawn another
+// thread for the next incoming connection.    
+// 	inport.join();    
+// 	outport.join();
+// 	handler.join();
+//     if (_die) {
+// 	log_debug("Handler done...");
+//     }
+    return true;
+}
+    
 extern "C" {
 void
 netin_handler(Handler::thread_params_t *args)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     Handler *hand = reinterpret_cast<Handler *>(args->handle);
 
     do {
 	Buffer *buf = new Buffer;
-	int ret = hand->readNet(buf->reference(), buf->size(), 15);
-	if (ret > 0) {
+	size_t ret = hand->readNet(args->netfd, buf->reference(), buf->size(), 1);
+	if ((ret > 0) && (ret != string::npos)) {
 	    if (ret != buf->size()) {
 		buf->resize(ret);
 	    }
 	    hand->push(buf);
-//  	    string str = (const char *)buf->reference();
-//  	    cerr << str << endl;
 	    hand->notify();
 	} else {
-	    log_debug("no more data, exiting...");
+	    log_debug("no more data for fd #%d, exiting...", args->netfd);
 	    hand->die();
 	    break;
 	}
     } while (!hand->timetodie());
-    log_debug("Net In handler done...");
+    log_debug("Net In handler done for fd #%d...", args->netfd);
     hand->notify();
+    hand->closeNet(args->netfd);
     hand->clearall();
+//    cerr << "Removing handler: " << (void *)hand << endl;
+//    handlers.remove(hand);
+// 	delete hand;
 //    hand->dump();
 }
+
 void
 netout_handler(Handler::thread_params_t *args)
 {
-    GNASH_REPORT_FUNCTION;
-    int retries = 10;
+//    GNASH_REPORT_FUNCTION;
     int ret;
     Handler *hand = reinterpret_cast<Handler *>(args->handle);
     do {
+	// Don't look for any more packets in the que cause we're done
+ 	if (hand->timetodie()) {
+ 	    break;
+	}
 	hand->waitout();
 	while (hand->outsize()) {
 	    Buffer *buf = hand->popout();
 //	    log_debug("FIXME: got data in Outgoing que");
 //	    buf->dump();
 //	    ret = hand->writeNet(buf->reference(), buf->size(), 15);
-	    ret = hand->writeNet(buf);
+// 	    if (buf->size() != gnash::NETBUFSIZE) {
+// 			log_debug("Got smaller packet, size %d", buf->size());		
+// 	    }
+	    ret = hand->writeNet(args->netfd, buf);
 	    delete buf;
 	}
-	if (hand->timetodie()) {
-	    log_debug("Net Out handler done...");
-	    break;
-	}
     } while (ret > 0);
-    hand->closeConnection();
+    hand->die();
+    log_debug("Net Out handler done for fd #%d...", args->netfd);
+    hand->notifyin();
+    hand->closeNet(args->netfd);
+#if 0
+    map<int, Handler *>::iterator hit = handlers.find(args->netfd);
+    if ((*hit).second) {
+	log_debug("Removing handle %x for fd #%d: ",
+		  (void *)hand), args->netfd;
+	handlers.erase(args->netfd);
+    }
+#endif
+    delete hand;
 }
-
+    
 } // end of extern C
 
 } // end of cygnal namespace

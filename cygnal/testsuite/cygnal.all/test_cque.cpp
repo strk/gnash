@@ -157,6 +157,8 @@ main (int /*argc*/, char** /*argv*/) {
          runtest.fail ("CQue::merge()");
      }
 
-//     que.dump();
+     que.pop();
+     
+     que.dump();
 }
 

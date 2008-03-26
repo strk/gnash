@@ -63,7 +63,6 @@ NetStats::operator = (NetStats &stats) {
     _starttime = stats.getStartTime();
     _stoptime = stats.getStopTime();
     _bytes = stats.getBytes();
-    _codec = stats.getCodec();
     _type = stats.getFileType();
     return *this;
 }

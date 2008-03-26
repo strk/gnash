@@ -25,6 +25,33 @@
 
 //include all types plus i/o
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <string>
+
+// This is what the ActionScript 'Client' class returns:
+//
+// bytes_in		Total number of bytes received.
+// bytes_out		Total number of bytes sent.
+// msg_in		Total number of RTMP messages received.
+// msg_out		Total number of RTMP messages sent.
+// msg_dropped		Total number of dropped RTMP messages.
+// ping_rtt		Length of time the client takes to respond to a ping message.
+// audio_queue_msgs	Current number of audio messages in the queue waiting to be delivered to the client.
+// video_queue_msgs	Current number of video messages in the queue waiting to be delivered to the client.
+// so_queue_msgs	Current number of shared object messages in the queue waiting to be delivered to the client.
+// data_queue_msgs	Current number of data messages in the queue waiting to be delivered to the client.
+// dropped_audio_msgs	Number of audio messages that were dropped.
+// dropped_video_msgs	Number of video messages that were dropped.
+// audio_queue_bytes	Total size of all audio messages (in bytes) in the queue waiting to be delivered to the client.
+// video_queue_bytes	Total size of all video messages (in bytes) in the queue waiting to be delivered to the client.
+// so_queue_bytes	Total size of all shared object messages (in bytes) in the queue waiting to be delivered to the client.
+// data_queue_bytes	Total size of all data messages (in bytes) in the queue waiting to be delivered to the client.
+// dropped_audio_bytes	Total size of all audio messages (in bytes) that were dropped.
+// dropped_video_bytes	Total size of all video messages (in bytes) that were dropped.
+// bw_out		Current upstream (client to server) bandwidth for this client.
+// bw_in		Current downstream (server to client) bandwidth for this client.
+// client_id		A unique ID issued by the server for this client.
+//
+// samples are taken every 3 seconds, or the interval supplied in Client::setInterval()
 
 namespace cygnal 
 {
@@ -37,21 +64,27 @@ public:
         NO_CODEC,
         OGG,
         THEORA,
+	DIRAC,
+	SNOW,
         MP3,
         MPEG4,
+	H264,
+	H263,
         FLV,
         VP6,
         VP7
     } codec_e;
     typedef enum {
         NO_FILETYPE,
+        HTTP,
         RTMP,
         RTMPT,
         RTMPTS,
-        FLASH6,
-        FLASH7,
-        FLASH8,
-        FLASH9,
+        SWF,
+        SWF6,
+        SWF7,
+        SWF8,
+        SWF9,
         AUDIO,
         VIDEO
     } filetypes_e;
@@ -64,14 +97,12 @@ public:
     void setStartTime(boost::posix_time::ptime x) { _starttime = x; };
     void setStopTime(boost::posix_time::ptime x) { _stoptime = x; };
     void setBytes(int x) { _bytes = x; };
-    void setCodec(codec_e x) { _codec = x; };
     void setFileType(filetypes_e x) { _type = x; };
     // Accumulate the byts transferred
     int addBytes(int x) { _bytes += x; return _bytes; };
     
     // Accessors to get to the private data
     int getBytes() { return _bytes; };
-    codec_e getCodec() { return _codec; };
     filetypes_e getFileType() { return _type; };
     boost::posix_time::ptime getStartTime() { return _starttime; };
     boost::posix_time::ptime getStopTime() { return _stoptime; };
@@ -81,7 +112,6 @@ private:
     boost::posix_time::ptime _starttime;
     boost::posix_time::ptime _stoptime;
     int                      _bytes;
-    codec_e                  _codec;
     filetypes_e              _type;
 };
  

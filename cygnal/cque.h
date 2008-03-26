@@ -23,6 +23,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
 #include <deque>
+#include <time.h>
 
 #include "buffer.h"
 #include "network.h"
@@ -33,6 +34,14 @@ namespace cygnal
 
 class CQue {
 public:
+#ifdef USE_STATS_QUEUE
+    typedef struct {
+	struct timespec start;
+	int		totalbytes;
+	int		totalin;
+	int		totalout;
+    } que_stats_t;
+#endif
     CQue();
     CQue(const std::string &str) { _name = str; };
     ~CQue();
@@ -59,8 +68,10 @@ public:
     // Merge sucessive buffers into one single larger buffer. This is for some
     // protocols, than have very long headers.
     Buffer *merge(Buffer *begin);
+    
     // Dump the data to the terminal
     void dump();
+    que_stats_t *stats() { return &_stats; };
     void setName(const std::string &str) { _name = str; }
 private:
     // an optional name for the queue, only used for debugging messages to make them unique
@@ -74,6 +85,9 @@ private:
     boost::mutex	_cond_mutex;
     // This is the mutex that control access to the que.
     boost::mutex	_mutex;
+#ifdef USE_STATS_QUEUE
+    que_stats_t		_stats;
+#endif
 };
     
 } // end of cygnal namespace

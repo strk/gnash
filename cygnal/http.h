@@ -86,6 +86,7 @@ public:
         SERVICE_UNAVAILABLE = 503,
         GATEWAY_TIMEOUT = 504,
         HTTP_VERSION_NOT_SUPPORTED = 505,
+	// Gnash/Cygnal extensions for internal use
 	LIFE_IS_GOOD = 1234,
 	CLOSEPIPE = 1235
     } http_status_e;
@@ -123,8 +124,8 @@ public:
     HTTP();
     HTTP(Handler *hand);
     ~HTTP();
-    std::string waitForGetRequest();
-    std::string waitForGetRequest(gnash::Network &net);
+    bool waitForGetRequest();
+    bool waitForGetRequest(gnash::Network &net);
     
     // Handle the GET request response
     bool sendGetReply(http_status_e code);
