@@ -1482,15 +1482,12 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
     media::audioCodecType format = sinfo->getFormat();
     unsigned int sample_count = sinfo->getSampleCount();
 
-    // discard garbage data if format is MP3
+    // MP3 format blocks have additional info
     if (format == media::AUDIO_CODEC_MP3)
     {
-        // 2bytes is sampleCount
-        // 2bytes is seekSamples
-        //log_debug("Skipping 4 garbage bytes of MP3 format... (2 are samples count, 2 are seek samples!)");
         in->ensureBytes(4);
-        //in->skip_bytes(4);
-        unsigned int samplesCount = in->read_u16();
+	// FIXME: use these values !
+        unsigned int samplesCount = in->read_u16(); UNUSED(samplesCount);
         unsigned int seekSamples = in->read_u16();
 	ONCE ( if ( seekSamples ) log_unimpl("MP3 soundblock seek samples") );
     }
