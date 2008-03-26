@@ -1,3 +1,9 @@
+2008-03-22  Dossy Shiobara <dossy@panoptic.com>
+
+	* gui/Makefile.am, gui/am-frag/fltk.am: Add missing
+	  line-continuation backslash. Move extra Win32 libs to
+	  am-frag/fltk.am from main Makefile.am.
+
 2008-03-26 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/NetStream.cpp: make elements of the info object
