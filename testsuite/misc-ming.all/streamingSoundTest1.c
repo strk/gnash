@@ -24,6 +24,10 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include <ming.h>
 
 #include "ming_utils.h"
@@ -41,6 +45,7 @@ main(int argc, char** argv)
   FILE* sound_f;
   const char* sound_filename;
   SWFDisplayItem it;
+  struct stat statbuf;
 
   if ( argc>1 ) {
     sound_filename=argv[1];
@@ -51,7 +56,18 @@ main(int argc, char** argv)
   sound_f = fopen(sound_filename, "r");
   if ( ! sound_f ) {
     perror(sound_filename);
-    return 1;
+    return EXIT_FAILURE;
+  }
+
+  if ( -1 == fstat(fileno(sound_f), &statbuf) )
+  {
+    perror("fstat");
+    return EXIT_FAILURE;
+  }
+  if ( S_ISDIR(statbuf.st_mode) )
+  {
+    fprintf(stderr, "%s is a directory, we need a file\n", sound_filename);
+    return EXIT_FAILURE;
   }
 
   Ming_init();
@@ -74,5 +90,5 @@ main(int argc, char** argv)
   puts("Saving " OUTPUT_FILENAME );
   SWFMovie_save(mo, OUTPUT_FILENAME);
 
-  return 0;
+  return EXIT_SUCCESS;
 }
