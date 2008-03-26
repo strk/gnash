@@ -296,13 +296,13 @@ SDLGui::sdl_to_gnash_modifier(int state)
 {
   int modifier = gnash::key::GNASH_MOD_NONE;
   
-  if (state & KGNASH_MOD_SHIFT) {
+  if (state & KMOD_SHIFT) {
       modifier = modifier | gnash::key::GNASH_MOD_SHIFT;
     }
-    if (state & KGNASH_MOD_CTRL) {
+    if (state & KMOD_CTRL) {
       modifier = modifier | gnash::key::GNASH_MOD_CONTROL;
     }
-    if (state & KGNASH_MOD_ALT) {
+    if (state & KMOD_ALT) {
       modifier = modifier | gnash::key::GNASH_MOD_ALT;
     }
 
