@@ -58,8 +58,8 @@ static void usage (void);
 
 static TestState runtest;
 
-bool test_read(std::string &filespec);
-bool test_write(std::string &filespec);
+static void test_read(std::string &filespec);
+static void test_write(std::string &filespec);
 bool test_sol(std::string &filespec);
 
 LogFile& dbglogfile = LogFile::getDefaultInstance();
@@ -100,7 +100,7 @@ main(int argc, char *argv[])
 //    test_sol();
 }
 
-bool
+void
 test_read(std::string &filespec)
 {
     GNASH_REPORT_FUNCTION;
@@ -135,7 +135,7 @@ test_read(std::string &filespec)
     }
 }
 
-bool
+void
 test_write(std::string &filespec)
 {
     GNASH_REPORT_FUNCTION;
@@ -165,8 +165,8 @@ test_write(std::string &filespec)
         runtest.fail("gain set");
     }
 
-    uint8_t *foo;
-    char *ptr;
+    //uint8_t *foo;
+    //char *ptr;
 #if 0
     foo = amf_obj.encodeVariable(el); 
     ptr = (char *)amf_obj.extractVariable(&newel, foo);
