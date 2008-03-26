@@ -1,5 +1,12 @@
 2008-03-26 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: provide a MING_SUPPORTS_STREAMING_SOUND
+	  conditional.
+	* testsuite/misc-ming.all/Makefile.am: only build and
+	  run the streamingSoundTest if ming supports it.
+
+2008-03-26 Sandro Santilli <strk@keybit.net>
+
 	* server/swf/tag_loaders.cpp: warn about unimplemented MP3 seeks.
 	* server/sprite_instance.cpp (stagePlacementCallback): place also
 	  sprites for which NO frame was loaded (tot frames 0).

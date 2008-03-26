@@ -141,8 +141,6 @@ check_PROGRAMS = \
 	loadMovieTestRunner \
 	eventSoundTest1 \
 	eventSoundTest1-Runner \
-	streamingSoundTest1 \
-	streamingSoundTest1-Runner \
 	DrawingApiTestRunner \
 	DragDropTestRunner   \
 	frame_label_test \
@@ -196,6 +194,13 @@ check_PROGRAMS += \
 	replace_buttons1test \
 	$(NULL)
 endif
+
+if MING_SUPPORTS_STREAMING_SOUND
+check_PROGRAMS += \
+	streamingSoundTest1 \
+	streamingSoundTest1-Runner 
+endif
+
 
 check_SCRIPTS = \
 	timeline_var_test-Runner \
