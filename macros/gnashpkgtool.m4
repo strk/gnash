@@ -62,18 +62,27 @@ dnl     esac], $1=yes)
 	  ])
 
   if test x$cross_compiling = xno; then
-	  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_$1_incl}" = x; then
-	    AC_MSG_CHECKING([for $2 header using pkg-config])
-  	    $PKG_CONFIG --exists DOWN[] && ac_cv_path_$1_incl="`$PKG_CONFIG --cflags DOWN[]`"
-	    $PKG_CONFIG --exists $name && ac_cv_path_$1_incl="`$PKG_CONFIG --cflags $name`"
-	    if test x"${ac_cv_path_$1_incl}" != x; then
-	      AC_MSG_RESULT(${ac_cv_path_$1_incl})
-	      found_$1_incl="yes"
-	    else
-	      AC_MSG_RESULT(not found)
-	    fi
+    if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_$1_incl}" = x; then
+      AC_MSG_CHECKING([for $2 header using pkg-config])
+      $PKG_CONFIG --exists DOWN[] && ac_cv_path_$1_incl="`$PKG_CONFIG --cflags DOWN[]`"
+      $PKG_CONFIG --exists $name && ac_cv_path_$1_incl="`$PKG_CONFIG --cflags $name`"
+      if test x"${ac_cv_path_$1_incl}" != x; then
+        AC_MSG_RESULT(${ac_cv_path_$1_incl})
+        found_$1_incl="yes"
+      else
+        AC_MSG_RESULT(not found)
+      fi
     fi
-	fi
+    if test x"${ac_cv_path_$1_incl}" = x; then
+      AC_PATH_PROG(UP[]_CONFIG, $1-config)
+      if test x"${UP[]_CONFIG}" != x; then
+        AC_MSG_CHECKING([for $2 header using $1-config])
+        ac_cv_path_$1_incl="`${UP[]_CONFIG} --cxxflags`"
+        AC_MSG_RESULT(${ac_cv_path_$1_incl})
+        found_$1_incl="yes"
+      fi
+    fi
+  fi
 
 	dnl If the path hasn't been specified, go look for it.
 	if test x"${ac_cv_path_$1_incl}" = x; then
@@ -182,6 +191,14 @@ if test x"${$1}" = x"yes"; then
 		  AC_MSG_CHECKING([for lib$1 library])      
 		  AC_MSG_RESULT(${ac_cv_path_$1_lib})
 	  fi
+    if test x"${ac_cv_path_$1_lib}" = x; then
+      AC_PATH_PROG(UP[]_CONFIG, $1-config)
+      if test x"${UP[]_CONFIG}" != x; then
+        AC_MSG_CHECKING([for lib$1 library using $1-config])
+        ac_cv_path_$1_lib="`${UP[]_CONFIG} --libs`"
+        AC_MSG_RESULT(${ac_cv_path_$1_lib})
+      fi
+    fi
   fi
 
 	if test x"${ac_cv_path_$1_lib}" = x; then

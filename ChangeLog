@@ -1,3 +1,8 @@
+2008-03-26  Dossy Shiobara <dossy@panoptic.com>
+
+	* macros/gnashpkgtool.m4: Add support for package-config scripts
+	  (i.e., fltk2-config, xml2-config, etc.)
+
 2008-03-26 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/vm/ActionExec.h
