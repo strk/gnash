@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Global.as,v 1.49 2008/03/26 14:15:18 bwy Exp $";
+rcsid="$Id: Global.as,v 1.50 2008/03/26 17:02:24 bwy Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION > 5
@@ -415,7 +415,12 @@ check_equals (int("2147483649"), -2147483647);
 check_equals (int("-2147483649"), 2147483647);
 check_equals (int("4294967296"), 0);
 check_equals (int("-4294967296"), 0);
-
+check_equals(int("1e+45"), 0);
+check_equals(int("1e+5"), 100000);
+check_equals(int("1e+10"), 1410065408);
+check_equals(int("1e+12"), -727379968);
+check_equals(int("1e+14"), 276447232);
+check_equals(int("1.4e+7"), 14000000);
 
 /// Octal (or not)
 #if OUTPUT_VERSION < 6
@@ -458,15 +463,15 @@ check_equals (int("0x-7.8 "), 0);
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 5
-	check_totals(146); // SWF5
+	check_totals(152); // SWF5
 #else
 # if OUTPUT_VERSION == 6
-	check_totals(180); // SWF6
+	check_totals(186); // SWF6
 # else
 #  if OUTPUT_VERSION == 7
-	check_totals(162); // SWF7
+	check_totals(168); // SWF7
 #  else
-	check_totals(149); // SWF8+
+	check_totals(155); // SWF8+
 #  endif
 # endif
 #endif

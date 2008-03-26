@@ -1,3 +1,7 @@
+2008-03-26 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* testsuite/actionscript.all/Global.as: more tests for int().
+
 2008-03-26 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac: provide a MING_SUPPORTS_STREAMING_SOUND
