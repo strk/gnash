@@ -167,15 +167,13 @@ as_global_unescape(const fn_call& fn)
     return as_value(input.c_str());
 }
 
-// parseFloat(string)
-// The return value has double precision
 static as_value
 as_global_parsefloat(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
     as_value rv;
-    double result;
+    float result;
     
     std::istringstream s(fn.arg(0).to_string());
     
@@ -185,11 +183,10 @@ as_global_parsefloat(const fn_call& fn)
         return rv;   
     }    
 
+    rv = result;
     return rv;
 }
 
-// parseInt(string[, base])
-//
 // The second argument, if supplied, is the base.
 // If none is supplied, we have to work out the 
 // base from the string. Decimal, octal and hexadecimal are
