@@ -1,4 +1,9 @@
-2008-03-22  Dossy Shiobara <dossy@panoptic.com>
+2008-03-26 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/log.{h,cpp}: drop (unused) vsnprintf logging calls, tidy up
+	  a bit.
+
+2008-03-26  Dossy Shiobara <dossy@panoptic.com>
 
 	* gui/Makefile.am, gui/am-frag/fltk.am: Add missing
 	  line-continuation backslash. Move extra Win32 libs to

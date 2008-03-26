@@ -21,12 +21,8 @@
 #include "gnashconfig.h"
 #endif
 
-#ifndef USE_BOOST_FORMAT_TEMPLATES
-# include <cstdio>  
-# include <cstdarg> // Both for vsnprintf
-#endif
-
 #include <ctime>
+#include <cctype>
 
 #include <iostream>
 #include <sstream>
@@ -39,10 +35,9 @@
 // Required for SYSTEMTIME definitions
 # include <windows.h>
 # include <sys/types.h>
-# include <unistd.h> 
-#else
-# include <unistd.h>
 #endif
+
+#include <unistd.h>
 
 #include "log.h"
 
@@ -50,9 +45,6 @@ using std::cout;
 using std::endl;
 
 namespace gnash {
-
-// Workspace for vsnprintf formatting.
-static const int BUFFER_SIZE = 2048;
 
 // Convert each byte into its hex representation
 std::string hexify (const unsigned char *p, size_t length, bool ascii)
@@ -69,7 +61,7 @@ std::string hexify (const unsigned char *p, size_t length, bool ascii)
 				i != e; ++i)
 	{
 		if (ascii) {
-			if (isprint(*i) || *i == 0xd || *i == 0xa) {
+			if (std::isprint(*i) || *i == 0xd || *i == 0xa) {
 				ss << *i;
 			}
 			else ss << "^";
@@ -142,156 +134,6 @@ namespace {
 	LogFile& dbglogfile = LogFile::getDefaultInstance();
 }
 
-#ifndef USE_BOOST_FORMAT_TEMPLATES
-
-void
-log_trace(const char* fmt, ...)
-{
-
-	va_list ap;
-	char tmp[BUFFER_SIZE];
-
-	va_start (ap, fmt);
-	vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
-	tmp[BUFFER_SIZE-1] = '\0';
-
-	dbglogfile.log(_("TRACE"), tmp);
-
-	va_end (ap);
-}
-
-void
-log_debug(const char* fmt, ...)
-{
-
-	if (dbglogfile.getVerbosity() < DEBUGLEVEL) return;
-
-	va_list ap;
-	char tmp[BUFFER_SIZE];
-
-	va_start (ap, fmt);
-	vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
-	tmp[BUFFER_SIZE-1] = '\0';
-
-	// We don't translate DEBUG: because code below here looks for it
-	// in the output of const char strings.  If we translated it, both
-	// its type would change (to non-const char string) and the letters would
-	// change to the local language.  Could perhaps be fixed more cleanly
-	// later...
-	dbglogfile.log(N_("DEBUG"), tmp);
-
-	va_end (ap);
-}
-
-void
-log_action(const char* fmt, ...)
-{
-	va_list ap;
-	char tmp[BUFFER_SIZE];
-
-	va_start (ap, fmt);
-	vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
-	tmp[BUFFER_SIZE-1] = '\0';
-
-	bool stamp = dbglogfile.getStamp();
-	dbglogfile.setStamp(false);
-	dbglogfile.log(tmp);
-	dbglogfile.setStamp(stamp);
-}
-
-void
-log_parse(const char* fmt, ...)
-{
-
-	va_list ap;
-	char tmp[BUFFER_SIZE];
-
-	va_start (ap, fmt);
-	vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
-	tmp[BUFFER_SIZE-1] = '\0';
-
-	dbglogfile.log(tmp);
-
-	va_end (ap);
-}
-
-// Printf-style error log.
-void
-log_error(const char* fmt, ...)
-{
-	va_list ap;
-	char tmp[BUFFER_SIZE];
-
-	va_start (ap, fmt);
-	vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
-	tmp[BUFFER_SIZE-1] = '\0';
-
-	dbglogfile.log(_("ERROR"), tmp);
-
-	va_end (ap);
-}
-
-void
-log_unimpl(const char* fmt, ...)
-{
-	va_list ap;
-	char tmp[BUFFER_SIZE];
-
-	va_start (ap, fmt);
-	vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
-	tmp[BUFFER_SIZE-1] = '\0';
-
-	dbglogfile.log(_("UNIMPLEMENTED"), tmp);
-
-	va_end (ap);
-}
-
-void
-log_security(const char* fmt, ...)
-{
-	va_list ap;
-	char tmp[BUFFER_SIZE];
-
-	va_start (ap, fmt);
-	vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
-	tmp[BUFFER_SIZE-1] = '\0';
-
-	dbglogfile.log(_("SECURITY"), tmp);
-
-	va_end (ap);
-}
-
-void
-log_swferror(const char* fmt, ...)
-{
-	va_list ap;
-	char tmp[BUFFER_SIZE];
-
-	va_start (ap, fmt);
-	vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
-	tmp[BUFFER_SIZE-1] = '\0';
-
-	dbglogfile.log(_("MALFORMED SWF"), tmp);
-
-	va_end (ap);
-}
-
-void
-log_aserror(const char* fmt, ...)
-{
-	va_list ap;
-	char tmp[BUFFER_SIZE];
-
-	va_start (ap, fmt);
-	vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
-	tmp[BUFFER_SIZE-1] = '\0';
-
-	dbglogfile.log(_("ACTIONSCRIPT ERROR"), tmp);
-
-	va_end (ap);
-}
-
-#else
 // boost format functions to process the objects
 // created by our hundreds of templates 
 
@@ -353,13 +195,10 @@ processLog_action(const boost::format& fmt)
 	dbglogfile.setStamp(stamp);
 }
 
-#endif
-
 void
 LogFile::log(const std::string& msg)
 {
 	boost::mutex::scoped_lock lock(_ioMutex);
-
 	dbglogfile << msg << endl;
 }
 
@@ -367,9 +206,7 @@ void
 LogFile::log(const std::string& label, const std::string& msg)
 {
 	boost::mutex::scoped_lock lock(_ioMutex);
-
 	dbglogfile << label << ": " << msg << endl;
-
 }
 
 void
@@ -445,7 +282,7 @@ LogFile::openLog (const std::string& filespec)
 
   // LogFile::outstream << "Opened " << filespec << endl;
 
-  return true;
+    return true;
 }
 
 bool

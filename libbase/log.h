@@ -54,23 +54,20 @@
 
 // Define to switch between printf-style log formatting
 // and boost::format
-#define USE_BOOST_FORMAT_TEMPLATES 1
-
-#ifdef USE_BOOST_FORMAT_TEMPLATES
 # include <boost/preprocessor/arithmetic/inc.hpp>
 # include <boost/preprocessor/repetition/enum_params.hpp>
 # include <boost/preprocessor/repetition/repeat.hpp>
 # include <boost/preprocessor/repetition/repeat_from_to.hpp>
 # include <boost/preprocessor/seq/for_each.hpp>
-#endif
 
 namespace gnash {
 
-extern std::ostream& stampon(std::ostream& x);
-extern std::ostream& stampoff(std::ostream& x);
-extern std::ostream& timestamp(std::ostream& x);
-extern std::ostream& datetimestamp(std::ostream& x);
 #define DEBUGLEVEL 2
+
+//extern std::ostream& stampon(std::ostream& x);
+//extern std::ostream& stampoff(std::ostream& x);
+//extern std::ostream& timestamp(std::ostream& x);
+//extern std::ostream& datetimestamp(std::ostream& x);
 
 // This is a basic file logging class
 class DSOEXPORT LogFile {
@@ -242,8 +239,6 @@ private:
 
 };
 
-
-#ifdef USE_BOOST_FORMAT_TEMPLATES
 /// This heap of steaming preprocessor code magically converts
 /// printf-style statements into boost::format messages using templates.
 //
@@ -322,92 +317,6 @@ DSOEXPORT void processLog_parse(const boost::format& fmt);
 DSOEXPORT void processLog_security(const boost::format& fmt);
 DSOEXPORT void processLog_swferror(const boost::format& fmt);
 DSOEXPORT void processLog_aserror(const boost::format& fmt);
-
-#else
-
-#ifdef __GNUC__
-#define GNUC_LOG_ATTRS __attribute__((format (printf, 1, 2)))
-#else
-#define GNUC_LOG_ATTRS
-#endif
-
-/// Log a runtime error
-//
-/// Runtime errors, such as un-openable files, un-allocatable memory,
-/// etc, are logged (for convenience of the user or debugger) this way.
-/// This function is not used to report coding errors; use log_aserror
-/// or log_swferror for that.
-///
-DSOEXPORT void log_error(const char* fmt, ...) GNUC_LOG_ATTRS;
-
-/// Log a message about unimplemented features.
-//
-/// This function must be used to warn user about missing Gnash features.
-/// We expect all calls to this function to disappear over time, as we
-/// implement those features of Flash.
-///
-DSOEXPORT void log_unimpl(const char* fmt, ...) GNUC_LOG_ATTRS;
-
-/// Use only for explicit user traces
-//
-/// Current users are Global.cpp for _global.trace() and
-/// ASHandlers.cpp for ActionTrace
-///
-DSOEXPORT void log_trace(const char* fmt, ...) GNUC_LOG_ATTRS;
-
-/// Log debug info
-//
-/// Used for function entry/exit tracing.
-///
-DSOEXPORT void log_debug(const char* fmt, ...) GNUC_LOG_ATTRS;
-
-/// Log action execution info
-//
-/// Wrap all calls to this function (and other related statements)
-/// into an IF_VERBOSE_ACTION macro, so to allow completely
-/// removing all the overhead at compile time and reduce it
-/// at runtime.
-///
-DSOEXPORT void log_action(const char* fmt, ...) GNUC_LOG_ATTRS;
-
-/// Log parsing information
-//
-/// Wrap all calls to this function (and other related statements)
-/// into an IF_VERBOSE_PARSE macro, so to allow completely
-/// removing all the overhead at compile time and reduce it
-/// at runtime.
-///
-DSOEXPORT void log_parse(const char* fmt, ...) GNUC_LOG_ATTRS;
-
-/// Log security information
-DSOEXPORT void log_security(const char* fmt, ...) GNUC_LOG_ATTRS;
-
-/// Log a malformed SWF error
-//
-/// This indicates an error in how the binary SWF file was constructed, i.e.
-/// probably a bug in the tools used to build the SWF file.
-///
-/// Wrap all calls to this function (and other related statements)
-/// into an IF_VERBOSE_MALFORMED_SWF macro, so to allow completely
-/// removing all the overhead at compile time and reduce it
-/// at runtime.
-///
-DSOEXPORT void log_swferror(const char* fmt, ...) GNUC_LOG_ATTRS;
-
-/// Log an ActionScript error
-//
-/// This indicates an error by the programmer who wrote the ActionScript
-/// code, such as too few or too many arguments to a function.
-///
-/// Wrap all calls to this function (and other related statements)
-/// into an IF_VERBOSE_ASCODING_ERRORS macro, so to allow completely
-/// removing all the overhead at compile time and reduce it
-/// at runtime.
-///
-DSOEXPORT void log_aserror(const char* fmt, ...) GNUC_LOG_ATTRS;
-
-
-#endif // USE_BOOST_FORMAT_TEMPLATES
 
 /// A fault-tolerant boost::format object for logging
 //
