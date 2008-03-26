@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Global.as,v 1.48 2008/03/25 16:23:10 bwy Exp $";
+rcsid="$Id: Global.as,v 1.49 2008/03/26 14:15:18 bwy Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION > 5
@@ -385,40 +385,88 @@ check_equals(tmp.length, 2);
 
 /// Tests for int
 
+/// non-numeric
+check_equals (int(undefined), 0);
+check_equals (int("string"), 0);
+check_equals (int("infinity"), 0);
+
+/// Floats
 check_equals (int(1.5), 1);
-check_equals (int(0), 0);
-check_equals (int(s), 0);
 check_equals (int(-1.e-15), 0);
 check_equals (int(-0.99999999999999), 0);
 check_equals (int(0.99999999999), 0);
 check_equals (int(-7.8), -7);
 check_equals (int(6.1), 6);
+check_equals (int("-7.8"), -7);
+check_equals (int("6.1"), 6);
+xcheck_equals (int("      -7.8"), -7);
 
+/// Integer values
+check_equals (int(0), 0);
 check_equals (int(0xffffffff), -1);
-
 check_equals (int(2147483648), -2147483648);
 check_equals (int(-2147483648), -2147483648);
-
 check_equals (int(2147483649), -2147483647);
 check_equals (int(-2147483649), 2147483647);
 check_equals (int(4294967296), 0);
 check_equals (int(-4294967296), 0);
 check_equals (int(infinity), 0);
+check_equals (int("2147483649"), -2147483647);
+check_equals (int("-2147483649"), 2147483647);
+check_equals (int("4294967296"), 0);
+check_equals (int("-4294967296"), 0);
 
+
+/// Octal (or not)
+#if OUTPUT_VERSION < 6
+check_equals(int("0123"), 123);
+check_equals(int("-0123"), -123);
+#else
+xcheck_equals(int("0123"), 83);
+xcheck_equals(int("-0123"), -83);
+#endif
+xcheck_equals(int("   0123"), 123);
+check_equals(int("-   0123"), 0);
+check_equals(int("   0-123"), 0);
+check_equals(int("01238"), 1238);
+check_equals (int("0123.6"), 123);
+
+/// Hex (or not)
+check_equals(int("-0x10"), 0);
+#if OUTPUT_VERSION < 6
+check_equals(int("0x-10"), 0);
+check_equals(int("0X+10"), 0);
+#else
+xcheck_equals(int("0x-10"), -16);
+xcheck_equals(int("0X+10"), 16);
+#endif
+
+/// Extraneous characters
+check_equals (int("0123r"), 0);
+check_equals (int("0123&"), 0);
+check_equals (int("   0123r"), 0);
+check_equals (int("-6.1     "), 0);
+check_equals (int("6,1"), 0);
+check_equals (int("-7,8"), 0);
+check_equals (int("7 "), 0);
+check_equals (int("0x10 "), 0);
+check_equals (int("0x10.8"), 0);
+check_equals (int("0123.6 "), 0);
+check_equals (int("0x-7.8 "), 0);
 //------------------------------------------------------------
 // END OF TEST
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 5
-	check_totals(116); // SWF5
+	check_totals(146); // SWF5
 #else
 # if OUTPUT_VERSION == 6
-	check_totals(150); // SWF6
+	check_totals(180); // SWF6
 # else
 #  if OUTPUT_VERSION == 7
-	check_totals(132); // SWF7
+	check_totals(162); // SWF7
 #  else
-	check_totals(119); // SWF8+
+	check_totals(149); // SWF8+
 #  endif
 # endif
 #endif
