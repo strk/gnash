@@ -1,5 +1,6 @@
 2008-03-26 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp: warn about unimplemented MP3 seeks.
 	* server/sprite_instance.cpp (stagePlacementCallback): place also
 	  sprites for which NO frame was loaded (tot frames 0).
 	* testsuite/misc-swfmill.all/zeroframe_definesprite.xml: don't

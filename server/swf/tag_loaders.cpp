@@ -1417,6 +1417,7 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 	{
                 in->ensureBytes(2);
                 latency = in->read_s16(); // UNUSED !!
+		ONCE ( if ( latency ) log_unimpl("MP3 stream latency seek") );
         }
 	catch (ParserException& ex)
 	{
@@ -1488,7 +1489,10 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
         // 2bytes is seekSamples
         //log_debug("Skipping 4 garbage bytes of MP3 format... (2 are samples count, 2 are seek samples!)");
         in->ensureBytes(4);
-        in->skip_bytes(4);
+        //in->skip_bytes(4);
+        unsigned int samplesCount = in->read_u16();
+        unsigned int seekSamples = in->read_u16();
+	ONCE ( if ( seekSamples ) log_unimpl("MP3 soundblock seek samples") );
     }
 
     unsigned int data_bytes = in->get_tag_end_position() - in->get_position();
