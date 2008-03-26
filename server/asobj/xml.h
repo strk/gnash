@@ -18,10 +18,6 @@
 #ifndef __XML_H__
 #define __XML_H__
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "tu_config.h"
 
 //#include "event_id.h"
@@ -30,6 +26,7 @@
 #include "xmlattrs.h"
 #include "xmlnode.h"
 #include "log.h"
+#include "dsodefs.h"
 
 #include <vector>
 #include <sstream>

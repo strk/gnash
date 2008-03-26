@@ -19,10 +19,6 @@
 #ifndef __GNASH_ASOBJ_LOADVARS_H__
 #define __GNASH_ASOBJ_LOADVARS_H__
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <memory> // for auto_ptr
 
 namespace gnash {

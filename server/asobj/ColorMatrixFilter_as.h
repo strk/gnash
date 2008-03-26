@@ -19,10 +19,6 @@
 #ifndef __GNASH_ASOBJ_COLORMATRIXFILTER_H__
 #define __GNASH_ASOBJ_COLORMATRIXFILTER_H__
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 namespace gnash {
 
 class as_object;

@@ -18,10 +18,6 @@
 #ifndef __DATE_H__
 #define __DATE_H__
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "as_object.h" // for inheritance
 #include "fn_call.h" // for inheritance
 

@@ -19,10 +19,6 @@
 #ifndef __GNASH_ASOBJ_STAGE_H__
 #define __GNASH_ASOBJ_STAGE_H__
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "as_object.h" // for inheritance
 
 #include <list>

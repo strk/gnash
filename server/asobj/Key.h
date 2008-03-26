@@ -20,15 +20,12 @@
 #ifndef __KEY_H__
 #define __KEY_H__
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "tu_config.h"
 #include "as_object.h" // for inheritance
 #include "fn_call.h"
 #include "event_id.h"
 #include "gnash.h" // for gnash::key namespace
+#include "dsodefs.h"
 #include <bitset>
 
 #ifdef WIN32

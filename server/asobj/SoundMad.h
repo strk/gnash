@@ -19,10 +19,6 @@
 #ifndef __SOUNDMAD_H__
 #define __SOUNDMAD_H__
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "impl.h"
 #include "as_object.h"
 #include "NetConnection.h"

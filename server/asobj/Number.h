@@ -20,10 +20,6 @@
 #ifndef GNASH_NUMBER_H
 #define GNASH_NUMBER_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "smart_ptr.h"
 
 #include <memory> // for auto_ptr

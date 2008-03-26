@@ -19,10 +19,6 @@
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "tu_file.h"
 #include "LoadThread.h"
 #include "FLVParser.h"

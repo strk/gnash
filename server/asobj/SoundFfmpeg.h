@@ -19,10 +19,6 @@
 #ifndef __SOUNDFFMPEG_H__
 #define __SOUNDFFMPEG_H__
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #ifndef __STDC_CONSTANT_MACROS
 #define __STDC_CONSTANT_MACROS
 #endif

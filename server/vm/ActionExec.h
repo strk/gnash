@@ -18,10 +18,6 @@
 #ifndef GNASH_ACTIONEXEC_H
 #define GNASH_ACTIONEXEC_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "with_stack_entry.h"
 #include "as_environment.h" // for ensureStack
 #include "smart_ptr.h"

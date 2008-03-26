@@ -18,10 +18,6 @@
 #ifndef __LOCALCONNECTION_H__
 #define __LOCALCONNECTION_H__
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <string>
 #include <map>
 #include <boost/cstdint.hpp> // for boost::?int??_t

@@ -18,11 +18,6 @@
 #ifndef GNASH_WITH_STACK_ENTRY_H
 #define GNASH_WITH_STACK_ENTRY_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
-
 #include "as_object.h" // for dtor visibility by boost::intrusive_ptr
 #include "smart_ptr.h"
 

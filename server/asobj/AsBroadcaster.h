@@ -18,10 +18,6 @@
 #ifndef __ASBROADCASTER_H__
 #define __ASBROADCASTER_H__
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 // Forward declarations
 namespace gnash {
 	class as_value;

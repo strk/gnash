@@ -21,11 +21,7 @@
 #ifndef GNASH_ACTION_H
 #define GNASH_ACTION_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
-#include "tu_config.h"
+#include "dsodefs.h" // for DSOEXPORT
 
 #include "gnash.h"
 #include "as_object.h"
