@@ -597,8 +597,8 @@ NetStream::getStatusObject(StatusCode code)
 	std::pair<const char*, const char*> info = getStatusCodeInfo(code);
 
 	boost::intrusive_ptr<as_object> o = new as_object(getObjectInterface());
-	o->init_member("code",  info.first,  1);
-	o->init_member("level", info.second, as_prop_flags::dontDelete|as_prop_flags::dontEnum);
+	o->init_member("code",  info.first,  0); // enumerable, deletable
+	o->init_member("level", info.second, 0); // enumerable, deletable
 
 	return o;
 }

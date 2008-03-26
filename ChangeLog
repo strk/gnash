@@ -1,3 +1,10 @@
+2008-03-26 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/NetStream.cpp: make elements of the info object
+	  enumerable and deletable.
+	* testsuite/misc-ming.all/NetStream-SquareTest.c: test that elements
+	  of the info object passed to onStatus are enumerable and deletable.
+
 2008-03-26 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/actionscript.all/Global.as: more tests for int().

@@ -238,6 +238,28 @@ main(int argc, char** argv)
 
 		"stream.onStatus = function(info) {"
 
+		"  if ( ! _root.enumerableStatusInfoChecked ) {"
+		"    _root.check(info.code != undefined);"
+		"    _root.check(info.level != undefined);"
+		"    var tmp = new Array();"
+		"    for (var e in info) tmp.push(e);"
+		"    tmp.sort();"
+		"    _root.check_equals(tmp.length, 2);"
+		"    _root.check_equals(tmp[0], 'code');"
+		"    _root.check_equals(tmp[1], 'level');"
+		"    _root.enumerableStatusInfoChecked=true;"
+		"    var backup = info.code; info.code = 65;"
+		"    _root.check_equals(info.code, 65);"
+		"    _root.check(delete info.code);"
+		"    _root.check_equals(info.code, undefined);"
+		"    info.code = backup;"
+		"    var backup = info.level; info.level = 66;"
+		"    _root.check_equals(info.level, 66);"
+		"    _root.check(delete info.level);"
+		"    _root.check_equals(info.level, undefined);"
+		"    info.level = backup;"
+		"  }"
+
 		// Ignore Buffer.Flush for now
 		"  if ( info.code == 'NetStream.Buffer.Flush' ) return; "
 
@@ -380,7 +402,7 @@ main(int argc, char** argv)
 
   SWFMovie_nextFrame(mo);
 
-  SWFMovie_add(mo, (SWFBlock)newSWFAction("totals(101); stop();"));
+  SWFMovie_add(mo, (SWFBlock)newSWFAction("totals(112); stop();"));
 
   SWFMovie_nextFrame(mo);
 
