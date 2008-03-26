@@ -82,14 +82,10 @@ AM_LDFLAGS =  \
 	$(LIBXML_LIBS) \
 	$(INCLTDL) \
 	$(LIRC_LIBS) \
-	$(MYSQL_LIBS)
+	$(MYSQL_LIBS) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)
-
-if WIN32
-	AM_LDFLAGS += -lgdi32 -lole32 -luuid -lws2_32 -lmsimg32
-endif
 
 GNASH_LIBS = \
 	$(top_builddir)/libamf/libgnashamf.la \
