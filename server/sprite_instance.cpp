@@ -216,8 +216,7 @@ static as_value sprite_attach_movie(const fn_call& fn)
   {
     IF_VERBOSE_ASCODING_ERRORS(
     log_aserror(_("attachMovie: '%s': no such exported resource - "
-      "returning undefined"),
-      id_name.c_str());
+      "returning undefined"), id_name);
     );
     return rv; 
   }
@@ -228,8 +227,7 @@ static as_value sprite_attach_movie(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     log_aserror(_("attachMovie: exported resource '%s' "
       "is not a character definition (%s) -- "
-      "returning undefined"),
-      id_name.c_str(),
+      "returning undefined"), id_name,
       typeid(*(exported.get())).name());
     );
     return rv;
@@ -271,7 +269,7 @@ static as_value sprite_attach_movie(const fn_call& fn)
       IF_VERBOSE_ASCODING_ERRORS(
       log_aserror(_("Fourth argument of attachMovie "
         "doesn't cast to an object (%s), we'll act as if it wasn't given"),
-        fn.arg(3).to_debug_string().c_str());
+        fn.arg(3).to_debug_string());
       );
     }
   }
@@ -322,7 +320,9 @@ static as_value sprite_create_empty_movieclip(const fn_call& fn)
     }
   }
 
-  character* ch = sprite->add_empty_movieclip(fn.arg(0).to_string().c_str(), int(fn.arg(1).to_number()));
+  // TODO: Why not use to_int()?
+  character* ch = sprite->add_empty_movieclip(fn.arg(0).to_string().c_str(),
+                                              fn.arg(1).to_int());
   return as_value(ch);
 }
 
@@ -350,7 +350,7 @@ static as_value sprite_swap_depths(const fn_call& fn)
   if (fn.nargs < 1)
   {
     IF_VERBOSE_ASCODING_ERRORS(
-    log_aserror(_("%s.swapDepths() needs one arg"), sprite->getTarget().c_str());
+    log_aserror(_("%s.swapDepths() needs one arg"), sprite->getTarget());
     );
     return rv;
   }
@@ -361,7 +361,7 @@ static as_value sprite_swap_depths(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     stringstream ss; fn.dump_args(ss);
     log_aserror(_("%s.swapDepths(%s): won't swap a clip below depth %d (%d)"),
-      sprite->getTarget().c_str(), ss.str().c_str(), character::staticDepthOffset, this_depth);
+      sprite->getTarget(), ss.str(), character::staticDepthOffset, this_depth);
     );
     return rv;
   }
@@ -379,7 +379,7 @@ static as_value sprite_swap_depths(const fn_call& fn)
     {
       IF_VERBOSE_ASCODING_ERRORS(
       log_aserror(_("%s.swapDepths(%s): invalid call, swapping to self?"),
-        sprite->getTarget().c_str(), target_sprite->getTarget().c_str());
+        sprite->getTarget(), target_sprite->getTarget());
       );
       return rv;
     }
@@ -389,7 +389,7 @@ static as_value sprite_swap_depths(const fn_call& fn)
     {
       IF_VERBOSE_ASCODING_ERRORS(
       log_aserror(_("%s.swapDepths(%s): invalid call, the two characters don't have the same parent"),
-        sprite->getTarget().c_str(), target_sprite->getTarget().c_str());
+        sprite->getTarget(), target_sprite->getTarget());
       );
       return rv;
     }
@@ -405,8 +405,7 @@ static as_value sprite_swap_depths(const fn_call& fn)
       IF_VERBOSE_ASCODING_ERRORS(
       stringstream ss; fn.dump_args(ss);
       log_aserror(_("%s.swapDepths(%s): ignored, source and target characters have the same depth %d"),
-        sprite->getTarget().c_str(),
-        ss.str().c_str(), target_depth);
+        sprite->getTarget(), ss.str(), target_depth);
       );
       return rv;
     }
@@ -424,8 +423,7 @@ static as_value sprite_swap_depths(const fn_call& fn)
       stringstream ss; fn.dump_args(ss);
       log_aserror(_("%s.swapDepths(%s): first argument invalid "
         "(neither a sprite nor a number)"),
-        sprite->getTarget().c_str(),
-        ss.str().c_str());
+        sprite->getTarget(), ss.str());
       );
       return rv;
     }
@@ -441,8 +439,7 @@ static as_value sprite_swap_depths(const fn_call& fn)
       IF_VERBOSE_ASCODING_ERRORS(
       stringstream ss; fn.dump_args(ss);
       log_aserror(_("%s.swapDepths(%s): ignored, character already at depth %d"),
-        sprite->getTarget().c_str(),
-        ss.str().c_str(), target_depth);
+        sprite->getTarget(), ss.str(), target_depth);
       );
       return rv;
     }
@@ -521,7 +518,7 @@ static as_value sprite_goto_and_play(const fn_call& fn)
     // No dice.
     IF_VERBOSE_ASCODING_ERRORS(
     log_aserror(_("sprite_goto_and_play('%s') -- invalid frame"),
-          fn.arg(0).to_debug_string().c_str());
+          fn.arg(0).to_debug_string());
     );
     return as_value();
   }
@@ -550,7 +547,7 @@ static as_value sprite_goto_and_stop(const fn_call& fn)
     // No dice.
     IF_VERBOSE_ASCODING_ERRORS(
     log_aserror(_("sprite_goto_and_stop('%s') -- invalid frame"),
-          fn.arg(0).to_debug_string().c_str());
+          fn.arg(0).to_debug_string());
     );
     return as_value();
   }
@@ -627,7 +624,7 @@ static as_value sprite_load_movie(const fn_call& fn)
     log_aserror(_("First argument of MovieClip.loadMovie(%s) "
       "evaluates to an empty string - "
       "returning undefined"),
-      ss.str().c_str());
+      ss.str());
     );
     return as_value();
   }
@@ -662,7 +659,7 @@ static as_value sprite_load_movie(const fn_call& fn)
 		std::stringstream ss;
 		fn.dump_args(ss);
 		log_aserror(_("MovieClip.loadMovie(%s): second argument (if any) must be 'post' or 'get' [got %s]"),
-			ss.str().c_str(), methodString.c_str());
+			ss.str(), methodString);
 		);
 	}
   }
@@ -679,7 +676,7 @@ static as_value sprite_load_movie(const fn_call& fn)
  
 	if ( usePost )
 	{
-		log_debug("Posting: %s", data.c_str());
+		log_debug("POSTING: %s", data);
 		mr.loadMovie(url, target, &data);
 	}
 	else
@@ -688,7 +685,7 @@ static as_value sprite_load_movie(const fn_call& fn)
 		if ( qs.empty() ) data.insert(0, 1, '?');
 		else data.insert(0, 1, '&');
 		url.set_querystring(qs+data);
-		log_debug("GETTIN: %s", url.str().c_str());
+		log_debug("GETTING: %s", url.str());
 		mr.loadMovie(url, target); 
 	}
   }
@@ -720,7 +717,7 @@ static as_value sprite_load_variables(const fn_call& fn)
     log_aserror(_("First argument passed to MovieClip.loadVariables(%s) "
       "evaluates to an empty string - "
       "returning undefined"),
-      ss.str().c_str());
+      ss.str());
     );
     return as_value();
   }
@@ -744,7 +741,7 @@ static as_value sprite_load_variables(const fn_call& fn)
   }
 
   sprite->loadVariables(url, method);
-  log_debug("MovieClip.loadVariables(%s) - TESTING ", url.str().c_str());
+  log_debug("MovieClip.loadVariables(%s) - TESTING ", url.str());
 
 
   //log_unimpl(__PRETTY_FUNCTION__);
@@ -784,7 +781,7 @@ static as_value sprite_hit_test(const fn_call& fn)
       {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Can't find hitTest target %s"),
-          tgt_val.to_debug_string().c_str());
+          tgt_val.to_debug_string());
         );
         return as_value();
       }
@@ -954,14 +951,14 @@ sprite_meth(const fn_call& fn)
   boost::intrusive_ptr<as_object> o = v.to_object();
   if ( ! o )
   {
-    log_debug("meth(%s): first argument doesn't cast to object", v.to_debug_string().c_str());
+    log_debug("meth(%s): first argument doesn't cast to object", v.to_debug_string());
     return as_value(0);
   }
 
   string_table& st = sprite->getVM().getStringTable();
   as_value lc = o->callMethod(st.find(PROPNAME("toLowerCase")));
 
-  log_debug("after call to toLowerCase with arg %s we got %s", v.to_debug_string().c_str(), lc.to_debug_string().c_str());
+  log_debug("after call to toLowerCase with arg %s we got %s", v.to_debug_string(), lc.to_debug_string());
 
   //if ( ! v.is_string() ) return as_value(0);
   std::string s = lc.to_string();
@@ -1002,7 +999,7 @@ sprite_getBounds(const fn_call& fn)
     {
       IF_VERBOSE_ASCODING_ERRORS(
       log_aserror(_("MovieClip.getBounds(%s): invalid call, first arg must be a sprite"),
-        fn.arg(0).to_debug_string().c_str());
+        fn.arg(0).to_debug_string());
       );
       return as_value();
     }
@@ -1063,7 +1060,7 @@ sprite_globalToLocal(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     log_aserror(_("MovieClip.globalToLocal(%s): "
         "first argument doesn't cast to an object"),
-      fn.arg(0).to_debug_string().c_str());
+      fn.arg(0).to_debug_string());
     );
     return ret;
   }
@@ -1077,7 +1074,7 @@ sprite_globalToLocal(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     log_aserror(_("MovieClip.globalToLocal(%s): "
         "object parameter doesn't have an 'x' member"),
-      fn.arg(0).to_debug_string().c_str());
+      fn.arg(0).to_debug_string());
     );
     return ret;
   }
@@ -1088,7 +1085,7 @@ sprite_globalToLocal(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     log_aserror(_("MovieClip.globalToLocal(%s): "
         "object parameter doesn't have an 'y' member"),
-      fn.arg(0).to_debug_string().c_str());
+      fn.arg(0).to_debug_string());
     );
     return ret;
   }
@@ -1125,7 +1122,7 @@ sprite_localToGlobal(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     log_aserror(_("MovieClip.localToGlobal(%s): "
         "first argument doesn't cast to an object"),
-      fn.arg(0).to_debug_string().c_str());
+      fn.arg(0).to_debug_string());
     );
     return ret;
   }
@@ -1139,7 +1136,7 @@ sprite_localToGlobal(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     log_aserror(_("MovieClip.localToGlobal(%s): "
         "object parameter doesn't have an 'x' member"),
-      fn.arg(0).to_debug_string().c_str());
+      fn.arg(0).to_debug_string());
     );
     return ret;
   }
@@ -1150,7 +1147,7 @@ sprite_localToGlobal(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     log_aserror(_("MovieClip.localToGlobal(%s): "
         "object parameter doesn't have an 'y' member"),
-      fn.arg(0).to_debug_string().c_str());
+      fn.arg(0).to_debug_string());
     );
     return ret;
   }
@@ -1178,7 +1175,7 @@ sprite_setMask(const fn_call& fn)
   if ( ! fn.nargs )
   {
     IF_VERBOSE_ASCODING_ERRORS(
-    log_aserror(_("%s.setMask() : needs an argument"), maskee->getTarget().c_str());
+    log_aserror(_("%s.setMask() : needs an argument"), maskee->getTarget());
     );
     return as_value();
   }
@@ -1198,7 +1195,7 @@ sprite_setMask(const fn_call& fn)
     {
       IF_VERBOSE_ASCODING_ERRORS(
       log_aserror(_("%s.setMask(%s) : first argument is not a character"),
-        maskee->getTarget().c_str(), arg.to_debug_string().c_str());
+        maskee->getTarget(), arg.to_debug_string());
       );
       return as_value();
     }
@@ -1217,7 +1214,7 @@ sprite_endFill(const fn_call& fn)
 {
   boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 #ifdef DEBUG_DRAWING_API
-  log_debug("%s.endFill();", sprite->getTarget().c_str());
+  log_debug("%s.endFill();", sprite->getTarget());
 #endif
   sprite->endFill();
   return as_value();
@@ -1244,8 +1241,8 @@ sprite_lineTo(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     std::stringstream ss; fn.dump_args(ss);
     log_aserror("%s.lineTo(%s) : non-finite first argument (%s), "
-      "converted to zero", sprite->getTarget().c_str(),
-      ss.str().c_str(), fn.arg(0).to_debug_string().c_str());
+      "converted to zero", sprite->getTarget(),
+      ss.str(), fn.arg(0).to_debug_string());
     );
     x = 0;
   }
@@ -1255,14 +1252,14 @@ sprite_lineTo(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     std::stringstream ss; fn.dump_args(ss);
     log_aserror("%s.lineTo(%s) : non-finite second argument (%s), "
-      "converted to zero", sprite->getTarget().c_str(),
-      ss.str().c_str(), fn.arg(1).to_debug_string().c_str());
+      "converted to zero", sprite->getTarget(),
+      ss.str(), fn.arg(1).to_debug_string());
     );
     y = 0;
   }
 
 #ifdef DEBUG_DRAWING_API
-  log_debug("%s.lineTo(%g,%g);", sprite->getTarget().c_str(), x, y);
+  log_debug("%s.lineTo(%g,%g);", sprite->getTarget(), x, y);
 #endif
   sprite->lineTo(x, y);
 
@@ -1290,8 +1287,8 @@ sprite_moveTo(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     std::stringstream ss; fn.dump_args(ss);
     log_aserror("%s.moveTo(%s) : non-finite first argument (%s), "
-      "converted to zero", sprite->getTarget().c_str(),
-      ss.str().c_str(), fn.arg(0).to_debug_string().c_str());
+      "converted to zero", sprite->getTarget(),
+      ss.str(), fn.arg(0).to_debug_string());
     );
     x = 0;
   }
@@ -1301,14 +1298,14 @@ sprite_moveTo(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     std::stringstream ss; fn.dump_args(ss);
     log_aserror("%s.moveTo(%s) : non-finite second argument (%s), "
-      "converted to zero", sprite->getTarget().c_str(),
-      ss.str().c_str(), fn.arg(1).to_debug_string().c_str());
+      "converted to zero", sprite->getTarget(),
+      ss.str(), fn.arg(1).to_debug_string());
     );
     y = 0;
   }
 
 #ifdef DEBUG_DRAWING_API
-  log_debug("%s.moveTo(%g,%g);", sprite->getTarget().c_str(), x, y);
+  log_debug("%s.moveTo(%g,%g);", sprite->getTarget(), x, y);
 #endif
   sprite->moveTo(x, y);
 
@@ -1352,10 +1349,10 @@ sprite_lineStyle(const fn_call& fn)
 
 
   rgba color(r, g, b, a);
-  //log_debug("Color: %s", color.toString().c_str());
+  //log_debug("Color: %s", color.toString());
 
 #ifdef DEBUG_DRAWING_API
-  log_debug("%s.lineStyle(%d,%d,%d,%d);", sprite->getTarget().c_str(), thickness, r, g, b);
+  log_debug("%s.lineStyle(%d,%d,%d,%d);", sprite->getTarget(), thickness, r, g, b);
 #endif
   sprite->lineStyle(thickness, color);
 
@@ -1385,8 +1382,8 @@ sprite_curveTo(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     std::stringstream ss; fn.dump_args(ss);
     log_aserror("%s.curveTo(%s) : non-finite first argument (%s), "
-      "converted to zero", sprite->getTarget().c_str(),
-      ss.str().c_str(), fn.arg(0).to_debug_string().c_str());
+      "converted to zero", sprite->getTarget(),
+      ss.str(), fn.arg(0).to_debug_string());
     );
     cx = 0;
   }
@@ -1396,8 +1393,8 @@ sprite_curveTo(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     std::stringstream ss; fn.dump_args(ss);
     log_aserror("%s.curveTo(%s) : non-finite second argument (%s), "
-      "converted to zero", sprite->getTarget().c_str(),
-      ss.str().c_str(), fn.arg(1).to_debug_string().c_str());
+      "converted to zero", sprite->getTarget(),
+      ss.str(), fn.arg(1).to_debug_string());
     );
     cy = 0;
   }
@@ -1407,8 +1404,8 @@ sprite_curveTo(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     std::stringstream ss; fn.dump_args(ss);
     log_aserror("%s.curveTo(%s) : non-finite third argument (%s), "
-      "converted to zero", sprite->getTarget().c_str(),
-      ss.str().c_str(), fn.arg(0).to_debug_string().c_str());
+      "converted to zero", sprite->getTarget(),
+      ss.str(), fn.arg(0).to_debug_string());
     );
     ax = 0;
   }
@@ -1418,14 +1415,14 @@ sprite_curveTo(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     std::stringstream ss; fn.dump_args(ss);
     log_aserror("%s.curveTo(%s) : non-finite fourth argument (%s), "
-      "converted to zero", sprite->getTarget().c_str(),
-      ss.str().c_str(), fn.arg(1).to_debug_string().c_str());
+      "converted to zero", sprite->getTarget(),
+      ss.str(), fn.arg(1).to_debug_string());
     );
     ay = 0;
   }
 
 #ifdef DEBUG_DRAWING_API
-  log_debug("%s.curveTo(%g,%g,%g,%g);", sprite->getTarget().c_str(), cx, cy, ax, ay);
+  log_debug("%s.curveTo(%g,%g,%g,%g);", sprite->getTarget(), cx, cy, ax, ay);
 #endif
   sprite->curveTo(cx, cy, ax, ay);
 
@@ -1438,7 +1435,7 @@ sprite_clear(const fn_call& fn)
   boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 #ifdef DEBUG_DRAWING_API
-  log_debug("%s.clear();", sprite->getTarget().c_str());
+  log_debug("%s.clear();", sprite->getTarget());
 #endif
   sprite->clear();
 
@@ -1473,7 +1470,7 @@ sprite_beginFill(const fn_call& fn)
   rgba color(r, g, b, a);
 
 #ifdef DEBUG_DRAWING_API
-  log_debug("%s.beginFill(%d,%d,%d);", sprite->getTarget().c_str(), r, g, b);
+  log_debug("%s.beginFill(%d,%d,%d);", sprite->getTarget(), r, g, b);
 #endif
   sprite->beginFill(color);
 
@@ -1490,7 +1487,7 @@ sprite_beginGradientFill(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     std::stringstream ss; fn.dump_args(ss);
     log_aserror(_("%s.beginGradientFill(%s): invalid call: 5 arguments needed"),
-      sprite->getTarget().c_str(), ss.str().c_str());
+      sprite->getTarget(), ss.str());
     );
     return as_value();
   }
@@ -1506,7 +1503,7 @@ sprite_beginGradientFill(const fn_call& fn)
     std::stringstream ss; fn.dump_args(ss);
     log_aserror(_("%s.beginGradientFill(%s): first arg must be "
       "'radial' or 'linear'"),
-      sprite->getTarget().c_str(), ss.str().c_str());
+      sprite->getTarget(), ss.str());
     );
     return as_value();
   }
@@ -1524,7 +1521,7 @@ sprite_beginGradientFill(const fn_call& fn)
     std::stringstream ss; fn.dump_args(ss);
     log_aserror(_("%s.beginGradientFill(%s): one or more of the "
       " args from 2nd to 5th don't cast to objects"),
-      sprite->getTarget().c_str(), ss.str().c_str());
+      sprite->getTarget(), ss.str());
     );
     return as_value();
   }
@@ -1683,7 +1680,7 @@ sprite_beginGradientFill(const fn_call& fn)
     std::stringstream ss; fn.dump_args(ss);
     log_aserror(_("%s.beginGradientFill(%s): colors, alphas and "
       "ratios args don't have same length"),
-      sprite->getTarget().c_str(), ss.str().c_str());
+      sprite->getTarget(), ss.str());
     );
     return as_value();
   }
@@ -1693,8 +1690,8 @@ sprite_beginGradientFill(const fn_call& fn)
   {
     std::stringstream ss; fn.dump_args(ss);
     log_debug("%s.beginGradientFill(%s) : too many array elements"
-      " for colors and ratios ("SIZET_FMT"), trim to 8", 
-      sprite->getTarget().c_str(), ss.str().c_str(), ngradients); 
+      " for colors and ratios (%d), trim to 8", 
+      sprite->getTarget(), ss.str(), ngradients); 
     ngradients = 8;
   }
 
@@ -1789,9 +1786,9 @@ sprite_startDrag(const fn_call& fn)
             if ( gotinf || swapped ) {
                 std::stringstream ss; fn.dump_args(ss);
 		if ( swapped ) 
-		  log_aserror(_("min/max bbox values in MovieClip.startDrag(%s) swapped, fixing"), ss.str().c_str());
+		  log_aserror(_("min/max bbox values in MovieClip.startDrag(%s) swapped, fixing"), ss.str());
 		if ( gotinf )
-                  log_aserror(_("non-finite bbox values in MovieClip.startDrag(%s), took as zero"), ss.str().c_str());
+                  log_aserror(_("non-finite bbox values in MovieClip.startDrag(%s), took as zero"), ss.str());
             }
             );
 
@@ -1865,7 +1862,7 @@ sprite_url_getset(const fn_call& fn)
 {
   boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
 
-  return as_value(ptr->get_movie_definition()->get_url().c_str());
+  return as_value(ptr->get_movie_definition()->get_url());
 }
 
 static as_value
@@ -2317,7 +2314,7 @@ bool sprite_instance::get_member(string_table::key name_key, as_value* val,
           "the name of an existing character "
           "in its display list.  "
           "The member will hide the "
-          "character"), name.c_str());
+          "character"), name);
     }
     );
 #endif
@@ -2376,12 +2373,12 @@ sprite_instance::get_frame_number(const as_value& frame_spec, size_t& frameno) c
 
   double num =  str.to_number();
 
-  //log_debug("get_frame_number(%s), num: %g", frame_spec.to_debug_string().c_str(), num);
+  //log_debug("get_frame_number(%s), num: %g", frame_spec.to_debug_string(), num);
 
   if ( ! isfinite(num) || int(num) != num || num == 0)
   {
     bool ret = m_def->get_labeled_frame(fspecStr, frameno);
-    //log_debug("get_labeled_frame(%s) returned %d, frameno is %d", fspecStr.c_str(), ret, frameno);
+    //log_debug("get_labeled_frame(%s) returned %d, frameno is %d", fspecStr, ret, frameno);
     return ret;
   }
 
@@ -2406,7 +2403,7 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
     // No dice.
     IF_VERBOSE_ASCODING_ERRORS(
     log_aserror(_("call_frame('%s') -- invalid frame"),
-          frame_spec.to_debug_string().c_str());
+          frame_spec.to_debug_string());
     );
     return;
   }
@@ -2516,7 +2513,7 @@ sprite_instance::duplicateMovieClip(const std::string& newname, int depth,
   sprite_instance* parent = parent_ch->to_movie();
   if ( ! parent )
   {
-    log_error(_("%s parent is not a sprite, can't clone"), getTarget().c_str());
+    log_error(_("%s parent is not a sprite, can't clone"), getTarget());
     return NULL;
   }
 
@@ -2573,14 +2570,14 @@ sprite_instance::on_event(const event_id& id)
   testInvariant();
 
 #ifdef GNASH_DEBUG
-  log_debug("Event %s invoked for sprite %s", id.get_function_name().c_str(), getTarget().c_str());
+  log_debug("Event %s invoked for sprite %s", id.get_function_name(), getTarget());
 #endif
 
   // We do not execute ENTER_FRAME if unloaded
   if ( id.m_id == event_id::ENTER_FRAME && isUnloaded() )
   {
 #ifdef GNASH_DEBUG
-    log_debug("Sprite %s ignored ENTER_FRAME event (is unloaded)", getTarget().c_str());
+    log_debug("Sprite %s ignored ENTER_FRAME event (is unloaded)", getTarget());
 #endif
     return false;
   }
@@ -2589,7 +2586,7 @@ sprite_instance::on_event(const event_id& id)
   {
 #ifdef GNASH_DEBUG
     log_debug("Sprite %s ignored button-like event %s as not 'enabled'",
-      getTarget().c_str(), id.get_function_name().c_str());
+      getTarget(), id.get_function_name());
 #endif
     return false;
   }
@@ -2651,7 +2648,7 @@ sprite_instance::on_event(const event_id& id)
 #ifdef GNASH_DEBUG
         log_debug("Sprite %s (depth %d) won't check for user-defined LOAD event (is not dynamic, has a parent, "
 		"no registered class and no clip events defined)",
-		getTarget().c_str(), get_depth());
+		getTarget(), get_depth());
         testInvariant();
 #endif
         return called;
@@ -2685,7 +2682,7 @@ sprite_instance::on_event(const event_id& id)
 as_object*
 sprite_instance::get_path_element(string_table::key key)
 {
-  //log_debug("%s.get_path_element(%s) called", getTarget().c_str(), _vm.getStringTable().value(key).c_str());
+  //log_debug("%s.get_path_element(%s) called", getTarget(), _vm.getStringTable().value(key));
   as_object* obj = get_path_element_character(key);
   if ( obj )
   {
@@ -2737,7 +2734,7 @@ void sprite_instance::set_member(string_table::key name,
     const as_value& val, string_table::key nsname)
 {
 #ifdef DEBUG_DYNTEXT_VARIABLES
-  //log_debug(_("sprite[%p]::set_member(%s, %s)"), (void*)this, VM::get().getStringTable().value(name), val.to_debug_string().c_str());
+  //log_debug(_("sprite[%p]::set_member(%s, %s)"), (void*)this, VM::get().getStringTable().value(name), val.to_debug_string());
 #endif
 
   //if ( val.is_function() )
@@ -2754,11 +2751,11 @@ void sprite_instance::set_member(string_table::key name,
   //        property (ie: have a textfield use _x as variable name and
   //        be scared)
   //
-  TextFieldPtrVect* etc = get_textfield_variable(VM::get().getStringTable().value(name).c_str());
+  TextFieldPtrVect* etc = get_textfield_variable(VM::get().getStringTable().value(name));
   if ( etc )
   {
 #ifdef DEBUG_DYNTEXT_VARIABLES
-    log_debug(_("it's a Text Variable, associated with " SIZET_FMT " TextFields"), etc->size());
+    log_debug(_("it's a Text Variable, associated with %d TextFields"), etc->size());
 #endif
     for (TextFieldPtrVect::iterator i=etc->begin(), e=etc->end(); i!=e; ++i)
     {
@@ -2791,7 +2788,7 @@ void sprite_instance::advance_sprite()
     IF_VERBOSE_MALFORMED_SWF(
     static bool warned=false;
     if ( ! warned ) {
-      log_swferror(_("advance_sprite: no frames loaded for sprite/movie %s"), getTarget().c_str());
+      log_swferror(_("advance_sprite: no frames loaded for sprite/movie %s"), getTarget());
       warned=true;
     }
     );
@@ -2806,7 +2803,7 @@ void sprite_instance::advance_sprite()
   size_t frame_count = m_def->get_frame_count();
 
   log_debug(_("Advance_sprite for sprite '%s' - frame %u/%u "),
-    getTarget().c_str(), m_current_frame,
+    getTarget(), m_current_frame,
     frame_count);
 #endif
 
@@ -2838,14 +2835,14 @@ void sprite_instance::advance_sprite()
       if ( m_current_frame == 0 && has_looped() )
       {
 #ifdef GNASH_DEBUG
-        log_debug("Jumping back to frame 0 of sprite %s", getTarget().c_str());
+        log_debug("Jumping back to frame 0 of sprite %s", getTarget());
 #endif
         restoreDisplayList(0); // seems OK to me.
       }
       else
       {
 #ifdef GNASH_DEBUG
-        log_debug("Executing frame%d (0-based) tags of sprite %s", m_current_frame, getTarget().c_str());
+        log_debug("Executing frame%d (0-based) tags of sprite %s", m_current_frame, getTarget());
 #endif
         // Make sure m_current_frame is 0-based during execution of DLIST tags
         execute_frame_tags(m_current_frame, TAG_DLIST|TAG_ACTION);
@@ -2869,7 +2866,7 @@ void sprite_instance::advance()
 
 #ifdef GNASH_DEBUG
   log_debug(_("Advance sprite '%s' at frame %u/%u"),
-    getTargetPath().c_str(), m_current_frame,
+    getTargetPath(), m_current_frame,
     get_frame_count());
 #endif
 
@@ -2887,7 +2884,7 @@ sprite_instance::execute_init_action_buffer(const action_buffer& a, int cid)
   if ( mi->setCharacterInitialized(cid) )
   {
 #ifdef GNASH_DEBUG
-    log_debug("Queuing init actions in frame " SIZET_FMT " of sprite %s", m_current_frame, getTarget().c_str());
+    log_debug("Queuing init actions in frame %d of sprite %s", m_current_frame, getTarget());
 #endif
     std::auto_ptr<ExecutableCode> code ( new GlobalCode(a, boost::intrusive_ptr<sprite_instance>(this)) );
 
@@ -2967,10 +2964,9 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
   {
     IF_VERBOSE_ACTION(
       // Use 1-based frame numbers
-      log_action(_("Executing " SIZET_FMT " tags in frame "
-        SIZET_FMT "/" SIZET_FMT " of sprite %s"),
-        playlist->size(), frame+1, get_frame_count(),
-        getTargetPath().c_str());
+      log_action(_("Executing %d tags in frame %d/%d of sprite %s"),
+        playlist->size(), frame + 1, get_frame_count(),
+        getTargetPath());
     );
 
     if ( (typeflags&TAG_DLIST) && (typeflags&TAG_ACTION) )
@@ -2996,9 +2992,8 @@ void
 sprite_instance::goto_frame(size_t target_frame_number)
 {
 #if defined(DEBUG_GOTOFRAME) || defined(GNASH_DEBUG_TIMELINE)
-  log_debug(_("sprite %s ::goto_frame(" SIZET_FMT ") - current frame is "
-    SIZET_FMT),
-    getTargetPath().c_str(), target_frame_number, m_current_frame);
+  log_debug(_("sprite %s ::goto_frame(%d) - current frame is %d"),
+    getTargetPath(), target_frame_number, m_current_frame);
 #endif
 
   // goto_frame stops by default.
@@ -3012,7 +3007,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
 
     if ( ! m_def->ensure_frame_loaded(target_frame_number+1) )
     {
-      log_error("Target frame of a gotoFrame("SIZET_FMT") was never loaded, although frame count in header ("SIZET_FMT") said we would have found it",
+      log_error("Target frame of a gotoFrame(%d) was never loaded, although frame count in header (%d) said we would have found it",
         target_frame_number+1, m_def->get_frame_count());
       return; // ... I guess, or not ?
     }
@@ -3044,8 +3039,8 @@ sprite_instance::goto_frame(size_t target_frame_number)
   if ( target_frame_number >= loaded_frames )
   {
     IF_VERBOSE_ASCODING_ERRORS(
-      log_aserror(_("GotoFrame(" SIZET_FMT ") targets a yet "
-      "to be loaded frame (" SIZET_FMT ") loaded). "
+      log_aserror(_("GotoFrame(%d) targets a yet "
+      "to be loaded frame (%d) loaded). "
       "We'll wait for it but a more correct form "
       "is explicitly using WaitForFrame instead"),
       target_frame_number+1,
@@ -3054,7 +3049,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
     );
     if ( ! m_def->ensure_frame_loaded(target_frame_number+1) )
     {
-      log_error("Target frame of a gotoFrame("SIZET_FMT") was never loaded, although frame count in header ("SIZET_FMT") said we would have found it",
+      log_error("Target frame of a gotoFrame(%d) was never loaded, although frame count in header (%d) said we would have found it",
         target_frame_number+1, m_def->get_frame_count());
       return; // ... I guess, or not ?
     }
@@ -3116,7 +3111,7 @@ bool sprite_instance::goto_labeled_frame(const std::string& label)
 
     IF_VERBOSE_MALFORMED_SWF(
     log_swferror(_("sprite_instance::goto_labeled_frame('%s') "
-      "unknown label"), label.c_str());
+      "unknown label"), label);
     );
     return false;
 }
@@ -3407,7 +3402,7 @@ public:
       if ( ch->isMaskLayer() )
       {
         log_debug("CHECKME: nested mask in MouseEntityFinder. This mask is %s at depth %d outer mask masked up to depth %d.",
-          ch->getTarget().c_str(), ch->get_depth(), _highestHiddenDepth);
+          ch->getTarget(), ch->get_depth(), _highestHiddenDepth);
         // Hiding mask still in effect...
       }
       return;
@@ -3420,7 +3415,7 @@ public:
       {
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
         log_debug("Character %s at depth %d is a mask not hitting the query point %g,%g and masking up to depth %d",
-          ch->getTarget().c_str(), ch->get_depth(), _wp.x, _wp.y, ch->get_clip_depth());
+          ch->getTarget(), ch->get_depth(), _wp.x, _wp.y, ch->get_clip_depth());
 #endif // DEBUG_MOUSE_ENTITY_FINDING
         _highestHiddenDepth = ch->get_clip_depth();
       }
@@ -3428,7 +3423,7 @@ public:
       {
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
         log_debug("Character %s at depth %d is a mask hitting the query point %g,%g",
-          ch->getTarget().c_str(), ch->get_depth(), _wp.x, _wp.y);
+          ch->getTarget(), ch->get_depth(), _wp.x, _wp.y);
 #endif // DEBUG_MOUSE_ENTITY_FINDING
       }
 
@@ -3465,7 +3460,7 @@ public:
     if ( _m ) 
     {
       log_debug("MouseEntityFinder found character %s (depth %d) hitting point %g,%g",
-        _m->getTarget().c_str(), _m->get_depth(), _wp.x, _wp.y);
+        _m->getTarget(), _m->get_depth(), _wp.x, _wp.y);
     }
 #endif // DEBUG_MOUSE_ENTITY_FINDING
     return _m;
@@ -3556,7 +3551,7 @@ sprite_instance::pointInVisibleShape(float x, float y) const
   {
       // see testsuite/misc-ming.all/masks_test.swf
 #ifdef GNASH_DEBUG_HITTEST
-      log_debug("%s is a dynamic mask and can't handle mouse events, no point will hit it", getTarget().c_str());
+      log_debug("%s is a dynamic mask and can't handle mouse events, no point will hit it", getTarget());
 #endif
       return false;
   }
@@ -3564,7 +3559,7 @@ sprite_instance::pointInVisibleShape(float x, float y) const
   if ( mask && mask->get_visible() && ! mask->pointInShape(x, y) )
   {
 #ifdef GNASH_DEBUG_HITTEST
-    log_debug("%s is dynamically masked by %s, which doesn't hit point %g,%g", getTarget().c_str(), mask->getTarget().c_str(), x, y);
+    log_debug("%s is dynamically masked by %s, which doesn't hit point %g,%g", getTarget(), mask->getTarget(), x, y);
 #endif
     return false;
   }
@@ -3666,7 +3661,7 @@ public:
       if ( ch->isMaskLayer() )
       {
         log_debug("CHECKME: nested mask in DropTargetFinder. This mask is %s at depth %d outer mask masked up to depth %d.",
-          ch->getTarget().c_str(), ch->get_depth(), _highestHiddenDepth);
+          ch->getTarget(), ch->get_depth(), _highestHiddenDepth);
         // Hiding mask still in effect...
       }
       return;
@@ -3682,7 +3677,7 @@ public:
       {
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
         log_debug("Character %s at depth %d is a mask not hitting the query point %g,%g and masking up to depth %d",
-          ch->getTarget().c_str(), ch->get_depth(), _x, _y, ch->get_clip_depth());
+          ch->getTarget(), ch->get_depth(), _x, _y, ch->get_clip_depth());
 #endif // DEBUG_MOUSE_ENTITY_FINDING
         _highestHiddenDepth = ch->get_clip_depth();
       }
@@ -3690,7 +3685,7 @@ public:
       {
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
         log_debug("Character %s at depth %d is a mask hitting the query point %g,%g",
-          ch->getTarget().c_str(), ch->get_depth(), _x, _y);
+          ch->getTarget(), ch->get_depth(), _x, _y);
 #endif // DEBUG_MOUSE_ENTITY_FINDING
       }
 
@@ -3953,7 +3948,7 @@ sprite_instance::stagePlacementCallback()
   saveOriginalTarget();
 
 #ifdef GNASH_DEBUG
-  log_debug(_("Sprite '%s' placed on stage"), getTarget().c_str());
+  log_debug(_("Sprite '%s' placed on stage"), getTarget());
 #endif
 
   // Register this sprite as a live one
@@ -3973,7 +3968,7 @@ sprite_instance::stagePlacementCallback()
     IF_VERBOSE_MALFORMED_SWF(
     static bool warned=false;
     if ( ! warned ) {
-      log_swferror(_("stagePlacementCallback: no frames loaded for sprite/movie %s"), getTarget().c_str());
+      log_swferror(_("stagePlacementCallback: no frames loaded for sprite/movie %s"), getTarget());
       warned=true;
     }
     );
@@ -3992,7 +3987,7 @@ sprite_instance::stagePlacementCallback()
   if ( isDynamic() )
   {
 #ifdef GNASH_DEBUG
-    log_debug("Sprite %s is dynamic, sending INITIALIZE and CONSTRUCT events immediately", getTarget().c_str());
+    log_debug("Sprite %s is dynamic, sending INITIALIZE and CONSTRUCT events immediately", getTarget());
 #endif
     on_event(event_id::INITIALIZE);
     constructAsScriptObject(); 
@@ -4000,12 +3995,12 @@ sprite_instance::stagePlacementCallback()
   else
   {
 #ifdef GNASH_DEBUG
-    log_debug("Queuing INITIALIZE event for sprite %s", getTarget().c_str());
+    log_debug("Queuing INITIALIZE event for sprite %s", getTarget());
 #endif
     queueEvent(event_id::INITIALIZE, movie_root::apINIT);
 
 #ifdef GNASH_DEBUG
-    log_debug("Queuing CONSTRUCT event for sprite %s", getTarget().c_str());
+    log_debug("Queuing CONSTRUCT event for sprite %s", getTarget());
 #endif
     std::auto_ptr<ExecutableCode> code ( new ConstructEvent(this) );
     _vm.getRoot().pushAction(code, movie_root::apCONSTRUCT);
@@ -4024,7 +4019,7 @@ sprite_instance::stagePlacementCallback()
     if ( hasFrames )
     {
 #ifdef GNASH_DEBUG
-      log_debug(_("Executing tags of frame0 in sprite %s"), getTarget().c_str());
+      log_debug(_("Executing tags of frame0 in sprite %s"), getTarget());
 #endif
       execute_frame_tags(0, TAG_DLIST|TAG_ACTION);
     }
@@ -4032,7 +4027,7 @@ sprite_instance::stagePlacementCallback()
     if ( _vm.getSWFVersion() > 5 )
     {
 #ifdef GNASH_DEBUG
-      log_debug(_("Queuing ONLOAD event for sprite %s"), getTarget().c_str());
+      log_debug(_("Queuing ONLOAD event for sprite %s"), getTarget());
 #endif
       queueEvent(event_id::LOAD, movie_root::apDOACTION);
     }
@@ -4042,14 +4037,14 @@ sprite_instance::stagePlacementCallback()
   {
 
 #ifdef GNASH_DEBUG
-    log_debug(_("Queuing ONLOAD event for sprite %s"), getTarget().c_str());
+    log_debug(_("Queuing ONLOAD event for sprite %s"), getTarget());
 #endif
     queueEvent(event_id::LOAD, movie_root::apDOACTION);
 
     if ( hasFrames )
     {
 #ifdef GNASH_DEBUG
-      log_debug(_("Executing tags of frame0 in sprite %s"), getTarget().c_str());
+      log_debug(_("Executing tags of frame0 in sprite %s"), getTarget());
 #endif
       execute_frame_tags(0, TAG_DLIST|TAG_ACTION);
     }
@@ -4062,7 +4057,7 @@ void
 sprite_instance::constructAsScriptObject()
 {
 #ifdef GNASH_DEBUG
-  log_debug("constructAsScriptObject called for sprite %s", getTarget().c_str());
+  log_debug("constructAsScriptObject called for sprite %s", getTarget());
 #endif
 
   bool eventHandlersInvoked = false;
@@ -4085,7 +4080,7 @@ sprite_instance::constructAsScriptObject()
 
     as_function* ctor = def->getRegisteredClass();
 #ifdef GNASH_DEBUG
-    log_debug(_("Attached sprites %s registered class is %p"), getTarget().c_str(), (void*)ctor); 
+    log_debug(_("Attached sprites %s registered class is %p"), getTarget(), (void*)ctor); 
 #endif
 
     // TODO: builtin constructors are different from user-defined ones
@@ -4146,7 +4141,7 @@ bool
 sprite_instance::unload()
 {
 #ifdef GNASH_DEBUG
-  log_debug(_("Unloading sprite '%s'"), getTargetPath().c_str());
+  log_debug(_("Unloading sprite '%s'"), getTargetPath());
 #endif
 
   // stop any pending streaming sounds
@@ -4176,12 +4171,12 @@ sprite_instance::loadMovie(const URL& url, const std::string* postdata)
   character* parent = get_parent();
   if ( parent )
   {
-	if ( postdata ) log_debug("Posting data '%s' to url '%s'", postdata->c_str(), url.str().c_str());
+	if ( postdata ) log_debug("Posting data '%s' to url '%s'", postdata, url.str());
     boost::intrusive_ptr<movie_definition> md ( create_library_movie(url, NULL, true, postdata) );
     if (md == NULL)
     {
       log_error(_("can't create movie_definition for %s"),
-        url.str().c_str());
+        url.str());
       return false;
     }
 
@@ -4190,7 +4185,7 @@ sprite_instance::loadMovie(const URL& url, const std::string* postdata)
     if (extern_movie == NULL)
     {
       log_error(_("can't create extern movie_instance "
-        "for %s"), url.str().c_str());
+        "for %s"), url.str());
       return false;
     }
 
@@ -4287,10 +4282,10 @@ sprite_instance::loadVariables(URL url, short sendVarsMethod)
   }
   catch (NetworkException& ex)
   {
-    log_error(_("Could not load variables from %s"), url.str().c_str());
+    log_error(_("Could not load variables from %s"), url.str());
   }
 
-  //log_debug(_(SIZET_FMT " loadVariables requests pending"), _loadVariableRequests.size());
+  //log_debug(_(%d loadVariables requests pending"), _loadVariableRequests.size());
 
 }
 
@@ -4311,8 +4306,8 @@ sprite_instance::processCompletedLoadVariableRequest(LoadVariablesThread& reques
   {
     const string name = PROPNAME(it->first);
     const string& val = it->second;
-    //log_debug(_("Setting variable '%s' to value '%s'"), name.c_str(), val.c_str());
-    set_member(st.find(name), val.c_str());
+    //log_debug(_("Setting variable '%s' to value '%s'"), name, val);
+    set_member(st.find(name), val);
   }
 
   // We wan't to call a clip-event too if available, see bug #22116
@@ -4351,7 +4346,7 @@ sprite_instance::setVariables(VariableMap& vars)
   {
     const string& name = it->first;
     const string& val = it->second;
-    set_member(st.find(PROPNAME(name)), val.c_str());
+    set_member(st.find(PROPNAME(name)), val);
   }
 }
 
@@ -4364,7 +4359,7 @@ sprite_instance::removeMovieClip()
     IF_VERBOSE_ASCODING_ERRORS(
     log_aserror(_("removeMovieClip(%s): sprite depth (%d) out of the "
       "'dynamic' zone [0..1048575], won't remove"),
-      getTarget().c_str(), depth);
+      getTarget(), depth);
     );
     return;
   }
@@ -4381,7 +4376,7 @@ sprite_instance::removeMovieClip()
     // removing _level#
     _vm.getRoot().dropLevel(depth);
     // I guess this can only happen if someone uses _root.swapDepth([0..1048575])
-    //log_error(_("Can't remove sprite %s as it has no parent"), getTarget().c_str());
+    //log_error(_("Can't remove sprite %s as it has no parent"), getTarget());
   }
 
 }
@@ -4438,7 +4433,7 @@ sprite_instance::enumerateNonProperties(as_environment& env) const
 void
 sprite_instance::cleanupDisplayList()
 {
-        //log_debug("%s.cleanDisplayList() called, current dlist is %p", getTarget().c_str(), (void*)&m_display_list);
+        //log_debug("%s.cleanDisplayList() called, current dlist is %p", getTarget(), (void*)&m_display_list);
   m_display_list.removeUnloaded();
 }
 

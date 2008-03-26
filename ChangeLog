@@ -2,6 +2,8 @@
 
 	* libbase/log.{h,cpp}: drop (unused) vsnprintf logging calls, tidy up
 	  a bit.
+	* server/sprite_instance.cpp: don't use SIZET_FMT or c_str() in logging
+	  calls.
 
 2008-03-26  Dossy Shiobara <dossy@panoptic.com>
 
