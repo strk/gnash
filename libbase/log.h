@@ -275,7 +275,7 @@ private:
          BOOST_PP_ENUM_PARAMS(\
          BOOST_PP_INC(n), typename T)\
      >\
-    DSOEXPORT void log_##data (\
+    void log_##data (\
         BOOST_PP_REPEAT(\
         BOOST_PP_INC(n), \
         TOKENIZE_ARGS, t)\
