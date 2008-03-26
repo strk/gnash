@@ -3952,19 +3952,6 @@ sprite_instance::stagePlacementCallback()
 
   saveOriginalTarget();
 
-  // We might have loaded NO frames !
-  if ( get_loaded_frames() == 0 )
-  {
-    IF_VERBOSE_MALFORMED_SWF(
-    static bool warned=false;
-    if ( ! warned ) {
-      log_swferror(_("stagePlacementCallback: no frames loaded for sprite/movie %s"), getTarget().c_str());
-      warned=true;
-    }
-    );
-    return;
-  }
-
 #ifdef GNASH_DEBUG
   log_debug(_("Sprite '%s' placed on stage"), getTarget().c_str());
 #endif
@@ -3975,8 +3962,22 @@ sprite_instance::stagePlacementCallback()
   // Register this sprite as a core broadcasters listener
   registerAsListener();
 
-  // We *might* avoid this, but better safe then sorry
-  m_def->ensure_frame_loaded(0);
+  // It seems it's legal to place 0-framed sprites on stage.
+  // See testsuite/misc-swfmill.all/zeroframe_definesprite.swf
+  //m_def->ensure_frame_loaded(0);
+
+  // We might have loaded NO frames !
+  bool hasFrames = get_loaded_frames();
+  if ( ! hasFrames )
+  {
+    IF_VERBOSE_MALFORMED_SWF(
+    static bool warned=false;
+    if ( ! warned ) {
+      log_swferror(_("stagePlacementCallback: no frames loaded for sprite/movie %s"), getTarget().c_str());
+      warned=true;
+    }
+    );
+  }
 
   // We execute events immediately when the stage-placed character is dynamic.
   // This is becase we assume that this means that the character is placed during
@@ -4020,10 +4021,13 @@ sprite_instance::stagePlacementCallback()
   assert(!_callingFrameActions); // or will not be queuing actions
   if ( get_parent() == 0 )
   {
+    if ( hasFrames )
+    {
 #ifdef GNASH_DEBUG
       log_debug(_("Executing tags of frame0 in sprite %s"), getTarget().c_str());
 #endif
       execute_frame_tags(0, TAG_DLIST|TAG_ACTION);
+    }
 
     if ( _vm.getSWFVersion() > 5 )
     {
@@ -4042,10 +4046,13 @@ sprite_instance::stagePlacementCallback()
 #endif
     queueEvent(event_id::LOAD, movie_root::apDOACTION);
 
+    if ( hasFrames )
+    {
 #ifdef GNASH_DEBUG
-    log_debug(_("Executing tags of frame0 in sprite %s"), getTarget().c_str());
+      log_debug(_("Executing tags of frame0 in sprite %s"), getTarget().c_str());
 #endif
-    execute_frame_tags(0, TAG_DLIST|TAG_ACTION);
+      execute_frame_tags(0, TAG_DLIST|TAG_ACTION);
+    }
   }
 
 }

@@ -203,12 +203,9 @@
             <items>
               <!--
                 // NOTE: the number of characters in the next string push 
-                // DOES matter in the BranchIfTrue tag above, so when we'll
-                // succeed in this, an empty space must be added to replace
-                // the 'X' character removed.
-                // Yes, is NOT fun doing actionscript with swfmill...
+                // DOES matter in the BranchIfTrue tag above, so keep it constant
                 -->
-              <StackString value="XFAILED: expected a00b11c22 ...       "/>
+              <StackString value="FAILED: expected a00b11c22 ...        "/>
             </items>
           </PushData>
           <Trace/>

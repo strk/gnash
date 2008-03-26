@@ -1,3 +1,10 @@
+2008-03-26 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (stagePlacementCallback): place also
+	  sprites for which NO frame was loaded (tot frames 0).
+	* testsuite/misc-swfmill.all/zeroframe_definesprite.xml: don't
+	  expect a failure.
+
 2008-03-26 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/actionscript.all/Global.as: tests for int(). 
