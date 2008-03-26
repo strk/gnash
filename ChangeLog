@@ -1,3 +1,9 @@
+2008-03-26 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/asobj/Global.cpp: parseFloat should work with double
+	  precision; improves swfdec testsuite results in parse-float.as
+	  and string-to-number.as (though neither passes yet). 
+
 2008-03-26 Sandro Santilli <strk@keybit.net>
 
 	* gui/sdl.cpp: fix sdl to gnash key modifiers conversion.
