@@ -1,5 +1,11 @@
 2008-03-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* server/vm/ASHandlers.{cpp,h}: const correct guessEncoding,
+	  don't try to access vector out of bounds in ActionMbSubString.
+	  Use at() for run time checking.
+	
+2008-03-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* server/parser/action_buffer.{cpp,h}: fix very annoying
 	  g++4.3 compiler warnings about parentheses, use at() to
 	  access vectors, don't cast away constness in hexify call.

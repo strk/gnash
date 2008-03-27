@@ -1531,61 +1531,67 @@ SWFHandlers::ActionRandom(ActionExec& thread)
 }
 
 as_encoding_guess_t
-SWFHandlers::GuessEncoding(std::string &str, int &length, std::vector<int>& offsets)
+SWFHandlers::guessEncoding(const std::string &str, int &length, std::vector<int>& offsets)
 {
-    const char *cstr = str.c_str();
-    const char *i = cstr;
     int width = 0; // The remaining width, not the total.
     bool is_sought = true;
-    int j;
-    int index = 0;
 
+    std::string::const_iterator it = str.begin();
     length = 0;
+    int index = 0;
+    
     // First, assume it's UTF8 and try to be wrong.
-    for (index = 0; is_sought && *i != '\0'; ++i, ++index)
+    while (it != str.end() && is_sought)
     {
-        j = static_cast<int> (*i);
+        int c = static_cast<int>(*it);
 
         if (width)
         {
             --width;
-            if ((j & 0xB0) != 0x80)
+            if ((c & 0xB0) != 0x80)
+            {
                 is_sought = false;
+            }
             continue;
         }
         ++length;
         offsets.push_back(index); //[length - 1] = index;
 
-        if ((j & 0xC0) == 0x80)
-            continue; // A 1 byte character.
-        else if ((j & 0xE0) == 0xC0)
-            width = 1;
-        else if ((j & 0xF0) == 0xE0)
-            width = 2;
-        else if ((j & 0xF8) == 0xF0)
-            width = 3;
-        else if (j & 0x80)
-            is_sought = false;
+        if ((c & 0xC0) == 0x80) continue; // A 1 byte character.
+        else if ((c & 0xE0) == 0xC0) width = 1;
+        else if ((c & 0xF0) == 0xE0) width = 2;
+        else if ((c & 0xF8) == 0xF0) width = 3;
+        else if (c & 0x80) is_sought = false;
+            
+        ++it;
+        ++index;
     }
-    offsets.push_back(index); // [length - 1] = index;
-    if (!width && is_sought) // No width left, so it's almost certainly UTF8.
-        return ENCGUESS_UNICODE;
 
+    offsets.push_back(index); // [length - 1] = index;
+
+    if (!width && is_sought)
+    {
+        // No width left, so it's almost certainly UTF8.
+        return ENCGUESS_UNICODE;
+    }
+
+    it = str.begin();
+    index = 0;
     is_sought = true;
     width = 0;
     length = 0;
     bool was_odd = true;
     bool was_even = true;
     // Now, assume it's SHIFT_JIS and try to be wrong.
-    for (index = 0, i = cstr; is_sought && (*i != '\0'); ++i, ++index)
+    while (it != str.end() && is_sought)
     {
-        j = static_cast<int> (*i);
+        int c = static_cast<int> (*it);
 
         if (width)
         {
             --width;
-            if ((j < 0x40) || ((j < 0x9F) && was_even) ||
-                ((j > 0x9E) && was_odd) || (j == 0x7F))
+            if ((c < 0x40) || ((c < 0x9F) && was_even) ||
+                ((c > 0x9E) && was_odd) || (c == 0x7F))
             {
                 is_sought = false;
             }
@@ -1595,28 +1601,36 @@ SWFHandlers::GuessEncoding(std::string &str, int &length, std::vector<int>& offs
         ++length;
         offsets.push_back(index); // [length - 1] = index;
 
-        if ((j == 0x80) || (j == 0xA0) || (j >= 0xF0))
+        if ((c == 0x80) || (c == 0xA0) || (c >= 0xF0))
         {
             is_sought = false;
             break;
         }
 
-        if (((j >= 0x81) && (j <= 0x9F)) || ((j >= 0xE0) && (j <= 0xEF)))
+        if (((c >= 0x81) && (c <= 0x9F)) || ((c >= 0xE0) && (c <= 0xEF)))
         {
             width = 1;
-            was_odd = j & 0x01;
+            was_odd = c & 0x01;
             was_even = !was_odd;
         }
-        
+    
+        it++;
+        index++;    
     }
     offsets.push_back(index); // [length - 1] = index;
-    if (!width && is_sought) // No width left, so it's probably SHIFT_JIS.
+    
+    if (!width && is_sought)
+    {
+        // No width left, so it's probably SHIFT_JIS.
         return ENCGUESS_JIS;
+    }
 
     // It's something else.
-    length = mbstowcs(NULL, cstr, 0);
+    length = mbstowcs(NULL, str.c_str(), 0);
     if (length == -1)
-        length = strlen(cstr);
+    {
+        length = str.length();
+    }
     return ENCGUESS_OTHER;
 }
 
@@ -1638,7 +1652,7 @@ SWFHandlers::ActionMbLength(ActionExec& thread)
         int length;
         std::vector<int> unused;
 	    unused.resize(str.length()+1);
-        (void) GuessEncoding(str, length, unused);
+        (void) guessEncoding(str, length, unused);
         env.top(0).set_int(length);
     }
 }
@@ -1747,32 +1761,31 @@ SWFHandlers::ActionMbSubString(ActionExec& thread)
     string str = string_val.to_string();
     int length = 0;
     std::vector<int> offsets;
-    //offsets.resize(str.length() + 1);
 
-    as_encoding_guess_t encoding = GuessEncoding(str, length, offsets);
+    as_encoding_guess_t encoding = guessEncoding(str, length, offsets);
 
     //log_debug("Guessed encoding for %s: %d - len:%d, offsets.size:%d", str.c_str(), encoding, length, offsets.size());
     //for (int i=0; i<offsets.size(); ++i) log_debug("  offsets[%d]: %d", i, offsets[i]);
 
     if (size < 0)
     {
-	IF_VERBOSE_ASCODING_ERRORS(
-    	log_aserror(_("Negative size passed to ActionSubString, "
-		"taking as whole length"));
-	);
-	size = length;
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Negative size passed to ActionSubString, "
+            "taking as whole length"));
+        );
+        size = length;
     }
 
     if (start < 1)
     {
-	IF_VERBOSE_ASCODING_ERRORS(
-    	log_aserror(_("Base is less then 1 in ActionMbSubString, "
-		"setting to 1."));
-	);
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Base is less then 1 in ActionMbSubString, "
+            "setting to 1."));
+        );
         start = 1;
     }
 
-    else if ( start > length )
+    else if ( start > length)
     {
 	IF_VERBOSE_ASCODING_ERRORS (
     	log_aserror(_("base goes beyond input string in ActionMbSubString, "
@@ -1785,11 +1798,11 @@ SWFHandlers::ActionMbSubString(ActionExec& thread)
     // Adjust the start for our own use.
     --start;
 
-    if (size + start - 1 > length)
+    if (size + start > length)
     {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("base+size goes beyond input string in ActionMbSubString, "
-            "adjusting size based on length:%d and start:%d"), length,start);
+            "adjusting size based on length:%d and start:%d"), length, start);
         );
         size = length - start;
     }
@@ -1802,7 +1815,8 @@ SWFHandlers::ActionMbSubString(ActionExec& thread)
     }
     else
     {
-        env.top(0).set_string(str.substr(offsets[start], offsets[start+size] - offsets[start]));
+        env.top(0).set_string(str.substr(offsets.at(start),
+                            offsets.at(start + size) - offsets.at(start)));
     }
     return;
 }
