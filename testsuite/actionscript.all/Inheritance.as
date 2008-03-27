@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.56 2008/03/17 11:36:46 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.57 2008/03/27 17:55:43 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Object.prototype.constructor), 'function');
@@ -293,7 +293,7 @@ n = co.myName();
 #endif
 
 // double gap now
-delete(A.prototype.myName);
+delete A.prototype.myName;
 FctorCalls=0;
 BctorCalls=0;
 ActorCalls=0;
