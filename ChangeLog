@@ -2,6 +2,8 @@
 
 	* backend/render_handler_agg.h,render_handler.h: include
 	  dsodefs.h
+	* libbase/dsodefs.h: include gnashconfig.h so DSOEXPORT
+	  etc are correctly defined all the time.
 
 2008-03-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 

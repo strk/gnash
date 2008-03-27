@@ -18,6 +18,8 @@
 #ifndef DSODEFS_H
 #define DSODEFS_H
 
+#include "gnashconfig.h"
+
 #ifdef _MSC_VER
 	#ifdef BUILDING_DLL
 		#define DSOEXPORT __declspec(dllexport)
