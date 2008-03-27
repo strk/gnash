@@ -21,7 +21,6 @@
 #ifndef UTF8_H
 #define UTF8_H
 
-#include "tu_config.h"
 #include "dsodefs.h" // For DSOEXPORT
 #include <string>
 #include <boost/cstdint.hpp> // for boost::?int??_t

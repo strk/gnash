@@ -4,6 +4,7 @@
 	  dsodefs.h
 	* libbase/dsodefs.h: include gnashconfig.h so DSOEXPORT
 	  etc are correctly defined all the time.
+	* libbase/utf8.h: drop tu_config.h include.
 
 2008-03-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
