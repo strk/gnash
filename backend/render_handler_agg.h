@@ -19,6 +19,8 @@
 #ifndef BACKEND_RENDER_HANDLER_AGG_H
 #define BACKEND_RENDER_HANDLER_AGG_H
 
+#include "dsodefs.h"
+
 namespace gnash {
 
 // Base class to shield GUIs from AGG's pixelformat classes 

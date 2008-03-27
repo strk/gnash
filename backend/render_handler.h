@@ -18,7 +18,6 @@
 // 
 //
 
-
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
 
@@ -144,11 +143,7 @@
 /// faster than converting between ints and floats all the way.
 
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
-#include "tu_config.h" // for DSOEXPORT
+#include "dsodefs.h" // for DSOEXPORT
 
 #include "shape_character_def.h"  
 #include "generic_character.h"

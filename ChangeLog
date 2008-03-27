@@ -1,5 +1,10 @@
 2008-03-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* backend/render_handler_agg.h,render_handler.h: include
+	  dsodefs.h
+
+2008-03-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* libbase/Makefile.am: add dsodefs.h, which should fix 'make
 	  distcheck'.
 
