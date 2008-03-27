@@ -25,10 +25,6 @@
 #ifndef GNASH_POINT2DH
 #define GNASH_POINT2DH
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <ostream>
 #include <limits>
 #include <algorithm>

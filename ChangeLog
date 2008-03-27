@@ -1,5 +1,11 @@
 2008-03-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* libgeometry/Point2d.h
+	* libgeometry/Range2d.h
+	* libgeometry/snappingrange.h: gnashconfig.h gone.
+
+2008-03-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* libbase/BitsReader.cpp
 	* libbase/BitsReader.h
 	* libbase/FLVParser.h
