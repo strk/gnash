@@ -8,10 +8,7 @@
 #ifndef GRID_INDEX_H
 #define GRID_INDEX_H
 
-
-#include "tu_config.h"
 #include "container.h"
-
 
 //
 // grid_index_point

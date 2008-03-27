@@ -8,8 +8,7 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
-
-#include "tu_config.h"
+#include "dsodefs.h"
 #include <boost/cstdint.hpp>
 
 #include <boost/scoped_array.hpp>

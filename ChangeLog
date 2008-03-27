@@ -1,5 +1,36 @@
 2008-03-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* libbase/BitsReader.cpp
+	* libbase/BitsReader.h
+	* libbase/FLVParser.h
+	* libbase/GC.h
+	* libbase/URL.h
+	* libbase/WallClockTimer.h
+	* libbase/arg_parser.h
+	* libbase/curl_adapter.h
+	* libbase/dsodefs.h
+	* libbase/extension.h
+	* libbase/grid_index.h
+	* libbase/image.h
+	* libbase/jpeg.h
+	* libbase/lirc.h
+	* libbase/membuf.h
+	* libbase/noseek_fd_adapter.h
+	* libbase/ogl.h
+	* libbase/ref_counted.h
+	* libbase/smart_ptr.h
+	* libbase/string_table.h
+	* libbase/tu_file.h
+	* libbase/tu_math.h
+	* libbase/tu_opengl_includes.h
+	* libbase/tu_timer.h
+	* libbase/utf8.h
+	* libbase/utility.h
+	* libbase/zlib_adapter.h: drop gnashconfig.h where it's not needed,
+	  replace tu_config.h with dsodefs.h.
+
+2008-03-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* server/vm/ASHandlers.{cpp,h}: const correct guessEncoding,
 	  don't try to access vector out of bounds in ActionMbSubString.
 	  Use at() for run time checking.

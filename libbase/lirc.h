@@ -18,10 +18,7 @@
 #ifndef __LIRC_H__
 #define __LIRC_H__
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
+#include "dsodefs.h"
 #include "gnash.h"
 #include "network.h"
 

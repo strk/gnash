@@ -10,8 +10,6 @@
 #ifndef MEMBUF_H
 #define MEMBUF_H
 
-
-#include "tu_config.h"
 #include "utility.h"
 #include <string>
 

@@ -21,12 +21,8 @@
 #ifndef BITSREADER_H
 #define BITSREADER_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "swf.h"
-#include "tu_config.h"
+#include "dsodefs.h"
 #include "GnashException.h"
 #include "log.h"
 

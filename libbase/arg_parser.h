@@ -43,7 +43,6 @@
 // outside the range of argument - there's no reasonable situation in which that would
 // happen. <bwy>
 
-#include "tu_config.h"
 #include "dsodefs.h"
 #include <sstream>
 

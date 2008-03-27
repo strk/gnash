@@ -18,13 +18,10 @@
 #ifndef __EXTENSION_H__
 #define __EXTENSION_H__
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <vector>
 #include <string>
 #include "sharedlib.h"
+#include "dsodefs.h"
 
 namespace gnash 
 {  

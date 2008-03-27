@@ -19,7 +19,7 @@
 #ifndef CURL_ADAPTER_H
 #define CURL_ADAPTER_H
 
-#include "tu_config.h"
+#include "dsodefs.h"
 
 #include <string>
 

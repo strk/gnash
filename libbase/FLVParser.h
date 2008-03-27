@@ -24,6 +24,7 @@
 #define __FLVPARSER_H__
 
 #include "LoadThread.h"
+#include "dsodefs.h"
 #include <vector>
 #include <boost/thread/mutex.hpp>
 

@@ -21,7 +21,7 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
-#include "tu_config.h"
+//#include "tu_config.h"
 
 #include <cassert>
 #include <cctype>

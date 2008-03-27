@@ -19,7 +19,7 @@
 #ifndef STDIN_ADAPTER_H
 #define STDIN_ADAPTER_H
 
-#include "tu_config.h"
+#include "dsodefs.h"
 
 #include <string>
 

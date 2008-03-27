@@ -9,8 +9,7 @@
 #ifndef TU_FILE_H
 #define TU_FILE_H
 
-
-#include "tu_config.h" // needed ?
+#include "dsodefs.h" // DSOEXPORT
 #include "utility.h"
 
 #include <cstdio>

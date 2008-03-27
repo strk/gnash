@@ -32,7 +32,7 @@
 # include <boost/thread.hpp>
 #endif
 
-#include "tu_config.h"
+#include "dsodefs.h"
 
 // Define the following macro to enable GC verbosity 
 // Verbosity levels:

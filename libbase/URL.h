@@ -18,11 +18,7 @@
 #ifndef __GNASH_URL_H__
 #define __GNASH_URL_H__
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
-#include "tu_config.h"
+#include "dsodefs.h"
 
 #include <iosfwd>
 #include <string>

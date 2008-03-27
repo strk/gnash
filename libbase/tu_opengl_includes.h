@@ -9,7 +9,7 @@
 #ifndef TU_OPENGL_INCLUDES_H
 #define TU_OPENGL_INCLUDES_H
 
-#include "tu_config.h"
+#include "gnashconfig.h"
 
 // WIN32 includes.  We don't want to have to include windows.h because
 // it's such a pig, so #define a couple things that are required to

@@ -18,7 +18,9 @@
 #ifndef DSODEFS_H
 #define DSODEFS_H
 
+#ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
+#endif
 
 #ifdef _MSC_VER
 	#ifdef BUILDING_DLL

@@ -8,7 +8,7 @@
 #ifndef TU_MATH_H
 #define TU_MATH_H
 
-#include "tu_config.h"
+//#include "tu_config.h"
 #include <cmath>
 #include <cfloat>
 

@@ -25,7 +25,6 @@
 #ifndef SMART_PTR_H
 #define SMART_PTR_H
 
-#include "tu_config.h"
 #include "utility.h"
 
 // Define the following macro to use garbage collecting rather

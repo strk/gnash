@@ -23,7 +23,7 @@
 
 #include "dsodefs.h" // For DSOEXPORT
 #include <string>
-#include <boost/cstdint.hpp> // for boost::?int??_t
+#include <boost/cstdint.hpp> // for C99 int types
 
 /// Utilities to convert between std::string and std::wstring.
 //

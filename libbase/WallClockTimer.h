@@ -20,7 +20,7 @@
 #ifndef WALLCLOCKTIMER_H
 #define WALLCLOCKTIMER_H 1
 
-#include "tu_config.h" // for DSOEXPORT
+#include "dsodefs.h" // for DSOEXPORT
 
 #include <boost/cstdint.hpp>
 

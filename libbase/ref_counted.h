@@ -23,7 +23,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "tu_config.h" // for DSOEXPORT (better move that define in some other file?)
+#include "dsodefs.h" // for DSOEXPORT
 
 #include <cassert>
 #include <boost/detail/atomic_count.hpp>

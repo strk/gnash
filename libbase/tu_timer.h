@@ -8,9 +8,9 @@
 
 #ifndef TU_TIMER_H
 
-#include "tu_config.h" // needed ?
+#include "dsodefs.h" // DSOEXPORT
 
-#include <boost/cstdint.hpp> // for boost::?int??_t 
+#include <boost/cstdint.hpp> // for C99 int types 
 
 
 namespace tu_timer
