@@ -58,7 +58,7 @@
 	  <entry>Optional</entry>
 	  <entry>part of swftools 0.8.1</entry>
 	  <entry>
-	    Swfc a swf decompiler.
+	    Swfc is an swf compiler.
 	  </entry>
 	  <entry>
 	    Swfc is used in some testcases.
