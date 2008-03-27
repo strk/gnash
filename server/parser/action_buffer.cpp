@@ -240,7 +240,7 @@ disasm_instruction(const unsigned char* instruction_data)
 	{
 	    for (int i = 0; i < length; i++) {
 
-		ss << "0x" << hexify((boost::uint8_t *)&instruction_data[3 + i], 1, false) << " ";
+		ss << "0x" << hexify((const boost::uint8_t *)&instruction_data[3 + i], 1, false) << " ";
 	    }
 	}
 	else if (fmt == ARG_STR)

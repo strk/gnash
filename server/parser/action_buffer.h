@@ -70,7 +70,7 @@ public:
 
 	bool is_null() const
 	{
-		return m_buffer.size() < 1 || m_buffer[0] == 0;
+		return (m_buffer.size() < 1 || m_buffer.at(0) == 0);
 	}
 
 	// kept for backward compatibility, should drop and see
@@ -102,31 +102,31 @@ public:
 	/// Store its length in the passed boost::uint8_t.
 	boost::uint32_t read_V32(size_t pc, boost::uint8_t& length) const
 	{
-		boost::uint32_t res = m_buffer[pc];
+		boost::uint32_t res = m_buffer.at(pc);
 		if (!(res & 0x00000080))
 		{
 			length = 1;
 			return res;
 		}
-		res = res & 0x0000007F | m_buffer[pc + 1] << 7;
+		res = (res & 0x0000007F) | (m_buffer.at(pc + 1) << 7);
 		if (!(res & 0x00004000))
 		{
 			length = 2;
 			return res;
 		}
-		res = res & 0x00003FFF | m_buffer[pc + 2] << 14;
+		res = (res & 0x00003FFF) | (m_buffer.at(pc + 2) << 14);
 		if (!(res & 0x00200000))
 		{
 			length = 3;
 			return res;
 		}
-		res = res & 0x001FFFFF | m_buffer[pc + 3] << 21;
+		res = (res & 0x001FFFFF) | (m_buffer.at(pc + 3) << 21);
 		if (!(res & 0x10000000))
 		{
 			length = 4;
 			return res;
 		}
-		res = res & 0x0FFFFFFF | m_buffer[pc + 4] << 28;
+		res = (res & 0x0FFFFFFF) | (m_buffer.at(pc + 4) << 28);
 		length = 5;
 		return res;
 	}
@@ -134,7 +134,7 @@ public:
     /// Get a pointer to the current instruction within the code
 	const unsigned char* getFramePointer(size_t pc) const
 	{
-		return reinterpret_cast<const unsigned char*>(&m_buffer[pc]);
+		return reinterpret_cast<const unsigned char*>(&m_buffer.at(pc));
 	}
 
         /// Get the base pointer of the code buffer.
@@ -146,7 +146,7 @@ public:
 	const unsigned char* get_buffer(size_t pc) const
 	{
 		//assert(pc < m_buffer.size() );
-		return (const unsigned char*)(&m_buffer[pc]);
+		return (const unsigned char*)(&m_buffer.at(pc));
 	}
 
 	/// Get a signed integer value from given offset
@@ -155,7 +155,7 @@ public:
 	///
 	boost::int16_t read_int16(size_t pc) const
 	{
-		boost::int16_t ret = m_buffer[pc] | (m_buffer[pc + 1] << 8);
+		boost::int16_t ret = (m_buffer.at(pc) | (m_buffer.at(pc + 1) << 8));
 		return ret;
 	}
 
@@ -175,9 +175,9 @@ public:
 	boost::int32_t read_int32(size_t pc) const
 	{
 		boost::int32_t	val = m_buffer[pc]
-		      | (m_buffer[pc + 1] << 8)
-		      | (m_buffer[pc + 2] << 16)
-		      | (m_buffer[pc + 3] << 24);
+		      | (m_buffer.at(pc + 1) << 8)
+		      | (m_buffer.at(pc + 2) << 16)
+		      | (m_buffer.at(pc + 3) << 24);
 		return val;
 	}
 
@@ -203,7 +203,7 @@ public:
 	/// Return a value from the constant pool
 	const char* dictionary_get(size_t n) const
 	{
-		return m_dictionary[n];
+		return m_dictionary.at(n);
 	}
 
 	/// Interpret the SWF::ACTION_CONSTANTPOOL opcode. 

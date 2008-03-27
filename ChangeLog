@@ -1,5 +1,11 @@
 2008-03-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* server/parser/action_buffer.{cpp,h}: fix very annoying
+	  g++4.3 compiler warnings about parentheses, use at() to
+	  access vectors, don't cast away constness in hexify call.
+
+2008-03-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* backend/render_handler_agg.h,render_handler.h: include
 	  dsodefs.h
 	* libbase/dsodefs.h: include gnashconfig.h so DSOEXPORT
