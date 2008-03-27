@@ -20,12 +20,8 @@
 #ifndef GNASH_EVENT_ID_H
 #define GNASH_EVENT_ID_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "string_table.h"
-#include "tu_config.h"
+#include "dsodefs.h"
 
 #include "gnash.h" // for gnash::key namespace
 

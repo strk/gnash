@@ -19,10 +19,6 @@
 #ifndef GNASH_BITMAPMOVIEINSTANCE_H
 #define GNASH_BITMAPMOVIEINSTANCE_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "movie_instance.h" // for inheritance
 
 // Forward declarations

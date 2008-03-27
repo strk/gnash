@@ -19,10 +19,6 @@
 #ifndef GNASH_DROPSHADOWFILTER_H
 #define GNASH_DROPSHADOWFILTER_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "BitmapFilter.h"
 
 #include <boost/cstdint.hpp> // for XintXX_t

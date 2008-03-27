@@ -22,7 +22,7 @@
 #define GNASH_SPRITE_INSTANCE_H
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
+#include "gnashconfig.h" // GNASH_USE_GC
 #endif
 
 #include "edit_text_character.h" // temp hack
@@ -33,7 +33,7 @@
 #include "DynamicShape.h" // for composition
 //#include "LoadVariablesThread.h" // for composition
 #include "Range2d.h"
-#include "dsodefs.h" // for DSEXPORT
+#include "dsodefs.h" // for DSOEXPORT
 
 #include <vector>
 #include <list>

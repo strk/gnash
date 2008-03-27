@@ -19,14 +19,10 @@
 #ifndef GNASH_GRADIENTBEVELFILTER_H
 #define GNASH_GRADIENTBEVELFILTER_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "BitmapFilter.h"
 
 #include <vector>
-#include <boost/cstdint.hpp> // for XintXX_t
+#include <boost/cstdint.hpp> // for C99 int types
 
 namespace gnash {
 

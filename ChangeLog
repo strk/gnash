@@ -1,3 +1,55 @@
+2008-03-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/BevelFilter.h
+	* server/BitmapFilter.h
+	* server/BitmapMovieInstance.h
+	* server/BlurFilter.h
+	* server/ColorMatrixFilter.h
+	* server/ConvolutionFilter.h
+	* server/DropShadowFilter.h
+	* server/DynamicShape.h
+	* server/FreetypeGlyphsProvider.h
+	* server/GlowFilter.h
+	* server/GradientBevelFilter.h
+	* server/GradientGlowFilter.h
+	* server/LoadVariablesThread.h
+	* server/Property.h
+	* server/PropertyList.h
+	* server/StreamProvider.h
+	* server/StringPredicates.h
+	* server/SystemClock.h
+	* server/as_prop_flags.h
+	* server/bitmap_info.h
+	* server/builtin_function.h
+	* server/button_character_instance.h
+	* server/cxform.h
+	* server/drag_state.h
+	* server/edit_text_character.h
+	* server/event_id.h
+	* server/fill_style.h
+	* server/font.h
+	* server/fontlib.h
+	* server/generic_character.h
+	* server/gnash.h
+	* server/impl.h
+	* server/matrix.h
+	* server/mouse_button_state.h
+	* server/movie_instance.h
+	* server/movie_root.h
+	* server/rect.h
+	* server/shape.h
+	* server/sprite_instance.h
+	* server/stream.h
+	* server/swf_event.h
+	* server/swf_function.h
+	* server/textformat.h
+	* server/timers.h
+	* server/types.h
+	* server/parser/edit_text_character_def.h: Drop gnashconfig.h
+	  where it's not needed, replace tu_config.h with dsodefs.h
+	  when it's there for DSOEXPORT, add headers where they are
+	  needed but were relying on includes before.
+
 2008-03-27 Sandro Santilli <strk@keybit.net>
 
 	* doc/C/refmanual/testing_dependencies.xml: 

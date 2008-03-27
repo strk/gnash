@@ -18,11 +18,7 @@
 #ifndef GNASHCXFORM_H
 #define GNASHCXFORM_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
-#include "tu_config.h" // for DSOEXPORT
+#include "dsodefs.h" // for DSOEXPORT
 
 #include <string>
 #include <iosfwd>

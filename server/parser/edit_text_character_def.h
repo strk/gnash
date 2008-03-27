@@ -18,6 +18,7 @@
 #ifndef _GNASH_EDIT_TEXT_CHARACTER_DEF_H_
 #define _GNASH_EDIT_TEXT_CHARACTER_DEF_H_
 
+#include "types.h"
 #include "character_def.h" // for inheritance
 #include "rect.h" // for composition
 #include "textformat.h" // for composition

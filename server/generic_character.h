@@ -19,7 +19,7 @@
 #define GNASH_GENERIC_CHARACTER_H
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
+#include "gnashconfig.h" // GNASH_USE_GC
 #endif
 
 #include "character.h" // for inheritance

@@ -19,10 +19,6 @@
 #ifndef GNASH_BITMAPFILTER_H
 #define GNASH_BITMAPFILTER_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <boost/shared_ptr.hpp>
 
 namespace gnash {

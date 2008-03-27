@@ -22,6 +22,8 @@
 #include "gnashconfig.h"
 #endif
 
+#include "dsodefs.h"
+
 #include "as_value.h" // for struct variable composition
 #include "as_object.h" // for inheritance
 #include "as_function.h" // for visibility of destructor by intrusive_ptr

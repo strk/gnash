@@ -19,10 +19,6 @@
 #ifndef GNASH_FREETYPE_H
 #define GNASH_FREETYPE_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "rect.h"
 #include "smart_ptr.h" // for intrusive_ptr
 

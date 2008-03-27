@@ -22,7 +22,7 @@
 #define GNASH_FILL_STYLE_H
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
+#include "gnashconfig.h" // GNASH_USE_GC
 #endif
 
 #include "types.h"

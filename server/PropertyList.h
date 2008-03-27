@@ -18,9 +18,7 @@
 #ifndef GNASH_PROPERTYLIST_H
 #define GNASH_PROPERTYLIST_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
+#include "dsodefs.h" // DSOEXPORT
 
 #include "Property.h" // for templated functions
 #include "as_value.h" // for templated functions

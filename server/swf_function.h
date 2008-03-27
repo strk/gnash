@@ -19,7 +19,7 @@
 #define __GNASH_SWF_FUNCTION_H__
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
+#include "gnashconfig.h" // GNASH_USE_GC
 #endif
 
 #include "impl.h"

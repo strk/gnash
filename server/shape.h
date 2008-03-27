@@ -19,7 +19,7 @@
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
 
-#include "tu_config.h"
+#include "dsodefs.h"
 #include "styles.h"
 
 #include <vector> // for path composition

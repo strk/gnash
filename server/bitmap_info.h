@@ -19,12 +19,8 @@
 #ifndef GNASH_BITMAP_INFO_H
 #define GNASH_BITMAP_INFO_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "ref_counted.h" // for inheritance
-#include "tu_config.h"
+#include "dsodefs.h"
 
 // Forward declarations
 namespace image {

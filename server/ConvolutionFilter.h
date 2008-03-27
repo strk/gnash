@@ -19,10 +19,6 @@
 #ifndef GNASH_CONVOLUTIONFILTER_H
 #define GNASH_CONVOLUTIONFILTER_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "BitmapFilter.h"
 
 #include <vector>

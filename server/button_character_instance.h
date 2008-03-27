@@ -22,9 +22,7 @@
 #ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
 #define GNASH_BUTTON_CHARACTER_INSTANCE_H
 
-
 #include "character.h" // for inheritance
-
 
 namespace gnash {
 

@@ -23,11 +23,7 @@
 #ifndef GNASH_H
 #define GNASH_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
-#include "tu_config.h"
+#include "dsodefs.h"
 
 #include <memory> // for auto_ptr
 #include <cctype>   // for poxy wchar_t

@@ -18,10 +18,6 @@
 #ifndef __GNASH_BUILTIN_FUNCTION_H__
 #define __GNASH_BUILTIN_FUNCTION_H__
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "as_function.h" // for inheritance
 #include "as_environment.h" // for FrameGuard
 

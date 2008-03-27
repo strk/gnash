@@ -20,9 +20,7 @@
 #ifndef GNASH_DYNAMIC_SHAPE_H
 #define GNASH_DYNAMIC_SHAPE_H
 
-
 #include "shape_character_def.h"  // for inheritance
-
 
 namespace gnash {
 

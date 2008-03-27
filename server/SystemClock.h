@@ -19,15 +19,10 @@
 #ifndef GNASH_SYSTEM_CLOCK_H
 #define GNASH_SYSTEM_CLOCK_H
 
-// What's the policy for when to include config.h ? --strk Dec 7 2007;
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "VirtualClock.h" // for inheritance
 
 #include <boost/cstdint.hpp> // for boost::uint64_t typedef
-#include "tu_config.h"
+#include "dsodefs.h"
 
 namespace gnash
 {

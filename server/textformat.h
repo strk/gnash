@@ -21,7 +21,7 @@
 #ifndef __TEXTFORMAT_H__
 #define __TEXTFORMAT_H__
 
-#include "tu_config.h"
+#include "dsodefs.h"
 #include "as_object.h" // for textformat_as_object inheritance
 
 

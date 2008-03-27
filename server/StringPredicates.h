@@ -20,10 +20,6 @@
 #ifndef GNASH_STRINGPREDICATES_H
 #define GNASH_STRINGPREDICATES_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <algorithm>
 #include <boost/algorithm/string/compare.hpp>
 #include <boost/algorithm/string/predicate.hpp>

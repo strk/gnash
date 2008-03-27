@@ -9,7 +9,7 @@
 #define __TYPES_H__
 
 
-#include "gnash.h" // what for ?
+//#include "gnash.h" // what for ?
 
 #include <string>
 #include <boost/cstdint.hpp> // for boost::?int??_t 

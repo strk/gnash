@@ -19,11 +19,7 @@
 #ifndef GNASH_RECT_H
 #define GNASH_RECT_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
-#include "tu_config.h"
+#include "dsodefs.h"
 
 #include "Range2d.h"
 #include "Point2d.h"

@@ -19,10 +19,6 @@
 #ifndef GNASH_PROPERTY_H
 #define GNASH_PROPERTY_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "as_prop_flags.h"
 #include "as_value.h"
 #include "string_table.h"

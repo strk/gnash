@@ -20,10 +20,6 @@
 #ifndef GNASH_LOADVARIABLESTHREAD_H
 #define GNASH_LOADVARIABLESTHREAD_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "StreamProvider.h" // for inlines
 #include "URL.h" // for inlines
 

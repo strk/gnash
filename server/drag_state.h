@@ -20,10 +20,6 @@
 #ifndef GNASH_DRAG_STATE_H
 #define GNASH_DRAG_STATE_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "rect.h" // for composition
 #include "smart_ptr.h" // we keep character being dragged by intrusive_ptr
 

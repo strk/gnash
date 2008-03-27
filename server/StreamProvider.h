@@ -18,10 +18,6 @@
 #ifndef _GNASH_STREAMPROVIDER_H
 #define _GNASH_STREAMPROVIDER_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <string>
 
 // Forward declarations

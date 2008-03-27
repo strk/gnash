@@ -24,11 +24,7 @@
 #ifndef GNASH_MATRIX_H
 #define GNASH_MATRIX_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
-#include "tu_config.h" // for DSOEXPORT
+#include "dsodefs.h" // for DSOEXPORT
 #include "Range2d.h" // for transforming Range2d<float>
 #include "Point2d.h" // for transforming Point2d<float> (typedefe'd to point)
 

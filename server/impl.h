@@ -19,15 +19,9 @@
 #ifndef GNASH_IMPL_H
 #define GNASH_IMPL_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
-#include "tu_config.h"
+#include "dsodefs.h"
 
 #include "gnash.h"
-//#include "cxform.h" // for composition of display_info
-//#include "matrix.h" // for display_info composition
 #include "types.h"
 #include "utility.h"
 #include "smart_ptr.h"

@@ -21,10 +21,6 @@
 #ifndef GNASH_MOVIE_INSTANCE_H
 #define GNASH_MOVIE_INSTANCE_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <vector>
 #include <set>
 

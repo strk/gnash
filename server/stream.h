@@ -20,7 +20,7 @@
 #define GNASH_STREAM_H
 
 #include "swf.h"
-#include "tu_config.h" // still neded ?
+#include "dsodefs.h" // still neded ?
 #include "GnashException.h"
 
 #include <string>

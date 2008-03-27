@@ -19,10 +19,6 @@
 #ifndef GNASH_GLOWFILTER_H
 #define GNASH_GLOWFILTER_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "BitmapFilter.h"
 
 #include <boost/cstdint.hpp> // for boost::uint32_t

@@ -20,7 +20,6 @@
 #ifndef GNASH_FONTLIB_H
 #define GNASH_FONTLIB_H
 
-
 #include "types.h"
 
 // Forward declarations

@@ -7,9 +7,11 @@
 #ifndef GNASH_MOUSE_BUTTON_STATE_H
 #define GNASH_MOUSE_BUTTON_STATE_H
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h" // For GNASH_USE_GC
+#endif
 
 #include "character_def.h"
-//#include "sound.h"
 #include "smart_ptr.h" // for composition and inlines
 #include "character.h" // for use in intrusive_ptr
 

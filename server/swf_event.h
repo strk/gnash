@@ -19,15 +19,9 @@
 #ifndef GNASH_SWF_EVENT_H
 #define GNASH_SWF_EVENT_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include "as_value.h" // for composition
 #include "action_buffer.h" // for composition
 #include "event_id.h" // for composition
-
-#include <cassert>
 
 namespace gnash {
 
