@@ -130,6 +130,7 @@ noinst_HEADERS = \
 	sharedlib.h \
 	string_table.h \
 	tree.hh \
+	dsodefs.h \
 	tu_config.h \
 	tu_file.h \
 	tu_math.h \

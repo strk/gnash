@@ -1,5 +1,10 @@
 2008-03-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* libbase/Makefile.am: add dsodefs.h, which should fix 'make
+	  distcheck'.
+
+2008-03-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* server/BevelFilter.h
 	* server/BitmapFilter.h
 	* server/BitmapMovieInstance.h
