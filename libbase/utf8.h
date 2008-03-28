@@ -35,10 +35,10 @@
 /// allowing many thousands of unique codes. Multibyte characters are 
 /// difficult to handle, as their length - used for many string
 /// operations - is not certain without parsing the string.
-/// Converting the string to a wstring (generally a uint32_t - how
-/// many codes the reference player can deal with is unknown)
-/// facilitates string operations, as the length of the string
-/// is equal to the number of valid characters. 
+/// Converting the string to a wstring (generally a uint32_t - the 
+/// pp seems only to handle characters up to 65535 - two bytes is
+/// the minimum size of a wchar) facilitates string operations, as
+/// the length of the string is equal to the number of valid characters. 
 /// 
 /// SWF5 and earlier, however, used the ISO-8859 specification,
 /// allowing the standard 128 ASCII characters plus 128 extra
