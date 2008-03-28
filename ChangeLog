@@ -1,5 +1,10 @@
 2008-03-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* server/asobj/string.cpp: (charAt) prevent another potential
+	  out-of-bounds string access.
+
+2008-03-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* libbase/gmemory.h: add DSOEXPORT to allow the testsuite to
 	  build with visibility support enabled.
 	* libamf/lcshm.h: make Listener class visible (testsuite).

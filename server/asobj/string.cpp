@@ -590,7 +590,7 @@ string_char_code_at(const fn_call& fn)
 
     size_t index = static_cast<size_t>(fn.arg(0).to_number());
 
-    if (index >= wstr.size()) {
+    if (index >= wstr.length()) {
         as_value rv;
         rv.set_nan();
         return rv;
@@ -610,9 +610,9 @@ string_char_at(const fn_call& fn)
 
     ENSURE_FN_ARGS(1, 1, "");
 
-    size_t index = fn.arg(0).to_number<size_t>();
+    size_t index = static_cast<size_t>(fn.arg(0).to_number());
 
-    if (index > wstr.size()) {
+    if (index >= wstr.length()) {
         as_value rv;
         rv.set_nan();
         return rv;
