@@ -55,7 +55,7 @@ extern "C"{
 #include "limits.h"
 #include "netstats.h"
 #include "statistics.h"
-#include "stream.h"
+//#include "stream.h"
 #include "gmemory.h"
 #include "arg_parser.h"
 
@@ -92,6 +92,9 @@ LogFile& dbglogfile = LogFile::getDefaultInstance();
 // The rcfile is loaded and parsed here:
 CRcInitFile& crcfile = CRcInitFile::getDefaultInstance();
 
+// Toggles very verbose debugging info from the network Network class
+static bool netdebug = false;
+
 static struct sigaction  act;
 
 // The next few global variables have to be global because Boost
@@ -111,8 +114,8 @@ int thread_retries = 10;
 static int port_offset = 0;
 
 // Keep a list of all active network connections
-namespace cygnal {
-  map<int, Handler *> handlers;
+namespace gnash {
+extern map<int, Handler *> handlers;
 }
 
 // Admin commands are small
@@ -136,7 +139,8 @@ main(int argc, char *argv[])
         { 'V', "version",       Arg_parser::no  },
         { 'p', "port-offset",   Arg_parser::yes },
         { 'v', "verbose",       Arg_parser::no  },
-        { 'd', "dump",          Arg_parser::no  }
+        { 'd', "dump",          Arg_parser::no  },
+        { 'n', "netdebug",      Arg_parser::no  }
         };
 
     Arg_parser parser(argc, argv, opts);
@@ -184,6 +188,9 @@ main(int argc, char *argv[])
 	      port_offset = parser.argument<int>(i);
 	      crcfile.setPortOffset(port_offset);
 	      break;
+	  case 'n':
+	      netdebug = true;
+	      break;
 	  case 'd':
 	      crcfile.dump();
 	      exit(0);
@@ -210,76 +217,37 @@ main(int argc, char *argv[])
 #endif
 
 #if 1
-    // Incomming connection handler
-    Handler::thread_params_t conn_data;
-    conn_data.port = port_offset + gnash::RTMPT;
-    conn_data.filespec = docroot;
-//    conn_data.handle = &handlers;
-    boost::thread conn_handler(boost::bind(&connection_handler, &conn_data));
+    // Incomming connection handler for port 80, HTTP and RTMPT. As port 80 requires
+    // root access, cygnal supports a "port offset" for debugging and development of
+    // the server. Since this port offset changes the constant to test for which protocol,
+    // we pass the info to the start thread so it knows which handler to invoke.
+    Handler::thread_params_t http_data;
+    http_data.port = port_offset + gnash::RTMPT;
+    http_data.netfd = 0;
+    http_data.filespec = docroot;
+    boost::thread http_thread(boost::bind(&connection_handler, &http_data));
 #endif
     
-#if 0
-    int retries = 10;
-    // Run forever
-    while (retries > 0) {
-	Handler::thread_params_t http_data;
-	http_data.netfd = 0;
-	http_data.port = port_offset + gnash::RTMPT;
-	http_data.filespec = docroot;
-	Handler *hand = new Handler;
-	http_data.handle = &hand;
-	cerr << "Adding handler: " << (void *)hand << endl;
-	handlers.push_back(hand);
-	hand->createServer(http_data.port);
-	hand->start(&http_data);
-	cerr << "Removing handler: " << (void *)hand << endl;
-	handlers.remove(hand);
-	delete hand;
-    }
+#if 1
+    // Incomming connection handler for port 1935, RTMP. As RTMP is not a priviledged port,
+    // we just open it without an offset.
+    Handler::thread_params_t rtmp_data;
+    rtmp_data.port = gnash::RTMP;
+    rtmp_data.netfd = 0;
+    rtmp_data.filespec = docroot;
+    boost::thread rtmp_thread(boost::bind(&connection_handler, &rtmp_data));
 #endif
-    
+
     // wait for the thread to finish
-//    adminhandler.join();    
-    conn_handler.join();    
-    log_debug (_("All done I think..."));
+//     adminhandler.join();    
+//     http_thread.join();
+    rtmp_thread.join();
+    log_debug (_("Cygnal done..."));
     
     return(0);
 }
 
 #if 0
-static void
-rtmp_thread(struct thread_params *conndata)
-{
-    GNASH_REPORT_FUNCTION;
-    int retries = 0;
-    RTMPproto proto;
-    
-    Statistics st;
-    st.setFileType(NetStats::RTMP);
-
-    log_debug("Param port is: %d", conndata->port);
-    
-    proto.createServer(RTMP);
-    while (retries++ < thread_retries) {
-	log_debug(_("%s: Thread for RTMP port looping..."), __PRETTY_FUNCTION__);
-	proto.newConnection(true);
-	st.startClock();
-	proto.handShakeWait();
-	proto.handShakeResponse();
-	proto.serverFinish();
-	
-	// Keep track of the network statistics
-	st.stopClock();
- 	log_debug (_("Bytes read: %d"), proto.getBytesIn());
- 	log_debug (_("Bytes written: %d"), proto.getBytesOut());
-	st.setBytes(proto.getBytesIn() + proto.getBytesOut());
-	st.addStats();
-	proto.resetBytesIn();
-	proto.resetBytesOut();	
-
-	st.dump();
-    }    
-}
 
 static void
 ssl_thread(struct thread_params *conndata)
@@ -306,24 +274,6 @@ ssl_thread(struct thread_params *conndata)
 	boost::thread sendthr(boost::bind(&stream_thread, &loadfile));
 	sendthr.join();
     }
-}
-#endif
-
-#if 0
-static void
-stream_thread(struct thread_params *params)
-{
-    GNASH_REPORT_FUNCTION;
-    
-    //struct stat stats;
-    //struct thread_params loadfile;
-    
-    log_debug ("%s: %s", __PRETTY_FUNCTION__, params->filespec);
-    
-    Stream str;
-    str.open(params->filespec, params->netfd);
-    str.play();
-//    ::close(params->netfd);
 }
 #endif
 
@@ -478,31 +428,25 @@ connection_handler(Handler::thread_params_t *args)
     int fd = 0;
 //    list<Handler *> *handlers = reinterpret_cast<list<Handler *> *>(args->handle);
 
+    log_debug("Starting Connection Handler for fd #%d, port %hd", args->netfd, args->port);
     Network net;
-//	net.toggleDebug(true);
+    if (netdebug) {
+	net.toggleDebug(true);
+    }
     fd = net.createServer(args->port);
-    // Run forever
+    // FIXME: this runs forever, we probably want a cleaner way to test for the end of time.
     do {
 	Handler *hand = new Handler;
-	hand->toggleDebug(true); // FIXME: too verbose
+	hand->setPort(args->port);
+	if (netdebug) {
+	    hand->toggleDebug(true);
+	}
 	args->netfd = hand->newConnection(true, fd);
 	args->handle = hand;
- 	log_debug("Adding handler: %x for fd #%d",
-		  (void *)hand, args->netfd);
-#if 0
-	map<int, Handler *>::iterator hit = handlers.find(args->netfd);
-	if ((*hit).second) {
-	    log_debug("Removing handle %x for fd #%d: ",
-		      (void *)hand), args->netfd;
-	    handlers.erase(args->netfd);
-	}
-#endif
+ 	log_debug("Adding handler: %x for fd #%d", (void *)hand, args->netfd);
 	handlers[args->netfd] = hand;
 	hand->start(args);
-
-//  	handlers.remove(hand);
-// 	delete hand;
-	log_debug("Restarting loop...");
+	log_debug("Restarting loop for next connection for port %d...", args->port);
     } while(1);
 } // end of connection_handler
 

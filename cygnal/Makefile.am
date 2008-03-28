@@ -33,11 +33,10 @@ SUBDIRS = \
 
 AM_CPPFLAGS = # -Wall
 
-## WARNING: make sure GLIB_LIBS appears first
-## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_LDFLAGS = \
 	../libbase/libgnashbase.la \
 	../server/libgnashserver.la \
+	../libnet/libgnashnet.la \
 	../libamf/libgnashamf.la \
 	$(LIBLTDL) \
 	$(GLIB_LIBS) \
@@ -50,6 +49,7 @@ localedir = $(datadir)/locale
 
 INCLUDES = -I.. \
         -I$(top_srcdir)	\
+        -I$(top_srcdir)/libnet \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/server \
@@ -60,38 +60,16 @@ INCLUDES = -I.. \
 	$(BOOST_CFLAGS) \
 	$(PTHREAD_CFLAGS)
 
-noinst_LTLIBRARIES = libcygnal.la
-
-libcygnal_la_LIBADD = $(AM_LDFLAGS)
+# noinst_LTLIBRARIES = libcygnal.la
+# libcygnal_la_LIBADD = $(AM_LDFLAGS)
 
 noinst_HEADERS = \
-	buffer.h \
-	cque.h \
-	handler.h \
-	http.h \
-	netstats.h \
-	stream.h \
-	statistics.h \
 	crc.h
-#	transcode.h
-#	flash.h
-
-
-libcygnal_la_SOURCES = \
-	buffer.cpp \
-	cque.cpp \
-	handler.cpp \
-	http.cpp \
-	alloc.cpp \
-	netstats.cpp \
-	stream.cpp \
-	statistics.cpp \
-	crc.cpp
 
 bin_PROGRAMS = cygnal
 
-cygnal_SOURCES = cygnal.cpp
-cygnal_LDADD = $(AM_LDFLAGS) libcygnal.la
+cygnal_SOURCES = cygnal.cpp crc.cpp
+cygnal_LDADD = $(AM_LDFLAGS)
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

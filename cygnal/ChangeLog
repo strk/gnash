@@ -1,3 +1,12 @@
+2008-03-28  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* Makefile.am: Don't build libcygnal anymore, it's been made
+	gnash/libnet, so it's code can be shared with Gnash for the client
+	side of all protocols.
+	* cygnal.cpp: Add -n option to turn on network debugging. Remove
+	unused code. Move rtmp handler to libnet/rtmp.cpp.
+
+
 2008-03-25  Rob Savoye  <rob@ute.welcomehome.org>
 
 	* buffer.{h,cpp}: Use more fime grained ifdef for statistics
