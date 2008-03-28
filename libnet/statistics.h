@@ -19,17 +19,13 @@
 #ifndef __STATISTICS_H__
 #define __STATISTICS_H__
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <sys/time.h>
 #include <network.h>
 #include <list>
 
 #include "netstats.h"
 
-namespace cygnal 
+namespace gnash 
 {
 
 class Statistics : public NetStats {
@@ -85,7 +81,7 @@ private:
     std::vector<std::string> _filespec;
 };
  
-} // end of cygnal namespace
+} // end of gnash namespace
 
 #endif // __STATISTICS_H__
 

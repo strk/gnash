@@ -46,7 +46,7 @@ using namespace std;
 
 static boost::mutex stl_mutex;
 
-namespace cygnal
+namespace gnash
 {
 
 extern map<int, Handler *> handlers;
@@ -1328,7 +1328,7 @@ httphandler(Handler::thread_params_t *args)
     
 } // end of extern C
 
-} // end of cygnal namespace
+} // end of gnash namespace
 
 
 // local Variables:

@@ -40,10 +40,10 @@ using namespace gnash;
 using namespace std;
 using namespace boost;
 
-namespace cygnal
+namespace gnash
 {
 
-extern map<int, Handler *> handlers;
+map<int, Handler *> handlers;
 
 Handler::Handler()
     : _die(false), _netfd(0)
@@ -284,7 +284,7 @@ netout_handler(Handler::thread_params_t *args)
     
 } // end of extern C
 
-} // end of cygnal namespace
+} // end of gnash namespace
 
 
 // local Variables:

@@ -33,6 +33,7 @@ pkglib_LTLIBRARIES =  $(LIBLTDLLIB) libgnashbase.la
 libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	-I.. -I$(srcdir) \
 	-I$(top_srcdir)	\
+	-I$(top_srcdir)/libnet	\
 	-I$(top_srcdir)/libamf	\
 	-I$(top_srcdir)/server	\
 	-I$(top_srcdir)/server/swf	\
@@ -80,10 +81,8 @@ libgnashbase_la_SOURCES = \
 	extension.cpp \
 	image.cpp \
 	jpeg.cpp \
-	lirc.cpp	\
 	log.cpp	\
 	memory.cpp \
-	network.cpp \
 	rc.cpp \
 	shm.cpp \
 	sharedlib.cpp \
@@ -116,8 +115,6 @@ noinst_HEADERS = \
 	image.h	\
 	jpeg.h \
 	gmemory.h \
-	network.h \
-	lirc.h \
 	log.h \
 	ogl.h \
 	rc.h \

@@ -19,10 +19,6 @@
 #ifndef __NETSTATS_H__
 #define __NETSTATS_H__
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 //include all types plus i/o
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <string>
@@ -53,7 +49,7 @@
 //
 // samples are taken every 3 seconds, or the interval supplied in Client::setInterval()
 
-namespace cygnal 
+namespace gnash 
 {
 
 class NetStats {
@@ -115,7 +111,7 @@ private:
     filetypes_e              _type;
 };
  
-} // end of cygnal namespace
+} // end of gnash namespace
 
 #endif // __NETSTATS_H__
 

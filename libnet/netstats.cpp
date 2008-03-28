@@ -28,7 +28,7 @@
 using namespace gnash;
 using namespace boost::posix_time;
 
-namespace cygnal {
+namespace gnash {
 
 NetStats::NetStats()
 {
@@ -67,7 +67,7 @@ NetStats::operator = (NetStats &stats) {
     return *this;
 }
 
-} // end of cygnal namespace
+} // end of gnash namespace
 
 // local Variables:
 // mode: C++

@@ -73,7 +73,7 @@ const char *filetype_names[] = {
         "VIDEO"
 };
 
-namespace cygnal 
+namespace gnash 
 {
 
 Statistics::Statistics() {
@@ -129,7 +129,7 @@ Statistics::dump() {
     }
 }
 
-} // end of cygnal namespace
+} // end of gnash namespace
 
 // local Variables:
 // mode: C++

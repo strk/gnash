@@ -21,6 +21,7 @@ AUTOMAKE_OPTIONS =
 noinst_LTLIBRARIES = libgnashasobjs.la 
 
 AM_CPPFLAGS = \
+	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/backend \
 	-I$(top_srcdir)/server \
 	-I$(top_srcdir)/server/swf \
@@ -44,37 +45,37 @@ libgnashasobjs_la_SOURCES = \
         AsBroadcaster.cpp \
         BevelFilter_as.cpp \
         BitmapFilter_as.cpp \
-	Boolean.cpp	\
+	Boolean.cpp \
         BlurFilter_as.cpp \
-	Camera.cpp	\
+	Camera.cpp \
 	ClassHierarchy.cpp \
-	Color.cpp	\
+	Color.cpp \
 	ColorMatrixFilter_as.cpp \
 	ContextMenu.cpp	\
 	ConvolutionFilter_as.cpp \
 	CustomActions.cpp\
-	Date.cpp	\
+	Date.cpp \
 	DropShadowFilter_as.cpp \
-	Error.cpp	\
-	Global.cpp	\
+	Error.cpp \
+	Global.cpp \
 	GlowFilter_as.cpp \
 	GradientBevelFilter_as.cpp \
 	GradientGlowFilter_as.cpp \
-	Key.cpp		\
-	LoadVars.cpp	\
+	Key.cpp	\
+	LoadVars.cpp \
 	LocalConnection.cpp\
-	Math.cpp	\
+	Math.cpp \
 	Microphone.cpp	\
-	Mouse.cpp	\
+	Mouse.cpp \
 	NetConnection.cpp \
-	NetStream.cpp	\
-	Number.cpp	\
-	Object.cpp	\
-	Selection.cpp	\
+	NetStream.cpp \
+	Number.cpp \
+	Object.cpp \
+	Selection.cpp \
 	SharedObject.cpp\
-	Sound.cpp	\
-	Stage.cpp	\
-	System.cpp	\
+	Sound.cpp \
+	Stage.cpp \
+	System.cpp \
 	TextSnapshot.cpp\
 	MovieClipLoader.cpp\
 	string.cpp \
@@ -88,50 +89,50 @@ noinst_HEADERS = \
         AsBroadcaster.h \
         BevelFilter_as.h \
         BitmapFilter_as.h \
-	Boolean.h	\
+	Boolean.h \
 	BlurFilter_as.h \
-	Camera.h	\
+	Camera.h \
 	ClassHierarchy.h \
-	Color.h		\
+	Color.h	\
 	ColorMatrixFilter_as.h \
-	ContextMenu.h	\
+	ContextMenu.h \
 	ConvolutionFilter_as.h \
 	CustomActions.h	\
-	Date.h		\
+	Date.h \
 	DropShadowFilter_as.h \
-	Error.h		\
-	GMath.h		\
-	Global.h	\
+	Error.h	\
+	GMath.h	\
+	Global.h\
 	GlowFilter_as.h \
 	GradientBevelFilter_as.h \
 	GradientGlowFilter_as.h \
-	Key.h 		\
-	LoadVars.h	\
+	Key.h \
+	LoadVars.h \
 	LocalConnection.h\
-	Microphone.h	\
-	Mouse.h		\
+	Microphone.h \
+	Mouse.h	\
 	MovieClipLoader.h \
 	NetConnection.h	\
-	NetStream.h	\
+	NetStream.h \
 	NetStreamFfmpeg.h \
 	NetStreamGst.h \
-	Number.h	\
-	Object.h	\
+	Number.h \
+	Object.h \
 	prophelper.h \
-	Selection.h	\
-	SharedObject.h	\
-	Sound.h 	\
+	Selection.h \
+	SharedObject.h \
+	Sound.h \
 	SoundFfmpeg.h \
 	SoundGst.h \
 	SoundMad.h \
-	Stage.h		\
-	System.h	\
-	TextSnapshot.h	\
-	gstring.h	\
-	xml.h		\
+	Stage.h	\
+	System.h \
+	TextSnapshot.h \
+	gstring.h \
+	xml.h \
 	xmlsocket.h \
-	xmlattrs.h	\
-	xmlnode.h	\
+	xmlattrs.h \
+	xmlnode.h \
 	$(NULL)
 
 libgnashasobjs_la_LIBADD = \

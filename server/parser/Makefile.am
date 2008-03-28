@@ -26,6 +26,7 @@ noinst_LTLIBRARIES = libgnashparser.la
 # rendering calls from the parser (see https://savannah.gnu.org/task/?5837)
 #
 AM_CPPFLAGS = \
+	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/backend \
 	-I$(top_srcdir)/server \
 	-I$(top_srcdir)/server/swf \

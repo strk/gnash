@@ -1,3 +1,34 @@
+2008-03-27  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* testsuite/Makefile.am: Add libnet.all to SUIBDIRS.
+	* configure.ac: Add libnet and testsuite/libnet.all.
+	* Makefile.am: Build libnet after libamf.
+	* libbase/lirc.{h,cpp}: Move to libnet.
+	* server/asobj/xmlsocket.cpp: Include network.h.
+
+	* libbase/Makefile.am: Add libnet to cflags and libs.
+	* server/Makefile.am, server/asobj/Makefile.am:
+	server/vm/Makefile.am: Add libnet to cflags and libs.
+	* utilities/Makefile.am:  Add libnet to cflags and libs.
+	* gui/Makefile.am:  Add libnet to cflags and libs.
+	* cygnal/Makefile.am: Move libcygnal.la files to new libnet. Use
+	libnet now instead of libcygnal.la.
+	
+	* libnet: New directory for networking and protocols.
+	* libbase/network.{h,cpp}: Move to libnet.
+	* libbase/Makefile.am: Remove network.*.
+	* cygnal/buffer.{h,cpp},cque.{h,cpp},handler.{h,cpp},http.{h,cpp},
+	network.{h,cpp},rtmp.{h,cpp},netstats.{h,cpp},statistics.{h,cpp},
+	cque.{h,cpp}: Move to libnet so they can be shared with Gnash.
+	* libnet/buffer.{h,cpp},cque.{h,cpp},handler.{h,cpp},http.{h,cpp},
+	network.{h,cpp},rtmp.{h,cpp},netstats.{h,cpp},statistics.{h,cpp},
+	cque.{h,cpp}: Moved from cygnal so they can be shared.
+	* testsuite/libnet.all: New directory for networking and protocol
+	test cases.
+	* testsuite/libnet.all/{test_buffer.cpp,test_cque.cpp,test_crc.cpp,
+	test_handler.cpp,test_http.cpp: Moved from cygnal/testsuite/cygnal.all.
+	* libamf/rtmp.{h,cpp}: Move to libnet.
+
 2008-03-28 Sandro Santilli <strk@keybit.net>
 
 	* server/swf_function.cpp (call operator): esplicit args override
@@ -133,6 +164,7 @@
 	* libbase/zlib_adapter.h: drop gnashconfig.h where it's not needed,
 	  replace tu_config.h with dsodefs.h.
 
+>>>>>>> 1.6063
 2008-03-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/vm/ASHandlers.{cpp,h}: const correct guessEncoding,

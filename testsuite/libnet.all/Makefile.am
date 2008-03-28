@@ -20,15 +20,12 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
-pkglib_LTLIBRARIES = libgnashnet.la
+AM_CPPFLAGS = # -Wall
 
 AM_LDFLAGS = \
-	../libbase/libgnashbase.la \
-	../libamf/libgnashamf.la \
-	$(LIBLTDL) \
-	$(GLIB_LIBS) \
-	$(LIBXML_LIBS) \
-	$(CURL_LIBS) \
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(top_builddir)/libamf/libgnashamf.la \
+	$(top_builddir)/libnet/libgnashnet.la \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS)
 
@@ -36,39 +33,62 @@ localedir = $(datadir)/locale
 
 INCLUDES = -I.. \
         -I$(top_srcdir)	\
+        -I$(top_srcdir)/libnet \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/libbase \
+        -I$(top_srcdir)/cygnal \
         -I$(top_srcdir)/server \
         -DLOCALEDIR=\"$(localedir)\" \
-        $(LIBXML_CFLAGS) \
-	$(DMALLOC_CFLAGS) \
-	$(CURL_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(PTHREAD_CFLAGS)
 
-noinst_HEADERS = \
-	buffer.h \
-	cque.h \
-	lirc.h \
-	handler.h \
-	http.h \
-	network.h \
-	netstats.h \
-	rtmp.h \
-	statistics.h
+check_PROGRAMS = \
+	test_buffer \
+	test_cque \
+	test_handler \
+	test_http
 
-libgnashnet_la_SOURCES = \
-	buffer.cpp \
-	cque.cpp \
-	handler.cpp \
-	lirc.cpp \
-	http.cpp \
-	network.cpp \
-	netstats.cpp \
-	rtmp.cpp \
-	statistics.cpp
+test_http_SOURCES = test_http.cpp
+test_http_LDADD = $(AM_LDFLAGS) 
+test_http_DEPENDENCIES = site-update
+
+test_cque_SOURCES = test_cque.cpp
+test_cque_LDADD = $(AM_LDFLAGS) 
+test_cque_DEPENDENCIES = site-update
+
+test_handler_SOURCES = test_handler.cpp
+test_handler_LDADD = $(AM_LDFLAGS) 
+test_handler_DEPENDENCIES = site-update
+
+test_buffer_SOURCES = test_buffer.cpp
+test_buffer_LDADD = $(AM_LDFLAGS) 
+test_buffer_DEPENDENCIES = site-update
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
 	@echo "Rebuilding with GCC Mudflap support"
 	$(MAKE) CXXFLAGS="$(CXXFLAGS) $(MUDFLAP_OPT)" LIBS="$(LIBS) $(MUDFLAP_LIB)"
+
+TEST_DRIVERS = ../simple.exp
+
+CLEANFILES =  \
+	site.exp.bak \
+	testrun.* 
+
+check-DEJAGNU: site-update
+	@runtest=$(RUNTEST); \
+	if $(SHELL) -c "$$runtest --version" > /dev/null 2>&1; then \
+	  $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); true; \
+	else \
+	  echo "WARNING: could not find \`runtest'" 1>&2; \
+	  for i in "$(check_PROGRAMS)"; do \
+	    $(SHELL) $$i; \
+	  done; \
+	fi
+
+site-update: site.exp
+	@rm -fr site.exp.bak
+	@cp site.exp site.exp.bak
+	@sed -e '/testcases/d' site.exp.bak > site.exp
+	@echo "# This is a list of the pre-compiled testcases" >> site.exp
+	@echo "set testcases \"$(check_PROGRAMS)\"" >> site.exp

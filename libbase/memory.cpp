@@ -65,7 +65,7 @@ Memory::~Memory()
 {
 //    GNASH_REPORT_FUNCTION;
     if (_info) {
-        delete _info;
+        delete[] _info;
     }
     _index = 0;
     _size = 0;
@@ -89,8 +89,7 @@ Memory::startStats()
 //    GNASH_REPORT_FUNCTION;
     _collecting = true;
     if (_info == 0) {
-        log_debug("Allocating buffer for %d data samples",
-                  DATALOG_SIZE);
+        log_debug("Allocating buffer for %d data samples", DATALOG_SIZE);
         _info = new struct small_mallinfo[DATALOG_SIZE];
         reset();
     }
@@ -349,6 +348,24 @@ Memory::dump()
     for (int i=0; i<_index; i++) {
         cerr << "Mallinfo index: " << i << endl;
         dump(_info + i);
+    }
+}
+
+void
+Memory::dumpCSV()
+{
+//    GNASH_REPORT_FUNCTION;
+
+    struct small_mallinfo *ptr;
+    cerr << "linenum,seconds,nanoseconds,arena,allocated,freed" << endl;
+    for (int i=0; i<_index; i++) {
+	ptr = _info + i;
+        cerr << ptr->line << ","
+	     << ptr->stamp.tv_sec << ","
+	     << ptr->stamp.tv_nsec << ","
+	     << ptr->arena << ","
+	     << ptr->uordblks << ","
+	     << ptr->fordblks << endl;
     }
 }
 

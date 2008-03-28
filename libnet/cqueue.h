@@ -17,10 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #ifndef __CQUEUE_H__
 #define __CQUEUE_H__ 1
 
@@ -34,7 +30,7 @@
 #include <vector>
 #include "log.h"
 
-namespace cygnal
+namespace gnash
 {
 
 class CQueue 
@@ -62,7 +58,7 @@ private:
 };
 
 
-} // end of cygnal namespace
+} // end of gnash namespace
 
 #endif // end of __CQUEUE_H__
 

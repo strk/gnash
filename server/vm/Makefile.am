@@ -21,6 +21,7 @@ AUTOMAKE_OPTIONS =
 noinst_LTLIBRARIES = libgnashvm.la 
 
 AM_CPPFLAGS = \
+	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/backend \
 	-I$(top_srcdir)/server \
 	-I$(top_srcdir)/server/asobj \

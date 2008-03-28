@@ -1,0 +1,163 @@
+// 
+//   Copyright (C) 2008 Free Software Foundation, Inc.
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
+
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
+#ifdef HAVE_STDARG_H
+#include <cstdarg>
+#endif
+
+#include <sys/stat.h>
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
+#include <regex.h>
+#include <cstdio>
+#include <cerrno>
+#include <iostream>
+#include <fstream>
+#include <cstring>
+#include <vector>
+#include <boost/cstdint.hpp>
+
+#ifdef HAVE_DEJAGNU_H
+#include "dejagnu.h"
+#else
+#include "check.h"
+#endif
+
+#include "log.h"
+#include "network.h"
+#include "cque.h"
+
+using namespace std;
+using namespace gnash;
+using namespace boost;
+
+TestState runtest;
+//LogFile& dbglogfile = LogFile::getDefaultInstance();
+
+int
+main (int /*argc*/, char** /*argv*/) {
+    gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+    dbglogfile.setVerbosity();
+
+    CQue que;
+
+    Buffer buf;
+    // populate the buffer
+    boost::uint8_t *ptr = buf.reference();
+    for (size_t i=1; i< buf.size(); i++) {
+        ptr[i] = i+' ';
+    }
+
+    boost::uint8_t *test = new uint8_t[6];
+    memcpy(test, "hell", 4);
+
+    // Push one buffer on the fifo. The default is the incoming fifo,
+    // which is the one where data flows from the network to the queue.
+    que.push(&buf);
+    if (que.size() == 1) {
+        runtest.pass ("CQue::push(Buffer *)");
+    } else {
+        runtest.fail ("CQue::push(Buffer *)");
+    }
+    
+    // Test push. When dumpimg, the second address should be different than the first,
+    // as well as the size. The outgoing queue should be uneffected.
+    Buffer buf1;
+    buf1.resize(112);
+    que.push(&buf1);
+    if (que.size() == 2) {
+        runtest.pass ("CQue::pushin(Buffer *)");
+    } else {
+        runtest.fail ("CQue::pushin(Buffer *)");
+    }
+
+    // Nuke the array
+    que.clear();
+    if (que.size() == 0) {
+        runtest.pass ("CQue::clearall()");
+    } else {
+        runtest.fail ("CQue::clearall()");
+    }
+
+    
+    que.push(&buf);
+    Buffer *buf2 = que.peek();
+    if ((buf2 == &buf) && (que.size() == 1)) {
+        runtest.pass ("CQue::peek()");
+    } else {
+        runtest.fail ("CQue::peek()");
+    }
+
+    Buffer *buf3 = que.peek();
+     if ((buf3 == &buf) && (que.size() == 1)) {
+         runtest.pass ("CQue::pop()");
+     } else {
+         runtest.fail ("CQue::pop()");
+     }
+
+     que.push(&buf1);
+     que.push(&buf1);
+     size_t firstsize = que.size();
+     que.remove(&buf);
+     if (que.size() == firstsize - 1) {
+         runtest.pass ("CQue::remove()");
+     } else {
+         runtest.fail ("CQue::remove()");
+     }
+
+     // Make some test buffers
+     Buffer merge1, merge2, merge3;
+     size_t i;
+     ptr = merge1.reference();
+     for (i=0; i< gnash::NETBUFSIZE; i++) {
+         ptr[i] = i*'A';
+     }
+     que.push(&merge1);
+     
+     ptr = merge2.reference();
+     for (i=0; i<gnash::NETBUFSIZE; i++) {
+         ptr[i] = i+'a';
+     }
+     que.push(&merge2);
+
+     merge3.resize(96);
+     ptr = merge3.reference();
+     for (i=0; i<96; i++) {
+         ptr[i] = i+' ';
+     }
+     que.push(&merge3);
+
+     // A merge gives us one big buffer where there were several buffers
+     Buffer *foo = que.merge(&merge1);
+     if (foo->size() == (gnash::NETBUFSIZE * 2) + 96) {
+         runtest.pass ("CQue::merge()");
+     } else {
+         runtest.fail ("CQue::merge()");
+     }
+
+     que.pop();
+     
+     que.dump();
+}
+

@@ -19,10 +19,6 @@
 #ifndef _HTTP_H_
 #define _HTTP_H_
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <string>
 #include <map>
 #include <vector>
@@ -31,7 +27,7 @@
 #include "handler.h"
 #include "network.h"
 
-namespace cygnal
+namespace gnash
 {
     
 class HTTP
@@ -292,7 +288,7 @@ extern "C" {
 }
 
 
-} // end of cygnal namespace
+} // end of gnash namespace
 
 // end of _HTTP_H_
 #endif

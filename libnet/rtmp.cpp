@@ -37,7 +37,7 @@ using namespace amf;
 using namespace gnash;
 using namespace std;
 
-namespace cygnal
+namespace gnash
 {
 
 extern map<int, Handler *> handlers;
@@ -512,7 +512,7 @@ rtmp_handler(Handler::thread_params_t *args)
     }
 }
     
-} // end of cygnal namespace
+} // end of gnash namespace
 
 // local Variables:
 // mode: C++

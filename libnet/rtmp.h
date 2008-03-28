@@ -18,12 +18,6 @@
 #ifndef _RTMP_H_
 #define _RTMP_H_
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
-#include "tu_config.h"
-
 #include <boost/cstdint.hpp>
 #include <vector>
 
@@ -31,7 +25,7 @@
 #include "handler.h"
 #include "network.h"
 
-namespace cygnal
+namespace gnash
 {
 
 #define RTMP_HANDSHAKE 0x3
@@ -154,7 +148,7 @@ public:
 // This is the thread for all incoming RTMP connections
 void rtmp_handler(Handler::thread_params_t *args);
 
-} // end of cygnal namespace
+} // end of gnash namespace
 // end of _RTMP_H_
 #endif
 

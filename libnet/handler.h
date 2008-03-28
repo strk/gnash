@@ -31,7 +31,7 @@
 #include "network.h"
 
 // _definst_ is the default instance name
-namespace cygnal
+namespace gnash
 {
 
 
@@ -153,7 +153,7 @@ extern "C" {
     void start_handler(Handler::thread_params_t *args);
 }
 
-} // end of cygnal namespace
+} // end of gnash namespace
 
 #endif // end of __HANDLER_H__
 

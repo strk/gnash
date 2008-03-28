@@ -24,7 +24,7 @@
 using namespace std;
 using namespace gnash;
 
-namespace cygnal
+namespace gnash
 {
 
 void *
@@ -203,7 +203,7 @@ Buffer::dump()
     cerr << gnash::hexify((unsigned char *)_ptr, _nbytes, true) << endl;
 }
 
-} // end of cygnal namespace
+} // end of gnash namespace
 
 
 // local Variables:

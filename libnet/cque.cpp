@@ -35,7 +35,7 @@ using namespace std;
 using namespace boost;
 
 
-namespace cygnal
+namespace gnash
 {
 
 CQue::CQue()
@@ -253,7 +253,7 @@ CQue::dump()
 #endif
 }
 
-} // end of cygnal namespace
+} // end of gnash namespace
 
 
 // local Variables:

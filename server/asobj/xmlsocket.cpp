@@ -21,6 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
+#include "network.h"
 #include "utility.h"
 #include "xml.h"
 #include "xmlsocket.h"

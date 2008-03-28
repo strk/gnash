@@ -26,7 +26,7 @@
 #include "network.h"
 
 // _definst_ is the default instance name
-namespace cygnal
+namespace gnash
 {
 
 class Buffer 
@@ -77,7 +77,7 @@ private:
 };
 
 
-} // end of cygnal namespace
+} // end of gnash namespace
 
 #endif // end of __BUFFER_H__
 

@@ -28,6 +28,7 @@
 #include <iomanip> // for std::setfill
 #include <string>
 #include <boost/format.hpp>
+#include <pthread.h>
 
 #if defined(_WIN32) && defined(WIN32)
 // Required for SYSTEMTIME definitions
@@ -57,20 +58,20 @@ hexify (const unsigned char *p, size_t length, bool ascii)
 	if (!ascii) ss << std::hex << std::setfill('0');
 	
 	for (std::vector<unsigned char>::const_iterator i = bytes.begin(), e = bytes.end();
-				i != e; ++i)
-	{
+	     i != e; ++i)
+	    {
 		if (ascii) {
-			if (std::isprint(*i) || *i == 0xd || *i == 0xa) {
-				ss << *i;
-			}
-			else ss << "^";
+		    if (std::isprint(*i) || *i == 0xd || *i == 0xa) {
+			ss << *i;
+		    }
+		    else ss << "^";
 		}
 		else  {
-			// Not ascii
-			ss << std::setw(2) << static_cast<int>(*i) << " ";	
+		    // Not ascii
+		    ss << std::setw(2) << static_cast<int>(*i) << " ";	
 		}
 	}	
-		
+	
 	return ss.str();
 
 }
@@ -101,7 +102,7 @@ timestamp() {
 	strftime (buf, sizeof(buf), "%H:%M:%S", localtime (&t));
 
 	std::stringstream ss;
-	ss << getpid() << "] " << buf;
+	ss << pthread_self() << "] " << buf;
 	return ss.str();
 }
 

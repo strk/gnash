@@ -35,7 +35,7 @@ using namespace gnash;
 using namespace std;
 using namespace boost;
 
-namespace cygnal
+namespace gnash
 {
 
 CQueue::CQueue()
@@ -107,7 +107,7 @@ CQueue::dump()
 //    GNASH_REPORT_FUNCTION;
 }
 
-} // end of cygnal namespace
+} // end of gnash namespace
 
 
 // local Variables:

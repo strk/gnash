@@ -88,6 +88,7 @@ public:
     void dump(struct mallinfo *x);
     void dump(struct small_mallinfo *x);
     void dump();
+    void dumpCSV();
 private:
     bool                _collecting;
     // For data logging, we want to store as little as possible

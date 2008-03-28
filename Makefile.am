@@ -45,6 +45,7 @@ STD_DIRS = \
 	libbase \
 	libgeometry \
 	libamf \
+	libnet \
 	libmedia \
 	server \
 	backend \
@@ -304,6 +305,9 @@ endif
 	fi
 	@if test -n "$(SECURITY_LIST)" ; then \
 	  echo "	Security features enables are: $(SECURITY_LIST)"; \
+	fi
+	@if test -n "$(STATISTICS_LIST)" ; then \
+	  echo "	Statistics features enables are: $(STATISTICS_LIST)"; \
 	fi
 if KPARTS
 	@echo "	KPARTS (KDE) plugin enabled"

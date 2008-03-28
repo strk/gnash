@@ -1950,6 +1950,7 @@ server/Makefile
 server/asobj/Makefile
 server/vm/Makefile
 server/parser/Makefile
+libnet/Makefile
 libamf/Makefile
 backend/Makefile
 utilities/Makefile
@@ -1970,6 +1971,7 @@ testsuite/misc-swfc.all/Makefile
 testsuite/movies.all/Makefile
 testsuite/server/Makefile
 testsuite/libamf.all/Makefile
+testsuite/libnet.all/Makefile
 gui/Makefile
 gui/Info.plist
 extensions/Makefile

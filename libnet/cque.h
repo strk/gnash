@@ -29,7 +29,7 @@
 #include "network.h"
 
 // _definst_ is the default instance name
-namespace cygnal
+namespace gnash
 {
 
 class CQue {
@@ -90,7 +90,7 @@ private:
 #endif
 };
     
-} // end of cygnal namespace
+} // end of gnash namespace
 
 #endif // end of __CQUE_H__
 
