@@ -170,7 +170,6 @@
 	* libbase/zlib_adapter.h: drop gnashconfig.h where it's not needed,
 	  replace tu_config.h with dsodefs.h.
 
->>>>>>> 1.6063
 2008-03-27 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/vm/ASHandlers.{cpp,h}: const correct guessEncoding,
