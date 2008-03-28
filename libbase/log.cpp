@@ -198,14 +198,28 @@ void
 LogFile::log(const std::string& msg)
 {
 	boost::mutex::scoped_lock lock(_ioMutex);
-	dbglogfile << msg << endl;
+
+	if (_stamp == true )
+	{
+        	std::string ts = timestamp();
+        	if (_verbose) cout << ts << " " << msg << endl;
+		if (openLogIfNeeded()) {
+			_outstream << ts << ": " << msg << endl;
+		}
+	}
+	else
+	{
+		if (_verbose) cout << msg << endl;
+		if (openLogIfNeeded()) {
+			_outstream << msg << endl;
+		}
+	}
 }
 
 void
 LogFile::log(const std::string& label, const std::string& msg)
 {
-	boost::mutex::scoped_lock lock(_ioMutex);
-	dbglogfile << label << ": " << msg << endl;
+	log(label+std::string(": ")+msg);
 }
 
 void
@@ -309,51 +323,6 @@ LogFile::removeLog (void)
     _filespec.clear();
 
 	return true;
-}
-
-/// log a string
-LogFile&
-LogFile::operator << (const std::string &s)
-{
-    // NOTE: _state will be == INPROGRESS right
-
-    if (_stamp == true && (_state != INPROGRESS) )
-    {
-        std::string ts = timestamp();
-
-        if (_verbose) cout << ts << ": " << s;
-        if (openLogIfNeeded())
-        {
-		_outstream << ts << ": " << s;
-	}
-        _state = INPROGRESS;
-    }
-    else
-    {
-        if (_verbose) cout << s;
-        if (openLogIfNeeded()) {
-		_outstream << s;   
-	}
-    }
-    return *this;
-}
-
-/// \brief Grab the endl operator.
-LogFile&
-LogFile::operator << (std::ostream & (&)(std::ostream &))
-{
-
-    if (_verbose) cout << endl;
-
-    if (openLogIfNeeded())
-    {
-        _outstream << endl;;
-        _outstream.flush();
-    }
-
-    _state = IDLE;
-
-    return *this;
 }
 
 boost::format

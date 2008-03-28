@@ -1,3 +1,7 @@
+2008-03-28 Sandro Santilli <strk@keybit.net>
+
+	* libbase/log.{cpp,h}: simplify logging path.
+
 2008-03-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/utf8.h: minor comment update.
@@ -42,9 +46,9 @@
 
 	* libbase/tu_file.{cpp,h}: remove everything that isn't currently
 	  used, including all membuf code.
-    * libbase/membuf.{cpp,h}: unused. Dropped.
-    * libbase/config.cpp: (lua bindings) dropped.
-    * libbase/Makefile.am: don't try to build unused files.
+	* libbase/membuf.{cpp,h}: unused. Dropped.
+	* libbase/config.cpp: (lua bindings) dropped.
+	* libbase/Makefile.am: don't try to build unused files.
 
 2008-03-27 Sandro Santilli <strk@keybit.net>
 

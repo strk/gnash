@@ -218,23 +218,6 @@ private:
     /// For the ostream << operator
     friend std::ostream & operator << (std::ostream &os, LogFile& e);
 
-    LogFile& operator << (const std::string &s);
-    LogFile& operator << (std::ostream & (&)(std::ostream &));
-
-    /// Print anything that can be printed on a stringstream
-    //
-    /// This template function could replace ALL but
-    /// operator << (const std::string&) members of
-    /// LogFile class.
-    ///
-    template <class T>
-    LogFile& operator << (const T& any)
-    {
-	    std::stringstream ss;
-	    ss << any;
-	    return *this << ss.str();
-    }
-
     std::string _logFilename;
 
 };
