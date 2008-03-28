@@ -23,7 +23,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "tu_config.h"
+#include "dsodefs.h"
 #include "smart_ptr.h"
 
 #include <cmath>

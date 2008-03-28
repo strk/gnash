@@ -15,31 +15,25 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+//#include <sys/types.h>
+//#include <sys/stat.h>
+//#include <vector>
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
+//#include "action.h"
+//#include "impl.h"
+//#include "as_function.h"
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <vector>
+//#include "xmlattrs.h"
 
-#include "action.h"
-#include "impl.h"
-#include "tu_config.h"
-#include "as_function.h"
+//#ifdef DEBUG_MEMORY_ALLOCATION
+//	#include "log.h"
+//#endif
 
-#include "xmlattrs.h"
-
-#ifdef DEBUG_MEMORY_ALLOCATION
-	#include "log.h"
-#endif
-
-#include <unistd.h>
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
-#include <libxml/tree.h>
-#include <libxml/xmlreader.h>
+//#include <unistd.h>
+//#include <libxml/xmlmemory.h>
+//#include <libxml/parser.h>
+//#include <libxml/tree.h>
+//#include <libxml/xmlreader.h>
 
 namespace gnash {
   

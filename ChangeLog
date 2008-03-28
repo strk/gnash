@@ -1,3 +1,32 @@
+2008-03-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/as_environment.h
+	* server/as_object.h
+	* server/as_value.h
+	* server/asobj/Key.h
+	* server/asobj/MovieClipLoader.cpp
+	* server/asobj/Number.cpp
+	* server/asobj/Object.cpp
+	* server/asobj/string.cpp
+	* server/asobj/xml.cpp
+	* server/asobj/xml.h
+	* server/asobj/xmlnode.cpp
+	* server/asobj/xmlnode.h
+	* server/vm/ExecutableCode.h
+	* libbase/utility.cpp
+	* libmedia/sound_handler.h
+	* libmedia/ffmpeg/ffmpegNetStreamUtil.h
+	* libmedia/gst/GstUtil.h
+	* libmedia/gst/VideoDecoderGst.h
+	* libamf/element.h
+	* libamf/sol.h
+	* backend/render_handler_cairo.h: drop tu_config.h include;
+	  replace with dsodefs.h where appropriate.
+	* server/asobj/xmlattrs.cpp: ditto, plus nothing in this file.
+	* server/asobj/xmlattrs.h
+	* libbase/Makefile.am: tu_config should be unused.
+	* gui/Player.h: nothing in gui/ needs to be visible.
+
 2008-03-28 Sandro Santilli <strk@keybit.net>
 
 	* libbase/log.{cpp,h}: simplify logging path.

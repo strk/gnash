@@ -22,12 +22,12 @@
 #include "gnashconfig.h"
 #endif
 
+#include "dsodefs.h" //DSOEXPORT
 #include <boost/cstdint.hpp>
 #include <string>
 #include <vector>
 #include "element.h"
 #include "amf.h"
-#include "tu_config.h"
 
 // It comprises of a magic number, followed by the file length, a
 // filetype, which appears to always be "TCSO", and what appears to be

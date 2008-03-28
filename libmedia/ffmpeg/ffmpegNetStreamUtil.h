@@ -26,7 +26,7 @@
 #endif
 
 #include "log.h"
-#include "tu_config.h" //For DSOEXPORT
+#include "dsodefs.h" //For DSOEXPORT
 
 #ifdef USE_FFMPEG
 extern "C" {

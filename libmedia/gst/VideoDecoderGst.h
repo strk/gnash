@@ -30,7 +30,7 @@
 #include "log.h"
 #include "MediaParser.h"
 #include "VideoDecoder.h"
-#include "tu_config.h"
+#include "dsodefs.h"
 
 
 namespace gnash {

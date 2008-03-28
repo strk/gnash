@@ -23,7 +23,6 @@
 #endif
 
 #include "log.h"
-#include "tu_config.h"
 #include "as_function.h" // for as_function
 #include "fn_call.h"
 #include "action.h" // for call_method

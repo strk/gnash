@@ -28,7 +28,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "tu_config.h" // for DSOEXPORT
+#include "dsodefs.h" // for DSOEXPORT
 #include "SoundInfo.h"
 
 #include <vector>

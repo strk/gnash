@@ -23,8 +23,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include "tu_config.h"
-
 #include "gnash.h" // still needed ?
 #include "sound_handler.h" // for visibility of sound_handler destructor
 #include "gui.h"
@@ -48,7 +46,7 @@ namespace gnash
 /// from the plugin so we can set callback for getUrl and fs_commands
 /// w/out the need of using FIFOs or sockets or whatever else.
 ///
-class DSOEXPORT Player
+class Player
 {
 public:
 

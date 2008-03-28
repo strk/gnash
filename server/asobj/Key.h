@@ -20,7 +20,6 @@
 #ifndef __KEY_H__
 #define __KEY_H__
 
-#include "tu_config.h"
 #include "as_object.h" // for inheritance
 #include "fn_call.h"
 #include "event_id.h"

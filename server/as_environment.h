@@ -22,6 +22,7 @@
 #include "gnashconfig.h"
 #endif
 
+#include "dsodefs.h" // DSOEXPORT
 #include "as_value.h" // for composition (vector + frame_slot)
 #include "StringPredicates.h" // for Variables 
 #include "as_object.h"
@@ -30,7 +31,6 @@
 #include <string> // for frame_slot name
 #include <vector>
 #include <iostream> // for dump_stack inline
-#include "tu_config.h"
 
 namespace gnash {
 

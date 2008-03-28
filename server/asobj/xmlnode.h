@@ -18,12 +18,6 @@
 #ifndef __XML_NODE_H__
 #define __XML_NODE_H__
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
-#include "tu_config.h"
-
 //#define DEBUG_MEMORY_ALLOCATION 1
 
 #include "action.h"

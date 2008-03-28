@@ -19,7 +19,6 @@
 
 
 #include "log.h"
-#include "tu_config.h"
 #include "Number.h"
 #include "smart_ptr.h"
 #include "fn_call.h"

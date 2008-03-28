@@ -18,11 +18,10 @@
 
 
 #ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
+#include "gnashconfig.h" // GNASH_USE_GC
 #endif
 
 #include "log.h"
-#include "tu_config.h"
 #include "fn_call.h"
 #include "builtin_function.h"
 #include "array.h" // for childNodes

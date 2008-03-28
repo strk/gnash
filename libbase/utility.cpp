@@ -32,7 +32,7 @@
 
 #include "utility.h"
 #include "dlmalloc.h"
-#include "tu_config.h"
+//#include "tu_config.h"
 
 // Overrides of new/delete that use Doug Lea's malloc.  Very helpful
 // on certain lame platforms.

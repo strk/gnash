@@ -29,7 +29,7 @@
 
 #include <gst/gst.h>
 #include "image.h"
-#include "tu_config.h"
+#include "dsodefs.h" // DSOEXPORT
 
 namespace gnash {
 namespace media {

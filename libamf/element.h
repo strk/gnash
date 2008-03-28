@@ -30,7 +30,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include "amf.h"
-#include "tu_config.h"
+#include "dsodefs.h" // DSOEXPORT
 
 namespace amf 
 {

@@ -22,7 +22,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "tu_config.h"
+#include "dsodefs.h" // DSOEXPORT
 
 #include "string_table.h"
 #include "ref_counted.h" // for inheritance  (to drop)

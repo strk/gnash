@@ -19,7 +19,6 @@
 #ifndef BACKEND_RENDER_HANDLER_CAIRO_H
 #define BACKEND_RENDER_HANDLER_CAIRO_H
 
-#include "tu_config.h"
 #include <cairo/cairo.h>
 #include "render_handler.h"
 

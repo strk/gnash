@@ -18,9 +18,6 @@
 #ifndef __XML_H__
 #define __XML_H__
 
-#include "tu_config.h"
-
-//#include "event_id.h"
 #include "action.h"
 #include "LoadThread.h"
 #include "xmlattrs.h"
