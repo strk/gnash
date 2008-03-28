@@ -8,16 +8,11 @@
 
 #include "tu_file.h"
 #include "utility.h"
-#include "membuf.h"
 #include "log.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
-#ifdef __sgi
-        __SGI_LIBC_USING_FROM_STD(va_list)
-#endif
 
 //
 // tu_file functions using FILE
@@ -162,209 +157,7 @@ std_close_func(void *appdata)
 }
 
 
-//
-// tu_file functions using a readable/writable memory buffer
-//
-
-class filebuf
-{
-public:
-
-    membuf 	m_;
-    int		m_position;
-    
-    filebuf()
-	{
-		m_position = 0; 
-		m_read_only = false;
-	}
-    
-    filebuf(int size, void* data)
-	:
-	m_(membuf::READ_ONLY, data, size),
-	m_position(0),
-	m_read_only(true)
-	{
-	}
-    
-    ~filebuf()
-	{
-	}
-    
-    bool	resize(int new_size)
-	// Return false if we couldn't resize.
-	{
-	    if (m_read_only) {
-		return false;
-	    }
-	    
-	    m_.resize(new_size);
-	    
-	    // Hm, does this make sense?  We're truncating the file, so clamping the cursor.
-	    // Alternative would be to disallow resize, but that doesn't seem good either.
-	    if (m_position > m_.size())	{
-		m_position = m_.size();
-	    }
-	    
-	    return true;
-	}
-    
-    bool	is_valid()
-	{
-	    return
-		m_position >= 0
-		&& m_position <= m_.size();
-	}
-    
-    unsigned char*	get_cursor()
-	{
-	    return ((unsigned char*) m_.data()) + m_position;
-	}
-
-private:
-    bool	m_read_only;	
-};
-
-
-static int
-mem_read_func(void* dst, int bytes, void* appdata) 
-// Return the number of bytes actually read.  EOF or an error would
-// cause that to not be equal to "bytes".
-{
-    assert(appdata);
-    assert(dst);
-    
-    filebuf* buf = (filebuf*) appdata;
-    assert(buf->is_valid());
-    
-    int	bytes_to_read = imin(bytes, buf->m_.size() - buf->m_position);
-    if (bytes_to_read) {
-	memcpy(dst, buf->get_cursor(), bytes_to_read);
-    }
-    buf->m_position += bytes_to_read;
-    
-    return bytes_to_read;
-}
-
-
-static int mem_write_func(const void* src, int bytes, void* appdata)
-// Return the number of bytes actually written.
-{
-    assert(appdata);
-    assert(src);
-    
-    filebuf* buf = (filebuf*) appdata;
-    assert(buf->is_valid());
-    
-    // Expand buffer if necessary.
-    int	bytes_to_expand = imax(0, buf->m_position + bytes - buf->m_.size());
-    if (bytes_to_expand) {
-	if (buf->resize(buf->m_.size() + bytes_to_expand) == false) {
-	    // Couldn't expand!
-	    return 0;
-	}
-    }
-    
-    memcpy(buf->get_cursor(), src, bytes);
-    buf->m_position += bytes;
-    
-    return bytes;
-}
-
-static int
-mem_seek_func(int pos, void *appdata)
-// Return 0 on success, or TU_FILE_SEEK_ERROR on failure.
-{
-    assert(appdata);
-    assert(pos >= 0);
-    
-    filebuf* buf = (filebuf*) appdata;
-    assert(buf->is_valid());
-    
-    if (pos < 0) {
-	buf->m_position = 0;
-	return TU_FILE_SEEK_ERROR;
-    }
-    
-    if (pos > buf->m_.size()) {
-	buf->m_position = buf->m_.size();
-	return TU_FILE_SEEK_ERROR;
-    }
-    
-    buf->m_position = pos;
-    return 0;
-}
-
-static int
-mem_seek_to_end_func(void* appdata)
-// Return 0 on success, TU_FILE_SEEK_ERROR on failure.
-{
-    assert(appdata);
-    
-    filebuf* buf = (filebuf*) appdata;
-    assert(buf->is_valid());
-    
-    buf->m_position = buf->m_.size();
-    return 0;
-}
-
-static int
-mem_tell_func(void* appdata)
-// Return the file position, or -1 on failure.
-{
-    assert(appdata);
-    
-    filebuf* buf = (filebuf*) appdata;
-    assert(buf->is_valid());
-    
-    return buf->m_position;
-}
-
-static bool
-mem_get_eof_func(void* appdata)
-// Return true if we're positioned at the end of the buffer.
-{
-    assert(appdata);
-    
-    filebuf* buf = (filebuf*) appdata;
-    assert(buf->is_valid());
-    
-    return buf->m_position >= buf->m_.size();
-}
-
-static int
-mem_get_err_func(void* appdata)
-// Return true if we're positioned at the end of the buffer.
-{
-    filebuf* buf = (filebuf*) appdata;
-    return buf->is_valid();
-}
-
-static long
-mem_get_stream_size(void* appdata)
-// Return the file size, or -1 on failure.
-{
-    assert(appdata);
-    
-    filebuf* buf = (filebuf*) appdata;
-    assert(buf->is_valid());
-    
-    return buf->m_.size();
-}
-
-static int mem_close_func(void* appdata)
-// Return 0 on success, or TU_FILE_CLOSE_ERROR on failure.
-{
-    assert(appdata);
-    
-    filebuf* buf = (filebuf*) appdata;
-    assert(buf->is_valid());
-    
-    delete buf;
-    
-    return 0;
-}
-}
+} // end namespace gnash
 
 //
 // generic functionality
@@ -387,7 +180,7 @@ tu_file::tu_file(void * appdata, read_func rf, write_func wf,
     m_close = cf;
 }
 
-// Create a file from a standard file pointer.
+//// Create a file from a standard file pointer.
 tu_file::tu_file(FILE* fp, bool autoclose=false)
 {
     //GNASH_REPORT_FUNCTION;
@@ -420,39 +213,6 @@ tu_file::tu_file(const char * name, const char * mode)
 	m_get_err = std_get_err_func;
 	m_get_stream_size = std_get_stream_size_func;
 	m_close = std_close_func;
-}
-
-tu_file::tu_file(memory_buffer_enum /* m */)
-// Create a read/write memory buffer.
-{
-    m_data = new filebuf;
-    
-    m_read = mem_read_func;
-    m_write = mem_write_func;
-    m_seek = mem_seek_func;
-    m_seek_to_end = mem_seek_to_end_func;
-    m_tell = mem_tell_func;
-    m_get_eof = mem_get_eof_func;
-    m_get_err = mem_get_err_func;
-    m_get_stream_size = mem_get_stream_size;
-    m_close = mem_close_func;
-}
-
-
-tu_file::tu_file(memory_buffer_enum /* m */, int size, void* data)
-// Create a read-only memory buffer, using the given data.
-{
-    m_data = new filebuf(size, data);
-    
-    m_read = mem_read_func;
-    m_write = mem_write_func;
-    m_seek = mem_seek_func;
-    m_seek_to_end = mem_seek_to_end_func;
-    m_tell = mem_tell_func;
-    m_get_eof = mem_get_eof_func;
-    m_get_err = mem_get_err_func;
-    m_get_stream_size = mem_get_stream_size;
-    m_close = mem_close_func;
 }
 
 tu_file::~tu_file()
@@ -489,28 +249,6 @@ tu_file::copy_from(tu_file* src)
 	}
 	
 	write8(b);
-    }
-}
-
-
-void
-tu_file::copy_to(membuf* dst)
-// Copy remaining contents of *this into *dst.
-{
-    static const int BUFSIZE = 4096;
-    
-    while (get_eof() == false) {
-	// Make room at the end of dst.
-	dst->resize(dst->size() + BUFSIZE);
-	int bytes_read = read_bytes(((char*) dst->data()) + dst->size() - BUFSIZE, BUFSIZE);
-	if (bytes_read < BUFSIZE) {
-	    // Didn't use everything we allocated; trim the unused bytes.
-	    dst->resize(dst->size() - (BUFSIZE - bytes_read));
-	}
-	
-	if (get_error()) {
-	    break;
-	}
     }
 }
 
@@ -574,33 +312,6 @@ tu_file::read_string(char* dst, int max_length)
     
     return -1;
 }
-
-
-
-#include <cstdarg>
-#include <cstring>
-
-#ifdef _WIN32
-#define vsnprintf	_vsnprintf
-// gettext 0.17 redefines printf in libintl.h which confuses cpp 3.x
-#undef printf
-#endif // _WIN32
-
-int	tu_file::printf(const char* fmt, ...)
-// Use printf-like semantics to send output to this stream.
-{
-    // Workspace for vsnprintf formatting.
-    static const int	BUFFER_SIZE = 1000;
-    char	buffer[BUFFER_SIZE];
-    
-    va_list ap;
-    va_start(ap, fmt);
-    vsnprintf(buffer, BUFFER_SIZE, fmt, ap);
-    va_end(ap);
-    
-    return write_bytes(buffer, strlen(buffer));
-}
-
 
 // Local Variables:
 // mode: C++

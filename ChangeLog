@@ -1,3 +1,10 @@
+2008-03-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/tu_file.{cpp,h}: remove everything that isn't currently
+	  used, including all membuf code.
+    * libbase/membuf.{cpp,h}: unused. Dropped.
+    * libbase/config.cpp: (lua bindings) dropped.
+
 2008-03-27 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Inheritance.as: use 'delete x.y'
