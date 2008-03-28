@@ -1,5 +1,11 @@
 2008-03-28 Russ Nelson <nelson@crynwr.com>
 
+	* Fix this problem report:
+	  http://www.mail-archive.com/gnash-dev@gnu.org/msg03319.html
+	  Both debian and ubuntu use a dash instead of underscore.
+
+2008-03-28 Russ Nelson <nelson@crynwr.com>
+
 	* Remove test which disables GTK gui if dependencies are missing.
 	  If the gtk is disabled, you don't get the right errors at the
 	  end of the output.

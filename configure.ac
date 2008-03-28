@@ -2642,7 +2642,7 @@ if test x"$BOOST_LIBS" != x; then
       for i in ${extra_missing_libs}; do
 	      echo "        WARNING: The BOOST $i library is recommended!"
         echo "               Install it from http://www.boost.org"
-        echo "               or .deb users: apt-get install libboost-${i}-dev"
+        echo "               or .deb users: apt-get install libboost-"`echo ${i} | sed 's/_/-/g'`"-dev"
         echo "               Gnash will compile anyway, but not all tests will work."
       done
     fi
@@ -2651,7 +2651,7 @@ if test x"$BOOST_LIBS" != x; then
 	# They have some boost libs but no date_time and want to compile cygnal.
 	echo "        ERROR: The BOOST $i library is needed!"
 	echo "               Install it from http://boost.org"
-	echo "               or .deb users: apt-get install libboost-$i-dev"
+	echo "               or .deb users: apt-get install libboost-"`echo ${i} | sed 's/_/-/g'`"-dev"
 	nogo=true
       done
     fi
