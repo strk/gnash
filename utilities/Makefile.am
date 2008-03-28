@@ -26,6 +26,7 @@ AUTOMAKE_OPTIONS = # dejagnu
 GNASH_LIBS = \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/libamf/libgnashamf.la \
+	$(top_builddir)/libnet/libgnashnet.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libmedia/libgnashmedia.la
 
@@ -48,6 +49,7 @@ AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)	\
         -I$(top_srcdir)/libgeometry \
         -I$(top_srcdir)/libbase \
+        -I$(top_srcdir)/libnet \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/server \
         -I$(top_srcdir)/server/asobj \

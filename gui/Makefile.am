@@ -34,6 +34,8 @@ EXTRA_DIST = gnash.in klash.moc.in
 noinst_LTLIBRARIES = 
 AM_CPPFLAGS = -I.. \
         -I$(top_srcdir) \
+        -I$(top_srcdir)/libamf \
+        -I$(top_srcdir)/libnet \
         -I$(top_srcdir)/server \
         -I$(top_srcdir)/server/parser \
         -I$(top_srcdir)/server/vm \
@@ -89,6 +91,7 @@ AM_LDFLAGS =  \
 
 GNASH_LIBS = \
 	$(top_builddir)/libamf/libgnashamf.la \
+	$(top_builddir)/libnet/libgnashnet.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/libbase/libgnashbase.la
