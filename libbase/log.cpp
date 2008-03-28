@@ -22,12 +22,10 @@
 #endif
 
 #include <ctime>
-#include <cctype>
+#include <cctype> // for isprint
 
-#include <iostream>
-#include <sstream>
-#include <iomanip>
-#include <fstream>
+#include <iosfwd> // ostream, fstream, sstream
+#include <iomanip> // for std::setfill
 #include <string>
 #include <boost/format.hpp>
 
@@ -37,7 +35,7 @@
 # include <sys/types.h>
 #endif
 
-#include <unistd.h>
+#include <unistd.h> // for getpid
 
 #include "log.h"
 
@@ -47,7 +45,8 @@ using std::endl;
 namespace gnash {
 
 // Convert each byte into its hex representation
-std::string hexify (const unsigned char *p, size_t length, bool ascii)
+std::string
+hexify (const unsigned char *p, size_t length, bool ascii)
 {
 
 	const std::vector<unsigned char> bytes (p, p + length);

@@ -1,5 +1,10 @@
 2008-03-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* libbase/log.cpp: comment headers, minor alterations.
+	* libbase/container.h: drop tu_config.h include.
+
+2008-03-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* po/cs.po: add Petr Pisar's updated Czech translation.
 
 2008-03-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>

@@ -23,8 +23,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include "tu_config.h"
-
 #ifdef HAVE_STRINGCASECMP
 # define STRCASECMP strcasecmp
 #else
@@ -57,7 +55,6 @@ size_t strftime __P((char *, size_t, const char *, const struct tm *));
 
 #endif // ! HAVE_WINSOCK_H
 
-//#include "tu_config.h"
 #include "utility.h"
 #include <cstddef>
 #include <cstring>	// for strcmp and friends
