@@ -1,5 +1,11 @@
 2008-03-28 Sandro Santilli <strk@keybit.net>
 
+	* server/swf_function.cpp (call operator): esplicit args override
+	  implicit ones.
+	* testsuite/swfdec/PASSING: definefunction2-overwrite.swf succeeds.
+
+2008-03-28 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/Object.cpp: add Object.toLocaleString.
 	* testsuite/actionscript.all/: Date.as, Object.as:
 	  toLocaleString tests pass.
