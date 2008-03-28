@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Date.as,v 1.38 2008/03/11 19:31:47 strk Exp $";
+rcsid="$Id: Date.as,v 1.39 2008/03/28 16:37:45 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(Date), 'function');
@@ -126,7 +126,7 @@ check (d.setUTCMonth);
 check (d.setUTCSeconds);
 check (d.setYear);
 check (d.toString);
-xcheck (d.toLocaleString);
+check (d.toLocaleString);
 // UTC is a static method present from v5
 check_equals (d.UTC, undefined);
 check (Date.UTC);
@@ -250,7 +250,7 @@ check (Date.utc);
 	check_equals(d.getUTCMilliseconds(), 0);
 	
     /// No difference:
-    xcheck_equals (Date.toLocaleString(), Date.toString());
+    check_equals (Date.toLocaleString(), Date.toString());
 
 // Check other convertible types
 // Booleans convert to 0 and 1

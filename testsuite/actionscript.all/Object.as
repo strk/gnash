@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Object.as,v 1.46 2008/03/26 08:25:03 bwy Exp $";
+rcsid="$Id: Object.as,v 1.47 2008/03/28 16:37:45 strk Exp $";
 #include "check.as"
 
 // Test existance of methods
@@ -31,12 +31,12 @@ check_equals(typeof(Object.prototype), 'object');
 // registerClass is a public static function of Object
 check_equals(typeof(Object.registerClass), 'function');
 check_equals(typeof(Object.prototype.toString), 'function');
-xcheck_equals(typeof(Object.prototype.toLocaleString), 'function');
+check_equals(typeof(Object.prototype.toLocaleString), 'function');
 check_equals(typeof(Object.prototype.valueOf), 'function');
 check_equals(typeof(Object.prototype.constructor), 'function'); 
 #if OUTPUT_VERSION > 5
  check(Object.prototype.hasOwnProperty('toString'));
- xcheck(Object.prototype.hasOwnProperty('toLocaleString'));
+ check(Object.prototype.hasOwnProperty('toLocaleString'));
  check(Object.prototype.hasOwnProperty('valueOf'));
 #endif
 check_equals(Object.prototype.prototype, undefined);
@@ -410,8 +410,8 @@ Object.prototype.toString = backup;
 
 // Check toLocaleString calls toString
 backup = Object.prototype.toString;
-Object.prototype.toString = function() { return "toString"; };
-xcheck_equals(Object.prototype.toLocaleString(), "toString");
+Object.prototype.toString = function() { return "toString"+arguments.length; };
+check_equals(Object.prototype.toLocaleString(1), "toString0");
 Object.prototype.toString = backup;
 
 //----------------------

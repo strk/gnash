@@ -27,6 +27,7 @@
 #include "sprite_instance.h" // for Object.registerClass  (get_movie_definition)
 #include "sprite_definition.h" // for Object.registerClass  (get_movie_definition)
 #include "VM.h" // for SWF version (attachObjectInterface)
+#include "namedStrings.h" // for NSV::PROP_TO_STRING
 
 #include "log.h"
 
@@ -43,6 +44,7 @@ static as_value object_isPropertyEnumerable(const fn_call&);
 static as_value object_isPrototypeOf(const fn_call&);
 static as_value object_watch(const fn_call&);
 static as_value object_unwatch(const fn_call&);
+static as_value object_toLocaleString(const fn_call&);
 
 
 static void
@@ -58,6 +60,9 @@ attachObjectInterface(as_object& o)
 	// Object.toString()
 	vm.registerNative(as_object::tostring_method, 101, 4);
 	o.init_member("toString", vm.getNative(101, 4));
+
+	// Object.toLocaleString()
+	o.init_member("toLocaleString", new builtin_function(object_toLocaleString));
 
 	if ( target_version  < 6 ) return;
 
@@ -429,6 +434,13 @@ object_unwatch(const fn_call&)
 		warned=true;
 	}
 	return as_value();
+}
+
+as_value
+object_toLocaleString(const fn_call& fn)
+{
+	boost::intrusive_ptr<as_object> obj = fn.this_ptr;
+	return obj->callMethod(NSV::PROP_TO_STRING);
 }
   
 } // namespace gnash

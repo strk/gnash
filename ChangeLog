@@ -1,3 +1,9 @@
+2008-03-28 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/Object.cpp: add Object.toLocaleString.
+	* testsuite/actionscript.all/: Date.as, Object.as:
+	  toLocaleString tests pass.
+
 2008-03-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/as_environment.h
