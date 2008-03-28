@@ -1,5 +1,10 @@
 2008-03-28  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* testsuite/cygnal.all/Makefile.am: Remove testcases moved to
+	gnash/testsuite/libnet.all.
+	* testsuite/cygnal.all/test_buffer.cpp,test_cque.cpp,test_handler.cpp,
+	test_http.cpp: Moved to gnash/testsuite/libnet.all.
+
 	* Makefile.am: Don't build libcygnal anymore, it's been made
 	gnash/libnet, so it's code can be shared with Gnash for the client
 	side of all protocols.
