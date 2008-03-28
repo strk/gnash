@@ -1,5 +1,9 @@
 2008-03-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* libbase/arg_parser.{cpp,h}: add FSF copyright.
+
+2008-03-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* libbase/tu_file.{cpp,h}: remove everything that isn't currently
 	  used, including all membuf code.
     * libbase/membuf.{cpp,h}: unused. Dropped.
