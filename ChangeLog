@@ -1,3 +1,9 @@
+2008-03-28 Russ Nelson <nelson@crynwr.com>
+
+	* Remove test which disables GTK gui if dependencies are missing.
+	  If the gtk is disabled, you don't get the right errors at the
+	  end of the output.
+
 2008-03-27  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* testsuite/Makefile.am: Add libnet.all to SUIBDIRS.

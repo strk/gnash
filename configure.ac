@@ -1066,12 +1066,6 @@ if test x$build_gtk = xyes -o $build_alp = xyes -o x$build_hildon = xyes; then
    fi
 
   GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
-   dnl if gtk isn't installed, even if it's specified, don't try to build
-   dnl the GTK gui. 
-   if test x$has_gtk2 = xno; then
-      build_gtk=no
-      AC_MSG_WARN(["Disabling GTK GUI, no GTK development tools found"])
-   fi
 fi
 if test x$build_hildon = xyes; then
   GNASH_PATH_HILDON
