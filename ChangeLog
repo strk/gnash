@@ -1,5 +1,12 @@
 2008-03-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* libbase/gmemory.h: add DSOEXPORT to allow the testsuite to
+	  build with visibility support enabled.
+	* libamf/lcshm.h: make Listener class visible (testsuite).
+	* libamf/amf.h: export swapbytes (testsuite).
+
+2008-03-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* server/asobj/string.cpp: (charCodeAt) don't try to
 	  access string out of bounds. (Fixes abort in the movie
 	  http://newsimg.bbc.co.uk/player/emp/2_0_1275/player.swf).

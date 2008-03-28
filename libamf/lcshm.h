@@ -29,13 +29,14 @@
 #include "amf.h"
 #include "element.h"
 #include "shm.h"
+#include "dsodefs.h"
 
 namespace gnash {
 
 // Manipulate the list of LocalConnection Listeners. We've made this a separate
 // class from LocalConnection as it's used standalone for the
 // dumpshm utility to dump the Listener lists.
-class Listener {
+class DSOEXPORT Listener {
 public:
     Listener();
     Listener(boost::uint8_t *baseaddr);

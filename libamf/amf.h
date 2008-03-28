@@ -26,10 +26,11 @@
 #include <string>
 #include <cstring>
 #include <map>
+#include <boost/cstdint.hpp>
 
 #include "element.h"
 #include "amfutf8.h"
-#include <boost/cstdint.hpp>
+#include "dsodefs.h"
 
 namespace amf 
 {
@@ -390,7 +391,7 @@ public:
     int                 _mystery_word;
 };
  
-void *swapBytes(void *word, int size);
+DSOEXPORT void *swapBytes(void *word, int size);
 
 
 } // end of amf namespace

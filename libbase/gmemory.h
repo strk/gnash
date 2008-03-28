@@ -32,10 +32,11 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <time.h>
+#include "dsodefs.h" // DSOEXPORT
 
 namespace gnash {
   
-class Memory {
+class DSOEXPORT Memory {
 public:
 
     // Borrowed from malloc.h and trimmed down.
