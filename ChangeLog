@@ -4,6 +4,7 @@
 	  used, including all membuf code.
     * libbase/membuf.{cpp,h}: unused. Dropped.
     * libbase/config.cpp: (lua bindings) dropped.
+    * libbase/Makefile.am: don't try to build unused files.
 
 2008-03-27 Sandro Santilli <strk@keybit.net>
 

@@ -76,14 +76,12 @@ EXTRA_DIST += tu_file_SDL.cpp
 endif
 
 libgnashbase_la_SOURCES = \
-	config.cpp \
 	$(DMALLOC_FILE)	\
 	extension.cpp \
 	image.cpp \
 	jpeg.cpp \
 	lirc.cpp	\
 	log.cpp	\
-	membuf.cpp \
 	memory.cpp \
 	network.cpp \
 	rc.cpp \
@@ -117,7 +115,6 @@ noinst_HEADERS = \
 	grid_index.h \
 	image.h	\
 	jpeg.h \
-	membuf.h \
 	gmemory.h \
 	network.h \
 	lirc.h \
