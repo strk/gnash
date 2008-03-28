@@ -1,5 +1,11 @@
 2008-03-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* server/asobj/string.cpp: (charCodeAt) don't try to
+	  access string out of bounds. (Fixes abort in the movie
+	  http://newsimg.bbc.co.uk/player/emp/2_0_1275/player.swf).
+
+2008-03-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* libbase/log.cpp: comment headers, minor alterations.
 	* libbase/container.h: drop tu_config.h include.
 
