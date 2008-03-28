@@ -23,6 +23,10 @@
 
 #include "utf8.h"
 
+// This isn't actually an invalid character; it's a valid char that
+// looks like an inverted question mark.
+#define INVALID_CHAR 0x0FFFD
+
 std::wstring
 utf8::decodeCanonicalString(const std::string& str, int version)
 {
@@ -35,7 +39,12 @@ utf8::decodeCanonicalString(const std::string& str, int version)
 	{
 		while (boost::uint32_t code = decodeNextUnicodeCharacter(it))
 		{
-			wstr.push_back(static_cast<wchar_t>(code));
+		    if (code == utf8::invalid)
+		    {
+			    wstr.push_back(static_cast<wchar_t>(INVALID_CHAR));
+			    continue;	    
+		    }
+		    wstr.push_back(static_cast<wchar_t>(code));
 		}
 	}
 	else
@@ -97,10 +106,6 @@ utf8::decodeNextUnicodeCharacter(std::string::const_iterator& it)
 	// If we decode characters { 0xD800 .. 0xDFFF } or { 0xFFFE,
 	// 0xFFFF } then we ignore them; they are not valid in UTF-8.
 
-// This isn't actually an invalid character; it's a valid char that
-// looks like an inverted question mark.
-#define INVALID 0x0FFFD
-
 #define FIRST_BYTE(mask, shift)		\
 	/* Post-increment iterator */ \
 	uc = (*it++ & (mask)) << (shift);
@@ -108,7 +113,7 @@ utf8::decodeNextUnicodeCharacter(std::string::const_iterator& it)
 #define NEXT_BYTE(shift)						\
 					\
 	if (*it == 0) return 0; /* end of buffer, do not advance */	\
-	if ((*it & 0xC0) != 0x80) return INVALID; /* standard check */	\
+	if ((*it & 0xC0) != 0x80) return utf8::invalid; /* standard check */	\
 	/* Post-increment iterator: */		\
 	uc |= (*it++ & 0x3F) << shift;
 
@@ -123,7 +128,7 @@ utf8::decodeNextUnicodeCharacter(std::string::const_iterator& it)
 		// Two-byte sequence.
 		FIRST_BYTE(0x1F, 6);
 		NEXT_BYTE(0);
-		if (uc < 0x80) return INVALID;	// overlong
+		if (uc < 0x80) return utf8::invalid;	// overlong
 		return uc;
 	}
 	else if ((*it & 0xF0) == 0xE0)
@@ -132,9 +137,9 @@ utf8::decodeNextUnicodeCharacter(std::string::const_iterator& it)
 		FIRST_BYTE(0x0F, 12);
 		NEXT_BYTE(6);
 		NEXT_BYTE(0);
-		if (uc < 0x800) return INVALID;	// overlong
-		if (uc >= 0x0D800 && uc <= 0x0DFFF) return INVALID;	// not valid ISO 10646
-		if (uc == 0x0FFFE || uc == 0x0FFFF) return INVALID;	// not valid ISO 10646
+		if (uc < 0x800) return utf8::invalid;	// overlong
+		if (uc >= 0x0D800 && uc <= 0x0DFFF) return utf8::invalid;	// not valid ISO 10646
+		if (uc == 0x0FFFE || uc == 0x0FFFF) return utf8::invalid;	// not valid ISO 10646
 		return uc;
 	}
 	else if ((*it & 0xF8) == 0xF0)
@@ -144,7 +149,7 @@ utf8::decodeNextUnicodeCharacter(std::string::const_iterator& it)
 		NEXT_BYTE(12);
 		NEXT_BYTE(6);
 		NEXT_BYTE(0);
-		if (uc < 0x010000) return INVALID;	// overlong
+		if (uc < 0x010000) return utf8::invalid;	// overlong
 		return uc;
 	}
 	else if ((*it & 0xFC) == 0xF8)
@@ -155,7 +160,7 @@ utf8::decodeNextUnicodeCharacter(std::string::const_iterator& it)
 		NEXT_BYTE(12);
 		NEXT_BYTE(6);
 		NEXT_BYTE(0);
-		if (uc < 0x0200000) return INVALID;	// overlong
+		if (uc < 0x0200000) return utf8::invalid;	// overlong
 		return uc;
 	}
 	else if ((*it & 0xFE) == 0xFC)
@@ -167,14 +172,14 @@ utf8::decodeNextUnicodeCharacter(std::string::const_iterator& it)
 		NEXT_BYTE(12);
 		NEXT_BYTE(6);
 		NEXT_BYTE(0);
-		if (uc < 0x04000000) return INVALID;	// overlong
+		if (uc < 0x04000000) return utf8::invalid;	// overlong
 		return uc;
 	}
 	else
 	{
 		// Invalid.
 		it++;
-		return INVALID;
+		return utf8::invalid;
 	}
 }
 

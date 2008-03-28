@@ -1,5 +1,10 @@
 2008-03-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* libbase/utf8.{cpp,h}: add a utf8::invalid constant.
+	* server/vm/ASHandlers.cpp: use utf8 code for guessEncoding.
+
+2008-03-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* server/asobj/string.cpp: (charAt) prevent another potential
 	  out-of-bounds string access.
 

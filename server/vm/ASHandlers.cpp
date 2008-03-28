@@ -1538,45 +1538,34 @@ SWFHandlers::guessEncoding(const std::string &str, int &length, std::vector<int>
 
     std::string::const_iterator it = str.begin();
     length = 0;
-    int index = 0;
     
     // First, assume it's UTF8 and try to be wrong.
     while (it != str.end() && is_sought)
     {
-        int c = static_cast<int>(*it);
-
-        if (width)
-        {
-            --width;
-            if ((c & 0xB0) != 0x80)
-            {
-                is_sought = false;
-            }
-            continue;
-        }
         ++length;
-        offsets.push_back(index); //[length - 1] = index;
 
-        if ((c & 0xC0) == 0x80) continue; // A 1 byte character.
-        else if ((c & 0xE0) == 0xC0) width = 1;
-        else if ((c & 0xF0) == 0xE0) width = 2;
-        else if ((c & 0xF8) == 0xF0) width = 3;
-        else if (c & 0x80) is_sought = false;
-            
-        ++it;
-        ++index;
+        offsets.push_back(it - str.begin()); // current position
+
+        // Advances the iterator to point to the next 
+        boost::uint32_t c = utf8::decodeNextUnicodeCharacter(it);
+
+        if (c == utf8::invalid)
+        {
+            is_sought = false;
+            break;
+        }
     }
 
-    offsets.push_back(index); // [length - 1] = index;
+    offsets.push_back(it - str.begin()); // current position
 
-    if (!width && is_sought)
+    if (it == str.end() && is_sought)
     {
-        // No width left, so it's almost certainly UTF8.
+        // No characters left, so it's almost certainly UTF8.
         return ENCGUESS_UNICODE;
     }
 
     it = str.begin();
-    index = 0;
+    int index = 0;
     is_sought = true;
     width = 0;
     length = 0;

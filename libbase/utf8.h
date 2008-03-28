@@ -53,6 +53,8 @@
 /// gnash::edit_text_character, ord() and chr().
 namespace utf8
 {
+    static const boost::uint32_t invalid = -1;
+
 	/// Converts a std::string with multibyte characters into a std::wstring.
 	//
 	/// @return a version-dependent wstring.
