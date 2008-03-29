@@ -8,6 +8,7 @@
 	* gui/kdesup.h
 	* gui/riscossup.h
 	* gui/sdlsup.h: drop tu_config.h, remove visibility qualifiers.
+	* libbase/tu_config.h: drop.
 
 2008-03-28  Dossy Shiobara <dossy@panoptic.com>
 
