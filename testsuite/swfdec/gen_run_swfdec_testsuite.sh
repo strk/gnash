@@ -59,16 +59,26 @@ for test in \`ls ${SWFDECTRACEDIR}/[$STARTPATTERN]*.swf\`; do
 		continue
 	fi
 
+	usedtopass=no
 	expectpass=no
+	expectpasslabel=no
 	if grep -q "^\${testid}\$" \${EXPECTPASS}; then
 		expectpass="yes"
+		expectpasslabel=yes
+	else
+		if grep -q "^\${testname}:" \${EXPECTPASS}; then
+			usedtopass="yes"
+			expectpasslabel="not anymore"
+		else
+			expectpasslabel=no
+		fi
 	fi
 	flags=
 	if grep -q "^\${testname}\$" \${REALTIME}; then
 		flags="-d -1"
-		echo "NOTE: running \${testname} (realtime - expect pass: \${expectpass})"
+		echo "NOTE: running \${testname} (realtime - expect pass: \${expectpasslabel})"
 	else
-		echo "NOTE: running \${testname} (expect pass: \${expectpass})"
+		echo "NOTE: running \${testname} (expect pass: \${expectpasslabel})"
 	fi
 	if ${SWFDEC_GNASH_TESTER} \${test} \${flags} > \${testname}.log; then
 		if [ "\${expectpass}" = "yes" ]; then
@@ -80,7 +90,11 @@ for test in \`ls ${SWFDECTRACEDIR}/[$STARTPATTERN]*.swf\`; do
 		if [ "\${expectpass}" = "yes" ]; then
 			echo "FAILED: \${testid} (traces in \${testname}.trace-gnash, log in \${testname}.log)"
 		else
-			echo "XFAILED: \${testid} (traces in \${testname}.trace-gnash, log in \${testname}.log)"
+			if [ "\${usedtopass}" = "yes" ]; then
+				echo "XFAILED: \${testid} (USED TO PASS! traces in \${testname}.trace-gnash, log in \${testname}.log)"
+			else
+				echo "XFAILED: \${testid} (traces in \${testname}.trace-gnash, log in \${testname}.log)"
+			fi
 		fi
 	fi
 done

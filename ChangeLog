@@ -1,5 +1,7 @@
 2008-03-29 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/gen_run_swfdec_testsuite.sh: hint about tests
+	  that used to pass and are not passing anymore.
 	* libbase/log.{cpp,h}: drop unused timestamp variation code.
 	* testsuite/actionscript.all/Function.as: add test for user-defined
 	  function's constructor.
