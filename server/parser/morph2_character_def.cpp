@@ -99,7 +99,7 @@ private:
 
 	morph2_character_def::morph2_character_def():
 		m_last_ratio(-1.0f)
-	{
+	{   /* Markus: No delete??? */
 		m_shape1 = new shape_character_def();
 		m_shape2 = new shape_character_def();
 	}
@@ -113,7 +113,7 @@ private:
 	{
 //		GNASH_REPORT_FUNCTION;
 
-		unsigned int i;
+		unsigned int i = 0;
 		float ratio = (inst->get_ratio()==character::noRatioValue) ? 0 : inst->get_ratio()/65535.0;
 
 		// bounds
@@ -122,7 +122,7 @@ private:
 		set_bound(new_bound);
 
 		// fill styles
-		for (i=0; i < m_fill_styles.size(); i++)
+		for (; i < m_fill_styles.size(); i++)
 		{
 			fill_style& fs = m_fill_styles[i];
 
@@ -173,10 +173,10 @@ private:
 				const edge& e1 = j < p1.size() ? p1[j] : empty_edge;
 				const edge& e2 = k < p2.size() ? p2[k] : empty_edge;
 
-				e.cp.x = flerp(e1.cp.x, e2.cp.x, ratio);
-				e.cp.y = flerp(e1.cp.y, e2.cp.y, ratio);
-				e.ap.x = flerp(e1.ap.x, e2.ap.x, ratio);
-				e.ap.y = flerp(e1.ap.y, e2.ap.y, ratio);
+				e.cp.x = static_cast<int>(flerp(e1.cp.x, e2.cp.x, ratio));
+				e.cp.y = static_cast<int>(flerp(e1.cp.y, e2.cp.y, ratio));
+				e.ap.x = static_cast<int>(flerp(e1.ap.x, e2.ap.x, ratio));
+				e.ap.y = static_cast<int>(flerp(e1.ap.y, e2.ap.y, ratio));
 				k++;
 				if (p2.size() <= k)
 				{
