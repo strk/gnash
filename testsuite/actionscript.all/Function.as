@@ -22,11 +22,13 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Function.as,v 1.69 2008/03/11 19:31:47 strk Exp $";
+rcsid="$Id: Function.as,v 1.70 2008/03/29 15:41:43 strk Exp $";
 #include "check.as"
 
-#if OUTPUT_VERSION > 6
+#if OUTPUT_VERSION >= 6
 check_equals(Function.prototype.__proto__, Object.prototype);
+check_equals(Function.constructor, Function);
+check( ! Function.hasOwnProperty('__constructor__') );
 #endif
 
 // Define a function returning 'this'.name and the given args
@@ -426,7 +428,7 @@ function f()
         propRecorder.push(props.toString());
     }
     propRecorder.sort();
-    xcheck_equals(propRecorder.length, 4);
+    xcheck_equals(propRecorder.length, 5);
     check_equals(propRecorder[0], '__proto__');
     check_equals(propRecorder[1], 'callee');
     xcheck_equals(propRecorder[2], 'caller');
@@ -914,8 +916,8 @@ check_equals(b.count, 1); // See bug #22203
  check_totals(146); // SWF5
 #endif
 #if OUTPUT_VERSION == 6
- check_totals(202); // SWF6
+ check_totals(205); // SWF6
 #endif
 #if OUTPUT_VERSION >= 7
- check_totals(204); // SWF7,SWF8
+ check_totals(206); // SWF7,SWF8
 #endif

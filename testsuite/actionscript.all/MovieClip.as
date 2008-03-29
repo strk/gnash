@@ -20,28 +20,28 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.120 2008/03/11 19:31:47 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.121 2008/03/29 15:41:43 strk Exp $";
 
-rcsid="$Id: MovieClip.as,v 1.120 2008/03/11 19:31:47 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.121 2008/03/29 15:41:43 strk Exp $";
 #include "check.as"
 
 // To be called at end of test
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(199); // SWF5
+	check_totals(200); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(613); // SWF6
+	check_totals(614); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(630); // SWF7
+	check_totals(631); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(631); // SWF8+
+	check_totals(632); // SWF8+
 #endif
 
 	play();
@@ -104,6 +104,12 @@ check_equals(typeof(mc.unloadMovie), 'function');
 check_equals(typeof(mc.meth), 'function');
 check_equals(typeof(mc.getSWFVersion), 'function');
 check_equals(mc.getSWFVersion(), OUTPUT_VERSION);
+
+#if OUTPUT_VERSION > 5
+ xcheck_equals(MovieClip.constructor, Function);
+#else
+ check_equals(MovieClip.constructor, Function);
+#endif
 
 #if OUTPUT_VERSION >= 6
 check(MovieClip.prototype.hasOwnProperty('loadMovie'));

@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Object.as,v 1.47 2008/03/28 16:37:45 strk Exp $";
+rcsid="$Id: Object.as,v 1.48 2008/03/29 15:41:43 strk Exp $";
 #include "check.as"
 
 // Test existance of methods
@@ -34,10 +34,15 @@ check_equals(typeof(Object.prototype.toString), 'function');
 check_equals(typeof(Object.prototype.toLocaleString), 'function');
 check_equals(typeof(Object.prototype.valueOf), 'function');
 check_equals(typeof(Object.prototype.constructor), 'function'); 
+check_equals(Object.prototype.constructor, Object); 
+check_equals(typeof(Object.prototype.toString.constructor), 'function');
 #if OUTPUT_VERSION > 5
+ xcheck_equals(Object.prototype.toString.constructor, Function);
  check(Object.prototype.hasOwnProperty('toString'));
  check(Object.prototype.hasOwnProperty('toLocaleString'));
  check(Object.prototype.hasOwnProperty('valueOf'));
+#else
+ check_equals(Object.prototype.toString.constructor, Function);
 #endif
 check_equals(Object.prototype.prototype, undefined);
 
@@ -98,7 +103,7 @@ check(O.prototype.constructor.hasOwnProperty('constructor'));
 check(O.prototype.constructor.hasOwnProperty('prototype'));
 
 check_equals(O.prototype.constructor, Object);
-xcheck(O.constructor != Object);
+xcheck_equals(O.constructor, Function);
 
 check_equals(typeof(Object.prototype.addProperty), 'function');
 check_equals(typeof(Object.prototype.hasOwnProperty), 'function');
@@ -548,10 +553,10 @@ check( obj8.prototype.isPrototypeOf(obj9) );
 
 
 #if OUTPUT_VERSION <= 5
-totals(65);
+totals(68);
 #endif
 
 #if OUTPUT_VERSION >= 6
-totals(172);
+totals(175);
 #endif
 

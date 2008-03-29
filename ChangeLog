@@ -1,5 +1,11 @@
 2008-03-29 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/: Function.as,
+	  MovieClip.as, Object.as: some tests for builtin
+	  constructor's "constructor" props.
+
+2008-03-29 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/libnet.all/test_http.cpp: fix qualification
 	  of enum.
 	* Makefile.am: don't enable build of cygnal on 'distcheck'
