@@ -23,7 +23,6 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
 #include <deque>
-#include <time.h>
 
 #include "buffer.h"
 #include "network.h"

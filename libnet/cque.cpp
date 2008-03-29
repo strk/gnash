@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 #include <deque>
-#include <time.h>
+#include <ctime>
 
 #include "log.h"
 #include "gmemory.h"
