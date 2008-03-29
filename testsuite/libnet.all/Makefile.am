@@ -41,7 +41,7 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/server \
         -DLOCALEDIR=\"$(localedir)\" \
 	$(BOOST_CFLAGS) \
-	$(DEJAGNU_CFLAGS) \	
+	$(DEJAGNU_CFLAGS) \
 	$(PTHREAD_CFLAGS)
 
 check_PROGRAMS = \
