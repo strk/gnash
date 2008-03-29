@@ -55,6 +55,7 @@ noinst_HEADERS = \
 	network.h \
 	netstats.h \
 	rtmp.h \
+	rtmp_server.h \
 	statistics.h
 
 libgnashnet_la_SOURCES = \
@@ -66,6 +67,7 @@ libgnashnet_la_SOURCES = \
 	network.cpp \
 	netstats.cpp \
 	rtmp.cpp \
+	rtmp_server.cpp \
 	statistics.cpp
 
 # Rebuild with GCC 4.x Mudflap support

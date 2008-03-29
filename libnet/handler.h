@@ -97,6 +97,11 @@ public:
     	{ return _outgoing.peek(); };    
 
     // Removes all the buffers from the queues
+    Buffer *merge(Buffer *begin) { return _incoming.merge(begin); };
+    Buffer *mergein(Buffer *begin) { return _incoming.merge(begin); };
+    Buffer *mergeout(Buffer *begin) { return _outgoing.merge(begin); };
+
+    // Removes all the buffers from the queues
     void clear() { _incoming.clear(); };
     void clear(fifo_e direction);
     void clearin() { _incoming.clear(); };

@@ -80,18 +80,6 @@ Buffer::~Buffer()
     }
 }
 
-Network::byte_t *
-Buffer::find(Network::byte_t b)
-{
-//    GNASH_REPORT_FUNCTION;
-    for (size_t i=0; i< _nbytes; i++) {
-	if ( *(_ptr + i) == b) {
-	    return _ptr + i;
-	}
-    }
-    return 0;
-}
-
 // Put data into the buffer
 void
 Buffer::copy(Network::byte_t *data, size_t nbytes)
@@ -157,6 +145,78 @@ Buffer::operator==(Buffer &buf)
         }
     }
     return false;
+}
+
+Network::byte_t *
+Buffer::find(Network::byte_t b, size_t start)
+{
+    GNASH_REPORT_FUNCTION;
+    for (size_t i=start; i< _nbytes; i++) {
+	if ( *(_ptr + i) == b) {
+	    return _ptr + i;
+	}
+    }
+    return 0;
+}
+
+// Find a byte in the buffer
+// Network::byte_t *
+// Buffer::find(char c)
+// {
+// //    GNASH_REPORT_FUNCTION;
+//     return find(static_cast<Network::byte_t>(c), 0);
+// }
+
+Network::byte_t *
+Buffer::find(Network::byte_t c)
+{
+//    GNASH_REPORT_FUNCTION;
+    return find(static_cast<Network::byte_t>(c), 0);
+}   
+
+// // Drop a character or range of characters without resizing
+// Network::byte_t
+// Buffer::remove(char c)
+// {
+// //    GNASH_REPORT_FUNCTION;
+//     return remove(reinterpret_cast<Network::byte_t>(c));
+// }
+
+Network::byte_t *
+Buffer::remove(Network::byte_t c)
+{
+    GNASH_REPORT_FUNCTION;
+    Network::byte_t *start = find(c, 0);
+    log_debug("FRAME MARK is at %x", (void *)start);
+    if (start == 0) {
+	return 0;
+    }
+//    std::copy((start + 1), end(), start);
+    *start = '*';
+//    *end() = 0;
+//    _nbytes--;
+
+    return _ptr;
+}
+
+Network::byte_t *
+Buffer::remove(int start)
+{
+//    GNASH_REPORT_FUNCTION;
+    std::copy((_ptr + start + 1), end(), (_ptr + start)),
+    *end() = 0;
+    _nbytes--;
+    return _ptr;
+}
+
+Network::byte_t *
+Buffer::remove(int start, int stop)
+{
+//    GNASH_REPORT_FUNCTION;
+    std::copy((_ptr + start), end(), (_ptr + stop)),
+//    *end() = 0;
+    _nbytes--;
+    return _ptr;
 }
 
 // Just reset to having no data, but still having storage

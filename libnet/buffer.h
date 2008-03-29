@@ -47,12 +47,22 @@ public:
     void copy(gnash::Network::byte_t *data, size_t nbytes);
     void copy(gnash::Network::byte_t *data) { copy(data, _nbytes); };
     void copy(std::string &str);
+
+    // Find a byte in the buffer
+//    Network::byte_t *find(char c);
+    Network::byte_t *find(Network::byte_t b);
+    Network::byte_t *find(Network::byte_t b, size_t start);
+    
+    // Drop a byte or range of characters without resizing
+//    Network::byte_t *remove(char c);
+    Network::byte_t *remove(Network::byte_t c);
+    Network::byte_t *remove(int x);
+    Network::byte_t *remove(int x, int y);
     
     // Accessors
-    gnash::Network::byte_t *find(gnash::Network::byte_t b);
-    gnash::Network::byte_t *begin() { return _ptr ; };
-    gnash::Network::byte_t *end() { return _ptr + _nbytes; };
-    gnash::Network::byte_t *reference() { return _ptr; }
+    Network::byte_t *begin() { return _ptr ; };
+    Network::byte_t *end() { return _ptr + _nbytes; };
+    Network::byte_t *reference() { return _ptr; }
     size_t size() { return _nbytes; }
     void setSize(size_t nbytes) { _nbytes = nbytes; };
     
@@ -63,14 +73,14 @@ public:
     // Test against other buffers
     bool operator==(Buffer *buf);
     bool operator==(Buffer &buf);
-    gnash::Network::byte_t operator[](int x) { return *(_ptr + x); };
+    Network::byte_t operator[](int x) { return *(_ptr + x); };
     
     // debug stuff, not need for running Cygnal
     void dump();
 private:
     void *init(size_t nbytes);
-    gnash::Network::byte_t *_ptr;
-    int         _nbytes;
+    Network::byte_t *_ptr;
+    size_t         _nbytes;
 #ifdef USE_STATS_BUFFERS
     struct timespec _stamp;	// used for timing how long data stays in the queue.
 #endif

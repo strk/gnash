@@ -19,9 +19,11 @@
 #define _RTMP_H_
 
 #include <boost/cstdint.hpp>
-#include <vector>
+#include <string>
+#include <map>
 
 #include "amf.h"
+#include "element.h"
 #include "handler.h"
 #include "network.h"
 
@@ -36,22 +38,38 @@ class DSOEXPORT RTMPproto
 {
 public:
     typedef enum {
-	CLIENT,                     // Flash player
-	SERVER                      // Flash com server
+	FROM_CLIENT,                     // Flash player
+	FROM_SERVER                      // Flash com server
     } rtmp_source_e;
     typedef enum {
-        CONNECT = 0x1,
-        DISCONNECT = 0x2,
-        SET_ATTRIBUTE = 0x3,
-        UPDATE_DATA = 0x4,
-        UPDATE_ATTRIBUTE = 0x5,
-        SEND_MESSAGE = 0x6,
-        STATUS = 0x7,
-        CLEAR_DATA = 0x8,
-        DELETE_DATA = 0x9,
-        DELETE_ATTRIBUTE = 0xa,
-        INITIAL_DATA = 0xb
-    } sharedobj_types_e;
+        NONE = 0x0,
+        CHUNK_SIZE = 0x1,
+        UNKNOWN = 0x2,
+        BYTES_READ = 0x3,
+        PING = 0x4,
+        SERVER = 0x5,
+        CLIENT = 0x6,
+        UNKNOWN2 = 0x7,
+        AUDIO_DATA = 0x8,
+        VIDEO_DATA = 0x9,
+        UNKNOWN3 = 0xa,
+        NOTIFY = 0x12,
+        SHARED_OBJ = 0x13,
+        INVOKE = 0x14
+    } content_types_e;
+//     typedef enum {
+//         CONNECT = 0x1,
+//         DISCONNECT = 0x2,
+//         SET_ATTRIBUTE = 0x3,
+//         UPDATE_DATA = 0x4,
+//         UPDATE_ATTRIBUTE = 0x5,
+//         SEND_MESSAGE = 0x6,
+//         STATUS = 0x7,
+//         CLEAR_DATA = 0x8,
+//         DELETE_DATA = 0x9,
+//         DELETE_ATTRIBUTE = 0xa,
+//         INITIAL_DATA = 0xb
+//     } sharedobj_types_e;
     typedef enum {
         RTMP_STATE_HANDSHAKE_SEND,
         RTMP_STATE_HANDSHAKE_RECV,
@@ -109,20 +127,22 @@ public:
     
     RTMPproto();
     ~RTMPproto();
-    bool handShakeWait();
+//     bool handShakeWait();
     bool handShakeRequest();
-    bool handShakeResponse();
+//    bool handShakeResponse();
     bool clientFinish();
-    bool serverFinish();
+//  bool serverFinish();
     bool packetRequest();
     bool packetSend(Buffer *buf);
     bool packetRead(Buffer *buf);
 
-    void addVariable(char *name, char *value);
-    std::string getVariable(char *name);
+    void addVariable(amf::Element *el);
+    void addVariable(char *name, amf::Element *el);
+    void addVariable(std::string &name, amf::Element *el);
+    amf::Element *getVariable(const std::string &name);
     void setHandler(Handler *hand) { _handler = hand; };
     int headerSize(gnash::Network::byte_t header);
-    int parseHeader(gnash::Network::byte_t *header);
+    Network::byte_t *parseHeader(gnash::Network::byte_t *header);
 
     int getHeaderSize()         { return _header_size; }; 
     int getTotalSize()          { return _total_size; }; 
@@ -130,10 +150,21 @@ public:
     int getMysteryWord()        { return _mystery_word; };
     rtmp_source_e getRouting()  { return _src_dest; };
     int getAMFIndex()           { return _amf_index; };
-  private:
-    std::map<char *, std::string> _variables;
-//     unsigned char               _body[RTMP_BODY_SIZE+1];
-//     std::vector<amf::AMF *>     _amfs;
+
+    // 
+    bool chunk_size();
+    bool bytes_read();
+    bool ping();
+    bool server();
+    bool client();
+    bool audio_data();
+    bool video_data();
+    bool notify();
+    bool shared_obj();
+    bool invoke();
+    void dump();
+  protected:
+    std::map<const char *, amf::Element *> _variables;
     Buffer		*_handshake;
     Handler		*_handler;
     int                 _amf_index;
@@ -141,12 +172,9 @@ public:
     int                 _total_size;
     int                 _packet_size;
     rtmp_source_e       _src_dest;
-    amf::AMF::content_types_e     _type;
+    content_types_e     _type;
     int                 _mystery_word;
 };
-
-// This is the thread for all incoming RTMP connections
-void rtmp_handler(Handler::thread_params_t *args);
 
 } // end of gnash namespace
 // end of _RTMP_H_

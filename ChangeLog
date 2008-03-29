@@ -1,3 +1,26 @@
+2008-03-29  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libamf/Makefile.am: Add libnet to include paths.
+	* libamf/amf.cpp: Include network.h. Use Network::byte_t instead
+	of boost::uint8_t. Move headerSize() and parseHeader to rtmp.h, as
+	they're really an RTMP thing, not an AMF one.
+	* libamf/amf.h: Move amfsource_e, amf_headersize_e,
+	content_types_e to rtmp.h, as they're an RTMP thing, not an AMF
+	one. Define the filetypes here. Use Network::byte_t instead
+	of boost::uint8_t. Move headerSize() and parseHeader to rtmp.h.
+	* libmedia/Makefile.am: Include libnet in include paths.
+	* libnet/Makefile.am: Build rtmp_server too.
+	* libnet/buffer.{h,cpp}: Find a byte in a buffer. Remove a byte(s)
+	from a buffer for filtering.
+	* libnet/handler.cpp: Compare incoming message size to NETBUFSIZE
+	instead of the buffer size itself.
+	* libnet/handler.h: Add support for merging buffers in the queues.
+	* libnet/http.cpp: Change to new prefixed enums.
+	* libnet/rtmp.{h,cpp}: Use Elements and byte_t for all
+	paramaters. Move all server sid efunctionality to rtmp_server.cpp.
+	* libnet/rtmp_server.{h,cpp}: New RTMPServer class for server side
+	only code.
+	
 2008-03-29 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/: Function.as,
@@ -40,7 +63,7 @@
 	  current thread ID or gracefully degrades to returning the
 	  current process ID if thread ID is not available.
 
-	* libbase/log.cpp, libnet/handler.cpp, libnet/http.cpp,
+ 	* libbase/log.cpp, libnet/handler.cpp, libnet/http.cpp,
 	  libnet/rtmp.cpp: Don't call pthread_self() directly, use
 	  get_thread_id() instead.
 

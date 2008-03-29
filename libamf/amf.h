@@ -28,6 +28,7 @@
 #include <map>
 #include <boost/cstdint.hpp>
 
+#include "network.h"
 #include "element.h"
 #include "amfutf8.h"
 #include "dsodefs.h"
@@ -36,11 +37,6 @@ namespace amf
 {
 
 const char AMF_NUMBER_SIZE = 0x08;
-
-typedef enum {
-    CLIENT,                     // Flash player
-    SERVER                      // Flash com server
-} amfsource_e;
 
 const char AMF_VERSION = 0;
 const int  AMF_HEADSIZE_MASK = 0xc0;
@@ -73,8 +69,8 @@ const char TERMINATOR = 0x09;
 // The third and fourth bytes form an integer value that specifies the
 // number of headers. 
 typedef struct {
-    boost::uint8_t version;
-    boost::uint8_t source;
+    gnash::Network::byte_t version;
+    gnash::Network::byte_t source;
     boost::uint32_t  count;
 } amfpacket_t;
 
@@ -86,13 +82,6 @@ typedef enum {
 
 class DSOEXPORT AMF {
 public:
-    typedef enum {
-        HEADER_12 = 0x0,
-        HEADER_8  = 0x40,
-        HEADER_4  = 0x80,
-        HEADER_1  = 0xc0
-    } amf_headersize_e;    
-    
 //     typedef enum {
 //         Byte,
 //         Int,
@@ -102,22 +91,6 @@ public:
 //         UTF8,
 //         LongUTF8
 //     } amftype_e;
-    typedef enum {
-        NONE = 0x0,
-        CHUNK_SIZE = 0x1,
-        UNKNOWN = 0x2,
-        BYTES_READ = 0x3,
-        PING = 0x4,
-        SERVER = 0x5,
-        CLIENT = 0x6,
-        UNKNOWN2 = 0x7,
-        AUDIO_DATA = 0x8,
-        VIDEO_DATA = 0x9,
-        UNKNOWN3 = 0xa,
-        NOTIFY = 0x12,
-        SHARED_OBJ = 0x13,
-        INVOKE = 0x14
-    } content_types_e;
     typedef enum {
         CONNECT = 0x01,
         DISCONNECT = 0x02,
@@ -131,7 +104,17 @@ public:
         DELETE_ATTRIBYTE = 0x0a,
         INITIAL_DATA = 0x0b
     } shared_obj_types_e;
-
+    typedef enum {
+	FILETYPE_ERROR = -1,
+	FILETYPE_NONE = 0,
+	FILETYPE_HTML,
+	FILETYPE_SWF,
+	FILETYPE_VIDEO,
+	FILETYPE_AUDIO,
+	FILETYPE_MP3,
+	FILETYPE_FCS,
+	FILETYPE_OSCP
+    } filetype_e;
     AMF();
     AMF(int size);
     ~AMF();
@@ -145,97 +128,97 @@ public:
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::uint8_t *encodeElement(const char *str);
+    static gnash::Network::byte_t *encodeElement(const char *str);
 
     /// Encode a Boolean object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::uint8_t *encodeBoolean(bool flag);
+    static gnash::Network::byte_t *encodeBoolean(bool flag);
 
     /// Encode an "Undefined" object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::uint8_t *encodeUndefined();
+    static gnash::Network::byte_t *encodeUndefined();
 
     /// Encode a "NULL" object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::uint8_t *encodeNull();
+    static gnash::Network::byte_t *encodeNull();
 
     /// Encode a "Unsupported" object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static  boost::uint8_t *encodeUnsupported();
+    static  gnash::Network::byte_t *encodeUnsupported();
 
     /// Encode an XML object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::uint8_t *encodeXMLObject(boost::uint8_t *data, int size);
+    static gnash::Network::byte_t *encodeXMLObject(gnash::Network::byte_t *data, int size);
 
     /// Encode a Typed Object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::uint8_t *encodeTypedObject(boost::uint8_t *data, int size);
+    static gnash::Network::byte_t *encodeTypedObject(gnash::Network::byte_t *data, int size);
 
     /// Encode a Reference to an object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::uint8_t *encodeReference(boost::uint8_t *data, int size);
+    static gnash::Network::byte_t *encodeReference(gnash::Network::byte_t *data, int size);
 
     /// Encode a Movie Clip
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::uint8_t *encodeMovieClip(boost::uint8_t *data, int size);
+    static gnash::Network::byte_t *encodeMovieClip(gnash::Network::byte_t *data, int size);
 
     /// Encode an ECMA Array
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::uint8_t *encodeECMAArray(boost::uint8_t *data, int size);
+    static gnash::Network::byte_t *encodeECMAArray(gnash::Network::byte_t *data, int size);
 
     /// Encode a long string
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::uint8_t *encodeLongString(boost::uint8_t *data, int size);
+    static gnash::Network::byte_t *encodeLongString(gnash::Network::byte_t *data, int size);
 
     /// Encode a Record Set
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::uint8_t *encodeRecordSet(boost::uint8_t *data, int size);
+    static gnash::Network::byte_t *encodeRecordSet(gnash::Network::byte_t *data, int size);
 
     /// Encode a Date
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::uint8_t *encodeDate(boost::uint8_t *data);
+    static gnash::Network::byte_t *encodeDate(gnash::Network::byte_t *data);
 
     /// Encode a Strict Array
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::uint8_t *encodeStrictArray(boost::uint8_t *data, int size);
+    static gnash::Network::byte_t *encodeStrictArray(gnash::Network::byte_t *data, int size);
     
     /// Encode an object
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::uint8_t *encodeObject(const boost::uint8_t *data, int size);
+    static gnash::Network::byte_t *encodeObject(const gnash::Network::byte_t *data, int size);
 
     /// Encode a 64 bit number
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::uint8_t *encodeNumber(double num);
+    static gnash::Network::byte_t *encodeNumber(double num);
     
     /// Encode a element. 
     ///
@@ -244,7 +227,7 @@ public:
     /// @return a newly allocated byte array.
     /// to be deleted by caller using delete [] operator, or NULL
     ///
-    static boost::uint8_t *encodeElement(amf::Element *el);
+    static gnash::Network::byte_t *encodeElement(amf::Element *el);
 
     /// Encode an array of elements. 
     ///
@@ -253,7 +236,7 @@ public:
     /// @return a newly allocated byte array.
     /// to be deleted by caller using delete [] operator, or NULL
     ///
-    static std::vector<boost::uint8_t> *encodeElement(std::vector<amf::Element *> &els);
+    static std::vector<gnash::Network::byte_t> *encodeElement(std::vector<amf::Element *> &els);
 
     /// Encode a variable. 
     //
@@ -265,7 +248,7 @@ public:
     ///         in form of a newly allocated byte array.
     ///         to be deleted by caller using delete [] operator, or NULL
     ///
-    boost::uint8_t *encodeVariable(amf::Element *el, size_t& outsize);
+    gnash::Network::byte_t *encodeVariable(amf::Element *el, size_t& outsize);
 
 #if 0
     /// Encode an element
@@ -281,40 +264,40 @@ public:
     ///
     /// @return an amf packet (header,data)
     ///
-    static boost::uint8_t* encodeElement(Element::astype_e type, const void *in, int nbytes);
+    static gnash::Network::byte_t* encodeElement(Element::astype_e type, const void *in, int nbytes);
 
     /// @return a newly allocated byte array,
     /// to be deleted by caller using delete [] operator, or NULL
     ///
-    static boost::uint8_t* encodeVariable(const char *name);
+    static gnash::Network::byte_t* encodeVariable(const char *name);
 
     /// Encode a boolean variable. This is a name followed by a boolean value.
     //
     /// @return a newly allocated byte array,
     /// to be deleted by caller using delete [] operator, or NULL
     ///
-    static boost::uint8_t* encodeVariable(const char *name, bool flag);
+    static gnash::Network::byte_t* encodeVariable(const char *name, bool flag);
 
     /// Encode a variable. 
     //
     /// @return a newly allocated byte array,
     /// to be deleted by caller using delete [] operator, or NULL
     ///
-    static boost::uint8_t* encodeVariable(const char *name, double num);
+    static gnash::Network::byte_t* encodeVariable(const char *name, double num);
 
     /// Encode a variable. 
     //
     /// @return a newly allocated byte array,
     /// to be deleted by caller using delete [] operator, or NULL
     ///
-    static boost::uint8_t* encodeVariable(std::string &name, std::string &val);
+    static gnash::Network::byte_t* encodeVariable(std::string &name, std::string &val);
 
     /// Encode a variable. 
     //
     /// @return a newly allocated byte array,
     /// to be deleted by caller using delete [] operator, or NULL
     ///
-    static boost::uint8_t* encodeVariable(const char *name, const char *val);
+    static gnash::Network::byte_t* encodeVariable(const char *name, const char *val);
 
     void *encodeRTMPHeader(int amf_index, amf_headersize_e head_size, int total_size,
                            content_types_e type, amfsource_e routing);
@@ -322,7 +305,7 @@ public:
 //     amfbody_t *encodeBody(amfutf8_t *target, amfutf8_t *response, int nbytes, void *data);
 //    amfpacket_t *encodePacket(std::vector<amfhead_t *> messages);
 
-//    std::vector<amf_element_t> *readElements(boost::uint8_t *in);
+//    std::vector<amf_element_t> *readElements(gnash::Network::byte_t *in);
     
     /// Extract the string from a string-type AMF packet
     //
@@ -336,39 +319,31 @@ public:
     //
     // Methods for extracting data from big endian formatted raw AMF data.
     //
-    amf::Element::astype_e extractElementHeader(boost::uint8_t *in)
+    amf::Element::astype_e extractElementHeader(gnash::Network::byte_t *in)
 	{ return *(reinterpret_cast<amf::Element::astype_e *>(in)); };
     
-    boost::uint8_t *extractElement(amf::Element *el, boost::uint8_t *in);
-    boost::uint8_t *extractVariable(amf::Element *el, boost::uint8_t *in);
+    gnash::Network::byte_t *extractElement(amf::Element *el, gnash::Network::byte_t *in);
+    gnash::Network::byte_t *extractVariable(amf::Element *el, gnash::Network::byte_t *in);
     
 #if 0
     // FIXME: these should return an Element, and then use to_*() to convert.
-    char *extractString(const boost::uint8_t* in);
+    char *extractString(const gnash::Network::byte_t* in);
 
-    double extractNumber(const boost::uint8_t *in);
-    Element &extractObject(const boost::uint8_t *in);
+    double extractNumber(const gnash::Network::byte_t *in);
+    Element &extractObject(const gnash::Network::byte_t *in);
     
 
     // FIXME: these are all for RTMP, and should be moved
-    bool parseAMF(boost::uint8_t *in);
-    static int headerSize(int8_t header);
+    bool parseAMF(gnash::Network::byte_t *in);
     int packetReadAMF(int bytes);
 
-    int parseHeader(boost::uint8_t *in);
     int parseBody();
-    int getHeaderSize()         { return _header_size; }; 
-    int getTotalSize()          { return _total_size; }; 
-    int getPacketSize()         { return _packet_size; };
-    int getMysteryWord()        { return _mystery_word; };
-    amfsource_e getRouting()    { return _src_dest; };
-    int getAMFIndex()           { return _amf_index; };
-    boost::uint8_t *addPacketData(boost::uint8_t *data, int bytes);
+    gnash::Network::byte_t *addPacketData(gnash::Network::byte_t *data, int bytes);
 #endif    
 
-    content_types_e getType()   { return _type; };
+//    content_types_e getType()   { return _type; };
 //    std::map<std::string, Element> *getElements() { return &_elements; };
-    boost::uint8_t *appendPtr(boost::uint8_t *data, boost::uint8_t *var,
+    gnash::Network::byte_t *appendPtr(gnash::Network::byte_t *data, gnash::Network::byte_t *var,
 			      int bytes) {
 	memcpy(data, var, bytes);
 	return data += bytes;
@@ -383,11 +358,11 @@ public:
     int                 _header_size;
     int                 _total_size;
     int                 _packet_size;
-    boost::uint8_t      *_amf_data;
-    boost::uint8_t      *_seekptr;
+    gnash::Network::byte_t      *_amf_data;
+    gnash::Network::byte_t      *_seekptr;
     amfsource_e         _src_dest;
 #endif
-    content_types_e     _type;
+//    content_types_e     _type;
     int                 _mystery_word;
 };
  

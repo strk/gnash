@@ -36,6 +36,7 @@
 #include <sys/stat.h>
 #include <algorithm>
 
+#include "amf.h"
 #include "http.h"
 #include "log.h"
 #include "network.h"
@@ -213,7 +214,7 @@ HTTP::formatErrorResponse(http_status_e code)
     _filesize = _body.str().size();
     formatContentLength(_filesize);
     formatConnection("close");
-    formatContentType(HTTP::FILETYPE_HTML);
+    formatContentType(amf::AMF::FILETYPE_HTML);
     return true;
 }
 
@@ -301,26 +302,26 @@ HTTP::formatContentType()
 }
 
 bool
-HTTP::formatContentType(filetype_e filetype)
+HTTP::formatContentType(amf::AMF::filetype_e filetype)
 {
 //    GNASH_REPORT_FUNCTION;
     
     switch (filetype) {
-      case FILETYPE_HTML:
+      case amf::AMF::FILETYPE_HTML:
 	  _header << "Content-Type: text/html" << "\r\n";
 //	  _header << "Content-Type: text/html; charset=UTF-8" << "\r\n";
 	  break;
-      case FILETYPE_SWF:
+      case amf::AMF::FILETYPE_SWF:
 	  _header << "Content-Type: application/x-shockwave-flash" << "\r\n";
 //	  _header << "Content-Type: application/futuresplash" << "\r\n";
 	  break;
-      case FILETYPE_VIDEO:
+      case amf::AMF::FILETYPE_VIDEO:
 	  _header << "Content-Type: video/flv" << "\r\n";
 	  break;
-      case FILETYPE_MP3:
+      case amf::AMF::FILETYPE_MP3:
 	  _header << "Content-Type: audio/mpeg" << "\r\n";
 	  break;
-      case FILETYPE_FCS:
+      case amf::AMF::FILETYPE_FCS:
 	  _header << "Content-Type: application/x-fcs" << "\r\n";
 	  break;
       default:
@@ -473,7 +474,7 @@ HTTP::sendPostReply(rtmpt_cmd_e code)
     _header << "HTTP/1.1 200 OK" << "\r\n";
     formatDate();
     formatServer();
-    formatContentType(HTTP::FILETYPE_FCS);
+    formatContentType(amf::AMF::FILETYPE_FCS);
     // All HTTP messages are followed by a blank line.
     terminateHeader();
     return true;
@@ -1080,7 +1081,7 @@ HTTP::extractTE(Network::byte_t *data) {
 
 // Get the file type, so we know how to set the
 // Content-type in the header.
-HTTP::filetype_e
+amf::AMF::filetype_e
 HTTP::getFileStats(std::string &filespec)
 {
 //    GNASH_REPORT_FUNCTION;    
@@ -1111,25 +1112,25 @@ HTTP::getFileStats(std::string &filespec)
 		if (pos != string::npos) {
 		    string suffix = filespec.substr(pos, filespec.size());
 		    if (suffix == "html") {
-			_filetype = FILETYPE_HTML;
+			_filetype = amf::AMF::FILETYPE_HTML;
 			log_debug("HTML content found");
 		    }
 		    if (suffix == "swf") {
-			_filetype = FILETYPE_SWF;
+			_filetype = amf::AMF::FILETYPE_SWF;
 			log_debug("SWF content found");
 		    }
 		    if (suffix == "flv") {
-			_filetype = FILETYPE_VIDEO;
+			_filetype = amf::AMF::FILETYPE_VIDEO;
 			log_debug("FLV content found");
 		    }
 		    if (suffix == "mp3") {
-			_filetype = FILETYPE_AUDIO;
+			_filetype = amf::AMF::FILETYPE_AUDIO;
 			log_debug("MP3 content found");
 		    }
 		}
 	    }
 	} else {
-	    _filetype = HTTP::FILETYPE_ERROR;
+	    _filetype = amf::AMF::FILETYPE_ERROR;
 	} // end of stat()
     } // end of try_waiting
 
@@ -1238,7 +1239,7 @@ httphandler(Handler::thread_params_t *args)
 	parameters = url.substr(pos + 1, url.size());
 	// Get the file size for the HTTP header
 	
-	if (www.getFileStats(filespec) == HTTP::FILETYPE_ERROR) {
+	if (www.getFileStats(filespec) == amf::AMF::FILETYPE_ERROR) {
 	    www.formatErrorResponse(HTTP::NOT_FOUND);
 	}
 	www.sendGetReply(HTTP::LIFE_IS_GOOD);

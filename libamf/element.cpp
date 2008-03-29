@@ -590,7 +590,8 @@ Element::dump()
       case Element::RECORD_SET:
       case Element::XML_OBJECT:
       case Element::TYPED_OBJECT:
-	  cerr << "AMF data is: 0x%s" << hexify(_data, _length, false) << endl;
+//	  cerr << "AMF data is: 0x" << hexify(_data, _length, false) << endl;
+	  log_debug("FIXME: got a typed object!");
 	  break;
       case Element::VARIABLE:
       case Element::FUNCTION:

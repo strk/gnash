@@ -23,6 +23,7 @@
 #include <map>
 #include <vector>
 
+#include "amf.h"
 #include "rtmp.h"
 #include "handler.h"
 #include "network.h"
@@ -107,17 +108,6 @@ public:
         const char *code;
         const char *msg;
     };
-    typedef enum {
-	FILETYPE_ERROR = -1,
-	FILETYPE_NONE = 0,
-	FILETYPE_HTML,
-	FILETYPE_SWF,
-	FILETYPE_VIDEO,
-	FILETYPE_AUDIO,
-	FILETYPE_MP3,
-	FILETYPE_FCS,
-	FILETYPE_OSCP
-    } filetype_e;
     HTTP();
     HTTP(Handler *hand);
     ~HTTP();
@@ -199,7 +189,7 @@ public:
     bool formatContentLength();
     bool formatContentLength(int filesize);
     bool formatContentType();
-    bool formatContentType(filetype_e type);
+    bool formatContentType(amf::AMF::filetype_e type);
     bool formatHost(const std::string &data);
     bool formatAgent(const std::string &data);
     bool formatAcceptRanges(const std::string &data);
@@ -225,7 +215,7 @@ public:
     // Get the file type, so we know how to set the
     // Content-type in the header.
 //    filetype_e getFileType(std::string &filespec);
-    filetype_e getFileStats(std::string &filespec);
+    amf::AMF::filetype_e getFileStats(std::string &filespec);
     void dump();
 
     // These accessors are used mostly just for debugging.
@@ -254,7 +244,7 @@ private:
     std::stringstream _header;
     std::stringstream _body;
     std::string _command;
-    filetype_e  _filetype;
+    amf::AMF::filetype_e  _filetype;
     std::string _filespec;
     int         _filesize;
     std::string _url;

@@ -35,6 +35,7 @@
 #include "utility.h"
 
 #include "rtmp.h"
+#include "rtmp_server.h"
 #include "http.h"
 
 using namespace gnash;
@@ -223,7 +224,7 @@ netin_handler(Handler::thread_params_t *args)
 	}
 	// We got data. Resize the buffer if necessary.
 	if (ret > 0) {
-	    if (ret != buf->size()) {
+	    if (ret < NETBUFSIZE) {
 		buf->resize(ret);
 	    }
 	    hand->push(buf);

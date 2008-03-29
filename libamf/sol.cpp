@@ -370,7 +370,7 @@ SOL::readFile(std::string &filespec)
 	    amf::Element *el = new amf::Element;
 	    ptr = amf_obj.extractVariable(el, ptr);
             if (ptr != 0) {
-		ptr += 1;    
+		ptr += 1;
 		addObj(el);
 	    } else {
 		break;
@@ -388,7 +388,6 @@ SOL::readFile(std::string &filespec)
 void
 SOL::dump()
 {
-    uint8_t *hexint;
     vector<amf::Element *>::iterator it;
 
     cerr << "Dumping SOL file" << endl;

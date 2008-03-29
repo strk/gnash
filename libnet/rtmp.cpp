@@ -22,6 +22,8 @@
 #endif
 
 #include <iostream>
+#include <string>
+#include <map>
 
 #if ! (defined(_WIN32) || defined(WIN32))
 #	include <netinet/in.h>
@@ -31,6 +33,7 @@
 #include "amf.h"
 #include "rtmp.h"
 #include "network.h"
+#include "element.h"
 #include "handler.h"
 #include "utility.h"
 
@@ -42,6 +45,30 @@ namespace gnash
 {
 
 extern map<int, Handler *> handlers;
+
+const char *content_str[] = {
+    "None",
+    "Chunk Size",
+    "Unknown",
+    "Bytes Read",
+    "Ping",
+    "Server",
+    "Client",
+    "Unknown2",
+    "Audio Data",
+    "Video Data",
+    "Unknown3",
+    "Blank 0xb",
+    "Blank 0xc",
+    "Blank 0xd",
+    "Blank 0xe",
+    "Blank 0xf",
+    "Blank 0x10",
+    "Blank 0x11",
+    "Notify",
+    "Shared object",
+    "Invoke"
+};
 
 // These are the textual responses
 const char *response_str[] = {
@@ -99,64 +126,33 @@ RTMPproto::~RTMPproto()
 }
 
 void
-RTMPproto::addVariable(char *name, char *value)
+RTMPproto::addVariable(amf::Element *el)
 {
-    _variables[name] = value;
+//    GNASH_REPORT_FUNCTION;
+    _variables[el->getName().c_str()] = el;
 }
 
-std::string
-RTMPproto::getVariable(char *name)
-{
-    return _variables[name];
+void
+RTMPproto::addVariable(char *name, Element *el)
+{ 
+//    GNASH_REPORT_FUNCTION;
+    _variables[name] = el;
 }
 
-// The handshake is a byte with the value of 0x3, followed by 1536
-// bytes of gibberish which we need to store for later.
-bool
-RTMPproto::handShakeWait()
+amf::Element *
+RTMPproto::getVariable(const std::string &name)
 {
-    GNASH_REPORT_FUNCTION;
-
-//     char buffer[RTMP_BODY_SIZE+16];
-//     memset(buffer, 0, RTMP_BODY_SIZE+16);
-    Buffer *buf = _handler->pop();
-
-    if (buf == 0) {
-	log_debug("Que empty, net connection dropped for fd #%d", _handler->getFileFd());
-	return false;
-    }    
-//     if (readNet(buffer, 1) == 1) {
-    log_debug (_("Read initial Handshake Request"));
-//     } else {
-//         log_error (_("Couldn't read initial Handshake Request"));
-//         return false;
-//     }
-//    _inbytes += 1;
-
-    if (*(buf->reference()) == 0x3) {
-        log_debug (_("Handshake is correct"));
-    } else {
-        log_error (_("Handshake isn't correct"));
-        return false;
+//    GNASH_REPORT_FUNCTION;
+//    return _variables[name.c_str()];
+    map<const char *, amf::Element *>::iterator it;
+    for (it = _variables.begin(); it != _variables.end(); it++) {
+	const char *title = it->first;
+	Element *el = it->second;
+	if (name == title) {
+// 	    log_debug("found variable in RTMP packet: %s", name);
+	    return el;
+	}
     }
-
-//     if (buf->size() >= RTMP_BODY_SIZE) {
-// 	secret = _handler->merge(buf->reference());
-//     }
-
-    if (buf->size() >= RTMP_BODY_SIZE) {
-	_handshake = new Buffer(RTMP_BODY_SIZE);
-	_handshake->copy(buf->reference() + 1, RTMP_BODY_SIZE);
-	log_debug (_("Handshake Data matched"));
-	delete buf;			// we're done with the buffer
-	return true;
-    } else {
-	delete buf;			// we're done with the buffer
- 	log_error (_("Handshake Data didn't match"));
- 	return false;
-    }
-    
-    return true;
 }
 
 // A request for a handshake is initiated by sending a byte with a
@@ -190,27 +186,6 @@ RTMPproto::handShakeRequest()
 #endif
     
     return true;
-}
-
-// The response is the gibberish sent back twice, preceeded by a byte
-// with the value of 0x3.
-bool
-RTMPproto::handShakeResponse()
-{
-    GNASH_REPORT_FUNCTION;
-
-    Buffer *buf = new Buffer((RTMP_BODY_SIZE * 2) + 1);
-    Network::byte_t *ptr = buf->reference();
-    *ptr = 0x3;
-
-    std::copy(_handshake->begin(), _handshake->end(), (ptr + 1));
-    std::copy(_handshake->begin(), _handshake->end(), ptr + _handshake->size() + 1);
-    _handler->pushout(buf);
-    _handler->notifyout();
-
-    log_debug("Sent RTMP Handshake response");
-
-    return true;    
 }
 
 // The client finished the handshake process by sending the second
@@ -249,53 +224,15 @@ RTMPproto::clientFinish()
 }
 
 bool
-RTMPproto::serverFinish()
-{
-    GNASH_REPORT_FUNCTION;
-
-    Buffer *buf = _handler->pop();
-    Buffer *obj = buf;
-    
-    if (buf == 0) {
-	log_debug("Que empty, net connection dropped for fd #%d", _handler->getFileFd());
-	return false;
-    }
-    
-    // The first data packet is often buried in with the end of the handshake.
-    // So after the handshake block, we strip that part off, and just pass on
-    // the remainder for processing.
-    if (buf->size() > RTMP_BODY_SIZE) {
-	int size = buf->size() - RTMP_BODY_SIZE;  
-	obj = new Buffer[size];
-	obj->copy(buf->begin()+RTMP_BODY_SIZE, size);
-    } else {
-	_handler->wait();
-	obj = _handler->pop();
-    }
-    
-    int diff = std::memcmp(buf->begin(), _handshake->begin(), RTMP_BODY_SIZE);
-    delete buf;			// we're done with the buffer
-    if (diff == 0) {
-	log_debug (_("Handshake Finish Data matched"));
-    } else {
-	log_error (_("Handshake Finish Data didn't match by %d bytes"), diff);
-//        return false;
-    }
-    
-    packetRead(obj);
-    
-    return true;
-}
-
-bool
 RTMPproto::packetRequest()
 {
     GNASH_REPORT_FUNCTION;
     return false;
 }
 
+#if 0
 bool
-RTMPproto::packetSend(Buffer *buf)
+RTMPproto::packetSend(Buffer * /* buf */)
 {
     GNASH_REPORT_FUNCTION;
     return false;
@@ -306,7 +243,6 @@ RTMPproto::packetRead(Buffer *buf)
 {
     GNASH_REPORT_FUNCTION;
 
-    int ret;
     int packetsize = 0;
     unsigned int amf_index, headersize;
     Network::byte_t *ptr = buf->reference();
@@ -328,41 +264,81 @@ RTMPproto::packetRead(Buffer *buf)
 //         }
 //     }
 
+#if 1
+    Network::byte_t *end = buf->remove(0xc3);
+#else
     Network::byte_t *end = buf->find(0xc3);
-    log_debug("END is 0x%x", (void *)end);
+    log_debug("END is %x", (void *)end);
     *end = '*';
-    packetsize = parseHeader(ptr);
-    ptr += headersize;
-
+#endif
+    ptr = parseHeader(ptr);
+//     ptr += headersize;
+    
     Element el;
     ptr = amf.extractElement(&el, ptr);
     el.dump();
     ptr = amf.extractElement(&el, ptr) + 1;
     el.dump();
     log_debug (_("Reading AMF packets till we're done..."));
-//    buf->dump();
+    buf->dump();
     while (ptr < end) {
 	amf::Element *el = new amf::Element;
 	ptr = amf.extractVariable(el, ptr);
+	addVariable(el);
 	el->dump();
-// 	if (ptr != 0) {
-// 	    ptr += 1;    
-// //	    addObj(el);
-// 	} else {
-// 	    break;
-// 	    }
     }
     ptr += 1;
-    while (ptr < buf->end()) {
+    size_t actual_size = static_cast<size_t>(_total_size - AMF_HEADER_SIZE);
+    log_debug("Total size in header is %d, buffer size is: %d", _total_size, buf->size());
+//    buf->dump();
+    if (buf->size() < actual_size) {
+	log_debug("FIXME: MERGING");
+	buf = _handler->merge(buf);
+    }
+    while ((ptr - buf->begin()) < actual_size) {
 	amf::Element *el = new amf::Element;
-	ptr = amf.extractVariable(el, ptr);
-	el->dump();
+	if (ptr) {
+	    ptr = amf.extractVariable(el, ptr);
+	    addVariable(el);
+	} else {
+	    return true;
+	}
+	el->dump();		// FIXME: dump the AMF objects as they are read in
+    }
+
+    dump();
+    
+    Element *url = getVariable("tcUrl");
+    Element *file = getVariable("swfUrl");
+    Element *app = getVariable("app");
+
+    if (file) {
+	log_debug("SWF file %s", file->getData());
+    }
+    if (url) {
+	log_debug("is Loading video %s", url->getData());
+    }
+    if (app) {
+	log_debug("is file name is %s", app->getData());
     }
     
     return true;
 }
+#endif
 
-int
+void
+RTMPproto::dump()
+{
+    cerr << "RTMP packet contains " << _variables.size() << " variables." << endl;
+    map<const char *, amf::Element *>::iterator it;
+    for (it = _variables.begin(); it != _variables.end(); it++) {
+//	const char *name = it->first;
+	Element *el = it->second;
+	el->dump();
+    }
+}
+
+Network::byte_t *
 RTMPproto::parseHeader(Network::byte_t *in)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -394,125 +370,41 @@ RTMPproto::parseHeader(Network::byte_t *in)
     }
 
     if (_header_size >= 8) {
-        _type = *(AMF::content_types_e *)tmpptr;
+        _type = *(content_types_e *)tmpptr;
         tmpptr++;
-        log_debug(_("The type is: 0x%x"), _type);
+        log_debug(_("The type is: %s"), content_str[_type]);
     }
 
-    switch(_type) {
-      case AMF::CHUNK_SIZE:
-      case AMF::BYTES_READ:
-      case AMF::PING:
-      case AMF::SERVER:
-      case AMF::CLIENT:
-      case AMF::VIDEO_DATA:
-      case AMF::NOTIFY:
-      case AMF::SHARED_OBJ:
-      case AMF::INVOKE:
-          _packet_size = AMF_VIDEO_PACKET_SIZE;
-          break;
-      case AMF::AUDIO_DATA:
-          _packet_size = AMF_AUDIO_PACKET_SIZE;
-          break;
-      default:
-          log_error (_("ERROR: Unidentified AMF header data type 0x%x"), _type);
-          break;
-    };
+//     switch(_type) {
+//       case CHUNK_SIZE:
+//       case BYTES_READ:
+//       case PING:
+//       case SERVER:
+//       case CLIENT:
+//       case VIDEO_DATA:
+//       case NOTIFY:
+//       case SHARED_OBJ:
+//       case INVOKE:
+//           _packet_size = AMF_VIDEO_PACKET_SIZE;
+//           break;
+//       case AUDIO_DATA:
+//           _packet_size = AMF_AUDIO_PACKET_SIZE;
+//           break;
+//       default:
+//           log_error (_("ERROR: Unidentified AMF header data type 0x%x"), _type);
+//           break;
+//     };
     
     if (_header_size == 12) {
 //        hexify((Network::byte_t *)hexint, (Network::byte_t *)tmpptr, 3, false);
         _src_dest = *(reinterpret_cast<rtmp_source_e *>(tmpptr));
         tmpptr += sizeof(unsigned int);
-//        log_debug(_("The source/destination is: %d, or 0x%s"), _src_dest, hexint);
+        log_debug(_("The source/destination is: %x"), _src_dest);
     }
 
-    return _packet_size;
+    return tmpptr;
 }
 
-// This is the thread for all incoming RTMP connections
-void
-rtmp_handler(Handler::thread_params_t *args)
-{
-    GNASH_REPORT_FUNCTION;
-    Handler *hand = reinterpret_cast<Handler *>(args->handle);
-    RTMPproto rtmp;
-
-    rtmp.setHandler(hand);
-    string docroot = args->filespec;
-
-    log_debug(_("Starting RTMP Handler for fd #%d, tid %ld"),
-	      args->netfd, get_thread_id());
-    
-    while (!hand->timetodie()) {	
- 	log_debug(_("Waiting for RTMP request on fd #%d..."), args->netfd);
-	hand->wait();
-	// This thread is the last to wake up when the browser
-	// closes the network connection. When browsers do this
-	// varies, elinks and lynx are very forgiving to a more
-	// flexible HTTP protocol, which Firefox/Mozilla & Opera
-	// are much pickier, and will hang or fail to load if
-	// you aren't careful.
-	if (hand->timetodie()) {
-	    log_debug("Not waiting no more, no more for RTMP data for fd #%d...", args->netfd);
-	    map<int, Handler *>::iterator hit = handlers.find(args->netfd);
-	    if ((*hit).second) {
-		log_debug("Removing handle %x for RTMP on fd #%d", (void *)hand), args->netfd;
-		handlers.erase(args->netfd);
-	    }
-
-	    return;
-	}
-#ifdef USE_STATISTICS
-	struct timespec start;
-	clock_gettime (CLOCK_REALTIME, &start);
-#endif
-	if (!rtmp.handShakeWait()) {
-	    hand->clearout();	// remove all data from the outgoing que
-	    hand->die();	// tell all the threads for this connection to die
-	    hand->notifyin();
-	    log_debug("Net RTMP done for fd #%d...", args->netfd);
-// 	    hand->closeNet(args->netfd);
-	    return;
-	}
-	string url, filespec;
-	url = docroot;
-	
-	rtmp.handShakeResponse();
-
-	hand->wait();
-	// This thread is the last to wake up when the browser
-	// closes the network connection. When browsers do this
-	// varies, elinks and lynx are very forgiving to a more
-	// flexible HTTP protocol, which Firefox/Mozilla & Opera
-	// are much pickier, and will hang or fail to load if
-	// you aren't careful.
-	if (hand->timetodie()) {
-	    log_debug("Not waiting no more, no more for RTMP data for fd #%d...", args->netfd);
-	    map<int, Handler *>::iterator hit = handlers.find(args->netfd);
-	    if ((*hit).second) {
-		log_debug("Removing handle %x for RTMP on fd #%d", (void *)hand), args->netfd;
-		handlers.erase(args->netfd);
-	    }
-
-	    return;
-	}
-	rtmp.serverFinish();
-    
-    // Keep track of the network statistics
-//    Statistics st;
-//    st.setFileType(NetStats::RTMP);
-// 	st.stopClock();
-//  	log_debug (_("Bytes read: %d"), proto.getBytesIn());
-//  	log_debug (_("Bytes written: %d"), proto.getBytesOut());
-// 	st.setBytes(proto.getBytesIn() + proto.getBytesOut());
-// 	st.addStats();
-// 	proto.resetBytesIn();
-// 	proto.resetBytesOut();	
-
-//	st.dump(); 
-    }
-}
-    
 } // end of gnash namespace
 
 // local Variables:

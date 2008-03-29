@@ -33,9 +33,11 @@ libgnashamf_la_LDFLAGS =  -release $(VERSION) ${AM_LDFLAGS}
 # noinst_HEADERS = amf.h amfutf8.h
 
 AM_CPPFLAGS = -I.. -I$(srcdir) \
+	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/server \
 	-I$(top_srcdir)/libbase \
 	$(BOOST_CFLAGS) \
+	$(PTHREAD_CFLAGS) \
         $(LIBXML_CFLAGS)
 
 AM_LDFLAGS = $(BOOST_LIBS)
@@ -45,7 +47,6 @@ noinst_HEADERS = \
 	amf.h \
 	element.h \
 	lcshm.h \
-	rtmp.h \
 	protocol.h \
 	sol.h
 
