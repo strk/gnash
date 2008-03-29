@@ -16,6 +16,9 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#ifndef GETCLOCKTIMER_HPP
+#define GETCLOCKTIMER_HPP 1
+
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
@@ -28,7 +31,7 @@
 
 #define CLOCK_REALTIME 0 /* Dummy */
 
-static int clock_gettime(int clk_id /* unused */, struct timespec *tp) {
+static int clock_gettime(int, struct timespec *tp) {
     
     struct timeval now;
     int ret = gettimeofday(&now, NULL);
@@ -42,3 +45,4 @@ static int clock_gettime(int clk_id /* unused */, struct timespec *tp) {
 }
 
 #endif
+#endif /* GETCLOCKTIMER_HPP */

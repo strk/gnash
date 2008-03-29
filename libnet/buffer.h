@@ -21,8 +21,8 @@
 
 #include <boost/cstdint.hpp>
 #include <string>
-#include <time.h>
 
+#include "getclocktime.hpp"
 #include "network.h"
 
 // _definst_ is the default instance name

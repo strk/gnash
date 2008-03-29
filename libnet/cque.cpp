@@ -24,11 +24,10 @@
 #include <vector>
 #include <deque>
 
-#include "getclocktime.hpp"
+#include "cque.h"
 #include "log.h"
 #include "gmemory.h"
 #include "buffer.h"
-#include "cque.h"
 
 using namespace gnash;
 using namespace std;

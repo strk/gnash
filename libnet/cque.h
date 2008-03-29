@@ -24,6 +24,7 @@
 #include <boost/thread/condition.hpp>
 #include <deque>
 
+#include "getclocktime.hpp"
 #include "buffer.h"
 #include "network.h"
 
