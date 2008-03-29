@@ -238,7 +238,7 @@ extern "C" {
 inline unsigned long int /* pthread_t */ get_thread_id(void)
 {
 #ifdef HAVE_PTHREADS
-    return reinterpret_cast<unsigned long int>(pthread_self());
+    return static_cast<unsigned long int>(pthread_self());
 #else
 # ifdef _WIN32
     return GetCurrentThreadId();
