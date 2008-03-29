@@ -1,3 +1,9 @@
+2008-03-29 Sandro Santilli <strk@keybit.net>
+
+	* libbase/log.{cpp,h}: drop unused timestamp variation code.
+	* testsuite/actionscript.all/Function.as: add test for user-defined
+	  function's constructor.
+
 2008-03-29  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* libamf/Makefile.am: Add libnet to include paths.

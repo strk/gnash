@@ -64,11 +64,6 @@ namespace gnash {
 
 #define DEBUGLEVEL 2
 
-//extern std::ostream& stampon(std::ostream& x);
-//extern std::ostream& stampoff(std::ostream& x);
-//extern std::ostream& timestamp(std::ostream& x);
-//extern std::ostream& datetimestamp(std::ostream& x);
-
 // This is a basic file logging class
 class DSOEXPORT LogFile {
 public:

@@ -76,21 +76,6 @@ hexify (const unsigned char *p, size_t length, bool ascii)
 
 }
 
-// FIXME: localize these, so they print local regional timestamps.
-std::ostream&
-timestamp(std::ostream& x)
-{
-	time_t t;
-	char buf[10];
-
-	memset (buf, '0', 10);		// this terminates the string
-	time (&t);					// get the current time
-	strftime (buf, sizeof(buf), "%H:%M:%S", localtime (&t));
-
-	return x << buf << ": ";
-}
-
-
 std::string
 timestamp() {
 
@@ -105,17 +90,6 @@ timestamp() {
 	ss << get_thread_id() << "] " << buf;
 	return ss.str();
 
-}
-
-std::ostream& datetimestamp(std::ostream& x) {
-	time_t t;
-	char buf[20];
-
-	memset (buf, '0', 20);		// this terminates the string
-	time (&t);					// get the current time
-	strftime (buf, sizeof(buf), "%Y-%m-%d %H:%M:%S ", localtime (&t));
-
-	return x << buf;
 }
 
 // This is a bit of a hack. We implement wrappers for the old
