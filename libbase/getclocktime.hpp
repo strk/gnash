@@ -26,7 +26,7 @@
 
 #include <sys/time.h>
 
-#define  CLOCK_REALTIME 0 /* Dummy */
+#define CLOCK_REALTIME 0 /* Dummy */
 
 static int clock_gettime(int clk_id /* unused */, struct timespec *tp) {
     
