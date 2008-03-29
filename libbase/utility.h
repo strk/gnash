@@ -241,9 +241,9 @@ inline unsigned long int /* pthread_t */ get_thread_id(void)
     return reinterpret_cast<unsigned long int>(pthread_self());
 #else
 # ifdef _WIN32
-    return reinterpret_cast<unsigned long int>(GetCurrentThreadId());
+    return GetCurrentThreadId();
 # else
-    return reinterpret_cast<unsigned long int>(getpid());
+    return static_cast<unsigned long int>(getpid());
 # endif
 #endif
 }
