@@ -1,5 +1,10 @@
 2008-03-28  Dossy Shiobara <dossy@panoptic.com>
 
+	* gui/gtk.cpp: Only include X11-specific headers if HAVE_X11 is
+	  defined.     
+
+2008-03-28  Dossy Shiobara <dossy@panoptic.com>
+
 	* libbase/utility.h: Provide get_thread_id() that returns the
 	  current thread ID or gracefully degrades to returning the
 	  current process ID if thread ID is not available.

@@ -34,7 +34,9 @@
 #include "lirc.h"
 
 #include <iostream>
+#ifdef HAVE_X11
 #include <X11/keysym.h>
+#endif
 
 #include <gtk/gtk.h>
 #ifndef _WIN32
