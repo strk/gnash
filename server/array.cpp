@@ -262,6 +262,10 @@ get_basic_cmp(boost::uint8_t flags, as_environment& env)
 {
 	as_cmp_fn f;
 
+	// fUniqueSort and fReturnIndexedArray must be stripped by caller
+	assert(flags^as_array_object::fUniqueSort);
+	assert(flags^as_array_object::fReturnIndexedArray);
+
 	switch ( flags )
 	{
 		case 0: // default string comparison
@@ -301,7 +305,7 @@ get_basic_cmp(boost::uint8_t flags, as_environment& env)
 			return f;
 
 		default:
-			log_error(_("Unhandled sort flags: %d (0x%X)"), flags, flags);
+			log_unimpl(_("Unhandled sort flags: %d (0x%X)"), (int)flags, (int)flags);
 			f = as_value_lt(env);
 			return f;
 	}
@@ -433,6 +437,8 @@ public:
 
 	bool operator() (const as_value& a, const as_value& b)
 	{
+		if ( _cmps.empty() ) return false;
+
 		std::deque<as_cmp_fn>::iterator cmp = _cmps.begin();
 		Props::iterator pit;
 
@@ -469,6 +475,8 @@ public:
 
 	bool operator() (const as_value& a, const as_value& b)
 	{
+		if ( _cmps.empty() ) return false;
+
 		Comps::iterator cmp = _cmps.begin();
 		Props::iterator pit;
 
@@ -1122,7 +1130,7 @@ array_sortOn(const fn_call& fn)
 		{
 			boost::uint8_t flags = 
 				static_cast<boost::uint8_t>(fn.arg(1).to_number());
-			flag_preprocess(flags, &do_unique, &do_index);
+			flags = flag_preprocess(flags, &do_unique, &do_index);
 			as_cmp_fn c = get_basic_cmp(flags, env);
 
 			cmp.assign(optnum, c);

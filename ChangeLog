@@ -1,5 +1,11 @@
 2008-03-29 Sandro Santilli <strk@keybit.net>
 
+	* server/array.cpp: don't assume multiprop comparator container is
+	  nonempty, add assertion checking in get_basic_cmp to ensure caller
+	  took care of stripping the fUniqueSort and fReturnIndexArray flags.
+
+2008-03-29 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/swfdec/: gen_run_swfdec_testsuite.sh, swfdec_gnash_tester:
 	  always take gnash crashes as real failures, expect it or not
 	  (yes, we have some crashes there..).
