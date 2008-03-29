@@ -407,12 +407,16 @@ as_function::constructInstance( as_environment& env,
 	{
 		// Set up the prototype.
 		as_value	proto;
-		// We can safaly call as_object::get_member here as member name is 
+
+		// We can safely call as_object::get_member here as member name is 
 		// a literal string in lowercase. (we should likely avoid calling
 		// get_member as a whole actually, and use a getProto() or similar
 		// method directly instead) TODO
-		bool func_has_prototype = get_member(NSV::PROP_PROTOTYPE, &proto);
-		assert(func_has_prototype);
+		/*bool func_has_prototype=*/ get_member(NSV::PROP_PROTOTYPE, &proto);
+
+		// user could have dropped the prototype..
+		// see construct-properties-#.swf from swfdec testsuite
+		//assert(func_has_prototype);
 
 		IF_VERBOSE_ACTION (
 		log_action(_("constructor prototype is %s"), proto.to_debug_string().c_str());
