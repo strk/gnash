@@ -34,6 +34,7 @@ AM_CPPFLAGS = -DSRCDIR=\"$(srcdir)\"
 INCLUDES = -I.. \
         -I$(top_srcdir)	\
         -I$(top_srcdir)/libamf \
+        -I$(top_srcdir)/libnet \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/server \
 	-I$(top_srcdir)/testsuite \
