@@ -13,7 +13,7 @@ FLAGS="-r11 -f10 -v"
 
 if [ -z "$1" ]; then
 	echo "Usage: `basename $0` <swffile> [<flags>]" >&2
-	exit 1
+	exit 2
 fi
 
 
@@ -21,6 +21,8 @@ in="$1"
 shift
 FLAGS="$FLAGS $@"
 out=`basename "${in}"`.trace-gnash
+logout=`basename "${in}"`.out
+logerr=`basename "${in}"`.err
 use_orig=0
 exp="${in}.trace"
 if [ -e "${in}.trace.org" ]; then
@@ -30,16 +32,17 @@ fi
 
 
 echo "Running ${GPROCESSOR} ${FLAGS} ${in}" >&2
-${GPROCESSOR} ${FLAGS} "$in"  | grep TRACE -A1 | sed '/^--$/d; s/.*TRACE: //; /\n*[0-9][0-9]*\].*/d; s/^$//;' > $out
+${GPROCESSOR} ${FLAGS} "$in" > $logout 2> $logerr
 if test "$?" != 0; then
 	echo "gprocessor returned an error"
-	exit 1
+	exit 2
+fi
+
+grep TRACE -A1 ${logout} | sed '/^--$/d; s/.*TRACE: //; /\n*[0-9][0-9]*\].*/d; s/^$//;' > $out
+if [ "$use_orig" != 0 ]; then
+	awk 'BEGIN {body=0;} { if (body) { print $0} else if (/^$/) {body=1} }' "$exp" | diff -u - "$out"
+	exit $?
 else
-	if [ "$use_orig" != 0 ]; then
-		awk 'BEGIN {body=0;} { if (body) { print $0} else if (/^$/) {body=1} }' "$exp" | diff -u - "$out"
-		exit $?
-	else
-		diff -u "$exp" "$out"
-		exit $?
-	fi
+	diff -u "$exp" "$out"
+	exit $?
 fi

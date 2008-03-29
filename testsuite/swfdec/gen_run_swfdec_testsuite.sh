@@ -80,22 +80,28 @@ for test in \`ls ${SWFDECTRACEDIR}/[$STARTPATTERN]*.swf\`; do
 	else
 		echo "NOTE: running \${testname} (expect pass: \${expectpasslabel})"
 	fi
-	if ${SWFDEC_GNASH_TESTER} \${test} \${flags} > \${testname}.log; then
+
+	${SWFDEC_GNASH_TESTER} \${test} \${flags} > \${testname}.log
+	ret=\$?
+	#echo "NOTE: ${SWFDEC_GNASH_TESTER} \${test} returned \$ret"
+	if [ \$ret -eq 0 ]; then
 		if [ "\${expectpass}" = "yes" ]; then
 			echo "PASSED: \${testid}"
 		else
 			echo "XPASSED: \${testid}"
 		fi	
-	else
-		if [ "\${expectpass}" = "yes" ]; then
-			echo "FAILED: \${testid} (traces in \${testname}.trace-gnash, log in \${testname}.log)"
-		else
-			if [ "\${usedtopass}" = "yes" ]; then
-				echo "XFAILED: \${testid} (USED TO PASS! traces in \${testname}.trace-gnash, log in \${testname}.log)"
+	elif [ \$ret -eq 1 ]; then
+			if [ "\${expectpass}" = "yes" ]; then
+				echo "FAILED: \${testid} (traces in \${testname}.trace-gnash, log in \${testname}.log)"
 			else
-				echo "XFAILED: \${testid} (traces in \${testname}.trace-gnash, log in \${testname}.log)"
+				if [ "\${usedtopass}" = "yes" ]; then
+					echo "XFAILED: \${testid} (USED TO PASS! traces in \${testname}.trace-gnash, log in \${testname}.log)"
+				else
+					echo "XFAILED: \${testid} (traces in \${testname}.trace-gnash, log in \${testname}.log)"
+				fi
 			fi
-		fi
+	else
+		echo "FAILED: \${testid} crashed gnash (stdout in \${testname}.out, stderr in \${testname}.err)"
 	fi
 done
 

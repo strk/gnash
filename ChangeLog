@@ -1,5 +1,11 @@
 2008-03-29 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/: gen_run_swfdec_testsuite.sh, swfdec_gnash_tester:
+	  always take gnash crashes as real failures, expect it or not
+	  (yes, we have some crashes there..).
+
+2008-03-29 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/swfdec/gen_run_swfdec_testsuite.sh: hint about tests
 	  that used to pass and are not passing anymore.
 	* libbase/log.{cpp,h}: drop unused timestamp variation code.
