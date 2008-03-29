@@ -228,7 +228,7 @@ main(int argc, char *argv[])
     // specified field, then next to see if the default works.
 //     bool formatContentType();
     http.clearHeader();
-    http.formatContentType(HTTP::SWF);
+    http.formatContentType(HTTP::FILETYPE_SWF);
 //    cerr << "FIXME: " << http.getHeader() << endl;
     regcomp (&regex_pat, "Content-Type: application/x-shockwave-flash.*$",
              REG_NOSUB|REG_NEWLINE);
