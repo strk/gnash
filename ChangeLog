@@ -1,3 +1,8 @@
+2008-03-29 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* libbase/getclocktime.hpp: Workaround for systems lacking
+	  clock_gettime().
+
 2008-03-28 Russ Nelson <nelson@crynwr.com>
 
 	* Fix this problem report:

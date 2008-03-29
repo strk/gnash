@@ -20,13 +20,11 @@
 #include "gnashconfig.h"
 #endif
 
-#ifdef HAVE_CLOCK_GETTIME
-# include <ctime>
-#else
-# include <sys/time.h>
-#endif
+#include <ctime>
 
 #ifndef HAVE_CLOCK_GETTIME
+
+#include <sys/time.h>
 
 #define  CLOCK_REALTIME 0 /* Dummy */
 

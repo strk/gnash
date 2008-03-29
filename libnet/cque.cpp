@@ -23,8 +23,8 @@
 #include <string>
 #include <vector>
 #include <deque>
-#include <ctime>
 
+#include "getclocktime.hpp"
 #include "log.h"
 #include "gmemory.h"
 #include "buffer.h"
