@@ -19,8 +19,8 @@
 #ifndef __PLUGININSTANCEBASE_H__
 #define __PLUGININSTANCEBASE_H__
 
+#include "dsodefs.h"
 #include "npplat.h"
-#include "tu_config.h"
 
 struct nsPluginCreateData
 {

@@ -24,7 +24,6 @@
 #endif
 
 #include "gnash.h"
-#include "tu_config.h"
 
 #include "oslib/colourtrans.h"
 #include "oslib/wimp.h"
@@ -38,7 +37,7 @@
 namespace gnash
 {
 
-class DSOEXPORT RiscosGui : public Gui
+class RiscosGui : public Gui
 {
  public:
     RiscosGui(unsigned long xid, float scale, bool loop, unsigned int depth);

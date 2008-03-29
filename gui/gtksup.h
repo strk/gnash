@@ -23,7 +23,6 @@
 #endif
 
 #include "gnash.h"
-#include "tu_config.h" // for DSOEXPORT
 #include "gtk_glue.h"
 
 #ifndef _WIN32
@@ -48,7 +47,7 @@ namespace gnash
 
 typedef bool (*callback_t)(void*, int, void *data);
 
-class DSOEXPORT GtkGui : public Gui
+class GtkGui : public Gui
 {
  public:
     GtkGui(unsigned long xid, float scale, bool loop, unsigned int depth);

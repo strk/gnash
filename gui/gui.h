@@ -22,7 +22,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include "tu_config.h"
 #include "rect.h"  // for composition
 #include "snappingrange.h"  // for InvalidatedRanges
 #include "gnash.h" // for gnash::key::code type
@@ -59,7 +58,7 @@ enum gnash_cursor_type {
 };
 
 /// Parent class from which all GUI implementations will depend.
-class DSOEXPORT Gui {
+class Gui {
 
 public:
 

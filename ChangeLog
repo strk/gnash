@@ -1,3 +1,14 @@
+2008-03-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* plugin/mozilla-sdk/pluginbase.h: replace tu_config with
+	  dsodefs.
+	* gui/NullGui.h
+	* gui/gtksup.h
+	* gui/gui.h
+	* gui/kdesup.h
+	* gui/riscossup.h
+	* gui/sdlsup.h: drop tu_config.h, remove visibility qualifiers.
+
 2008-03-28  Dossy Shiobara <dossy@panoptic.com>
 
 	* gui/gtk.cpp: Only include X11-specific headers if HAVE_X11 is

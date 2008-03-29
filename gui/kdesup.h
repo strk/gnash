@@ -22,7 +22,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include "tu_config.h"
 #include "gui.h"
 
 #include <qapplication.h>
@@ -50,7 +49,7 @@ namespace gnash
 
 class KdeGui;
 
-class DSOEXPORT qwidget : public WIDGETCLASS
+class qwidget : public WIDGETCLASS
 {
     Q_OBJECT
 public:
