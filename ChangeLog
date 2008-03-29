@@ -1,5 +1,15 @@
 2008-03-28  Dossy Shiobara <dossy@panoptic.com>
 
+	* libbase/utility.h: Provide get_thread_id() that returns the
+	  current thread ID or gracefully degrades to returning the
+	  current process ID if thread ID is not available.
+
+	* libbase/log.cpp, libnet/handler.cpp, libnet/http.cpp,
+	  libnet/rtmp.cpp: Don't call pthread_self() directly, use
+	  get_thread_id() instead.
+
+2008-03-28  Dossy Shiobara <dossy@panoptic.com>
+
 	* libnet/http.cpp, libnet/http.h, libnet/statistics.h:
 	  Disambiguate symbols with prefixes as GCC 3.x doesn't have
 	  strongly typed enums.

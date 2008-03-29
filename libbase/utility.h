@@ -220,6 +220,34 @@ std::string typeName(const T& inst)
 	return typeName;
 }
 
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#else
+# ifdef _WIN32
+/* We can't pull in all of windows.h here, so lets just copy this here. */
+extern "C" {
+    unsigned long int /* DWORD WINAPI */ GetCurrentThreadId(void);
+}
+# else
+/* getpid() */
+#include <sys/types.h>
+#include <unistd.h>
+# endif
+#endif
+
+inline unsigned long int /* pthread_t */ get_thread_id(void)
+{
+#ifdef HAVE_PTHREADS
+    return pthread_self();
+#else
+# ifdef _WIN32
+    return GetCurrentThreadId();
+# else
+    return getpid();
+# endif
+#endif
+}
+
 #endif // UTILITY_H
 
 
