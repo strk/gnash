@@ -885,8 +885,10 @@ SWFHandlers::ActionSubString(ActionExec& thread)
     // input checks
     if ( strval.is_undefined() || strval.is_null() )
     {
-    	log_error(_("Undefined or null string passed to ActionSubString, "
+	IF_VERBOSE_ASCODING_ERRORS(
+    	log_aserror(_("Undefined or null string passed to ActionSubString, "
 		"returning undefined"));
+        );
     	env.drop(2);
     	env.top(0).set_undefined();
 	    return;
@@ -909,6 +911,14 @@ SWFHandlers::ActionSubString(ActionExec& thread)
 	    );
 	    size = wstr.length();
     }
+
+    if ( size == 0 || wstr.empty() )
+    {
+        env.drop(2);
+        env.top(0).set_string("");
+        return;
+    }
+
 
     // TODO: if 'start' or 'size' do not evaluate to numbers return
     //       the empty string (how do we check if they evaluate ??)
@@ -935,13 +945,6 @@ SWFHandlers::ActionSubString(ActionExec& thread)
 	    return;
     }
 
-    if (size == 0)
-    {
-        env.drop(2);
-        env.top(0).set_string("");
-        return;
-    }
-
     // Adjust the start for our own use.
     --start;
 
@@ -953,7 +956,6 @@ SWFHandlers::ActionSubString(ActionExec& thread)
 	    );
 	    size = wstr.length() - start;
     }
-
 
     assert(start >= 0);
     assert(static_cast<unsigned int>(start) < wstr.length() );

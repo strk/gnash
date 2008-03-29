@@ -1,5 +1,12 @@
 2008-03-29 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionSubString): don't choke on empty
+	  strings. Fixes last crash in swfdec testsuite.
+	* testsuite/actionscript.all/String.as: test ACTION_SUBSTRING with
+	  empty input.
+
+2008-03-29 Sandro Santilli <strk@keybit.net>
+
 	* server/video_stream_instance.{cpp,h}: don't attach character
 	  properties if it's not a character (a user-created Video instance).
 	  Fixes more crashes in swfdec testsuite.

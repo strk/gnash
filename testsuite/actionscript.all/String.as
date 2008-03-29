@@ -17,7 +17,7 @@
 // Original author: Mike Carlson - June 19th, 2006
 
 
-rcsid="$Id: String.as,v 1.48 2008/03/17 08:06:47 bwy Exp $";
+rcsid="$Id: String.as,v 1.49 2008/03/29 23:41:05 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(String), 'function');
@@ -493,6 +493,16 @@ asm {
 };
 check_equals( b, "f");
 
+asm {
+	push "b"
+	push ""
+	push "0" 
+	push "1" 
+	substring
+	setvariable
+};
+check_equals( b, "");
+
 teststr = "Heöllo";
 count1 = 0;
 count2 = 0;
@@ -746,7 +756,7 @@ r = "s:"+s;
 check_equals(r, "s:");
 
 #if OUTPUT_VERSION < 6
- check_totals(203);
+ check_totals(204);
 #else
- check_totals(233);
+ check_totals(234);
 #endif
