@@ -484,20 +484,19 @@ static int headroom(int *la, short *sa)
 
 static void get_sample_bits(float *buf, int *bits)
 {
-	int i, j;
+	int i = 0, j;
 	short sbuf[128];
 	int bitsum = 0, last_bitsum, small_bitsum, big_bitsum;
-	short shift, shift_saved;
-	int tmp;
+	short shift = -16, shift_saved;
+	int tmp = 0;
 	int big_off;
 	int off, diff;
 
-	tmp = 0;
-	for (i = 0; i < NELLY_FILL_LEN; i++) {
+	for (; i < NELLY_FILL_LEN; i++) {
 		if (buf[i] > tmp)
-			tmp = buf[i];
+			tmp = static_cast<int>(buf[i]);
 	}
-	shift = -16;
+
 	headroom(&tmp, &shift);
 
 	if (shift < 0)
