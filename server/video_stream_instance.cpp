@@ -163,11 +163,13 @@ video_stream_instance::video_stream_instance(video_stream_definition* def,
 {
 	//log_debug("video_stream_instance %p ctor", (void*)this);
 
-	if ( m_def ) _embeddedStream = true;
+	if ( m_def )
+	{
+		_embeddedStream = true;
+		attachVideoProperties(*this);
+	}
 
 	set_prototype(getVideoInterface());
-			
-	attachVideoProperties(*this);
 }
 
 video_stream_instance::~video_stream_instance()
@@ -281,6 +283,18 @@ void video_class_init(as_object& global)
 
 	// Register _global.Video
 	global.init_member("Video", cl.get());
+}
+
+geometry::Range2d<float>
+video_stream_instance::getBounds() const
+{
+	if (_embeddedStream) return m_def->get_bound().getRange();
+
+	geometry::Range2d<float> bounds; // null bounds..
+
+	// TODO: return the bounds of the dynamically
+	//       loaded video if not embedded ?
+	return bounds;
 }
 
 #ifdef GNASH_USE_GC

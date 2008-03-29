@@ -56,12 +56,7 @@ public:
 		return pointInBounds(x, y);
 	}
 
-	geometry::Range2d<float> getBounds() const
-	{
-		// TODO: return the bounds of the dynamically
-		//       loaded video if not embedded ?
-		return m_def->get_bound().getRange();
-	}
+	geometry::Range2d<float> getBounds() const;
 
 	/// We use the call to ::advance to properly set invalidated status
 	virtual void	advance();

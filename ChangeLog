@@ -1,5 +1,13 @@
 2008-03-29 Sandro Santilli <strk@keybit.net>
 
+	* server/video_stream_instance.{cpp,h}: don't attach character
+	  properties if it's not a character (a user-created Video instance).
+	  Fixes more crashes in swfdec testsuite.
+	* testsuite/actionscript.all/Video.as: test that a user-defined Video
+	  instance doesn't have character properties.
+
+2008-03-29 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/libamf.all/Makefile.am: add libnet include
 	* server/as_function.cpp (constructInstance): don't assume a class
 	  will always have a prototype defined. Fixes leftover crashes

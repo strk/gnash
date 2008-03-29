@@ -21,12 +21,13 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Video.as,v 1.15 2008/03/11 19:31:48 strk Exp $";
+rcsid="$Id: Video.as,v 1.16 2008/03/29 22:50:54 strk Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION < 6
 
 check_equals(Video, undefined);
+check_totals(1);
 
 #else
 
@@ -43,8 +44,21 @@ var videoObj = new Video;
 check_equals (typeof(videoObj), 'object');
 check_equals (typeof(videoObj.attachVideo), 'function');
 check_equals (typeof(videoObj.clear), 'function');
+check_equals (typeof(videoObj._x), 'undefined');
+check_equals (typeof(videoObj._y), 'undefined');
+check_equals (typeof(videoObj._width), 'undefined');
+check_equals (typeof(videoObj._height), 'undefined');
+check_equals (typeof(videoObj._xscale), 'undefined');
+check_equals (typeof(videoObj._yscale), 'undefined');
+check_equals (typeof(videoObj._xmouse), 'undefined');
+check_equals (typeof(videoObj._ymouse), 'undefined');
+check_equals (typeof(videoObj._alpha), 'undefined');
+check_equals (typeof(videoObj._rotation), 'undefined');
+check_equals (typeof(videoObj._target), 'undefined');
+check_equals (typeof(videoObj._parent), 'undefined');
 
 // TODO: test other properties !
 
+check_totals(21);
+
 #endif
-totals();
