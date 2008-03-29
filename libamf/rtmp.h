@@ -22,7 +22,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "tu_config.h"
+#include "dsodefs.h"
 
 #include <boost/cstdint.hpp>
 #include <vector>

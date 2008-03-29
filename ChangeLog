@@ -1,5 +1,9 @@
 2008-03-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* libamf/rtmp.h: one that got away (tu_config.h).
+
+2008-03-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* plugin/mozilla-sdk/pluginbase.h: replace tu_config with
 	  dsodefs.
 	* gui/NullGui.h
