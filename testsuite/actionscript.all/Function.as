@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Function.as,v 1.71 2008/03/29 20:01:59 strk Exp $";
+rcsid="$Id: Function.as,v 1.72 2008/03/29 20:14:41 strk Exp $";
 #include "check.as"
 
 #if OUTPUT_VERSION >= 6
@@ -224,6 +224,7 @@ Object.prototype.addProperty = function() { return 7; };
 var t = testInstance.addProperty();
 check_equals(t, 7);
 check (Function instanceOf Object);
+check(TestClass.hasOwnProperty('constructor'));
 #endif
 
 check_equals (TestClass.constructor, Function);
@@ -917,8 +918,8 @@ check_equals(b.count, 1); // See bug #22203
  check_totals(147); // SWF5
 #endif
 #if OUTPUT_VERSION == 6
- check_totals(206); // SWF6
+ check_totals(207); // SWF6
 #endif
 #if OUTPUT_VERSION >= 7
- check_totals(207); // SWF7,SWF8
+ check_totals(208); // SWF7,SWF8
 #endif
