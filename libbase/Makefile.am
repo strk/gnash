@@ -141,6 +141,7 @@ noinst_HEADERS = \
 	GC.h \
 	BitsReader.h \
 	arg_parser.h \
+	getclocktime.hpp \
 	$(NULL)
 
 libgnashbase_la_LDFLAGS = -release $(VERSION)

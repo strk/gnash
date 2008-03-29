@@ -1,3 +1,8 @@
+2008-03-29 Sandro Santilli <strk@keybit.net>
+
+	* libbase/Makefile.am: distribute getclocktime.hpp
+	* testsuite/Makefile.am: descend into libnet.all
+
 2008-03-28 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libamf/rtmp.h: one that got away (tu_config.h).

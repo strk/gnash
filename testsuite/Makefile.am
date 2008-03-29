@@ -21,6 +21,7 @@ AUTOMAKE_OPTIONS =
 SUBDIRS = \
 	.	\
 	swfdec \
+	libnet.all \
 	libbase	\
 	libamf.all \
 	libgeometry \
