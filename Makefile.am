@@ -38,8 +38,8 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--with-kde-pluginprefix=/tmp/gnash-distcheck-$$/kparts \
 	--with-npapi-plugindir=/tmp/gnash-distcheck-$$/npapi \
 	--enable-extensions=all \
-	--enable-gui=all \
-	--enable-cygnal
+	--enable-gui=all 
+#--enable-cygnal
 
 STD_DIRS = \
 	libbase \

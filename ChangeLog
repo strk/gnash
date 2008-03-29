@@ -1,5 +1,7 @@
 2008-03-29 Sandro Santilli <strk@keybit.net>
 
+	* Makefile.am: don't enable build of cygnal on 'distcheck'
+	  (it's broken currently).
 	* libbase/Makefile.am: distribute getclocktime.hpp
 	* testsuite/Makefile.am: descend into libnet.all
 
