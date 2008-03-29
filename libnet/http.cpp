@@ -1192,7 +1192,7 @@ httphandler(Handler::thread_params_t *args)
     www.setHandler(hand);
 
     log_debug(_("Starting HTTP Handler for fd #%d, tid %ld"),
-	      args->netfd, pthread_self());
+	      args->netfd, get_thread_id());
     
     string docroot = args->filespec;
     

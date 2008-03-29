@@ -28,7 +28,6 @@
 #include <iomanip> // for std::setfill
 #include <string>
 #include <boost/format.hpp>
-#include <pthread.h>
 
 #if defined(_WIN32) && defined(WIN32)
 // Required for SYSTEMTIME definitions
@@ -39,6 +38,7 @@
 #include <unistd.h> // for getpid
 
 #include "log.h"
+#include "utility.h"
 
 using std::cout;
 using std::endl;
@@ -102,8 +102,9 @@ timestamp() {
 	strftime (buf, sizeof(buf), "%H:%M:%S", localtime (&t));
 
 	std::stringstream ss;
-	ss << pthread_self() << "] " << buf;
+	ss << get_thread_id() << "] " << buf;
 	return ss.str();
+
 }
 
 std::ostream& datetimestamp(std::ostream& x) {

@@ -32,6 +32,7 @@
 #include "rtmp.h"
 #include "network.h"
 #include "handler.h"
+#include "utility.h"
 
 using namespace amf;
 using namespace gnash;
@@ -440,7 +441,7 @@ rtmp_handler(Handler::thread_params_t *args)
     string docroot = args->filespec;
 
     log_debug(_("Starting RTMP Handler for fd #%d, tid %ld"),
-	      args->netfd, pthread_self());
+	      args->netfd, get_thread_id());
     
     while (!hand->timetodie()) {	
  	log_debug(_("Waiting for RTMP request on fd #%d..."), args->netfd);

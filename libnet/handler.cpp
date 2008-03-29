@@ -32,6 +32,7 @@
 #include "log.h"
 #include "network.h"
 #include "buffer.h"
+#include "utility.h"
 
 #include "rtmp.h"
 #include "http.h"
@@ -175,7 +176,7 @@ Handler::start(thread_params_t *args)
     _outgoing.setName("Outgoing");
     
     log_debug(_("Starting Handlers for port %d, tid %ld"),
-	      args->port, pthread_self());
+	      args->port, get_thread_id());
 
     if (args->port == 4080) {			// FIXME: hack alert!
 	boost::thread handler(boost::bind(&httphandler, args));
