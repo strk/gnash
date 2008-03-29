@@ -44,12 +44,12 @@ public:
         IE
     } browser_e;
     typedef enum {
-        NO_OSTYPE,
-        LINUX,
-        BSDS,
-        DARWIN,
-        WIN32,
-        SOLARIS
+        OSTYPE_NONE,
+        OSTYPE_LINUX,
+        OSTYPE_BSD,
+        OSTYPE_DARWIN,
+        OSTYPE_WIN32,
+        OSTYPE_SOLARIS
     } ostype_e;
 
     // Add a sample

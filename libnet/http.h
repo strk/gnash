@@ -88,14 +88,14 @@ public:
 	CLOSEPIPE = 1235
     } http_status_e;
     typedef enum {
-        OPTIONS,
-        GET,
-        HEAD,
-        POST,
-        PUT,
-        DELETE,
-        TRACE,
-        CONNECT
+        HTTP_OPTIONS,
+        HTTP_GET,
+        HTTP_HEAD,
+        HTTP_POST,
+        HTTP_PUT,
+        HTTP_DELETE,
+        HTTP_TRACE,
+        HTTP_CONNECT
     } http_method_e;
     typedef enum {
 	OPEN,
@@ -108,15 +108,15 @@ public:
         const char *msg;
     };
     typedef enum {
-	ERROR = -1,
-	NONE = 0,
-	HTML,
-	SWF,
-	VIDEO,
-	AUDIO,
-	MP3,
-	FCS,
-	OSCP
+	FILETYPE_ERROR = -1,
+	FILETYPE_NONE = 0,
+	FILETYPE_HTML,
+	FILETYPE_SWF,
+	FILETYPE_VIDEO,
+	FILETYPE_AUDIO,
+	FILETYPE_MP3,
+	FILETYPE_FCS,
+	FILETYPE_OSCP
     } filetype_e;
     HTTP();
     HTTP(Handler *hand);

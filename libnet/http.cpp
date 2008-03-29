@@ -40,6 +40,7 @@
 #include "log.h"
 #include "network.h"
 #include "handler.h"
+#include "utility.h"
 
 using namespace gnash;
 using namespace std;
@@ -212,7 +213,7 @@ HTTP::formatErrorResponse(http_status_e code)
     _filesize = _body.str().size();
     formatContentLength(_filesize);
     formatConnection("close");
-    formatContentType(HTTP::HTML);
+    formatContentType(HTTP::FILETYPE_HTML);
     return true;
 }
 
@@ -305,21 +306,21 @@ HTTP::formatContentType(filetype_e filetype)
 //    GNASH_REPORT_FUNCTION;
     
     switch (filetype) {
-      case HTML:
+      case FILETYPE_HTML:
 	  _header << "Content-Type: text/html" << "\r\n";
 //	  _header << "Content-Type: text/html; charset=UTF-8" << "\r\n";
 	  break;
-      case SWF:
+      case FILETYPE_SWF:
 	  _header << "Content-Type: application/x-shockwave-flash" << "\r\n";
 //	  _header << "Content-Type: application/futuresplash" << "\r\n";
 	  break;
-      case VIDEO:
+      case FILETYPE_VIDEO:
 	  _header << "Content-Type: video/flv" << "\r\n";
 	  break;
-      case MP3:
+      case FILETYPE_MP3:
 	  _header << "Content-Type: audio/mpeg" << "\r\n";
 	  break;
-      case FCS:
+      case FILETYPE_FCS:
 	  _header << "Content-Type: application/x-fcs" << "\r\n";
 	  break;
       default:
@@ -472,7 +473,7 @@ HTTP::sendPostReply(rtmpt_cmd_e code)
     _header << "HTTP/1.1 200 OK" << "\r\n";
     formatDate();
     formatServer();
-    formatContentType(HTTP::FCS);
+    formatContentType(HTTP::FILETYPE_FCS);
     // All HTTP messages are followed by a blank line.
     terminateHeader();
     return true;
@@ -657,35 +658,35 @@ HTTP::extractCommand(gnash::Network::byte_t *data)
     // Extract the command
     start = body.find("GET", 0);
     if (start != string::npos) {
-        cmd = HTTP::GET;
+        cmd = HTTP::HTTP_GET;
     }
     start = body.find("POST", 0);
     if (start != string::npos) {
-        cmd = HTTP::POST;
+        cmd = HTTP::HTTP_POST;
     }
     start = body.find("HEAD", 0);
     if (start != string::npos) {
-        cmd = HTTP::HEAD;
+        cmd = HTTP::HTTP_HEAD;
     }
     start = body.find("CONNECT", 0);
     if (start != string::npos) {
-        cmd = HTTP::CONNECT;
+        cmd = HTTP::HTTP_CONNECT;
     }
     start = body.find("TRACE", 0);
     if (start != string::npos) {
-        cmd = HTTP::TRACE;
+        cmd = HTTP::HTTP_TRACE;
     }
     start = body.find("OPTIONS", 0);
     if (start != string::npos) {
-        cmd = HTTP::OPTIONS;
+        cmd = HTTP::HTTP_OPTIONS;
     }
     start = body.find("PUT", 0);
     if (start != string::npos) {
-        cmd = HTTP::PUT;
+        cmd = HTTP::HTTP_PUT;
     }
     start = body.find("DELETE", 0);
     if (start != string::npos) {
-        cmd = HTTP::DELETE;
+        cmd = HTTP::HTTP_DELETE;
     }
 
     _command = cmd;
@@ -1110,25 +1111,25 @@ HTTP::getFileStats(std::string &filespec)
 		if (pos != string::npos) {
 		    string suffix = filespec.substr(pos, filespec.size());
 		    if (suffix == "html") {
-			_filetype = HTML;
+			_filetype = FILETYPE_HTML;
 			log_debug("HTML content found");
 		    }
 		    if (suffix == "swf") {
-			_filetype = SWF;
+			_filetype = FILETYPE_SWF;
 			log_debug("SWF content found");
 		    }
 		    if (suffix == "flv") {
-			_filetype = VIDEO;
+			_filetype = FILETYPE_VIDEO;
 			log_debug("FLV content found");
 		    }
 		    if (suffix == "mp3") {
-			_filetype = AUDIO;
+			_filetype = FILETYPE_AUDIO;
 			log_debug("MP3 content found");
 		    }
 		}
 	    }
 	} else {
-	    _filetype = HTTP::ERROR;
+	    _filetype = HTTP::FILETYPE_ERROR;
 	} // end of stat()
     } // end of try_waiting
 
@@ -1237,7 +1238,7 @@ httphandler(Handler::thread_params_t *args)
 	parameters = url.substr(pos + 1, url.size());
 	// Get the file size for the HTTP header
 	
-	if (www.getFileStats(filespec) == HTTP::ERROR) {
+	if (www.getFileStats(filespec) == HTTP::FILETYPE_ERROR) {
 	    www.formatErrorResponse(HTTP::NOT_FOUND);
 	}
 	www.sendGetReply(HTTP::LIFE_IS_GOOD);
