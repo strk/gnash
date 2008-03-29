@@ -246,7 +246,7 @@ CQue::dump()
     struct timespec now;
     clock_gettime (CLOCK_REALTIME, &now);
     cerr << "Que lifespan is " <<
-	(float)((now.tv_sec - _stats.start.tv_sec) + ((now.tv_nsec - _stats.start.tv_nsec)/1e9)) << " seconds" << endl;
+	static_cast<float>((now.tv_sec - _stats.start.tv_sec) + ((now.tv_nsec - _stats.start.tv_nsec)/1e9)) << " seconds" << endl;
     cerr << "Total number of bytes is " << _stats.totalbytes << " bytes" << endl;
     cerr << "Total number of packets pushed to queue is: " << _stats.totalin << endl;
     cerr << "Total number of packets popped from queue is: " << _stats.totalout << endl;
