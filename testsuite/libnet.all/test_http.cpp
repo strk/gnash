@@ -42,6 +42,7 @@ extern int optind, getopt(int, char *const *, const char *);
 #include "http.h"
 #include "dejagnu.h"
 #include "network.h"
+#include "amf.h"
 
 using namespace gnash;
 using namespace std;
@@ -228,7 +229,7 @@ main(int argc, char *argv[])
     // specified field, then next to see if the default works.
 //     bool formatContentType();
     http.clearHeader();
-    http.formatContentType(HTTP::FILETYPE_SWF);
+    http.formatContentType(amf::AMF::FILETYPE_SWF);
 //    cerr << "FIXME: " << http.getHeader() << endl;
     regcomp (&regex_pat, "Content-Type: application/x-shockwave-flash.*$",
              REG_NOSUB|REG_NEWLINE);

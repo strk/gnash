@@ -1,5 +1,10 @@
 2008-03-29 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/libnet.all/test_http.cpp: its' amf::AMF::FILETYPE_SWF 
+	  today (when do you want to go tomorrow?)
+
+2008-03-29 Sandro Santilli <strk@keybit.net>
+
 	* server/array.cpp: don't assume multiprop comparator container is
 	  nonempty, add assertion checking in get_basic_cmp to ensure caller
 	  took care of stripping the fUniqueSort and fReturnIndexArray flags.
