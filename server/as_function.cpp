@@ -111,10 +111,6 @@ as_function::as_function()
 	{
 		init_member(NSV::PROP_uuPROTOuu, as_value(getFunctionPrototype()));
 	}
-
-	as_object* iface = new as_object(getObjectInterface());
-	iface->init_member("constructor", this); 
-	init_member("prototype", as_value(iface));
 }
 
 

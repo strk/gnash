@@ -1,5 +1,11 @@
 2008-03-30 Sandro Santilli <strk@keybit.net>
 
+	* server/as_function.{cpp,h}: don't provide a prototype
+	  member to builtin function if not requested so.
+	* testsuite/swfdec/PASSING: function-properties-{6,7,8} succeed.
+
+2008-03-30 Sandro Santilli <strk@keybit.net>
+
 	* server/as_function.cpp, server/builtin_function.h
 	  server/asobj/ClassHierarchy.cpp: have function's
 	  constructor property set to Function.

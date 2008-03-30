@@ -151,10 +151,9 @@ protected:
 	}
 #endif // GNASH_USE_GC
 
-	/// Construct a function with a default interface
+	/// Construct a function with no interface
 	//
-	/// The default interface will have derive from Object and 
-	/// have 'this' set as it's 'constructor' member. 
+	/// For SWF>5 the function object will have derive from Function.
 	///
 	as_function();
 
