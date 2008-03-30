@@ -376,9 +376,11 @@ as_global_assetpropflags(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
     if ( ! obj )
     {
-		log_error(_("Invalid call to ASSetPropFlags: "
-			"object argument is not an object: %s"),
-			fn.arg(0).to_string().c_str());
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("Invalid call to ASSetPropFlags: "
+			"first argument is not an object: %s"),
+			fn.arg(0).to_debug_string().c_str());
+		);
 		return as_value();
     }
 

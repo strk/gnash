@@ -1,5 +1,9 @@
 2008-03-30 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Global.cpp: error to aserror
+
+2008-03-30 Sandro Santilli <strk@keybit.net>
+
 	* server/as_function.cpp: __constructor__ and constructor
 	  members given to new instances are not protected from
 	  deletion.
