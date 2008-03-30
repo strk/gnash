@@ -22,10 +22,12 @@
 #include "gnashconfig.h"
 #endif
 
-#include "dsodefs.h" //DSOEXPORT
 #include <boost/cstdint.hpp>
 #include <string>
 #include <vector>
+
+#include "dsodefs.h" //DSOEXPORT
+#include "network.h"
 #include "element.h"
 #include "amf.h"
 
@@ -49,11 +51,11 @@ public:
     size_t size() { return _amfobjs.size(); };
     
     // extract the header
-    bool extractHeader(const std::vector<boost::uint8_t> &data);
+    bool extractHeader(const std::vector<gnash::Network::byte_t> &data);
     bool extractHeader(const std::string &filespec);
 
     // Create the header
-    bool formatHeader(const std::vector<boost::uint8_t> &data);
+    bool formatHeader(const std::vector<gnash::Network::byte_t> &data);
     bool formatHeader(const std::string &name);
     bool formatHeader(const std::string &name, int filesize);
 
@@ -64,7 +66,7 @@ public:
     // read the .sol file from disk
     bool readFile(std::string &filespec);
     
-    std::vector<boost::uint8_t> getHeader() { return _header; };
+    std::vector<gnash::Network::byte_t> getHeader() { return _header; };
 
     /// Add the AMF objects that are the data of the file
     //
@@ -102,8 +104,8 @@ public:
     std::string &getObjectName() { return _objname; };
         
  private:
-    std::vector<boost::uint8_t> _header;
-    std::vector<boost::uint8_t> _data;
+    std::vector<gnash::Network::byte_t> _header;
+    std::vector<gnash::Network::byte_t> _data;
     std::string      _objname;
     std::string      _filespec;
 

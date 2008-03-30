@@ -39,17 +39,17 @@ namespace gnash {
 class DSOEXPORT Listener {
 public:
     Listener();
-    Listener(boost::uint8_t *baseaddr);
+    Listener(gnash::Network::byte_t *baseaddr);
     ~Listener();
     bool addListener(const std::string &name);
     bool findListener(const std::string &name);
     bool removeListener(const std::string &name);
     std::auto_ptr< std::vector<std::string> > listListeners();
-    void setBaseAddress(boost::uint8_t *addr) { _baseaddr = addr; };
-    boost::uint8_t *getBaseAddress() { return _baseaddr; };
+    void setBaseAddress(gnash::Network::byte_t *addr) { _baseaddr = addr; };
+    gnash::Network::byte_t *getBaseAddress() { return _baseaddr; };
 protected:
     std::string _name;
-    boost::uint8_t *_baseaddr;
+    gnash::Network::byte_t *_baseaddr;
 //    std::vector<std::string> _listeners;
 };
 
@@ -76,7 +76,7 @@ public:
         double unknown_num2;
     } lc_object_t;
     LcShm();
-    LcShm(boost::uint8_t *baseaddr);
+    LcShm(gnash::Network::byte_t *baseaddr);
     LcShm(key_t key);
     ~LcShm();
     bool connect(const std::string &name);
@@ -85,19 +85,19 @@ public:
     void send(const std::string &name, const std::string &dataname,
 	      std::vector<amf::Element *> &data);
     void recv(std::string &name, std::string &dataname, amf::Element *data);
-    std::vector<amf::Element *> parseBody(boost::uint8_t *data);
-    boost::uint8_t *parseHeader(boost::uint8_t *data);
-    boost::uint8_t *formatHeader(const std::string &con, const std::string &host, bool domain);
+    std::vector<amf::Element *> parseBody(gnash::Network::byte_t *data);
+    gnash::Network::byte_t *parseHeader(gnash::Network::byte_t *data);
+    gnash::Network::byte_t *formatHeader(const std::string &con, const std::string &host, bool domain);
     void addConnectionName(std::string &name);
     void addHostname(std::string &name);
     void addObject(amf::Element *el) { _amfobjs.push_back(el); };
     size_t size() { return _amfobjs.size(); };
     std::vector<amf::Element *> getElements() { return _amfobjs; };
 
-    void setBaseAddr(boost::uint8_t *x) { _baseaddr = x; };
+    void setBaseAddr(gnash::Network::byte_t *x) { _baseaddr = x; };
     void dump();
 private:
-    boost::uint8_t *_baseaddr;
+    gnash::Network::byte_t *_baseaddr;
     lc_header_t _header;
     lc_object_t _object;
     std::vector<amf::Element *> _amfobjs;

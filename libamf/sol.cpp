@@ -27,6 +27,8 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+
+#include "network.h"
 #include "amf.h"
 #include "sol.h"
 #include "log.h"
@@ -129,7 +131,7 @@ SOL::formatHeader(const std::string &name, int filesize)
     // so we swap it first.
     boost::uint16_t swapped = SOL_MAGIC;
     swapped = htons(swapped);
-    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(&swapped);
+    Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(&swapped);
     for (i=0; i<sizeof(boost::uint16_t); i++) {
         _header.push_back(ptr[i]);
     }
@@ -140,7 +142,7 @@ SOL::formatHeader(const std::string &name, int filesize)
     filesize += name.size() + 16;
     boost::uint32_t len = filesize;
     len = htonl(len);
-    ptr = reinterpret_cast<boost::uint8_t *>(&len);
+    ptr = reinterpret_cast<Network::byte_t *>(&len);
     for (i=0; i<sizeof(boost::uint32_t); i++) {
         _header.push_back(ptr[i]);
     }
@@ -156,7 +158,7 @@ SOL::formatHeader(const std::string &name, int filesize)
     // then the 0x0004 bytes, also a mystery
     swapped = SOL_BLOCK_MARK;
     swapped = htons(swapped);
-    ptr = reinterpret_cast<boost::uint8_t *>(&swapped);
+    ptr = reinterpret_cast<Network::byte_t *>(&swapped);
     for (i=0; i<sizeof(boost::uint16_t); i++) {
         _header.push_back(ptr[i]);
     }
@@ -170,12 +172,12 @@ SOL::formatHeader(const std::string &name, int filesize)
     //  First the length in two bytes
     swapped = name.size();
     swapped = htons(swapped);
-    ptr = reinterpret_cast<boost::uint8_t *>(&swapped);
+    ptr = reinterpret_cast<Network::byte_t *>(&swapped);
     for (i=0; i<sizeof(boost::uint16_t); i++) {
         _header.push_back(ptr[i]);
     }
     // then the string itself
-    ptr = (boost::uint8_t *)name.c_str();
+    ptr = (Network::byte_t *)name.c_str();
     for (i=0; i<name.size(); i++) {
         _header.push_back(ptr[i]);
     }
@@ -204,13 +206,12 @@ SOL::writeFile(const string &filespec, const string &name)
 {
 //    GNASH_REPORT_FUNCTION;
     ofstream ofs(filespec.c_str(), ios::binary);
-    if ( ! ofs )
-    {
+    if ( ! ofs ) {
         log_error("Failed opening file '%s' in binary mode", filespec.c_str());
         return false;
     }
-
-    vector<boost::uint8_t>::iterator it;
+    
+    vector<Network::byte_t>::iterator it;
     vector<amf::Element *>::iterator ita; 
     AMF amf_obj;
     char *ptr;
@@ -233,32 +234,33 @@ SOL::writeFile(const string &filespec, const string &name)
 
     for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
         amf::Element *el = (*(ita));
-        size_t outsize;
-        boost::uint8_t *foo = amf_obj.encodeVariable(el, outsize); 
-        if ( ! foo )
-        {
-             continue;
+        size_t outsize = 0;
+        Network::byte_t *var = amf_obj.encodeVariable(el); 
+//        Network::byte_t *var = amf_obj.encodeVariable(el, outsize); 
+        if (!var) {
+	    continue;
         }
         assert(outsize);
         switch (el->getType()) {
 	  case Element::BOOLEAN:
-	      //outsize = el->getName().size() + 5;
+	      outsize = el->getName().size() + 5;
               assert(ptr+outsize < endPtr);
-	      memcpy(ptr, foo, outsize);
+	      memcpy(ptr, var, outsize);
 	      ptr += outsize;
 	      break;
 	  case Element::OBJECT:
-	      //outsize = el->getName().size() + 5;
+	      outsize = el->getName().size() + 5;
               assert(ptr+outsize < endPtr);
-	      memcpy(ptr, foo, outsize);
+	      outsize = el->getName().size() + 5;
+	      memcpy(ptr, var, outsize);
 	      ptr += outsize;
 	      *ptr++ = Element::OBJECT_END;
 	      *ptr++ = 0;	// objects are terminated too!
 	      break;
 	  case Element::NUMBER:
-	      //outsize = el->getName().size() + AMF_NUMBER_SIZE + 2;
+	      outsize = el->getName().size() + AMF_NUMBER_SIZE + 2;
               assert(ptr+outsize < endPtr);
-	      memcpy(ptr, foo, outsize);
+	      memcpy(ptr, var, outsize);
 	      ptr += outsize;
 	      *ptr++ = 0;	// doubles are terminated too!
 	      *ptr++ = 0;	// doubles are terminated too!
@@ -266,21 +268,21 @@ SOL::writeFile(const string &filespec, const string &name)
 	  case Element::STRING:
 	      if (el->getLength() == 0) {
               	  assert(ptr+outsize+1 < endPtr);
-		  memcpy(ptr, foo, outsize+1);
+		  memcpy(ptr, var, outsize+1);
 		  ptr += outsize+1;
 	      } else {		// null terminate the string
                   assert(ptr+outsize < endPtr);
-		  memcpy(ptr, foo, outsize);
+		  memcpy(ptr, var, outsize);
 		  ptr += outsize;
 		  *ptr++ = 0;
 	      }
 	      break;
 	  default:
               assert(ptr+outsize < endPtr);
-	      memcpy(ptr, foo, outsize);
+	      memcpy(ptr, var, outsize);
 	      ptr += outsize;
 	}
-	delete[] foo;
+	delete[] var;
     }
     
     _filesize = ptr - body.get();
@@ -317,8 +319,8 @@ SOL::readFile(std::string &filespec)
 //    GNASH_REPORT_FUNCTION;
     struct stat st;
     boost::uint16_t size;
-    boost::scoped_array<boost::uint8_t> buf;
-    boost::uint8_t *ptr;
+    boost::scoped_array<Network::byte_t> buf;
+    Network::byte_t *ptr;
     int bodysize;
 
     // Make sure it's an SOL file
@@ -327,7 +329,7 @@ SOL::readFile(std::string &filespec)
         _filesize = st.st_size;
 	bodysize = st.st_size - 6;
         _filespec = filespec;
-        buf.reset( new boost::uint8_t[_filesize+1] );
+        buf.reset( new Network::byte_t[_filesize+1] );
         ptr = buf.get(); 
         ifs.read(reinterpret_cast<char *>(buf.get()), _filesize);
 

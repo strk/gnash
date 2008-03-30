@@ -28,6 +28,7 @@
 #include <boost/cstdint.hpp>
 
 #include "log.h"
+#include "network.h"
 #include "amf.h"
 #include "shm.h"
 #include "element.h"
@@ -67,7 +68,7 @@ LcShm::LcShm()
 //    GNASH_REPORT_FUNCTION;
 }
 
-LcShm::LcShm(boost::uint8_t *addr)
+LcShm::LcShm(Network::byte_t *addr)
 {
 //    GNASH_REPORT_FUNCTION;
     _baseaddr = addr;
@@ -99,7 +100,7 @@ Listener::Listener()
 //    GNASH_REPORT_FUNCTION;
 }
 
-Listener::Listener(boost::uint8_t *x)
+Listener::Listener(Network::byte_t *x)
 {
 //    GNASH_REPORT_FUNCTION;
     _baseaddr = x;
@@ -116,7 +117,7 @@ Listener::findListener(const string &name)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
+    Network::byte_t *addr = _baseaddr + LC_LISTENERS_START;
     char *item = reinterpret_cast<char *>(addr);
     // Walk through the list to the end
     while (*item != 0) {
@@ -134,7 +135,7 @@ Listener::addListener(const string &name)
 {
     GNASH_REPORT_FUNCTION;
 
-    boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
+    Network::byte_t *addr = _baseaddr + LC_LISTENERS_START;
     char *item = reinterpret_cast<char *>(addr);
     // Walk to the end of the list
     while ((item[0] != 0) && (item[1] != 0)) {
@@ -175,7 +176,7 @@ Listener::removeListener(const string &name)
 {
     GNASH_REPORT_FUNCTION;
 
-    boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
+    Network::byte_t *addr = _baseaddr + LC_LISTENERS_START;
 
     int len = 0;
     char *item = reinterpret_cast<char *>(addr);
@@ -203,7 +204,7 @@ Listener::listListeners()
 //    GNASH_REPORT_FUNCTION;    
     auto_ptr< vector<string> > listeners ( new vector<string> );
     if (_baseaddr != 0) {
-        boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
+        Network::byte_t *addr = _baseaddr + LC_LISTENERS_START;
         
         const char *item = reinterpret_cast<const char *>(addr);
         while (*item != 0) {
@@ -226,11 +227,11 @@ LcShm::close()
 }
 
 #if 0
-boost::uint8_t *
-LcShm::parseElement(amf::Element *el, boost::uint8_t *data)
+Network::byte_t *
+LcShm::parseElement(amf::Element *el, Network::byte_t *data)
 {
     GNASH_REPORT_FUNCTION;
-    boost::uint8_t *ptr = reinterpret_cast<uint8_t *>(data);
+    Network::byte_t *ptr = reinterpret_cast<uint8_t *>(data);
     Element::astype_e type = (Element::astype_e)*ptr;
     switch (type) {
       case AMF::NUMBER:
@@ -247,10 +248,10 @@ LcShm::parseElement(amf::Element *el, boost::uint8_t *data)
 #endif
 
 vector<amf::Element *> 
-LcShm::parseBody(boost::uint8_t *data)
+LcShm::parseBody(Network::byte_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint8_t *ptr = reinterpret_cast<uint8_t *>(data);
+    Network::byte_t *ptr = reinterpret_cast<uint8_t *>(data);
     AMF amf;
 
     while (ptr) {
@@ -286,11 +287,11 @@ LcShm::parseBody(boost::uint8_t *data)
 // added to the LocalConnection. This can be up to 40k long. While
 // other web sites have claimed there is a length field in the initial
 // shared memory segment header, I've never seen one in my tests.
-boost::uint8_t *
-LcShm::parseHeader(boost::uint8_t *data)
+Network::byte_t *
+LcShm::parseHeader(Network::byte_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint8_t *ptr = data;
+    Network::byte_t *ptr = data;
     
     memcpy(&_header, ptr, LC_HEADER_SIZE);
 //     memcpy(&_object, data + LC_HEADER_SIZE, _header.length);
@@ -345,15 +346,15 @@ LcShm::parseHeader(boost::uint8_t *data)
     return ptr;
 }
 
-boost::uint8_t *
+Network::byte_t *
 LcShm::formatHeader(const std::string &con, const std::string &host, bool /* domain */ )
 {
     GNASH_REPORT_FUNCTION;
-//    boost::uint8_t *ptr = data + LC_HEADER_SIZE;
+//    Network::byte_t *ptr = data + LC_HEADER_SIZE;
     int size = con.size() + host.size() + 9;
     
-    boost::uint8_t *header = new boost::uint8_t[size + 1];
-    boost::uint8_t *ptr = header;
+    Network::byte_t *header = new Network::byte_t[size + 1];
+    Network::byte_t *ptr = header;
 
     // This is the initial 16 bytes of the header
     memset(ptr, 0, size + 1);
@@ -363,7 +364,7 @@ LcShm::formatHeader(const std::string &con, const std::string &host, bool /* dom
     ptr = header + LC_HEADER_SIZE;
 
     // Which is then always followed by 3 AMF objects.
-    boost::uint8_t *tmp = AMF::encodeElement(con.c_str());
+    Network::byte_t *tmp = AMF::encodeElement(con.c_str());
     memcpy(ptr, tmp, con.size());
     ptr +=  con.size();
     delete[] tmp;
@@ -452,12 +453,12 @@ LcShm::send(const string &name, const string &domainname,
 //    formatHeader(name, domainname, _object.domain);
 
     // Update the connection name
-    boost::uint8_t *ptr = Listener::getBaseAddress();
-    if (ptr == reinterpret_cast<boost::uint8_t *>(0)) {
+    Network::byte_t *ptr = Listener::getBaseAddress();
+    if (ptr == reinterpret_cast<Network::byte_t *>(0)) {
         log_error("base address not set!");
     }
 
-//    boost::uint8_t *tmp = AMF::encodeElement(name.c_str());
+//    Network::byte_t *tmp = AMF::encodeElement(name.c_str());
 //     memcpy(ptr, tmp, name.size());
 //     ptr +=  name.size() + AMF_HEADER_SIZE;
 //     delete[] tmp;
@@ -467,7 +468,7 @@ LcShm::send(const string &name, const string &domainname,
 //     ptr +=  domainname.size() + AMF_HEADER_SIZE;
 
 //    ptr += LC_HEADER_SIZE;
-    boost::uint8_t *x = ptr;    // just for debugging from gdb. temporary
+    Network::byte_t *x = ptr;    // just for debugging from gdb. temporary
 
     // This is the initial 16 bytes of the header
     memset(ptr, 0, LC_HEADER_SIZE + 200);
@@ -478,7 +479,7 @@ LcShm::send(const string &name, const string &domainname,
 
     // Which is then always followed by 3 AMF objects.
     
-    boost::uint8_t *tmp = AMF::encodeElement(name.c_str());
+    Network::byte_t *tmp = AMF::encodeElement(name.c_str());
     memcpy(ptr, tmp, name.size() + AMF_HEADER_SIZE);
     delete[] tmp;
 
@@ -499,8 +500,8 @@ LcShm::send(const string &name, const string &domainname,
     
 //     ptr += AMF_BOOLEAN_SIZE;
     
-    vector<boost::uint8_t> *vec = AMF::encodeElement(data);
-    vector<boost::uint8_t>::iterator vit;
+    vector<Network::byte_t> *vec = AMF::encodeElement(data);
+    vector<Network::byte_t>::iterator vit;
     // Can't do a memcpy with a std::vector
 //    log_debug("Number of bytes in the vector: %x", vec->size());
     for (vit = vec->begin(); vit != vec->end(); vit++) {

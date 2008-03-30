@@ -248,7 +248,7 @@ public:
     ///         in form of a newly allocated byte array.
     ///         to be deleted by caller using delete [] operator, or NULL
     ///
-    gnash::Network::byte_t *encodeVariable(amf::Element *el, size_t& outsize);
+    gnash::Network::byte_t *encodeVariable(amf::Element *el);
 
 #if 0
     /// Encode an element

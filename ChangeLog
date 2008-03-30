@@ -1,5 +1,12 @@
 2008-03-30  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* libamf/sol.{h,cpp}, lcshm.{h,cpp}: Use Network::byte_t instead
+	of boost::uint8_t top stay consistant. Move all RTMP methods to
+	libnet/rtmp.h.
+	* libamf/amf.cpp: Move all RTMP methods to libnet/rtmp.h.
+	* libamf/element.{h,cpp}: Add more overloaded make* methods, get
+	ready to depreciated the init methods to use this instead.
+
 	* plugin/mozilla-sdk/include/npupp.h: Don't use NPPluginFuncs.
 	* gui/klash.moc.in: Drop the extraneous gnash-head path from the
 	include for kdesup.h.

@@ -81,7 +81,7 @@ Element::~Element()
     }
 }
 
-Element::Element(boost::uint8_t *indata)
+Element::Element(Network::byte_t *indata)
 {
     GNASH_REPORT_FUNCTION;
     init(indata);
@@ -177,7 +177,7 @@ Element::init(const string &name, double indata)
         _name = name;
     }
     _length = AMF_NUMBER_SIZE;
-    _data = reinterpret_cast<boost::uint8_t *>(new char[sizeof(double)]);
+    _data = reinterpret_cast<Network::byte_t *>(new char[sizeof(double)]);
     memcpy(_data, &indata, _length);
     return *this;
 }
@@ -192,14 +192,14 @@ Element::init(const string &indata)
 Element &
 Element::init(const string &name, const string &indata)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     _type = Element::STRING;
     if (name.size()) {
         _name = name;
     }
     _length = indata.size();
     // add a byte for a NULL string terminator byte.
-    _data = new boost::uint8_t[indata.size() + 1];
+    _data = new Network::byte_t[indata.size() + 1];
     memset(_data, 0, indata.size() + 1);
     memcpy(_data, indata.c_str(), indata.size());
     return *this;
@@ -221,7 +221,7 @@ Element::init(const string &name, bool indata)
         _name = name;
     }
     _length = 1;
-    _data = new boost::uint8_t[1];
+    _data = new Network::byte_t[1];
     *_data = indata;
     return *this;
 }
@@ -282,7 +282,7 @@ Element::operator=(Element &el)
     if (el.getName().size()) {
         _name = el.getName();
     }
-    _data = new boost::uint8_t[_length + 1];
+    _data = new Network::byte_t[_length + 1];
     memcpy(_data, el.getData(), _length);
     
     return *this;
@@ -295,18 +295,18 @@ Element::operator=(Element &el)
 /// normal ASCII. It may be that these need to be converted to wide
 /// characters, but for now we just leave them as standard multibyte
 /// characters.
-boost::uint8_t *
-Element::init(boost::uint8_t *indata)
+Network::byte_t *
+Element::init(Network::byte_t *indata)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    boost::uint8_t *ptr = indata;
+    Network::byte_t *ptr = indata;
     // Extract the type
     _type = (Element::astype_e)((*ptr++) & 0xff);
     // For doubles, the length value is never set, but we might as
     // well put in a legit value anyway.
     _length = AMF_NUMBER_SIZE;
-    _data = new boost::uint8_t[AMF_NUMBER_SIZE + 1];
+    _data = new Network::byte_t[AMF_NUMBER_SIZE + 1];
     memset(_data, 0, AMF_NUMBER_SIZE + 1);
     memcpy(_data, &indata, AMF_NUMBER_SIZE);
 
@@ -314,51 +314,97 @@ Element::init(boost::uint8_t *indata)
 }
 
 Element &
-Element::makeString(boost::uint8_t *data, int size)
+Element::makeString(Network::byte_t *data, int size)
 {
 //    GNASH_REPORT_FUNCTION;
     
     _type = Element::STRING;
     _length = size;
-    _data = new boost::uint8_t[size+1];
+    _data = new Network::byte_t[size+1];
     memset(_data, 0, size+1);
     memcpy(_data, data, size);
     return *this;
 }
 
 Element &
-Element::makeNumber(boost::uint8_t *data)
+Element::makeString(const string &name, const string &indata)
+{
+    GNASH_REPORT_FUNCTION;
+    _type = Element::STRING;
+    if (name.size()) {
+        _name = name;
+    }
+    _length = indata.size();
+    // add a byte for a NULL string terminator byte.
+    _data = new Network::byte_t[indata.size() + 1];
+    memcpy(_data, indata.c_str(),_length);
+    *(_data + _length) = 0;	// terminate the string for printing
+    return *this;
+}
+
+Element &
+Element::makeNumber(Network::byte_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     
     _type = Element::NUMBER;
     _length = amf::AMF_NUMBER_SIZE;
-    _data = new boost::uint8_t[amf::AMF_NUMBER_SIZE];
+    _data = new Network::byte_t[amf::AMF_NUMBER_SIZE];
     memcpy(_data, data, amf::AMF_NUMBER_SIZE);
     return *this;
 }
 
 Element &
-Element::makeBoolean(bool &data)
+Element::makeNumber(const string &name, double data)
+{
+//    GNASH_REPORT_FUNCTION;
+    if (name.size()) {
+        _name = name;
+    }    
+    _type = Element::NUMBER;
+    _length = amf::AMF_NUMBER_SIZE;
+    _data = new Network::byte_t[amf::AMF_NUMBER_SIZE];
+    memcpy(_data, &data, amf::AMF_NUMBER_SIZE);
+//    std::copy(&data, &data + amf::AMF_NUMBER_SIZE, _data);
+    return *this;
+}
+
+Element &
+Element::makeBoolean(bool data)
 {
 //    GNASH_REPORT_FUNCTION;
     
     _type = Element::BOOLEAN;
     _length = 1;
-    _data = new boost::uint8_t[2];
+    _data = new Network::byte_t[2];
     memset(_data, 0, 2);
     _data[1]= data;
     return *this;
 }
 
 Element &
-Element::makeBoolean(boost::uint8_t *data)
+Element::makeBoolean(const string &name, bool data)
+{
+//    GNASH_REPORT_FUNCTION;
+    if (name.size()) {
+        _name = name;
+    }
+    _type = Element::BOOLEAN;
+    _length = 1;
+    _data = new Network::byte_t[2];
+    memset(_data, 0, 2);
+    _data[1]= data;
+    return *this;
+}
+
+Element &
+Element::makeBoolean(Network::byte_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     
     _type = Element::BOOLEAN;
     _length = 1;
-    _data = new boost::uint8_t[2];
+    _data = new Network::byte_t[2];
     memset(_data, 0, 2);
     memcpy(_data, data+1, 1);
     return *this;
@@ -406,13 +452,13 @@ Element::makeNull(const std::string &name)
 }
 
 Element &
-Element::makeObject(boost::uint8_t *indata, int size)
+Element::makeObject(Network::byte_t *indata, int size)
 {
 //    GNASH_REPORT_FUNCTION;
     
     _type = Element::OBJECT;
     _length = size;
-    _data = new boost::uint8_t[size + 1];
+    _data = new Network::byte_t[size + 1];
     memset(_data, 0, size + 1);
     memcpy(_data, indata, size);
     return *this;
@@ -430,75 +476,75 @@ Element::makeObjectEnd()
 }
 
 Element &
-Element::makeXMLObject(boost::uint8_t *indata, int size)
+Element::makeXMLObject(Network::byte_t *indata, int size)
 {
 //    GNASH_REPORT_FUNCTION;
     
     _type = Element::XML_OBJECT;
     _length = size;
-    _data = new boost::uint8_t[size + 1];
+    _data = new Network::byte_t[size + 1];
     memset(_data, 0, size + 1);
     memcpy(_data, indata, size);
     return *this;
 }
 
 Element &
-Element::makeTypedObject(boost::uint8_t *indata, int size)
+Element::makeTypedObject(Network::byte_t *indata, int size)
 {
 //    GNASH_REPORT_FUNCTION;
     
     _type = Element::TYPED_OBJECT;
     _length = size;
-    _data = new boost::uint8_t[size + 1];
+    _data = new Network::byte_t[size + 1];
     memset(_data, 0, size + 1);
     memcpy(_data, indata, size);
     return *this;
 }
 
 Element &
-Element::makeReference(boost::uint8_t *indata, int size)
+Element::makeReference(Network::byte_t *indata, int size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::TYPED_OBJECT;
     _length = size;
-    _data = new boost::uint8_t[size + 1];
+    _data = new Network::byte_t[size + 1];
     memset(_data, 0, size + 1);
     memcpy(_data, indata, size);    
     return *this;
 }
 
 Element &
-Element::makeMovieClip(boost::uint8_t *indata, int size)
+Element::makeMovieClip(Network::byte_t *indata, int size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::MOVIECLIP;
     _length = size;
-    _data = new boost::uint8_t[size + 1];
+    _data = new Network::byte_t[size + 1];
     memset(_data, 0, size + 1);
     memcpy(_data, indata, size);    
     return *this;    
 }
 
 Element &
-Element::makeECMAArray(boost::uint8_t *indata, int size)
+Element::makeECMAArray(Network::byte_t *indata, int size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::ECMA_ARRAY;
     _length = size;
-    _data = new boost::uint8_t[size + 1];
+    _data = new Network::byte_t[size + 1];
     memset(_data, 0, size + 1);
     memcpy(_data, indata, size);    
     return *this;    
 }
 
 Element &
-Element::makeLongString(boost::uint8_t *indata, int size)
+Element::makeLongString(Network::byte_t *indata, int size)
 {
 //    GNASH_REPORT_FUNCTION;
     
     _type = Element::LONG_STRING;
     _length = size;
-    _data = new boost::uint8_t[size + 1];
+    _data = new Network::byte_t[size + 1];
     memset(_data, 0, size + 1);
     memcpy(_data, indata, size);    
 
@@ -506,13 +552,13 @@ Element::makeLongString(boost::uint8_t *indata, int size)
 }
 
 Element &
-Element::makeRecordSet(boost::uint8_t *indata, int size)
+Element::makeRecordSet(Network::byte_t *indata, int size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::RECORD_SET;
     
     _length = size;
-    _data = new boost::uint8_t[size + 1];
+    _data = new Network::byte_t[size + 1];
     memset(_data, 0, size + 1);
     memcpy(_data, indata, size);    
 
@@ -520,13 +566,13 @@ Element::makeRecordSet(boost::uint8_t *indata, int size)
 }
 
 Element &
-Element::makeDate(boost::uint8_t *indata)
+Element::makeDate(Network::byte_t *indata)
 {
 //    GNASH_REPORT_FUNCTION;
     
     _type = Element::DATE;
     _length = AMF_NUMBER_SIZE;
-    _data = new boost::uint8_t[AMF_NUMBER_SIZE + 1];
+    _data = new Network::byte_t[AMF_NUMBER_SIZE + 1];
     memset(_data, 0, AMF_NUMBER_SIZE + 1);
     memcpy(_data, indata, AMF_NUMBER_SIZE);    
 
@@ -534,17 +580,28 @@ Element::makeDate(boost::uint8_t *indata)
 }
 
 Element &
-Element::makeStrictArray(boost::uint8_t *indata, int size)
+Element::makeStrictArray(Network::byte_t *indata, int size)
 {
 //    GNASH_REPORT_FUNCTION;
     
     _type = Element::STRICT_ARRAY;
     _length = size;
-    _data = new boost::uint8_t[size + 1];
+    _data = new Network::byte_t[size + 1];
     memset(_data, 0, size + 1);
     memcpy(_data, indata, size);    
 
     return *this;
+}
+
+void
+Element::setName(Network::byte_t *name, int x)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    char *buf = new char[x+1];
+    *(buf+x) = 0;			// terminate the string, we don't need to memcpy the whole thing
+    std::copy(name, name+x, buf);
+    _name = buf;
 }
 
 void
@@ -553,7 +610,7 @@ Element::dump()
 //    GNASH_REPORT_FUNCTION;
     
     if (_name.size()) {
-	cerr << "AMF object name: " << _name << endl;
+	cerr << "AMF object name: " << _name << ", length is " << _length << endl;
     }
 
     cerr << astype_str[_type] << ": ";

@@ -739,177 +739,6 @@ AMF::encodeElement(vector<amf::Element *> &data)
     return vec;
 }
 
-
-#if 0
-/// \brief \ Each RTMP header consists of the following:
-///
-/// * Index & header size - The header size and amf channel index.
-/// * Total size - The total size of the message
-/// * Type - The type of the message
-/// * Routing - The source/destination of the message
-void *
-AMF::encodeRTMPHeader(int amf_index, amf_headersize_e head_size,
-		      int total_size, content_types_e type,
-		      amfsource_e routing)
-{
-//    GNASH_REPORT_FUNCTION;
-    void *out = new char[total_size + 12 + 4];
-    memset(out, 0, total_size + 12 + 4);
-    char *tmpptr = reinterpret_cast<char *>(out);
-    // Make the index & header size byte
-    *tmpptr = head_size & AMF_HEADSIZE_MASK;    
-    *tmpptr += amf_index  & AMF_INDEX_MASK;
-    tmpptr++;
-
-    // Add the unknown bytes. These seem to be used by video and
-    // audio, and only when the header size is 4 or more.
-    if (head_size <= HEADER_4) {
-	memset(tmpptr, 0, 3);
-	tmpptr += 3;
-    }
-
-    // Add the size of the message if the header size is 8 or more.
-    if (head_size <= HEADER_8) {
-	int length = total_size;
-	swapBytes(&length, 4);
-	memcpy(tmpptr, ((char *)&length +1), 3);
-	tmpptr += 3;
-    }
-    
-    // Add the type of the objectif the header size is 8 or more.
-    if (head_size <= HEADER_8) {
-	*tmpptr = type;
-	tmpptr++;
-    }
-
-    // Add the routing of the message if the header size is 12 or more.
-    if (head_size == HEADER_12) {
-	memcpy(tmpptr, &routing, 4);
-	tmpptr += 4;
-    }
-
-    return out;
-}
-
-/// \brief Each header consists of the following:
-///
-/// * UTF string (including length bytes) - name
-/// * Boolean - specifies if understanding the header is `required'
-/// * Long - Length in bytes of header
-/// * Variable - Actual data (including a type code)
-amfhead_t *
-AMF::encodeHeader(amfutf8_t *name, bool required, int nbytes, void *data)
-{
-//    GNASH_REPORT_FUNCTION;
-
-    AMF_Int_t length = sizeof(amfhead_t) + nbytes + name->length + 1;
-    char *buf = new char[length];
-    memset(buf, 0, length);
-    char *ptr = buf;
-
-    // The first two bytes are the byte count for the UTF8 string,
-    // which is in big-endian format.
-    length = name->length;
-    swapBytes(&length, sizeof(AMF_Int_t));
-    memcpy(ptr, &length, sizeof(AMF_Int_t));
-    ptr += sizeof(AMF_Int_t);
-
-    // Now the data part of the UTF8 string
-    memcpy(ptr, name->data, name->length);
-    ptr += name->length;
-
-    // Then the "required" flag, whatever this does...
-    memcpy(ptr, &required, 1);
-    ptr++;
-
-    // Then the byte count of the data, which is an ActionScript
-    // object
-    length = nbytes;
-    swapBytes(&length, 2);
-    memcpy(ptr, &length, 2);
-    ptr += 2;
-
-    // And finally all the data
-    memcpy(ptr, data, nbytes);
-
-    return (amfhead_t *)buf;
-}
-
-/// \brief Each body consists of the following:
-///
-/// * UTF String - Target
-/// * UTF String - Response
-/// * Long - Body length in bytes
-/// * Variable - Actual data (including a type code)
-amfbody_t *
-AMF::encodeBody(amfutf8_t *target, amfutf8_t *response, int nbytes, void *data)
-{
-//    GNASH_REPORT_FUNCTION;
-
-    char *buf = new char[sizeof(amfbody_t) + nbytes];
-    memset(buf, 0, sizeof(amfbody_t) + nbytes );
-    amfbody_t *body = (amfbody_t *)buf;
-    memcpy(&body->target, target, sizeof(amfutf8_t));
-    memcpy(&body->response, response, sizeof(amfutf8_t));    
-    body->length = nbytes;
-    memcpy(body->data, data, nbytes);
-
-    return body;
-}
-
-/// \brief Each packet consists of the following:
-///
-/// The first byte of the AMF file/stream is believed to be a version
-/// indicator. So far the only valid value for this field that has been
-/// found is 0×00. If it is anything other than 0×00 (zero), your
-/// system should consider the AMF file/stream to be
-/// 'cmalformed'd. This can happen in the IDE if AMF calls are put
-/// on the stack but never executed and the user exits the movie from the
-/// IDE; the two top bytes will be random and the number of headers will
-/// be unreliable.
-
-/// The second byte of the AMF file/stream is appears to be 0×00 if the
-/// client is the Flash Player and 0×01 if the client is the FlashCom
-/// server. 
-
-/// The third and fourth bytes form an integer value that specifies the
-/// number of headers. 
-amfpacket_t *
-AMF::encodePacket(std::vector<amfpacket_t *> messages)
-{
-//    GNASH_REPORT_FUNCTION;
-
-    int total = 0;
-    amfpacket_t pkt;
-    pkt.version = AMF_VERSION;
-    pkt.source = CLIENT;
-    pkt.count = (AMF_Int_t)messages.size();
-
-    // figure out how big the output buffer has to be
-    for (unsigned int i=0; i<messages.size(); i++ ) {
-        total += messages[i]->name.length + // the UTF8 string length
-            messages[i]->length  // the data length
-            + sizeof(amfhead_t); // the header length
-    }
-
-    amfpacket_t *out = (amfpacket_t *)new char[total];
-    char *ptr = (char *)out;
-    memset(ptr, 0, total);
-
-    // Copy the header
-    memcpy(ptr, &pkt, sizeof(amfpacket_t));
-    ptr += sizeof(amfpacket_t);
-    
-    // Add the messages
-    for (unsigned int i=0; i<messages.size(); i++ ) {
-        memcpy(ptr, messages[i], messages[i]->length + sizeof(amfhead_t));
-        ptr += messages[i]->length + sizeof(amfhead_t);
-    }
-
-    return out;
-}
-#endif
-
 #if 0
 AMF::astype_e
 AMF::extractElementHeader(void *in)
@@ -1179,10 +1008,10 @@ AMF::createElement(AMF::amf_element_t *el, const std::string &name, bool data)
 #endif
 
 uint8_t *
-AMF::encodeVariable(amf::Element *el, size_t& outsize)
+AMF::encodeVariable(amf::Element *el)
 {
     GNASH_REPORT_FUNCTION;
-    outsize = el->getName().size() + el->getLength() + 5; // why +5 here ?
+    size_t outsize = el->getName().size() + el->getLength() + 5; // why +5 here ?
 
     Network::byte_t *out = new Network::byte_t[outsize + 4]; // why +4 here ?
     Network::byte_t *end = out + outsize+4; // why +4 ?
@@ -1463,7 +1292,7 @@ AMF::extractVariable(Element *el, Network::byte_t *in)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    Network::byte_t buffer[AMF_PACKET_SIZE];
+    char *buffer[AMF_PACKET_SIZE];
     Network::byte_t *tmpptr = in;
     boost::int16_t length;
 
@@ -1501,7 +1330,7 @@ AMF::extractVariable(Element *el, Network::byte_t *in)
 	
 //        log_debug(_("AMF element length is: %d"), length);
         memcpy(buffer, tmpptr, length);
-        el->setName(buffer);
+        el->setName(tmpptr, length);
         tmpptr += length;
     }
     
