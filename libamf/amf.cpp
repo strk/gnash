@@ -1007,7 +1007,7 @@ AMF::createElement(AMF::amf_element_t *el, const std::string &name, bool data)
 // }
 #endif
 
-uint8_t *
+boost::uint8_t *
 AMF::encodeVariable(amf::Element *el)
 {
     GNASH_REPORT_FUNCTION;
@@ -1060,7 +1060,7 @@ AMF::encodeVariable(amf::Element *el)
 	  memcpy(tmpptr, el->getData(), el->getLength());
     }
     
-    return reinterpret_cast<uint8_t *>(out);    
+    return reinterpret_cast<boost::uint8_t *>(out);    
 }
 
 #if 0
