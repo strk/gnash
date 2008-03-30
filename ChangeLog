@@ -1,5 +1,10 @@
 2008-03-30  Dossy Shiobara <dossy@panoptic.com>
 
+	* plugin/win32/.cvsignore, plugin/win32/Makefile.am: Include
+	  Win32 npgnash.dll in Gnash build process.
+
+2008-03-30  Dossy Shiobara <dossy@panoptic.com>
+
 	* plugin/mozilla-sdk/np_entry.cpp: Fix symbols so they're
 	  exported correctly on Win32.
 

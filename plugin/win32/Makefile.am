@@ -1,0 +1,94 @@
+## Process this file with automake to generate Makefile.in
+# 
+#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+AUTOMAKE_OPTIONS = 
+
+if NSAPI
+if WIN32
+
+AM_CPPFLAGS = \
+	-I$(top_srcdir) \
+	-I$(top_srcdir)/libbase \
+	-I$(top_srcdir)/libgeometry \
+	-I$(top_srcdir)/libmedia \
+	-I$(top_srcdir)/libmedia/ffmpeg \
+	-I$(top_srcdir)/backend \
+	-I$(top_srcdir)/server \
+	-I$(top_srcdir)/server/parser \
+	-I$(top_srcdir)/server/vm \
+	-I$(top_srcdir)/gui \
+	-I$(top_srcdir)/plugin/mozilla-sdk \
+	-I$(top_srcdir)/plugin/mozilla-sdk/include \
+	$(AGG_CFLAGS) \
+	$(BOOST_CFLAGS) \
+	$(FFMPEG_CFLAGS) \
+	$(SDL_CFLAGS) \
+	$(NULL)
+
+AM_LDFLAGS = \
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(top_builddir)/libmedia/libgnashmedia.la \
+	$(top_builddir)/libamf/libgnashamf.la \
+	$(top_builddir)/backend/libgnashagg.la \
+	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/plugin/mozilla-sdk/libmozsdk.la \
+	$(AGG_LIBS) \
+	$(BOOST_LIBS) \
+	$(CURL_LIBS) \
+	$(EXPAT_LIBS) \
+	$(FFMPEG_LIBS) \
+	$(JPEG_LIBS) \
+	$(LIBXML_LIBS) \
+	$(PNG_LIBS) \
+	$(SDL_LIBS) \
+	$(NSPR_LIBS) \
+	$(NULL)
+
+plugindir   = $(FIREFOX_PLUGINS)
+
+plugin_LTLIBRARIES = npgnash.la
+
+npgnash.la: $(npgnash_la_OBJECTS) $(npgnash_la_DEPENDENCIES)
+	$(CXXLINK) $(am_npgnash_la_rpath) $(npgnash_la_LDFLAGS) $(npgnash_la_OBJECTS) $(npgnash_la_LIBADD) $(LIBS) && touch $@
+
+npgnash_la_SOURCES = npgnash.c plugin.cpp
+EXTRA_npgnash_la_SOURCES = npgnash.rc
+npgnash_la_LDFLAGS = -module -shared -no-undefined -version-info 0:0:0 \
+	-o npgnash.dll -Wl,--enable-stdcall-fixup npgnash.def \
+	$(AM_LDFLAGS)
+npgnash_la_LIBADD = npgnashrc.o
+
+npgnashrc.o: npgnash.rc
+	$(WINDRES) -o $@ $<
+
+install-pluginLIBRARIES: $(plugin_LIBRARIES)
+	@echo "Nothing to install here now."
+	@echo "Use \"make install-plugin\" to install the npgnash plugin to $(DESTDIR)$(plugindir)."
+
+install-plugin install-plugins: $(plugin_LIBRARIES)
+	test -d $(DESTDIR)$(plugindir) || $(mkinstalldirs) $(DESTDIR)$(plugindir)
+	$(INSTALL) $(INSTALL_STRIP_FLAG) $(plugin_LIBRARIES) $(DESTDIR)$(plugindir)
+
+uninstall-pluginLIBRARIES: $(plugin_LIBRARIES)
+	$(RM) -f $(DESTDIR)$(plugindir)/npgnash.dll
+
+endif # WIN32
+endif # NSAPI
+
+force:
+
+.PHONY : install-plugins install-plugin uninstall-plugin
