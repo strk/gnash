@@ -24,6 +24,16 @@
 #include "npplat.h"
 #include "pluginbase.h"
 
+#ifdef __cplusplus
+extern "C" {
+  DSOEXPORT NPError OSCALL NP_Shutdown();
+  DSOEXPORT NPError OSCALL NP_Initialize(NPNetscapeFuncs* aNPNFuncs);
+#ifdef XP_WIN
+  DSOEXPORT NPError OSCALL NP_GetEntryPoints(NPPluginFuncs* aNPPFuncs);
+#endif
+}
+#endif /* __cplusplus */
+
 DSOEXPORT NPNetscapeFuncs NPNFuncs;
 
 DSOEXPORT NPError OSCALL NP_Shutdown()

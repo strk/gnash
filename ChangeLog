@@ -1,5 +1,16 @@
 2008-03-30  Dossy Shiobara <dossy@panoptic.com>
 
+	* plugin/mozilla-sdk/np_entry.cpp: Fix symbols so they're
+	  exported correctly on Win32.
+
+2008-03-30  Dossy Shiobara <dossy@panoptic.com>
+
+	* plugin/mozilla-sdk/Makefile.am: Build libmozsdk separately,
+	  as its used by both the Win32 npgnash.dll and the
+	  libgnashplugin.so on *nix.
+
+2008-03-30  Dossy Shiobara <dossy@panoptic.com>
+
 	* plugin/Makefile.am: Conditionally add directories to the
 	  SUBDIRS list.  Build plugin/mozilla-sdk separately, with its
 	  own Makefile.
