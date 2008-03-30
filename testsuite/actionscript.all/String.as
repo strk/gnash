@@ -17,7 +17,7 @@
 // Original author: Mike Carlson - June 19th, 2006
 
 
-rcsid="$Id: String.as,v 1.49 2008/03/29 23:41:05 strk Exp $";
+rcsid="$Id: String.as,v 1.50 2008/03/30 12:55:48 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(String), 'function');
@@ -61,6 +61,7 @@ check_equals(typeof(String.fromCharCode), 'function');
 check(String.hasOwnProperty('fromCharCode'));
 check(!String.hasOwnProperty('toString'));
 check(!String.hasOwnProperty('valueOf'));
+check(String.hasOwnProperty('__proto__'));
 check(String.prototype.hasOwnProperty('valueOf'));
 check(String.prototype.hasOwnProperty('toString'));
 check(String.prototype.hasOwnProperty('toUpperCase'));
@@ -758,5 +759,5 @@ check_equals(r, "s:");
 #if OUTPUT_VERSION < 6
  check_totals(204);
 #else
- check_totals(234);
+ check_totals(235);
 #endif

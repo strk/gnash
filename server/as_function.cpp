@@ -73,8 +73,13 @@ static as_object* getFunctionPrototype()
 	static boost::intrusive_ptr<as_object> proto;
 
 	if ( proto.get() == NULL ) {
+
 		// Initialize Function prototype
-		proto = new as_object(getObjectInterface());
+		proto = new as_object();
+
+		// 
+		proto->set_prototype(getObjectInterface());
+
 		VM::get().addStatic(proto.get());
 
 		if ( VM::get().getSWFVersion() >= 6 )
@@ -172,7 +177,8 @@ as_function::getFunctionConstructor()
 	{
 		func = new builtin_function(
 			function_ctor, // function constructor doesn't do anything
-			getFunctionPrototype() // exported interface
+			getFunctionPrototype(), // exported interface
+			true // use "this" as constructor
 			);
 		VM::get().addStatic(func.get());
 	}

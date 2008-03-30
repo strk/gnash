@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Object.as,v 1.48 2008/03/29 15:41:43 strk Exp $";
+rcsid="$Id: Object.as,v 1.49 2008/03/30 12:55:48 strk Exp $";
 #include "check.as"
 
 // Test existance of methods
@@ -37,7 +37,7 @@ check_equals(typeof(Object.prototype.constructor), 'function');
 check_equals(Object.prototype.constructor, Object); 
 check_equals(typeof(Object.prototype.toString.constructor), 'function');
 #if OUTPUT_VERSION > 5
- xcheck_equals(Object.prototype.toString.constructor, Function);
+ check_equals(Object.prototype.toString.constructor, Function);
  check(Object.prototype.hasOwnProperty('toString'));
  check(Object.prototype.hasOwnProperty('toLocaleString'));
  check(Object.prototype.hasOwnProperty('valueOf'));
@@ -103,7 +103,7 @@ check(O.prototype.constructor.hasOwnProperty('constructor'));
 check(O.prototype.constructor.hasOwnProperty('prototype'));
 
 check_equals(O.prototype.constructor, Object);
-xcheck_equals(O.constructor, Function);
+check_equals(O.constructor, Function);
 
 check_equals(typeof(Object.prototype.addProperty), 'function');
 check_equals(typeof(Object.prototype.hasOwnProperty), 'function');

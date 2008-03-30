@@ -1,3 +1,11 @@
+2008-03-30 Sandro Santilli <strk@keybit.net>
+
+	* server/as_function.cpp, server/builtin_function.h
+	  server/asobj/ClassHierarchy.cpp: have function's
+	  constructor property set to Function.
+	* testsuite/actionscript.all/: MovieClip.as, Object.as,
+	  String.as: more constructors tests.
+
 2008-03-29 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ASHandlers.cpp (ActionSubString): don't choke on empty

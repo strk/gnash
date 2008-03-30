@@ -47,7 +47,7 @@ public:
 		as_function(),
 		_func(func)
 	{
-		init_member("constructor", this);
+		init_member("constructor", as_function::getFunctionConstructor().get());
 	}
 
 	/// Construct a builtin function/class with the given interface (possibly none)
@@ -63,12 +63,19 @@ public:
 	/// 	provided. Use the constructor taking a single argument
 	///	to get a default interface instead.
 	///
-	builtin_function(as_c_function_ptr func, as_object* iface)
+	builtin_function(as_c_function_ptr func, as_object* iface, bool useThisAsCtor=false)
 		:
 		as_function(iface),
 		_func(func)
 	{
-		init_member("constructor", this);
+		if ( useThisAsCtor )
+		{
+			init_member("constructor", this);
+		}
+		else
+		{
+			init_member("constructor", as_function::getFunctionConstructor().get());
+		}
 	}
 
 	/// Invoke this function or this Class constructor
