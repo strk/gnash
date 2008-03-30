@@ -1,3 +1,12 @@
+2008-03-30  Dossy Shiobara <dossy@panoptic.com>
+
+	* plugin/mozilla-sdk/Makefile.am,
+	  plugin/mozilla-sdk/np_entry.cpp,
+	  plugin/mozilla-sdk/include/npupp.h: Reverting my own
+	  change to np_entry.cpp and Rob Savoye's change to
+	  npupp.h.  The correct fix is to Makefile.am and define
+	  _WINDOWS on Win32.
+
 2008-03-31  Markus Gothe  <nietzsche@lysator.liu.se>
 
 	* libamf/amf.cpp: reinterpret return value.
