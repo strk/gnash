@@ -17,7 +17,7 @@
 // Original author: Mike Carlson - June 19th, 2006
 
 
-rcsid="$Id: String.as,v 1.50 2008/03/30 12:55:48 strk Exp $";
+rcsid="$Id: String.as,v 1.51 2008/03/30 17:09:32 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(String), 'function');
@@ -36,6 +36,7 @@ check_equals(typeof(String.prototype.slice), 'function');
 check_equals(typeof(String.prototype.substring), 'function');
 check_equals(typeof(String.prototype.split), 'function');
 check_equals(typeof(String.prototype.substr), 'function');
+check_equals(typeof(String.prototype.length), 'undefined');
 check_equals(typeof(String.prototype.fromCharCode), 'undefined');
 #if OUTPUT_VERSION > 5
  check_equals(typeof(String.valueOf), 'function');
@@ -75,6 +76,7 @@ check(String.prototype.hasOwnProperty('slice'));
 check(String.prototype.hasOwnProperty('substring'));
 check(String.prototype.hasOwnProperty('split'));
 check(String.prototype.hasOwnProperty('substr'));
+check(!String.prototype.hasOwnProperty('length'));
 #endif
 
 
@@ -82,6 +84,10 @@ check_equals(typeof(String()), 'string');
 
 var a;
 a = new String("wallawallawashinGTON");
+check_equals(a.length, 20);
+#if OUTPUT_VERSION > 5
+check(a.hasOwnProperty('length'));
+#endif
 check_equals(typeof(a), 'object');
 check(a instanceof String);
 check(a instanceof Object);
@@ -756,8 +762,29 @@ s = new String("");
 r = "s:"+s;
 check_equals(r, "s:");
 
+//----------------------------------------------------------------------
+// Test the 'length' property
+//----------------------------------------------------------------------
+
+a = "123";
+check_equals(a.length, 3);
+a.length = 2;
+check_equals(a.length, 3); // well, it's a string after all, not an object
+a = new String("123");
+check_equals(a.length, 3);
+a.length = 2;
+check_equals(a.length, 2); // can override
+check_equals(a, "123"); // not changing the actual string
+a.length = "another string";
+check_equals(a.length, "another string"); // can also be of a different type
+delete a.length;
+check_equals(a.length, "another string"); // can't be deleted
+#if OUTPUT_VERSION > 5
+ check(a.hasOwnProperty('length'));
+#endif
+
 #if OUTPUT_VERSION < 6
- check_totals(204);
+ check_totals(213);
 #else
- check_totals(235);
+ check_totals(247);
 #endif

@@ -56,7 +56,6 @@ namespace gnash
 
 // Forward declarations
 
-static as_value string_get_length(const fn_call& fn);
 static as_value string_concat(const fn_call& fn);
 static as_value string_slice(const fn_call& fn);
 static as_value string_split(const fn_call& fn);
@@ -132,10 +131,6 @@ attachStringInterface(as_object& o)
 	// ASnative(251, 13) - [String.prototype] substr
 	vm.registerNative(string_sub_str, 251, 13);
 	o.init_member("substr", vm.getNative(251, 13));
-
-	// This isn't advertised as native, so might be a proper property ?
-	o.init_readonly_property("length", string_get_length);
-
 }
 
 static as_object*
@@ -158,10 +153,15 @@ class string_as_object : public as_object
 {
 
 public:
-    string_as_object()
+    string_as_object(const std::string& s)
             :
-            as_object(getStringInterface())
-    {}
+            as_object(getStringInterface()),
+            _string(s)
+    {
+	std::wstring wstr = utf8::decodeCanonicalString(_string, _vm.getSWFVersion());
+	init_member(NSV::PROP_LENGTH, wstr.size(), as_prop_flags::dontDelete|as_prop_flags::dontEnum); // can override though
+    }
+
 
     bool useCustomToString() const { return false; }
 
@@ -176,8 +176,7 @@ public:
         return as_value(_string);
     }
 
-    std::string& str()
-
+    const std::string& str()
     {
         return _string;
     }
@@ -185,18 +184,6 @@ public:
 private:
     std::string _string;
 };
-
-static as_value
-string_get_length(const fn_call& fn)
-{
-    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
-
-    int version = VM::get().getSWFVersion();
-
-    std::wstring wstr = utf8::decodeCanonicalString(obj->str(), version);
-
-    return as_value(wstr.size());
-}
 
 // all the arguments will be converted to string and concatenated
 static as_value
@@ -234,7 +221,7 @@ string_slice(const fn_call& fn)
 {
     boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
-    int version = VM::get().getSWFVersion();
+    int version = obj->getVM().getSWFVersion();
 
     // Make a copy.
     std::wstring wstr = utf8::decodeCanonicalString(obj->str(), version);
@@ -269,15 +256,14 @@ string_split(const fn_call& fn)
     boost::intrusive_ptr<string_as_object> obj =
         ensureType<string_as_object>(fn.this_ptr);
 
-    int version = VM::get().getSWFVersion();
+    VM& vm = obj->getVM(); 
+    int SWFVersion = vm.getSWFVersion();
 
-    std::wstring wstr = utf8::decodeCanonicalString(obj->str(), version);
+    std::wstring wstr = utf8::decodeCanonicalString(obj->str(), SWFVersion);
 
     as_value val;
 
     boost::intrusive_ptr<as_array_object> array(new as_array_object());
-
-    int SWFVersion = VM::get().getSWFVersion();
 
     if (fn.nargs == 0)
     {
@@ -287,7 +273,7 @@ string_split(const fn_call& fn)
         return as_value(array.get());
     }
 
-    const std::wstring& delim = utf8::decodeCanonicalString(fn.arg(0).to_string(), version);
+    const std::wstring& delim = utf8::decodeCanonicalString(fn.arg(0).to_string(), SWFVersion);
 
     // SWF5 didn't support multichar or empty delimiter
     if ( SWFVersion < 6 )
@@ -322,7 +308,7 @@ string_split(const fn_call& fn)
 
     if ( delim.empty() ) {
         for (unsigned i=0; i <max; i++) {
-            val.set_std_string(utf8::encodeCanonicalString(wstr.substr(i, 1), version));
+            val.set_std_string(utf8::encodeCanonicalString(wstr.substr(i, 1), SWFVersion));
             array->push(val);
         }
 
@@ -338,7 +324,7 @@ string_split(const fn_call& fn)
         if (pos != std::wstring::npos) {
             val.set_std_string(utf8::encodeCanonicalString(
             		wstr.substr(prevpos, pos - prevpos),
-            		version));
+            		SWFVersion));
             array->push(val);
             num++;
             prevpos = pos + delim.size();
@@ -346,7 +332,7 @@ string_split(const fn_call& fn)
         } else {
             val.set_std_string(utf8::encodeCanonicalString(
             		wstr.substr(prevpos),
-            		version));
+            		SWFVersion));
             array->push(val);
             break;
         }
@@ -395,7 +381,7 @@ string_sub_str(const fn_call& fn)
 {
     boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
-    int version = VM::get().getSWFVersion();
+    int version = obj->getVM().getSWFVersion();
 
     std::wstring wstr = utf8::decodeCanonicalString(obj->str(), version);
 
@@ -432,7 +418,7 @@ string_sub_string(const fn_call& fn)
 {
     boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
-    int version = VM::get().getSWFVersion();
+    int version = obj->getVM().getSWFVersion();
 
     const std::wstring& wstr = utf8::decodeCanonicalString(obj->str(), version);
 
@@ -481,7 +467,7 @@ string_index_of(const fn_call& fn)
 {
     boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
-    int version = VM::get().getSWFVersion();
+    int version = obj->getVM().getSWFVersion();
 
     const std::wstring& wstr = utf8::decodeCanonicalString(obj->str(), version);
 
@@ -673,9 +659,7 @@ string_ctor(const fn_call& fn)
 		return as_value(str);
 	}
 	
-	boost::intrusive_ptr<string_as_object> obj = new string_as_object;
-
-	obj->str() = str;
+	boost::intrusive_ptr<string_as_object> obj = new string_as_object(str);
 
 	return as_value(obj.get());
 }

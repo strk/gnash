@@ -1,5 +1,13 @@
 2008-03-30 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/string.cpp: 'length' is an instance, not class, member,
+	  and it can be overridden.
+	* testsuite/actionscript.all/String.as: test 'length' member of string
+	  instances.
+	* testsuite/swfdec/PASSING: string-properties-{6,7,8}.swf pass
+
+2008-03-30 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/Global.cpp: error to aserror, provide a null
 	  _global.o (don't ask me why, but that's expected...)
 	* testsuite/swfdec/PASSING: global-variable-properties succeeds.
