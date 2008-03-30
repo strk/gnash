@@ -16,12 +16,20 @@
 #   along with this program; if not, write to the Free Software
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AUTOMAKE_OPTIONS = dejagnu
+AUTOMAKE_OPTIONS =
 
-AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX \
-        -I.. \
-        -I$(srcdir) \
-	-I$(srcdir)/include
+AM_CPPFLAGS = -DPLUGIN_TRACE
+
+if WIN32
+AM_CPPFLAGS += -DXP_WIN
+else
+AM_CPPFLAGS += -DXP_UNIX
+endif
+
+AM_CPPFLAGS += \
+	-I$(srcdir) \
+	-I$(srcdir)/include \
+	-I$(top_srcdir)/libbase
 
 # AM_CXXFLAGS = $(CXXFLAGS) $(AM_CPPFLAGS)
 # AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX # $(FIREFOX_DEFS)
@@ -30,32 +38,33 @@ AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX \
 # noinst_LTLIBRARIES = libmozsdk.la
 pkglib_LTLIBRARIES = libmozsdk.la
 
-noinst_HEADERS = npplat.h \
-	 pluginbase.h \
-         include/jri.h \
-	 include/npapi.h \
-         include/npupp.h \
-         include/prtypes.h \
-         include/jni.h \
-         include/jri_md.h \
-         include/npruntime.h \
-         include/jni_md.h \
-         include/jritypes.h \
-         include/nptypes.h \
-         include/prcpucfg.h \
-         prcpucfg-glibc.h \
-         prcpucfg-win32.h \
-         include/prlock.h \
-         include/prcvar.h \
-         include/prthread.h \
-         include/prinit.h \
-         include/prerr.h \
-         include/prerror.h \
-         include/prinrval.h \
-	 include/prwin16.h \
-         include/obsolete/protypes.h 
+noinst_HEADERS = \
+	npplat.h \
+	pluginbase.h \
+	include/jri.h \
+	include/npapi.h \
+	include/npupp.h \
+	include/prtypes.h \
+	include/jni.h \
+	include/jri_md.h \
+	include/npruntime.h \
+	include/jni_md.h \
+	include/jritypes.h \
+	include/nptypes.h \
+	include/prcpucfg.h \
+	include/prcpucfg-glibc.h \
+	include/prcpucfg-win32.h \
+	include/prlock.h \
+	include/prcvar.h \
+	include/prthread.h \
+	include/prinit.h \
+	include/prerr.h \
+	include/prerror.h \
+	include/prinrval.h \
+	include/prwin16.h \
+	include/obsolete/protypes.h 
 
 libmozsdk_la_SOURCES = \
 	npn_gate.cpp \
-        npp_gate.cpp \
-        np_entry.cpp
+	npp_gate.cpp \
+	np_entry.cpp
