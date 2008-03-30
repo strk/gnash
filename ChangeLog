@@ -1,5 +1,10 @@
 2008-03-30  Dossy Shiobara <dossy@panoptic.com>
 
+	* configure.ac: Add detection for NSPR and windres for Win32
+	  builds of npgnash.dll NPAPI plugin.
+
+2008-03-30  Dossy Shiobara <dossy@panoptic.com>
+
 	* macros/gnashpkgtool.m4: Add support for pkgname-config scripts
 	  that don't understand --cxxflags, such as nspr-config.
 

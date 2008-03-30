@@ -1382,6 +1382,11 @@ AC_LANG_POP(C++)
 dnl Shm::resize() uses this if it exists
 AC_CHECK_LIB(c, mremap)
 
+GNASH_PKG_FIND(nspr, [nspr.h], [Netscape Portable Runtime (NSPR)], PR_Init)
+
+AC_PATH_PROG(WINDRES, windres, [], [${pathlist}])
+AC_SUBST(WINDRES)
+
 GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
 GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
 GNASH_PKG_FIND(png, [png.h], [png images], png_info_init)
@@ -1483,6 +1488,15 @@ AM_CONDITIONAL(HAVE_GLIB, [ test x$has_glib = xyes ])
 
 if test x$build_gtk = xno -a x$nsapi = xyes; then
   AC_MSG_WARN(["Enabled NSAPI plugin, but you aren't building a GTK based GUI!"])
+fi
+
+if test x$windows = xyes -a x$nsapi = xyes; then
+  if test x$NSPR_CFLAGS = x -a x$NSPR_LIBS = x; then
+    AC_MSG_ERROR(["On Win32, NPAPI plugin requires NSPR."])
+  fi
+  if test x$WINDRES = x; then
+    AC_MSG_ERROR(["On Win32, NPAPI plugin requires windres."])
+  fi
 fi
 
 dnl if kde isn't installed, even if it's specified, don't try to build
@@ -1979,6 +1993,8 @@ extensions/dbus/Makefile
 extensions/metome/Makefile
 plugin/Makefile
 plugin/klash/Makefile
+plugin/mozilla-sdk/Makefile
+plugin/win32/Makefile
 cygnal/Makefile
 cygnal/testsuite/Makefile
 cygnal/testsuite/cygnal.all/Makefile
