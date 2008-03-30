@@ -1,3 +1,8 @@
+2008-03-30  Dossy Shiobara <dossy@panoptic.com>
+
+	* macros/gnashpkgtool.m4: Add support for pkgname-config scripts
+	  that don't understand --cxxflags, such as nspr-config.
+
 2008-03-30 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/string.cpp: 'length' is an instance, not class, member,
