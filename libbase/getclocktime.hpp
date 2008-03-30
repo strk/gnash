@@ -29,6 +29,13 @@
 
 #include <sys/time.h>
 
+#ifdef _WIN32
+struct timespec {
+	time_t	tv_sec; 	/* seconds */
+	long	tv_nsec;	/* nanoseconds */
+};
+#endif
+
 #define CLOCK_REALTIME 0 /* Dummy */
 
 static int clock_gettime(int, struct timespec *tp) {
