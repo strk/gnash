@@ -27,6 +27,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <cassert>
 
 #include "network.h"
 #include "amf.h"

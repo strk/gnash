@@ -1,3 +1,8 @@
+2008-03-31  Markus Gothe  <nietzsche@lysator.liu.se>
+
+	* libamf/amf.cpp: reinterpret return value.
+	* libamf/sol.cpp: include cassert.
+
 2008-03-30  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* libamf/sol.{h,cpp}, lcshm.{h,cpp}: Use Network::byte_t instead
