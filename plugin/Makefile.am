@@ -18,7 +18,19 @@
 
 AUTOMAKE_OPTIONS = 
 
-SUBDIRS = klash
+SUBDIRS =
+
+if KPARTS
+SUBDIRS += klash
+endif
+
+if NSAPI
+SUBDIRS += mozilla-sdk
+
+if WIN32
+SUBDIRS += win32
+endif
+endif # NSAPI
 
 # if DMALLOC
 # MALL_CFLAGS = $(DMALLOC_CFLAGS)
@@ -76,6 +88,7 @@ noinst_HEADERS = plugin.h \
 	 mozilla-sdk/include/prwin16.h \
          mozilla-sdk/include/obsolete/protypes.h 
 
+if !WIN32
 if NSAPI
 
 plugin_LTLIBRARIES = libgnashplugin.la
@@ -93,7 +106,8 @@ libgnashplugin_la_LDFLAGS = -avoid-version -L$(plugindir)
 else
 libgnashplugin_la_LDFLAGS = -module -avoid-version -L$(plugindir)
 endif
-endif
+endif # NSAPI
+endif # WIN32
 
 test_perms:
 	@if test ! -w $(DESTDIR)$(plugindir); then \
@@ -123,3 +137,4 @@ uninstall-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 	$(RM) -f $(DESTDIR)$(plugindir)/libgnashplugin.so
 
 .PHONY : install-plugins install-plugin test_perms
+

@@ -1,5 +1,11 @@
 2008-03-30  Dossy Shiobara <dossy@panoptic.com>
 
+	* plugin/Makefile.am: Conditionally add directories to the
+	  SUBDIRS list.  Build plugin/mozilla-sdk separately, with its
+	  own Makefile.
+
+2008-03-30  Dossy Shiobara <dossy@panoptic.com>
+
 	* libbase/getclocktime.hpp: Win32 has no "struct timespec" so we
 	  provide one.
 
