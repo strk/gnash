@@ -511,6 +511,14 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 	//          but not instanciatable.
 	//-------------------------------------------------
 
+	// No idea why, but it seems there's a NULL _global.o 
+	// defined at player startup...
+	// Probably due to the AS-based initialization 
+	// Not enumerable but overridable and deletable.
+	//
+	as_value nullVal; nullVal.set_null();
+	init_member("o", nullVal, as_prop_flags::dontEnum);
+
 	// ASSetPropFlags
 	init_member("ASSetPropFlags", new builtin_function(as_global_assetpropflags));
 	init_member("ASnative", new builtin_function(as_global_asnative));
