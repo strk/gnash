@@ -1,5 +1,10 @@
 2008-03-30  Dossy Shiobara <dossy@panoptic.com>
 
+	* libnet/rtmp_server.cpp: Use portable get_thread_id()
+	  instead of pthread_self() directly.
+
+2008-03-30  Dossy Shiobara <dossy@panoptic.com>
+
 	* plugin/mozilla-sdk/Makefile.am,
 	  plugin/mozilla-sdk/np_entry.cpp,
 	  plugin/mozilla-sdk/include/npupp.h: Reverting my own
