@@ -1,3 +1,8 @@
+2008-03-30  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* gui/klash.moc.in: Drop the extraneous gnash-head path from the
+	include for kdesup.h.
+
 2008-03-30  Dossy Shiobara <dossy@panoptic.com>
 
 	* plugin/win32/.cvsignore, plugin/win32/Makefile.am: Include

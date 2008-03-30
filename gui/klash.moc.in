@@ -7,7 +7,7 @@
 *****************************************************************************/
 
 #undef QT_NO_COMPAT
-#include "../../../../gnash-head/gui/kdesup.h"
+#include "kdesup.h"
 #include <qmetaobject.h>
 #include <qapplication.h>
 
