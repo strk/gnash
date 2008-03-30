@@ -1060,7 +1060,7 @@ AMF::encodeVariable(amf::Element *el)
 	  memcpy(tmpptr, el->getData(), el->getLength());
     }
     
-    return out;    
+    return reinterpret_cast<uint8_t *>(out);    
 }
 
 #if 0
