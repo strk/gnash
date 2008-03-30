@@ -396,11 +396,11 @@ as_function::constructInstance( as_environment& env,
 		// won't set __constructor__ to some other value...
 		if ( swfversion > 5 )
 		{
-			newobj->init_member("__constructor__", as_value(this));
+			newobj->init_member("__constructor__", as_value(this), as_prop_flags::dontEnum); // can delete
 
 			if ( swfversion == 6 )
 			{
-				newobj->init_member("constructor", as_value(this));
+				newobj->init_member("constructor", as_value(this), as_prop_flags::dontEnum); // can delete
 			}
 		}
 
@@ -431,11 +431,11 @@ as_function::constructInstance( as_environment& env,
 		// (to be checked)
 		if ( swfversion > 5 )
 		{
-			newobj->init_member("__constructor__", as_value(this));
+			newobj->init_member("__constructor__", as_value(this), as_prop_flags::dontEnum); // can delete
 
 			if ( swfversion == 6 )
 			{
-				newobj->init_member("constructor", as_value(this));
+				newobj->init_member("constructor", as_value(this), as_prop_flags::dontEnum); // can delete
 			}
 		}
 

@@ -1,5 +1,12 @@
 2008-03-30 Sandro Santilli <strk@keybit.net>
 
+	* server/as_function.cpp: __constructor__ and constructor
+	  members given to new instances are not protected from
+	  deletion.
+	* testsuite/swfdec/PASSING: video-properties-{6,7,8}.swf pass.
+
+2008-03-30 Sandro Santilli <strk@keybit.net>
+
 	* server/as_function.{cpp,h}: don't provide a prototype
 	  member to builtin function if not requested so.
 	* testsuite/swfdec/PASSING: function-properties-{6,7,8} succeed.
