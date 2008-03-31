@@ -28,8 +28,29 @@
 //	
 
 
-rcsid="$Id: Number.as,v 1.43 2008/03/31 12:19:11 strk Exp $";
+rcsid="$Id: Number.as,v 1.44 2008/03/31 23:18:34 strk Exp $";
 #include "check.as"
+
+Number.hasOwnProperty = ASnative(101, 5);
+
+check(Number.hasOwnProperty('MAX_VALUE'));
+check_equals(typeof(Number.MAX_VALUE), "number");
+// gnash fails in rounding (ends in 2316, we round up to 232)
+// TODO: check that we're close, if not extremely accurate
+xcheck_equals(Number.MAX_VALUE.toString(), "1.79769313486231e+308");
+
+check(Number.hasOwnProperty('MIN_VALUE'));
+check_equals(typeof(Number.MIN_VALUE), "number");
+check_equals(Number.MIN_VALUE.toString(), "4.94065645841247e-324"); 
+
+check(Number.hasOwnProperty('NEGATIVE_INFINITY'));
+check_equals(Number.NEGATIVE_INFINITY, -Infinity);
+
+check(Number.hasOwnProperty('NaN'));
+check_equals(Number.NaN, NaN);
+
+check(Number.hasOwnProperty('POSITIVE_INFINITY'));
+check_equals(Number.POSITIVE_INFINITY, Infinity);
 
 var n1=new Number(268);
 check_equals(typeof(n1), 'object');
@@ -477,11 +498,11 @@ check( isNaN(0/0) );
 // END OF TEST
 
 #if OUTPUT_VERSION < 6
- check_totals(158);
+ check_totals(170);
 #else
 #if OUTPUT_VERSION < 7
- check_totals(171);
+ check_totals(183);
 #else
- check_totals(169);
+ check_totals(181);
 #endif
 #endif

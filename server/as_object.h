@@ -770,7 +770,7 @@ public:
 	/// @param set_false
 	/// @param set_true
 	///
-	void setPropFlags(as_value& props, int set_false, int set_true);
+	void setPropFlags(const as_value& props, int set_false, int set_true);
 
 #ifdef USE_DEBUGGER
 	/// Get the properties of this objects 

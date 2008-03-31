@@ -1,5 +1,16 @@
 2008-03-31 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.{cpp,h}: const-correct setPropFlags (sorry
+	  for big rebuild).
+	* server/asobj/Number.cpp: add missing properties, make all Number
+	  properties constant (shown to be required by swfdec
+	  number-properties-*.swf, all of which only fail due to rounding
+	  issues now).
+	* testsuite/actionscript.all/Number.as: add test for missing
+	  properties.
+
+2008-03-31 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/ClassHierarchy.cpp: use hasOwnProperty to find out
 	  if a native class initialized its own __proto__ as get_member
 	  won't return a non-visible one; add debugging and error

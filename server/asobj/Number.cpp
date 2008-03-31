@@ -156,9 +156,19 @@ getNumberConstructor()
 		cl=new builtin_function(&number_ctor, getNumberInterface());
 		VM::get().addStatic(cl.get());
 
-		// We don't want to attach Number prototype methods to the Number
-		// class itself.
-		//attachNumberInterface(*cl); 
+		// constants flags
+		int cflags = as_prop_flags::dontEnum|as_prop_flags::dontDelete|as_prop_flags::readOnly;
+
+		// change __proto__ constructor and prototype to have constant flags..
+		as_value nullVal; nullVal.set_null();
+		cl->setPropFlags(nullVal, 0, cflags);
+
+		cl->init_member("MAX_VALUE", std::numeric_limits<double>::max(), cflags);
+		cl->init_member("MIN_VALUE", std::numeric_limits<double>::denorm_min(), cflags);
+		cl->init_member("NaN", as_value(NAN), cflags);
+		cl->init_member("POSITIVE_INFINITY", as_value(INFINITY), cflags);
+		cl->init_member("NEGATIVE_INFINITY", as_value(-INFINITY), cflags);
+
 	}
 
 	return cl;
