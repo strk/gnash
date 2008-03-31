@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Date.as,v 1.44 2008/03/31 15:38:14 bwy Exp $";
+rcsid="$Id: Date.as,v 1.45 2008/03/31 16:41:00 bwy Exp $";
 #include "check.as"
 
 check_equals(typeof(Date), 'function');
@@ -626,14 +626,22 @@ check_equals (Date.UTC(1969, 11).toString(), "-2678400000");
 check_equals (Date.UTC(1969, 11).valueOf(), -2678400000);
 check_equals (Date.UTC(1969, 12).toString(), "0");
 check_equals (Date.UTC(1969, 12).valueOf(), 0);
+
+#if OUTPUT_VERSION < 7
 check_equals (Date.UTC(0, 0, 0, 0, 0, 0, 0).tostring(), "-2209075200000");
 check_equals (Date.UTC(1969, 12, 31).tostring(), "2592000000");
 check_equals (Date.UTC(1969, 12, 31).tostring(), "2592000000");
+#else
+check_equals (Date.UTC(0, 0, 0, 0, 0, 0, 0).tostring(), undefined);
+check_equals (Date.UTC(1969, 12, 31).tostring(), undefined);
+check_equals (Date.UTC(1969, 12, 31).tostring(), undefined);
+#endif
+
 check_equals (Date.UTC(1970, 1).toString(), "2678400000");
 check_equals (Date.UTC(1970, 1).valueOf(), 2678400000);
 
-xcheck_equals (Date.UTC(-1, -12).toString(), "-2272060800000");
-xcheck_equals (Date.UTC(-1, 12).valueOf(), -2208988800000);
+check_equals (Date.UTC(-1, -12).toString(), "-2272060800000");
+check_equals (Date.UTC(-1, 12).valueOf(), -2208988800000);
 
 // Check if Date, concatenated to a string, is in human readable form
 d = new Date(2000, 1, 15, 0, 0, 0); 

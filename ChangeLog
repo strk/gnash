@@ -1,5 +1,10 @@
 2008-03-31 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* testsuite/actionscript.all/Date.as: results tested against
+	  LNX 9,0,115,0.
+
+2008-03-31 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* testsuite/actionscript.all/Date.as: more tests.
 
 2008-03-31 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
