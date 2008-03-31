@@ -1,3 +1,9 @@
+2008-03-31 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* testsuite/actionscript.all/Date.as: fix expected results.
+	  Some aren't the same as the pp - there was already a note about
+	  that, and maybe it is worth emulating the player here.
+
 2008-03-31 Sandro Santilli <strk@keybit.net>
 
 	* server/: as_object.cpp, builtin_function.h: don't lookup string_table

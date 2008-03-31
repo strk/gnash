@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Date.as,v 1.42 2008/03/31 13:47:49 bwy Exp $";
+rcsid="$Id: Date.as,v 1.43 2008/03/31 15:09:38 bwy Exp $";
 #include "check.as"
 
 check_equals(typeof(Date), 'function');
@@ -75,7 +75,7 @@ check_equals(Date.prototype.__proto__, Object.prototype);
 check_equals (d.UTC, undefined);
 check (Date.UTC);
 #else
- xcheck_equals(typeof(Date.__proto__), 'undefined');
+ check_equals(typeof(Date.__proto__), 'undefined');
 #endif
 
 // Static method should be available even if you haven't asked for a Date object.
@@ -548,7 +548,7 @@ check (Date.utc);
 #endif
 	
     h = new Date(3.0935415006117e+23);
-	xcheck_equals(h.getMilliseconds(), 584); // Might suggest how the pp works
+	check_equals(h.getMilliseconds(), 584);
 	xcheck_equals(h.getFullYear(), -2147481678);
 	check_equals(h.toString(), "Tue Jan -2147483647 16:04:00 GMT+0000 -2147481678");	   
 
