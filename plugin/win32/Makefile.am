@@ -58,7 +58,7 @@ AM_LDFLAGS = \
 	$(NSPR_LIBS) \
 	$(NULL)
 
-plugindir   = $(FIREFOX_PLUGINS)
+plugindir = $(bindir)
 
 plugin_LTLIBRARIES = npgnash.la
 
@@ -75,16 +75,16 @@ npgnash_la_LIBADD = npgnashrc.o
 npgnashrc.o: npgnash.rc
 	$(WINDRES) -o $@ $<
 
-install-pluginLIBRARIES: $(plugin_LIBRARIES)
+install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 	@echo "Nothing to install here now."
-	@echo "Use \"make install-plugin\" to install the npgnash plugin to $(DESTDIR)$(plugindir)."
+	@echo "Use \"make install-plugin\" to install the npgnash plugin to $(bindir)."
 
-install-plugin install-plugins: $(plugin_LIBRARIES)
-	test -d $(DESTDIR)$(plugindir) || $(mkinstalldirs) $(DESTDIR)$(plugindir)
-	$(INSTALL) $(INSTALL_STRIP_FLAG) $(plugin_LIBRARIES) $(DESTDIR)$(plugindir)
+install-plugin install-plugins: $(plugin_LTLIBRARIES)
+	test -d $(bindir) || $(mkinstalldirs) $(bindir)
+	$(INSTALL_PROGRAM) npgnash.dll $(bindir)
 
-uninstall-pluginLIBRARIES: $(plugin_LIBRARIES)
-	$(RM) -f $(DESTDIR)$(plugindir)/npgnash.dll
+uninstall-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
+	$(RM) -f $(bindir)/npgnash.dll
 
 endif # WIN32
 endif # NSAPI
