@@ -1,3 +1,8 @@
+2008-03-31 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libamf/sol.cpp: outsize isn't expected to be more than 0 at
+	  this point.
+
 2008-03-30  Dossy Shiobara <dossy@panoptic.com>
 
 	* libnet/rtmp_server.cpp: Use portable get_thread_id()
