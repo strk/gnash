@@ -20,6 +20,7 @@
 
 #include "as_function.h" // for inheritance
 #include "as_environment.h" // for FrameGuard
+#include "namedStrings.h"
 
 #include <cassert>
 
@@ -47,7 +48,7 @@ public:
 		as_function(),
 		_func(func)
 	{
-		init_member("constructor", as_function::getFunctionConstructor().get());
+		init_member(NSV::PROP_uuCONSTRUCTORuu, as_function::getFunctionConstructor().get());
 	}
 
 	/// Construct a builtin function/class with the given interface (possibly none)
@@ -70,11 +71,11 @@ public:
 	{
 		if ( useThisAsCtor )
 		{
-			init_member("constructor", this);
+			init_member(NSV::PROP_uuCONSTRUCTORuu, this);
 		}
 		else
 		{
-			init_member("constructor", as_function::getFunctionConstructor().get());
+			init_member(NSV::PROP_uuCONSTRUCTORuu, as_function::getFunctionConstructor().get());
 		}
 	}
 

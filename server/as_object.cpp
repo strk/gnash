@@ -954,7 +954,7 @@ as_object::as_object(as_object* proto)
 	_vm(VM::get())
 	//, m_prototype(proto)
 {
-	init_member("__proto__", as_value(proto));
+	init_member(NSV::PROP_uuPROTOuu, as_value(proto));
 }
 
 as_object::as_object(boost::intrusive_ptr<as_object> proto)
@@ -964,7 +964,7 @@ as_object::as_object(boost::intrusive_ptr<as_object> proto)
 	//, m_prototype(proto)
 {
 	//set_prototype(proto);
-	init_member("__proto__", as_value(proto));
+	init_member(NSV::PROP_uuPROTOuu, as_value(proto));
 }
 
 as_object::as_object(const as_object& other)
