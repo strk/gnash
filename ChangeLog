@@ -1,3 +1,11 @@
+2008-03-31  Dossy Shiobara <dossy@panoptic.com>
+
+	* plugin/win32/Makefile.am: Install npgnash.dll into
+	  $(bindir) for Win32.  A future installer will need to
+	  copy it into the correct directory as per the user's
+	  Windows registry indicates where the appropriate
+	  Mozilla-based application is installed.
+
 2008-03-31 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/Global.cpp (as_global_assetpropflags): clear flags
