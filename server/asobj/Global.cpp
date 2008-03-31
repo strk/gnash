@@ -366,8 +366,10 @@ as_global_assetpropflags(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
 	if (fn.nargs > 4)
             log_aserror(_("%s has more than four arguments"), __FUNCTION__);
+#if 0 // it is perfectly legal to have 4 args in SWF5 it seems..
 	if (version == 5 && fn.nargs == 4)
             log_aserror(_("%s has four arguments in a SWF version 5 movie"), __FUNCTION__);
+#endif
     )
 		
     // ASSetPropFlags(obj, props, n, allowFalse=false)

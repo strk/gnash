@@ -1,5 +1,7 @@
 2008-03-31 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Global.cpp (as_global_assetpropflags): it is perfectly
+	  fine for ASSetPropFlags() to take 4 args in SWF5..
 	* testsuite/swfdec/PASSING: object-hasownproperty-5.swf passes.
 	* testsuite/actionscript.all/Date.as, Number.as: tests for __proto__
 	  succeed.
