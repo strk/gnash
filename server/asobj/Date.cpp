@@ -517,9 +517,11 @@ date_new(const fn_call& fn)
 #define date_get_proto(function, timefn, element) \
   static as_value function(const fn_call& fn) { \
     boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr); \
-    time_t t = (time_t)(date->value / 1000.0); \
+    time_t t = static_cast<time_t>(date->value / 1000.0); \
     struct tm tm; \
-    return as_value(_##timefn##_r(&t, &tm)->element); \
+    if (!_##timefn##_r(&t, &tm)) \
+    { as_value rv; rv.set_nan(); return rv; } \
+    return as_value(tm.element); \
   }
 
 /// \brief Date.getYear
