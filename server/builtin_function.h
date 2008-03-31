@@ -48,7 +48,7 @@ public:
 		as_function(),
 		_func(func)
 	{
-		init_member(NSV::PROP_uuCONSTRUCTORuu, as_function::getFunctionConstructor().get());
+		init_member(NSV::PROP_CONSTRUCTOR, as_function::getFunctionConstructor().get());
 	}
 
 	/// Construct a builtin function/class with the given interface (possibly none)
@@ -71,11 +71,11 @@ public:
 	{
 		if ( useThisAsCtor )
 		{
-			init_member(NSV::PROP_uuCONSTRUCTORuu, this);
+			init_member(NSV::PROP_CONSTRUCTOR, this);
 		}
 		else
 		{
-			init_member(NSV::PROP_uuCONSTRUCTORuu, as_function::getFunctionConstructor().get());
+			init_member(NSV::PROP_CONSTRUCTOR, as_function::getFunctionConstructor().get());
 		}
 	}
 

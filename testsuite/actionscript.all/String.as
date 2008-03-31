@@ -17,7 +17,7 @@
 // Original author: Mike Carlson - June 19th, 2006
 
 
-rcsid="$Id: String.as,v 1.53 2008/03/31 11:58:47 strk Exp $";
+rcsid="$Id: String.as,v 1.54 2008/03/31 17:17:16 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(String), 'function');
@@ -738,12 +738,12 @@ s = new String("a");
 check_equals(typeof(Object.prototype.toString), 'function');
 check_equals(typeof(s.toString), 'function');
 check(! delete String.prototype.toString);
-ASSetPropFlags(String.prototype, "toString", 0, 7); // unprotect from deletion
+ASSetPropFlags(String.prototype, "toString", 0, 2); // unprotect from deletion
 StringProtoToStringBackup = String.prototype.toString;
 check(delete String.prototype.toString);
 check_equals(typeof(s.toString), 'function');
 check(!delete Object.prototype.toString);
-ASSetPropFlags(Object.prototype, "toString", 0, 7); // unprotect from deletion
+ASSetPropFlags(Object.prototype, "toString", 0, 2); // unprotect from deletion
 ObjectProtoToStringBackup = Object.prototype.toString;
 check(delete Object.prototype.toString);
 check_equals(typeof(s.toString), 'undefined');
@@ -787,18 +787,32 @@ check_equals(a.length, "another string"); // can't be deleted
 // Test that __proto__ is only hidden, but still existing , in SWF5
 //----------------------------------------------------------------------
 
-ASSetPropFlags(String, "__proto__", 0, 5248); // unhide String.__proto__
+a=new Array(); for (v in String) a.push(v); a.sort();
+#if OUTPUT_VERSION > 5
+ check_equals(a.toString(), "toString");
+#else
+ check_equals(a.length, 0);
+#endif
+
+ASSetPropFlags(String, "__proto__", 0, 128); // unhide String.__proto__
+
+a=new Array(); for (v in String) a.push(v); a.sort();
+check_equals(a.toString(), "toString"); 
+
 check_equals(typeof(String.__proto__), 'object'); 
 check_equals(typeof(Object.prototype), 'object');
 Object.prototype.gotcha = 1;
 check_equals(String.gotcha, 1);
-Object.prototype.hasOwnProperty = ASnative (101, 5);
+ASSetPropFlags(Object.prototype, "hasOwnProperty", 0, 128); // unhide Object.prototype.hasOwnProperty
 check(!String.__proto__.hasOwnProperty("gotcha"));
 check(String.__proto__.__proto__.hasOwnProperty("gotcha")); // function
-check_equals(String.__proto__.__proto__, Object.prototype); 
+check_equals(String.__proto__.__proto__, Object.prototype);  // hasOwnProperty doesn't exist in gnash !
+
+a=new Array(); for (v in String) a.push(v); a.sort();
+check_equals(a.toString(), "gotcha,toString"); 
 
 #if OUTPUT_VERSION < 6
- check_totals(219);
+ check_totals(222);
 #else
- check_totals(253);
+ check_totals(256);
 #endif

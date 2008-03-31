@@ -76,25 +76,26 @@ attachObjectInterface(as_object& o)
 	// Object.toLocaleString()
 	o.init_member("toLocaleString", new builtin_function(object_toLocaleString));
 
-	if ( target_version  < 6 ) return;
+	int swf6flags = as_prop_flags::dontEnum|as_prop_flags::dontDelete|as_prop_flags::onlySWF6Up;
+	//if ( target_version  < 6 ) return;
 
 	// Object.addProperty()
-	o.init_member("addProperty", vm.getNative(101, 2));
+	o.init_member("addProperty", vm.getNative(101, 2), swf6flags);
 
 	// Object.hasOwnProperty()
-	o.init_member("hasOwnProperty", vm.getNative(101, 5));
+	o.init_member("hasOwnProperty", vm.getNative(101, 5), swf6flags);
 
 	// Object.isPropertyEnumerable()
-	o.init_member("isPropertyEnumerable", vm.getNative(101, 7));
+	o.init_member("isPropertyEnumerable", vm.getNative(101, 7), swf6flags);
 
 	// Object.isPrototypeOf()
-	o.init_member("isPrototypeOf", vm.getNative(101, 6));
+	o.init_member("isPrototypeOf", vm.getNative(101, 6), swf6flags);
 
 	// Object.watch()
-	o.init_member("watch", vm.getNative(101, 0));
+	o.init_member("watch", vm.getNative(101, 0), swf6flags);
 
 	// Object.unwatch()
-	o.init_member("unwatch", vm.getNative(101, 1));
+	o.init_member("unwatch", vm.getNative(101, 1), swf6flags);
 }
 
 as_object*

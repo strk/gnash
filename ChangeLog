@@ -1,3 +1,13 @@
+2008-03-31 Sandro Santilli <strk@keybit.net>
+
+	* server/builtin_function.h: Oops, swapped __constructor__
+	  and constructor..
+	* server/asobj/Object.cpp: still register all property members,
+	  just visible or not based on version.
+	* testsuite/actionscript.all/String.as: cleanup tests to set
+	  strictly needed prop flags; test that hasOwnProperty is there
+	  for SWF5 too, just not-visible.
+
 2008-03-31 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/actionscript.all/Date.as: correct case.
