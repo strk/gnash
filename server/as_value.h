@@ -170,7 +170,7 @@ public:
 	as_value(unsigned long val);
 
 	/// Chad: Document this
-	as_value(asNamespace &) {/**/}
+	as_value(asNamespace &);
 
 	/// Construct a NULL, OBJECT, MOVIECLIP or AS_FUNCTION value
 	//

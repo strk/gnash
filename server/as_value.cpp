@@ -1514,6 +1514,11 @@ as_value::as_value(as_object* obj)
 	set_as_object(obj);
 }
 
+/// Chad: Document this
+as_value::as_value(asNamespace &)
+{
+}
+
 //-------------------------------------
 // as_value::CharacterProxy
 //-------------------------------------

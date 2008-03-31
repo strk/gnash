@@ -1,3 +1,10 @@
+2008-03-31 Zou Lunkai <zoulunkai@gmail.com>
+
+	* libnet/cque.{h, cpp}: add the USE_STATS_QUEUE macro guard, fix
+	  building without USE_STATS_QUEUE defined.
+	* server/as_value.{h, cpp}: don't inline as_value::as_value(asNamespace &),
+	  fix a 'link once' problem here with -O2 option.
+
 2008-03-31 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libamf/sol.cpp: outsize isn't expected to be more than 0 at
