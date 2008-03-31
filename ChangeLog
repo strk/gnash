@@ -1,5 +1,12 @@
 2008-03-31 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Global.cpp (as_global_assetpropflags): clear flags
+	  default to 0, always, not to 1 in swf5 (no idea where that idea came
+	  from).
+	* testsuite/swfdec/PASSING: {string,function}-properties-5.swf pass.
+
+2008-03-31 Sandro Santilli <strk@keybit.net>
+
 	* server/builtin_function.h: Oops, swapped __constructor__
 	  and constructor..
 	* server/asobj/Object.cpp: still register all property members,

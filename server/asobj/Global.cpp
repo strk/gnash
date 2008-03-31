@@ -402,11 +402,10 @@ as_global_assetpropflags(const fn_call& fn)
 
     // ASSetPropFlags was exposed in Flash 5, however the fourth argument 'set_false'
     // was not required as it always defaulted to the value '~0'. 
-    int set_false = (fn.nargs == 3 ? 
-		     (version == 5 ? ~0 : 0) : int(fn.arg(3).to_number()))
+    int set_false = (fn.nargs < 4 ? 0 : int(fn.arg(3).to_number()))
 	& as_prop_flags::as_prop_flags_mask;
 
-	obj->setPropFlags(props, set_false, set_true);
+    obj->setPropFlags(props, set_false, set_true);
 
     return as_value();
 }
