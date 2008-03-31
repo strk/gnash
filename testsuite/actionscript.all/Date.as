@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Date.as,v 1.41 2008/03/31 13:34:27 bwy Exp $";
+rcsid="$Id: Date.as,v 1.42 2008/03/31 13:47:49 bwy Exp $";
 #include "check.as"
 
 check_equals(typeof(Date), 'function');
@@ -548,8 +548,9 @@ check (Date.utc);
 #endif
 	
     h = new Date(3.0935415006117e+23);
-	xcheck_equals(wierddate.getMilliseconds(), 700);
-	xcheck_equals(wierddate.getFullYear(), -100000);	   
+	xcheck_equals(h.getMilliseconds(), 584); // Might suggest how the pp works
+	xcheck_equals(h.getFullYear(), -2147481678);
+	check_equals(h.toString(), "Tue Jan -2147483647 16:04:00 GMT+0000 -2147481678");	   
 
 // It's hard to test TimezoneOffset because the values will be different
 // depending upon where geographically you run the tests.
@@ -640,7 +641,7 @@ check_equals(typeof(foo), 'string');
 #endif
 
 #if OUTPUT_VERSION == 5
-totals(273);
+totals(274);
 #else
-totals (315);
+totals (316);
 #endif
