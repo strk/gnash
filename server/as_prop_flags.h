@@ -36,19 +36,19 @@ public:
 	enum Flags {
 
 		/// Protect from enumeration
-		dontEnum	= 1 << 0,
+		dontEnum	= 1 << 0, // 1
 
 		/// Protect from deletion
-		dontDelete	= 1 << 1,
+		dontDelete	= 1 << 1, // 2
 
 		/// Protect from assigning a value
-		readOnly	= 1 << 2,
+		readOnly	= 1 << 2, // 4
 
 		/// Property is static -- assignments change, not override.
-		staticProp	= 1 << 3,
+		staticProp	= 1 << 3, // 8
 
 		/// Flags are protected from changes
-		isProtected	= 1 << 4,
+		isProtected	= 1 << 4, // 16
 
 		/// Only visible by VM initialized for version 6 or higher 
 		onlySWF6Up 	= 1 << 7, // 128
