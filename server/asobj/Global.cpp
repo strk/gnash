@@ -520,11 +520,22 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 	init_member("o", nullVal, as_prop_flags::dontEnum);
 
 	// ASSetPropFlags
-	init_member("ASSetPropFlags", new builtin_function(as_global_assetpropflags));
+	vm.registerNative(as_global_assetpropflags, 1, 0);
+	init_member("ASSetPropFlags", vm.getNative(1, 0));
+
+	// ASnative
 	init_member("ASnative", new builtin_function(as_global_asnative));
+
+	// ASSetNative
 	init_member("ASSetNative", new builtin_function(as_global_assetnative));
+
+	// ASSetNativeAccessor
 	init_member("ASSetNativeAccessor", new builtin_function(as_global_assetnativeaccessor));
+
+	// ASconstructor
 	init_member("ASconstructor", new builtin_function(as_global_asconstructor));
+
+	// updateAfterEvent
 	init_member("updateAfterEvent", new builtin_function(as_global_updateAfterEvent));
 
 	// Defined in timers.h
