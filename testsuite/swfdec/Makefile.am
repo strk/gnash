@@ -53,6 +53,7 @@ check_SCRIPTS = \
 clean-local: 
 	rm -f $(check_SCRIPTS) \
 		*.log *.trace-gnash \
+		*.out *.err \
 		site.bak site.exp site.exp.bak testrun.sum \
 		gnash.sum 
 

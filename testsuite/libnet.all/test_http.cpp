@@ -371,6 +371,7 @@ main(int argc, char *argv[])
     }
     count = http.extractLanguage(buffer2);
     language = http.getLanguage();
+
     if ((count == 2) &&
         (language[0] == "en-US") &&
         (language[1] == "en")) {
@@ -379,8 +380,9 @@ main(int argc, char *argv[])
         runtest.pass ("HTTP::extractLanguage(Content-)");
     }
 
-    result = reinterpret_cast<const char *>(http.extractCharset(buffer));
+    count = http.extractCharset(buffer);
     std::vector<std::string> charsets = http.getCharset();
+    
     if ((count == 3) &&
         (charsets[0] == "iso-8859-1") &&
         (charsets[1] == "utf-8") &&

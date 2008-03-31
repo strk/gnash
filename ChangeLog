@@ -3,6 +3,9 @@
 	* server/asobj/Date.cpp: check for success of localtime - some
 	  more-than-32-bit numbers fail - and set to NaN. This (probably)
 	  isn't expected behaviour, but fixes a segfault.
+	* testsuite/libnet.all/test_http.cpp: extractCharset returns an int, and
+	  we don't want to try turning it into a string like that.
+	* testsuite/swfdec/Makefile.am: remove .out and .err files on make clean.
 
 2008-03-31 Zou Lunkai <zoulunkai@gmail.com>
 
