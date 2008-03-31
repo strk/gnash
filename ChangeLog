@@ -1,3 +1,8 @@
+2008-03-31 Sandro Santilli <strk@keybit.net>
+
+	* server/as_function.cpp: constructor and __constructor__ still exist
+	  in swf5, just not-visible. Reduce string_table lookups.
+
 2008-03-31 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/actionscript.all/Date.as: lots of failing tests, some

@@ -125,8 +125,8 @@ as_function::as_function(as_object* iface)
 
 	if ( iface )
 	{
-		iface->init_member("constructor", this); 
-		init_member("prototype", as_value(iface));
+		iface->init_member(NSV::PROP_CONSTRUCTOR, this); 
+		init_member(NSV::PROP_PROTOTYPE, as_value(iface));
 	}
 }
 
@@ -134,19 +134,21 @@ void
 as_function::setPrototype(as_object* proto)
 {
 	//_properties = proto;
-	init_member("prototype", as_value(proto));
+	init_member(NSV::PROP_PROTOTYPE, as_value(proto));
 }
 
 void
 as_function::extends(as_function& superclass)
 {
 	as_object* newproto = new as_object(superclass.getPrototype().get());
-	newproto->init_member("__proto__", superclass.getPrototype().get());
+	newproto->init_member(NSV::PROP_uuPROTOuu, superclass.getPrototype().get());
+
 	if ( VM::get().getSWFVersion() > 5 )
 	{
-		newproto->init_member("__constructor__", &superclass); 
+		newproto->init_member(NSV::PROP_uuCONSTRUCTORuu, &superclass); 
 	}
-	init_member("prototype", as_value(newproto));
+
+	init_member(NSV::PROP_PROTOTYPE, as_value(newproto));
 }
 
 boost::intrusive_ptr<as_object>
@@ -391,14 +393,12 @@ as_function::constructInstance( as_environment& env,
 		// Add a __constructor__ member to the new object, but only for SWF6 up
 		// (to be checked). NOTE that we assume the builtin constructors
 		// won't set __constructor__ to some other value...
-		if ( swfversion > 5 )
-		{
-			newobj->init_member("__constructor__", as_value(this), as_prop_flags::dontEnum); // can delete
+		int flags = as_prop_flags::dontEnum|as_prop_flags::onlySWF6Up; // can delete, hidden in swf5
+		newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, as_value(this), flags);
 
-			if ( swfversion == 6 )
-			{
-				newobj->init_member("constructor", as_value(this), as_prop_flags::dontEnum); // can delete
-			}
+		if ( swfversion < 7 )
+		{
+			newobj->init_member(NSV::PROP_CONSTRUCTOR, as_value(this), flags);
 		}
 
         }
@@ -426,14 +426,12 @@ as_function::constructInstance( as_environment& env,
 
 		// Add a __constructor__ member to the new object, but only for SWF6 up
 		// (to be checked)
-		if ( swfversion > 5 )
-		{
-			newobj->init_member("__constructor__", as_value(this), as_prop_flags::dontEnum); // can delete
+		int flags = as_prop_flags::dontEnum|as_prop_flags::onlySWF6Up; // can delete, hidden in swf5
+		newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, as_value(this), flags);
 
-			if ( swfversion == 6 )
-			{
-				newobj->init_member("constructor", as_value(this), as_prop_flags::dontEnum); // can delete
-			}
+		if ( swfversion < 7 )
+		{
+			newobj->init_member(NSV::PROP_CONSTRUCTOR, as_value(this), flags);
 		}
 
 		// Super is constructed from this function's prototype
