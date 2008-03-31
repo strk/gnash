@@ -1,3 +1,11 @@
+2008-03-31 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/ClassHierarchy.cpp: use hasOwnProperty to find out
+	  if a native class initialized its own __proto__ as get_member
+	  won't return a non-visible one; add debugging and error
+	  logging while loading on-demand classes.
+	* testsuite/swfdec/PASSING: boolean-properties-5.swf passes.
+
 2008-03-31 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/asobj/Date.cpp: drop dead code. Be more careful

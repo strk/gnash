@@ -89,6 +89,9 @@ public:
 
 	virtual as_value operator()(const fn_call& /*fn*/)
 	{
+		string_table& st = VM::get().getStringTable();
+		log_debug("Loading extension class %s", st.value(mDeclaration.name));
+
 		as_value super;
 		if (mDeclaration.super_name)
 		{
@@ -97,14 +100,18 @@ public:
 			if (!mTarget->get_member(mDeclaration.super_name, &super))
 			{
 				// Error here -- doesn't exist.
-				// TODO: Log the error.
+				log_error("Can't find %s (Superclass of %s)",
+					st.value(mDeclaration.super_name),
+					st.value(mDeclaration.name));
 				super.set_undefined();
 				return super;
 			}
 			if (!super.is_as_function())
 			{
 				// Error here -- not an object.
-				// TODO: Log the error.
+				log_error("%s (Superclass of %s) is not a function (%s)",
+					st.value(mDeclaration.super_name),
+					st.value(mDeclaration.name), super.to_debug_string());
 				super.set_undefined();
 				return super;
 			}
@@ -115,12 +122,14 @@ public:
 			// Successfully loaded it, now find it, set its proto, and return.
 			as_value us;
 			mTarget->get_member(mDeclaration.name, &us);
-			if (mDeclaration.super_name && !us.to_object()->get_prototype())
+			if (mDeclaration.super_name && !us.to_object()->hasOwnProperty(NSV::PROP_uuPROTOuu))
+			{
 				us.to_object()->set_prototype(super.to_as_function()->getPrototype());
-			fprintf(stderr, "Loaded ourselves.\n");
+			}
 			return us;
 		}
 		// Error here -- not successful in loading.
+		log_error("Could not load class %s", st.value(mDeclaration.name));
 		super.set_undefined();
 		return super;
 	}
@@ -141,38 +150,62 @@ public:
 		as_function(getObjectInterface()),
 		mDeclaration(c), mTarget(g), mExtension(e)
 	{
+		// does it make any sense to set a 'constructor' here ??
 		//init_member("constructor", this);
-		init_member("constructor", as_function::getFunctionConstructor().get());
+		//init_member("constructor", as_function::getFunctionConstructor().get());
 	}
 
 	virtual as_value operator()(const fn_call& /*fn*/)
 	{
-		as_value super;
-		if (mDeclaration.super_name)
-		{
-			// Check to be sure our super exists.
-			// This will trigger its instantiation if necessary.
-			if (!mTarget->get_member(mDeclaration.super_name, &super))
-			{
-				// Error here -- doesn't exist.
-				// TODO: Log the error.
-				super.set_undefined();
-				return super;
-			}
-			if (!super.is_as_function())
-			{
-				// Error here -- not an object.
-				// TODO: Log the error.
-				super.set_undefined();
-				return super;
-			}
-		}
+		string_table& st = VM::get().getStringTable();
+
+		log_debug("Loading native class %s", st.value(mDeclaration.name));
+
 		mDeclaration.initializer(*mTarget);
 		// Successfully loaded it, now find it, set its proto, and return.
 		as_value us;
-		mTarget->get_member(mDeclaration.name, &us);
-		if (mDeclaration.super_name && !us.to_object()->get_prototype())
-			us.to_object()->set_prototype(super.to_as_function()->getPrototype());
+		if ( mTarget->get_member(mDeclaration.name, &us) )
+		{
+			as_value super;
+			if (mDeclaration.super_name)
+			{
+				// Check to be sure our super exists.
+				// This will trigger its instantiation if necessary.
+				if (!mTarget->get_member(mDeclaration.super_name, &super))
+				{
+					// Error here -- doesn't exist.
+					log_error("Can't find %s (Superclass of %s)",
+						st.value(mDeclaration.super_name),
+						st.value(mDeclaration.name));
+					super.set_undefined();
+					return super;
+				}
+				if (!super.is_as_function())
+				{
+					// Error here -- not an object.
+					log_error("%s (Superclass of %s) is not a function (%s)",
+						st.value(mDeclaration.super_name),
+						st.value(mDeclaration.name), super.to_debug_string());
+					super.set_undefined();
+					return super;
+				}
+				assert(super.to_as_function());
+			}
+			if ( ! us.to_object() )
+			{
+				log_error("Native class %s is not an object after initialization (%s)",
+					st.value(mDeclaration.name), us.to_debug_string());
+			}
+			if (mDeclaration.super_name && !us.to_object()->hasOwnProperty(NSV::PROP_uuPROTOuu))
+			{
+				us.to_object()->set_prototype(super.to_as_function()->getPrototype());
+			}
+		}
+		else
+		{
+			log_error("Native class %s is not found after initialization", 
+				st.value(mDeclaration.name));
+		}
 		return us;
 	}
 };
