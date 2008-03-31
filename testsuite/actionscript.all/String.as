@@ -17,7 +17,7 @@
 // Original author: Mike Carlson - June 19th, 2006
 
 
-rcsid="$Id: String.as,v 1.51 2008/03/30 17:09:32 strk Exp $";
+rcsid="$Id: String.as,v 1.52 2008/03/31 07:25:26 zoulunkai Exp $";
 #include "check.as"
 
 check_equals(typeof(String), 'function');
@@ -777,7 +777,7 @@ check_equals(a.length, 2); // can override
 check_equals(a, "123"); // not changing the actual string
 a.length = "another string";
 check_equals(a.length, "another string"); // can also be of a different type
-delete a.length;
+delete a["length"];
 check_equals(a.length, "another string"); // can't be deleted
 #if OUTPUT_VERSION > 5
  check(a.hasOwnProperty('length'));
