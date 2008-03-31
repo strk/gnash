@@ -1,3 +1,8 @@
+2008-03-31 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* testsuite/actionscript.all/Date.as: lots of failing tests, some
+	  a bit wierd, and one segfault.
+
 2008-03-31 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/Global.cpp (as_global_assetpropflags): it is perfectly

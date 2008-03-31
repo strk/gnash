@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Date.as,v 1.40 2008/03/31 12:19:11 strk Exp $";
+rcsid="$Id: Date.as,v 1.41 2008/03/31 13:34:27 bwy Exp $";
 #include "check.as"
 
 check_equals(typeof(Date), 'function');
@@ -75,7 +75,7 @@ check_equals(Date.prototype.__proto__, Object.prototype);
 check_equals (d.UTC, undefined);
 check (Date.UTC);
 #else
- check_equals(typeof(Date.__proto__), 'undefined');
+ xcheck_equals(typeof(Date.__proto__), 'undefined');
 #endif
 
 // Static method should be available even if you haven't asked for a Date object.
@@ -248,6 +248,15 @@ check (Date.utc);
 	check_equals(d.getUTCMinutes(), 0);
 	check_equals(d.getUTCSeconds(), 0);
 	check_equals(d.getUTCMilliseconds(), 0);
+
+	check_equals(d.getFullYear(), 1970);
+	check_equals(d.getMonth(), 0);
+	check_equals(d.getDate(), 1);
+	check_equals(d.getDay(), 4);	// It was a Thursday
+	check_equals(d.getHours(), 1);
+	check_equals(d.getMinutes(), 0);
+	check_equals(d.getSeconds(), 0);
+	check_equals(d.getMilliseconds(), 0);
 	
     /// No difference:
     check_equals (Date.toLocaleString(), Date.toString());
@@ -334,9 +343,9 @@ check (Date.utc);
     delete d; var d = new Date(0,notanumber);
 	check_equals(d.valueOf().toString(), "NaN");
     delete d; var d = new Date(0,plusinfinity);
-	check_equals(d.valueOf().toString(), "Infinity");
+	xcheck_equals(d.valueOf().toString(), "NaN");
     delete d; var d = new Date(0,minusinfinity);
-	check_equals(d.valueOf().toString(), "-Infinity");
+	xcheck_equals(d.valueOf().toString(), "NaN");
 
 // Constructor with three numeric args means year month day-of-month
     delete d; var d = new Date(2000,0,1); // 1 Jan 2000 00:00:00 localtime
@@ -496,6 +505,52 @@ check (Date.utc);
     delete d; var d = new Date(2000,0,1,plusinfinity,minusinfinity,0,0);
 	check_equals(d.valueOf().toString(), "NaN");
 
+    wierddate = new Date (-2000, 5, 6, 12, 30, 12, 7);
+	check_equals(wierddate.getFullYear(), -100);
+	check_equals(wierddate.getMonth(), 5);
+	check_equals(wierddate.getDate(), 6);
+	check_equals(wierddate.getHours(), 12);
+	check_equals(wierddate.getMinutes(), 30);
+	xcheck_equals(wierddate.getSeconds(), 12);
+	xcheck_equals(wierddate.getMilliseconds(), 7);
+
+	xcheck_equals(wierddate.valueOf().toString(), "-65309372987993");
+
+    wierddate.setMilliseconds(300);
+	xcheck_equals(wierddate.getMilliseconds(), 300);
+	xcheck_equals(wierddate.getSeconds(), 12);
+
+	xcheck_equals(wierddate.valueOf().toString(), "-65309372987700");
+	
+    wierddate.setMilliseconds(-300);
+	xcheck_equals(wierddate.getMilliseconds(), 700);
+	xcheck_equals(wierddate.getSeconds(), 11);
+
+	xcheck_equals(wierddate.valueOf().toString(), "-65309372988300");
+	
+    wierddate.setYear(100000);
+	check_equals(wierddate.getMilliseconds(), 700);
+	check_equals(wierddate.getFullYear(), 100000);	   
+#if OUTPUT_VERSION < 8
+	xcheck_equals(wierddate.valueOf().toString(), "3.0935415006117e+15");
+#else
+	xcheck_equals(wierddate.valueOf().toString(), "3.0935415870117e+15");
+#endif
+
+
+    wierddate.setYear(-100000);
+	xcheck_equals(wierddate.getMilliseconds(), 700);
+	xcheck_equals(wierddate.getFullYear(), -100000);	   
+#if OUTPUT_VERSION < 8
+	xcheck_equals(wierddate.valueOf().toString(), "-3.2178488993883e+15");
+#else
+	xcheck_equals(wierddate.valueOf().toString(), "-3.2178488129883e+15");
+#endif
+	
+    h = new Date(3.0935415006117e+23);
+	xcheck_equals(wierddate.getMilliseconds(), 700);
+	xcheck_equals(wierddate.getFullYear(), -100000);	   
+
 // It's hard to test TimezoneOffset because the values will be different
 // depending upon where geographically you run the tests.
 // We do what we can without knowing where we are!
@@ -585,7 +640,7 @@ check_equals(typeof(foo), 'string');
 #endif
 
 #if OUTPUT_VERSION == 5
-totals(243);
+totals(273);
 #else
-totals (285);
+totals (315);
 #endif
