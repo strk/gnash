@@ -28,7 +28,7 @@
 //	
 
 
-rcsid="$Id: Number.as,v 1.42 2008/03/11 19:31:47 strk Exp $";
+rcsid="$Id: Number.as,v 1.43 2008/03/31 12:19:11 strk Exp $";
 #include "check.as"
 
 var n1=new Number(268);
@@ -309,9 +309,9 @@ check_equals(typeof(Number.valueOf()), 'function'); // this is odd
 #else // OUTPUT_VERSION <= 5
 check(!isNaN(Number.valueOf()) );
 check_equals(typeof(Number), 'function'); 
-xcheck_equals(typeof(Number.valueOf), 'undefined'); 
-xcheck_equals(typeof(Number.__proto__), 'undefined'); 
-xcheck_equals(typeof(Number.toString), 'undefined'); 
+check_equals(typeof(Number.valueOf), 'undefined'); 
+check_equals(typeof(Number.__proto__), 'undefined'); 
+check_equals(typeof(Number.toString), 'undefined'); 
 check_equals(typeof(Function), 'undefined');
 #endif
 

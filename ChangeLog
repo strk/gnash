@@ -1,5 +1,11 @@
 2008-03-31 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/PASSING: object-hasownproperty-5.swf passes.
+	* testsuite/actionscript.all/Date.as, Number.as: tests for __proto__
+	  succeed.
+
+2008-03-31 Sandro Santilli <strk@keybit.net>
+
 	* server/as_object.cpp (findProperty): respect visibility flag also
 	  for __proto__.
 	* testsuite/actionscript.all/String.as: test that __proto__ of String
