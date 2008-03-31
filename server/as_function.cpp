@@ -77,7 +77,10 @@ static as_object* getFunctionPrototype()
 		// Initialize Function prototype
 		proto = new as_object();
 
-		// 
+		// We initialize the __proto__ member separately, as getObjectInterface
+		// will end up calling getFunctionPrototype again and we want that
+		// call to return the still-not-completely-constructed prototype rather
+		// then create a new one. 
 		proto->set_prototype(getObjectInterface());
 
 		VM::get().addStatic(proto.get());
@@ -108,7 +111,6 @@ as_function::as_function()
 	as_object()
 {
 	int flags = as_prop_flags::dontDelete|as_prop_flags::dontEnum|as_prop_flags::onlySWF6Up;
-
 	init_member(NSV::PROP_uuPROTOuu, as_value(getFunctionPrototype()), flags);
 }
 
