@@ -20,6 +20,7 @@
 #include "as_prop_flags.h"
 #include "as_value.h"
 #include "as_function.h" // for function_class_init
+#include "button_character_instance.h"
 #include "array.h"
 #include "AsBroadcaster.h"
 #include "Boolean.h"
@@ -275,6 +276,7 @@ static ClassHierarchy::nativeClass knownClasses[] =
 	{ textfield_class_init, NSV::CLASS_TEXT_FIELD, 0, NSV::NS_FLASH_TEXT, 3 },
 	{ math_class_init, NSV::CLASS_MATH, 0, NS_GLOBAL, 4 },
 	{ boolean_class_init, NSV::CLASS_BOOLEAN, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
+	{ button_class_init, NSV::CLASS_BUTTON, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ color_class_init, NSV::CLASS_COLOR, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ selection_class_init, NSV::CLASS_SELECTION, NSV::CLASS_OBJECT, NS_UNKNOWN, 5 },
 	{ sound_class_init, NSV::CLASS_SOUND, NSV::CLASS_OBJECT, NSV::NS_FLASH_MEDIA, 5 },

@@ -1,5 +1,14 @@
 2008-03-31 Sandro Santilli <strk@keybit.net>
 
+	* server/button_character_instance.{cpp,h}: have buttons
+	  share prototype.
+	* server/namedStrings.{cpp,h}: add CLASS_BUTTON
+	* server/asobj/ClassHierarchy.cpp: register Button as a global class.
+	* testsuite/actionscript.all/Global.as: test that Button exists and
+	  is a function.
+
+2008-03-31 Sandro Santilli <strk@keybit.net>
+
 	* server/as_object.{cpp,h}: const-correct setPropFlags (sorry
 	  for big rebuild).
 	* server/asobj/Number.cpp: add missing properties, make all Number

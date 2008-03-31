@@ -36,6 +36,7 @@
 #include "GnashException.h" // for shared ActionScript getter-setters
 #include "ExecutableCode.h"
 #include "namedStrings.h"
+#include "Object.h" // for getObjectInterface
 
 /** \page buttons Buttons and mouse behaviour
 
@@ -167,6 +168,9 @@ frame loop:
 
 namespace gnash {
 
+// Forward declarations
+static as_object* getButtonInterface();
+
 /// A couple of typedefs to make code neater
 typedef button_character_instance Button;
 typedef boost::intrusive_ptr<Button> ButtonPtr;
@@ -244,7 +248,7 @@ button_character_instance::button_character_instance(
 {
 	assert(m_def);
 
-	attachButtonInterface(*this);
+	set_prototype(getButtonInterface());
 
 	// check up presence Key events
 	// TODO: use a service of button_character_def, not this hard-coded thing here
@@ -950,6 +954,43 @@ int
 button_character_instance::getSWFVersion() const
 {
 	return m_def->getSWFVersion();
+}
+
+static as_object*
+getButtonInterface()
+{
+  static boost::intrusive_ptr<as_object> proto;
+  if ( proto == NULL )
+  {
+    proto = new as_object(getObjectInterface());
+    VM::get().addStatic(proto.get());
+
+    attachButtonInterface(*proto);
+  }
+  return proto.get();
+}
+
+static as_value
+button_ctor(const fn_call& /* fn */)
+{
+  boost::intrusive_ptr<as_object> clip = new as_object(getButtonInterface());
+  return as_value(clip.get());
+}
+
+void
+button_class_init(as_object& global)
+{
+  // This is going to be the global Button "class"/"function"
+  static boost::intrusive_ptr<builtin_function> cl=NULL;
+
+  if ( cl == NULL )
+  {
+    cl=new builtin_function(&button_ctor, getButtonInterface());
+    VM::get().addStatic(cl.get());
+  }
+
+  // Register _global.MovieClip
+  global.init_member("Button", cl.get());
 }
 
 } // end of namespace gnash

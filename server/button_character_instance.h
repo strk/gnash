@@ -198,6 +198,9 @@ private:
 
 };
 
+/// Initialize the global Button class
+void button_class_init(as_object& global);
+
 }	// end namespace gnash
 
 

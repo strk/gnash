@@ -22,8 +22,10 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Global.as,v 1.50 2008/03/26 17:02:24 bwy Exp $";
+rcsid="$Id: Global.as,v 1.51 2008/03/31 23:48:33 strk Exp $";
 #include "check.as"
+
+check_equals(typeof(Button), 'function'); // random check
 
 #if OUTPUT_VERSION > 5
 check_equals(typeof(_global.updateAfterEvent), 'function');
@@ -463,15 +465,15 @@ check_equals (int("0x-7.8 "), 0);
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 5
-	check_totals(152); // SWF5
+	check_totals(153); // SWF5
 #else
 # if OUTPUT_VERSION == 6
-	check_totals(186); // SWF6
+	check_totals(187); // SWF6
 # else
 #  if OUTPUT_VERSION == 7
-	check_totals(168); // SWF7
+	check_totals(169); // SWF7
 #  else
-	check_totals(155); // SWF8+
+	check_totals(156); // SWF8+
 #  endif
 # endif
 #endif
