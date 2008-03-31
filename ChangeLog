@@ -1,3 +1,9 @@
+2008-03-31 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/asobj/Date.cpp: drop dead code. Be more careful
+	  with casts to time_t to avoid segfaults. Use std::strings,
+	  not snprintf. Use boost::format, probably only temporarily.	   
+
 2008-03-31 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/Boolean.cpp: don't replicate interface to class
