@@ -6,5 +6,7 @@ testrun.log
 *.sum
 *.trace-gnash
 *.log
+*.out
+*.err
 run_swfdec_testsuite_*
 gmon.out
