@@ -1,3 +1,9 @@
+2008-03-31 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/Boolean.cpp: don't replicate interface to class
+	* testsuite/swfdec/PASSING: boolean-properties-6,7,8 pass,
+	  5 still fails.
+
 2008-03-31  Dossy Shiobara <dossy@panoptic.com>
 
 	* plugin/win32/Makefile.am: Install npgnash.dll into

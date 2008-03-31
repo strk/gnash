@@ -144,7 +144,7 @@ getBooleanConstructor()
 
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
-		attachBooleanInterface(*cl);
+		//attachBooleanInterface(*cl);
 	}
 
 	return cl;
