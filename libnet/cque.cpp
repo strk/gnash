@@ -40,10 +40,12 @@ namespace gnash
 CQue::CQue()
 {
 //    GNASH_REPORT_FUNCTION;
+#ifdef USE_STATS_QUEUE
     _stats.totalbytes = 0;
     _stats.totalin = 0;
     _stats.totalout = 0;
     clock_gettime (CLOCK_REALTIME, &_stats.start);
+#endif
     _name = "default";
 }
 

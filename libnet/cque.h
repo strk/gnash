@@ -71,7 +71,9 @@ public:
     
     // Dump the data to the terminal
     void dump();
+#ifdef USE_STATS_QUEUE
     que_stats_t *stats() { return &_stats; };
+#endif
     void setName(const std::string &str) { _name = str; }
 private:
     // an optional name for the queue, only used for debugging messages to make them unique
