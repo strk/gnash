@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Date.as,v 1.43 2008/03/31 15:09:38 bwy Exp $";
+rcsid="$Id: Date.as,v 1.44 2008/03/31 15:38:14 bwy Exp $";
 #include "check.as"
 
 check_equals(typeof(Date), 'function');
@@ -603,7 +603,7 @@ d.setHours(0, 0, 0, 0);
 d.setMonth(11);
 check_equals (d.getHours(), 0);
 
-// It's not easy to test the toString() code here cos we cannot find out from
+// It's not easy to test the toString() code here because we cannot find out from
 // within AS whether DST is in effect or not.
 
 check_equals (Date.UTC(1970,0), 0);
@@ -618,6 +618,22 @@ d.setUTCFullYear(2000, 6, 1);
 d.setUTCHours(0, 0, 0, 0);
 check (Date.UTC(2000,6,1,0,0,0,0) == d.valueOf());
 
+
+xcheck_equals (Date.UTC(-1000, 20).valueOf(), -33713366400000);
+xcheck_equals (Date.UTC(-70, 0).toString(), "-4417977600000");
+xcheck_equals (Date.UTC(-70, 0).valueOf(), -4417977600000);
+check_equals (Date.UTC(1969, 11).toString(), "-2678400000");
+check_equals (Date.UTC(1969, 11).valueOf(), -2678400000);
+check_equals (Date.UTC(1969, 12).toString(), "0");
+check_equals (Date.UTC(1969, 12).valueOf(), 0);
+check_equals (Date.UTC(0, 0, 0, 0, 0, 0, 0).tostring(), "-2209075200000");
+check_equals (Date.UTC(1969, 12, 31).tostring(), "2592000000");
+check_equals (Date.UTC(1969, 12, 31).tostring(), "2592000000");
+check_equals (Date.UTC(1970, 1).toString(), "2678400000");
+check_equals (Date.UTC(1970, 1).valueOf(), 2678400000);
+
+xcheck_equals (Date.UTC(-1, -12).toString(), "-2272060800000");
+xcheck_equals (Date.UTC(-1, 12).valueOf(), -2208988800000);
 
 // Check if Date, concatenated to a string, is in human readable form
 d = new Date(2000, 1, 15, 0, 0, 0); 
@@ -641,7 +657,7 @@ check_equals(typeof(foo), 'string');
 #endif
 
 #if OUTPUT_VERSION == 5
-totals(274);
+totals(288);
 #else
-totals (316);
+totals (330);
 #endif
