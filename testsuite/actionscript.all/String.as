@@ -17,7 +17,7 @@
 // Original author: Mike Carlson - June 19th, 2006
 
 
-rcsid="$Id: String.as,v 1.52 2008/03/31 07:25:26 zoulunkai Exp $";
+rcsid="$Id: String.as,v 1.53 2008/03/31 11:58:47 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(String), 'function');
@@ -783,8 +783,22 @@ check_equals(a.length, "another string"); // can't be deleted
  check(a.hasOwnProperty('length'));
 #endif
 
+//----------------------------------------------------------------------
+// Test that __proto__ is only hidden, but still existing , in SWF5
+//----------------------------------------------------------------------
+
+ASSetPropFlags(String, "__proto__", 0, 5248); // unhide String.__proto__
+check_equals(typeof(String.__proto__), 'object'); 
+check_equals(typeof(Object.prototype), 'object');
+Object.prototype.gotcha = 1;
+check_equals(String.gotcha, 1);
+Object.prototype.hasOwnProperty = ASnative (101, 5);
+check(!String.__proto__.hasOwnProperty("gotcha"));
+check(String.__proto__.__proto__.hasOwnProperty("gotcha")); // function
+check_equals(String.__proto__.__proto__, Object.prototype); 
+
 #if OUTPUT_VERSION < 6
- check_totals(213);
+ check_totals(219);
 #else
- check_totals(247);
+ check_totals(253);
 #endif

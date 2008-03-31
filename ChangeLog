@@ -1,5 +1,10 @@
 2008-03-31 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.cpp (findProperty): respect visibility flag also
+	  for __proto__.
+	* testsuite/actionscript.all/String.as: test that __proto__ of String
+	  still exists, but it's not-visible (assetpropflags can be used to
+	  unhide).
 	* server/as_function.cpp: __proto__ is still attached to functions in
 	  SWF5, only not-visible (a flag).
 	* server/asobj/Object.cpp: register natives despite swf version.

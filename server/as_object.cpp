@@ -405,18 +405,25 @@ Property*
 as_object::findProperty(string_table::key key, string_table::key nsname, 
 	as_object **owner)
 {
+	int swfVersion = _vm.getSWFVersion();
+
 	// don't enter an infinite loop looking for __proto__ ...
 	if (key == NSV::PROP_uuPROTOuu && !nsname)
 	{
-		if (owner != NULL)
-			*owner = this;
-		return _members.getProperty(key, nsname);
+		Property* prop = _members.getProperty(key, nsname);
+		// TODO: add ignoreVisibility parameter to allow using __proto__ even when not visible ?
+		if (prop && prop->isVisible(swfVersion))
+		{
+			if (owner != NULL)
+				*owner = this;
+			return prop;
+		}
+		return NULL;
 	}
 
 	// keep track of visited objects, avoid infinite loops.
 	std::set<as_object*> visited;
 
-	int swfVersion = _vm.getSWFVersion();
 	int i = 0;
 
 	boost::intrusive_ptr<as_object> obj = this;
@@ -451,7 +458,7 @@ as_object::findUpdatableProperty(string_table::key key, string_table::key nsname
 	// We won't scan the inheritance chain if we find a member,
 	// even if invisible.
 	// 
-	if ( prop )	return prop; 
+	if ( prop )	return prop;  // TODO: what about isVisible ?
 
 	// don't enter an infinite loop looking for __proto__ ...
 	if (key == NSV::PROP_uuPROTOuu) return NULL;
