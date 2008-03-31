@@ -51,14 +51,26 @@ static void
 attachObjectInterface(as_object& o)
 {
 	VM& vm = o.getVM();
+
+	// We register natives despite swf version,
+
+	vm.registerNative(object_watch, 101, 0); 
+	vm.registerNative(object_unwatch, 101, 1); 
+	vm.registerNative(object_addproperty, 101, 2); 
+	vm.registerNative(as_object::valueof_method, 101, 3); 
+	vm.registerNative(as_object::tostring_method, 101, 4); 
+	vm.registerNative(object_hasOwnProperty, 101, 5); 
+	vm.registerNative(object_isPrototypeOf, 101, 6); 
+	vm.registerNative(object_isPropertyEnumerable, 101, 7); 
+
+	// Then will attach to the prototype based on version
+
 	int target_version = vm.getSWFVersion();
 
 	// Object.valueOf()
-	vm.registerNative(as_object::valueof_method, 101, 3);
 	o.init_member("valueOf", vm.getNative(101, 3));
 
 	// Object.toString()
-	vm.registerNative(as_object::tostring_method, 101, 4);
 	o.init_member("toString", vm.getNative(101, 4));
 
 	// Object.toLocaleString()
@@ -67,27 +79,21 @@ attachObjectInterface(as_object& o)
 	if ( target_version  < 6 ) return;
 
 	// Object.addProperty()
-	vm.registerNative(object_addproperty, 101, 2);
 	o.init_member("addProperty", vm.getNative(101, 2));
 
 	// Object.hasOwnProperty()
-	vm.registerNative(object_hasOwnProperty, 101, 5);
 	o.init_member("hasOwnProperty", vm.getNative(101, 5));
 
 	// Object.isPropertyEnumerable()
-	vm.registerNative(object_isPropertyEnumerable, 101, 7);
 	o.init_member("isPropertyEnumerable", vm.getNative(101, 7));
 
 	// Object.isPrototypeOf()
-	vm.registerNative(object_isPrototypeOf, 101, 6);
 	o.init_member("isPrototypeOf", vm.getNative(101, 6));
 
 	// Object.watch()
-	vm.registerNative(object_watch, 101, 0);
 	o.init_member("watch", vm.getNative(101, 0));
 
 	// Object.unwatch()
-	vm.registerNative(object_unwatch, 101, 1);
 	o.init_member("unwatch", vm.getNative(101, 1));
 }
 
