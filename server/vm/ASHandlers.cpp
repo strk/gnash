@@ -843,6 +843,9 @@ SWFHandlers::ActionLogicalNot(ActionExec& thread)
     as_environment& env = thread.env;
     thread.ensureStack(1);
     env.top(0).set_bool(! env.top(0).to_bool());
+
+    // Flash4 used 1 and 0 as return from this tag
+    if ( env.get_version() < 5 ) env.top(0).convert_to_number();
 }
 
 void

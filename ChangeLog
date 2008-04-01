@@ -1,5 +1,7 @@
 2008-04-01 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionLogicalNot): swf < 5 return 0 
+	  or 1 from this tag.
 	* testsuite/actionscript.all/MovieClip.as: fix handling of load
 	  callback for SWF5.
 
