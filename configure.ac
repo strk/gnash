@@ -1907,6 +1907,19 @@ dnl echo "RENDERER_LIBS=$RENDERER_LIBS"
 AC_SUBST(RENDERER_LIBS)
 AC_SUBST(RENDERER_CONFIG)
 
+
+dnl check for missing libraries and disable them.
+if test x"$BOOST_LIBS" != x; then
+  if test x"${extra_missing_libs}" != x; then
+    for i in ${extra_missing_libs}; do
+      if test $i = serialization; then
+        AC_DEFINE([BOOST_MULTI_INDEX_DISABLE_SERIALIZATION], ["1"], [if the library is missing, don't use it.])
+      fi
+    done
+  fi
+fi
+
+
 SUPPORTED_GUIS=
 if test x$build_qtopia = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},qtopia"
