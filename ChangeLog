@@ -1,3 +1,11 @@
+2008-04-01 Sandro Santilli <strk@keybit.net>
+
+	* server/as_value.cpp (to_number): in swf<5 a astring can
+	  convert to a number as long as it starts with digits; leading
+	  non-digits won't yeld a NaN. Fixes bug #20911.
+	* testsuite/misc-swfc.all/swf4opcode.sc: test convertion of 
+	  strings containing leading non-digits to number.
+
 2008-04-01 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/asobj/Date.cpp: drop ctime methods as time_t is not up to
@@ -7,7 +15,7 @@
 	  Return NaN when the date value is NaN or infinity. Make sure 
 	  fillGnashTime doesn't return negative month or milliseconds.
 	  Drop (temporarily) timezone functions.
-    * testsuite/actionscript.all/Date.as: passing tests.  
+	* testsuite/actionscript.all/Date.as: passing tests.  
 
 2008-04-01  Rob Savoye  <rob@ripple.welcomehome.org>
 

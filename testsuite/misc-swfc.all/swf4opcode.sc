@@ -106,6 +106,24 @@
 
 .frame 2
     .action:
+
+        //
+        // test convertion to number (and thus bool)
+        //
+        x = '2/';
+        y = '3/';
+        // x and y are converted to number 0 before comparision
+        check_equals( (x+y), 5 );
+        check( y > x );
+        neg = !x;
+	check(!neg);
+        neg = !y;
+	check(!neg);
+	y = '/';
+        check_equals( y, 0 );
+	y = '  4';
+        check_equals( y, 4 );
+
         //
         // test ActionLessThan
         //
