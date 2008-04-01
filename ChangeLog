@@ -1,3 +1,8 @@
+2008-04-01 Sandro Santilli <strk@keybit.net>
+
+	* doc/C/gnashrc.xml: removed, the good one is
+	  doc/C/usermanual/gnashrc.xml
+
 2008-03-31 Sandro Santilli <strk@keybit.net>
 
 	* server/button_character_instance.{cpp,h}: have buttons
