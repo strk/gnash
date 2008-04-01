@@ -1,5 +1,9 @@
 2008-04-01 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp: register natives.
+
+2008-04-01 Sandro Santilli <strk@keybit.net>
+
 	* server/array.cpp: sorting constants are not protected (swfdec test
 	  shows).
 	* testsuite/actionscript.all/toString_valueOf.as: xpass leftovers
