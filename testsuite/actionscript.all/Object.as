@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Object.as,v 1.50 2008/04/01 09:04:48 zoulunkai Exp $";
+rcsid="$Id: Object.as,v 1.51 2008/04/01 09:31:07 zoulunkai Exp $";
 #include "check.as"
 
 // Test things in Class Object (swf5~swf8)
@@ -29,6 +29,7 @@ check_equals(typeof(Object), 'function');
 check_equals(typeof(Object.prototype), 'object');
 check_equals(typeof(Object.constructor), 'function');
 #if OUTPUT_VERSION == 5
+	check_equals(typeof(Object.__proto__), 'undefined');
 	// make Object.__proto__  visible in swf5
 	ASSetPropFlags(Object, null, 8, 128 + 1);
 #endif
@@ -573,7 +574,7 @@ check( obj8.prototype.isPrototypeOf(obj9) );
 
 
 #if OUTPUT_VERSION <= 5
-totals(78);
+totals(79);
 #endif
 
 #if OUTPUT_VERSION >= 6
