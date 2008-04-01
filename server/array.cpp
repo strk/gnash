@@ -1458,11 +1458,12 @@ attachArrayProperties(as_object& proto)
 static void
 attachArrayStatics(as_object& proto)
 {
-	proto.init_member("CASEINSENSITIVE", as_array_object::fCaseInsensitive);
-	proto.init_member("DESCENDING", as_array_object::fDescending);
-	proto.init_member("UNIQUESORT", as_array_object::fUniqueSort);
-	proto.init_member("RETURNINDEXEDARRAY", as_array_object::fReturnIndexedArray);
-	proto.init_member("NUMERIC", as_array_object::fNumeric);
+	int flags = 0; // these are not protected
+	proto.init_member("CASEINSENSITIVE", as_array_object::fCaseInsensitive, flags);
+	proto.init_member("DESCENDING", as_array_object::fDescending, flags);
+	proto.init_member("UNIQUESORT", as_array_object::fUniqueSort, flags);
+	proto.init_member("RETURNINDEXEDARRAY", as_array_object::fReturnIndexedArray, flags);
+	proto.init_member("NUMERIC", as_array_object::fNumeric, flags);
 }
 
 static void
