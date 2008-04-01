@@ -37,10 +37,11 @@
 #include "element.h"
 #include "handler.h"
 #include "utility.h"
+#include "buffer.h"
 
-using namespace amf;
 using namespace gnash;
 using namespace std;
+using namespace amf;
 
 namespace gnash
 {
@@ -73,7 +74,7 @@ RTMPServer::handShakeWait()
 
 //     char buffer[RTMP_BODY_SIZE+16];
 //     memset(buffer, 0, RTMP_BODY_SIZE+16);
-    Buffer *buf = _handler->pop();
+    amf::Buffer *buf = _handler->pop();
 
     if (buf == 0) {
 	log_debug("Que empty, net connection dropped for fd #%d", _handler->getFileFd());
@@ -99,7 +100,7 @@ RTMPServer::handShakeWait()
 //     }
 
     if (buf->size() >= RTMP_BODY_SIZE) {
-	_handshake = new Buffer(RTMP_BODY_SIZE);
+	_handshake = new amf::Buffer(RTMP_BODY_SIZE);
 	_handshake->copy(buf->reference() + 1, RTMP_BODY_SIZE);
 	log_debug (_("Handshake Data matched"));
 	delete buf;			// we're done with the buffer
@@ -120,7 +121,7 @@ RTMPServer::handShakeResponse()
 {
     GNASH_REPORT_FUNCTION;
 
-    Buffer *buf = new Buffer((RTMP_BODY_SIZE * 2) + 1);
+    amf::Buffer *buf = new amf::Buffer((RTMP_BODY_SIZE * 2) + 1);
     Network::byte_t *ptr = buf->reference();
     *ptr = 0x3;
 
@@ -139,8 +140,8 @@ RTMPServer::serverFinish()
 {
     GNASH_REPORT_FUNCTION;
 
-    Buffer *buf = _handler->pop();
-    Buffer *obj = buf;
+    amf::Buffer *buf = _handler->pop();
+    amf::Buffer *obj = buf;
     
     if (buf == 0) {
 	log_debug("Que empty, net connection dropped for fd #%d", _handler->getFileFd());
@@ -152,7 +153,7 @@ RTMPServer::serverFinish()
     // the remainder for processing.
     if (buf->size() > RTMP_BODY_SIZE) {
 	int size = buf->size() - RTMP_BODY_SIZE;  
-	obj = new Buffer[size];
+	obj = new amf::Buffer[size];
 	obj->copy(buf->begin()+RTMP_BODY_SIZE, size);
     } else {
 	_handler->wait();
@@ -174,14 +175,14 @@ RTMPServer::serverFinish()
 }
 
 bool
-RTMPServer::packetSend(Buffer * /* buf */)
+RTMPServer::packetSend(amf::Buffer * /* buf */)
 {
     GNASH_REPORT_FUNCTION;
     return false;
 }
 
 bool
-RTMPServer::packetRead(Buffer *buf)
+RTMPServer::packetRead(amf::Buffer *buf)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -192,7 +193,7 @@ RTMPServer::packetRead(Buffer *buf)
     AMF amf;
     
 //    \003\000\000\017\000\000%G￿%@\024\000\000\000\000\002\000\aconnect\000?%G￿%@\000\000\000\000\000\000\003\000\003app\002\000#software/gnash/tests/1153948634.flv\000\bflashVer\002\000\fLNX 6,0,82,0\000\006swfUrl\002\000\035file:///file|%2Ftmp%2Fout.swf%G￿%@\000\005tcUrl\002\0004rtmp://localhost/software/gnash/tests/1153948634
-    amf_index = *buf->reference() & AMF_INDEX_MASK;
+    amf_index = *buf->reference() & RTMP_INDEX_MASK;
     headersize = headerSize(*buf->reference());
     log_debug (_("The Header size is: %d"), headersize);
     log_debug (_("The AMF index is: 0x%x"), amf_index);
@@ -232,7 +233,7 @@ RTMPServer::packetRead(Buffer *buf)
 	el->dump();
     }
     ptr += 1;
-    size_t actual_size = _total_size - AMF_HEADER_SIZE;
+    size_t actual_size = _total_size - RTMP_HEADER_SIZE;
     log_debug("Total size in header is %d, buffer size is: %d", _total_size, buf->size());
 //    buf->dump();
     if (buf->size() < actual_size) {

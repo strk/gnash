@@ -1,3 +1,36 @@
+2008-04-01  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libamf/Makefile.am: Build buffer class here instead of libnet. 
+	* libamf/amf.cpp: All encode* methods return a Buffer now with the
+	encoded data.
+	* libamf/amf.h: Add more comments about the constants. All encode*
+	methods return a Buffer now.
+	* libamf/element.{h,cpp}: Use a Buffer to store data instead of
+	duplicating the functionality here. Add additional methods for
+	appending data. Use a char * for the name instead of a string to
+	reduce copying of data.
+	* libamf/lcshm.cpp: AMF:encode* methods return an Element now.
+	* libamf/protocol.h: Add a suffix to the enum names for protocol
+	types.
+	* libamf/sol.cpp: Work with modified Element class. All encoding
+	classs use a Buffer now, extract classes return an Element.
+	* libnet/Makefile.am: Don't build buffer class here.
+	* libnet/cque.{h,cpp}: Buffer class now in amf namespace.
+	* libnet/handler.{h,cpp}: Buffer class now in amf namespace.
+	* libnet/http.{h,cpp}: Buffer class now in amf namespace.
+	* libnet/network.{h,cpp}: Buffer class now in amf namespace. Add
+	suffix to port names in enum.
+	* libnet/rtmp.{h,cpp}: Buffer class now in amf namespace. Rename
+	RTMPproto to just RTMP.
+	* libnet/rtmp_server.{h,cpp}: Buffer class now in amf namespace.
+	* testsuite/libnet.all/Makefile.am: Move test_buffer to libamf.all.
+	* testsuite/libamf.all/Makefile.am: Test_buffer moved to here as
+	it's on libamf now.
+	* testsuite/libamf.all/test_el.cpp: Use MakeString instead of
+	init().
+	* testsuite/libamf.all/test_sol.cpp: Element name is now a char*,
+	so use strcmp() for string compares.
+	
 2008-04-01 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ASHandlers.cpp (ActionLogicalNot): swf < 5 return 0 

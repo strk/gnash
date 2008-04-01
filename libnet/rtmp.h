@@ -26,17 +26,55 @@
 #include "element.h"
 #include "handler.h"
 #include "network.h"
+#include "buffer.h"
+#include "amfutf8.h"
 
 namespace gnash
 {
 
-#define RTMP_HANDSHAKE 0x3
-#define RTMP_BODY_SIZE 1536
-#define MAX_AMF_INDEXES 64
+const int  RTMP_HANDSHAKE = 0x3;
+const int  RTMP_BODY_SIZE = 1536;
+const int  MAX_AMF_INDEXES = 64;
 
-class DSOEXPORT RTMPproto
+const int  RTMP_HEADSIZE_MASK = 0xc0;
+const char RTMP_INDEX_MASK = 0x3f;
+const int  RTMP_VIDEO_PACKET_SIZE = 128;
+const int  RTMP_AUDIO_PACKET_SIZE = 64;
+
+// For terminating sequences, a byte with value 0x09 is used.
+const char TERMINATOR = 0x09;
+
+// Each packet consists of the following:
+//
+// The first byte of the AMF file/stream is believed to be a version
+// indicator. So far the only valid value for this field that has been
+// found is 0x00. If it is anything other than 0x00 (zero), your
+// system should consider the AMF file/stream to be
+// 'malformed'd. This can happen in the IDE if AMF calls are put
+// on the stack but never executed and the user exits the movie from the
+// IDE; the two top bytes will be random and the number of headers will
+// be unreliable.
+
+// The third and fourth bytes form an integer value that specifies the
+// number of headers.
+typedef struct {
+    gnash::Network::byte_t version;
+    gnash::Network::byte_t source;
+    boost::uint32_t  count;
+} amfpacket_t;
+
+typedef enum {
+    onStatus,
+    onResult,
+    onDebugEvents
+} amfresponse_e;
+
+class DSOEXPORT RTMP
 {
 public:
+    // The second byte of the AMF file/stream is appears to be 0x00 if the
+    // client is the Flash Player and 0x01 if the client is the FlashCom
+    // server.
     typedef enum {
 	FROM_CLIENT,                     // Flash player
 	FROM_SERVER                      // Flash com server
@@ -125,16 +163,19 @@ public:
         void *data;
     } rtmp_body_t;
     
-    RTMPproto();
-    ~RTMPproto();
+    RTMP();
+    ~RTMP();
+    gnash::Network::byte_t *encodeRTMPHeader(int amf_index, rtmp_headersize_e head_size,
+				size_t total_size, content_types_e type, rtmp_source_e routing);
+    
 //     bool handShakeWait();
     bool handShakeRequest();
 //    bool handShakeResponse();
     bool clientFinish();
 //  bool serverFinish();
     bool packetRequest();
-    bool packetSend(Buffer *buf);
-    bool packetRead(Buffer *buf);
+    bool packetSend(amf::Buffer *buf);
+    bool packetRead(amf::Buffer *buf);
 
     void addVariable(amf::Element *el);
     void addVariable(char *name, amf::Element *el);
@@ -165,7 +206,7 @@ public:
     void dump();
   protected:
     std::map<const char *, amf::Element *> _variables;
-    Buffer		*_handshake;
+    amf::Buffer		*_handshake;
     Handler		*_handler;
     int                 _amf_index;
     int                 _header_size;

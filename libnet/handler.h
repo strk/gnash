@@ -61,45 +61,45 @@ public:
     typedef enum { INCOMING, OUTGOING } fifo_e;
     
     // Push bytes on the incoming FIFO, which is the default
-    bool push(Buffer *data)
+    bool push(amf::Buffer *data)
 	{ return _incoming.push(data); };
-    bool push(Buffer *data, fifo_e direction);
+    bool push(amf::Buffer *data, fifo_e direction);
     bool push(gnash::Network::byte_t *data, int nbytes, fifo_e direction);
     bool push(gnash::Network::byte_t *data, int nbytes)
 	{ return _incoming.push(data, nbytes); };
     bool pushin(gnash::Network::byte_t *data, int nbytes)
 	{ return _incoming.push(data, nbytes); };
-    bool pushin(Buffer *data)
+    bool pushin(amf::Buffer *data)
 	{ return _incoming.push(data); };
     
     // Push bytes on the incoming FIFO, which must be specified
     bool pushout(gnash::Network::byte_t *data, int nbytes)
 	{ return _outgoing.push(data, nbytes); };
-    bool pushout(Buffer *data)
+    bool pushout(amf::Buffer *data)
 	{ return _outgoing.push(data); };
     
     // Pop the first date element off the incoming FIFO
-    Buffer *pop() { return _incoming.pop(); };
-    Buffer *pop(fifo_e direction);
-    Buffer *popin()
+    amf::Buffer *pop() { return _incoming.pop(); };
+    amf::Buffer *pop(fifo_e direction);
+    amf::Buffer *popin()
     	{ return _incoming.pop(); };
     // Pop the first date element off the outgoing FIFO
-    Buffer *popout()
+    amf::Buffer *popout()
     	{ return _outgoing.pop(); };
     
     // Peek at the first data element without removing it
-    Buffer *peek() { return _incoming.peek(); };
-    Buffer *peek(fifo_e direction);
-    Buffer *peekin()
+    amf::Buffer *peek() { return _incoming.peek(); };
+    amf::Buffer *peek(fifo_e direction);
+    amf::Buffer *peekin()
     	{ return _incoming.peek(); };
     // Pop the first date element off the outgoing FIFO
-    Buffer *peekout()
+    amf::Buffer *peekout()
     	{ return _outgoing.peek(); };    
 
     // Removes all the buffers from the queues
-    Buffer *merge(Buffer *begin) { return _incoming.merge(begin); };
-    Buffer *mergein(Buffer *begin) { return _incoming.merge(begin); };
-    Buffer *mergeout(Buffer *begin) { return _outgoing.merge(begin); };
+    amf::Buffer *merge(amf::Buffer *begin) { return _incoming.merge(begin); };
+    amf::Buffer *mergein(amf::Buffer *begin) { return _incoming.merge(begin); };
+    amf::Buffer *mergeout(amf::Buffer *begin) { return _outgoing.merge(begin); };
 
     // Removes all the buffers from the queues
     void clear() { _incoming.clear(); };
@@ -128,10 +128,10 @@ public:
     bool start(thread_params_t *args);
 
     // Take a buffer and write it to the network
-    int writeNet(int fd, Buffer *buf)
+    int writeNet(int fd, amf::Buffer *buf)
     	{ return Network::writeNet(fd, buf->reference(), buf->size()); };
     
-    int writeNet(Buffer *buf)
+    int writeNet(amf::Buffer *buf)
     	{ return Network::writeNet(buf->reference(), buf->size()); };
     
     // Dump internal data.

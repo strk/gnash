@@ -24,14 +24,14 @@
 
 #include "rtmp.h"
 #include "amf.h"
-#include "element.h"
 #include "handler.h"
 #include "network.h"
+#include "buffer.h"
 
 namespace gnash
 {
-  
-  class DSOEXPORT RTMPServer : public RTMPproto
+
+class DSOEXPORT RTMPServer : public RTMP
 {
 public:
     RTMPServer();
@@ -39,8 +39,8 @@ public:
     bool handShakeWait();
     bool handShakeResponse();
     bool serverFinish();
-    bool packetSend(Buffer *buf);
-    bool packetRead(Buffer *buf);
+    bool packetSend(amf::Buffer *buf);
+    bool packetRead(amf::Buffer *buf);
 
     // These process the incoming RTMP message content types from the header
     gnash::Network::byte_t *decodeChunkSize(gnash::Network::byte_t *buf);

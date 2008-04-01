@@ -31,6 +31,7 @@
 
 #include "network.h"
 #include "amf.h"
+#include "buffer.h"
 #include "sol.h"
 #include "log.h"
 
@@ -47,6 +48,7 @@
 #include <boost/scoped_array.hpp>
 
 using namespace std;
+using namespace amf;
 using namespace gnash;
 
 // It comprises of a magic number, followed by the file length, a
@@ -78,12 +80,15 @@ SOL::~SOL()
 {
 //    GNASH_REPORT_FUNCTION;
 
+#if 0
     vector<amf::Element *>::iterator it;
-    for (it = _amfobjs.begin(); it != _amfobjs.end(); it++)
-    {
+    for (it = _amfobjs.begin(); it != _amfobjs.end(); it++) {
 	amf::Element *el = (*(it));
-	delete el;
+	if (el) {
+	    delete el;
+	}
     }
+#endif
 }
 
 bool
@@ -224,7 +229,7 @@ SOL::writeFile(const string &filespec, const string &name)
 
     for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
         amf::Element *el = (*(ita));
-	size += el->getName().size() + el->getLength() + 7;
+	size += el->getNameSize() + el->getLength() + 7;
     }
     _filesize = size;
     
@@ -235,7 +240,7 @@ SOL::writeFile(const string &filespec, const string &name)
 
     for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
         amf::Element *el = (*(ita));
-        Network::byte_t *var = amf_obj.encodeVariable(el); 
+        Buffer *var = amf_obj.encodeVariable(el); 
         //  Network::byte_t *var = amf_obj.encodeVariable(el, outsize); 
         if (!var) {
             continue;
@@ -243,22 +248,21 @@ SOL::writeFile(const string &filespec, const string &name)
         size_t outsize = 0;
         switch (el->getType()) {
 	  case Element::BOOLEAN:
-	      outsize = el->getName().size() + 5;
-              assert(ptr+outsize < endPtr);
-	      memcpy(ptr, var, outsize);
+	      outsize = el->getNameSize() + 5;
+	      var->append(el->getNameSize());
 	      ptr += outsize;
 	      break;
 	  case Element::OBJECT:
-	      outsize = el->getName().size() + 5;
+	      outsize = el->getNameSize() + 5;
               assert(ptr+outsize < endPtr);
-	      outsize = el->getName().size() + 5;
+	      outsize = el->getNameSize() + 5;
 	      memcpy(ptr, var, outsize);
 	      ptr += outsize;
 	      *ptr++ = Element::OBJECT_END;
 	      *ptr++ = 0;	// objects are terminated too!
 	      break;
 	  case Element::NUMBER:
-	      outsize = el->getName().size() + AMF_NUMBER_SIZE + 2;
+	      outsize = el->getNameSize() + AMF_NUMBER_SIZE + 2;
               assert(ptr+outsize < endPtr);
 	      memcpy(ptr, var, outsize);
 	      ptr += outsize;
@@ -282,7 +286,7 @@ SOL::writeFile(const string &filespec, const string &name)
 	      memcpy(ptr, var, outsize);
 	      ptr += outsize;
 	}
-	delete[] var;
+	delete var;
     }
     
     _filesize = ptr - body.get();
@@ -368,12 +372,13 @@ SOL::readFile(std::string &filespec)
         ptr += 4;
 
         AMF amf_obj;
-        while ((ptr - buf.get()) < bodysize) {
-	    amf::Element *el = new amf::Element;
-	    ptr = amf_obj.extractVariable(el, ptr);
-            if (ptr != 0) {
-		ptr += 1;
-		addObj(el);
+	int size = 0;
+        while (size <= bodysize) {
+	    amf::Element *el =  amf_obj.extractVariable(ptr);
+            if (el != 0) {
+		ptr += el->getLength() + AMF_HEADER_SIZE;
+		size += el->getNameSize() + AMF_HEADER_SIZE;
+		_amfobjs.push_back(el);
 	    } else {
 		break;
 	    }

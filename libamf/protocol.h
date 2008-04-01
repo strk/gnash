@@ -26,7 +26,7 @@
 #include "network.h"
 
 class Protocol : public gnash::Network {
-  typedef enum { RTMP, RTMPT, RTMPS, HTTP, HTTPS } protocol_type_e;  
+  typedef enum { RTMP_PROTO, RTMPT_PROTO, RTMPS_PROTO, HTTP_PROTO, HTTPS_PROTO } protocol_type_e;  
 public:
     Protocol() { };
     virtual ~Protocol() { };

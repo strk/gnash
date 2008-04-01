@@ -26,6 +26,7 @@
 #include <cmath>
 #include <climits>
 
+#include "buffer.h"
 #include "log.h"
 #include "amf.h"
 #include "amfutf8.h"
@@ -63,8 +64,10 @@ const char *astype_str[] = {
 
 Element::Element()
     : _type(Element::NOTYPE),
-      _length(0),
-      _data(0)
+      _buffer(0),
+      _name(0)
+//       _length(0),
+//       _data(0)
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -73,21 +76,29 @@ Element::Element()
 Element::~Element()
 {
 //    GNASH_REPORT_FUNCTION;
-    if (_data) {
-        delete [] _data;
-    }
+//     if (_buffer) {
+// 	if (_buffer->size() > 0) {
+// 	    delete _buffer;
+// 	}
+//     }
     for (size_t i=0; i< _children.size(); i++) {
 	delete _children[i];
     }
 }
 
-Element::Element(Network::byte_t *indata)
+Element::Element(Network::byte_t *indata) 
+    : _type(Element::NOTYPE),
+      _buffer(0),
+      _name(0)
 {
     GNASH_REPORT_FUNCTION;
     init(indata);
 }
 
 Element::Element(double indata)
+    : _type(Element::NOTYPE),
+      _buffer(0),
+      _name(0)
 {
     GNASH_REPORT_FUNCTION;
     init(indata);
@@ -100,24 +111,36 @@ Element::Element(double indata)
 // }
 
 Element::Element(const string &indata)
+    : _type(Element::NOTYPE),
+      _buffer(0),
+      _name(0)
 {
     GNASH_REPORT_FUNCTION;
     init(indata);
 }
 
 Element::Element(const string &name, const string &indata)
+    : _type(Element::NOTYPE),
+      _buffer(0),
+      _name(0)
 {
     GNASH_REPORT_FUNCTION;
     init(name, indata);
 }
 
 Element::Element(const string &name, bool indata)
+    : _type(Element::NOTYPE),
+      _buffer(0),
+      _name(0)
 {
     GNASH_REPORT_FUNCTION;
     init(name, indata);
 }
 
 Element::Element(bool indata)
+    : _type(Element::NOTYPE),
+      _buffer(0),
+      _name(0)
 {
     GNASH_REPORT_FUNCTION;
     init(indata);
@@ -126,19 +149,38 @@ Element::Element(bool indata)
 // Create a function block for AMF
 Element::Element(bool flag, double unknown1, double unknown2,
 		 const string &methodname)
+    : _type(Element::NOTYPE),
+      _buffer(0),
+      _name(0)
 {
     GNASH_REPORT_FUNCTION;
     init(flag, unknown1, unknown2, methodname);
 }
 
+// Return the total size of the data plus the headers for byte math
+size_t
+Element::totalsize()
+{
+//    GNASH_REPORT_FUNCTION;
+    size_t size = 0;
+    
+    if (_name == 0) {
+	size = _buffer->size() + AMF_HEADER_SIZE;
+    } else {
+	size = _buffer->size() + AMF_VAR_HEADER_SIZE + strlen(_name);
+    }
+    
+    return size;
+}    
+
 Element &
 Element::init(bool flag, double unknown1, double unknown2,
-		 const string &methodname)
+	      const string &methodname)
 {
     GNASH_REPORT_FUNCTION;
     _type = Element::FUNCTION;
     if (methodname.size()) {
-	_name = methodname;
+	setName(methodname);
     }
 
     // Build up the children for the function block
@@ -154,9 +196,9 @@ Element::init(bool flag, double unknown1, double unknown2,
     el = new Element(methodname);
     _children.push_back(el);
     
-    _length = 3
+    _buffer = new Buffer(3
 	+ ((AMF_HEADER_SIZE + AMF_NUMBER_SIZE) * 2)
-	+ methodname.size() + AMF_HEADER_SIZE;
+	       + methodname.size() + AMF_HEADER_SIZE);
 //     memcpy(_data, &indata, _length);
     return *this;
 }
@@ -169,16 +211,18 @@ Element::init(double indata)
 }
 
 Element &
-Element::init(const string &name, double indata)
+Element::init(const string &name, double num)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::NUMBER;
     if (name.size()) {
-        _name = name;
+        setName(name);
     }
-    _length = AMF_NUMBER_SIZE;
-    _data = reinterpret_cast<Network::byte_t *>(new char[sizeof(double)]);
-    memcpy(_data, &indata, _length);
+    _buffer = new Buffer(AMF_NUMBER_SIZE);
+//     _data = reinterpret_cast<Network::byte_t *>(new char[sizeof(double)]);
+//     Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(&indata);
+
+    _buffer->append(num);
     return *this;
 }
 
@@ -190,18 +234,16 @@ Element::init(const string &indata)
 }
 
 Element &
-Element::init(const string &name, const string &indata)
+Element::init(const string &name, const string &str)
 {
     GNASH_REPORT_FUNCTION;
     _type = Element::STRING;
     if (name.size()) {
-        _name = name;
+        setName(name);
     }
-    _length = indata.size();
-    // add a byte for a NULL string terminator byte.
-    _data = new Network::byte_t[indata.size() + 1];
-    memset(_data, 0, indata.size() + 1);
-    memcpy(_data, indata.c_str(), indata.size());
+    _buffer = new Buffer(str.size());
+    _buffer->append(str);
+    
     return *this;
 }
 
@@ -213,16 +255,16 @@ Element::init(bool indata)
 }
 
 Element &
-Element::init(const string &name, bool indata)
+Element::init(const string &name, bool flag)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::BOOLEAN;
     if (name.size()) {
-        _name = name;
+        setName(name);
     }
-    _length = 1;
-    _data = new Network::byte_t[1];
-    *_data = indata;
+    _buffer = new Buffer(sizeof(bool));
+    _buffer->append(flag);
+    
     return *this;
 }
 
@@ -230,23 +272,39 @@ void
 Element::clear()
 {
 //    GNASH_REPORT_FUNCTION;
-    if (_data) {
-        delete[] _data;
-        _data = 0;
+    if (_name) {
+	delete [] _name;
     }
-    if (_name.size()) {
-	_name.clear();
+    if (_buffer) {
+	delete _buffer;
     }
-    _length = 0;
-    _type = Element::NOTYPE;
-    
 }
+
+Network::byte_t *
+Element::getData()
+{
+//    GNASH_REPORT_FUNCTION;
+    if (_buffer) {
+	return _buffer->reference();
+    }
+    return 0;
+};
+
+boost::uint16_t
+Element::getLength()
+{
+//    GNASH_REPORT_FUNCTION;
+    if (_buffer) {
+	return _buffer->size();
+    }
+    return 0;
+};
 
 double
 Element::to_number()
 {
-    if (_data) {
-	return *(reinterpret_cast<double *>(_data));
+    if (_buffer) {
+	return *(reinterpret_cast<double *>(_buffer->reference()));
     }
 //    return ::nan("NaN");
     return -1.0;
@@ -255,14 +313,20 @@ Element::to_number()
 const char *
 Element::to_string()
 {
-    return reinterpret_cast<const char *>(_data);
+    if (_buffer) {
+	if (_buffer->size() > 0) {
+	    return reinterpret_cast<const char *>(_buffer->reference());
+	}
+	return "NULL";
+    }
+    return 0;
 };
 
 bool
 Element::to_bool()
 {
-    if (_data) {
-	return *(reinterpret_cast<bool *>(_data));
+    if (_buffer) {
+	return *(reinterpret_cast<bool *>(_buffer->reference()));
     }
     return false;
 };
@@ -270,24 +334,44 @@ Element::to_bool()
 void *
 Element::to_reference()
 {
-    return reinterpret_cast<void *>(_data);
+    if (_buffer) {
+	return reinterpret_cast<void *>(_buffer->reference());
+    }
+    return 0;
 };
+
+bool
+Element::operator==(bool x)
+{
+    if (_buffer) {
+	_buffer->append(x);
+    }
+    return false;
+};
+Network::byte_t
+Element::operator[](int x)
+{
+    if (_buffer) {
+	return *_buffer->at(x);
+    }
+    return 0;
+};
+
 
 Element &
 Element::operator=(Element &el)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = el.getType();
-    _length = el.getLength();
-    if (el.getName().size()) {
+    if (el.getNameSize()) {
         _name = el.getName();
     }
-    _data = new Network::byte_t[_length + 1];
-    memcpy(_data, el.getData(), _length);
-    
+    _buffer = new Buffer(el.getLength());
+    _buffer = el.getBuffer();
     return *this;
 }
-/// \brief Extract an AMF element from the byte stream
+
+/// \brief Fill an element with data
 ///
 /// All Numbers are 64 bit, big-endian (network byte order) entities.
 ///
@@ -295,313 +379,279 @@ Element::operator=(Element &el)
 /// normal ASCII. It may be that these need to be converted to wide
 /// characters, but for now we just leave them as standard multibyte
 /// characters.
-Network::byte_t *
-Element::init(Network::byte_t *indata)
-{
-//    GNASH_REPORT_FUNCTION;
-
-    Network::byte_t *ptr = indata;
-    // Extract the type
-    _type = (Element::astype_e)((*ptr++) & 0xff);
-    // For doubles, the length value is never set, but we might as
-    // well put in a legit value anyway.
-    _length = AMF_NUMBER_SIZE;
-    _data = new Network::byte_t[AMF_NUMBER_SIZE + 1];
-    memset(_data, 0, AMF_NUMBER_SIZE + 1);
-    memcpy(_data, &indata, AMF_NUMBER_SIZE);
-
-    return indata + AMF_NUMBER_SIZE;
-}
-
 Element &
-Element::makeString(Network::byte_t *data, int size)
+Element::makeString(Network::byte_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
-    
     _type = Element::STRING;
-    _length = size;
-    _data = new Network::byte_t[size+1];
-    memset(_data, 0, size+1);
-    memcpy(_data, data, size);
+    // Make room for an additional NULL terminator
+    _buffer = new Buffer(size+1);
+    _buffer->copy(data, size);
+    // Unlike other buffers, people like to print strings, so we must add
+    // a NULL terminator to the string. When encoding, we are careful to
+    // to adjust the byte count down by one, as the NULL terminator doesn't
+    // get written.
+    *(_buffer->end()) = 0;
     return *this;
 }
 
 Element &
-Element::makeString(const string &name, const string &indata)
+Element::makeString(const char *str, size_t size)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     _type = Element::STRING;
+    Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(const_cast<char *>(str));
+    return makeString(ptr, size);
+}
+
+Element &
+Element::makeString(const string &str)
+{
+//    GNASH_REPORT_FUNCTION;
+    return makeString(str.c_str(), str.size());
+}
+
+Element &
+Element::makeString(const string &name, const string &str)
+{
+//    GNASH_REPORT_FUNCTION;
     if (name.size()) {
-        _name = name;
-    }
-    _length = indata.size();
-    // add a byte for a NULL string terminator byte.
-    _data = new Network::byte_t[indata.size() + 1];
-    memcpy(_data, indata.c_str(),_length);
-    *(_data + _length) = 0;	// terminate the string for printing
-    return *this;
+        setName(name);
+    }    
+    return makeString(str.c_str(), str.size());
 }
 
 Element &
 Element::makeNumber(Network::byte_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
-    
+    double num = *reinterpret_cast<const double*>(data);
     _type = Element::NUMBER;
-    _length = amf::AMF_NUMBER_SIZE;
-    _data = new Network::byte_t[amf::AMF_NUMBER_SIZE];
-    memcpy(_data, data, amf::AMF_NUMBER_SIZE);
+    _buffer = new Buffer(AMF_NUMBER_SIZE);
+    _buffer->append(num);
+
     return *this;
 }
 
 Element &
-Element::makeNumber(const string &name, double data)
+Element::makeNumber(const string &name, double innum)
 {
 //    GNASH_REPORT_FUNCTION;
     if (name.size()) {
-        _name = name;
-    }    
-    _type = Element::NUMBER;
-    _length = amf::AMF_NUMBER_SIZE;
-    _data = new Network::byte_t[amf::AMF_NUMBER_SIZE];
-    memcpy(_data, &data, amf::AMF_NUMBER_SIZE);
-//    std::copy(&data, &data + amf::AMF_NUMBER_SIZE, _data);
-    return *this;
-}
-
-Element &
-Element::makeBoolean(bool data)
-{
-//    GNASH_REPORT_FUNCTION;
-    
-    _type = Element::BOOLEAN;
-    _length = 1;
-    _data = new Network::byte_t[2];
-    memset(_data, 0, 2);
-    _data[1]= data;
-    return *this;
-}
-
-Element &
-Element::makeBoolean(const string &name, bool data)
-{
-//    GNASH_REPORT_FUNCTION;
-    if (name.size()) {
-        _name = name;
+        setName(name);
     }
+    Network::byte_t *num = reinterpret_cast<Network::byte_t *>(&innum);
+    return makeNumber(num);
+}
+
+Element &
+Element::makeBoolean(bool flag)
+{
+//    GNASH_REPORT_FUNCTION;
     _type = Element::BOOLEAN;
-    _length = 1;
-    _data = new Network::byte_t[2];
-    memset(_data, 0, 2);
-    _data[1]= data;
+    _buffer = new Buffer(sizeof(bool));
+    _buffer->append(flag);
     return *this;
+}
+
+Element &
+Element::makeBoolean(const string &name, bool flag)
+{
+//    GNASH_REPORT_FUNCTION;
+    if (name.size()) {
+        setName(name);
+    }
+    return makeBoolean(flag);
 }
 
 Element &
 Element::makeBoolean(Network::byte_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
+    bool flag = *reinterpret_cast<const bool*>(data);
     
-    _type = Element::BOOLEAN;
-    _length = 1;
-    _data = new Network::byte_t[2];
-    memset(_data, 0, 2);
-    memcpy(_data, data+1, 1);
-    return *this;
+    return makeBoolean(flag);
 }
 
 Element &
 Element::makeUndefined()
 {
-    return makeUndefined("");
+    _type = Element::UNDEFINED;
+    return *this;
 }
 
 Element &
 Element::makeUndefined(const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
-    
-    _type = Element::UNDEFINED;
     if (name.size()) {
-        _name = name;
+        setName(name);
     }
-    _length = 0;
-    _data = 0;
-    return *this;
+    return makeUndefined();
 }
 
 Element &
 Element::makeNull()
 {
 //    GNASH_REPORT_FUNCTION;
-    return makeNull("");
+    _type = Element::NULL_VALUE;
+    Network::byte_t val = 0;
+    _buffer = new Buffer(sizeof(Network::byte_t));
+    _buffer->append(val);
+    return *this;
 }
 
 Element &
 Element::makeNull(const std::string &name)
 {
-//    GNASH_REPORT_FUNCTION;
-    
-    _type = Element::NULL_VALUE;
+//    GNASH_REPORT_FUNCTION;    
     if (name.size()) {
-        _name = name;
+        setName(name);
     }
-    _length = 0;
-    _data = 0;
+    return makeNull();
+}
+
+Element &
+Element::makeObject(const std::string &name)
+{
+    GNASH_REPORT_FUNCTION;
+    setName(name);
+    _type = OBJECT;
     return *this;
 }
 
 Element &
-Element::makeObject(Network::byte_t *indata, int size)
+Element::makeObject(Network::byte_t *indata, size_t size)
 {
-//    GNASH_REPORT_FUNCTION;
-    
+    GNASH_REPORT_FUNCTION;
     _type = Element::OBJECT;
-    _length = size;
-    _data = new Network::byte_t[size + 1];
-    memset(_data, 0, size + 1);
-    memcpy(_data, indata, size);
+    _buffer = new Buffer(size);
+    _buffer->copy(indata, size);
     return *this;
 }
 
 Element &
 Element::makeObjectEnd()
 {
-//    GNASH_REPORT_FUNCTION;
-    
+    GNASH_REPORT_FUNCTION;
     _type = Element::OBJECT_END;
-    _length = 0;
-    _data = 0;
     return *this;
 }
 
 Element &
-Element::makeXMLObject(Network::byte_t *indata, int size)
+Element::makeXMLObject(Network::byte_t *indata, size_t size)
 {
-//    GNASH_REPORT_FUNCTION;
-    
+    GNASH_REPORT_FUNCTION;
     _type = Element::XML_OBJECT;
-    _length = size;
-    _data = new Network::byte_t[size + 1];
-    memset(_data, 0, size + 1);
-    memcpy(_data, indata, size);
+    _buffer = new Buffer(size);
+    _buffer->copy(indata, size);
     return *this;
 }
 
 Element &
-Element::makeTypedObject(Network::byte_t *indata, int size)
+Element::makeTypedObject(Network::byte_t *indata, size_t size)
 {
-//    GNASH_REPORT_FUNCTION;
-    
+    GNASH_REPORT_FUNCTION;
     _type = Element::TYPED_OBJECT;
-    _length = size;
-    _data = new Network::byte_t[size + 1];
-    memset(_data, 0, size + 1);
-    memcpy(_data, indata, size);
+    _buffer = new Buffer(size);
+    _buffer->copy(indata, size);
     return *this;
 }
 
 Element &
-Element::makeReference(Network::byte_t *indata, int size)
+Element::makeReference(Network::byte_t *indata, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
-    _type = Element::TYPED_OBJECT;
-    _length = size;
-    _data = new Network::byte_t[size + 1];
-    memset(_data, 0, size + 1);
-    memcpy(_data, indata, size);    
+    _type = Element::REFERENCE;
+    _buffer = new Buffer(size);
+    _buffer->copy(indata, size);
     return *this;
 }
 
 Element &
-Element::makeMovieClip(Network::byte_t *indata, int size)
+Element::makeMovieClip(Network::byte_t *indata, size_t size)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     _type = Element::MOVIECLIP;
-    _length = size;
-    _data = new Network::byte_t[size + 1];
-    memset(_data, 0, size + 1);
-    memcpy(_data, indata, size);    
+    _buffer = new Buffer(size);
+    _buffer->copy(indata, size);
     return *this;    
 }
 
 Element &
-Element::makeECMAArray(Network::byte_t *indata, int size)
+Element::makeECMAArray(Network::byte_t *indata, size_t size)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     _type = Element::ECMA_ARRAY;
-    _length = size;
-    _data = new Network::byte_t[size + 1];
-    memset(_data, 0, size + 1);
-    memcpy(_data, indata, size);    
+    _buffer = new Buffer(size);
+    _buffer->copy(indata, size);
     return *this;    
 }
 
 Element &
-Element::makeLongString(Network::byte_t *indata, int size)
+Element::makeLongString(Network::byte_t *indata, size_t size)
 {
-//    GNASH_REPORT_FUNCTION;
-    
+    GNASH_REPORT_FUNCTION;    
     _type = Element::LONG_STRING;
-    _length = size;
-    _data = new Network::byte_t[size + 1];
-    memset(_data, 0, size + 1);
-    memcpy(_data, indata, size);    
-
+    _buffer = new Buffer(size);
+    _buffer->copy(indata, size);
     return *this;
 }
 
 Element &
-Element::makeRecordSet(Network::byte_t *indata, int size)
+Element::makeRecordSet(Network::byte_t *indata, size_t size)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     _type = Element::RECORD_SET;
-    
-    _length = size;
-    _data = new Network::byte_t[size + 1];
-    memset(_data, 0, size + 1);
-    memcpy(_data, indata, size);    
-
+    _buffer = new Buffer(size);
+    _buffer->copy(indata, size);
     return *this;
 }
 
 Element &
-Element::makeDate(Network::byte_t *indata)
+Element::makeDate(Network::byte_t *date)
 {
-//    GNASH_REPORT_FUNCTION;
-    
+    GNASH_REPORT_FUNCTION;
     _type = Element::DATE;
-    _length = AMF_NUMBER_SIZE;
-    _data = new Network::byte_t[AMF_NUMBER_SIZE + 1];
-    memset(_data, 0, AMF_NUMBER_SIZE + 1);
-    memcpy(_data, indata, AMF_NUMBER_SIZE);    
-
-    return *this;
+    return makeNumber(date);
 }
 
 Element &
-Element::makeStrictArray(Network::byte_t *indata, int size)
+Element::makeStrictArray(Network::byte_t *indata, size_t size)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     
     _type = Element::STRICT_ARRAY;
-    _length = size;
-    _data = new Network::byte_t[size + 1];
-    memset(_data, 0, size + 1);
-    memcpy(_data, indata, size);    
-
+    _buffer = new Buffer(size);
+    _buffer->copy(indata, size);
     return *this;
+}
+
+size_t
+Element::getNameSize()
+{
+    if (_name) {
+	return strlen(_name);
+    }
+    return 0;
 }
 
 void
-Element::setName(Network::byte_t *name, int x)
+Element::setName(const string &str)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
+    _name = new char[str.size() + 1];
+    std::copy(str.begin(), str.end(), _name);
+    *(_name + str.size()) = 0;
+}
 
-    char *buf = new char[x+1];
-    *(buf+x) = 0;			// terminate the string, we don't need to memcpy the whole thing
-    std::copy(name, name+x, buf);
-    _name = buf;
+void
+Element::setName(Network::byte_t *name, size_t x)
+{
+    GNASH_REPORT_FUNCTION;
+    char *_name = new char[x+1];
+    std::copy(name, name+x, _name);
+    *(_name + x) = 0;
 }
 
 void
@@ -609,8 +659,8 @@ Element::dump()
 {
 //    GNASH_REPORT_FUNCTION;
     
-    if (_name.size()) {
-	cerr << "AMF object name: " << _name << ", length is " << _length << endl;
+    if (_name) {
+ 	cerr << "AMF object name: " << _name << ", length is " << getLength() << endl;
     }
 
     cerr << astype_str[_type] << ": ";
@@ -625,8 +675,8 @@ Element::dump()
 	  cerr << (to_bool() ? "true" : "false") << endl;
 	  break;
       case Element::STRING:
-	  cerr << "(" << _length << " bytes): ";
-	  if (_length > 0) {
+	  cerr << "(" << getLength() << " bytes): ";
+	  if (getLength() > 0) {
 	      cerr << "\t\"" << to_string() << "\"" << endl;
 	  } else {
 	      cerr << endl;

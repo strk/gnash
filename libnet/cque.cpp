@@ -54,10 +54,10 @@ CQue::~CQue()
 //    GNASH_REPORT_FUNCTION;
 //    clear();
 #if 0
-    deque<Buffer *>::iterator it;
+    deque<amf::Buffer *>::iterator it;
     boost::mutex::scoped_lock lock(_mutex);
     for (it = _que.begin(); it != _que.end(); it++) {
-	Buffer *ptr = *(it);
+	amf::Buffer *ptr = *(it);
 	delete ptr;
     }
 #endif
@@ -91,7 +91,7 @@ CQue::size()
 }
 
 bool
-CQue::push(Buffer *data)
+CQue::push(amf::Buffer *data)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_mutex);
@@ -108,18 +108,18 @@ bool
 CQue::push(gnash::Network::byte_t *data, int nbytes)
 {
 //    GNASH_REPORT_FUNCTION;
-    Buffer *buf = new Buffer;
+    amf::Buffer *buf = new amf::Buffer;
     std::copy(data, data + nbytes, buf->reference());
     return push(buf);
 }
 
 
 // Pop the first date element off the FIFO
-Buffer *
+amf::Buffer *
 CQue::pop()
 {
 //    GNASH_REPORT_FUNCTION;
-    Buffer *buf = 0;
+    amf::Buffer *buf = 0;
     boost::mutex::scoped_lock lock(_mutex);
     if (_que.size()) {
         buf = _que.front();
@@ -132,7 +132,7 @@ CQue::pop()
 }
 
 // Peek at the first data element without removing it
-Buffer *
+amf::Buffer *
 CQue::peek()
 {
 //    GNASH_REPORT_FUNCTION;
@@ -154,14 +154,14 @@ CQue::clear()
 
 // Remove a range of elements
 void
-CQue::remove(Buffer *begin, Buffer *end)
+CQue::remove(amf::Buffer *begin, amf::Buffer *end)
 {
     GNASH_REPORT_FUNCTION;
-    deque<Buffer *>::iterator it;
-    deque<Buffer *>::iterator start;
-    deque<Buffer *>::iterator stop;
+    deque<amf::Buffer *>::iterator it;
+    deque<amf::Buffer *>::iterator start;
+    deque<amf::Buffer *>::iterator stop;
     boost::mutex::scoped_lock lock(_mutex);
-    Buffer *ptr;
+    amf::Buffer *ptr;
     for (it = _que.begin(); it != _que.end(); it++) {
 	ptr = *(it);
 	if (ptr->reference() == begin->reference()) {
@@ -177,13 +177,13 @@ CQue::remove(Buffer *begin, Buffer *end)
 
 // Remove an element
 void
-CQue::remove(Buffer *element)
+CQue::remove(amf::Buffer *element)
 {
     GNASH_REPORT_FUNCTION;
-    deque<Buffer *>::iterator it;
+    deque<amf::Buffer *>::iterator it;
     boost::mutex::scoped_lock lock(_mutex);
     for (it = _que.begin(); it != _que.end(); it++) {
-	Buffer *ptr = *(it);
+	amf::Buffer *ptr = *(it);
 	if (ptr->reference() == element->reference()) {
 	    _que.erase(it);
 	}
@@ -192,27 +192,27 @@ CQue::remove(Buffer *element)
 
 // Merge sucessive buffers into one single larger buffer. This is for some
 // protocols, than have very long headers.
-Buffer *
-CQue::merge(Buffer *begin)
+amf::Buffer *
+CQue::merge(amf::Buffer *begin)
 {
     GNASH_REPORT_FUNCTION;
     int totalsize = 0;
-    deque<Buffer *>::iterator it;
-    vector<deque<Buffer *>::iterator> elements;
-    vector<deque<Buffer *>::iterator>::iterator eit;
+    deque<amf::Buffer *>::iterator it;
+    vector<deque<amf::Buffer *>::iterator> elements;
+    vector<deque<amf::Buffer *>::iterator>::iterator eit;
     boost::mutex::scoped_lock lock(_mutex);
     for (it = _que.begin(); it != _que.end(); it++) {
-	Buffer *ptr = *(it);
+	amf::Buffer *ptr = *(it);
 	if (totalsize > 0) {
 	    totalsize += ptr->size();
 	    elements.push_back(it);
 	    if (ptr->size() < gnash::NETBUFSIZE) {
-		Buffer *newbuf = new Buffer(totalsize);
+		amf::Buffer *newbuf = new amf::Buffer(totalsize);
 		Network::byte_t *tmp = newbuf->reference();
-		Buffer *buf;
+		amf::Buffer *buf;
 //		_que.insert(elements.begin(), newbuf);
 		for (eit = elements.begin(); eit != elements.end(); eit++) {
- 		    deque<Buffer *>::iterator ita = *(eit);
+ 		    deque<amf::Buffer *>::iterator ita = *(eit);
 		    buf = *(ita);
 		    std::copy(buf->reference(), buf->reference() + buf->size(), tmp);
 		    tmp += buf->size();
@@ -236,11 +236,11 @@ void
 CQue::dump()
 {
 //    GNASH_REPORT_FUNCTION;
-    deque<Buffer *>::iterator it;
+    deque<amf::Buffer *>::iterator it;
     boost::mutex::scoped_lock lock(_mutex);
     cerr << endl << "CQue \"" << _name << "\" has "<< _que.size() << " buffers." << endl;
     for (it = _que.begin(); it != _que.end(); it++) {
-	Buffer *ptr = *(it);
+	amf::Buffer *ptr = *(it);
         ptr->dump();
     }
 #ifdef USE_STATS_QUEUE

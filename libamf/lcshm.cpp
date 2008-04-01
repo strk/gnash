@@ -28,6 +28,7 @@
 #include <boost/cstdint.hpp>
 
 #include "log.h"
+#include "buffer.h"
 #include "network.h"
 #include "amf.h"
 #include "shm.h"
@@ -255,16 +256,17 @@ LcShm::parseBody(Network::byte_t *data)
     AMF amf;
 
     while (ptr) {
-        amf::Element *el = new Element;
-        ptr = amf.extractElement(el, ptr);
+        amf::Element *el = amf.extractAMF(ptr);
         if (el->getType() == Element::NUMBER) {
             if (el->to_number() == 0.0) {
-                ptr = 0;
-                continue;
+                break;
             }
         }
         if (el->getType() != Element::NOTYPE) {
-            addObject(el);
+            _amfobjs.push_back(el);
+            ptr += el->getLength();
+        } else {
+            break;
         }
     };
     
@@ -302,19 +304,17 @@ LcShm::parseHeader(Network::byte_t *data)
     ptr += LC_HEADER_SIZE;
 
     
-    Element *el = new amf::Element;
     AMF amf;
-    ptr = amf.extractElement(el, ptr);
-    if (ptr == 0) {
-        log_error("Didn't extract element from byte stream!");
+    Element *el = AMF::extractAMF(ptr);
+    if (el == 0) {
+        log_debug("Didn't extract an element from the byte stream!");
         return 0;
     }
     
     _object.connection_name = el->to_string();
     delete el;
     
-    el = new amf::Element;
-    ptr = amf.extractElement(el, ptr);
+    el = AMF::extractAMF(ptr);
     if (ptr != 0) {
         _object.hostname = el->to_string();
     }
@@ -352,6 +352,8 @@ LcShm::formatHeader(const std::string &con, const std::string &host, bool /* dom
     GNASH_REPORT_FUNCTION;
 //    Network::byte_t *ptr = data + LC_HEADER_SIZE;
     int size = con.size() + host.size() + 9;
+
+    Buffer *buf;
     
     Network::byte_t *header = new Network::byte_t[size + 1];
     Network::byte_t *ptr = header;
@@ -364,16 +366,13 @@ LcShm::formatHeader(const std::string &con, const std::string &host, bool /* dom
     ptr = header + LC_HEADER_SIZE;
 
     // Which is then always followed by 3 AMF objects.
-    Network::byte_t *tmp = AMF::encodeElement(con.c_str());
-    memcpy(ptr, tmp, con.size());
-    ptr +=  con.size();
-    delete[] tmp;
+    Buffer *buf1 = AMF::encodeString(con);
+    memcpy(ptr, buf1->begin(), buf1->size());
+    ptr += buf->size();
 
-    tmp = AMF::encodeElement(host.c_str());
-    memcpy(ptr, tmp, host.size());
-    ptr +=  host.size();
-    
-    delete[] tmp;
+    Buffer *buf2 = AMF::encodeString(host);
+    memcpy(ptr, buf2->begin(), buf2->size());
+    ptr += buf->size();
     
     return ptr;
 }
@@ -458,6 +457,7 @@ LcShm::send(const string &name, const string &domainname,
         log_error("base address not set!");
     }
 
+#if 0
 //    Network::byte_t *tmp = AMF::encodeElement(name.c_str());
 //     memcpy(ptr, tmp, name.size());
 //     ptr +=  name.size() + AMF_HEADER_SIZE;
@@ -468,18 +468,19 @@ LcShm::send(const string &name, const string &domainname,
 //     ptr +=  domainname.size() + AMF_HEADER_SIZE;
 
 //    ptr += LC_HEADER_SIZE;
-    Network::byte_t *x = ptr;    // just for debugging from gdb. temporary
+//    Network::byte_t *x = ptr;    // just for debugging from gdb. temporary
 
     // This is the initial 16 bytes of the header
     memset(ptr, 0, LC_HEADER_SIZE + 200);
-    *ptr = 1;
+    *buf->at(0) = 1;
+//    *ptr = 1;
     ptr += 4;
-    *ptr = 1;
+    *buf->at(4) = 1;
+//    *ptr = 1;
     ptr += LC_HEADER_SIZE - 4;
-
     // Which is then always followed by 3 AMF objects.
     
-    Network::byte_t *tmp = AMF::encodeElement(name.c_str());
+    Buffer *tmp = AMF::encodeElement(name.c_str());
     memcpy(ptr, tmp, name.size() + AMF_HEADER_SIZE);
     delete[] tmp;
 
@@ -516,7 +517,8 @@ LcShm::send(const string &name, const string &domainname,
     }
     
 //    delete[] tmp;
-
+#endif
+    
 }
 
 void

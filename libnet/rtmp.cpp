@@ -36,10 +36,11 @@
 #include "element.h"
 #include "handler.h"
 #include "utility.h"
+#include "buffer.h"
 
-using namespace amf;
 using namespace gnash;
 using namespace std;
+using namespace amf;
 
 namespace gnash
 {
@@ -78,13 +79,13 @@ const char *response_str[] = {
 };
 
 int
-RTMPproto::headerSize(Network::byte_t header)
+RTMP::headerSize(Network::byte_t header)
 {
 //    GNASH_REPORT_FUNCTION;
     
     int headersize = -1;
     
-    switch (header & AMF_HEADSIZE_MASK) {
+    switch (header & RTMP_HEADSIZE_MASK) {
       case HEADER_12:
           headersize = 12;
           break;
@@ -99,7 +100,7 @@ RTMPproto::headerSize(Network::byte_t header)
           break;
       default:
           log_error(_("AMF Header size bits (0x%X) out of range"),
-          		header & AMF_HEADSIZE_MASK);
+          		header & RTMP_HEADSIZE_MASK);
           headersize = 1;
           break;
     };
@@ -107,7 +108,7 @@ RTMPproto::headerSize(Network::byte_t header)
     return headersize;
 }
 
-RTMPproto::RTMPproto() 
+RTMP::RTMP() 
     : _handshake(0), _handler(0)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -118,7 +119,7 @@ RTMPproto::RTMPproto()
 //    memset(_body, 0, RTMP_BODY_SIZE+1);
 }
 
-RTMPproto::~RTMPproto()
+RTMP::~RTMP()
 {
 //    GNASH_REPORT_FUNCTION;
     _variables.clear();
@@ -126,28 +127,28 @@ RTMPproto::~RTMPproto()
 }
 
 void
-RTMPproto::addVariable(amf::Element *el)
+RTMP::addVariable(amf::Element *el)
 {
 //    GNASH_REPORT_FUNCTION;
-    _variables[el->getName().c_str()] = el;
+    _variables[el->getName()] = el;
 }
 
 void
-RTMPproto::addVariable(char *name, Element *el)
+RTMP::addVariable(char *name, amf::Element *el)
 { 
 //    GNASH_REPORT_FUNCTION;
     _variables[name] = el;
 }
 
 amf::Element *
-RTMPproto::getVariable(const std::string &name)
+RTMP::getVariable(const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
 //    return _variables[name.c_str()];
     map<const char *, amf::Element *>::iterator it;
     for (it = _variables.begin(); it != _variables.end(); it++) {
 	const char *title = it->first;
-	Element *el = it->second;
+	amf::Element *el = it->second;
 	if (name == title) {
 // 	    log_debug("found variable in RTMP packet: %s", name);
 	    return el;
@@ -158,7 +159,7 @@ RTMPproto::getVariable(const std::string &name)
 // A request for a handshake is initiated by sending a byte with a
 // value of 0x3, followed by a message body of unknown format.
 bool
-RTMPproto::handShakeRequest()
+RTMP::handShakeRequest()
 {
     GNASH_REPORT_FUNCTION;
 
@@ -191,7 +192,7 @@ RTMPproto::handShakeRequest()
 // The client finished the handshake process by sending the second
 // data block we get from the server as the response
 bool
-RTMPproto::clientFinish()
+RTMP::clientFinish()
 {
     GNASH_REPORT_FUNCTION;
 
@@ -224,7 +225,7 @@ RTMPproto::clientFinish()
 }
 
 bool
-RTMPproto::packetRequest()
+RTMP::packetRequest()
 {
     GNASH_REPORT_FUNCTION;
     return false;
@@ -232,14 +233,65 @@ RTMPproto::packetRequest()
 
 #if 0
 bool
-RTMPproto::packetSend(Buffer * /* buf */)
+RTMP::packetSend(amf::Buffer * /* buf */)
 {
     GNASH_REPORT_FUNCTION;
     return false;
 }
+#endif
+
+/// \brief \ Each RTMP header consists of the following:
+///
+/// * Index & header size - The header size and amf channel index.
+/// * Total size - The total size of the message
+/// * Type - The type of the message
+/// * Routing - The source/destination of the message
+Network::byte_t *
+RTMP::encodeRTMPHeader(int amf_index, rtmp_headersize_e head_size,
+			    size_t total_size, content_types_e type,
+			    rtmp_source_e routing)
+{
+//    GNASH_REPORT_FUNCTION;
+    Network::byte_t *out = new Network::byte_t[total_size + 12 + 4];
+    memset(out, 0, total_size + 12 + 4);
+    char *tmpptr = reinterpret_cast<char *>(out);
+    // Make the index & header size byte
+    *tmpptr = head_size & RTMP_HEADSIZE_MASK;    
+    *tmpptr += amf_index  & RTMP_INDEX_MASK;
+    tmpptr++;
+
+    // Add the unknown bytes. These seem to be used by video and
+    // audio, and only when the header size is 4 or more.
+    if (head_size <= HEADER_4) {
+        memset(tmpptr, 0, 3);
+        tmpptr += 3;
+    }
+
+    // Add the size of the message if the header size is 8 or more.
+    if (head_size <= HEADER_8) {
+        int length = total_size;
+        swapBytes(&length, 4);
+        memcpy(tmpptr, ((char *)&length +1), 3);
+        tmpptr += 3;
+    }
+    
+    // Add the type of the objectif the header size is 8 or more.
+    if (head_size <= HEADER_8) {
+        *tmpptr = type;
+        tmpptr++;
+    }
+
+    // Add the routing of the message if the header size is 12 or more.
+    if (head_size == HEADER_12) {
+        memcpy(tmpptr, &routing, 4);
+        tmpptr += 4;
+    }
+
+    return out;
+}
 
 bool
-RTMPproto::packetRead(Buffer *buf)
+RTMP::packetRead(amf::Buffer *buf)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -249,7 +301,7 @@ RTMPproto::packetRead(Buffer *buf)
     AMF amf;
     
 //    \003\000\000\017\000\000%G￿%@\024\000\000\000\000\002\000\aconnect\000?%G￿%@\000\000\000\000\000\000\003\000\003app\002\000#software/gnash/tests/1153948634.flv\000\bflashVer\002\000\fLNX 6,0,82,0\000\006swfUrl\002\000\035file:///file|%2Ftmp%2Fout.swf%G￿%@\000\005tcUrl\002\0004rtmp://localhost/software/gnash/tests/1153948634
-    amf_index = *buf->reference() & AMF_INDEX_MASK;
+    amf_index = *buf->reference() & RTMP_INDEX_MASK;
     headersize = headerSize(*buf->reference());
     log_debug (_("The Header size is: %d"), headersize);
     log_debug (_("The AMF index is: 0x%x"), amf_index);
@@ -274,16 +326,14 @@ RTMPproto::packetRead(Buffer *buf)
     ptr = parseHeader(ptr);
 //     ptr += headersize;
     
-    Element el;
-    ptr = amf.extractElement(&el, ptr);
-    el.dump();
-    ptr = amf.extractElement(&el, ptr) + 1;
-    el.dump();
+    amf::Element *el = amf.extractAMF(ptr);
+    el->dump();
+    el = amf.extractAMF(ptr) + 1;
+    el->dump();
     log_debug (_("Reading AMF packets till we're done..."));
     buf->dump();
     while (ptr < end) {
-	amf::Element *el = new amf::Element;
-	ptr = amf.extractVariable(el, ptr);
+	amf::Element *el = amf.extractVariable(ptr);
 	addVariable(el);
 	el->dump();
     }
@@ -296,21 +346,16 @@ RTMPproto::packetRead(Buffer *buf)
 	buf = _handler->merge(buf);
     }
     while ((ptr - buf->begin()) < actual_size) {
-	amf::Element *el = new amf::Element;
-	if (ptr) {
-	    ptr = amf.extractVariable(el, ptr);
-	    addVariable(el);
-	} else {
-	    return true;
-	}
+	amf::Element *el = amf.extractVariable(ptr);
+	addVariable(el);
 	el->dump();		// FIXME: dump the AMF objects as they are read in
     }
 
     dump();
     
-    Element *url = getVariable("tcUrl");
-    Element *file = getVariable("swfUrl");
-    Element *app = getVariable("app");
+    amf::Element *url = getVariable("tcUrl");
+    amf::Element *file = getVariable("swfUrl");
+    amf::Element *app = getVariable("app");
 
     if (file) {
 	log_debug("SWF file %s", file->getData());
@@ -324,32 +369,31 @@ RTMPproto::packetRead(Buffer *buf)
     
     return true;
 }
-#endif
 
 void
-RTMPproto::dump()
+RTMP::dump()
 {
     cerr << "RTMP packet contains " << _variables.size() << " variables." << endl;
     map<const char *, amf::Element *>::iterator it;
     for (it = _variables.begin(); it != _variables.end(); it++) {
 //	const char *name = it->first;
-	Element *el = it->second;
+	amf::Element *el = it->second;
 	el->dump();
     }
 }
 
 Network::byte_t *
-RTMPproto::parseHeader(Network::byte_t *in)
+RTMP::parseHeader(Network::byte_t *in)
 {
 //    GNASH_REPORT_FUNCTION;
 
     Network::byte_t *tmpptr = in;
     
-    _amf_index = *tmpptr & AMF_INDEX_MASK;
+    _amf_index = *tmpptr & RTMP_INDEX_MASK;
     log_debug (_("The AMF channel index is %d"), _amf_index);
     
     _header_size = headerSize(*tmpptr++);
-    log_debug (_("The header size is %d"), _header_size);
+    printf (_("The header size is %d"), _header_size);
 
     if (_header_size >= 4) {
         _mystery_word = *tmpptr++;
@@ -363,9 +407,6 @@ RTMPproto::parseHeader(Network::byte_t *in)
         _total_size = (_total_size << 12) + *tmpptr++;
         _total_size = (_total_size << 8) + *tmpptr++;
         _total_size = _total_size & 0xffffff;
-//        _amf_data = new uint8_t(_total_size+1);
-//        _seekptr = _amf_data;
-//        memset(_amf_data, 0, _total_size+1);
         log_debug(_("The body size is: %d"), _total_size);
     }
 
@@ -385,10 +426,10 @@ RTMPproto::parseHeader(Network::byte_t *in)
 //       case NOTIFY:
 //       case SHARED_OBJ:
 //       case INVOKE:
-//           _packet_size = AMF_VIDEO_PACKET_SIZE;
+//           _packet_size = RTMP_VIDEO_PACKET_SIZE;
 //           break;
 //       case AUDIO_DATA:
-//           _packet_size = AMF_AUDIO_PACKET_SIZE;
+//           _packet_size = RTMP_AUDIO_PACKET_SIZE;
 //           break;
 //       default:
 //           log_error (_("ERROR: Unidentified AMF header data type 0x%x"), _type);
@@ -396,7 +437,6 @@ RTMPproto::parseHeader(Network::byte_t *in)
 //     };
     
     if (_header_size == 12) {
-//        hexify((Network::byte_t *)hexint, (Network::byte_t *)tmpptr, 3, false);
         _src_dest = *(reinterpret_cast<rtmp_source_e *>(tmpptr));
         tmpptr += sizeof(unsigned int);
         log_debug(_("The source/destination is: %x"), _src_dest);

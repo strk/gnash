@@ -31,6 +31,7 @@
 #endif
 
 #include "log.h"
+#include "buffer.h"
 #include "amf.h"
 #include "network.h"
 #include "element.h"
@@ -289,23 +290,19 @@ AMF::readElements(Network::byte_t *in)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Network::byte_t *
+Buffer *
 AMF::encodeNumber(double indata)
 {
 //    GNASH_REPORT_FUNCTION;
-    int pktsize = AMF_NUMBER_SIZE + AMF_HEADER_SIZE;
     double num;
     // Encode the data as a 64 bit, big-endian, numeric value
-    Network::byte_t *ptr = new Network::byte_t[pktsize + 1];
-    Network::byte_t *x = ptr;
-    memset(x, 0, pktsize);
-    *x++ = (char)Element::NUMBER;
-    memcpy(&num, &indata, AMF_NUMBER_SIZE);
+    Buffer *buf = new Buffer(AMF_NUMBER_SIZE + AMF_HEADER_SIZE);
+    buf->append(Element::NUMBER);
+    num = indata;
     swapBytes(&num, AMF_NUMBER_SIZE);
-    memcpy(x, &num, AMF_NUMBER_SIZE);
-//    x += pktsize - AMF_HEADER_SIZE;
+    buf->append(num);
     
-    return ptr;
+    return buf;
 }
 
 /// Encode a Boolean object
@@ -315,23 +312,18 @@ AMF::encodeNumber(double indata)
 ///
 /// Although a boolean is one byte in size, swf uses 16bit short integers
 /// heavily, so this value is also a short.
-Network::byte_t *
+Buffer *
 AMF::encodeBoolean(bool flag)
 {
 //    GNASH_REPORT_FUNCTION;
-    int pktsize = AMF_HEADER_SIZE;
-
-    Network::byte_t*ptr = new Network::byte_t[pktsize + 1];
-    Network::byte_t* x = ptr;
-    memset(x, 0, pktsize);
     // Encode a boolean value. 0 for false, 1 for true
-    *x++ = (char)Element::BOOLEAN;
-    x++;
-    *x = flag;
-//    swapBytes(x, 2);
-//    x += sizeof(boost::uint16_t);
+    Buffer *buf = new Buffer(AMF_HEADER_SIZE);
+    buf->append(Element::BOOLEAN);
+    bool x = flag;
+    swapBytes(&x, 2);
+    buf->append(x);
     
-    return ptr;
+    return buf;
 }
 
 /// Encode an object
@@ -339,22 +331,20 @@ AMF::encodeBoolean(bool flag)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Network::byte_t *
-AMF::encodeObject(const Network::byte_t *data, int size)
+Buffer *
+AMF::encodeObject(Network::byte_t *data, int size)
 {
 //    GNASH_REPORT_FUNCTION;
-    int pktsize = AMF_HEADER_SIZE + size;
-
     // Encode an XML object. The data follows a 4 byte length
     // field. (which must be big-endian)
-    Network::byte_t *x = new Network::byte_t[pktsize + 1];
-    memset(x, 0, pktsize);
-    *x++ = Element::OBJECT;
-    uint32_t num = size;
+    Buffer *buf = new Buffer(AMF_HEADER_SIZE + size);
+    buf->append(Element::OBJECT);
+    boost::uint32_t num = size;
     swapBytes(&num, 4);
-    memcpy(x, data, size);
+    buf->append(num);
+    buf->append(data, size);
     
-    return x;
+    return buf;
 }
 
 /// Encode an "Undefined" object
@@ -362,18 +352,14 @@ AMF::encodeObject(const Network::byte_t *data, int size)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Network::byte_t *
+Buffer *
 AMF::encodeUndefined()
 {
 //    GNASH_REPORT_FUNCTION;
-    int pktsize = AMF_HEADER_SIZE;;
-    Network::byte_t* x = new Network::byte_t[pktsize + 1];
-    memset(x, 0, pktsize);
-    *x++ = (char)Element::UNDEFINED;
-//    *x = *static_cast<const char *>(flag);
-    x += pktsize - AMF_HEADER_SIZE;
+    Buffer *buf = new Buffer(AMF_HEADER_SIZE);
+    buf->append(Element::UNDEFINED);
     
-    return x;
+    return buf;
 }
 
 /// Encode an "Undefined" object
@@ -381,18 +367,14 @@ AMF::encodeUndefined()
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Network::byte_t *
+Buffer *
 AMF::encodeUnsupported()
 {
 //    GNASH_REPORT_FUNCTION;
-    int pktsize = AMF_HEADER_SIZE;;
-    Network::byte_t* x = new Network::byte_t[pktsize + 1];
-    memset(x, 0, pktsize);
-    *x++ = (char)Element::UNSUPPORTED;
-//    *x = *static_cast<const char *>(flag);
-    x += pktsize - AMF_HEADER_SIZE;
+    Buffer *buf = new Buffer(AMF_HEADER_SIZE);
+    buf->append(Element::UNSUPPORTED);
     
-    return x;
+    return buf;
 }
 
 /// Encode a Date
@@ -400,25 +382,23 @@ AMF::encodeUnsupported()
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Network::byte_t *encodeDate(Network::byte_t *data)
+Buffer *encodeDate(Network::byte_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
-    int pktsize = AMF_HEADER_SIZE;;
-    Network::byte_t *x = new Network::byte_t[pktsize + 1];
-    memset(x, 0, pktsize);
-    *x++ = Element::DATE;
+    Buffer *buf = new Buffer(AMF_HEADER_SIZE);
+    buf->append(Element::DATE);
     double num = *reinterpret_cast<const double*>(data);
     swapBytes(&num, 8);
-    memcpy(x, &num, 8);
+    buf->append(num);
     
-    return x;
+    return buf;
 }
 /// Encode a "NULL" object
 ///
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Network::byte_t *
+Buffer *
 AMF::encodeNull()
 {
 //    GNASH_REPORT_FUNCTION;
@@ -432,7 +412,7 @@ AMF::encodeNull()
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Network::byte_t *
+Buffer *
 AMF::encodeXMLObject(Network::byte_t * /*data */, int /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -446,7 +426,7 @@ AMF::encodeXMLObject(Network::byte_t * /*data */, int /* size */)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Network::byte_t *
+Buffer *
 AMF::encodeTypedObject(Network::byte_t * /* data */, int /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -460,7 +440,7 @@ AMF::encodeTypedObject(Network::byte_t * /* data */, int /* size */)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Network::byte_t *
+Buffer *
 AMF::encodeReference(Network::byte_t * /* data */, int /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -474,7 +454,7 @@ AMF::encodeReference(Network::byte_t * /* data */, int /* size */)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Network::byte_t *
+Buffer *
 AMF::encodeMovieClip(Network::byte_t * /*data */, int /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -488,7 +468,7 @@ AMF::encodeMovieClip(Network::byte_t * /*data */, int /* size */)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Network::byte_t *
+Buffer *
 AMF::encodeECMAArray(Network::byte_t * /*data */, int /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -502,7 +482,7 @@ AMF::encodeECMAArray(Network::byte_t * /*data */, int /* size */)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Network::byte_t *
+Buffer *
 AMF::encodeLongString(Network::byte_t * /* data */, int /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -516,7 +496,7 @@ AMF::encodeLongString(Network::byte_t * /* data */, int /* size */)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Network::byte_t *
+Buffer *
 AMF::encodeRecordSet(Network::byte_t * /* data */, int /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -531,7 +511,7 @@ AMF::encodeRecordSet(Network::byte_t * /* data */, int /* size */)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Network::byte_t *
+Buffer *
 AMF::encodeStrictArray(Network::byte_t * /* data */, int /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -545,28 +525,25 @@ AMF::encodeStrictArray(Network::byte_t * /* data */, int /* size */)
 /// @return a binary AMF packet in big endian format (header,data) which
 /// needs to be deleted[] after being used.
 ///
-Network::byte_t *
-AMF::encodeElement(const char *str)
+Buffer *
+AMF::encodeString(const string &str)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     boost::uint16_t length;
     
-    int pktsize = strlen(str) + AMF_HEADER_SIZE;
-    // Encode a string value. The data follows a 2 byte length
-    // field. (which must be big-endian)
-    Network::byte_t *ptr = new Network::byte_t[pktsize + 1];
-    Network::byte_t *x = ptr;
-    memset(x, 0, pktsize);
-    *x++ = Element::STRING;
-    length = strlen(str);
+    Buffer *buf = new Buffer(str.size() + AMF_HEADER_SIZE);
+    buf->append(Element::STRING);
+    // when a string is stored in an element, we add a NULL terminator so
+    // it can be printed by to_string() efficiently. The NULL terminator
+    // doesn't get written when encoding a string as it has a byte count
+    // instead.
+    length = str.size() - 1;
     log_debug("Encoded data size is going to be %d", length);
     swapBytes(&length, 2);
-    memcpy(x, &length, 2);
-    x += 2;
-    memcpy(x, str, pktsize - AMF_HEADER_SIZE);
-    x += pktsize - AMF_HEADER_SIZE;
+    buf->append(length);
+    buf->append(str);
     
-    return ptr;
+    return buf;
 }
 
 /// \brief Write an AMF element
@@ -586,7 +563,7 @@ AMF::encodeElement(const char *str)
 /// normal ASCII. It may be that these need to be converted to wide
 /// characters, but for now we just leave them as standard multibyte
 /// characters.
-Network::byte_t *
+Buffer *
 AMF::encodeElement(Element *el)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -602,7 +579,7 @@ AMF::encodeElement(Element *el)
 	  return encodeBoolean(el->to_bool());
           break;
       case Element::STRING:
-	  return encodeElement(el->to_string());
+	  return encodeString(el->to_string());
           break;
       case Element::OBJECT:
 	  return encodeObject(el->getData(), el->getLength());
@@ -661,6 +638,7 @@ AMF::encodeElement(Element *el)
     return 0;
 }
 
+#if 0
 /// Encode an array of elements. 
 ///
 /// @return a binary AMF packet in big endian format (header,data)
@@ -668,7 +646,7 @@ AMF::encodeElement(Element *el)
 /// @return a newly allocated byte array.
 /// to be deleted by caller using delete [] operator, or NULL
 ///
-vector<Network::byte_t> *
+vector<Buffer> *
 AMF::encodeElement(vector<amf::Element *> &data)
 {
     GNASH_REPORT_FUNCTION;
@@ -738,6 +716,7 @@ AMF::encodeElement(vector<amf::Element *> &data)
     }
     return vec;
 }
+#endif
 
 #if 0
 AMF::astype_e
@@ -980,241 +959,206 @@ AMF::createElement(AMF::amf_element_t *el, const std::string &name, bool data)
     return el;
 }
 
-
-// AMF::amf_element_t *
-// createElement(AMF::amf_element_t *el, std::string &name,
-// 	      boost::intrusive_ptr<gnash::as_object> &data)
-// {
-//     GNASH_REPORT_FUNCTION;
-//     log_debug("Creating element %s", name.c_str());
-
-//     el->type = AMF::OBJECT;
-//     el->name = name;
-//     el->length = sizeof(data);
-//     el->data = new uint8_t[sizeof(uint16_t)];
-//     memset(el->data, 0, sizeof(uint16_t));
-//     memcpy(el->data, (char *)&data, el->length);
-//     return el;
-// }
-
-// AMF::amf_element_t *
-// createElement(AMF::amf_element_t *el, const char *name,
-// 	      boost::intrusive_ptr<gnash::as_object> &data)
-// {
-//     GNASH_REPORT_FUNCTION;
-//     string str = name;
-//     return createElement(el, str, data);
-// }
 #endif
 
-boost::uint8_t *
+Buffer *
 AMF::encodeVariable(amf::Element *el)
 {
     GNASH_REPORT_FUNCTION;
-    size_t outsize = el->getName().size() + el->getLength() + 5; // why +5 here ?
+    
+    size_t outsize = el->getNameSize() + el->getLength() + AMF_VAR_HEADER_SIZE;
 
-    Network::byte_t *out = new Network::byte_t[outsize + 4]; // why +4 here ?
-    Network::byte_t *end = out + outsize+4; // why +4 ?
+    Buffer *buf = new Buffer(outsize);
+//     Network::byte_t *out = new Network::byte_t[outsize + 4]; // why +4 here ?
+//     Network::byte_t *end = out + outsize+4; // why +4 ?
 
-    memset(out, 0, outsize + 2); // why +2 here ?
-    Network::byte_t *tmpptr = out;
+//    memset(out, 0, outsize + 2); // why +2 here ?
+//    Network::byte_t *tmpptr = out;
 
     // Add the length of the string for the name of the variable
-    size_t length = el->getName().size();
+    size_t length = el->getNameSize();
     boost::uint16_t enclength = length;
     swapBytes(&enclength, 2);
-    assert(tmpptr+2 < end);
-    memcpy(tmpptr, &enclength, 2);
+    buf->copy(enclength);
 
-    // Add the actual name
-    tmpptr += sizeof(uint16_t);
-    assert(tmpptr+length < end);
-    memcpy(tmpptr, el->getName().c_str(), length);
-    tmpptr += length;
+    buf->append(el->getName());
     // Add the type of the variable's data
-    *tmpptr++ = el->getType();
+    buf->append(el->getType());
     // Booleans appear to be encoded weird. Just a short after
     // the type byte that's the value.
     switch (el->getType()) {
       case Element::BOOLEAN:
 	  enclength = el->to_bool();
-          assert(tmpptr+2 < end);
-	  memcpy(tmpptr, &enclength, 2);
-	  tmpptr += sizeof(uint16_t);
+	  buf->append(enclength);
 	  break;
       case Element::NUMBER:
 	  if (el->getData()) {
 	      swapBytes(el->getData(), AMF_NUMBER_SIZE);
-              assert(tmpptr+AMF_NUMBER_SIZE < end);
-	      memcpy(tmpptr, el->getData(), AMF_NUMBER_SIZE);
+	      buf->append(el->getData(), AMF_NUMBER_SIZE);
 	  }
 	  break;
       default:
 	  enclength = el->getLength();
 	  swapBytes(&enclength, 2);
-          assert(tmpptr+2 < end);
-	  memcpy(tmpptr, &enclength, 2);
-	  tmpptr += sizeof(uint16_t);
+	  buf->append(enclength);
 	  // Now the data for the variable
-          assert(tmpptr+el->getLength() < end);
-	  memcpy(tmpptr, el->getData(), el->getLength());
+	  buf->append(el->getData(), el->getLength());
     }
     
-    return reinterpret_cast<boost::uint8_t *>(out);    
+    return buf;
 }
 
-#if 0
-Network::byte_t *
-AMF::encodeVariable(const char *name, bool flag)
-{
-//    GNASH_REPORT_FUNCTION;
+// #if 0
+// Network::byte_t *
+// AMF::encodeVariable(const char *name, bool flag)
+// {
+// //    GNASH_REPORT_FUNCTION;
     
-    int outsize = strlen(name) + AMF_NUMBER_SIZE + 5;
-    Network::byte_t *out = new uint8_t[outsize];
-    Network::byte_t *tmpptr = out;
+//     int outsize = strlen(name) + AMF_NUMBER_SIZE + 5;
+//     Network::byte_t *out = new uint8_t[outsize];
+//     Network::byte_t *tmpptr = out;
 
-    size_t length = strlen(name);
-    short enclength = length;
-    swapBytes(&enclength, 2);
-    memcpy(tmpptr, &enclength, 2);
-    tmpptr += 2;
-    memcpy(tmpptr, name, length);
-    tmpptr += length;
-    *tmpptr = Element::BOOLEAN;
-    tmpptr++;
-    *tmpptr = flag;
+//     size_t length = strlen(name);
+//     short enclength = length;
+//     swapBytes(&enclength, 2);
+//     memcpy(tmpptr, &enclength, 2);
+//     tmpptr += 2;
+//     memcpy(tmpptr, name, length);
+//     tmpptr += length;
+//     *tmpptr = Element::BOOLEAN;
+//     tmpptr++;
+//     *tmpptr = flag;
 
-    return out;    
-}
+//     return out;    
+// }
 
-Network::byte_t *
-AMF::encodeVariable(const char *name)
+// Network::byte_t *
+// AMF::encodeVariable(const char *name)
+// {
+// //    GNASH_REPORT_FUNCTION;
+//     size_t outsize = strlen(name) + AMF_NUMBER_SIZE + 5;
+//     Network::byte_t *out = new Network::byte_t[outsize];
+//     Network::byte_t *tmpptr = out;
+
+//     size_t length = strlen(name);
+//     short enclength = length;
+//     swapBytes(&enclength, 2);
+//     memcpy(tmpptr, &enclength, 2);
+//     tmpptr += 2;
+//     memcpy(tmpptr, name, length);
+//     tmpptr += length;
+//     *tmpptr = Element::UNDEFINED;
+//     tmpptr++;
+
+//     return out;    
+// }
+
+// Network::byte_t *
+// AMF::encodeVariable(const char *name, double bignum)
+// {
+// //    GNASH_REPORT_FUNCTION;
+//     int outsize = strlen(name) + AMF_NUMBER_SIZE + 5;
+//     Network::byte_t *out = new Network::byte_t[outsize];
+//     Network::byte_t *tmpptr = out;
+//     double newnum = bignum;
+//     char *numptr = (char *)&newnum;
+
+//     size_t length = strlen(name);
+//     short enclength = length;
+//     swapBytes(&enclength, 2);
+//     memcpy(tmpptr, &enclength, 2);
+//     tmpptr += 2;
+//     memcpy(tmpptr, name, length);
+//     tmpptr += length;
+//     *tmpptr = Element::NUMBER;
+//     tmpptr++;
+// //    swapBytes(numptr, AMF_NUMBER_SIZE);
+//     memcpy(tmpptr, numptr, AMF_NUMBER_SIZE);
+
+//     return out;    
+// }
+
+// uint8_t *
+// AMF::encodeVariable(const char *name, const char *val)
+// {
+// //    GNASH_REPORT_FUNCTION;
+
+//     int outsize = strlen(name) + strlen(val) + 5;
+//     Network::byte_t *out = new Network::byte_t[outsize];
+//     Network::byte_t *tmpptr = out;
+
+//     size_t length = strlen(name);
+//     short enclength = length;
+//     swapBytes(&enclength, 2);
+//     memcpy(tmpptr, &enclength, 2);
+//     tmpptr += 2;
+//     memcpy(tmpptr, name, length);
+//     tmpptr += length;
+//     *tmpptr = Element::STRING;
+//     tmpptr++;
+//     length = strlen(val);
+//     enclength = length;
+//     swapBytes(&enclength, 2);
+//     memcpy(tmpptr, &enclength, 2);
+//     tmpptr += 2;
+//     memcpy(tmpptr, val, length);
+
+//     return out;
+// }
+
+// Network::byte_t *
+// AMF::encodeVariable(std::string &name, std::string &val)
+// {
+// //    GNASH_REPORT_FUNCTION;
+
+//     int outsize = name.size() + val.size() + 5;
+//     Network::byte_t *out = new Network::byte_t[outsize];
+//     Network::byte_t *tmpptr = out;
+//     short length;
+
+//     length = name.size() && 0xffff;
+//     swapBytes(&length, 2);
+//     memcpy(tmpptr, &length, 2);
+//     tmpptr += 2;
+//     memcpy(tmpptr, name.c_str(), name.size());
+//     tmpptr += name.size();
+//     *tmpptr = Element::STRING;
+//     tmpptr++;
+//     length = val.size() && 0xffff;
+//     swapBytes(&length, 2);
+//     memcpy(tmpptr, &length, 2);
+//     tmpptr += 2;
+//     memcpy(tmpptr, val.c_str(), name.size());
+
+//     return out;
+// }
+
+// Network::byte_t *
+// AMF::addPacketData(Network::byte_t *data, int bytes)
+// {
+// //    GNASH_REPORT_FUNCTION;
+//     memcpy(_seekptr, data, bytes);
+//     _seekptr+=bytes;
+//     return _seekptr;
+// }
+
+// int
+// AMF::parseBody()
+// {
+// //    GNASH_REPORT_FUNCTION;
+
+// //    return parseBody(_amf_data, _total_size);
+// }
+// #endif
+
+Element *
+AMF::extractAMF(Network::byte_t *in)
 {
-//    GNASH_REPORT_FUNCTION;
-    size_t outsize = strlen(name) + AMF_NUMBER_SIZE + 5;
-    Network::byte_t *out = new Network::byte_t[outsize];
-    Network::byte_t *tmpptr = out;
+    GNASH_REPORT_FUNCTION;
 
-    size_t length = strlen(name);
-    short enclength = length;
-    swapBytes(&enclength, 2);
-    memcpy(tmpptr, &enclength, 2);
-    tmpptr += 2;
-    memcpy(tmpptr, name, length);
-    tmpptr += length;
-    *tmpptr = Element::UNDEFINED;
-    tmpptr++;
-
-    return out;    
-}
-
-Network::byte_t *
-AMF::encodeVariable(const char *name, double bignum)
-{
-//    GNASH_REPORT_FUNCTION;
-    int outsize = strlen(name) + AMF_NUMBER_SIZE + 5;
-    Network::byte_t *out = new Network::byte_t[outsize];
-    Network::byte_t *tmpptr = out;
-    double newnum = bignum;
-    char *numptr = (char *)&newnum;
-
-    size_t length = strlen(name);
-    short enclength = length;
-    swapBytes(&enclength, 2);
-    memcpy(tmpptr, &enclength, 2);
-    tmpptr += 2;
-    memcpy(tmpptr, name, length);
-    tmpptr += length;
-    *tmpptr = Element::NUMBER;
-    tmpptr++;
-//    swapBytes(numptr, AMF_NUMBER_SIZE);
-    memcpy(tmpptr, numptr, AMF_NUMBER_SIZE);
-
-    return out;    
-}
-
-uint8_t *
-AMF::encodeVariable(const char *name, const char *val)
-{
-//    GNASH_REPORT_FUNCTION;
-
-    int outsize = strlen(name) + strlen(val) + 5;
-    Network::byte_t *out = new Network::byte_t[outsize];
-    Network::byte_t *tmpptr = out;
-
-    size_t length = strlen(name);
-    short enclength = length;
-    swapBytes(&enclength, 2);
-    memcpy(tmpptr, &enclength, 2);
-    tmpptr += 2;
-    memcpy(tmpptr, name, length);
-    tmpptr += length;
-    *tmpptr = Element::STRING;
-    tmpptr++;
-    length = strlen(val);
-    enclength = length;
-    swapBytes(&enclength, 2);
-    memcpy(tmpptr, &enclength, 2);
-    tmpptr += 2;
-    memcpy(tmpptr, val, length);
-
-    return out;
-}
-
-Network::byte_t *
-AMF::encodeVariable(std::string &name, std::string &val)
-{
-//    GNASH_REPORT_FUNCTION;
-
-    int outsize = name.size() + val.size() + 5;
-    Network::byte_t *out = new Network::byte_t[outsize];
-    Network::byte_t *tmpptr = out;
-    short length;
-
-    length = name.size() && 0xffff;
-    swapBytes(&length, 2);
-    memcpy(tmpptr, &length, 2);
-    tmpptr += 2;
-    memcpy(tmpptr, name.c_str(), name.size());
-    tmpptr += name.size();
-    *tmpptr = Element::STRING;
-    tmpptr++;
-    length = val.size() && 0xffff;
-    swapBytes(&length, 2);
-    memcpy(tmpptr, &length, 2);
-    tmpptr += 2;
-    memcpy(tmpptr, val.c_str(), name.size());
-
-    return out;
-}
-
-Network::byte_t *
-AMF::addPacketData(Network::byte_t *data, int bytes)
-{
-//    GNASH_REPORT_FUNCTION;
-    memcpy(_seekptr, data, bytes);
-    _seekptr+=bytes;
-    return _seekptr;
-}
-
-int
-AMF::parseBody()
-{
-//    GNASH_REPORT_FUNCTION;
-
-//    return parseBody(_amf_data, _total_size);
-}
-#endif
-
-Network::byte_t *
-AMF::extractElement(Element *el, Network::byte_t *in)
-{
-//    GNASH_REPORT_FUNCTION;
-
+    Element *el = new Element;    
     Network::byte_t *tmpptr;
-
-//    uint8_t hexint[(bytes*2)+1];
-    short length;
+    boost::uint16_t length;
 
     if (in == 0) {
         log_error(_("AMF body input data is NULL"));
@@ -1234,36 +1178,36 @@ AMF::extractElement(Element *el, Network::byte_t *in)
 // If it's a String type, then there is a count of characters, then the string value    
     
     // Check the type of the element data
-    char type = *(Element::astype_e *)tmpptr;
+    Element::amf_type_e type = *(Element::amf_type_e *)tmpptr;
     tmpptr++;                        // skip the header byte
     
-    switch ((Element::astype_e)type) {
+    switch (type) {
       case Element::NUMBER:
 	  el->makeNumber(tmpptr);
-	  tmpptr += 8;
+	  tmpptr += AMF_NUMBER_SIZE; // all numbers are 8 bit big endian
 	  break;
       case Element::BOOLEAN:
 	  el->makeBoolean(tmpptr);
-	  tmpptr += 2;
+	  tmpptr += sizeof(boost::uint16_t); // although a bool is one byte, it's stored as a short
 	  break;
       case Element::STRING:
 	  // get the length of the name
-	  length = ntohs((*(short *)tmpptr) & 0xffff);
-	  tmpptr += 2;
-//	  log_debug(_("AMF String length is: %d"), length);
+	  length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
+	  tmpptr += sizeof(boost::uint16_t);
+	  log_debug(_("AMF String length is: %d"), length);
 	  if (length > 0) {
 	      // get the name of the element
 	      el->makeString(tmpptr, length);
-//	      log_debug(_("AMF String is: %s"), el->to_string());
+	      log_debug(_("AMF String is: %s"), el->to_string());
 	      tmpptr += length;
 	  } else {
 	      el->setType(Element::STRING);
-	      el->setData(0);
 	  };
 	  break;
       case Element::OBJECT:
 	  do {
-	      tmpptr = extractVariable(el, tmpptr);
+	      el = extractVariable(tmpptr);
+	      tmpptr += el->totalsize();
 	  } while (el->getType() != Element::OBJECT_END);
 	  break;
       case Element::MOVIECLIP:
@@ -1284,101 +1228,65 @@ AMF::extractElement(Element *el, Network::byte_t *in)
 	  return 0;
     }
     
-    return tmpptr;
+    return el;
 }
 
-Network::byte_t *
-AMF::extractVariable(Element *el, Network::byte_t *in)
+Element *
+AMF::extractVariable(Network::byte_t *in)
 {
 //    GNASH_REPORT_FUNCTION;
-    
-    char *buffer[AMF_PACKET_SIZE];
-    Network::byte_t *tmpptr = in;
-    boost::int16_t length;
+    Element *el;
+    boost::uint16_t length;
 
-//     if (el == 0) {
-// 	return 0;
-//     }
+    Network::byte_t *tmpptr = in;
+    length = *(reinterpret_cast<boost::uint16_t *>(in));
+    tmpptr += sizeof(boost::uint16_t);
+    swapBytes(&length, sizeof(boost::uint16_t));
     
-    el->clear();
-    
-    memset(buffer, 0, AMF_PACKET_SIZE);
-    // @@ casting generic pointers to bigger types may be dangerous
-    //    due to memory alignment constraints
-    length = *((short *)tmpptr);
-    swapBytes(&length, 2);
-//    length = ntohs((*(const short *)tmpptr) & 0xffff);
-    el->setLength(length);
-    if (length == 0) {
-        if (*(tmpptr+2) == Element::OBJECT_END) {
-//            log_debug(_("End of Object definition"));
-            el->setLength(0);
+    if (length <= 0) {
+	if (*(in+2) == Element::OBJECT_END) {
+	    log_debug(_("End of Object definition"));
             el->setType(Element::OBJECT_END);
-            tmpptr+=3;
-            return tmpptr;
+            return el;
         }
 	return 0;
-    }
-    
-    tmpptr += 2;
-    // get the name of the element
+    }    
+    // get the name of the element, the length of which we just decoded
     if (length > 0) {
-	if (length > 20000) {
-	    log_error("Length field corrupted! parsed value is: %hd", length);
-	    return 0;
-	}
-	
-//        log_debug(_("AMF element length is: %d"), length);
-        memcpy(buffer, tmpptr, length);
+        log_debug(_("AMF element length is: %d"), length);
         el->setName(tmpptr, length);
-        tmpptr += length;
+//	el->setName("fixme");
+	tmpptr += length;
+	log_debug(_("AMF element name is: %s"), el->getName());
     }
     
-//    log_debug(_("AMF element name is: %s"), buffer);
-    Element::astype_e type = (Element::astype_e)((*tmpptr++) & 0xff);
-
+    // get the type of the element, which is a single byte
+    Element::amf_type_e type = (Element::amf_type_e)(*(tmpptr) & 0xff);
+    tmpptr++;
     if (type <= Element::TYPED_OBJECT) {
-//        log_debug(_("AMF type is: %s"), Element::astype_str[(int)type]);
+        log_debug(_("AMF type is: %s"), amftype_str[(int)type]);
 	el->setType(type);
     }
     
     switch (type) {
-      case Element::NUMBER:
-      {
-          memcpy(buffer, tmpptr, AMF_NUMBER_SIZE);
-          swapBytes(buffer, AMF_NUMBER_SIZE);
-	  uint8_t* tmp = new uint8_t[AMF_NUMBER_SIZE+1];
-	  memset(tmp, 0, AMF_NUMBER_SIZE+1);
-	  memcpy(tmp, buffer, AMF_NUMBER_SIZE);
-	  el->setData(tmp);
-#if 0
-          uint8_t hexint[AMF_NUMBER_SIZE*3];
-          hexify((uint8_t *)hexint, (uint8_t *)buffer,
-		 AMF_NUMBER_SIZE, false);
-          log_debug(_("Number \"%s\" is: 0x%s"), el->getName().c_str(), hexint);
-//          double *num = extractNumber(tmpptr);
-#endif
-          tmpptr += 8;
-	  el->setLength(AMF_NUMBER_SIZE);
+      case Element::NUMBER: {
+          swapBytes(tmpptr, AMF_NUMBER_SIZE);
+	  el->makeNumber(tmpptr);
+          tmpptr += AMF_NUMBER_SIZE;
           break;
       }
       case Element::BOOLEAN:
       {
-	  bool sheet = *tmpptr;
-          el->init(sheet);
+	  bool sheet = *(reinterpret_cast<bool *>(tmpptr));
+          el->makeBoolean(sheet);
 	  tmpptr += 1;
 	  break;
     }
       case Element::STRING:
 	  // extractString returns a printable char *
-	  length = ntohs((*(const short *)tmpptr) & 0xffff);
-          tmpptr += sizeof(short);
-          el->setLength(length);
-	  Network::byte_t *str;
-	  str = new Network::byte_t[length + 1];
- 	  memset(str, 0, length + 1);
- 	  memcpy(str, tmpptr, length);
-	  el->setData(str);
+	      length = ntohs((*(const boost::uint16_t *)tmpptr) & 0xffff);
+          tmpptr += sizeof(boost::uint16_t);
+	  el->makeString(tmpptr, length);
 // 	  string v(reinterpret_cast<const char *>(str) + 3, (int)length);
 // 	  log_debug(_("Variable \"%s\" is: %s"), el->getName().c_str(), v.c_str());
           tmpptr += length;
@@ -1415,11 +1323,11 @@ AMF::extractVariable(Element *el, Network::byte_t *in)
       case Element::RECORD_SET:
       case Element::XML_OBJECT:
       default:
-          log_unimpl(_("astype_e of value: %x"), (int)type);
+          log_unimpl(_("amf_type_e of value: %x"), (int)type);
           break;
     }
     
-    return tmpptr; // we're dropping const specification
+    return el;
 }
 
 } // end of amf namespace

@@ -63,7 +63,7 @@ Handler::~Handler()
 }
 
 bool
-Handler::push(Buffer *data, fifo_e direction)
+Handler::push(amf::Buffer *data, fifo_e direction)
 {
 //    GNASH_REPORT_FUNCTION;
     if (direction == Handler::OUTGOING) {
@@ -83,17 +83,17 @@ bool
 Handler::push(gnash::Network::byte_t *data, int nbytes, fifo_e direction)
 {
 //    GNASH_REPORT_FUNCTION;
-    Buffer *ptr = new Buffer;
+    amf::Buffer *ptr = new amf::Buffer;
     ptr->copy(data, nbytes);
     return push(ptr, direction);
 }
 
 // Pop the first date element off the FIFO
-Buffer *
+amf::Buffer *
 Handler::pop(fifo_e direction)
 {
 //    GNASH_REPORT_FUNCTION;
-    Buffer *buf;
+    amf::Buffer *buf;
     
     if (direction == Handler::OUTGOING) {
 	if (_outgoing.size()) {
@@ -112,7 +112,7 @@ Handler::pop(fifo_e direction)
 }
 
 // Peek at the first data element without removing it
-Buffer *
+amf::Buffer *
 Handler::peek(fifo_e direction)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -182,7 +182,7 @@ Handler::start(thread_params_t *args)
     if (args->port == 4080) {			// FIXME: hack alert!
 	boost::thread handler(boost::bind(&httphandler, args));
     }
-    if (args->port == RTMP) {
+    if (args->port == RTMP_PORT) {
 	boost::thread handler(boost::bind(&rtmp_handler, args));
     }
     
@@ -211,7 +211,7 @@ netin_handler(Handler::thread_params_t *args)
     log_debug("Starting to wait for data in net for fd #%d", args->netfd);
     
     do {
-	Buffer *buf = new Buffer;
+	amf::Buffer *buf = new amf::Buffer;
 	size_t ret = hand->readNet(args->netfd, buf->reference(), buf->size(), 1);
 	// the read timed out as there was no data, but the socket is still open.
  	if (ret == 0) {
@@ -258,7 +258,7 @@ netout_handler(Handler::thread_params_t *args)
 	}
 	hand->waitout();
 	while (hand->outsize()) {
-	    Buffer *buf = hand->popout();
+	    amf::Buffer *buf = hand->popout();
 //	    log_debug("FIXME: got data in Outgoing que");
 //	    buf->dump();
 //	    ret = hand->writeNet(buf->reference(), buf->size(), 15);

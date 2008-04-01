@@ -57,7 +57,7 @@ using namespace std;
 namespace gnash {
 
 static const char *DEFAULTPROTO = "tcp";
-static const short DEFAULTPORT  = RTMP;
+static const short DEFAULTPORT  = RTMP_PORT;
 
 #ifndef INADDR_NONE
 #define INADDR_NONE  0xffffffff
@@ -434,7 +434,7 @@ Network::createClient(void)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    return createClient("localhost", RTMP);
+    return createClient("localhost", RTMP_PORT);
 }
 bool
 Network::createClient(short /* port */)
@@ -449,7 +449,7 @@ Network::createClient(const string &hostname)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    return createClient(hostname, RTMP);
+    return createClient(hostname, RTMP_PORT);
 }
 
 bool

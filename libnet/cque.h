@@ -47,11 +47,11 @@ public:
     ~CQue();
     // Push data onto the que
     bool push(gnash::Network::byte_t *data, int nbytes);
-    bool push(Buffer *data);
+    bool push(amf::Buffer *data);
     // Pop the first date element off the que
-    Buffer *pop();
+    amf::Buffer *pop();
     // Peek at the first date element witjhout removing it from the que
-    Buffer *peek();
+    amf::Buffer *peek();
     // Get the number of elements in the que
     size_t size();
     // Wait for a condition variable to trigger
@@ -61,13 +61,13 @@ public:
     // Empty the que of all data. 
     void clear();
     // Remove a range of elements
-    void remove(Buffer *begin, Buffer *end);
+    void remove(amf::Buffer *begin, amf::Buffer *end);
 //     // Remove an element
-//    void remove(Buffer *it);
-    void remove(Buffer *it);
+//    void remove(amf::Buffer *it);
+    void remove(amf::Buffer *it);
     // Merge sucessive buffers into one single larger buffer. This is for some
     // protocols, than have very long headers.
-    Buffer *merge(Buffer *begin);
+    amf::Buffer *merge(amf::Buffer *begin);
     
     // Dump the data to the terminal
     void dump();
@@ -79,7 +79,7 @@ private:
     // an optional name for the queue, only used for debugging messages to make them unique
     std::string _name;
     // The queue itself
-    std::deque<Buffer *> _que;
+    std::deque<amf::Buffer *> _que;
     // A condition variable used to signal the other thread when the que has data
     boost::condition	_cond;
     // This is the mutex used by the condition variable. It needs to be separate from the

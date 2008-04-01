@@ -18,26 +18,21 @@
 #ifndef _ELEMENT_H_
 #define _ELEMENT_H_
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <vector>
 #include <string>
 #include <cstring>
-
 #include <boost/cstdint.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
 
+//#include "buffer.h"
 #include "network.h"
-#include "amfutf8.h"
-#include "amf.h"
 #include "dsodefs.h" // DSOEXPORT
 
-namespace amf 
+namespace amf
 {
 
-class DSOEXPORT Element {
+class Buffer;
+
+class Element {
 public:
     // The following elements are defined within AMF:
     typedef enum {
@@ -62,7 +57,7 @@ public:
 	// these aren't part of the AMF spec, they're used internally
 	VARIABLE=0x11,
 	FUNCTION=0x12
-    } astype_e;
+    } amf_type_e;
     Element();
     Element(gnash::Network::byte_t *data);
     Element(double data);
@@ -75,7 +70,6 @@ public:
     Element(bool, double, double, const std::string &str);
     ~Element();
     void clear();
-    gnash::Network::byte_t *init(gnash::Network::byte_t *data);
     Element &init(const std::string &name, double data);
     Element &init(double data);
     Element &init(std::vector<double> &data);
@@ -87,7 +81,8 @@ public:
     Element &init(bool, double, double, const std::string &str);
 
     // These create the other "special" AMF types.
-    Element &makeString(gnash::Network::byte_t *data, int size); 
+    Element &makeString(const char *str, size_t size); 
+    Element &makeString(gnash::Network::byte_t *data, size_t size); 
     Element &makeString(const std::string &data); 
     Element &makeString(const std::string &name, const std::string &data);
     
@@ -102,29 +97,37 @@ public:
     Element &makeUndefined(const std::string &name);
     Element &makeNull();
     Element &makeNull(const std::string &name);
+
     Element &makeObjectEnd();
-    Element &makeObject(gnash::Network::byte_t *data, int size);
-    Element &makeXMLObject(gnash::Network::byte_t *data, int size);
-    Element &makeTypedObject(gnash::Network::byte_t *data, int size);
-    Element &makeReference(gnash::Network::byte_t *data, int size);
-    Element &makeMovieClip(gnash::Network::byte_t *data, int size);
-    Element &makeECMAArray(gnash::Network::byte_t *data, int size);
-    Element &makeLongString(gnash::Network::byte_t *data, int size);
-    Element &makeRecordSet(gnash::Network::byte_t *data, int size);
+    Element &makeObject(const std::string &name);
+    Element &makeObject(gnash::Network::byte_t *data, size_t size);
+    
+    Element &makeXMLObject(gnash::Network::byte_t *data, size_t size);
+    Element &makeTypedObject(gnash::Network::byte_t *data, size_t size);
+    Element &makeReference(gnash::Network::byte_t *data, size_t size);
+    Element &makeMovieClip(gnash::Network::byte_t *data, size_t size);
+    Element &makeECMAArray(gnash::Network::byte_t *data, size_t size);
+    Element &makeLongString(gnash::Network::byte_t *data, size_t size);
+    Element &makeRecordSet(gnash::Network::byte_t *data, size_t size);
     Element &makeDate(gnash::Network::byte_t *data);
-    Element &makeStrictArray(gnash::Network::byte_t *data, int size);
+    Element &makeStrictArray(gnash::Network::byte_t *data, size_t size);
 //    Element &makeArray();
     
     Element &operator=(Element &);
+    bool operator==(bool x);
+    gnash::Network::byte_t operator[](int x);
 
-    bool operator==(bool x) { if (_data) return _data[0] == x; return false; };
-    uint8_t operator[](int x) { if (_data) return _data[x]; return 0; };
+    // Return the total size of the data plus the headers for byte math
+    size_t totalsize();
+    
+    gnash::Network::byte_t *getData();
+    boost::uint16_t getLength();
+    Buffer *getBuffer() { return _buffer; };
     
     // These are all accessors for the various output formats
-    astype_e getType() { return _type; };
-    void setType(astype_e x) { _type = x; };
-    gnash::Network::byte_t *getData() { return _data; };
-    void setData(gnash::Network::byte_t *x) { _data = x; };
+    amf_type_e getType() { return _type; };
+    void setType(amf_type_e x) { _type = x; };
+//    void setData(Buffer *buf) { _buffer = buf; };
 
     // These accessors convert the raw data to a standard data type we can use.
     double to_number();
@@ -132,19 +135,19 @@ public:
     bool to_bool();
     void *to_reference();
     
-    boost::uint16_t getLength() { return _length; };
-    void setLength(boost::uint16_t x) { _length = x; };
-    const std::string &getName() const { return _name; };
-    void setName(const std::string &name) { _name = name; };
-    void setName(gnash::Network::byte_t *name, int x);
-//    boost::posix_time::ptime to_date();
+    char *getName() const { return _name; };
+    size_t getNameSize();
+    void setName(const std::string &name);
+    void setName(gnash::Network::byte_t *name, size_t x);
+
+    void addChild(Element *el) { _children.push_back(el); };
+    Element *popChild() { return _children.front(); };
     void dump();
     
 private:
-    astype_e	_type;
-    boost::int16_t _length;
-    std::string    _name;
-    gnash::Network::byte_t *_data;
+    amf_type_e		_type;
+    Buffer		*_buffer;
+    char		*_name;
     std::vector<Element	*> _children;
 };                              // end of class definition
 

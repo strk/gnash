@@ -47,7 +47,6 @@ INCLUDES = -I.. \
 	$(PTHREAD_CFLAGS)
 
 noinst_HEADERS = \
-	buffer.h \
 	cque.h \
 	lirc.h \
 	handler.h \
@@ -59,7 +58,6 @@ noinst_HEADERS = \
 	statistics.h
 
 libgnashnet_la_SOURCES = \
-	buffer.cpp \
 	cque.cpp \
 	handler.cpp \
 	lirc.cpp \

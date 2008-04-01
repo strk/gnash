@@ -42,6 +42,7 @@
 #include "network.h"
 #include "handler.h"
 #include "utility.h"
+#include "buffer.h"
 
 using namespace gnash;
 using namespace std;
@@ -125,7 +126,7 @@ HTTP::waitForGetRequest()
 //     memset(buffer, 0, readsize+1);
     
 //    _handler->wait();
-    Buffer *buf = _handler->pop();
+    amf::Buffer *buf = _handler->pop();
 
     if (buf == 0) {
 	log_debug("Que empty, net connection dropped for fd #%d", _handler->getFileFd());
@@ -446,7 +447,7 @@ HTTP::sendGetReply(http_status_e code)
     
     formatHeader(_filesize, code);
 //    int ret = Network::writeNet(_header.str());
-    Buffer *buf = new Buffer;
+    amf::Buffer *buf = new amf::Buffer;
 //    Network::byte_t *ptr = (Network::byte_t *)_body.str().c_str();
 //     buf->copy(ptr, _body.str().size());
 //    _handler->dump();
@@ -481,7 +482,7 @@ HTTP::sendPostReply(rtmpt_cmd_e code)
 
 #if 0
     formatHeader(_filesize, code);
-    Buffer *buf = new Buffer;
+    amf::Buffer *buf = new amf::Buffer;
     if (_header.str().size()) {
 	buf->resize(_header.str().size());
 	string str = _header.str();
@@ -1270,7 +1271,7 @@ httphandler(Handler::thread_params_t *args)
 		log_debug (_("File \"%s\" is %lld bytes in size, disk fd #%d"), filespec,
 			   st.st_size, filefd);
 		do {
-		    Buffer *buf = new Buffer;
+		    amf::Buffer *buf = new amf::Buffer;
 		    ret = read(filefd, buf->reference(), buf->size());
 		    if (ret == 0) { // the file is done
 			delete buf;

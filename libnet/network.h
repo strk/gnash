@@ -41,10 +41,12 @@
 namespace gnash {
 
 // Define the ports for the RTMP protocols
-const short ADMIN = 1111;
-const short RTMP = 1935;
-const short RTMPT = 80;
-const short RTMPTS = 443;
+const short ADMIN_PORT = 1111;
+const short RTMP_PORT = 1935;
+const short RTMPE_PORT = 1935;
+const short RTMPT_PORT = 80;
+const short RTMPTE_PORT = 80;
+const short RTMPTS_PORT = 443;
 
 #ifdef __OS2__
  typedef int    socklen_t;
@@ -88,12 +90,14 @@ public:
     DSOEXPORT bool createClient(const std::string &hostname, short port);
 
     // Read from the connection
+//    int readNet(Buffer &buffer);
     int readNet(byte_t *buffer, int nbytes);
     DSOEXPORT int readNet(byte_t *buffer, int nbytes, int timeout);
     int readNet(int fd, byte_t *buffer, int nbytes);
     int readNet(int fd, byte_t *buffer, int nbytes, int timeout);
     
     // Write to the connection
+//    int writeNet(gnash::Buffer &buffer);
     int writeNet(const std::string &buffer);
     DSOEXPORT int writeNet(const byte_t *buffer, int nbytes);
 //    int writeNet(int fd, const byte_t *buffer);
