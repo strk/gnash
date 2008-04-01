@@ -1,5 +1,10 @@
 2008-04-01 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/MovieClip.as: fix handling of load
+	  callback for SWF5.
+
+2008-04-01 Sandro Santilli <strk@keybit.net>
+
 	* server/edit_text_character.{cpp,h}: always register
 	  the variable name, just don't set a value for it
 	  unless we have one defined.

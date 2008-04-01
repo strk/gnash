@@ -20,9 +20,9 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.122 2008/03/30 12:55:48 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.123 2008/04/01 19:47:20 strk Exp $";
 
-rcsid="$Id: MovieClip.as,v 1.122 2008/03/30 12:55:48 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.123 2008/04/01 19:47:20 strk Exp $";
 #include "check.as"
 
 // To be called at end of test
@@ -1445,8 +1445,8 @@ onData = function()
 	check_equals(arguments.length, 0);
 	check_equals(_root.var1, 'val1');
 	check_equals(_root.var3, 'val3\n');
-	_root.var1 = 'val1custom';
-	_root.var2 = 'val2custom';
+	delete _root.var1; // = 'val1custom';
+	delete _root.var2; // = 'val2custom';
 
 	if ( dataLoaded++ )
 	{
