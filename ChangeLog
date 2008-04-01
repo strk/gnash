@@ -1,5 +1,6 @@
 2008-04-01 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Number.as: rounding tests.
 	* doc/C/gnashrc.xml: removed, the good one is
 	  doc/C/usermanual/gnashrc.xml
 

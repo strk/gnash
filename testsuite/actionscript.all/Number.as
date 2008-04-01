@@ -28,7 +28,7 @@
 //	
 
 
-rcsid="$Id: Number.as,v 1.44 2008/03/31 23:18:34 strk Exp $";
+rcsid="$Id: Number.as,v 1.45 2008/04/01 08:04:05 strk Exp $";
 #include "check.as"
 
 Number.hasOwnProperty = ASnative(101, 5);
@@ -493,16 +493,40 @@ a=new Number(5.4 / 1000000);
 check_equals(a.toString(), "5.4e-6");
 check_equals(a.toString(10), "5.4e-6");
 
+a=new Number(2.123456789123455);
+check_equals(a.toString(), "2.12345678912346"); // rounds abs up
+
+a=new Number(-2.123456789123455);
+check_equals(a.toString(), "-2.12345678912346"); // rounds abs up
+
+a=new Number(0.1234567891234565);
+check_equals(a.toString(), "0.123456789123457"); // rounds abs up
+
+a=new Number(-0.1234567891234565);
+check_equals(a.toString(), "-0.123456789123457"); // round abs up
+
+a=new Number(1.234567891234565e+308); 
+check_equals(a.toString(), "1.23456789123456e+308"); // round abs down
+
+a=new Number(-1.234567891234565e+308); 
+check_equals(a.toString(), "-1.23456789123456e+308"); // round abs down
+
+a=new Number(1.234567891234565e-308);  // gnash rounds this down, pp up
+xcheck_equals(a.toString(), "1.23456789123457e-308"); // round abs up ( abs < 1 ? )
+
+a=new Number(-1.234567891234565e-308);  // gnash rounds this down, pp up
+xcheck_equals(a.toString(), "-1.23456789123457e-308"); // round abs up ( abs < 1 ? ) 
+
 check( isNaN(0/0) );
 
 // END OF TEST
 
 #if OUTPUT_VERSION < 6
- check_totals(170);
+ check_totals(178);
 #else
 #if OUTPUT_VERSION < 7
- check_totals(183);
+ check_totals(191);
 #else
- check_totals(181);
+ check_totals(189);
 #endif
 #endif
