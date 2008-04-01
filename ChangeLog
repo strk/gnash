@@ -1,5 +1,14 @@
 2008-04-01 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.{cpp,h}: always register
+	  the variable name, just don't set a value for it
+	  unless we have one defined.
+	* server/sprite_instance.cpp (get_member): don't use
+	  a registered textfield variable if there's no text
+	  defined for the corresponding textfield.
+
+2008-04-01 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.{cpp,h}: streamline headers inclusion.
 	* server/edit_text_character.{cpp,h}: keep note about whether
 	  text is defined, and don't register the text variable until

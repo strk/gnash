@@ -115,8 +115,8 @@ public:
  	/// Return value of our text.
 	std::string get_text_value() const;
 
-	/// Return true if this TextField has text defined
-	bool getTextDefined();
+	/// Return true if text is defined
+	bool getTextDefined() const { return _textDefined; }
 
 	/// We have a "text" member.
 	void set_member(string_table::key name, const as_value& val, 

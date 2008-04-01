@@ -2375,10 +2375,12 @@ bool sprite_instance::get_member(string_table::key name_key, as_value* val,
     for (TextFieldPtrVect::const_iterator i=etc->begin(), e=etc->end(); i!=e; ++i)
     {
 	TextFieldPtr tf = *i;
-	val->set_string(tf->get_text_value());
-	// break ?
+	if ( tf->getTextDefined() )
+	{
+		val->set_string(tf->get_text_value());
+    		return true;
+	}
     }
-    return true;
   }
 
   return false;

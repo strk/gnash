@@ -419,8 +419,9 @@ edit_text_character::edit_text_character(character* parent,
 	if ( _textDefined ) 
 	{
 		setTextValue(utf8::decodeCanonicalString(m_def->get_default_text(), version));
-		registerTextVariable();
 	}
+
+	registerTextVariable();
 
 	m_dummy_style.push_back(fill_style());
 
@@ -1583,19 +1584,11 @@ edit_text_character::parseTextVariableRef(const std::string& variableName) const
 void
 edit_text_character::registerTextVariable() 
 {
-//#define DEBUG_DYNTEXT_VARIABLES 1
+#define DEBUG_DYNTEXT_VARIABLES 1
 
 #ifdef DEBUG_DYNTEXT_VARIABLES
 	log_debug(_("registerTextVariable() called"));
 #endif
-
-	if ( ! _textDefined )
-	{
-#ifdef DEBUG_DYNTEXT_VARIABLES
-		log_debug(_("registerTextVariable() no-op call (has no text)"));
-#endif
-		return;
-	}
 
 	if ( _text_variable_registered )
 	{
@@ -1642,15 +1635,22 @@ edit_text_character::registerTextVariable()
 		// as_environment& env = get_environment();
 		setTextValue(utf8::decodeCanonicalString(val.to_string(), version));
 	}
-	else
+	else if ( _textDefined )
 	{
 		as_value newVal = as_value(utf8::encodeCanonicalString(_text, version));
 #ifdef DEBUG_DYNTEXT_VARIABLES
 		log_debug(_("target sprite (%s @ %p) does NOT have a member named %s (no problem, we'll add it with value %s)"),
-			typeName(*target).c_str(), (void*)target, _vm.getStringTable().value(key).c_str(),
-			newVal.to_debug_string().c_str());
+			typeName(*target), (void*)target, _vm.getStringTable().value(key),
+			newVal.to_debug_string());
 #endif
 		target->set_member(key, newVal);
+	}
+	else
+	{
+#ifdef DEBUG_DYNTEXT_VARIABLES
+		log_debug(_("target sprite (%s @ %p) does NOT have a member named %s, and we don't have text defined"),
+			typeName(*target), (void*)target, _vm.getStringTable().value(key));
+#endif
 	}
 
 	sprite_instance* sprite = target->to_movie();
@@ -1660,7 +1660,7 @@ edit_text_character::registerTextVariable()
 		// add the textfield variable to the target sprite
 		// TODO: have set_textfield_variable take a string_table::key instead ?
 #ifdef DEBUG_DYNTEXT_VARIABLES
-		log_debug("Calling set_textfield_variable(%s) against sprite %s", _vm.getStringTable().value(key).c_str(), sprite->getTarget().c_str());
+		log_debug("Calling set_textfield_variable(%s) against sprite %s", _vm.getStringTable().value(key), sprite->getTarget());
 #endif
 		sprite->set_textfield_variable(_vm.getStringTable().value(key), this);
 
