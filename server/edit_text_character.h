@@ -115,6 +115,9 @@ public:
  	/// Return value of our text.
 	std::string get_text_value() const;
 
+	/// Return true if this TextField has text defined
+	bool getTextDefined();
+
 	/// We have a "text" member.
 	void set_member(string_table::key name, const as_value& val, 
 		string_table::key nsname = 0);
@@ -361,6 +364,12 @@ private:
 	/// this is a wide string; the cursor position and the position within the string
 	/// are then the same, which makes manipulating the string much easier.
 	std::wstring _text;
+
+	/// This flag will be true as soon as the TextField
+	/// is assigned a text value. Only way to be false is
+	/// when definition has the hasText flag set to false
+	/// and no actionscript added text.
+	bool _textDefined;
 
 	/// immutable definition of this object, as read
 	/// from the SWF stream. Assured to be not-NULL

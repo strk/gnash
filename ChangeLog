@@ -1,5 +1,14 @@
 2008-04-01 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.{cpp,h}: streamline headers inclusion.
+	* server/edit_text_character.{cpp,h}: keep note about whether
+	  text is defined, and don't register the text variable until
+	  it is. Fixes bug #22472.
+	* server/parser/edit_text_character_def.{cpp,h}: keep note about
+	  whether text is defined at definition time.
+
+2008-04-01 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/gst/SoundHandlerGst.{cpp,h}: streamline headers
 	  inclusion.
 

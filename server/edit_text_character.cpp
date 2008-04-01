@@ -376,6 +376,7 @@ edit_text_character::edit_text_character(character* parent,
 	:
 	character(parent, id),
 	_text(L""),
+	_textDefined(def->has_text()),
 	m_def(def),
 	_font(0),
 	m_has_focus(false),
@@ -415,11 +416,13 @@ edit_text_character::edit_text_character(character* parent,
 
 	int version = VM::get().getSWFVersion();
 	
-	setTextValue(utf8::decodeCanonicalString(m_def->get_default_text(), version));
+	if ( _textDefined ) 
+	{
+		setTextValue(utf8::decodeCanonicalString(m_def->get_default_text(), version));
+		registerTextVariable();
+	}
 
 	m_dummy_style.push_back(fill_style());
-
-	registerTextVariable();
 
 	reset_bounding_box(0, 0);
 
@@ -722,6 +725,8 @@ edit_text_character::updateText(const std::string& str)
 void
 edit_text_character::updateText(const std::wstring& wstr)
 {
+	_textDefined=true;
+
 	unsigned int maxLen = m_def->get_max_length();
 
 	std::wstring newText = wstr; // copy needed for eventual resize
@@ -1583,6 +1588,14 @@ edit_text_character::registerTextVariable()
 #ifdef DEBUG_DYNTEXT_VARIABLES
 	log_debug(_("registerTextVariable() called"));
 #endif
+
+	if ( ! _textDefined )
+	{
+#ifdef DEBUG_DYNTEXT_VARIABLES
+		log_debug(_("registerTextVariable() no-op call (has no text)"));
+#endif
+		return;
+	}
 
 	if ( _text_variable_registered )
 	{

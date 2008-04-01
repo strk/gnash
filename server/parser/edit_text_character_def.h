@@ -51,6 +51,11 @@ public:
 		:
 		m_root_def(root_def),
 		m_format(),
+
+		m_has_text(true), // For an SWF-defined textfield we'll read
+		                  // this from the tag. Dynamic textfields should
+		                  // behave as always having text by default (not tested).
+
 		m_word_wrap(false),
 		m_multiline(false),
 		m_password(false),
@@ -213,6 +218,11 @@ public:
 		return m_word_wrap;
 	}
 
+	/// Has text defined ?
+	bool has_text() const {
+		return m_has_text;
+	}
+
 	/// Get root movie definition
 	movie_definition* get_root_def() {
 		return m_root_def;
@@ -268,6 +278,7 @@ private:
 	rect			m_rect;
 	std::string		m_variable_name;
 	text_format		m_format;
+	bool			m_has_text;
 	bool			m_word_wrap;
 	bool			m_multiline;
 	/// show asterisks instead of actual characters

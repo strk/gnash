@@ -44,7 +44,7 @@ edit_text_character_def::read(stream* in, int tag_type,
 
 	in->align();
 	in->ensureBytes(1);
-	bool	has_text = in->read_bit();
+	m_has_text = in->read_bit();
 	m_word_wrap = in->read_bit();
 	m_multiline = in->read_bit();
 	m_password = in->read_bit();
@@ -93,7 +93,7 @@ edit_text_character_def::read(stream* in, int tag_type,
 
 	in->read_string(m_variable_name);
 
-	if (has_text)
+	if (m_has_text)
 	{
 		in->read_string(m_default_text);
 	}

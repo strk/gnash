@@ -28,6 +28,7 @@
 #include "MovieClipLoader.h" // @@ temp hack for loading tests
 #include "as_value.h"
 #include "as_function.h"
+#include "edit_text_character.h" // for registered variables
 #include "edit_text_character_def.h" // @@ temp hack for createTextField exp.
 #include "ControlTag.h"
 #include "fn_call.h"
@@ -2373,8 +2374,9 @@ bool sprite_instance::get_member(string_table::key name_key, as_value* val,
   {
     for (TextFieldPtrVect::const_iterator i=etc->begin(), e=etc->end(); i!=e; ++i)
     {
-      TextFieldPtr tf = *i;
-          val->set_string(tf->get_text_value());
+	TextFieldPtr tf = *i;
+	val->set_string(tf->get_text_value());
+	// break ?
     }
     return true;
   }

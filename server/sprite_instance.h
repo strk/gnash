@@ -25,7 +25,7 @@
 #include "gnashconfig.h" // GNASH_USE_GC
 #endif
 
-#include "edit_text_character.h" // temp hack
+//#include "edit_text_character.h" // temp hack
 #include "movie_definition.h" // for inlines
 #include "dlist.h" // DisplayList 
 #include "log.h"
@@ -47,6 +47,7 @@ namespace gnash {
 	class drag_state;
 	class LoadVariablesThread;
 	class gradient_record;
+	class edit_text_character;
 }
 
 namespace gnash
@@ -901,15 +902,10 @@ private:
 
 
 	/// Forbid copy
-	sprite_instance(const sprite_instance&)
-		:
-		character(NULL, 0)
-	{
-		abort();
-	}
+	sprite_instance(const sprite_instance&);
 
 	/// Forbid assignment
-	sprite_instance& operator=(const sprite_instance&) { abort(); return *this; }
+	sprite_instance& operator=(const sprite_instance&);
 
 	/// Advance to a previous frame.
 	//
