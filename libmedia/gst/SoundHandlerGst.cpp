@@ -16,13 +16,15 @@
 
 #include "SoundHandlerGst.h"
 
-#include <boost/bind.hpp>
-#include <boost/checked_delete.hpp>
-#include <boost/mem_fn.hpp>
 #include "log.h"
 #include "vm/VM.h"
 #include "builtin_function.h"
-#include "gnash.h"
+#include "timers.h"
+#include "as_value.h"
+
+#include <boost/bind.hpp>
+#include <boost/checked_delete.hpp>
+#include <boost/mem_fn.hpp>
 
 namespace gnash {
 namespace media {

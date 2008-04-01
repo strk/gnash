@@ -18,9 +18,14 @@
 #define __SOUND_HANDLER_GST_H
 
 #include "SoundGst.h"
-#include "timers.h"
-#include "as_value.h"
 #include <boost/thread/mutex.hpp>
+
+
+// Forward declarations
+namespace gnash {
+	class as_value;
+	class fn_call;
+}
 
 namespace gnash {
 namespace media {

@@ -1,3 +1,8 @@
+2008-04-01 Sandro Santilli <strk@keybit.net>
+
+	* libmedia/gst/SoundHandlerGst.{cpp,h}: streamline headers
+	  inclusion.
+
 2008-04-01 Russ Nelson <nelson@crynwr.com>
 
 	* Made boost-serialization optional again.
