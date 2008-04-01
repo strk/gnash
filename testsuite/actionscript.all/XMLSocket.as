@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: XMLSocket.as,v 1.9 2008/03/11 19:31:48 strk Exp $";
+rcsid="$Id: XMLSocket.as,v 1.10 2008/04/01 09:26:54 strk Exp $";
 #include "check.as"
 
 check_equals(typeof(XMLSocket), 'function');
@@ -40,15 +40,13 @@ check_equals(typeof(XMLSocket.prototype.connected), 'undefined');
 check(XMLSocket.prototype.hasOwnProperty('connect'));
 check(XMLSocket.prototype.hasOwnProperty('close'));
 check(XMLSocket.prototype.hasOwnProperty('send'));
+check(XMLSocket.prototype.hasOwnProperty('onData'));
 #endif
 
 socketObj = new XMLSocket;
 
 // The default onData handler calls onXML after parsing the code
 check_equals(typeof(socketObj.onData), 'function');
-#if OUTPUT_VERSION >= 6
-check(socketObj.hasOwnProperty('onData'));
-#endif
 
 check_equals(typeof(socketObj), 'object');
 check_equals(socketObj.__proto__, XMLSocket.prototype);

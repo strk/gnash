@@ -1,5 +1,13 @@
 2008-04-01 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xmlsocket.cpp: onData is a prototype (not instance)
+	  member, and has weird inheritance as shown by swfdec testsuite.
+	* testsuite/actionscript.all/XMLSocket.as: onData is a prototype (not
+	  instance) member. The test was wrong.
+	* testsuite/swfdec/PASSING: xml-socket-properties-{5,6,7,8} pass.
+
+2008-04-01 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Number.as: rounding tests.
 	* doc/C/gnashrc.xml: removed, the good one is
 	  doc/C/usermanual/gnashrc.xml

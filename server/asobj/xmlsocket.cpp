@@ -597,12 +597,20 @@ attachXMLSocketInterface(as_object& o)
     o.init_member("connect", new builtin_function(xmlsocket_connect));
     o.init_member("send", new builtin_function(xmlsocket_send));
     o.init_member("close", new builtin_function(xmlsocket_close));
+
+
+    // all this crap to satisfy swfdec testsuite... (xml-socket-properties*)
+    as_object* onDataIface = new as_object(getObjectInterface());
+    as_function* onDataFun = new builtin_function(xmlsocket_onData, onDataIface);
+    o.init_member("onData", onDataFun);
+    onDataIface->init_member(NSV::PROP_CONSTRUCTOR, as_value(onDataFun));
 }
 
 static void
 attachXMLSocketProperties(as_object& o)
 {
-    o.init_member("onData", new builtin_function(xmlsocket_onData));
+    // this is attached to proto
+    //o.init_member("onData", new builtin_function(xmlsocket_onData));
 }
 
 // extern (used by Global.cpp)
