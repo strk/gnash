@@ -21,28 +21,54 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Object.as,v 1.49 2008/03/30 12:55:48 strk Exp $";
+rcsid="$Id: Object.as,v 1.50 2008/04/01 09:04:48 zoulunkai Exp $";
 #include "check.as"
 
-// Test existance of methods
+// Test things in Class Object (swf5~swf8)
 check_equals(typeof(Object), 'function');
 check_equals(typeof(Object.prototype), 'object');
+check_equals(typeof(Object.constructor), 'function');
+#if OUTPUT_VERSION == 5
+	// make Object.__proto__  visible in swf5
+	ASSetPropFlags(Object, null, 8, 128 + 1);
+#endif
+check_equals(typeof(Object.__proto__), 'object');
 
 // registerClass is a public static function of Object
 check_equals(typeof(Object.registerClass), 'function');
+check_equals(Object.prototype.registerClass, undefined);
+
+// Test things in Object.prototype (swf5~swf8)
 check_equals(typeof(Object.prototype.toString), 'function');
 check_equals(typeof(Object.prototype.toLocaleString), 'function');
 check_equals(typeof(Object.prototype.valueOf), 'function');
 check_equals(typeof(Object.prototype.constructor), 'function'); 
+#if OUTPUT_VERSION == 5
+	check_equals(typeof(Object.prototype.addProperty), 'undefined');
+	check_equals(typeof(Object.prototype.watch), 'undefined');
+	check_equals(typeof(Object.prototype.unwatch), 'undefined');
+	check_equals(typeof(Object.prototype.isPropertyEnumerable), 'undefined'); 
+	check_equals(typeof(Object.prototype.isPrototypeOs), 'undefined');
+	check_equals(typeof(Object.prototype.hasOwnProperty), 'undefined'); 
+	// make functions above visible
+	ASSetPropFlags(Object.prototype, null, 8, 128 + 1);
+#endif
+// These functions are visible now even in swf5 (swf5 ~ swf8)
+check_equals(typeof(Object.prototype.addProperty), 'function');
+check_equals(typeof(Object.prototype.watch), 'function');
+check_equals(typeof(Object.prototype.unwatch), 'function');
+check_equals(typeof(Object.prototype.isPropertyEnumerable), 'function'); 
+check_equals(typeof(Object.prototype.isPrototypeOf), 'function');
+check_equals(typeof(Object.prototype.hasOwnProperty), 'function'); 
+
 check_equals(Object.prototype.constructor, Object); 
 check_equals(typeof(Object.prototype.toString.constructor), 'function');
+
 #if OUTPUT_VERSION > 5
+ // Function Object only exists in swf6 and above
  check_equals(Object.prototype.toString.constructor, Function);
- check(Object.prototype.hasOwnProperty('toString'));
- check(Object.prototype.hasOwnProperty('toLocaleString'));
- check(Object.prototype.hasOwnProperty('valueOf'));
 #else
- check_equals(Object.prototype.toString.constructor, Function);
+ check_equals(typeof(Function), 'undefined');
 #endif
 check_equals(Object.prototype.prototype, undefined);
 
@@ -51,11 +77,8 @@ check_equals(Object.prototype.prototype, undefined);
 // in trace_properties.as from swfdec testsuite.
 // WE WANT THIS FIXED !!
 check_equals(Object.prototype.__proto__, undefined);
-#if OUTPUT_VERSION > 5
- check(!Object.prototype.hasOwnProperty("__proto__"));
-#endif 
+check(!Object.prototype.hasOwnProperty("__proto__"));
 
-check_equals(Object.prototype.registerClass, undefined);
 
 #if OUTPUT_VERSION > 5
 
@@ -111,13 +134,6 @@ check_equals(typeof(Object.prototype.isPropertyEnumerable), 'function');
 check_equals(typeof(Object.prototype.isPrototypeOf), 'function');
 check_equals(typeof(Object.prototype.watch), 'function');
 check_equals(typeof(Object.prototype.unwatch), 'function');
-#else
-check_equals(typeof(Object.prototype.addProperty), 'undefined');
-check_equals(typeof(Object.prototype.hasOwnProperty), 'undefined');
-check_equals(typeof(Object.prototype.isPropertyEnumerable), 'undefined');
-check_equals(typeof(Object.prototype.isPrototypeOf), 'undefined');
-check_equals(typeof(Object.prototype.watch), 'undefined');
-check_equals(typeof(Object.prototype.unwatch), 'undefined');
 #endif
 
 // Test Object creation using 'new'
@@ -130,10 +146,12 @@ check_equals(typeof(obj.prototype), 'undefined');
 check_equals(typeof(obj.__proto__), 'object');
 
 #if OUTPUT_VERSION == 5
-// Gnash fails on swf5 but succeeds on swf6,7,8
-check(obj.__constructor__ == Object);
+	check(obj.__constructor__ == undefined);
+	// make obj.__constructor__ visible
+	ASSetPropFlags(obj, null, 8, 128 + 1);
+	check(obj.__constructor__ == Object);
 #else
-check(obj.__constructor__ == Object);
+	check(obj.__constructor__ == Object);
 #endif
 
 check(obj.constructor == Object);
@@ -143,20 +161,17 @@ check (obj.__proto__.constructor == Object);
 // Test instantiated Object methods
 check_equals(typeof(obj.toString), 'function');
 check_equals(typeof(obj.valueOf), 'function');
+check_equals(typeof(obj.addProperty), 'function');
 
-#if OUTPUT_VERSION > 5
-  check_equals(typeof(obj.addProperty), 'function');
-  check(Object.hasOwnProperty('constructor')); 
-  #if OUTPUT_VERSION == 6
-    // bug in swf6???
-    check(obj.hasOwnProperty('constructor')); 
-  #else
-    check(!obj.hasOwnProperty('constructor')); 
-  #endif
-  check(obj.hasOwnProperty('__constructor__')); 
-#else
-  check_equals(typeof(obj.addProperty), 'undefined');
+check(Object.hasOwnProperty('constructor'));
+#if OUTPUT_VERSION == 6
+	check(obj.hasOwnProperty('constructor'));  
+#elif  OUTPUT_VERSION > 6
+	// seems swf7 and above are different.
+	check(!obj.hasOwnProperty('constructor'));  
 #endif
+// swf5~8
+check(obj.hasOwnProperty('__constructor__')); 
 
 // Test instantiated Object members
 obj.member = 1;
@@ -442,7 +457,9 @@ l2.__proto__ = l1;
 // check properties
 var enum = new Object;
 var enumlen = enumerate(l2, enum);
-check_equals( enumlen, 6);
+#if OUTPUT_VERSION  > 5
+	check_equals( enumlen, 6);
+#endif
 check_equals( enum["a"], 1);
 check_equals( enum["b"], 2);
 check_equals( enum["c"], 3);
@@ -455,7 +472,10 @@ var ret = ASSetPropFlags(l0, "a", 1);
 
 var enum = new Object;
 var enumlen = enumerate(l2, enum);
-check_equals( enumlen, 5);
+#if OUTPUT_VERSION  > 5
+	check_equals( enumlen, 5);
+#endif
+
 check_equals( enum["a"], undefined);
 
 var obj5 = new Object();
@@ -553,10 +573,10 @@ check( obj8.prototype.isPrototypeOf(obj9) );
 
 
 #if OUTPUT_VERSION <= 5
-totals(68);
+totals(78);
 #endif
 
 #if OUTPUT_VERSION >= 6
-totals(175);
+totals(180);
 #endif
 
