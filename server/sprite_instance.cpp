@@ -4327,7 +4327,7 @@ sprite_instance::processCompletedLoadVariableRequest(LoadVariablesThread& reques
     set_member(st.find(name), val);
   }
 
-  // We wan't to call a clip-event too if available, see bug #22116
+  // We want to call a clip-event too if available, see bug #22116
   on_event(event_id::DATA);
 }
 
