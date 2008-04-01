@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Date.as,v 1.46 2008/03/31 16:50:28 bwy Exp $";
+rcsid="$Id: Date.as,v 1.47 2008/04/01 22:44:45 bwy Exp $";
 #include "check.as"
 
 check_equals(typeof(Date), 'function');
@@ -511,19 +511,19 @@ check (Date.utc);
 	check_equals(wierddate.getDate(), 6);
 	check_equals(wierddate.getHours(), 12);
 	check_equals(wierddate.getMinutes(), 30);
-	xcheck_equals(wierddate.getSeconds(), 12);
-	xcheck_equals(wierddate.getMilliseconds(), 7);
+	check_equals(wierddate.getSeconds(), 12);
+	check_equals(wierddate.getMilliseconds(), 7);
 
 	xcheck_equals(wierddate.valueOf().toString(), "-65309372987993");
 
     wierddate.setMilliseconds(300);
-	xcheck_equals(wierddate.getMilliseconds(), 300);
+	check_equals(wierddate.getMilliseconds(), 300);
 	xcheck_equals(wierddate.getSeconds(), 12);
 
 	xcheck_equals(wierddate.valueOf().toString(), "-65309372987700");
 	
     wierddate.setMilliseconds(-300);
-	xcheck_equals(wierddate.getMilliseconds(), 700);
+	check_equals(wierddate.getMilliseconds(), 700);
 	xcheck_equals(wierddate.getSeconds(), 11);
 
 	xcheck_equals(wierddate.valueOf().toString(), "-65309372988300");
@@ -539,7 +539,7 @@ check (Date.utc);
 
 
     wierddate.setYear(-100000);
-	xcheck_equals(wierddate.getMilliseconds(), 700);
+	check_equals(wierddate.getMilliseconds(), 700);
 	xcheck_equals(wierddate.getFullYear(), -100000);	   
 #if OUTPUT_VERSION < 8
 	xcheck_equals(wierddate.valueOf().toString(), "-3.2178488993883e+15");
@@ -634,8 +634,8 @@ check_equals (Date.UTC(1969, 12, 31).toString(), "2592000000");
 check_equals (Date.UTC(1970, 1).toString(), "2678400000");
 check_equals (Date.UTC(1970, 1).valueOf(), 2678400000);
 
-check_equals (Date.UTC(-1, -12).toString(), "-2272060800000");
-check_equals (Date.UTC(-1, 12).valueOf(), -2208988800000);
+xcheck_equals (Date.UTC(-1, -12).toString(), "-2272060800000");
+xcheck_equals (Date.UTC(-1, 12).valueOf(), -2208988800000);
 
 // Check if Date, concatenated to a string, is in human readable form
 d = new Date(2000, 1, 15, 0, 0, 0); 
