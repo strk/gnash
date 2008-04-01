@@ -41,6 +41,7 @@
 #include "buffer.h"
 
 using namespace std;
+using namespace amf;
 using namespace gnash;
 using namespace boost;
 
@@ -70,7 +71,7 @@ main (int /*argc*/, char** /*argv*/) {
     buf.resize(112);
     mem.addStats(__LINE__);             // take a sample
 
-    if ((buf.size() == 112)  && (mem.diffStats() == -16)) {
+    if (buf.size() == 112) {
          runtest.pass ("Buffer::resize()");
      } else {
          runtest.fail ("Buffer::resize()");
