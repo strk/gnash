@@ -23,10 +23,13 @@
 #include <string>
 
 #include "getclocktime.hpp"
+#include "amf.h"
+#include "element.h"
 #include "network.h"
+#include "dsodefs.h"
 
 // _definst_ is the default instance name
-namespace gnash
+namespace amf
 {
 
 class Buffer 
@@ -43,26 +46,42 @@ public:
     // Resize the buffer that holds the data
     void *resize(size_t nbytes);
 
-    // Put data into the buffer
+    // Put data into the buffer. This overwrites all data, and resets the seek ptr.
     void copy(gnash::Network::byte_t *data, size_t nbytes);
     void copy(gnash::Network::byte_t *data) { copy(data, _nbytes); };
     void copy(std::string &str);
+    void copy(boost::uint16_t length);
+//     void copy(boost::uint32_t val);
+//     void copy(bool);
+//     void copy(double num);
+//     void copy(Element::amf_type_e type);
+
+    // Append data to the existing data in the buffer. This assume the
+    // buffer has been sized to hold the data as it is appended.
+    gnash::Network::byte_t *append(boost::uint32_t val);
+    gnash::Network::byte_t *append(bool);
+    gnash::Network::byte_t *append(double num);
+    gnash::Network::byte_t *append(Element::amf_type_e type);
+    gnash::Network::byte_t *append(boost::uint16_t length);
+    gnash::Network::byte_t *append(gnash::Network::byte_t *data, size_t nbytes);
+    gnash::Network::byte_t *append(gnash::Network::byte_t byte);
+    gnash::Network::byte_t *append(const std::string &str);
 
     // Find a byte in the buffer
 //    Network::byte_t *find(char c);
-    Network::byte_t *find(Network::byte_t b);
-    Network::byte_t *find(Network::byte_t b, size_t start);
+    gnash::Network::byte_t *find(gnash::Network::byte_t b);
+    gnash::Network::byte_t *find(gnash::Network::byte_t b, size_t start);
     
     // Drop a byte or range of characters without resizing
 //    Network::byte_t *remove(char c);
-    Network::byte_t *remove(Network::byte_t c);
-    Network::byte_t *remove(int x);
-    Network::byte_t *remove(int x, int y);
+    gnash::Network::byte_t *remove(gnash::Network::byte_t c);
+    gnash::Network::byte_t *remove(int x);
+    gnash::Network::byte_t *remove(int x, int y);
     
     // Accessors
-    Network::byte_t *begin() { return _ptr ; };
-    Network::byte_t *end() { return _ptr + _nbytes; };
-    Network::byte_t *reference() { return _ptr; }
+    gnash::Network::byte_t *begin() { return _ptr ; };
+    gnash::Network::byte_t *end() { return _ptr + _nbytes; };
+    gnash::Network::byte_t *reference() { return _ptr; }
     size_t size() { return _nbytes; }
     void setSize(size_t nbytes) { _nbytes = nbytes; };
     
@@ -73,13 +92,15 @@ public:
     // Test against other buffers
     bool operator==(Buffer *buf);
     bool operator==(Buffer &buf);
-    Network::byte_t operator[](int x) { return *(_ptr + x); };
-    
+    gnash::Network::byte_t operator[](int x) { return *(_ptr + x); };
+    gnash::Network::byte_t *at(int x) { return _ptr + x; };
+
     // debug stuff, not need for running Cygnal
     void dump();
-private:
+protected:
     void *init(size_t nbytes);
-    Network::byte_t *_ptr;
+    gnash::Network::byte_t *_seekptr;
+    gnash::Network::byte_t *_ptr;
     size_t         _nbytes;
 #ifdef USE_STATS_BUFFERS
     struct timespec _stamp;	// used for timing how long data stays in the queue.
@@ -87,7 +108,7 @@ private:
 };
 
 
-} // end of gnash namespace
+} // end of amf namespace
 
 #endif // end of __BUFFER_H__
 
