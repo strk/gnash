@@ -47,10 +47,12 @@
 #include "log.h"
 #include "network.h"
 #include "cque.h"
+#include "amf.h"
 
 using namespace std;
 using namespace gnash;
 using namespace boost;
+using namespace amf;
 
 TestState runtest;
 //LogFile& dbglogfile = LogFile::getDefaultInstance();

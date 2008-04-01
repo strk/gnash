@@ -45,7 +45,6 @@ INCLUDES = -I.. \
 	$(PTHREAD_CFLAGS)
 
 check_PROGRAMS = \
-	test_buffer \
 	test_cque \
 	test_handler \
 	test_http
@@ -62,9 +61,9 @@ test_handler_SOURCES = test_handler.cpp
 test_handler_LDADD = $(AM_LDFLAGS) 
 test_handler_DEPENDENCIES = site-update
 
-test_buffer_SOURCES = test_buffer.cpp
-test_buffer_LDADD = $(AM_LDFLAGS) 
-test_buffer_DEPENDENCIES = site-update
+#test_buffer_SOURCES = test_buffer.cpp
+#test_buffer_LDADD = $(AM_LDFLAGS) 
+#test_buffer_DEPENDENCIES = site-update
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

@@ -1,5 +1,11 @@
 2008-04-01 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/libnet.all/Makefile.am: test_buffer was killed by rob...
+	* testsuite/libnet.all/: test_cque.cpp, test_handler.cpp: Buffer is
+	  now in amf namespace (tests still fail, but build now).
+
+2008-04-01 Sandro Santilli <strk@keybit.net>
+
 	* server/as_value.cpp (to_number): in swf<5 a astring can
 	  convert to a number as long as it starts with digits; leading
 	  non-digits won't yeld a NaN. Fixes bug #20911.
