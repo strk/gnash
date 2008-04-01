@@ -28,7 +28,7 @@
 //	
 
 
-rcsid="$Id: Number.as,v 1.46 2008/04/01 08:19:29 strk Exp $";
+rcsid="$Id: Number.as,v 1.47 2008/04/01 08:21:20 strk Exp $";
 #include "check.as"
 
 Number.hasOwnProperty = ASnative(101, 5);
@@ -521,18 +521,24 @@ a=new Number(-0.001234567891234565); // gnash succeeds in rounding this up
 check_equals(a.toString(), "-0.00123456789123457"); // round abs up 
 
 a=new Number(-0.001234567891234564); // gnash succeeds in rounding this down
-check_equals(a.toString(), "-0.00123456789123456"); // round abs up 
+check_equals(a.toString(), "-0.00123456789123456"); // round abs down (obvious?)
+
+a=new Number(0.001234567891234565); // gnash succeeds in rounding this up
+check_equals(a.toString(), "0.00123456789123457"); // round abs up 
+
+a=new Number(0.001234567891234564); // gnash succeeds in rounding this down
+check_equals(a.toString(), "0.00123456789123456"); // round abs down (obvious?)
 
 check( isNaN(0/0) );
 
 // END OF TEST
 
 #if OUTPUT_VERSION < 6
- check_totals(180);
+ check_totals(182);
 #else
 #if OUTPUT_VERSION < 7
- check_totals(193);
+ check_totals(195);
 #else
- check_totals(191);
+ check_totals(193);
 #endif
 #endif
