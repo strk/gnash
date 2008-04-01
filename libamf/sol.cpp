@@ -240,7 +240,7 @@ SOL::writeFile(const string &filespec, const string &name)
 
     for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
         amf::Element *el = (*(ita));
-        Buffer *var = amf_obj.encodeVariable(el); 
+        const Buffer *var = amf_obj.encodeVariable(el); 
         //  Network::byte_t *var = amf_obj.encodeVariable(el, outsize); 
         if (!var) {
             continue;
@@ -249,7 +249,7 @@ SOL::writeFile(const string &filespec, const string &name)
         switch (el->getType()) {
 	  case Element::BOOLEAN:
 	      outsize = el->getNameSize() + 5;
-	      var->append(el->getNameSize());
+	      memcpy(ptr, var, outsize); 
 	      ptr += outsize;
 	      break;
 	  case Element::OBJECT:
