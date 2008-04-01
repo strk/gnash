@@ -1,5 +1,10 @@
 2008-04-01 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/toString_valueOf.as: xpass leftovers
+	  from implementation of Button class.
+
+2008-04-01 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/xmlsocket.cpp: onData is a prototype (not instance)
 	  member, and has weird inheritance as shown by swfdec testsuite.
 	* testsuite/actionscript.all/XMLSocket.as: onData is a prototype (not

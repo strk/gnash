@@ -22,7 +22,7 @@
 
 
 
-rcsid="$Id: toString_valueOf.as,v 1.31 2008/03/11 19:31:49 strk Exp $";
+rcsid="$Id: toString_valueOf.as,v 1.32 2008/04/01 09:29:10 strk Exp $";
 #include "check.as"
 
 //
@@ -336,8 +336,8 @@ check(!Button.prototype.hasOwnProperty('toString'));
 check(!Button.prototype.hasOwnProperty('valueOf'));
 #endif
 
-xcheck_equals(typeof(Button.prototype.toString), 'function' );
-xcheck_equals(typeof(Button.prototype.valueOf), 'function' );
+check_equals(typeof(Button.prototype.toString), 'function' );
+check_equals(typeof(Button.prototype.valueOf), 'function' );
 
 // For Buttons, this true from swf5~swf8!
 #if OUTPUT_VERSION < 6
@@ -346,20 +346,20 @@ xcheck_equals(typeof(Button.prototype.valueOf), 'function' );
  check_equals(Button.prototype.toString, undefined);
  check_equals(Button.prototype.valueOf, undefined);
 #else
- xcheck_equals(Button.prototype.toString, Object.prototype.toString);
- xcheck_equals(Button.prototype.valueOf, Object.prototype.valueOf);
+ check_equals(Button.prototype.toString, Object.prototype.toString);
+ check_equals(Button.prototype.valueOf, Object.prototype.valueOf);
 #endif
 
 btn1 = new Button();
-xcheck_equals(typeof(btn1), "object");
+check_equals(typeof(btn1), "object");
 x = btn1.toString();
 y = btn1.valueOf();
-xcheck_equals(typeof(x), "string");  
-xcheck_equals(typeof(y), "object");   
-xcheck_equals(x, "[object Object]");  
-xcheck_equals(y.toString(), "[object Object]"); 
-xcheck_equals(typeof(y.valueOf()), "object");  
-xcheck_equals(typeof(btn1), "object");
+check_equals(typeof(x), "string");  
+check_equals(typeof(y), "object");   
+check_equals(x, "[object Object]");  
+check_equals(y.toString(), "[object Object]"); 
+check_equals(typeof(y.valueOf()), "object");  
+check_equals(typeof(btn1), "object");
 check(y == btn1);
 //trace(btn1); // invoke btn1.toString(), output [object Object]
 
