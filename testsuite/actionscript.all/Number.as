@@ -25,10 +25,10 @@
 //       it seems it will only do it for SWF4 output
 //
 // TODO: test with SWF target != 6 (the only one tested so far)
-//	
+//  
 
 
-rcsid="$Id: Number.as,v 1.49 2008/04/01 08:52:17 strk Exp $";
+rcsid="$Id: Number.as,v 1.50 2008/04/02 06:20:43 zoulunkai Exp $";
 #include "check.as"
 
 Number.hasOwnProperty = ASnative(101, 5);
@@ -315,44 +315,64 @@ check(isNaN("0xff000z"));
 check_equals(typeof(Number.prototype.valueOf), 'function'); 
 check_equals(typeof(Number.prototype.toString), 'function'); 
 #if OUTPUT_VERSION > 5
-check(isNaN(Number.valueOf()));
+    check(isNaN(Number.valueOf()));
+#else
+    check(!isNaN(Number.valueOf()) );
+#endif
+
+check_equals(typeof(Number), 'function'); 
+check(Number.hasOwnProperty('prototype')); 
+check(Number.hasOwnProperty('__proto__')); 
+check(Number.hasOwnProperty('constructor')); 
+check_equals(typeof(Number.prototype), 'object'); 
+#if OUTPUT_VERSION == 5
+    check_equals(Number.prototype, Object);
+#else
+    check(Number.prototype != Object);
+#endif
+ 
+#if OUTPUT_VERSION == 5
+    // not visible in swf5 by default.
+    check_equals(typeof(Number.valueOf), 'undefined'); 
+    check_equals(typeof(Number.toString), 'undefined'); 
+    check_equals(typeof(Number.__proto__), 'undefined'); 
+    // make properties visible.
+    ASSetPropFlags(Number, null, 0, 128 + 1);
+    ASSetPropFlags(Object, null, 0, 128 + 1);
+#endif
+check_equals(typeof(Number.__proto__), 'object'); 
+check_equals(Number.prototype.__proto__, Object.prototype); 
+
 check_equals(typeof(Number.toString), 'function');
 check_equals(typeof(Number.valueOf), 'function');
 check(!Number.hasOwnProperty('valueOf'));
 check(!Number.hasOwnProperty('toString'));
 check(!Number.__proto__.hasOwnProperty('valueOf'));
 check(!Number.__proto__.hasOwnProperty('toString'));
-check(Number.__proto__.__proto__.hasOwnProperty('valueOf'));
-check(Number.__proto__.__proto__.hasOwnProperty('toString'));
-check(Number.__proto__.__proto__ === Object.prototype);
+check(Number.__proto__.__proto__ == Object.prototype);
 
 check_equals(typeof(Number.valueOf()), 'function'); // this is odd
-#else // OUTPUT_VERSION <= 5
-check(!isNaN(Number.valueOf()) );
-check_equals(typeof(Number), 'function'); 
-check_equals(typeof(Number.valueOf), 'undefined'); 
-check_equals(typeof(Number.__proto__), 'undefined'); 
-check_equals(typeof(Number.toString), 'undefined'); 
-check_equals(typeof(Function), 'undefined');
-#endif
 
 a = 1;
 check_equals(typeof(a.toString), 'function');
 check_equals(typeof(a.valueOf), 'function');
-#if OUTPUT_VERSION > 5
 check(!a.hasOwnProperty('valueOf'));
+#if OUTPUT_VERSION == 5
+    // make properties visible.
+    ASSetPropFlags(Number.prototype, null, 0, 128 + 1);
+    ASSetPropFlags(Object.prototype, null, 0, 128 + 1);
+#endif
 check(a.__proto__.hasOwnProperty('valueOf'));
 check(!a.hasOwnProperty('toString'));
-#endif
+
 
 anum = new Number(1);
 check_equals(typeof(anum.toString), 'function');
 check_equals(typeof(anum.valueOf), 'function');
-#if OUTPUT_VERSION > 5
 check(!anum.hasOwnProperty('valueOf'));
 check(anum.__proto__.hasOwnProperty('valueOf'));
 check(!anum.hasOwnProperty('toString'));
-#endif
+
 
 //-----------------------------------------------------------
 // Check conversion to number
@@ -451,7 +471,7 @@ check_equals(450 - undefined, 450);
 // Numbers should be rounded to 15 significant digits.
 // Numbers above 10e+15 are expressed with exponent.
 // Numbers below 0 with more than 4 leading zeros expressed
-// 	with exponent.
+//  with exponent.
 // Exponent has no leading zero.
 // Trailing zeros are always trimmed.
 //-----------------------------------------------------------
@@ -549,11 +569,11 @@ check( isNaN(0/0) );
 // END OF TEST
 
 #if OUTPUT_VERSION < 6
- check_totals(187);
+ check_totals(207);
 #else
 #if OUTPUT_VERSION < 7
- check_totals(200);
+ check_totals(206);
 #else
- check_totals(198);
+ check_totals(204);
 #endif
 #endif
