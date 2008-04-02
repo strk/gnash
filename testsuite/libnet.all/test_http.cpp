@@ -85,7 +85,8 @@ main(int argc, char *argv[])
     // Check the Date field
     // The date should look something like this:
     //     Date: Mon, 10 Dec 2007  GMT
-    regcomp (&regex_pat, "Date: [A-Z][a-z]*, [0-9]* [A-Z][a-z]* [0-9]* [0-9:]* *GMT$",
+    //     Date: Tue, 1 Apr 2008 19:52:16 GMT\r\n
+    regcomp (&regex_pat, "Date: [A-Z][a-z]*, [0-9]* [A-Z][a-z]* [0-9]* [0-9:]* *GMT.*$",
              REG_NOSUB|REG_NEWLINE);
     if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatDate()");
@@ -96,10 +97,11 @@ main(int argc, char *argv[])
     regfree(&regex_pat);
 
     // Check the Content-Length field
+    // Content-Length: 12345\r\n"
     http.clearHeader();
     http.formatContentLength(12345);
 //    cerr << "FIXME: " << http.getHeader() << endl;
-    regcomp (&regex_pat, "Content-Length: [0-9]*$",
+    regcomp (&regex_pat, "Content-Length: [0-9]*.*$",
              REG_NOSUB|REG_NEWLINE);
     if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatContentLength()");
@@ -128,7 +130,7 @@ main(int argc, char *argv[])
     http.clearHeader();
     http.formatServer();
 //    cerr << "FIXME: " << http.getHeader() << endl;
-    regcomp (&regex_pat, "Server: Cygnal (GNU/Linux)$",
+    regcomp (&regex_pat, "Server: Cygnal (GNU/Linux).*$",
              REG_NOSUB|REG_NEWLINE);
     if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatServer()");
@@ -143,7 +145,7 @@ main(int argc, char *argv[])
     data = "localhost:4080";
     http.formatHost(data);
 //    cerr << "FIXME: " << http.getHeader() << endl;
-    regcomp (&regex_pat, "Host: [A-za-z-]*:[0-9]*$",
+    regcomp (&regex_pat, "Host: [A-za-z-]*:[0-9]*.*$",
              REG_NOSUB|REG_NEWLINE);
     if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatHost()");
@@ -158,7 +160,7 @@ main(int argc, char *argv[])
     data = "en-US,en;q=0.9";
     http.formatLanguage(data);
 //    cerr << "FIXME: " << http.getHeader() << endl;
-    regcomp (&regex_pat, "Accept-Language: en-US,en;q=0.9$",
+    regcomp (&regex_pat, "Accept-Language: en-US,en;q=0.9.*$",
              REG_NOSUB|REG_NEWLINE);
     if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatLanguage()");
@@ -267,10 +269,11 @@ main(int argc, char *argv[])
     regfree(&regex_pat);
 
     // Check formatHeader()
+    // HTTP/1.1 200 OK\r\nDate: Tue, 1 Apr 2008 19:58:40 GMT\r\nServer: Cygnal (GNU/Linux)\r\nLast-Modified: Tue, 1 Apr 2008 19:58:40 GMT\r\nEtag: 24103b9-1c54-ec8632c0\r\nAccept-Ranges: bytes\r\nContent-Length: 0\r\nKeep
     http.clearHeader();
     http.formatHeader(HTTP::LIFE_IS_GOOD);
 //    cerr << "FIXME: " << http.getHeader() << endl;
-    regcomp (&regex_pat, "HTTP/1.1 200 OK.*Date:.*Connection:.*-Length.*-Type:.*$",
+    regcomp (&regex_pat, "HTTP/1.1 200 OK.*Date:.*Server:.*:.*-Length.*-Type:.*$",
              REG_NOSUB);        // note that we do want to look for NL
     if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatHeader(port)");

@@ -1,3 +1,8 @@
+2008-04-01  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* testsuite/libnet.all/test_http.cpp: Adjust patterns because all
+	header fields now have a "\r\n" instead of just a "\n".
+	
 2008-04-01 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/movie_def_impl.cpp (read_all_swf): on end of stream
