@@ -123,6 +123,8 @@
         check_equals( y, 0 );
 	y = '  4';
         check_equals( y, 4 );
+	x = '2e1';
+	check_equals(x+1, 21);
 
         //
         // test ActionLessThan

@@ -1,5 +1,7 @@
 2008-04-01 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfc.all/swf4opcode.sc: check that scientific
+	  notation still works in swf4.
 	* testsuite/libamf.all/Makefile.am: test_buffer is here now...
 
 2008-04-01  Rob Savoye  <rob@ripple.welcomehome.org>
