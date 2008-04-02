@@ -1,5 +1,10 @@
 2008-04-01 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfc.all/swf4opcode.sc: make swf4 dejagnu interface
+	  behave as the usual one (more info).
+
+2008-04-01 Sandro Santilli <strk@keybit.net>
+
 	* server/as_value.cpp (to_bool_v5, to_bool_v6): "true" and "false"
 	  have no special meaning !
 	* testsuite/actionscript.all/ops.as: pass !"true" is false in swf<7.

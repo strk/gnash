@@ -31,32 +31,39 @@
 // Dejagnu clip does not work/compile in swf4.
 //
 
+//-------------------------------------------------------------------------------------------
+// Dejagnu-like interface for SWF4
+// TODO: expose in check.as based on OUTPUT_VERSION ?
+//-------------------------------------------------------------------------------------------
+
 #define _INFO_ concat(' [', concat(__FILE__, concat(':', concat(__LINE__,']'))))
 
-#define pass_check() { trace(concat("PASSED: ", _INFO_)); }
-#define xpass_check() { trace(concat("XPASSED: ", _INFO_)); }
-#define fail_check() { trace(concat("FAILED: ", _INFO_)); }
-#define xfail_check(){ trace(concat("XFAILED: ", _INFO_)); }
+#define pass_check(lbl) { trace(concat("PASSED: ", concat(lbl, _INFO_))); }
+#define xpass_check(lbl) { trace(concat("XPASSED: ", concat(lbl, _INFO_))); }
+#define fail_check(lbl) { trace(concat("FAILED: ", concat(lbl, _INFO_))); }
+#define xfail_check(lbl) { trace(concat("XFAILED: ", concat(lbl, _INFO_))); }
 
 
 //
 // Use check_equals(<obtained>, <expected>)
 //
 #define check_equals(obt, exp)  \
-    if ( obt == exp ) pass_check() \
-    else fail_check()
+    if ( obt == exp ) pass_check( concat(#obt, concat(" == ", #exp)) ) \
+    else fail_check( concat("expected: ", concat(#exp, concat(" obtained: ", obt))) )
     
 #define xcheck_equals(obt, exp)  \
-        if ( obt == exp ) xpass_check() \
-        else xfail_check()
+    if ( obt == exp ) xpass_check( concat(#obt, concat(" == ", #exp)) ) \
+    else xfail_check( concat("expected: ", concat(#exp, concat(" obtained: ", obt))) )
         
 #define check(expr)  \
-    if ( expr ) pass_check() \
-    else fail_check()
+    if ( expr ) pass_check(#expr) \
+    else fail_check(#expr)
 
 #define xcheck(expr)  \
-        if ( expr ) xpass_check() \
-        else xfail_check() 
+        if ( expr ) xpass_check(#expr) \
+        else xfail_check(#expr) 
+
+//-------------------------------------------------------------------------------------------
     
 .flash  bbox=800x600 filename="swf4opcode.swf" background=white version=4 fps=12
 
