@@ -28,7 +28,7 @@
 //  
 
 
-rcsid="$Id: Number.as,v 1.50 2008/04/02 06:20:43 zoulunkai Exp $";
+rcsid="$Id: Number.as,v 1.51 2008/04/02 08:05:05 zoulunkai Exp $";
 #include "check.as"
 
 Number.hasOwnProperty = ASnative(101, 5);
@@ -326,7 +326,7 @@ check(Number.hasOwnProperty('__proto__'));
 check(Number.hasOwnProperty('constructor')); 
 check_equals(typeof(Number.prototype), 'object'); 
 #if OUTPUT_VERSION == 5
-    check_equals(Number.prototype, Object);
+    xcheck_equals(Number.prototype, Object);
 #else
     check(Number.prototype != Object);
 #endif
