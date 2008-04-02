@@ -1,3 +1,7 @@
+2008-04-01 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/libamf.all/Makefile.am: test_buffer is here now...
+
 2008-04-01  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* testsuite/libnet.all/test_http.cpp: Adjust patterns because all

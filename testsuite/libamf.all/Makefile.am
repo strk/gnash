@@ -49,6 +49,7 @@ INCLUDES = -I.. \
 
 
 check_PROGRAMS = \
+	test_buffer \
 	test_el \
 	test_sol \
 	test_lc
@@ -62,6 +63,9 @@ test_sol_DEPENDENCIES = $(solfiles)
 
 test_lc_SOURCES = test_lc.cpp
 test_lc_LDADD = $(AM_LDFLAGS)
+
+test_buffer_SOURCES = test_buffer.cpp
+test_buffer_LDADD = $(AM_LDFLAGS) 
 
 # test_number_SOURCES = test_number.cpp
 # test_number_LDADD = $(AM_LDFLAGS)
