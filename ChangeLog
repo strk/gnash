@@ -1,3 +1,10 @@
+2008-04-01 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/Number.as (toString_method): Number.prototype.toString
+	  is supposed to work _only_ for the number object.
+	* testsuite/actionscript.all/Boolean.as: !"true" succeeds.
+	* testsuite/swfdec/PASSING: number.swf succeeds.
+
 2008-04-01 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/as_value.cpp: use stringstream instead of strtod to avoid

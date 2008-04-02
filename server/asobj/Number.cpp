@@ -197,7 +197,9 @@ init_number_instance(double val)
 as_value
 number_as_object::toString_method(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = fn.this_ptr;
+	// Number.toString must only work for number object, not generic ones.
+	// This is so trace(Number.prototype) doesn't return 0 ...
+	boost::intrusive_ptr<number_as_object> obj = ensureType<number_as_object>(fn.this_ptr);
 
 	double val = obj->get_numeric_value();
 	unsigned radix=10;
