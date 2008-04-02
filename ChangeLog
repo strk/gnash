@@ -1,11 +1,18 @@
 2008-04-01 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Number.cpp: add valueOf_method, as Number.valueOf like
+	  Number.toString must only work for number instances.
+	* testsuite/actionscript.all/Number.as: those weird tests for
+	  Number.prototype in swf5 are fixed now.
+	* testsuite/swfdec/PASSING: number.swf succeeds.
+
+2008-04-01 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Number.as: more tests on Number.prototype
 	  (weird results)
 	* server/asobj/Number.as (toString_method): Number.prototype.toString
 	  is supposed to work _only_ for the number object.
 	* testsuite/actionscript.all/Boolean.as: !"true" succeeds.
-	* testsuite/swfdec/PASSING: number.swf succeeds.
 
 2008-04-01 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 

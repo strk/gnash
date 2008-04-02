@@ -106,6 +106,8 @@ public:
 	}
 
 	static as_value toString_method(const fn_call& fn);
+
+	static as_value valueOf_method(const fn_call& fn);
 };
 
 static void
@@ -122,7 +124,7 @@ attachNumberInterface(as_object& o)
 	o.init_member("toString", new builtin_function(number_as_object::toString_method));
 
 	// Number.valueOf()
-	o.init_member("valueOf", new builtin_function(as_object::valueof_method));
+	o.init_member("valueOf", new builtin_function(number_as_object::valueOf_method));
 }
 
 
@@ -219,6 +221,16 @@ number_as_object::toString_method(const fn_call& fn)
 
 	}
 	return as_value::doubleToString(val, radix); 
+}
+
+as_value
+number_as_object::valueOf_method(const fn_call& fn)
+{
+	// Number.valueOf must only work for number object, not generic ones.
+	// This is so trace(Number.prototype == Object) return true in swf5 ?
+	boost::intrusive_ptr<number_as_object> obj = ensureType<number_as_object>(fn.this_ptr);
+
+	return obj->get_primitive_value();
 }
   
 } // namespace gnash
