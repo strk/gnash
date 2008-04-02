@@ -28,7 +28,7 @@
 //  
 
 
-rcsid="$Id: Number.as,v 1.51 2008/04/02 08:05:05 zoulunkai Exp $";
+rcsid="$Id: Number.as,v 1.52 2008/04/02 09:54:50 strk Exp $";
 #include "check.as"
 
 Number.hasOwnProperty = ASnative(101, 5);
@@ -327,6 +327,12 @@ check(Number.hasOwnProperty('constructor'));
 check_equals(typeof(Number.prototype), 'object'); 
 #if OUTPUT_VERSION == 5
     xcheck_equals(Number.prototype, Object);
+    xcheck_equals(Number.prototype, Function);
+    xcheck_equals(Number.prototype, Object.__proto__);
+    xcheck_equals(Number.prototype, null);
+    xcheck_equals(Number.prototype, undefined);
+    check(Number.prototype != 0);
+    check(Number.prototype != "string");
 #else
     check(Number.prototype != Object);
 #endif
@@ -569,7 +575,7 @@ check( isNaN(0/0) );
 // END OF TEST
 
 #if OUTPUT_VERSION < 6
- check_totals(207);
+ check_totals(213);
 #else
 #if OUTPUT_VERSION < 7
  check_totals(206);

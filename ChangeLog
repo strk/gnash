@@ -1,5 +1,7 @@
 2008-04-01 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Number.as: more tests on Number.prototype
+	  (weird results)
 	* server/asobj/Number.as (toString_method): Number.prototype.toString
 	  is supposed to work _only_ for the number object.
 	* testsuite/actionscript.all/Boolean.as: !"true" succeeds.
