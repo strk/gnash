@@ -1,3 +1,8 @@
+2008-04-02 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/asobj/Date.cpp: disable timezone offset for all systems
+	  to fix build.
+
 2008-04-02 Sandro Santilli <strk@keybit.net>
 
 	* server/as_prop_flags.h: add SWF9 visibility flag.

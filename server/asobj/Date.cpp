@@ -666,6 +666,7 @@ date_get_proto(date_getutcseconds,  getUniversalTime, second)
  
 static int minutes_east_of_gmt(struct tm& /* tm*/)
 {
+    return 0;
 #ifdef HAVE_TM_GMTOFF
   // tm_gmtoff is in seconds east of GMT; convert to minutes.
 //  return((int) (tm.tm_gmtoff / 60));
@@ -682,6 +683,8 @@ static int minutes_east_of_gmt(struct tm& /* tm*/)
   int minutes_east;
 
   // Find out system timezone offset...
+
+#if 0
 
 # if defined(HAVE_TZSET) && defined(HAVE_LONG_TIMEZONE)
   tzset();
@@ -728,6 +731,7 @@ static int minutes_east_of_gmt(struct tm& /* tm*/)
     log_error("Cannot get timezone information");
     minutes_east = 0;
   }
+#endif
 
   return minutes_east;
 #endif // HAVE_TM_OFFSET
