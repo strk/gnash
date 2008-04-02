@@ -1,5 +1,7 @@
 2008-04-01 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/DefineEditTextVariableNameTest-Runner.cpp: 
+	  the testcase has 11 tests now.
 	* server/asobj/Number.cpp: add valueOf_method, as Number.valueOf like
 	  Number.toString must only work for number instances.
 	* testsuite/actionscript.all/Number.as: those weird tests for
