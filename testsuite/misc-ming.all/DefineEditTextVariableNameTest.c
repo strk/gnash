@@ -320,7 +320,7 @@ main(int argc, char** argv)
     SWFMovie_nextFrame(mo);
     //
     //  test that uninitialized textfield instance variables are not
-    //  visible in the time where the textfield instance is placed.
+    //  visible in the timeline where the textfield instance is placed.
     //
     mc4 = newSWFMovieClip();
     add_text_field(mc4, (SWFBlock)bfont, varName3, NULL);
