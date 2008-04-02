@@ -212,7 +212,7 @@ main(int argc, char *argv[])
 #if 1
     // Admin handler
     Handler::thread_params_t admin_data;
-    admin_data.port = gnash::ADMIN;
+    admin_data.port = gnash::ADMIN_PORT;
     boost::thread adminhandler(boost::bind(&admin_handler, &admin_data));
 #endif
 
@@ -222,7 +222,7 @@ main(int argc, char *argv[])
     // the server. Since this port offset changes the constant to test for which protocol,
     // we pass the info to the start thread so it knows which handler to invoke.
     Handler::thread_params_t http_data;
-    http_data.port = port_offset + gnash::RTMPT;
+    http_data.port = port_offset + gnash::RTMPT_PORT;
     http_data.netfd = 0;
     http_data.filespec = docroot;
     boost::thread http_thread(boost::bind(&connection_handler, &http_data));
@@ -232,7 +232,7 @@ main(int argc, char *argv[])
     // Incomming connection handler for port 1935, RTMP. As RTMP is not a priviledged port,
     // we just open it without an offset.
     Handler::thread_params_t rtmp_data;
-    rtmp_data.port = gnash::RTMP;
+    rtmp_data.port = gnash::RTMP_PORT;
     rtmp_data.netfd = 0;
     rtmp_data.filespec = docroot;
     boost::thread rtmp_thread(boost::bind(&connection_handler, &rtmp_data));
@@ -258,10 +258,10 @@ ssl_thread(struct thread_params *conndata)
     RTMPproto proto;
     struct thread_params loadfile;
     string filespec;
-    int port = RTMPTS + port_offset;
+    int port = RTMPTS_PORT + port_offset;
 
     Statistics st;
-    st.setFileType(NetStats::RTMPTS);    
+    st.setFileType(NetStats::RTMPTS_PORT);
     
     www.createServer(port);
     

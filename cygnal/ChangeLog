@@ -1,3 +1,7 @@
+2008-04-01  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* cygnal.cpp: Ports now have a _PORT appended.
+
 2008-03-28  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* testsuite/cygnal.all/Makefile.am: Remove testcases moved to
@@ -24,7 +28,7 @@
 	threads die in the proper order.
 	* handler.h: Add enum for admin commands.
 	* http.cpp: Return a bool instead of a string from
-	waitForGetRequest(). CLeanup after ourselves and die when the I/O
+	waitForGetRequest(). Cleanup after ourselves and die when the I/O
 	threads go away.
 	* netstats.h: Add comment on statistics API. Rename ifdefs of swf
 	versions.
