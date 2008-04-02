@@ -43,6 +43,7 @@
 
 #include <string>
 
+#define ONCE(x) { static bool warned=false; if (!warned) { warned=true; x; } }
 
 namespace gnash {
 
@@ -51,14 +52,18 @@ static as_value sound_attachsound(const fn_call& fn);
 static as_value sound_getbytesloaded(const fn_call& fn);
 static as_value sound_getbytestotal(const fn_call& fn);
 static as_value sound_getpan(const fn_call& fn);
+static as_value sound_setpan(const fn_call& fn);
+static as_value sound_getDuration(const fn_call& fn);
+static as_value sound_setDuration(const fn_call& fn);
 static as_value sound_gettransform(const fn_call& fn);
+static as_value sound_getPosition(const fn_call& fn);
 static as_value sound_getvolume(const fn_call& fn);
 static as_value sound_loadsound(const fn_call& fn);
-static as_value sound_setpan(const fn_call& fn);
 static as_value sound_settransform(const fn_call& fn);
 static as_value sound_setvolume(const fn_call& fn);
 static as_value sound_start(const fn_call& fn);
 static as_value sound_stop(const fn_call& fn);
+static as_value checkPolicyFile_getset(const fn_call& fn);
 static as_object* getSoundInterface();
 
 Sound::Sound() 	:
@@ -379,48 +384,56 @@ sound_attachsound(const fn_call& fn)
 as_value
 sound_getbytesloaded(const fn_call& /*fn*/)
 {
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_unimpl (__FUNCTION__);
-		warned = true;
-	}
+	ONCE( log_unimpl ("Sound.getBytesLoaded()") );
 	return as_value();
 }
 
 as_value
 sound_getbytestotal(const fn_call& /*fn*/)
 {
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_unimpl (__FUNCTION__);
-		warned = true;
-	}
+	ONCE( log_unimpl ("Sound.getBytesTotal()") );
 	return as_value();
 }
 
 as_value
 sound_getpan(const fn_call& /*fn*/)
 {
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_unimpl (__FUNCTION__);
-		warned = true;
-	}
+	ONCE( log_unimpl ("Sound.getDuration()") );
+	return as_value();
+}
+
+as_value
+sound_getDuration(const fn_call& /*fn*/)
+{
+	ONCE( log_unimpl ("Sound.getDuration()") );
+	return as_value();
+}
+
+as_value
+sound_setDuration(const fn_call& /*fn*/)
+{
+	ONCE( log_unimpl ("Sound.setDuration()") );
+	return as_value();
+}
+
+as_value
+sound_getPosition(const fn_call& /*fn*/)
+{
+	ONCE( log_unimpl ("Sound.getPosition()") );
+	return as_value();
+}
+
+as_value
+sound_setPosition(const fn_call& /*fn*/)
+{
+	ONCE( log_unimpl ("Sound.setPosition()") );
 	return as_value();
 }
 
 as_value
 sound_gettransform(const fn_call& /*fn*/)
 {
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_unimpl (__FUNCTION__);
-		warned = true;
-	}
+	ONCE( log_unimpl ("Sound.getTransform()") );
 	return as_value();
 }
 
@@ -455,24 +468,14 @@ sound_loadsound(const fn_call& fn)
 as_value
 sound_setpan(const fn_call& /*fn*/)
 {
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_unimpl (__FUNCTION__);
-		warned = true;
-	}
+	ONCE( log_unimpl ("Sound.setPan()") );
 	return as_value();
 }
 
 as_value
 sound_settransform(const fn_call& /*fn*/)
 {
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_unimpl (__FUNCTION__);
-		warned = true;
-	}
+	ONCE( log_unimpl ("Sound.setTransform()") );
 	return as_value();
 }
 
@@ -502,14 +505,22 @@ sound_duration(const fn_call& fn)
 }
 
 as_value
-sound_ID3(const fn_call& /*fn*/)
+checkPolicyFile_getset(const fn_call& /*fn*/)
 {
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_unimpl (__FUNCTION__);
-		warned = true;
-	}
+	ONCE( log_unimpl ("Sound.checkPolicyFile") );
+	return as_value();
+}
+
+as_value
+sound_areSoundsInaccessible(const fn_call& /*fn*/)
+{
+	// TODO: I guess this would have to do with premissions (crossdomain stuff)
+	// more then capability.
+	// See http://www.actionscript.org/forums/showthread.php3?t=160028
+	// 
+	// naive test shows this always being undefined..
+	//
+	ONCE( log_unimpl ("Sound.areSoundsInaccessible()") );
 	return as_value();
 }
 
@@ -525,18 +536,30 @@ void
 attachSoundInterface(as_object& o)
 {
 
-	o.init_member("attachSound", new builtin_function(sound_attachsound));
-	o.init_member("getBytesLoaded", new builtin_function(sound_getbytesloaded));
-	o.init_member("getBytesTotal", new builtin_function(sound_getbytestotal));
-	o.init_member("getPan", new builtin_function(sound_getpan));
-	o.init_member("getTransform", new builtin_function(sound_gettransform));
-	o.init_member("getVolume", new builtin_function(sound_getvolume));
-	o.init_member("loadSound", new builtin_function(sound_loadsound));
-	o.init_member("setPan", new builtin_function(sound_setpan));
-	o.init_member("setTransform", new builtin_function(sound_settransform));
-	o.init_member("setVolume", new builtin_function(sound_setvolume));
-	o.init_member("start", new builtin_function(sound_start));
-	o.init_member("stop", new builtin_function(sound_stop));
+	int fl_hpc = as_prop_flags::dontEnum|as_prop_flags::dontDelete|as_prop_flags::readOnly;
+
+	o.init_member("attachSound", new builtin_function(sound_attachsound), fl_hpc);
+	o.init_member("getDuration", new builtin_function(sound_getDuration), fl_hpc);
+	o.init_member("setDuration", new builtin_function(sound_setDuration), fl_hpc);
+	o.init_member("getPan", new builtin_function(sound_getpan), fl_hpc);
+	o.init_member("setPan", new builtin_function(sound_setpan), fl_hpc);
+	o.init_member("loadSound", new builtin_function(sound_loadsound), fl_hpc);
+	o.init_member("start", new builtin_function(sound_start), fl_hpc);
+	o.init_member("stop", new builtin_function(sound_stop), fl_hpc);
+	o.init_member("getPosition", new builtin_function(sound_getPosition), fl_hpc);
+	o.init_member("setPosition", new builtin_function(sound_setPosition), fl_hpc);
+	o.init_member("getTransform", new builtin_function(sound_gettransform), fl_hpc);
+	o.init_member("setTransform", new builtin_function(sound_settransform), fl_hpc);
+	o.init_member("getVolume", new builtin_function(sound_getvolume), fl_hpc);
+	o.init_member("setVolume", new builtin_function(sound_setvolume), fl_hpc);
+
+	int fl_hpcn6 = fl_hpc|as_prop_flags::onlySWF6Up;
+
+	o.init_member("getBytesLoaded", new builtin_function(sound_getbytesloaded), fl_hpcn6);
+	o.init_member("getBytesTotal", new builtin_function(sound_getbytestotal), fl_hpcn6);
+
+	int fl_hpcn9 = as_prop_flags::dontEnum|as_prop_flags::dontDelete|as_prop_flags::readOnly|as_prop_flags::onlySWF9Up;
+	o.init_member("areSoundsInaccessible", new builtin_function(sound_areSoundsInaccessible), fl_hpcn9);
 
 	// Properties
 
@@ -545,8 +568,13 @@ attachSoundInterface(as_object& o)
 	gettersetter = &sound_duration;
 	o.init_readonly_property("duration", *gettersetter);
 
-	gettersetter = &sound_ID3;
-	o.init_property("ID3", *gettersetter, *gettersetter);
+	//there's no such thing as an ID3 member (swfdec shows)
+	//gettersetter = &sound_ID3;
+	//o.init_property("ID3", *gettersetter, *gettersetter);
+
+	gettersetter = &checkPolicyFile_getset;
+	int fl_hp = as_prop_flags::dontEnum|as_prop_flags::dontDelete;
+	o.init_property("checkPolicyFile", *gettersetter, *gettersetter, fl_hp);
 
 	gettersetter = &sound_position;
 	o.init_readonly_property("position", *gettersetter);
@@ -562,6 +590,9 @@ getSoundInterface()
 	{
 		o = new as_object(getObjectInterface());
 		attachSoundInterface(*o);
+
+		// TODO: make this an additional second arg to as_object(__proto__) ctor !
+		o->set_member_flags(NSV::PROP_uuPROTOuu, as_prop_flags::readOnly, 0);
 	}
 
 	return o.get();
@@ -576,10 +607,9 @@ void sound_class_init(as_object& global)
 
 	if ( cl == NULL )
 	{
-		cl=new builtin_function(&sound_new, getSoundInterface());
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		attachSoundInterface(*cl);
+		as_object* iface = getSoundInterface();
+		cl=new builtin_function(&sound_new, iface);
+		iface->set_member_flags(NSV::PROP_CONSTRUCTOR, as_prop_flags::readOnly);
 		     
 	}
 

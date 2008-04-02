@@ -1,9 +1,17 @@
+2008-04-02 Sandro Santilli <strk@keybit.net>
+
+	* server/as_prop_flags.h: add SWF9 visibility flag.
+	* server/asobj/Sound.cpp: get closer to swfdec reported properties
+	  set, stubbing missing methods, correctly setting flags.
+	* testsuite/swfdec/PASSING: sound-properties-9.swf passes, 5 to 8
+	  still not (due to a weird value of a weird member).
+
 2008-04-02 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp: Only swap pixel format bits on big
 	  endian hosts for 24 and 32 bpp modes (see bug #22799)
 	  
-2008-04-01 Sandro Santilli <strk@keybit.net>
+2008-04-02 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/DefineEditTextVariableNameTest-Runner.cpp: 
 	  the testcase has 11 tests now.
@@ -13,7 +21,7 @@
 	  Number.prototype in swf5 are fixed now.
 	* testsuite/swfdec/PASSING: number.swf succeeds.
 
-2008-04-01 Sandro Santilli <strk@keybit.net>
+2008-04-02 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Number.as: more tests on Number.prototype
 	  (weird results)
@@ -21,37 +29,37 @@
 	  is supposed to work _only_ for the number object.
 	* testsuite/actionscript.all/Boolean.as: !"true" succeeds.
 
-2008-04-01 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+2008-04-02 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/as_value.cpp: use stringstream instead of strtod to avoid
 	  different locales changing the result (SWF4 only).
 	* testsuite/misc-swfc.all: tests passing.
 
-2008-04-01 Sandro Santilli <strk@keybit.net>
+2008-04-02 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-swfc.all/swf4opcode.sc: make swf4 dejagnu interface
 	  behave as the usual one (more info).
 
-2008-04-01 Sandro Santilli <strk@keybit.net>
+2008-04-02 Sandro Santilli <strk@keybit.net>
 
 	* server/as_value.cpp (to_bool_v5, to_bool_v6): "true" and "false"
 	  have no special meaning !
 	* testsuite/actionscript.all/ops.as: pass !"true" is false in swf<7.
 	* testsuite/misc-swfc.all/swf4opcode.sc: pass !"true".
 
-2008-04-01 Sandro Santilli <strk@keybit.net>
+2008-04-02 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-swfc.all/swf4opcode.sc: test ACTION_LOGICALNOT, gnash
 	  fails a "true" and a "_root" in swf4.
 	* testsuite/actionscript.all/ops.as: test ACTION_LOGICALNOT, gnash
 	  fails a "true" in swf5.
 
-2008-04-01 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+2008-04-02 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/misc-swfc.all/swf4opcode.sc: was just about to add exponent
 	  tests. Here are some more. Also test for decimal separator.
 
-2008-04-01 Sandro Santilli <strk@keybit.net>
+2008-04-02 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-swfc.all/swf4opcode.sc: check that scientific
 	  notation still works in swf4.

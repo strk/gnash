@@ -60,7 +60,10 @@ public:
 		onlySWF7Up 	= 1 << 10, // 1024
 
 		/// Only visible by VM initialized for version 8 or higher 
-		onlySWF8Up	= 1 << 12 // 4096
+		onlySWF8Up	= 1 << 12, // 4096
+
+		/// Only visible by VM initialized for version 9 or higher 
+		onlySWF9Up	= 1 << 13 // 8192
 
 	};
 
@@ -141,10 +144,11 @@ public:
 	/// Get version-based visibility 
 	bool get_visible(int swfVersion) const
 	{
-		if ( _flags & onlySWF6Up && swfVersion  < 6 ) return false;
+		if ( _flags & onlySWF6Up && swfVersion < 6 ) return false;
 		if ( _flags & ignoreSWF6 && swfVersion == 6 ) return false;
-		if ( _flags & onlySWF7Up && swfVersion  < 7 ) return false;
+		if ( _flags & onlySWF7Up && swfVersion < 7 ) return false;
 		if ( _flags & onlySWF8Up && swfVersion < 8 ) return false;
+		if ( _flags & onlySWF9Up && swfVersion < 9 ) return false;
 		return true;
 	}
 
