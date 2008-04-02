@@ -820,9 +820,10 @@ parse_tag:
 	{
 		IF_VERBOSE_MALFORMED_SWF(
 		log_swferror(_(SIZET_FMT " frames advertised in header, but only " SIZET_FMT " SHOWFRAME tags "
-			"found in stream. Updating total frames count"), m_frame_count, floaded);
+			"found in stream. Pretending we loaded all advertised frames"), m_frame_count, floaded);
 		);
-		m_frame_count = floaded;
+		boost::mutex::scoped_lock lock(_frames_loaded_mutex);
+		_frames_loaded = m_frame_count;
 		// Notify any thread waiting on frame reached condition
 		_frame_reached_condition.notify_all();
 	}

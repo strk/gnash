@@ -1,5 +1,12 @@
 2008-04-01 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/movie_def_impl.cpp (read_all_swf): on end of stream
+	  update loaded frames count to match advertised number. This is
+	  now the same handling for definesprite. While we have automated
+	  test for the sprite case (swfmill testsuite) we don't have one
+	  for the root movie case, but swfdec's crash-0.5.5-cvs-truncated
+	  series of tests seem to be less race-condition prone with this
+	  patch.
 	* libamf/sol.cpp (writeFile): fix write of BOOLEAN elements.
 
 2008-04-01 Sandro Santilli <strk@keybit.net>
