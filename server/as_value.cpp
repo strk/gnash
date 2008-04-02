@@ -399,16 +399,25 @@ as_value::to_number() const
             }
             else if(swfversion <= 4)
             {
-		const std::string& s = getStr();
-		const char* nptr = s.c_str();
-		char* endptr = NULL;
-		double d = strtod(nptr, &endptr);
-		return d;
+                // For SWF4, any valid number before non-numerical
+                // characters is returned, including exponent, positive
+                // and negative signs and whitespace before. A stringstream
+                // does the job. Locale differences (decimal separator) arise
+                // with strtod.                
+                double d = 0;
+                std::istringstream is (getStr());
+                is >> d;
+                return d;
             }
 
             // @@ Moock says the rule here is: if the
             // string is a valid float literal, then it
             // gets converted; otherwise it is set to NaN.
+            // Valid for SWF5 and above.
+            //
+            // boost::lexical_cast is remarkably inflexible and 
+            // fails for anything that has non-numerical characters.
+            // Fortunately, actionscript is equally inflexible.
             try 
             { 
                 double d = boost::lexical_cast<double>(getStr());

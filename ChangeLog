@@ -1,3 +1,9 @@
+2008-04-01 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/as_value.cpp: use stringstream instead of strtod to avoid
+	  different locales changing the result (SWF4 only).
+	* testsuite/misc-swfc.all: tests passing.
+
 2008-04-01 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-swfc.all/swf4opcode.sc: make swf4 dejagnu interface
