@@ -146,6 +146,23 @@
 	x = '2e1';
         check_equals(x+1, 21);
         //
+        // test ActionLogicalNot (0x12)
+        //
+        check(!"");
+        check(!"a");
+        xcheck(!"true");
+        check(!"false");
+        check("1");
+        check(!"0000.000");
+        check(!false); // doh !
+        check(true); // doh !
+        check(!0); 
+        check(4); 
+        xcheck(!_root);  // undefined ?
+        check(!null); 
+        check(!undefined); 
+
+        //
         // test ActionLessThan
         //
         x = 'ab';

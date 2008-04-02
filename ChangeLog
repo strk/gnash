@@ -1,5 +1,7 @@
 2008-04-01 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfc.all/swf4opcode.sc: test ACTION_LOGICALNOT, gnash
+	  fails a "true" and a "_root" in swf4.
 	* testsuite/actionscript.all/ops.as: test ACTION_LOGICALNOT, gnash
 	  fails a "true" in swf5.
 
