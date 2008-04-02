@@ -1,3 +1,8 @@
+2008-04-01 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* testsuite/misc-swfc.all/swf4opcode.sc: was just about to add exponent
+	  tests. Here are some more. Also test for decimal separator.
+
 2008-04-01 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-swfc.all/swf4opcode.sc: check that scientific

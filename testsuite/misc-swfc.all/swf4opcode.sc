@@ -123,9 +123,28 @@
         check_equals( y, 0 );
 	y = '  4';
         check_equals( y, 4 );
+    // This needs to work in all locales
+    y = '4.5';
+        check_equals( y, 4.5 );
+    y = '4,5';
+        xcheck_equals( y, 4 ); 
+    // exponent       
+    y = '4.5e4';
+        xcheck_equals( y, 45000 );
+    y = '4.5E4';
+        xcheck_equals( y, 45000 );
+    y = '+4.5e4';
+        xcheck_equals( y, 45000 );
+    y = '-4.5e4';
+        xcheck_equals( y, -45000 );
+    y = '4.5e+4';
+        xcheck_equals( y, 45000 );
+    y = '4.5e-4';
+        xcheck_equals( y, 0.00045 );
+    y = '-4.5e-4';
+        xcheck_equals( y, -0.00045 );
 	x = '2e1';
-	check_equals(x+1, 21);
-
+        check_equals(x+1, 21);
         //
         // test ActionLessThan
         //
