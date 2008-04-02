@@ -22,7 +22,7 @@
 
 
 
-rcsid="$Id: toString_valueOf.as,v 1.32 2008/04/01 09:29:10 strk Exp $";
+rcsid="$Id: toString_valueOf.as,v 1.33 2008/04/02 01:52:14 zoulunkai Exp $";
 #include "check.as"
 
 //
@@ -49,11 +49,7 @@ rcsid="$Id: toString_valueOf.as,v 1.32 2008/04/01 09:29:10 strk Exp $";
 #else
   // No Function Class in swf5
   check_equals(typeof(Function), 'undefined');
-  
-  // Function Object in swf5 does not support toString and valueOf
-  check_equals(Function.prototype['toString'], undefined);
-  check_equals(Function.prototype['valueOf'], undefined);
-  
+   
   // test 'function' is supported in swf5:)
   x = function () {};
   check_equals(typeof(x), 'function');
@@ -66,7 +62,7 @@ rcsid="$Id: toString_valueOf.as,v 1.32 2008/04/01 09:29:10 strk Exp $";
   check(Object.prototype.hasOwnProperty('toString'));
   check(Object.prototype.hasOwnProperty('valueOf'));
 #else
-  // swf5 does not support hasOwnProperty method
+  // hasOwnProperty method is not visible in swf5 by default.
   check(typeof(hasOwnProperty) == 'undefined');
   // Object object still supports toString and valueOf in swf5
   check_equals(typeof(Object.prototype['toString']), 'function');
@@ -123,7 +119,7 @@ check(obj == y);
   check(Number.prototype.toString != Object.prototype.toString);
   check(Number.prototype.valueOf != Object.prototype.valueOf);
 #else
-  // this is true only in swf5
+  // toString and valueOf are not visible in swf5 by default.
   check(Number.prototype.toString == undefined);
   check(Number.prototype.valueOf == undefined);
 #endif
@@ -163,7 +159,7 @@ check(y=="TO_VALUE");
   check(String.prototype.toString != Object.prototype.toString);
   check(String.prototype.valueOf != Object.prototype.valueOf);
 #else
-  // this is true only in swf5
+  // toString and valueOf are not visible in swf5 by default.
   check(String.prototype.toString == undefined);
   check(String.prototype.valueOf == undefined);
 #endif
@@ -229,7 +225,7 @@ y = mc1.valueOf();
   check_equals(x, '[object Object]'); 
   check_equals(y, _level0.mc1); 
 #else
-  // createEmptyMovieClip is not a function in SWF5...
+  // swf5 does not support createEmptyMovieClip by default
   check_equals(typeof(x), 'undefined'); 
   check_equals(typeof(y), 'undefined');  
   check_equals(x, undefined); 
@@ -264,7 +260,7 @@ _root.createEmptyMovieClip("mc2", 2);
   check(typeof(mc3) == "number");    
   check(isNaN(mc3)); 
 #else
-  // swf5 does not support createEmptyMovieClip
+  // swf5 does not support createEmptyMovieClip by default
   check(typeof(createEmptyMovieClip) == "undefined");
   check(typeof(mc1) == "undefined"); 
   check(typeof(mc2) == "undefined"); 
@@ -279,7 +275,7 @@ _root.createEmptyMovieClip("mc2", 2);
   check(typeof(TextField.prototype.toString) == 'function' );
   check(typeof(TextField.prototype.valueOf) == 'function' );
 #else
-  // TextField in swf5 does not have a prototype at all !
+  // TextField in swf5 does not have a prototype by default!
   check_equals(typeof(TextField.prototype), 'undefined'); 
 #endif
 
@@ -331,7 +327,7 @@ a = "prefix_"+text1;
 //
 
 #if OUTPUT_VERSION > 5 
-// swf5 does not support hasOwnProperty method
+// hasOwnProperty method is not visible in swf5 by default.
 check(!Button.prototype.hasOwnProperty('toString'));
 check(!Button.prototype.hasOwnProperty('valueOf'));
 #endif
@@ -483,7 +479,7 @@ check_equals(a, "[type Object]");
 
 
 #if OUTPUT_VERSION < 6
- check_totals(128);
+ check_totals(126);
 #else
  check_totals(144);
 #endif
