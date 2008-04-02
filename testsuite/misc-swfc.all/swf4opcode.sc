@@ -150,7 +150,7 @@
         //
         check(!"");
         check(!"a");
-        xcheck(!"true");
+        check(!"true");
         check(!"false");
         check("1");
         check(!"0000.000");

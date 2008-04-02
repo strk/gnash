@@ -543,14 +543,9 @@ as_value::to_bool_v5() const
 	    {
 		case  STRING:
 		{
-			if (getStr() == "false") return false;
-			else if (getStr() == "true") return true;
-			else
-			{
-				double num = to_number();
-				bool ret = num && ! isnan(num);
-				return ret;
-			}
+			double num = to_number();
+			bool ret = num && ! isnan(num);
+			return ret;
 		}
 		case NUMBER:
 		{
@@ -580,14 +575,9 @@ as_value::to_bool_v6() const
 	    {
 		case  STRING:
 		{
-			if (getStr() == "false") return false;
-			else if (getStr() == "true") return true;
-			else
-			{
-				double num = to_number();
-				bool ret = num && ! isnan(num);
-				return ret;
-			}
+			double num = to_number();
+			bool ret = num && ! isnan(num);
+			return ret;
 		}
 		case NUMBER:
 		{

@@ -1,5 +1,12 @@
 2008-04-01 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.cpp (to_bool_v5, to_bool_v6): "true" and "false"
+	  have no special meaning !
+	* testsuite/actionscript.all/ops.as: pass !"true" is false in swf<7.
+	* testsuite/misc-swfc.all/swf4opcode.sc: pass !"true".
+
+2008-04-01 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-swfc.all/swf4opcode.sc: test ACTION_LOGICALNOT, gnash
 	  fails a "true" and a "_root" in swf4.
 	* testsuite/actionscript.all/ops.as: test ACTION_LOGICALNOT, gnash

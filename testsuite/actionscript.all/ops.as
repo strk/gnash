@@ -21,7 +21,7 @@
  */
 
 
-rcsid="$Id: ops.as,v 1.37 2008/04/02 08:07:08 strk Exp $";
+rcsid="$Id: ops.as,v 1.38 2008/04/02 08:21:49 strk Exp $";
 #include "check.as"
 
 //--------------------------------------------
@@ -774,7 +774,7 @@ check(isNaN(y));
 check(!"");
 #if OUTPUT_VERSION < 7
  check(!"a");
- xcheck(!"true"); 
+ check(!"true"); 
  check(!"false"); 
  check(!"0000.000"); 
 #else
