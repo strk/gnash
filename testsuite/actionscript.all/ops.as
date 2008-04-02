@@ -21,7 +21,7 @@
  */
 
 
-rcsid="$Id: ops.as,v 1.36 2008/03/11 19:31:49 strk Exp $";
+rcsid="$Id: ops.as,v 1.37 2008/04/02 08:07:08 strk Exp $";
 #include "check.as"
 
 //--------------------------------------------
@@ -767,16 +767,46 @@ y = ++x;
 xcheck(y!=NaN);
 check(isNaN(y));
 
+//------------------------------------------------------
+// Less logical not operator (ACTION_LOGICALNOT : 0x12)
+//-----------------------------------------------------
+
+check(!"");
+#if OUTPUT_VERSION < 7
+ check(!"a");
+ xcheck(!"true"); 
+ check(!"false"); 
+ check(!"0000.000"); 
+#else
+ check("a"); 
+ check("true"); 
+ check("false"); 
+ check("0000.000"); 
+#endif
+
+check("1");
+check(!false); // doh !
+check(true); // doh !
+check(!0); 
+check(4); 
+check(_root); 
+check(!null); 
+check(!undefined); 
+
+//------------------------------------------------------
+// END OF TEST
+//-----------------------------------------------------
+
 #if OUTPUT_VERSION < 7
 # ifndef MING_LOGICAL_ANDOR_BROKEN
- totals(226);
+ totals(239);
 # else
- totals(203);
+ totals(216);
 # endif
 #else
 # ifndef MING_LOGICAL_ANDOR_BROKEN
- totals(228);
+ totals(241);
 # else
- totals(205);
+ totals(218);
 # endif
 #endif

@@ -1,3 +1,8 @@
+2008-04-01 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/ops.as: test ACTION_LOGICALNOT, gnash
+	  fails a "true" in swf5.
+
 2008-04-01 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/misc-swfc.all/swf4opcode.sc: was just about to add exponent
