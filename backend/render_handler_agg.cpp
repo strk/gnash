@@ -962,7 +962,7 @@ public:
     
     // Flash only aligns outlines. Probably this is done at rendering
     // level.
-    
+
     if (have_outline)
       build_agg_paths_rounded(agg_paths_rounded, paths);
     
@@ -2151,10 +2151,15 @@ DSOEXPORT const char *agg_detect_pixel_format(unsigned int rofs, unsigned int rs
   unsigned int bofs, unsigned int bsize,
   unsigned int bpp) {
   
-  if (!is_little_endian_host()) {
+  if (!is_little_endian_host() && (bpp>=24)) {
   
     // Swap bits for big endian hosts, because the following tests assume
     // little endians. The pixel format string matches the bytes in memory.
+    
+    // This applies for 24 bpp and 32 bpp modes only because AGG uses arrays
+    // in the premultiply() implementation for these modes. 16 bpp modes 
+    // instead use bit shifting, which is transparent to host endianess.
+    // See bug #22799.
     
     rofs = bpp - rofs - rsize;
     gofs = bpp - gofs - gsize;

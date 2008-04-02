@@ -1,3 +1,8 @@
+2008-04-02 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler_agg.cpp: Only swap pixel format bits on big
+	  endian hosts for 24 and 32 bpp modes (see bug #22799)
+	  
 2008-04-01 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/DefineEditTextVariableNameTest-Runner.cpp: 
