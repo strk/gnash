@@ -1,3 +1,10 @@
+2008-04-03 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/asobj/Date.cpp: add several algorithms for working out the
+	  year from the epoch day; the most accurate but slowest is enabled.
+	  Comments explaining the advantages and disadvantages of the
+	  implementations. Fixes most date tests.
+
 2008-04-03 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Object.as: test that null is a valid

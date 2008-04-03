@@ -21,58 +21,49 @@
 //
 // Implements methods of the ActionScript "Date" class for Gnash
 //
-// TODO:
-//  What does Flash setTime() do/return if you hand it 0 parameters?
+// TODO: What does Flash setTime() do/return if you hand it 0 parameters?
 //
-// BUGS:
-//  Flash player handles a huge range of dates, including
-//  thousands of years BC, but the localtime code here only works for
-//  valid Unix dates Dec 13 20:45:52 1901 - Jan 19 03:14:07 2038.
-//  Our UTC code could be hacked into working outside this range but
-//  this is not worth doing unless we also implement full-range localtime
-//  operations too.
-//
-//  We probably get negative datestamps (1901-1969) wrong sometimes but
-//  don't really care that much.
+// Flash player handles a huge range of dates, including
+// thousands of years BC. The timestamp value is correspondingly
+// large: it is a double, which has a minimum size of 8 bytes
+// in the C++ standard. Methods provided by ctime and sys/time.h
+// generally rely on time_t whose size varies according to platform.
+// It is not big enough to deal with all valid flash timestamps,
+// so this class uses its own methods to convert to and from 
+// a time struct and the time stamp.
+// 
 //
 // FEATURES:
-//  Flash Player does not seem to respect TZ or the zoneinfo database;
-//  It changes to/from daylight saving time according to its own rules.
-//  We use the operating system's localtime routines.
+// Flash Player does not seem to respect TZ or the zoneinfo database;
+// It changes to/from daylight saving time according to its own rules.
+// We use the operating system's localtime routines.
 //
-//  Flash player does bizarre things for some argument combinations,
-//  returning datestamps of /6.*e+19  We don't bother doing this...
+// Flash player does bizarre things for some argument combinations,
+// returning datestamps of /6.*e+19  We don't bother doing this...
 //
-// It may be useful to convert this to use libboost's date_time stuff
-// http://www.boost.org/doc/html/date_time.html
+// Boost date-time handles a larger range of correct dates than
+// the usual C and system functions. However, it is still limited
+// to POSIX to 1 Jan 1400 - 31 Dec 9999 and will not handle
+// dates at all outside this range. Flash isn't really that
+// bothered by correctness; rather, it needs to handle a vast
+// range of dates consistently. See http://www.boost.org/doc/html/date_time.html
+//
 // Pros:
+//
 // *  OS portability is done by libboost, not here;
-// *  it extends correct date handling from POSIX to 1 Jan 1400 - 31 Dec 9999
+//
 // Cons:
-// *  it doesn't handle fractions of milliseconds (and who cares?);
-// *  mapping between boost's coherent date_time methods and Flash's
-//  ideosyncratic ones to implement this class' methods is more tricky;
-// *  it brings the need to handle all boundary cases and exceptions
-//  explicitly (e.g. mapping of 38 Nov to 8 Dec, mapping negative
-//  month/day-of-month/hours/min/secs/millisecs into the previous
-//  year/month/day/hour/min/sec and so on).
 //
-// To probe FlashPlayer functionality put something like:
-// class Test {
-//        }
-//
-//        static function main(mc) {
-//    var now = new Date();
-//    var s:String;
-//    s = now.toString(); // or whatever
-//              _root.createTextField("tf",0,0,0,320,200);
-//              _root.tf.text = now.toString(); // output in flash player
-//    trace(s);     // output in gnash -v
-//        }
-// }
-// in test.as, compile with
-//  mtasc -swf test.swf -main -header 320:200:10 test.as
-// and get someone to open test.swf for you in the commercial Flash Player.
+// *  It doesn't handle fractions of milliseconds (and who cares?);
+// *  Mapping between boost's coherent date_time methods and Flash's
+//    idiosyncratic ones to implement this class' methods is more tricky;
+// *  It brings the need to handle all boundary cases and exceptions
+//    explicitly (e.g. mapping of 38 Nov to 8 Dec, mapping negative
+//    month/day-of-month/hours/min/secs/millisecs into the previous
+//    year/month/day/hour/min/sec and so on).
+// *  It doesn't do what ActionScript wants. This is the best reason
+//    not to use it for time and date functions (though for portable
+//    timing it might well be useful).
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -117,13 +108,7 @@ extern long timezone;   // for tzset()/long timezone;
 
 namespace gnash {
 
-// We have our own UTC time converter that works with Flash timestamps
-// (double milliseconds after 1970) rather than the time-limited time_t.
-//
-// Currently, without this, setting times in UTC to a moment when DST is active
-// gets the hour and datestamp wrong, and changing the date into/out of a
-// DST period changes the UTC time of day (it shouldn't).
-
+// A time struct to contain the broken-down time.
 struct GnashTime
 {
     boost::int32_t millisecond;
@@ -134,19 +119,22 @@ struct GnashTime
     boost::int32_t weekday;
     boost::int32_t month;
     boost::int32_t year;
+    boost::int32_t timezoneOffset;
 };
-
-// forward declarations
-static void fillGnashTime(double time, GnashTime& gt);
-static double makeTimeValue(GnashTime& gt);
-static double rogue_date_args(const fn_call& fn, unsigned maxargs);
-
-static int minutes_east_of_gmt(struct tm &tm);
 
 static const int daysInMonth[2][12] = {
     {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
     {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
 };
+
+// forward declarations
+static void fillGnashTime(double time, GnashTime& gt);
+static double makeTimeValue(GnashTime& gt);
+static void getLocalTime(const double& time, GnashTime& gt);
+static void getUniversalTime(const double& time, GnashTime& gt);
+
+static double rogue_date_args(const fn_call& fn, unsigned maxargs);
+static int minutes_east_of_gmt(struct tm &tm);
 
 // Helper macros for calendar algorithms
 #define IS_LEAP_YEAR(n) ( !((n + 1900) % 400) || ( !((n + 1900) % 4) && ((n + 1900) % 100)) )
@@ -154,91 +142,6 @@ static const int daysInMonth[2][12] = {
 // Count the leap years. This needs some adjustment
 // to get the actual number
 #define COUNT_LEAP_YEARS(n)   ( (n - 70) / 4 - (n - 70) / 100 + (n - 70) / 400 )
-
-// A portable replacement for mktime (the latter uses time_t - generally 8
-// bytes on 64-bit but only 4 on 32-bit platforms). ActionScript
-// time functions need an 8 byte (double) return values. This
-// function provides that in a way consistent with the ActionScript
-// Date class.
-// Returns the number of milliseconds since the epoch from
-// a time struct.
-static double
-makeTimeValue(GnashTime& t)
-{
-
-#if 1
-
-    // First, adjust years to deal with strange month
-    // values.
-    
-    // Add or substract more than 12 months from the year
-    // and adjust months to a valid value.
-    t.year += t.month / 12;
-    t.month %= 12;
-
-    // Any negative remainder rolls back to the previous year.
-    if (t.month < 0) {
-        t.year--;
-        t.month += 12;
-    }
-
-    // Now work out the years from 1970 in days.
-    boost::int32_t day = t.monthday;    
-
-    // This works but is a bit clunky.
-    if (t.year < 70) {
-        day = COUNT_LEAP_YEARS(t.year - 2) + ((t.year - 70) * 365);
-        // Adds an extra leap year for the year 0.
-        if (t.year <= 0) day++;
-    }
-    else {
-        day = COUNT_LEAP_YEARS(t.year + 1) + ((t.year - 70) * 365);
-    }
-    
-    // Add days for each month. Month must be 0 - 11;
-    // December is 0.
-    for (int i = 0; i < t.month; i++)
-    {
-        assert (t.month < 12);
-        day += daysInMonth[IS_LEAP_YEAR (t.year)][i];
-    }
-    
-    // Add the days of the month
-    day += t.monthday - 1;
-
-    /// Work out the timestamp
-    double ret = static_cast<double>(day) * 86400000.0;
-    ret += t.hour * 3600000.0;
-    ret += t.minute * 60000.0;
-    ret += t.second * 1000.0;
-    ret += t.millisecond;
-    return ret;
-#else
-
-  boost::int32_t d = t.monthday;
-  boost::int32_t m = t.month + 1;
-  boost::int32_t ya = t.year;  /* Years since 1900 */
-  boost::int32_t k;  /* day number since 1 Jan 1900 */
-
-  // For calculation, convert to a year starting on 1 March
-  if (m > 2) m -= 3;
-  else {
-    m += 9;
-    ya--;
-  }
-
-  k = (1461 * ya) / 4 + (153 * m + 2) / 5 + d + 58;
-
-  /* K is now the day number since 1 Jan 1900.
-   * Convert to minutes since 1 Jan 1970 */
-  /* 25567 is the number of days from 1 Jan 1900 to 1 Jan 1970 */
-  k = ((k - 25567) * 24 + t.hour) * 60 + t.minute;
-  
-  // Converting to double after minutes allows for +/- 4082 years with
-  // 32-bit signed integers.
-  return  (k * 60.0 + t.second) * 1000.0 + t.millisecond;
-#endif
-}
 
 static void
 getLocalTime(const double& time, GnashTime& gt)
@@ -254,54 +157,29 @@ getUniversalTime(const double& time, GnashTime& gt)
     fillGnashTime(time, gt);
 }
 
-// A modified version of mktime that works in localtime on struct tm
-// without you having to set tm_isdst.
-// If the real mktime() sees isdst==0 with a DST date, it sets
-// t_isdst and modifies the hour fields, but we need to set the
-// specified hour in the localtime in force at that time.
-//
-// To do this we set tm_isdst to the correct value for that moment in time
-// by doing an initial conversion of the time to find out is_dst for that
-// moment without DST, then do the real conversion.
-// This may still get things wrong around the hour when the clocks go back
-// or forth.
-//static time_t
-//makeTimeValue(struct tm *tmp)
-//{
-//    struct tm tm2 = *tmp;
-//    time_t t2;
-
-//    tm2.tm_isdst = 0;
-//    t2 = mktime(&tm2);    // Convert the time without DST,
-//    log_debug ("t2: %d", t2);
-
-//    _localtime_r(&t2, &tm2);  // find out whether DST was in force
-//    tmp->tm_isdst = tm2.tm_isdst; // and apply that to the given time
-//    return(mktime(tmp));
-//}
-
+// Seconds and milliseconds should be exactly the same whether in UTC
+// or in localtime, so we always use localtime.
 
 // forward declarations
 static as_value date_new(const fn_call& fn);
+static as_value date_gettime(const fn_call& fn); 
+static as_value date_settime(const fn_call& fn);
+static as_value date_gettimezoneoffset(const fn_call& fn);
+static as_value date_getyear(const fn_call& fn);
+static as_value date_getfullyear(const fn_call& fn);
+static as_value date_getmonth(const fn_call& fn);
 static as_value date_getdate(const fn_call& fn);
 static as_value date_getday(const fn_call& fn);
-static as_value date_getfullyear(const fn_call& fn);
 static as_value date_gethours(const fn_call& fn);
-static as_value date_getmilliseconds(const fn_call& fn);
 static as_value date_getminutes(const fn_call& fn);
-static as_value date_getmonth(const fn_call& fn);
 static as_value date_getseconds(const fn_call& fn);
-static as_value date_gettime(const fn_call& fn); 
-static as_value date_gettimezoneoffset(const fn_call& fn);
+static as_value date_getmilliseconds(const fn_call& fn);
+static as_value date_getutcfullyear(const fn_call& fn);
+static as_value date_getutcmonth(const fn_call& fn);
 static as_value date_getutcdate(const fn_call& fn);
 static as_value date_getutcday(const fn_call& fn);
-static as_value date_getutcfullyear(const fn_call& fn);
 static as_value date_getutchours(const fn_call& fn);
 static as_value date_getutcminutes(const fn_call& fn);
-static as_value date_getutcmonth(const fn_call& fn);
-static as_value date_getutcseconds(const fn_call& fn);
-//static as_value date_getutcmilliseconds(const fn_call& fn); // == getmilliseconds
-static as_value date_getyear(const fn_call& fn);
 static as_value date_setdate(const fn_call& fn);
 static as_value date_setfullyear(const fn_call& fn);
 static as_value date_sethours(const fn_call& fn);
@@ -309,14 +187,11 @@ static as_value date_setmilliseconds(const fn_call& fn);
 static as_value date_setminutes(const fn_call& fn);
 static as_value date_setmonth(const fn_call& fn);
 static as_value date_setseconds(const fn_call& fn);
-static as_value date_settime(const fn_call& fn);
 static as_value date_setutcdate(const fn_call& fn);
 static as_value date_setutcfullyear(const fn_call& fn);
 static as_value date_setutchours(const fn_call& fn);
-//static as_value date_setutcmilliseconds(const fn_call& fn); // == setmilliseconds
 static as_value date_setutcminutes(const fn_call& fn);
 static as_value date_setutcmonth(const fn_call& fn);
-static as_value date_setutcseconds(const fn_call& fn);
 static as_value date_setyear(const fn_call& fn);
 static as_value date_tostring(const fn_call& fn);
 static as_value date_valueof(const fn_call& fn);
@@ -348,7 +223,7 @@ attachDateInterface(as_object& o)
   o.init_member("getUTCMilliseconds", new builtin_function(date_getmilliseconds)); // same
   o.init_member("getUTCMinutes", new builtin_function(date_getutcminutes));
   o.init_member("getUTCMonth", new builtin_function(date_getutcmonth));
-  o.init_member("getUTCSeconds", new builtin_function(date_getutcseconds));
+  o.init_member("getUTCSeconds", new builtin_function(date_getseconds));
   o.init_member("getYear", new builtin_function(date_getyear));
   o.init_member("setDate", new builtin_function(date_setdate));
   o.init_member("setFullYear", new builtin_function(date_setfullyear));
@@ -364,7 +239,7 @@ attachDateInterface(as_object& o)
   o.init_member("setUTCMilliseconds", new builtin_function(date_setmilliseconds)); // same
   o.init_member("setUTCMinutes", new builtin_function(date_setutcminutes));
   o.init_member("setUTCMonth", new builtin_function(date_setutcmonth));
-  o.init_member("setUTCSeconds", new builtin_function(date_setutcseconds));
+  o.init_member("setUTCSeconds", new builtin_function(date_setseconds));
   o.init_member("setYear", new builtin_function(date_setyear));
   o.init_member("toString", new builtin_function(date_tostring));
   o.init_member("valueOf", new builtin_function(date_valueof));
@@ -515,63 +390,64 @@ date_new(const fn_call& fn)
     // Poo! Use old time() to get seconds only
     date->value = time((time_t *) 0) * 1000.0;
 #endif
-  } else if (fn.nargs == 1) {
-    // Set the value in milliseconds since 1970 UTC
-    date->value = fn.arg(0).to_number();
-  } else {
-    GnashTime gt;
-//    struct tm tm; // time constructed from localtime components
-//    time_t utcsecs; // Seconds since 1970 as returned by mktime()
-//    double millisecs = 0; // milliseconds if specified by caller
+    }
+    else if (fn.nargs == 1) {
+        // Set the value in milliseconds since 1970 UTC
+        date->value = fn.arg(0).to_number();
+    }
+    else {
+        // Create a time from the supplied (at least 2) arguments.
+        GnashTime gt;
     
-    gt.millisecond = 0;            
-    gt.second = 0;
-    gt.minute = 0;
-    gt.hour = 0;
-    gt.monthday = 1;
-    gt.month = static_cast<int>(fn.arg(1).to_number());
+        gt.millisecond = 0;            
+        gt.second = 0;
+        gt.minute = 0;
+        gt.hour = 0;
+        gt.monthday = 1;
+        gt.month = static_cast<int>(fn.arg(1).to_number());
     
-    int year = static_cast<int>(fn.arg(0).to_number());
-    
-    // GnashTime.year is the value since 1900 (like struct tm)
-    // negative value is a year before 1900
-    // A year between 0 and 99 is the year since 1900
-    if (year < 100) gt.year = year;
-    // A value of 100 or more is a full year.
-    else gt.year = year - 1900;
+        int year = static_cast<int>(fn.arg(0).to_number());
+        
+        // GnashTime.year is the value since 1900 (like struct tm)
+        // negative value is a year before 1900
+        // A year between 0 and 99 is the year since 1900
+        if (year < 100) gt.year = year;
+        // A value of 100 or more is a full year and must be
+        // converted to years since 1900
+        else gt.year = year - 1900;
 
-    switch (fn.nargs) {
-        default:
-            IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Date constructor called with more than 7 arguments"));
-            )
-        case 7:
-            // fractions of milliseconds are ignored
-            gt.millisecond = (int)fn.arg(6).to_number();
-        case 6:
-            gt.second = (int)fn.arg(5).to_number();
-        case 5:
-            gt.minute = (int)fn.arg(4).to_number();
-        case 4:
-            gt.hour = (int)fn.arg(3).to_number();
-        case 3:
-            gt.monthday = (int)fn.arg(2).to_number();
-        case 2:
-            break;
-            // Done already
-        }
+        switch (fn.nargs) {
+            default:
+                IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror(_("Date constructor called with more than 7 arguments"));
+                )
+            case 7:
+                // fractions of milliseconds are ignored
+                gt.millisecond = (int)fn.arg(6).to_number();
+            case 6:
+                gt.second = (int)fn.arg(5).to_number();
+            case 5:
+                gt.minute = (int)fn.arg(4).to_number();
+            case 4:
+                gt.hour = (int)fn.arg(3).to_number();
+            case 3:
+                gt.monthday = (int)fn.arg(2).to_number();
+            case 2:
+                break;
+                // Done already
+            }
 
-        double val = makeTimeValue(gt); // convert from local time
-        if (val == -1) {
-            // mktime could not represent the time
-            log_error(_("Date() failed to initialise from arguments"));
-            date->value = 0;  // or undefined?
-        } else {
-            date->value = val;
-        }
+            double val = makeTimeValue(gt); // convert from local time
+            if (val == -1) {
+                // mktime could not represent the time
+                log_error(_("Date() failed to initialise from arguments"));
+                date->value = 0;  // or undefined?
+            } else {
+                date->value = val;
+            }
     }
     
-  return as_value(date);
+    return as_value(date);
 }
 
 //
@@ -657,8 +533,6 @@ date_get_proto(date_getutcdate,     getUniversalTime, monthday)
 date_get_proto(date_getutcday,      getUniversalTime, weekday)
 date_get_proto(date_getutchours,    getUniversalTime, hour)
 date_get_proto(date_getutcminutes,  getUniversalTime, minute)
-date_get_proto(date_getutcseconds,  getUniversalTime, second)
-// date_getutcmilliseconds is implemented by date_getmilliseconds.
 
 
 // Return the difference between UTC and localtime+DST for a given date/time
@@ -803,21 +677,12 @@ static as_value date_settime(const fn_call& fn) {
 // The Adobe player 9 behaves strangely. e.g., after "new date = Date(0)":
 // date.setYear(1970); date.setMonth(1); date.setDate(29); gives Mar 1 but
 // date.setYear(1970); date.setDate(29); date.setMonth(1); gives Feb 28
-// For now, just let mktime do as it pleases with rogue values.
-
+//
 // We need two sets of the same functions: those that take localtime values
 // and those that take UTC (GMT) values.
 // Since there are a lot of them and they are hairy, we write one set that,
 // if an additional extra parameter is passed, switch to working in UTC
 // instead. Apart from the bottom-level conversions they are identical.
-
-// Until we find a better algorithm, we can use mktime which, by
-// experiment, seems to flip timezone at midnight, not at 2 in the morning,
-// so we use that to do year/month/day and put the unadjusted hours/mins/secs
-// in by hand. It's probably not right but it'll do for the moment.
-
-// Now the generic version of these two functions that switch according to
-// what the customer asked for
 
 static void
 gnashTimeToDate(GnashTime& gt, date_as_object& date, bool utc)
@@ -983,7 +848,7 @@ static as_value _date_setmonth(const fn_call& fn, bool utc) {
       dateToGnashTime(*date, gt, utc);
 
       // It seems odd, but FlashPlayer takes all bad month values to mean
-      // January.
+      // January
       double monthvalue =  fn.arg(0).to_number();
       if (isnan(monthvalue) || isinf(monthvalue)) monthvalue = 0.0;
       gt.month = (int) monthvalue;
@@ -1211,7 +1076,6 @@ utc_proto(month)
 utc_proto(date)
 utc_proto(hours)
 utc_proto(minutes)
-utc_proto(seconds)
 #undef utc_proto
 
 
@@ -1289,31 +1153,30 @@ static as_value date_utc(const fn_call& fn) {
   gt.second = 0;
   gt.millisecond = 0;
 
-  switch (fn.nargs) {
-  default:  // More than 7
-      IF_VERBOSE_ASCODING_ERRORS(
-    log_aserror(_("Date.UTC was called with more than 7 arguments"));
-      )
-  case 7:
-      // millisecs is double, but fractions of millisecs are ignored.
-      gt.millisecond = fn.arg(6).to_int();
-  case 6:
-      gt.second = fn.arg(5).to_int();
-  case 5:
-      gt.minute = fn.arg(4).to_int();
-  case 4:
-      gt.hour = fn.arg(3).to_int();
-  case 3:
-      gt.monthday = fn.arg(2).to_int();
-  case 2:   // these last two are always performed
-      gt.month = fn.arg(1).to_int();
-      {
-    int y = fn.arg(0).to_int();
-    if (y < 100 && y >= 0) y += 1900;
-    // y is now the Gregorian year number
-    gt.year = y - 1900;
-      }
-  }
+    switch (fn.nargs) {
+        default:  // More than 7
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror(_("Date.UTC was called with more than 7 arguments"));
+            )
+        case 7:
+            // millisecs is double, but fractions of millisecs are ignored.
+            gt.millisecond = fn.arg(6).to_int();
+        case 6:
+            gt.second = fn.arg(5).to_int();
+        case 5:
+            gt.minute = fn.arg(4).to_int();
+        case 4:
+            gt.hour = fn.arg(3).to_int();
+        case 3:
+            gt.monthday = fn.arg(2).to_int();
+        case 2:   // these last two are always performed
+            gt.month = fn.arg(1).to_int();
+            {
+                int year = static_cast<int>(fn.arg(0).to_number());
+                if (year < 100) gt.year = year;
+                else gt.year = year - 1900;
+            }
+    }
 
     result = makeTimeValue(gt);
     return as_value(result);
@@ -1399,104 +1262,243 @@ void date_class_init(as_object& global)
 
 }
 
-/*
- * This routine converts time as follows.
- * The epoch is 00:00 Jan 1 1970 GMT.
- * The argument time is in seconds since then.
- * fillGnashTime() fills the structure pointed to by tmp as follows:
- *
- *  tm_sec    seconds (0-59)
- *  tm_min    minutes (0-59)
- *  tm_hour   hours (0-23)
- *  tm_mday   day of month (1-31)
- *  tm_mon    month (0-11)
- *  tm_year   year - 1900 (70- )
- *  tm_wday   weekday (0-6, Sun is 0)
- *  tm_yday   day of the year (0-364/5)
- *  tm_isdst  is daylight saving time in force? (always 0 = GMT)
- *
- *  Reference: Algorithm 199 by Robert G. Tantzen
- *  from "Collected Algorithms from ACM" Volume 1
- *  Published by the Association for Computing Machinery, 1980.
- *  See http://portal.acm.org/citation.cfm?id=390020 (pay-to-know site)
- *  See also http://ftp.unicamp.br/pub/unix-c/calendars/jday-jdate.c
- *
- *  When munging this, bear in mind that for calculation
- *  the year starts on March the 1st (yday == 0)
- *
- *  These routines have been tested exhaustively against gmtime() and
- *  may work for dates outside the range that gmtime() can handle
- *  (Dec 13 20:45:52 1901 - Jan 19 03:14:07 2038)
- *  Dates up to 2100 should work; ones before 1900 I doubt it.
- */
-
-// Uses milliseconds since the epoch (date->value) to fill
-// a Gnash time struct.
-static void
-fillGnashTime(double time, GnashTime& gt)
+// Converts a time struct into a flash timestamp. Similar to
+// mktime, but not limited by the size of time_t. The mathematical
+// algorithm looks nicer, but does not cope with large dates.
+// Bumping up the int size or using doubles more might help - I 
+// haven't really looked at it.
+// The first algorithm appears to mimic flash behaviour for
+// all dates, though it's a bit ugly.
+static double
+makeTimeValue(GnashTime& t)
 {
-  int d; /* workhorse variable */
-  int m, a;
 
-  /*
-   *  This routine is good until year 2100.
-   */
+#if 1
 
-  gt.millisecond = std::fmod(time, 1000.0);
-  time = trunc(time / 1000.0);
-  gt.second = (d = static_cast<int>(std::fmod(time, 86400.0))) % 60;
-  gt.minute = (d /= 60) % 60;
-  gt.hour = d / 60;
+    // First, adjust years to deal with strange month
+    // values.
+    
+    // Add or substract more than 12 months from the year
+    // and adjust months to a valid value.
+    t.year += t.month / 12;
+    t.month %= 12;
 
-  d = static_cast<int>(trunc(time / 86400.0)); /* no of days after 1 Jan 1970 */
-
-  /* Make time of day positive when time is negative */
-    if (gt.millisecond < 0) { gt.millisecond += 1000; gt.second--; }
-    if (gt.second < 0) { gt.second += 60; gt.minute--; }
-    if (gt.minute < 0) { gt.minute += 60; gt.hour--; }
-    if (gt.hour < 0) { gt.hour += 24; d--; }
-
-
-  /*
-   * d is the day number after 1 Jan 1970. Generate day of the week.
-   * The addend is 4 mod 7 (1/1/1970 was Thursday)
-   */
-
-  if (d >= -4) gt.weekday = (d + 4) % 7;
-  else gt.weekday = 6 - (((-5) - d ) % 7);
-
-  // 693902 is the days from 1st March 0000 to 1st Jan 1900
-  // 25567 is the days from 1st Jan 1900 to 1st Jan 1970
-  // 10957 is the days from 1st Jan 1970 to 1st Jan 2000
-  // 1461 is the number of days in 4 years
-
-    int year;
-
-  /* deal with years 2000-2099 */
-  if ( d > 10957+59 /* 29 Feb 2000 */ ) year = 100;
-  else year = 0;
-  
-    year += ( d = ( 4 * ( d + 693902 + 25567 ) - 1 ) % 146097 | 3 ) / 1461;
-    a = ( d = ( d % 1461 ) / 4 + 1 ) - 307;
-    m = ( ( d *= 5 ) - 3 ) / 153;
-    gt.monthday = ( d + 2 - 153 * m ) / 5;
-
-    /* adjust for fact that day==0 is 1st Mar */
-    if ((m += 2) > 11) {
-        m -= 12; year++;
+    // Any negative remainder rolls back to the previous year.
+    if (t.month < 0) {
+        t.year--;
+        t.month += 12;
     }
-  
-    if (m < 0) {
-        year--;
-        m += 12;
-    }
-    //tmp->tm_yday = ( a >= 0 ? a : a+365 );
-    //if ( (year & 3) == 0 && a < 0) tmp->tm_++;
-    gt.month = m;
-    gt.year = year;
 
-    assert (gt.month >= 0);
-    //assert (gt.millisecond >= 0);
+    // Now work out the years from 1970 in days.
+    boost::int32_t day = t.monthday;    
+
+    // This works but is a bit clunky.
+    if (t.year < 70) {
+        day = COUNT_LEAP_YEARS(t.year - 2) + ((t.year - 70) * 365);
+        // Adds an extra leap year for the year 0.
+        if (t.year <= 0) day++;
+    }
+    else {
+        day = COUNT_LEAP_YEARS(t.year + 1) + ((t.year - 70) * 365);
+    }
+    
+    // Add days for each month. Month must be 0 - 11;
+    for (int i = 0; i < t.month; i++)
+    {
+        assert (t.month < 12);
+        day += daysInMonth[IS_LEAP_YEAR (t.year)][i];
+    }
+    
+    // Add the days of the month
+    day += t.monthday - 1;
+
+    /// Work out the timestamp
+    double ret = static_cast<double>(day) * 86400000.0;
+    ret += t.hour * 3600000.0;
+    ret += t.minute * 60000.0;
+    ret += t.second * 1000.0;
+    ret += t.millisecond;
+    return ret;
+#else
+
+  boost::int32_t d = t.monthday;
+  boost::int32_t m = t.month + 1;
+  boost::int32_t ya = t.year;  /* Years since 1900 */
+  boost::int32_t k;  /* day number since 1 Jan 1900 */
+
+  // For calculation, convert to a year starting on 1 March
+  if (m > 2) m -= 3;
+  else {
+    m += 9;
+    ya--;
+  }
+
+  k = (1461 * ya) / 4 + (153 * m + 2) / 5 + d + 58;
+
+  /* K is now the day number since 1 Jan 1900.
+   * Convert to minutes since 1 Jan 1970 */
+  /* 25567 is the number of days from 1 Jan 1900 to 1 Jan 1970 */
+  k = ((k - 25567) * 24 + t.hour) * 60 + t.minute;
+  
+  // Converting to double after minutes allows for +/- 4082 years with
+  // 32-bit signed integers.
+  return  (k * 60.0 + t.second) * 1000.0 + t.millisecond;
+#endif
+}
+
+/// Helper function for getYearMathematical
+static double
+daysSinceUTCForYear(double year)
+{
+    return (
+        365 * (year - 1970) +
+        std::floor ((year - 1969) / 4.0f) -
+        std::floor ((year - 1901) / 100.0f) +
+        std::floor ((year - 1601) / 400.0f)
+    );
+}
+
+// The algorithm used by swfdec. It iterates only a small number of
+// times and is reliable to within a few milliseconds in 
+// +- 100000 years. However, it appears to get the year wrong for
+// midnight on January 1 of some years (as well as a few milliseconds
+// before the end of other years, though that seems less serious).
+static boost::int32_t
+getYearMathematical(double days)
+{
+
+    boost::int32_t low = std::floor ((days >= 0 ? days / 366.0 : days / 365.0)) + 1970;
+    boost::int32_t high = std::ceil ((days >= 0 ? days / 365.0 : days / 366.0)) + 1970;
+
+    while (low < high) {
+        boost::int32_t pivot = (low + high) / 2;
+
+        if (daysSinceUTCForYear (pivot) <= days) {
+            if (daysSinceUTCForYear (pivot + 1) > days) {
+                return pivot;
+            }
+            else {
+                low = pivot + 1;
+            }
+        }
+        else {
+        high = pivot - 1;
+        }
+    }
+
+    return low;
+}
+
+// Another mathematical way of working out the year, which
+// appears to be less reliable than swfdec's way. Adjusts
+// days as well as returning the year.
+static boost::int32_t
+getYearApproximate(boost::int32_t& days)
+{
+    boost::int32_t year = ((days - 16) - COUNT_LEAP_YEARS((days - 16) / 365)) / 365 + 70;
+    if (time < 0) year--;
+
+    days -= (year - 70) * 365;
+    if (year < 70) {
+        days -= COUNT_LEAP_YEARS(year - 2);
+        if (year <= 0) days--;
+    }
+    else {
+        days -= COUNT_LEAP_YEARS(year + 1);
+    }
+    
+    return year;
+}
+
+// The brute force way of converting days into years since the epoch.
+// This also reduces the number of days accurately. Its disadvantage is,
+// of course, that it iterates; its advantage that it's always correct.
+boost::int32_t
+getYearBruteForce(boost::int32_t& days)
+{
+    boost::int32_t year = 1970;
+
+    // Handle 400-year blocks - which always have the same
+    // number of days (14097) - to cut down on iterations.
+    year += (days / 146097) * 400;
+    days %= 146097;
+
+    if (days >= 0)
+    {
+        for (;;)
+	    {
+            bool isleap = IS_LEAP_YEAR(year - 1900);
+            if (days < (isleap ? 366 : 365)) break;
+	        year++;
+	        days -= isleap ? 366 : 365;
+	    }
+    }
+    else
+    {
+        do
+	    {
+	        --year;
+	        bool isleap = IS_LEAP_YEAR(year - 1900);
+	        days += isleap ? 366 : 365;
+	    } while (days < 0);
+    }
+    return year - 1900;
+}
+
+void fillGnashTime (double time, GnashTime& gt)
+{
+
+    gt.millisecond = std::fmod(time, 1000.0);
+    time /= 1000.0;
+    
+    // Get the sub-day part of the time, if any and reduce time
+    // to number of complete days.
+    boost::int32_t remainder = static_cast<boost::int32_t>(std::fmod(time, 86400.0));
+    boost::int32_t days = static_cast<boost::int32_t>(time / 86400.0); // complete days
+   
+    gt.second = remainder % 60;
+    remainder /= 60;
+
+    gt.minute = remainder % 60;
+    remainder /= 60;
+
+    gt.hour = remainder % 24;
+ 
+    if (time < 0)
+    {
+        if (gt.millisecond < 0) { gt.millisecond += 1000; gt.second--; }
+        if (gt.second < 0) { gt.second += 60; gt.minute--; }
+        if (gt.minute < 0) { gt.minute += 60; gt.hour--; }
+        if (gt.hour < 0) { gt.hour += 24; days--; }
+    }
+
+    if (days >= -4) gt.weekday = (days + 4) % 7;
+    else gt.weekday = 6 - (((-5) - days ) % 7);
+
+    // approximate way:
+    //gt.year = getYearApproximate(days);
+
+    /// swfdec way:
+    //gt.year = getYearMathematical(static_cast<double>(days));
+    //days -= 365 * (gt.year - 1970) + COUNT_LEAP_YEARS(gt.year - 1900);
+    //gt.year -= 1900;
+
+    // brute force way:
+    gt.year = getYearBruteForce(days);
+            
+    gt.month = 0;
+    for (int i = 0; i < 12; ++i)
+    {
+        if (days - daysInMonth[IS_LEAP_YEAR (gt.year)][i] < 0)
+        {
+            gt.month = i;
+            break;
+        }
+        days -= daysInMonth[IS_LEAP_YEAR (gt.year)][i];
+    }
+    
+    gt.monthday = days + 1;
+
 }
 
 } // end of gnash namespace
