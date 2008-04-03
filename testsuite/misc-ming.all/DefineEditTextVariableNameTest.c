@@ -340,7 +340,7 @@ main(int argc, char** argv)
     SWFMovie_nextFrame(mo); 
     
     //
-    // (1) test deletion of text variable
+    // (1) test deletion of textField variable
     //
     mc5 = newSWFMovieClip();
     add_text_field(mc5, (SWFBlock)bfont, "text_var5", NULL);
@@ -360,7 +360,7 @@ main(int argc, char** argv)
     SWFMovie_nextFrame(mo); 
     
     //
-    //  test deletion of text variable(another one).
+    //  test deletion of textField variable(another one).
     //
     mc6 = newSWFMovieClip();
     add_text_field(mc6, (SWFBlock)bfont, "text_var6", "initial_text");
