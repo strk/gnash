@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Object.as,v 1.52 2008/04/03 10:34:50 strk Exp $";
+rcsid="$Id: Object.as,v 1.53 2008/04/03 10:39:42 strk Exp $";
 #include "check.as"
 
 // Test things in Class Object (swf5~swf8)
@@ -406,7 +406,7 @@ check_equals(o1.mem1, 6);
 check_equals(o2.mem2, 6);
 
 // Test having a getter but not a setter
-getter = function() { _root.getcalls++; };
+getter = function() { _root.getcalls++; return this[_root.retwhat]; };
 o = {};
 r = o.addProperty('lmissing', getter);
 check(!r);
@@ -419,6 +419,9 @@ xcheck(r);
 getcalls=0;
 t=o.lnull;
 xcheck_equals(getcalls, 1);
+o.lnull = 5;
+_root.retwhat='lnull';
+check_equals(o.lnull, 5);
 
 // Test having a setter but not a getter (invalid)
 setter = function() { _root.setcalls++; };
@@ -602,6 +605,6 @@ totals(79);
 #endif
 
 #if OUTPUT_VERSION >= 6
-totals(187);
+totals(188);
 #endif
 
