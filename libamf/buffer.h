@@ -32,7 +32,7 @@
 namespace amf
 {
 
-class Buffer 
+class DSOEXPORT Buffer 
 {
 public:
     Buffer();

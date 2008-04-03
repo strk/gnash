@@ -32,7 +32,7 @@ namespace amf
 
 class Buffer;
 
-class Element {
+class DSOEXPORT Element {
 public:
     // The following elements are defined within AMF:
     typedef enum {
