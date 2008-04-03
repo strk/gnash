@@ -1,5 +1,13 @@
 2008-04-03 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/ButtonEventsTest.c: test that button
+	  instances should have a _name property.
+	* server/button_character_instance.cpp: provide a _name property
+	  for button characters. Fixes the never-loading "free software
+	  movement" animation from Ubuntu movie.
+
+2008-04-03 Sandro Santilli <strk@keybit.net>
+
 	* server/: Property.cpp, PropertyList.{cpp,h},
 	  as_object.{cpp,h}: add support for setter-less
 	  gette-rsetters.

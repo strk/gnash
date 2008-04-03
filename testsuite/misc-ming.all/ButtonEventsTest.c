@@ -121,10 +121,13 @@ add_button(SWFMovie mo)
 	SWFButton_addAction(bu, compileSWFActionCode(
 		"_root.msg='MouseDown';"
 		"_root.note('SWFBUTTON_MOUSEDOWN');"
-		// Target of button action is the button's parent sprite
+		// Target (and name) of button action is the button's parent sprite
 		"_root.check_equals(_target, '/square1');"
+		"_root.check_equals(_name, 'square1');"
 		"setTarget('/');"
 		"_root.check_equals(_target, '/');"
+		"_root.check_equals(typeof(_name), 'string');"
+		"_root.check_equals(_name, '');"
 		), SWFBUTTON_MOUSEDOWN);
 
 	SWFButton_addAction(bu, compileSWFActionCode(
@@ -139,8 +142,10 @@ add_button(SWFMovie mo)
 	SWFButton_addAction(bu, compileSWFActionCode(
 		"_root.msg='MouseUpOutside';"
 		"_root.note('SWFBUTTON_MOUSEUPOUTSIDE');"
+		"_root.check(!'SWFBUTTON_MOUSEUPOUTSIDE should never be invoked?');"
 		// Target of button action is the button's parent sprite
 		"_root.check_equals(_target, '/square1');"
+		"_root.check_equals(_name, 'square1');"
 		"setTarget('/');"
 		"_root.check_equals(_target, '/');"
 		), SWFBUTTON_MOUSEUPOUTSIDE);
@@ -211,7 +216,7 @@ main(int argc, char **argv)
  
 	mo = newSWFMovie();
 	SWFMovie_setDimension(mo, 800, 600);
-	SWFMovie_setRate(mo, 0.5);
+	SWFMovie_setRate(mo, 0.2);
 
 	if ( argc>1 ) srcdir=argv[1];
 	else

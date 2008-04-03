@@ -229,6 +229,9 @@ attachButtonInterface(as_object& o)
 	
 	gettersetter = &character::target_getset;
 	o.init_property("_target", *gettersetter, *gettersetter);
+
+	gettersetter = character::name_getset;
+	o.init_property("_name", gettersetter, gettersetter);
 	
 	gettersetter = &button_character_instance::enabled_getset;
 	o.init_property("enabled", *gettersetter, *gettersetter);
