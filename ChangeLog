@@ -1,3 +1,8 @@
+2008-04-03 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/asobj/Date.cpp: get current time from tu_timer, avoids
+	  duplicating ifdefs. Clean ups of code and indentation.
+
 2008-04-03 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/dlist.cpp: clear invalidated flag when skipping display() call;
