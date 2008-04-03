@@ -1,5 +1,7 @@
 2008-04-03 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/sprite_definition.cpp (read): warn only once about
+	  less SHOWFRAME then advertised in header.
 	* testsuite/misc-ming.all/DefineEditTextVariableNameText.c:
 	  check that even if you delete the associated variable
 	  and then set it back, the textfield still uses that value.

@@ -35,6 +35,8 @@ using namespace std;
 // members of classes registered to definitions.
 //#define DEBUG_REGISTER_CLASS 1
 
+#define ONCE(x) { static bool warned=false; if (!warned) { warned=true; x; } }
+
 namespace gnash {
 
 character*
@@ -154,8 +156,8 @@ sprite_definition::read(stream* in)
         if ( m_frame_count > m_loading_frame )
         {
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_(SIZET_FMT " frames advertised in header, but only " SIZET_FMT " SHOWFRAME tags "
-			"found in define sprite."), m_frame_count, m_loading_frame);
+		ONCE( log_swferror(_(SIZET_FMT " frames advertised in header, but only " SIZET_FMT " SHOWFRAME tags "
+			"found in define sprite. Is a common thing, will warn only once."), m_frame_count, m_loading_frame) );
 		);
 
 		// this should be safe 
