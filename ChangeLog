@@ -1,5 +1,10 @@
 2008-04-03 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Object.as: test that null is a valid
+	  setter argument for setProperty (gnash fails).
+
+2008-04-03 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/sprite_definition.cpp (read): warn only once about
 	  less SHOWFRAME then advertised in header.
 	* testsuite/misc-ming.all/DefineEditTextVariableNameText.c:
