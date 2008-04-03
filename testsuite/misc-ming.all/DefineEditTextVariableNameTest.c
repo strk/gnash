@@ -240,7 +240,7 @@ main(int argc, char** argv)
     Ming_setScale(20.0); /* let's talk pixels */
  
     mo = newSWFMovie();
-    SWFMovie_setRate(mo, 1);
+    SWFMovie_setRate(mo, 2);
     SWFMovie_setDimension(mo, 628, 451);
 
     bfont = get_default_font(srcdir);
@@ -357,6 +357,12 @@ main(int argc, char** argv)
         "mc5.textfield.text = 'new_text';"
         "mc5.textfield._width = 60;");
     check_equals(mo, "mc5.text_var5", "'new_text'");
+    add_actions(mo, "mc5.text_var5 = 'change back';");
+    check_equals(mo, "mc5.textfield.text", "'change back'");
+    add_actions(mo, 
+        "delete mc5.text_var5;"
+        "mc5.text_var5 = 'revival';"); 
+    add_actions(mo, "mc5.textfield.text = 'revival';"); 
     SWFMovie_nextFrame(mo); 
     
     //
@@ -377,7 +383,10 @@ main(int argc, char** argv)
         "mc6.textfield.text = 'new_text';"
         "mc6.textfield._width = 60;");
     check_equals(mo, "mc6.text_var6", "'new_text'");
+    add_actions(mo, "mc6.text_var6 = 'change back';");
+    check_equals(mo, "mc6.textfield.text", "'change back'");
     SWFMovie_nextFrame(mo); 
+
     /*********************************************
      *
      * Print test results
