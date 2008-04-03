@@ -606,9 +606,27 @@ Gui::display(movie_root* m)
 	{
 		changed_ranges.setWorld();
 	}
+	
+	// DEBUG ONLY:
+  // This is a good place to inspect the invalidated bounds state. Enable
+  // the following block (and parts of it) if you need to. 
+#if 0
+  {
+    // This may print a huge amount of information, but is useful to analyze
+    // the (visible) object structure of the movie and the flags of the
+    // characters. For example, a characters should have set the 
+    // m_child_invalidated flag if at least one of it's childs has the
+    // invalidated flag set.
+    log_debug("DUMPING CHARACTER TREE"); 
+    m->dump_character_tree();
+    
+    // less verbose, and often necessary: see the exact coordinates of the
+    // invalidated bounds (mainly to see if it's NULL or something else).	
+    std::cout << "Calculated changed ranges: " << changed_ranges << "\n";
+  }
+#endif
   
 	// Avoid drawing of stopped movies
-
 	if ( ! changed_ranges.isNull() ) // use 'else'?
 	{
 		// Tell the GUI(!) that we only need to update this

@@ -198,6 +198,13 @@ character::set_child_invalidated()
   } 
 }
 
+void 
+character::dump_character_tree(const std::string prefix) const
+{
+  log_debug("%s%s<%p> I=%d,CI=%d", prefix, typeName(*this).c_str(), this,
+    m_invalidated, m_child_invalidated);  
+}
+
 void
 character::extend_invalidated_bounds(const InvalidatedRanges& ranges)
 {

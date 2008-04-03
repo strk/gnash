@@ -3934,6 +3934,12 @@ sprite_instance::add_invalidated_bounds(InvalidatedRanges& ranges,
 
 }
 
+void 
+sprite_instance::dump_character_tree(const std::string prefix) const
+{
+  character::dump_character_tree(prefix);
+  m_display_list.dump_character_tree(prefix+" ");
+}
 
 const char*
 sprite_instance::call_method_args(const char* method_name,
@@ -4408,6 +4414,7 @@ sprite_instance::getBounds() const
   const_cast<DisplayList&>(m_display_list).visitAll(f);
   Range drawableBounds = _drawable->get_bound().getRange();
   bounds.expandTo(drawableBounds);
+  
   return bounds;
 }
 

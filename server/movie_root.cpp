@@ -1314,6 +1314,16 @@ movie_root::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 	}
 }
 
+void 
+movie_root::dump_character_tree() const 
+{
+  for (Levels::const_iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
+	{
+	  log_debug("--- movie at depth %d:", i->second->get_depth());
+		i->second->dump_character_tree("CTREE: ");
+	}
+}
+
 int
 movie_root::minPopulatedPriorityQueue() const
 {

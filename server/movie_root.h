@@ -477,6 +477,8 @@ public:
     void setFocus(character* ch);
     
     DSOEXPORT void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
+    
+    void dump_character_tree() const;
 
     /// Return the topmost active entity under the pointer
     //

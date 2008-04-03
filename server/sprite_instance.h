@@ -712,6 +712,8 @@ public:
 			edit_text_character* ch);
 
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
+	
+	void dump_character_tree(const std::string prefix) const;
 			
 
 	const DisplayList& getDisplayList() const {

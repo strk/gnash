@@ -657,11 +657,15 @@ DisplayList::display()
             
             if (mask->boundsInClippingArea())
               mask->display();
+            else
+              mask->clear_invalidated();  // avoid stale flag
               
             render::end_submit_mask();
             
             if (ch->boundsInClippingArea())
               ch->display();
+            else
+              ch->clear_invalidated();  // avoid stale flag
               
             render::disable_mask();
             
@@ -714,7 +718,9 @@ DisplayList::display()
         }
         
         if (ch->boundsInClippingArea())
-          ch->display();
+          ch->display();        
+        else 
+          ch->clear_invalidated();  // avoid stale flag
         
         // Notify the renderer that mask drawing has finished.
         if (ch->isMaskLayer())
@@ -883,6 +889,25 @@ DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
   
 }
 
+
+void 
+DisplayList::dump_character_tree(const std::string prefix) const
+{
+  // print self:
+  //character::dump_character_tree(prefix);
+
+  // recursion:
+  for( const_iterator it = _charsByDepth.begin(),
+      endIt = _charsByDepth.end();
+    it != endIt; ++it)
+  {
+    const DisplayItem& dobj = *it;
+    
+    dobj->dump_character_tree(prefix+" "); 
+  }
+  
+
+}
 
 /// This method is not in the header in the hope DisplayItemDepthLess
 /// will be inlined by compiler
