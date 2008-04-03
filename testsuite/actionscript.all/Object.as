@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Object.as,v 1.53 2008/04/03 10:39:42 strk Exp $";
+rcsid="$Id: Object.as,v 1.54 2008/04/03 16:00:48 strk Exp $";
 #include "check.as"
 
 // Test things in Class Object (swf5~swf8)
@@ -415,10 +415,10 @@ check(!r);
 r = o.addProperty('lnull', getter, o); // self as setter..
 check(!r);
 r = o.addProperty('lnull', getter, null);
-xcheck(r);
+check(r);
 getcalls=0;
 t=o.lnull;
-xcheck_equals(getcalls, 1);
+check_equals(getcalls, 1);
 o.lnull = 5;
 _root.retwhat='lnull';
 check_equals(o.lnull, 5);

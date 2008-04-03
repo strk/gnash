@@ -283,7 +283,7 @@ public:
 	///         otherwise (property already existent?)
 	///
 	bool addGetterSetter(string_table::key key, as_function& getter,
-		as_function& setter, string_table::key ns = 0);
+		as_function* setter, string_table::key ns = 0);
 
 	/// \brief
 	/// Add a getter/setter property, if not already existing

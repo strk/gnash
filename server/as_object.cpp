@@ -156,7 +156,7 @@ namespace gnash {
 
 bool
 as_object::add_property(const std::string& name, as_function& getter,
-		as_function& setter)
+		as_function* setter)
 {
 	string_table &st = _vm.getStringTable();
 	return _members.addGetterSetter(st.find(PROPNAME(name)), getter, setter);
@@ -627,7 +627,7 @@ as_object::init_property(string_table::key key, as_function& getter,
 		as_function& setter, int flags, string_table::key nsname)
 {
 	bool success;
-	success = _members.addGetterSetter(key, getter, setter, nsname);
+	success = _members.addGetterSetter(key, getter, &setter, nsname);
 
 	// We shouldn't attempt to initialize a property twice, should we ?
 	assert(success);

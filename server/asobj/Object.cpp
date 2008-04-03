@@ -233,21 +233,27 @@ object_addproperty(const fn_call& fn)
 		return as_value(false);
 	}
 
-	as_function* setter = fn.arg(2).to_as_function();
-	if ( ! setter )
+	as_function* setter = NULL;
+	const as_value& setterval = fn.arg(2);
+	if ( ! setterval.is_null() )
 	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Invalid call to Object.addProperty() - "
-			"setter is not an AS function"));
-		);
-		return as_value(false);
+		setter = setterval.to_as_function();
+		if ( ! setter )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Invalid call to Object.addProperty() - "
+				"setter is not null and not an AS function (%s)"),
+				setterval.to_debug_string());
+			);
+			return as_value(false);
+		}
 	}
 
 
 	// Now that we checked everything, let's call the as_object
 	// interface for getter/setter properties :)
 	
-	bool result = obj->add_property(propname, *getter, *setter);
+	bool result = obj->add_property(propname, *getter, setter);
 
 	//log_debug("Object.addProperty(): testing");
 	return as_value(result);

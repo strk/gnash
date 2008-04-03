@@ -4,7 +4,13 @@ abort-really-aborts-7.swf:2f7ae8e5595e0dec523ea46107683025
 abort-really-aborts-8.swf:cfd60440f939844201b7bc405a75d662
 add2-different-objects-5.swf:e35553c20f435d125b6e4905cbd1ad20
 addProperty-5.swf:00e23fa4da0445805c0c4ea3f54a140d
+addProperty-6.swf:d35a3de35c9da995d03e0c2da1ea0dce
+addProperty-7.swf:6bb7593ed139daddaa7be97db33833fb
+addProperty-8.swf:8bd2137601b88a6a44cc6c332d1fd68b
 addProperty-delete-5.swf:27b4309647c2ef74ec4ce8caea05f4bd
+addProperty-delete-6.swf:1ad962de27d1187410a015a4da8c35eb
+addProperty-delete-7.swf:5fa090b1e0e4914875ae7191dca3eb0f
+addProperty-delete-8.swf:0e27629384de8fc7ae84b477f8296294
 addProperty-flags-5.swf:16a729f3d956fd1287236873fb26fac4
 addProperty-flags-6.swf:574869d2213ee609d3f2910dabecaa80
 addProperty-flags-7.swf:b52073016bf68198756bdc210e0d2b41
@@ -14,6 +20,9 @@ addProperty-get-prototypes-6.swf:5ff58334e7bfbd2aed87b28cf8c30959
 addProperty-get-prototypes-7.swf:db2e8ce9695eb081b9c01da90d0e494f
 addProperty-get-prototypes-8.swf:ac8d51d66f9144311ce0abbbc80cb42b
 addProperty-set-prototypes-5.swf:8b70bc713c001802c96c5b38f9aba14a
+addProperty-set-prototypes-6.swf:9c551f9e26d382466c9f1e33c648b857
+addProperty-set-prototypes-7.swf:ace9ab3223a575532ccba54a0a257091
+addProperty-set-prototypes-8.swf:f5f6a0305a91b7cf09448d60bb86ddae
 and-or-5.swf:a734facbc191156759ad278e25c3f308
 and-or-6.swf:a3a02811b62c07c4d2dd6d6d547f1d2f
 and-or-7.swf:b4c3eb73aa8e0403e8d141516b25c9c6
@@ -530,6 +539,8 @@ propflags-call-9.swf:c8d4e3c04fbbb612a2bea6b27d1bd37b
 propflags-call-prototype-8.swf:e144d5fa2807272f7d45ad2bd3cb9eb9
 propflags-call-prototype-9.swf:d4a4fd3e2f4727e5cdc4b4ff9c8ed1b5
 propflags-get-9.swf:56b0cf506962343f670d24c4ed64dedf
+propflags-get-prototype-8.swf:711bd46c4c4a3e62a324c0902ee5b364
+propflags-get-prototype-9.swf:713e3808411e4c89458fae8c082e208f
 propflags-set-native-5.swf:a0c0652f4c7a1626e064ae0dd6a867a8
 propflags-set-native-8.swf:b11c0be85a33c08d588897a99ed35f7f
 propflags-set-proto-5.swf:d8cfcbffc8213a9eb60301a877f750e1

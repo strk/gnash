@@ -122,20 +122,20 @@ GetterSetter::UserDefinedGetterSetter::get(fn_call& fn) const
 	}
 
 	if ( mGetter ) return (*mGetter)(fn);
-	else return as_value();
+	else return as_value(); // should we return underlyingValue here ?
 }
 
 void
 GetterSetter::UserDefinedGetterSetter::set(fn_call& fn)
 {
 	ScopedLock lock(*this);
-	if ( ! lock.obtained() )
+	if ( ! lock.obtained() || ! mSetter )
 	{
 		underlyingValue = fn.arg(0);
 		return;
 	}
 
-	if ( mSetter ) (*mSetter)(fn);
+	(*mSetter)(fn);
 }
 
 } // namespace gnash
