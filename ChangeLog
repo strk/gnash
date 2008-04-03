@@ -1,5 +1,12 @@
 2008-04-03 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* testsuite/actionscript.all/Date.as: these are the results on 
+	  my machine. Don't expect the overflow result at the moment - 
+	  it might be possible to do, but is worth sacrificing for
+	  32-bit compatibility at the moment. 
+
+2008-04-03 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* server/asobj/Date.cpp: add several algorithms for working out the
 	  year from the epoch day; the most accurate but slowest is enabled.
 	  Comments explaining the advantages and disadvantages of the
