@@ -210,7 +210,7 @@ int
 main(int argc, char** argv)
 {
     SWFMovie mo;
-    SWFMovieClip mc1, mc2, mc3, mc4;
+    SWFMovieClip mc1, mc2, mc3, mc4, mc5, mc6;
     SWFDisplayItem it;
     const char *srcdir=".";
     /* The variable name for textfield */
@@ -339,6 +339,45 @@ main(int argc, char** argv)
     check_equals(mo, "mc4.uninitalized_text_var", "100");
     SWFMovie_nextFrame(mo); 
     
+    //
+    // (1) test deletion of text variable
+    //
+    mc5 = newSWFMovieClip();
+    add_text_field(mc5, (SWFBlock)bfont, "text_var5", NULL);
+    it = SWFMovie_add(mo, (SWFBlock)mc5);
+    SWFDisplayItem_setName(it, "mc5");
+    SWFDisplayItem_moveTo(it, 400, 300);
+    check_equals(mo, "typeof(mc5.textfield)", "'object'");
+    check_equals(mo, "typeof(mc5.text_var5)", "'undefined'");
+    add_actions(mo, 
+        "mc5.text_var5 = 'intial_text';"
+        "delete mc5.text_var5;");
+    xcheck_equals(mo, "typeof(mc5.text_var5)", "'undefined'");
+    add_actions(mo,
+        "mc5.textfield.text = 'new_text';"
+        "mc5.textfield._width = 60;");
+    check_equals(mo, "mc5.text_var5", "'new_text'");
+    SWFMovie_nextFrame(mo); 
+    
+    //
+    //  test deletion of text variable(another one).
+    //
+    mc6 = newSWFMovieClip();
+    add_text_field(mc6, (SWFBlock)bfont, "text_var6", "initial_text");
+    it = SWFMovie_add(mo, (SWFBlock)mc6);
+    SWFDisplayItem_setName(it, "mc6");
+    SWFDisplayItem_moveTo(it, 500, 300);
+    check_equals(mo, "typeof(mc6.textfield)", "'object'");
+    check_equals(mo, "typeof(mc6.text_var6)", "'string'");
+    add_actions(mo, 
+        "delete mc6.text_var6;");
+    xcheck_equals(mo, "typeof(mc6.text_var6)", "'undefined'");
+    check_equals(mo, "mc6.textfield.text", "'initial_text'");
+    add_actions(mo,
+        "mc6.textfield.text = 'new_text';"
+        "mc6.textfield._width = 60;");
+    check_equals(mo, "mc6.text_var6", "'new_text'");
+    SWFMovie_nextFrame(mo); 
     /*********************************************
      *
      * Print test results
