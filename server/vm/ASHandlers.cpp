@@ -2446,7 +2446,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 	}
 	else
 	{
-		log_debug("user-provided host requests fd is %d", hostfd);
+		//log_debug("user-provided host requests fd is %d", hostfd);
 		std::stringstream request;
 
 		// use the original url, non parsed (the browser will know better how to resolve relative urls and handle hactionscript)
@@ -2469,7 +2469,9 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 			log_error("Could only write %d bytes over "SIZET_FMT" required to user-provided host requests fd %d",
 				ret, len, hostfd);
 		}
-		log_debug("Wrote %d bytes of geturl requests (all needed)", ret);
+		//log_debug("Wrote %d bytes of geturl requests (all needed)", ret);
+		requestString.resize(requestString.size()-1); // for sake of clean logging, should always end with newline
+		log_debug(_("Sent request '%s' to host fd %d"), requestString, hostfd);
 	}
 
 }

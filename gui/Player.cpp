@@ -413,7 +413,7 @@ Player::fs_callback(gnash::sprite_instance* movie, const std::string& command,
 	{
 		//log_debug("user-provided host requests fd is %d", hostfd);
 		std::stringstream request;
-		request << "INVOKE " << command << ":" << args;
+		request << "INVOKE " << command << ":" << args << endl;
 
 		string requestString = request.str();
 		const char* cmd = requestString.c_str();
@@ -431,7 +431,8 @@ Player::fs_callback(gnash::sprite_instance* movie, const std::string& command,
 			log_error("Could only write %d bytes over "SIZET_FMT" required to user-provided host requests fd %d",
 				ret, len, hostfd);
 		}
-		log_debug(_("Sent request '%s' to host fd %d"), cmd, hostfd);
+		requestString.resize(requestString.size()-1); // for sake of clean logging, should always end with newline
+		log_debug(_("Sent request '%s' to host fd %d"), requestString, hostfd);
 	}
 
 	/// Fscommands can be ignored using an rcfile setting. As a 

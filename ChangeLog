@@ -1,5 +1,12 @@
 2008-04-04 Sandro Santilli <strk@keybit.net>
 
+	* gui/Player.cpp (fs_callback): don't forget the newline ending
+	  (the gnash-to-host protocol needs some real definition).
+	* server/vm/ASHandlers.cpp (CommonGetUrl): consitent logging
+	  for gnash-to-host comunication.
+
+2008-04-04 Sandro Santilli <strk@keybit.net>
+
 	* gui/Player.cpp (fs_callback): if an host-fd is given, always
 	  send an INVOKE request for fscommands, no matter how we've
 	  been called (standalone or plugin).
