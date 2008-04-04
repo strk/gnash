@@ -1,5 +1,9 @@
 2008-04-04 Sandro Santilli <strk@keybit.net>
 
+	* server/character.{cpp,h}: have getMovieInfo return an iterator
+	  to the added subtree.
+	* server/sprite_instance.{cpp,h}: implement getMovieInfo descending
+	  in displaylist.
 	* gui/gtk.cpp (makeTreeModel): fix model constructor when
 	  jumping back to ancestor nodes at depth !+ current-1.
 

@@ -879,6 +879,11 @@ public:
 	/// Getter-setter for MovieClip._lockroot
 	static as_value lockroot_getset(const fn_call& fn);
 
+#ifdef USE_MENUS
+	// Override to append display list info, see dox in character.h
+	virtual InfoTree::iterator getMovieInfo(InfoTree& tr, InfoTree::iterator it);
+#endif
+
 private:
 
 	void stopStreamSound();

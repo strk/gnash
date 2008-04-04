@@ -1001,14 +1001,13 @@ character::boundsInClippingArea() const
 }
 
 #ifdef USE_MENUS
-void
-character::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it)
+character::InfoTree::iterator
+character::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 {
 	const std::string yes = _("yes");
 	const std::string no = _("no");
 
 	it = tr.append_child(it, StringPair(getTarget(), typeName(*this)));
-
 
 	std::ostringstream os;
 	os << get_depth();
@@ -1040,6 +1039,8 @@ character::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it)
 	tr.append_child(it, StringPair(_("Mask"), isMaskLayer() ? yes : no));	    
 	tr.append_child(it, StringPair(_("Destroyed"), isDestroyed() ? yes : no));
 	tr.append_child(it, StringPair(_("Unloaded"), isUnloaded() ? yes : no));
+
+	return it;
 }
 #endif
 

@@ -4605,4 +4605,44 @@ sprite_instance::set_play_state(play_state s)
 	m_play_state = s;
 }
 
+#ifdef USE_MENUS
+
+class MovieInfoVisitor {
+
+  character::InfoTree& _tr;
+  character::InfoTree::iterator _it;
+
+public:
+  MovieInfoVisitor(character::InfoTree& tr, character::InfoTree::iterator it)
+    :
+    _tr(tr),
+    _it(it)
+  {}
+
+  void operator() (character* ch)
+  {
+    //if ( ch->isUnloaded() ) return; // or maybe we should stil print these..
+    ch->getMovieInfo(_tr, _it);
+  }
+};
+
+character::InfoTree::iterator 
+sprite_instance::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
+{
+	InfoTree::iterator selfIt = character::getMovieInfo(tr, it);
+	std::ostringstream os;
+	os << m_display_list.size();
+	InfoTree::iterator localIter = tr.append_child(selfIt, StringPair(_("Childs"), os.str()));	    
+	//localIter = tr.append_child(localIter, StringPair("child1", "fake"));
+	//localIter = tr.append_child(localIter, StringPair("child2", "fake"));
+
+	MovieInfoVisitor v(tr, localIter);
+	m_display_list.visitAll(v);
+
+	return selfIt;
+
+}
+
+#endif // USE_MENUS
+
 } // namespace gnash

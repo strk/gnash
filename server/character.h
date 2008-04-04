@@ -70,6 +70,7 @@ public:
   typedef std::vector<const action_buffer*> BufferList;
   typedef std::map<event_id, BufferList> Events;
   typedef std::pair<std::string, std::string> StringPair; // ifdef USE_MENU...
+  typedef tree<StringPair> InfoTree; // ifdef USE_MENU
 
 private:
 
@@ -1175,7 +1176,10 @@ public: // istn't this 'public' reduntant ?
   /// @param it
   /// The iterator to append info to.
   ///
-  virtual void getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it);
+  /// @return iterator the appended subtree
+  ///
+  // TODO: use a typedef for tree<StringPair> ?
+  virtual InfoTree::iterator getMovieInfo(InfoTree& tr, InfoTree::iterator it);
 #endif
 
 };
