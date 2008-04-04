@@ -1494,7 +1494,7 @@ SWFHandlers::ActionFscommand2(ActionExec& thread)
 	for (unsigned int i=1; i<nargs; ++i)
 	{
 		as_value arg = env.top(off++);
-		if ( i ) ss << ", ";
+		if ( i>1 ) ss << ", ";
 		ss << arg.to_debug_string();
 	}
 	ss << ")";
