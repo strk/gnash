@@ -408,11 +408,40 @@ Player::fs_callback(gnash::sprite_instance* movie, const std::string& command,
 
 	gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 
+	int hostfd = VM::get().getRoot().getHostFD(); // it's _hostfd, but we're a static method...
+	if ( hostfd != -1 )
+	{
+		//log_debug("user-provided host requests fd is %d", hostfd);
+		std::stringstream request;
+		request << "INVOKE " << command << ":" << args;
+
+		string requestString = request.str();
+		const char* cmd = requestString.c_str();
+		size_t len = requestString.length();
+		// TODO: should mutex-protect this ?
+		// NOTE: we assuming the hostfd is set in blocking mode here..
+		//log_debug("Attempt to write INVOKE requests fd %d", hostfd);
+		int ret = write(hostfd, cmd, len);
+		if ( ret == -1 )
+		{
+			log_error("Could not write to user-provided host requests fd %d: %s", hostfd, strerror(errno));
+		}
+		if ( (size_t)ret < len )
+		{
+			log_error("Could only write %d bytes over "SIZET_FMT" required to user-provided host requests fd %d",
+				ret, len, hostfd);
+		}
+		log_debug(_("Sent request '%s' to host fd %d"), cmd, hostfd);
+	}
+
 	/// Fscommands can be ignored using an rcfile setting. As a 
 	/// plugin they are always ignored.
 	if (_gui->isPlugin())
 	{
-		log_debug(_("Running as plugin: ignoring fscommand %s."), command);
+		log_debug(_("Running as plugin: skipping internal handling of fscommand %s%s."),
+			command,
+			(hostfd != -1) ? _(" (but INVOKE request was still sent to host application)")
+			               : _(" (and no host fd given)"));
 		return;
 	}
 	
@@ -468,7 +497,8 @@ Player::fs_callback(gnash::sprite_instance* movie, const std::string& command,
    		return;
    	}
    	
-   	log_error(_("Unhandled FSCommand %s (%s)"), command, args);
+	log_debug(_("FSCommand '%s(%s)' not handled by the standalone player (might have been by the hosting app)"),
+		command, args);
 
 }
 

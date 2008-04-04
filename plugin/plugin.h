@@ -127,6 +127,9 @@ private:
     pid_t                              _childpid;
     int                                _filefd;
 
+    /// Name of the plugin instance element in the dom 
+    std::string                        _name;
+
     const char* getCurrentPageURL() const;
 };
 

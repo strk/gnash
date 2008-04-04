@@ -1,3 +1,12 @@
+2008-04-04 Sandro Santilli <strk@keybit.net>
+
+	* gui/Player.cpp (fs_callback): if an host-fd is given, always
+	  send an INVOKE request for fscommands, no matter how we've
+	  been called (standalone or plugin).
+	* plugin/plugin.{cpp,h}: remember instance 'name' (as set by
+	  <object> attribute); support INVOKE command in the gnash-to-host
+	  interface.
+
 2008-04-04 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/asobj/Date.cpp: add timeZoneOffset functions. Now to

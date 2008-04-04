@@ -60,6 +60,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <sstream>
 
 // Mozilla SDK headers
 #include "prinit.h"
@@ -286,7 +287,8 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
 	_ichan(0),
 	_ichanWatchId(0),
 	_childpid(0),
-	_filefd(-1)
+	_filefd(-1),
+	_name()
 {
 	for (size_t i=0, n=data->argc; i<n; ++i)
 	{
@@ -301,7 +303,13 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
 		{
 			val = data->argv[i];
 		}
-		//log_debug("PARAM: %s = %s", name.c_str(), val.c_str());
+
+		if ( ! strcasecmp(name.c_str(), "name") )
+		{
+			_name = val;
+		}
+
+		cerr << "PARAM: " << name << " = " << val << endl;
 		_params[name] = val;
 	}
 }
@@ -622,34 +630,66 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
 		return false;
 	}
 
-	if ( strncmp(buf, "GET ", 4) )
+	if ( ! strncmp(buf, "GET ", 4) )
 	{
-		cout << "Unknown player request: " << buf << endl;
-		return false;
-	}
+		char* target = buf+4;
+		if ( ! *target )
+		{
+			cout << "No target found after GET request" << endl;
+			return false;
+		}
+		char* url = target;
+		while (*url && *url != ':') ++url;
+		if ( *url )
+		{
+			*url='\0';
+			++url;
+		}
+		else
+		{
+			cout << "No colon found after GETURL target string" << endl;
+			return false;
+		}
 
-	char* target = buf+4;
-	if ( ! *target )
-	{
-		cout << "No target found after GET request" << endl;
-		return false;
+		cout << "Asked to get URL '" << url << "' in target '" << target << "'" << endl;
+		NPN_GetURL(_instance, url, target);
+		return true;
+
 	}
-	char* url = target;
-	while (*url && *url != ':') ++url;
-	if ( *url )
+	else if ( ! strncmp(buf, "INVOKE ", 7) )
 	{
-		*url='\0';
-		++url;
+		char* command = buf+7;
+		if ( ! *command ) {
+			cout << "No command found after INVOKE request" << endl;
+			return false;
+		}
+		char* arg = command;
+		while (*arg && *arg != ':') ++arg;
+		if ( *arg ) {
+			*arg='\0';
+			++arg;
+		} else {
+			cout << "No colon found after INVOKE command string" << endl;
+			return false;
+		}
+
+		std::string name = _name; 
+
+		std::stringstream jsurl;
+		jsurl << "javascript:" << name << "_DoFSCommand('" << command << "','" << arg <<"')";
+
+		// TODO: check if _self is a good target for this
+		static const char* tgt = "_self";
+
+		cout << "Calling NPN_GetURL(" << jsurl.str() << ", '" << tgt << "');" << endl;
+		NPN_GetURL(_instance, jsurl.str().c_str(), tgt);
+		return true;
 	}
 	else
 	{
-		cout << "No colon found after target string" << endl;
+		cout << "Unknown player request: '" << buf << "'" << endl;
 		return false;
 	}
-
-	cout << "Asked to get URL '" << url << "' in target '" << target << "'" << endl;
-	NPN_GetURL(_instance, url, target);
-	return true;
 }
 
 void
