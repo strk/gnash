@@ -7,3 +7,23 @@
 
 # Enable extensions for allowing testing them..
 set EnableExtensions on
+
+# Don't write to logfile
+set writelog false
+
+# Don't be verbose by default (-v will enable verbosity=1)
+set verbosity 0
+
+# Don't bother printing SWF errors during automated testing
+set MalformedSWFVerbosity false
+
+# Don't bother printing AS errors during automated testing
+set ASCodingErrorsVerbosity false
+
+# Enable sound (for testcases using it..)
+set sound true
+
+# Don't really play sound while testing (at least with gstreamer)
+# In the future, we might want to use a 'testsink' here for checking:wq
+# actual output
+set GstAudioSink fakesink

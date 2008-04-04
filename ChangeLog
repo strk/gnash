@@ -1,5 +1,14 @@
 2008-04-04 Sandro Santilli <strk@keybit.net>
 
+	* extensions/gnashrc: force useless options off.
+	* testsuite/misc-mtasc.all/Makefile.am,
+	  testsuite/misc-swfc.all/Makefile.am,
+	  testsuite/misc-swfmill.all/Makefile.am,
+	  testsuite/samples/Makefile.am:
+	  Use the testsuite/gnashrc config file.
+
+2008-04-04 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/gnashrc.in: use fakesink as GstAudioSink, so you don't
 	  hear sound from tests coming out of speakers on make check.
 	* testsuite/misc-ming.all/Makefile.am: use testsuite/gnashrc
