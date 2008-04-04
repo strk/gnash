@@ -664,6 +664,7 @@ GtkGui::makeTreeModel (std::auto_ptr<InfoTree> treepointer)
     // Depth within the *GTK* tree.
     int depth = 0;    
 
+    assert(info.depth(info.begin()) == 0); // seems assumed in the code below
     for (InfoTree::iterator i=info.begin(), e=info.end(); i!=e; ++i)
     {
         StringPair& p = *i;
@@ -671,15 +672,22 @@ GtkGui::makeTreeModel (std::auto_ptr<InfoTree> treepointer)
         std::ostringstream os;
         os << info.depth(i);  
 
-        if (info.depth(i) > depth) {
+        int newdepth = info.depth(i);
+
+        if (newdepth > depth) {
+            assert(newdepth == depth+1);
             depth++;                   
             iter=child_iter;                  
         }
 
-        if (info.depth(i) < depth) {
-            depth = info.depth(i);
-            gtk_tree_model_iter_parent (GTK_TREE_MODEL(model), &parent_iter, &iter);  
-            iter = parent_iter;
+        if (newdepth < depth) {
+            int gap = depth-newdepth;
+            depth = newdepth;
+            while(gap--)
+            {
+                gtk_tree_model_iter_parent (GTK_TREE_MODEL(model), &parent_iter, &iter);  
+                iter = parent_iter;
+	    }
         }
 
         //Read in data from present node
