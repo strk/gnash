@@ -1584,7 +1584,7 @@ edit_text_character::parseTextVariableRef(const std::string& variableName) const
 void
 edit_text_character::registerTextVariable() 
 {
-#define DEBUG_DYNTEXT_VARIABLES 1
+//#define DEBUG_DYNTEXT_VARIABLES 1
 
 #ifdef DEBUG_DYNTEXT_VARIABLES
 	log_debug(_("registerTextVariable() called"));
