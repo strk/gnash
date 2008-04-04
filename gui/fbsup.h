@@ -201,6 +201,12 @@ class FBGui : public Gui
     virtual void setInterval(unsigned int interval);
     virtual void setTimeout(unsigned int timeout);
     
+    virtual void setFullscreen();
+    virtual void unsetFullscreen();
+    
+    virtual void showMenu(bool show);
+    virtual void showMouse(bool show);
+    
     virtual void setInvalidatedRegions(const InvalidatedRanges& ranges);
     virtual bool want_multiple_regions() { return true; }
 };

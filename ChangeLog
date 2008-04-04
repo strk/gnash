@@ -1,6 +1,8 @@
 2008-04-04 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* gui/Player.cpp: avoid bogus "Unhandled FSCommand quit"
+	* gui/fb.cpp, gui/fbsup.h: stubs for setFullscreen, unsetFullscreen,
+	  showMenu and showMouse
 
 2008-04-03 Sandro Santilli <strk@keybit.net>
 

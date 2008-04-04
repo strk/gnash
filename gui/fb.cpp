@@ -461,6 +461,26 @@ void FBGui::setTimeout(unsigned int /*timeout*/)
 
 }
 
+void FBGui::setFullscreen()
+{
+  // FB GUI always runs fullscreen; ignore...
+}
+
+void FBGui::unsetFullscreen()
+{
+  // FB GUI always runs fullscreen; ignore...
+}
+
+void FBGui::showMenu(bool /*show*/)
+{
+  log_unimpl(_("This GUI does not yet support menus"));
+}
+
+void FBGui::showMouse(bool /*show*/)
+{
+  log_unimpl(_("This GUI does not yet support a mouse pointer"));
+}
+
 
 int FBGui::valid_x(int x) {
   if (x<0) x=0;
