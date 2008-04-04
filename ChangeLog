@@ -1,5 +1,12 @@
 2008-04-04 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/gnashrc.in: use fakesink as GstAudioSink, so you don't
+	  hear sound from tests coming out of speakers on make check.
+	* testsuite/misc-ming.all/Makefile.am: use testsuite/gnashrc
+	  while automatically running tests.
+
+2008-04-04 Sandro Santilli <strk@keybit.net>
+
 	* gui/Player.cpp (fs_callback): don't forget the newline ending
 	  (the gnash-to-host protocol needs some real definition).
 	* server/vm/ASHandlers.cpp (CommonGetUrl): consitent logging

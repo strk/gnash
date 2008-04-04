@@ -20,4 +20,9 @@ set writeLog false
 # Enable sound (for testcases using it..)
 set sound true
 
+# Don't really play sound while testing (at least with gstreamer)
+# In the future, we might want to use a 'testsink' here for checking:wq
+# actual output
+set GstAudioSink fakesink
+
 # TODO: enable extensions ?
