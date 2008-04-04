@@ -1,3 +1,7 @@
+2008-04-04 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/Player.cpp: avoid bogus "Unhandled FSCommand quit"
+
 2008-04-03 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/ButtonEventsTest.c: test that button

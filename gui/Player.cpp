@@ -424,6 +424,7 @@ Player::fs_callback(gnash::sprite_instance* movie, const std::string& command,
    	if (noCaseCompare(command, "quit"))
    	{
    		_gui->quit();
+   		return;
    	}
 
     // FSCommand fullscreen
