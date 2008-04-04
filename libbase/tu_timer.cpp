@@ -26,31 +26,6 @@ double tu_timer::ticks_to_seconds(boost::uint64_t ticks)
 	return ticks * (1.0f / 1000.f);
 }
 
-
-boost::uint64_t	tu_timer::get_profile_ticks()
-{
-	// @@ use rdtsc?
-
-	//Nano-second timer.
-	LARGE_INTEGER	li;
-	QueryPerformanceCounter(&li);
-
-	return li.QuadPart;
-}
-
-
-double	tu_timer::profile_ticks_to_seconds(boost::uint64_t ticks)
-{
-	LARGE_INTEGER	freq;
-	QueryPerformanceFrequency(&freq);
-
-	double	seconds = (double) ticks;
-	seconds /= (double) freq.QuadPart;
-
-	return seconds;
-}
-
-
 #else	// not _WIN32
 
 
@@ -62,37 +37,22 @@ double	tu_timer::profile_ticks_to_seconds(boost::uint64_t ticks)
 
 boost::uint64_t tu_timer::get_ticks()
 {
-	return static_cast<boost::uint64_t>(get_profile_ticks()/1000.0);
+
+	struct timeval tv;
+	
+	gettimeofday(&tv, 0);
+
+	boost::uint64_t result = static_cast<boost::uint64_t>(tv.tv_sec) * 1000000L;
+
+	result += tv.tv_usec;
+	// Time Unit: microsecond
+
+	return static_cast<boost::uint64_t>(result / 1000.0);
 }
 
 
 double tu_timer::ticks_to_seconds(boost::uint64_t ticks)
 {
-	return profile_ticks_to_seconds(ticks);
-}
-
-
-boost::uint64_t	tu_timer::get_profile_ticks()
-{
-	// @@ TODO prefer rdtsc when available?
-
-	// Return microseconds.
-	struct timeval tv;
-	
-	gettimeofday(&tv, 0);
-
-	boost::uint64_t result = (boost::uint64_t)tv.tv_sec * 1000000L;
-
-	result += tv.tv_usec;
-	// Time Unit: microsecond
-
-	return result;
-}
-
-
-double	tu_timer::profile_ticks_to_seconds(boost::uint64_t ticks)
-{
-	// ticks is microseconds.  Convert to seconds.
 	return ticks / 1000000.0;
 }
 

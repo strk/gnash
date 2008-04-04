@@ -1,3 +1,7 @@
+2008-04-04 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/tu_timer.{h,cpp}: drop unnecessary functions.
+
 2008-04-04 Sandro Santilli <strk@keybit.net>
 
 	* server/character.{cpp,h}: have getMovieInfo return an iterator
