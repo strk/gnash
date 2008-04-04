@@ -113,7 +113,7 @@ test_perms:
 	@if test ! -w $(DESTDIR)$(plugindir); then \
 	  echo "WARNING: Improper permissions for $(DESTDIR)$(plugindir)!"; \
 	  echo "You probably need to be root"; \
-	  echo "Or configure with --with-plugindir= set to a writable directory"; \
+	  echo "Or configure with --with-npapi-plugindir= set to a writable directory"; \
 	exit 1; \
 	fi
 
