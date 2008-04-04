@@ -1235,7 +1235,7 @@ Element *
 AMF::extractVariable(Network::byte_t *in)
 {
 //    GNASH_REPORT_FUNCTION;
-    Element *el;
+    Element *el = new Element;
     boost::uint16_t length;
 
     Network::byte_t *tmpptr = in;
