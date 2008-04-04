@@ -1,5 +1,10 @@
 2008-04-04 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* server/asobj/Date.cpp: add timeZoneOffset functions. Now to
+	  decide how best to implement them.
+
+2008-04-04 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* libbase/tu_timer.{h,cpp}: drop unnecessary functions.
 
 2008-04-04 Sandro Santilli <strk@keybit.net>

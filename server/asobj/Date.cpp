@@ -120,7 +120,7 @@ struct GnashTime
     boost::int32_t weekday;
     boost::int32_t month;
     boost::int32_t year;
-    boost::int32_t timezoneOffset;
+    boost::int32_t timeZoneOffset;
 };
 
 static const int daysInMonth[2][12] = {
@@ -129,13 +129,13 @@ static const int daysInMonth[2][12] = {
 };
 
 // forward declarations
-static void fillGnashTime(double time, GnashTime& gt);
+static void fillGnashTime(const double& time, GnashTime& gt);
 static double makeTimeValue(GnashTime& gt);
 static void getLocalTime(const double& time, GnashTime& gt);
 static void getUniversalTime(const double& time, GnashTime& gt);
 
 static double rogue_date_args(const fn_call& fn, unsigned maxargs);
-static int minutes_east_of_gmt(struct tm &tm);
+static int getLocalTimeZoneOffset();
 
 // Helper macros for calendar algorithms
 #define IS_LEAP_YEAR(n) ( !((n + 1900) % 400) || ( !((n + 1900) % 4) && ((n + 1900) % 100)) )
@@ -144,10 +144,20 @@ static int minutes_east_of_gmt(struct tm &tm);
 // to get the actual number
 #define COUNT_LEAP_YEARS(n)   ( (n - 70) / 4 - (n - 70) / 100 + (n - 70) / 400 )
 
+
+// FIND_YEAR_ALGORITHM:
+//      default: ("brute force"):   up to 400 iterations to find the correct
+//                                  year. Accurate.
+//      MATHEMATIC_ALGORITHM        small number of iterations, fairly accurate.
+//      APPROXIMATE_ALGORITHM       no iterations, not all that accurate.
+//#define USE_MATHEMATIC_ALGORITHM
+//#define USE_APPROXIMATE_ALGORITHM
+
 static void
 getLocalTime(const double& time, GnashTime& gt)
 {
     // Not yet correct - no time zone.
+    gt.timeZoneOffset = getLocalTimeZoneOffset();
     fillGnashTime(time, gt);
 }
 
@@ -155,6 +165,7 @@ static void
 getUniversalTime(const double& time, GnashTime& gt)
 {
     // No time zone needed.
+    gt.timeZoneOffset = 0;
     fillGnashTime(time, gt);
 }
 
@@ -306,31 +317,23 @@ date_as_object::toString()
     }
   
     // The date value split out to year, month, day, hour etc and millisecs
-    struct tm tm;
     GnashTime gt;
     // Time zone offset (including DST) as hours and minutes east of GMT
-    int tzhours = 0;
-    int tzminutes = 0; 
 
     getLocalTime(value, gt);
-  
-    // At the meridian we need to print "GMT+0100" when Daylight Saving
-    // Time is in force, "GMT+0000" when it isn't, and other values for
-    // other places around the globe when DST is/isn't in force there.
-  
-    // Split offset into hours and minutes
-//    tzminutes = minutes_east_of_gmt(tm);
-//    tzhours = tzminutes / 60, tzminutes %= 60;
+
+    int offsetMinutes = gt.timeZoneOffset / 60;
+    int offsetHours = gt.timeZoneOffset % 60;    
   
     // If timezone is negative, both hours and minutes will be negative
     // but for the purpose of printing a string, only the hour needs to
     // produce a minus sign.
-//    if (tzminutes < 0) tzminutes = - tzminutes;
+    if (offsetMinutes < 0) offsetMinutes = - offsetMinutes;
   
     boost::format dateFormat("%s %s %d %02d:%02d:%02d GMT%+03d%02d %d");
     dateFormat % dayweekname[gt.weekday] % monthname[gt.month]
                % gt.monthday % gt.hour % gt.minute % gt.second
-               % tzhours % tzminutes % (gt.year + 1900);
+               % offsetHours % offsetMinutes % (gt.year + 1900);
   
     return as_value(dateFormat.str());
   
@@ -519,10 +522,15 @@ date_get_proto(date_getutchours,    getUniversalTime, hour)
 date_get_proto(date_getutcminutes,  getUniversalTime, minute)
 
 
-// Return the difference between UTC and localtime+DST for a given date/time
-// as the number of minutes east of GMT.
-static int minutes_east_of_gmt(struct tm& /* tm*/)
+// Return the difference between UTC and localtime in minutes.
+static int getLocalTimeZoneOffset()
 {
+    // This simply has to return the difference in minutes
+    // between UTC (Greenwich Mean Time, GMT) and the localtime.
+    // Obviously, this includes Daylight Saving Time if it applies.
+    
+    // Should we get this from tu_timer too.
+
     return 0;
 #ifdef HAVE_TM_GMTOFF
   // tm_gmtoff is in seconds east of GMT; convert to minutes.
@@ -599,27 +607,11 @@ static int minutes_east_of_gmt(struct tm& /* tm*/)
 /// returns the difference between localtime and UTC that was in effect at the
 /// time specified by a Date object, according to local timezone and DST.
 /// For example, if you are in GMT+0100, the offset is -60
-
-static as_value date_gettimezoneoffset(const fn_call& fn) {
-  boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
-
-    log_unimpl("getTimeZoneOffset() unimplemented");
-//  struct tm tm;
-//  double msec;
-
-//  if (fn.nargs > 0) {
-//      IF_VERBOSE_ASCODING_ERRORS(
-//    log_aserror("Date.getTimezoneOffset was called with parameters");
-//      )
-//  }
-
-//  // Turn Flash datestamp into tm structure...
-//  local_dateToGnashTime(date->value, tm, msec);
-
-//  // ...and figure out the timezone/DST offset from that.
-//  return as_value(-minutes_east_of_gmt(tm));
-    return 0;
-
+static as_value
+date_gettimezoneoffset(const fn_call& fn)
+{
+    boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
+    return as_value( -getLocalTimeZoneOffset() );
 }
 
 
@@ -817,7 +809,6 @@ date_setyear(const fn_call& fn)
 // Only if the second parameter is present and has a non-numeric value,
 // the result is NAN.
 // We do not do the same because it's a bugger to code.
-
 static as_value
 _date_setmonth(const fn_call& fn, bool utc)
 {
@@ -871,7 +862,6 @@ _date_setmonth(const fn_call& fn, bool utc)
 /// If the day-of-month is beyond the end of the current month, it wraps into
 /// the first days of the following  month.  This also happens if you set the
 /// day > 31. Example: setting the 35th in January results in Feb 4th.
-
 static as_value
 _date_setdate(const fn_call& fn, bool utc) {
   boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
@@ -909,38 +899,39 @@ _date_setdate(const fn_call& fn, bool utc) {
 /// Only the integer part of millisec is used, truncating it, not rounding it.
 /// The only way to set a fractional number of milliseconds is to use
 /// setTime(n) or call the constructor with one argument.
+static as_value
+_date_sethours(const fn_call& fn, bool utc)
+{
+    boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
 
-static as_value _date_sethours(const fn_call& fn, bool utc) {
-  boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
-
-  // assert(fn.nargs >= 1 && fn.nargs <= 4);
-  if (fn.nargs < 1) {
-      IF_VERBOSE_ASCODING_ERRORS(
-    log_aserror(_("Date.setHours needs one argument"));
-      )
-      date->value = NAN;  // Is what FlashPlayer sets
-  } else if (rogue_date_args(fn, 4) != 0.0) {
-      date->value = NAN;
-  } else {
+    // assert(fn.nargs >= 1 && fn.nargs <= 4);
+    if (fn.nargs < 1) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Date.setHours needs one argument"));
+        )
+        date->value = NAN;  // Is what FlashPlayer sets
+    }
+    else if (rogue_date_args(fn, 4) != 0.0) {
+        date->value = NAN;
+    }
+    else {
       
-      GnashTime gt;
+        GnashTime gt;
 
-      dateToGnashTime(*date, gt, utc);
-      gt.hour = fn.arg(0).to_int();
-      if (fn.nargs >= 2)
-        gt.minute = fn.arg(1).to_int();
-      if (fn.nargs >= 3)
-        gt.second = fn.arg(2).to_int();
-      if (fn.nargs >= 4)
-        gt.millisecond = fn.arg(3).to_int();
-      if (fn.nargs > 4) {
-    IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Date.setHours was called with more than four arguments"));
-    )
-      }
-      gnashTimeToDate(gt, *date, utc);
-  }
-  return as_value(date->value);
+        dateToGnashTime(*date, gt, utc);
+        gt.hour = fn.arg(0).to_int();
+        if (fn.nargs >= 2) gt.minute = fn.arg(1).to_int();
+        if (fn.nargs >= 3) gt.second = fn.arg(2).to_int();
+        if (fn.nargs >= 4) gt.millisecond = fn.arg(3).to_int();
+        if (fn.nargs > 4) {
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror(_("Date.setHours was called with more than four arguments"));
+            )
+        }
+        
+        gnashTimeToDate(gt, *date, utc);
+    }
+    return as_value(date->value);
 }
 
 /// \brief Date.setMinutes(minutes[,secs[,millisecs]])
@@ -989,39 +980,42 @@ _date_setminutes(const fn_call& fn, bool utc)
 ///
 /// Values <0, >59 for secs or >999 for millisecs take the date back to the
 /// previous minute (or hour or calendar day) or on to the following ones.
+static as_value
+_date_setseconds(const fn_call& fn, bool utc)
+{
+    boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
 
-static as_value _date_setseconds(const fn_call& fn, bool utc) {
-  boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
+    // assert(fn.nargs >= 1 && fn.nargs <= 2);
+    if (fn.nargs < 1) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Date.setSeconds needs one argument"));
+        )
+        date->value = NAN;  // Same as commercial player
+    }
+    else if (rogue_date_args(fn, 2) != 0.0) {
+        date->value = NAN;
+    }
+    else {
+        // We *could* set seconds [and milliseconds] without breaking the
+        // structure out and reasembling it. We do it the same way as the
+        // rest for simplicity and in case anyone's date routines ever
+        // take account of leap seconds.
+        GnashTime gt;
 
-  // assert(fn.nargs >= 1 && fn.nargs <= 2);
-  if (fn.nargs < 1) {
-      IF_VERBOSE_ASCODING_ERRORS(
-    log_aserror(_("Date.setSeconds needs one argument"));
-      )
-      date->value = NAN;  // Same as commercial player
-  } else if (rogue_date_args(fn, 2) != 0.0) {
-      date->value = NAN;
-  } else {
-      // We *could* set seconds [and milliseconds] without breaking the
-      // structure out and reasembling it. We do it the same way as the
-      // rest for simplicity and in case anyone's date routines ever
-      // take account of leap seconds.
-      GnashTime gt;
+        dateToGnashTime(*date, gt, utc);
+        gt.second = fn.arg(0).to_int();
+        if (fn.nargs >= 2) gt.millisecond = fn.arg(1).to_int();
+        if (fn.nargs > 2) {
+            IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Date.setMinutes was called with more than three arguments"));
+        )
+        }
 
-      dateToGnashTime(*date, gt, utc);
-      gt.second = fn.arg(0).to_int();
-      if (fn.nargs >= 2)
-        gt.millisecond = fn.arg(1).to_int();
-      if (fn.nargs > 2) {
-    IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Date.setMinutes was called with more than three arguments"));
-    )
-      }
-      // This is both setSeconds and setUTCSeconds.
-      // Use utc to avoid needless worrying about timezones.
-      gnashTimeToDate(gt, *date, utc);
-  }
-  return as_value(date->value);
+        // This is both setSeconds and setUTCSeconds.
+        // Use utc to avoid needless worrying about timezones.
+        gnashTimeToDate(gt, *date, utc);
+    }
+    return as_value(date->value);
 }
 
 static as_value
@@ -1083,9 +1077,9 @@ utc_proto(minutes)
 /// convert a Date to a printable string.
 /// The format is "Thu Jan 1 00:00:00 GMT+0000 1970" and it is displayed in
 /// local time.
-
-static as_value date_tostring(const fn_call& fn) {
-
+static as_value
+date_tostring(const fn_call& fn)
+{
     boost::intrusive_ptr<date_as_object> date = 
                     ensureType<date_as_object>(fn.this_ptr);
     return date->toString();
@@ -1351,6 +1345,8 @@ makeTimeValue(GnashTime& t)
 #endif
 }
 
+
+#if USE_MATHEMATICAL_ALGORITHM
 /// Helper function for getYearMathematical
 static double
 daysSinceUTCForYear(double year)
@@ -1394,6 +1390,7 @@ getYearMathematical(double days)
     return low;
 }
 
+#elif defined (USE_APPROXIMATE_ALGORITHM) // approximate algorithm
 // Another mathematical way of working out the year, which
 // appears to be less reliable than swfdec's way. Adjusts
 // days as well as returning the year.
@@ -1415,6 +1412,8 @@ getYearApproximate(boost::int32_t& days)
     return year;
 }
 
+
+#else
 // The brute force way of converting days into years since the epoch.
 // This also reduces the number of days accurately. Its disadvantage is,
 // of course, that it iterates; its advantage that it's always correct.
@@ -1449,9 +1448,15 @@ getYearBruteForce(boost::int32_t& days)
     }
     return year - 1900;
 }
+#endif // brute force algorithm
 
-void fillGnashTime (double time, GnashTime& gt)
+
+void fillGnashTime(const double& t, GnashTime& gt)
 {
+
+    // Calculate local time by adding offset from UTC in
+    // milliseconds to time value. Offset is in minutes.
+    double time = t + gt.timeZoneOffset * 60000;
 
     gt.millisecond = std::fmod(time, 1000.0);
     time /= 1000.0;
@@ -1480,16 +1485,18 @@ void fillGnashTime (double time, GnashTime& gt)
     if (days >= -4) gt.weekday = (days + 4) % 7;
     else gt.weekday = 6 - (((-5) - days ) % 7);
 
+#ifdef USE_MATHEMATICAL_ALGORITHM
     // approximate way:
-    //gt.year = getYearApproximate(days);
-
+    gt.year = getYearApproximate(days);
+#elif defined(USE_APPROXIMATE_ALGORITHM) // approximate algorithm
     /// swfdec way:
-    //gt.year = getYearMathematical(static_cast<double>(days));
-    //days -= 365 * (gt.year - 1970) + COUNT_LEAP_YEARS(gt.year - 1900);
-    //gt.year -= 1900;
-
-    // brute force way:
+    gt.year = getYearMathematical(static_cast<double>(days));
+    days -= 365 * (gt.year - 1970) + COUNT_LEAP_YEARS(gt.year - 1900);
+    gt.year -= 1900;
+#else
+    // default, brute force:
     gt.year = getYearBruteForce(days);
+#endif
             
     gt.month = 0;
     for (int i = 0; i < 12; ++i)
