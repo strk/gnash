@@ -59,61 +59,60 @@ std::auto_ptr<Gui> Player::_gui(NULL);
 void
 Player::setFlashVars(const std::string& varstr)
 {
-	typedef Gui::VariableMap maptype;
+    typedef Gui::VariableMap maptype;
 
-	maptype vars;
-	URL::parse_querystring(varstr, vars);
+    maptype vars;
+    URL::parse_querystring(varstr, vars);
 
-	_gui->addFlashVars(vars);
-	//si->setVariables(vars);
+    _gui->addFlashVars(vars);
 }
 
 Player::Player()
-	:
+    :
 #if defined(RENDERER_CAIRO)
-	_bitDepth(32),
+    _bitDepth(32),
 #else
-	_bitDepth(16),
+    _bitDepth(16),
 #endif
-	_scale(1.0f),
-	_delay(0),
-	_width(0),
-	_height(0),
-	_windowID(0),
-	_doLoop(true),
-	_doRender(true),
-	_doSound(true),
-	_exitTimeout(0),
-	_movieDef(0),
-	_maxAdvances(0),
+    _scale(1.0f),
+    _delay(0),
+    _width(0),
+    _height(0),
+    _windowID(0),
+    _doLoop(true),
+    _doRender(true),
+    _doSound(true),
+    _exitTimeout(0),
+    _movieDef(0),
+    _maxAdvances(0),
 #ifdef GNASH_FPS_DEBUG
-	_fpsDebugTime(0.0),
+    _fpsDebugTime(0.0),
 #endif
-	_hostfd(-1),
+    _hostfd(-1),
     _startFullscreen(false)
 {
-	init();
+    init();
 }
 
 float
 Player::setScale(float newscale)
 {
-	float oldscale = _scale;
-	_scale = newscale;
-	return oldscale;
+    float oldscale = _scale;
+    _scale = newscale;
+    return oldscale;
 }
 
 void
 Player::init()
 {
-	/// Initialize gnash core library
-	gnashInit();
+    /// Initialize gnash core library
+    gnashInit();
 
-	set_use_cache_files(false);
+    set_use_cache_files(false);
 
-	gnash::registerFSCommandCallback(fs_callback);
-	
-	gnash::movie_root::registerEventCallback(&interfaceEventCallback);
+    gnash::registerFSCommandCallback(fs_callback);
+    
+    gnash::movie_root::registerEventCallback(&interfaceEventCallback);
 
 }
 
@@ -178,88 +177,88 @@ Player::init_sound()
 void
 Player::init_gui()
 {
-	if ( _doRender )
-	{
-		_gui = getGui(); 
+    if ( _doRender )
+    {
+        _gui = getGui(); 
 
-		RcInitFile& rcfile = RcInitFile::getDefaultInstance();
-		if ( rcfile.startStopped() )
-		{
-			_gui->stop();
-		}
+        RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+        if ( rcfile.startStopped() )
+        {
+            _gui->stop();
+        }
 
-	}
-	else
-	{
-		_gui.reset(new NullGui(_doLoop));
-	}
+    }
+    else
+    {
+        _gui.reset(new NullGui(_doLoop));
+    }
 
     _gui->setMaxAdvances(_maxAdvances);
 
 #ifdef GNASH_FPS_DEBUG
-	if ( _fpsDebugTime )
-	{
-		log_debug(_("Activating FPS debugging every %g seconds"), _fpsDebugTime);
-		_gui->setFpsTimerInterval(_fpsDebugTime);
-	}
+    if ( _fpsDebugTime )
+    {
+        log_debug(_("Activating FPS debugging every %g seconds"), _fpsDebugTime);
+        _gui->setFpsTimerInterval(_fpsDebugTime);
+    }
 #endif // def GNASH_FPS_DEBUG
 }
 
 movie_definition* 
 Player::load_movie()
 {
-	gnash::movie_definition* md = NULL;
+    gnash::movie_definition* md = NULL;
 
-	RcInitFile& rcfile = RcInitFile::getDefaultInstance();
-	URL vurl(_url);
-	//cout << "URL is " << vurl.str() << " (" << _url << ")" << endl;
-	if ( vurl.protocol() == "file" )
-	{
-		const std::string& path = vurl.path();
-		size_t lastSlash = path.find_last_of('/');
-		std::string dir = path.substr(0, lastSlash+1);
-		rcfile.addLocalSandboxPath(dir);
-		log_debug(_("%s appended to local sandboxes"), dir.c_str());
-	}
-
-    try {
-	    if ( _infile == "-" )
-	    {
-		    std::auto_ptr<tu_file> in ( noseek_fd_adapter::make_stream(fileno(stdin)) );
-		    md = gnash::create_movie(in, _url, false);
-	    }
-	    else
-	    {
-		    URL url(_infile);
-		    if ( url.protocol() == "file" )
-		    {
-			    std::string path = url.path();
-			    // We'll need to allow load of the file, no matter virtual url
-			    // specified...
-			    // This is kind of hackish, cleaner would be adding an argument
-			    // to create_library_movie to skip the security checking phase.
-			    // NOTE that if we fail to allow this load, the konqueror plugin
-			    // would not be able to load anything
-			    //
-			    rcfile.addLocalSandboxPath(path);
-			    log_debug(_("%s appended to local sandboxes"), path.c_str());
-		    }
-
-		    // _url should be always set at this point...
-		    md = gnash::create_library_movie(url, _url.c_str(), false);
-	    }
-    } catch (const GnashException& er) {
-	    fprintf(stderr, "%s\n", er.what());
-	    md = NULL;
+    RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+    URL vurl(_url);
+    //cout << "URL is " << vurl.str() << " (" << _url << ")" << endl;
+    if ( vurl.protocol() == "file" )
+    {
+        const std::string& path = vurl.path();
+        size_t lastSlash = path.find_last_of('/');
+        std::string dir = path.substr(0, lastSlash+1);
+        rcfile.addLocalSandboxPath(dir);
+        log_debug(_("%s appended to local sandboxes"), dir.c_str());
     }
 
-	if ( ! md )
-	{
-		fprintf(stderr, "Could not load movie '%s'\n", _infile.c_str());
-		return NULL;
-	}
+    try {
+        if ( _infile == "-" )
+        {
+            std::auto_ptr<tu_file> in ( noseek_fd_adapter::make_stream(fileno(stdin)) );
+            md = gnash::create_movie(in, _url, false);
+        }
+        else
+        {
+            URL url(_infile);
+            if ( url.protocol() == "file" )
+            {
+                std::string path = url.path();
+                // We'll need to allow load of the file, no matter virtual url
+                // specified...
+                // This is kind of hackish, cleaner would be adding an argument
+                // to create_library_movie to skip the security checking phase.
+                // NOTE that if we fail to allow this load, the konqueror plugin
+                // would not be able to load anything
+                //
+                rcfile.addLocalSandboxPath(path);
+                log_debug(_("%s appended to local sandboxes"), path.c_str());
+            }
 
-	return md;
+            // _url should be always set at this point...
+            md = gnash::create_library_movie(url, _url.c_str(), false);
+        }
+    } catch (const GnashException& er) {
+        fprintf(stderr, "%s\n", er.what());
+        md = NULL;
+    }
+
+    if ( ! md )
+    {
+        fprintf(stderr, "Could not load movie '%s'\n", _infile.c_str());
+        return NULL;
+    }
+
+    return md;
 }
 
 /* \brief Run, used to open a new flash file. Using previous initialization */
@@ -267,77 +266,73 @@ int
 Player::run(int argc, char* argv[], const std::string& infile, const std::string& url)
 {
     
-	// Call this at run() time, so the caller has
-	// a cache of setting some parameter before calling us...
-	// (example: setDoSound(), setWindowId() etc.. ) 
-	init_logfile();
-	init_sound();
-	init_gui();
+    // Call this at run() time, so the caller has
+    // a cache of setting some parameter before calling us...
+    // (example: setDoSound(), setWindowId() etc.. ) 
+    init_logfile();
+    init_sound();
+    init_gui();
    
-	// gnash.cpp should check that a filename is supplied.
-	assert (!infile.empty());
+    // gnash.cpp should check that a filename is supplied.
+    assert (!infile.empty());
 
-	_infile = infile;
+    _infile = infile;
 
-	// Set base url
-	if ( _baseurl.empty() )
-	{
-		if (! url.empty() ) _baseurl = url;
-		else if ( infile == "-" ) _baseurl = URL("./").str();
-		else _baseurl = infile;
-	}
+    // Set base url
+    if ( _baseurl.empty() )
+    {
+        if (! url.empty() ) _baseurl = url;
+        else if ( infile == "-" ) _baseurl = URL("./").str();
+        else _baseurl = infile;
+    }
 
-	// Set _root._url (either explicit of from infile)
-	if (! url.empty() ) {
-		_url = url;
-	}  else {
-		_url = infile;
-	}
+    // Set _root._url (either explicit of from infile)
+    if (! url.empty() ) {
+        _url = url;
+    }  else {
+        _url = infile;
+    }
 
 
-	// Initialize gui (we need argc/argv for this)
-	// note that this will also initialize the renderer
-	// which is *required* during movie loading
-	if ( ! _gui->init(argc, &argv) )
-	{
-    		std::cerr << "Could not initialize gui." << std::endl;
-		return EXIT_FAILURE;
-	}
+    // Initialize gui (we need argc/argv for this)
+    // note that this will also initialize the renderer
+    // which is *required* during movie loading
+    if ( ! _gui->init(argc, &argv) )
+    {
+            std::cerr << "Could not initialize gui." << std::endl;
+        return EXIT_FAILURE;
+    }
 
-    	// Parse querystring (before FlashVars, see testsuite/misc-ming.all/FlashVarsTest*)
-	setFlashVars(URL(_url).querystring());
+        // Parse querystring (before FlashVars, see testsuite/misc-ming.all/FlashVarsTest*)
+    setFlashVars(URL(_url).querystring());
 
-	// Parse parameters
-	StringNoCaseEqual noCaseCompare;
-	for ( map<string,string>::const_iterator it=params.begin(),
-		itEnd=params.end(); it != itEnd; ++it)
-	{
-		if ( noCaseCompare(it->first, "flashvars") )
-		{
-			setFlashVars(it->second);
-			continue;
-		}
+    // Parse parameters
+    StringNoCaseEqual noCaseCompare;
+    for ( map<string,string>::const_iterator it=params.begin(),
+        itEnd=params.end(); it != itEnd; ++it)
+    {
+        if ( noCaseCompare(it->first, "flashvars") )
+        {
+            setFlashVars(it->second);
+            continue;
+        }
 
-	    	if ( noCaseCompare(it->first, "base") )
-		{
-			setBaseUrl(it->second);
-			continue;
-		}
+            if ( noCaseCompare(it->first, "base") )
+        {
+            setBaseUrl(it->second);
+            continue;
+        }
+    }
 
-		// too much noise...
-		//log_debug(_("Unused parameter %s = %s"),
-		//	it->first.c_str(), it->second.c_str());
-	}
+    // Set base url for this movie (needed before parsing)
+    gnash::set_base_url(URL(_baseurl));
 
-	// Set base url for this movie (needed before parsing)
-	gnash::set_base_url(URL(_baseurl));
-
-	// Load the actual movie.
-	_movieDef = load_movie();
-	if ( ! _movieDef )
-	{
-		return EXIT_FAILURE;
-	}
+    // Load the actual movie.
+    _movieDef = load_movie();
+    if ( ! _movieDef )
+    {
+        return EXIT_FAILURE;
+    }
 
 
     // Get info about the width & height of the movie.
@@ -356,8 +351,8 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     {
         log_debug(_("Input movie has collapsed dimensions " SIZET_FMT "/"
                 SIZET_FMT ". Setting to 1/1 and going on."), _width, _height);
-	    if ( ! _width ) _width = 1;
-	    if ( ! _height ) _height = 1;
+        if ( ! _width ) _width = 1;
+        if ( ! _height ) _height = 1;
     }
 
     // Now that we know about movie size, create gui window.
@@ -399,134 +394,149 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
 }
 
 // static private
-// For handling notification callbacks from ActionScript.
+// For handling notification callbacks from ActionScript. The callback is
+// always sent to a hosting application (i.e. if a file descriptor is
+// supplied). It is never acted on by Gnash when running as a plugin.
 void
 Player::fs_callback(gnash::sprite_instance* movie, const std::string& command,
-								const std::string& args)
+                                const std::string& args)
 {
-	log_debug(_("fs_callback(%p): %s %s"), (void*)movie, command, args);
+    log_debug(_("fs_callback(%p): %s %s"), (void*)movie, command, args);
 
-	gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+    gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 
-	int hostfd = VM::get().getRoot().getHostFD(); // it's _hostfd, but we're a static method...
-	if ( hostfd != -1 )
-	{
-		//log_debug("user-provided host requests fd is %d", hostfd);
-		std::stringstream request;
-		request << "INVOKE " << command << ":" << args << endl;
+    // it's _hostfd, but we're a static method...
+    int hostfd = VM::get().getRoot().getHostFD();
+    if ( hostfd != -1 )
+    {
+        //log_debug("user-provided host requests fd is %d", hostfd);
+        std::stringstream request;
+        request << "INVOKE " << command << ":" << args << endl;
 
-		string requestString = request.str();
-		const char* cmd = requestString.c_str();
-		size_t len = requestString.length();
-		// TODO: should mutex-protect this ?
-		// NOTE: we assuming the hostfd is set in blocking mode here..
-		//log_debug("Attempt to write INVOKE requests fd %d", hostfd);
-		int ret = write(hostfd, cmd, len);
-		if ( ret == -1 )
-		{
-			log_error("Could not write to user-provided host requests fd %d: %s", hostfd, strerror(errno));
-		}
-		if ( (size_t)ret < len )
-		{
-			log_error("Could only write %d bytes over "SIZET_FMT" required to user-provided host requests fd %d",
-				ret, len, hostfd);
-		}
-		requestString.resize(requestString.size()-1); // for sake of clean logging, should always end with newline
-		log_debug(_("Sent request '%s' to host fd %d"), requestString, hostfd);
-	}
+        string requestString = request.str();
+        const char* cmd = requestString.c_str();
+        size_t len = requestString.length();
+        // TODO: should mutex-protect this ?
+        // NOTE: we assuming the hostfd is set in blocking mode here..
+        //log_debug("Attempt to write INVOKE requests fd %d", hostfd);
+        int ret = write(hostfd, cmd, len);
+        if ( ret == -1 )
+        {
+            log_error("Could not write to user-provided host "
+                      "requests fd %d: %s", hostfd, strerror(errno));
+        }
+        if ( static_cast<size_t>(ret) < len )
+        {
+            log_error("Could only write %d bytes over %d required to "
+                      "user-provided host requests fd %d",
+                      ret, len, hostfd);
+        }
 
-	/// Fscommands can be ignored using an rcfile setting. As a 
-	/// plugin they are always ignored.
-	if (_gui->isPlugin())
-	{
-		log_debug(_("Running as plugin: skipping internal handling of fscommand %s%s."),
-			command,
-			(hostfd != -1) ? _(" (but INVOKE request was still sent to host application)")
-			               : _(" (and no host fd given)"));
-		return;
-	}
-	
-	if (rcfile.ignoreFSCommand()) return;
+        // Remove the newline for logging
+        requestString.resize(requestString.size() - 1);
+        log_debug(_("Sent FsCommand '%s' to host fd %d"),
+                    requestString, hostfd);
+    }
 
-	StringNoCaseEqual noCaseCompare;
+    /// Fscommands can be ignored using an rcfile setting. As a 
+    /// plugin they are always ignored.
+    if (_gui->isPlugin())
+    {
+        // We log the request to the fd above
+        log_debug(_("Running as plugin: skipping internal "
+                    "handling of FsCommand %s%s."));
+        return;
+    }
+    
+    // This only disables fscommands for the standalone player. In the
+    // plugin or a hosting application, the fscommands are always passed
+    // on; the hosting application should decide what to do with them.
+    // (Or do we want to allow disabling all external communication?) 
+    if (rcfile.ignoreFSCommand()) return;
 
+    StringNoCaseEqual noCaseCompare;
+
+    // There are six defined FsCommands handled by the standalone player:
+    // quit, fullscreen, showmenu, exec, allowscale, and trapallkeys.
+    
     // FSCommand quit
-   	if (noCaseCompare(command, "quit"))
-   	{
-   		_gui->quit();
-   		return;
-   	}
+    if (noCaseCompare(command, "quit"))
+    {
+        _gui->quit();
+        return;
+    }
 
     // FSCommand fullscreen
-   	if (noCaseCompare(command, "fullscreen"))
-   	{
-   		if (noCaseCompare(args, "true")) _gui->setFullscreen();
-   		else if (noCaseCompare(args, "false")) _gui->unsetFullscreen();
-   		return;
-   	}
-   	
-   	// FSCommand showmenu
-   	if (noCaseCompare(command, "showmenu"))
-   	{
-   		if (noCaseCompare(args, "true")) _gui->showMenu(true);
-   		else if (noCaseCompare(args, "false")) _gui->showMenu(false);
-   		return;
-   	}
-
-   	// FSCommand exec
-   	// Note: the pp insists that the file to execute should be in 
-   	// a subdirectory 'fscommand' of the 'projector' executable's
-   	// location.
-   	// In SWF5 there were no restrictions.
-   	if (noCaseCompare(command, "exec"))
-   	{
-        log_unimpl(_("FScommand exec called with argument %s"), args);
+    if (noCaseCompare(command, "fullscreen"))
+    {
+        if (noCaseCompare(args, "true")) _gui->setFullscreen();
+        else if (noCaseCompare(args, "false")) _gui->unsetFullscreen();
         return;
-   	}
+    }
+       
+    // FSCommand showmenu
+    if (noCaseCompare(command, "showmenu"))
+    {
+        if (noCaseCompare(args, "true")) _gui->showMenu(true);
+        else if (noCaseCompare(args, "false")) _gui->showMenu(false);
+        return;
+    }
 
-   	// FSCommand allowscale
-   	if (noCaseCompare(command, "allowscale"))
-   	{
-        log_unimpl(_("FScommand allowscale called with argument %s"), args);
-   		return;
-   	}
+    // FSCommand exec
+    // Note: the pp insists that the file to execute should be in 
+    // a subdirectory 'fscommand' of the 'projector' executable's
+    // location. In SWF5 there were no restrictions.
+    if (noCaseCompare(command, "exec"))
+    {
+        log_unimpl(_("FsCommand exec called with argument %s"), args);
+        return;
+    }
 
-   	// FSCommand trapallkeys
-   	if (noCaseCompare(command, "trapallkeys"))
-   	{
-        log_unimpl(_("FScommand trapallkeys called with argument %s"), args);
-   		return;
-   	}
-   	
-	log_debug(_("FSCommand '%s(%s)' not handled by the standalone player (might have been by the hosting app)"),
-		command, args);
+    // FSCommand allowscale
+    if (noCaseCompare(command, "allowscale"))
+    {
+        log_unimpl(_("FsCommand allowscale called with argument %s"), args);
+        return;
+    }
+
+    // FSCommand trapallkeys
+    if (noCaseCompare(command, "trapallkeys"))
+    {
+        log_unimpl(_("FsCommand trapallkeys called with argument %s"), args);
+        return;
+    }
+       
+    // The plugin never reaches this point; anything sent to the fd has
+    // been logged already.
+    log_debug(_("FsCommand '%s(%s)' not handled internally"),
+            command, args);
 
 }
 
 std::string
 Player::interfaceEventCallback(const std::string& event, const std::string& arg)
 {
-	if (event == "Mouse.hide")
-	{
-		_gui->showMouse(false);
-		return "";
-	}
+    if (event == "Mouse.hide")
+    {
+        _gui->showMouse(false);
+        return "";
+    }
 
-	if (event == "Mouse.show")
-	{
-		_gui->showMouse(true);
-		return "";
-	}
-	
-	if (event == "Stage.displayState")
-	{
-	    if (arg == "fullScreen") _gui->setFullscreen();
-	    else if (arg == "normal") _gui->unsetFullscreen();
-		return "";
-	}
-	
-	log_error(_("Unhandled callback %s with arguments %s"), event, arg);
-	return "";
+    if (event == "Mouse.show")
+    {
+        _gui->showMouse(true);
+        return "";
+    }
+    
+    if (event == "Stage.displayState")
+    {
+        if (arg == "fullScreen") _gui->setFullscreen();
+        else if (arg == "normal") _gui->unsetFullscreen();
+        return "";
+    }
+    
+    log_error(_("Unhandled callback %s with arguments %s"), event, arg);
+    return "";
 }
 
 // private
@@ -534,33 +544,33 @@ std::auto_ptr<Gui>
 Player::getGui()
 {
 #ifdef GUI_GTK
-	return createGTKGui(_windowID, _scale, _doLoop, _bitDepth);
+    return createGTKGui(_windowID, _scale, _doLoop, _bitDepth);
 #endif
 
 #ifdef GUI_KDE
-	return createKDEGui(_windowID, _scale, _doLoop, _bitDepth);
+    return createKDEGui(_windowID, _scale, _doLoop, _bitDepth);
 #endif
 
 #ifdef GUI_SDL
-	return createSDLGui(_windowID, _scale, _doLoop, _bitDepth);
+    return createSDLGui(_windowID, _scale, _doLoop, _bitDepth);
 #endif
 
 #ifdef GUI_AQUA
-	return createAQUAGui(_windowID, _scale, _doLoop, _bitDepth);
+    return createAQUAGui(_windowID, _scale, _doLoop, _bitDepth);
 #endif
 
 #ifdef GUI_RISCOS
-	return createRISCOSGui(_windowID, _scale, _doLoop, _bitDepth);
+    return createRISCOSGui(_windowID, _scale, _doLoop, _bitDepth);
 #endif
 
 #ifdef GUI_FLTK
-	return createFLTKGui(_windowID, _scale, _doLoop, _bitDepth);
+    return createFLTKGui(_windowID, _scale, _doLoop, _bitDepth);
 #endif
 
 #ifdef GUI_FB
-	return createFBGui(_windowID, _scale, _doLoop, _bitDepth);
+    return createFBGui(_windowID, _scale, _doLoop, _bitDepth);
 #endif
 
-	return std::auto_ptr<Gui>(new NullGui(_doLoop));
+    return std::auto_ptr<Gui>(new NullGui(_doLoop));
 }
 
