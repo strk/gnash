@@ -1,5 +1,14 @@
 2008-04-04 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.{cpp,h}: add initial support for
+	  property modify/create triggers (watches).
+	* server/asobj/Object.cpp: implement Object.watch/unwatch.
+	* testsuite/actionscript.all/Object.as: watch/unwatch successes
+	  (not complete yet).
+	* testsuite/swfdec/PASSING: object-watch-segv-*.swf all pass now.
+
+2008-04-04 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Object.as: add test for "underlying
 	  value" for getter-setter, add tests for watch/unwatch.
 

@@ -65,7 +65,7 @@ attachObjectInterface(as_object& o)
 
 	// Then will attach to the prototype based on version
 
-	int target_version = vm.getSWFVersion();
+	//int target_version = vm.getSWFVersion();
 
 	// Object.valueOf()
 	o.init_member("valueOf", vm.getNative(101, 3));
@@ -428,25 +428,65 @@ object_isPrototypeOf(const fn_call& fn)
 }
 
 as_value
-object_watch(const fn_call&)
+object_watch(const fn_call& fn)
 {
-	static bool warned = false;
-	if ( ! warned ) {
-		log_unimpl (__FUNCTION__);
-		warned=true;
+	as_object* obj = fn.this_ptr.get();
+
+	if ( fn.nargs < 2 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss; fn.dump_args(ss);
+		log_aserror(_("Object.watch(%s): missing arguments"));
+		);
+		return as_value(false);
 	}
-	return as_value();
+
+	as_value& propval = fn.arg(0);
+	as_value& funcval = fn.arg(1);
+
+	if ( ! funcval.is_function() )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss; fn.dump_args(ss);
+		log_aserror(_("Object.watch(%s): second argument is not a function"));
+		);
+		return as_value(false);
+	}
+
+	VM& vm = obj->getVM();
+	string_table& st = vm.getStringTable();
+
+	std::string propname = propval.to_string();
+	string_table::key propkey = st.find(propname);
+	as_function* trig = funcval.to_as_function();
+	as_value cust; if ( fn.nargs > 2 ) cust = fn.arg(2);
+
+	return as_value(obj->watch(propkey, *trig, cust));
 }
 
 as_value
-object_unwatch(const fn_call&)
+object_unwatch(const fn_call& fn)
 {
-	static bool warned = false;
-	if ( ! warned ) {
-		log_unimpl (__FUNCTION__);
-		warned=true;
+	as_object* obj = fn.this_ptr.get();
+
+	if ( fn.nargs < 1 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss; fn.dump_args(ss);
+		log_aserror(_("Object.unwatch(%s): missing argument"));
+		);
+		return as_value(false);
 	}
-	return as_value();
+
+	as_value& propval = fn.arg(0);
+
+	VM& vm = obj->getVM();
+	string_table& st = vm.getStringTable();
+
+	std::string propname = propval.to_string();
+	string_table::key propkey = st.find(propname);
+
+	return as_value(obj->unwatch(propkey));
 }
 
 as_value

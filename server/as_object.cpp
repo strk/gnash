@@ -159,7 +159,12 @@ as_object::add_property(const std::string& name, as_function& getter,
 		as_function* setter)
 {
 	string_table &st = _vm.getStringTable();
-	return _members.addGetterSetter(st.find(PROPNAME(name)), getter, setter);
+	string_table::key k = st.find(name);
+
+	// TODO: if the named property already exist, store it's value
+	//       into the getter-setter as "underlying value"
+
+	return _members.addGetterSetter(k, getter, setter);
 }
 
 bool
@@ -492,6 +497,7 @@ as_object::set_prototype(boost::intrusive_ptr<as_object> proto, int flags)
 	static string_table::key key = NSV::PROP_uuPROTOuu;
 
 	// TODO: check what happens if __proto__ is set as a user-defined getter/setter
+	// TODO: check triggers !!
 	_members.setValue(key, as_value(proto.get()), *this, 0, flags);
 }
 
@@ -521,7 +527,37 @@ as_object::set_member_default(string_table::key key, const as_value& val,
 
 		try
 		{
-			prop->setValue(*this, val);
+			// check if we have a trigger, if so, invoke it
+			// and set val to it's return
+			TriggerContainer::iterator trigIter = _trigs.find(std::make_pair(key, nsname));
+			if ( trigIter != _trigs.end() )
+			{
+				Trigger& trig = trigIter->second;
+
+				// WARNING: getValue might itself invoke a trigger
+				// (getter-setter)... ouch ?
+				// TODO: in this case, return the underlying value !
+				as_value curVal = prop->getValue(*this); 
+
+				log_debug("Property %s is being watched, current val: %s", _vm.getStringTable().value(key), curVal.to_debug_string());
+				as_value newVal = trig.call(curVal, val, *this);
+				// The trigger call could have deleted the property,
+				// so we check for its existance again, and do NOT put
+				// it back in if it was deleted
+				prop = findUpdatableProperty(key, nsname);
+				if ( ! prop )
+				{
+					log_debug("Property %s deleted by trigger on update", _vm.getStringTable().value(key));
+					return;
+				}
+				prop->setValue(*this, newVal);
+			}
+			else
+			{
+				// log_debug("No trigger for key %d ns %d", key, nsname);
+				prop->setValue(*this, val);
+			}
+
 			prop->clearVisible(_vm.getSWFVersion());
 			return;
 		}
@@ -543,7 +579,36 @@ as_object::set_member_default(string_table::key key, const as_value& val,
 			log_aserror(_("Unknown failure in setting property '%s' on "
 			"object '%p'"), _vm.getStringTable().value(key).c_str(),
 			(void*) this););
+		return;
 	}
+
+	// Now check if we have a trigger, if so, invoke it
+	// and reset val to it's return
+	// NOTE that we do this *after* setting it in first place 
+	// as the trigger seems allowed to delete the property again
+	TriggerContainer::iterator trigIter = _trigs.find(std::make_pair(key, nsname));
+	if ( trigIter != _trigs.end() )
+	{
+		Trigger& trig = trigIter->second;
+
+		log_debug("Property %s is being watched, calling trigger on create", _vm.getStringTable().value(key));
+
+		// NOTE: the trigger call might delete the propery being added
+		//       so we first add the property, then call the trigger
+		//       and finally check if the property still exists (ufff...)
+		//
+
+		as_value curVal; // undefined, didn't exist...
+		as_value newVal = trig.call(curVal, val, *this);
+		Property* prop = _members.getProperty(key);
+		if ( ! prop )
+		{
+			log_debug("Property %s deleted by trigger on create", _vm.getStringTable().value(key));
+			return;
+		}
+		prop->setValue(*this, newVal);
+	}
+
 }
 
 std::pair<bool,bool>
@@ -566,7 +631,29 @@ as_object::update_member(string_table::key key, const as_value& val,
 
 		try
 		{
-			prop->setValue(*this, val);
+			as_value newVal = val;
+
+			// check if we have a trigger, if so, invoke it
+			// and set val to it's return
+			TriggerContainer::iterator trigIter = _trigs.find(std::make_pair(key, nsname));
+			if ( trigIter != _trigs.end() )
+			{
+				Trigger& trig = trigIter->second;
+				// WARNING: getValue might itself invoke a trigger (getter-setter)... ouch ?
+				as_value curVal = prop->getValue(*this); 
+				log_debug("Property %s is being watched, current val: %s", _vm.getStringTable().value(key), curVal.to_debug_string());
+				newVal = trig.call(curVal, val, *this);
+				// The trigger call could have deleted the property,
+				// so we check for its existance again, and do NOT put
+				// it back in if it was deleted
+				prop = findUpdatableProperty(key, nsname);
+				if ( ! prop )
+				{
+					return std::make_pair(true, true);
+				}
+			}
+
+			prop->setValue(*this, newVal);
 			return std::make_pair(true, true);
 		}
 		catch (ActionException& exc)
@@ -1256,6 +1343,92 @@ as_object::getURLEncodedVars(std::string& data)
     }
     
 }
+
+bool
+as_object::watch(string_table::key key, as_function& trig,
+		const as_value& cust, string_table::key ns)
+{
+	
+	FQkey k = std::make_pair(key, ns);
+	std::string propname = VM::get().getStringTable().value(key);
+
+	TriggerContainer::iterator it = _trigs.find(k);
+	if ( it == _trigs.end() )
+	{
+		return _trigs.insert(std::make_pair(k, Trigger(propname, trig, cust))).second;
+	}
+	it->second = Trigger(propname, trig, cust);
+	return true;
+}
+
+bool
+as_object::unwatch(string_table::key key, string_table::key ns)
+{
+	TriggerContainer::iterator trigIter = _trigs.find(std::make_pair(key, ns));
+	if ( trigIter == _trigs.end() ) return false;
+	_trigs.erase(trigIter);
+	return true;
+}
+
+#ifdef GNASH_USE_GC
+void
+as_object::markAsObjectReachable() const
+{
+	_members.setReachable();
+
+	for (TriggerContainer::const_iterator it = _trigs.begin();
+			it != _trigs.end(); ++it)
+	{
+		it->second.setReachable();
+	}
+}
+#endif // GNASH_USE_GC
+
+void
+Trigger::setReachable() const
+{
+	_func->setReachable();
+	_customArg.setReachable();
+}
+
+as_value
+Trigger::call(const as_value& oldval, const as_value& newval, as_object& this_obj)
+{
+	if ( _executing ) return newval;
+
+	_executing = true;
+
+	try {
+		as_environment env;
+
+#ifndef NDEBUG
+		size_t origStackSize = env.stack_size();
+#endif
+
+		env.push(_customArg);
+		env.push(newval);
+		env.push(oldval);
+		env.push(_propname);
+		fn_call fn(const_cast<as_object*>(&this_obj), &env, 4, env.stack_size()-1);
+		as_value ret = _func->call(fn);
+		env.drop(4);
+
+#ifndef NDEBUG
+		assert(origStackSize == env.stack_size());
+#endif
+
+		_executing = false;
+
+		return ret;
+
+	}
+	catch (...)
+	{
+		_executing = false;
+		throw;
+	}
+}
+
 
 
 } // end of gnash namespace

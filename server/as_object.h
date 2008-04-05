@@ -58,6 +58,56 @@ namespace gnash {
 class asClass;
 class asName;
 
+/// A trigger that can be associated with a property name
+class Trigger
+{
+	/// Name of the property
+	//
+	/// By storing a string_table::key we'd save CPU cycles
+	/// while adding/removing triggers and some memory
+	/// on each trigger, but at the cost of looking up
+	/// the string_table on every invocation of the watch...
+	///
+	std::string _propname;
+
+	/// The trigger function 
+	as_function* _func;
+
+	/// A custom argument to pass to the trigger
+	/// after old and new value.
+	as_value _customArg;
+
+	/// Flag to protect from infinite loops
+	bool _executing;
+
+public:
+
+	Trigger(const std::string& propname, as_function& trig, const as_value& customArg)
+		:
+		_propname(propname),
+		_func(&trig),
+		_customArg(customArg),
+		_executing(false)
+	{}
+
+	/// Call the trigger
+	//
+	/// @param oldval
+	///	Old value being modified
+	///
+	/// @param newval
+	///	New value requested
+	/// 
+	/// @param this_obj
+	/// 	Object of which the property is being changed
+	///
+	as_value call(const as_value& oldval, const as_value& newval, as_object& this_obj);
+
+	void setReachable() const;
+
+};
+
+
 /// \brief
 /// A generic bag of attributes. Base class for all ActionScript-able objects.
 //
@@ -221,7 +271,7 @@ public:
 
 	/// Update an existing member value
 	//
-	/// NOTE that getter-setter in the inheritance chaing are
+	/// NOTE that getter-setter in the inheritance chain are
 	/// considered as existing members. See with.as and Object.as
 	/// testcases under actionscript.all.
 	/// Also be aware that 'special' (non-proper) properties
@@ -237,7 +287,7 @@ public:
 	/// @param nsname
 	///	Id of the namespace.
 	///
-	/// @return a pair in which first element express wheter the property01apl0mb
+	/// @return a pair in which first element express wheter the property
 	///         was found and the second wheter it was set (won't set if read-only).
 	///
 	std::pair<bool,bool> update_member(string_table::key key, const as_value& val,
@@ -494,6 +544,43 @@ public:
 	void init_readonly_property(const std::string& key, as_c_function_ptr getter,
 			int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
 			string_table::key nsname = 0);
+
+	/// \brief
+	/// Add a watch trigger, overriding any other defined for same name.
+	//
+	/// @param key
+	///	property name (key)
+	///
+	/// @param ns
+	///	property namespace.
+	///
+	/// @param trig
+	///	A function to invoke when this property value is assigned to.
+	///	The function will be called with old val, new val and the custom
+	///	value below. It's return code will be used to set actual value
+	///
+	/// @param cust
+	///	Custom value to always pass to the trigger as third arg
+	///
+	/// @return true if the trigger was successfully added, false
+	///         otherwise (error? should always be possible to add...)
+	///
+	bool watch(string_table::key key, as_function& trig,
+		const as_value& cust, string_table::key ns = 0);
+
+	/// \brief
+	/// Remove a watch trigger.
+	//
+	/// @param key
+	///	property name (key)
+	///
+	/// @param ns
+	///	property namespace.
+	///
+	/// @return true if the trigger was successfully removed, false
+	///         otherwise (no such trigger...)
+	///
+	bool unwatch(string_table::key key, string_table::key ns = 0);
 
 	/// Get a member as_value by name
 	//
@@ -997,12 +1084,8 @@ protected:
 		markAsObjectReachable();
 	}
 
-	/// Mark properties and __proto__ as reachable (for the GC)
-	void markAsObjectReachable() const
-	{
-		_members.setReachable();
-		//if ( m_prototype.get() ) m_prototype->setReachable();
-	}
+	/// Mark properties and triggers list as reachable (for the GC)
+	void markAsObjectReachable() const;
 #endif // GNASH_USE_GC
 
 	/// The Virtual Machine used to create this object
@@ -1017,6 +1100,10 @@ private:
 	/// Reference to this object's '__proto__'
 	//boost::intrusive_ptr<as_object> m_prototype;
 
+
+	typedef std::pair< string_table::key, string_table::key > FQkey;
+	typedef std::map< FQkey, Trigger > TriggerContainer;
+	TriggerContainer _trigs;
 };
 
 /// Template which does a dynamic cast for as_object pointers. It throws an
