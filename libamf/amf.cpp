@@ -66,14 +66,7 @@ const char *amftype_str[] = {
 };
 
 AMF::AMF() 
-#if 0
-      _amf_index(0),
-      _header_size(0),
-      _total_size(0),
-      _packet_size(0),
-      _amf_data(0),
-      _seekptr(0),
-#endif
+    : _totalsize(0)
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -738,10 +731,10 @@ AMF::extractElementLength(void *in)
     
     switch (type) {
       case Element::NUMBER:              // a 64 bit numeric value
-          return 8;
+          return AMF_NUMBER_SIZE;
           break;
       case Element::BOOLEAN:             // a single byte
-          return 1;
+          return sizeof(bool);
           break;
       case Element::STRING:              // the length is a 2 byte value
 		//FIXME, there are all kinds of byte order problems in this code.
@@ -1133,22 +1126,6 @@ AMF::encodeVariable(amf::Element *el)
 //     return out;
 // }
 
-// Network::byte_t *
-// AMF::addPacketData(Network::byte_t *data, int bytes)
-// {
-// //    GNASH_REPORT_FUNCTION;
-//     memcpy(_seekptr, data, bytes);
-//     _seekptr+=bytes;
-//     return _seekptr;
-// }
-
-// int
-// AMF::parseBody()
-// {
-// //    GNASH_REPORT_FUNCTION;
-
-// //    return parseBody(_amf_data, _total_size);
-// }
 // #endif
 
 Element *
@@ -1164,23 +1141,21 @@ AMF::extractAMF(Network::byte_t *in)
         log_error(_("AMF body input data is NULL"));
         return 0;
     }
-//     if (reinterpret_cast<int>(el) == 0)) {
-//         log_error(_("Got NULL instead of amf_element_t!"));
-//         return 0;
-//     }
 
     tmpptr = in;
     
-// All elements look like this:
-// the first two bytes is the length of name of the element
-// Then the next bytes are the element name
-// After the element name there is a type byte. If it's a Number type, then 8 bytes are read
-// If it's a String type, then there is a count of characters, then the string value    
+    // All elements look like this:
+    // the first two bytes is the length of name of the element
+    // Then the next bytes are the element name
+    // After the element name there is a type byte. If it's a Number type, then
+    // 8 bytes are read If it's a String type, then there is a count of
+    // characters, then the string value    
     
     // Check the type of the element data
     Element::amf_type_e type = *(Element::amf_type_e *)tmpptr;
     tmpptr++;                        // skip the header byte
-    
+
+    AMF amf_obj;
     switch (type) {
       case Element::NUMBER:
 	  el->makeNumber(tmpptr);
@@ -1206,8 +1181,8 @@ AMF::extractAMF(Network::byte_t *in)
 	  break;
       case Element::OBJECT:
 	  do {
-	      el = extractVariable(tmpptr);
-	      tmpptr += el->totalsize();
+	      el = amf_obj.extractVariable(tmpptr);
+	      tmpptr += amf_obj.totalsize();
 	  } while (el->getType() != Element::OBJECT_END);
 	  break;
       case Element::MOVIECLIP:
@@ -1239,41 +1214,44 @@ AMF::extractVariable(Network::byte_t *in)
     boost::uint16_t length;
 
     Network::byte_t *tmpptr = in;
-    length = *(reinterpret_cast<boost::uint16_t *>(in));
-    tmpptr += sizeof(boost::uint16_t);
+//    std::copy(in, in + sizeof(boost::uint16_t), &length);
+    length = *reinterpret_cast<boost::uint16_t *>(in);
     swapBytes(&length, sizeof(boost::uint16_t));
-    
+    tmpptr += sizeof(boost::uint16_t);    
     if (length <= 0) {
 	if (*(in+2) == Element::OBJECT_END) {
 	    log_debug(_("End of Object definition"));
             el->setType(Element::OBJECT_END);
             return el;
         }
+	delete el;
 	return 0;
     }    
     // get the name of the element, the length of which we just decoded
     if (length > 0) {
         log_debug(_("AMF element length is: %d"), length);
         el->setName(tmpptr, length);
-//	el->setName("fixme");
-	tmpptr += length;
 	log_debug(_("AMF element name is: %s"), el->getName());
+	tmpptr += length;
     }
     
-    // get the type of the element, which is a single byte
-    Element::amf_type_e type = (Element::amf_type_e)(*(tmpptr) & 0xff);
+    // get the type of the element, which is a single byte.
+    char c = *(reinterpret_cast<char *>(tmpptr));
+    Element::amf_type_e type = static_cast<Element::amf_type_e>(c);
     tmpptr++;
-    if (type <= Element::TYPED_OBJECT) {
+    if (type != Element::TYPED_OBJECT) {
         log_debug(_("AMF type is: %s"), amftype_str[(int)type]);
 	el->setType(type);
     }
-    
+
     switch (type) {
-      case Element::NUMBER: {
-          swapBytes(tmpptr, AMF_NUMBER_SIZE);
-	  el->makeNumber(tmpptr);
+      case Element::NUMBER: 
+      {
+	  double num = *reinterpret_cast<const double*>(tmpptr);
+          swapBytes(&num, AMF_NUMBER_SIZE);
+	  el->makeNumber(num);
           tmpptr += AMF_NUMBER_SIZE;
-          break;
+	  break;
       }
       case Element::BOOLEAN:
       {
@@ -1281,21 +1259,28 @@ AMF::extractVariable(Network::byte_t *in)
           el->makeBoolean(sheet);
 	  tmpptr += 1;
 	  break;
-    }
+      }
       case Element::STRING:
-	  // extractString returns a printable char *
-	      length = ntohs((*(const boost::uint16_t *)tmpptr) & 0xffff);
-          tmpptr += sizeof(boost::uint16_t);
-	  el->makeString(tmpptr, length);
-// 	  string v(reinterpret_cast<const char *>(str) + 3, (int)length);
-// 	  log_debug(_("Variable \"%s\" is: %s"), el->getName().c_str(), v.c_str());
-          tmpptr += length;
+	  // extractString returns a printable char *. First 2 bytes for the length,
+	  // and then read the string, which is NOT NULL terminated.
+	  length = *reinterpret_cast<boost::uint16_t *>(tmpptr);
+	  swapBytes(&length, sizeof(boost::uint16_t));
+	  tmpptr += sizeof(boost::uint16_t);
+	  if (length > 0) {
+	      el->makeString(tmpptr, length);
+	      tmpptr += length;
+	  }
+	  if (length == 0) {
+	      el->makeNullString();
+//	      tmpptr++;
+	  }
+//  	  string v(reinterpret_cast<const char *>(tmpptr) + 3, (int)length);
+  	  log_debug(_("Variable \"%s\" is: %s"), el->getName(), el->to_string());
           break;
       case Element::OBJECT:
   	  while (*(tmpptr++) != Element::OBJECT_END) {
 	      log_debug("Look for end of object...");
   	  }
-	  
 	  break;
       case Element::MOVIECLIP:
       case Element::NULL_VALUE:
@@ -1324,8 +1309,13 @@ AMF::extractVariable(Network::byte_t *in)
       case Element::XML_OBJECT:
       default:
           log_unimpl(_("amf_type_e of value: %x"), (int)type);
-          break;
+	  delete el;
+	  return 0;
     }
+
+    // Calculate the offset for the next read
+    _totalsize = (tmpptr - in) + 1;
+    log_debug("Total number of bytes read from byte stream is: %d", _totalsize);
     
     return el;
 }

@@ -258,9 +258,12 @@ public:
     static amf::Element *extractAMF(gnash::Network::byte_t *in);
     // Extract an AMF "variable", which is a standard AMF object preceeded by
     // just a length and a name field.
-    static amf::Element *extractVariable(gnash::Network::byte_t *in);
+    amf::Element *extractVariable(gnash::Network::byte_t *in);
+
+    size_t totalsize() { return _totalsize; }
+    
 private:
-// no data, all the methods are static
+    size_t _totalsize;
 };
  
 DSOEXPORT void *swapBytes(void *word, int size);

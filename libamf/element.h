@@ -81,13 +81,15 @@ public:
     Element &init(bool, double, double, const std::string &str);
 
     // These create the other "special" AMF types.
+    Element &makeNullString(); 
     Element &makeString(const char *str, size_t size); 
     Element &makeString(gnash::Network::byte_t *data, size_t size); 
     Element &makeString(const std::string &data); 
     Element &makeString(const std::string &name, const std::string &data);
     
+    Element &makeNumber(double num); 
     Element &makeNumber(gnash::Network::byte_t *data); 
-    Element &makeNumber(const std::string &name, double);
+    Element &makeNumber(const std::string &name, double num);
     
     Element &makeBoolean(gnash::Network::byte_t *data); 
     Element &makeBoolean(bool data); 
@@ -117,9 +119,6 @@ public:
     bool operator==(bool x);
     gnash::Network::byte_t operator[](int x);
 
-    // Return the total size of the data plus the headers for byte math
-    size_t totalsize();
-    
     gnash::Network::byte_t *getData();
     boost::uint16_t getLength();
     Buffer *getBuffer() { return _buffer; };
@@ -145,10 +144,10 @@ public:
     void dump();
     
 private:
-    amf_type_e		_type;
-    Buffer		*_buffer;
     char		*_name;
+    Buffer		*_buffer;
     std::vector<Element	*> _children;
+    amf_type_e		_type;
 };                              // end of class definition
 
 

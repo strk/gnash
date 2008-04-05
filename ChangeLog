@@ -1,3 +1,14 @@
+2008-04-05  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libamf/amf.{h,cpp}: Keep track of the total size of data read
+	from each packet to make it easier to calculate the byte
+	offset. Don't have extractVariable as a static so it can calculate
+	the pointer offset.
+	* libamf/buffer.cpp: Set private data at constructor time.
+	* libamf/element.cpp: Set private data. Don't calculate the total
+	data size here. Add makeNull() for zero length strings.
+	* libamf/sol.cpp: Remove smart pointer for file reading.
+
 2008-04-05 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/Player.cpp: minor cleanups.

@@ -63,11 +63,9 @@ const char *astype_str[] = {
 };
 
 Element::Element()
-    : _type(Element::NOTYPE),
+    : _name(0),
       _buffer(0),
-      _name(0)
-//       _length(0),
-//       _data(0)
+      _type(Element::NOTYPE)
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -87,18 +85,18 @@ Element::~Element()
 }
 
 Element::Element(Network::byte_t *indata) 
-    : _type(Element::NOTYPE),
+    : _name(0),
       _buffer(0),
-      _name(0)
+      _type(Element::NOTYPE)
 {
     GNASH_REPORT_FUNCTION;
     init(indata);
 }
 
 Element::Element(double indata)
-    : _type(Element::NOTYPE),
+    : _name(0),
       _buffer(0),
-      _name(0)
+      _type(Element::NOTYPE)
 {
     GNASH_REPORT_FUNCTION;
     init(indata);
@@ -111,36 +109,36 @@ Element::Element(double indata)
 // }
 
 Element::Element(const string &indata)
-    : _type(Element::NOTYPE),
+    : _name(0),
       _buffer(0),
-      _name(0)
+    _type(Element::NOTYPE)
 {
     GNASH_REPORT_FUNCTION;
     init(indata);
 }
 
 Element::Element(const string &name, const string &indata)
-    : _type(Element::NOTYPE),
+    : _name(0),
       _buffer(0),
-      _name(0)
+      _type(Element::NOTYPE)
 {
     GNASH_REPORT_FUNCTION;
     init(name, indata);
 }
 
 Element::Element(const string &name, bool indata)
-    : _type(Element::NOTYPE),
+    : _name(0),
       _buffer(0),
-      _name(0)
+      _type(Element::NOTYPE)
 {
     GNASH_REPORT_FUNCTION;
     init(name, indata);
 }
 
 Element::Element(bool indata)
-    : _type(Element::NOTYPE),
+    : _name(0),
       _buffer(0),
-      _name(0)
+      _type(Element::NOTYPE)
 {
     GNASH_REPORT_FUNCTION;
     init(indata);
@@ -149,29 +147,13 @@ Element::Element(bool indata)
 // Create a function block for AMF
 Element::Element(bool flag, double unknown1, double unknown2,
 		 const string &methodname)
-    : _type(Element::NOTYPE),
+    : _name(0),
       _buffer(0),
-      _name(0)
+      _type(Element::NOTYPE)
 {
     GNASH_REPORT_FUNCTION;
     init(flag, unknown1, unknown2, methodname);
 }
-
-// Return the total size of the data plus the headers for byte math
-size_t
-Element::totalsize()
-{
-//    GNASH_REPORT_FUNCTION;
-    size_t size = 0;
-    
-    if (_name == 0) {
-	size = _buffer->size() + AMF_HEADER_SIZE;
-    } else {
-	size = _buffer->size() + AMF_VAR_HEADER_SIZE + strlen(_name);
-    }
-    
-    return size;
-}    
 
 Element &
 Element::init(bool flag, double unknown1, double unknown2,
@@ -391,7 +373,19 @@ Element::makeString(Network::byte_t *data, size_t size)
     // a NULL terminator to the string. When encoding, we are careful to
     // to adjust the byte count down by one, as the NULL terminator doesn't
     // get written.
-    *(_buffer->end()) = 0;
+    *(_buffer->end() - 1) = 0;
+    return *this;
+}
+
+// A Null string is a string with no length. The data is only one byte, which
+// always has the value of zero of course.
+Element &
+Element::makeNullString()
+{
+//    GNASH_REPORT_FUNCTION;
+    _type = Element::STRING;
+    _buffer = new Buffer(sizeof(Network::byte_t));
+    *(_buffer->reference()) = 0;
     return *this;
 }
 
@@ -424,24 +418,22 @@ Element::makeString(const string &name, const string &str)
 Element &
 Element::makeNumber(Network::byte_t *data)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     double num = *reinterpret_cast<const double*>(data);
+    _type = Element::NUMBER;
+    _buffer = new Buffer(AMF_NUMBER_SIZE);
+    _buffer->append(num);
+    return *this;
+}
+
+Element &
+Element::makeNumber(double num)
+{
     _type = Element::NUMBER;
     _buffer = new Buffer(AMF_NUMBER_SIZE);
     _buffer->append(num);
 
     return *this;
-}
-
-Element &
-Element::makeNumber(const string &name, double innum)
-{
-//    GNASH_REPORT_FUNCTION;
-    if (name.size()) {
-        setName(name);
-    }
-    Network::byte_t *num = reinterpret_cast<Network::byte_t *>(&innum);
-    return makeNumber(num);
 }
 
 Element &
@@ -630,6 +622,7 @@ Element::makeStrictArray(Network::byte_t *indata, size_t size)
 size_t
 Element::getNameSize()
 {
+//    GNASH_REPORT_FUNCTION;
     if (_name) {
 	return strlen(_name);
     }
@@ -639,19 +632,19 @@ Element::getNameSize()
 void
 Element::setName(const string &str)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     _name = new char[str.size() + 1];
     std::copy(str.begin(), str.end(), _name);
     *(_name + str.size()) = 0;
 }
 
 void
-Element::setName(Network::byte_t *name, size_t x)
+Element::setName(Network::byte_t *name, size_t size)
 {
-    GNASH_REPORT_FUNCTION;
-    _name = new char[x+1];
-    std::copy(name, name+x, _name);
-    *(_name + x) = 0;
+//    GNASH_REPORT_FUNCTION;
+    _name = new char[size+1];
+    std::copy(name, name+size, _name);
+    *(_name + size) = 0;
 }
 
 void
@@ -669,6 +662,7 @@ Element::dump()
       case Element::NOTYPE:
 	  break;
       case Element::NUMBER:
+
 	  cerr << to_number() << endl;
 	  break;
       case Element::BOOLEAN:

@@ -248,7 +248,7 @@ SOL::writeFile(const string &filespec, const string &name)
         size_t outsize = 0;
         switch (el->getType()) {
 	  case Element::BOOLEAN:
-	      outsize = el->getNameSize() + 5;
+	      outsize = el->getNameSize() + AMF_VAR_HEADER_SIZE;
 	      memcpy(ptr, var, outsize); 
 	      ptr += outsize;
 	      break;
@@ -323,7 +323,7 @@ SOL::readFile(std::string &filespec)
 //    GNASH_REPORT_FUNCTION;
     struct stat st;
     boost::uint16_t size;
-    boost::scoped_array<Network::byte_t> buf;
+    Network::byte_t *buf;
     Network::byte_t *ptr;
     int bodysize;
 
@@ -333,15 +333,15 @@ SOL::readFile(std::string &filespec)
         _filesize = st.st_size;
 	bodysize = st.st_size - 6;
         _filespec = filespec;
-        buf.reset( new Network::byte_t[_filesize+1] );
-        ptr = buf.get(); 
-        ifs.read(reinterpret_cast<char *>(buf.get()), _filesize);
+	buf = new Network::byte_t[_filesize+1];
+	ptr = buf;
+        ifs.read(reinterpret_cast<char *>(buf), _filesize);
 
         // skip the magic number (will check later)
         ptr += 2;
 
         // extract the file size
-        int length = *(reinterpret_cast<boost::uint32_t *>(ptr));
+	boost::uint32_t length = *(reinterpret_cast<boost::uint32_t *>(ptr));
         length = ntohl(length);
         ptr += 4;
 
@@ -360,7 +360,7 @@ SOL::readFile(std::string &filespec)
         } else {
             log_error("%s isn't an SOL file", filespec.c_str());
         }
-
+	
         // 2 bytes for the length of the object name, but it's also null terminated
         size = *(reinterpret_cast<boost::uint16_t *>(ptr));
         size = ntohs(size);
@@ -376,8 +376,8 @@ SOL::readFile(std::string &filespec)
         while (size <= bodysize) {
 	    amf::Element *el =  amf_obj.extractVariable(ptr);
             if (el != 0) {
-		ptr += el->getLength() + AMF_HEADER_SIZE;
-		size += el->getNameSize() + AMF_HEADER_SIZE;
+		size += amf_obj.totalsize();
+		ptr += amf_obj.totalsize();
 		_amfobjs.push_back(el);
 	    } else {
 		break;

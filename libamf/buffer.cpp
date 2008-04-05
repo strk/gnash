@@ -47,20 +47,20 @@ Buffer::init(size_t nbytes)
 }
 
 Buffer::Buffer() 
+    : _seekptr(0),
+      _ptr(0)
 {
 //    GNASH_REPORT_FUNCTION;
-    _ptr = 0;
-    _seekptr = 0;
     _nbytes = gnash::NETBUFSIZE;
     init(gnash::NETBUFSIZE);
 }
     
 // Create with a size other than the default
 Buffer::Buffer(size_t nbytes)
+    : _seekptr(0),
+      _ptr(0)
 {
 //    GNASH_REPORT_FUNCTION;
-    _ptr = 0;
-    _seekptr = 0;
     _nbytes = nbytes;
     init(nbytes);
 }
