@@ -649,7 +649,7 @@ void
 Element::setName(Network::byte_t *name, size_t x)
 {
     GNASH_REPORT_FUNCTION;
-    char *_name = new char[x+1];
+    _name = new char[x+1];
     std::copy(name, name+x, _name);
     *(_name + x) = 0;
 }
