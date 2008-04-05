@@ -378,7 +378,7 @@ public:
 	/// Set the order id
 	//
 	/// NOTE: this field is used by one of the indexes
-	///       in the boost::multi_index used by PropertlyList,
+	///       in the boost::multi_index used by PropertyList,
 	///       so changing this value on an instance which was
 	///       put in that index might result in corruption of
 	///       the index invariant. (at least this is what happens
