@@ -1,3 +1,9 @@
+2008-04-05 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/Player.cpp: minor cleanups.
+	* testsuite/asobj/Date.as: don't use == to compare double - it 
+	  failed on one of the amd64-ubuntu machines.
+
 2008-04-04 Sandro Santilli <strk@keybit.net>
 
 	* server/as_object.{cpp,h}: add initial support for

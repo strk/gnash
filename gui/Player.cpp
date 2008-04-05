@@ -46,7 +46,8 @@
 #include "log.h"
 #include <iostream>
 
-using namespace std;
+using std::endl;
+using std::cerr;
 using namespace gnash;
 
 namespace {
@@ -211,7 +212,7 @@ Player::load_movie()
 
     RcInitFile& rcfile = RcInitFile::getDefaultInstance();
     URL vurl(_url);
-    //cout << "URL is " << vurl.str() << " (" << _url << ")" << endl;
+
     if ( vurl.protocol() == "file" )
     {
         const std::string& path = vurl.path();
@@ -248,7 +249,7 @@ Player::load_movie()
             md = gnash::create_library_movie(url, _url.c_str(), false);
         }
     } catch (const GnashException& er) {
-        fprintf(stderr, "%s\n", er.what());
+        std::cerr << er.what() << std::endl;
         md = NULL;
     }
 
@@ -299,7 +300,7 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     // which is *required* during movie loading
     if ( ! _gui->init(argc, &argv) )
     {
-            std::cerr << "Could not initialize gui." << std::endl;
+        std::cerr << "Could not initialize gui." << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -308,7 +309,7 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
 
     // Parse parameters
     StringNoCaseEqual noCaseCompare;
-    for ( map<string,string>::const_iterator it=params.begin(),
+    for ( std::map<std::string,std::string>::const_iterator it=params.begin(),
         itEnd=params.end(); it != itEnd; ++it)
     {
         if ( noCaseCompare(it->first, "flashvars") )
@@ -341,16 +342,17 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     float movie_fps = _movieDef->get_frame_rate();
 
     if (! _width) {
-      _width = size_t(movie_width * _scale);
+      _width = static_cast<size_t>(movie_width * _scale);
     }
     if (! _height) {
-      _height = size_t(movie_height * _scale);
+      _height = static_cast<size_t>(movie_height * _scale);
     }
 
     if ( ! _width || ! _height )
     {
-        log_debug(_("Input movie has collapsed dimensions " SIZET_FMT "/"
-                SIZET_FMT ". Setting to 1/1 and going on."), _width, _height);
+        log_debug(_("Input movie has collapsed dimensions "
+                    "%d/%d. Setting to 1/1 and going on."),
+                     _width, _height);
         if ( ! _width ) _width = 1;
         if ( ! _height ) _height = 1;
     }
@@ -413,7 +415,7 @@ Player::fs_callback(gnash::sprite_instance* movie, const std::string& command,
         std::stringstream request;
         request << "INVOKE " << command << ":" << args << endl;
 
-        string requestString = request.str();
+        std::string requestString = request.str();
         const char* cmd = requestString.c_str();
         size_t len = requestString.length();
         // TODO: should mutex-protect this ?

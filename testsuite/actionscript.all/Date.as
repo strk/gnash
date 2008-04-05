@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Date.as,v 1.48 2008/04/03 10:52:31 bwy Exp $";
+rcsid="$Id: Date.as,v 1.49 2008/04/05 11:08:19 bwy Exp $";
 #include "check.as"
 
 check_equals(typeof(Date), 'function');
@@ -495,7 +495,7 @@ check (Date.utc);
 	check_equals(d.getSeconds(), 0);
 	check_equals(d.getMilliseconds(), 1);
     delete d; var d = new Date(2000,0,1,0,0,0,-1);
-    note (d.valueOf());
+    //note (d.valueOf());
 	check_equals(d.getFullYear(), 1999);
 	check_equals(d.getMonth(), 11);
 	check_equals(d.getDate(), 31);
@@ -639,7 +639,8 @@ check_equals (Date.UTC(1970, 1).toString(), "2678400000");
 check_equals (Date.UTC(1970, 1).valueOf(), 2678400000);
 
 check_equals (Date.UTC(-1, -12).toString(), "-2272060800000");
-check_equals (Date.UTC(-1, 12).valueOf(), -2208988800000);
+check_equals ((Date.UTC(-1, 12).valueOf() < -2208988799999.5 &&
+               Date.UTC(-1, 12).valueOf() > -2208988800000.5), true);
 
 // Check if Date, concatenated to a string, is in human readable form
 d = new Date(2000, 1, 15, 0, 0, 0); 
