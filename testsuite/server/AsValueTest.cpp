@@ -40,6 +40,8 @@ main(int /*argc*/, char** /*argv*/)
 {
 	float num = 0;
 
+	std::cout << "sizeof(as_value): " << (sizeof(as_value)) << std::endl;
+
 	check(!isnan(num));
 
 	num /= 9999999;
