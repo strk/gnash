@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Object.as,v 1.54 2008/04/03 16:00:48 strk Exp $";
+rcsid="$Id: Object.as,v 1.55 2008/04/05 10:10:05 strk Exp $";
 #include "check.as"
 
 // Test things in Class Object (swf5~swf8)
@@ -277,7 +277,66 @@ check_equals(typeof(obj3), "object");
 check_equals(typeof(obj3.__proto__), 'undefined');
 xcheck_equals(obj3, undefined);
 
-// TODO: try using the name of an existing property
+// Use name of an existing property
+
+o = {};
+o.test = 5;
+function test_get() { _root.test_get_calls++; return this.test; }
+function test_set(v) { this.test=v; _root.test_set_calls++; }
+test_set_calls=test_get_calls=0;
+r = o.addProperty("test", test_get, test_set);
+check(r);
+check_equals(test_set_calls, 0);
+check_equals(test_get_calls, 0);
+test_set_calls=test_get_calls=0;
+v = o.test;
+check_equals(test_set_calls, 0);
+#if OUTPUT_VERSION < 7
+ check_equals(test_get_calls, 1);
+#else
+ xcheck_equals(test_get_calls, 65); // urgh ! :)
+#endif
+xcheck_equals(v, 5); // underlying value was initializied to existing prop
+test_set_calls=test_get_calls=0;
+o.test = 16; // should change underlying as well I guess
+check_equals(test_get_calls, 0);
+#if OUTPUT_VERSION < 7
+ check_equals(test_set_calls, 1);
+#else
+ xcheck_equals(test_set_calls, 65); // urgh ! :)
+#endif
+test_set_calls=test_get_calls=0;
+r = o.addProperty("test", test_get, test_set);
+check(r);
+check_equals(test_get_calls, 0); // didn't invoke the former getter..
+check_equals(test_set_calls, 0); // .. to fetch underlying var
+
+test_set_calls=test_get_calls=0;
+v = o.test;
+// got underlying value from previous getter-setter
+xcheck_equals(v, 16);
+#if OUTPUT_VERSION < 7
+ check_equals(test_get_calls, 1);
+#else
+ xcheck_equals(test_get_calls, 65); // urgh ! :)
+#endif
+check_equals(test_set_calls, 0);
+
+// Existing property higher in inheritance chain
+
+delete o.test;
+o2 = {};
+o2.test = 19;
+o.__proto__ = o2;
+check_equals(o.test, 19); 
+r = o.addProperty("test", test_get, test_set);
+check(r);
+v = o.test;
+check_equals(v, undefined); // but not existing prop from inheritance chain
+
+// TODO: existing getter-setter property higher in inheritance chain ?
+
+
 
 // Try property inheritance
 
@@ -585,7 +644,78 @@ check( obj8.prototype.isPrototypeOf(obj9) );
 
 #if OUTPUT_VERSION > 5
 
-// TODO: add tests here !
+o = {};
+simplewatch = function(nam, ov, nv, d) {
+	_root.info = { nam:nam, ov:ov, nv:nv, d:d, tv:this };
+	return _root.ret;
+};
+r = o.watch('l', simplewatch, 'cust');
+xcheck(r); // can watch unexisting prop
+_root.ret = 2;
+o.l = 5;
+xcheck_equals(o.l, 2); // returned by watcher
+xcheck_equals(_root.info.nam, 'l');
+check_equals(typeof(_root.info.ov), 'undefined');
+xcheck_equals(_root.info.nv, 5);
+xcheck_equals(_root.info.d, 'cust');
+xcheck_equals(_root.info.tv, o);
+delete _root.info;
+check(delete o.l);
+o.p = 4;
+check(!o.unwatch('p')); // can not unwatch not-watched props
+check(!o.unwatch('r')); // can not unwatch non-watched props
+xcheck(o.unwatch('l')); // can unwatch non-existing but watched vars
+
+// watch a getter-setter 
+
+get_l = function() { _root.get_l_calls++; return this.l; };
+set_l = function(v) { _root.set_l_calls++; this.l=v; };
+r = o.watch('l', simplewatch, 'cust2');
+xcheck(r);
+check_equals(typeof(_root.info), 'undefined'); // just checking...
+_root.ret = 'return from watch';
+_root.get_l_calls=_root.set_l_calls=0;
+r = o.addProperty("l", get_l, set_l);
+check(r);
+xcheck_equals(_root.info.nam, 'l');
+check_equals(typeof(_root.info.ov), 'undefined');
+check_equals(typeof(_root.info.nv), 'undefined'); // underlying value of getter-setter was undefined
+xcheck_equals(_root.info.d, 'cust2');
+xcheck_equals(_root.info.tv, o); 
+check_equals(_root.get_l_calls, 0);
+check_equals(_root.set_l_calls, 0);
+
+// Getter/setter is not invoked, but watcher was used to set it's 
+// underlying value, check this:
+v = o.l;
+xcheck_equals(v, 'return from watch'); 
+
+delete _root.info;
+_root.get_l_calls=_root.set_l_calls=0;
+
+o.l = 'ciao'; // watched, and invokes setter
+#if OUTPUT_VERSION < 7
+  xcheck_equals(_root.info.ov, 'return from watch'); // old value
+  xcheck_equals(_root.info.nv, 'ciao'); // we requested this
+  xcheck_equals(_root.info.d, 'cust2'); 
+  xcheck_equals(_root.info.tv, o); 
+  check_equals(_root.get_l_calls, 0);
+  check_equals(_root.set_l_calls, 1);
+#else
+  xcheck_equals(_root.info.ov, 'return from watch'); // old value
+  xcheck_equals(_root.info.nv, 'return from watch'); // mmm ?
+  xcheck_equals(_root.info.d, 'cust2'); 
+  xcheck_equals(_root.info.tv, o); 
+  check_equals(_root.get_l_calls, 0);
+  xcheck_equals(_root.set_l_calls, 65);
+#endif
+
+// watch a getter-setter in the inheritance chain
+
+o2 = {}; o2.__proto__ = o;
+o2.l = 
+
+// TODO: add tests here
 
 #endif // OUTPUT_VERSION > 5
 
@@ -605,6 +735,6 @@ totals(79);
 #endif
 
 #if OUTPUT_VERSION >= 6
-totals(188);
+totals(233);
 #endif
 

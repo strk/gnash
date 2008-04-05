@@ -1,3 +1,8 @@
+2008-04-04 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Object.as: add test for "underlying
+	  value" for getter-setter, add tests for watch/unwatch.
+
 2008-04-04 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/Player.cpp: document fscommand, edit logging calls, drop
