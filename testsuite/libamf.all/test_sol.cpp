@@ -47,6 +47,8 @@ extern int optind, getopt(int, char *const *, const char *);
 #include "dejagnu.h"
 
 #include "amf.h"
+#include "buffer.h"
+#include "network.h"
 #include "element.h"
 #include "sol.h"
 
@@ -108,22 +110,18 @@ test_read(std::string &filespec)
 
     if (stat(filespec.c_str(), &st) == 0) {
         SOL sol;
-        char *buf;
-        
-        buf = new char[st.st_size + 1];
-
         sol.readFile(filespec);
         vector<amf::Element *> els = sol.getElements();
 
         if (els.size() > 1) {
             string str = els[2]->to_string();
-            
+
             // Make sure multiple elements of varying datatypes are checked for.
-            if ((els[0]->getName() == "gain") &&
-                (els[2]->getName() == "defaultmicrophone") &&
+            if ((strcmp(els[0]->getName(), "gain") == 0) &&
+                (strcmp(els[2]->getName(), "defaultmicrophone") == 0) &&
                 (str == "/dev/input/mic") &&
-                (els[5]->getName() == "defaultalways") &&
-                (els[9]->getName() == "trustedPaths")) {
+                (strcmp(els[5]->getName(), "defaultalways") == 0) &&
+                 (strcmp(els[9]->getName(), "trustedPaths") == 0)) {
                 runtest.pass("Read SOL File");
             } else {
                 runtest.fail("Read SOL file");
@@ -131,7 +129,7 @@ test_read(std::string &filespec)
         } else {
             runtest.fail("Read SOL file");
         }
-        sol.dump();
+//        sol.dump();
     }
 }
 
@@ -155,7 +153,7 @@ test_write(std::string &filespec)
     el->init("gain", dub);
 //    amf_obj.createElement(&el, "gain", dub);
     sol.addObj(el);
-    if ((el->getName() == "gain") &&
+    if ((strcmp(el->getName(), "gain") == 0) &&
         (el->getType() == Element::NUMBER) &&
         (memcmp(el->getData(), &dub, AMF_NUMBER_SIZE) == 0) &&
         (*((double *)el->getData()) == dub) &&
@@ -181,7 +179,7 @@ test_write(std::string &filespec)
 #endif
     el = new amf::Element("echosuppression", false);
     sol.addObj(el);
-    if ((el->getName() == "echosuppression") &&
+    if ((strcmp(el->getName(), "echosuppression") == 0) &&
         (el->getType() == Element::BOOLEAN) &&
         (*el->getData() == 0) &&
         (el->getLength() == 1)) {
@@ -218,13 +216,13 @@ test_write(std::string &filespec)
     el = new amf::Element("defaultcamera", data);
     el->init("defaultcamera", data);
     sol.addObj(el);
-    if ((el->getName() == "defaultcamera") &&
+    if ((strcmp(el->getName(), "defaultcamera") == 0) &&
         (el->getType() == Element::STRING) &&
         (*el->getData() == 0) &&
         (el->getLength() == 0)) {
         runtest.pass("defaultcamera set");
     } else {
-        runtest.fail("defaultcamea set");
+        runtest.fail("defaultcamera set");
     }
 
     dub = 100.0;
@@ -232,7 +230,7 @@ test_write(std::string &filespec)
 //    el = new amf::Element("defaultklimit", dub);
     el->init("defaultklimit", dub);
     sol.addObj(el);
-    if ((el->getName() == "defaultklimit") &&
+    if ((strcmp(el->getName(), "defaultklimit") == 0) &&
         (el->getType() == Element::NUMBER) &&
         (memcmp(el->getData(), &dub, AMF_NUMBER_SIZE) == 0) &&
         (*((double *)el->getData()) == dub) &&
@@ -244,7 +242,7 @@ test_write(std::string &filespec)
 
     el = new amf::Element("defaultalways", false);
     sol.addObj(el);
-    if ((el->getName() == "defaultalways") &&
+    if ((strcmp(el->getName(), "defaultalways") == 0) &&
         (el->getType() == Element::BOOLEAN) &&
         (*el->getData() == 0) &&
         (el->getLength() == 1)) {
@@ -255,7 +253,7 @@ test_write(std::string &filespec)
 
     el = new amf::Element("crossdomainAllow", true);
     sol.addObj(el);
-    if ((el->getName() == "crossdomainAllow") &&
+    if ((strcmp(el->getName(), "crossdomainAllow") == 0) &&
         (el->getType() == Element::BOOLEAN) &&
         (*el->getData() == 1) &&
         (el->getLength() == 1)) {
@@ -266,7 +264,7 @@ test_write(std::string &filespec)
 
     el = new amf::Element("crossdomainAlways", true);
     sol.addObj(el);
-    if ((el->getName() == "crossdomainAlways") &&
+    if ((strcmp(el->getName(), "crossdomainAlways") == 0) &&
         (el->getType() == Element::BOOLEAN) &&
         (*el->getData() == 1) &&
         (el->getLength() == 1)) {
@@ -277,7 +275,7 @@ test_write(std::string &filespec)
 
     el = new amf::Element("allowThirdPartyLSOAccess", true);
     sol.addObj(el);
-    if ((el->getName() == "allowThirdPartyLSOAccess") &&
+    if ((strcmp(el->getName(), "allowThirdPartyLSOAccess") ==0) &&
         (el->getType() == Element::BOOLEAN) &&
         (*el->getData() == 1) &&
         (el->getLength() == 1)) {
@@ -306,11 +304,11 @@ test_write(std::string &filespec)
     sol.addObj(el);
 #endif
     
-    el = new amf::Element("localSecPath", data);
+    el = new amf::Element;
+    el->init("localSecPath", data);
     sol.addObj(el);
-    if ((el->getName() == "localSecPath") &&
+    if ((strcmp(el->getName(), "localSecPath") == 0) &&
         (el->getType() == Element::STRING) &&
-        (*el->getData() == 0) &&
         (el->getLength() == 0)) {
         runtest.pass("localSecPath set");
     } else {
@@ -323,9 +321,8 @@ test_write(std::string &filespec)
     
     el = new amf::Element;
     el->init("localSecPathTime", dub);
-//    el = new amf::Element("localSecPathTime", dub);
     sol.addObj(el);
-    if ((el->getName() == "localSecPathTime") &&
+    if ((strcmp(el->getName(), "localSecPathTime") ==0) &&
         (el->getType() == Element::NUMBER) &&
         (memcmp(el->getData(), &dub, AMF_NUMBER_SIZE) == 0) &&
         (*((double *)el->getData()) == dub) &&
