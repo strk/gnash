@@ -43,6 +43,8 @@ using namespace gnash;
 int
 main(int /*argc*/, char** /*argv*/)
 {
+	cout << "sizeof(Property): " << sizeof(Property) << endl;
+
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity();
 
