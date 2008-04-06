@@ -1,3 +1,14 @@
+2008-04-06  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* testsuite/libamf.all/test_el.cpp: Use new make* methods for
+	constructing elements.
+	* libamf/element.cpp: Apply strk's patch for initializing private
+	data.
+	* libnet/cque.{h,cpp}: Apply part of strk's patch for merging
+	buffers.
+	* libamf/sol.cpp: Copy a buffer by it's reference(), not it's base
+	address.
+
 2008-04-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/tu_timer.{cpp,h}: drop, functions moved to Time.{cpp,h}.

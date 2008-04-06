@@ -79,7 +79,9 @@ private:
     // an optional name for the queue, only used for debugging messages to make them unique
     std::string _name;
     // The queue itself
-    std::deque<amf::Buffer *> _que;
+    typedef std::deque<amf::Buffer *> Que;
+    Que _que;
+
     // A condition variable used to signal the other thread when the que has data
     boost::condition	_cond;
     // This is the mutex used by the condition variable. It needs to be separate from the

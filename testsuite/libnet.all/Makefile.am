@@ -34,6 +34,7 @@ localedir = $(datadir)/locale
 
 INCLUDES = -I.. \
         -I$(top_srcdir)	\
+        -I$(top_srcdir)/testsuite \
         -I$(top_srcdir)/libnet \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/libbase \

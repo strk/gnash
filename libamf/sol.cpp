@@ -240,7 +240,7 @@ SOL::writeFile(const string &filespec, const string &name)
 
     for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
         amf::Element *el = (*(ita));
-        const Buffer *var = amf_obj.encodeVariable(el); 
+        Buffer *var = amf_obj.encodeVariable(el); 
         //  Network::byte_t *var = amf_obj.encodeVariable(el, outsize); 
         if (!var) {
             continue;
@@ -249,14 +249,14 @@ SOL::writeFile(const string &filespec, const string &name)
         switch (el->getType()) {
 	  case Element::BOOLEAN:
 	      outsize = el->getNameSize() + AMF_VAR_HEADER_SIZE;
-	      memcpy(ptr, var, outsize); 
+	      memcpy(ptr, var->reference(), outsize); 
 	      ptr += outsize;
 	      break;
 	  case Element::OBJECT:
 	      outsize = el->getNameSize() + 5;
               assert(ptr+outsize < endPtr);
 	      outsize = el->getNameSize() + 5;
-	      memcpy(ptr, var, outsize);
+	      memcpy(ptr, var->reference(), outsize);
 	      ptr += outsize;
 	      *ptr++ = Element::OBJECT_END;
 	      *ptr++ = 0;	// objects are terminated too!
@@ -264,7 +264,7 @@ SOL::writeFile(const string &filespec, const string &name)
 	  case Element::NUMBER:
 	      outsize = el->getNameSize() + AMF_NUMBER_SIZE + 2;
               assert(ptr+outsize < endPtr);
-	      memcpy(ptr, var, outsize);
+	      memcpy(ptr, var->reference(), outsize);
 	      ptr += outsize;
 	      *ptr++ = 0;	// doubles are terminated too!
 	      *ptr++ = 0;	// doubles are terminated too!
@@ -276,14 +276,14 @@ SOL::writeFile(const string &filespec, const string &name)
 		  ptr += outsize+1;
 	      } else {		// null terminate the string
                   assert(ptr+outsize < endPtr);
-		  memcpy(ptr, var, outsize);
+		  memcpy(ptr, var->reference(), outsize);
 		  ptr += outsize;
 		  *ptr++ = 0;
 	      }
 	      break;
 	  default:
               assert(ptr+outsize < endPtr);
-	      memcpy(ptr, var, outsize);
+	      memcpy(ptr, var->reference(), outsize);
 	      ptr += outsize;
 	}
 	delete var;

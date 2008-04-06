@@ -45,9 +45,11 @@
 #endif
 
 #include "log.h"
+#include "buffer.h"
 #include "handler.h"
 #include "amf.h"
 
+using namespace amf;
 using namespace std;
 using namespace gnash;
 using namespace boost;

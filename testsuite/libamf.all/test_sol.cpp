@@ -331,7 +331,7 @@ test_write(std::string &filespec)
     } else {
         runtest.fail("localSecPathTime set");
     }
-    sol.dump();
+//    sol.dump();
     // now write the data to disk
     sol.writeFile(filespec, "settings");
 }

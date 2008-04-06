@@ -1240,7 +1240,7 @@ AMF::extractVariable(Network::byte_t *in)
     Element::amf_type_e type = static_cast<Element::amf_type_e>(c);
     tmpptr++;
     if (type != Element::TYPED_OBJECT) {
-        log_debug(_("AMF type is: %s"), amftype_str[(int)type]);
+//        log_debug(_("AMF type is: %s"), amftype_str[(int)type]);
 	el->setType(type);
     }
 
@@ -1315,7 +1315,7 @@ AMF::extractVariable(Network::byte_t *in)
 
     // Calculate the offset for the next read
     _totalsize = (tmpptr - in) + 1;
-    log_debug("Total number of bytes read from byte stream is: %d", _totalsize);
+//    log_debug("Total number of bytes read from byte stream is: %d", _totalsize);
     
     return el;
 }

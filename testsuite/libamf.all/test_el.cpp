@@ -46,6 +46,8 @@ extern int optind, getopt(int, char *const *, const char *);
 
 #include "dejagnu.h"
 
+#include "buffer.h"
+#include "network.h"
 #include "amf.h"
 #include "element.h"
 
@@ -100,11 +102,11 @@ main(int argc, char *argv[])
         runtest.fail("Created double element");
     }
 
-    el.dump();
+//    el.dump();
     el.clear();
     
     string str = "Hello World!";
-    el.init(str);
+    el.makeString("Hello World!");
     if ((el.getType() == Element::STRING) &&
         (el.to_string() == str)) {
         runtest.pass("Created string element");
@@ -114,7 +116,7 @@ main(int argc, char *argv[])
 
     el.clear();
     bool sheet = true;
-    el.init(sheet);
+    el.makeBoolean(sheet);
     if ((el.getType() == Element::BOOLEAN) &&
         (el.to_bool() == sheet)) {
         runtest.pass("Created bool element");
@@ -136,7 +138,6 @@ main(int argc, char *argv[])
     } else {
         runtest.fail("Created Undefined element");
     }
-
 }
 
 static void

@@ -182,10 +182,12 @@ CQue::remove(amf::Buffer *element)
     GNASH_REPORT_FUNCTION;
     deque<amf::Buffer *>::iterator it;
     boost::mutex::scoped_lock lock(_mutex);
-    for (it = _que.begin(); it != _que.end(); it++) {
+    for (it = _que.begin(); it != _que.end(); ) {
 	amf::Buffer *ptr = *(it);
 	if (ptr->reference() == element->reference()) {
-	    _que.erase(it);
+	    it = _que.erase(it);
+	} else {
+	    it++;
 	}
     }
 }
@@ -197,16 +199,17 @@ CQue::merge(amf::Buffer *begin)
 {
     GNASH_REPORT_FUNCTION;
     int totalsize = 0;
-    deque<amf::Buffer *>::iterator it;
-    vector<deque<amf::Buffer *>::iterator> elements;
-    vector<deque<amf::Buffer *>::iterator>::iterator eit;
+    Que::iterator it;
+    vector<Que::iterator> elements; // iterators to elements to merge
+    vector<Que::iterator>::iterator eit;
+
     boost::mutex::scoped_lock lock(_mutex);
     for (it = _que.begin(); it != _que.end(); it++) {
 	amf::Buffer *ptr = *(it);
 	if (totalsize > 0) {
 	    totalsize += ptr->size();
-	    elements.push_back(it);
-	    if (ptr->size() < gnash::NETBUFSIZE) {
+	    elements.push_back(it); // add this element to the ones to merge
+	    if (ptr->size() < gnash::NETBUFSIZE) {// stop merging here
 		amf::Buffer *newbuf = new amf::Buffer(totalsize);
 		Network::byte_t *tmp = newbuf->reference();
 		amf::Buffer *buf;

@@ -45,10 +45,12 @@
 #endif
 
 #include "log.h"
+#include "buffer.h"
 #include "network.h"
 #include "cque.h"
 #include "amf.h"
 
+using namespace amf;
 using namespace std;
 using namespace gnash;
 using namespace boost;
@@ -160,6 +162,6 @@ main (int /*argc*/, char** /*argv*/) {
 
      que.pop();
      
-     que.dump();
+//     que.dump();
 }
 

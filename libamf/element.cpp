@@ -63,7 +63,7 @@ const char *astype_str[] = {
 };
 
 Element::Element()
-    : _name(0),
+    : _name(),
       _buffer(0),
       _type(Element::NOTYPE)
 {
@@ -85,7 +85,7 @@ Element::~Element()
 }
 
 Element::Element(Network::byte_t *indata) 
-    : _name(0),
+    : _name(),
       _buffer(0),
       _type(Element::NOTYPE)
 {
@@ -94,7 +94,7 @@ Element::Element(Network::byte_t *indata)
 }
 
 Element::Element(double indata)
-    : _name(0),
+    : _name(),
       _buffer(0),
       _type(Element::NOTYPE)
 {
@@ -109,7 +109,7 @@ Element::Element(double indata)
 // }
 
 Element::Element(const string &indata)
-    : _name(0),
+    : _name(),
       _buffer(0),
     _type(Element::NOTYPE)
 {
@@ -118,7 +118,7 @@ Element::Element(const string &indata)
 }
 
 Element::Element(const string &name, const string &indata)
-    : _name(0),
+    : _name(),
       _buffer(0),
       _type(Element::NOTYPE)
 {
@@ -127,7 +127,7 @@ Element::Element(const string &name, const string &indata)
 }
 
 Element::Element(const string &name, bool indata)
-    : _name(0),
+    : _name(),
       _buffer(0),
       _type(Element::NOTYPE)
 {
@@ -136,7 +136,7 @@ Element::Element(const string &name, bool indata)
 }
 
 Element::Element(bool indata)
-    : _name(0),
+    : _name(),
       _buffer(0),
       _type(Element::NOTYPE)
 {
@@ -147,7 +147,7 @@ Element::Element(bool indata)
 // Create a function block for AMF
 Element::Element(bool flag, double unknown1, double unknown2,
 		 const string &methodname)
-    : _name(0),
+    : _name(),
       _buffer(0),
       _type(Element::NOTYPE)
 {
@@ -642,9 +642,15 @@ void
 Element::setName(Network::byte_t *name, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
-    _name = new char[size+1];
-    std::copy(name, name+size, _name);
-    *(_name + size) = 0;
+    if ((size > 0) && (name != 0)) {
+	if (isascii(*name)) {
+	    _name = new char[size+1];
+	    std::copy(name, name+size, _name);
+	    *(_name + size) = 0;
+	} else {
+	    log_debug("Got unprintable characters for the element name!");
+	}
+    }
 }
 
 void

@@ -19,8 +19,8 @@
 #include "gnashconfig.h"
 #endif
 
-#ifdef HAVE_DEJAGNU_H
-
+//#ifdef HAVE_DEJAGNU_H
+#if 1
 #include <sys/types.h>
 extern "C"{
 #include <unistd.h>
@@ -34,12 +34,12 @@ extern int optind, getopt(int, char *const *, const char *);
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <log.h>
 #include <string>
 #include <iostream>
 #include <string>
 
-//#include "dejagnu.h"
+#include "log.h"
+#include "dejagnu.h"
 #include "rtmp.h"
 #include "amf.h"
 #include "check.h"
