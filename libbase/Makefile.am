@@ -89,7 +89,7 @@ libgnashbase_la_SOURCES = \
 	string_table.cpp \
 	tu_file.cpp \
 	$(SDL_FILE) \
-	tu_timer.cpp \
+	Time.cpp \
 	WallClockTimer.cpp \
 	utf8.cpp \
 	utility.cpp \
@@ -128,7 +128,7 @@ noinst_HEADERS = \
 	tu_file.h \
 	tu_math.h \
 	tu_opengl_includes.h \
-	tu_timer.h \
+	Time.h \
 	WallClockTimer.h \
 	utf8.h \
 	utility.h \

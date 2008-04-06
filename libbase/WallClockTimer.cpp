@@ -23,32 +23,31 @@
 #endif
 
 #include "WallClockTimer.h"
-
-#include "tu_timer.h" // for "portable" get_ticks (contains implementation for win32)
+#include "Time.h" // for "portable" get_ticks (contains implementation for win32)
 
 namespace gnash {
 
 WallClockTimer::WallClockTimer()
 	:
-	startTimer(tu_timer::get_ticks())
+	startTimer(clocktime::getTicks())
 {
 }
 
 void
 WallClockTimer::restart()
 {
-	startTimer = tu_timer::get_ticks();
+	startTimer = clocktime::getTicks();
 }
 
 boost::uint32_t
 WallClockTimer::elapsed() const
 {
-	boost::uint64_t currTime = tu_timer::get_ticks();
+	boost::uint64_t currTime = clocktime::getTicks();
 	
 	// be aware of time glitches
 	if ( currTime <= startTimer ) return 0;
 
-	return currTime-startTimer;
+	return currTime - startTimer;
 
 }
 

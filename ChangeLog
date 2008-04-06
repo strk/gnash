@@ -1,3 +1,24 @@
+2008-04-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/tu_timer.{cpp,h}: drop, functions moved to Time.{cpp,h}.
+	* libbase/Time.{cpp,h}: new file to collect all platform- and
+	  implementation-dependent clock time code in namespace clocktime.
+	  Includes the used functions of tu_timer, timezone detection
+	  from Date.cpp and a partial boost date-time implementation of a
+	  timer (not enabled by default).
+	* libbase/Makefile.am: add Time, remove tu_timer.
+	* libbase/WallClockTimer.cpp: change from tu_timer to clocktime.
+	* server/SystemClock.cpp: tu_timer -> clocktime.
+	* utilities/processor.cpp: tu_timer -> clocktime.
+	* gui/gui.cpp: tu_timer -> clocktime.
+	* server/asobj/NetStreamFfmpeg.cpp: tu_timer -> clocktime.
+	* server/asobj/Date.cpp: update methods to take account of local
+	  timezone. The calculation of timezone, now in Time.cpp, is
+	  a bit dubious, but the Date class methods *should* be
+	  internally consistent - the timezone may be wrong in some
+	  cases, but the relationship between UTC and local time methods
+	  is always correctly described in Date.getTimezoneOffset().
+
 2008-04-05  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* libamf/amf.{h,cpp}: Keep track of the total size of data read

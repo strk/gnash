@@ -31,7 +31,7 @@
 #include "VM.h"
 
 #ifdef GNASH_FPS_DEBUG
-#include "tu_timer.h"
+#include "Time.h"
 #endif
 
 #include <cstdio>
@@ -1002,7 +1002,7 @@ Gui::fpsCounterTick()
 	  return;
   }
 
-  boost::uint64_t current_timer = tu_timer::get_ticks();
+  boost::uint64_t current_timer = clocktime::get_ticks();
 
   // TODO: keep fps_timer_interval in milliseconds to avoid the multiplication
   //       at each fpsCounterTick call...

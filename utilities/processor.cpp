@@ -31,7 +31,7 @@
 #endif
 
 #include "gettext.h"
-#include "tu_file.h"
+#include "Time.h"
 #include "gnash.h"
 #include "movie_definition.h"
 #include "sprite_instance.h"
@@ -44,7 +44,6 @@
 #include "VM.h"
 #include "noseek_fd_adapter.h"
 #include "ManualClock.h"
-#include "tu_timer.h"
 #include "StringPredicates.h"
 
 extern "C"{
@@ -115,15 +114,15 @@ double lastAdvanceTimer;
 void
 resetLastAdvanceTimer()
 {
-	using namespace tu_timer;
-	lastAdvanceTimer = ticks_to_seconds(get_ticks());
+    // clocktime::getTicks() returns milliseconds
+	lastAdvanceTimer = static_cast<double>(clocktime::getTicks()) / 1000.0;
 }
 
 double
 secondsSinceLastAdvance()
 {
-	using namespace tu_timer;
-	double now = ticks_to_seconds(get_ticks());
+    // clocktime::getTicks() returns milliseconds
+	double now = static_cast<double>(clocktime::getTicks()) / 1000.0;
 	return ( now - lastAdvanceTimer);
 }
 

@@ -32,7 +32,7 @@
 #include "movie_root.h"
 #include "sound_handler.h"
 #include "VideoDecoderFfmpeg.h"
-#include "tu_timer.h" // TODO: use the VirtualClock instead ?
+#include "Time.h" // TODO: use the VirtualClock instead ?
 
 #include <boost/scoped_array.hpp>
 
@@ -669,7 +669,7 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 	ns->m_last_audio_timestamp = 0;
 	ns->m_current_timestamp = 0;
 
-	ns->m_start_clock = tu_timer::get_ticks();
+	ns->m_start_clock = clocktime::getTicks();
 
 	ns->m_unqueued_data = NULL;
 
@@ -1133,7 +1133,7 @@ NetStreamFfmpeg::seek(boost::uint32_t pos)
 		m_last_audio_timestamp = 0;
 		m_current_timestamp = 0;
 
-		m_start_clock = tu_timer::get_ticks();
+		m_start_clock = clocktime::getTicks();
 
 	}
 	else if (m_isFLV)
@@ -1215,7 +1215,7 @@ NetStreamFfmpeg::refreshVideoFrame()
 		}
 		else
 		{
-			current_clock = tu_timer::get_ticks() - m_start_clock;
+			current_clock = clocktime::getTicks() - m_start_clock;
 			m_current_timestamp = current_clock;
 		}
 
@@ -1318,7 +1318,7 @@ void NetStreamFfmpeg::pausePlayback()
 	m_pause = true;
 
 	// Save the current time so we later can tell how long the pause lasted
-	m_time_of_pause = tu_timer::get_ticks();
+	m_time_of_pause = clocktime::getTicks();
 }
 
 void NetStreamFfmpeg::unpausePlayback()
@@ -1332,13 +1332,13 @@ void NetStreamFfmpeg::unpausePlayback()
 
 	if (m_current_timestamp == 0)
 	{
-		m_start_clock = tu_timer::get_ticks();
+		m_start_clock = clocktime::getTicks();
 	}
 	else
 	{
 		// Add the paused time to the start time so that the playhead doesn't
 		// noticed that we have been paused
-		m_start_clock += tu_timer::get_ticks() - m_time_of_pause;
+		m_start_clock += clocktime::getTicks() - m_time_of_pause;
 	}
 
 	// Re-connect to the soundhandler.

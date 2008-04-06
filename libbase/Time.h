@@ -1,4 +1,4 @@
-// SystemClock.cpp -- system-time based VirtualClock for gnash core lib
+// Time.h: clock and local time functions for Gnash
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -11,53 +11,34 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-// 
+//
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
+#ifndef GNASH_TIME_H
+#define GNASH_TIME_H
+
+#include <boost/cstdint.hpp>
+#include "dsodefs.h"
+
+namespace clocktime
+{
+    /// Wall clock timer, uses highest available resolution.
+    /// Generally microseconds on Linux / Unix, microseconds with
+    /// millisecond resolution on Windows. Nanosecond resolution is
+    /// theoretically available.
+	DSOEXPORT boost::uint64_t getTicks();
+
+	/// Converts ticks to seconds.
+	DSOEXPORT double ticksToSeconds(boost::uint64_t ticks);
+
+	/// Returns the offset between actual clock time and UTC.
+	/// It relies on the system's time zone settings, so
+	/// cannot be regarded as reliable.
+	DSOEXPORT boost::int32_t getTimeZoneOffset(double time);
+
+}
+
 #endif
-
-#include "SystemClock.h"
-
-#include "Time.h" // for fetchSystemTime
-
-#include <boost/cstdint.hpp> // for boost::uint64_t typedef
-
-namespace gnash
-{
-
-/* static private */
-boost::uint64_t
-SystemClock::fetchSystemTime() 
-{
-    // Time::getTicks always returns milliseconds
-    return clocktime::getTicks();
-}
-
-/* public */
-SystemClock::SystemClock() 
-	:
-	_startTime(fetchSystemTime())
-{
-}
-
-/* public */
-unsigned long int
-SystemClock::elapsed() const
-{
-    return fetchSystemTime() - _startTime;
-}
-
-/* public */
-void
-SystemClock::restart()
-{
-    _startTime = fetchSystemTime();
-}
-
-} // namespace gnash
-

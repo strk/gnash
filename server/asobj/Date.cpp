@@ -76,36 +76,15 @@
 #include "GnashException.h"
 #include "builtin_function.h"
 #include "Object.h" // for getObjectInterface
-#include "tu_timer.h"
+#include "Time.h"
 
 #include <ctime>
 #include <cmath>
 #include <boost/format.hpp>
 
-# include <sys/time.h>
-
-// Declaration for replacement timezone functions
-// In the absence of gettimeofday() we use ftime() to get milliseconds,
-// but not for timezone offset because ftime's TZ stuff is unreliable.
-// For that we use tzset()/timezone if it is available.
-
-// The structure of these ifdefs mimics the structure of the code below
-// where these things are used if available.
-
-#if !defined(HAVE_GETTIMEOFDAY) || (!defined(HAVE_TM_GMTOFF) && !defined(HAVE_TZSET))
-#ifdef HAVE_FTIME
-extern "C" {
-#  include <sys/types.h>    // for ftime()
-#  include <sys/timeb.h>    // for ftime()
-}
-#endif
-#endif
-
-#if !defined(HAVE_TM_GMTOFF)
-# ifdef HAVE_LONG_TIMEZONE
-extern long timezone;   // for tzset()/long timezone;
-# endif
-#endif
+// All clock time / localtime functions are in libbase/Time.cpp,
+// so that portability problems are all in one place. It saves
+// a lot of rebuilding too.
 
 namespace gnash {
 
@@ -133,9 +112,9 @@ static void fillGnashTime(const double& time, GnashTime& gt);
 static double makeTimeValue(GnashTime& gt);
 static void getLocalTime(const double& time, GnashTime& gt);
 static void getUniversalTime(const double& time, GnashTime& gt);
+static int getLocalTimeZoneOffset(const double& time);
 
 static double rogue_date_args(const fn_call& fn, unsigned maxargs);
-static int getLocalTimeZoneOffset();
 
 // Helper macros for calendar algorithms
 #define IS_LEAP_YEAR(n) ( !((n + 1900) % 400) || ( !((n + 1900) % 4) && ((n + 1900) % 100)) )
@@ -156,8 +135,8 @@ static int getLocalTimeZoneOffset();
 static void
 getLocalTime(const double& time, GnashTime& gt)
 {
-    // Not yet correct - no time zone.
-    gt.timeZoneOffset = getLocalTimeZoneOffset();
+    // find local timezone offset for the desired time.
+    gt.timeZoneOffset = getLocalTimeZoneOffset(time);
     fillGnashTime(time, gt);
 }
 
@@ -268,13 +247,13 @@ attachDateStaticInterface(as_object& o)
 static as_object*
 getDateInterface()
 {
-  static boost::intrusive_ptr<as_object> o;
-  if ( o == NULL )
-  {
-    o = new as_object(getObjectInterface());
-    attachDateInterface(*o);
-  }
-  return o.get();
+    static boost::intrusive_ptr<as_object> o;
+    if ( !o )
+    {
+        o = new as_object(getObjectInterface());
+        attachDateInterface(*o);
+    }
+    return o.get();
 }
 
 class date_as_object : public as_object
@@ -322,8 +301,8 @@ date_as_object::toString()
 
     getLocalTime(value, gt);
 
-    int offsetMinutes = gt.timeZoneOffset / 60;
-    int offsetHours = gt.timeZoneOffset % 60;    
+    int offsetHours = gt.timeZoneOffset / 60;
+    int offsetMinutes = gt.timeZoneOffset % 60;    
   
     // If timezone is negative, both hours and minutes will be negative
     // but for the purpose of printing a string, only the hour needs to
@@ -376,7 +355,7 @@ date_new(const fn_call& fn)
     // TODO: move this to date_as_object constructor
     if (fn.nargs < 1 || fn.arg(0).is_undefined()) {
         // Set from system clock
-        date->value = tu_timer::get_ticks();
+        date->value = clocktime::getTicks();
     }
     else if (fn.nargs == 1) {
         // Set the value in milliseconds since 1970 UTC
@@ -422,16 +401,14 @@ date_new(const fn_call& fn)
             case 2:
                 break;
                 // Done already
-            }
+        }
 
-            double val = makeTimeValue(gt); // convert from local time
-            if (val == -1) {
-                // mktime could not represent the time
-                log_error(_("Date() failed to initialise from arguments"));
-                date->value = 0;  // or undefined?
-            } else {
-                date->value = val;
-            }
+        // The arguments are in local time: subtract the local time offset
+        // at the desired time to get UTC. This may not be completely correct
+        // due to shortcomings in the timezoneoffset calculation, but should
+        // be internally consistent.
+        double localTime = makeTimeValue(gt);
+        date->value = localTime - clocktime::getTimeZoneOffset(localTime) * 60000;
     }
     
     return as_value(date);
@@ -523,83 +500,13 @@ date_get_proto(date_getutcminutes,  getUniversalTime, minute)
 
 
 // Return the difference between UTC and localtime in minutes.
-static int getLocalTimeZoneOffset()
+static int getLocalTimeZoneOffset(const double& time)
 {
     // This simply has to return the difference in minutes
     // between UTC (Greenwich Mean Time, GMT) and the localtime.
     // Obviously, this includes Daylight Saving Time if it applies.
-    
-    // Should we get this from tu_timer too.
 
-    return 0;
-#ifdef HAVE_TM_GMTOFF
-  // tm_gmtoff is in seconds east of GMT; convert to minutes.
-//  return((int) (tm.tm_gmtoff / 60));
-    return 0;
-#else
-  // Find the geographical system timezone offset and add an hour if
-  // DST applies to the date.
-  // To get it really right I guess we should call both gmtime()
-  // and localtime() and look at the difference.
-  //
-  // The range of standard time is GMT-11 to GMT+14.
-  // The most extreme with DST is Chatham Island GMT+12:45 +1DST
-
-  int minutes_east;
-
-  // Find out system timezone offset...
-
-#if 0
-
-# if defined(HAVE_TZSET) && defined(HAVE_LONG_TIMEZONE)
-  tzset();
-  minutes_east = -timezone/60; // timezone is seconds west of GMT
-# elif defined(HAVE_GETTIMEOFDAY)
-  // gettimeofday(3):
-  // "The use of the timezone structure is obsolete; the tz argument
-  // should normally be specified as NULL. The tz_dsttime field has
-  // never been used under Linux; it has not been and will not be
-  // supported by libc or glibc."
-  // Still, mancansa d'asu, t'acuma i buoi.
-  struct timeval tv;
-  struct timezone tz;
-  gettimeofday(&tv,&tz);
-  minutes_east = -tz.tz_minuteswest;
-
-# elif defined(HAVE_FTIME)
-  // ftime(3): "These days the contents of the timezone and dstflag
-  // fields are undefined."
-  // In practice, timezone is -120 in Italy when it should be -60.
-  struct timeb tb;
-    
-  ftime (&tb);
-  // tb.timezone is number of minutes west of GMT
-  minutes_east = -tb.timezone;
-
-# else
-  minutes_east = 0; // No idea.
-# endif
-
-  // ...and adjust by one hour if DST was in force at that time.
-  //
-  // According to http://www.timeanddate.com/time/, the only place that
-  // uses DST != +1 hour is Lord Howe Island with half an hour. Tough.
-
-  if (tm.tm_isdst == 0) {
-    // DST exists and is not in effect
-  } else if (tm.tm_isdst > 0) {
-    // DST exists and was in effect
-    minutes_east += 60;
-  } else {
-    // tm_isdst is negative: cannot get TZ info.
-    // Convert and print in UTC instead.
-    log_error("Cannot get timezone information");
-    minutes_east = 0;
-  }
-#endif
-
-  return minutes_east;
-#endif // HAVE_TM_OFFSET
+    return clocktime::getTimeZoneOffset(time);
 }
 
 
@@ -611,7 +518,7 @@ static as_value
 date_gettimezoneoffset(const fn_call& fn)
 {
     boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
-    return as_value( -getLocalTimeZoneOffset() );
+    return as_value( -getLocalTimeZoneOffset(date->value) );
 }
 
 
@@ -668,7 +575,11 @@ gnashTimeToDate(GnashTime& gt, date_as_object& date, bool utc)
 {
     // Needs timezone.
     if (utc) date.value = makeTimeValue(gt);
-    else date.value = makeTimeValue(gt);
+
+    else {
+        double localTime = makeTimeValue(gt);
+        date.value = localTime - clocktime::getTimeZoneOffset(localTime) * 60000;
+    }
 }
 
 static void
