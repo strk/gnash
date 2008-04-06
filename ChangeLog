@@ -1,3 +1,8 @@
+2008-04-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/Time.{cpp,h}: sys/time.h should be included; let's see if
+	  this fixes the win32 build.
+
 2008-04-06  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* testsuite/libamf.all/test_el.cpp: Use new make* methods for

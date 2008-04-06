@@ -84,6 +84,7 @@ clocktime::getTimeZoneOffset()
 #else // not using boost::date_time
 
 #include <ctime> // for time_t, localtime
+#include <sys/time.h> // should be included for all OSs?
 
 #if !defined(HAVE_GETTIMEOFDAY) || (!defined(HAVE_TM_GMTOFF) && !defined(HAVE_TZSET))
 #ifdef HAVE_FTIME
