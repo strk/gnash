@@ -1,3 +1,9 @@
+2008-04-07 Sandro Santilli <strk@keybit.net>
+
+        * server/as_object.cpp (add_property): invoke the watch trigger
+	  if replacing an existing property.
+	* testsuite/actionscript.all/Object.as: 6 more successes.
+
 2008-04-07  Dossy Shiobara <dossy@panoptic.com>
 
 	* libbase/ClockTime.h: Win32 needs to include <sys/time.h> too.

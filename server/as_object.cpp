@@ -164,38 +164,46 @@ as_object::add_property(const std::string& name, as_function& getter,
 	as_value cacheVal;
 
 	Property* prop = _members.getProperty(k);
-	if ( prop ) cacheVal = prop->getCache();
-
-
-	bool ret = _members.addGetterSetter(k, getter, setter, cacheVal);
-
-	if (!ret) return false;
-
-#if 0
-	// check if we have a trigger, if so, invoke it
-	// and set val to it's return
-	TriggerContainer::iterator trigIter = _trigs.find(std::make_pair(k, 0));
-	if ( trigIter != _trigs.end() )
+	if ( prop )
 	{
-		Trigger& trig = trigIter->second;
+		cacheVal = prop->getCache();
+		return _members.addGetterSetter(k, getter, setter, cacheVal);
 
-		log_debug("add_property: property %s is being watched, current val: %s", name, cacheVal.to_debug_string());
-		cacheVal = trig.call(cacheVal, as_value(), *this);
-
-		// The trigger call could have deleted the property,
-		// so we check for its existance again, and do NOT put
-		// it back in if it was deleted
-		prop = _members.getProperty(k);
-		if ( ! prop )
-		{
-			log_debug("Property %s deleted by trigger on create (getter-setter)", name);
-			return false; // or true ?
-		}
-		prop->setValue(*this, cacheVal);
+		// NOTE: watch triggers not called when adding a new getter-setter property
 	}
+	else
+	{
+
+		bool ret = _members.addGetterSetter(k, getter, setter, cacheVal);
+		if (!ret) return false;
+
+#if 1
+		// check if we have a trigger, if so, invoke it
+		// and set val to it's return
+		TriggerContainer::iterator trigIter = _trigs.find(std::make_pair(k, 0));
+		if ( trigIter != _trigs.end() )
+		{
+			Trigger& trig = trigIter->second;
+
+			log_debug("add_property: property %s is being watched, current val: %s", name, cacheVal.to_debug_string());
+			cacheVal = trig.call(cacheVal, as_value(), *this);
+
+			// The trigger call could have deleted the property,
+			// so we check for its existance again, and do NOT put
+			// it back in if it was deleted
+			prop = _members.getProperty(k);
+			if ( ! prop )
+			{
+				log_debug("Property %s deleted by trigger on create (getter-setter)", name);
+				return false; // or true ?
+			}
+			prop->setCache(cacheVal);
+			//prop->setValue(*this, cacheVal);
+		}
 #endif
 
-	return ret;
+		return ret;
+	}
 }
 
 bool

@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Object.as,v 1.61 2008/04/07 18:03:46 strk Exp $";
+rcsid="$Id: Object.as,v 1.62 2008/04/07 18:25:42 strk Exp $";
 #include "check.as"
 
 // Test things in Class Object (swf5~swf8)
@@ -715,11 +715,11 @@ _root.ret = 'return from watch';
 _root.get_l_calls=_root.set_l_calls=0;
 r = o.addProperty("l", get_l, set_l);
 check(r);
-xcheck_equals(_root.info.nam, 'l'); // gnash fails calling the watch trigger at all here
+check_equals(_root.info.nam, 'l'); // gnash fails calling the watch trigger at all here
 check_equals(typeof(_root.info.ov), 'undefined');
 check_equals(typeof(_root.info.nv), 'undefined'); // underlying value of getter-setter was undefined
-xcheck_equals(_root.info.d, 'cust2');
-xcheck_equals(_root.info.tv, o); 
+check_equals(_root.info.d, 'cust2');
+check_equals(_root.info.tv, o); 
 check_equals(_root.get_l_calls, 0);
 check_equals(_root.set_l_calls, 0);
 
@@ -729,7 +729,7 @@ delete _root.info;
 _root.get_l_calls=_root.set_l_calls=0;
 r = o.addProperty("l", get_l, set_l);
 check(r);
-xcheck_equals(typeof(_root.info), 'undefined');
+check_equals(typeof(_root.info), 'undefined');
 check_equals(_root.get_l_calls, 0);
 check_equals(_root.set_l_calls, 0);
 r = o.l;
@@ -738,21 +738,21 @@ check_equals(r, 'return from watch');
 // Getter/setter is not invoked, but watcher was used to set it's 
 // underlying value, check this:
 v = o.l;
-xcheck_equals(v, 'return from watch'); 
+check_equals(v, 'return from watch'); 
 
 delete _root.info;
 _root.get_l_calls=_root.set_l_calls=0;
 
 o.l = 'ciao'; // watched, and invokes setter
 #if OUTPUT_VERSION < 7
-  xcheck_equals(_root.info.ov, 'return from watch'); // old value
+  check_equals(_root.info.ov, 'return from watch'); // old value
   xcheck_equals(_root.info.nv, 'ciao'); // we requested this
   check_equals(_root.info.d, 'cust2'); 
   check_equals(_root.info.tv, o); 
   check_equals(_root.get_l_calls, 0); // should get underlying value, not invoke getter
   check_equals(_root.set_l_calls, 1);
 #else
-  xcheck_equals(_root.info.ov, 'return from watch'); // old value
+  check_equals(_root.info.ov, 'return from watch'); // old value
   check_equals(_root.info.nv, 'return from watch'); // mmm ?
   check_equals(_root.info.d, 'cust2'); 
   check_equals(_root.info.tv, o); 
