@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Object.as,v 1.58 2008/04/07 16:31:18 strk Exp $";
+rcsid="$Id: Object.as,v 1.59 2008/04/07 17:09:40 strk Exp $";
 #include "check.as"
 
 // Test things in Class Object (swf5~swf8)
@@ -498,6 +498,36 @@ check(!r);
 r = o.addProperty('lundef', null, setter);
 check(!r);
 
+// not-setting setter
+noset_setter = function(v) { noset_setter_calls++; }; // doesn't set cache
+simple_test_getter = function() { return this.test; };
+o = {};
+o.addProperty("test", simple_test_getter, noset_setter);
+noset_setter_calls=0;
+o.test = 2;
+check_equals(noset_setter_calls, 1);
+v = o.test;
+xcheck_equals(v, 2); // did still set the cache
+o.test = 5;
+check_equals(noset_setter_calls, 2);
+v = o.test;
+xcheck_equals(v, 5);
+
+// test setter visibility of value (multiplies * 2)
+timetwo_test_setter = function(v) {
+	// note("timetwo_test_setter sees this.test as "+this.test);
+	this.test *= 2;
+};
+o = {};
+o.test = 1;
+o.addProperty("test", simple_test_getter, timetwo_test_setter);
+o.test = 2;
+v = o.test;
+xcheck_equals(v, 2);
+o.test = 5;
+v = o.test;
+xcheck_equals(v, 5);
+
 
 // Object.addProperty wasn't in SWF5
 #endif // OUTPUT_VERSION > 5
@@ -747,6 +777,6 @@ totals(79);
 #endif
 
 #if OUTPUT_VERSION >= 6
-totals(240);
+totals(246);
 #endif
 
