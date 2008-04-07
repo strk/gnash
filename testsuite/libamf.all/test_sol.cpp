@@ -218,7 +218,6 @@ test_write(std::string &filespec)
     sol.addObj(el);
     if ((strcmp(el->getName(), "defaultcamera") == 0) &&
         (el->getType() == Element::STRING) &&
-        (*el->getData() == 0) &&
         (el->getLength() == 0)) {
         runtest.pass("defaultcamera set");
     } else {
