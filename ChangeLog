@@ -1,5 +1,12 @@
 2008-04-07 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Object.as: test that native
+	  getter-setters (assuming MovieClip._target is one of them)
+	  will not provide an underlying value for overriding user
+	  defined property.
+
+2008-04-07 Sandro Santilli <strk@keybit.net>
+
 	* libmedia/gst/gstflvparse.c, server/asobj/NetStream.cpp,
 	  server/asobj/NetStream.h, server/asobj/NetStreamGst.cpp:
 	  Applied bastiaan patch for proper INVOKE tag processing,

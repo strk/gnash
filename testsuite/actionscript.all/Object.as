@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Object.as,v 1.56 2008/04/05 10:19:26 strk Exp $";
+rcsid="$Id: Object.as,v 1.57 2008/04/07 09:19:02 strk Exp $";
 #include "check.as"
 
 // Test things in Class Object (swf5~swf8)
@@ -334,9 +334,17 @@ check(r);
 v = o.test;
 check_equals(v, undefined); // but not existing prop from inheritance chain
 
-// TODO: existing getter-setter property higher in inheritance chain ?
+// Existing native property 
 
-
+o = createEmptyMovieClip("hello", 10);
+check_equals(o._target, "/hello");
+function target_get() { _root.target_get_calls++; return this._target; }
+function target_set(v) { this._target=v; _root.target_set_calls++; }
+target_get_calls=target_set_calls=0;
+o.addProperty("_target", target_get, target_set);
+check_equals(_root.target_get_calls, 0);
+check_equals(_root.target_set_calls, 0);
+check_equals(typeof(o._target), "undefined"); // native getter-setter don't get initialized with underlying value
 
 // Try property inheritance
 
@@ -735,6 +743,6 @@ totals(79);
 #endif
 
 #if OUTPUT_VERSION >= 6
-totals(233);
+totals(237);
 #endif
 
