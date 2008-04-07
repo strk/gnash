@@ -125,9 +125,9 @@ install-plugin: $(plugin_LTLIBRARIES)
 	@test -d "$(DESTDIR)$(plugindir)" || $(mkinstalldirs) "$(DESTDIR)$(plugindir)"
 	@echo "Installing plugin to $(DESTDIR)$(plugindir)"
 	@if test -d .libs; then \
-	  cp -f .libs/libgnashplugin.so $(DESTDIR)$(plugindir)/libgnashplugin.so; \
+	  cp -f .libs/libgnashplugin.so* $(DESTDIR)$(plugindir)/libgnashplugin.so; \
 	else \
-	  cp -f libgnashplugin.so $(DESTDIR)$(plugindir)/libgnashplugin.so; \
+	  cp -f libgnashplugin.so* $(DESTDIR)$(plugindir)/libgnashplugin.so; \
 	fi
 
 install-plugins: install-plugin

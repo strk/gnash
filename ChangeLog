@@ -3,7 +3,11 @@
 	* libnet/cque.cpp: Enable ifdef'd out deletion of buffers from the
 	cque at destuction time.
 	* libnet/http.cpp: Don't forget to pass in the filetype.
-
+	* libamf/element.cpp: Enable deletion of the buffer when an an
+	Element is destructed.
+	* plugin/Makefile.am: Get all shared libraries, not just the ones
+	that end in .so.
+	
 2008-04-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/actionscript.all: drop more tests that are dependent on
