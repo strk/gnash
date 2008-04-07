@@ -24,14 +24,14 @@
 #include <iostream>
 #include <cstdio>
 #include <sys/time.h>
-#include <time.h>
+#include <ctime>
 
 #ifdef ENABLE_NLS
 #include <locale>
 #endif
 
 #include "gettext.h"
-#include "Time.h"
+#include "ClockTime.h"
 #include "gnash.h"
 #include "movie_definition.h"
 #include "sprite_instance.h"

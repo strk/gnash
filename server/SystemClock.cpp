@@ -23,7 +23,7 @@
 
 #include "SystemClock.h"
 
-#include "Time.h" // for fetchSystemTime
+#include "ClockTime.h" // for getting system time
 
 #include <boost/cstdint.hpp> // for boost::uint64_t typedef
 

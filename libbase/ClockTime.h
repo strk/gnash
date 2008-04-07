@@ -25,14 +25,8 @@
 
 namespace clocktime
 {
-    /// Wall clock timer, uses highest available resolution.
-    /// Generally microseconds on Linux / Unix, microseconds with
-    /// millisecond resolution on Windows. Nanosecond resolution is
-    /// theoretically available.
+    /// Wall clock timer, returns current POSIX time in milliseconds.
 	DSOEXPORT boost::uint64_t getTicks();
-
-	/// Converts ticks to seconds.
-	DSOEXPORT double ticksToSeconds(boost::uint64_t ticks);
 
 	/// Returns the offset between actual clock time and UTC.
 	/// It relies on the system's time zone settings, so

@@ -32,7 +32,7 @@
 #include "movie_root.h"
 #include "sound_handler.h"
 #include "VideoDecoderFfmpeg.h"
-#include "Time.h" // TODO: use the VirtualClock instead ?
+#include "ClockTime.h" // TODO: use the VirtualClock instead ?
 
 #include <boost/scoped_array.hpp>
 

@@ -31,7 +31,7 @@
 #include "VM.h"
 
 #ifdef GNASH_FPS_DEBUG
-#include "Time.h"
+#include "ClockTime.h"
 #endif
 
 #include <cstdio>

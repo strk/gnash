@@ -23,7 +23,7 @@
 #endif
 
 #include "WallClockTimer.h"
-#include "Time.h" // for "portable" get_ticks (contains implementation for win32)
+#include "ClockTime.h" // for "portable" get_ticks (contains implementation for win32)
 
 namespace gnash {
 

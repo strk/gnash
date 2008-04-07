@@ -1,5 +1,15 @@
 2008-04-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* libbase/Time.{cpp,h}: renamed.
+	* libbase/ClockTime.{cpp,h}: renamed from Time.{cpp,h}.
+	* libbase/Makefile.am: reflect name change.
+	* libbase/WallClockTimer.cpp, server/SystemClock.cpp,
+	  utilities/processor.cpp, gui/gui.cpp,
+	  server/asobj/NetStreamFfmpeg.cpp, server/asobj/Date.cpp: update
+	  includes.
+
+2008-04-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* server/asobj/Date.cpp: add getUTCYear(), fix setMilliseconds,
 	  fix setFullYear.
 	* testsuite/actionscript.all/Date.as: drop tests that vary according

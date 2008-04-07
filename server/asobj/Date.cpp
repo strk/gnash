@@ -76,7 +76,7 @@
 #include "GnashException.h"
 #include "builtin_function.h"
 #include "Object.h" // for getObjectInterface
-#include "Time.h"
+#include "ClockTime.h"
 
 #include <ctime>
 #include <cmath>

@@ -31,7 +31,7 @@
 /// disadvantage is that date_time requires not only header files, but also
 /// a run-time library, and thus increases the requirements.
 
-#include "Time.h"
+#include "ClockTime.h"
 #include "log.h"
 
 // Define USE_BOOST_DATE_TIME to use boost as the basis for all
@@ -60,12 +60,6 @@ clocktime::getTicks()
     const int denominator = time_duration::ticks_per_second() / 1000.0;
     
 	return elapsed.ticks() / denominator;
-}
-
-double
-clocktime::ticksToSeconds(boost::uint64_t ticks)
-{
-	return ticks / 1000.0;
 }
 
 boost::int32_t
@@ -139,13 +133,6 @@ clocktime::getTicks()
 }
 
 # endif // not WIN32
-
-// Common non-boost conversion of ticks to seconds
-double
-clocktime::ticksToSeconds(boost::uint64_t ticks)
-{
-	return ticks * (1.0f / 1000.f);
-}
 
 /// Common non-boost function to return the present time offset.
 /// This all seems like a terrible hack. It was moved from Date.cpp,
