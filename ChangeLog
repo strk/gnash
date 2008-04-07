@@ -1,5 +1,10 @@
 2008-04-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* libbase/ClockTime.{cpp,h}: drop left-over w32 function; should
+	  help compiling...
+
+2008-04-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* libbase/ClockTime.{cpp,h}: fix build for systems with no
 	  localtime_r; add safety checks.
 

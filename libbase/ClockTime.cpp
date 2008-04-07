@@ -104,15 +104,9 @@ extern long timezone;   // for tzset()/long timezone;
 boost::uint64_t
 clocktime::getTicks()
 {
+    // This needs to return milliseconds. Does it?
 	return timeGetTime();
 }
-
-boost::int32_t
-clocktime::getTimeZoneOffset()
-{
-    return 0;
-}
-
 
 # else // not _WIN32
 #  include <sys/time.h>
