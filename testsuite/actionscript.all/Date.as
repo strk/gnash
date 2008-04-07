@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Date.as,v 1.50 2008/04/07 09:22:10 bwy Exp $";
+rcsid="$Id: Date.as,v 1.51 2008/04/07 13:14:54 bwy Exp $";
 #include "check.as"
 
 check_equals(typeof(Date), 'function');
@@ -252,12 +252,15 @@ check (Date.utc);
 	check_equals(d.getUTCSeconds(), 0);
 	check_equals(d.getUTCMilliseconds(), 0);
 
-	check_equals(d.getFullYear(), 1970);
-	check_equals(d.getMonth(), 0);
-	check_equals(d.getDate(), 1);
-	check_equals(d.getDay(), 4);	// It was a Thursday
-	//check_equals(d.getHours(), 1); // Doesn't this vary according to timezone?
-	check_equals(d.getMinutes(), 0);
+    // These all vary according to timezone... 0 milliseconds since
+    // midnight 1 Jan 1970 was 1969 in anything west of Greenwich.
+    // It *should* fail there (and does in the pp).
+	//check_equals(d.getFullYear(), 1970);
+	//check_equals(d.getMonth(), 0);
+	//check_equals(d.getDate(), 1);
+	//check_equals(d.getDay(), 4);	// It was a Thursday
+	//check_equals(d.getHours(), 1);
+	//check_equals(d.getMinutes(), 0);
 	check_equals(d.getSeconds(), 0);
 	check_equals(d.getMilliseconds(), 0);
 	
@@ -656,7 +659,7 @@ check_equals(typeof(foo), 'string');
 #endif
 
 #if OUTPUT_VERSION == 5
-totals(285);
+totals(280);
 #else
-totals (327);
+totals (322);
 #endif

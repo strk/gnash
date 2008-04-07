@@ -1,5 +1,10 @@
 2008-04-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* testsuite/actionscript.all: drop more tests that are dependent on
+	  timezone, with comments.
+
+2008-04-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* libbase/ClockTime.{cpp,h}: drop left-over w32 function; should
 	  help compiling...
 
