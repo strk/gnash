@@ -22,6 +22,7 @@
 
 #include <boost/cstdint.hpp>
 #include "dsodefs.h"
+#include <sys/time.h> // for struct timezone
 
 namespace clocktime
 {
