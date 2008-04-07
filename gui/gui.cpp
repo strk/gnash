@@ -175,7 +175,7 @@ Gui::unsetFullscreen()
     log_unimpl(_("Fullscreen not yet supported in this GUI"));
 }
 
-void
+bool
 Gui::showMouse(bool /* show */)
 {
 	static bool warned = false;
@@ -184,6 +184,8 @@ Gui::showMouse(bool /* show */)
     	log_unimpl(_("Mouse show/hide not yet supported in this GUI"));
     	warned = true;
    	}
+   	
+   	return true;
 }
 
 void

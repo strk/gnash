@@ -476,9 +476,12 @@ void FBGui::showMenu(bool /*show*/)
   log_unimpl(_("This GUI does not yet support menus"));
 }
 
-void FBGui::showMouse(bool /*show*/)
+bool FBGui::showMouse(bool /*show*/)
 {
   log_unimpl(_("This GUI does not yet support a mouse pointer"));
+  // Should return true if the pointer was visible before call,
+  // otherwise false;
+  return true;
 }
 
 

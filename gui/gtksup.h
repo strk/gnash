@@ -183,7 +183,7 @@ class GtkGui : public Gui
 
     virtual void setCursor(gnash_cursor_type newcursor);
     
-    virtual void showMouse(bool show);
+    virtual bool showMouse(bool show);
 
     virtual void showMenu(bool show);
 

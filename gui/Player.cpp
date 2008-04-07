@@ -520,14 +520,12 @@ Player::interfaceEventCallback(const std::string& event, const std::string& arg)
 {
     if (event == "Mouse.hide")
     {
-        _gui->showMouse(false);
-        return "";
+        return _gui->showMouse(false) ? "true" : "false";
     }
 
     if (event == "Mouse.show")
     {
-        _gui->showMouse(true);
-        return "";
+        return _gui->showMouse(true) ? "true" : "false";
     }
     
     if (event == "Stage.displayState")

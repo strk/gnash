@@ -94,17 +94,19 @@ as_value mouse_hide(const fn_call& fn)
     boost::intrusive_ptr<mouse_as_object> obj=ensureType<mouse_as_object>(fn.this_ptr);
     UNUSED(obj);
 
+    int success = 0;
+
 	if (movie_root::interfaceHandle)
 	{
-		(*movie_root::interfaceHandle)("Mouse.hide", "");
+		success = ((*movie_root::interfaceHandle)("Mouse.hide", "") == "true") ? 1 : 0;
 	}
 	else
 	{
 		log_error(_("No callback to handle Mouse.hide"));
 	}
 
-	/// Returns nothing
-    return as_value();
+    // returns 1 if mouse was visible before call.
+    return as_value(success);
 }
 
 as_value mouse_show(const fn_call& fn)
@@ -112,16 +114,19 @@ as_value mouse_show(const fn_call& fn)
     boost::intrusive_ptr<mouse_as_object> obj=ensureType<mouse_as_object>(fn.this_ptr);
     UNUSED(obj);
 
+    int success = 0;
+
 	if (movie_root::interfaceHandle)
 	{
-		(*movie_root::interfaceHandle)("Mouse.show", "");
+		success = ((*movie_root::interfaceHandle)("Mouse.show", "") == "true") ? 1 : 0;
 	}
 	else
 	{
 		log_error(_("No callback to handle Mouse.show"));
 	}
-	/// Returns nothing
-    return as_value();
+
+    // returns 1 if Mouse was visible before call.
+    return as_value(success);
 }
 
 as_value

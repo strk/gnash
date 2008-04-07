@@ -1,3 +1,16 @@
+2008-04-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/asobj/Mouse.cpp: expect a return value from Mouse.show and
+	  Mouse.hide callbacks, and return it (as an integer 1 or 0, not a
+	  boolean).
+	* gui/gtk{.cpp,sup.h}, gui/fb{.cpp,sup.h}, gui/gui.{cpp,h}: return
+	  true if Mouse was visible before the call; otherwise false.
+	* gui/Player.cpp: pass Mouse return as "true" or "false".
+	* utilities/processor.cpp: replicate event callback for Mouse.show
+	  and .hide. Return whether hypothetical mouse was visible or not.
+	* testsuite/swfdec/PASSING: mouse-show-hide test passes (relies on
+	  processor and gui acting the same).
+
 2008-04-07 Sandro Santilli <strk@keybit.net>
 
 	* libnet/cque.cpp: implement safe ::merge method. 

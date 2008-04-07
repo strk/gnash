@@ -231,7 +231,8 @@ public:
     /// Sets whether the gui should show the system mouse pointer
     //
     /// @param show true if the mouse should be shown.
-    virtual void showMouse(bool show);
+    /// @return true if the state changed.
+    virtual bool showMouse(bool show);
 
     /// Sets whether the menus should be shown (for fscommand)
     //

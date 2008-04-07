@@ -205,7 +205,7 @@ class FBGui : public Gui
     virtual void unsetFullscreen();
     
     virtual void showMenu(bool show);
-    virtual void showMouse(bool show);
+    virtual bool showMouse(bool show);
     
     virtual void setInvalidatedRegions(const InvalidatedRanges& ranges);
     virtual bool want_multiple_regions() { return true; }

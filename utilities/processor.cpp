@@ -140,6 +140,33 @@ void execFsCommand(sprite_instance* movie, const std::string& command, const std
     if ( ncasecomp(command, "quit") ) quitrequested = true;
 }
 
+std::string eventCallback(const std::string& event,
+							const std::string& arg)
+{
+    log_debug(_("eventCallback: %s %s"), event, arg);
+    
+    StringNoCaseEqual ncasecomp;  
+
+    static bool mouseShown = true;
+
+    // These should return "true" if the mouse was visible before
+    // the call.
+    if ( ncasecomp(event, "Mouse.hide") ) {
+        bool state = mouseShown;
+        mouseShown = false;
+        return state ? "true" : "false";
+    }
+
+    if ( ncasecomp(event, "Mouse.show") ) {
+        bool state = mouseShown;
+        mouseShown = true;
+        return state ? "true" : "false" ;
+    }
+    
+    return "";
+
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -277,6 +304,7 @@ main(int argc, char *argv[])
     }
 
     registerFSCommandCallback(execFsCommand);
+    gnash::movie_root::registerEventCallback(&eventCallback);
 
     // Play through all the movies.
     for (int i = 0, n = infiles.size(); i < n; i++) {

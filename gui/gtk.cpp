@@ -361,11 +361,14 @@ GtkGui::setCursor(gnash_cursor_type newcursor)
     }
 }
 
-void
+// Returns whether the mouse was visible before call.
+bool
 GtkGui::showMouse(bool show)
 {
 
-    if (show == _mouseShown) return;
+    bool state = _mouseShown;
+
+    if (show == _mouseShown) return state;
 
     if (!show)
     {
@@ -389,8 +392,9 @@ GtkGui::showMouse(bool show)
 	else if (show)
     {
         _mouseShown = true;	
-    } 
-
+    }
+    
+    return state;
 }
 
 void
