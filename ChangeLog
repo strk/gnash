@@ -1,3 +1,7 @@
+2008-04-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/Time.{cpp,h}: clean up headers again.
+
 2008-04-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/Time.{cpp,h}: sys/time.h should be included; let's see if
