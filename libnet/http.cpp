@@ -58,7 +58,8 @@ extern map<int, Handler *> handlers;
 static const int readsize = 1024;
 
 HTTP::HTTP() 
-    : _filesize(0),
+    : _filetype(amf::AMF::FILETYPE_HTML),
+      _filesize(0),
       _port(80),
       _keepalive(true),
       _handler(0),
@@ -72,7 +73,10 @@ HTTP::HTTP()
 }
 
 HTTP::HTTP(Handler *hand) 
-    : _filesize(0), _port(80), _keepalive(false)
+    : _filetype(amf::AMF::FILETYPE_HTML),
+      _filesize(0),
+      _port(80),
+      _keepalive(false)
 {
 //    GNASH_REPORT_FUNCTION;
     _handler = hand;
@@ -185,7 +189,7 @@ HTTP::formatHeader(int filesize, http_status_e type)
     formatContentLength(filesize);
     formatKeepAlive("timeout=15, max=100");
     formatConnection("Keep-Alive");
-    formatContentType();
+    formatContentType(amf::AMF::FILETYPE_HTML);
     // All HTTP messages are followed by a blank line.
     terminateHeader();
     return true;

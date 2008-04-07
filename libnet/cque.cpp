@@ -53,14 +53,12 @@ CQue::~CQue()
 {
 //    GNASH_REPORT_FUNCTION;
 //    clear();
-#if 0
-    deque<amf::Buffer *>::iterator it;
+    Que::iterator it;
     boost::mutex::scoped_lock lock(_mutex);
     for (it = _que.begin(); it != _que.end(); it++) {
 	amf::Buffer *ptr = *(it);
 	delete ptr;
     }
-#endif
 }
 
 // Wait for a condition variable to trigger
