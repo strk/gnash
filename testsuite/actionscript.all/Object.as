@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Object.as,v 1.57 2008/04/07 09:19:02 strk Exp $";
+rcsid="$Id: Object.as,v 1.58 2008/04/07 16:31:18 strk Exp $";
 #include "check.as"
 
 // Test things in Class Object (swf5~swf8)
@@ -718,12 +718,16 @@ o.l = 'ciao'; // watched, and invokes setter
   xcheck_equals(_root.set_l_calls, 65);
 #endif
 
-// watch a getter-setter in the inheritance chain
+r = o.unwatch("l");
+xcheck(!r); // can't unwatch while the property is a getter-setter
+check(delete o.l);
+r = o.unwatch("l");
+xcheck(r); // now we can unwatch.. (gnash fails as it removed the watch before)
 
-o2 = {}; o2.__proto__ = o;
-o2.l = 
+// TODO: watch a getter-setter in the inheritance chain
 
-// TODO: add tests here
+//o2 = {}; o2.__proto__ = o;
+//o2.l = 
 
 #endif // OUTPUT_VERSION > 5
 
@@ -743,6 +747,6 @@ totals(79);
 #endif
 
 #if OUTPUT_VERSION >= 6
-totals(237);
+totals(240);
 #endif
 
