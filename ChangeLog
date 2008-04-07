@@ -1,5 +1,10 @@
 2008-04-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* libbase/ClockTime.{cpp,h}: fix build for systems with no
+	  localtime_r; add safety checks.
+
+2008-04-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* libbase/Time.{cpp,h}: renamed.
 	* libbase/ClockTime.{cpp,h}: renamed from Time.{cpp,h}.
 	* libbase/Makefile.am: reflect name change.

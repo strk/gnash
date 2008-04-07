@@ -31,6 +31,7 @@
 /// disadvantage is that date_time requires not only header files, but also
 /// a run-time library, and thus increases the requirements.
 
+#include <boost/cstdint.hpp>
 #include "ClockTime.h"
 #include "log.h"
 
@@ -161,9 +162,10 @@ clocktime::getTimeZoneOffset(double time)
 #ifdef HAVE_LOCALTIME_R
     localtime_r(&tt, &tm);
 #else
-    struct tm *tmp;
-    tmp = localtime(t);
-    memcpy(tm, tmp, sizeof(struct tm));
+    struct tm *tmp = NULL;
+    tmp = localtime(&tt);
+    if (!tmp) return 0; // We failed.
+    memcpy(&tm, tmp, sizeof(struct tm));
 #endif
 
     struct tm tm2 = tm;
@@ -173,7 +175,14 @@ clocktime::getTimeZoneOffset(double time)
     
     ttmp = mktime(&tm2);
 
+#ifdef HAVE_LOCALTIME_R
     localtime_r(&ttmp, &tm2);  // find out whether DST is in force
+#else
+    struct tm *tmp2 = NULL;
+    tmp2 = localtime(&ttmp);
+    if (!tmp2) return 0; // We failed.
+    memcpy(&tm2, tmp2, sizeof(struct tm));
+#endif
 
     // If mktime or localtime fail, tm2.tm_isdst should be unchanged,
     // so 0. That's why we don't make any checks on their success.
