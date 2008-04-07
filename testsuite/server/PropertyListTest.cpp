@@ -44,6 +44,7 @@ int
 main(int /*argc*/, char** /*argv*/)
 {
 	cout << "sizeof(Property): " << sizeof(Property) << endl;
+	cout << "sizeof(PropertyList): " << sizeof(PropertyList) << endl;
 
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity();
