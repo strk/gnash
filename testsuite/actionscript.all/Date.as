@@ -22,7 +22,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Date.as,v 1.49 2008/04/05 11:08:19 bwy Exp $";
+rcsid="$Id: Date.as,v 1.50 2008/04/07 09:22:10 bwy Exp $";
 #include "check.as"
 
 check_equals(typeof(Date), 'function');
@@ -103,6 +103,7 @@ check (d.getTimezoneOffset);
 check (d.getUTCDate);
 check (d.getUTCDay);
 check (d.getUTCFullYear);
+check (d.getUTCYear);
 check (d.getUTCHours);
 check (d.getUTCMilliseconds);
 check (d.getUTCMinutes);
@@ -146,6 +147,7 @@ check_equals (d.gettimezoneOffset, undefined);
 check_equals (d.getUTCdate, undefined);
 check_equals (d.getUTCday, undefined);
 check_equals (d.getUTCfullYear, undefined);
+check_equals (d.getUTCyear, undefined);
 check_equals (d.getUTChours, undefined);
 check_equals (d.getUTCmilliseconds, undefined);
 check_equals (d.getUTCminutes, undefined);
@@ -184,6 +186,7 @@ check (d.gettimezoneOffset);
 check (d.getUTCdate);
 check (d.getUTCday);
 check (d.getUTCfullYear);
+check (d.getUTCyear);
 check (d.getUTChours);
 check (d.getUTCmilliseconds);
 check (d.getUTCminutes);
@@ -515,46 +518,35 @@ check (Date.utc);
 	check_equals(wierddate.getSeconds(), 12);
 	check_equals(wierddate.getMilliseconds(), 7);
 
-	xcheck_equals(wierddate.valueOf().toString(), "-65309372987993");
+    // Bogus tests: depend on the timezone.
+	//xcheck_equals(wierddate.valueOf().toString(), "-65309372987993");
 
     wierddate.setMilliseconds(300);
 	check_equals(wierddate.getMilliseconds(), 300);
-	xcheck_equals(wierddate.getSeconds(), 12);
+	check_equals(wierddate.getSeconds(), 12);
 
-	xcheck_equals(wierddate.valueOf().toString(), "-65309372987700");
+	//xcheck_equals(wierddate.valueOf().toString(), "-65309372987700");
 	
     wierddate.setMilliseconds(-300);
 	check_equals(wierddate.getMilliseconds(), 700);
-	xcheck_equals(wierddate.getSeconds(), 11);
+	check_equals(wierddate.getSeconds(), 11);
 
-	xcheck_equals(wierddate.valueOf().toString(), "-65309372988300");
+	//xcheck_equals(wierddate.valueOf().toString(), "-65309372988300");
 	
     wierddate.setYear(100000);
 	check_equals(wierddate.getMilliseconds(), 700);
 	check_equals(wierddate.getFullYear(), 100000);	   
-#if OUTPUT_VERSION < 8
-	xcheck_equals(wierddate.valueOf().toString(), "3.0935415006117e+15");
-#else
-	xcheck_equals(wierddate.valueOf().toString(), "3.0935415870117e+15");
-#endif
 
 
     wierddate.setYear(-100000);
 	check_equals(wierddate.getMilliseconds(), 700);
-	xcheck_equals(wierddate.getFullYear(), -100000);	   
-#if OUTPUT_VERSION < 8
-	xcheck_equals(wierddate.valueOf().toString(), "-3.2178488993883e+15");
-#else
-	xcheck_equals(wierddate.valueOf().toString(), "-3.2178488129883e+15");
-#endif
-	
+	check_equals(wierddate.getFullYear(), -100000);	   
+
     h = new Date(3.0935415006117e+23);
-	check_equals(h.getMilliseconds(), 584);
-	check_equals(h.getSeconds(), 0);
-	check_equals(h.getMinutes(), 4);
-	check_equals(h.getDay(), 2);
-	xcheck_equals(h.getFullYear(), -2147481678);
-	xcheck_equals(h.toString(), "Tue Jan -2147483647 16:04:00 GMT+0000 -2147481678");	   
+	check_equals(h.getUTCMilliseconds(), 584);
+	check_equals(h.getUTCSeconds(), 0);
+	check_equals(h.getUTCMinutes(), 4);
+	check_equals(h.getUTCDay(), 2);
 
 // It's hard to test TimezoneOffset because the values will be different
 // depending upon where geographically you run the tests.
@@ -664,7 +656,7 @@ check_equals(typeof(foo), 'string');
 #endif
 
 #if OUTPUT_VERSION == 5
-totals(290);
+totals(285);
 #else
-totals (332);
+totals (327);
 #endif

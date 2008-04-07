@@ -1,3 +1,11 @@
+2008-04-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/asobj/Date.cpp: add getUTCYear(), fix setMilliseconds,
+	  fix setFullYear.
+	* testsuite/actionscript.all/Date.as: drop tests that vary according
+	  to local timezone. Add tests for getUTCYear, more passes for
+	  milliseconds and full year.
+
 2008-04-07 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Object.as: test that native

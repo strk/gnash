@@ -166,6 +166,7 @@ static as_value date_getminutes(const fn_call& fn);
 static as_value date_getseconds(const fn_call& fn);
 static as_value date_getmilliseconds(const fn_call& fn);
 static as_value date_getutcfullyear(const fn_call& fn);
+static as_value date_getutcyear(const fn_call& fn);
 static as_value date_getutcmonth(const fn_call& fn);
 static as_value date_getutcdate(const fn_call& fn);
 static as_value date_getutcday(const fn_call& fn);
@@ -175,6 +176,8 @@ static as_value date_setdate(const fn_call& fn);
 static as_value date_setfullyear(const fn_call& fn);
 static as_value date_sethours(const fn_call& fn);
 static as_value date_setmilliseconds(const fn_call& fn);
+static as_value date_setutcseconds(const fn_call& fn);
+static as_value date_setutcmilliseconds(const fn_call& fn);
 static as_value date_setminutes(const fn_call& fn);
 static as_value date_setmonth(const fn_call& fn);
 static as_value date_setseconds(const fn_call& fn);
@@ -194,47 +197,52 @@ static as_object* getDateInterface();
 static void attachDateInterface(as_object& o);
 static void attachDateStaticInterface(as_object& o);
 
+// As UTC offset is measured in minutes, we can use the same
+// functions to get seconds and milliseconds in local and utc time.
+// But setting either of them can have a knock-on effect on minutes
+// and hours, so both need their own set functions.
 static void
 attachDateInterface(as_object& o)
 {
-  o.init_member("getDate", new builtin_function(date_getdate));
-  o.init_member("getDay", new builtin_function(date_getday));
-  o.init_member("getFullYear", new builtin_function(date_getfullyear));
-  o.init_member("getHours", new builtin_function(date_gethours));
-  o.init_member("getMilliseconds", new builtin_function(date_getmilliseconds));
-  o.init_member("getMinutes", new builtin_function(date_getminutes));
-  o.init_member("getMonth", new builtin_function(date_getmonth));
-  o.init_member("getSeconds", new builtin_function(date_getseconds));
-  o.init_member("getTime", new builtin_function(date_gettime));
-  o.init_member("getTimezoneOffset", new builtin_function(date_gettimezoneoffset));
-  o.init_member("getUTCDate", new builtin_function(date_getutcdate));
-  o.init_member("getUTCDay", new builtin_function(date_getutcday));
-  o.init_member("getUTCFullYear", new builtin_function(date_getutcfullyear));
-  o.init_member("getUTCHours", new builtin_function(date_getutchours));
-  o.init_member("getUTCMilliseconds", new builtin_function(date_getmilliseconds)); // same
-  o.init_member("getUTCMinutes", new builtin_function(date_getutcminutes));
-  o.init_member("getUTCMonth", new builtin_function(date_getutcmonth));
-  o.init_member("getUTCSeconds", new builtin_function(date_getseconds));
-  o.init_member("getYear", new builtin_function(date_getyear));
-  o.init_member("setDate", new builtin_function(date_setdate));
-  o.init_member("setFullYear", new builtin_function(date_setfullyear));
-  o.init_member("setHours", new builtin_function(date_sethours));
-  o.init_member("setMilliseconds", new builtin_function(date_setmilliseconds));
-  o.init_member("setMinutes", new builtin_function(date_setminutes));
-  o.init_member("setMonth", new builtin_function(date_setmonth));
-  o.init_member("setSeconds", new builtin_function(date_setseconds));
-  o.init_member("setTime", new builtin_function(date_settime));
-  o.init_member("setUTCDate", new builtin_function(date_setutcdate));
-  o.init_member("setUTCFullYear", new builtin_function(date_setutcfullyear));
-  o.init_member("setUTCHours", new builtin_function(date_setutchours));
-  o.init_member("setUTCMilliseconds", new builtin_function(date_setmilliseconds)); // same
-  o.init_member("setUTCMinutes", new builtin_function(date_setutcminutes));
-  o.init_member("setUTCMonth", new builtin_function(date_setutcmonth));
-  o.init_member("setUTCSeconds", new builtin_function(date_setseconds));
-  o.init_member("setYear", new builtin_function(date_setyear));
-  o.init_member("toString", new builtin_function(date_tostring));
-  o.init_member("valueOf", new builtin_function(date_valueof));
-}
+    o.init_member("getDate", new builtin_function(date_getdate));
+    o.init_member("getDay", new builtin_function(date_getday));
+    o.init_member("getFullYear", new builtin_function(date_getfullyear));
+    o.init_member("getHours", new builtin_function(date_gethours));
+    o.init_member("getMilliseconds", new builtin_function(date_getmilliseconds));
+    o.init_member("getMinutes", new builtin_function(date_getminutes));
+    o.init_member("getMonth", new builtin_function(date_getmonth));
+    o.init_member("getSeconds", new builtin_function(date_getseconds));
+    o.init_member("getTime", new builtin_function(date_gettime));
+    o.init_member("getTimezoneOffset", new builtin_function(date_gettimezoneoffset));
+    o.init_member("getUTCDate", new builtin_function(date_getutcdate));
+    o.init_member("getUTCDay", new builtin_function(date_getutcday));
+    o.init_member("getUTCFullYear", new builtin_function(date_getutcfullyear));
+    o.init_member("getUTCYear", new builtin_function(date_getutcyear));
+    o.init_member("getUTCHours", new builtin_function(date_getutchours));
+    o.init_member("getUTCMilliseconds", new builtin_function(date_getmilliseconds)); // same
+    o.init_member("getUTCMinutes", new builtin_function(date_getutcminutes));
+    o.init_member("getUTCMonth", new builtin_function(date_getutcmonth));
+    o.init_member("getUTCSeconds", new builtin_function(date_getseconds));
+    o.init_member("getYear", new builtin_function(date_getyear));
+    o.init_member("setDate", new builtin_function(date_setdate));
+    o.init_member("setFullYear", new builtin_function(date_setfullyear));
+    o.init_member("setHours", new builtin_function(date_sethours));
+    o.init_member("setMilliseconds", new builtin_function(date_setmilliseconds));
+    o.init_member("setMinutes", new builtin_function(date_setminutes));
+    o.init_member("setMonth", new builtin_function(date_setmonth));
+    o.init_member("setSeconds", new builtin_function(date_setseconds));
+    o.init_member("setTime", new builtin_function(date_settime));
+    o.init_member("setUTCDate", new builtin_function(date_setutcdate));
+    o.init_member("setUTCFullYear", new builtin_function(date_setutcfullyear));
+    o.init_member("setUTCHours", new builtin_function(date_setutchours));
+    o.init_member("setUTCMilliseconds", new builtin_function(date_setutcmilliseconds));
+    o.init_member("setUTCMinutes", new builtin_function(date_setutcminutes));
+    o.init_member("setUTCMonth", new builtin_function(date_setutcmonth));
+    o.init_member("setUTCSeconds", new builtin_function(date_setutcseconds));
+    o.init_member("setYear", new builtin_function(date_setyear));
+    o.init_member("toString", new builtin_function(date_tostring));
+    o.init_member("valueOf", new builtin_function(date_valueof));
+}   
 
 static void
 attachDateStaticInterface(as_object& o)
@@ -375,9 +383,10 @@ date_new(const fn_call& fn)
         int year = static_cast<int>(fn.arg(0).to_number());
         
         // GnashTime.year is the value since 1900 (like struct tm)
-        // negative value is a year before 1900
-        // A year between 0 and 99 is the year since 1900
+        // negative value is a year before 1900. A year between 0
+        // and 99 is the year since 1900 (which is the same arithmetic).
         if (year < 100) gt.year = year;
+
         // A value of 100 or more is a full year and must be
         // converted to years since 1900
         else gt.year = year - 1900;
@@ -492,6 +501,7 @@ date_get_proto(date_getmilliseconds, getLocalTime, millisecond)
 // The same functions for universal time.
 //
 date_get_proto(date_getutcfullyear, getUniversalTime, year + 1900)
+date_get_proto(date_getutcyear,     getUniversalTime, year)
 date_get_proto(date_getutcmonth,    getUniversalTime, month)
 date_get_proto(date_getutcdate,     getUniversalTime, monthday)
 date_get_proto(date_getutcday,      getUniversalTime, weekday)
@@ -690,10 +700,7 @@ date_setyear(const fn_call& fn)
         GnashTime gt;
 
         dateToGnashTime(*date, gt, false);
-        gt.year = (int) fn.arg(0).to_number();
-        // tm_year is number of years since 1900, so if they gave a
-        // full year spec, we must adjust it.
-        if (gt.year >= 100) gt.year -= 1900;
+        gt.year = static_cast<int>(fn.arg(0).to_number()) - 1900;
 
         if (fn.nargs >= 2) gt.month = fn.arg(1).to_int();
         if (fn.nargs >= 3) gt.monthday = fn.arg(2).to_int();
@@ -918,8 +925,8 @@ _date_setseconds(const fn_call& fn, bool utc)
         if (fn.nargs >= 2) gt.millisecond = fn.arg(1).to_int();
         if (fn.nargs > 2) {
             IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Date.setMinutes was called with more than three arguments"));
-        )
+                log_aserror(_("Date.setMinutes was called with more than three arguments"));
+            )
         }
 
         // This is both setSeconds and setUTCSeconds.
@@ -930,7 +937,7 @@ _date_setseconds(const fn_call& fn, bool utc)
 }
 
 static as_value
-date_setmilliseconds(const fn_call& fn)
+_date_setmilliseconds(const fn_call& fn, bool utc)
 {
     boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
 
@@ -945,13 +952,22 @@ date_setmilliseconds(const fn_call& fn)
         date->value = NAN;
     }
     else {
-        // Zero the milliseconds and set them from the argument.
-        date->value = date->value - std::fmod(date->value, 1000.0) + fn.arg(0).to_int();
+    
+        GnashTime gt;
+
+        dateToGnashTime(*date, gt, utc);
+        gt.millisecond = static_cast<int>(fn.arg(0).to_number());
+
         if (fn.nargs > 1) {
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("Date.setMilliseconds was called with more than one argument"));
             )
         }
+
+        // This is both setMilliseconds and setUTCMilliseconds.
+        // Use utc to avoid needless worrying about timezones.
+        gnashTimeToDate(gt, *date, utc);
+
     }
     return as_value(date->value);
 }
@@ -968,6 +984,7 @@ local_proto(date)
 local_proto(hours)
 local_proto(minutes)
 local_proto(seconds)
+local_proto(milliseconds)
 #undef local_proto
 
 // The same things for UTC.
@@ -981,6 +998,8 @@ utc_proto(month)
 utc_proto(date)
 utc_proto(hours)
 utc_proto(minutes)
+utc_proto(seconds)
+utc_proto(milliseconds)
 #undef utc_proto
 
 
