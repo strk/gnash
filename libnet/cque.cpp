@@ -240,17 +240,7 @@ CQue::merge(amf::Buffer *start)
 
     // Finally erase all merged elements, and replace with the composite one
     Que::iterator nextIter = _que.erase(from, to);
-
-    // NOTE: nextIter points now right after the last erased
-    // element. Sounds like a good place to put the new merged buffer
-    // to me, but the original code always did push_back so dunno 
-    // what's the correct behaviour
-    //
-    // Next line puts newbuf in place of the removed ones:
-    //
-    //  _que.insert(nextIter, newbuf);
-    //
-    _que.push_back(newbuf.get()); // <-- this is what the old code was doing
+    _que.insert(nextIter, newbuf.get());
 
     return newbuf.release(); // ownership is transferred. TODO: return auto_ptr
 }
