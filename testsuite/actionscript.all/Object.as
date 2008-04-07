@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Object.as,v 1.60 2008/04/07 17:39:52 strk Exp $";
+rcsid="$Id: Object.as,v 1.61 2008/04/07 18:03:46 strk Exp $";
 #include "check.as"
 
 // Test things in Class Object (swf5~swf8)
@@ -723,6 +723,18 @@ xcheck_equals(_root.info.tv, o);
 check_equals(_root.get_l_calls, 0);
 check_equals(_root.set_l_calls, 0);
 
+// if a property did exist already when adding a getter-setter, it's watcher
+// isn't called
+delete _root.info;
+_root.get_l_calls=_root.set_l_calls=0;
+r = o.addProperty("l", get_l, set_l);
+check(r);
+xcheck_equals(typeof(_root.info), 'undefined');
+check_equals(_root.get_l_calls, 0);
+check_equals(_root.set_l_calls, 0);
+r = o.l;
+check_equals(r, 'return from watch');
+
 // Getter/setter is not invoked, but watcher was used to set it's 
 // underlying value, check this:
 v = o.l;
@@ -777,6 +789,6 @@ totals(79);
 #endif
 
 #if OUTPUT_VERSION >= 6
-totals(246);
+totals(251);
 #endif
 

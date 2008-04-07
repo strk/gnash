@@ -1,5 +1,11 @@
 2008-04-07 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Object.as: another test to show
+	  difference in watch triggers calls between adding a getter
+	  setter for an existend or unexistend property.
+
+2008-04-07 Sandro Santilli <strk@keybit.net>
+
 	* server/Property.{cpp,h}: expose interface to set/get "cache" value
 	  (only meaningful for getter-setters)
 	* server/PropertyList.{cpp,h}: (addGetterSetter) takes an additional
