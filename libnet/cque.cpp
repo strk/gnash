@@ -57,7 +57,9 @@ CQue::~CQue()
     boost::mutex::scoped_lock lock(_mutex);
     for (it = _que.begin(); it != _que.end(); it++) {
 	amf::Buffer *ptr = *(it);
-	delete ptr;
+	if (ptr->size()) {	// FIXME: we probably want to delete ptr anyway,
+	    delete ptr;		// but if we do, this will core dump.
+	}
     }
 }
 
@@ -193,45 +195,43 @@ CQue::remove(amf::Buffer *element)
 // Merge sucessive buffers into one single larger buffer. This is for some
 // protocols, than have very long headers.
 amf::Buffer *
-CQue::merge(amf::Buffer *begin)
+CQue::merge(amf::Buffer *start)
 {
     GNASH_REPORT_FUNCTION;
     int totalsize = 0;
     Que::iterator it;
     vector<Que::iterator> elements; // iterators to elements to merge
-    vector<Que::iterator>::iterator eit;
-
+    vector<Que::iterator>::const_iterator eit;
+    Network::byte_t *ptr;
+    bool found = false;
+    
     boost::mutex::scoped_lock lock(_mutex);
+    // Calculate how big the combined buffer needs to be. As all buffers by default
+    // are NETBUFSIZE, we know we're at the end of a merge because the final packet
+    // is less that the default.
     for (it = _que.begin(); it != _que.end(); it++) {
 	amf::Buffer *ptr = *(it);
-	if (totalsize > 0) {
-	    totalsize += ptr->size();
-	    elements.push_back(it); // add this element to the ones to merge
-	    if (ptr->size() < gnash::NETBUFSIZE) {// stop merging here
-		amf::Buffer *newbuf = new amf::Buffer(totalsize);
-		Network::byte_t *tmp = newbuf->reference();
-		amf::Buffer *buf;
-//		_que.insert(elements.begin(), newbuf);
-		for (eit = elements.begin(); eit != elements.end(); eit++) {
- 		    deque<amf::Buffer *>::iterator ita = *(eit);
-		    buf = *(ita);
-		    std::copy(buf->reference(), buf->reference() + buf->size(), tmp);
-		    tmp += buf->size();
-		    _que.erase(ita);
-		}
-		_que.push_back(newbuf);
-		return newbuf;
+	if ((ptr == start) || (found)) {
+	    found = true;
+	    if (ptr->size() == NETBUFSIZE) {
+		totalsize += ptr->size();
+		elements.push_back(it);
+	    } else {		// add the last packet
+		totalsize += ptr->size();
+		elements.push_back(it);
+		break;
 	    }
-	    continue;
 	}
-	if (ptr->reference() == begin->reference()) {
-	    totalsize = ptr->size();
-	    elements.push_back(it);
-	}
-    }
-    return 0;
-}
+    }    
+    amf::Buffer *newbuf = new amf::Buffer(totalsize);
 
+    for (eit = elements.begin(); eit != elements.end(); eit++ ) {
+	newbuf->append(ptr);
+//	_que.erase(*eit);
+    }
+    return newbuf;
+}
+    
 // Dump internal data.
 void
 CQue::dump()

@@ -1,3 +1,13 @@
+2008-04-07  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libnet/cque.cpp: Only delete the pointer if we actually have
+	data. Handle merging differently to eliminate problem with
+	singular interators. Not this fixes the abort, but leaks memory as
+	the original buffers aren't removed from the que like they need to
+	be. This at least get make check working for libnet.all.
+	* testsuite/libamf.all/test_sol.cpp: Don't ehck the bogus data for
+	default camera.
+
 2008-04-07 Sandro Santilli <strk@keybit.net>
 
         * server/as_object.cpp (add_property): invoke the watch trigger

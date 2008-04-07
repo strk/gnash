@@ -74,11 +74,11 @@ Element::Element()
 Element::~Element()
 {
 //    GNASH_REPORT_FUNCTION;
-//     if (_buffer) {
-// 	if (_buffer->size() > 0) {
-// 	    delete _buffer;
-// 	}
-//     }
+    if (_buffer) {
+	if (_buffer->size() > 0) {
+ 	    delete _buffer;
+	}
+    }
     for (size_t i=0; i< _children.size(); i++) {
 	delete _children[i];
     }
@@ -668,7 +668,6 @@ Element::dump()
       case Element::NOTYPE:
 	  break;
       case Element::NUMBER:
-
 	  cerr << to_number() << endl;
 	  break;
       case Element::BOOLEAN:

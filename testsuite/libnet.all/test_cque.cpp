@@ -134,7 +134,7 @@ main (int /*argc*/, char** /*argv*/) {
      Buffer merge1, merge2, merge3;
      size_t i;
      ptr = merge1.reference();
-     for (i=0; i< gnash::NETBUFSIZE; i++) {
+     for (i=0; i<gnash::NETBUFSIZE; i++) {
          ptr[i] = i*'A';
      }
      que.push(&merge1);
