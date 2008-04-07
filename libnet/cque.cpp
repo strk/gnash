@@ -197,39 +197,62 @@ CQue::remove(amf::Buffer *element)
 amf::Buffer *
 CQue::merge(amf::Buffer *start)
 {
-    GNASH_REPORT_FUNCTION;
-    int totalsize = 0;
-    Que::iterator it;
-    vector<Que::iterator> elements; // iterators to elements to merge
-    vector<Que::iterator>::const_iterator eit;
-    Network::byte_t *ptr;
-    bool found = false;
-    
-    boost::mutex::scoped_lock lock(_mutex);
-    // Calculate how big the combined buffer needs to be. As all buffers by default
-    // are NETBUFSIZE, we know we're at the end of a merge because the final packet
-    // is less that the default.
-    for (it = _que.begin(); it != _que.end(); it++) {
-	amf::Buffer *ptr = *(it);
-	if ((ptr == start) || (found)) {
-	    found = true;
-	    if (ptr->size() == NETBUFSIZE) {
-		totalsize += ptr->size();
-		elements.push_back(it);
-	    } else {		// add the last packet
-		totalsize += ptr->size();
-		elements.push_back(it);
-		break;
-	    }
-	}
-    }    
-    amf::Buffer *newbuf = new amf::Buffer(totalsize);
-
-    for (eit = elements.begin(); eit != elements.end(); eit++ ) {
-	newbuf->append(ptr);
-//	_que.erase(*eit);
+    // Find iterator to first element to merge
+    Que::iterator from = std::find(_que.begin(), _que.end(), start); 
+    if ( from == _que.end() ) {
+        // Didn't find the requested Buffer pointer
+        return NULL;
     }
-    return newbuf;
+
+
+    // Find iterator to last element to merge (first with size < NETBUFSIZE)
+    // computing total size with the same scan
+    size_t totalsize = (*from)->size();
+    Que::iterator to=from; ++to;
+    for (Que::iterator e=_que.end(); to!=e; ++to)
+    {
+        size_t sz = (*to)->size();
+        totalsize += sz;
+        if (sz < gnash::NETBUFSIZE) break;
+    }
+    if ( to == _que.end() )
+    {
+        // Didn't find an element ending the merge
+        return NULL;
+    }
+
+    // Merge all elements in a single buffer. We have totalsize now.
+    std::auto_ptr<amf::Buffer> newbuf ( new amf::Buffer(totalsize) );
+    Network::byte_t *tmp = newbuf->reference();
+    ++to;
+    for (Que::iterator i=from; i!=to; ++i)
+    {
+        amf::Buffer *buf = *i;
+        size_t sz = buf->size();
+        std::copy(buf->reference(), buf->reference() + sz, tmp);
+	//
+	// NOTE: If we're the buffer owners, it is safe to delete
+	//       the buffer now.
+	// delete buf;
+	//
+        tmp += sz;
+    }
+
+    // Finally erase all merged elements, and replace with the composite one
+    Que::iterator nextIter = _que.erase(from, to);
+
+    // NOTE: nextIter points now right after the last erased
+    // element. Sounds like a good place to put the new merged buffer
+    // to me, but the original code always did push_back so dunno 
+    // what's the correct behaviour
+    //
+    // Next line puts newbuf in place of the removed ones:
+    //
+    //  _que.insert(nextIter, newbuf);
+    //
+    _que.push_back(newbuf.get()); // <-- this is what the old code was doing
+
+    return newbuf.release(); // ownership is transferred. TODO: return auto_ptr
 }
     
 // Dump internal data.

@@ -1,3 +1,7 @@
+2008-04-07 Sandro Santilli <strk@keybit.net>
+
+	* libnet/cque.cpp: implement safe ::merge method. 
+
 2008-04-07  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* libnet/cque.cpp: Only delete the pointer if we actually have
