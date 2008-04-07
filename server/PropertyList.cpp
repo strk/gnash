@@ -338,9 +338,10 @@ PropertyList::import(const PropertyList& o)
 
 bool
 PropertyList::addGetterSetter(string_table::key key, as_function& getter,
-	as_function* setter, string_table::key nsId)
+	as_function* setter, const as_value& cacheVal, string_table::key nsId)
 {
 	Property a(key, nsId, &getter, setter);
+	a.setCache(cacheVal);
 	a.setOrder(- ++mDefaultOrder - 1);
 
 	container::iterator found = iterator_find(_props, key, nsId);

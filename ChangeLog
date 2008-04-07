@@ -1,5 +1,18 @@
 2008-04-07 Sandro Santilli <strk@keybit.net>
 
+	* server/Property.{cpp,h}: expose interface to set/get "cache" value
+	  (only meaningful for getter-setters)
+	* server/PropertyList.{cpp,h}: (addGetterSetter) takes an additional
+	  value to set the cache value
+	* server/as_object.cpp: don't unwatch existing getter-setters, use
+	  cache setter-getters for passing and using return of triggers on
+	  values.
+	* testsuite/actionscript.all/Object.as: average of 9 successes.
+	* testsuite/swfdec/PASSING: object-watch-6.swf succeeds (7 and 8
+	  still fail).
+
+2008-04-07 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Object.as: test that a watch trigger is
 	  sticky once a getter-setter is being watched.
 

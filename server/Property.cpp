@@ -53,7 +53,7 @@ Property::setDelayedValue(as_object& this_ptr, const as_value& value)
 	env.push(value); 
 	fn_call fn(&this_ptr, &env, 1, 0);
 	a->set(fn);
-
+	a->setCache(value);
 }
 
 void
@@ -136,6 +136,75 @@ GetterSetter::UserDefinedGetterSetter::set(fn_call& fn)
 	}
 
 	(*mSetter)(fn);
+}
+
+as_value
+Property::getValue(const as_object& this_ptr) const
+{
+	switch (mBound.which())
+	{
+	case 0: // blank, nothing to do.
+		return as_value();
+	case 1: // Bound value
+		return boost::get<as_value>(mBound);
+	case 2: // Getter/setter
+		return getDelayedValue(this_ptr);
+	} // end of switch
+	return as_value(); // Not reached.
+}
+
+const as_value&
+Property::getCache() const
+{
+	static as_value undefVal;
+
+	switch (mBound.which())
+	{
+	case 0: // blank, nothing to do.
+		return undefVal;
+	case 1: // Bound value
+		return boost::get<as_value&>(mBound);
+	case 2: // Getter/setter
+		return boost::get<GetterSetter&>(mBound).getCache();
+	} // end of switch
+	return undefVal; // not reached
+}
+
+void
+Property::setValue(as_object& this_ptr, const as_value &value)
+{
+	switch (mBound.which())
+	{
+	case 0: // As yet unbound, so make it a simple
+	case 1: // Bound value, set. Trust our callers to check read-only.
+		mBound = value;
+		return;
+	case 2: // Getter/setter
+		// Destructive are always overwritten.
+		if (mDestructive)
+		{
+			mDestructive = false;
+			mBound = value;
+		}
+		else
+			setDelayedValue(this_ptr, value);
+		return;
+	}
+}
+
+void
+Property::setCache(const as_value &value)
+{
+	switch (mBound.which())
+	{
+	case 0: // As yet unbound, so make it a simple
+	case 1: // Bound value, set. Trust our callers to check read-only.
+		mBound = value;
+		return;
+	case 2: // Getter/setter
+		boost::get<GetterSetter&>(mBound).setCache(value);
+		return;
+	}
 }
 
 } // namespace gnash

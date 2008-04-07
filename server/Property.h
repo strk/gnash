@@ -84,6 +84,32 @@ public:
 		}
 	}
 
+	/// Set the cache value (for user-defined getter-setters)
+	void setCache(const as_value& v)
+	{
+		switch ( _getset.which() )
+		{
+			case 0: // user-defined
+				boost::get<UserDefinedGetterSetter>(_getset).setUnderlying(v);
+				break;
+			case 1: // native 
+				// nothing to do for native
+				break;
+		}
+	}
+
+	/// Get the cache value (for user-defined getter-setters)
+	const as_value& getCache() const
+	{
+		switch ( _getset.which() )
+		{
+			case 0: // user-defined
+				return boost::get<UserDefinedGetterSetter>(_getset).getUnderlying();
+		}
+		static as_value undefVal;
+		return undefVal;
+	}
+
 	/// Set a user-defined getter
 	void setGetter(as_function* fun)
 	{
@@ -128,6 +154,12 @@ private:
 
 		/// Invoke the setter
 		void set(fn_call& fn);
+
+		/// Get the underlying value
+		const as_value& getUnderlying() const { return underlyingValue; }
+
+		/// Set the underlying value
+		void setUnderlying(const as_value& v) { underlyingValue=v; }
 
 		/// Set the setter
 		void setSetter(as_function* setter) { mSetter = setter; }
@@ -324,19 +356,27 @@ public:
 	///
 	/// @return the value of this property
 	///
-	as_value getValue(const as_object& this_ptr) const
-	{
-		switch (mBound.which())
-		{
-		case 0: // blank, nothing to do.
-			return as_value();
-		case 1: // Bound value
-			return boost::get<as_value>(mBound);
-		case 2: // Getter/setter
-			return getDelayedValue(this_ptr);
-		} // end of switch
-		return as_value(); // Not reached.
-	}
+	as_value getValue(const as_object& this_ptr) const;
+
+	/// Get internal cached value of this property
+	//
+	/// For simple properties, this is the usual value;
+	/// for user-defined getter-setter this is a cached value
+	/// to watch for infinitely recurse on calling the getter
+	/// or setter; Native getter-setter has no cache,
+	/// undefined will be returned for them.
+	///
+	const as_value& getCache() const;
+
+	/// Set internal cached value of this property
+	//
+	/// For simple properties, this is the usual value;
+	/// for user-defined getter-setter this is a cached value
+	/// to watch for infinitely recurse on calling the getter
+	/// or setter; Native getter-setter has no cache,
+	/// nothing would happen for them.
+	///
+	void setCache(const as_value& v);
 
 	/// Set value of this property
 	//
@@ -354,26 +394,7 @@ public:
 	///	argument of the 'setter' function if this is a Getter/Setter
 	///	property. @see isGetterSetter().
 	///
-	void setValue(as_object& this_ptr, const as_value &value)
-	{
-		switch (mBound.which())
-		{
-		case 0: // As yet unbound, so make it a simple
-		case 1: // Bound value, set. Trust our callers to check read-only.
-			mBound = value;
-			return;
-		case 2: // Getter/setter
-			// Destructive are always overwritten.
-			if (mDestructive)
-			{
-				mDestructive = false;
-				mBound = value;
-			}
-			else
-				setDelayedValue(this_ptr, value);
-			return;
-		}
-	}
+	void setValue(as_object& this_ptr, const as_value &value);
 
 	/// Set the order id
 	//

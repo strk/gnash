@@ -279,11 +279,15 @@ public:
 	///	A function to invoke when setting this property's value.
 	///	add_ref will be called on the function.
 	///
+	/// @param cacheVal
+	///	The value to use as a cache. If null uses any cache
+	///	from pre-existing property with same name.
+	///
 	/// @return true if the property was successfully added, false
 	///         otherwise (property already existent?)
 	///
 	bool addGetterSetter(string_table::key key, as_function& getter,
-		as_function* setter, string_table::key ns = 0);
+		as_function* setter, const as_value& cacheVal, string_table::key ns=0);
 
 	/// \brief
 	/// Add a getter/setter property, if not already existing

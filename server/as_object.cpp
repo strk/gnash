@@ -161,10 +161,41 @@ as_object::add_property(const std::string& name, as_function& getter,
 	string_table &st = _vm.getStringTable();
 	string_table::key k = st.find(name);
 
-	// TODO: if the named property already exist, store it's value
-	//       into the getter-setter as "underlying value"
+	as_value cacheVal;
 
-	return _members.addGetterSetter(k, getter, setter);
+	Property* prop = _members.getProperty(k);
+	if ( prop ) cacheVal = prop->getCache();
+
+
+	bool ret = _members.addGetterSetter(k, getter, setter, cacheVal);
+
+	if (!ret) return false;
+
+#if 0
+	// check if we have a trigger, if so, invoke it
+	// and set val to it's return
+	TriggerContainer::iterator trigIter = _trigs.find(std::make_pair(k, 0));
+	if ( trigIter != _trigs.end() )
+	{
+		Trigger& trig = trigIter->second;
+
+		log_debug("add_property: property %s is being watched, current val: %s", name, cacheVal.to_debug_string());
+		cacheVal = trig.call(cacheVal, as_value(), *this);
+
+		// The trigger call could have deleted the property,
+		// so we check for its existance again, and do NOT put
+		// it back in if it was deleted
+		prop = _members.getProperty(k);
+		if ( ! prop )
+		{
+			log_debug("Property %s deleted by trigger on create (getter-setter)", name);
+			return false; // or true ?
+		}
+		prop->setValue(*this, cacheVal);
+	}
+#endif
+
+	return ret;
 }
 
 bool
@@ -537,9 +568,10 @@ as_object::set_member_default(string_table::key key, const as_value& val,
 				// WARNING: getValue might itself invoke a trigger
 				// (getter-setter)... ouch ?
 				// TODO: in this case, return the underlying value !
-				as_value curVal = prop->getValue(*this); 
+				as_value curVal = prop->getCache(); // getValue(*this); 
 
-				log_debug("Property %s is being watched, current val: %s", _vm.getStringTable().value(key), curVal.to_debug_string());
+				log_debug("Existing property %s is being watched: firing trigger on update (current val:%s, new val:%s)",
+					_vm.getStringTable().value(key), curVal.to_debug_string(), val.to_debug_string());
 				as_value newVal = trig.call(curVal, val, *this);
 				// The trigger call could have deleted the property,
 				// so we check for its existance again, and do NOT put
@@ -550,7 +582,8 @@ as_object::set_member_default(string_table::key key, const as_value& val,
 					log_debug("Property %s deleted by trigger on update", _vm.getStringTable().value(key));
 					return;
 				}
-				prop->setValue(*this, newVal);
+				//if ( prop->isGetterSetter() ) prop->setCache(newVal); 
+				prop->setValue(*this, newVal); 
 			}
 			else
 			{
@@ -640,8 +673,10 @@ as_object::update_member(string_table::key key, const as_value& val,
 			{
 				Trigger& trig = trigIter->second;
 				// WARNING: getValue might itself invoke a trigger (getter-setter)... ouch ?
-				as_value curVal = prop->getValue(*this); 
-				log_debug("Property %s is being watched, current val: %s", _vm.getStringTable().value(key), curVal.to_debug_string());
+				as_value curVal = prop->getCache(); // Value(*this); 
+				log_debug("Property %s is being watched: firing trigger on update (current val:%s, new val:%s",
+					_vm.getStringTable().value(key),
+					curVal.to_debug_string(), val.to_debug_string());
 				newVal = trig.call(curVal, val, *this);
 				// The trigger call could have deleted the property,
 				// so we check for its existance again, and do NOT put
@@ -1365,7 +1400,17 @@ bool
 as_object::unwatch(string_table::key key, string_table::key ns)
 {
 	TriggerContainer::iterator trigIter = _trigs.find(std::make_pair(key, ns));
-	if ( trigIter == _trigs.end() ) return false;
+	if ( trigIter == _trigs.end() )
+	{
+		log_debug("No watch for property %s", getVM().getStringTable().value(key));
+		return false;
+	}
+	Property* prop = _members.getProperty(key, ns);
+	if ( prop && prop->isGetterSetter() )
+	{
+		log_debug("Watch on %s not removed (is a getter-setter)", getVM().getStringTable().value(key));
+		return false;
+	}
 	_trigs.erase(trigIter);
 	return true;
 }

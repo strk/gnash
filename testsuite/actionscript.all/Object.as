@@ -21,7 +21,7 @@
 // execute it like this gnash -1 -r 0 -v out.swf
 
 
-rcsid="$Id: Object.as,v 1.59 2008/04/07 17:09:40 strk Exp $";
+rcsid="$Id: Object.as,v 1.60 2008/04/07 17:39:52 strk Exp $";
 #include "check.as"
 
 // Test things in Class Object (swf5~swf8)
@@ -296,7 +296,7 @@ check_equals(test_set_calls, 0);
 #else
  xcheck_equals(test_get_calls, 65); // urgh ! :)
 #endif
-xcheck_equals(v, 5); // underlying value was initializied to existing prop
+check_equals(v, 5); // underlying value was initializied to existing prop
 test_set_calls=test_get_calls=0;
 o.test = 16; // should change underlying as well I guess
 check_equals(test_get_calls, 0);
@@ -314,7 +314,7 @@ check_equals(test_set_calls, 0); // .. to fetch underlying var
 test_set_calls=test_get_calls=0;
 v = o.test;
 // got underlying value from previous getter-setter
-xcheck_equals(v, 16);
+check_equals(v, 16);
 #if OUTPUT_VERSION < 7
  check_equals(test_get_calls, 1);
 #else
@@ -507,11 +507,11 @@ noset_setter_calls=0;
 o.test = 2;
 check_equals(noset_setter_calls, 1);
 v = o.test;
-xcheck_equals(v, 2); // did still set the cache
+check_equals(v, 2); // did still set the cache
 o.test = 5;
 check_equals(noset_setter_calls, 2);
 v = o.test;
-xcheck_equals(v, 5);
+check_equals(v, 5);
 
 // test setter visibility of value (multiplies * 2)
 timetwo_test_setter = function(v) {
@@ -523,10 +523,10 @@ o.test = 1;
 o.addProperty("test", simple_test_getter, timetwo_test_setter);
 o.test = 2;
 v = o.test;
-xcheck_equals(v, 2);
+check_equals(v, 2);
 o.test = 5;
 v = o.test;
-xcheck_equals(v, 5);
+check_equals(v, 5);
 
 
 // Object.addProperty wasn't in SWF5
@@ -737,22 +737,22 @@ o.l = 'ciao'; // watched, and invokes setter
   xcheck_equals(_root.info.nv, 'ciao'); // we requested this
   check_equals(_root.info.d, 'cust2'); 
   check_equals(_root.info.tv, o); 
-  xcheck_equals(_root.get_l_calls, 0); // should get underlying value, not invoke getter
+  check_equals(_root.get_l_calls, 0); // should get underlying value, not invoke getter
   check_equals(_root.set_l_calls, 1);
 #else
   xcheck_equals(_root.info.ov, 'return from watch'); // old value
   check_equals(_root.info.nv, 'return from watch'); // mmm ?
   check_equals(_root.info.d, 'cust2'); 
   check_equals(_root.info.tv, o); 
-  xcheck_equals(_root.get_l_calls, 0); // should get underlying value, not invoke getter
+  check_equals(_root.get_l_calls, 0); // should get underlying value, not invoke getter
   xcheck_equals(_root.set_l_calls, 65);
 #endif
 
 r = o.unwatch("l");
-xcheck(!r); // can't unwatch while the property is a getter-setter
+check(!r); // can't unwatch while the property is a getter-setter
 check(delete o.l);
 r = o.unwatch("l");
-xcheck(r); // now we can unwatch.. (gnash fails as it removed the watch before)
+check(r); // now we can unwatch.. (gnash fails as it removed the watch before)
 
 // TODO: watch a getter-setter in the inheritance chain
 
