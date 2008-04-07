@@ -546,13 +546,24 @@ NetStreamGst::handleMessage (GstMessage *message)
     {
       GstTagList* taglist;
 
-      gst_message_parse_tag(message, &taglist);      
+      gst_message_parse_tag(message, &taglist);
+      
+      gchar* value;
+      if (!gst_tag_list_get_string(taglist, "___function_name___", &value)) {
+        break;
+      }
+      
+      std::string funcname(value);
+      g_free(value);
+      
+      gst_tag_list_remove_tag (taglist, "___function_name___");
+
         
-      boost::intrusive_ptr<as_object> o = new as_object(getObjectInterface());
+      as_object* o = new as_object(getObjectInterface());
 
-      gst_tag_list_foreach(taglist, metadata, o.get());
+      gst_tag_list_foreach(taglist, metadata, o);
 
-      processMetaData(o);
+      processNotify(funcname, o);
       
       g_free(taglist);
       break;

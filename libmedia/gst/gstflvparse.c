@@ -334,14 +334,25 @@ gst_flv_parse_tag_script (GstFLVDemux * demux, const guint8 * data,
 
     GST_LOG_OBJECT (demux, "function name is %s", function_name);
 
-    if (!strcmp (function_name, "onMetaData")) {
+    if (TRUE) {
       guint32 nb_elems = 0;
       gboolean end_marker = FALSE;
 
       GST_DEBUG_OBJECT (demux, "we have a metadata script object");
+      
+      if (!gst_tag_exists ("___function_name___")) {
+        gst_tag_register ("___function_name___", GST_TAG_FLAG_META, G_TYPE_STRING,
+                          "___function_name___", "___function_name___", 
+                          gst_tag_merge_strings_with_comma);
+      }
 
-      /* Jump over the onMetaData string and the array indicator */
-      offset += 13;
+      if (gst_tag_get_type ("___function_name___") == G_TYPE_STRING) {
+        gst_tag_list_add (demux->taglist, GST_TAG_MERGE_REPLACE,
+                          "___function_name___", function_name, NULL);
+      }
+
+      /* Jump over the function_name string and the array indicator */
+      offset += strlen(function_name) + 3;
 
       nb_elems = GST_READ_UINT32_BE (data + offset);
 

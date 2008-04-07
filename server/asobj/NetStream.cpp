@@ -36,6 +36,8 @@
 #include "NetConnection.h"
 #include "render.h"	// for gnash::render::videoFrameFormat()
 #include "Object.h" // for getObjectInterface
+#include "VM.h"
+#include <boost/algorithm/string/case_conv.hpp> // for PROPNAME
 #include "namedStrings.h"
 #include "movie_root.h"
 
@@ -469,7 +471,7 @@ void netstream_class_init(as_object& global)
 
 
 void
-NetStream::processMetaData(boost::intrusive_ptr<as_object>& metadata_obj)
+NetStream::processNotify(const std::string& funcname, as_object* info_obj)
 {
 	// TODO: check for System.onStatus too ! use a private getStatusHandler() method for this.
 
@@ -477,7 +479,9 @@ NetStream::processMetaData(boost::intrusive_ptr<as_object>& metadata_obj)
   log_debug(" Invoking onMetaData");
 #endif
 
-	callMethod(NSV::PROP_ON_META_DATA, as_value(metadata_obj.get()));
+        string_table::key func = getVM().getStringTable().find(PROPNAME(funcname));
+
+	callMethod(func, as_value(info_obj));
 }
 
 

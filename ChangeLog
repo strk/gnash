@@ -1,3 +1,10 @@
+2008-04-07 Sandro Santilli <strk@keybit.net>
+
+	* libmedia/gst/gstflvparse.c, server/asobj/NetStream.cpp,
+	  server/asobj/NetStream.h, server/asobj/NetStreamGst.cpp:
+	  Applied bastiaan patch for proper INVOKE tag processing,
+	  will hopefully fix distcheck on gnashdev.
+
 2008-04-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gui.cpp: get_ticks -> getTicks.

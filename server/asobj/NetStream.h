@@ -119,7 +119,7 @@ protected:
 	void processStatusNotifications();
 	
 	
-	void processMetaData(boost::intrusive_ptr<as_object>& metadata_obj);
+	void processNotify(const std::string& funcname, as_object* metadata_obj);
 
 	/// The actionscript enviroment for the AS callbacks
 	//
