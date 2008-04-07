@@ -1,5 +1,10 @@
 2008-04-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* testsuite/swfdec/PASSING: update for some new tests
+	  (constant-pool-when-lookup.as)
+
+2008-04-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* server/asobj/Mouse.cpp: expect a return value from Mouse.show and
 	  Mouse.hide callbacks, and return it (as an integer 1 or 0, not a
 	  boolean).
