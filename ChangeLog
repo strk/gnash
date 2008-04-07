@@ -1,5 +1,9 @@
 2008-04-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
+	* gui/gui.cpp: get_ticks -> getTicks.
+
+2008-04-07 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
 	* libbase/Time.{cpp,h}: clean up headers again.
 
 2008-04-06 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>

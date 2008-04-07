@@ -1002,7 +1002,7 @@ Gui::fpsCounterTick()
 	  return;
   }
 
-  boost::uint64_t current_timer = clocktime::get_ticks();
+  boost::uint64_t current_timer = clocktime::getTicks();
 
   // TODO: keep fps_timer_interval in milliseconds to avoid the multiplication
   //       at each fpsCounterTick call...
